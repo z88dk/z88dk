@@ -7,19 +7,20 @@
  *
  *  $Id: read.c,v 1.3 2013-06-06 08:58:32 stefano Exp $
  */
-
-#include <stdio.h>
+ 
 #include <fcntl.h>
+#include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <cpm.h>
 
 
 ssize_t read(int fd, void *buf, size_t len)
 {   
-    unsigned char    buffer[SECSIZE+2];
+    unsigned char buffer[SECSIZE+2];
     unsigned char uid;
     struct fcb *fc;
-    int    cnt,size,offset;
+    size_t cnt,size,offset;
 
     if ( fd >= MAXFILE )
        return -1;
@@ -52,22 +53,25 @@ ssize_t read(int fd, void *buf, size_t len)
 #endif
     case U_READ:
     case U_RDWR:
+        cnt = len;    
         uid = getuid();
-        cnt = len;
+        setuid(fc->uid);
         while ( len ) {
-            setuid(fc->uid);
             offset = fc->rwptr%SECSIZE;
-            if ( ( size = SECSIZE - offset ) > len )
+            if ( ( size = SECSIZE - offset ) > len ) {
                 size = len;
-            _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
+            }
             if ( size == SECSIZE ) {
                 bdos(CPM_SDMA,buf);
                 if ( bdos(CPM_READ,fc) ) {
+                    setuid(uid);
                     return cnt-len;
                 }
             } else {
                 bdos(CPM_SDMA,buffer);
+                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
                 if ( bdos(CPM_RRAN,fc) ) {
+                    setuid(uid);
                     return cnt-len;          
                 }
                 memcpy(buf,buffer+offset,size);
@@ -75,9 +79,8 @@ ssize_t read(int fd, void *buf, size_t len)
             buf += size;
             fc->rwptr += size;
             len -= size;
-            setuid(uid);
         }
-        setuid(uid);
+        setuid(uid);      
         return cnt-len;
         break;
     default:

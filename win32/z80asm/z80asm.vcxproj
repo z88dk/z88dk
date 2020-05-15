@@ -89,7 +89,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src\common;..\..\src\z80asm\lib;..\..\ext\UNIXem\include;..\..\ext\uthash\src;..\..\ext\regex</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\src\z80asm;..\..\src\common;..\..\src\z80asm\lib;..\..\ext\UNIXem\include;..\..\ext\uthash\src;..\..\ext\regex</AdditionalIncludeDirectories>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
@@ -185,7 +185,9 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\common\zutils.c" />
     <ClCompile Include="..\..\src\z80asm\codearea.c" />
+    <ClCompile Include="..\..\src\z80asm\common.c" />
     <ClCompile Include="..\..\src\z80asm\directives.c" />
     <ClCompile Include="..\..\src\z80asm\errors.c" />
     <ClCompile Include="..\..\src\z80asm\error_func.c" />
@@ -218,9 +220,11 @@
     <ClCompile Include="..\..\src\z80asm\z80pass.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\common\zutils.h" />
     <ClInclude Include="..\..\src\config.h" />
     <ClInclude Include="..\..\src\portability.h" />
     <ClInclude Include="..\..\src\z80asm\codearea.h" />
+    <ClInclude Include="..\..\src\z80asm\common.h" />
     <ClInclude Include="..\..\src\z80asm\directives.h" />
     <ClInclude Include="..\..\src\z80asm\errors.h" />
     <ClInclude Include="..\..\src\z80asm\error_func.h" />

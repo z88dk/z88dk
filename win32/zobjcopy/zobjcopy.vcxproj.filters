@@ -18,9 +18,15 @@
     <ClCompile Include="..\..\src\zobjcopy\zobjcopy.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\zutils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\zobjcopy\zobjcopy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\zutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

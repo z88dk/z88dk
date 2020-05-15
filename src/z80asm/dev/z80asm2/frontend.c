@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm restart
-// Copyright (C) Paulo Custodio, 2011-2019
+// Copyright (C) Paulo Custodio, 2011-2020
 // License: http://www.perlfoundation.org/artistic_license_2_0
 // Repository: https://github.com/z88dk/z88dk
 //-----------------------------------------------------------------------------
@@ -11,6 +11,7 @@
 #include "uthash.h"
 #include "utlist.h"
 #include "utstring.h"
+#include "zutils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -343,7 +344,7 @@ static bool scan_hex_or_op(const char** pp, token_t* tok) {
 }
 
 static token_t* scan_text(const char* input) {
-	UT_string* str; utstring_new(str);
+	UT_string* str = utstr_new();
 	utarray_clear(scanner->tokens);
 
 	// scan all input tokens
@@ -379,13 +380,13 @@ static token_t* scan_text(const char* input) {
 		default:
 			if (isident_start (*p)) {						// T_IDENT
 				while (isident(*p)) p++;
-				utstring_set_n(str, ts, p - ts);			// identifier
+				utstr_set_n(str, ts, p - ts);			// identifier
 
 				tok->id = T_IDENT;
-				tok->str = safe_strdup(utstring_body(str));	// make a copy
+				tok->str = safe_strdup(utstr_body(str));	// make a copy
 
-				utstring_toupper(str);						// convert to upper case to lookup keyword
-				tok->keyword = lookup_keyword(utstring_body(str));
+				utstr_toupper(str);						// convert to upper case to lookup keyword
+				tok->keyword = lookup_keyword(utstr_body(str));
 			}
 			else if (isdigit(*p)) {							// T_NUM
 				if (!scan_num(&p, tok)) goto fail;
@@ -395,10 +396,10 @@ static token_t* scan_text(const char* input) {
 			}
 		}
 	}
-	utstring_free(str);
+	utstr_free(str);
 	return (token_t*)utarray_front(scanner->tokens);
 fail:
-	utstring_free(str);
+	utstr_free(str);
 	return NULL;
 }
 
@@ -615,7 +616,7 @@ static bool LABEL(UT_string* label) {
 	else
 		return false;
 
-	utstring_set(label, yy[ident].str);		// get label
+	utstr_set(label, yy[ident].str);		// get label
 	if (yy[ident].keyword)
 		reserved_warning(yy[ident].str);
 	yy += 2;
@@ -1422,27 +1423,27 @@ static bool parse_statement(void) {
 }
 
 static bool parse_line(void) {
-	UT_string* label; utstring_new(label);
+	UT_string* label = utstr_new();
 
 	bool ok = true;
 	if (LABEL(label)) {
-		printf("Define label: %s\n", utstring_body(label));
+		printf("Define label: %s\n", utstr_body(label));
 	}
 	while (yy->id != T_END) {
         if (!parse_statement()) ok = false;
 	}
 	
-	utstring_free(label);
+	utstr_free(label);
 	return ok;
 }
 
 static bool parse_file_1(void) {
-	UT_string* line; utstring_new(line);
+	UT_string* line = utstr_new();
 
 	bool ok = true;
-	while (utstring_fgets(line, input_file)) {
+	while (utstr_fgets(line, input_file)) {
 		line_num++;
-		yy = scan_text(utstring_body(line));
+		yy = scan_text(utstr_body(line));
 		if (!yy)
 			ok = false;
 		else {
@@ -1451,7 +1452,7 @@ static bool parse_file_1(void) {
 		}
 	}
 
-	utstring_free(line);
+	utstr_free(line);
 	return ok;
 }
 
@@ -1486,14 +1487,12 @@ static bool parse_file(const char* filename) {
 bool assemble_file(const char* input_filename) {
 	init();
 
-	UT_string* output_filename; 
-	utstring_new(output_filename);
-	
+	UT_string* output_filename = utstr_new();	
 	remove_ext(output_filename, input_filename); 
-	utstring_printf(output_filename, ".bin");
+	utstr_append(output_filename, ".bin");
 	
-	start_backend(utstring_body(output_filename));
-	utstring_free(output_filename);
+	start_backend(utstr_body(output_filename));
+	utstr_free(output_filename);
 
 	bool ok = parse_file(input_filename);
 

@@ -13,20 +13,29 @@ else
   EXESUFFIX ?=
 endif
 
-CC 	?= gcc
+CC 		?= gcc
 INSTALL ?= install
 CROSS	?= 0
 
-SRCS	:= $(filter-out test.c,$(wildcard *.c))
+SRCS	:= $(filter-out test.c,$(wildcard *.c)) \
+			../../zutils.c \
+			../../../common/die.c \
+			../../../../ext/UNIXem/src/glob.c \
+			../../../../ext/UNIXem/src/dirent.c
 OBJS 	:= $(SRCS:.c=.o)
 DEPENDS	:= $(SRCS:.c=.d)
 
 TARGET 	= $(PROJ)$(EXESUFFIX)
 
+#OPT 	= -pg -O3
 OPT 	= -O3
 
 STD 	= -std=gnu11
-LOCAL_CFLAGS += -I../../../../ext/uthash/src -MMD -g -Wall $(STD) $(OPT)
+LOCAL_CFLAGS += \
+			-I../.. \
+			-I../../../../ext/uthash/src \
+			-I../../../../ext/UNIXem/include \
+			-MMD -Wall $(STD) $(OPT)
 
 .PHONY: all
 

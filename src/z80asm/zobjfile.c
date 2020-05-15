@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2019
+Copyright (C) Paulo Custodio, 2011-2020
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -11,15 +11,17 @@ Handle object file contruction, reading and writing
 
 #include "class.h"
 #include "codearea.h"
-#include "fileutil.h"
+#include "die.h"
 #include "errors.h"
+#include "fileutil.h"
 #include "libfile.h"
-#include "options.h"
 #include "model.h"
-#include "zobjfile.h"
+#include "options.h"
 #include "str.h"
 #include "strutil.h"
-#include "die.h"
+#include "utstring.h"
+#include "zobjfile.h"
+#include "zutils.h"
 
 /*-----------------------------------------------------------------------------
 *   Object header
@@ -50,6 +52,7 @@ static long write_expr(FILE* fp)
 		expr = iter->obj;
 
 		/* store range */
+		range = 0;
 		if (expr->target_name)
 		{
 			target_name = expr->target_name;		/* EQU expression */
@@ -120,6 +123,7 @@ static int write_symbols_symtab(FILE* fp, SymbolHash* symtab)
 		if (scope != 0 && sym->is_touched && sym->type != TYPE_UNKNOWN)
 		{
 			/* type */
+			type = 0;
 			switch (sym->type)
 			{
 			case TYPE_CONSTANT:	type = 'C'; break;
@@ -267,7 +271,7 @@ static bool test_header(FILE* file)
 {
 	char buffer[Z80objhdr_size];
 
-	if (fread(buffer, sizeof(char), Z80objhdr_size, file) == Z80objhdr_size &&
+	if (fread(buffer, 1, Z80objhdr_size, file) == Z80objhdr_size &&
 		memcmp(buffer, Z80objhdr, Z80objhdr_size) == 0
 		)
 		return true;
@@ -316,7 +320,7 @@ void OFile_fini(OFile* self)
 *----------------------------------------------------------------------------*/
 OFile* OFile_read_header(FILE* file, size_t start_ptr)
 {
-	str_t* modname = str_new();
+	UT_string* modname = utstr_new();
 	OFile* self;
 
 	/* check file version */
@@ -340,9 +344,9 @@ OFile* OFile_read_header(FILE* file, size_t start_ptr)
 	/* read module name */
 	fseek(file, start_ptr + self->modname_ptr, SEEK_SET);
 	xfread_bcount_str(modname, file);
-	self->modname = spool_add(str_data(modname));
+	self->modname = spool_add(utstr_body(modname));
 
-	str_free(modname);
+	utstr_free(modname);
 
 	return self;
 }
@@ -446,7 +450,7 @@ ByteArray* read_obj_file_data(const char* filename)
 *	Updates current module name and size, if given object file is valid
 *	Load module name and size, when assembling with -d and up-to-date
 *----------------------------------------------------------------------------*/
-static bool objmodule_loaded_1(const char* obj_filename, str_t* section_name)
+static bool objmodule_loaded_1(const char* obj_filename, UT_string* section_name)
 {
 	int code_size;
 	OFile* ofile;
@@ -470,7 +474,7 @@ static bool objmodule_loaded_1(const char* obj_filename, str_t* section_name)
 
 				/* reserve space in section */
 				xfread_bcount_str(section_name, ofile->file);
-				section = new_section(str_data(section_name));
+				section = new_section(utstr_body(section_name));
 				read_origin(ofile->file, section);
 				section->align = xfread_dword(ofile->file);
 
@@ -491,9 +495,9 @@ static bool objmodule_loaded_1(const char* obj_filename, str_t* section_name)
 
 bool objmodule_loaded(const char* obj_filename)
 {
-	str_t* section_name = str_new();
+	UT_string* section_name = utstr_new();
 	bool ret = objmodule_loaded_1(obj_filename, section_name);
-	str_free(section_name);
+	utstr_free(section_name);
 	return ret;
 }
 
@@ -504,6 +508,17 @@ bool check_object_file(const char* obj_filename)
 		Z80objhdr,
 		error_not_obj_file,
 		error_obj_file_version);
+}
+
+static void no_error_file(const char* filename) {}
+static void no_error_version(const char* filename, int version, int expected) {}
+
+bool check_object_file_no_errors(const char* obj_filename) {
+	return check_obj_lib_file(
+		obj_filename,
+		Z80objhdr,
+		no_error_file,
+		no_error_version);
 }
 
 bool check_obj_lib_file(const char* filename,

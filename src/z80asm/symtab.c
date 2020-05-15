@@ -2,7 +2,7 @@
 Z88-DK Z80ASM - Z80 Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2019
+Copyright (C) Paulo Custodio, 2011-2020
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -13,6 +13,7 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
    see t\developer\benchmark_symtab.t
 */
 
+#include "die.h"
 #include "errors.h"
 #include "listfile.h"
 #include "fileutil.h"
@@ -22,7 +23,7 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 #include "symtab.h"
 #include "str.h"
 #include "z80asm.h"
-#include "die.h"
+#include "zutils.h"
 
 /*-----------------------------------------------------------------------------
 *   Global Symbol Tables
@@ -608,7 +609,7 @@ static void _write_symbol_file(const char *filename, Module *module, bool(*cond)
 				Str_append_sprintf(line, "%s:%d", sym->filename, sym->line_nr);
 			}
 		}
-		cstr_strip(Str_data(line));
+		strstrip(Str_data(line));
 		Str_sync_len(line);
 		fprintf(file, "%s\n", Str_data(line));
 	}

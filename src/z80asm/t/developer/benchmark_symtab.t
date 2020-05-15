@@ -3,7 +3,7 @@
 # Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
-# Copyright (C) Paulo Custodio, 2011-2019
+# Copyright (C) Paulo Custodio, 2011-2020
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #
@@ -14,7 +14,7 @@ use Test::More;
 use List::AllUtils 'uniq';
 require './t/test_utils.pl';
 
-my $objs = "avltree.o lib/alloc.o lib/str.o lib/list.o errors.o error_func.o ../common/strutil.o lib/strhash.o lib/class.o";
+my $objs = "avltree.o lib/alloc.o lib/str.o lib/list.o errors.o error_func.o ../common/strutil.o lib/strhash.o lib/class.o ../common/zutils.o ";
 my $src = "t/data/zx48.asm";
 my @words;
 

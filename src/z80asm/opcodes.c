@@ -2,13 +2,14 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2019
+Copyright (C) Paulo Custodio, 2011-2020
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
 Define CPU opcodes
 */
 
+#include "../portability.h"
 #include "directives.h"
 #include "expr.h"
 #include "codearea.h"
@@ -16,12 +17,7 @@ Define CPU opcodes
 #include "opcodes.h"
 #include "parse.h"
 #include "z80asm.h"
-
 #include <assert.h>
-
-#ifdef _MSC_VER
-#define snprintf _snprintf
-#endif
 
 /* add 1 to 4 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xCB00 */

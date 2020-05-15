@@ -44182,7 +44182,7 @@ _match:
 	break;
 	case 52:
 	{ asm_cond_LABEL(stmt_label);
-     Str_len(name) = cstr_compress_escapes(Str_data(name));
+     Str_len(name) = str_compress_escapes(Str_data(name));
      asm_DEFB_str(Str_data(name), Str_len(name));
      if ( ctx->p->tok == TK_COMMA )
       {( ctx->cs) = 13;goto _again;}
