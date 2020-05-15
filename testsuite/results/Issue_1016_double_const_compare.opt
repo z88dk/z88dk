@@ -15,8 +15,7 @@
 	add	hl,sp
 	call	dldpsh
 	ld	hl,4	;const
-	ld	de,0
-	call	float
+	call	l_int2long_s_float
 	call	dswap
 	call	dlt
 	ld	a,h
