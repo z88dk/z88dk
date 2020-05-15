@@ -17,10 +17,10 @@
 
 ssize_t write(int fd, void *buf, size_t len)
 {
-    char    buffer[SECSIZE+2];
+    unsigned char buffer[SECSIZE+2];
     unsigned char uid;
     struct fcb *fc;
-    int    cnt,size,offset;
+    size_t cnt,size,offset;
 
     if ( fd >= MAXFILE )
     return -1;
@@ -49,12 +49,12 @@ ssize_t write(int fd, void *buf, size_t len)
     case U_WRITE:
     case U_RDWR:
         uid = getuid();
+        setuid(fc->uid);
         while ( len ) {
-            setuid(fc->uid);
             offset = fc->rwptr%SECSIZE;
-            if ( (size = SECSIZE-offset) > len )
+            if ( (size = SECSIZE-offset) > len ) {
                 size = len;
-            _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
+            }
             if ( size == SECSIZE ) {
                 bdos(CPM_SDMA,buf);
                 if ( bdos(CPM_WRIT,fc) ) {
@@ -63,6 +63,7 @@ ssize_t write(int fd, void *buf, size_t len)
                 }
             } else {  /* Not the required size, read in the extent */
                 bdos(CPM_SDMA,buffer);
+                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
                 /* Blank out the buffer to indicate EOF */
                 buffer[0] = 26;         /* ^Z */
                 memcpy(buffer+1,buffer,SECSIZE-1);
@@ -76,7 +77,6 @@ ssize_t write(int fd, void *buf, size_t len)
             buf += size;
             fc->rwptr += size;
             len -= size;
-            setuid(uid);
         }
         setuid(uid);
         return cnt-len;
