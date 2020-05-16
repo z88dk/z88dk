@@ -115,6 +115,9 @@ typedef short half_t;           /* IEEE16 half float type */
 #define HUGE_NEG_F             (float)-1.7014118346E+38
 #define TINY_NEG_F             (float)-1.1754943508E-38
 
+#define INFINITY_POS_F         ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F         ((unsigned long)0xFF800000)
+
 #define MAXL2_F                ((float)+127.999999914)
 #define MINL2_F                ((float)-126.0)
 #define MAXLOG_F               ((float)+88.722839052)
@@ -131,8 +134,8 @@ typedef short half_t;           /* IEEE16 half float type */
 #define HUGE_NEG_HF            (short)0xFBFF        /*  -6.5504E+4 */
 #define TINY_NEG_HF            (short)0x8400        /*  -6.1035E-5 */
 
-#define INF_POS_HF             (short)0x7C00
-#define INF_NEG_HF             (short)0xFC00
+#define INFINITY_POS_HF        (short)0x7C00
+#define INFINITY_NEG_HF        (short)0xFC00
 
 #define MAXL2_HF               (short)0x4BFF        /*  +15.99    */
 #define MINL2_HF               (short)0xCB00        /*  -14.00    */
@@ -210,6 +213,7 @@ extern double_t __LIB__ ldexp_callee(double_t x,int exp) __smallc __z88dk_callee
 #define ldexp(a,b) ldexp_callee(a,b)
 
 
+#define scalbn(x,pw2) ldexp(x,pw2)
 
 extern double_t __LIB__ log(double_t x) __smallc __z88dk_fastcall;
 
@@ -224,17 +228,6 @@ extern double_t __LIB__ log2(double_t x) __smallc __z88dk_fastcall;
 
 
 extern double_t __LIB__ logb(double_t x) __smallc __z88dk_fastcall;
-
-
-
-extern double_t __LIB__ scalbn(double_t x,int n) __smallc;
-extern double_t __LIB__ scalbn_callee(double_t x,int n) __smallc __z88dk_callee;
-#define scalbn(a,b) scalbn_callee(a,b)
-
-
-extern double_t __LIB__ scalbln(double_t x,int n) __smallc;
-extern double_t __LIB__ scalbln_callee(double_t x,int n) __smallc __z88dk_callee;
-#define scalbln(a,b) scalbln_callee(a,b)
 
 
 
@@ -513,6 +506,7 @@ extern half_t __LIB__ f16_ldexp_callee(half_t x,int exp) __smallc __z88dk_callee
 #define f16_ldexp(a,b) f16_ldexp_callee(a,b)
 
 
+#define scalbn(x,pw2) ldexp(x,pw2)
 
 extern half_t __LIB__ f16_log(half_t x) __smallc __z88dk_fastcall;
 
@@ -527,17 +521,6 @@ extern half_t __LIB__ f16_log2(half_t x) __smallc __z88dk_fastcall;
 
 
 extern half_t __LIB__ f16_logb(half_t x) __smallc __z88dk_fastcall;
-
-
-
-extern half_t __LIB__ f16_scalbn(half_t x,int n) __smallc;
-extern half_t __LIB__ f16_scalbn_callee(half_t x,int n) __smallc __z88dk_callee;
-#define f16_scalbn(a,b) f16_scalbn_callee(a,b)
-
-
-extern half_t __LIB__ f16_scalbln(half_t x,int n) __smallc;
-extern half_t __LIB__ f16_scalbln_callee(half_t x,int n) __smallc __z88dk_callee;
-#define f16_scalbln(a,b) f16_scalbln_callee(a,b)
 
 
 

@@ -27,6 +27,11 @@ typedef double double_t;
 #endif
 #endif
 
+#ifndef _HALF_FLOAT_T
+#define _HALF_FLOAT_T
+typedef short half_t;           /* IEEE16 half float type */
+#endif
+
 #ifndef _SIZE_T
 #define _SIZE_T
 typedef unsigned int size_t;

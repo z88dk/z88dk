@@ -80,7 +80,7 @@ ssize_t read(int fd, void *buf, size_t len)
             fc->rwptr += size;
             len -= size;
         }
-        setuid(uid);      
+        setuid(uid);
         return cnt-len;
         break;
     default:

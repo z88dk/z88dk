@@ -113,6 +113,9 @@ typedef short half_t;           /* IEEE16 half float type */
 #define HUGE_NEG_F             (float)-1.7014118346E+38
 #define TINY_NEG_F             (float)-1.1754943508E-38
 
+#define INFINITY_POS_F         ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F         ((unsigned long)0xFF800000)
+
 #define MAXL2_F                ((float)+127.999999914)
 #define MINL2_F                ((float)-126.0)
 #define MAXLOG_F               ((float)+88.722839052)
@@ -129,8 +132,8 @@ typedef short half_t;           /* IEEE16 half float type */
 #define HUGE_NEG_HF            (short)0xFBFF        /*  -6.5504E+4 */
 #define TINY_NEG_HF            (short)0x8400        /*  -6.1035E-5 */
 
-#define INF_POS_HF             (short)0x7C00
-#define INF_NEG_HF             (short)0xFC00
+#define INFINITY_POS_HF        (short)0x7C00
+#define INFINITY_NEG_HF        (short)0xFC00
 
 #define MAXL2_HF               (short)0x4BFF        /*  +15.99    */
 #define MINL2_HF               (short)0xCB00        /*  -14.00    */
@@ -164,15 +167,13 @@ __DPROTO(,,double_t,,expm1,double_t x)
 __DPROTO(,,double_t,,frexp,double_t value,int *exp)
 __DPROTO(,,int,,ilogb,double_t x)
 __DPROTO(,,double_t,,ldexp,double_t x,int exp)
+#define scalbn(x,pw2) ldexp(x,pw2)
 
 __DPROTO(,,double_t,,log,double_t x)
 __DPROTO(,,double_t,,log10,double_t x)
 __DPROTO(,,double_t,,log1p,double_t x)
 __DPROTO(,,double_t,,log2,double_t x)
 __DPROTO(,,double_t,,logb,double_t x)
-
-__DPROTO(,,double_t,,scalbn,double_t x,int n)
-__DPROTO(,,double_t,,scalbln,double_t x,int n)
 
 __DPROTO(,,double_t,,fabs,double_t x)
 __DPROTO(,,double_t,,hypot,double_t x,double_t y)
@@ -263,15 +264,13 @@ __DPROTO(,,half_t,,f16_expm1,half_t x)
 __DPROTO(,,half_t,,f16_frexp,half_t value,int *exp)
 __DPROTO(,,int,,f16_ilogb,half_t x)
 __DPROTO(,,half_t,,f16_ldexp,half_t x,int exp)
+#define scalbn(x,pw2) ldexp(x,pw2)
 
 __DPROTO(,,half_t,,f16_log,half_t x)
 __DPROTO(,,half_t,,f16_log10,half_t x)
 __DPROTO(,,half_t,,f16_log1p,half_t x)
 __DPROTO(,,half_t,,f16_log2,half_t x)
 __DPROTO(,,half_t,,f16_logb,half_t x)
-
-__DPROTO(,,half_t,,f16_scalbn,half_t x,int n)
-__DPROTO(,,half_t,,f16_scalbln,half_t x,int n)
 
 __DPROTO(,,half_t,,f16_fabs,half_t x)
 __DPROTO(,,half_t,,f16_hypot,half_t x,half_t y)

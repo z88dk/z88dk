@@ -8,7 +8,9 @@
 
 /* $Id: math.h,v 1.18 2016-07-16 22:00:08 dom Exp $ */
 
-#ifdef __MATH_MATH32
+#ifdef __MATH_MATH16
+#include <math/math_math16.h>
+#elif __MATH_MATH32
 #include <math/math_math32.h>
 #elif __MATH_MBF32
 #include <math/math_mbf32.h>
