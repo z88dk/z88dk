@@ -28,9 +28,9 @@
 
 SECTION code_fp_math16
 
-PUBLIC _f16_neg
+PUBLIC asm_f16_neg
 
-_f16_neg:
+asm_f16_neg:
     ld a,0x80
     xor h
     ld h,a

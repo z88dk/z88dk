@@ -13,25 +13,25 @@
 SECTION code_clib
 SECTION code_fp_math16
 
-PUBLIC _f16_float8
-PUBLIC _f16_float16
-PUBLIC _f16_float32
+PUBLIC asm_f16_float8
+PUBLIC asm_f16_float16
+PUBLIC asm_f16_float32
 
-PUBLIC _f16_float8u
-PUBLIC _f16_float16u
-PUBLIC _f16_float32u
+PUBLIC asm_f16_float8u
+PUBLIC asm_f16_float16u
+PUBLIC asm_f16_float32u
 
-EXTERN _f16_fsnormalize
+EXTERN asm_f16_fsnormalize
 
 ; convert signed char in l to float in dehl
-._f16_float8
+.asm_f16_float8
     ld a,l
     rla                         ; sign bit of a into C
     sbc a,a
     ld h,a                      ; now hl is sign extended
 
 ; convert integer in hl to float in dehl
-._f16_float16
+.asm_f16_float16
     ex de,hl                    ; integer to de
     ld a,d                      ; sign
     rla                         ; get sign to C
@@ -39,7 +39,7 @@ EXTERN _f16_fsnormalize
     ex de,hl                    ; dehl
 
 ; now convert long in dehl to float in dehl
-._f16_float32
+.asm_f16_float32
     ex de,hl                    ; hlde
     ld b,h                      ; to hold the sign, put copy of ULSW into b
     bit 7,h                     ; test sign, negate if negative
@@ -59,15 +59,15 @@ EXTERN _f16_fsnormalize
     ret
 
 ; convert character in l to float in dehl
-._f16_float8u
+.asm_f16_float8u
     ld h,0
 
 ; convert unsigned in hl to float in dehl
-._f16_float16u                  
+.asm_f16_float16u                  
     ld de,0
 
 ; convert unsigned long in dehl to float in dehl
-._f16_float32u                  
+.asm_f16_float32u                  
     res 7,d                     ; ensure unsigned long's "sign" bit is reset
     ld b,d                      ; to hold the sign, put copy of MSB into b
                                 ; continue, with unsigned long number in dehl
@@ -81,7 +81,7 @@ EXTERN _f16_fsnormalize
     jr NZ,dldfright             ; go shift right
 ; exponent in c, sign in b[7]
     ex af,af                    ; set carry off
-    jp _f16_fsnormalize          ; piggy back on existing code in _fsnormalize
+    jp asm_f16_fsnormalize          ; piggy back on existing code in _fsnormalize
 
 ; must shift right to make h = 0 and mantissa in lde
 .dldfright

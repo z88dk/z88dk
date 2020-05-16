@@ -28,12 +28,12 @@
 
 SECTION code_fp_math16
 
-EXTERN _f16_isunordered
+EXTERN asm_f16_isunordered
 
-PUBLIC _f16_islessgreater
+PUBLIC asm_f16_islessgreater
 
-_f16_islessgreater:
-    call _f16_isunordered
+asm_f16_islessgreater:
+    call asm_f16_isunordered
     ld a,1
     xor l
     ld l,a

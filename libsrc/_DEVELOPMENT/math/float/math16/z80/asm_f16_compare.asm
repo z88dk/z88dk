@@ -28,14 +28,14 @@
 
 SECTION code_fp_math16
 
-PUBLIC _f16_compare
+PUBLIC asm_f16_compare
 
 ; input hl as A, de as B
 ; return bit 0,a = A > B;
 ; return bit 1,a = A == B
 ; return bit 2,a = A < B;
 
-_f16_compare:
+asm_f16_compare:
     ld bc,0x7C7F
     ld a,h
     and c

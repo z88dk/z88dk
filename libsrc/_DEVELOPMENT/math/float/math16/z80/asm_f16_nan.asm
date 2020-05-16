@@ -28,9 +28,9 @@
 
 SECTION code_fp_math16
 
-PUBLIC _f16_nan
+PUBLIC asm_f16_nan
 
-_f16_nan:
+asm_f16_nan:
     ld hl,0x7FFF
     ret
 

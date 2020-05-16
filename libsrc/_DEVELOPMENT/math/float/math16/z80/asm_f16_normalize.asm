@@ -1,17 +1,21 @@
 ;
-;  feilipu, 2019 May
+;  feilipu, 2020 May
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_fsnormalize32 - z80, z180, z80n unpacked normalisation code
+; asm_f16_normalize - z80, z180, z80n unpacked normalisation code
 ;-------------------------------------------------------------------------
 ;
 ;    unpacked format: mantissa= dehl, exponent in b, sign in c[7]
 ;    return normalized result also in unpacked format
 ;
+;    unpacked floating point format:
+;              exponent right justified in d, sign in d[7], mantissa in ehl
+;    dehl =  s00eeeeee 1mmmmmmm mmmmmmmm mmmmmmmm
+;    return normalized result also in unpacked format
 ;
 ;-------------------------------------------------------------------------
 ; FIXME clocks
@@ -20,10 +24,10 @@
 SECTION code_clib
 SECTION code_math
 
-PUBLIC m32_fsnormalize32
+PUBLIC asm_f16_normalize
 
 
-.m32_fsnormalize32
+.asm_f16_normalize
     xor a
     or a,d
     jr Z,fa8a

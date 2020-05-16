@@ -28,12 +28,12 @@
 
 SECTION code_fp_math16
 
-EXTERN _f16_compare
+EXTERN asm_f16_compare
 
-PUBLIC _f16_isgreaterequal
+PUBLIC asm_f16_isgreaterequal
 
-_f16_isgreaterequal:
-    call _f16_compare
+asm_f16_isgreaterequal:
+    call asm_f16_compare
     sbc hl,de
     ld hl,0
     ccf

@@ -28,9 +28,9 @@
 
 SECTION code_fp_math16
 
-PUBLIC _f16_inf
+PUBLIC asm_f16_inf
 
-_f16_inf:
+asm_f16_inf:
     ld hl,0x7C00
     ex af,af'
     or h

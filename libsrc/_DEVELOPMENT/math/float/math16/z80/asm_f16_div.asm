@@ -28,15 +28,15 @@
 
 SECTION code_fp_math16
 
-EXTERN _f16_inf
-EXTERN _f16_nan
+EXTERN asm_f16_inf
+EXTERN asm_f16_nan
 
-EXTERN _f16_calc_ax_bx_mantissa_and_sign
+EXTERN asm_f16_calc_ax_bx_mantissa_and_sign
 
-PUBLIC _f16_div
+PUBLIC asm_f16_div
 
-_f16_div:
-    call _f16_calc_ax_bx_mantissa_and_sign
+asm_f16_div:
+    call asm_f16_calc_ax_bx_mantissa_and_sign
     jp z,div_handle_inf_or_nan
     sub b   ; new_exp = ax + bx - 15
     add 15
@@ -93,7 +93,7 @@ div_denorm_shift:
 div_exp_positive:
     ld a,30
     cp b
-    jp c,_f16_inf
+    jp c,asm_f16_inf
     res 2,h
     ld a,b
     add a,a
@@ -107,23 +107,23 @@ div_exp_positive:
 div_handle_div_by_zero:
     ld a,h
     or l
-    jp z,_f16_nan
-    jp _f16_inf 
+    jp z,asm_f16_nan
+    jp asm_f16_inf 
 div_handle_inf_or_nan:
     ld c,a
     add b
     cp 62
-    jp z,_f16_nan
+    jp z,asm_f16_nan
     ld a,c
     cp 31
     jr nz,div_a_valid
     ld a,4
     xor h
     or l
-    jp nz,_f16_nan
+    jp nz,asm_f16_nan
     ld a,d
     or e
-    jp z,_f16_inf
+    jp z,asm_f16_inf
 div_a_valid:
     ld a,b
     cp 31
@@ -131,14 +131,14 @@ div_a_valid:
     ld a,4
     xor d
     or e
-    jp nz,_f16_nan
+    jp nz,asm_f16_nan
     ld hl,0 ; div by inf is 0
     ret
 div_b_valid:
     ld a,h
     or l
     ret z
-    jp _f16_inf
+    jp asm_f16_inf
 
 
 _div_24_by_15_ehl_by_bc:

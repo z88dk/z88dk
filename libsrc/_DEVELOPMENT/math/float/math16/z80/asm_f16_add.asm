@@ -28,20 +28,20 @@
 
 SECTION code_fp_math16
 
-EXTERN _f16_inf
-EXTERN _f16_nan
-EXTERN _f16_sub
+EXTERN asm_f16_inf
+EXTERN asm_f16_nan
+EXTERN asm_f16_sub
 
-PUBLIC _f16_add
+PUBLIC asm_f16_add
 
-_f16_add:
+asm_f16_add:
     ld a,h
     xor d
     and 0x80
     jr z,fast_add_do_add
     xor d
     ld d,a
-    jp _f16_sub
+    jp asm_f16_sub
 fast_add_do_add:
     ld a,0x80
     and h
@@ -134,7 +134,7 @@ fast_add_update_exp:
     ld b,a
     and 0x7C
     cp 0x7C
-    jp z,_f16_inf
+    jp z,asm_f16_inf
     ex af,af'
     or b
     or h
@@ -147,14 +147,14 @@ add_handle_nan_or_inf:
     jr c,add_a_not_inv
     xor c
     or l
-    jp nz,_f16_nan
+    jp nz,asm_f16_nan
 add_a_not_inv:
     ld a,d
     cp c
     jr c,add_b_not_inv
     xor c
     or e
-    jp nz,_f16_nan
+    jp nz,asm_f16_nan
 add_b_not_inv:
-    jp _f16_inf
+    jp asm_f16_inf
 

@@ -28,14 +28,14 @@
 
 SECTION code_fp_math16
 
-EXTERN _f16_inf
-EXTERN _f16_nan
+EXTERN asm_f16_inf
+EXTERN asm_f16_nan
 
-PUBLIC _f16_mul
-PUBLIC _f16_calc_ax_bx_mantissa_and_sign
+PUBLIC asm_f16_mul
+PUBLIC asm_f16_calc_ax_bx_mantissa_and_sign
 
-_f16_mul:
-    call _f16_calc_ax_bx_mantissa_and_sign
+asm_f16_mul:
+    call asm_f16_calc_ax_bx_mantissa_and_sign
     jr z,mul_handle_nan_inf
     add b   ; new_exp = ax + bx - 15
     sub 15
@@ -107,7 +107,7 @@ fmul_denorm_shift:
     djnz fmul_denorm_shift
 final_combine:              
     cp 31
-    jr nc, _f16_inf
+    jr nc, asm_f16_inf
     add a
     add a 
     res 2,h ; remove hidden bit
@@ -126,7 +126,7 @@ mul_handle_nan_inf:
     ld a,4
     xor h
     or l
-    jp nz,_f16_nan ; exp=31 and mant!=0
+    jp nz,asm_f16_nan ; exp=31 and mant!=0
 mul_a_is_valid:
     ld a,b
     cp 31
@@ -134,15 +134,15 @@ mul_a_is_valid:
     ld a,4
     xor d
     or e
-    jp nz,_f16_nan ; exp=31 and mant!=0
+    jp nz,asm_f16_nan ; exp=31 and mant!=0
 mul_b_is_valid:
     ld a,h
     or l
-    jp z,_f16_nan
+    jp z,asm_f16_nan
     ld a,d
     or e
-    jp z,_f16_nan
-    jp _f16_inf 
+    jp z,asm_f16_nan
+    jp asm_f16_inf 
     
 
     ; input hl,de
@@ -155,7 +155,7 @@ mul_b_is_valid:
     ;   no calcs done
     ;   a' sign = sign(hl)^sign(de)
 
-_f16_calc_ax_bx_mantissa_and_sign:
+asm_f16_calc_ax_bx_mantissa_and_sign:
     ld a,h
     xor d
     and 0x80
