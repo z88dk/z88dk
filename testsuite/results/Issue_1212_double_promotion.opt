@@ -59,8 +59,7 @@
 	call	dsub
 	call	dpush
 	ld	hl,24	;const
-	ld	de,0
-	call	float
+	call	l_int2long_s_float
 	call	dmul
 	call	ifix
 	pop	bc
@@ -132,8 +131,7 @@
 	call	dsub
 	call	dpush
 	ld	hl,24	;const
-	ld	de,0
-	call	float
+	call	l_int2long_s_float
 	call	dmul
 	call	ifix
 	pop	bc

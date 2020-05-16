@@ -56,38 +56,39 @@ static const char  *current_nspace = NULL;
 struct _mapping {
     char     *opname;
     char     *fp_48bit;
+    char     *fp_16bit;
     char     *fp_32bit;
     char     *fp_64bit;
 } mappings[] = {
-        { "dload","dload","l_glong"  , "l_f64_load"  },
-        { "dstore","dstore","l_plong", "l_f64_store" },
-        { "fadd", "dadd", "l_f32_add", "l_f64_add" },
-        { "fsub", "dsub", "l_f32_sub", "l_f64_sub" },
-        { "fmul", "dmul", "l_f32_mul", "l_f64_mul" },
-        { "fdiv", "ddiv", "l_f32_div", "l_f64_div" },
-        { "fle",  "dleq", "l_f32_le",  "l_f64_le" },
-        { "flt",  "dlt",  "l_f32_lt",  "l_f64_lt" },
-        { "fge",  "dge",  "l_f32_ge",  "l_f64_ge" },
-        { "fgt",  "dgt",  "l_f32_gt",  "l_f64_gt" },
-        { "feq",  "deq",  "l_f32_eq",  "l_f64_eq" },
-        { "fne",  "dne",  "l_f32_ne",  "l_f64_ne" },
-        { "schar2f", "l_int2long_s_float","l_f32_schar2f", "l_f64_schar2f" },
-        { "uchar2f", "l_int2long_u_float","l_f32_uchar2f", "l_f64_uchar2f" },
-        { "sint2f", "l_int2long_s_float","l_f32_sint2f",   "l_f64_sint2f" },
-        { "uint2f", "l_int2long_u_float","l_f32_uint2f",   "l_f64_uint2f" },
-        { "slong2f", "float", "l_f32_slong2f", "l_f64_slong2f" },
-        { "ulong2f", "ufloat","l_f32_ulong2f", "l_f64_ulong2f" },
-        { "f2sint",  "ifix",  "l_f32_f2sint",  "l_f64_f2sint" },
-        { "f2uint",  "ifix",  "l_f32_f2uint",  "l_f64_f2uint" },
-        { "f2slong", "ifix",  "l_f32_f2slong", "l_f64_f2slong" },
-        { "f2ulong", "ifix",  "l_f32_f2ulong", "l_f64_f2ulong" },
-        { "fpush",   "dpush", NULL, "l_f64_dpush" },
-        { "dpush_under_long", "dpush3", NULL, "l_f64_dpush3" }, // Inlined
-        { "dpush_under_int", "dpush2", NULL, "l_f64_dpush2" }, // Inlined
-        { "fswap", "dswap", "l_f32_swap", "l_f64_swap" },
-        { "fnegate", "minusfa", NULL, "l_f64_negate" },
-        { "ldexp", "l_f48_ldexp", "l_f32_ldexp", "l_f64_ldexp" },
-        { "inversef", NULL, "l_f32_invf", NULL }, // Called only for IEEE mode
+        { "dload","dload", "l_gint", "l_glong"  , "l_f64_load"  },
+        { "dstore","dstore","l_pint", "l_plong", "l_f64_store" },
+        { "fadd", "dadd", "l_f16_add", "l_f32_add", "l_f64_add" },
+        { "fsub", "dsub", "l_f16_sub", "l_f32_sub", "l_f64_sub" },
+        { "fmul", "dmul", "l_f16_mul", "l_f32_mul", "l_f64_mul" },
+        { "fdiv", "ddiv", "l_f16_div", "l_f32_div", "l_f64_div" },
+        { "fle",  "dleq", "l_f16_le", "l_f32_le",  "l_f64_le" },
+        { "flt",  "dlt",  "l_f16_lt", "l_f32_lt",  "l_f64_lt" },
+        { "fge",  "dge",  "l_f16_ge", "l_f32_ge",  "l_f64_ge" },
+        { "fgt",  "dgt",  "l_f16_gt", "l_f32_gt",  "l_f64_gt" },
+        { "feq",  "deq",  "l_f16_eq", "l_f32_eq",  "l_f64_eq" },
+        { "fne",  "dne",  "l_f16_ne", "l_f32_ne",  "l_f64_ne" },
+        { "schar2f", "l_int2long_s_float","l_f16_schar2f","l_f32_schar2f", "l_f64_schar2f" },
+        { "uchar2f", "l_int2long_u_float","l_f16_uchar2f","l_f32_uchar2f", "l_f64_uchar2f" },
+        { "sint2f", "l_int2long_s_float","l_f16_sint2f", "l_f32_sint2f",   "l_f64_sint2f" },
+        { "uint2f", "l_int2long_u_float","l_f16_uint2f", "l_f32_uint2f",   "l_f64_uint2f" },
+        { "slong2f", "float", "l_f16_slong2f", "l_f32_slong2f", "l_f64_slong2f" },
+        { "ulong2f", "ufloat","l_f16_ulong2f", "l_f32_ulong2f", "l_f64_ulong2f" },
+        { "f2sint",  "ifix",  "l_f16_f2sint",  "l_f32_f2sint",  "l_f64_f2sint" },
+        { "f2uint",  "ifix",  "l_f16_f2uint",  "l_f32_f2uint",  "l_f64_f2uint" },
+        { "f2slong", "ifix",  "l_f16_f2slong", "l_f32_f2slong", "l_f64_f2slong" },
+        { "f2ulong", "ifix",  "l_f16_f2ulong", "l_f32_f2ulong", "l_f64_f2ulong" },
+        { "fpush",   "dpush",  NULL,            NULL, "l_f64_dpush" },
+        { "dpush_under_long", "dpush3", NULL, NULL, "l_f64_dpush3" }, // Inlined
+        { "dpush_under_int", "dpush2", NULL, NULL, "l_f64_dpush2" }, // Inlined
+        { "fswap", "dswap",   NULL, "l_f32_swap", "l_f64_swap" },
+        { "fnegate", "minusfa", NULL, NULL, "l_f64_negate" },
+        { "ldexp", "l_f48_ldexp", "l_f16_ldexp", "l_f32_ldexp", "l_f64_ldexp" },
+        { "inversef", NULL, "l_f16_invf", "l_f32_invf", NULL }, // Called only for IEEE mode
         { NULL }
 };
 
@@ -99,6 +100,8 @@ static const char *map_library_routine(const char *wanted)
         if ( strcmp(wanted, map->opname) == 0) {
             if ( c_fp_size == 4 ) {
                 return map->fp_32bit;
+            } else if ( c_fp_size == 2 ) {
+                return map->fp_16bit;
             } else if ( c_fp_size == 8 ) {
                 return map->fp_64bit;
             }
@@ -324,7 +327,7 @@ void getmem(SYMBOL* sym)
     } else if (sym->ctype->kind == KIND_DOUBLE && c_fp_size > 4 ) {
         address(sym);
         callrts("dload");
-    } else if (sym->ctype->kind == KIND_LONG || sym->ctype->kind == KIND_DOUBLE || sym->ctype->kind == KIND_CPTR ) {  // 4 byte doubles only
+    } else if (sym->ctype->kind == KIND_LONG || (sym->ctype->kind == KIND_DOUBLE && c_fp_size == 4) || sym->ctype->kind == KIND_CPTR ) {  // 4 byte doubles only
         if ( IS_GBZ80() ) {
             ot("ld\thl,");
             outname(sym->name, dopref(sym));  
@@ -387,7 +390,7 @@ void putmem(SYMBOL* sym)
         ot("ld\t(");
         outname(sym->name, dopref(sym));
         outstr("),a\n");
-    } else if (sym->ctype->kind == KIND_LONG || sym->ctype->kind == KIND_DOUBLE ) { // 4 byte doubles
+    } else if (sym->ctype->kind == KIND_LONG || (sym->ctype->kind == KIND_DOUBLE && c_fp_size == 4) ) { // 4 byte doubles
         if ( IS_GBZ80() ) {
             ot("ld\tbc,");
             outname(sym->name, dopref(sym));
@@ -620,6 +623,9 @@ void putstk(LVALUE *lval)
     case KIND_DOUBLE:
         if ( c_fp_size > 4) {
             mainpop();
+            callrts("dstore");
+        } else if ( c_fp_size == 2 ) {
+            zpop();
             callrts("dstore");
         } else {
             zpopbc();
@@ -951,6 +957,8 @@ void dpush(void)
     if ( c_fp_size == 4 ) {
         zpushde();
         zpush();
+    } else if ( c_fp_size == 2 ) {
+        zpush();
     } else {
         callrts("fpush");
         Zsp -= c_fp_size;
@@ -998,7 +1006,7 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
             zpushde(); /* LSW -> stack, addr = hl */
         }
         return 4;
-    } else if (expr == KIND_DOUBLE) {
+    } else if (expr == KIND_DOUBLE && c_fp_size != 2 ) {
         dpush_under(KIND_INT);
         mainpop();
         return c_fp_size;
@@ -1036,6 +1044,7 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
         the top value  */
 void dpush_under(int val_type)
 {
+    // This isn't call for float16
     if ( val_type == KIND_LONG || val_type == KIND_CPTR ) {
         if ( c_fp_size == 4 ) {
             ol("pop\tbc");	// addr2 -> bc
@@ -1386,6 +1395,8 @@ void leave(Kind vartype, char type, int incritical)
     else if ( vartype == KIND_DOUBLE ) {
         if ( c_fp_size == 4 ) {
             vartype = KIND_LONG;
+        } else if ( c_fp_size == 2 ) {
+            vartype = KIND_INT;
         } else {
             vartype = KIND_NONE;
             save = NO;
@@ -1519,6 +1530,8 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
     else if ( save == KIND_DOUBLE ) {
         if ( c_fp_size == 4 ) {
             save = KIND_LONG;
+        } else if ( c_fp_size == 2 ) {
+            save = KIND_INT;
         }
         // For a 6/8 byte double the value is safely in the exx set or in FA 
     }
@@ -1576,6 +1589,8 @@ void scale(Kind type, Type *tag)
     case KIND_DOUBLE:
         if ( c_fp_size == 4 ) {
             ol("add\thl,hl");
+            ol("add\thl,hl");
+        } else if ( c_fp_size == 2 ) {
             ol("add\thl,hl");
         } else {
             sixreg();
@@ -2292,7 +2307,7 @@ void zdiv_const(LVALUE *lval, int32_t value)
 
 int zdiv_dconst(LVALUE *lval, double value, int isrhs)
 {
-    if ( isrhs == 0.0 && value == 1.0 && c_maths_mode == MATHS_IEEE) {
+    if ( isrhs == 0.0 && value == 1.0 && (c_maths_mode == MATHS_IEEE || c_maths_mode == MATHS_IEEE16)) {
         callrts("inversef");
         lval->ltype = type_double;
         lval->val_type = KIND_DOUBLE;
@@ -3296,6 +3311,11 @@ void neg(LVALUE* lval)
            ol("xor\t128");
            ol("ld\td,a");
            break;
+        case MATHS_IEEE16:
+           ol("ld\ta,h");
+           ol("xor\t128");
+           ol("ld\th,a");
+           break;
         case MATHS_MBFS:
            ol("ld\ta,e");
            ol("xor\t128");
@@ -3338,12 +3358,14 @@ void inc(LVALUE* lval)
         case MATHS_IEEE:
             vlongconst(0x3f800000); // +1.0
             break;
+        case MATHS_IEEE16:
+            vconst(0x3c00); // +1.0
+            break;
         case MATHS_MBFS:
             vlongconst(0x81000000); // +1.0
             break;
         default:
-            vconst(1);
-            zconvert_to_double(KIND_INT, 1);
+            zconvert_constant_to_double(1, 1);
         }
         callrts("fadd");
         Zsp += c_fp_size;
@@ -3371,12 +3393,14 @@ void dec(LVALUE* lval)
         case MATHS_IEEE:
             vlongconst(0xbf800000); // -1.0
             break;
+        case MATHS_IEEE16:
+            vconst(0xbc00); // -1.0
+            break;
         case MATHS_MBFS:
             vlongconst(0x81800000); // -1.0
             break;
         default:
-            vlongconst(-1);
-            zconvert_to_double(KIND_LONG, 0);
+            zconvert_constant_to_double(-1,0);
         }
         callrts("fadd");
         Zsp += c_fp_size;
@@ -4253,7 +4277,11 @@ void convSint2long(void)
 /* Swap double positions on stack */
 void DoubSwap(void)
 {
-    callrts("fswap");
+    if ( c_fp_size == 2 ) {
+        swapstk(); 
+    } else {
+        callrts("fswap");
+    }
 }
 
 void vlongconst(double val)
@@ -4824,6 +4852,30 @@ void zconvert_from_double(Kind type, unsigned char isunsigned)
         callrts("f2sint");
     }
 }
+
+void zconvert_constant_to_double(double val, unsigned char isunsigned)
+{
+    unsigned char  fa[8] = {0};
+
+    if ( c_fp_size == 2 ) {
+        dofloat(val, fa);
+        vconst((fa[1] << 8) | fa[0]);
+    } else if ( c_fp_size == 4 ) {
+        dofloat(val, fa);
+        vconst((fa[1] << 8) | fa[0]);
+        const2((fa[3] << 8) | fa[2]);
+    } else {
+        if ( fabs(val) < 65536 ) {
+            vconst(val);
+            zconvert_to_double(KIND_INT, isunsigned);
+        } else {
+            vlongconst(val);
+            zconvert_to_double(KIND_LONG, isunsigned);
+        }
+    }
+
+}
+
 
 void zconvert_to_double(Kind type, unsigned char isunsigned)
 {

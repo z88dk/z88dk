@@ -175,8 +175,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 }
             }
             dpush();
-            vlongconst(lval->const_val);
-            zconvert_to_double(KIND_LONG, lval->ltype->isunsigned);
+            zconvert_constant_to_double(lval->const_val, lval->ltype->isunsigned);
             lval->val_type = KIND_DOUBLE;
             lval->ltype = type_double;
             /* division isn't commutative so we need to swap over' */
@@ -489,8 +488,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 load_double_into_fa(lval);
             } else {
                 /* On stack we've got the double, load the constant as a double */
-                vlongconst(val);
-                zconvert_to_double(KIND_LONG, lval->ltype->isunsigned);
+                zconvert_constant_to_double(val, lval->ltype->isunsigned);
                 lval->val_type = KIND_DOUBLE;
                 lval->ltype = type_double;
             }
@@ -568,8 +566,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 if ( lval2->val_type == KIND_DOUBLE ) {
                     load_double_into_fa(lval2);
                 } else {
-                    vlongconst(val);
-                    zconvert_to_double(KIND_LONG, lval2->ltype->isunsigned);
+                    zconvert_constant_to_double(val, lval2->ltype->isunsigned);
                 }
                 (*oper)(lval);
             } else {

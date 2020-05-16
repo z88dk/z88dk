@@ -31,8 +31,7 @@
 	add	hl,sp
 	call	dldpsh
 	ld	hl,2	;const
-	ld	de,0
-	call	float
+	call	l_int2long_s_float
 	call	dsub
 	call	dpush
 	call	_func
@@ -55,8 +54,7 @@
 	add	hl,sp
 	call	dldpsh
 	ld	hl,2	;const
-	ld	de,0
-	call	float
+	call	l_int2long_s_float
 	call	dswap
 	call	dsub
 	call	dpush
