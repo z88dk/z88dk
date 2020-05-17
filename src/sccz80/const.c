@@ -47,6 +47,7 @@ static elem_t    *double_queue = NULL;
 
 
 static void dofloat_ieee(double raw, unsigned char fa[]);
+static void dofloat_ieee16(double raw, unsigned char fa[]);
 static void dofloat_z80(double raw, unsigned char fa[]);
 static void dofloat_mbfs(double raw, unsigned char fa[]);
 static void dofloat_mbf40(double raw, unsigned char fa[]);
@@ -653,6 +654,9 @@ void dofloat(double raw, unsigned char fa[])
         case MATHS_IEEE:
             dofloat_ieee(raw, fa);
             break;
+        case MATHS_IEEE16:
+            dofloat_ieee16(raw, fa);
+            break;
         case MATHS_MBFS:
             dofloat_mbfs(raw, fa);
             break;
@@ -711,6 +715,39 @@ static void dofloat_ieee(double raw, unsigned char fa[])
         // And the sign bit
         fp_value |= fs.sign ? 0x80000000 : 0x00000000;
         pack32bit_float(fp_value, fa);
+    }
+}
+
+static void dofloat_ieee16(double raw, unsigned char fa[])
+{
+    if ( isnan(raw)) {
+        fa[0] = 0xff;
+        fa[1] = 0xff;
+    } else if ( isinf(raw) && raw > 0 ) {
+        // positive infinity: 7c00
+        fa[0] = 0x00;
+        fa[1] = 0x7c;
+    } else if ( isinf(raw) && raw < 0 ) {
+        // positive infinity: 7c00
+        fa[0] = 0x00;
+        fa[1] = 0xfc;
+    } else {
+        struct fp_decomposed fs = {0};
+        uint32_t fp_value = 0;
+
+        decompose_float(raw, &fs);
+        
+        // Bundle up mantissa - it's only 10 bits
+        fp_value = ((((uint32_t)fs.mantissa[6]) << 3) |  ((((uint32_t)fs.mantissa[5]) >> 5 ) & 0x07) ) & 0x3ff  ;
+
+
+        // And now the exponent
+        fp_value |= (((uint32_t)fs.exponent) << 10) & 0x7fc00;
+
+        // And the sign bit
+        fp_value |= fs.sign ? 0x8000 : 0x0000;
+        fa[0] = fp_value & 0xff;
+        fa[1] = (fp_value & 0xff00) >> 8;
     }
 }
 
@@ -985,6 +1022,8 @@ void load_double_into_fa(LVALUE *lval)
         if ( c_fp_size == 4 ) {
             vconst(fa[1] << 8 | fa[0]);
             const2(fa[3] << 8 | fa[2]);
+        } else if ( c_fp_size == 2 ) {
+            vconst(fa[1] << 8 | fa[0]);
         } else {
             elem = get_elem_for_fa(fa,lval->const_val);
             elem->refcount++;
