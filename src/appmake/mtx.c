@@ -1,7 +1,7 @@
 /*
  *      Memotech MTX application packager
  *      
- *      $Id: mtx.c,v 1.13 2016-06-26 00:46:55 aralbrec Exp $
+ *      $Id: mtx.c $
  */
 
 
@@ -15,6 +15,7 @@ static char             *outfile      = NULL;
 static int               origin       = -1;
 static char              audio        = 0;
 static char              fast         = 0;
+static char              khz_22       = 0;
 static char              mtb          = 0;
 static char              mtx          = 0;
 static char              dumb         = 0;
@@ -33,10 +34,11 @@ option_t mtx_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
+    {  0,  "22",       "22050hz bitrate option",     OPT_BOOL,  &khz_22 },
+    {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
     {  0,  "mtb",      "MTB output file mode",       OPT_BOOL,  &mtb },
     {  0,  "mtx",      "append MTX extension",       OPT_BOOL,  &mtx },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
-    {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
@@ -371,7 +373,7 @@ The basic block must contain the following instructions:
     /* ***************************************** */
     /*  Now, if requested, create the audio file */
     /* ***************************************** */
-    if ((audio) || (fast) || (loud)) {
+    if ((audio) || (fast) || (khz_22) || (loud)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
             fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
             myexit(NULL, 1);
@@ -557,7 +559,10 @@ The basic block must contain the following instructions:
         fclose(fpout);
 
         /* Now complete with the WAV header */
-        raw2wav(wavfile);
+		if (khz_22)
+			raw2wav_22k(wavfile,2);
+		else
+			raw2wav(wavfile);
 
     } /* END of WAV CONVERSION BLOCK */
 
