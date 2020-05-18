@@ -1,7 +1,7 @@
 /*
  *        BIN to MZ Sharp M/C file
  *
- *        $Id: mz.c,v 1.17 2016-06-26 00:46:55 aralbrec Exp $
+ *        $Id: mz.c $
  *
  *        bin2m12 by: Stefano Bodrato 4/5/2000
  *        portions from mzf2wav by: Jeroen F. J. Laros. Sep 11 2003.
@@ -28,10 +28,11 @@ static int               origin       = -1;
 static char              help         = 0;
 static char              audio        = 0;
 static char              fast         = 0;
+static char              khz_22       = 0;
+static char              loud         = 0;
 static char              mz80b        = 0;
 static char              turbo        = 0;
 static char              dumb         = 0;
-static char              loud         = 0;
 static char             *src          = NULL;
 static char             *dst          = NULL;
 static char              foopatch     = 0;
@@ -62,14 +63,15 @@ option_t mz_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
+    {  0,  "22",       "22050hz bitrate option",     OPT_BOOL,  &khz_22 },
+    {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
+    {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
     {  0,  "mz80b",    "MZ80B mode (faster 1800bps)",   OPT_BOOL,  &mz80b },
     {  0,  "src",      "Patch from (80B,700,2000,sos)",  OPT_STR,   &src },
     {  0,  "dst",      "Patch to (80B,700,2000,sos)",    OPT_STR,   &dst },
     {  0,  "foopatch", "Patch unknown locations with BEEP",    OPT_BOOL,  &foopatch },
     {  0,  "patchall", "Patch more types of JPs and CALLs",    OPT_BOOL,  &aggressive_patch },
-    {  0,  "turbo",    "Turbo tape loader",          OPT_BOOL,  &turbo },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
-    {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0 , "blockname", "Opt name for the code block", OPT_STR, &blockname},
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
@@ -845,7 +847,7 @@ int mz_exec(char *target)
 	/* ************************************************** */
 	/*  Now, if requested, mzf2wav creates the audio file */
 	/* ************************************************** */
-	if (( audio ) || (src_codes != 0)) {
+    if ((audio) || (fast) || (khz_22) || (loud) || (src_codes != 0)) {
 
 		strcpy(wavfile,filename);
 
@@ -976,10 +978,11 @@ int mz_exec(char *target)
 			free(image);
 			
 			/* Now let's think at the WAV format */
-			raw2wav(wavfile);
+			if (khz_22)
+				raw2wav_22k(wavfile,2);
+			else
+				raw2wav(wavfile);
 		}
 	}
     return 0;
 }
-                
-
