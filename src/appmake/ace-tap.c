@@ -6,7 +6,7 @@
  *                         - Modified for the Jupiter ACE
  *	Stefano 19/5/2010 - Heavily updated
  *
- *	$Id: ace-tap.c,v 1.15 2016-06-26 00:46:54 aralbrec Exp $
+ *	$Id: ace-tap.c $
  */
 
 #include "appmake.h"
@@ -19,6 +19,7 @@ static int               origin       = -1;
 static char              help         = 0;
 static char              audio        = 0;
 static char              fast         = 0;
+static char              khz_22       = 0;
 static char              dumb         = 0;
 static char              noloader     = 0;
 static unsigned char     parity;
@@ -32,6 +33,7 @@ option_t acetap_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
+    {  0,  "22",       "22050hz bitrate option",     OPT_BOOL,  &khz_22 },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "noloader",  "Don't create the loader block",  OPT_BOOL,  &noloader },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
@@ -189,7 +191,7 @@ int acetap_exec(char* target)
     /* ***************************************** */
     /*  Now, if requested, create the audio file */
     /* ***************************************** */
-    if (audio) {
+    if ((audio) || (fast) || (khz_22)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
             fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
             myexit(NULL, 1);
@@ -246,7 +248,11 @@ int acetap_exec(char* target)
         fclose(fpout);
 
         /* Now let's think at the WAV format */
-        raw2wav(wavfile);
+        /* Now let's think at the WAV format */
+		if (khz_22)
+			raw2wav_22k(wavfile,2);
+		else
+			raw2wav(wavfile);
     }
 
     return 0;
