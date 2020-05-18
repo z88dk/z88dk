@@ -1,7 +1,7 @@
 /*
  *        CCE MMC-1000 BIN to CAS file converter and WAV generator
  *
- *        $Id: mc.c,v 1.10 2016-06-26 00:46:55 aralbrec Exp $
+ *        $Id: mc.c $
  */
 
 #include "appmake.h"
@@ -15,6 +15,7 @@ static int               origin       = -1;
 static char              help         = 0;
 static char              audio        = 0;
 static char              fast         = 0;
+static char              khz_22       = 0;
 
 
 /* Options that are available for this module */
@@ -25,6 +26,7 @@ option_t mc_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Fast loading WAV trick for MESS emulator",  OPT_BOOL,  &fast },
+    {  0,  "22",       "22050hz bitrate option",     OPT_BOOL,  &khz_22 },
 //    {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
 	{  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0 , "blockname", "Name of the code block",    OPT_STR,   &blockname},
@@ -168,7 +170,7 @@ int mc_exec(char* target)
     /* ***************************************** */
     /*  Now, if requested, create the audio file */
     /* ***************************************** */
-    if (audio) {
+    if ((audio) || (fast) || (khz_22)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
             fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
             myexit(NULL, 1);
@@ -232,7 +234,10 @@ int mc_exec(char* target)
         fclose(fpout);
 
         /* Now let's think at the WAV format */
-        raw2wav(wavfile);
+		if (khz_22)
+			raw2wav_22k(wavfile,2);
+		else
+			raw2wav(wavfile);
     }
 
     return 0;
