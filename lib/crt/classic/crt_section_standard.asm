@@ -31,6 +31,7 @@
 		SECTION code_l_sdcc
 		SECTION code_l_sccz80
 		SECTION code_compress_zx7
+		SECTION code_compress_aplib
 		SECTION code_ctype
 		SECTION code_esxdos
 		SECTION code_fp
@@ -117,6 +118,7 @@ ENDIF
 		SECTION bss_fp_math32
 		SECTION bss_fp_mbf32
 		SECTION bss_fp_mbf64
+		SECTION bss_compress_aplib
 		SECTION bss_error
 		SECTION bss_crt
 		SECTION bss_fardata
