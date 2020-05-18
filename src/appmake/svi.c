@@ -5,7 +5,7 @@
  *
  *	By Stefano Bodrato
  *
- *	$Id: svi.c,v 1.9 2016-06-26 00:46:55 aralbrec Exp $
+ *	$Id: svi.c $
  */
 
 #include "appmake.h"
@@ -18,6 +18,7 @@ static int               origin       = -1;
 static char              audio        = 0;
 static char              c_disk       = 0;
 static char              fast         = 0;
+static char              khz_22       = 0;
 static char              dumb         = 0;
 static char              loud         = 0;
 static char              help         = 0;
@@ -37,6 +38,7 @@ option_t svi_options[] = {
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Tweak the audio tones to run a bit faster",  OPT_BOOL,  &fast },
+    {  0,  "22",       "22050hz bitrate option",     OPT_BOOL,  &khz_22 },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
     {  0,  "disk",     "Create a .dsk image",        OPT_BOOL,  &c_disk },
@@ -235,7 +237,7 @@ int svi_exec(char* target)
     /* ***************************************** */
     /*  Now, if requested, create the audio file */
     /* ***************************************** */
-    if ((audio) || (fast) || (loud)) {
+    if ((audio) || (fast) || (khz_22) || (loud)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
             fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
             myexit(NULL, 1);
@@ -311,7 +313,10 @@ int svi_exec(char* target)
         fclose(fpout);
 
         /* Now complete with the WAV header */
-        raw2wav(wavfile);
+		if (khz_22)
+			raw2wav_22k(wavfile,2);
+		else
+			raw2wav(wavfile);
 
     } /* END of WAV CONVERSION BLOCK */
 
