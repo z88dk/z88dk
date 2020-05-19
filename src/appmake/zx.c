@@ -42,7 +42,7 @@
  * 
  *        See zx-util.c
  *
- *        $Id: zx.c,v 1.27 2016-09-17 05:09:40 aralbrec Exp $
+ *        $Id: zx.c $
  */
 
 #include "appmake.h"
@@ -79,7 +79,8 @@ static struct zx_tape zxt = {
     0,          // dumb
     0,          // noloader
     0,          // noheader
-    0           // parity
+    0,          // parity
+    0           // khz22
 };
 
 static struct zx_sna zxs = {
@@ -147,6 +148,7 @@ option_t zx_options[] = {
     { 0,  "patchdata", "Turbo tape patch (i.e. cd7fff..)", OPT_STR, &zxt.patchdata },
     { 0,  "screen",    "Title screen file name",    OPT_STR,   &zxt.screen },
     { 0,  "fast",      "Create a fast loading WAV", OPT_BOOL,  &zxt.fast },
+    { 0,  "22",        "22Khz, lower rate WAV format", OPT_BOOL,  &zxt.khz22 },
     { 0,  "dumb",      "Just convert to WAV a tape file", OPT_BOOL, &zxt.dumb },
     { 0,  "noloader",  "Don't create the loader block", OPT_BOOL, &zxt.noloader },
     { 0,  "noheader",  "Don't create the header",   OPT_BOOL,  &zxt.noheader },
