@@ -327,7 +327,7 @@ static void init_found_files(void)
 static void reinit_lexer_state(struct lexer_state *ls, int wb)
 {
 #ifndef NO_UCPP_BUF
-	ls->input_buf = wb ? getmem(INPUT_BUF_MEMG) : 0;
+	ls->input_buf = wb ? getmem(INPUT_BUF_MEMG + 1) : 0;
 #ifdef UCPP_MMAP
 	ls->from_mmap = 0;
 #endif
