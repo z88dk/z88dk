@@ -8,7 +8,7 @@
 ;  feilipu, 2020 May
 ;
 ;-------------------------------------------------------------------------
-;  asm_f16_nan - z80 half floating point not a number
+;  asm_f16_zero - z80 half floating point signed zero
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked format: sign in d[7], exponent in e, mantissa in hl
@@ -20,15 +20,23 @@
 
 SECTION code_fp_math16
 
-PUBLIC asm_f16_nan
-PUBLIC asm_f16_nan_half
+PUBLIC asm_f16_zero
+PUBLIC asm_f16_zero_half
 
-.asm_f16_nan
-    ld de,000FFh
-    ld hl,00000h
+.asm_f16_zero
+    ld a,d
+    and 080h
+    ld d,a
+    xor a
+    ld e,a
+    ld h,a
+    ld l,a
     ret
 
-.asm_f16_nan_half
-    ld hl,07C00h
+.asm_f16_zero_half
+    ld a,d
+    and 080h
+    ld h,a
+    ld l,0
     ret
 

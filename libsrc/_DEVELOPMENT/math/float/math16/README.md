@@ -28,9 +28,9 @@ This library is also designed to be as fast as possible on the z80 processor.
 
   *  Made for the Spectrum Next. The z80n `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
 
-  *  Mantissa calculations are done with 11-bits and 5-bits for rounding. Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
+  *  Mantissa calculations are done with 16-bits (11-bits plus 5-bits for rounding). Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
 
-  *  Derived functions are calculated with a 16-bit internal mantissa calculation path, without rounding, to provide the maximum accuracy when repeated multiplications and additions are required. This is equivalent to a fused multiply-add process.
+  *  All functions are calculated with a 16-bit internal mantissa calculation path, without rounding, to provide the maximum accuracy when repeated multiplications and additions are required.
 
   *  Higher functions are written in C, for maintainability, and draw upon the intrinsic functions including the square root, square, and polynomial evaluation, as well as the 4 standard arithmetic functions.
 
@@ -48,8 +48,8 @@ The z88dk floating point format (compatible with Intel/ IEEE, etc.) is as follow
 stored in memory with the 2 bytes reversed from shown above.
 
 ```
-    s - 1 negative, 0 positive
-    e - 0-15 indicating the exponent
+    s - 1 bit, 1 negative, 0 positive
+    e - 5 bits,indicating the exponent
     m - mantissa 10 bits, with implied 11th bit which is always 1
 ```
 The mantissa, when the hidden bit is added in, is 11-bits long and has a value in the range of in decimal of 1.000 to 1.9999...
@@ -70,26 +70,26 @@ Examples of numbers:
 ```
 This floating point package is loosely based on IEEE-754. We maintain the packed format, but we do not support the round to even convention. 
 
-z88dk math32 assumes any number with a zero exponent is positive or negative zero.
+z88dk math16 assumes any number with a zero exponent is positive or negative zero.
 IEEE-754 assumes bit 11 of the mantissa is 1 except where the exponent is zero.
 
 
 ## IEEE Floating Point Expanded Mantissa Format
 
-An expanded 24-bit internal mantissa is used to calculate derived functions. This is to provide increased accuracy for the Newton-Raphson iterations, and the Horner polynomial expansions.
+An expanded 16-bit internal mantissa is used to calculate all functions. 16-bit mantissa calculations are natural for the z80, and this provides enhanced accuracy for repeated calculations required for derived functions. Specifically, this is to provide increased accuracy for the Newton-Raphson iterations, and the Horner polynomial expansions.
 
-This format is provided for both the multiply and add intrinsic internal 24-bit mantissa functions, from which other functions are derived.
+This format is provided for both the multiply and add intrinsic internal 16-bit mantissa functions, from which other functions are derived.
 
 ```
-  unpacked floating point format: exponent right justified in d, sign in d[7], mantissa in ehl
+  unpacked floating point format: sign in d[7], exponent right justified in e, mantissa in hl
 
-  dehl =  s00eeeeee 1mmmmmmm mmmmmmmm mmmmmmmm (s-sign, e-exponent, m-mantissa)
+  dehl = s....... eeeeeeeee 1mmmmmmm mmmmmmmm (s-sign, e-exponent, m-mantissa)
 
 ```
 
 ## Calling Convention
 
-The z88dk math32 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or the right hand side parameter is passed in DEHL, and the second or LHS parameter is passed on the stack. For zsdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
+The z88dk math16 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or the right hand side parameter is passed in DEHL, and the second or LHS parameter is passed on the stack. For zsdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
 
 The intrinsic functions, written in assembly, assume the sccz80 calling convention, and are by default `__z88dk_fastcall` or `__z88dk_callee`, which means that they will consume values passed on the stack, returning with the value in HL.
 
@@ -133,7 +133,7 @@ Contains the trigonometric, logarithmic, power and other functions implemented i
 
 Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the z80 directory. Float conversion between the math16 IEEE-754 format and the format expected by zsdcc and sccz80 occurs here.
 
-### lm32
+### lm16
 
 Glue that connects the compilers and standard assembly interface to the `math16` library.  The purpose is to define aliases that connect the standard names to the math16 specific names.  These functions make up the complete z88dk `math16` maths library that is linked against on the compile line as `-lmath16`.
 
@@ -147,7 +147,7 @@ The expanded floating point domain is a useful tool for creating functions, as c
 
 ## Licence
 
-Copyright (c) 2020 Artyom Beilis
+Copyright (c) 2020 Phillip Stevens
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -155,28 +155,3 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# TO BE COMPLETED
-
-It supports:
-
-- Basic operations "+", "-", "\*", "/"
-- Conversion to/from integer
-- Comparison operations
-
-It uses IEEE 754 format. It supports full range of values including +/- inf, nan and subnormal values.
-All operations work as expected with the respect of inf/nan values
-
-Only simplest truncation rounding policy implemented, no round to nearest ties to evens provided.
-
-What is expected in future:
-
-- math functions: log/exp, trigonometry etc,
-- formatting/parsing functions
-
-## Z80 notes
-
-- All functions are reentrant and relay on alternative set of registers AF', HL', DE', BC', so if your interrupt routines use shadow registers for fast context switching you can't use this library.
-
-### FIX ME
-
-- Some functions is IX for frame pointer, IY is not modified. <<< this XXX

@@ -1,17 +1,25 @@
 ;
-;  Copyright (c) 2015 Digi International Inc.
+;  Copyright (c) 2020 Phillip Stevens
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, 2019 April
-;  adapted for z80, z180, and z80n
+;  feilipu, May 2020
+;
+;-------------------------------------------------------------------------
+;  asm_f16_convert - z80, z180, z80n unpacked format conversion code
+;-------------------------------------------------------------------------
+;
+;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  return normalized result also in unpacked format
 ;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math16
+
+EXTERN asm_f16_fsnormalize
 
 PUBLIC asm_f16_float8
 PUBLIC asm_f16_float16
@@ -20,8 +28,6 @@ PUBLIC asm_f16_float32
 PUBLIC asm_f16_float8u
 PUBLIC asm_f16_float16u
 PUBLIC asm_f16_float32u
-
-EXTERN asm_f16_fsnormalize
 
 ; convert signed char in l to float in dehl
 .asm_f16_float8
@@ -51,12 +57,7 @@ EXTERN asm_f16_fsnormalize
     ex de,hl
     ld hl,0
     sbc hl,bc
-    jp PO,dldf0                 ; number in hlde, sign in b[7]
-
-; here negation of 0x80000000 = -2^31 = 0xcf000000
-    ld de,0cf00h
-    ld hl,0
-    ret
+    jp dldf0                    ; number in hlde, sign in b[7]
 
 ; convert character in l to float in dehl
 .asm_f16_float8u
@@ -71,82 +72,82 @@ EXTERN asm_f16_fsnormalize
     res 7,d                     ; ensure unsigned long's "sign" bit is reset
     ld b,d                      ; to hold the sign, put copy of MSB into b
                                 ; continue, with unsigned long number in dehl
-    ex de,hl
+    ex de,hl                    ; number in hlde, sign in b[7]
 
 .dldf0
-; number in hlde, sign in b[7]
-    ld c,150                    ; exponent if no shift
-    ld a,h
-    or a
-    jr NZ,dldfright             ; go shift right
-; exponent in c, sign in b[7]
-    ex af,af                    ; set carry off
-    jp asm_f16_fsnormalize          ; piggy back on existing code in _fsnormalize
+    ex de,hl                    ; number in dehl, sign in b[7]
+    xor a
+    or a,d
+    ld c,142                    ; exponent if MSB is zero
+    jr Z,SMSB                   ; MSB is zero, we have an int24
+    ld l,h
+    ld h,e
+    ld e,d
+    ld c,150                    ;  MSB non zero, exponent if no shift
 
-; must shift right to make h = 0 and mantissa in lde
-.dldfright
-    ld a,h
+.SMSB
+    or a,e
+    jr Z,normalize              ; we have an int16, so need to normalise
     and 0f0h
-    jr Z,dldf4                  ; shift right only 1-4 bits
+    jr Z,S12R                   ; shift 4 bits, most significant in low nibble
+    jr S16R                     ; shift 8 bits, most significant in high nibble
 
-; here shift right 4-8
-    srl h
+.normalize
+    ld e,142                    ; exponent if MSW is zero
+    ld d,b                      ; sign to d[7]
+    jp asm_f16_normalize        ; piggy back on normalisation code
+
+
+.S16R                           ; must shift right to make de = 0 and mantissa in hl
+    srl e
+    rr h
     rr l
-    rr d
-    rr e
-    srl h
-    rr l
-    rr d
-    rr e
-    srl h
-    rr l
-    rr d
-    rr e
-    srl h
-    rr l
-    rr d
-    rr e                        ; 4 for sure
-    ld c,154                    ; exponent for no more shifts
-; here shift right 1-4 more
-.dldf4
-    ld a,h
-    or a
-    jr Z,dldf8                  ; done right
-    srl h
-    rr l
-    rr d
-    rr e
     inc c
-    ld a,h
-    or a
-    jr Z,dldf8
-    srl h
+    srl e
+    rr h
     rr l
-    rr d
-    rr e
     inc c
-    ld a,h
-    or a
-    jr Z,dldf8
-    srl h
+    srl e
+    rr h
     rr l
-    rr d
-    rr e
     inc c
-    ld a,h
+    srl e
+    rr h
+    rr l                        ; 4 for sure
+    inc c                       ; exponent for no more shifts
+.S12R                           ; here shift right 1-4 more
+    ld a,e
     or a
-    jr Z,dldf8
-    srl h
+    jr Z,packup                 ; done right
+    
+    srl e
+    rr h
     rr l
-    rr d
-    rr e
     inc c
-.dldf8                          ; pack up the floating point mantissa in lde, exponent in c, sign in b[7]
-    sla l
-    rl b                        ; get sign (if unsigned input, it was forced 0)
-    rr c
+    ld a,e
+    or a
+    jr Z,packup
+    srl e
+    rr h
     rr l
-    ld h,c                      ; result in hlde
-    ex de,hl 
+    inc c
+    ld a,e
+    or a
+    jr Z,packup
+    srl e
+    rr h
+    rr l
+    inc c
+    ld a,e
+    or a
+    jr Z,packup
+    srl e
+    rr h
+    rr l
+    inc c
+.packup                         ; pack up the floating point mantissa in hl, exponent in e, sign in d[7]
+    ld d,b                      ; sign in d[7], get sign (if unsigned input, it was forced 0)
+    ld e,c                      ; get exponent in e
+
     ret                         ; result in dehl
 

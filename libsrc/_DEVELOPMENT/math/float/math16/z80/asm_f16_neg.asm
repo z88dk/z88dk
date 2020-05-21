@@ -1,38 +1,37 @@
-; Copyright (c) 2020 Artyom Beilis
-
-; Permission is hereby granted, free of charge, to any person obtaining a copy
-; of this software and associated documentation files (the "Software"), to deal
-; in the Software without restriction, including without limitation the rights
-; to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-; copies of the Software, and to permit persons to whom the Software is
-; furnished to do so, subject to the following conditions:
-
-; The above copyright notice and this permission notice shall be included in
-; all copies or substantial portions of the Software.
-
-; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-; THE SOFTWARE.
 ;
+;  Copyright (c) 2020 Phillip Stevens
 ;
-; feilipu, 2020 May
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+;  feilipu, 2020 May
 ;
 ;-------------------------------------------------------------------------
-; f16_neg - z80 half floating point negate
+;  asm_f16_neg - z80 half floating point negate
 ;-------------------------------------------------------------------------
 ;
+;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  return normalized result also in unpacked format
+;
+;  return half float in hl
+;
+;-------------------------------------------------------------------------
 
 SECTION code_fp_math16
 
 PUBLIC asm_f16_neg
+PUBLIC asm_f16_neg_half
 
-asm_f16_neg:
-    ld a,0x80
-    xor h
+.asm_f16_neg
+    ld a,d
+    xor 080h
+    ld d,a
+    ret
+
+.asm_f16_neg_half
+    ld a,h
+    xor 080h
     ld h,a
     ret
 

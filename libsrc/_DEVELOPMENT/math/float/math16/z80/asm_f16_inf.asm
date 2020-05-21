@@ -1,39 +1,44 @@
-; Copyright (c) 2020 Artyom Beilis
-
-; Permission is hereby granted, free of charge, to any person obtaining a copy
-; of this software and associated documentation files (the "Software"), to deal
-; in the Software without restriction, including without limitation the rights
-; to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-; copies of the Software, and to permit persons to whom the Software is
-; furnished to do so, subject to the following conditions:
-
-; The above copyright notice and this permission notice shall be included in
-; all copies or substantial portions of the Software.
-
-; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-; THE SOFTWARE.
 ;
+;  Copyright (c) 2020 Phillip Stevens
 ;
-; feilipu, 2020 May
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+;  feilipu, 2020 May
 ;
 ;-------------------------------------------------------------------------
-; f16_inf - z80 half floating point infinity
+;  asm_f16_inf - z80 half floating point signed infinity
 ;-------------------------------------------------------------------------
 ;
+;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  return normalized result also in unpacked format
+;
+;  return half float in hl
+;
+;-------------------------------------------------------------------------
 
 SECTION code_fp_math16
 
 PUBLIC asm_f16_inf
+PUBLIC asm_f16_inf_half
 
-asm_f16_inf:
-    ld hl,0x7C00
-    ex af,af'
-    or h
-    ld h,a
+.asm_f16_inf
+    ld a,d
+    and 080h            ; preserve sign
+    ld d,a
+    xor a
+    ld h,a              ; clear mantissa
+    ld l,a
+    dec a
+    ld e,a              ; load 0xFF exponent
+    ret
+
+.asm_f16_inf_half
+    ld a,d
+    and 080h            ; preserve sign
+    or 07Ch             ; set infinity exponent
+    ld h,a              ; set sign, exponent
+    ld l,0
     ret
 
