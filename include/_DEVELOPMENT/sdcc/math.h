@@ -245,7 +245,16 @@ extern double_t ldexp_callee(double_t x,int exp) __z88dk_callee;
 #define ldexp(a,b) ldexp_callee(a,b)
 
 
-#define scalbn(x,pw2) ldexp(x,pw2)
+extern double_t scalbn(double_t x,int n);
+extern double_t scalbn_callee(double_t x,int n) __z88dk_callee;
+#define scalbn(a,b) scalbn_callee(a,b)
+
+	
+extern double_t scalbln(double_t x,int n);
+extern double_t scalbln_callee(double_t x,int n) __z88dk_callee;
+#define scalbln(a,b) scalbln_callee(a,b)
+
+
 
 extern double_t log(double_t x);
 extern double_t log_fastcall(double_t x) __z88dk_fastcall;
@@ -527,6 +536,17 @@ extern half_t f16_div_callee(half_t y,half_t x) __z88dk_callee;
 
 
 
+extern half_t f16_inv(half_t x);
+extern half_t f16_inv_fastcall(half_t x) __z88dk_fastcall;
+#define f16_inv(a) f16_inv_fastcall(a)
+
+
+extern half_t f16_invsqrt(half_t x);
+extern half_t f16_invsqrt_fastcall(half_t x) __z88dk_fastcall;
+#define f16_invsqrt(a) f16_invsqrt_fastcall(a)
+
+
+
 extern half_t f16_acos(half_t x);
 extern half_t f16_acos_fastcall(half_t x) __z88dk_fastcall;
 #define f16_acos(a) f16_acos_fastcall(a)
@@ -606,9 +626,25 @@ extern half_t f16_exp2_fastcall(half_t x) __z88dk_fastcall;
 #define f16_exp2(a) f16_exp2_fastcall(a)
 
 
-extern half_t f16_expm1(half_t x);
-extern half_t f16_expm1_fastcall(half_t x) __z88dk_fastcall;
-#define f16_expm1(a) f16_expm1_fastcall(a)
+extern half_t f16_exp10(half_t x);
+extern half_t f16_exp10_fastcall(half_t x) __z88dk_fastcall;
+#define f16_exp10(a) f16_exp10_fastcall(a)
+
+
+
+extern half_t f16_div2(half_t x);
+extern half_t f16_div2_fastcall(half_t x) __z88dk_fastcall;
+#define f16_div2(a) f16_div2_fastcall(a)
+
+
+extern half_t f16_mul2(half_t x);
+extern half_t f16_mul2_fastcall(half_t x) __z88dk_fastcall;
+#define f16_mul2(a) f16_mul2_fastcall(a)
+
+
+extern half_t f16_mul10u(half_t x);
+extern half_t f16_mul10u_fastcall(half_t x) __z88dk_fastcall;
+#define f16_mul10u(a) f16_mul10u_fastcall(a)
 
 
 extern half_t f16_frexp(half_t value,int *exp);
@@ -616,31 +652,15 @@ extern half_t f16_frexp_callee(half_t value,int *exp) __z88dk_callee;
 #define f16_frexp(a,b) f16_frexp_callee(a,b)
 
 
-extern int f16_ilogb(half_t x);
-extern int f16_ilogb_fastcall(half_t x) __z88dk_fastcall;
-#define f16_ilogb(a) f16_ilogb_fastcall(a)
-
-
 extern half_t f16_ldexp(half_t x,int exp);
 extern half_t f16_ldexp_callee(half_t x,int exp) __z88dk_callee;
 #define f16_ldexp(a,b) f16_ldexp_callee(a,b)
 
 
-#define scalbn(x,pw2) ldexp(x,pw2)
 
 extern half_t f16_log(half_t x);
 extern half_t f16_log_fastcall(half_t x) __z88dk_fastcall;
 #define f16_log(a) f16_log_fastcall(a)
-
-
-extern half_t f16_log10(half_t x);
-extern half_t f16_log10_fastcall(half_t x) __z88dk_fastcall;
-#define f16_log10(a) f16_log10_fastcall(a)
-
-
-extern half_t f16_log1p(half_t x);
-extern half_t f16_log1p_fastcall(half_t x) __z88dk_fastcall;
-#define f16_log1p(a) f16_log1p_fastcall(a)
 
 
 extern half_t f16_log2(half_t x);
@@ -648,9 +668,9 @@ extern half_t f16_log2_fastcall(half_t x) __z88dk_fastcall;
 #define f16_log2(a) f16_log2_fastcall(a)
 
 
-extern half_t f16_logb(half_t x);
-extern half_t f16_logb_fastcall(half_t x) __z88dk_fastcall;
-#define f16_logb(a) f16_logb_fastcall(a)
+extern half_t f16_log10(half_t x);
+extern half_t f16_log10_fastcall(half_t x) __z88dk_fastcall;
+#define f16_log10(a) f16_log10_fastcall(a)
 
 
 
@@ -665,9 +685,9 @@ extern half_t f16_hypot_callee(half_t x,half_t y) __z88dk_callee;
 
 
 
-extern half_t f16_pow(half_t x,half_t y);
-extern half_t f16_pow_callee(half_t x,half_t y) __z88dk_callee;
-#define f16_pow(a,b) f16_pow_callee(a,b)
+extern half_t f16_sqr(half_t x);
+extern half_t f16_sqr_fastcall(half_t x) __z88dk_fastcall;
+#define f16_sqr(a) f16_sqr_fastcall(a)
 
 
 extern half_t f16_sqrt(half_t x);
@@ -675,31 +695,15 @@ extern half_t f16_sqrt_fastcall(half_t x) __z88dk_fastcall;
 #define f16_sqrt(a) f16_sqrt_fastcall(a)
 
 
-extern half_t f16_cbrt(half_t x);
-extern half_t f16_cbrt_fastcall(half_t x) __z88dk_fastcall;
-#define f16_cbrt(a) f16_cbrt_fastcall(a)
+extern half_t f16_pow(half_t x,half_t y);
+extern half_t f16_pow_callee(half_t x,half_t y) __z88dk_callee;
+#define f16_pow(a,b) f16_pow_callee(a,b)
 
 
 
-extern half_t f16_erf(half_t x);
-extern half_t f16_erf_fastcall(half_t x) __z88dk_fastcall;
-#define f16_erf(a) f16_erf_fastcall(a)
-
-
-extern half_t f16_erfc(half_t x);
-extern half_t f16_erfc_fastcall(half_t x) __z88dk_fastcall;
-#define f16_erfc(a) f16_erfc_fastcall(a)
-
-
-extern half_t f16_lgamma(half_t x);
-extern half_t f16_lgamma_fastcall(half_t x) __z88dk_fastcall;
-#define f16_lgamma(a) f16_lgamma_fastcall(a)
-
-
-extern half_t f16_tgamma(half_t x);
-extern half_t f16_tgamma_fastcall(half_t x) __z88dk_fastcall;
-#define f16_tgamma(a) f16_tgamma_fastcall(a)
-
+extern half_t f16_neg(half_t x);
+extern half_t f16_neg_fastcall(half_t x) __z88dk_fastcall;
+#define f16_neg(a) f16_neg_fastcall(a)
 
 
 extern half_t f16_ceil(half_t x);
@@ -712,34 +716,10 @@ extern half_t f16_floor_fastcall(half_t x) __z88dk_fastcall;
 #define f16_floor(a) f16_floor_fastcall(a)
 
 
-extern half_t f16_nearbyint(half_t x);
-extern half_t f16_nearbyint_fastcall(half_t x) __z88dk_fastcall;
-#define f16_nearbyint(a) f16_nearbyint_fastcall(a)
 
-
-extern half_t f16_rint(half_t x);
-extern half_t f16_rint_fastcall(half_t x) __z88dk_fastcall;
-#define f16_rint(a) f16_rint_fastcall(a)
-
-
-extern int f16_lrint(half_t x);
-extern int f16_lrint_fastcall(half_t x) __z88dk_fastcall;
-#define f16_lrint(a) f16_lrint_fastcall(a)
-
-
-extern double_t f16_round(half_t x);
-extern double_t f16_round_fastcall(half_t x) __z88dk_fastcall;
+extern half_t f16_round(half_t x);
+extern half_t f16_round_fastcall(half_t x) __z88dk_fastcall;
 #define f16_round(a) f16_round_fastcall(a)
-
-
-extern long f16_lround(half_t x);
-extern long f16_lround_fastcall(half_t x) __z88dk_fastcall;
-#define f16_lround(a) f16_lround_fastcall(a)
-
-
-extern half_t f16_trunc(half_t x);
-extern half_t f16_trunc_fastcall(half_t x) __z88dk_fastcall;
-#define f16_trunc(a) f16_trunc_fastcall(a)
 
 
 
@@ -751,16 +731,6 @@ extern half_t f16_modf_callee(half_t value,half_t *iptr) __z88dk_callee;
 extern half_t f16_fmod(half_t x,half_t y);
 extern half_t f16_fmod_callee(half_t x,half_t y) __z88dk_callee;
 #define f16_fmod(a,b) f16_fmod_callee(a,b)
-
-
-extern half_t f16_remainder(half_t x,half_t y);
-extern half_t f16_remainder_callee(half_t x,half_t y) __z88dk_callee;
-#define f16_remainder(a,b) f16_remainder_callee(a,b)
-
-
-extern half_t f16_remquo(half_t x,half_t y,int *quo);
-extern half_t f16_remquo_callee(half_t x,half_t y,int *quo) __z88dk_callee;
-#define f16_remquo(a,b,c) f16_remquo_callee(a,b,c)
 
 
 
@@ -775,23 +745,6 @@ extern half_t f16_nan_fastcall(const char *tagp) __z88dk_fastcall;
 
 
 
-extern half_t f16_nextafter(half_t x,half_t y);
-extern half_t f16_nextafter_callee(half_t x,half_t y) __z88dk_callee;
-#define f16_nextafter(a,b) f16_nextafter_callee(a,b)
-
-
-extern half_t f16_nexttoward(half_t x,half_t y);
-extern half_t f16_nexttoward_callee(half_t x,half_t y) __z88dk_callee;
-#define f16_nexttoward(a,b) f16_nexttoward_callee(a,b)
-
-
-
-extern half_t f16_fdim(half_t x,half_t y);
-extern half_t f16_fdim_callee(half_t x,half_t y) __z88dk_callee;
-#define f16_fdim(a,b) f16_fdim_callee(a,b)
-
-
-
 extern half_t f16_fmax(half_t x,half_t y);
 extern half_t f16_fmax_callee(half_t x,half_t y) __z88dk_callee;
 #define f16_fmax(a,b) f16_fmax_callee(a,b)
@@ -800,12 +753,6 @@ extern half_t f16_fmax_callee(half_t x,half_t y) __z88dk_callee;
 extern half_t f16_fmin(half_t x,half_t y);
 extern half_t f16_fmin_callee(half_t x,half_t y) __z88dk_callee;
 #define f16_fmin(a,b) f16_fmin_callee(a,b)
-
-
-
-extern half_t f16_fma(half_t x,half_t y,half_t z);
-extern half_t f16_fma_callee(half_t x,half_t y,half_t z) __z88dk_callee;
-#define f16_fma(a,b,c) f16_fma_callee(a,b,c)
 
 
 
@@ -840,44 +787,9 @@ extern int f16_isunordered_callee(half_t x,half_t y) __z88dk_callee;
 
 
 
-extern half_t f16_neg(half_t x);
-extern half_t f16_neg_fastcall(half_t x) __z88dk_fastcall;
-#define f16_neg(a) f16_neg_fastcall(a)
-
-
-extern half_t f16_sqr(half_t x);
-extern half_t f16_sqr_fastcall(half_t x) __z88dk_fastcall;
-#define f16_sqr(a) f16_sqr_fastcall(a)
-
-
-extern half_t f16_inv(half_t x);
-extern half_t f16_inv_fastcall(half_t x) __z88dk_fastcall;
-#define f16_inv(a) f16_inv_fastcall(a)
-
-
-extern half_t f16_invsqrt(half_t x);
-extern half_t f16_invsqrt_fastcall(half_t x) __z88dk_fastcall;
-#define f16_invsqrt(a) f16_invsqrt_fastcall(a)
-
-
-extern half_t f16_div2(half_t x);
-extern half_t f16_div2_fastcall(half_t x) __z88dk_fastcall;
-#define f16_div2(a) f16_div2_fastcall(a)
-
-
-extern half_t f16_mul2(half_t x);
-extern half_t f16_mul2_fastcall(half_t x) __z88dk_fastcall;
-#define f16_mul2(a) f16_mul2_fastcall(a)
-
-
-extern half_t f16_mul10u(half_t x);
-extern half_t f16_mul10u_fastcall(half_t x) __z88dk_fastcall;
-#define f16_mul10u(a) f16_mul10u_fastcall(a)
-
-
-extern half_t f16_exp10(half_t x);
-extern half_t f16_exp10_fastcall(half_t x) __z88dk_fastcall;
-#define f16_exp10(a) f16_exp10_fastcall(a)
+extern half_t f16_fma(half_t x,half_t y,half_t z);
+extern half_t f16_fma_callee(half_t x,half_t y,half_t z) __z88dk_callee;
+#define f16_fma(a,b,c) f16_fma_callee(a,b,c)
 
 
 extern double_t f16_poly(const half_t x,const half_t d[],unsigned int n);
@@ -909,15 +821,16 @@ extern double_t f16_poly_callee(const half_t x,const half_t d[],unsigned int n) 
 
 #define expf         exp
 #define exp2f        exp2
+#define exp10f       exp10
 #define expm1f       expm1
 #define frexpf       frexp
 #define ilogbf       ilogb
 #define ldexpf       ldexp
 
 #define logf         log
+#define log2f        log2
 #define log10f       log10
 #define log1pf       log1p
-#define log2f        log2
 #define logbf        logb
 
 #define scalbnf      scalbn

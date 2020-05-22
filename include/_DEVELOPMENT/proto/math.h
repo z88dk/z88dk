@@ -167,7 +167,8 @@ __DPROTO(,,double_t,,expm1,double_t x)
 __DPROTO(,,double_t,,frexp,double_t value,int *exp)
 __DPROTO(,,int,,ilogb,double_t x)
 __DPROTO(,,double_t,,ldexp,double_t x,int exp)
-#define scalbn(x,pw2) ldexp(x,pw2)
+__DPROTO(,,double_t,,scalbn,double_t x,int n)	
+__DPROTO(,,double_t,,scalbln,double_t x,int n)
 
 __DPROTO(,,double_t,,log,double_t x)
 __DPROTO(,,double_t,,log10,double_t x)
@@ -241,6 +242,9 @@ __DPROTO(,,half_t,,f16_sub,half_t y,half_t x)
 __DPROTO(,,half_t,,f16_mul,half_t y,half_t x)
 __DPROTO(,,half_t,,f16_div,half_t y,half_t x)
 
+__DPROTO(,,half_t,,f16_inv,half_t x)
+__DPROTO(,,half_t,,f16_invsqrt,half_t x)
+
 __DPROTO(,,half_t,,f16_acos,half_t x)
 __DPROTO(,,half_t,,f16_asin,half_t x)
 __DPROTO(,,half_t,,f16_atan,half_t x)
@@ -260,56 +264,39 @@ __DPROTO(,,half_t,,f16_tanh,half_t x)
 
 __DPROTO(,,half_t,,f16_exp,half_t x)
 __DPROTO(,,half_t,,f16_exp2,half_t x)
-__DPROTO(,,half_t,,f16_expm1,half_t x)
+__DPROTO(,,half_t,,f16_exp10,half_t x)
+
+__DPROTO(,,half_t,,f16_div2,half_t x)
+__DPROTO(,,half_t,,f16_mul2,half_t x)
+__DPROTO(,,half_t,,f16_mul10u,half_t x)
 __DPROTO(,,half_t,,f16_frexp,half_t value,int *exp)
-__DPROTO(,,int,,f16_ilogb,half_t x)
 __DPROTO(,,half_t,,f16_ldexp,half_t x,int exp)
-#define scalbn(x,pw2) ldexp(x,pw2)
 
 __DPROTO(,,half_t,,f16_log,half_t x)
-__DPROTO(,,half_t,,f16_log10,half_t x)
-__DPROTO(,,half_t,,f16_log1p,half_t x)
 __DPROTO(,,half_t,,f16_log2,half_t x)
-__DPROTO(,,half_t,,f16_logb,half_t x)
+__DPROTO(,,half_t,,f16_log10,half_t x)
 
 __DPROTO(,,half_t,,f16_fabs,half_t x)
 __DPROTO(,,half_t,,f16_hypot,half_t x,half_t y)
 
-__DPROTO(,,half_t,,f16_pow,half_t x,half_t y)
+__DPROTO(,,half_t,,f16_sqr,half_t x)
 __DPROTO(,,half_t,,f16_sqrt,half_t x)
-__DPROTO(,,half_t,,f16_cbrt,half_t x)
+__DPROTO(,,half_t,,f16_pow,half_t x,half_t y)
 
-__DPROTO(,,half_t,,f16_erf,half_t x)
-__DPROTO(,,half_t,,f16_erfc,half_t x)
-__DPROTO(,,half_t,,f16_lgamma,half_t x)
-__DPROTO(,,half_t,,f16_tgamma,half_t x)
-
+__DPROTO(,,half_t,,f16_neg,half_t x)
 __DPROTO(,,half_t,,f16_ceil,half_t x)
 __DPROTO(,,half_t,,f16_floor,half_t x)
-__DPROTO(,,half_t,,f16_nearbyint,half_t x)
-__DPROTO(,,half_t,,f16_rint,half_t x)
-__DPROTO(,,int,,f16_lrint,half_t x)
-__DPROTO(,,double_t,,f16_round,half_t x)
-__DPROTO(,,long,,f16_lround,half_t x)
-__DPROTO(,,half_t,,f16_trunc,half_t x)
+
+__DPROTO(,,half_t,,f16_round,half_t x)
 
 __DPROTO(,,half_t,,f16_modf,half_t value,half_t *iptr)
 __DPROTO(,,half_t,,f16_fmod,half_t x,half_t y)
-__DPROTO(,,half_t,,f16_remainder,half_t x,half_t y)
-__DPROTO(,,half_t,,f16_remquo,half_t x,half_t y,int *quo)
 
 __DPROTO(,,half_t,,f16_copysign,half_t x,half_t y)
 __DPROTO(,,half_t,,f16_nan,const char *tagp)
 
-__DPROTO(,,half_t,,f16_nextafter,half_t x,half_t y)
-__DPROTO(,,half_t,,f16_nexttoward,half_t x,half_t y)
-
-__DPROTO(,,half_t,,f16_fdim,half_t x,half_t y)
-
 __DPROTO(,,half_t,,f16_fmax,half_t x,half_t y)
 __DPROTO(,,half_t,,f16_fmin,half_t x,half_t y)
-
-__DPROTO(,,half_t,,f16_fma,half_t x,half_t y,half_t z)
 
 __DPROTO(,,int,,f16_isgreater,half_t x,half_t y)
 __DPROTO(,,int,,f16_isgreaterequal,half_t x,half_t y)
@@ -318,14 +305,7 @@ __DPROTO(,,int,,f16_islessequal,half_t x,half_t y)
 __DPROTO(,,int,,f16_islessgreater,half_t x,half_t y)
 __DPROTO(,,int,,f16_isunordered,half_t x,half_t y)
 
-__DPROTO(,,half_t,,f16_neg,half_t x)
-__DPROTO(,,half_t,,f16_sqr,half_t x)
-__DPROTO(,,half_t,,f16_inv,half_t x)
-__DPROTO(,,half_t,,f16_invsqrt,half_t x)
-__DPROTO(,,half_t,,f16_div2,half_t x)
-__DPROTO(,,half_t,,f16_mul2,half_t x)
-__DPROTO(,,half_t,,f16_mul10u,half_t x)
-__DPROTO(,,half_t,,f16_exp10,half_t x)
+__DPROTO(,,half_t,,f16_fma,half_t x,half_t y,half_t z)
 __DPROTO(,,double_t,,f16_poly, const half_t x, const half_t d[], unsigned int n)
 
 #endif
@@ -351,15 +331,16 @@ __DPROTO(,,double_t,,f16_poly, const half_t x, const half_t d[], unsigned int n)
 
 #define expf         exp
 #define exp2f        exp2
+#define exp10f       exp10
 #define expm1f       expm1
 #define frexpf       frexp
 #define ilogbf       ilogb
 #define ldexpf       ldexp
 
 #define logf         log
+#define log2f        log2
 #define log10f       log10
 #define log1pf       log1p
-#define log2f        log2
 #define logbf        logb
 
 #define scalbnf      scalbn
