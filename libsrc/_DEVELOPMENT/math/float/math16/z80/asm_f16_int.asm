@@ -8,7 +8,7 @@
 ;  feilipu, 2020 May
 ;
 ;-------------------------------------------------------------------------
-;  asm_f16_int - z80 half floating to int
+;  asm_f24_int - z80 half floating to int
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked format: sign in d[7], exponent in e, mantissa in hl

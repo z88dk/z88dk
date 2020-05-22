@@ -59,18 +59,17 @@ PUBLIC asm_f24_f16
 ; convert f16 to f24
 .asm_f16_f24
     ld d,h                      ; capture sign in d
-    ld e,h                      ; capture exponent in e
+    ld a,h                      ; capture exponent in a
     ld h,l                      ; mantissa padded to ehl
     ld l,0
-    srl e                       ; shift & position exponent
+    rra                        ; shift & position exponent
     rr h
     rr l
-    srl e
+    rra
     rr h
     rr l
-    ld a,01Fh                   ; separate exponent
-    and e
-    add a,+(127-15)             ; convert bias to 8 bits
+    and 01Fh                    ; separate exponent
+    add a,127-15                ; convert bias to 8 bits
     ld e,a
     scf                         ; set implicit bit
     rr h                        ; align mantissa to hl
@@ -80,9 +79,7 @@ PUBLIC asm_f24_f16
 ; convert f24 to f16
 .asm_f24_f16
     ld a,e                      ; exponent to a
-    and 07Fh                    ; check for zero
-    jp Z,asm_f16_zero           ; return zero
-    sub a,+(127-15)             ; convert to f24 bias
+    sub a,127-15                ; convert to f24 bias
     jp M,asm_f16_zero           ; zero if number too small
     cp 31
     jp NC,asm_f16_inf           ; infinity if number too large
@@ -91,13 +88,13 @@ PUBLIC asm_f24_f16
     rl h                        ; remove implicit bit
     sla l
     rl h
-    rl e                        ; move mantissa into e
+    rla                         ; move mantissa into a
     sla l
     rl h
-    rl e
-    sla e                       ; set e ready for sign
+    rla
+    rla                         ; set a ready for sign
     sla d                       ; move sign to carry
-    rr e                        ; place it in e, with exponent and mantissa e (hl)
+    rra                         ; place it in a, with exponent and mantissa e (hl)
     ld l,h                      ; position f16 in hl
-    ld h,e
+    ld h,a
     ret

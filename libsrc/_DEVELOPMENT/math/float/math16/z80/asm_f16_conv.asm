@@ -8,7 +8,7 @@
 ;  feilipu, May 2020
 ;
 ;-------------------------------------------------------------------------
-;  asm_f16_convert - z80, z180, z80n unpacked format conversion code
+;  asm_f24_convert - z80, z180, z80n unpacked format conversion code
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked format: sign in d[7], exponent in e, mantissa in hl
@@ -19,33 +19,33 @@
 SECTION code_clib
 SECTION code_fp_math16
 
-EXTERN asm_f16_normalize
+EXTERN asm_f24_normalize
 
-PUBLIC asm_f16_float8
-PUBLIC asm_f16_float16
-PUBLIC asm_f16_float32
+PUBLIC asm_f24_half8
+PUBLIC asm_f24_half16
+PUBLIC asm_f24_half32
 
-PUBLIC asm_f16_float8u
-PUBLIC asm_f16_float16u
-PUBLIC asm_f16_float32u
+PUBLIC asm_f24_half8u
+PUBLIC asm_f24_half16u
+PUBLIC asm_f24_half32u
 
-; convert signed char in l to float in dehl
-.asm_f16_float8
+; convert signed char in l to half in dehl
+.asm_f24_half8
     ld a,l
     rla                         ; sign bit of a into C
     sbc a,a
     ld h,a                      ; now hl is sign extended
 
-; convert integer in hl to float in dehl
-.asm_f16_float16
+; convert integer in hl to half in dehl
+.asm_f24_half16
     ex de,hl                    ; integer to de
     ld a,d                      ; sign
     rla                         ; get sign to C
     sbc hl,hl                   ; sign extension, all 1's if neg
     ex de,hl                    ; dehl
 
-; now convert long in dehl to float in dehl
-.asm_f16_float32
+; now convert long in dehl to half in dehl
+.asm_f24_half32
     ex de,hl                    ; hlde
     ld b,h                      ; to hold the sign, put copy of ULSW into b
     bit 7,h                     ; test sign, negate if negative
@@ -59,16 +59,16 @@ PUBLIC asm_f16_float32u
     sbc hl,bc
     jp dldf0                    ; number in hlde, sign in b[7]
 
-; convert character in l to float in dehl
-.asm_f16_float8u
+; convert character in l to half in dehl
+.asm_f24_half8u
     ld h,0
 
-; convert unsigned in hl to float in dehl
-.asm_f16_float16u                  
+; convert unsigned in hl to half in dehl
+.asm_f24_half16u                  
     ld de,0
 
-; convert unsigned long in dehl to float in dehl
-.asm_f16_float32u                  
+; convert unsigned long in dehl to half in dehl
+.asm_f24_half32u                  
     res 7,d                     ; ensure unsigned long's "sign" bit is reset
     ld b,d                      ; to hold the sign, put copy of MSB into b
                                 ; continue, with unsigned long number in dehl
@@ -95,7 +95,7 @@ PUBLIC asm_f16_float32u
 .normalize
     ld e,142                    ; exponent if MSW is zero
     ld d,b                      ; sign to d[7]
-    jp asm_f16_normalize        ; piggy back on normalisation code
+    jp asm_f24_normalize        ; piggy back on normalisation code
 
 
 .S16R                           ; must shift right to make de = 0 and mantissa in hl

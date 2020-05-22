@@ -35,7 +35,7 @@ PUBLIC asm_f16_inf
     ret
 
 .asm_f16_inf
-    ld a,d
+    ld a,h
     and 080h            ; preserve sign
     or 07Ch             ; set infinity exponent
     ld h,a              ; set sign, exponent

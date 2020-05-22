@@ -17,11 +17,11 @@
 SECTION code_clib
 SECTION code_math
 
-EXTERN asm_f16_zero
+EXTERN asm_f24_zero
 
-PUBLIC asm_f16_normalize
+PUBLIC asm_f24_normalize
 
-.asm_f16_normalize
+.asm_f24_normalize
     xor a
     or a,h
     jr Z,SLSB
@@ -97,18 +97,17 @@ PUBLIC asm_f16_normalize
 ;
 .normdone
     add a,e                     ; exponent of result
-    jp NC,asm_f16_zero          ; if underflow return zero
+    jp NC,asm_f24_zero          ; if underflow return zero
     ld e,a
     ret                         ; return DEHL
 
 
 .SLSB
     or a,l
-    jp Z,asm_f16_zero           ; mantissa is all zeros, return zero
+    jp Z,asm_f24_zero           ; mantissa is all zeros, return zero
     and 0f0h
     jr Z,S16L                   ; shift <16 bits, most significant in low nibble
 ;   jr S12L                     ; shift <12 bits, most significant in high nibble
-
 
 .S12L                           ; shift 8 to 11 bits left
     ld a,l
@@ -141,7 +140,6 @@ PUBLIC asm_f16_normalize
     ld l,0
     ld a,-10
     jp normdone
-
 
 .S16L                           ; shift 12 to 15 bits left
     ld a,l
