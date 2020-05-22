@@ -14,20 +14,20 @@
 ;  unpacked format: sign in d[7], exponent in e, mantissa in hl
 ;  return normalized result also in unpacked format
 ;
-;  return half float in hl
+;  return f24 float in hl
 ;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math16
 
-PUBLIC asm_f32_f16
-PUBLIC asm_f16_f32
-PUBLIC asm_half_f16
-PUBLIC asm_f16_half
+PUBLIC asm_f24_f32
+PUBLIC asm_f32_f24
+PUBLIC asm_f24_f16
+PUBLIC asm_f16_f24
 
-; convert f32 to f16
-.asm_f32_f16
+; convert f32 to f24
+.asm_f24_f32
     xor a
     rl e
     rl d                        ; capture exponent in d, sign in carry
@@ -40,8 +40,8 @@ PUBLIC asm_f16_half
     ld d,a                      ; save sign
     ret                         ; result in dehl
 
-; convert f16 to f32
-.asm_f16_f32
+; convert f24 to f32
+.asm_f32_f24
     ld a,d                      ; preserve sign in a
     ld d,e                      ; exponent to d
     ld e,h                      ; mantissa padded to ehl
@@ -53,7 +53,8 @@ PUBLIC asm_f16_half
     rr e                        ; exponent and mantissa in e (hl)
     ret
 
-.asm_half_f16
+; convert f16 to f24
+.asm_f24_f16
     ld d,h                      ; capture sign in d
     ld e,h                      ; capture exponent in e
     ld h,l                      ; mantissa padded to ehl
@@ -73,14 +74,15 @@ PUBLIC asm_f16_half
     rr l
     ret
 
-.asm_f16_half
+; convert f24 to f16
+.asm_f16_f24
     ld a,e                      ; exponent to a
     and 07Fh                    ; check for zero
-    jp Z,asm_f16_zero_half      ; return zero
-    sub a,(127-15)              ; convert to half bias
-    jp M,asm_f16_zero_half      ; zero if number too small
+    jp Z,asm_f16_zero           ; return zero
+    sub a,(127-15)              ; convert to f24 bias
+    jp M,asm_f16_zero           ; zero if number too small
     cp 31
-    jp NC,asm_f16_inf_half      ; infinity if number too large
+    jp NC,asm_f16_inf           ; infinity if number too large
     
     sla l                       ; position mantissa
     rl h                        ; remove implicit bit
@@ -93,6 +95,6 @@ PUBLIC asm_f16_half
     sla e                       ; set e ready for sign
     sla d                       ; move sign to carry
     rr e                        ; place it in e, with exponent and mantissa e (hl)
-    ld l,h                      ; position half in hl
+    ld l,h                      ; position f16 in hl
     ld h,e
     ret

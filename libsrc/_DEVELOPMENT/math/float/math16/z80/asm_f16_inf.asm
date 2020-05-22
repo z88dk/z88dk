@@ -20,10 +20,10 @@
 
 SECTION code_fp_math16
 
+PUBLIC asm_f24_inf
 PUBLIC asm_f16_inf
-PUBLIC asm_f16_inf_half
 
-.asm_f16_inf
+.asm_f24_inf
     ld a,d
     and 080h            ; preserve sign
     ld d,a
@@ -34,7 +34,7 @@ PUBLIC asm_f16_inf_half
     ld e,a              ; load 0xFF exponent
     ret
 
-.asm_f16_inf_half
+.asm_f16_inf
     ld a,d
     and 080h            ; preserve sign
     or 07Ch             ; set infinity exponent

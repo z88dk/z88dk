@@ -20,10 +20,10 @@
 
 SECTION code_fp_math16
 
+PUBLIC asm_f24_zero
 PUBLIC asm_f16_zero
-PUBLIC asm_f16_zero_half
 
-.asm_f16_zero
+.asm_f24_zero
     ld a,d
     and 080h
     ld d,a
@@ -33,7 +33,7 @@ PUBLIC asm_f16_zero_half
     ld l,a
     ret
 
-.asm_f16_zero_half
+.asm_f16_zero
     ld a,d
     and 080h
     ld h,a

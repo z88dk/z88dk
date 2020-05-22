@@ -83,11 +83,11 @@ PUBLIC asm_f16_float32u
     ld l,h
     ld h,e
     ld e,d
-    ld c,150                    ;  MSB non zero, exponent if no shift
+    ld c,150                    ; MSB non zero, exponent if initial 8 shifts
 
 .SMSB
     or a,e
-    jr Z,normalize              ; we have an int16, so need to normalise
+    jr Z,normalize              ; we have an int16, MSW is zero, so need to normalise
     and 0f0h
     jr Z,S12R                   ; shift 4 bits, most significant in low nibble
     jr S16R                     ; shift 8 bits, most significant in high nibble
@@ -102,7 +102,7 @@ PUBLIC asm_f16_float32u
     srl e
     rr h
     rr l
-    inc c
+    inc c                       ; increment exponent following each shift
     srl e
     rr h
     rr l
@@ -115,11 +115,11 @@ PUBLIC asm_f16_float32u
     rr h
     rr l                        ; 4 for sure
     inc c                       ; exponent for no more shifts
-.S12R                           ; here shift right 1-4 more
     ld a,e
     or a
     jr Z,packup                 ; done right
-    
+
+.S12R                           ; here shift right 1-4 more
     srl e
     rr h
     rr l
@@ -127,6 +127,7 @@ PUBLIC asm_f16_float32u
     ld a,e
     or a
     jr Z,packup
+
     srl e
     rr h
     rr l
@@ -134,6 +135,7 @@ PUBLIC asm_f16_float32u
     ld a,e
     or a
     jr Z,packup
+
     srl e
     rr h
     rr l
@@ -141,6 +143,7 @@ PUBLIC asm_f16_float32u
     ld a,e
     or a
     jr Z,packup
+
     srl e
     rr h
     rr l

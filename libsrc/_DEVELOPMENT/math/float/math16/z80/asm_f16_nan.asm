@@ -20,15 +20,15 @@
 
 SECTION code_fp_math16
 
+PUBLIC asm_f24_nan
 PUBLIC asm_f16_nan
-PUBLIC asm_f16_nan_half
 
-.asm_f16_nan
+.asm_f24_nan
     ld de,000FFh
     ld hl,00000h
     ret
 
-.asm_f16_nan_half
+.asm_f16_nan
     ld hl,07C00h
     ret
 
