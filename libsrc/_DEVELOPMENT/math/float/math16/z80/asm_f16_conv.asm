@@ -19,7 +19,7 @@
 SECTION code_clib
 SECTION code_fp_math16
 
-EXTERN asm_f16_fsnormalize
+EXTERN asm_f16_normalize
 
 PUBLIC asm_f16_float8
 PUBLIC asm_f16_float16
