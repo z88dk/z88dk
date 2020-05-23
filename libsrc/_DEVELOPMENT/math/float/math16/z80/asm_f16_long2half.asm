@@ -8,7 +8,7 @@
 ;  feilipu, May 2020
 ;
 ;-------------------------------------------------------------------------
-;  asm_f24_convert - z80, z180, z80n unpacked format conversion code
+;  asm_f24_long2half - z80, z180, z80n unpacked format conversion code
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked format: sign in d[7], exponent in e, mantissa in hl
@@ -21,35 +21,16 @@ SECTION code_fp_math16
 
 EXTERN asm_f24_normalize
 
-PUBLIC asm_f24_half8
-PUBLIC asm_f24_half16
 PUBLIC asm_f24_half32
-
-PUBLIC asm_f24_half8u
-PUBLIC asm_f24_half16u
 PUBLIC asm_f24_half32u
 
-; convert signed char in l to half in dehl
-.asm_f24_half8
-    ld a,l
-    rla                         ; sign bit of a into C
-    sbc a,a
-    ld h,a                      ; now hl is sign extended
-
-; convert integer in hl to half in dehl
-.asm_f24_half16
-    ex de,hl                    ; integer to de
-    ld a,d                      ; sign
-    rla                         ; get sign to C
-    sbc hl,hl                   ; sign extension, all 1's if neg
-    ex de,hl                    ; dehl
-
-; now convert long in dehl to half in dehl
+; convert long in dehl to half in dehl
 .asm_f24_half32
+    ld b,d                      ; to hold the sign, put copy of ULSW into b
+    bit 7,d                     ; test sign, negate if negative
+    jr Z,shiftright
+
     ex de,hl                    ; hlde
-    ld b,h                      ; to hold the sign, put copy of ULSW into b
-    bit 7,h                     ; test sign, negate if negative
-    jr Z,dldf0
     ld c,l                      ; LLSW into c
     ld hl,0
     or a                        ; clear C
@@ -57,25 +38,15 @@ PUBLIC asm_f24_half32u
     ex de,hl
     ld hl,0
     sbc hl,bc
-    jp dldf0                    ; number in hlde, sign in b[7]
-
-; convert character in l to half in dehl
-.asm_f24_half8u
-    ld h,0
-
-; convert unsigned in hl to half in dehl
-.asm_f24_half16u                  
-    ld de,0
+    ex de,hl
+    jp shiftright               ; number in dehl, sign in b[7]
 
 ; convert unsigned long in dehl to half in dehl
 .asm_f24_half32u                  
-    res 7,d                     ; ensure unsigned long's "sign" bit is reset
-    ld b,d                      ; to hold the sign, put copy of MSB into b
+    res 7,b                     ; ensure unsigned long "sign" bit is reset in b
                                 ; continue, with unsigned long number in dehl
-    ex de,hl                    ; number in hlde, sign in b[7]
 
-.dldf0
-    ex de,hl                    ; number in dehl, sign in b[7]
+.shiftright
     xor a
     or a,d
     ld c,142                    ; exponent if MSB is zero
@@ -83,7 +54,7 @@ PUBLIC asm_f24_half32u
     ld l,h
     ld h,e
     ld e,d
-    ld c,150                    ; MSB non zero, exponent if initial 8 shifts
+    ld c,150                    ; MSB non zero, exponent if initial 8 shifts needed
 
 .SMSB
     or a,e
