@@ -14,7 +14,7 @@
 ;  unpacked format: sign in d[7], exponent in e, mantissa in hl
 ;  return normalized result also in unpacked format
 ;
-;  return f24 float in hl
+;  return f32 and f24 float in dehl, and f16 in hl
 ;
 ;-------------------------------------------------------------------------
 
@@ -31,16 +31,19 @@ PUBLIC asm_f24_f16
 
 ; convert f32 to f24
 .asm_f32_f24
-    xor a
-    rl e
+    sla e
     rl d                        ; capture exponent in d, sign in carry
-    rra                         ; capture sign in a
+    rr b                        ; capture sign in b
     scf                         ; set implicit bit
     rr e                        ; mantissa in ehl
+    ld a,l                      ; capture 8 truncated bits
     ld l,h                      ; create 16 bit mantissa by truncation
     ld h,e
     ld e,d                      ; save exponent
-    ld d,a                      ; save sign
+    ld d,b                      ; save sign
+    or a                        ; check for truncated bits
+    ret Z                       ; return if none
+    set 0,l                     ; set lsb if truncated bits
     ret                         ; result in dehl
 
 ; convert f24 to f32
@@ -83,7 +86,7 @@ PUBLIC asm_f24_f16
     jp M,asm_f16_zero           ; zero if number too small
     cp 31
     jp NC,asm_f16_inf           ; infinity if number too large
-    
+
     sla l                       ; position mantissa
     rl h                        ; remove implicit bit
     sla l
@@ -94,7 +97,13 @@ PUBLIC asm_f24_f16
     rla
     rla                         ; set a ready for sign
     sla d                       ; move sign to carry
-    rra                         ; place it in a, with exponent and mantissa e (hl)
-    ld l,h                      ; position f16 in hl
-    ld h,a
+    rra                         ; place it in a, with exponent and mantissa
+    ld d,a                      ; position f16 in de
+    ld e,h
+    ld a,l                      ; capture 5 truncated bits
+    ex de,hl                    ; position f16 in hl
+    or a                        ; check for truncated bits
+    ret Z                       ; return if none
+    set 0,l                     ; set lsb if truncated bits
     ret
+
