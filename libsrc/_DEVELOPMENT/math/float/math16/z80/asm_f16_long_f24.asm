@@ -8,7 +8,7 @@
 ;  feilipu, May 2020
 ;
 ;-------------------------------------------------------------------------
-;  asm_f24_long2half - z80, z180, z80n unpacked format conversion code
+;  asm_f16_long_f24 - z80, z180, z80n unpacked format conversion code
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked format: sign in d[7], exponent in e, mantissa in hl
@@ -21,11 +21,11 @@ SECTION code_fp_math16
 
 EXTERN asm_f24_normalize
 
-PUBLIC asm_f24_half32
-PUBLIC asm_f24_half32u
+PUBLIC asm_i32_f24
+PUBLIC asm_u32_f24
 
-; convert long in dehl to half in dehl
-.asm_f24_half32
+; convert long in dehl to _f24 in dehl
+.asm_i32_f24
     ld b,d                      ; to hold the sign, put copy of ULSW into b
     bit 7,d                     ; test sign, negate if negative
     jr Z,shiftright
@@ -41,8 +41,8 @@ PUBLIC asm_f24_half32u
     ex de,hl
     jp shiftright               ; number in dehl, sign in b[7]
 
-; convert unsigned long in dehl to half in dehl
-.asm_f24_half32u                  
+; convert unsigned long in dehl to _f24 in dehl
+.asm_u32_f24                  
     res 7,b                     ; ensure unsigned long "sign" bit is reset in b
                                 ; continue, with unsigned long number in dehl
 

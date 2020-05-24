@@ -4,13 +4,14 @@ math/float/math16/z80/asm_f16_nan
 math/float/math16/z80/asm_f16_neg
 math/float/math16/z80/asm_f16_abs
 
-math/float/math16/z80/asm_f16_int
-math/float/math16/z80/asm_f16_long
+math/float/math16/z80/asm_f16_f32
+
+math/float/math16/z80/asm_f16_f24_int
+math/float/math16/z80/asm_f16_f24_long
+math/float/math16/z80/asm_f16_int_f24
+math/float/math16/z80/asm_f16_long_f24
 
 math/float/math16/z80/asm_f16_normalize
-math/float/math16/z80/asm_f16_int2half
-math/float/math16/z80/asm_f16_long2half
-math/float/math16/z80/asm_f16_f32
 
 ;math/float/math16/z80/asm_f16_add
 

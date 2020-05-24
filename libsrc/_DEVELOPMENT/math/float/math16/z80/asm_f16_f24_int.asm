@@ -8,54 +8,45 @@
 ;  feilipu, 2020 May
 ;
 ;-------------------------------------------------------------------------
-;  asm_f24_long - z80 half floating to long
+;  asm_f24_i16 - z80 half floating to int
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked format: sign in d[7], exponent in e, mantissa in hl
 ;  return normalized result also in unpacked format
 ;
-;  return long in dehl
+;  return int in hl
 ;
 ;-------------------------------------------------------------------------
 
 SECTION code_fp_math16
 
-EXTERN  l_neg_dehl
+EXTERN  l_neg_hl
 
-PUBLIC asm_f24_2long
-PUBLIC asm_f24_2ulong
+PUBLIC asm_f24_i16
+PUBLIC asm_f24_u16
 
-; Convert floating point number to long
-.asm_f24_2long
-.asm_f24_2ulong
-    ld b,d                      ;Holds sign
+; Convert floating point number to int
+.asm_f24_i16
+.asm_f24_u16
     ld a,e                      ;Holds exponent
     and a
-    jr Z,lzero                  ;exponent was 0, return 0
-    cp $7e + 32
-    jp NC,lmax                  ;number too large
-    ld d,h                      ;place mantissa in long
-    ld e,l
-    ld h,0
-    ld l,h
-.lloop
-    srl d                       ;fill with 0
-    rr e
-    rr h
+    jr Z,izero                  ;exponent was 0, return 0
+    cp $7e + 16
+    jp NC,imax                  ;number too large
+.iloop
+    srl h                       ;fill with 0
     rr l
     inc a
-    cp $7e + 32
-    jr NZ,lloop
-    rl b                        ;check sign bit
-    call C,l_neg_dehl
+    cp $7e + 16
+    jr NZ,iloop
+    rl d                        ;check sign bit
+    call C,l_neg_hl
     ret
 
-.lzero
-    ld de,0
+.izero
     ld hl,0
     ret
 
-.lmax
-    ld de,0FFh
+.imax
     ld hl,0FFh
     ret

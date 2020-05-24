@@ -8,7 +8,7 @@
 ;  feilipu, May 2020
 ;
 ;-------------------------------------------------------------------------
-;  asm_f24_int2half - z80, z180, z80n unpacked format conversion code
+;  asm_f16_int_f24 - z80, z180, z80n unpacked format conversion code
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked format: sign in d[7], exponent in e, mantissa in hl
@@ -21,22 +21,22 @@ SECTION code_fp_math16
 
 EXTERN asm_f24_normalize
 
-PUBLIC asm_f24_half8
-PUBLIC asm_f24_half16
+PUBLIC asm_i8_f24
+PUBLIC asm_i16_f24
 
-PUBLIC asm_f24_half8u
-PUBLIC asm_f24_half16u
+PUBLIC asm_u8_f24
+PUBLIC asm_u16_f24
 
 
-; convert signed char in l to half in dehl
-.asm_f24_half8
+; convert signed char in l to _f24 in dehl
+.asm_i8_f24
     ld a,l
     rla                         ; sign bit of a into C
     sbc a,a
     ld h,a                      ; now hl is sign extended
 
-; convert integer in hl to half in dehl
-.asm_f24_half16
+; convert integer in hl to _f24 in dehl
+.asm_i16_f24
     ld d,h                      ; sign in d[7]
     ld e,142                    ; exponent
     bit 7,h                     ; test sign, negate if negative
@@ -49,12 +49,12 @@ PUBLIC asm_f24_half16u
     ld h,a
     jp asm_f24_normalize        ; piggy back on normalisation code
 
-; convert character in l to half in hl
-.asm_f24_half8u
+; convert character in l to _f24 in dehl
+.asm_u8_f24
     ld h,0
 
-; convert unsigned in hl to half in hl
-.asm_f24_half16u
+; convert unsigned integer in hl to _f24 in dehl
+.asm_u16_f24
     res 7,d                     ; sign in d[7]
     ld e,142                    ; exponent
     jp asm_f24_normalize        ; piggy back on normalisation code
