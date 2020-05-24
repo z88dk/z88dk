@@ -105,17 +105,18 @@ PUBLIC asm_f24_sub_callee
                                 ; y, op1 mantissa: hlde  = 1mmmmmmm mmmmmmmm
 
 ; sort larger from smaller and compute exponent difference
-    ld a,d
-    exx
+    ld a,e
+    exx                         ; y, op2 mantissa: hlde' = 1mmmmmmm mmmmmmmm
+                                ; x, op1 mantissa: hlde  = 1mmmmmmm mmmmmmmm
 
-    cp a,d                      ; nc if a>=b
-    jp Z,alignzero              ; no alignment needed, mantissas equal
+    cp a,e                      ; nc if a>=b
+    jp Z,alignzero              ; no alignment needed, exponents equal
     jr NC,sort                  ; if a larger than b
-    ld a,d
+    ld a,e
     exx
 
 .sort
-    sub a,d                     ; positive difference in a
+    sub a,e                     ; positive difference in a
     cp  a,1                     ; if one difference, special case
     jp Z,alignone               ; smaller mantissa on top
 
@@ -132,14 +133,14 @@ PUBLIC asm_f24_sub_callee
     srl h                       ; 1 shift
     rr l
 .al_2
-    rra                         ; 1st lost bit to a
+    rra                         ; 1st lost bit to a[7]
     jr NC,al_3
     srl h                       ; 2 shifts
     rr l
     srl h
     rr l
 .al_3
-    rra                         ; 2nd lost bit to a
+    rra                         ; 2nd lost bit to a[7,6]
     jr NC,al_4
     srl h                       ; 4 shifts
     rr l
@@ -151,10 +152,10 @@ PUBLIC asm_f24_sub_callee
     rr l
 ; check for 8 bit right shift
 .al_4
-    rra                         ; 3rd lost bit to a check shift by 8,
+    rra                         ; 3rd lost bit to a[7,6,5], check shift by 8
     jr NC,al_5
-; shift by 8 right, no 16 possible
-    ld a,l                      ; lost bits, keep only 8 most significant
+; shift by 8 right
+    ld a,l                      ; lost bits, keep only 8 most significant truncated
     ld l,h
     ld h,0                      ; upper zero
 .al_5
@@ -167,13 +168,10 @@ PUBLIC asm_f24_sub_callee
     jp P,doadd
 ; here for subtract, smaller shifted right at least 2, so no more than
 ; one step of normalize
-    ld b,h                      ; smaller to bc
-    ld c,l
-    exx
     push hl
     exx
-    pop hl                      ; subtract the mantissas
-    sbc hl,bc                   ; carry cleared earlier
+    pop bc                      ; smaller to bc
+    sbc hl,bc                   ; subtract the mantissas, carry cleared earlier
 ; difference larger-smaller in hl
 ; sign of result in d, exponent of result in e
     bit 7,h                     ; check for normalize
@@ -193,17 +191,16 @@ PUBLIC asm_f24_sub_callee
     jp M,dosub
 ;   jr doadd
 
-; here for do add e has exponent of result (larger) d or d' has sign
+; here for do add e' has exponent of result (larger) d or d' has sign
 .doadd
     xor a
-    exx
     push hl
     exx
-    pop bc                      ; add the mantissas
-    add hl,bc
+    pop bc
+    add hl,bc                   ; add the mantissas
     adc a,a                     ; see if overflow from hl
     ret Z                       ; return if no overflow
-    rra                         ; put carry back
+    rra                         ; put carry bit back
     rr h
     rr l
     jr NC,doadd0
@@ -221,18 +218,15 @@ PUBLIC asm_f24_sub_callee
 
 ; here do subtract
 
-; enter with aligned, smaller in hl, exp of result in e'
-; sign of result in d'
+; enter with aligned, smaller in hl
+; sign of result in d', exp of result in e'
 ; larger number in hl'
 ; C is clear
 .dosub
-    ld b,h
-    ld c,l
-    exx
     push hl
     exx
-    pop hl                      ; subtract the mantissas
-    sbc hl,bc
+    pop bc
+    sbc hl,bc                   ; subtract the mantissas
     jp NC,asm_f24_normalize     ; now begin to normalize with dehl
 
 ; fix up and subtract in reverse direction
@@ -250,6 +244,5 @@ PUBLIC asm_f24_sub_callee
 ; difference larger-smaller in hl
 ; exponent of result in e sign of result in d
 ; now do normalize
-
     jp asm_f24_normalize        ; now begin to normalize with dehl
 
