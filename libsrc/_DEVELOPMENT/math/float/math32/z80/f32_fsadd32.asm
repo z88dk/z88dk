@@ -62,7 +62,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
 
     pop af                      ; pop return address
     pop de                      ; get second operand off of the stack
-    pop hl                      ; second b = eeeeeeee c' = s-------
+    pop hl                      ; second b = eeeeeeee c  = s-------
     pop bc                      ;     hlde = 1mmmmmmm mmmmmmmm mmmmmmmm mmmmmmmm
     push af                     ; return address on stack
 
@@ -140,7 +140,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     rr d
     rr e
 .al_2
-    rra                         ; 1st lost bit to a
+    rra                         ; 1st lost bit to a[7]
     jr NC,al_3
     srl h
     rr l
@@ -151,7 +151,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     rr d
     rr e
 .al_3
-    rra                         ; 2nd lost bit to a
+    rra                         ; 2nd lost bits to a[7,6]
     jr NC,al_4
     srl h
     rr l
@@ -171,43 +171,40 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     rr e
 ; check for 8 bit right shift
 .al_4
-    rra                         ;  3rd lost bit to a check shift by 8,
+    rra                         ;  3rd lost bit to a[7,6,5], check shift by 8,
     jr NC,al_5
 ; shift by 8 right, no 16 possible
-    ld a,e                      ; lost bits, keep only 8
-    or a                        ; test lost bits
+    ld a,e                      ; lost bits in a, keep only 8 most significant
     ld e,d
     ld d,l
     ld l,h
     ld h,0                      ; upper zero
-    jr Z,aldone
+    or a
+    jr Z,aligndone
     set 0,e                     ; lost bits
-    jr aldone
+    jr aligndone
 
 ; here possible 16
 .al_5 
-    rra                         ; shift in a zero, lost bits in 6,5,4
+    rra                         ; 4th lost bit in 6,5,4,3
     jr NC,al_6                  ; no shift by 16
 ; here shift by 16
 ; toss lost bits in a which are remote for 16 shift
 ; consider only lost bits in d
-    ld a,d                      ; lost bits
-    or a                        ; test lost bits
+    ld a,d                      ; lost bits in a, keep only 8 most significant
     ld e,l
     ld d,h
     ld hl,0                     ; hl zero
-    jr Z,aldone
-    set 0,e                     ; lost bits
-    jr aldone
 
 ; here no 8 or 16 shift, lost bits in a-reg bits 6,5,4, other bits zero's
 .al_6
     or a                        ; test lost bits
-    jr Z,aldone
-    set 0,e
+    jr Z,aligndone
+    set 0,e                     ; lost bits
+;   jr aligndone
     
-; aldone here
-.aldone
+; align done here
+.aligndone
     ex af,af                    ; carry clear
     jp P,doadd
 ; here for subtract, smaller shifted right at least 2, so no more than
@@ -257,6 +254,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     exx
     pop de                      ; get least of sum
     jr Z,doadd1                 ; if no overflow
+    rra                         ; recover carry
     rr h
     rr l
     rr d
