@@ -1,248 +1,155 @@
-; Copyright (c) 2020 Artyom Beilis
-
-; Permission is hereby granted, free of charge, to any person obtaining a copy
-; of this software and associated documentation files (the "Software"), to deal
-; in the Software without restriction, including without limitation the rights
-; to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-; copies of the Software, and to permit persons to whom the Software is
-; furnished to do so, subject to the following conditions:
-
-; The above copyright notice and this permission notice shall be included in
-; all copies or substantial portions of the Software.
-
-; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-; IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-; FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-; AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-; LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-; THE SOFTWARE.
 ;
+;  feilipu, 2020 May
 ;
-; feilipu, 2020 May
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; f16_mul - z80 half floating point multiplication
+;  asm_f16_add - z80 half floating point add 16-bit mantissa
 ;-------------------------------------------------------------------------
 ;
+; since the z180, and z80n only have support for 8x8bit multiply,
+; the multiplication of the mantissas needs to be broken
+; into stages and accumulated at the end.
+;
+; ab * cd
+;
+; = (a*c)*2^16 +
+;   (a*d + b*c)*2^8 +
+;   (b*d)*2^0
+;
+; assume worst overflow case:  ab=cd=0xffff
+; assume worst underflow case: ab=cd=0x8000
+;
+;   0xFFFF * 0xFFFF = 0x FF FE 00 01
+;
+;   0x8000 * 0x8000 = 0x 40 00 00 00
+;
+;   for underflow, maximum left shift is 1 place
+;   so we should report 32 bits of accuracy
+;   = 16 bits significant
+;
+; calculation for the z80 is done using unrolled shift+add.
+; with zero operand and zero bit elimination.
+;
+;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_math16
 
-EXTERN asm_f16_inf
-EXTERN asm_f16_nan
+EXTERN asm_f16_f24, asm_f24_f16
+EXTERN asm_f24_zero, asm_f24_inf
+EXTERN l_mulu_32_16x16
 
-PUBLIC asm_f16_mul
-PUBLIC asm_f16_calc_ax_bx_mantissa_and_sign
+PUBLIC asm_f16_mul_callee
 
-asm_f16_mul:
-    call asm_f16_calc_ax_bx_mantissa_and_sign
-    jr z,mul_handle_nan_inf
-    add b   ; new_exp = ax + bx - 15
-    sub 15
-    exx 
-    ld c,a ; save exp in bc'
+PUBLIC asm_f24_mul_callee
+
+; enter here for floating asm_f16_mul_callee, x+y, x on stack, y in hl, result in hl
+.asm_f16_mul_callee
+    call asm_f16_f24            ; expand to dehl
+    ld a,d                      ; place op1.s in a[7]
+
+    exx                         ; first  d' = s------- e' = eeeeeeee
+                                ;       hl' = 1mmmmmmm mmmmmmmm
+
+    pop bc                      ; pop return address
+    pop hl                      ; get second operand off of the stack
+    push bc                     ; return address on stack
+    call asm_f16_f24            ; expand to dehl
+                                ; second  d = s------- e = eeeeeeee
+                                ;        hl = 1mmmmmmm mmmmmmmm
+    call mul_f24_f24
+    jp asm_f24_f16
+
+
+; enter here for floating asm_f24_add_callee, x+y, x on stack, y in dehl, result in dehl
+.asm_f24_mul_callee
+    ld a,d                      ; place op1.s in a[7]
+
+    exx                         ; first  d' = s------- e' = eeeeeeee
+                                ;       hl' = 1mmmmmmm mmmmmmmm
+
+    pop bc                      ; pop return address
+    pop hl                      ; second  d = s------- e = eeeeeeee
+    pop de                      ;        hl = 1mmmmmmm mmmmmmmm
+    push bc                     ; return address on stack
+
+.mul_f24_f24
+    xor a,d                     ; xor sign flags
+    ex af,af                    ; save sign flag in a[7]' and f' reg
+
+    ld a,e                      ; calculate the exponent
+    or a                        ; second exponent zero then result is zero
+    jr Z,mulzero
+
+    sub a,07fh                  ; subtract out bias, so when exponents are added only one bias present
+    jr C,fmchkuf
+
     exx
-    ld a,h
-    or l
-    ret z
-    ex de,hl
-    ld a,h
-    or l
-    ret z
-    call mpl_11_bit  ; de/hl = m1*m2
+
+    add a,e
+    jr C,mulovl
+    jr fmnouf
+
+.fmchkuf
     exx
-    ld a,c
-    exx 
-    bit 5,e                      ; if v >=2048: m>>11, exp++
-    jr nz,fmul_exp_inc_shift_11
-    bit 4,e
-    jr nz,fmul_shift_10         ; if v>=1024: m>>10
-    jr fmul_handle_denormals    ; check denormals
-fmul_exp_inc_shift_11:
-    inc a
-    sra e
-    rr h
-    rr l
-fmul_shift_10:
-    sra e
-    rr h
-    rr l
-    sra e
-    rr h
-    rr l
-    ld l,h ; ehl >> 8
-    ld h,e
-    ld e,0
-    jr fmul_check_exponent
-fmul_handle_denormals:
-    sub a,10
-    ld c,a
-    ld b,0xf8
-fmul_next_shift:    ; while ehl >= 2048
-    ld a,h
-    and b
-    or e
-    jr z,fmul_shift_loop_end
-    sra e           ; ehl >> = 1, exp++
-    rr h
-    rr l
-    inc c
-    jr fmul_next_shift
-fmul_shift_loop_end:
-    ld a,c      ; restre exp
-fmul_check_exponent:
-    ld b,1
-    and a
-    jr z,fmul_denorm_shift
-    bit 7,a
-    jr z,final_combine
-    neg 
-    add a,b
+
+    add a,e                     ; add the exponents
+    jr NC,mulzero
+
+.fmnouf
     ld b,a
-    xor a
-fmul_denorm_shift:
-    sra e
-    rr h
-    rr l
-    djnz fmul_denorm_shift
-final_combine:              
-    cp 31
-    jr nc, asm_f16_inf
-    add a
-    add a 
-    res 2,h ; remove hidden bit
-    or h
-    ld h,a
-    or 0x7F         ; reset -0 to normal 0
-    or l
-    ret z
-    ex af,af' ; restore sign
-    or h
-    ld h,a
-    ret
-mul_handle_nan_inf:
-    cp 31
-    jr nz,mul_a_is_valid
-    ld a,4
-    xor h
-    or l
-    jp nz,asm_f16_nan ; exp=31 and mant!=0
-mul_a_is_valid:
+    or a
+    jr Z,mulzero                ; check sum of exponents for zero
+
+    ex af,af
     ld a,b
-    cp 31
-    jr nz,mul_b_is_valid
-    ld a,4
-    xor d
-    or e
-    jp nz,asm_f16_nan ; exp=31 and mant!=0
-mul_b_is_valid:
-    ld a,h
-    or l
-    jp z,asm_f16_nan
-    ld a,d
-    or e
-    jp z,asm_f16_nan
-    jp asm_f16_inf 
-    
+    push af                     ; stack: sum of exponents a, and xor sign of exponents in f
 
-    ; input hl,de
-    ; output 
-    ;   a=ax = max(exp(hl),1)
-    ;   b=bx = max(exp(de),1)
-    ;   hl = mantissa(hl)
-    ;   de = mantissa(de)
-    ;   z flag one of the numbers is inf/nan
-    ;   no calcs done
-    ;   a' sign = sign(hl)^sign(de)
+                                ; first  e  = eeeeeeee, hl  = 1mmmmmmm mmmmmmmm
+                                ; second e' = eeeeeeee, hl' = 1mmmmmmm mmmmmmmm
+                                ; sum of exponents in a', xor of exponents in sign f'
+    push hl
+    exx
+    pop de
+                                ; multiplication of two 16-bit numbers into a 32-bit product
+    call l_mulu_32_16x16        ; exit  : de * hl = dehl  = 32-bit product
 
-asm_f16_calc_ax_bx_mantissa_and_sign:
-    ld a,h
-    xor d
-    and 0x80
-    ex af,af'
-calc_ax_bx_mantissa:
-    res 7,h
-    res 7,d
-    ld c,0x7c
-    ld a,d
-    and c
-    jr z,bx_is_zero
-    rrca  
-    rra 
-    ld b,a ; b=bx
-    ld a,3
-    and d      ; keep bits 0,1, set 2
-    or 4      
-    ld d,a     ; de = mantissa
-    jr bx_not_zero 
-bx_is_zero:
-    ld b,1 ; de is already ok since exp=0, bit 7 reset
-bx_not_zero:
-    ; b is bx, de=mantissa(de)
-    ld a,h
-    and c
-    jr z,ax_is_zero 
-    rrca
-    rra 
-    ld c,a  ; c=exp
-    ld a,3
-    and h
-    or 4
-    ld h,a
-    ld a,c ; exp=ax
-exp_check_nan:
-    ld c,a
-    ld a,31
-    cp c
-    ret z
-    cp b
-    ld a,c ; restore exp(hl)
-    ret
-ax_is_zero:
-    ld a,1 ; hl is already ok a=ax
-    jr exp_check_nan
+    pop bc                      ; retrieve sign and exponent from stack = b,c[7]
 
-
-mpl_11_bit:
-    ld b,d
-    ld c,e
-    ld d,h
-    ld e,l
-    xor a,a
-    bit 2,b
-	jr	nz,unroll_a
-	ld	h,a  
-	ld	l,a
-unroll_a:
+    bit 7,d                     ; need to shift result left if msb!=1
+    jr NZ,fm2
     add hl,hl
-    rla
-    bit 1,b
-    jr  z,unroll_b
-	add hl,de
-    adc 0
-unroll_b:
-    add hl,hl
-    rla
-    bit 0,b
-    jr z,unroll_c
-    add hl,de
-    adc 0
-unroll_c:
+    rl e
+    rl d
+    jr fm3
 
-    ld b,8
+.fm2
+    inc b
+    jr Z,mulovl
 
-mpl_loop2:
+.fm3
+    ex de,hl                     ; put 16 bit mantissa in place, de into hl
+    ld a,d                       ; capture 8 rounding bits
 
-	add	hl,hl  ; 
-    rla
-	rl c	   ; carry goes to de low bit
-	jr	nc,mpl_end2
-	add	hl,de
-	adc 0
-mpl_end2:
+    or a                         ; round
+    jr Z,fm4
+    set 0,l
 
-    djnz mpl_loop2
-    ld e,a
-    ld d,0
-    ret
+.fm4
+    ld d,c                      ; put sign into d[7]
+    ld e,b                      ; put sign and exponent in e
+    ret                         ; return half float f24
+
+.mulovl
+    ex af,af                    ; get sign
+    ld d,a
+    jp asm_f24_inf              ; done overflow
+
+.mulzero
+    ex af,af                    ; get sign
+    ld d,a
+    jp asm_f24_zero             ; done underflow
 
