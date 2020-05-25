@@ -8,7 +8,7 @@
 ;  feilipu, May 2020
 ;
 ;-------------------------------------------------------------------------
-;  asm_f16_int_f24 - z80, z180, z80n unpacked format conversion code
+;  asm_f16_int_f24 - z80 half float unpacked format conversion
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked format: sign in d[7], exponent in e, mantissa in hl

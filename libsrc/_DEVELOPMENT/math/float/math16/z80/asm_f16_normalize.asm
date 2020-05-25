@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-;  asm_f16_normalize - z80, z180, z80n unpacked normalisation code
+;  asm_f16_normalize - z80 half floating point unpacked normalisation
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked format: sign in d[7], exponent in e, mantissa in hl
@@ -69,7 +69,7 @@ PUBLIC asm_f24_normalize
     add hl,hl
     jr C,S8L2
     ld a,-6                     ; 6 shift case
-    jr normdone
+    jp normdone
 
 .S8L4more
     add hl,hl

@@ -6,13 +6,13 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-;  f16_add - z80, z180, z80n floating point add 16-bit mantissa
+;  asm_f16_add - z80 half floating point add 16-bit mantissa
 ;-------------------------------------------------------------------------
 ;
 ; 1) first section: unpack from f24_add: to sort:
-;    one unpacked number in dehl the other in de'hl'
+;    one unpacked number in dehl the other in dehl'
 ;    unpacked format: mantissa= hl, exponent in e, sign in d[7]
-;         in addition af' holds c xor c' used to test if add or sub needed
+;         in addition af' holds d xor d' used to test if add or sub needed
 ;
 ; 2) second section: sort from sort to align, sets up smaller number in de hl and larger in de' hl'
 ;    This section sorts out the special cases:
@@ -191,7 +191,7 @@ PUBLIC asm_f24_sub_callee
     jp M,dosub
 ;   jr doadd
 
-; here for do add e' has exponent of result (larger) d or d' has sign
+; here for do add, e' has exponent of result (larger) d or d' has sign
 .doadd
     xor a
     push hl
