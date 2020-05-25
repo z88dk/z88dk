@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-;  asm_f16_add - z80 half floating point add 16-bit mantissa
+;  asm_f16_mul - z80 half floating point multiply 16-bit mantissa
 ;-------------------------------------------------------------------------
 ;
 ; since the z180, and z80n only have support for 8x8bit multiply,
@@ -31,7 +31,7 @@
 ;   = 16 bits significant
 ;
 ; calculation for the z80 is done using unrolled shift+add.
-; with zero operand and zero bit elimination.
+; with zero operand and zero bit elimination for fast multiply option.
 ;
 ;-------------------------------------------------------------------------
 
