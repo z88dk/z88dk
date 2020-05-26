@@ -11,7 +11,7 @@
 ;  asm_f16_int_f24 - z80 half float unpacked format conversion
 ;-------------------------------------------------------------------------
 ;
-;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  unpacked format: exponent in d, sign in e[7], mantissa in hl
 ;  return normalized result also in unpacked format
 ;
 ;-------------------------------------------------------------------------
@@ -37,8 +37,8 @@ PUBLIC asm_u16_f24
 
 ; convert integer in hl to _f24 in dehl
 .asm_i16_f24
-    ld d,h                      ; sign in d[7]
-    ld e,142                    ; exponent
+    ld d,142                    ; exponent
+    ld e,h                      ; sign in e[7]
     bit 7,h                     ; test sign, negate if negative
     jp Z,asm_f24_normalize      ; straight to normalisation code
     xor a                       ; negate
@@ -55,7 +55,7 @@ PUBLIC asm_u16_f24
 
 ; convert unsigned integer in hl to _f24 in dehl
 .asm_u16_f24
-    res 7,d                     ; sign in d[7]
-    ld e,142                    ; exponent
+    ld d,142                    ; exponent
+    res 7,e                     ; sign in e[7]
     jp asm_f24_normalize        ; piggy back on normalisation code
 

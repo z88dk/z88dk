@@ -11,7 +11,7 @@
 ;  asm_f24_i16 - z80 half floating to int
 ;-------------------------------------------------------------------------
 ;
-;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  unpacked format: exponent in d, sign in e[7], mantissa in hl
 ;  return normalized result also in unpacked format
 ;
 ;  return int in hl
@@ -28,7 +28,7 @@ PUBLIC asm_f24_u16
 ; Convert floating point number to int
 .asm_f24_i16
 .asm_f24_u16
-    ld a,e                      ;Holds exponent
+    ld a,d                      ;Holds exponent
     and a
     jr Z,izero                  ;exponent was 0, return 0
     cp $7e + 16
@@ -39,7 +39,7 @@ PUBLIC asm_f24_u16
     inc a
     cp $7e + 16
     jr NZ,iloop
-    rl d                        ;check sign bit
+    rl e                        ;check sign bit
     call C,l_neg_hl
     ret
 

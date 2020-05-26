@@ -11,8 +11,8 @@
 ;
 ; 1) first section: unpack from f24_add: to sort:
 ;    one unpacked number in dehl the other in dehl'
-;    unpacked format: mantissa= hl, exponent in e, sign in d[7]
-;         in addition af' holds d xor d' used to test if add or sub needed
+;    unpacked format: exponent in d, sign in e[7], mantissa in hl
+;         in addition af' holds e xor e' used to test if add or sub needed
 ;
 ; 2) second section: sort from sort to align, sets up smaller number in de hl and larger in de' hl'
 ;    This section sorts out the special cases:
@@ -63,16 +63,14 @@ PUBLIC asm_f24_sub_callee
 ; enter here for floating asm_f16_add_callee, x+y, x on stack, y in hl, result in hl
 .asm_f16_add_callee
     call asm_f16_f24            ; expand to dehl
-    ld a,d                      ; place op1.s in a[7]
-
-    exx                         ; first  d' = s------- e' = eeeeeeee
+    exx                         ; y     d' = s------- e' = eeeeeeee
                                 ;       hl' = 1mmmmmmm mmmmmmmm
 
     pop bc                      ; pop return address
     pop hl                      ; get second operand off of the stack
     push bc                     ; return address on stack
     call asm_f16_f24            ; expand to dehl
-                                ; second  d = s------- e = eeeeeeee
+                                ; x      d = s------- e = eeeeeeee
                                 ;        hl = 1mmmmmmm mmmmmmmm
     call add_f24_f24
     jp asm_f24_f16
@@ -80,43 +78,41 @@ PUBLIC asm_f24_sub_callee
 
 ; enter here for floating asm_f24_sub_callee, x-y x on stack, y in dehl, result in dehl
 .asm_f24_sub_callee
-    ld a,d                      ; toggle the sign bit for subtraction
+    ld a,e                      ; toggle the sign bit for subtraction
     xor 080h
-    ld d,a
+    ld e,a
 
 ; enter here for floating asm_f24_add_callee, x+y, x on stack, y in dehl, result in dehl
 .asm_f24_add_callee
-    ld a,d                      ; place op1.s in a[7]
-
-    exx                         ; first  d' = s------- e' = eeeeeeee
+    exx                         ; y     d' = s------- e' = eeeeeeee
                                 ;       hl' = 1mmmmmmm mmmmmmmm
 
     pop bc                      ; pop return address
-    pop hl                      ; second  d = s------- e = eeeeeeee
+    pop hl                      ; x      d = s------- e = eeeeeeee
     pop de                      ;        hl = 1mmmmmmm mmmmmmmm
     push bc                     ; return address on stack
 
 
 .add_f24_f24
-    xor d                       ; check if op1.s==op2.s
+    ld a,e                      ; place op1.s in a[7]
+    exx                         ; x mantissa: hl' = 1mmmmmmm mmmmmmmm
+                                ; y mantissa: hl  = 1mmmmmmm mmmmmmmm
+    xor e                       ; check if op1.s==op2.s
     ex af,af                    ; save results sign in f' (C clear in af')
-    
-    exx                         ; x, op2 mantissa: hlde' = 1mmmmmmm mmmmmmmm
-                                ; y, op1 mantissa: hlde  = 1mmmmmmm mmmmmmmm
 
 ; sort larger from smaller and compute exponent difference
-    ld a,e
-    exx                         ; y, op2 mantissa: hlde' = 1mmmmmmm mmmmmmmm
-                                ; x, op1 mantissa: hlde  = 1mmmmmmm mmmmmmmm
+    ld a,d
+    exx                         ; y mantissa: hl' = 1mmmmmmm mmmmmmmm
+                                ; x mantissa: hl  = 1mmmmmmm mmmmmmmm
 
-    cp a,e                      ; nc if a>=b
+    cp a,d                      ; nc if a>=b
     jp Z,alignzero              ; no alignment needed, exponents equal
     jr NC,sort                  ; if a larger than b
-    ld a,e
+    ld a,d
     exx
 
 .sort
-    sub a,e                     ; positive difference in a
+    sub a,d                     ; positive difference in a
     cp  a,1                     ; if one difference, special case
     jp Z,alignone               ; smaller mantissa on top
 
@@ -177,7 +173,7 @@ PUBLIC asm_f24_sub_callee
     bit 7,h                     ; check for normalize
     ret NZ                      ; no normalize step, return f24 in DEHL
     add hl,hl
-    dec e
+    dec d
     ret                         ; return f24 in DEHL
 
 ; here one alignment needed
@@ -191,7 +187,7 @@ PUBLIC asm_f24_sub_callee
     jp M,dosub
 ;   jr doadd
 
-; here for do add, e' has exponent of result (larger) d or d' has sign
+; here for do add, d' has exponent of result (larger) e or e' has sign
 .doadd
     xor a
     push hl
@@ -200,13 +196,13 @@ PUBLIC asm_f24_sub_callee
     add hl,bc                   ; add the mantissas
     adc a,a                     ; see if overflow from hl
     ret Z                       ; return if no overflow
-    rra                         ; put carry bit back
+    rra                         ; put carried bit back
     rr h
     rr l
     jr NC,doadd0
     set 0,l
 .doadd0
-    inc e                       ; test exponent overflow
+    inc d                       ; test exponent overflow
     jp Z,asm_f24_inf
 .doadd1
     ret                         ; return f24 in DEHL
@@ -231,9 +227,9 @@ PUBLIC asm_f24_sub_callee
 
 ; fix up and subtract in reverse direction
     exx
-    ld a,d                      ; get reversed sign
+    ld a,e                      ; get reversed sign
     exx
-    ld d,a                      ; get proper sign to result
+    ld e,a                      ; get proper sign to result
     xor a                       ; complement the result
     sub a,l
     ld l,a

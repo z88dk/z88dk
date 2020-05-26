@@ -9,7 +9,7 @@
 ;  asm_f16_normalize - z80 half floating point unpacked normalisation
 ;-------------------------------------------------------------------------
 ;
-;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  unpacked format: exponent in d, sign in e[7], mantissa in hl
 ;  return normalized result also in unpacked format
 ;
 ;-------------------------------------------------------------------------
@@ -92,13 +92,13 @@ PUBLIC asm_f24_normalize
 ;   jp normdone                 ; drop through to .normdone
                                 
 ; enter here to continue after normalize
-; a has left shift count, hl has mantissa, e has exponent before shift
-; d has original sign of larger number
+; a has left shift count, hl has mantissa, d has exponent before shift
+; e[7] has original sign of larger number
 ;
 .normdone
-    add a,e                     ; exponent of result
+    add a,d                     ; exponent of result
     jp NC,asm_f24_zero          ; if underflow return zero
-    ld e,a
+    ld d,a
     ret                         ; return DEHL
 
 

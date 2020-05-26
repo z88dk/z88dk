@@ -11,7 +11,7 @@
 ;  asm_f16_f32 - z80, z180, z80n unpacked format conversion code
 ;-------------------------------------------------------------------------
 ;
-;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  unpacked format: exponent in d, sign in e[7], mantissa in hl
 ;  return normalized result also in unpacked format
 ;
 ;  return f32 and f24 float in dehl, and f16 in hl
@@ -39,8 +39,7 @@ PUBLIC asm_f24_f16
     ld a,l                      ; capture 8 truncated bits
     ld l,h                      ; create 16 bit mantissa by truncation
     ld h,e
-    ld e,d                      ; save exponent
-    ld d,b                      ; save sign
+    ld e,b                      ; save sign in e[7]
     or a                        ; check for truncated bits
     ret Z                       ; return if none
     set 0,l                     ; set lsb if truncated bits
@@ -48,8 +47,7 @@ PUBLIC asm_f24_f16
 
 ; convert f24 to f32
 .asm_f24_f32
-    ld a,d                      ; preserve sign in a
-    ld d,e                      ; exponent to d
+    ld a,e                      ; preserve sign in a
     ld e,h                      ; mantissa padded to ehl
     ld h,l
     ld l,0
@@ -61,7 +59,7 @@ PUBLIC asm_f24_f16
 
 ; convert f16 to f24
 .asm_f16_f24
-    ld d,h                      ; capture sign in d
+    ld e,h                      ; capture sign in e[7]
     ld a,h                      ; capture exponent in a
     ld h,l                      ; mantissa padded to ehl
     ld l,0
@@ -73,7 +71,7 @@ PUBLIC asm_f24_f16
     rr l
     and 01Fh                    ; separate exponent
     add a,127-15                ; convert bias to 8 bits
-    ld e,a
+    ld d,a
     scf                         ; set implicit bit
     rr h                        ; align mantissa to hl
     rr l
@@ -81,12 +79,11 @@ PUBLIC asm_f24_f16
 
 ; convert f24 to f16
 .asm_f24_f16
-    ld a,e                      ; exponent to a
+    ld a,d                      ; exponent to a
     sub a,127-15                ; convert to f24 bias
     jp M,asm_f16_zero           ; zero if number too small
     cp 31
     jp NC,asm_f16_inf           ; infinity if number too large
-
     sla l                       ; position mantissa
     rl h                        ; remove implicit bit
     sla l
@@ -96,7 +93,7 @@ PUBLIC asm_f24_f16
     rl h
     rla
     rla                         ; set a ready for sign
-    sla d                       ; move sign to carry
+    sla e                       ; move sign to carry
     rra                         ; place it in a, with exponent and mantissa
     ld d,a                      ; position f16 in de
     ld e,h

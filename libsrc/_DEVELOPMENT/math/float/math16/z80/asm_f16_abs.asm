@@ -11,7 +11,7 @@
 ;  asm_f16_abs - z80 half floating point absolute value
 ;-------------------------------------------------------------------------
 ;
-;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  unpacked format: exponent in d, sign in e[7], mantissa in hl
 ;  return normalized result also in unpacked format
 ;
 ;  return half float in hl
@@ -24,7 +24,7 @@ PUBLIC asm_f24_abs
 PUBLIC asm_f16_abs
 
 .asm_f24_abs
-    res 7,d
+    res 7,e
     ret
 
 .asm_f16_abs

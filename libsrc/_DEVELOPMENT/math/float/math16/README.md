@@ -81,9 +81,9 @@ An expanded 16-bit internal mantissa is used to calculate all functions. 16-bit 
 This format is provided for both the multiply and add intrinsic internal 16-bit mantissa functions, from which other functions are derived.
 
 ```
-  unpacked floating point format: sign in d[7], exponent right justified in e, mantissa in hl
+  unpacked floating point format: exponent right justified in d, sign in e[7],  mantissa in hl
 
-  dehl = s....... eeeeeeeee 1mmmmmmm mmmmmmmm (s-sign, e-exponent, m-mantissa)
+  dehl = eeeeeeeee s....... 1mmmmmmm mmmmmmmm (e-exponent, s-sign, m-mantissa)
 
 ```
 

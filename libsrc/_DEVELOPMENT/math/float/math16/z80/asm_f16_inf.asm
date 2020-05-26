@@ -11,7 +11,7 @@
 ;  asm_f16_inf - z80 half floating point signed infinity
 ;-------------------------------------------------------------------------
 ;
-;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  unpacked format: exponent in d, sign in e[7], mantissa in hl
 ;  return normalized result also in unpacked format
 ;
 ;  return half float in hl
@@ -24,14 +24,14 @@ PUBLIC asm_f24_inf
 PUBLIC asm_f16_inf
 
 .asm_f24_inf
-    ld a,d
+    ld a,e
     and 080h            ; preserve sign
-    ld d,a
+    ld e,a
     xor a
     ld h,a              ; clear mantissa
     ld l,a
     dec a
-    ld e,a              ; load 0xFF exponent
+    ld d,a              ; load 0xFF exponent
     ret
 
 .asm_f16_inf

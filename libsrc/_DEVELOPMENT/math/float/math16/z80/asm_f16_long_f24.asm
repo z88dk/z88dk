@@ -11,7 +11,7 @@
 ;  asm_f16_long_f24 - z80 half float unpacked format conversion
 ;-------------------------------------------------------------------------
 ;
-;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  unpacked format: exponent in d, sign in e[7], mantissa in hl
 ;  return normalized result also in unpacked format
 ;
 ;-------------------------------------------------------------------------
@@ -64,8 +64,8 @@ PUBLIC asm_u32_f24
     jr S16R                     ; shift 8 bits, most significant in high nibble
 
 .normalize
-    ld e,142                    ; exponent if MSW is zero
-    ld d,b                      ; sign to d[7]
+    ld d,142                    ; exponent if MSW is zero
+    ld e,b                      ; sign to e[7]
     jp asm_f24_normalize        ; piggy back on normalisation code
 
 
@@ -119,9 +119,9 @@ PUBLIC asm_u32_f24
     rr h
     rr l
     inc c
-.packup                         ; pack up the floating point mantissa in hl, exponent in e, sign in d[7]
-    ld d,b                      ; sign in d[7], get sign (if unsigned input, it was forced 0)
-    ld e,c                      ; get exponent in e
+.packup                         ; pack up the floating point mantissa in hl, exponent in d, sign in e[7]
+    ld e,b                      ; sign in e[7], get sign (if unsigned input, it was forced 0)
+    ld d,c                      ; get exponent in d
 
     ret                         ; result in dehl
 

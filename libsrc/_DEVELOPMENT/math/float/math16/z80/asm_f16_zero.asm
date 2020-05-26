@@ -11,7 +11,7 @@
 ;  asm_f16_zero - z80 half floating point signed zero
 ;-------------------------------------------------------------------------
 ;
-;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  unpacked format: exponent in d, sign in e[7], mantissa in hl
 ;  return normalized result also in unpacked format
 ;
 ;  return half float in hl
@@ -24,17 +24,17 @@ PUBLIC asm_f24_zero
 PUBLIC asm_f16_zero
 
 .asm_f24_zero
-    ld a,d
+    ld a,e
     and 080h
-    ld d,a
-    xor a
     ld e,a
+    xor a
+    ld d,a
     ld h,a
     ld l,a
     ret
 
 .asm_f16_zero
-    ld a,d
+    ld a,h
     and 080h
     ld h,a
     ld l,0

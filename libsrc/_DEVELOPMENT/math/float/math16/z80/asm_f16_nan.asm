@@ -11,7 +11,7 @@
 ;  asm_f16_nan - z80 half floating point not a number
 ;-------------------------------------------------------------------------
 ;
-;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  unpacked format: exponent in d, sign in e[7],  mantissa in hl
 ;  return normalized result also in unpacked format
 ;
 ;  return half float in hl
@@ -24,7 +24,7 @@ PUBLIC asm_f24_nan
 PUBLIC asm_f16_nan
 
 .asm_f24_nan
-    ld de,000FFh
+    ld de,0FF00h
     ld hl,00000h
     ret
 

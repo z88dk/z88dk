@@ -11,7 +11,7 @@
 ;  asm_f24_i32 - z80 half floating to long
 ;-------------------------------------------------------------------------
 ;
-;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  unpacked format: exponent in d, sign in e[7], mantissa in hl
 ;  return normalized result also in unpacked format
 ;
 ;  return long in dehl
@@ -28,8 +28,8 @@ PUBLIC asm_f24_u32
 ; Convert floating point number to long
 .asm_f24_i32
 .asm_f24_u32
-    ld b,d                      ;Holds sign
-    ld a,e                      ;Holds exponent
+    ld b,e                      ;Holds sign
+    ld a,d                      ;Holds exponent
     and a
     jr Z,lzero                  ;exponent was 0, return 0
     cp $7e + 32

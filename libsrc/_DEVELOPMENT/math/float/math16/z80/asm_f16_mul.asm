@@ -33,6 +33,8 @@
 ; calculation for the z80 is done using unrolled shift+add.
 ; with zero operand and zero bit elimination for fast multiply option.
 ;
+; unpacked format: exponent in d, sign in e[7], mantissa in hl
+;
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -46,41 +48,40 @@ PUBLIC asm_f16_mul_callee
 
 PUBLIC asm_f24_mul_callee
 
+PUBLIC asm_f24_mul_f24
+
 ; enter here for floating asm_f16_mul_callee, x+y, x on stack, y in hl, result in hl
 .asm_f16_mul_callee
     call asm_f16_f24            ; expand to dehl
-    ld a,d                      ; place op1.s in a[7]
-
-    exx                         ; first  d' = s------- e' = eeeeeeee
-                                ;       hl' = 1mmmmmmm mmmmmmmm
-
+    exx                         ; y      d = eeeeeeee e = s-------
+                                ;        hl = 1mmmmmmm mmmmmmmm
     pop bc                      ; pop return address
     pop hl                      ; get second operand off of the stack
     push bc                     ; return address on stack
     call asm_f16_f24            ; expand to dehl
-                                ; second  d = s------- e = eeeeeeee
+                                ; x      d = eeeeeeee e = s-------
                                 ;        hl = 1mmmmmmm mmmmmmmm
-    call mul_f24_f24
+    call asm_f24_mul_f24
     jp asm_f24_f16
 
 
 ; enter here for floating asm_f24_add_callee, x+y, x on stack, y in dehl, result in dehl
 .asm_f24_mul_callee
-    ld a,d                      ; place op1.s in a[7]
-
-    exx                         ; first  d' = s------- e' = eeeeeeee
-                                ;       hl' = 1mmmmmmm mmmmmmmm
-
+    exx                         ; y      d = eeeeeeee e = s-------
+                                ;        hl = 1mmmmmmm mmmmmmmm
     pop bc                      ; pop return address
-    pop hl                      ; second  d = s------- e = eeeeeeee
-    pop de                      ;        hl = 1mmmmmmm mmmmmmmm
+    pop hl                      ; x     d = eeeeeeee e = s------- hl = 1mmmmmmm mmmmmmmm
+    pop de
     push bc                     ; return address on stack
 
-.mul_f24_f24
-    xor a,d                     ; xor sign flags
+.asm_f24_mul_f24
+    ld a,e                      ; place op1.s in a[7]
+    exx                         ; x     d' = eeeeeeee e' = s------- hl' = 1mmmmmmm mmmmmmmm
+
+    xor a,e                     ; xor sign flags
     ex af,af                    ; save sign flag in a[7]' and f' reg
 
-    ld a,e                      ; calculate the exponent
+    ld a,d                      ; calculate the exponent
     or a                        ; second exponent zero then result is zero
     jr Z,mulzero
 
@@ -89,14 +90,14 @@ PUBLIC asm_f24_mul_callee
 
     exx
 
-    add a,e
+    add a,d
     jr C,mulovl
     jr fmnouf
 
 .fmchkuf
     exx
 
-    add a,e                     ; add the exponents
+    add a,d                     ; add the exponents
     jr NC,mulzero
 
 .fmnouf
@@ -117,7 +118,7 @@ PUBLIC asm_f24_mul_callee
                                 ; multiplication of two 16-bit numbers into a 32-bit product
     call l_mulu_32_16x16        ; exit  : de * hl = dehl  = 32-bit product
 
-    pop bc                      ; retrieve sign and exponent from stack = b,c[7]
+    pop bc                      ; retrieve exponent and sign from stack = b,c[7]
 
     bit 7,d                     ; need to shift result left if msb!=1
     jr NZ,fm2
@@ -139,17 +140,17 @@ PUBLIC asm_f24_mul_callee
     set 0,l
 
 .fm4
-    ld d,c                      ; put sign into d[7]
-    ld e,b                      ; put sign and exponent in e
+    ld d,b                      ; put exponent in d
+    ld e,c                      ; put sign into e[7]
     ret                         ; return half float f24
 
 .mulovl
     ex af,af                    ; get sign
-    ld d,a
+    ld e,a
     jp asm_f24_inf              ; done overflow
 
 .mulzero
     ex af,af                    ; get sign
-    ld d,a
+    ld e,a
     jp asm_f24_zero             ; done underflow
 

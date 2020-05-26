@@ -11,7 +11,7 @@
 ;  asm_f16_neg - z80 half floating point negate
 ;-------------------------------------------------------------------------
 ;
-;  unpacked format: sign in d[7], exponent in e, mantissa in hl
+;  unpacked format: exponent in d, sign in e[7], mantissa in hl
 ;  return normalized result also in unpacked format
 ;
 ;  return half float in hl
@@ -24,9 +24,9 @@ PUBLIC asm_f24_neg
 PUBLIC asm_f16_neg
 
 .asm_f24_neg
-    ld a,d
+    ld a,e
     xor 080h
-    ld d,a
+    ld e,a
     ret
 
 .asm_f16_neg
