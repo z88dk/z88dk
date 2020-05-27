@@ -16,6 +16,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <sys/stat.h>
+#include <libgen.h>
 #ifndef WIN32
 #include <unistd.h>
 #endif
