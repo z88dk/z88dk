@@ -45,7 +45,6 @@ int c7420_exec(char* target)
     unsigned int location;
     unsigned long checksum;
 
-    strcpy(ldr_name, "_");
 
     if ((binname == NULL) && (crtfile == NULL)) {
         return -1;
@@ -95,10 +94,16 @@ int c7420_exec(char* target)
     fseek(fpin, 0L, SEEK_SET);
 
     if (pos == 35055) {
+        char *copy1, *copy2;
         /****************************/
         /* Single BASIC + M/C block */
         /****************************/
-        strcat(ldr_name, filename);
+
+        copy1 = strdup(filename);
+        copy2 = strdup(filename);
+        snprintf(ldr_name, sizeof(ldr_name), "%s_%s", dirname(copy1), basename(copy2));
+        free(copy1);
+        free(copy2);
 
         if ((fpout = fopen(ldr_name, "wb")) == NULL) {
             printf("Can't create the loader file\n");
@@ -170,14 +175,19 @@ int c7420_exec(char* target)
         /* the code tail will append the binary block and update the checksum */
 
     } else {
-
+        char *copy1, *copy2;
         /****************/
         /* BASIC loader */
         /****************/
         sprintf(lsbbuf, "%i", (int)pos % 256); /* no more than 3 characters long */
         sprintf(msbbuf, "%i", (int)pos / 256); /* no more than 3 characters long */
 
-        strcat(ldr_name, filename);
+        copy1 = strdup(filename);
+        copy2 = strdup(filename);
+        snprintf(ldr_name, sizeof(ldr_name), "%s_%s", dirname(copy1), basename(copy2));
+        free(copy1);
+        free(copy2);
+
 
         if ((fpout = fopen(ldr_name, "wb")) == NULL) {
             printf("Can't create the loader file\n");
