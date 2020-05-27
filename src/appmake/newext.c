@@ -64,7 +64,7 @@ int newext_exec(char* target)
         strcpy(filename, outfile);
     }
 
-    for (i = 0; i <= strlen(filename); i++)
+    for (i = strlen(filename) - 1; i >= 0 && filename[i] != '/' && filename[i] != '\\'; i--)
         filename[i] = toupper(filename[i]);
 
     if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
@@ -83,7 +83,6 @@ int newext_exec(char* target)
     len = ftell(fpin);
 
     fseek(fpin, 0L, SEEK_SET);
-
     if ((fpout = fopen(filename, "wb")) == NULL) {
         fclose(fpin);
         myexit("Can't open output file\n", 1);

@@ -69,8 +69,8 @@ int c128_exec(char *target)
     /* strupr(filename);
        not available on all platforms */
     
-    for (p = filename; *p !='\0'; ++p)
-       *p = toupper(*p);
+    for (i = strlen(filename) - 1; i >= 0 && filename[i] != '/' && filename[i] != '\\'; i--)
+        filename[i] = toupper(filename[i]);
 
     suffix_change(filename,"");
 
