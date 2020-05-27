@@ -68,13 +68,13 @@ endef
 define build_ofile_asm
 build/$(1)/$(patsubst %.asm,%.o,$(2)): $(2) 
 	@mkdir -p $(dir build/$(1)/$(2))
-	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(CFLAGS_$(1)) $(ZCFLAGS_$(1)) -o $$@ -c $(2)
+	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(2))) $(ZCFLAGS_$(1)) -o $$@ -c $(2)
 endef
 
 define build_ofile
 build/$(1)/$(patsubst %.c,%.o,$(2)): $(2) 
 	@mkdir -p $(dir build/$(1)/$(2))
-	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(ZCFLAGS_$(1)) -I$(1) -o $$@ -c $(2)
+	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(2))) $(ZCFLAGS_$(1)) -I$(1) -o $$@ -c $(2)
 endef
 
 
@@ -88,11 +88,13 @@ $(1): build/$(1)/$(2)
 .PHONY: $(1)
 
 # And the full rule
+# $(1) = target
+# $(2) = binary name
 build/$(1)/$(2): $(addprefix build/$(1)/,$(patsubst %.c,%.o,$(filter %.c,$(3)))) \
 		$(addprefix build/$(1)/,$(patsubst %.asm,%.o,$(filter %.asm,$(3)))) \
 		$(addprefix build/$(1)/,$(patsubst %.c,%.o,$(wildcard $(target)/*.c))) \
 		$(addprefix build/$(1)/,$(patsubst %.asm,%.o,$(wildcard $(target)/*.asm))) 
-	$(Q)zcc +$(Z88DKTARGET_$(1)) -m -o $$@ $$^ $(CFLAGS) $(LDFLAGS) $(CFLAGS_$(1)) $(ZCFLAGS_$(1)) $(LDFLAGS_$(1)) $(ZLDFLAGS_$(1)) -create-app 
+	$(Q)zcc +$(Z88DKTARGET_$(1)) -m -o $$@ $$^ $(CFLAGS) $(LDFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(2))) $(ZCFLAGS_$(1)) $(LDFLAGS_$(1))  $(LDFLAGS_$(1)_$(basename $(2)))  $(ZLDFLAGS_$(1)) -create-app 
 endef
 
 
@@ -101,7 +103,6 @@ endef
 # $(3) = common sources
 define build_app
     $(foreach target, $(1), \
-		$(warning Build target $(target) app <$(strip $(2))>)
 		$(eval $(call setup_target,$(target))) \
 		$(eval $(call build_target,$(target),$(strip $(2)),$(3))) \
 		$(foreach file, $(filter %.c,$(3)) $(wildcard $(target)/*.c) , \
