@@ -65,16 +65,19 @@ endef
 
 
 # Functions to build the makefile
+# $(1) = target
+# $(2) = source file
+# $(3) = $(basename binary name)
 define build_ofile_asm
 build/$(1)/$(patsubst %.asm,%.o,$(2)): $(2) 
 	@mkdir -p $(dir build/$(1)/$(2))
-	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(2))) $(ZCFLAGS_$(1)) -o $$@ -c $(2)
+	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(basename $(3))) $(CFLAGS_$(1)_$(basename $(3))) $(ZCFLAGS_$(1)) -o $$@ -c $(2)
 endef
 
 define build_ofile
 build/$(1)/$(patsubst %.c,%.o,$(2)): $(2) 
 	@mkdir -p $(dir build/$(1)/$(2))
-	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(2))) $(ZCFLAGS_$(1)) -I$(1) -o $$@ -c $(2)
+	$(Q)zcc +$(Z88DKTARGET_$(1)) $(CFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(basename $(3))) $(CFLAGS_$(1)_$(basename $(3))) $(ZCFLAGS_$(1)) -I$(1) -o $$@ -c $(2)
 endef
 
 
@@ -94,7 +97,7 @@ build/$(1)/$(2): $(addprefix build/$(1)/,$(patsubst %.c,%.o,$(filter %.c,$(3))))
 		$(addprefix build/$(1)/,$(patsubst %.asm,%.o,$(filter %.asm,$(3)))) \
 		$(addprefix build/$(1)/,$(patsubst %.c,%.o,$(wildcard $(target)/*.c))) \
 		$(addprefix build/$(1)/,$(patsubst %.asm,%.o,$(wildcard $(target)/*.asm))) 
-	$(Q)zcc +$(Z88DKTARGET_$(1)) -m -o $$@ $$^ $(CFLAGS) $(LDFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(1)_$(basename $(2))) $(ZCFLAGS_$(1)) $(LDFLAGS_$(1))  $(LDFLAGS_$(1)_$(basename $(2)))  $(ZLDFLAGS_$(1)) -create-app 
+	$(Q)zcc +$(Z88DKTARGET_$(1)) -m -o $$@ $$^ $(CFLAGS) $(LDFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(basename $(2))) $(CFLAGS_$(1)_$(basename $(2))) $(ZCFLAGS_$(1)) $(LDFLAGS_$(1)) $(LDFLAGS_$(basename $(2))) $(LDFLAGS_$(1)_$(basename $(2)))  $(ZLDFLAGS_$(1)) -create-app 
 endef
 
 
@@ -106,10 +109,10 @@ define build_app
 		$(eval $(call setup_target,$(target))) \
 		$(eval $(call build_target,$(target),$(strip $(2)),$(3))) \
 		$(foreach file, $(filter %.c,$(3)) $(wildcard $(target)/*.c) , \
-			$(eval $(call build_ofile,$(target),$(file)))  \
+			$(eval $(call build_ofile,$(target),$(file),$(basename $(2))))  \
 		) \
 		$(foreach file, $(filter %.asm,$(3)) $(wildcard $(target)/*.asm) , \
-			$(eval $(call build_ofile_asm,$(target),$(file)))  \
+			$(eval $(call build_ofile_asm,$(target),$(file),$(basename $(2))))  \
 		) \
 	)
 endef
