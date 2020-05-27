@@ -771,8 +771,13 @@ Type *parse_parameter_list(Type *return_type)
         if ( check_existing_parameter(func, param) == 0 )            
             array_add(func->parameters, param);
 
-        if ( !rcmatch(',')) 
+        if ( !rcmatch(','))  {
+            if ( iskr && !rcmatch(')'))  {
+                // It's just a random character, so maybe it's not a K&R definition
+                errorfmt("Cannot parse function argument '%s' - unknown type, but not K&R syntax",1,param->name);
+            }
             break;
+        }
         needchar(',');
     } while (1);
     needchar(')'); 
