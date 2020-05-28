@@ -96,7 +96,14 @@ void debug(int num, char* str, ...)
 
 static void warningva(const char *category, const char *fmt, va_list ap)
 {
-    fprintf(stderr, "sccz80:%s L:%d Warning:", Filename, lineno);
+    if ( c_old_diagnostic_fmt ) {
+        fprintf(stderr, "sccz80:%s L:%d Warning:", Filename, lineno);
+    } else {
+        char filen[FILENAME_MAX+1];
+        strncpy(filen, Filename + 1, strlen(Filename) - 2);
+        filen[strlen(Filename) - 2] = '\0';
+        fprintf(stderr, "%s:%d:%d: warning: ", filen, lineno, lptr + 1);
+    }
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, " [-W%s]\n", category);
 }
@@ -140,10 +147,20 @@ void warningfmt(const char *category, const char *fmt, ...)
 void errorva(int fatal, const char *fmt, va_list ap)
 {
     if ( buffer_fps_num ) return;
-    fprintf(stderr, "sccz80:%s L:%d Error:", Filename, lineno);
+    if ( c_old_diagnostic_fmt ) {
+        fprintf(stderr, "sccz80:%s L:%d Error:", Filename, lineno);
+    } else {
+        char filen[FILENAME_MAX+1];
+        strncpy(filen, Filename + 1, strlen(Filename) - 2);
+        filen[strlen(Filename) - 2] = '\0';
+        fprintf(stderr, "%s:%d:%d: %s: ", filen, lineno, lptr + 1, fatal ? "Fatal error" : "Error");
+    }
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");
     ++errcnt;
+    if ( fatal ) {
+        ccabort();
+    }
     if (c_errstop) {
         fprintf(stderr, "Continue (Y\\N) ?\n");
         if ((toupper(getchar()) == 'N'))
@@ -153,6 +170,7 @@ void errorva(int fatal, const char *fmt, va_list ap)
         fprintf(stderr, "\nMaximum (%d) number of errors reached, aborting!\n", MAXERRORS);
         ccabort();
     }
+
 }
 
 void errorfmt(const char *fmt, int fatal, ...)

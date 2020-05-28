@@ -33,6 +33,7 @@ int c_disable_builtins = 0;
 int c_line_labels = 0;
 int c_cline_directive = 0;
 int c_cpu = CPU_Z80;
+int c_old_diagnostic_fmt = 0;
 
 /* Settings for genmath + math48 */
 int c_fp_mantissa_bytes = 5;
@@ -138,6 +139,7 @@ static option  sccz80_opts[] = {
 
     { 0, "", OPT_HEADER, "Error/warning handling:", NULL, 0 },
     { 0, "stop-on-error", OPT_BOOL, "Stop on any error", &c_errstop, 0 },
+    { 0, "old-diagnostic-format", OPT_BOOL, "Use old style diagnostic messages", &c_old_diagnostic_fmt, 0 },
 #if 0
     { 0, "Wnone", OPT_FUNCTION|OPT_BOOL, "Disable all warnings", SetNoWarn, 0 },
     { 0, "Wall", OPT_FUNCTION|OPT_BOOL, "Enable all warnings", SetAllWarn, 0 },
