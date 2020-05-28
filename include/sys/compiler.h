@@ -5,7 +5,7 @@
 
 
 /* Temporary fix to turn off features not supported by sdcc */
-#ifdef __SDCC
+#if __SDCC | __clang__
 #define __LIB__
 #define __SAVEFRAME__
 #define far
@@ -14,6 +14,14 @@
 #define __stdc
 #define __z88dk_deprecated
 #define __z88dk_sdccdecl
+
+// Make intellisense run easier..
+#ifdef __clang__
+#define __smallc 
+#define __z88dk_callee
+#define __z88dk_fastcall
+#endif
+
 #else
 #define __vasmallc __smallc
 #define __z88dk_deprecated

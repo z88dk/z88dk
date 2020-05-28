@@ -5,11 +5,13 @@
 #ifndef __PSG_WYZ_H__
 #define __PSG_WYZ_H__
 
+#include <sys/compiler.h>
+
 typedef struct {
-	void  *effect_table;
-	void  *instrument_table;
-	void  *note_table;
-        void  *song_table;
+    void  *effect_table;
+    void  *instrument_table;
+    void  *note_table;
+    void  *song_table;
 } wyz_song;
 
 

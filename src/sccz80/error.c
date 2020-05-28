@@ -153,7 +153,7 @@ void errorva(int fatal, const char *fmt, va_list ap)
         char filen[FILENAME_MAX+1];
         strncpy(filen, Filename + 1, strlen(Filename) - 2);
         filen[strlen(Filename) - 2] = '\0';
-        fprintf(stderr, "%s:%d:%d: %s: ", filen, lineno, lptr + 1, fatal ? "Fatal error" : "Error");
+        fprintf(stderr, "%s:%d:%d: %s: ", filen, lineno, lptr + 1, fatal ? "fatal error" : "error");
     }
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");
