@@ -63,14 +63,14 @@ PUBLIC asm_f24_sub_callee
 ; enter here for floating asm_f16_add_callee, x+y, x on stack, y in hl, result in hl
 .asm_f16_add_callee
     call asm_f16_f24            ; expand to dehl
-    exx                         ; y     d' = s------- e' = eeeeeeee
+    exx                         ; y     d'  = eeeeeeee e' = s-------
                                 ;       hl' = 1mmmmmmm mmmmmmmm
 
     pop bc                      ; pop return address
     pop hl                      ; get second operand off of the stack
     push bc                     ; return address on stack
     call asm_f16_f24            ; expand to dehl
-                                ; x      d = s------- e = eeeeeeee
+                                ; x      d  = eeeeeeee e  = s-------
                                 ;        hl = 1mmmmmmm mmmmmmmm
     call add_f24_f24
     jp asm_f24_f16
@@ -84,11 +84,11 @@ PUBLIC asm_f24_sub_callee
 
 ; enter here for floating asm_f24_add_callee, x+y, x on stack, y in dehl, result in dehl
 .asm_f24_add_callee
-    exx                         ; y     d' = s------- e' = eeeeeeee
+    exx                         ; y     d'  = eeeeeeee e' = s-------
                                 ;       hl' = 1mmmmmmm mmmmmmmm
 
     pop bc                      ; pop return address
-    pop hl                      ; x      d = s------- e = eeeeeeee
+    pop hl                      ; x      d  = eeeeeeee e  = s-------
     pop de                      ;        hl = 1mmmmmmm mmmmmmmm
     push bc                     ; return address on stack
 
