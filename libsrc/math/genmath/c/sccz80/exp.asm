@@ -49,12 +49,10 @@
         CCF     
         LD      (HL),A
         RET     NC
-        JP      DIV17
 
 .DIV17	call	sgn
         cpl
         or      a
-        pop     hl
         jp      p,norm4
         ret     ;jp oflow
 
