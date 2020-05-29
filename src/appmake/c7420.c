@@ -101,7 +101,7 @@ int c7420_exec(char* target)
 
         copy1 = strdup(filename);
         copy2 = strdup(filename);
-        snprintf(ldr_name, sizeof(ldr_name), "%s/_%s", dirname(copy1), basename(copy2));
+        snprintf(ldr_name, sizeof(ldr_name), "%s/_%s", zdirname(copy1), zbasename(copy2));
         free(copy1);
         free(copy2);
 
@@ -184,7 +184,7 @@ int c7420_exec(char* target)
 
         copy1 = strdup(filename);
         copy2 = strdup(filename);
-        snprintf(ldr_name, sizeof(ldr_name), "%s/_%s", dirname(copy1), basename(copy2));
+        snprintf(ldr_name, sizeof(ldr_name), "%s/_%s", zdirname(copy1), zbasename(copy2));
         free(copy1);
         free(copy2);
 

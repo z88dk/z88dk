@@ -26,6 +26,7 @@
 #include        <sys/stat.h>
 #include        "zcc.h"
 #include        "regex/regex.h"
+#include 	"dirname.h"
 
 #ifdef WIN32
 #include        <direct.h>
@@ -93,7 +94,6 @@ static int             hassuffix(char *file, char *suffix_to_check);
 static char           *stripsuffix(char *, char *);
 static char           *changesuffix(char *, char *);
 static char           *find_file_ext(char *filename);
-static char           *last_path_char(char *filename);
 static int             is_path_absolute(char *filename);
 static int             process(char *, char *, char *, char *, enum iostyle, int, int, int);
 static int             linkthem(char *);
@@ -2239,20 +2239,6 @@ char *find_file_ext(char *filename)
     return strrchr(p, '.');
 }
 
-char *last_path_char(char *filename)
-{
-    char *p, *q;
-
-    // return pointer to last slash character in filename
-    // return NULL if no slash character found
-
-    p = strrchr(filename, '/');
-    q = strrchr(filename, '\\');
-    if ((p == NULL) || ((q != NULL) && ((q - filename) > (p - filename))))
-        p = q;
-
-    return p;
-}
 
 int is_path_absolute(char *p)
 {

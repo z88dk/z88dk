@@ -80,10 +80,10 @@ int aquarius_exec(char *target)
 /* BASIC loader */
 /****************/
 
-    // Create the loader name, we need to take the dirname, add an underscore, then the filename
+    // Create the loader name, we need to take the zdirname, add an underscore, then the filename
     copy1 = strdup(filename);
     copy2 = strdup(filename);
-    snprintf(ldr_name, sizeof(ldr_name), "%s/_%s", dirname(copy1), basename(copy2));
+    snprintf(ldr_name, sizeof(ldr_name), "%s/_%s", zdirname(copy1), zbasename(copy2));
     free(copy1);
     free(copy2);
  	if ( (fpout=fopen(ldr_name,"wb") ) == NULL ) {

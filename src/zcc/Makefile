@@ -8,12 +8,12 @@ endif
 
 INSTALL ?= install
 
-INCLUDES += -I. -I../copt
+INCLUDES += -I. -I../copt -I../common
 
 CFLAGS += -DLOCAL_REGEXP
 
 OBJS = zcc.o
-REGEX_OBJS = ../copt/regex/regcomp.o  ../copt/regex/regerror.o ../copt/regex/regexec.o  ../copt/regex/regfree.o
+REGEX_OBJS = ../copt/regex/regcomp.o  ../copt/regex/regerror.o ../copt/regex/regexec.o  ../copt/regex/regfree.o ../common/dirname.c
 
 OBJS += $(REGEX_OBJS)
 

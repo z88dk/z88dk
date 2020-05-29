@@ -11,11 +11,11 @@ else
 endif
 
 CC			?= gcc
-CFLAGS		+= -Wall -std=gnu11 -MMD -pedantic
+CFLAGS		+= -Wall -std=gnu11 -MMD -pedantic -I../common
 
 INSTALL 	?= install
 
-SRCS 		:= $(wildcard *.c)
+SRCS 		:= $(wildcard *.c) ../common/dirname.c
 
 OBJS_ALL	:= $(SRCS:.c=.o)
 OBJS		:= $(OBJS_ALL:$(PROJ).o=)

@@ -45,7 +45,6 @@ int kc_exec(char* target)
     int len;
     int c, i;
     int nflag;
-    char* p;
 
     if (help)
         return -1;

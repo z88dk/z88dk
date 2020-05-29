@@ -50,8 +50,7 @@ int c128_exec(char *target)
     long    pos;
     int     len,namelen;
     int     c,i;
-    char   *p;
-	int diskgap;
+    int diskgap;
 
     if ( help )
         return -1;

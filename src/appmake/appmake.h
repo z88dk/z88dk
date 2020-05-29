@@ -16,7 +16,6 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <sys/stat.h>
-#include <libgen.h>
 #ifndef WIN32
 #include <unistd.h>
 #endif
@@ -27,7 +26,7 @@
 #ifdef WIN32
 #define __NORETURN 
 #endif
-
+#include "dirname.h"
 #include "cpmdisk.h"
 
 extern char c_install_dir[];

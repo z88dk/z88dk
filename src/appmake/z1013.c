@@ -47,7 +47,6 @@ int z1013_exec(char* target)
     char name[17];
     int len;
     int c, i;
-    char* p;
 
     if (help)
         return -1;

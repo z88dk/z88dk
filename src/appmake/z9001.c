@@ -45,7 +45,6 @@ int z9001_exec(char *target)
     int     len;
     int     c,i;
     int	    blocknr,nflag,a;
-    char   *p;
 
     if ( help )
         return -1;
