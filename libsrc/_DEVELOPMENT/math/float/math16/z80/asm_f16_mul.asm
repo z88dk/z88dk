@@ -53,22 +53,22 @@ PUBLIC asm_f24_mul_f24
 ; enter here for floating asm_f16_mul_callee, x+y, x on stack, y in hl, result in hl
 .asm_f16_mul_callee
     call asm_f16_f24            ; expand to dehl
-    exx                         ; y      d = eeeeeeee e = s-------
-                                ;        hl = 1mmmmmmm mmmmmmmm
+    exx                         ; y     d  = eeeeeeee e = s-------
+                                ;       hl = 1mmmmmmm mmmmmmmm
     pop bc                      ; pop return address
     pop hl                      ; get second operand off of the stack
     push bc                     ; return address on stack
     call asm_f16_f24            ; expand to dehl
-                                ; x      d = eeeeeeee e = s-------
-                                ;        hl = 1mmmmmmm mmmmmmmm
+                                ; x     d  = eeeeeeee e = s-------
+                                ;       hl = 1mmmmmmm mmmmmmmm
     call asm_f24_mul_f24
     jp asm_f24_f16
 
 
-; enter here for floating asm_f24_add_callee, x+y, x on stack, y in dehl, result in dehl
+; enter here for floating asm_f24_mul_callee, x+y, x on stack, y in dehl, result in dehl
 .asm_f24_mul_callee
-    exx                         ; y      d = eeeeeeee e = s-------
-                                ;        hl = 1mmmmmmm mmmmmmmm
+    exx                         ; y     d  = eeeeeeee e = s-------
+                                ;       hl = 1mmmmmmm mmmmmmmm
     pop bc                      ; pop return address
     pop hl                      ; x     d = eeeeeeee e = s------- hl = 1mmmmmmm mmmmmmmm
     pop de
@@ -109,8 +109,8 @@ PUBLIC asm_f24_mul_f24
     ld a,b
     push af                     ; stack: sum of exponents a, and xor sign of exponents in f
 
-                                ; first  e  = eeeeeeee, hl  = 1mmmmmmm mmmmmmmm
-                                ; second e' = eeeeeeee, hl' = 1mmmmmmm mmmmmmmm
+                                ; first  d  = eeeeeeee e  = s------- hl  = 1mmmmmmm mmmmmmmm
+                                ; second d' = eeeeeeee e' = s------- hl' = 1mmmmmmm mmmmmmmm
                                 ; sum of exponents in a', xor of exponents in sign f'
     push hl
     exx

@@ -98,6 +98,8 @@ PUBLIC asm_f24_div_callee
 
     ld de,07e80h                ; scale to -0.5 <= D' < -1.0
 
+    push de                     ; - D' msw on stack for D[3] calculation
+    push hl                     ; - D' lsw on stack for D[3] calculation
     push de                     ; - D' msw on stack for D[2] calculation
     push hl                     ; - D' lsw on stack for D[2] calculation
     push de                     ; - D' msw on stack for D[1] calculation
@@ -155,6 +157,29 @@ PUBLIC asm_f24_div_callee
     ld bc,08000h
     push bc
     push de                      ; - D' for D[2] calculation
+    push hl
+    exx
+    call asm_f24_mul_callee     ; (f24) - D' × X
+    call asm_f24_add_callee     ; (f24) 1 - D' × X
+    call asm_f24_mul_callee     ; (f24) X × (1 - D' × X)
+    call asm_f24_add_callee     ; (f24) X + X × (1 - D' × X)
+
+;-------------------------------;
+                                ; X := X + X × (1 - D' × X)
+    exx
+    pop hl                      ; - D' for D[3] calculation
+    pop de
+    exx
+    push de                     ; X
+    push hl
+    push de                     ; X
+    push hl
+    exx
+    ld bc,07f00h                ; 1.0
+    push bc
+    ld bc,08000h
+    push bc
+    push de                      ; - D' for D[3] calculation
     push hl
     exx
     call asm_f24_mul_callee     ; (f24) - D' × X
