@@ -215,7 +215,7 @@ PUBLIC asm_f24_sub_callee
 ; here do subtract
 
 ; enter with aligned, smaller in hl
-; sign of result in d', exp of result in e'
+; exp of result in d', sign of result in e'
 ; larger number in hl'
 ; C is clear
 .dosub
@@ -226,16 +226,15 @@ PUBLIC asm_f24_sub_callee
     jp NC,asm_f24_normalize     ; now begin to normalize with dehl
 
 ; fix up and subtract in reverse direction
+    add hl,bc
+    push hl
     exx
+
+    pop bc
+    or a
+    sbc hl,bc
     ld a,e                      ; get reversed sign
-    exx
-    ld e,a                      ; get proper sign to result
-    xor a                       ; complement the result
-    sub a,l
-    ld l,a
-    sbc a,a
-    sub a,h
-    ld h,a
+
 ; sub zero alignment from fadd
 ; difference larger-smaller in hl
 ; exponent of result in e sign of result in d
