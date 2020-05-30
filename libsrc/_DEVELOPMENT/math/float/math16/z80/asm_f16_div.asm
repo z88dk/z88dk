@@ -26,7 +26,7 @@
 ;
 ; D' := D / 2e+1   // scale between 0.5 and 1
 ; N' := N / 2e+1
-; X := 140/33 + (-64/11 + 256/99 x D') x D'
+; X  := 140/33 + (-64/11 + 256/99 x D') x D'
 ; precompute constants with same precision as D
 ;
 ; while
@@ -105,22 +105,22 @@ PUBLIC asm_f24_div_callee
     push hl                     ; - D' lsw on stack for D[2] calculation
     push de                     ; - D' msw on stack for D[1] calculation
     push hl                     ; - D' lsw on stack for D[1] calculation
-    push de                     ; - D' msw on stack for D[0] calculation
-    push hl                     ; - D' lsw on stack for D[0] calculation
 
 ;-------------------------------;
                                 ; X = 140/33 + (-64/11 + 256/99 x D') x D'
-    ld bc,08100h
+    ld bc,08100h                ; (f24) 140/33
     push bc
-    ld bc,08ba2h
+    ld bc,08ba3h
     push bc
-    ld bc,08180h
+    push de                     ; - D' msw on stack for D[0] calculation
+    push hl                     ; - D' lsw on stack for D[0] calculation
+    ld bc,08180h                ; (f24) -64/11
     push bc
-    ld bc,0ba2eh
+    ld bc,0ba2fh
     push bc
-    ld bc,08000h
+    ld bc,08000h                ; (f24) 256/99
     push bc
-    ld bc,0a57eh
+    ld bc,0a57fh
     push bc
     call asm_f24_mul_callee     ; (f24) 256/99 × D'
     call asm_f24_add_callee     ; (f24) X = -64/11 + 256/99 × D'
