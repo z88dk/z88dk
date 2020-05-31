@@ -10,6 +10,7 @@
 static char buf[65536];
 
 static char filename[FILENAME_MAX+1];
+static char *c_zcc_opt = "zcc_opt.def";
 static int  lineno = 0;
 static int  sccz80_mode = 0;
 
@@ -55,7 +56,7 @@ void write_pragma_string(char *ptr)
     if ( text != NULL ) {
         *text = 0;
         text++;
-        if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
+        if ( (fp=fopen(c_zcc_opt,"a")) == NULL ) {
             fprintf(stderr,"%s:%d Cannot open zcc_opt.def file\n", filename, lineno);
             exit(1);
         }
@@ -85,7 +86,7 @@ void write_bytes(char *line, int flag)
     *ptr = 0;
 
     if ( strlen(sname) ) {
-        if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
+        if ( (fp=fopen(c_zcc_opt,"a")) == NULL ) {
             fprintf(stderr,"%s:%d Cannot open zcc_opt.def file\n", filename, lineno);
             exit(1);
         }
@@ -137,7 +138,7 @@ void write_defined(char *sname, int32_t value, int export)
 {
     FILE *fp;
 
-    if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
+    if ( (fp=fopen(c_zcc_opt,"a")) == NULL ) {
         fprintf(stderr,"%s:%d Cannot open zcc_opt.def file\n", filename, lineno);
         exit(1);
     }
@@ -156,7 +157,7 @@ void write_need(char *sname, int value)
 {
     FILE *fp;
 
-    if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
+    if ( (fp=fopen(c_zcc_opt,"a")) == NULL ) {
         fprintf(stderr,"%s:%d Cannot open zcc_opt.def file\n", filename, lineno);
         exit(1);
     }
@@ -173,7 +174,7 @@ void write_redirect(char *sname, char *value)
     strip_nl(sname);
     value = skip_ws(value);
     first_word_only(value);
-    if ( (fp=fopen("zcc_opt.def","a")) == NULL ) {
+    if ( (fp=fopen(c_zcc_opt,"a")) == NULL ) {
         fprintf(stderr,"%s:%d Cannot open zcc_opt.def file\n", filename, lineno);
         exit(1);
     }
@@ -321,10 +322,15 @@ static uint64_t parse_format_string(char *arg, CONVSPEC *specifiers)
 
 int main(int argc, char **argv)
 {
+    int     i;
     char   *ptr;
 
-    if ( argc == 2 && strcmp(argv[1],"-sccz80") == 0 ) {
-         sccz80_mode = 1;
+    for ( i = 1 ; i < argc; i++ ) {
+        if (strcmp(argv[i],"-sccz80") == 0 ) {
+            sccz80_mode = 1;
+        } else if ( strncmp(argv[i],"-zcc-opt=", 9) == 0 ) {
+            c_zcc_opt = argv[i] + 9;
+        }
     }
 
     strcpy(filename,"<stdin>");

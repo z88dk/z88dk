@@ -139,7 +139,6 @@ static int             zcc_asprintf(char **s, const char *fmt, ...);
 static int             zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *stream);
 
 
-static int             preserve = 0;    /* don't destroy zcc_opt */
 static int             createapp = 0;    /* Go the next stage and create the app */
 static int             z80verbose = 0;
 static int             cleanup = 1;
@@ -235,7 +234,8 @@ static enum iostyle    compiler_style = outimplied;
 static char           *c_compiler_type = "sccz80";
 static int             compiler_type = CC_SCCZ80;
 
-
+static char           *zcc_opt_dir = ".";
+static char           *zcc_opt_def = "zcc_opt.def";
 
 static char           *defaultout = "a.bin";
 
@@ -409,7 +409,6 @@ static arg_t     myargs[] = {
     { "z80-verb", AF_BOOL_TRUE, SetBoolean, &z80verbose, NULL, "Make the assembler more verbose" },
     { "cleanup",  AF_BOOL_TRUE, SetBoolean, &cleanup, NULL,    "(default) Cleanup temporary files" },
     { "no-cleanup", AF_BOOL_FALSE, SetBoolean, &cleanup, NULL, "Don't cleanup temporary files" },
-    { "preserve", AF_BOOL_TRUE, SetBoolean, &preserve, NULL, "Don't remove zcc_opt.def at start of run" },
     { "create-app", AF_BOOL_TRUE, SetBoolean, &createapp, NULL, "Run appmake on the resulting binary to create emulator usable file" },
     { "specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, NULL, "Print out compiler specs" },
     { "compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)" },
@@ -944,6 +943,24 @@ int main(int argc, char **argv)
         exit(1);
     }
 
+    /* Setup zcc_opt.def */
+    {
+        char tempdir[FILENAME_MAX+1];
+
+#ifndef WIN32
+        snprintf(tempdir, sizeof(tempdir),"/tmp/tmpzccXXXXXXXX");
+        mkdtemp(tempdir);
+#else
+        tempname(tempdir);
+        mkdir(tempdir);
+#endif
+        zcc_opt_dir = strdup(tempdir);
+        strcat(tempdir,"/zcc_opt.def");
+        zcc_opt_def = strdup(tempdir);
+    }
+
+
+
     if (c_sccz80_inline_ints == 0 ) {
         c_coptrules_sccz80 = NULL;
     }
@@ -968,32 +985,16 @@ int main(int argc, char **argv)
         BuildOptions(&linkargs, "--list ");
     }
 
-
-    /* clear zcc_opt.def */
-    if (preserve == NO) {
-        if ((fp = fopen(DEFFILE, "w")) != NULL) {
-            fclose(fp);
-            if (remove(DEFFILE) < 0) {
-                fprintf(stderr, "Cannot remove %s: File in use?\n", DEFFILE);
-                exit(1);
-            }
-        }
-        else {
-            fprintf(stderr, "Cannot open %s: File in use?\n", DEFFILE);
-            exit(1);
-        }
-    }
-
     if (c_zorg != -1) {
         write_zcc_defined("CRT_ORG_CODE", c_zorg, 0);
     }
 
-    if ((fp = fopen(DEFFILE, "a")) != NULL) {
+    if ((fp = fopen(zcc_opt_def, "a")) != NULL) {
         fprintf(fp, "%s", zccopt ? zccopt : "");
         fclose(fp);
     }
     else {
-        fprintf(stderr, "Could not create %s: File in use?\n", DEFFILE);
+        fprintf(stderr, "Could not create %s: File in use?\n", zcc_opt_def);
         exit(1);
     }
 
@@ -1003,9 +1004,9 @@ int main(int argc, char **argv)
         char cmdline[FILENAME_MAX + 128];
 
 #ifdef _WIN32
-        snprintf(cmdline, FILENAME_MAX + 127, "%s < \"%s\" > nul",c_zpragma_exe, pragincname);
+        snprintf(cmdline, FILENAME_MAX + 127, "%s -zcc-opt=%s < \"%s\" > nul",c_zpragma_exe, zcc_opt_def, pragincname);
 #else
-        snprintf(cmdline, FILENAME_MAX + 127, "%s < \"%s\" > /dev/null",c_zpragma_exe, pragincname);
+        snprintf(cmdline, FILENAME_MAX + 127, "%s -zcc-opt=%s < \"%s\" > /dev/null",c_zpragma_exe, zcc_opt_def, pragincname);
 #endif
         if (verbose) { printf("%s\n", cmdline); fflush(stdout); }
         system(cmdline);
@@ -1094,7 +1095,7 @@ int main(int argc, char **argv)
     /* Some pragma values need to be known at m4 time in the new c lib CRTs */
 
     if (build_bin) {
-        if ((fp = fopen(DEFFILE, "r")) != NULL) {
+        if ((fp = fopen(zcc_opt_def, "r")) != NULL) {
             char buffer[LINEMAX + 1];
             int32_t val;
 
@@ -1114,7 +1115,7 @@ int main(int argc, char **argv)
                 }
             }
         } else {
-            fprintf(stderr, "Could not open %s: File in use?\n", DEFFILE);
+            fprintf(stderr, "Could not open %s: File in use?\n", zcc_opt_def);
             exit(1);
         }
 
@@ -1215,15 +1216,20 @@ int main(int argc, char **argv)
                 BuildOptions(&cpparg, clangcpparg);
             // past clang+llvm related pre-processing
             if (compiler_type == CC_SDCC) {
+                char zpragma_args[1024];
+                snprintf(zpragma_args, sizeof(zpragma_args),"-zcc-opt=%s", zcc_opt_def);
                 if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
-                if (process(".i2", ".i", c_zpragma_exe, "", filter, i, YES, NO))
+                if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
                     exit(1);
             }
             else {
+                char zpragma_args[1024];
+                snprintf(zpragma_args, sizeof(zpragma_args),"-sccz80 -zcc-opt=%s", zcc_opt_def);
+ 
                 if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
-                if (process(".i2", ".i", c_zpragma_exe, "-sccz80", filter, i, YES, NO))
+                if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
                     exit(1);
             }
         case CPPFILE:
@@ -2599,6 +2605,7 @@ static void configure_maths_library(char **libstring)
 
 static void configure_assembler()
 {
+    char            buf[FILENAME_MAX+1];
     char           *assembler = NULL;
     char           *linker = NULL;
     int             type = ASM_Z80ASM;
@@ -2616,6 +2623,10 @@ static void configure_assembler()
     if (linker) {
         c_linker = linker;
     }
+    snprintf(buf,sizeof(buf),"-I\"%s\"",zcc_opt_dir);
+    BuildOptions(&asmargs, buf);
+    BuildOptions(&linkargs, buf);
+
 }
 
 
@@ -2654,9 +2665,9 @@ static void configure_compiler()
                 BuildOptions(&asmargs, "-D__SCCZ80");
                 BuildOptions(&linkargs, "-D__SCCZ80");
         /* Indicate to sccz80 what assembler we want */
-        snprintf(buf, sizeof(buf), "-ext=opt %s", select_cpu(CPU_MAP_TOOL_SCCZ80));
-
+        snprintf(buf, sizeof(buf), "-ext=opt %s -zcc-opt=%s", select_cpu(CPU_MAP_TOOL_SCCZ80),zcc_opt_def);
         add_option_to_compiler(buf);
+
         if (sccz80arg) {
             add_option_to_compiler(sccz80arg);
         }
@@ -2894,6 +2905,9 @@ void remove_temporary_files(void)
             remove_file_with_extension(temporary_filenames[j], ".lis");
         }
     }
+    // Cleanup zcc_opt files
+    remove(zcc_opt_def);
+    rmdir(zcc_opt_dir);
 }
 
 
