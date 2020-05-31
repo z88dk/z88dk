@@ -26,14 +26,13 @@
 ;
 ; D' := D / 2e+1   // scale between 0.5 and 1
 ; N' := N / 2e+1
-; X := 48/17 − 31/17 × D'   // precompute constants with same precision as D
+; X  := 140/33 + (-64/11 + 256/99 x D') x D'
+; precompute constants with same precision as D
 ;
 ; while
 ;    X := X + X × (1 - D' × X)
 ; return N' × X
 ;
-;-------------------------------------------------------------------------
-; FIXME clocks
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -89,7 +88,7 @@ PUBLIC _m32_invf
 
     sla e
     rl d                        ; get D' full exponent into d
-    rr c                        ; put sign in c
+    res 7,c                     ; set D' positive
     scf
     rr e                        ; put implicit bit for mantissa in ehl
     ld b,d                      ; unpack IEEE to expanded float 32-bit mantissa
@@ -98,19 +97,30 @@ PUBLIC _m32_invf
     ld h,l
     ld l,0
 ;-------------------------------;
-                                ; X = 48/17 − 31/17 × D'
+                                ; X = 140/33 + (-64/11 + 256/99 x D') x D'
     exx
-    ld bc,04034h
+    ld bc,04087h                ; (float) 140/33
     push bc
-    ld bc,0B4B5h
-    push bc
-    ld bc,03FE9h
-    push bc
-    ld bc,06969h
+    ld bc,0c1f0h
     push bc
     exx
-    call m32_fsmul24x32         ; (float) 31/17 × D'
-    call m32_fsadd24x32         ; X = 48/17 − 31/17 × D'
+    push bc                     ; D' exp sign on stack for D[0] calculation
+    push de                     ; D' msw on stack for D[0] calculation
+    push hl                     ; D' lsw on stack for D[0] calculation
+    exx
+    ld bc,0c0bah                ; (float) -64/11
+    push bc
+    ld bc,02e8ch
+    push bc
+    ld bc,04025h                ; (float) 256/99
+    push bc
+    ld bc,07eb5h
+    push bc
+    exx
+    call m32_fsmul24x32         ; (float) 256/99 × D'
+    call m32_fsadd24x32         ; (float) X = -64/11 + 256/99 × D'
+    call m32_fsmul32x32         ; (float) X = (-64/11 + 256/99 × D') x D'
+    call m32_fsadd24x32         ; (float) X = 140/33 + (-64/11 + 256/99 × D') x D'
 
 ;-------------------------------;
                                 ; X := X + X × (1 - D' × X)
