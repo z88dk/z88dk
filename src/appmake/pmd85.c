@@ -24,11 +24,9 @@ option_t pmd85_options[] = {
 int pmd85_exec(char *target)
 {
     char    *buf;
-    char    bootbuf[512];
     char    filename[FILENAME_MAX+1];
-    char    bootname[FILENAME_MAX+1];
-    FILE    *fpin, *bootstrap_fp, *fpout;
-    long    pos, bootlen;
+    FILE    *fpin, *fpout;
+    long    pos;
     int     i;
     unsigned long cksum;
     
@@ -38,30 +36,6 @@ int pmd85_exec(char *target)
     if ( binname == NULL ) {
         return -1;
     }
-
-#if 0
-    strcpy(bootname, binname);
-    suffix_change(bootname, "_BOOTSTRAP.bin");
-    if ( (bootstrap_fp=fopen_bin(bootname, crtfile) ) == NULL ) {
-        exit_log(1,"Can't open input file %s\n",bootname);
-    }
-    if ( fseek(bootstrap_fp,0,SEEK_END) ) {
-        fclose(bootstrap_fp);
-        fprintf(stderr,"Couldn't determine size of file\n");
-    }
-    bootlen = ftell(bootstrap_fp);
-    fseek(bootstrap_fp,0L,SEEK_SET);
-
-    if ( bootlen > 256 ) {
-        exit_log(1, "Bootstrap has length %d > 256", bootlen);
-    }
-    memset(bootbuf, 0, sizeof(bootbuf));
-    if ( fread(bootbuf, 1, bootlen, bootstrap_fp) != bootlen ) {
-        exit_log(1, "Cannot read whole bootstrap file");
-    }
-    fclose(bootstrap_fp);
-#endif
-
 
     strcpy(filename, binname);
 

@@ -34,6 +34,7 @@ struct zx_tape
     char           noloader;
     char           noheader;
     unsigned char  parity;
+    char           khz22;
 };
 
 struct zx_sna

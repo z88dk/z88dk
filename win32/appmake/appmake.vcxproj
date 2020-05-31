@@ -18,6 +18,89 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\appmake\appmake.h" />
+    <ClInclude Include="..\..\src\appmake\cpmdisk.h" />
+    <ClInclude Include="..\..\src\appmake\diskio.h" />
+    <ClInclude Include="..\..\src\appmake\ff.h" />
+    <ClInclude Include="..\..\src\appmake\ffconf.h" />
+    <ClInclude Include="..\..\src\appmake\zx-util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\appmake\abc80.c" />
+    <ClCompile Include="..\..\src\appmake\ace-tap.c" />
+    <ClCompile Include="..\..\src\appmake\appmake.c" />
+    <ClCompile Include="..\..\src\appmake\aquarius.c" />
+    <ClCompile Include="..\..\src\appmake\c128.c" />
+    <ClCompile Include="..\..\src\appmake\c7420.c" />
+    <ClCompile Include="..\..\src\appmake\cpc.c" />
+    <ClCompile Include="..\..\src\appmake\cpm2.c" />
+    <ClCompile Include="..\..\src\appmake\cpmdisk.c" />
+    <ClCompile Include="..\..\src\appmake\enterprise.c" />
+    <ClCompile Include="..\..\src\appmake\extract.c" />
+    <ClCompile Include="..\..\src\appmake\fat.c" />
+    <ClCompile Include="..\..\src\appmake\ff.c" />
+    <ClCompile Include="..\..\src\appmake\fp1100.c" />
+    <ClCompile Include="..\..\src\appmake\galaksija.c" />
+    <ClCompile Include="..\..\src\appmake\gb.c" />
+    <ClCompile Include="..\..\src\appmake\glue.c" />
+    <ClCompile Include="..\..\src\appmake\hex.c" />
+    <ClCompile Include="..\..\src\appmake\homelab.c" />
+    <ClCompile Include="..\..\src\appmake\inject.c" />
+    <ClCompile Include="..\..\src\appmake\kc.c" />
+    <ClCompile Include="..\..\src\appmake\lynx.c" />
+    <ClCompile Include="..\..\src\appmake\m5.c" />
+    <ClCompile Include="..\..\src\appmake\mamepp.c" />
+    <ClCompile Include="..\..\src\appmake\mameql.c" />
+    <ClCompile Include="..\..\src\appmake\mc.c" />
+    <ClCompile Include="..\..\src\appmake\msx.c" />
+    <ClCompile Include="..\..\src\appmake\mtx.c" />
+    <ClCompile Include="..\..\src\appmake\multi8.c" />
+    <ClCompile Include="..\..\src\appmake\mz.c" />
+    <ClCompile Include="..\..\src\appmake\mz2500.c" />
+    <ClCompile Include="..\..\src\appmake\nascom.c" />
+    <ClCompile Include="..\..\src\appmake\nec.c" />
+    <ClCompile Include="..\..\src\appmake\newbrain.c" />
+    <ClCompile Include="..\..\src\appmake\newext.c" />
+    <ClCompile Include="..\..\src\appmake\noop.c" />
+    <ClCompile Include="..\..\src\appmake\p2000.c" />
+    <ClCompile Include="..\..\src\appmake\pasopia7.c" />
+    <ClCompile Include="..\..\src\appmake\pc88.c" />
+    <ClCompile Include="..\..\src\appmake\pmd85.c" />
+    <ClCompile Include="..\..\src\appmake\px.c" />
+    <ClCompile Include="..\..\src\appmake\residos.c" />
+    <ClCompile Include="..\..\src\appmake\rex6000.c" />
+    <ClCompile Include="..\..\src\appmake\rk.c" />
+    <ClCompile Include="..\..\src\appmake\rom.c" />
+    <ClCompile Include="..\..\src\appmake\sc3000.c" />
+    <ClCompile Include="..\..\src\appmake\sms.c" />
+    <ClCompile Include="..\..\src\appmake\sorcerer.c" />
+    <ClCompile Include="..\..\src\appmake\sos.c" />
+    <ClCompile Include="..\..\src\appmake\spc1000.c" />
+    <ClCompile Include="..\..\src\appmake\svi.c" />
+    <ClCompile Include="..\..\src\appmake\tixx.c" />
+    <ClCompile Include="..\..\src\appmake\trs80.c" />
+    <ClCompile Include="..\..\src\appmake\tvc.c" />
+    <ClCompile Include="..\..\src\appmake\vector06c.c" />
+    <ClCompile Include="..\..\src\appmake\vg5k.c" />
+    <ClCompile Include="..\..\src\appmake\vz.c" />
+    <ClCompile Include="..\..\src\appmake\x07.c" />
+    <ClCompile Include="..\..\src\appmake\x1.c" />
+    <ClCompile Include="..\..\src\appmake\z1013.c" />
+    <ClCompile Include="..\..\src\appmake\z88.c" />
+    <ClCompile Include="..\..\src\appmake\z88shell.c" />
+    <ClCompile Include="..\..\src\appmake\z9001.c" />
+    <ClCompile Include="..\..\src\appmake\zx-util.c" />
+    <ClCompile Include="..\..\src\appmake\zx.c" />
+    <ClCompile Include="..\..\src\appmake\zx81.c" />
+    <ClCompile Include="..\..\src\appmake\zxn.c" />
+    <ClCompile Include="..\..\src\appmake\zxvgs.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\common\common.vcxproj">
+      <Project>{d7bc7a18-5bc5-4543-9f93-87a055319826}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{321F0E77-E3DC-4C14-8113-28FDFAC73F7B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -88,7 +171,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\win32\appmake</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\common</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -117,7 +200,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\win32\appmake</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\common</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -161,83 +244,6 @@
       <Inputs>$(OutDir)$(TargetName)$(TargetExt)</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\src\appmake\abc80.c" />
-    <ClCompile Include="..\..\src\appmake\ace-tap.c" />
-    <ClCompile Include="..\..\src\appmake\appmake.c" />
-    <ClCompile Include="..\..\src\appmake\aquarius.c" />
-    <ClCompile Include="..\..\src\appmake\c128.c" />
-    <ClCompile Include="..\..\src\appmake\c7420.c" />
-    <ClCompile Include="..\..\src\appmake\cpc.c" />
-    <ClCompile Include="..\..\src\appmake\cpm2.c" />
-    <ClCompile Include="..\..\src\appmake\cpmdisk.c" />
-    <ClCompile Include="..\..\src\appmake\enterprise.c" />
-    <ClCompile Include="..\..\src\appmake\extract.c" />
-    <ClCompile Include="..\..\src\appmake\fat.c" />
-    <ClCompile Include="..\..\src\appmake\ff.c" />
-    <ClCompile Include="..\..\src\appmake\fp1100.c" />
-    <ClCompile Include="..\..\src\appmake\galaksija.c" />
-    <ClCompile Include="..\..\src\appmake\gb.c" />
-    <ClCompile Include="..\..\src\appmake\glue.c" />
-    <ClCompile Include="..\..\src\appmake\hex.c" />
-    <ClCompile Include="..\..\src\appmake\homelab.c" />
-    <ClCompile Include="..\..\src\appmake\inject.c" />
-    <ClCompile Include="..\..\src\appmake\kc.c" />
-    <ClCompile Include="..\..\src\appmake\lynx.c" />
-    <ClCompile Include="..\..\src\appmake\m5.c" />
-    <ClCompile Include="..\..\src\appmake\mamepp.c" />
-    <ClCompile Include="..\..\src\appmake\mameql.c" />
-    <ClCompile Include="..\..\src\appmake\mc.c" />
-    <ClCompile Include="..\..\src\appmake\msx.c" />
-    <ClCompile Include="..\..\src\appmake\mtx.c" />
-    <ClCompile Include="..\..\src\appmake\multi8.c" />
-    <ClCompile Include="..\..\src\appmake\mz.c" />
-    <ClCompile Include="..\..\src\appmake\mz2500.c" />
-    <ClCompile Include="..\..\src\appmake\nascom.c" />
-    <ClCompile Include="..\..\src\appmake\nec.c" />
-    <ClCompile Include="..\..\src\appmake\newbrain.c" />
-    <ClCompile Include="..\..\src\appmake\newext.c" />
-    <ClCompile Include="..\..\src\appmake\p2000.c" />
-    <ClCompile Include="..\..\src\appmake\pasopia7.c" />
-    <ClCompile Include="..\..\src\appmake\pc88.c" />
-    <ClCompile Include="..\..\src\appmake\pmd85.c" />
-    <ClCompile Include="..\..\src\appmake\px.c" />
-    <ClCompile Include="..\..\src\appmake\residos.c" />
-    <ClCompile Include="..\..\src\appmake\rex6000.c" />
-    <ClCompile Include="..\..\src\appmake\rk8.c" />
-    <ClCompile Include="..\..\src\appmake\rom.c" />
-    <ClCompile Include="..\..\src\appmake\sc3000.c" />
-    <ClCompile Include="..\..\src\appmake\sms.c" />
-    <ClCompile Include="..\..\src\appmake\sorcerer.c" />
-    <ClCompile Include="..\..\src\appmake\sos.c" />
-    <ClCompile Include="..\..\src\appmake\spc1000.c" />
-    <ClCompile Include="..\..\src\appmake\svi.c" />
-    <ClCompile Include="..\..\src\appmake\tixx.c" />
-    <ClCompile Include="..\..\src\appmake\trs80.c" />
-    <ClCompile Include="..\..\src\appmake\tvc.c" />
-    <ClCompile Include="..\..\src\appmake\vector06c.c" />
-    <ClCompile Include="..\..\src\appmake\vg5k.c" />
-    <ClCompile Include="..\..\src\appmake\vz.c" />
-    <ClCompile Include="..\..\src\appmake\x1.c" />
-    <ClCompile Include="..\..\src\appmake\x07.c" />
-    <ClCompile Include="..\..\src\appmake\z88.c" />
-    <ClCompile Include="..\..\src\appmake\z88shell.c" />
-    <ClCompile Include="..\..\src\appmake\z1013.c" />
-    <ClCompile Include="..\..\src\appmake\z9001.c" />
-    <ClCompile Include="..\..\src\appmake\zx.c" />
-    <ClCompile Include="..\..\src\appmake\zx81.c" />
-    <ClCompile Include="..\..\src\appmake\zxn.c" />
-    <ClCompile Include="..\..\src\appmake\zx-util.c" />
-    <ClCompile Include="..\..\src\appmake\zxvgs.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\src\appmake\appmake.h" />
-    <ClInclude Include="..\..\src\appmake\cpmdisk.h" />
-    <ClInclude Include="..\..\src\appmake\diskio.h" />
-    <ClInclude Include="..\..\src\appmake\ff.h" />
-    <ClInclude Include="..\..\src\appmake\ffconf.h" />
-    <ClInclude Include="..\..\src\appmake\zx-util.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

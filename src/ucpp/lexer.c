@@ -502,6 +502,11 @@ static inline int read_char(struct lexer_state *ls)
 			ls->ebuf = fread(ls->input_buf, 1,
 				INPUT_BUF_MEMG, ls->input);
 			ls->pbuf = 0;
+                        // If we read a chunk and it's the last block and 
+                        // it doesn't end with \n, then stuff one in
+		        if ( feof(ls->input) && ls->ebuf && ls->input_buf[ls->ebuf-1] != '\n' ) {
+			    ls->input_buf[ls->ebuf++] = '\n';
+                        }
 		}
 		if (ls->ebuf == 0) return -1;
 		c = ls->input_buf[ls->pbuf ++];

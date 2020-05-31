@@ -6,8 +6,8 @@ double sqrt(x)
 double x;
 {
 	double extra;	/* current approximate root */
-	unsigned char *px;		/* points to x */
-	unsigned char *pextra;	/* points to extra */
+	char *px;		/* points to x */
+	char *pextra;	/* points to extra */
 	int i;			/* loop counter */
 
 	if (x == 0.0) return 0.0 ;

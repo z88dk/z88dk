@@ -9,12 +9,14 @@
 	EXTERN		___mbf32_return
         EXTERN          ___mbf32_FPINT
         EXTERN          ___mbf32_FPREG
+        EXTERN          ___mbf32_FPEXP
 
 
 floor:
 	call	___mbf32_setup_single
 	ld	a,(___mbf32_FPREG+2)
 	push	af
+	ld	a,(___mbf32_FPEXP)		;exponent
 IF __CPU_INTEL__
         call	___mbf32_FPINT
 ELSE

@@ -5,6 +5,8 @@
 #ifndef __PSG_VT2_H__
 #define __PSG_VT2_H__
 
+#include <sys/compiler.h>
+
 typedef int vt2_song;
 
 extern void __LIB__ ay_vt2_init(vt2_song *song) __z88dk_fastcall;

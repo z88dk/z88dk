@@ -6,7 +6,7 @@
  *
  *        Stefano Bodrato Jun 2011
  *
- *        $Id: x07.c,v 1.9 2016-06-26 00:46:55 aralbrec Exp $
+ *        $Id: x07.c $
  */
 
 #include "appmake.h"
@@ -19,6 +19,7 @@ static int               origin       = -1;
 static char              help         = 0;
 static char              audio        = 0;
 static char              fast         = 0;
+static char              khz_22       = 0;
 static char              loud         = 0;
 static char              dumb         = 0;
 
@@ -34,6 +35,7 @@ option_t x07_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
+    {  0,  "22",        "22050hz bitrate option",    OPT_BOOL,  &khz_22 },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
     {  0 , "org",      "Origin of the binary (CLOADM only)",       OPT_INT,   &origin },
@@ -302,7 +304,7 @@ int x07_exec(char* target)
     /* ***************************************** */
     /*  Now, if requested, create the audio file */
     /* ***************************************** */
-    if ((audio) || (fast) || (loud)) {
+    if ((audio) || (fast) || (khz_22) || (loud)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
             fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
             myexit(NULL, 1);
@@ -402,7 +404,11 @@ int x07_exec(char* target)
         fclose(fpout);
 
         /* Now complete with the WAV header */
-        raw2wav(wavfile);
+		if (khz_22)
+			raw2wav_22k(wavfile,2);
+		else
+			raw2wav(wavfile);
+
     }
 
     exit(0);

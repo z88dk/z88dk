@@ -13,17 +13,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appmake", "appmake\appmake.
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "copt", "copt\copt.vcxproj", "{07E658CC-1989-42C6-B8CB-CB64157F6FE9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-copt", "copt\copt.vcxproj", "{07E658CC-1989-42C6-B8CB-CB64157F6FE9}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zx7", "zx7\zx7.vcxproj", "{086E8F49-256B-4400-A2E2-4B76827A7ABA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-zx7", "zx7\zx7.vcxproj", "{086E8F49-256B-4400-A2E2-4B76827A7ABA}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dzx7", "dzx7\dzx7.vcxproj", "{F33CCA3A-0186-4A3C-9624-137D3221EDD8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-dzx7", "dzx7\dzx7.vcxproj", "{F33CCA3A-0186-4A3C-9624-137D3221EDD8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
 	EndProjectSection
@@ -33,7 +33,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sccz80", "sccz80\sccz80.vcx
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ticks", "ticks\ticks.vcxproj", "{DC84BAC7-DC4A-4C90-9C94-0E4FC77796E9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-ticks", "ticks\ticks.vcxproj", "{DC84BAC7-DC4A-4C90-9C94-0E4FC77796E9}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
 	EndProjectSection
@@ -48,12 +48,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zcc", "zcc\zcc.vcxproj", "{
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zcpp", "zcpp\zcpp.vcxproj", "{6ED563F1-DC26-4619-A2EA-3BF91B015976}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-zcpp", "zcpp\zcpp.vcxproj", "{6ED563F1-DC26-4619-A2EA-3BF91B015976}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zpragma", "zpragma\zpragma.vcxproj", "{748E94AB-5E0D-4B30-A8C5-E7E4582DEB10}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-zpragma", "zpragma\zpragma.vcxproj", "{748E94AB-5E0D-4B30-A8C5-E7E4582DEB10}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
 	EndProjectSection
@@ -79,7 +79,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-map", "z88dk-map\z88d
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UNIXem", "UNIXem\UNIXem.vcxproj", "{7D0213A3-87FA-4F56-A5D6-CC23682ACAD8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ucpp", "ucpp\ucpp.vcxproj", "{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-ucpp", "ucpp\ucpp.vcxproj", "{3381AF88-AAA9-4670-91CE-A5D0079C7BF2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
 	EndProjectSection
@@ -93,6 +93,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "regex", "regex\regex.vcxproj", "{BD9576EB-A8C0-4E05-ACE3-563277AB90BC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm2", "z80asm2\z80asm2.vcxproj", "{2D3EF459-1199-423F-A1D2-7EDFFB563075}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "common\common.vcxproj", "{D7BC7A18-5BC5-4543-9F93-87A055319826}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -286,6 +288,14 @@ Global
 		{2D3EF459-1199-423F-A1D2-7EDFFB563075}.Release|Win32.Build.0 = Release|Win32
 		{2D3EF459-1199-423F-A1D2-7EDFFB563075}.Release|x64.ActiveCfg = Release|x64
 		{2D3EF459-1199-423F-A1D2-7EDFFB563075}.Release|x64.Build.0 = Release|x64
+		{D7BC7A18-5BC5-4543-9F93-87A055319826}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D7BC7A18-5BC5-4543-9F93-87A055319826}.Debug|Win32.Build.0 = Debug|Win32
+		{D7BC7A18-5BC5-4543-9F93-87A055319826}.Debug|x64.ActiveCfg = Debug|x64
+		{D7BC7A18-5BC5-4543-9F93-87A055319826}.Debug|x64.Build.0 = Debug|x64
+		{D7BC7A18-5BC5-4543-9F93-87A055319826}.Release|Win32.ActiveCfg = Release|Win32
+		{D7BC7A18-5BC5-4543-9F93-87A055319826}.Release|Win32.Build.0 = Release|Win32
+		{D7BC7A18-5BC5-4543-9F93-87A055319826}.Release|x64.ActiveCfg = Release|x64
+		{D7BC7A18-5BC5-4543-9F93-87A055319826}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

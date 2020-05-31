@@ -5,6 +5,7 @@
 **/*.lib
 **/*.lis
 **/*.o
+**/*.orig
 **/*.vcxproj.user
 **/lib*.a
 **/zcc_opt.def

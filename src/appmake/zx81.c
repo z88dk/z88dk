@@ -7,7 +7,7 @@
  *        Stefano Bodrato Apr. 2000
  *        May 2010, added support for wave file
  *
- *        $Id: zx81.c,v 1.18 2016-06-26 00:46:55 aralbrec Exp $
+ *        $Id: zx81.c $
  */
 
 
@@ -18,6 +18,7 @@ static char             *outfile      = NULL;
 static char              help         = 0;
 static char              audio        = 0;
 static char              fast         = 0;
+static char              khz_22       = 0;
 static char              dumb         = 0;
 static char              collapsed    = 0;
 static char              zx80         = 0;
@@ -32,6 +33,7 @@ option_t zx81_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
+    {  0,  "22",        "22050hz bitrate option",    OPT_BOOL,  &khz_22 },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0,  "collapsed",  "Collapse display to save loading time",  OPT_BOOL,  &collapsed },
     {  0,  "zx80",     "Work in ZX80 mode (4K ROM)",  OPT_BOOL,  &zx80 },
@@ -516,7 +518,7 @@ int zx81_exec(char* target)
     /* ***************************************** */
     /*  Now, if requested, create the audio file */
     /* ***************************************** */
-    if ((audio) || (fast)) {
+    if ((audio) || (fast) || (khz_22)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
             fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
             myexit(NULL, 1);
@@ -582,7 +584,11 @@ int zx81_exec(char* target)
         fclose(fpout);
 
         /* Now let's think at the WAV format */
-        raw2wav(wavfile);
+		if (khz_22)
+			raw2wav_22k(wavfile,2);
+		else
+			raw2wav(wavfile);
+
     }
 
     exit(0);

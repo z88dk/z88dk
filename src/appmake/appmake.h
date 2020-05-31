@@ -26,7 +26,7 @@
 #ifdef WIN32
 #define __NORETURN 
 #endif
-
+#include "dirname.h"
 #include "cpmdisk.h"
 
 extern char c_install_dir[];
@@ -150,6 +150,9 @@ extern option_t  nascom_options;
 
 extern int       nec_exec(char *target);
 extern option_t  nec_options;
+
+extern int       noop_exec(char *target);
+extern option_t  noop_options;
 
 extern int       pasopia7_exec(char *target);
 extern option_t  pasopia7_options;
@@ -401,6 +404,10 @@ struct {
       "Changes the binary file extension for CP/M and others",
       NULL,
       newext_exec,   &newext_options },
+    { "bin2bin",   "noop",       "(C) 2020 z88dk",
+      "A noop operator, does nothing",
+      NULL,
+      noop_exec,    &noop_options },
     { "mc2cas",   "p2000",      "(C) 2014 Stefano Bodrato",
       "Philips P2000 MicroCassette to CAS format conversion",
       NULL,

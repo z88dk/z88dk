@@ -38,7 +38,7 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_math
+SECTION code_fp_math32
 
 EXTERN m32_mulu_32h_24x24, m32_mulu_32h_32x32
 

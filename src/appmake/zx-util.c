@@ -760,8 +760,11 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
         fclose(fpin);
         fclose(fpout);
 
-        /* Now let's think at the WAV format */
-        raw2wav(wavfile);
+        /* Now complete with the WAV header */
+		if (zxt->khz22)
+			raw2wav_22k(wavfile,2);
+		else
+			raw2wav(wavfile);
     }
 
     return 0;

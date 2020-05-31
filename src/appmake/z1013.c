@@ -47,7 +47,6 @@ int z1013_exec(char* target)
     char name[17];
     int len;
     int c, i;
-    char* p;
 
     if (help)
         return -1;
@@ -65,8 +64,8 @@ int z1013_exec(char* target)
     // strupr(filename);
     // not available on all platforms
 
-    for (p = filename; *p != '\0'; ++p)
-        *p = toupper(*p);
+    for (i = strlen(filename) - 1; i >= 0 && filename[i] != '/' && filename[i] != '\\'; i--)
+        filename[i] = toupper(filename[i]);
 
     //
 

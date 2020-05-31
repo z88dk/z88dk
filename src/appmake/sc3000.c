@@ -18,6 +18,7 @@ static int               origin       = -1;
 static char              help         = 0;
 static char              audio        = 0;
 static char              fast         = 0;
+static char              khz_22       = 0;
 static char              survivors    = 0;
 static char              sf7000       = 0;
 
@@ -32,6 +33,7 @@ option_t sc3000_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
     {  0,  "audio",    "Create also a WAV file",     OPT_BOOL,  &audio },
     {  0,  "fast",     "Create a fast loading WAV",  OPT_BOOL,  &fast },
+    {  0,  "22",       "22050hz bitrate option",     OPT_BOOL,  &khz_22 },
     {  0,  "survivors", "Add an 'SC Survivors' flash player file", OPT_BOOL,  &survivors },
     {  0 , "org",      "Origin of the binary (CLOADM only)",       OPT_INT,   &origin },
     {  0,  "sf7000",    "Simpler CLOADM format for SF-7000 only",  OPT_BOOL,  &sf7000 },
@@ -291,7 +293,7 @@ int sc3000_exec(char* target)
     /* ***************************************** */
     /*  Now, if requested, create the audio file */
     /* ***************************************** */
-    if ((audio) || (fast)) {
+    if ((audio) || (fast) || (khz_22)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
             fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
             myexit(NULL, 1);
@@ -352,8 +354,12 @@ int sc3000_exec(char* target)
         fclose(fpout);
 
         /* Now complete with the WAV header */
-        if (!survivors)
-            raw2wav(wavfile);
+        if (!survivors) {
+			if (khz_22)
+				raw2wav_22k(wavfile,2);
+			else
+				raw2wav(wavfile);
+		}
     }
 
     exit(0);

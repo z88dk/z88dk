@@ -2,7 +2,7 @@
  *        Laser 200/300 VZ to CAS file converter
  *        and WAV generator (dumb mode is not necessary)
  *
- *        $Id: vz.c,v 1.7 2016-06-26 00:46:55 aralbrec Exp $
+ *        $Id: vz.c $
  */
 
 #include "appmake.h"
@@ -14,6 +14,7 @@ static char* blockname = NULL;
 static char help = 0;
 static char audio = 0;
 static char fast = 0;
+static char vz_22 = 0;
 
 static int create_file(const char* target, int laser500);
 
@@ -25,6 +26,7 @@ option_t vz_options[] = {
     { 'o', "output", "Name of output file", OPT_STR, &outfile },
     { 0, "audio", "Create also a WAV file", OPT_BOOL, &audio },
     { 0, "fast", "Create a fast loading WAV", OPT_BOOL, &fast },
+    { 0, "22", "22050hz bitrate option", OPT_BOOL, &vz_22 },
     { 0, "blockname", "Name of the code block", OPT_STR, &blockname },
     { 0, NULL, NULL, OPT_NONE, NULL }
 };
@@ -35,6 +37,7 @@ option_t laser500_options[] = {
     { 'c', "crt0file", "crt0 file used in linking", OPT_STR, &crtfile },
     { 'o', "output", "Name of output file", OPT_STR, &outfile },
     { 0, "fast", "Create a fast loading WAV", OPT_BOOL, &fast },
+    { 0, "22", "22050hz bitrate option", OPT_BOOL, &vz_22 },
     { 0, "audio", "Create also a WAV file", OPT_BOOL, &audio },
     { 0, NULL, NULL, OPT_NONE, NULL }
 };
@@ -207,7 +210,7 @@ static int create_file(const char* target, int laser500)
     /* ***************************************** */
     /*  Now, if requested, create the audio file */
     /* ***************************************** */
-    if (audio) {
+    if ((audio) || (fast) || (vz_22)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
             fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
             myexit(NULL, 1);
@@ -278,7 +281,10 @@ static int create_file(const char* target, int laser500)
         fclose(fpout);
 
         /* Now let's think at the WAV format */
-        raw2wav(wavfile);
+		if (vz_22)
+			raw2wav_22k(wavfile,2);
+		else
+			raw2wav(wavfile);
     }
 
     return 0;

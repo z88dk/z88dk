@@ -68,8 +68,8 @@ EXTERN m32_fsnormalize
 
 ; convert unsigned long in dehl to float in dehl
 .m32_float32u                  
-    res 7,d                     ; ensure unsigned long's "sign" bit is reset
-    ld b,d                      ; to hold the sign, put copy of MSB into b
+    res 7,b                     ; ensure unsigned long's "sign" bit is reset
+                                ; to hold the sign, put copy of MSB into b
                                 ; continue, with unsigned long number in dehl
     ex de,hl
 
