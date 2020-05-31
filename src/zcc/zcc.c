@@ -951,8 +951,12 @@ int main(int argc, char **argv)
         snprintf(tempdir, sizeof(tempdir),"/tmp/tmpzccXXXXXXXX");
         mkdtemp(tempdir);
 #else
-        tempname(tempdir);
-        mkdir(tempdir);
+        int ret = -1;
+
+        while ( ret != 0 ) {
+            tempname(tempdir);
+            ret = mkdir(tempdir);
+        }
 #endif
         zcc_opt_dir = strdup(tempdir);
         strcat(tempdir,"/zcc_opt.def");
