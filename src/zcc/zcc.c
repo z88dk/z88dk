@@ -1086,6 +1086,14 @@ int main(int argc, char **argv)
         free(p);
     }
 
+    // m4 must include zcc_opt_dir
+    {
+        char  optdir[FILENAME_MAX+1];
+
+        snprintf(optdir,sizeof(optdir),"-I \"%s\"",zcc_opt_dir);
+        BuildOptions(&m4arg, optdir);
+    }
+
     /* m4 include path finds z88dk macro definition file "z88dk.m4" */
     BuildOptions(&m4arg, c_m4opts);
 
