@@ -450,6 +450,10 @@ main()
    console_ioctl(IOCTL_GENCON_SET_MODE, &maxy);
 #endif
 
+#ifdef __SPECTRUM
+  cputs("\x01 ");
+#endif
+
   screensize(&maxx, &maxy);
   x_offset = (maxx - 16) / 2;
   y_offset = (maxy - 9) / 2;
