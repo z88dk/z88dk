@@ -3,7 +3,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#ifdef WIN32
+#include <io.h>
+#else
 #include <unistd.h>                         // For declarations of isatty()
+#endif
 
 #include "utlist.h"
 
@@ -600,11 +604,13 @@ static int cmd_examine(int argc, char **argv)
                 uint8_t b = get_memory(addr);
                 abuf[i % 16] = isprint(b) ? ((char) b) : '.';   // Prepare end of dump in ASCII format
 
-                if ( i % 16 == 0 )                              // Handle line prefix
-                    if (interact_with_tty)
+                if ( i % 16 == 0 ) {                            // Handle line prefix 
+                    if (interact_with_tty) {
                         printf(FNT_CLR"%04X"FNT_RST":   ", addr);
-                    else
+                    } else {
                         printf("%04X:   ", addr);               // Non-color output for non-active tty
+                    }
+                }
 
                 printf("%02X ", b);                             // Hex dump of actual byte
 
