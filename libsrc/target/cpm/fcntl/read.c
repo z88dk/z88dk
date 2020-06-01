@@ -1,13 +1,13 @@
 /*
  *  Read from a file
- * 
+ *
  *  27/1/2002 - djm
  *
  *  May, 2020 - feilipu - added sequential read
  *
  *  $Id: read.c,v 1.3 2013-06-06 08:58:32 stefano Exp $
  */
- 
+
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,7 +16,7 @@
 
 
 ssize_t read(int fd, void *buf, size_t len)
-{   
+{
     unsigned char buffer[SECSIZE+2];
     unsigned char uid;
     struct fcb *fc;
@@ -53,7 +53,7 @@ ssize_t read(int fd, void *buf, size_t len)
 #endif
     case U_READ:
     case U_RDWR:
-        cnt = len;    
+        cnt = len;
         uid = getuid();
         setuid(fc->uid);
         while ( len ) {
@@ -72,7 +72,7 @@ ssize_t read(int fd, void *buf, size_t len)
                 _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
                 if ( bdos(CPM_RRAN,fc) ) {
                     setuid(uid);
-                    return cnt-len;          
+                    return cnt-len;
                 }
                 memcpy(buf,buffer+offset,size);
             }
@@ -80,7 +80,7 @@ ssize_t read(int fd, void *buf, size_t len)
             fc->rwptr += size;
             len -= size;
         }
-        setuid(uid);      
+        setuid(uid);
         return cnt-len;
         break;
     default:
