@@ -21,9 +21,6 @@
 SECTION code_clib
 SECTION code_fp_math16
 
-EXTERN  asm_f16_f24
-EXTERN  asm_f24_f32
-
 PUBLIC  asm_f16_compare, asm_f16_compare_callee
 
 ; Compare two IEEE half floats.
@@ -42,24 +39,22 @@ PUBLIC  asm_f16_compare, asm_f16_compare_callee
 ;       Exit:      Z = number is zero
 ;               (NZ) = number is non-zero
 ;                  C = number is negative 
-;                 NC = number is positive
+;               (NC) = number is positive
 ;              stack = right, left, ret
 ;
-;       Uses: af, bc, de, hl, bc', de', hl'
+;       Uses: af, bc, de, hl
 .asm_f16_compare
-    pop bc              ;return address from this function
-    pop de              ;return address to real program
+    pop af              ;return address from this function
+    pop bc              ;return address to real program
     pop hl              ;the left (primary) off the stack
-    exx                 ;right
-    pop hl              ;and the right (secondary) off the stack
-    push hl
-    exx                 ;left
-    push hl
+    pop de              ;and the right (secondary) off the stack
     push de
+    push hl
     push bc
+    push af
     jr continue
 
-;       Entry:   hl  = right
+;       Entry:   h  = right
 ;              stack = left, ret, ret
 ;
 ;       Exit:      Z = number is zero
@@ -67,30 +62,26 @@ PUBLIC  asm_f16_compare, asm_f16_compare_callee
 ;                  C = number is negative 
 ;                 NC = number is positive
 ;
-;       Uses: af, bc, de, hl, bc', de', hl'
+;       Uses: af, bc, de, hl
 .asm_f16_compare_callee
-    exx                 ;left
-    pop bc              ;return address from this function
-    pop de              ;return address to real program
-    pop hl              ;and the left (primary) off the stack
-    push de
+    pop af              ;return address from this function
+    pop bc              ;return address to real program
+    pop de              ;and the left (primary) off the stack
     push bc
+    push af
+    ex de,hl
 
 .continue
-    exx                 ;right
-    call asm_f16_f24
-    call asm_f24_f32
-    sla e
-    rl d
+;
+;                 hl = primary (left)
+;                 de = secondary (right)
+;
+    ld a,$7c            ;exponent mask
+    and d
     jr Z,zero_right     ;right is zero (exponent is zero)
+    sla d
     ccf
     jr C,positive_right
-    ld a,l
-    cpl
-    ld l,a
-    ld a,h
-    cpl
-    ld h,a
     ld a,e
     cpl
     ld e,a
@@ -99,14 +90,11 @@ PUBLIC  asm_f16_compare, asm_f16_compare_callee
     ld d,a
 .positive_right
     rr d
-    rr e
 
-    exx                 ;left
-    call asm_f16_f24
-    call asm_f24_f32
-    sla e
-    rl d
+    ld a,$7c            ;exponent mask
+    and h
     jr Z,zero_left      ;left is zero (exponent is zero)
+    sla h
     ccf
     jr C,positive_left
     ld a,l
@@ -115,52 +103,17 @@ PUBLIC  asm_f16_compare, asm_f16_compare_callee
     ld a,h
     cpl
     ld h,a
-    ld a,e
-    cpl
-    ld e,a
-    ld a,d
-    cpl
-    ld d,a
 .positive_left
-    rr d
-    rr e
+    rr h
 
-    ld a,l
-
-    exx                 ;right
-    sub l
-    ld c,a
-
-    exx                 ;left
-    ld a,h
-
-    exx                 ;right
-    sbc a,h
-    ld b,a
-
-    exx                 ;left
-    ld a,e
-
-    exx                 ;right
-    sbc a,e
-
-    exx                 ;left
-    ld c,a
-    ld a,d
-
-    exx                 ;right
-    sbc a,d
-
-    ; dehl  = right float, bc   =  low word of result
-    ; dehl' =  left float, a,c' = high word of result
+    xor a
+    sbc hl,de
     jr C,consider_negative
 
 .consider_positive
     ; Calculate whether result is zero (equal)
-    or c
-    or b
-    exx                 ;left
-    or c
+    ld a,h
+    or l
 .return_positive
     ld hl,1
     scf
@@ -169,31 +122,27 @@ PUBLIC  asm_f16_compare, asm_f16_compare_callee
 
 .consider_negative
     ; Calculate whether result is zero (equal)
-    or c
-    or b
-    exx                 ;left
-    or c
+    ld a,h
+    or l
 .return_negative
     ld hl,1
     scf
     ret
 
 .zero_right
-    ;   right dehl = 0    
-    ;   left dehl' = float
-    exx                 ;left
-    sla e
-    rl d
-    jr NC,return_positive
+    ;   right de = 0    
+    ;   left  hl = half
+    ld a,$7c                ;exponent mask
+    and h
     jr Z,return_positive    ;both left and right are zero
+    sla h
+    jr NC,return_positive
     jr return_negative
 
 .zero_left
-    ;   left dehl = 0
-    ;   right dehl' = (cpl if negative)float non-zero
-    exx                 ;right
-    sla e
-    rl d
+    ;   left hl = 0
+    ;   right de = (cpl if negative) non-zero
+    sla d
     jr NC,return_positive
     jr return_negative
 

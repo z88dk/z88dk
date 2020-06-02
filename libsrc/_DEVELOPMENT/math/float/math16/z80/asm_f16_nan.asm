@@ -29,6 +29,6 @@ PUBLIC asm_f16_nan
     ret
 
 .asm_f16_nan
-    ld hl,07C00h
+    ld hl,07C80h
     ret
 
