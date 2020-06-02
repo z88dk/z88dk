@@ -24,7 +24,7 @@ static unsigned char  zxnext_mmu[8] = {0xff};
 static unsigned char *zxn_banks[256];
 
 static unsigned char  zx_pages[4] = { 0x11, 0x05, 0x02, 0x00 };
-static unsigned char *zx_banks[7];
+static unsigned char *zx_banks[8];
 static unsigned char *zx_rom[2];
 
 static memory_func   get_mem_addr;
