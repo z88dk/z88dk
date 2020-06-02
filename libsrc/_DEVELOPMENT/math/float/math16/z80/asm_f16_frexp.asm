@@ -6,41 +6,20 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-; m32_frexp - z80, z180, z80n fraction and exponent
-;-------------------------------------------------------------------------
-;
-;   float m32_frexpf (float x, int *pw2)
-;   {
-;       union float_long fl;
-;       int8_t i;
-;
-;       fl.f = x;
-;       /* Find the exponent (power of 2) */
-;       i  = ( fl.l >> 23) & 0x000000ff;
-;       i -= 0x7e;
-;       *pw2 = i;
-;       fl.l &= 0x807fffff; /* strip all exponent bits */
-;       fl.l |= 0x3f000000; /* mantissa between 0.5 and 1 */
-;       return(fl.f);
-;   }
-;
-;-------------------------------------------------------------------------
-; FIXME clocks
+;  asm_f16_frexp - z80, z180, z80n fraction and exponent
 ;-------------------------------------------------------------------------
 
-SECTION code_clib
-SECTION code_fp_math32
+SECTION code_fp_math16
 
-PUBLIC m32_fsfrexp_callee
-PUBLIC _m32_frexpf
+EXTERN asm_f16_f24, asm_f24_f16
 
+PUBLIC asm_f16_frexp
 
-; float frexpf (float x, int *pw2);
-._m32_frexpf
-.m32_fsfrexp_callee
+; half frexpf (half x, int *pw2);
+.asm_f16_frexp
     ; evaluation of fraction and exponent
     ;
-    ; enter : stack = float *pw2, float x, ret
+    ; enter : stack =  int16_t *pw2, half x,ret
     ;
     ; exit  : dehl  = 32-bit result
     ;         carry reset
@@ -48,14 +27,11 @@ PUBLIC _m32_frexpf
     ; uses  : af, bc, de, hl
 
     pop af                      ; return
-    pop hl                      ; (float)x in dehl
-    pop de
-    pop bc                      ; (int8_t*)pw2
+    pop hl                      ; (half)x in hl
+    pop bc                      ; (int16_t*)pw2
     push af                     ; return on stack
 
-    sla e                       ; get the exponent
-    rl d
-    rr e                        ; save the sign in e[7]
+    call asm_f16_f24            ; convert to expanded format
 
     ld a,d
     ld d,0
@@ -71,7 +47,5 @@ PUBLIC _m32_frexpf
     sbc  a
     ld  (bc),a
 
-    rl e                        ; get sign back
-    rr d
-    rr e
-    ret                         ; return IEEE DEHL fraction
+    jp asm_f24_f16              ; return IEEE HL fraction
+

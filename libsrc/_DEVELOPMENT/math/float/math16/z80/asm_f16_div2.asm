@@ -6,7 +6,7 @@
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
 ;-------------------------------------------------------------------------
-;  asm_f16div2 - z80, z180, z80n floating point divide by 2
+;  asm_f16_div2 - z80, z180, z80n floating point divide by 2
 ;-------------------------------------------------------------------------
 ; 
 ;  Division by 2 is decrementing the exponent. An easy optimisation.

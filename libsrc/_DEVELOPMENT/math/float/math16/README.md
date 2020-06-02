@@ -78,7 +78,7 @@ IEEE-754 assumes bit 11 of the mantissa is 1 except where the exponent is zero.
 
 An expanded 16-bit internal mantissa is used to calculate all functions. 16-bit mantissa calculations are natural for the z80, and this provides enhanced accuracy for repeated calculations required for derived functions. Specifically, this is to provide increased accuracy for the Newton-Raphson iterations, and the Horner polynomial expansions.
 
-This format is provided for both the multiply and add intrinsic internal 16-bit mantissa functions, from which other functions are derived.
+This format is provided for both the multiply and add intrinsic internal 16-bit mantissa functions, from which other functions are derived, and is referred to as `f24` in the library.
 
 ```
   unpacked floating point format: exponent right justified in d, sign in e[7],  mantissa in hl
@@ -89,14 +89,16 @@ This format is provided for both the multiply and add intrinsic internal 16-bit 
 
 ## Calling Convention
 
-The z88dk math16 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or the right hand side parameter is passed in DEHL, and the second or LHS parameter is passed on the stack. For zsdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
+The z88dk math16 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or the right hand side parameter is passed in `HL`, and the second or LHS parameter is passed on the stack. For zsdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
 
-The intrinsic functions, written in assembly, assume the sccz80 calling convention, and are by default `__z88dk_fastcall` or `__z88dk_callee`, which means that they will consume values passed on the stack, returning with the value in HL.
+The intrinsic functions, written in assembly, assume the sccz80 calling convention, and are by default `__z88dk_fastcall` or `__z88dk_callee`, which means that they will consume values passed on the stack, returning with the value in `HL`.
 
 ```
-     LHS STACK - RHS DEHL -> RETURN DEHL
+     LHS STACK - RHS HL -> RETURN HL
 
-    ; add two sccz80 floats
+    ; add two sccz80 half floats
+    ;
+    ; half f16_add (half x, half y);
     ;
     ; enter : stack = sccz80_half left, ret
     ;            HL = sccz80_half right
@@ -108,11 +110,11 @@ The intrinsic functions, written in assembly, assume the sccz80 calling conventi
 
     ; evaluation of a polynomial function
     ;
-    ; float poly (half x, half d[], uint16_t n);
+    ; half poly (half x, half d[], uint16_t n);
     ;
     ; enter : stack = uint16_t n, half d[], half x, ret
     ;
-    ; exit  : dehl  = 32-bit product
+    ; exit  :    HL = 16-bit product
     ;         carry reset
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
@@ -124,10 +126,6 @@ The library is laid out in these directories.
 ### z80
 
 Contains the assembly language implementation of the maths library.  This includes the maths functions expected by the C11 standard and various low level functions necessary to implement a complete float package accessible from assembly language.  These functions are the intrinsic `math16` functions.
-
-### c
-
-Contains the trigonometric, logarithmic, power and other functions implemented in C. Currently, compiled versions of these functions are prepared and saved in `c/asm` to be assembled and built as required.
 
 ### c/sdcc and c/sccz80
 
@@ -141,7 +139,7 @@ An alias is provided to simplify usage of the library. `--math16` provides all t
 
 ## Function Discussion
 
-There are essentially three different grades of functions in this library. Those written in assembly code in the expanded floating point domain, where the sign, exponent, and mantissa are handled separately. Those written in assembly code, in the floating point domain but using intrinsic functions, where floating point numbers are passed as expanded 6 byte values. And those written in C language.
+There are essentially three different grades of functions in this library. Those written in assembly code in the expanded floating point domain, where the sign, exponent, and mantissa are handled separately. Those written in assembly code, in the floating point domain but using intrinsic functions, where floating point numbers are passed as expanded 4 byte values. And those written in C language.
 
 The expanded floating point domain is a useful tool for creating functions, as complex functions can be written quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `poly()` function.
 

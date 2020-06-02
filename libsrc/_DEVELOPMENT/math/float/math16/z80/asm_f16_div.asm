@@ -40,11 +40,8 @@
 SECTION code_clib
 SECTION code_fp_math16
 
-EXTERN asm_f16_inf
-EXTERN asm_f16_nan
-
 EXTERN asm_f16_f24, asm_f24_f16
-EXTERN asm_f24_zero, asm_f24_inf
+EXTERN asm_f24_inf
 
 EXTERN asm_f24_mul_f24
 

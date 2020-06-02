@@ -24,7 +24,7 @@ PUBLIC asm_f24_inf
 PUBLIC asm_f16_inf
 
 .asm_f24_inf
-    ld a,e
+    ld a,e              ; called from expanded format, sign in e
     and 080h            ; preserve sign
     ld e,a
     xor a
@@ -35,7 +35,7 @@ PUBLIC asm_f16_inf
     ret
 
 .asm_f16_inf
-    ld a,h
+    ld a,e              ; called from expanded format, sign in e
     and 080h            ; preserve sign
     or 07Ch             ; set infinity exponent
     ld h,a              ; set sign, exponent

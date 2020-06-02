@@ -24,7 +24,7 @@ PUBLIC asm_f24_zero
 PUBLIC asm_f16_zero
 
 .asm_f24_zero
-    ld a,e
+    ld a,e              ; called from expanded format, sign in e
     and 080h
     ld e,a
     xor a
@@ -34,7 +34,7 @@ PUBLIC asm_f16_zero
     ret
 
 .asm_f16_zero
-    ld a,h
+    ld a,e              ; called from expanded format, sign in e
     and 080h
     ld h,a
     ld l,0
