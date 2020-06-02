@@ -30,13 +30,16 @@
 
 #ifdef WIN32
 #include        <direct.h>
+#include        <process.h>
 #else
 #include        <unistd.h>
 #endif
 
 
 #ifdef WIN32
+#ifndef strcasecmp
 #define strcasecmp(a,b) stricmp(a,b)
+#endif
 #endif
 
 #if (_BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)
@@ -219,7 +222,7 @@ static int             processing_user_command_line_arg = 0;
 static char            c_sccz80_r2l_calling;
 
 static char            filenamebuf[FILENAME_MAX + 1];
-static char            tmpnambuf[] = "zccXXXX";
+static char            tmpnambuf[FILENAME_MAX+1];
 
 #define ASM_Z80ASM     0
 #define IS_ASM(x)  ( assembler_type == (x) )
@@ -850,8 +853,9 @@ int main(int argc, char **argv)
     FILE           *fp;
 
 #ifdef WIN32
-    /* Randomize temporary filenames for windows */
-    snprintf(tmpnambuf, sizeof(tmpnambuf), "zcc%04X", ((unsigned int)time(NULL)) & 0xffff);
+    /* Randomize temporary filenames for windows (it may end up in cwd)  */
+    snprintf(tmpnambuf, sizeof(tmpnambuf), "zcc%08X%04X",_getpid(),  ((unsigned int)time(NULL)) & 0xffff);
+    printf("Random buffer is <%s>\n",tmpnambuf);
 #endif
 
     processing_user_command_line_arg = 0;
