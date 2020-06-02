@@ -855,7 +855,6 @@ int main(int argc, char **argv)
 #ifdef WIN32
     /* Randomize temporary filenames for windows (it may end up in cwd)  */
     snprintf(tmpnambuf, sizeof(tmpnambuf), "zcc%08X%04X",_getpid(),  ((unsigned int)time(NULL)) & 0xffff);
-    printf("Random buffer is <%s>\n",tmpnambuf);
 #endif
 
     processing_user_command_line_arg = 0;
