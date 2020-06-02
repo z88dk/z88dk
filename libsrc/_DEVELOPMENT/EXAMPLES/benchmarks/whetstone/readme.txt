@@ -212,15 +212,15 @@ MWIPS        = 1.8308 / 1000 = 0.0018308
 SDCC implements its float library in C.
 
 8.
-Z88DK April 20, 2020
+Z88DK June 2, 2020
 zsdcc #11566 / new c library / math32
 24 bit mantissa + 8 bit exponent
-9578 bytes less page zero
+9554 bytes less page zero
 
-cycle count  = 844247586
-time @ 4MHz  = 844247586 / 4x10^6 = 211.0619 seconds
-KWIPS        = 100*10*1 / 211.0619 = 4.7379
-MWIPS        = 4.7379 / 1000 = 0.0047379
+cycle count  = 794722631
+time @ 4MHz  = 794722631 / 4x10^6 = 198.6806 seconds
+KWIPS        = 100*10*1 / 211.0619 = 5.0332
+MWIPS        = 5.0332 / 1000 = 0.0050332
 
 DQ.
 HITECH C MSDOS V750

@@ -34,6 +34,7 @@ int c_line_labels = 0;
 int c_cline_directive = 0;
 int c_cpu = CPU_Z80;
 int c_old_diagnostic_fmt = 0;
+char *c_zcc_opt = "zcc_opt.def";
 
 /* Settings for genmath + math48 */
 int c_fp_mantissa_bytes = 5;
@@ -136,6 +137,7 @@ static option  sccz80_opts[] = {
     { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, 1},
     { 0, "frameiy", OPT_ASSIGN|OPT_INT, "Use iy as the frame pointer", &c_framepointer_is_ix, 0},
 #endif
+    { 0, "zcc-opt", OPT_STRING, "Location for zcc_opt.def", &c_zcc_opt, "zcc_opt.def"},
 
     { 0, "", OPT_HEADER, "Error/warning handling:", NULL, 0 },
     { 0, "stop-on-error", OPT_BOOL, "Stop on any error", &c_errstop, 0 },
@@ -286,7 +288,6 @@ int main(int argc, char** argv)
         WriteDefined("CPU_GBZ80", 1);
     }
 
-
     litlab = getlabel(); /* Get labels for function lits*/
     openout(); /* get the output file */
     openin(); /* and initial input file */
@@ -420,6 +421,8 @@ void info()
     fprintf(stderr, "Usage: %s [flags] [file]\n", gargv[0]);
 }
 
+
+
 /*
  ***********************************************************************
  *
@@ -463,7 +466,7 @@ static void dumpfns()
         }
     }
 
-    if ((fp = fopen("zcc_opt.def", "a")) == NULL) {
+    if ((fp = fopen(c_zcc_opt, "a")) == NULL) {
         errorfmt("Can't open zcc_opt.def file", 1);
     }
 
@@ -532,7 +535,7 @@ void WriteDefined(char* sname, int value)
 {
     FILE* fp;
 
-    if ((fp = fopen("zcc_opt.def", "a")) == NULL) {
+    if ((fp = fopen(c_zcc_opt, "a")) == NULL) {
         errorfmt("Can't open zcc_opt.def file", 1);
     }
     fprintf(fp, "\nIF !DEFINED_%s\n", sname);

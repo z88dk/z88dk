@@ -76,12 +76,12 @@ cycle count  = 3624577433
 time @ 4MHz  = 3624577433 / 4*10^6 = 15 min 06 sec
 
 
-Z88DK April 20, 2020
+Z88DK June 2, 2020
 sccz80 / classic / math32
-5333 bytes less page zero
+5346 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-6)
 
-cycle count  = 1358606369
-time @ 4MHz  = 1358606369 / 4*10^6 =  5 min 40 sec
+cycle count  = 1320690188
+time @ 4MHz  = 1320690188 / 4*10^6 =  5 min 30 sec

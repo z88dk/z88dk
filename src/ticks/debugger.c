@@ -3,6 +3,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#ifdef WIN32
+#include <io.h>
+#else
+#include <unistd.h>                         // For declarations of isatty()
+#endif
 
 #include "utlist.h"
 
@@ -11,7 +16,13 @@
 
 #define HISTORY_FILE ".ticks_history.txt"
 
+#define FNT_CLR "\x1B[34m"              // Color (blue on black)
+#define FNT_BLD "\x1B[34;1m"            // Bold color (bright blue on black)
+#define FNT_BCK "\x1B[34;7m"            // Reverse color (white on blue)
+#define FNT_RST "\x1B[0m"               // Reset colors to default value (gray on black)
 
+#define CLR_REG
+#define CLR_ADDR
 
 typedef enum {
     BREAK_PC,
@@ -45,25 +56,25 @@ static struct reg registers[] = {
     { "bc",  &c,  &b },
     { "hl'", &l_, &h_ },
     { "de'", &e_, &d_ },
-    { "bc'", &c_, &b_ },  
-    { "ix'", &xl, &xh },   
-    { "iy'", &yl, &yh },  
-    { "sp",  NULL, NULL, &sp }, 
-    { "pc",  NULL, NULL, &pc }, 
+    { "bc'", &c_, &b_ },
+    { "ix'", &xl, &xh },
+    { "iy'", &yl, &yh },
+    { "sp",  NULL, NULL, &sp },
+    { "pc",  NULL, NULL, &pc },
     { "a",   &a,   NULL },
     { "a'",  &a_,  NULL },
     { "b",   &b,   NULL },
     { "b'",  &b_,  NULL },
     { "c",   &c,   NULL },
-    { "c'",  &c_,  NULL },             
+    { "c'",  &c_,  NULL },
     { "d",   &d,   NULL },
     { "d'",  &d_,  NULL },
     { "e",   &e,   NULL },
-    { "e'",  &e_,  NULL },  
+    { "e'",  &e_,  NULL },
     { "h",   &h,   NULL },
-    { "h'",  &h_,  NULL },  
+    { "h'",  &h_,  NULL },
     { "l",   &l,   NULL },
-    { "l'",  &l_,  NULL },  
+    { "l'",  &l_,  NULL },
     { "ixh", &xh,  NULL },
     { "ixl", &xl,  NULL },
     { "iyh", &yh,  NULL },
@@ -128,6 +139,9 @@ static int last_hotspot_st;
 static int hotspots[65536];
 static int hotspots_t[65536];
 
+static int interact_with_tty = 0;
+
+
 
 void debugger_init()
 {
@@ -135,10 +149,12 @@ void debugger_init()
     linenoiseHistoryLoad(HISTORY_FILE); /* Load the history at startup */
     atexit(print_hotspots);
     memset(hotspots, 0, sizeof(hotspots));
+    interact_with_tty = isatty(fileno(stdin)) && isatty(fileno(stdout)); // Only colors with active tty
 }
 
 
-static void completion(const char *buf, linenoiseCompletions *lc, void *ctx) 
+
+static void completion(const char *buf, linenoiseCompletions *lc, void *ctx)
 {
     command *cmd= &commands[0];
 
@@ -150,6 +166,8 @@ static void completion(const char *buf, linenoiseCompletions *lc, void *ctx)
     }
 }
 
+
+
 void debugger()
 {
     char   buf[256];
@@ -159,7 +177,11 @@ void debugger()
     if ( trace ) {
         cmd_registers(0, NULL);
         disassemble2(pc, buf, sizeof(buf));
-        printf("%s\n",buf);     
+
+        if (interact_with_tty)
+            printf( "\n%s\n\n",buf);    // In case of active tty, double LF to improve layout in case of 'cont'
+        else
+            printf("%s\n",buf);         // Unchanged in case of non-active tty
     }
 
     if ( hotspot ) {
@@ -191,7 +213,7 @@ void debugger()
                 elem->enabled = 0;
                 dodebug=1;
                 break;
-            } else if ( elem->type == BREAK_CHECK16 && 
+            } else if ( elem->type == BREAK_CHECK16 &&
                         *elem->lcheck_ptr == elem->lvalue  &&
                          *elem->hcheck_ptr == elem->hvalue  ) {
                 printf("Hit breakpoint %d (%s = $%02x%02x)\n",i,elem->text, elem->hvalue, elem->lvalue);
@@ -210,10 +232,17 @@ void debugger()
     }
 
 
-    disassemble2(pc, buf, sizeof(buf));
-    printf("%s\n",buf);
+    if (trace ==0) { // Prevent two lines with the same information
+        disassemble2(pc, buf, sizeof(buf));
+        printf("%s\n",buf);
+    }
+
     /* In the debugger, loop continuously for commands */
-    snprintf(prompt,sizeof(prompt)," %04x >", pc);  // TODO: Symbol address
+
+    if (interact_with_tty)
+        snprintf(prompt,sizeof(prompt), "\n" FNT_BCK "    $%04x    >" FNT_RST, pc);     // TODO: Symbol address
+    else                                                                                // Original output for non-active tty
+        snprintf(prompt,sizeof(prompt), " %04x >", pc);                                 // TODO: Symbol address
 
     while ( (line = linenoise(prompt) ) != NULL ) {
         int argc;
@@ -251,8 +280,6 @@ void debugger()
 
 
 
-
-
 static int cmd_next(int argc, char **argv)
 {
     char  buf[100];
@@ -281,17 +308,23 @@ static int cmd_next(int argc, char **argv)
     return 1;  /* We should exit the loop */
 }
 
+
+
 static int cmd_step(int argc, char **argv)
 {
     debugger_active = 1;
     return 1;  /* We should exit the loop */
 }
 
+
+
 static int cmd_continue(int argc, char **argv)
 {
     debugger_active = 0;
     return 1;
 }
+
+
 
 static int parse_number(char *str, char **end)
 {
@@ -304,6 +337,8 @@ static int parse_number(char *str, char **end)
     } 
     return strtol(str, end, base);
 }
+
+
 
 static int cmd_disassemble(int argc, char **argv)
 {
@@ -330,17 +365,56 @@ static int cmd_disassemble(int argc, char **argv)
     return 0;
 }
 
+
+
 static int cmd_registers(int argc, char **argv) 
 {
-   printf("pc=%04X, [pc]=%02X,    bc=%04X,  de=%04X,  hl=%04X,  af=%04X, ix=%04X, iy=%04X\n"
-          "sp=%04X, [sp]=%04X, bc'=%04X, de'=%04X, hl'=%04X, af'=%04X\n"
-          "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d\n",
-          pc, get_memory(pc), c | b << 8, e | d << 8, l | h << 8, f() | a << 8, xl | xh << 8, yl | yh << 8,
-          sp, (get_memory(sp+1) << 8 | get_memory(sp)), c_ | b_ << 8, e_ | d_ << 8, l_ | h_ << 8, f_() | a_ << 8,
-          (f() & 0x80) ? 1 : 0, (f() & 0x40) ? 1 : 0, (f() & 0x10) ? 1 : 0, (f() & 0x04) ? 1 : 0, (f() & 0x02) ? 1 : 0, (f() & 0x01) ? 1 : 0);
-    
+    if (interact_with_tty) {
+        printf(
+            FNT_CLR "af " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+            FNT_CLR "bc " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+            FNT_CLR "de " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+            FNT_CLR "hl " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+            FNT_CLR "ix " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+
+            " S:"   FNT_BLD "%d" FNT_RST
+            " Z:"   FNT_BLD "%d" FNT_RST
+            " H:"   FNT_BLD "%d" FNT_RST
+            " P/V:" FNT_BLD "%d" FNT_RST
+            " N:"   FNT_BLD "%d" FNT_RST
+            " C:"   FNT_BLD "%d" FNT_RST "\n"
+
+            FNT_CLR "af'" FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+            FNT_CLR "bc'" FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+            FNT_CLR "de'" FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+            FNT_CLR "hl'" FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
+            FNT_CLR "iy " FNT_RST "$" FNT_BLD "%04X" FNT_RST "\n"
+
+            FNT_CLR "pc "  FNT_RST "$" FNT_BLD "%04X"   FNT_RST "  "
+            FNT_CLR "[pc]" FNT_RST "$" FNT_BLD "  %02X" FNT_RST "   "
+            FNT_CLR "sp "  FNT_RST "$" FNT_BLD "%04X"   FNT_RST "  "
+            FNT_CLR "[sp]" FNT_RST "$" FNT_BLD "%04X" FNT_RST "\n",
+
+            f()  | a << 8,  c  | b  << 8, e  | d  << 8, l  | h  << 8, xl | xh << 8,
+            (f()  & 0x80) ? 1 : 0, (f()  & 0x40) ? 1 : 0, (f()  & 0x10) ? 1 : 0, (f()  & 0x04) ? 1 : 0, (f()  & 0x02) ? 1 : 0, (f()  & 0x01) ? 1 : 0,
+
+            f_() | a_ << 8, c_ | b_ << 8, e_ | d_ << 8, l_ | h_ << 8, yl | yh << 8,
+
+            pc, get_memory(pc), sp, (get_memory(sp+1) << 8 | get_memory(sp))
+            );
+    } else {  // Original output for non-active tty
+        printf("pc=%04X, [pc]=%02X,    bc=%04X,  de=%04X,  hl=%04X,  af=%04X, ix=%04X, iy=%04X\n"
+               "sp=%04X, [sp]=%04X, bc'=%04X, de'=%04X, hl'=%04X, af'=%04X\n"
+               "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d\n",
+               pc, get_memory(pc), c | b << 8, e | d << 8, l | h << 8, f() | a << 8, xl | xh << 8, yl | yh << 8,
+               sp, (get_memory(sp+1) << 8 | get_memory(sp)), c_ | b_ << 8, e_ | d_ << 8, l_ | h_ << 8, f_() | a_ << 8,
+               (f() & 0x80) ? 1 : 0, (f() & 0x40) ? 1 : 0, (f() & 0x10) ? 1 : 0, (f() & 0x04) ? 1 : 0, (f() & 0x02) ? 1 : 0, (f() & 0x01) ? 1 : 0);
+    }
+
     return 0;
 }
+
+
 
 static int cmd_break(int argc, char **argv)
 {
@@ -400,7 +474,7 @@ static int cmd_break(int argc, char **argv)
                 LL_DELETE(breakpoints,elem); // TODO: Freeing
                 break;
             }
-        }  
+        }
     } else if ( argc == 3 && strcmp(argv[1],"disable") == 0 ) {
         int num = atoi(argv[2]);
         breakpoint *elem;
@@ -411,7 +485,7 @@ static int cmd_break(int argc, char **argv)
                 elem->enabled = 0;
                 break;
             }
-        }    
+        }
    } else if ( argc == 3 && strcmp(argv[1],"enable") == 0 ) {
         int num = atoi(argv[2]);
         breakpoint *elem;
@@ -422,16 +496,16 @@ static int cmd_break(int argc, char **argv)
                 elem->enabled = 1;
                 break;
             }
-        }              
+        }
     } else if ( argc == 5 && strcmp(argv[1], "memory8") == 0 ) {
         // break memory8 <addr> = <value>
         char  *end;
         int value = parse_number(argv[2], &end);
-        
+
         if ( end == argv[2] ) {
             value =  symbol_resolve(argv[2]);
         }
-       
+
         if ( value != -1 ) {
             breakpoint *elem = malloc(sizeof(*elem));
             elem->type = BREAK_CHECK8;
@@ -441,15 +515,15 @@ static int cmd_break(int argc, char **argv)
             elem->text = strdup(argv[2]);
             LL_APPEND(breakpoints, elem);
             printf("Adding breakpoint for %s = $%02x\n", elem->text, elem->lvalue);
-        }   
+        }
     } else if ( argc == 5 && strcmp(argv[1], "memory16") == 0 ) {
         char  *end;
         int addr = parse_number(argv[2], &end);
-        
+
         if ( end == argv[2] ) {
             addr =  symbol_resolve(argv[2]);
         }
-       
+
         if ( addr != -1 ) {
             int value = parse_number(argv[4],&end);
             breakpoint *elem = malloc(sizeof(*elem));
@@ -462,7 +536,7 @@ static int cmd_break(int argc, char **argv)
             elem->text = strdup(argv[2]);
             LL_APPEND(breakpoints, elem);
             printf("Adding breakpoint for %s = $%02x%02x\n", elem->text, elem->hvalue, elem->lvalue);
-        }      
+        }
     } else if ( argc == 5 && strncmp(argv[1], "register",3) == 0 ) {
         struct reg *search = &registers[0];
 
@@ -508,6 +582,8 @@ static int cmd_break(int argc, char **argv)
     return 0;
 }
 
+
+
 static int cmd_examine(int argc, char **argv)
 {
     if ( argc == 2 ) {
@@ -516,29 +592,37 @@ static int cmd_examine(int argc, char **argv)
         if ( end == argv[1] ) {
             addr =  symbol_resolve(argv[1]);
         }
+
         if ( addr != -1  ) {
-            char  buf[100];
             char  abuf[17];
-            size_t offs;
             int    i;
 
-            abuf[16] = 0;
-            addr %= 65536;
+            abuf[16] = 0;                                       // Zero terminated string
+            addr %= 0x10000;                                    // First address with overflow correction
 
-            offs = snprintf(buf,sizeof(buf),"%04x: ", addr);
             for ( i = 0; i < 128; i++ ) {
-                uint8_t b = get_memory( (addr + i) );
-                offs += snprintf(buf + offs, sizeof(buf) - offs,"%02x ", b);
-                abuf[i % 16] = isprint(b) ? b : '.';
-                if ( i % 16 == 15  && i != 0 ) {
-                    printf("%s  %s\n",buf,abuf);
-                    offs = snprintf(buf,sizeof(buf),"%04x: ", (addr + i) % 65536);
+                uint8_t b = get_memory(addr);
+                abuf[i % 16] = isprint(b) ? ((char) b) : '.';   // Prepare end of dump in ASCII format
+
+                if ( i % 16 == 0 ) {                            // Handle line prefix 
+                    if (interact_with_tty) {
+                        printf(FNT_CLR"%04X"FNT_RST":   ", addr);
+                    } else {
+                        printf("%04X:   ", addr);               // Non-color output for non-active tty
+                    }
                 }
+
+                printf("%02X ", b);                             // Hex dump of actual byte
+
+                if (i % 16 == 15) printf("   %s\n", abuf);      // Suffix line with ASCII dump
+
+                addr = (addr + 1) % 0x10000;                    // Next address with overflow correction
             }
         }
     }
     return 0;
 }
+
 
 
 static int cmd_set(int argc, char **argv)
@@ -579,12 +663,14 @@ static int cmd_out(int argc, char **argv)
         char *end;
         int port = parse_number(argv[1], &end);
         int value = parse_number(argv[2], &end);
-        
+
         printf("Writing IO: out(%d),%d\n",port,value);
         out(port,value);
     }
     return 0;
 }
+
+
 
 static int cmd_trace(int argc, char **argv)
 {
@@ -599,6 +685,8 @@ static int cmd_trace(int argc, char **argv)
     return 0;
 }
 
+
+
 static int cmd_hotspot(int argc, char **argv)
 {
     if ( argc == 2 ) {
@@ -612,16 +700,24 @@ static int cmd_hotspot(int argc, char **argv)
     return 0;
 }
 
+
+
 static int cmd_help(int argc, char **argv)
 {
-     command *cmd = &commands[0];
+    command *cmd = &commands[0];
 
-     while ( cmd->cmd != NULL ) {
-         printf("%-10s\t%-20s\t%s\n",cmd->cmd, cmd->options, cmd->help);
+    while ( cmd->cmd != NULL ) {
+        if (interact_with_tty)
+            printf(FNT_CLR"%-7s\t%-20s"FNT_RST"\t%s\n",cmd->cmd, cmd->options, cmd->help);
+        else // Original output for non-active tty
+            printf("%-10s\t%-20s\t%s\n",cmd->cmd, cmd->options, cmd->help);
+
          cmd++;
      }
      return 0;
 }
+
+
 
 static int cmd_quit(int argc, char **argv)
 {
