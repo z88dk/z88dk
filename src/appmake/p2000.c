@@ -79,7 +79,14 @@ int p2000_exec(char* target)
         strncpy(name, blockname, 8);
     } else {
         strcpy(name, blockname);
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"  // Prevent overflow warning
+#endif
         strncat(name, "        ", 8 - strlen(blockname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
     }
 
     bcount = 0;

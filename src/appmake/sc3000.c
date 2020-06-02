@@ -177,7 +177,14 @@ int sc3000_exec(char* target)
             strncpy(name, blockname, 16);
         } else {
             strcpy(name, blockname);
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"  // Prevent overflow warning
+#endif
             strncat(name, "                ", 16 - strlen(blockname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
         }
         for (i = 0; i <= 15; i++)
             writebyte_cksum(name[i], fpout, &checksum);
@@ -223,7 +230,14 @@ int sc3000_exec(char* target)
             strncpy(name, blockname, 16);
         } else {
             strcpy(name, blockname);
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"  // Prevent overflow warning
+#endif
             strncat(name, "                ", 16 - strlen(blockname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
         }
         for (i = 0; i <= 15; i++)
             writebyte_cksum(name[i], fpout, &checksum);

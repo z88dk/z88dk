@@ -329,7 +329,14 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
             }
             else {
                 strcpy(name, zxt->blockname);
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"  // Prevent overflow warning
+#endif
                 strncat(name, "          ", 10 - strlen(zxt->blockname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
             }
             for (i = 0; i <= 9; i++)
                 writebyte_p(name[i], fpout, &zxt->parity);
@@ -581,7 +588,14 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
                 }
                 else {
                     strcpy(name, zxt->blockname);
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"  // Prevent overflow warning
+#endif
                     strncat(name, "$         ", 10 - strlen(zxt->blockname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
                 }
                 for (i = 0; i <= 9; i++)
                     writebyte_p(name[i], fpout, &zxt->parity);
@@ -620,7 +634,14 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
                 }
                 else {
                     strcpy(name, zxt->blockname);
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"  // Prevent overflow warning
+#endif
                     strncat(name, "          ", 10 - strlen(zxt->blockname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
                 }
                 for (i = 0; i <= 9; i++)
                     writebyte_p(name[i], fpout, &zxt->parity);

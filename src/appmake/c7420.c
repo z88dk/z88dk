@@ -120,7 +120,14 @@ int c7420_exec(char* target)
             strncpy(name, blockname, 6);
         } else {
             strcpy(name, blockname);
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"  // Prevent overflow warning
+#endif
             strncat(name, "      ", 6 - strlen(blockname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
         }
         writestring(name, fpout);
         writebyte(0, fpout);
@@ -179,9 +186,16 @@ int c7420_exec(char* target)
         /****************/
         /* BASIC loader */
         /****************/
+
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-overflow"      // Prevent overflow warning
+#endif
         sprintf(lsbbuf, "%i", (int)pos % 256); /* no more than 3 characters long */
         sprintf(msbbuf, "%i", (int)pos / 256); /* no more than 3 characters long */
-
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
         copy1 = strdup(filename);
         copy2 = strdup(filename);
         snprintf(ldr_name, sizeof(ldr_name), "%s/_%s", zdirname(copy1), zbasename(copy2));
@@ -290,7 +304,14 @@ int c7420_exec(char* target)
             strncpy(name, blockname, 6);
         } else {
             strcpy(name, blockname);
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"  // Prevent overflow warning
+#endif
             strncat(name, "      ", 6 - strlen(blockname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
         }
         writestring(name, fpout);
         writebyte(0, fpout);

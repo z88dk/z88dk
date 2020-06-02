@@ -1,8 +1,8 @@
-	
+
 /*
  *      Philips VG-5000 application packager
  * 		(c) 2014 Stefano Bodrato, part of the z88dk kit
- *      
+ *
  *      $Id: vg5k.c $
  */
 
@@ -131,7 +131,7 @@ int vg5k_exec(char* target)
     int len;
     long pos;
     unsigned long checksum;
-    int c, i, j;
+    int c, i, j=0;                                      // Prevent non-initialised use of j
 
     if (help)
         return -1;
@@ -220,7 +220,14 @@ int vg5k_exec(char* target)
             strncpy(name, blockname, 7);
         } else {
             strcpy(name, blockname); /* optionally, 00 - 01  to terminate the fname text, then zero-fill */
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"  // Prevent overflow warning
+#endif
             strncat(name, "       ", 7 - strlen(blockname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
         }
         for (i = 0; i <= 6; i++)
             writebyte(name[i], fpout);
@@ -313,6 +320,8 @@ int vg5k_exec(char* target)
         /* Copy the header */
         if (dumb)
             printf("\nInfo: Program Name found in header: ");
+
+        j = 0;                                          // Prevent non-initialised use of j in the following for block
         for (i = 0; (i < 32); i++) {
             c = getc(fpin);
             if (dumb && i > 10 && i < 18)

@@ -128,7 +128,14 @@ int acetap_exec(char* target)
                 strncpy(name, blockname, 10);
             } else {
                 strcpy(name, blockname);
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"  // Prevent truncation warning
+#endif
                 strncat(name, "          ", 10 - strlen(blockname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
             }
             blockname = codename; /* Next block will be named z88dk_code */
             for (i = 0; i <= 9; i++)
@@ -166,7 +173,14 @@ int acetap_exec(char* target)
             strncpy(name, blockname, 10);
         } else {
             strcpy(name, blockname);
-            strncat(name, "          ", 10 - strlen(blockname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#endif
+            strncat(name, "          ", ((strlen(blockname) < 10) ? 10 - strlen(blockname) : 0));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
         }
         for (i = 0; i <= 9; i++)
             writebyte_p(name[i], fpout, &parity);

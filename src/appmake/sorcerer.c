@@ -2,7 +2,7 @@
 /*
  *      Sorcerer Exidy, MicroBee and Excalibur 64 audio cassette formats
  *      Kansas City Standard (DGOS variants)
- *      
+ *
  *      $Id: sorcerer.c $
  */
 
@@ -262,13 +262,13 @@ int sorcerer_exec(char* target)
         /* Leader (DGOS' standard padding sequence) */
         for (i = 0; (i < leadinlength); i++)
             writebyte_pk(0, fpout, &parity);
-		
+
 		/* leading SOH */
         if (excalibur)
 			writebyte_pk(0xa5, fpout, &parity);
 		else
 			writebyte_pk(1, fpout, &parity);
-		
+
         parity = 0;
 
         /* Deal with the filename */
@@ -276,9 +276,16 @@ int sorcerer_exec(char* target)
             strncpy(name, blockname, 6);
         } else {
             strcpy(name, blockname);
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"  // Prevent overflow warning
+#endif
             strncat(name, "      ", 6 - strlen(blockname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
         }
-		
+
         if (excalibur) {
 			writebyte_pk(0x2f, fpout, &parity); /* File type (0x2f for M/C block, 0xd3 for BASIC program) */
 			writebyte_pk(0x2f, fpout, &parity); /* File type (0x2f for M/C block, 0xd3 for BASIC program) */
@@ -308,8 +315,7 @@ int sorcerer_exec(char* target)
 			writeword_pk(len, fpout, &parity); /* Program File Length */
 			writeword_pk(pos, fpout, &parity); /* Program Location */
 			writeword_pk(pos, fpout, &parity); /* GO Address: pos for autorun when LOADG (Sorcerer) / or LOADM (MicroBee w/FL_EXEC set to 0xff) */
-			
-			
+
 			if (bee) {
 				if (!bps300) {
 					bee1200 = 1; /* Speed (MicroBee at 1200 bps) */
@@ -391,13 +397,15 @@ int sorcerer_exec(char* target)
         /* Copy the header */
         if (dumb)
 			printf("\nInfo: Program Name found in header: ");
-				
+
+        j = 0;                                          // Prevent non-initialised use of j in the following for block
+
 		for (i = 0; (i < (leadinlength + 18)); i++) {
 			c = getc(fpin);
 			if (dumb) {
 				if (excalibur) {
 					if (i > (leadinlength+3) && i < (leadinlength + 6))
-						printf("%c", c);					
+						printf("%c", c);
 					if ((i == (leadinlength + 7) || i == (leadinlength + 9)))
 						j = c;
 					if (i == (leadinlength + 8))
@@ -423,7 +431,7 @@ int sorcerer_exec(char* target)
 		}
 
 		len = len - 18 - leadinlength;
-		
+
         if ((bee) && (bee1200))
             bps300 = 0;
 

@@ -203,7 +203,14 @@ int svi_exec(char* target)
             strncpy(name, binname, 6);
         } else {
             strcpy(name, binname);
+#if __GNUC__ >= 8
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"  // Prevent overflow warning
+#endif
             strncat(name, "      ", 6 - strlen(binname));
+#if __GNUC__ >= 8
+#pragma GCC diagnostic pop
+#endif
         }
         for (i = 0; i < 6; i++)
             writebyte(name[i], fpout);
