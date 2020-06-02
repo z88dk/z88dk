@@ -18,6 +18,9 @@ static void     zxn_handle_out(int port, int value);
 static void     zx_init(char *config);
 static uint8_t *zx_get_memory_addr(int pc);
 static void     zx_handle_out(int port, int value);
+static void     z180_init(void);
+static uint8_t *z180_get_memory_addr(int pc);
+static void     z180_handle_out(int port, int value);
 
 static unsigned char *mem;
 static unsigned char  zxnext_mmu[8] = {0xff};
@@ -39,6 +42,8 @@ void memory_init(char *model) {
         zx_init(model + 5);
     } else if ( strcmp(model,"standard") == 0 ) {
         standard_init();
+    } else if ( strcmp(model, "z180") == 0 ) {
+        z180_init();
     } else {
         fprintf(stderr, "Unknown memory model %s\n",model);
         exit(1);
@@ -70,12 +75,6 @@ void memory_handle_paging(int port, int value)
     }
 }
 
-static void standard_init(void) 
-{
-    mem = calloc(65536, 1);
-    get_mem_addr = standard_get_memory_addr;
-}
-
 void memory_reset_paging() 
 {
     int i;
@@ -83,6 +82,70 @@ void memory_reset_paging()
         zxnext_mmu[i] = 0xff;
     }
 }
+
+// Z180 MMU support
+static uint8_t *z180_mem = NULL;
+static uint8_t z180_CBAR = 0xf0;
+static uint8_t z180_CBR = 0x00;
+static uint8_t z180_BBR = 0x00;
+
+#define Z180_IO_CBR 56
+#define Z180_IO_BBR 57
+#define Z180_IO_CBAR 58
+
+static uint8_t *z180_get_memory_addr(int pc)
+{
+    /*
+    CBAR is an 8 bit I/O port that can be accessed by the processor's OUT and IN instructions. 
+    The lower 4 bits specify the starting address of the bank area, and the upper 4 give the start of common 1. 
+   */
+    // Are we in bank area?
+    int bank_start = ((z180_CBAR) & 0x0f) << 12;
+    int common1_start =  ((z180_CBAR) & 0xf0) << 8;
+    if ( pc >= bank_start && pc < common1_start ) {
+        // Bank area
+        // Physical = Logical + (BBR * 4096)
+        return &z180_mem[ (pc & 0x0fff) + (z180_BBR * 4096)];
+    } else if ( pc >= common1_start ) {
+        // Common 1
+        // Physical = Logical + (CBR * 4096)
+        return &z180_mem[ (pc & 0x0fff) + (z180_CBR * 4096)];
+    }
+    // Otherwise, it's common 0
+    return &z180_mem[pc & 0xffff];
+}
+
+static void z180_handle_out(int port, int value)
+{
+    switch (port) {
+    case Z180_IO_CBR:
+        z180_CBR = value;
+        break;
+    case Z180_IO_BBR:
+        z180_BBR = value;
+        break;
+    case Z180_IO_CBAR:
+        z180_CBAR = value;
+        break;
+    }
+}
+
+static void z180_init(void) 
+{
+    z180_mem = calloc(1024*1024, sizeof(char));
+    get_mem_addr = z180_get_memory_addr;
+    handle_out = z180_handle_out;
+}
+
+
+
+// Standard, 64k flat address space
+static void standard_init(void) 
+{
+    mem = calloc(65536, 1);
+    get_mem_addr = standard_get_memory_addr;
+}
+
 
 static uint8_t *standard_get_memory_addr(int pc)
 {
@@ -92,6 +155,8 @@ static uint8_t *standard_get_memory_addr(int pc)
   return &mem[pc & 65535];
 }
 
+
+// ZXN: 256 pages of 8k, paged in at any 8k boundary
 static void zxn_init(void) 
 {
     int  i;
@@ -150,6 +215,7 @@ static void load_rom(char *filename, unsigned char *buf, size_t len)
 
 }
 
+// ZX128: 8 pages of 16k @ 0xc000 + 2 rom slots
 static void zx_init(char *config) 
 {
     int  i;
