@@ -19,8 +19,7 @@ PUBLIC asm_f16_mul10u
 .asm_f16_mul10u
     call asm_f16_f24            ; convert to expanded format
 
-    ld a,d
-    ld d,0
+    ld a,d                      ; get the exponent
     and a
     jp Z,asm_f16_zero
 
@@ -42,6 +41,7 @@ PUBLIC asm_f16_mul10u
 
 .no_carry
     add a,d                     ; resulting exponent
+    ld d,a                      ; return the exponent
     jp C,asm_f16_inf
     jp asm_f24_f16              ; return IEEE HL
 

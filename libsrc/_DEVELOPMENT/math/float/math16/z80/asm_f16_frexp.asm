@@ -33,8 +33,7 @@ PUBLIC asm_f16_frexp
 
     call asm_f16_f24            ; convert to expanded format
 
-    ld a,d
-    ld d,0
+    ld a,d                      ; get the exponent
     and a
     jr Z,zero
     ld d,$7e                    ; remove exponent excess (bias-1)

@@ -33,13 +33,13 @@ PUBLIC asm_f24_f16
 .asm_f32_f24
     sla e
     rl d                        ; capture exponent in d, sign in carry
-    rr b                        ; capture sign in b
+    rr c                        ; capture sign in c
     scf                         ; set implicit bit
     rr e                        ; mantissa in ehl
     ld a,l                      ; capture 8 truncated bits
     ld l,h                      ; create 16 bit mantissa by truncation
     ld h,e
-    ld e,b                      ; save sign in e[7]
+    ld e,c                      ; save sign in e[7]
     or a                        ; check for truncated bits
     ret Z                       ; return if none
     set 0,l                     ; set lsb if truncated bits

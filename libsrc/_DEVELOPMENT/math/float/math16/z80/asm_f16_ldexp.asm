@@ -34,7 +34,7 @@ PUBLIC asm_f16_ldexp
 
     call asm_f16_f24            ; convert to expanded format
 
-    add a,d                     ; get the exponent
+    ld a,d                      ; get the exponent
     and a
     jp Z,asm_f16_zero           ; return IEEE signed zero
 
