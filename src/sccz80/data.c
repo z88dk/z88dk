@@ -92,11 +92,6 @@ SYMBOL  *currfn; /* ptr to symtab entry for current fn. */
 
 int debuglevel;
 
-/*
- * Assembler type
- */
-
-int c_assembler_type;
 
 
 
