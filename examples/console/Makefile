@@ -4,8 +4,7 @@ all: binaries
 
 include ../../support/multitarget_build/Makefile
 
-# Hello world
-
+# Hello world 
 WORLD_TARGETS = abc80 abc800 ace alphatro aquarius bee c128 c7420 coleco cpc cpm enterprise fp1100 \
 	g800 gal hemc hgmc homelab homelab2 kc kramermc lambda laser500 lynx m5 m100 mc1000 mikro80 \
 	msx mtx multi8 myvision mz mz2500 nascom nc newbrain osca oz p2000 pacman pasopia7 pc6001 \
@@ -18,7 +17,7 @@ WORLD_TARGETS += cpm_px8 cpm_px4 cpm_einstein cpm_attache cpm_osborne1 cpm_kaypr
 	cpm_smc777 cpm_rc700 cpm_fp1100 cpm_x1 cpm_lynx cpm_bic cpm_excali64 cpm_vector06c \
 	cpm_zxplus3
 
-LDFLAGS_world = -lndos
+LDFLAGS_world = -lndos -pragma-define:CLIB_OPT_PRINTF=0x00000001
 
 
 OUTPUT_BINS += $(foreach target, $(WORLD_TARGETS),  build/$(target)/world.bin )
