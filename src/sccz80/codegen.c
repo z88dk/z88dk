@@ -2734,6 +2734,42 @@ void asr(LVALUE* lval)
 
 void asr_const(LVALUE *lval, int32_t value)
 {
+    if ( lval->val_type == KIND_CHAR && ulvalue(lval) ) {
+        int i;
+        if ( value == 0 ) {
+            return;
+        } else if ( value >= 5 ) {
+            int rotate_count = 8 - value;
+            ol("ld\ta,l");
+            if ( value == 5 && (IS_GBZ80() || IS_Z80N()) ) {
+                rotate_count -= 4;
+                if ( IS_GBZ80() ) ol("swap\ta"); else ol("swapnib");
+            }
+            for ( i = rotate_count; i < 0; i++ ) {
+                ol("rrca");
+            }
+            for ( i = 0; i < rotate_count; i++ ) {
+                ol("rlca");
+            }
+            outfmt("\tand\t%d\n", ( ((1 << (8-value)) - 1)));
+            ol("ld\tl,a");
+            return;
+        } else if  (value < 8 ) {
+            int rotate_count = value;
+            ol("ld\ta,l");
+            if ( value >= 4 && (IS_GBZ80() || IS_Z80N()) ) {
+                rotate_count -= 4;
+                if ( IS_GBZ80() ) ol("swap\ta"); else ol("swapnib");
+            }
+            for ( i = 0; i <rotate_count; i++ ) {
+                ol("rrca");
+            }
+            outfmt("\tand\t%d\n", ( ((1 << (8-value)) - 1)));
+            ol("ld\tl,a");
+            return;
+        }
+    }
+
     if  (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
         if ( value == 1 && !IS_808x() ) {
             if ( ulvalue(lval) ) { /* 8 bytes, 8 + 8 + 8 + 8 + 8 = 40T */

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 void test_rshift16_var(void)
 {
      int val = 0x8000;
@@ -120,6 +121,22 @@ void test_rshift32_var(void)
 //     Assert( val >> v == 0x80000000L >> 33, ">>33"); // Undefined, but it should match
 }
 
+void test_rshift8_const(void)
+{
+     unsigned char val = 0x80;
+
+     // RHS is folded by compiler
+     Assert( val >> 0 == 0x80 >> 0, ">>0");
+     Assert( val >> 1 == 0x80 >> 1, ">>1");
+     Assert( val >> 2 == 0x80 >> 2, ">>2");
+     Assert( val >> 3 == 0x80 >> 3, ">>3");
+     Assert( val >> 4 == 0x80 >> 4, ">>4");
+     Assert( val >> 5 == 0x80 >> 5, ">>5");
+     Assert( val >> 6 == 0x80 >> 6, ">>6");
+     Assert( val >> 7 == 0x80 >> 7, ">>7");
+     Assert( val >> 8 == 0x80 >> 8, ">>8");
+}
+
 void test_rshift16_const(void)
 {
      int val = 0x8000;
@@ -236,6 +253,7 @@ int suite_rshift()
     suite_add_test(test_rshift32_var);
     suite_add_test(test_rshift16_const);
     suite_add_test(test_rshift16_var);
+    suite_add_test(test_rshift8_const);
 
     return suite_run();
 }

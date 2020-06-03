@@ -4552,3 +4552,30 @@
 	ld	l,(hl)
 	dec	l
 	ld	h,0
+
+	ld	l,(hl)
+	ld	h,0
+	ld	l,h
+	ld	h,0
+=
+	ld	hl,0	;const
+
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	hl,%2	;const
+=
+	ld	hl,%2	;const
+
+	ld	a,(hl)
+	and	0
+	ld	l,a
+	ld	h,0
+=
+	ld	hl,0	;const
+
+	ld	l,(hl)
+	ld	h,%1
+	ld	a,l
+=
+	ld	a,(hl)
+	ld	h,%1

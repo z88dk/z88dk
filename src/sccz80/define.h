@@ -354,6 +354,7 @@ struct gototab_s {
 #define IS_8085() (c_cpu == CPU_8085 )
 #define IS_808x() (c_cpu == CPU_8080 || c_cpu == CPU_8085)
 #define IS_GBZ80() (c_cpu == CPU_GBZ80)
+#define IS_Z80N() (c_cpu == CPU_Z80N)
 
 
 
