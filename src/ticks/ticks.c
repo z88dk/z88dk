@@ -660,7 +660,7 @@ int main (int argc, char **argv){
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
     printf("  -d             Enable debugger\n"),
     printf("  -l X           Load file to address\n"),
-    printf("  -b <model>     Memory model (zxn/zx)\n"),
+    printf("  -b <model>     Memory model (zxn/zx/z180)\n"),
     printf("  -m8080         Emulate an 8080\n"),
     printf("  -m8085         Emulate an 8085 (mostly)\n"),
     printf("  -mgbz80        Emulate a gbz80 (mostly)\n"),

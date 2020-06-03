@@ -19,13 +19,15 @@
 #ifndef WIN32
 #include <unistd.h>
 #endif
-#ifdef _MSC_VER
+
+#if defined(__GNUC__) || defined(__clang__)
+#define __NORETURN __attribute((noreturn))
+#endif
+
+#ifndef __NORETURN
 #define __NORETURN 
 #endif
 
-#ifdef WIN32
-#define __NORETURN 
-#endif
 #include "dirname.h"
 #include "cpmdisk.h"
 
@@ -40,9 +42,6 @@ typedef enum { OPT_NONE, OPT_BOOL, OPT_INT, OPT_STR, OPT_INPUT=128, OPT_OUTPUT=2
 enum { FALSE = 0, TRUE };
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
-#define __NORETURN __attribute((noreturn))
-#endif
 
 typedef struct {
     char     sopt;

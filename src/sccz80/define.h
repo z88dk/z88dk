@@ -338,14 +338,6 @@ struct gototab_s {
 #define Z80ASM_PREFIX "_"
 
 
-/* Assembler modes */
-#define ASM_Z80ASM  0
-#define ASM_ASXX    1
-#define ASM_VASM    2
-#define ASM_GNU     3
-
-#define ISASM(x) ( c_assembler_type == (x) )
-
 
 #define CPU_Z80      1
 #define CPU_Z180     2
