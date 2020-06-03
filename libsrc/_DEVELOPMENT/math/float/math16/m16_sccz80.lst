@@ -2,4 +2,3 @@
 @l/sdcc.lst
 @math/float/math16/m16_asm.lst
 @math/float/math16/lm16/c/m16_sccz80.lst
-@math/float/math16/lm16/c/m16_sdcc_sccz80.lst
