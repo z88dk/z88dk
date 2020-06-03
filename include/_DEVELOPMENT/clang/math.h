@@ -377,180 +377,121 @@ extern double_t poly(const float x,const float d[],unsigned int n);
 
 #ifdef __MATH_MATH16
 
-extern half_t f16_add(half_t y,half_t x);
+extern half_t m16_f16_f32(float x);
 
 
-extern half_t f16_sub(half_t y,half_t x);
+extern float m16_f32_f16(half_t x);
 
 
-extern half_t f16_mul(half_t y,half_t x);
 
+extern int16_t m16_i16_f16(half_t x);
 
-extern half_t f16_div(half_t y,half_t x);
 
+extern uint16_t m16_u16_f16(half_t x);
 
 
-extern half_t f16_inv(half_t x);
+extern int32_t m16_i32_f16(half_t x);
 
 
-extern half_t f16_invsqrt(half_t x);
+extern uint32_t m16_u32_f16(half_t x);
 
 
 
-extern half_t f16_acos(half_t x);
+extern half_t m16_f16_i8(int8_t x);
 
 
-extern half_t f16_asin(half_t x);
+extern half_t m16_f16_i16(int16_t x);
 
 
-extern half_t f16_atan(half_t x);
+extern half_t m16_f16_i32(int32_t x);
 
 
-extern half_t f16_atan2(half_t y,half_t x);
+extern half_t m16_f16_u8(uint8_t x);
 
 
+extern half_t m16_f16_u16(uint16_t x);
 
-extern half_t f16_cos(half_t x);
 
+extern half_t m16_f16_u32(uint32_t x);
 
-extern half_t f16_sin(half_t x);
 
 
-extern half_t f16_tan(half_t x);
+extern half_t m16_add(half_t y,half_t x);
 
 
+extern half_t m16_sub(half_t y,half_t x);
 
-extern half_t f16_acosh(half_t x);
 
+extern half_t m16_mul(half_t y,half_t x);
 
-extern half_t f16_asinh(half_t x);
 
+extern half_t m16_div(half_t y,half_t x);
 
-extern half_t f16_atanh(half_t x);
 
 
+extern half_t m16_inv(half_t x);
 
-extern half_t f16_cosh(half_t x);
 
+extern half_t m16_invsqrt(half_t x);
 
-extern half_t f16_sinh(half_t x);
 
 
-extern half_t f16_tanh(half_t x);
+extern half_t m16_sqrt(half_t x);
 
 
 
-extern half_t f16_exp(half_t x);
+extern half_t m16_div2(half_t x);
 
 
-extern half_t f16_exp2(half_t x);
+extern half_t m16_mul2(half_t x);
 
 
-extern half_t f16_exp10(half_t x);
+extern half_t m16_mul10(half_t x);
 
 
+extern half_t m16_frexp(half_t value,int8_t *exp);
 
-extern half_t f16_div2(half_t x);
 
+extern half_t m16_ldexp(half_t x,int16_t exp);
 
-extern half_t f16_mul2(half_t x);
 
 
-extern half_t f16_mul10u(half_t x);
+extern half_t m16_abs(half_t x);
 
 
-extern half_t f16_frexp(half_t value,int *exp);
+extern half_t m16_neg(half_t x);
 
 
-extern half_t f16_ldexp(half_t x,int exp);
+extern half_t m16_ceil(half_t x);
 
 
+extern half_t m16_floor(half_t x);
 
-extern half_t f16_log(half_t x);
 
 
-extern half_t f16_log2(half_t x);
+extern int m16_isgreater(half_t x,half_t y);
 
 
-extern half_t f16_log10(half_t x);
+extern int m16_isgreaterequal(half_t x,half_t y);
 
 
+extern int m16_isless(half_t x,half_t y);
 
-extern half_t f16_fabs(half_t x);
 
+extern int m16_islessequal(half_t x,half_t y);
 
-extern half_t f16_hypot(half_t x,half_t y);
 
+extern int m16_islessgreater(half_t x,half_t y);
 
 
-extern half_t f16_sqr(half_t x);
+extern int m16_isunordered(half_t x,half_t y);
 
 
-extern half_t f16_sqrt(half_t x);
 
+extern half_t m16_fma(half_t x,half_t y,half_t z);
 
-extern half_t f16_pow(half_t x,half_t y);
 
-
-
-extern half_t f16_neg(half_t x);
-
-
-extern half_t f16_ceil(half_t x);
-
-
-extern half_t f16_floor(half_t x);
-
-
-
-extern half_t f16_round(half_t x);
-
-
-
-extern half_t f16_modf(half_t value,half_t *iptr);
-
-
-extern half_t f16_fmod(half_t x,half_t y);
-
-
-
-extern half_t f16_copysign(half_t x,half_t y);
-
-
-extern half_t f16_nan(const char *tagp);
-
-
-
-extern half_t f16_fmax(half_t x,half_t y);
-
-
-extern half_t f16_fmin(half_t x,half_t y);
-
-
-
-extern int f16_isgreater(half_t x,half_t y);
-
-
-extern int f16_isgreaterequal(half_t x,half_t y);
-
-
-extern int f16_isless(half_t x,half_t y);
-
-
-extern int f16_islessequal(half_t x,half_t y);
-
-
-extern int f16_islessgreater(half_t x,half_t y);
-
-
-extern int f16_isunordered(half_t x,half_t y);
-
-
-
-extern half_t f16_fma(half_t x,half_t y,half_t z);
-
-
-extern double_t f16_poly(const half_t x,const half_t d[],unsigned int n);
+extern double_t m16_poly(const half_t x,const half_t d[],unsigned int n);
 
 
 
