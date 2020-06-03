@@ -323,14 +323,9 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
             zxt->parity = 0;
             writebyte_p(0, fpout, &zxt->parity);          /* Filetype (Basic) */
 
-                                                     /* Deal with the filename */
-            if (strlen(zxt->blockname) >= 10) {
-                strncpy(name, zxt->blockname, 10);
-            }
-            else {
-                strcpy(name, zxt->blockname);
-                strncat(name, "          ", 10 - strlen(zxt->blockname));
-            }
+            /* Deal with the filename */
+            snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, zxt->blockname);
+
             for (i = 0; i <= 9; i++)
                 writebyte_p(name[i], fpout, &zxt->parity);
             writeword_p(21 + len, fpout, &zxt->parity);    /* length */
@@ -575,14 +570,10 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
                 writebyte_p(0, fpout, &zxt->parity);          /* Header is a type 0 block */
                 zxt->parity = 0;
                 writebyte_p(3, fpout, &zxt->parity);          /* Filetype (Code) */
-                                                         /* Deal with the filename */
-                if (strlen(zxt->blockname) >= 10) {
-                    strncpy(name, zxt->blockname, 10);
-                }
-                else {
-                    strcpy(name, zxt->blockname);
-                    strncat(name, "$         ", 10 - strlen(zxt->blockname));
-                }
+
+                /* Deal with the filename */
+                snprintf(name, sizeof(name), "$%-*s", (int) sizeof(name)-2, zxt->blockname);
+
                 for (i = 0; i <= 9; i++)
                     writebyte_p(name[i], fpout, &zxt->parity);
 
@@ -614,14 +605,9 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
                 zxt->parity = 0;
                 writebyte_p(3, fpout, &zxt->parity);          /* Filetype (Code) */
 
-                                                         /* Deal with the filename */
-                if (strlen(zxt->blockname) >= 10) {
-                    strncpy(name, zxt->blockname, 10);
-                }
-                else {
-                    strcpy(name, zxt->blockname);
-                    strncat(name, "          ", 10 - strlen(zxt->blockname));
-                }
+                /* Deal with the filename */
+                snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, zxt->blockname);
+
                 for (i = 0; i <= 9; i++)
                     writebyte_p(name[i], fpout, &zxt->parity);
                 writeword_p(len, fpout, &zxt->parity);
