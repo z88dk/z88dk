@@ -14,10 +14,10 @@ SECTION code_fp_math16
 EXTERN asm_f16_zero
 EXTERN asm_f16_f24, asm_f24_f16
 
-PUBLIC asm_f16_ldexp
+PUBLIC asm_f16_ldexp_callee
 
 ; half ldexpf (half x, int16_t pw2);
-.asm_f16_ldexp
+.asm_f16_ldexp_callee
     ; evaluation of fraction and exponent
     ;
     ; enter : stack = int16_t pw2, half x, ret

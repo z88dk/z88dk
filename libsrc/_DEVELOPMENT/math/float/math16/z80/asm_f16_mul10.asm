@@ -14,24 +14,24 @@ SECTION code_fp_math16
 EXTERN asm_f16_inf, asm_f16_zero
 EXTERN asm_f16_f24, asm_f24_f16
 
-PUBLIC asm_f16_mul10u
+PUBLIC asm_f16_mul10
 
-.asm_f16_mul10u
+.asm_f16_mul10
     call asm_f16_f24            ; convert to expanded format
 
     ld a,d                      ; get the exponent
     and a
     jp Z,asm_f16_zero
 
-    ld d,h                      ; 10*a = 2*(4*a + a)
-    ld e,l                      ; hl *= 10
+    ld b,h                      ; 10*a = 2*(4*a + a)
+    ld c,l                      ; hl *= 10
 
-    srl h
-    rr l
-    srl h
-    rr l
+    srl b
+    rr c
+    srl b
+    rr c
 
-    add hl,de
+    add hl,bc
     ld a,3                      ; exponent increase
     jr NC,no_carry
 
@@ -42,6 +42,7 @@ PUBLIC asm_f16_mul10u
 .no_carry
     add a,d                     ; resulting exponent
     ld d,a                      ; return the exponent
-    jp C,asm_f16_inf
+    inc a                       ; ensure not infinity
+    jp Z,asm_f16_inf
     jp asm_f24_f16              ; return IEEE HL
 

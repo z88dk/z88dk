@@ -13,10 +13,10 @@ SECTION code_fp_math16
 
 EXTERN asm_f16_f24, asm_f24_f16
 
-PUBLIC asm_f16_frexp
+PUBLIC asm_f16_frexp_callee
 
 ; half frexpf (half x, int *pw2);
-.asm_f16_frexp
+.asm_f16_frexp_callee
     ; evaluation of fraction and exponent
     ;
     ; enter : stack =  int16_t *pw2, half x,ret

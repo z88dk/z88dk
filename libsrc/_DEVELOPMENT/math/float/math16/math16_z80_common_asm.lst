@@ -25,7 +25,7 @@ math/float/math16/z80/asm_f16_sigdig
 
 math/float/math16/z80/asm_f16_div2
 math/float/math16/z80/asm_f16_mul2
-math/float/math16/z80/asm_f16_mul10u
+math/float/math16/z80/asm_f16_mul10
 math/float/math16/z80/asm_f16_frexp
 math/float/math16/z80/asm_f16_ldexp
 
