@@ -4,7 +4,6 @@ SECTION code_fp_math32
 EXTERN m32_f2ulong
 EXTERN m32_float32u
 EXTERN m32_float32
-EXTERN m32_fsconst_one
 EXTERN m32_fssub_callee
 
 PUBLIC m32_floor_fastcall
@@ -23,11 +22,13 @@ PUBLIC _m32_floorf
     jr NZ,was_negative
     call m32_float32u
     ret
+
 .was_negative
     call m32_float32
     ; And subtract 1
     push de
     push hl
-    call m32_fsconst_one
+    ld de,$3f80
+    ld hl,$0000
     call m32_fssub_callee
     ret
