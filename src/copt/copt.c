@@ -552,8 +552,8 @@ struct lnode* opt(struct lnode* r)
             /* since we 'install()' strings, we can compare pointers */
             sprintf(signature, "%s%p%p%p%p%p%p%p%p%p%p\n",
                 activated,
-                vars[0], vars[1], vars[2], vars[3], vars[4],
-                vars[5], vars[6], vars[7], vars[8], vars[9]);
+                (void *) vars[0],(void *) vars[1],(void *) vars[2],(void *) vars[3],(void *) vars[4],
+                (void *) vars[5],(void *) vars[6],(void *) vars[7],(void *) vars[8],(void *) vars[9]);
             lnp = o->o_new->l_next;
             while (lnp && strncmp(lnp->l_text, activated, strlen(activated)) == 0) {
                 if (strcmp(lnp->l_text, signature) == 0) {

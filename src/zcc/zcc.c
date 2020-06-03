@@ -30,13 +30,16 @@
 
 #ifdef WIN32
 #include        <direct.h>
+#include        <process.h>
 #else
 #include        <unistd.h>
 #endif
 
 
 #ifdef WIN32
+#ifndef strcasecmp
 #define strcasecmp(a,b) stricmp(a,b)
+#endif
 #endif
 
 #if (_BSD_SOURCE || _SVID_SOURCE || _XOPEN_SOURCE >= 500)
@@ -65,10 +68,8 @@ static void            AddPreProcIncPath(arg_t *arg, char *);
 static void            AddToArgs(arg_t *arg, char *);
 static void            AddToArgsQuoted(arg_t *arg, char *);
 static void            AddToArgsQuotedFull(arg_t *argument, char *arg);
-static void            AddAppmake(arg_t *arg, char *);
 static void            AddLinkLibrary(arg_t *arg, char *);
 static void            AddLinkSearchPath(arg_t *arg, char *);
-static void            print_help_config(arg_t *arg, char *);
 static void            usage(const char *program);
 static void            print_help_text(const char *program);
 static void            SetString(arg_t *arg, char *);
@@ -165,7 +166,6 @@ static int             preprocessonly = 0;
 static int             relocate = 0;
 static int             relocinfo = 0;
 static int             sdcc_signed_char = 0;
-static int             crtcopied = 0;    /* Copied the crt0 code over? */
 static int             swallow_M = 0;
 static int             c_print_specs = 0;
 static int             c_zorg = -1;
@@ -219,7 +219,9 @@ static int             processing_user_command_line_arg = 0;
 static char            c_sccz80_r2l_calling;
 
 static char            filenamebuf[FILENAME_MAX + 1];
-static char            tmpnambuf[] = "zccXXXX";
+#ifdef WIN32
+static char            tmpnambuf[FILENAME_MAX+1];
+#endif
 
 #define ASM_Z80ASM     0
 #define IS_ASM(x)  ( assembler_type == (x) )
@@ -262,13 +264,6 @@ static char  *c_options = NULL;
 
 
 static char  *c_z80asm_exe = EXEC_PREFIX "z80asm";
-static char  *c_mpm_exe = EXEC_PREFIX "mpm";
-static char  *c_vasm_exe = "vasmz80";
-static char  *c_vlink_exe = "vlink";
-static char  *c_gnuas_exe = "z80-unknown-coff-as";
-static char  *c_gnuld_exe = "z80-unknown-coff-ld";
-static char  *c_asz80_exe = "asz80";
-static char  *c_aslink_exe = "aslink";
 
 static char  *c_clang_exe = "zclang";
 static char  *c_llvm_exe = "zllvm-cbe";
@@ -316,16 +311,9 @@ static char  *c_altmathflags = NULL; // "-math-z88 -D__NATIVE_MATH__";
 static char  *c_startuplib = "z80_crt0";
 static char  *c_genmathlib = "genmath";
 static int    c_stylecpp = outspecified;
-static char  *c_vasmopts = NULL;
-static char  *c_vlinkopts = NULL;
-static char  *c_asz80opts = "";
-static char  *c_aslinkopts = "";
-static char  *c_gnuasopts = "";
-static char  *c_gnulinkopts = "";
 
 static char  *c_extension = NULL;
 static char  *c_assembler = NULL;
-static char  *c_asmarg = NULL;
 static char  *c_linker = NULL;
 static char  *c_compiler = NULL;
 static char **c_subtype_array = NULL;
@@ -720,7 +708,6 @@ int linkthem(char *linker)
 {
     int             i, len, offs, status;
     char           *temp, *cmdline;
-    char           *asmline = "";
     char            tname[FILENAME_MAX + 1];
     FILE           *out, *prj;
 
@@ -850,8 +837,8 @@ int main(int argc, char **argv)
     FILE           *fp;
 
 #ifdef WIN32
-    /* Randomize temporary filenames for windows */
-    snprintf(tmpnambuf, sizeof(tmpnambuf), "zcc%04X", ((unsigned int)time(NULL)) & 0xffff);
+    /* Randomize temporary filenames for windows (it may end up in cwd)  */
+    snprintf(tmpnambuf, sizeof(tmpnambuf), "zcc%08X%04X",_getpid(),  ((unsigned int)time(NULL)) & 0xffff);
 #endif
 
     processing_user_command_line_arg = 0;
@@ -2137,11 +2124,6 @@ void OptCodeSpeed(arg_t *argument, char *arg)
     BuildOptions(&sccz80arg, arg);
 }
 
-void AddAppmake(arg_t *argument, char *arg)
-{
-    BuildOptions(&appmakeargs, arg);
-}
-
 
 void AddToArgs(arg_t *argument, char *arg)
 {
@@ -2734,7 +2716,6 @@ void PragmaRedirect(arg_t *arg, char *val)
 void Alias(arg_t *arg, char *val)
 {
     char *ptr = val + strlen(arg->name) + 1;
-    char *value = NULL;
     char *eql;
 
     while ((*ptr == '=') || (*ptr == ':')) 
@@ -2958,7 +2939,7 @@ ShowErrors(char *filen, char *orig)
             fprintf(stderr, "%s", buffer);
 
             /* Dig into asm source file and show the corresponding line.. */
-            if (strstr(buffer, " line ") >0) {    /* ..only if a line number is given */
+            if (strstr(buffer, " line ") != NULL ) {    /* ..only if a line number is given */
                 linepos = atoi(strstr(buffer, " line ") + strlen(" line "));
                 strcpy(filenamebuf, strstr(buffer, "'") + strlen("'"));
                 sprintf(strstr(filenamebuf, "'"), "");

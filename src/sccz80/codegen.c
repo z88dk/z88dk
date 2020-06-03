@@ -125,22 +125,12 @@ void header(void)
 {
     time_t tim;
     char* timestr;
-    char* assembler = "z80 Module Assembler";
 
     outfmt(";%s\n",Banner);
     outfmt(";%s\n",Version);
     outfmt(";\n");
-
-    if (ISASM(ASM_ASXX)) {
-        assembler = "asxx";
-    } else if (ISASM(ASM_VASM)) {
-        assembler = "vasm";
-    } else if (ISASM(ASM_GNU)) {
-        assembler = "binutils";
-    }
-
-    outfmt(";\tReconstructed for %s\n", assembler);
-
+    outfmt(";\tReconstructed for z80 Module Assembler\n");
+    
     donelibheader = 0;
     if ((tim = time(NULL)) != -1) {
         timestr = ctime(&tim);
@@ -157,7 +147,6 @@ void header(void)
 void DoLibHeader(void)
 {
     char filen[FILENAME_LEN + 1];
-    char* incdir;
     char* segment;
 
     if (donelibheader)
@@ -182,13 +171,7 @@ void DoLibHeader(void)
             ptr++;
         }
         /* Compiling a program */
-        if (ISASM(ASM_ASXX)) {
-            outstr("\n\t.module\t");
-        } else if (ISASM(ASM_Z80ASM)) {
-            outstr("\n\tMODULE\t");
-        } else {
-            outstr("\n;\t module\t");
-        }
+        outstr("\n\tMODULE\t");
         if (strlen(filen) && strncmp(filen, "<stdin>", 7)) {
             if ((segment = strrchr(filen, '/'))) /* Unix */
                 ++segment;
@@ -215,26 +198,10 @@ void DoLibHeader(void)
         }
         nl();
     }
-    if (ISASM(ASM_ASXX)) {
-        incdir = getenv("Z80_OZFILES");
-        outstr("\n\n\t.include \"");
-        if (incdir)
-            outstr(incdir);
-        outstr("z80_crt0.hdx\"\n\n");
-        ol(".area _CODE\n");
-        ol(".radix d\n");
-        if (c_notaltreg) {
-            ol(".globl\tsaved_hl");
-            ol(".globl\tsaved_de");
-        }
-    } else if (ISASM(ASM_GNU)) {
-
-    } else {
-        outstr("\n\n\tINCLUDE \"z80_crt0.hdr\"\n\n\n");
-        if (c_notaltreg) {
-            ol("EXTERN\tsaved_hl");
-            ol("EXTERN\tsaved_de");
-        }
+    outstr("\n\n\tINCLUDE \"z80_crt0.hdr\"\n\n\n");
+    if (c_notaltreg) {
+        ol("EXTERN\tsaved_hl");
+        ol("EXTERN\tsaved_de");
     }
     donelibheader = 1;
 }
@@ -884,20 +851,14 @@ void swap(void)
 /*      into the primary register */
 void immed(void)
 {
-    if (ISASM(ASM_ASXX))
-        ot("ld\thl,+");
-    else
-        ot("ld\thl,");
+    ot("ld\thl,");
 }
 
 /* Print partial instruction to get an immediate value */
 /*      into the secondary register */
 void immed2(void)
 {
-    if (ISASM(ASM_ASXX))
-        ot("ld\tde,+");
-    else
-        ot("ld\tde,");
+    ot("ld\tde,");
 }
 
 /* Partial instruction to access literal */
@@ -1318,58 +1279,37 @@ void testjump(LVALUE* lval, int label)
 /* Print pseudo-op to define a byte */
 void defbyte(void)
 {
-    if (ISASM(ASM_ASXX))
-        ot(".db\t");
-    else
-        ot("defb\t");
+    ot("defb\t");
 }
 
 /*Print pseudo-op to define storage */
 void defstorage(void)
 {
-    if (ISASM(ASM_ASXX))
-        ot(".ds\t");
-    else if (ISASM(ASM_Z80ASM)) {
-        ot("defs\t");
-    } else {
-        ot("defs\t");
-    }
+    ot("defs\t");
 }
 
 /* Print pseudo-op to define a word */
 void defword(void)
 {
-    if (ISASM(ASM_ASXX))
-        ot(".dw\t");
-    else
-        ot("defw\t");
+    ot("defw\t");
 }
 
 /* Print pseudo-op to dump a long */
 void deflong(void)
 {
-    if (ISASM(ASM_Z80ASM))
-        ot("defq\t");
-    else
-        ot("defl\t");
+    ot("defq\t");
 }
 
 /* Print pseudo-op to define a string */
 void defmesg(void)
 {
-    if (ISASM(ASM_ASXX) || ISASM(ASM_GNU))
-        ot(".ascii\t\"");
-    else
-        ot("defm\t\"");
+    ot("defm\t\"");
 }
 
 /* Point to following object */
 void point(void)
 {
-    if (ISASM(ASM_ASXX))
-        ol(".dw\t.+2");
-    else
-        ol("defw\tASMPC+2");
+    ol("defw\tASMPC+2");
 }
 
 
@@ -4370,15 +4310,7 @@ void CpCharVal(int val)
 
 void GlobalPrefix(void)
 {
-    if (ISASM(ASM_ASXX)) {
-        ot(".globl\t");
-    } else if (ISASM(ASM_VASM)) {
-        ot("GLOBAL\t");
-    } else if (ISASM(ASM_GNU)) {
-        ot(".global\t");
-    } else {
-        ot("GLOBAL\t");
-    }
+    ot("GLOBAL\t");
 }
 
 
@@ -4397,7 +4329,7 @@ void EmitLine(int line)
         *ptr = 0;
     }
 
-    if (ISASM(ASM_Z80ASM) && (c_cline_directive || c_intermix_ccode)) {
+    if (c_cline_directive || c_intermix_ccode) {
         outfmt("\tC_LINE\t%d,\"%s\"\n", line, filen);
     }
 }
@@ -4428,40 +4360,23 @@ void restorede(void)
 
 void prefix()
 {
-    if (ISASM(ASM_Z80ASM)) {
-        outbyte('.');
-    }
+    outbyte('.');
 }
 
 /* Print specified number as label */
 void printlabel(int label)
 {
-    if (ISASM(ASM_ASXX)) {
-        outdec(label);
-        outstr("$");
-    } else {
-        outfmt("i_%d", label);            
-    }
+    outfmt("i_%d", label);            
 }
 
 /* Print a label suffix */
 void col()
 {
-    if (!ISASM(ASM_Z80ASM))
-        outstr(":");
+    //outstr(":");
 }
 
 void function_appendix(SYMBOL* func)
 {
-    /* Asz80 needs a label at the end to sort out local symbols */
-    if (ISASM(ASM_ASXX)) {
-        nl();
-        prefix();
-        outstr("smce_");
-        outname(func->name, NO);
-        col();
-        nl();
-    }
 }
 
 void output_section(const char* section_name)
@@ -4470,15 +4385,7 @@ void output_section(const char* section_name)
     if (strcmp(section_name, current_section) == 0) {
         return;
     }
-    if (ISASM(ASM_ASXX)) {
-        outfmt("\t.area\t%s\n", section_name);
-    } else if (ISASM(ASM_Z80ASM)) {
-        outfmt("\tSECTION\t%s\n", section_name);
-    } else if (ISASM(ASM_VASM)) {
-        outfmt("\tSECTION\t%s\n", section_name);
-    } else if (ISASM(ASM_GNU)) {
-        outfmt("\t.section\t%s\n", section_name);
-    }
+    outfmt("\tSECTION\t%s\n", section_name);
     current_section = section_name;
 }
 
@@ -4502,23 +4409,15 @@ int CheckOffset(int val)
 
 void OutIndex(int val)
 {
-    if (ISASM(ASM_ASXX)) {
-        outdec(val);
-        if (c_framepointer_is_ix)
-            outstr("(ix)");
-        else
-            outstr("(iy)");
-    } else {
-        outstr("(");
-        if (c_framepointer_is_ix)
-            outstr("ix ");
-        else
-            outstr("iy ");
-        if (val >= 0)
-            outstr("+");
-        outdec(val);
-        outstr(")");
-    }
+    outstr("(");
+    if (c_framepointer_is_ix)
+        outstr("ix ");
+    else
+        outstr("iy ");
+    if (val >= 0)
+        outstr("+");
+    outdec(val);
+    outstr(")");
 }
 
 void RestoreSP(char saveaf)

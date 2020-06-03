@@ -8,6 +8,10 @@
 
 #include "ccdefs.h"
 
+#ifdef WIN32
+#include <process.h>
+#endif
+
 /*
  * Local functions
  */
@@ -34,7 +38,7 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst);
 #ifdef _WIN32
 static FILE* w32_tmpfile()
 {
-    static char tmpnambuf[] = "sccz80XXXX";
+    static char tmpnambuf[FILENAME_MAX+1];
     static int  inited = 0;
     char        *tmpnam;
     FILE        *fp;
@@ -42,7 +46,7 @@ static FILE* w32_tmpfile()
     if (!inited) {
         /* Randomize temporary filenames for windows */
         snprintf(tmpnambuf, sizeof(tmpnambuf), 
-                 "sccz80%04X", ((unsigned int)time(NULL)) & 0xffff);
+                 "sccz80%08X%04X",_getpid(), ((unsigned int)time(NULL)) & 0xffff);
         inited = 1;
     }
 
