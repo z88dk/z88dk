@@ -1163,10 +1163,10 @@ enum
 
 void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory, struct aligned_data *aligned)
 {
-    char buffer[MBLINEMAX];
-    char symbol_name[MBLINEMAX];
+    char buffer[MBLINEMAX-6];
+    char symbol_name[MBLINEMAX-5];      // Prevent sscanf of buffer overflowing symbol_name
     long symbol_value;
-    char section_name[MBLINEMAX];
+    char section_name[MBLINEMAX-5];     // Prevent snprintf overflow warning
     char bfilename[MBLINEMAX];
     int  c,i;
     struct stat st;
