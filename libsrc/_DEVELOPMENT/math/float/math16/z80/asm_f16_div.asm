@@ -37,10 +37,10 @@
 ;
 ;-------------------------------------------------------------------------
 
-SECTION code_clib
 SECTION code_fp_math16
 
-EXTERN asm_f16_f24, asm_f24_f16
+EXTERN asm_f24_f16
+EXTERN asm_f16_f24
 EXTERN asm_f24_inf
 
 EXTERN asm_f24_mul_f24
@@ -57,7 +57,7 @@ PUBLIC asm_f24_div_callee
 
 ; enter here for floating asm_f16_div_callee, x+y, x on stack, y in hl, result in hl
 .asm_f16_div_callee
-    call asm_f16_f24            ; expand to dehl
+    call asm_f24_f16            ; expand to dehl
     call asm_f24_inv
 
     exx                         ; 1/y   d'  = eeeeeeee e' = s-------
@@ -66,11 +66,11 @@ PUBLIC asm_f24_div_callee
     pop bc                      ; pop return address
     pop hl                      ; get second operand off of the stack
     push bc                     ; return address on stack
-    call asm_f16_f24            ; expand to dehl
+    call asm_f24_f16            ; expand to dehl
                                 ; x      d  = eeeeeeee e  = s-------
                                 ;        hl = 1mmmmmmm mmmmmmmm
     call asm_f24_mul_f24
-    jp asm_f24_f16
+    jp asm_f16_f24
 
 
 ; enter here for floating asm_f24_add_callee, x+y, x on stack, y in dehl, result in dehl
@@ -81,9 +81,9 @@ PUBLIC asm_f24_div_callee
 
 ; enter here for floating asm_f16_inv, 1/y, y in hl, result in hl
 .asm_f16_inv
-    call asm_f16_f24
+    call asm_f24_f16
     call asm_f24_inv
-    jp asm_f24_f16
+    jp asm_f16_f24
 
 
 ; enter here for floating asm_f24_inv, 1/y, y in dehl, result in dehl

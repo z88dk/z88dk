@@ -22,12 +22,12 @@ SECTION code_fp_math16
 
 EXTERN  l_neg_dehl
 
-PUBLIC asm_f24_i32
-PUBLIC asm_f24_u32
+PUBLIC asm_i32_f24
+PUBLIC asm_u32_f24
 
 ; Convert floating point number to long
-.asm_f24_i32
-.asm_f24_u32
+.asm_i32_f24
+.asm_u32_f24
     ld b,e                      ;Holds sign
     ld a,d                      ;Holds exponent
     and a

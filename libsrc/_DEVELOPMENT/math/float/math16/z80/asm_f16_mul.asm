@@ -37,11 +37,13 @@
 ;
 ;-------------------------------------------------------------------------
 
-SECTION code_clib
 SECTION code_fp_math16
 
-EXTERN asm_f16_f24, asm_f24_f16
-EXTERN asm_f24_zero, asm_f24_inf
+EXTERN asm_f24_f16
+EXTERN asm_f16_f24
+EXTERN asm_f24_zero
+EXTERN asm_f24_inf
+
 EXTERN l_mulu_32_16x16
 
 PUBLIC asm_f16_mul_callee
@@ -52,17 +54,17 @@ PUBLIC asm_f24_mul_f24
 
 ; enter here for floating asm_f16_mul_callee, x+y, x on stack, y in hl, result in hl
 .asm_f16_mul_callee
-    call asm_f16_f24            ; expand to dehl
+    call asm_f24_f16            ; expand to dehl
     exx                         ; y     d  = eeeeeeee e = s-------
                                 ;       hl = 1mmmmmmm mmmmmmmm
     pop bc                      ; pop return address
     pop hl                      ; get second operand off of the stack
     push bc                     ; return address on stack
-    call asm_f16_f24            ; expand to dehl
+    call asm_f24_f16            ; expand to dehl
                                 ; x     d  = eeeeeeee e = s-------
                                 ;       hl = 1mmmmmmm mmmmmmmm
     call asm_f24_mul_f24
-    jp asm_f24_f16
+    jp asm_f16_f24
 
 
 ; enter here for floating asm_f24_mul_callee, x+y, x on stack, y in dehl, result in dehl

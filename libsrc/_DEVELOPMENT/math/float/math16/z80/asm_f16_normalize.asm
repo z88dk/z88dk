@@ -14,7 +14,6 @@
 ;
 ;-------------------------------------------------------------------------
 
-SECTION code_clib
 SECTION code_math
 
 EXTERN asm_f24_zero

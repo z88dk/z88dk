@@ -1,7 +1,7 @@
 
 SECTION code_fp_math16
 
-EXTERN  asm_f16_f24
+EXTERN  asm_f24_f16
 
 PUBLIC  asm_f16_classify
 
@@ -16,7 +16,7 @@ PUBLIC  asm_f16_classify
     ;
     ; uses  : af, de
     push hl
-    call asm_f16_f24
+    call asm_f24_f16
 
     ; Zero  -     sign  = whatever
     ;         exponent  = all 0s

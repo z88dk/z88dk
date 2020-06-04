@@ -18,10 +18,10 @@
 ;
 ;-------------------------------------------------------------------------
 
-SECTION code_clib
 SECTION code_fp_math16
 
-PUBLIC  asm_f16_compare, asm_f16_compare_callee
+PUBLIC asm_f16_compare
+PUBLIC asm_f16_compare_callee
 
 ; Compare two IEEE half floats.
 ;

@@ -21,11 +21,11 @@ SECTION code_fp_math16
 
 EXTERN asm_f24_normalize
 
-PUBLIC asm_i32_f24
-PUBLIC asm_u32_f24
+PUBLIC asm_f24_i32
+PUBLIC asm_f24_u32
 
 ; convert long in dehl to _f24 in dehl
-.asm_i32_f24
+.asm_f24_i32
     ld b,d                      ; to hold the sign, put copy of ULSW into b
     bit 7,d                     ; test sign, negate if negative
     jr Z,shiftright
@@ -42,7 +42,7 @@ PUBLIC asm_u32_f24
     jp shiftright               ; number in dehl, sign in b[7]
 
 ; convert unsigned long in dehl to _f24 in dehl
-.asm_u32_f24                  
+.asm_f24_u32                  
     res 7,b                     ; ensure unsigned long "sign" bit is reset in b
                                 ; continue, with unsigned long number in dehl
 

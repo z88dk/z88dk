@@ -11,13 +11,15 @@
 
 SECTION code_fp_math16
 
-EXTERN asm_f16_inf, asm_f16_zero
-EXTERN asm_f16_f24, asm_f24_f16
+EXTERN asm_f24_f16
+EXTERN asm_f16_f24
+EXTERN asm_f16_zero
+EXTERN asm_f16_inf
 
 PUBLIC asm_f16_mul10
 
 .asm_f16_mul10
-    call asm_f16_f24            ; convert to expanded format
+    call asm_f24_f16            ; convert to expanded format
 
     ld a,d                      ; get the exponent
     and a
@@ -44,5 +46,5 @@ PUBLIC asm_f16_mul10
     ld d,a                      ; return the exponent
     inc a                       ; ensure not infinity
     jp Z,asm_f16_inf
-    jp asm_f24_f16              ; return IEEE HL
+    jp asm_f16_f24              ; return IEEE HL
 

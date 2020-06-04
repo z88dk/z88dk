@@ -21,22 +21,21 @@ SECTION code_fp_math16
 
 EXTERN asm_f24_normalize
 
-PUBLIC asm_i8_f24
-PUBLIC asm_i16_f24
+PUBLIC asm_f24_i8
+PUBLIC asm_f24_i16
 
-PUBLIC asm_u8_f24
-PUBLIC asm_u16_f24
-
+PUBLIC asm_f24_u8
+PUBLIC asm_f24_u16
 
 ; convert signed char in l to _f24 in dehl
-.asm_i8_f24
+.asm_f24_i8
     ld a,l
     rla                         ; sign bit of a into C
     sbc a,a
     ld h,a                      ; now hl is sign extended
 
 ; convert integer in hl to _f24 in dehl
-.asm_i16_f24
+.asm_f24_i16
     ld d,142                    ; exponent
     ld e,h                      ; sign in e[7]
     bit 7,h                     ; test sign, negate if negative
@@ -50,11 +49,11 @@ PUBLIC asm_u16_f24
     jp asm_f24_normalize        ; piggy back on normalisation code
 
 ; convert character in l to _f24 in dehl
-.asm_u8_f24
+.asm_f24_u8
     ld h,0
 
 ; convert unsigned integer in hl to _f24 in dehl
-.asm_u16_f24
+.asm_f24_u16
     ld d,142                    ; exponent
     res 7,e                     ; sign in e[7]
     jp asm_f24_normalize        ; piggy back on normalisation code

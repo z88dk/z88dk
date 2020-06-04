@@ -11,8 +11,10 @@
 
 SECTION code_fp_math16
 
+EXTERN asm_f24_f16
+EXTERN asm_f16_f24
+
 EXTERN asm_f16_zero
-EXTERN asm_f16_f24, asm_f24_f16
 
 PUBLIC asm_f16_ldexp_callee
 
@@ -32,7 +34,7 @@ PUBLIC asm_f16_ldexp_callee
     pop bc                      ; pw2 maximum int8_t actually
     push af                     ; return on stack
 
-    call asm_f16_f24            ; convert to expanded format
+    call asm_f24_f16            ; convert to expanded format
 
     ld a,d                      ; get the exponent
     and a
@@ -40,5 +42,5 @@ PUBLIC asm_f16_ldexp_callee
 
     add c                       ; pw2
     ld d,a                      ; exponent returned
-    jp asm_f24_f16              ; return IEEE HL
+    jp asm_f16_f24              ; return IEEE HL
 

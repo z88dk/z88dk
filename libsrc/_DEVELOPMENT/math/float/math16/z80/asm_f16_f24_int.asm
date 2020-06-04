@@ -22,12 +22,12 @@ SECTION code_fp_math16
 
 EXTERN  l_neg_hl
 
-PUBLIC asm_f24_i16
-PUBLIC asm_f24_u16
+PUBLIC asm_i16_f24
+PUBLIC asm_u16_f24
 
 ; Convert floating point number to int
-.asm_f24_i16
-.asm_f24_u16
+.asm_i16_f24
+.asm_u16_f24
     ld a,d                      ;Holds exponent
     and a
     jr Z,izero                  ;exponent was 0, return 0
