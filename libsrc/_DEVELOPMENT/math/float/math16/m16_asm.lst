@@ -1,20 +1,2 @@
-;math/float/math16/lm16/z80/asm_add
-;math/float/math16/lm16/z80/asm_ceil
-;math/float/math16/lm16/z80/asm_div
-;math/float/math16/lm16/z80/asm_div2
-;math/float/math16/lm16/z80/asm_fabs
-;math/float/math16/lm16/z80/asm_floor
-;math/float/math16/lm16/z80/asm_classify
-;math/float/math16/lm16/z80/asm_inv
-;math/float/math16/lm16/z80/asm_invsqrt
-;math/float/math16/lm16/z80/asm_mul
-;math/float/math16/lm16/z80/asm_mul2
-;math/float/math16/lm16/z80/asm_mul10
-;math/float/math16/lm16/z80/asm_neg
-;math/float/math16/lm16/z80/asm_poly
-;math/float/math16/lm16/z80/asm_sigdig
-;math/float/math16/lm16/z80/asm_sqr
-;math/float/math16/lm16/z80/asm_sqrt
-;math/float/math16/lm16/z80/asm_sub
-;math/float/math16/lm16/z80/asm_zero
+
 

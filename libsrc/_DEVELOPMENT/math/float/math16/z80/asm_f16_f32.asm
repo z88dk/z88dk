@@ -20,7 +20,6 @@
 ;
 ;-------------------------------------------------------------------------
 
-SECTION code_clib
 SECTION code_fp_math16
 
 EXTERN asm_f16_zero
@@ -30,6 +29,9 @@ PUBLIC asm_f24_f32
 PUBLIC asm_f32_f24
 PUBLIC asm_f24_f16
 PUBLIC asm_f16_f24
+
+PUBLIC asm_f16_f32
+PUBLIC asm_f32_f16
 
 ; convert f32 to f24
 .asm_f24_f32
@@ -42,6 +44,10 @@ PUBLIC asm_f16_f24
     ld h,e
     ld e,a                      ; save sign in e[7]
     ret                         ; result in dehl
+
+; convert f16 to f32
+.asm_f32_f16
+    call asm_f24_f16
 
 ; convert f24 to f32
 .asm_f32_f24
@@ -76,6 +82,10 @@ PUBLIC asm_f16_f24
     ld l,h                      ; position f16 in hl
     ld h,a
     ret
+
+; convert f32 to f16
+.asm_f16_f32
+    call asm_f24_f32
 
 ; convert f16 to f24
 .asm_f24_f16

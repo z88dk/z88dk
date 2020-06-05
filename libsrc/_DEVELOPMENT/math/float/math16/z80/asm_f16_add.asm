@@ -56,6 +56,8 @@ PUBLIC asm_f16_sub_callee
 PUBLIC asm_f24_add_callee
 PUBLIC asm_f24_sub_callee
 
+PUBLIC asm_f24_add_f24
+
 ; enter here for floating asm_f16_sub_callee, x-y x on stack, y in hl, result in hl
 .asm_f16_sub_callee
     ld a,h                      ; toggle the sign bit for subtraction
@@ -74,7 +76,7 @@ PUBLIC asm_f24_sub_callee
     call asm_f24_f16            ; expand to dehl
                                 ; x      d  = eeeeeeee e  = s-------
                                 ;        hl = 1mmmmmmm mmmmmmmm
-    call add_f24_f24
+    call asm_f24_add_f24
     jp asm_f16_f24
 
 
@@ -95,7 +97,7 @@ PUBLIC asm_f24_sub_callee
     push bc                     ; return address on stack
 
 
-.add_f24_f24
+.asm_f24_add_f24
     ld a,e                      ; place op1.s in a[7]
     exx                         ; x mantissa: hl' = 1mmmmmmm mmmmmmmm
                                 ; y mantissa: hl  = 1mmmmmmm mmmmmmmm

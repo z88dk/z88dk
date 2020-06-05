@@ -22,7 +22,7 @@ PUBLIC asm_f16_frexp_callee
     ;
     ; enter : stack =  int16_t *pw2, half x,ret
     ;
-    ; exit  : dehl  = 32-bit result
+    ; exit  : hl  = 16-bit result
     ;         carry reset
     ;
     ; uses  : af, bc, de, hl

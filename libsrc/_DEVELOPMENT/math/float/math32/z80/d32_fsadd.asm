@@ -65,7 +65,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld d,a
 
 
-; enter here for floating add, x+y, x on stack, y in bcde, result in bcde
+; enter here for floating add, x+y, x on stack, y in dehl, result in dehl
 .m32_fsadd
     ex de,hl                    ; DEHL -> HLDE
     ld b,h                      ; place op1.s in b[7]
