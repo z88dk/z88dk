@@ -67,66 +67,27 @@
 #define M_SQRT1_2  0.707107
 
 
-/* Trigonometric functions */
-extern half_t __LIB__ sin(half_t x);
-extern half_t __LIB__ cos(half_t x);
-extern half_t __LIB__ tan(half_t x);
-extern half_t __LIB__ asin(half_t x);
-extern half_t __LIB__ acos(half_t x);
-extern half_t __LIB__ atan(half_t x);
-extern half_t __LIB__ atan2(half_t x, half_t y) __smallc;
-
-/* Hyperbolic functions */
-extern half_t __LIB__ sinh(half_t x);
-extern half_t __LIB__ cosh(half_t x);
-extern half_t __LIB__ tanh(half_t x);
-extern half_t __LIB__ asinh(half_t x);
-extern half_t __LIB__ acosh(half_t x);
-extern half_t __LIB__ atanh(half_t x);
-
 /* Power functions */
-extern half_t __LIB__ pow(half_t x, half_t y) __smallc;
 extern half_t __LIB__ sqrt(half_t a);
-
-/* Exponential */
-extern half_t __LIB__ exp(half_t x);
-extern half_t __LIB__ exp2(half_t x);
-extern half_t __LIB__ exp10(half_t x);
-extern half_t __LIB__ log(half_t x);
-extern half_t __LIB__ log2(half_t x);
-extern half_t __LIB__ log10(half_t x);
-#define log1p(x) log(1.+x)
-#define expm1(x) (exp(x)-1.)
 
 /* Nearest integer, absolute value, and remainder functions */
 extern half_t __LIB__ ceil(half_t x);
 extern half_t __LIB__ floor(half_t x);
-extern half_t __LIB__ round(half_t x);
 #define trunc(a) (a>0.?floor(a):ceil(a))
-//#define round(a) (a>0.?floor(a+0.5):ceil(a-0.5))
+#define round(a) (a>0.?floor(a+0.5):ceil(a-0.5))
 #define rint(a) ceil(a)
 
 /* Manipulation */
+extern half_t __LIB__ frexp(half_t x, int *pw2) __smallc;
 extern half_t __LIB__ ldexp(half_t x, int pw2) __smallc;
 #define scalbn(x,pw2) ldexp(x,pw2)
-extern half_t __LIB__ modf(half_t x, half_t * y) __smallc;
-extern half_t __LIB__ frexp(half_t x, int *pw2) __smallc;
 
 /* Intrinsic functions */
-extern half_t __LIB__ sqr(half_t a);
 extern half_t __LIB__ inv(half_t a);
 extern half_t __LIB__ invsqrt(half_t a);
 
 /* General */
-extern half_t __LIB__ fabs(half_t x);
-extern half_t __LIB__ fmod(half_t x, half_t y) __smallc;
-extern half_t __LIB__ hypot(half_t x, half_t y) __smallc;
-
-/* Helper functions */
-extern half_t __LIB__ atof(char *) __smallc;
-extern void __LIB__ ftoa(half_t, int, char *) __smallc;
-extern void __LIB__ ftoe(half_t, int, char *) __smallc;
-
+extern half_t __LIB__ abs(half_t x);
 
 /* Classification functions */
 #define FP_NORMAL   0
@@ -134,11 +95,11 @@ extern void __LIB__ ftoe(half_t, int, char *) __smallc;
 #define FP_NAN      2
 #define FP_INFINITE 3
 #define FP_SUBNORMAL 4
-extern int __LIB__ fpclassify(half_t x);
-#define isinf(x) ( fpclassify(x) == FP_INFINITE )
-#define isnan(x) ( fpclassify(x) == FP_NAN )
+extern int __LIB__ classify(half_t x);
+#define isinf(x) ( classify(x) == FP_INFINITE )
+#define isnan(x) ( classify(x) == FP_NAN )
 #define isnormal(x) 1
-#define isfinite(x) ( fpclassify(x) == FP_NORMAL )
+#define isfinite(x) ( classify(x) == FP_NORMAL )
 
 #endif
 
