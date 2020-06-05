@@ -1,6 +1,6 @@
 
-	SECTION	code_fp_math16
-	PUBLIC	_inv
-	EXTERN	cm16_sdcc_inv
+    SECTION code_fp_math16
+    PUBLIC  _m16_inv
+    EXTERN  cm16_sdcc_inv
 
-	defc	_inv = cm16_sdcc_inv
+    defc    _m16_inv = cm16_sdcc_inv
