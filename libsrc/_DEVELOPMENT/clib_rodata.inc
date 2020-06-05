@@ -22,6 +22,7 @@ section rodata_fp_math32
 section rodata_input
 section rodata_SMSlib
 section rodata_sound_ay
+section rodata_sound_bit
 section rodata_stdio
 section rodata_stdlib
 
