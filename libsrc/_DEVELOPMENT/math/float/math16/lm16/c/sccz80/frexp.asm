@@ -1,15 +1,15 @@
 
 	SECTION	code_fp_math16
-	PUBLIC	frexp
+	PUBLIC	m16_frexp
 	EXTERN	cm16_sccz80_frexp
 
-	defc	frexp = cm16_sccz80_frexp
+	defc	m16_frexp = cm16_sccz80_frexp
 
 
 ; SDCC bridge for Classic
 IF __CLASSIC
-PUBLIC _frexp
+PUBLIC _m16_frexp
 EXTERN cm16_sdcc_frexp
-defc _frexp = cm16_sdcc_frexp
+defc _m16_frexp = cm16_sdcc_frexp
 ENDIF
 

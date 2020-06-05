@@ -1,14 +1,14 @@
 
     SECTION code_fp_math16
-    PUBLIC inv_fastcall
+    PUBLIC m16_inv_fastcall
     EXTERN asm_f16_inv
 
-    defc inv_fastcall = asm_f16_inv
+    defc m16_inv_fastcall = asm_f16_inv
 
 
 ; SDCC bridge for Classic
 IF __CLASSIC
-PUBLIC _inv_fastcall
-defc _inv_fastcall = asm_f16_inv
+PUBLIC _m16_inv_fastcall
+defc _m16_inv_fastcall = asm_f16_inv
 ENDIF
 

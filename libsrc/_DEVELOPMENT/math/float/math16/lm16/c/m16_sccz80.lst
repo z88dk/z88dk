@@ -3,7 +3,6 @@ math/float/math16/lm16/c/sccz80/abs
 math/float/math16/lm16/c/sccz80/abs_fastcall
 math/float/math16/lm16/c/sccz80/ceil
 math/float/math16/lm16/c/sccz80/ceil_fastcall
-math/float/math16/lm16/c/sccz80/classify
 math/float/math16/lm16/c/sccz80/div2
 math/float/math16/lm16/c/sccz80/div2_fastcall
 math/float/math16/lm16/c/sccz80/floor
