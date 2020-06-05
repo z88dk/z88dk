@@ -12,7 +12,7 @@ EXTERN cm16_sccz80_read1, asm_f16_inv
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-cm16_sccz80_inv:
+.cm16_sccz80_inv
     call cm16_sccz80_read1
     jp asm_f16_inv
 

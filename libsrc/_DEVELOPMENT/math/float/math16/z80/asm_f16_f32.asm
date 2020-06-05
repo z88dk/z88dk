@@ -25,6 +25,8 @@ SECTION code_fp_math16
 EXTERN asm_f16_zero
 EXTERN asm_f16_inf
 
+EXTERN asm_f24_zero
+
 PUBLIC asm_f24_f32
 PUBLIC asm_f32_f24
 PUBLIC asm_f24_f16
@@ -100,6 +102,7 @@ PUBLIC asm_f32_f16
     rr h
     rr l
     and 01Fh                    ; separate exponent
+    jp Z,asm_f24_zero           ; zero if number was zero
     add a,127-15                ; convert bias to 8 bits
     ld d,a
     scf                         ; set implicit bit

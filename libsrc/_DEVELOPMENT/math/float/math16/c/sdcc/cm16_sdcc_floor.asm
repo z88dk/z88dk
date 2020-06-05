@@ -1,10 +1,11 @@
 
-SECTION code_fp_math32
+SECTION code_fp_math16
 
-PUBLIC cm32_sdcc_floor
+PUBLIC cm16_sdcc_floor
 
-EXTERN cm32_sdcc_fsread1, m32_floor_fastcall
+EXTERN cm16_sdcc_read1, asm_f16_floor
 
-cm32_sdcc_floor:
-    call cm32_sdcc_fsread1
-    jp m32_floor_fastcall
+.cm16_sdcc_floor
+    call cm16_sdcc_read1
+    jp asm_f16_floor
+

@@ -3,6 +3,7 @@ math/float/math16/c/sdcc/cm16_sdcc_abs
 math/float/math16/c/sdcc/cm16_sdcc_add
 math/float/math16/c/sdcc/cm16_sdcc_add_callee
 math/float/math16/c/sdcc/cm16_sdcc_ceil
+math/float/math16/c/sdcc/cm16_sdcc_classify
 math/float/math16/c/sdcc/cm16_sdcc_div
 math/float/math16/c/sdcc/cm16_sdcc_div2
 math/float/math16/c/sdcc/cm16_sdcc_div_callee

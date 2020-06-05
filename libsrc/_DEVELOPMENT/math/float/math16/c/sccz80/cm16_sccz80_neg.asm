@@ -13,7 +13,7 @@ EXTERN cm16_sccz80_read1, asm_f16_neg
     ;
     ; uses  : af, bc, de, hl
 
-cm16_sccz80_neg:
+.cm16_sccz80_neg
     call cm16_sccz80_read1
     jp asm_f16_neg
 

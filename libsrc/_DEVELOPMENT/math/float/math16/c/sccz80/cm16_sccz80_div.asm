@@ -11,6 +11,8 @@ EXTERN asm_f16_f24
 EXTERN asm_f24_inv
 EXTERN asm_f24_mul_f24
 
+.cm16_sccz80_div
+
     ; divide sccz80 half by sccz80 half
     ;
     ; enter : stack = sccz80_half left, sccz80_half right, ret
@@ -19,7 +21,6 @@ EXTERN asm_f24_mul_f24
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-.cm16_sccz80_div
     pop bc                      ; pop return address
     pop hl                      ; get right operand off of the stack
     exx

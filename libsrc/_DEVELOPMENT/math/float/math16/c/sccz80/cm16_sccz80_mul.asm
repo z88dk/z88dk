@@ -1,25 +1,43 @@
 
-; float __fsmul (float left, float right)
+; half __mul (half left, half right)
 
-SECTION code_clib
-SECTION code_fp_math32
+SECTION code_fp_math16
 
-PUBLIC cm32_sccz80_fsmul
+PUBLIC cm16_sccz80_mul
 
-EXTERN cm32_sccz80_switch_arg, cm32_sccz80_fsreadl
-EXTERN m32_fsmul
+EXTERN asm_f24_f16
+EXTERN asm_f16_f24
 
-    ; multiply two sccz80 floats
+EXTERN asm_f24_mul_f24
+
+.cm16_sccz80_mul
+
+    ; multiply two sccz80 halfs
     ;
-    ; enter : stack = sccz80_float left, sccz80_float right, ret
+    ; enter : stack = sccz80_half left, sccz80_half right, ret
     ;
-    ; exit  :  DEHL = sccz80_float(left*right)
+    ; exit  :    HL = sccz80_half(left*right)
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-.cm32_sccz80_fsmul
-    call cm32_sccz80_switch_arg
-    call cm32_sccz80_fsreadl
-    jp m32_fsmul            ; enter stack = sccz80_float right, sccz80_float left, ret
-                            ;        DEHL = sccz80_float right
-                            ; return DEHL = sccz80_float
+    pop bc                      ; pop return address
+    pop hl                      ; get right operand off of the stack
+    exx
+
+    pop hl                      ; get left operand off of the stack
+    push hl
+    exx
+
+    push hl
+    push bc                     ; return address on stack
+    call asm_f24_f16            ; expand to dehl
+
+    exx                         ; y     d'  = eeeeeeee e' = s-------
+                                ;       hl' = 1mmmmmmm mmmmmmmm
+    call asm_f24_f16            ; expand to dehl
+                                ; x      d  = eeeeeeee e  = s-------
+                                ;        hl = 1mmmmmmm mmmmmmmm
+    call asm_f24_mul_f24
+    jp asm_f16_f24              ; enter stack = sccz80_half right, sccz80_half left, ret
+                                ;          HL = sccz80_half right
+                                ; return   HL = sccz80_half

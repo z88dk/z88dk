@@ -1,14 +1,7 @@
 
 ## z88dk IEEE Floating Point Package - `math16`
 
-This is the z88dk 16-bit IEEE-754 standard math16 floating point maths package, designed to work with the SCCZ80 IEEE-754 16-bit interfaces.
-
-Where not written by me, the functions were sourced from:
-
-  * [float16 library](https://github.com/artyom-beilis/float16), copywrite (C) 2020 Artyom Beilis.
-  * the Hi-Tech C floating point library, copyright (C) 1984-1987 HI-TECH SOFTWARE.
-  * the Cephes Math Library Release 2.2, copyright (C) 1984, 1987, 1989 by Stephen L. Moshier.
-  * various Wikipedia references, especially for Newton-Raphson and Horner's Method.
+This is the z88dk 16-bit IEEE-754 standard math16 half precision floating point maths package, designed to work with the SCCZ80 IEEE-754 half precision 16-bit interfaces.
   
 This library is designed for z80, z180, and z80n processors. Specifically, it is optimised for the z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate the floating point mantissa calculation.
 
@@ -30,17 +23,13 @@ This library is also designed to be as fast as possible on the z80 processor.
 
   *  Mantissa calculations are done with 16-bits (11-bits plus 5-bits for rounding). Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
 
-  *  All functions are calculated with a 16-bit internal mantissa calculation path, without rounding, to provide the maximum accuracy when repeated multiplications and additions are required.
+  *  All functions are calculated with a 16-bit internal mantissa calculation path, as this is a natural size for the z80, to provide the maximum accuracy when repeated multiplications and additions are required.
 
-  *  Higher functions are written in C, for maintainability, and draw upon the intrinsic functions including the square root, square, and polynomial evaluation, as well as the 4 standard arithmetic functions.
+  *  To be added - The square root (through the inverse square root function) is seeded using the Quake magic number method, with two Newton-Raphson iterations for accuracy. Again, accuracy and speed can be traded depending on the application by removing one or two iterations, for example for game usage.
 
-  *  Power and trigonometric functions' accuracy and speed can be traded by managing their polynomial series coefficient tables and algorithms. More coefficients and iterations provides higher accuracy at the expense of performance. A combination of the Cephes Math library, and the Hi-Tech C library coefficients are provided by default. Alternative coefficient tables can be implemented without impacting the code.
+## IEEE-754 Half Precision Floating Point Format
 
-  *  The square root (through the inverse square root function) is seeded using the Quake magic number method, with two Newton-Raphson iterations for accuracy. Again, accuracy and speed can be traded depending on the application by removing one or two iterations, for example for game usage.
-
-## IEEE-754 Floating Point Format
-
-The z88dk floating point format (compatible with Intel/ IEEE, etc.) is as follows:
+The z88dk half precision floating point format (compatible with Intel/ IEEE, etc.) is as follows:
 
 ```
   hl = seeeeemm mmmmmmmm (s-sign, e-exponent, m-mantissa)
@@ -68,7 +57,7 @@ Examples of numbers:
     x   11111        000... infinity  (sign positive or negative, mantissa zero)
     x   11111        xxx... not a number (sign positive or negative, mantissa non zero)
 ```
-This floating point package is loosely based on IEEE-754. We maintain the packed format, but we do not support the round to even convention. 
+This half precision floating point package is loosely based on IEEE-754. We maintain the packed format, but we do not support the round to even convention. 
 
 z88dk math16 assumes any number with a zero exponent is positive or negative zero.
 IEEE-754 assumes bit 11 of the mantissa is 1 except where the exponent is zero.
@@ -76,7 +65,7 @@ IEEE-754 assumes bit 11 of the mantissa is 1 except where the exponent is zero.
 
 ## IEEE Floating Point Expanded Mantissa Format
 
-An expanded 16-bit internal mantissa is used to calculate all functions. 16-bit mantissa calculations are natural for the z80, and this provides enhanced accuracy for repeated calculations required for derived functions. Specifically, this is to provide increased accuracy for the Newton-Raphson iterations, and the Horner polynomial expansions.
+An expanded 16-bit internal mantissa is used to calculate all functions. 16-bit mantissa calculations are natural for the z80, and this provides enhanced accuracy for repeated calculations required for derived functions. Specifically, this is to provide increased accuracy for the Newton-Raphson iterations, and the Horner polynomial expansions. The fused multiply add function and the poly function are also implemented using the 16-bit mantissa internal path.
 
 This format is provided for both the multiply and add intrinsic internal 16-bit mantissa functions, from which other functions are derived, and is referred to as `f24` in the library.
 
@@ -94,30 +83,28 @@ The z88dk math16 library uses the sccz80 standard register and stack calling con
 The intrinsic functions, written in assembly, assume the sccz80 calling convention, and are by default `__z88dk_fastcall` or `__z88dk_callee`, which means that they will consume values passed on the stack, returning with the value in `HL`.
 
 ```
-     LHS STACK - RHS HL -> RETURN HL
+     RETURN HL <- LHS STACK - RHS STACK 
 
-    ; add two sccz80 half floats
+    ; subtract two sccz80 half floats
     ;
-    ; half f16_add (half x, half y);
+    ; half m16_add (half x, half y);
     ;
-    ; enter : stack = sccz80_half left, ret
-    ;            HL = sccz80_half right
+    ; enter : stack = sccz80_half left, sccz80_half right, ret
     ;
-    ; exit  :    HL = sccz80_half(left+right)
+    ; exit  :    HL = sccz80_half(left-right)
     ;
-    ; uses  : af, bc, de, hl, af', bc', de', hl'
+    ; uses  : af, bc, de, hl
 
 
-    ; evaluation of a polynomial function
+    ; subtract two sdcc half floats
     ;
-    ; half poly (half x, half d[], uint16_t n);
+    ; half m16_add (half x, half y);
     ;
-    ; enter : stack = uint16_t n, half d[], half x, ret
+    ; enter : stack = sdcc_half right, sdcc_half left, ret
     ;
-    ; exit  :    HL = 16-bit product
-    ;         carry reset
+    ; exit  :    HL = sdcc_half(left-right)
     ;
-    ; uses  : af, bc, de, hl, af', bc', de', hl'
+    ; uses  : af, bc, de, hl
 ```
 ## Directory Structure
 
@@ -139,9 +126,9 @@ An alias is provided to simplify usage of the library. `--math16` provides all t
 
 ## Function Discussion
 
-There are essentially three different grades of functions in this library. Those written in assembly code in the expanded floating point domain, where the sign, exponent, and mantissa are handled separately. Those written in assembly code, in the floating point domain but using intrinsic functions, where floating point numbers are passed as expanded 4 byte values. And those written in C language.
+There are essentially two different grades of functions in this library. Those written in assembly code in the expanded floating point domain, where the sign, exponent, and mantissa are handled separately. And those written in assembly code, in the floating point domain but using intrinsic functions, where floating point numbers are passed as expanded 4 byte values using the internal `f24` format.
 
-The expanded floating point domain is a useful tool for creating functions, as complex functions can be written quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `poly()` function.
+The expanded floating point format is a useful tool for creating functions, as complex functions can be written quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `fma()` and the `poly()` functions.
 
 ## Licence
 

@@ -10,7 +10,9 @@ EXTERN asm_f16_f24
 
 EXTERN asm_f24_add_f24
 
-    ; add two sccz80 hal
+.cm16_sccz80_add
+
+    ; add two sccz80 halfs
     ;
     ; enter : stack = sccz80_half left, sccz80_half right, ret
     ;
@@ -18,7 +20,6 @@ EXTERN asm_f24_add_f24
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-.cm16_sccz80_add
     pop bc                      ; pop return address
     pop hl                      ; get right operand off of the stack
     exx
