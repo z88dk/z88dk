@@ -217,7 +217,7 @@ int nec_exec(char* target)
 
     unsigned char* prefix;
     int prefix_length;
-    int codeseg = 0;
+    // int codeseg = 0;
 
     if (binname == NULL) {
         return -1;
@@ -305,7 +305,7 @@ int nec_exec(char* target)
         prefix[24] = '4';
         prefix[48] = len % 256;
         prefix[49] = len / 256;
-        codeseg = MODE1_ADDRESS_CODESEG;
+        // codeseg = MODE1_ADDRESS_CODESEG;
         break;
     case MODE5:
         prefix = prefix_p6;
@@ -316,17 +316,17 @@ int nec_exec(char* target)
         prefix[24] = '0';
         prefix[48] = len % 256;
         prefix[49] = len / 256;
-        codeseg = MODE5_ADDRESS_CODESEG;
+        // codeseg = MODE5_ADDRESS_CODESEG;
         break;
     case MODEN88:
         prefix = prefix_p88;
         prefix_length = prefix_length_p88;
-        codeseg = MODEN88_ADDRESS_CODESEG;
+        // codeseg = MODEN88_ADDRESS_CODESEG;
         break;
     case MODEROM:
         prefix = prefix_rom;
         prefix_length = prefix_length_rom;
-        codeseg = MODEROM_ADDRESS_CODESEG;
+        // codeseg = MODEROM_ADDRESS_CODESEG;
         break;
     case MODE2:
     default:
@@ -336,7 +336,7 @@ int nec_exec(char* target)
         //prefix[24] = '4';
         prefix[48] = len % 256;
         prefix[49] = len / 256;
-        codeseg = MODE2_ADDRESS_CODESEG;
+        // codeseg = MODE2_ADDRESS_CODESEG;
         break;
     }
     // set p6 file name

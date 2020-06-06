@@ -116,12 +116,9 @@ int c7420_exec(char* target)
         for (i = 1; i <= 10; i++)
             writebyte(0xD3, fpout);
         writebyte(' ', fpout); /* File type ' ', BASIC program. */
-        if (strlen(blockname) >= 6) {
-            strncpy(name, blockname, 6);
-        } else {
-            strcpy(name, blockname);
-            strncat(name, "      ", 6 - strlen(blockname));
-        }
+
+        snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, blockname);
+
         writestring(name, fpout);
         writebyte(0, fpout);
         writebyte('1', fpout); /* Autorun (line 10) */
@@ -179,8 +176,8 @@ int c7420_exec(char* target)
         /****************/
         /* BASIC loader */
         /****************/
-        sprintf(lsbbuf, "%i", (int)pos % 256); /* no more than 3 characters long */
-        sprintf(msbbuf, "%i", (int)pos / 256); /* no more than 3 characters long */
+        sprintf(lsbbuf, "%i", (uint8_t) (pos % 256) ); /* no more than 3 characters long */
+        sprintf(msbbuf, "%i", (uint8_t) (pos / 256) ); /* no more than 3 characters long */
 
         copy1 = strdup(filename);
         copy2 = strdup(filename);
@@ -286,12 +283,9 @@ int c7420_exec(char* target)
         for (i = 1; i <= 10; i++)
             writebyte(0xD3, fpout);
         writebyte('M', fpout); /* File type 'M' (Memory block) */
-        if (strlen(blockname) >= 6) {
-            strncpy(name, blockname, 6);
-        } else {
-            strcpy(name, blockname);
-            strncat(name, "      ", 6 - strlen(blockname));
-        }
+
+        snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, blockname);
+
         writestring(name, fpout);
         writebyte(0, fpout);
         writebyte(0, fpout);

@@ -124,12 +124,8 @@ int acetap_exec(char* target)
             writebyte_p(32, fpout, &parity); /* ACE header block type */
 
             /* deal with the filename */
-            if (strlen(blockname) >= 10) {
-                strncpy(name, blockname, 10);
-            } else {
-                strcpy(name, blockname);
-                strncat(name, "          ", 10 - strlen(blockname));
-            }
+            snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, blockname);
+
             blockname = codename; /* Next block will be named z88dk_code */
             for (i = 0; i <= 9; i++)
                 writebyte_p(name[i], fpout, &parity);
@@ -162,12 +158,8 @@ int acetap_exec(char* target)
         writebyte_p(32, fpout, &parity); /* ACE header block type */
 
         /* Deal with the filename */
-        if (strlen(blockname) >= 10) {
-            strncpy(name, blockname, 10);
-        } else {
-            strcpy(name, blockname);
-            strncat(name, "          ", 10 - strlen(blockname));
-        }
+        snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, blockname);
+
         for (i = 0; i <= 9; i++)
             writebyte_p(name[i], fpout, &parity);
         writeword_p(len, fpout, &parity);

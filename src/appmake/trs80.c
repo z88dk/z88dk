@@ -218,12 +218,8 @@ int trs80_exec(char* target)
             fputc(0x55, fpout); /* system type filename header identifier */
 
             /* Deal with the filename */
-            if (strlen(binname) >= 6) {
-                strncpy(name, binname, 6);
-            } else {
-                strcpy(name, binname);
-                strncat(name, "      ", 6 - strlen(binname));
-            }
+            snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, binname);
+
             for (i = 0; i < 6; i++)
                 writebyte(toupper(name[i]), fpout);
         }

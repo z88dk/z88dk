@@ -199,12 +199,8 @@ int svi_exec(char* target)
             writebyte(208, fpout);
 
         /* Deal with the filename */
-        if (strlen(binname) >= 6) {
-            strncpy(name, binname, 6);
-        } else {
-            strcpy(name, binname);
-            strncat(name, "      ", 6 - strlen(binname));
-        }
+        snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, binname);
+
         for (i = 0; i < 6; i++)
             writebyte(name[i], fpout);
 
