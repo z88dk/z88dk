@@ -337,10 +337,7 @@ for my $options ('-d', '--update') {
 	t_z80asm_capture("$options ".asm_file(), "", "", 0);
 	is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
-	# fails in linux???
-	if ($^O ne 'linux') {
-		ok(abs((-M o_file()) - $date_obj) > 0.001);	# new object
-	}
+	ok(abs((-M o_file()) - $date_obj) > 0);	# new object
 	
 	# remove source, give -d -> uses existing object - with extensiom
 	unlink asm_file();
