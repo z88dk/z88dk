@@ -173,12 +173,9 @@ int sc3000_exec(char* target)
 
         /* Deal with the filename */
         checksum = 255;
-        if (strlen(blockname) >= 16) {
-            strncpy(name, blockname, 16);
-        } else {
-            strcpy(name, blockname);
-            strncat(name, "                ", 16 - strlen(blockname));
-        }
+
+        snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, blockname);
+
         for (i = 0; i <= 15; i++)
             writebyte_cksum(name[i], fpout, &checksum);
 
@@ -219,12 +216,9 @@ int sc3000_exec(char* target)
 
         /* Deal with the filename */
         checksum = 255;
-        if (strlen(blockname) >= 16) {
-            strncpy(name, blockname, 16);
-        } else {
-            strcpy(name, blockname);
-            strncat(name, "                ", 16 - strlen(blockname));
-        }
+
+        snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, blockname);
+
         for (i = 0; i <= 15; i++)
             writebyte_cksum(name[i], fpout, &checksum);
 

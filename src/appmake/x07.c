@@ -106,7 +106,7 @@ int x07_exec(char* target)
     char name[7];
     char addr[7];
     FILE *fpin, *fpout;
-    long pos;
+    long pos = -1;      // Prevent warning "may be used uninitialized"
     int c, i, len;
     if (help)
         return -1;

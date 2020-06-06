@@ -75,12 +75,7 @@ int p2000_exec(char* target)
         blockname = binname;
 
     /* Deal with the filename */
-    if (strlen(blockname) >= 8) {
-        strncpy(name, blockname, 8);
-    } else {
-        strcpy(name, blockname);
-        strncat(name, "        ", 8 - strlen(blockname));
-    }
+    snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, blockname);
 
     bcount = 0;
     for (j = 0; j < len; j++) {

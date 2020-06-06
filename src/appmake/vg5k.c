@@ -216,12 +216,8 @@ int vg5k_exec(char* target)
         writebyte('M', fpout); /* 'CSAVEM/CLOADM', binary machine code file type */
 
         /* Deal with the filename */
-        if (strlen(blockname) >= 7) {
-            strncpy(name, blockname, 7);
-        } else {
-            strcpy(name, blockname); /* optionally, 00 - 01  to terminate the fname text, then zero-fill */
-            strncat(name, "       ", 7 - strlen(blockname));
-        }
+        snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, blockname);
+
         for (i = 0; i <= 6; i++)
             writebyte(name[i], fpout);
 
@@ -313,6 +309,9 @@ int vg5k_exec(char* target)
         /* Copy the header */
         if (dumb)
             printf("\nInfo: Program Name found in header: ");
+
+        j = 0;      // Prevent warning "may be used uninitialized"
+
         for (i = 0; (i < 32); i++) {
             c = getc(fpin);
             if (dumb && i > 10 && i < 18)
