@@ -8,8 +8,8 @@ PUBLIC cm16_sccz80_div
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 
-EXTERN asm_f24_inv
 EXTERN asm_f24_mul_f24
+EXTERN asm_f24_inv
 
 .cm16_sccz80_div
 

@@ -1,9 +1,9 @@
 
     SECTION code_fp_math16
     PUBLIC m16_inv
-    EXTERN cm16_sccz80_inv
+    EXTERN asm_f16_inv
 
-    defc m16_inv = cm16_sccz80_inv
+    defc m16_inv = asm_f16_inv
 
 
 ; SDCC bridge for Classic

@@ -8,8 +8,8 @@ PUBLIC cm16_sccz80_sub
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 
-EXTERN asm_f24_neg
 EXTERN asm_f24_add_f24
+EXTERN asm_f24_neg
 
 .cm16_sccz80_sub
 

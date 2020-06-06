@@ -3,6 +3,8 @@ math/float/math16/lm16/c/sdcc/abs
 math/float/math16/lm16/c/sdcc/abs_fastcall
 math/float/math16/lm16/c/sdcc/ceil
 math/float/math16/lm16/c/sdcc/ceil_fastcall
+math/float/math16/lm16/c/sdcc/convert
+math/float/math16/lm16/c/sdcc/convert_fastcall
 math/float/math16/lm16/c/sdcc/div2
 math/float/math16/lm16/c/sdcc/div2_fastcall
 math/float/math16/lm16/c/sdcc/floor
@@ -17,6 +19,8 @@ math/float/math16/lm16/c/sdcc/mul2
 math/float/math16/lm16/c/sdcc/mul2_fastcall
 math/float/math16/lm16/c/sdcc/mul10
 math/float/math16/lm16/c/sdcc/mul10_fastcall
+math/float/math16/lm16/c/sdcc/neg
+math/float/math16/lm16/c/sdcc/neg_fastcall
 
 math/float/math16/lm16/c/sdcc/___h2schar
 math/float/math16/lm16/c/sdcc/___h2schar_callee

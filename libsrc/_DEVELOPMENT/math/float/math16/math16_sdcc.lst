@@ -17,6 +17,7 @@ math/float/math16/c/sdcc/cm16_sdcc_mul
 math/float/math16/c/sdcc/cm16_sdcc_mul2
 math/float/math16/c/sdcc/cm16_sdcc_mul10
 math/float/math16/c/sdcc/cm16_sdcc_mul_callee
+math/float/math16/c/sdcc/cm16_sdcc_neg
 math/float/math16/c/sdcc/cm16_sdcc_read
 math/float/math16/c/sdcc/cm16_sdcc_read_callee
 math/float/math16/c/sdcc/cm16_sdcc_sub

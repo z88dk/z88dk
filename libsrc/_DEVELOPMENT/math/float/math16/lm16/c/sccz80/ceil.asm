@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_math16
 	PUBLIC	m16_ceil
-	EXTERN	cm16_sccz80_ceil
+	EXTERN	asm_f16_ceil
 
-	defc	m16_ceil = cm16_sccz80_ceil
+	defc	m16_ceil = asm_f16_ceil
 
 
 ; SDCC bridge for Classic

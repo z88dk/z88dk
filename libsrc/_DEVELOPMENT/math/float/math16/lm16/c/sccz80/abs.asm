@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_math16
 	PUBLIC	m16_abs
-	EXTERN	cm16_sccz80_abs
+	EXTERN	asm_f16_abs
 
-	defc	m16_abs = cm16_sccz80_abs
+	defc	m16_abs = asm_f16_abs
 
 
 ; SDCC bridge for Classic
