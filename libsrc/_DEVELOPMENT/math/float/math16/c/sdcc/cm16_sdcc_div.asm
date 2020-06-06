@@ -8,8 +8,10 @@ PUBLIC cm16_sdcc_div
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 
-EXTERN asm_f24_inv
 EXTERN asm_f24_mul_f24
+EXTERN asm_f24_inv
+
+EXTERN cm16_sdcc_readr
 
 .cm16_sdcc_div
 
@@ -21,27 +23,19 @@ EXTERN asm_f24_mul_f24
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    pop bc                      ; pop return address
-    pop hl                      ; get left operand off of the stack
-    exx
-
-    pop hl                      ; get right operand off of the stack
-    push hl
-    exx
-
-    push hl                     ; left operand on stack
-    push bc                     ; return address on stack
-    exx
+    call cm16_sdcc_readr
 
     call asm_f24_f16            ; expand to dehl
     call asm_f24_inv            ; 1/y   d'  = eeeeeeee e' = s-------
     exx                         ;       hl' = 1mmmmmmm mmmmmmmm
     
+    pop bc                      ; pop return address
+    pop hl                      ; get left operand off of the stack
+    push hl                     ; left operand on stack
+    push bc                     ; return address on stack
     call asm_f24_f16            ; expand to dehl
                                 ; x      d  = eeeeeeee e  = s-------
                                 ;        hl = 1mmmmmmm mmmmmmmm
     call asm_f24_mul_f24
-    jp asm_f16_f24              ; enter stack = sdcc_half right, sdcc_half left, ret
-                                ;          HL = sdcc_half right
-                                ; return   HL = sdcc_half
+    jp asm_f16_f24              ; return   HL = sdcc_half
 

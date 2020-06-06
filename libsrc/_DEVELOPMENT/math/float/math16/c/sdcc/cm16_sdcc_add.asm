@@ -26,6 +26,7 @@ EXTERN asm_f24_add_f24
 
     pop hl                      ; get right operand off of the stack
     push hl
+
     call asm_f24_f16            ; expand to dehl  
     exx
 
@@ -37,7 +38,5 @@ EXTERN asm_f24_add_f24
                                 ; x      d  = eeeeeeee e  = s-------
                                 ;        hl = 1mmmmmmm mmmmmmmm
     call asm_f24_add_f24
-    jp asm_f16_f24              ; enter stack = sdcc_half right, sdcc_half left, ret
-                                ;        HL = sdcc_half right
-                                ; return HL = sdcc_half
+    jp asm_f16_f24              ; return HL = sdcc_half
 
