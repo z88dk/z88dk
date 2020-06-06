@@ -68,6 +68,9 @@ setup:
 
 
 bin/zsdcc$(EXESUFFIX):
+	@echo ""
+	@echo "--- Building module zsdcc ---"
+	@echo ""
 	svn checkout -r 11556 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
 	cd $(SDCC_PATH) && patch -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 	cd $(SDCC_PATH) && CC=$(OCC) ./configure \
@@ -84,52 +87,101 @@ bin/zsdcc$(EXESUFFIX):
 	$(RM) -fR $(SDCC_PATH)
 
 bin/appmake$(EXESUFFIX):
-	$(MAKE) -C src/appmake PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module appmake ---"
+	@echo ""
+	$(MAKE) -s -C src/appmake PREFIX=`pwd` install
 
 bin/z88dk-copt$(EXESUFFIX):
-	$(MAKE) -C src/copt PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module copt ---"
+	@echo ""
+	$(MAKE) -s -C src/copt PREFIX=`pwd` install
 
 bin/z88dk-ucpp$(EXESUFFIX):
-	$(MAKE) -C src/ucpp PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module ucpp ---"
+	@echo ""
+	$(MAKE) -s -C src/ucpp PREFIX=`pwd` install
 
 bin/z88dk-zcpp$(EXESUFFIX):
-	$(MAKE) -C src/cpp PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module cpp ---"
+	@echo ""
+	$(MAKE) -s -C src/cpp PREFIX=`pwd` install
 
 bin/sccz80$(EXESUFFIX):
-	$(MAKE) -C src/sccz80 PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module sccz80 ---"
+	@echo ""
+	$(MAKE) -s -C src/sccz80 PREFIX=`pwd` install
 
 bin/z80asm$(EXESUFFIX):
-	$(MAKE) -C src/z80asm PREFIX=`pwd` PREFIX_SHARE=`pwd` install
+	@echo ""
+	@echo "--- Building module z80asm ---"
+	@echo ""
+	$(MAKE) -s -C src/z80asm PREFIX=`pwd` PREFIX_SHARE=`pwd` install
 
 bin/zcc$(EXESUFFIX):
-	$(MAKE) -C src/zcc PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module zcc ---"
+	@echo ""
+	$(MAKE) -s -C src/zcc PREFIX=`pwd` install
 
 bin/z88dk-zpragma$(EXESUFFIX):
-	$(MAKE) -C src/zpragma PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module zpragma ---"
+	@echo ""
+	$(MAKE) -s -C src/zpragma PREFIX=`pwd` install
 
 bin/z88dk-zx7$(EXESUFFIX):
-	$(MAKE) -C src/zx7 PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module zx7 ---"
+	@echo ""
+	$(MAKE) -s -C src/zx7 PREFIX=`pwd` install
 
 bin/z80nm$(EXESUFFIX):
-	$(MAKE) -C src/z80nm PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module z80nm ---"
+	@echo ""
+	$(MAKE) -s -C src/z80nm PREFIX=`pwd` install
 
 bin/zobjcopy$(EXESUFFIX):
-	$(MAKE) -C src/zobjcopy PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module zobjcopy ---"
+	@echo ""
+	$(MAKE) -s -C src/zobjcopy PREFIX=`pwd` install
 
 bin/z88dk-z80svg$(EXESUFFIX):
-	$(MAKE) -C support/graphics PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module graphics ---"
+	@echo ""
+	$(MAKE) -s -C support/graphics PREFIX=`pwd` install
 
 bin/z88dk-basck$(EXESUFFIX):
-	$(MAKE) -C support/basck PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module basck ---"
+	@echo ""
+	$(MAKE) -s -C support/basck PREFIX=`pwd` install
 
 bin/z88dk-font2pv1000$(EXESUFFIX):
-	$(MAKE) -C support/pv1000 PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module pv1000 ---"
+	@echo ""
+	$(MAKE) -s -C support/pv1000 PREFIX=`pwd` install
 
 bin/z88dk-ticks$(EXESUFFIX):
-	$(MAKE) -C src/ticks PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module ticks ---"
+	@echo ""
+	$(MAKE) -s -C src/ticks PREFIX=`pwd` install
 
 bin/z88dk-lib$(EXESUFFIX):
-	$(MAKE) -C src/z88dk-lib PREFIX=`pwd` install
+	@echo ""
+	@echo "--- Building module z88dk-lib ---"
+	@echo ""
+	$(MAKE) -s -C src/z88dk-lib PREFIX=`pwd` install
+
 
 
 libs:
