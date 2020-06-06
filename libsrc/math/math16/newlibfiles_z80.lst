@@ -67,7 +67,6 @@
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/l_f16_ge.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/l_f16_gt.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/l_f16_inv.asm
-../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/l_f16_invf.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/l_f16_ldexp.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/l_f16_le.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/l_f16_lt.asm
