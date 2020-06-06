@@ -801,8 +801,7 @@ int mz_exec(char *target)
 
 		/* Deal with the filename */
 
-        // To Do - It seems very weird to pad the filename with CR's (ascii char 15 octal)
-        memset(name, '\r', sizeof(name)-1);
+        memset(name, '\15', sizeof(name)-1);
         name[sizeof(name)-1] = 0;
         memcpy(name, blockname, (strlen(blockname) < sizeof(name)-1) ? strlen(blockname) : sizeof(name)-1);
 
