@@ -66,9 +66,35 @@
 #define M_SQRT3    1.732051
 #define M_SQRT1_2  0.707107
 
+/* Conversion functions */
+extern half_t __LIB__ m16_f16_f32(float x);
+extern float __LIB__ m16_f32_f16(half_t x);
+
+extern int16_t __LIB__ m16_i16_f16(half_t x);
+extern uint16_t __LIB__ m16_u16_f16(half_t x);
+extern int32_t __LIB__ m16_i32_f16(half_t x);
+extern uint32_t __LIB__ m16_u32_f16(half_t x);
+
+extern half_t __LIB__ m16_f16_i8(int8_t x);
+extern half_t __LIB__ m16_f16_i16(int16_t x);
+extern half_t __LIB__ m16_f16_i32(int32_t x);
+extern half_t __LIB__ m16_f16_u8(uint8_t x);
+extern half_t __LIB__ m16_f16_u16(uint16_t x);
+extern half_t __LIB__ m16_f16_u32(uint32_t x);
+
+/* Arithmetic functions */
+extern half_t __LIB__ m16_add(half_t x,half_t y) __smallc;
+extern half_t __LIB__ m16_sub(half_t x,half_t y) __smallc;
+extern half_t __LIB__ m16_mul(half_t x,half_t y) __smallc;
+extern half_t __LIB__ m16_div(half_t x,half_t y) __smallc;
+
+extern half_t __LIB__ m16_fma(half_t x,half_t y,half_t z) __smallc;
 
 /* Power functions */
-extern half_t __LIB__ sqrt(half_t a);
+extern half_t __LIB__ sqrt(half_t x);
+extern half_t __LIB__ m16_div2(half_t x);
+extern half_t __LIB__ m16_mul2(half_t x);
+extern half_t __LIB__ m16_mul10(half_t x);
 
 /* Nearest integer, absolute value, and remainder functions */
 extern half_t __LIB__ ceil(half_t x);
@@ -88,6 +114,7 @@ extern half_t __LIB__ invsqrt(half_t a);
 
 /* General */
 extern half_t __LIB__ abs(half_t x);
+extern half_t __LIB__ neg(half_t x);
 
 /* Classification functions */
 #define FP_NORMAL   0

@@ -578,24 +578,30 @@ extern half_t m16_f16_u32_fastcall(uint32_t x) __z88dk_fastcall;
 
 
 
-extern half_t m16_add(half_t y,half_t x);
-extern half_t m16_add_callee(half_t y,half_t x) __z88dk_callee;
+extern half_t m16_add(half_t x,half_t y);
+extern half_t m16_add_callee(half_t x,half_t y) __z88dk_callee;
 #define m16_add(a,b) m16_add_callee(a,b)
 
 
-extern half_t m16_sub(half_t y,half_t x);
-extern half_t m16_sub_callee(half_t y,half_t x) __z88dk_callee;
+extern half_t m16_sub(half_t x,half_t y);
+extern half_t m16_sub_callee(half_t x,half_t y) __z88dk_callee;
 #define m16_sub(a,b) m16_sub_callee(a,b)
 
 
-extern half_t m16_mul(half_t y,half_t x);
-extern half_t m16_mul_callee(half_t y,half_t x) __z88dk_callee;
+extern half_t m16_mul(half_t x,half_t y);
+extern half_t m16_mul_callee(half_t x,half_t y) __z88dk_callee;
 #define m16_mul(a,b) m16_mul_callee(a,b)
 
 
-extern half_t m16_div(half_t y,half_t x);
-extern half_t m16_div_callee(half_t y,half_t x) __z88dk_callee;
+extern half_t m16_div(half_t x,half_t y);
+extern half_t m16_div_callee(half_t x,half_t y) __z88dk_callee;
 #define m16_div(a,b) m16_div_callee(a,b)
+
+
+
+extern half_t m16_fma(half_t x,half_t y,half_t z);
+extern half_t m16_fma_callee(half_t x,half_t y,half_t z) __z88dk_callee;
+#define m16_fma(a,b,c) m16_fma_callee(a,b,c)
 
 
 
@@ -631,8 +637,8 @@ extern half_t m16_mul10_fastcall(half_t x) __z88dk_fastcall;
 #define m16_mul10(a) m16_mul10_fastcall(a)
 
 
-extern half_t m16_frexp(half_t value,int8_t *exp);
-extern half_t m16_frexp_callee(half_t value,int8_t *exp) __z88dk_callee;
+extern half_t m16_frexp(half_t x,int8_t *exp);
+extern half_t m16_frexp_callee(half_t x,int8_t *exp) __z88dk_callee;
 #define m16_frexp(a,b) m16_frexp_callee(a,b)
 
 
@@ -691,17 +697,6 @@ extern int m16_islessgreater_callee(half_t x,half_t y) __z88dk_callee;
 extern int m16_isunordered(half_t x,half_t y);
 extern int m16_isunordered_callee(half_t x,half_t y) __z88dk_callee;
 #define m16_isunordered(a,b) m16_isunordered_callee(a,b)
-
-
-
-extern half_t m16_fma(half_t x,half_t y,half_t z);
-extern half_t m16_fma_callee(half_t x,half_t y,half_t z) __z88dk_callee;
-#define m16_fma(a,b,c) m16_fma_callee(a,b,c)
-
-
-extern double_t m16_poly(const half_t x,const half_t d[],unsigned int n);
-extern double_t m16_poly_callee(const half_t x,const half_t d[],unsigned int n) __z88dk_callee;
-#define m16_poly(a,b,c) m16_poly_callee(a,b,c)
 
 
 

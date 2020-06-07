@@ -416,16 +416,20 @@ extern half_t m16_f16_u32(uint32_t x);
 
 
 
-extern half_t m16_add(half_t y,half_t x);
+extern half_t m16_add(half_t x,half_t y);
 
 
-extern half_t m16_sub(half_t y,half_t x);
+extern half_t m16_sub(half_t x,half_t y);
 
 
-extern half_t m16_mul(half_t y,half_t x);
+extern half_t m16_mul(half_t x,half_t y);
 
 
-extern half_t m16_div(half_t y,half_t x);
+extern half_t m16_div(half_t x,half_t y);
+
+
+
+extern half_t m16_fma(half_t x,half_t y,half_t z);
 
 
 
@@ -449,7 +453,7 @@ extern half_t m16_mul2(half_t x);
 extern half_t m16_mul10(half_t x);
 
 
-extern half_t m16_frexp(half_t value,int8_t *exp);
+extern half_t m16_frexp(half_t x,int8_t *exp);
 
 
 extern half_t m16_ldexp(half_t x,int16_t exp);
@@ -485,13 +489,6 @@ extern int m16_islessgreater(half_t x,half_t y);
 
 
 extern int m16_isunordered(half_t x,half_t y);
-
-
-
-extern half_t m16_fma(half_t x,half_t y,half_t z);
-
-
-extern double_t m16_poly(const half_t x,const half_t d[],unsigned int n);
 
 
 

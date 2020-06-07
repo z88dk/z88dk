@@ -252,10 +252,12 @@ __DPROTO(,,half_t,,m16_f16_u8,uint8_t x)
 __DPROTO(,,half_t,,m16_f16_u16,uint16_t x)
 __DPROTO(,,half_t,,m16_f16_u32,uint32_t x)
 
-__DPROTO(,,half_t,,m16_add,half_t y,half_t x)
-__DPROTO(,,half_t,,m16_sub,half_t y,half_t x)
-__DPROTO(,,half_t,,m16_mul,half_t y,half_t x)
-__DPROTO(,,half_t,,m16_div,half_t y,half_t x)
+__DPROTO(,,half_t,,m16_add,half_t x,half_t y)
+__DPROTO(,,half_t,,m16_sub,half_t x,half_t y)
+__DPROTO(,,half_t,,m16_mul,half_t x,half_t y)
+__DPROTO(,,half_t,,m16_div,half_t x,half_t y)
+
+__DPROTO(,,half_t,,m16_fma,half_t x,half_t y,half_t z)
 
 __DPROTO(,,half_t,,m16_inv,half_t x)
 __DPROTO(,,half_t,,m16_invsqrt,half_t x)
@@ -265,7 +267,7 @@ __DPROTO(,,half_t,,m16_sqrt,half_t x)
 __DPROTO(,,half_t,,m16_div2,half_t x)
 __DPROTO(,,half_t,,m16_mul2,half_t x)
 __DPROTO(,,half_t,,m16_mul10,half_t x)
-__DPROTO(,,half_t,,m16_frexp,half_t value,int8_t *exp)
+__DPROTO(,,half_t,,m16_frexp,half_t x,int8_t *exp)
 __DPROTO(,,half_t,,m16_ldexp,half_t x,int16_t exp)
 
 __DPROTO(,,half_t,,m16_abs,half_t x)
@@ -279,9 +281,6 @@ __DPROTO(,,int,,m16_isless,half_t x,half_t y)
 __DPROTO(,,int,,m16_islessequal,half_t x,half_t y)
 __DPROTO(,,int,,m16_islessgreater,half_t x,half_t y)
 __DPROTO(,,int,,m16_isunordered,half_t x,half_t y)
-
-__DPROTO(,,half_t,,m16_fma,half_t x,half_t y,half_t z)
-__DPROTO(,,double_t,,m16_poly, const half_t x, const half_t d[], unsigned int n)
 
 #endif
 
