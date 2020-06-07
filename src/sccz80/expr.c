@@ -66,7 +66,7 @@ int heir1(LVALUE* lval)
         setstage(&before1, &start1);
         if (heir1(&lval2))
             rvalue(&lval2);
-            
+
         /* If it's a const, then load it with the right type */
         if ( lval2.is_const ) {
             /* This leaves the double with a count of 2 */
@@ -89,7 +89,7 @@ int heir1(LVALUE* lval)
             if (  rhs->kind == KIND_ARRAY ) {
                 rhs = make_pointer(rhs->ptr);
             }
-            
+
             if ( type_matches(lval->ltype, rhs) == 0 && lval->ltype->ptr->kind != KIND_VOID && 
                     ! (ispointer(rhs) && rhs->ptr->kind == KIND_VOID) )  {
                 if ( ispointer(lval->ltype) && lval2.is_const && lval2.const_val == 0 ) {
@@ -120,7 +120,7 @@ int heir1(LVALUE* lval)
             if ( lval2.ltype->kind != KIND_STRUCT ) {
                 errorfmt("Cannot assign to aggregate",0);
             }
-        } 
+        }
         if ( lval2.ltype->kind == KIND_VOID ) {
             warningfmt("void","Assigning from a void expression");
         }
@@ -161,7 +161,7 @@ int heir1(LVALUE* lval)
     } else if (match("<<=")) {
         oper = asl;
         constoper = asl_const;
-    } else 
+    } else
         return k;
 
     /* if we get here we have an oper= */
@@ -258,7 +258,7 @@ int heir1a(LVALUE* lval)
             postlabel(endlab);
             widenlong(lval, &lval2);
             lval->val_type = KIND_LONG;
-            lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;            
+            lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             postlabel(skiplab);
         } else
             postlabel(endlab);
@@ -459,7 +459,7 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
     }
 
     lval->ltype = lval->ltype->ptr;
-    if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR ) 
+    if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR )
         lval->ptr_type = KIND_NONE;
     else
         lval->ptr_type = lval->ltype->ptr->kind;
@@ -567,7 +567,7 @@ int heira(LVALUE *lval)
 
         if (lval->symbol) {
             lval->symbol->isassigned = YES;
-        } 
+        }
         if (lval->indirect_kind)
             return 0;
         /* global & non-array */
@@ -584,7 +584,7 @@ int heira(LVALUE *lval)
     } else if (match("--")) {
         poststep(k, lval, -1, dec, inc);
         return 0;
-    } 
+    }
     return k;
 }
 
@@ -595,13 +595,12 @@ int heirb(LVALUE* lval)
     char sname[NAMESIZE];
     double dval;
     int val, con, direct, k;
-    Kind valtype;
+    // Kind valtype;
     char flags;
     SYMBOL* ptr = NULL;
 
     setstage(&before1, &start1);
 
-    
     k = primary(lval);
     ptr = lval->symbol;
     blanks();
@@ -609,7 +608,7 @@ int heirb(LVALUE* lval)
         while (1) {
             if (cmatch('[')) {
                 Type *type;
-                
+
                 if (k && ispointer(lval->ltype)) {
                     rvalue(lval);
                 } else if ( !ispointer(lval->ltype) && lval->ltype->kind != KIND_ARRAY) {
@@ -622,7 +621,8 @@ int heirb(LVALUE* lval)
                 if (lval->ltype->kind == KIND_CPTR)
                     zpushde();
                 zpush();
-                valtype = expression(&con, &dval, &type);
+                // valtype = expression(&con, &dval, &type);
+                expression(&con, &dval, &type);
                 // TODO: Check valtype
                 val = dval;
                 needchar(']');
@@ -635,7 +635,6 @@ int heirb(LVALUE* lval)
                     }
                     cscale(lval->ltype, &val);
                     val += lval->offset;
-                    
 
                     if (ptr && ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY && ptr->ctype->kind != KIND_PTR) {
                         /* constant offset to array on stack */
@@ -702,8 +701,8 @@ int heirb(LVALUE* lval)
                     } else {
                         callfunction(ptr,NULL);
                     }
-                    return_type = lval->ltype->return_type;      
-                    flags = lval->ltype->flags;                    
+                    return_type = lval->ltype->return_type;
+                    flags = lval->ltype->flags;
                 } else {
                     // No idea what you are doing, calling a non pointer
                     errorfmt("Calling a non-pointer function?",1);
@@ -752,7 +751,7 @@ int heirb(LVALUE* lval)
                         errorfmt("%s", 1, utstring_body(us));
                         utstring_free(us);
                         direct = 0;
-                    } 
+                    }
                     str = str->ptr->tag;
                 } else {
                     if ( direct == 0 ) {
@@ -769,7 +768,6 @@ int heirb(LVALUE* lval)
                     // TODO: Warning
                     str = str->tag;
                 }
-            
 
                 if (str == NULL ) {
                     errorfmt("Non struct type can't take member", 1);

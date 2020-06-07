@@ -1024,6 +1024,9 @@ void dpush_under(int val_type)
             swapstk(); /* MSW -> stack, addr -> hl */
             zpushde(); /* LSW -> stack, addr = hl */
             zpush();
+        } else if (c_fp_size == 2 ) {
+            swapstk(); /* float -> stack, addr -> hl */
+            zpush();
         } else {
             callrts("dpush_under_int");
             Zsp -= c_fp_size;
@@ -1322,7 +1325,7 @@ void point(void)
  */
 void leave(Kind vartype, char type, int incritical)
 {
-    int savesp;
+    // int savesp;
     Kind save = vartype;
     int callee_cleanup = (currfn->ctype->flags & CALLEE) && (stackargs > 2);
 
@@ -1348,7 +1351,7 @@ void leave(Kind vartype, char type, int incritical)
     if (callee_cleanup) {
         int bcused = 0;
 
-        savesp = Zsp;
+        // savesp = Zsp;
         Zsp = -stackargs;
 
         if ( c_notaltreg && ( vartype != KIND_NONE && vartype != KIND_DOUBLE) && abs(Zsp) >= 11 ) {

@@ -336,12 +336,13 @@ Type *doexpr()
     char *before, *start;
     double val;
     int    vconst;
-    Kind    type;
+    // Kind    type;
     Type   *type_ptr;
-    
+
     while (1) {
         setstage(&before, &start);
-        type = expression(&vconst, &val, &type_ptr);
+        // type = expression(&vconst, &val, &type_ptr);
+        expression(&vconst, &val, &type_ptr);
         clearstage(before, start);
         if (ch() != ',')
             return type_ptr;
