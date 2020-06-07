@@ -43,6 +43,7 @@ section code_font_fzx
 section code_fp_genmath
 section code_fp_math48
 section code_fp_math32
+section code_fp_math16
 section code_im2
 section code_input
 section code_inttypes

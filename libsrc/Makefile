@@ -32,7 +32,7 @@ all: genlibs z88libs tilibs zxlibs enterprise_clib.lib c128ansi_clib.lib nclibs 
 	kramermc_clib.lib hgmc_clib.lib pmd85_clib.lib vector06c_clib.lib homelab_clib.lib m100_clib.lib \
 	homelab2_clib.lib primo_clib.lib mikro80_clib.lib special_clib.lib
 
-genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math32.lib gendos.lib ndos.lib  \
+genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math16.lib math32.lib gendos.lib ndos.lib  \
 	 lib3d.lib fastmath.lib
 
 
@@ -103,6 +103,13 @@ mbf32.lib:
 	@echo ''
 	$(MAKE) -C math/mbf32
 
+# math16 build - @feilipu
+math16.lib:
+	@echo ''
+	@echo '--- Building IEEE Half Precision Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/math16
+	
 # math32 build - @feilipu
 math32.lib:
 	@echo ''

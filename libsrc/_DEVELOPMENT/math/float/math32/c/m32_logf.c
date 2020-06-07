@@ -27,7 +27,7 @@
  *
  * In the tests over the interval [1, MAXNUM], the logarithms
  * of the random arguments were uniformly distributed over
- * [0, MAXLOGF].
+ * [0, MAXLOG_F].
  *
  * ERROR MESSAGES:
  *
@@ -55,7 +55,7 @@ float m32_logf (float x) __z88dk_fastcall
     /* Test for domain */
     if( x <= 0.0 )
     {
-        return( HUGE_NEGF );
+        return( HUGE_NEG_F );
     }
 
     x = m32_frexpf(x, &e);

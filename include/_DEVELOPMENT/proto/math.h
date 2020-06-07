@@ -51,6 +51,13 @@ include(__link__.m4)
    
 #endif
 
+#ifndef _HALF_FLOAT_T
+#define _HALF_FLOAT_T
+
+typedef short half_t;           /* IEEE16 half float type */
+
+#endif
+
 // XSI EXTENSION
 // temporary : math lib should supply these via func call
 
@@ -101,15 +108,39 @@ include(__link__.m4)
 
 #ifdef __MATH_MATH32
 
-#define HUGE_POSF              (float)+3.4028234664E+38
-#define TINY_POSF              (float)+1.1754943508E−38
-#define HUGE_NEGF              (float)-1.7014118346E+38
-#define TINY_NEGF              (float)-1.1754943508E-38
+#define HUGE_POS_F             (float)+3.4028234664E+38
+#define TINY_POS_F             (float)+1.1754943508E−38
+#define HUGE_NEG_F             (float)-1.7014118346E+38
+#define TINY_NEG_F             (float)-1.1754943508E-38
 
-#define MAXL2F                 ((float)+127.999999914)
-#define MINL2F                 ((float)-126.0)
-#define MAXL10F                ((float)+38.230809449)
-#define MINL10F                ((float)−37.929779454)
+#define INFINITY_POS_F         ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F         ((unsigned long)0xFF800000)
+
+#define MAXL2_F                ((float)+127.999999914)
+#define MINL2_F                ((float)-126.0)
+#define MAXLOG_F               ((float)+88.722839052)
+#define MINLOG_F               ((float)−87.336544751)
+#define MAXL10_F               ((float)+38.230809449)
+#define MINL10_F               ((float)−37.929779454)
+
+#endif
+
+#ifdef __MATH_MATH16
+
+#define HUGE_POS_HF            (short)0x7BFF        /*  +6.5504E+4 */
+#define TINY_POS_HF            (short)0x0400        /*  +6.1035E-5 */
+#define HUGE_NEG_HF            (short)0xFBFF        /*  -6.5504E+4 */
+#define TINY_NEG_HF            (short)0x8400        /*  -6.1035E-5 */
+
+#define INFINITY_POS_HF        (short)0x7C00
+#define INFINITY_NEG_HF        (short)0xFC00
+
+#define MAXL2_HF               (short)0x4BFF        /*  +15.99    */
+#define MINL2_HF               (short)0xCB00        /*  -14.00    */
+#define MAXLOG_HF              (short)0x498B        /*  +11.086   */
+#define MINLOG_HF              (short)0xC8DA        /*  -9.700    */       
+#define MAXL10_HF              (short)0x44D1        /*  +4.816    */
+#define MINL10_HF              (short)0xC437        /*  -4.215    */
 
 #endif
 
@@ -136,15 +167,14 @@ __DPROTO(,,double_t,,expm1,double_t x)
 __DPROTO(,,double_t,,frexp,double_t value,int *exp)
 __DPROTO(,,int,,ilogb,double_t x)
 __DPROTO(,,double_t,,ldexp,double_t x,int exp)
+__DPROTO(,,double_t,,scalbn,double_t x,int n)	
+__DPROTO(,,double_t,,scalbln,double_t x,int n)
 
 __DPROTO(,,double_t,,log,double_t x)
 __DPROTO(,,double_t,,log10,double_t x)
 __DPROTO(,,double_t,,log1p,double_t x)
 __DPROTO(,,double_t,,log2,double_t x)
 __DPROTO(,,double_t,,logb,double_t x)
-
-__DPROTO(,,double_t,,scalbn,double_t x,int n)
-__DPROTO(,,double_t,,scalbln,double_t x,int n)
 
 __DPROTO(,,double_t,,fabs,double_t x)
 __DPROTO(,,double_t,,hypot,double_t x,double_t y)
@@ -205,6 +235,55 @@ __DPROTO(,,double_t,,poly, const float x, const float d[], unsigned int n)
 
 #endif
 
+#ifdef __MATH_MATH16
+
+__DPROTO(,,half_t,,m16_f16_f32,float x)
+__DPROTO(,,float,,m16_f32_f16,half_t x)
+
+__DPROTO(,,int16_t,,m16_i16_f16,half_t x)
+__DPROTO(,,uint16_t,,m16_u16_f16,half_t x)
+__DPROTO(,,int32_t,,m16_i32_f16,half_t x)
+__DPROTO(,,uint32_t,,m16_u32_f16,half_t x)
+
+__DPROTO(,,half_t,,m16_f16_i8,int8_t x)
+__DPROTO(,,half_t,,m16_f16_i16,int16_t x)
+__DPROTO(,,half_t,,m16_f16_i32,int32_t x)
+__DPROTO(,,half_t,,m16_f16_u8,uint8_t x)
+__DPROTO(,,half_t,,m16_f16_u16,uint16_t x)
+__DPROTO(,,half_t,,m16_f16_u32,uint32_t x)
+
+__DPROTO(,,half_t,,m16_add,half_t x,half_t y)
+__DPROTO(,,half_t,,m16_sub,half_t x,half_t y)
+__DPROTO(,,half_t,,m16_mul,half_t x,half_t y)
+__DPROTO(,,half_t,,m16_div,half_t x,half_t y)
+
+__DPROTO(,,half_t,,m16_fma,half_t x,half_t y,half_t z)
+
+__DPROTO(,,half_t,,m16_inv,half_t x)
+__DPROTO(,,half_t,,m16_invsqrt,half_t x)
+
+__DPROTO(,,half_t,,m16_sqrt,half_t x)
+
+__DPROTO(,,half_t,,m16_div2,half_t x)
+__DPROTO(,,half_t,,m16_mul2,half_t x)
+__DPROTO(,,half_t,,m16_mul10,half_t x)
+__DPROTO(,,half_t,,m16_frexp,half_t x,int8_t *exp)
+__DPROTO(,,half_t,,m16_ldexp,half_t x,int16_t exp)
+
+__DPROTO(,,half_t,,m16_abs,half_t x)
+__DPROTO(,,half_t,,m16_neg,half_t x)
+__DPROTO(,,half_t,,m16_ceil,half_t x)
+__DPROTO(,,half_t,,m16_floor,half_t x)
+
+__DPROTO(,,int,,m16_isgreater,half_t x,half_t y)
+__DPROTO(,,int,,m16_isgreaterequal,half_t x,half_t y)
+__DPROTO(,,int,,m16_isless,half_t x,half_t y)
+__DPROTO(,,int,,m16_islessequal,half_t x,half_t y)
+__DPROTO(,,int,,m16_islessgreater,half_t x,half_t y)
+__DPROTO(,,int,,m16_isunordered,half_t x,half_t y)
+
+#endif
+
 // NO DISTINCTION BETWEEN FLOAT AND DOUBLE
 
 #define acosf        acos
@@ -226,15 +305,16 @@ __DPROTO(,,double_t,,poly, const float x, const float d[], unsigned int n)
 
 #define expf         exp
 #define exp2f        exp2
+#define exp10f       exp10
 #define expm1f       expm1
 #define frexpf       frexp
 #define ilogbf       ilogb
 #define ldexpf       ldexp
 
 #define logf         log
+#define log2f        log2
 #define log10f       log10
 #define log1pf       log1p
-#define log2f        log2
 #define logbf        logb
 
 #define scalbnf      scalbn

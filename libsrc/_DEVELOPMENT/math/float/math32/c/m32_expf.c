@@ -37,8 +37,8 @@
  * ERROR MESSAGES:
  *
  *   message         condition      value returned
- * expf underflow    x < MINLOGF         0.0
- * expf overflow     x > MAXLOGF         MAXNUMF
+ * expf underflow    x < MINLOG_F        0.0
+ * expf overflow     x > MAXLOG_F      HUGE_POS_F
  *
  */
  
@@ -60,12 +60,12 @@ float m32_expf(float x) __z88dk_fastcall
 {
     float z;
 #if 0
-    if( x > MAXLOGF)
+    if( x > MAXLOG_F)
     {
-        return( HUGE_POSF );
+        return( HUGE_POS_F );
     }
 
-    if( x < MINLOGF )
+    if( x < MINLOG_F )
     {
         return(0.0);
     }

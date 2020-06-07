@@ -18,5 +18,6 @@ ALIAS   --math-bbc      -Cc-fp-mode=z88 -lbbc_math
 #
 # Math library aliases (classic + newlib)
 #
+ALIAS   --math16                -Cc-fp-mode=ieee -Cc-D__MATH_MATH16 -D__MATH_MATH16 -lmath16 -pragma-define:CLIB_16BIT_FLOAT=1
 ALIAS   --math32                -Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32 -pragma-define:CLIB_32BIT_FLOAT=1
 

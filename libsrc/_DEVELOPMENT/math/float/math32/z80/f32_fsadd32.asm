@@ -51,7 +51,7 @@ EXTERN m32_fsnormalize32
 PUBLIC m32_fsadd24x32, m32_fsadd32x32
 
 
-; enter here for floating add32+32, x+y, x on stack, y in bcde, result in bcde
+; enter here for floating add32+32, x+y, x on stack, y in dehl, result in dehl
 .m32_fsadd32x32
     ex de,hl                    ; dehl -> hlde
     ld a,c                      ; place op1.s in a[7]
