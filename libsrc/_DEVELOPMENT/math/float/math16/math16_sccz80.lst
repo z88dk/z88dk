@@ -4,6 +4,8 @@ math/float/math16/c/sccz80/cm16_sccz80_add_callee
 math/float/math16/c/sccz80/cm16_sccz80_classify
 math/float/math16/c/sccz80/cm16_sccz80_div
 math/float/math16/c/sccz80/cm16_sccz80_div_callee
+math/float/math16/c/sccz80/cm16_sccz80_fma
+math/float/math16/c/sccz80/cm16_sccz80_fma_callee
 math/float/math16/c/sccz80/cm16_sccz80_frexp
 math/float/math16/c/sccz80/cm16_sccz80_frexp_callee
 math/float/math16/c/sccz80/cm16_sccz80_ldexp

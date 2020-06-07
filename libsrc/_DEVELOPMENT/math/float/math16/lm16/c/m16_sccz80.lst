@@ -3,6 +3,8 @@ math/float/math16/lm16/c/sccz80/abs
 math/float/math16/lm16/c/sccz80/ceil
 math/float/math16/lm16/c/sccz80/div2
 math/float/math16/lm16/c/sccz80/floor
+math/float/math16/lm16/c/sccz80/fma
+math/float/math16/lm16/c/sccz80/fma_callee
 math/float/math16/lm16/c/sccz80/frexp
 math/float/math16/lm16/c/sccz80/frexp_callee
 math/float/math16/lm16/c/sccz80/inv

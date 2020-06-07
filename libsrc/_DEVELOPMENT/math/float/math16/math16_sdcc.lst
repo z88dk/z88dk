@@ -7,6 +7,8 @@ math/float/math16/c/sdcc/cm16_sdcc_classify
 math/float/math16/c/sdcc/cm16_sdcc_div
 math/float/math16/c/sdcc/cm16_sdcc_div2
 math/float/math16/c/sdcc/cm16_sdcc_div_callee
+math/float/math16/c/sdcc/cm16_sdcc_fma
+math/float/math16/c/sdcc/cm16_sdcc_fma_callee
 math/float/math16/c/sdcc/cm16_sdcc_floor
 math/float/math16/c/sdcc/cm16_sdcc_frexp
 math/float/math16/c/sdcc/cm16_sdcc_frexp_callee

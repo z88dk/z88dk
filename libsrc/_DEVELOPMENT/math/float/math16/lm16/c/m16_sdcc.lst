@@ -9,6 +9,8 @@ math/float/math16/lm16/c/sdcc/div2
 math/float/math16/lm16/c/sdcc/div2_fastcall
 math/float/math16/lm16/c/sdcc/floor
 math/float/math16/lm16/c/sdcc/floor_fastcall
+math/float/math16/lm16/c/sdcc/fma
+math/float/math16/lm16/c/sdcc/fma_callee
 math/float/math16/lm16/c/sdcc/frexp
 math/float/math16/lm16/c/sdcc/frexp_callee
 math/float/math16/lm16/c/sdcc/inv
