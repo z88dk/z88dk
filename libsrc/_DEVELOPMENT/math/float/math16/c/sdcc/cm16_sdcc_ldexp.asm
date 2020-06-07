@@ -3,12 +3,11 @@ SECTION code_fp_math16
 
 PUBLIC cm16_sdcc_ldexp
 
-EXTERN asm_f16_ldexp_callee
+EXTERN asm_f16_ldexp
 
-; half_t ldexpf(half_t x, int16_t pw2);
+; half_t ldexp(half_t x, int16_t pw2);
 
 .cm16_sdcc_ldexp
-
     ; Entry:
     ; Stack: int right, half_t left, ret
 
@@ -19,6 +18,5 @@ EXTERN asm_f16_ldexp_callee
     push bc                     ; int
     push hl                     ; half_t
     push de                     ; my return
-    jp asm_f16_ldexp_callee
+    jp asm_f16_ldexp
 
-    

@@ -3,9 +3,9 @@ SECTION code_fp_math16
 
 PUBLIC cm16_sccz80_ldexp_callee
 
-EXTERN asm_f16_ldexp_callee
+EXTERN asm_f16_ldexp
 
-; half_t ldexpf(half_t x, int16_t pw2);
+; half_t ldexp(half_t x, int16_t pw2);
 
 .cm16_sccz80_ldexp_callee
     ; Entry:
@@ -16,5 +16,5 @@ EXTERN asm_f16_ldexp_callee
     pop bc                      ;int
     pop hl                      ;half_t
     push de                     ;my return
-    jp asm_f16_ldexp_callee
+    jp asm_f16_ldexp
 
