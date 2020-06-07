@@ -7,20 +7,21 @@ PUBLIC cm32_sdcc_read1
 
 .cm16_sdcc_readr
 
-    ; sdcc half primitive
-    ; Read right sdcc half from the stack
+    ; sdcc half_t primitive
+    ; Read right sdcc half_t from the stack
     ;
-    ; Convert from sdcc_half calling to f16 half.
+    ; Convert from sdcc_half calling to f16 half_t.
     ;
     ; enter : stack = sdcc_half right, sdcc_half left, ret1, ret0
     ;
     ; exit  : stack = sdcc_half right, sdcc_half left, ret1
     ;          DEHL = sdcc_half right
     ; 
-    ; uses  : f, bc, de, hl
+    ; uses  : f, de, hl
 
     ld hl,6                     ; stack sdcc_half right
     add hl,sp
+
     ld e,(hl)
     inc hl
     ld d,(hl)                   ; DE = sdcc_float
@@ -29,20 +30,21 @@ PUBLIC cm32_sdcc_read1
 
 .cm16_sdcc_read1
 
-    ; sdcc half primitive
-    ; Read left / single sdcc half from the stack
+    ; sdcc half_t primitive
+    ; Read left / single sdcc half_t from the stack
     ;
-    ; Convert from sdcc_half calling to f16 half.
+    ; Convert from sdcc_half calling to f16 half_t.
     ;
     ; enter : stack = sdcc_half, ret1, ret0
     ;
     ; exit  : stack = sdcc_half, ret1
     ;          DEHL = sdcc_half
     ; 
-    ; uses  : f, bc, de, hl
+    ; uses  : f, de, hl
 
     ld hl,4                     ; stack sdcc_half
     add hl,sp
+
     ld e,(hl)
     inc hl
     ld d,(hl)                   ; DE = sdcc_float

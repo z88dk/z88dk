@@ -6,15 +6,15 @@ PUBLIC cm16_sdcc_read1_callee
 
 .cm16_sdcc_readr_callee
 
-    ; sdcc half primitive
-    ; Read right sdcc half from the stack
+    ; sdcc half_t primitive
+    ; Read right sdcc half_t from the stack
     ;
     ; enter : stack = sdcc_half right, sdcc_half left, ret1, ret0
     ;
     ; exit  : sdcc_half left, ret1
     ;         HL = sdcc_half right
     ; 
-    ; uses  : af, bc, de, hl, bc', de', hl'
+    ; uses  : af, bc, de, hl
 
     pop af                      ; my return
     pop bc                      ; ret 1
@@ -26,8 +26,8 @@ PUBLIC cm16_sdcc_read1_callee
     ret
 
 .cm16_sdcc_read1_callee
-    ; sdcc half primitive
-    ; Read a single sdcc half from the stack
+    ; sdcc half_t primitive
+    ; Read a single sdcc half_t from the stack
     ;
     ; enter : stack = sdcc_half, ret1, ret0
     ;

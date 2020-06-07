@@ -18,21 +18,19 @@ EXTERN asm_f16_zero
 
 PUBLIC asm_f16_ldexp_callee
 
-; half ldexpf (half x, int16_t pw2);
+; half_t ldexpf (half_t x, int16_t pw2);
 .asm_f16_ldexp_callee
     ; evaluation of fraction and exponent
     ;
-    ; enter : stack = int16_t pw2, half x, ret
+    ; enter : stack : ret
+    ;            bc : int16_t   pw2
+    ;            hl : half_t      x
     ;
-    ; exit  :   hl  = 16-bit result
-    ;         carry reset
+    ; exit  :    hl = 16-bit result
+    ;            carry reset
+    ;
     ;
     ; uses  : af, bc, de, hl
-
-    pop af                      ; return
-    pop hl                      ; (half)x in hl
-    pop bc                      ; pw2 maximum int8_t actually
-    push af                     ; return on stack
 
     call asm_f24_f16            ; convert to expanded format
 
@@ -42,5 +40,5 @@ PUBLIC asm_f16_ldexp_callee
 
     add c                       ; pw2
     ld d,a                      ; exponent returned
-    jp asm_f16_f24              ; return IEEE HL
+    jp asm_f16_f24              ; return IEEE HL half_t
 

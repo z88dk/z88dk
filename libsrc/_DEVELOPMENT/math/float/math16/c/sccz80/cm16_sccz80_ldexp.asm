@@ -5,24 +5,19 @@ PUBLIC cm16_sccz80_ldexp
 
 EXTERN asm_f16_ldexp_callee
 
-; half ldexpf(half x, int16_t pw2);
+; half_t ldexpf(half_t x, int16_t pw2);
 
 .cm16_sccz80_ldexp
 
     ; Entry:
-    ; Stack: half left, int right, ret
+    ; Stack: half_t left, int right, ret
     ; Reverse the stack
-    pop af                      ;my return
+    pop de                      ;my return
     pop bc                      ;int
-    pop hl                      ;half
-    push af                     ;my return
-    push bc                     ;int
-    push hl                     ;half
-    call asm_f16_ldexp_callee
+    pop hl                      ;half_t
 
-    pop af                      ;my return
-    push af
-    push af
-    push af
-    ret
+    push hl                     ;half_t
+    push bc                     ;int
+    push de                     ;my return
+    jp asm_f16_ldexp_callee
 

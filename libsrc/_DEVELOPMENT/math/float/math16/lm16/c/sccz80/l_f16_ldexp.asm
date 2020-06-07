@@ -6,15 +6,15 @@ SECTION code_fp_math16
 
 PUBLIC  l_f16_ldexp
 
-EXTERN asm_f16_zero
-
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 
-; Entry: hl = float, a = adjustment for exponent
+EXTERN asm_f16_zero
+
+; Entry: hl = half_t, a = adjustment for exponent
 ;        stack = ret
 ;
-; Exit:  dehl = adjusted float
+; Exit:  hl = adjusted half_t
 
 .l_f16_ldexp
     ld b,a                      ; save exponent adjustment
@@ -26,5 +26,5 @@ EXTERN asm_f16_f24
     
     add a,b                     ; pw2
     ld d,a                      ; exponent returned
-    jp asm_f16_f24              ; return IEEE HL
+    jp asm_f16_f24              ; return IEEE HL half_t
 

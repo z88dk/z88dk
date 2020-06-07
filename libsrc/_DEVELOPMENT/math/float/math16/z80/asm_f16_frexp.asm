@@ -16,21 +16,18 @@ EXTERN asm_f16_f24
 
 PUBLIC asm_f16_frexp_callee
 
-; half frexpf (half x, int *pw2);
+; half_t frexpf (half_t x, int *pw2);
 .asm_f16_frexp_callee
     ; evaluation of fraction and exponent
     ;
-    ; enter : stack =  int16_t *pw2, half x,ret
+    ; enter : stack : ret
+    ;            bc : int16_t  *pw2
+    ;            hl : half_t      x
     ;
-    ; exit  : hl  = 16-bit result
-    ;         carry reset
+    ; exit  :    hl = 16-bit result
+    ;            carry reset
     ;
     ; uses  : af, bc, de, hl
-
-    pop af                      ; return
-    pop hl                      ; (half)x in hl
-    pop bc                      ; (int16_t*)pw2
-    push af                     ; return on stack
 
     call asm_f24_f16            ; convert to expanded format
 
@@ -47,5 +44,5 @@ PUBLIC asm_f16_frexp_callee
     sbc  a
     ld  (bc),a
 
-    jp asm_f16_f24              ; return IEEE HL fraction
+    jp asm_f16_f24              ; return IEEE HL half_t fraction
 

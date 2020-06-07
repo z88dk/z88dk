@@ -5,10 +5,14 @@ PUBLIC cm16_sdcc_frexp_callee
 
 EXTERN asm_f16_frexp_callee
 
-; half frexpf(half x, int8_t *pw2);
+; half_t frexpf(half_t x, int8_t *pw2);
 
     ; Entry:
-    ; Stack: ptr right, half left, ret
+    ; Stack: ptr right, half_t left, ret
 
-defc cm16_sdcc_frexp_callee = asm_f16_frexp_callee
-
+.cm16_sdcc_frexp_callee
+    pop de                      ;my return
+    pop hl                      ;half_t
+    pop bc                      ;ptr
+    push de                     ;my return
+    jp  asm_f16_frexp_callee

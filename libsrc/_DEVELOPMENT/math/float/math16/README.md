@@ -87,7 +87,7 @@ The intrinsic functions, written in assembly, assume the sccz80 calling conventi
 
     ; subtract two sccz80 half floats
     ;
-    ; half m16_add (half x, half y);
+    ; half m16_sub (half x, half y);
     ;
     ; enter : stack = sccz80_half left, sccz80_half right, ret
     ;
@@ -98,7 +98,7 @@ The intrinsic functions, written in assembly, assume the sccz80 calling conventi
 
     ; subtract two sdcc half floats
     ;
-    ; half m16_add (half x, half y);
+    ; half m16_sub (half x, half y);
     ;
     ; enter : stack = sdcc_half right, sdcc_half left, ret
     ;
@@ -126,7 +126,7 @@ An alias is provided to simplify usage of the library. `--math16` provides all t
 
 ## Function Discussion
 
-There are essentially two different grades of functions in this library. Those written in assembly code in the expanded floating point domain, where the sign, exponent, and mantissa are handled separately. And those written in assembly code, in the floating point domain but using intrinsic functions, where floating point numbers are passed as expanded 4 byte values using the internal `f24` format.
+There are essentially two different grades of functions in this library. Those intrinsic functions written in assembly code in the expanded floating point domain, where the sign, exponent, and mantissa are handled separately. And those written in assembly code, in the floating point domain but using intrinsic functions, where floating point numbers are passed as expanded 4 byte values using the internal `f24` format.
 
 The expanded floating point format is a useful tool for creating functions, as complex functions can be written quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `fma()` and the `poly()` functions.
 
