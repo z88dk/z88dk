@@ -459,7 +459,7 @@ SYMBOL *deref(LVALUE* lval, char isaddr)
     }
 
     lval->ltype = lval->ltype->ptr;
-    if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR ) 
+    if ( lval->ltype->kind != KIND_PTR && lval->ltype->kind != KIND_CPTR )
         lval->ptr_type = KIND_NONE;
     else
         lval->ptr_type = lval->ltype->ptr->kind;
@@ -607,7 +607,7 @@ int heirb(LVALUE* lval)
     if (ch() == '[' || ch() == '(' || ch() == '.' || (ch() == '-' && nch() == '>'))
         while (1) {
             if (cmatch('[')) {
-               Type *type;
+                Type *type;
 
                 if (k && ispointer(lval->ltype)) {
                     rvalue(lval);
@@ -624,7 +624,7 @@ int heirb(LVALUE* lval)
                 // valtype = expression(&con, &dval, &type);
                 expression(&con, &dval, &type);
                 // TODO: Check valtype
-                // val = dval;
+                val = dval;
                 needchar(']');
                 if (con) {
                     Zsp += 2; /* undo push */
