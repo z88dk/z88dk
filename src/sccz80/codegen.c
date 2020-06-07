@@ -1024,6 +1024,9 @@ void dpush_under(int val_type)
             swapstk(); /* MSW -> stack, addr -> hl */
             zpushde(); /* LSW -> stack, addr = hl */
             zpush();
+        } else if (c_fp_size == 2 ) {
+            swapstk(); /* float -> stack, addr -> hl */
+            zpush();
         } else {
             callrts("dpush_under_int");
             Zsp -= c_fp_size;
