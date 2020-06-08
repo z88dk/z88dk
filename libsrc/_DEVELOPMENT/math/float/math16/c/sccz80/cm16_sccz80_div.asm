@@ -23,22 +23,19 @@ EXTERN asm_f24_inv
 
     pop bc                      ; pop return address
     pop hl                      ; get right operand off of the stack
-    push bc
-
+    push bc                     ; save return address (inv uses bc)
     call asm_f24_f16            ; expand to dehl
     call asm_f24_inv
     exx                         ; 1/y   d'  = eeeeeeee e' = s-------
 
-    pop bc                      ; pop return address
+    pop bc                      ; pop return address again
     pop hl                      ; get left operand off of the stack
 
     push bc
     push bc
     push bc                     ; return address on stack
-
     call asm_f24_f16            ; expand to dehl
                                 ; x      d  = eeeeeeee e  = s-------
                                 ;        hl = 1mmmmmmm mmmmmmmm
-
     call asm_f24_mul_f24
     jp asm_f16_f24              ; return HL = sccz80_half
