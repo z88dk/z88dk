@@ -5,8 +5,10 @@ SECTION code_fp_math16
 
 PUBLIC cm16_sdcc_add_callee
 
-EXTERN cm16_sdcc_readr_callee
-EXTERN asm_f16_add_callee
+EXTERN asm_f24_f16
+EXTERN asm_f16_f24
+
+EXTERN asm_f24_add_f24
 
 .cm16_sdcc_add_callee
 
@@ -18,8 +20,16 @@ EXTERN asm_f16_add_callee
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    call cm16_sdcc_readr_callee
-    jp asm_f16_add_callee   ; enter stack = sdcc_half left, ret
-                            ;          HL = sdcc_half right
-                            ; return   HL = sdcc_half
+    pop bc                      ; pop return address
+    pop hl                      ; get left operand off of the stack
+    exx
+
+    pop hl                      ; get right operand off of the stack
+    call asm_f24_f16            ; expand to dehl  
+    exx                         ; y     d'  = eeeeeeee e' = s-------
+                                ;       hl' = 1mmmmmmm mmmmmmmm
+    push bc                     ; return address on stack
+    call asm_f24_f16            ; expand to dehl
+    call asm_f24_add_f24
+    jp asm_f16_f24              ; return HL = sdcc_half
 

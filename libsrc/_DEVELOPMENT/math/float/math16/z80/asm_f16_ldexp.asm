@@ -16,10 +16,10 @@ EXTERN asm_f16_f24
 
 EXTERN asm_f16_zero
 
-PUBLIC asm_f16_ldexp_callee
+PUBLIC asm_f16_ldexp
 
 ; half_t ldexpf (half_t x, int16_t pw2);
-.asm_f16_ldexp_callee
+.asm_f16_ldexp
     ; evaluation of fraction and exponent
     ;
     ; enter : stack : ret

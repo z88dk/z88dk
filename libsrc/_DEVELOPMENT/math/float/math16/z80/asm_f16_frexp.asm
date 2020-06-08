@@ -14,10 +14,10 @@ SECTION code_fp_math16
 EXTERN asm_f24_f16
 EXTERN asm_f16_f24
 
-PUBLIC asm_f16_frexp_callee
+PUBLIC asm_f16_frexp
 
 ; half_t frexpf (half_t x, int *pw2);
-.asm_f16_frexp_callee
+.asm_f16_frexp
     ; evaluation of fraction and exponent
     ;
     ; enter : stack : ret
@@ -29,7 +29,7 @@ PUBLIC asm_f16_frexp_callee
     ;
     ; uses  : af, bc, de, hl
 
-    call asm_f24_f16            ; convert to expanded format
+    call asm_f24_f16            ; convert HL to expanded format
 
     ld a,d                      ; get the exponent
     and a

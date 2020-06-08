@@ -89,7 +89,8 @@ The intrinsic functions, written in assembly, assume the sccz80 calling conventi
     ;
     ; half m16_sub (half x, half y);
     ;
-    ; enter : stack = sccz80_half left, sccz80_half right, ret
+    ; enter : stack = sccz80_half left, ret
+    ;            HL = sccz80_half right
     ;
     ; exit  :    HL = sccz80_half(left-right)
     ;
