@@ -945,7 +945,8 @@ int find_in_skel (int *skel, int p) {
 							default:
 								return (-1);
 								break;
-					} else if (skel[j] == SKIP_JP_RET)
+					    }
+					else if (skel[j] == SKIP_JP_RET)
 						switch (img[j+i]) {
 							case 0xC9:		/* RET */
 								break;
@@ -956,7 +957,9 @@ int find_in_skel (int *skel, int p) {
 							case 0x18:		/* JR n */
 								i++;
 								break;
-					} else if (img[j+i] != skel[j]) return (-1);
+					    }
+					else if (img[j+i] != skel[j])
+					    return (-1);
 		}
 	}
 	return (retval);
@@ -2626,8 +2629,12 @@ int main(int argc, char *argv[])
 							printf("- $%04X", (unsigned int) (res2+3));
 						}
 					/* JR to next OPCODE group */
+
 					res2 += 2;
 					res2=signed_byte(img[res2])+res2+1;
+//
+// TO-DO - Check logic
+//
 					if (img[res2] == 0xFE)
 						if (img[res2+2]==0xCA) {
 							/* Extra commands only in latest versions (MSX, SVI..) */
@@ -2640,61 +2647,66 @@ int main(int argc, char *argv[])
 							}
 							res2--;
 						}
-						if (img[res2+2]==0x20) {
-							/* This should be present also on all the later Ext. Basic variants */
-							res2++;
-							if (SKOOLMODE) {
-								printf("\n@ $%04x label=__%s\n", (unsigned int) (res2+3), "VARPTR");
-								printf("w $%04x %s\n", (unsigned int) (res2+3), "VARPTR function evaluation");
-							} else {
-								printf("\n#\tVARPTR\t\t[%d]\t",img[res2]);
-								printf("- $%04X", (unsigned int) (res2+3));
-							}
-							/* JR to next OPCODE group */
-							res2 += 2;
-							res2=signed_byte(img[res2])+res2+1;
-							if ((img[res2] == 0xFE) && (img[res2+2]==0xCA)) {
-								res2++;
-								if (SKOOLMODE) {
-									res2 += 2;
-									printf("\n@ $%04x label=__%s\n", img[res2] + 256*img[res2+1], "USR");
-									printf("w $%04x %s\n", img[res2] + 256*img[res2+1], "eval user M/C functions");
-								} else {
-									printf("\n#\tUSR\t\t[%d]\t",img[res2]);
-									res2 += 2;
-									printf("- $%04X",img[res2] + 256*img[res2+1] );
-								}
-								res2 += 3;
 
-								if (SKOOLMODE) {
-									res2 += 2;
-									printf("\n@ $%04x label=__%s\n", img[res2] + 256*img[res2+1], "INSTR");
-									printf("w $%04x %s\n", img[res2] + 256*img[res2+1], "INSTR function");
-								} else {
-									printf("\n#\tINSTR\t\t[%d]\t",img[res2]);
-									res2 += 2;
-									printf("- $%04X",img[res2] + 256*img[res2+1] );
-								}
-								res2 += 3;
+					    if (img[res2+2]==0x20) {
+						    /* This should be present also on all the later Ext. Basic variants */
+						    res2++;
+						    if (SKOOLMODE) {
+							    printf("\n@ $%04x label=__%s\n", (unsigned int) (res2+3), "VARPTR");
+							    printf("w $%04x %s\n", (unsigned int) (res2+3), "VARPTR function evaluation");
+						    } else {
+							    printf("\n#\tVARPTR\t\t[%d]\t",img[res2]);
+							    printf("- $%04X", (unsigned int) (res2+3));
+						    }
+						    /* JR to next OPCODE group */
+						    res2 += 2;
+						    res2=signed_byte(img[res2])+res2+1;
+						    if ((img[res2] == 0xFE) && (img[res2+2]==0xCA)) {
+							    res2++;
+							    if (SKOOLMODE) {
+								    res2 += 2;
+								    printf("\n@ $%04x label=__%s\n", img[res2] + 256*img[res2+1], "USR");
+								    printf("w $%04x %s\n", img[res2] + 256*img[res2+1], "eval user M/C functions");
+							    } else {
+								    printf("\n#\tUSR\t\t[%d]\t",img[res2]);
+								    res2 += 2;
+								    printf("- $%04X",img[res2] + 256*img[res2+1] );
+							    }
+							    res2 += 3;
 
-								/* TOKEN list order here changes depending on the implementation,
-								   e.g. POINT on TA Alphatronics, INKEY$ on SVI and MSX */
-								while (img[res2+1]==0xCA)  {
-									printf("\n#\tTOKEN_?\t\t[%d]\t",img[res2]);
-									res2 += 2;
-									printf("- $%04X",img[res2] + 256*img[res2+1] );
-									res2 += 3;
-								}
-								res2--;
+							    if (SKOOLMODE) {
+								    res2 += 2;
+								    printf("\n@ $%04x label=__%s\n", img[res2] + 256*img[res2+1], "INSTR");
+								    printf("w $%04x %s\n", img[res2] + 256*img[res2+1], "INSTR function");
+							    } else {
+								    printf("\n#\tINSTR\t\t[%d]\t",img[res2]);
+								    res2 += 2;
+								    printf("- $%04X",img[res2] + 256*img[res2+1] );
+							    }
+							    res2 += 3;
 
-							}
-						}
-					}
-				}
+							    /* TOKEN list order here changes depending on the implementation,
+							       e.g. POINT on TA Alphatronics, INKEY$ on SVI and MSX */
+							    while (img[res2+1]==0xCA)  {
+								    printf("\n#\tTOKEN_?\t\t[%d]\t",img[res2]);
+								    res2 += 2;
+								    printf("- $%04X",img[res2] + 256*img[res2+1] );
+								    res2 += 3;
+							    }
+							    res2--;
 
+						    }
+					    }
+//
+// TO-DO - End check logic
+//
 
-			}
-			printf("\n");
+				    }
+			    }
+
+		    }
+		
+		    printf("\n");
 
 			res2=find_skel(else_token_skel);
 			if (res2>0)
@@ -2959,26 +2971,29 @@ int main(int argc, char *argv[])
 		printf("\n");
 
 		res=find_skel(prog_skel);
+
 		if (res<0)
 			res=find_skel(prog_skel2);
+
 		if (res>0)
 			printf("\n#\tPROG    = $%04X  ; BASIC program start", (unsigned int) res);
-			switch (res) {
-				case 0x4396:
-					printf (" - LAMBDA style addressing");
-					brand=LAMBDA;
-					break;
-				case 0x407d:
-					printf (" - ZX81 style addressing");
-					brand=ZX81;
-					break;
-				case 23653:
-					printf (" ptr - ZX Spectrum style addressing");
-					brand=SPECTRUM;
-					break;
-				default:
-					break;
-			}
+
+		switch (res) {
+			case 0x4396:
+				printf (" - LAMBDA style addressing");
+				brand=LAMBDA;
+				break;
+			case 0x407d:
+				printf (" - ZX81 style addressing");
+				brand=ZX81;
+				break;
+			case 23653:
+				printf (" ptr - ZX Spectrum style addressing");
+				brand=SPECTRUM;
+				break;
+			default:
+				break;
+		}
 
 		printf("\n");
 
