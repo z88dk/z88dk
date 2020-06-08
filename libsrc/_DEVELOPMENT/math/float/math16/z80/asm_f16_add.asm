@@ -152,10 +152,10 @@ PUBLIC asm_f24_add_f24
     rr l
 ; check for 8 bit right shift
 .al_4
-    rra                         ; 3rd lost bit to a[7,6,5], check shift by 8
-    jr NC,al_5
+    rra                         ; 3rd lost bit to a[7,6,5]
+    jr NC,al_5                  ; check shift by 8
 ; shift by 8 right
-    ld a,l                      ; lost bits, keep only 8 most significant truncated
+    ld a,l                      ; lost bits, keep only 8 most significant truncated bits
     ld l,h
     ld h,0                      ; upper zero
 .al_5

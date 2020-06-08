@@ -80,14 +80,14 @@ This format is provided for both the multiply and add intrinsic internal 16-bit 
 
 The z88dk math16 library uses the sccz80 standard register and stack calling convention, but with the standard c parameter passing direction. For sccz80 the first or the right hand side parameter is passed in `HL`, and the second or LHS parameter is passed on the stack. For zsdcc all parameters are passed on the stack, from right to left. For both compilers, where multiple parameters are passed, they will be passed on the stack.
 
-The intrinsic functions, written in assembly, assume the sccz80 calling convention, and are by default `__z88dk_fastcall` or `__z88dk_callee`, which means that they will consume values passed on the stack, returning with the value in `HL`.
+The intrinsic functions `l_f16_`, written in assembly, assume the sccz80 calling convention, and are by default `__z88dk_fastcall` or `__z88dk_callee`, which means that they will consume values passed on the stack and/or `HL`, returning with the value in `HL`.
 
 ```
-     RETURN HL <- LHS STACK - RHS STACK 
+     RETURN HL <- LHS STACK - RHS HL REGISTERS 
 
     ; subtract two sccz80 half floats
     ;
-    ; half m16_sub (half x, half y);
+    ; half l_f16_sub (half x, half y);
     ;
     ; enter : stack = sccz80_half left, ret
     ;            HL = sccz80_half right
@@ -95,7 +95,8 @@ The intrinsic functions, written in assembly, assume the sccz80 calling conventi
     ; exit  :    HL = sccz80_half(left-right)
     ;
     ; uses  : af, bc, de, hl
-
+    
+     RETURN HL <- LHS STACK - RHS STACK 
 
     ; subtract two sdcc half floats
     ;
@@ -107,13 +108,44 @@ The intrinsic functions, written in assembly, assume the sccz80 calling conventi
     ;
     ; uses  : af, bc, de, hl
 ```
+
+Normal functions `m16_`, assume the calling convention of sccz80 or sdcc depending on the selected compiler.
+
+```
+     RETURN HL <- LHS STACK - RHS HL REGISTERS 
+
+    ; subtract two sccz80 half floats
+    ;
+    ; half l_f16_sub (half x, half y);
+    ;
+    ; enter : stack = sccz80_half left, ret
+    ;            HL = sccz80_half right
+    ;
+    ; exit  :    HL = sccz80_half(left-right)
+    ;
+    ; uses  : af, bc, de, hl
+
+     RETURN HL <- LHS STACK - RHS STACK
+
+    ; subtract two sdcc half floats
+    ;
+    ; half m16_sub (half x, half y);
+    ;
+    ; enter : stack = sdcc_half right, sdcc_half left, ret
+    ;
+    ; exit  :    HL = sdcc_half(left-right)
+    ;
+    ; uses  : af, bc, de, hl
+```
+
+
 ## Directory Structure
 
 The library is laid out in these directories.
 
 ### z80
 
-Contains the assembly language implementation of the maths library.  This includes the maths functions expected by the C11 standard and various low level functions necessary to implement a complete float package accessible from assembly language.  These functions are the intrinsic `math16` functions.
+Contains the assembly language implementation of the maths library.  This includes the maths functions expected by the IEEE-754 standard and various low level functions necessary to implement a float package accessible from assembly language.  These functions are the intrinsic `math16` functions.
 
 ### c/sdcc and c/sccz80
 
@@ -123,7 +155,7 @@ Contains the zsdcc and the sccz80 C compiler interface and is implemented using 
 
 Glue that connects the compilers and standard assembly interface to the `math16` library.  The purpose is to define aliases that connect the standard names to the math16 specific names.  These functions make up the complete z88dk `math16` maths library that is linked against on the compile line as `-lmath16`.
 
-An alias is provided to simplify usage of the library. `--math16` provides all the required linkages and definitions, as a simple alternative to `-Cc-fp-mode=ieee -Cc-D__MATH_MATH16 -D__MATH_MATH16 -lmath16 -pragma-define:CLIB_16BIT_FLOAT=1`.
+An alias is provided to simplify usage of the library. `--math16` provides all the required linkages and definitions, as a simple alternative to `-Cc-fp-mode=ieee16 -Cc-D__MATH_MATH16 -D__MATH_MATH16 -lmath16 -pragma-define:CLIB_16BIT_FLOAT=1`.
 
 ## Function Discussion
 
