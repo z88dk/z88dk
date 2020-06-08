@@ -919,11 +919,11 @@ int find_in_skel (int *skel, int p) {
 				retval += 256 * img[i+j+1];
 				j++;}
 		} else {
-			if (skel[j] != SKIP)
-				if (skel[j] == ADDR)
+			if (skel[j] != SKIP) {
+				if (skel[j] == ADDR) {
 					retval=j+i;
-				else
-					if ((skel[j] == CATCH_CALL) || (skel[j] == SKIP_CALL))
+				} else {
+					if ((skel[j] == CATCH_CALL) || (skel[j] == SKIP_CALL)) {
 						switch (img[j+i]) {
 							case 0xC7:		/* RST 0 */
 							case 0xCF:		/* RST 8 */
@@ -946,7 +946,7 @@ int find_in_skel (int *skel, int p) {
 								return (-1);
 								break;
 					    }
-					else if (skel[j] == SKIP_JP_RET)
+					} else if (skel[j] == SKIP_JP_RET) {
 						switch (img[j+i]) {
 							case 0xC9:		/* RET */
 								break;
@@ -958,8 +958,11 @@ int find_in_skel (int *skel, int p) {
 								i++;
 								break;
 					    }
-					else if (img[j+i] != skel[j])
+					} else if (img[j+i] != skel[j]) {
 					    return (-1);
+					}
+				}
+			}
 		}
 	}
 	return (retval);
