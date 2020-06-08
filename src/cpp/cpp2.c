@@ -485,7 +485,10 @@ int             searchlocal;            /* TRUE if #include "file"      */
                 if (filename[0] == '/')
                     strcpy(tmpname, filename);
                 else {
-                    sprintf(tmpname, "%s/%s", *incptr, filename);
+                    if (strlen(*incptr) + strlen(filename) >= sizeof(tmpname))
+                        sprintf(tmpname, "%s/%s", *incptr, filename);
+                    else
+                        cfatal("Filename work buffer overflow", NULLST);
                 }
 #else
                 if (!hasdirectory(filename, tmpname))
@@ -504,7 +507,10 @@ int             searchlocal;            /* TRUE if #include "file"      */
                     if (filename[0] == '/')
                         strcpy(tmpname, filename);
                     else {
-                        sprintf(tmpname, "%s/%s", *incptr, filename);
+                        if (strlen(*incptr) + strlen(filename) >= sizeof(tmpname))
+                            sprintf(tmpname, "%s/%s", *incptr, filename);
+                        else
+                            cfatal("Filename work buffer overflow", NULLST);
                     }
     #else
                     if (!hasdirectory(filename, tmpname))
@@ -523,7 +529,10 @@ int             searchlocal;            /* TRUE if #include "file"      */
                     if (filename[0] == '/')
                         strcpy(tmpname, filename);
                     else {
-                        sprintf(tmpname, "%s/%s", *incptr, filename);
+                        if (strlen(*incptr) + strlen(filename) >= sizeof(tmpname))
+                            sprintf(tmpname, "%s/%s", *incptr, filename);
+                        else
+                            cfatal("Filename work buffer overflow", NULLST);
                     }
         #else
                     if (!hasdirectory(filename, tmpname))
