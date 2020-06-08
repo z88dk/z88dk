@@ -1,4 +1,4 @@
-/* 
+/*
  * Some standard defines which are the same for all machines - hopefully!
  *
  * rcs messing up..hohum! (twiddle, keep adding here till I sort it!)

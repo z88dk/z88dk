@@ -48,8 +48,54 @@
 #define mktempfile(a) mktemp(a)
 #endif
 
+enum {
+    CPU_MAP_TOOL_Z80ASM = 0,
+    CPU_MAP_TOOL_SCCZ80,
+    CPU_MAP_TOOL_ZSDCC,
+    CPU_MAP_TOOL_COPT,
+    CPU_MAP_TOOL_SIZE
+};
+
+enum {
+    CPU_TYPE_Z80 = 0,
+    CPU_TYPE_Z80N,
+    CPU_TYPE_Z180,
+    CPU_TYPE_R2K,
+    CPU_TYPE_R3K,
+    CPU_TYPE_8080,
+    CPU_TYPE_8085,
+    CPU_TYPE_GBZ80,
+    CPU_TYPE_SIZE
+};
+
 
 typedef struct arg_s arg_t;
+
+struct arg_s {
+    char  *name;
+    int    flags;
+    void(*setfunc)(arg_t *arg, char *);
+    void  *data;
+    int   *num_ptr;
+    char  *help;
+    char  *defvalue;
+};
+
+
+typedef struct cpu_map_s cpu_map_t;
+
+struct cpu_map_s {
+    char *tool[CPU_MAP_TOOL_SIZE];
+};
+
+
+typedef struct pragma_m4_s pragma_m4_t;
+
+struct pragma_m4_s {
+    int         seen;
+    const char *pragma;
+    const char *m4_name;
+};
 
 
 /* All our function prototypes */
@@ -84,7 +130,6 @@ static void            PragmaInclude(arg_t *arg, char *);
 static void            AddArray(arg_t *arg, char *);
 static void            OptCodeSpeed(arg_t *arg, char *);
 static void            write_zcc_defined(char *name, int value, int export);
-
 
 static void           *mustmalloc(size_t);
 static char           *muststrdup(const char *s);
@@ -138,7 +183,6 @@ static char           *strip_inner_quotes(char *p);
 static char           *strip_outer_quotes(char *p);
 static int             zcc_asprintf(char **s, const char *fmt, ...);
 static int             zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *stream);
-
 
 static int             createapp = 0;    /* Go the next stage and create the app */
 static int             z80verbose = 0;
@@ -231,7 +275,7 @@ static int             linker_output_separate_arg = 0;
 
 static enum iostyle    compiler_style = outimplied;
 
-#define CC_SCCZ80 0 
+#define CC_SCCZ80 0
 #define CC_SDCC   1
 static char           *c_compiler_type = "sccz80";
 static int             compiler_type = CC_SCCZ80;
@@ -241,19 +285,6 @@ static char           *zcc_opt_def = "zcc_opt.def";
 
 static char           *defaultout = "a.bin";
 
-
-struct arg_s {
-    char  *name;
-    int    flags;
-    void(*setfunc)(arg_t *arg, char *);
-    void  *data;
-    int   *num_ptr;
-    char  *help;
-    char  *defvalue;
-};
-
-
-
 #define AF_BOOL_TRUE      1
 #define AF_BOOL_FALSE     2
 #define AF_MORE           4
@@ -261,7 +292,6 @@ struct arg_s {
 
 static char  *c_install_dir = PREFIX "/";
 static char  *c_options = NULL;
-
 
 static char  *c_z80asm_exe = EXEC_PREFIX "z80asm";
 
@@ -389,10 +419,6 @@ static arg_t  config[] = {
 };
 
 
-
-
-
-
 static arg_t     myargs[] = {
     { "z80-verb", AF_BOOL_TRUE, SetBoolean, &z80verbose, NULL, "Make the assembler more verbose" },
     { "cleanup",  AF_BOOL_TRUE, SetBoolean, &cleanup, NULL,    "(default) Cleanup temporary files" },
@@ -475,42 +501,18 @@ static arg_t     myargs[] = {
     { "", 0, NULL, NULL }
 };
 
-enum {
-    CPU_MAP_TOOL_Z80ASM = 0,
-    CPU_MAP_TOOL_SCCZ80,
-    CPU_MAP_TOOL_ZSDCC,
-    CPU_MAP_TOOL_COPT,
-    CPU_MAP_TOOL_SIZE
-};
-
-struct cpu_map_s {
-    char *tool[CPU_MAP_TOOL_SIZE];
-};
-
-typedef struct cpu_map_s cpu_map_t;
-
-enum {
-    CPU_TYPE_Z80 = 0,
-    CPU_TYPE_Z80N,
-    CPU_TYPE_Z180,
-    CPU_TYPE_R2K,
-    CPU_TYPE_R3K,
-    CPU_TYPE_8080,
-    CPU_TYPE_8085,
-    CPU_TYPE_GBZ80,
-    CPU_TYPE_SIZE
-};
 
 cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
-    { "-mz80",     "-mz80" , "-mz80", "" },                     // CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
-    { "-mz80n",    "-mz80n", "-mz80", "" },                     // CPU_TYPE_Z80N    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
-    { "-mz180",    "-mz180", "-mz180 -portmode=z180", "" },     // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
-    { "-mr2k",     "-mr2k",  "-mr2k", "" },                     // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
-    { "-mr3k",     "-mr3k",  "-mr3ka", "" },                    // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
-    { "-m8080",    "-m8080" , "-mz80", "-m8080" },              // CPU_TYPE_8080    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
-    { "-m8085",    "-m8085" , "-mz80", "-m8080" },              // CPU_TYPE_8085    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
-    { "-mgbz80",   "-mgbz80" , "-mgbz80", "-mgbz80" },          // CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    {{ "-mz80"   , "-mz80"   , "-mz80"   , ""        }},          // CPU_TYPE_Z80     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    {{ "-mz80n"  , "-mz80n"  , "-mz80"   , ""        }},          // CPU_TYPE_Z80N    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC
+    {{ "-mz180"  , "-mz180"  , "-mz180 -portmode=z180", "" }},    // CPU_TYPE_Z180    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    {{ "-mr2k"   , "-mr2k"   , "-mr2k"   , ""        }},          // CPU_TYPE_R2K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    {{ "-mr3k"   , "-mr3k"   , "-mr3ka"  , ""        }},          // CPU_TYPE_R3K     : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    {{ "-m8080"  , "-m8080"  , "-mz80"   , "-m8080"  }},          // CPU_TYPE_8080    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    {{ "-m8085"  , "-m8085"  , "-mz80"   , "-m8080"  }},          // CPU_TYPE_8085    : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
+    {{ "-mgbz80" , "-mgbz80" , "-mgbz80" , "-mgbz80" }}           // CPU_TYPE_GBZ80   : CPU_MAP_TOOL_Z80ASM, CPU_MAP_TOOL_SCCZ80, CPU_MAP_TOOL_ZSDCC, CPU_TOOL_COPT
 };
+
 
 char *select_cpu(int n)
 {
@@ -538,13 +540,6 @@ char *select_cpu(int n)
     return cpu_map[CPU_TYPE_Z80].tool[n];
 }
 
-struct pragma_m4_s {
-    int         seen;
-    const char *pragma;
-    const char *m4_name;
-};
-
-typedef struct pragma_m4_s pragma_m4_t;
 
 pragma_m4_t important_pragmas[] = {
     { 0, "startup", "__STARTUP" },
@@ -1225,7 +1220,7 @@ int main(int argc, char **argv)
             else {
                 char zpragma_args[1024];
                 snprintf(zpragma_args, sizeof(zpragma_args),"-sccz80 -zcc-opt=%s", zcc_opt_def);
- 
+
                 if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
@@ -1280,7 +1275,7 @@ int main(int argc, char **argv)
             } else {
                 char  *rules[MAX_COPT_RULE_FILES];
                 int    num_rules = 0;
-                
+
                 /* z80rules.9 implements intrinsics and RST substitution */
                 rules[num_rules++] = c_coptrules9;
 
@@ -1336,10 +1331,10 @@ int main(int argc, char **argv)
             // z80asm is unable to output object files to an arbitrary destination directory.
             // We don't want to assemble files in their original source directory because that would
             // create a temporary object file there which may accidentally overwrite user files.
-            
+
             // Instead the plan is to copy the asm file to the temp directory and add the original
             // source directory to the include search path
-            
+
             BuildAsmLine(asmarg, sizeof(asmarg), " -s ");
 
             // Check if source .asm file is in the temp directory already (indicates this is an intermediate file)
@@ -1703,7 +1698,7 @@ void zsdcc_asm_filter_comments(int filenumber, char *ext)
 
 
 /* Filter global defc file as it is written to the destination directory.
- * 
+ *
  * (globaldefon     &   0x2) = make symbols PUBLIC
  * (globaldefrefile != NULL) = file holding one regular expression per line with
  *                             leading +- indicating acceptance or rejection for matches
@@ -2117,7 +2112,7 @@ void AddArray(arg_t *argument, char *arg)
 
 
 void OptCodeSpeed(arg_t *argument, char *arg)
-{    
+{
     if ( strstr(arg,"inlineints") != NULL || strstr(arg,"all") != NULL) {
         c_sccz80_inline_ints = 1;
     }
@@ -2718,7 +2713,7 @@ void Alias(arg_t *arg, char *val)
     char *ptr = val + strlen(arg->name) + 1;
     char *eql;
 
-    while ((*ptr == '=') || (*ptr == ':')) 
+    while ((*ptr == '=') || (*ptr == ':'))
        ++ptr;
     if ((eql = strchr(ptr, '=')) != NULL) {
         *eql = 0;
@@ -2920,6 +2915,7 @@ ShowErrors(char *filen, char *orig)
     char            buffer[LINEMAX + 1];
     char            buffer2[LINEMAX + 1];
     char            filenamebuf[LINEMAX + 1];
+    char           *ptr_char;
     int             j, linepos;
     FILE           *fp, *fp2;
 
@@ -2942,7 +2938,9 @@ ShowErrors(char *filen, char *orig)
             if (strstr(buffer, " line ") != NULL ) {    /* ..only if a line number is given */
                 linepos = atoi(strstr(buffer, " line ") + strlen(" line "));
                 strcpy(filenamebuf, strstr(buffer, "'") + strlen("'"));
-                sprintf(strstr(filenamebuf, "'"), "");
+                ptr_char = strstr(filenamebuf, "'");        // Find second '
+                if (ptr_char) *ptr_char = 0;                // End filenamebuf at second ' or at end of string
+
                 if ((linepos > 1) && ((fp2 = fopen(filenamebuf, "r")) != NULL)) {
                     for (j = 1; j < linepos; j++)
                         fgets(buffer2, LINEMAX, fp2);
@@ -3044,7 +3042,7 @@ int find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, 
          * when
          */
         return (gc);
-    } 
+    }
     // Without a config file, we should just print usage and then exit
     fprintf(stderr, "A config file must be specified with +file as the first argument\n\n");
     print_help_text(program);
