@@ -854,26 +854,26 @@ long signed_byte(long byt)
 
 
 /* DATA label declaration */
-int dlbl(char *label, long position, char *comment) {
-if (SKOOLMODE) {
-	if (strlen(label) >2) {
-		printf("@ $%04x label=%s\n", (unsigned int) position, label);
-		printf("D $%04x %s\n", (unsigned int) position, comment);
-	}
-} else
-	printf("%s \t= $%04X   ; %s\n", label, (unsigned int) position, comment);
+void dlbl(char *label, long position, char *comment) {
+    if (SKOOLMODE) {
+	    if (strlen(label) >2) {
+		    printf("@ $%04x label=%s\n", (unsigned int) position, label);
+	    	printf("D $%04x %s\n", (unsigned int) position, comment);
+	    }
+    } else
+	    printf("%s \t= $%04X   ; %s\n", label, (unsigned int) position, comment);
 }
 
 
 /* CODE label declaration */
-int clbl(char *label, long position, char *comment) {
-if (SKOOLMODE) {
-	if (strlen(label) >2) {
-		printf("@ $%04x label=%s\n", (unsigned int) position, label);
-		printf("c $%04x %s\n", (unsigned int) position, comment);
-	}
-} else
-	printf("%s \t= $%04X   ; %s\n", label, (unsigned int) position, comment);
+void clbl(char *label, long position, char *comment) {
+    if (SKOOLMODE) {
+	    if (strlen(label) >2) {
+		    printf("@ $%04x label=%s\n", (unsigned int) position, label);
+    		printf("c $%04x %s\n", (unsigned int) position, comment);
+	    }
+    } else
+	    printf("%s \t= $%04X   ; %s\n", label, (unsigned int) position, comment);
 }
 
 void clear_token () {
