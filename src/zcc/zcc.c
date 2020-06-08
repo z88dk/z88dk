@@ -2487,7 +2487,7 @@ void LoadConfigFile(arg_t *argument, char *arg)
 
     cfgfile = getenv("ZCCCFG");
     if (cfgfile != NULL) {
-        if (strlen(cfgfile) > FILENAME_MAX) {
+        if (strlen(cfgfile) > ( FILENAME_MAX - strlen(arg) - strlen("/") )) {
             fprintf(stderr, "Possibly corrupt env variable ZCCCFG\n");
             exit(1);
         }
@@ -3027,7 +3027,7 @@ int find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, 
         }
         cfgfile = getenv("ZCCCFG");
         if (cfgfile != NULL) {
-            if (strlen(cfgfile) > FILENAME_MAX) {
+            if (strlen(cfgfile) > ( FILENAME_MAX - strlen(arg+1) - strlen("/.cfg") )) {
                 fprintf(stderr, "Possibly corrupt env variable ZCCCFG\n");
                 exit(1);
             }
