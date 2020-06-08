@@ -27,17 +27,13 @@ EXTERN asm_f24_neg
 
     pop hl                      ; get right operand off of the stack
     push hl
-
-    call asm_f24_f16            ; expand to dehl
+    call asm_f24_f16            ; expand to dehl 
     call asm_f24_neg
-    exx                         ; -y    d'  = eeeeeeee e' = s-------
+    exx                         ; y     d'  = eeeeeeee e' = s-------
                                 ;       hl' = 1mmmmmmm mmmmmmmm
     push hl
     push bc                     ; return address on stack
-
     call asm_f24_f16            ; expand to dehl
-                                ; x      d  = eeeeeeee e  = s-------
-                                ;        hl = 1mmmmmmm mmmmmmmm
     call asm_f24_add_f24
-    jp asm_f16_f24              ; return   HL = sdcc_half
+    jp asm_f16_f24              ; return HL = sdcc_half
 
