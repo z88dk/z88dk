@@ -1018,7 +1018,8 @@ int zx81char(int c) {
 int main(int argc, char *argv[])
 {
 	FILE	*fpin;
-	int	c, chr;
+	int	c = ' ';
+	int chr;
 	int	i, flg;
 	long res, res2, res3;
 	int token_range;
