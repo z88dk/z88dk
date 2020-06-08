@@ -1,7 +1,7 @@
-include 
+include
 
 
-SUBDIRS = graphics pv1000
+SUBDIRS = basck debugger graphics pv1000 rcmx000
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 INSTALLDIRS = $(SUBDIRS:%=install-%)
 
