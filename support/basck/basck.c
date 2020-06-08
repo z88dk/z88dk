@@ -3069,7 +3069,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(zxfpmod_skel2);
 		if (res>0) {
-			if (img[res-1] & 0xC7 == 0xC7)
+			if ( (img[res-1] & 0xC7) == 0xC7)
 				printf("\n#\tZXFP_BEGIN_CALC  = $%02X\n",img[res-1] & 0x38);
 			if (img[res+12]==img[res+33]) {
 				printf("\n#\tZXFP_END_CALC   = $%02X",img[res+12]);
