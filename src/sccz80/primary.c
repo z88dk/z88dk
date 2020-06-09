@@ -657,7 +657,7 @@ void rvaluest(LVALUE* lval)
        
         getmem(lval->symbol);
     } else {
-        indirect(lval);
+        gen_load_indirect(lval);
     }
     if (lval->cast_type ) docast(lval, lval);
 }
@@ -672,7 +672,7 @@ void rvalue(LVALUE* lval)
     } else if (lval->symbol && lval->indirect_kind == KIND_NONE) {
         getmem(lval->symbol);
     } else {           
-        indirect(lval);
+        gen_load_indirect(lval);
     }
     if (lval->cast_type ) docast(lval, lval);
 #if DEBUG_SIGN

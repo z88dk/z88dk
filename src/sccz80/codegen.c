@@ -39,8 +39,6 @@ extern int check_lastop_was_comparison(LVALUE* lval);
 extern char Filenorig[];
 
 #ifdef USEFRAME
-extern void zpushflags(void);
-extern void zpopflags(void);
 extern int CheckOffset(int);
 extern void FrameP(void);
 extern void PutFrame(char,int);
@@ -48,14 +46,13 @@ extern void RestoreSP(char);
 extern void OutIndex(int);
 #endif
 
+static void push(const char *ret);
+static void pop(const char *ret);
 static void immed2(void);
 static void constbc(int32_t val);
-static void doexx(void);
-static void swapstk(void);
 static void savehl(void);
 static void restorehl(void);
 extern void zret(void);
-static void zpopbc(void);
 static void addbchl(int val);
 static void dcallrts(char *sname,Kind to);
 static void quikmult(int type, int32_t size, char preserve);
@@ -472,7 +469,6 @@ void gen_store_to_tos(Kind typeobj)
  */
 
 #ifdef USEFRAME
-
 void PutFrame(char typeobj, int offset)
 {
     Type* ctype;
@@ -531,10 +527,10 @@ void putstk(LVALUE *lval)
     //outfmt(";Restore %p flags %02d\n",ptr, flags);
     if (flags & FARACC) {
         /* exx pop hl, pop de, exx */
-        doexx();
+        ol("exx");
         mainpop();
         zpop();
-        doexx();
+        ol("exx");
         switch (typeobj) {
         case KIND_DOUBLE:
             dcallrts("lp_pdoub", KIND_DOUBLE);
@@ -616,16 +612,16 @@ void putstk(LVALUE *lval)
             zpop();
             dcallrts("dstore", KIND_DOUBLE);
         } else {
-            zpopbc();
+            pop("bc");
             dcallrts("dstore", KIND_DOUBLE);
         }
         break;
     case KIND_CPTR:
-        zpopbc();
+        pop("bc");
         callrts("l_putptr");
         break;
     case KIND_LONG:
-        zpopbc();
+        pop("bc");
         callrts("l_plong");
         break;
     case KIND_CHAR:
@@ -776,7 +772,7 @@ void get_bitfield(LVALUE *lval)
 
 /* Fetch the specified object type indirect through the */
 /*      primary register into the primary register */
-void indirect(LVALUE* lval)
+void gen_load_indirect(LVALUE* lval)
 {
     char sign;
     char flags;
@@ -902,35 +898,17 @@ void lpush2(void)
     Zsp -= 4;
 }
 
-#ifdef USEFRAME
-/* Push and pop flags (used for ? operator) */
-void zpushflags(void)
-{
-    ol("push\taf");
-    Zsp -= 2;
-}
-
-void zpopflags(void)
-{
-    ol("pop\taf");
-    Zsp += 2;
-}
-#endif
 
 /* Push secondary register/high work of long onto the stack */
-
 void zpushde(void)
 {
-    ol("push\tde");
-    Zsp -= 2;
+    push("de");
 }
 
 /* Push the primary register onto the stack */
-
 void zpush(void)
 {
-    ol("push\thl");
-    Zsp -= 2;
+    push("hl");
 }
 
 /* Push the primary floating point register onto the stack */
@@ -949,7 +927,7 @@ void gen_push_float(Kind typeToPush)
 }
 
 /* Push an argument for a function pointer call: regular or far pointer */
-int push_function_argument(Kind expr, Type *type, int push_sdccchar)
+int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar)
 {
     if (expr == KIND_DOUBLE) {
         gen_push_float(expr);
@@ -985,7 +963,7 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
     if (expr == KIND_LONG || expr == KIND_CPTR || ( c_fp_size == 4 && expr == KIND_DOUBLE)) {
         if ( !is_last_argument ) {
             swap(); /* MSW -> hl */
-            swapstk(); /* MSW -> stack, addr -> hl */
+            ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
             zpushde(); /* LSW -> stack, addr = hl */
         }
         return 4;
@@ -1015,7 +993,7 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
             ol("pop\thl");
             ol("push\tde");
         } else {
-            swapstk();
+            ol("ex\t(sp),hl");
         }
     }
     return 2;
@@ -1032,7 +1010,7 @@ void dpush_under(int val_type)
         if ( c_fp_size == 4 ) {
             ol("pop\tbc");	// addr2 -> bc
             swap(); /* MSW -> hl */
-            swapstk(); /* MSW -> stack, addr1 -> hl */
+            ol("ex\t(sp),hl"); /* MSW -> stack, addr1 -> hl */
             zpushde(); /* LSW -> stack, addr1 = hl */
             zpush();   // addr -> stack
             ol("push\tbc"); // addr2 -> stack
@@ -1043,11 +1021,11 @@ void dpush_under(int val_type)
     } else {
         if ( c_fp_size == 4 ) {
             swap(); /* MSW -> hl */
-            swapstk(); /* MSW -> stack, addr -> hl */
+            ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
             zpushde(); /* LSW -> stack, addr = hl */
             zpush();
         } else if (c_fp_size == 2 ) {
-            swapstk(); /* float -> stack, addr -> hl */
+            ol("ex\t(sp),hl"); /* float -> stack, addr -> hl */
             zpush();
         } else {
             dcallrts("dpush_under_int",KIND_DOUBLE);
@@ -1056,60 +1034,31 @@ void dpush_under(int val_type)
     }
 }
 
+static void push(const char *reg)
+{
+    outfmt("\tpush\t%s\n",reg);
+    Zsp -= 2;
+}
+
+static void pop(const char *reg)
+{
+    outfmt("\tpop\t%s\n",reg);
+    Zsp += 2;
+}
+
 /* Pop the top of the stack into the primary register */
 void mainpop(void)
 {
-    ol("pop\thl");
-    Zsp += 2;
+    pop("hl");
 }
 
 /* Pop the top of the stack into the secondary register */
 void zpop(void)
 {
-    ol("pop\tde");
-    Zsp += 2;
+    pop("de");
 }
-
-/* Pop top of stack into bc */
-
-void zpopbc(void)
-{
-    ol("pop\tbc");
-    Zsp += 2;
-}
-
-/* Swap af & af' (preserve carry) */
-
-static void doexaf(void)
-{
-    ol("ex\taf,af");
-}
-
-/* Swap between the sets of registers */
-
-void doexx(void)
-{
-    ol("exx");
-}
-
-/* Swap the primary register and the top of the stack */
-void swapstk(void)
-{
-    ol("ex\t(sp),hl");
-}
-
-/* process switch statement */
-void sw(char type)
-{
-    if (type == KIND_LONG || type == KIND_CPTR)
-        callrts("l_long_case");
-    else
-        callrts("l_case");
-}
-
 
 /* Output the call op code */
-
 void zcallop(void)
 {
     ot("call\t");
@@ -1218,12 +1167,12 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
                 ol("pop\thl");
                 ol("push\tde");
             } else {
-                swapstk();
+                ol("ex\t(sp),hl");
             }
         } else if ( last_argument_size == 4) {
             /* At this point, TOS = function, dehl = argument */
             swap(); /* MSW -> hl */
-            swapstk(); /* MSW -> stack, addr -> hl */
+            ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
             zpushde(); /* LSW -> stack, addr = hl */
         }
         
@@ -1392,7 +1341,7 @@ void leave(Kind vartype, char type, int incritical)
             mainpop();
         } else {
             // Pop return address into bc
-            zpopbc();
+            pop("bc");
             bcused = 1;
         }
 
@@ -1444,10 +1393,10 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
     if (c_framepointer_is_ix != -1) {
         if ( saveaf ) {
             if ( c_noaltreg ) {
-                zpushflags();
-                zpopbc();
+                push("af");
+                pop("bc");
             } else {
-                doexaf();
+                 ol("ex\taf,af");
             }
         }
         outfmt("\tld\t%s,%d\n",FRAME_REGISTER, k);
@@ -1457,9 +1406,9 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
             if ( c_noaltreg ) {
                 ol("push\tbc");
                 Zsp -= 2;
-                zpopflags();
+                pop("af");
             } else {
-                doexaf();
+                 ol("ex\taf,af");
             }
         }
         return newsp;
@@ -1537,13 +1486,13 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
     }
 
     // We're on a z80 or other platform with alt registers
-    if ( saveaf ) doexaf();
-    if ( ( save != KIND_NONE && save != KIND_DOUBLE)) doexx();
+    if ( saveaf )  ol("ex\taf,af");
+    if ( ( save != KIND_NONE && save != KIND_DOUBLE)) ol("exx");
     vconst(k);
     ol("add\thl,sp");
     ol("ld\tsp,hl");
-    if ( ( save != KIND_NONE && save != KIND_DOUBLE)) doexx();
-    if ( saveaf ) doexaf();
+    if ( ( save != KIND_NONE && save != KIND_DOUBLE)) ol("exx");
+    if ( saveaf )  ol("ex\taf,af");
 
     return newsp;
 }
@@ -1584,9 +1533,7 @@ void scale(Kind type, Type *tag)
 }
 
 
-
-
-void quikmult(int type, int32_t size, char preserve)
+static void quikmult(int type, int32_t size, char preserve)
 {
     if ( type == KIND_LONG ) {
         LVALUE lval = {0};
@@ -2327,7 +2274,7 @@ void zmod(LVALUE* lval)
         } else {
             zdiv(lval);
             if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR)
-                doexx();
+                ol("exx");
             else
                 swap();
         }
@@ -4350,7 +4297,7 @@ void gen_conv_sint2long(void)
 void gen_swap_float(Kind type)
 {
     if ( c_fp_size == 2 || type == KIND_FLOAT16) {
-        swapstk(); 
+        ol("ex\t(sp),hl"); 
     } else {
         callrts("fswap");
     }
@@ -4546,12 +4493,12 @@ void OutIndex(int val)
 void RestoreSP(char saveaf)
 {
     if (saveaf)
-        doexaf();
+         ol("ex\taf,af");
     ot("ld\tsp,");
     FrameP();
     nl();
     if (saveaf)
-        doexaf();
+         ol("ex\taf,af");
 }
 
 void setframe(void)
@@ -4856,13 +4803,6 @@ int zcriticaloffset(void)
     return 2;
 }
 
-void push_char_sdcc_style(void)
-{
-    ol("ld\tb,l");
-    ol("push\tbc");
-    ol("inc\tsp");
-    Zsp--;
-}
 
 
 void zconvert_from_double(Kind from, Kind to, unsigned char isunsigned)
@@ -4947,11 +4887,11 @@ void zwiden_stack_to_long(LVALUE *lval)
         ol("ld\tl,c");
         ol("ld\th,b");
     } else {
-        doexx(); /* Preserve other operator */
+        ol("exx"); /* Preserve other operator */
         mainpop();
         force(KIND_LONG, lval->val_type, lval->ltype->isunsigned, lval->ltype->isunsigned, 0);
         lpush(); /* Put the new expansion on stk*/
-        doexx(); /* Get it back again */
+        ol("exx"); /* Get it back again */
     }
 }
 

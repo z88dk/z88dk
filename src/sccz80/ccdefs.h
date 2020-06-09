@@ -66,6 +66,9 @@ extern void gen_push_float(Kind typeToPush);
 extern void gen_critical_enter(void);
 extern void gen_critical_leave(void);
 
+extern void gen_load_indirect(LVALUE *lval);
+extern int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar);
+
 extern void gen_switch_preamble(Kind kind);
 extern void gen_switch_case(Kind kind, int32_t value, int label);
 extern void gen_switch_postamble(Kind kind);
@@ -113,7 +116,6 @@ extern void zge_const(LVALUE *, int32_t value);
 
 extern void copy_to_stack(char *label, int stack_offset,  int size);
 extern void copy_to_extern(const char *src, const char *dest, int size);
-extern void push_char_sdcc_style(void);
 extern void gen_builtin_strcpy(); 
 extern void gen_builtin_strchr(int32_t c); 
 extern void gen_builtin_memset(int32_t c, int32_t s);
