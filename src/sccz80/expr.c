@@ -70,7 +70,7 @@ int heir1(LVALUE* lval)
         /* If it's a const, then load it with the right type */
         if ( lval2.is_const ) {
             /* This leaves the double with a count of 2 */
-            if ( lval2.val_type == KIND_DOUBLE ) {
+            if ( kind_is_floating(lval2.val_type) ) {
                 decrement_double_ref(&lval2);
                 decrement_double_ref(&lval2);
             }
@@ -240,13 +240,13 @@ int heir1a(LVALUE* lval)
         if (heir1(lval))
             rvalue(lval);
         /* check types of expressions and widen if necessary */
-        if (lval2.val_type == KIND_DOUBLE && lval->val_type != KIND_DOUBLE) {
-            zconvert_to_double(lval->val_type, lval->ltype->isunsigned);
+        if (kind_is_floating(lval2.val_type) && lval2.val_type != lval->val_type) {
+            zconvert_to_double(lval->val_type, lval2.val_type, lval->ltype->isunsigned);
             postlabel(endlab);
-        } else if (lval2.val_type != KIND_DOUBLE && lval->val_type == KIND_DOUBLE) {
+        } else if (lval2.val_type != lval->val_type && kind_is_floating(lval->val_type)) {
             jump(skiplab = getlabel());
             postlabel(endlab);
-            zconvert_to_double(lval2.val_type, lval2.ltype->isunsigned);
+            zconvert_to_double(lval2.val_type, lval->val_type, lval2.ltype->isunsigned);
             postlabel(skiplab);
         } else if (lval2.val_type == KIND_LONG && lval->val_type != KIND_LONG) {
             widenlong(&lval2, lval);
@@ -534,9 +534,9 @@ int heira(LVALUE *lval)
         if (heira(lval))
             rvalue(lval);
         neg(lval);
-        if ( lval->val_type == KIND_DOUBLE ) decrement_double_ref(lval);
+        if ( kind_is_floating(lval->val_type)) decrement_double_ref(lval);
         lval->const_val = -lval->const_val;
-        if ( lval->val_type == KIND_DOUBLE ) increment_double_ref(lval);
+        if ( kind_is_floating(lval->val_type) ) increment_double_ref(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('*')) { /* unary * */

@@ -54,6 +54,8 @@ typedef enum {
     MODE_CAST
 } decl_mode;
 
+
+
 typedef enum {
     KIND_NONE,
     KIND_VOID,
@@ -72,8 +74,12 @@ typedef enum {
     KIND_PORT8,
     KIND_PORT16,
     KIND_ENUM,
-    KIND_CARRY
+    KIND_CARRY,
+    KIND_FLOAT16,
 } Kind;
+
+#define kind_is_floating(x)  ( (x) == KIND_DOUBLE || (x) == KIND_FLOAT16)
+
 
 #define kind_is_integer(k) ( k == KIND_CHAR || k == KIND_INT || k == KIND_SHORT || k == KIND_LONG )
 

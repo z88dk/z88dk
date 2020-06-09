@@ -138,6 +138,7 @@ int fnumber(LVALUE *lval)
     for ( i = 0; i < buffer_fps_num; i++ ) 
         fprintf(buffer_fps[i], "%.*s", (int)(end-start), start);
     lptr = end - line;
+
     if ( line[lptr] == 'f' ) {
         lptr++;
     }
@@ -231,6 +232,8 @@ typecheck:
         }
         if (cmatch('S'))
             isunsigned = 0;
+        if (amatch("f16"))
+            lval->val_type = KIND_FLOAT16;
         if (cmatch('f'))
             lval->val_type = KIND_DOUBLE;
     }
@@ -1018,12 +1021,13 @@ void load_double_into_fa(LVALUE *lval)
         WriteDefined("math_atof", 1);
     } else {
         dofloat(lval->const_val, fa);
-        
-        if ( c_fp_size == 4 ) {
+
+        if ( lval->val_type == KIND_FLOAT16 || c_fp_size == 2 ) {
+            dofloat_ieee16(lval->const_val, fa);
+            vconst(fa[1] << 8 | fa[0]);
+        } else if ( c_fp_size == 4 ) {
             vconst(fa[1] << 8 | fa[0]);
             const2(fa[3] << 8 | fa[2]);
-        } else if ( c_fp_size == 2 ) {
-            vconst(fa[1] << 8 | fa[0]);
         } else {
             elem = get_elem_for_fa(fa,lval->const_val);
             elem->refcount++;

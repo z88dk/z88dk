@@ -88,20 +88,22 @@ struct _mapping {
         { "fswap", "dswap",   NULL, "l_f32_swap", "l_f64_swap" },
         { "fnegate", "minusfa", NULL, NULL, "l_f64_negate" },
         { "ldexp", "l_f48_ldexp", "l_f16_ldexp", "l_f32_ldexp", "l_f64_ldexp" },
+        { "f16tof", "l_f48_f16tof", "l_f16_f16tof", "l_f32_f16tof", "l_f64_f16tof" },
+        { "ftof16", "l_f48_ftof16", "l_f16_ftof16", "l_f32_ftof16", "l_f64_ftof16" },
         { "inversef", NULL, "l_f16_invf", "l_f32_invf", NULL }, // Called only for IEEE mode
         { NULL }
 };
 
-static const char *map_library_routine(const char *wanted)
+static const char *map_library_routine(const char *wanted, Kind to)
 {
     struct _mapping *map = &mappings[0];
 
     while ( map->opname != NULL ) {
         if ( strcmp(wanted, map->opname) == 0) {
-            if ( c_fp_size == 4 ) {
-                return map->fp_32bit;
-            } else if ( c_fp_size == 2 ) {
+            if (to == KIND_FLOAT16 || c_fp_size == 2) {
                 return map->fp_16bit;
+            } else if ( c_fp_size == 4 ) {
+                return map->fp_32bit;
             } else if ( c_fp_size == 8 ) {
                 return map->fp_64bit;
             }
@@ -293,8 +295,8 @@ void getmem(SYMBOL* sym)
 #endif
     } else if (sym->ctype->kind == KIND_DOUBLE && c_fp_size > 4 ) {
         address(sym);
-        callrts("dload");
-    } else if (sym->ctype->kind == KIND_LONG || (sym->ctype->kind == KIND_DOUBLE && c_fp_size == 4) || sym->ctype->kind == KIND_CPTR ) {  // 4 byte doubles only
+        dcallrts("dload", KIND_DOUBLE);
+    } else if (sym->ctype->kind == KIND_LONG || (sym->ctype->kind == KIND_DOUBLE && c_fp_size < 6) || sym->ctype->kind == KIND_CPTR ) {  // 4 byte doubles only
         if ( IS_GBZ80() ) {
             ot("ld\thl,");
             outname(sym->name, dopref(sym));  
@@ -351,7 +353,7 @@ void putmem(SYMBOL* sym)
     switch_namespace(sym->ctype->namespace);
     if (sym->ctype->kind == KIND_DOUBLE && c_fp_size > 4 ) {
         address(sym);
-        callrts("dstore");
+        dcallrts("dstore", KIND_DOUBLE);
     } else if (sym->ctype->kind == KIND_CHAR) {
         LoadAccum();
         ot("ld\t(");
@@ -412,7 +414,7 @@ void putmem(SYMBOL* sym)
  *  Store type at TOS - used for initialising auto vars
  */
 
-void StoreTOS(char typeobj)
+void StoreTOS(Kind typeobj)
 {
     switch (typeobj) {
     case KIND_LONG:
@@ -427,7 +429,7 @@ void StoreTOS(char typeobj)
         Zsp--;
         return;
     case KIND_DOUBLE:
-        dpush();
+        gen_push_float(typeobj);
         return;
     /* KIND_CPTR..untested */
     case KIND_CPTR:
@@ -516,7 +518,7 @@ void putstk(LVALUE *lval)
         doexx();
         switch (typeobj) {
         case KIND_DOUBLE:
-            callrts("lp_pdoub");
+            dcallrts("lp_pdoub", KIND_DOUBLE);
             break;
         case KIND_CPTR:
             callrts("lp_pptr");
@@ -590,13 +592,13 @@ void putstk(LVALUE *lval)
     case KIND_DOUBLE:
         if ( c_fp_size > 4) {
             mainpop();
-            callrts("dstore");
+            dcallrts("dstore", KIND_DOUBLE);
         } else if ( c_fp_size == 2 ) {
             zpop();
-            callrts("dstore");
+            dcallrts("dstore", KIND_DOUBLE);
         } else {
             zpopbc();
-            callrts("dstore");
+            dcallrts("dstore", KIND_DOUBLE);
         }
         break;
     case KIND_CPTR:
@@ -782,7 +784,7 @@ void indirect(LVALUE* lval)
             callrts("lp_glong");
             break;
         case KIND_DOUBLE:
-            callrts("lp_gdoub");
+            dcallrts("lp_gdoub",KIND_DOUBLE);
             break;
         case KIND_STRUCT:
             warningfmt("incompatible-pointer-types","Cannot retrieve a struct via __far");
@@ -818,7 +820,7 @@ void indirect(LVALUE* lval)
         callrts("l_glong");
         break;
     case KIND_DOUBLE:
-        callrts("dload");
+        dcallrts("dload",KIND_DOUBLE);
         break;
     case KIND_STRUCT:
         break;
@@ -913,15 +915,15 @@ void zpush(void)
 
 /* Push the primary floating point register onto the stack */
 
-void dpush(void)
+void gen_push_float(Kind typeToPush)
 {
     if ( c_fp_size == 4 ) {
         zpushde();
         zpush();
-    } else if ( c_fp_size == 2 ) {
+    } else if ( c_fp_size == 2 || typeToPush == KIND_FLOAT16 ) {
         zpush();
     } else {
-        callrts("fpush");
+        dcallrts("fpush",KIND_DOUBLE);
         Zsp -= c_fp_size;
     }
 }
@@ -930,7 +932,7 @@ void dpush(void)
 int push_function_argument(Kind expr, Type *type, int push_sdccchar)
 {
     if (expr == KIND_DOUBLE) {
-        dpush();
+        gen_push_float(expr);
         return type_double->size;
     } else if (expr == KIND_LONG || expr == KIND_CPTR) {
         lpush();
@@ -1005,7 +1007,7 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
         the top value  */
 void dpush_under(int val_type)
 {
-    // This isn't call for float16
+    // This isn't called for float16
     if ( val_type == KIND_LONG || val_type == KIND_CPTR ) {
         if ( c_fp_size == 4 ) {
             ol("pop\tbc");	// addr2 -> bc
@@ -1015,7 +1017,7 @@ void dpush_under(int val_type)
             zpush();   // addr -> stack
             ol("push\tbc"); // addr2 -> stack
         } else {
-           callrts("dpush_under_long");
+           dcallrts("dpush_under_long",KIND_DOUBLE);
            Zsp -= c_fp_size;
         }
     } else {
@@ -1028,7 +1030,7 @@ void dpush_under(int val_type)
             swapstk(); /* float -> stack, addr -> hl */
             zpush();
         } else {
-            callrts("dpush_under_int");
+            dcallrts("dpush_under_int",KIND_DOUBLE);
             Zsp -= c_fp_size;
         }
     }
@@ -1120,7 +1122,15 @@ char dopref(SYMBOL* sym)
 /* Call a run-time library routine */
 void callrts(char* sname)
 {
-    const char *func_name = map_library_routine(sname);
+    const char *func_name = map_library_routine(sname, KIND_VOID);
+    ot("call\t");
+    outstr(func_name);
+    nl();
+}
+
+void dcallrts(char* sname, Kind to)
+{
+    const char *func_name = map_library_routine(sname, to);
     ot("call\t");
     outstr(func_name);
     nl();
@@ -1325,7 +1335,7 @@ void point(void)
  */
 void leave(Kind vartype, char type, int incritical)
 {
-    // int savesp;
+    int savesp;
     Kind save = vartype;
     int callee_cleanup = (currfn->ctype->flags & CALLEE) && (stackargs > 2);
 
@@ -1344,6 +1354,8 @@ void leave(Kind vartype, char type, int incritical)
             vartype = KIND_NONE;
             save = NO;
         }
+    } else if (vartype == KIND_FLOAT16 ) {
+        vartype = KIND_INT;
     }
 
     modstk(0, save, NO,YES);
@@ -1351,7 +1363,7 @@ void leave(Kind vartype, char type, int incritical)
     if (callee_cleanup) {
         int bcused = 0;
 
-        // savesp = Zsp;
+        savesp = Zsp;
         Zsp = -stackargs;
 
         if ( c_notaltreg && ( vartype != KIND_NONE && vartype != KIND_DOUBLE) && abs(Zsp) >= 11 ) {
@@ -1477,6 +1489,8 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
             save = KIND_INT;
         }
         // For a 6/8 byte double the value is safely in the exx set or in FA 
+    } else if ( save == KIND_FLOAT16 ) {
+        save = KIND_INT;
     }
 
     if ( c_notaltreg ) {
@@ -1520,6 +1534,7 @@ void scale(Kind type, Type *tag)
     switch (type) {
     case KIND_INT:
     case KIND_PTR:
+    case KIND_FLOAT16:
         ol("add\thl,hl");
         break;
     case KIND_CPTR:
@@ -1855,8 +1870,12 @@ void zadd(LVALUE* lval)
         }
         Zsp += 4;
         break;
+    case KIND_FLOAT16:
+        dcallrts("fadd",lval->val_type);
+        Zsp += 2;
+        break;
     case KIND_DOUBLE:
-        callrts("fadd");
+        dcallrts("fadd",lval->val_type);
         Zsp += c_fp_size;
         break;
     default:
@@ -2027,8 +2046,12 @@ void zsub(LVALUE* lval)
         }
         Zsp += 4;
         break;
+    case KIND_FLOAT16:
+        dcallrts("fsub",lval->val_type);
+        Zsp += 2;
+        break;
     case KIND_DOUBLE:
-        callrts("fsub");
+        dcallrts("fsub",lval->val_type);
         Zsp += c_fp_size;
         break;
     default:
@@ -2052,8 +2075,12 @@ void mult(LVALUE* lval)
         callrts("l_long_mult");
         Zsp += 4;
         break;
+    case KIND_FLOAT16:
+        dcallrts("fmul",lval->val_type);
+        Zsp += 2;
+        break;
     case KIND_DOUBLE:
-        callrts("fmul");
+        dcallrts("fmul",lval->val_type);
         Zsp += c_fp_size;
         break;
     case KIND_CHAR:
@@ -2094,16 +2121,11 @@ int mult_dconst(LVALUE *lval, double value, int isrhs)
     int exp;
 
     if ( value == 1.0 ) {
-        // We don't need to do anything
-        lval->ltype = type_double;
-        lval->val_type = KIND_DOUBLE;
         return 1;
     } else if ( frexp(value, &exp) == 0.5 ) {
         // It's a power of two so we can nobble the exponent
         loada(exp - 1);
-        callrts("ldexp");
-        lval->ltype = type_double;
-        lval->val_type = KIND_DOUBLE;
+        dcallrts("ldexp",lval->val_type);
         return 1;
     }
 
@@ -2124,8 +2146,12 @@ void zdiv(LVALUE* lval)
             callrts("l_long_div");
         Zsp += 4;
         break;
+    case KIND_FLOAT16:
+        dcallrts("fdiv",lval->val_type);
+        Zsp += c_fp_size;
+        break;
     case KIND_DOUBLE:
-        callrts("fdiv");
+        dcallrts("fdiv",lval->val_type);
         Zsp += c_fp_size;
         break;
     default:
@@ -2250,10 +2276,9 @@ void zdiv_const(LVALUE *lval, int32_t value)
 
 int zdiv_dconst(LVALUE *lval, double value, int isrhs)
 {
-    if ( isrhs == 0.0 && value == 1.0 && (c_maths_mode == MATHS_IEEE || c_maths_mode == MATHS_IEEE16)) {
-        callrts("inversef");
-        lval->ltype = type_double;
-        lval->val_type = KIND_DOUBLE;
+    if ( isrhs == 0.0 && value == 1.0 && 
+        (c_maths_mode == MATHS_IEEE || c_maths_mode == MATHS_IEEE16 || lval->val_type == KIND_FLOAT16)) {
+        dcallrts("inversef",lval->val_type);
         return 1;
     }
     return 0;
@@ -3268,7 +3293,8 @@ void lneg(LVALUE* lval)
         ol("ccf");
         break;
     case KIND_DOUBLE:
-        zconvert_from_double(KIND_INT, 0);
+    case KIND_FLOAT16:
+        zconvert_from_double(KIND_INT,lval->val_type, 0);
     default:
         set_int(lval);
         callrts("l_lneg");
@@ -3282,6 +3308,11 @@ void neg(LVALUE* lval)
     case KIND_LONG:
     case KIND_CPTR:
         callrts("l_long_neg");
+        break;
+    case KIND_FLOAT16:
+        ol("ld\ta,h");
+        ol("xor\t128");
+        ol("ld\th,a");
         break;
     case KIND_DOUBLE:
         switch ( c_maths_mode ) {
@@ -3301,7 +3332,7 @@ void neg(LVALUE* lval)
            ol("ld\te,a");
            break;
         default:
-            callrts("fnegate");
+            dcallrts("fnegate",KIND_DOUBLE);
         }
         break;
     default:
@@ -3332,7 +3363,7 @@ void inc(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_DOUBLE:
         // FA = value to be incremented
-        dpush();
+        gen_push_float(lval->val_type);
         switch ( c_maths_mode ) {
         case MATHS_IEEE:
             vlongconst(0x3f800000); // +1.0
@@ -3344,10 +3375,16 @@ void inc(LVALUE* lval)
             vlongconst(0x81000000); // +1.0
             break;
         default:
-            zconvert_constant_to_double(1, 1);
+            zconvert_constant_to_double(1, KIND_DOUBLE, 1);
         }
-        callrts("fadd");
+        dcallrts("fadd",KIND_DOUBLE);
         Zsp += c_fp_size;
+        break;
+    case KIND_FLOAT16:
+        gen_push_float(lval->val_type);
+        vconst(0x3c00); // +1.0
+        dcallrts("fadd",KIND_FLOAT16);
+        Zsp += 2;
         break;
     case KIND_LONG:
     case KIND_CPTR:
@@ -3367,7 +3404,7 @@ void dec(LVALUE* lval)
     switch (lval->val_type) {
     case KIND_DOUBLE:
         // FA = value to be incremented
-        dpush();
+        gen_push_float(lval->val_type);
         switch ( c_maths_mode ) {
         case MATHS_IEEE:
             vlongconst(0xbf800000); // -1.0
@@ -3379,10 +3416,16 @@ void dec(LVALUE* lval)
             vlongconst(0x81800000); // -1.0
             break;
         default:
-            zconvert_constant_to_double(-1,0);
+            zconvert_constant_to_double(-1,KIND_DOUBLE, 0);
         }
         callrts("fadd");
         Zsp += c_fp_size;
+        break;
+    case KIND_FLOAT16:
+        gen_push_float(lval->val_type);
+        vconst(0xbc00); // -1.0
+        dcallrts("fadd",KIND_FLOAT16);
+        Zsp += 2;
         break;
     case KIND_LONG:
     case KIND_CPTR:
@@ -3540,9 +3583,14 @@ void zeq(LVALUE* lval)
         callrts("l_long_eq");
         Zsp += 4;
         break;
+    case KIND_FLOAT16:
+        set_int(lval);
+        dcallrts("feq",lval->val_type);
+        Zsp += 2;
+        break;
     case KIND_DOUBLE:
         set_int(lval);
-        callrts("feq");
+        dcallrts("feq",lval->val_type);
         Zsp += c_fp_size;
         break;
     case KIND_CHAR:
@@ -3681,8 +3729,13 @@ void zne(LVALUE* lval)
         callrts("l_long_ne");
         Zsp += 4;
         break;
+    case KIND_FLOAT16:
+        set_int(lval);
+        dcallrts("fne",lval->val_type);
+        Zsp += 2;
+        break;
     case KIND_DOUBLE:
-        callrts("fne");
+        dcallrts("fne",lval->val_type);
         set_int(lval);            
         Zsp += c_fp_size;
         break;
@@ -3826,8 +3879,13 @@ void zlt(LVALUE* lval)
         Zsp += 4;
         set_int(lval);        
         break;
+    case KIND_FLOAT16:
+        set_int(lval);
+        dcallrts("flt",lval->val_type);
+        Zsp += 2;
+        break;
     case KIND_DOUBLE:
-        callrts("flt");
+        dcallrts("flt",lval->val_type);
         set_int(lval);            
         Zsp += c_fp_size;
         break;
@@ -3934,8 +3992,13 @@ void zle(LVALUE* lval)
         set_int(lval);            
         Zsp += 4;
         break;
+    case KIND_FLOAT16:
+        set_int(lval);
+        dcallrts("fle",lval->val_type);
+        Zsp += 2;
+        break;
     case KIND_DOUBLE:
-        callrts("fle");
+        dcallrts("fle",lval->val_type);
         set_int(lval);            
         Zsp += c_fp_size;
         break;
@@ -4041,8 +4104,13 @@ void zgt(LVALUE* lval)
         set_int(lval);            
         Zsp += 4;
         break;
+    case KIND_FLOAT16:
+        set_int(lval);
+        dcallrts("fgt",lval->val_type);
+        Zsp += 2;
+        break;
     case KIND_DOUBLE:
-        callrts("fgt");
+        dcallrts("fgt",lval->val_type);
         Zsp += c_fp_size;
         set_int(lval);
         break;
@@ -4159,8 +4227,13 @@ void zge(LVALUE* lval)
         Zsp += 4;
         set_int(lval);        
         break;
+    case KIND_FLOAT16:
+        set_int(lval);
+        dcallrts("fge",lval->val_type);
+        Zsp += 2;
+        break;
     case KIND_DOUBLE:
-        callrts("fge");
+        dcallrts("fge",lval->val_type);
         set_int(lval);
         Zsp += c_fp_size;
         break;
@@ -4254,9 +4327,9 @@ void convSint2long(void)
 
 
 /* Swap double positions on stack */
-void DoubSwap(void)
+void gen_swap_float(Kind type)
 {
-    if ( c_fp_size == 2 ) {
+    if ( c_fp_size == 2 || type == KIND_FLOAT16) {
         swapstk(); 
     } else {
         callrts("fswap");
@@ -4779,19 +4852,19 @@ void push_char_sdcc_style(void)
 }
 
 
-void zconvert_from_double(Kind type, unsigned char isunsigned)
+void zconvert_from_double(Kind to, Kind from, unsigned char isunsigned)
 {
-    if ( type == KIND_LONG || type == KIND_CPTR ) {
-        if ( isunsigned ) callrts("f2ulong");
-        else callrts("f2slong");
+    if ( to == KIND_LONG || to == KIND_CPTR ) {
+        if ( isunsigned ) dcallrts("f2ulong",from);
+        else dcallrts("f2slong",from);
     } else if ( isunsigned ) {
-        callrts("f2uint");
+        dcallrts("f2uint",from);
     } else {
-        callrts("f2sint");
+        dcallrts("f2sint",from);
     }
 }
 
-void zconvert_constant_to_double(double val, unsigned char isunsigned)
+void zconvert_constant_to_double(double val, Kind to, unsigned char isunsigned)
 {
     unsigned char  fa[8] = {0};
 
@@ -4805,32 +4878,40 @@ void zconvert_constant_to_double(double val, unsigned char isunsigned)
     } else {
         if ( fabs(val) < 65536 ) {
             vconst(val);
-            zconvert_to_double(KIND_INT, isunsigned);
+            zconvert_to_double(KIND_INT,to, isunsigned);
         } else {
             vlongconst(val);
-            zconvert_to_double(KIND_LONG, isunsigned);
+            zconvert_to_double(KIND_LONG,to, isunsigned);
         }
     }
 
 }
 
 
-void zconvert_to_double(Kind type, unsigned char isunsigned)
+void zconvert_to_double(Kind from, Kind to, unsigned char isunsigned)
 {
-   if ( type == KIND_LONG || type == KIND_CPTR ) {
-       if ( isunsigned ) callrts("ulong2f");
-       else callrts("slong2f");
+   if ( from == to ) {
        return;
-   } else if ( type == KIND_CHAR ) {
-       if ( isunsigned ) callrts("uchar2f");
-       else callrts("schar2f");
+   } else if ( from == KIND_LONG || from == KIND_CPTR ) {
+       if ( isunsigned ) dcallrts("ulong2f",to);
+       else dcallrts("slong2f",to);
        return;
-   } else if ( type == KIND_CARRY ) {
+   } else if ( from == KIND_CHAR ) {
+       if ( isunsigned ) dcallrts("uchar2f",to);
+       else dcallrts("schar2f",to);
+       return;
+   } else if ( from == KIND_CARRY ) {
        zcarryconv();
        isunsigned = 1;
+   } else if ( from == KIND_FLOAT16 ) {
+       dcallrts("f16tof",to);
+       return;
+   } else if ( from == KIND_DOUBLE ) {
+       dcallrts("ftof16", from);
+       return;
    }
-   if ( isunsigned ) callrts("uint2f");
-   else callrts("sint2f");
+   if ( isunsigned ) dcallrts("uint2f",to);
+   else dcallrts("sint2f",to);
 }
 
 void zwiden_stack_to_long(LVALUE *lval)

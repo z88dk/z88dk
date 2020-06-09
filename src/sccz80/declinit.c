@@ -398,6 +398,8 @@ static void output_double_string_load(double value)
     int   dumplocation = getlabel();
     LVALUE lval;
 
+    lval.val_type = KIND_DOUBLE;
+
     postlabel(dumplocation);
     defstorage(); outdec(6); nl();
     

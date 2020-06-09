@@ -262,7 +262,7 @@ double CalcStand(
 /* Complains if an operand isn't int */
 int intcheck(LVALUE* lval, LVALUE* lval2)
 {
-    if (lval->val_type == KIND_DOUBLE || lval2->val_type == KIND_DOUBLE) {
+    if ( kind_is_floating(lval->val_type)|| kind_is_floating(lval2->val_type) ) {
         errorfmt("Operands must be int", 0);
         return -1;
     }
@@ -276,13 +276,11 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
         zcarryconv();
     }
 
-    if (t1 == KIND_DOUBLE) {
-        if (t2 != KIND_DOUBLE) {
-            zconvert_to_double(t2, isunsigned2);
-        }
+    if (kind_is_floating(t1)) {
+        zconvert_to_double(t2, t1, isunsigned2);
     } else {
-        if (t2 == KIND_DOUBLE) {
-            zconvert_from_double(t1, isunsigned1);
+        if (kind_is_floating(t2)) {
+            zconvert_from_double(t1, t2, isunsigned1);
             return;
         }
     }
@@ -327,23 +325,23 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
  */
 int widen(LVALUE* lval, LVALUE* lval2)
 {
-    if (lval2->val_type == KIND_DOUBLE) {
-        if (lval->val_type != KIND_DOUBLE) {
+    if (kind_is_floating(lval2->val_type)) {
+        if (lval->val_type != lval2->val_type ) {
             dpush_under(lval->ltype->kind); /* push 2nd operand UNDER 1st */
             mainpop();
             if (lval->val_type == KIND_LONG)
                 zpop();
-            zconvert_to_double(lval->val_type, lval->ltype->isunsigned);
-            DoubSwap();
-            lval->val_type = KIND_DOUBLE; /* type of result */
-            lval->ltype = type_double;
+            zconvert_to_double(lval->val_type, lval2->val_type, lval->ltype->isunsigned);
+            gen_swap_float(lval2->val_type);
+            lval->val_type = lval2->val_type; /* type of result */
+            lval->ltype = lval2->ltype;
         }
         return (1);
     } else {
-        if (lval->val_type == KIND_DOUBLE) {
-            zconvert_to_double(lval2->val_type, lval2->ltype->isunsigned);
-            lval2->val_type = KIND_DOUBLE;
-            lval2->ltype = type_double;
+        if (kind_is_floating(lval->val_type)) {
+            zconvert_to_double(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+            lval2->val_type = lval->val_type;
+            lval2->ltype = lval->ltype;
             return (1);
         } else
             return (0);
@@ -488,6 +486,7 @@ void prestep(
         case KIND_CPTR:
             (*step)(lval);
         case KIND_INT:
+        case KIND_FLOAT16:
         case KIND_PTR:
             (*step)(lval);
         default:
@@ -533,6 +532,7 @@ void poststep(
             nstep(lval, n * 3, unstep);
             break;
         case KIND_INT:
+        case KIND_FLOAT16:
         case KIND_PTR:
             (*step)(lval);
         default:
@@ -793,7 +793,7 @@ int constexpr(double *val, Kind *type, int flag)
     valtype = expression(&con, &valtemp, &type_ptr);
     *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
-    if ( valtype == KIND_DOUBLE && con ) {
+    if ( kind_is_floating(valtype) && con ) {
         decrement_double_ref_direct(valtemp);
     }
     *type = valtype;

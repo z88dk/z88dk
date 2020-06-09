@@ -264,7 +264,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
                 if ( vconst && type->kind == KIND_DOUBLE && kind_is_integer(prototype->kind)) {
                      LVALUE lval = {0};
                      clearstage(before,start);
-		     start = NULL;
+                     start = NULL;
                      lval.val_type = prototype->kind;
                      lval.const_val = val;
                      load_constant(&lval);
@@ -361,7 +361,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             Zsp += nargs;
         } else
 #endif
-            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve, YES);  /* clean up arguments - we know what type is MOOK */
+            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE || c_fp_size < 6, preserve, YES);  /* clean up arguments - we know what type is MOOK */
     }
 }
 
