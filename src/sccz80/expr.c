@@ -226,13 +226,13 @@ int heir1a(LVALUE* lval)
             /* evaluate 'true' expression */
             if (heir1(&lval2))
                 rvalue(&lval2);
-            jump(endlab = getlabel());
+            gen_jp_label(endlab = getlabel());
             postlabel(falselab);
         } else {
             jumpnc(falselab = getlabel());
             if (heir1(&lval2))
                 rvalue(&lval2);
-            jump(endlab = getlabel());
+            gen_jp_label(endlab = getlabel());
             postlabel(falselab);
         }
         needchar(':');
@@ -244,7 +244,7 @@ int heir1a(LVALUE* lval)
             zconvert_to_double(lval->val_type, lval2.val_type, lval->ltype->isunsigned);
             postlabel(endlab);
         } else if (lval2.val_type != lval->val_type && kind_is_floating(lval->val_type)) {
-            jump(skiplab = getlabel());
+            gen_jp_label(skiplab = getlabel());
             postlabel(endlab);
             zconvert_to_double(lval2.val_type, lval->val_type, lval2.ltype->isunsigned);
             postlabel(skiplab);
@@ -254,7 +254,7 @@ int heir1a(LVALUE* lval)
             lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             postlabel(endlab);
         } else if (lval2.val_type != KIND_LONG && lval->val_type == KIND_LONG) {
-            jump(skiplab = getlabel());
+            gen_jp_label(skiplab = getlabel());
             postlabel(endlab);
             widenlong(lval, &lval2);
             lval->val_type = KIND_LONG;
@@ -619,8 +619,9 @@ int heirb(LVALUE* lval)
                 }
                 setstage(&before, &start);
                 if (lval->ltype->kind == KIND_CPTR)
-                    zpushde();
-                zpush();
+                    lpush();
+                else
+                    zpush();
                 // valtype = expression(&con, &dval, &type);
                 expression(&con, &dval, &type);
                 // TODO: Check valtype
@@ -784,7 +785,7 @@ int heirb(LVALUE* lval)
                  * not to access via far methods near data..
                  */
                 if (k && direct == 0)
-                    rvaluest(lval);
+                    rvalue(lval);
 
                 debug(DBG_FAR1, "prev=%s name=%s flags %d oflags %d", lval->symbol->name, ptr->name, lval->flags, lval->oflags);
                 flags = member_type->flags;

@@ -50,9 +50,6 @@ static void push(const char *ret);
 static void pop(const char *ret);
 static void immed2(void);
 static void constbc(int32_t val);
-static void savehl(void);
-static void restorehl(void);
-extern void zret(void);
 static void addbchl(int val);
 static void dcallrts(char *sname,Kind to);
 static void quikmult(int type, int32_t size, char preserve);
@@ -60,6 +57,7 @@ static void threereg(void);
 static void fivereg(void);
 static void sixreg(void);
 static void loada(int n);
+static void setcond(int val);
 
 /*
  * Data for this module
@@ -131,11 +129,10 @@ static const char *map_library_routine(const char *wanted, Kind to)
     return wanted;
 }
 
-/* Begin a comment line for the assembler */
-
-void comment(void)
+/* Output a comment line for the assembler */
+void gen_comment(const char *message)
 {
-    outbyte(';');
+    outfmt(";%s\n",message);
 }
 
 /* Put out assembler info before any code is generated */
@@ -273,7 +270,7 @@ static void switch_namespace(char *name)
  * able to just check for far to see if we need to pick up second
  * bit of long pointer (check for type POINTER as well...
  */
-void getmem(SYMBOL* sym)
+void gen_load_static(SYMBOL* sym)
 {
     switch_namespace(sym->ctype->namespace);
     if (sym->ctype->kind == KIND_CHAR) {
@@ -365,14 +362,14 @@ int getloc(SYMBOL* sym, int off)
 
 /* Store the primary register into the specified */
 /*      static memory cell */
-void putmem(SYMBOL* sym)
+void gen_store_static(SYMBOL* sym)
 {
     switch_namespace(sym->ctype->namespace);
     if (sym->ctype->kind == KIND_DOUBLE && c_fp_size > 4 ) {
         address(sym);
         dcallrts("dstore", KIND_DOUBLE);
     } else if (sym->ctype->kind == KIND_CHAR) {
-        LoadAccum();
+        ol("ld\ta,l");
         ot("ld\t(");
         outname(sym->name, dopref(sym));
         outstr("),a\n");
@@ -438,10 +435,10 @@ void gen_store_to_tos(Kind typeobj)
         return;
     case KIND_CHAR:
         ol("dec\tsp");
-        LoadAccum();
-        mainpop();
+        ol("ld\ta,l");
+        pop("hl");
         ol("ld\tl,a");
-        zpush();
+        push("hl");
         Zsp--;
         return;
     case KIND_DOUBLE:
@@ -451,14 +448,14 @@ void gen_store_to_tos(Kind typeobj)
     case KIND_CPTR:
         ol("dec\tsp");
         ol("ld\ta,e");
-        zpop(); /* pop de */
+        pop("de"); /* pop de */
         ol("ld\te,a");
-        zpushde();
-        zpush();
+        push("de");
+        push("hl");
         Zsp--;
         return;
     default:
-        zpush();
+        push("hl");
         return;
     }
 }
@@ -528,8 +525,8 @@ void putstk(LVALUE *lval)
     if (flags & FARACC) {
         /* exx pop hl, pop de, exx */
         ol("exx");
-        mainpop();
-        zpop();
+        pop("hl");
+        pop("de");
         ol("exx");
         switch (typeobj) {
         case KIND_DOUBLE:
@@ -563,7 +560,7 @@ void putstk(LVALUE *lval)
 
         if ( lval->ltype->bit_size + bit_offset <= 8 ) {
             int i;
-            zpop();  // de address
+            pop("de"); // de address
             if ( doinc ) {
                 ol("inc\tde");
             }
@@ -588,7 +585,7 @@ void putstk(LVALUE *lval)
             // hl = value, lets shift into the right place
             asl_const(lval, lval->ltype->bit_offset);
             zand_const(lval,((1 << lval->ltype->bit_size) - 1) << bit_offset);
-            zpop();  // de = destination address
+            pop("de");  // de = destination address
             ol("ld\ta,(de)");
             outfmt("\tand\t%d\n",(0xffff - (((1 << lval->ltype->bit_size) - 1) << bit_offset)) % 256);
             ol("or\tl");
@@ -606,10 +603,10 @@ void putstk(LVALUE *lval)
     switch (typeobj) {
     case KIND_DOUBLE:
         if ( c_fp_size > 4) {
-            mainpop();
+            pop("hl");
             dcallrts("dstore", KIND_DOUBLE);
         } else if ( c_fp_size == 2 ) {
-            zpop();
+            pop("de");
             dcallrts("dstore", KIND_DOUBLE);
         } else {
             pop("bc");
@@ -625,17 +622,17 @@ void putstk(LVALUE *lval)
         callrts("l_plong");
         break;
     case KIND_CHAR:
-        zpop();
-        LoadAccum();
+        pop("de");
+        ol("ld\ta,l");
         ol("ld\t(de),a");
         break;
     case KIND_STRUCT:
-        zpop();
+        pop("de");
         outfmt("\tld\tbc,%d\n",lval->ltype->size);
         ol("ldir");
         break;
     default:
-        zpop();
+        pop("de");
         callrts("l_pint");
     }
 }
@@ -873,7 +870,7 @@ void immed(void)
 
 /* Print partial instruction to get an immediate value */
 /*      into the secondary register */
-void immed2(void)
+static void immed2(void)
 {
     ot("ld\tde,");
 }
@@ -885,25 +882,12 @@ void immedlit(int lab, int offs)
 }
 
 /* Push long onto stack */
-
 void lpush(void)
 {
-    zpushde();
-    zpush();
-}
-
-void lpush2(void)
-{
-    callrts("lpush2");
-    Zsp -= 4;
-}
-
-
-/* Push secondary register/high work of long onto the stack */
-void zpushde(void)
-{
     push("de");
+    push("hl");
 }
+
 
 /* Push the primary register onto the stack */
 void zpush(void)
@@ -916,10 +900,10 @@ void zpush(void)
 void gen_push_float(Kind typeToPush)
 {
     if ( c_fp_size == 4 ) {
-        zpushde();
-        zpush();
+        push("de");
+        push("hl");
     } else if ( c_fp_size == 2 || typeToPush == KIND_FLOAT16 ) {
-        zpush();
+        push("hl");
     } else {
         dcallrts("fpush",KIND_DOUBLE);
         Zsp -= c_fp_size;
@@ -953,7 +937,7 @@ int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar)
         return type->size;
     } 
     // Default push the word
-    zpush();
+    push("hl");
     return 2;
 }
 
@@ -964,12 +948,12 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
         if ( !is_last_argument ) {
             swap(); /* MSW -> hl */
             ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
-            zpushde(); /* LSW -> stack, addr = hl */
+            push("de"); /* LSW -> stack, addr = hl */
         }
         return 4;
     } else if (expr == KIND_DOUBLE && c_fp_size != 2 ) {
         dpush_under(KIND_INT);
-        mainpop();
+        pop("hl");
         return c_fp_size;
     } else if (expr == KIND_STRUCT ) {
         // 13 bytes
@@ -983,7 +967,7 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
         swap();
         outfmt("\tld\tbc,%d\n",type->size);
         ol("ldir");
-        mainpop();
+        pop("hl");
         return type->size;
     } 
     if ( !is_last_argument ) {
@@ -1011,8 +995,8 @@ void dpush_under(int val_type)
             ol("pop\tbc");	// addr2 -> bc
             swap(); /* MSW -> hl */
             ol("ex\t(sp),hl"); /* MSW -> stack, addr1 -> hl */
-            zpushde(); /* LSW -> stack, addr1 = hl */
-            zpush();   // addr -> stack
+            push("de"); /* LSW -> stack, addr1 = hl */
+            push("hl");   // addr -> stack
             ol("push\tbc"); // addr2 -> stack
         } else {
            dcallrts("dpush_under_long",KIND_DOUBLE);
@@ -1022,17 +1006,18 @@ void dpush_under(int val_type)
         if ( c_fp_size == 4 ) {
             swap(); /* MSW -> hl */
             ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
-            zpushde(); /* LSW -> stack, addr = hl */
-            zpush();
+            push("de"); /* LSW -> stack, addr = hl */
+            push("hl");
         } else if (c_fp_size == 2 ) {
             ol("ex\t(sp),hl"); /* float -> stack, addr -> hl */
-            zpush();
+            push("hl");
         } else {
             dcallrts("dpush_under_int",KIND_DOUBLE);
             Zsp -= c_fp_size;
         }
     }
 }
+
 
 static void push(const char *reg)
 {
@@ -1064,13 +1049,13 @@ void zcallop(void)
     ot("call\t");
 }
 
-void zshortcall(int rst, int value) 
+void gen_shortcall(int rst, int value) 
 {
     outfmt("\trst\t%d\n",rst);
     outfmt("\t%s\t%d\n", value < 0x100 ? "defb" : "defw", value);
 }
 
-void zbankedcall(SYMBOL *sym)
+void gen_bankedcall(SYMBOL *sym)
 {
     ol("call\tbanked_call");
     ot("defq\t"); outname(sym->name, dopref(sym)); nl();
@@ -1105,13 +1090,6 @@ void dcallrts(char* sname, Kind to)
     nl();
 }
 
-/* Return from subroutine */
-void zret(void)
-{
-    ol("ret");
-    nl();
-    nl();
-}
 
 /*
  * Perform subroutine call to value on top of stack
@@ -1173,7 +1151,7 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
             /* At this point, TOS = function, dehl = argument */
             swap(); /* MSW -> hl */
             ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
-            zpushde(); /* LSW -> stack, addr = hl */
+            push("de"); /* LSW -> stack, addr = hl */
         }
         
         if ( type->funcattrs.hasva ) 
@@ -1186,7 +1164,7 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
 
 
 /* Jump to specified internal label number */
-void jump(int label)
+void gen_jp_label(int label)
 {
     opjump("", label);
 }
@@ -1227,7 +1205,7 @@ void jumpnc(int label)
     opjump("nc,", label);
 }
 
-void setcond(int val)
+static void setcond(int val)
 {
     if (val == 1)
         ol("scf");
@@ -1337,8 +1315,8 @@ void leave(Kind vartype, char type, int incritical)
 
         if ( c_notaltreg && ( vartype != KIND_NONE && vartype != KIND_DOUBLE) && abs(Zsp) >= 11 ) {
             // 8080, save hl, pop return int hl
-            savehl();
-            mainpop();
+            ol("ld\t(saved_hl),hl");
+            pop("hl");
         } else {
             // Pop return address into bc
             pop("bc");
@@ -1354,9 +1332,9 @@ void leave(Kind vartype, char type, int incritical)
             ol("push\tbc");
             Zsp -= 2;
         } else {
-            zpush();
-            restorehl();
-        }
+            push("hl");
+            ol("ld\thl,(saved_hl)");
+         }
     }
     gen_pop_frame(); /* Restore previous frame pointer */
 
@@ -1366,7 +1344,7 @@ void leave(Kind vartype, char type, int incritical)
     }
     if (type)
         setcond(type);
-    zret(); /* and exit function */
+    ol("ret"); nl(); nl(); /* and exit function */
 }
 
 /* Modify the stack pointer to the new value indicated 
@@ -4246,6 +4224,13 @@ void zge(LVALUE* lval)
     }
 }
 
+
+/*
+ *      Routines for conversion between different types, kept in this
+ *      file to aid conversion etc
+ */
+
+
 void gen_conv_carry2int(void)
 {
     vconst(0);
@@ -4257,11 +4242,6 @@ void gen_conv_carry2int(void)
         ol("ld\tl,a");
     }
 }
-
-/*
- *      Routines for conversion between different types, kept in this
- *      file to aid conversion etc
- */
 
 void gen_conv_uint2char(void)
 {
@@ -4367,21 +4347,7 @@ void addbchl(int val)
     }
 }
 
-/* Load accumulator with lower half of int */
 
-void LoadAccum(void)
-{
-    ol("ld\ta,l");
-}
-
-/* Compare the accumulator with a value (mod 256) */
-
-void CpCharVal(int val)
-{
-    ot("cp\t+(");
-    outdec(val);
-    outstr("% 256)\n");
-}
 
 /*
  *      Print prefix for global defintion
@@ -4413,18 +4379,7 @@ void EmitLine(int line)
     }
 }
 
-/* These routines save and restore hl/de from special places */
 
-void savehl(void)
-{
-    ol("ld\t(saved_hl),hl");
-}
-
-
-void restorehl(void)
-{
-    ol("ld\thl,(saved_hl)");
-}
 
 /* Prefix for assembler */
 
@@ -4661,7 +4616,7 @@ void gen_builtin_memset(int32_t c, int32_t s)
         ol("ld\te,l");
         ol("inc\tde");
         outstr("\tld\tbc,"); outdec((s % 65536) - 1); nl();
-	ol("ldir");
+        ol("ldir");
     }
     ol("pop\thl");
 }
@@ -4883,12 +4838,12 @@ void zwiden_stack_to_long(LVALUE *lval)
         ol("dec\thl");
         ol("ex\t(sp),hl"); // Emulated on GBZ80 unfortunately
         postlabel(label);
-        zpush();
+        push("hl");
         ol("ld\tl,c");
         ol("ld\th,b");
     } else {
         ol("exx"); /* Preserve other operator */
-        mainpop();
+        pop("hl");
         force(KIND_LONG, lval->val_type, lval->ltype->isunsigned, lval->ltype->isunsigned, 0);
         lpush(); /* Put the new expansion on stk*/
         ol("exx"); /* Get it back again */

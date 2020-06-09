@@ -1,12 +1,9 @@
 /* codegen.c */
-extern void comment(void);
 extern void header(void);
 extern void DoLibHeader(void);
 extern void trailer(void);
 extern void outname(const char *sname, char pref);
-extern void getmem(SYMBOL *sym);
 extern int getloc(SYMBOL *sym, int off);
-extern void putmem(SYMBOL *sym);
 extern void putstk(LVALUE *lval);
 extern void puttos(void);
 extern void put2tos(void);
@@ -15,22 +12,19 @@ extern void swap(void);
 extern void immed(void);
 extern void immedlit(int lab,int offs);
 extern void lpush(void);
-extern void zpushde(void);
 extern void zpush(void);
 extern void dpush_under(int val_type);
+
+
+
 extern void mainpop(void);
 extern void zpop(void);
 extern void zcallop(void);
-extern void zshortcall(int rst, int value) ;
-extern void zbankedcall(SYMBOL *sym);
-extern void zclibcallop(void);
+
 extern char dopref(SYMBOL *sym);
 extern void callrts(char *sname);
 extern int callstk(Type *type, int n, int isfarptr, int last_argument_size);
-extern void jump(int label);
-extern void opjump(char *, int);
-extern void testjump(LVALUE *,int label);
-extern void zerojump(void (*oper)(LVALUE *,int), int label, LVALUE *lval);
+
 extern void defbyte(void);
 extern void defstorage(void);
 extern void defword(void);
@@ -52,10 +46,7 @@ extern void jumpnc(int);
 
 extern void jumpr(int);
 extern void opjumpr(char *, int);
-extern void setcond(int);
 extern void dummy(LVALUE *);
-extern void LoadAccum(void);
-extern void CpCharVal(int);
 extern void EmitLine(int);
 
 

@@ -1758,7 +1758,7 @@ static void declfunc(Type *functype, enum storage_type storage)
         if ( fastarg->size == 2 || fastarg->size == 1) 
             zpush();
         else if ( kind_is_floating(fastarg->kind) )
-            gen_push_float(KIND_DOUBLE);     
+            gen_push_float(fastarg->kind);     
         else if ( fastarg->size == 4 || fastarg->size == 3)
             lpush();
         else

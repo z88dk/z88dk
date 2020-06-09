@@ -48,6 +48,8 @@ extern void     callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
 
 #include "codegen.h"
 
+extern void gen_comment(const char *comment);
+
 extern void gen_store_to_tos(Kind typeobj);
 extern void gen_conv_uint2char(void);
 extern void gen_conv_sint2char(void);
@@ -65,13 +67,23 @@ extern void gen_push_float(Kind typeToPush);
 
 extern void gen_critical_enter(void);
 extern void gen_critical_leave(void);
+extern void gen_shortcall(int rst, int value);
+extern void gen_bankedcall(SYMBOL *sym);
 
 extern void gen_load_indirect(LVALUE *lval);
+extern void gen_load_static(SYMBOL *sym);
+extern void gen_store_static(SYMBOL *sym);
+
 extern int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar);
 
 extern void gen_switch_preamble(Kind kind);
 extern void gen_switch_case(Kind kind, int32_t value, int label);
 extern void gen_switch_postamble(Kind kind);
+
+extern void gen_jp_label(int label);
+extern void opjump(char *, int);
+extern void testjump(LVALUE *,int label);
+extern void zerojump(void (*oper)(LVALUE *,int), int label, LVALUE *lval);
 
 extern void zadd_const(LVALUE *lval, int32_t value);
 extern void zadd(LVALUE *);

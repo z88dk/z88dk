@@ -68,10 +68,10 @@ void dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq
         rvalue(lval);
     else if (lval->is_const) {
         if ( lval->const_val && testfuncz == eq0 ) {
-            jump(exit1);
+            gen_jp_label(exit1);
             return;
         } else if ( lval->const_val == 0 && testfuncz == testjump) {
-            jump(exit1);
+            gen_jp_label(exit1);
             return;
         } 
         load_constant(lval);

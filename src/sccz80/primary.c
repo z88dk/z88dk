@@ -575,7 +575,7 @@ void store(LVALUE* lval)
     if (lval->symbol && (lval->symbol->type == KIND_PORT8 || lval->symbol->type == KIND_PORT16) ) {
         gen_intrinsic_out(lval->symbol);
     } else if (lval->indirect_kind == KIND_NONE)
-        putmem(lval->symbol);
+        gen_store_static(lval->symbol);
     else
         putstk(lval);
 }
@@ -645,22 +645,6 @@ void smartstore(LVALUE* lval)
     }
 }
 
-void rvaluest(LVALUE* lval)
-{
-    if ( lval->symbol && lval->symbol->isassigned == NO && buffer_fps_num == 0 ) {
-        warningfmt("maybe-uninitialized", "unknown","Variable '%s' may be used before initialisation", lval->symbol->name);
-    }
-
-    if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
-        gen_intrinsic_in(lval->symbol);
-    } else if (lval->symbol && lval->indirect_kind == KIND_NONE) {
-       
-        getmem(lval->symbol);
-    } else {
-        gen_load_indirect(lval);
-    }
-    if (lval->cast_type ) docast(lval, lval);
-}
 
 void rvalue(LVALUE* lval)
 {
@@ -670,7 +654,7 @@ void rvalue(LVALUE* lval)
     if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
         gen_intrinsic_in(lval->symbol);
     } else if (lval->symbol && lval->indirect_kind == KIND_NONE) {
-        getmem(lval->symbol);
+        gen_load_static(lval->symbol);
     } else {           
         gen_load_indirect(lval);
     }
@@ -759,7 +743,7 @@ int test(int label, int parens)
             return lval.const_val;
         }
         /* false constant, jump round body */
-      //  jump(label);
+      //  gen_jp_label(label);
         return 0;
     }
     
