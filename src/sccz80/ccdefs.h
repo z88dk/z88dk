@@ -66,6 +66,10 @@ extern void gen_push_float(Kind typeToPush);
 extern void gen_critical_enter(void);
 extern void gen_critical_leave(void);
 
+extern void gen_switch_preamble(Kind kind);
+extern void gen_switch_case(Kind kind, int32_t value, int label);
+extern void gen_switch_postamble(Kind kind);
+
 extern void zadd_const(LVALUE *lval, int32_t value);
 extern void zadd(LVALUE *);
 extern void zsub(LVALUE *);

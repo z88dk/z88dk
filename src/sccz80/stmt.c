@@ -497,31 +497,12 @@ void doswitch()
     suspendbuffer();
 
     postlabel(endlab);
-    if (switch_type->kind == KIND_CHAR) {
-        LoadAccum();
-        while (swptr < swnext) {
-            CpCharVal(swptr->value);
-            opjump("z,", swptr->label);
-            ++swptr;
-        }
-    } else {
-        sw(switch_type->kind); /* insert code to match cases */
-        while (swptr < swnext) {
-            defword();
-            printlabel(swptr->label); /* case label */
-            if (switch_type->kind == KIND_LONG) {
-                outbyte('\n');
-                deflong();
-            } else
-                outbyte(',');
-            outdec(swptr->value); /* case value */
-            nl();
-            ++swptr;
-        }
-        defword();
-        outdec(0);
-        nl();
+    gen_switch_preamble(switch_type->kind);
+    while (swptr < swnext ) {
+        gen_switch_case(switch_type->kind, swptr->value, swptr->label);
+        ++swptr;
     }
+    gen_switch_postamble(switch_type->kind);
     if (swdefault)
         jump(swdefault);
     else

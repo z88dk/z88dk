@@ -4955,6 +4955,52 @@ void zwiden_stack_to_long(LVALUE *lval)
     }
 }
 
+void gen_switch_preamble(Kind kind) 
+{
+    if ( kind == KIND_CHAR ) {
+        ol("ld\ta,l");
+    } else if (kind == KIND_LONG || kind == KIND_CPTR) {
+        callrts("l_long_case");
+    } else {
+        callrts("l_case");
+    }
+}
+
+void gen_switch_case(Kind kind, int32_t value, int label) 
+{
+    if ( kind == KIND_CHAR ) {
+        if ( value == 0 ) {
+            ol("and\ta");
+        } else {
+            ot("cp\t+(");
+            outdec(value);
+            outstr("% 256)\n");
+        }
+        opjump("z,", label);
+    } else {
+        defword();
+        printlabel(label); /* case label */
+        nl();
+        if ( kind == KIND_LONG || kind == KIND_CPTR) {
+            deflong();
+        } else {
+            defword();
+        }
+        outdec(value); /* case value */
+        nl();
+    }
+}
+
+void gen_switch_postamble(Kind kind)
+{
+    // Table terminator
+    if ( kind != KIND_CHAR ) {
+        defword();
+        outdec(0);
+        nl();
+    }
+}
+
 /*
  * Local Variables:
  *  indent-tabs-mode:nil
