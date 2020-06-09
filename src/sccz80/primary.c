@@ -273,14 +273,14 @@ int intcheck(LVALUE* lval, LVALUE* lval2)
 void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
 {
     if (t2 == KIND_CARRY) {
-        zcarryconv();
+        gen_conv_carry2int();
     }
 
     if (kind_is_floating(t1)) {
         zconvert_to_double(t2, t1, isunsigned2);
     } else {
         if (kind_is_floating(t2)) {
-            zconvert_from_double(t1, t2, isunsigned1);
+            zconvert_from_double(t2, t1, isunsigned1);
             return;
         }
     }
@@ -290,30 +290,30 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
     if (t1 == KIND_LONG) {
         if (t2 != KIND_LONG ) {
             if (isunsigned2 == NO && isunsigned1 == NO && t2 != KIND_CARRY) {
-                convSint2long();
+                gen_conv_sint2long();
             } else
-                convUint2long();
+                gen_conv_uint2long();
         }
         return;
     }
 
     /* Converting between pointer types..far and near */
     if (t1 == KIND_CPTR && t2 == KIND_INT)
-        convUint2long();
+        gen_conv_uint2long();
     else if (t2 == KIND_CPTR && (t1 == KIND_INT || t1 == KIND_PTR))
         warningfmt("incompatible-pointer-types","Narrowing pointer from far to near");
         
     /* Char conversion */
     if (t1 == KIND_CHAR && isunsigned2 == NO && !isconst) {
         if (isunsigned1 == NO)
-            convSint2char();
+            gen_conv_sint2char();
         else
-            convUint2char();
+            gen_conv_uint2char();
     } else if (t1 == KIND_CHAR && isunsigned2 == YES && !isconst) {
         if (isunsigned1 == NO)
-            convSint2char();
+            gen_conv_sint2char();
         else
-            convUint2char();
+            gen_conv_uint2char();
     }
 }
 
@@ -351,7 +351,7 @@ int widen(LVALUE* lval, LVALUE* lval2)
 void widenlong(LVALUE* lval, LVALUE* lval2)
 {
     if (lval2->val_type == KIND_CARRY) {
-        zcarryconv();
+        gen_conv_carry2int();
         lval2->ltype = type_int;
         lval2->val_type = KIND_INT;
     }
@@ -375,16 +375,16 @@ void widenlong(LVALUE* lval, LVALUE* lval2)
             if ( lval->ltype->isunsigned ) {
                 if ( !lval2->ltype->isunsigned ) {
                     // RHS is signed, 
-                    convSint2long();
+                    gen_conv_sint2long();
                 } else {
-                    convUint2long();
+                    gen_conv_uint2long();
                 }
                 lval->ltype = type_ulong;
             } else {
                 if ( lval2->ltype->isunsigned ) {
-                    convUint2long();
+                    gen_conv_uint2long();
                 } else {
-                    convSint2long();
+                    gen_conv_sint2long();
                 }
                 lval->ltype = type_long;
             }
@@ -573,7 +573,7 @@ void store(LVALUE* lval)
     if ( lval->symbol ) 
         lval->symbol->isassigned = YES;
     if (lval->symbol && (lval->symbol->type == KIND_PORT8 || lval->symbol->type == KIND_PORT16) ) {
-        intrinsic_out(lval->symbol);
+        gen_intrinsic_out(lval->symbol);
     } else if (lval->indirect_kind == KIND_NONE)
         putmem(lval->symbol);
     else
@@ -652,7 +652,7 @@ void rvaluest(LVALUE* lval)
     }
 
     if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
-        intrinsic_in(lval->symbol);
+        gen_intrinsic_in(lval->symbol);
     } else if (lval->symbol && lval->indirect_kind == KIND_NONE) {
        
         getmem(lval->symbol);
@@ -668,7 +668,7 @@ void rvalue(LVALUE* lval)
         warningfmt("maybe-uninitialized","Variable '%s' may be used before initialisation", lval->symbol->name);
     }
     if (lval->symbol && (lval->symbol->type == KIND_PORT8  || lval->symbol->type == KIND_PORT16) ) {
-        intrinsic_in(lval->symbol);
+        gen_intrinsic_in(lval->symbol);
     } else if (lval->symbol && lval->indirect_kind == KIND_NONE) {
         getmem(lval->symbol);
     } else {           

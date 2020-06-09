@@ -3,19 +3,6 @@
  *      Split into parts 3/3/99 djm
  *
  *      This part deals with the evaluation of a constant
- *
- *      $Id: const.c,v 1.26 2016-08-26 05:45:05 aralbrec Exp $
- *
- *      7/3/99 djm - fixed minor problem in fnumber, which prevented
- *      fp numbers from working properly! Also added a ifdef UNSURE
- *      around exponent-- for -math-z88
- *
- *      29/1/2001 djm - added ability to dump string literals and have
- *      them sorted out at compile time
- *
- *      26/1/2002 djm - Exponent code uncommented now. This works, but
- *      there may be accuracy issues due to method used for -ve exponents
- *
  */
 
 #include "ccdefs.h"
@@ -67,8 +54,6 @@ int constant(LVALUE* lval)
     lval->is_const = 1; /* assume constant will be found */
     if (fnumber(lval)) {
         load_double_into_fa(lval);
-        lval->ltype = type_double;
-        lval->val_type = KIND_DOUBLE;
         lval->flags = FLAGS_NONE;
         return (1);
     } else if (number(lval) || pstr(lval)) {
@@ -122,7 +107,7 @@ int fnumber(LVALUE *lval)
     while (numeric(*s))
         ++s;
 
-    if (*s != '.' && *s != 'e') { /* Check that it is floating point */
+    if (*s != '.' && (*s != 'e' && *s != 'f')) { /* Check that it is floating point */
         s++;
         return 0;
     }
@@ -135,13 +120,22 @@ int fnumber(LVALUE *lval)
     if (end == start)
         return 0;
 
-    for ( i = 0; i < buffer_fps_num; i++ ) 
-        fprintf(buffer_fps[i], "%.*s", (int)(end-start), start);
+
     lptr = end - line;
+
+    lval->val_type = KIND_DOUBLE;
+    lval->ltype = type_double;
 
     if ( line[lptr] == 'f' ) {
         lptr++;
+        if ( line[lptr] == '1' && line[lptr+1] == '6') {
+            lptr+=2;
+            lval->val_type = KIND_FLOAT16;
+            lval->ltype = type_float16;
+        }
     }
+    for ( i = 0; i < buffer_fps_num; i++ ) 
+        fprintf(buffer_fps[i], "%.*s", (int)(line+lptr-start), start);
 
     lval->const_val = dval;
 
@@ -232,10 +226,14 @@ typecheck:
         }
         if (cmatch('S'))
             isunsigned = 0;
-        if (amatch("f16"))
+        if (amatch("f16")) {
             lval->val_type = KIND_FLOAT16;
-        if (cmatch('f'))
+            lval->ltype = type_float16;
+        }
+        if (cmatch('f')) {
             lval->val_type = KIND_DOUBLE;
+            lval->ltype = type_double;
+        }
     }
     if ( lval->val_type == KIND_LONG ) {
         if ( isunsigned )
@@ -325,9 +323,9 @@ int storeq(int length, unsigned char* queue, int32_t* val)
 {
     int j, k, len;
     /* Have stashed it in our temporary queue, we know the length, so lets
- * get checking to see if one exactly the same has already been placed
- * in there...
- */
+    * get checking to see if one exactly the same has already been placed
+    * in there...
+    */
     k = length;
     len = litptr - k; /* Amount of leeway to search through.. */
     j = 1; /* Literal queue starts from 1 not 0 now
@@ -433,6 +431,9 @@ unsigned char litchar()
     case 'l': /* LF (non standard)*/
         gch();
         return 10;
+    case 'e':
+        gch();
+        return 27;
     }
 
     if (ch() != 'x' && (ch() < '0' || ch() > '7')) {

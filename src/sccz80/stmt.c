@@ -626,12 +626,10 @@ static void docritical(void)
         errorfmt("Cannot nest __critical sections", 1);
     }
     incritical = 1;
-    zentercritical();
-    Zsp -= zcriticaloffset();
+    gen_critical_enter();
     statement();
-    zleavecritical();
+    gen_critical_leave();
     incritical = 0;
-    Zsp += zcriticaloffset();
 }
 
 /*

@@ -12,7 +12,7 @@
 	ld	hl,_main
 	push	hl
 	ld	hl,1	;const
-	call	l_int2long_s
+	ld	de,0
 	push	de
 	push	hl
 	ld	hl,3	;const

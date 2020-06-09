@@ -38,6 +38,26 @@ extern int check_lastop_was_comparison(LVALUE* lval);
 
 extern char Filenorig[];
 
+#ifdef USEFRAME
+extern void zpushflags(void);
+extern void zpopflags(void);
+extern int CheckOffset(int);
+extern void FrameP(void);
+extern void PutFrame(char,int);
+extern void RestoreSP(char);
+extern void OutIndex(int);
+#endif
+
+static void immed2(void);
+static void constbc(int32_t val);
+static void doexx(void);
+static void swapstk(void);
+static void savehl(void);
+static void restorehl(void);
+extern void zret(void);
+static void zpopbc(void);
+static void addbchl(int val);
+static void dcallrts(char *sname,Kind to);
 static void quikmult(int type, int32_t size, char preserve);
 static void threereg(void);
 static void fivereg(void);
@@ -413,8 +433,7 @@ void putmem(SYMBOL* sym)
 /*
  *  Store type at TOS - used for initialising auto vars
  */
-
-void StoreTOS(Kind typeobj)
+void gen_store_to_tos(Kind typeobj)
 {
     switch (typeobj) {
     case KIND_LONG:
@@ -883,8 +902,8 @@ void lpush2(void)
     Zsp -= 4;
 }
 
+#ifdef USEFRAME
 /* Push and pop flags (used for ? operator) */
-
 void zpushflags(void)
 {
     ol("push\taf");
@@ -896,6 +915,7 @@ void zpopflags(void)
     ol("pop\taf");
     Zsp += 2;
 }
+#endif
 
 /* Push secondary register/high work of long onto the stack */
 
@@ -1389,11 +1409,11 @@ void leave(Kind vartype, char type, int incritical)
             restorehl();
         }
     }
-    popframe(); /* Restore previous frame pointer */
+    gen_pop_frame(); /* Restore previous frame pointer */
 
     /* Naked has already returned */
     if ( (currfn->flags & CRITICAL) == CRITICAL || incritical) {
-        zleavecritical();
+        gen_critical_leave();
     }
     if (type)
         setcond(type);
@@ -3294,7 +3314,7 @@ void lneg(LVALUE* lval)
         break;
     case KIND_DOUBLE:
     case KIND_FLOAT16:
-        zconvert_from_double(KIND_INT,lval->val_type, 0);
+        zconvert_from_double(lval->val_type,KIND_INT, 0);
     default:
         set_int(lval);
         callrts("l_lneg");
@@ -4279,7 +4299,7 @@ void zge(LVALUE* lval)
     }
 }
 
-void zcarryconv(void)
+void gen_conv_carry2int(void)
 {
     vconst(0);
     if ( !IS_808x() ) {
@@ -4296,25 +4316,25 @@ void zcarryconv(void)
  *      file to aid conversion etc
  */
 
-void convUint2char(void)
+void gen_conv_uint2char(void)
 {
     ol("ld\th,0");
 }
 
-void convSint2char(void)
+void gen_conv_sint2char(void)
 {
     ol("ld\ta,l");
     callrts("l_sxt");
 }
 
 /* Unsigned int to long */
-void convUint2long(void)
+void gen_conv_uint2long(void)
 {
     const2(0);
 }
 
 /* Signed int to long */
-void convSint2long(void)
+void gen_conv_sint2long(void)
 {
     // ol("ld\ta,h");
     // ol("rla");
@@ -4453,19 +4473,10 @@ void savehl(void)
     ol("ld\t(saved_hl),hl");
 }
 
-void savede(void)
-{
-    ol("ld\t(saved_de),de");
-}
 
 void restorehl(void)
 {
     ol("ld\thl,(saved_hl)");
-}
-
-void restorede(void)
-{
-    ol("ld\tde,(saved_de)");
 }
 
 /* Prefix for assembler */
@@ -4564,7 +4575,7 @@ void FrameP(void)
     outstr(c_framepointer_is_ix ? "ix" : "iy");
 }
 
-void pushframe(void)
+void gen_push_frame(void)
 {
     if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         if ( !IS_808x() && !IS_GBZ80() ) {
@@ -4577,7 +4588,7 @@ void pushframe(void)
     }
 }
 
-void popframe(void)
+void gen_pop_frame(void)
 {
     if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         if ( !IS_808x() && !IS_GBZ80() ) {
@@ -4756,7 +4767,7 @@ void copy_to_extern(const char *src, const char *dest, int size)
 }
 
 
-void intrinsic_in(SYMBOL *sym)
+void gen_intrinsic_in(SYMBOL *sym)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ioi");
@@ -4787,7 +4798,7 @@ void intrinsic_in(SYMBOL *sym)
     }
 }
 
-void intrinsic_out(SYMBOL *sym)
+void gen_intrinsic_out(SYMBOL *sym)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ld\ta,l");
@@ -4817,21 +4828,23 @@ void intrinsic_out(SYMBOL *sym)
 }
 
 
-void zentercritical(void)
+void gen_critical_enter(void)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ipset\t3");
     } else {
         callrts("l_push_di");
+        Zsp -= 2;
     }
 }
 
-void zleavecritical(void)
+void gen_critical_leave(void)
 {
     if ( c_cpu & CPU_RABBIT ) {
         ol("ipres");
     } else {
         callrts("l_pop_ei");
+        Zsp += 2;
     }
 }
 
@@ -4852,7 +4865,7 @@ void push_char_sdcc_style(void)
 }
 
 
-void zconvert_from_double(Kind to, Kind from, unsigned char isunsigned)
+void zconvert_from_double(Kind from, Kind to, unsigned char isunsigned)
 {
     if ( to == KIND_LONG || to == KIND_CPTR ) {
         if ( isunsigned ) dcallrts("f2ulong",from);
@@ -4901,7 +4914,7 @@ void zconvert_to_double(Kind from, Kind to, unsigned char isunsigned)
        else dcallrts("schar2f",to);
        return;
    } else if ( from == KIND_CARRY ) {
-       zcarryconv();
+       gen_conv_carry2int();
        isunsigned = 1;
    } else if ( from == KIND_FLOAT16 ) {
        dcallrts("f16tof",to);

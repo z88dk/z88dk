@@ -246,7 +246,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         setstage(&before, &start);
         expr = expression(&vconst, &val, &type);
         if (expr == KIND_CARRY) {
-            zcarryconv();
+            gen_conv_carry2int();
             expr = KIND_INT;
             type = type_int;
         }
@@ -261,7 +261,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             prototype = array_get_byindex(functype->parameters, proto_argnumber);
 
             if ( prototype->kind != KIND_ELLIPSES && type->kind != prototype->kind ) {
-                if ( vconst && type->kind == KIND_DOUBLE && kind_is_integer(prototype->kind)) {
+                if ( vconst && (kind_is_floating(prototype->kind) || kind_is_integer(prototype->kind))) {                 
                      LVALUE lval = {0};
                      clearstage(before,start);
                      start = NULL;

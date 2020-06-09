@@ -154,7 +154,7 @@
 	ld	hl,_l_regular
 	push	hl
 	ld	hl,101	;const
-	call	l_int2long_s
+	ld	de,0
 	push	de
 	push	hl
 	call	_l_regular
@@ -247,24 +247,24 @@
 	ld	hl,_ll_fastcall
 	push	hl
 	ld	hl,100	;const
-	call	l_int2long_s
+	ld	de,0
 	push	de
 	push	hl
 	ld	hl,65526	;const
-	call	l_int2long_s
+	ld	de,65535
 	call	_ll_fastcall
 	pop	bc
 	pop	bc
 	ld	hl,0	;const
 	call	l_gintspsp	;
 	ld	hl,10	;const
-	call	l_int2long_s
+	ld	de,0
 	ex	de,hl
 	ex	(sp),hl
 	push	de
 	push	hl
 	ld	hl,65535	;const
-	call	l_int2long_s
+	ld	de,65535
 	pop	af
 	ld	bc,i_5
 	push	bc

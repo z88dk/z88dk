@@ -1000,7 +1000,7 @@ int declare_local(int local_static)
                         //conv type
                         force(type->kind, expr, type->isunsigned, expr_type->isunsigned, 0);
                     }
-                    StoreTOS(type->kind);
+                    gen_store_to_tos(type->kind);
                 }
             }
         }
@@ -1747,9 +1747,9 @@ static void declfunc(Type *functype, enum storage_type storage)
         
     
     if ( (functype->flags & CRITICAL) == CRITICAL ) {
-        zentercritical();
+        gen_critical_enter();
     }
-    pushframe();
+    gen_push_frame();
 
     if (array_len(functype->parameters) && (functype->flags & (FASTCALL|NAKED)) == FASTCALL ) {
         Type *fastarg = array_get_byindex(functype->parameters,array_len(functype->parameters) - 1);

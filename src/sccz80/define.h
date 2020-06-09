@@ -79,8 +79,6 @@ typedef enum {
 } Kind;
 
 #define kind_is_floating(x)  ( (x) == KIND_DOUBLE || (x) == KIND_FLOAT16)
-
-
 #define kind_is_integer(k) ( k == KIND_CHAR || k == KIND_INT || k == KIND_SHORT || k == KIND_LONG )
 
 typedef struct {
@@ -134,7 +132,7 @@ struct type_s {
     UT_hash_handle hh;
 };
 
-extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double;
+extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double, *type_float16;
 
 
 enum ident_type {

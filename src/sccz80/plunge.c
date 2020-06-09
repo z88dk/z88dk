@@ -538,7 +538,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lpush();
         } else {
             if (lval->val_type == KIND_CARRY) {
-                zcarryconv();
+                gen_conv_carry2int();
                 lval->val_type = lhs_val_type = KIND_INT;
                 lval->ltype = type_int;
             }

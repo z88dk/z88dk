@@ -711,9 +711,9 @@ int heirb(LVALUE* lval)
                     // We just called an SDCC function, we need to extend out to 16 bits, these names are wrong, but
                     // they do the right thing
                     if ( return_type->isunsigned ) {
-                        convUint2char();
+                        gen_conv_uint2char();
                     } else {
-                        convSint2char();
+                        gen_conv_sint2char();
                     }
                 }
                 lval->flags &= ~(CALLEE|FASTCALL|SMALLC);
