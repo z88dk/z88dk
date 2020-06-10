@@ -249,14 +249,14 @@ int heir1a(LVALUE* lval)
             zconvert_to_double(lval2.val_type, lval->val_type, lval2.ltype->isunsigned);
             postlabel(skiplab);
         } else if (lval2.val_type == KIND_LONG && lval->val_type != KIND_LONG) {
-            widenlong(&lval2, lval);
+            widenintegers(&lval2, lval);
             lval->val_type = KIND_LONG;
             lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             postlabel(endlab);
         } else if (lval2.val_type != KIND_LONG && lval->val_type == KIND_LONG) {
             gen_jp_label(skiplab = getlabel());
             postlabel(endlab);
-            widenlong(lval, &lval2);
+            widenintegers(lval, &lval2);
             lval->val_type = KIND_LONG;
             lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             postlabel(skiplab);

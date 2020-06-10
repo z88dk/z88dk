@@ -100,7 +100,11 @@ static void warningva(const char *category, const char *fmt, va_list ap)
         fprintf(stderr, "sccz80:%s L:%d Warning:", Filename, lineno);
     } else {
         char filen[FILENAME_MAX+1];
-        strncpy(filen, Filename + 1, strlen(Filename) - 2);
+        if ( Filename[0] == '\"' ) {
+            strncpy(filen, Filename + 1, strlen(Filename) - 2);
+        } else {
+            strcpy(filen,Filename);
+        }
         filen[strlen(Filename) - 2] = '\0';
         fprintf(stderr, "%s:%d:%d: warning: ", filen, lineno, lptr + 1);
     }
@@ -151,7 +155,11 @@ void errorva(int fatal, const char *fmt, va_list ap)
         fprintf(stderr, "sccz80:%s L:%d Error:", Filename, lineno);
     } else {
         char filen[FILENAME_MAX+1];
-        strncpy(filen, Filename + 1, strlen(Filename) - 2);
+        if ( Filename[0] == '\"' ) {
+            strncpy(filen, Filename + 1, strlen(Filename) - 2);
+        } else {
+            strcpy(filen,Filename);
+        }
         filen[strlen(Filename) - 2] = '\0';
         fprintf(stderr, "%s:%d:%d: %s: ", filen, lineno, lptr + 1, fatal ? "fatal error" : "error");
     }

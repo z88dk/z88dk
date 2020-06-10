@@ -81,6 +81,8 @@ typedef enum {
 #define kind_is_floating(x)  ( (x) == KIND_DOUBLE || (x) == KIND_FLOAT16)
 #define kind_is_integer(k) ( k == KIND_CHAR || k == KIND_INT || k == KIND_SHORT || k == KIND_LONG )
 
+#define get_float_type(k) (k == KIND_DOUBLE || k == KIND_FLOAT) ? type_double : type_float16
+
 typedef struct {
     size_t    size;
     void    **elems;

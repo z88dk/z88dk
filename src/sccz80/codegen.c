@@ -887,6 +887,21 @@ void lpush(void)
     push("hl");
 }
 
+void gen_push_primary(LVALUE *lval)
+{
+    switch ( lval->val_type ) {
+    case KIND_DOUBLE:
+    case KIND_FLOAT16:
+        gen_push_float(lval->val_type);
+        break;
+    case KIND_LONG:
+    case KIND_CPTR:
+        lpush();
+        break;
+    default:
+        zpush();
+    }
+}
 
 /* Push the primary register onto the stack */
 void zpush(void)

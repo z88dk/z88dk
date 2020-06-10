@@ -323,7 +323,7 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
  *
  * Maybe should an operand in here for KIND_LONG?
  */
-int widen(LVALUE* lval, LVALUE* lval2)
+int widen_if_float(LVALUE* lval, LVALUE* lval2)
 {
     if (kind_is_floating(lval2->val_type)) {
         if (lval->val_type != lval2->val_type ) {
@@ -348,7 +348,7 @@ int widen(LVALUE* lval, LVALUE* lval2)
     }
 }
 
-void widenlong(LVALUE* lval, LVALUE* lval2)
+void widenintegers(LVALUE* lval, LVALUE* lval2)
 {
     if (lval2->val_type == KIND_CARRY) {
         gen_conv_carry2int();
