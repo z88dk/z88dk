@@ -67,54 +67,54 @@
 #define M_SQRT1_2  0.707107
 
 /* Conversion functions */
-extern half_t __LIB__ m16_f16_f32(float x);
-extern float __LIB__ m16_f32_f16(half_t x);
+extern half_t __LIB__ f16_f16_f32(float x);
+extern float __LIB__ f16_f32_f16(half_t x);
 
-extern int16_t __LIB__ m16_i16_f16(half_t x);
-extern uint16_t __LIB__ m16_u16_f16(half_t x);
-extern int32_t __LIB__ m16_i32_f16(half_t x);
-extern uint32_t __LIB__ m16_u32_f16(half_t x);
+extern int16_t __LIB__ f16_i16_f16(half_t x);
+extern uint16_t __LIB__ f16_u16_f16(half_t x);
+extern int32_t __LIB__ f16_i32_f16(half_t x);
+extern uint32_t __LIB__ f16_u32_f16(half_t x);
 
-extern half_t __LIB__ m16_f16_i8(int8_t x);
-extern half_t __LIB__ m16_f16_i16(int16_t x);
-extern half_t __LIB__ m16_f16_i32(int32_t x);
-extern half_t __LIB__ m16_f16_u8(uint8_t x);
-extern half_t __LIB__ m16_f16_u16(uint16_t x);
-extern half_t __LIB__ m16_f16_u32(uint32_t x);
+extern half_t __LIB__ f16_f16_i8(int8_t x);
+extern half_t __LIB__ f16_f16_i16(int16_t x);
+extern half_t __LIB__ f16_f16_i32(int32_t x);
+extern half_t __LIB__ f16_f16_u8(uint8_t x);
+extern half_t __LIB__ f16_f16_u16(uint16_t x);
+extern half_t __LIB__ f16_f16_u32(uint32_t x);
 
 /* Arithmetic functions */
-extern half_t __LIB__ m16_add(half_t x,half_t y) __smallc;
-extern half_t __LIB__ m16_sub(half_t x,half_t y) __smallc;
-extern half_t __LIB__ m16_mul(half_t x,half_t y) __smallc;
-extern half_t __LIB__ m16_div(half_t x,half_t y) __smallc;
+extern half_t __LIB__ f16_add(half_t x,half_t y) __smallc;
+extern half_t __LIB__ f16_sub(half_t x,half_t y) __smallc;
+extern half_t __LIB__ f16_mul(half_t x,half_t y) __smallc;
+extern half_t __LIB__ f16_div(half_t x,half_t y) __smallc;
 
-extern half_t __LIB__ m16_fma(half_t x,half_t y,half_t z) __smallc;
+extern half_t __LIB__ f16_fma(half_t x,half_t y,half_t z) __smallc;
 
 /* Power functions */
-extern half_t __LIB__ m16_sqrt(half_t x);
-extern half_t __LIB__ m16_div2(half_t x);
-extern half_t __LIB__ m16_mul2(half_t x);
-extern half_t __LIB__ m16_mul10(half_t x);
+extern half_t __LIB__ f16_sqrt(half_t x);
+extern half_t __LIB__ f16_div2(half_t x);
+extern half_t __LIB__ f16_mul2(half_t x);
+extern half_t __LIB__ f16_mul10(half_t x);
 
 /* Nearest integer, absolute value, and remainder functions */
-extern half_t __LIB__ m16_ceil(half_t x);
-extern half_t __LIB__ m16_floor(half_t x);
-#define m16_trunc(a) (a>0.?m16_floor(a):m16_ceil(a))
-#define m16_round(a) (a>0.?m16_floor(a+0.5):m16_ceil(a-0.5))
-#define m16_rint(a) m16_ceil(a)
+extern half_t __LIB__ f16_ceil(half_t x);
+extern half_t __LIB__ f16_floor(half_t x);
+#define f16_trunc(a) (a>0.?f16_floor(a):f16_ceil(a))
+#define f16_round(a) (a>0.?f16_floor(a+0.5):f16_ceil(a-0.5))
+#define f16_rint(a) f16_ceil(a)
 
 /* Manipulation */
-extern half_t __LIB__ m16_frexp(half_t x, int *pw2) __smallc;
-extern half_t __LIB__ m16_ldexp(half_t x, int pw2) __smallc;
+extern half_t __LIB__ f16_frexp(half_t x, int *pw2) __smallc;
+extern half_t __LIB__ f16_ldexp(half_t x, int pw2) __smallc;
 #define scalbn(x,pw2) ldexp(x,pw2)
 
 /* Intrinsic functions */
-extern half_t __LIB__ m16_inv(half_t a);
-extern half_t __LIB__ m16_invsqrt(half_t a);
+extern half_t __LIB__ f16_inv(half_t a);
+extern half_t __LIB__ f16_invsqrt(half_t a);
 
 /* General */
-extern half_t __LIB__ m16_fabs(half_t x);
-extern half_t __LIB__ m16_neg(half_t x);
+extern half_t __LIB__ f16_fabs(half_t x);
+extern half_t __LIB__ f16_neg(half_t x);
 
 /* Classification functions */
 #define FP_NORMAL   0

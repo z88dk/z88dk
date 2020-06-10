@@ -10,7 +10,7 @@ EXTERN  asm_f16_f24
 
 PUBLIC  asm_f16_ceil
 
-; half m16_ceil( half ) __z88dk_fastcall;
+; half f16_ceil( half ) __z88dk_fastcall;
 
 ; Entry: hl = floating point number
 .asm_f16_ceil

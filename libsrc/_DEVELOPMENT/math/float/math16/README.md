@@ -99,7 +99,7 @@ The intrinsic functions `l_f16_`, written in assembly, assume the sccz80 calling
 
     ; subtract two sdcc half floats
     ;
-    ; half m16_sub (half x, half y);
+    ; half f16_sub (half x, half y);
     ;
     ; enter : stack = sdcc_half right, sdcc_half left, ret
     ;
@@ -108,14 +108,14 @@ The intrinsic functions `l_f16_`, written in assembly, assume the sccz80 calling
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 ```
 
-Normal functions `m16_`, assume the calling convention of sccz80 or sdcc depending on the selected compiler.
+Normal functions `f16_`, assume the calling convention of sccz80 or sdcc depending on the selected compiler.
 
 ```
-     RETURN HL <- LHS STACK - RHS HL STACK 
+     RETURN HL <- LHS STACK - RHS STACK 
 
     ; subtract two sccz80 half floats
     ;
-    ; half m16_sub (half x, half y);
+    ; half f16_sub (half x, half y);
     ;
     ; enter : stack = sccz80_half left, sccz80_half right, ret
     ;
@@ -127,7 +127,7 @@ Normal functions `m16_`, assume the calling convention of sccz80 or sdcc dependi
 
     ; subtract two sdcc half floats
     ;
-    ; half m16_sub (half x, half y);
+    ; half f16_sub (half x, half y);
     ;
     ; enter : stack = sdcc_half right, sdcc_half left, ret
     ;
