@@ -8,7 +8,7 @@
 ;  feilipu, 2020 May
 ;
 ;-------------------------------------------------------------------------
-;  asm_f16_abs - z80 half floating point absolute value
+;  asm_f16_fabs - z80 half floating point absolute value
 ;-------------------------------------------------------------------------
 ;
 ;  unpacked format: exponent in d, sign in e[7], mantissa in hl
@@ -20,14 +20,14 @@
 
 SECTION code_fp_math16
 
-PUBLIC asm_f24_abs
-PUBLIC asm_f16_abs
+PUBLIC asm_f24_fabs
+PUBLIC asm_f16_fabs
 
-.asm_f24_abs
+.asm_f24_fabs
     res 7,e
     ret
 
-.asm_f16_abs
+.asm_f16_fabs
     res 7,h
     ret
 

@@ -648,9 +648,9 @@ extern half_t m16_ldexp_callee(half_t x,int16_t exp) __z88dk_callee;
 
 
 
-extern half_t m16_abs(half_t x);
-extern half_t m16_abs_fastcall(half_t x) __z88dk_fastcall;
-#define m16_abs(a) m16_abs_fastcall(a)
+extern half_t m16_fabs(half_t x);
+extern half_t m16_fabs_fastcall(half_t x) __z88dk_fastcall;
+#define m16_fabs(a) m16_fabs_fastcall(a)
 
 
 extern half_t m16_neg(half_t x);

@@ -460,7 +460,7 @@ extern half_t m16_ldexp(half_t x,int16_t exp);
 
 
 
-extern half_t m16_abs(half_t x);
+extern half_t m16_fabs(half_t x);
 
 
 extern half_t m16_neg(half_t x);

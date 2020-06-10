@@ -524,7 +524,7 @@ extern half_t __LIB__ m16_ldexp_callee(half_t x,int16_t exp) __smallc __z88dk_ca
 
 
 
-extern half_t __LIB__ m16_abs(half_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ m16_fabs(half_t x) __smallc __z88dk_fastcall;
 
 
 extern half_t __LIB__ m16_neg(half_t x) __smallc __z88dk_fastcall;

@@ -270,7 +270,7 @@ __DPROTO(,,half_t,,m16_mul10,half_t x)
 __DPROTO(,,half_t,,m16_frexp,half_t x,int8_t *exp)
 __DPROTO(,,half_t,,m16_ldexp,half_t x,int16_t exp)
 
-__DPROTO(,,half_t,,m16_abs,half_t x)
+__DPROTO(,,half_t,,m16_fabs,half_t x)
 __DPROTO(,,half_t,,m16_neg,half_t x)
 __DPROTO(,,half_t,,m16_ceil,half_t x)
 __DPROTO(,,half_t,,m16_floor,half_t x)
