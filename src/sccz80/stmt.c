@@ -559,9 +559,9 @@ void doreturn(char type)
     if (endst() == 0) {
         Type *expr = doexpr();
         force(currfn->ctype->return_type->kind, expr->kind, currfn->ctype->return_type->isunsigned, expr->isunsigned, 0);
-        leave(currfn->ctype->return_type->kind, type, incritical);
+        gen_leave_function(currfn->ctype->return_type->kind, type, incritical);
     } else {
-        leave(KIND_INT, type, incritical);
+        gen_leave_function(KIND_INT, type, incritical);
     }
 }
 

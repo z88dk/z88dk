@@ -7,7 +7,6 @@ extern int getloc(SYMBOL *sym, int off);
 extern void putstk(LVALUE *lval);
 extern void puttos(void);
 extern void put2tos(void);
-extern void loadargc(int n);
 extern void swap(void);
 extern void immed(void);
 extern void immedlit(int lab,int offs);
@@ -19,7 +18,6 @@ extern void dpush_under(int val_type);
 
 extern void mainpop(void);
 extern void zpop(void);
-extern void zcallop(void);
 
 extern char dopref(SYMBOL *sym);
 extern void callrts(char *sname);
@@ -31,7 +29,6 @@ extern void defword(void);
 extern void deflong(void);
 extern void defmesg(void);
 extern void point(void);
-extern void leave(Kind save,char type, int incritical);
 extern int modstk(int newsp, Kind save,int saveaf, int usebc);
 extern void scale(Kind type, Type *tag);
 

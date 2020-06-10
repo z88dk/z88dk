@@ -258,8 +258,7 @@ static void switch_namespace(char *name)
         ns = get_namespace(name);
 
         if ( ns != NULL ) {
-            zcallop();
-            outname(ns->bank_function->name, dopref(ns->bank_function)); nl();
+            gen_call(-1, ns->bank_function->name, ns->bank_function);
         }
     }
 
@@ -679,7 +678,7 @@ void put2tos(void)
  *            if n=0 then emit xor a instead of ld a,0 
  *            (this is picked up by the optimizer, but even so)
  */
-void loadargc(int n)
+static void loadargc(int n)
 {
     n >>= 1;
     loada(n);
@@ -1044,9 +1043,12 @@ void zpop(void)
 }
 
 /* Output the call op code */
-void zcallop(void)
+void gen_call(int arg_count, const char *name, SYMBOL *sym)
 {
-    ot("call\t");
+    if (arg_count != -1 ) {
+        loadargc(arg_count);
+    }
+    ot("call\t"); outname(name, dopref(sym)); nl();
 }
 
 void gen_shortcall(int rst, int value) 
@@ -1280,7 +1282,7 @@ void point(void)
  * \param type 1=c, 2=nc, 0=no carry state
  * \param incritical - We're in a critical section, restore interrupts 
  */
-void leave(Kind vartype, char type, int incritical)
+void gen_leave_function(Kind vartype, char type, int incritical)
 {
     int savesp;
     Kind save = vartype;

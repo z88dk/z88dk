@@ -312,10 +312,11 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
 
 
     if (function_pointer_call == NO ) {
+        int va_arg_count = -1;
         /* Check to see if we have a variable number of arguments */
         if ( functype->funcattrs.hasva ) {
             if ( (functype->flags & SMALLC) == SMALLC ) {
-                loadargc(nargs);
+                va_arg_count = nargs;
             }
         }
         if ( strcmp(funcname,"__builtin_strcpy") == 0 && !IS_808x() ) {
@@ -336,8 +337,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         } else if ( functype->flags & BANKED ) {
             gen_bankedcall(ptr);
         } else {
-            zcallop();
-            outname(funcname, dopref(ptr)); nl();
+            gen_call(va_arg_count, funcname, ptr);
         }
     } else {
         nargs += callstk(functype, nargs, fnptr_type->kind == KIND_CPTR, last_argument_size);
