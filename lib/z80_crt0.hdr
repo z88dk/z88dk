@@ -187,6 +187,8 @@
 	EXTERN	extra		;ditto
 	EXTERN  __atof2		;string->fa conversion
         EXTERN  l_f48_ldexp     ;FA * pow2(N)
+	EXTERN	l_f48_f16tof	;Convert _Float16 to float
+	EXTERN	l_f48_ftof16	;Convert float to _Float16
 
 	; 16 bit float ABI
 	EXTERN	l_f16_add
@@ -212,6 +214,8 @@
 	EXTERN	l_f16_f2ulong
         EXTERN  l_f16_ldexp
         EXTERN  l_f16_invf	;Only for ieee16
+	EXTERN	l_f16_f16tof	;A noop
+	EXTERN	l_f16_ftof16	;A noop
 
 	; 32 bit float ABI
 	EXTERN	l_f32_add
@@ -237,6 +241,8 @@
 	EXTERN	l_f32_f2ulong
         EXTERN  l_f32_ldexp
         EXTERN  l_f32_invf	; Only for math32
+	EXTERN	l_f32_f16tof	;Convert _Float16 to float
+	EXTERN	l_f32_ftof16	;Convert float to _Float16
 
 	; 64 bit float ABI
 	EXTERN	l_f64_load
@@ -268,6 +274,8 @@
 	EXTERN	l_f64_f2slong
 	EXTERN	l_f64_f2ulong
         EXTERN  l_f64_ldexp
+	EXTERN	l_f64_f16tof	;Convert _Float16 to float
+	EXTERN	l_f64_ftof16	;Convert float to _Float16
 
 
 ;--------------------------------------------------
