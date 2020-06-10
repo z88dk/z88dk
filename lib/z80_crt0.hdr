@@ -5,42 +5,42 @@
 ;	Stick in this file any routines which are needed or implicitly
 ;	implied by sccz80.
 ;
-;       This file is included by every module
-;       To handle multi module programs which use floating point
-;       routines in different modules, we have got rid of
-;       the conditional assembly around the float routines
+;	This file is included by every module
+;	To handle multi module programs which use floating point
+;	routines in different modules, we have got rid of
+;	the conditional assembly around the float routines
 ;
 ;	$Id: z80_crt0.hdr,v 1.12 2015-11-24 06:47:17 stefano Exp $
 
-	EXTERN    base_graphics	; Address of graphics screen
+	EXTERN	base_graphics	; Address of graphics screen
 
 	EXTERN	_cpfar2near	; Far->near conversion (z88)
 	EXTERN	packintrout	; Process interrupt (z88 apps)
 
-	EXTERN    l_dcal		; jp(hl)
-	EXTERN    cleanup		; cleanup before program exit
+	EXTERN	l_dcal		; jp(hl)
+	EXTERN	cleanup		; cleanup before program exit
 
 
-	EXTERN     l_jphl        ; another jp(hl)
-	EXTERN     l_jpix        ; jp(ix)
-	EXTERN     l_jpiy        ; jp(iy)
+	EXTERN	l_jphl	   ; another jp(hl)
+	EXTERN	l_jpix	   ; jp(ix)
+	EXTERN	l_jpiy	   ; jp(iy)
 
-	EXTERN     l_ldi
-	EXTERN     l_ldi_128
-	EXTERN     l_ldi_256
+	EXTERN	l_ldi
+	EXTERN	l_ldi_128
+	EXTERN	l_ldi_256
 
-	EXTERN     l_outi
-	EXTERN     l_outi_128
-	EXTERN     l_outi_256
+	EXTERN	l_outi
+	EXTERN	l_outi_128
+	EXTERN	l_outi_256
 	
-	EXTERN     l_ini
-	EXTERN     l_ini_128
-	EXTERN     l_ini_256
-	EXTERN     l_ini_512
+	EXTERN	l_ini
+	EXTERN	l_ini_128
+	EXTERN	l_ini_256
+	EXTERN	l_ini_512
 
 
 	; Used for banked calls for __banked for sccz80 + sdcc
-	EXTERN     banked_call
+	EXTERN	banked_call
 
 
 ;------------------------------------
@@ -107,51 +107,51 @@
 ;Long functions now
 ;------------------
 
-	EXTERN     lpush2		;Push a long under the stack
-	EXTERN     l_int2long_s	;Int->long signed conversion
-	EXTERN     l_int2long_s_float	;Int->long->float signed conversion (optimizer: use -O3)
-	EXTERN     l_int2long_u_float	;uInt->ulong->float signed conversion 
-	EXTERN     l_glong		;Get long
-	EXTERN     l_glongsp	;Get long (peephole opt)
-	EXTERN     l_glonghlp	;Get pointer, then get long
-	EXTERN     l_glong2sp	;Get long and copy on stack (peephole opt)
-	EXTERN     l_glong2sp_hlp
-	EXTERN     l_long_add
-	EXTERN     l_long_and
-	EXTERN     l_long_asl
-	EXTERN     l_long_asr
-	EXTERN     l_long_aslo	;Long << shift in c
-	EXTERN     l_long_asro	;Long >> shift in c (signed)
-	EXTERN     l_long_bool
-	EXTERN     l_long_cmp
-	EXTERN     l_long_com
-	EXTERN     l_long_eq
-	EXTERN     l_long_ge
-	EXTERN     l_long_gt
-	EXTERN     l_long_le
-	EXTERN     l_long_lneg
-	EXTERN     l_long_lt
-	EXTERN     l_long_ne
-	EXTERN     l_long_neg
-	EXTERN     l_long_or
-	EXTERN     l_long_sub
-	EXTERN     l_long_ucmp
-	EXTERN     l_long_uge
-	EXTERN     l_long_ugt
-	EXTERN     l_long_ule
-	EXTERN     l_long_ult
-	EXTERN     l_long_xor
-	EXTERN     l_plong
-	EXTERN     l_inclong	;Increment long
-	EXTERN     l_declong	;Decrement long
-	EXTERN     l_long_div
-	EXTERN     l_long_div_u
-	EXTERN     l_long_mod
-	EXTERN     l_long_mod_u
-	EXTERN     l_long_mult
-	EXTERN     l_long_asr_u	;Long unsigned >>
-	EXTERN     l_long_asr_uo	;Long unsigned >> shift in c
-	EXTERN     l_long_case
+	EXTERN	lpush2		;Push a long under the stack
+	EXTERN	l_int2long_s	;Int->long signed conversion
+	EXTERN	l_int2long_s_float	;Int->long->float signed conversion (optimizer: use -O3)
+	EXTERN	l_int2long_u_float	;uInt->ulong->float signed conversion 
+	EXTERN	l_glong		;Get long
+	EXTERN	l_glongsp	;Get long (peephole opt)
+	EXTERN	l_glonghlp	;Get pointer, then get long
+	EXTERN	l_glong2sp	;Get long and copy on stack (peephole opt)
+	EXTERN	l_glong2sp_hlp
+	EXTERN	l_long_add
+	EXTERN	l_long_and
+	EXTERN	l_long_asl
+	EXTERN	l_long_asr
+	EXTERN	l_long_aslo	;Long << shift in c
+	EXTERN	l_long_asro	;Long >> shift in c (signed)
+	EXTERN	l_long_bool
+	EXTERN	l_long_cmp
+	EXTERN	l_long_com
+	EXTERN	l_long_eq
+	EXTERN	l_long_ge
+	EXTERN	l_long_gt
+	EXTERN	l_long_le
+	EXTERN	l_long_lneg
+	EXTERN	l_long_lt
+	EXTERN	l_long_ne
+	EXTERN	l_long_neg
+	EXTERN	l_long_or
+	EXTERN	l_long_sub
+	EXTERN	l_long_ucmp
+	EXTERN	l_long_uge
+	EXTERN	l_long_ugt
+	EXTERN	l_long_ule
+	EXTERN	l_long_ult
+	EXTERN	l_long_xor
+	EXTERN	l_plong
+	EXTERN	l_inclong	;Increment long
+	EXTERN	l_declong	;Decrement long
+	EXTERN	l_long_div
+	EXTERN	l_long_div_u
+	EXTERN	l_long_mod
+	EXTERN	l_long_mod_u
+	EXTERN	l_long_mult
+	EXTERN	l_long_asr_u	;Long unsigned >>
+	EXTERN	l_long_asr_uo	;Long unsigned >> shift in c
+	EXTERN	l_long_case
 
 ;--------------------------------------------------------------
 ; Floating point support routines, mostly in library
@@ -172,9 +172,9 @@
 	EXTERN	minusfa		;FA=-FA
 
 	EXTERN	dswap		;Exchange FA with top of stack
-	EXTERN  float		;Convert int to float
-	EXTERN  ufloat		;unsigned int to float
-	EXTERN  ifix		;Convert float to int
+	EXTERN	float		;Convert int to float
+	EXTERN	ufloat		;unsigned int to float
+	EXTERN	ifix		;Convert float to int
 
 	EXTERN	dstore		;FA->(de)
 	EXTERN	dload		;FA<-(hl)
@@ -185,8 +185,8 @@
 
 	EXTERN	fa		;may not be needed in this file
 	EXTERN	extra		;ditto
-	EXTERN  __atof2		;string->fa conversion
-        EXTERN  l_f48_ldexp     ;FA * pow2(N)
+	EXTERN	__atof2		;string->fa conversion
+	EXTERN	l_f48_ldexp	;FA * pow2(N)
 	EXTERN	l_f48_f16tof	;Convert _Float16 to float
 	EXTERN	l_f48_ftof16	;Convert float to _Float16
 
@@ -212,8 +212,8 @@
 	EXTERN	l_f16_f2uint
 	EXTERN	l_f16_f2slong
 	EXTERN	l_f16_f2ulong
-        EXTERN  l_f16_ldexp
-        EXTERN  l_f16_invf	;Only for ieee16
+	EXTERN	l_f16_ldexp
+	EXTERN	l_f16_invf	;Only for ieee16
 	EXTERN	l_f16_f16tof	;A noop
 	EXTERN	l_f16_ftof16	;A noop
 
@@ -239,8 +239,8 @@
 	EXTERN	l_f32_f2uint
 	EXTERN	l_f32_f2slong
 	EXTERN	l_f32_f2ulong
-        EXTERN  l_f32_ldexp
-        EXTERN  l_f32_invf	; Only for math32
+	EXTERN	l_f32_ldexp
+	EXTERN	l_f32_invf	;Only for math32
 	EXTERN	l_f32_f16tof	;Convert _Float16 to float
 	EXTERN	l_f32_ftof16	;Convert float to _Float16
 
@@ -273,7 +273,7 @@
 	EXTERN	l_f64_f2uint
 	EXTERN	l_f64_f2slong
 	EXTERN	l_f64_f2ulong
-        EXTERN  l_f64_ldexp
+	EXTERN	l_f64_ldexp
 	EXTERN	l_f64_f16tof	;Convert _Float16 to float
 	EXTERN	l_f64_ftof16	;Convert float to _Float16
 
@@ -293,50 +293,50 @@
 	EXTERN	lp_plong
 	EXTERN	lp_pptr
 
-	EXTERN  l_farcall	; Long call
+	EXTERN	l_farcall	; Long call
 
 
 ;-------------------
 ; Routines for SDCC
 ;-------------------
 
-	EXTERN     __divsint_rrx_s
-	EXTERN     __divsint_rrx_hds
-	EXTERN     __divuint_rrx_s
-	EXTERN     __divuint_rrx_hds
-	EXTERN     __divsuchar_rrx_s
-	EXTERN     __divuschar_rrx_s
-	EXTERN     __divuchar_rrx_s
-	EXTERN     __divuchar_rrx_hds
-	EXTERN     __moduchar_rrx_s
-	EXTERN     __moduchar_rrx_hds
-	EXTERN     __moduschar_rrx_s
-	EXTERN     __modsuchar_rrx_s
-    EXTERN     __modschar_rrx_s
-	EXTERN     __modschar_rrx_hds
-	EXTERN     __modsint_rrx_s
-	EXTERN     __modsint_rrx_hds
-	EXTERN     __moduint_rrx_s
-	EXTERN     __moduint_rrx_hds
-	EXTERN     __get_remainder
-	EXTERN     __divunsigned
-    EXTERN     __div_signexte
-	EXTERN     __divu16
-	EXTERN     __div16
-	EXTERN     __div8
-	EXTERN     __muluchar_rrx_s
-	EXTERN     __muluchar_rrx_hds
-	EXTERN     __mulsuchar_rrx_s
-	EXTERN     __muluschar_rrx_s
-	EXTERN     __mulschar_rrx_s
-	EXTERN     __mulschar_rrx_hds
-	EXTERN     __mulint_rrx_s
-	EXTERN     __mulint_rrx_hds
-	EXTERN     __mul16
-	EXTERN    	__rrulong_rrx_s
-	EXTERN    	__rrslong_rrx_s
-	EXTERN    	__rlslong_rrx_s
-	EXTERN    	__rlulong_rrx_s
+	EXTERN	__divsint_rrx_s
+	EXTERN	__divsint_rrx_hds
+	EXTERN	__divuint_rrx_s
+	EXTERN	__divuint_rrx_hds
+	EXTERN	__divsuchar_rrx_s
+	EXTERN	__divuschar_rrx_s
+	EXTERN	__divuchar_rrx_s
+	EXTERN	__divuchar_rrx_hds
+	EXTERN	__moduchar_rrx_s
+	EXTERN	__moduchar_rrx_hds
+	EXTERN	__moduschar_rrx_s
+	EXTERN	__modsuchar_rrx_s
+	EXTERN	__modschar_rrx_s
+	EXTERN	__modschar_rrx_hds
+	EXTERN	__modsint_rrx_s
+	EXTERN	__modsint_rrx_hds
+	EXTERN	__moduint_rrx_s
+	EXTERN	__moduint_rrx_hds
+	EXTERN	__get_remainder
+	EXTERN	__divunsigned
+	EXTERN	__div_signexte
+	EXTERN	__divu16
+	EXTERN	__div16
+	EXTERN	__div8
+	EXTERN	__muluchar_rrx_s
+	EXTERN	__muluchar_rrx_hds
+	EXTERN	__mulsuchar_rrx_s
+	EXTERN	__muluschar_rrx_s
+	EXTERN	__mulschar_rrx_s
+	EXTERN	__mulschar_rrx_hds
+	EXTERN	__mulint_rrx_s
+	EXTERN	__mulint_rrx_hds
+	EXTERN	__mul16
+	EXTERN	__rrulong_rrx_s
+	EXTERN	__rrslong_rrx_s
+	EXTERN	__rlslong_rrx_s
+	EXTERN	__rlulong_rrx_s
 
-	EXTERN		l_push_di
-	EXTERN		l_pop_ei
+	EXTERN	l_push_di
+	EXTERN	l_pop_ei
