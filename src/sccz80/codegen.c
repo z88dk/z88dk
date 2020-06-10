@@ -4792,10 +4792,12 @@ void zconvert_from_double(Kind from, Kind to, unsigned char isunsigned)
 void zconvert_constant_to_double(double val, Kind to, unsigned char isunsigned)
 {
     unsigned char  fa[8] = {0};
+    LVALUE lval = {0};
 
-    if ( c_fp_size == 2 ) {
-        dofloat(val, fa);
-        vconst((fa[1] << 8) | fa[0]);
+    if ( c_fp_size == 2 || to == KIND_FLOAT16 ) {
+        lval.const_val = val;
+        lval.val_type = KIND_FLOAT16;
+        load_double_into_fa(&lval);
     } else if ( c_fp_size == 4 ) {
         dofloat(val, fa);
         vconst((fa[1] << 8) | fa[0]);

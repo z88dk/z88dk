@@ -146,14 +146,19 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         lval->stage_add = stagenext;
         lval->stage_add_ltype = lval2->ltype;
         if ( kind_is_floating(lval->val_type) && lval2->is_const == 0 ) {
+            if ( kind_is_floating(lval2->val_type)) {
+                // If the RHS (non constant) is a float, then use its type 
+                lval->val_type = lval2->val_type;
+                lval->ltype = lval2->ltype;
+             }
+
             if ( lval2->val_type != lval->val_type ) {  // TODO, always?
                 zconvert_to_double(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = lval->val_type;
                 lval2->ltype = lval->ltype;
             }
 
-
-             if ( dconstoper != NULL ) {
+            if ( dconstoper != NULL ) {
                 if ( dconstoper(lval, lval->const_val, 0)) {
                     lval->is_const = 0;
                     return;
@@ -250,6 +255,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                      }
                  }
                  gen_push_float(lval->val_type);
+                 if ( kind_is_floating(lval->val_type)) {
+                     lval2->val_type = lval->val_type;
+                     lval2->ltype = lval->ltype;
+                 }
                  load_double_into_fa(lval2);
                  lval2->val_type = lval->val_type;
                  lval2->ltype = lval->ltype;
