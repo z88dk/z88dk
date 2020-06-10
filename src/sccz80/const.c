@@ -653,7 +653,6 @@ static Type *get_member(Type *tag)
 
 void dofloat(double raw, unsigned char fa[])
 {
-
     switch ( c_maths_mode ) {
         case MATHS_IEEE:
             dofloat_ieee(raw, fa);
