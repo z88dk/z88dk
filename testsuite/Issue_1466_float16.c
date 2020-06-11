@@ -101,3 +101,20 @@ _Float16 func6e(int a, _Float16 b) {
 _Float16 func6f(int a, _Float16 b) {
         return a + b;
 }
+
+// RHS int is promoted to _Float16
+_Float16 func7a(long a, _Float16 b) {
+        return b + a;
+}
+// RHS is promoted to _Float16
+_Float16 func7b(long a, _Float16 b) {
+        return a + b;
+}
+// RHS int is promoted to _Floa16
+_Float16 func7c(long a, _Float16 b) {
+        return b * a;
+}
+// RHS is promoted to _Float16
+_Float16 func7d(long a, _Float16 b) {
+        return a * b;
+}

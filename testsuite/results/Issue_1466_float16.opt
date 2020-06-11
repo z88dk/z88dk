@@ -315,6 +315,62 @@
 
 
 
+._func7a
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f16_slong2f
+	call	l_f16_add
+	ret
+
+
+
+._func7b
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	(sp),hl
+	ex	de,hl
+	call	l_f16_slong2f
+	call	l_f16_add
+	ret
+
+
+
+._func7c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f16_slong2f
+	call	l_f16_mul
+	ret
+
+
+
+._func7d
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	(sp),hl
+	ex	de,hl
+	call	l_f16_slong2f
+	call	l_f16_mul
+	ret
+
+
+
 
 	SECTION	bss_compiler
 ._doub_val	defs	6
@@ -348,6 +404,10 @@
 	GLOBAL	_func6d
 	GLOBAL	_func6e
 	GLOBAL	_func6f
+	GLOBAL	_func7a
+	GLOBAL	_func7b
+	GLOBAL	_func7c
+	GLOBAL	_func7d
 
 
 

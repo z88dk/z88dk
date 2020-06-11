@@ -4799,11 +4799,9 @@ void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned cha
 {
     if ( float_kind == KIND_FLOAT16) {
         if ( stacked_kind == KIND_LONG ) {
-            ol("ld\tc,l");
-            ol("ld\tb,h");
-            pop("hl");      // LSW
-            pop("de");      // MSW
-            push("bc");     // Save float
+            pop("de");      // LSW
+            ol("ex\t(sp),hl");  // hl = MSW, stack = float
+            ol("ex\tde,hl");
             zconvert_to_double(stacked_kind, float_kind, isunsigned);
             if (!operator_is_commutative) ol("ex\t(sp),hl"); 
         } else {
