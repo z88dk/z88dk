@@ -8,8 +8,6 @@
 
 .l_f16_swap
     pop bc          ; Return
-    pop de          ; left
-    push hl         ; Push right
+    ex (sp),hl      ; Exchange left for right
     push bc         ; Return address
-    ex de,hl
     ret

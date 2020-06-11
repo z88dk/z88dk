@@ -13,3 +13,11 @@ Each subdirectory contains an independent floating point math implementation.
 
    An independent 32-bit floating point package for all targets.
    Complying (on the whole) to the IEEE-754 floating point standard.
+      
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+   ;; math16
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+   An independent 16-bit floating point package for all targets.
+   Complying (on the whole) to the IEEE-754 half precision 
+   floating point standard.

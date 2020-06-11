@@ -1,5 +1,4 @@
 
-math/float/math16/lm16/c/sccz80/abs
 math/float/math16/lm16/c/sccz80/ceil
 math/float/math16/lm16/c/sccz80/div2
 math/float/math16/lm16/c/sccz80/floor
@@ -12,7 +11,7 @@ math/float/math16/lm16/c/sccz80/ldexp
 math/float/math16/lm16/c/sccz80/ldexp_callee
 math/float/math16/lm16/c/sccz80/mul2
 math/float/math16/lm16/c/sccz80/mul10
-math/float/math16/lm16/c/sccz80/neg
+math/float/math16/lm16/c/sccz80/l_f16_fabs
 math/float/math16/lm16/c/sccz80/l_f16_add
 math/float/math16/lm16/c/sccz80/l_f16_conv_int
 math/float/math16/lm16/c/sccz80/l_f16_conv_long
@@ -27,6 +26,7 @@ math/float/math16/lm16/c/sccz80/l_f16_le
 math/float/math16/lm16/c/sccz80/l_f16_lt
 math/float/math16/lm16/c/sccz80/l_f16_mul
 math/float/math16/lm16/c/sccz80/l_f16_ne
+math/float/math16/lm16/c/sccz80/l_f16_neg
 math/float/math16/lm16/c/sccz80/l_f16_sub
 math/float/math16/lm16/c/sccz80/l_f16_swap
 math/float/math16/lm16/c/sccz80/l_f16_zero
