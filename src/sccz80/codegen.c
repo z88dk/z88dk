@@ -913,10 +913,10 @@ void zpush(void)
 
 void gen_push_float(Kind typeToPush)
 {
-    if ( c_fp_size == 4 ) {
-        push("de");
+    if ( c_fp_size == 2 || typeToPush == KIND_FLOAT16 ) {
         push("hl");
-    } else if ( c_fp_size == 2 || typeToPush == KIND_FLOAT16 ) {
+    } else if ( c_fp_size == 4 ) {
+        push("de");
         push("hl");
     } else {
         dcallrts("fpush",KIND_DOUBLE);
