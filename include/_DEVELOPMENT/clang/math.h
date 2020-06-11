@@ -393,10 +393,10 @@ extern double_t poly(const float x,const float d[],unsigned int n);
 
 #ifdef __MATH_MATH16
 
-extern half_t f16_f16_f48(float x);
+extern half_t f16_f16_f48(double_t x);
 
 
-extern float f16_f48_f16(half_t x);
+extern double_t f16_f48_f16(half_t x);
 
 
 
