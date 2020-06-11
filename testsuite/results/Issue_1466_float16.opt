@@ -140,6 +140,16 @@
 
 
 
+._func4e
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	call	l_f16_invf
+	ret
+
+
+
 
 	SECTION	bss_compiler
 ._doub_val	defs	6
@@ -160,6 +170,7 @@
 	GLOBAL	_func3f
 	GLOBAL	_func4c
 	GLOBAL	_func4d
+	GLOBAL	_func4e
 
 
 

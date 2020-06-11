@@ -48,3 +48,6 @@ _Float16 func4c(_Float16 a) {
 _Float16 func4d(_Float16 a) {
 	return a / 3;
 }
+_Float16 func4e(_Float16 a) {
+	return 1 / a;
+}

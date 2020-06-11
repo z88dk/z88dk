@@ -419,7 +419,6 @@ enum maths_mode {
     MATHS_MBF40, // 40 bit Microsoft 
     MATHS_MBF64, // 64 bit Microsoft double precision
     MATHS_Z88,   // Special handling for z88 (subtype of MATHS_Z80)
-    MATHS_IEEE16, // 16 bit ieee
 };
 
 

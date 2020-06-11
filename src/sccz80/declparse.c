@@ -988,9 +988,6 @@ int declare_local(int local_static)
                         // It's a constant that doesn't match the right type
                         LVALUE  lval={0};
                         clearstage(before, 0);
-                        if ( kind_is_floating(expr) ) {
-                            decrement_double_ref_direct(val);
-                        }
                         lval.ltype = type;
                         lval.val_type = type->kind;
                         lval.const_val = val;
@@ -1481,7 +1478,7 @@ void type_describe(Type *type, UT_string *output)
         utstring_printf(output,"double ");
         break;
     case KIND_FLOAT16:
-        utstring_printf(output,"__Float16 ");
+        utstring_printf(output,"_Float16 ");
         break;
     case KIND_ARRAY:
         snprintf(tail, sizeof(tail),"[%d]",type->len);

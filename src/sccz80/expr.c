@@ -69,11 +69,6 @@ int heir1(LVALUE* lval)
 
         /* If it's a const, then load it with the right type */
         if ( lval2.is_const ) {
-            /* This leaves the double with a count of 2 */
-            if ( kind_is_floating(lval2.val_type) ) {
-                decrement_double_ref(&lval2);
-                decrement_double_ref(&lval2);
-            }
             clearstage(before1, 0);
             lval2.val_type = lval->val_type;
             load_constant(&lval2);
@@ -534,9 +529,7 @@ int heira(LVALUE *lval)
         if (heira(lval))
             rvalue(lval);
         neg(lval);
-        if ( kind_is_floating(lval->val_type)) decrement_double_ref(lval);
         lval->const_val = -lval->const_val;
-        if ( kind_is_floating(lval->val_type) ) increment_double_ref(lval);
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('*')) { /* unary * */

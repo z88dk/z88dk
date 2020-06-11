@@ -115,7 +115,7 @@ static const char *map_library_routine(const char *wanted, Kind to)
 
     while ( map->opname != NULL ) {
         if ( strcmp(wanted, map->opname) == 0) {
-            if (to == KIND_FLOAT16 || c_fp_size == 2) {
+            if (to == KIND_FLOAT16 ) {
                 return map->fp_16bit;
             } else if ( c_fp_size == 4 ) {
                 return map->fp_32bit;
@@ -604,9 +604,6 @@ void putstk(LVALUE *lval)
         if ( c_fp_size > 4) {
             pop("hl");
             dcallrts("dstore", KIND_DOUBLE);
-        } else if ( c_fp_size == 2 ) {
-            pop("de");
-            dcallrts("dstore", KIND_DOUBLE);
         } else {
             pop("bc");
             dcallrts("dstore", KIND_DOUBLE);
@@ -630,7 +627,7 @@ void putstk(LVALUE *lval)
         outfmt("\tld\tbc,%d\n",lval->ltype->size);
         ol("ldir");
         break;
-    default:
+    default: 
         pop("de");
         callrts("l_pint");
     }
@@ -913,7 +910,7 @@ void zpush(void)
 
 void gen_push_float(Kind typeToPush)
 {
-    if ( c_fp_size == 2 || typeToPush == KIND_FLOAT16 ) {
+    if ( typeToPush == KIND_FLOAT16 ) {
         push("hl");
     } else if ( c_fp_size == 4 ) {
         push("de");
@@ -1001,7 +998,7 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
 
 /* Push the primary floating point register, preserving
         the top value  */
-void dpush_under(int val_type)
+void dpush_under(int val_type) // TODO
 {
     // This isn't called for float16
     if ( val_type == KIND_LONG || val_type == KIND_CPTR ) {
@@ -1312,8 +1309,6 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     else if ( vartype == KIND_DOUBLE ) {
         if ( c_fp_size == 4 ) {
             vartype = KIND_LONG;
-        } else if ( c_fp_size == 2 ) {
-            vartype = KIND_INT;
         } else {
             vartype = KIND_NONE;
             save = NO;
@@ -1449,9 +1444,6 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
     else if ( save == KIND_DOUBLE ) {
         if ( c_fp_size == 4 ) {
             save = KIND_LONG;
-        } else if ( c_fp_size == 2 ) {
-            save = KIND_INT;
-        }
         // For a 6/8 byte double the value is safely in the exx set or in FA 
     } else if ( save == KIND_FLOAT16 ) {
         save = KIND_INT;
@@ -1511,8 +1503,6 @@ void scale(Kind type, Type *tag)
     case KIND_DOUBLE:
         if ( c_fp_size == 4 ) {
             ol("add\thl,hl");
-            ol("add\thl,hl");
-        } else if ( c_fp_size == 2 ) {
             ol("add\thl,hl");
         } else {
             sixreg();
@@ -2239,7 +2229,7 @@ void zdiv_const(LVALUE *lval, int32_t value)
 int zdiv_dconst(LVALUE *lval, double value, int isrhs)
 {
     if ( isrhs == 0.0 && value == 1.0 && 
-        (c_maths_mode == MATHS_IEEE || c_maths_mode == MATHS_IEEE16 || lval->val_type == KIND_FLOAT16)) {
+        (c_maths_mode == MATHS_IEEE || lval->val_type == KIND_FLOAT16)) {
         dcallrts("inversef",lval->val_type);
         return 1;
     }
@@ -3283,11 +3273,6 @@ void neg(LVALUE* lval)
            ol("xor\t128");
            ol("ld\td,a");
            break;
-        case MATHS_IEEE16:
-           ol("ld\ta,h");
-           ol("xor\t128");
-           ol("ld\th,a");
-           break;
         case MATHS_MBFS:
            ol("ld\ta,e");
            ol("xor\t128");
@@ -3330,9 +3315,6 @@ void inc(LVALUE* lval)
         case MATHS_IEEE:
             vlongconst(0x3f800000); // +1.0
             break;
-        case MATHS_IEEE16:
-            vconst(0x3c00); // +1.0
-            break;
         case MATHS_MBFS:
             vlongconst(0x81000000); // +1.0
             break;
@@ -3370,9 +3352,6 @@ void dec(LVALUE* lval)
         switch ( c_maths_mode ) {
         case MATHS_IEEE:
             vlongconst(0xbf800000); // -1.0
-            break;
-        case MATHS_IEEE16:
-            vconst(0xbc00); // -1.0
             break;
         case MATHS_MBFS:
             vlongconst(0x81800000); // -1.0
@@ -4293,7 +4272,7 @@ void gen_conv_sint2long(void)
 /* Swap double positions on stack */
 void gen_swap_float(Kind type)
 {
-    if ( c_fp_size == 2 || type == KIND_FLOAT16) {
+    if (type == KIND_FLOAT16) {
         ol("ex\t(sp),hl"); 
     } else {
         callrts("fswap");
@@ -4794,7 +4773,7 @@ void zconvert_constant_to_double(double val, Kind to, unsigned char isunsigned)
     unsigned char  fa[8] = {0};
     LVALUE lval = {0};
 
-    if ( c_fp_size == 2 || to == KIND_FLOAT16 ) {
+    if ( to == KIND_FLOAT16 ) {
         lval.const_val = val;
         lval.val_type = KIND_FLOAT16;
         load_double_into_fa(&lval);

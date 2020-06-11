@@ -152,9 +152,6 @@ extern void       size_of(LVALUE *lval);
 extern void       offset_of(LVALUE *lval);
 extern void       load_double_into_fa(LVALUE *lval);
 extern void       write_double_queue(void);
-extern void       decrement_double_ref(LVALUE *lval);
-extern void       increment_double_ref(LVALUE *lval);
-extern void       decrement_double_ref_direct(double value);
 extern void       indicate_double_written(int litlab);
 
 extern void       dofloat(double raw, unsigned char fa[]);

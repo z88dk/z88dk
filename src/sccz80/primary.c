@@ -777,9 +777,6 @@ int constexpr(double *val, Kind *type, int flag)
     valtype = expression(&con, &valtemp, &type_ptr);
     *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
-    if ( kind_is_floating(valtype) && con ) {
-        decrement_double_ref_direct(valtemp);
-    }
     *type = valtype;
     Zsp = savesp;
     if (flag && con == 0)

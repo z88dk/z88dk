@@ -657,9 +657,6 @@ void dofloat(double raw, unsigned char fa[])
         case MATHS_IEEE:
             dofloat_ieee(raw, fa);
             break;
-        case MATHS_IEEE16:
-            dofloat_ieee16(raw, fa);
-            break;
         case MATHS_MBFS:
             dofloat_mbfs(raw, fa);
             break;
@@ -889,7 +886,6 @@ elem_t *get_elem_for_fa(unsigned char fa[], double value)
         }
     }
     elem = MALLOC(sizeof(*elem));
-    elem->refcount = 0;
     elem->litlab = getlabel();
     elem->value = value;
     elem->written = 0;
@@ -904,8 +900,8 @@ void indicate_double_written(int litlab)
 
     LL_FOREACH(double_queue, elem ) {
         if ( elem->litlab == litlab ) {
-	    elem->written = 1;
-	}
+            elem->written = 1;
+        }
     }
 }
 
@@ -960,48 +956,6 @@ void write_double_queue(void)
     nl();
 }
 
-void decrement_double_ref_direct(double value)
-{
-    LVALUE lval={0};
-
-    lval.const_val = value;
-
-    decrement_double_ref(&lval);
-}
-
-void decrement_double_ref(LVALUE *lval)
-{   
-    unsigned char    fa[MAX_MANTISSA_SIZE+1] = {0};
-    elem_t          *elem;
-    if ( c_double_strings ) {
-        char  buf[40];
-        snprintf(buf, sizeof(buf), "%lf", lval->const_val);
-        elem = get_elem_for_buf(buf,lval->const_val);
-        elem->refcount--;
-    } else {
-        dofloat(lval->const_val, fa);
-        elem = get_elem_for_fa(fa,lval->const_val);
-        elem->refcount--;
-    }
-}
-
-void increment_double_ref(LVALUE *lval)
-{   
-    unsigned char    fa[MAX_MANTISSA_SIZE+1] = {0};
-    elem_t          *elem;
-    if ( c_double_strings ) {
-        char  buf[40];
-        snprintf(buf, sizeof(buf), "%lf", lval->const_val);
-        elem = get_elem_for_buf(buf,lval->const_val);
-        elem->refcount++;
-    } else {
-        dofloat(lval->const_val, fa);
-        elem = get_elem_for_fa(fa,lval->const_val);
-        elem->refcount++;
-    }
-}
-
-
 
 
 void load_double_into_fa(LVALUE *lval)
@@ -1022,7 +976,7 @@ void load_double_into_fa(LVALUE *lval)
     } else {
         dofloat(lval->const_val, fa);
 
-        if ( lval->val_type == KIND_FLOAT16 || c_fp_size == 2 ) {
+        if ( lval->val_type == KIND_FLOAT16 ) {
             dofloat_ieee16(lval->const_val, fa);
             vconst(fa[1] << 8 | fa[0]);
         } else if ( c_fp_size == 4 ) {

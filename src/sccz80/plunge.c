@@ -100,9 +100,6 @@ int plnge1(int (*heir)(LVALUE* lval), LVALUE* lval)
     if (lval->is_const) {
         /* constant, load it later */
         clearstage(before, 0);
-        if ( kind_is_floating(lval->val_type) ) {
-       //     decrement_double_ref(lval);
-        }
     }
     return (k);
 }
@@ -275,9 +272,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if (lval2->const_val == 0 && (oper == zdiv || oper == zmod)) {
                 /* Note, a redundant load of lval has been done, this can be taken out by the optimiser */
                 clearstage(before, 0);
-                if ( kind_is_floating(lval2->val_type) ) {
-                    decrement_double_ref(lval2);
-                }
                 Zsp = savesp;
                 if (lval->val_type == KIND_LONG) {
                     vlongconst(0);
@@ -300,8 +294,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         // Fold constants if we can
         if ( lval->is_const && lval2->is_const ) {
             int is16bit = lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR;
-            if ( kind_is_floating(lhs_val_type) ) decrement_double_ref(lval);
-            if ( kind_is_floating(rhs_val_type) ) decrement_double_ref(lval2);
             if (lval->ltype->isunsigned || lval2->ltype->isunsigned ) {
                 lval->const_val = calcun(lhs_val_type, lval->const_val, oper, lval2->const_val);
                 // Promote char here
@@ -606,10 +598,6 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
     if (lval->is_const && lval2->is_const) {
         // Both operators are constant fold them
-        // Fold constants
-        if ( kind_is_floating(lhs_val_type) ) decrement_double_ref(lval);
-        if ( kind_is_floating(rhs_val_type) ) decrement_double_ref(lval2);
-        /* both operands constant */
         if (oper == zadd) 
             lval->const_val += lval2->const_val;
         else if (oper == zsub)

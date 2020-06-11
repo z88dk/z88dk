@@ -371,7 +371,6 @@ constdecl:
                     unsigned char  fa[6];
                     int            i;
 
-                    decrement_double_ref_direct(value);
                     /* It was a float, lets parse the float and then dump it */
                       if ( c_double_strings ) {
                         output_double_string_load(value);

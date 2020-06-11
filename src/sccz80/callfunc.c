@@ -136,9 +136,6 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             constargval[argnumber] = val;
         }
         clearstage(before, start);  // Wipe out everything we did
-        if ( vconst && expr == KIND_DOUBLE ) {
-            decrement_double_ref_direct(val);
-        }
         fprintf(tmpfiles[argnumber],";\n");
         pop_buffer_fp();
 
