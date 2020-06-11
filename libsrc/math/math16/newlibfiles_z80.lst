@@ -9,6 +9,7 @@
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_f24_int.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_f24_long.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_f32.asm
+../../_DEVELOPMENT/math/float/math16/z80/asm_f16_f48.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_floor.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_frexp.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_inf.asm
