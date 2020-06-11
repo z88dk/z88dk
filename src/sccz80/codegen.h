@@ -12,7 +12,6 @@ extern void immed(void);
 extern void immedlit(int lab,int offs);
 extern void lpush(void);
 extern void zpush(void);
-extern void dpush_under(int val_type);
 
 
 
@@ -59,3 +58,4 @@ extern void zconvert_from_double(Kind from, Kind to, unsigned char isunsigned);
 extern int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int is_last_argument);
 extern void reset_namespace();
 extern void zwiden_stack_to_long(LVALUE *lval);
+extern void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned char isunsigned, int operator_is_commutative);

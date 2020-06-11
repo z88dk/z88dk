@@ -54,7 +54,6 @@
 	call	dpush2
 	pop	hl
 	call	l_f48_f16tof
-	call	dswap
 	call	dmul
 	call	l_f48_ftof16
 	ret
@@ -150,6 +149,172 @@
 
 
 
+._func5a
+	ld	hl,4	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,8	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f48_f16tof
+	call	dmul
+	call	l_f48_ftof16
+	ret
+
+
+
+._func5b
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	dload
+	call	dpush2
+	pop	hl
+	call	l_f48_f16tof
+	call	dmul
+	call	l_f48_ftof16
+	ret
+
+
+
+._func5c
+	ld	hl,8	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	dload
+	call	dpush2
+	pop	hl
+	call	l_int2long_s_float
+	call	dmul
+	call	l_f48_ftof16
+	ret
+
+
+
+._func5d
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,14	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_int2long_s_float
+	call	dmul
+	call	l_f48_ftof16
+	ret
+
+
+
+._func5e
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f16_sint2f
+	call	l_f16_mul
+	ret
+
+
+
+._func5f
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	ex	(sp),hl
+	call	l_f16_sint2f
+	call	l_f16_mul
+	ret
+
+
+
+._func6a
+	ld	hl,4	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,8	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f48_f16tof
+	call	dadd
+	call	l_f48_ftof16
+	ret
+
+
+
+._func6b
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	dload
+	call	dpush2
+	pop	hl
+	call	l_f48_f16tof
+	call	dadd
+	call	l_f48_ftof16
+	ret
+
+
+
+._func6c
+	ld	hl,8	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	dload
+	call	dpush2
+	pop	hl
+	call	l_int2long_s_float
+	call	dadd
+	call	l_f48_ftof16
+	ret
+
+
+
+._func6d
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,14	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_int2long_s_float
+	call	dadd
+	call	l_f48_ftof16
+	ret
+
+
+
+._func6e
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f16_sint2f
+	call	l_f16_add
+	ret
+
+
+
+._func6f
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	ex	(sp),hl
+	call	l_f16_sint2f
+	call	l_f16_add
+	ret
+
+
+
 
 	SECTION	bss_compiler
 ._doub_val	defs	6
@@ -171,6 +336,18 @@
 	GLOBAL	_func4c
 	GLOBAL	_func4d
 	GLOBAL	_func4e
+	GLOBAL	_func5a
+	GLOBAL	_func5b
+	GLOBAL	_func5c
+	GLOBAL	_func5d
+	GLOBAL	_func5e
+	GLOBAL	_func5f
+	GLOBAL	_func6a
+	GLOBAL	_func6b
+	GLOBAL	_func6c
+	GLOBAL	_func6d
+	GLOBAL	_func6e
+	GLOBAL	_func6f
 
 
 

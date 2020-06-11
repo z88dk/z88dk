@@ -46,6 +46,7 @@ extern void RestoreSP(char);
 extern void OutIndex(int);
 #endif
 
+static void dpush_under(Kind val_type);
 static void push(const char *ret);
 static void pop(const char *ret);
 static void immed2(void);
@@ -962,7 +963,7 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
             push("de"); /* LSW -> stack, addr = hl */
         }
         return 4;
-    } else if (expr == KIND_DOUBLE && c_fp_size != 2 ) {
+    } else if (expr == KIND_DOUBLE  ) {
         dpush_under(KIND_INT);
         pop("hl");
         return c_fp_size;
@@ -996,12 +997,11 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
 
 
 
-/* Push the primary floating point register, preserving
-        the top value  */
-void dpush_under(int val_type) // TODO
+/* Push the primary floating point register, preserving the top value  */
+void dpush_under(Kind val_type) 
 {
-    // This isn't called for float16
-    if ( val_type == KIND_LONG || val_type == KIND_CPTR ) {
+   // Only called for KIND_DOUBLE
+   if ( val_type == KIND_LONG || val_type == KIND_CPTR ) {
         if ( c_fp_size == 4 ) {
             ol("pop\tbc");	// addr2 -> bc
             swap(); /* MSW -> hl */
@@ -1444,6 +1444,7 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
     else if ( save == KIND_DOUBLE ) {
         if ( c_fp_size == 4 ) {
             save = KIND_LONG;
+        }
         // For a 6/8 byte double the value is safely in the exx set or in FA 
     } else if ( save == KIND_FLOAT16 ) {
         save = KIND_INT;
@@ -4791,6 +4792,34 @@ void zconvert_constant_to_double(double val, Kind to, unsigned char isunsigned)
         }
     }
 
+}
+
+// Convert the value that's on the stack to a double and restore stack to appropriate state
+void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned char isunsigned, int operator_is_commutative)
+{
+    if ( float_kind == KIND_FLOAT16) {
+        if ( stacked_kind == KIND_LONG ) {
+            ol("ld\tc,l");
+            ol("ld\tb,h");
+            pop("hl");      // LSW
+            pop("de");      // MSW
+            push("bc");     // Save float
+            zconvert_to_double(stacked_kind, float_kind, isunsigned);
+            if (!operator_is_commutative) ol("ex\t(sp),hl"); 
+        } else {
+            // 2 bytes
+            ol("ex\t(sp),hl");  // 
+            zconvert_to_double(stacked_kind, float_kind, isunsigned);
+            if (!operator_is_commutative)  ol("ex\t(sp),hl"); 
+        }
+    } else {
+        dpush_under(stacked_kind);
+        mainpop();
+        if (stacked_kind == KIND_LONG)
+            zpop();
+        zconvert_to_double(stacked_kind, float_kind, isunsigned);
+        if (!operator_is_commutative) gen_swap_float(float_kind); 
+    }
 }
 
 

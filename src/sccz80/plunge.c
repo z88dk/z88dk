@@ -113,6 +113,13 @@ int operator_is_comparison(void (*oper)(LVALUE *lval))
     return 0;
 }
 
+int operator_is_commutative(void (*oper)(LVALUE *lval))
+{
+    if ( oper == zeq || oper == zne || oper == zadd || oper == mult ) 
+        return 1;
+    return 0;
+}
+
 /*
  * binary plunge to lower level (not for +/-)
  */
@@ -320,7 +327,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             Zsp = savesp;
             return;
         }
-        if (widen_if_float(lval, lval2)) {
+        if (widen_if_float(lval, lval2, operator_is_commutative(oper))) {
             // We only end up in here if at least one of the operands is floating
             if ( doper == zmod ) {
                 errorfmt("Cannot apply operator %% to floating point",1);
@@ -575,7 +582,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if (dbltest(lval, lval2)) {
                 scale(lval->ptr_type, lval->ptr_type == KIND_STRUCT ? lval->ltype->ptr->tag : NULL);
             }
-            if (widen_if_float(lval, lval2)) {
+            if (widen_if_float(lval, lval2,operator_is_commutative(oper))) {
                 /* floating point operation */
                 (*oper)(lval);
                 lval->is_const = 0;

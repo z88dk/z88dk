@@ -51,3 +51,53 @@ _Float16 func4d(_Float16 a) {
 _Float16 func4e(_Float16 a) {
 	return 1 / a;
 }
+
+// RHS is promoted to double
+_Float16 func5a(double a, _Float16 b) {
+        return a * b;
+}
+// LHS is promoted to double
+_Float16 func5b(double a, _Float16 b) {
+        return b * a;
+}
+// LHS int is promoted to double
+_Float16 func5c(int a, double b) {
+        return a * b;
+}
+// RHS int is promoted to double
+_Float16 func5d(int a, double b) {
+        return b * a;
+}
+// RHS is promoted to _Float16
+_Float16 func5e(int a, _Float16 b) {
+        return b * a;
+}
+// LHS is promoted to _Float16
+_Float16 func5f(int a, _Float16 b) {
+        return a * b;
+}
+
+// RHS is promoted to double
+_Float16 func6a(double a, _Float16 b) {
+        return a + b;
+}
+// LHS is promoted to double
+_Float16 func6b(double a, _Float16 b) {
+        return b + a;
+}
+// LHS int is promoted to double
+_Float16 func6c(int a, double b) {
+        return a + b;
+}
+// RHS int is promoted to double
+_Float16 func6d(int a, double b) {
+        return b + a;
+}
+// RHS is promoted to _Float16
+_Float16 func6e(int a, _Float16 b) {
+        return b + a;
+}
+// LHS is promoted to _Float16
+_Float16 func6f(int a, _Float16 b) {
+        return a + b;
+}

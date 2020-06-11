@@ -323,29 +323,34 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
  *
  * Maybe should an operand in here for KIND_LONG?
  */
-int widen_if_float(LVALUE* lval, LVALUE* lval2)
+int widen_if_float(LVALUE* lval, LVALUE* lval2, int operator_is_commutative)
 {
     if (kind_is_floating(lval2->val_type)) {
+        if ( kind_is_floating(lval->val_type)) {
+            // Both are floating but different types
+            if ( lval->val_type == KIND_DOUBLE) {
+                // RHS is _Float16, LHS is double, promote RHS
+                zconvert_to_double(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+                lval2->val_type = lval->val_type;
+                lval2->ltype = lval->ltype;
+                return 1;
+            }
+            // RHS is double, LHS is _Float16, promote LHS
+            // Fall thrrough
+        }
         if (lval->val_type != lval2->val_type ) {
-            dpush_under(lval->ltype->kind); /* push 2nd operand UNDER 1st */
-            mainpop();
-            if (lval->val_type == KIND_LONG)
-                zpop();
-            zconvert_to_double(lval->val_type, lval2->val_type, lval->ltype->isunsigned);
-            gen_swap_float(lval2->val_type);
+            zconvert_stacked_to_double(lval->val_type, lval2->val_type, lval->ltype->isunsigned,operator_is_commutative);
             lval->val_type = lval2->val_type; /* type of result */
             lval->ltype = lval2->ltype;
         }
-        return (1);
-    } else {
-        if (kind_is_floating(lval->val_type)) {
-            zconvert_to_double(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
-            lval2->val_type = lval->val_type;
-            lval2->ltype = lval->ltype;
-            return (1);
-        } else
-            return (0);
+        return 1;
+    } else if (kind_is_floating(lval->val_type)) {
+        zconvert_to_double(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+        lval2->val_type = lval->val_type;
+        lval2->ltype = lval->ltype;
+        return 1;
     }
+    return 0;
 }
 
 void widenintegers(LVALUE* lval, LVALUE* lval2)

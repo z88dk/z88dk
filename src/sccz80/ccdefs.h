@@ -277,7 +277,7 @@ extern double   calc(Kind left_kind, double left, void (*oper)(LVALUE *), double
 extern double   calcun(Kind left_kind, double left, void (*oper)(LVALUE *),double right);
 extern int      intcheck(LVALUE *lval, LVALUE *lval2);
 extern void     force(Kind to, Kind from, char to_sign, char from_sign, int lconst);
-extern int      widen_if_float(LVALUE *lval, LVALUE *lval2);
+extern int      widen_if_float(LVALUE *lval, LVALUE *lval2, int operator_is_commutative);
 extern void     widenintegers(LVALUE *lval, LVALUE *lval2);
 extern int      dbltest(LVALUE *lval, LVALUE *lval2);
 extern void     result(LVALUE *lval, LVALUE *lval2);
