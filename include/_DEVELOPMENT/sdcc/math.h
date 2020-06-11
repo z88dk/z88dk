@@ -531,6 +531,17 @@ extern double_t poly_callee(const float x,const float d[],unsigned int n) __z88d
 
 #ifdef __MATH_MATH16
 
+extern half_t f16_f16_f48(float x);
+extern half_t f16_f16_f48_fastcall(float x) __z88dk_fastcall;
+#define f16_f16_f48(a) f16_f16_f48_fastcall(a)
+
+
+extern float f16_f48_f16(half_t x);
+extern float f16_f48_f16_fastcall(half_t x) __z88dk_fastcall;
+#define f16_f48_f16(a) f16_f48_f16_fastcall(a)
+
+
+
 extern half_t f16_f16_f32(float x);
 extern half_t f16_f16_f32_fastcall(float x) __z88dk_fastcall;
 #define f16_f16_f32(a) f16_f16_f32_fastcall(a)

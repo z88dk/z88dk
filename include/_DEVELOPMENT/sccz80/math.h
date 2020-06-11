@@ -443,6 +443,13 @@ extern double_t __LIB__ poly_callee(const float x,const float d[],unsigned int n
 
 #ifdef __MATH_MATH16
 
+extern half_t __LIB__ f16_f16_f48(float x) __smallc __z88dk_fastcall;
+
+
+extern float __LIB__ f16_f48_f16(half_t x) __smallc __z88dk_fastcall;
+
+
+
 extern half_t __LIB__ f16_f16_f32(float x) __smallc __z88dk_fastcall;
 
 

@@ -253,6 +253,9 @@ __DPROTO(,,double_t,,poly, const float x, const float d[], unsigned int n)
 
 #ifdef __MATH_MATH16
 
+__DPROTO(,,half_t,,f16_f16_f48,float x)
+__DPROTO(,,float,,f16_f48_f16,half_t x)
+
 __DPROTO(,,half_t,,f16_f16_f32,float x)
 __DPROTO(,,float,,f16_f32_f16,half_t x)
 
