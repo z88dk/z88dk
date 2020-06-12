@@ -20,9 +20,9 @@
 
 
 ._func1a_TypedConstants
-	ld	hl,2631	;const
+	ld	hl,16967	;const
 	push	hl
-	ld	hl,2304	;const
+	ld	hl,16640	;const
 	push	hl
 	call	_func1
 	pop	bc
@@ -32,9 +32,9 @@
 
 
 ._func1a_OpenConstants
-	ld	hl,2631	;const
+	ld	hl,16967	;const
 	push	hl
-	ld	hl,2304	;const
+	ld	hl,16640	;const
 	push	hl
 	call	_func1
 	pop	bc
@@ -63,7 +63,7 @@
 ._func3a
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,2304	;const
+	ld	hl,16640	;const
 	call	l_f16_mul
 	ret
 
@@ -72,7 +72,7 @@
 ._func3b
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,2304	;const
+	ld	hl,16640	;const
 	call	l_f16_mul
 	ret
 
@@ -81,7 +81,7 @@
 ._func3c
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,2560	;const
+	ld	hl,16896	;const
 	call	l_f16_mul
 	ret
 
@@ -90,7 +90,7 @@
 ._func3d
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,2560	;const
+	ld	hl,16896	;const
 	call	l_f16_mul
 	ret
 
@@ -121,11 +121,9 @@
 ._func4c
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,2560	;const
+	ld	hl,16896	;const
 	ex	(sp),hl
 	call	l_f16_div
-	push	bc
-	push	bc
 	ret
 
 
@@ -133,7 +131,7 @@
 ._func4d
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,64853	;const
+	ld	hl,13653	;const
 	call	l_f16_mul
 	ret
 

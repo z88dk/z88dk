@@ -734,15 +734,23 @@ static void dofloat_ieee16(double raw, unsigned char fa[])
     } else {
         struct fp_decomposed fs = {0};
         uint32_t fp_value = 0;
+        int saved_exp = c_fp_exponent_bias;
+        int saved_mant = c_fp_mantissa_bytes;
 
+        c_fp_exponent_bias = 14;
+        c_fp_mantissa_bytes = 2;
         decompose_float(raw, &fs);
+
+        c_fp_exponent_bias = saved_exp;
+        c_fp_mantissa_bytes = saved_mant;
         
+
+
         // Bundle up mantissa - it's only 10 bits
         fp_value = ((((uint32_t)fs.mantissa[6]) << 3) |  ((((uint32_t)fs.mantissa[5]) >> 5 ) & 0x07) ) & 0x3ff  ;
 
-
         // And now the exponent
-        fp_value |= (((uint32_t)fs.exponent) << 10) & 0x7fc00;
+        fp_value |= (((uint32_t)fs.exponent) << 10) & 0x7fc0;
 
         // And the sign bit
         fp_value |= fs.sign ? 0x8000 : 0x0000;
@@ -975,7 +983,6 @@ void load_double_into_fa(LVALUE *lval)
         WriteDefined("math_atof", 1);
     } else {
         dofloat(lval->const_val, fa);
-
         if ( lval->val_type == KIND_FLOAT16 ) {
             dofloat_ieee16(lval->const_val, fa);
             vconst(fa[1] << 8 | fa[0]);

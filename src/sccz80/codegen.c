@@ -1042,11 +1042,6 @@ static void pop(const char *reg)
     Zsp += 2;
 }
 
-/* Pop the top of the stack into the primary register */
-void mainpop(void)
-{
-    pop("hl");
-}
 
 /* Pop the top of the stack into the secondary register */
 void zpop(void)
@@ -2101,7 +2096,7 @@ void zdiv(LVALUE* lval)
         break;
     case KIND_FLOAT16:
         dcallrts("fdiv",lval->val_type);
-        Zsp += c_fp_size;
+        Zsp += 2;
         break;
     case KIND_DOUBLE:
         dcallrts("fdiv",lval->val_type);
@@ -3526,8 +3521,8 @@ void zeq(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_FLOAT16:
-        set_int(lval);
         dcallrts("feq",lval->val_type);
+        set_int(lval);
         Zsp += 2;
         break;
     case KIND_DOUBLE:
@@ -3672,8 +3667,8 @@ void zne(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_FLOAT16:
-        set_int(lval);
         dcallrts("fne",lval->val_type);
+        set_int(lval);
         Zsp += 2;
         break;
     case KIND_DOUBLE:
@@ -3822,8 +3817,8 @@ void zlt(LVALUE* lval)
         set_int(lval);        
         break;
     case KIND_FLOAT16:
-        set_int(lval);
         dcallrts("flt",lval->val_type);
+        set_int(lval);
         Zsp += 2;
         break;
     case KIND_DOUBLE:
@@ -3935,8 +3930,8 @@ void zle(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_FLOAT16:
-        set_int(lval);
         dcallrts("fle",lval->val_type);
+        set_int(lval);
         Zsp += 2;
         break;
     case KIND_DOUBLE:
@@ -4047,8 +4042,8 @@ void zgt(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_FLOAT16:
-        set_int(lval);
         dcallrts("fgt",lval->val_type);
+        set_int(lval);
         Zsp += 2;
         break;
     case KIND_DOUBLE:
@@ -4170,8 +4165,8 @@ void zge(LVALUE* lval)
         set_int(lval);        
         break;
     case KIND_FLOAT16:
-        set_int(lval);
         dcallrts("fge",lval->val_type);
+        set_int(lval);
         Zsp += 2;
         break;
     case KIND_DOUBLE:
@@ -4812,7 +4807,7 @@ void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned cha
         }
     } else {
         dpush_under(stacked_kind);
-        mainpop();
+        pop("hl");
         if (stacked_kind == KIND_LONG)
             zpop();
         zconvert_to_double(stacked_kind, float_kind, isunsigned);
