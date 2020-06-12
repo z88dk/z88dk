@@ -55,8 +55,8 @@ PUBLIC asm_f24_mul_f24
 ; enter here for floating asm_f16_mul_callee, x+y, x on stack, y in hl, result in hl
 .asm_f16_mul_callee
     call asm_f24_f16            ; expand to dehl
-    exx                         ; y     d  = eeeeeeee e = s-------
-                                ;       hl = 1mmmmmmm mmmmmmmm
+    exx                         ; y    d'  = eeeeeeee e = s-------
+                                ;      hl' = 1mmmmmmm mmmmmmmm
     pop bc                      ; pop return address
     pop hl                      ; get second operand off of the stack
     push bc                     ; return address on stack

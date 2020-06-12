@@ -69,7 +69,6 @@ PUBLIC asm_f24_add_f24
     call asm_f24_f16            ; expand to dehl
     exx                         ; y     d'  = eeeeeeee e' = s-------
                                 ;       hl' = 1mmmmmmm mmmmmmmm
-
     pop bc                      ; pop return address
     pop hl                      ; get second operand off of the stack
     push bc                     ; return address on stack
@@ -90,7 +89,6 @@ PUBLIC asm_f24_add_f24
 .asm_f24_add_callee
     exx                         ; y     d'  = eeeeeeee e' = s-------
                                 ;       hl' = 1mmmmmmm mmmmmmmm
-
     pop bc                      ; pop return address
     pop hl                      ; x      d  = eeeeeeee e  = s-------
     pop de                      ;        hl = 1mmmmmmm mmmmmmmm
