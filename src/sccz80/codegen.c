@@ -4774,7 +4774,7 @@ void zconvert_constant_to_double(double val, Kind to, unsigned char isunsigned)
         lval.val_type = KIND_FLOAT16;
         load_double_into_fa(&lval);
     } else if ( c_fp_size == 4 ) {
-        dofloat(val, fa);
+        dofloat(c_maths_mode,val, fa);
         vconst((fa[1] << 8) | fa[0]);
         const2((fa[3] << 8) | fa[2]);
     } else {

@@ -651,9 +651,9 @@ static Type *get_member(Type *tag)
 
 
 
-void dofloat(double raw, unsigned char fa[])
+void dofloat(enum maths_mode mode,double raw, unsigned char fa[])
 {
-    switch ( c_maths_mode ) {
+    switch ( mode ) {
         case MATHS_IEEE:
             dofloat_ieee(raw, fa);
             break;
@@ -665,6 +665,9 @@ void dofloat(double raw, unsigned char fa[])
             break;
         case MATHS_MBF64:
             dofloat_mbf64(raw, fa);
+            break;
+        case MATHS_IEEE16:
+            dofloat_ieee16(raw, fa);
             break;
         default:
             dofloat_z80(raw, fa);
@@ -982,7 +985,7 @@ void load_double_into_fa(LVALUE *lval)
         callrts("__atof2");
         WriteDefined("math_atof", 1);
     } else {
-        dofloat(lval->const_val, fa);
+        dofloat(c_maths_mode,lval->const_val, fa);
         if ( lval->val_type == KIND_FLOAT16 ) {
             dofloat_ieee16(lval->const_val, fa);
             vconst(fa[1] << 8 | fa[0]);

@@ -154,7 +154,7 @@ extern void       load_double_into_fa(LVALUE *lval);
 extern void       write_double_queue(void);
 extern void       indicate_double_written(int litlab);
 
-extern void       dofloat(double raw, unsigned char fa[]);
+extern void       dofloat(enum maths_mode mode, double raw, unsigned char fa[]);
 #include "data.h"
 
 /* declinit.c */

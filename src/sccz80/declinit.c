@@ -329,13 +329,18 @@ constdecl:
                     if ( c_double_strings ) { 
                         output_double_string_load(value);
                     } else {
-                        dofloat(value, fa);
+                        dofloat(c_maths_mode,value, fa);
                         defbyte();
                         for ( i = 0; i < c_fp_size; i++ ) {
                             if ( i ) outbyte(',');
                             outdec(fa[i]);
                         }
                     }
+                } else if (type->kind == KIND_FLOAT16) {
+                    unsigned char  fa[MAX_MANTISSA_SIZE+1];
+                    dofloat(MATHS_IEEE16, value, fa);
+                    defword();
+                    outdec(fa[1] << 8 | fa[0]);
                 } else if (type->kind == KIND_LONG ){
                     /* there appears to be a bug in z80asm regarding defq */
                     defbyte();
@@ -375,7 +380,7 @@ constdecl:
                       if ( c_double_strings ) {
                         output_double_string_load(value);
                     } else {
-                        dofloat(value, fa);
+                        dofloat(c_maths_mode,value, fa);
                         for ( i = 0; i < c_fp_size; i++ ) {
                             stowlit(fa[i], 1);
                         }
