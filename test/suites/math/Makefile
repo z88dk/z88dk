@@ -23,7 +23,7 @@ test_math32.bin: $(SOURCES)
 	$(runtest)
 
 test_math16.bin: $(SOURCES)
-	$(call compile, -m -DMATH16 -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath16)
+	$(call compile, -m -DMATH16 -DMATH_LIBRARY="\"\\\"Math16\\\"\"", -lmath16)
 	$(runtest)
 
 clean:
