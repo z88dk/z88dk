@@ -32,11 +32,9 @@ EXTERN error_lznc
 .asm_f32_f48
    exx
 
-   push af
-
    ld a,l
    sub 2
-   jr C,zero32
+   jp C,error_lznc
 
    sla b
    rra
@@ -46,14 +44,8 @@ EXTERN error_lznc
    ld h,c
    ld l,d
    ld d,a
-
-   pop af
    ret
 
-.zero32
-   call error_lznc
-   pop af
-   ret
 
 ;-------------------------------------------------------------------------
 ;  asm_f48_f32 - z80, z180, z80n unpacked format conversion code
@@ -91,7 +83,7 @@ EXTERN error_lznc
    
    ld e,0
    ld h,e
-   
    exx
+
    ret
 

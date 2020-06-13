@@ -134,10 +134,10 @@ PUBLIC asm_f24_mul_f24
     jr Z,mulovl
 
 .fm3
-    ex de,hl                     ; put 16 bit mantissa in place, de into hl
-    ld a,d                       ; capture 8 rounding bits
+    ex de,hl                    ; put 16 bit mantissa in place, de into hl
+    ld a,d                      ; capture 8 rounding bits
 
-    or a                         ; round
+    and a,0F0h                  ; check for 4 lost bits rounding
     jr Z,fm4
     set 0,l
 
