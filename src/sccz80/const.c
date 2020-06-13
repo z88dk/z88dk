@@ -3,19 +3,6 @@
  *      Split into parts 3/3/99 djm
  *
  *      This part deals with the evaluation of a constant
- *
- *      $Id: const.c,v 1.26 2016-08-26 05:45:05 aralbrec Exp $
- *
- *      7/3/99 djm - fixed minor problem in fnumber, which prevented
- *      fp numbers from working properly! Also added a ifdef UNSURE
- *      around exponent-- for -math-z88
- *
- *      29/1/2001 djm - added ability to dump string literals and have
- *      them sorted out at compile time
- *
- *      26/1/2002 djm - Exponent code uncommented now. This works, but
- *      there may be accuracy issues due to method used for -ve exponents
- *
  */
 
 #include "ccdefs.h"
@@ -66,9 +53,7 @@ int constant(LVALUE* lval)
     lval->ltype = type_int;
     lval->is_const = 1; /* assume constant will be found */
     if (fnumber(lval)) {
-        load_double_into_fa(lval);
-        lval->ltype = type_double;
-        lval->val_type = KIND_DOUBLE;
+        load_constant(lval);
         lval->flags = FLAGS_NONE;
         return (1);
     } else if (number(lval) || pstr(lval)) {
@@ -81,7 +66,7 @@ int constant(LVALUE* lval)
         lval->const_val = val;
         lval->is_const = 0; /* string address not constant */
         lval->ltype = make_pointer(type_char);
-        lval->ptr_type = KIND_CHAR; /* djm 9/3/99 */
+        lval->ptr_type = KIND_CHAR; 
         lval->val_type = KIND_INT;
         lval->flags = FLAGS_NONE;
         immedlit(litlab,lval->const_val);
@@ -122,7 +107,7 @@ int fnumber(LVALUE *lval)
     while (numeric(*s))
         ++s;
 
-    if (*s != '.' && *s != 'e') { /* Check that it is floating point */
+    if (*s != '.' && (*s != 'e' && *s != 'f')) { /* Check that it is floating point */
         s++;
         return 0;
     }
@@ -135,12 +120,22 @@ int fnumber(LVALUE *lval)
     if (end == start)
         return 0;
 
-    for ( i = 0; i < buffer_fps_num; i++ ) 
-        fprintf(buffer_fps[i], "%.*s", (int)(end-start), start);
+
     lptr = end - line;
+
+    lval->val_type = KIND_DOUBLE;
+    lval->ltype = type_double;
+
     if ( line[lptr] == 'f' ) {
         lptr++;
+        if ( line[lptr] == '1' && line[lptr+1] == '6') {
+            lptr+=2;
+            lval->val_type = KIND_FLOAT16;
+            lval->ltype = type_float16;
+        }
     }
+    for ( i = 0; i < buffer_fps_num; i++ ) 
+        fprintf(buffer_fps[i], "%.*s", (int)(line+lptr-start), start);
 
     lval->const_val = dval;
 
@@ -231,8 +226,14 @@ typecheck:
         }
         if (cmatch('S'))
             isunsigned = 0;
-        if (cmatch('f'))
+        if (amatch("f16")) {
+            lval->val_type = KIND_FLOAT16;
+            lval->ltype = type_float16;
+        }
+        if (cmatch('f')) {
             lval->val_type = KIND_DOUBLE;
+            lval->ltype = type_double;
+        }
     }
     if ( lval->val_type == KIND_LONG ) {
         if ( isunsigned )
@@ -322,9 +323,9 @@ int storeq(int length, unsigned char* queue, int32_t* val)
 {
     int j, k, len;
     /* Have stashed it in our temporary queue, we know the length, so lets
- * get checking to see if one exactly the same has already been placed
- * in there...
- */
+    * get checking to see if one exactly the same has already been placed
+    * in there...
+    */
     k = length;
     len = litptr - k; /* Amount of leeway to search through.. */
     j = 1; /* Literal queue starts from 1 not 0 now
@@ -430,6 +431,9 @@ unsigned char litchar()
     case 'l': /* LF (non standard)*/
         gch();
         return 10;
+    case 'e':
+        gch();
+        return 27;
     }
 
     if (ch() != 'x' && (ch() < '0' || ch() > '7')) {
@@ -647,15 +651,11 @@ static Type *get_member(Type *tag)
 
 
 
-void dofloat(double raw, unsigned char fa[])
+void dofloat(enum maths_mode mode,double raw, unsigned char fa[])
 {
-
-    switch ( c_maths_mode ) {
+    switch ( mode ) {
         case MATHS_IEEE:
             dofloat_ieee(raw, fa);
-            break;
-        case MATHS_IEEE16:
-            dofloat_ieee16(raw, fa);
             break;
         case MATHS_MBFS:
             dofloat_mbfs(raw, fa);
@@ -665,6 +665,9 @@ void dofloat(double raw, unsigned char fa[])
             break;
         case MATHS_MBF64:
             dofloat_mbf64(raw, fa);
+            break;
+        case MATHS_IEEE16:
+            dofloat_ieee16(raw, fa);
             break;
         default:
             dofloat_z80(raw, fa);
@@ -734,15 +737,23 @@ static void dofloat_ieee16(double raw, unsigned char fa[])
     } else {
         struct fp_decomposed fs = {0};
         uint32_t fp_value = 0;
+        int saved_exp = c_fp_exponent_bias;
+        int saved_mant = c_fp_mantissa_bytes;
 
+        c_fp_exponent_bias = 14;
+        c_fp_mantissa_bytes = 2;
         decompose_float(raw, &fs);
+
+        c_fp_exponent_bias = saved_exp;
+        c_fp_mantissa_bytes = saved_mant;
         
+
+
         // Bundle up mantissa - it's only 10 bits
         fp_value = ((((uint32_t)fs.mantissa[6]) << 3) |  ((((uint32_t)fs.mantissa[5]) >> 5 ) & 0x07) ) & 0x3ff  ;
 
-
         // And now the exponent
-        fp_value |= (((uint32_t)fs.exponent) << 10) & 0x7fc00;
+        fp_value |= (((uint32_t)fs.exponent) << 10) & 0x7fc0;
 
         // And the sign bit
         fp_value |= fs.sign ? 0x8000 : 0x0000;
@@ -886,7 +897,6 @@ elem_t *get_elem_for_fa(unsigned char fa[], double value)
         }
     }
     elem = MALLOC(sizeof(*elem));
-    elem->refcount = 0;
     elem->litlab = getlabel();
     elem->value = value;
     elem->written = 0;
@@ -901,8 +911,8 @@ void indicate_double_written(int litlab)
 
     LL_FOREACH(double_queue, elem ) {
         if ( elem->litlab == litlab ) {
-	    elem->written = 1;
-	}
+            elem->written = 1;
+        }
     }
 }
 
@@ -957,48 +967,6 @@ void write_double_queue(void)
     nl();
 }
 
-void decrement_double_ref_direct(double value)
-{
-    LVALUE lval={0};
-
-    lval.const_val = value;
-
-    decrement_double_ref(&lval);
-}
-
-void decrement_double_ref(LVALUE *lval)
-{   
-    unsigned char    fa[MAX_MANTISSA_SIZE+1] = {0};
-    elem_t          *elem;
-    if ( c_double_strings ) {
-        char  buf[40];
-        snprintf(buf, sizeof(buf), "%lf", lval->const_val);
-        elem = get_elem_for_buf(buf,lval->const_val);
-        elem->refcount--;
-    } else {
-        dofloat(lval->const_val, fa);
-        elem = get_elem_for_fa(fa,lval->const_val);
-        elem->refcount--;
-    }
-}
-
-void increment_double_ref(LVALUE *lval)
-{   
-    unsigned char    fa[MAX_MANTISSA_SIZE+1] = {0};
-    elem_t          *elem;
-    if ( c_double_strings ) {
-        char  buf[40];
-        snprintf(buf, sizeof(buf), "%lf", lval->const_val);
-        elem = get_elem_for_buf(buf,lval->const_val);
-        elem->refcount++;
-    } else {
-        dofloat(lval->const_val, fa);
-        elem = get_elem_for_fa(fa,lval->const_val);
-        elem->refcount++;
-    }
-}
-
-
 
 
 void load_double_into_fa(LVALUE *lval)
@@ -1017,13 +985,13 @@ void load_double_into_fa(LVALUE *lval)
         callrts("__atof2");
         WriteDefined("math_atof", 1);
     } else {
-        dofloat(lval->const_val, fa);
-        
-        if ( c_fp_size == 4 ) {
+        dofloat(c_maths_mode,lval->const_val, fa);
+        if ( lval->val_type == KIND_FLOAT16 ) {
+            dofloat_ieee16(lval->const_val, fa);
+            vconst(fa[1] << 8 | fa[0]);
+        } else if ( c_fp_size == 4 ) {
             vconst(fa[1] << 8 | fa[0]);
             const2(fa[3] << 8 | fa[2]);
-        } else if ( c_fp_size == 2 ) {
-            vconst(fa[1] << 8 | fa[0]);
         } else {
             elem = get_elem_for_fa(fa,lval->const_val);
             elem->refcount++;

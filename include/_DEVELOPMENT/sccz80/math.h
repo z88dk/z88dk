@@ -56,7 +56,23 @@
 #ifndef _HALF_FLOAT_T
 #define _HALF_FLOAT_T
 
-typedef short half_t;           /* IEEE16 half float type */
+   #ifdef __CLANG
+   
+   typedef short half_t;        /* IEEE-754 half float type */
+   
+   #endif
+
+   #ifdef __SDCC
+   
+   typedef short half_t;        /* IEEE-754 half float type */
+   
+   #endif
+   
+   #ifdef __SCCZ80
+   
+   typedef _Float16 half_t;     /* IEEE-754 half float type */
+   
+   #endif
 
 #endif
 
@@ -426,6 +442,13 @@ extern double_t __LIB__ poly_callee(const float x,const float d[],unsigned int n
 #endif
 
 #ifdef __MATH_MATH16
+
+extern half_t __LIB__ f16_f16_f48(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ f16_f48_f16(half_t x) __smallc __z88dk_fastcall;
+
+
 
 extern half_t __LIB__ f16_f16_f32(float x) __smallc __z88dk_fastcall;
 

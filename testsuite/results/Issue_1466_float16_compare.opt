@@ -1,0 +1,679 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._Yes
+	ret
+
+
+
+._No
+	ret
+
+
+
+._eq_int_c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_2
+	call	_Yes
+	jp	i_3
+.i_2
+	call	_No
+.i_3
+	ret
+
+
+
+._eq_long_c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_4
+	call	_Yes
+	jp	i_5
+.i_4
+	call	_No
+.i_5
+	ret
+
+
+
+._eq_double_c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_6
+	call	_Yes
+	jp	i_7
+.i_6
+	call	_No
+.i_7
+	ret
+
+
+
+._eq_float16_c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_8
+	call	_Yes
+	jp	i_9
+.i_8
+	call	_No
+.i_9
+	ret
+
+
+
+._eq_int_cr
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_10
+	call	_Yes
+	jp	i_11
+.i_10
+	call	_No
+.i_11
+	ret
+
+
+
+._eq_long_cr
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_12
+	call	_Yes
+	jp	i_13
+.i_12
+	call	_No
+.i_13
+	ret
+
+
+
+._eq_double_cr
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_14
+	call	_Yes
+	jp	i_15
+.i_14
+	call	_No
+.i_15
+	ret
+
+
+
+._eq_float16_cr
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_16
+	call	_Yes
+	jp	i_17
+.i_16
+	call	_No
+.i_17
+	ret
+
+
+
+._eq_int
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f16_sint2f
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_18
+	call	_Yes
+	jp	i_19
+.i_18
+	call	_No
+.i_19
+	ret
+
+
+
+._eq_long
+	ld	hl,6	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f16_slong2f
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_20
+	call	_Yes
+	jp	i_21
+.i_20
+	call	_No
+.i_21
+	ret
+
+
+
+._eq_double
+	ld	hl,8	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	dload
+	call	dpush2
+	pop	hl
+	call	l_f48_f16tof
+	call	deq
+	ld	a,h
+	or	l
+	jp	z,i_22
+	call	_Yes
+	jp	i_23
+.i_22
+	call	_No
+.i_23
+	ret
+
+
+
+._eq_float16
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_24
+	call	_Yes
+	jp	i_25
+.i_24
+	call	_No
+.i_25
+	ret
+
+
+
+._eq_int_r
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	ex	(sp),hl
+	call	l_f16_sint2f
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_26
+	call	_Yes
+	jp	i_27
+.i_26
+	call	_No
+.i_27
+	ret
+
+
+
+._eq_long_r
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,10	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	(sp),hl
+	ex	de,hl
+	call	l_f16_slong2f
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_28
+	call	_Yes
+	jp	i_29
+.i_28
+	call	_No
+.i_29
+	ret
+
+
+
+._eq_double_r
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,14	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f48_f16tof
+	call	deq
+	ld	a,h
+	or	l
+	jp	z,i_30
+	call	_Yes
+	jp	i_31
+.i_30
+	call	_No
+.i_31
+	ret
+
+
+
+._eq_float16_r
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_32
+	call	_Yes
+	jp	i_33
+.i_32
+	call	_No
+.i_33
+	ret
+
+
+
+._lt_int_c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_34
+	call	_Yes
+	jp	i_35
+.i_34
+	call	_No
+.i_35
+	ret
+
+
+
+._lt_long_c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_36
+	call	_Yes
+	jp	i_37
+.i_36
+	call	_No
+.i_37
+	ret
+
+
+
+._lt_double_c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_38
+	call	_Yes
+	jp	i_39
+.i_38
+	call	_No
+.i_39
+	ret
+
+
+
+._lt_float16_c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_40
+	call	_Yes
+	jp	i_41
+.i_40
+	call	_No
+.i_41
+	ret
+
+
+
+._lt_int_cr
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_gint
+	ld	bc,15360	;const
+	push	bc
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_42
+	call	_Yes
+	jp	i_43
+.i_42
+	call	_No
+.i_43
+	ret
+
+
+
+._lt_long_cr
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_gint
+	ld	bc,15360	;const
+	push	bc
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_44
+	call	_Yes
+	jp	i_45
+.i_44
+	call	_No
+.i_45
+	ret
+
+
+
+._lt_double_cr
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_gint
+	ld	bc,15360	;const
+	push	bc
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_46
+	call	_Yes
+	jp	i_47
+.i_46
+	call	_No
+.i_47
+	ret
+
+
+
+._lt_float16_cr
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_gint
+	ld	bc,15360	;const
+	push	bc
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_48
+	call	_Yes
+	jp	i_49
+.i_48
+	call	_No
+.i_49
+	ret
+
+
+
+._lt_int
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f16_sint2f
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_50
+	call	_Yes
+	jp	i_51
+.i_50
+	call	_No
+.i_51
+	ret
+
+
+
+._lt_long
+	ld	hl,6	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f16_slong2f
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_52
+	call	_Yes
+	jp	i_53
+.i_52
+	call	_No
+.i_53
+	ret
+
+
+
+._lt_double
+	ld	hl,8	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	dload
+	call	dpush2
+	pop	hl
+	call	l_f48_f16tof
+	call	dswap
+	call	dlt
+	ld	a,h
+	or	l
+	jp	z,i_54
+	call	_Yes
+	jp	i_55
+.i_54
+	call	_No
+.i_55
+	ret
+
+
+
+._lt_float16
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_56
+	call	_Yes
+	jp	i_57
+.i_56
+	call	_No
+.i_57
+	ret
+
+
+
+._lt_int_r
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	ex	(sp),hl
+	call	l_f16_sint2f
+	ex	(sp),hl
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_58
+	call	_Yes
+	jp	i_59
+.i_58
+	call	_No
+.i_59
+	ret
+
+
+
+._lt_long_r
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,10	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	(sp),hl
+	ex	de,hl
+	call	l_f16_slong2f
+	ex	(sp),hl
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_60
+	call	_Yes
+	jp	i_61
+.i_60
+	call	_No
+.i_61
+	ret
+
+
+
+._lt_double_r
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,14	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f48_f16tof
+	call	dlt
+	ld	a,h
+	or	l
+	jp	z,i_62
+	call	_Yes
+	jp	i_63
+.i_62
+	call	_No
+.i_63
+	ret
+
+
+
+._lt_float16_r
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_64
+	call	_Yes
+	jp	i_65
+.i_64
+	call	_No
+.i_65
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_Yes
+	GLOBAL	_No
+	GLOBAL	_eq_int_c
+	GLOBAL	_eq_long_c
+	GLOBAL	_eq_double_c
+	GLOBAL	_eq_float16_c
+	GLOBAL	_eq_int_cr
+	GLOBAL	_eq_long_cr
+	GLOBAL	_eq_double_cr
+	GLOBAL	_eq_float16_cr
+	GLOBAL	_eq_int
+	GLOBAL	_eq_long
+	GLOBAL	_eq_double
+	GLOBAL	_eq_float16
+	GLOBAL	_eq_int_r
+	GLOBAL	_eq_long_r
+	GLOBAL	_eq_double_r
+	GLOBAL	_eq_float16_r
+	GLOBAL	_lt_int_c
+	GLOBAL	_lt_long_c
+	GLOBAL	_lt_double_c
+	GLOBAL	_lt_float16_c
+	GLOBAL	_lt_int_cr
+	GLOBAL	_lt_long_cr
+	GLOBAL	_lt_double_cr
+	GLOBAL	_lt_float16_cr
+	GLOBAL	_lt_int
+	GLOBAL	_lt_long
+	GLOBAL	_lt_double
+	GLOBAL	_lt_float16
+	GLOBAL	_lt_int_r
+	GLOBAL	_lt_long_r
+	GLOBAL	_lt_double_r
+	GLOBAL	_lt_float16_r
+
+
+
+

@@ -1,0 +1,387 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func1a
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	inc	hl
+	inc	hl
+	ret
+
+
+
+._func1b
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	inc	hl
+	inc	hl
+	ret
+
+
+
+._func1c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ret
+
+
+
+._func1d
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ex	de,hl
+	ld	hl,(_c)
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ret
+
+
+
+._func1e
+	pop	de
+	pop	hl
+	dec	hl
+	push	hl
+	push	de
+	inc	hl
+	ret
+
+
+
+._func2a
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	bc,4
+	add	hl,bc
+	ret
+
+
+
+._func2b
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	bc,4
+	add	hl,bc
+	ret
+
+
+
+._func2c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	srl	h
+	rr	l
+	ret
+
+
+
+._func2d
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	ld	hl,(_c)
+	add	hl,hl
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ret
+
+
+
+._func2e
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	dec	hl
+	dec	hl
+	pop	de
+	call	l_pint
+	inc	hl
+	inc	hl
+	ret
+
+
+
+._func3a
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	bc,4
+	add	hl,bc
+	ret
+
+
+
+._func3b
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	bc,4
+	add	hl,bc
+	ret
+
+
+
+._func3c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	srl	h
+	rr	l
+	ret
+
+
+
+._func3d
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	ld	hl,(_c)
+	add	hl,hl
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ret
+
+
+
+._func3e
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	dec	hl
+	dec	hl
+	pop	de
+	call	l_pint
+	inc	hl
+	inc	hl
+	ret
+
+
+
+._func4a
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	bc,8
+	add	hl,bc
+	ret
+
+
+
+._func4b
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	bc,8
+	add	hl,bc
+	ret
+
+
+
+._func4c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	srl	h
+	rr	l
+	srl	h
+	rr	l
+	ret
+
+
+
+._func4d
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	ld	hl,(_c)
+	add	hl,hl
+	add	hl,hl
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ret
+
+
+
+._func4e
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	ld	bc,-4
+	add	hl,bc
+	pop	de
+	call	l_pint
+	ld	bc,4
+	add	hl,bc
+	ret
+
+
+
+._func5a
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	bc,4
+	add	hl,bc
+	ret
+
+
+
+._func5b
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	bc,4
+	add	hl,bc
+	ret
+
+
+
+._func5c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	srl	h
+	rr	l
+	ret
+
+
+
+._func5d
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	ld	hl,(_c)
+	add	hl,hl
+	pop	de
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ret
+
+
+
+._func5e
+	ld	hl,2	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;
+	dec	hl
+	dec	hl
+	pop	de
+	call	l_pint
+	inc	hl
+	inc	hl
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._c	defs	2
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_c
+	GLOBAL	_func1a
+	GLOBAL	_func1b
+	GLOBAL	_func1c
+	GLOBAL	_func1d
+	GLOBAL	_func1e
+	GLOBAL	_func2a
+	GLOBAL	_func2b
+	GLOBAL	_func2c
+	GLOBAL	_func2d
+	GLOBAL	_func2e
+	GLOBAL	_func3a
+	GLOBAL	_func3b
+	GLOBAL	_func3c
+	GLOBAL	_func3d
+	GLOBAL	_func3e
+	GLOBAL	_func4a
+	GLOBAL	_func4b
+	GLOBAL	_func4c
+	GLOBAL	_func4d
+	GLOBAL	_func4e
+	GLOBAL	_func5a
+	GLOBAL	_func5b
+	GLOBAL	_func5c
+	GLOBAL	_func5d
+	GLOBAL	_func5e
+
+
+
+

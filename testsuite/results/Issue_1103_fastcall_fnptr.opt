@@ -27,9 +27,8 @@
 ._test2
 	ld	hl,_func
 	push	hl
-	push	hl
-	ld	hl,1	;const
-	ex	(sp),hl
+	ld	bc,1	;const
+	push	bc
 	call	l_jphl
 	pop	bc
 	pop	bc
@@ -40,9 +39,8 @@
 ._test3
 	ld	hl,_func_callee
 	push	hl
-	push	hl
-	ld	hl,1	;const
-	ex	(sp),hl
+	ld	bc,1	;const
+	push	bc
 	call	l_jphl
 	pop	bc
 	ret

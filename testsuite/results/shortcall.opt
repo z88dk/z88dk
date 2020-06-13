@@ -49,9 +49,8 @@
 	ex	de,hl
 	ex	(sp),hl
 	push	de
-	push	hl
-	ld	hl,3	;const
-	ex	(sp),hl
+	ld	bc,3	;const
+	push	bc
 	call	l_jphl
 	pop	bc
 	pop	bc

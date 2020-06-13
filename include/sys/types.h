@@ -29,7 +29,11 @@ typedef double double_t;
 
 #ifndef _HALF_FLOAT_T
 #define _HALF_FLOAT_T
-typedef short half_t;           /* IEEE16 half float type */
+#ifdef __SDCC
+typedef short half_t;              /* IEEE-754 half float type */
+#else
+typedef _Float16 half_t;           /* IEEE-754 half float type */
+#endif
 #endif
 
 #ifndef _SIZE_T
