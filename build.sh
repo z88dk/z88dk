@@ -51,7 +51,7 @@ export ZCCCFG
 
 
 if [ -z "$CFLAGS" ]; then
-   CFLAGS="-g -O2"
+   CFLAGS="-g -O2 -std=c99"
 fi
 
 export CC
