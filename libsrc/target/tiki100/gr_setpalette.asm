@@ -23,6 +23,8 @@ SECTION code_clib
 PUBLIC gr_setpalette
 PUBLIC _gr_setpalette
 
+INCLUDE	"target/cpm/def/tiki100.def"
+
 gr_setpalette:
 _gr_setpalette:
 	pop	bc
@@ -32,8 +34,8 @@ _gr_setpalette:
 	push	hl
 	push	bc
 
-	ld	d,e		; Number of colours
-	ld	b,0		; Current position
+	ld	d,e		; Number of colours in selected mode
+	ld	b,0		; Palette index
 
 	ld	a,e
 set_loop:
@@ -63,39 +65,43 @@ set_loop:
 ;
 ;
 ; Input:
-; 	A = Palette
-; 	B = Position
-;	D = number of colours
+; 	A = Palette color
+; 	B = Palette index
+;	D = number of colours in selected mode
 ;
 .do_set
 	cpl
         LD E,A
 	ld	hl,$f04d
 .palette_loop
-        PUSH DE
-        LD A,E
+
+        PUSH	DE
+        LD	A,E
         DI
-        OUT ($14),A             ; Palette register (prepare the color to be loaded)
-        OUT ($14),A             ; Palette register (do it again to be sure)
-	ld	a,(hl)
+        OUT	($14),A             ; Palette register (prepare the color to be loaded)
+	ld	a,(PORT_0C_COPY)
 	and	$30
 	add	b
+	or	$7F
 	ld	d,a
+        OUT	($0C),A             ; Set palette entry
 	or	$80
-        OUT ($0C),A             ; set graphics mode enabling graphics
-        LD C,0
+        OUT	($0C),A             ; Trigger write
+        LD	C,0
 .wait_loop
-        DEC C
-        JP NZ,wait_loop         ; wait for HBLANK to get the color copied in the requested palette position
-        LD A,D
-        OUT ($0C),A                     ; set graphics mode
+        DEC	C
+        JP	NZ,wait_loop        ; wait for HBLANK to get the color copied in the requested palette position
+        LD	A,D
+        OUT	($0C),A             ; End write
+	ld	(PORT_0C_COPY),a
         EI
-        POP DE
-        LD A,B
-        ADD D                   ; move to next palette position
-        LD B,A
-        CP 16
-        JR C,palette_loop
+        POP	DE
+
+        LD	A,B
+        ADD	D                   ; move to next palette position
+        LD	B,A
+        CP	16
+        JR	C,palette_loop
         RET
 
 
