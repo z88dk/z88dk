@@ -119,9 +119,10 @@
 	pop	bc
 	pop	bc
 	ld	hl,0	;const
-	call	l_gintspsp	;
-	ld	hl,4	;const
-	ex	(sp),hl
+	add	hl,sp
+	call	l_gint
+	ld	bc,4	;const
+	push	bc
 	push	hl
 	ld	hl,i_1+58
 	ex	(sp),hl
@@ -198,14 +199,13 @@
 ._test6
 	ld	hl,_d_fastcall
 	push	hl
-	ld	hl,i_3+0
-	call	dload
+	ld	hl,20	;const
+	call	l_int2long_u_float
 	call	_d_fastcall
-	pop	hl
-	push	hl
-	push	hl
-	ld	hl,i_4+0
-	call	dload
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	ld	hl,1	;const
+	call	l_int2long_u_float
 	call	dpush2
 	pop	hl
 	call	l_jphl
@@ -266,11 +266,11 @@
 	ld	hl,65535	;const
 	ld	de,65535
 	pop	af
-	ld	bc,i_5
+	ld	bc,i_3
 	push	bc
 	push	af
 	ret
-.i_5
+.i_3
 	pop	bc
 	pop	bc
 	pop	bc
@@ -304,17 +304,18 @@
 	call	_is_fastcall
 	pop	bc
 	ld	hl,0	;const
-	call	l_gintspsp	;
-	ld	hl,1	;const
-	ex	(sp),hl
+	add	hl,sp
+	call	l_gint
+	ld	bc,1	;const
+	push	bc
 	push	hl
 	ld	hl,i_1+124
 	pop	af
-	ld	bc,i_6
+	ld	bc,i_4
 	push	bc
 	push	af
 	ret
-.i_6
+.i_4
 	pop	bc
 	pop	bc
 	ret
@@ -383,12 +384,6 @@
 	defm	"test1"
 	defb	0
 
-.i_3
-	;20.000000
-	defb	0x00,0x00,0x00,0x00,0x20,0x85
-.i_4
-	;1.000000
-	defb	0x00,0x00,0x00,0x00,0x00,0x81
 
 
 	SECTION	bss_compiler

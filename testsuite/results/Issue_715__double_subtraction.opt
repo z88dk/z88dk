@@ -14,13 +14,14 @@
 
 
 ._test
-	ld	hl,i_2+0
-	call	dldpsh
+	ld	hl,3	;const
+	call	l_int2long_u_float
+	call	dpush
 	ld	hl,0	;const
 	add	hl,sp
 	call	dldpsh
-	ld	hl,i_3+0
-	call	dload
+	ld	hl,2	;const
+	call	l_int2long_u_float
 	call	dsub
 	call	dpush
 	call	_func
@@ -31,7 +32,7 @@
 	add	hl,sp
 	call	dldpsh
 	ld	hl,2	;const
-	call	l_int2long_s_float
+	call	l_int2long_u_float
 	call	dsub
 	call	dpush
 	call	_func
@@ -41,8 +42,8 @@
 	ld	hl,0	;const
 	add	hl,sp
 	call	dldpsh
-	ld	hl,i_3+0
-	call	dload
+	ld	hl,2	;const
+	call	l_int2long_u_float
 	call	dswap
 	call	dsub
 	call	dpush
@@ -54,7 +55,7 @@
 	add	hl,sp
 	call	dldpsh
 	ld	hl,2	;const
-	call	l_int2long_s_float
+	call	l_int2long_u_float
 	call	dswap
 	call	dsub
 	call	dpush
@@ -68,13 +69,6 @@
 	ret
 
 
-	SECTION	rodata_compiler
-.i_2
-	;3.000000
-	defb	0x00,0x00,0x00,0x00,0x40,0x82
-.i_3
-	;2.000000
-	defb	0x00,0x00,0x00,0x00,0x00,0x82
 
 
 	SECTION	bss_compiler

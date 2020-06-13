@@ -53,7 +53,7 @@ int constant(LVALUE* lval)
     lval->ltype = type_int;
     lval->is_const = 1; /* assume constant will be found */
     if (fnumber(lval)) {
-        load_double_into_fa(lval);
+        load_constant(lval);
         lval->flags = FLAGS_NONE;
         return (1);
     } else if (number(lval) || pstr(lval)) {
@@ -66,7 +66,7 @@ int constant(LVALUE* lval)
         lval->const_val = val;
         lval->is_const = 0; /* string address not constant */
         lval->ltype = make_pointer(type_char);
-        lval->ptr_type = KIND_CHAR; /* djm 9/3/99 */
+        lval->ptr_type = KIND_CHAR; 
         lval->val_type = KIND_INT;
         lval->flags = FLAGS_NONE;
         immedlit(litlab,lval->const_val);

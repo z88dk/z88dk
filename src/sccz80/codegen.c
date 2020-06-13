@@ -46,6 +46,7 @@ extern void RestoreSP(char);
 extern void OutIndex(int);
 #endif
 
+static void swap(void);
 static void dpush_under(Kind val_type);
 static void push(const char *ret);
 static void pop(const char *ret);
@@ -705,7 +706,7 @@ void get_bitfield(LVALUE *lval)
     if ( lval->ltype->bit_size + bit_offset <= 8 ) {
         int i;
         ol("ld\ta,(hl)");
-        // TODO: Shift left as necessary
+        // Shift left as necessary
         if ( bit_offset >= 4) {
             for ( i = 0; i < (8 - bit_offset); i++ ) {
                 ol("rlca");
@@ -845,7 +846,7 @@ void gen_load_indirect(LVALUE* lval)
 }
 
 /* Swap the primary and secondary registers */
-void swap(void)
+static void swap(void)
 {
     if ( IS_GBZ80() ) {
         // Crude emulation - we can probably do better on a case by case basis
@@ -2224,7 +2225,7 @@ void zdiv_const(LVALUE *lval, int32_t value)
 
 int zdiv_dconst(LVALUE *lval, double value, int isrhs)
 {
-    if ( isrhs == 0.0 && value == 1.0 && 
+    if ( isrhs == 0 && value == 1.0 && 
         (c_maths_mode == MATHS_IEEE || lval->val_type == KIND_FLOAT16)) {
         dcallrts("inversef",lval->val_type);
         return 1;
@@ -2247,7 +2248,6 @@ void zmod(LVALUE* lval)
         Zsp += 4;
     } else {
         if ( IS_GBZ80() ) {
-            // TODO: This or just load registers?
             if (ulvalue(lval))
                 callrts("l_mod_u");
             else
@@ -3315,7 +3315,7 @@ void inc(LVALUE* lval)
             vlongconst(0x81000000); // +1.0
             break;
         default:
-            zconvert_constant_to_double(1, KIND_DOUBLE, 1);
+            gen_load_constant_as_float(1, KIND_DOUBLE, 1);
         }
         dcallrts("fadd",KIND_DOUBLE);
         Zsp += c_fp_size;
@@ -3353,7 +3353,7 @@ void dec(LVALUE* lval)
             vlongconst(0x81800000); // -1.0
             break;
         default:
-            zconvert_constant_to_double(-1,KIND_DOUBLE, 0);
+            gen_load_constant_as_float(-1,KIND_DOUBLE, 0);
         }
         callrts("fadd");
         Zsp += c_fp_size;
@@ -4764,7 +4764,7 @@ void zconvert_from_double(Kind from, Kind to, unsigned char isunsigned)
     }
 }
 
-void zconvert_constant_to_double(double val, Kind to, unsigned char isunsigned)
+void gen_load_constant_as_float(double val, Kind to, unsigned char isunsigned)
 {
     unsigned char  fa[8] = {0};
     LVALUE lval = {0};
@@ -4778,15 +4778,23 @@ void zconvert_constant_to_double(double val, Kind to, unsigned char isunsigned)
         vconst((fa[1] << 8) | fa[0]);
         const2((fa[3] << 8) | fa[2]);
     } else {
-        if ( fabs(val) < 65536 ) {
+        // Long doubles, for integer values we can load an int constant and convert, this
+        // is shorter but slower than loading the floating constant directly
+        isunsigned = val >= 0;
+        if ( val >= INT16_MIN && val <= UINT16_MAX && 
+            (c_speed_optimisation & OPT_DOUBLE_CONST) == 0 && fmod(val,1) == 0.0 ) {
             vconst(val);
             zconvert_to_double(KIND_INT,to, isunsigned);
-        } else {
+        } else if ( val >= INT32_MIN && val <= UINT32_MAX && 
+            (c_speed_optimisation & OPT_DOUBLE_CONST) == 0 && fmod(val,1) == 0.0) {
             vlongconst(val);
-            zconvert_to_double(KIND_LONG,to, isunsigned);
+            zconvert_to_double(KIND_LONG,to, isunsigned);             
+        } else {
+            lval.val_type = to;
+            lval.const_val = val;
+            load_double_into_fa(&lval);
         }
     }
-
 }
 
 // Convert the value that's on the stack to a double and restore stack to appropriate state

@@ -61,10 +61,10 @@
 	or	l
 	jp	z,i_6
 	call	_Yes
-	jp	i_8
+	jp	i_7
 .i_6
 	call	_No
-.i_8
+.i_7
 	ret
 
 
@@ -76,12 +76,12 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_9
+	jp	z,i_8
 	call	_Yes
-	jp	i_10
-.i_9
+	jp	i_9
+.i_8
 	call	_No
-.i_10
+.i_9
 	ret
 
 
@@ -93,12 +93,12 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_11
+	jp	z,i_10
 	call	_Yes
-	jp	i_12
-.i_11
+	jp	i_11
+.i_10
 	call	_No
-.i_12
+.i_11
 	ret
 
 
@@ -110,12 +110,12 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_13
+	jp	z,i_12
 	call	_Yes
-	jp	i_14
-.i_13
+	jp	i_13
+.i_12
 	call	_No
-.i_14
+.i_13
 	ret
 
 
@@ -127,12 +127,12 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_15
+	jp	z,i_14
 	call	_Yes
-	jp	i_16
-.i_15
+	jp	i_15
+.i_14
 	call	_No
-.i_16
+.i_15
 	ret
 
 
@@ -144,12 +144,12 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_17
+	jp	z,i_16
 	call	_Yes
-	jp	i_18
-.i_17
+	jp	i_17
+.i_16
 	call	_No
-.i_18
+.i_17
 	ret
 
 
@@ -164,12 +164,12 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_19
+	jp	z,i_18
 	call	_Yes
-	jp	i_20
-.i_19
+	jp	i_19
+.i_18
 	call	_No
-.i_20
+.i_19
 	ret
 
 
@@ -184,12 +184,12 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_21
+	jp	z,i_20
 	call	_Yes
-	jp	i_22
-.i_21
+	jp	i_21
+.i_20
 	call	_No
-.i_22
+.i_21
 	ret
 
 
@@ -206,12 +206,12 @@
 	call	deq
 	ld	a,h
 	or	l
-	jp	z,i_23
+	jp	z,i_22
 	call	_Yes
-	jp	i_24
-.i_23
+	jp	i_23
+.i_22
 	call	_No
-.i_24
+.i_23
 	ret
 
 
@@ -225,12 +225,12 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_25
+	jp	z,i_24
 	call	_Yes
-	jp	i_26
-.i_25
+	jp	i_25
+.i_24
 	call	_No
-.i_26
+.i_25
 	ret
 
 
@@ -246,12 +246,12 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_27
+	jp	z,i_26
 	call	_Yes
-	jp	i_28
-.i_27
+	jp	i_27
+.i_26
 	call	_No
-.i_28
+.i_27
 	ret
 
 
@@ -270,12 +270,12 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_29
+	jp	z,i_28
 	call	_Yes
-	jp	i_30
-.i_29
+	jp	i_29
+.i_28
 	call	_No
-.i_30
+.i_29
 	ret
 
 
@@ -291,12 +291,12 @@
 	call	deq
 	ld	a,h
 	or	l
-	jp	z,i_31
+	jp	z,i_30
 	call	_Yes
-	jp	i_32
-.i_31
+	jp	i_31
+.i_30
 	call	_No
-.i_32
+.i_31
 	ret
 
 
@@ -310,12 +310,12 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_33
+	jp	z,i_32
 	call	_Yes
-	jp	i_34
-.i_33
+	jp	i_33
+.i_32
 	call	_No
-.i_34
+.i_33
 	ret
 
 
@@ -327,12 +327,12 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_35
+	jp	z,i_34
 	call	_Yes
-	jp	i_36
-.i_35
+	jp	i_35
+.i_34
 	call	_No
-.i_36
+.i_35
 	ret
 
 
@@ -344,12 +344,12 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_37
+	jp	z,i_36
 	call	_Yes
-	jp	i_38
-.i_37
+	jp	i_37
+.i_36
 	call	_No
-.i_38
+.i_37
 	ret
 
 
@@ -361,12 +361,12 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_39
+	jp	z,i_38
 	call	_Yes
-	jp	i_40
-.i_39
+	jp	i_39
+.i_38
 	call	_No
-.i_40
+.i_39
 	ret
 
 
@@ -378,84 +378,88 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_41
+	jp	z,i_40
 	call	_Yes
-	jp	i_42
-.i_41
+	jp	i_41
+.i_40
 	call	_No
-.i_42
+.i_41
 	ret
 
 
 
 ._lt_int_cr
 	ld	hl,2	;const
-	call	l_gintspsp	;
-	ld	hl,15360	;const
-	ex	(sp),hl
+	add	hl,sp
+	call	l_gint
+	ld	bc,15360	;const
+	push	bc
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_43
+	jp	z,i_42
 	call	_Yes
-	jp	i_44
-.i_43
+	jp	i_43
+.i_42
 	call	_No
-.i_44
+.i_43
 	ret
 
 
 
 ._lt_long_cr
 	ld	hl,2	;const
-	call	l_gintspsp	;
-	ld	hl,15360	;const
-	ex	(sp),hl
+	add	hl,sp
+	call	l_gint
+	ld	bc,15360	;const
+	push	bc
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_45
+	jp	z,i_44
 	call	_Yes
-	jp	i_46
-.i_45
+	jp	i_45
+.i_44
 	call	_No
-.i_46
+.i_45
 	ret
 
 
 
 ._lt_double_cr
 	ld	hl,2	;const
-	call	l_gintspsp	;
-	ld	hl,15360	;const
-	ex	(sp),hl
+	add	hl,sp
+	call	l_gint
+	ld	bc,15360	;const
+	push	bc
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_47
+	jp	z,i_46
 	call	_Yes
-	jp	i_48
-.i_47
+	jp	i_47
+.i_46
 	call	_No
-.i_48
+.i_47
 	ret
 
 
 
 ._lt_float16_cr
 	ld	hl,2	;const
-	call	l_gintspsp	;
-	ld	hl,15360	;const
-	ex	(sp),hl
+	add	hl,sp
+	call	l_gint
+	ld	bc,15360	;const
+	push	bc
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_49
+	jp	z,i_48
 	call	_Yes
-	jp	i_50
-.i_49
+	jp	i_49
+.i_48
 	call	_No
-.i_50
+.i_49
 	ret
 
 
@@ -470,12 +474,12 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_51
+	jp	z,i_50
 	call	_Yes
-	jp	i_52
-.i_51
+	jp	i_51
+.i_50
 	call	_No
-.i_52
+.i_51
 	ret
 
 
@@ -490,12 +494,12 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_53
+	jp	z,i_52
 	call	_Yes
-	jp	i_54
-.i_53
+	jp	i_53
+.i_52
 	call	_No
-.i_54
+.i_53
 	ret
 
 
@@ -513,12 +517,12 @@
 	call	dlt
 	ld	a,h
 	or	l
-	jp	z,i_55
+	jp	z,i_54
 	call	_Yes
-	jp	i_56
-.i_55
+	jp	i_55
+.i_54
 	call	_No
-.i_56
+.i_55
 	ret
 
 
@@ -532,12 +536,12 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_57
+	jp	z,i_56
 	call	_Yes
-	jp	i_58
-.i_57
+	jp	i_57
+.i_56
 	call	_No
-.i_58
+.i_57
 	ret
 
 
@@ -554,12 +558,12 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_59
+	jp	z,i_58
 	call	_Yes
-	jp	i_60
-.i_59
+	jp	i_59
+.i_58
 	call	_No
-.i_60
+.i_59
 	ret
 
 
@@ -579,12 +583,12 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_61
+	jp	z,i_60
 	call	_Yes
-	jp	i_62
-.i_61
+	jp	i_61
+.i_60
 	call	_No
-.i_62
+.i_61
 	ret
 
 
@@ -600,12 +604,12 @@
 	call	dlt
 	ld	a,h
 	or	l
-	jp	z,i_63
+	jp	z,i_62
 	call	_Yes
-	jp	i_64
-.i_63
+	jp	i_63
+.i_62
 	call	_No
-.i_64
+.i_63
 	ret
 
 
@@ -619,12 +623,12 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_65
+	jp	z,i_64
 	call	_Yes
-	jp	i_66
-.i_65
+	jp	i_65
+.i_64
 	call	_No
-.i_66
+.i_65
 	ret
 
 

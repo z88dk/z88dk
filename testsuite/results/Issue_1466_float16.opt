@@ -120,9 +120,10 @@
 
 ._func4c
 	ld	hl,2	;const
-	call	l_gintspsp	;
-	ld	hl,16896	;const
-	ex	(sp),hl
+	add	hl,sp
+	call	l_gint
+	ld	bc,16896	;const
+	push	bc
 	call	l_f16_div
 	ret
 

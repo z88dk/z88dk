@@ -159,7 +159,7 @@ enum storage_type {
 enum symbol_flags {
         FLAGS_NONE = 0,
     //    UNSIGNED = 1,
-        FARPTR = 0x02,
+    //    FARPTR = 0x02,
         FARACC = 0x04,
         FASTCALL = 0x08,     /* for certain lib calls only */
         CALLEE = 0x40,      /* Called function pops regs */
@@ -409,7 +409,8 @@ enum optimisation {
         OPT_SUB32          = (1 << 4),
         OPT_INT_COMPARE    = (1 << 5),
         OPT_LONG_COMPARE   = (1 << 6),
-        OPT_UCHAR_MULT     = (1 << 7)
+        OPT_UCHAR_MULT     = (1 << 7),
+        OPT_DOUBLE_CONST   = (1 << 8)
 };
 
 enum maths_mode {

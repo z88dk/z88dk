@@ -7,7 +7,6 @@ extern int getloc(SYMBOL *sym, int off);
 extern void putstk(LVALUE *lval);
 extern void puttos(void);
 extern void put2tos(void);
-extern void swap(void);
 extern void immed(void);
 extern void immedlit(int lab,int offs);
 extern void lpush(void);
@@ -52,7 +51,6 @@ extern void function_appendix(SYMBOL *func);
 
 
 extern int zcriticaloffset(void);
-extern void zconvert_constant_to_double(double value, Kind to, unsigned char isunsigned);
 extern void zconvert_to_double(Kind from, Kind to, unsigned char isunsigned);
 extern void zconvert_from_double(Kind from, Kind to, unsigned char isunsigned);
 extern int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int is_last_argument);

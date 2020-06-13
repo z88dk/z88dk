@@ -75,6 +75,7 @@ extern void gen_bankedcall(SYMBOL *sym);
 extern void gen_load_indirect(LVALUE *lval);
 extern void gen_load_static(SYMBOL *sym);
 extern void gen_store_static(SYMBOL *sym);
+extern void gen_load_constant_as_float(double value, Kind to, unsigned char isunsigned);
 
 extern void gen_leave_function(Kind save,char type, int incritical);
 extern int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar);

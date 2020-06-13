@@ -38,11 +38,11 @@
 	push	bc
 	call	l_int2long_s_float
 	call	dpush
-	ld	hl,i_7+0
+	ld	hl,i_5+0
 	call	dload
 	call	dmul
 	call	dpush
-	ld	hl,i_8+0
+	ld	hl,i_6+0
 	call	dload
 	call	dmul
 	ld	a,3
@@ -53,13 +53,13 @@
 	pop	bc
 	pop	bc
 	call	dpush
-	ld	hl,i_5+0
-	call	dload
+	ld	hl,1	;const
+	call	l_int2long_u_float
 	call	dswap
 	call	dsub
 	call	dpush
 	ld	hl,24	;const
-	call	l_int2long_s_float
+	call	l_int2long_u_float
 	call	dmul
 	call	ifix
 	pop	bc
@@ -84,14 +84,14 @@
 	pop	bc
 	push	hl
 	push	de
-	jp	i_11
-.i_9
+	jp	i_9
+.i_7
 	pop	de
 	pop	hl
 	inc	hl
 	push	hl
 	push	de
-.i_11
+.i_9
 	pop	bc
 	pop	hl
 	push	hl
@@ -103,18 +103,18 @@
 	ccf
 	rra
 	sbc	128
-	jp	nc,i_10
+	jp	nc,i_8
 	pop	bc
 	pop	hl
 	push	hl
 	push	bc
 	call	l_int2long_s_float
 	call	dpush
-	ld	hl,i_7+0
+	ld	hl,i_5+0
 	call	dload
 	call	dmul
 	call	dpush
-	ld	hl,i_8+0
+	ld	hl,i_6+0
 	call	dload
 	call	dmul
 	ld	a,3
@@ -125,13 +125,13 @@
 	pop	bc
 	pop	bc
 	call	dpush
-	ld	hl,i_5+0
-	call	dload
+	ld	hl,1	;const
+	call	l_int2long_u_float
 	call	dswap
 	call	dsub
 	call	dpush
 	ld	hl,24	;const
-	call	l_int2long_s_float
+	call	l_int2long_u_float
 	call	dmul
 	call	ifix
 	pop	bc
@@ -149,8 +149,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	jp	i_9
-.i_10
+	jp	i_7
+.i_8
 	ld	hl,0	;const
 	pop	bc
 	pop	bc
@@ -166,12 +166,9 @@
 	defb	0
 
 .i_5
-	;1.000000
-	defb	0x00,0x00,0x00,0x00,0x00,0x81
-.i_7
 	;0.006944
 	defb	0x8e,0xe3,0x38,0x8e,0x63,0x79
-.i_8
+.i_6
 	;3.140000
 	defb	0x5c,0x8f,0xc2,0xf5,0x48,0x82
 
