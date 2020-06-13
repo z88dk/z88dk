@@ -33,6 +33,12 @@ struct fp_decomposed {
 static elem_t    *double_queue = NULL;
 
 
+static int  hex(char c);
+static int  pstr(LVALUE *lval);
+static int  tstr(int32_t *val);
+static int  fnumber(LVALUE *val);
+static int  number(LVALUE *lval);
+
 static void dofloat_ieee(double raw, unsigned char fa[]);
 static void dofloat_ieee16(double raw, unsigned char fa[]);
 static void dofloat_z80(double raw, unsigned char fa[]);

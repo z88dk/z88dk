@@ -263,9 +263,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                  load_constant(lval2);
             } else if (lval->val_type == KIND_LONG  || lval2->val_type == KIND_LONG ) {
                 // Even if LHS is int, we promote to long. 
-                vlongconst(lval2->const_val);
                 lval2->val_type = KIND_LONG;
-                lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;                
+                lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;    
+                load_constant(lval2);            
             } else {
                 vconst(lval2->const_val);
             }
@@ -478,13 +478,12 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
             
         } else if (lval->val_type == KIND_LONG) {
-            // LongContant +/- lvalue
+            // LongConstant +/- lvalue
             widenintegers(lval, lval2);
-            lval2->val_type = KIND_LONG; /* Kludge */
+            lval2->val_type = KIND_LONG;
             lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long; 
             if ( doconst_oper == 0 ) {
-                lpush();  // Get RHS on stack
-                vlongconst(lval->const_val);
+                vlongconst_tostack(lval->const_val); 
             }
         } else {
             // LHS = integer constant, RHS = lvalue?

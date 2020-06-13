@@ -139,7 +139,7 @@ void gen_comment(const char *message)
 
 /* Put out assembler info before any code is generated */
 
-void header(void)
+void gen_file_header(void)
 {
     time_t tim;
     char* timestr;
@@ -158,9 +158,6 @@ void header(void)
     nl();
 }
 
-/*
- * Print the header for a library function, called from the preprocessor!
- */
 
 void DoLibHeader(void)
 {
@@ -225,7 +222,7 @@ void DoLibHeader(void)
 }
 
 /* Print any assembler stuff needed after all code */
-void trailer(void)
+void gen_file_footer(void)
 {
     outfmt("\n; --- End of Compilation ---\n");
 }
@@ -4798,6 +4795,7 @@ void gen_load_constant_as_float(double val, Kind to, unsigned char isunsigned)
 }
 
 // Convert the value that's on the stack to a double and restore stack to appropriate state
+// We have a float in the primary register
 void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned char isunsigned, int operator_is_commutative)
 {
     if ( float_kind == KIND_FLOAT16) {
@@ -4808,7 +4806,7 @@ void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned cha
             zconvert_to_double(stacked_kind, float_kind, isunsigned);
             if (!operator_is_commutative) ol("ex\t(sp),hl"); 
         } else {
-            // 2 bytes
+            // 2 bytes on stack
             ol("ex\t(sp),hl");  // 
             zconvert_to_double(stacked_kind, float_kind, isunsigned);
             if (!operator_is_commutative)  ol("ex\t(sp),hl"); 

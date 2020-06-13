@@ -284,7 +284,7 @@ int main(int argc, char** argv)
     litlab = getlabel(); /* Get labels for function lits*/
     openout(); /* get the output file */
     openin(); /* and initial input file */
-    header(); /* intro code */
+    gen_file_header(); /* intro code */
     parse(); /* process ALL input */
     /* dump literal queues, with label */
     /* litq starts from 1, so literp has to be -1 */
@@ -292,7 +292,7 @@ int main(int argc, char** argv)
     write_double_queue();
     dumpvars();
     dumpfns();
-    trailer(); /* follow-up code */
+    gen_file_footer(); /* follow-up code */
     closeout();
     errsummary(); /* summarize errors */
     if (errcnt)

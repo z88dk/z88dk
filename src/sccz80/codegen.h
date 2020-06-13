@@ -1,7 +1,7 @@
 /* codegen.c */
-extern void header(void);
+
+
 extern void DoLibHeader(void);
-extern void trailer(void);
 extern void outname(const char *sname, char pref);
 extern int getloc(SYMBOL *sym, int off);
 extern void putstk(LVALUE *lval);
@@ -14,7 +14,6 @@ extern void zpush(void);
 
 
 
-extern void mainpop(void);
 extern void zpop(void);
 
 extern char dopref(SYMBOL *sym);

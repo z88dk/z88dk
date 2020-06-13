@@ -49,6 +49,8 @@ extern void     callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
 #include "codegen.h"
 
 extern void gen_comment(const char *comment);
+extern void gen_file_header(void);
+extern void gen_file_footer(void);
 
 extern void gen_store_to_tos(Kind typeobj);
 extern void gen_conv_uint2char(void);
@@ -76,15 +78,14 @@ extern void gen_load_indirect(LVALUE *lval);
 extern void gen_load_static(SYMBOL *sym);
 extern void gen_store_static(SYMBOL *sym);
 extern void gen_load_constant_as_float(double value, Kind to, unsigned char isunsigned);
-
 extern void gen_leave_function(Kind save,char type, int incritical);
 extern int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar);
-
 extern void gen_switch_preamble(Kind kind);
 extern void gen_switch_case(Kind kind, int32_t value, int label);
 extern void gen_switch_postamble(Kind kind);
-
 extern void gen_jp_label(int label);
+
+
 extern void opjump(char *, int);
 extern void testjump(LVALUE *,int label);
 extern void zerojump(void (*oper)(LVALUE *,int), int label, LVALUE *lval);
@@ -139,12 +140,9 @@ extern void gen_builtin_memcpy(int32_t src, int32_t n);
 
 /* const.c */
 extern int        constant(LVALUE *lval);
-extern int        fnumber(LVALUE *val);
-extern int        number(LVALUE *lval);
-extern int        hex(char c);
+
 extern void       address(SYMBOL *ptr);
-extern int        pstr(LVALUE *lval);
-extern int        tstr(int32_t *val);
+
 extern int        storeq(int length, unsigned char *queue,int32_t *val);
 extern int        qstr(double *val);
 extern void       stowlit(int value, int size);
