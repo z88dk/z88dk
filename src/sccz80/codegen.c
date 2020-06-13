@@ -1960,7 +1960,7 @@ void zadd_const(LVALUE *lval, int32_t value)
             add_to_high_word(value);          // it will be < 7 bytes, 33T
         } else {
             ol("ex\tde,hl");                      // 1, 4
-            // TODO: 8080
+            // TODO: 8080 - this adc is emulated and we could probably do better with an 8 bit operation
             constbc(((uint32_t)value) / 65536);   // 3, 10
             ol("adc\thl,bc");                     // 2, 15
             ol("ex\tde,hl");                      // 1, 4

@@ -757,7 +757,6 @@ int heirb(LVALUE* lval)
                         direct = 0;
                         direct = 1;
                     }
-                    // TODO: Warning
                     str = str->tag;
                 }
 

@@ -254,7 +254,6 @@ static int init(Type *type, int dump)
             return 2;
         }
     } else {
-        // TODO....
         /* djm, catch label names in structures (for (*name)() initialisation */
         char sname[NAMESIZE];
         SYMBOL *ptr;
