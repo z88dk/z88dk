@@ -21,6 +21,7 @@ target/zx/graphics/bkrestore
 target/zx/graphics/rowtab
 target/zx/graphics/pixladdr
 target/sam/graphics/swapgfxbk
+target/sam/variables
 @gfx/narrow/gfx_narrow.lst
 target/sam/games/beeper
 target/zx/games/bit_open

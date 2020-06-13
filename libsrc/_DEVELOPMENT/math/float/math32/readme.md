@@ -272,10 +272,10 @@ Following this magic number seeding and traditional Newtwon-Raphson iterations, 
 
 Two N-R iterations produce 5 or 6 significant digits of accuracy. Greater accuracy, approaching 7 significant digits for this library, has been obtained by increasing the Newton-Raphson iterations to 3 cycles at the expense of performance. Also, as in the original Quake game, 1 N-R iteration produces a good enough answer for most applications, and is substantially faster.
 
-#### _abs()_, _frexp()_ and _ldexp()_
+#### _fabs()_, _frexp()_ and _ldexp()_
 
 ```C
-float abs (float x);
+float fabs (float x);
 float frexp (float x, int *pw2);
 float ldexp (float x, int pw2);
 ```
