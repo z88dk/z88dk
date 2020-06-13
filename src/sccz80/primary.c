@@ -99,10 +99,6 @@ int primary(LVALUE* lval)
                 lval->flags = ptr->flags;
                 lval->ptr_type = KIND_NONE;
                 if (lval->ltype->kind != KIND_ARRAY && lval->ltype->kind != KIND_STRUCT ) {
-                    // if (lval->ltype->kind == KIND_PTR) {
-                    //     lval->ptr_type = ptr->ctype->ptr->kind;
-                    //     lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
-                    // }
                     return (1);
                 }
                 /* Handle arrays... */
@@ -111,7 +107,6 @@ int primary(LVALUE* lval)
                 lval->indirect_kind = lval->ptr_type = ptr->type;
                 if ( ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY )
                     lval->ptr_type = lval->ltype->ptr->kind;
-                // lval->val_type = (ptr->flags & FARPTR ? KIND_CPTR : KIND_INT);
                 return (0);
             } else {
                 lval->symbol = ptr;

@@ -669,8 +669,6 @@ int heirb(LVALUE* lval)
                         zpop();
                     }
                     zadd(lval);
-                    /* If long pointer restore upper 16 bits */
-                    //    if (lval->flags&FARPTR) zpop();
                 }
                 ptr = deref(lval, YES);
                 k = lval->ltype->kind == KIND_ARRAY ? 0 : 1;
@@ -722,7 +720,7 @@ int heirb(LVALUE* lval)
                     lval->indirect_kind = lval->ltype->kind;
                 }
             }
-            /* Handle structures... come in here with lval holding tehe previous
+            /* Handle structures... come in here with lval holding the previous
              * pointer to the struct thing..*/
             else if ((direct = cmatch('.')) || match("->")) {
                 Type *str = lval->ltype;
@@ -790,7 +788,6 @@ int heirb(LVALUE* lval)
                 lval->flags = flags;
 
                 zadd_const(lval, member_type->offset);
-//                lval->symbol = ptr; // 201710108: Remove this
                 lval->symbol = NULL;
                 lval->ltype = member_type;
                 lval->indirect_kind = lval->val_type = member_type->kind;
@@ -799,25 +796,8 @@ int heirb(LVALUE* lval)
                 lval->binop = NULL;
                 if (ispointer(lval->ltype) || lval->ltype->kind == KIND_ARRAY) {
                     lval->ptr_type = lval->ltype->ptr->kind;
-                    /* djm */
-                    // TODO
-                  //  if (ptr->flags & FARPTR) {
-                       // lval->indirect_kind = KIND_INT;
-                       // lval->val_type = KIND_INT;
-                    // } else {
-                    //     lval->indirect_kind = KIND_INT;
-                    //     lval->val_type = KIND_INT;
-                    // }
                 }
                 if (lval->ltype->kind == KIND_ARRAY || lval->ltype->kind == KIND_STRUCT ) {
-                   // lval->indirect_kind = lval->ltype->ptr->kind;
-                    /* array or struct */
-                    // TODO
-                 //   lval->ptr_type = ptr->type;
-                    /* djm Long pointers here? */
-                 //   lval->ptr_type = lval->ltype->kind;
-                 //   lval->val_type = KIND_PTR;
-                    //lval->val_type = ((ptr->flags & FARPTR) ? KIND_CPTR : KIND_INT);
                     k = 0;
                 } else
                     k = 1;
