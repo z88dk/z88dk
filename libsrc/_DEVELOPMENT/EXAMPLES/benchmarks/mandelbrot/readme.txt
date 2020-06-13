@@ -141,14 +141,24 @@ time @ 4MHz  = 1519179081 / 4*10^6 =  6 min 20 sec
 IEEE 32-bit float implementation.
 
 9.
-Z88DK April 20, 2020
+Z88DK June 13, 2020
 sccz80 / new c library / math32
-3651 bytes less page zero
+3663 bytes less page zero
 
-cycle count  = 1519179681
-time @ 4MHz  = 1519179681 / 4*10^6 =  6 min 20 sec
+cycle count  = 1517530881
+time @ 4MHz  = 1517530881 / 4*10^6 =  6 min 20 sec
 
 IEEE 32-bit float implementation.
+
+10.
+Z88DK June 13, 2020
+sccz80 / new c library / math16
+1891 bytes less page zero
+
+cycle count  = 1103113465
+time @ 4MHz  = 1103113465 / 4*10^6 =  4 min 36 sec
+
+IEEE 16-bit float implementation.
 
 DQ.
 HITECH C MSDOS V750

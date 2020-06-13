@@ -11,8 +11,11 @@ Compilation:
 new/sccz80
 zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -O2 -clib=new mandelbrot.c -o mandelbrot -lm -m -pragma-include:zpragma.inc -create-app
 
-new/sccz80
+math32/new/sccz80
 zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -O2 -clib=new mandelbrot.c -o mandelbrot --math32 -m -pragma-include:zpragma.inc -create-app
+
+math16/new/sccz80
+zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -O2 -clib=new mandelbrot.c -o mandelbrot --math16 -m -pragma-include:zpragma.inc -create-app
 
 new/zsdcc
 zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 mandelbrot.c -o mandelbrot -lm -m -pragma-include:zpragma.inc -create-app
@@ -71,9 +74,17 @@ cycle count  = 3265477446
 time @ 4MHz  = 3265477446 / 4*10^6 = 13 min 36 sec
 
 
-Z88DK April 20, 2020
+Z88DK June 13, 2020
 sccz80 / new / math32
-3651 bytes less page zero
+3663 bytes less page zero
 
-cycle count  = 1519179681
-time @ 4MHz  = 1519179681 / 4*10^6 =  6 min 20 sec
+cycle count  = 1517530881
+time @ 4MHz  = 1517530881 / 4*10^6 =  6 min 20 sec
+
+
+Z88DK June 13, 2020
+sccz80 / new / math16
+1891 bytes less page zero
+
+cycle count  = 1103113465
+time @ 4MHz  = 1103113465 / 4*10^6 =  4 min 36 sec
