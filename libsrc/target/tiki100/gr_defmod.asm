@@ -22,6 +22,9 @@
 PUBLIC gr_defmod
 PUBLIC _gr_defmod
 
+
+INCLUDE	"target/cpm/def/tiki100.def"
+
 gr_defmod:
 _gr_defmod:
 	ld	a,l
@@ -32,13 +35,11 @@ _gr_defmod:
 	add	a,a
 	ld	b,a
 
-	ld	hl,$F04D
 	DI
-	ld	a,(hl)
+	ld	a,(PORT_0C_COPY)
 	and	$4F
 	or	b
-	LD	(hl),A		; Video port: copy of the value sent to the video port address 0CH
-	OUT	($0C),A		; set graphics mode
+	LD	(PORT_0C_COPY),A	; Video port: copy of the value sent to the video port address 0CH
 	OUT	($0C),A		; set graphics mode
 	EI
 	RET
