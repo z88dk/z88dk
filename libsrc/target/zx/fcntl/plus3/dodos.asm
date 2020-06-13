@@ -23,9 +23,9 @@ dodos:
 dodos2:
         push    af
         push    bc
+        call    l_push_di
         ld      a,7
         ld      bc,32765
-        call    l_push_di
         ld      (23388),a
         out     (c),a
         call    l_pop_ei
@@ -34,9 +34,9 @@ dodos2:
         call    l_jpiy
         push    af
         push    bc
+        call    l_push_di
         ld      a,16
         ld      bc,32765
-        call    l_push_di
         ld      (23388),a
         out     (c),a
         call    l_pop_ei
