@@ -100,6 +100,7 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/l_f32_eq.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/asinh.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/l_f32_conv.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/l_f32_conv_float.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/atanh.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/acosh_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/sin_fastcall.asm

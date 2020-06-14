@@ -1,0 +1,413 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func1
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f16_add
+	ret
+
+
+
+._func1a_TypedConstants
+	ld	hl,16967	;const
+	push	hl
+	ld	hl,16640	;const
+	push	hl
+	call	_func1
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func1a_OpenConstants
+	ld	hl,16967	;const
+	push	hl
+	ld	hl,16640	;const
+	push	hl
+	call	_func1
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._func2
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	ld	hl,_doub_val
+	call	dload
+	call	dpush2
+	pop	hl
+	call	l_f48_f16tof
+	call	dmul
+	call	l_f48_ftof16
+	ret
+
+
+
+._func3a
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,16640	;const
+	call	l_f16_mul
+	ret
+
+
+
+._func3b
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,16640	;const
+	call	l_f16_mul
+	ret
+
+
+
+._func3c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,16896	;const
+	call	l_f16_mul
+	ret
+
+
+
+._func3d
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,16896	;const
+	call	l_f16_mul
+	ret
+
+
+
+._func3e
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	a,1
+	call	l_f16_ldexp
+	ret
+
+
+
+._func3f
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	a,1
+	call	l_f16_ldexp
+	ret
+
+
+
+._func4c
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_gint
+	ld	bc,16896	;const
+	push	bc
+	call	l_f16_div
+	ret
+
+
+
+._func4d
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,13653	;const
+	call	l_f16_mul
+	ret
+
+
+
+._func4e
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	call	l_f16_invf
+	ret
+
+
+
+._func5a
+	ld	hl,4	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,8	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f48_f16tof
+	call	dmul
+	call	l_f48_ftof16
+	ret
+
+
+
+._func5b
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	dload
+	call	dpush2
+	pop	hl
+	call	l_f48_f16tof
+	call	dmul
+	call	l_f48_ftof16
+	ret
+
+
+
+._func5c
+	ld	hl,8	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	dload
+	call	dpush2
+	pop	hl
+	call	l_int2long_s_float
+	call	dmul
+	call	l_f48_ftof16
+	ret
+
+
+
+._func5d
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,14	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_int2long_s_float
+	call	dmul
+	call	l_f48_ftof16
+	ret
+
+
+
+._func5e
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f16_sint2f
+	call	l_f16_mul
+	ret
+
+
+
+._func5f
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	ex	(sp),hl
+	call	l_f16_sint2f
+	call	l_f16_mul
+	ret
+
+
+
+._func6a
+	ld	hl,4	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,8	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f48_f16tof
+	call	dadd
+	call	l_f48_ftof16
+	ret
+
+
+
+._func6b
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	dload
+	call	dpush2
+	pop	hl
+	call	l_f48_f16tof
+	call	dadd
+	call	l_f48_ftof16
+	ret
+
+
+
+._func6c
+	ld	hl,8	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	dload
+	call	dpush2
+	pop	hl
+	call	l_int2long_s_float
+	call	dadd
+	call	l_f48_ftof16
+	ret
+
+
+
+._func6d
+	ld	hl,2	;const
+	add	hl,sp
+	call	dldpsh
+	ld	hl,14	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_int2long_s_float
+	call	dadd
+	call	l_f48_ftof16
+	ret
+
+
+
+._func6e
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f16_sint2f
+	call	l_f16_add
+	ret
+
+
+
+._func6f
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	ex	(sp),hl
+	call	l_f16_sint2f
+	call	l_f16_add
+	ret
+
+
+
+._func7a
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f16_slong2f
+	call	l_f16_add
+	ret
+
+
+
+._func7b
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	(sp),hl
+	ex	de,hl
+	call	l_f16_slong2f
+	call	l_f16_add
+	ret
+
+
+
+._func7c
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f16_slong2f
+	call	l_f16_mul
+	ret
+
+
+
+._func7d
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	de
+	ex	(sp),hl
+	ex	de,hl
+	call	l_f16_slong2f
+	call	l_f16_mul
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._doub_val	defs	6
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_doub_val
+	GLOBAL	_func1
+	GLOBAL	_func1a_TypedConstants
+	GLOBAL	_func1a_OpenConstants
+	GLOBAL	_func2
+	GLOBAL	_func3a
+	GLOBAL	_func3b
+	GLOBAL	_func3c
+	GLOBAL	_func3d
+	GLOBAL	_func3e
+	GLOBAL	_func3f
+	GLOBAL	_func4c
+	GLOBAL	_func4d
+	GLOBAL	_func4e
+	GLOBAL	_func5a
+	GLOBAL	_func5b
+	GLOBAL	_func5c
+	GLOBAL	_func5d
+	GLOBAL	_func5e
+	GLOBAL	_func5f
+	GLOBAL	_func6a
+	GLOBAL	_func6b
+	GLOBAL	_func6c
+	GLOBAL	_func6d
+	GLOBAL	_func6e
+	GLOBAL	_func6f
+	GLOBAL	_func7a
+	GLOBAL	_func7b
+	GLOBAL	_func7c
+	GLOBAL	_func7d
+
+
+
+

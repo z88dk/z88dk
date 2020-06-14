@@ -51,6 +51,7 @@ math/float/math32/lm32/c/sccz80/ldexp
 math/float/math32/lm32/c/sccz80/ldexp_callee
 math/float/math32/lm32/c/sccz80/l_f32_add
 math/float/math32/lm32/c/sccz80/l_f32_conv
+math/float/math32/lm32/c/sccz80/l_f32_conv_float
 math/float/math32/lm32/c/sccz80/l_f32_div
 math/float/math32/lm32/c/sccz80/l_f32_eq
 math/float/math32/lm32/c/sccz80/l_f32_f2long

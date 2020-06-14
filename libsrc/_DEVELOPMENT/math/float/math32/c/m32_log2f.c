@@ -34,8 +34,8 @@
  *
  * ERROR MESSAGES:
  *
- * log singularity:  x = 0; returns MINLOG_F/log(2)
- * log domain:       x < 0; returns MINLOG_F/log(2)
+ * log singularity:  x = 0; returns MINLOG_F32/log(2)
+ * log domain:       x < 0; returns MINLOG_F32/log(2)
  */
 
 /*
@@ -60,7 +60,7 @@ float m32_log2f (float x) __z88dk_fastcall
     /* Test for domain */
     if( x <= 0.0 )
     {
-        return( HUGE_NEG_F );
+        return( HUGE_NEG_F32 );
     }
 
     /* separate mantissa from exponent */

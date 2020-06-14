@@ -4579,3 +4579,48 @@
 =
 	ld	a,(hl)
 	ld	h,%1
+
+	push	de
+	push	hl
+	ld	hl,%1	;const
+	ld	de,%2
+	call	l_f32_swap
+=
+	ld	bc,%2
+	push	bc
+	ld	bc,%1
+	push	bc
+
+	call	l_glong2sp
+	ld	hl,%1	;const
+	ld	de,%2
+	call	l_f32_swap
+=
+	call	l_glong
+	ld	bc,%2
+	push	bc
+	ld	bc,%1
+	push	bc
+
+	push	hl
+	ld	hl,%1	;const
+	ex	(sp),hl
+=
+	ld	bc,%1	;const
+	push	bc
+
+	call	l_gintspsp	;%2
+	ld	hl,%1	;const
+	ex	(sp),hl
+=
+	add	hl,sp
+	call	l_gint
+	ld	bc,%1	;const
+	push	bc
+
+	ld	l,e
+	ld	h,d
+	ex	de,hl
+=
+	ld	l,e
+	ld	h,d

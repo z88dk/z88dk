@@ -266,7 +266,7 @@ void doiferror()
     flab2 = getlabel();
     if (lastst != STRETURN) {
         /* if last statement of 'if' was 'return' we needn't skip 'else' code */
-        jump(flab2);
+        gen_jp_label(flab2);
     }
     postlabel(flab1); /* print false label */
     statement(); /* and do 'else' clause */
@@ -317,7 +317,7 @@ void doif()
     flab2 = getlabel();
     if (lastst != STRETURN) {
         /* if last statement of 'if' was 'return' we needn't skip 'else' code */
-        jump(flab2);
+        gen_jp_label(flab2);
     }
     if ( testtype != 0 ) {
         postlabel(flab1); /* print false label */
@@ -336,13 +336,12 @@ Type *doexpr()
     char *before, *start;
     double val;
     int    vconst;
-    // Kind    type;
+    Kind    type;
     Type   *type_ptr;
-
+    
     while (1) {
         setstage(&before, &start);
-        // type = expression(&vconst, &val, &type_ptr);
-        expression(&vconst, &val, &type_ptr);
+        type = expression(&vconst, &val, &type_ptr);
         clearstage(before, start);
         if (ch() != ',')
             return type_ptr;
@@ -371,7 +370,7 @@ void dowhile()
         clearbuffer(buf);
     } else {
         statement(); /* if so, do a statement */
-        jump(wq.loop); /* loop to label */
+        gen_jp_label(wq.loop); /* loop to label */
         postlabel(wq.exit); /* exit label */
         clearbuffer(buf);
     }
@@ -396,7 +395,7 @@ void dodo()
     if ( testresult == 0 ) { // False
         // We don't need to do anything
     } else {
-        jump(top);
+        gen_jp_label(top);
         postlabel(wq.exit);
     }
     delwhile();
@@ -446,13 +445,13 @@ void dofor()
     suspendbuffer();
 
     if ( testresult != 0 ) {  /* So it's either true or non-constant */
-        jump(l_condition); /*         goto condition             */
+        gen_jp_label(l_condition); /*         goto condition             */
         postlabel(wq.loop); /* .loop                              */
         clearbuffer(buf3); /*         modification               */
         postlabel(l_condition); /* .condition                         */
         clearbuffer(buf2); /*         if (!condition) goto exit  */
         statement(); /*         statement                  */
-        jump(wq.loop); /*         goto loop                  */
+        gen_jp_label(wq.loop); /*         goto loop                  */
         postlabel(wq.exit); /* .exit                              */
     } else {
         clearbuffer(buf2); // Condition 
@@ -490,43 +489,24 @@ void doswitch()
     swdefault = 0;
     swactive = 1;
     endlab = getlabel();
-    /* jump(endlab) ; */
+    /* gen_jp_label(endlab) ; */
 
     buf = startbuffer(100);
     statement(); /* cases, etc. */
-    /* jump(wq.exit) ; */
+    /* gen_jp_label(wq.exit) ; */
     suspendbuffer();
 
     postlabel(endlab);
-    if (switch_type->kind == KIND_CHAR) {
-        LoadAccum();
-        while (swptr < swnext) {
-            CpCharVal(swptr->value);
-            opjump("z,", swptr->label);
-            ++swptr;
-        }
-    } else {
-        sw(switch_type->kind); /* insert code to match cases */
-        while (swptr < swnext) {
-            defword();
-            printlabel(swptr->label); /* case label */
-            if (switch_type->kind == KIND_LONG) {
-                outbyte('\n');
-                deflong();
-            } else
-                outbyte(',');
-            outdec(swptr->value); /* case value */
-            nl();
-            ++swptr;
-        }
-        defword();
-        outdec(0);
-        nl();
+    gen_switch_preamble(switch_type->kind);
+    while (swptr < swnext ) {
+        gen_switch_case(switch_type->kind, swptr->value, swptr->label);
+        ++swptr;
     }
+    gen_switch_postamble(switch_type->kind);
     if (swdefault)
-        jump(swdefault);
+        gen_jp_label(swdefault);
     else
-        jump(wq.exit);
+        gen_jp_label(wq.exit);
 
     clearbuffer(buf);
 
@@ -552,7 +532,7 @@ void docase()
     }
     postlabel(swnext->label = getlabel());
     constexpr(&value,&valtype, 1);
-    if ( valtype == KIND_DOUBLE ) 
+    if ( kind_is_floating(valtype)) 
         warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
     swnext->value = value;
     needchar(':');
@@ -579,9 +559,9 @@ void doreturn(char type)
     if (endst() == 0) {
         Type *expr = doexpr();
         force(currfn->ctype->return_type->kind, expr->kind, currfn->ctype->return_type->isunsigned, expr->isunsigned, 0);
-        leave(currfn->ctype->return_type->kind, type, incritical);
+        gen_leave_function(currfn->ctype->return_type->kind, type, incritical);
     } else {
-        leave(KIND_INT, type, incritical);
+        gen_leave_function(KIND_INT, type, incritical);
     }
 }
 
@@ -598,7 +578,7 @@ void dobreak()
     if ((ptr = readwhile(wqptr)) == 0)
         return; /* no */
     modstk(ptr->sp, KIND_NONE, NO, YES); /* else clean up stk ptr */
-    jump(ptr->exit); /* jump to exit label */
+    gen_jp_label(ptr->exit); /* jump to exit label */
 }
 
 /*
@@ -618,7 +598,7 @@ void docont()
             break;
     }
     modstk(ptr->sp, KIND_NONE, NO, YES); /* else clean up stk ptr */
-    jump(ptr->loop); /* jump to loop label */
+    gen_jp_label(ptr->loop); /* jump to loop label */
 }
 
 static void docritical(void)
@@ -627,12 +607,10 @@ static void docritical(void)
         errorfmt("Cannot nest __critical sections", 1);
     }
     incritical = 1;
-    zentercritical();
-    Zsp -= zcriticaloffset();
+    gen_critical_enter();
     statement();
-    zleavecritical();
+    gen_critical_leave();
     incritical = 0;
-    Zsp += zcriticaloffset();
 }
 
 /*

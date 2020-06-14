@@ -9,6 +9,7 @@
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_f24_int.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_f24_long.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_f32.asm
+../../_DEVELOPMENT/math/float/math16/z80/asm_f16_f48.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_floor.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_frexp.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_inf.asm
@@ -22,6 +23,7 @@
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_neg.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_normalize.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_sigdig.asm
+../../_DEVELOPMENT/math/float/math16/z80/asm_f16_sqrt.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_zero.asm
 
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sdcc/___h2schar.asm
@@ -56,7 +58,10 @@
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/fma_callee.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/frexp.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/frexp_callee.asm
+../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/hypot.asm
+../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/hypot_callee.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/inv.asm
+../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/invsqrt.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/ldexp.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/ldexp_callee.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/l_f16_fabs.asm
@@ -80,6 +85,7 @@
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/l_f16_zero.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/mul2.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/mul10.asm
+../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/sqrt.asm
 
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_abs.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_add.asm
@@ -104,7 +110,10 @@
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc___h2uint_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc___h2ulong.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc___h2ulong_callee.asm
+../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_hypot.asm
+../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_hypot_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_inv.asm
+../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_invsqrt.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_ldexp.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_ldexp_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc___lt_callee.asm
@@ -121,6 +130,7 @@
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc___sint2h_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc___slong2h.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc___slong2h_callee.asm
+../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_sqrt.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_sub.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_sub_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc___uchar2h.asm
@@ -139,6 +149,8 @@
 ../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_fma_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_frexp.asm
 ../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_frexp_callee.asm
+../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_hypot.asm
+../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_hypot_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_ldexp.asm
 ../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_ldexp_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_mul.asm
