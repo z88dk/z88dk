@@ -1,5 +1,5 @@
 ;
-;  feilipu, 2019 April
+;  feilipu, 2020 June
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -28,7 +28,7 @@
 ;
 ;-------------------------------------------------------------------------
 
-SECTION code_fp_math32
+SECTION code_fp_math16
 
 EXTERN asm_f24_f16
 EXTERN asm_f32_f24
