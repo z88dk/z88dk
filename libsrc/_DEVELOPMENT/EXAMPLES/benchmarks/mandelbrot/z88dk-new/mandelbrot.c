@@ -59,7 +59,7 @@
 #endif
 
 #ifdef __MATH_MATH16
-    #define DOUBLE          half_t
+    #define DOUBLE          _Float16
 #else
     #define DOUBLE          double
 #endif

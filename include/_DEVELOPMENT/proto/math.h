@@ -46,7 +46,7 @@ include(__link__.m4)
    typedef short _Float16;      /* IEEE-754 half float type */  
    #endif
 
-typedef _Float16 half_t; 
+typedef _Float16 half_t;
 
 #endif
 
@@ -234,8 +234,8 @@ __DPROTO(,,double_t,,poly, const float x, const float d[], unsigned int n)
 __DPROTO(,,half_t,,f16_f16_f48,double_t x)
 __DPROTO(,,double_t,,f16_f48_f16,half_t x)
 
-__DPROTO(,,half_t,,f16_f16_f32,float x)
-__DPROTO(,,float,,f16_f32_f16,half_t x)
+__DPROTO(,,half_t,,f16_f16_f32,float_t x)
+__DPROTO(,,float_t,,f16_f32_f16,half_t x)
 
 __DPROTO(,,int16_t,,f16_i16_f16,half_t x)
 __DPROTO(,,uint16_t,,f16_u16_f16,half_t x)

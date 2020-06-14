@@ -48,7 +48,7 @@
    typedef short _Float16;      /* IEEE-754 half float type */  
    #endif
 
-typedef _Float16 half_t; 
+typedef _Float16 half_t;
 
 #endif
 
@@ -428,10 +428,10 @@ extern double_t __LIB__ f16_f48_f16(half_t x) __smallc __z88dk_fastcall;
 
 
 
-extern half_t __LIB__ f16_f16_f32(float x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ f16_f16_f32(float_t x) __smallc __z88dk_fastcall;
 
 
-extern float __LIB__ f16_f32_f16(half_t x) __smallc __z88dk_fastcall;
+extern float_t __LIB__ f16_f32_f16(half_t x) __smallc __z88dk_fastcall;
 
 
 
