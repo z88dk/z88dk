@@ -41,8 +41,8 @@
    
 #endif
 
-#ifndef _FLOAT16_T
-#define _FLOAT16_T
+#ifndef _FLOAT16_T_DEFINED
+#define _FLOAT16_T_DEFINED
 
    #ifndef __SCCZ80
    typedef short _Float16;      /* IEEE-754 half float type */  
