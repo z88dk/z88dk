@@ -82,7 +82,6 @@ set_loop:
 	ld	a,(PORT_0C_COPY)
 	and	$30
 	add	b
-	or	$7F
 	ld	d,a
 	OUT	($0C),A	     ; Set palette entry
 	or	$80

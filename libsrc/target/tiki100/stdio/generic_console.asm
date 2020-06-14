@@ -217,9 +217,10 @@ done:
 
 
 generic_console_scrollup:
+	push	af
 	push	bc
 	push	de
-	ld	b,-8
+	ld	a,-8
 	call	gr_vscroll
 	call	swapgfxbk
 	ld	hl,$7C00
@@ -230,6 +231,7 @@ generic_console_scrollup:
 	call	swapgfxbk1
 	pop	de
 	pop	bc
+	pop	af
 	ret
 
 
