@@ -11,21 +11,15 @@
 #define _FLOAT_T_DEFINED
 
    #ifdef __CLANG
-   
    typedef float float_t;
-   
    #endif
 
    #ifdef __SDCC
-   
    typedef float float_t;
-   
    #endif
    
    #ifdef __SCCZ80
-   
    typedef double float_t;
-   
    #endif
    
 #endif
@@ -34,45 +28,27 @@
 #define _DOUBLE_T_DEFINED
 
    #ifdef __CLANG
-   
    typedef float double_t;
-   
    #endif
 
    #ifdef __SDCC
-   
    typedef float double_t;
-   
    #endif
    
    #ifdef __SCCZ80
-   
    typedef double double_t;
-   
    #endif
    
 #endif
 
-#ifndef _HALF_FLOAT_T
-#define _HALF_FLOAT_T
+#ifndef _FLOAT16_T
+#define _FLOAT16_T
 
-   #ifdef __CLANG
-   
-   typedef short half_t;        /* IEEE-754 half float type */
-   
+   #ifndef __SCCZ80
+   typedef short _Float16;      /* IEEE-754 half float type */  
    #endif
 
-   #ifdef __SDCC
-   
-   typedef short half_t;        /* IEEE-754 half float type */
-   
-   #endif
-   
-   #ifdef __SCCZ80
-   
-   typedef _Float16 half_t;     /* IEEE-754 half float type */
-   
-   #endif
+typedef _Float16 half_t; 
 
 #endif
 
