@@ -609,6 +609,11 @@ extern half_t f16_fma_callee(half_t x,half_t y,half_t z) __z88dk_callee;
 #define f16_fma(a,b,c) f16_fma_callee(a,b,c)
 
 
+extern half_t f16_hypot(half_t x,half_t y);
+extern half_t f16_hypot_callee(half_t x,half_t y) __z88dk_callee;
+#define f16_hypot(a,b) f16_hypot_callee(a,b)
+
+
 
 extern half_t f16_inv(half_t x);
 extern half_t f16_inv_fastcall(half_t x) __z88dk_fastcall;

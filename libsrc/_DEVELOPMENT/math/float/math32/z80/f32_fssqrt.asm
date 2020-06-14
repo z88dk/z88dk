@@ -49,18 +49,16 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     push de
     push hl
     push af                     ; ret
-    rl d
-    jp C,m32_fsconst_nnan       ; negative number?
-    rr d
+    bit 7,d
+    jp NZ,m32_fsconst_nnan      ; negative number?
     call m32_fsinvsqrt_fastcall
     jp m32_fsmul
 
 
 ._m32_sqrtf
 .m32_fssqrt_fastcall
-    rl d
-    jp C,m32_fsconst_nnan       ; negative number?
-    rr d
+    bit 7,d
+    jp NZ,m32_fsconst_nnan      ; negative number?
     pop af                      ; ret
     push de                     ; y msw on stack
     push hl                     ; y lsw on stack
@@ -70,9 +68,8 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
 
 
 ._m32_invsqrtf
-    rl d
-    jp C,m32_fsconst_nnan       ; negative number?
-    rr d
+    bit 7,d
+    jp NZ,m32_fsconst_nnan      ; negative number?
 
 .m32_fsinvsqrt_fastcall         ; DEHL
     sla e
@@ -81,7 +78,7 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     rr d
     rr e
 
-    ld b,d                      ; retain original y sign & exponent
+    ld b,d
     set 7,d                     ; make y negative
 
     push de                     ; -y msw on stack for w[3] - remove for 2 iterations
@@ -91,11 +88,11 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     push de                     ; -y msw on stack for w[1]
     push hl                     ; -y lsw on stack for w[1]
 
-    ex de,hl                    ; original y in hlde
-    ld c,l                      ; original y in bcde
+    ld c,e
+    ex de,hl                    ; original y in bcde
                                 ; now calculate w[0]
-    srl b                       
-    rr c                        ; y>>1
+    srl b                       ; y>>1
+    rr c
     rr d
     rr e
 
@@ -106,14 +103,14 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
     ld hl,05f37h
     sbc hl,bc                   ; (float) w[0] in hlde
 
-    add hl,hl                   ; get w[0] full exponent into h  
+    add hl,hl                   ; get w[0] full exponent into h
     rr c                        ; put sign in c
 
     scf
     rr l                        ; put implicit bit for mantissa in lde
     ld b,h                      ; unpack IEEE to expanded float 32-bit mantissa h lde0 -> b dehl
     ld d,l
-    ld h,e   
+    ld h,e
     ld e,d
     ld l,0
 

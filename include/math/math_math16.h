@@ -47,6 +47,7 @@ extern half_t __LIB__ f16_mul(half_t x,half_t y) __smallc;
 extern half_t __LIB__ f16_div(half_t x,half_t y) __smallc;
 
 extern half_t __LIB__ f16_fma(half_t x,half_t y,half_t z) __smallc;
+extern half_t __LIB__ f16_hypot(half_t x,half_t y) __smallc;
 
 /* Power functions */
 extern half_t __LIB__ f16_sqrt(half_t x);

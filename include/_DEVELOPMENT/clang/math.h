@@ -433,6 +433,9 @@ extern half_t f16_div(half_t x,half_t y);
 extern half_t f16_fma(half_t x,half_t y,half_t z);
 
 
+extern half_t f16_hypot(half_t x,half_t y);
+
+
 
 extern half_t f16_inv(half_t x);
 

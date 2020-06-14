@@ -493,6 +493,11 @@ extern half_t __LIB__ f16_fma_callee(half_t x,half_t y,half_t z) __smallc __z88d
 #define f16_fma(a,b,c) f16_fma_callee(a,b,c)
 
 
+extern half_t __LIB__ f16_hypot(half_t x,half_t y) __smallc;
+extern half_t __LIB__ f16_hypot_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define f16_hypot(a,b) f16_hypot_callee(a,b)
+
+
 
 extern half_t __LIB__ f16_inv(half_t x) __smallc __z88dk_fastcall;
 

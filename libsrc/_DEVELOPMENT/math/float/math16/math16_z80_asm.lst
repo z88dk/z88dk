@@ -18,9 +18,6 @@ math/float/math16/z80/asm_f16_add
 math/float/math16/z80/asm_f16_mul
 math/float/math16/z80/asm_f16_div
 
-;math/float/math16/z80/asm_f16_sqr
-;math/float/math16/z80/asm_f16_sqrt
-
 math/float/math16/z80/asm_f16_floor
 math/float/math16/z80/asm_f16_ceil
 math/float/math16/z80/asm_f16_classify
@@ -33,6 +30,6 @@ math/float/math16/z80/asm_f16_mul10
 math/float/math16/z80/asm_f16_frexp
 math/float/math16/z80/asm_f16_ldexp
 
-;math/float/math16/z80/asm_f16_fma
+math/float/math16/z80/asm_f16_sqrt
 ;math/float/math16/z80/asm_f16_poly
 

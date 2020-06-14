@@ -61,7 +61,7 @@ PUBLIC asm_f32_f16
     ld e,h                      ; mantissa padded to ehl
     ld h,l
     ld l,0
-    rl e                        ; remove implicit bit
+    sla e                       ; remove implicit bit
     rla                         ; sign in carry
     rr d                        ; sign and exponent in d
     rr e                        ; exponent and mantissa in e (hl)
