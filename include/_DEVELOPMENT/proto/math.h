@@ -100,39 +100,41 @@ typedef _Float16 half_t;
 
 #ifdef __MATH_MATH32
 
-#define HUGE_POS_F             (float)+3.4028234664E+38
-#define TINY_POS_F             (float)+1.1754943508E−38
-#define HUGE_NEG_F             (float)-1.7014118346E+38
-#define TINY_NEG_F             (float)-1.1754943508E-38
+#define HUGE_POS_F32           (float)+3.4028234664E+38
+#define TINY_POS_F32           (float)+1.1754943508E−38
+#define HUGE_NEG_F32           (float)-1.7014118346E+38
+#define TINY_NEG_F32           (float)-1.1754943508E-38
 
-#define INFINITY_POS_F         ((unsigned long)0x7F800000)
-#define INFINITY_NEG_F         ((unsigned long)0xFF800000)
+#define MAXL2_F32              ((float)+127.999999914)
+#define MINL2_F32              ((float)-126.0)
+#define MAXLOG_F32             ((float)+88.722839052)
+#define MINLOG_F32             ((float)−87.336544751)
+#define MAXL10_F32             ((float)+38.230809449)
+#define MINL10_F32             ((float)−37.929779454)
 
-#define MAXL2_F                ((float)+127.999999914)
-#define MINL2_F                ((float)-126.0)
-#define MAXLOG_F               ((float)+88.722839052)
-#define MINLOG_F               ((float)−87.336544751)
-#define MAXL10_F               ((float)+38.230809449)
-#define MINL10_F               ((float)−37.929779454)
+#define HUGE_VAL_F32           ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32       ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32       ((unsigned long)0xFF800000)
 
 #endif
 
 #ifdef __MATH_MATH16
 
-#define HUGE_POS_HF            (short)0x7BFF        /*  +6.5504E+4 */
-#define TINY_POS_HF            (short)0x0400        /*  +6.1035E-5 */
-#define HUGE_NEG_HF            (short)0xFBFF        /*  -6.5504E+4 */
-#define TINY_NEG_HF            (short)0x8400        /*  -6.1035E-5 */
+#define HUGE_POS_F16            (_Float16)(short)0x7BFF       /*  +6.5504E+4 */
+#define TINY_POS_F16            (_Float16)(short)0x0400       /*  +6.1035E-5 */
+#define HUGE_NEG_F16            (_Float16)(short)0xFBFF       /*  -6.5504E+4 */
+#define TINY_NEG_F16            (_Float16)(short)0x8400       /*  -6.1035E-5 */
 
-#define INFINITY_POS_HF        (short)0x7C00
-#define INFINITY_NEG_HF        (short)0xFC00
+#define MAXL2_F16               (_Float16)(short)0x4BFF       /*  +15.99    */
+#define MINL2_F16               (_Float16)(short)0xCB00       /*  -14.00    */
+#define MAXLOG_F16              (_Float16)(short)0x498B       /*  +11.086   */
+#define MINLOG_F16              (_Float16)(short)0xC8DA       /*  -9.700    */       
+#define MAXL10_F16              (_Float16)(short)0x44D1       /*  +4.816    */
+#define MINL10_F16              (_Float16)(short)0xC437       /*  -4.215    */
 
-#define MAXL2_HF               (short)0x4BFF        /*  +15.99    */
-#define MINL2_HF               (short)0xCB00        /*  -14.00    */
-#define MAXLOG_HF              (short)0x498B        /*  +11.086   */
-#define MINLOG_HF              (short)0xC8DA        /*  -9.700    */       
-#define MAXL10_HF              (short)0x44D1        /*  +4.816    */
-#define MINL10_HF              (short)0xC437        /*  -4.215    */
+#define HUGE_VAL_F16            (_Float16)(short)0x7C00
+#define INFINITY_POS_F16        (_Float16)(short)0x7C00
+#define INFINITY_NEG_F16        (_Float16)(short)0xFC00
 
 #endif
 
