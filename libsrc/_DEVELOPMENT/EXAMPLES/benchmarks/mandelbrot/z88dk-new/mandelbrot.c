@@ -58,8 +58,14 @@
    #endif
 #endif
 
+#ifdef __MATH_MATH16
+    #define DOUBLE          _Float16
+#else
+    #define DOUBLE          double
+#endif
 
-#include<stdio.h>
+#include <stdio.h>
+#include <math.h>
 
 unsigned char *output = (unsigned char *)0xc000;
 
@@ -68,10 +74,10 @@ int main (int argc, char **argv)
     STATIC int w, h, bit_num;
     STATIC unsigned char byte_acc;
     STATIC int i;
-	 STATIC int iter = 50;
-    STATIC double x, y;
-    STATIC double Zr, Zi, Cr, Ci, Tr, Ti;
-    STATIC double limit = 2.0;
+	STATIC int iter = 50;
+    STATIC DOUBLE x, y;
+    STATIC DOUBLE Zr, Zi, Cr, Ci, Tr, Ti;
+    STATIC DOUBLE limit = 2.0;
 
 #ifdef COMMAND
     w = argc > 1 ? atoi(argv[1]) : 60;
@@ -84,13 +90,14 @@ int main (int argc, char **argv)
 
 TIMER_START();
 
-    for(y=0;y<h;++y) 
+    for(y=0;y<h;++y)
     {
         for(x=0;x<w;++x)
         {
             Zr = Zi = Tr = Ti = 0.0;
-            Cr = (2.0*x/w - 1.5); Ci=(2.0*y/h - 1.0);
-        
+            Cr = (2.0*x/w - 1.5);
+            Ci=(2.0*y/h - 1.0);
+
             for (i=0;i<iter && (Tr+Ti <= limit*limit);++i)
             {
                 Zi = 2.0*Zr*Zi + Ci;
@@ -98,11 +105,11 @@ TIMER_START();
                 Tr = Zr * Zr;
                 Ti = Zi * Zi;
             }
-       
-            byte_acc <<= 1; 
+
+            byte_acc <<= 1;
             if(Tr+Ti <= limit*limit) byte_acc |= 0x01;
-                
-            ++bit_num; 
+
+            ++bit_num;
 
             if(bit_num == 8)
             {

@@ -2,15 +2,10 @@
 
 include ../../Make.config
 
-vpath %.c ../../_DEVELOPMENT/math/float/math16/c
-vpath %.c ../cimpl
+AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard z80/*.asm)
+OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
-
-CFILES  = $(notdir $(wildcard ../../_DEVELOPMENT/math/float/math16/c/*.c)) atof.c ftoa.c ftoe.c
-#CFILES  = atof.c ftoa.c ftoe.c ftoa_fudgeit.c
-OBJECTS = $(CFILES:.c=.o)
-
-CFLAGS += -fp-mode=ieee16  -DMUST_ROUND
+CFLAGS += -D__MATH_MATH16
 
 all: dirs $(OUTPUT_DIRECTORY)/math16.lib $(OUTPUT_DIRECTORY)/math16_ixiy.lib
 

@@ -34,39 +34,41 @@
 #include <stdint.h>
 #include <limits.h>
 
-#define HUGE_POS_F  (float)+3.4028234664E+38
-#define TINY_POS_F  (float)+1.1754943508E−38
-#define HUGE_NEG_F  (float)-1.7014118346E+38
-#define TINY_NEG_F  (float)-1.1754943508E-38
-#define INFINITY_POSF   ((unsigned long)0x7F800000)
-#define INFINITY_NEGF   ((unsigned long)0xFF800000)
+#define HUGE_POS_F32        (float)+3.4028234664E+38
+#define TINY_POS_F32        (float)+1.1754943508E−38
+#define HUGE_NEG_F32        (float)-1.7014118346E+38
+#define TINY_NEG_F32        (float)-1.1754943508E-38
 
-#define PI          (float)3.1415926536
-#define TWO_PI      (float)6.2831853071
-#define HALF_PI     (float)1.5707963268
-#define QUART_PI    (float)0.7853981634
-#define iPI         (float)0.3183098862
-#define iTWO_PI     (float)0.1591549431
-#define TWO_O_PI    (float)0.6366197724
+#define HUGE_VAL_F32        ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32    ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32    ((unsigned long)0xFF800000)
+
+#define MAXL2_F32           (float)+127.999999914
+#define MINL2_F32           (float)-126.0
+#define MAXLOG_F32          (float)+88.722839052
+#define MINLOG_F32          (float)−87.336544751
+#define MAXL10_F32          (float)+38.230809449
+#define MINL10_F32          (float)−37.929779454
+
+#define PI                  (float)3.1415926536
+#define TWO_PI              (float)6.2831853071
+#define HALF_PI             (float)1.5707963268
+#define QUART_PI            (float)0.7853981634
+#define iPI                 (float)0.3183098862
+#define iTWO_PI             (float)0.1591549431
+#define TWO_O_PI            (float)0.6366197724
 
 // Non-ANSI macros
-#define BADTAN          (float)1.560796327
-#define EXPLARGE        (float)89.80081863
-#define INF             (float)3.00e38
-#define IPIby180        (float)57.29577951
-#define LNof10          (float)2.302585093
-#define LOG2            (float)0.30102999567
-#define LOGE            (float)0.43429448190
-#define PIby180         (float)0.0174532925
-#define POW10INF        (float)38.0
-#define SQR10           (float)3.162277660168
-
-#define MAXL2_F         ((float)+127.999999914)
-#define MINL2_F         ((float)-126.0)
-#define MAXLOG_F        ((float)+88.722839052)
-#define MINLOG_F        ((float)−87.336544751)
-#define MAXL10_F        ((float)+38.230809449)
-#define MINL10_F        ((float)−37.929779454)
+#define BADTAN              (float)1.560796327
+#define EXPLARGE            (float)89.80081863
+#define INF                 (float)3.00e38
+#define IPIby180            (float)57.29577951
+#define LNof10              (float)2.302585093
+#define LOG2                (float)0.30102999567
+#define LOGE                (float)0.43429448190
+#define PIby180             (float)0.0174532925
+#define POW10INF            (float)38.0
+#define SQR10               (float)3.162277660168
 
 union float_long
 {

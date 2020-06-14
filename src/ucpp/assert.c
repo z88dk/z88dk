@@ -132,7 +132,7 @@ int handle_assert(struct lexer_state *ls)
 	struct token t;
 	struct token_fifo *atl = 0;
 	struct assert *a;
-	char *aname;
+	char *aname = NULL;                             // Prevent uninitialized use warning
 	int ret = -1;
 	long l = ls->line;
 	int nnp;

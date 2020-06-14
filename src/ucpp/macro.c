@@ -321,6 +321,7 @@ int handle_define(struct lexer_state *ls)
 	struct macro *m = 0, *n;
 #ifdef LOW_MEM
 	struct token_fifo mv;
+	mv.t = NULL;                                    // Prevent uninitialized use warning
 #endif
 	int ltwws = 1, redef = 0;
 	char *mname = 0;
@@ -933,7 +934,8 @@ static inline char *stringify_string(char *x)
 {
 	size_t l;
 	int i, inside_str = 0, inside_cc = 0, must_quote, has_quoted = 0;
-	char *y, *d;
+	char *y;
+	char *d = NULL;                                 // Prevent uninitialized use warning
 
 	for (i = 0; i < 2; i ++) {
 		if (i) d[0] = '"';
@@ -1029,10 +1031,12 @@ int substitute_macro(struct lexer_state *ls, struct macro *m,
 	struct token_fifo *tfi, int penury, int reject_nested, long l)
 {
 	char *mname = HASH_ITEM_NAME(m);
-	struct token_fifo *atl, etl;
+	struct token_fifo etl;
+	struct token_fifo *atl = NULL;                  // Prevent uninitialized use warning
 	struct token t, *ct;
 	int i, save_nest = m->nest;
-	size_t save_art, save_tfi, etl_limit;
+	size_t save_art, etl_limit;
+	size_t save_tfi = 0;                            // Prevent uninitialized use warning
 	int ltwds, ntwds, ltwws;
 	int pragma_op = 0;
 

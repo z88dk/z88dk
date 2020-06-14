@@ -32,7 +32,7 @@
  *
  * log10f singularity:  x = 0; returns -MAXL10
  * log10f domain:       x < 0; returns -MAXL10
- * MAXL10_F = 38.230809449325611792
+ * MAXL10_F32 = 38.230809449325611792
  */
 
 /*
@@ -60,7 +60,7 @@ float m32_log10f (float x) __z88dk_fastcall
     /* Test for domain */
     if( x <= 0.0 )
     {
-        return( HUGE_NEG_F );
+        return( HUGE_NEG_F32 );
     }
 
     /* separate mantissa from exponent */

@@ -15,6 +15,7 @@ Type   *type_uint = &(Type){ KIND_INT, 2, 1, .len=1 };
 Type   *type_long = &(Type){ KIND_LONG, 4, 0, .len=1 };
 Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
 Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
+Type   *type_float16 = &(Type){ KIND_FLOAT16, 2, 0, .len=1 }; 
 
 static namespace  *namespaces = NULL;
 
@@ -34,7 +35,7 @@ static int32_t needsub(void)
         errorfmt("Negative Size Illegal", 0);
         val = (-val);
     }
-    if (valtype == KIND_DOUBLE)
+    if (kind_is_floating(valtype))
         warningfmt("unknown","Unexpected floating point encountered, taking int value");
     needchar(']'); /* force single dimension */
     return (val); /* and return size */
@@ -304,7 +305,7 @@ static Type *parse_enum(Type *type)
                 Kind   valtype;
 
                 constexpr(&dval, &valtype, 1);
-                if ( valtype == KIND_DOUBLE )
+                if ( kind_is_floating(valtype))
                     warningfmt("unknown","Unexpected floating point encountered, taking int value");
                 value = dval;
             }
@@ -561,6 +562,9 @@ static Type *parse_type(void)
     } else if ( amatch("float") || amatch("double")) {
         type->kind = KIND_DOUBLE;
         type->size = c_fp_size;
+    } else if ( amatch("_Float16")) {
+        type->kind = KIND_FLOAT16;
+        type->size = 2;
     } else if ( amatch("void")) {
         type->kind = KIND_VOID;
         type->size = 1;
@@ -984,9 +988,6 @@ int declare_local(int local_static)
                         // It's a constant that doesn't match the right type
                         LVALUE  lval={0};
                         clearstage(before, 0);
-                        if ( expr == KIND_DOUBLE ) {
-                            decrement_double_ref_direct(val);
-                        }
                         lval.ltype = type;
                         lval.val_type = type->kind;
                         lval.const_val = val;
@@ -996,7 +997,7 @@ int declare_local(int local_static)
                         //conv type
                         force(type->kind, expr, type->isunsigned, expr_type->isunsigned, 0);
                     }
-                    StoreTOS(type->kind);
+                    gen_store_to_tos(type->kind);
                 }
             }
         }
@@ -1142,6 +1143,7 @@ Type *make_type(Kind kind, Type *tag)
         type->size = 1;
         break;
     case KIND_INT:
+    case KIND_FLOAT16:
         type->size = 2;
         break;
     case KIND_CPTR:
@@ -1210,7 +1212,7 @@ Type *dodeclare2(Type **base_type, decl_mode mode)
             errorfmt("Negative Size Illegal", 0);
             dval = (-dval);
         }
-        if ( valtype == KIND_DOUBLE )
+        if ( kind_is_floating(valtype) )
             warningfmt("invalid-value","Unexpected floating point encountered, taking int value");
         type->value = dval;
 
@@ -1474,6 +1476,9 @@ void type_describe(Type *type, UT_string *output)
     case KIND_FLOAT:
     case KIND_DOUBLE:    
         utstring_printf(output,"double ");
+        break;
+    case KIND_FLOAT16:
+        utstring_printf(output,"_Float16 ");
         break;
     case KIND_ARRAY:
         snprintf(tail, sizeof(tail),"[%d]",type->len);
@@ -1739,9 +1744,9 @@ static void declfunc(Type *functype, enum storage_type storage)
         
     
     if ( (functype->flags & CRITICAL) == CRITICAL ) {
-        zentercritical();
+        gen_critical_enter();
     }
-    pushframe();
+    gen_push_frame();
 
     if (array_len(functype->parameters) && (functype->flags & (FASTCALL|NAKED)) == FASTCALL ) {
         Type *fastarg = array_get_byindex(functype->parameters,array_len(functype->parameters) - 1);
@@ -1749,8 +1754,8 @@ static void declfunc(Type *functype, enum storage_type storage)
 
         if ( fastarg->size == 2 || fastarg->size == 1) 
             zpush();
-        else if ( fastarg->kind == KIND_DOUBLE )
-            dpush();     
+        else if ( kind_is_floating(fastarg->kind) )
+            gen_push_float(fastarg->kind);     
         else if ( fastarg->size == 4 || fastarg->size == 3)
             lpush();
         else
@@ -1787,7 +1792,7 @@ static void declfunc(Type *functype, enum storage_type storage)
         }
         /* do a statement, but if it's a return, skip */
         /* cleaning up the stack */
-        leave(NO, NO, 0);
+        gen_leave_function(NO, NO, 0);
     }
     goto_cleanup();
     function_appendix(currfn);

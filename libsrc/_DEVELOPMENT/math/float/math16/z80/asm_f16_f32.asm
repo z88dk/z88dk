@@ -37,15 +37,19 @@ PUBLIC asm_f32_f16
 
 ; convert f32 to f24
 .asm_f24_f32
+    ld a,l                      ; capture LSB
     sla e                       ; capture exponent in d, sign in carry
     rl d
-    rra                         ; capture sign in a
+    rra                         ; capture sign in a[7]
     scf                         ; set implicit bit
     rr e                        ; mantissa in ehl
     ld l,h                      ; create 16 bit mantissa by truncation
     ld h,e
     ld e,a                      ; save sign in e[7]
-    ret                         ; result in dehl
+    and a,078h                  ; check for 4 lost bits
+    ret Z                       ; result in dehl
+    set 0,l                     ; set for rounding of LSB
+    ret
 
 ; convert f16 to f32
 .asm_f32_f16
@@ -57,7 +61,7 @@ PUBLIC asm_f32_f16
     ld e,h                      ; mantissa padded to ehl
     ld h,l
     ld l,0
-    rl e                        ; remove implicit bit
+    sla e                       ; remove implicit bit
     rla                         ; sign in carry
     rr d                        ; sign and exponent in d
     rr e                        ; exponent and mantissa in e (hl)
@@ -81,8 +85,13 @@ PUBLIC asm_f32_f16
     rla                         ; set a ready for sign
     sla e                       ; move sign to carry
     rra                         ; place it in a, with exponent and mantissa
+    ld e,l                      ; capture lost bits
     ld l,h                      ; position f16 in hl
     ld h,a
+    ld a,e                      ; lost bits
+    and a,0F0h                  ; check for 4 lost bits rounding
+    ret Z
+    set 0,l                     ; set for rounding of LSB
     ret
 
 ; convert f32 to f16

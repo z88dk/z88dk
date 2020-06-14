@@ -103,9 +103,7 @@ void vinline()
         }
         if (lptr) {
             if (c_intermix_ccode && cmode) {
-                comment();
-                outstr(line);
-                nl();
+                gen_comment(line);
             }
             EmitLine(lineno);
             lptr = 0;

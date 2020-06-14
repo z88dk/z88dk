@@ -12,7 +12,10 @@ math/float/math16/c/sdcc/cm16_sdcc_fma_callee
 math/float/math16/c/sdcc/cm16_sdcc_floor
 math/float/math16/c/sdcc/cm16_sdcc_frexp
 math/float/math16/c/sdcc/cm16_sdcc_frexp_callee
+math/float/math16/c/sdcc/cm16_sdcc_hypot
+math/float/math16/c/sdcc/cm16_sdcc_hypot_callee
 math/float/math16/c/sdcc/cm16_sdcc_inv
+math/float/math16/c/sdcc/cm16_sdcc_invsqrt
 math/float/math16/c/sdcc/cm16_sdcc_ldexp
 math/float/math16/c/sdcc/cm16_sdcc_ldexp_callee
 math/float/math16/c/sdcc/cm16_sdcc_mul
@@ -22,6 +25,7 @@ math/float/math16/c/sdcc/cm16_sdcc_mul_callee
 math/float/math16/c/sdcc/cm16_sdcc_neg
 math/float/math16/c/sdcc/cm16_sdcc_read
 math/float/math16/c/sdcc/cm16_sdcc_read_callee
+math/float/math16/c/sdcc/cm16_sdcc_sqrt
 math/float/math16/c/sdcc/cm16_sdcc_sub
 math/float/math16/c/sdcc/cm16_sdcc_sub_callee
 

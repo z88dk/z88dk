@@ -44,10 +44,10 @@
  * ERROR MESSAGES:
  *
  *   message         condition      value returned
- * exp10 underflow    x < -MAXL10_F       0.0
- * exp10 overflow     x >  MAXL10_F     HUGE_POS_F
+ * exp10 underflow    x < -MAXL10_F32     0.0
+ * exp10 overflow     x >  MAXL10_F32   HUGE_POS_F
  *
- * IEEE single arithmetic: MAXL10_F = 38.230809449325611792.
+ * IEEE single arithmetic: MAXL10_F32 = 38.230809449325611792.
  *
  */
 
@@ -71,12 +71,12 @@ float m32_exp10f (float x) __z88dk_fastcall
     float z;
 
 #if 0
-    if( x > MAXL10_F )
+    if( x > MAXL10_F32 )
     {
-        return( HUGE_POS_F );
+        return( HUGE_POS_F32 );
     }
 
-    if( x < MINL10_F )
+    if( x < MINL10_F32 )
     {
         return(0.0);
     }

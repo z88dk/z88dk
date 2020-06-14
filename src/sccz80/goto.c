@@ -116,7 +116,7 @@ void dogoto()
     }
     if (stkmod)
         modstk(stkmod, KIND_NONE, NO, YES);
-    jump(label);
+    gen_jp_label(label);
 }
 
 SYMBOL* addgotosym(char* sname)
@@ -210,7 +210,7 @@ void goto_cleanup(void)
             debug(DBG_GOTO, "Cleaning %s #%d\n", gptr->sym->name, i);
             postlabel(gptr->label);
             modstk((gptr->sym->offset.i) - (gptr->sp), KIND_NONE, NO, YES);
-            jump(gptr->sym->size); /* label label(!) */
+            gen_jp_label(gptr->sym->size); /* label label(!) */
         }
         gptr++;
     }

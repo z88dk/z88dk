@@ -136,9 +136,6 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             constargval[argnumber] = val;
         }
         clearstage(before, start);  // Wipe out everything we did
-        if ( vconst && expr == KIND_DOUBLE ) {
-            decrement_double_ref_direct(val);
-        }
         fprintf(tmpfiles[argnumber],";\n");
         pop_buffer_fp();
 
@@ -246,7 +243,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         setstage(&before, &start);
         expr = expression(&vconst, &val, &type);
         if (expr == KIND_CARRY) {
-            zcarryconv();
+            gen_conv_carry2int();
             expr = KIND_INT;
             type = type_int;
         }
@@ -261,10 +258,10 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             prototype = array_get_byindex(functype->parameters, proto_argnumber);
 
             if ( prototype->kind != KIND_ELLIPSES && type->kind != prototype->kind ) {
-                if ( vconst && type->kind == KIND_DOUBLE && kind_is_integer(prototype->kind)) {
+                if ( vconst && (kind_is_floating(prototype->kind) || kind_is_integer(prototype->kind))) {                 
                      LVALUE lval = {0};
                      clearstage(before,start);
-		     start = NULL;
+                     start = NULL;
                      lval.val_type = prototype->kind;
                      lval.const_val = val;
                      load_constant(&lval);
@@ -296,7 +293,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
                 }
             }
             if ( function_pointer_call == 0 ||  fnptr_type->kind == KIND_CPTR ) {
-                nargs += push_function_argument(expr, type, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters));
+                nargs += gen_push_function_argument(expr, type, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters));
             } else {
                 last_argument_size = push_function_argument_fnptr(expr, type, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters), tmpfiles[argnumber+1] == NULL);
                 nargs += last_argument_size;
@@ -312,10 +309,11 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
 
 
     if (function_pointer_call == NO ) {
+        int va_arg_count = -1;
         /* Check to see if we have a variable number of arguments */
         if ( functype->funcattrs.hasva ) {
             if ( (functype->flags & SMALLC) == SMALLC ) {
-                loadargc(nargs);
+                va_arg_count = nargs;
             }
         }
         if ( strcmp(funcname,"__builtin_strcpy") == 0 && !IS_808x() ) {
@@ -332,12 +330,11 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             gen_builtin_memcpy(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
             nargs = 0;
         } else if ( functype->flags & SHORTCALL ) {
-            zshortcall(functype->funcattrs.shortcall_rst, functype->funcattrs.shortcall_value);
+            gen_shortcall(functype->funcattrs.shortcall_rst, functype->funcattrs.shortcall_value);
         } else if ( functype->flags & BANKED ) {
-            zbankedcall(ptr);
+            gen_bankedcall(ptr);
         } else {
-            zcallop();
-            outname(funcname, dopref(ptr)); nl();
+            gen_call(va_arg_count, funcname, ptr);
         }
     } else {
         nargs += callstk(functype, nargs, fnptr_type->kind == KIND_CPTR, last_argument_size);
@@ -361,7 +358,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             Zsp += nargs;
         } else
 #endif
-            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE || c_fp_size == 4, preserve, YES);  /* clean up arguments - we know what type is MOOK */
+            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE || c_fp_size < 6, preserve, YES);  /* clean up arguments - we know what type is MOOK */
     }
 }
 
