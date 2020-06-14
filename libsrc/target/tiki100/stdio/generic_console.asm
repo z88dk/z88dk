@@ -16,7 +16,7 @@
 		EXTERN		__MODE3_attr
 
 		EXTERN		gr_setpalette
-		EXTERN		gr_scroll
+		EXTERN		gr_vscroll
 		EXTERN		swapgfxbk
 		EXTERN		swapgfxbk1
 
