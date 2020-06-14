@@ -95,8 +95,8 @@ TIMER_START();
         for(x=0;x<w;++x)
         {
             Zr = Zi = Tr = Ti = 0.0;
-            Cr = (2.0*x/w - (DOUBLE)1.5);
-            Ci=(2.0*y/h - (DOUBLE)1.0);
+            Cr = (2.0*x/w - 1.5);
+            Ci=(2.0*y/h - 1.0);
 
             for (i=0;i<iter && (Tr+Ti <= limit*limit);++i)
             {

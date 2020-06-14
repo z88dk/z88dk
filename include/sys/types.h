@@ -16,6 +16,7 @@ typedef float float_t;
 #else
 typedef double float_t;
 #endif
+typedef float_t f32_t;
 #endif
 
 #ifndef _DOUBLE_T
@@ -27,13 +28,13 @@ typedef double double_t;
 #endif
 #endif
 
-#ifndef _HALF_FLOAT_T
-#define _HALF_FLOAT_T
-#ifdef __SDCC
-typedef short half_t;              /* IEEE-754 half float type */
-#else
-typedef _Float16 half_t;           /* IEEE-754 half float type */
+#ifndef _FLOAT16_T
+#define _FLOAT16_T
+#ifndef __SCCZ80
+typedef short _Float16;            /* IEEE-754 half float type */
 #endif
+typedef _Float16 half_t;
+typedef _Float16 f16_t;
 #endif
 
 #ifndef _SIZE_T
@@ -94,6 +95,9 @@ typedef unsigned long  u32_t;      /* 32 bit type */
 typedef char            i8_t;      /* 8 bit signed type */
 typedef short          i16_t;      /* 16 bit signed type */
 typedef long           i32_t;      /* 32 bit signed type */
+
+typedef _Float16       f16_t;      /* 16 bit floating point type */
+typedef float_t        f32_t;      /* 32 bit floating point type */
 
 /* use of following is deprecated, a stopgap because some libraries use it */
 
