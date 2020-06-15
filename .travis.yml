@@ -34,6 +34,7 @@ matrix:
 #        - MATRIX_EVAL="CC=clang && CXX=clang++"
 
 before_install:
+  - git checkout test
   - eval "${MATRIX_EVAL}"
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update                  ; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install cpanm dos2unix ccache ragel ; fi
