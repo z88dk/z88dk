@@ -60,7 +60,6 @@
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/frexp_callee.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/hypot.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/hypot_callee.asm
-../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/inv.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/invsqrt.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/ldexp.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/ldexp_callee.asm

@@ -8,7 +8,6 @@ math/float/math16/lm16/c/sccz80/frexp
 math/float/math16/lm16/c/sccz80/frexp_callee
 math/float/math16/lm16/c/sccz80/hypot
 math/float/math16/lm16/c/sccz80/hypot_callee
-math/float/math16/lm16/c/sccz80/inv
 math/float/math16/lm16/c/sccz80/invsqrt
 math/float/math16/lm16/c/sccz80/ldexp
 math/float/math16/lm16/c/sccz80/ldexp_callee

@@ -3,8 +3,8 @@
 
     PUBLIC  l_f16_mul
 
-    PUBLIC  f16_mul
-    PUBLIC  f16_mul_callee
+    PUBLIC  mulf16
+    PUBLIC  mulf16_callee
 
     EXTERN  asm_f16_mul_callee
 
@@ -13,6 +13,6 @@
 
     defc l_f16_mul = asm_f16_mul_callee
 
-    defc f16_mul = cm16_sccz80_mul
-    defc f16_mul_callee = cm16_sccz80_mul_callee
+    defc mulf16 = cm16_sccz80_mul
+    defc mulf16_callee = cm16_sccz80_mul_callee
 

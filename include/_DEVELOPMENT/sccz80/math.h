@@ -421,161 +421,161 @@ extern double_t __LIB__ poly_callee(const float x,const float d[],unsigned int n
 
 #ifdef __MATH_MATH16
 
-extern half_t __LIB__ f16_f16_f48(double_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ f16_f48(double_t x) __smallc __z88dk_fastcall;
 
 
-extern double_t __LIB__ f16_f48_f16(half_t x) __smallc __z88dk_fastcall;
+extern double_t __LIB__ f48_f16(half_t x) __smallc __z88dk_fastcall;
 
 
 
-extern half_t __LIB__ f16_f16_f32(float_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ f16_f32(float_t x) __smallc __z88dk_fastcall;
 
 
-extern float_t __LIB__ f16_f32_f16(half_t x) __smallc __z88dk_fastcall;
+extern float_t __LIB__ f32_f16(half_t x) __smallc __z88dk_fastcall;
 
 
 
-extern int16_t __LIB__ f16_i16_f16(half_t x) __smallc __z88dk_fastcall;
+extern int16_t __LIB__ i16_f16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern uint16_t __LIB__ f16_u16_f16(half_t x) __smallc __z88dk_fastcall;
+extern uint16_t __LIB__ u16_f16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern int32_t __LIB__ f16_i32_f16(half_t x) __smallc __z88dk_fastcall;
+extern int32_t __LIB__ i32_f16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern uint32_t __LIB__ f16_u32_f16(half_t x) __smallc __z88dk_fastcall;
+extern uint32_t __LIB__ u32_f16(half_t x) __smallc __z88dk_fastcall;
 
 
 
-extern half_t __LIB__ f16_f16_i8(int8_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ f16_i8(int8_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ f16_f16_i16(int16_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ f16_i16(int16_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ f16_f16_i32(int32_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ f16_i32(int32_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ f16_f16_u8(uint8_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ f16_u8(uint8_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ f16_f16_u16(uint16_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ f16_u16(uint16_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ f16_f16_u32(uint32_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ f16_u32(uint32_t x) __smallc __z88dk_fastcall;
 
 
 
-extern half_t __LIB__ f16_add(half_t x,half_t y) __smallc;
-extern half_t __LIB__ f16_add_callee(half_t x,half_t y) __smallc __z88dk_callee;
-#define f16_add(a,b) f16_add_callee(a,b)
+extern half_t __LIB__ addf16(half_t x,half_t y) __smallc;
+extern half_t __LIB__ addf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define addf16(a,b) addf16_callee(a,b)
 
 
-extern half_t __LIB__ f16_sub(half_t x,half_t y) __smallc;
-extern half_t __LIB__ f16_sub_callee(half_t x,half_t y) __smallc __z88dk_callee;
-#define f16_sub(a,b) f16_sub_callee(a,b)
+extern half_t __LIB__ subf16(half_t x,half_t y) __smallc;
+extern half_t __LIB__ subf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define subf16(a,b) subf16_callee(a,b)
 
 
-extern half_t __LIB__ f16_mul(half_t x,half_t y) __smallc;
-extern half_t __LIB__ f16_mul_callee(half_t x,half_t y) __smallc __z88dk_callee;
-#define f16_mul(a,b) f16_mul_callee(a,b)
+extern half_t __LIB__ mulf16(half_t x,half_t y) __smallc;
+extern half_t __LIB__ mulf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define mulf16(a,b) mulf16_callee(a,b)
 
 
-extern half_t __LIB__ f16_div(half_t x,half_t y) __smallc;
-extern half_t __LIB__ f16_div_callee(half_t x,half_t y) __smallc __z88dk_callee;
-#define f16_div(a,b) f16_div_callee(a,b)
+extern half_t __LIB__ divf16(half_t x,half_t y) __smallc;
+extern half_t __LIB__ divf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define divf16(a,b) divf16_callee(a,b)
 
 
 
-extern half_t __LIB__ f16_fma(half_t x,half_t y,half_t z) __smallc;
-extern half_t __LIB__ f16_fma_callee(half_t x,half_t y,half_t z) __smallc __z88dk_callee;
-#define f16_fma(a,b,c) f16_fma_callee(a,b,c)
+extern half_t __LIB__ fmaf16(half_t x,half_t y,half_t z) __smallc;
+extern half_t __LIB__ fmaf16_callee(half_t x,half_t y,half_t z) __smallc __z88dk_callee;
+#define fmaf16(a,b,c) fmaf16_callee(a,b,c)
 
 
-extern half_t __LIB__ f16_hypot(half_t x,half_t y) __smallc;
-extern half_t __LIB__ f16_hypot_callee(half_t x,half_t y) __smallc __z88dk_callee;
-#define f16_hypot(a,b) f16_hypot_callee(a,b)
+extern half_t __LIB__ hypotf16(half_t x,half_t y) __smallc;
+extern half_t __LIB__ hypotf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define hypotf16(a,b) hypotf16_callee(a,b)
 
 
 
-extern half_t __LIB__ f16_inv(half_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ invf16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ f16_invsqrt(half_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ invsqrtf16(half_t x) __smallc __z88dk_fastcall;
 
 
 
-extern half_t __LIB__ f16_sqrt(half_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ sqrtf16(half_t x) __smallc __z88dk_fastcall;
 
 
 
-extern half_t __LIB__ f16_div2(half_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ div2f16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ f16_mul2(half_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ mul2f16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ f16_mul10(half_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ mul10f16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ f16_frexp(half_t x,int8_t *exp) __smallc;
-extern half_t __LIB__ f16_frexp_callee(half_t x,int8_t *exp) __smallc __z88dk_callee;
-#define f16_frexp(a,b) f16_frexp_callee(a,b)
+extern half_t __LIB__ frexpf16(half_t x,int8_t *exp) __smallc;
+extern half_t __LIB__ frexpf16_callee(half_t x,int8_t *exp) __smallc __z88dk_callee;
+#define frexpf16(a,b) frexpf16_callee(a,b)
 
 
-extern half_t __LIB__ f16_ldexp(half_t x,int16_t exp) __smallc;
-extern half_t __LIB__ f16_ldexp_callee(half_t x,int16_t exp) __smallc __z88dk_callee;
-#define f16_ldexp(a,b) f16_ldexp_callee(a,b)
+extern half_t __LIB__ ldexpf16(half_t x,int16_t exp) __smallc;
+extern half_t __LIB__ ldexpf16_callee(half_t x,int16_t exp) __smallc __z88dk_callee;
+#define ldexpf16(a,b) ldexpf16_callee(a,b)
 
 
 
-extern half_t __LIB__ f16_fabs(half_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ fabsf16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ f16_neg(half_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ negf16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ f16_ceil(half_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ ceilf16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ f16_floor(half_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ floorf16(half_t x) __smallc __z88dk_fastcall;
 
 
 
-extern int __LIB__ f16_isgreater(half_t x,half_t y) __smallc;
-extern int __LIB__ f16_isgreater_callee(half_t x,half_t y) __smallc __z88dk_callee;
-#define f16_isgreater(a,b) f16_isgreater_callee(a,b)
+extern int __LIB__ isgreaterf16(half_t x,half_t y) __smallc;
+extern int __LIB__ isgreaterf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define isgreaterf16(a,b) isgreaterf16_callee(a,b)
 
 
-extern int __LIB__ f16_isgreaterequal(half_t x,half_t y) __smallc;
-extern int __LIB__ f16_isgreaterequal_callee(half_t x,half_t y) __smallc __z88dk_callee;
-#define f16_isgreaterequal(a,b) f16_isgreaterequal_callee(a,b)
+extern int __LIB__ isgreaterequalf16(half_t x,half_t y) __smallc;
+extern int __LIB__ isgreaterequalf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define isgreaterequalf16(a,b) isgreaterequalf16_callee(a,b)
 
 
-extern int __LIB__ f16_isless(half_t x,half_t y) __smallc;
-extern int __LIB__ f16_isless_callee(half_t x,half_t y) __smallc __z88dk_callee;
-#define f16_isless(a,b) f16_isless_callee(a,b)
+extern int __LIB__ islessf16(half_t x,half_t y) __smallc;
+extern int __LIB__ islessf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define islessf16(a,b) islessf16_callee(a,b)
 
 
-extern int __LIB__ f16_islessequal(half_t x,half_t y) __smallc;
-extern int __LIB__ f16_islessequal_callee(half_t x,half_t y) __smallc __z88dk_callee;
-#define f16_islessequal(a,b) f16_islessequal_callee(a,b)
+extern int __LIB__ islessequalf16(half_t x,half_t y) __smallc;
+extern int __LIB__ islessequalf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define islessequalf16(a,b) islessequalf16_callee(a,b)
 
 
-extern int __LIB__ f16_islessgreater(half_t x,half_t y) __smallc;
-extern int __LIB__ f16_islessgreater_callee(half_t x,half_t y) __smallc __z88dk_callee;
-#define f16_islessgreater(a,b) f16_islessgreater_callee(a,b)
+extern int __LIB__ islessgreaterf16(half_t x,half_t y) __smallc;
+extern int __LIB__ islessgreaterf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define islessgreaterf16(a,b) islessgreaterf16_callee(a,b)
 
 
-extern int __LIB__ f16_isnotequal(half_t x,half_t y) __smallc;
-extern int __LIB__ f16_isnotequal_callee(half_t x,half_t y) __smallc __z88dk_callee;
-#define f16_isnotequal(a,b) f16_isnotequal_callee(a,b)
+extern int __LIB__ isnotequalf16(half_t x,half_t y) __smallc;
+extern int __LIB__ isnotequalf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define isnotequalf16(a,b) isnotequalf16_callee(a,b)
 
 
-extern int __LIB__ f16_isunordered(half_t x,half_t y) __smallc;
-extern int __LIB__ f16_isunordered_callee(half_t x,half_t y) __smallc __z88dk_callee;
-#define f16_isunordered(a,b) f16_isunordered_callee(a,b)
+extern int __LIB__ isunorderedf16(half_t x,half_t y) __smallc;
+extern int __LIB__ isunorderedf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+#define isunorderedf16(a,b) isunorderedf16_callee(a,b)
 
 
 

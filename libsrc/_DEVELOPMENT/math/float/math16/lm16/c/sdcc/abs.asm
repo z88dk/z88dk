@@ -1,6 +1,6 @@
 
     SECTION code_fp_math16
-    PUBLIC  _f16_fabs
+    PUBLIC  _fabsf16
     EXTERN  cm16_sdcc_fabs
 
-    defc    _f16_fabs = cm16_sdcc_fabs
+    defc    _fabsf16 = cm16_sdcc_fabs

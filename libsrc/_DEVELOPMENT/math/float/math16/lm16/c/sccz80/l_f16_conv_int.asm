@@ -9,13 +9,13 @@
 	PUBLIC	l_f16_f2sint
 	PUBLIC	l_f16_f2uint
 
-    PUBLIC f16_i16_f16
-    PUBLIC f16_u16_f16
+    PUBLIC i16_f16
+    PUBLIC u16_f16
 
-    PUBLIC f16_f16_i8
-    PUBLIC f16_f16_u8
-    PUBLIC f16_f16_i16
-    PUBLIC f16_f16_u16
+    PUBLIC f16_i8
+    PUBLIC f16_u8
+    PUBLIC f16_i16
+    PUBLIC f16_u16
 
     EXTERN asm_f16_f24
     EXTERN asm_f24_f16
@@ -29,32 +29,32 @@
     EXTERN asm_u16_f24
 
 .l_f16_uchar2f
-.f16_f16_u8
+.f16_u8
     call asm_f24_u8
     jp asm_f16_f24
 
 .l_f16_schar2f
-.f16_f16_i8
+.f16_i8
     call asm_f24_i8
     jp asm_f16_f24
     
 .l_f16_uint2f
-.f16_f16_u16
+.f16_u16
     call asm_f24_u16
     jp asm_f16_f24
     
 .l_f16_sint2f
-.f16_f16_i16
+.f16_i16
     call asm_f24_i16
     jp asm_f16_f24
 
 .l_f16_f2sint
-.f16_i16_f16
+.i16_f16
     call asm_f24_f16
     jp asm_i16_f24
 
 .l_f16_f2uint
-.f16_u16_f16
+.u16_f16
     call asm_f24_f16
     jp asm_u16_f24
 
