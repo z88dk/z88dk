@@ -4363,7 +4363,11 @@ void gen_emit_line(int line)
         *ptr = 0;
     }
 
-    outfmt("\tC_LINE\t%d,\"%s\"\n", line, filen);
+    if ( currfn ) {
+        outfmt("\tC_LINE\t%d,\"%s::%s\"\n", line, filen,currfn->name);
+    } else {
+        outfmt("\tC_LINE\t%d,\"%s\"\n", line, filen);
+    }
 }
 
 
