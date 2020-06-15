@@ -104,7 +104,7 @@ static int approx_equal(FLOAT a, FLOAT b)
 #ifdef MATH32
    if ( fabs(b-a) < 0.0001) {
 #elif MATH16
-   if ( f16_fabs(b-a) < 0.1) {
+   if ( fabsf16(b-a) < 0.1) {
 #else
    if ( fabs(b-a) < 0.00000001 ) {
 #endif
@@ -145,7 +145,7 @@ static void run_sqrt(FLOAT x, FLOAT e)
 {
     static char   buf[100];
 #ifdef MATH16
-    FLOAT r = f16_sqrt(x);
+    FLOAT r = sqrtf16(x);
 #else
     FLOAT r = sqrt(x);
 #endif
