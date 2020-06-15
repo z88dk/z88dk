@@ -51,6 +51,8 @@ extern void     callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
 extern void gen_comment(const char *comment);
 extern void gen_file_header(void);
 extern void gen_file_footer(void);
+extern void gen_switch_section(const char *section_name);
+
 
 extern void gen_store_to_tos(Kind typeobj);
 extern void gen_conv_uint2char(void);
@@ -73,6 +75,7 @@ extern void gen_critical_enter(void);
 extern void gen_critical_leave(void);
 extern void gen_shortcall(int rst, int value);
 extern void gen_bankedcall(SYMBOL *sym);
+extern void gen_emit_line(int);
 
 extern void gen_load_indirect(LVALUE *lval);
 extern void gen_load_static(SYMBOL *sym);
@@ -129,6 +132,7 @@ extern void zgt(LVALUE *);
 extern void zgt_const(LVALUE *, int32_t value);
 extern void zge(LVALUE *);
 extern void zge_const(LVALUE *, int32_t value);
+extern void dummy(LVALUE *);
 
 
 extern void copy_to_stack(char *label, int stack_offset,  int size);

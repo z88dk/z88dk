@@ -59,7 +59,8 @@ int statement()
     blanks();
     if (lineno != lastline) {
         lastline = lineno;
-        EmitLine(lineno);
+        if (c_cline_directive || c_intermix_ccode) 
+            gen_emit_line(lineno);
     }
     if (ch() == 0 && eof) {
         return (lastst = STEXP);

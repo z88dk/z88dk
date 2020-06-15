@@ -22,9 +22,9 @@ int initials(const char *dropname, Type *type)
     if ( (type->isconst && !c_double_strings) ||
         ( (ispointer(type) || type->kind == KIND_ARRAY) && 
 		(type->ptr->isconst || ((ispointer(type->ptr) || type->ptr->kind == KIND_ARRAY) && type->ptr->ptr->isconst) ) ) ) {
-        output_section(get_section_name(type->namespace,c_rodata_section));
+        gen_switch_section(get_section_name(type->namespace,c_rodata_section));
     } else {
-        output_section(get_section_name(type->namespace,c_data_section));
+        gen_switch_section(get_section_name(type->namespace,c_data_section));
     }
     prefix();
     outname(dropname, YES);
@@ -47,7 +47,7 @@ int initials(const char *dropname, Type *type)
         desize = init(type, 1);
     }
 
-    output_section(c_code_section); 
+    gen_switch_section(c_code_section); 
     return (desize);
 }
 
@@ -406,12 +406,12 @@ static void output_double_string_load(double value)
     postlabel(dumplocation);
     defstorage(); outdec(6); nl();
     
-    output_section(c_init_section);
+    gen_switch_section(c_init_section);
     lval.const_val = value;
     lval.val_type = KIND_DOUBLE;
     lval.ltype = type_double;
     load_constant(&lval);
     immedlit(dumplocation,0); nl();
     callrts("dstore");
-    output_section(c_data_section);
+    gen_switch_section(c_data_section);
 }

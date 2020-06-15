@@ -20,11 +20,7 @@ static void initialise_sym(SYMBOL *ptr, char *sname, enum ident_type id, Kind ki
 SYMBOL *findstc(char* sname)
 {
     char sname2[3 * NAMESIZE]; /* Should be enuff! */
-    strcpy(sname2, "st_");
-    if (currfn)
-        strcat(sname2, currfn->name);
-    strcat(sname2, "_");
-    strcat(sname2, sname);
+    snprintf(sname2,sizeof(sname2),"st_%s_%s",currfn ? currfn->name : "", sname);
     return (findglb(sname2));
 }
 
