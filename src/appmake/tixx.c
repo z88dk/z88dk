@@ -203,7 +203,7 @@ int tixx_exec(char *target)
         die("Failed to open input file: %s\n", binname);
     n = fsize(fp);
     buf = (char *)malloc(n);
-    fread(buf, n, 1, fp);
+    if (1 != fread(buf, n, 1, fp)) { fclose(buf); exit(-1); }
     if (ferror(fp))
         die("Error reading input file: %s\n", binname);
     fclose(fp);

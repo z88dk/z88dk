@@ -87,7 +87,7 @@ int fp1100_exec(char *target)
     pos = ftell(fpin);
     fseek(fpin, 0L, SEEK_SET);
     buf = must_malloc(pos);
-    fread(buf, 1, pos, fpin);
+    if (pos != fread(buf, 1, pos, fpin)) { fclose(buf); exit(-1); }
     fclose(fpin);
 
 

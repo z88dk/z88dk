@@ -51,7 +51,7 @@ int pmd85_exec(char *target)
     pos = ftell(fpin);
     fseek(fpin, 0L, SEEK_SET);
     buf = must_malloc(pos);
-    fread(buf, 1, pos, fpin);
+    if (pos != fread(buf, 1, pos, fpin)) { fclose(buf); exit(-1); }
     fclose(fpin);
 
     // So in bootbuf/bootlen we've got the bootstrap and in buf/pos we have the binary file
