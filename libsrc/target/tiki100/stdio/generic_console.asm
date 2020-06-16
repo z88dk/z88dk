@@ -16,6 +16,7 @@
 		EXTERN		__MODE3_attr
 
 		EXTERN		gr_setpalette
+		EXTERN		gr_vscroll
 		EXTERN		swapgfxbk
 		EXTERN		swapgfxbk1
 
@@ -218,13 +219,12 @@ done:
 generic_console_scrollup:
 	push	bc
 	push	de
+	ld	a,-8
+ 	call	gr_vscroll
 	call	swapgfxbk
-	ld	hl,1024
-	ld	de,0
-	ld	bc, 32768 - 1024
-	ldir
-	ld	h,d
-	ld	l,e
+	ld	hl,$7C00
+	ld	d,h
+	ld	e,l
 	inc	de
 	ld	(hl),0
 	ld	bc,1024
