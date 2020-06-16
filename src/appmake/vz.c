@@ -127,8 +127,7 @@ static int create_file(const char* target, int laser500)
         blockname = binname;
 
     if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-        fprintf(stderr, "Can't open input file %s\n", binname);
-        myexit(NULL, 1);
+        exit_log(1, "Can't open input file %s\n", binname);
     }
 
     /*
@@ -136,9 +135,8 @@ static int create_file(const char* target, int laser500)
  *        to be converted
  */
     if (fseek(fpin, 0, SEEK_END)) {
-        fprintf(stderr, "Couldn't determine size of file\n");
         fclose(fpin);
-        myexit(NULL, 1);
+        exit_log(1,"Couldn't determine size of file\n");
     }
 
     /*len=ftell(fpin) - sizeof(struct vz);*/
@@ -154,7 +152,7 @@ static int create_file(const char* target, int laser500)
 
     if ((fpout = fopen(filename, "wb")) == NULL) {
         fclose(fpin);
-        myexit("Can't open output file\n", 1);
+        exit_log(1,"Can't open output file\n");
     }
 
     for (i = 0; i < 128; i++)
@@ -212,13 +210,12 @@ static int create_file(const char* target, int laser500)
     /* ***************************************** */
     if ((audio) || (fast) || (vz_22)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
-            fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open file %s for wave conversion\n", filename);
         }
 
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file\n", 1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
         len = ftell(fpin);
         fseek(fpin, 0L, SEEK_SET);
@@ -226,8 +223,7 @@ static int create_file(const char* target, int laser500)
         strcpy(wavfile, filename);
         suffix_change(wavfile, ".RAW");
         if ((fpout = fopen(wavfile, "wb")) == NULL) {
-            fprintf(stderr, "Can't open output raw audio file %s\n", wavfile);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open output raw audio file %s\n", wavfile);
         }
 
         /* preamble + leadin + type + name + string termination */

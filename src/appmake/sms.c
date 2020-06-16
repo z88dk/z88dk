@@ -150,7 +150,7 @@ int sms_exec(char *target)
     rewind(fpin);
 
     memset(memory, romfill, sizeof(memory));
-    if (len != fread(memory, sizeof(memory[0]), len, fpin)) { fclose(memory); exit(-1); }
+    if (len != fread(memory, sizeof(memory[0]), len, fpin)) { fclose(fpin); exit_log(1, "Could not required data from <%s>\n",binname); }
     
     fclose(fpin);
 

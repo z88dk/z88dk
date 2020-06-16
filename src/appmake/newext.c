@@ -53,8 +53,7 @@ int newext_exec(char* target)
     }
 
     if (strlen(suffixchar) != 1) {
-        fprintf(stderr, "Wrong value for suffix delimiter.\n");
-        myexit(NULL, 1);
+        exit_log(1,"Wrong value for suffix delimiter.\n");
     }
 
     if (outfile == NULL) {
@@ -68,14 +67,12 @@ int newext_exec(char* target)
         filename[i] = toupper(filename[i]);
 
     if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-        fprintf(stderr, "Can't open input file %s\n", binname);
-        myexit(NULL, 1);
+        exit_log(1, "Can't open input file %s\n", binname);
     }
 
     if (fseek(fpin, 0, SEEK_END)) {
-        fprintf(stderr, "Couldn't determine size of file\n");
         fclose(fpin);
-        myexit(NULL, 1);
+        exit_log(1, "Couldn't determine size of file\n");
     }
 
     unlink(filename);
@@ -85,7 +82,7 @@ int newext_exec(char* target)
     fseek(fpin, 0L, SEEK_SET);
     if ((fpout = fopen(filename, "wb")) == NULL) {
         fclose(fpin);
-        myexit("Can't open output file\n", 1);
+        exit_log(1,"Can't open output file\n");
     }
 
     for (i = 0; i < len; i++) {

@@ -59,25 +59,25 @@ int zxvgs_exec(char* target)
 
     zorg = get_org_addr(crtfile);
     if (zorg == -1)
-        myexit("Could not find parameter ZORG (compiled as BASIC?)\n", 1);
+        exit_log(1,"Could not find parameter ZORG (compiled as BASIC?)\n");
 
     memory = calloc(1, 49152L);
     if (memory == NULL)
-        myexit("Can't allocate memory\n", 1);
+        exit_log(1,"Can't allocate memory\n");
 
     binfile = fopen_bin(binname, crtfile);
     if (binfile == NULL)
-        myexit("Can't open binary file\n", 1);
+        exit_log(1,"Can't open binary file\n");
 
     if (fseek(binfile, 0, SEEK_END)) {
         fclose(binfile);
-        myexit("Couldn't determine the size of the file\n", 1);
+        exit_log(1,"Couldn't determine the size of the file\n");
     }
 
     filesize = ftell(binfile);
     if (filesize > 49152L) {
         fclose(binfile);
-        myexit("The source binary is over 49152 bytes in length.\n", 1);
+        exit_log(1,"The source binary is over 49152 bytes in length.\n");
     }
 
     fseek(binfile, 0, SEEK_SET);
@@ -85,7 +85,7 @@ int zxvgs_exec(char* target)
     readlen = fread(memory, 1, filesize, binfile);
     if (filesize != readlen) {
         fclose(binfile);
-        myexit("Couldn't read in binary file\n", 1);
+        exit_log(1,"Couldn't read in binary file\n");
     }
     fclose(binfile);
 

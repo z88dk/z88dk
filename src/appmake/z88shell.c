@@ -114,7 +114,6 @@ int z88shell_exec(char* target)
 
     save_block(filesize, outfile, ".com");
 
-    myexit(0, 0);
     return 0;
 }
 

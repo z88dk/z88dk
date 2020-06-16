@@ -298,7 +298,7 @@ int cpc_exec(char* target)
             pos = origin;
         } else {
             if ((pos = get_org_addr(crtfile)) == -1) {
-                myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
+                exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
             }
         }
 
@@ -307,8 +307,7 @@ int cpc_exec(char* target)
         }
 
         if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-            fprintf(stderr, "Can't open input file %s\n", binname);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open input file %s\n", binname);
         }
 
         /*
@@ -316,9 +315,9 @@ int cpc_exec(char* target)
            * converted
            */
         if (fseek(fpin, 0, SEEK_END)) {
-            fprintf(stderr, "Couldn't determine size of file\n");
             fclose(fpin);
-            myexit(NULL, 1);
+            exit_log(1, "Couldn't determine size of file\n");
+            fclose(fpin);
         }
         len = ftell(fpin);
 
@@ -326,7 +325,7 @@ int cpc_exec(char* target)
 
         if ((fpout = fopen(filename, "wb")) == NULL) {
             fclose(fpin);
-            myexit("Can't open output file\n", 1);
+            exit_log(1,"Can't open output file\n");
         }
         /* Setup an AMSDOS header */
         memset(header, 0, 128);
@@ -388,15 +387,14 @@ int cpc_exec(char* target)
     /* ***************************************** */
     if ((audio) || (loud)) {
         if ((source = fopen(filename, "rb")) == NULL) {
-            fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open file %s for wave conversion\n", filename);
         }
         /*
            * if (fseek(source,0,SEEK_END)) { fclose(source);
-           * myexit("Couldn't determine size of file\n",1); }
+           * exit_log(1,"Couldn't determine size of file\n"); }
            * len=ftell(source); fseek(source,0,SEEK_SET);
            */
-        if (1 != fread(srchead, 128, 1, source)) { fclose(srchead); exit(-1); }
+        if (1 != fread(srchead, 128, 1, source)) { fclose(source); exit_log(1, "Could not required data from <%s>\n",filename); }
         size = srchead[64] + srchead[65] * 256;
         if (dumb)
             printf("CPC file size (%s):%d bytes\n", filename, size);
@@ -413,8 +411,7 @@ int cpc_exec(char* target)
         suffix_change(wavfile, ".wav");
 
         if ((f = fopen(wavfile, "wb")) == NULL) {
-            fprintf(stderr, "Can't open output waw audio file %s\n", wavfile);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open output waw audio file %s\n", wavfile);
         }
         putWavHeader(f);
 
@@ -460,7 +457,7 @@ int cpc_exec(char* target)
                 */
             if (dumb)
                 printf("Size of block:%d\n", header[19] + header[20] * 256);
-            if (1 != fread(srcdata, header[19] + header[20] * 256, 1, source)) { fclose(srcdata); exit(-1); }
+            if (1 != fread(srcdata, header[19] + header[20] * 256, 1, source)) { fclose(source); exit_log(1, "Could not required data from <%s>\n",filename); }
 
             if (feof(source)) {
                 fprintf(stderr, "Fatal error: EOF met on input file.\nMaybe a non-CPC or ASCII file ?\n");

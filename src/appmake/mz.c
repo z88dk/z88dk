@@ -679,8 +679,7 @@ int mz_exec(char *target)
 	if ( dst != NULL )
 	{
 		if ( src == NULL ) {
-			fprintf(stderr,"Please specify the source model for patching\n");
-			myexit(NULL,1);
+			exit_log(1,"Please specify the source model for patching\n");
 		}
 		if ((strcmp(dst,"80b") == 0) || (strcmp(dst,"80b") == 0))
 			dst_codes = mz80b_codes;
@@ -695,16 +694,14 @@ int mz_exec(char *target)
 			dst_codes = sos_codes;
 
 		if (dst_codes == 0) {
-			fprintf(stderr,"Specified dst model for patching is not valid\n");
-			myexit(NULL,1);
+			exit_log(1,"Specified dst model for patching is not valid\n");
 		}
 	}
 
 	if ( src != NULL )
 	{
 		if ( dst == NULL ) {
-			fprintf(stderr,"Please specify the destination model for patching\n");
-			myexit(NULL,1);
+			exit_log(1,"Please specify the destination model for patching\n");
 		}
 		if ((strcmp(src,"80b") == 0) || (strcmp(src,"80b") == 0))
 			src_codes = mz80b_codes;
@@ -719,13 +716,11 @@ int mz_exec(char *target)
 			src_codes = sos_codes;
 
 		if (src_codes == 0) {
-			fprintf(stderr,"Specified src model for patching is not valid\n");
-			myexit(NULL,1);
+			exit_log(1,"Specified src model for patching is not valid\n");
 		}
 
 		if (src_codes == dst_codes) {
-			fprintf(stderr,"MZ src and dst models must be different for patching\n");
-			myexit(NULL,1);
+			exit_log(1,"MZ src and dst models must be different for patching\n");
 		}
 	}
 
@@ -753,15 +748,14 @@ int mz_exec(char *target)
 			blockname = binname;
 
 		if ( strcmp(binname,filename) == 0 ) {
-			fprintf(stderr,"Input and output file names must be different\n");
-			myexit(NULL,1);
+			exit_log(1,"Input and output file names must be different\n");
 		}
 
 		if ( origin != -1 ) {
 			pos = origin;
 		} else {
 			if ( (pos = get_org_addr(crtfile)) == -1 ) {
-				myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+				exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
 			}
 		}
 
@@ -777,7 +771,7 @@ int mz_exec(char *target)
 	 */
 		if (fseek(fpin,0,SEEK_END)) {
 			fclose(fpin);
-			myexit("Couldn't determine size of file\n",1);
+			exit_log(1,"Couldn't determine size of file\n");
 		}
 
 		len=ftell(fpin);
@@ -786,8 +780,7 @@ int mz_exec(char *target)
 
 		if ( (fpout=fopen(filename,"wb") ) == NULL ) {
 			fclose(fpin);
-			printf("Can't open output file %s\n",filename);
-			myexit(NULL,1);
+			exit_log(1,"Can't open output file %s\n",filename);
 		}
 
 
@@ -849,13 +842,12 @@ int mz_exec(char *target)
 		strcpy(wavfile,filename);
 
 		if ( (fpin=fopen(filename,"rb") ) == NULL ) {
-			fprintf(stderr,"Can't open file %s for wave conversion\n",filename);
-			myexit(NULL,1);
+			exit_log(1,"Can't open file %s for wave conversion\n",filename);
 		}
 
         if (fseek(fpin,0,SEEK_END)) {
            fclose(fpin);
-           myexit("Couldn't determine size of file\n",1);
+           exit_log(1,"Couldn't determine size of file\n");
         }
         len=ftell(fpin);
         fseek(fpin,0L,SEEK_SET);
@@ -864,8 +856,7 @@ int mz_exec(char *target)
 		i = 0;
 
 		if (!image) {
-			fprintf(stderr,"Can't allocate temp memory to load '%s' for audio conversion\n",filename);
-			myexit(NULL,1);
+			exit_log(1,"Can't allocate temp memory to load '%s' for audio conversion\n",filename);
 		}
 
 		/* Load program in a temp memory space */
@@ -892,8 +883,7 @@ int mz_exec(char *target)
 
 		/* Check the file comparing the declared size to its real one */
 		if ((image[0x12] + (image[0x13] * 256) + 0x80)!=len) {
-			fprintf(stderr,"MZF file corrupt: %s\n",filename);
-			myexit(NULL,1);
+			exit_log(1,"MZF file corrupt: %s\n",filename);
 		}
 
 		if (src_codes != 0) {
@@ -902,8 +892,7 @@ int mz_exec(char *target)
 
 				suffix_change(filename,"_patched.mzf");
 				if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-					fprintf(stderr,"Can't open output patched file %s\n",filename);
-					myexit(NULL,1);
+					exit_log(1,"Can't open output patched file %s\n",filename);
 				}
 				for (i=0; i<len; i++)	fputc (image[i],fpout);
 				fclose(fpout);
@@ -916,8 +905,7 @@ int mz_exec(char *target)
 
 			suffix_change(wavfile,".RAW");
 			if ( (rawout=fopen(wavfile,"wb") ) == NULL ) {
-				fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
-				myexit(NULL,1);
+				exit_log(1,"Can't open output raw audio file %s\n",wavfile);
 			}
 
 			if (turbo) {

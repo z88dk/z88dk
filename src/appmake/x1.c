@@ -77,37 +77,34 @@ int x1_exec(char* target)
 
 
     if (strcmp(binname, filename) == 0) {
-        fprintf(stderr, "Input and output file names must be different\n");
-        myexit(NULL, 1);
+        exit_log(1, "Input and output file names must be different\n");
     }
 
     if (blockname == NULL)
         blockname = binname;
 
     if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-        fprintf(stderr, "Can't open input file %s\n", binname);
-        myexit(NULL, 1);
+        exit_log(1, "Can't open input file %s\n", binname);
     }
 
     suffix_change(blockname, "");
 
     if (fseek(fpin, 0, SEEK_END)) {
-        fprintf(stderr, "Couldn't determine size of file\n");
         fclose(fpin);
-        myexit(NULL, 1);
+        exit_log(1,"Couldn't determine size of file\n");
     }
 
     len = ftell(fpin);
 
     fseek(fpin, 0L, SEEK_SET);
     buf = must_malloc(len);
-    if (len != fread(buf, 1, len, fpin)) { fclose(buf); exit(-1); }
+    if (len != fread(buf, 1, len, fpin)) { fclose(fpin); exit_log(1, "Could not required data from <%s>\n",binname); }
     fclose(fpin);
 
 
     if (origin == -1) {
         if ((origin = get_org_addr(crtfile)) == -1) {
-            myexit("Could not find parameter CRT_ORG_CODE (not z88dk compiled?)\n", 1);
+            exit_log(1,"Could not find parameter CRT_ORG_CODE (not z88dk compiled?)\n");
         }
     }
 

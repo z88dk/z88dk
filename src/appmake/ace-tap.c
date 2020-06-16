@@ -83,13 +83,12 @@ int acetap_exec(char* target)
             pos = origin;
         } else {
             if ((pos = get_org_addr(crtfile)) == -1) {
-                myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
+                exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
             }
         }
 
         if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-            fprintf(stderr, "Can't open input file %s\n", binname);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open input file %s\n", binname);
         }
 
         /*
@@ -97,9 +96,8 @@ int acetap_exec(char* target)
 	 *        to be converted
 	 */
         if (fseek(fpin, 0, SEEK_END)) {
-            fprintf(stderr, "Couldn't determine size of file\n");
             fclose(fpin);
-            myexit(NULL, 1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
 
         len = ftell(fpin);
@@ -108,7 +106,7 @@ int acetap_exec(char* target)
 
         if ((fpout = fopen(filename, "wb")) == NULL) {
             fclose(fpin);
-            myexit("Can't open output file\n", 1);
+            exit_log(1,"Can't open output file <%s>\n", filename);
         }
 
         /* ===============
@@ -185,13 +183,12 @@ int acetap_exec(char* target)
     /* ***************************************** */
     if ((audio) || (fast) || (khz_22)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
-            fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open file %s for wave conversion\n", filename);
         }
 
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file\n", 1);
+            exit_log(1,"Couldn't determine size of file <%s>\n",filename);
         }
         len = ftell(fpin);
         fseek(fpin, 0L, SEEK_SET);
@@ -199,8 +196,7 @@ int acetap_exec(char* target)
         strcpy(wavfile, filename);
         suffix_change(wavfile, ".RAW");
         if ((fpout = fopen(wavfile, "wb")) == NULL) {
-            fprintf(stderr, "Can't open output raw audio file %s\n", wavfile);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open output raw audio file <%s>\n", wavfile);
         }
 
         /* leading silence */

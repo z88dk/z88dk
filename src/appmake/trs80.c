@@ -146,7 +146,7 @@ int trs80_exec(char* target)
         pos = origin;
     } else {
         if ((pos = get_org_addr(crtfile)) == -1) {
-            myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
+            exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
         }
     }
 
@@ -157,7 +157,7 @@ int trs80_exec(char* target)
         co = cmd = 0;
  	
     if ((blocksz < 10) || (blocksz > 256)) {
-        myexit("Invalid block size: %d\n", blocksz);
+        exit_log(1,"Invalid block size: %d\n", blocksz);
     }
     if (cmd)
         blocksz -= 2;
@@ -180,8 +180,7 @@ int trs80_exec(char* target)
         }
 
         if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-            fprintf(stderr, "Can't open input file %s\n", binname);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open input file %s\n", binname);
         }
 
         /*
@@ -190,7 +189,7 @@ int trs80_exec(char* target)
 	 */
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file\n", 1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
 
         len = ftell(fpin);
@@ -202,8 +201,7 @@ int trs80_exec(char* target)
 	 */
 
         if ((fpout = fopen(filename, "wb")) == NULL) {
-            fprintf(stderr, "Can't open output CMD file %s\n", filename);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open output CMD file %s\n", filename);
         }
 
         if (!cmd) {
@@ -298,13 +296,12 @@ int trs80_exec(char* target)
     /* ***************************************** */
     if ((audio) || (fast) || (khz_22) || (loud)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
-            fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open file %s for wave conversion\n", filename);
         }
 
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file\n", 1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
         len = ftell(fpin);
         fseek(fpin, 0, SEEK_SET);
@@ -314,8 +311,7 @@ int trs80_exec(char* target)
         suffix_change(wavfile, ".RAW");
 
         if ((fpout = fopen(wavfile, "wb")) == NULL) {
-            fprintf(stderr, "Can't open output raw audio file %s\n", wavfile);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open output raw audio file %s\n", wavfile);
         }
 
         /* leading silence */
@@ -329,13 +325,11 @@ int trs80_exec(char* target)
         } while ((c == 0) && (len > 0));
 
         if (len < 10) {
-            fprintf(stderr, "Invalid .CAS file %s\n", filename);
-            myexit(NULL, 1);
+            exit_log(1,"Invalid .CAS file %s\n", filename);
         }
 
         if (c != 0xA5) {
-            fprintf(stderr, "Header marker not found: 0xA5\n");
-            myexit(NULL, 1);
+            exit_log(1, "Header marker not found: 0xA5\n");
         }
 
         len--;

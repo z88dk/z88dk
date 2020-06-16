@@ -75,19 +75,16 @@ int px_exec(char* target)
     suffix_change(filename, ".ROM");
 
     if (strcmp(binname, filename) == 0) {
-        fprintf(stderr, "Input and output file names must be different\n");
-        myexit(NULL, 1);
+        exit_log(1, "Input and output file names must be different\n");
     }
 
     if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-        fprintf(stderr, "Can't open input file %s\n", binname);
-        myexit(NULL, 1);
+        exit_log(1, "Can't open input file %s\n", binname);
     }
 
     if (fseek(fpin, 0, SEEK_END)) {
-        fprintf(stderr, "Couldn't determine size of file\n");
         fclose(fpin);
-        myexit(NULL, 1);
+        exit_log(1, "Couldn't determine size of file\n");
     }
 
     len = ftell(fpin);
@@ -95,14 +92,13 @@ int px_exec(char* target)
     fseek(fpin, 0L, SEEK_SET);
 
     if (len > (32768 - 180)) {
-        fprintf(stderr, "Program is too big\n");
         fclose(fpin);
-        myexit(NULL, 1);
+        exit_log(1, "Program is too big\n");
     }
 
     if ((fpout = fopen(filename, "wb")) == NULL) {
         fclose(fpin);
-        myexit("Can't open output file\n", 1);
+        exit_log(1,"Can't open output file\n");
     }
 
     /* init blank areas */

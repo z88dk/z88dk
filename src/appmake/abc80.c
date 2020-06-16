@@ -190,7 +190,7 @@ int abc80_exec(char* target)
         pos = origin;
     } else {
         if ((pos = get_org_addr(crtfile)) == -1) {
-            myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
+            exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
         }
     }
 
@@ -208,8 +208,7 @@ int abc80_exec(char* target)
         }
 
         if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-            fprintf(stderr, "Can't open input file %s\n", binname);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open input file %s\n", binname);
         }
 
         /*
@@ -218,7 +217,7 @@ int abc80_exec(char* target)
 	 */
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file\n", 1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
 
         len = ftell(fpin);
@@ -226,8 +225,7 @@ int abc80_exec(char* target)
         fseek(fpin, 0L, SEEK_SET);
 
         if ((fpout = fopen(tmpname, "wb")) == NULL) {
-            printf("Can't open temp output file %s\n", tmpname);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open temp output file %s\n", tmpname);
         }
 
         /* Write out the file */
@@ -265,7 +263,7 @@ int abc80_exec(char* target)
 	 */
 
         if ((fpin = fopen(tmpname, "rb")) == NULL) {
-            myexit("Can't open temp file\n", 1);
+            exit_log(1,"Can't open temp file\n");
         }
 
         /*
@@ -274,7 +272,7 @@ int abc80_exec(char* target)
 
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file\n", 1);
+            exit_log(1,"Couldn't determine size of file <%s>\n", tmpname);
         }
 
         len = ftell(fpin);
@@ -283,8 +281,7 @@ int abc80_exec(char* target)
         fseek(fpin, 0L, SEEK_SET);
 
         if ((fpout = fopen(filename, "wb")) == NULL) {
-            fprintf(stderr, "Can't open output file %s\n", tmpname);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open output file %s\n", tmpname);
         }
 
         /*
@@ -320,13 +317,12 @@ int abc80_exec(char* target)
     /* ***************************************** */
     if ((audio) || (loud)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
-            fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open file %s for wave conversion\n", filename);
         }
 
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file for wave conversion\n", 1);
+            exit_log(1,"Couldn't determine size of file for wave conversion\n");
         }
         len = ftell(fpin);
         fseek(fpin, 0, SEEK_SET);
@@ -336,8 +332,7 @@ int abc80_exec(char* target)
         suffix_change(wavfile, ".wav");
 
         if ((fpout = fopen(wavfile, "wb")) == NULL) {
-            fprintf(stderr, "Can't open output waw audio file %s\n", wavfile);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open output waw audio file %s\n", wavfile);
         }
 
         blocks = len / 253;

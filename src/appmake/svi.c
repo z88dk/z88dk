@@ -141,7 +141,7 @@ int svi_exec(char* target)
         pos = origin;
     } else {
         if ((pos = get_org_addr(crtfile)) == -1) {
-            myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
+            exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
         }
     }
 
@@ -165,13 +165,11 @@ int svi_exec(char* target)
         }
 
         if (strcmp(binname, filename) == 0) {
-            fprintf(stderr, "Input and output file names must be different\n");
-            myexit(NULL, 1);
+            exit_log(1, "Input and output file names must be different\n");
         }
 
         if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-            printf("Can't open input file\n");
-            exit(1);
+            exit_log(1,"Can't open input file\n");
         }
 
         /*
@@ -179,9 +177,8 @@ int svi_exec(char* target)
 	 *	to be converted
 	 */
         if (fseek(fpin, 0, SEEK_END)) {
-            printf("Couldn't determine size of file\n");
             fclose(fpin);
-            exit(1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
 
         len = ftell(fpin);
@@ -235,13 +232,12 @@ int svi_exec(char* target)
     /* ***************************************** */
     if ((audio) || (fast) || (khz_22) || (loud)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
-            fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open file %s for wave conversion\n", filename);
         }
 
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file\n", 1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
         len = ftell(fpin);
         fseek(fpin, 0, SEEK_SET);
@@ -251,8 +247,7 @@ int svi_exec(char* target)
         suffix_change(wavfile, ".RAW");
 
         if ((fpout = fopen(wavfile, "wb")) == NULL) {
-            fprintf(stderr, "Can't open output raw audio file %s\n", wavfile);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open output raw audio file %s\n", wavfile);
         }
 
         /* leading silence and tone*/
@@ -354,7 +349,7 @@ static int create_disk()
         exit_log(1, "Bootstrap has length %d > 128", binlen);
     }
     memset(sectorbuf, 0, sizeof(sectorbuf));
-    if (128 != fread(sectorbuf, 1, 128, fpin)) { fclose(sectorbuf); exit(-1); }
+    if (128 != fread(sectorbuf, 1, 128, fpin)) { fclose(fpin); exit_log(1, "Could not required data from <%s>\n",bootname); }
     fclose(fpin);
 
     if ( (fpout = fopen(disc_name, "wb")) == NULL ) {
@@ -374,7 +369,7 @@ static int create_disk()
             int size = track == 0 ? 128 : 256;
             memset(sectorbuf, 0, sizeof(sectorbuf));
             if ( !feof(fpin) ) {
-                if (size != fread(sectorbuf, 1, size, fpin)) { fclose(sectorbuf); exit(-1); }
+                if (size != fread(sectorbuf, 1, size, fpin)) { fclose(fpin); exit_log(1, "Could not required data from <%s>\n",binname); }
             }
             fwrite(sectorbuf, 1, size, fpout);	
         }

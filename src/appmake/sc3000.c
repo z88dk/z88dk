@@ -137,13 +137,12 @@ int sc3000_exec(char* target)
     } else {
         if (!sf7000)
             if ((pos = get_org_addr(crtfile)) == -1) {
-                myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
+                exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
             }
     }
 
     if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-        fprintf(stderr, "Can't open input file %s\n", binname);
-        myexit(NULL, 1);
+        exit_log(1,"Can't open input file %s\n", binname);
     }
 
     /*
@@ -152,15 +151,14 @@ int sc3000_exec(char* target)
  */
     if (fseek(fpin, 0, SEEK_END)) {
         fclose(fpin);
-        myexit("Couldn't determine size of file\n", 1);
+        exit_log(1,"Couldn't determine size of file\n");
     }
 
     len = ftell(fpin);
     fseek(fpin, 0, SEEK_SET);
 
     if ((fpout = fopen(filename, "wb")) == NULL) {
-        fprintf(stderr, "Can't open output file %s\n", filename);
-        myexit(NULL, 1);
+        exit_log(1, "Can't open output file %s\n", filename);
     }
 
     /* Write out the .tap file */
@@ -289,13 +287,12 @@ int sc3000_exec(char* target)
     /* ***************************************** */
     if ((audio) || (fast) || (khz_22)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
-            fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open file %s for wave conversion\n", filename);
         }
 
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file\n", 1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
         len = ftell(fpin);
         fseek(fpin, 0, SEEK_SET);
@@ -308,8 +305,7 @@ int sc3000_exec(char* target)
             suffix_change(wavfile, ".RAW");
 
         if ((fpout = fopen(wavfile, "wb")) == NULL) {
-            fprintf(stderr, "Can't open output raw audio file %s\n", wavfile);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open output raw audio file %s\n", wavfile);
         }
 
         /* leading silence */
