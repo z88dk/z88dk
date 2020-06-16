@@ -540,7 +540,7 @@ void poststep(
             store(lval);
             if (unstep)
                 (*unstep)(lval);
-            if (lval->ptr_type == KIND_INT||lval->ptr_type ==KIND_PTR)
+            if (lval->ptr_type == KIND_INT||lval->ptr_type ==KIND_PTR||lval->ptr_type==KIND_FLOAT16)
                 if (unstep)
                     (*unstep)(lval);
             break;
