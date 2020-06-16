@@ -40,12 +40,9 @@ extern void jumpnc(int);
 
 extern void jumpr(int);
 extern void opjumpr(char *, int);
-extern void dummy(LVALUE *);
-extern void EmitLine(int);
 
 
 
-extern void output_section(const char *section_name);
 extern void function_appendix(SYMBOL *func);
 
 

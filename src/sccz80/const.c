@@ -949,7 +949,7 @@ void write_double_queue(void)
 
     LL_FOREACH(double_queue, elem ) {
         if ( elem->written ) {
-            output_section(c_rodata_section); // output_section("text");
+            gen_switch_section(c_rodata_section); // gen_switch_section("text");
             prefix();
             queuelabel(elem->litlab);
             col();

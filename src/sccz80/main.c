@@ -551,7 +551,7 @@ void dumpvars()
     /* Start at the start! */
     outstr("; --- Start of Static Variables ---\n\n");
 
-    output_section(c_bss_section); // output_section("bss");
+    gen_switch_section(c_bss_section); // gen_switch_section("bss");
 
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
         if (ptr->name[0] != '0' ) {
@@ -570,7 +570,7 @@ void dumpvars()
                 continue;
             if ( ptr->ctype->size == -1 )
                 continue;
-            if ( ptr->bss_section ) output_section(ptr->bss_section);
+            if ( ptr->bss_section ) gen_switch_section(ptr->bss_section);
             prefix();
             outname(ptr->name, 1);
             col();
@@ -581,7 +581,7 @@ void dumpvars()
     }
 
     /* Switch back to standard section */
-    output_section(c_code_section); // output_section("code");
+    gen_switch_section(c_code_section); // gen_switch_section("code");
 }
 
 /*
@@ -598,7 +598,7 @@ void dumplits(
 
     if (queueptr) {
         if (pr_label) {
-            output_section(c_rodata_section); // output_section("text");
+            gen_switch_section(c_rodata_section); // gen_switch_section("text");
             prefix();
             queuelabel(queuelab);
             col();
@@ -658,7 +658,7 @@ void dumplits(
                 }
             }
         }
-        //output_section(c_code_section); // output_section("code");
+        //gen_switch_section(c_code_section); // gen_switch_section("code");
     }
 }
 

@@ -2938,6 +2938,8 @@ ShowErrors(char *filen, char *orig)
             if (strstr(buffer, " line ") != NULL ) {    /* ..only if a line number is given */
                 linepos = atoi(strstr(buffer, " line ") + strlen(" line "));
                 strcpy(filenamebuf, strstr(buffer, "'") + strlen("'"));
+                ptr_char = strstr(filenamebuf,"::");
+                if (ptr_char) *ptr_char = 0;
                 ptr_char = strstr(filenamebuf, "'");        // Find second '
                 if (ptr_char) *ptr_char = 0;                // End filenamebuf at second ' or at end of string
 

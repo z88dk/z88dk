@@ -1,15 +1,4 @@
 /*
- *      The Goto File
- *
- *      Yes, they are truly hideous things, and no, you shouldn't
- *      have to use them if you write your own code, but those
- *      pesky kids who write grown up C love em..so here I will
- *      (finally!) give them to you!
- *
- *      Started djm 22/4/99
- *
- *      $Id: goto.c,v 1.3 2016-03-29 13:39:44 dom Exp $
- *
  *      The scheme is:
  *
  *      1. If label defined and we hit goto, adjust stack and jump
@@ -25,8 +14,6 @@
  *      6. All gotos are kept in global variable space
  *      7. We endeavour to wipe all trace of goto labels from
  *         global symbol table on exit
- *
- *      All relevent structures and #define are in define.h
  */
 
 #include "ccdefs.h"
@@ -122,20 +109,14 @@ void dogoto()
 SYMBOL* addgotosym(char* sname)
 {
     char sname2[NAMESIZE * 3];
-    strcpy(sname2, "00goto_");
-    strcat(sname2, currfn->name);
-    strcat(sname2, "_");
-    strcat(sname2, sname);
+    snprintf(sname2,sizeof(sname2),"00goto_%s_%s",currfn->name,sname);
     return (addglb(sname2, type_void, ID_GOTOLABEL, 0, 0, 0));
 }
 
 SYMBOL* findgoto(char* sname)
 {
     char sname2[NAMESIZE * 3];
-    strcpy(sname2, "00goto_");
-    strcat(sname2, currfn->name);
-    strcat(sname2, "_");
-    strcat(sname2, sname);
+    snprintf(sname2,sizeof(sname2),"00goto_%s_%s",currfn->name,sname);
     return (findglb(sname2));
 }
 

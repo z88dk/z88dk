@@ -1014,6 +1014,9 @@ Type *dodeclare(enum storage_type storage)
     decl_mode mode = MODE_NONE;
     int32_t    ataddress = -1;
 
+
+    gen_emit_line(lineno);
+
     if ( storage == TYPDEF ) mode = MODE_TYPEDEF;
     else if ( storage == EXTERNAL ) mode = MODE_EXTERN;
 
@@ -1120,7 +1123,7 @@ Type *dodeclare(enum storage_type storage)
 
         if ( sym->storage == EXTERNP ) {
             // Copy from local to the supplied address
-            output_section(c_init_section);
+            gen_switch_section(c_init_section);
             copy_to_extern(drop_name, type->name, alloc_size);
         }
 
@@ -1645,7 +1648,7 @@ static void declfunc(Type *functype, enum storage_type storage)
     // Reset all local variables
     locptr = STARTLOC;
     // Setup local variables
-    output_section(c_code_section);
+    gen_switch_section(c_code_section);
     
 
 
@@ -1728,6 +1731,8 @@ static void declfunc(Type *functype, enum storage_type storage)
             where += get_parameter_size(functype, ptype);
         }
     }
+
+    gen_emit_line(lineno);
 
     prefix();
     outname(currfn->name, dopref(currfn));

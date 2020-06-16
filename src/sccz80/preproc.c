@@ -105,7 +105,9 @@ void vinline()
             if (c_intermix_ccode && cmode) {
                 gen_comment(line);
             }
-            EmitLine(lineno);
+            if (c_cline_directive || c_intermix_ccode) {
+                gen_emit_line(lineno);
+            }
             lptr = 0;
             return;
         }
@@ -177,14 +179,23 @@ void ifline()
                 continue;
             }
             if (match("# ") || match("#line")) {
-                int num = 0;
+                int num = 0, emitline = 0;
                 char string[FILENAME_LEN + 1];
                 string[0] = 0;
                 sscanf(line + lptr, "%d %s", &num, string);
                 if (num)
                     lineno = --num;
-                if (strlen(string))
+
+                if (strlen(string)) {
+                    if ( strcmp(Filename, string)) {
+                        emitline = 1;
+                    }
                     strcpy(Filename, string);
+                }
+                if ( emitline ) {
+                    // Emit a C_LINE directive when the file changes
+                    gen_emit_line(lineno);
+                }
                 if (lineno == 0)
                     DoLibHeader();
                 continue;

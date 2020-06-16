@@ -4353,7 +4353,7 @@ void GlobalPrefix(void)
  *  error reporting
  */
 
-void EmitLine(int line)
+void gen_emit_line(int line)
 {
     char filen[FILENAME_LEN];
     char  *ptr;
@@ -4363,7 +4363,9 @@ void EmitLine(int line)
         *ptr = 0;
     }
 
-    if (c_cline_directive || c_intermix_ccode) {
+    if ( currfn ) {
+        outfmt("\tC_LINE\t%d,\"%s::%s\"\n", line, filen,currfn->name);
+    } else {
         outfmt("\tC_LINE\t%d,\"%s\"\n", line, filen);
     }
 }
@@ -4393,7 +4395,7 @@ void function_appendix(SYMBOL* func)
 {
 }
 
-void output_section(const char* section_name)
+void gen_switch_section(const char* section_name)
 {
     /* If the same section don't do anything */
     if (strcmp(section_name, current_section) == 0) {
