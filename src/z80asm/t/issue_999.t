@@ -38,8 +38,8 @@ Object  file testcons.o at $0000: Z80RMF14
     C $0000: 21 64 00 C9 21 C8 00 C9
   Section bss_compiler: 0 bytes
   Symbols:
-    G A $0000 _fa (section code_compiler) (file testa.c:20)
-    G A $0004 _fb (section code_compiler) (file testb.c:20)
+    G A $0000 _fa (section code_compiler) (file testa.c::fa:2)
+    G A $0004 _fb (section code_compiler) (file testb.c::fb:2)
 END
 
 unlink_testfiles(qw(testa.c testb.c testcons.o));
