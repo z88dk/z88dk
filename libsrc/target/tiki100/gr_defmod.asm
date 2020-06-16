@@ -35,11 +35,12 @@ _gr_defmod:
 	add	a,a
 	ld	b,a
 
+	ld	hl,PORT_0C_COPY
 	DI
-	ld	a,(PORT_0C_COPY)
+	ld	a,(hl)
 	and	$4F
 	or	b
-	LD	(PORT_0C_COPY),A	; Video port: copy of the value sent to the video port address 0CH
+	LD	(hl),A	; Video port: copy of the value sent to the video port address 0CH
 	OUT	($0C),A		; set graphics mode
 	EI
 	RET

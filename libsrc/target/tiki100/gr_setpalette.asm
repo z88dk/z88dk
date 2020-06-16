@@ -72,14 +72,14 @@ set_loop:
 .do_set
 	cpl
 	LD E,A
-	ld	hl,$f04d
+	ld	hl,PORT_0C_COPY
 .palette_loop
 
 	PUSH	DE
 	LD	A,E
 	DI
 	OUT	($14),A	     ; Palette register (prepare the color to be loaded)
-	ld	a,(PORT_0C_COPY)
+	ld	a,(hl)
 	and	$30
 	add	b
 	ld	d,a
@@ -92,7 +92,7 @@ set_loop:
 	JP	NZ,wait_loop	; wait for HBLANK to get the color copied in the requested palette position
 	LD	A,D
 	OUT	($0C),A	     ; End write
-	ld	(PORT_0C_COPY),a
+	ld	(hl),a
 	EI
 	POP	DE
 

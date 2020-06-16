@@ -10,7 +10,7 @@
 
 gr_getmode:
 _gr_getmode:
-	call	generic_console_get_mode
+	call    generic_console_get_mode
 	ld	l,a
 	ld	h,0
 	ret
