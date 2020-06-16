@@ -14,9 +14,9 @@
 
     SECTION code_driver
 
-    PUBLIC _apu_init
+    PUBLIC  apu_init
     
-    EXTERN asm_am9511a_isr
+    EXTERN  asm_am9511a_isr
 
-    defc _apu_init   =  asm_am9511a_isr
+    defc apu_init   =  asm_am9511a_isr
 

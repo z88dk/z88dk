@@ -7,7 +7,7 @@
 
 SECTION code_driver
     
-PUBLIC _apu_opp_callee
+PUBLIC  apu_opp_callee
 
 EXTERN asm_am9511a_opp
 
@@ -30,7 +30,7 @@ EXTERN asm_am9511a_opp
 ;           ret high
 ;           ret low
 
-_apu_opp_callee:
+apu_opp_callee:
     pop hl                  ; collect ret address
     pop de                  ; addr in DE
     pop bc                  ; bank in BC

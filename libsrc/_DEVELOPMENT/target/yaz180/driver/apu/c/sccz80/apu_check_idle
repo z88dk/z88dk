@@ -14,9 +14,9 @@
 
     SECTION code_driver
 
-    PUBLIC _apu_chk_idle
+    PUBLIC  apu_chk_idle
 
     EXTERN asm_am9511a_chk_idle
 
-    defc _apu_chk_idle = asm_am9511a_chk_idle
+    defc apu_chk_idle = asm_am9511a_chk_idle
 

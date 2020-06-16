@@ -6,7 +6,7 @@
 
 SECTION code_driver
 
-PUBLIC _apu_cmd
+PUBLIC  apu_cmd
 
 EXTERN asm_am9511a_cmd
     
@@ -14,19 +14,9 @@ EXTERN asm_am9511a_cmd
 ;
 ;       This function returns a void.
 ;
-;       void apu_cmd( uint8_t command ) __smallc;
+;       void apu_cmd( uint8_t command ) __smallc __z88dk_fastcall;
 ;
-;       stack:
-;
-;           cmd uint8
-;           cmd uint8
-;           ret high
-;           ret low
 
-_apu_cmd:
-    pop hl                      ; collect ret address
-    pop bc                      ; command in C   
-    push bc
-    push hl                     ; put ret address back
-
+apu_cmd:
+    ld c,l                  ; cmd to C
     jp asm_am9511a_cmd
