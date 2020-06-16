@@ -354,7 +354,7 @@ static int create_disk()
         exit_log(1, "Bootstrap has length %d > 128", binlen);
     }
     memset(sectorbuf, 0, sizeof(sectorbuf));
-    fread(sectorbuf, 1, 128, fpin);
+    if (128 != fread(sectorbuf, 1, 128, fpin)) { fclose(sectorbuf); exit(-1); }
     fclose(fpin);
 
     if ( (fpout = fopen(disc_name, "wb")) == NULL ) {
@@ -374,7 +374,7 @@ static int create_disk()
             int size = track == 0 ? 128 : 256;
             memset(sectorbuf, 0, sizeof(sectorbuf));
             if ( !feof(fpin) ) {
-                fread(sectorbuf, 1, size, fpin);
+                if (size != fread(sectorbuf, 1, size, fpin)) { fclose(sectorbuf); exit(-1); }
             }
             fwrite(sectorbuf, 1, size, fpout);	
         }

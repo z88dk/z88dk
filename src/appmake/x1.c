@@ -101,7 +101,7 @@ int x1_exec(char* target)
 
     fseek(fpin, 0L, SEEK_SET);
     buf = must_malloc(len);
-    fread(buf, 1, len, fpin);
+    if (len != fread(buf, 1, len, fpin)) { fclose(buf); exit(-1); }
     fclose(fpin);
 
 

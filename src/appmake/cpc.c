@@ -396,7 +396,7 @@ int cpc_exec(char* target)
            * myexit("Couldn't determine size of file\n",1); }
            * len=ftell(source); fseek(source,0,SEEK_SET);
            */
-        fread(srchead, 128, 1, source);
+        if (1 != fread(srchead, 128, 1, source)) { fclose(srchead); exit(-1); }
         size = srchead[64] + srchead[65] * 256;
         if (dumb)
             printf("CPC file size (%s):%d bytes\n", filename, size);
@@ -460,7 +460,7 @@ int cpc_exec(char* target)
                 */
             if (dumb)
                 printf("Size of block:%d\n", header[19] + header[20] * 256);
-            fread(srcdata, header[19] + header[20] * 256, 1, source);
+            if (1 != fread(srcdata, header[19] + header[20] * 256, 1, source)) { fclose(srcdata); exit(-1); }
 
             if (feof(source)) {
                 fprintf(stderr, "Fatal error: EOF met on input file.\nMaybe a non-CPC or ASCII file ?\n");
