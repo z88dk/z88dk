@@ -20,6 +20,8 @@
 		EXTERN		swapgfxbk
 		EXTERN		swapgfxbk1
 
+		defc 		SCREEN_LAST_ROW = $7c00
+
 		INCLUDE		"target/cpm/def/tiki100.def"
 
 
@@ -222,10 +224,8 @@ generic_console_scrollup:
 	ld	a,-8
  	call	gr_vscroll
 	call	swapgfxbk
-	ld	hl,$7C00
-	ld	d,h
-	ld	e,l
-	inc	de
+	ld	hl,SCREEN_LAST_ROW
+	ld	de,SCREEN_LAST_ROW+1
 	ld	(hl),0
 	ld	bc,1024
 	ldir
