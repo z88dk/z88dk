@@ -50,7 +50,7 @@ extern char rawsound[];
 #endasm
 
 /* Added for "malloc" with z88dk */
-extern long heap(60000);
+#pragma export _heap = 60000
 
 /* 64k vdc locations */
 
