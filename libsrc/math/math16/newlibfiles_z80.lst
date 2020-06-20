@@ -22,9 +22,17 @@
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_nan.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_neg.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_normalize.asm
+../../_DEVELOPMENT/math/float/math16/z80/asm_f16_poly.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_sigdig.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_sqrt.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_zero.asm
+
+../../_DEVELOPMENT/math/float/math16/z80/coeff_f16_atan.asm
+../../_DEVELOPMENT/math/float/math16/z80/coeff_f16_exp2.asm
+../../_DEVELOPMENT/math/float/math16/z80/coeff_f16_exp10.asm
+../../_DEVELOPMENT/math/float/math16/z80/coeff_f16_exp.asm
+../../_DEVELOPMENT/math/float/math16/z80/coeff_f16_log.asm
+../../_DEVELOPMENT/math/float/math16/z80/coeff_f16_sin.asm
 
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sdcc/___h2schar.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sdcc/___h2schar_callee.asm
@@ -63,6 +71,8 @@
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/invsqrt.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/ldexp.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/ldexp_callee.asm
+../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/poly.asm
+../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/poly_callee.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/l_f16_fabs.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/l_f16_add.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/l_f16_conv_int.asm
@@ -121,6 +131,8 @@
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_mul10.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_mul_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc___neq_callee.asm
+../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_poly.asm
+../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_poly_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_read.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc_read_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sdcc/cm16_sdcc___schar2h.asm
@@ -154,6 +166,8 @@
 ../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_ldexp_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_mul.asm
 ../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_mul_callee.asm
+../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_poly.asm
+../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_poly_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_read.asm
 ../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_read_callee.asm
 ../../_DEVELOPMENT/math/float/math16/c/sccz80/cm16_sccz80_sub.asm

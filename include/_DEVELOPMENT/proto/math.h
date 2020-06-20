@@ -255,6 +255,7 @@ __DPROTO(,,half_t,,mulf16,half_t x,half_t y)
 __DPROTO(,,half_t,,divf16,half_t x,half_t y)
 
 __DPROTO(,,half_t,,fmaf16,half_t x,half_t y,half_t z)
+__DPROTO(,,half_t,,polyf16,half_t x,float_t d[],uint16_t n)
 __DPROTO(,,half_t,,hypotf16,half_t x,half_t y)
 
 __DPROTO(,,half_t,,invf16,half_t x)

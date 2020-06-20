@@ -31,5 +31,11 @@ math/float/math16/z80/asm_f16_frexp
 math/float/math16/z80/asm_f16_ldexp
 
 math/float/math16/z80/asm_f16_sqrt
-;math/float/math16/z80/asm_f16_poly
+math/float/math16/z80/asm_f16_poly
 
+math/float/math16/z80/coeff_f16_atan
+math/float/math16/z80/coeff_f16_exp2
+math/float/math16/z80/coeff_f16_exp10
+math/float/math16/z80/coeff_f16_exp
+math/float/math16/z80/coeff_f16_log
+math/float/math16/z80/coeff_f16_sin

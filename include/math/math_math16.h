@@ -48,6 +48,7 @@ extern half_t __LIB__ mulf16(half_t x,half_t y) __smallc;
 extern half_t __LIB__ divf16(half_t x,half_t y) __smallc;
 
 extern half_t __LIB__ fmaf16(half_t x,half_t y,half_t z) __smallc;
+extern half_t __LIB__ polyf16(half_t x,float d[],uint16_t n) __smallc;
 extern half_t __LIB__ hypotf16(half_t x,half_t y) __smallc;
 
 /* Power functions */

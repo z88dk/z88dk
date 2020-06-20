@@ -14,6 +14,8 @@ math/float/math16/c/sccz80/cm16_sccz80_ldexp
 math/float/math16/c/sccz80/cm16_sccz80_ldexp_callee
 math/float/math16/c/sccz80/cm16_sccz80_mul
 math/float/math16/c/sccz80/cm16_sccz80_mul_callee
+math/float/math16/c/sccz80/cm16_sccz80_poly
+math/float/math16/c/sccz80/cm16_sccz80_poly_callee
 math/float/math16/c/sccz80/cm16_sccz80_read
 math/float/math16/c/sccz80/cm16_sccz80_read_callee
 math/float/math16/c/sccz80/cm16_sccz80_sub

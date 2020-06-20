@@ -493,6 +493,11 @@ extern half_t __LIB__ fmaf16_callee(half_t x,half_t y,half_t z) __smallc __z88dk
 #define fmaf16(a,b,c) fmaf16_callee(a,b,c)
 
 
+extern half_t __LIB__ polyf16(half_t x,float_t d[],uint16_t n) __smallc;
+extern half_t __LIB__ polyf16_callee(half_t x,float_t d[],uint16_t n) __smallc __z88dk_callee;
+#define polyf16(a,b,c) polyf16_callee(a,b,c)
+
+
 extern half_t __LIB__ hypotf16(half_t x,half_t y) __smallc;
 extern half_t __LIB__ hypotf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
 #define hypotf16(a,b) hypotf16_callee(a,b)

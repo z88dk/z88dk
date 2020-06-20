@@ -433,6 +433,9 @@ extern half_t divf16(half_t x,half_t y);
 extern half_t fmaf16(half_t x,half_t y,half_t z);
 
 
+extern half_t polyf16(half_t x,float_t d[],uint16_t n);
+
+
 extern half_t hypotf16(half_t x,half_t y);
 
 

@@ -609,6 +609,11 @@ extern half_t fmaf16_callee(half_t x,half_t y,half_t z) __z88dk_callee;
 #define fmaf16(a,b,c) fmaf16_callee(a,b,c)
 
 
+extern half_t polyf16(half_t x,float_t d[],uint16_t n);
+extern half_t polyf16_callee(half_t x,float_t d[],uint16_t n) __z88dk_callee;
+#define polyf16(a,b,c) polyf16_callee(a,b,c)
+
+
 extern half_t hypotf16(half_t x,half_t y);
 extern half_t hypotf16_callee(half_t x,half_t y) __z88dk_callee;
 #define hypotf16(a,b) hypotf16_callee(a,b)
