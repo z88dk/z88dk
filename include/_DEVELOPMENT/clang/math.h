@@ -468,6 +468,28 @@ extern half_t ldexpf16(half_t x,int16_t exp);
 
 
 
+extern half_t_t expf16(half_t_t x);
+
+
+extern half_t_t exp2f16(half_t_t x);
+
+
+extern half_t_t exp10f16(half_t_t x);
+
+
+extern half_t_t logf16(half_t_t x);
+
+
+extern half_t_t log2f16(half_t_t x);
+
+
+extern half_t_t log10f16(half_t_t x);
+
+
+extern half_t_t powf16(half_t x,half_t y);
+
+
+
 extern half_t fabsf16(half_t x);
 
 

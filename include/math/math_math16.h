@@ -5,7 +5,6 @@
 #include <sys/types.h>
 #include <limits.h>
 
-
 #define HUGE_POS_F16            (0x7BFF)        /*  +6.5504E+4 */
 #define TINY_POS_F16            (0x0400)        /*  +6.1035E-5 */
 #define HUGE_NEG_F16            (0xFBFF)        /*  -6.5504E+4 */
@@ -57,16 +56,25 @@ extern half_t __LIB__ div2f16(half_t x);
 extern half_t __LIB__ mul2f16(half_t x);
 extern half_t __LIB__ mul10f16(half_t x);
 
+/* Exponential, logarithmic and power functions */
+extern half_t __LIB__ expf16 (half_t x) __z88dk_fastcall;
+extern half_t __LIB__ exp2f16 (half_t x) __z88dk_fastcall;
+extern half_t __LIB__ exp10f16 (half_t x) __z88dk_fastcall;
+extern half_t __LIB__ logf16 (half_t x) __z88dk_fastcall;
+extern half_t __LIB__ log2f16 (half_t x) __z88dk_fastcall;
+extern half_t __LIB__ log10f16 (half_t x) __z88dk_fastcall;
+extern half_t __LIB__ powf16 (half_t x, half_t y);
+
 /* Nearest integer, absolute value, and remainder functions */
 extern half_t __LIB__ ceilf16(half_t x);
 extern half_t __LIB__ floorf16(half_t x);
-#definetruncf16(a) (a>0.?f16_floor(a):f16_ceil(a))
-#defineroundf16(a) (a>0.?f16_floor(a+0.5):f16_ceil(a-0.5))
-#definerint(a)ceil(a)
+#define truncf16(a) (a>0.?floorf16(a):ceilf16(a))
+#define roundf16(a) (a>0.?floorf16(a+0.5):ceilf16(a-0.5))
+#define rintf16(a) ceilf16(a)
 
 /* Manipulation */
-extern half_t __LIB__ frexpf16(half_t x, int *pw2) __smallc;
-extern half_t __LIB__ ldexpf16(half_t x, int pw2) __smallc;
+extern half_t __LIB__ frexpf16(half_t x, int8_t *pw2) __smallc;
+extern half_t __LIB__ ldexpf16(half_t x, int16_t pw2) __smallc;
 #define scalbnf16(x,pw2) ldexpf16(x,pw2)
 
 /* Intrinsic functions */
