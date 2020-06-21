@@ -163,6 +163,23 @@ There are essentially two different grades of functions in this library. Those i
 
 The expanded floating point format is a useful tool for creating functions, as complex functions can be written quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `inv()`, `fma()` and the `poly()` functions.
 
+For the `poly()` function, I decided to use `_f32` float format for the coefficients (rather than `_f16` half format), for a couple of reasons.
+
+```c
+half_t polyf16(const half_t x, const float_t d[], uint16_t n)
+{
+  float_t res = d[n];  /* where n is the maximum coefficient index. Same as the C index. */
+
+  while(n)
+    res = res * x + d[--n];
+    return res;
+}
+```
+
+- Accuracy. The `poly()` function uses the `_f24` format (16-bit mantissa) internally for multiply-add. Using IEEE float coefficients (with 24-bit mantissa) provides the most accuracy that the function can consume.
+- Performance. Converting the coefficients from `_f32` to `_f24` for calculations is faster than converting from `_f16` to `_f24`, even though more bytes are stored.
+- Convenience. There are already tables of `_f32` coefficients proven for math32, so it is much easier to just reuse them.
+
 ## Licence
 
 Copyright (c) 2020 Phillip Stevens
