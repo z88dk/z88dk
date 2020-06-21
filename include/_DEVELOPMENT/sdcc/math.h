@@ -664,70 +664,70 @@ extern half_t ldexpf16_callee(half_t x,int16_t exp) __z88dk_callee;
 
 
 
-extern half_t_t acosf16(half_t_t x);
-extern half_t_t acosf16_fastcall(half_t_t x) __z88dk_fastcall;
+extern half_t acosf16(half_t x);
+extern half_t acosf16_fastcall(half_t x) __z88dk_fastcall;
 #define acosf16(a) acosf16_fastcall(a)
 
 
-extern half_t_t asinf16(half_t_t x);
-extern half_t_t asinf16_fastcall(half_t_t x) __z88dk_fastcall;
+extern half_t asinf16(half_t x);
+extern half_t asinf16_fastcall(half_t x) __z88dk_fastcall;
 #define asinf16(a) asinf16_fastcall(a)
 
 
-extern half_t_t atanf16(half_t_t x);
-extern half_t_t atanf16_fastcall(half_t_t x) __z88dk_fastcall;
+extern half_t atanf16(half_t x);
+extern half_t atanf16_fastcall(half_t x) __z88dk_fastcall;
 #define atanf16(a) atanf16_fastcall(a)
 
 
 
-extern half_t_t cosf16(half_t_t x);
-extern half_t_t cosf16_fastcall(half_t_t x) __z88dk_fastcall;
+extern half_t cosf16(half_t x);
+extern half_t cosf16_fastcall(half_t x) __z88dk_fastcall;
 #define cosf16(a) cosf16_fastcall(a)
 
 
-extern half_t_t sinf16(half_t_t x);
-extern half_t_t sinf16_fastcall(half_t_t x) __z88dk_fastcall;
+extern half_t sinf16(half_t x);
+extern half_t sinf16_fastcall(half_t x) __z88dk_fastcall;
 #define sinf16(a) sinf16_fastcall(a)
 
 
-extern half_t_t tanf16(half_t_t x);
-extern half_t_t tanf16_fastcall(half_t_t x) __z88dk_fastcall;
+extern half_t tanf16(half_t x);
+extern half_t tanf16_fastcall(half_t x) __z88dk_fastcall;
 #define tanf16(a) tanf16_fastcall(a)
 
 
 
-extern half_t_t expf16(half_t_t x);
-extern half_t_t expf16_fastcall(half_t_t x) __z88dk_fastcall;
+extern half_t expf16(half_t x);
+extern half_t expf16_fastcall(half_t x) __z88dk_fastcall;
 #define expf16(a) expf16_fastcall(a)
 
 
-extern half_t_t exp2f16(half_t_t x);
-extern half_t_t exp2f16_fastcall(half_t_t x) __z88dk_fastcall;
+extern half_t exp2f16(half_t x);
+extern half_t exp2f16_fastcall(half_t x) __z88dk_fastcall;
 #define exp2f16(a) exp2f16_fastcall(a)
 
 
-extern half_t_t exp10f16(half_t_t x);
-extern half_t_t exp10f16_fastcall(half_t_t x) __z88dk_fastcall;
+extern half_t exp10f16(half_t x);
+extern half_t exp10f16_fastcall(half_t x) __z88dk_fastcall;
 #define exp10f16(a) exp10f16_fastcall(a)
 
 
-extern half_t_t logf16(half_t_t x);
-extern half_t_t logf16_fastcall(half_t_t x) __z88dk_fastcall;
+extern half_t logf16(half_t x);
+extern half_t logf16_fastcall(half_t x) __z88dk_fastcall;
 #define logf16(a) logf16_fastcall(a)
 
 
-extern half_t_t log2f16(half_t_t x);
-extern half_t_t log2f16_fastcall(half_t_t x) __z88dk_fastcall;
+extern half_t log2f16(half_t x);
+extern half_t log2f16_fastcall(half_t x) __z88dk_fastcall;
 #define log2f16(a) log2f16_fastcall(a)
 
 
-extern half_t_t log10f16(half_t_t x);
-extern half_t_t log10f16_fastcall(half_t_t x) __z88dk_fastcall;
+extern half_t log10f16(half_t x);
+extern half_t log10f16_fastcall(half_t x) __z88dk_fastcall;
 #define log10f16(a) log10f16_fastcall(a)
 
 
-extern half_t_t powf16(half_t x,half_t y);
-extern half_t_t powf16_callee(half_t x,half_t y) __z88dk_callee;
+extern half_t powf16(half_t x,half_t y);
+extern half_t powf16_callee(half_t x,half_t y) __z88dk_callee;
 #define powf16(a,b) powf16_callee(a,b)
 
 

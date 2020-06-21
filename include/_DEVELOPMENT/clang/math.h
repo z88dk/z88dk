@@ -468,45 +468,45 @@ extern half_t ldexpf16(half_t x,int16_t exp);
 
 
 
-extern half_t_t acosf16(half_t_t x);
+extern half_t acosf16(half_t x);
 
 
-extern half_t_t asinf16(half_t_t x);
+extern half_t asinf16(half_t x);
 
 
-extern half_t_t atanf16(half_t_t x);
-
-
-
-extern half_t_t cosf16(half_t_t x);
-
-
-extern half_t_t sinf16(half_t_t x);
-
-
-extern half_t_t tanf16(half_t_t x);
+extern half_t atanf16(half_t x);
 
 
 
-extern half_t_t expf16(half_t_t x);
+extern half_t cosf16(half_t x);
 
 
-extern half_t_t exp2f16(half_t_t x);
+extern half_t sinf16(half_t x);
 
 
-extern half_t_t exp10f16(half_t_t x);
+extern half_t tanf16(half_t x);
 
 
-extern half_t_t logf16(half_t_t x);
+
+extern half_t expf16(half_t x);
 
 
-extern half_t_t log2f16(half_t_t x);
+extern half_t exp2f16(half_t x);
 
 
-extern half_t_t log10f16(half_t_t x);
+extern half_t exp10f16(half_t x);
 
 
-extern half_t_t powf16(half_t x,half_t y);
+extern half_t logf16(half_t x);
+
+
+extern half_t log2f16(half_t x);
+
+
+extern half_t log10f16(half_t x);
+
+
+extern half_t powf16(half_t x,half_t y);
 
 
 

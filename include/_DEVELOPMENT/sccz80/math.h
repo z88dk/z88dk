@@ -536,46 +536,46 @@ extern half_t __LIB__ ldexpf16_callee(half_t x,int16_t exp) __smallc __z88dk_cal
 
 
 
-extern half_t_t __LIB__ acosf16(half_t_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ acosf16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t_t __LIB__ asinf16(half_t_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ asinf16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t_t __LIB__ atanf16(half_t_t x) __smallc __z88dk_fastcall;
-
-
-
-extern half_t_t __LIB__ cosf16(half_t_t x) __smallc __z88dk_fastcall;
-
-
-extern half_t_t __LIB__ sinf16(half_t_t x) __smallc __z88dk_fastcall;
-
-
-extern half_t_t __LIB__ tanf16(half_t_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ atanf16(half_t x) __smallc __z88dk_fastcall;
 
 
 
-extern half_t_t __LIB__ expf16(half_t_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ cosf16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t_t __LIB__ exp2f16(half_t_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ sinf16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t_t __LIB__ exp10f16(half_t_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ tanf16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t_t __LIB__ logf16(half_t_t x) __smallc __z88dk_fastcall;
+
+extern half_t __LIB__ expf16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t_t __LIB__ log2f16(half_t_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ exp2f16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t_t __LIB__ log10f16(half_t_t x) __smallc __z88dk_fastcall;
+extern half_t __LIB__ exp10f16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t_t __LIB__ powf16(half_t x,half_t y) __smallc;
-extern half_t_t __LIB__ powf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
+extern half_t __LIB__ logf16(half_t x) __smallc __z88dk_fastcall;
+
+
+extern half_t __LIB__ log2f16(half_t x) __smallc __z88dk_fastcall;
+
+
+extern half_t __LIB__ log10f16(half_t x) __smallc __z88dk_fastcall;
+
+
+extern half_t __LIB__ powf16(half_t x,half_t y) __smallc;
+extern half_t __LIB__ powf16_callee(half_t x,half_t y) __smallc __z88dk_callee;
 #define powf16(a,b) powf16_callee(a,b)
 
 
