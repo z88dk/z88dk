@@ -270,6 +270,14 @@ __DPROTO(,,half_t,,mul10f16,half_t x)
 __DPROTO(,,half_t,,frexpf16,half_t x,int8_t *exp)
 __DPROTO(,,half_t,,ldexpf16,half_t x,int16_t exp)
 
+__DPROTO(,,half_t_t,,acosf16,half_t_t x)
+__DPROTO(,,half_t_t,,asinf16,half_t_t x)
+__DPROTO(,,half_t_t,,atanf16,half_t_t x)
+
+__DPROTO(,,half_t_t,,cosf16,half_t_t x)
+__DPROTO(,,half_t_t,,sinf16,half_t_t x)
+__DPROTO(,,half_t_t,,tanf16,half_t_t x)
+
 __DPROTO(,,half_t_t,,expf16,half_t_t x)
 __DPROTO(,,half_t_t,,exp2f16,half_t_t x)
 __DPROTO(,,half_t_t,,exp10f16,half_t_t x)
