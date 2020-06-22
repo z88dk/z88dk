@@ -18,9 +18,9 @@
 ;	$Id: gr_defmod.asm,v 1.4 2016-06-10 23:01:47 dom Exp $
 ;
 
-	SECTION code_clib
-PUBLIC gr_defmod
-PUBLIC _gr_defmod
+	SECTION		code_clib
+	PUBLIC		gr_defmod
+	PUBLIC		_gr_defmod
 
 
 INCLUDE	"target/cpm/def/tiki100.def"
@@ -36,11 +36,11 @@ _gr_defmod:
 	ld	b,a
 
 	ld	hl,PORT_0C_COPY
-	DI
+	di
 	ld	a,(hl)
 	and	$4F
 	or	b
-	LD	(hl),A	; Video port: copy of the value sent to the video port address 0CH
-	OUT	($0C),A		; set graphics mode
-	EI
-	RET
+	ld	(hl),a		; store change in readable copy
+	out	($0C),a		; set graphics mode
+	ei
+	ret

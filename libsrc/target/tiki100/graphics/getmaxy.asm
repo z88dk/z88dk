@@ -1,9 +1,9 @@
 
 
-	SECTION	code_graphics
+	SECTION		code_graphics
 
-	PUBLIC	getmaxy
-	PUBLIC	_getmaxy
+	PUBLIC		getmaxy
+	PUBLIC		_getmaxy
 
 
 

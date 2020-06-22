@@ -19,11 +19,11 @@
 ;	$Id: gr_setpalette.asm,v 1.3 2016-06-10 23:01:47 dom Exp $
 ;
 
-SECTION code_clib
-PUBLIC gr_setpalette
-PUBLIC _gr_setpalette
+	SECTION		code_clib
+	PUBLIC		gr_setpalette
+	PUBLIC		_gr_setpalette
 
-INCLUDE	"target/cpm/def/tiki100.def"
+	INCLUDE		"target/cpm/def/tiki100.def"
 
 gr_setpalette:
 _gr_setpalette:
@@ -71,37 +71,35 @@ set_loop:
 ;
 .do_set
 	cpl
-	LD E,A
+	ld	e,a
 	ld	hl,PORT_0C_COPY
 .palette_loop
-	PUSH	DE
-	DI
+	push	de
+	di
 	ld	a,(hl)
 	and	$7F
-	OUT	($0C),A		; Make sure write-flag is clear in advance to avoid hardware race-conditions
-	LD	A,E
-	OUT	($14),A		; Set palette register (prepare the color to be loaded)
+	out	($0C),a		; Make sure write-flag is clear in advance to avoid hardware race-conditions
+	ld	a,e
+	out	($14),a		; Set palette register (prepare the color to be loaded)
 	ld	a,(hl)
 	and	$70
 	or	b
-	OUT	($0C),A		; Set index
+	out	($0C),a		; Set index
 	or	$80
-	OUT	($0C),A		; Initiate write
-	LD	C,18
+	out	($0C),a		; Initiate write
+	ld	c,18
 .wait_loop
-	DEC	C
-	JP	NZ,wait_loop	; wait 288 clocks, 72usec for HBLANK to trigger (64usec period + 8usec margin)
+	dec	c
+	jp	nz,wait_loop	; wait 288 clocks, 72usec for HBLANK to trigger (64usec period + 8usec margin)
 	and	$7F
-	OUT	($0C),A		; End write
+	out	($0C),a		; End write
 	ld	(hl),a
-	EI
-	POP	DE
+	ei
+	pop	de
 
-	LD	A,B
-	ADD	D		; move to next palette position
-	LD	B,A
-	CP	16
-	JR	C,palette_loop
-	RET
-
-
+	ld	a,b
+	add	d		; Set all palettes which corresponds to the given color in the given mode
+	ld	b,a
+	cp	16
+	jr	c,palette_loop
+	ret

@@ -1,11 +1,11 @@
 
 
-	SECTION	code_graphics
+	SECTION		code_graphics
 
-	PUBLIC	getmaxx
-	PUBLIC	_getmaxx
+	PUBLIC		getmaxx
+	PUBLIC		_getmaxx
 
-	EXTERN	generic_console_get_mode
+	EXTERN		generic_console_get_mode
 
 
 getmaxx:
