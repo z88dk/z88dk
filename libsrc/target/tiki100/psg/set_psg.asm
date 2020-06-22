@@ -10,7 +10,7 @@
 ;	$Id: set_psg.asm,v 1.2 2016-06-10 21:13:58 dom Exp $
 ;
 
-        SECTION		code_clib
+	SECTION		code_clib
 	PUBLIC		set_psg
 	PUBLIC		_set_psg
 	EXTERN		set_psg_callee

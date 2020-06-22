@@ -7,8 +7,8 @@
 ;
 
 	SECTION		code_graphics
-        PUBLIC		clg
-        PUBLIC		_clg
+	PUBLIC		clg
+	PUBLIC		_clg
 	EXTERN		generic_console_cls
 
 	defc	clg = generic_console_cls
