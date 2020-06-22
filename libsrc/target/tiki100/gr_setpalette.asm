@@ -74,30 +74,31 @@ set_loop:
 	LD E,A
 	ld	hl,PORT_0C_COPY
 .palette_loop
-
 	PUSH	DE
-	LD	A,E
 	DI
-	OUT	($14),A	     ; Palette register (prepare the color to be loaded)
 	ld	a,(hl)
-	and	$30
-	add	b
-	ld	d,a
-	OUT	($0C),A	     ; Set palette entry
+	and	$7F
+	OUT	($0C),A		; Make sure write-flag is clear in advance to avoid hardware race-conditions
+	LD	A,E
+	OUT	($14),A		; Set palette register (prepare the color to be loaded)
+	ld	a,(hl)
+	and	$70
+	or	b
+	OUT	($0C),A		; Set index
 	or	$80
-	OUT	($0C),A	     ; Trigger write
-	LD	C,0
+	OUT	($0C),A		; Initiate write
+	LD	C,18
 .wait_loop
 	DEC	C
-	JP	NZ,wait_loop	; wait for HBLANK to get the color copied in the requested palette position
-	LD	A,D
-	OUT	($0C),A	     ; End write
+	JP	NZ,wait_loop	; wait 288 clocks, 72usec for HBLANK to trigger (64usec period + 8usec margin)
+	and	$7F
+	OUT	($0C),A		; End write
 	ld	(hl),a
 	EI
 	POP	DE
 
 	LD	A,B
-	ADD	D		   ; move to next palette position
+	ADD	D		; move to next palette position
 	LD	B,A
 	CP	16
 	JR	C,palette_loop
