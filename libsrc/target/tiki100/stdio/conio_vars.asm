@@ -13,7 +13,7 @@ __MODE2_attr:   defb    @00000011, 0
 __MODE3_attr:   defb    @00001111, 0
 
 
-        SECTION		code_clib
+	SECTION		code_clib
 	PUBLIC		generic_console_setup_mode
 	EXTERN		__console_w
 	EXTERN		gr_setpalette
