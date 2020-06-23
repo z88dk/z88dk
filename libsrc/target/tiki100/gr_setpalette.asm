@@ -19,9 +19,11 @@
 ;	$Id: gr_setpalette.asm,v 1.3 2016-06-10 23:01:47 dom Exp $
 ;
 
-SECTION code_clib
-PUBLIC gr_setpalette
-PUBLIC _gr_setpalette
+	SECTION		code_clib
+	PUBLIC		gr_setpalette
+	PUBLIC		_gr_setpalette
+
+	INCLUDE		"target/cpm/def/tiki100.def"
 
 gr_setpalette:
 _gr_setpalette:
@@ -32,8 +34,8 @@ _gr_setpalette:
 	push	hl
 	push	bc
 
-	ld	d,e		; Number of colours
-	ld	b,0		; Current position
+	ld	d,e		; Number of colours in selected mode
+	ld	b,0		; Palette index
 
 	ld	a,e
 set_loop:
@@ -63,39 +65,41 @@ set_loop:
 ;
 ;
 ; Input:
-; 	A = Palette
-; 	B = Position
-;	D = number of colours
+; 	A = Palette color
+; 	B = Palette index
+;	D = number of colours in selected mode
 ;
 .do_set
 	cpl
-        LD E,A
-	ld	hl,$f04d
+	ld	e,a
+	ld	hl,PORT_0C_COPY
 .palette_loop
-        PUSH DE
-        LD A,E
-        DI
-        OUT ($14),A             ; Palette register (prepare the color to be loaded)
-        OUT ($14),A             ; Palette register (do it again to be sure)
+	push	de
+	di
 	ld	a,(hl)
-	and	$30
-	add	b
-	ld	d,a
+	and	$7F
+	out	($0C),a		; Make sure write-flag is clear in advance to avoid hardware race-conditions
+	ld	a,e
+	out	($14),a		; Set palette register (prepare the color to be loaded)
+	ld	a,(hl)
+	and	$70
+	or	b
+	out	($0C),a		; Set index
 	or	$80
-        OUT ($0C),A             ; set graphics mode enabling graphics
-        LD C,0
+	out	($0C),a		; Initiate write
+	ld	c,18
 .wait_loop
-        DEC C
-        JP NZ,wait_loop         ; wait for HBLANK to get the color copied in the requested palette position
-        LD A,D
-        OUT ($0C),A                     ; set graphics mode
-        EI
-        POP DE
-        LD A,B
-        ADD D                   ; move to next palette position
-        LD B,A
-        CP 16
-        JR C,palette_loop
-        RET
+	dec	c
+	jp	nz,wait_loop	; wait 288 clocks, 72usec for HBLANK to trigger (64usec period + 8usec margin)
+	and	$7F
+	out	($0C),a		; End write
+	ld	(hl),a
+	ei
+	pop	de
 
-
+	ld	a,b
+	add	d		; Set all palettes which corresponds to the given color in the given mode
+	ld	b,a
+	cp	16
+	jr	c,palette_loop
+	ret

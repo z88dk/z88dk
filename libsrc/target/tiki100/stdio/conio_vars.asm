@@ -13,10 +13,11 @@ __MODE2_attr:   defb    @00000011, 0
 __MODE3_attr:   defb    @00001111, 0
 
 
-        SECTION code_clib
-	PUBLIC	generic_console_setup_mode
-	EXTERN	__console_w
-	EXTERN	gr_setpalette
+	SECTION		code_clib
+	PUBLIC		generic_console_setup_mode
+	EXTERN		__console_w
+	EXTERN		gr_setpalette
+	EXTERN		generic_console_get_mode
 
 
 ; Entry: a = mode
@@ -70,12 +71,7 @@ palette:
 
         SECTION code_crt_init
 
-        ld      a,(PORT_0C_COPY)
-        rrca
-        rrca
-        rrca
-        rrca
-        and     3
+        call	generic_console_get_mode
         call    generic_console_setup_mode
         ld      a,201
         ld      (CURSOR_BLINK_VECTOR),a

@@ -1,16 +1,16 @@
 
-	MODULE	generic_console_ioctl
-	PUBLIC	generic_console_ioctl
+	MODULE		generic_console_ioctl
+	PUBLIC		generic_console_ioctl
 
-	SECTION	code_clib
+	SECTION		code_clib
 
-	EXTERN	generic_console_cls
-	EXTERN	generic_console_setup_mode
-	EXTERN	gr_defmod
-	EXTERN	generic_console_font32
-	EXTERN	generic_console_udg32
+	EXTERN		generic_console_cls
+	EXTERN		generic_console_setup_mode
+	EXTERN		gr_defmod
+	EXTERN		generic_console_font32
+	EXTERN		generic_console_udg32
 
-	INCLUDE	"ioctl.def"
+	INCLUDE		"ioctl.def"
 
         PUBLIC          CLIB_GENCON_CAPS
         defc            CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS
