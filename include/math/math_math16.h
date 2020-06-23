@@ -5,128 +5,93 @@
 #include <sys/types.h>
 #include <limits.h>
 
+#define HUGE_POS_F16            (0x7BFF)        /*  +6.5504E+4 */
+#define TINY_POS_F16            (0x0400)        /*  +6.1035E-5 */
+#define HUGE_NEG_F16            (0xFBFF)        /*  -6.5504E+4 */
+#define TINY_NEG_F16            (0x8400)        /*  -6.1035E-5 */
 
-#define HUGE_POS_HF     (short)0x7BFF       /*  +6.5504E+4 */
-#define TINY_POS_HF     (short)0x0400       /*  +6.1035E-5 */
-#define HUGE_NEG_HF     (short)0xFBFF       /*  -6.5504E+4 */
-#define TINY_NEG_HF     (short)0x8400       /*  -6.1035E-5 */
+#define MAXL2_F16               (0x4BFF)        /*  +15.99    */
+#define MINL2_F16               (0xCB00)        /*  -14.00    */
+#define MAXLOG_F16              (0x498B)        /*  +11.086   */
+#define MINLOG_F16              (0xC8DA)        /*  -9.700    */       
+#define MAXL10_F16              (0x44D1)        /*  +4.816    */
+#define MINL10_F16              (0xC437)        /*  -4.215    */
 
-#define MAXL2_HF        (short)0x4BFF       /*  +15.99    */
-#define MINL2_HF        (short)0xCB00       /*  -14.00    */
-#define MAXLOG_HF       (short)0x498B       /*  +11.086   */
-#define MINLOG_HF       (short)0xC8DA       /*  -9.700    */       
-#define MAXL10_HF       (short)0x44D1       /*  +4.816    */
-#define MINL10_HF       (short)0xC437       /*  -4.215    */
-
-#define INFINITY_POS_HF (short)0x7C00
-#define INFINITY_NEG_HF (short)0xFC00
-
-#define PI          3.1415926536
-#define TWO_PI      6.2831853071
-#define HALF_PI     1.5707963268
-#define QUART_PI    0.7853981634
-#define iPI         0.3183098862
-#define iTWO_PI     0.1591549431
-#define TWO_O_PI    0.6366197724
-
-
-// Non-ANSI macros
-#define BADTAN          (half_t)1.560796327
-#define EXPLARGE        (half_t)89.80081863
-#define INF             (half_t)3.00e38
-#define IPIby180        (half_t)57.29577951
-#define LNof10          (half_t)2.302585093
-#define LOG2            (half_t)0.30102999567
-#define LOGE            (half_t)0.43429448190
-#define PIby180         (half_t)0.0174532925
-#define PIbyTWO         (half_t)1.570796326795
-#define POW10INF        (half_t)38.0
-#define SQR10           (half_t)3.162277660168
-#define TWObyPI         (half_t)0.63661977
-
-#define M_E        2.718282
-#define M_INVLN2   1.442694  /* 1 / log(2) */
-#define M_LOG2E    1.442694
-#define M_IVLN10   0.434294  /* 1 / log(10) */
-#define M_LOG10E   0.434294
-#define M_LOG2_E   0.693146
-#define M_LN2      0.693146
-#define M_LN10     2.302585
-#define M_PI       3.141592
-#define M_TWOPI    6.283184
-#define M_PI_2     1.570796
-#define M_PI_4     0.785396
-#define M_3PI_4    2.356194
-#define M_SQRTPI   1.772454
-#define M_1_PI     0.318310
-#define M_2_PI     0.636620
-#define M_1_SQRTPI 0.564190
-#define M_2_SQRTPI 1.128379
-#define M_SQRT2    1.414214
-#define M_SQRT3    1.732051
-#define M_SQRT1_2  0.707107
+#define HUGE_VAL_F16            (0x7C00)
+#define INFINITY_POS_F16        (0x7C00)
+#define INFINITY_NEG_F16        (0xFC00)
 
 /* Conversion functions */
-extern half_t __LIB__ f16_f16_f32(float x);
-extern float __LIB__ f16_f32_f16(half_t x);
+extern half_t __LIB__ f16_f48(float x) __z88dk_fastcall;
+extern half_t __LIB__ f16_f32(float x) __z88dk_fastcall;
 
-extern int16_t __LIB__ f16_i16_f16(half_t x);
-extern uint16_t __LIB__ f16_u16_f16(half_t x);
-extern int32_t __LIB__ f16_i32_f16(half_t x);
-extern uint32_t __LIB__ f16_u32_f16(half_t x);
+extern float  __LIB__ f48_f16(half_t x) __z88dk_fastcall;
+extern float  __LIB__ f32_f16(half_t x) __z88dk_fastcall;
 
-extern half_t __LIB__ f16_f16_i8(int8_t x);
-extern half_t __LIB__ f16_f16_i16(int16_t x);
-extern half_t __LIB__ f16_f16_i32(int32_t x);
-extern half_t __LIB__ f16_f16_u8(uint8_t x);
-extern half_t __LIB__ f16_f16_u16(uint16_t x);
-extern half_t __LIB__ f16_f16_u32(uint32_t x);
+extern int16_t  __LIB__ i16_f16(half_t x) __z88dk_fastcall;
+extern uint16_t __LIB__ u16_f16(half_t x) __z88dk_fastcall;
+extern int32_t  __LIB__ i32_f16(half_t x) __z88dk_fastcall;
+extern uint32_t __LIB__ u32_f16(half_t x) __z88dk_fastcall;
+
+extern half_t __LIB__ f16_i8(int8_t x) __z88dk_fastcall;
+extern half_t __LIB__ f16_i16(int16_t x) __z88dk_fastcall;
+extern half_t __LIB__ f16_i32(int32_t x) __z88dk_fastcall;
+extern half_t __LIB__ f16_u8(uint8_t x) __z88dk_fastcall;
+extern half_t __LIB__ f16_u16(uint16_t x) __z88dk_fastcall;
+extern half_t __LIB__ f16_u32(uint32_t x) __z88dk_fastcall;
 
 /* Arithmetic functions */
-extern half_t __LIB__ f16_add(half_t x,half_t y) __smallc;
-extern half_t __LIB__ f16_sub(half_t x,half_t y) __smallc;
-extern half_t __LIB__ f16_mul(half_t x,half_t y) __smallc;
-extern half_t __LIB__ f16_div(half_t x,half_t y) __smallc;
+extern half_t __LIB__ addf16(half_t x,half_t y) __smallc;
+extern half_t __LIB__ subf16(half_t x,half_t y) __smallc;
+extern half_t __LIB__ mulf16(half_t x,half_t y) __smallc;
+extern half_t __LIB__ divf16(half_t x,half_t y) __smallc;
 
-extern half_t __LIB__ f16_fma(half_t x,half_t y,half_t z) __smallc;
+extern half_t __LIB__ fmaf16(half_t x,half_t y,half_t z) __smallc;
+extern half_t __LIB__ polyf16(half_t x,float d[],uint16_t n) __smallc;
+extern half_t __LIB__ hypotf16(half_t x,half_t y) __smallc;
 
 /* Power functions */
-extern half_t __LIB__ f16_sqrt(half_t x);
-extern half_t __LIB__ f16_div2(half_t x);
-extern half_t __LIB__ f16_mul2(half_t x);
-extern half_t __LIB__ f16_mul10(half_t x);
+extern half_t __LIB__ sqrtf16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ div2f16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ mul2f16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ mul10f16(half_t x) __z88dk_fastcall;
+
+/* Trigonometric functions */
+extern half_t __LIB__ acosf16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ asinf16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ atanf16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ cosf16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ sinf16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ tanf16(half_t x) __z88dk_fastcall;
+
+/* Exponential, logarithmic and power functions */
+extern half_t __LIB__ expf16 (half_t x) __z88dk_fastcall;
+extern half_t __LIB__ exp2f16 (half_t x) __z88dk_fastcall;
+extern half_t __LIB__ exp10f16 (half_t x) __z88dk_fastcall;
+extern half_t __LIB__ logf16 (half_t x) __z88dk_fastcall;
+extern half_t __LIB__ log2f16 (half_t x) __z88dk_fastcall;
+extern half_t __LIB__ log10f16 (half_t x) __z88dk_fastcall;
+extern half_t __LIB__ powf16 (half_t x, half_t y) __smallc;
 
 /* Nearest integer, absolute value, and remainder functions */
-extern half_t __LIB__ f16_ceil(half_t x);
-extern half_t __LIB__ f16_floor(half_t x);
-#define f16_trunc(a) (a>0.?f16_floor(a):f16_ceil(a))
-#define f16_round(a) (a>0.?f16_floor(a+0.5):f16_ceil(a-0.5))
-#define f16_rint(a) f16_ceil(a)
+extern half_t __LIB__ ceilf16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ floorf16(half_t x) __z88dk_fastcall;
+#define truncf16(a) (a>0.?floorf16(a):ceilf16(a))
+#define roundf16(a) (a>0.?floorf16(a+0.5):ceilf16(a-0.5))
+#define rintf16(a) ceilf16(a)
 
 /* Manipulation */
-extern half_t __LIB__ f16_frexp(half_t x, int *pw2) __smallc;
-extern half_t __LIB__ f16_ldexp(half_t x, int pw2) __smallc;
-#define scalbn(x,pw2) ldexp(x,pw2)
+extern half_t __LIB__ frexpf16(half_t x, int8_t *pw2) __smallc;
+extern half_t __LIB__ ldexpf16(half_t x, int16_t pw2) __smallc;
+#define scalbnf16(x,pw2) ldexpf16(x,pw2)
 
 /* Intrinsic functions */
-extern half_t __LIB__ f16_inv(half_t a);
-extern half_t __LIB__ f16_invsqrt(half_t a);
+extern half_t __LIB__ invf16(half_t a) __z88dk_fastcall;
+extern half_t __LIB__ invsqrtf16(half_t a) __z88dk_fastcall;
 
 /* General */
-extern half_t __LIB__ f16_fabs(half_t x);
-extern half_t __LIB__ f16_neg(half_t x);
-
-/* Classification functions */
-#define FP_NORMAL   0
-#define FP_ZERO     1
-#define FP_NAN      2
-#define FP_INFINITE 3
-#define FP_SUBNORMAL 4
-extern int __LIB__ classify(half_t x);
-#define isinf(x) ( classify(x) == FP_INFINITE )
-#define isnan(x) ( classify(x) == FP_NAN )
-#define isnormal(x) 1
-#define isfinite(x) ( classify(x) == FP_NORMAL )
+extern half_t __LIB__ fabsf16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ negf16(half_t x) __z88dk_fastcall;
 
 #endif
 

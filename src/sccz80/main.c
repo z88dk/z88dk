@@ -117,7 +117,6 @@ static option  sccz80_opts[] = {
     { 0, "fp-mantissa-size", OPT_INT, "=<num> FP mantissa size (default: 5 bytes)", &c_fp_mantissa_bytes, NULL, 0 },
     { 0, "fp-mode=z80", OPT_ASSIGN|OPT_INT, "Use 48 bit doubles", &c_maths_mode, NULL, MATHS_Z80 },
     { 0, "fp-mode=ieee", OPT_ASSIGN|OPT_INT, "Use 32 bit IEEE doubles", &c_maths_mode, NULL, MATHS_IEEE },
-    { 0, "fp-mode=ieee16", OPT_ASSIGN|OPT_INT, "Use 16 bit IEEE doubles", &c_maths_mode, NULL, MATHS_IEEE16 },
     { 0, "fp-mode=mbf32", OPT_ASSIGN|OPT_INT, "Use 32 bit Microsoft Binary format", &c_maths_mode, NULL, MATHS_MBFS },
     { 0, "fp-mode=mbf40", OPT_ASSIGN|OPT_INT, "Use 40 bit Microsoft binary format", &c_maths_mode, NULL, MATHS_MBF40 },
     { 0, "fp-mode=mbf64", OPT_ASSIGN|OPT_INT, "Use 64 bit Microsoft binary format", &c_maths_mode, NULL, MATHS_MBF64 },
@@ -251,12 +250,6 @@ int main(int argc, char** argv)
         c_fp_exponent_bias = 126;
         c_fp_mantissa_bytes = 3;
         WriteDefined("CLIB_32BIT_FLOATS", 1);
-    } else if ( c_maths_mode == MATHS_IEEE16 ) {
-        c_fp_size = 2;
-        type_double = &(Type){ KIND_DOUBLE, 2, 0, .len=1 }; 
-        c_fp_exponent_bias = 14;
-        c_fp_mantissa_bytes = 2; 
-        WriteDefined("CLIB_16BIT_FLOATS", 1);
     } else if ( c_maths_mode == MATHS_MBFS ) {
         c_fp_size = 4;
         type_double = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
@@ -291,7 +284,7 @@ int main(int argc, char** argv)
     litlab = getlabel(); /* Get labels for function lits*/
     openout(); /* get the output file */
     openin(); /* and initial input file */
-    header(); /* intro code */
+    gen_file_header(); /* intro code */
     parse(); /* process ALL input */
     /* dump literal queues, with label */
     /* litq starts from 1, so literp has to be -1 */
@@ -299,7 +292,7 @@ int main(int argc, char** argv)
     write_double_queue();
     dumpvars();
     dumpfns();
-    trailer(); /* follow-up code */
+    gen_file_footer(); /* follow-up code */
     closeout();
     errsummary(); /* summarize errors */
     if (errcnt)
@@ -558,7 +551,7 @@ void dumpvars()
     /* Start at the start! */
     outstr("; --- Start of Static Variables ---\n\n");
 
-    output_section(c_bss_section); // output_section("bss");
+    gen_switch_section(c_bss_section); // gen_switch_section("bss");
 
     for ( ptr = symtab; ptr != NULL; ptr = ptr->hh.next ) {
         if (ptr->name[0] != '0' ) {
@@ -577,7 +570,7 @@ void dumpvars()
                 continue;
             if ( ptr->ctype->size == -1 )
                 continue;
-            if ( ptr->bss_section ) output_section(ptr->bss_section);
+            if ( ptr->bss_section ) gen_switch_section(ptr->bss_section);
             prefix();
             outname(ptr->name, 1);
             col();
@@ -588,7 +581,7 @@ void dumpvars()
     }
 
     /* Switch back to standard section */
-    output_section(c_code_section); // output_section("code");
+    gen_switch_section(c_code_section); // gen_switch_section("code");
 }
 
 /*
@@ -605,7 +598,7 @@ void dumplits(
 
     if (queueptr) {
         if (pr_label) {
-            output_section(c_rodata_section); // output_section("text");
+            gen_switch_section(c_rodata_section); // gen_switch_section("text");
             prefix();
             queuelabel(queuelab);
             col();
@@ -665,7 +658,7 @@ void dumplits(
                 }
             }
         }
-        //output_section(c_code_section); // output_section("code");
+        //gen_switch_section(c_code_section); // gen_switch_section("code");
     }
 }
 
@@ -967,6 +960,8 @@ static void opt_code_speed(option *arg, char* val)
             c_speed_optimisation |= OPT_LONG_COMPARE;
         } else if ( strncmp(ptr, "ucharmult", 9) == 0 ) {
             c_speed_optimisation |= OPT_UCHAR_MULT;
+        } else if ( strncmp(ptr, "floatconst", 10) == 0 ) {
+            c_speed_optimisation |= OPT_DOUBLE_CONST;
         }
     } while ( (ptr = strchr(ptr, ',')) != NULL );
 }

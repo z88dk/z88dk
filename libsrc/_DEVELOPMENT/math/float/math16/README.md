@@ -3,9 +3,9 @@
 
 This is the z88dk 16-bit IEEE-754 standard math16 half precision floating point maths package, designed to work with the SCCZ80 IEEE-754 half precision 16-bit interfaces.
   
-This library is designed for z80, z180, and z80n processors. Specifically, it is optimised for the z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate the floating point mantissa calculation.
+This library is designed for z80, z180, and z80n processors. Specifically, it is optimised for the z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate the floating point mantissa calculation. This library is also designed to be as fast as possible on the z80 processor.
 
-This library is also designed to be as fast as possible on the z80 processor.
+The specialised nature of 16-bit floating point implies that this is an adjunct or special purpose library. It can be used to accelerate the calculation of floating point, where the results are only needed to 3.5 significant digits. Applications can include video games, or neural networks, for example.
 
 *@feilipu, May 2020*
 
@@ -24,6 +24,8 @@ This library is also designed to be as fast as possible on the z80 processor.
   *  Mantissa calculations are done with 16-bits (11-bits plus 5-bits for rounding). Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
 
   *  All functions are calculated with an 8-bit exponent and 16-bit internal mantissa calculation path, as this is a natural size for the z80, to provide the maximum accuracy when repeated multiplications and additions are required.
+
+  *  Compiles natively with sccz80. Variables and constants with the type `half_t` can be used naturally in C expressions, including comparisons and arithmetic operations.
 
 
 ## IEEE-754 Half Precision Floating Point Format
@@ -153,13 +155,30 @@ Contains the zsdcc and the sccz80 C compiler interface and is implemented using 
 
 Glue that connects the compilers and standard assembly interface to the `math16` library.  The purpose is to define aliases that connect the standard names to the math16 specific names.  These functions make up the complete z88dk `math16` maths library that is linked against on the compile line as `-lmath16`.
 
-An alias is provided to simplify usage of the library. `--math16` provides all the required linkages and definitions, as a simple alternative to `-Cc-fp-mode=ieee16 -Cc-D__MATH_MATH16 -D__MATH_MATH16 -lmath16 -pragma-define:CLIB_16BIT_FLOAT=1`.
+An alias is provided to simplify usage of the library. `--math16` provides all the required linkages and definitions, as a simple command line alternative to `-lmath16 -Cc-D__MATH_MATH16 -D__MATH_MATH16 -pragma-define:CLIB_16BIT_FLOAT=1`.
 
 ## Function Discussion
 
 There are essentially two different grades of functions in this library. Those intrinsic functions written in assembly code in the expanded floating point domain, where the sign, exponent, and mantissa are handled separately. And those written in assembly code, in the floating point domain but using intrinsic functions, where floating point numbers are passed as expanded 4 byte values using the internal `f24` format.
 
 The expanded floating point format is a useful tool for creating functions, as complex functions can be written quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `inv()`, `fma()` and the `poly()` functions.
+
+For the `poly()` function, I decided to use `_f32` float format for the coefficients (rather than `_f16` half format), for a couple of reasons.
+
+```c
+half_t polyf16(const half_t x, const float_t d[], uint16_t n)
+{
+  float_t res = d[n];  /* where n is the maximum coefficient index. Same as the C index. */
+
+  while(n)
+    res = res * x + d[--n];
+    return res;
+}
+```
+
+- Accuracy. The `poly()` function uses the `_f24` format (16-bit mantissa) internally for multiply-add. Using IEEE float coefficients (with 24-bit mantissa) provides the most accuracy that the function can consume.
+- Performance. Converting the coefficients from `_f32` to `_f24` for calculations is faster than converting from `_f16` to `_f24`, even though more bytes are stored.
+- Convenience. There are already tables of `_f32` coefficients proven for math32, so it is much easier to just reuse them.
 
 ## Licence
 

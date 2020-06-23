@@ -792,13 +792,12 @@ void raw2wav(char *wavfile)
     strcpy(rawfilename,wavfile);
 
     if ( (fpin=fopen(wavfile,"rb") ) == NULL ) {
-        fprintf(stderr,"Can't open file %s for wave conversion\n",wavfile);
-        myexit(NULL,1);
+        exit_log(1,"Can't open file %s for wave conversion\n",wavfile);
     }
 
     if (fseek(fpin,0,SEEK_END)) {
        fclose(fpin);
-       myexit("Couldn't determine size of file\n",1);
+       exit_log(1,"Couldn't determine size of file\n",1);
     }
 
     len=ftell(fpin);
@@ -806,8 +805,7 @@ void raw2wav(char *wavfile)
     suffix_change(wavfile,".wav");
 
     if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
-        fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
-        myexit(NULL,1);
+        exit_log(1,"Can't open output raw audio file %s\n",wavfile);
     }
 
     /* Now let's think at the WAV file */
@@ -857,13 +855,12 @@ void raw2wav_22k(char *wavfile, int mode)
     strcpy(rawfilename,wavfile);
 
     if ( (fpin=fopen(wavfile,"rb") ) == NULL ) {
-        fprintf(stderr,"Can't open file %s for wave conversion\n",wavfile);
-        myexit(NULL,1);
+        exit_log(1,"Can't open file %s for wave conversion\n",wavfile);
     }
 
     if (fseek(fpin,0,SEEK_END)) {
        fclose(fpin);
-       myexit("Couldn't determine size of file\n",1);
+       exit_log(1,"Couldn't determine size of file\n");
     }
 
     len=ftell(fpin)/2;
@@ -871,8 +868,7 @@ void raw2wav_22k(char *wavfile, int mode)
     suffix_change(wavfile,".wav");
 
     if ( (fpout=fopen(wavfile,"wb") ) == NULL ) {
-        fprintf(stderr,"Can't open output raw audio file %s\n",wavfile);
-        myexit(NULL,1);
+        exit_log(1,"Can't open output raw audio file %s\n",wavfile);
     }
 
     /* Now let's think at the WAV file */
@@ -997,8 +993,7 @@ int hexdigit(char digit)
         return digit - '0';
     }
 
-    fprintf(stderr,"\nError in patch string\n");
-    myexit(NULL,1);
+    exit_log(1,"\nError in patch string\n");
     return 0; /* Not reached */
 }
 

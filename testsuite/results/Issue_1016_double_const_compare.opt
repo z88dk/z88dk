@@ -9,53 +9,54 @@
 	SECTION	code_compiler
 
 ._main
-	ld	hl,i_2+0
-	call	dldpsh
+	ld	hl,0	;const
+	call	l_int2long_u_float
+	call	dpush
 	ld	hl,0	;const
 	add	hl,sp
 	call	dldpsh
 	ld	hl,4	;const
-	call	l_int2long_s_float
+	call	l_int2long_u_float
 	call	dswap
 	call	dlt
 	ld	a,h
 	or	l
-	jp	z,i_3
+	jp	z,i_2
 	ld	hl,i_1+0
 	push	hl
 	ld	a,1
 	call	printf
 	pop	bc
-	jp	i_4
-.i_3
+	jp	i_3
+.i_2
 	ld	hl,i_1+6
 	push	hl
 	ld	a,1
 	call	printf
 	pop	bc
-.i_4
+.i_3
 	ld	hl,0	;const
 	add	hl,sp
 	call	dldpsh
-	ld	hl,i_6+0
-	call	dload
+	ld	hl,4	;const
+	call	l_int2long_u_float
 	call	dgt
 	ld	a,h
 	or	l
-	jp	z,i_5
+	jp	z,i_4
 	ld	hl,i_1+0
 	push	hl
 	ld	a,1
 	call	printf
 	pop	bc
-	jp	i_7
-.i_5
+	jp	i_5
+.i_4
 	ld	hl,i_1+6
 	push	hl
 	ld	a,1
 	call	printf
 	pop	bc
-.i_7
+.i_5
 	pop	bc
 	pop	bc
 	pop	bc
@@ -76,12 +77,6 @@
 	defm	""
 	defb	0
 
-.i_2
-	;0.000000
-	defb	0x00,0x00,0x00,0x00,0x00,0x00
-.i_6
-	;4.000000
-	defb	0x00,0x00,0x00,0x00,0x00,0x83
 
 
 	SECTION	bss_compiler

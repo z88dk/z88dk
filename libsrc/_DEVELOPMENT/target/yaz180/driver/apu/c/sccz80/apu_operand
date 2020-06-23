@@ -7,9 +7,9 @@
 
 SECTION code_driver
 
-PUBLIC _apu_opp
+PUBLIC  apu_opp
 
-EXTERN asm_am9511a_opp
+EXTERN  asm_am9511a_opp
 
 ;       cmd - This is the APU command to load either 16 bit or 32 bit operand. uint8 (C)
 ;       bank- This is the operand bank, relative to the current bank. int8 (B)
@@ -30,7 +30,7 @@ EXTERN asm_am9511a_opp
 ;           ret high
 ;           ret low
 
-_apu_opp:
+apu_opp:
     pop af                  ; collect ret address
     pop de                  ; addr in DE
     pop bc                  ; bank in BC

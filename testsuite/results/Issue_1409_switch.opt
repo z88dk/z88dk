@@ -15,8 +15,10 @@
 	push	bc
 .i_4
 	call	l_case
-	defw	i_5,1
-	defw	i_6,3
+	defw	i_5
+	defw	1
+	defw	i_6
+	defw	3
 	defw	0
 	jp	i_3
 .i_5

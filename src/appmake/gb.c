@@ -104,7 +104,7 @@ int gb_exec(char *target)
     rewind(fpin);
 
     memset(memory, romfill, 0x8000);
-    fread(memory, sizeof(memory[0]), main_length, fpin);
+    if (main_length != fread(memory, sizeof(memory[0]), main_length, fpin)){ fclose(fpin); exit_log(1, "Could not required data from <%s>\n",binname); }
     fclose(fpin);
 
     len = 0x8000;
@@ -119,7 +119,7 @@ int gb_exec(char *target)
             memset(memory + (i * 0x4000), romfill, 0x4000);
 
             fprintf(stderr, "Adding bank 0x%02X ", i);
-            fread(memory + (i * 0x4000), 0x4000, 1, fpin);
+            if (1 != fread(memory + (i * 0x4000), 0x4000, 1, fpin)) { fclose(fpin); exit_log(1, "Could not required data from <%s>\n",filename); }
 
             if (!feof(fpin)) {
                 fseek(fpin, 0, SEEK_END);

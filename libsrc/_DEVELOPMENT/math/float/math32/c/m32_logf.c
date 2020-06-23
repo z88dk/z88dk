@@ -31,8 +31,8 @@
  *
  * ERROR MESSAGES:
  *
- * logf singularity:  x = 0; returns MINLOG
- * logf domain:       x < 0; returns MINLOG
+ * logf singularity:  x = 0; returns MINLOG_F32
+ * logf domain:       x < 0; returns MINLOG_F32
  */
 
 /*
@@ -55,7 +55,7 @@ float m32_logf (float x) __z88dk_fastcall
     /* Test for domain */
     if( x <= 0.0 )
     {
-        return( HUGE_NEG_F );
+        return( HUGE_NEG_F32 );
     }
 
     x = m32_frexpf(x, &e);

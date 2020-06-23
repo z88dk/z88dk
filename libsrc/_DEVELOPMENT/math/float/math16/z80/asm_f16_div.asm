@@ -59,13 +59,11 @@ PUBLIC asm_f24_div_callee
 .asm_f16_div_callee
     call asm_f24_f16            ; expand to dehl
     call asm_f24_inv
-
     exx                         ; 1/y   d'  = eeeeeeee e' = s-------
                                 ;       hl' = 1mmmmmmm mmmmmmmm
-
-    pop bc                      ; pop return address
-    pop hl                      ; get second operand off of the stack
-    push bc                     ; return address on stack
+    pop hl                      ; pop return address
+    ex (sp),hl                  ; get second operand off of the stack,
+                                ; return address on stack
     call asm_f24_f16            ; expand to dehl
                                 ; x      d  = eeeeeeee e  = s-------
                                 ;        hl = 1mmmmmmm mmmmmmmm

@@ -21,7 +21,7 @@ To compile for a minimal C128 without CP/M:
 		40 SYS 65488:END
 
 To compile for CP/M:
-	zcc +cpm -lc128cpm -lndos -lmalloc sgdemo.c
+	zcc +cpm -lc128cpm -lndos sgdemo.c
 
 */
 
@@ -50,7 +50,7 @@ extern char rawsound[];
 #endasm
 
 /* Added for "malloc" with z88dk */
-extern long heap(60000);
+long heap;
 
 /* 64k vdc locations */
 

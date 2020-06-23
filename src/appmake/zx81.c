@@ -110,13 +110,11 @@ int zx81_exec(char* target)
         }
 
         if (strcmp(binname, filename) == 0) {
-            fprintf(stderr, "Input and output file names must be different\n");
-            myexit(NULL, 1);
+            exit_log(1, "Input and output file names must be different\n");
         }
 
         if ((fpin = fopen_bin(binname, NULL)) == NULL) {
-            fprintf(stderr, "Can't open input file %s\n", binname);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open input file %s\n", binname);
         }
 
         /*
@@ -125,7 +123,7 @@ int zx81_exec(char* target)
 	 */
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file\n", 1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
 
         len = ftell(fpin);
@@ -134,8 +132,7 @@ int zx81_exec(char* target)
 
         if ((fpout = fopen(filename, "wb")) == NULL) {
             fclose(fpin);
-            fprintf(stderr, "Can't open output file %s\n", filename);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open output file %s\n", filename);
         }
 
         /* Write out the '.P' or '.O' file */
@@ -520,13 +517,12 @@ int zx81_exec(char* target)
     /* ***************************************** */
     if ((audio) || (fast) || (khz_22)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
-            fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open file %s for wave conversion\n", filename);
         }
 
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file\n", 1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
         len = ftell(fpin);
         fseek(fpin, 0L, SEEK_SET);
@@ -534,8 +530,7 @@ int zx81_exec(char* target)
         strcpy(wavfile, filename);
         suffix_change(wavfile, ".RAW");
         if ((fpout = fopen(wavfile, "wb")) == NULL) {
-            fprintf(stderr, "Can't open output raw audio file %s\n", wavfile);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open output raw audio file %s\n", wavfile);
         }
 
         /* leading silence */

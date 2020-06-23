@@ -11,21 +11,15 @@
 #define _FLOAT_T_DEFINED
 
    #ifdef __CLANG
-   
    typedef float float_t;
-   
    #endif
 
    #ifdef __SDCC
-   
    typedef float float_t;
-   
    #endif
    
    #ifdef __SCCZ80
-   
    typedef double float_t;
-   
    #endif
    
 #endif
@@ -34,29 +28,27 @@
 #define _DOUBLE_T_DEFINED
 
    #ifdef __CLANG
-   
    typedef float double_t;
-   
    #endif
 
    #ifdef __SDCC
-   
    typedef float double_t;
-   
    #endif
    
    #ifdef __SCCZ80
-   
    typedef double double_t;
-   
    #endif
    
 #endif
 
-#ifndef _HALF_FLOAT_T
-#define _HALF_FLOAT_T
+#ifndef _FLOAT16_T_DEFINED
+#define _FLOAT16_T_DEFINED
 
-typedef short half_t;           /* IEEE16 half float type */
+   #ifndef __SCCZ80
+   typedef short _Float16;      /* IEEE-754 half float type */  
+   #endif
+
+typedef _Float16 half_t;
 
 #endif
 
@@ -110,39 +102,42 @@ typedef short half_t;           /* IEEE16 half float type */
 
 #ifdef __MATH_MATH32
 
-#define HUGE_POS_F             (float)+3.4028234664E+38
-#define TINY_POS_F             (float)+1.1754943508E−38
-#define HUGE_NEG_F             (float)-1.7014118346E+38
-#define TINY_NEG_F             (float)-1.1754943508E-38
+#define HUGE_POS_F32           (float)+3.4028234664E+38
+#define TINY_POS_F32           (float)+1.1754943508E−38
+#define HUGE_NEG_F32           (float)-1.7014118346E+38
+#define TINY_NEG_F32           (float)-1.1754943508E-38
 
-#define INFINITY_POS_F         ((unsigned long)0x7F800000)
-#define INFINITY_NEG_F         ((unsigned long)0xFF800000)
+#define MAXL2_F32              ((float)+127.999999914)
+#define MINL2_F32              ((float)-126.0)
+#define MAXLOG_F32             ((float)+88.722839052)
+#define MINLOG_F32             ((float)−87.336544751)
+#define MAXL10_F32             ((float)+38.230809449)
+#define MINL10_F32             ((float)−37.929779454)
 
-#define MAXL2_F                ((float)+127.999999914)
-#define MINL2_F                ((float)-126.0)
-#define MAXLOG_F               ((float)+88.722839052)
-#define MINLOG_F               ((float)−87.336544751)
-#define MAXL10_F               ((float)+38.230809449)
-#define MINL10_F               ((float)−37.929779454)
+#define HUGE_VAL_F32           ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32       ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32       ((unsigned long)0xFF800000)
 
 #endif
 
 #ifdef __MATH_MATH16
 
-#define HUGE_POS_HF            (short)0x7BFF        /*  +6.5504E+4 */
-#define TINY_POS_HF            (short)0x0400        /*  +6.1035E-5 */
-#define HUGE_NEG_HF            (short)0xFBFF        /*  -6.5504E+4 */
-#define TINY_NEG_HF            (short)0x8400        /*  -6.1035E-5 */
 
-#define INFINITY_POS_HF        (short)0x7C00
-#define INFINITY_NEG_HF        (short)0xFC00
+#define HUGE_POS_F16            (0x7BFF)        /*  +6.5504E+4 */
+#define TINY_POS_F16            (0x0400)        /*  +6.1035E-5 */
+#define HUGE_NEG_F16            (0xFBFF)        /*  -6.5504E+4 */
+#define TINY_NEG_F16            (0x8400)        /*  -6.1035E-5 */
 
-#define MAXL2_HF               (short)0x4BFF        /*  +15.99    */
-#define MINL2_HF               (short)0xCB00        /*  -14.00    */
-#define MAXLOG_HF              (short)0x498B        /*  +11.086   */
-#define MINLOG_HF              (short)0xC8DA        /*  -9.700    */       
-#define MAXL10_HF              (short)0x44D1        /*  +4.816    */
-#define MINL10_HF              (short)0xC437        /*  -4.215    */
+#define MAXL2_F16               (0x4BFF)        /*  +15.99    */
+#define MINL2_F16               (0xCB00)        /*  -14.00    */
+#define MAXLOG_F16              (0x498B)        /*  +11.086   */
+#define MINLOG_F16              (0xC8DA)        /*  -9.700    */       
+#define MAXL10_F16              (0x44D1)        /*  +4.816    */
+#define MINL10_F16              (0xC437)        /*  -4.215    */
+
+#define HUGE_VAL_F16            (0x7C00)
+#define INFINITY_POS_F16        (0x7C00)
+#define INFINITY_NEG_F16        (0xFC00)
 
 #endif
 
@@ -377,121 +372,176 @@ extern double_t poly(const float x,const float d[],unsigned int n);
 
 #ifdef __MATH_MATH16
 
-extern half_t f16_f16_f32(float x);
+extern half_t f16_f48(double_t x);
 
 
-extern float f16_f32_f16(half_t x);
+extern double_t f48_f16(half_t x);
 
 
 
-extern int16_t f16_i16_f16(half_t x);
+extern half_t f16_f32(float_t x);
 
 
-extern uint16_t f16_u16_f16(half_t x);
+extern float_t f32_f16(half_t x);
 
 
-extern int32_t f16_i32_f16(half_t x);
 
+extern int16_t i16_f16(half_t x);
 
-extern uint32_t f16_u32_f16(half_t x);
 
+extern uint16_t u16_f16(half_t x);
 
 
-extern half_t f16_f16_i8(int8_t x);
+extern int32_t i32_f16(half_t x);
 
 
-extern half_t f16_f16_i16(int16_t x);
+extern uint32_t u32_f16(half_t x);
 
 
-extern half_t f16_f16_i32(int32_t x);
 
+extern half_t f16_i8(int8_t x);
 
-extern half_t f16_f16_u8(uint8_t x);
 
+extern half_t f16_i16(int16_t x);
 
-extern half_t f16_f16_u16(uint16_t x);
 
+extern half_t f16_i32(int32_t x);
 
-extern half_t f16_f16_u32(uint32_t x);
 
+extern half_t f16_u8(uint8_t x);
 
 
-extern half_t f16_add(half_t x,half_t y);
+extern half_t f16_u16(uint16_t x);
 
 
-extern half_t f16_sub(half_t x,half_t y);
+extern half_t f16_u32(uint32_t x);
 
 
-extern half_t f16_mul(half_t x,half_t y);
 
+extern half_t addf16(half_t x,half_t y);
 
-extern half_t f16_div(half_t x,half_t y);
 
+extern half_t subf16(half_t x,half_t y);
 
 
-extern half_t f16_fma(half_t x,half_t y,half_t z);
+extern half_t mulf16(half_t x,half_t y);
 
 
+extern half_t divf16(half_t x,half_t y);
 
-extern half_t f16_inv(half_t x);
 
 
-extern half_t f16_invsqrt(half_t x);
+extern half_t fmaf16(half_t x,half_t y,half_t z);
 
 
+extern half_t polyf16(half_t x,float_t d[],uint16_t n);
 
-extern half_t f16_sqrt(half_t x);
 
+extern half_t hypotf16(half_t x,half_t y);
 
 
-extern half_t f16_div2(half_t x);
 
+extern half_t invf16(half_t x);
 
-extern half_t f16_mul2(half_t x);
 
+extern half_t invsqrtf16(half_t x);
 
-extern half_t f16_mul10(half_t x);
 
 
-extern half_t f16_frexp(half_t x,int8_t *exp);
+extern half_t sqrtf16(half_t x);
 
 
-extern half_t f16_ldexp(half_t x,int16_t exp);
 
+extern half_t div2f16(half_t x);
 
 
-extern half_t f16_fabs(half_t x);
+extern half_t mul2f16(half_t x);
 
 
-extern half_t f16_neg(half_t x);
+extern half_t mul10f16(half_t x);
 
 
-extern half_t f16_ceil(half_t x);
+extern half_t frexpf16(half_t x,int8_t *exp);
 
 
-extern half_t f16_floor(half_t x);
+extern half_t ldexpf16(half_t x,int16_t exp);
 
 
 
-extern int f16_isgreater(half_t x,half_t y);
+extern half_t acosf16(half_t x);
 
 
-extern int f16_isgreaterequal(half_t x,half_t y);
+extern half_t asinf16(half_t x);
 
 
-extern int f16_isless(half_t x,half_t y);
+extern half_t atanf16(half_t x);
 
 
-extern int f16_islessequal(half_t x,half_t y);
 
+extern half_t cosf16(half_t x);
 
-extern int f16_islessgreater(half_t x,half_t y);
 
+extern half_t sinf16(half_t x);
 
-extern int f16_isnotequal(half_t x,half_t y);
 
+extern half_t tanf16(half_t x);
 
-extern int f16_isunordered(half_t x,half_t y);
+
+
+extern half_t expf16(half_t x);
+
+
+extern half_t exp2f16(half_t x);
+
+
+extern half_t exp10f16(half_t x);
+
+
+extern half_t logf16(half_t x);
+
+
+extern half_t log2f16(half_t x);
+
+
+extern half_t log10f16(half_t x);
+
+
+extern half_t powf16(half_t x,half_t y);
+
+
+
+extern half_t fabsf16(half_t x);
+
+
+extern half_t negf16(half_t x);
+
+
+extern half_t ceilf16(half_t x);
+
+
+extern half_t floorf16(half_t x);
+
+
+
+extern int isgreaterf16(half_t x,half_t y);
+
+
+extern int isgreaterequalf16(half_t x,half_t y);
+
+
+extern int islessf16(half_t x,half_t y);
+
+
+extern int islessequalf16(half_t x,half_t y);
+
+
+extern int islessgreaterf16(half_t x,half_t y);
+
+
+extern int isnotequalf16(half_t x,half_t y);
+
+
+extern int isunorderedf16(half_t x,half_t y);
 
 
 

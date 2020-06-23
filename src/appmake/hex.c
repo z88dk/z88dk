@@ -68,13 +68,11 @@ int hex_exec(char *target)
 	}
 
     if ( (input=fopen_bin(binname, crtfile) ) == NULL ) {
-        perror("Error opening input file");
-        myexit(NULL,1);
+        exit_log(1,"Error opening input file <%s>\n",binname);
     }
 
     if ( (output = fopen(filename,"w") ) == NULL ) {
-        perror("Error opening output file");
-        myexit(NULL,1);
+        exit_log(1,"Error opening output file <%s>\n",filename);
     }
 
     // check if section CODE extends past fence

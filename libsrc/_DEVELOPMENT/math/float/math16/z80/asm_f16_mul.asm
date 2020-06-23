@@ -55,11 +55,11 @@ PUBLIC asm_f24_mul_f24
 ; enter here for floating asm_f16_mul_callee, x+y, x on stack, y in hl, result in hl
 .asm_f16_mul_callee
     call asm_f24_f16            ; expand to dehl
-    exx                         ; y     d  = eeeeeeee e = s-------
-                                ;       hl = 1mmmmmmm mmmmmmmm
-    pop bc                      ; pop return address
-    pop hl                      ; get second operand off of the stack
-    push bc                     ; return address on stack
+    exx                         ; y    d'  = eeeeeeee e = s-------
+                                ;      hl' = 1mmmmmmm mmmmmmmm
+    pop hl                      ; pop return address
+    ex (sp),hl                  ; get second operand off of the stack,
+                                ; return address on stack
     call asm_f24_f16            ; expand to dehl
                                 ; x     d  = eeeeeeee e = s-------
                                 ;       hl = 1mmmmmmm mmmmmmmm
@@ -134,10 +134,10 @@ PUBLIC asm_f24_mul_f24
     jr Z,mulovl
 
 .fm3
-    ex de,hl                     ; put 16 bit mantissa in place, de into hl
-    ld a,d                       ; capture 8 rounding bits
+    ex de,hl                    ; put 16 bit mantissa in place, de into hl
+    ld a,d                      ; capture 8 rounding bits
 
-    or a                         ; round
+    and a,0F0h                  ; check for 4 lost bits rounding
     jr Z,fm4
     set 0,l
 

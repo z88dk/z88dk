@@ -15,12 +15,15 @@
 	EXTERN		__MODE2_attr
 	EXTERN		__MODE3_attr
 
-	EXTERN		gr_setpalette
-	EXTERN		gr_vscroll
-	EXTERN		swapgfxbk
-	EXTERN		swapgfxbk1
 
-	INCLUDE		"target/cpm/def/tiki100.def"
+		EXTERN		gr_setpalette
+		EXTERN		gr_vscroll
+		EXTERN		swapgfxbk
+		EXTERN		swapgfxbk1
+
+		defc 		SCREEN_LAST_ROW = $7c00
+
+		INCLUDE		"target/cpm/def/tiki100.def"
 
 
 ; c = x
@@ -220,10 +223,10 @@ generic_console_scrollup:
 	push	bc
 	push	de
 	ld	a,-8
-	call	gr_vscroll
+ 	call	gr_vscroll
 	call	swapgfxbk
-	ld	hl,$7C00
-	ld	de,$7C01
+	ld	hl,SCREEN_LAST_ROW
+	ld	de,SCREEN_LAST_ROW+1
 	ld	(hl),0
 	ld	bc,1023
 	ldir

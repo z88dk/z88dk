@@ -1,15 +1,15 @@
 
 	SECTION	code_fp_math16
-	PUBLIC	f16_ldexp
+	PUBLIC	ldexpf16
 	EXTERN	cm16_sccz80_ldexp
 
-	defc	f16_ldexp = cm16_sccz80_ldexp
+	defc	ldexpf16 = cm16_sccz80_ldexp
 
 
 ; SDCC bridge for Classic
 IF __CLASSIC
-PUBLIC _f16_ldexp
+PUBLIC _ldexpf16
 EXTERN cm16_sdcc_ldexp
-defc _f16_ldexp = cm16_sdcc_ldexp
+defc _ldexpf16 = cm16_sdcc_ldexp
 ENDIF
 

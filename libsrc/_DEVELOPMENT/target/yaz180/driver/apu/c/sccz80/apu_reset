@@ -5,8 +5,8 @@
 
     SECTION code_driver
 
-    PUBLIC _apu_reset
+    PUBLIC  apu_reset
 
-    Extern asm_am9511a_reset
+    EXTERN  asm_am9511a_reset
 
-    defc _apu_reset   =  asm_am9511a_reset
+    defc apu_reset   =  asm_am9511a_reset

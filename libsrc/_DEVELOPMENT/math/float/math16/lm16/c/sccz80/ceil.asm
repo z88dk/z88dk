@@ -1,15 +1,15 @@
 
 	SECTION	code_fp_math16
-	PUBLIC	f16_ceil
+	PUBLIC	ceilf16
 	EXTERN	asm_f16_ceil
 
-	defc	f16_ceil = asm_f16_ceil
+	defc	ceilf16 = asm_f16_ceil
 
 
 ; SDCC bridge for Classic
 IF __CLASSIC
-PUBLIC _f16_ceil
+PUBLIC _ceilf16
 EXTERN cm16_sdcc_ceil
-defc _f16_ceil = cm16_sdcc_ceil
+defc _ceilf16 = cm16_sdcc_ceil
 ENDIF
 

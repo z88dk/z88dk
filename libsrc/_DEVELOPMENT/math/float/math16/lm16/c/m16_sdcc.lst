@@ -13,8 +13,12 @@ math/float/math16/lm16/c/sdcc/fma
 math/float/math16/lm16/c/sdcc/fma_callee
 math/float/math16/lm16/c/sdcc/frexp
 math/float/math16/lm16/c/sdcc/frexp_callee
+math/float/math16/lm16/c/sdcc/hypot
+math/float/math16/lm16/c/sdcc/hypot_callee
 math/float/math16/lm16/c/sdcc/inv
 math/float/math16/lm16/c/sdcc/inv_fastcall
+math/float/math16/lm16/c/sdcc/invsqrt
+math/float/math16/lm16/c/sdcc/invsqrt_fastcall
 math/float/math16/lm16/c/sdcc/ldexp
 math/float/math16/lm16/c/sdcc/ldexp_callee
 math/float/math16/lm16/c/sdcc/mul2
@@ -23,6 +27,10 @@ math/float/math16/lm16/c/sdcc/mul10
 math/float/math16/lm16/c/sdcc/mul10_fastcall
 math/float/math16/lm16/c/sdcc/neg
 math/float/math16/lm16/c/sdcc/neg_fastcall
+math/float/math16/lm16/c/sdcc/poly
+math/float/math16/lm16/c/sdcc/poly_callee
+math/float/math16/lm16/c/sdcc/sqrt
+math/float/math16/lm16/c/sdcc/sqrt_fastcall
 
 math/float/math16/lm16/c/sdcc/___h2schar
 math/float/math16/lm16/c/sdcc/___h2schar_callee

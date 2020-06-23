@@ -225,27 +225,24 @@ int sorcerer_exec(char* target)
             blockname = binname;
 
         if (strcmp(binname, filename) == 0) {
-            fprintf(stderr, "Input and output file names must be different\n");
-            myexit(NULL, 1);
+            exit_log(1, "Input and output file names must be different\n");
         }
 
         if (origin != -1) {
             pos = origin;
         } else {
             if ((pos = get_org_addr(crtfile)) == -1) {
-                myexit("Could not find parameter ZORG (not z88dk compiled?)\n", 1);
+                exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
             }
         }
 
         if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-            fprintf(stderr, "Can't open input file %s\n", binname);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open input file %s\n", binname);
         }
 
         if (fseek(fpin, 0, SEEK_END)) {
-            fprintf(stderr, "Couldn't determine size of file\n");
             fclose(fpin);
-            myexit(NULL, 1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
 
         len = ftell(fpin);
@@ -254,7 +251,7 @@ int sorcerer_exec(char* target)
 
         if ((fpout = fopen(filename, "wb")) == NULL) {
             fclose(fpin);
-            myexit("Can't open output file\n", 1);
+            exit_log(1,"Can't open output file\n");
         }
 
         /* HEADER */
@@ -357,13 +354,12 @@ int sorcerer_exec(char* target)
     /* ***************************************** */
     if ((audio) || (fast) || (bps300) || (khz_22) || (loud)) {
         if ((fpin = fopen(filename, "rb")) == NULL) {
-            fprintf(stderr, "Can't open file %s for wave conversion\n", filename);
-            myexit(NULL, 1);
+            exit_log(1,"Can't open file %s for wave conversion\n", filename);
         }
 
         if (fseek(fpin, 0, SEEK_END)) {
             fclose(fpin);
-            myexit("Couldn't determine size of file\n", 1);
+            exit_log(1,"Couldn't determine size of file\n");
         }
         len = ftell(fpin);
         fseek(fpin, 0, SEEK_SET);
@@ -373,8 +369,7 @@ int sorcerer_exec(char* target)
         suffix_change(wavfile, ".RAW");
 
         if ((fpout = fopen(wavfile, "wb")) == NULL) {
-            fprintf(stderr, "Can't open output raw audio file %s\n", wavfile);
-            myexit(NULL, 1);
+            exit_log(1, "Can't open output raw audio file %s\n", wavfile);
         }
 
         /* leading silence and tone*/

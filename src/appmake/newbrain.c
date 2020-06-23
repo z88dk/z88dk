@@ -61,14 +61,13 @@ int newbrain_exec()
         pos = origin;
     } else {
 		if ( (pos = get_org_addr(crtfile)) == -1 ) {
-            myexit("Could not find parameter ZORG (not z88dk compiled?)\n",1);
+            exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
         }
     }
 
 
 	if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
-        fprintf(stderr,"Can't open input file %s\n",binname);
-        myexit(NULL,1);
+        exit_log(1,"Can't open input file %s\n",binname);
     }
 
 
@@ -78,7 +77,7 @@ int newbrain_exec()
  */
     if  (fseek(fpin,0,SEEK_END)) {
         fclose(fpin);
-        myexit("Couldn't determine size of file\n",1);
+        exit_log(1,"Couldn't determine size of file\n");
     }
 
     len=ftell(fpin);
@@ -92,8 +91,7 @@ int newbrain_exec()
             /* All in a BASIC program */
 
             if ( (fpout=fopen(filename,"w") ) == NULL ) {
-                printf("Can't open output text format file %s\n",filename);
-                myexit(NULL,1);
+                exit_log(1,"Can't open output text format file %s\n",filename);
             }
                     
             fprintf(fpout,"10 IF TOP>%i THEN RESERVE TOP-%i\n",pos-1,pos-1);
@@ -127,8 +125,7 @@ int newbrain_exec()
             suffix_change(filename,".dat");
         
             if ( (fpout2=fopen(filename,"wb") ) == NULL ) {
-                printf("Can't open output dat Binary file %s\n",filename);
-                myexit(NULL,1);
+                exit_log(1,"Can't open output dat Binary file %s\n",filename);
             }
 
             checksum=0x3b;                 /* Init checksum */
@@ -183,8 +180,7 @@ int newbrain_exec()
             suffix_change(filename,".tmp");
 
             if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-                printf("Can't open temp output file %s\n",filename);
-                myexit(NULL,1);
+                exit_log(1,"Can't open temp output file %s\n",filename);
             }
 
             fputc(0x0d,fpout);
@@ -283,13 +279,12 @@ int newbrain_exec()
             /* Now convert in tape format */
 
             if ( (fpin=fopen(filename,"rb") ) == NULL ) {
-                fprintf(stderr,"Can't read temp file%s\n",binname);
-                myexit(NULL,1);
+                exit_log(1,"Can't read temp file%s\n",binname);
             }
 
             if  (fseek(fpin,0,SEEK_END)) {
                 fclose(fpin);
-                myexit("Couldn't determine size of temp file\n",1);
+                exit_log(1,"Couldn't determine size of temp file\n");
             }
         
             len=ftell(fpin);
@@ -297,8 +292,7 @@ int newbrain_exec()
             suffix_change(filename,".bas");
         
             if ( (fpout2=fopen(filename,"wb") ) == NULL ) {
-                printf("Can't open output BASIC Binary file %s\n",filename);
-                myexit(NULL,1);
+                exit_log(1,"Can't open output BASIC Binary file %s\n",filename);
             }
                 
             /* header for binary block */
@@ -342,8 +336,7 @@ int newbrain_exec()
             /* TAPE directory */
             
             if ( (fpout=fopen("_dir.txt","w") ) == NULL ) {
-                printf("Can't open output text format file %s\n",filename);
-                myexit(NULL,1);
+                exit_log(1,"Can't open output text format file %s\n",filename);
             }
             fprintf(fpout,"%s\n",filename);
             suffix_change(filename,".dat");

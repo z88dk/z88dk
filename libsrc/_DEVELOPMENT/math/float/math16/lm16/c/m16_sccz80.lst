@@ -6,11 +6,16 @@ math/float/math16/lm16/c/sccz80/fma
 math/float/math16/lm16/c/sccz80/fma_callee
 math/float/math16/lm16/c/sccz80/frexp
 math/float/math16/lm16/c/sccz80/frexp_callee
-math/float/math16/lm16/c/sccz80/inv
+math/float/math16/lm16/c/sccz80/hypot
+math/float/math16/lm16/c/sccz80/hypot_callee
+math/float/math16/lm16/c/sccz80/invsqrt
 math/float/math16/lm16/c/sccz80/ldexp
 math/float/math16/lm16/c/sccz80/ldexp_callee
 math/float/math16/lm16/c/sccz80/mul2
 math/float/math16/lm16/c/sccz80/mul10
+math/float/math16/lm16/c/sccz80/poly
+math/float/math16/lm16/c/sccz80/poly_callee
+math/float/math16/lm16/c/sccz80/sqrt
 math/float/math16/lm16/c/sccz80/l_f16_fabs
 math/float/math16/lm16/c/sccz80/l_f16_add
 math/float/math16/lm16/c/sccz80/l_f16_conv_int

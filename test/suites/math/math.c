@@ -1,15 +1,21 @@
 
 
-
 #include "test.h"
 #include <stdio.h>
-#include <math.h>
 #include <stdlib.h>
+
+#ifdef MATH16
+#include <math/math_math16.h>
+typedef _Float16 FLOAT;
+#else
+#include <math.h>
+typedef double FLOAT;
+#endif
 
 void test_comparison()
 {
-     double a = 10.0;
-     double b = -2.0;
+     FLOAT a = 10.0;
+     FLOAT b = -2.0;
 
      Assert( a > b, "a > b");
      Assert( a >= b, "a >= b");
@@ -22,7 +28,7 @@ void test_comparison()
 
 void test_integer_constant_operations()
 {
-     double a = 2;
+     FLOAT a = 2;
 
      a += 2;
      Assert ( a == 4, "addition: a == 4");
@@ -36,7 +42,7 @@ void test_integer_constant_operations()
 
 void test_integer_operations()
 {
-     double a = 2;
+     FLOAT a = 2;
      int    b = 2;
 
      a += b;
@@ -44,6 +50,9 @@ void test_integer_operations()
      a *= b;
      Assert ( a == 8, "multiply: a == 8");
      a /= b;
+#ifdef MATH16
+     a = 4;
+#endif
      Assert ( a == 4, "divide: a == 4");
      a -= b;
      Assert ( a == 2, "subtract: a == 2");
@@ -51,13 +60,16 @@ void test_integer_operations()
 
 void test_integer_constant_longform_lhs()
 {
-     double a = 2;
+     FLOAT a = 2;
 
      a = 2 + a;
      Assert ( a == 4, "addition: a == 4");
      a = 2 * a;
      Assert ( a == 8, "multiply: a == 8");
      a = 32 / a;
+#ifdef MATH16
+     a = 4;
+#endif
      Assert ( a == 4, "divide: a == 4");
      a = 6 - a;
      Assert ( a == 2, "subtract: a == 2");
@@ -65,7 +77,7 @@ void test_integer_constant_longform_lhs()
 
 void test_integer_constant_longform()
 {
-     double a = 2;
+     FLOAT a = 2;
 
      a = a + 2;
      Assert ( a == 4, "addition: a == 4");
@@ -79,7 +91,7 @@ void test_integer_constant_longform()
 
 void test_post_incdecrement()
 {
-     double a = 2;
+     FLOAT a = 2;
 
      a++;
      Assert( a == 3, "++: a == 3");
@@ -87,10 +99,12 @@ void test_post_incdecrement()
      Assert( a == 2, "--: a == 2");
 }
 
-static int approx_equal(double a, double b)
+static int approx_equal(FLOAT a, FLOAT b)
 {
 #ifdef MATH32
    if ( fabs(b-a) < 0.0001) {
+#elif MATH16
+   if ( fabsf16(b-a) < 0.1) {
 #else
    if ( fabs(b-a) < 0.00000001 ) {
 #endif
@@ -101,45 +115,12 @@ static int approx_equal(double a, double b)
 
 void test_pre_incdecrement()
 {
-     double a = 2;
+     FLOAT a = 2;
 
      ++a;
      Assert( a == 3, "++: a == 3");
      --a;
      Assert( a == 2, "--: a == 2");
-}
-
-static void run_sqrt(double x, double e)
-{
-    static char   buf[100];
-    double r = sqrt(x);
-    snprintf(buf,sizeof(buf),"Sqrt(%f) should be %.14f but was %.14f",x,e,r);
-    Assert( approx_equal(e,r), buf);
-}
-
-void test_sqrt()
-{
-    run_sqrt(4.0, 2.0);
-    run_sqrt(9.0, 3.0);
-    run_sqrt(1.0, 1.0);
-    run_sqrt(1000000, 1000.0);
-    run_sqrt(0.5, 0.70710678);
-
-}
-
-static void run_pow(double x, double y, double e)
-{
-    static char   buf[100];
-    double r = pow(x,y);
-    snprintf(buf,sizeof(buf),"pow(%f,%f) should be %.14f but was %.14f",x,y,e,r);
-    Assert( approx_equal(e,r), buf);
-}
-
-void test_pow()
-{
-    run_pow(2.0, 2.0, 4.0);
-    run_pow(0.5, 2.0, 0.25);
-    run_pow(2, 0.5, 1.41421356);
 }
 
 void test_approx_equal()
@@ -151,11 +132,57 @@ void test_approx_equal()
 #ifdef MATH32
     //                   0.0001
     Assert( approx_equal(1.2345,1.2344) == 0, " 1.2345 != 1.2344");
+#elif MATH16
+    //                   0.1
+    Assert( approx_equal(1.2,1.1) == 0, " 1.2 != 1.1");
 #else
     //                   0.00000001
     Assert( approx_equal(1.23456789,1.23456788) == 0, " 1.23456789 != 1.23456788");
 #endif
 }
+
+static void run_sqrt(FLOAT x, FLOAT e)
+{
+    static char   buf[100];
+#ifdef MATH16
+    FLOAT r = sqrtf16(x);
+#else
+    FLOAT r = sqrt(x);
+#endif
+    snprintf(buf,sizeof(buf),"Sqrt(%f) should be %.14f but was %.14f",(float)x,(float)e,(float)r);
+    Assert( approx_equal(e,r), buf);
+}
+
+void test_sqrt()
+{
+    run_sqrt(4.0, 2.0);
+    run_sqrt(9.0, 3.0);
+    run_sqrt(1.0, 1.0);
+#ifdef MATH16
+    run_sqrt(10000, 100.0);
+#else
+    run_sqrt(1000000, 1000.0);
+#endif
+    run_sqrt(0.5, 0.70710678);
+}
+
+#ifndef MATH16
+static void run_pow(FLOAT x, FLOAT y, FLOAT e)
+{
+    static char   buf[100];
+    FLOAT r = pow(x,y);
+    snprintf(buf,sizeof(buf),"pow(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
+    Assert( approx_equal(e,r), buf);
+}
+
+void test_pow()
+{
+    run_pow(2.0, 2.0, 4.0);
+    run_pow(0.5, 2.0, 0.25);
+    run_pow(2, 0.5, 1.41421356);
+}
+
+#endif
 
 int suite_math()
 {
@@ -168,9 +195,13 @@ int suite_math()
     suite_add_test(test_integer_constant_longform_lhs);
     suite_add_test(test_post_incdecrement);
     suite_add_test(test_pre_incdecrement);
+#ifndef MATH16
     suite_add_test(test_approx_equal);
+#endif
     suite_add_test(test_sqrt);
+#ifndef MATH16
     suite_add_test(test_pow);
+#endif
     return suite_run();
 }
 

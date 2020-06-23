@@ -122,20 +122,19 @@ int rex_exec(char *target)
     }
 
 	if ( (binfile=fopen_bin(binname, crtfile) ) == NULL ) {
-        fprintf(stderr,"Couldn't open binary file: %s\n",binname);
-        myexit(NULL,1);
+        exit_log(1,"Couldn't open binary file: %s\n",binname);
     }
 
     /* Now we have to do the program length */
     if (fseek(binfile, 0, SEEK_END)) {
         fclose(binfile);
-        myexit("Couldn't determine the size of binary file\n",1);
+        exit_log(1,"Couldn't determine the size of binary file\n");
     }
     filesize = ftell(binfile);
 
     if ( filesize > 65536L ) {
         fclose(binfile);
-        myexit("The source binary is over 65,536 bytes in length\n",1);
+        exit_log(1,"The source binary is over 65,536 bytes in length\n");
     }
 
     fseek(binfile, 0, SEEK_SET);
@@ -143,8 +142,7 @@ int rex_exec(char *target)
 
     if ( (fp = fopen(output_name,"wb")) == NULL ) {
         fclose(binfile);
-        fprintf(stderr,"Couldn't open output file: %s\n",output_name);
-        myexit(NULL,1);
+        exit_log(1,"Couldn't open output file: %s\n",output_name);
     }
     fprintf(fp,"ApplicationName:Addin\r\n");
     fprintf(fp,"%s\r\n",application_name);
@@ -228,7 +226,7 @@ static void icon_form(char *filen)
             c = fgetc(fp);
 
             if ( c == EOF ) {
-                myexit("Icon file too short\n",1);
+                exit_log(1,"Icon file too short\n");
             }
             if ( c == '\n' || c=='\r')
                 continue;

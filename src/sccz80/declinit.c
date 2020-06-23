@@ -22,9 +22,9 @@ int initials(const char *dropname, Type *type)
     if ( (type->isconst && !c_double_strings) ||
         ( (ispointer(type) || type->kind == KIND_ARRAY) && 
 		(type->ptr->isconst || ((ispointer(type->ptr) || type->ptr->kind == KIND_ARRAY) && type->ptr->ptr->isconst) ) ) ) {
-        output_section(get_section_name(type->namespace,c_rodata_section));
+        gen_switch_section(get_section_name(type->namespace,c_rodata_section));
     } else {
-        output_section(get_section_name(type->namespace,c_data_section));
+        gen_switch_section(get_section_name(type->namespace,c_data_section));
     }
     prefix();
     outname(dropname, YES);
@@ -47,7 +47,7 @@ int initials(const char *dropname, Type *type)
         desize = init(type, 1);
     }
 
-    output_section(c_code_section); 
+    gen_switch_section(c_code_section); 
     return (desize);
 }
 
@@ -254,7 +254,6 @@ static int init(Type *type, int dump)
             return 2;
         }
     } else {
-        // TODO....
         /* djm, catch label names in structures (for (*name)() initialisation */
         char sname[NAMESIZE];
         SYMBOL *ptr;
@@ -329,13 +328,18 @@ constdecl:
                     if ( c_double_strings ) { 
                         output_double_string_load(value);
                     } else {
-                        dofloat(value, fa);
+                        dofloat(c_maths_mode,value, fa);
                         defbyte();
                         for ( i = 0; i < c_fp_size; i++ ) {
                             if ( i ) outbyte(',');
                             outdec(fa[i]);
                         }
                     }
+                } else if (type->kind == KIND_FLOAT16) {
+                    unsigned char  fa[MAX_MANTISSA_SIZE+1];
+                    dofloat(MATHS_IEEE16, value, fa);
+                    defword();
+                    outdec(fa[1] << 8 | fa[0]);
                 } else if (type->kind == KIND_LONG ){
                     /* there appears to be a bug in z80asm regarding defq */
                     defbyte();
@@ -371,12 +375,11 @@ constdecl:
                     unsigned char  fa[6];
                     int            i;
 
-                    decrement_double_ref_direct(value);
                     /* It was a float, lets parse the float and then dump it */
                       if ( c_double_strings ) {
                         output_double_string_load(value);
                     } else {
-                        dofloat(value, fa);
+                        dofloat(c_maths_mode,value, fa);
                         for ( i = 0; i < c_fp_size; i++ ) {
                             stowlit(fa[i], 1);
                         }
@@ -398,13 +401,17 @@ static void output_double_string_load(double value)
     int   dumplocation = getlabel();
     LVALUE lval;
 
+    lval.val_type = KIND_DOUBLE;
+
     postlabel(dumplocation);
     defstorage(); outdec(6); nl();
     
-    output_section(c_init_section);
+    gen_switch_section(c_init_section);
     lval.const_val = value;
-    load_double_into_fa(&lval);
+    lval.val_type = KIND_DOUBLE;
+    lval.ltype = type_double;
+    load_constant(&lval);
     immedlit(dumplocation,0); nl();
     callrts("dstore");
-    output_section(c_data_section);
+    gen_switch_section(c_data_section);
 }

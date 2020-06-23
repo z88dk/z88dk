@@ -3,8 +3,8 @@
 
     PUBLIC  l_f16_div
 
-    PUBLIC  f16_div
-    PUBLIC  f16_div_callee
+    PUBLIC  divf16
+    PUBLIC  divf16_callee
 
     EXTERN  asm_f16_div_callee
 
@@ -13,6 +13,6 @@
 
     defc l_f16_div = asm_f16_div_callee
 
-    defc f16_div = cm16_sccz80_div
-    defc f16_div_callee = cm16_sccz80_div_callee
+    defc divf16 = cm16_sccz80_div
+    defc divf16_callee = cm16_sccz80_div_callee
 

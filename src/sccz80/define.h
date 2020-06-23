@@ -54,6 +54,8 @@ typedef enum {
     MODE_CAST
 } decl_mode;
 
+
+
 typedef enum {
     KIND_NONE,
     KIND_VOID,
@@ -72,10 +74,14 @@ typedef enum {
     KIND_PORT8,
     KIND_PORT16,
     KIND_ENUM,
-    KIND_CARRY
+    KIND_CARRY,
+    KIND_FLOAT16,
 } Kind;
 
+#define kind_is_floating(x)  ( (x) == KIND_DOUBLE || (x) == KIND_FLOAT16)
 #define kind_is_integer(k) ( k == KIND_CHAR || k == KIND_INT || k == KIND_SHORT || k == KIND_LONG )
+
+#define get_float_type(k) (k == KIND_DOUBLE || k == KIND_FLOAT) ? type_double : type_float16
 
 typedef struct {
     size_t    size;
@@ -128,7 +134,7 @@ struct type_s {
     UT_hash_handle hh;
 };
 
-extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double;
+extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double, *type_float16;
 
 
 enum ident_type {
@@ -153,7 +159,7 @@ enum storage_type {
 enum symbol_flags {
         FLAGS_NONE = 0,
     //    UNSIGNED = 1,
-        FARPTR = 0x02,
+    //    FARPTR = 0x02,
         FARACC = 0x04,
         FASTCALL = 0x08,     /* for certain lib calls only */
         CALLEE = 0x40,      /* Called function pops regs */
@@ -403,7 +409,8 @@ enum optimisation {
         OPT_SUB32          = (1 << 4),
         OPT_INT_COMPARE    = (1 << 5),
         OPT_LONG_COMPARE   = (1 << 6),
-        OPT_UCHAR_MULT     = (1 << 7)
+        OPT_UCHAR_MULT     = (1 << 7),
+        OPT_DOUBLE_CONST   = (1 << 8)
 };
 
 enum maths_mode {
@@ -413,7 +420,7 @@ enum maths_mode {
     MATHS_MBF40, // 40 bit Microsoft 
     MATHS_MBF64, // 64 bit Microsoft double precision
     MATHS_Z88,   // Special handling for z88 (subtype of MATHS_Z80)
-    MATHS_IEEE16, // 16 bit ieee
+    MATHS_IEEE16, // Used for _Float16
 };
 
 

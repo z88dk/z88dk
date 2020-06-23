@@ -2,6 +2,5 @@ target/yaz180/driver/apu/c/sccz80/apu_init
 target/yaz180/driver/apu/c/sccz80/apu_reset
 target/yaz180/driver/apu/c/sccz80/apu_check_idle
 target/yaz180/driver/apu/c/sccz80/apu_command
-target/yaz180/driver/apu/c/sccz80/apu_command_fastcall
 target/yaz180/driver/apu/c/sccz80/apu_operand
 target/yaz180/driver/apu/c/sccz80/apu_operand_callee
