@@ -25,19 +25,14 @@ EXTERN asm_f16_poly
 
     pop hl                      ; (float*)d
     pop de                      ; (uint16_t)n
-
     push af                     ; my return
-    push de                     ; (uint16_t)n
-    push hl                     ; (float*)d
-    exx
 
-    push hl                     ; (half_t)x
     call asm_f16_poly
 
-    pop af                      ; my return
-    push af
-    push af
-    push af
-    push af
+    pop bc                      ; my return
+    push bc
+    push bc
+    push bc
+    push bc
     ret
 

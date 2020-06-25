@@ -52,9 +52,10 @@ EXTERN asm_f24_nan
 EXTERN asm_f24_mul_f24
 EXTERN asm_f24_add_f24
 
+PUBLIC asm_f16_poly_callee
 PUBLIC asm_f16_poly
 
-.asm_f16_poly
+.asm_f16_poly_callee
     ; evaluation of a polynomial function
     ;
     ; enter : stack = uint16_t n, float_t d[], half_t x, ret
@@ -72,8 +73,9 @@ PUBLIC asm_f16_poly
     pop hl                      ; count n
     push af                     ; return on stack
 
+.asm_f16_poly
     ld b,l                      ; mask n to uint8_t in b, because that's got to be enough coefficients.
-    push bc                     ; copy of n on stack in MSW
+    push bc                     ; copy of n on stack in MSB
     dec hl                      ; count of (float_t)d[n-1]
 
     add hl,hl                   ; point at float_t d[] relative index
@@ -82,9 +84,9 @@ PUBLIC asm_f16_poly
     exx
 
     call asm_f24_f16            ; expand half_t x to f24
-    push de                     ; (f24)x on stack
+    push de                     ; (f24) x on stack
     push hl
-    exx                         ; (f24)x in dehl'
+    exx                         ; (f24) x in dehl'
 
     push hl                     ; absolute table index on stack
 
@@ -103,16 +105,14 @@ PUBLIC asm_f16_poly
     inc hl
     ld d,(hl)
     inc hl
-    ld c,(hl)
+    ld a,(hl)
     inc hl
-    ld b,(hl)                   ; sdcc_float_t res = d[n] in bcde
-    push bc                     ; sdcc_float_t res = d[n] on stack
-    push de
-                                ; (f24)x in dehl'
-.poly0
-    pop hl                      ; d[n]
-    pop de
-    call asm_f24_f32
+    ld h,(hl)
+    ld l,a
+    ex de,hl                    ; sdcc_float_t res = d[n] in dehl
+    call asm_f24_f32            ; (f24) d[n] in dehl
+
+.poly0                          ; (f24) x in dehl'
     call asm_f24_mul_f24
     exx                         ; x * res => dehl'
 
@@ -153,9 +153,9 @@ PUBLIC asm_f16_poly
     push hl                     ; push d[--n] msw to stack
     push de                     ; push d[--n] lsw to stack
 
-    push bc                     ; x msw on stack for this iteration
-    push af                     ; x lsw on stack for this iteration
-    exx
-
+    ld d,b                      ; (f24) x msw
+    ld e,c
+    push af                     ; (f24) r1x lsw 
+    pop hl
     jp poly0
 

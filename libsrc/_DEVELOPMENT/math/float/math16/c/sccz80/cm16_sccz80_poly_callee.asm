@@ -19,7 +19,7 @@ EXTERN asm_f16_poly
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    pop af                      ; my return
+    pop bc                      ; my return
     pop hl                      ; (uint16_t)n
     pop de                      ; (float*)d
     exx
@@ -27,11 +27,6 @@ EXTERN asm_f16_poly
     pop hl                      ; (half_t)x
     exx
 
-    push hl                     ; (uint16_t)n
-    push de                     ; (float*)d
-    exx
-
-    push hl                     ; (half_t)x
-    push af                     ; my return
+    push bc                     ; my return
     jp asm_f16_poly
 

@@ -4,7 +4,7 @@
 extern float f16_coeff_sin_a[];
 extern float f16_coeff_sin_b[];
 
-half_t m32_sinf (half_t f)
+half_t sinf16 (half_t f)
 {
     half_t    y, y_squared;
     int16_t    sect, e;
@@ -16,7 +16,7 @@ half_t m32_sinf (half_t f)
     }
     else
         sect = 0;
-    f *= .63661977237;
+    f *= 0.63661977237;
     if(f > 4.0)
         f -= mul2f16( mul2f16( floorf16( div2f16( div2f16(f) )) ));
     if(f > 2.0)

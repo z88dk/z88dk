@@ -31,7 +31,7 @@
 
 #include "math16.h"
 
-half_t powf16 (half_t x, half_t y) __smallc
+half_t powf16 (half_t x, half_t y)
 {
     if(x <= 0.0) return (half_t)0.0;
     if(y == 0.0) return (half_t)1.0;

@@ -5,7 +5,7 @@ SECTION code_fp_math16
 
 PUBLIC cm16_sdcc_poly_callee
 
-EXTERN asm_f16_poly
+EXTERN asm_f16_poly_callee
 
     ; evaluation of a polynomial function
     ;
@@ -17,4 +17,4 @@ EXTERN asm_f16_poly
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
 
-DEFC cm16_sdcc_poly_callee = asm_f16_poly
+DEFC cm16_sdcc_poly_callee = asm_f16_poly_callee
