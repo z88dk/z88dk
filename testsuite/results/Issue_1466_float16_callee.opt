@@ -1,0 +1,94 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+.powf16
+	GLOBAL	_powf16
+._powf16
+	ld	hl,4	;const
+	call	l_gintspsp	;
+	ld	hl,0	;const
+	call	l_f16_le
+	ld	a,h
+	or	l
+	jp	z,i_2
+	ld	hl,0	;const
+	pop	bc
+	pop	af
+	pop	af
+	push	bc
+	ret
+
+
+.i_2
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,0	;const
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_3
+	ld	hl,15360	;const
+	pop	bc
+	pop	af
+	pop	af
+	push	bc
+	ret
+
+
+.i_3
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,15360	;const
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_4
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	pop	bc
+	pop	af
+	pop	af
+	push	bc
+	ret
+
+
+.i_4
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	call	logf16
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	call	l_f16_mul
+	call	expf16
+	pop	bc
+	pop	af
+	pop	af
+	push	bc
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	expf16
+	GLOBAL	logf16
+	GLOBAL	powf16
+
+
+
+

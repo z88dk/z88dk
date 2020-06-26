@@ -1315,6 +1315,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     if (callee_cleanup) {
         int bcused = 0;
 
+
         savesp = Zsp;
         Zsp = -stackargs;
 
@@ -1335,11 +1336,11 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
         if ( bcused ) {
             ol("push\tbc");
-            Zsp -= 2;
         } else {
             push("hl");
             ol("ld\thl,(saved_hl)");
          }
+         Zsp = savesp;
     }
     gen_pop_frame(); /* Restore previous frame pointer */
 

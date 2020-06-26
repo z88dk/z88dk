@@ -1797,7 +1797,7 @@ static void declfunc(Type *functype, enum storage_type storage)
         }
         /* do a statement, but if it's a return, skip */
         /* cleaning up the stack */
-        gen_leave_function(NO, NO, 0);
+        gen_leave_function(KIND_NONE, NO, 0);
     }
     goto_cleanup();
     function_appendix(currfn);
