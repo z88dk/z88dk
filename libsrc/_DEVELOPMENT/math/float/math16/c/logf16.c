@@ -31,8 +31,9 @@
  *
  * ERROR MESSAGES:
  *
- * logf singularity:  x = 0; returns MINLOG_F32
- * logf domain:       x < 0; returns MINLOG_F32
+ * logf singularity:  x = 0; returns HUGE_NEG_F16
+ * logf domain:       x < 0; returns HUGE_NEG_F16
+ * MAXLOG_F16         0x498B     /*  +11.086   */
  */
 
 /*
@@ -43,8 +44,6 @@
  
 #include "math16.h"
 
-#define SQRTHF   ((half_t)0.70710678118654752440)
-
 half_t __LIB__ logf16 (half_t x) __smallc __z88dk_fastcall;
 
 half_t logf16 (half_t x)
@@ -54,14 +53,12 @@ half_t logf16 (half_t x)
 
     /* Test for domain */
     if( x <= 0.0 )
-    {
         return( HUGE_NEG_F16 );
-    }
 
     /* separate mantissa from exponent */
     x = frexpf16(x, &e);
 
-    if( x < SQRTHF )
+    if( x < (half_t)M_SQRT1_2 )
     {
         --e;
         x = mul2f16(x) - (half_t)1.0; /*  2x - 1  */

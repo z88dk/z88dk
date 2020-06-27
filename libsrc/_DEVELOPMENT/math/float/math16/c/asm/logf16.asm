@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 10:38:33 2020
+;	Module compile time: Sat Jun 27 14:48:11 2020
 
 
 	C_LINE	0,"logf16.c"
@@ -14,6 +14,7 @@
 	INCLUDE "z80_crt0.hdr"
 
 
+	C_LINE	37,"logf16.c"
 	C_LINE	0,"math16.h"
 	C_LINE	0,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/stdint.h"
 	C_LINE	8,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/stdint.h"
@@ -199,15 +200,15 @@
 	C_LINE	626,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/math.h"
 	C_LINE	627,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/math.h"
 	C_LINE	35,"math16.h"
-	C_LINE	44,"logf16.c"
-	C_LINE	48,"logf16.c"
-	C_LINE	50,"logf16.c"
+	C_LINE	45,"logf16.c"
+	C_LINE	47,"logf16.c"
+	C_LINE	49,"logf16.c"
 	SECTION	code_compiler
 
 ; Function logf16 flags 0x00000288 __smallc __z88dk_fastcall 
 ; _Float16 half_tlogf16(_Float16 x)
 ; parameter '_Float16 x' at 2 size(2)
-	C_LINE	51,"logf16.c::logf16"
+	C_LINE	50,"logf16.c::logf16"
 .logf16
 	GLOBAL	_logf16
 ._logf16

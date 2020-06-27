@@ -37,8 +37,10 @@
  * ERROR MESSAGES:
  *
  *   message           condition     value returned
- * expf underflow    x < MINLOG_F32        0.0
- * expf overflow     x > MAXLOG_F32    HUGE_POS_F32
+ * expf underflow    x < MINLOG_F16        0.0
+ * expf overflow     x > MAXLOG_F16    HUGE_POS_F16
+ *
+ * IEEE single arithmetic: MAXLOG_F16 =  +11.086
  *
  */
  
@@ -60,20 +62,14 @@ half_t expf16 (half_t x)
 {
     half_t z;
 
-#if 0
-    if( x > MAXL10_F16)
-    {
+    if( x > MAXLOG_F16)
         return( HUGE_POS_F16 );
-    }
 
-    if( x < MINL10_F16 )
-    {
-        return(0.0);
-    }
-#endif
+    if( x < MINLOG_F16 )
+        return((half_t)0.0);
 
-	if( x == 0.0 )
-		return (half_t)1.0;
+    if( x == 0.0 )
+        return (half_t)1.0;
 
     z = floorf16( x * LOG2EF + (half_t)0.5 );
 

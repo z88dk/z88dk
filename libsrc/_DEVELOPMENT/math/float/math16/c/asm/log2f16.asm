@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 10:38:32 2020
+;	Module compile time: Sat Jun 27 14:48:10 2020
 
 
 	C_LINE	0,"log2f16.c"
@@ -14,6 +14,7 @@
 	INCLUDE "z80_crt0.hdr"
 
 
+	C_LINE	40,"log2f16.c"
 	C_LINE	0,"math16.h"
 	C_LINE	0,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/stdint.h"
 	C_LINE	8,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/stdint.h"
@@ -199,7 +200,7 @@
 	C_LINE	626,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/math.h"
 	C_LINE	627,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/math.h"
 	C_LINE	35,"math16.h"
-	C_LINE	47,"log2f16.c"
+	C_LINE	48,"log2f16.c"
 	C_LINE	52,"log2f16.c"
 	C_LINE	54,"log2f16.c"
 	SECTION	code_compiler

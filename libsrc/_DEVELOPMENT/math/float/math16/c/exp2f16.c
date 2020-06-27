@@ -1,4 +1,4 @@
-/*	Base 2 exponential function
+/*    Base 2 exponential function
  *
  *
  * SYNOPSIS:
@@ -50,10 +50,10 @@
  * ERROR MESSAGES:
  *
  *   message         condition      value returned
- * exp underflow    x < -MAXL2_F32          0.0
- * exp overflow     x > MAXL2_F32        HUGE_POS_F32
+ * exp underflow    x < -MAXL2_F16          0.0
+ * exp overflow     x > MAXL2_F16        HUGE_POS_F16
  *
- * For IEEE arithmetic, MAXL2_F32 = 127.
+ * For IEEE arithmetic, MAXL2_F16 = 15.99.
  */
 
 
@@ -70,20 +70,15 @@ extern float f16_coeff_exp2[];
 half_t exp2f16 (half_t x)
 {
     half_t z;
-#if 0
+
     if( x > MAXL2_F16 )
-    {
-	    return( HUGE_POS_F16 );
-    }
+        return( HUGE_POS_F16 );
 
     if( x < MINL2_F16 )
-    {
-	    return((half_t)0.0);
-    }
-#endif
+        return((half_t)0.0);
 
-	if( x == 0.0 )
-		return (half_t)1.0;
+    if( x == 0.0 )
+        return (half_t)1.0;
 
     /* separate into integer and fractional parts */
     z = floorf16( x + (half_t)0.5 );

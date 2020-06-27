@@ -30,9 +30,9 @@
  *
  * ERROR MESSAGES:
  *
- * log10f singularity:  x = 0; returns -MAXL10
- * log10f domain:       x < 0; returns -MAXL10
- * MAXL10_F32 = 38.230809449325611792
+ * log10f singularity:  x = 0; returns -HUGE_NEG_F16
+ * log10f domain:       x < 0; returns -HUGE_NEG_F16
+ * MAXL10_F16           0x44D1      /*  +4.816    */
  */
 
 /*
@@ -42,8 +42,6 @@ Direct inquiries to 30 Frost Street, Cambridge, MA 02140
 */
 
 #include "math16.h"
-
-#define SQRTHF      ((half_t) 0.70710678118654752440)
 
 #define L102A       ((half_t) 3.0078125E-1)
 #define L102B       ((half_t) 2.48745663981195213739E-4)
@@ -59,16 +57,14 @@ half_t log10f16 (half_t x)
 
     /* Test for domain */
     if( x <= 0.0 )
-    {
         return( HUGE_NEG_F16 );
-    }
 
     /* separate mantissa from exponent */
     x = frexpf16( x, &e );
 
     /* logarithm using log(1+x) = x - .5x**2 + x**3 P(x) */
 
-    if( x < SQRTHF )
+    if( x < (half_t)M_SQRT1_2 )
     {
         --e;
         x = mul2f16(x) - (half_t)1.0; /*  2x - 1  */
@@ -78,7 +74,7 @@ half_t log10f16 (half_t x)
         x -= (half_t)1.0;
     }
 
-    z = x * x;
+    z = x*x;
     
     y = polyf16( x, f16_coeff_log, 9) * z;
     

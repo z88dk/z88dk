@@ -34,8 +34,9 @@
  *
  * ERROR MESSAGES:
  *
- * log singularity:  x = 0; returns MINLOG_F32/log(2)
- * log domain:       x < 0; returns MINLOG_F32/log(2)
+ * log singularity:  x = 0; returns HUGE_NEG_F16
+ * log domain:       x < 0; returns HUGE_NEG_F16
+ * MAXL2_F16         0x4BFF     /*  +15.99    */
  */
 
 /*
@@ -46,7 +47,6 @@ Direct inquiries to 30 Frost Street, Cambridge, MA 02140
 
 #include "math16.h"
 
-#define SQRTHF      ((half_t) 0.70710678118654752440)
 #define LOG2EA      ((half_t) 0.44269504088896340735992)
 
 extern float f16_coeff_log[];
@@ -58,16 +58,14 @@ half_t log2f16 (half_t x)
 
     /* Test for domain */
     if( x <= 0.0 )
-    {
         return( HUGE_NEG_F16 );
-    }
 
     /* separate mantissa from exponent */
     x = frexpf16( x, &e );
 
     /* logarithm using log(1+x) = x - .5x**2 + x**3 P(x)/Q(x) */
 
-    if( x < SQRTHF )
+    if( x < (half_t)M_SQRT1_2 )
     {
         --e;
         x = mul2f16(x) - (half_t)1.0; /*  2x - 1  */
@@ -77,7 +75,7 @@ half_t log2f16 (half_t x)
         x -= (half_t)1.0;
     }
 
-    z = x * x;
+    z = x*x;
     
     y = polyf16( x, f16_coeff_log, 9 ) * z;
     

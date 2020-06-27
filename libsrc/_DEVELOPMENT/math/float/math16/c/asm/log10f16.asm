@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 10:38:33 2020
+;	Module compile time: Sat Jun 27 14:48:10 2020
 
 
 	C_LINE	0,"log10f16.c"
@@ -14,6 +14,7 @@
 	INCLUDE "z80_crt0.hdr"
 
 
+	C_LINE	36,"log10f16.c"
 	C_LINE	0,"math16.h"
 	C_LINE	0,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/stdint.h"
 	C_LINE	8,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/stdint.h"
@@ -200,14 +201,14 @@
 	C_LINE	627,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/math.h"
 	C_LINE	35,"math16.h"
 	C_LINE	44,"log10f16.c"
+	C_LINE	51,"log10f16.c"
 	C_LINE	53,"log10f16.c"
-	C_LINE	55,"log10f16.c"
 	SECTION	code_compiler
 
 ; Function log10f16 flags 0x00000288 __smallc __z88dk_fastcall 
 ; _Float16 half_tlog10f16(_Float16 x)
 ; parameter '_Float16 x' at 2 size(2)
-	C_LINE	56,"log10f16.c::log10f16"
+	C_LINE	54,"log10f16.c::log10f16"
 .log10f16
 	GLOBAL	_log10f16
 ._log10f16

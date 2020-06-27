@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 10:38:33 2020
+;	Module compile time: Sat Jun 27 14:48:10 2020
 
 
 	C_LINE	0,"expf16.c"
@@ -199,15 +199,15 @@
 	C_LINE	626,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/math.h"
 	C_LINE	627,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/math.h"
 	C_LINE	35,"math16.h"
-	C_LINE	51,"expf16.c"
-	C_LINE	57,"expf16.c"
+	C_LINE	53,"expf16.c"
 	C_LINE	59,"expf16.c"
+	C_LINE	61,"expf16.c"
 	SECTION	code_compiler
 
 ; Function expf16 flags 0x00000288 __smallc __z88dk_fastcall 
 ; _Float16 half_texpf16(_Float16 x)
 ; parameter '_Float16 x' at 2 size(2)
-	C_LINE	60,"expf16.c::expf16"
+	C_LINE	62,"expf16.c::expf16"
 .expf16
 	GLOBAL	_expf16
 ._expf16
@@ -215,18 +215,47 @@
 	push	bc
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,0	;const
-	call	l_f16_eq
+	ld	hl,29848	;const
+	call	l_f16_gt
 	ld	a,h
 	or	l
 	jp	z,i_2
-	ld	hl,15360	;const
+	ld	hl,31743	;const
+	call	l_f16_sint2f
 	pop	bc
 	pop	bc
 	ret
 
 
 .i_2
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,31302	;const
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_3
+	ld	hl,0	;const
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_3
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,0	;const
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_4
+	ld	hl,15360	;const
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_4
 	ld	hl,2	;const
 	call	l_gintspsp	;
 	ld	hl,15813	;const

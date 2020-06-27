@@ -44,10 +44,10 @@
  * ERROR MESSAGES:
  *
  *   message         condition      value returned
- * exp10 underflow    x < -MAXL10_F32     0.0
- * exp10 overflow     x >  MAXL10_F32   HUGE_POS_F
+ * exp10 underflow    x < -MAXL10_F16     0.0
+ * exp10 overflow     x >  MAXL10_F16   HUGE_POS_F
  *
- * IEEE single arithmetic: MAXL10_F32 = 38.230809449325611792.
+ * IEEE single arithmetic: MAXL10_F16 = +4.816
  *
  */
 
@@ -70,20 +70,14 @@ half_t exp10f16 (half_t x)
 {
     half_t z;
 
-#if 0
     if( x > MAXL10_F16 )
-    {
         return( HUGE_POS_F16 );
-    }
 
     if( x < MINL10_F16 )
-    {
         return((half_t)0.0);
-    }
-#endif
 
-	if( x == 0.0 )
-		return (half_t)1.0;
+    if( x == 0.0 )
+        return (half_t)1.0;
 
     /* Express 10**x = 10**g 2**n
      *   = 10**g 10**( n log10(2) )

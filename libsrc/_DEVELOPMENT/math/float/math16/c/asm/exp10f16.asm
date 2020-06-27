@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 10:38:33 2020
+;	Module compile time: Sat Jun 27 14:48:10 2020
 
 
 	C_LINE	0,"exp10f16.c"
@@ -215,18 +215,47 @@
 	push	bc
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,0	;const
-	call	l_f16_eq
+	ld	hl,29773	;const
+	call	l_f16_gt
 	ld	a,h
 	or	l
 	jp	z,i_2
-	ld	hl,15360	;const
+	ld	hl,31743	;const
+	call	l_f16_sint2f
 	pop	bc
 	pop	bc
 	ret
 
 
 .i_2
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,31265	;const
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_3
+	ld	hl,0	;const
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_3
+	ld	hl,2	;const
+	call	l_gintspsp	;
+	ld	hl,0	;const
+	call	l_f16_eq
+	ld	a,h
+	or	l
+	jp	z,i_4
+	ld	hl,15360	;const
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_4
 	ld	hl,2	;const
 	call	l_gintspsp	;
 	ld	hl,17060	;const
