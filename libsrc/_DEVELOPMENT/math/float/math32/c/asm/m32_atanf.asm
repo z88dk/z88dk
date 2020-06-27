@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.0 #11528 (Linux)
+; Version 4.0.2 #11690 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -309,12 +309,12 @@ _m32_atanf:
 	ld	d,h
 	jp	l_m32_atanf_00107
 l_m32_atanf_00102:
-	ld	l,(ix-7)
-	ld	h,(ix-6)
+	pop	bc
+	pop	hl
 	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
+	push	bc
 	push	hl
+	push	bc
 	ld	hl,0x3f80
 	push	hl
 	ld	hl,0x0000

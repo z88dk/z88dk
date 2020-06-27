@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.0 #11528 (Linux)
+; Version 4.0.2 #11690 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -287,16 +287,20 @@ _m32_logf:
 	ld	hl, -18
 	add	hl, sp
 	ld	sp, hl
-	push	bc
-	push	de
-	push	de
-	push	bc
+	ld	(ix-6),c
+	ld	(ix-5),b
+	ld	(ix-4),e
+	ld	l, e
+	ld	(ix-3),d
+	ld	h,d
+	push	hl
+	ld	l,(ix-6)
+	ld	h,(ix-5)
+	push	hl
 	ld	hl,0x0000
 	push	hl
 	push	hl
 	call	___fslt_callee
-	pop	de
-	pop	bc
 	bit	0,l
 	jr	NZ,l_m32_logf_00102
 	ld	de,0xff00
@@ -305,11 +309,13 @@ _m32_logf:
 l_m32_logf_00102:
 	ld	hl,16
 	add	hl, sp
-	ld	(ix-4),l
-	ld	(ix-3),h
 	push	hl
-	push	de
-	push	bc
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	push	hl
+	ld	l,(ix-6)
+	ld	h,(ix-5)
+	push	hl
 	call	_m32_frexpf
 	push	hl
 	ld	c,l

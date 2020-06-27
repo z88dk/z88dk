@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.0 #11528 (Linux)
+; Version 4.0.2 #11690 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -301,12 +301,12 @@ _m32_expf:
 	ld	hl,0x0000
 	jp	l_m32_expf_00103
 l_m32_expf_00102:
-	ld	l,(ix-10)
-	ld	h,(ix-9)
+	pop	bc
+	pop	hl
 	push	hl
-	ld	l,(ix-12)
-	ld	h,(ix-11)
+	push	bc
 	push	hl
+	push	bc
 	ld	hl,0x3fb8
 	push	hl
 	ld	hl,0xaa3b

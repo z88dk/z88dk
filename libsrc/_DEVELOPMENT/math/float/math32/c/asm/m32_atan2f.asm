@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.0 #11528 (Linux)
+; Version 4.0.2 #11690 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -339,7 +339,8 @@ _m32_atan2f:
 	ld	h,(ix-4)
 	push	hl
 	call	___fslt_callee
-	bit	0,l
+	ld	a, l
+	or	a, a
 	jr	NZ,l_m32_atan2f_00107
 	ld	l,(ix+10)
 	ld	h,(ix+11)

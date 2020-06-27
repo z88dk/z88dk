@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.0 #11528 (Linux)
+; Version 4.0.2 #11690 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -346,7 +346,8 @@ l_m32_fmodf_00102:
 	call	___fslt_callee
 	pop	de
 	pop	bc
-	bit	0,l
+	ld	a,l
+	or	a, a
 	jr	NZ,l_m32_fmodf_00105
 	ld	l,(ix+10)
 	ld	h,(ix+11)
