@@ -120,17 +120,17 @@ typedef _Float16 half_t;
 
 #ifdef __MATH_MATH16
 
-#define HUGE_POS_F16            (0x7BFF)        /*  +6.5504E+4 */
-#define TINY_POS_F16            (0x0400)        /*  +6.1035E-5 */
-#define HUGE_NEG_F16            (0xFBFF)        /*  -6.5504E+4 */
-#define TINY_NEG_F16            (0x8400)        /*  -6.1035E-5 */
+#define HUGE_POS_F16            (+6.5504E+4)        /* 0x7BFF */
+#define TINY_POS_F16            (+6.1035E-5)        /* 0x0400 */
+#define HUGE_NEG_F16            (-6.5504E+4)        /* 0xFBFF */
+#define TINY_NEG_F16            (-6.1035E-5)        /* 0x8400 */
 
-#define MAXL2_F16               (0x4BFF)        /*  +15.99    */
-#define MINL2_F16               (0xCB00)        /*  -14.00    */
-#define MAXLOG_F16              (0x498B)        /*  +11.086   */
-#define MINLOG_F16              (0xC8DA)        /*  -9.700    */       
-#define MAXL10_F16              (0x44D1)        /*  +4.816    */
-#define MINL10_F16              (0xC437)        /*  -4.215    */
+#define MAXL2_F16               (+15.999)           /* 0x4BFF */
+#define MINL2_F16               (-14.00)            /* 0xCB00 */
+#define MAXLOG_F16              (+11.086)           /* 0x498B */
+#define MINLOG_F16              (-9.700)            /* 0xC8DA */      
+#define MAXL10_F16              (+4.816)            /* 0x44D1 */
+#define MINL10_F16              (-4.215)            /* 0xC437 */
 
 #define HUGE_VAL_F16            (0x7C00)
 #define INFINITY_POS_F16        (0x7C00)

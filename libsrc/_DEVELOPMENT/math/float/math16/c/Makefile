@@ -7,7 +7,7 @@ CFLAGS += -Cc-D__MATH_MATH16 -D__MATH_MATH16 -I.
 all: $(addprefix asm/,$(AFILES))
 
 asm/%.asm: %.c
-	zcc +z80 -clib=new -O3 $(CFLAGS) -a $^ -o $@
+	zcc +z80 -clib=new -O3 --opt-code-speed=inlineints $(CFLAGS) -a $^ -o $@
 
 clean:
 	$(RM) asm/*.asm asm/*.err zcc_opt.def
