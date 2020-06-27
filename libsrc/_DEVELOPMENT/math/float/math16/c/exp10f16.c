@@ -71,11 +71,11 @@ half_t exp10f16 (half_t x)
     half_t z;
 
     if( x > MAXL10_F16 )
-        return( HUGE_POS_F16 );
-
+        return (half_t)HUGE_POS_F16;
+#if 0
     if( x < MINL10_F16 )
-        return((half_t)0.0);
-
+        return (half_t)0.0;
+#endif
     if( x == 0.0 )
         return (half_t)1.0;
 
