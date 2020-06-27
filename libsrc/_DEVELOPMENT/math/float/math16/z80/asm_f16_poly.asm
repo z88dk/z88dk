@@ -13,7 +13,7 @@
 ; scheme etc) refers to a polynomial evaluation method named after
 ; William George Horner.
 ;
-; This allows evaluation of a polynomial of degree n with only 
+; This allows evaluation of a polynomial of degree n with only
 ; n multiplications and n additions.
 ;
 ; This is optimal, since there are polynomials of degree n that cannot
@@ -22,7 +22,7 @@
 ; This algorithm is much older than Horner. He himself ascribed it
 ; to Joseph-Louis Lagrange but it can be traced back many hundreds of
 ; years to Chinese and Persian mathematicians
-; 
+;
 ; half_t poly(const half_t x, const float_t d[], uint16_t n)
 ; {
 ;   float_t res = d[n];
@@ -155,7 +155,7 @@ PUBLIC asm_f16_poly
 
     ld d,b                      ; (f24) x msw
     ld e,c
-    push af                     ; (f24) r1x lsw 
+    push af                     ; (f24) x lsw
     pop hl
     jp poly0
 

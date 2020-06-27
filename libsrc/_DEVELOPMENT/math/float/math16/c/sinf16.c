@@ -1,5 +1,5 @@
 
-#include    "math16.h"
+#include "math16.h"
 
 extern float f16_coeff_sin_a[];
 extern float f16_coeff_sin_b[];
