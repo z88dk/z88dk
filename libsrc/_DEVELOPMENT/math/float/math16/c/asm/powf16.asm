@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 23:06:26 2020
+;	Module compile time: Sat Jun 27 23:49:11 2020
 
 
 	C_LINE	0,"powf16.c"
@@ -212,7 +212,12 @@
 	GLOBAL	_powf16_callee
 ._powf16_callee
 	ld	hl,4	;const
-	call	l_gintspsp	;
+	add hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
 	ld	hl,0	;const
 	call	l_f16_le
 	ld	a,h
@@ -228,7 +233,12 @@
 
 .i_2
 	ld	hl,2	;const
-	call	l_gintspsp	;
+	add hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
 	ld	hl,0	;const
 	call	l_f16_eq
 	ld	a,h
@@ -244,14 +254,23 @@
 
 .i_3
 	ld	hl,2	;const
-	call	l_gintspsp	;
+	add hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
 	ld	hl,15360	;const
 	call	l_f16_eq
 	ld	a,h
 	or	l
 	jp	z,i_4
 	ld	hl,4	;const
-	call	l_gintsp	;
+	add hl,sp	;l_gintsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
 	pop	bc
 	pop	af
 	pop	af
@@ -261,11 +280,19 @@
 
 .i_4
 	ld	hl,4	;const
-	call	l_gintsp	;
+	add hl,sp	;l_gintsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
 	call	logf16
 	push	hl
 	ld	hl,4	;const
-	call	l_gintsp	;
+	add hl,sp	;l_gintsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
 	call	l_f16_mul
 	call	expf16
 	pop	bc

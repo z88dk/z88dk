@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 23:06:27 2020
+;	Module compile time: Sat Jun 27 23:49:12 2020
 
 
 	C_LINE	0,"tanf16.c"

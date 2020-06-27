@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 23:06:26 2020
+;	Module compile time: Sat Jun 27 23:49:11 2020
 
 
 	C_LINE	0,"sinf16.c"
@@ -218,7 +218,12 @@
 	push	bc
 	push	bc
 	ld	hl,8	;const
-	call	l_gintspsp	;
+	add hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
 	ld	hl,0	;const
 	call	l_f16_lt
 	ld	a,h
@@ -227,7 +232,7 @@
 	ld	hl,8	;const
 	add	hl,sp
 	push	hl
-	ld	a,(hl)
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
@@ -259,7 +264,12 @@
 	call	l_f16_mul
 	call	l_pint_pop
 	ld	hl,8	;const
-	call	l_gintspsp	;
+	add hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
 	ld	hl,17408	;const
 	call	l_f16_gt
 	ld	a,h
@@ -273,7 +283,11 @@
 	ld	d,(hl)
 	push	de
 	ld	hl,12	;const
-	call	l_gintsp	;
+	add hl,sp	;l_gintsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
 	call	div2f16
 	call	div2f16
 	call	floorf16
@@ -283,7 +297,12 @@
 	call	l_pint_pop
 .i_5
 	ld	hl,8	;const
-	call	l_gintspsp	;
+	add hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
 	ld	hl,16384	;const
 	call	l_f16_gt
 	ld	a,h
@@ -315,21 +334,39 @@
 	add	hl,sp
 	push	hl
 	ld	hl,10	;const
-	call	l_gintspsp	;
+	add hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
 	ld	hl,4	;const
 	add	hl,sp
 	push	hl
 	ld	hl,14	;const
-	call	l_gintsp	;
+	add hl,sp	;l_gintsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
 	call	l_f16_f2sint
 	call	l_pint_pop
 	call	l_f16_sint2f
 	call	l_f16_sub
 	call	l_pint_pop
 	ld	hl,0	;const
-	call	l_gintspsp	;
+	add hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
 	ld	hl,4	;const
-	call	l_gintsp	;
+	add hl,sp	;l_gintsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
 	pop	de
 	add	hl,de
 	bit	7,h
@@ -369,7 +406,7 @@
 	ld	hl,6	;const
 	add	hl,sp
 	push	hl
-	ld	a,(hl)
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
@@ -382,13 +419,27 @@
 	add	hl,sp
 	push	hl
 	ld	hl,8	;const
-	call	l_gintspsp	;
+	add hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
 	ld	hl,10	;const
-	call	l_gintsp	;
+	add hl,sp	;l_gintsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
 	call	l_f16_mul
 	call	l_pint_pop
 	ld	hl,6	;const
-	call	l_gintspsp	;
+	add hl,sp	;l_gintspsp
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	push	hl
 	ld	hl,6	;const
 	add	hl,sp
 	ld	e,(hl)
