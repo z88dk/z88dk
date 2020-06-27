@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 14:58:25 2020
+;	Module compile time: Sat Jun 27 19:42:56 2020
 
 
 	C_LINE	0,"logf16.c"
@@ -224,8 +224,7 @@
 	ld	a,h
 	or	l
 	jp	z,i_2
-	ld	hl,64511	;const
-	call	l_f16_sint2f
+	ld	hl,31711	;const
 	pop	bc
 	pop	bc
 	pop	bc
