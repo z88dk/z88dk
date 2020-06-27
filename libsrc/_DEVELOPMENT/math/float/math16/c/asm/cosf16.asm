@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 14:48:10 2020
+;	Module compile time: Sat Jun 27 14:58:25 2020
 
 
 	C_LINE	0,"cosf16.c"
@@ -212,8 +212,7 @@
 ._cosf16
 	push	hl
 	push	hl
-	ld	hl,(_HALF_PI)
-	call	l_f16_sint2f
+	ld	hl,15944	;const
 	call	l_f16_add
 	call	sinf16
 	pop	bc
@@ -384,7 +383,6 @@
 	GLOBAL	isnotequalf16_callee
 	GLOBAL	isunorderedf16
 	GLOBAL	isunorderedf16_callee
-	GLOBAL	_HALF_PI
 
 
 ; --- End of Scope Defns ---
