@@ -40,6 +40,7 @@
     #define DOUBLE          double
 #endif
 
+#include <stdint.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -73,7 +74,13 @@ void advance(int nbodies, struct planet * bodies)
       dx = b->x - b2->x;
       dy = b->y - b2->y;
       dz = b->z - b2->z;
+#ifdef __MATH_MATH16
+      inv_distance = invsqrtf16(dx * dx + dy * dy + dz * dz);
+#elif __MATH_MATH32
+      inv_distance = invsqrt(dx * dx + dy * dy + dz * dz);
+#else
       inv_distance = 1.0/sqrt(dx * dx + dy * dy + dz * dz);
+#endif
       mag = inv_distance * inv_distance * inv_distance;
       b->vx -= dx * b2->mass * mag;
       b->vy -= dy * b2->mass * mag;
@@ -102,13 +109,17 @@ DOUBLE energy(int nbodies, struct planet * bodies)
   e = 0.0;
   for (i = 0; i < nbodies; i++) {
     b = &(bodies[i]);
-    e += 0.5 * b->mass * (b->vx * b->vx + b->vy * b->vy + b->vz * b->vz);
+    e += b->mass * (b->vx * b->vx + b->vy * b->vy + b->vz * b->vz) * 0.5;
     for (j = i + 1; j < nbodies; j++) {
       b2 = &(bodies[j]);
       dx = b->x - b2->x;
       dy = b->y - b2->y;
       dz = b->z - b2->z;
+#ifdef __MATH_MATH16
+      distance = sqrtf16(dx * dx + dy * dy + dz * dz);
+#else
       distance = sqrt(dx * dx + dy * dy + dz * dz);
+#endif
       e -= (b->mass * b2->mass) / distance;
     }
   }
@@ -174,7 +185,12 @@ struct planet bodies[NBODIES] = {
   }
 };
 
+#ifdef __MATH_MATH16
+#define DT 1e-1                   /* otherwise exceeds half_t range */
+#else
 #define DT 1e-2
+#endif
+
 #define RECIP_DT (1.0/DT)
 
 /*
@@ -206,13 +222,13 @@ int main(int argc, char ** argv)
 TIMER_START();
 
   offset_momentum(NBODIES, bodies);
-  PRINTF2("%.9f\n", energy(NBODIES, bodies));
+  PRINTF2("\n%.9f\n", (double)energy(NBODIES, bodies));
   scale_bodies(NBODIES, bodies, DT);
   for (i = 1; i <= n; i++)  {
     advance(NBODIES, bodies);
   }
   scale_bodies(NBODIES, bodies, RECIP_DT);
-  PRINTF2("%.9f\n", energy(NBODIES, bodies));
+  PRINTF2("%.9f\n", (double)energy(NBODIES, bodies));
 
 TIMER_STOP();
 

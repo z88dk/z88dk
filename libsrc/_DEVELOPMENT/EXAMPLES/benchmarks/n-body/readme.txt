@@ -52,15 +52,15 @@ RESULTS
 =======
 
 1.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library
-4356 bytes less page zero
+Z88DK June 28, 2020
+zsdcc #11690 / new
+4309 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-4)
 
-cycle count  = 2247600377
-time @ 4MHz  = 2247600377 / 4*10^6 = 9 min 22 sec
+cycle count  = 2247439592
+time @ 4MHz  = 2247439592 / 4*10^6 = 9 min 22 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
@@ -113,15 +113,15 @@ time @ 4MHz  = 3624577433 / 4*10^6 = 15 min 06 sec
 Internal 48-bit float implementation causes relative slowdown.
 
 6.
-Z88DK April 20, 2020
+Z88DK June 28, 2020
 sccz80 / new c library
-3244 bytes less page zero
+3608 bytes less page zero
 
 first number error : 5 * 10^(-8)
-second number error: 1 * 10^(-8)
+second number error: 1 * 10^(-4)
 
-cycle count  = 2374676379
-time @ 4MHz  = 2374676379 / 4*10^6 = 9 min 54 sec
+cycle count  = 2372283755
+time @ 4MHz  = 2372283755 / 4*10^6 = 9 min 53 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
@@ -137,17 +137,30 @@ cycle count  = 2253531346
 time @ 4MHz  = 2253531346 / 4*10^6 = 9 min 23 sec
 
 8.
-Z88DK June 2, 2020
-sccz80 / classic / math32
-5346 bytes less page zero
+Z88DK June 28, 2020
+sccz80 / new / math32
+5264 bytes less page zero
 
-first number error : 1 * 10^(-7)
-second number error: 1 * 10^(-6)
+first number error : 5 * 10^(-7)
+second number error: 1 * 10^(-4)
 
-cycle count  = 1320690188
-time @ 4MHz  = 1320690188 / 4*10^6 =  5 min 30 sec
+cycle count  = 1025105884
+time @ 4MHz  = 1025105884 / 4*10^6 = 4 min 16 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
+
+9.
+Z88DK June 28, 2020
+sccz80 / new / math16
+3227 bytes less page zero
+
+first number error : 5 * 10^(-4)
+second number error: 5 * 10^(-2)
+
+cycle count  = 384230543
+time @ 4MHz  = 384230543 / 4*10^6 = 1 min 36 sec
+
+IEEE 16-bit float implementation, accurate to 3 significant digits.
 
 DQ.
 HITECH C CPM V309
