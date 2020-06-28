@@ -96,12 +96,10 @@ PUBLIC asm_f24_invsqrt
     ld b,h                      ; original y to debc
     ld c,l                      ; now calculate w[0]
 
-    sla c                       ; remove mantissa leading bit
-    rl b
+    sla b                       ; remove mantissa leading bit
 
     srl d                       ; y>>1
     rr b
-    rr c
 
     xor a                       ; clear carry
     ld e,a                      ; clear sign in e[7]
@@ -118,7 +116,7 @@ PUBLIC asm_f24_invsqrt
     rr l
                                 ; (f24) w[0] in dehl
 
-;-------------------------------; Iteration 1
+;----------- snip ----------    ; Iteration 1
 
     exx
     pop hl                      ; -y lsw
@@ -176,6 +174,6 @@ PUBLIC asm_f24_invsqrt
     dec d                       ; (float) (3 - w[1]*w[1]*y) / 2
     call asm_f24_mul_callee     ; w[2] = (float) w[1]*(3 - w[1]*w[1]*y)/2
 
-;----------- snip ----------
+;---------------------------
 
     ret                         ; return _f24

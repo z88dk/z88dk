@@ -152,13 +152,13 @@ IEEE 32-bit float implementation, accurate to 7 significant digits.
 9.
 Z88DK June 28, 2020
 sccz80 / new / math16
-3227 bytes less page zero
+3222 bytes less page zero
 
 first number error : 5 * 10^(-4)
 second number error: 5 * 10^(-2)
 
-cycle count  = 384230543
-time @ 4MHz  = 384230543 / 4*10^6 = 1 min 36 sec
+cycle count  = 384070543
+time @ 4MHz  = 384070543 / 4*10^6 = 1 min 36 sec
 
 IEEE 16-bit float implementation, accurate to 3 significant digits.
 

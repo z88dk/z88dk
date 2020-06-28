@@ -186,7 +186,7 @@ struct planet bodies[NBODIES] = {
 };
 
 #ifdef __MATH_MATH16
-#define DT 1e-1                   /* otherwise exceeds half_t range */
+#define DT 1e-1         /* otherwise calculation exceeds half_t range */
 #else
 #define DT 1e-2
 #endif
