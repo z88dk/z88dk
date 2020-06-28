@@ -84,7 +84,7 @@ time @ 4MHz  = 1517530881 / 4*10^6 =  6 min 20 sec
 
 Z88DK June 13, 2020
 sccz80 / new / math16-fast
-1989 bytes less page zero
+1986 bytes less page zero
 
-cycle count  =  966629715
-time @ 4MHz  =  966629715 / 4*10^6 =  4 min 02 sec
+cycle count  =  965171871
+time @ 4MHz  =  965171871 / 4*10^6 =  4 min 01 sec
