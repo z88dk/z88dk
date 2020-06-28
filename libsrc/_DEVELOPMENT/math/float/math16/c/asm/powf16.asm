@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 23:49:11 2020
+;	Module compile time: Sun Jun 28 10:24:11 2020
 
 
 	C_LINE	0,"powf16.c"
@@ -212,7 +212,7 @@
 	GLOBAL	_powf16_callee
 ._powf16_callee
 	ld	hl,4	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -233,7 +233,7 @@
 
 .i_2
 	ld	hl,2	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -254,7 +254,7 @@
 
 .i_3
 	ld	hl,2	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -266,7 +266,7 @@
 	or	l
 	jp	z,i_4
 	ld	hl,4	;const
-	add hl,sp	;l_gintsp
+	add	hl,sp	;l_gintsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -280,7 +280,7 @@
 
 .i_4
 	ld	hl,4	;const
-	add hl,sp	;l_gintsp
+	add	hl,sp	;l_gintsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -288,7 +288,7 @@
 	call	logf16
 	push	hl
 	ld	hl,4	;const
-	add hl,sp	;l_gintsp
+	add	hl,sp	;l_gintsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)

@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 23:49:11 2020
+;	Module compile time: Sun Jun 28 10:24:11 2020
 
 
 	C_LINE	0,"log2f16.c"
@@ -217,7 +217,7 @@
 	push	bc
 	push	bc
 	ld	hl,6	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -241,7 +241,7 @@
 	add	hl,sp
 	push	hl
 	ld	hl,8	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -253,7 +253,7 @@
 	call	frexpf16_callee
 	call	l_pint_pop
 	ld	hl,6	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -293,14 +293,14 @@
 	call	l_pint_pop
 .i_5
 	ld	hl,6	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
 	push	hl
 	ld	hl,8	;const
-	add hl,sp	;l_gintsp
+	add	hl,sp	;l_gintsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -326,7 +326,7 @@
 	call	polyf16_callee
 	push	hl
 	ld	hl,6	;const
-	add hl,sp	;l_gintsp
+	add	hl,sp	;l_gintsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -341,7 +341,7 @@
 	ld	d,(hl)
 	push	de
 	ld	hl,6	;const
-	add hl,sp	;l_gintsp
+	add	hl,sp	;l_gintsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -350,7 +350,7 @@
 	call	l_f16_sub
 	call	l_pint_pop
 	ld	hl,4	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -363,14 +363,14 @@
 	push	hl
 	push	de
 	ld	hl,2	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
 	push	hl
 	ld	hl,8	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -384,14 +384,14 @@
 	push	hl
 	push	de
 	ld	hl,2	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
 	push	hl
 	ld	hl,6	;const
-	add hl,sp	;l_gintsp
+	add	hl,sp	;l_gintsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -402,14 +402,14 @@
 	push	hl
 	push	de
 	ld	hl,2	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
 	push	hl
 	ld	hl,8	;const
-	add hl,sp	;l_gintsp
+	add	hl,sp	;l_gintsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -420,7 +420,7 @@
 	push	hl
 	push	de
 	ld	hl,2	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)

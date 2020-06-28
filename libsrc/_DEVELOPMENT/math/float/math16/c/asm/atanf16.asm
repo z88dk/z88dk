@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jun 27 23:49:11 2020
+;	Module compile time: Sun Jun 28 10:24:12 2020
 
 
 	C_LINE	0,"atanf16.c"
@@ -215,7 +215,7 @@
 	push	bc
 	dec	sp
 	ld	hl,3	;const
-	add hl,sp	;l_gintsp
+	add	hl,sp	;l_gintsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -241,7 +241,7 @@
 	add	hl,sp
 	push	hl
 	ld	hl,2	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -285,7 +285,7 @@
 	push	hl
 .i_4
 	ld	hl,3	;const
-	add hl,sp	;l_gintspsp
+	add	hl,sp	;l_gintspsp
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)

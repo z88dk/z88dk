@@ -301,7 +301,8 @@ _m32_log2f:
 	push	hl
 	push	hl
 	call	___fslt_callee
-	bit	0,l
+	ld	a, l
+	or	a, a
 	jr	NZ,l_m32_log2f_00102
 	ld	de,0xff00
 	ld	hl,0x0000
