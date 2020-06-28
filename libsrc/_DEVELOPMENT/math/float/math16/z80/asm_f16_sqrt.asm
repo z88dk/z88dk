@@ -93,26 +93,33 @@ PUBLIC asm_f24_invsqrt
     push de                     ; -y msw on stack for w[1]
     push hl                     ; -y lsw on stack for w[1]
 
-    res 7,e                     ; make y postitive
-    call asm_f32_f24            ; convert to _f32
+    ld b,h                      ; original y to debc
+    ld c,l                      ; now calculate w[0]
+    sla b                       ; remove mantissa leading bit
 
-    ld b,d
-    ld c,e
-    ex de,hl                    ; original y to bcde
-                                ; now calculate w[0]
-    srl b                       ; y>>1
+    srl d                       ; shift exponent into mantissa msb
+    rr b
+    
+    srl d                       ; y>>1
+    rr b
     rr c
-    rr d
-    rr e
 
-    xor a                       ; w[0] = 0x5f375a86 - (y>>1)
-    ld hl,05A86h
-    sbc hl,de
-    ex de,hl
-    ld hl,05F37h
-    sbc hl,bc
-    ex de,hl                    ; (float) w[0] in dehl
-    call asm_f24_f32            ; convert to _f24
+    xor a                       ; clear carry
+    ld e,a                      ; clear sign in e[7]
+
+    ld hl,0375Ah                ; w[0] = 0x5F exponent 0x375A mantissa - (y)
+    sbc hl,bc                   ; subtract mantissa
+
+    ld a,05Fh
+    sbc a,d                     ; subtract exponent plus carry
+    ld d,a
+
+    sla h                       ; restore exponent and mantissa
+    rl d
+
+    scf                         ; restore mantissa leading bit
+    rr h
+                                ; (f24) w[0] in dehl
 
 ;-------------------------------; Iteration 1
 
@@ -144,7 +151,7 @@ PUBLIC asm_f24_invsqrt
     call asm_f24_mul_callee     ; w[1] = (float) w[0]*(3 - w[0]*w[0]*y)/2
 
 ;----------- snip ----------    ; Iteration 2
-
+;if 0
     exx
     pop hl                      ; -y lsw
     pop de                      ; -y msw
@@ -171,7 +178,7 @@ PUBLIC asm_f24_invsqrt
 
     dec d                       ; (float) (3 - w[1]*w[1]*y) / 2
     call asm_f24_mul_callee     ; w[2] = (float) w[1]*(3 - w[1]*w[1]*y)/2
-
+;endif
 ;----------- snip ----------
 
     ret                         ; return _f24
