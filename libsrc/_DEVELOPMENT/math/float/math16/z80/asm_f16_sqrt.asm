@@ -15,14 +15,14 @@
 ;
 ; w[i+1] = w[i]*(1.5 - w[i]*w[i]*y/2) where w[0] is approx 1/y^0.5
 ;
-;   float invsqrtf(float x)
+;   half_t invsqrtf(half_t x)
 ;   {
-;       float xhalf = 0.5f*x;
+;       half_t xhalf = 0.5*x;
 ;       int i = *(int*)&x;
-;       i = 0x5f375a86 - (i>>1);
+;       i = 0xBE6EB5 - (i>>1);
 ;       x = *(float*)&i;
-;       x = x*(1.5f-xhalf*x*x); // 1st Newton-Raphson Iteration
-;       x = x*(1.5f-xhalf*x*x); // 2nd Newton-Raphson Iteration
+;       x = x*(3*(f-xhalf*x*x)/2; // 1st Newton-Raphson Iteration
+;       x = x*(3*(f-xhalf*x*x)/2; // 2nd Newton-Raphson Iteration
 ;       return x;
 ;   }
 ;
@@ -95,11 +95,10 @@ PUBLIC asm_f24_invsqrt
 
     ld b,h                      ; original y to debc
     ld c,l                      ; now calculate w[0]
-    sla b                       ; remove mantissa leading bit
 
-    srl d                       ; shift exponent into mantissa msb
-    rr b
-    
+    sla c                       ; remove mantissa leading bit
+    rl b
+
     srl d                       ; y>>1
     rr b
     rr c
@@ -107,18 +106,16 @@ PUBLIC asm_f24_invsqrt
     xor a                       ; clear carry
     ld e,a                      ; clear sign in e[7]
 
-    ld hl,0375Ah                ; w[0] = 0x5F exponent 0x375A mantissa - (y)
+    ld hl,06EB5h                ; w[0] = 0xBE exponent 0x6EB5 mantissa - (y)
     sbc hl,bc                   ; subtract mantissa
 
-    ld a,05Fh
+    ld a,0BEh
     sbc a,d                     ; subtract exponent plus carry
     ld d,a
 
-    sla h                       ; restore exponent and mantissa
-    rl d
-
     scf                         ; restore mantissa leading bit
     rr h
+    rr l
                                 ; (f24) w[0] in dehl
 
 ;-------------------------------; Iteration 1
@@ -151,7 +148,7 @@ PUBLIC asm_f24_invsqrt
     call asm_f24_mul_callee     ; w[1] = (float) w[0]*(3 - w[0]*w[0]*y)/2
 
 ;----------- snip ----------    ; Iteration 2
-;if 0
+
     exx
     pop hl                      ; -y lsw
     pop de                      ; -y msw
@@ -178,7 +175,7 @@ PUBLIC asm_f24_invsqrt
 
     dec d                       ; (float) (3 - w[1]*w[1]*y) / 2
     call asm_f24_mul_callee     ; w[2] = (float) w[1]*(3 - w[1]*w[1]*y)/2
-;endif
+
 ;----------- snip ----------
 
     ret                         ; return _f24
