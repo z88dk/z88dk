@@ -10,12 +10,9 @@
 
 ._func2
 	call	_func
-	call	l_f48_f16tof
-	call	dpush
-	ld	hl,3	;const
-	call	l_int2long_u_float
-	call	dadd
-	call	l_f48_ftof16
+	push	hl
+	ld	hl,16896	;const
+	call	l_f16_add
 	ret
 
 
