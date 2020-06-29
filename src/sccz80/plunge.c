@@ -28,7 +28,7 @@ int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfun
             dropout(k, testfuncz, testfuncq, droplab, lval);
         } else if (hits) {
             dropout(k, testfuncz, testfuncq, droplab, lval);
-	    // TODO: Change to a carry?
+            // TODO: Change to a carry?
             vconst(endval);
             jumpr(endlab = getlabel());
             postlabel(droplab);
@@ -447,6 +447,12 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         doconst_oper = oper == zadd && lval2->is_const == 0;
         
         if ( kind_is_floating(lval->val_type) && lval2->is_const == 0 ) {
+            if ( kind_is_floating(lval2->val_type)) {
+                // If the RHS (non constant) is a float, then use its type 
+                lval->val_type = lval2->val_type;
+                lval->ltype = lval2->ltype;
+             }
+
             // Floatconstant +/- lvalue
             if ( lval2->val_type != lval->val_type ) {
                 zconvert_to_double(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);

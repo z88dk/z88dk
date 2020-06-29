@@ -1,0 +1,34 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func2
+	call	_func
+	call	l_f48_f16tof
+	call	dpush
+	ld	hl,3	;const
+	call	l_int2long_u_float
+	call	dadd
+	call	l_f48_ftof16
+	ret
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_func2
+
+
+
+
