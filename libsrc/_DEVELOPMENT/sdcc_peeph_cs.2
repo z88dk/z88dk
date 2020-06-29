@@ -5253,7 +5253,7 @@ replace restart {
 	; peephole 66 removed redundant load of 0 into a.
 }
 
-replace {
+replace restart {
 	ld	e,#0x%1
 	ld	d,#0x%2
 } by {
@@ -5261,7 +5261,7 @@ replace {
 	; peephole 67 combined constant loads into register pair.
 }
 
-replace {
+replace restart {
 	ld	d,#0x%1
 	ld	e,#0x%2
 } by {
@@ -5269,7 +5269,7 @@ replace {
 	; peephole 67a combined constant loads into register pair.
 }
 
-replace {
+replace restart {
 	ld	l,#0x%1
 	ld	h,#0x%2
 } by {
@@ -5277,7 +5277,7 @@ replace {
 	; peephole 68 combined constant loads into register pair.
 }
 
-replace {
+replace restart {
 	ld	h,#0x%1
 	ld	l,#0x%2
 } by {
@@ -5285,7 +5285,7 @@ replace {
 	; peephole 68a combined constant loads into register pair.
 }
 
-replace {
+replace restart {
 	ld	c,#0x%1
 	ld	b,#0x%2
 } by {
@@ -5293,7 +5293,7 @@ replace {
 	; peephole 69 combined constant loads into register pair.
 }
 
-replace {
+replace restart {
 	ld	b,#0x%1
 	ld	c,#0x%2
 } by {
@@ -5372,7 +5372,7 @@ replace restart {
 	; peephole 77 removed redundant or after xor.
 }
 
-replace {
+replace restart {
 	ld	%1,%2
 	ld	a,%2
 } by {
@@ -6212,7 +6212,7 @@ replace restart {
 	; peephole 142 used value still in a instead of reloading from %1.
 }
 
-replace {
+replace restart {
 	jp	%5
 	ret
 } by {
@@ -6220,7 +6220,7 @@ replace {
 	; peephole 143 removed unused ret.
 }
 
-replace {
+replace restart {
 	jp	%5
 	ld	sp,ix
 	pop	ix
