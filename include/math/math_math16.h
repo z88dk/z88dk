@@ -5,21 +5,43 @@
 #include <sys/types.h>
 #include <limits.h>
 
-#define HUGE_POS_F16            (0x7BFF)        /*  +6.5504E+4 */
-#define TINY_POS_F16            (0x0400)        /*  +6.1035E-5 */
-#define HUGE_NEG_F16            (0xFBFF)        /*  -6.5504E+4 */
-#define TINY_NEG_F16            (0x8400)        /*  -6.1035E-5 */
+#define HUGE_POS_F16            (+6.5504E+4)        /* 0x7BFF */
+#define TINY_POS_F16            (+6.10352E-5)       /* 0x0400 */
+#define HUGE_NEG_F16            (-6.5504E+4)        /* 0xFBFF */
+#define TINY_NEG_F16            (-6.10352E-5)       /* 0x8400 */
 
-#define MAXL2_F16               (0x4BFF)        /*  +15.99    */
-#define MINL2_F16               (0xCB00)        /*  -14.00    */
-#define MAXLOG_F16              (0x498B)        /*  +11.086   */
-#define MINLOG_F16              (0xC8DA)        /*  -9.700    */       
-#define MAXL10_F16              (0x44D1)        /*  +4.816    */
-#define MINL10_F16              (0xC437)        /*  -4.215    */
+#define MAXL2_F16               (+15.999)           /* 0x4BFF */
+#define MINL2_F16               (-14.00)            /* 0xCB00 */
+#define MAXLOG_F16              (+11.086)           /* 0x498B */
+#define MINLOG_F16              (-9.700)            /* 0xC8DA */      
+#define MAXL10_F16              (+4.816)            /* 0x44D1 */
+#define MINL10_F16              (-4.215)            /* 0xC437 */
 
 #define HUGE_VAL_F16            (0x7C00)
 #define INFINITY_POS_F16        (0x7C00)
 #define INFINITY_NEG_F16        (0xFC00)
+
+#define M_E        2.718282
+#define M_INVLN2   1.442694  /* 1 / log(2) */
+#define M_LOG2E    1.442694
+#define M_IVLN10   0.434294  /* 1 / log(10) */
+#define M_LOG10E   0.434294
+#define M_LOG2_E   0.693146
+#define M_LN2      0.693146
+#define M_LN10     2.302585
+#define M_PI       3.141592
+#define M_TWOPI    6.283184
+#define M_PI_2     1.570796
+#define M_PI_4     0.785396
+#define M_3PI_4    2.356194
+#define M_SQRTPI   1.772454
+#define M_1_PI     0.318310
+#define M_2_PI     0.636620
+#define M_1_SQRTPI 0.564190
+#define M_2_SQRTPI 1.128379
+#define M_SQRT2    1.414214
+#define M_SQRT3    1.732051
+#define M_SQRT1_2  0.707107
 
 /* Conversion functions */
 extern half_t __LIB__ f16_f48(float x) __z88dk_fastcall;

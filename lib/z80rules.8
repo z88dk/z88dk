@@ -9,6 +9,14 @@
 =
 ;
 
+
+	call	l_gint
+=
+	ld	a,(hl)	;l_gint
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+
 	call	l_gint	;
 =
 	ld	a,(hl)	;l_gint
