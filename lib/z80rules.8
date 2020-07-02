@@ -3,7 +3,8 @@
 ; l_gint rule saves 27T at the cost of 1 byte
 ; l_gintsp rule saves 35T at the cost of 2 bytes
 ; l_gintspsp rule saves 57T at the cost of 3 bytes
-; l_pint rule saves 27T at cost of 2 bytes
+; l_pint rule saves 31T at cost of 2 bytes
+; l_pint_pop rule saves 58T at cost of -2 bytes
 ; l_sxt rule saves 27T at the cost of 1 byte
 ; l_sub rule saves 27T at a cost of 1 bytes
 =
@@ -47,7 +48,16 @@
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
+ 	ex	de,hl
+
+	call	l_pint_pop
+=
+	pop	de		;l_pint_pop
 	ex	de,hl
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+ 	ex	de,hl
 
 	call	l_sxt
 =
