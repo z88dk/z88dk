@@ -1583,7 +1583,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
     if ((fin = fopen(filename, "rb")) == NULL)
         exit_log(1, "Error: SNA prototype %s not found\n", filename);
 
-    if (1 != fread(sna_state, 27, 1, fin)) { fclose(fin); exit_log(1, "Could not required data from <%s>\n",filename); }
+    if (1 != fread(sna_state, 27, 1, fin)) { fclose(fin); exit_log(1, "Could not read required data from <%s>\n",filename); }
 
     if (fread(mem128, 49152, 1, fin) < 1)
     {
@@ -1593,7 +1593,7 @@ int zx_sna(struct zx_common *zxc, struct zx_sna *zxs, struct banked_memory *memo
 
     if (is_128)
     {
-        if (1 != fread(&sna_state[SNA_128_PC], 4, 1, fin)) { fclose(fin); exit_log(1, "Could not required data from <%s>\n",filename); }
+        if (1 != fread(&sna_state[SNA_128_PC], 4, 1, fin)) { fclose(fin); exit_log(1, "Could not read required data from <%s>\n",filename); }
 
         // 5,2,0 (48k) 1,3,4,6,7
 
@@ -2245,7 +2245,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
             exit_log(1,"Cannot open SCREEN$ file %s\n", zxt->screen);
         }
         suffix_change(basic_filename, ".SCR");
-        if (6912 != fread(scrbuf, 1, 6912, fpscr)) { fclose(fpscr); exit_log(1, "Could not required data from <%s>\n",zxt->screen); }
+        if (6912 != fread(scrbuf, 1, 6912, fpscr)) { fclose(fpscr); exit_log(1, "Could not read required data from <%s>\n",zxt->screen); }
         fclose(fpscr);
         file_buf = zx3_layout_file(scrbuf, 6912, 16384, 3, &file_len);
         cpm_create_filename(basic_filename, cpm_filename, 0, 0);
@@ -2254,7 +2254,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
     }
     // Read the binary
     ptr = must_malloc(binary_length);
-    if (binary_length != fread(ptr, 1, binary_length, fpin)) { fclose(fpin); exit_log(1, "Could not required data from <%s>\n",zxc->binname); }
+    if (binary_length != fread(ptr, 1, binary_length, fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n",zxc->binname); }
     fclose(fpin);
 
     // And write it

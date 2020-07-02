@@ -98,7 +98,7 @@ int x1_exec(char* target)
 
     fseek(fpin, 0L, SEEK_SET);
     buf = must_malloc(len);
-    if (len != fread(buf, 1, len, fpin)) { fclose(fpin); exit_log(1, "Could not required data from <%s>\n",binname); }
+    if (len != fread(buf, 1, len, fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n",binname); }
     fclose(fpin);
 
 

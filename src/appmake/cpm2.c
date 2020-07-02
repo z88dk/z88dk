@@ -535,7 +535,7 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     binlen = ftell(binary_fp);
     fseek(binary_fp, 0L, SEEK_SET);
     filebuf = malloc(binlen);
-    if (1 != fread(filebuf, binlen, 1, binary_fp))  { fclose(binary_fp); exit_log(1, "Could not required data from <%s>\n",binary_name); }
+    if (1 != fread(filebuf, binlen, 1, binary_fp))  { fclose(binary_fp); exit_log(1, "Could not read required data from <%s>\n",binary_name); }
     fclose(binary_fp);
 
     h = cpm_create(spec);
@@ -554,7 +554,7 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
                 exit_log(1, "Boot file is too large\n");
             }
             bootbuf = malloc(max_bootsize);
-            if (1 != fread(bootbuf, bootlen, 1, binary_fp)) { fclose(binary_fp); exit_log(1, "Could not required data from <%s>\n",binary_name); }
+            if (1 != fread(bootbuf, bootlen, 1, binary_fp)) { fclose(binary_fp); exit_log(1, "Could not read required data from <%s>\n",binary_name); }
             fclose(binary_fp);
             disc_write_boot_track(h, bootbuf, bootlen);
             free(bootbuf);
