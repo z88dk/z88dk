@@ -146,7 +146,7 @@ int mz2500_exec(char* target)
     written = 0;
     while ( written < len ) {
        memset(sectorbuf, 0, sizeof(sector));
-       if (sizeof(uint8_t) != fread(sectorbuf, 256, sizeof(uint8_t), fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n", filename) };
+       if (sizeof(uint8_t) != fread(sectorbuf, 256, sizeof(uint8_t), fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n", filename); }
        written += 256;
        write_sector(h, track, sector, head);
        sector++;
