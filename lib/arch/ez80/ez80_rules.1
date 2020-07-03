@@ -1,11 +1,3 @@
-	call	l_gint
-=
-	ld	hl,(hl)
-
-	call	l_gint	;
-=
-	ld	hl,(hl)
-
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -27,6 +19,14 @@
 	ld	de,(hl)
 	inc	hl
 
+	call	l_gint
+=
+	ld	hl,(hl)
+
+	call	l_gint	;
+=
+	ld	hl,(hl)
+
 	call	l_gintsp	;
 =
 	add	hl,sp
@@ -46,7 +46,7 @@
 
 	call	l_pint_pop
 =
-	pop	de		;l_pint_pop
+	pop	de
 	ex	de,hl
 	ld	(hl),de
  	ex	de,hl
