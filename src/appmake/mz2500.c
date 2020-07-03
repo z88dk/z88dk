@@ -60,11 +60,13 @@ void write_sector(disc_handle *h, int track, int sector, int head)
 
 int mz2500_exec(char* target)
 {
-    char filename[FILENAME_MAX + 1];
-    FILE* fpin;
-    int len;
-    int i;
-    int track, sector, head, written;
+    char   filename[FILENAME_MAX + 1];
+    FILE*  fpin;
+    int    len;
+    int    i;
+    int    track, sector, head;
+    size_t bytes_read;
+    int    bytes_to_write;
     disc_handle *h;
 
     if (help)
@@ -129,7 +131,7 @@ int mz2500_exec(char* target)
     sectorbuf[33] = 13;		// Next bank
     sectorbuf[34] = 14;		// Next bank
     sectorbuf[35] = 0xff;		// Terminate
- 
+
     // Banking at start of execution
     sectorbuf[48] = 8;		// for $000
     sectorbuf[49] = 9;
@@ -141,24 +143,24 @@ int mz2500_exec(char* target)
     sectorbuf[55] = 15;
     write_sector(h, 0, 0, 1);
 
-    // Now, locate to track 2, first sector (block 0x30)
+    // Write info from input file to dsk per sector (in blocks of 256)
+    // Append trailing blanks if bytes_read is smaller than the size of a sector
+    // Start writing on track 2, first sector (block 0x30)
     track = 1; sector = 0; head = 0;
-    written = 0;
-    while ( written < len ) {
-       memset(sectorbuf, 0, sizeof(sector));
-/*
-fprintf(stderr, "binname=%s\n", binname);
-fprintf(stderr, "crtfile=%s\n", outfile);
-fprintf(stderr, "outfile=%s\n", crtfile);
+    bytes_to_write = len;
 
-       if (sizeof(uint8_t) != fread(sectorbuf, 256, sizeof(uint8_t), fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n", filename); }
-*/
-       fread(sectorbuf, 256, sizeof(uint8_t), fpin);
-       written += 256;
-       write_sector(h, track, sector, head);
-       sector++;
+    while ( 0 < bytes_to_write ) {
+       memset(sectorbuf, 0, sizeof(sector));               // Fill sector buffer with data (and evt trailing blanks)
+       bytes_read = fread(sectorbuf, sizeof(uint8_t), 256, fpin);
+       if (bytes_read == 0) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n", binname); }
+
+       write_sector(h, track, sector, head);               // Write sector buffer to sector on dsk
+       bytes_to_write -= bytes_read;
+
+       sector++;                                           // Adjust track, sector, head to write next
        if ( sector == 16 ) {
-          sector = 0; head ^= 1;
+          sector = 0;
+          head ^= 1;
           if ( head == 1 ) track++;
        }
     }
