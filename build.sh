@@ -4,7 +4,8 @@
 # Build z88dk on unix systems
 #
 
-function show_help_and_exit {
+show_help_and_exit()
+{
 
   if [[ -n $1 ]]; then rc=$1; else rc=0; fi
 
