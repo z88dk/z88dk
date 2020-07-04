@@ -71,7 +71,7 @@ half_t expf16 (half_t x)
     if( x == 0.0 )
         return (half_t)1.0;
 
-    z = floorf16( x * LOG2EF + (half_t)0.5 );
+    z = floorf16( x * LOG2EF + 0.5 );
 
     x -= z * C1;
     x -= z * C2;
