@@ -248,7 +248,6 @@ sopno stopst;
 	register char *ssp;	/* start of string matched by subsubRE */
 	register char *sep;	/* end of string matched by subsubRE */
 	register char *oldssp;	/* previous ssp */
-	register char *dp;
 
 	AT("diss", start, stop, startst, stopst);
 	sp = start;
@@ -307,8 +306,7 @@ sopno stopst;
 			esub = es - 1;
 			/* did innards match? */
 			if (slow(m, sp, rest, ssub, esub) != NULL) {
-				dp = dissect(m, sp, rest, ssub, esub);
-				assert(dp == rest);
+				assert( rest == dissect(m, sp, rest, ssub, esub) );
 			} else		/* no */
 				assert(sp == rest);
 			sp = rest;
@@ -345,8 +343,7 @@ sopno stopst;
 			}
 			assert(sep == rest);	/* must exhaust substring */
 			assert(slow(m, ssp, sep, ssub, esub) == rest);
-			dp = dissect(m, ssp, sep, ssub, esub);
-			assert(dp == sep);
+			assert( sep == dissect(m, ssp, sep, ssub, esub) );
 			sp = rest;
 			break;
 		case OCH_:
@@ -380,8 +377,8 @@ sopno stopst;
 				else
 					assert(OP(m->g->strip[esub]) == O_CH);
 			}
-			dp = dissect(m, sp, rest, ssub, esub);
-			assert(dp == rest);
+
+			assert( rest == dissect(m, sp, rest, ssub, esub) );
 			sp = rest;
 			break;
 		case O_PLUS:

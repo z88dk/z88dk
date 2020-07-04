@@ -238,7 +238,7 @@ I decided to use `_f32` float format for the coefficients (rather than the `_f16
 - Performance. Converting the coefficients from `_f32` to `_f24` for calculations is faster than converting from `_f16` to `_f24`, even though more bytes are stored.
 - Convenience. There are already tables of `_f32` coefficients proven for math32, so it is much easier to just reuse them.
 
-It is a general function. Any coefficient table can be used, as desired. The coefficients are provided in packed IEEE single precision floating point format, with the coefficients stored in the correct order. The 0th coefficient is stored first in the table. For examples see in the library for `sinf16()`, `tanf16()`, `logf16()` and `expf16()`.
+It is a general function. Any coefficient table can be used, as desired. The coefficients are provided in packed IEEE single precision floating point format, with the coefficients stored in the correct order. The 0th coefficient is stored first in the table. For examples see in the library for `sinf16()`, `atanf16()`, `logf16()` and `expf16()`.
 
 #### _hypot()_
 
@@ -249,11 +249,7 @@ The hypotenuse function `hypotf16()` is provided as it is part of the standard m
 
 ### C Floating Point Functions
 
-The rest of the maths library is derived from source code obtained from the Hi-Tech C Compiler floating point library, the Cephes Math Library Release 2.2, and from the GCC IEEE floating point library.
-
-The Hi-Tech C Compiler floating point library is known for its performance, but not for its accuracy. This may be related to the limited number of coefficients used in the polynomial expansion used for calculating its results.
-
-If desired, alternative and extended coefficient matrices can be tested for accuracy and performance.
+The rest of the maths library is derived from source code obtained from the Hi-Tech C Compiler floating point library, the Cephes Math Library Release 2.2, and from the GCC IEEE floating point library. If desired, alternative and extended coefficient matrices can be tested for accuracy and performance.
 
 ```c
 /* Trigonometric functions */

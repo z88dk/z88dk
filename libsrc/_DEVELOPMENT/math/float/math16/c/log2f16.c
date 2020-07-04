@@ -65,14 +65,14 @@ half_t log2f16 (half_t x)
 
     /* logarithm using log(1+x) = x - .5x**2 + x**3 P(x)/Q(x) */
 
-    if( x < (half_t)M_SQRT1_2 )
+    if( x < M_SQRT1_2 )
     {
         --e;
-        x = mul2f16(x) - (half_t)1.0; /*  2x - 1  */
+        x = mul2f16(x) - 1.0; /*  2x - 1  */
     }
     else
     {
-        x -= (half_t)1.0;
+        x -= 1.0;
     }
 
     z = x*x;
