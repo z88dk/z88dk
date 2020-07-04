@@ -1168,7 +1168,7 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
 
     // organize output binaries into banks
 
-    while (fgets(buffer, MBLINEMAX, fmap) != NULL)
+    while (fgets(buffer, MBLINEMAX-7, fmap) != NULL)
     {
         // have one line of the map file
         // make sure the entire line is consumed

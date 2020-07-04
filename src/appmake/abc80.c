@@ -135,7 +135,7 @@ void datablockout(FILE* fin, FILE* fout)
         buffer[0] = 0;
         buffer[1] = blcnt & 0xff;
         buffer[2] = (blcnt >> 8) & 0xff;
-        fread(&buffer[3], 253, 1, fin);
+        if (1 != fread(&buffer[3], 253, 1, fin)) { fclose(fin); exit_log(1, "Routine <datablockout> could not read required data from input file");  };
         blockout(fout);
         blcnt++;
     }
