@@ -191,7 +191,7 @@ int tixx_exec(char *target)
         exit_log(1,"Failed to open input file: %s\n", binname);
     n = fsize(fp);
     buf = (char *)malloc(n);
-    if (1 != fread(buf, n, 1, fp)) { fclose(fp); exit_log(1, "Could not required data from <%s>\n",binname); }
+    if (1 != fread(buf, n, 1, fp)) { fclose(fp); exit_log(1, "Could not read required data from <%s>\n",binname); }
     if (ferror(fp))
         exit_log(1,"Error reading input file: %s\n", binname);
     fclose(fp);

@@ -155,7 +155,7 @@ int fat_write_file_to_image(const char *disc_format, const char *container, cons
     binlen = ftell(binary_fp);
     fseek(binary_fp, 0L, SEEK_SET);
     filebuf = malloc(binlen);
-    if (1 != fread(filebuf, binlen, 1, binary_fp)) { fclose(binary_fp); exit_log(1, "Could not required data from <%s>\n",binary_name); }
+    if (1 != fread(filebuf, binlen, 1, binary_fp)) { fclose(binary_fp); exit_log(1, "Could not read required data from <%s>\n",binary_name); }
     fclose(binary_fp);
 
     h = fat_create(spec);
