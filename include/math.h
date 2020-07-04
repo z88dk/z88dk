@@ -3,6 +3,7 @@
 
 #include <sys/compiler.h>
 #include <sys/types.h>
+#include <stdint.h>
 #include <limits.h>
 #include <float.h>
 
