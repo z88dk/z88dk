@@ -1,7 +1,7 @@
 
 ; half_t __poly (const half_t x, const float_t d[], uint16_t n)
 
-SECTION code_fp_math32
+SECTION code_fp_math16
 
 PUBLIC cm16_sccz80_poly_callee
 

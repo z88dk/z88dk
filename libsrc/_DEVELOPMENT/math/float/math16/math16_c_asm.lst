@@ -1,3 +1,10 @@
+math/float/math16/c/asm/acosf16
+math/float/math16/c/asm/asinf16
+math/float/math16/c/asm/atanf16
+math/float/math16/c/asm/cosf16
+math/float/math16/c/asm/sinf16
+math/float/math16/c/asm/tanf16
+
 math/float/math16/c/asm/exp2f16
 math/float/math16/c/asm/exp10f16
 math/float/math16/c/asm/expf16
@@ -5,3 +12,4 @@ math/float/math16/c/asm/log2f16
 math/float/math16/c/asm/log10f16
 math/float/math16/c/asm/logf16
 math/float/math16/c/asm/powf16
+
