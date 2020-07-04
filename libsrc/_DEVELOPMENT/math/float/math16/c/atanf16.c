@@ -34,7 +34,7 @@ half_t atanf16 (half_t f)
     val = polyf16( val, f16_coeff_atan, 7 );
 
     if(recip)
-        val = (half_t)M_PI_2 - val;
+        val = M_PI_2 - val;
 
     return f < 0.0 ? -val : val;
 }

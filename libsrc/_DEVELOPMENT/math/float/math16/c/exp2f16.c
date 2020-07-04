@@ -81,7 +81,7 @@ half_t exp2f16 (half_t x)
         return (half_t)1.0;
 
     /* separate into integer and fractional parts */
-    z = floorf16( x + (half_t)0.5 );
+    z = floorf16( x + 0.5 );
 
     x -= z;
 

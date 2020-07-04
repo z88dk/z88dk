@@ -58,14 +58,14 @@ half_t logf16 (half_t x)
     /* separate mantissa from exponent */
     x = frexpf16(x, &e);
 
-    if( x < (half_t)M_SQRT1_2 )
+    if( x < M_SQRT1_2 )
     {
         --e;
-        x = mul2f16(x) - (half_t)1.0; /*  2x - 1  */
+        x = mul2f16(x) - 1.0; /*  2x - 1  */
     }
     else
     {
-        x -= (half_t)1.0;
+        x -= 1.0;
     }
 
     z = x*x;

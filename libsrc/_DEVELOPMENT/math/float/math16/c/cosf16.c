@@ -91,9 +91,6 @@ half_t cosf16( half_t xx )
         y = polyf16(z, f16_coeff_cos, 4) - 0.5 * z + 1.0;
     }
 
-    if( sign < 0 )
-        y = -y;
-
-    return( y );
+    return sign < 0 ? -y : y;
 }
 

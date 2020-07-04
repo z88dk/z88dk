@@ -1,9 +1,9 @@
 ;* * * * *  Small-C/Plus z88dk * * * * *
-;  Version: 16606-fb6d348bb-20200630
+;  Version: 16623-4e88a30ef-20200704
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jul  4 10:26:54 2020
+;	Module compile time: Sat Jul  4 13:06:27 2020
 
 
 	C_LINE	0,"cosf16.c"
@@ -547,21 +547,15 @@
 	rla
 	jp	nc,i_13
 	ld	hl,5	;const
-	add	hl,sp
-	push	hl
-	ld	a,(hl)	;l_gint
+	add	hl,sp	;l_gintsp
+	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
 	ld	a,h
 	xor	128
 	ld	h,a
-	pop	de		;l_pint_pop
-	ex	de,hl
-	ld	(hl),e
-	inc	hl
-	ld	(hl),d
- 	ex	de,hl
+	jp	i_14
 .i_13
 	ld	hl,5	;const
 	add	hl,sp	;l_gintsp
@@ -569,6 +563,7 @@
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
+.i_14
 	exx
 	ld	hl,11	;const
 	add	hl,sp

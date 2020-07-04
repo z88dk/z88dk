@@ -90,9 +90,6 @@ half_t sinf16( half_t xx )
         y = polyf16(z, f16_coeff_sin, 3) * x + x;
     }
 
-    if( sign < 0 )
-        y = -y;
-
-    return( y );
+    return sign < 0 ? -y : y;
 }
 
