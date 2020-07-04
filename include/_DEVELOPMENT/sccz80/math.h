@@ -65,8 +65,10 @@ typedef _Float16 half_t;
 #define M_PI_4                 0.7853981633974
 #define M_1_PI                 0.3183098861838
 #define M_2_PI                 0.6366197723676
+#define M_4_PI                 1.27323954473516
+#define M_1_SQRTPI             0.5641895835478
 #define M_2_SQRTPI             1.128379167096
-#define M_SQRT2                1.414213562373
+#define M_SQRT2                1.4142135623731
 #define M_SQRT1_2              0.7071067811865
 
 //
@@ -524,13 +526,13 @@ extern half_t __LIB__ mul2f16(half_t x) __smallc __z88dk_fastcall;
 extern half_t __LIB__ mul10f16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ frexpf16(half_t x,int8_t *exp) __smallc;
-extern half_t __LIB__ frexpf16_callee(half_t x,int8_t *exp) __smallc __z88dk_callee;
+extern half_t __LIB__ frexpf16(half_t x,int8_t *pw2) __smallc;
+extern half_t __LIB__ frexpf16_callee(half_t x,int8_t *pw2) __smallc __z88dk_callee;
 #define frexpf16(a,b) frexpf16_callee(a,b)
 
 
-extern half_t __LIB__ ldexpf16(half_t x,int16_t exp) __smallc;
-extern half_t __LIB__ ldexpf16_callee(half_t x,int16_t exp) __smallc __z88dk_callee;
+extern half_t __LIB__ ldexpf16(half_t x,int16_t pw2) __smallc;
+extern half_t __LIB__ ldexpf16_callee(half_t x,int16_t pw2) __smallc __z88dk_callee;
 #define ldexpf16(a,b) ldexpf16_callee(a,b)
 
 
@@ -627,6 +629,12 @@ extern int __LIB__ isunorderedf16_callee(half_t x,half_t y) __smallc __z88dk_cal
 #define isunorderedf16(a,b) isunorderedf16_callee(a,b)
 
 
+
+#define scalbnf16(x,pw2) ldexpf16(x,pw2)
+
+#define truncf16(a) (a>0.?floorf16(a):ceilf16(a))
+#define roundf16(a) (a>0.?floorf16(a+0.5):ceilf16(a-0.5))
+#define rintf16(a) ceilf16(a)
 
 #endif
 
