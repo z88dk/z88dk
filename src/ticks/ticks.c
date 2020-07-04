@@ -586,16 +586,11 @@ static const uint8_t mirror_table[] = {
 void exit_log(int code, char *fmt, ...)
 {
     va_list  ap;
-    
-    char *program_name = (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__);
 
     va_start(ap, fmt);
     if ( fmt != NULL ) {
-        if ( program_name ) {
-            fprintf(stderr, "%s: ", program_name);
-        }
-
-        vfprintf(stderr, fmt, ap);
+       fprintf(stderr, "ticks: ");
+       vfprintf(stderr, fmt, ap);
     }
 
     va_end(ap);
