@@ -83,7 +83,7 @@ half_t exp10f16 (half_t x)
      *   = 10**g 10**( n log10(2) )
      *   = 10**( g + n log10(2) )
      */
-    z = floorf16( x * LOG210 + (half_t)0.5 );
+    z = floorf16( x * LOG210 + 0.5 );
 
     x -= z * LG102A;
     x -= z * LG102B;  

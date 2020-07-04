@@ -1,7 +1,3 @@
-	call	l_gint
-=
-	ld	hl,(hl)
-
 	ld	a,(hl)
 	inc	hl
 	ld	h,(hl)
@@ -23,11 +19,37 @@
 	ld	de,(hl)
 	inc	hl
 
+	call	l_gint
+=
+	ld	hl,(hl)
+
+	call	l_gint	;
+=
+	ld	hl,(hl)
+
+	call	l_gintsp	;
+=
+	add	hl,sp
+	ld	hl,(hl)
+
+	call	l_gintspsp	;
+=
+	add	hl,sp
+	ld	hl,(hl)
+	push	hl
+
 	call	l_pint
 =
 	ex	de,hl
 	ld	(hl),de
 	ex	de,hl
+
+	call	l_pint_pop
+=
+	pop	de
+	ex	de,hl
+	ld	(hl),de
+ 	ex	de,hl
 
 	call	l_glonghlp	;too long
 =

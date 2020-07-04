@@ -8,49 +8,126 @@
 
 include Make.config
 
-# LIBRARIES not built by the global list below:
-# - SP1 (build depends on customization and machine target, "make sp1" for options)
+TARGETS ?= all
 
-all: genlibs z88libs tilibs zxlibs enterprise_clib.lib c128ansi_clib.lib nclibs cpclibs \
-	abc80_clib.lib abc800_clib.lib ace_clib.lib aquarius_clib.lib \
-	aussie.lib bee_clib.lib microbee.lib c7420_clib.lib \
-	cpm_clib.lib einstein.lib fp1100_clib.lib gal_clib.lib \
-	g800_clib.lib m5_clib.lib mc1000_clib.lib \
-	msx_clib.lib mtx_clib.lib mz_clib.lib mz2500_clib.lib x1_clib.lib \
-	nascom_clib.lib  newbrain_clib.lib \
-	osca_clib.lib ozansi_clib.lib pacman_clib.lib p2000_clib.lib  \
-	pc6001_clib.lib pc88_clib.lib pps_clib.lib px4.lib px8.lib \
-	rex_clib.lib rx78_clib.lib sc3000_clib.lib sms_clib.lib lynx_clib.lib \
-	svi_clib.lib sam_clib.lib  srr_clib.lib  sos_clib.lib tiki100.lib \
-	trs80_clib.lib trsdos.lib vg5k_clib.lib vz_clib.lib  x07_clib.lib \
-	embedded_clib.lib test_clib.lib test8080_clib.lib testrcm_clib.lib testgbz80_clib.lib z1013_clib.lib z9001_clib.lib kc_clib.lib \
-	pv1000_clib.lib pv2000_clib.lib coleco_clib.lib multi8_clib.lib alphatro_clib.lib  spc1000_clib.lib \
-	laser500_clib.lib super80_clib.lib super80_vduem_clib.lib \
-	adam.lib z80tvgame_clib.lib smc777_cpm.lib pasopia7_clib.lib sv8000_clib.lib \
-	excali64_clib.lib gb_clib.lib s1mp3_clib.lib bic.lib myvision_clib.lib pencil2_clib.lib \
-	preempt.lib zx80_clib.lib zx81libs sp1-all rcmx000_clib.lib tvc_clib.lib hemc_clib.lib \
-	kramermc_clib.lib hgmc_clib.lib pmd85_clib.lib vector06c_clib.lib homelab_clib.lib m100_clib.lib \
-	homelab2_clib.lib primo_clib.lib mikro80_clib.lib special_clib.lib
+TOCREATE =
 
-genlibs: z80_crt0.lib math48.lib gen_math.lib mbf32.lib mbf64.lib math16.lib math32.lib gendos.lib ndos.lib  \
-	 lib3d.lib fastmath.lib
+# $1 = target
+# $2 = libs
+check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
+
+CPMLIBS = cpm_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib
+GENLIBS = z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib gendos.lib ndos.lib  lib3d.lib fastmath.lib preempt.lib sp1-all
 
 
-nclibs: nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib
+TOCREATE := $(call check_target,ace,ace_clib.lib gfxace.lib gfxaceudg.lib)
+TOCREATE += $(call check_target,abc80,abc80_clib.lib)
+TOCREATE += $(call check_target,abc800,abc800_clib.lib)
+TOCREATE += $(call check_target,adam,adam.lib $(CPMLIBS))
+TOCREATE += $(call check_target,alphatro,alphatro_clib.lib)
+TOCREATE += $(call check_target,aquarius,aquarius_clib.lib gfxaq48.lib)
+TOCREATE += $(call check_target,attache,attache.lib $(CPMLIBS))
+TOCREATE += $(call check_target,aussie,aussie.lib $(CPMLIBS))
+TOCREATE += $(call check_target,bee,bee_clib.lib microbee.lib $(CPMLIBS))
+TOCREATE += $(call check_target,bic,bic.lib $(CPMLIBS))
+TOCREATE += $(call check_target,bit90,bit90.lib coleco_clib.lib)
+TOCREATE += $(call check_target,c128,c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib)
+TOCREATE += $(call check_target,c7420,c7420_clib.lib)
+TOCREATE += $(call check_target,coleco,coleco_clib.lib)
+TOCREATE += $(call check_target,cpc,cpc_clib.lib cpcfs.lib cpc_math.lib)
+TOCREATE += $(call check_target,cpm,$(CPMLIBS))
+TOCREATE += $(call check_target,einstein,einstein.lib $(CPMLIBS))
+TOCREATE += $(call check_target,embedded,embedded_clib.lib)
+TOCREATE += $(call check_target,enterprise,enterprise_clib.lib gfxep.lib gfxephr.lib)
+TOCREATE += $(call check_target,excali64,excali64_clib.lib $(CPMLIBS))
+TOCREATE += $(call check_target,fp1100,fp1100_clib.lib)
+TOCREATE += $(call check_target,g800,g800_clib.lib)
+TOCREATE += $(call check_target,gal,gal_clib.lib)
+TOCREATE += $(call check_target,gb,gb_clib.lib)
+TOCREATE += $(call check_target,hemc,hemc_clib.lib)
+TOCREATE += $(call check_target,hgmc,hgmc_clib.lib)
+TOCREATE += $(call check_target,homelab,homelab_clib.lib)
+TOCREATE += $(call check_target,homelab2,homelab2_clib.lib)
+TOCREATE += $(call check_target,kaypro,gfxkp.lib $(CPMLIBS))
+TOCREATE += $(call check_target,kc,kc_clib.lib)
+TOCREATE += $(call check_target,kramermc,kramermc_clib.lib)
+TOCREATE += $(call check_target,lambda, mlambda.lib mlambda_tiny.lib lambda_clib.lib gfxlambda.lib )
+TOCREATE += $(call check_target,laser500,laser500_clib.lib)
+TOCREATE += $(call check_target,lynx,lynx_clib.lib)
+TOCREATE += $(call check_target,m100,m100_clib.lib)
+TOCREATE += $(call check_target,m5,m5_clib.lib)
+TOCREATE += $(call check_target,mc1000,mc1000_clib.lib)
+TOCREATE += $(call check_target,mikro80,mikro80_clib.lib)
+TOCREATE += $(call check_target,msx,msx_clib.lib)
+TOCREATE += $(call check_target,mtx,mtx_clib.lib)
+TOCREATE += $(call check_target,multi8,multi8_clib.lib)
+TOCREATE += $(call check_target,myvision,myvision_clib.lib)
+TOCREATE += $(call check_target,mz,mz_clib.lib)
+TOCREATE += $(call check_target,mz2500,mz2500_clib.lib)
+TOCREATE += $(call check_target,nascom,nascom_clib.lib)
+TOCREATE += $(call check_target,nc,nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib zxfcntl)
+TOCREATE += $(call check_target,newbrain,newbrain_clib.lib)
+TOCREATE += $(call check_target,osborne,gfxosborne1.lib $(CPMLIBS))
+TOCREATE += $(call check_target,osca,osca_clib.lib)
+TOCREATE += $(call check_target,oz,ozansi_clib.lib)
+TOCREATE += $(call check_target,p2000,p2000_clib.lib)
+TOCREATE += $(call check_target,pacman,pacman_clib.lib)
+TOCREATE += $(call check_target,pasopia7,pasopia7_clib.lib)
+TOCREATE += $(call check_target,pc6001,pc6001_clib.lib)
+TOCREATE += $(call check_target,pc88,pc88_clib.lib)
+TOCREATE += $(call check_target,pencil2,pencil2_clib.lib)
+TOCREATE += $(call check_target,pmd85,pmd85_clib.lib)
+TOCREATE += $(call check_target,pps,pps_clib.lib)
+TOCREATE += $(call check_target,primo,primo_clib.lib)
+TOCREATE += $(call check_target,pv1000,pv1000_clib.lib)
+TOCREATE += $(call check_target,pv2000,pv2000_clib.lib)
+TOCREATE += $(call check_target,px4,px4.lib $(CPMLIBS))
+TOCREATE += $(call check_target,px8,px8.lib $(CPMLIBS))
+TOCREATE += $(call check_target,rcmx000,rcmx000_clib.lib)
+TOCREATE += $(call check_target,rc700,rc700.lib $(CPMLIBS))
+TOCREATE += $(call check_target,rex,rex_clib.lib)
+TOCREATE += $(call check_target,rx78,rx78_clib.lib)
+TOCREATE += $(call check_target,s1mp3,s1mp3_clib.lib)
+TOCREATE += $(call check_target,sam,sam_clib.lib)
+TOCREATE += $(call check_target,sc3000,sc3000_clib.lib)
+TOCREATE += $(call check_target,smc777,smc777_cpm.lib $(CPMLIBS))
+TOCREATE += $(call check_target,sms,sms_clib.lib)
+TOCREATE += $(call check_target,spc1000,spc1000_clib.lib)
+TOCREATE += $(call check_target,srr,srr_clib.lib)
+TOCREATE += $(call check_target,sos,sos_clib.lib)
+TOCREATE += $(call check_target,special,special_clib.lib)
+TOCREATE += $(call check_target,super80,super80_clib.lib super80_vduem_clib.lib)
+TOCREATE += $(call check_target,sv8000,sv8000_clib.lib)
+TOCREATE += $(call check_target,svi,svi_clib.lib)
+TOCREATE += $(call check_target,test,test_clib.lib test8080_clib.lib testrcm_clib.lib testgbz80_clib.lib)
+TOCREATE += $(call check_target,ti82,ti82_clib.lib)
+TOCREATE += $(call check_target,ti83,ti83_clib.lib)
+TOCREATE += $(call check_target,ti83p,ti83p_clib.lib)
+TOCREATE += $(call check_target,ti85,ti85_clib.lib)
+TOCREATE += $(call check_target,ti86,ti86_clib.lib)
+TOCREATE += $(call check_target,tiki100,tiki100.lib $(CPMLIBS))
+TOCREATE += $(call check_target,trs80, trs80_clib.lib trsdos.lib gfxtrs80.lib gfxeg2000.lib)
+TOCREATE += $(call check_target,ts2068, ts2068_clib.lib m2068.lib)
+TOCREATE += $(call check_target,tvc, tvc_clib.lib)
+TOCREATE += $(call check_target,vector06c,vector06c_clib.lib)
+TOCREATE += $(call check_target,vg5k,vg5k_clib.lib)
+TOCREATE += $(call check_target,vz,vz_clib.lib)
+TOCREATE += $(call check_target,x07,x07_clib.lib)
+TOCREATE += $(call check_target,x1,x1_clib.lib x1_cpm.lib $(CPMLIBS))
+TOCREATE += $(call check_target,z1013,z1013_clib.lib)
+TOCREATE += $(call check_target,z80tvgame,z80tvgame_clib.lib)
+TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
+TOCREATE += $(call check_target,z9001,z9001_clib.lib gfx9001krt.lib)
+TOCREATE += $(call check_target,zx, zx_clib.lib mzx.lib mzx_tiny.lib zxrom.lib)
+TOCREATE += $(call check_target,zxvgs, zxvgs.lib)
+TOCREATE += $(call check_target,zx80, zx80_clib.lib)
+TOCREATE += $(call check_target,zx81, zx81_clib.lib gfx81.lib gfx81udg.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib)
+TOCREATE += $(call check_target,zxn, zxn_clib.lib zxfcntl)
 
 
-cpclibs: cpc_clib.lib  cpcfs.lib cpc_math.lib
+TOCREATE += $(GENLIBS)
 
-z88libs: z88_math.lib  z88_clib.lib   
-
-tilibs: ti82_clib.lib ti83_clib.lib ti83p_clib.lib ti85_clib.lib ti86_clib.lib
-
-zxlibs: ts2068_clib.lib zx_clib.lib zxvgs.lib mzx.lib mzx_tiny.lib m2068.lib zxrom.lib zxfcntl zxn_clib.lib
-
-zx81libs: zx81_clib.lib gfx81.lib gfxlambda.lib gfx81udg.lib gfx81hr64.lib gfx81hr192.lib m81.lib m81_tiny.lib mlambda.lib mlambda_tiny.lib lambda_clib.lib
-
-# moving external shell scripts to makefile to make life easy on
-# the windows platform devs (ie Me :-) -- gamesdeps.sh, gfxdeps.sh, tideps.sh
+all: $(TOCREATE)
 
 
 # Arg1: target
@@ -91,7 +168,7 @@ zx81deps:
 
 
 # Generic maths build - dom, stefano
-gen_math.lib:
+genmath.lib:
 	@echo ''
 	@echo '--- Building Z80 Generic Maths Library ---'
 	@echo ''
@@ -176,9 +253,6 @@ z88_clib.lib:
 
 # ZX Spectrum fcntl - dom/stefano
 zxfcntl:
-	@echo ''
-	@echo '--- Building ZX Spectrum fcntl libraries ---'
-	@echo ''
 	$(MAKE) -C target/zx/fcntl
 
 # 64/32 column library for ZX Spectrum - dom/stefano
@@ -573,26 +647,32 @@ x1_cpm.lib:
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=x1
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_cpm @$(LISTFILE_DIRECTORY)/target/x1/x1.lst
 
-cpm_clib.lib: gfxkp.lib attache.lib gfxosborne1.lib rc700.lib x1_cpm.lib
+cpm_clib.lib: 
 	@echo ''
 	@echo '--- Building CP/M Library ---'
 	@echo ''
 	$(call buildgeneric,cpm)
 	$(MAKE) -C target/cpm
 	TARGET=cpm TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
+
+cpm8080_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Library (8080)---'
 	@echo ''
 	$(RM) target/cpm/stdio/*.o target/cpm/cpm/*.o
 	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(LISTFILE_DIRECTORY)/cpm_8080.lst
+
+cpmdevice.lib:
 	@echo ''
 	@echo '--- Building CP/M Device fnctl Library ---'
 	@echo ''
 	TARGET=cpm TYPE=z80 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @target/cpm/fcntl/fcntl.lst
+
+cpmdevice_8080.lib:
 	@echo ''
 	@echo '--- Building CP/M Device fnctl Library (8080) ---'
 	@echo ''
-	TARGET=cpm TYPE=8080 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice @target/cpm/fcntl/fcntl.lst
+	TARGET=cpm TYPE=8080 DEVICE=device $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpmdevice_8080 @target/cpm/fcntl/fcntl.lst
 
 
 # Sorcerer Exidy lib - Stefano
@@ -642,7 +722,7 @@ abc800_clib.lib:
 	TARGET=abc800 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/abc800_clib @$(LISTFILE_DIRECTORY)/abc800.lst
 
 # Jupiter ACE library - Stefano
-ace_clib.lib: gfxace.lib gfxaceudg.lib
+ace_clib.lib:
 	@echo ''
 	@echo '--- Building Jupiter Ace Library ---'
 	@echo ''
@@ -666,7 +746,7 @@ gfxaceudg.lib:
 	TARGET=aceudg TYPE=z80 $(LIBLINKER) -DFORaceudg -x$(OUTPUT_DIRECTORY)/gfxaceudg @$(LISTFILE_DIRECTORY)/target/ace/gfxaceudg.lst
 
 # Mattel Aquarius library - Stefano
-aquarius_clib.lib: gfxaq48.lib
+aquarius_clib.lib: 
 	@echo ''
 	@echo '--- Building Mattel Aquarius Library (& 80x72 GFX) ---'
 	@echo ''
@@ -795,7 +875,7 @@ tvc_clib.lib:
 
 
 # Enterprise library - Stefano
-enterprise_clib.lib: gfxep.lib gfxephr.lib
+enterprise_clib.lib: 
 	@echo ''
 	@echo '--- Building Enterprise 64/128 Library ---'
 	@echo ''
@@ -923,7 +1003,7 @@ z1013_clib.lib:
 	TARGET=z1013 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(LISTFILE_DIRECTORY)/z1013.lst
 
 # Robotron KC85/1, Z9001 library - Stefano
-z9001_clib.lib: gfx9001krt.lib
+z9001_clib.lib: 
 	@echo ''
 	@echo '--- Building Robotron KC85/1, KC/87, Z9001 Library ---'
 	@echo ''
@@ -1122,7 +1202,7 @@ sv8000_clib.lib:
 	TARGET=sv8000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsv8000 -x$(OUTPUT_DIRECTORY)/sv8000_clib @$(LISTFILE_DIRECTORY)/sv8000.lst
 
 # Colecovision - dom/stefano
-coleco_clib.lib: bit90.lib
+coleco_clib.lib: 
 	@echo ''
 	@echo '--- Building Colecovision Library ---'
 	@echo ''
@@ -1208,7 +1288,7 @@ cpc_math.lib:
 	$(MAKE) -C math/cpcmath 
 
 # Commodore 128 (Z80 mode) library - Stefano
-c128ansi_clib.lib: gfx128.lib gfx128hr.lib gfx128hr480.lib
+c128ansi_clib.lib: 
 	@echo ''
 	@echo '--- Building Commodore 128 ANSI Library ---'
 	@echo ''
@@ -1381,7 +1461,7 @@ testgbz80_clib.lib:
 
 
 # TRS 80 - stefano
-trs80_clib.lib: gfxtrs80.lib gfxeg2000.lib
+trs80_clib.lib: 
 	@echo ''
 	@echo '--- Building TRS 80 Library ---'
 	@echo ''

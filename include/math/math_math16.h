@@ -37,6 +37,7 @@
 #define M_SQRTPI   1.772454
 #define M_1_PI     0.318310
 #define M_2_PI     0.636620
+#define M_4_PI     1.273240
 #define M_1_SQRTPI 0.564190
 #define M_2_SQRTPI 1.128379
 #define M_SQRT2    1.414214
