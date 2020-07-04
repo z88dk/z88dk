@@ -370,6 +370,18 @@
 
 
 
+._func8a
+	ld	hl,15360	;const
+	ret
+
+
+
+._func8b
+	ld	hl,15360	;const
+	ret
+
+
+
 
 	SECTION	bss_compiler
 ._doub_val	defs	6
@@ -407,6 +419,8 @@
 	GLOBAL	_func7b
 	GLOBAL	_func7c
 	GLOBAL	_func7d
+	GLOBAL	_func8a
+	GLOBAL	_func8b
 
 
 

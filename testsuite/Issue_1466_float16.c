@@ -118,3 +118,11 @@ _Float16 func7c(long a, _Float16 b) {
 _Float16 func7d(long a, _Float16 b) {
         return a * b;
 }
+
+_Float16 func8a() {
+	return 1.0;
+}
+
+_Float16 func8b() {
+	return 1L;
+}

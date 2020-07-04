@@ -557,8 +557,31 @@ void doreturn(char type)
 {
     /* if not end of statement, get an expression */
     if (endst() == 0) {
-        Type *expr = doexpr();
-        force(currfn->ctype->return_type->kind, expr->kind, currfn->ctype->return_type->isunsigned, expr->isunsigned, 0);
+        char *before, *start;
+        double val;
+        int    vconst;
+        Type   *type_ptr;
+
+        while (1) {
+            setstage(&before, &start);
+            expression(&vconst, &val, &type_ptr);
+            // If it's a constant and last, clear the load and load as a constant of the right
+            // type
+            if ( vconst && ch() != ',') {
+                LVALUE lval = {0};
+                clearstage(before, NULL);
+                lval.val_type = currfn->ctype->return_type->kind;
+                lval.const_val = val;
+                load_constant(&lval);
+                gen_leave_function(currfn->ctype->return_type->kind, type, incritical);
+                return;
+            }
+            clearstage(before, start);
+            if (ch() != ',')
+                break;
+            inbyte();
+        }
+        force(currfn->ctype->return_type->kind, type_ptr->kind, currfn->ctype->return_type->isunsigned, type_ptr->isunsigned, 0);
         gen_leave_function(currfn->ctype->return_type->kind, type, incritical);
     } else {
         gen_leave_function(KIND_INT, type, incritical);
