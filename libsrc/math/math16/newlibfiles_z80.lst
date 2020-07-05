@@ -78,6 +78,7 @@
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/asin.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/asin_fastcall.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/atan.asm
+../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/atan_fastcall.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/ceil.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/cos.asm
 ../../_DEVELOPMENT/math/float/math16/lm16/c/sccz80/cos_fastcall.asm

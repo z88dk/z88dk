@@ -1,6 +1,6 @@
 
 	SECTION	code_fp_math16
-	PUBLIC	_cos
+	PUBLIC	_cosf16
 	EXTERN	cm16_sdcc_cos
 
-	defc	_cos = cm16_sdcc_cos
+	defc	_cosf16 = cm16_sdcc_cos

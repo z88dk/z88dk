@@ -1,6 +1,6 @@
 
 	SECTION	code_fp_math16
-	PUBLIC	_asin_fastcall
+	PUBLIC	_asinf16_fastcall
 	EXTERN	_m16_asinf
 
-	defc	_asin_fastcall = _m16_asinf
+	defc	_asinf16_fastcall = _m16_asinf

@@ -1,13 +1,14 @@
 
 	SECTION	code_fp_math16
-	PUBLIC	tan_fastcall
+	PUBLIC	tanf16_fastcall
 	EXTERN	_m16_tanf
 
-	defc	tan_fastcall = _m16_tanf
+	defc	tanf16_fastcall = _m16_tanf
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC
-PUBLIC _tan_fastcall
-defc _tan_fastcall = _m16_tanf
+PUBLIC _tanf16_fastcall
+defc _tanf16_fastcall = _m16_tanf
 ENDIF
 
