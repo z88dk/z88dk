@@ -7,8 +7,8 @@ char *last_path_char(char *filename)
 {
     char *p, *q;
 
-    // return pointer to last slash character in filename
-    // return NULL if no slash character found
+    /* return pointer to last slash character in filename   */
+    /* return NULL if no slash character found              */
 
     p = strrchr(filename, '/');
     q = strrchr(filename, '\\');
