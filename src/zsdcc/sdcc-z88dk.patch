@@ -1,6 +1,6 @@
 Index: src/SDCCasm.c
 ===================================================================
---- src/SDCCasm.c	(revision 11690)
+--- src/SDCCasm.c	(revision 11715)
 +++ src/SDCCasm.c	(working copy)
 @@ -403,8 +403,8 @@
  static const ASM_MAPPING _asxxxx_mapping[] = {
@@ -23,7 +23,7 @@ Index: src/SDCCasm.c
     "; ---------------------------------\n"
 Index: src/SDCCglue.c
 ===================================================================
---- src/SDCCglue.c	(revision 11690)
+--- src/SDCCglue.c	(revision 11715)
 +++ src/SDCCglue.c	(working copy)
 @@ -189,7 +189,7 @@
             (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
@@ -84,7 +84,7 @@ Index: src/SDCCglue.c
  
 Index: src/SDCCmain.c
 ===================================================================
---- src/SDCCmain.c	(revision 11690)
+--- src/SDCCmain.c	(revision 11715)
 +++ src/SDCCmain.c	(working copy)
 @@ -502,16 +502,15 @@
  {
@@ -112,7 +112,7 @@ Index: src/SDCCmain.c
  static void
 Index: src/SDCCopt.c
 ===================================================================
---- src/SDCCopt.c	(revision 11690)
+--- src/SDCCopt.c	(revision 11715)
 +++ src/SDCCopt.c	(working copy)
 @@ -1010,7 +1010,7 @@
        /* TODO: Eliminate it, convert any SEND of volatile into DUMMY_READ_VOLATILE. */
@@ -176,7 +176,7 @@ Index: src/SDCCopt.c
                  continue;
 Index: src/z80/peep.c
 ===================================================================
---- src/z80/peep.c	(revision 11690)
+--- src/z80/peep.c	(revision 11715)
 +++ src/z80/peep.c	(working copy)
 @@ -248,6 +248,88 @@
    return(found && found < end);

@@ -18,7 +18,7 @@ Detailed but incomplete changelist:
 - [sccz80] Bitfields now work and on the 8080
 - [sccz80] Code generator fixes for gbz80
 - [z80asm] db/dw/ds etc synonyms are now accepted
-- [zsdcc] Upgraded to SDCC 4.0.2 r11690 (bugfixes)
+- [zsdcc] Upgraded to SDCC 4.0.2 r11715 (bugfixes)
 
 z88dk v2.0 - 03.02.2020
 
