@@ -13,6 +13,7 @@
 #include "hist.h"
 #include "init.h"
 #include "model.h"
+#include "modlink.h"        /* Prevent warning: implicit declaration of function ‘library_file_append’ */
 #include "options.h"
 #include "srcfile.h"
 #include "str.h"
