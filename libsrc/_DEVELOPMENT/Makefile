@@ -7,6 +7,8 @@ TARGET ?= z80 cpm hbios m math16 math32 rc2014 scz180 sms vgl yaz180 z180 zx zxn
 jobs := $(foreach target,$(TARGET),job-$(target))
 cleans := $(foreach target,$(TARGET),clean-$(target))
 
+Z88DK_LIB := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../../lib/
+
 .PHONY: all
 all: ${jobs} 
 
@@ -48,9 +50,9 @@ ${jobs}: job-%:
 	@if [ -f target/$(target)/library/$(target)_macro.lst ]; then \
 		zcc +z80 -vn -clib=new -m4 --lstcwd @target/$(target)/library/$(target)_macro.lst; \
 	fi;
-	$(Z80ASM) $(cpu) -xlib/sccz80/$(target) @target/$(target)/library/$(target)_sccz80.lst
-	$(Z80ASM) $(cpu) -xlib/sdcc_ix/$(target) -D__SDCC -D__SDCC_IX @target/$(target)/library/$(target)_sdcc_ix.lst
-	$(Z80ASM) $(cpu) --IXIY -xlib/sdcc_iy/$(target) -D__SDCC -D__SDCC_IY @target/$(target)/library/$(target)_sdcc_iy.lst
+	$(Z80ASM) $(cpu) -xlib/sccz80/$(target) -I$(Z88DK_LIB) @target/$(target)/library/$(target)_sccz80.lst
+	$(Z80ASM) $(cpu) -xlib/sdcc_ix/$(target) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @target/$(target)/library/$(target)_sdcc_ix.lst
+	$(Z80ASM) $(cpu) --IXIY -xlib/sdcc_iy/$(target) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IY @target/$(target)/library/$(target)_sdcc_iy.lst
 
 .PHONY: ${cleans}
 ${cleans}: clean-%:
