@@ -53,7 +53,7 @@ half_t logf16 (half_t x)
 
     /* Test for domain */
     if( x <= 0.0 )
-        return (half_t)HUGE_NEG_F16;
+        return HUGE_NEG_F16;
 
     /* separate mantissa from exponent */
     x = frexpf16(x, &e);

@@ -71,13 +71,13 @@ half_t exp10f16 (half_t x)
     half_t z;
 
     if( x > MAXL10_F16 )
-        return (half_t)HUGE_POS_F16;
+        return HUGE_POS_F16;
 
     if( x < MINL10_F16 )
-        return (half_t)0.0;
+        return 0.0;
 
     if( x == 0.0 )
-        return (half_t)1.0;
+        return 1.0;
 
     /* Express 10**x = 10**g 2**n
      *   = 10**g 10**( n log10(2) )

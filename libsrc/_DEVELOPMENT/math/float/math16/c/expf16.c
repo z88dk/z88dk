@@ -63,13 +63,13 @@ half_t expf16 (half_t x)
     half_t z;
 
     if( x > MAXLOG_F16)
-        return (half_t)HUGE_POS_F16;
+        return HUGE_POS_F16;
 
     if( x < MINLOG_F16 )
-        return (half_t)0.0;
+        return 0.0;
 
     if( x == 0.0 )
-        return (half_t)1.0;
+        return 1.0;
 
     z = floorf16( x * LOG2EF + 0.5 );
 

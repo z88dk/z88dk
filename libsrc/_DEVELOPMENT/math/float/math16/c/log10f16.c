@@ -57,7 +57,7 @@ half_t log10f16 (half_t x)
 
     /* Test for domain */
     if( x <= 0.0 )
-        return (half_t)HUGE_NEG_F16;
+        return HUGE_NEG_F16;
 
     /* separate mantissa from exponent */
     x = frexpf16( x, &e );
@@ -67,7 +67,7 @@ half_t log10f16 (half_t x)
     if( x < M_SQRT1_2 )
     {
         --e;
-        x = mul2f16(x) - (half_t)1.0; /*  2x - 1  */
+        x = mul2f16(x) - 1.0; /*  2x - 1  */
     }
     else
     {

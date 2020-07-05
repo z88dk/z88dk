@@ -26,7 +26,7 @@ half_t atanf16 (half_t f)
     half_t val;
 
     if((val = fabsf16(f)) == 0.0)
-        return (half_t)0.0;
+        return 0.0;
 
     if(recip = (val > 1.0))
         val = invf16( val );

@@ -72,13 +72,13 @@ half_t exp2f16 (half_t x)
     half_t z;
 
     if( x > MAXL2_F16 )
-        return (half_t)HUGE_POS_F16;
+        return HUGE_POS_F16;
 
     if( x < MINL2_F16 )
-        return (half_t)0.0;
+        return 0.0;
 
     if( x == 0.0 )
-        return (half_t)1.0;
+        return 1.0;
 
     /* separate into integer and fractional parts */
     z = floorf16( x + 0.5 );
