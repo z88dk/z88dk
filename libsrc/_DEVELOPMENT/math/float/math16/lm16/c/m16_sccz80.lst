@@ -4,6 +4,7 @@ math/float/math16/lm16/c/sccz80/acos_fastcall
 math/float/math16/lm16/c/sccz80/asin
 math/float/math16/lm16/c/sccz80/asin_fastcall
 math/float/math16/lm16/c/sccz80/atan
+math/float/math16/lm16/c/sccz80/atan_fastcall
 math/float/math16/lm16/c/sccz80/ceil
 math/float/math16/lm16/c/sccz80/cos
 math/float/math16/lm16/c/sccz80/cos_fastcall

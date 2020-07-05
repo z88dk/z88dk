@@ -1,6 +1,6 @@
 
 	SECTION	code_fp_math16
-	PUBLIC	_tan_fastcall
+	PUBLIC	_tanf16_fastcall
 	EXTERN	_m16_tanf
 
-	defc	_tan_fastcall = _m16_tanf
+	defc	_tanf16_fastcall = _m16_tanf

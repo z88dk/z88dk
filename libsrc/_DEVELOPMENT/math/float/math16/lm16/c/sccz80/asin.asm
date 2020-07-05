@@ -1,14 +1,15 @@
 
 	SECTION	code_fp_math16
-	PUBLIC	asin
+	PUBLIC	asinf16
 	EXTERN	_m16_asinf
 
-	defc	asin = _m16_asinf
+	defc	asinf16 = _m16_asinf
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC
-PUBLIC _asin
+PUBLIC _asinf16
 EXTERN cm16_sdcc_asin
-defc _asin = cm16_sdcc_asin
+defc _asinf16 = cm16_sdcc_asin
 ENDIF
 
