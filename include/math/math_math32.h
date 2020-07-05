@@ -22,30 +22,6 @@
 #define INFINITY_POS_F32    ((unsigned long)0x7F800000)
 #define INFINITY_NEG_F32    ((unsigned long)0xFF800000)
 
-#define PI          3.1415926536
-#define TWO_PI      6.2831853071
-#define HALF_PI     1.5707963268
-#define QUART_PI    0.7853981634
-#define iPI         0.3183098862
-#define iTWO_PI     0.1591549431
-#define TWO_O_PI    0.6366197724
-
-
-// Non-ANSI macros
-#define BADTAN          (double_t)1.560796327
-#define EXPLARGE        (double_t)89.80081863
-#define INF             (double_t)3.00e38
-#define IPIby180        (double_t)57.29577951
-#define LNof10          (double_t)2.302585093
-#define LOG2            (double_t)0.30102999567
-#define LOGE            (double_t)0.43429448190
-#define PIby180         (double_t)0.0174532925
-#define PIbyTWO         (double_t)1.570796326795
-#define POW10INF        (double_t)38.0
-#define SQR10           (double_t)3.162277660168
-#define TWObyPI         (double_t)0.63661977
-
-
 
 /* Trigonometric functions */
 extern double_t __LIB__ sin(double_t x);
