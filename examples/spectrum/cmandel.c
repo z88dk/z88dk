@@ -9,6 +9,10 @@
 	build with:   zcc +zx -lndos -lm -create-app cmandel.c
 	              - or -
 	              zcc +zx -lndos -lm -create-app -Dlr64x48 cmandel.c
+    
+    zcc +zx -lndos -O3 -lm cmandel.c -o cmandel48 -create-app
+    zcc +zx -lndos -O3 --math32 cmandel.c -o cmandel32 -create-app
+    zcc +zx -lndos -O3 --math16  cmandel.c -o cmandel16 -create-app
 
 	$Id: cmandel.c,v 1.3 2010-04-02 09:05:06 stefano Exp $
 */
@@ -23,13 +27,19 @@
 #include <stdio.h>
 #include <zxlowgfx.h>
 
+#ifdef __MATH_MATH16
+    #define FLOAT       _Float16
+#else
+    #define FLOAT       float
+#endif
+
 void main()
 {
-    float a, b, c, d, e, g, h, i, j;
+    FLOAT a, b, c, d, e, g, h, i, j;
     int x, y;
     int xmax, ymax;
     int k;
-    float l, m, n, o, p;
+    FLOAT l, m, n, o, p;
 
     cclg(1); // Blue background
 
@@ -50,13 +60,13 @@ void main()
 
     e = 4.0;
 
-    g = (b - a) / (float)xmax;
-    h = (d - c) / (float)ymax;
+    g = (b - a) / (FLOAT)xmax;
+    h = (d - c) / (FLOAT)ymax;
 
     for (y = ymax / 2; y >= 0; y--) {
-        j = (float)y * h + c;
+        j = (FLOAT)y * h + c;
         for (x = xmax; x >= 0; x--) {
-            i = (float)x * g + a;
+            i = (FLOAT)x * g + a;
             k = 0;
             l = 0.0;
             m = 0.0;
