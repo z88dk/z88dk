@@ -18,7 +18,7 @@ OBJECTS = $(CLASSIC_OBJECTS)
 
 .PHONY: dirs  $(NEWLIB_TARGETS)
 
-all: dirs $(OBJECTS) $(NEWLIB_TARGETS) $(OUTPUT_DIRECTORY)/fastmath.lib $(OUTPUT_DIRECTORY)/fastmath_ixiy.lib
+all: dirs $(OBJECTS) $(NEWLIB_TARGETS) $(OUTPUT_DIRECTORY)/fastmath.lib $(OUTPUT_DIRECTORY)/fastmath_ixiy.lib $(OUTPUT_DIRECTORY)/fastmath_z80n.lib
 
 obj/newlib-z80:  
 	@$(ASSEMBLER) -d -O=obj/z80/x -I.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
@@ -32,6 +32,9 @@ obj/newlib-z80n:
 
 obj/newlib-ixiy:  
 	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
+
+$(OUTPUT_DIRECTORY)/fastmath_z80n.lib: fastmath.lst
+	TYPE=z80n $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_z80n.lib @fastmath.lst
 
 $(OUTPUT_DIRECTORY)/fastmath.lib: fastmath.lst
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath.lib @fastmath.lst

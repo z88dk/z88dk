@@ -24,7 +24,7 @@ defc __CPU_INFO_ENABLE_SLL = 0x01
 ; selection of an integer math lib that ranges from
 ; very fast and very large to very slow and very small.
 
-defc __CLIB_OPT_IMATH = 60
+defc __CLIB_OPT_IMATH = 100
 
 defc __CLIB_OPT_IMATH_FAST = 0x0f
 
