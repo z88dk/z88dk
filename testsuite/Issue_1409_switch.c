@@ -1,4 +1,6 @@
 
+void dofunc(int);
+
 void func(int i) {
    switch ( i ) {
    case 1:
