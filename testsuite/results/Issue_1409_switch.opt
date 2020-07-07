@@ -43,8 +43,8 @@
 
 
 
-	GLOBAL	_func
 	GLOBAL	_dofunc
+	GLOBAL	_func
 
 
 
