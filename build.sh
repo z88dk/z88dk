@@ -7,7 +7,7 @@
 show_help_and_exit()
 {
 
-  if [[ -n $1 ]]; then rc=$1; else rc=0; fi
+  if [ -n $1 ]; then rc=$1; else rc=0; fi
 
   echo ""
   echo "Usage: $0 [-b][-c][-C][-e][-h][-k][-l][-p][-t]"
@@ -58,17 +58,17 @@ while getopts "bcCehklpt" arg; do       # Handle all given arguments
 done
 
                                         # If there will be no action at all with the given parameters, then show help and exit with error
-if [[ $do_clean     = 0 ]]         \
-&& [[ $do_clean_bin = 0 ]]         \
-&& [[ $do_build     = 0 ]]         \
-&& [[ $do_libbuild  = 0 ]]         \
-&& [[ $do_tests     = 0 ]]         \
-&& [[ $do_examples  = 0 ]]; then
+if [ $do_clean     != 1 ]          \
+&& [ $do_clean_bin != 1 ]          \
+&& [ $do_build     != 1 ]          \
+&& [ $do_libbuild  != 1 ]          \
+&& [ $do_tests     != 1 ]          \
+&& [ $do_examples  != 1 ]; then
   show_help_and_exit 1
 fi
                                         # Only execute the most complete clean of the two options
-if [[ $do_clean     = 1 ]]         \
-&& [[ $do_clean_bin = 1 ]]; then
+if [ $do_clean     = 1 ]           \
+&& [ $do_clean_bin = 1 ]; then
   do_clean=0
 fi
 
@@ -84,10 +84,10 @@ if [ $do_clean_bin = 1 ]; then          # Remove bin => zsdcc and zdcpp must be 
 fi
 
                                         # If there was only cleaning to do then don't change paths, global variables, ...
-if [[ $do_build    != 1 ]]         \
-&& [[ $do_libbuild != 1 ]]         \
-&& [[ $do_tests    != 1 ]]         \
-&& [[ $do_examples != 1 ]]; then
+if [ $do_build    != 1 ]           \
+&& [ $do_libbuild != 1 ]           \
+&& [ $do_tests    != 1 ]           \
+&& [ $do_examples != 1 ]; then
   exit 0
 fi
 
@@ -125,7 +125,7 @@ esac
 
 path=`pwd`/bin                          # Add bin directory to path if it's not already there
 mkdir -p $path                          # Guarantee that the directory exists
-if [[ $PATH != *$path* ]]; then
+if [ $PATH != *$path* ]; then
   PATH=$path:$PATH
   export PATH
 fi
