@@ -1,5 +1,4 @@
 
-
 void func(int i) {
    switch ( i ) {
    case 1:
