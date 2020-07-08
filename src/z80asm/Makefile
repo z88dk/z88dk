@@ -195,6 +195,7 @@ clean::
 	$(RM) zcc_opt.def mandel.bin   mandel.tap
 
 clean::
+	$(RM) -r *.dSYM
 	$(RM) $(TARGET) $(LOCAL_LIB)/$(TARGET) test* $(LOCAL_LIB)/test*
 	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/dev/*.tmp
 
