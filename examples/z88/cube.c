@@ -6,9 +6,29 @@
 /*                                                                         */
 /***************************************************************************/
 
+// zcc +z88 -subtype=app -lm cube.c -o cubeg -create-app                   Generic Maths
+// zcc +z88 -subtype=app -lmz cube.c -o cubez -create-app                  Z88 Maths
+// zcc +z88 -subtype=app --math16 -lfastmath cube.c -o cube16 -create-app  IEEE 16-Bit Maths
+
 #include <stdio.h>
 #include <math.h>
 #include <graphics.h>
+
+#include <dor.h>
+
+#ifdef __MATH_MATH16
+    #define double  _Float16
+    #define sin     sinf16
+    #define cos     cosf16
+
+    #define APP_NAME "ieeecube"   
+    #define APP_KEY 'I'
+#else
+    #define APP_NAME "zcube"   
+    #define APP_KEY 'Z'
+#endif
+
+#include <application.h>
 
 #define MAX_X   256.0
 #define MAX_Y    64.0
