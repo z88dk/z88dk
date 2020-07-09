@@ -14,21 +14,25 @@
 #include <math.h>
 #include <graphics.h>
 
-#include <dor.h>
+/*  Remove comments to support -subtype=app
 
-#ifdef __MATH_MATH16
-    #define double  _Float16
-    #define sin     sinf16
-    #define cos     cosf16
+    #include <dor.h>
 
-    #define APP_NAME "ieeecube"   
-    #define APP_KEY 'I'
-#else
-    #define APP_NAME "zcube"   
-    #define APP_KEY 'Z'
-#endif
+    #ifdef __MATH_MATH16
+        #define double  _Float16
+        #define sin     sinf16
+        #define cos     cosf16
 
-#include <application.h>
+        #define APP_NAME "ieeecube"   
+        #define APP_KEY 'I'
+    #else
+        #define APP_NAME "zcube"   
+        #define APP_KEY 'Z'
+    #endif
+
+    #include <application.h>
+
+*/
 
 #define MAX_X   256.0
 #define MAX_Y    64.0
