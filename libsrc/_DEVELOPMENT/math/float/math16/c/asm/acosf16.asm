@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jul 11 14:37:53 2020
+;	Module compile time: Sat Jul 11 20:26:34 2020
 
 
 	C_LINE	0,"acosf16.c"
@@ -212,16 +212,10 @@
 ._acosf16
 	push	hl
 	push	bc
-	ld	hl,2	;const
-	add	hl,sp	;l_gintspsp
-	ld	a,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
 	push	hl
 	ld	hl,4	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
@@ -234,8 +228,8 @@
 	push	hl
 	push	hl
 	ld	hl,4	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a

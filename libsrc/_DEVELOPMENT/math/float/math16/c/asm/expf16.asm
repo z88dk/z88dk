@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jul 11 14:37:53 2020
+;	Module compile time: Sat Jul 11 20:26:34 2020
 
 
 	C_LINE	0,"expf16.c"
@@ -213,12 +213,6 @@
 ._expf16
 	push	hl
 	push	bc
-	ld	hl,2	;const
-	add	hl,sp	;l_gintspsp
-	ld	a,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
 	push	hl
 	ld	hl,18827	;const
 	call	l_f16_gt
@@ -232,12 +226,10 @@
 
 
 .i_2
-	ld	hl,2	;const
-	add	hl,sp	;l_gintspsp
-	ld	a,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
 	push	hl
 	ld	hl,51417	;const
 	call	l_f16_lt
@@ -251,12 +243,10 @@
 
 
 .i_4
-	ld	hl,2	;const
-	add	hl,sp	;l_gintspsp
-	ld	a,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
 	push	hl
 	ld	hl,0	;const
 	call	l_f16_eq
@@ -270,12 +260,10 @@
 
 
 .i_7
-	ld	hl,2	;const
-	add	hl,sp	;l_gintspsp
-	ld	a,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
 	push	hl
 	ld	hl,15813	;const
 	call	l_f16_mul
@@ -284,9 +272,13 @@
 	call	l_f16_add
 	call	floorf16
 	pop	bc
+	pop	de
+	push	de
+	ex	de,hl
+	push	de
 	push	hl
-	ld	hl,2	;const
-	call	l_g2intspsp	;
+	ex	de,hl
+	push	hl
 	ld	hl,14732	;const
 	call	l_f16_mul
 	call	l_f16_sub
@@ -294,8 +286,9 @@
 	pop	bc
 	push	hl
 	push	de
-	ld	hl,2	;const
-	call	l_g2intspsp	;
+	push	hl
+	ex	de,hl
+	push	hl
 	ld	hl,35572	;const
 	call	l_f16_mul
 	call	l_f16_sub

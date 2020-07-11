@@ -43,4 +43,13 @@ math/float/math16/lm16/c/sccz80/l_f16_sub
 math/float/math16/lm16/c/sccz80/l_f16_swap
 math/float/math16/lm16/c/sccz80/l_f16_zero
 
+math/float/math16/lm16/c/sccz80/div2
+math/float/math16/lm16/c/sccz80/floor
+math/float/math16/lm16/c/sccz80/frexp
+math/float/math16/lm16/c/sccz80/frexp_callee
+math/float/math16/lm16/c/sccz80/ldexp
+math/float/math16/lm16/c/sccz80/ldexp_callee
+math/float/math16/lm16/c/sccz80/mul2
 math/float/math16/lm16/c/sccz80/poly_callee
+math/float/math16/lm16/c/sccz80/sqrt
+
