@@ -209,8 +209,6 @@
 ; parameter '_Float16 x' at 4 size(2)
 	C_LINE	35,"powf16.c::powf16_callee"
 .powf16_callee
-	GLOBAL	_powf16_callee
-._powf16_callee
 	ld	hl,4	;const
 	add	hl,sp
 	ld	e,(hl)

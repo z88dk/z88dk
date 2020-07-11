@@ -7,11 +7,11 @@ EXTERN powf16_callee
 .cm16_sdcc_pow
 
     pop hl      ; return
-    pop de      ; RHS
-    ex (sp),hl  ; return to stack, LHS
+    pop de      ; LHS
+    ex (sp),hl  ; return to stack, RHS
     
-    push de     ; RHS    
-    push hl     ; LHS
+    push de     ; LHS    
+    push hl     ; RHS
 
     call powf16_callee
     pop bc

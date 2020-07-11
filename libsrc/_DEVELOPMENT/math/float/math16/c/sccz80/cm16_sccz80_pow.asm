@@ -7,11 +7,11 @@ EXTERN powf16_callee
 .cm16_sccz80_pow
 
     pop hl      ; return
-    pop de      ; LHS
-    ex (sp),hl  ; return to stack, RHS
-    
-    push hl     ; RHS
-    push de     ; LHS
+    pop de      ; RHS
+    ex (sp),hl  ; return to stack, LHS
+
+    push hl     ; LHS
+    push de     ; RHS
 
     call powf16_callee
     pop bc
