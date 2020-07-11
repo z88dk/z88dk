@@ -1,6 +1,6 @@
 
 	SECTION	code_fp_math16
 	PUBLIC	_log10f16_fastcall
-	EXTERN	_m16_log10f
+	EXTERN	log10f16
 
-	defc	_log10f16_fastcall = _m16_log10f
+	defc	_log10f16_fastcall = log10f16
