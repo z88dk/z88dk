@@ -10,6 +10,45 @@
 =
 ;
 
+	call	l_neg
+=
+	ld	a,l		;l_neg
+	cpl
+	ld	l,a
+	ld	a,h
+	cpl
+	ld	h,a
+	inc	hl
+
+	call	l_sxt
+=
+	ld	l,a		;l_sxt
+	rla
+	sbc	a
+	ld	h,a
+
+	call	l_sub
+=
+	ex	de,hl	;l_sub
+	or	a
+	sbc	hl,de
+
+	call	l_gchar
+=
+	ld	a,(hl)	;l_gchar
+	ld	l,a
+	rla
+	sbc	a
+	ld	h,a
+
+	call	l_gcharsp	;
+=
+	add	hl,sp	;l_gcharsp
+	ld	a,(hl)
+	ld	l,a
+	rla
+	sbc	a
+	ld	h,a
 
 	call	l_gint
 =
@@ -58,19 +97,6 @@
 	inc	hl
 	ld	(hl),d
  	ex	de,hl
-
-	call	l_sxt
-=
-	ld	l,a	;l_sxt
-	rla
-	sbc	a
-	ld	h,a
-
-	call	l_sub
-=
-	ex	de,hl	;l_sub
-	and	a
-	sbc	hl,de
 
 	call	l_glong		;ignore
 	call	l_long_and
