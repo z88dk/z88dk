@@ -39,14 +39,26 @@
  *
  *      Enough twaddle, enjoy the game and study the source!
  *
- *      d. <djm@jb.man.ac.uk> 1/12/98
+ *      d. 1/12/98
  *
- *      This is the BASIC version of the program, compile with:
+ *      This is the application version of the program, compile with:
  *
- *      zcc -lgfx dstar.c
- *
+ *      This example demonstrates the dstar_redrawscreen function which allows
+ *      you to supply a routine to redraw the screen and take the load
+ *      off of OZ. This is a bad app out of necessity really, you can
+ *      write good ones! - Have a look at the file doc/apps.html for
+ *      more details.
  */
 
+/*
+ * Compiler options, need expanded z88 (cos we use the map), need 5
+ * bad pages and we should write the .asm file in app format
+ */
+#ifdef __Z88_APPLICATION
+#pragma -expandz88
+#pragma redirect redrawscreen = _dstar_redrawscreen
+#pragma redirect handlecmds =  _dstar_handlecmds
+#endif
 
 
 /* Call up the required header files */
@@ -58,7 +70,6 @@
 /* dstar.h contains the levels and "sprite" data */
 
 #include "dstar.h"
-
 
 
 #define NO 0
@@ -86,18 +97,17 @@
 /* Declare some variables to start off with! */
 
 
-char balloffset;        /* Ball position */
-char boxoffset;         /* Box position */
-char ballorbox;         /* 1 if box, 0 if ball */
-char level;             /* Take a guess! */
-
-char board[144];        /* Level internal map thing */
-char tiscr[1024];       /* Our very own TI86 screen! */
+static unsigned char balloffset;        /* Ball position */
+static unsigned char boxoffset;         /* Box position */
+static unsigned char ballorbox;         /* 1 if box, 0 if ball */
+static unsigned char level;             /* Take a guess! */
+static unsigned char gameon;            /* Flag for dstar_redrawscreen */
+static unsigned char board[144];        /* Level internal map thing */
+static unsigned char tiscr[1024];       /* Our very own TI86 screen! */
 
 
 /* Some character arrays to handle window functions */
-
-char windtitle[]= {
+static unsigned char windtitle[]= {
             1,'7','#','3',32+7,32+1,32+34,32+7,131,   
             1,'2','C','3',1,'4','+','T','U','R',1,'2','J','C',
             1,'3','@',32,32, /*reset to (0,0)*/
@@ -105,61 +115,60 @@ char windtitle[]= {
             1,'3','@',32,32 ,1,'2','A',32+34,0   
         };
 
-char baswindres[]= {
-                1,'2','H','1',0x0C,0
+static unsigned char baswindres[]= {
+               1,'7','#','3',32,32,32+94,32+8,128,1,'2','C','3',0
                };
 
-char windclr[]= {
+static unsigned char windclr[]= {
                 1,'2','C','3',
                 1,'3','@',32,32,1,'2','+','B',0
                 };
 
 /* Used for the map, keep it global so we can close it easily! */
+static struct window graphics;
 
-struct window graphics;
+static void myexit();
+static void playgame();
+static void setupgame();
+static void gamekeys();
+static void left(unsigned char *ptr);
+static void right(unsigned char *ptr);
+static void down(unsigned char *ptr);
+static void up(unsigned char *ptr);
+static int standardmiddle(unsigned char nextpos);
+static void setuplevel();
+void dstar_redrawscreen(void);
+static void puttiblock(unsigned char spr,int x, int y);
+static void drawboard();
+static void doozcopyasm();
+static int checkfinish();
 
-void redrawscreen(void);
-void myexit();
-void playgame();
-void setupgame();
-void gamekeys();
-void left(char *ptr);
-void right(char *ptr);
-void down(char *ptr);
-void up(char *ptr);
-void setuplevel();
-void redrawscreen(void);
-void drawboard();
-void puttiblock(char spr,int x, int y);
-void doozcopyasm();
-void redrawscreen(void);
-int checkfinish();
-int standardmiddle(char nextpos);
 
-void main()
+
+int main()
 {
-        redrawscreen();         /* Define the windows */
-        playgame();     /* Play the game */
-        myexit();       /* Clean up after ourselves */
-
+    gameon=0;
+    dstar_redrawscreen();         /* Define the windows */
+    playgame();     /* Play the game */
+    myexit();       /* Clean up after ourselves */
+	return 0;
 }
 
 void myexit()
 {
-        closegfx(&graphics);     /* Close the Map window */
-        puts(baswindres);
-        exit(0);                /* Get outta here! */
+    closegfx(&graphics);     /* Close the Map window */
+    exit(0);                /* Get outta here! */
 }
 
 
 void playgame()
 {
-        setupgame();            /* Set level to 1, get level etc */
-/* Loop while checkfinish() says we haven't finished! */
+    setupgame();            /* Set level to 1, get level etc */
 
-        while ( checkfinish() ) {
-                gamekeys();     /* Scan keys */
-        }
+    /* Loop while checkfinish() says we haven't finished! */
+    while ( checkfinish() ) {
+        gamekeys();     /* Scan keys */
+    }
 }
 
 
@@ -167,43 +176,45 @@ void playgame()
 
 void setupgame()
 {
-        ballorbox=NO;
-        level=STARTLEV;
-        setuplevel();
+    ballorbox=NO;
+    level=STARTLEV;
+    setuplevel();
 }
 
 
 void gamekeys()
 {
-        char *charptr;
+    unsigned char *charptr;
 
-/* Set up a pointer to the variable we want to change (either for
- * box or for ball
- */
-        if (ballorbox) charptr=&boxoffset;
-        else charptr=&balloffset;
+    /* Set up a pointer to the variable we want to change (either for
+    * box or for ball
+    */
+    if (ballorbox) 
+        charptr=&boxoffset;
+    else 
+        charptr=&balloffset;
 
-        switch( getk() ) {      /* Use OZ to get the key */
-                case K_DOWN:
-                        down(charptr);
-                        break;
-                case K_UP:
-                        up(charptr);
-                        break;
-                case K_RIGHT:
-                        right(charptr);
-                        break;
-                case K_LEFT:
-                        left(charptr);
-                        break;
-                case K_SWITCH:
-                        ballorbox^=1;   /* Toggle ball/box */
-                        break;
-                case K_EXIT:
-                        myexit();
-                case K_CLEAR:
-                        setuplevel();
-        }
+    switch( getk() ) {      /* Use OZ to get the key */
+    case K_DOWN:
+        down(charptr);
+        break;
+    case K_UP:
+        up(charptr);
+        break;
+    case K_RIGHT:
+        right(charptr);
+        break;
+    case K_LEFT:
+        left(charptr);
+        break;
+    case K_SWITCH:
+        ballorbox^=1;   /* Toggle ball/box */
+        break;
+    case K_EXIT:
+        myexit();
+    case K_CLEAR:
+        setuplevel();
+    }
 }
 
 
@@ -212,61 +223,63 @@ void gamekeys()
  * happening though
  */
 
-void left(char *ptr)
+void left(unsigned char *ptr)
 {
-        char *locn;
+    unsigned char *locn;
 
-        while(1) {
-                locn=*(ptr)+board;
-                if (standardmiddle(*(locn-1)) ) return;
-                *(locn-1)=*locn;
-                *locn=0;
-                (*ptr)--;       /* ptr is the location of blob */
-                drawboard();    /* Draw screen */
-        }
+    while(1) {
+        locn=*(ptr)+board;
+        if (standardmiddle(*(locn-1)) ) return;
+        *(locn-1)=*locn;
+        *locn=0;
+        (*ptr)--;       /* ptr is the location of blob */
+        drawboard();    /* Draw screen */
+    }
 }
 
 
-void right(char *ptr)
+void right(unsigned char *ptr)
 {
-        char *locn;
+    unsigned char *locn;
 
-        while(1) {
-                locn=*(ptr)+board;
-                if (standardmiddle(*(locn+1)) ) return;
-                *(locn+1)=*locn;
-                *locn=0;
-                (*ptr)++;
-                drawboard();
-        }
+    while(1) {
+        locn=*(ptr)+board;
+        if (standardmiddle(*(locn+1)) ) 
+            return;
+        *(locn+1)=*locn;
+        *locn=0;
+        (*ptr)++;
+        drawboard();
+    }
 }
 
-void down(char *ptr)
+void down(unsigned char *ptr)
 {
-        char *locn;
+    unsigned char *locn;
 
-        while(1) {
-                locn=*(ptr)+board;
-                if (standardmiddle(*(locn+16)) ) return;
-                *(locn+16)=*locn;
-                *locn=0;
-                (*ptr)+=16;
-                drawboard();
-        }
+    while(1) {
+        locn=*(ptr)+board;
+        if (standardmiddle(*(locn+16)) ) 
+            return;
+        *(locn+16)=*locn;
+        *locn=0;
+        (*ptr)+=16;
+        drawboard();
+    }
 }
 
-void up(char *ptr)
+void up(unsigned char *ptr)
 {
-        char *locn;
+    unsigned char *locn;
 
-        while(1) {
-                locn=*(ptr)+board;
-                if ( standardmiddle(*(locn-16)) ) return;
-                *(locn-16)=*locn;
-                *locn=0;
-                (*ptr)-=16;
-                drawboard();
-        }
+    while(1) {
+        locn=*(ptr)+board;
+        if ( standardmiddle(*(locn-16)) ) return;
+        *(locn-16)=*locn;
+        *locn=0;
+        (*ptr)-=16;
+        drawboard();
+    }
 }
 
 
@@ -275,13 +288,13 @@ void up(char *ptr)
  * hit anything except for bubble we wanna stop
  */
 
-int standardmiddle(char nextpos)
+int standardmiddle(unsigned char nextpos)
 {
-        if (ballorbox)
-                return (nextpos);       /* For box */
-        else
-                if (nextpos==BUBB || nextpos==NO) return(0);
-        return(1);
+    if (ballorbox)
+        return (nextpos);       /* For box */
+    else
+        if (nextpos==BUBB || nextpos==NO) return(0);
+    return(1);
 }
 
 
@@ -290,18 +303,19 @@ int standardmiddle(char nextpos)
  * There are 144 squares in each level, note the use of != instead of
  * </<= - this is quicker to execute on the Z80!
  */
-
 int checkfinish()
 {
-        char *ptr;
-        int i;
-        ptr=board;
-        for (i=1; i!=144; i++) {
-                if (*ptr++ == BUBB) return(1);
-        }
-        if ( ++level==MAXLEVEL ) return(0);     /* Done all the levels!! */
-        setuplevel();
-        return(1);
+    unsigned char *ptr;
+    int i;
+    ptr=board;
+    for (i=1; i!=144; i++) {
+        if (*ptr++ == BUBB) 
+            return(1);
+    }
+    if ( ++level==MAXLEVEL ) 
+        return(0);     /* Done all the levels!! */
+    setuplevel();
+    return(1);
 }
 
 /* Setup a level..the level is stored compressed, taking up 38 bytes a
@@ -316,78 +330,74 @@ int checkfinish()
 
 void setuplevel()
 {
-        int y,x;
-        char *ptr,*ptr2;
-        ptr2=board;
-        ptr=levels+(level*38);
-/* ptr points to start of level now */
-/* First two bytes are the ball and the boxes position */
-        balloffset=*ptr++;
-        boxoffset=*ptr++;
+    int y,x;
+    unsigned char *ptr,*ptr2;
+    ptr2=board;
+    ptr=levels+(level*38);
+    /* ptr points to start of level now */
+    /* First two bytes are the ball and the boxes position */
+    balloffset=*ptr++;
+    boxoffset=*ptr++;
 
-/* Now, decompress level into board */
-        for (y=0; y!=9; y++) {
-                for (x=0; x !=4; x++) {
-                        *ptr2++=((*ptr)>>6)&3;
-                        *ptr2++=((*ptr)>>4)&3;
-                        *ptr2++=((*ptr)>>2)&3;
-                        *ptr2++=(*ptr)&3;
-                        ptr++;
-                }
+    /* Now, decompress level into board */
+    for (y=0; y!=9; y++) {
+        for (x=0; x !=4; x++) {
+            *ptr2++=((*ptr)>>6)&3;
+            *ptr2++=((*ptr)>>4)&3;
+            *ptr2++=((*ptr)>>2)&3;
+            *ptr2++=(*ptr)&3;
+            ptr++;
         }
-/* Now, plot the ball and box into the internal map */
-        ptr2=board;
-        *(ptr2+balloffset)=BALL;
-        *(ptr2+boxoffset)=BOX;
-        drawboard();
+    }
+    /* Now, plot the ball and box into the internal map */
+    ptr2=board;
+    *(ptr2+balloffset)=BALL;
+    *(ptr2+boxoffset)=BOX;
+    gameon=1;
+    drawboard();
 }
 
 
 
-/* Define the text window and the graphics window
- * If can't open graphics window then exit gracefully
- */
-
-void redrawscreen(void)
+void dstar_redrawscreen(void)
 {
-        struct window text;
-/*
- * Clear the whole screen
- */
-        puts(baswindres);
-/* Define and open a text window with title and other embellishments
- * strings are at top for clearing, position etc
- */
-        text.number='3';
-        text.x=32+7;
-        text.y=32+1;
-        text.width=32+34;
-        text.depth=32+7;
-        text.type=131;
-        text.graph=0;
-        window(&text);
-        fputs(windtitle,stdout);
-        text.x=32+8;
-        text.y=32+3;
-        text.width=32+32;
-        text.depth=32+5;
-        text.type=128;
-        window(&text);
-        fputs(windclr,stdout);
-/* Now, try to open a map window.. */
-        graphics.graph=1;
-        graphics.width=128;
-        graphics.number='4';
-        if (window(&graphics)) {
-                puts("Sorry, Can't Open Map");
-                sleep(5);
-                exit(0);
-        }
-/* Sucessfully opened, now dump some info in the text window! */
-        puts("       DStar Z88 - C Demo");
-        fputs("Original TI game By A Von Dollen",stdout);
-        puts("  Converted to Z88 By D Morris");
-        puts("    Keys: Q,A,O,P,SPACE,H,G");
+    struct window text;
+
+    puts(baswindres);
+    /* Define and open a text window with title and other embellishments
+     * strings are at top for clearing, position etc
+     */
+    text.number='3';
+    text.x=32+7;
+    text.y=32+1;
+    text.width=32+34;
+    text.depth=32+7;
+    text.type=131;
+    text.graph=0;
+    window(&text);
+    fputs(windtitle,stdout);
+    text.x=32+8;
+    text.y=32+3;
+    text.width=32+32;
+    text.depth=32+5;
+    text.type=128;
+    window(&text);
+    fputs(windclr,stdout);
+    /* Now, try to open a map window.. */
+    graphics.graph=1;
+    graphics.width=128;
+    graphics.number='4';
+    if (window(&graphics)) {
+            puts("Sorry, Can't Open Map");
+            sleep(5);
+            exit(0);
+    }
+    /* Sucessfully opened, now dump some info in the text window! */
+    puts("       DStar Z88 - C Demo");
+    fputs("Original TI game By A Von Dollen",stdout);
+    puts("  Converted to Z88 By D Morris");
+    puts("    Keys: Q,A,O,P,SPACE,H,G");
+    if (gameon) drawboard();
 }
 
 /* Draw the board, mostly written in C, even though we did take a bit
@@ -396,22 +406,22 @@ void redrawscreen(void)
 
 void drawboard()
 {
-        int x,y;
-        char *ptr;
+    int x,y;
+    unsigned char *ptr;
 
-/* We let OZ in here, because we only go back to the loop once our
- * thing has hit something
- */
-        getk();
+    /* We let OZ in here, because we only go back to the loop once our
+     * thing has hit something
+     */
+    getk();
 
-        ptr=board;
+    ptr=board;
 
-        for (y=0;y!=9;y++) {
-                for (x=0;x!=16;x++) {
-                        puttiblock((*ptr++),x,y);
-                }
+    for (y=0;y!=9;y++) {
+        for (x=0;x!=16;x++) {
+            puttiblock((*ptr++),x,y);
         }
-        doozcopyasm();
+    }
+    doozcopyasm();
 }
 
 
@@ -423,29 +433,22 @@ void drawboard()
  * So for each y we have to step down by 112.
  * The increment between rows is 16.
  */
- 
-
-
-void puttiblock(char spr,int x, int y)
+void puttiblock(unsigned char spr,int x, int y)
 {
-        char *ptr2,*ptr;
-        int i;
+    unsigned char *ptr2,*ptr;
+    int i;
 
-/* We use this method instead of y*=112 because the compiler has special
- * cases for multiplying by ints less than 16 (except for 11 and 13 
- * (Hmmm, I wonder why?!?!)
- */
-        y=(y*14)*8;
-/* So, get where we want to dump our sprite into ptr */
-        ptr=tiscr+y+x;
-/* Calculate where the sprite is */
-        spr*=8;
-        ptr2=sprites+spr;
-/* And dump it in there */
-        for (i=0; i!=7;i++) {
-                *ptr=*(ptr2++);
-                ptr+=16;
-        }
+    y=(y*14)*8;
+    /* So, get where we want to dump our sprite into ptr */
+    ptr=tiscr+y+x;
+    /* Calculate where the sprite is */
+    spr*=8;
+    ptr2=sprites+spr;
+    /* And dump it in there */
+    for (i=0; i!=7;i++) {
+            *ptr=*(ptr2++);
+            ptr+=16;
+    }
 }
 
 /* Ooops, forgive me this one bit of assembler in the entire program!
@@ -460,49 +463,100 @@ void doozcopyasm()
 {
 #asm
 
-        EXTERN	swapgfxbk
+    EXTERN	swapgfxbk
 
-        call    swapgfxbk
-        call    ozscrcpy
-        jp      swapgfxbk
+    call    swapgfxbk
+    call    ozscrcpy
+    jp      swapgfxbk
+
+    EXTERN	base_graphics
 
 .ozscrcpy
-        ld      de,(base_graphics)
-        ld      hl,_tiscr
-        ld      c,8
+    ld      de,(base_graphics)
+    ld      hl,_tiscr
+    ld      c,8
 .ozscrcpy1
-        push    hl
-        ld      b,16
+    push    hl
+    ld      b,16
 .ozscrcpy3
-        push    bc
-        push    hl
-        ld      bc,16
-        ld      a,8
+    push    bc
+    push    hl
+    ld      bc,16
+    ld      a,8
 .ozscrcpy2
-        ex      af,af
-        ld      a,(hl)
-        ld      (de),a
-        inc     de
-        add     hl,bc
-        ex      af,af
-        dec     a
-        jr      nz,ozscrcpy2
-        pop     hl
-        inc     hl
-        pop     bc
-        djnz    ozscrcpy3
-        pop     hl
-        push    bc
-        ld      bc,16*8
-        add     hl,bc
-        pop     bc
-        dec     c
-        jr      nz,ozscrcpy1
-/* Every function always has a ret at the end! So don't need one of
- * our own!!
- */
+    ex      af,af
+    ld      a,(hl)
+    ld      (de),a
+    inc     de
+    add     hl,bc
+    ex      af,af
+    dec     a
+    jr      nz,ozscrcpy2
+    pop     hl
+    inc     hl
+    pop     bc
+    djnz    ozscrcpy3
+    pop     hl
+    push    bc
+    ld      bc,16*8
+    add     hl,bc
+    pop     bc
+    dec     c
+    jr      nz,ozscrcpy1
 #endasm
 }
 
+/*
+ * Now, some application info, have a look at doc/apps.html to see
+ * what is going on!
+ */
 
+#ifdef __Z88_APPLICATION
+void  dstar_handlecmds(int cmd)
+{
+    switch(cmd) {
+    case 0x82:
+            myexit();
+    case 0x81:
+            setuplevel();
+            break;
+    }
+}
+
+#include <dor.h>
+
+#define HELP1   "A demo application made with z88dk - Small C+ Compiler"
+#define HELP2   "Converted from a TI86 game found with source on"
+#define HELP3   "www.ticalc.org. Converted to C and Z88 by"
+#define HELP4   "Dominic Morris <djm@jb.man.ac.uk>"
+#define HELP5   ""
+#define HELP6   "v3.0 - 5.4.99 (djm)"
+
+#define APP_INFO "Made by z88dk"
+#define APP_KEY  'D'
+#define APP_NAME "Dstarz88"
+#define APP_TYPE AT_Bad
+
+#define TOPIC1   "Commands"
+#define TOPIC1ATTR      TP_Help
+#define TOPIC1HELP1     "The only menu we have!"
+#define TOPIC1HELP2     "This contains actions that affect the game"
+
+#define TOPIC1_1         "Restart"
+#define TOPIC1_1KEY      "CR"
+#define TOPIC1_1CODE     $81
+#define TOPIC1_1ATTR     MN_Help
+#define TOPIC1_1HELP1    "Use this to restart the level"
+#define TOPIC1_1HELP2    "For example when you get terrible stuck!"
+
+#define TOPIC1_2         "Quit"
+#define TOPIC1_2KEY      "CQ"
+#define TOPIC1_2CODE     $82
+#define TOPIC1_2ATTR     MN_Help
+
+#define TOPIC1_2HELP1    "Use this to quit the game"
+#define TOPIC1_2HELP2    "Not that you'll ever get bored of the game!"
+
+#include <application.h>
+#endif
 /* THE END! */

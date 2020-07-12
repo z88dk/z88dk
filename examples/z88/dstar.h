@@ -6,12 +6,12 @@
  * bytes, so calculations go that little bit quicker!
  */
 
-extern char levels[];
-extern char sprites[];
+extern unsigned char levels[];
+extern unsigned char sprites[];
 
+void data_container() __naked
+{
 #asm
-
-
 ._sprites
                         ;1=edge, 2=clear ball 3=moveable ball 4=moveable block
  defb    @00000000
@@ -342,3 +342,4 @@ extern char sprites[];
  defb    @00000000,@00000000,@00000000,@00000000
 
 #endasm
+}

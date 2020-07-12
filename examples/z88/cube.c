@@ -14,25 +14,24 @@
 #include <math.h>
 #include <graphics.h>
 
-/*  Remove comments to support -subtype=app
+#ifdef __MATH_MATH16
+  #define FLOAT _Float16
+  #define SIN(x) sinf16(x)
+  #define COS(x) cosf16(x)
+  #define APP_NAME "ieeecube"   
+  #define APP_KEY 'I'
+#else
+  #define FLOAT double
+  #define SIN(x) sin(x)
+  #define COS(x) cos(x)
+  #define APP_NAME "zcube"   
+  #define APP_KEY 'Z'
+#endif
 
+#ifdef __Z88_APPLICATION
     #include <dor.h>
-
-    #ifdef __MATH_MATH16
-        #define double  _Float16
-        #define sin     sinf16
-        #define cos     cosf16
-
-        #define APP_NAME "ieeecube"   
-        #define APP_KEY 'I'
-    #else
-        #define APP_NAME "zcube"   
-        #define APP_KEY 'Z'
-    #endif
-
     #include <application.h>
-
-*/
+#endif
 
 #define MAX_X   256.0
 #define MAX_Y    64.0
@@ -48,12 +47,12 @@ struct window win;    /* Window structure */
 
 void main()
 {
-        double x[NODES], y[NODES], z[NODES];
-        double vx, vy, vz;
-        double xg[NODES], yg[NODES], zg[NODES];
-        double mx, my, halfangle;
-        double cx,cy,cz,sx,sy,sz;
-        double t1,t2,t3;
+        FLOAT x[NODES], y[NODES], z[NODES];
+        FLOAT vx, vy, vz;
+        FLOAT xg[NODES], yg[NODES], zg[NODES];
+        FLOAT mx, my, halfangle;
+        FLOAT cx,cy,cz,sx,sy,sz;
+        FLOAT t1,t2,t3;
         int node;
 
         vx=0; vy=0; vz=0;
@@ -83,10 +82,10 @@ void main()
                 zg[node]=z[node];
         }
         while(getk()==0) {
-                cx=cos(vx); cy=cos(vy); sx=sin(vx); sy=sin(vy);
-                cz=cos(vz); sz=sin(vz);
-                mx=(MAX_X2-SIZE*1.8)*cos(vx)+MAX_X2;
-                my=(MAX_Y2-SIZE*1.8)*sin(vy)+MAX_Y2;
+                cx=COS(vx); cy=COS(vy); sx=SIN(vx); sy=SIN(vy);
+                cz=COS(vz); sz=SIN(vz);
+                mx=(MAX_X2-SIZE*1.8)*COS(vx)+MAX_X2;
+                my=(MAX_Y2-SIZE*1.8)*SIN(vy)+MAX_Y2;
                 for(node=0;node!=NODES;node++) {
 
                         t1=yg[node]*cx-zg[node]*sx;

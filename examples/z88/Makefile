@@ -1,30 +1,31 @@
 
-all: info ansitest.bas cube.bas cubez88.bas dstar.bas gfx.bas apps
+all: ansitest.bas cube.bas cubez88.bas dstar.bas gfx.bas cube.63 cubeflt16.63 wc.63 useless.63 rpn.63 farmalloc.63 dstar.63
 
 info:
 	@echo Building examples..
 
 ansitest.bas: ansitest.c
-	zcc +z88 -vn -clib=ansi ansitest.c -o ansitest.bas
+	zcc +z88 -clib=ansi ansitest.c -o ansitest.bas
 
 cube.bas: cube.c
-	zcc +z88 -vn -lm cube.c -o cube.bas
+	zcc +z88 cube.c -o cube.bas -lm
 
 cubez88.bas: cube.c
-	zcc +z88 -vn cube.c -o cubez88.bas -lmz
+	zcc +z88 cube.c -o cubez88.bas -lmz
 
-dstar.bas: dstar.c dstar.h
-	zcc +z88 -vn dstar.c -o dstar.bas
+%.bas: %.c
+	zcc +z88 $^ -o $@
 
-gfx.bas: gfx.c
-	zcc +z88 -vn gfx.c -o gfx.bas
+farmalloc.63: farmalloc.c
+	zcc +z88 $^ -subtype=app -create-app -o $(@:.63=.bin) -lfarz88
 
-apps:
-	$(MAKE) -C app
+cubeflt16.63: cube.c
+	zcc +z88 $^ --math16 -subtype=app -create-app -o $(@:.63=.bin)
 
-.PHONY: apps
+%.63: %.c
+	zcc +z88 $^ -subtype=app -create-app -o $(@:.app=.bin) -lm
 
 clean:
-	$(RM) ansitest.bas cube.bas cubez88.bas dstar.bas gfx.bas  *.reloc
+	$(RM) *.bas *.bin *.reloc *.63 *.epr
 	$(RM) zcc_opt.def *.op* *.o *.i *.asm *.err *.map *.sym
 	$(MAKE) -C app clean
