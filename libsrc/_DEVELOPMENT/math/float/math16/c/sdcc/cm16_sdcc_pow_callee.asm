@@ -2,7 +2,7 @@
 SECTION code_fp_math16
 PUBLIC cm16_sdcc_pow_callee
 
-EXTERN powf16_callee
+EXTERN asm_f16_pow
 
 
 cm16_sdcc_pow_callee:
@@ -12,5 +12,5 @@ cm16_sdcc_pow_callee:
     push hl     ; RHS
     push de     ; return
 
-    jp powf16_callee
+    jp asm_f16_pow
 

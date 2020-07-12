@@ -1,6 +1,6 @@
 /*-------------------------------------------------------------------------
-   powf.c - Computes x**y where x and y are 32-bit floats.
-            WARNING: less that 6 digits accuracy.
+   powf.c - Computes x**y where x and y are 16-bit floats.
+            WARNING: less that 3 digits accuracy.
 
    Copyright (C) 2001, 2002, Jesus Calvino-Fraga, jesusc@ieee.org
 
@@ -31,11 +31,13 @@
 
 #include "math16.h"
 
-half_t powf16 (half_t x, half_t y)
+half_t __LIB__ asm_f16_pow (half_t x, half_t y) __smallc  __z88dk_callee;
+
+half_t asm_f16_pow (half_t x, half_t y)
 {
     if(x <= 0.0) return (half_t)0.0;
     if(y == 0.0) return (half_t)1.0;
     if(y == 1.0) return x;
 
-    return expf16 (logf16 (x) * y);
+    return exp2f16 (log2f16 (x) * y);
 }

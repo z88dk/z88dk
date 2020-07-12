@@ -1,9 +1,9 @@
 ;* * * * *  Small-C/Plus z88dk * * * * *
-;  Version: 16668-1b318d7b8-20200708
+;  Version: 16679-4729f39a8-20200711
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jul 11 20:26:34 2020
+;	Module compile time: Sun Jul 12 10:40:23 2020
 
 
 	C_LINE	0,"powf16.c"
@@ -201,14 +201,17 @@
 	C_LINE	35,"math16.h"
 	C_LINE	32,"powf16.c"
 	C_LINE	34,"powf16.c"
+	C_LINE	36,"powf16.c"
 	SECTION	code_compiler
 
-; Function powf16_callee flags 0x000002c0 __smallc __z88dk_callee 
-; _Float16 half_tpowf16_callee(_Float16 x, _Float16 y)
+; Function asm_f16_pow flags 0x000002c0 __smallc __z88dk_callee 
+; _Float16 half_tasm_f16_pow(_Float16 x, _Float16 y)
 ; parameter '_Float16 y' at 2 size(2)
 ; parameter '_Float16 x' at 4 size(2)
-	C_LINE	35,"powf16.c::powf16_callee"
-.powf16_callee
+	C_LINE	37,"powf16.c::asm_f16_pow"
+.asm_f16_pow
+	GLOBAL	_asm_f16_pow
+._asm_f16_pow
 	ld	hl,4	;const
 	add	hl,sp
 	ld	e,(hl)
@@ -278,7 +281,7 @@
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
-	call	logf16
+	call	log2f16
 	push	hl
 	ld	hl,4	;const
 	add	hl,sp
@@ -287,7 +290,7 @@
 	ld	h,(hl)
 	ld	l,a
 	call	l_f16_mul
-	call	expf16
+	call	exp2f16
 	pop	bc
 	pop	af
 	pop	af
@@ -459,6 +462,7 @@
 	GLOBAL	isnotequalf16_callee
 	GLOBAL	isunorderedf16
 	GLOBAL	isunorderedf16_callee
+	GLOBAL	asm_f16_pow
 
 
 ; --- End of Scope Defns ---
