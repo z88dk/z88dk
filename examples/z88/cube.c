@@ -14,6 +14,10 @@
 #include <math.h>
 #include <graphics.h>
 
+#ifdef __Z88_APPLICATION
+    #include <dor.h>
+#endif
+
 #ifdef __MATH_MATH16
   #define FLOAT _Float16
   #define SIN(x) sinf16(x)
@@ -29,7 +33,6 @@
 #endif
 
 #ifdef __Z88_APPLICATION
-    #include <dor.h>
     #include <application.h>
 #endif
 
