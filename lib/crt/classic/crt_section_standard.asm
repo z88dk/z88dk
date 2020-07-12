@@ -74,6 +74,7 @@ IF !__crt_org_graphics
 ENDIF
 		SECTION code_user
 		SECTION rodata_fp
+		SECTION rodata_fp_math16
 		SECTION rodata_fp_math32
 		SECTION rodata_fp_mbf32
 		SECTION rodata_fp_mbf64
