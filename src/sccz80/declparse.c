@@ -1484,7 +1484,11 @@ void type_describe(Type *type, UT_string *output)
         utstring_printf(output,"_Float16 ");
         break;
     case KIND_ARRAY:
-        snprintf(tail, sizeof(tail),"[%d]",type->len);
+        if ( type->len == -1 ) {
+            snprintf(tail, sizeof(tail),"[]");
+        } else {
+            snprintf(tail, sizeof(tail),"[%d]",type->len);
+        }
         break;
     case KIND_PTR:
         utstring_printf(output,"*");
@@ -1512,6 +1516,9 @@ void type_describe(Type *type, UT_string *output)
     case KIND_ENUM:
     case KIND_CARRY:
         break;
+    }
+    if ( !isspace(utstring_body(output)[utstring_len(output)-1])) {
+        utstring_printf(output," ");
     }
     utstring_printf(output,"%s%s",type->name,tail);
     return;

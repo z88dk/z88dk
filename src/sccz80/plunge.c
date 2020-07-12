@@ -650,7 +650,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             utstring_new(str);
             utstring_printf(str,"Pointer arithmetic with non-matching types: ");
             type_describe(lval->ltype, str);
-            utstring_printf(str, "-");
+            utstring_printf(str, " - ");
             type_describe(lval2->ltype, str);
             warningfmt("incompatible-pointer-types","%s", utstring_body(str));
             utstring_free(str);
@@ -660,7 +660,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         utstring_new(str);
         utstring_printf(str,"Pointer addition: ");
         type_describe(lval->ltype, str);
-        utstring_printf(str, "+");
+        utstring_printf(str, " + ");
         type_describe(lval2->ltype, str);
         utstring_printf(str, " is invalid");
         errorfmt("%s", 1, utstring_body(str));
