@@ -42,10 +42,27 @@ ENDIF
 	sbc hl,bc	; hl = total free memory
 	ld d,h
 	ld e,l
+IF __CPU_INTEL__
+	and	a
+	ld	a,d
+	rra
+	ld	d,a
+	ld	a,e
+	rra
+	ld	e,a
+	and	a
+	ld	a,d
+	rra
+	ld	d,a
+	ld	a,e
+	rra
+	ld	e,a
+ELSE
 	srl d
 	rr e
 	srl d
 	rr e
+ENDIF
 IF DEFINED_USING_amalloc_2
 	sbc hl,de	;  leave 2/4 of the free memory for the stack
 IF DEFINED_USING_amalloc_1
@@ -53,7 +70,6 @@ IF DEFINED_USING_amalloc_1
 ENDIF
 ENDIF
 	sbc hl,de	;  leave 1/4 of the free memory for the stack
-
 	push bc ; main address for malloc area
 	push hl	; area size
 	EXTERN sbrk_callee
