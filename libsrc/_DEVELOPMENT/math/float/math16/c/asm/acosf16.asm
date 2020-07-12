@@ -1,9 +1,9 @@
 ;* * * * *  Small-C/Plus z88dk * * * * *
-;  Version: 16649-74585a2ce-20200705
+;  Version: 16668-1b318d7b8-20200708
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sun Jul  5 14:20:03 2020
+;	Module compile time: Sat Jul 11 20:26:34 2020
 
 
 	C_LINE	0,"acosf16.c"
@@ -212,16 +212,10 @@
 ._acosf16
 	push	hl
 	push	bc
-	ld	hl,2	;const
-	add	hl,sp	;l_gintspsp
-	ld	a,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
 	push	hl
 	ld	hl,4	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
@@ -234,8 +228,8 @@
 	push	hl
 	push	hl
 	ld	hl,4	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a

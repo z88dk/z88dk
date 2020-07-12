@@ -1,9 +1,9 @@
 ;* * * * *  Small-C/Plus z88dk * * * * *
-;  Version: 16649-74585a2ce-20200705
+;  Version: 16668-1b318d7b8-20200708
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sun Jul  5 14:20:03 2020
+;	Module compile time: Sat Jul 11 20:26:34 2020
 
 
 	C_LINE	0,"cosf16.c"
@@ -225,8 +225,8 @@
 	add	hl,sp
 	ex	de,hl
 	ld	hl,9	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
@@ -236,12 +236,11 @@
 	ld	(hl),d
  	ex	de,hl
 	ld	hl,7	;const
-	add	hl,sp	;l_gintspsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	e,(hl)
 	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	push	hl
+	ld	d,(hl)
+	push	de
 	ld	hl,0	;const
 	call	l_f16_lt
 	ld	a,h
@@ -257,8 +256,8 @@
 	ld	a,h
 	xor	128
 	ld	h,a
-	pop	de		;l_pint_pop
-	ex	de,hl
+	pop	de
+	ex	de,hl	;l_pint
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
@@ -268,17 +267,16 @@
 	add	hl,sp
 	push	hl
 	ld	hl,9	;const
-	add	hl,sp	;l_gintspsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	e,(hl)
 	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	push	hl
+	ld	d,(hl)
+	push	de
 	ld	hl,15639	;const
 	call	l_f16_mul
 	call	l_f16_f2sint
-	pop	de		;l_pint_pop
-	ex	de,hl
+	pop	de
+	ex	de,hl	;l_pint
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
@@ -287,25 +285,25 @@
 	add	hl,sp
 	push	hl
 	ld	hl,3	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
 	call	l_f16_uint2f
-	pop	de		;l_pint_pop
-	ex	de,hl
+	pop	de
+	ex	de,hl	;l_pint
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
  	ex	de,hl
 	ld	hl,1	;const
-	add	hl,sp	;l_gintsp
+	add	hl,sp
 	ld	a,(hl)
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
 	and	+(1 % 256)
+	ld	l,a
+	ld	h,0
+	and	a
 	jp	z,i_4
 	ld	hl,1	;const
 	add	hl,sp
@@ -314,6 +312,8 @@
 	inc	hl
 	jr	nz,ASMPC+3
 	inc	(hl)
+	ld	h,(hl)
+	ld	l,a
 	ld	hl,5	;const
 	add	hl,sp
 	push	hl
@@ -323,8 +323,8 @@
 	push	de
 	ld	hl,15360	;const
 	call	l_f16_add
-	pop	de		;l_pint_pop
-	ex	de,hl
+	pop	de
+	ex	de,hl	;l_pint
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
@@ -337,8 +337,8 @@
 	and	+(7 % 256)
 	ld	l,a
 	ld	h,0
-	pop	de		;l_pint_pop
-	ex	de,hl
+	pop	de
+	ex	de,hl	;l_pint
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
@@ -355,8 +355,23 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	l_gchar
-	call	l_neg
+	ld	a,(hl)	;l_gchar
+	ld	l,a
+	rla
+	sbc	a
+	ld	h,a
+	ld	a,l		;l_neg
+	cpl
+	ld	l,a
+	ld	a,h
+	cpl
+	ld	h,a
+	inc	hl
+	ld	a,l
+	ld	l,a		;l_sxt
+	rla
+	sbc	a
+	ld	h,a
 	pop	de
 	ld	a,l
 	ld	(de),a
@@ -369,8 +384,8 @@
 	ld	l,a
 	ld	bc,-4
 	add	hl,bc
-	pop	de		;l_pint_pop
-	ex	de,hl
+	pop	de
+	ex	de,hl	;l_pint
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
@@ -388,10 +403,20 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	l_gchar
-	call	l_neg
+	ld	a,(hl)	;l_gchar
+	ld	l,a
+	rla
+	sbc	a
+	ld	h,a
+	ld	a,l		;l_neg
+	cpl
+	ld	l,a
+	ld	a,h
+	cpl
+	ld	h,a
+	inc	hl
 	ld	a,l
-	ld	l,a	;l_sxt
+	ld	l,a		;l_sxt
 	rla
 	sbc	a
 	ld	h,a
@@ -407,17 +432,16 @@
 	ld	d,(hl)
 	push	de
 	ld	hl,9	;const
-	add	hl,sp	;l_gintspsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	e,(hl)
 	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	push	hl
+	ld	d,(hl)
+	push	de
 	ld	hl,14920	;const
 	call	l_f16_mul
 	call	l_f16_sub
-	pop	de		;l_pint_pop
-	ex	de,hl
+	pop	de
+	ex	de,hl	;l_pint
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
@@ -426,28 +450,27 @@
 	add	hl,sp
 	push	hl
 	ld	hl,9	;const
-	add	hl,sp	;l_gintspsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	e,(hl)
 	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	push	hl
+	ld	d,(hl)
+	push	de
 	ld	hl,11	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
 	call	l_f16_mul
-	pop	de		;l_pint_pop
-	ex	de,hl
+	pop	de
+	ex	de,hl	;l_pint
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
  	ex	de,hl
 	ld	hl,1	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
@@ -459,8 +482,8 @@
 	ccf
 	jp	c,i_9
 	ld	hl,1	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
@@ -485,22 +508,22 @@
 	call	polyf16_callee
 	push	hl
 	ld	hl,11	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
 	call	l_f16_mul
 	push	hl
 	ld	hl,11	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
 	call	l_f16_add
-	pop	de		;l_pint_pop
-	ex	de,hl
+	pop	de
+	ex	de,hl	;l_pint
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
@@ -523,8 +546,8 @@
 	call	polyf16_callee
 	push	hl
 	ld	hl,7	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
@@ -534,21 +557,26 @@
 	push	hl
 	ld	hl,15360	;const
 	call	l_f16_add
-	pop	de		;l_pint_pop
-	ex	de,hl
+	pop	de
+	ex	de,hl	;l_pint
 	ld	(hl),e
 	inc	hl
 	ld	(hl),d
  	ex	de,hl
 .i_11
 	ld	hl,0	;const
-	call	l_gcharsp	;
+	add	hl,sp
+	ld	a,(hl)	;l_gchar
+	ld	l,a
+	rla
+	sbc	a
+	ld	h,a
 	ld	a,l
 	rla
 	jp	nc,i_13
 	ld	hl,5	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
@@ -558,8 +586,8 @@
 	jp	i_14
 .i_13
 	ld	hl,5	;const
-	add	hl,sp	;l_gintsp
-	ld	a,(hl)
+	add	hl,sp
+	ld	a,(hl)	;l_gint
 	inc	hl
 	ld	h,(hl)
 	ld	l,a

@@ -10,6 +10,7 @@ math/float/math16/c/sccz80/cm16_sccz80_frexp
 math/float/math16/c/sccz80/cm16_sccz80_frexp_callee
 math/float/math16/c/sccz80/cm16_sccz80_hypot
 math/float/math16/c/sccz80/cm16_sccz80_hypot_callee
+math/float/math16/c/sccz80/cm16_sccz80_invsqrt
 math/float/math16/c/sccz80/cm16_sccz80_ldexp
 math/float/math16/c/sccz80/cm16_sccz80_ldexp_callee
 math/float/math16/c/sccz80/cm16_sccz80_mul
@@ -22,4 +23,17 @@ math/float/math16/c/sccz80/cm16_sccz80_read
 math/float/math16/c/sccz80/cm16_sccz80_read_callee
 math/float/math16/c/sccz80/cm16_sccz80_sub
 math/float/math16/c/sccz80/cm16_sccz80_sub_callee
+math/float/math16/c/sccz80/cm16_sccz80_sqrt
 
+math/float/math16/c/sccz80/cm16_sccz80_acos
+math/float/math16/c/sccz80/cm16_sccz80_asin
+math/float/math16/c/sccz80/cm16_sccz80_atan
+math/float/math16/c/sccz80/cm16_sccz80_cos
+math/float/math16/c/sccz80/cm16_sccz80_sin
+math/float/math16/c/sccz80/cm16_sccz80_tan
+math/float/math16/c/sccz80/cm16_sccz80_exp
+math/float/math16/c/sccz80/cm16_sccz80_exp2
+math/float/math16/c/sccz80/cm16_sccz80_exp10
+math/float/math16/c/sccz80/cm16_sccz80_log
+math/float/math16/c/sccz80/cm16_sccz80_log2
+math/float/math16/c/sccz80/cm16_sccz80_log10

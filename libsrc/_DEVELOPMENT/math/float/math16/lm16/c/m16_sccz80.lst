@@ -23,6 +23,7 @@ math/float/math16/lm16/c/sccz80/frexp_callee
 math/float/math16/lm16/c/sccz80/hypot
 math/float/math16/lm16/c/sccz80/hypot_callee
 math/float/math16/lm16/c/sccz80/invsqrt
+math/float/math16/lm16/c/sccz80/invsqrt_fastcall
 math/float/math16/lm16/c/sccz80/ldexp
 math/float/math16/lm16/c/sccz80/ldexp_callee
 math/float/math16/lm16/c/sccz80/log
@@ -40,6 +41,7 @@ math/float/math16/lm16/c/sccz80/pow_callee
 math/float/math16/lm16/c/sccz80/sin
 math/float/math16/lm16/c/sccz80/sin_fastcall
 math/float/math16/lm16/c/sccz80/sqrt
+math/float/math16/lm16/c/sccz80/sqrt_fastcall
 math/float/math16/lm16/c/sccz80/tan
 math/float/math16/lm16/c/sccz80/tan_fastcall
 

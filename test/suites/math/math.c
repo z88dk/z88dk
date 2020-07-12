@@ -101,10 +101,10 @@ void test_post_incdecrement()
 
 static int approx_equal(FLOAT a, FLOAT b)
 {
-#ifdef MATH32
+#ifdef MATH16
+   if ( fabsf16(b-a) < 0.01) {
+#elif MATH32
    if ( fabs(b-a) < 0.0001) {
-#elif MATH16
-   if ( fabsf16(b-a) < 0.1) {
 #else
    if ( fabs(b-a) < 0.00000001 ) {
 #endif
@@ -129,12 +129,12 @@ void test_approx_equal()
     Assert( approx_equal(1.0,1.0) == 1, " 1 == 1");
     //                   0.00000001
     Assert( approx_equal(1.23456789,1.23456789) == 1, " 1.23456789 == 1.23456789");
-#ifdef MATH32
+#ifdef MATH16
+    //                   0.02
+    Assert( approx_equal(1.24,1.22) == 0, " 1.24 != 1.22");
+#elif MATH32
     //                   0.0001
     Assert( approx_equal(1.2345,1.2344) == 0, " 1.2345 != 1.2344");
-#elif MATH16
-    //                   0.1
-    Assert( approx_equal(1.2,1.1) == 0, " 1.2 != 1.1");
 #else
     //                   0.00000001
     Assert( approx_equal(1.23456789,1.23456788) == 0, " 1.23456789 != 1.23456788");
@@ -159,18 +159,21 @@ void test_sqrt()
     run_sqrt(9.0, 3.0);
     run_sqrt(1.0, 1.0);
 #ifdef MATH16
-    run_sqrt(10000, 100.0);
+    run_sqrt(6400, 80.0);
 #else
     run_sqrt(1000000, 1000.0);
 #endif
     run_sqrt(0.5, 0.70710678);
 }
 
-#ifndef MATH16
 static void run_pow(FLOAT x, FLOAT y, FLOAT e)
 {
     static char   buf[100];
+#ifdef MATH16
+    FLOAT r = powf16(x,y);
+#else
     FLOAT r = pow(x,y);
+#endif
     snprintf(buf,sizeof(buf),"pow(%f,%f) should be %.14f but was %.14f",(float)x,(float)y,(float)e,(float)r);
     Assert( approx_equal(e,r), buf);
 }
@@ -181,8 +184,6 @@ void test_pow()
     run_pow(0.5, 2.0, 0.25);
     run_pow(2, 0.5, 1.41421356);
 }
-
-#endif
 
 int suite_math()
 {
@@ -195,13 +196,9 @@ int suite_math()
     suite_add_test(test_integer_constant_longform_lhs);
     suite_add_test(test_post_incdecrement);
     suite_add_test(test_pre_incdecrement);
-#ifndef MATH16
     suite_add_test(test_approx_equal);
-#endif
     suite_add_test(test_sqrt);
-#ifndef MATH16
     suite_add_test(test_pow);
-#endif
     return suite_run();
 }
 
