@@ -441,6 +441,7 @@
 	ld	hl,(_%1)
 
 %notcpu gbz80
+%notcpu 8080
 	ld	hl,_%1
 	call	l_glong
 =
@@ -1770,6 +1771,23 @@
 	rlca
 	jp	nc,%1
 
+	ld	hl,%1	;const
+	push	hl
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	add	hl,hl
+	pop	de
+	add	hl,de
+=
+	pop	hl
+	push	hl
+	add	hl,hl
+	ld	de,%1
+	add	hl,de
+
+%notcpu 8080
 	ld	hl,%1
 	push	hl
 	pop	bc
@@ -1786,7 +1804,7 @@
 	ld	de,%1
 	add	hl,de
 
-	ld	hl,%1
+	ld	hl,%1	;const
 	push	hl
 	pop	bc
 	pop	hl
@@ -2310,6 +2328,7 @@
 	jp	nz,%1
 	ld	hl,%2
 
+%notcpu 8080
 	ld	hl,%1
 	push	hl
 	ld	hl,%2
@@ -2319,6 +2338,18 @@
 =
 	ld	de,%1
 	ld	hl,%2
+	add	hl,hl
+	add	hl,de
+
+	ld	hl,%1	;const
+	push	hl
+	ld	hl,%2	;const
+	add	hl,hl
+	pop	de
+	add	hl,de
+=
+	ld	de,%1
+	ld	hl,%2	;const
 	add	hl,hl
 	add	hl,de
 

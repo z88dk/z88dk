@@ -1,0 +1,88 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	EXTERN	saved_hl
+	EXTERN	saved_de
+	SECTION	data_compiler
+._A
+	defw	11
+	SECTION	code_compiler
+	SECTION	data_compiler
+._Q
+	defw	2
+	SECTION	code_compiler
+	SECTION	data_compiler
+._L
+	defw	5
+	SECTION	code_compiler
+
+._main
+	ld	hl,(_L)
+	push	hl
+	ld	hl,(_Q)
+	add	hl,hl
+	pop	de
+	add	hl,de
+	dec	hl
+	dec	hl
+	dec	hl
+	push	hl
+	ld	hl,(_A)
+	ld	bc,-5
+	add	hl,bc
+	pop	de
+	call	l_sub
+	ld	a,h
+	or	l
+	jp	nz,ASMPC+4
+	scf
+	jp	nc,i_5
+	ld	hl,i_1+0
+	push	hl
+	call	_func
+	pop	bc
+	jp	i_6
+.i_5
+	ld	hl,i_1+12
+	push	hl
+	call	_func
+	pop	bc
+.i_6
+	ret
+
+
+	SECTION	rodata_compiler
+.i_1
+	defm	"It is zero"
+	defb	10
+
+	defm	""
+	defb	0
+
+	defm	"It is not zero"
+	defb	10
+
+	defm	""
+	defb	0
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_A
+	GLOBAL	_Q
+	GLOBAL	_L
+	GLOBAL	_func
+	GLOBAL	_main
+
+
+
+
