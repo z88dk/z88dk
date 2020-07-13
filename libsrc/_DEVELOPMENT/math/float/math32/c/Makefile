@@ -7,7 +7,7 @@ CFLAGS += -I.
 all: $(addprefix asm/,$(AFILES))
 
 asm/%.asm: %.c
-	zcc +z80 -clib=sdcc_ix --reserve-regs-iy --allow-unsafe-read --max-allocs-per-node400000 -SO3 $(CFLAGS) -a $^ -o $@
+	zcc +z80 -clib=sdcc_ix --reserve-regs-iy --allow-unsafe-read --max-allocs-per-node400000 -D__MATH_MATH32 -SO3 $(CFLAGS) -a $^ -o $@
 
 clean:
 	$(RM) asm/*.asm asm/*.err zcc_opt.def

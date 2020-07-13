@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.2 #11690 (Linux)
+; Version 4.0.2 #11722 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -239,7 +239,144 @@
 	GLOBAL _m32_tanf
 	GLOBAL _m32_cosf
 	GLOBAL _m32_sinf
-	GLOBAL __MAX_OPEN
+	GLOBAL _poly_callee
+	GLOBAL _poly
+	GLOBAL _exp10_fastcall
+	GLOBAL _exp10
+	GLOBAL _mul10u_fastcall
+	GLOBAL _mul10u
+	GLOBAL _mul2_fastcall
+	GLOBAL _mul2
+	GLOBAL _div2_fastcall
+	GLOBAL _div2
+	GLOBAL _invsqrt_fastcall
+	GLOBAL _invsqrt
+	GLOBAL _inv_fastcall
+	GLOBAL _inv
+	GLOBAL _sqr_fastcall
+	GLOBAL _sqr
+	GLOBAL _isunordered_callee
+	GLOBAL _isunordered
+	GLOBAL _islessgreater_callee
+	GLOBAL _islessgreater
+	GLOBAL _islessequal_callee
+	GLOBAL _islessequal
+	GLOBAL _isless_callee
+	GLOBAL _isless
+	GLOBAL _isgreaterequal_callee
+	GLOBAL _isgreaterequal
+	GLOBAL _isgreater_callee
+	GLOBAL _isgreater
+	GLOBAL _fma_callee
+	GLOBAL _fma
+	GLOBAL _fmin_callee
+	GLOBAL _fmin
+	GLOBAL _fmax_callee
+	GLOBAL _fmax
+	GLOBAL _fdim_callee
+	GLOBAL _fdim
+	GLOBAL _nexttoward_callee
+	GLOBAL _nexttoward
+	GLOBAL _nextafter_callee
+	GLOBAL _nextafter
+	GLOBAL _nan_fastcall
+	GLOBAL _nan
+	GLOBAL _copysign_callee
+	GLOBAL _copysign
+	GLOBAL _remquo_callee
+	GLOBAL _remquo
+	GLOBAL _remainder_callee
+	GLOBAL _remainder
+	GLOBAL _fmod_callee
+	GLOBAL _fmod
+	GLOBAL _modf_callee
+	GLOBAL _modf
+	GLOBAL _trunc_fastcall
+	GLOBAL _trunc
+	GLOBAL _lround_fastcall
+	GLOBAL _lround
+	GLOBAL _round_fastcall
+	GLOBAL _round
+	GLOBAL _lrint_fastcall
+	GLOBAL _lrint
+	GLOBAL _rint_fastcall
+	GLOBAL _rint
+	GLOBAL _nearbyint_fastcall
+	GLOBAL _nearbyint
+	GLOBAL _floor_fastcall
+	GLOBAL _floor
+	GLOBAL _ceil_fastcall
+	GLOBAL _ceil
+	GLOBAL _tgamma_fastcall
+	GLOBAL _tgamma
+	GLOBAL _lgamma_fastcall
+	GLOBAL _lgamma
+	GLOBAL _erfc_fastcall
+	GLOBAL _erfc
+	GLOBAL _erf_fastcall
+	GLOBAL _erf
+	GLOBAL _cbrt_fastcall
+	GLOBAL _cbrt
+	GLOBAL _sqrt_fastcall
+	GLOBAL _sqrt
+	GLOBAL _pow_callee
+	GLOBAL _pow
+	GLOBAL _hypot_callee
+	GLOBAL _hypot
+	GLOBAL _fabs_fastcall
+	GLOBAL _fabs
+	GLOBAL _logb_fastcall
+	GLOBAL _logb
+	GLOBAL _log2_fastcall
+	GLOBAL _log2
+	GLOBAL _log1p_fastcall
+	GLOBAL _log1p
+	GLOBAL _log10_fastcall
+	GLOBAL _log10
+	GLOBAL _log_fastcall
+	GLOBAL _log
+	GLOBAL _scalbln_callee
+	GLOBAL _scalbln
+	GLOBAL _scalbn_callee
+	GLOBAL _scalbn
+	GLOBAL _ldexp_callee
+	GLOBAL _ldexp
+	GLOBAL _ilogb_fastcall
+	GLOBAL _ilogb
+	GLOBAL _frexp_callee
+	GLOBAL _frexp
+	GLOBAL _expm1_fastcall
+	GLOBAL _expm1
+	GLOBAL _exp2_fastcall
+	GLOBAL _exp2
+	GLOBAL _exp_fastcall
+	GLOBAL _exp
+	GLOBAL _tanh_fastcall
+	GLOBAL _tanh
+	GLOBAL _sinh_fastcall
+	GLOBAL _sinh
+	GLOBAL _cosh_fastcall
+	GLOBAL _cosh
+	GLOBAL _atanh_fastcall
+	GLOBAL _atanh
+	GLOBAL _asinh_fastcall
+	GLOBAL _asinh
+	GLOBAL _acosh_fastcall
+	GLOBAL _acosh
+	GLOBAL _tan_fastcall
+	GLOBAL _tan
+	GLOBAL _sin_fastcall
+	GLOBAL _sin
+	GLOBAL _cos_fastcall
+	GLOBAL _cos
+	GLOBAL _atan2_callee
+	GLOBAL _atan2
+	GLOBAL _atan_fastcall
+	GLOBAL _atan
+	GLOBAL _asin_fastcall
+	GLOBAL _asin
+	GLOBAL _acos_fastcall
+	GLOBAL _acos
 ;--------------------------------------------------------
 ; special function registers
 ;--------------------------------------------------------
