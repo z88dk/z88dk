@@ -176,7 +176,7 @@ void debugger()
 
     if ( trace ) {
         cmd_registers(0, NULL);
-        disassemble2(pc, buf, sizeof(buf));
+        disassemble2(pc, buf, sizeof(buf), 0);
 
         if (interact_with_tty)
             printf( "\n%s\n\n",buf);    // In case of active tty, double LF to improve layout in case of 'cont'
@@ -233,7 +233,7 @@ void debugger()
 
 
     if (trace ==0) { // Prevent two lines with the same information
-        disassemble2(pc, buf, sizeof(buf));
+        disassemble2(pc, buf, sizeof(buf), 0);
         printf("%s\n",buf);
     }
 
@@ -286,7 +286,7 @@ static int cmd_next(int argc, char **argv)
     int   len;
     uint8_t opcode = get_memory(pc);
 
-    len = disassemble2(pc, buf, sizeof(buf));
+    len = disassemble2(pc, buf, sizeof(buf), 0);
 
     // Set a breakpoint after the call
     switch ( opcode ) {
@@ -358,7 +358,7 @@ static int cmd_disassemble(int argc, char **argv)
     }
 
     while ( i < 10 ) {
-       where += disassemble2(where, buf, sizeof(buf));
+       where += disassemble2(where, buf, sizeof(buf), 0);
        printf("%s\n",buf);
        i++;
     }
@@ -737,7 +737,7 @@ static void print_hotspots()
     if ( (fp = fopen("hotspots", "w")) != NULL ) {
         for ( i = 0; i < max_hotspot_addr; i++) {
             if ( hotspots[i] != 0 ) {
-                disassemble2(i, buf, sizeof(buf));
+                disassemble2(i, buf, sizeof(buf), 1);
                 fprintf(fp, "%d\t%d\t\t%s\n",hotspots[i],hotspots_t[i],buf);
             }
         }

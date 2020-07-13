@@ -842,8 +842,7 @@ int main (int argc, char **argv){
         *get_memory_addr(7) = 0xC9;
        pc = 256;
         // CP/M emulator
-        if (1 != fread(get_memory_addr(256), 1, size, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
-
+        if (1 != fread(get_memory_addr(256), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
       } else if( !strcasecmp(strchr(argv[1], '.'), ".sna" ) && size==49179 ){
         FILE *fk= fopen("48.rom", "rb");
         if( !fk )

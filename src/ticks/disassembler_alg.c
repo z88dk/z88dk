@@ -230,7 +230,7 @@ static char *handle_im_instructions(dcontext *state, uint8_t y)
 }   
 
 
-int disassemble2(int pc, char *bufstart, size_t buflen)
+int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
 {
     dcontext    s_state = {0};
     dcontext   *state = &s_state;
@@ -248,7 +248,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen)
     
     label = find_symbol(pc, SYM_ADDRESS);
     if (label ) {
-        offs += snprintf(bufstart + offs, buflen - offs, "%s:\n",label);
+        offs += snprintf(bufstart + offs, buflen - offs, "%s:%s",label, compact ? "" : "\n");
     }
     buf = bufstart + offs;
     buflen -= offs;

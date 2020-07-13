@@ -135,7 +135,7 @@ static void disassemble_loop(int start, int end)
     char   buf[256];
 
     while ( start < end ) {
-        start += disassemble2(start, buf, sizeof(buf));
+        start += disassemble2(start, buf, sizeof(buf), 0);
         printf("%s\n",buf);
     }
 }
