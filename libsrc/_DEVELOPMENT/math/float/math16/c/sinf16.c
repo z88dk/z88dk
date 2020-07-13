@@ -62,7 +62,6 @@ half_t sinf16( half_t xx )
 
     j &= 7; /* octant modulo 360 degrees */
 
-
     if( j > 3 ) /* reflect in x axis */
     {
         sign = -sign;
@@ -71,7 +70,7 @@ half_t sinf16( half_t xx )
 
     x -= y * M_PI_4;
     z = x * x;
- 
+
     if( (j==1) || (j==2) )
     {
         /* measured relative error in +/- pi/4 is 7.8e-8 */

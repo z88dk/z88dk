@@ -63,7 +63,7 @@ half_t cosf16( half_t xx )
 
     if( j > 3 ) /* reflect in x axis */
     {
-        sign = -sign;    
+        sign = -sign;
         j -= 4;
     }
 

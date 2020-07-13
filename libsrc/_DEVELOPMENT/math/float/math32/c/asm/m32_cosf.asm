@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.2 #11690 (Linux)
+; Version 4.0.2 #11722 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -239,7 +239,146 @@
 	GLOBAL _m32_asinf
 	GLOBAL _m32_tanf
 	GLOBAL _m32_sinf
-	GLOBAL __MAX_OPEN
+	GLOBAL _poly_callee
+	GLOBAL _poly
+	GLOBAL _exp10_fastcall
+	GLOBAL _exp10
+	GLOBAL _mul10u_fastcall
+	GLOBAL _mul10u
+	GLOBAL _mul2_fastcall
+	GLOBAL _mul2
+	GLOBAL _div2_fastcall
+	GLOBAL _div2
+	GLOBAL _invsqrt_fastcall
+	GLOBAL _invsqrt
+	GLOBAL _inv_fastcall
+	GLOBAL _inv
+	GLOBAL _sqr_fastcall
+	GLOBAL _sqr
+	GLOBAL _isunordered_callee
+	GLOBAL _isunordered
+	GLOBAL _islessgreater_callee
+	GLOBAL _islessgreater
+	GLOBAL _islessequal_callee
+	GLOBAL _islessequal
+	GLOBAL _isless_callee
+	GLOBAL _isless
+	GLOBAL _isgreaterequal_callee
+	GLOBAL _isgreaterequal
+	GLOBAL _isgreater_callee
+	GLOBAL _isgreater
+	GLOBAL _fma_callee
+	GLOBAL _fma
+	GLOBAL _fmin_callee
+	GLOBAL _fmin
+	GLOBAL _fmax_callee
+	GLOBAL _fmax
+	GLOBAL _fdim_callee
+	GLOBAL _fdim
+	GLOBAL _nexttoward_callee
+	GLOBAL _nexttoward
+	GLOBAL _nextafter_callee
+	GLOBAL _nextafter
+	GLOBAL _nan_fastcall
+	GLOBAL _nan
+	GLOBAL _copysign_callee
+	GLOBAL _copysign
+	GLOBAL _remquo_callee
+	GLOBAL _remquo
+	GLOBAL _remainder_callee
+	GLOBAL _remainder
+	GLOBAL _fmod_callee
+	GLOBAL _fmod
+	GLOBAL _modf_callee
+	GLOBAL _modf
+	GLOBAL _trunc_fastcall
+	GLOBAL _trunc
+	GLOBAL _lround_fastcall
+	GLOBAL _lround
+	GLOBAL _round_fastcall
+	GLOBAL _round
+	GLOBAL _lrint_fastcall
+	GLOBAL _lrint
+	GLOBAL _rint_fastcall
+	GLOBAL _rint
+	GLOBAL _nearbyint_fastcall
+	GLOBAL _nearbyint
+	GLOBAL _floor_fastcall
+	GLOBAL _floor
+	GLOBAL _ceil_fastcall
+	GLOBAL _ceil
+	GLOBAL _tgamma_fastcall
+	GLOBAL _tgamma
+	GLOBAL _lgamma_fastcall
+	GLOBAL _lgamma
+	GLOBAL _erfc_fastcall
+	GLOBAL _erfc
+	GLOBAL _erf_fastcall
+	GLOBAL _erf
+	GLOBAL _cbrt_fastcall
+	GLOBAL _cbrt
+	GLOBAL _sqrt_fastcall
+	GLOBAL _sqrt
+	GLOBAL _pow_callee
+	GLOBAL _pow
+	GLOBAL _hypot_callee
+	GLOBAL _hypot
+	GLOBAL _fabs_fastcall
+	GLOBAL _fabs
+	GLOBAL _logb_fastcall
+	GLOBAL _logb
+	GLOBAL _log2_fastcall
+	GLOBAL _log2
+	GLOBAL _log1p_fastcall
+	GLOBAL _log1p
+	GLOBAL _log10_fastcall
+	GLOBAL _log10
+	GLOBAL _log_fastcall
+	GLOBAL _log
+	GLOBAL _scalbln_callee
+	GLOBAL _scalbln
+	GLOBAL _scalbn_callee
+	GLOBAL _scalbn
+	GLOBAL _ldexp_callee
+	GLOBAL _ldexp
+	GLOBAL _ilogb_fastcall
+	GLOBAL _ilogb
+	GLOBAL _frexp_callee
+	GLOBAL _frexp
+	GLOBAL _expm1_fastcall
+	GLOBAL _expm1
+	GLOBAL _exp2_fastcall
+	GLOBAL _exp2
+	GLOBAL _exp_fastcall
+	GLOBAL _exp
+	GLOBAL _tanh_fastcall
+	GLOBAL _tanh
+	GLOBAL _sinh_fastcall
+	GLOBAL _sinh
+	GLOBAL _cosh_fastcall
+	GLOBAL _cosh
+	GLOBAL _atanh_fastcall
+	GLOBAL _atanh
+	GLOBAL _asinh_fastcall
+	GLOBAL _asinh
+	GLOBAL _acosh_fastcall
+	GLOBAL _acosh
+	GLOBAL _tan_fastcall
+	GLOBAL _tan
+	GLOBAL _sin_fastcall
+	GLOBAL _sin
+	GLOBAL _cos_fastcall
+	GLOBAL _cos
+	GLOBAL _atan2_callee
+	GLOBAL _atan2
+	GLOBAL _atan_fastcall
+	GLOBAL _atan
+	GLOBAL _asin_fastcall
+	GLOBAL _asin
+	GLOBAL _acos_fastcall
+	GLOBAL _acos
+	GLOBAL _m32_coeff_cos
+	GLOBAL _m32_coeff_sin
 ;--------------------------------------------------------
 ; special function registers
 ;--------------------------------------------------------
@@ -278,12 +417,222 @@ ENDIF
 ; Function m32_cosf
 ; ---------------------------------
 _m32_cosf:
-	ld	bc,0x3fc9
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	ld	c, l
+	ld	b, h
+	ld	hl, -9
+	add	hl, sp
+	ld	sp, hl
+	ld	(ix-5),0x01
+	ld	(ix-9),c
+	ld	(ix-8),b
+	ld	(ix-7),e
+	ld	(ix-6),d
 	push	bc
-	ld	bc,0x0fdb
+	push	de
+	ld	hl,0x0000
+	push	hl
+	push	hl
+	push	de
+	push	bc
+	call	___fslt_callee
+	pop	de
+	pop	bc
+	ld	a,l
+	or	a, a
+	jr	Z,l_m32_cosf_00102
+	ld	a, d
+	xor	a,0x80
+	ld	(ix-6),a
+	ld	(ix-9),c
+	ld	(ix-8),b
+	ld	(ix-7),e
+l_m32_cosf_00102:
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	push	hl
+	push	bc
+	ld	hl,0x3fa2
+	push	hl
+	ld	hl,0xf983
+	push	hl
+	call	___fsmul_callee
+	push	de
+	push	hl
+	call	___fs2sint_callee
+	ld	(ix-4),l
+	ld	(ix-3),h
+	push	hl
+	call	___uint2fs_callee
+	ld	c, l
+	ld	b, h
+	bit	0,(ix-4)
+	jr	Z,l_m32_cosf_00104
+	inc	(ix-4)
+	jr	NZ,l_m32_cosf_00148
+	inc	(ix-3)
+l_m32_cosf_00148:
+	ld	hl,0x3f80
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	push	de
+	push	bc
+	call	___fsadd_callee
+	ld	c, l
+	ld	b, h
+l_m32_cosf_00104:
+	ld	a,(ix-4)
+	and	a,0x07
+	ld	(ix-2),a
+	ld	(ix-1),0x00
+	ld	a,0x03
+	cp	a,(ix-2)
+	ld	a,0x00
+	sbc	a,(ix-1)
+	jr	NC,l_m32_cosf_00106
+	ld	(ix-5),0xff
+	ld	a,(ix-2)
+	add	a,0xfc
+	ld	(ix-2),a
+	ld	a,(ix-1)
+	adc	a,0xff
+	ld	(ix-1),a
+l_m32_cosf_00106:
+	ld	a,0x01
+	cp	a,(ix-2)
+	ld	a,0x00
+	sbc	a,(ix-1)
+	jr	NC,l_m32_cosf_00108
+	xor	a, a
+	sub	a,(ix-5)
+	ld	(ix-5),a
+l_m32_cosf_00108:
+	push	de
+	push	bc
+	ld	hl,0x3f49
+	push	hl
+	ld	hl,0x0fdb
+	push	hl
+	call	___fsmul_callee
+	push	de
+	push	hl
+	ld	l,(ix-7)
+	ld	h,(ix-6)
+	push	hl
+	ld	l,(ix-9)
+	ld	h,(ix-8)
+	push	hl
+	call	___fssub_callee
+	ld	(ix-9),l
+	ld	(ix-8),h
+	ld	(ix-7),e
+	ld	(ix-6),d
+	pop	bc
+	pop	de
+	push	de
+	ld	l,c
+	ld	h,b
+	push	hl
+	call	_m32_sqrf
+	ld	a,(ix-2)
+	dec	a
+	ld	c,l
+	ld	b,h
+	or	a,(ix-1)
+	jr	Z,l_m32_cosf_00109
+	ld	a,(ix-2)
+	sub	a,0x02
+	or	a,(ix-1)
+	jr	NZ,l_m32_cosf_00110
+l_m32_cosf_00109:
+	ld	hl,0x0003
+	push	hl
+	ld	hl,_m32_coeff_sin
+	push	hl
+	push	de
+	push	bc
+	call	_m32_polyf
+	ld	c, l
+	ld	l,(ix-7)
+	ld	b,h
+	ld	h,(ix-6)
+	push	hl
+	ld	l,(ix-9)
+	ld	h,(ix-8)
+	push	hl
+	push	de
+	push	bc
+	call	___fsmul_callee
+	ld	c, l
+	ld	l,(ix-7)
+	ld	b,h
+	ld	h,(ix-6)
+	push	hl
+	ld	l,(ix-9)
+	ld	h,(ix-8)
+	push	hl
+	push	de
+	push	bc
+	call	___fsadd_callee
+	ld	c, l
+	ld	b, h
+	jr	l_m32_cosf_00111
+l_m32_cosf_00110:
+	push	bc
+	push	de
+	ld	hl,0x0004
+	push	hl
+	ld	hl,_m32_coeff_cos
+	push	hl
+	push	de
+	push	bc
+	call	_m32_polyf
+	ld	(ix-4),l
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
+	pop	de
+	pop	bc
+	push	de
+	push	bc
+	ld	hl,0x3f00
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	call	___fsmul_callee
+	push	de
+	push	hl
+	ld	l,(ix-2)
+	ld	h,(ix-1)
+	push	hl
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	push	hl
+	call	___fssub_callee
+	ld	bc,0x3f80
+	push	bc
+	ld	bc,0x0000
 	push	bc
 	push	de
 	push	hl
 	call	___fsadd_callee
-	jp  _m32_sinf
+	ld	c, l
+	ld	b, h
+l_m32_cosf_00111:
+	bit	7,(ix-5)
+	jr	Z,l_m32_cosf_00115
+	ld	a, d
+	xor	a,0x80
+	ld	d, a
+l_m32_cosf_00115:
+	ld	l, c
+	ld	h, b
+	ld	sp, ix
+	pop	ix
+	ret
 	SECTION IGNORE
