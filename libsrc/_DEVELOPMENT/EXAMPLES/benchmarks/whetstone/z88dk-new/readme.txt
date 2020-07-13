@@ -33,6 +33,9 @@ This simplifies the use of TICKS for timing.
 new/sccz80/math48 : 40 bit mantissa
 zcc +z80 -vn -startup=0 -clib=new -O2 -DSTATIC -DTIMER whetstone.c -o whetstone -lm -m -pragma-include:zpragma.inc -create-app
 
+new/sccz80/math32 : 24 bit mantissa
+zcc +z80 -vn -startup=0 -clib=new -O2 -DSTATIC -DTIMER whetstone.c -o whetstone --math32 -m -pragma-include:zpragma.inc -create-app
+
 new/zsdcc/math48 : 40 bit mantissa internal, 24 bit mantissa presented by compiler
 zcc +z80 -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER whetstone.c -o whetstone -lm -m -pragma-include:zpragma.inc -create-app
 
@@ -65,6 +68,17 @@ cycle count  = 973210939
 time @ 4MHz  = 973210939 / 4x10^6 = 243.3027 seconds
 KWIPS        = 100*10*1 / 243.3027 = 4.1101
 MWIPS        = 4.1101 / 1000 = 0.0041101
+
+
+Z88DK July 13, 2020
+sccz80 / new c library / math32
+24 bit mantissa + 8 bit exponent
+8823 bytes less page zero
+
+cycle count  = 653436776
+time @ 4MHz  = 653436776 / 4x10^6 = 163.3592 seconds
+KWIPS        = 100*10*1 / 163.3592 = 6.1215
+MWIPS        = 6.1215 / 1000 = 0.0061215
 
 
 Z88DK April 20, 2020

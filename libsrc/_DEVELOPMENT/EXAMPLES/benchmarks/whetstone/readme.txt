@@ -222,6 +222,17 @@ time @ 4MHz  = 663018211 / 4x10^6 = 165.7546 seconds
 KWIPS        = 100*10*1 / 165.7546 = 6.0330
 MWIPS        = 6.0330 / 1000 = 0.0060330
 
+9.
+Z88DK July 13, 2020
+sccz80 / new c library / math32
+24 bit mantissa + 8 bit exponent
+8823 bytes less page zero
+
+cycle count  = 653436776
+time @ 4MHz  = 653436776 / 4x10^6 = 163.3592 seconds
+KWIPS        = 100*10*1 / 163.3592 = 6.1215
+MWIPS        = 6.1215 / 1000 = 0.0061215
+
 DQ.
 HITECH C MSDOS V750
 24 bit mantissa + 8 bit exponent
