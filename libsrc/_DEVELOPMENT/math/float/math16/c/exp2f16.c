@@ -22,20 +22,19 @@
  * Approximation of f(x) = 2**x
  * with weight function g(x) = 2**x
  * on interval [ -0.5, 0.5 ]
- * with a polynomial of degree 9.
- * double f(double x)
+ * with a polynomial of degree 5.
+ * p(x)=((((1.3276472e-3*x+9.6755413e-3)*x+5.5507133e-2)*x+2.402212e-1)*x+6.9314697e-1)*x+1.0000001
+ *
+ * float f(float x)
  * {
- *   double u = 1.0150336705309648e-7;
- *   u = u * x + 1.3259405609345135e-6;
- *   u = u * x + 1.5252984838653427e-5;
- *   u = u * x + 1.540343494807179e-4;
- *   u = u * x + 1.3333557617604443e-3;
- *   u = u * x + 9.6181291920672461e-3;
- *   u = u * x + 5.5504108668685612e-2;
- *   u = u * x + 2.4022650695649653e-1;
- *   u = u * x + 6.9314718055987097e-1;
- *   return u * x + 1.0000000000000128;
+ *    float u = 1.3276472e-3f;
+ *    u = u * x + 9.6755413e-3f;
+ *    u = u * x + 5.5507133e-2f;
+ *    u = u * x + 2.402212e-1f;
+ *    u = u * x + 6.9314697e-1f;
+ *    return u * x + 1.000000f;
  * }
+ *
  *
  * ACCURACY:
  *
@@ -90,6 +89,6 @@ half_t exp2f16 (half_t x)
      * scale by power of 2
      */
 
-    return ldexpf16( polyf16( x, f16_coeff_exp2, 9 ), (int16_t)z );
+    return ldexpf16( polyf16( x, f16_coeff_exp2, 5 ), (int16_t)z );
 }
 

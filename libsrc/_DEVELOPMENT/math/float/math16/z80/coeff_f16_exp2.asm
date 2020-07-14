@@ -8,23 +8,21 @@
 ; Coefficients from lolremez, to make use of additional accuracy in
 ; calculation from 32-bit mantissa poly() function.
 ;
-;  Approximation of f(x) = 2**x
-;  with weight function g(x) = 2**x
-;  on interval [ -0.5, 0.5 ]
-;  with a polynomial of degree 9.
-;  double f(double x)
-;  {
-;    double u = 1.0150336705309648e-7;
-;    u = u * x + 1.3259405609345135e-6;
-;    u = u * x + 1.5252984838653427e-5;
-;    u = u * x + 1.540343494807179e-4;
-;    u = u * x + 1.3333557617604443e-3;
-;    u = u * x + 9.6181291920672461e-3;
-;    u = u * x + 5.5504108668685612e-2;
-;    u = u * x + 2.4022650695649653e-1;
-;    u = u * x + 6.9314718055987097e-1;
-;    return u * x + 1.0000000000000128;
-;  }
+; Approximation of f(x) = 2**x
+; with weight function g(x) = 2**x
+; on interval [ -0.5, 0.5 ]
+; with a polynomial of degree 5.
+; p(x)=((((1.3276472e-3*x+9.6755413e-3)*x+5.5507133e-2)*x+2.402212e-1)*x+6.9314697e-1)*x+1.0000001
+;
+; float f(float x)
+; {
+;    float u = 1.3276472e-3f;
+;    u = u * x + 9.6755413e-3f;
+;    u = u * x + 5.5507133e-2f;
+;    u = u * x + 2.402212e-1f;
+;    u = u * x + 6.9314697e-1f;
+;    return u * x + 1.000000f;
+; }
 ;
 ;-------------------------------------------------------------------------
 ; Coefficients for exp2()
@@ -35,14 +33,10 @@ SECTION rodata_fp_math16
 PUBLIC _f16_coeff_exp2
 
 ._f16_coeff_exp2
-DEFQ 0x3F800000                 ; 1.0000000000000000E+00
-DEFQ 0x3F317218                 ; 6.9314718055987097E-01
-DEFQ 0x3E75FDF0                 ; 2.4022650695649653E-01
-DEFQ 0x3D635847                 ; 5.5504108668685612E-02
-DEFQ 0x3C1D955C                 ; 9.6181291920672461E-03
-DEFQ 0x3AAEC3FF                 ; 1.3333557617604443E-03
-DEFQ 0x39218448                 ; 1.5403434948071790E-04
-DEFQ 0x377FE712                 ; 1.5252984838653427E-05
-DEFQ 0x35B1F6F9                 ; 1.3259405609345135E-06
-DEFQ 0x33D9FA11                 ; 1.0150336705309648E-07
+DEFQ 0x3F800000                 ; 1.000000
+DEFQ 0x3F317214                 ; 6.9314697e-1
+DEFQ 0x3E75FC8C                 ; 2.402212e-1
+DEFQ 0x3D635B73                 ; 5.5507133e-2
+DEFQ 0x3C1E8629                 ; 9.6755413e-3
+DEFQ 0x3AAE0473                 ; 1.3276472e-3
 

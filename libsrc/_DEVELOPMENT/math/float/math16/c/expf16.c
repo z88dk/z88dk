@@ -20,6 +20,21 @@
  * A polynomial is used to approximate exp(f)
  * in the basic range [-0.5, 0.5].
  *
+ * Approximation of f(x) = exp(x)
+ * with weight function g(x) = exp(x)
+ * on interval [ -0.5, 0.5 ]
+ * with a polynomial of degree 5.
+ * p(x)=((((8.2592303e-3*x+4.2180928e-2)*x+1.667058e-1)*x+4.9995314e-1)*x+9.9999726e-1)*x+1.0000006
+ *
+ * float f(float x)
+ * {
+ *    float u = 8.2592303e-3f;
+ *    u = u * x + 4.2180928e-2f;
+ *    u = u * x + 1.667058e-1f;
+ *    u = u * x + 4.9995314e-1f;
+ *    u = u * x + 9.9999726e-1f;
+ *    return u * x + 1.0000006f;
+ * }
  *
  * ACCURACY:
  *
@@ -76,8 +91,6 @@ half_t expf16 (half_t x)
     x -= z * C1;
     x -= z * C2;
 
-    /* Theoretical peak relative error in [-0.5, +0.5] is 5.23e-13 */
-
-    return ldexpf16( polyf16( x, f16_coeff_exp, 9), (int16_t)z );
+    return ldexpf16( polyf16( x, f16_coeff_exp, 5), (int16_t)z );
 }
 

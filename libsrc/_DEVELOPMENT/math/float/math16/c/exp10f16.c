@@ -19,18 +19,17 @@
  * Approximation of f(x) = 10**x
  * with weight function g(x) = 10**x
  * on interval [ 0, 0.15051499783 ]
- * with a polynomial of degree 7.
- * double f(double x)
- * {
- *   double u = 8.090484272600454e-2;
- *   u = u * x + 2.0380373931544082e-1;
- *   u = u * x + 5.3978993685198384e-1;
- *   u = u * x + 1.1712266435079228;
- *   u = u * x + 2.0346796696616236;
- *   u = u * x + 2.6509490353631601;
- *   u = u * x + 2.3025850931327687;
- *   return u * x + 9.9999999999984258e-1;
- * }
+ * with a polynomial of degree 5.
+ * p(x)=((((6.4075045e-1*x+1.1538467)*x+2.0360299)*x+2.6509022)*x+2.3025857)*x+1.
+ *float f(float x)
+ *{
+ *    float u = 6.4075045e-1f;
+ *    u = u * x + 1.1538467f;
+ *    u = u * x + 2.0360299f;
+ *    u = u * x + 2.6509022f;
+ *    u = u * x + 2.3025857f;
+ *    return u * x + 1.f;
+ *}
  *
  * ACCURACY:
  *
@@ -88,6 +87,6 @@ half_t exp10f16 (half_t x)
     x -= z * LG102A;
     x -= z * LG102B;  
 
-    return ldexpf16( polyf16( x, f16_coeff_exp10, 7 ), (int16_t)z );
+    return ldexpf16( polyf16( x, f16_coeff_exp10, 5 ), (int16_t)z );
 }
 

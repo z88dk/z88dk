@@ -1,9 +1,9 @@
 ;* * * * *  Small-C/Plus z88dk * * * * *
-;  Version: 16668-1b318d7b8-20200708
+;  Version: 16694-c9c62f963-20200714
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sat Jul 11 20:26:34 2020
+;	Module compile time: Tue Jul 14 22:46:15 2020
 
 
 	C_LINE	0,"expf16.c"
@@ -199,15 +199,15 @@
 	C_LINE	627,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/math.h"
 	C_LINE	628,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/math.h"
 	C_LINE	35,"math16.h"
-	C_LINE	53,"expf16.c"
-	C_LINE	59,"expf16.c"
-	C_LINE	61,"expf16.c"
+	C_LINE	68,"expf16.c"
+	C_LINE	74,"expf16.c"
+	C_LINE	76,"expf16.c"
 	SECTION	code_compiler
 
 ; Function expf16 flags 0x00000288 __smallc __z88dk_fastcall 
 ; _Float16 half_texpf16(_Float16 x)
 ; parameter '_Float16 x' at 2 size(2)
-	C_LINE	62,"expf16.c::expf16"
+	C_LINE	77,"expf16.c::expf16"
 .expf16
 	GLOBAL	_expf16
 ._expf16
@@ -299,7 +299,7 @@
 	push	hl
 	ld	hl,_f16_coeff_exp
 	push	hl
-	ld	hl,9	;const
+	ld	hl,5	;const
 	push	hl
 	call	polyf16_callee
 	pop	de
