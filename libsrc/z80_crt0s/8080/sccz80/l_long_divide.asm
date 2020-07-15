@@ -210,9 +210,7 @@ again:
 do_subtract:
     ld    de,__math_block2        ; remainder is larger or equal: subtract divisor
     ld    hl,__math_block3
-    ld    c,2
     xor   a
-loop2:    
     ld    a,(de)
     sbc   (hl)
     ld    (de),a
@@ -223,8 +221,14 @@ loop2:
     ld    (de),a
     inc   de
     inc   hl
-    dec   c
-    jp    nz,loop2    
+    ld    a,(de)
+    sbc   (hl)
+    ld    (de),a
+    inc   de
+    inc   hl
+    ld    a,(de)
+    sbc   (hl)
+    ld    (de),a
     ld    hl,__math_block1
     inc   (hl)
 

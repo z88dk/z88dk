@@ -59,9 +59,11 @@ l_long_mult:
 	LD HL,0
 	LD (__math_result),HL
 	LD (__math_result+2),HL
-	LD BC,0
-lp1:	LD HL,__math_rhs
-	ADD	HL,BC
+
+	ld hl,__math_rhs
+	ld c,4
+lp1:	
+	push hl
 	LD  a,(HL)			; get next byte of multiplier
 	LD  b,8
 lp2:	RRA
@@ -95,9 +97,9 @@ store:	LD (__math_lhs+2),HL
 	DEC b
 	JP	NZ,lp2
 
-	INC c
-	LD  a,c
-	CP 4
+        pop hl
+        inc hl
+        dec c
 	JP	NZ,lp1
 
 	LD HL,(__retloc)

@@ -2947,6 +2947,14 @@ void asr_const(LVALUE *lval, int32_t value)
     } else {
         if ( value == 1 && IS_8085() && !ulvalue(lval) ) {
             ol("sra\thl");
+        } else if ( value == 1 && IS_808x() && ulvalue(lval) ) {
+            ol("xor\ta");
+            ol("ld\ta,h");
+            ol("rra");
+            ol("ld\th,a");
+            ol("ld\ta,l");
+            ol("rra");
+            ol("ld\tl,a");
         } else if ( value == 1  && !IS_808x() ) { /* 4 bytes, 16T */
             if ( ulvalue(lval) ) {
                 ol("srl\th");
@@ -3986,7 +3994,7 @@ void zle(LVALUE* lval)
 void zgt_const(LVALUE *lval, int32_t value)
 {
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
-        if ( value == 0 && ulvalue(lval) && !IS_808x() ) {
+        if ( value == 0 && ulvalue(lval) ) {
             if ( lval->val_type == KIND_CPTR ) {
                 ol("ld\ta,e");
             } else {
@@ -3995,7 +4003,11 @@ void zgt_const(LVALUE *lval, int32_t value)
             }
             ol("or\th");
             ol("or\tl");
-            ol("jr\tz,ASMPC+3");
+            if ( IS_808x() ) {
+                ol("jp\tz,ASMPC+4");
+            } else {
+                ol("jr\tz,ASMPC+3");
+            }           
             ol("scf");
             set_carry(lval);
         } else {
