@@ -76,8 +76,12 @@ IF __CPU_GBZ80__
         ld    (hl+),a
 ELSE
         ld    (__math_block3),hl
+	ld    a,h	;0 divisor check
+        or    l
         ex    de,hl
         ld    (__math_block3+2),hl
+        or    h
+        or    l
 ENDIF
 IF __CPU_GBZ80__
         pop    de
@@ -86,7 +90,7 @@ IF __CPU_GBZ80__
         ld    (hl+),a
         ld    a,d
         ld    (hl+),a
-        pop    de        ;store divisor
+        pop    de        ;store dividend
         ld    hl,__math_block1
         ld    a,e
         ld    (hl+),a
@@ -100,24 +104,24 @@ IF __CPU_GBZ80__
 ELSE
         pop   hl        ;return address
         ld    (__retloc),hl
-        pop   hl            ; store divisor
+        pop   hl            ; store dividend
         ld    (__math_block1),HL
-        pop   hl
+	pop   hl
         ld    (__math_block1+2),HL
+	jp    z,divide_zero
 ENDIF
-    ld    hl,__math_block3
+
 IF __CPU_GBZ80__
-        ld    a,(hl+)
-ELSE
-        ld    a,(hl)
-        inc   hl
-ENDIF
+    ld    hl,__math_block3
+    ld    a,(hl+)
     or    (hl)
     inc   hl
     or    (hl)
     inc   hl
     or    (hl)
     jp    z,divide_zero
+ENDIF
+
 IF __CPU_GBZ80__
     ld    hl,__math_block2
     xor   a
@@ -158,7 +162,6 @@ do_unsigned:
 
 dv0:    
     ld    hl,__math_block1        ; left shift: __math_block2 <- __math_block1 <- 0
-    ld    c,2
     xor   a
 shift:
 IF __CPU_GBZ80__
@@ -170,6 +173,13 @@ IF __CPU_GBZ80__
         inc   hl
         rl    (hl)
         inc   hl
+        rl    (hl)
+        inc   hl
+        rl    (hl)
+        inc   hl
+        rl    (hl)
+        inc   hl
+        rl    (hl)
 ELSE
         ld    a,(hl)
         rla
@@ -187,9 +197,22 @@ ELSE
         rla
         ld    (hl),a
         inc   hl
+        ld    a,(hl)
+        rla
+        ld    (hl),a
+        inc   hl
+        ld    a,(hl)
+        rla
+        ld    (hl),a
+        inc   hl
+        ld    a,(hl)
+        rla
+        ld    (hl),a
+        inc   hl
+        ld    a,(hl)
+        rla
+        ld    (hl),a
 ENDIF
-    dec   c
-    jp    nz,shift
 
 
     ld    hl,__math_block2+3        ; which is larger: divisor or remainder?
@@ -246,10 +269,10 @@ continue:
     rra
     ld    hl, __math_block1        ; complement quotient if divisor
     call  c,compl        ; and dividend have different signs
-;    ld    a,b
-;    rla
-;    ld    hl, __math_block2
-;    call  C,compl        ; negate remainder if dividend was negative
+    ld    a,b
+    rla
+    ld    hl, __math_block2
+    call  C,compl        ; negate remainder if dividend was negative
 IF __CPU_GBZ80__
     ld    hl,__retloc
     ld    a,(hl+)
@@ -275,10 +298,10 @@ ENDIF
 
 ; for rmi 4 and rmu 4 only:
 return_modulus:
-;    ld    a,b
-;    rra
-;    ld    hl, __math_block1        ; complement quotient if divisor
-;    call  c,compl        ; and dividend have different signs
+    ld    a,b
+    rra
+    ld    hl, __math_block1        ; complement quotient if divisor
+    call  c,compl        ; and dividend have different signs
     ld    a,b
     rla
     ld    hl, __math_block2
@@ -310,7 +333,7 @@ ENDIF
 compl:    
     push  bc
     ld    c,4
-    xor   a
+    xor	  a
 compl1:    
     ld    a,0
     sbc   (HL)
