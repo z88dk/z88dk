@@ -10,6 +10,7 @@ math/float/math32/c/sdcc/cm32_sdcc_cos
 math/float/math32/c/sdcc/cm32_sdcc_cosh
 math/float/math32/c/sdcc/cm32_sdcc_dload
 math/float/math32/c/sdcc/cm32_sdcc_exp
+math/float/math32/c/sdcc/cm32_sdcc_fam9511
 math/float/math32/c/sdcc/cm32_sdcc_fabs
 math/float/math32/c/sdcc/cm32_sdcc_floor
 math/float/math32/c/sdcc/cm32_sdcc_fpclassify

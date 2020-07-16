@@ -83,6 +83,8 @@ extern double_t __LIB__ atof(char *) __smallc;
 extern void __LIB__ ftoa(double_t, int, char *) __smallc;
 extern void __LIB__ ftoe(double_t, int, char *) __smallc;
 
+extern double_t __LIB__ f32_fam9511(double_t x) __smallc;
+extern double_t __LIB__ fam9511_f32(double_t x) __smallc;
 
 /* Classification functions */
 #define FP_NORMAL   0

@@ -421,6 +421,17 @@ extern double_t __LIB__ poly_callee(const float x,const float d[],unsigned int n
 
 #endif
 
+#ifdef __MATH_AM9511
+
+extern double_t __LIB__ f32_fam9511(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ fam9511_f32(double_t x) __smallc __z88dk_fastcall;
+
+
+
+#endif
+
 #ifdef __MATH_MATH16
 
 extern half_t __LIB__ f16_f48(double_t x) __smallc __z88dk_fastcall;

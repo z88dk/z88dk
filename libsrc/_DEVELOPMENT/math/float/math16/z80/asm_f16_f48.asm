@@ -24,10 +24,10 @@
 
 SECTION code_fp_math16
 
+EXTERN error_lznc
+
 PUBLIC asm_f32_f48
 PUBLIC asm_f48_f32
-
-EXTERN error_lznc
 
 .asm_f32_f48
    exx

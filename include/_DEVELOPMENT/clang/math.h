@@ -371,6 +371,17 @@ extern double_t poly(const float x,const float d[],unsigned int n);
 
 #endif
 
+#ifdef __MATH_AM9511
+
+extern double_t f32_fam9511(double_t x);
+
+
+extern double_t fam9511_f32(double_t x);
+
+
+
+#endif
+
 #ifdef __MATH_MATH16
 
 extern half_t f16_f48(double_t x);

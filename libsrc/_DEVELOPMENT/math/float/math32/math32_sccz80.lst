@@ -12,6 +12,7 @@ math/float/math32/c/sccz80/cm32_sccz80_cosh
 math/float/math32/c/sccz80/cm32_sccz80_dload
 math/float/math32/c/sccz80/cm32_sccz80_dloadb
 math/float/math32/c/sccz80/cm32_sccz80_exp
+math/float/math32/c/sccz80/cm32_sccz80_fam9511
 math/float/math32/c/sccz80/cm32_sccz80_fabs
 math/float/math32/c/sccz80/cm32_sccz80_floor
 math/float/math32/c/sccz80/cm32_sccz80_fmax

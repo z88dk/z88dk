@@ -25,6 +25,7 @@ math/float/math32/lm32/c/sdcc/exp2
 math/float/math32/lm32/c/sdcc/exp2_fastcall
 math/float/math32/lm32/c/sdcc/exp10
 math/float/math32/lm32/c/sdcc/exp10_fastcall
+math/float/math32/lm32/c/sdcc/f32_fam9511
 math/float/math32/lm32/c/sdcc/fabs
 math/float/math32/lm32/c/sdcc/fabs_fastcall
 math/float/math32/lm32/c/sdcc/floor

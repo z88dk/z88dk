@@ -2,6 +2,7 @@ math/float/math32/lm32/z80/asm_addf
 math/float/math32/lm32/z80/asm_ceilf
 math/float/math32/lm32/z80/asm_divf
 math/float/math32/lm32/z80/asm_div2f
+math/float/math32/lm32/z80/asm_fam9511
 math/float/math32/lm32/z80/asm_fabsf
 math/float/math32/lm32/z80/asm_floorf
 math/float/math32/lm32/z80/asm_fpclassifyf
