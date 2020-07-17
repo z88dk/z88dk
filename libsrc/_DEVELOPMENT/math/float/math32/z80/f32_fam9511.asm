@@ -74,7 +74,7 @@ PUBLIC m32_fam9511_f32
     rra
     ld d,a                      ; restore exponent
 
+    scf                         ; set mantissa leading 1
     rr e                        ; restore mantissa
-    set 7,e                     ; set leading 1
     ret
 
