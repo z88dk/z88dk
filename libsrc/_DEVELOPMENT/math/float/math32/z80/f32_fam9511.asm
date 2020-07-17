@@ -31,7 +31,7 @@ PUBLIC m32_fam9511_f32
 
 .m32_f32_fam9511
     sla e                       ; remove leading 1 from mantissa
-    jp Z,m32_fszero             ; if it was zero, then return zero
+    jp NC,m32_fszero            ; if it was zero, then return zero
 
     ld a,d                      ; capture exponent
     rla                         ; adjust twos complement exponent
