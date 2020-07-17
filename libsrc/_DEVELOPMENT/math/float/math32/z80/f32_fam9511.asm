@@ -36,7 +36,7 @@ PUBLIC m32_fam9511_f32
     ld a,d                      ; capture exponent
     rla                         ; adjust twos complement exponent
     sra a                       ; with sign extention
-    add 128                     ; bias including shift binary point
+    add 127-1                   ; bias including shift binary point
 
     rl d                        ; get sign
     rra                         ; position sign and exponent
@@ -61,21 +61,20 @@ PUBLIC m32_fam9511_f32
 .m32_fam9511_f32
     ld a,d                      ; capture exponent
     sla e
-    rla                         ; position exponent in a
+    rl a                        ; position exponent in a
     jp Z,m32_fszero             ; check for zero
     cp 127+63                   ; check for overflow
     jp NC,m32_fsmax
     cp 127-64                   ; check for underflow
     jp C,m32_fszero
-    sub 128                     ; bias including shift binary point
+    sub 127-1                   ; bias including shift binary point
 
     rla                         ; position sign
     rl d                        ; get sign
     rra
+    ld d,a                      ; restore exponent
 
     rr e                        ; restore mantissa
     set 7,e                     ; set leading 1
-
-    ld d,a                      ; restore exponent
     ret
 
