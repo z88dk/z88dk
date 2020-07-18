@@ -45,6 +45,7 @@ static void dofloat_z80(double raw, unsigned char fa[]);
 static void dofloat_mbfs(double raw, unsigned char fa[]);
 static void dofloat_mbf40(double raw, unsigned char fa[]);
 static void dofloat_mbf64(double raw, unsigned char fa[]);
+static void dofloat_am9511(double raw, unsigned char fa[]);
 static void decompose_float(double raw, struct fp_decomposed *fs);
 
 
@@ -675,6 +676,9 @@ void dofloat(enum maths_mode mode,double raw, unsigned char fa[])
         case MATHS_IEEE16:
             dofloat_ieee16(raw, fa);
             break;
+        case MATHS_AM9511:
+            dofloat_am9511(raw, fa);
+            break;
         default:
             dofloat_z80(raw, fa);
             break;  
@@ -783,6 +787,24 @@ static void dofloat_mbfs(double raw, unsigned char fa[])
 
     // And the sign bit
     fp_value |= fs.sign ? 0x00800000 : 0x00000000;
+    pack32bit_float(fp_value, fa);
+}
+
+static void dofloat_am9511(double raw, unsigned char fa[])
+{
+    struct fp_decomposed fs = {0};
+    uint32_t fp_value = 0;
+
+    decompose_float(raw, &fs);
+
+    // Bundle up mantissa
+    fp_value = (((uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16)) | 0x00800000;
+
+    // And now the exponent
+    fp_value |= ((((uint32_t)fs.exponent) << 24) & 0x7f000000);
+
+    // And the sign bit
+    fp_value |= fs.sign ? 0x80000000 : 0x00000000;
     pack32bit_float(fp_value, fa);
 }
 

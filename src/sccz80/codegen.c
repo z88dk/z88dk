@@ -3271,6 +3271,7 @@ void neg(LVALUE* lval)
     case KIND_DOUBLE:
         switch ( c_maths_mode ) {
         case MATHS_IEEE:
+        case MATHS_AM9511:
            ol("ld\ta,d");
            ol("xor\t128");
            ol("ld\td,a");
@@ -3320,6 +3321,9 @@ void inc(LVALUE* lval)
         case MATHS_MBFS:
             vlongconst(0x81000000); // +1.0
             break;
+        case MATHS_AM9511:
+            vlongconst(0x01800000); // +1.0
+            break;
         default:
             gen_load_constant_as_float(1, KIND_DOUBLE, 1);
         }
@@ -3356,6 +3360,9 @@ void dec(LVALUE* lval)
             vlongconst(0xbf800000); // -1.0
             break;
         case MATHS_MBFS:
+            vlongconst(0x81800000); // -1.0
+            break;
+        case MATHS_AM9511:
             vlongconst(0x81800000); // -1.0
             break;
         default:

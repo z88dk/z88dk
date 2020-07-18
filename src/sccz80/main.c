@@ -121,6 +121,7 @@ static option  sccz80_opts[] = {
     { 0, "fp-mode=mbf40", OPT_ASSIGN|OPT_INT, "Use 40 bit Microsoft binary format", &c_maths_mode, NULL, MATHS_MBF40 },
     { 0, "fp-mode=mbf64", OPT_ASSIGN|OPT_INT, "Use 64 bit Microsoft binary format", &c_maths_mode, NULL, MATHS_MBF64 },
     { 0, "fp-mode=z88", OPT_ASSIGN|OPT_INT, "Use 40 bit z88 doubles", &c_maths_mode, NULL, MATHS_Z88 },
+    { 0, "fp-mode=am9511", OPT_ASSIGN|OPT_INT, "Use 32 bit AM9511 doubles", &c_maths_mode, NULL, MATHS_AM9511 },
     
     { 0, "noaltreg", OPT_BOOL, "Try not to use the alternative register set", &c_notaltreg, NULL, 0 },
     { 0, "standard-escape-chars", OPT_BOOL, "Use standard mappings for \\r and \\n", &c_standard_escapecodes, NULL, 0},
@@ -269,6 +270,11 @@ int main(int argc, char** argv)
         c_fp_exponent_bias = 127;
         c_fp_mantissa_bytes = 4;
         c_fp_fudge_offset = 1;
+    } else if ( c_maths_mode == MATHS_AM9511 ) {
+        type_double = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
+        c_fp_exponent_bias = 0;
+        c_fp_mantissa_bytes = 3;
+        c_fp_size = 4;
     }
 
     if ( c_cpu == CPU_8080 ) {
