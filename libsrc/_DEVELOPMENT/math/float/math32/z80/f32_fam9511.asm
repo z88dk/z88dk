@@ -48,7 +48,7 @@ PUBLIC m32_fam9511_f32
 ;  fam9511_f32 - z80 format conversion code
 ;-------------------------------------------------------------------------
 ;
-; convert IEEE-754 float to math48 float
+; convert IEEE-754 float to am9511 float
 ;
 ; enter : DEHL = IEEE-754 float
 ;
