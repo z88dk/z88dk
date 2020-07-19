@@ -18,19 +18,19 @@ floor:
     rlca
     ; It's negative, we need to decrement
     ld      hl,___dai32_fpac+3
-    call    c, inclong
+    call    c, declong
     call    ___dai32_xflt
     jp      ___dai32_return
 
 
-inclong:
-    inc     (hl)
+declong:
+    dec     (hl)
     ret     nz
     dec     hl
-    inc     (hl)
+    dec     (hl)
     ret     nz
     dec     hl
-    inc     (hl)
+    dec     (hl)
     ret     nz
     dec     hl
     inc     (hl)

@@ -1687,7 +1687,7 @@ xlog10:
                     push    de                              ;[e872] d5
                     push    hl                              ;[e873] e5
                     call    xln                             ;[e874] cd 45 e7
-                    ld      hl,fp_invln10                        ;[e877] 21 90 e8
+                    ld      hl,fp_invln10                   ;[e877] 21 90 e8
                     call    amul                            ;[e87a] cd 59 ea
                     jp      fpexit                          ;[e87d] c3 4d c1
 
