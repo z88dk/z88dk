@@ -1,6 +1,6 @@
 
-    MODULE  dai_fpcomp
-    GLOBAL  fcomp
+    MODULE  fpcomp
+    GLOBAL  fpcomp
     GLOBAL  xget
 
 
@@ -14,7 +14,7 @@
 ;               cy=0,S=0,Z=1 -> both numbers identical
 ;               cy=0,S=0,Z=0 -> MACC > (hl)  (jp P,)
 ;               cy=0,S=1,Z=0 -> MACC < (hl)  (jp M,)
-fcomp:
+fpcomp:
                     push    bc                              ;[c079] c5
                     push    af                              ;[c07a] f5
                     push    de                              ;[c07b] d5

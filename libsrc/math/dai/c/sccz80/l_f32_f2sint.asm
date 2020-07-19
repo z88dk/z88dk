@@ -7,7 +7,7 @@
     PUBLIC    l_f32_f2slong
     EXTERN    ___dai32_setup_single_reg
     EXTERN    ___dai32_return
-    EXTERN    ___dai32_xfint
+    EXTERN    ___dai32_xfix
     EXTERN    ___dai32_fpac
 
 
@@ -16,8 +16,14 @@ l_f32_f2uint:
 l_f32_f2slong:
 l_f32_f2ulong:
     call    ___dai32_setup_single_reg
-    call    ___dai32_xfint
-    ld  hl,(___dai32_fpac)
-    ex  de,hl
-    ld  hl,(___dai32_fpac+2)
+    call    ___dai32_xfix
+    ld      hl,(___dai32_fpac)
+    ld      a,h
+    ld      h,l
+    ld      l,a
+    ex      de,hl
+    ld      hl,(___dai32_fpac+2)
+    ld      a,h
+    ld      h,l
+    ld      l,a
     ret

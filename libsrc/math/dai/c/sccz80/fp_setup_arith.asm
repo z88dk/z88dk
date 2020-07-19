@@ -22,12 +22,12 @@ ___dai32_setup_arith:
     ld  a,h
     ld  h,l
     ld  l,a
-    ld  (___dai32_tempval + 0),hl
+    ld  (___dai32_tempval + 2),hl
     ex  de,hl
     ld  a,h
     ld  h,l
     ld  l,a
-	ld  (___dai32_tempval + 2),hl
+	ld  (___dai32_tempval + 0),hl
 
 	pop	de		;return address
 	pop	bc		;Caller return address

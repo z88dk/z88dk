@@ -1,34 +1,35 @@
 
-        MODULE  dai_math
+        MODULE  dai32math
 
-        GLOBAL  DAI_xfmul
-        GLOBAL  DAI_xfdiv
-        GLOBAL  DAI_xload
-        GLOBAL  DAI_xsave
-        GLOBAL  DAI_xfabs
-        GLOBAL  DAI_xfchs
-        GLOBAL  DAI_xfrac
-        GLOBAL  DAI_xiadd
-        GLOBAL  DAI_xisub
-        GLOBAL  DAI_ximul
-        GLOBAL  DAI_xidiv
-        GLOBAL  DAI_xirem
-        GLOBAL  DAI_xflt
-        GLOBAL  DAI_xfix
-        GLOBAL  DAI_xfint
-        GLOBAL  DAI_xsqrt
-        GLOBAL  DAI_xexp
-        GLOBAL  DAI_xln
-        GLOBAL  DAI_xsin
-        GLOBAL  DAI_xcos
-        GLOBAL  DAI_xpwr
-        GLOBAL  DAI_xlog10
-        GLOBAL  DAI_xtan
-        GLOBAL  DAI_xatan
-        GLOBAL  DAI_xasin
-        GLOBAL  DAI_xacos
-        GLOBAL  DAI_xfadd
-        GLOBAL  DAI_xfsub
+        GLOBAL  xget
+        GLOBAL  xfmul
+        GLOBAL  xfdiv
+        GLOBAL  xload
+        GLOBAL  xsave
+        GLOBAL  xfabs
+        GLOBAL  xfchs
+        GLOBAL  xfrac
+        GLOBAL  xiadd
+        GLOBAL  xisub
+        GLOBAL  ximul
+        GLOBAL  xidiv
+        GLOBAL  xirem
+        GLOBAL  xflt
+        GLOBAL  xfix
+        GLOBAL  xfint
+        GLOBAL  xsqrt
+        GLOBAL  xexp
+        GLOBAL  xln
+        GLOBAL  xsin
+        GLOBAL  xcos
+        GLOBAL  xpwr
+        GLOBAL  xlog10
+        GLOBAL  xtan
+        GLOBAL  xatan
+        GLOBAL  xasin
+        GLOBAL  xacos
+        GLOBAL  xfadd
+        GLOBAL  xfsub
 
 
 
@@ -43,6 +44,8 @@
         GLOBAL fp_half
         GLOBAL addexp
 
+        GLOBAL ___dai32_fpac
+
 sext:
                     rlca                                    ;[c1e9] 07
                     rlca                                    ;[c1ea] 07
@@ -50,6 +53,9 @@ sext:
                     rra                                     ;[c1ec] 1f
                     ret                                     ;[c1ed] c9
 
+
+lc1b7:
+                    ld      hl,fpac
 addexp:
                     push    hl                              ;[c1ba] e5
                     push    de                              ;[c1bb] d5
@@ -70,19 +76,29 @@ addexp:
                     rra                                     ;[c1cd] 1f
                     xor     c                               ;[c1ce] a9
                     and     d                               ;[c1cf] a2
-                    jp      m,$c1e2                         ;[c1d0] fa e2 c1
+                    jp      m,lc1e2                         ;[c1d0] fa e2 c1
                     ld      a,c                             ;[c1d3] 79
                     rla                                     ;[c1d4] 17
                     xor     c                               ;[c1d5] a9
-                    jp      m,$c1e2                         ;[c1d6] fa e2 c1
+                    jp      m,lc1e2                         ;[c1d6] fa e2 c1
                     ld      a,c                             ;[c1d9] 79
                     and     $7f                             ;[c1da] e6 7f
                     or      b                               ;[c1dc] b0
                     ld      (hl),a                          ;[c1dd] 77
+lc1de:
                     pop     bc                              ;[c1de] c1
                     pop     de                              ;[c1df] d1
                     pop     hl                              ;[c1e0] e1
                     ret                                     ;[c1e1] c9                                        
+
+
+lc1e2:
+                    ld      a,c                             ;[c1e2] 79
+                    rla                                     ;[c1e3] 17
+                    or      a                               ;[c1e4] b7
+                    scf                                     ;[c1e5] 37
+                    jp      lc1de                           ;[c1e6] c3 de c1
+
 
 fppush:
                     ld      (xphls),hl                      ;[c21e] 22 e1 00
@@ -116,6 +132,7 @@ fperr_overflow:
                     push    hl                              ;[c04b] e5
                     ld      hl,$0000                        ;[c04c] 21 00 00
 handle_error:
+                    ret         ; TODO
                     push    af                              ;[c04f] f5
                     push    de                              ;[c050] d5
                     ex      de,hl                           ;[c051] eb
@@ -137,7 +154,7 @@ fperr_argerror:
 fperr_underflow:
                     push    hl                              ;[c065] e5
                     ld      hl,fp_zero                      ;[c066] 21 5e c4
-                    call    DAI_xload
+                    call    xload
                     ; Copy to MACC
                     ld      hl,$0004
                     jp      handle_error
@@ -163,7 +180,7 @@ fpexit:
 ;
 ; Entry: HL: Points to multiplier
 ; Exit: All registers preserved
-DAI_xfmul:
+xfmul:
                     push    af                              ;[e0fe] f5
                     push    bc                              ;[e0ff] c5
                     push    de                              ;[e100] d5
@@ -177,7 +194,7 @@ DAI_xfmul:
 ;
 ; Entry: HL: Points to divisor
 ; Exit: All registers preserved
-DAI_xfdiv:
+xfdiv:
                     push    af                              ;[e108] f5
                     push    bc                              ;[e109] c5
                     push    de                              ;[e10a] d5
@@ -189,7 +206,7 @@ DAI_xfdiv:
 ;
 ; Entry: HL: Points to operand
 ; Exit: All registers preserved
-DAI_xload:
+xload:
                     push    af                              ;[e112] f5
                     push    bc                              ;[e113] c5
                     push    de                              ;[e114] d5
@@ -201,7 +218,7 @@ DAI_xload:
 ;
 ; Entry: HL: Points to operand
 ; Exit: All registers preserved
-DAI_xsave:
+xsave:
                     push    af                              ;[e11c] f5
                     push    bc                              ;[e11d] c5
                     push    de                              ;[e11e] d5
@@ -245,7 +262,7 @@ xget:
 ;
 ; Entry: None
 ; Exit: All registers preserved
-DAI_xfabs:
+xfabs:
                     push    af                              ;[e140] f5
                     push    bc                              ;[e141] c5
                     push    de                              ;[e142] d5
@@ -260,7 +277,7 @@ DAI_xfabs:
 ;
 ; Entry; None
 ; Exit: All registers preserved
-DAI_xfchs:
+xfchs:
                     push    af                              ;[e14a] f5
                     push    bc                              ;[e14b] c5
                     push    de                              ;[e14c] d5
@@ -274,15 +291,15 @@ DAI_xfchs:
 ;
 ; Entry; None
 ; Exit: All registers preserved
-DAI_xfrac:
+xfrac:
                     push    af                              ;[e154] f5
                     push    hl                              ;[e155] e5
                     call    fppush                          ;[e156] cd 1e c2
-                    call    DAI_xfint                           ;[e159] cd 43 e4
+                    call    xfint                           ;[e159] cd 43 e4
                     ld      hl,$0000                        ;[e15c] 21 00 00
                     add     hl,sp                           ;[e15f] 39
-                    call    DAI_xfsub                           ;[e160] cd b4 ed
-                    call    DAI_xfchs                           ;[e163] cd 4a e1
+                    call    xfsub                           ;[e160] cd b4 ed
+                    call    xfchs                           ;[e163] cd 4a e1
                     inc     sp                              ;[e166] 33
                     inc     sp                              ;[e167] 33
                     inc     sp                              ;[e168] 33
@@ -297,7 +314,7 @@ DAI_xfrac:
 ; 
 ; Entry: hl = points to operand
 ; Exit: All registers preserved
-DAI_xiadd:
+xiadd:
                     push    af                              ;[e16d] f5
                     push    bc                              ;[e16e] c5
                     push    de                              ;[e16f] d5
@@ -333,7 +350,7 @@ l1e11:
 ; 
 ; Entry: hl = points to operand
 ; Exit: All registers preserved
-DAI_xisub:
+xisub:
                     push    af                              ;[e18d] f5
                     push    bc                              ;[e18e] c5
                     push    de                              ;[e18f] d5
@@ -368,7 +385,7 @@ DAI_xisub:
 ; 
 ; Entry: hl = points to multiplier
 ; Exit: All registers preserved
-DAI_ximul:
+ximul:
                     push    af                              ;[e1ac] f5
                     push    bc                              ;[e1ad] c5
                     push    de                              ;[e1ae] d5
@@ -464,7 +481,7 @@ l1e21:
 ;        MACC = dividend
 ; Exit:  MACC = quotient
 ;        All registers preserved
-DAI_xidiv:
+xidiv:
                     push    af                              ;[e22b] f5
                     push    bc                              ;[e22c] c5
                     push    de                              ;[e22d] d5
@@ -472,7 +489,7 @@ DAI_xidiv:
                     call    lie24                           ;[e22f] cd 42 e2
                     call    l1e58                           ;[e232] cd cf e3
                     jp      fpexit                          ;[e235] c3 4d c1
-DAI_xirem:
+xirem:
                     push    af                              ;[e238] f5
                     push    bc                              ;[e239] c5
                     push    de                              ;[e23a] d5
@@ -824,7 +841,7 @@ l1e60:
 ;
 ; Entry: none
 ; Exit: All registers preservied
-DAI_xflt:
+xflt:
                     push    af                              ;[e3de] f5
                     push    bc                              ;[e3df] c5
                     push    de                              ;[e3e0] d5
@@ -860,7 +877,7 @@ l1e63:
 ;
 ; Entry: none
 ; Exit: All registers preservied
-DAI_xfix:
+xfix:
                     push    af                              ;[e414] f5
                     push    bc                              ;[e415] c5
                     push    de                              ;[e416] d5
@@ -894,7 +911,7 @@ l1e66:
 ; The fractional bits of mantissa are masked off
 ;
 ; Exit: All registers preserved
-DAI_xfint:
+xfint:
                     push    af                              ;[e443] f5
                     push    bc                              ;[e444] c5
                     push    de                              ;[e445] d5
@@ -1309,7 +1326,7 @@ l1e115:
 ;      Final SQRT(F): P(3)
 ;
 ; Exit: All registers preserved
-DAI_xsqrt:
+xsqrt:
                     push    af                              ;[e5f8] f5
                     push    bc                              ;[e5f9] c5
                     push    de                              ;[e5fa] d5
@@ -1333,7 +1350,7 @@ l1e117:
                     ld      (hl),a                          ;[e618] 77
                     push    hl                              ;[e619] e5
                     ld      hl,icbwk                        ;[e61a] 21 e3 00
-                    call    DAI_xsave                           ;[e61d] cd 1c e1
+                    call    xsave                           ;[e61d] cd 1c e1
                     ex      de,hl                           ;[e620] eb
                     push    hl                              ;[e621] e5
                     call    amul                            ;[e622] cd 59 ea
@@ -1369,7 +1386,7 @@ l1e119:
                     and     $7f                             ;[e654] e6 7f
                     ret                                     ;[e656] c9
 
-; Constants for DAI_xsqrt (RODATA)
+; Constants for xsqrt (RODATA)
 l1e275:
                     defb    $7f, $d2, $d0, $1c          ;a1: 0.578125
                     defb    $00, $99, $ee, $14          ;b1: 0.421875
@@ -1383,31 +1400,32 @@ l1e277:
 ; MACC = e ^ MACC
 ;
 ; Method: Polynomial approximation
-DAI_xexp:
+xexp:
                     push    af                              ;[e667] f5
                     push    bc                              ;[e668] c5
                     push    de                              ;[e669] d5
                     push    hl                              ;[e66a] e5
                     ld      a,(fpac)                       ;[e66b] 3a d5 00
-                    ld      ($00ef),a                       ;[e66e] 32 ef 00
+                    ld      (fatzx),a                       ;[e66e] 32 ef 00
                     call    abs_MACC                          ;[e671] cd ee e9
                     ld      hl,l1e291                       ;[e674] 21 2b e7
                     call    amul                            ;[e677] cd 59 ea
                     call    fppush                          ;[e67a] cd 1e c2
-                    call    DAI_xfix                            ;[e67d] cd 14 e4
+                    call    xfix                            ;[e67d] cd 14 e4
                     call    xget                            ;[e680] cd 33 e1
                     call    fppop                           ;[e683] cd 34 c2
                     or      b                               ;[e686] b0
                     or      c                               ;[e687] b1
                     jp      z,exp_part2                     ;[e688] ca c9 ef
-                    ld      a,($00ef)                       ;[e68b] 3a ef 00
+le68b:
+                    ld      a,(fatzx)                       ;[e68b] 3a ef 00
                     cpl                                     ;[e68e] 2f
                     or      a                               ;[e68f] b7
                     scf                                     ;[e690] 37
                     jp      l1e126                          ;[e691] c3 f5 e6
 l1e121:
                     push    de                              ;[e694] d5
-                    call    DAI_xfrac                           ;[e695] cd 54 e1
+                    call    xfrac                           ;[e695] cd 54 e1
                     ld      de,l1e279                       ;[e698] 11 fb e6
                     ld      hl,(fpac)                      ;[e69b] 2a d5 00
                     or      l                               ;[e69e] b5
@@ -1455,13 +1473,13 @@ l1e124:
                     cpl                                     ;[e6f0] 2f
                     inc     a                               ;[e6f1] 3c
 l1e125:
-                    call    $c1b7                           ;[e6f2] cd b7 c1
+                    call    lc1b7                           ;[e6f2] cd b7 c1
 l1e126:
                     call    c,ovunf                         ;[e6f5] dc 4b ea
 l1e127:
                     jp      fpexit                          ;[e6f8] c3 4d c1
 
-; Constants for DAI_xexp (RODATA)
+; Constants for xexp (RODATA)
 l1e279:
                     defb    $7e, $80, $00, $00          ;FPT(1/8)
 l1e280:
@@ -1507,7 +1525,7 @@ l1e292:
 ;       sum-ee: Entry MACC (X)
 ;       MACC:  Result
 ; All registers preserved
-DAI_xln:
+xln:
                     push    af                              ;[e745] f5
                     push    bc                              ;[e746] c5
                     push    de                              ;[e747] d5
@@ -1561,7 +1579,7 @@ l1e273:
                     ld      b,a                             ;[e7a1] 47
                     ld      c,a                             ;[e7a2] 4f
                     call    xput                            ;[e7a3] cd 26 e1
-                    call    DAI_xflt                            ;[e7a6] cd de e3
+                    call    xflt                            ;[e7a6] cd de e3
                     ld      hl,fp_ln2                       ;[e7a9] 21 b8 e7
                     call    amul                            ;[e7ac] cd 59 ea
                     ld      hl,l1e299                       ;[e7af] 21 bc e7
@@ -1581,7 +1599,7 @@ l1e299:             defb    $02, $80, $00, $00              ;b1: 2.0
 
 
 ; MACC = SIN(MACC)
-DAI_xsin:
+xsin:
                     push    af                              ;[e7d2] f5
                     push    bc                              ;[e7d3] c5
                     push    de                              ;[e7d4] d5
@@ -1591,7 +1609,7 @@ DAI_xsin:
 ; MACC = COS(MACC)
 ;
 ; Method: Polynomial expansion
-DAI_xcos:
+xcos:
                     push    af                              ;[e7d9] f5
                     push    bc                              ;[e7da] c5
                     push    de                              ;[e7db] d5
@@ -1601,7 +1619,7 @@ DAI_xcos:
 l1e132:
                     ld      hl,l1e306                       ;[e7e3] 21 3f e8
                     call    adiv                            ;[e7e6] cd 20 ea
-                    call    DAI_xfrac                           ;[e7e9] cd 54 e1
+                    call    xfrac                           ;[e7e9] cd 54 e1
                     ld      hl,fpac                        ;[e7ec] 21 d5 00
                     ld      a,(hl)                          ;[e7ef] 7e
                     and     $7f                             ;[e7f0] e6 7f
@@ -1648,7 +1666,7 @@ l1e306:             defb    $03, $c9, $0f, $db              ;a1: ~PI/2         -
 
 
 
-DAI_xpwr:
+xpwr:
                     push    af                              ;[e855] f5
                     push    bc                              ;[e856] c5
                     push    de                              ;[e857] d5
@@ -1658,17 +1676,17 @@ DAI_xpwr:
                     pop     hl                              ;[e85d] e1
                     jp      z,xpw10                         ;[e85e] ca 6d e8
                     jp      m,faser                         ;[e861] fa d0 e9
-                    call    DAI_xln                             ;[e864] cd 45 e7
+                    call    xln                             ;[e864] cd 45 e7
                     call    amul                            ;[e867] cd 59 ea
-                    call    DAI_xexp                            ;[e86a] cd 67 e6
+                    call    xexp                            ;[e86a] cd 67 e6
 xpw10:
                     jp      fpexit                          ;[e86d] c3 4d c1
-DAI_xlog10:
+xlog10:
                     push    af                              ;[e870] f5
                     push    bc                              ;[e871] c5
                     push    de                              ;[e872] d5
                     push    hl                              ;[e873] e5
-                    call    DAI_xln                             ;[e874] cd 45 e7
+                    call    xln                             ;[e874] cd 45 e7
                     ld      hl,fp_invln10                        ;[e877] 21 90 e8
                     call    amul                            ;[e87a] cd 59 ea
                     jp      fpexit                          ;[e87d] c3 4d c1
@@ -1687,26 +1705,26 @@ xalog:
                     push    hl                              ;[e883] e5
                     ld      hl,fp_invln10                        ;[e884] 21 90 e8
                     call    adiv                            ;[e887] cd 20 ea
-                    call    DAI_xexp                            ;[e88a] cd 67 e6
+                    call    xexp                            ;[e88a] cd 67 e6
                     jp      fpexit                          ;[e88d] c3 4d c1
 
 
 fp_invln10:         defb    $7f, $de, $5b, $d9              ;1/ln(10)
 
 
-DAI_xtan:
+xtan:
                     push    hl                              ;[e894] e5
                     call    fppush                          ;[e895] cd 1e c2
-                    call    DAI_xcos                            ;[e898] cd d9 e7
+                    call    xcos                            ;[e898] cd d9 e7
                     ld      hl,$00ef                        ;[e89b] 21 ef 00
-                    call    DAI_xsave                           ;[e89e] cd 1c e1
+                    call    xsave                           ;[e89e] cd 1c e1
                     call    fppop                           ;[e8a1] cd 34 c2
-                    call    DAI_xsin                            ;[e8a4] cd d2 e7
-                    call    DAI_xfdiv                           ;[e8a7] cd 08 e1
+                    call    xsin                            ;[e8a4] cd d2 e7
+                    call    xfdiv                           ;[e8a7] cd 08 e1
                     pop     hl                              ;[e8aa] e1
                     ret                                     ;[e8ab] c9
 
-DAI_xatan:
+xatan:
                     push    af                              ;[e8ac] f5
                     push    bc                              ;[e8ad] c5
                     push    de                              ;[e8ae] d5
@@ -1801,7 +1819,7 @@ fatpl:
                     defb    $00, $00                        ;end of table
 
 
-DAI_xasin:
+xasin:
                     push    af                              ;[e96c] f5
                     push    bc                              ;[e96d] c5
                     push    de                              ;[e96e] d5
@@ -1820,7 +1838,7 @@ DAI_xasin:
                     ld      a,e                             ;[e986] 7b
                     or      a                               ;[e987] b7
                     ld      hl,fp_halfpi                    ;[e988] 21 33 e8
-                    call    DAI_xload                           ;[e98b] cd 12 e1
+                    call    xload                           ;[e98b] cd 12 e1
                     call    m,achgs                         ;[e98e] fc e4 e9
 fasret:
                     jp      fpexit                          ;[e991] c3 4d c1
@@ -1835,19 +1853,19 @@ fas20:
                     call    achgs                           ;[e9a3] cd e4 e9
                     ld      hl,fp_one                       ;[e9a6] 21 62 c4
                     call    aadd                            ;[e9a9] cd 72 ea
-                    call    DAI_xsqrt                           ;[e9ac] cd f8 e5
+                    call    xsqrt                           ;[e9ac] cd f8 e5
                     ld      hl,$00ef                        ;[e9af] 21 ef 00
-                    call    DAI_xsave                           ;[e9b2] cd 1c e1
+                    call    xsave                           ;[e9b2] cd 1c e1
                     call    fppop                           ;[e9b5] cd 34 c2
-                    call    DAI_xfdiv                           ;[e9b8] cd 08 e1
-                    call    DAI_xatan                           ;[e9bb] cd ac e8
+                    call    xfdiv                           ;[e9b8] cd 08 e1
+                    call    xatan                           ;[e9bb] cd ac e8
                     jp      fasret                          ;[e9be] c3 91 e9
-DAI_xacos:
-                    call    DAI_xasin                           ;[e9c1] cd 6c e9
-                    call    DAI_xfchs                           ;[e9c4] cd 4a e1
+xacos:
+                    call    xasin                           ;[e9c1] cd 6c e9
+                    call    xfchs                           ;[e9c4] cd 4a e1
                     push    hl                              ;[e9c7] e5
                     ld      hl,fp_halfpi                    ;[e9c8] 21 33 e8
-                    call    DAI_xfadd                           ;[e9cb] cd aa ed
+                    call    xfadd                           ;[e9cb] cd aa ed
                     pop     hl                              ;[e9ce] e1
                     ret                                     ;[e9cf] c9
 
@@ -2188,7 +2206,7 @@ l1e190:
 
 l1e191:
                     call    l1e192                          ;[eb96] cd a0 eb
-                    call    nc,$c1b7                        ;[eb99] d4 b7 c1
+                    call    nc,lc1b7                        ;[eb99] d4 b7 c1
                     ccf                                     ;[eb9c] 3f
                     rra                                     ;[eb9d] 1f
                     or      a                               ;[eb9e] b7
@@ -2395,6 +2413,7 @@ l1e206:
                     pop     bc                              ;[ec99] c1
 l1e207:
                     ld      a,(dp4)                       ;[ec9a] 3a da 00
+lec9d:
                     rlca                                    ;[ec9d] 07
                     ld      a,b                             ;[ec9e] 78
                     rla                                     ;[ec9f] 17
@@ -2422,7 +2441,7 @@ l1e208:
                     ld      e,a                             ;[ecbc] 5f
                     pop     bc                              ;[ecbd] c1
                     ld      a,(dp4)                       ;[ecbe] 3a da 00
-                    jp      $ec9d                           ;[ecc1] c3 9d ec
+                    jp      lec9d                           ;[ecc1] c3 9d ec
 l1e209:
                     ld      l,e                             ;[ecc4] 6b
                     ld      h,d                             ;[ecc5] 62
@@ -2585,7 +2604,7 @@ zpwr:
                     and     $20                             ;[eda4] e6 20
                     ret     nz                              ;[eda6] c0
                     jp      mpr14                           ;[eda7] c3 ac e4
-DAI_xfadd:
+xfadd:
                     push    af                              ;[edaa] f5
                     push    bc                              ;[edab] c5
                     push    de                              ;[edac] d5
@@ -2598,7 +2617,7 @@ DAI_xfadd:
 ;
 ; Entry: hl points to fp number in memory
 ; Exit: all registers preserved
-DAI_xfsub:
+xfsub:
                     push    af                              ;[edb4] f5
                     push    bc                              ;[edb5] c5
                     push    de                              ;[edb6] d5
@@ -2614,7 +2633,7 @@ DAI_xfsub:
 exp_part2:
                     ld      a,d                             ;[efc9] 7a
                     and     $c0                             ;[efca] e6 c0
-                    jp      nz,$e68b                        ;[efcc] c2 8b e6
+                    jp      nz,le68b                        ;[efcc] c2 8b e6
                     jp      l1e121                          ;[efcf] c3 94 e6
 
 ;Part of exp
@@ -2636,6 +2655,7 @@ fp_two:             defb    $02, $80, $00, $00              ;2.0 (c466)
 
 error_vector:   defw    0               ;0xd0
 
+___dai32_fpac:
 fpac:       defb    0,0,0,0             ;0xd5-d8
 sf:         defb    0                   ;0xd9
 dp4:        defb    0                   ;0xda

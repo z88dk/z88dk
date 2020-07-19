@@ -7,33 +7,37 @@
 	PUBLIC	l_f32_schar2f
 	PUBLIC	l_f32_sint2f
 
-	EXTERN	___dai32_BNORM
-	EXTERN	___dai32_FPREG
-	EXTERN	___dai32_FPEXP
-	EXTERN	___dai32_FPSIGN
+	EXTERN	___dai32_xflt
+	EXTERN	___dai32_fpac
 	EXTERN	___dai32_return
-	EXTERN	l_neg_hl
 
 ; Convert signed char/int in l to floating point value in dehl
 l_f32_uchar2f:
+    ld      h,0
 l_f32_uint2f:
-	ld	a,128
-	jr	not_negative
+    ld      de,0
+    jp      do_float
 l_f32_schar2f:
+    ld      a,l
+    rlca
+    sbc     a
+    ld      h,a
 l_f32_sint2f:
-	ld	a,h
-	rla
-	ld	a,128
-	jr	nc,not_negative
-	call	l_neg_hl
-	xor	a
-not_negative:
-	ld	(___dai32_FPSIGN),a
-	ex	de,hl
-	ld	c,0
-	ld	a,24 + 128
-	ld	(___dai32_FPEXP),a
-	ld	b,0
-	call	___dai32_BNORM
-	jp	___dai32_return
+    ld      a,h
+    rlca
+    sbc     a
+    ld      e,a
+    ld      d,a
+do_float:
+    ld      a,h
+    ld      h,l
+    ld      l,a
+    ld      (___dai32_fpac+2),hl
+    ex      de,hl
+    ld      a,h
+    ld      h,l
+    ld      l,a
+    ld      (___dai32_fpac+2),hl
+    call    ___dai32_xflt
+    jp      ___dai32_return
 

@@ -1,33 +1,37 @@
 
 
-        SECTION         code_fp_dai32
+        SECTION code_fp_dai32
 
-        PUBLIC          ceil
-        EXTERN		l_long_neg
-        EXTERN		l_f32_slong2f
-        EXTERN		___dai32_setup_single
-        EXTERN		___dai32_return
-        EXTERN          ___dai32_fpac
+        PUBLIC  ceil
+        EXTERN  ___dai32_setup_single
+        EXTERN  ___dai32_return
+        EXTERN  ___dai32_xfix
+        EXTERN  ___dai32_xflt
+        EXTERN  ___dai32_fpac
 
 
 ceil:
     call    ___dai32_setup_single
-    ld      hl,___dai32_fpac+0
+    ld      hl,___dai32_fpac
     ld      a,(hl)
-    xor     $80
-    ld      (hl),a
-    push    af
-;    call    ___dai32_FPINT 
-
-    ; bcde = integer
-    ; Now normalise it again
-    ex      de,hl
-    ld      e,c
-    ld      d,b
-    pop     af
+    call    ___dai32_xfix           ;Turns fpac into integer, preserves registers
     rlca
-    jr      nc,not_negative
-    dec     d
-not_negative:
-    call    l_long_neg
-    jp      l_f32_slong2f
+    ; It's postive, we need to increment
+    ld      hl,___dai32_fpac+3
+    call    nc, inclong
+    call    ___dai32_xflt
+    jp      ___dai32_return
+
+
+inclong:
+    inc     (hl)
+    ret     nz
+    dec     hl
+    inc     (hl)
+    ret     nz
+    dec     hl
+    inc     (hl)
+    ret     nz
+    dec     hl
+    inc     (hl)
+    ret
