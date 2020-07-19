@@ -7,10 +7,6 @@ cache:
  
 language: cpp
 
-# https://docs.travis-ci.com/user/languages/cpp/ - support C11
-# linux: gcc-4.9 and clang-3.6
-# osx:   gcc-4.9 and os-default clang
-# https://stackoverflow.com/questions/39536144/libsystem-symptoms-dylib-missing-in-xcode-8
 matrix:
   include:
     - os: linux
@@ -19,19 +15,13 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - gcc-4.9
-            - g++-4.9
             - dos2unix
             - libboost-all-dev
             - texinfo
             - texi2html
+            - gdb
       env:
-         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
-
-#    - os: osx
-#      osx_image: xcode7.3
-#      env:
-#        - MATRIX_EVAL="CC=clang && CXX=clang++"
+         - MATRIX_EVAL="CC=gcc && CXX=g++"
 
 before_install:
   - eval "${MATRIX_EVAL}"
@@ -43,6 +33,12 @@ before_install:
 before_script:
   - export PATH=`pwd`/bin:$PATH
   - export ZCCCFG=`pwd`/lib/config
+  - ulimit -c unlimited -S       # enable core 
 
 script:
   - ./build.sh -e -t
+
+# show backtrace on core dump - replace path to executable file and un-comment following lines
+#after_failure:
+#  - COREFILE=$(find . -name "core*" | head -n 1) # find core file
+#  - if [[ -f "$COREFILE" ]]; then gdb -c "$COREFILE" INSERT-EXECUTABLE-HERE -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
