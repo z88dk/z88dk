@@ -795,16 +795,18 @@ static void dofloat_am9511(double raw, unsigned char fa[])
     struct fp_decomposed fs = {0};
     uint32_t fp_value = 0;
 
-    decompose_float(raw, &fs);
+    if ( raw != 0.0 ) {
+        decompose_float(raw, &fs);
 
-    // Bundle up mantissa
-    fp_value = (((uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16)) | 0x00800000;
+        // Bundle up mantissa
+        fp_value = (((uint32_t)fs.mantissa[4]) | ( ((uint32_t)fs.mantissa[5]) << 8) | (((uint32_t)fs.mantissa[6]) << 16)) | 0x00800000;
 
-    // And now the exponent
-    fp_value |= ((((uint32_t)fs.exponent) << 24) & 0x7f000000);
+        // And now the exponent
+        fp_value |= ((((uint32_t)fs.exponent) << 24) & 0x7f000000);
 
-    // And the sign bit
-    fp_value |= fs.sign ? 0x80000000 : 0x00000000;
+        // And the sign bit
+        fp_value |= fs.sign ? 0x80000000 : 0x00000000;
+    }
     pack32bit_float(fp_value, fa);
 }
 
