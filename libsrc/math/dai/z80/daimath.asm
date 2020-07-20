@@ -107,8 +107,7 @@ fppush:
                     push    hl                              ;[c225] e5
                     ld      hl,$0000                        ;[c226] 21 00 00
                     add     hl,sp                           ;[c229] 39
-                    rst     $20                             ;[c22a] e7
-                    rrca                                    ;[c22b] 0f
+                    call    xsave
                     ld      hl,(fwork)                      ;[c22c] 2a df 00
                     push    hl                              ;[c22f] e5
                     ld      hl,(xphls)                      ;[c230] 2a e1 00
@@ -120,8 +119,7 @@ fppop:
                     ld      (fwork),hl                      ;[c238] 22 df 00
                     ld      hl,$0000                        ;[c23b] 21 00 00
                     add     hl,sp                           ;[c23e] 39
-                    rst     $20                             ;[c23f] e7
-                    inc     c                               ;[c240] 0c
+                    call    xload
                     pop     hl                              ;[c241] e1
                     ld      hl,(fwork)                      ;[c242] 2a df 00
                     ex      (sp),hl                         ;[c245] e3
@@ -132,6 +130,7 @@ fperr_overflow:
                     push    hl                              ;[c04b] e5
                     ld      hl,$0000                        ;[c04c] 21 00 00
 handle_error:
+                    pop     hl
                     ret         ; TODO
                     push    af                              ;[c04f] f5
                     push    de                              ;[c050] d5
@@ -2624,8 +2623,7 @@ xfsub:
                     push    hl                              ;[edb7] e5
                     call    asub                            ;[edb8] cd 6d ea
                     jp      fpexit                          ;[edbb] c3 4d c1
-                    rst     $38                             ;[edbe] ff
-                    rst     $38                             ;[edbf] ff
+
 
 
 
