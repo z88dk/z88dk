@@ -5,10 +5,10 @@
 
 fabs:
 IF __CPU_INTEL__
-	ld	a,e
+	ld	a,d
 	and	@01111111
-	ld	e,a
+	ld	d,a
 ELSE
-	res	7,e
+	res	7,d
 ENDIF
 	ret

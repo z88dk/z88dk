@@ -37,7 +37,7 @@ do_float:
     ld      a,h
     ld      h,l
     ld      l,a
-    ld      (___dai32_fpac+2),hl
+    ld      (___dai32_fpac+0),hl
     call    ___dai32_xflt
     jp      ___dai32_return
 
