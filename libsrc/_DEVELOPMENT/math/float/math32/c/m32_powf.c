@@ -33,10 +33,18 @@
 
 float m32_powf (float x, float y)
 {
-    if(x <= 0.0) return 0.0;
-   
     if(y == 0.0) return 1.0;
-    if(y == 1.0) return x;
 
-    return m32_expf(m32_logf(x) * y);
+    if(x <= 0.0) return 0.0;
+
+    if(y == 1.0) return x;
+    if(y == -1.0) return m32_invf(x);
+
+    if(y == 0.5) return m32_sqrtf(x);
+    if(y == -0.5) return m32_invsqrtf(x);
+
+    if(y == 2.0) return m32_sqrf(x);
+    if(y == -2.0) return m32_invf(m32_sqrf(x));
+
+    return m32_expf( m32_logf(x) * y);
 }
