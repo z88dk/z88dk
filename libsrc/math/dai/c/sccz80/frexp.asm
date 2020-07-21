@@ -4,7 +4,6 @@ SECTION code_fp
 PUBLIC frexp
 
 
-; TODO
 ; float frexpf (float x, int8_t *pw2);
 frexp:
 IF __CPU_INTEL__ || __CPU_GBZ80__
@@ -37,11 +36,12 @@ ENDIF
 	and	a
 	ld	d,0
 	jr	z,zero
-	sub	$80
-	ld	d,$80	;And set to non-scaled
+	and	$7f
+	ld	d,$00	;And set to non-scaled
 zero:
 	ld	(bc),a
 	inc	bc
+	rlca
 	rlca
 	sbc	a
 	ld	(bc),a
