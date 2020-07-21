@@ -110,6 +110,7 @@ fppush:
                     call    xsave
                     ld      hl,(fwork)                      ;[c22c] 2a df 00
                     push    hl                              ;[c22f] e5
+lc230:
                     ld      hl,(xphls)                      ;[c230] 2a e1 00
                     ret
 
@@ -123,7 +124,7 @@ fppop:
                     pop     hl                              ;[c241] e1
                     ld      hl,(fwork)                      ;[c242] 2a df 00
                     ex      (sp),hl                         ;[c245] e3
-                    jp      $c230                           ;[c246] c3 30 c2
+                    jp      lc230                           ;[c246] c3 30 c2
                  
 
 fperr_overflow:

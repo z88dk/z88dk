@@ -41,6 +41,8 @@
 #include <math/math_zx.h>
 #elif __MATH_CPC
 #include <math/math_cpc.h>
+#elif __MATH_DAI32
+#include <math/math_dai32.h>
 #else
 #include <math/math_genmath.h>
 #endif

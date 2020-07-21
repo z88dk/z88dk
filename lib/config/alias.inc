@@ -10,11 +10,11 @@ ALIAS   --hardware-keyboard -pragma-redirect:fgetc_cons=fgetc_cons_inkey -pragma
 #
 # Math library aliases (classic)
 #
-ALIAS   --math-mbf32            -Cc-fp-mode=mbf32   -lmbf32 -pragma-define:CLIB_32BIT_FLOATS=1
-ALIAS   --math-mbf32_8080       -Cc-fp-mode=mbf32   -lmbf32_8080
+ALIAS   --math-mbf32            -Cc-fp-mode=mbf32   -lmbf32 -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_MBF32 -D__MATH_MBF32
+ALIAS   --math-mbf32_8080       -Cc-fp-mode=mbf32   -lmbf32_8080 -Cc-D__MATH_MBF32 -D__MATH_MBF32
 ALIAS   --math-mbf64            -Cc-fp-mode=mbf64   -lmbf64
 ALIAS   --math-bbc              -Cc-fp-mode=z88     -lbbc_math
-ALIAS   --math-dai32            -Cc-fp-mode=am9511  -ldai32math -pragma-define:CLIB_32BIT_FLOATS=1
+ALIAS   --math-dai32            -Cc-fp-mode=am9511  -ldai32math -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_DAI32 -D__MATH_DAI32
 
 #
 # Math library aliases (classic + newlib)

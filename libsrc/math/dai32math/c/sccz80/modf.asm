@@ -6,7 +6,7 @@
 	EXTERN		floor
 	EXTERN		ceil
 	EXTERN		msbios
-	EXTERN		___dai32_xsub
+	EXTERN		___dai32_xfsub
 	EXTERN		___dai32_fpac
 	EXTERN		l_glong
 	EXTERN		___dai32_return
@@ -72,7 +72,7 @@ ENDIF
 	ld	c,(hl)
 	inc	hl
 	ld	b,(hl)
-	call	___dai32_xsub		; fpac = floor - value
+	call	___dai32_xfsub		; fpac = floor - value
         ld      hl,(___dai32_fpac+2)
 	ex	de,hl
         ld      hl,(___dai32_fpac)
