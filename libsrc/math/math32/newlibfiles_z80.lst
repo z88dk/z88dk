@@ -173,6 +173,7 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/cosh_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/asin.asm
 
+../../_DEVELOPMENT/math/float/math32/z80/m32_discardfraction
 ../../_DEVELOPMENT/math/float/math32/z80/d32_fsadd.asm
 ../../_DEVELOPMENT/math/float/math32/z80/f32_fsconst.asm
 ../../_DEVELOPMENT/math/float/math32/z80/d32_fsconv.asm

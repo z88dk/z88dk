@@ -1,3 +1,4 @@
+math/float/math32/z80/m32_discardfraction
 math/float/math32/z80/d32_fsadd
 math/float/math32/z80/f32_fsconst
 math/float/math32/z80/d32_fsconv
@@ -41,3 +42,4 @@ math/float/math32/z80/h32_coeff_logf
 math/float/math32/z80/h32_coeff_sinf
 
 @math/float/math32/math32_c_asm.lst
+
