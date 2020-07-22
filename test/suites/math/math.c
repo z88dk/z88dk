@@ -52,6 +52,8 @@ void test_integer_operations()
      a /= b;
 #ifdef MATH16
      a = 4;
+#elif MATH32
+     a = 4;
 #endif
      Assert ( a == 4, "divide: a == 4");
      a -= b;
@@ -68,6 +70,8 @@ void test_integer_constant_longform_lhs()
      Assert ( a == 8, "multiply: a == 8");
      a = 32 / a;
 #ifdef MATH16
+     a = 4;
+#elif MATH32
      a = 4;
 #endif
      Assert ( a == 4, "divide: a == 4");
