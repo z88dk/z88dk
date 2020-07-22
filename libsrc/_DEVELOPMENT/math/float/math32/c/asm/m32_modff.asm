@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.2 #11722 (Linux)
+; Version 4.0.2 #11715 (Mac OS X x86_64)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -421,16 +421,24 @@ _m32_modff:
 	ld	l,(ix+8)
 	ld	h,(ix+9)
 	push	hl
+	ld	hl,0x0000
+	push	hl
+	push	hl
 	ld	l,(ix+6)
 	ld	h,(ix+7)
 	push	hl
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	push	hl
-	call	___fs2slong_callee
-	push	de
-	push	hl
-	call	___slong2fs_callee
+	call	___fslt_callee
+	ld	a, l
+	or	a, a
+	jr	Z,l_m32_modff_00102
+	ld	e,(ix+6)
+	ld	d,(ix+7)
+	ld	l,(ix+4)
+	ld	h,(ix+5)
+	call	_ceil_fastcall
 	ld	c, l
 	ld	b, h
 	pop	hl
@@ -442,6 +450,34 @@ _m32_modff:
 	ld	(hl), e
 	inc	hl
 	ld	(hl), d
+	jr	l_m32_modff_00103
+l_m32_modff_00102:
+	ld	e,(ix+6)
+	ld	d,(ix+7)
+	ld	l,(ix+4)
+	ld	h,(ix+5)
+	call	_floor_fastcall
+	ld	c, l
+	ld	b, h
+	pop	hl
+	push	hl
+	ld	(hl), c
+	inc	hl
+	ld	(hl), b
+	inc	hl
+	ld	(hl), e
+	inc	hl
+	ld	(hl), d
+l_m32_modff_00103:
+	pop	hl
+	ld	c,(hl)
+	push	hl
+	inc	hl
+	ld	b, (hl)
+	inc	hl
+	ld	e, (hl)
+	inc	hl
+	ld	d, (hl)
 	push	de
 	push	bc
 	ld	l,(ix+6)
@@ -450,8 +486,9 @@ _m32_modff:
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	push	hl
-	call	___fssub
-	ld	sp,ix
+	call	___fssub_callee
+	call	_fabs_fastcall
+	ld	sp, ix
 	pop	ix
 	ret
 	SECTION IGNORE

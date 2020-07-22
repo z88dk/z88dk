@@ -32,6 +32,7 @@
 
 float m32_modff (float x, float * y) 
 {
-    *y = (long)x;
-    return (x-*y);
+    if ( x < 0 ) *y = ceil(x);
+    else *y = floor(x);
+    return fabs(x-*y);
 }
