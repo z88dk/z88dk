@@ -229,6 +229,7 @@
 	EXTERN	l_f32_eq
 	EXTERN	l_f32_ne
 	EXTERN	l_f32_swap
+	EXTERN	l_f32_negate
 	EXTERN	l_f32_schar2f
 	EXTERN	l_f32_uchar2f
 	EXTERN	l_f32_sint2f

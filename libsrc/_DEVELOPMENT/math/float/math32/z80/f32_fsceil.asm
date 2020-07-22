@@ -1,10 +1,8 @@
 
 SECTION code_fp_math32
 
-EXTERN m32_f2ulong
-EXTERN m32_float32u
-EXTERN m32_float32
 EXTERN m32_fsadd_callee
+EXTERN m32_discardfraction
 
 PUBLIC m32_ceil_fastcall
 PUBLIC _m32_ceilf
@@ -17,14 +15,11 @@ PUBLIC _m32_ceilf
 .m32_ceil_fastcall
     bit 7,d
     push af                     ;Save sign flag
-    call m32_f2ulong            ;Exits dehl = number
+    call m32_discardfraction
     pop af
-    jr Z,was_positive
-    call m32_float32
-    ret
+    ret nz
 
 .was_positive
-    call m32_float32u
     ; Add 1
     push de
     push hl

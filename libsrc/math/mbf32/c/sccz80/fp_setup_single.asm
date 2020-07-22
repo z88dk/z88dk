@@ -20,8 +20,18 @@ ___mbf32_setup_single:
 	ld	hl,4
 	add	hl,sp
 	ld	de,___mbf32_FPREG		;Store the right hand
+IF __CPU_INTEL__|__CPU_GBZ80__
+	ld	b,4
+copy_loop:
+	ld	a,(hl)
+	ld	(de),a
+	inc	hl
+	inc	de
+	djnz	copy_loop
+ELSE
 	ld	bc,4
 	ldir
+ENDIF
 IF !__CPU_INTEL__
 	pop	hl
 	push	ix

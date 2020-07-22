@@ -17,7 +17,7 @@ TOCREATE =
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
 CPMLIBS = cpm_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib
-GENLIBS = z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib gendos.lib ndos.lib  lib3d.lib fastmath.lib preempt.lib sp1-all
+GENLIBS = z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib gendos.lib ndos.lib  lib3d.lib fastmath.lib preempt.lib sp1-all
 
 
 TOCREATE := $(call check_target,ace,ace_clib.lib gfxace.lib gfxaceudg.lib)
@@ -199,6 +199,12 @@ mbf64.lib:
 	@echo '--- Building Microsoft Double Precision Maths Library ---'
 	@echo ''
 	$(MAKE) -C math/mbf64
+
+daimath32.lib:
+	@echo ''
+	@echo '--- Building DAI 32-bit 8080 Maths Library ---'
+	@echo ''
+	$(MAKE) -C math/daimath32
 
 
 fastmath.lib:

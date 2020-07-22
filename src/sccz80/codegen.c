@@ -103,7 +103,7 @@ struct _mapping {
         { "dpush_under_long", "dpush3", NULL, NULL, "l_f64_dpush3" }, // Inlined
         { "dpush_under_int", "dpush2", NULL, NULL, "l_f64_dpush2" }, // Inlined
         { "fswap", "dswap",   NULL, "l_f32_swap", "l_f64_swap" },
-        { "fnegate", "minusfa", NULL, NULL, "l_f64_negate" },
+        { "fnegate", "minusfa", "l_f16_negate", "l_f32_negate", "l_f64_negate" },
         { "ldexp", "l_f48_ldexp", "l_f16_ldexp", "l_f32_ldexp", "l_f64_ldexp" },
         { "f16tof", "l_f48_f16tof", "l_f16_f16tof", "l_f32_f16tof", "l_f64_f16tof" },
         { "ftof16", "l_f48_ftof16", "l_f16_ftof16", "l_f32_ftof16", "l_f64_ftof16" },
@@ -3271,7 +3271,6 @@ void neg(LVALUE* lval)
     case KIND_DOUBLE:
         switch ( c_maths_mode ) {
         case MATHS_IEEE:
-        case MATHS_AM9511:
            ol("ld\ta,d");
            ol("xor\t128");
            ol("ld\td,a");
