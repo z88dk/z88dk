@@ -1,9 +1,9 @@
 ;* * * * *  Small-C/Plus z88dk * * * * *
-;  Version: 16710-3ac2e209c-20200720
+;  Version: 16712-4a3171772-20200722
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Tue Jul 21 23:40:57 2020
+;	Module compile time: Wed Jul 22 19:31:40 2020
 
 
 	C_LINE	0,"powf16.c"
@@ -419,7 +419,7 @@
 	inc	hl
 	ld	h,(hl)
 	ld	l,a
-	call	logf16
+	call	log2f16
 	push	hl
 	ld	hl,4	;const
 	add	hl,sp
@@ -428,7 +428,7 @@
 	ld	h,(hl)
 	ld	l,a
 	call	l_f16_mul
-	call	expf16
+	call	exp2f16
 	pop	bc
 	pop	af
 	pop	af

@@ -48,5 +48,5 @@ half_t asm_f16_pow (half_t x, half_t y)
     if(y == 2.0) return x*x;
     if(y == -2.0) return invf16(x*x);
 
-    return expf16( logf16(x) * y);
+    return exp2f16( log2f16(x) * y);
 }
