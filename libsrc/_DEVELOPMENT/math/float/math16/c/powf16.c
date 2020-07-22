@@ -35,9 +35,18 @@ half_t __LIB__ asm_f16_pow (half_t x, half_t y) __smallc  __z88dk_callee;
 
 half_t asm_f16_pow (half_t x, half_t y)
 {
-    if(x <= 0.0) return (half_t)0.0;
-    if(y == 0.0) return (half_t)1.0;
-    if(y == 1.0) return x;
+    if(y == 0.0) return 1.0;
 
-    return exp2f16 (log2f16 (x) * y);
+    if(x <= 0.0) return 0.0;
+
+    if(y == 1.0) return x;
+    if(y == -1.0) return invf16(x);
+
+    if(y == 0.5) return sqrtf16(x);
+    if(y == -0.5) return invsqrtf16(x);
+
+    if(y == 2.0) return x*x;
+    if(y == -2.0) return invf16(x*x);
+
+    return exp2f16( log2f16(x) * y);
 }

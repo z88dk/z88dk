@@ -46,7 +46,7 @@ PUBLIC asm_f32_f16
     ld l,h                      ; create 16 bit mantissa by truncation
     ld h,e
     ld e,a                      ; save sign in e[7]
-    and a,078h                  ; check for 4 lost bits
+    and a,070h                  ; check for 3 lost bits rounding
     ret Z                       ; result in dehl
     set 0,l                     ; set for rounding of LSB
     ret
@@ -89,7 +89,7 @@ PUBLIC asm_f32_f16
     ld l,h                      ; position f16 in hl
     ld h,a
     ld a,e                      ; lost bits
-    and a,0F0h                  ; check for 4 lost bits rounding
+    and a,0e0h                  ; check for 3 lost bits rounding
     ret Z
     set 0,l                     ; set for rounding of LSB
     ret

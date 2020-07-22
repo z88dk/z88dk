@@ -146,12 +146,11 @@ PUBLIC m32_mulu_32h_32x32
     ld h,a                      ; promote HL p6 p5
 
     ex af,af
-    or a
+    and 0c0h
     jr Z,mlt0                   ; use p3 to round p4
     set 0,e
 
 .mlt0
-
     ; start doing the p5 byte
 
     pop bc                      ; y3 x2

@@ -23,8 +23,7 @@
 
 SECTION code_fp_math32
 
-EXTERN m32_fszero       ; return a legal zero of sign d in dehl
-EXTERN m32_fsmax        ; change overflow to floating infinity of sign d in dehl
+EXTERN m32_fszero               ; return a legal zero of sign d in dehl
 
 PUBLIC m32_f32_fam9511
 PUBLIC m32_fam9511_f32
@@ -62,11 +61,11 @@ PUBLIC m32_fam9511_f32
     ld a,d                      ; capture exponent
     sla e
     rl a                        ; position exponent in a
-    jp Z,m32_fszero             ; check for zero
+    jr Z,m32_am9511_fszero      ; check for zero
     cp 127+63                   ; check for overflow
-    jp NC,m32_fsmax
+    jr NC,m32_am9511_fsmax
     cp 127-64                   ; check for underflow
-    jp C,m32_fszero
+    jr C,m32_am9511_fszero
     sub 127-1                   ; bias including shift binary point
 
     rla                         ; position sign
@@ -76,5 +75,22 @@ PUBLIC m32_fam9511_f32
 
     scf                         ; set mantissa leading 1
     rr e                        ; restore mantissa
+    ret
+
+.m32_am9511_fszero
+    ld de,0                     ; no signed zero available
+    ld h,d
+    ld l,e
+    ret
+
+.m32_am9511_fsmax               ; floating max value of sign d in dehl
+    ld a,d
+    and 080h                    ; isolate sign
+    or 03fh                     ; max exponent
+    ld d,a
+
+    ld e, 0ffh                  ; max mantissa
+    ld h,e
+    ld l,e
     ret
 
