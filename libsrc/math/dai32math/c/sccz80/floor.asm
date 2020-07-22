@@ -5,33 +5,23 @@
         PUBLIC  floor
         EXTERN  ___dai32_setup_single
         EXTERN  ___dai32_return
-        EXTERN  ___dai32_xfix
-        EXTERN  ___dai32_xflt
+        EXTERN  ___dai32_xfadd
+        EXTERN  ___dai32_xfint
         EXTERN  ___dai32_fpac
+        EXTERN  ___dai32_tempval
 
 
 floor:
     call    ___dai32_setup_single
-    ld      hl,___dai32_fpac
-    ld      a,(hl)
-    call    ___dai32_xfix           ;Turns fpac into integer, preserves registers
-    rlca
-    ; It's negative, we need to decrement
-    ld      hl,___dai32_fpac+3
-    call    c, declong
-    call    ___dai32_xflt
+    ld      a,(___dai32_fpac)
+    rla
+    call    ___dai32_xfint
+    jp      nc,___dai32_return ;Positive we don't need to anything else
+    ld      hl,$8100        ; -1
+    ld      de,$0000
+    ld      (___dai32_tempval+0),hl
+    ex      de,hl
+    ld      (___dai32_tempval+2),hl
+    ld      hl,___dai32_tempval
+    call    ___dai32_xfadd
     jp      ___dai32_return
-
-
-declong:
-    dec     (hl)
-    ret     nz
-    dec     hl
-    dec     (hl)
-    ret     nz
-    dec     hl
-    dec     (hl)
-    ret     nz
-    dec     hl
-    inc     (hl)
-    ret
