@@ -486,9 +486,8 @@ l_m32_modff_00103:
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	push	hl
-	call	___fssub_callee
-	call	_fabs_fastcall
-	ld	sp, ix
+	call	___fssub
+	ld	sp,ix
 	pop	ix
 	ret
 	SECTION IGNORE
