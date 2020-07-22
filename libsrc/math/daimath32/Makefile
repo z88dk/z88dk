@@ -10,14 +10,14 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += -fp-mode=am9511 -D__MATH_AM9511
 
-all: dirs $(OUTPUT_DIRECTORY)/dai32math.lib $(OUTPUT_DIRECTORY)/dai32math_8080.lib
+all: dirs $(OUTPUT_DIRECTORY)/daimath32.lib $(OUTPUT_DIRECTORY)/daimath32_8080.lib
 
 
-$(OUTPUT_DIRECTORY)/dai32math.lib: $(addprefix obj/z80/, $(OBJECTS))
-	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/dai32math @dai32math.lst
+$(OUTPUT_DIRECTORY)/daimath32.lib: $(addprefix obj/z80/, $(OBJECTS))
+	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/daimath32 @daimath32.lst
 
-$(OUTPUT_DIRECTORY)/dai32math_8080.lib: $(addprefix obj/8080/, $(OBJECTS))
-	TYPE=8080 $(LIBLINKER) -m8080 -x$(OUTPUT_DIRECTORY)/dai32math_8080 @dai32math.lst
+$(OUTPUT_DIRECTORY)/daimath32_8080.lib: $(addprefix obj/8080/, $(OBJECTS))
+	TYPE=8080 $(LIBLINKER) -m8080 -x$(OUTPUT_DIRECTORY)/daimath32_8080 @daimath32.lst
 
 
 dirs:
