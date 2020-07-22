@@ -117,7 +117,7 @@ PUBLIC _m32_sqrf
     ld h,l
     ld l,d
 
-    and 080h                    ; round using feilipu method
+    and 0c0h                    ; round using feilipu method
     jr Z,fs3
     set 0,l
 

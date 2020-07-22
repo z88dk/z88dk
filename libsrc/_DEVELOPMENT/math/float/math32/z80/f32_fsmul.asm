@@ -161,7 +161,7 @@ PUBLIC m32_fsmul, m32_fsmul_callee
     ld h,l
     ld l,d
 
-    and 080h                    ; round using feilipu method
+    and 0c0h                    ; round using feilipu method
     jr Z,fm4
     set 0,l
 
