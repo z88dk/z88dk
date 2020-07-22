@@ -1,5 +1,11 @@
+; Floating point package extract from the DAI machine
+;
+; Labels taken from the DAI firmware disassembly
+;
+;
 
-        MODULE  dai32math
+
+        MODULE  math_dai32
 
         GLOBAL  xget
         GLOBAL  xfmul
@@ -30,6 +36,7 @@
         GLOBAL  xacos
         GLOBAL  xfadd
         GLOBAL  xfsub
+        GLOBAL  fpcomp
 
 
 
@@ -45,6 +52,82 @@
         GLOBAL addexp
 
         GLOBAL ___dai32_fpac
+
+        SECTION code_fp_dai32
+
+
+; Floating point compare
+;
+; Compare FPT number in MACC and that starting at (hl)
+;
+; Exit: ABCDEHL preserved
+;       Flags:  cy=1,S=0,Z=1 -> both numbers 0
+;               cy=0,S=0,Z=1 -> both numbers identical
+;               cy=0,S=0,Z=0 -> MACC > (hl)  (jp P,)
+;               cy=0,S=1,Z=0 -> MACC < (hl)  (jp M,)
+fpcomp:
+                    push    bc                              ;[c079] c5
+                    push    af                              ;[c07a] f5
+                    push    de                              ;[c07b] d5
+                    push    hl                              ;[c07c] e5
+                    call    xget
+                    ld      e,a                             ;[c07f] 5f
+                    xor     (hl)                            ;[c080] ae
+                    ; Jump if signs different
+                    jp      m,lc0b7                         ;[c081] fa b7 c0
+                    ld      a,b                             ;[d1e8] 78
+                    inc     hl                              ;[d1e9] 23
+                    and     (hl)                            ;[d1ea] a6
+                    ld      a,(hl)                          ;[d1eb] 7e
+                    dec     hl                              ;[d1ec] 2b
+                    jp      m,ld1f5                         ;[d1ed] fa f5 d1
+                    cp      b                               ;[d1f0] b8
+                    ccf                                     ;[d1f1] 3f
+                    jp      lc09f                           ;[d1f2] c3 9f c0
+ld1f5:
+                    ld      a,e                             ;[d1f5] 7b
+                    xor     (hl)                            ;[d1f6] ae
+                    and     $40                             ;[d1f7] e6 40
+                    ld      a,e                             ;[d1f9] 7b
+                    rla                                     ;[c087] 17
+                    jp      nz,lc0a3                        ;[c088] c2 a3 c0
+                    ld      a,e                             ;[c08b] 7b
+                    sub     (hl)                            ;[c08c] 96
+                    jp      nz,lc0a2                        ;[c08d] c2 a2 c0
+                    inc     hl                              ;[c090] 23
+                    ld      a,b                             ;[c091] 78
+                    sub     (hl)                            ;[c092] 96
+                    jp      nz,lc0a2                        ;[c093] c2 a2 c0
+                    inc     hl                              ;[c096] 23
+                    ld      a,c                             ;[c097] 79
+                    sub     (hl)                            ;[c098] 96
+                    jp      nz,lc0a6                        ;[c099] c2 a2 c0
+                    inc     hl                              ;[c09c] 23
+                    ld      a,d                             ;[c09d] 7a
+                    ld      a,d                             ;[c09d] 7a
+                    sub     (hl)                            ;[c09e] 96
+lc09f:
+                    jp      z,lc0a6                         ;[c09f] ca a6 c0
+lc0a2:
+                    rra                                     ;[c0a2] 1f
+lc0a3:
+                    xor     e                               ;[c0a3] ab
+lc0a4:
+                    or      $01                             ;[c0a4] f6 01
+lc0a6:
+                    pop     hl                              ;[c0a6] e1
+                    pop     de                              ;[c0a7] d1
+                    pop     bc                              ;[c0a8] c1
+                    ld      a,b                             ;[c0a9] 78
+                    pop     bc                              ;[c0aa] c1
+                    ret                                     ;[c0ab] c9
+
+
+lc0b7:
+                    xor     (hl)                            ;[c0b7] ae
+                    jp      lc0a4                           ;[c0b8] c3 a4 c0
+
+
 
 sext:
                     rlca                                    ;[c1e9] 07
@@ -944,6 +1027,8 @@ l1e70:
                     jp      nz,l1e68                        ;[e46e] c2 5d e4
                     jp      fpexit                          ;[e471] c3 4d c1
 
+IF MATH_AM9511
+
 ; AMD: FPT addition
 ;
 ; MTOS = MTOS + MEM
@@ -1028,7 +1113,6 @@ zfrac:
                     call    wopi                            ;[e4a7] cd 35 e5
                     defb    $11
                     ret
-
 
 ; Part of AMD: POWER
 ;
@@ -1249,6 +1333,7 @@ zsave:
                     inc     hl                              ;[e5a5] 23
                     ld      (hl),d                          ;[e5a6] 72
                     jp      fpexit                          ;[e5a7] c3 4d c1
+ENDIF
 
 ; Calculate taylor sum
 ;
@@ -1386,14 +1471,7 @@ l1e119:
                     and     $7f                             ;[e654] e6 7f
                     ret                                     ;[e656] c9
 
-; Constants for xsqrt (RODATA)
-l1e275:
-                    defb    $7f, $d2, $d0, $1c          ;a1: 0.578125
-                    defb    $00, $99, $ee, $14          ;b1: 0.421875
 
-l1e277:
-                    defb    $00, $94, $00, $00          ;a2: 0.411744
-                    defb    $7f, $d8, $00, $00          ;b2: 0.601289
 
 ; FPT EXP
 ;
@@ -1445,7 +1523,7 @@ l1e123:
                     push    hl                              ;[e6b9] e5
                     call    asub                            ;[e6ba] cd 6d ea
                     ld      e,a                             ;[e6bd] 5f
-                    ld      a,($00ef)                       ;[e6be] 3a ef 00
+                    ld      a,(fatzx)                       ;[e6be] 3a ef 00
                     rlca                                    ;[e6c1] 07
                     push    af                              ;[e6c2] f5
                     ld      a,e                             ;[e6c3] 7b
@@ -1479,40 +1557,6 @@ l1e126:
 l1e127:
                     jp      fpexit                          ;[e6f8] c3 4d c1
 
-; Constants for xexp (RODATA)
-l1e279:
-                    defb    $7e, $80, $00, $00          ;FPT(1/8)
-l1e280:
-                    defb    $7f, $c0, $00, $00          ;FPT(3/8)
-
-l1e281:
-                    defb    $00, $a0, $00, $00          ;FPT(5/8)
-
-l1e282:
-                    defb    $00, $e0, $00, $00          ;FPT(7/8)
-
-l1e283:
-                    defb    $01, $8b, $95, $c2          ;2 ^(1/8)
-                    defb    $01, $a5, $fe, $d7          ;2 ^(3/8)
-                    defb    $01, $c5, $67, $2a          ;2 ^(5/8)
-                    defb    $01, $ea, $c0, $c7          ;2 ^(7/8)
-
-l1e287:
-                    defb    $00, $ea, $c0, $c7          ;2 ^(-1/8)
-                    defb    $00, $c5, $67, $2a          ;2 ^(-3/8)
-                    defb    $00, $a5, $fe, $d7          ;2 ^(-5/8)
-                    defb    $00, $8b, $95, $c2          ;2 ^(-7/8)
-
-l1e291:
-                    defb    $01, $b8, $aa, $3b          ;1 / LN2
-
-l1e292:
-                    defb    $00, $b1, $72, $18          ;a1: LN2,         -> 0.69314718057
-                    defb    $7e, $f4, $fd, $ef          ;a2: ((LN2)^2)/2! -> 0.24022648580
-                    defb    $7c, $e3, $58, $46          ;a3: ((LN2)^3)/3! -> 0.055504105406
-                    defb    $7a, $9d, $a4, $b1          ;a4: ((LN2)^4)/4! -> 0.0096217389747
-                    defb    $77, $aa, $d1, $fe          ;a5: ((LN2)^5)/5! -> 0.0013337729375
-                    defb    $00, $00                    ;end of table
 
 ; FPT LOG
 ;
@@ -1586,16 +1630,7 @@ l1e273:
                     call    poly                            ;[e7b2] cd aa e5
                     jp      fpexit                          ;[e7b5] c3 4d c1
 
-; Data Constants for LN (RODATA)
-fp_ln2:
-                    defb    $00, $b1, $72, $18              ;LN(2)
 
-l1e299:             defb    $02, $80, $00, $00              ;b1: 2.0
-                    defb    $00, $aa, $aa, $a9              ;b2: ~2/3 -> 0.666666564181
-                    defb    $7f, $cc, $cf, $45              ;b5: ~2/5 -> 0.400018840613
-                    defb    $7f, $91, $ae, $ab              ;b7: ~2/7 -> 0.2845357266
-                    defb    $7e, $80, $00, $00              ;b9: ~2/9 -> 0.125
-                    defb    $00, $00                        ;End of table
 
 
 ; MACC = SIN(MACC)
@@ -1651,18 +1686,6 @@ l1e134:
                     ld      hl,l1e306                       ;[e82a] 21 3f e8
                     call    poly                            ;[e82d] cd aa e5
                     jp      fpexit                          ;[e830] c3 4d c1
-fp_halfpi:
-                    defb    $01, $c9, $0f, $db              ; PI / 2
-
-fp_quarter:         defb    $7f, $80, $00, $00              ; 0.25
-fp_half:            defb    $00, $80, $00, $00              ; 0.5
-
-l1e306:             defb    $03, $c9, $0f, $db              ;a1: ~PI/2         -> 6.2831853
-                    defb    $86, $a5, $5d, $e2              ;a2: ~-(PI*2)^3/3! -> -41.341681
-                    defb    $07, $a3, $34, $7b              ;a3: ~(PI*2)^5/5!  -> 81.602481
-                    defb    $87, $99, $29, $9e              ;a4: ~-(PI*2)^7/7! -> -76.581285
-                    defb    $06, $9f, $0a, $fb              ;a5: ~(PI*2)^9/9!  -> 39.760722
-                    defb    $00, $00                        ;End of table
 
 
 
@@ -1709,14 +1732,13 @@ xalog:
                     jp      fpexit                          ;[e88d] c3 4d c1
 
 
-fp_invln10:         defb    $7f, $de, $5b, $d9              ;1/ln(10)
 
 
 xtan:
                     push    hl                              ;[e894] e5
                     call    fppush                          ;[e895] cd 1e c2
                     call    xcos                            ;[e898] cd d9 e7
-                    ld      hl,$00ef                        ;[e89b] 21 ef 00
+                    ld      hl,fatzx                        ;[e89b] 21 ef 00
                     call    xsave                           ;[e89e] cd 1c e1
                     call    fppop                           ;[e8a1] cd 34 c2
                     call    xsin                            ;[e8a4] cd d2 e7
@@ -1733,7 +1755,7 @@ xatan:
                     jp      z,l1e145                        ;[e8b3] ca 43 e9
                     push    af                              ;[e8b6] f5
                     call    abs_MACC                          ;[e8b7] cd ee e9
-                    ld      hl,$00ef                        ;[e8ba] 21 ef 00
+                    ld      hl,fatzx                        ;[e8ba] 21 ef 00
                     call    astore                          ;[e8bd] cd db e9
                     cp      $40                             ;[e8c0] fe 40
                     jp      c,l1e141                        ;[e8c2] da d3 e8
@@ -1773,14 +1795,14 @@ l1e143:
                     call    aadd                            ;[e8fc] cd 72 ea
                     ld      hl,fwork                        ;[e8ff] 21 df 00
                     call    astore                          ;[e902] cd db e9
-                    ld      hl,$00ef                        ;[e905] 21 ef 00
+                    ld      hl,fatzx                        ;[e905] 21 ef 00
                     call    loadfphl                          ;[e908] cd fb e9
                     pop     hl                              ;[e90b] e1
                     call    asub                            ;[e90c] cd 6d ea
                     ld      hl,fwork                        ;[e90f] 21 df 00
                     call    adiv                            ;[e912] cd 20 ea
 l1e144:
-                    ld      hl,$00ef                        ;[e915] 21 ef 00
+                    ld      hl,fatzx                        ;[e915] 21 ef 00
                     push    hl                              ;[e918] e5
                     push    hl                              ;[e919] e5
                     call    asave                           ;[e91a] cd d6 e9
@@ -1803,20 +1825,7 @@ l1e144:
 l1e145:
                     jp      fpexit                          ;[e943] c3 4d c1
 
-; Constants for xatn
-fatc1:
-                    defb    $7f, $e5, $c8, $fa              ;a(1): PI/7      -> 0.4487978506
-                    defb    $7f, $f6, $90, $f3              ;b(1): TAN(a(1)) -> 0.4815746188
-                    defb    $00, $e5, $c8, $fa              ;a(2): 2* PI/7   -> 0.8975979011
-                    defb    $01, $a0, $81, $c6              ;b(2): TAN(a(2)) -> 1.253960337
-                    defb    $01, $ac, $56, $bb              ;a(3): 3* PI/7   -> 1.346396852
-                    defb    $03, $8c, $33, $7f              ;b(3): TAN(a(3)) -> 4.381286272
 
-fatpl:
-                    defb    $ff, $aa, $aa, $2d              ;Q1: ~-1/3   -> -0.333329573
-                    defb    $7e, $cc, $6e, $b3              ;Q2 ~1/5     -> 0.199641035
-                    defb    $fe, $86, $f1, $4f              ;Q3 ~-1/7    -> -0.131779888
-                    defb    $00, $00                        ;end of table
 
 
 xasin:
@@ -1854,7 +1863,7 @@ fas20:
                     ld      hl,fp_one                       ;[e9a6] 21 62 c4
                     call    aadd                            ;[e9a9] cd 72 ea
                     call    xsqrt                           ;[e9ac] cd f8 e5
-                    ld      hl,$00ef                        ;[e9af] 21 ef 00
+                    ld      hl,fatzx                        ;[e9af] 21 ef 00
                     call    xsave                           ;[e9b2] cd 1c e1
                     call    fppop                           ;[e9b5] cd 34 c2
                     call    xfdiv                           ;[e9b8] cd 08 e1
@@ -2495,9 +2504,12 @@ l1e219:
                     call    z,l1e59                         ;[ed0b] cc d6 e3
                     ret                                     ;[ed0e] c9
 
+IF MATH_AM9511
 l1e220:
                     push    af                              ;[ed0f] f5
                     call    zget                            ;[ed10] cd 6f e5
+ENDIF
+
 gbc10:
                     ld      e,d                             ;[ed13] 5a
                     ld      d,c                             ;[ed14] 51
@@ -2506,6 +2518,7 @@ gbc10:
                     pop     af                              ;[ed17] f1
                     ret                                     ;[ed18] c9
 
+IF MATH_AM9511
 ziand:
                     push    af                              ;[ed19] f5
                     push    bc                              ;[ed1a] c5
@@ -2571,6 +2584,9 @@ zgbcde:
                     push    af                              ;[ed7c] f5
                     call    zget                            ;[ed7d] cd 6f e5
                     jp      gbc10                           ;[ed80] c3 13 ed
+ENDIF
+
+
 l1e232:
                     ld      a,b                             ;[ed83] 78
                     or      c                               ;[ed84] b1
@@ -2591,6 +2607,7 @@ l1e234:
                     xor     (hl)                            ;[ed93] ae
                     ret                                     ;[ed94] c9
 
+IF MATH_AM9511
 mfstat:
                     call    opi                             ;[ed95] cd 2d e5
                     defb    $37
@@ -2604,6 +2621,9 @@ zpwr:
                     and     $20                             ;[eda4] e6 20
                     ret     nz                              ;[eda6] c0
                     jp      mpr14                           ;[eda7] c3 ac e4
+ENDIF
+
+
 xfadd:
                     push    af                              ;[edaa] f5
                     push    bc                              ;[edab] c5
@@ -2611,7 +2631,6 @@ xfadd:
                     push    hl                              ;[edad] e5
                     call    aadd                            ;[edae] cd 72 ea
                     jp      fpexit                          ;[edb1] c3 4d c1
-
 ; FPT subtraction
 ; MACC = MACC - MEM
 ;
@@ -2642,6 +2661,83 @@ l1e272:
                     jp      l1e122                          ;[effd] c3 ad e6
 
 
+            SECTION rodata_fp_dai32
+
+; Constants for xexp (RODATA)
+l1e279:
+                    defb    $7e, $80, $00, $00          ;FPT(1/8)
+l1e280:
+                    defb    $7f, $c0, $00, $00          ;FPT(3/8)
+
+l1e281:
+                    defb    $00, $a0, $00, $00          ;FPT(5/8)
+
+l1e282:
+                    defb    $00, $e0, $00, $00          ;FPT(7/8)
+
+l1e283:
+                    defb    $01, $8b, $95, $c2          ;2 ^(1/8)
+                    defb    $01, $a5, $fe, $d7          ;2 ^(3/8)
+                    defb    $01, $c5, $67, $2a          ;2 ^(5/8)
+                    defb    $01, $ea, $c0, $c7          ;2 ^(7/8)
+
+l1e287:
+                    defb    $00, $ea, $c0, $c7          ;2 ^(-1/8)
+                    defb    $00, $c5, $67, $2a          ;2 ^(-3/8)
+                    defb    $00, $a5, $fe, $d7          ;2 ^(-5/8)
+                    defb    $00, $8b, $95, $c2          ;2 ^(-7/8)
+
+l1e291:
+                    defb    $01, $b8, $aa, $3b          ;1 / LN2
+
+l1e292:
+                    defb    $00, $b1, $72, $18          ;a1: LN2,         -> 0.69314718057
+                    defb    $7e, $f4, $fd, $ef          ;a2: ((LN2)^2)/2! -> 0.24022648580
+                    defb    $7c, $e3, $58, $46          ;a3: ((LN2)^3)/3! -> 0.055504105406
+                    defb    $7a, $9d, $a4, $b1          ;a4: ((LN2)^4)/4! -> 0.0096217389747
+                    defb    $77, $aa, $d1, $fe          ;a5: ((LN2)^5)/5! -> 0.0013337729375
+                    defb    $00, $00                    ;end of table
+
+
+; Constants for xsqrt (RODATA)
+l1e275:
+                    defb    $7f, $d2, $d0, $1c          ;a1: 0.578125
+                    defb    $00, $99, $ee, $14          ;b1: 0.421875
+
+l1e277:
+                    defb    $00, $94, $00, $00          ;a2: 0.411744
+                    defb    $7f, $d8, $00, $00          ;b2: 0.601289
+                   
+; Constants for xatn
+fatc1:
+                    defb    $7f, $e5, $c8, $fa              ;a(1): PI/7      -> 0.4487978506
+                    defb    $7f, $f6, $90, $f3              ;b(1): TAN(a(1)) -> 0.4815746188
+                    defb    $00, $e5, $c8, $fa              ;a(2): 2* PI/7   -> 0.8975979011
+                    defb    $01, $a0, $81, $c6              ;b(2): TAN(a(2)) -> 1.253960337
+                    defb    $01, $ac, $56, $bb              ;a(3): 3* PI/7   -> 1.346396852
+                    defb    $03, $8c, $33, $7f              ;b(3): TAN(a(3)) -> 4.381286272
+
+fatpl:
+                    defb    $ff, $aa, $aa, $2d              ;Q1: ~-1/3   -> -0.333329573
+                    defb    $7e, $cc, $6e, $b3              ;Q2 ~1/5     -> 0.199641035
+                    defb    $fe, $86, $f1, $4f              ;Q3 ~-1/7    -> -0.131779888
+                    defb    $00, $00                        ;end of table
+
+fp_halfpi:
+                    defb    $01, $c9, $0f, $db              ; PI / 2
+
+fp_quarter:         defb    $7f, $80, $00, $00              ; 0.25
+fp_half:            defb    $00, $80, $00, $00              ; 0.5
+
+l1e306:             defb    $03, $c9, $0f, $db              ;a1: ~PI/2         -> 6.2831853
+                    defb    $86, $a5, $5d, $e2              ;a2: ~-(PI*2)^3/3! -> -41.341681
+                    defb    $07, $a3, $34, $7b              ;a3: ~(PI*2)^5/5!  -> 81.602481
+                    defb    $87, $99, $29, $9e              ;a4: ~-(PI*2)^7/7! -> -76.581285
+                    defb    $06, $9f, $0a, $fb              ;a5: ~(PI*2)^9/9!  -> 39.760722
+                    defb    $00, $00                        ;End of table
+
+
+fp_invln10:         defb    $7f, $de, $5b, $d9              ;1/ln(10)
 
 fp_tenth:           defb    $7d, $cc, $cc, $cd              ;0.1
 
@@ -2649,8 +2745,20 @@ fp_zero:            defb    $00, $00, $00, $00              ;0
 fp_one:             defb    $01, $80, $00, $00              ;1.0 (c462)
 fp_two:             defb    $02, $80, $00, $00              ;2.0 (c466)
 
+; Data Constants for LN (RODATA)
+fp_ln2:
+                    defb    $00, $b1, $72, $18              ;LN(2)
 
-            SECTION bss_data
+l1e299:             defb    $02, $80, $00, $00              ;b1: 2.0
+                    defb    $00, $aa, $aa, $a9              ;b2: ~2/3 -> 0.666666564181
+                    defb    $7f, $cc, $cf, $45              ;b5: ~2/5 -> 0.400018840613
+                    defb    $7f, $91, $ae, $ab              ;b7: ~2/7 -> 0.2845357266
+                    defb    $7e, $80, $00, $00              ;b9: ~2/9 -> 0.125
+                    defb    $00, $00                        ;End of table
+
+
+
+            SECTION bss_fp_dai32
 
 error_vector:   defw    0               ;0xd0
 
