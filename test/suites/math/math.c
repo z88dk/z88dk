@@ -142,6 +142,8 @@ void test_approx_equal()
     //                   0.0001
     Assert( approx_equal(1.2345,1.2344) == 0, " 1.2345 != 1.2344");
 #elif MATHDAI32
+    //                   0.02
+    Assert( approx_equal(1.24,1.22) == 0, " 1.24 != 1.22");
 #else
     //                   0.00000001
     Assert( approx_equal(1.23456789,1.23456788) == 0, " 1.23456789 != 1.23456788");
