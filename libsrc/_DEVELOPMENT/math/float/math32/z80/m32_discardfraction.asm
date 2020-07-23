@@ -10,18 +10,18 @@ PUBLIC m32_discardfraction
     rl d
     jr Z,zero_legal             ; return IEEE signed zero
 
-    ld a,d			            ; Exponent
-    rr d			            ; Keep sign and exponent safe
+    ld a,d                      ; Exponent
+    rr d                        ; Keep sign and exponent safe
     rr e
     sub $7f                     ; Exponent value of 127 is 1.xx
     jr C,return_zero
     inc a
 
     cp 24
-    ret NC			            ; No shift needed, all integer
+    ret NC                      ; No shift needed, all integer
 
                                 ; Build mask of integer bits
-    				            ; a = number of bits to keep
+                                ; a = number of bits to keep
     exx
     ld hl,0
     ld e,h
