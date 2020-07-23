@@ -4,6 +4,7 @@
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_ceil.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_classify.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_compare.asm
+../../_DEVELOPMENT/math/float/math16/z80/asm_f16_discardfraction.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_div.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_div2.asm
 ../../_DEVELOPMENT/math/float/math16/z80/asm_f16_f24_int.asm

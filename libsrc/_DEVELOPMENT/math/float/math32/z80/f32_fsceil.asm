@@ -13,11 +13,9 @@ PUBLIC _m32_ceilf
 
 ; Entry: dehl = floating point number
 .m32_ceil_fastcall
-    bit 7,d
-    push af                     ;Save sign flag
     call m32_discardfraction
-    pop af
-    ret nz
+    bit 7,d
+    ret NZ
 
 .was_positive
     ; Add 1

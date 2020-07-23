@@ -18,6 +18,7 @@ math/float/math16/z80/asm_f16_add
 math/float/math16/z80/asm_f16_mul
 math/float/math16/z80/asm_f16_div
 
+math/float/math16/z80/asm_f16_discardfraction
 math/float/math16/z80/asm_f16_floor
 math/float/math16/z80/asm_f16_ceil
 math/float/math16/z80/asm_f16_classify

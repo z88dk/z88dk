@@ -13,11 +13,9 @@ PUBLIC _m32_floorf
 
 ; Entry: dehl = floating point number
 .m32_floor_fastcall
-    bit 7,d
-    push af                     ;Save sign flag
     call m32_discardfraction
-    pop af
-    ret z
+    bit 7,d
+    ret Z
 
 .was_negative
     ; And subtract 1

@@ -15,8 +15,8 @@ PUBLIC m32_discardfraction
     rr e
     sub $7f                     ; Exponent value of 127 is 1.xx
     jr C,return_zero
-    inc a
 
+    inc a
     cp 24
     ret NC                      ; No shift needed, all integer
 
