@@ -91,6 +91,9 @@ PUBLIC asm_f16_compare_callee
 .positive_right
     rr d
 
+    res 1,e             ;remove least significant bits
+    res 0,e             ;remove least significant bits
+
     ld a,$7c            ;exponent mask
     and h
     jr Z,zero_left      ;left is zero (exponent is zero)
@@ -105,6 +108,9 @@ PUBLIC asm_f16_compare_callee
     ld h,a
 .positive_left
     rr h
+
+    res 1,l             ;remove least significant bits
+    res 0,l             ;remove least significant bits
 
     xor a
     sbc hl,de

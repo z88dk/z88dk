@@ -69,14 +69,10 @@ void test_integer_operations()
      Assert ( a == 4, "addition: a == 4");
      a *= b;
      Assert ( a == 8, "multiply: a == 8");
-     a -= b;
-     Assert ( a == 6, "subtract: a == 6");
-#ifndef MATH32
-#ifndef MATH16
      a /= b;
-     Assert ( a == 3, "divide: a == 3");
-#endif
-#endif
+     Assert ( a == 4, "divide: a == 4");
+     a -= b;
+     Assert ( a == 2, "subtract: a == 2");
 }
 
 void test_integer_constant_longform_lhs()
@@ -87,14 +83,10 @@ void test_integer_constant_longform_lhs()
      Assert ( a == 4, "addition: a == 4");
      a = 2 * a;
      Assert ( a == 8, "multiply: a == 8");
-     a = 6 - a;
-     Assert ( a == -2, "subtract: a == -2");
-#ifndef MATH32
-#ifndef MATH16
      a = 32 / a;
-     Assert ( a == -16, "divide: a == -16");
-#endif
-#endif
+     Assert ( a == 4, "divide: a == 4");
+     a = 6 - a;
+     Assert ( a == 2, "subtract: a == 2");
 }
 
 void test_integer_constant_longform()

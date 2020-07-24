@@ -69,11 +69,27 @@ PUBLIC asm_f32_f16
 
 ; convert f24 to f16
 .asm_f16_f24
+    ld a,l                      ; rounding using 3 lost bits
+    and 00eh
+    ld a,l
+    jr Z,rounded
+    add a,010h                  ; if there were rounding bits
+    jr NC,rounded
+    inc h
+    jr NZ,rounded
+    rr h
+    rra
+    inc d
+
+.rounded
+    ld l,a                      ; mantissa lsb to l
+
     ld a,d                      ; exponent to a
     sub a,127-15                ; convert to f24 bias
     jp M,asm_f16_zero           ; zero if number too small
     cp 31
     jp NC,asm_f16_inf           ; infinity if number too large
+
     sla l                       ; position mantissa
     rl h                        ; remove implicit bit
     sla l
@@ -85,13 +101,8 @@ PUBLIC asm_f32_f16
     rla                         ; set a ready for sign
     sla e                       ; move sign to carry
     rra                         ; place it in a, with exponent and mantissa
-    ld e,l                      ; capture lost bits
     ld l,h                      ; position f16 in hl
     ld h,a
-    ld a,e                      ; lost bits
-    and a,0e0h                  ; check for 3 lost bits rounding
-    ret Z
-    set 0,l                     ; set for rounding of LSB
     ret
 
 ; convert f32 to f16

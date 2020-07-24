@@ -81,6 +81,10 @@ PUBLIC  m32_compare, m32_compare_callee
     rr d
     rr e
 
+    ld a,l
+    and 0f0h            ;remove least significant nibble
+    ld l,a
+
     exx                 ;left
     sla e
     rl d
@@ -104,6 +108,7 @@ PUBLIC  m32_compare, m32_compare_callee
     rr e
 
     ld a,l
+    and 0f0h            ;remove least significant nibble
 
     exx                 ;right
     sub l

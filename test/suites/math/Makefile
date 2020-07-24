@@ -31,4 +31,4 @@ test_daimath32.bin: $(SOURCES)
 	$(runtest)
 
 clean:
-	rm -f *.bin *.map $(OBJECTS) zcc_opt.def *~
+	rm -f *.bin *.map *.lis $(OBJECTS) zcc_opt.def *~

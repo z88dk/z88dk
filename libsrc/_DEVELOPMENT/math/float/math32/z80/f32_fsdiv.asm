@@ -184,9 +184,18 @@ PUBLIC _m32_invf
     ld h,e
     ld e,d
 
-    and 0c0h                    ; round using feilipu method
+    or a                        ; round using feilipu method
     jr Z,fd0
-    set 0,l
+    inc l
+    jr NZ,fd0	
+    inc h	
+    jr NZ,fd0	
+    inc e	
+    jr NZ,fd0	
+    rr e	
+    rr h	
+    rr l	
+    inc b
 
 .fd0
     sla e
