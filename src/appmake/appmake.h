@@ -505,7 +505,6 @@ struct {
       "Generate TVC .cas file from the linked binary",
       NULL,
       tvc_exec,   &tvc_options },
-    { NULL, NULL, NULL, NULL, NULL, NULL },
     { "bin2fdd",  "vector06c", "(C) 2020 z88dk",
       "Create a bootable vector06c disk",
       NULL,
@@ -563,7 +562,8 @@ struct {
     { "appzxvgs",   "zxvgs",    "(C) 2003 Yarek",
       "Creates a zxvgs application file",
       NULL,
-      zxvgs_exec,   &zxvgs_options}
+      zxvgs_exec,   &zxvgs_options},
+    { NULL, NULL, NULL, NULL, NULL, NULL }
 };
 #endif
 
