@@ -1,0 +1,5 @@
+
+
+
+	defc	dai_PRINTC = $d695		;a = character to print (may go to rs232)
+	defc	dai_GETK = $d6bb		;a = scanned key, this is non-blocking

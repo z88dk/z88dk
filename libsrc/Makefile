@@ -36,6 +36,7 @@ TOCREATE += $(call check_target,c7420,c7420_clib.lib)
 TOCREATE += $(call check_target,coleco,coleco_clib.lib)
 TOCREATE += $(call check_target,cpc,cpc_clib.lib cpcfs.lib cpc_math.lib)
 TOCREATE += $(call check_target,cpm,$(CPMLIBS))
+TOCREATE += $(call check_target,dai,dai_clib.lib)
 TOCREATE += $(call check_target,einstein,einstein.lib $(CPMLIBS))
 TOCREATE += $(call check_target,embedded,embedded_clib.lib)
 TOCREATE += $(call check_target,enterprise,enterprise_clib.lib gfxep.lib gfxephr.lib)
@@ -1590,6 +1591,14 @@ vector06c_clib.lib:
 	$(MAKE) -C gfx TARGET=vector06c FLAVOUR=wide
 	$(MAKE) -C games TARGET=vector06c
 	TARGET=vector06c TYPE=8080 $(LIBLINKER) -m8080 -DFORvector06c -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vector06c_clib @$(LISTFILE_DIRECTORY)/vector06c.lst
+
+dai_clib.lib:
+	@echo ''
+	@echo '--- Building DAI Library ---'
+	@echo ''
+	$(call buildgeneric,dai,portable)
+	TARGET=dai TYPE=8080 $(LIBLINKER) -m8080 -DFORdai -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/dai_clib @$(LISTFILE_DIRECTORY)/dai.lst
+
 
 # Homelab 3/4 - dom
 homelab_clib.lib:
