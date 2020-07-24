@@ -82,7 +82,7 @@ PUBLIC  m32_compare, m32_compare_callee
     rr e
 
     ld a,l
-    and 0f0h            ;remove least significant nibble
+    and 0fch            ;remove least significant 2 bits
     ld l,a
 
     exx                 ;left
@@ -108,7 +108,7 @@ PUBLIC  m32_compare, m32_compare_callee
     rr e
 
     ld a,l
-    and 0f0h            ;remove least significant nibble
+    and 0fch            ;remove least significant 2 bits
 
     exx                 ;right
     sub l
