@@ -5,16 +5,18 @@
 #include <sys/types.h>
 #include <limits.h>
 
-#define FLT_ROUNDS 1
-#define FLT_RADIX  2
+#define FLT_ROUNDS          1
+#define FLT_RADIX           2
 
-#define FLT_MANT_DIG 23
-#define DBL_MANT_DIG 23
-#define FLT_DIG      6
-#define DBL_DIG      6
+#define FLT_MANT_DIG        23
+#define DBL_MANT_DIG        23
+#define FLT_DIG             6
+#define DBL_DIG             6
 
-
-
+#define HUGE_POS_AM9511    (+9.2e+18)
+#define TINY_POS_AM9511    (+2.7e-20)
+#define HUGE_NEG_AM9511    (-9.2e+18)
+#define TINY_NEG_AM9511    (-2.7e-20)
 
 /* Trigonmetric functions */
 extern double_t __LIB__ cos(double_t);   /* cosine */

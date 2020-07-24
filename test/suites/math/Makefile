@@ -19,15 +19,15 @@ test_math48.bin: $(SOURCES)
 	$(runtest)
 
 test_math32.bin: $(SOURCES)
-	$(call compile, -m -DMATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32)
+	$(call compile, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32)
 	$(runtest)
 
 test_math16.bin: $(SOURCES)
-	$(call compile, -m -DMATH16 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16\\\"\"", -lmath16 -lmath32)
+	$(call compile, -DMATH16 -D__MATH_MATH16 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math16\\\"\"", -lmath16 -lmath32)
 	$(runtest)
 
 test_daimath32.bin: $(SOURCES)
-	$(call compile, -m -DMATHDAI32 --math-dai32 -DMATH_LIBRARY="\"\\\"daimath32\\\"\"",)
+	$(call compile, -DMATHDAI32 -D__MATH_DAI32 --math-dai32 -DMATH_LIBRARY="\"\\\"daimath32\\\"\"",)
 	$(runtest)
 
 clean:

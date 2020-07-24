@@ -5,10 +5,10 @@
 #include <sys/types.h>
 #include <limits.h>
 
-#define HUGE_POS_F16            (+6.5504E+4)        /* 0x7BFF */
-#define TINY_POS_F16            (+6.10352E-5)       /* 0x0400 */
-#define HUGE_NEG_F16            (-6.5504E+4)        /* 0xFBFF */
-#define TINY_NEG_F16            (-6.10352E-5)       /* 0x8400 */
+#define HUGE_POS_F16            (+6.5504e+4)        /* 0x7BFF */
+#define TINY_POS_F16            (+6.10352e-5)       /* 0x0400 */
+#define HUGE_NEG_F16            (-6.5504e+4)        /* 0xFBFF */
+#define TINY_NEG_F16            (-6.10352e-5)       /* 0x8400 */
 
 #define MAXL2_F16               (+15.999)           /* 0x4BFF */
 #define MINL2_F16               (-14.00)            /* 0xCB00 */
