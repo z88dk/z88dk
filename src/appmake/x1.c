@@ -81,7 +81,7 @@ int x1_exec(char* target)
     }
 
     if (blockname == NULL)
-        blockname = binname;
+        blockname = zbasename(binname);
 
     if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
         exit_log(1, "Can't open input file %s\n", binname);

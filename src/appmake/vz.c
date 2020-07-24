@@ -124,7 +124,7 @@ static int create_file(const char* target, int laser500)
     }
 
     if (blockname == NULL)
-        blockname = binname;
+        blockname = zbasename(binname);
 
     if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
         exit_log(1, "Can't open input file %s\n", binname);

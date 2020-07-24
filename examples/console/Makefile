@@ -5,7 +5,8 @@ all: binaries
 include ../../support/multitarget_build/Makefile
 
 # Hello world 
-WORLD_TARGETS = abc80 abc800 ace alphatro aquarius bee c128 c7420 coleco cpc cpm enterprise fp1100 \
+WORLD_TARGETS = abc80 abc800 ace alphatro aquarius bee c128 c7420 coleco cpc cpm dai \
+	enterprise fp1100 \
 	g800 gal hemc hgmc homelab homelab2 kc kramermc lambda laser500 lynx m5 m100 mc1000 mikro80 \
 	msx mtx multi8 myvision mz mz2500 nascom nc newbrain osca oz p2000 pacman pasopia7 pc6001 \
 	pencil2 pps primo pv1000  \

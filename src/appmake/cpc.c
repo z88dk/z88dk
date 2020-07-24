@@ -340,7 +340,7 @@ int cpc_exec(char* target)
         header[0x08] = ' ';
 
         if (blockname == NULL)
-            blockname = binname;
+            blockname = zbasename(binname);
 
         /* Deal with the block name */
         for (i = 0; (i <= 8) && (isalnum(blockname[i])); i++)

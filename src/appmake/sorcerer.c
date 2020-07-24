@@ -222,7 +222,7 @@ int sorcerer_exec(char* target)
         }
 
         if (blockname == NULL)
-            blockname = binname;
+            blockname = zbasename(binname);
 
         if (strcmp(binname, filename) == 0) {
             exit_log(1, "Input and output file names must be different\n");

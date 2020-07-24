@@ -5,7 +5,6 @@
 
 #include "appmake.h"
 
-static char             *description  = NULL;
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
 static char             *crtfile      = NULL;
@@ -19,7 +18,6 @@ static void writebyte_dai(uint8_t byte, FILE *fp, uint8_t *cksump);
 option_t dai_options[] = {
     { 'h', "help",       "Display this help",                OPT_BOOL,  &help },
     { 'b', "binfile",    "Binary file to embed",             OPT_STR,   &binname },
-    {  0 , "description","Description of the file",          OPT_STR,   &description},
     {  0 , "org",        "Origin of the embedded binary",    OPT_INT,   &origin },
     {  0 , "exec",       "Starting execution address",       OPT_INT,   &exec },
     { 'c', "crt0file",   "crt0 used to link binary",         OPT_STR,   &crtfile },
@@ -30,6 +28,7 @@ option_t dai_options[] = {
 int dai_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
+    char   *blockname;
     struct  stat binname_sb;
     FILE   *fpin;
     FILE   *fpout;
@@ -51,10 +50,8 @@ int dai_exec(char *target)
         strcpy(filename,outfile);
     }
 
-    if ( description == NULL ) {
-         description = binname;
-    }
-
+    blockname = zbasename(binname);
+    
     if ((origin == -1) && ((crtfile == NULL) || ((origin = get_org_addr(crtfile)) == -1))) {
         origin = 0;
     }
@@ -93,11 +90,15 @@ int dai_exec(char *target)
     size = binname_sb.st_size;
     writebyte(0x30, fpout);
     cksum = 0x56;
-    size = strlen(binname);
+    size = strlen(blockname);
     writebyte_dai((size >> 8) & 0xff,fpout,&cksum);
     writebyte_dai(size & 0xff,fpout,&cksum);
     writebyte(cksum,fpout);
     cksum = 0x56;
+    for ( i = 0; i < size; i++) {
+        writebyte_dai(blockname[i], fpout, &cksum);
+    }
+    writebyte(cksum,fpout);
     writebyte_dai(0x00, fpout, &cksum);  // Address length
     writebyte_dai(0x02, fpout, &cksum);
     writebyte(cksum,fpout);

@@ -47,7 +47,7 @@ int newbrain_exec()
         return -1;
     }
 
-    if ( blockname == NULL ) blockname = binname;
+    if ( blockname == NULL ) blockname = zbasename(binname);
 
     if ( outfile == NULL ) {
         strcpy(filename,binname);

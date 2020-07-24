@@ -265,7 +265,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
         }
 
         if (zxt->blockname == NULL)
-            zxt->blockname = zxc->binname;
+            zxt->blockname = zbasename(zxc->binname);
 
 
         if (strcmp(zxc->binname, filename) == 0) {
@@ -2154,7 +2154,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
 
 
     if (zxt->blockname == NULL)
-        zxt->blockname = zxc->binname;
+        zxt->blockname = zbasename(zxc->binname);
 
 
     if (strcmp(zxc->binname, disc_image_name) == 0) {

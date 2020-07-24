@@ -70,7 +70,7 @@ int p2000_exec(char* target)
     }
 
     if (blockname == NULL)
-        blockname = binname;
+        blockname = zbasename(binname);
 
     /* Deal with the filename */
     snprintf(name, sizeof(name), "%-*s", (int) sizeof(name)-1, blockname);

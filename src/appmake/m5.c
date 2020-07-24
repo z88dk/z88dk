@@ -101,7 +101,7 @@ int m5_exec(char* target)
     }
 
     if (blockname == NULL)
-        blockname = binname;
+        blockname = zbasename(binname);
 
     if (origin != -1) {
         pos = origin;

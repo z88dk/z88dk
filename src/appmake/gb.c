@@ -94,7 +94,7 @@ int gb_exec(char *target)
 
     suffix_change(binname,"");
     if ( appname == NULL ) {
-        appname = binname;
+        appname = zbasename(binname);
     }
 
     if ((main_length = ftell(fpin)) > 0x8000) {

@@ -168,7 +168,7 @@ int gal_exec(char* target)
         }
 
         if (blockname == NULL)
-            blockname = binname;
+            blockname = zbasename(binname);
 
 /* Tomaz's code insertion starts here */
 

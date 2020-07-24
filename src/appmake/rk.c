@@ -67,7 +67,7 @@ static int rk_create(char *extension, int be)
     }
 
     if ( description == NULL ) {
-         description = binname;
+         description = zbasename(binname);
     }
 
     if ((origin == -1) && ((crtfile == NULL) || ((origin = get_org_addr(crtfile)) == -1))) {
