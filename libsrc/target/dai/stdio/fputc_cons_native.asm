@@ -15,5 +15,15 @@
 	add     hl,sp
 	ld	d,0
 	ld	a,(hl)
-	call	dai_PRINTC	
+	cp	10
+	jp	nz,notcr
+	ld	a,13
+	jp	printit
+notcr:	cp	13
+	jp	nz,printit
+	ld	a,10
+printit:
+	rst	$28
+	defb	dai_SCR_OUTC
+;	call	dai_PRINTC	
 	ret

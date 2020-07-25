@@ -30,9 +30,9 @@
 
 	defc    TAR__fputc_cons_generic = 0
         defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = 32768
-	defc	CRT_KEY_DEL = 12
-	defc	__CPU_CLOCK = 3000000
+        defc    TAR__register_sp = -1
+	defc	CRT_KEY_DEL = 8
+	defc	__CPU_CLOCK = 2000000
 	defc	CONSOLE_ROWS = 32
 	defc	CONSOLE_COLUMNS = 32
         INCLUDE "crt/classic/crt_rules.inc"
@@ -44,7 +44,6 @@
 
 
 program:
-	di
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
 	call    crt0_init_bss

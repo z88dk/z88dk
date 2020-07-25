@@ -11,4 +11,9 @@
 	call	dai_GETK
 	ld	l,a
 	ld	h,0
+	and	a
+	ret	z
+	cp	13
+	ret	nz
+	ld	l,10
 	ret
