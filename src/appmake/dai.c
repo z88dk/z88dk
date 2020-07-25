@@ -164,9 +164,10 @@ int dai_exec(char *target)
     writebyte_dai(cksum,fpout,fpwav,&cksum);
     cksum = 0x56;
     for ( i = 0; i < size; i++) {
-        writebyte_dai(blockname[i], fpout, fpwav, &cksum);
+        writebyte_dai(toupper(blockname[i]), fpout, fpwav, &cksum);
     }
     writebyte_dai(cksum,fpout,fpwav,&cksum);
+    cksum = 0x56;
     writebyte_dai(0x00, fpout, fpwav, &cksum);  // Address length
     writebyte_dai(0x02, fpout, fpwav, &cksum);
     writebyte_dai(cksum,fpout, fpwav, &cksum);
@@ -179,6 +180,7 @@ int dai_exec(char *target)
     writebyte_dai((size >> 8) & 0xff,fpout,fpwav,&cksum);
     writebyte_dai(size & 0xff,fpout,fpwav,&cksum);
     writebyte_dai(cksum,fpout, fpwav, &cksum);
+    cksum = 0x56;
     i = 0;
     while ( i < size ) {
         c = getc(fpin);
@@ -191,6 +193,8 @@ int dai_exec(char *target)
     for ( i = 0; i < 74; i++ ) {
         dai_bit(fpwav, 3);
     }
+    // Bit1 to indicate end of trailer
+    dai_bit(fpwav, 2);
 
     fclose(fpwav);
     fclose(fpin);
