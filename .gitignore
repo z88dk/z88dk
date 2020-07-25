@@ -57,6 +57,13 @@ examples/z88/app/rpn.epr
 examples/z88/app/useless.epr
 examples/z88/app/viewer.epr
 examples/z88/app/wc.epr
+examples/z88/cube.epr
+examples/z88/cubeflt16.epr
+examples/z88/dstar.epr
+examples/z88/farmalloc.epr
+examples/z88/rpn.epr
+examples/z88/useless.epr
+examples/z88/wc.epr
 include/_DEVELOPMENT/clang/lib/
 include/_DEVELOPMENT/proto/lib/
 include/_DEVELOPMENT/sccz80/lib/
