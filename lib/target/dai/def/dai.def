@@ -3,3 +3,15 @@
 
 	defc	dai_PRINTC = $d695		;a = character to print (may go to rs232)
 	defc	dai_GETK = $d6bb		;a = scanned key, this is non-blocking
+
+	; Rst28 codes for screen driver
+	defc	dai_SCR_INIT = $0		;initialise screen
+	defc	dai_SCR_OUTC = $3		;output character
+	defc	dai_SCR_CLT = $6		;set colours
+	defc	dai_SCR_CUS = $9		;set cursor position
+	defc	dai_SCR_MODE = $18		;change screen mode
+	defc	dai_SCR_CLG = $1b		;set graphics colpurs
+	defc	dai_SCR_DOT = $1e		;plot a pixel
+	defc	dai_SCR_LIN = $21		;draw line
+	defc	dai_SCR_POINT = $27		;point a pixel
+	
