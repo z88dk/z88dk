@@ -43,41 +43,55 @@ PUBLIC _m32_sqrtf, _m32_invsqrtf
 
 
 .m32_fssqrt
-    pop af                      ; ret
+    pop bc                      ; ret
     pop hl                      ; y off stack
     pop de
     push de
     push hl
-    push af                     ; ret
-    bit 7,d
-    jp NZ,m32_fsconst_nnan      ; negative number?
+    push bc                     ; ret
+    sla e
+    rl d
+    jr Z,m32_sqrt_zero          ; sqrt 0
+    jp C,m32_fsconst_nnan       ; negative number
+    rr d
+    rr e
     call m32_fsinvsqrt_fastcall
     jp m32_fsmul
 
 
 ._m32_sqrtf
 .m32_fssqrt_fastcall
-    bit 7,d
-    jp NZ,m32_fsconst_nnan      ; negative number?
-    pop af                      ; ret
+    sla e
+    rl d
+    jr Z,m32_sqrt_zero          ; sqrt 0
+    jp C,m32_fsconst_nnan       ; negative number
+    rr d
+    rr e
+    pop bc                      ; ret
     push de                     ; y msw on stack
     push hl                     ; y lsw on stack
-    push af                     ; ret
+    push bc                     ; ret
     call m32_fsinvsqrt_fastcall
     jp m32_fsmul_callee
 
 
-._m32_invsqrtf
-    bit 7,d
-    jp NZ,m32_fsconst_nnan      ; negative number?
+.m32_sqrt_zero
+    ld e,d                      ; use 0
+    ld h,d
+    ld l,d
+    rr d                        ; recover sign
+    ret
 
-.m32_fsinvsqrt_fastcall         ; DEHL
+
+._m32_invsqrtf
     sla e
     rl d
-    jp Z,m32_fsconst_pzero      ; zero exponent? zero result
+    jr Z,m32_sqrt_zero          ; sqrt 0
+    jp C,m32_fsconst_nnan       ; negative number
     rr d
     rr e
 
+.m32_fsinvsqrt_fastcall         ; DEHL
     ld b,d
     set 7,d                     ; make y negative
 

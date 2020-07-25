@@ -63,9 +63,6 @@ PUBLIC asm_f24_invsqrt
 
 
 .asm_f24_sqrt
-    bit 7,e
-    jp NZ,asm_f24_nan           ; negative number?
-
     inc d
     dec d
     jp Z,asm_f24_zero           ; zero exponent? zero result
@@ -79,12 +76,12 @@ PUBLIC asm_f24_invsqrt
 
 
 .asm_f24_invsqrt
-    bit 7,e
-    jp NZ,asm_f24_nan           ; negative number?
-
     inc d
     dec d
     jp Z,asm_f24_inf            ; zero exponent? infinite result
+
+    bit 7,e
+    jp NZ,asm_f24_nan           ; negative number?
 
     set 7,e                     ; make y negative
 
