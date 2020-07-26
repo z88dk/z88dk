@@ -1,0 +1,61 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	data_compiler
+._foofoo
+	defm	"this"
+	defb	0
+
+	defs	7
+	defm	"that"
+	defb	0
+
+	defs	7
+	SECTION	code_compiler
+	SECTION	data_compiler
+._bar
+	defm	"this"
+	defb	0
+
+	defs	7
+	SECTION	code_compiler
+	SECTION	data_compiler
+._bar2
+	defm	"this"
+	defb	0
+
+	defs	7
+	SECTION	code_compiler
+	SECTION	data_compiler
+._font2
+	defb	0
+	defb	1
+	defb	2
+	defb	3
+	SECTION	code_compiler
+	SECTION	data_compiler
+._y
+	defb	1
+	defb	2
+	defb	3
+	SECTION	code_compiler
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_foofoo
+	GLOBAL	_bar
+	GLOBAL	_bar2
+	GLOBAL	_font2
+
+
+
+

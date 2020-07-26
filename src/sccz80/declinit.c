@@ -190,7 +190,11 @@ int agg_init(Type *type, int isflexible)
             char needbrace = 0;
             if ( cmatch('{') ) 
                needbrace = 1;
-            size += init(type->ptr,1);
+            if ( type->kind == KIND_ARRAY && type->ptr->kind == KIND_CHAR && rcmatch('"')) {
+                size += init(type,1);
+            } else {
+                size += init(type->ptr,1);
+            }
             if ( needbrace ) needchar('}');
         }
         done++;
@@ -219,7 +223,7 @@ static int init(Type *type, int dump)
 {
     double value;
     Kind   valtype;
-    int sz; /* number of chars in queue */
+    int sz = 0; /* number of chars in queue */
 
     if ((sz = qstr(&value)) != -1) {
         sz++;
