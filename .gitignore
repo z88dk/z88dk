@@ -10,7 +10,7 @@
 **/*.o
 **/*.orig
 **/*.vcxproj.user
-**/.prove
+**/.prove*
 **/.vscode/
 **/_prove
 **/lib*.a
