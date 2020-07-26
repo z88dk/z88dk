@@ -61,6 +61,7 @@ ENDIF
         and     a
         jr      z,argv_done
         ld      c,a
+	inc	hl
         add     hl,bc   ;now points to the end of the command line
 	INCLUDE	"crt/classic/crt_command_line.asm"
 

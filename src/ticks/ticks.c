@@ -619,6 +619,10 @@ int in(int port){
 }
 
 void out(int port, int value){
+#if 0
+  if ( (port&0xff) == 0x02 ) printf(" %02x", value);
+  if ( (port&0xff) == 0x03 ) printf("%c", value);
+#endif
   memory_handle_paging(port, value);
 }
 
@@ -816,8 +820,13 @@ int main (int argc, char **argv){
             argc--;
             argv++;
           }
-          put_memory(65280,cmd_arguments_len % 256);
-          memcpy(get_memory_addr(65281), cmd_arguments, cmd_arguments_len % 256);
+          if ( pc == 256 ) {
+            put_memory(0x80,cmd_arguments_len % 256);
+            memcpy(get_memory_addr(0x81), cmd_arguments, cmd_arguments_len % 256);
+          } else {
+            put_memory(65280,cmd_arguments_len % 256);
+            memcpy(get_memory_addr(65281), cmd_arguments, cmd_arguments_len % 256);
+          }
           break;
         default:
           printf("\nWrong Argument: %s\n", argv[0]);
@@ -840,7 +849,7 @@ int main (int argc, char **argv){
         *get_memory_addr(5) = 0xED;
         *get_memory_addr(6) = 0xFE;
         *get_memory_addr(7) = 0xC9;
-       pc = 256;
+        pc = 256;
         // CP/M emulator
         if (1 != fread(get_memory_addr(256), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
       } else if( !strcasecmp(strchr(argv[1], '.'), ".sna" ) && size==49179 ){

@@ -8,7 +8,6 @@
 ; Exit:	  bc = argc
 ;         hl = argv
 
-    GLOBAL  asm_isspace
     ld      de,0	;NULL pointer at end of array, just in case
     push    de
 ; Try to find the end of the arguments
@@ -25,8 +24,8 @@ argv_loop_2:
     ld      a,(hl)
     cp      ' '
     jr      nz,argv_loop_3
-    ;ld	(hl),0
-    inc     hl
+    inc     hl              ; We're now on the first character of the argument
+    inc     c
 IF CRT_ENABLE_STDIO
   IF !DEFINED_noredir
     IF !DEFINED_nostreams
@@ -63,7 +62,6 @@ noappendb:
         dec     hl
         jr      argv_zloop
 no_redir_stdout:
-
         ld      a,(hl)
         cp      '<'
         jr      nz,no_redir_stdin
@@ -89,41 +87,50 @@ no_redir_stdin:
 ENDIF
     push    hl
     inc     b
-    dec     hl
-; skip extra blanks
-argv_zloop:
-    ld      (hl),0
+empty_arg:
     dec     hl
     dec     c
-    jr      z,argv_done
+; skip extra blanks
+argv_zloop:
+    ld      (hl),0      ;Terminate the previous argument
+    dec     hl          ;Last character of previous argument
+    dec     c
+    jr      z,argv_done 
     ld      a,(hl)
     cp      ' '
-    jr      z,argv_zloop
-    inc     c
-    inc     hl
-
+    jr      z,argv_zloop ;Skip over multiple spaces
+    jr      argv_loop_2  ;And do the next argument
+    
 argv_loop_3:
     dec     hl
     dec     c
     jr      nz,argv_loop_2
 
 argv_done:
-    pop     de              ;Get last argument pushed, if it's not the same as hl we have an extra arg
+    ; We may still have an argument left (if it was at the start of the buffer)
+
+argv_push_final_arg:
+    ld      a,(hl)              ;Strip leading spaces
+    cp      ' '
+    jr      nz,argv_push_final_arg2
+    inc     hl
+    jr      argv_push_final_arg
+argv_push_final_arg2:
+    pop     de                  ;Is it the same as the last argument we pushed?
     push    de
     ld      a,h
     sub     d
-    jr      nz,argv_push_extra_arg
+    jr      nz,argv_push_final_arg3
     ld      a,l
     sub     e
     jr      z,argv_done_2
-argv_push_extra_arg:
-    ld      a,(hl)          ;We don't want to push an empty space argument
+argv_push_final_arg3:
+    ld      a,(hl)
     and     a
     jr      z,argv_done_2
-    call    asm_isspace     ;And we don't want to push just whitespace
-    jr      nc,argv_done_2
     push    hl
     inc     b
+    
 argv_done_2:
     ld      hl,end	;name of program (NULL)
     push    hl

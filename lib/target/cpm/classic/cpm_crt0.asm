@@ -165,6 +165,7 @@ ENDIF
         ld      b,0
         and     a
         jr      z,argv_done
+	inc	hl
         ld      c,a
         add     hl,bc   ;now points to the end of the command line
 
