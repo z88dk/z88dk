@@ -233,5 +233,8 @@
     <ClCompile Include="..\..\src\appmake\zxvgs.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\appmake\dai.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -36,6 +36,7 @@
     <ClCompile Include="..\..\src\appmake\cpc.c" />
     <ClCompile Include="..\..\src\appmake\cpm2.c" />
     <ClCompile Include="..\..\src\appmake\cpmdisk.c" />
+    <ClCompile Include="..\..\src\appmake\dai.c" />
     <ClCompile Include="..\..\src\appmake\enterprise.c" />
     <ClCompile Include="..\..\src\appmake\extract.c" />
     <ClCompile Include="..\..\src\appmake\fat.c" />
