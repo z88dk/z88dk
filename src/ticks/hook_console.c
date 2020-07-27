@@ -7,26 +7,14 @@
 #endif
 #include <stdlib.h>
 
-
-static void cmd_printchar(void)
+void console_raw_printchar(int c)
 {
-    if ( l == '\n' || l == '\r' ) {
-        fputc('\n',stdout);
-    } else if ( l == 8 || l == 127 ) {
-        // VT100 code, understood by all terminals, honest
-        printf("%c[1D",27);
-    } else {
-        fputc(l,stdout);
-    }
-    SET_ERROR(Z88DK_ENONE);
-    fflush(stdout);
+    fputc(c,stdout);
 }
 
-
-static void cmd_readkey(void)
+int console_raw_read()
 {
-    int   val;
-
+    int val;
 #ifndef WIN32
     struct termios old_kbd_mode;    /* orig keyboard settings   */
     struct termios new_kbd_mode;
@@ -48,7 +36,28 @@ static void cmd_readkey(void)
     if (tcsetattr (0, TCSANOW, &old_kbd_mode)) {
     }
 #endif
+    return val;
+}
 
+
+static void cmd_printchar(void)
+{
+    if ( l == '\n' || l == '\r' ) {
+        fputc('\n',stdout);
+    } else if ( l == 8 || l == 127 ) {
+        // VT100 code, understood by all terminals, honest
+        printf("%c[1D",27);
+    } else {
+        fputc(l,stdout);
+    }
+    SET_ERROR(Z88DK_ENONE);
+    fflush(stdout);
+}
+
+
+static void cmd_readkey(void)
+{
+    int   val = console_raw_read();
 
     l = val % 256;
     h = val / 256;

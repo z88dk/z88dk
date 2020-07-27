@@ -154,4 +154,8 @@ extern uint8_t apu_read_data();
 extern void apu_write_data(uint8_t data);
 extern void apu_write_command(uint8_t cmd);
 
+
+extern void console_raw_printchar(int c);
+extern int console_raw_read();
+
 #endif

@@ -573,6 +573,7 @@ unsigned char
 char   cmd_arguments[255];
 int    cmd_arguments_len = 0;
 
+int    ioport = -1;
 int    c_cpu = CPU_Z80;
 int    rom_size = 0;
 
@@ -615,14 +616,17 @@ long tapcycles(void){
 }
 
 int in(int port){
+  if (ioport !=-1 && (port&0xff) == ioport) {
+      return console_raw_read();
+  }
   return port&1 ? 255 : ear;
 }
 
 void out(int port, int value){
-#if 0
-  if ( (port&0xff) == 0x02 ) printf(" %02x", value);
-  if ( (port&0xff) == 0x03 ) printf("%c", value);
-#endif
+  if (ioport !=-1 && (port&0xff) == ioport) {
+    console_raw_printchar(value);
+    return;
+  }
   memory_handle_paging(port, value);
 }
 
@@ -693,6 +697,7 @@ int main (int argc, char **argv){
     printf("  -x <file>      Symbol file to read\n"),
     printf("  -ide0 <file>   Set file to be ide device 0\n"),
     printf("  -ide1 <file>   Set file to be ide device 1\n"),
+    printf("  -iochar X      Set port X to be character input/output\n"),
     printf("  -output <file> dumps the RAM content to a 64K file\n"),
     printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n\n"),
     printf("  Default values for -pc, -start and -end are 0000 if ommited. When the program "),
@@ -725,6 +730,8 @@ int main (int argc, char **argv){
             hook_io_set_ide_device(0, argv[1]);
           } else if ( strcmp(&argv[0][1], "ide1") == 0 ) {
             hook_io_set_ide_device(1, argv[1]);
+          } else if ( strcmp(&argv[0][1], "iochar") == 0 ) {
+            ioport = strtol(argv[1], NULL, 10);
           } else {
             intr= strtol(argv[1], NULL, 10);
           }
