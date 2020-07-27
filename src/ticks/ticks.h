@@ -146,4 +146,12 @@ extern uint8_t    *get_memory_addr(int pc);
 extern uint8_t     get_memory(int pc);
 extern uint8_t     put_memory(int pc, uint8_t b);
 
+
+// am9511
+extern void apu_reset(void);
+extern uint8_t apu_read_status(void);
+extern uint8_t apu_read_data();
+extern void apu_write_data(uint8_t data);
+extern void apu_write_command(uint8_t cmd);
+
 #endif

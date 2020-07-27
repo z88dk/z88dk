@@ -165,6 +165,7 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\ticks\am9511.c" />
     <ClCompile Include="..\..\src\ticks\debugger.c" />
     <ClCompile Include="..\..\src\ticks\disassembler_alg.c" />
     <ClCompile Include="..\..\src\ticks\hook.c" />
