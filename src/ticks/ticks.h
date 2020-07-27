@@ -71,6 +71,7 @@ extern int c_cpu;
 extern int trace;
 extern int debugger_active;
 extern int rom_size;		/* amount of memory in low addresses that is read-only */
+extern int ioport;
 
 /* Break down flags */
 extern int f(void);
@@ -143,19 +144,21 @@ extern void        out(int port, int value);
 
 
 extern uint8_t    *get_memory_addr(int pc);
+
 extern uint8_t     get_memory(int pc);
 extern uint8_t     put_memory(int pc, uint8_t b);
 
 
 // am9511
+extern int apu_out(int port, int value);
+extern int apu_in(int port);
 extern void apu_reset(void);
 extern uint8_t apu_read_status(void);
 extern uint8_t apu_read_data();
 extern void apu_write_data(uint8_t data);
 extern void apu_write_command(uint8_t cmd);
 
-
-extern void console_raw_printchar(int c);
-extern int console_raw_read();
+extern int hook_console_out(int port, int value);
+extern int hook_console_in(int port);
 
 #endif

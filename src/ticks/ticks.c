@@ -616,17 +616,18 @@ long tapcycles(void){
 }
 
 int in(int port){
-  if (ioport !=-1 && (port&0xff) == ioport) {
-      return console_raw_read();
-  }
+  int val;
+
+  if ( (val = hook_console_in(port)) != -1 ) return val;
+  if ( (val = apu_in(port)) != -1 ) return val;
+  
   return port&1 ? 255 : ear;
 }
 
 void out(int port, int value){
-  if (ioport !=-1 && (port&0xff) == ioport) {
-    console_raw_printchar(value);
-    return;
-  }
+  if ( hook_console_out(port,value) == 0 ) return;
+  if ( apu_out(port,value) == 0 ) return;
+  
   memory_handle_paging(port, value);
 }
 
@@ -668,6 +669,7 @@ int main (int argc, char **argv){
 
   hook_init();
   debugger_init();
+  apu_reset();
 
   tapbuf= (unsigned char *) malloc (0x20000);
   if( argc==1 )

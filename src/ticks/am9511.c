@@ -65,6 +65,28 @@ static uint8_t _apu_status;
 
 
 
+int apu_out(int port, int value)
+{
+    if ( (port & 0xff) != 0x80 && (port & 0xff) != 0x81) {
+        return -1;
+    }
+
+    if ( port & 1 ) apu_write_command(value);
+    else apu_write_data(value);
+    return 0;
+}
+
+int apu_in(int port)
+{
+    if ( (port & 0xff) != 0x80 && (port & 0xff) != 0x81) {
+        return -1;
+    }
+
+    if ( port & 1 ) return apu_read_status();
+    return apu_read_data(); 
+}
+
+
 
 void apu_reset ( void )
 {

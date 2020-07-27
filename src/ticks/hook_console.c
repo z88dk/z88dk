@@ -7,12 +7,29 @@
 #endif
 #include <stdlib.h>
 
-void console_raw_printchar(int c)
+static int console_raw_read();
+
+
+int hook_console_out(int port, int value)
 {
-    fputc(c,stdout);
+    if (ioport !=-1 && (port&0xff) == ioport) {
+        fputc(c,stdout);
+        return 0;
+    }
+
+    return -1;
 }
 
-int console_raw_read()
+int hook_console_in(int port)
+{
+    if (ioport !=-1 && (port&0xff) == ioport) {
+        return console_raw_read();
+    }
+    return -1;   
+}
+
+
+static int console_raw_read()
 {
     int val;
 #ifndef WIN32
