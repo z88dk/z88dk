@@ -26,6 +26,7 @@ PUBLIC asm0_vfprintf_unlocked, asm1_vfprintf_unlocked
 EXTERN __stdio_verify_output, asm_strchrnul, __stdio_send_output_buffer
 EXTERN l_utod_hl, l_neg_hl, error_einval_zc
 EXTERN __stdio_nextarg_de, l_atou, __stdio_length_modifier, error_erange_zc
+GLOBAL CLIB_32BIT_FLOATS
 
 asm_vfprintf_unlocked:
 
@@ -561,10 +562,13 @@ printf_return_is_8:
 ENDIF
 
 IF (__SCCZ80 | __ASM) && (CLIB_OPT_PRINTF & $3fc00000)
-
+; This is used for floats only so we can check the library spec
 printf_return_is_6:
-
+   ld a,CLIB_32BIT_FLOATS
+   and a
    ld bc,printf_return_6
+   jr nz,printf_invoke_flags
+   ld bc,printf_return_4
    jr printf_invoke_flags
 
 ENDIF
