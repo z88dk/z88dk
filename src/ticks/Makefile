@@ -15,12 +15,13 @@ DEPENDS         := $(OBJS:.o=.d) $(DISOBJS:.o=.d)
 
 INSTALL ?= install
 
-CFLAGS += -I../../ext/uthash/src/ -g -MMD -lm
+CFLAGS += -I../../ext/uthash/src/ -g -MMD 
+LDFLAGS = -lm
 
 all: z88dk-ticks$(EXESUFFIX) z88dk-dis$(EXESUFFIX)
 
 z88dk-ticks$(EXESUFFIX):	$(OBJS)
-	$(CC) -o $@ $(CFLAGS) $(OBJS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(LDFLAGS)
 
 z88dk-dis$(EXESUFFIX):	$(DISOBJS)
 	$(CC) -o $@ $(CFLAGS) $(DISOBJS)
