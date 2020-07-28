@@ -1109,8 +1109,8 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
     if ( isfarptr ) {
         // The function address is on the stack at +n
         if ( n > 0 ) {
-            outfmt("\tld\thl,%d\n",n);
-            ol("add\thl,de");
+            vconst(n);
+            ol("add\thl,sp");
             ol("ld\te,(hl)");
             ol("inc\thl");
             ol("ld\td,(hl)");
