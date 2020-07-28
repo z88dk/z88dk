@@ -23,6 +23,8 @@ static int      saveline;    /* copy of lineno  "    " */
 static int      saveinfn;    /* copy of infunc  "    " */
 static int      filenum; /* next argument to be used */
 
+static Type *type_double4 = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
+static Type *type_double8 = &(Type){ KIND_DOUBLE, 8, 0, .len=1 }; 
 
 char Filenorig[FILENAME_LEN + 1];
 
@@ -247,13 +249,13 @@ int main(int argc, char** argv)
 
     if ( c_maths_mode == MATHS_IEEE ) {
         c_fp_size = 4;
-        type_double = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
+        type_double = type_double4;
         c_fp_exponent_bias = 126;
         c_fp_mantissa_bytes = 3;
         WriteDefined("CLIB_32BIT_FLOATS", 1);
     } else if ( c_maths_mode == MATHS_MBFS ) {
         c_fp_size = 4;
-        type_double = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
+        type_double = type_double4;
         c_fp_exponent_bias = 128;
         c_fp_mantissa_bytes = 3;
         WriteDefined("CLIB_32BIT_FLOATS", 1);
@@ -262,7 +264,7 @@ int main(int argc, char** argv)
         c_fp_mantissa_bytes = 4;
     } else if ( c_maths_mode == MATHS_MBF64 ) {
         c_fp_size = 8;
-        type_double = &(Type){ KIND_DOUBLE, 8, 0, .len=1 }; 
+        type_double = type_double8;
         c_fp_exponent_bias = 128;
         c_fp_mantissa_bytes = 7;
         WriteDefined("CLIB_64BIT_FLOATS", 1);
@@ -271,11 +273,12 @@ int main(int argc, char** argv)
         c_fp_mantissa_bytes = 4;
         c_fp_fudge_offset = 1;
     } else if ( c_maths_mode == MATHS_AM9511 ) {
-        type_double = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
+        type_double = type_double4;
         c_fp_exponent_bias = 0;
         c_fp_mantissa_bytes = 3;
         c_fp_size = 4;
     }
+
 
     if ( c_cpu == CPU_8080 ) {
         c_notaltreg = 1;
