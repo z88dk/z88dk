@@ -181,7 +181,7 @@ Contains the zsdcc and the sccz80 C compiler interface and is implemented using 
 
 Glue that connects the compilers and standard assembly interface to the `math32` library.  The purpose is to define aliases that connect the standard names to the math32 specific names.  These functions make up the complete z88dk `math32` maths library that is linked against on the compile line as `-lmath32`.
 
-An alias is provided to simplify usage of the library. `--math32` provides all the required linkages and definitions, as a simple alternative to `-Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32 -pragma-define:CLIB_32BIT_FLOAT=1`.
+An alias is provided to simplify usage of the library. `--math32` provides all the required linkages and definitions, as a simple alternative to `-Cc-fp-mode=ieee -Cc-D__MATH_MATH32 -D__MATH_MATH32 -lmath32 -pragma-define:CLIB_32BIT_FLOATS=1`.
 
 ## Function Discussion
 
