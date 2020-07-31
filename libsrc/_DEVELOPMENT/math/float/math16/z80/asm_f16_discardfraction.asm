@@ -34,27 +34,22 @@ PUBLIC asm_f24_discardfraction
     cp 16
     ret NC                      ; No shift needed, all integer
 
-                                ; Build mask of integer bits
                                 ; a = number of bits to keep
-    exx
-    ld hl,0
+    ld bc,0                     ; build mask for integer bits
 
 .shift_right                    ; shift mantissa mask right
     scf
-    rr h
-    rr l
+    rr b
+    rr c
     dec a
     jr NZ,shift_right
 
-    ld  a,h                     ; mask out fractional bits
-    exx
+    ld  a,b                     ; mask out fractional bits
     and h
     ld h,a
 
-    ld a,l
-    exx
+    ld a,c
     and l
-    exx
     ld l,a
     ret
 

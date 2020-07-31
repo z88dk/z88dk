@@ -15,8 +15,7 @@ PUBLIC  asm_f16_ceil
     call asm_f24_f16
     call asm_f24_discardfraction
     bit 7,e                     ;check sign
-    jr Z,was_positive
-    jp asm_f16_f24
+    jp NZ,asm_f16_f24           ;was negative
 
 .was_positive
     ; And add 1

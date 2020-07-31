@@ -15,8 +15,7 @@ PUBLIC  asm_f16_floor
     call asm_f24_f16
     call asm_f24_discardfraction
     bit 7,e                     ;check sign
-    jr NZ,was_negative
-    jp asm_f16_f24
+    jp Z,asm_f16_f24            ;was positive
 
 .was_negative
     ; And subtract 1
