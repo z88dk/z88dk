@@ -119,7 +119,7 @@ int gb_exec(char *target)
             memset(memory + (i * 0x4000), romfill, 0x4000);
 
             fprintf(stderr, "Adding bank 0x%02X ", i);
-            if (1 != fread(memory + (i * 0x4000), 0x4000, 1, fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n",filename); }
+            fread(memory + (i * 0x4000), 0x4000, 1, fpin);
 
             if (!feof(fpin)) {
                 fseek(fpin, 0, SEEK_END);
