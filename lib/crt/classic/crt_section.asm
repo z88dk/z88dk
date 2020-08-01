@@ -57,8 +57,16 @@ IF CRT_ENABLE_STDIO = 1
         ld      (hl),21 ;stderr
 ENDIF
 IF DEFINED_USING_amalloc
+  IF __CPU_GBZ80__
+	ld	hl,__BSS_END_tail
+        ld      a,l
+        ld      (_heap),a
+        ld      a,h
+        ld      (_heap+1),a
+  ELSE
 	ld	hl,__BSS_END_tail
 	ld	(_heap),hl
+  ENDIF
 ENDIF
 IF ( __crt_model & 1 )
 	; Just copy the DATA section
