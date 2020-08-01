@@ -130,7 +130,7 @@ void ifline()
 
             if (match("#pragma")) {
                 dopragma();
-                continue;
+		break;
             }
 
             if (match("#undef")) {
