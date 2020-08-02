@@ -187,6 +187,11 @@ errors:
     message	: "\"invalid --origin option '%s'\", org_hex"
 	
   - type	: ErrError
+    func	: error_invalid_define_option
+    args	: const char *define
+    message	: "\"invalid -DVAR=VAL option '%s'\", define"
+	
+  - type	: ErrError
     func	: error_invalid_org
     args	: int origin
     message	: "\"invalid origin: %d\", origin"
