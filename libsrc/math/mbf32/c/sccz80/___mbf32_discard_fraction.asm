@@ -12,7 +12,7 @@
 ; Exit:  integral number in ___mbf32_FPREG
 ; Uses:  a, b, hl
 ___mbf32_discard_fraction:
-        ld      a,(___mbf32_FPREG + 3)
+    ld      a,(___mbf32_FPREG + 3)
 	sub	$81
 	jp	c,___mbf32_set_zero
 	cp	24
@@ -46,8 +46,6 @@ ELSE
 	sla	a
 ENDIF
 	djnz	calc_mask
-	ld	b,(hl)
-	ld	c,a
 	and	(hl)
 	ld	(hl),a
 	ret
