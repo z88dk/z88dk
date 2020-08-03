@@ -34,7 +34,7 @@ obj/newlib-z80n: $(NEWLIBASM)
 	@touch $@
 
 obj/newlib-ixiy: $(NEWLIBASM)
-	@$(ASSEMBLER) -O=obj/ixiy/x -I.. -mz80 --IXIY -D__CLASSIC $^
+	@$(ASSEMBLER) -O=obj/ixiy/x -I.. -mz80 -IXIY -D__CLASSIC $^
 	@touch $@
 
 
@@ -43,7 +43,7 @@ obj/z80/%.o: %.asm
 	@mv $(^:.asm=.o) $@
 
 obj/ixiy/%.o: %.asm
-	@$(ASSEMBLER) -I../ --IXIY -mz80 -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ -IXIY -mz80 -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/r2k/%.o: %.asm
@@ -61,7 +61,7 @@ obj/z80n/%.o: %.c
 	$(ZCC) +$(TARGET) -mz80n -custom-copt-rules=$(Z88DK_LIB)/z80n_rules.1 $(CFLAGS) -o   $^
 
 obj/ixiy/%.o: %.c
-	$(ZCC) +$(TARGET) -Ca--IXIY $(CFLAGS) -o $  $^
+	$(ZCC) +$(TARGET) -Ca-IXIY $(CFLAGS) -o $  $^
 
 obj/r2k/%.o: %.c
 	$(ZCC) +rcmx000 $(CFLAGS) -o $  $^

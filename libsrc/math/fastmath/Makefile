@@ -31,7 +31,7 @@ obj/newlib-z80n:
 	@$(ASSEMBLER) -d -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $(NEWLIBZXNGLOBS)
 
 obj/newlib-ixiy:  
-	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 -IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 $(OUTPUT_DIRECTORY)/fastmath_z80n.lib: fastmath.lst
 	TYPE=z80n $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/fastmath_z80n.lib @fastmath.lst

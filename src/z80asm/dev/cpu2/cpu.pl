@@ -98,7 +98,7 @@ sub isr2k()			{ return $cpu eq 'r2k'; }
 sub isr3k()			{ return $cpu eq 'r3k'; }
 sub israbbit()		{ return isr2k() || isr3k(); }
 
-sub ixiy_asm_flag()	{ return $ixiy ? "--IXIY " : ""; }
+sub ixiy_asm_flag()	{ return $ixiy ? "-IXIY " : ""; }
 sub restarts()		{ return israbbit ? (          0x10,0x18,0x20,0x28,     0x38) :
 									    (0x00,0x08,0x10,0x18,0x20,0x28,0x30,0x38); }
 										
@@ -2107,7 +2107,7 @@ sub write_tests_files {
 
 sub run_tests {
 	for $cpu (@CPUS) {
-		for $ixiy ("", "--IXIY") {
+		for $ixiy ("", "-IXIY") {
 			my @test = [" ld sp, 0c000h",  $Opcodes{"ld sp, %m"}{$cpu}->clone(m => 0xc000)];
                 
 			for my $asm (sort keys %Opcodes) {

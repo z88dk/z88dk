@@ -21,8 +21,8 @@ $(OUTPUT_DIRECTORY)/math48.lib: $(addprefix obj/z80/, $(OBJECTS))
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math48 @math48.lst
 
 $(OUTPUT_DIRECTORY)/math48_iy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
-	@$(ASSEMBLER) -d -O=obj/ixiy/x/x -I.. -mz80 --IXIY -D__CLASSIC @newlibfiles.lst
-	TYPE=ixiy $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math48_iy --IXIY @math48.lst
+	@$(ASSEMBLER) -d -O=obj/ixiy/x/x -I.. -mz80 -IXIY -D__CLASSIC @newlibfiles.lst
+	TYPE=ixiy $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math48_iy -IXIY @math48.lst
 
 dirs:
 	@mkdir -p obj/z80 obj/ixiy obj/r2k

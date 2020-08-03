@@ -42,7 +42,7 @@ $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib:
 # this one uses iy in place of ix
 $(OUTPUT_DIRECTORY)/z80iy_crt0.lib:
 	@$(MAKE) clean
-	$(LIBLINKER) -I.. --IXIY -D__SDCC_IX -DZ80S183 -x$@ @crt0.lst
+	$(LIBLINKER) -I.. -IXIY -D__SDCC_IX -DZ80S183 -x$@ @crt0.lst
 	$(MAKE) clean
 
 $(OUTPUT_DIRECTORY)/z80s183_crt0.lib:

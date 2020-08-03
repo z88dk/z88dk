@@ -29,7 +29,7 @@ obj/newlib-z80n:
 	@$(ASSEMBLER) -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/newlib-ixiy:  
-	@$(ASSEMBLER) -O=obj/ixiy/x -I.. -mz80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -O=obj/ixiy/x -I.. -mz80 -IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/newlib-8080:  
 	@$(ASSEMBLER) -O=obj/8080/x -I.. -m8080 -D__CLASSIC $(NEWLIBGLOBS)

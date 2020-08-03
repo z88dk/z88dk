@@ -52,7 +52,7 @@ ${jobs}: job-%:
 	fi;
 	$(Z80ASM) $(cpu) -xlib/sccz80/$(target) -I$(Z88DK_LIB) @target/$(target)/library/$(target)_sccz80.lst
 	$(Z80ASM) $(cpu) -xlib/sdcc_ix/$(target) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @target/$(target)/library/$(target)_sdcc_ix.lst
-	$(Z80ASM) $(cpu) --IXIY -xlib/sdcc_iy/$(target) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IY @target/$(target)/library/$(target)_sdcc_iy.lst
+	$(Z80ASM) $(cpu) -IXIY -xlib/sdcc_iy/$(target) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IY @target/$(target)/library/$(target)_sdcc_iy.lst
 
 .PHONY: ${cleans}
 ${cleans}: clean-%:
