@@ -9,7 +9,7 @@
 
 l_f32_div:
 	call	___mbf32_setup_arith
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
 	call	___mbf32_DVBCDE
 ELSE
 	ld	ix,___mbf32_DVBCDE

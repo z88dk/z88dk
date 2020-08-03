@@ -13,10 +13,10 @@ EXTERN ___mbf32_FPREG
 ;	 3 = infinite
 
 fpclassify:
-	call    ___mbf32_setup_single
-	ld	a,(___mbf32_FPREG+3)	;exponent
-	ld	hl,1
-	and	a
-	ret	z
-	dec	hl
-	ret
+    call    ___mbf32_setup_single
+    ld      a,(___mbf32_FPREG+3)	;exponent
+    ld      hl,1
+    and     a
+    ret     z
+    dec     hl
+    ret
