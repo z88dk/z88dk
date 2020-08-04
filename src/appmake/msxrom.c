@@ -33,6 +33,7 @@ int msxrom_exec(char *target)
     char filename[FILENAME_MAX+1];
     FILE *fpin, *fpout;
     int len, i, c, count, rom_banks = 2, main_length;
+    int startbank;
 
     if ((help) || (binname == NULL))
         return -1;
@@ -60,10 +61,16 @@ int msxrom_exec(char *target)
     if (main_length != fread(memory, sizeof(memory[0]), main_length, fpin)){ fclose(fpin); exit_log(1, "Could not read required data from <%s>\n",binname); }
     fclose(fpin);
 
-    len = 0x8000;
+    if ( main_length <= 0x4000 ) {
+        len = 0x4000;
+        startbank = 1;
+    } else {
+        len = 0x8000;
+        startbank = 2;
+    }
+
     // Lets read in the banks now
-    count = 0;
-    for (i = 0x02; i <= 0x1f; i++) {
+    for (i = startbank; i <= 0x1f; i++) {
         sprintf(filename, "%s_BANK_%02X.bin", binname, i);
         if ((stat(filename, &st_file) < 0) || (st_file.st_size == 0) || ((fpin = fopen(filename, "rb")) == NULL)) {
             break;
@@ -78,10 +85,7 @@ int msxrom_exec(char *target)
                 count = ftell(fpin);
                 fprintf(stderr, " (error truncating %d bytes from %s)", count - 0x4000, filename);
             }
-
-            count = 0;
             fputc('\n', stderr);
-
             fclose(fpin);
         }
     }
@@ -92,6 +96,7 @@ int msxrom_exec(char *target)
         rom_banks *= 2;
     }
 
+
     memory = must_realloc(memory, rom_banks * 0x4000);
     len = (0x4000 * i);
     for ( i = len; i < len; i++ ) {
@@ -99,7 +104,7 @@ int msxrom_exec(char *target)
     }
     len = rom_banks * 0x4000;
 
-    fprintf(stderr, "Program requires cartridge with %d ROM banks\n",rom_banks);
+    fprintf(stderr, "Program requires cartridge with %d 16k ROM banks\n",rom_banks);
 
 
     if ((c = parameter_search(crtfile, ".map", "__BSS_END_tail")) >= 0) {
@@ -108,7 +113,7 @@ int msxrom_exec(char *target)
             if (c <= 0x4000)
                 fprintf(stderr, "Notice: Available RAM space is %d bytes ignoring the stack\n", 0x4000 - c);
             else
-                fprintf(stderr, "Warning: Exceeded 8k RAM by %d bytes.\n", c - 0x4000);
+                fprintf(stderr, "Warning: Exceeded 16k RAM by %d bytes.\n", c - 0x4000);
         }
     }
 
@@ -124,7 +129,16 @@ int msxrom_exec(char *target)
     if ((fpout = fopen(filename, "wb")) == NULL)
         exit_log(1, "Can't create output file %s\n", filename);
 
-    fprintf(stderr, "Adding main banks 0x00,0x01 (%d bytes free)\n", 0x8000 - main_length);
+
+
+    if ( rom_banks == 2 ) {
+        // It's not a MegaROM
+        fprintf(stderr, "Adding main banks 0x00,0x01 (%d bytes free)\n", 0x8000 - main_length);
+    } else if ( startbank == 1 ) {
+        fprintf(stderr, "Adding main bank 0x00 (%d bytes free)\n", 0x4000 - main_length);
+    } else {
+        fprintf(stderr, "Main ROM code is > 16kb, the ROM may not work correctly\n");
+    }
     
     fwrite(memory,len,1,fpout);
     fclose(fpout);

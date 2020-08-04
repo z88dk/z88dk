@@ -695,6 +695,10 @@ int_0x60:	defs	16
 ; DEFINE SECTIONS FOR BANKSWITCHING
 ; consistent with appmake and new c library
 
+   IFNDEF CRT_ORG_BANK_01
+      defc CRT_ORG_BANK_01 = 0x4000
+   ENDIF
+
    IFNDEF CRT_ORG_BANK_02
       defc CRT_ORG_BANK_02 = 0x4000
    ENDIF
@@ -814,6 +818,11 @@ int_0x60:	defs	16
    IFNDEF CRT_ORG_BANK_1F
       defc CRT_ORG_BANK_1F = 0x4000
    ENDIF
+
+   SECTION BANK_01
+   org 0x010000 + CRT_ORG_BANK_01
+   SECTION CODE_1
+   SECTION RODATA_1
 
    SECTION BANK_02
    org 0x020000 + CRT_ORG_BANK_02

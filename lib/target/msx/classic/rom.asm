@@ -76,8 +76,17 @@ l_dcal:	jp	(hl)		;Used for call by function pointer
 	; Memory address for changing the mapping at $8000 and $a000
 	; If _A000 is 0 then we work with 16kb banks
 	; These values are by default the KONAMI mapper
+IF DEFINED_MAPPER_ASCII16 = 1
+	defc	MAPPER_ADDRESS_8000 = $7000
+	defc	MAPPER_ADDRESS_A000 = $0000
+ELIF DEFINED_MAPPER_ASCII8 = 1
+	defc	MAPPER_ADDRESS_8000 = $7000
+	defc	MAPPER_ADDRESS_A000 = $7800
+ELSE
+	; Konami Mapper without SCC
 	defc	MAPPER_ADDRESS_8000 = $8000
 	defc	MAPPER_ADDRESS_A000 = $A000
+ENDIF
 
 banked_call:
         pop     hl              ; Get the return address
@@ -142,6 +151,10 @@ __current_bank:	defb	1
 ELSE
 __current_bank:	defb	2
 ENDIF
+
+   IFNDEF CRT_ORG_BANK_01
+      defc CRT_ORG_BANK_01 = 0x8000
+   ENDIF
 
    IFNDEF CRT_ORG_BANK_02
       defc CRT_ORG_BANK_02 = 0x8000
@@ -261,6 +274,11 @@ ENDIF
    IFNDEF CRT_ORG_BANK_1F
       defc CRT_ORG_BANK_1F = 0x8000
    ENDIF
+
+   SECTION BANK_01
+   org 0x010000 + CRT_ORG_BANK_01
+   SECTION CODE_1
+   SECTION RODATA_1
 
    SECTION BANK_02
    org 0x020000 + CRT_ORG_BANK_02
