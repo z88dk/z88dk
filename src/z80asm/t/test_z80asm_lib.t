@@ -115,23 +115,23 @@ move('testdir/root/lib/z80asm-z80-.lib', 'z80asm-z80-.lib');
 
 
 # test loading of each different library for different CPUs
-run("./z80asm -b -v                  test.asm", 0, exp_output("z80",	0, "z80asm-z80-.lib"), "");
-run("./z80asm -b -v           --IXIY test.asm", 0, exp_output("z80",	1, "z80asm-z80-ixiy.lib"), "");
+run("./z80asm -b -v                 test.asm", 0, exp_output("z80",		0, "z80asm-z80-.lib"), "");
+run("./z80asm -b -v           -IXIY test.asm", 0, exp_output("z80",		1, "z80asm-z80-ixiy.lib"), "");
 
-run("./z80asm -b -v -mz80            test.asm", 0, exp_output("z80",	0, "z80asm-z80-.lib"), "");
-run("./z80asm -b -v -mz80     --IXIY test.asm", 0, exp_output("z80",	1, "z80asm-z80-ixiy.lib"), "");
+run("./z80asm -b -v -mz80           test.asm", 0, exp_output("z80",		0, "z80asm-z80-.lib"), "");
+run("./z80asm -b -v -mz80     -IXIY test.asm", 0, exp_output("z80",		1, "z80asm-z80-ixiy.lib"), "");
 
-run("./z80asm -b -v -mz80n           test.asm", 0, exp_output("z80n",   0, "z80asm-z80n-.lib"), "");
-run("./z80asm -b -v -mz80n    --IXIY test.asm", 0, exp_output("z80n",   1, "z80asm-z80n-ixiy.lib"), "");
+run("./z80asm -b -v -mz80n          test.asm", 0, exp_output("z80n",   	0, "z80asm-z80n-.lib"), "");
+run("./z80asm -b -v -mz80n    -IXIY test.asm", 0, exp_output("z80n",   	1, "z80asm-z80n-ixiy.lib"), "");
 
-run("./z80asm -b -v -mz180           test.asm", 0, exp_output("z180",	0, "z80asm-z180-.lib"), "");
-run("./z80asm -b -v -mz180    --IXIY test.asm", 0, exp_output("z180",	1, "z80asm-z180-ixiy.lib"), "");
+run("./z80asm -b -v -mz180          test.asm", 0, exp_output("z180",	0, "z80asm-z180-.lib"), "");
+run("./z80asm -b -v -mz180    -IXIY test.asm", 0, exp_output("z180",	1, "z80asm-z180-ixiy.lib"), "");
 
-run("./z80asm -b -v -mr2k            test.asm", 0, exp_output("r2k",	0, "z80asm-r2k-.lib"), "");
-run("./z80asm -b -v -mr2k     --IXIY test.asm", 0, exp_output("r2k",	1, "z80asm-r2k-ixiy.lib"), "");
+run("./z80asm -b -v -mr2k           test.asm", 0, exp_output("r2k",		0, "z80asm-r2k-.lib"), "");
+run("./z80asm -b -v -mr2k     -IXIY test.asm", 0, exp_output("r2k",		1, "z80asm-r2k-ixiy.lib"), "");
 
-run("./z80asm -b -v -mr3k            test.asm", 0, exp_output("r3k",	0, "z80asm-r3k-.lib"), "");
-run("./z80asm -b -v -mr3k     --IXIY test.asm", 0, exp_output("r3k",	1, "z80asm-r3k-ixiy.lib"), "");
+run("./z80asm -b -v -mr3k           test.asm", 0, exp_output("r3k",		0, "z80asm-r3k-.lib"), "");
+run("./z80asm -b -v -mr3k     -IXIY test.asm", 0, exp_output("r3k",		1, "z80asm-r3k-ixiy.lib"), "");
 
 path('testdir')->remove_tree;
 unlink_testfiles();

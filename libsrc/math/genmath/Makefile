@@ -17,10 +17,10 @@ $(OUTPUT_DIRECTORY)/genmath.lib: $(addprefix obj/z80/, $(OBJECTS))
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/genmath @genmath.lst
 
 $(OUTPUT_DIRECTORY)/genmath_iy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
-	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/genmath_iy @genmath.lst
+	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/genmath_iy @genmath.lst
 
 $(OUTPUT_DIRECTORY)/genmath_zx81.lib: $(addprefix obj/ixiy/, $(OBJECTS))
-	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/genmath_zx81 @genmathzx81.lst
+	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/genmath_zx81 @genmathzx81.lst
 
 dirs:
 	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80

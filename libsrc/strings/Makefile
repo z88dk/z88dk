@@ -38,10 +38,10 @@ newlib-z80n:
 	@$(ASSEMBLER) -d -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $(NEWLIBGLOBS)
 
 newlib-ixiy: 
-	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 -IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 newlib-8080: 
-	@$(ASSEMBLER) -d -O=obj/8080/x -I.. -m8080 --IXIY -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/8080/x -I.. -m8080 -IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 newlib-gbz80: 
 	@$(ASSEMBLER) -d -O=obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(NEWLIBGLOBS)

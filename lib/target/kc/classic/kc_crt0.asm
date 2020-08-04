@@ -13,7 +13,7 @@
 ;
 ; - - - - - - -
 ;
-; NB. Compiled with --IXIY so all iy references are actually iy
+; NB. Compiled with -IXIY so all iy references are actually iy
 
 
 	MODULE  kc_crt0

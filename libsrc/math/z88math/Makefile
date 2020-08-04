@@ -21,7 +21,7 @@ $(OUTPUT_DIRECTORY)/bbc_math.lib: $(addprefix obj/z80/, $(OBJECTS))
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/bbc_math @z88math.lst
 
 $(OUTPUT_DIRECTORY)/bbc_math_iy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
-	TYPE=z80 $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/bbc_math_iy @z88math.lst
+	TYPE=z80 $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/bbc_math_iy @z88math.lst
 
 obj/z88/%.o: %.c
 	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^

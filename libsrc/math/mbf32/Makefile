@@ -20,7 +20,7 @@ $(OUTPUT_DIRECTORY)/mbf32_8080.lib: $(addprefix obj/8080/, $(OBJECTS))
 	TYPE=8080 $(LIBLINKER) -m8080 -x$(OUTPUT_DIRECTORY)/mbf32_8080 @mbf32.lst
 
 $(OUTPUT_DIRECTORY)/mbf32_iy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
-	TYPE=ixiy $(LIBLINKER) --IXIY -x$(OUTPUT_DIRECTORY)/mbf32_iy @mbf32.lst
+	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/mbf32_iy @mbf32.lst
 
 $(OUTPUT_DIRECTORY)/mbf32_gbz80.lib: $(addprefix obj/gbz80/, $(OBJECTS))
 	TYPE=gbz80 $(LIBLINKER) -mgbz80 -x$(OUTPUT_DIRECTORY)/mbf32_gbz80 @mbf32.lst
