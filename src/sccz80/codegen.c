@@ -1169,6 +1169,14 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
     return 0;
 }
 
+void gen_save_pointer(LVALUE *lval)
+{
+    if (lval->flags & FARACC)
+        lpush();
+    else
+        zpush();
+}
+
 
 /* Jump to specified internal label number */
 void gen_jp_label(int label)

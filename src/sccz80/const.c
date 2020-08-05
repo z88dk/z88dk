@@ -119,6 +119,8 @@ int fnumber(LVALUE *lval)
         return 0;
     }
     s++;
+    if ( *s == '+' || *s == '-')
+        ++s;
     while (numeric(*s))
         ++s;
 

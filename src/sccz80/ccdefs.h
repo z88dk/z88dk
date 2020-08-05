@@ -87,7 +87,7 @@ extern void gen_switch_preamble(Kind kind);
 extern void gen_switch_case(Kind kind, int32_t value, int label);
 extern void gen_switch_postamble(Kind kind);
 extern void gen_jp_label(int label);
-
+extern void gen_save_pointer(LVALUE *lval);
 
 extern void opjump(char *, int);
 extern void testjump(LVALUE *,int label);

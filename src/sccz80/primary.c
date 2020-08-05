@@ -467,10 +467,7 @@ void prestep(
     } else {
         if (lval->indirect_kind) {
             addstk(lval);
-            if (lval->flags & FARACC)
-                lpush();
-            else
-                zpush();
+            gen_save_pointer(lval);
         }
         rvalue(lval);
         //intcheck(lval, lval);
@@ -512,10 +509,7 @@ void poststep(
     } else {
         if (lval->indirect_kind) {
             addstk(lval);
-            if (lval->flags & FARACC)
-                lpush();
-            else
-                zpush();
+            gen_save_pointer(lval);
         }
         rvalue(lval);
         switch (lval->ptr_type) {
@@ -590,11 +584,7 @@ void smartpush(LVALUE* lval, char* before)
    // outfmt(";%s Indirect kind %d kind %d flags %d\n",lval->ltype->name,lval->ltype->kind, lval->indirect_kind,lval->flags);
     if ( lval->ltype->size != 2 || lval->symbol == NULL || lval->symbol->storage != STKLOC   )  {
         addstk(lval);
-        if ((lval->flags & FARACC) ) {
-            lpush();
-        } else {
-            zpush();
-        }
+        gen_save_pointer(lval);
     } else {
         switch ((lval->symbol->offset.i) - Zsp) {
         case 0:
@@ -604,11 +594,7 @@ void smartpush(LVALUE* lval, char* before)
             break;
         default:
             addstk(lval);
-            if ((lval->flags & FARACC) ) {
-                lpush();
-            } else {
-                zpush();
-            }
+            gen_save_pointer(lval);
         }
     }
 }
