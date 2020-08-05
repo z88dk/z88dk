@@ -335,7 +335,7 @@ void doif()
 Type *doexpr()
 {
     char *before, *start;
-    double val;
+    zdouble val;
     int    vconst;
     Type   *type_ptr;
 
@@ -558,7 +558,7 @@ void doreturn(char type)
     /* if not end of statement, get an expression */
     if (endst() == 0) {
         char *before, *start;
-        double val;
+        zdouble val;
         int    vconst;
         Type   *type_ptr;
 

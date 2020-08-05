@@ -10,7 +10,7 @@
 
 #include "ccdefs.h"
 
-static double   CalcStand(Kind left_kind, double left, void (*oper)(LVALUE *), double right);
+static zdouble   CalcStand(Kind left_kind, zdouble left, void (*oper)(LVALUE *), zdouble right);
 static void     nstep(LVALUE *lval, int n, void (*unstep)(LVALUE *lval));
 static void     store(LVALUE *lval);
 
@@ -162,11 +162,11 @@ int primary(LVALUE* lval)
 /*
  * calculate constant expression (signed values)
  */
-double calc(
+zdouble calc(
     Kind   left_kind,
-    double left,
+    zdouble left,
     void (*oper)(LVALUE *),
-    double right, int is16bit)
+    zdouble right, int is16bit)
 {
     if (oper == zdiv && right != 0.0)
         return (left / right);
@@ -192,11 +192,11 @@ double calc(
         return (CalcStand(left_kind, left, oper, right));
 }
 
-double calcun(
+zdouble calcun(
     Kind   left_kind,
-    double left,
+    zdouble left,
     void (*oper)(LVALUE *),
-    double right)
+    zdouble right)
 {
     if (oper == zdiv)   {
         return (left / right);
@@ -225,11 +225,11 @@ double calcun(
  * Calculations..standard ones - same for U & S 
  */
 
-double CalcStand(
+zdouble CalcStand(
     Kind left_kind,
-    double left,
+    zdouble left,
     void (*oper)(LVALUE *),
-    double right)
+    zdouble right)
 {
     if (oper == zor)
         return ((unsigned int)left | (unsigned int)right);
@@ -288,6 +288,13 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
                 gen_conv_sint2long();
             } else
                 gen_conv_uint2long();
+        }
+        return;
+    }
+
+    if (t1 == KIND_LONGLONG) {
+        if (t2 != KIND_LONGLONG ) {
+            ol("TODO: force to i64");
         }
         return;
     }
@@ -472,6 +479,9 @@ void prestep(
         rvalue(lval);
         //intcheck(lval, lval);
         switch (lval->ptr_type) {
+        case KIND_LONGLONG:
+            zadd_const(lval, n * 8);
+            break;
         case KIND_DOUBLE:
             zadd_const(lval, n * c_fp_size);
             break;
@@ -515,6 +525,9 @@ void poststep(
         switch (lval->ptr_type) {
         case KIND_DOUBLE:
             nstep(lval, n * c_fp_size, unstep);
+            break;
+        case KIND_LONGLONG:
+            nstep(lval, n * 8, unstep);
             break;
         case KIND_STRUCT:
             nstep(lval, n * lval->ltype->ptr->tag->size, unstep);
@@ -753,7 +766,7 @@ int test(int label, int parens)
 int constexpr(double *val, Kind *type, int flag)
 {
     char *before, *start;
-    double valtemp;
+    zdouble valtemp;
     int con;
     int savesp = Zsp;
     int valtype;

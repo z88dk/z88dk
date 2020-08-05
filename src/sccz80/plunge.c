@@ -50,7 +50,9 @@ int skim(char* opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfun
 
 void load_constant(LVALUE *lval)
 {
-    if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
+    if (lval->val_type == KIND_LONGLONG) {
+        vllongconst(lval->const_val);
+    } else if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         vlongconst(lval->const_val);
     } else if (kind_is_floating(lval->val_type) ){
         gen_load_constant_as_float(lval->const_val, lval->val_type, 0);
@@ -282,7 +284,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
         }
         if ( !kind_is_floating(lval->val_type) && !kind_is_floating(lval2->val_type) && 
-            lval->val_type != KIND_LONG && lval2->val_type != KIND_LONG && lval->val_type != KIND_CPTR && lval2->val_type != KIND_CPTR) {
+            lval->val_type != KIND_LONG && lval2->val_type != KIND_LONG && lval->val_type != KIND_CPTR && lval2->val_type != KIND_CPTR &&
+            lval->val_type != KIND_LONGLONG && lval2->val_type != KIND_LONGLONG) {
             /* Gets the LHS back again for 16 bit operands */
             zpop();
         }

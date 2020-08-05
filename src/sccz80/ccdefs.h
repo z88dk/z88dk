@@ -17,6 +17,9 @@
 #include <stdio.h>
 #include <ctype.h>
 
+
+typedef long double zdouble;
+
 #include "define.h"
 
 /*
@@ -199,7 +202,7 @@ extern void       errorfmt(const char *fmt, int fatal, ...);
 extern void       parse_warning_option(const char *value);
 
 /* expr.c */
-extern Kind       expression(int *con, double *val, Type **type);
+extern Kind       expression(int *con, zdouble *val, Type **type);
 extern int        heir1(LVALUE *lval);
 extern int        heira(LVALUE *lval);
 
@@ -276,8 +279,8 @@ extern void     pop_buffer_fp(void);
 
 /* primary.c */
 extern int      primary(LVALUE *lval);
-extern double   calc(Kind left_kind, double left, void (*oper)(LVALUE *), double right, int is16bit);
-extern double   calcun(Kind left_kind, double left, void (*oper)(LVALUE *),double right);
+extern zdouble  calc(Kind left_kind, zdouble left, void (*oper)(LVALUE *), zdouble right, int is16bit);
+extern zdouble  calcun(Kind left_kind, zdouble left, void (*oper)(LVALUE *), zdouble right);
 extern int      intcheck(LVALUE *lval, LVALUE *lval2);
 extern void     force(Kind to, Kind from, char to_sign, char from_sign, int lconst);
 extern int      widen_if_float(LVALUE *lval, LVALUE *lval2, int operator_is_commutative);

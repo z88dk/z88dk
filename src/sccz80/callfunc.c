@@ -77,12 +77,12 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     int isscanf = 0;
     uint32_t format_option = 0;
     int nargs, vconst, expr, argnumber;
-    double val;
+    zdouble val;
     int watcharg; /* For watching printf etc */
     int minifunc = 0; /* Call cut down version */
     char preserve = NO; /* Preserve af when cleaningup */
     int   isconstarg[5];
-    double constargval[5];
+    zdouble constargval[5];
     FILE *tmpfiles[100];  // 100 arguments enough I guess */
     int   tmplinenos[100];
     FILE *save_fps;

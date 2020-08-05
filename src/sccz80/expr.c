@@ -25,7 +25,7 @@ static int        heirb(LVALUE *lval);
 static SYMBOL    *deref(LVALUE *lval, char isaddr);
 
 
-Kind expression(int  *con, double *val, Type **type)
+Kind expression(int  *con, zdouble *val, Type **type)
 {
     LVALUE lval={0};
 
@@ -586,7 +586,7 @@ int heirb(LVALUE* lval)
     char *before, *start;
     char *before1, *start1;
     char sname[NAMESIZE];
-    double dval;
+    zdouble dval;
     int val, con, direct, k;
     // Kind valtype;
     char flags;

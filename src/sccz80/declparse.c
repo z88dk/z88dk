@@ -16,6 +16,7 @@ Type   *type_long = &(Type){ KIND_LONG, 4, 0, .len=1 };
 Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
 Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
 Type   *type_float16 = &(Type){ KIND_FLOAT16, 2, 0, .len=1 }; 
+Type   *type_longlong = &(Type){ KIND_LONGLONG, 8, 0, .len=1 }; 
 
 static namespace  *namespaces = NULL;
 
@@ -556,9 +557,14 @@ static Type *parse_type(void)
         type->kind = KIND_INT;
         type->size = 2;
     } else if ( amatch("long")) {
+        if ( amatch("long")) {
+            type->kind = KIND_LONGLONG;
+            type->size = 8;
+        } else {
+            type->kind = KIND_LONG;
+            type->size = 4;
+        }
         swallow("int");
-        type->kind = KIND_LONG;
-        type->size = 4;
     } else if ( amatch("float") || amatch("double")) {
         type->kind = KIND_DOUBLE;
         type->size = c_fp_size;
@@ -971,7 +977,7 @@ int declare_local(int local_static)
                     Type *expr_type;
                     char *before, *start;
                     int   vconst;
-                    double val;
+                    zdouble val;
 
                     Zsp = modstk(Zsp - (declared - type->size), KIND_NONE, NO, YES);
                     declared = 0;
@@ -1154,6 +1160,9 @@ Type *make_type(Kind kind, Type *tag)
         break;
     case KIND_LONG:
         type->size = 4;
+        break;
+    case KIND_LONGLONG:
+        type->size = 8;
         break;
     case KIND_DOUBLE:
         type->size =  c_fp_size;
@@ -1475,6 +1484,9 @@ void type_describe(Type *type, UT_string *output)
         break;
     case KIND_LONG:
         utstring_printf(output,"%slong ",type->isunsigned ? "unsigned " : "");
+        break;
+    case KIND_LONGLONG:
+        utstring_printf(output,"%slong long ",type->isunsigned ? "unsigned " : "");
         break;
     case KIND_FLOAT:
     case KIND_DOUBLE:    

@@ -30,8 +30,9 @@ extern int modstk(int newsp, Kind save,int saveaf, int usebc);
 extern void scale(Kind type, Type *tag);
 
 
-extern void vlongconst(double val);
-extern void vlongconst_tostack(double val);
+extern void vlongconst(zdouble val);
+extern void vlongconst_tostack(zdouble val);
+extern void vllongconst(zdouble val);
 extern void vconst(int32_t val);
 extern void const2(int32_t val);
 extern void GlobalPrefix(void);
