@@ -134,6 +134,9 @@ extern option_t  mc_options;
 extern int       msx_exec(char *target);
 extern option_t  msx_options;
 
+extern int       msxrom_exec(char *target);
+extern option_t  msxrom_options;
+
 extern int       mtx_exec(char *target);
 extern option_t  mtx_options;
 
@@ -377,6 +380,10 @@ struct {
       "Adds a file header to enable the program to be loaded using 'bload \"file.bin\",r",
       NULL,
       msx_exec,     &msx_options },
+    { "bin2msr",  "msxrom",   "(C) 2020 z88dk",
+      "Generates an MSX rom file.",
+      NULL,
+      msxrom_exec,  &msxrom_options },
     { "bin2mtx",  "mtx",      "(C) 2011 Stefano Bodrato",
       "Memotech MTX file format packaging, optional WAV format",
       NULL,

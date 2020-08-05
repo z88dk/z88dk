@@ -120,7 +120,7 @@ L028F:  JP      L0229           ; to DISPLAY-1
 ; ---
 
 ;; DISPLAY-3
-L0292:  POP     IY              ; return address to IX register (--IXIY swap).
+L0292:  POP     IY              ; return address to IX register (-IXIY swap).
                                 ; will be either L0281 or L028F - see above.
 ; Modified here to keep IY unchanged
 

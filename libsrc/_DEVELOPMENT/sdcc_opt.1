@@ -555,3 +555,10 @@ __xinit_%0
 	ldhl	sp, %2
 =
 	ld	hl,sp + %2
+
+	call	banked_call
+	DEFW	%1
+	DEFW 0
+=
+	call	banked_call
+	defq	%1

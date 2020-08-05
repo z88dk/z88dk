@@ -69,7 +69,7 @@ int gb_exec(char *target)
     struct stat st_file;
     char filename[FILENAME_MAX+1];
     FILE *fpin, *fpout;
-    int len, i, c, count,mbc_type = 0, ram_banks = 0, rom_banks = 2,chk, main_length;
+    int len, i, c, count,mbc_type = 0, ram_banks = 0, rom_banks = 2,chk, main_length, startbank;
 
     if ((help) || (binname == NULL))
         return -1;
@@ -107,10 +107,16 @@ int gb_exec(char *target)
     if (main_length != fread(memory, sizeof(memory[0]), main_length, fpin)){ fclose(fpin); exit_log(1, "Could not read required data from <%s>\n",binname); }
     fclose(fpin);
 
-    len = 0x8000;
+    if ( main_length <= 0x4000 ) {
+        len = 0x4000;
+        startbank = 1;
+    } else {
+        len = 0x8000;
+        startbank = 2;
+    }
+
     // Lets read in the banks now
-    count = 0;
-    for (i = 0x02; i <= 0x1f; i++) {
+    for (i = startbank; i <= 0x1f; i++) {
         sprintf(filename, "%s_BANK_%02X.bin", binname, i);
         if ((stat(filename, &st_file) < 0) || (st_file.st_size == 0) || ((fpin = fopen(filename, "rb")) == NULL)) {
             break;
@@ -119,17 +125,14 @@ int gb_exec(char *target)
             memset(memory + (i * 0x4000), romfill, 0x4000);
 
             fprintf(stderr, "Adding bank 0x%02X ", i);
-            if (1 != fread(memory + (i * 0x4000), 0x4000, 1, fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n",filename); }
+            fread(memory + (i * 0x4000), 0x4000, 1, fpin);
 
             if (!feof(fpin)) {
                 fseek(fpin, 0, SEEK_END);
                 count = ftell(fpin);
                 fprintf(stderr, " (error truncating %d bytes from %s)", count - 0x4000, filename);
             }
-
-            count = 0;
             fputc('\n', stderr);
-
             fclose(fpin);
         }
     }
@@ -142,9 +145,9 @@ int gb_exec(char *target)
 
     // Calculate correct power of two for ROM banks
     rom_banks = 1;
-    while ( rom_banks < i ) {
+    do {
         rom_banks *= 2;
-    }
+    } while ( rom_banks < i );
 
     memory = must_realloc(memory, rom_banks * 0x4000);
     len = (0x4000 * i);
@@ -307,8 +310,15 @@ int gb_exec(char *target)
     if ((fpout = fopen(filename, "wb")) == NULL)
         exit_log(1, "Can't create output file %s\n", filename);
 
-    // look for and append memory banks
-    fprintf(stderr, "Adding main banks 0x00,0x01 (%d bytes free)\n", 0x8000 - main_length);
+
+    if ( rom_banks == 2 ) {
+        // It's not a MegaROM
+        fprintf(stderr, "Adding main banks 0x00,0x01 (%d bytes free)\n", 0x8000 - main_length);
+    } else if ( startbank == 1 ) {
+        fprintf(stderr, "Adding main bank 0x00 (%d bytes free)\n", 0x4000 - main_length);
+    } else {
+        fprintf(stderr, "Main ROM code is > 16kb, the ROM may not work correctly\n");
+    }
     
     fwrite(memory,len,1,fpout);
     fclose(fpout);

@@ -14,12 +14,12 @@
 floor:
 	call	___mbf32_setup_single
 	call	___mbf32_discard_fraction
-	ld	a,(___mbf32_FPREG+2)		;exponent
+	ld	a,(___mbf32_FPREG+2)		;sign
 	rlca
 	jp	nc,___mbf32_return
-	; This is negative, so we have to delete one
-	ld	de,$8180
-	ld	hl,$0000
+	; This is negative, so we have to subtract one
+	ld	bc,$8180
+	ld	de,$0000
 IF __CPU_INTEL__|__CPU_GBZ80__
 	call	___mbf32_FPADD
 ELSE

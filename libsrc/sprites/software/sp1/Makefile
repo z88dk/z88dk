@@ -27,7 +27,7 @@ sp1-all:
 	@echo
 	@echo Making sp1-zx81hr
 	@echo
-	$(LIBLINKER) -xzx81hr/sp1 --IXIY @zx81hr.lst
+	$(LIBLINKER) -xzx81hr/sp1 -IXIY @zx81hr.lst
 	@echo
 
 sp1-spectrum:
@@ -57,7 +57,7 @@ sp1-zx81hr:
 	@echo SP1 Software Sprite Engine 
 	@echo making zx81 hrg version
 	@echo
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1 --IXIY @zx81hr.lst
+	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1 -IXIY @zx81hr.lst
 	cp zx81hr/zx81hr-sp1.h ../../../../include/sprites/sp1.h
 	@echo
 	@echo all done

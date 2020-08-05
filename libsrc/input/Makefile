@@ -26,7 +26,7 @@ obj/z80n/%.o: %.asm
 	$(ZCC) +test -mz80n $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
 obj/ixiy/%.o: %.asm
-	$(ZCC) +test -mz80 -Ca--IXIY $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
+	$(ZCC) +test -mz80 -Ca-IXIY $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
 
 .PHONY: dirs

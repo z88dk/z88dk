@@ -746,7 +746,18 @@ void dopragma()
         set_section(&c_bss_section);
     else if (amatch("initseg"))
         set_section(&c_init_section);
-    else {
+    else if (amatch("bank")) {
+        Kind valtype;
+        double val;
+        char   buf[100];
+
+        if ( constexpr(&val, &valtype, 1) ) {
+            snprintf(buf,sizeof(buf),"CODE_%d",(int)val);
+            c_code_section = STRDUP(buf);
+            snprintf(buf,sizeof(buf),"RODATA_%d",(int)val);
+            c_rodata_section = STRDUP(buf);
+        }
+    }else {
         warningfmt("unknown-pragmas","Unknown #pragma directive");
         clear();
     }

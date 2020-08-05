@@ -20,7 +20,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 	
 	# build command line
 	my $cmd = "z80asm -m$cpu ".
-			($ixiy ? "--IXIY " : "").
+			($ixiy ? "-IXIY " : "").
 			" -m -l -b $file 2> test.err";
 	
 	# assembler output files

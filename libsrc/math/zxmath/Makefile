@@ -13,11 +13,11 @@ mzx_tiny:
 
 m81_tiny:
 	$(RM) -f *.o* ../../m81_tiny.lib
-	$(LIBLINKER) -DFORzx81 --IXIY -DTINYMODE -x$(OUTPUT_DIRECTORY)/m81_tiny @zxmlist
+	$(LIBLINKER) -DFORzx81 -IXIY -DTINYMODE -x$(OUTPUT_DIRECTORY)/m81_tiny @zxmlist
 
 mlambda_tiny:
 	$(RM) -f *.o* ../../mlambda_tiny.lib
-	$(LIBLINKER) -DFORlambda --IXIY -DTINYMODE -x$(OUTPUT_DIRECTORY)/mlambda_tiny @zxmlist
+	$(LIBLINKER) -DFORlambda -IXIY -DTINYMODE -x$(OUTPUT_DIRECTORY)/mlambda_tiny @zxmlist
 
 mzx:
 	$(RM) -f *.o* ../../mzx.lib
@@ -29,11 +29,11 @@ m2068:
 
 m81:
 	$(RM) -f *.o* ../../m81.lib
-	$(LIBLINKER) -DFORzx81 --IXIY -x$(OUTPUT_DIRECTORY)/m81 @zxmlist
+	$(LIBLINKER) -DFORzx81 -IXIY -x$(OUTPUT_DIRECTORY)/m81 @zxmlist
 
 mlambda:
 	$(RM) -f *.o* ../../mlambda.lib
-	$(LIBLINKER) -DFORlambda --IXIY -x$(OUTPUT_DIRECTORY)/mlambda @zxmlist
+	$(LIBLINKER) -DFORlambda -IXIY -x$(OUTPUT_DIRECTORY)/mlambda @zxmlist
 
 clean:
 	$(RM) -f *.o* *.sym *.map *.err 
