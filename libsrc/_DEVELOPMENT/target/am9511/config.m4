@@ -37,18 +37,10 @@ dnl# INCLUDE ALL CONFIG FILES
 dnl############################################################
 
 include(`target/z88dk_version.m4')
-include(`target/yaz180/config/config_target.m4')
-include(`target/yaz180/config/config_cpu.m4')
-include(`target/yaz180/config/config_clib.m4')
-include(`target/yaz180/config/config_clib_const.m4')
-
-include(`target/yaz180/config/config_82c55.m4')
-include(`target/yaz180/config/config_ide.m4')
-include(`target/yaz180/config/config_pca9665.m4')
+include(`target/am9511/config/config_target.m4')
+include(`target/am9511/config/config_cpu.m4')
 
 include(`target/am9511/config/config_am9511a.m4')
-
-include(`target/cpm/config/config_cpm.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

@@ -40,6 +40,7 @@ section code_error
 section code_esxdos
 section code_fcntl
 section code_font_fzx
+section code_fp_am9511
 section code_fp_genmath
 section code_fp_math48
 section code_fp_math32

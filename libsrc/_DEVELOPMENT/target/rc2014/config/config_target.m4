@@ -34,6 +34,10 @@ define(`__IO_PROM_TOGGLE', 0x38)    # Port Address for PROM Toggle
 
 define(`__IO_LUT_PORT_BASE', 0x40)  # Port Address for LUT Module
 
+# Am9511A-1 APU Definitions
+
+define(`__IO_APU_PORT_BASE', 0x42)  # Port Address for Am9511A Module
+
 # MC68C60 ACIA Port Definition
 
 define(`__IO_ACIA_PORT_BASE', 0x80) # Port Address for 68C50 Module
@@ -43,16 +47,16 @@ define(`__IO_ACIA_PORT_BASE', 0x80) # Port Address for 68C50 Module
 define(`__IO_SIO_PORT_BASE', 0x80)  # Port Address for SIO/0-2 Module
 
 # Spencer's build
-define(`__IO_SIO_PORT_OFFSET_A', 0x00)   # Port Offset for A Channel (A1)
-define(`__IO_SIO_PORT_OFFSET_B', 0x02)   # Port Offset for B Channel (A1)
-define(`__IO_SIO_PORT_OFFSET_C', 0x00)   # Port Offset for Command (!A0)
-define(`__IO_SIO_PORT_OFFSET_D', 0x01)   # Port Offset for Data (!A0)
+define(`__IO_SIO_PORT_OFFSET_A', 0x00)  # Port Offset for A Channel (A1)
+define(`__IO_SIO_PORT_OFFSET_B', 0x02)  # Port Offset for B Channel (A1)
+define(`__IO_SIO_PORT_OFFSET_C', 0x00)  # Port Offset for Command (!A0)
+define(`__IO_SIO_PORT_OFFSET_D', 0x01)  # Port Offset for Data (!A0)
 
 # Standard (including Dr Baker)
-# define(`__IO_SIO_PORT_OFFSET_A', 0x00)   # Port Offset for A Channel (A0)
-# define(`__IO_SIO_PORT_OFFSET_B', 0x01)   # Port Offset for B Channel (A0)
-# define(`__IO_SIO_PORT_OFFSET_C', 0x02)   # Port Offset for Command (A1)
-# define(`__IO_SIO_PORT_OFFSET_D', 0x00)   # Port Offset for Data (A1)
+# define(`__IO_SIO_PORT_OFFSET_A', 0x00)  # Port Offset for A Channel (A0)
+# define(`__IO_SIO_PORT_OFFSET_B', 0x01)  # Port Offset for B Channel (A0)
+# define(`__IO_SIO_PORT_OFFSET_C', 0x02)  # Port Offset for Command (A1)
+# define(`__IO_SIO_PORT_OFFSET_D', 0x00)  # Port Offset for Data (A1)
 
 #
 # END OF USER CONFIGURATION
@@ -76,6 +80,7 @@ PUBLIC `__IO_PIO_PORT_BASE'
 PUBLIC `__IO_PROM_RESET'
 PUBLIC `__IO_PROM_TOGGLE'
 PUBLIC `__IO_LUT_PORT_BASE'
+PUBLIC `__IO_APU_PORT_BASE'
 PUBLIC `__IO_ACIA_PORT_BASE'
 PUBLIC `__IO_SIO_PORT_BASE'
 PUBLIC `__IO_SIO_PORT_OFFSET_A'
@@ -100,6 +105,7 @@ defc `__IO_PIO_PORT_BASE' = __IO_PIO_PORT_BASE
 defc `__IO_PROM_RESET' = __IO_PROM_RESET
 defc `__IO_PROM_TOGGLE' = __IO_PROM_TOGGLE
 defc `__IO_LUT_PORT_BASE' = __IO_LUT_PORT_BASE
+defc `__IO_APU_PORT_BASE' = __IO_APU_PORT_BASE
 defc `__IO_ACIA_PORT_BASE' = __IO_ACIA_PORT_BASE
 defc `__IO_SIO_PORT_BASE' = __IO_SIO_PORT_BASE
 defc `__IO_SIO_PORT_OFFSET_A' = __IO_SIO_PORT_OFFSET_A
