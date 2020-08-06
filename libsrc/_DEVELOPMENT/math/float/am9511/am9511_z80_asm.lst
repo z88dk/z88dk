@@ -1,9 +1,13 @@
+math/float/am9511/z80/am32_acos
 math/float/am9511/z80/am32_add
 math/float/am9511/z80/am32_am9511
+math/float/am9511/z80/am32_asin
+math/float/am9511/z80/am32_atan
 math/float/am9511/z80/am32_ceil
 math/float/am9511/z80/am32_compare
 math/float/am9511/z80/am32_const
 math/float/am9511/z80/am32_conv
+math/float/am9511/z80/am32_cos
 math/float/am9511/z80/am32_discardfraction
 math/float/am9511/z80/am32_div
 math/float/am9511/z80/am32_div2
@@ -12,6 +16,7 @@ math/float/am9511/z80/am32__dtoa_base16
 math/float/am9511/z80/am32__dtoa_digits
 math/float/am9511/z80/am32__dtoa_sgnabs
 math/float/am9511/z80/am32_error
+math/float/am9511/z80/am32_exp
 math/float/am9511/z80/am32_f2long
 math/float/am9511/z80/am32_fabs
 math/float/am9511/z80/am32_floor
@@ -20,6 +25,8 @@ math/float/am9511/z80/am32_frexp
 math/float/am9511/z80/am32_hexpop
 math/float/am9511/z80/am32_hypot
 math/float/am9511/z80/am32_ldexp
+math/float/am9511/z80/am32_log
+math/float/am9511/z80/am32_log10
 math/float/am9511/z80/am32_mul
 math/float/am9511/z80/am32_mul2
 math/float/am9511/z80/am32_mul10u
@@ -27,12 +34,14 @@ math/float/am9511/z80/am32_nan_b
 math/float/am9511/z80/am32_popf
 math/float/am9511/z80/am32_popi
 math/float/am9511/z80/am32_popl
+math/float/am9511/z80/am32_pow
 math/float/am9511/z80/am32_pushf
 math/float/am9511/z80/am32_pushi
 math/float/am9511/z80/am32_pushl
 math/float/am9511/z80/am32_sigdig
+math/float/am9511/z80/am32_sin
 math/float/am9511/z80/am32_sqr
 math/float/am9511/z80/am32_sqrt
 math/float/am9511/z80/am32_sub
+math/float/am9511/z80/am32_tan
 math/float/am9511/z80/am32_util
-
