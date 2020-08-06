@@ -227,8 +227,11 @@ typecheck:
     lval->is_const = 1;
 
     while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S') || rcmatch('f'))) {
-        if (cmatch('L'))
+        if (cmatch('L')) {
             lval->val_type = KIND_LONG;
+            if (cmatch('L'))
+                lval->val_type = KIND_LONGLONG;
+        }
         if (cmatch('U')) {
             isunsigned = 1;
             lval->const_val = (uint32_t)k;
@@ -244,7 +247,12 @@ typecheck:
             lval->ltype = type_double;
         }
     }
-    if ( lval->val_type == KIND_LONG ) {
+    if ( lval->val_type == KIND_LONGLONG ) {
+        if ( isunsigned )
+            lval->ltype = type_ulonglong;
+        else
+            lval->ltype = type_longlong;
+    } else if ( lval->val_type == KIND_LONG ) {
         if ( isunsigned )
             lval->ltype = type_ulong;
         else

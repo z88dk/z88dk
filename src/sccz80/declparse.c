@@ -17,6 +17,7 @@ Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
 Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
 Type   *type_float16 = &(Type){ KIND_FLOAT16, 2, 0, .len=1 }; 
 Type   *type_longlong = &(Type){ KIND_LONGLONG, 8, 0, .len=1 }; 
+Type   *type_ulonglong = &(Type){ KIND_LONGLONG, 8, 1, .len=1 }; 
 
 static namespace  *namespaces = NULL;
 

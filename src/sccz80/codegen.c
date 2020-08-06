@@ -4538,13 +4538,14 @@ void vlongconst(zdouble val)
 
 void vllongconst(zdouble val)
 {
-    uint32_t l;
-    callrts("l_i64_loada");
+    uint64_t v,l;
+    callrts("l_i64_loadi");
     ot("defb\t");
-    l = (uint32_t)(int64_t)(val - val / (zdouble)UINT32_MAX);
-    outfmt("%02x,%02x,%02x,%02x,", (l % 65536) % 256, (l % 65536) / 256, (l / 65536) % 256, (l / 65536) / 256);
-    l = (uint32_t)(int64_t)(val / (zdouble)UINT32_MAX);
-    outfmt("%02x,%02x,%02x,%02x", (l % 65536) % 256, (l % 65536) / 256, (l / 65536) % 256, (l / 65536) / 256);
+    v = val;
+    l = v & 0xffffffff;
+    outfmt("$%02x,$%02x,$%02x,$%02x,", (l % 65536) % 256, (l % 65536) / 256, (l / 65536) % 256, (l / 65536) / 256);
+    l = (v >> 32) & 0xffffffff;
+    outfmt("$%02x,$%02x,$%02x,$%02x", (l % 65536) % 256, (l % 65536) / 256, (l / 65536) % 256, (l / 65536) / 256);
     nl();
 }
 

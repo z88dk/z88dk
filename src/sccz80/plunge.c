@@ -594,7 +594,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             } else {
                 widenintegers(lval, lval2);
                 /* non-constant integer operation */
-                if (lval->val_type != KIND_LONG && lval->val_type != KIND_CPTR)
+                if (lval->val_type != KIND_LONGLONG && lval->val_type != KIND_LONG && lval->val_type != KIND_CPTR)
                     zpop();
                 if (dbltest(lval2, lval)) {
                     UT_string  *str;
