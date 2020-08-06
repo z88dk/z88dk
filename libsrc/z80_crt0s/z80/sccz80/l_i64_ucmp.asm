@@ -27,7 +27,7 @@ l_i64_ucmp:
 
 
 	; We could have equality here
-	ld	hl,2 
+	ld	hl,4 
 	add	hl,sp
 	call	l_testzero_64_mhl
 

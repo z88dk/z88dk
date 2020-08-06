@@ -122,6 +122,7 @@ z80/sccz80/l_i64_dec
 z80/sccz80/l_i64_div
 z80/sccz80/l_i64_div_u
 z80/sccz80/l_i64_eq0
+z80/sccz80/l_i64_eq
 z80/sccz80/l_i64_ge
 z80/sccz80/l_i64_gt
 z80/sccz80/l_i64_inc
@@ -131,6 +132,7 @@ z80/sccz80/l_i64_lt
 z80/sccz80/l_i64_mod
 z80/sccz80/l_i64_mod_u
 z80/sccz80/l_i64_mult
+z80/sccz80/l_i64_ne
 z80/sccz80/l_i64_neg
 z80/sccz80/l_i64_or
 z80/sccz80/l_i64_push

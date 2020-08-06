@@ -19,17 +19,17 @@ l_i64_cmp:
 	add	hl,sp
 	ex	de,hl
 	ld	hl,__i64_acc
-	call	l_sub_64_mde_mhl
+	call	l_sub_64_mde_mhl	;de = de - hl
 	
 
 
 	;We've done the comparison and sp+4 is the result
-	ld	hl,2 + 7
+	ld	hl,4 + 7
 	add	hl,sp
 	bit	7,(hl)
 	jr	z,positive
 
-	; Result is negative
+	; Result is negative secondary < primary
 
 	; nz is set
 	; Cleanup stack
@@ -50,10 +50,9 @@ l_i64_cmp:
 positive:
 	ld	b,7
 	ld	a,(hl)
-	dec	hl
 loop1:
-	or	(hl)
 	dec	hl
+	or	(hl)
 	djnz	loop1
 	;Clean up stack
 	pop	bc
