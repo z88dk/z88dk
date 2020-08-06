@@ -3706,9 +3706,9 @@ void zeq(LVALUE* lval)
     lval->ptr_type = KIND_NONE;
     switch (lval->val_type) {
     case KIND_LONGLONG:
-        set_int(lval);
         callrts("l_i64_eq");
         Zsp += 8;
+        set_int(lval);
         break;
     case KIND_LONG:
     case KIND_CPTR:
@@ -3861,9 +3861,9 @@ void zne(LVALUE* lval)
     lval->ptr_type = KIND_NONE;
     switch (lval->val_type) {
     case KIND_LONGLONG:
-        set_int(lval);
         callrts("l_i64_ne");
         Zsp += 8;
+        set_int(lval);
         break;
     case KIND_LONG:
     case KIND_CPTR:
@@ -4017,9 +4017,12 @@ void zlt(LVALUE* lval)
     lval->ptr_type = KIND_NONE;
     switch (lval->val_type) {
     case KIND_LONGLONG:
+        if (ulvalue(lval))
+            callrts("l_i64_ult");
+        else
+            callrts("l_i64_lt");
         set_int(lval);
-        callrts("l_i64_eq");
-        Zsp += 4;
+        Zsp += 8;
         break;
     case KIND_LONG:
     case KIND_CPTR:
@@ -4139,11 +4142,11 @@ void zle(LVALUE* lval)
     lval->ptr_type = KIND_NONE;
     switch (lval->val_type) {
     case KIND_LONGLONG:
-        set_int(lval);
         if (ulvalue(lval))
             callrts("l_i64_ule");
         else
             callrts("l_i64_le");
+        set_int(lval);
         Zsp += 8;
         break;
     case KIND_LONG:
@@ -4267,11 +4270,11 @@ void zgt(LVALUE* lval)
     lval->ptr_type = KIND_NONE;
     switch (lval->val_type) {
     case KIND_LONGLONG:
-        set_int(lval);
         if (ulvalue(lval))
             callrts("l_i64_ugt");
         else
             callrts("l_i64_gt");
+        set_int(lval);
         Zsp += 8;
         break;
     case KIND_LONG:
@@ -4402,11 +4405,11 @@ void zge(LVALUE* lval)
     lval->ptr_type = KIND_NONE;
     switch (lval->val_type) {
     case KIND_LONGLONG:
-        set_int(lval);
         if (ulvalue(lval))
             callrts("l_i64_uge");
         else
             callrts("l_i64_ge");
+        set_int(lval);
         Zsp += 8;
         break;
     case KIND_LONG:
