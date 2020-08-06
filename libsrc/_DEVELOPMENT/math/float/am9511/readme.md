@@ -116,7 +116,7 @@ Contains the assembly language implementation of the maths library.  This includ
 
 ### c
 
-Contains the trigonometric, logarithmic, power and other functions implemented in C. Currently, compiled versions of these functions are prepared and saved in `c/asm` to be assembled and built as required.
+Contains the remaining hyperbolic, logarithmic, power and other functions implemented in C. Currently, compiled versions of these functions are prepared and saved in `c/asm` to be assembled and built as required.
 
 ### c/sdcc and c/sccz80
 
@@ -132,7 +132,7 @@ An alias is provided to simplify usage of the library. `--am9511` provides all t
 
 There are essentially two different grades of functions in this library. Those written in assembly code, in the floating point domain using intrinsic functions. And those written in C language.
 
-The Am9511A can build complex functions quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `poly()` function.
+The Am9511A can build complex functions quite efficiently without needing to manage details (which are best left for the intrinsic functions). For a good example of this see the `hypot()` function.
 
 ### Intrinsic Assembly Functions
 
@@ -142,6 +142,20 @@ float ceil (float x);
 float floor (float x);
 float frexp (float x, int *pw2);
 float ldexp (float x, int pw2);
+
+/* Trigonometric functions */
+float sin (float x);
+float cos (float x);
+float tan (float x);
+float asin (float x);
+float acos (float x);
+float atan (float x);
+
+/* Exponential, logarithmic and power functions */
+float exp (float x);
+float log (float x);
+float log10 (float x);
+float pow (float x, float y);
 ```
 For some functions it is easiest to work with IEEE floating point numbers in assembly. For these three functions simple assembly code produces the result required effectively.
 
@@ -156,23 +170,13 @@ float mul10u (float x);
 ```
 For sccz80, sdcc and in assembly there are `mul2()` and `div2()` functions available to handle simple power of two multiplication and division, as well as `ldexp()`. Also, a `mul10u()` function provides a fast `y = 10 * |x|` result. These functions are substantially faster than a full multiply equivalent, and combinations can be used to advantage. For example using `div2( mul10u( mul10u( x )))` is substantially faster than `y = 50.0 * x` on any CPU type.
 
-#### _poly()_
-
-```C
-float poly (const float x, const float d[], uint16_t n);
-```
-All of the higher functions are implemented based on Horner's Method for polynomial expansion. Therefore to evaluate these functions efficiently, an optimised `poly()` function has been developed, using full 32-bit expanded mantissa multiplies and adds for accuracy.
-
-This function reads a table of coefficients stored in "ROM" and iterates the specified number of iterations to produce the result desired.
-
-It is a general function. Any coefficient table can be used, as desired. The coefficients are provided in packed IEEE floating point format, with the coefficients stored in the correct order. The 0th coefficient is stored first in the table. For examples see in the library for `sin()`, `tan()`, `log()` and `exp()`.
 
 #### _hypot()_
 
 ```C
 float hypot (float x, float y);
 ```
-The hypotenuse function `hypot()` is provided as it is part of the standard maths library. The main use is to further demonstrate how effectively (simply) complex routines can be written using the compact floating point format.
+The hypotenuse function `hypot()` is provided as it is part of the standard maths library. The main use is to further demonstrate how effectively (simply) complex routines can be written using the Am9511A APU.
 
 ### C Floating Point Functions
 
@@ -181,6 +185,9 @@ The rest of the maths library is derived from source code obtained from the Ceph
 If desired, alternative and extended coefficient matrices can be tested for accuracy and performance.
 
 ```c
+/* Trigonometric functions */
+float atan2f (float x, float y);
+
 /* Hyperbolic functions */
 float sinh (float x);
 float cosh (float x);
@@ -190,13 +197,9 @@ float acosh (float x);
 float atanh (float x);
 
 /* Exponential, logarithmic and power functions */
-float exp (float x);
 float exp2 (float x);
 float exp10 (float x);
-float log (float x);
 float log2 (float x);
-float log10 (float x);
-float pow (float x, float y);
 
 /* Nearest integer, absolute value, and remainder functions */
 float modf (float x, float *y);

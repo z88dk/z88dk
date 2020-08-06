@@ -1,9 +1,11 @@
 ;
-;  feilipu, 2019 April
+;  Copyright (c) 2020 Phillip Stevens
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+;  feilipu, August 2020
 ;
 ;-------------------------------------------------------------------------
 ; asm_am9511_sqrt - am9511 floating point square root

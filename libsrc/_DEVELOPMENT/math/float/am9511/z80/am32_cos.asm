@@ -8,50 +8,38 @@
 ;  feilipu, August 2020
 ;
 ;-------------------------------------------------------------------------
-; asm_am9511_mul - z80 floating point multiply
+; asm_am9511_cos - am9511 floating point cosine
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_am9511
 
 EXTERN __IO_APU_CONTROL
-EXTERN __IO_APU_OP_FMUL
+EXTERN __IO_APU_OP_COS
 
 EXTERN asm_am9511_pushf
 EXTERN asm_am9511_pushf_fastcall
 EXTERN asm_am9511_popf
 
-PUBLIC asm_am9511_mul, asm_am9511_mul_callee
+PUBLIC asm_am9511_cos, asm_am9511_cos_fastcall
 
 
-.asm_am9511_mul
-    push hl
-    ld hl,6
+.asm_am9511_cos
+    ld hl,4
     add hl,sp
     call asm_am9511_pushf           ; x
-    pop hl
-    call asm_am9511_pushf_fastcall  ; y
 
-    ld a,__IO_APU_OP_FMUL
-    out (__IO_APU_CONTROL),a        ; x + y
+    ld a,__IO_APU_OP_COS
+    out (__IO_APU_CONTROL),a        ; cos(x)
 
     jp asm_am9511_popf
 
 
-.asm_am9511_mul_callee
-    push hl
-    ld hl,6
-    add hl,sp
-    call asm_am9511_pushf           ; x
-    pop hl
-    call asm_am9511_pushf_fastcall  ; y
+.asm_am9511_cos_fastcall
+    call asm_am9511_pushf_fastcall  ; x
 
-    ld a,__IO_APU_OP_FMUL
-    out (__IO_APU_CONTROL),a        ; x + y
-
-    pop hl                          ; ret
-    pop de
-    ex (sp),hl                      ; ret back on stack
+    ld a,__IO_APU_OP_COS
+    out (__IO_APU_CONTROL),a        ; cos(x)
 
     jp asm_am9511_popf
 

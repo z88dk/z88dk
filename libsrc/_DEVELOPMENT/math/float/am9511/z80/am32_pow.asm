@@ -8,23 +8,24 @@
 ;  feilipu, August 2020
 ;
 ;-------------------------------------------------------------------------
-; asm_am9511_mul - z80 floating point multiply
+; asm_am9511_pow - am9511 floating point power x^y
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_am9511
 
 EXTERN __IO_APU_CONTROL
-EXTERN __IO_APU_OP_FMUL
+EXTERN __IO_APU_OP_PWR
 
 EXTERN asm_am9511_pushf
 EXTERN asm_am9511_pushf_fastcall
 EXTERN asm_am9511_popf
 
-PUBLIC asm_am9511_mul, asm_am9511_mul_callee
+PUBLIC asm_am9511_pow, asm_am9511_pow_callee
 
 
-.asm_am9511_mul
+; enter here for floating power, x^y x on stack, y in dehl
+.asm_am9511_pow
     push hl
     ld hl,6
     add hl,sp
@@ -32,13 +33,14 @@ PUBLIC asm_am9511_mul, asm_am9511_mul_callee
     pop hl
     call asm_am9511_pushf_fastcall  ; y
 
-    ld a,__IO_APU_OP_FMUL
-    out (__IO_APU_CONTROL),a        ; x + y
+    ld a,__IO_APU_OP_PWR
+    out (__IO_APU_CONTROL),a        ; x ^ y
 
     jp asm_am9511_popf
 
 
-.asm_am9511_mul_callee
+; enter here for floating power callee, x^y x on stack, y in dehl
+.asm_am9511_pow_callee
     push hl
     ld hl,6
     add hl,sp
@@ -46,8 +48,8 @@ PUBLIC asm_am9511_mul, asm_am9511_mul_callee
     pop hl
     call asm_am9511_pushf_fastcall  ; y
 
-    ld a,__IO_APU_OP_FMUL
-    out (__IO_APU_CONTROL),a        ; x + y
+    ld a,__IO_APU_OP_PWR
+    out (__IO_APU_CONTROL),a        ; x ^ y
 
     pop hl                          ; ret
     pop de
