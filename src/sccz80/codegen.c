@@ -5157,11 +5157,15 @@ void zwiden_stack_to_llong(LVALUE *lval)
     // We have a value in _i64_acc already
     pop("hl");
     push("hl");
-    ol("ld\ta,h");
-    ol("rlca");
-    ol("sbc\ta");
-    ol("ld\tl,a");
-    ol("ld\th,a");
+    if ( lval->ltype->isunsigned ) {
+        vconst(0);
+    } else {
+        ol("ld\ta,h");
+        ol("rlca");
+        ol("sbc\ta");
+        ol("ld\tl,a");
+        ol("ld\th,a");
+    }
     push("hl");
     push("hl");
     if ( lval->val_type != KIND_LONG ) {
