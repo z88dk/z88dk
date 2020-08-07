@@ -267,7 +267,7 @@ void outstr(const char *ptr)
             int lab;
             loc += strlen("ld\thl,i_");
             lab = atoi(loc);
-            indicate_double_written(lab);     
+            indicate_constant_written(lab);     
         }
     }
     while (outbyte(*ptr++))

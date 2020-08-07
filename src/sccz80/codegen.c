@@ -1105,7 +1105,9 @@ void gen_call(int arg_count, const char *name, SYMBOL *sym)
         loadargc(arg_count);
     }
     ot("call\t"); outname(name, dopref(sym)); nl();
-    pop("bc");
+    if (sym->ctype->return_type->kind == KIND_LONGLONG) {
+        pop("bc");
+    }
 }
 
 void gen_shortcall(Type *functype, int rst, int value) 
@@ -1116,7 +1118,9 @@ void gen_shortcall(Type *functype, int rst, int value)
     }
     outfmt("\trst\t%d\n",rst);
     outfmt("\t%s\t%d\n", value < 0x100 ? "defb" : "defw", value);
-    pop("bc");
+    if (functype->return_type->kind == KIND_LONGLONG) {
+        pop("bc");
+    }
 }
 
 void gen_bankedcall(SYMBOL *sym)
@@ -1127,7 +1131,9 @@ void gen_bankedcall(SYMBOL *sym)
     }
     ol("call\tbanked_call");
     ot("defq\t"); outname(sym->name, dopref(sym)); nl();
-    pop("bc");
+    if (sym->ctype->return_type->kind == KIND_LONGLONG) {
+        pop("bc");
+    }
 }
 
 /* djm (move this!) Decide whether to print a prefix or not 
@@ -4565,15 +4571,7 @@ void vlongconst(zdouble val)
 
 void vllongconst(zdouble val)
 {
-    uint64_t v,l;
-    callrts("l_i64_loadi");
-    ot("defb\t");
-    v = val;
-    l = v & 0xffffffff;
-    outfmt("$%02x,$%02x,$%02x,$%02x,", (l % 65536) % 256, (l % 65536) / 256, (l / 65536) % 256, (l / 65536) / 256);
-    l = (v >> 32) & 0xffffffff;
-    outfmt("$%02x,$%02x,$%02x,$%02x", (l % 65536) % 256, (l % 65536) / 256, (l / 65536) % 256, (l / 65536) / 256);
-    nl();
+    load_llong_into_acc(val);
 }
 
 
@@ -5162,6 +5160,11 @@ void zconvert_to_llong(unsigned char tounsigned, Kind from, unsigned char fromun
         if (from == KIND_LONG) callrts("l_i64_ulong2i64");
         else callrts("l_i64_uint2i64");
     }
+}
+
+void zwiden_stack_to_llong(LVALUE *lval)
+{
+    ol("TODO: zwiden_stack_to_llong");
 }
 
 void zconvert_to_long(unsigned char tounsigned, Kind from, unsigned char fromunsigned) {

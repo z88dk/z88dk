@@ -366,6 +366,29 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
         lval2->val_type = KIND_INT;
     }
 
+    if (lval2->val_type == KIND_LONGLONG) {
+        /* Second operator is long long */
+        if (lval->val_type != KIND_LONGLONG) {
+            zwiden_stack_to_llong(lval);
+            if ( lval->ltype->isunsigned ) {
+                lval->ltype = type_ulonglong;
+            } else {
+                lval->ltype = type_longlong;
+            }
+            lval->val_type = KIND_LONGLONG;
+        }
+        return;
+    }
+
+    if (lval->val_type == KIND_LONGLONG) {
+        if (lval2->val_type != KIND_LONGLONG ) {
+            zconvert_to_llong(lval->ltype->isunsigned, lval2->val_type, lval2->ltype->isunsigned);
+        }
+        return;
+    }
+
+
+
     if (lval2->val_type == KIND_LONG) {
         /* Second operator is long */
         if (lval->val_type != KIND_LONG) {
@@ -382,23 +405,7 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
 
     if (lval->val_type == KIND_LONG) {
         if (lval2->val_type != KIND_LONG && lval2->val_type != KIND_CPTR) {
-            if ( lval->ltype->isunsigned ) {
-                if ( !lval2->ltype->isunsigned ) {
-                    // RHS is signed, 
-                    gen_conv_sint2long();
-                } else {
-                    gen_conv_uint2long();
-                }
-                lval->ltype = type_ulong;
-            } else {
-                if ( lval2->ltype->isunsigned ) {
-                    gen_conv_uint2long();
-                } else {
-                    gen_conv_sint2long();
-                }
-                lval->ltype = type_long;
-            }
-            lval->val_type = KIND_LONG;
+            zconvert_to_long(lval->ltype->isunsigned, lval2->val_type, lval2->ltype->isunsigned);
         }
         return;
     }

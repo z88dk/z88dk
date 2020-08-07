@@ -161,8 +161,9 @@ extern unsigned char litchar(void);
 extern void       size_of(LVALUE *lval);
 extern void       offset_of(LVALUE *lval);
 extern void       load_double_into_fa(LVALUE *lval);
-extern void       write_double_queue(void);
-extern void       indicate_double_written(int litlab);
+extern void       load_llong_into_acc(zdouble val);
+extern void       write_constant_queue(void);
+extern void       indicate_constant_written(int litlab);
 
 extern void       dofloat(enum maths_mode mode, double raw, unsigned char fa[]);
 #include "data.h"

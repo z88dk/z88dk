@@ -298,7 +298,7 @@ int main(int argc, char** argv)
     /* dump literal queues, with label */
     /* litq starts from 1, so literp has to be -1 */
     dumplits(0, YES, litptr - 1, litlab, litq + 1);
-    write_double_queue();
+    write_constant_queue();
     dumpvars();
     dumpfns();
     gen_file_footer(); /* follow-up code */
