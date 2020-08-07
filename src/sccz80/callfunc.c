@@ -330,7 +330,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             gen_builtin_memcpy(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
             nargs = 0;
         } else if ( functype->flags & SHORTCALL ) {
-            gen_shortcall(functype->funcattrs.shortcall_rst, functype->funcattrs.shortcall_value);
+            gen_shortcall(functype, functype->funcattrs.shortcall_rst, functype->funcattrs.shortcall_value);
         } else if ( functype->flags & BANKED ) {
             gen_bankedcall(ptr);
         } else {

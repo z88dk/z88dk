@@ -1686,7 +1686,10 @@ static void declfunc(Type *functype, enum storage_type storage)
         where += zcriticaloffset();
     }
 
-    
+    // Functions that return long long have a buffer stuffed into them
+    if (functype->return_type->kind == KIND_LONGLONG ) {
+        where += 2;
+    }
 
     nl();
     {

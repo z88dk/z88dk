@@ -1097,22 +1097,37 @@ void zpop(void)
 /* Output the call op code */
 void gen_call(int arg_count, const char *name, SYMBOL *sym)
 {
+    if (sym->ctype->return_type->kind == KIND_LONGLONG) {
+        ol("ld\thl,__i64_acc");
+        push("hl");
+    }
     if (arg_count != -1 ) {
         loadargc(arg_count);
     }
     ot("call\t"); outname(name, dopref(sym)); nl();
+    pop("bc");
 }
 
-void gen_shortcall(int rst, int value) 
+void gen_shortcall(Type *functype, int rst, int value) 
 {
+    if (functype->return_type->kind == KIND_LONGLONG) {
+        ol("ld\thl,__i64_acc");
+        push("hl");
+    }
     outfmt("\trst\t%d\n",rst);
     outfmt("\t%s\t%d\n", value < 0x100 ? "defb" : "defw", value);
+    pop("bc");
 }
 
 void gen_bankedcall(SYMBOL *sym)
 {
+    if (sym->ctype->return_type->kind == KIND_LONGLONG) {
+        ol("ld\thl,__i64_acc");
+        push("hl");
+    }
     ol("call\tbanked_call");
     ot("defq\t"); outname(sym->name, dopref(sym)); nl();
+    pop("bc");
 }
 
 /* djm (move this!) Decide whether to print a prefix or not 
@@ -1174,14 +1189,14 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
         // More than one argument, TOS = last parameter, hl = function
         // For long sp+0 = LSW, sp +2 = MSW, hl = function
         if ( last_argument_size == 2 ) {
-            ol("pop\taf");
+            ol("pop\taf");  // TODO: 8080/gbz80 doesn't work here
             outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
             ol("push\tbc");
             ol("push\taf");
             Zsp += 2;
             ret = -4;
          } else {
-            ol("pop\taf");
+            ol("pop\taf"); // TODO: 8080/gbz80 doesn't work here
             outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
             ol("push\tbc"); /* Return address */		
             ol("push\taf");		
@@ -1371,10 +1386,9 @@ void gen_leave_function(Kind vartype, char type, int incritical)
         }
     } else if (vartype == KIND_FLOAT16 ) {
         vartype = KIND_INT;
-    } else if ( vartype == KIND_LONGLONG ) {
-        vartype = KIND_LONG; /// TODO
+    } else if (vartype == KIND_LONGLONG) {
+        vartype = KIND_NONE;
     }
-
     modstk(0, save, NO,YES);
 
     if (callee_cleanup) {
@@ -1413,6 +1427,16 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     if ( (currfn->flags & CRITICAL) == CRITICAL || incritical) {
         gen_critical_leave();
     }
+
+    if ( save == KIND_LONGLONG ) {
+        pop("de");
+        pop("hl");
+        push("hl");
+        push("de");
+        callrts("l_i64_copy");
+    }
+
+
     if (type)
         setcond(type);
     ol("ret"); nl(); nl(); /* and exit function */
@@ -5128,6 +5152,24 @@ void zconvert_to_double(Kind from, Kind to, unsigned char isunsigned)
    }
    if ( isunsigned ) dcallrts("uint2f",to);
    else dcallrts("sint2f",to);
+}
+
+void zconvert_to_llong(unsigned char tounsigned, Kind from, unsigned char fromunsigned) {
+    if (tounsigned == NO && fromunsigned == NO) {
+        if (from == KIND_LONG) callrts("l_i64_slong2i64");
+        else callrts("l_i64_sint2i64");
+    } else {
+        if (from == KIND_LONG) callrts("l_i64_ulong2i64");
+        else callrts("l_i64_uint2i64");
+    }
+}
+
+void zconvert_to_long(unsigned char tounsigned, Kind from, unsigned char fromunsigned) {
+    if (tounsigned == NO && fromunsigned == NO) {
+        gen_conv_sint2long();
+    } else {
+        gen_conv_uint2long();
+    }
 }
 
 void zwiden_stack_to_long(LVALUE *lval)

@@ -269,6 +269,8 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
 {
     if (t2 == KIND_CARRY) {
         gen_conv_carry2int();
+        isunsigned2 = NO;
+        t2 = KIND_INT;
     }
 
     if (kind_is_floating(t1)) {
@@ -279,25 +281,26 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
             return;
         }
     }
+
+    if (t1 == KIND_LONGLONG) {
+        if (t2 != KIND_LONGLONG ) {
+            zconvert_to_llong(isunsigned1, t2, isunsigned2);
+        }
+        return;
+    }
+
     /* t2 =source, t1=dest */
     /* int to long, if signed, do sign, if not ld de,0 */
     /* Check to see if constant or not... */
     if (t1 == KIND_LONG) {
         if (t2 != KIND_LONG ) {
-            if (isunsigned2 == NO && isunsigned1 == NO && t2 != KIND_CARRY) {
-                gen_conv_sint2long();
-            } else
-                gen_conv_uint2long();
+            zconvert_to_long(isunsigned1, t2, isunsigned2);
         }
         return;
     }
 
-    if (t1 == KIND_LONGLONG) {
-        if (t2 != KIND_LONGLONG ) {
-            ol("TODO: force to i64");
-        }
-        return;
-    }
+
+
 
     /* Converting between pointer types..far and near */
     if (t1 == KIND_CPTR && t2 == KIND_INT)

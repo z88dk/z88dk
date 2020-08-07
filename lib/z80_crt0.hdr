@@ -336,7 +336,11 @@
 	EXTERN	l_i64_com
 	EXTERN	l_i64_case
 	EXTERN	l_i64_dpush2
-	; TODO: Conversion routines
+	EXTERN	l_i64_copy
+	EXTERN	l_i64_slong2i64
+	EXTERN	l_i64_ulong2i64
+	EXTERN	l_i64_sint2i64
+	EXTERN	l_i64_uint2i64
 
 
 ;-------------------

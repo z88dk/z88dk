@@ -136,11 +136,13 @@ z80/sccz80/l_i64_ne
 z80/sccz80/l_i64_neg
 z80/sccz80/l_i64_or
 z80/sccz80/l_i64_push
+z80/sccz80/l_i64_sint2i64
 z80/sccz80/l_i64_store
 z80/sccz80/l_i64_sub
 z80/sccz80/l_i64_ucmp
 z80/sccz80/l_i64_uge
 z80/sccz80/l_i64_ugt
+z80/sccz80/l_i64_uint2i64
 z80/sccz80/l_i64_ule
 z80/sccz80/l_i64_ult
 z80/sccz80/l_i64_xor
