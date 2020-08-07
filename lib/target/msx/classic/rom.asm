@@ -148,25 +148,24 @@ banked_call:
         ld      d,(hl)
         inc     hl
         ld      a,(hl)          ; ...and page
-IF MAPPER_ADDRESS_A000 != 0
+  IF MAPPER_ADDRESS_A000 != 0
 	add	a		; For 8kb pages we have to double - our
 				; model is for 16kb pages
-ENDIF
+  ENDIF
 	inc	hl
         inc     hl              ; Yes this should be here
         push    hl              ; Push the real return address
         ld      (__current_bank),a
 	ld	(MAPPER_ADDRESS_8000),a
-IF MAPPER_ADDRESS_A000 != 0
+  IF MAPPER_ADDRESS_A000 != 0
 	inc	a
 	ld	(MAPPER_ADDRESS_A000),a
-ENDIF
+  ENDIF
         ld      hl,banked_ret  ; Push the fake return address
         push    hl
         ld      l,e
         ld      h,d
         jp      (hl)
-ENDIF
 
 banked_ret:
         pop     bc              ; Get the return address
@@ -179,6 +178,7 @@ IF MAPPER_ADDRESS_A000 != 0
 ENDIF
         push    bc
         ret
+ENDIF
 
 
 IFNDEF CRT_ORG_BSS
