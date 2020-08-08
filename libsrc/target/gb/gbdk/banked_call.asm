@@ -3,7 +3,6 @@
 
 	SECTION	code_driver
 	PUBLIC	banked_call
-	PUBLIC	banked_ret
 
 
         INCLUDE "target/gb/def/gb_globals.def"
@@ -33,13 +32,9 @@ banked_call:
         push    hl              ; Push the real return address
         ld      (__current_bank),a
         ld      (MBC1_ROM_PAGE),a      ; Perform the switch
-        ld      hl,banked_ret  ; Push the fake return address
-        push    hl
-        ld      l,e
-        ld      h,d
-        jp      (hl)
-
-banked_ret:
+	ld	l,e
+	ld	h,d
+	rst	$20
         pop     bc              ; Get the return address
         pop     af              ; Pop the old bank
         ld      (MBC1_ROM_PAGE),a
