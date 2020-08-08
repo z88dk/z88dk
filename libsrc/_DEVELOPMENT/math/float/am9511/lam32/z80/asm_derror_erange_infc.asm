@@ -1,0 +1,12 @@
+
+SECTION code_clib
+SECTION code_fp_am9511
+
+PUBLIC derror_erange_infc, derror_erange_pinfc, derror_erange_minfc
+
+EXTERN asm_am9511_derror_erange_infc, asm_am9511_derror_erange_pinfc, asm_am9511_derror_erange_ninfc
+
+defc derror_erange_infc  = asm_am9511_derror_erange_infc
+defc derror_erange_pinfc = asm_am9511_derror_erange_pinfc
+defc derror_erange_minfc = asm_am9511_derror_erange_ninfc
+

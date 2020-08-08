@@ -6,7 +6,7 @@ PUBLIC asm_am9511_nan_b
 
 EXTERN asm_am9511_derror_einval_zc
 
-asm_am9511_nan_b:
+.asm_am9511_nan_b
 
     ; strtod() helper function
     ; return nan(...) given pointer to buffer at '('

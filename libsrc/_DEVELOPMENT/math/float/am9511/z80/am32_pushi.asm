@@ -26,7 +26,7 @@ PUBLIC asm_am9511_pushi_fastcall
 .asm_am9511_pushi
 
     ; float primitive
-    ; push a long into Am9511 stack.
+    ; push an integer into Am9511 stack.
     ;
     ; enter : stack = integer, ret1, ret0
     ;       :    hl = pointer to integer
@@ -50,7 +50,7 @@ PUBLIC asm_am9511_pushi_fastcall
 .asm_am9511_pushi_fastcall
 
     ; float primitive
-    ; push a long into Am9511 stack.
+    ; push an integer into Am9511 stack.
     ;
     ; enter : stack = ret1, ret0
     ;       :    hl = integer

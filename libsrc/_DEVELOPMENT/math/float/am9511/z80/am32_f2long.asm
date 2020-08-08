@@ -27,7 +27,7 @@ PUBLIC asm_am9511_f2slong
 PUBLIC asm_am9511_f2ulong
 
 
-; Convert floating point number to long
+; Convert floating point number to int
 asm_am9511_f2sint:
 asm_am9511_f2uint:
     ld a,d                      ;Holds sign + 7bits of exponent
@@ -36,7 +36,7 @@ asm_am9511_f2uint:
     and a
     jp Z,asm_am9511_zero        ;exponent was 0, return 0
 
-    cp $7e + 32
+    cp $7e + 16
     jp NC,asm_am9511_max        ;number too large
 
     rrc  e                      ; e register is rotated by bit, rotate back
@@ -49,6 +49,7 @@ asm_am9511_f2uint:
     jp asm_am9511_popi
 
 
+; Convert floating point number to long
 asm_am9511_f2slong:
 asm_am9511_f2ulong:
     ld a,d                      ;Holds sign + 7bits of exponent

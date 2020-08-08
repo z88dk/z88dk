@@ -52,11 +52,11 @@ PUBLIC asm_am9511_pushf_fastcall
     inc hl
     ld a,(hl)                   ; get exponent to a
     rl a                        ; get all exponent to a
-    jr Z,zero                   ; check for zero
+    jr Z,asm_am9511_zero        ; check for zero
     cp 127+63                   ; check for overflow
-    jr NC,max
+    jr NC,asm_am9511_max
     cp 127-64                   ; check for underflow
-    jr C,zero
+    jr C,asm_am9511_zero
     sub 127-1                   ; bias including shift binary point
 
     dec hl
@@ -70,7 +70,7 @@ PUBLIC asm_am9511_pushf_fastcall
     out (c),a                   ; load exponent into APU
     ret
 
-.max
+.asm_am9511_max
     dec hl
     bit 7,(hl)                  ; set mantissa MSB
     outi                        ; load mantissa MSB into APU
@@ -82,7 +82,7 @@ PUBLIC asm_am9511_pushf_fastcall
     out (c),a                   ; load maximum exponent into APU
     ret
 
-.zero
+.asm_am9511_zero
     in a,(c)
     in a,(c)
     xor a                       ; confirm we have a zero
@@ -110,11 +110,11 @@ PUBLIC asm_am9511_pushf_fastcall
     ld a,d                      ; capture exponent
     sla e
     rl a                        ; position exponent in a
-    jr Z,asm_am9511_zero      ; check for zero
+    jr Z,asm_am9511_zero_f      ; check for zero
     cp 127+63                   ; check for overflow
-    jr NC,asm_am9511_max
+    jr NC,asm_am9511_max_f
     cp 127-64                   ; check for underflow
-    jr C,asm_am9511_zero
+    jr C,asm_am9511_zero_f
     sub 127-1                   ; bias including shift binary point
 
     rla                         ; position sign
@@ -137,13 +137,13 @@ PUBLIC asm_am9511_pushf_fastcall
     out (c),d
     ret
 
-.asm_am9511_zero
+.asm_am9511_zero_f
     ld de,0                     ; no signed zero available
     ld h,d
     ld l,e
     jr pushf_fastcall
 
-.asm_am9511_max                 ; floating max value of sign d in dehl
+.asm_am9511_max_f                 ; floating max value of sign d in dehl
     ld a,d
     and 080h                    ; isolate sign
     or 03fh                     ; max exponent

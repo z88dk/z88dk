@@ -13,7 +13,7 @@ SECTION code_fp_am9511
 
 PUBLIC asm_am9511_fpclassify
 
-asm_am9511_fpclassify:
+.asm_am9511_fpclassify
     ; enter : dehl  = float x
     ;
     ; exit  : dehl  = float x
@@ -60,11 +60,11 @@ asm_am9511_fpclassify:
     dec a       ;It's NaN
     ret
 
-number:
+.number
     xor    a
     ret
 
-zero:
+.zero
     inc    a
     ret
 
