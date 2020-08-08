@@ -22,6 +22,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
 
 #include "ticks.h"
+#define _USE_MATH_DEFINES		// needed in MSC to get M_E et. all.
 #include <math.h>
 
 /* From my JSep emulator:
