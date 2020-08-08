@@ -126,7 +126,7 @@ int operator_is_commutative(void (*oper)(LVALUE *lval))
  * binary plunge to lower level (not for +/-)
  */
 void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval),
-             void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t constval),
+             void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int64_t constval),
              int (*dconstoper)(LVALUE *lval, double constval, int isrhs))
 {
     char *before, *start;
@@ -197,8 +197,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if ( !operator_is_commutative(oper) ) {
                 gen_swap_float(lval->val_type);
             }
-        } else if (lval->val_type == KIND_LONG) {
-            widenintegers(lval, lval2);
+        } else if (lval->val_type == KIND_LONG) { // TODO: LONGLONG + don't widen for some operators
+            widenintegers(lval, lval2); 
             lval2->val_type = KIND_LONG;
             lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;
             vlongconst_tostack(lval->const_val);
@@ -342,6 +342,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     // we could choose not to do this
     widenintegers(lval, lval2);
 
+
     if ( lval->ptr_type || lval2->ptr_type ) {
         if ( !operator_is_comparison(oper)) {
             errorfmt("Invalid pointer arithmetic",1);
@@ -391,13 +392,13 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         // Handle constant on RHS
         if ( lval2->is_const && kind_is_integer(lval->val_type) ) {
             doconstoper = 1;
-            const_val = (int32_t)(int64_t)lval2->const_val;
+            const_val = (int64_t)lval2->const_val;
             clearstage(before, 0);
             force(rhs_val_type, lhs_val_type, lval->ltype->isunsigned, lval2->ltype->isunsigned, 1);
         } else if ( lval1_wasconst && kind_is_integer(lval2->val_type) ) {
             /* Handle the case that the constant was on the left */
             doconstoper = 1;
-            const_val = (int32_t)(int64_t)lval->const_val;
+            const_val = (int64_t)lval->const_val;
             clearstage(before_constlval, 0);
             force(lhs_val_type, rhs_val_type, lval2->ltype->isunsigned, lval->ltype->isunsigned,1);
         }

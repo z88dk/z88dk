@@ -301,6 +301,7 @@
 ; Routines for handling 64 bit integers for sccz80
 ;--------------------------------------------------
 
+        EXTERN  __i64_acc
 	EXTERN	l_i64_load
 	EXTERN	l_i64_store
 	EXTERN	l_i64_push
@@ -315,8 +316,11 @@
 	EXTERN	l_i64_xor
 	EXTERN	l_i64_and
 	EXTERN	l_i64_asr_u
+	EXTERN	l_i64_asr_uo
 	EXTERN	l_i64_asr
+	EXTERN	l_i64_asro
 	EXTERN	l_i64_asl
+	EXTERN	l_i64_aslo
 	EXTERN	l_i64_inc
 	EXTERN	l_i64_dec
 	EXTERN	l_i64_eq0

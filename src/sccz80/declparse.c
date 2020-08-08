@@ -202,7 +202,7 @@ void free_type(void *data)
     FREENULL(type);
 }
 
-Type *make_constant(const char *name, int32_t value)
+Type *make_constant(const char *name, int64_t value)
 {
     SYMBOL *ptr;
     Type *type = CALLOC(1,sizeof(*type));

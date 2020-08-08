@@ -12,7 +12,7 @@
 static int        heir1a(LVALUE *lval);
 static int        heir2a(LVALUE *lval);
 static int        heir2b(LVALUE *lval);
-static int        heir234(LVALUE *lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t value));
+static int        heir234(LVALUE *lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int64_t value));
 static int        heir2(LVALUE *lval);
 static int        heir3(LVALUE *lval);
 static int        heir4(LVALUE *lval);
@@ -44,7 +44,7 @@ int heir1(LVALUE* lval)
     LVALUE lval2={0}, lval3={0};
     void (*oper)(LVALUE *) = NULL;
     void  (*doper)(LVALUE *lval) = NULL;
-    void (*constoper)(LVALUE *lval, int32_t constvalue) = NULL;
+    void (*constoper)(LVALUE *lval, int64_t constvalue) = NULL;
     int k;
 
     setstage(&before, &start);
@@ -274,7 +274,7 @@ int heir2b(LVALUE* lval)
     return skim("&&", testjump, jumpnc, 0, 1, heir2, lval);
 }
 
-int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int32_t value))
+int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int64_t value))
 {
     LVALUE lval2={0};
     int k;
@@ -514,7 +514,7 @@ int heira(LVALUE *lval)
             rvalue(lval);
         intcheck(lval, lval);
         com(lval);
-        lval->const_val = (int32_t)~(uint32_t)lval->const_val;
+        lval->const_val = (int64_t)~(uint64_t)lval->const_val;
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('!')) {

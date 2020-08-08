@@ -237,7 +237,7 @@ typedef struct switchtab_s SW_TAB;
 
 struct switchtab_s {
         int label ;             /* label for start of case */
-        int32_t value ;             /* value associated with case */
+        int64_t value ;             /* value associated with case */
 } ;
 
 

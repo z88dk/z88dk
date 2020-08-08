@@ -1042,6 +1042,8 @@ void load_llong_into_acc(zdouble val)
     elem_t *elem;
 
     v = val;
+
+
     l = v & 0xffffffff;
     buf[0] = (l % 65536) % 256;
     buf[1] = (l % 65536) / 256;

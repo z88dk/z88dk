@@ -187,7 +187,7 @@ zdouble calc(
             right = 0;
         }
         if ( is16bit ) return ((int16_t)left >> (int16_t)right);
-        else return ((int32_t)left >> (int)right);
+        else return ((int64_t)left >> (int)right);
     } else
         return (CalcStand(left_kind, left, oper, right));
 }
@@ -216,7 +216,7 @@ zdouble calcun(
             warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
             right = 0;
         }
-        return ((uint32_t)left >> (int)right);
+        return ((uint64_t)left >> (int)right);
     } else
         return (CalcStand(left_kind, left, oper, right));
 }
@@ -245,7 +245,7 @@ zdouble CalcStand(
             warningfmt("limited-range", "Left shifting by more than size of object, changed to zero");
             right = 0;
         }
-        return ((unsigned int)left << (unsigned int)right);
+        return (zdouble)((uint64_t)left << (unsigned int)right);
     } else if (oper == zeq)
         return (left == right);
     else if (oper == zne)
