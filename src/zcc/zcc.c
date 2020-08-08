@@ -3093,15 +3093,28 @@ void parse_option(char *option)
 }
 
 
+/* check for "-lxxx", not "-l" */
+static int at_link_arg(const char* ptr) 
+{
+	if (strncmp(ptr, "-l", 2) == 0 && ptr[2] != '\0' && !isspace(ptr[2]))
+		return 1;
+	else
+		return 0;
+}
+
 /* Check link arguments (-l) to -i for z80asm */
 void linkargs_mangle(char *linkargs)
 {
     char           *ptr = linkargs;
 
     if (IS_ASM(ASM_Z80ASM)) {
-        if (strncmp(linkargs, "-l", 2) == 0) linkargs[1] = 'i';
-        while ((ptr = strstr(linkargs, " -l")) != NULL) {
-            ptr[2] = 'i';
+		ptr = linkargs;
+		if (at_link_arg(ptr))
+			ptr[1] = 'i';
+        while ((ptr = strstr(ptr, " -l")) != NULL) {
+			ptr++;
+			if (at_link_arg(ptr))
+				ptr[2] = 'i';
         }
     }
 }
