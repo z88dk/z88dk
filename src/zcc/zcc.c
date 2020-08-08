@@ -3114,7 +3114,7 @@ void linkargs_mangle(char *linkargs)
         while ((ptr = strstr(ptr, " -l")) != NULL) {
 			ptr++;
 			if (at_link_arg(ptr))
-				ptr[2] = 'i';
+				ptr[1] = 'i';
         }
     }
 }
