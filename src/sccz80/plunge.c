@@ -364,7 +364,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     if ( constoper != NULL && 
         ( oper == mult || oper == zor || oper == zand || oper == zxor || lval2->is_const) ) {
         int doconstoper = 0;
-        int32_t const_val;
+        int64_t const_val;
 
         /* Check for comparisions being out of range, if so, return constant */
         if ( lval2->is_const && operator_is_comparison(oper)) {

@@ -120,6 +120,147 @@ void test_lshift32_var(void)
  //    Assert( val << v == (1L << 33) & 0xffffffff, "<<33"); // Undefined, but it should match
 }
 
+
+#ifndef __8080__
+  #ifndef __GBZ80__
+void test_lshift64_var(void)
+{
+     long long val = 1;
+     int  v = 0;
+
+     // RHS is folded by compiler
+     Assert( val << v == 1LL << 0, "<<0");
+     ++v;
+     Assert( val << v == 1LL << 1, "<<1");
+     ++v;
+     Assert( val << v == 1LL << 2, "<<2");
+     ++v;
+     Assert( val << v == 1LL << 3, "<<3");
+     ++v;
+     Assert( val << v == 1LL << 4, "<<4");
+     ++v;
+     Assert( val << v == 1LL << 5, "<<5");
+     ++v;
+     Assert( val << v == 1LL << 6, "<<6");
+     ++v;
+     Assert( val << v == 1LL << 7, "<<7");
+     ++v;
+     Assert( val << v == 1LL << 8, "<<8");
+     ++v;
+     Assert( val << v == 1LL << 9, "<<9");
+     ++v;
+     Assert( val << v == 1LL << 10, "<<10");
+     ++v;
+     Assert( val << v == 1LL << 11, "<<11");
+     ++v;
+     Assert( val << v == 1LL << 12, "<<12");
+     ++v;
+     Assert( val << v == 1LL << 13, "<<13");
+     ++v;
+     Assert( val << v == 1LL << 14, "<<14");
+     ++v;
+     Assert( val << v == 1LL << 15, "<<15");
+     ++v;
+     Assert( val << v == 1LL << 16, "<<16");
+     ++v;
+     Assert( val << v == 1LL << 17, "<<17");
+     ++v;
+     Assert( val << v == 1LL << 18, "<<18");
+     ++v;
+     Assert( val << v == 1LL << 19, "<<19");
+     ++v;
+     Assert( val << v == 1LL << 20, "<<20");
+     ++v;
+     Assert( val << v == 1LL << 21, "<<21");
+     ++v;
+     Assert( val << v == 1LL << 22, "<<22");
+     ++v;
+     Assert( val << v == 1LL << 23, "<<23");
+     ++v;
+     Assert( val << v == 1LL << 24, "<<24");
+     ++v;
+     Assert( val << v == 1LL << 25, "<<25");
+     ++v;
+     Assert( val << v == 1LL << 26, "<<26");
+     ++v;
+     Assert( val << v == 1LL << 27, "<<27");
+     ++v;
+     Assert( val << v == 1LL << 28, "<<28");
+     ++v;
+     Assert( val << v == 1LL << 29, "<<29");
+     ++v;
+     Assert( val << v == 1LL << 30, "<<30");
+     ++v;
+     Assert( val << v == 1LL << 31, "<<31");
+     ++v;
+     Assert( val << v == 1LL << 32, "<<32");
+     ++v;
+     Assert( val << v == 1LL << 33, "<<33");
+     ++v;
+     Assert( val << v == 1LL << 34, "<<34");
+     ++v;
+     Assert( val << v == 1LL << 35, "<<35");
+     ++v;
+     Assert( val << v == 1LL << 36, "<<36");
+     ++v;
+     Assert( val << v == 1LL << 37, "<<37");
+     ++v;
+     Assert( val << v == 1LL << 38, "<<38");
+     ++v;
+     Assert( val << v == 1LL << 39, "<<39");
+     ++v;
+     Assert( val << v == 1LL << 40, "<<40");
+     ++v;
+     Assert( val << v == 1LL << 41, "<<41");
+     ++v;
+     Assert( val << v == 1LL << 42, "<<42");
+     ++v;
+     Assert( val << v == 1LL << 43, "<<43");
+     ++v;
+     Assert( val << v == 1LL << 44, "<<44");
+     ++v;
+     Assert( val << v == 1LL << 45, "<<45");
+     ++v;
+     Assert( val << v == 1LL << 46, "<<46");
+     ++v;
+     Assert( val << v == 1LL << 47, "<<47");
+     ++v;
+     Assert( val << v == 1LL << 48, "<<48");
+     ++v;
+     Assert( val << v == 1LL << 49, "<<49");
+     ++v;
+     Assert( val << v == 1LL << 50, "<<50");
+     ++v;
+     Assert( val << v == 1LL << 51, "<<51");
+     ++v;
+     Assert( val << v == 1LL << 52, "<<52");
+     ++v;
+     Assert( val << v == 1LL << 53, "<<53");
+     ++v;
+     Assert( val << v == 1LL << 54, "<<54");
+     ++v;
+     Assert( val << v == 1LL << 55, "<<55");
+     ++v;
+     Assert( val << v == 1LL << 56, "<<56");
+     ++v;
+     Assert( val << v == 1LL << 57, "<<57");
+     ++v;
+     Assert( val << v == 1LL << 58, "<<58");
+     ++v;
+     Assert( val << v == 1LL << 59, "<<59");
+     ++v;
+     Assert( val << v == 1LL << 60, "<<60");
+     ++v;
+     Assert( val << v == 1LL << 61, "<<61");
+     ++v;
+     Assert( val << v == 1LL << 62, "<<62");
+     ++v;
+     Assert( val << v == 1LL << 63, "<<63");    
+}
+  #endif
+#endif
+
+
 void test_lshift16_const(void)
 {
      int val = 1;
@@ -189,7 +330,11 @@ void test_lshift32_const(void)
 int suite_lshift()
 {
     suite_setup("Left shift Tests");
-
+#ifndef __8080__
+  #ifndef __GBZ80__
+    suite_add_test(test_lshift64_var);
+  #endif
+#endif
     suite_add_test(test_lshift32_const);
     suite_add_test(test_lshift32_var);
     suite_add_test(test_lshift16_const);
