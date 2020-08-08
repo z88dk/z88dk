@@ -17,6 +17,6 @@ EXTERN asm_am9511_hypot_callee
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-DEFC  asm_hypotf = asm_am9511_hypot_callee  ; enter stack = am32_float left
-                                            ;        DEHL = am32_float right
-                                            ; return DEHL = am32_float
+DEFC  asm_hypotf = asm_am9511_hypot_callee  ; enter stack = IEEE-754 float left
+                                            ;        DEHL = IEEE-754 float right
+                                            ; return DEHL = IEEE-754 float

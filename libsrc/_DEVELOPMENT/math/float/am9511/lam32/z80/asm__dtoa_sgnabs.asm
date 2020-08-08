@@ -15,6 +15,6 @@ EXTERN asm_am9511__dtoa_sgnabs
 
 
 DEFC  __dtoa_sgnabs = asm_am9511__dtoa_sgnabs   ; enter stack  = ret
-                                                ;        DEHL' = am32_float
-                                                ; return DEHL' = am32_float
+                                                ;        DEHL' = IEEE-754 float
+                                                ; return DEHL' = IEEE-754 float
                                                 ;           A  = sign
