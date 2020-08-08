@@ -110,13 +110,9 @@ IF MAPPER_ADDRESS_A000 != 0
 	inc	a
 	ld	(MAPPER_ADDRESS_A000),a
 ENDIF
-        ld      hl,banked_ret  ; Push the fake return address
-        push    hl
         ld      l,e
         ld      h,d
-        jp      (hl)
-
-banked_ret:
+	call	l_dcal		; jp(hl)
         pop     bc              ; Get the return address
         pop     af              ; Pop the old bank
         ld      (__current_bank),a
