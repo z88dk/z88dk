@@ -127,6 +127,7 @@ z80/sccz80/l_i64_ge
 z80/sccz80/l_i64_gt
 z80/sccz80/l_i64_inc
 z80/sccz80/l_i64_le
+z80/sccz80/l_i64_lneg
 z80/sccz80/l_i64_load
 z80/sccz80/l_i64_lt
 z80/sccz80/l_i64_mod
