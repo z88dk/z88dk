@@ -3117,12 +3117,14 @@ void asr_const(LVALUE *lval, int64_t value)
         }
     } else if ( lval->val_type == KIND_LONGLONG ) {
         if ( value >= 64 ) warningfmt("overflow","Left shifting by more than the size of the object");
+        llpush();
         loada(value & 63);
         if (ulvalue(lval)) {
             callrts("l_i64_asr_uo");
         } else {
             callrts("l_i64_asro");
         }
+        Zsp += 8;
     } else {
         if ( value == 1 && IS_8085() && !ulvalue(lval) ) {
             ol("sra\thl");
@@ -3398,8 +3400,10 @@ void asl_const(LVALUE *lval, int64_t value)
         }
     } else if ( lval->val_type == KIND_LONGLONG ) {
         if ( value >= 64 ) warningfmt("overflow","Left shifting by more than the size of the object");
+        llpush();
         loada(value & 63);
         callrts("l_i64_aslo");
+        Zsp += 8;
     } else {
         asl_16bit_const(lval, value);
     }
@@ -4032,7 +4036,7 @@ void zlt_const(LVALUE *lval, int64_t value)
             }
         }
     } else if ( lval->val_type == KIND_LONGLONG) {
-        llpush();  // 11 bytes
+        llpush();
         vllongconst(value);
         zlt(lval);
     } else {
@@ -4147,7 +4151,7 @@ void zle_const(LVALUE *lval, int64_t value)
         ol("ccf");
         set_carry(lval);
     } else if ( lval->val_type == KIND_LONGLONG) {
-        llpush();  // 11 bytes
+        llpush();
         vllongconst(value);
         zle(lval);
     } else {
@@ -4285,7 +4289,7 @@ void zgt_const(LVALUE *lval, int64_t value)
         ol("scf");
         set_carry(lval);
     } else if ( lval->val_type == KIND_LONGLONG) {
-        llpush();  // 11 bytes
+        llpush();
         vllongconst(value);
         zgt(lval);
     } else {
@@ -4398,7 +4402,7 @@ void zge_const(LVALUE *lval, int64_t value)
             ol("ccf");
         }
     } else if ( lval->val_type == KIND_LONGLONG) {
-        llpush();  // 11 bytes
+        llpush();
         vllongconst(value);
         zge(lval);
     } else {
