@@ -17,6 +17,6 @@ EXTERN asm_am9511_add_callee
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-DEFC  asm_addf = asm_am9511_add_callee  ; enter stack = am9511_float left
-                                        ;        DEHL = am9511_float right
-                                        ; return DEHL = am9511_float
+DEFC  asm_addf = asm_am9511_add_callee  ; enter stack = IEEE-754 float left
+                                        ;        DEHL = IEEE-754 float right
+                                        ; return DEHL = IEEE-754 float
