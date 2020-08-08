@@ -971,8 +971,8 @@ int main(int argc, char **argv)
 
     if (lston) {
         /* list on so add list options to assembler and linker */
-        BuildOptions(&asmargs, "--list ");
-        BuildOptions(&linkargs, "--list ");
+        BuildOptions(&asmargs, "-l ");
+        BuildOptions(&linkargs, "-l ");
     }
 
     if (c_zorg != -1) {
