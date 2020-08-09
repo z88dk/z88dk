@@ -408,7 +408,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             doconstoper = 1;
             const_val = (int64_t)lval2->const_val;
             clearstage(before, 0);
-            // The constant on the right doesn't need to have its type forced since it's not loaded
+            // Promote lhs if it's a smaller integer type than the constant
+            if ( lhs_val_type < rhs_val_type) {
+                force(rhs_val_type, lhs_val_type, lval->ltype->isunsigned, lval2->ltype->isunsigned,1);
+            }
         } else if ( lval1_wasconst && kind_is_integer(lval2->val_type) ) {
             /* Handle the case that the constant was on the left */
             doconstoper = 1;
