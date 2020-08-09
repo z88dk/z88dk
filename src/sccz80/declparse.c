@@ -1708,6 +1708,10 @@ static void declfunc(Type *functype, enum storage_type storage)
     if ( (functype->flags & SMALLC) == SMALLC ) {
         int i;
 
+        if (functype->return_type->kind == KIND_LONGLONG) {
+            outfmt("; longlong stuffed pointer at sp+2 size(2)\n");
+        }
+
         for ( i = array_len(functype->parameters) - 1; i >= 0; i-- ) {
             SYMBOL     *ptr;
             UT_string  *str;            
@@ -1724,7 +1728,7 @@ static void declfunc(Type *functype, enum storage_type storage)
             ptr->ctype = ptype;
             ptr->offset.i = where;
             type_describe(ptype, str);
-            outfmt("; parameter '%s' at %d size(%d)\n",utstring_body(str),where, ptype->size);
+            outfmt("; parameter '%s' at sp+%d size(%d)\n",utstring_body(str),where, ptype->size);
             utstring_free(str);
             ptr->isassigned = 1;
             where += get_parameter_size(functype,ptype);
@@ -1786,6 +1790,8 @@ static void declfunc(Type *functype, enum storage_type storage)
             gen_push_float(fastarg->kind);     
         else if ( fastarg->size == 4 || fastarg->size == 3)
             lpush();
+        else if ( fastarg->kind == KIND_LONGLONG ) 
+            llpush();
         else
             adjust = 0;
 
@@ -1794,8 +1800,8 @@ static void declfunc(Type *functype, enum storage_type storage)
             int     i;
 
             if ( ptr ) {
-                ptr->offset.i -= (get_parameter_size(functype,fastarg) + 2);
-                where = 2;
+                ptr->offset.i = -get_parameter_size(functype,fastarg); 
+                where += 2;
             } else {
                 errorfmt("Something has gone very wrong, can't find parameter <%s>\n",1,fastarg->name);
             }

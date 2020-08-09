@@ -60,7 +60,6 @@ static void fivereg(void);
 static void sixreg(void);
 static void loada(int n);
 static void setcond(int val);
-static void llpush();
 
 /*
  * Data for this module
@@ -1098,8 +1097,8 @@ void zpop(void)
 void gen_call(int arg_count, const char *name, SYMBOL *sym)
 {
     if (sym->ctype->return_type->kind == KIND_LONGLONG) {
-        ol("ld\thl,__i64_acc");
-        push("hl");
+        ol("ld\tbc,__i64_acc");
+        push("bc");
     }
     if (arg_count != -1 ) {
         loadargc(arg_count);
@@ -1110,8 +1109,8 @@ void gen_call(int arg_count, const char *name, SYMBOL *sym)
 void gen_shortcall(Type *functype, int rst, int value) 
 {
     if (functype->return_type->kind == KIND_LONGLONG) {
-        ol("ld\thl,__i64_acc");
-        push("hl");
+        ol("ld\tbc,__i64_acc");
+        push("bc");
     }
     outfmt("\trst\t%d\n",rst);
     outfmt("\t%s\t%d\n", value < 0x100 ? "defb" : "defw", value);
@@ -1120,8 +1119,8 @@ void gen_shortcall(Type *functype, int rst, int value)
 void gen_bankedcall(SYMBOL *sym)
 {
     if (sym->ctype->return_type->kind == KIND_LONGLONG) {
-        ol("ld\thl,__i64_acc");
-        push("hl");
+        ol("ld\tbc,__i64_acc");
+        push("bc");
     }
     ol("call\tbanked_call");
     ot("defq\t"); outname(sym->name, dopref(sym)); nl();
@@ -1386,11 +1385,12 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     } else if (vartype == KIND_LONGLONG) {
         vartype = KIND_NONE;
     }
-    modstk(0, save, NO,YES);
+    modstk(0, vartype, NO,YES);
 
     if (callee_cleanup) {
         int bcused = 0;
 
+        // TODO: LONGLONG stuffed pointer
 
         savesp = Zsp;
         Zsp = -stackargs;
@@ -1408,7 +1408,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
         if ( Zsp > 0 ) {
             errorfmt("Internal error: Cannot cleanup function by lowering sp: Zsp=%d",1,Zsp);
         }
-        modstk(0, save, NO, !bcused);
+        modstk(0, vartype, NO, !bcused);
 
         if ( bcused ) {
             ol("push\tbc");
@@ -1428,6 +1428,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     if ( save == KIND_LONGLONG ) {
         pop("de");
         pop("hl");
+        push("hl");
         push("de");
         callrts("l_i64_copy");
     }
@@ -1554,11 +1555,11 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
 
     // We're on a z80 or other platform with alt registers
     if ( saveaf )  ol("ex\taf,af");
-    if ( ( save != KIND_NONE && save != KIND_DOUBLE)) ol("exx");
+    if ( ( save != KIND_NONE && save != KIND_DOUBLE && save != KIND_LONGLONG)) ol("exx");
     vconst(k);
     ol("add\thl,sp");
     ol("ld\tsp,hl");
-    if ( ( save != KIND_NONE && save != KIND_DOUBLE)) ol("exx");
+    if ( ( save != KIND_NONE && save != KIND_DOUBLE && save != KIND_LONGLONG)) ol("exx");
     if ( saveaf )  ol("ex\taf,af");
 
     return newsp;
@@ -1957,9 +1958,16 @@ static int add_to_high_word(int64_t value)
 void zadd_const(LVALUE *lval, int64_t value)
 {
     if ( lval->val_type == KIND_LONGLONG ) {
-        llpush();       
-        vllongconst(value);
-        zadd(lval);
+        // TODO: If 2 <= value <= 255 then there's a libsrc call to add a
+        if ( value == 1 ) {
+            inc(lval);
+        } else if ( value == -1 ) {
+            inc(lval);
+        } else if ( value != 0 ) {
+            llpush();       
+            vllongconst(value);
+            zadd(lval);
+        }
         return;
     }
 
@@ -2171,10 +2179,22 @@ void mult(LVALUE* lval)
 void mult_const(LVALUE *lval, int64_t value)
 {
     if ( lval->val_type == KIND_LONGLONG ) {
-        llpush();       
-        vllongconst(value);
-        callrts("l_i64_mult");
-        Zsp += 8;
+        int c = 0;
+        int64_t p = value;
+        // Determine if it's a power of two:
+        while (((p & 1) == 0) && p > 1) { /* While x is even and > 1 */
+            c++;
+            p >>= 1;
+        }
+        if ( p == 1 ) {
+            loada(c);
+            callrts("l_i64_asl");
+        } else {           
+            llpush();       
+            vllongconst(value);
+            callrts("l_i64_mult");
+            Zsp += 8;
+        }
         return;
     } else {
         quikmult(lval->val_type, value, NO);

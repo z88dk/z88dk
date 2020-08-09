@@ -339,7 +339,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     } else {
         nargs += callstk(functype, nargs, fnptr_type->kind == KIND_CPTR, last_argument_size);
     }
-
+    if ( functype->return_type->kind == KIND_LONGLONG) {
+        nargs += 2;
+    }
     if (functype->flags & CALLEE ) {
         Zsp += nargs;
         // IF we called a far pointer and we had arguments, pop the address off the stack

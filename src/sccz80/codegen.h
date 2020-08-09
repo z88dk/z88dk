@@ -10,6 +10,7 @@ extern void put2tos(void);
 extern void immed(void);
 extern void immedlit(int lab,int offs);
 extern void lpush(void);
+extern void llpush(void);
 extern void zpush(void);
 
 
