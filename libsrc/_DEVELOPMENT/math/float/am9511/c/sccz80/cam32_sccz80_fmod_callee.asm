@@ -1,11 +1,11 @@
 
 SECTION code_fp_am9511
 
-PUBLIC asm_am9511_fmod_callee
+PUBLIC cam32_sccz80_fmod_callee
 
 EXTERN _am9511_fmod
 
-.asm_am9511_fmod_callee
+.cam32_sccz80_fmod_callee
     ; Entry:
     ; Stack: float left, float right, ret
     ; Reverse the stack
