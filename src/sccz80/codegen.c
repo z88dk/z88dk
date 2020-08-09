@@ -4611,6 +4611,25 @@ void vlongconst_tostack(zdouble val)
     Zsp -= 4;
 }
 
+void vllongconst_tostack(zdouble val)
+{
+    uint64_t v,l;
+
+    v = val;
+
+    l = (v >> 32) & 0xffffffff;
+    constbc(l / 65536);
+    push("bc");
+    constbc(l % 65536);
+    push("bc");
+
+    l = v & 0xffffffff;
+    constbc(l / 65536);
+    push("bc");
+    constbc(l % 65536);
+    push("bc");
+}
+
 
 /*
  * load constant into primary register
