@@ -1,9 +1,7 @@
-
-	MODULE	get_16bit_ap_parameter
-	SECTION	code_clib
-	PUBLIC	get_16bit_ap_parameter
-
-	EXTERN	__printf_issccz80
+    MODULE  get_16bit_ap_parameter
+    SECTION code_clib
+    PUBLIC  get_16bit_ap_parameter
+    EXTERN  __printf_issccz80
 
 
 ; Change the arguments pointer, the delta is always 2, but is it +/-ve?
@@ -13,28 +11,28 @@
 ; Uses:  ix
 get_16bit_ap_parameter:
 IF __CPU_GBZ80__
-	ld	a,(de)
-	ld	l,a
-	inc	de
-	ld	a,(de)
-	ld	h,a
+    ld      a,(de)
+    ld      l,a
+    inc     de
+    ld      a,(de)
+    ld      h,a
 ELSE
-        ex      de,hl
-        ld      e,(hl)
-        inc     hl
-        ld      d,(hl)
-        ex      de,hl           ;de=ap+1 hl=to print
+    ex      de,hl
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    ex      de,hl           ;de=ap+1 hl=to print
 ENDIF
 IF __CPU_INTEL__ | __CPU_GBZ80__
-	call	__printf_issccz80
+    call    __printf_issccz80
 ELSE
-        bit     0,(ix+6)        ;sccz80 flag
+    bit     0,(ix+6)        ;sccz80 flag
 ENDIF
-        jr      nz,change_ap_decrement
-        inc     de
-        ret
+    jr      nz,change_ap_decrement
+    inc     de
+    ret
 change_ap_decrement:
-        dec     de
-        dec     de
-        dec     de
-        ret
+    dec     de
+    dec     de
+    dec     de
+    ret
