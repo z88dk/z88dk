@@ -1,10 +1,8 @@
 
 
-SECTION code_fp_math32
-PUBLIC cm32_sccz80_log
+SECTION code_fp_am9511
+PUBLIC cam32_sccz80_log
 
-EXTERN cm32_sccz80_fsread1, _m32_logf
+EXTERN asm_am9511_log_fastcall
 
-cm32_sccz80_log:
-    call cm32_sccz80_fsread1
-    jp _m32_logf
+defc cam32_sccz80_log = asm_am9511_log_fastcall

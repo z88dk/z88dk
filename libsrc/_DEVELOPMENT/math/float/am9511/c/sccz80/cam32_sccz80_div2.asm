@@ -1,10 +1,10 @@
 
 
-SECTION code_fp_math32
-PUBLIC cm32_sccz80_fsdiv2
+SECTION code_fp_am9511
+PUBLIC cam32_sccz80_div2
 
-EXTERN cm32_sccz80_fsread1, m32_fsdiv2_fastcall
+EXTERN cam32_sccz80_read1, asm_am9511_div2_fastcall
 
-cm32_sccz80_fsdiv2:
-    call cm32_sccz80_fsread1
-    jp m32_fsdiv2_fastcall
+.cam32_sccz80_div2
+    call cam32_sccz80_read1
+    jp asm_am9511_div2_fastcall

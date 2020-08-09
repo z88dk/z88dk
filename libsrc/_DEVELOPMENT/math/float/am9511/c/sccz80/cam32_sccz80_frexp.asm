@@ -1,14 +1,13 @@
 
-SECTION code_fp_math32
+SECTION code_fp_am9511
 
-PUBLIC cm32_sccz80_frexp
+PUBLIC cam32_sccz80_frexp
 
-EXTERN m32_fsfrexp_callee
+EXTERN asm_am9511_frexp_callee
 
 ; float frexpf(float x, int16_t *pw2);
 
-.cm32_sccz80_frexp
-
+.cam32_sccz80_frexp
     ; Entry:
     ; Stack: float left, ptr right, ret
     ; Reverse the stack
@@ -20,7 +19,7 @@ EXTERN m32_fsfrexp_callee
     push bc                     ;ptr
     push de                     ;float
     push hl
-    call m32_fsfrexp_callee
+    call asm_am9511_frexp_callee
 
     pop af                      ;my return
     push af

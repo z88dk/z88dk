@@ -28,8 +28,8 @@ PUBLIC asm_am9511_f2ulong
 
 
 ; Convert floating point number to int
-asm_am9511_f2sint:
-asm_am9511_f2uint:
+.asm_am9511_f2sint
+.asm_am9511_f2uint
     ld a,d                      ;Holds sign + 7bits of exponent
     rlc e
     rla                         ;a = Exponent
@@ -50,8 +50,8 @@ asm_am9511_f2uint:
 
 
 ; Convert floating point number to long
-asm_am9511_f2slong:
-asm_am9511_f2ulong:
+.asm_am9511_f2slong
+.asm_am9511_f2ulong
     ld a,d                      ;Holds sign + 7bits of exponent
     rlc e
     rla                         ;a = Exponent

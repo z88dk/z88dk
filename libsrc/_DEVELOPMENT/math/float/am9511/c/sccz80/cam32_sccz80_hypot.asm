@@ -1,11 +1,11 @@
 
 
-SECTION code_fp_math32
+SECTION code_fp_am9511
 
-PUBLIC cm32_sccz80_fshypot
+PUBLIC cam32_sccz80_hypot
 
-EXTERN cm32_sccz80_switch_arg, cm32_sccz80_fsreadl
-EXTERN m32_fshypot
+EXTERN cam32_sccz80_switch_arg, cam32_sccz80_readl
+EXTERN asm_am9511_hypot
 
     ; find the hypotenuse of two sccz80 floats
     ;
@@ -15,9 +15,9 @@ EXTERN m32_fshypot
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-.cm32_sccz80_fshypot
-    call cm32_sccz80_switch_arg
-    call cm32_sccz80_fsreadl
-    jp m32_fshypot          ; enter stack = sccz80_float right, sccz80_float left, ret
+.cam32_sccz80_hypot
+    call cam32_sccz80_switch_arg
+    call cam32_sccz80_readl
+    jp asm_am9511_hypot     ; enter stack = sccz80_float right, sccz80_float left, ret
                             ;        DEHL = sccz80_float right
                             ; return DEHL = sccz80_float

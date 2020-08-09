@@ -1,14 +1,13 @@
 
-SECTION code_fp_math32
+SECTION code_fp_am9511
 
-PUBLIC cm32_sccz80_ldexp
+PUBLIC cam32_sccz80_ldexp
 
-EXTERN m32_fsldexp_callee
+EXTERN asm_am9511_ldexp_callee
 
 ; float ldexpf(float x, int16_t pw2);
 
-.cm32_sccz80_ldexp
-
+.cam32_sccz80_ldexp
     ; Entry:
     ; Stack: float left, int right, ret
     ; Reverse the stack
@@ -20,7 +19,7 @@ EXTERN m32_fsldexp_callee
     push bc                     ;int
     push de                     ;float
     push hl
-    call m32_fsldexp_callee
+    call asm_am9511_ldexp_callee
 
     pop af                      ;my return
     push af

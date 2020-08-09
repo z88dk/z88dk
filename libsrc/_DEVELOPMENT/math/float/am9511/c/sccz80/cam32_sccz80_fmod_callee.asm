@@ -1,11 +1,11 @@
 
-SECTION code_fp_math32
+SECTION code_fp_am9511
 
-PUBLIC cm32_sccz80_fmod_callee
+PUBLIC asm_am9511_fmod_callee
 
-EXTERN _m32_fmodf
+EXTERN _am9511_fmod
 
-.cm32_sccz80_fmod_callee
+.asm_am9511_fmod_callee
     ; Entry:
     ; Stack: float left, float right, ret
     ; Reverse the stack
@@ -18,7 +18,7 @@ EXTERN _m32_fmodf
     push af
     push hl     ;left
     push de
-    call _m32_fmodf
+    call _am9511_fmod
     pop af
     pop af
     pop af

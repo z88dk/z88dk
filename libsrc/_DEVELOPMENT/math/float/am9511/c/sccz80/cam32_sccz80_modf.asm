@@ -1,12 +1,12 @@
 
-SECTION code_fp_math32
+SECTION code_fp_am9511
 
-PUBLIC cm32_sccz80_modf
+PUBLIC cam32_sccz80_modf
 
-EXTERN _m32_modff
+EXTERN _am9511_modf
 
-; float modff(float x, float * y)
-.cm32_sccz80_modf
+; float modf(float x, float * y)
+.cam32_sccz80_modf
     ; Entry:
     ; Stack: float left, ptr right, ret
 
@@ -19,4 +19,4 @@ EXTERN _m32_modff
     push de     ;float
     push hl
     push af     ;ret
-    jp _m32_modff
+    jp _am9511_modf

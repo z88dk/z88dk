@@ -2,24 +2,13 @@
 SECTION code_fp_am9511
 PUBLIC cam32_sccz80_pow_callee
 
-EXTERN asm_am9511_pow
+EXTERN asm_am9511_pow_callee
 
 
 .cam32_sccz80_pow_callee
     pop hl      ; return
-    pop bc      ; RHS
-    pop de
-    pop af      ; LHS
-    ex (sp),hl  ; return to stack
+    pop de      ; RHS LSB
+    ex (sp),hl  ; RHS MSB, return to stack
+    ex de,hl
 
-    push de     ; RHS
-    push bc
-    push hl     ; LHS
-    push af
-
-    call asm_am9511_pow
-    pop af
-    pop af
-    pop af
-    pop af
-    ret
+    jp asm_am9511_pow_callee
