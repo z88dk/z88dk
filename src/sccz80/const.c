@@ -155,7 +155,7 @@ int number(LVALUE *lval)
 {
     char c;
     int minus;
-    int32_t k;
+    int64_t k;
     int isunsigned = 0;
 
     k = minus = 1;
@@ -223,6 +223,9 @@ typecheck:
     if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
         lval->val_type = KIND_LONG;
     }
+    if ( lval->const_val >= UINT32_MAX || lval->const_val < -INT32_MIN ) {
+        lval->val_type = KIND_LONGLONG;
+    }
     lval->is_const = 1;
 
     while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S') || rcmatch('f'))) {
@@ -233,7 +236,7 @@ typecheck:
         }
         if (cmatch('U')) {
             isunsigned = 1;
-            lval->const_val = (uint32_t)k;
+            lval->const_val = (uint64_t)k;
         }
         if (cmatch('S'))
             isunsigned = 0;

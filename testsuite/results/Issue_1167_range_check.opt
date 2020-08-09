@@ -13,7 +13,7 @@
 	add	hl,sp
 	ld	a,(hl)
 	ld	h,0
-	cp	-128
+	cp	128
 	jp	nz,i_2
 	ld	hl,0	;const
 	ret

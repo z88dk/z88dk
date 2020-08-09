@@ -4595,7 +4595,7 @@ void vlongconst_tostack(zdouble val)
 /*
  * load constant into primary register
  */
-void vconst(int32_t val)
+void vconst(int64_t val)
 {
     if (val < 0)
         val += 65536;

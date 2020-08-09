@@ -168,9 +168,9 @@ zdouble calc(
     void (*oper)(LVALUE *),
     zdouble right, int is16bit)
 {
-    if (oper == zdiv && right != 0.0)
+    if (oper == zdiv && right != 0.0) {
         return (left / right);
-    else if (oper == zmod)
+    } else if (oper == zmod)
         return ((int)left % (int)right);
     else if (oper == zle)
         return (left <= right);
@@ -186,8 +186,9 @@ zdouble calc(
             warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
             right = 0;
         }
-        if ( is16bit ) return ((int16_t)left >> (int16_t)right);
-        else return ((int64_t)left >> (int)right);
+        if ( is16bit ) return ((int16_t)left) >> (int16_t)right;
+        else if (left_kind == KIND_LONG) return ((int32_t)left) >> (int)right;
+        else return ((int64_t)left) >> (int)right;
     } else
         return (CalcStand(left_kind, left, oper, right));
 }
@@ -232,11 +233,11 @@ zdouble CalcStand(
     zdouble right)
 {
     if (oper == zor)
-        return ((unsigned int)left | (unsigned int)right);
+        return ((uint64_t)left | (uint64_t)right);
     else if (oper == zxor)
-        return ((unsigned int)left ^ (unsigned int)right);
+        return ((uint64_t)left ^ (uint64_t)right);
     else if (oper == zand)
-        return ((unsigned int)left & (unsigned int)right);
+        return ((uint64_t)left & (uint64_t)right);
     else if (oper == mult)
         return (left * right);
     else if (oper == asl) {
@@ -383,6 +384,12 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
     if (lval->val_type == KIND_LONGLONG) {
         if (lval2->val_type != KIND_LONGLONG ) {
             zconvert_to_llong(lval->ltype->isunsigned, lval2->val_type, lval2->ltype->isunsigned);
+            if ( lval->ltype->isunsigned ) {
+                lval->ltype = type_ulonglong;
+            } else {
+                lval->ltype = type_longlong;
+            }
+            lval->val_type = KIND_LONGLONG;
         }
         return;
     }
@@ -825,7 +832,19 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
     } else if ( t2 == KIND_CPTR ) {
         t2 = KIND_LONG;
     }
+    if ( kind_is_integer(lval->cast_type->kind) && dest_lval->is_const) {
+        int64_t val = dest_lval->const_val;
+        if ( lval->cast_type->kind < dest_lval->val_type) {
+            if ( lval->cast_type->kind == KIND_INT ) {
+                dest_lval->const_val = lval->cast_type->isunsigned ? (uint16_t)(val & 0xffff) : (int16_t)(val & 0xffff);
+            } else if ( lval->cast_type->kind == KIND_CHAR) {
+                dest_lval->const_val = lval->cast_type->isunsigned ? (uint8_t)(val & 0xff) : (int8_t)(val & 0xff);
+            } else if ( lval->cast_type->kind == KIND_LONG) {
+                dest_lval->const_val = lval->cast_type->isunsigned ? (uint32_t)(val & 0xffffffff) : (int32_t)(val & 0xffffffff);
+            }
+        }
 
+    }
 
     force(t1, t2, lval->cast_type->isunsigned, dest_lval->ltype->isunsigned, 0); // TODO lconst
 

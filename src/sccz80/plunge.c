@@ -197,13 +197,22 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if ( !operator_is_commutative(oper) ) {
                 gen_swap_float(lval->val_type);
             }
-        } else if (lval->val_type == KIND_LONG) { // TODO: LONGLONG + don't widen for some operators
+        } else if (lval->val_type == KIND_LONGLONG) {
+            widenintegers(lval, lval2); 
+            lval2->val_type = KIND_LONGLONG;
+            lval2->ltype = lval2->ltype->isunsigned ? type_ulonglong : type_longlong;
+            vlongconst_tostack(lval->const_val);
+        } else if (lval->val_type == KIND_LONG) {
             widenintegers(lval, lval2); 
             lval2->val_type = KIND_LONG;
             lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;
             vlongconst_tostack(lval->const_val);
         } else {
-            if ( lval2->val_type == KIND_LONG ) {
+            if ( lval2->val_type == KIND_LONGLONG ) {
+                ol("TODO: vllongconst_tostack");
+                lval->val_type = KIND_LONGLONG;  
+                lval->ltype = lval->ltype->isunsigned ? type_ulonglong : type_longlong;    
+            } else if ( lval2->val_type == KIND_LONG ) {
                 vlongconst_tostack(lval->const_val); 
                 lval->val_type = KIND_LONG;  
                 lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;        
@@ -263,6 +272,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                      lval2->ltype = lval->ltype;
                  }
                  load_constant(lval2);
+             } else if (lval->val_type == KIND_LONGLONG  || lval2->val_type == KIND_LONGLONG ) {
+                // Even if LHS is int, we promote to longlong. 
+                lval2->val_type = KIND_LONGLONG;
+                lval2->ltype = lval2->ltype->isunsigned ? type_ulonglong : type_longlong;    
+                load_constant(lval2);            
             } else if (lval->val_type == KIND_LONG  || lval2->val_type == KIND_LONG ) {
                 // Even if LHS is int, we promote to long. 
                 lval2->val_type = KIND_LONG;
@@ -394,7 +408,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             doconstoper = 1;
             const_val = (int64_t)lval2->const_val;
             clearstage(before, 0);
-            force(rhs_val_type, lhs_val_type, lval->ltype->isunsigned, lval2->ltype->isunsigned, 1);
+            // The constant on the right doesn't need to have its type forced since it's not loaded
         } else if ( lval1_wasconst && kind_is_integer(lval2->val_type) ) {
             /* Handle the case that the constant was on the left */
             doconstoper = 1;
@@ -497,7 +511,13 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             }
         } else {
             // LHS = integer constant, RHS = lvalue?
-            if ( lval2->val_type == KIND_LONG ) {
+             if ( lval2->val_type == KIND_LONGLONG ) {
+                if ( doconst_oper == 0 ) {
+                    ol("TODO: vllongconst_tostack"); 
+                }
+                lval->val_type = KIND_LONGLONG;
+                lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
+            } else if ( lval2->val_type == KIND_LONG ) {
                 if ( doconst_oper == 0 ) {
                     vlongconst_tostack(lval->const_val); 
                 }
