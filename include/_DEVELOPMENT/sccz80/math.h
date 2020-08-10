@@ -781,4 +781,14 @@ extern int __LIB__ isunorderedf16_callee(half_t x,half_t y) __smallc __z88dk_cal
 
 #endif
 
+#ifdef __MATH_AM9511
+
+#define sqrf         sqr
+#define div2f        div2
+#define mul2f        mul2
+#define mul10uf      mul10u
+#define exp10f       exp10
+
+#endif
+
 #endif
