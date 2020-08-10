@@ -2,7 +2,7 @@
 SECTION code_fp_am9511
 PUBLIC cam32_sdcc_pow_callee
 
-EXTERN asm_am9511_powf_callee
+EXTERN asm_am9511_pow_callee
 
 
 .cam32_sdcc_pow_callee
@@ -15,4 +15,4 @@ EXTERN asm_am9511_powf_callee
     push af
     ex de,hl
 
-    jp asm_am9511_powf_callee
+    jp asm_am9511_pow_callee
