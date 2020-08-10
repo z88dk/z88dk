@@ -23,5 +23,5 @@ float am9511_log2 (float x) __z88dk_fastcall
         return( HUGE_NEG_F32 );
     }
 
-    return( am9511_log( x ) * M_INVLN2 );
+    return( log( x ) * M_INVLN2 );
 }

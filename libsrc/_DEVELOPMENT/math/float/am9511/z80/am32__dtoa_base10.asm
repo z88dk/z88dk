@@ -12,7 +12,8 @@
 SECTION code_clib
 SECTION code_fp_am9511
 
-EXTERN asm_am9511_float8, asm_am9511_exp10f, asm_am9511_mul_callee, asm_am9511_mul10u_fastcall
+EXTERN asm_am9511_float8, asm_am9511_mul_callee, asm_am9511_mul10u_fastcall
+EXTERN _am9511_exp10
 
 PUBLIC asm_am9511__dtoa_base10
 
@@ -79,7 +80,7 @@ PUBLIC asm_am9511__dtoa_base10
 
     ld l,a                      ; -e
     call asm_am9511_float8      ; convert L to float in DEHL
-    call asm_am9511_exp10f      ; make 10^-e
+    call _am9511_exp10          ; make 10^-e
     call asm_am9511_mul_callee  ; x *= 10^-e
 
     ; DEHL = b

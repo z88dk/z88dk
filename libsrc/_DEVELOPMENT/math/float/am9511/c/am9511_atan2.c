@@ -7,9 +7,9 @@ float am9511_atan2 (float x, float y)
 
     if( y != 0.0)
     {
-        if(am9511_fabs(y) >= am9511_fabs(x))
+        if(fabs(y) >= fabs(x))
         {
-            v = am9511_atan(x/y);
+            v = atan(x/y);
             if( y < 0.0)
             {
                 if(x >= 0.0)
@@ -19,7 +19,7 @@ float am9511_atan2 (float x, float y)
             }
             return v;
         }
-        v = -am9511_atan(y/x);
+        v = -atan(y/x);
         if(y < 0.0)
             v -= M_PI_2;
         else

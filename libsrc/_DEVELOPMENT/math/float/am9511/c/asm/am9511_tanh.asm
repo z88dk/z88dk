@@ -204,47 +204,44 @@
 ;--------------------------------------------------------
 ; Externals used
 ;--------------------------------------------------------
-	GLOBAL _am9511_hypot
-	GLOBAL _am9511_ldexp
-	GLOBAL _am9511_frexp
-	GLOBAL _am9511_sqrt
-	GLOBAL _am9511_sqr
-	GLOBAL _am9511_div2
-	GLOBAL _am9511_mul2
+	GLOBAL _hypot_callee
+	GLOBAL _ldexp_callee
+	GLOBAL _frexp_callee
+	GLOBAL _sqrt_fastcall
+	GLOBAL _sqr_fastcall
+	GLOBAL _div2_fastcall
+	GLOBAL _mul2_fastcall
 	GLOBAL _am9511_modf
 	GLOBAL _am9511_fmod
 	GLOBAL _am9511_round
-	GLOBAL _am9511_floor
-	GLOBAL _am9511_fabs
-	GLOBAL _am9511_ceil
-	GLOBAL _am9511_pow
-	GLOBAL _am9511_log10
-	GLOBAL _am9511_log2
-	GLOBAL _am9511_log
+	GLOBAL _floor_fastcall
+	GLOBAL _fabs_fastcall
+	GLOBAL _ceil_fastcall
 	GLOBAL _am9511_exp10
 	GLOBAL _am9511_exp2
-	GLOBAL _am9511_exp
+	GLOBAL _am9511_log2
+	GLOBAL _pow_callee
+	GLOBAL _exp_fastcall
+	GLOBAL _log10_fastcall
+	GLOBAL _log_fastcall
 	GLOBAL _am9511_atanh
 	GLOBAL _am9511_acosh
 	GLOBAL _am9511_asinh
 	GLOBAL _am9511_cosh
 	GLOBAL _am9511_sinh
 	GLOBAL _am9511_atan2
-	GLOBAL _am9511_atan
-	GLOBAL _am9511_acos
-	GLOBAL _am9511_asin
-	GLOBAL _am9511_tan
-	GLOBAL _am9511_cos
-	GLOBAL _am9511_sin
+	GLOBAL _atan_fastcall
+	GLOBAL _acos_fastcall
+	GLOBAL _asin_fastcall
+	GLOBAL _tan_fastcall
+	GLOBAL _cos_fastcall
+	GLOBAL _sin_fastcall
 	GLOBAL _exp10_fastcall
 	GLOBAL _exp10
 	GLOBAL _mul10u_fastcall
 	GLOBAL _mul10u
-	GLOBAL _mul2_fastcall
 	GLOBAL _mul2
-	GLOBAL _div2_fastcall
 	GLOBAL _div2
-	GLOBAL _sqr_fastcall
 	GLOBAL _sqr
 	GLOBAL _fam9511_f32_fastcall
 	GLOBAL _fam9511_f32
@@ -298,9 +295,7 @@
 	GLOBAL _rint
 	GLOBAL _nearbyint_fastcall
 	GLOBAL _nearbyint
-	GLOBAL _floor_fastcall
 	GLOBAL _floor
-	GLOBAL _ceil_fastcall
 	GLOBAL _ceil
 	GLOBAL _tgamma_fastcall
 	GLOBAL _tgamma
@@ -312,13 +307,9 @@
 	GLOBAL _erf
 	GLOBAL _cbrt_fastcall
 	GLOBAL _cbrt
-	GLOBAL _sqrt_fastcall
 	GLOBAL _sqrt
-	GLOBAL _pow_callee
 	GLOBAL _pow
-	GLOBAL _hypot_callee
 	GLOBAL _hypot
-	GLOBAL _fabs_fastcall
 	GLOBAL _fabs
 	GLOBAL _logb_fastcall
 	GLOBAL _logb
@@ -326,25 +317,20 @@
 	GLOBAL _log2
 	GLOBAL _log1p_fastcall
 	GLOBAL _log1p
-	GLOBAL _log10_fastcall
 	GLOBAL _log10
-	GLOBAL _log_fastcall
 	GLOBAL _log
 	GLOBAL _scalbln_callee
 	GLOBAL _scalbln
 	GLOBAL _scalbn_callee
 	GLOBAL _scalbn
-	GLOBAL _ldexp_callee
 	GLOBAL _ldexp
 	GLOBAL _ilogb_fastcall
 	GLOBAL _ilogb
-	GLOBAL _frexp_callee
 	GLOBAL _frexp
 	GLOBAL _expm1_fastcall
 	GLOBAL _expm1
 	GLOBAL _exp2_fastcall
 	GLOBAL _exp2
-	GLOBAL _exp_fastcall
 	GLOBAL _exp
 	GLOBAL _tanh_fastcall
 	GLOBAL _tanh
@@ -358,19 +344,13 @@
 	GLOBAL _asinh
 	GLOBAL _acosh_fastcall
 	GLOBAL _acosh
-	GLOBAL _tan_fastcall
 	GLOBAL _tan
-	GLOBAL _sin_fastcall
 	GLOBAL _sin
-	GLOBAL _cos_fastcall
 	GLOBAL _cos
 	GLOBAL _atan2_callee
 	GLOBAL _atan2
-	GLOBAL _atan_fastcall
 	GLOBAL _atan
-	GLOBAL _asin_fastcall
 	GLOBAL _asin
-	GLOBAL _acos_fastcall
 	GLOBAL _acos
 ;--------------------------------------------------------
 ; special function registers
@@ -417,7 +397,7 @@ _am9511_tanh:
 	push	af
 	push	af
 	push	af
-	call	_am9511_exp
+	call	_exp_fastcall
 	ld	(ix-8),l
 	ld	(ix-7),h
 	ld	(ix-6),e

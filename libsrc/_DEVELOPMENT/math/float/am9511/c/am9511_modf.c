@@ -32,7 +32,7 @@
 
 float am9511_modf (float x, float * y) 
 {
-    if ( x < 0 ) *y = am9511_ceil(x);
-    else *y = am9511_floor(x);
+    if ( x < 0 ) *y = ceil(x);
+    else *y = floor(x);
     return x-*y;
 }

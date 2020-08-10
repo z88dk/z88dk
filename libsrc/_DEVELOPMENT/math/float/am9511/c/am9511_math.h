@@ -45,12 +45,13 @@ union float_long
      ****************************************/
 
 /* Trigonometric functions */
-float am9511_sin (float x) __z88dk_fastcall;
-float am9511_cos (float x) __z88dk_fastcall;
-float am9511_tan (float x) __z88dk_fastcall;
-float am9511_asin (float x) __z88dk_fastcall;
-float am9511_acos (float x) __z88dk_fastcall;
-float am9511_atan (float x) __z88dk_fastcall;
+float sin (float x) __z88dk_fastcall;
+float cos (float x) __z88dk_fastcall;
+float tan (float x) __z88dk_fastcall;
+float asin (float x) __z88dk_fastcall;
+float acos (float x) __z88dk_fastcall;
+float atan (float x) __z88dk_fastcall;
+
 float am9511_atan2 (float x, float y);
 
 /* Hyperbolic functions */
@@ -62,29 +63,31 @@ float am9511_acosh (float x) __z88dk_fastcall;
 float am9511_atanh (float x) __z88dk_fastcall;
 
 /* Exponential, logarithmic and power functions */
-float am9511_exp (float x) __z88dk_fastcall;
+float log (float x) __z88dk_fastcall;
+float log10 (float x) __z88dk_fastcall;
+float exp (float x) __z88dk_fastcall;
+float pow (float x, float y);
+
+float am9511_log2 (float x) __z88dk_fastcall;
 float am9511_exp2 (float x) __z88dk_fastcall;
 float am9511_exp10 (float x) __z88dk_fastcall;
-float am9511_log (float x) __z88dk_fastcall;
-float am9511_log2 (float x) __z88dk_fastcall;
-float am9511_log10 (float x) __z88dk_fastcall;
-float am9511_pow (float x, float y);
 
 /* Nearest integer, absolute value, and remainder functions */
-float am9511_ceil (float x) __z88dk_fastcall;
-float am9511_fabs (float x) __z88dk_fastcall;
-float am9511_floor (float x) __z88dk_fastcall;
+float ceil (float x) __z88dk_fastcall;
+float fabs (float x) __z88dk_fastcall;
+float floor (float x) __z88dk_fastcall;
+
 float am9511_round (float x) __z88dk_fastcall;
 float am9511_fmod (float x, float y);
 float am9511_modf (float x, float *y);
 
 /* Intrinsic functions */
-float am9511_mul2 (float a) __z88dk_fastcall;
-float am9511_div2 (float a) __z88dk_fastcall;
-float am9511_sqr (float a) __z88dk_fastcall;
-float am9511_sqrt (float a) __z88dk_fastcall;
-float am9511_frexp (float x, int16_t *pw2) __z88dk_callee;
-float am9511_ldexp (float x, int16_t pw2) __z88dk_callee;
-float am9511_hypot (float x, float y) __z88dk_callee;
+float mul2 (float a) __z88dk_fastcall;
+float div2 (float a) __z88dk_fastcall;
+float sqr (float a) __z88dk_fastcall;
+float sqrt (float a) __z88dk_fastcall;
+float frexp (float x, int16_t *pw2) __z88dk_callee;
+float ldexp (float x, int16_t pw2) __z88dk_callee;
+float hypot (float x, float y) __z88dk_callee;
 
 #endif  /* _INC_AM9511_C */

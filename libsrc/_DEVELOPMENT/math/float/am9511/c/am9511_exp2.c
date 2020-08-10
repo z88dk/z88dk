@@ -32,5 +32,5 @@ float am9511_exp2 (float x) __z88dk_fastcall
 	if( x == 0.0 )
 		return 1.0;
 
-    return am9511_exp( x * M_LN2 );
+    return exp( x * M_LN2 );
 }

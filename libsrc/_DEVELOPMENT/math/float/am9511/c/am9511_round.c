@@ -14,10 +14,10 @@
 
 float am9511_round (float x) __z88dk_fastcall
 {
-  int signbit;
+  int16_t signbit;
   union float_long fl;
   uint32_t w;
-  int exponent_less_127;
+  int16_t exponent_less_127;
 
   fl.f = x;
   w = (uint32_t)fl.l;
