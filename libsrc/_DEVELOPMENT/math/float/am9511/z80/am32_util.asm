@@ -26,36 +26,24 @@ PUBLIC asm_am9511_nan
     ld d,a
     ret
 
+
 ; here to return a legal zero of sign h in hlde
 .asm_am9511_zero_hlde
     ex de,hl
+
+
+; here to change underflow to a error floating zero
+.asm_am9511_min
+
 
 ; here to return a legal zero of sign d in dehl
 .asm_am9511_zero
     ld a,d
     and 080h
     ld d,a
-    ld e,0
-    ld h,e
-    ld l,e
-    ret
-
-; here to change underflow to a error floating zero
-.asm_am9511_min
-    call asm_am9511_zero
-
-.asm_am9511_eexit
-    scf                     ; C set for error
-    ret
-
-; here to change overflow to floating infinity of sign d in dehl
-.asm_am9511_max
-    ld a,d
-    or 07fh                 ; max exponent
-    ld d,a
-    ld e,080h               ;floating infinity
     ld hl,0
-    jr asm_am9511_eexit
+    ld e,h
+    ret
 
 
 ; here to change error to floating NaN of sign d in dehl
@@ -68,3 +56,16 @@ PUBLIC asm_am9511_nan
     ld l,e
     jr asm_am9511_eexit
 
+
+; here to change overflow to floating infinity of sign d in dehl
+.asm_am9511_max
+    ld a,d
+    or 07fh                 ; max exponent
+    ld d,a
+    ld e,080h               ;floating infinity
+    ld hl,0
+
+
+.asm_am9511_eexit
+    scf                     ; C set for error
+    ret
