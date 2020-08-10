@@ -52,7 +52,7 @@ extern void function_appendix(SYMBOL *func);
 extern int zcriticaloffset(void);
 extern void zconvert_to_double(Kind from, Kind to, unsigned char isunsigned);
 extern void zconvert_from_double(Kind from, Kind to, unsigned char isunsigned);
-extern int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int is_last_argument);
+extern int push_function_argument_fnptr(Kind expr, Type *type, Type *functype, int push_sdccchar, int is_last_argument);
 extern void reset_namespace();
 extern void zwiden_stack_to_long(LVALUE *lval);
 extern void zwiden_stack_to_llong(LVALUE *lval);

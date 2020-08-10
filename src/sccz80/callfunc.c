@@ -293,9 +293,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
                 }
             }
             if ( function_pointer_call == 0 ||  fnptr_type->kind == KIND_CPTR ) {
-                nargs += gen_push_function_argument(expr, type, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters));
+                nargs += gen_push_function_argument(expr, type,  functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters));
             } else {
-                last_argument_size = push_function_argument_fnptr(expr, type, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters), tmpfiles[argnumber+1] == NULL);
+                last_argument_size = push_function_argument_fnptr(expr, type, functype, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters), tmpfiles[argnumber+1] == NULL);
                 nargs += last_argument_size;
             }
         }

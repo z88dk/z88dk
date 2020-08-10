@@ -991,23 +991,34 @@ int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar)
     return 2;
 }
 
-/* Push an argument for a function pointer call */
-int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int is_last_argument)
+/* Push an argument for a function pointer call 
+ *
+ * \return The stack offset
+ * 
+ * For int/long sized parameters, we need to leave the parameter in the registers for the last
+ * argument
+ */
+int push_function_argument_fnptr(Kind expr, Type *type, Type *functype, int push_sdccchar, int is_last_argument)
 {
     if (expr == KIND_LONG || expr == KIND_CPTR || ( c_fp_size == 4 && expr == KIND_DOUBLE)) {
-        if ( !is_last_argument ) {
+        if (is_last_argument == 0 || (functype->flags & FASTCALL) == 0 ) {
             swap(); /* MSW -> hl */
             ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
             push("de"); /* LSW -> stack, addr = hl */
+            return 4;
         }
-        return 4;
     } else if ( expr == KIND_LONGLONG ) {
-        callrts("l_i64_dpush2");
-        return 8;
+        if (is_last_argument == 0 || (functype->flags & FASTCALL) == 0 ) {
+            callrts("l_i64_push_under_int");
+            Zsp -= 6;
+            return 8;
+        }
     } else if (expr == KIND_DOUBLE  ) {
-        dpush_under(KIND_INT);
-        pop("hl");
-        return c_fp_size;
+        if (is_last_argument == 0 || (functype->flags & FASTCALL) == 0 ) {
+            dpush_under(KIND_INT);
+            pop("hl");
+            return c_fp_size;
+        }
     } else if (expr == KIND_STRUCT ) {
         // 13 bytes
         swap();    // de = address of struct
@@ -1022,8 +1033,7 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
         ol("ldir");
         pop("hl");
         return type->size;
-    } 
-    if ( !is_last_argument ) {
+    } else if (is_last_argument == 0 || (functype->flags & FASTCALL) == 0 ) {
         if ( IS_GBZ80() ) {
             ol("ld\td,h");
             ol("ld\te,l");
@@ -1032,8 +1042,9 @@ int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int i
         } else {
             ol("ex\t(sp),hl");
         }
+        return 2;
     }
-    return 2;
+    return 0;
 }
 
 
@@ -1178,50 +1189,38 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
         }
         loadargc(n);
         callrts("l_farcall");
-    } else if ( type->flags & FASTCALL && last_argument_size < 6 ) {
-        int ret = -2;
-        int label = getlabel();		  
-        // TOS = address, dehl = parameter
-        // More than one argument, TOS = last parameter, hl = function
-        // For long sp+0 = LSW, sp +2 = MSW, hl = function
+    } else if ( type->flags & FASTCALL && last_argument_size <= 4 ) {
+        int ret = 0;
+        int label = getlabel();
+
+        // TOS = address, dehl = parameter (or in memory)
         if ( last_argument_size == 2 ) {
-            ol("pop\taf");  // TODO: 8080/gbz80 doesn't work here
-            outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
-            ol("push\tbc");
-            ol("push\taf");
-            Zsp += 2;
-            ret = -4;
-         } else {
-            ol("pop\taf"); // TODO: 8080/gbz80 doesn't work here
-            outstr("\tld\tbc,"); printlabel(label);  nl();	// bc = return address
-            ol("push\tbc"); /* Return address */		
-            ol("push\taf");		
-            Zsp += 2;
-         } 
-         ol("ret");		
+            ret -= 4;
+        }
+
+        ol("pop\taf");  // TODO: 8080/gbz80 doesn't work here
+        if (type->return_type->kind == KIND_LONGLONG) {
+            ol("ld\tbc,__i64_acc");
+            push("bc");
+        }
+        outstr("\tld\tbc,"); printlabel(label);  nl();     // bc = return address
+        ol("push\tbc");
+        ol("push\taf");
+        Zsp += 2;
+
+         ol("ret");
          postlabel(label);
          return ret;
     } else {
-        if (last_argument_size == 2) {
-            /* At this point, TOS = function, hl = argument */
-            if ( IS_GBZ80() ) {
-                ol("ld\td,h");
-                ol("ld\te,l");
-                ol("pop\thl");
-                ol("push\tde");
-            } else {
-                ol("ex\t(sp),hl");
-            }
-        } else if ( last_argument_size == 4) {
-            /* At this point, TOS = function, dehl = argument */
-            swap(); /* MSW -> hl */
-            ol("ex\t(sp),hl"); /* MSW -> stack, addr -> hl */
-            push("de"); /* LSW -> stack, addr = hl */
-        }
-        
+        // Non __z88dk_fastcall function pointers and those qwhich have a
+        // fastcall argument that's stored in memory
         if ( type->funcattrs.hasva ) 
             loadargc(n);
 
+        if (type->return_type->kind == KIND_LONGLONG) {
+            ol("ld\tbc,__i64_acc");
+            push("bc");
+        }
         callrts("l_jphl");
     }
     return 0;
