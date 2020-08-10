@@ -56,7 +56,7 @@ ok -f 'test.lib';
 
 # use library
 unlink 'test.bin';
-z80asm(<<'END', '-b -itest');
+z80asm(<<'END', '-b -ltest');
 	extern lbl1234;
 	defw lbl1234;
 END

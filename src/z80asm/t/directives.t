@@ -79,44 +79,44 @@ z80asm(
 z80asm(
 	asm		=> " defb 1 \n defs 3 \n defb 2",
 	bin		=> pack("C*", 1, 254, 254, 254, 2),
-	options	=> "-b --filler=0xFE"
+	options	=> "-b -f0xFE"
 );
 z80asm(
 	asm		=> " defb 1 \n defs 3, 21 \n defb 2",
 	bin		=> pack("C*", 1, 21, 21, 21, 2),
-	options	=> "-b --filler=0xFE"
+	options	=> "-b -f0xFE"
 );
 
 z80asm(
 	asm		=> " defb 1 \n defs 3 \n defb 2",
 	bin		=> pack("C*", 1, 253, 253, 253, 2),
-	options	=> ($^O eq 'MSWin32') ? "-b --filler=\$FD" : '-b --filler=\\$FD',	# Note: different quoting
+	options	=> ($^O eq 'MSWin32') ? "-b -f\$FD" : '-b -f\\$FD',	# Note: different quoting
 );
 
 z80asm(
 	asm		=> " defb 1 \n defs 3 \n defb 2",
 	bin		=> pack("C*", 1, 252, 252, 252, 2),
-	options	=> "-b --filler=0FCh"
+	options	=> "-b -f0FCh"
 );
 z80asm(
 	asm		=> " defb 1 \n defs 3 \n defb 2",
 	bin		=> pack("C*", 1, 251, 251, 251, 2),
-	options	=> "-b --filler=251"
+	options	=> "-b -f251"
 );
 z80asm(
 	asm		=> " defb 1 \n defs 3 \n defb 2",
 	bin		=> pack("C*", 1, 0, 0, 0, 2),
-	options	=> "-b --filler=0"
+	options	=> "-b -f0"
 );
 
 z80asm(
 	asm		=> " defb 1 ",
-	options	=> "-b --filler=-1",
+	options	=> "-b -f-1",
 	error	=> "Error: invalid filler value: -1",
 );
 z80asm(
 	asm		=> " defb 1 ",
-	options	=> "-b --filler=256",
+	options	=> "-b -f256",
 	error	=> "Error: invalid filler value: 256",
 );
 

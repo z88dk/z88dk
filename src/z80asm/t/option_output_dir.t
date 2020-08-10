@@ -30,16 +30,14 @@ check_bin_file("test.bin", pack("C*", 0xC9));
 ok ! -d "test_dir", "! test_dir";
 
 # second run with -O
-for my $opt('-O', '--out-dir') {
-	for my $dir ('test_dir', 'test_dir////sub//dir//') {	# use pairs of /, as they will be converted to \ in run()
-		unlink_output();
-		run("z80asm -s -l -m -g -b $opt=$dir test.asm");
-		ok -d $dir, $dir;
-		for (@output) {
-			ok -f "$dir/$_", "$dir/$_";
-		}
-		check_bin_file("$dir/test.bin", pack("C*", 0xC9));
+for my $dir ('test_dir', 'test_dir////sub//dir//') {	# use pairs of /, as they will be converted to \ in run()
+	unlink_output();
+	run("z80asm -s -l -m -g -b -O$dir test.asm");
+	ok -d $dir, $dir;
+	for (@output) {
+		ok -f "$dir/$_", "$dir/$_";
 	}
+	check_bin_file("$dir/test.bin", pack("C*", 0xC9));
 }
 
 # make trees

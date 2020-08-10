@@ -40,7 +40,7 @@ t_z80asm_error('
 
 unlink_testfiles();
 write_file(asm_file(), "nop");
-t_z80asm_capture("-b -ixxxx ".asm_file(), "",
+t_z80asm_capture("-b -lxxxx ".asm_file(), "",
 		"Error: cannot read file 'xxxx.lib'\n",
 		1);
 
@@ -246,7 +246,7 @@ write_file(asm_file(), "main: ret");
 t_z80asm_capture("-x".$lib." ".asm_file(), "", "", 0);
 ok -f $lib;
 write_file(asm_file(), "EXTERN main \n call main");
-t_z80asm_capture("-b -i".$lib." ".asm_file(), "",
+t_z80asm_capture("-b -l".$lib." ".asm_file(), "",
 		"Error at file 'test.asm' line 2: symbol 'main' not defined\n",
 		1);
 
@@ -395,7 +395,7 @@ t_z80asm_capture("-b -d ".o_file(),
 unlink_testfiles();
 write_file(asm_file(), "nop");
 write_file(lib_file(), "not a library");
-t_z80asm_capture("-b -i".lib_file()." ".asm_file(), "",
+t_z80asm_capture("-b -l".lib_file()." ".asm_file(), "",
 		"Error: file 'test.lib' not a library file\n",
 		1);
 
@@ -406,7 +406,7 @@ $lib = libfile(objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] ));
 substr($lib,6,2)="99";		# change version
 write_file(asm_file(), "nop");
 write_file(lib_file(), $lib);
-t_z80asm_capture("-b -i".lib_file()." ".asm_file(), "", <<"END", 1);
+t_z80asm_capture("-b -l".lib_file()." ".asm_file(), "", <<"END", 1);
 Error: library file 'test.lib' version 99, expected version 14
 END
 

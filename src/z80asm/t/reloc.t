@@ -27,7 +27,7 @@ my $reloc_routine =
 	"\x71\x01\xFD\x70\x02\xD9\x08\xFD\xE9";
 
 #------------------------------------------------------------------------------
-# -R, --relocatable
+# -R
 #------------------------------------------------------------------------------
 
 t_reloc("start: jp start");
@@ -60,7 +60,7 @@ sub data_asm {
 }
 
 #------------------------------------------------------------------------------
-# without --relocatable, one module
+# without -R, one module
 #------------------------------------------------------------------------------
 my $code_addr = 0x1020;
 my $data_addr = 0x3040;
@@ -73,7 +73,7 @@ my $asm = "section code\norg $code_addr\n".code_asm("").
 
 unlink_testfiles();
 write_file("test.asm", $asm);
-t_z80asm_capture("-b -m --reloc-info test.asm", "", "", 0);
+t_z80asm_capture("-b -m -reloc-info test.asm", "", "", 0);
 ok ! -f "test.bin";
 ok ! -f "test.reloc";
 
@@ -110,7 +110,7 @@ __data_size                     = $0020 ; const, public, def, , ,
 ...
 
 #------------------------------------------------------------------------------
-# with --relocatable, one module
+# with -R, one module
 #------------------------------------------------------------------------------
 unlink_testfiles();
 write_file("test.asm", $asm);
@@ -120,7 +120,7 @@ $asm = code_asm("").code_asm("1").code_asm("2").
 my @reloc = reloc_addrs($asm);
 my $reloc_header = reloc_header(@reloc);
 
-t_z80asm_capture("-b -m --relocatable test.asm", 
+t_z80asm_capture("-b -m -R test.asm", 
 				 "Relocation header is ".length($reloc_header)." bytes.\n", <<'ERR', 0);
 Warning at module 'test': ORG ignored at file 'test.o', section 'code'
 Warning at module 'test': ORG ignored at file 'test.o', section 'data'
@@ -153,7 +153,7 @@ __data_size                     = $007F ; const, public, def, , ,
 ...
 
 #------------------------------------------------------------------------------
-# without --relocatable, several modules
+# without -R, several modules
 #------------------------------------------------------------------------------
 unlink_testfiles();
 write_file("test.asm", 
@@ -174,7 +174,7 @@ write_file("test2.asm",
 		code_asm("2").
 		"section data\n".
 		data_asm("2"));
-t_z80asm_capture("-b -m --reloc-info test.asm test1.asm test2.asm", "", "", 0);
+t_z80asm_capture("-b -m -reloc-info test.asm test1.asm test2.asm", "", "", 0);
 ok ! -f "test.bin";
 ok ! -f "test.reloc";
 
@@ -211,7 +211,7 @@ __data_size                     = $0020 ; const, public, def, , ,
 ...
 
 #------------------------------------------------------------------------------
-# with --relocatable, several modules
+# with -R, several modules
 #------------------------------------------------------------------------------
 unlink_testfiles();
 write_file("test.asm", 
@@ -238,7 +238,7 @@ $asm = code_asm("").code_asm("1").code_asm("2").
 @reloc = reloc_addrs($asm);
 $reloc_header = reloc_header(@reloc);
 
-t_z80asm_capture("-b -m --relocatable test.asm test1.asm test2.asm", 
+t_z80asm_capture("-b -m -R test.asm test1.asm test2.asm", 
 				 "Relocation header is ".length($reloc_header)." bytes.\n", <<'ERR', 0);
 Warning at module 'test': ORG ignored at file 'test.o', section 'code'
 Warning at module 'test': ORG ignored at file 'test.o', section 'data'
@@ -275,7 +275,7 @@ __data_size                     = $007F ; const, public, def, , ,
 ...
 
 #------------------------------------------------------------------------------
-# without --relocatable, several sections
+# without -R, several sections
 #------------------------------------------------------------------------------
 unlink_testfiles();
 write_file("test.asm", <<"...".
@@ -296,7 +296,7 @@ write_file("test.asm", <<"...".
 	"section data\n" .data_asm("").
 	"section data1\n".data_asm("1").
 	"section data2\n".data_asm("2"));
-t_z80asm_capture("-b -m --reloc-info test.asm", "", "", 0);
+t_z80asm_capture("-b -m -reloc-info test.asm", "", "", 0);
 ok ! -f "test.bin";
 ok ! -f "test.reloc";
 
@@ -368,7 +368,7 @@ sub t_reloc {
 	my($bin0, $bin1, $reloc_header, @reloc) = compute_reloc_addrs($asm);
 	
 	# -R
-	for my $options ('-R', '--relocatable', '--relocatable --reloc-info') {
+	for my $options ('-R', '-R -reloc-info') {
 		unlink_testfiles();
 		write_file("test.asm", $asm);
 		
@@ -379,7 +379,7 @@ sub t_reloc {
 		ok ! -f "test.reloc";
 	}
 
-	# no -R, no --reloc-info
+	# no -R, no -reloc-info
 	unlink_testfiles();
 	write_file("test.asm", "org 1\n".$asm);
 	
@@ -387,11 +387,11 @@ sub t_reloc {
 	t_binary(read_binfile("test.bin"), $bin1);
 	ok ! -f "test.reloc";
 	
-	# no -R, --reloc-info
+	# no -R, -reloc-info
 	unlink_testfiles();
 	write_file("test.asm", "org 1\n".$asm);
 	
-	t_z80asm_capture("-b --reloc-info test.asm", "", "", 0);
+	t_z80asm_capture("-b -reloc-info test.asm", "", "", 0);
 	t_binary(read_binfile("test.bin"), $bin1);
 	t_binary(read_binfile("test.reloc"), pack("v*", @reloc));
 }	

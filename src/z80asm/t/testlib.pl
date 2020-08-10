@@ -127,7 +127,7 @@ sub ticks {
 	build_ticks();
 	z80asm($source, $options." -b");
 	
-	my $cpu = ($options =~ /(?:--cpu=?|-m=?)(\S+)/) ? $1 : "z80";
+	my $cpu = ($options =~ /(?:-m=?)(\S+)/) ? $1 : "z80";
 	run("z88dk-ticks test.bin -m$cpu -output test.out", 
 		0, "IGNORE");
 

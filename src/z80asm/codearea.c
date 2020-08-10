@@ -608,7 +608,7 @@ void fwrite_codearea(const char *filename, FILE **pbinfile, FILE **prelocfile)
 		{
 			if (section->name && *section->name)					/* only if section name not empty */
 			{
-				/* change current file if address changed, or option --split-bin, or section_split */
+				/* change current file if address changed, or option -split-bin, or section_split */
 				if ((!opts.relocatable && opts.split_bin) ||
 					section->section_split ||
 					cur_addr != section->addr ||
@@ -675,7 +675,7 @@ void set_origin_directive(int origin)
 		else if (origin >= 0)
 		{
 			if (CURRENTSECTION->origin_opts && CURRENTSECTION->origin >= 0)
-				; /* ignore ORG, as --origin from command line overrides */
+				; /* ignore ORG, as -r from command line overrides */
 			else
 				CURRENTSECTION->origin = origin;
 		}
