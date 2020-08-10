@@ -253,6 +253,18 @@ static void process_opt( int *parg, int argc, char *argv[] )
 		option_cpu_ti83plus();
 		return;
 	}
+	else if (strncmp(argv[II], "-l", 2) == 0 && argv[II][2] != '\0') {
+		library_file_append(&argv[II][2]);
+		return;
+	}
+	else if (strcmp(argv[II], "-l") == 0) {
+		opts.list = true;
+		return;
+	}
+	else if (strcmp(argv[II], "-reloc-info") == 0) {
+		opts.reloc_info = true;
+		return;
+	}
 	else {
 		/* search opts_lu[] */
 		for (j = 0; j < NUM_ELEMS(opts_lu); j++)
@@ -602,7 +614,7 @@ static void show_option( enum OptType type, bool *pflag,
 
     if ( *help_arg )
     {
-        Str_append_sprintf( msg, "=%s", help_arg );
+        Str_append_sprintf( msg, "%s", help_arg );
     }
 
     if ( Str_len(msg) > ALIGN_HELP )

@@ -28,7 +28,7 @@ unlink_testfiles();
 t_z80asm_capture("", 		$copyrightmsg, 	"", 0);
 
 #------------------------------------------------------------------------------
-# --verbose, -v
+# -v
 #------------------------------------------------------------------------------
 my $verbose_text = <<'END';
 Reading library 'z80asm-z80-.lib'
@@ -43,24 +43,21 @@ Code size: 3 bytes ($0000 to $0002)
 Creating binary 'test.bin'
 END
 
-for my $options ('-v', '--verbose') {
-	unlink_testfiles();
-	write_file(asm_file(), " nop \n nop \n nop");
-	t_z80asm_capture("-b -s -l -g $options ".asm_file(), 
-					$verbose_text, "", 0);
-	ok -f o_file();
-	ok -f bin_file();
-	is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
-	
-	unlink_testfiles();
-	write_file(asm_file(), " nop \n nop \n nop");
-	t_z80asm_capture("-b -s -l -g $options ".asm_file(), 
-					$verbose_text, "", 0);
-	ok -f o_file();
-	ok -f bin_file();
-	is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
-	
-}
+unlink_testfiles();
+write_file(asm_file(), " nop \n nop \n nop");
+t_z80asm_capture("-b -s -l -g -v ".asm_file(), 
+				$verbose_text, "", 0);
+ok -f o_file();
+ok -f bin_file();
+is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
+
+unlink_testfiles();
+write_file(asm_file(), " nop \n nop \n nop");
+t_z80asm_capture("-b -s -l -g -v ".asm_file(), 
+				$verbose_text, "", 0);
+ok -f o_file();
+ok -f bin_file();
+is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
 
 # check no arguments
 t_z80asm_capture("-v=x", 	"", 	<<'ERR', 1);
@@ -118,7 +115,7 @@ for my $file ('test', 'test.o') {
 }
 
 #------------------------------------------------------------------------------
-# -s, --symtable
+# -s
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
@@ -142,16 +139,14 @@ t_z80asm(
 );
 
 # symbol table
-for my $options ('-s', '--symtable') {
-	t_z80asm(
-		asm		=> $asm,
-		bin		=> $bin,
-		options	=> $options,
-	);
-}
+t_z80asm(
+	asm		=> $asm,
+	bin		=> $bin,
+	options	=> '-s',
+);
 
 #------------------------------------------------------------------------------
-# -l, --list
+# -l
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
@@ -177,17 +172,15 @@ t_z80asm(
 
 
 # list file
-for my $options ('-l', '--list') {
-	t_z80asm(
-		asm		=> $asm,
-		bin		=> $bin,
-		options	=> $options,
-		nolist	=> 1,
-	);
-}
+t_z80asm(
+	asm		=> $asm,
+	bin		=> $bin,
+	options	=> '-l',
+	nolist	=> 1,
+);
 
 #------------------------------------------------------------------------------
-# -g, --globaldef
+# -g
 #------------------------------------------------------------------------------
 $asm = "
 	PUBLIC main, x31_x31_x31_x31_x31_x31_x31_x31, x_32_x32_x32_x32_x32_x32_x32_x32
@@ -224,15 +217,14 @@ t_z80asm(
 ok ! -f def_file(), "no ".def_file();
 
 # -g
-for my $options ('-g', '--globaldef') {
-	t_z80asm(
-		asm		=> $asm,
-		asm2	=> $asm2,
-		bin		=> $bin,
-		options	=> $options,
-	);
-	ok -f def_file(), def_file();
-	is_text( scalar(read_file(def_file())), <<'END', "deffile contents" );
+t_z80asm(
+	asm		=> $asm,
+	asm2	=> $asm2,
+	bin		=> $bin,
+	options	=> '-g',
+);
+ok -f def_file(), def_file();
+is_text( scalar(read_file(def_file())), <<'END', "deffile contents" );
 DEFC main                            = $0000
 DEFC x31_x31_x31_x31_x31_x31_x31_x31 = $0004
 DEFC x_32_x32_x32_x32_x32_x32_x32_x32 = $0005
@@ -241,10 +233,9 @@ DEFC alias_main                      = $0000
 DEFC alias_last                      = $0004
 DEFC func                            = $0006
 END
-}
 
 #------------------------------------------------------------------------------
-# -b, --make-bin
+# -b
 #------------------------------------------------------------------------------
 
 # no -b
@@ -256,18 +247,16 @@ ok -f o_file();
 ok ! -f bin_file();
 
 # -b
-for my $options ('-b', '--make-bin') {
-	unlink_testfiles();
-	write_file(asm_file(), "nop");
+unlink_testfiles();
+write_file(asm_file(), "nop");
 
-	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	ok -f o_file();
-	ok -f bin_file();
-	is read_file(bin_file(), binmode => ':raw'), "\0";
-}
+t_z80asm_capture("-b ".asm_file(), "", "", 0);
+ok -f o_file();
+ok -f bin_file();
+is read_file(bin_file(), binmode => ':raw'), "\0";
 
 #------------------------------------------------------------------------------
-# -o, --output
+# -o
 #------------------------------------------------------------------------------
 $bin = bin_file(); $bin =~ s/\.bin$/2.bin/i;
 
@@ -281,15 +270,13 @@ ok ! -f $bin;
 t_binary(read_file(bin_file(), binmode => ':raw'), "\0");
 
 # -o
-for my $options ("-o$bin", "-o=$bin", "--output$bin", "--output=$bin") {
-	unlink_testfiles($bin);
-	write_file(asm_file(), "nop");
+unlink_testfiles($bin);
+write_file(asm_file(), "nop");
 
-	t_z80asm_capture("-b $options ".asm_file(), "", "", 0);
-	ok ! -f bin_file();
-	ok -f $bin;
-	t_binary(read_file($bin, binmode => ':raw'), "\0");
-}
+t_z80asm_capture("-b -o$bin ".asm_file(), "", "", 0);
+ok ! -f bin_file();
+ok -f $bin;
+t_binary(read_file($bin, binmode => ':raw'), "\0");
 
 # test -o with environment variables
 $ENV{TEST_ENV} = '2.bin';
@@ -311,66 +298,62 @@ t_binary(read_file($bin, binmode => ':raw'), "\0");
 unlink_testfiles($bin);
 
 #------------------------------------------------------------------------------
-# -d, --update
+# -d
 #------------------------------------------------------------------------------
 
-for my $options ('-d', '--update') {
-	# first compiles; second skips
-	unlink_testfiles();
-	write_file(asm_file(), "nop");
+# first compiles; second skips
+unlink_testfiles();
+write_file(asm_file(), "nop");
 
-	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
+t_z80asm_capture("-d ".asm_file(), "", "", 0);
+is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
-	my $date_obj = -M o_file();
+my $date_obj = -M o_file();
 
-	# now skips compile
-	sleep 0.500;		# make sure our obj is older
-	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
+# now skips compile
+sleep 0.500;		# make sure our obj is older
+t_z80asm_capture("-d ".asm_file(), "", "", 0);
+is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
-	ok(abs((-M o_file()) - $date_obj) < 0.001);	# same object
+ok(abs((-M o_file()) - $date_obj) < 0.001);	# same object
 
-	# touch source
-	sleep 0.500;		# make sure our obj is older
-	write_file(asm_file(), "nop");
-	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
+# touch source
+sleep 0.500;		# make sure our obj is older
+write_file(asm_file(), "nop");
+t_z80asm_capture("-d ".asm_file(), "", "", 0);
+is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 
-	ok(abs((-M o_file()) - $date_obj) > 0);	# new object
-	
-	# remove source, give -d -> uses existing object - with extensiom
-	unlink asm_file();
-	$date_obj = -M o_file();
-	t_z80asm_capture("$options ".asm_file(), "", "", 0);
-	is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
-	is -M o_file(), $date_obj;	# new object
-	
-	# remove source, give -d -> uses existing object - without extensiom
-	unlink asm_file();
-	$date_obj = -M o_file();
-	my $base = asm_file(); $base =~ s/\.\w+$//;
-	t_z80asm_capture("$options $base", "", "", 0);
-	is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
-	is -M o_file(), $date_obj;	# new object
-	
-}
+ok(abs((-M o_file()) - $date_obj) > 0);	# new object
+
+# remove source, give -d -> uses existing object - with extensiom
+unlink asm_file();
+$date_obj = -M o_file();
+t_z80asm_capture("-d ".asm_file(), "", "", 0);
+is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
+is -M o_file(), $date_obj;	# new object
+
+# remove source, give -d -> uses existing object - without extensiom
+unlink asm_file();
+$date_obj = -M o_file();
+my $base = asm_file(); $base =~ s/\.\w+$//;
+t_z80asm_capture("-d $base", "", "", 0);
+is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
+is -M o_file(), $date_obj;	# new object
+
 
 #------------------------------------------------------------------------------
-# -r, --origin
+# -r
 #------------------------------------------------------------------------------
 
-# -r, --origin
+# -r
 for my $origin (0, 0x1234) {
 	my $origin_hex = sprintf("%x", $origin);
-	for my $options ("-r", "-r=", "--origin", "--origin=") {
-		for my $origin_text ($origin, "0x${origin_hex}", "0X${origin_hex}", "0${origin_hex}h", "0${origin_hex}H", "\$${origin_hex}") {
-			z80asm(
-				options	=> "-b $options".$origin_text,
-				asm		=> "start: jp start",
-				bin		=> "\xC3" . pack("v", $origin),
-			);
-		}
+	for my $origin_text ($origin, "0x${origin_hex}", "0X${origin_hex}", "0${origin_hex}h", "0${origin_hex}H", "\$${origin_hex}") {
+		z80asm(
+			options	=> "-b -r".$origin_text,
+			asm		=> "start: jp start",
+			bin		=> "\xC3" . pack("v", $origin),
+		);
 	}
 }
 
@@ -385,70 +368,56 @@ for my $origin (-1, 0x10000) {
 z80asm(
 	options	=> "-b -r123Z",
 	asm		=> "start: jp start",
-	error	=> "Error: invalid --origin option '123Z'",
+	error	=> "Error: invalid origin (-r) option '123Z'",
 );
 
 #------------------------------------------------------------------------------
-# -R, --relocatable - tested in reloc.t
+# -R - tested in reloc.t
 
 #------------------------------------------------------------------------------
-# --cpu=z80
+# -mz80
 #------------------------------------------------------------------------------
 
 t_z80asm_ok(0, "halt", "\x76");
-t_z80asm_ok(0, "halt", "\x76", "--cpu=z80");
 t_z80asm_ok(0, "halt", "\x76", "-mz80");
-t_z80asm_ok(0, "halt", "\x76", "-m=z80");
 
 #------------------------------------------------------------------------------
-# --cpu=z80n
+# -mz80n
 #------------------------------------------------------------------------------
 
-t_z80asm_ok(0, "swapnib", "\xED\x23", "--cpu=z80n");
 t_z80asm_ok(0, "swapnib", "\xED\x23", "-mz80n");
-t_z80asm_ok(0, "swapnib", "\xED\x23", "-m=z80n");
 
 #------------------------------------------------------------------------------
-# --cpu=z180
+# -mz180
 #------------------------------------------------------------------------------
 
-t_z80asm_ok(0, "slp", "\xED\x76", "--cpu=z180");
 t_z80asm_ok(0, "slp", "\xED\x76", "-mz180");
-t_z80asm_ok(0, "slp", "\xED\x76", "-m=z180");
 
 #------------------------------------------------------------------------------
-# --cpu=r2k
+# -mr2k
 #------------------------------------------------------------------------------
 
 t_z80asm_ok(0, "ex (sp),hl", "\xE3");
-t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "--cpu=r2k");
 t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "-mr2k");
-t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "-m=r2k");
 
 #------------------------------------------------------------------------------
-# --cpu=r3k
+# -mr3k
 #------------------------------------------------------------------------------
 
-t_z80asm_ok(0, "push su", "\xED\x66", "--cpu=r3k");
 t_z80asm_ok(0, "push su", "\xED\x66", "-mr3k");
-t_z80asm_ok(0, "push su", "\xED\x66", "-m=r3k");
 
 #------------------------------------------------------------------------------
-# --cpu=ti83
+# -mti83
 #------------------------------------------------------------------------------
 
 t_z80asm_ok(0, "invoke 0x1234", "\xCD\x34\x12");
-t_z80asm_ok(0, "invoke 0x1234", "\xCD\x34\x12", "--cpu=ti83");
 t_z80asm_ok(0, "invoke 0x1234", "\xCD\x34\x12", "-mti83");
-t_z80asm_ok(0, "invoke 0x1234", "\xCD\x34\x12", "-m=ti83");
 
 #------------------------------------------------------------------------------
-# --cpu=ti83plus
+# -mti83plus
 #------------------------------------------------------------------------------
 
-t_z80asm_ok(0, "invoke 0x1234", "\xEF\x34\x12", "--cpu=ti83plus");
 t_z80asm_ok(0, "invoke 0x1234", "\xEF\x34\x12", "-mti83plus");
-t_z80asm_ok(0, "invoke 0x1234", "\xEF\x34\x12", "-m=ti83plus");
 
 #------------------------------------------------------------------------------
 # -IXIY
@@ -463,11 +432,11 @@ t_z80asm_ok(0, "ld iy,0x1234", "\xDD\x21\x34\x12", "-IXIY");
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-# -I, --inc-path - tested in directives.t
+# -I - tested in directives.t
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-# -L, --lib-path
+# -L
 #------------------------------------------------------------------------------
 
 # create library
@@ -483,29 +452,27 @@ $asm = "EXTERN main \n call main \n ret";
 $bin = "\xCD\x04\x00\xC9\xC9";
 
 # no -L, full path : OK
-t_z80asm_ok(0, $asm, $bin, "-i".$lib);
+t_z80asm_ok(0, $asm, $bin, "-l".$lib);
 
 # no -L, only file name : error
 write_file(asm_file(), $asm);
-t_z80asm_capture("-i".$lib_base." ".asm_file(), "", 
+t_z80asm_capture("-l".$lib_base." ".asm_file(), "", 
 		"Error: cannot read file 'test.lib'\n", 1);
 
 # -L : OK
-for my $options ('-L', '-L=', '--lib-path', '--lib-path=') {
-	t_z80asm_ok(0, $asm, $bin, $options.$lib_dir." -i".$lib_base);
-}
+t_z80asm_ok(0, $asm, $bin, "-L$lib_dir -l$lib_base");
 
 # use environment variable in -L
 $ENV{TEST_ENV} = 'data';
-t_z80asm_ok(0, $asm, $bin, '"-Lt/${TEST_ENV}" -i'.$lib_base);
+t_z80asm_ok(0, $asm, $bin, '"-Lt/${TEST_ENV}" -l'.$lib_base);
 
 delete $ENV{TEST_ENV};
-t_z80asm_ok(0, $asm, $bin, '"-Lt/da${TEST_ENV}ta" -i'.$lib_base);
+t_z80asm_ok(0, $asm, $bin, '"-Lt/da${TEST_ENV}ta" -l'.$lib_base);
 
 unlink_testfiles($lib);
 
 #------------------------------------------------------------------------------
-# -D, --define
+# -D
 #------------------------------------------------------------------------------
 
 $asm = "ld a,_value23";		# BUG_0045
@@ -526,14 +493,12 @@ for my $options ('aaa=', 'aaa=a', 'aaa=!', 'aaa=1x') {
 					"Error: invalid -DVAR=VAL option '${options}'\n", 1);
 }
 
-for my $options ('-D', '-D=', '--define', '--define=') {
-	# -D
-	t_z80asm_ok(0, $asm, "\x3E\x01", $options."_value23");
-	
-	# -Dvar=value
-	for my $value (255, "0xff", "0XFF", "0ffh", "0FFH", "\$FF") {
-		t_z80asm_ok(0, $asm, "\x3E\xFF", quote_os("${options}_value23=${value}"));		# quote because of '$'
-	}
+# -D
+t_z80asm_ok(0, $asm, "\x3E\x01", "-D_value23");
+
+# -Dvar=value
+for my $value (255, "0xff", "0XFF", "0ffh", "0FFH", "\$FF") {
+	t_z80asm_ok(0, $asm, "\x3E\xFF", quote_os("-D_value23=${value}"));		# quote because of '$'
 }
 
 # -D with environment variables
@@ -547,7 +512,7 @@ delete $ENV{TEST_ENV};
 t_z80asm_ok(0, $asm, "\x3E\x01", '"-D=_value${TEST_ENV}23"');
 
 #------------------------------------------------------------------------------
-# -i, --use-lib, -x, --make-lib
+# -l, -x
 #------------------------------------------------------------------------------
 
 unlink_testfiles();
@@ -563,24 +528,21 @@ one:
 	ld a,1
 	ret
 ");
-for my $options ('-x', '-x=', '--make-lib', '--make-lib=') {
-	unlink(o_file(), lib_file());
-	t_z80asm_capture($options.lib_file()." ".asm_file(), "", "", 0);
-	ok -f o_file(), o_file()." created";
-	ok -f lib_file(), lib_file()." created";
-}
+
+unlink(o_file(), lib_file());
+t_z80asm_capture('-x'.lib_file()." ".asm_file(), "", "", 0);
+ok -f o_file(), o_file()." created";
+ok -f lib_file(), lib_file()." created";
 
 # create $lib
 ok copy(lib_file(), $lib), "create $lib";
 unlink(o_file(), lib_file());
 
 # link with the library
-for my $options ('-i', '-i=', '--use-lib', '--use-lib=') {
-	t_z80asm_ok(0, "
-		EXTERN one
-		jp one
-	", "\xC3\x03\x00\x3E\x01\xC9", $options.$lib);
-}
+t_z80asm_ok(0, "
+	EXTERN one
+	jp one
+", "\xC3\x03\x00\x3E\x01\xC9", "-l$lib");
 
 unlink_testfiles($lib);
 
@@ -607,7 +569,7 @@ ok -f lib6_file();
 t_z80asm_capture("-x".lib7_file()." ".asm7_file(), "", "", 0); 
 ok -f lib7_file();
 
-t_z80asm_capture("-l -m -b -i".lib5_file()." -i".lib6_file()." -i".lib7_file()." ".
+t_z80asm_capture("-l -m -b -l".lib5_file()." -l".lib6_file()." -l".lib7_file()." ".
 				 asm_file()." ".asm2_file()." ".asm3_file(), "", "", 0);
 ok -f bin_file();
 t_binary(read_binfile(bin_file()), 
@@ -629,7 +591,7 @@ write_file(asm5_file(), " PUBLIC abs \nabs: ld a,2\n ret\n");
 t_z80asm_capture("-x".lib5_file()." ".asm5_file(), "", "", 0); 
 ok -f lib5_file();
 
-t_z80asm_capture("-l -m -b -i".lib5_file()." ".asm_file()." ".asm2_file(), "", "", 0);
+t_z80asm_capture("-l -m -b -l".lib5_file()." ".asm_file()." ".asm2_file(), "", "", 0);
 ok -f bin_file();
 t_binary(read_binfile(bin_file()), 
 		pack("C*",
@@ -650,7 +612,7 @@ write_file(asm5_file(), "PUBLIC A5 \n PUBLIC A51 \n A5: \n defc A51 = 51");
 t_z80asm_capture("-x".lib5_file()." ".asm5_file(), "", "", 0); 
 ok -f lib5_file();
 
-t_z80asm_capture("-l -m -b -i".lib5_file()." ".asm_file(), "", "", 0);
+t_z80asm_capture("-l -m -b -l".lib5_file()." ".asm_file(), "", "", 0);
 ok -f bin_file();
 t_binary(read_binfile(bin_file()), pack("C*", 51 ));
 
@@ -677,7 +639,7 @@ write_file(asm_file(),  "A0: \n ".
 write_file(asm7_file(), "PUBLIC A7 \n A7: defb 7");
 write_file(asm8_file(), "PUBLIC A8 \n A8: defb 8");
 write_file(asm9_file(), "PUBLIC A9 \n A9: defb 9");
-t_z80asm_capture("-l -b -i".lib1_file()." -i".lib2_file()." ".
+t_z80asm_capture("-l -b -l".lib1_file()." -l".lib2_file()." ".
 				 asm_file()." ".asm7_file()." ".asm8_file()." ".asm9_file(), "", "", 0);
 ok -f bin_file();
 my $binary = read_file(bin_file(), binmode => ':raw', err_mode => 'quiet');
@@ -712,15 +674,15 @@ t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 
 # link library files
 t_z80asm_capture("-x".lib1_file()." ".asm1_file(), "", "", 0);
-t_z80asm_capture("-b -i".lib1_file()." ".asm2_file(), "", "", 0);
+t_z80asm_capture("-b -l".lib1_file()." ".asm2_file(), "", "", 0);
 t_binary(read_binfile(bin2_file()), "\xCD\x06\x00\xC9\x3E\x01\x3E\x02\xC9");
 
 #------------------------------------------------------------------------------
-# --split-bin, ORG -1: tested in directives.t
+# -split-bin, ORG -1: tested in directives.t
 
 
 #------------------------------------------------------------------------------
-# --cpu=z180
+# -mz180
 t_z80asm_ok(0, "
 	slp
 	
@@ -879,7 +841,7 @@ t_z80asm_error("tstio 23	", "Error at file 'test.asm' line 1: illegal identifier
 t_z80asm_error("tst b		", "Error at file 'test.asm' line 1: illegal identifier");
 
 #------------------------------------------------------------------------------
-# --cpu=r2k
+# -mr2k
 t_z80asm_ok(0, "
 	altd ld a,31
 	ioi ld a,(0xFE)

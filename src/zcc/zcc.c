@@ -172,7 +172,6 @@ static int             copy_defc_file(char *name1, char *ext1, char *name2, char
 static void            tempname(char *);
 static int             find_zcc_config_fileFile(const char *program, char *arg, int argc, char *buf, size_t buflen);
 static void            parse_option(char *option);
-static void            linkargs_mangle(char *linkargs);
 static void            add_zccopt(char *fmt, ...);
 static char           *replace_str(const char *str, const char *old, const char *new);
 static void            setup_default_configuration();
@@ -706,12 +705,9 @@ int linkthem(char *linker)
     char            tname[FILENAME_MAX + 1];
     FILE           *out, *prj;
 
-    linkargs_mangle(linklibs);
-    linkargs_mangle(linkargs);
-
     if (compileonly)
     {
-        len = offs = zcc_asprintf(&temp, "%s %s --output=\"%s\" %s",
+        len = offs = zcc_asprintf(&temp, "%s %s -o\"%s\" %s",
             linker,
             select_cpu(CPU_MAP_TOOL_Z80ASM),
             outputfile,
@@ -3088,33 +3084,6 @@ void parse_option(char *option)
                 add_file_to_process(strip_outer_quotes(ptr));
             }
             ptr = qstrtok(NULL, " \t\r\n");
-        }
-    }
-}
-
-
-/* check for "-lxxx", not "-l" */
-static int at_link_arg(const char* ptr) 
-{
-	if (strncmp(ptr, "-l", 2) == 0 && ptr[2] != '\0' && !isspace(ptr[2]))
-		return 1;
-	else
-		return 0;
-}
-
-/* Check link arguments (-l) to -i for z80asm */
-void linkargs_mangle(char *linkargs)
-{
-    char           *ptr = linkargs;
-
-    if (IS_ASM(ASM_Z80ASM)) {
-		ptr = linkargs;
-		if (at_link_arg(ptr))
-			ptr[1] = 'i';
-        while ((ptr = strstr(ptr, " -l")) != NULL) {
-			ptr++;
-			if (at_link_arg(ptr))
-				ptr[1] = 'i';
         }
     }
 }

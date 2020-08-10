@@ -66,7 +66,7 @@ check_bin_file("test.bin", pack("C*", 1,0,0,0, 2,2,0,0, 3,3,3,0, 4,4,4,4, 5,5,5,
 
 # align inside a section with different filler byte
 unlink_testfiles();
-z80asm(<<'END', "-l -s -b -m --filler=9", 0, "", "");
+z80asm(<<'END', "-l -s -b -m -f9", 0, "", "");
 	defb 	1
 l1:	align 	4
 	defb 	2, 2
@@ -116,7 +116,7 @@ Object  file test.o at $0000: Z80RMF14
 END
 
 unlink_testfiles();
-z80asm(<<'END', "-l -s -b -m --filler=0xFF", 0, "", "");
+z80asm(<<'END', "-l -s -b -m -f0xFF", 0, "", "");
 	section code
 	nop
 
