@@ -4662,3 +4662,21 @@
 =
 	ld	a,l
 	call	l_i64_%2o
+
+	call	l_i64_push
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+	call	l_i64_load
+=
+	call	l_i64_push
+	ld	hl,0	;const
+	add	hl,sp
+	push	hl
+
+	ld	hl,%1
+	call	l_i64_load
+	call	l_i64_push_under_int
+=
+	ld	hl,%1
+	call	l_i64_push_under_int_mhl

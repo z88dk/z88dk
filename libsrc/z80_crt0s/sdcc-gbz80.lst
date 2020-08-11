@@ -1,2 +1,2 @@
 ../_DEVELOPMENT/l/sdcc/___sdcc_call_hl
-gbz80/sdcc/*.asm
+sdcc/gbz80/**.asm

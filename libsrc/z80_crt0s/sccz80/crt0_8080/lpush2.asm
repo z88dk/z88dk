@@ -13,10 +13,15 @@
                 PUBLIC lpush2
 		EXTERN	__retloc
 
-.lpush2 pop	af
-        pop     bc      ;save next item on stack
-        push    de      ;dump our long
+.lpush2 
+        ld      (__retloc),hl
+        pop     hl      ;save next item on stack
+        push    de      ;dump our long - MSW
+        ex      de,hl   ;de is now return address
+        ld      hl,(__retloc)
         push    hl
+        ex      de,hl
         push    bc      ;store back "next item on stack"
-	push	af
+	push	de
+        ld      hl,(__retloc)
 	ret
