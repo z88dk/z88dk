@@ -1391,7 +1391,14 @@ void gen_leave_function(Kind vartype, char type, int incritical)
         savesp = Zsp;
         Zsp = -stackargs;
 
-        if ( c_notaltreg && ( vartype != KIND_NONE && vartype != KIND_DOUBLE) && abs(Zsp) >= 11 ) {
+        if ( save == KIND_LONGLONG) {
+            pop("de");
+            pop("hl");
+            push("de");
+            callrts("l_i64_copy");
+        }
+
+        if ( c_notaltreg && ( vartype != KIND_NONE && vartype != KIND_DOUBLE && vartype != KIND_LONGLONG) && abs(Zsp) >= 11 ) {
             // 8080, save hl, pop return int hl
             ol("ld\t(saved_hl),hl");
             pop("hl");
@@ -1421,7 +1428,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
         gen_critical_leave();
     }
 
-    if ( save == KIND_LONGLONG ) {
+    if ( !callee_cleanup && save == KIND_LONGLONG ) {
         pop("de");
         pop("hl");
         push("hl");
@@ -5148,7 +5155,9 @@ void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned cha
             if (!operator_is_commutative) ol("ex\t(sp),hl"); 
         } else if ( stacked_kind == KIND_LONGLONG) {
             /* Pop the longlong into the accumulator */
+            ol("exx");
             callrts("l_i64_pop");  // Preserves
+            ol("exx");
             Zsp += 8;
             /* Push the float */
             push("hl");
@@ -5162,12 +5171,17 @@ void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned cha
             if (!operator_is_commutative)  ol("ex\t(sp),hl"); 
         }
     } else if ( stacked_kind == KIND_LONGLONG ) {
-        /* Pop the longlong into the accumulator */
+        /* Pop the longlong into the accumulator
+         * If we're using 4 byte longs, then they are held in dehl, so we need to preserve the register
+         * If bigger, then they are held in FA or in alt registers, so we can trash the main set
+         */
+        if ( c_fp_size < 6 ) ol("exx");
         callrts("l_i64_pop");  // Preserves
+        if ( c_fp_size < 6 ) ol("exx");
         Zsp += 8;
         /* Push the float */
-        push("hl");
-        /* And convert */
+        gen_push_float(float_kind); 
+        /* And convert the long */
         zconvert_to_double(stacked_kind, float_kind, isunsigned);
         if (!operator_is_commutative) gen_swap_float(float_kind); 
     } else {
