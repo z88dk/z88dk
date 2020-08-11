@@ -21,13 +21,7 @@ EXTERN __IO_APU_STATUS, __IO_APU_DATA
 
 PUBLIC asm_am9511_pushf
 PUBLIC asm_am9511_pushf_fastcall
-PUBLIC _am9511_pushf
-PUBLIC _am9511_pushf_fastcall
 
-
-._am9511_pushf
-    ld hl,2
-    add hl,sp
 
 .asm_am9511_pushf
 
@@ -98,7 +92,7 @@ PUBLIC _am9511_pushf_fastcall
     out (c),a                   ; load zero exponent into APU
     ret
 
-._am9511_pushf_fastcall
+
 .asm_am9511_pushf_fastcall
 
     ; float primitive
