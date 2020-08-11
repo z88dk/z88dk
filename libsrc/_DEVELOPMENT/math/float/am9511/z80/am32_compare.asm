@@ -81,9 +81,7 @@ PUBLIC  asm_am9511_compare, asm_am9511_compare_callee
     rr d
     rr e
 
-    ld a,l
-    and 0fch            ;remove least significant 2 bits
-    ld l,a
+    res 0,l             ;remove least significant bit
 
     exx                 ;left
     sla e
@@ -107,8 +105,7 @@ PUBLIC  asm_am9511_compare, asm_am9511_compare_callee
     rr d
     rr e
 
-    ld a,l
-    and 0fch            ;remove least significant 2 bits
+    res 0,l             ;remove least significant bit
 
     exx                 ;right
     sub l

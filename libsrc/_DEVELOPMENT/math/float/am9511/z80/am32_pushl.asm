@@ -21,7 +21,12 @@ EXTERN __IO_APU_STATUS, __IO_APU_DATA
 
 PUBLIC asm_am9511_pushl
 PUBLIC asm_am9511_pushl_fastcall
+PUBLIC _am9511_pushl
+PUBLIC _am9511_pushl_fastcall
 
+._am9511_pushl
+    ld hl,2
+    add hl,sp
 
 .asm_am9511_pushl
 
@@ -47,10 +52,10 @@ PUBLIC asm_am9511_pushl_fastcall
     outi                        ; load MSW into APU
     inc b
     outi
-    inc b
     ret
 
 
+._am9511_pushl_fastcall
 .asm_am9511_pushl_fastcall
 
     ; float primitive

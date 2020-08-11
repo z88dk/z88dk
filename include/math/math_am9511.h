@@ -48,8 +48,9 @@ extern double_t __LIB__ acosh(double_t x);
 extern double_t __LIB__ atanh(double_t x);
 
 /* Power functions */
-extern double_t __LIB__ pow(double_t x, double_t y) __smallc;
+extern double_t __LIB__ sqr(double_t a);
 extern double_t __LIB__ sqrt(double_t a);
+extern double_t __LIB__ pow(double_t x, double_t y) __smallc;
 
 /* Exponential */
 extern double_t __LIB__ exp(double_t x);
@@ -70,15 +71,13 @@ extern double_t __LIB__ round(double_t x);
 #define rint(a) ceil(a)
 
 /* Manipulation */
+extern double_t __LIB__ div2(double_t x);
+extern double_t __LIB__ mul2(double_t x);
+extern double_t __LIB__ mul10u(double_t x);
 extern double_t __LIB__ ldexp(double_t x, int pw2) __smallc;
 #define scalbn(x,pw2) ldexp(x,pw2)
 extern double_t __LIB__ modf(double_t x, double_t * y) __smallc;
 extern double_t __LIB__ frexp(double_t x, int *pw2) __smallc;
-
-/* Intrinsic functions */
-extern double_t __LIB__ sqr(double_t a);
-extern double_t __LIB__ inv(double_t a);
-extern double_t __LIB__ invsqrt(double_t a);
 
 /* General */
 extern double_t __LIB__ fabs(double_t x);
@@ -90,8 +89,8 @@ extern double_t __LIB__ atof(char *) __smallc;
 extern void __LIB__ ftoa(double_t, int, char *) __smallc;
 extern void __LIB__ ftoe(double_t, int, char *) __smallc;
 
-extern double_t __LIB__ f32_fam9511(double_t x) __smallc;
-extern double_t __LIB__ fam9511_f32(double_t x) __smallc;
+extern double_t __LIB__ f32_fam9511(double_t x);
+extern double_t __LIB__ fam9511_f32(double_t x);
 
 /* Classification functions */
 #define FP_NORMAL   0

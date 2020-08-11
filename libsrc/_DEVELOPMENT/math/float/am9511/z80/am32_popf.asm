@@ -20,8 +20,9 @@ SECTION code_fp_am9511
 EXTERN __IO_APU_STATUS, __IO_APU_DATA
 
 PUBLIC asm_am9511_popf
+PUBLIC _am9511_popf
 
-
+._am9511_popf
 .asm_am9511_popf
 
     ; float primitive

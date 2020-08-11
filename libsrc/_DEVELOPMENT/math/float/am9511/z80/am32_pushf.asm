@@ -21,7 +21,13 @@ EXTERN __IO_APU_STATUS, __IO_APU_DATA
 
 PUBLIC asm_am9511_pushf
 PUBLIC asm_am9511_pushf_fastcall
+PUBLIC _am9511_pushf
+PUBLIC _am9511_pushf_fastcall
 
+
+._am9511_pushf
+    ld hl,2
+    add hl,sp
 
 .asm_am9511_pushf
 
@@ -51,7 +57,7 @@ PUBLIC asm_am9511_pushf_fastcall
     rla                         ; get exponent least significant bit to carry
     inc hl
     ld a,(hl)                   ; get exponent to a
-    rl a                        ; get all exponent to a
+    rl a                        ; get all exponent to a, set flags
     jr Z,asm_am9511_zero        ; check for zero
     cp 127+63                   ; check for overflow
     jr NC,asm_am9511_max
@@ -60,7 +66,7 @@ PUBLIC asm_am9511_pushf_fastcall
     sub 127-1                   ; bias including shift binary point
 
     dec hl
-    bit 7,(hl)                  ; set mantissa MSB
+    set 7,(hl)                  ; set mantissa MSB
     outi                        ; load mantissa MSB into APU
     inc b
     
@@ -92,7 +98,7 @@ PUBLIC asm_am9511_pushf_fastcall
     out (c),a                   ; load zero exponent into APU
     ret
 
-
+._am9511_pushf_fastcall
 .asm_am9511_pushf_fastcall
 
     ; float primitive
@@ -117,7 +123,7 @@ PUBLIC asm_am9511_pushf_fastcall
     jr C,asm_am9511_zero_f
     sub 127-1                   ; bias including shift binary point
 
-    rla                         ; position sign
+    rla                         ; position exponent for sign
     rl d                        ; get sign
     rra
     ld d,a                      ; restore exponent
