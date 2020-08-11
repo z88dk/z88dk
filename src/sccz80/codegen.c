@@ -5309,9 +5309,9 @@ void gen_switch_case(Kind kind, int64_t value, int label)
         if ( kind == KIND_LONGLONG ) {
             uint64_t l;
             l = value & 0xffffffff;
-            outfmt("\tdefb\t$%02x,$%02x,$%02x,$%02x\n", (l % 65536 ) % 256, (l % 65536 ) / 256, (l / 65536) % 256, (l / 65536) / 256 )
+            outfmt("\tdefb\t$%02x,$%02x,$%02x,$%02x\n", (l % 65536 ) % 256, (l % 65536 ) / 256, (l / 65536) % 256, (l / 65536) / 256 );
             l = (value >> 32) & 0xffffffff;
-            outfmt("\tdefb\t$%02x,$%02x,$%02x,$%02x\n", (l % 65536 ) % 256, (l % 65536 ) / 256, (l / 65536) % 256, (l / 65536) / 256 )
+            outfmt("\tdefb\t$%02x,$%02x,$%02x,$%02x\n", (l % 65536 ) % 256, (l % 65536 ) / 256, (l / 65536) % 256, (l / 65536) / 256 );
         } else {
             if ( kind == KIND_LONG || kind == KIND_CPTR) {
                 deflong();
