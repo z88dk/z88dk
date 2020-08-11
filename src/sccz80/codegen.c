@@ -1065,9 +1065,6 @@ void dpush_under(Kind val_type)
            dcallrts("dpush_under_long",KIND_DOUBLE);
            Zsp -= c_fp_size;
         }
-    } else if ( val_type == KIND_LONGLONG ) {
-        ol("TODO: dpush_under");
-        Zsp -= c_fp_size;
     } else {
         if ( c_fp_size == 4 ) {
             swap(); /* MSW -> hl */
@@ -1208,9 +1205,9 @@ int callstk(Type *type, int n, int isfarptr, int last_argument_size)
         ol("push\taf");
         Zsp += 2;
 
-         ol("ret");
-         postlabel(label);
-         return ret;
+        ol("ret");
+        postlabel(label);
+        return ret;
     } else {
         // Non __z88dk_fastcall function pointers and those qwhich have a
         // fastcall argument that's stored in memory
@@ -2067,7 +2064,7 @@ void zadd_const(LVALUE *lval, int64_t value)
             add_to_high_word(value);          // it will be < 7 bytes, 33T
         } else {
             ol("ex\tde,hl");                      // 1, 4
-            // TODO: 8080 - this adc is emulated and we could probably do better with an 8 bit operation
+            // TODO: 8080/gbz80 - this adc is emulated and we could probably do better with an 8 bit operation
             constbc(((uint32_t)value) / 65536);   // 3, 10
             ol("adc\thl,bc");                     // 2, 15
             ol("ex\tde,hl");                      // 1, 4
@@ -5149,12 +5146,30 @@ void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned cha
             ol("ex\tde,hl");
             zconvert_to_double(stacked_kind, float_kind, isunsigned);
             if (!operator_is_commutative) ol("ex\t(sp),hl"); 
+        } else if ( stacked_kind == KIND_LONGLONG) {
+            /* Pop the longlong into the accumulator */
+            callrts("l_i64_pop");  // Preserves
+            Zsp += 8;
+            /* Push the float */
+            push("hl");
+            /* And convert */
+            zconvert_to_double(stacked_kind, float_kind, isunsigned);
+            if (!operator_is_commutative)  ol("ex\t(sp),hl"); 
         } else {
             // 2 bytes on stack
             ol("ex\t(sp),hl");  // 
             zconvert_to_double(stacked_kind, float_kind, isunsigned);
             if (!operator_is_commutative)  ol("ex\t(sp),hl"); 
         }
+    } else if ( stacked_kind == KIND_LONGLONG ) {
+        /* Pop the longlong into the accumulator */
+        callrts("l_i64_pop");  // Preserves
+        Zsp += 8;
+        /* Push the float */
+        push("hl");
+        /* And convert */
+        zconvert_to_double(stacked_kind, float_kind, isunsigned);
+        if (!operator_is_commutative) gen_swap_float(float_kind); 
     } else {
         dpush_under(stacked_kind);
         pop("hl");
@@ -5292,7 +5307,11 @@ void gen_switch_case(Kind kind, int64_t value, int label)
         printlabel(label); /* case label */
         nl();
         if ( kind == KIND_LONGLONG ) {
-            ol("TODO: gen_switch_Case");
+            uint64_t l;
+            l = value & 0xffffffff;
+            outfmt("\tdefb\t$%02x,$%02x,$%02x,$%02x\n", (l % 65536 ) % 256, (l % 65536 ) / 256, (l / 65536) % 256, (l / 65536) / 256 )
+            l = (value >> 32) & 0xffffffff;
+            outfmt("\tdefb\t$%02x,$%02x,$%02x,$%02x\n", (l % 65536 ) % 256, (l % 65536 ) / 256, (l / 65536) % 256, (l / 65536) / 256 )
         } else {
             if ( kind == KIND_LONG || kind == KIND_CPTR) {
                 deflong();

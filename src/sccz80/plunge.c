@@ -286,7 +286,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 vconst(lval2->const_val);
             }
 
-            // TODO: We can do some quickdiv as well surely
             if (lval2->const_val == 0 && (oper == zdiv || oper == zmod)) {
                 /* Note, a redundant load of lval has been done, this can be taken out by the optimiser */
                 clearstage(before, 0);

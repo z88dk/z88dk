@@ -98,5 +98,6 @@ sccz80/crt0_z80/fp_seed
 sccz80/crt0_z80/l_push_di
 sccz80/crt0_z80/l_pop_ei
 sccz80/crt0_z80/l_graphics_cmp
+sdcc/z80/__convert_sdccf2reg
 @newlib-gbz80.lst
 @sdcc-gbz80.lst
