@@ -22,7 +22,7 @@ z80asm(<<END);
 END
 check_bin_file("test.bin", pack("C*", 0x3E, 10, 1..9, 0));
 
-# -I, --inc-path
+# -I
 unlink_testfiles();
 mkdir("test_dir");
 
@@ -38,10 +38,8 @@ Error at file 'test.asm' line 1: cannot read file 'test.inc'
 END
 	
 # -I : OK
-for my $options ('-I', '-I=', '--inc-path', '--inc-path=') {
-	z80asm('include "test.inc"', "-b ${options}test_dir");
-	check_bin_file("test.bin", pack("C*", 0x3E, 10));
-}
+z80asm('include "test.inc"', "-b -Itest_dir");
+check_bin_file("test.bin", pack("C*", 0x3E, 10));
 
 # -I, full path : OK
 z80asm('include "test_dir/test.inc"', "-b -Itest_dir");

@@ -6,7 +6,7 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
-# Test --debug info in map file
+# Test -debug info in map file
 
 use Modern::Perl;
 use Test::More;
@@ -43,7 +43,7 @@ __tail                          = $000A ; const, public, def, , ,
 __size                          = $000A ; const, public, def, , ,
 END
 
-run("z80asm -b --debug test.asm test1.asm");
+run("z80asm -b -debug test.asm test1.asm");
 check_text_file("test.map", <<'END');
 main                            = $0000 ; addr, local, , test, , test.asm:3
 __ASM_LINE_3                    = $0000 ; addr, local, , test, , test.asm:3
@@ -78,7 +78,7 @@ END
 SKIP: {
 	skip "need zcc changed", 1;
 	
-run("zcc +z80 -m -Ca--debug test.c test1.asm -otest.bin", 0, 'IGNORE', "");
+run("zcc +z80 -m -Ca-debug test.c test1.asm -otest.bin", 0, 'IGNORE', "");
 check_text_file("test.map", <<'END');
 __SDCC_IY                       = $0001 ; const, local, , z80_crt, ,
 __CRTCFG                        = $0002 ; const, local, , z80_crt, , z80_crt.asm:50

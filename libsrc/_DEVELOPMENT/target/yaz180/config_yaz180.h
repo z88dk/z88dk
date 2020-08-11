@@ -752,77 +752,49 @@
 
 
 
-#define __IO_APU_DATA  0xc000
-#define __IO_APU_CONTROL  0xc001
-#define __IO_APU_STATUS  0xc001
+#define __IO_PIO_IDE_LSB  0x4000
+#define __IO_PIO_IDE_MSB  0x4001
+#define __IO_PIO_IDE_CTL  0x4002
+#define __IO_PIO_IDE_CONFIG  0x4003
+#define __IO_PIO_IDE_RD  0x92
+#define __IO_PIO_IDE_WR  0x80
 
-#define __IO_APU_STATUS_BUSY  0x80
-#define __IO_APU_STATUS_SIGN  0x40
-#define __IO_APU_STATUS_ZERO  0x20
-#define __IO_APU_STATUS_DIV0  0x10
-#define __IO_APU_STATUS_NEGRT  0x08
-#define __IO_APU_STATUS_UNDFL  0x04
-#define __IO_APU_STATUS_OVRFL  0x02
-#define __IO_APU_STATUS_CARRY  0x01
+#define __IO_IDE_A0_LINE  0x10
+#define __IO_IDE_A1_LINE  0x04
+#define __IO_IDE_A2_LINE  0x40
+#define __IO_IDE_CS0_LINE  0x08
+#define __IO_IDE_CS1_LINE  0x20
+#define __IO_IDE_WR_LINE  0x01
+#define __IO_IDE_RD_LINE  0x02
+#define __IO_IDE_RST_LINE  0x80
 
-#define __IO_APU_STATUS_ERROR  0x1E
+#define __IO_IDE_DATA  0x08
+#define __IO_IDE_ERROR  0x18
+#define __IO_IDE_SEC_CNT  0xc
+#define __IO_IDE_SECTOR  0x1c
+#define __IO_IDE_CYL_LSB  0x48
+#define __IO_IDE_CYL_MSB  0x58
+#define __IO_IDE_HEAD  0x4c
+#define __IO_IDE_COMMAND  0x5c
+#define __IO_IDE_STATUS  0x5c
 
-#define __IO_APU_COMMAND_SVREQ 0x80
+#define __IO_IDE_CONTROL  0x64
+#define __IO_IDE_ALT_STATUS  0x64
 
-#define __IO_APU_OP_ENT  0x40
-#define __IO_APU_OP_REM  0x50
-#define __IO_APU_OP_ENT16  0x40
-#define __IO_APU_OP_ENT32  0x41
-#define __IO_APU_OP_REM16  0x50
-#define __IO_APU_OP_REM32  0x51
+#define __IO_IDE_LBA0  0x1c
+#define __IO_IDE_LBA1  0x48
+#define __IO_IDE_LBA2  0x58
+#define __IO_IDE_LBA3  0x4c
 
-#define __IO_APU_OP_SADD  0x6C
-#define __IO_APU_OP_SSUB  0x6D
-#define __IO_APU_OP_SMUL  0x6E
-#define __IO_APU_OP_SMUU  0x76
-#define __IO_APU_OP_SDIV  0x6F
+#define __IDE_CMD_READ  0x20
+#define __IDE_CMD_WRITE  0x30
 
-#define __IO_APU_OP_DADD  0x2C
-#define __IO_APU_OP_DSUB  0x2D
-#define __IO_APU_OP_DMUL  0x2E
-#define __IO_APU_OP_DMUU  0x36
-#define __IO_APU_OP_DDIV  0x2F
+#define __IDE_CMD_STANDBY  0xE0
+#define __IDE_CMD_IDLE  0xE1
+#define __IDE_CMD_SLEEP  0xE6
+#define __IDE_CMD_CACHE_FLUSH  0xE7
+#define __IDE_CMD_ID  0xEC
 
-#define __IO_APU_OP_FADD  0x10
-#define __IO_APU_OP_FSUB  0x11
-#define __IO_APU_OP_FMUL  0x12
-#define __IO_APU_OP_FDIV  0x13
-
-#define __IO_APU_OP_SQRT  0x01
-#define __IO_APU_OP_SIN  0x02
-#define __IO_APU_OP_COS  0x03
-#define __IO_APU_OP_TAN  0x04
-#define __IO_APU_OP_ASIN  0x05
-#define __IO_APU_OP_ACOS  0x06
-#define __IO_APU_OP_ATAN  0x07
-#define __IO_APU_OP_LOG  0x08
-#define __IO_APU_OP_LN  0x09
-#define __IO_APU_OP_EXP  0x0A
-#define __IO_APU_OP_PWR  0x0B
-
-#define __IO_APU_OP_NOP  0x00
-#define __IO_APU_OP_FIXS  0x1F
-#define __IO_APU_OP_FIXD  0x1E
-#define __IO_APU_OP_FLTS  0x1D
-#define __IO_APU_OP_FLTD  0x1C
-#define __IO_APU_OP_CHSS  0x74
-#define __IO_APU_OP_CHSD  0x34
-#define __IO_APU_OP_CHSF  0x15
-#define __IO_APU_OP_PTOS  0x77
-#define __IO_APU_OP_PTOD  0x37
-#define __IO_APU_OP_PTOF  0x17
-#define __IO_APU_OP_POPS  0x78
-#define __IO_APU_OP_POPD  0x38
-#define __IO_APU_OP_POPF  0x18
-#define __IO_APU_OP_XCHS  0x79
-#define __IO_APU_OP_XCHD  0x39
-#define __IO_APU_OP_XCHF  0x19
-#define __IO_APU_OP_PUPI  0x1A
 
 
 
@@ -921,49 +893,78 @@
 
 
 
-#define __IO_PIO_IDE_LSB  0x4000
-#define __IO_PIO_IDE_MSB  0x4001
-#define __IO_PIO_IDE_CTL  0x4002
-#define __IO_PIO_IDE_CONFIG  0x4003
-#define __IO_PIO_IDE_RD  0x92
-#define __IO_PIO_IDE_WR  0x80
 
-#define __IO_IDE_A0_LINE  0x10
-#define __IO_IDE_A1_LINE  0x04
-#define __IO_IDE_A2_LINE  0x40
-#define __IO_IDE_CS0_LINE  0x08
-#define __IO_IDE_CS1_LINE  0x20
-#define __IO_IDE_WR_LINE  0x01
-#define __IO_IDE_RD_LINE  0x02
-#define __IO_IDE_RST_LINE  0x80
+#define __IO_APU_DATA  0xc000
+#define __IO_APU_CONTROL  0xc001
+#define __IO_APU_STATUS  0xc001
 
-#define __IO_IDE_DATA  0x08
-#define __IO_IDE_ERROR  0x18
-#define __IO_IDE_SEC_CNT  0xc
-#define __IO_IDE_SECTOR  0x1c
-#define __IO_IDE_CYL_LSB  0x48
-#define __IO_IDE_CYL_MSB  0x58
-#define __IO_IDE_HEAD  0x4c
-#define __IO_IDE_COMMAND  0x5c
-#define __IO_IDE_STATUS  0x5c
+#define __IO_APU_STATUS_BUSY  0x80
+#define __IO_APU_STATUS_SIGN  0x40
+#define __IO_APU_STATUS_ZERO  0x20
+#define __IO_APU_STATUS_DIV0  0x10
+#define __IO_APU_STATUS_NEGRT  0x08
+#define __IO_APU_STATUS_UNDFL  0x04
+#define __IO_APU_STATUS_OVRFL  0x02
+#define __IO_APU_STATUS_CARRY  0x01
 
-#define __IO_IDE_CONTROL  0x64
-#define __IO_IDE_ALT_STATUS  0x64
+#define __IO_APU_STATUS_ERROR  0x1E
 
-#define __IO_IDE_LBA0  0x1c
-#define __IO_IDE_LBA1  0x48
-#define __IO_IDE_LBA2  0x58
-#define __IO_IDE_LBA3  0x4c
+#define __IO_APU_COMMAND_SVREQ 0x80
 
-#define __IDE_CMD_READ  0x20
-#define __IDE_CMD_WRITE  0x30
+#define __IO_APU_OP_ENT  0x40
+#define __IO_APU_OP_REM  0x50
+#define __IO_APU_OP_ENT16  0x40
+#define __IO_APU_OP_ENT32  0x41
+#define __IO_APU_OP_REM16  0x50
+#define __IO_APU_OP_REM32  0x51
 
-#define __IDE_CMD_STANDBY  0xE0
-#define __IDE_CMD_IDLE  0xE1
-#define __IDE_CMD_SLEEP  0xE6
-#define __IDE_CMD_CACHE_FLUSH  0xE7
-#define __IDE_CMD_ID  0xEC
+#define __IO_APU_OP_SADD  0x6C
+#define __IO_APU_OP_SSUB  0x6D
+#define __IO_APU_OP_SMUL  0x6E
+#define __IO_APU_OP_SMUU  0x76
+#define __IO_APU_OP_SDIV  0x6F
 
+#define __IO_APU_OP_DADD  0x2C
+#define __IO_APU_OP_DSUB  0x2D
+#define __IO_APU_OP_DMUL  0x2E
+#define __IO_APU_OP_DMUU  0x36
+#define __IO_APU_OP_DDIV  0x2F
+
+#define __IO_APU_OP_FADD  0x10
+#define __IO_APU_OP_FSUB  0x11
+#define __IO_APU_OP_FMUL  0x12
+#define __IO_APU_OP_FDIV  0x13
+
+#define __IO_APU_OP_SQRT  0x01
+#define __IO_APU_OP_SIN  0x02
+#define __IO_APU_OP_COS  0x03
+#define __IO_APU_OP_TAN  0x04
+#define __IO_APU_OP_ASIN  0x05
+#define __IO_APU_OP_ACOS  0x06
+#define __IO_APU_OP_ATAN  0x07
+#define __IO_APU_OP_LOG  0x08
+#define __IO_APU_OP_LN  0x09
+#define __IO_APU_OP_EXP  0x0A
+#define __IO_APU_OP_PWR  0x0B
+
+#define __IO_APU_OP_NOP  0x00
+#define __IO_APU_OP_FIXS  0x1F
+#define __IO_APU_OP_FIXD  0x1E
+#define __IO_APU_OP_FLTS  0x1D
+#define __IO_APU_OP_FLTD  0x1C
+#define __IO_APU_OP_CHSS  0x74
+#define __IO_APU_OP_CHSD  0x34
+#define __IO_APU_OP_CHSF  0x15
+#define __IO_APU_OP_PTOS  0x77
+#define __IO_APU_OP_PTOD  0x37
+#define __IO_APU_OP_PTOF  0x17
+#define __IO_APU_OP_POPS  0x78
+#define __IO_APU_OP_POPD  0x38
+#define __IO_APU_OP_POPF  0x18
+#define __IO_APU_OP_XCHS  0x79
+#define __IO_APU_OP_XCHD  0x39
+#define __IO_APU_OP_XCHF  0x19
+#define __IO_APU_OP_PUPI  0x1A
 
 
 

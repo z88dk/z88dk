@@ -152,7 +152,7 @@ sub t_z80asm {
 		ok -f $_, "$line $_" for (@o, bin_file());
 
 		# map file
-		if ($cmd =~ / (-m|--map) /) {
+		if ($cmd =~ / (-m) /) {
 			ok   -f map_file(), "$line ".map_file();
 		}
 		else {
@@ -196,14 +196,14 @@ sub t_z80asm {
 
 	# list file or symbol table
 	if (defined($args{bin})) {
-		if ($cmd =~ / (-l|--list) /) {
+		if ($cmd =~ / (-l) /) {
 			ok   -f $_, "$line $_" for (@lst);
 		}
 		else {
 			ok ! -f $_, "$line no $_" for (@lst);
 		}
 
-		if ($cmd =~ / (-s|--symtable) /) {
+		if ($cmd =~ / (-s) /) {
 			ok   -f $_, "$line $_" for (@sym);
 		}
 		else {
@@ -213,7 +213,7 @@ sub t_z80asm {
 	elsif ($args{linkerr}) {	# asm OK but link failed
 		ok -f $_, "$line $_" for (@lst);
 
-		if ($cmd =~ / (-s|--symtable) /) {
+		if ($cmd =~ / (-s) /) {
 			ok   -f $_, "$line $_" for (@sym);
 		}
 		else {

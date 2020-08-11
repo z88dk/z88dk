@@ -32,7 +32,7 @@ spew("test.asm", <<'...');
 	extern main
 	jp main
 ...
-run('z80asm -b -itest.lib test.asm', 1, '', <<'...');
+run('z80asm -b -ltest.lib test.asm', 1, '', <<'...');
 Error at file 'test.asm' line 2: symbol 'main' not defined
 ...
 

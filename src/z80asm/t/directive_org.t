@@ -68,7 +68,7 @@ z80asm("extern start \n org start", "", 1, "", <<'ERR');
 Error at file 'test.asm' line 2: expected constant expression
 ERR
 
-# -r, --origin -- tested in options.t
+# -r -- tested in options.t
 
 # BUG_0025 : JR at org 0 with out-of-range jump crashes WriteListFile()
 unlink_testfiles();
@@ -81,7 +81,7 @@ z80asm("jr ASMPC+2+128", "", 1, "", <<'ERR');
 Error at file 'test.asm' line 1: integer '128' out of range
 ERR
 
-# --split-bin, ORG -1
+# -split-bin, ORG -1
 unlink_testfiles();
 z80asm(<<'END');
 	defw ASMPC
@@ -102,7 +102,7 @@ ok ! -f "test_data.bin", "test_data.bin";
 check_bin_file("test_bss.bin", pack("v*", 0x4000));
 
 unlink_testfiles();
-z80asm(<<'END', "-b --split-bin");
+z80asm(<<'END', "-b -split-bin");
 	defw ASMPC		; split file here
 	
 	section code	; split file here

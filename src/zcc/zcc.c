@@ -172,7 +172,6 @@ static int             copy_defc_file(char *name1, char *ext1, char *name2, char
 static void            tempname(char *);
 static int             find_zcc_config_fileFile(const char *program, char *arg, int argc, char *buf, size_t buflen);
 static void            parse_option(char *option);
-static void            linkargs_mangle(char *linkargs);
 static void            add_zccopt(char *fmt, ...);
 static char           *replace_str(const char *str, const char *old, const char *new);
 static void            setup_default_configuration();
@@ -706,12 +705,9 @@ int linkthem(char *linker)
     char            tname[FILENAME_MAX + 1];
     FILE           *out, *prj;
 
-    linkargs_mangle(linklibs);
-    linkargs_mangle(linkargs);
-
     if (compileonly)
     {
-        len = offs = zcc_asprintf(&temp, "%s %s --output=\"%s\" %s",
+        len = offs = zcc_asprintf(&temp, "%s %s -o\"%s\" %s",
             linker,
             select_cpu(CPU_MAP_TOOL_Z80ASM),
             outputfile,
@@ -971,8 +967,8 @@ int main(int argc, char **argv)
 
     if (lston) {
         /* list on so add list options to assembler and linker */
-        BuildOptions(&asmargs, "--list ");
-        BuildOptions(&linkargs, "--list ");
+        BuildOptions(&asmargs, "-l ");
+        BuildOptions(&linkargs, "-l ");
     }
 
     if (c_zorg != -1) {
@@ -3088,20 +3084,6 @@ void parse_option(char *option)
                 add_file_to_process(strip_outer_quotes(ptr));
             }
             ptr = qstrtok(NULL, " \t\r\n");
-        }
-    }
-}
-
-
-/* Check link arguments (-l) to -i for z80asm */
-void linkargs_mangle(char *linkargs)
-{
-    char           *ptr = linkargs;
-
-    if (IS_ASM(ASM_Z80ASM)) {
-        if (strncmp(linkargs, "-l", 2) == 0) linkargs[1] = 'i';
-        while ((ptr = strstr(linkargs, " -l")) != NULL) {
-            ptr[2] = 'i';
         }
     }
 }

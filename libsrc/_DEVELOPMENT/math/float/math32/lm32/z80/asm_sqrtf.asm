@@ -13,7 +13,7 @@ EXTERN m32_fssqrt_fastcall
     ; enter : stack = ret
     ;          DEHL = sccz80_float number
     ;
-    ; exit  :  DEHL = sccz80_float(1/number)
+    ; exit  :  DEHL = sccz80_float(number^0.5)
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 

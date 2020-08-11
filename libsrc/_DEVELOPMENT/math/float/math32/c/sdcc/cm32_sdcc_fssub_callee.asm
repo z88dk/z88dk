@@ -17,7 +17,7 @@ DEFC _m32_sub_callee = cm32_sdcc_fssub_callee
     ;
     ; enter : stack = sdcc_float right, sdcc_float left, ret
     ;
-    ; exit  : DEHL = sdcc_float(left+right)
+    ; exit  : DEHL = sdcc_float(left-right)
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 

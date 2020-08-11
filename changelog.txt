@@ -8,6 +8,10 @@ Detailed but incomplete changelist:
 - [classic] WYZTracker is now available for AY music and SFX
 - [classic] Interrupt code is now 8080 clean
 - [classic] +cpm: Vector06c disc creation
+- [classic] +gb: Banking now works for both sdcc and sccz80
+- [classic] +gb: MBF32 floating point maths is now available
+- [classic] +msx: Banking now works for both sdcc and sccz80
+- [classic] +msx: MegaROMs can now be created
 - [classic] +svi: Generic console now works again
 - [classic] +zx: The enter key now works with ROM input
 - [classic] +vector06c: New target

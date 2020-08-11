@@ -20,6 +20,8 @@ sccz80/crt0_long_8080/l_long_ucmp
 sccz80/crt0_long_8080/l_long_xor
 sccz80/crt0_8080/l_ne
 sccz80/crt0_8080/l_sub
+sccz80/crt0_long_8080/l_long_mod
+sccz80/crt0_long_8080/l_long_mod_u
 sccz80/crt0_long_8080/l_long_div
 sccz80/crt0_long_8080/l_long_div_u
 sccz80/crt0_long_8080/l_long_divide

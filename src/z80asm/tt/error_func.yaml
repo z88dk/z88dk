@@ -184,7 +184,7 @@ errors:
   - type	: ErrError
     func	: error_invalid_org_option
     args	: const char *org_hex
-    message	: "\"invalid --origin option '%s'\", org_hex"
+    message	: "\"invalid origin (-r) option '%s'\", org_hex"
 	
   - type	: ErrError
     func	: error_invalid_define_option

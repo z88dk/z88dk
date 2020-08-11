@@ -35,7 +35,7 @@ int main()
 }
 END
 
-run("zcc +z80 -m -clib=new -Cc-gcline -Ca--debug test.c test1.asm -otest.bin", 0, 'IGNORE', '');
+run("zcc +z80 -m -clib=new -Cc-gcline -Ca-debug test.c test1.asm -otest.bin", 0, 'IGNORE', '');
 my $map = join("\n", grep {/test.c:|test1.asm:/} split('\n', slurp("test.map")))."\n";
 check_text($map, <<'END', "map file contents");
 __C_LINE_0                      = $0000 ; addr, local, , test_c, , test.c:0

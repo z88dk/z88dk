@@ -19,11 +19,11 @@
 	push	hl
 	push	ix	;save callers ix
 	
-	ld	a,d
+	ld	a,d	;Supplying -1 as the address means we disassemble the following opcode
 	and	e
-	cp	255
+	inc	a
 	jr	nz,dizloop
-	ld	hl,0
+	ld	hl,2
 	add	hl,sp
 	ld	e,(hl)
 	inc	hl
@@ -39,7 +39,7 @@
 	ld	a,b
 	or	c
 	jr	nz,dizloop
-	ld	h,d
+	ld	h,d	;Address of next instruction
 	ld	l,e
 	pop	ix	;restore callers ix
 	ret
