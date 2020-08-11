@@ -18,7 +18,7 @@ typedef struct elem_s {
     Kind           kind;
     int            written;
     int            litlab;
-    double         value;
+    zdouble        value;
     unsigned char  fa[MAX_MANTISSA_SIZE+1];      /* The parsed representation */
     char           str[60];    /* A raw string version */
 } elem_t;
@@ -223,7 +223,7 @@ typecheck:
     if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
         lval->val_type = KIND_LONG;
     }
-    if ( lval->const_val >= UINT32_MAX || lval->const_val < -INT32_MIN ) {
+    if ( lval->const_val >= UINT32_MAX || lval->const_val < INT32_MIN ) {
         lval->val_type = KIND_LONGLONG;
         if ( sizeof(long double) == sizeof(double)) {
             warningfmt("limited-range", "On this host, 64 bit constants may not be correct\n");
