@@ -40,6 +40,7 @@
 		SECTION code_fp_math16
 		SECTION code_fp_mbf32
 		SECTION code_fp_mbf64
+		SECTION code_fp_am9511
 		SECTION code_fp_dai32
 		SECTION code_math
 		SECTION code_error
@@ -80,6 +81,7 @@ ENDIF
 		SECTION rodata_fp_math16
 		SECTION rodata_fp_mbf32
 		SECTION rodata_fp_mbf64
+		SECTION rodata_fp_am9511
 		SECTION rodata_fp_dai32
 		SECTION rodata_arch
 		SECTION rodata_compiler
@@ -124,6 +126,7 @@ ENDIF
 		SECTION bss_fp_math16
 		SECTION bss_fp_mbf32
 		SECTION bss_fp_mbf64
+		SECTION bss_fp_am9511
 		SECTION bss_fp_dai32
 		SECTION bss_compress_aplib
 		SECTION bss_error

@@ -48,6 +48,8 @@ include(`target/rc2014/config/config_82c55.m4')
 include(`target/rc2014/config/config_ide.m4')
 include(`target/rc2014/config/config_lut.m4')
 
+include(`target/am9511/config/config_am9511a.m4')
+
 include(`target/hbios/config/config_hbios.m4')
 include(`target/cpm/config/config_cpm.m4')
 

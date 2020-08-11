@@ -13,7 +13,7 @@ EXTERN m32_fssub
     ;
     ; enter : stack = sccz80_float left, sccz80_float right, ret
     ;
-    ; exit  :  DEHL = sccz80_float(left+right)
+    ; exit  :  DEHL = sccz80_float(left-right)
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 

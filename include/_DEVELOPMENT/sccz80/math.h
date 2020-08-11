@@ -56,19 +56,26 @@ typedef _Float16 half_t;
 // temporary : math lib should supply these via func call
 
 #define M_E                    2.718281828459
+#define M_INVLN2               1.442695040889   /* 1 / log(2) */
 #define M_LOG2E                1.442695040889
-#define M_LOG10E               0.4342944819033
+#define M_IVLN10               0.434294481903  /* 1 / log(10) */
+#define M_LOG10E               0.434294481903
+#define M_LOG2_E               0.693147180560
 #define M_LN2                  0.693147180560
 #define M_LN10                 2.302585092994
 #define M_PI                   3.141592653590
+#define M_TWOPI                6.283185307180
 #define M_PI_2                 1.570796326795
 #define M_PI_4                 0.7853981633974
+#define M_3PI_4                2.3561944901923
+#define M_SQRTPI               1.7724538509055
 #define M_1_PI                 0.3183098861838
 #define M_2_PI                 0.6366197723676
-#define M_4_PI                 1.27323954473516
+#define M_4_PI                 1.2732395447352
 #define M_1_SQRTPI             0.5641895835478
-#define M_2_SQRTPI             1.128379167096
+#define M_2_SQRTPI             1.1283791670955
 #define M_SQRT2                1.4142135623731
+#define M_SQRT3                1.7320508075689
 #define M_SQRT1_2              0.7071067811865
 
 //
@@ -99,6 +106,26 @@ typedef _Float16 half_t;
 #define HUGE_VAL               (1.7014118346E+38)
 #define HUGE_VALF              (1.7014118346E+38)
 #define INFINITY               (1.7014118346E+38)
+
+#endif
+
+#ifdef __MATH_AM9511
+
+#define HUGE_POS_F32            (+9.2e+18)
+#define TINY_POS_F32            (+2.7e-20)
+#define HUGE_NEG_F32            (-9.2e+18)
+#define TINY_NEG_F32            (-2.7e-20)
+
+#define MAXL2_F32               (+63.0)
+#define MINL2_F32               (-64.0)
+#define MAXLOG_F32              (+43.6657)
+#define MINLOG_F32              (−45.0)
+#define MAXL10_F32              (+18.9638)
+#define MINL10_F32              (−19.5686)
+
+#define HUGE_VAL_F32           (0x7F800000)
+#define INFINITY_POS_F32       (0x7F800000)
+#define INFINITY_NEG_F32       (0xFF800000)
 
 #endif
 
@@ -429,6 +456,21 @@ extern double_t __LIB__ f32_fam9511(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ fam9511_f32(double_t x) __smallc __z88dk_fastcall;
 
 
+extern double_t __LIB__ sqr(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ div2(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ mul2(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ mul10u(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ exp10(double_t x) __smallc __z88dk_fastcall;
+
+
 
 #endif
 
@@ -736,6 +778,16 @@ extern int __LIB__ isunorderedf16_callee(half_t x,half_t y) __smallc __z88dk_cal
 #define mul10uf      mul10u
 #define exp10f       exp10
 #define polyf        poly
+
+#endif
+
+#ifdef __MATH_AM9511
+
+#define sqrf         sqr
+#define div2f        div2
+#define mul2f        mul2
+#define mul10uf      mul10u
+#define exp10f       exp10
 
 #endif
 
