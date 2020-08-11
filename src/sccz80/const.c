@@ -225,6 +225,9 @@ typecheck:
     }
     if ( lval->const_val >= UINT32_MAX || lval->const_val < -INT32_MIN ) {
         lval->val_type = KIND_LONGLONG;
+        if ( sizeof(long double) == sizeof(double)) {
+            warningfmt("limited-range", "On this host, 64 bit constants may not be correct\n");
+        }
     }
     lval->is_const = 1;
 
@@ -1022,7 +1025,7 @@ void write_constant_queue(void)
                         offs += snprintf(buf + offs, sizeof(buf) - offs,"%s0x%02x", i != 0 ? "," : "", elem->fa[i]);
                     }
                     //outfmt("\t;%lf ref: %d written: %d\n",elem->value,elem->refcount, elem->written);
-                    outfmt("\t;%lf\n",elem->value);
+                    outfmt("\t;%Lf\n",elem->value);
                     outfmt("\tdefb\t%s\n", buf);
                 }
             } else {
@@ -1073,7 +1076,7 @@ void load_double_into_fa(LVALUE *lval)
     
     if ( c_double_strings ) {
         char  buf[40];
-        snprintf(buf, sizeof(buf), "%lf", lval->const_val);
+        snprintf(buf, sizeof(buf), "%Lf", lval->const_val);
         elem = get_elem_for_buf(buf, lval->const_val);
         immedlit(elem->litlab,0);
         nl();
