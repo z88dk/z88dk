@@ -2190,8 +2190,10 @@ void mult_const(LVALUE *lval, int64_t value)
             p >>= 1;
         }
         if ( p == 1 ) {
+            llpush();
             loada(c);
-            callrts("l_i64_asl");
+            callrts("l_i64_aslo");
+            Zsp += 8;
         } else {           
             llpush();       
             vllongconst(value);
@@ -5341,6 +5343,7 @@ void gen_switch_case(Kind kind, int64_t value, int label)
 void gen_switch_postamble(Kind kind)
 {
     // Table terminator
+
     if ( kind != KIND_CHAR ) {
         defword();
         outdec(0);
