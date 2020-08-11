@@ -26,7 +26,7 @@ PUBLIC asm_am9511_div, asm_am9511_div_callee
 
 .asm_am9511_div
     push hl
-    ld hl,6
+    ld hl,4
     add hl,sp
     call asm_am9511_pushf           ; x
     pop hl
@@ -40,7 +40,7 @@ PUBLIC asm_am9511_div, asm_am9511_div_callee
 
 .asm_am9511_div_callee
     push hl
-    ld hl,6
+    ld hl,4
     add hl,sp
     call asm_am9511_pushf           ; x
     pop hl

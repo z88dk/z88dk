@@ -27,7 +27,7 @@ PUBLIC asm_am9511_add, asm_am9511_add_callee
 ; enter here for floating add, x+y, x on stack, y in dehl, result in dehl
 .asm_am9511_add
     push hl
-    ld hl,6
+    ld hl,4
     add hl,sp
     call asm_am9511_pushf           ; x
     pop hl
@@ -42,7 +42,7 @@ PUBLIC asm_am9511_add, asm_am9511_add_callee
 ; enter here for floating add callee, x+y, x on stack, y in dehl
 .asm_am9511_add_callee
     push hl
-    ld hl,6
+    ld hl,4
     add hl,sp
     call asm_am9511_pushf           ; x
     pop hl

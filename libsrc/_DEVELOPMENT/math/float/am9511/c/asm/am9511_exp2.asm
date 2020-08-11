@@ -390,63 +390,24 @@ ENDIF
 ; Function am9511_exp2
 ; ---------------------------------
 _am9511_exp2:
-	push	hl
-	ld	c,l
-	ld	b,h
-	push	de
-	push	de
-	push	bc
-	ld	hl,0x427c
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	call	___fslt_callee
-	pop	de
-	pop	bc
-	ld	a,l
-	or	a, a
-	jr	Z,l_am9511_exp2_00102
-	ld	de,0x5eff
-	ld	hl,0x59ef
-	jr	l_am9511_exp2_00107
-l_am9511_exp2_00102:
-	push	bc
-	push	de
-	ld	hl,0xc280
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
-	push	bc
-	call	___fslt_callee
-	pop	de
-	pop	bc
-	ld	a,l
-	or	a, a
-	jr	Z,l_am9511_exp2_00104
-	ld	hl,0x0000
-	ld	e,l
-	ld	d,h
-	jr	l_am9511_exp2_00107
-l_am9511_exp2_00104:
 	ld	a, d
 	and	a,0x7f
 	or	a, e
-	or	a, b
-	or	a, c
-	jr	NZ,l_am9511_exp2_00106
+	or	a, h
+	or	a, l
+	jr	NZ,l_am9511_exp2_00102
 	ld	de,0x3f80
 	ld	hl,0x0000
-	jr	l_am9511_exp2_00107
-l_am9511_exp2_00106:
+	jr	l_am9511_exp2_00103
+l_am9511_exp2_00102:
 	push	de
-	push	bc
+	push	hl
 	ld	hl,0x3f31
 	push	hl
 	ld	hl,0x7218
 	push	hl
 	call	___fsmul_callee
 	call	_exp_fastcall
-l_am9511_exp2_00107:
+l_am9511_exp2_00103:
 	ret
 	SECTION IGNORE

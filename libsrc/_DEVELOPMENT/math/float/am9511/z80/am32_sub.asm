@@ -27,7 +27,7 @@ PUBLIC asm_am9511_sub, asm_am9511_sub_callee
 ; enter here for floating subtract, x-y x on stack, y in dehl
 .asm_am9511_sub
     push hl
-    ld hl,6
+    ld hl,4
     add hl,sp
     call asm_am9511_pushf           ; x
     pop hl
@@ -42,7 +42,7 @@ PUBLIC asm_am9511_sub, asm_am9511_sub_callee
 ; enter here for floating subtract callee, x-y x on stack, y in dehl
 .asm_am9511_sub_callee
     push hl
-    ld hl,6
+    ld hl,4
     add hl,sp
     call asm_am9511_pushf           ; x
     pop hl

@@ -18,6 +18,7 @@
 
 float am9511_log2 (float x) __z88dk_fastcall
 {
+    /* Test for domain */
     if( x <= 0.0 )
     {
         return( HUGE_NEG_F32 );
