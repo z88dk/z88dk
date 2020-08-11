@@ -3,19 +3,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void int_fastcall(int a,int b) __z88dk_fastcall {
+
+int int_fastcall(int a,int b) __z88dk_fastcall {
     assertEqual(3,a);
     assertEqual(5,b);
+    return 22;
 }
 
 void test_int_fastcall() {
-   int_fastcall(3,5);
+   int ret;
+   ret = int_fastcall(3,5);
+   assertEqual(22,ret);
 }
 
 void test_int_fastcall_ptr() {
-   void (*func)(int x, int y) __z88dk_fastcall = int_fastcall;
+   int (*func)(int x, int y) __z88dk_fastcall = int_fastcall;
 
-   (func)(3,5);
+   int ret = (func)(3,5);
+   assertEqual(22,ret);
 }
 
 void long_fastcall(long a,long b) __z88dk_fastcall {
@@ -28,7 +33,7 @@ void test_long_fastcall() {
 }
 
 void test_long_fastcall_ptr() {
-   void (*func)(long x, long y) __z88dk_fastcall = int_fastcall;
+   void (*func)(long x, long y) __z88dk_fastcall = long_fastcall;
 
    (func)(3,5);
 }
@@ -47,7 +52,24 @@ void test_int_fastcall_ret_longlong() {
 }
 
 void test_int_fastcall_ret_longlong_ptr() {
-   long long (*func)(int x, int y) __z88dk_fastcall = test_int_fastcall_ret_longlong;
+   long long (*func)(int x, int y) __z88dk_fastcall = int_fastcall_ret_longlong;
+   long long ret = func(3,5);
+   assertEqual(3, ret);
+}
+
+long long longlong_fastcall_ret_longlong(long long a,long long b) __z88dk_fastcall {
+    assertEqual(3,a);
+    assertEqual(5,b);
+    return a;
+}
+
+void test_longlong_fastcall_ret_longlong() {
+   long long ret = longlong_fastcall_ret_longlong(3,5);
+   assertEqual(3, ret);
+}
+
+void test_longlong_fastcall_ret_longlong_ptr() {
+   long long (*func)(long long x, long long y) __z88dk_fastcall = longlong_fastcall_ret_longlong;
    long long ret = func(3,5);
    assertEqual(3, ret);
 }
@@ -66,6 +88,8 @@ int suite_fastcall()
   #ifndef __GBZ80__
     suite_add_test(test_int_fastcall_ret_longlong);
     suite_add_test(test_int_fastcall_ret_longlong_ptr);
+    suite_add_test(test_longlong_fastcall_ret_longlong);
+    suite_add_test(test_longlong_fastcall_ret_longlong_ptr);
   #endif
 #endif
 
