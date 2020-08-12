@@ -33,7 +33,7 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	@$(ASSEMBLER) -DFOR$(TARGET) -I../..  $^
+	$(Q)$(ASSEMBLER) -DFOR$(TARGET) -I../.. -I../../../lib/ $^
 	@mv $(^:.asm=.o) $@
 
 dirs:

@@ -117,4 +117,5 @@ target/zx/zxmmc/mmc_wait_response
 target/zx/zxmmc/mmc_waitdata_token
 target/zx/zxmmc/mmc_write_block
 target/zx/zxmmc/mmc_write_command
+target/zx/banked_call
 @target/zx/newlib/newlib.lst
