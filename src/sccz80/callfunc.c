@@ -77,12 +77,12 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     int isscanf = 0;
     uint32_t format_option = 0;
     int nargs, vconst, expr, argnumber;
-    double val;
+    zdouble val;
     int watcharg; /* For watching printf etc */
     int minifunc = 0; /* Call cut down version */
     char preserve = NO; /* Preserve af when cleaningup */
     int   isconstarg[5];
-    double constargval[5];
+    zdouble constargval[5];
     FILE *tmpfiles[100];  // 100 arguments enough I guess */
     int   tmplinenos[100];
     FILE *save_fps;
@@ -293,9 +293,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
                 }
             }
             if ( function_pointer_call == 0 ||  fnptr_type->kind == KIND_CPTR ) {
-                nargs += gen_push_function_argument(expr, type, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters));
+                nargs += gen_push_function_argument(expr, type,  functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters));
             } else {
-                last_argument_size = push_function_argument_fnptr(expr, type, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters), tmpfiles[argnumber+1] == NULL);
+                last_argument_size = push_function_argument_fnptr(expr, type, functype, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters), tmpfiles[argnumber+1] == NULL);
                 nargs += last_argument_size;
             }
         }
@@ -330,7 +330,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             gen_builtin_memcpy(isconstarg[2] ? constargval[2] : -1,  constargval[3]);
             nargs = 0;
         } else if ( functype->flags & SHORTCALL ) {
-            gen_shortcall(functype->funcattrs.shortcall_rst, functype->funcattrs.shortcall_value);
+            gen_shortcall(functype, functype->funcattrs.shortcall_rst, functype->funcattrs.shortcall_value);
         } else if ( functype->flags & BANKED ) {
             gen_bankedcall(ptr);
         } else {
@@ -339,7 +339,9 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     } else {
         nargs += callstk(functype, nargs, fnptr_type->kind == KIND_CPTR, last_argument_size);
     }
-
+    if ( functype->return_type->kind == KIND_LONGLONG) {
+        nargs += 2;
+    }
     if (functype->flags & CALLEE ) {
         Zsp += nargs;
         // IF we called a far pointer and we had arguments, pop the address off the stack

@@ -206,12 +206,12 @@
 	call	l_gintspsp	;
 	ld	hl,1	;const
 	call	l_int2long_u_float
-	call	dpush2
-	pop	hl
-	call	l_jphl
-	pop	bc
-	pop	bc
-	pop	bc
+	pop	af
+	ld	bc,i_3
+	push	bc
+	push	af
+	ret
+.i_3
 	pop	bc
 	ret
 
@@ -266,11 +266,11 @@
 	ld	hl,65535	;const
 	ld	de,65535
 	pop	af
-	ld	bc,i_3
+	ld	bc,i_4
 	push	bc
 	push	af
 	ret
-.i_3
+.i_4
 	pop	bc
 	pop	bc
 	pop	bc
@@ -311,11 +311,11 @@
 	push	hl
 	ld	hl,i_1+124
 	pop	af
-	ld	bc,i_4
+	ld	bc,i_5
 	push	bc
 	push	af
 	ret
-.i_4
+.i_5
 	pop	bc
 	pop	bc
 	ret

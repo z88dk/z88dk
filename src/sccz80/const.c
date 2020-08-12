@@ -13,13 +13,12 @@
 static Type *get_member(Type *tag);
 
 
-
 typedef struct elem_s {
     struct elem_s *next;
-    int            refcount;
+    Kind           kind;
     int            written;
     int            litlab;
-    double         value;
+    zdouble        value;
     unsigned char  fa[MAX_MANTISSA_SIZE+1];      /* The parsed representation */
     char           str[60];    /* A raw string version */
 } elem_t;
@@ -30,7 +29,7 @@ struct fp_decomposed {
     uint8_t   mantissa[MAX_MANTISSA_SIZE + 1];
 };
 
-static elem_t    *double_queue = NULL;
+static elem_t    *bigconst_queue = NULL;
 
 
 static int  hex(char c);
@@ -156,7 +155,7 @@ int number(LVALUE *lval)
 {
     char c;
     int minus;
-    int32_t k;
+    int64_t k;
     int isunsigned = 0;
 
     k = minus = 1;
@@ -224,14 +223,23 @@ typecheck:
     if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
         lval->val_type = KIND_LONG;
     }
+    if ( lval->const_val >= UINT32_MAX || lval->const_val < INT32_MIN ) {
+        lval->val_type = KIND_LONGLONG;
+        if ( sizeof(long double) == sizeof(double)) {
+            warningfmt("limited-range", "On this host, 64 bit constants may not be correct\n");
+        }
+    }
     lval->is_const = 1;
 
     while (checkws() == 0 && (rcmatch('L') || rcmatch('U') || rcmatch('S') || rcmatch('f'))) {
-        if (cmatch('L'))
+        if (cmatch('L')) {
             lval->val_type = KIND_LONG;
+            if (cmatch('L'))
+                lval->val_type = KIND_LONGLONG;
+        }
         if (cmatch('U')) {
             isunsigned = 1;
-            lval->const_val = (uint32_t)k;
+            lval->const_val = (uint64_t)k;
         }
         if (cmatch('S'))
             isunsigned = 0;
@@ -244,7 +252,12 @@ typecheck:
             lval->ltype = type_double;
         }
     }
-    if ( lval->val_type == KIND_LONG ) {
+    if ( lval->val_type == KIND_LONGLONG ) {
+        if ( isunsigned )
+            lval->ltype = type_ulonglong;
+        else
+            lval->ltype = type_longlong;
+    } else if ( lval->val_type == KIND_LONG ) {
         if ( isunsigned )
             lval->ltype = type_ulong;
         else
@@ -923,25 +936,26 @@ elem_t *get_elem_for_fa(unsigned char fa[], double value)
 {
     elem_t  *elem;
 
-    LL_FOREACH(double_queue, elem ) {
-        if ( memcmp(elem->fa, fa, MAX_MANTISSA_SIZE) == 0 ) {
+    LL_FOREACH(bigconst_queue, elem ) {
+        if ( elem->kind == KIND_DOUBLE && memcmp(elem->fa, fa, MAX_MANTISSA_SIZE) == 0 ) {
             return elem;
         }
     }
     elem = MALLOC(sizeof(*elem));
+    elem->kind = KIND_DOUBLE;
     elem->litlab = getlabel();
     elem->value = value;
     elem->written = 0;
     memcpy(elem->fa, fa, MAX_MANTISSA_SIZE+1);
-    LL_APPEND(double_queue, elem);
+    LL_APPEND(bigconst_queue, elem);
     return elem;
 }
 
-void indicate_double_written(int litlab)
+void indicate_constant_written(int litlab)
 {
     elem_t  *elem;
 
-    LL_FOREACH(double_queue, elem ) {
+    LL_FOREACH(bigconst_queue, elem ) {
         if ( elem->litlab == litlab ) {
             elem->written = 1;
         }
@@ -952,46 +966,74 @@ elem_t *get_elem_for_buf(char *str, double value)
 {
     elem_t  *elem;
 
-    LL_FOREACH(double_queue, elem ) {
-        if ( strcmp(elem->str, str) == 0 ) {
+    LL_FOREACH(bigconst_queue, elem ) {
+        if ( elem->kind == KIND_DOUBLE && strcmp(elem->str, str) == 0 ) {
             return elem;
         }
     }
     elem = MALLOC(sizeof(*elem));
+    elem->kind = KIND_DOUBLE;
     elem->litlab = getlabel();
-    elem->refcount = 0;
     elem->value = value;
     elem->written = 0;
     strcpy(elem->str,str);
-    LL_APPEND(double_queue, elem);
+    LL_APPEND(bigconst_queue, elem);
+    return elem;
+}
+
+
+elem_t *get_elem_for_llong(char buf[8]) 
+{
+    elem_t  *elem;
+
+    LL_FOREACH(bigconst_queue, elem ) {
+        if ( elem->kind == KIND_LONGLONG && memcmp(elem->fa, buf, 8) == 0 ) {
+            return elem;
+        }
+    }
+    elem = MALLOC(sizeof(*elem));
+    elem->kind = KIND_LONGLONG;
+    elem->litlab = getlabel();
+    elem->written = 0;
+    memcpy(elem->fa, buf, 8);
+    LL_APPEND(bigconst_queue, elem);
     return elem;
 }
 
 
 
-void write_double_queue(void)
+void write_constant_queue(void)
 {
     elem_t  *elem;
 
-    LL_FOREACH(double_queue, elem ) {
+    LL_FOREACH(bigconst_queue, elem ) {
         if ( elem->written ) {
-            gen_switch_section(c_rodata_section); // gen_switch_section("text");
+            gen_switch_section(c_rodata_section);
             prefix();
             queuelabel(elem->litlab);
             col();
             nl();
-            if ( c_double_strings ) {
-                defmesg(); outstr(elem->str); outstr("\"\n");
-                defbyte(); outdec(0); nl();
+            if ( elem->kind == KIND_DOUBLE) {
+                if ( c_double_strings ) {
+                    defmesg(); outstr(elem->str); outstr("\"\n");
+                    defbyte(); outdec(0); nl();
+                } else {
+                    char   buf[128];
+                    int    i, offs;
+
+                    for ( i = 0, offs = 0; i < c_fp_size; i++) {
+                        offs += snprintf(buf + offs, sizeof(buf) - offs,"%s0x%02x", i != 0 ? "," : "", elem->fa[i]);
+                    }
+                    //outfmt("\t;%lf ref: %d written: %d\n",elem->value,elem->refcount, elem->written);
+                    outfmt("\t;%Lf\n",elem->value);
+                    outfmt("\tdefb\t%s\n", buf);
+                }
             } else {
                 char   buf[128];
                 int    i, offs;
-
-                for ( i = 0, offs = 0; i < c_fp_size; i++) {
+                for ( i = 0, offs = 0; i < 8; i++) {
                     offs += snprintf(buf + offs, sizeof(buf) - offs,"%s0x%02x", i != 0 ? "," : "", elem->fa[i]);
                 }
-                //outfmt("\t;%lf ref: %d written: %d\n",elem->value,elem->refcount, elem->written);
-                outfmt("\t;%lf\n",elem->value);
                 outfmt("\tdefb\t%s\n", buf);
             }
         }
@@ -999,6 +1041,31 @@ void write_double_queue(void)
     nl();
 }
 
+void load_llong_into_acc(zdouble val)
+{
+    uint64_t v,l;
+    char    buf[8];
+    elem_t *elem;
+
+    v = val;
+
+
+    l = v & 0xffffffff;
+    buf[0] = (l % 65536) % 256;
+    buf[1] = (l % 65536) / 256;
+    buf[2] = (l / 65536) % 256;
+    buf[3] =  (l / 65536) / 256;
+    l = (v >> 32) & 0xffffffff;
+    buf[4] = (l % 65536) % 256;
+    buf[5] = (l % 65536) / 256;
+    buf[6] = (l / 65536) % 256;
+    buf[7] =  (l / 65536) / 256;
+
+    elem = get_elem_for_llong(buf);
+    immedlit(elem->litlab,0);
+    nl();
+    callrts("l_i64_load");
+}
 
 
 void load_double_into_fa(LVALUE *lval)
@@ -1009,9 +1076,8 @@ void load_double_into_fa(LVALUE *lval)
     
     if ( c_double_strings ) {
         char  buf[40];
-        snprintf(buf, sizeof(buf), "%lf", lval->const_val);
+        snprintf(buf, sizeof(buf), "%Lf", lval->const_val);
         elem = get_elem_for_buf(buf, lval->const_val);
-        elem->refcount++;
         immedlit(elem->litlab,0);
         nl();
         callrts("__atof2");
@@ -1026,7 +1092,6 @@ void load_double_into_fa(LVALUE *lval)
             const2(fa[3] << 8 | fa[2]);
         } else {
             elem = get_elem_for_fa(fa,lval->const_val);
-            elem->refcount++;
             immedlit(elem->litlab,0);
             nl();
             callrts("dload");

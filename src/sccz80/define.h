@@ -76,10 +76,11 @@ typedef enum {
     KIND_ENUM,
     KIND_CARRY,
     KIND_FLOAT16,
+    KIND_LONGLONG,
 } Kind;
 
 #define kind_is_floating(x)  ( (x) == KIND_DOUBLE || (x) == KIND_FLOAT16)
-#define kind_is_integer(k) ( k == KIND_CHAR || k == KIND_INT || k == KIND_SHORT || k == KIND_LONG )
+#define kind_is_integer(k) ( k == KIND_CHAR || k == KIND_INT || k == KIND_SHORT || k == KIND_LONG || k == KIND_LONGLONG )
 
 #define get_float_type(k) (k == KIND_DOUBLE || k == KIND_FLOAT) ? type_double : type_float16
 
@@ -134,7 +135,7 @@ struct type_s {
     UT_hash_handle hh;
 };
 
-extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double, *type_float16;
+extern Type *type_void, *type_carry, *type_char, *type_uchar, *type_int, *type_uint, *type_long, *type_ulong, *type_double, *type_float16, *type_longlong, *type_ulonglong;
 
 
 enum ident_type {
@@ -236,7 +237,7 @@ typedef struct switchtab_s SW_TAB;
 
 struct switchtab_s {
         int label ;             /* label for start of case */
-        int32_t value ;             /* value associated with case */
+        int64_t value ;             /* value associated with case */
 } ;
 
 
@@ -386,7 +387,7 @@ struct lvalue_s {
         Kind    indirect_kind;                  /* type of indirect object, 0 for static object */
         int ptr_type ;                  /* type of pointer or array, 0 for other idents */
         int is_const ;                  /* true if constant expression */
-        double const_val ;                        /* value of constant expression (& other uses) */
+        zdouble const_val ;                        /* value of constant expression (& other uses) */
         void (*binop)(LVALUE *lval) ;                /* function address of highest/last binary operator */
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
         Type *stage_add_ltype;          /* Type at stage_add being set */

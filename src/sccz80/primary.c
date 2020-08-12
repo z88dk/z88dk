@@ -10,7 +10,7 @@
 
 #include "ccdefs.h"
 
-static double   CalcStand(Kind left_kind, double left, void (*oper)(LVALUE *), double right);
+static zdouble   CalcStand(Kind left_kind, zdouble left, void (*oper)(LVALUE *), zdouble right);
 static void     nstep(LVALUE *lval, int n, void (*unstep)(LVALUE *lval));
 static void     store(LVALUE *lval);
 
@@ -162,15 +162,15 @@ int primary(LVALUE* lval)
 /*
  * calculate constant expression (signed values)
  */
-double calc(
+zdouble calc(
     Kind   left_kind,
-    double left,
+    zdouble left,
     void (*oper)(LVALUE *),
-    double right, int is16bit)
+    zdouble right, int is16bit)
 {
-    if (oper == zdiv && right != 0.0)
+    if (oper == zdiv && right != 0.0) {
         return (left / right);
-    else if (oper == zmod)
+    } else if (oper == zmod)
         return ((int)left % (int)right);
     else if (oper == zle)
         return (left <= right);
@@ -186,17 +186,18 @@ double calc(
             warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
             right = 0;
         }
-        if ( is16bit ) return ((int16_t)left >> (int16_t)right);
-        else return ((int32_t)left >> (int)right);
+        if ( is16bit ) return ((int16_t)left) >> (int16_t)right;
+        else if (left_kind == KIND_LONG) return ((int32_t)left) >> (int)right;
+        else return ((int64_t)left) >> (int)right;
     } else
         return (CalcStand(left_kind, left, oper, right));
 }
 
-double calcun(
+zdouble calcun(
     Kind   left_kind,
-    double left,
+    zdouble left,
     void (*oper)(LVALUE *),
-    double right)
+    zdouble right)
 {
     if (oper == zdiv)   {
         return (left / right);
@@ -216,7 +217,7 @@ double calcun(
             warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
             right = 0;
         }
-        return ((uint32_t)left >> (int)right);
+        return ((uint64_t)left >> (int)right);
     } else
         return (CalcStand(left_kind, left, oper, right));
 }
@@ -225,18 +226,18 @@ double calcun(
  * Calculations..standard ones - same for U & S 
  */
 
-double CalcStand(
+zdouble CalcStand(
     Kind left_kind,
-    double left,
+    zdouble left,
     void (*oper)(LVALUE *),
-    double right)
+    zdouble right)
 {
     if (oper == zor)
-        return ((unsigned int)left | (unsigned int)right);
+        return ((uint64_t)left | (uint64_t)right);
     else if (oper == zxor)
-        return ((unsigned int)left ^ (unsigned int)right);
+        return ((uint64_t)left ^ (uint64_t)right);
     else if (oper == zand)
-        return ((unsigned int)left & (unsigned int)right);
+        return ((uint64_t)left & (uint64_t)right);
     else if (oper == mult)
         return (left * right);
     else if (oper == asl) {
@@ -245,7 +246,7 @@ double CalcStand(
             warningfmt("limited-range", "Left shifting by more than size of object, changed to zero");
             right = 0;
         }
-        return ((unsigned int)left << (unsigned int)right);
+        return (zdouble)((uint64_t)left << (unsigned int)right);
     } else if (oper == zeq)
         return (left == right);
     else if (oper == zne)
@@ -269,6 +270,8 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
 {
     if (t2 == KIND_CARRY) {
         gen_conv_carry2int();
+        isunsigned2 = NO;
+        t2 = KIND_INT;
     }
 
     if (kind_is_floating(t1)) {
@@ -279,18 +282,26 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
             return;
         }
     }
+
+    if (t1 == KIND_LONGLONG) {
+        if (t2 != KIND_LONGLONG ) {
+            zconvert_to_llong(isunsigned1, t2, isunsigned2);
+        }
+        return;
+    }
+
     /* t2 =source, t1=dest */
     /* int to long, if signed, do sign, if not ld de,0 */
     /* Check to see if constant or not... */
     if (t1 == KIND_LONG) {
         if (t2 != KIND_LONG ) {
-            if (isunsigned2 == NO && isunsigned1 == NO && t2 != KIND_CARRY) {
-                gen_conv_sint2long();
-            } else
-                gen_conv_uint2long();
+            zconvert_to_long(isunsigned1, t2, isunsigned2);
         }
         return;
     }
+
+
+
 
     /* Converting between pointer types..far and near */
     if (t1 == KIND_CPTR && t2 == KIND_INT)
@@ -356,6 +367,35 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
         lval2->val_type = KIND_INT;
     }
 
+    if (lval2->val_type == KIND_LONGLONG) {
+        /* Second operator is long long */
+        if (lval->val_type != KIND_LONGLONG) {
+            zwiden_stack_to_llong(lval);
+            if ( lval->ltype->isunsigned ) {
+                lval->ltype = type_ulonglong;
+            } else {
+                lval->ltype = type_longlong;
+            }
+            lval->val_type = KIND_LONGLONG;
+        }
+        return;
+    }
+
+    if (lval->val_type == KIND_LONGLONG) {
+        if (lval2->val_type != KIND_LONGLONG ) {
+            zconvert_to_llong(lval->ltype->isunsigned, lval2->val_type, lval2->ltype->isunsigned);
+            if ( lval->ltype->isunsigned ) {
+                lval->ltype = type_ulonglong;
+            } else {
+                lval->ltype = type_longlong;
+            }
+            lval->val_type = KIND_LONGLONG;
+        }
+        return;
+    }
+
+
+
     if (lval2->val_type == KIND_LONG) {
         /* Second operator is long */
         if (lval->val_type != KIND_LONG) {
@@ -372,23 +412,7 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
 
     if (lval->val_type == KIND_LONG) {
         if (lval2->val_type != KIND_LONG && lval2->val_type != KIND_CPTR) {
-            if ( lval->ltype->isunsigned ) {
-                if ( !lval2->ltype->isunsigned ) {
-                    // RHS is signed, 
-                    gen_conv_sint2long();
-                } else {
-                    gen_conv_uint2long();
-                }
-                lval->ltype = type_ulong;
-            } else {
-                if ( lval2->ltype->isunsigned ) {
-                    gen_conv_uint2long();
-                } else {
-                    gen_conv_sint2long();
-                }
-                lval->ltype = type_long;
-            }
-            lval->val_type = KIND_LONG;
+            zconvert_to_long(lval->ltype->isunsigned, lval2->val_type, lval2->ltype->isunsigned);
         }
         return;
     }
@@ -472,6 +496,9 @@ void prestep(
         rvalue(lval);
         //intcheck(lval, lval);
         switch (lval->ptr_type) {
+        case KIND_LONGLONG:
+            zadd_const(lval, n * 8);
+            break;
         case KIND_DOUBLE:
             zadd_const(lval, n * c_fp_size);
             break;
@@ -515,6 +542,9 @@ void poststep(
         switch (lval->ptr_type) {
         case KIND_DOUBLE:
             nstep(lval, n * c_fp_size, unstep);
+            break;
+        case KIND_LONGLONG:
+            nstep(lval, n * 8, unstep);
             break;
         case KIND_STRUCT:
             nstep(lval, n * lval->ltype->ptr->tag->size, unstep);
@@ -753,7 +783,7 @@ int test(int label, int parens)
 int constexpr(double *val, Kind *type, int flag)
 {
     char *before, *start;
-    double valtemp;
+    zdouble valtemp;
     int con;
     int savesp = Zsp;
     int valtype;
@@ -802,7 +832,19 @@ int docast(LVALUE* lval, LVALUE *dest_lval)
     } else if ( t2 == KIND_CPTR ) {
         t2 = KIND_LONG;
     }
+    if ( kind_is_integer(lval->cast_type->kind) && dest_lval->is_const) {
+        int64_t val = dest_lval->const_val;
+        if ( lval->cast_type->kind < dest_lval->val_type) {
+            if ( lval->cast_type->kind == KIND_INT ) {
+                dest_lval->const_val = lval->cast_type->isunsigned ? (uint16_t)(val & 0xffff) : (int16_t)(val & 0xffff);
+            } else if ( lval->cast_type->kind == KIND_CHAR) {
+                dest_lval->const_val = lval->cast_type->isunsigned ? (uint8_t)(val & 0xff) : (int8_t)(val & 0xff);
+            } else if ( lval->cast_type->kind == KIND_LONG) {
+                dest_lval->const_val = lval->cast_type->isunsigned ? (uint32_t)(val & 0xffffffff) : (int32_t)(val & 0xffffffff);
+            }
+        }
 
+    }
 
     force(t1, t2, lval->cast_type->isunsigned, dest_lval->ltype->isunsigned, 0); // TODO lconst
 

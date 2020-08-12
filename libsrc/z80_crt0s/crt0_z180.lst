@@ -1,4 +1,4 @@
-z180/sccz80/l_mult.asm
+sccz80/crt0_z180/**.asm
 @newlib-z180.lst
 @crt0.lst
 

@@ -10,6 +10,7 @@ extern void put2tos(void);
 extern void immed(void);
 extern void immedlit(int lab,int offs);
 extern void lpush(void);
+extern void llpush(void);
 extern void zpush(void);
 
 
@@ -30,9 +31,11 @@ extern int modstk(int newsp, Kind save,int saveaf, int usebc);
 extern void scale(Kind type, Type *tag);
 
 
-extern void vlongconst(double val);
-extern void vlongconst_tostack(double val);
-extern void vconst(int32_t val);
+extern void vlongconst(zdouble val);
+extern void vlongconst_tostack(zdouble val);
+extern void vllongconst_tostack(zdouble val);
+extern void vllongconst(zdouble val);
+extern void vconst(int64_t val);
 extern void const2(int32_t val);
 extern void GlobalPrefix(void);
 extern void jumpc(int);
@@ -49,7 +52,8 @@ extern void function_appendix(SYMBOL *func);
 extern int zcriticaloffset(void);
 extern void zconvert_to_double(Kind from, Kind to, unsigned char isunsigned);
 extern void zconvert_from_double(Kind from, Kind to, unsigned char isunsigned);
-extern int push_function_argument_fnptr(Kind expr, Type *type, int push_sdccchar, int is_last_argument);
+extern int push_function_argument_fnptr(Kind expr, Type *type, Type *functype, int push_sdccchar, int is_last_argument);
 extern void reset_namespace();
 extern void zwiden_stack_to_long(LVALUE *lval);
+extern void zwiden_stack_to_llong(LVALUE *lval);
 extern void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned char isunsigned, int operator_is_commutative);

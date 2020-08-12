@@ -16,6 +16,8 @@ Type   *type_long = &(Type){ KIND_LONG, 4, 0, .len=1 };
 Type   *type_ulong = &(Type){ KIND_LONG, 4, 1, .len=1 };
 Type   *type_double = &(Type){ KIND_DOUBLE, 6, 0, .len=1 }; 
 Type   *type_float16 = &(Type){ KIND_FLOAT16, 2, 0, .len=1 }; 
+Type   *type_longlong = &(Type){ KIND_LONGLONG, 8, 0, .len=1 }; 
+Type   *type_ulonglong = &(Type){ KIND_LONGLONG, 8, 1, .len=1 }; 
 
 static namespace  *namespaces = NULL;
 
@@ -200,7 +202,7 @@ void free_type(void *data)
     FREENULL(type);
 }
 
-Type *make_constant(const char *name, int32_t value)
+Type *make_constant(const char *name, int64_t value)
 {
     SYMBOL *ptr;
     Type *type = CALLOC(1,sizeof(*type));
@@ -556,9 +558,14 @@ static Type *parse_type(void)
         type->kind = KIND_INT;
         type->size = 2;
     } else if ( amatch("long")) {
+        if ( amatch("long")) {
+            type->kind = KIND_LONGLONG;
+            type->size = 8;
+        } else {
+            type->kind = KIND_LONG;
+            type->size = 4;
+        }
         swallow("int");
-        type->kind = KIND_LONG;
-        type->size = 4;
     } else if ( amatch("float") || amatch("double")) {
         type->kind = KIND_DOUBLE;
         type->size = c_fp_size;
@@ -971,7 +978,7 @@ int declare_local(int local_static)
                     Type *expr_type;
                     char *before, *start;
                     int   vconst;
-                    double val;
+                    zdouble val;
 
                     Zsp = modstk(Zsp - (declared - type->size), KIND_NONE, NO, YES);
                     declared = 0;
@@ -1154,6 +1161,9 @@ Type *make_type(Kind kind, Type *tag)
         break;
     case KIND_LONG:
         type->size = 4;
+        break;
+    case KIND_LONGLONG:
+        type->size = 8;
         break;
     case KIND_DOUBLE:
         type->size =  c_fp_size;
@@ -1476,6 +1486,9 @@ void type_describe(Type *type, UT_string *output)
     case KIND_LONG:
         utstring_printf(output,"%slong ",type->isunsigned ? "unsigned " : "");
         break;
+    case KIND_LONGLONG:
+        utstring_printf(output,"%slong long ",type->isunsigned ? "unsigned " : "");
+        break;
     case KIND_FLOAT:
     case KIND_DOUBLE:    
         utstring_printf(output,"double ");
@@ -1673,7 +1686,10 @@ static void declfunc(Type *functype, enum storage_type storage)
         where += zcriticaloffset();
     }
 
-    
+    // Functions that return long long have a buffer stuffed into them
+    if (functype->return_type->kind == KIND_LONGLONG ) {
+        where += 2;
+    }
 
     nl();
     {
@@ -1692,6 +1708,10 @@ static void declfunc(Type *functype, enum storage_type storage)
     if ( (functype->flags & SMALLC) == SMALLC ) {
         int i;
 
+        if (functype->return_type->kind == KIND_LONGLONG) {
+            outfmt("; longlong stuffed pointer at sp+2 size(2)\n");
+        }
+
         for ( i = array_len(functype->parameters) - 1; i >= 0; i-- ) {
             SYMBOL     *ptr;
             UT_string  *str;            
@@ -1708,7 +1728,7 @@ static void declfunc(Type *functype, enum storage_type storage)
             ptr->ctype = ptype;
             ptr->offset.i = where;
             type_describe(ptype, str);
-            outfmt("; parameter '%s' at %d size(%d)\n",utstring_body(str),where, ptype->size);
+            outfmt("; parameter '%s' at sp+%d size(%d)\n",utstring_body(str),where, ptype->size);
             utstring_free(str);
             ptr->isassigned = 1;
             where += get_parameter_size(functype,ptype);
@@ -1770,6 +1790,8 @@ static void declfunc(Type *functype, enum storage_type storage)
             gen_push_float(fastarg->kind);     
         else if ( fastarg->size == 4 || fastarg->size == 3)
             lpush();
+        else if ( fastarg->kind == KIND_LONGLONG ) 
+            llpush();
         else
             adjust = 0;
 
@@ -1778,8 +1800,8 @@ static void declfunc(Type *functype, enum storage_type storage)
             int     i;
 
             if ( ptr ) {
-                ptr->offset.i -= (get_parameter_size(functype,fastarg) + 2);
-                where = 2;
+                ptr->offset.i = -get_parameter_size(functype,fastarg); 
+                where += 2;
             } else {
                 errorfmt("Something has gone very wrong, can't find parameter <%s>\n",1,fastarg->name);
             }

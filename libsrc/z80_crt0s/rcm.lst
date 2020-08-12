@@ -1,10 +1,4 @@
-r2k/sccz80/l_asr_u.asm	
-r2k/sccz80/l_mult.asm
-r2k/sccz80/l_long_asr_u.asm
-r2k/sccz80/l_long_asr_uo.asm
-r2k/sccz80/l_long_asl.asm
-r2k/sccz80/l_long_aslo.asm
-r2k/sccz80/l_long_or.asm
-r2k/sccz80/l_long_and.asm
+sccz80/crt0_r2k/**.asm
+sccz80/crt0_long_r2k/**.asm
 @crt0.lst
 
