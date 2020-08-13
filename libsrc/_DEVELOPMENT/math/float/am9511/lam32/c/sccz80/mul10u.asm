@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	mul10u
-	EXTERN	asm_am9511_mul10u_fastcall
+	EXTERN	cam32_sccz80_mul10u
 
-	defc	mul10u = asm_am9511_mul10u_fastcall
+	defc	mul10u = cam32_sccz80_mul10u
 
 ; SDCC bridge for Classic
 IF __CLASSIC

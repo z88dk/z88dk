@@ -567,7 +567,7 @@ printf_return_is_6:
    ld a,CLIB_32BIT_FLOATS
    and a
    ld bc,printf_return_6
-   jr nz,printf_invoke_flags
+   jr Z,printf_invoke_flags
    ld bc,printf_return_4
    jr printf_invoke_flags
 

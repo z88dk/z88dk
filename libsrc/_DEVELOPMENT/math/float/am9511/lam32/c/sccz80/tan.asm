@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	tan
-	EXTERN	asm_am9511_tan_fastcall
+	EXTERN	cam32_sccz80_tan
 
-	defc	tan = asm_am9511_tan_fastcall
+	defc	tan = cam32_sccz80_tan
 
 ; SDCC bridge for Classic
 IF __CLASSIC

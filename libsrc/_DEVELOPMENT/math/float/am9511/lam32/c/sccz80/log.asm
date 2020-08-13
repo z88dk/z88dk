@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	log
-	EXTERN	asm_am9511_log_fastcall
+	EXTERN	cam32_sccz80_log
 
-	defc	log = asm_am9511_log_fastcall
+	defc	log = cam32_sccz80_log
 
 ; SDCC bridge for Classic
 IF __CLASSIC

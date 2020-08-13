@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	ceil
-	EXTERN	asm_am9511_ceil_fastcall
+	EXTERN	cam32_sccz80_ceil
 
-	defc	ceil = asm_am9511_ceil_fastcall
+	defc	ceil = cam32_sccz80_ceil
 
 ; SDCC bridge for Classic
 IF __CLASSIC

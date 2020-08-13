@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	asin
-	EXTERN	asm_am9511_asinf_fastcall
+	EXTERN	cam32_sccz80_asin
 
-	defc	asin = asm_am9511_asinf_fastcall
+	defc	asin = cam32_sccz80_asin
 
 ; SDCC bridge for Classic
 IF __CLASSIC

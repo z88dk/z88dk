@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	acos
-	EXTERN	asm_am9511_acos_fastcall
+	EXTERN	cam32_sccz80_acos
 
-	defc	acos = asm_am9511_acos_fastcall
+	defc	acos = cam32_sccz80_acos
 
 ; SDCC bridge for Classic
 IF __CLASSIC

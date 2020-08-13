@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	asinh
-	EXTERN	_am9511_asinh
+	EXTERN	cam32_sccz80_asinh
 
-	defc	asinh = _am9511_asinh
+	defc	asinh = cam32_sccz80_asinh
 
 
 ; SDCC bridge for Classic

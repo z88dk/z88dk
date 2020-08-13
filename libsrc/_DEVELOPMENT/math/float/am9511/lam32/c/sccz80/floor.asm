@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	floor
-	EXTERN	asm_am9511_floor_fastcall
+	EXTERN	cam32_sccz80_floor
 
-	defc	floor = asm_am9511_floor_fastcall
+	defc	floor = cam32_sccz80_floor
 
 ; SDCC bridge for Classic
 IF __CLASSIC

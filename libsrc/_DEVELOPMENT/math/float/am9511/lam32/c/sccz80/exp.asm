@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	exp
-	EXTERN	asm_am9511_exp_fastcall
+	EXTERN	cam32_sccz80_exp
 
-	defc	exp = asm_am9511_exp_fastcall
+	defc	exp = cam32_sccz80_exp
 
 ; SDCC bridge for Classic
 IF __CLASSIC

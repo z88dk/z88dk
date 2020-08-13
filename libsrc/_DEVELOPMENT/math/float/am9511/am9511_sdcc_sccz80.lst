@@ -21,6 +21,9 @@ math/float/am9511/c/sdcc/cam32_sdcc___uint2fs
 math/float/am9511/c/sdcc/cam32_sdcc___uint2fs_callee
 math/float/am9511/c/sdcc/cam32_sdcc___ulong2fs
 math/float/am9511/c/sdcc/cam32_sdcc___ulong2fs_callee
+math/float/am9511/c/sdcc/cam32_sdcc_load
+math/float/am9511/c/sdcc/cam32_sdcc_read
+math/float/am9511/c/sdcc/cam32_sdcc_read_callee
 math/float/am9511/c/sdcc/cam32_sdcc_add
 math/float/am9511/c/sdcc/cam32_sdcc_add_callee
 math/float/am9511/c/sdcc/cam32_sdcc_div

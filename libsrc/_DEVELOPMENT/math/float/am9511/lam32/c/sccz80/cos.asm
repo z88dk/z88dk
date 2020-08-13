@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	cos
-	EXTERN	_asm_am9511_cos_fastcall
+	EXTERN	cam32_sccz80_cos
 
-	defc	cos = _asm_am9511_cos_fastcall
+	defc	cos = cam32_sccz80_cos
 
 
 ; SDCC bridge for Classic

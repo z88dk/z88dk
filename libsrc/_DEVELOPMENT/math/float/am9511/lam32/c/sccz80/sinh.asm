@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	sinh
-	EXTERN	_am9511_sinh
+	EXTERN	cam32_sccz80_sinh
 
-	defc	sinh = _am9511_sinh
+	defc	sinh = cam32_sccz80_sinh
 
 ; SDCC bridge for Classic
 IF __CLASSIC

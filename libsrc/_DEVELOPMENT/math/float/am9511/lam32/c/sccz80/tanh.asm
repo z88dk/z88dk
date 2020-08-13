@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	tanh
-	EXTERN	_am9511_tanh
+	EXTERN	cam32_sccz80_tanh
 
-	defc	tanh = _am9511_tanh
+	defc	tanh = cam32_sccz80_tanh
 
 ; SDCC bridge for Classic
 IF __CLASSIC

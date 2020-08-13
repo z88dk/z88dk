@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	atan
-	EXTERN	asm_am9511_atan_fastcall
+	EXTERN	cam32_sccz80_atan
 
-	defc	atan = asm_am9511_atan_fastcall
+	defc	atan = cam32_sccz80_atan
 
 
 ; SDCC bridge for Classic

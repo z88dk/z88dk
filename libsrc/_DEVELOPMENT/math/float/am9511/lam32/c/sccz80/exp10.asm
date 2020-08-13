@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	exp10
-	EXTERN	_am9511_exp10_fastcall
+	EXTERN	cam32_sccz80_exp10
 
-	defc	exp10 = _am9511_exp10_fastcall
+	defc	exp10 = cam32_sccz80_exp10
 
 
 ; SDCC bridge for Classic

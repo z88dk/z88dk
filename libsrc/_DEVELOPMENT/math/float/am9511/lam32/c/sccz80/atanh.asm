@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	atanh
-	EXTERN	_am9511_atanh
+	EXTERN	cam32_sccz80_atanh
 
-	defc	atanh = _am9511_atanh
+	defc	atanh = cam32_sccz80_atanh
 
 
 ; SDCC bridge for Classic

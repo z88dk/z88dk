@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	cosh
-	EXTERN	_am9511_cosh
+	EXTERN	cam32_sccz80_cosh
 
-	defc	cosh = _am9511_cosh
+	defc	cosh = cam32_sccz80_cosh
 
 
 ; SDCC bridge for Classic

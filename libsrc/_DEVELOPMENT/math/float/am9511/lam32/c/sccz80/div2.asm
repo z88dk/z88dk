@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	div2
-	EXTERN	asm_am9511_div2_fastcall
+	EXTERN	cam32_sccz80_div2
 
-	defc	div2 = asm_am9511_div2_fastcall
+	defc	div2 = cam32_sccz80_div2
 
 ; SDCC bridge for Classic
 IF __CLASSIC

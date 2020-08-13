@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	fabs
-	EXTERN	asm_am9511_fabs_fastcall
+	EXTERN	cam32_sccz80_fabs
 
-	defc	fabs = asm_am9511_fabs_fastcall
+	defc	fabs = cam32_sccz80_fabs
 
 ; SDCC bridge for Classic
 IF __CLASSIC

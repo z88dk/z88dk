@@ -1,9 +1,9 @@
 
 	SECTION	code_fp_am9511
 	PUBLIC	sin
-	EXTERN	asm_am9511_sin_fastcall
+	EXTERN	cam32_sccz80_sin
 
-	defc	sin = asm_am9511_sin_fastcall
+	defc	sin = cam32_sccz80_sin
 
 
 ; SDCC bridge for Classic

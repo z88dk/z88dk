@@ -2,9 +2,9 @@
     SECTION code_fp_am9511
 
     PUBLIC sqrt
-    EXTERN asm_am9511_sqrt_fastcall
+    EXTERN cam32_sccz80_sqrt
 
-    defc sqrt = asm_am9511_sqrt_fastcall
+    defc sqrt = cam32_sccz80_sqrt
 
 ; SDCC bridge for Classic
 IF __CLASSIC
