@@ -128,4 +128,5 @@ TIMER_START();
     }
 
 TIMER_STOP();
+return 0;
 }

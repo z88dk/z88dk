@@ -1,9 +1,9 @@
 
 ## z88dk Am9511A IEEE Floating Point Package - `am9511`
 
-This is the z88dk 32-bit IEEE-754 (mostly) standard Am9511A floating point maths package, designed to work with the SCCZ80 and ZSDCC IEEE-754 (mostly) standard 32-bit interfaces.
+This is the z88dk 32-bit IEEE-754 (mostly) standard Am9511A floating point maths package, designed to work with the SCCZ80 and ZSDCC IEEE-754 (mostly) standard 32-bit floating point interfaces.
 
-This library is designed expressly to support the AMD Am9511A Arithmetic Processor Unit. 
+This library is designed expressly to support the AMD Am9511A Arithmetic Processor Unit. The initial implementation is for the Am9511 APU Module, designed for the RC2014. Later expansion will support the DAI, and the YAZ180, and other classic machines with the Am9511A APU.
 
 *@feilipu, August 2020*
 
@@ -120,7 +120,7 @@ Contains the remaining hyperbolic, logarithmic, power and other functions implem
 
 ### c/sdcc and c/sccz80
 
-Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the z80 directory. Float conversion between the am9511 IEEE-754 format and the format expected by the Am9511A occurs here.
+Contains the zsdcc and the sccz80 C compiler interface and is implemented using the assembly language interface in the z80 directory. Calling convention conversion between the am9511 library and the format expected by the compilers occurs here.
 
 ### lam32
 
@@ -137,12 +137,6 @@ The Am9511A can build complex functions quite efficiently without needing to man
 ### Intrinsic Assembly Functions
 
 ```C
-float fabs (float x);
-float ceil (float x);
-float floor (float x);
-float frexp (float x, int *pw2);
-float ldexp (float x, int pw2);
-
 /* Trigonometric functions */
 float sin (float x);
 float cos (float x);
@@ -157,11 +151,21 @@ float log (float x);
 float log10 (float x);
 float pow (float x, float y);
 ```
-For some functions it is easiest to work with IEEE floating point numbers in assembly. For these three functions simple assembly code produces the result required effectively.
+
+#### Special Functions
+
+For some functions it is easiest to work with IEEE floating point numbers in assembly. For these functions simple assembly code produces the result required effectively.
+
+```C
+float fabs (float x);
+float ceil (float x);
+float floor (float x);
+float frexp (float x, int *pw2);
+float ldexp (float x, int pw2);
+```
 
 The sccz80 compiler has been upgraded to issue `ldexp()` instructions where power of 2 multiplies (or divides) are required. This means that for example `x/2` is calculated as a decrement of the exponent byte rather than calculating a full divide, saving hundreds of cycles.
 
-#### Special Functions
 
 ```C
 float div2 (float x);
@@ -210,4 +214,114 @@ float fmod (float x, float y);
 Generally the intrinsic functions are accurate within 1-2 counts of the floating mantissa. However, in certain ranges of certain functions the relative accuracy is much less do to the intrinsic properties of floating point math. Accuracy expressed in counts of the floating mantissa is relative accuracy - i.e. relative to the size of the number. Absolute accuracy is the absolute size of the error - e.g. .000001. The derivative functions, computed as combinations of the basic functions, typically have larger error because the errors of 2 or more basic functions are added together in some fashion.
 
 If the value of the function depends on the value of the difference of 2 floating point numbers that are close to each other in value, the relative error generally becomes large, although the absolute error may remain well bounded. Examples are the logs of numbers near 1 and the sine of numbers near pi. For example, if the argument of the sine function is a floating point number is close to pi, say 5 counts of the mantissa away from pi and it is subtracted from pi the result will be a number with only 3 significant bits. The relative error in the sine result will be very large, but the absolute error will still be very small. Functions with steep slopes, such as the exponent of larger numbers will show a large relative error, since the relative error in the argument is magnified by the slope.
+
+### Execution speed
+
+Some [benchmarking](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) has been completed and, as expected, the results show substantial improvements over other floating point libraries.
+
+
+#### whetstone
+
+Z88DK August 13, 2020
+zsdcc #11722 / new c library
+
+whetstone math48
+126 seconds
+
+`zcc +rc2014 -subtype=cpm -SO3 --max-allocs-per-node400000 -DPRINTOUT whetstone.c -o whetstone -lm -m -create-app`
+
+whetstone math32
+92 seconds
+
+`zcc +rc2014 -subtype=cpm -SO3 --max-allocs-per-node400000 -DPRINTOUT whetstone.c -o whetstone --math32 -m -create-app`
+
+whetstone am9511
+30 seconds
+
+`zcc +rc2014 -subtype=cpm -SO3 --max-allocs-per-node400000 -DPRINTOUT whetstone.c -o whetstone --am9511 -m -create-app`
+
+To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
+And they agree to the z88dk-ticks results within a few percentage points.
+
+#### fasta
+
+
+Z88DK August 13, 2020
+zsdcc #11722 / new c library
+
+fasta math48
+30 seconds
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta -lm -create-app`
+
+fasta math32
+37 seconds
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta --math32 -create-app`
+
+fasta am9511
+14.5 seconds
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta --am9511 -create-app`
+
+
+#### n-body
+
+Correct results
+-0.169075164
+-0.169087605
+
+Z88DK August 13, 2020
+zsdcc #11722 / new c library
+
+n-body math48
+308 seconds
+-0.169075117
+-0.169158205
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 n-body.c -o n-body -lm -m -pragma-include:zpragma.inc -create-app`
+
+
+n-body math32
+150 seconds
+-0.169075200
+-0.169086500
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 n-body.c -o n-body --math32 -m -pragma-include:zpragma.inc -create-app`
+
+
+n-body am9511
+78 seconds
+-0.169075100
+-0.169080500
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 n-body.c -o n-body --am9511 -m -pragma-include:zpragma.inc -create-app`
+
+
+To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
+And they agree to the z88dk-ticks results within a few percentage points.
+
+
+#### mandelbrot
+
+Z88DK August 13, 2020
+zsdcc #11722 / new c library
+
+mandelbrot math48
+432 seconds
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node400000 mandelbrot.c -o mandelbrot -lm -m -pragma-include:zpragma.inc -create-app`
+
+mandelbrot math32
+225 seconds
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node400000 mandelbrot.c -o mandelbrot --math32 -m -pragma-include:zpragma.inc -create-app`
+
+mandelbrot am9511
+162 seconds
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node400000 mandelbrot.c -o mandelbrot --am9511 -m -pragma-include:zpragma.inc -create-app`
+
+To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
+And they agree to the z88dk-ticks results within a few percentage points.
 
