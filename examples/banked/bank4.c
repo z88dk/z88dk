@@ -1,6 +1,6 @@
 
 
-
+#ifndef __SPECTRUM
 #pragma bank 4
 
 // This function isn't used, and is just used to push the rom size
@@ -8,3 +8,4 @@
 void func_bank4() {
 
 }
+#endif

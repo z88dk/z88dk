@@ -199,8 +199,7 @@ int zxn_exec(char *target)
     if (tap && (zxc.main_fence > 0))
         fprintf(stderr, "Warning: Main-fence is ignored for tap compiles\n");
 
-    if (tap)
-        return zx_tape(&zxc, &zxt);
+
 
     // output formats below need banked memory model
 
@@ -566,6 +565,10 @@ int zxn_exec(char *target)
             if (error) exit(1);
         }
     }
+
+
+    if (tap)
+        return zx_tape(&zxc, &zxt, &memory);
 
     // now the output formats
 

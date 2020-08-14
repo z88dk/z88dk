@@ -10,4 +10,5 @@ int main() {
     printf("Printing from main memory bank\n");
     val = func_bank1();
     printf("Returned value from bank calls is %d\n",val);
+    while( 1 ) { }
 }

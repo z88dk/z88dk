@@ -19,6 +19,7 @@ banked_call:
     push    hl              ; Push the real return address
     ld      bc,32765
     di
+    or      16
     ld      (SV_BANKM),a
     out     (c),a
     ei
@@ -27,10 +28,10 @@ banked_call:
     call    l_jphl
     pop     bc              ; Get the return address
     pop     af              ; Pop the old bank
+    push    bc
     ld      bc,32765
     di
     ld      (SV_BANKM),a
     out     (c),a
     ei
-    push    bc
     ret

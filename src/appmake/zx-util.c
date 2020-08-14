@@ -198,7 +198,7 @@ void turbo_rawout(FILE *fpout, unsigned char b, char extreme)
 }
 
 
-int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
+int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *memory)
 {
     char    filename[FILENAME_MAX + 1];
     char    wavfile[FILENAME_MAX + 1];
@@ -210,8 +210,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
     int     warping;
     int     i, j, blocklen;
     int     len, mlen;
-    int		blockcount;
-
+    int		blockcount, bsnum_bank;
     unsigned char * loader;
     int		loader_len;
 
@@ -616,6 +615,34 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt)
                 writebyte_p(c, fpout, &zxt->parity);
             }
             writebyte_p(zxt->parity, fpout, &zxt->parity);
+
+            // Write the memory banks
+             // Write the banks
+            bsnum_bank = mb_find_bankspace(memory, "BANK");
+            for ( i = 0; i < 8; i++ ) {
+                struct memory_bank *mb = &memory->bankspace[bsnum_bank].membank[i];
+                if (mb->num > 0) {     
+                    int      j;              
+                    unsigned char bank_buf[16384];
+                    FILE    *fpbank = fopen(mb->secbin->filename, "rb");
+
+                    if ( fpbank == NULL ) {
+                        exit_log(1,"Cannot open BANK file %s\n", mb->secbin->filename);
+                    }
+                    if ( mb->secbin->size != fread(bank_buf, 1,  mb->secbin->size, fpbank)) {  exit_log(1, "Could not read required data from <%s>\n",mb->secbin->filename); }
+                    
+                    /* Now onto the data bit */
+                    writeword_p(mb->secbin->size + 2, fpout, &zxt->parity);      /* Length of next block */
+                    zxt->parity = 0;
+                    writebyte_p(255, fpout, &zxt->parity);        /* Data is a type 255 block */
+                    for (j = 0; j<mb->secbin->size; j++) {
+                        c = bank_buf[j];
+                        writebyte_p(c, fpout, &zxt->parity);
+                    }
+                    writebyte_p(zxt->parity, fpout, &zxt->parity);
+                    fclose(fpbank);
+                }
+            }
         }
         fclose(fpin);
         fclose(fpout);
@@ -2129,7 +2156,7 @@ uint8_t *zx3_layout_file(uint8_t *inbuf, size_t filelen, int start_address, int 
      return buf;
 }
 
-int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
+int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *memory)
 {
     uint8_t  buffer[1024];  // Temporary buffer
     uint8_t *ptr;
@@ -2139,7 +2166,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
     char    tbuf[50];
     size_t  origin;
     size_t  binary_length;
-    int     len;
+    int     len, i, bsnum_bank;
     disc_handle *h;
     FILE   *fpin;
     void   *file_buf;
@@ -2188,7 +2215,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
     }
 
     // Lets do some filename mangling
-    cpm_create_filename(zxc->binname, basic_filename, 0, 1);
+    cpm_create_filename(zxt->blockname, basic_filename, 0, 1);
 
     // Create the basic file
 
@@ -2225,6 +2252,9 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
     writebyte_b(0xb0, &ptr);	/* VAL */
     snprintf(tbuf,sizeof(tbuf), "\"%i\"", (int)origin);           /* Location for USR */
     writestring_b(tbuf, &ptr);
+    writebyte_b(':', &ptr);
+    writebyte_b(234, &ptr);      /* REM */
+    writestring_b(basic_filename, &ptr);
     writebyte_b(0x0d, &ptr);	/* ENTER (end of BASIC line) */
     len = ptr - buffer;
     buffer[2] = (len-4) % 256; 
@@ -2264,6 +2294,30 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt)
     disc_write_file(h, cpm_filename, file_buf, file_len);
     free(file_buf);
     free(ptr);
+
+    // Write the banks
+    bsnum_bank = mb_find_bankspace(memory, "BANK");
+    for ( i = 0; i < 8; i++ ) {
+        struct memory_bank *mb = &memory->bankspace[bsnum_bank].membank[i];
+        if (mb->num > 0) {
+            unsigned char bank_buf[16384];
+            char          numbuf[32];
+            FILE    *fpbank = fopen(mb->secbin->filename, "rb");
+
+            if ( fpbank == NULL ) {
+                exit_log(1,"Cannot open BANK file %s\n", mb->secbin->filename);
+            }
+            if ( mb->secbin->size != fread(bank_buf, 1,  mb->secbin->size, fpbank)) {  exit_log(1, "Could not read required data from <%s>\n",mb->secbin->filename); }
+            snprintf(numbuf,sizeof(numbuf),".%d",i);
+            suffix_change(basic_filename, numbuf);
+            cpm_create_filename(basic_filename, cpm_filename, 0, 0);
+            file_buf = zx3_layout_file(bank_buf, mb->secbin->size, 0xc000, 3, &file_len);
+            disc_write_file(h, cpm_filename, file_buf, file_len);
+            fclose(fpbank);
+        }
+    }
+
+
     // Finalise the image
     if ( disc_write_edsk(h, disc_image_name) < 0 ) {
         exit_log(1,"Can't write disc image");

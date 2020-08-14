@@ -1216,6 +1216,14 @@ void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory,
                         snprintf(section_name, sizeof(section_name), "%s", &symbol_name[2]);
                         section_name[len - 7] = 0;
                         snprintf(bfilename, sizeof(bfilename), "%s_%s.bin", binname, section_name);
+                        if ( stat(bfilename, &st) < 0 ) {
+                            char binname_buf[FILENAME_MAX+1];
+
+                            snprintf(binname_buf,sizeof(binname_buf),"%s", binname);
+                            suffix_change(binname_buf, "");
+
+                            snprintf(bfilename, sizeof(bfilename), "%s_%s.bin", binname_buf, section_name);
+                        }
                     }
 
                     // if section head

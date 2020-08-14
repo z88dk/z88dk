@@ -130,6 +130,7 @@ init:
 ELSE
 
         ; --- startup=[default] ---
+        call   loadbanks
 
         ld      iy,23610        ; restore the right iy value, 
                                 ; fixing the self-relocating trick, if any
@@ -329,6 +330,7 @@ ENDIF
         push    bc
         exx                      ; Back to the regular set
         ret
+
         
 
 
@@ -345,6 +347,13 @@ IF (startup=2) 			;ROM
         ELSE
             defc __crt_model = 1
         ENDIF
+ELSE
+loadbanks:
+    IF DEFINED_CRT_PLUS3LOADER
+        INCLUDE "target/zx/classic/zx_p3loader.asm"
+    ELSE
+        INCLUDE "target/zx/classic/zx_tapeloader.asm"
+    ENDIF
 ENDIF
 
 ; If we were given an address for the BSS then use it
@@ -385,35 +394,35 @@ _RND_BLOCKSIZE: defw    1000
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    IFNDEF CRT_ORG_BANK_0
-      defc CRT_ORG_BANK_0 = 0xc000
+      defc CRT_ORG_BANK_0 = 0x00c000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_1
-      defc CRT_ORG_BANK_1 = 0xc000
+      defc CRT_ORG_BANK_1 = 0x01c000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_2
-      defc CRT_ORG_BANK_2 = 0xc000
+      defc CRT_ORG_BANK_2 = 0x02c000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_3
-      defc CRT_ORG_BANK_3 = 0xc000
+      defc CRT_ORG_BANK_3 = 0x03c000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_4
-      defc CRT_ORG_BANK_4 = 0xc000
+      defc CRT_ORG_BANK_4 = 0x04c000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_5
-      defc CRT_ORG_BANK_5 = 0xc000
+      defc CRT_ORG_BANK_5 = 0x05c000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_6
-      defc CRT_ORG_BANK_6 = 0xc000
+      defc CRT_ORG_BANK_6 = 0x06c000
    ENDIF
 
    IFNDEF CRT_ORG_BANK_7
-      defc CRT_ORG_BANK_7 = 0xc000
+      defc CRT_ORG_BANK_7 = 0x07c000
    ENDIF
 
 
@@ -421,38 +430,48 @@ _RND_BLOCKSIZE: defw    1000
    org CRT_ORG_BANK_0
    SECTION CODE_0
    SECTION RODATA_0
+   SECTION BANK_0_END
 
    SECTION BANK_1
    org CRT_ORG_BANK_1
    SECTION CODE_1
    SECTION RODATA_1
+   SECTION BANK_1_END
 
    SECTION BANK_2
    org CRT_ORG_BANK_2
    SECTION CODE_2
    SECTION RODATA_2
+   SECTION BANK_2_END
+
 
    SECTION BANK_3
    org CRT_ORG_BANK_3
    SECTION CODE_3
    SECTION RODATA_3
+   SECTION BANK_3_END
 
    SECTION BANK_4
    org CRT_ORG_BANK_4
    SECTION CODE_4
    SECTION RODATA_4
+   SECTION BANK_4_END
 
    SECTION BANK_5
    org CRT_ORG_BANK_5
    SECTION CODE_5
    SECTION RODATA_5
+   SECTION BANK_5_END
 
    SECTION BANK_6
    org CRT_ORG_BANK_6
    SECTION CODE_6
    SECTION RODATA_6
+   SECTION BANK_6_END
 
    SECTION BANK_7
    org CRT_ORG_BANK_7
    SECTION CODE_7
    SECTION RODATA_7
+   SECTION BANK_7_END
+
