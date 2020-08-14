@@ -26,7 +26,7 @@ PUBLIC _am9511_popf
 .asm_am9511_popf
 
     ; float primitive
-    ; push a IEEE-754 floating point into Am9511 stack.
+    ; pop a IEEE-754 floating point from the Am9511 stack.
     ;
     ; Convert from am9511_float to IEEE_float.
     ;

@@ -26,7 +26,7 @@ PUBLIC _am9511_popi
 .asm_am9511_popi
 
     ; float primitive
-    ; push a long into Am9511 stack.
+    ; pop a long from the Am9511 stack.
     ;
     ; enter : stack = ret0
     ;
