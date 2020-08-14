@@ -6,17 +6,22 @@ z88dk vx.x.x - xx.xx.xxxx
 Detailed but incomplete changelist:
 
 - [classic] WYZTracker is now available for AY music and SFX
+- [classic] Vortex Track is now available for AY music and SFX
 - [classic] Interrupt code is now 8080 clean
 - [classic] +cpm: Vector06c disc creation
+- [classic] +dai: New target
 - [classic] +gb: Banking now works for both sdcc and sccz80
 - [classic] +gb: MBF32 floating point maths is now available
+- [classic] +homelab: New target for the Homelab 3/4 machine
+- [classic] +homelab2: New target for the Homelab 2 machine
 - [classic] +msx: Banking now works for both sdcc and sccz80
 - [classic] +msx: MegaROMs can now be created
+- [classic] +special: New target
 - [classic] +svi: Generic console now works again
-- [classic] +zx: The enter key now works with ROM input
 - [classic] +vector06c: New target
-- [classic] +homelab2: New target for the Homelab 2 machine
-- [classic] +homelab: New target for the Homelab 3/4 machine
+- [classic] +zx: The enter key now works with ROM input
+- [classic] +zx: Banked code support.
+- [classic] +zxn: New target
 - [classic] all: IEEE-754 16 bit (adjunct) maths library
 - [classic] all: DAI 8080 (Am9511) 32 bit maths library
 - [newlib] +zx WYZTRacker is now available
@@ -24,8 +29,10 @@ Detailed but incomplete changelist:
 - [sccz80] genmath/math48: Fixes to builtin ldexp implementation
 - [sccz80] Bitfields now work and on the 8080
 - [sccz80] Code generator fixes for gbz80
+- [sccz80] Support for long long integer types
 - [sccz80] Support added for IEEE-754 16 bit floating point numbers
 - [sccz80] Support added for Am9511 32 bit floating point numbers
+- [z80asm] Linking speed cleanup
 - [z80asm] db/dw/ds etc synonyms are now accepted
 - [zsdcc] Upgraded to SDCC 4.0.2 r11722 (bugfixes)
 
