@@ -130,7 +130,9 @@ init:
 ELSE
 
         ; --- startup=[default] ---
+  IF !DEFINED_CRT_DISABLELOADER
         call   loadbanks
+  ENDIF
 
         ld      iy,23610        ; restore the right iy value, 
                                 ; fixing the self-relocating trick, if any
@@ -348,12 +350,14 @@ IF (startup=2) 			;ROM
             defc __crt_model = 1
         ENDIF
 ELSE
+  IF !DEFINED_CRT_DISABLELOADER
 loadbanks:
     IF DEFINED_CRT_PLUS3LOADER
         INCLUDE "target/zx/classic/zx_p3loader.asm"
     ELSE
         INCLUDE "target/zx/classic/zx_tapeloader.asm"
     ENDIF
+  ENDIF
 ENDIF
 
 ; If we were given an address for the BSS then use it

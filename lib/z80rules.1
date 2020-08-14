@@ -4610,7 +4610,6 @@
 	ld	a,l
 =
 	ld	a,(hl)
-	ld	h,%1
 
 	push	de
 	push	hl
@@ -4680,3 +4679,15 @@
 =
 	ld	hl,%1
 	call	l_i64_push_under_int_mhl
+
+	ld	hl,%1	;const
+	ld	b,l
+	push	bc
+	inc	sp
+	ld	hl,%2	;const
+	ld	b,l
+	push	bc
+	inc	sp
+=
+	ld	bc,%eval(%1 256 * %2 +)
+	push	bc

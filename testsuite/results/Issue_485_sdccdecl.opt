@@ -21,14 +21,8 @@
 
 
 ._func2
-	ld	hl,2	;const
-	ld	b,l
+	ld	bc,513
 	push	bc
-	inc	sp
-	ld	hl,1	;const
-	ld	b,l
-	push	bc
-	inc	sp
 	call	_func
 	pop	bc
 	ret
