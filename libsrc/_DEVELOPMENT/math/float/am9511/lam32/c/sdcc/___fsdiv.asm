@@ -1,6 +1,6 @@
 
     SECTION code_fp_am9511
     PUBLIC ___fsdiv
-    EXTERN cam32_sdcc_div
+    EXTERN cam32_sdcc_fdiv
 
-    defc ___fsdiv = cam32_sdcc_div
+    defc ___fsdiv = cam32_sdcc_fdiv

@@ -4,7 +4,7 @@ SECTION code_fp_am9511
 
 PUBLIC asm_dmul
 
-EXTERN asm_am9511_mul_callee
+EXTERN asm_am9511_fmul_callee
 
    ; compute DEHL' = DEHL * DEHL'
    ;
@@ -30,7 +30,7 @@ EXTERN asm_am9511_mul_callee
     push hl
 
     exx
-    call asm_am9511_mul_callee
+    call asm_am9511_fmul_callee
 
     exx
     ret

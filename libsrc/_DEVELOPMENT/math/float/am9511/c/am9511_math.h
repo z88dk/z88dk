@@ -66,7 +66,7 @@ float am9511_atanh (float x) __z88dk_fastcall;
 float log (float x) __z88dk_fastcall;
 float log10 (float x) __z88dk_fastcall;
 float exp (float x) __z88dk_fastcall;
-float pow (float x, float y);
+float pow (float x, float y) __z88dk_callee;
 
 float am9511_log2 (float x) __z88dk_fastcall;
 float am9511_exp2 (float x) __z88dk_fastcall;

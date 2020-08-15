@@ -4,7 +4,7 @@ SECTION code_fp_am9511
 
 PUBLIC asm_dmul10u, asm_dmul10a
 
-EXTERN asm_am9511_mul10u_fastcall
+EXTERN asm_am9511_fmul10u_fastcall
 
    ; multiply DEHL' by 10 and make positive
    ; 
@@ -28,7 +28,7 @@ defc asm_dmul10a = asm_dmul10u
 .asm_dmul10u
 
     exx
-    call asm_am9511_mul10u_fastcall
+    call asm_am9511_fmul10u_fastcall
 
     exx
     ret
