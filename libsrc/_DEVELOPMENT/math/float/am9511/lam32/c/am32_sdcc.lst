@@ -22,6 +22,8 @@ math/float/am9511/lam32/c/sdcc/div2
 math/float/am9511/lam32/c/sdcc/div2_fastcall
 math/float/am9511/lam32/c/sdcc/__divslong
 math/float/am9511/lam32/c/sdcc/__divslong_callee
+math/float/am9511/lam32/c/sdcc/__divulong
+math/float/am9511/lam32/c/sdcc/__divulong_callee
 math/float/am9511/lam32/c/sdcc/dload
 math/float/am9511/lam32/c/sdcc/exp
 math/float/am9511/lam32/c/sdcc/exp2
@@ -80,6 +82,8 @@ math/float/am9511/lam32/c/sdcc/mlib2d
 math/float/am9511/lam32/c/sdcc/modf
 math/float/am9511/lam32/c/sdcc/__modslong
 math/float/am9511/lam32/c/sdcc/__modslong_callee
+math/float/am9511/lam32/c/sdcc/__modulong
+math/float/am9511/lam32/c/sdcc/__modulong_callee
 math/float/am9511/lam32/c/sdcc/mul2
 math/float/am9511/lam32/c/sdcc/mul2_fastcall
 math/float/am9511/lam32/c/sdcc/mul10u
