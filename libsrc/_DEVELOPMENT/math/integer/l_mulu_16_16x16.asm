@@ -23,12 +23,12 @@ IF __CPU_Z80N__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
 ELSE
 
-IF __IO_LUT_MODULE_AVAILABLE
-
-   EXTERN l_lut_mulu_16_16x16
-   defc l_mulu_16_16x16 = l_lut_mulu_16_16x16
-
-ELSE
+;IF __IO_LUT_MODULE_AVAILABLE
+;
+;   EXTERN l_lut_mulu_16_16x16
+;   defc l_mulu_16_16x16 = l_lut_mulu_16_16x16
+;
+;ELSE
 
 IF __CLIB_OPT_IMATH <= 50
 
@@ -44,7 +44,7 @@ IF __CLIB_OPT_IMATH > 50
 
 ENDIF
 
-ENDIF
+;ENDIF
 
 ENDIF
 
