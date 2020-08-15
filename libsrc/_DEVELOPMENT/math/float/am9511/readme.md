@@ -243,6 +243,29 @@ whetstone am9511
 To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
 And they agree to the z88dk-ticks results within a few percentage points.
 
+#### spectral-norm
+
+Correct result
+1.274219991
+
+Z88DK August 15, 2020
+zsdcc #11722 / new c library
+
+spectral-norm math32
+28 minutes 57 seconds
+1.2742190
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 spectral-norm.c -o spectral-norm --math32 -create-app`
+
+spectral-norm am9511
+6 min 35 seconds
+1.2742140
+
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 spectral-norm.c -o spectral-norm --am9511 -create-app`
+
+To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
+
+
 #### fasta
 
 
@@ -297,9 +320,7 @@ n-body am9511
 
 `zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 n-body.c -o n-body --am9511 -m -pragma-include:zpragma.inc -create-app`
 
-
 To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
-And they agree to the z88dk-ticks results within a few percentage points.
 
 
 #### mandelbrot
@@ -323,5 +344,4 @@ mandelbrot am9511
 `zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 mandelbrot.c -o mandelbrot --am9511 -m -pragma-include:zpragma.inc -create-app`
 
 To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
-And they agree to the z88dk-ticks results within a few percentage points.
 
