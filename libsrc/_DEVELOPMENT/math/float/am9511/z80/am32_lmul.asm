@@ -8,54 +8,54 @@
 ;  feilipu, August 2020
 ;
 ;-------------------------------------------------------------------------
-; asm_am9511_fmul - z80 floating point multiply
+; asm_am9511_lmul - z80 long multiply
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_am9511
 
 EXTERN __IO_APU_CONTROL
-EXTERN __IO_APU_OP_FMUL
+EXTERN __IO_APU_OP_DMUL
 
-EXTERN asm_am9511_pushf
-EXTERN asm_am9511_pushf_fastcall
-EXTERN asm_am9511_popf
+EXTERN asm_am9511_pushl
+EXTERN asm_am9511_pushl_fastcall
+EXTERN asm_am9511_popl
 
-PUBLIC asm_am9511_fmul, asm_am9511_fmul_callee
+PUBLIC asm_am9511_lmul, asm_am9511_lmul_callee
 
 
-; enter here for floating multiply, x+y, x on stack, y in dehl, result in dehl
-.asm_am9511_fmul
+; enter here for long multiply, x-y x on stack, y in dehl
+.asm_am9511_lmul
     exx
     ld hl,2
     add hl,sp
-    call asm_am9511_pushf           ; x
+    call asm_am9511_pushl           ; x
 
     exx
-    call asm_am9511_pushf_fastcall  ; y
+    call asm_am9511_pushl_fastcall  ; y
 
-    ld a,__IO_APU_OP_FMUL
+    ld a,__IO_APU_OP_DMUL
     out (__IO_APU_CONTROL),a        ; x * y
 
-    jp asm_am9511_popf
+    jp asm_am9511_popl
 
 
-; enter here for floating multiply callee, x+y, x on stack, y in dehl
-.asm_am9511_fmul_callee
+; enter here for long multiply callee, x-y x on stack, y in dehl
+.asm_am9511_lmul_callee
     exx
     ld hl,2
     add hl,sp
-    call asm_am9511_pushf           ; x
+    call asm_am9511_pushl           ; x
 
     exx
-    call asm_am9511_pushf_fastcall  ; y
+    call asm_am9511_pushl_fastcall  ; y
 
-    ld a,__IO_APU_OP_FMUL
+    ld a,__IO_APU_OP_DMUL
     out (__IO_APU_CONTROL),a        ; x * y
 
     pop hl                          ; ret
     pop de
     ex (sp),hl                      ; ret back on stack
 
-    jp asm_am9511_popf
+    jp asm_am9511_popl
 

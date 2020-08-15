@@ -8,54 +8,54 @@
 ;  feilipu, August 2020
 ;
 ;-------------------------------------------------------------------------
-; asm_am9511_fdiv - am9511 floating point divide
+; asm_am9511_ldiv - am9511 long divide
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_am9511
 
 EXTERN __IO_APU_CONTROL
-EXTERN __IO_APU_OP_FDIV
+EXTERN __IO_APU_OP_DDIV
 
-EXTERN asm_am9511_pushf
-EXTERN asm_am9511_pushf_fastcall
-EXTERN asm_am9511_popf
+EXTERN asm_am9511_pushl
+EXTERN asm_am9511_pushl_fastcall
+EXTERN asm_am9511_popl
 
-PUBLIC asm_am9511_fdiv, asm_am9511_fdiv_callee
+PUBLIC asm_am9511_ldiv, asm_am9511_ldiv_callee
 
 
-; enter here for floating divide, x+y, x on stack, y in dehl, result in dehl
-.asm_am9511_fdiv
+; enter here for long divide, x+y, x on stack, y in dehl
+.asm_am9511_ldiv
     exx
     ld hl,2
     add hl,sp
-    call asm_am9511_pushf           ; x
+    call asm_am9511_pushl           ; x
 
     exx
-    call asm_am9511_pushf_fastcall  ; y
+    call asm_am9511_pushl_fastcall  ; y
 
-    ld a,__IO_APU_OP_FDIV
+    ld a,__IO_APU_OP_DDIV
     out (__IO_APU_CONTROL),a        ; x / y
 
-    jp asm_am9511_popf
+    jp asm_am9511_popl              ; quotient in dehl
 
 
-; enter here for floating divide callee, x+y, x on stack, y in dehl
-.asm_am9511_fdiv_callee
+; enter here for long divide callee, x+y, x on stack, y in dehl
+.asm_am9511_ldiv_callee
     exx
     ld hl,2
     add hl,sp
-    call asm_am9511_pushf           ; x
+    call asm_am9511_pushl           ; x
 
     exx
-    call asm_am9511_pushf_fastcall  ; y
+    call asm_am9511_pushl_fastcall  ; y
 
-    ld a,__IO_APU_OP_FDIV
+    ld a,__IO_APU_OP_DDIV
     out (__IO_APU_CONTROL),a        ; x / y
 
     pop hl                          ; ret
     pop de
     ex (sp),hl                      ; ret back on stack
 
-    jp asm_am9511_popf
+    jp asm_am9511_popl              ; quotient in dehl
 

@@ -28,9 +28,14 @@ math/float/am9511/z80/am32_frexp
 math/float/am9511/z80/am32_fsub
 math/float/am9511/z80/am32_hexpop
 math/float/am9511/z80/am32_hypot
+math/float/am9511/z80/am32_ladd
 math/float/am9511/z80/am32_ldexp
+math/float/am9511/z80/am32_ldiv
+math/float/am9511/z80/am32_lmod
+math/float/am9511/z80/am32_lmul
 math/float/am9511/z80/am32_log
 math/float/am9511/z80/am32_log10
+math/float/am9511/z80/am32_lsub
 math/float/am9511/z80/am32_nan_b
 math/float/am9511/z80/am32_popf
 math/float/am9511/z80/am32_popi
