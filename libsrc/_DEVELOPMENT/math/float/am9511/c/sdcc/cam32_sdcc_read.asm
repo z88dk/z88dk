@@ -3,9 +3,11 @@ SECTION code_clib
 SECTION code_fp_am9511
 
 PUBLIC cam32_sdcc_readr
+PUBLIC cam32_sdcc_ireadr
 PUBLIC cam32_sdcc_read1
 
 EXTERN cam32_sdcc_load
+EXTERN cam32_sdcc_iload
 
 .cam32_sdcc_readr
 
@@ -25,6 +27,24 @@ EXTERN cam32_sdcc_load
     add hl,sp
 
     jp cam32_sdcc_load          ; return DEHL = sdcc_float right
+
+
+.cam32_sdcc_ireadr
+
+    ; sdcc integer primitive
+    ; Read right sdcc integer from the stack
+    ;
+    ; enter : stack = sdcc_integer right, sdcc_integer left, ret1, ret0
+    ;
+    ; exit  : stack = sdcc_integer right, sdcc_integer left, ret1
+    ;          DEHL = sdcc_integer right
+    ; 
+    ; uses  : f, bc, de, hl
+
+    ld hl,6                     ; stack sdcc_integer right
+    add hl,sp
+
+    jp cam32_sdcc_iload         ; return HL = sdcc_integer right
 
 
 .cam32_sdcc_read1

@@ -3,6 +3,7 @@ SECTION code_clib
 SECTION code_fp_am9511
 
 PUBLIC cam32_sdcc_load
+PUBLIC cam32_sdcc_iload
 
 .cam32_sdcc_load
 
@@ -27,3 +28,21 @@ PUBLIC cam32_sdcc_load
     ld h,b
 
     ret                         ; DEHL = sdcc_float
+
+.cam32_sdcc_iload
+
+    ; sdcc integer primitive
+    ; Load integer pointed to by HL into DEHL
+    ;
+    ; enter : HL = integer* (sdcc_integer)
+    ;
+    ; exit  : HL = integer (sdcc_integer)
+    ;
+    ; uses  : de, hl
+
+    ld e,(hl)
+    inc hl
+    ld d,(hl)                   ; DE = sdcc_integer
+
+    ex de,hl
+    ret                         ; HL = sdcc_integer
