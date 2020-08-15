@@ -3,7 +3,7 @@ SECTION code_fp_am9511
 
 PUBLIC __modslong_callee
 
-EXTERN cam32_sdcc_lmod_callee
+EXTERN cam32_sdcc_lmods_callee
 
    ; modulus of two 32-bit numbers into a 32-bit remainder
    ;
@@ -11,4 +11,4 @@ EXTERN cam32_sdcc_lmod_callee
    ;
    ; exit  : dehl = remainder
 
-defc __modslong_callee = cam32_sdcc_lmod_callee
+defc __modslong_callee = cam32_sdcc_lmods_callee

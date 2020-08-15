@@ -3,7 +3,7 @@ SECTION code_fp_am9511
 
 PUBLIC __divslong
 
-EXTERN cam32_sdcc_ldiv
+EXTERN cam32_sdcc_ldivs
 
    ; divide two 32-bit numbers into a 32-bit quotient
    ;
@@ -11,4 +11,4 @@ EXTERN cam32_sdcc_ldiv
    ;
    ; exit  : dehl = quotient
 
-defc __divslong = cam32_sdcc_ldiv
+defc __divslong = cam32_sdcc_ldivs

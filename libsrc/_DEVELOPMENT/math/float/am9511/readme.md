@@ -252,17 +252,17 @@ zsdcc #11722 / new c library
 fasta math48
 30 seconds
 
-`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta -lm -create-app`
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta -lm -create-app`
 
 fasta math32
 37 seconds
 
-`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta --math32 -create-app`
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta --math32 -create-app`
 
 fasta am9511
 14.5 seconds
 
-`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta --am9511 -create-app`
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta --am9511 -create-app`
 
 
 #### n-body
@@ -310,17 +310,17 @@ zsdcc #11722 / new c library
 mandelbrot math48
 432 seconds
 
-`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node400000 mandelbrot.c -o mandelbrot -lm -m -pragma-include:zpragma.inc -create-app`
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 mandelbrot.c -o mandelbrot -lm -m -pragma-include:zpragma.inc -create-app`
 
 mandelbrot math32
 225 seconds
 
-`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node400000 mandelbrot.c -o mandelbrot --math32 -m -pragma-include:zpragma.inc -create-app`
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 mandelbrot.c -o mandelbrot --math32 -m -pragma-include:zpragma.inc -create-app`
 
 mandelbrot am9511
 162 seconds
 
-`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node400000 mandelbrot.c -o mandelbrot --am9511 -m -pragma-include:zpragma.inc -create-app`
+`zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 mandelbrot.c -o mandelbrot --am9511 -m -pragma-include:zpragma.inc -create-app`
 
 To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
 And they agree to the z88dk-ticks results within a few percentage points.

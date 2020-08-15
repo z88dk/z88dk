@@ -3,7 +3,7 @@ SECTION code_fp_am9511
 
 PUBLIC __modulong
 
-EXTERN cam32_sdcc_lmod
+EXTERN cam32_sdcc_lmodu
 
    ; modulus of two 32-bit numbers into a 32-bit remainder
    ;
@@ -11,4 +11,4 @@ EXTERN cam32_sdcc_lmod
    ;
    ; exit  : dehl = remainder
 
-defc __modulong = cam32_sdcc_lmod
+defc __modulong = cam32_sdcc_lmodu
