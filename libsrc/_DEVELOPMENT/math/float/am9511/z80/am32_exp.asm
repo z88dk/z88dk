@@ -25,7 +25,7 @@ PUBLIC asm_am9511_exp, asm_am9511_exp_fastcall
 
 
 .asm_am9511_exp
-    ld hl,4
+    ld hl,2
     add hl,sp
     call asm_am9511_pushf           ; x
 

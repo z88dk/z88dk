@@ -25,7 +25,7 @@ PUBLIC asm_am9511_acos, asm_am9511_acos_fastcall
 
 
 .asm_am9511_acos
-    ld hl,4
+    ld hl,2
     add hl,sp
     call asm_am9511_pushf           ; x
 

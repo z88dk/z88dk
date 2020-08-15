@@ -27,7 +27,7 @@ PUBLIC asm_am9511_sqr, asm_am9511_sqr_fastcall
 
 
 .asm_am9511_sqr
-    ld hl,4
+    ld hl,2
     add hl,sp
     call asm_am9511_pushf           ; x
 

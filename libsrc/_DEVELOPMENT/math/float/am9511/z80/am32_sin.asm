@@ -25,7 +25,7 @@ PUBLIC asm_am9511_sin, asm_am9511_sin_fastcall
 
 
 .asm_am9511_sin
-    ld hl,4
+    ld hl,2
     add hl,sp
     call asm_am9511_pushf           ; x
 

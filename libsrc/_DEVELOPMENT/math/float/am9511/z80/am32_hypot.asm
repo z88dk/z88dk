@@ -58,7 +58,7 @@ PUBLIC asm_am9511_hypot, asm_am9511_hypot_callee
     ld a,__IO_APU_OP_FMUL
     out (__IO_APU_CONTROL),a        ; y * y
 
-    ld hl,4
+    ld hl,2
     add hl,sp
     call asm_am9511_pushf           ; x
 
@@ -96,7 +96,7 @@ PUBLIC asm_am9511_hypot, asm_am9511_hypot_callee
     ld a,__IO_APU_OP_FMUL
     out (__IO_APU_CONTROL),a        ; y * y
 
-    ld hl,4
+    ld hl,2
     add hl,sp
     call asm_am9511_pushf           ; x
 

@@ -25,11 +25,12 @@ PUBLIC asm_am9511_div, asm_am9511_div_callee
 
 
 .asm_am9511_div
-    push hl
-    ld hl,4
+    exx
+    ld hl,2
     add hl,sp
     call asm_am9511_pushf           ; x
-    pop hl
+
+    exx
     call asm_am9511_pushf_fastcall  ; y
 
     ld a,__IO_APU_OP_FDIV
@@ -39,11 +40,12 @@ PUBLIC asm_am9511_div, asm_am9511_div_callee
 
 
 .asm_am9511_div_callee
-    push hl
-    ld hl,4
+    exx
+    ld hl,2
     add hl,sp
     call asm_am9511_pushf           ; x
-    pop hl
+
+    exx
     call asm_am9511_pushf_fastcall  ; y
 
     ld a,__IO_APU_OP_FDIV

@@ -25,7 +25,7 @@ PUBLIC asm_am9511_tan, asm_am9511_tan_fastcall
 
 
 .asm_am9511_tan
-    ld hl,4
+    ld hl,2
     add hl,sp
     call asm_am9511_pushf           ; x
 
