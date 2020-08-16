@@ -16,6 +16,7 @@ target = $(firstword $(subst -, ,$*))
 
 .PHONY: ${jobs}
 ${jobs}: job-%:
+	@mkdir -p target/$(target)/obj/sccz80 target/$(target)/obj/sdcc_ix target/$(target)/obj/sdcc_iy
 	$(eval cpu := $(shell \
 		if [ "$(target)" = "z180" ]; then \
 			echo "-mz180"; \
@@ -31,31 +32,32 @@ ${jobs}: job-%:
 		else \
 			echo "";  \
 		fi) )
-	m4 -DCFG_ASM_DEF target/$(target)/config.m4 > target/$(target)/config_$(target)_private.inc
+	m4 -DCFG_ASM_DEF target/$(target)/config.M4 > target/$(target)/config_$(target)_private.inc
 	m4 -DCFG_ASM_PUB target/$(target)/config.m4 > target/$(target)/config_$(target)_public.inc
 	m4 -DCFG_C_DEF target/$(target)/config.m4 > target/$(target)/config_$(target).h
-	cp target/$(target)/config_$(target)_private.inc config_private.inc
-	@if [ "$(target)" = "zx" ]; then \
-		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
-		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
+	cp target/$(target)/config_$(target)_private.inc target/$(target)/obj/config_private.inc
+	if [ "$(target)" = "zx" ]; then \
+		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" -Cm-Itarget/$(target)/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
+		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" -Cm-Itarget/$(target)/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
 		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 	fi;
 	@if [ "$(target)" = "zxn" ]; then \
-		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
-		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
+		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" -Cm-Itarget/$(target)/obj  arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
+		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" -Cm-Itarget/$(target)/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
 		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 	fi;
 	@if [ -f target/$(target)/library/$(target)_macro.lst ]; then \
-		zcc +z80 -vn -clib=new -m4 --lstcwd @target/$(target)/library/$(target)_macro.lst; \
+		zcc +z80 -vn -clib=new -m4 -Cm-Itarget/$(target)/obj --lstcwd @target/$(target)/library/$(target)_macro.lst; \
 	fi;
-	$(Z80ASM) $(cpu) -xlib/sccz80/$(target) -I$(Z88DK_LIB) @target/$(target)/library/$(target)_sccz80.lst
-	$(Z80ASM) $(cpu) -xlib/sdcc_ix/$(target) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @target/$(target)/library/$(target)_sdcc_ix.lst
-	$(Z80ASM) $(cpu) -IXIY -xlib/sdcc_iy/$(target) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IY @target/$(target)/library/$(target)_sdcc_iy.lst
+	$(Z80ASM) $(cpu) -d -Otarget/$(target)/obj/sccz80 -Itarget/$(target)/obj -xlib/sccz80/$(target) -I$(Z88DK_LIB) @target/$(target)/library/$(target)_sccz80.lst
+	$(Z80ASM) $(cpu) -d -Otarget/$(target)/obj/sdcc_ix -Itarget/$(target)/obj -xlib/sdcc_ix/$(target) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @target/$(target)/library/$(target)_sdcc_ix.lst
+	$(Z80ASM) $(cpu) -d -Otarget/$(target)/obj/sdcc_iy -Itarget/$(target)/obj -IXIY -xlib/sdcc_iy/$(target) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IY @target/$(target)/library/$(target)_sdcc_iy.lst
 
 .PHONY: ${cleans}
 ${cleans}: clean-%:
+	$(RM) -r target/$(target)/obj
 	$(RM) lib/sccz80/$(target).lib
 	$(RM) lib/sdcc_ix/$(target).lib
 	$(RM) lib/sdcc_iy/$(target).lib
