@@ -240,7 +240,7 @@ void debugger()
     /* In the debugger, loop continuously for commands */
 
     if (interact_with_tty)
-        snprintf(prompt,sizeof(prompt), "\n" FNT_BCK "    $%04x    >" FNT_RST, pc);     // TODO: Symbol address
+        snprintf(prompt,sizeof(prompt), "\n" FNT_BCK "    $%04x    >" FNT_RST " ", pc);     // TODO: Symbol address
     else                                                                                // Original output for non-active tty
         snprintf(prompt,sizeof(prompt), " %04x >", pc);                                 // TODO: Symbol address
 
@@ -425,7 +425,8 @@ static int cmd_break(int argc, char **argv)
         /* Just show the breakpoints */
         LL_FOREACH(breakpoints, elem) {
             if ( elem->type == BREAK_PC) {
-                printf("%d:\tPC = $%04x%s\n",i, elem->value,elem->enabled ? "" : " (disabled)");
+                const char *sym = find_symbol(elem->value, SYM_ADDRESS);
+                printf("%d:\tPC = $%04x (%s) %s\n",i, elem->value,sym ? sym : "<unknown>", elem->enabled ? "" : " (disabled)");
             } else if ( elem->type == BREAK_CHECK8 ) {
                 printf("%d\t%s = $%02x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
             } else if ( elem->type == BREAK_CHECK16 ) {
@@ -434,7 +435,13 @@ static int cmd_break(int argc, char **argv)
             i++;
         }
     } else if ( argc == 2 && strcmp(argv[1],"--help") == 0 ) {
-        printf("Breakpoint help - to be written\n");
+        printf("break [address/label]             - Break at address\n");
+        printf("break delete [index]              - Delete breakpoint\n");
+        printf("break disable [index]             - Disable breakpoint\n");
+        printf("break enable [index]              - Enabled breakpoint\n");
+        printf("break memory8 [address] [value]   - Break when [address/label] is value\n");
+        printf("break memory16 [address] [value]  - Break when [address/label] is value\n");
+        printf("break register [register] [value] - Break when [register] is value\n");
     } else if ( argc == 2 ) {
         char *end;
         const char *sym;

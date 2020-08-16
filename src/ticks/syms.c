@@ -16,29 +16,11 @@ static void demangle_filename(const char *input, char *buf, size_t buflen, int *
     char *ptr;
 
     *lineno = -1;
-    input += strlen("__CFILE___");
+    ptr = strrchr(input, ':');
 
-    while ( *input ) {
-        char   c = *input++;
-        if ( c != '_' ) {
-            *buf++ = c;
-        } else {
-            unsigned char d;
-
-            c = *input++;
-            d = (c >= 'A' ? c - 'A' + 10 : c - '0' ) << 4;
-            c = *input++;
-            d |= (c >= 'A' ? c - 'A' + 10 : c-'0');
-            *buf++ = d;
-        }
-    }
-    *buf = 0;
-
-    ptr = strrchr(start, '_');
     if ( ptr != NULL ) {
-        *ptr = 0;
-        ptr++;
-        *lineno = atoi(ptr);
+        snprintf(buf,buflen,"%.*s", (int)(ptr - input), input);
+        *lineno = atoi(ptr+1);
     }
 }
 
@@ -94,7 +76,7 @@ void read_symbol_file(char *filename)
                 free(argv);
                 continue;
             }
-            if ( strncmp(argv[0], "__CLINE__",9) ) {
+            if ( strncmp(argv[0], "__C_LINE_",9) ) {
                 symbol *sym = calloc(1,sizeof(*sym));
 
                 sym->name = strdup(argv[0]);
@@ -113,12 +95,19 @@ void read_symbol_file(char *filename)
                     LL_APPEND(symbols[sym->address], sym);
                 }
                 HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
-            } else {
+            } else if ( argc > 9 ) {
                 /* It's a cline symbol */
                 char   filename[FILENAME_MAX+1];
                 int    lineno;
-                demangle_filename(argv[0], filename, sizeof(filename),&lineno);
+                char  *ptr;
+
+                demangle_filename(argv[9], filename, sizeof(filename),&lineno);
                 add_cline(filename, lineno, argv[2]);
+
+                if ( ( ptr = strchr(filename,':')) != NULL ) {
+                    *ptr = 0;
+                    add_cline(filename, lineno, argv[2]);
+                }
 
             }
             free(argv);
@@ -146,7 +135,7 @@ int symbol_resolve(char *name)
     }
 
     /* Check for it being a file */
-    if ( ( ptr = strchr(name, ':') ) != NULL ) {
+    if ( ( ptr = strrchr(name, ':') ) != NULL ) {
         char filename[FILENAME_MAX+1];
         int  line;
         cfile *cf;
