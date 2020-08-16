@@ -43,9 +43,9 @@ PUBLIC asm_am9511_idiv, asm_am9511_idiv_callee
 ; enter here for integer divide callee, x+y, x on stack, y in hl
 .asm_am9511_idiv_callee
     exx
-    ld hl,2
-    add hl,sp
-    call asm_am9511_pushi           ; x
+    pop hl                          ; ret
+    ex (sp),hl                      ; ret back on stack
+    call asm_am9511_pushi_fastcall  ; x
 
     exx
     call asm_am9511_pushi_fastcall  ; y
@@ -53,8 +53,4 @@ PUBLIC asm_am9511_idiv, asm_am9511_idiv_callee
     ld a,__IO_APU_OP_SDIV
     out (__IO_APU_CONTROL),a        ; x / y
 
-    pop hl                          ; ret
-    ex (sp),hl                      ; ret back on stack
-
     jp asm_am9511_popi              ; quotient in hl
-

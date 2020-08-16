@@ -222,7 +222,7 @@ Some [benchmarking](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries
 
 #### whetstone
 
-Z88DK August 13, 2020
+Z88DK August 16, 2020
 zsdcc #11722 / new c library
 
 whetstone math48
@@ -294,7 +294,7 @@ Correct results
 -0.169075164
 -0.169087605
 
-Z88DK August 13, 2020
+Z88DK August 16, 2020
 zsdcc #11722 / new c library
 
 n-body math48
@@ -314,7 +314,7 @@ n-body math32
 
 
 n-body am9511
-78 seconds
+77 seconds
 -0.169075100
 -0.169080500
 
