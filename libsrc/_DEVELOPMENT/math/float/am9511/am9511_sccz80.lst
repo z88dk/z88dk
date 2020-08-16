@@ -41,6 +41,11 @@ math/float/am9511/c/sccz80/cam32_sccz80_hypot
 math/float/am9511/c/sccz80/cam32_sccz80_hypot_callee
 math/float/am9511/c/sccz80/cam32_sccz80_ldexp
 math/float/am9511/c/sccz80/cam32_sccz80_ldexp_callee
+math/float/am9511/c/sccz80/cam32_sccz80_ldiv_callee
+math/float/am9511/c/sccz80/cam32_sccz80_ldiv_u_callee
+math/float/am9511/c/sccz80/cam32_sccz80_lmod_callee
+math/float/am9511/c/sccz80/cam32_sccz80_lmod_u_callee
+math/float/am9511/c/sccz80/cam32_sccz80_lmul_callee
 math/float/am9511/c/sccz80/cam32_sccz80_load
 math/float/am9511/c/sccz80/cam32_sccz80_log
 math/float/am9511/c/sccz80/cam32_sccz80_log2

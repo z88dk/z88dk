@@ -168,6 +168,11 @@
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_sub.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_swap.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_zero.asm
+../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_div.asm
+../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_div_u.asm
+../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_mod.asm
+../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_mod_u.asm
+../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_long_mult.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/log.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/log2.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/log2_fastcall.asm
@@ -407,6 +412,11 @@
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_hypot_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_ldexp.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_ldexp_callee.asm
+../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_ldiv_callee.asm
+../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_ldiv_u_callee.asm
+../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_lmod_callee.asm
+../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_lmod_u_callee.asm
+../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_lmul_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_load.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_log.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_log2.asm

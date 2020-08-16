@@ -241,7 +241,6 @@ whetstone am9511
 `zcc +rc2014 -subtype=cpm -SO3 --max-allocs-per-node400000 -DPRINTOUT whetstone.c -o whetstone --am9511 -m -create-app`
 
 To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
-And they agree to the z88dk-ticks results within a few percentage points.
 
 #### spectral-norm
 
@@ -287,6 +286,7 @@ fasta am9511
 
 `zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta --am9511 -create-app`
 
+To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
 
 #### n-body
 
