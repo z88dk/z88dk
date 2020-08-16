@@ -323,12 +323,19 @@ n-body math32
 `zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 n-body.c -o n-body --math32 -m -pragma-include:zpragma.inc -create-app`
 
 
-n-body am9511
+n-body am9511 - fast integer math
 77 seconds
 -0.169075100
 -0.169080500
 
 `zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 n-body.c -o n-body --am9511 -m -pragma-include:zpragma.inc -create-app`
+
+n-body sccz80 / newlib / am9511 - fast integer math & `--opt-code-speed=inlineints`
+70 seconds
+-0.169075100
+-0.169080500
+
+`zcc +rc2014 -subtype=cpm -clib=new --opt-code-speed=inlineints -DPRINTF n-body.c -o n-body --am9511 -m -pragma-include:zpragma.inc -create-app`
 
 To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
 
