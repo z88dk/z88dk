@@ -59,6 +59,12 @@ linenoiseCompletionCallback * linenoiseSetCompletionCallback(linenoiseCompletion
  * by the linenoiseCompletions object.
  */
 void linenoiseAddCompletion(linenoiseCompletions *comp, const char *str);
+
+typedef char*(linenoiseHintsCallback)(const char *, int *color, int *bold, void *userdata);
+typedef void(linenoiseFreeHintsCallback)(void *hint, void *userdata);
+void linenoiseSetHintsCallback(linenoiseHintsCallback *callback, void *userdata);
+void linenoiseSetFreeHintsCallback(linenoiseFreeHintsCallback *callback);
+
 #endif
 
 /*
@@ -121,5 +127,10 @@ char **linenoiseHistory(int *len);
  * Returns the number of display columns in the current terminal.
  */
 int linenoiseColumns(void);
+
+/**
+ * Enable or disable multiline mode (disabled by default)
+ */
+void linenoiseSetMultiLine(int enableml);
 
 #endif /* __LINENOISE_H */
