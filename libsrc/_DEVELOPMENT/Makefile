@@ -32,11 +32,11 @@ ${jobs}: job-%:
 		else \
 			echo "";  \
 		fi) )
-	m4 -DCFG_ASM_DEF target/$(target)/config.M4 > target/$(target)/config_$(target)_private.inc
+	m4 -DCFG_ASM_DEF target/$(target)/config.m4 > target/$(target)/config_$(target)_private.inc
 	m4 -DCFG_ASM_PUB target/$(target)/config.m4 > target/$(target)/config_$(target)_public.inc
 	m4 -DCFG_C_DEF target/$(target)/config.m4 > target/$(target)/config_$(target).h
 	cp target/$(target)/config_$(target)_private.inc target/$(target)/obj/config_private.inc
-	if [ "$(target)" = "zx" ]; then \
+	@if [ "$(target)" = "zx" ]; then \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" -Cm-Itarget/$(target)/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" -Cm-Itarget/$(target)/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
