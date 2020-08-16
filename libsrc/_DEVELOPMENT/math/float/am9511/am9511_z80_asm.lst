@@ -31,6 +31,7 @@ math/float/am9511/z80/am32_hypot
 math/float/am9511/z80/am32_idiv
 math/float/am9511/z80/am32_imod
 math/float/am9511/z80/am32_imul
+math/float/am9511/z80/am32_inv
 math/float/am9511/z80/am32_ladd
 math/float/am9511/z80/am32_ldexp
 math/float/am9511/z80/am32_ldiv

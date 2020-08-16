@@ -257,10 +257,20 @@ spectral-norm math32
 `zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 spectral-norm.c -o spectral-norm --math32 -create-app`
 
 spectral-norm am9511
-6 min 35 seconds
+6 min 10 seconds - fast integer math
 1.2742140
 
 `zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 spectral-norm.c -o spectral-norm --am9511 -create-app`
+
+Z88DK August 16, 2020
+sccz80 / new c library
+
+spectral-norm am9511
+5 min 48 seconds - fast integer math
+5 min 28 seconds - fast integer math & `--opt-code-speed=inlineints`
+1.2742140
+
+`zcc +rc2014 -subtype=cpm -clib=new --opt-code-speed=inlineints -DPRINTF spectral-norm.c -o spectral-norm --am9511 -create-app`
 
 To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
 

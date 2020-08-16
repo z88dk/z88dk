@@ -24,7 +24,7 @@ EXTERN asm_am9511_popi
 PUBLIC asm_am9511_imul, asm_am9511_imul_callee
 
 
-; enter here for integer multiply, x-y x on stack, y in hl
+; enter here for integer multiply, x*y, x on stack, y in hl
 .asm_am9511_imul
     exx
     ld hl,2
@@ -40,7 +40,7 @@ PUBLIC asm_am9511_imul, asm_am9511_imul_callee
     jp asm_am9511_popi              ; product in hl
 
 
-; enter here for integer multiply callee, x-y x on stack, y in hl
+; enter here for integer multiply callee, x*y, x on stack, y in hl
 .asm_am9511_imul_callee
     exx
     pop hl                          ; ret
