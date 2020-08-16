@@ -21,6 +21,7 @@ Detailed but incomplete changelist:
 - [classic] +vector06c: New target
 - [classic] +zx: The enter key now works with ROM input
 - [classic] +zx: Banked code support.
+- [classic] +zx: 128k .TAP and .DSK images can be created
 - [classic] +zxn: New target
 - [classic] all: IEEE-754 16 bit (adjunct) maths library
 - [classic] all: DAI 8080 (Am9511) 32 bit maths library
