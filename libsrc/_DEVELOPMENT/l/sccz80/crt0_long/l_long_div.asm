@@ -14,10 +14,16 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_long_div
+PUBLIC l_long_mod
 
 EXTERN l_divs_32_32x32
 
+l_long_mod:
+  and a
+  jr common
 l_long_div:
+   scf
+common:
 
    ; dehl  = divisor
    ; stack = dividend, ret
@@ -31,4 +37,7 @@ l_long_div:
    push bc
    exx
    
-   jp l_divs_32_32x32
+   jp c,l_divs_32_32x32
+   call l_divs_32_32x32
+   exx
+   ret

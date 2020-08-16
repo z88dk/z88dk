@@ -64,3 +64,5 @@ clean:
 	@$(RM) ../_DEVELOPMENT/math/integer/fast/*.o
 	@$(RM) ../_DEVELOPMENT/math/integer/small/*.o
 	@$(RM) ../_DEVELOPMENT/math/float/math32/z80/*.o
+	@$(RM) ../_DEVELOPMENT/l/sccz80/*/*.o
+

@@ -16,10 +16,16 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_long_div_u
+PUBLIC l_long_mod_u
 
 EXTERN l_divu_32_32x32
 
+l_long_mod_u:
+   and a
+   jr  common
 l_long_div_u:
+   scf
+common:
 
    ; dehl  = divisor
    ; stack = dividend, ret
@@ -31,4 +37,7 @@ l_long_div_u:
    pop de
    
    push bc
-   jp l_divu_32_32x32 - 1
+   jp c,l_divu_32_32x32 - 1
+   call l_divu_32_32x32 - 1
+   exx
+   ret

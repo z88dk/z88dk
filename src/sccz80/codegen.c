@@ -2410,12 +2410,15 @@ void zmod(LVALUE* lval)
                 callrts("l_i64_mod_u");
             else
                 callrts("l_i64_mod");
+        } else if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
+            if (ulvalue(lval))
+                callrts("l_long_mod_u");
+            else
+                callrts("l_long_mod");
+            Zsp += 4;
         } else {
             zdiv(lval);
-            if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR)
-                ol("exx");
-            else
-                swap();
+            swap();
         }
     }
 }
