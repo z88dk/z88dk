@@ -24,7 +24,7 @@ EXTERN asm_am9511_popf
 PUBLIC asm_am9511_fsub, asm_am9511_fsub_callee
 
 
-; enter here for floating subtract, x-y x on stack, y in dehl
+; enter here for floating subtract, x-y x on stack, y in dehl, result in dehl
 .asm_am9511_fsub
     exx
     ld hl,2
@@ -43,9 +43,11 @@ PUBLIC asm_am9511_fsub, asm_am9511_fsub_callee
 ; enter here for floating subtract callee, x-y x on stack, y in dehl
 .asm_am9511_fsub_callee
     exx
-    ld hl,2
-    add hl,sp
-    call asm_am9511_pushf           ; x
+    pop hl                          ; ret
+    pop de
+    ex (sp),hl                      ; ret back on stack
+    ex de,hl
+    call asm_am9511_pushf_fastcall  ; x
 
     exx
     call asm_am9511_pushf_fastcall  ; y
@@ -53,9 +55,4 @@ PUBLIC asm_am9511_fsub, asm_am9511_fsub_callee
     ld a,__IO_APU_OP_FSUB
     out (__IO_APU_CONTROL),a        ; x - y
 
-    pop hl                          ; ret
-    pop de
-    ex (sp),hl                      ; ret back on stack
-
     jp asm_am9511_popf
-

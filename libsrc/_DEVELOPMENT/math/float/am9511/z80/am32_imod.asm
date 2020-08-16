@@ -57,9 +57,9 @@ PUBLIC asm_am9511_imod, asm_am9511_imod_callee
 ; enter here for integer modulus callee, x+y, x on stack, y in hl
 .asm_am9511_imod_callee
     exx
-    ld hl,2
-    add hl,sp
-    call asm_am9511_pushi           ; x
+    pop hl                          ; ret
+    ex (sp),hl                      ; ret back on stack
+    call asm_am9511_pushi_fastcall  ; x
 
     ld a,__IO_APU_OP_PTOS
     out (__IO_APU_CONTROL),a        ; push x
@@ -78,8 +78,4 @@ PUBLIC asm_am9511_imod, asm_am9511_imod_callee
     ld a,__IO_APU_OP_SSUB
     out (__IO_APU_CONTROL),a        ; x%y
 
-    pop hl                          ; ret
-    ex (sp),hl                      ; ret back on stack
-
     jp asm_am9511_popi              ; remainder in hl
-
