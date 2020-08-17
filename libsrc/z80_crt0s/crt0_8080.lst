@@ -1,5 +1,5 @@
-sccz80/crt0_8080/**.asm
-sccz80/crt0_long_8080/**.asm
+../_DEVELOPMENT/l/sccz80/crt0_8080/**.asm
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/**.asm
 
 
 sccz80/crt0_z80/getarg

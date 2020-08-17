@@ -1,30 +1,30 @@
-sccz80/crt0_gbz80/**.asm
-sccz80/crt0_long_gbz80/**.asm
+../_DEVELOPMENT/l/sccz80/crt0_gbz80/**.asm
+../_DEVELOPMENT/l/sccz80/crt0_long_gbz80/**.asm
 
 
-sccz80/crt0_8080/crt0_variables
-sccz80/crt0_8080/crt_variables_math
-sccz80/crt0_8080/l_cmpbcde
-sccz80/crt0_8080/l_eq
-sccz80/crt0_long_8080/l_long_add
-sccz80/crt0_long_8080/l_long_and
-sccz80/crt0_long_8080/l_long_asl
-sccz80/crt0_long_8080/l_long_asr
-sccz80/crt0_long_8080/l_long_asr_u
-sccz80/crt0_long_8080/l_long_cmp
-sccz80/crt0_long_8080/l_long_eq
-sccz80/crt0_long_8080/l_long_ne
-sccz80/crt0_long_8080/l_long_or
-sccz80/crt0_long_8080/l_long_sub
-sccz80/crt0_long_8080/l_long_ucmp
-sccz80/crt0_long_8080/l_long_xor
-sccz80/crt0_8080/l_ne
-sccz80/crt0_8080/l_sub
-sccz80/crt0_long_8080/l_long_mod
-sccz80/crt0_long_8080/l_long_mod_u
-sccz80/crt0_long_8080/l_long_div
-sccz80/crt0_long_8080/l_long_div_u
-sccz80/crt0_long_8080/l_long_divide
+../_DEVELOPMENT/l/sccz80/crt0_8080/crt0_variables
+../_DEVELOPMENT/l/sccz80/crt0_8080/crt_variables_math
+../_DEVELOPMENT/l/sccz80/crt0_8080/l_cmpbcde
+../_DEVELOPMENT/l/sccz80/crt0_8080/l_eq
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_add
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_and
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_asl
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_asr
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_asr_u
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_cmp
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_eq
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_ne
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_or
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_sub
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_ucmp
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_xor
+../_DEVELOPMENT/l/sccz80/crt0_8080/l_ne
+../_DEVELOPMENT/l/sccz80/crt0_8080/l_sub
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_mod
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_mod_u
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_div
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_div_u
+../_DEVELOPMENT/l/sccz80/crt0_long_8080/l_long_divide
 
 
 sccz80/crt0_z80/getarg
@@ -102,4 +102,5 @@ sccz80/crt0_z80/l_pop_ei
 sccz80/crt0_z80/l_graphics_cmp
 sdcc/z80/__convert_sdccf2reg
 @newlib-gbz80.lst
-@sdcc-gbz80.lst
+../_DEVELOPMENT/l/sdcc/___sdcc_call_hl
+../_DEVELOPMENT/l/sdcc/gbz80/*

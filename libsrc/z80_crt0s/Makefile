@@ -29,7 +29,7 @@ $(OUTPUT_DIRECTORY)/ez80_crt0.lib:
 	$(LIBLINKER) -Oobj/ez80/ez80 -I.. -x$@ -mz180 -DEZ80 @crt0_ez80.lst
 
 $(OUTPUT_DIRECTORY)/rcmx000_crt0.lib:
-	$(LIBLINKER) -Oobj/r2k/r2k -I.. -mr2k -x$@ @rcm.lst
+	$(LIBLINKER) -Oobj/r2k/r2k -I.. -mr2k -x$@ @crt0_rcm.lst
 
 # this one uses iy in place of ix
 $(OUTPUT_DIRECTORY)/z80iy_crt0.lib:
