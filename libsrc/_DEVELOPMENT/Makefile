@@ -11,19 +11,20 @@ TARGET = am9511 cpm hbios m math16 math32 rc2014 scz180 sms vgl yaz180 z180 z80 
 
 Z88DK_LIB := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../../lib/
 
-JOBS = 
-CLEANS = 
 
-.PHONY: all clean binaries
-all: binaries
+.PHONY: all clean install-clean
+all: $(TARGET)
 
-clean: $(CLEANS)
+clean: $(addprefix clean-,$(TARGET))
+	@find . -name '*.err' | xargs $(RM)
+
+install-clean:
+	$(RM) -fr target/*/obj
 
 
 
 define config
 .PHONY: clean-$(1)
-CLEANS += clean-$(1)
 
 # +zx/+zxn use +z80 as part of the config stage so add the dependency
 target/zx/obj/config_private.inc: lib/sccz80/z80.lib
@@ -72,21 +73,17 @@ target/$(1)/obj/config_private.inc: target/$(1)/config.m4
 endef
 
 define build_libs
-JOBS += lib/sccz80/$(1).lib
 lib/sccz80/$(1).lib: target/$(1)/obj/config_private.inc
 	$(Z80ASM) $(cpu) -d -Otarget/$(1)/obj/sccz80 -Itarget/$(1)/obj -xlib/sccz80/$(1) -I$(Z88DK_LIB) @target/$(1)/library/$(1)_sccz80.lst
 
-JOBS += lib/sdcc_ix/$(1).lib
 lib/sdcc_ix/$(1).lib: target/$(1)/obj/config_private.inc
 	$(Z80ASM) $(cpu) -d -Otarget/$(1)/obj/sdcc_ix -Itarget/$(1)/obj -xlib/sdcc_ix/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IX @target/$(1)/library/$(1)_sdcc_ix.lst
 
-JOBS += lib/sdcc_iy/$(1).lib
 lib/sdcc_iy/$(1).lib: target/$(1)/obj/config_private.inc
 	$(Z80ASM) $(cpu) -d -Otarget/$(1)/obj/sdcc_iy -Itarget/$(1)/obj -IXIY -xlib/sdcc_iy/$(1) -I$(Z88DK_LIB) -D__SDCC -D__SDCC_IY @target/$(1)/library/$(1)_sdcc_iy.lst
 endef
 
 define make_clean
-CLEANS += clean-$(1)
 .PHONY: clean-$(1)
 
 clean-$(1):
@@ -110,10 +107,4 @@ endef
 
 $(eval $(call build_targets,$(TARGET)))
 
-binaries: $(JOBS)
 
-install-clean:
-	$(RM) -fr target/*/obj
-
-clean:	$(CLEANS)
-	@find . -name '*.err' | xargs $(RM)
