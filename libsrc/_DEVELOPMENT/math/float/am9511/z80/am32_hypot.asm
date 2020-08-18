@@ -96,9 +96,11 @@ PUBLIC asm_am9511_hypot, asm_am9511_hypot_callee
     ld a,__IO_APU_OP_FMUL
     out (__IO_APU_CONTROL),a        ; y * y
 
-    ld hl,2
-    add hl,sp
-    call asm_am9511_pushf           ; x
+    pop hl                          ; ret
+    pop de
+    ex (sp),hl                      ; ret back on stack
+    ex de,hl
+    call asm_am9511_pushf_fastcall  ; x
 
     ld a,__IO_APU_OP_PTOF
     out (__IO_APU_CONTROL),a        ; x
@@ -112,9 +114,4 @@ PUBLIC asm_am9511_hypot, asm_am9511_hypot_callee
     ld a,__IO_APU_OP_SQRT
     out (__IO_APU_CONTROL),a        ; (y^2 + x^2)^0.5
 
-    pop hl                          ; ret
-    pop de
-    ex (sp),hl                      ; ret back on stack
-
     jp asm_am9511_popf
-
