@@ -39,19 +39,22 @@ Z88DK_PATH	= $(shell pwd)
 
 export CC INSTALL CFLAGS EXEC_PREFIX CROSS
 
-ALL = setup bin/appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(EXESUFFIX) \
+BINS = bin/appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(EXESUFFIX) \
 	bin/z88dk-ucpp$(EXESUFFIX) bin/sccz80$(EXESUFFIX) bin/z80asm$(EXESUFFIX) \
 	bin/zcc$(EXESUFFIX) bin/z88dk-zpragma$(EXESUFFIX) bin/z88dk-zx7$(EXESUFFIX) \
 	bin/z80nm$(EXESUFFIX) bin/zobjcopy$(EXESUFFIX)  \
 	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
 	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
-	testsuite bin/z88dk-lib$(EXESUFFIX)
+	bin/z88dk-lib$(EXESUFFIX)
+	
+ALL = $(BINS) testsuite
+
 ALL_EXT = bin/zsdcc$(EXESUFFIX)
 
-.PHONY: $(ALL)
+.PHONY: all
 all: 	$(ALL) $(ALL_EXT)
 
-setup:
+src/config.h:
 	$(shell if [ "${git_count}" != "" ]; then \
 		echo '#define PREFIX "${prefix_share}"' > src/config.h; \
 		echo '#define UNIX 1' >> src/config.h; \
@@ -83,56 +86,56 @@ bin/zsdcc$(EXESUFFIX):
 	cd $(SDCC_PATH) && mv ./bin/sdcpp $(Z88DK_PATH)/bin/zsdcpp
 	$(RM) -fR $(SDCC_PATH)
 
-bin/appmake$(EXESUFFIX):
+bin/appmake$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/appmake PREFIX=`pwd` install
 
-bin/z88dk-copt$(EXESUFFIX):
+bin/z88dk-copt$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/copt PREFIX=`pwd` install
 
-bin/z88dk-ucpp$(EXESUFFIX):
+bin/z88dk-ucpp$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/ucpp PREFIX=`pwd` install
 
-bin/z88dk-zcpp$(EXESUFFIX):
+bin/z88dk-zcpp$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/cpp PREFIX=`pwd` install
 
-bin/sccz80$(EXESUFFIX):
+bin/sccz80$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/sccz80 PREFIX=`pwd` install
 
-bin/z80asm$(EXESUFFIX):
+bin/z80asm$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/z80asm PREFIX=`pwd` PREFIX_SHARE=`pwd` install
 
-bin/zcc$(EXESUFFIX):
+bin/zcc$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/zcc PREFIX=`pwd` install
 
-bin/z88dk-zpragma$(EXESUFFIX):
+bin/z88dk-zpragma$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/zpragma PREFIX=`pwd` install
 
-bin/z88dk-zx7$(EXESUFFIX):
+bin/z88dk-zx7$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/zx7 PREFIX=`pwd` install
 
-bin/z80nm$(EXESUFFIX):
+bin/z80nm$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/z80nm PREFIX=`pwd` install
 
-bin/zobjcopy$(EXESUFFIX):
+bin/zobjcopy$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/zobjcopy PREFIX=`pwd` install
 
-bin/z88dk-z80svg$(EXESUFFIX):
+bin/z88dk-z80svg$(EXESUFFIX): src/config.h
 	$(MAKE) -C support/graphics PREFIX=`pwd` install
 
-bin/z88dk-basck$(EXESUFFIX):
+bin/z88dk-basck$(EXESUFFIX): src/config.h
 	$(MAKE) -C support/basck PREFIX=`pwd` install
 
-bin/z88dk-font2pv1000$(EXESUFFIX):
+bin/z88dk-font2pv1000$(EXESUFFIX): src/config.h
 	$(MAKE) -C support/pv1000 PREFIX=`pwd` install
 
-bin/z88dk-ticks$(EXESUFFIX):
+bin/z88dk-ticks$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/ticks PREFIX=`pwd` install
 
-bin/z88dk-lib$(EXESUFFIX):
+bin/z88dk-lib$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/z88dk-lib PREFIX=`pwd` install
 
 
-libs:
+libs: $(BINS)
 	cd libsrc ; $(MAKE)
 	cd libsrc ; $(MAKE) install
 
@@ -159,12 +162,11 @@ install: install-clean
 	find libsrc -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/}{} \;
 
 
-# Needs libs to have been installed, no dependency yet since rebuilding libsrc
-# still does too many cleans
-test:
+# Needs to have a dependency on libs
+test: $(ALL) 
 	$(MAKE) -C test
 
-testsuite:
+testsuite: $(BINS)
 	$(MAKE) -C testsuite
 
 install-clean:

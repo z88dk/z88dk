@@ -92,6 +92,7 @@ libsrc/_DEVELOPMENT/target/z180/z180_crt.asm
 libsrc/_DEVELOPMENT/target/z80/z80_crt.asm
 libsrc/_DEVELOPMENT/target/zx/zx_crt.asm
 libsrc/_DEVELOPMENT/target/zxn/zxn_crt.asm
+libsrc/_DEVELOPMENT/target/**/obj/**
 libsrc/alloc/balloc/obj/
 src/appmake/appmake
 src/common/t/test
