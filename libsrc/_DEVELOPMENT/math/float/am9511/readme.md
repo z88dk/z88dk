@@ -208,7 +208,7 @@ If the value of the function depends on the value of the difference of 2 floatin
 
 Some benchmarking has been completed using the RC2014 APU Module and, as expected, the results show substantial improvements over other floating point libraries.
 
-To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
+To compare to the [standardised benchmark results](https://github.com/z88dk/z88dk/wiki/Classic--Maths-Libraries#benchmarks) (Z80 @ 4MHz), the times below must be multiplied by 1.8432.
 
 #### whetstone
 
@@ -241,7 +241,7 @@ zsdcc / newlib / **math32 - 28 minutes 57 seconds**<br>
 
 `zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 spectral-norm.c -o spectral-norm --math32 -create-app`
 
-zsdcc / newlib / **am9511 - 6 min 10 seconds**
+zsdcc / newlib / **am9511 - 6 min 10 seconds**<br>
 1.2742140
 
 `zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 spectral-norm.c -o spectral-norm --am9511 -create-app`
@@ -272,8 +272,6 @@ zsdcc / newlib / **math32 - 37 seconds**
 zsdcc / newlib / **am9511 - 14.5 seconds**
 
 `zcc +rc2014 -subtype=cpm -DPRINTF -SO3 --max-allocs-per-node400000 --fsigned-char fasta.c -o fasta --am9511 -create-app`
-
-To compare to the standardised results (Z80 @ 4MHz), the times must be multiplied by 1.8432.
 
 
 #### n-body
