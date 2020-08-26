@@ -22,6 +22,10 @@ EXTERN __IO_APU_STATUS, __IO_APU_DATA
 PUBLIC asm_am9511_popi
 PUBLIC _am9511_popi
 
+.wait
+    ex (sp),hl
+    ex (sp),hl
+
 ._am9511_popi
 .asm_am9511_popi
 
@@ -36,7 +40,7 @@ PUBLIC _am9511_popi
 
     in a,(__IO_APU_STATUS)      ; read the APU status register
     rlca                        ; busy? and __IO_APU_STATUS_BUSY
-    jr C,asm_am9511_popi
+    jr C,wait
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     in h,(c)                    ; load LSW from APU

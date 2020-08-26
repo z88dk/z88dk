@@ -35,9 +35,9 @@ PUBLIC asm_am9511_pushi_fastcall
     ; 
     ; uses  : af, bc, hl
 
-    in a,(__IO_APU_STATUS)      ; read the APU status register
-    rlca                        ; busy? __IO_APU_STATUS_BUSY
-    jr C,asm_am9511_pushi
+;   in a,(__IO_APU_STATUS)      ; read the APU status register
+;   rlca                        ; busy? __IO_APU_STATUS_BUSY
+;   jr C,asm_am9511_pushi
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     outi                        ; load LSW into APU
@@ -58,9 +58,9 @@ PUBLIC asm_am9511_pushi_fastcall
     ; 
     ; uses  : af, bc, hl
 
-    in a,(__IO_APU_STATUS)      ; read the APU status register
-    rlca                        ; busy? __IO_APU_STATUS_BUSY
-    jr C,asm_am9511_pushi_fastcall
+;   in a,(__IO_APU_STATUS)      ; read the APU status register
+;   rlca                        ; busy? __IO_APU_STATUS_BUSY
+;   jr C,asm_am9511_pushi_fastcall
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     out (c),l                   ; load LSW into APU

@@ -37,9 +37,9 @@ PUBLIC asm_am9511_pushf_fastcall
     ; 
     ; uses  : af, bc, hl
 
-    in a,(__IO_APU_STATUS)      ; read the APU status register
-    rlca                        ; busy? and __IO_APU_STATUS_BUSY
-    jr C,asm_am9511_pushf
+;   in a,(__IO_APU_STATUS)      ; read the APU status register
+;   rlca                        ; busy? and __IO_APU_STATUS_BUSY
+;   jr C,asm_am9511_pushf
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     outi                        ; load LSW into APU
@@ -126,9 +126,9 @@ PUBLIC asm_am9511_pushf_fastcall
     rr e                        ; restore mantissa
 
 .pushf_fastcall
-    in a,(__IO_APU_STATUS)      ; read the APU status register
-    rlca                        ; busy? and __IO_APU_STATUS_BUSY
-    jr C,pushf_fastcall
+;   in a,(__IO_APU_STATUS)      ; read the APU status register
+;   rlca                        ; busy? and __IO_APU_STATUS_BUSY
+;   jr C,pushf_fastcall
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     out (c),l                   ; load LSW into APU
