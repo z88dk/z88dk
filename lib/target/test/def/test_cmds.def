@@ -7,15 +7,16 @@ lstoff
 	defc	CMD_EXIT = 0
 	defc	CMD_PRINTCHAR = 1	; hl=characeter to print
 	defc	CMD_READKEY = 2		; hl=pressed key
+	defc	CMD_POLLKEY = 3		; hl=pressed key
 
-        defc    CMD_OPENF = 3		; hl=filename, de=mode, ret: hl=handle
-        defc    CMD_CLOSEF = 4		; b=handle
-        defc    CMD_WRITEBYTE = 5	; b=handle, l = byte
-        defc    CMD_READBYTE = 6	; b=handle, hl=read byte
-        defc    CMD_WRITEBLOCK = 7	; b=handle, de=address, hl=length, 
-        defc    CMD_READBLOCK = 8	; b=handle, de=address, hl=length, 
-        defc    CMD_SEEK = 9		; dehl=offset, b =handle, c=whence
-        defc    CMD_STAT = 10		; hl=filename, de=struct stat
+        defc    CMD_OPENF = 4		; hl=filename, de=mode, ret: hl=handle
+        defc    CMD_CLOSEF = 5		; b=handle
+        defc    CMD_WRITEBYTE = 6	; b=handle, l = byte
+        defc    CMD_READBYTE = 7	; b=handle, hl=read byte
+        defc    CMD_WRITEBLOCK = 8	; b=handle, de=address, hl=length, 
+        defc    CMD_READBLOCK = 9	; b=handle, de=address, hl=length, 
+        defc    CMD_SEEK = 10		; dehl=offset, b =handle, c=whence
+        defc    CMD_STAT = 11		; hl=filename, de=struct stat
 
 
         defc    CMD_REMOVE = 20		; hl=filename

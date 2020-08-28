@@ -165,6 +165,7 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\ticks\acia.c" />
     <ClCompile Include="..\..\src\ticks\am9511.c" />
     <ClCompile Include="..\..\src\ticks\debugger.c" />
     <ClCompile Include="..\..\src\ticks\disassembler_alg.c" />
@@ -173,6 +174,7 @@
     <ClCompile Include="..\..\src\ticks\hook_cpm.c" />
     <ClCompile Include="..\..\src\ticks\hook_io.c" />
     <ClCompile Include="..\..\src\ticks\hook_misc.c" />
+    <ClCompile Include="..\..\src\ticks\hook_rc2014.c" />
     <ClCompile Include="..\..\src\ticks\linenoise.c" />
     <ClCompile Include="..\..\src\ticks\memory.c" />
     <ClCompile Include="..\..\src\ticks\syms.c" />

@@ -576,6 +576,7 @@ int    cmd_arguments_len = 0;
 int    ioport = -1;
 int    c_cpu = CPU_Z80;
 int    rom_size = 0;
+int    rc2014_mode = 0;
 
 static const uint8_t mirror_table[] = {
     0x0, 0x8, 0x4, 0xC,  /*  0-3  */
@@ -620,6 +621,7 @@ int in(int port){
 
   if ( (val = hook_console_in(port)) != -1 ) return val;
   if ( (val = apu_in(port)) != -1 ) return val;
+  if ( (val = acia_in(port)) != -1 ) return val;
   
   return port&1 ? 255 : ear;
 }
@@ -627,6 +629,7 @@ int in(int port){
 void out(int port, int value){
   if ( hook_console_out(port,value) == 0 ) return;
   if ( apu_out(port,value) == 0 ) return;
+  if ( acia_out(port, value) == 0 ) return;
   
   memory_handle_paging(port, value);
 }
@@ -854,7 +857,19 @@ int main (int argc, char **argv){
       if( size>65536 && size!=65574 )
         printf("\nIncorrect length: %d\n", size),
         exit(-1);
-      else if( !strcasecmp(strchr(argv[1], '.'), ".com" ) ){
+      else if( strstr(argv[1], "rc2014") != NULL ) {
+        *get_memory_addr(0x08) = 0xED;
+        *get_memory_addr(0x09) = 0xFE;
+        *get_memory_addr(0x0a) = 0xC9;
+        *get_memory_addr(0x10) = 0xED;
+        *get_memory_addr(0x11) = 0xFE;
+        *get_memory_addr(0x12) = 0xC9;
+        *get_memory_addr(0x18) = 0xED;
+        *get_memory_addr(0x19) = 0xFE;
+        *get_memory_addr(0x1a) = 0xC9;
+        rc2014_mode = 1;
+        if (1 != fread(get_memory_addr(pc), size, 1, fh)) { fclose(fh); exit_log(1, "Could not read required data from <%s>\n", argv[1]); }
+      } else if( !strcasecmp(strchr(argv[1], '.'), ".com" ) ){
         *get_memory_addr(5) = 0xED;
         *get_memory_addr(6) = 0xFE;
         *get_memory_addr(7) = 0xC9;

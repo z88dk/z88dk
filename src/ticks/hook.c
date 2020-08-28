@@ -15,6 +15,11 @@ void PatchZ80(void)
         return;
     }
 
+    if ( rc2014_mode && (pc == 0x08 + 2 || pc == 0x10 + 2|| pc == 0x18 + 2) ) {
+        hook_rc2014();
+        return;
+    }
+
     if ( hooks[a] != NULL ) {
         hooks[a]();
     } else {

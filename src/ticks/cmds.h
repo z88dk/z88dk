@@ -8,15 +8,16 @@
 #define CMD_EXIT       0    /**< Exit, hl holds return value */
 #define CMD_PRINTCHAR  1    /**< Print character, hl holds character to print */
 #define CMD_READKEY    2    /**< Read console, hl holds the pressed key */
+#define CMD_POLLKEY    3    /**< Poll console, hl holds the pressed key or -1 */
 
-#define CMD_OPENF      3    /**< Open file on disc, hl = filename, de = mode, ret hl = handle */
-#define CMD_CLOSEF     4    /**< Close file (b=handle) */
-#define CMD_WRITEBYTE  5    /**< Write byte, b=handle, l = byte to write */
-#define CMD_READBYTE   6    /**< Read byte, b= handle, Ret hl = byte */
-#define CMD_WRITEBLOCK 7    /**< Write a block, b=handle, de=address, hl=length, ret hl=bytes written */
-#define CMD_READBLOCK  8    /**< Read a block, b=handle, de=address, hl=length, ret hl=bytes read */
-#define CMD_SEEK       9    /**< Seek in a file, b=handle, dehl=offset, c=whence, ret dehl=position */
-#define CMD_STAT       10   /**< Stat a file (hl=filename, de=stat buffer) */
+#define CMD_OPENF      4    /**< Open file on disc, hl = filename, de = mode, ret hl = handle */
+#define CMD_CLOSEF     5    /**< Close file (b=handle) */
+#define CMD_WRITEBYTE  6    /**< Write byte, b=handle, l = byte to write */
+#define CMD_READBYTE   7    /**< Read byte, b= handle, Ret hl = byte */
+#define CMD_WRITEBLOCK 8    /**< Write a block, b=handle, de=address, hl=length, ret hl=bytes written */
+#define CMD_READBLOCK  9    /**< Read a block, b=handle, de=address, hl=length, ret hl=bytes read */
+#define CMD_SEEK       10    /**< Seek in a file, b=handle, dehl=offset, c=whence, ret dehl=position */
+#define CMD_STAT       11   /**< Stat a file (hl=filename, de=stat buffer) */
 
 
 /* Opendir, closedir etc */

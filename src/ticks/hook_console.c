@@ -4,10 +4,68 @@
 #include <stdio.h>
 #ifndef WIN32
 #include <termios.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#else
+#include <conio.h>
 #endif
 #include <stdlib.h>
 
-static int console_raw_read();
+
+#ifndef WIN32
+int kbhit(void)
+{
+    struct termios original;
+    struct termios term;
+    int    oldf,ch;
+
+    tcgetattr(0, &original);
+    memcpy(&term, &original, sizeof(term));
+
+    term.c_lflag &= ~(ICANON|ECHO);
+    tcsetattr(0, TCSANOW, &term);
+
+    oldf = fcntl(0, F_GETFL, 0);
+    fcntl(0, F_SETFL, oldf | O_NONBLOCK);
+
+    ch = getchar();
+
+//    tcsetattr(0, TCSANOW, &original);
+    fcntl(0, F_SETFL, oldf);
+ 
+    if (ch != EOF) {
+        ungetc(ch, stdin);
+        return 1;
+    }
+    return 0;
+}
+
+
+int getch()
+{
+    int val;
+    struct termios old_kbd_mode;    /* orig keyboard settings   */
+    struct termios new_kbd_mode;
+
+    if (tcgetattr (0, &old_kbd_mode)) {
+    }  
+    memcpy (&new_kbd_mode, &old_kbd_mode, sizeof(struct termios));
+    new_kbd_mode.c_lflag &= ~(ICANON | ECHO);  /* new kbd flags */
+    new_kbd_mode.c_cc[VTIME] = 0;
+    new_kbd_mode.c_cc[VMIN] = 1;
+    if (tcsetattr (0, TCSANOW, &new_kbd_mode)) {
+    }
+
+    val = getchar();
+
+//    tcsetattr(0, TCSANOW, &old_kbd_mode);
+    return val;
+}
+
+
+
+
+#endif
 
 
 int hook_console_out(int port, int value)
@@ -23,37 +81,9 @@ int hook_console_out(int port, int value)
 int hook_console_in(int port)
 {
     if (ioport !=-1 && (port&0xff) == ioport) {
-        return console_raw_read();
+        return getch();
     }
     return -1;   
-}
-
-
-static int console_raw_read()
-{
-    int val;
-#ifndef WIN32
-    struct termios old_kbd_mode;    /* orig keyboard settings   */
-    struct termios new_kbd_mode;
-
-    if (tcgetattr (0, &old_kbd_mode)) {
-    }  
-    memcpy (&new_kbd_mode, &old_kbd_mode, sizeof(struct termios));
-    new_kbd_mode.c_lflag &= ~(ICANON | ECHO);  /* new kbd flags */
-    new_kbd_mode.c_cc[VTIME] = 0;
-    new_kbd_mode.c_cc[VMIN] = 1;
-    if (tcsetattr (0, TCSANOW, &new_kbd_mode)) {
-    }
-#endif
-
-    val = getchar();
-
-#ifndef WIN32
-    /* reset original keyboard  */
-    if (tcsetattr (0, TCSANOW, &old_kbd_mode)) {
-    }
-#endif
-    return val;
 }
 
 
@@ -74,10 +104,25 @@ static void cmd_printchar(void)
 
 static void cmd_readkey(void)
 {
-    int   val = console_raw_read();
+    int   val = getch();
 
     l = val % 256;
     h = val / 256;
+
+    SET_ERROR(Z88DK_ENONE);
+}
+
+static void cmd_pollkey(void)
+{
+    int   val = kbhit();
+
+    if ( val ) {
+        val = getch();
+        l = val % 256;
+        h = val / 256;
+    } else {
+        l = h = 255;
+    }
 
     SET_ERROR(Z88DK_ENONE);
 }
@@ -86,4 +131,5 @@ void hook_console_init(hook_command *cmds)
 {
     cmds[CMD_PRINTCHAR] = cmd_printchar;
     cmds[CMD_READKEY] = cmd_readkey;
+    cmds[CMD_POLLKEY] = cmd_pollkey;
 }

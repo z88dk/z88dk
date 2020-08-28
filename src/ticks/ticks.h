@@ -72,6 +72,7 @@ extern int trace;
 extern int debugger_active;
 extern int rom_size;		/* amount of memory in low addresses that is read-only */
 extern int ioport;
+extern int rc2014_mode;
 
 /* Break down flags */
 extern int f(void);
@@ -125,6 +126,7 @@ extern void      hook_io_init(hook_command *cmds);
 extern void      hook_io_set_ide_device(int unit, const char *file);
 extern void      hook_misc_init(hook_command *cmds);
 extern void      hook_cpm(void);
+extern void      hook_rc2014(void);
 extern void      hook_console_init(hook_command *cmds);
 extern void      debugger_init();
 extern void      debugger();
@@ -148,6 +150,9 @@ extern uint8_t    *get_memory_addr(int pc);
 extern uint8_t     get_memory(int pc);
 extern uint8_t     put_memory(int pc, uint8_t b);
 
+// acia
+extern int acia_out(int port, int value);
+extern int acia_in(int port);
 
 // am9511
 extern int apu_out(int port, int value);
@@ -160,5 +165,12 @@ extern void apu_write_command(uint8_t cmd);
 
 extern int hook_console_out(int port, int value);
 extern int hook_console_in(int port);
+
+#ifndef WIN32
+extern int kbhit();
+extern int getch();
+#else
+#include <conio.h>
+#endif
 
 #endif
