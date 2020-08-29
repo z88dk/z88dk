@@ -39,7 +39,7 @@ void parsefcb(struct fcb *fc, unsigned char *name)
     }
 
     /* Now copy the name */
-    ptr = fc->name;
+    ptr = (void *)fc->name;
     
     /* Copy the name across upto the '.' or a '*' */
     while ( *name != '.' && *name != '*' && *name > ' ' &&
