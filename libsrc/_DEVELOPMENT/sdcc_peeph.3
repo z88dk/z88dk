@@ -17577,7 +17577,7 @@ replace restart {
 	ld	a,%4 (%5)
 	sub	a,%6 (%7)
 	; peephole z88dk-414l4
-}
+} if operandsNotRelated(%3 'a')
 
 replace restart {
 	ld	hl,#%1
