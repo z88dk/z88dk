@@ -609,6 +609,6 @@ void apu_write_command ( uint8_t cmd )
 			clocks = 4; // no idea what happens.
 			break;
 	}
-    // Say the APU runs at half the speed of the CPU
-    st += (clocks * 2);
+    // Say the APU runs at one third the speed of the CPU (for rc2014 target)
+    st += (clocks * 3);
 }
