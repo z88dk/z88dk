@@ -5,7 +5,7 @@ SECTION code_fp_am9511
 PUBLIC asm_dmulpow10
 
 EXTERN asm_am9511_float8, asm_am9511_fmul_callee
-EXTERN _am32_exp10
+EXTERN _am9511_exp10
 
    ; multiply DEHL' by a power of ten
    ; DEHL' *= 10^(A)
@@ -37,7 +37,7 @@ EXTERN _am32_exp10
     push hl
     exx
     
-    call _am32_exp10            ; make 10^A
+    call _am9511_exp10          ; make 10^A
     call asm_am9511_fmul_callee ; DEHL = x * 10^(A)
     exx
     ret
