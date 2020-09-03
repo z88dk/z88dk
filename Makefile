@@ -71,6 +71,7 @@ src/config.h:
 
 
 bin/zsdcc$(EXESUFFIX):
+ifdef BUILD_SDCC
 	svn checkout -r 11722 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
 	cd $(SDCC_PATH) && patch -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 	cd $(SDCC_PATH) && CC=$(OCC) ./configure \
@@ -85,6 +86,7 @@ bin/zsdcc$(EXESUFFIX):
 	cd $(SDCC_PATH) && mv ./bin/sdcc  $(Z88DK_PATH)/bin/zsdcc
 	cd $(SDCC_PATH) && mv ./bin/sdcpp $(Z88DK_PATH)/bin/zsdcpp
 	$(RM) -fR $(SDCC_PATH)
+endif
 
 bin/appmake$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/appmake PREFIX=`pwd` install

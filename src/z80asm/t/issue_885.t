@@ -14,6 +14,8 @@ use Test::More;
 use Path::Tiny;
 require './t/testlib.pl';
 
+my $got_zsdcc = `which zsdcc 2> /dev/null`;
+
 my $c_code = <<'END';
 void main(void)
 {
@@ -25,14 +27,19 @@ __endasm;
 END
 
 for my $clib ('sdcc_iy',		# zsdcc compile
-	      'new',			# sccz80 compile
+	          'new',			# sccz80 compile
 ) {
-    ok 1, "-clib=$clib";
+    if ($clib eq 'sdcc_iy' && !$got_zsdcc) {
+        diag("zsdcc not found, test skipped");
+    }
+    else {
+        ok 1, "-clib=$clib";
 
-    unlink_testfiles();
-    spew("test.c", $c_code);
-    run("zcc +zx -vn -clib=$clib -m --list test.c -o test");
-    test_map("test.map");
+        unlink_testfiles();
+        spew("test.c", $c_code);
+        run("zcc +zx -vn -clib=$clib -m --list test.c -o test");
+        test_map("test.map");
+    }
 }
 
 # core of the problem
