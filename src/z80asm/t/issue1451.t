@@ -10,9 +10,17 @@ use strict;
 use warnings;
 use Test::More;
 
-my $dir = "t/1451";
-my $cmd = "zcc +zxn -startup=4 -clib=sdcc_iy $dir/hexdump.c -subtype=dotn -create-app";
-ok 0==system($cmd), $cmd;
+my $got_zsdcc = `which zsdcc 2> /dev/null`;
+if (!$got_zsdcc) {
+    diag("zsdcc not found, test skipped");
+    ok 1;
+}
+else {
+    my $dir = "t/1451";
+    my $cmd = "zcc +zxn -startup=4 -clib=sdcc_iy $dir/hexdump.c -subtype=dotn -create-app";
+    ok 0==system($cmd), $cmd;
 
-unlink "A", "a_CODE.bin", "a_MAIN.bin", "a_UNASSIGNED.bin", "zcc_opt.def";
+    unlink "A", "a_CODE.bin", "a_MAIN.bin", "a_UNASSIGNED.bin", "zcc_opt.def";
+}
+
 done_testing();
