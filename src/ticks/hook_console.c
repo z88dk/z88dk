@@ -6,8 +6,10 @@
 #include <termios.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
+#include <unistd.h>                         // For declarations of isatty()
 #else
 #include <conio.h>
+#include <io.h>
 #endif
 #include <stdlib.h>
 
@@ -104,7 +106,11 @@ static void cmd_printchar(void)
 
 static void cmd_readkey(void)
 {
-    int   val = getch();
+    int val;
+    if (isatty(fileno(stdin)))
+        val = getch();          // read one character at a time if connected to a tty
+    else
+        val = getchar();        // read in cooked mode if redirected from a file
 
     l = val % 256;
     h = val / 256;
