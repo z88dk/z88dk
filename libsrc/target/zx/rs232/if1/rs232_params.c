@@ -21,10 +21,7 @@
 u8_t rs232_params(unsigned char param, unsigned char parity)
 {
 #asm
-        rst     8
-        defb    $31             ; Create the IF1 system variables area
-        ;xor     a
-        ;ld      ($5cc7),a       ; Reset SER-FL to clean the input buffer
+        EXTERN BAUD
 
         pop     bc
         pop     de
@@ -62,7 +59,7 @@ avail:
         inc     hl
         ld      h,(hl)
         ld      l,a
-        ld      (23747),hl
+        ld      (BAUD),hl
         ld      hl,0            ; RS_ERR_OK
         ret
 

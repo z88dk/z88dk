@@ -20,6 +20,9 @@
 uint8_t rs232_get(uint8_t *char) __naked __z88dk_fastcall
 {
 #asm
+        EXTERN BAUD
+        EXTERN SERFL
+
         push	hl
 ;	rst	8
 ;	defb	$1d  		; Calls the Hook Code here
@@ -41,7 +44,7 @@ uint8_t rs232_get(uint8_t *char) __naked __z88dk_fastcall
 ; (Hook Code: $1D)
 
 ;; BCHAN-IN
-L0B88:  LD      HL,$5CC7        ; sv SER_FL
+L0B88:  LD      HL, SERFL        ; sv SER_FL
         LD      A,(HL)          ; Is the second-character received flag set?
         AND     A               ;
         JR      Z,L0B95         ; forward to REC-BYTE (if Z set)
@@ -57,15 +60,9 @@ L0B88:  LD      HL,$5CC7        ; sv SER_FL
 
 ; ---
 
-;; REC-BYTE
-;; L0B95:  CALL    L163E          ; routine TEST-BRK  - Thanks Jetset Willy really dont need this!
-
 L0B95:	DI                      ; Disable Interrupts
 
-        LD      A,($5CC6)       ; sv IOBORD
-;        OUT     ($FE),A		; Change the border colour.  -  No Thanks Jetset Willy change the borders in program if wanted
-
-        LD      DE,($5CC3)      ; sv BAUD
+        LD      DE,(BAUD)       ; sv BAUD
         LD      HL,$0320        ; 800d.
         LD      B,D             ;
         LD      C,E             ;
@@ -214,7 +211,7 @@ L0C1D:  DEC     HL              ;
 
 ;  The start bit has been pushed out and B contains the second received byte.
 
-        LD      HL,$5CC7        ; Address the SER_FL System Variable.
+        LD      HL,(SERFL)        ; Address the SER_FL System Variable.
 
         LD      (HL),$01        ; Signal there is a byte in the next location.
         INC     HL              ; Address that location.

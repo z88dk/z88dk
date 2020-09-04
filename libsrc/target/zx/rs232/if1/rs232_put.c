@@ -17,6 +17,8 @@
 uint8_t __FASTCALL__ rs232_put(uint8_t char)
 {       
 #asm
+        EXTERN BAUD
+
         ld      a,l     		;get byte
 ;        rst     8
 ;        defb    $1E			;  Calls the Hook Code
@@ -36,16 +38,13 @@ L0D07:  LD      B,$0B           ; Set bit count to eleven - 1 + 8 + 2.
         CPL                     ; Invert the bits of the character.
         LD      C,A             ; Copy the character to C.
 
-        LD      A,($5CC6)       ; Load A from System Variable IOBORD
-;        OUT     ($FE),A         ; Change the border colour.  -  No Thanks Jetset Willy change the borders in program if wanted
-
         LD      A,$EF           ; Set to %11101111
         OUT     ($EF),A         ; Make CTS (Clear to Send) low.
 
         CPL                     ; reset bit 0 (other bits of no importance)
         OUT     ($F7),A         ; Make RXdata low. %00010000
 
-        LD      HL,($5CC3)      ; Fetch value from BAUD System Variable.
+        LD      HL,(BAUD)      ; Fetch value from BAUD System Variable.
         LD      D,H             ; Copy BAUD value to DE for count.
         LD      E,L             ;
 

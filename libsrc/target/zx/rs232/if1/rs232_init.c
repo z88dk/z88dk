@@ -17,12 +17,16 @@
 u8_t rs232_init()
 {
 #asm
-        rst     8
-        defb    $31             ; Create the IF1 system variables area
-        ;xor     a
-        ;ld      ($5cc7),a       ; Reset SER-FL to clean the input buffer
-        ;ld      a,(23624)
-        ;ld      (23750),a       ; Set IOBORD to the current border colour (hide flashing)
+    PUBLIC BAUD
+    PUBLIC SERFL
+
+    BAUD:
+        ; Default speed: 2400 baud
+        defw $36
+    SERFL:
+        ; flag + data byte about an eventual 2nd character already transmitted
+        defw 0
+
         ld      hl,RS_ERR_OK
 #endasm
 }
