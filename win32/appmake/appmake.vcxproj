@@ -65,6 +65,7 @@
     <ClCompile Include="..\..\src\appmake\newbrain.c" />
     <ClCompile Include="..\..\src\appmake\newext.c" />
     <ClCompile Include="..\..\src\appmake\noop.c" />
+    <ClCompile Include="..\..\src\appmake\ondra.c" />
     <ClCompile Include="..\..\src\appmake\p2000.c" />
     <ClCompile Include="..\..\src\appmake\pasopia7.c" />
     <ClCompile Include="..\..\src\appmake\pc88.c" />

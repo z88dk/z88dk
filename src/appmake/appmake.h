@@ -158,6 +158,9 @@ extern option_t  nec_options;
 extern int       noop_exec(char *target);
 extern option_t  noop_options;
 
+extern int       ondra_exec(char *target);
+extern option_t  ondra_options;
+
 extern int       pasopia7_exec(char *target);
 extern option_t  pasopia7_options;
 
@@ -420,6 +423,10 @@ struct {
       "A noop operator, does nothing",
       NULL,
       noop_exec,    &noop_options },
+    { "bin2otp",   "ondra",       "(C) 2020 z88dk",
+      "Convert binary file to Ondra .tap file",
+      NULL,
+      ondra_exec,    &ondra_options },
     { "mc2cas",   "p2000",      "(C) 2014 Stefano Bodrato",
       "Philips P2000 MicroCassette to CAS format conversion",
       NULL,
