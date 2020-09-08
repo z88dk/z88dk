@@ -584,10 +584,19 @@ void size_of(LVALUE* lval)
         }
     } else if (cmatch('"')) { /* Check size of string */
         length = 1; /* Always at least one */
-        while (!cmatch('"')) {
-            length++;
-            litchar();
-        };
+        do
+        {
+            while (!cmatch('"')) {
+                length++;
+                litchar();
+            };
+            /* Keep going for "concatenated" "strings" */
+            if (!cmatch('"')) {
+                break;
+            }
+            /* But correct the opening quotes */
+            length--;
+        } while (1);
         lval->const_val = length;
         if ( deref ) 
             lval->const_val = 1;
