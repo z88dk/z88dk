@@ -27,60 +27,71 @@ option_t ondra_options[] = {
 
 
 
-// Leader: 283.5us high, 296us low, 283.5us high, 212.5us low
-// Bit 0 = 283.5us high, 296us low, 463.5us high, 392.5us low
-// Bit 1 = 463.5us high, 476us low, 283.5us high, 212.5us low
-// Trailer: 193.5us high, 206us low, 283.5us high, 212.5us low
-//
-// Time periods: 193.5, 206, 212.5, 283.5, 296, 463.5 476
 
 
-static int lengths[4][4] = {
-    // Leader
-    { 13, 13, 13, 13 },
-    // Bit 0
-    { 13, 13, 21, 21 },
-    // Bit 1
-    { 21, 21, 13, 13 },
-    // Trailer
-    { 9, 9, 12, 13 }
-};
+// Time periods:  SHORT = 220us, LONG=440us
+// Byte leader:
+// Bit value 0:  Short Low, Short High
+// Bit value 1:  Short high, short low
 
+
+// 44100 samples per second, each byte=22.67us
+#define LEN_SHORT 10
+#define LEN_LONG  20
 static uint8_t    h_lvl = 0xff;
 static uint8_t    l_lvl = 0x00;
 
-static void ondra_bit(FILE* fpout, int index)
+#define BLOCK_SIZE 65536  // Change to 1024 to get JetPac.tap into a .wav file
+
+
+static void ondra_bit(FILE* fpout, int bit)
 {
     int  i;
 
-    for ( i = 0; i < lengths[index][0]; i++ ) {
-        fputc(h_lvl, fpout);
-    }
-    for ( i = 0; i < lengths[index][1]; i++ ) {
-        fputc(l_lvl, fpout);
-    }
-    for ( i = 0; i < lengths[index][2]; i++ ) {
-        fputc(h_lvl, fpout);
-    }
-    for ( i = 0; i < lengths[index][3]; i++ ) {
-        fputc(l_lvl, fpout);
+    if (bit == 0) {
+        for ( i = 0; i < LEN_SHORT; i++ ) {
+            fputc(l_lvl, fpout);
+        }
+        for ( i = 0; i < LEN_SHORT; i++ ) {
+            fputc(h_lvl, fpout);
+        }
+    } else {
+        for ( i = 0; i < LEN_SHORT; i++ ) {
+            fputc(h_lvl, fpout);
+        }
+        for ( i = 0; i < LEN_SHORT; i++ ) {
+            fputc(l_lvl, fpout);
+        } 
     }
 }
 
+static void ondra_pilot(FILE *fpout, int pilotLength)
+{
+    int i;
+    for ( i = 0; i < pilotLength; i++) {
+        ondra_bit(fpout,1);
+    }
+    ondra_bit(fpout,0);
+}
+
+
 static void ondra_rawout(FILE *fpout, unsigned char b)
 {
-    unsigned char c[8] = { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
+    unsigned char c[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
     int i;
 
+    // Send bit 0 inverted
+    ondra_bit(fpout, (b & 0x01) & 0x01);
+
     for (i = 0; i < 8; i++)
-        ondra_bit(fpout, (b & c[i]) ? 2 : 1);
+        ondra_bit(fpout, (b & c[i]) ? 1 : 0);
 }
 
 
 int ondra_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
-    char   *blockname;
+    char   *blockname, *ptr;
     struct  stat binname_sb;
     FILE   *fpin;
     FILE   *fpout;
@@ -103,7 +114,10 @@ int ondra_exec(char *target)
         strcpy(filename,outfile);
     }
 
-    blockname = zbasename(binname);
+    blockname = strdup(zbasename(binname));
+
+    if ( ( ptr = strchr(blockname,'.'))) 
+        *ptr = 0;
     
     if ((origin == -1) && ((crtfile == NULL) || ((origin = get_org_addr(crtfile)) == -1))) {
         origin = 0;
@@ -146,14 +160,24 @@ int ondra_exec(char *target)
      */
 
     size = binname_sb.st_size;
-    num_blks = size / 1024;
+    num_blks = size / BLOCK_SIZE;
 
-    if ( size > num_blks * 1024) 
+    if ( size > num_blks * BLOCK_SIZE) 
         num_blks++;
+
+
+    // Half a second of quiet
+    for ( i = 0; i < 22000; i++ ) {
+        fputc(0, fpwav);
+    }
+
 
     for ( blk = 0; blk < num_blks; blk++ ) {
         int tmp;
-        writebyte_ondra(0x48, fpout,fpwav,&cksum);  // File type
+
+        ondra_pilot(fpwav, 0x300);
+
+        writebyte_ondra('H', fpout,fpwav,&cksum);  // Header block
         cksum = 0x00;
         for ( i = 0 ; i < 12; i++) {
             writebyte_ondra(i < strlen(blockname) ? blockname[i] : ' ',fpout,fpwav,&cksum);
@@ -166,19 +190,23 @@ int ondra_exec(char *target)
         writebyte_ondra(blk >= 9 ? ((blk+1) / 10) + '0' : ' ',fpout,fpwav,&cksum);
         writebyte_ondra(((blk+1) % 10) + '0',fpout,fpwav,&cksum);
         writebyte_ondra(blk == num_blks - 1 ? 0xff : 0x00,fpout,fpwav,&cksum); // Exec indicator
-        tmp = blk != num_blks - 1 ? 1024 : (size - (blk) * 1024);
+        tmp = blk != num_blks - 1 ? BLOCK_SIZE : (size - (blk) * BLOCK_SIZE);
         writebyte_ondra(tmp % 256,fpout,fpwav,&cksum);
         writebyte_ondra(tmp / 256,fpout,fpwav,&cksum);
         writebyte_ondra(0,fpout,fpwav,&cksum);
         writebyte_ondra(cksum,fpout,fpwav,&cksum);
-        writebyte_ondra(0x44,fpout,fpwav,&cksum); // padding
+        ondra_pilot(fpwav, 0x300);
+        writebyte_ondra('D',fpout,fpwav,&cksum); // data block
         cksum = 0x00;
-        tmp = blk != num_blks - 1 ? 1024 : (size - (blk) * 1024);
         for ( i = 0; i < tmp; i++ ) {
             c = getc(fpin);
             writebyte_ondra(c, fpout, fpwav, &cksum);
         }
         writebyte_ondra(cksum,fpout, fpwav, &cksum);
+
+        for ( i = 0; i < 5000; i++ ) {
+            fputc(0, fpwav);
+        }
     }
 
     fclose(fpwav);
@@ -186,7 +214,7 @@ int ondra_exec(char *target)
     fclose(fpout);
 
     // And now convert raw to a .wav
-    //raw2wav(filename);
+    raw2wav(filename);
     
     return 0;
 }
