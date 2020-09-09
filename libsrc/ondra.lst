@@ -1,3 +1,8 @@
 target/ondra/stdio/fputc_cons_native
+target/ondra/stdio/generic_console
+target/ondra/stdio/generic_console_ioctl
+target/ondra/stdio/generic_console_vpeek
+target/ondra/stdio/CRT_FONT
+@font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
 @z80.lst

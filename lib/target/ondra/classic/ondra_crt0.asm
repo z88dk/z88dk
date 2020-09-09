@@ -23,13 +23,14 @@
 	EXTERN  __BSS_END_tail
 
 
+        defc    CONSOLE_ROWS = 32
+        defc    CONSOLE_COLUMNS = 40
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 0xbfff
 	defc	CRT_KEY_DEL = 127
 	defc	__CPU_CLOCK = 2000000
         INCLUDE "crt/classic/crt_rules.inc"
 
-LS174   EQU @11110111           ; memory mapping, audio_out, timers     (PORT3)
 
 IF      !DEFINED_CRT_ORG_CODE
         defc CRT_ORG_CODE = 0x4000

@@ -41,7 +41,7 @@ option_t ondra_options[] = {
 static uint8_t    h_lvl = 0xff;
 static uint8_t    l_lvl = 0x00;
 
-#define BLOCK_SIZE 65536  // Change to 1024 to get JetPac.tap into a .wav file
+#define BLOCK_SIZE 1024  // Change to 1024 to get JetPac.tap into a .wav file
 
 
 static void ondra_bit(FILE* fpout, int bit)
