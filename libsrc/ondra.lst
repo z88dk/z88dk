@@ -1,0 +1,3 @@
+target/ondra/stdio/fputc_cons_native
+@stdio/stdio.lst
+@z80.lst

@@ -69,6 +69,7 @@ TOCREATE += $(call check_target,nascom,nascom_clib.lib)
 TOCREATE += $(call check_target,nc,nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib zxfcntl)
 TOCREATE += $(call check_target,newbrain,newbrain_clib.lib)
 TOCREATE += $(call check_target,osborne,gfxosborne1.lib $(CPMLIBS))
+TOCREATE += $(call check_target,ondra,ondra_clib.lib)
 TOCREATE += $(call check_target,osca,osca_clib.lib)
 TOCREATE += $(call check_target,oz,ozansi_clib.lib)
 TOCREATE += $(call check_target,p2000,p2000_clib.lib)
@@ -1604,6 +1605,12 @@ dai_clib.lib:
 	$(call buildgeneric,dai,portable)
 	TARGET=dai TYPE=8080 $(LIBLINKER) -m8080 -DFORdai -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/dai_clib @$(LISTFILE_DIRECTORY)/dai.lst
 
+ondra_clib.lib:
+	@echo ''
+	@echo '--- Building Ondra Library ---'
+	@echo ''
+	$(call buildgeneric,ondra)
+	TARGET=ondra TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORondra -x$(OUTPUT_DIRECTORY)/ondra_clib @$(LISTFILE_DIRECTORY)/ondra.lst
 
 # Homelab 3/4 - dom
 homelab_clib.lib:

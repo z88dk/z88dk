@@ -24,7 +24,7 @@
 
 
         defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = 0x7fff
+        defc    TAR__register_sp = 0xbfff
 	defc	CRT_KEY_DEL = 127
 	defc	__CPU_CLOCK = 2000000
         INCLUDE "crt/classic/crt_rules.inc"
@@ -32,7 +32,7 @@
 LS174   EQU @11110111           ; memory mapping, audio_out, timers     (PORT3)
 
 IF      !DEFINED_CRT_ORG_CODE
-        defc CRT_ORG_CODE = 0x8000
+        defc CRT_ORG_CODE = 0x4000
 ENDIF
 
 	org	  CRT_ORG_CODE - 5
@@ -48,12 +48,9 @@ program:
 	ld	hl,0
 	add	hl,sp
 	ld	(exitsp),hl
-	ld	a, @00000010
-	out	(LS174),a
-    	ei
-	; Heap starts at 0x4000? - Why can't programs?
-	;ld	hl,$4000
-	;ld	(_heap),hl
+	ld	a, @00000001
+	out	(3),a
+	di
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
 ; the compiled program and the stack pointer
