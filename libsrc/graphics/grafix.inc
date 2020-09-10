@@ -621,6 +621,11 @@ IF FORmikro80
 	defc USEplotc = 1
 ENDIF
 
+IF FORondra
+	DEFINE gotgfx
+	defc maxx	= 320
+	defc maxy	= 256
+ENDIF
 
 ; =============================================
 
