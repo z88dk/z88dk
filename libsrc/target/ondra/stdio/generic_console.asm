@@ -75,7 +75,6 @@ not_udg:
         ld      a,b
 	add	a
 	add	a
-	add	a
         cpl
         ld      e,a
 
@@ -107,9 +106,9 @@ no_need_for_underline:
 not_bold:
 	xor	c		;Add in inverse
         ld      (de),a
-        rlc     e
-        dec     e
-        rrc     e
+	rlc	e
+	dec	e
+	rrc	e
 	inc	hl
 	djnz	printc_1
 	ret
