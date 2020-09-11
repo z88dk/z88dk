@@ -1,0 +1,6 @@
+@input/basic/input_asm.lst
+input/basic/c/sccz80/in_inkey
+input/basic/c/sccz80/in_pause
+input/basic/c/sccz80/in_test_key
+input/basic/c/sccz80/in_wait_key
+input/basic/c/sccz80/in_wait_nokey

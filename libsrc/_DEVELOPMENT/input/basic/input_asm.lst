@@ -1,0 +1,5 @@
+input/basic/z80/asm_in_inkey
+input/basic/z80/asm_in_pause
+input/basic/z80/asm_in_test_key
+input/basic/z80/asm_in_wait_key
+input/basic/z80/asm_in_wait_nokey
