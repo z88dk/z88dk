@@ -33,7 +33,7 @@ defc __Z88DK = 2000
 
 
 defc __HBIOS = 1
-defc __HBIOS_VERS = 020922
+defc __HBIOS_VERS = 030001
 
 defc __CPU_CLOCK = 18432000
 

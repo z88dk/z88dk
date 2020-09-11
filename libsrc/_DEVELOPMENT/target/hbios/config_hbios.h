@@ -38,7 +38,7 @@
 
 #undef  __HBIOS
 #define __HBIOS  1
-#define __HBIOS_VERS  020922
+#define __HBIOS_VERS  030001
 
 #define __CPU_CLOCK  18432000
 

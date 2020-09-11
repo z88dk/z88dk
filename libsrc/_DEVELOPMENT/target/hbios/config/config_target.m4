@@ -8,7 +8,7 @@ divert(-1)
 # Announce target
 
 define(`__HBIOS', 1) 
-define(`__HBIOS_VERS', 020922)  # HBIOS VERSION 2.9.22
+define(`__HBIOS_VERS', 030001)  # HBIOS VERSION 3.0.1
 
 # Clock frequency in Hz
 
