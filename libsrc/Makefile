@@ -1609,7 +1609,7 @@ ondra_clib.lib:
 	@echo ''
 	@echo '--- Building Ondra Library ---'
 	@echo ''
-	$(call buildgeneric,ondra)
+	$(call buildgeneric,ondra,wide)
 	TARGET=ondra TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORondra -x$(OUTPUT_DIRECTORY)/ondra_clib @$(LISTFILE_DIRECTORY)/ondra.lst
 
 # Homelab 3/4 - dom
