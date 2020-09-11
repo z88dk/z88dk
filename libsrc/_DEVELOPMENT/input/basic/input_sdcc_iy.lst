@@ -1,0 +1,7 @@
+@input/basic/input_asm.lst
+input/basic/c/sdcc_iy/in_inkey
+input/basic/c/sdcc_iy/in_pause
+input/basic/c/sdcc_iy/in_pause_fastcall
+input/basic/c/sdcc_iy/in_test_key
+input/basic/c/sdcc_iy/in_wait_key
+input/basic/c/sdcc_iy/in_wait_nokey

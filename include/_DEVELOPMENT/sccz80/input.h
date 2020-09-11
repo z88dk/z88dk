@@ -64,6 +64,10 @@ typedef struct udk_s
 // PLATFORM SPECIFIC INPUT FUNCTIONS
 ////////////////////////////////////
 
+#ifdef __BASIC
+#include <input/input_basic.h>
+#endif
+
 #ifdef __CPM
 #include <input/input_cpm.h>
 #endif
