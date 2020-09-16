@@ -101,6 +101,7 @@ IF !__crt_model
 		SECTION DATA
 		SECTION smc_clib
 		SECTION smc_user
+                SECTION data_driver
 		SECTION data_clib
 		SECTION data_stdlib
 		SECTION data_psg
@@ -157,8 +158,9 @@ IF __crt_model > 0
 		SECTION smc_clib
 		SECTION smc_fp
 		SECTION smc_user
-		SECTION data_clib
+                SECTION data_driver
 		SECTION data_crt
+		SECTION data_clib
 		SECTION data_arch
 		SECTION data_stdlib
 		SECTION data_psg

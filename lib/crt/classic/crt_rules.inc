@@ -31,6 +31,17 @@
       ENDIF
    ENDIF
 
+   ; For each bank call we save 2 words on the temporary stack
+   ; this controls the depth of calls we can make safely
+   IFNDEF CLIB_BANKING_STACK_SIZE
+      PUBLIC CLIB_BANKING_STACK_SIZE
+      IFDEF TAR__clib_banking_stack_size
+         defc CLIB_BANKING_STACK_SIZE = TAR__clib_banking_stack_size
+      ELSE
+         defc CLIB_BANKING_STACK_SIZE = 100
+      ENDIF
+   ENDIF
+
 
    PUBLIC __CRT_KEY_DEL
    IFDEF CRT_KEY_DEL

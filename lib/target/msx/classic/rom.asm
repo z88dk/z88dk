@@ -141,6 +141,8 @@ ENDIF
 IF MAPPER_ADDRESS_8000 != 0
 banked_call:
         pop     hl              ; Get the return address
+        ld      (mainsp),sp
+        ld      sp,(tempsp)
         ld      a,(__current_bank)
         push    af              ; Push the current bank onto the stack
         ld      e,(hl)          ; Fetch the call address
@@ -155,6 +157,8 @@ banked_call:
 	inc	hl
         inc     hl              ; Yes this should be here
         push    hl              ; Push the real return address
+        ld      (tempsp),sp
+        ld      sp,(mainsp)
         ld      (__current_bank),a
 	ld	(MAPPER_ADDRESS_8000),a
   IF MAPPER_ADDRESS_A000 != 0
@@ -164,8 +168,12 @@ banked_call:
         ld      l,e
         ld      h,d
 	call	l_dcal		; jp(hl)
+        ld      (mainsp),sp
+        ld      sp,(tempsp)
         pop     bc              ; Get the return address
         pop     af              ; Pop the old bank
+        ld      (tempsp),sp
+        ld      sp,(mainsp)
         ld      (__current_bank),a
 	ld	(MAPPER_ADDRESS_8000),a
   IF MAPPER_ADDRESS_A000 != 0
@@ -201,6 +209,16 @@ __current_bank:	defb	1
 __current_bank:	defb	2
   ENDIF
 ENDIF
+
+        SECTION bss_driver
+
+mainsp: defw    0
+
+tempstack:      defs    CLIB_BANKING_STACK_SIZE
+
+        SECTION data_driver
+
+tempsp: defw    tempstack + CLIB_BANKING_STACK_SIZE
 
 IF MAPPER_ADDRESS_8000 != 0
 	INCLUDE "target/msx/classic/megarom.asm"
