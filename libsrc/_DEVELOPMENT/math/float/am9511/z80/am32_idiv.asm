@@ -17,7 +17,7 @@ SECTION code_fp_am9511
 EXTERN __IO_APU_CONTROL
 EXTERN __IO_APU_OP_SDIV
 
-EXTERN asm_am9511_pushi
+EXTERN asm_am9511_pushi_hl
 EXTERN asm_am9511_pushi_fastcall
 EXTERN asm_am9511_popi
 
@@ -29,7 +29,7 @@ PUBLIC asm_am9511_idiv, asm_am9511_idiv_callee
     exx
     ld hl,2
     add hl,sp
-    call asm_am9511_pushi           ; x
+    call asm_am9511_pushi_hl        ; x
 
     exx
     call asm_am9511_pushi_fastcall  ; y

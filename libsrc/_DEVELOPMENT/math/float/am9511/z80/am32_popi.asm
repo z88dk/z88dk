@@ -19,18 +19,44 @@ SECTION code_fp_am9511
 
 EXTERN __IO_APU_STATUS, __IO_APU_DATA
 
+PUBLIC asm_am9511_popi_hl
 PUBLIC asm_am9511_popi
-PUBLIC _am9511_popi
 
-.wait
+.am9511_popi_wait_hl
+    ex (sp),hl
+    ex (sp),hl
+    
+.asm_am9511_popi_hl
+
+    ; float primitive
+    ; pop an integer from the Am9511 stack.
+    ;
+    ; enter : stack = ret1, ret0
+    ;       :    hl = pointer to integer
+    ;
+    ; exit  : stack = long, ret1
+    ; 
+    ; uses  : af, bc, hl
+
+    in a,(__IO_APU_STATUS)      ; read the APU status register
+    rlca                        ; busy? __IO_APU_STATUS_BUSY
+    jr C,am9511_popi_wait_hl
+
+    ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
+    inc hl
+    ind                        ; load LSW into APU
+    inc b
+    ind
+    ret
+
+.am9511_popi_wait
     ex (sp),hl
     ex (sp),hl
 
-._am9511_popi
 .asm_am9511_popi
 
     ; float primitive
-    ; pop a long from the Am9511 stack.
+    ; pop an integer from the Am9511 stack.
     ;
     ; enter : stack = ret0
     ;
@@ -40,7 +66,7 @@ PUBLIC _am9511_popi
 
     in a,(__IO_APU_STATUS)      ; read the APU status register
     rlca                        ; busy? and __IO_APU_STATUS_BUSY
-    jr C,wait
+    jr C,am9511_popi_wait
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     in h,(c)                    ; load LSW from APU

@@ -17,7 +17,7 @@ SECTION code_fp_am9511
 EXTERN __IO_APU_CONTROL
 EXTERN __IO_APU_OP_ACOS
 
-EXTERN asm_am9511_pushf
+EXTERN asm_am9511_pushf_hl
 EXTERN asm_am9511_pushf_fastcall
 EXTERN asm_am9511_popf
 
@@ -27,7 +27,7 @@ PUBLIC asm_am9511_acos, asm_am9511_acos_fastcall
 .asm_am9511_acos
     ld hl,2
     add hl,sp
-    call asm_am9511_pushf           ; x
+    call asm_am9511_pushf_hl        ; x
 
     ld a,__IO_APU_OP_ACOS
     out (__IO_APU_CONTROL),a        ; acos(x)

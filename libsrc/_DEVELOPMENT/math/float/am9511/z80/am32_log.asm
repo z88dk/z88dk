@@ -17,7 +17,7 @@ SECTION code_fp_am9511
 EXTERN __IO_APU_CONTROL
 EXTERN __IO_APU_OP_LN
 
-EXTERN asm_am9511_pushf
+EXTERN asm_am9511_pushf_hl
 EXTERN asm_am9511_pushf_fastcall
 EXTERN asm_am9511_popf
 
@@ -27,7 +27,7 @@ PUBLIC asm_am9511_log, asm_am9511_log_fastcall
 .asm_am9511_log
     ld hl,2
     add hl,sp
-    call asm_am9511_pushf           ; x
+    call asm_am9511_pushf_hl        ; x
 
     ld a,__IO_APU_OP_LN
     out (__IO_APU_CONTROL),a        ; log(x)

@@ -19,11 +19,11 @@ SECTION code_fp_am9511
 
 EXTERN __IO_APU_STATUS, __IO_APU_DATA
 
-PUBLIC asm_am9511_pushf
+PUBLIC asm_am9511_pushf_hl
 PUBLIC asm_am9511_pushf_fastcall
 
 
-.asm_am9511_pushf
+.asm_am9511_pushf_hl
 
     ; float primitive
     ; push a IEEE-754 floating point into Am9511 stack.

@@ -20,7 +20,7 @@ EXTERN __IO_APU_OP_SMUL
 EXTERN __IO_APU_OP_SSUB
 EXTERN __IO_APU_OP_PTOS
 
-EXTERN asm_am9511_pushi
+EXTERN asm_am9511_pushi_hl
 EXTERN asm_am9511_pushi_fastcall
 EXTERN asm_am9511_popi
 
@@ -32,7 +32,7 @@ PUBLIC asm_am9511_imod, asm_am9511_imod_callee
     exx
     ld hl,2
     add hl,sp
-    call asm_am9511_pushi           ; x
+    call asm_am9511_pushi_hl        ; x
 
     ld a,__IO_APU_OP_PTOS
     out (__IO_APU_CONTROL),a        ; push x
