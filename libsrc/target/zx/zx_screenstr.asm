@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC zx_screenstr
 PUBLIC _zx_screenstr
 
-EXTERN zx_screenstr_callee
-EXTERN ASMDISP_ZX_SCREENSTR_CALLEE
+EXTERN asm_zx_screenstr
 
 .zx_screenstr
 ._zx_screenstr
@@ -19,5 +18,5 @@ EXTERN ASMDISP_ZX_SCREENSTR_CALLEE
    push bc
    
    ld h,e
-   jp zx_screenstr_callee + ASMDISP_ZX_SCREENSTR_CALLEE
+   jp asm_zx_screenstr
 
