@@ -38,6 +38,8 @@ define(`__IO_LUT_PORT_BASE', 0x40)  # Port Address for LUT Module
 
 define(`__IO_APU_PORT_BASE', 0x42)  # Port Address for Am9511A Module
 
+# Am9511A-1 APU Multi Processor Definitions
+
 define(`__IO_APU0_PORT_BASE', 0x42) # Base Address for Am9511A Module #0
 define(`__IO_APU1_PORT_BASE', 0x62) # Base Address for Am9511A Module #1
 define(`__IO_APU2_PORT_BASE', 0xC2) # Base Address for Am9511A Module #2

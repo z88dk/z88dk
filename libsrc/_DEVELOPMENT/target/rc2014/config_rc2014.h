@@ -734,22 +734,6 @@
 #define __IO_APU_CONTROL  0x43
 #define __IO_APU_STATUS  0x43
 
-#define __IO_APU0_DATA  0x42
-#define __IO_APU0_CONTROL  0x43
-#define __IO_APU0_STATUS  0x43
-
-#define __IO_APU1_DATA  0x62
-#define __IO_APU1_CONTROL  0x63
-#define __IO_APU1_STATUS  0x63
-
-#define __IO_APU2_DATA  0xc2
-#define __IO_APU2_CONTROL  0xc3
-#define __IO_APU2_STATUS  0xc3
-
-#define __IO_APU3_DATA  0xe2
-#define __IO_APU3_CONTROL  0xe3
-#define __IO_APU3_STATUS  0xe3
-
 #define __IO_APU_STATUS_BUSY  0x80
 #define __IO_APU_STATUS_SIGN  0x40
 #define __IO_APU_STATUS_ZERO  0x20
@@ -817,6 +801,33 @@
 #define __IO_APU_OP_XCHD  0x39
 #define __IO_APU_OP_XCHF  0x19
 #define __IO_APU_OP_PUPI  0x1A
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_APU0_DATA  0x42
+#define __IO_APU0_CONTROL  0x43
+#define __IO_APU0_STATUS  0x43
+
+#define __IO_APU1_DATA  0x62
+#define __IO_APU1_CONTROL  0x63
+#define __IO_APU1_STATUS  0x63
+
+#define __IO_APU2_DATA  0xc2
+#define __IO_APU2_CONTROL  0xc3
+#define __IO_APU2_STATUS  0xc3
+
+#define __IO_APU3_DATA  0xe2
+#define __IO_APU3_CONTROL  0xe3
+#define __IO_APU3_STATUS  0xe3
 
 
 
