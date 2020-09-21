@@ -33,6 +33,10 @@ defc __Z88DK = 2000
 
 
 defc __IO_APU_PORT_BASE = 0x42
+defc __IO_APU0_PORT_BASE = 0x42
+defc __IO_APU1_PORT_BASE = 0x62
+defc __IO_APU2_PORT_BASE = 0xC2
+defc __IO_APU3_PORT_BASE = 0xE2
 
 
 
@@ -66,6 +70,22 @@ defc __CPU_INFO_ENABLE_SLL = 0x01
 defc __IO_APU_DATA = 0x42
 defc __IO_APU_CONTROL = 0x43
 defc __IO_APU_STATUS = 0x43
+
+defc __IO_APU0_DATA = 0x42
+defc __IO_APU0_CONTROL = 0x43
+defc __IO_APU0_STATUS = 0x43
+
+defc __IO_APU1_DATA = 0x62
+defc __IO_APU1_CONTROL = 0x63
+defc __IO_APU1_STATUS = 0x63
+
+defc __IO_APU2_DATA = 0xc2
+defc __IO_APU2_CONTROL = 0xc3
+defc __IO_APU2_STATUS = 0xc3
+
+defc __IO_APU3_DATA = 0xe2
+defc __IO_APU3_CONTROL = 0xe3
+defc __IO_APU3_STATUS = 0xe3
 
 defc __IO_APU_STATUS_BUSY = 0x80
 defc __IO_APU_STATUS_SIGN = 0x40

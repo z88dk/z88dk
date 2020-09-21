@@ -38,6 +38,11 @@ define(`__IO_LUT_PORT_BASE', 0x40)  # Port Address for LUT Module
 
 define(`__IO_APU_PORT_BASE', 0x42)  # Port Address for Am9511A Module
 
+define(`__IO_APU0_PORT_BASE', 0x42) # Base Address for Am9511A Module #0
+define(`__IO_APU1_PORT_BASE', 0x62) # Base Address for Am9511A Module #1
+define(`__IO_APU2_PORT_BASE', 0xC2) # Base Address for Am9511A Module #2
+define(`__IO_APU3_PORT_BASE', 0xE2) # Base Address for Am9511A Module #3
+
 # MC68C60 ACIA Port Definition
 
 define(`__IO_ACIA_PORT_BASE', 0x80) # Port Address for 68C50 Module
@@ -81,6 +86,10 @@ PUBLIC `__IO_PROM_RESET'
 PUBLIC `__IO_PROM_TOGGLE'
 PUBLIC `__IO_LUT_PORT_BASE'
 PUBLIC `__IO_APU_PORT_BASE'
+PUBLIC `__IO_APU0_PORT_BASE'
+PUBLIC `__IO_APU1_PORT_BASE'
+PUBLIC `__IO_APU2_PORT_BASE'
+PUBLIC `__IO_APU3_PORT_BASE'
 PUBLIC `__IO_ACIA_PORT_BASE'
 PUBLIC `__IO_SIO_PORT_BASE'
 PUBLIC `__IO_SIO_PORT_OFFSET_A'
@@ -106,6 +115,10 @@ defc `__IO_PROM_RESET' = __IO_PROM_RESET
 defc `__IO_PROM_TOGGLE' = __IO_PROM_TOGGLE
 defc `__IO_LUT_PORT_BASE' = __IO_LUT_PORT_BASE
 defc `__IO_APU_PORT_BASE' = __IO_APU_PORT_BASE
+defc `__IO_APU0_PORT_BASE' = __IO_APU0_PORT_BASE
+defc `__IO_APU1_PORT_BASE' = __IO_APU1_PORT_BASE
+defc `__IO_APU2_PORT_BASE' = __IO_APU2_PORT_BASE
+defc `__IO_APU3_PORT_BASE' = __IO_APU3_PORT_BASE
 defc `__IO_ACIA_PORT_BASE' = __IO_ACIA_PORT_BASE
 defc `__IO_SIO_PORT_BASE' = __IO_SIO_PORT_BASE
 defc `__IO_SIO_PORT_OFFSET_A' = __IO_SIO_PORT_OFFSET_A

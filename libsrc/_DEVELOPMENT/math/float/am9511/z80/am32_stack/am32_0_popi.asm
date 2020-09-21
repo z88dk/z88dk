@@ -8,7 +8,7 @@
 ;  feilipu, August 2020
 ;
 ;-------------------------------------------------------------------------
-;  asm_am9511_popi - am9511 APU pop integer
+;  asm_am9511_0_popi - am9511 APU pop integer
 ;-------------------------------------------------------------------------
 ; 
 ;  Load integer from Am9511 APU stack
@@ -17,16 +17,16 @@
 
 SECTION code_fp_am9511
 
-EXTERN __IO_APU_STATUS, __IO_APU_DATA
+EXTERN __IO_APU0_STATUS, __IO_APU0_DATA
 
-PUBLIC asm_am9511_popi_hl
-PUBLIC asm_am9511_popi
+PUBLIC asm_am9511_0_popi_hl
+PUBLIC asm_am9511_0_popi
 
-.am9511_popi_hl_wait
+.am9511_0_popi_hl_wait
     ex (sp),hl
     ex (sp),hl
     
-.asm_am9511_popi_hl
+.asm_am9511_0_popi_hl
 
     ; float primitive
     ; pop an integer from the Am9511 stack.
@@ -38,22 +38,22 @@ PUBLIC asm_am9511_popi
     ; 
     ; uses  : af, bc, hl
 
-    in a,(__IO_APU_STATUS)      ; read the APU status register
+    in a,(__IO_APU0_STATUS)     ; read the APU status register
     rlca                        ; busy? __IO_APU_STATUS_BUSY
-    jr C,am9511_popi_hl_wait
+    jr C,am9511_0_popi_hl_wait
 
-    ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
+    ld bc,__IO_APU0_DATA        ; the address of the APU data port in bc
     inc hl
-    ind                        ; load LSW into APU
+    ind                         ; load LSW into APU
     inc b
     ind
     ret
 
-.am9511_popi_wait
+.am9511_0_popi_wait
     ex (sp),hl
     ex (sp),hl
 
-.asm_am9511_popi
+.asm_am9511_0_popi
 
     ; float primitive
     ; pop an integer from the Am9511 stack.
@@ -64,11 +64,11 @@ PUBLIC asm_am9511_popi
     ; 
     ; uses  : af, bc, hl
 
-    in a,(__IO_APU_STATUS)      ; read the APU status register
+    in a,(__IO_APU0_STATUS)     ; read the APU status register
     rlca                        ; busy? and __IO_APU_STATUS_BUSY
-    jr C,am9511_popi_wait
+    jr C,am9511_0_popi_wait
 
-    ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
+    ld bc,__IO_APU0_DATA        ; the address of the APU data port in bc
     in h,(c)                    ; load LSW from APU
     in l,(c)
     ret

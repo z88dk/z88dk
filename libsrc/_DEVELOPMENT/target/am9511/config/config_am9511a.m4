@@ -5,9 +5,25 @@ divert(-1)
 # rebuild the library if changes are made
 #
 
-define(`__IO_APU_DATA',    0x`'eval(__IO_APU_PORT_BASE+0x00,16))  # APU Data Port
-define(`__IO_APU_CONTROL', 0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU Control Port
-define(`__IO_APU_STATUS',  0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU Status Port == Control Port
+define(`__IO_APU_DATA',    0x`'eval(__IO_APU_PORT_BASE+0x00,16))  # APU0 Data Port
+define(`__IO_APU_CONTROL', 0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU0 Control Port
+define(`__IO_APU_STATUS',  0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU0 Status Port == Control Port
+
+define(`__IO_APU0_DATA',    0x`'eval(__IO_APU0_PORT_BASE+0x00,16))  # APU0 Data Port
+define(`__IO_APU0_CONTROL', 0x`'eval(__IO_APU0_PORT_BASE+0x01,16))  # APU0 Control Port
+define(`__IO_APU0_STATUS',  0x`'eval(__IO_APU0_PORT_BASE+0x01,16))  # APU0 Status Port == Control Port
+
+define(`__IO_APU1_DATA',    0x`'eval(__IO_APU1_PORT_BASE+0x00,16))  # APU1 Data Port
+define(`__IO_APU1_CONTROL', 0x`'eval(__IO_APU1_PORT_BASE+0x01,16))  # APU1 Control Port
+define(`__IO_APU1_STATUS',  0x`'eval(__IO_APU1_PORT_BASE+0x01,16))  # APU1 Status Port == Control Port
+
+define(`__IO_APU2_DATA',    0x`'eval(__IO_APU2_PORT_BASE+0x00,16))  # APU2 Data Port
+define(`__IO_APU2_CONTROL', 0x`'eval(__IO_APU2_PORT_BASE+0x01,16))  # APU2 Control Port
+define(`__IO_APU2_STATUS',  0x`'eval(__IO_APU2_PORT_BASE+0x01,16))  # APU2 Status Port == Control Port
+
+define(`__IO_APU3_DATA',    0x`'eval(__IO_APU3_PORT_BASE+0x00,16))  # APU3 Data Port
+define(`__IO_APU3_CONTROL', 0x`'eval(__IO_APU3_PORT_BASE+0x01,16))  # APU3 Control Port
+define(`__IO_APU3_STATUS',  0x`'eval(__IO_APU3_PORT_BASE+0x01,16))  # APU3 Status Port == Control Port
 
 define(`__IO_APU_STATUS_BUSY',  0x80)
 define(`__IO_APU_STATUS_SIGN',  0x40)
@@ -99,6 +115,22 @@ PUBLIC `__IO_APU_DATA'
 PUBLIC `__IO_APU_CONTROL'
 PUBLIC `__IO_APU_STATUS'
 
+PUBLIC `__IO_APU0_DATA'
+PUBLIC `__IO_APU0_CONTROL'
+PUBLIC `__IO_APU0_STATUS'
+
+PUBLIC `__IO_APU1_DATA'
+PUBLIC `__IO_APU1_CONTROL'
+PUBLIC `__IO_APU1_STATUS'
+
+PUBLIC `__IO_APU2_DATA'
+PUBLIC `__IO_APU2_CONTROL'
+PUBLIC `__IO_APU2_STATUS'
+
+PUBLIC `__IO_APU3_DATA'
+PUBLIC `__IO_APU3_CONTROL'
+PUBLIC `__IO_APU3_STATUS'
+
 PUBLIC `__IO_APU_STATUS_BUSY'
 PUBLIC `__IO_APU_STATUS_SIGN'
 PUBLIC `__IO_APU_STATUS_ZERO'
@@ -178,6 +210,22 @@ defc `__IO_APU_DATA' = __IO_APU_DATA
 defc `__IO_APU_CONTROL' = __IO_APU_CONTROL
 defc `__IO_APU_STATUS' = __IO_APU_STATUS
 
+defc `__IO_APU0_DATA' = __IO_APU0_DATA
+defc `__IO_APU0_CONTROL' = __IO_APU0_CONTROL
+defc `__IO_APU0_STATUS' = __IO_APU0_STATUS
+
+defc `__IO_APU1_DATA' = __IO_APU1_DATA
+defc `__IO_APU1_CONTROL' = __IO_APU1_CONTROL
+defc `__IO_APU1_STATUS' = __IO_APU1_STATUS
+
+defc `__IO_APU2_DATA' = __IO_APU2_DATA
+defc `__IO_APU2_CONTROL' = __IO_APU2_CONTROL
+defc `__IO_APU2_STATUS' = __IO_APU2_STATUS
+
+defc `__IO_APU3_DATA' = __IO_APU3_DATA
+defc `__IO_APU3_CONTROL' = __IO_APU3_CONTROL
+defc `__IO_APU3_STATUS' = __IO_APU3_STATUS
+
 defc `__IO_APU_STATUS_BUSY' = __IO_APU_STATUS_BUSY
 defc `__IO_APU_STATUS_SIGN' = __IO_APU_STATUS_SIGN
 defc `__IO_APU_STATUS_ZERO' = __IO_APU_STATUS_ZERO
@@ -256,6 +304,22 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_APU_DATA'  __IO_APU_DATA
 `#define' `__IO_APU_CONTROL'  __IO_APU_CONTROL
 `#define' `__IO_APU_STATUS'  __IO_APU_STATUS
+
+`#define' `__IO_APU0_DATA'  __IO_APU0_DATA
+`#define' `__IO_APU0_CONTROL'  __IO_APU0_CONTROL
+`#define' `__IO_APU0_STATUS'  __IO_APU0_STATUS
+
+`#define' `__IO_APU1_DATA'  __IO_APU1_DATA
+`#define' `__IO_APU1_CONTROL'  __IO_APU1_CONTROL
+`#define' `__IO_APU1_STATUS'  __IO_APU1_STATUS
+
+`#define' `__IO_APU2_DATA'  __IO_APU2_DATA
+`#define' `__IO_APU2_CONTROL'  __IO_APU2_CONTROL
+`#define' `__IO_APU2_STATUS'  __IO_APU2_STATUS
+
+`#define' `__IO_APU3_DATA'  __IO_APU3_DATA
+`#define' `__IO_APU3_CONTROL'  __IO_APU3_CONTROL
+`#define' `__IO_APU3_STATUS'  __IO_APU3_STATUS
 
 `#define' `__IO_APU_STATUS_BUSY'  __IO_APU_STATUS_BUSY
 `#define' `__IO_APU_STATUS_SIGN'  __IO_APU_STATUS_SIGN

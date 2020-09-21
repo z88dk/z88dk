@@ -22,7 +22,7 @@ EXTERN __IO_APU_STATUS, __IO_APU_DATA
 PUBLIC asm_am9511_popl_hl
 PUBLIC asm_am9511_popl
 
-.am9511_popl_wait_hl
+.am9511_popl_hl_wait
     ex (sp),hl
     ex (sp),hl
     
@@ -40,7 +40,7 @@ PUBLIC asm_am9511_popl
 
     in a,(__IO_APU_STATUS)      ; read the APU status register
     rlca                        ; busy? __IO_APU_STATUS_BUSY
-    jr C,am9511_popl_wait_hl
+    jr C,am9511_popl_hl_wait
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     inc hl
