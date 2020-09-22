@@ -20,13 +20,11 @@ SECTION code_fp_am9511
 EXTERN __IO_APU_STATUS, __IO_APU_DATA
 
 PUBLIC asm_am9511_popf
-PUBLIC _am9511_popf
 
-.wait
+.am9511_popf_wait
     ex (sp),hl
     ex (sp),hl
 
-._am9511_popf
 .asm_am9511_popf
 
     ; float primitive
@@ -42,7 +40,7 @@ PUBLIC _am9511_popf
 
     in a,(__IO_APU_STATUS)      ; read the APU status register
     rlca                        ; busy? and __IO_APU_STATUS_BUSY
-    jr C,wait
+    jr C,am9511_popf_wait
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     in d,(c)                    ; load MSW from APU

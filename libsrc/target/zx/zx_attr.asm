@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC zx_attr
 PUBLIC _zx_attr
 
-EXTERN zx_attr_callee
-EXTERN ASMDISP_ZX_ATTR_CALLEE
+EXTERN asm_zx_attr
 
 .zx_attr
 ._zx_attr
@@ -20,4 +19,4 @@ EXTERN ASMDISP_ZX_ATTR_CALLEE
    
    ld h,l
    ld l,e
-   jp zx_attr_callee + ASMDISP_ZX_ATTR_CALLEE
+   jp asm_zx_attr

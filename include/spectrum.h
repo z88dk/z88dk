@@ -427,7 +427,7 @@ extern uint  __LIB__     zx_saddr2px_callee(void *pixeladdr, uchar mask) __small
 extern uchar __LIB__    *zx_saddrpleft_callee(void *pixeladdr, uchar *mask) __smallc __z88dk_callee;
 extern uchar __LIB__    *zx_saddrpright_callee(void *pixeladdr, uchar *mask) __smallc __z88dk_callee;
 
-#define zx_cyx2saddr(a,b)          zx_cxy2saddr_callee(a,b)
+#define zx_cyx2saddr(a,b)          zx_cxy2saddr_callee(b,a)
 #define zx_cxy2saddr(a,b)          zx_cxy2saddr_callee(a,b)
 
 #define zx_pxy2saddr(a,b,c)        zx_pxy2saddr_callee(a,b,c)

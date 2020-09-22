@@ -19,11 +19,11 @@ SECTION code_fp_am9511
 
 EXTERN __IO_APU_STATUS, __IO_APU_DATA
 
-PUBLIC asm_am9511_pushi
+PUBLIC asm_am9511_pushi_hl
 PUBLIC asm_am9511_pushi_fastcall
 
 
-.asm_am9511_pushi
+.asm_am9511_pushi_hl
 
     ; float primitive
     ; push an integer into Am9511 stack.
@@ -37,7 +37,7 @@ PUBLIC asm_am9511_pushi_fastcall
 
 ;   in a,(__IO_APU_STATUS)      ; read the APU status register
 ;   rlca                        ; busy? __IO_APU_STATUS_BUSY
-;   jr C,asm_am9511_pushi
+;   jr C,asm_am9511_pushi_hl
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     outi                        ; load LSW into APU

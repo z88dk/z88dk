@@ -11,10 +11,9 @@
 SECTION code_clib
 PUBLIC zx_screenstr_callee
 PUBLIC _zx_screenstr_callee
-PUBLIC ASMDISP_ZX_SCREENSTR_CALLEE
+PUBLIC asm_zx_screenstr
 
-EXTERN zx_cyx2saddr_callee
-EXTERN ASMDISP_ZX_CYX2SADDR_CALLEE
+EXTERN asm_zx_cxy2saddr
 
 .zx_screenstr_callee
 ._zx_screenstr_callee
@@ -25,14 +24,13 @@ EXTERN ASMDISP_ZX_CYX2SADDR_CALLEE
    ld h,l
    ld l,e
 
-.asmentry
-
+asm_zx_screenstr:
    ; h = char Y 0..23
    ; l = char X 0..31
    ;
    ; exit : hl = ascii char code if match, else 0 and carry set
 
-   call zx_cyx2saddr_callee + ASMDISP_ZX_CYX2SADDR_CALLEE
+   call asm_zx_cxy2saddr
    
    ; hl = screen address
    
@@ -89,4 +87,3 @@ EXTERN ASMDISP_ZX_CYX2SADDR_CALLEE
    scf
    ret
 
-DEFC ASMDISP_ZX_SCREENSTR_CALLEE = asmentry - zx_screenstr_callee

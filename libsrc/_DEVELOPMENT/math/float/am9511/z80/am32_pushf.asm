@@ -19,11 +19,11 @@ SECTION code_fp_am9511
 
 EXTERN __IO_APU_STATUS, __IO_APU_DATA
 
-PUBLIC asm_am9511_pushf
+PUBLIC asm_am9511_pushf_hl
 PUBLIC asm_am9511_pushf_fastcall
 
 
-.asm_am9511_pushf
+.asm_am9511_pushf_hl
 
     ; float primitive
     ; push a IEEE-754 floating point into Am9511 stack.
@@ -108,13 +108,13 @@ PUBLIC asm_am9511_pushf_fastcall
     ; uses  : af, bc, hl
 
     ld a,d                      ; capture exponent
-    sla e
-    rl a                        ; position exponent in a
-    jr Z,asm_am9511_zero_f      ; check for zero
+    sla e                       ; position exponent in a
+    rl a                        ; check for zero
+    jr Z,asm_am9511_zero_fastcall
     cp 127+63                   ; check for overflow
-    jr NC,asm_am9511_max_f
+    jr NC,asm_am9511_max_fastcall
     cp 127-64                   ; check for underflow
-    jr C,asm_am9511_zero_f
+    jr C,asm_am9511_zero_fastcall
     sub 127-1                   ; bias including shift binary point
 
     rla                         ; position exponent for sign
@@ -137,13 +137,13 @@ PUBLIC asm_am9511_pushf_fastcall
     out (c),d
     ret
 
-.asm_am9511_zero_f
+.asm_am9511_zero_fastcall
     ld de,0                     ; no signed zero available
     ld h,d
     ld l,e
     jr pushf_fastcall
 
-.asm_am9511_max_f                 ; floating max value of sign d in dehl
+.asm_am9511_max_fastcall        ; floating max value of sign d in dehl
     ld a,d
     and 080h                    ; isolate sign
     or 03fh                     ; max exponent

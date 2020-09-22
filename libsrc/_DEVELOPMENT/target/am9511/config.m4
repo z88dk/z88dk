@@ -41,6 +41,7 @@ include(`target/am9511/config/config_target.m4')
 include(`target/am9511/config/config_cpu.m4')
 
 include(`target/am9511/config/config_am9511a.m4')
+include(`target/am9511/config/config_am9511a_multi.m4')
 
 dnl############################################################
 dnl# END IF GUARDS

@@ -7,7 +7,11 @@ divert(-1)
 
 # Am9511A-1 APU Definitions
 
-define(`__IO_APU_PORT_BASE', 0x42)      # Base Address for Am9511A
+define(`__IO_APU_PORT_BASE', 0x42)      # Base Address for Am9511A #0
+define(`__IO_APU0_PORT_BASE', 0x42)     # Base Address for Am9511A #0
+define(`__IO_APU1_PORT_BASE', 0x62)     # Base Address for Am9511A #1
+define(`__IO_APU2_PORT_BASE', 0xC2)     # Base Address for Am9511A #2
+define(`__IO_APU3_PORT_BASE', 0xE2)     # Base Address for Am9511A #3
 
 #
 # END OF USER CONFIGURATION
@@ -22,6 +26,10 @@ dnl#
 ifdef(`CFG_ASM_PUB',
 `
 PUBLIC `__IO_APU_PORT_BASE'
+PUBLIC `__IO_APU0_PORT_BASE'
+PUBLIC `__IO_APU1_PORT_BASE'
+PUBLIC `__IO_APU2_PORT_BASE'
+PUBLIC `__IO_APU3_PORT_BASE'
 ')
 
 dnl#
@@ -31,5 +39,9 @@ dnl#
 ifdef(`CFG_ASM_DEF',
 `
 defc `__IO_APU_PORT_BASE' = __IO_APU_PORT_BASE
+defc `__IO_APU0_PORT_BASE' = __IO_APU0_PORT_BASE
+defc `__IO_APU1_PORT_BASE' = __IO_APU1_PORT_BASE
+defc `__IO_APU2_PORT_BASE' = __IO_APU2_PORT_BASE
+defc `__IO_APU3_PORT_BASE' = __IO_APU3_PORT_BASE
 ')
 

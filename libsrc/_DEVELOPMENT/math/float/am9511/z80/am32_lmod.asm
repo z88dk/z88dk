@@ -20,7 +20,7 @@ EXTERN __IO_APU_OP_DMUL
 EXTERN __IO_APU_OP_DSUB
 EXTERN __IO_APU_OP_PTOD
 
-EXTERN asm_am9511_pushl
+EXTERN asm_am9511_pushl_hl
 EXTERN asm_am9511_pushl_fastcall
 EXTERN asm_am9511_popl
 
@@ -32,7 +32,7 @@ PUBLIC asm_am9511_lmod, asm_am9511_lmod_callee
     exx
     ld hl,2
     add hl,sp
-    call asm_am9511_pushl           ; x
+    call asm_am9511_pushl_hl        ; x
 
     ld a,__IO_APU_OP_PTOD
     out (__IO_APU_CONTROL),a        ; push x

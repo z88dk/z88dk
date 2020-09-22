@@ -5,9 +5,9 @@ divert(-1)
 # rebuild the library if changes are made
 #
 
-define(`__IO_APU_DATA',    0x`'eval(__IO_APU_PORT_BASE+0x00,16))  # APU Data Port
-define(`__IO_APU_CONTROL', 0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU Control Port
-define(`__IO_APU_STATUS',  0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU Status Port == Control Port
+define(`__IO_APU_DATA',    0x`'eval(__IO_APU_PORT_BASE+0x00,16))  # APU0 Data Port
+define(`__IO_APU_CONTROL', 0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU0 Control Port
+define(`__IO_APU_STATUS',  0x`'eval(__IO_APU_PORT_BASE+0x01,16))  # APU0 Status Port == Control Port
 
 define(`__IO_APU_STATUS_BUSY',  0x80)
 define(`__IO_APU_STATUS_SIGN',  0x40)
