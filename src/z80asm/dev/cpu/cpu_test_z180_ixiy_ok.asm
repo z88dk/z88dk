@@ -1220,6 +1220,7 @@
  out (c), c                     ; ED 49
  out (c), d                     ; ED 51
  out (c), e                     ; ED 59
+ out (c), f                     ; ED 71
  out (c), h                     ; ED 61
  out (c), l                     ; ED 69
  out -128                       ; D3 80
@@ -1926,6 +1927,20 @@
  sll h                          ; CB 34
  sll l                          ; CB 35
  slp                            ; ED 76
+ sls (hl)                       ; CB 36
+ sls (ix)                       ; FD CB 00 36
+ sls (ix+127)                   ; FD CB 7F 36
+ sls (ix-128)                   ; FD CB 80 36
+ sls (iy)                       ; DD CB 00 36
+ sls (iy+127)                   ; DD CB 7F 36
+ sls (iy-128)                   ; DD CB 80 36
+ sls a                          ; CB 37
+ sls b                          ; CB 30
+ sls c                          ; CB 31
+ sls d                          ; CB 32
+ sls e                          ; CB 33
+ sls h                          ; CB 34
+ sls l                          ; CB 35
  sphl                           ; F9
  sra (hl)                       ; CB 2E
  sra (ix)                       ; FD CB 00 2E

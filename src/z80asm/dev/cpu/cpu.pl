@@ -64,7 +64,7 @@ my %V = (
 	cp => 7, cmp => 7,
 	rlca => 0, rrca => 1, rla => 2, rra => 3,
 	rlc => 0, rrc => 1, rl => 2, rr => 3, sla => 4, sra => 5, 
-	sll => 6, sli => 6, swap => 6, 
+	sll => 6, sls => 6, sli => 6, swap => 6, 
 	srl => 7, 
 	bit => 1, res => 2, set => 3,
 	ix => 0xDD, iy => 0xFD, 
@@ -831,9 +831,9 @@ for my $cpu (@CPUS) {
 	add_opc($cpu, "rar",	0x1F);
 	
 	if (!$intel) {
-		for (qw( rlc rrc rl rr sla sra sll sli srl )) {
-			my $op = (/sll|sli/ && $gameboy) ? 'swap' : $_;
-			next if $op =~ /sll|sli/ && !$zilog;
+		for (qw( rlc rrc rl rr sla sra sll sls sli srl )) {
+			my $op = (/sll|sls|sli/ && $gameboy) ? 'swap' : $_;
+			next if $op =~ /sll|sls|sli/ && !$zilog;
 
 			for my $r (qw( b c d e h l (hl) a )) {
 				add_opc($cpu, "$op $r", 0xCB, $V{$op}*8 + $V{$r});
@@ -842,13 +842,22 @@ for my $cpu (@CPUS) {
 	}
 	
 	if ($z80) {
-		for my $op (qw( rlc rrc rl rr sla sra sll sli srl )) {
+		for my $op (qw( rlc rrc rl rr sla sra sll sls sli srl )) {
 			for my $x (qw( ix iy )) {
 				for my $r (qw( b c d e h l a )) {
-					add_opc($cpu, "$op ($x+%d), $r", $V{$x}, 0xCB, '%d', $V{$op}*8 + $V{$r});
+					add_opc($cpu, "$op ($x+%d), $r", 
+							$V{$x}, 0xCB, '%d', $V{$op}*8 + $V{$r});
 				}
 			}
 		}			
+		for my $op (qw( res set )) {
+			for my $x (qw( ix iy )) {
+				for my $r (qw( b c d e h l a )) {
+					add_opc($cpu, "$op %c, ($x+%d), $r", 	
+							$V{$x}, 0xCB, '%d', ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
+				}
+			}
+		}
 	}
 
     # 16-bit rotate group
@@ -1234,6 +1243,7 @@ for my $cpu (@CPUS) {
 		
 		add_opc($cpu, "out (%n), a", 		0xD3, '%n');
 		add_opc($cpu, "out (c), %c", 		0xED, '0x41+%c(0)+6*8');
+		add_opc($cpu, "out (c), f", 		0xED, 0x71);
 
 		for my $r (qw( b c d e h l a )) {
 			add_opc($cpu, "out (c), $r", 	0xED, 0x41 + $V{$r}*8);
@@ -1577,7 +1587,7 @@ sub add_opc {
 	
 	# expand ixh, ixl, ...
 	if ($cpu =~ /^z80/ && $asm =~ /\b[hl]\b/ && 
-		$asm !~ /\b(hl|ix|iy|in|out|dad|ana|bit|res|set|inr|dcr|dcx|inx|lxi|mov|mvi|sbb|ora|xra|pop|push|rlc|rrc|rl|rr|sla|sra|sll|srl|sli)\b/) {
+		$asm !~ /\b(hl|ix|iy|in|out|dad|ana|bit|res|set|inr|dcr|dcx|inx|lxi|mov|mvi|sbb|ora|xra|pop|push|rlc|rrc|rl|rr|sla|sra|sll|sls|srl|sli)\b/) {
 		(my $asm1 = $asm) =~ s/\b([hl])\b/ix$1/g;
 		add_opc_1($cpu, $asm1, $V{ix}, @bin);
 		(   $asm1 = $asm) =~ s/\b([hl])\b/iy$1/g;
@@ -1634,7 +1644,7 @@ sub add_opc_3 {
 	# expand altd
 	if ($asm =~ /^ (?| ( (?:ld|inc|dec|pop|bool) \s+ 
 									(?:a|b|c|d|e|h|l|af|bc|de|hl)) ( $ | \b [^'] .*)
-                     | ( (?:rl|rr|rlc|rrc|sla|sra|sll|sli|srl) \s+ 
+                     | ( (?:rl|rr|rlc|rrc|sla|sra|sll|sls|sli|srl) \s+ 
 									(?:a|b|c|d|e|h|l)) ( $ | \b [^'] .*)
                      | ( (?:rr) \s+ (?:de|hl)) ( $ | \b [^'] .*)
                      | ( (?:rl) \s+ (?:de))    ( $ | \b [^'] .*)
@@ -1666,7 +1676,7 @@ sub add_opc_3 {
 						| ( (?:inc|dec) \s+ \( .* )
 						| ( (?:bool|rr) \s+ (ix|iy) .* )
 					    | ( (?:cp|bit) \s+ .*) 
-						| ( (?:rlc|rrc|rl|rr|sla|sra|sll|sli|srl) \s+ \( .*)
+						| ( (?:rlc|rrc|rl|rr|sla|sra|sll|sls|sli|srl) \s+ \( .*)
 					  ) $/x) {
 		if ($has_io) {
 			add_opc_final($cpu, "altd $1", $V{altd}, @bin);
