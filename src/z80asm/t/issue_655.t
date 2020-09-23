@@ -18,8 +18,8 @@ unlink_testfiles();
 
 build_z80nm();
 spew("test.asm", <DATA>);
-run("z80asm -l test.asm");
-open(my $p, "z80nm -a test.o|");
+run("z88dk-z80asm -l test.asm");
+open(my $p, "z88dk-z80nm -a test.o|");
 my($command_l, $command_h);
 my($clearbuf_l, $clearbuf_h);
 

@@ -12,7 +12,7 @@ all: $(EXECFILES)
 .PRECIOUS: $(EXECFILES:.cas=.vz)
 
 %.cas: %.vz
-	appmake +vz -b $^ --audio
+	z88dk-appmake +vz -b $^ --audio
 
 dstar.vz: ../dstar.c
 	zcc +vz -vn ../dstar.c -I.. -Dspritesize=7 -DSOUND  -o dstar.vz
