@@ -292,7 +292,7 @@ static char           *defaultout = "a.bin";
 static char  *c_install_dir = PREFIX "/";
 static char  *c_options = NULL;
 
-static char  *c_z80asm_exe = EXEC_PREFIX "z80asm";
+static char  *c_z80asm_exe = "z88dk-z80asm";
 
 static char  *c_clang_exe = "zclang";
 static char  *c_llvm_exe = "zllvm-cbe";
