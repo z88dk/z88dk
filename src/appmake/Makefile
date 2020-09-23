@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------
 # appmake - Z88dk application creator
 #-----------------------------------------------------------------------------
-PROJ		:= appmake
+PROJ		:= z88dk-appmake
 
 # EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)

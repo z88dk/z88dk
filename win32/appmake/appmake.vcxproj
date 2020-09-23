@@ -107,8 +107,9 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{321F0E77-E3DC-4C14-8113-28FDFAC73F7B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>appmake</RootNamespace>
+    <RootNamespace>z88dk-appmake</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>z88dk-appmake</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

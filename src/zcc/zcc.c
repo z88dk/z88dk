@@ -302,7 +302,7 @@ static char  *c_cpp_exe = "z88dk-ucpp";
 static char  *c_sdcc_preproc_exe = "zsdcpp";
 static char  *c_zpragma_exe = "z88dk-zpragma";
 static char  *c_copt_exe = "z88dk-copt";
-static char  *c_appmake_exe = "appmake";
+static char  *c_appmake_exe = "z88dk-appmake";
 #ifndef WIN32
 static char  *c_copycmd = "cat";
 #else
