@@ -34,7 +34,7 @@ sub t_z80nm {
 
 	my $line = "[line ".((caller)[2])."]";
 	my($stdout, $stderr, $return) = capture {
-		system "z80nm -a $o_file";
+		system "z88dk-z80nm -a $o_file";
 	};
 	my $ok = is_text( $stdout, $expected_out, "$line stdout" );
 	is_text( $stderr, "", "$line stderr" );
@@ -45,7 +45,7 @@ sub t_z80nm {
 		my($file, $line) = (caller)[1,2];
 		my $out = "test.out";
 		system "head -$line $file > $out";
-		system "z80nm -a $o_file >> $out";
+		system "z88dk-z80nm -a $o_file >> $out";
 		system "winmergeu -w $file $out";
 		unlink "test.out";
 		die;		# need to refresh source
