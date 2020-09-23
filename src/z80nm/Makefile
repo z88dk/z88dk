@@ -40,16 +40,16 @@ OBJS	+= \
 ../../ext/getopt/getopt.o
 endif
 
-all: z80nm$(EXESUFFIX)
+all: z88dk-z80nm$(EXESUFFIX)
 
-z80nm$(EXESUFFIX):	$(OBJS)
-	$(CC) -o z80nm$(EXESUFFIX) $(CFLAGS) $(OBJS)
+z88dk-z80nm$(EXESUFFIX):	$(OBJS)
+	$(CC) -o z88dk-z80nm$(EXESUFFIX) $(CFLAGS) $(OBJS)
 
-install:  z80nm$(EXESUFFIX)
-	$(INSTALL) z80nm$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)z80nm$(EXESUFFIX)
+install:  z88dk-z80nm$(EXESUFFIX)
+	$(INSTALL) z88dk-z80nm$(EXESUFFIX) $(PREFIX)/bin/z88dk-z80nm$(EXESUFFIX)
 
 clean:
-	$(RM) z80nm$(EXESUFFIX) $(OBJS) $(DEPENDS) core
+	$(RM) z88dk-z80nm$(EXESUFFIX) $(OBJS) $(DEPENDS) core
 	$(RM) -rf Debug Release
 
 

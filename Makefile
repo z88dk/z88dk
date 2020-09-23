@@ -39,10 +39,10 @@ Z88DK_PATH	= $(shell pwd)
 
 export CC INSTALL CFLAGS EXEC_PREFIX CROSS
 
-BINS = bin/appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(EXESUFFIX) \
+BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(EXESUFFIX) \
 	bin/z88dk-ucpp$(EXESUFFIX) bin/sccz80$(EXESUFFIX) bin/z80asm$(EXESUFFIX) \
 	bin/zcc$(EXESUFFIX) bin/z88dk-zpragma$(EXESUFFIX) bin/z88dk-zx7$(EXESUFFIX) \
-	bin/z80nm$(EXESUFFIX) bin/zobjcopy$(EXESUFFIX)  \
+	bin/z88dk-z80nm$(EXESUFFIX) bin/z88dk-zobjcopy$(EXESUFFIX)  \
 	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
 	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
 	bin/z88dk-lib$(EXESUFFIX)
@@ -88,7 +88,7 @@ ifdef BUILD_SDCC
 	$(RM) -fR $(SDCC_PATH)
 endif
 
-bin/appmake$(EXESUFFIX): src/config.h
+bin/z88dk-appmake$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/appmake PREFIX=`pwd` install
 
 bin/z88dk-copt$(EXESUFFIX): src/config.h
@@ -115,10 +115,10 @@ bin/z88dk-zpragma$(EXESUFFIX): src/config.h
 bin/z88dk-zx7$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/zx7 PREFIX=`pwd` install
 
-bin/z80nm$(EXESUFFIX): src/config.h
+bin/z88dk-z80nm$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/z80nm PREFIX=`pwd` install
 
-bin/zobjcopy$(EXESUFFIX): src/config.h
+bin/z88dk-zobjcopy$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/zobjcopy PREFIX=`pwd` install
 
 bin/z88dk-z80svg$(EXESUFFIX): src/config.h

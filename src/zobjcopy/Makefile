@@ -3,7 +3,7 @@
 # Copyright (C) Paulo Custodio, 2011-2019
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #-----------------------------------------------------------------------------
-PROJ		:= zobjcopy
+PROJ		:= z88dk-zobjcopy
 
 # EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)
@@ -70,6 +70,6 @@ clean::
 
 #------------------------------------------------------------------------------
 install: $(PROJ)$(EXESUFFIX)
-	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)$(PROJ)$(EXESUFFIX)
+	$(INSTALL) $(PROJ)$(EXESUFFIX) $(PREFIX)/bin/$(PROJ)$(EXESUFFIX)
 
 -include $(DEPENDS)
