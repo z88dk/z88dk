@@ -118,7 +118,7 @@ sub appmake {
 	my($args) = @_;
 	
 	build_appmake();
-	run("appmake $args", 0, 'IGNORE');
+	run("z88dk-appmake $args", 0, 'IGNORE');
 }
 
 sub ticks {

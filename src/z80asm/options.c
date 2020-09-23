@@ -988,7 +988,7 @@ void checkrun_appmake(void)
 			const char *bin_filename = get_bin_filename(get_first_module(NULL)->filename);
 			const char *out_filename = path_replace_ext(bin_filename, opts.appmake_ext);
 
-			Str_sprintf(cmd, "appmake %s -b \"%s\" -o \"%s\" --org %d",
+			Str_sprintf(cmd, "z88dk-appmake %s -b \"%s\" -o \"%s\" --org %d",
 				opts.appmake_opts,
 				bin_filename,
 				out_filename,
