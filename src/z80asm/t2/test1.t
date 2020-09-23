@@ -43,7 +43,7 @@ path("$test.asm")->spew(<<END);
 	dc		c2 = 5
 END
 
-run_ok("z80asm -b $test.asm", '', '');
+run_ok("z88dk-z80asm -b $test.asm", '', '');
 my $bin = path("$test.bin")->slurp_raw();
 ok $bin eq  "\x01\x02\x03\x04\x05".
 			"helloworld".
@@ -53,7 +53,7 @@ ok $bin eq  "\x01\x02\x03\x04\x05".
 			"\x78\x56\x34\x12\x78\x56\x34\x12\x78\x56\x34\x12".
 			"\x55\x55\xaa\xaa", "bin ok";
 
-run_ok("z80nm -a $test.o", <<'END', '');
+run_ok("z88dk-z80nm -a $test.o", <<'END', '');
 Object  file test1.o at $0000: Z80RMF14
   Name: test1
   Section "": 50 bytes

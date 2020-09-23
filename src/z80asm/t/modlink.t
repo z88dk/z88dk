@@ -1122,7 +1122,7 @@ is_text( $stdout, "", "stdout" );
 is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 
-$cmd = "../../src/z80nm/z80nm test1.o";
+$cmd = "../../src/z80nm/z88dk-z80nm test1.o";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 $stdout = join("\n", grep {/__/} split(/\n/, $stdout))."\n";
@@ -1141,7 +1141,7 @@ is_text( $stdout, "", "stdout" );
 is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 
-$cmd = "../../src/z80nm/z80nm test1.o";
+$cmd = "../../src/z80nm/z88dk-z80nm test1.o";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 $stdout = join("\n", grep {/__/} split(/\n/, $stdout))."\n";
