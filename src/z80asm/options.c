@@ -931,10 +931,11 @@ const char *get_map_filename(const char *filename)
 	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_MAP));
 }
 
+// argument is binary file, already has the output_dir prepended
 const char *get_reloc_filename(const char *filename)
 {
 	init_module();
-	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_RELOC));
+	return path_replace_ext(filename, FILEEXT_RELOC);
 }
 
 const char *get_asm_filename(const char *filename)
