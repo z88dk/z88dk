@@ -46,7 +46,7 @@ do_tests=0
 DESTDIR=/usr/local
 
 
-while getopts "bcCehklt:p:i:" arg; do       # Handle all given arguments
+while getopts "bcCehkltp:i:" arg; do       # Handle all given arguments
   case "$arg" in
     b)     do_build=0              ;;   # Don't build
     c)     do_clean=1              ;;   # clean except bin/*
