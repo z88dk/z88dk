@@ -157,15 +157,16 @@ install: install-clean
 	$(MAKE) -C src/ticks PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/z88dk-lib PREFIX=$(DESTDIR) install
 	$(MAKE) -C support/graphics PREFIX=$(DESTDIR) install
-        #cp -r include $(prefix_share)/
-        #cp -r lib $(prefix_share)/
-        #cp -r libsrc $(prefix_share)/
-	find include -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{}  \;
-	find include -type f -exec $(INSTALL) -m 664 {,$(prefix_share)/}{}  \;
-	find lib -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{} \;
-	find lib -type f -exec $(INSTALL) -m 664 {,$(prefix_share)/}{} \;
-	find libsrc -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{} \;
-	find libsrc -type f -exec $(INSTALL) -m 664 {,$(prefix_share)/}{} \;
+	cp -r include $(prefix_share)/
+	cp -r lib $(prefix_share)/
+	cp -r libsrc $(prefix_share)/
+	# BSD install syntax below
+	#find include -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{}  \;
+	#find include -type f -exec $(INSTALL) -m 664 {,$(prefix_share)/}{}  \;
+	#find lib -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{} \;
+	#find lib -type f -exec $(INSTALL) -m 664 {,$(prefix_share)/}{} \;
+	#find libsrc -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{} \;
+	#find libsrc -type f -exec $(INSTALL) -m 664 {,$(prefix_share)/}{} \;
 
 
 # Needs to have a dependency on libs
