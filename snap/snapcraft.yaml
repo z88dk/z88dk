@@ -1,0 +1,46 @@
+name: z88dk
+base: core18
+version: '0.1'
+summary: Development kit for Z80 machiens
+description: |
+  C compiler, assembler and libraries for over 100 z80 family machines.
+
+grade: devel 
+confinement: devmode 
+
+
+parts:
+  part-z88dk:
+    plugin: make
+    source-type: git
+    source: https://github.com/z88dk/z88dk.git
+    # See 'snapcraft plugins'
+    override-build: |
+      ./build.sh -i $SNAP
+      make DESTDIR=$SNAPCRAFT_PART_INSTALL install
+    build-packages:
+      - build-essential
+      - dos2unix
+      - libboost-all-dev
+      - texinfo
+      - texi2html
+      - libxml2-dev
+      - subversion
+      - bison
+      - flex
+      - zlib1g-dev
+      - m4
+    stage-packages:
+      - libicu60
+      - libxml2
+      - m4
+
+apps:
+  zcc:
+    command: zcc
+    environment:
+      ZCCCFG: "$SNAP/share/z88dk/lib/config"
+  z88dk-z80asm:
+    command: z88dk-z80asm
+
+
