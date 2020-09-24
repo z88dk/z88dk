@@ -14,8 +14,9 @@ else
   EXESUFFIX 		?=
 endif
 
-prefix ?= /usr/local
-prefix_share = $(prefix)/share/z88dk
+DESTDIR ?= /usr/local
+
+prefix_share = $(DESTDIR)/share/z88dk
 git_rev ?= $(shell git rev-parse --short HEAD)
 git_count ?= $(shell git rev-list --count HEAD)
 version ?= $(shell date +%Y%m%d)
@@ -142,26 +143,29 @@ libs: $(BINS)
 	cd libsrc ; $(MAKE) install
 
 install: install-clean
-	install -d $(DESTDIR)/$(prefix) $(DESTDIR)/$(prefix_share)/lib
-	$(MAKE) -C src/appmake PREFIX=$(DESTDIR)/$(prefix) install
-	$(MAKE) -C src/copt PREFIX=$(DESTDIR)/$(prefix) install
-	$(MAKE) -C src/ucpp PREFIX=$(DESTDIR)/$(prefix) install
-	$(MAKE) -C src/cpp PREFIX=$(DESTDIR)/$(prefix) install
-	$(MAKE) -C src/sccz80 PREFIX=$(DESTDIR)/$(prefix) install
-	$(MAKE) -C src/z80asm  PREFIX=$(DESTDIR)/$(prefix) PREFIX_SHARE=$(DESTDIR)/$(prefix_share) install
-	$(MAKE) -C src/zcc PREFIX=$(DESTDIR)/$(prefix) install
-	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR)/$(prefix) install
-	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR)/$(prefix) install
-	$(MAKE) -C src/z80nm PREFIX=$(DESTDIR)/$(prefix) install
-	$(MAKE) -C src/ticks PREFIX=$(DESTDIR)/$(prefix) install
-	$(MAKE) -C src/z88dk-lib PREFIX=$(DESTDIR)/$(prefix) install
-	$(MAKE) -C support/graphics PREFIX=$(DESTDIR)/$(prefix) install
-	find include -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/}{}  \;
-	find include -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/}{}  \;
-	find lib -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/}{} \;
-	find lib -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/}{} \;
-	find libsrc -type d -exec $(INSTALL) -d -m 755 {,$(DESTDIR)/$(prefix_share)/}{} \;
-	find libsrc -type f -exec $(INSTALL) -m 664 {,$(DESTDIR)/$(prefix_share)/}{} \;
+	install -d $(DESTDIR) $(DESTDIR)/bin /$(prefix_share)/lib
+	$(MAKE) -C src/appmake PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/copt PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/ucpp PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/cpp PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/sccz80 PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/z80asm  PREFIX=$(DESTDIR) PREFIX_SHARE=$(prefix_share) install
+	$(MAKE) -C src/zcc PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/z80nm PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/ticks PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/z88dk-lib PREFIX=$(DESTDIR) install
+	$(MAKE) -C support/graphics PREFIX=$(DESTDIR) install
+        #cp -r include $(prefix_share)/
+        #cp -r lib $(prefix_share)/
+        #cp -r libsrc $(prefix_share)/
+	find include -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{}  \;
+	find include -type f -exec $(INSTALL) -m 664 {,$(prefix_share)/}{}  \;
+	find lib -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{} \;
+	find lib -type f -exec $(INSTALL) -m 664 {,$(prefix_share)/}{} \;
+	find libsrc -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{} \;
+	find libsrc -type f -exec $(INSTALL) -m 664 {,$(prefix_share)/}{} \;
 
 
 # Needs to have a dependency on libs

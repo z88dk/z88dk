@@ -22,6 +22,7 @@ show_help_and_exit()
   echo "  -k    Keep building ignoring errors"
   echo "  -l    Don't build libraries"
   echo "  -p    TARGET Build specified targets"
+  echo "  -i    PATH Final installation directory"
   echo "  -t    Run tests"
   echo ""
   echo "Default is to build binaries and libraries"
@@ -42,8 +43,10 @@ do_examples=0
 do_libbuild=1
 do_tests=0
 
+DESTDIR=/usr/local
 
-while getopts "bcCehklpt" arg; do       # Handle all given arguments
+
+while getopts "bcCehklt:p:i:" arg; do       # Handle all given arguments
   case "$arg" in
     b)     do_build=0              ;;   # Don't build
     c)     do_clean=1              ;;   # clean except bin/*
@@ -52,6 +55,7 @@ while getopts "bcCehklpt" arg; do       # Handle all given arguments
     k)     set +e                  ;;   # keep building ignoring errors
     l)     do_libbuild=0           ;;   # Don't build libraries
     p)     export TARGETS=$OPTARG  ;;
+    i)     DESTDIR=$OPTARG  ;;
     t)     do_tests=1              ;;   # Run tests as well
     h | *) show_help_and_exit 0    ;;   # Show help on demand
   esac
@@ -137,7 +141,7 @@ export ZCCCFG
 
 
 if [ $do_build = 1 ]; then              # Build binaries or not...
-  $MAKE
+  $MAKE DESTDIR=$DESTDIR
 fi
 
 
