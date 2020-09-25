@@ -33,8 +33,8 @@ ifneq (, $(shell which ccache))
    CC := ccache $(CC)
 endif
 
-SDCC_PATH	= /tmp/sdcc
 Z88DK_PATH	= $(shell pwd)
+SDCC_PATH	= $(Z88DK_PATH)/src/sdcc-build
 
 # --> End of Configurable Options
 
@@ -73,6 +73,7 @@ src/config.h:
 
 bin/zsdcc$(EXESUFFIX):
 ifdef BUILD_SDCC
+	$(RM) -r $(SDCC_PATH)
 	svn checkout -r 11722 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
 	cd $(SDCC_PATH) && patch -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 	cd $(SDCC_PATH) && CC=$(OCC) ./configure \
@@ -160,6 +161,8 @@ install: install-clean
 	cp -r include $(prefix_share)/
 	cp -r lib $(prefix_share)/
 	cp -r libsrc $(prefix_share)/
+
+
 	# BSD install syntax below
 	#find include -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{}  \;
 	#find include -type f -exec $(INSTALL) -m 664 {,$(prefix_share)/}{}  \;
@@ -205,6 +208,7 @@ clean-bins:
 	$(MAKE) -C test clean
 	$(MAKE) -C testsuite clean
 	$(MAKE) -C src/z88dk-lib clean
+	$(RM) -r $(SDCC_PATH)
 	#if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
 
 .PHONY: test testsuite
