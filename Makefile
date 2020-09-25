@@ -144,7 +144,7 @@ libs: $(BINS)
 	cd libsrc ; $(MAKE) install
 
 install: install-clean
-	install -d $(DESTDIR) $(DESTDIR)/bin /$(prefix_share)/lib
+	install -d $(DESTDIR) $(DESTDIR)/bin $(prefix_share)/lib $(prefix_share)/src
 	$(MAKE) -C src/appmake PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/copt PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/ucpp PREFIX=$(DESTDIR) install
@@ -166,6 +166,7 @@ install: install-clean
 	cp -r include $(prefix_share)/
 	cp -r lib $(prefix_share)/
 	cp -r libsrc $(prefix_share)/
+	cp -r src/m4 $(prefix_share)/src/
 
 
 	# BSD install syntax below
