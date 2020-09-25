@@ -4,9 +4,10 @@ version: '0.1'
 summary: Development kit for Z80 machiens
 description: |
   C compiler, assembler and libraries for over 100 z80 family machines.
+  
 
 grade: devel 
-confinement: devmode 
+confinement: strict
 
 
 parts:
@@ -15,8 +16,10 @@ parts:
     source-type: git
     source: https://github.com/z88dk/z88dk.git
     # See 'snapcraft plugins'
+    build-environment:
+      - BUILD_SDCC: "1"
     override-build: |
-      ./build.sh -i $SNAP
+      ./build.sh -i $SNAP 
       make DESTDIR=$SNAPCRAFT_PART_INSTALL install
     build-packages:
       - build-essential
@@ -40,7 +43,39 @@ apps:
     command: zcc
     environment:
       ZCCCFG: "$SNAP/share/z88dk/lib/config"
+    plugs: [home, removable-media]
   z88dk-z80asm:
     command: z88dk-z80asm
+    plugs: [home, removable-media]
+  z88dk-dis:
+    command: z88dk-dis
+    plugs: [home, removable-media]
+  z88dk-ticks:
+    command: z88dk-ticks
+    plugs: [home, removable-media]
+  z88dk-zx7:
+    command: z88dk-zx7
+    plugs: [home, removable-media]
+  z88dk-dzx7:
+    command: z88dk-dzx7
+    plugs: [home, removable-media]
+  z88dk-lib:
+    command: z88dk-lib
+    plugs: [home, removable-media]
+  z88dk-z80nm:
+    command: z88dk-z80nm
+    plugs: [home, removable-media]
+  z88dk-zobjcopy:
+    command: bin/z88dk-zobjcopy
+    plugs: [home, removable-media]
+  z88dk-basck:
+    command: bin/z88dk-basck
+    plugs: [home, removable-media]
+  z88dk-z80svg:
+    command: bin/z88dk-z80svg
+    plugs: [home, removable-media]
+  z88dk-font2pv1000:
+    command: bin/z88dk-font2pv1000
+    plugs: [home, removable-media]
 
 
