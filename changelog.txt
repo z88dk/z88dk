@@ -35,7 +35,7 @@ Detailed but incomplete changelist:
 - [sccz80] Support added for Am9511 32 bit floating point numbers
 - [z80asm] Linking speed cleanup
 - [z80asm] db/dw/ds etc synonyms are now accepted
-- [zsdcc] Upgraded to SDCC 4.0.2 r11722 (bugfixes)
+- [zsdcc] Upgraded to SDCC 4.0.3 r11869 (bugfixes)
 
 z88dk v2.0 - 03.02.2020
 
