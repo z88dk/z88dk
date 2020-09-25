@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.2 #11722 (Linux)
+; Version 4.0.3 #11868 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -438,8 +438,7 @@ _m32_log2f:
 	push	hl
 	push	hl
 	call	___fslt_callee
-	ld	a, l
-	or	a, a
+	bit	0,l
 	jr	NZ,l_m32_log2f_00102
 	ld	de,0xff00
 	ld	hl,0x0000
