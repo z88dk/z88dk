@@ -155,9 +155,14 @@ install: install-clean
 	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/z80nm PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/zobjcopy PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/ticks PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/z88dk-lib PREFIX=$(DESTDIR) install
 	$(MAKE) -C support/graphics PREFIX=$(DESTDIR) install
+	$(MAKE) -C support/basck PREFIX=$(DESTDIR) install
+	$(MAKE) -C support/pv1000 PREFIX=$(DESTDIR) install
+	if [ -f bin/zsdcpp$(EXESUFFIX) ]; then cp bin/zsdcpp$(EXESUFFIX) $(DESTDIR)/bin/; fi
+	if [ -f bin/zsdcc$(EXESUFFIX) ]; then cp bin/zsdcc$(EXESUFFIX) $(DESTDIR)/bin/; fi
 	cp -r include $(prefix_share)/
 	cp -r lib $(prefix_share)/
 	cp -r libsrc $(prefix_share)/
