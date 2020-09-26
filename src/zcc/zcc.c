@@ -640,8 +640,7 @@ static char *changesuffix(char *name, char *suffix)
     return (r);
 }
 
-int
-process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum iostyle ios, int number, int needsuffix, int src_is_original)
+int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum iostyle ios, int number, int needsuffix, int src_is_original)
 {
     int             status, errs;
     int             tstore;
@@ -1148,15 +1147,26 @@ int main(int argc, char **argv)
     /* This nastiness is marked "HACK" in the loop below.  Maybe something better will come along later.         */
 
     /* Parse through the files, handling each one in turn */
-    for (i = 1; (i <= nfiles) && (i != 0); i += (i != 0))  /* HACK 1 OF 2 */
-    {
+    for (i = 1; (i <= nfiles) && (i != 0); i += (i != 0)) { /* HACK 1 OF 2 */
+        char   temp_filename[FILENAME_MAX+1];
+        char   *ext;
+
         if (i == nfiles) i = 0;                            /* HACK 2 OF 2 */
         if (verbose) printf("\nPROCESSING %s\n", original_filenames[i]);
     SWITCH_REPEAT:
         switch (get_filetype_by_suffix(filelist[i]))
         {
         case M4FILE:
-            if (process(".m4", "", "m4", (m4arg == NULL) ? "" : m4arg, filter, i, YES, YES))
+            // Strip off the .m4 suffix and find the underlying extension
+            snprintf(temp_filename,sizeof(temp_filename),"%s", filelist[i]);
+            ext = find_file_ext(temp_filename);
+            if ( ext != NULL ) {
+                *ext = 0;
+                ext = find_file_ext(temp_filename);
+            }
+            if ( ext == NULL) ext = "";
+
+            if (process(".m4", ext, "m4", (m4arg == NULL) ? "" : m4arg, filter, i, YES, YES))
                 exit(1);
             /* Disqualify recursive .m4 extensions */
             ft = get_filetype_by_suffix(filelist[i]);
@@ -1164,18 +1174,6 @@ int main(int argc, char **argv)
                 fprintf(stderr, "Cannot process recursive .m4 file %s\n", original_filenames[i]);
                 exit(1);
             }
-            /* Write processed file to original source location immediately */
-            ptr = stripsuffix(original_filenames[i], ".m4");
-            if (copy_file(filelist[i], "", ptr, "")) {
-                fprintf(stderr, "Couldn't write output file %s\n", ptr);
-                exit(1);
-            }
-            /* Copied file becomes the new original file */
-            free(original_filenames[i]);
-            free(filelist[i]);
-            original_filenames[i] = ptr;
-            filelist[i] = muststrdup(ptr);
-            /* No more processing for .h and .inc files */
             ft = get_filetype_by_suffix(filelist[i]);
             if ((ft == HDRFILE) || (ft == INCFILE)) continue;
             /* Continue processing macro expanded source file */
