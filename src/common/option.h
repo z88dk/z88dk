@@ -3,6 +3,7 @@
 #define OPTION_H
 
 #include <sys/types.h>
+#include <inttypes.h>
 
 #define OPT_BOOL         1      // Assign the value to true
 #define OPT_BOOL_FALSE   2      // Assign the value to false
