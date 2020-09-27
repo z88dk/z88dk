@@ -2066,7 +2066,7 @@ void conf_opt_code_speed(option *argument, char *arg)
     if ( strstr(arg,"inlineints") != NULL || strstr(arg,"all") != NULL) {
         c_sccz80_inline_ints = 1;
     }
-    zcc_asprintf(&sccz80_arg,"-%s=%s", argument->long_name, arg);
+    zcc_asprintf(&sccz80_arg,"-%s%s=%s", argument->type & OPT_DOUBLE_DASH ? "-" : "",argument->long_name, arg);
     BuildOptions(&sccz80arg, sccz80_arg);
     free(sccz80_arg);
 }
