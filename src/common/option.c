@@ -60,7 +60,10 @@ int option_parse(option *args, int argc, char **argv)
                 if ( !doubledash && strlen(argstart) == 1 && *argstart == myarg->short_name ) {
                     char *val = NULL;
                     if ( (myarg->type & (OPT_BOOL|OPT_BOOL_FALSE|OPT_ASSIGN|OPT_OR)) == 0 ) {
-                        if ( ++i < argc ) {
+                        if ( i+1 < argc ) {
+                            i++;
+                            val = argv[i];
+                        } else if ( myarg->type & OPT_INCLUDE_OPT ) {
                             val = argv[i];
                         } else {
                             fprintf(stderr, "Insufficient number of arguments supplied\n");
@@ -84,7 +87,10 @@ int option_parse(option *args, int argc, char **argv)
                          val = myarg->type & OPT_INCLUDE_OPT ? argv[i] : argstart + strlen(myarg->long_name);
                     } else {
                         /* Otherwise it's the next argument */
-                        if ( ++i < argc ) {
+                        if ( i+1 < argc ) {
+                            i++;
+                            val = argv[i];
+                        } else if ( myarg->type & OPT_INCLUDE_OPT ) {
                             val = argv[i];
                         } else {
                             fprintf(stderr, "Insufficient number of arguments supplied\n");

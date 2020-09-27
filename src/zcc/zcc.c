@@ -502,7 +502,7 @@ static option options[] = {
     { 0, "Cz", OPT_FUNCTION,  "Add an option to appmake" , &appmakeargs, AddToArgs, 0},
    
     { 0, "", OPT_HEADER, "Misc options:", NULL, NULL, 0 },
-    { 'g', NULL, OPT_FUNCTION,  "Generate a global defc file of the final executable (-g -gp -gpf filename)" , &globaldefrefile, GlobalDefc, 0},
+    { 0, "g", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Generate a global defc file of the final executable (-g -gp -gpf filename)" , &globaldefrefile, GlobalDefc, 0},
     { 0, "alias", OPT_FUNCTION,  "Define a command line alias" , NULL, Alias, 0},
     { 0, "lstcwd", OPT_BOOL|OPT_DOUBLE_DASH,  "Paths in .lst files are relative to the current working dir" , &lstcwd, NULL, 0},
     { 0, "custom-copt-rules", OPT_STRING,  "Custom user copt rules" , &c_coptrules_user, NULL, 0},
@@ -1965,38 +1965,28 @@ void BuildAsmLine(char *dest, size_t destlen, char *prefix)
 
 void GlobalDefc(option *argument, char *arg)
 {
-    // TODO:
-    // char *ptr = arg + 1;
+    char *ptr = arg + 1;
 
-    // if (*ptr++ == 'g') {
-    //     /* global defc is on */
-    //     *argument->num_ptr = 0x1;
+    if (*ptr++ == 'g') {
+        /* global defc is on */
+        globaldefon = 0x1;
 
-    //     if (*ptr == 'p') {
-    //         /* make defc symbols public */
-    //         *argument->num_ptr |= 0x2;
-    //         ++ptr;
-    //     }
+        if (*ptr == 'p') {
+            /* make defc symbols public */
+            globaldefon |= 0x2;
+            ++ptr;
+        }
 
-    //     if (*ptr == 'f') {
-    //         /* filename containing regular expressions */
-    //         ++ptr;
-    //         while (isspace(*ptr) || (*ptr == '=') || (*ptr == ':')) ++ptr;
+        if (*ptr == 'f') {
+            /* filename containing regular expressions */
+            ++ptr;
+            while (isspace(*ptr) || (*ptr == '=') || (*ptr == ':')) ++ptr;
 
-    //         if (*ptr != 0) {
-    //             *(char **)argument->data = muststrdup(ptr);
-    //         } else {
-    //             /* try following argument for filename */
-    //             if ((gargc + 1) < max_argc && gargv[gargc + 1][0] != '-') {
-    //                 /* Aha...non option comes next... */
-    //                 gargc++;
-    //                 *(char **)argument->data = muststrdup(gargv[gargc]);
-    //             } else {
-    //                 /* No option given.. */
-    //             }
-    //         }
-    //     }
-    // }
+            if (*ptr != 0) {
+                globaldefrefile = muststrdup(ptr);
+            }
+        }
+    }
 }
 
 
