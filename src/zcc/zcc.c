@@ -445,10 +445,10 @@ static option options[] = {
 
     { 0, "", OPT_HEADER, "Lifecycle options:", NULL, NULL, 0 },
     { 0, "m4", OPT_BOOL,  "Stop after processing m4 files" , &m4only, NULL, 0},
-    { 'E', "preprocess-only", OPT_BOOL,  "Stop after preprocessing files" , &preprocessonly, NULL, 0},
-    { 'c', "compile-only", OPT_BOOL,  "Stop after compiling .c .s .asm files to .o files" , &compileonly, NULL, 0},
-    { 'a', "assemble-only", OPT_BOOL,  "Stop after compiling .c .s files to .asm files" , &assembleonly, NULL, 0},
-    { 'S', "assemble-only", OPT_BOOL,  "Stop after compiling .c .s files to .asm files" , &assembleonly, NULL, 0},
+    { 'E', "preprocess-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after preprocessing files" , &preprocessonly, NULL, 0},
+    { 'c', "compile-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after compiling .c .s .asm files to .o files" , &compileonly, NULL, 0},
+    { 'a', "assemble-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after compiling .c .s files to .asm files" , &assembleonly, NULL, 0},
+    { 'S', "assemble-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after compiling .c .s files to .asm files" , &assembleonly, NULL, 0},
     { 'x', NULL, OPT_BOOL,  "Make a library out of source files" , &makelib, NULL, 0},
     { 0, "create-app", OPT_BOOL,  "Run appmake on the resulting binary to create emulator usable file" , &createapp, NULL, 0},
 
