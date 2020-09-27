@@ -90,7 +90,7 @@ static option  sccz80_opts[] = {
     { 0, "mgbz80", OPT_ASSIGN|OPT_INT, "Generate output for the Gameboy Z80", &c_cpu, NULL, CPU_GBZ80 },
     { 0, "", OPT_HEADER, "Code generation options", NULL, NULL, 0 },
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, NULL, 0 },
-    { 0, "disable-builtins", OPT_BOOL, "Disable builtin functions",&c_disable_builtins, NULL, 0},
+    { 0, "disable-builtins", OPT_BOOL|OPT_DOUBLE_DASH, "Disable builtin functions",&c_disable_builtins, NULL, 0},
     { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, NULL, 0 },
     { 0, "math-z88", OPT_ASSIGN|OPT_INT, "(deprecated) Make FP constants match z88", &c_maths_mode, NULL, MATHS_Z88 },
 
@@ -107,13 +107,13 @@ static option  sccz80_opts[] = {
     { 0, "noaltreg", OPT_BOOL, "Try not to use the alternative register set", &c_notaltreg, NULL, 0 },
     { 0, "standard-escape-chars", OPT_BOOL, "Use standard mappings for \\r and \\n", &c_standard_escapecodes, NULL, 0},
     { 0, "set-r2l-by-default", OPT_BOOL, "Use r->l calling convention by default", &c_use_r2l_calling_convention, NULL, 0 },
-    { 0, "constseg", OPT_STRING, "=<name> Set the const section name", &c_rodata_section, NULL, 0 },
-    { 0, "codeseg", OPT_STRING, "=<name> Set the code section name", &c_code_section, NULL, 0 },
-    { 0, "bssseg", OPT_STRING, "=<name> Set the bss section name", &c_bss_section, NULL, 0 },
-    { 0, "dataseg", OPT_STRING, "=<name> Set the data section name", &c_data_section, NULL, 0 },
-    { 0, "initseg", OPT_STRING, "=<name> Set the initialisation section name", &c_init_section, NULL, 0 },
+    { 0, "constseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the const section name", &c_rodata_section, NULL, 0 },
+    { 0, "codeseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the code section name", &c_code_section, NULL, 0 },
+    { 0, "bssseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the bss section name", &c_bss_section, NULL, 0 },
+    { 0, "dataseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the data section name", &c_data_section, NULL, 0 },
+    { 0, "initseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the initialisation section name", &c_init_section, NULL, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, NULL, 0 },
-    { 0, "opt-code-speed", OPT_FUNCTION|OPT_STRING, "Optimise for speed not size", NULL, opt_code_speed, 0},
+    { 0, "opt-code-speed", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "Optimise for speed not size", NULL, opt_code_speed, 0},
 #ifdef USEFRAME
     { 0, "", OPT_HEADER, "Framepointer configuration:", NULL, NULL, 0 },
     { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, NULL, 1},
@@ -123,7 +123,7 @@ static option  sccz80_opts[] = {
 
     { 0, "", OPT_HEADER, "Error/warning handling:", NULL, NULL, 0 },
     { 0, "stop-on-error", OPT_BOOL, "Stop on any error", &c_errstop, NULL, 0 },
-    { 0, "old-diagnostic-format", OPT_BOOL, "Use old style diagnostic messages", &c_old_diagnostic_fmt, NULL, 0 },
+    { 0, "old-diagnostic-format", OPT_BOOL|OPT_DOUBLE_DASH, "Use old style diagnostic messages", &c_old_diagnostic_fmt, NULL, 0 },
 #if 0
     { 0, "Wnone", OPT_FUNCTION|OPT_BOOL, "Disable all warnings", NULL, SetNoWarn, 0 },
     { 0, "Wall", OPT_FUNCTION|OPT_BOOL, "Enable all warnings", NULL, SetAllWarn, 0 },
@@ -136,7 +136,6 @@ static option  sccz80_opts[] = {
     { 0, "ext", OPT_STRING, "=<ext> Set the file extension for the generated output", &c_output_extension, NULL, 0 },
     { 0, "D", OPT_FUNCTION, "Define a preprocessor directive", NULL, SetDefine, 0 },
     { 0, "U", OPT_FUNCTION, "Undefine a preprocessor directive", NULL, SetUndefine, 0 },
-    { 0, "", OPT_HEADER, "All options can be prefixed with either a single or double -", NULL, NULL, 0},
     { 0, "", OPT_HEADER, "Assignments can either be = or as next argument", NULL, NULL, 0},
     { 0 }
 };
