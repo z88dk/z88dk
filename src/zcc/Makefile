@@ -10,10 +10,10 @@ INSTALL ?= install
 
 INCLUDES += -I. -I../copt -I../common
 
-CFLAGS += -DLOCAL_REGEXP -Wall -pedantic
+CFLAGS += -DLOCAL_REGEXP -Wall -pedantic -g
 
 OBJS = zcc.o
-REGEX_OBJS = ../copt/regex/regcomp.o  ../copt/regex/regerror.o ../copt/regex/regexec.o  ../copt/regex/regfree.o ../common/dirname.c
+REGEX_OBJS = ../copt/regex/regcomp.o  ../copt/regex/regerror.o ../copt/regex/regexec.o  ../copt/regex/regfree.o ../common/dirname.c ../common/option.c
 
 OBJS += $(REGEX_OBJS)
 

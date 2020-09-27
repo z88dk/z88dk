@@ -31,13 +31,14 @@ OBJS =	callfunc.o     	\
 	stmt.o		\
 	sym.o		\
 	while.o 	\
-	declparse.o
+	declparse.o	\
+	../common/option.o
 
 DEPENDS := $(OBJS:.o=.d)
 
 all: sccz80$(EXESUFFIX)
 
-CFLAGS += -MMD -Wall -I../../ext/uthash/src/ -g -pedantic -std=gnu99
+CFLAGS += -MMD -Wall -I../common -I../../ext/uthash/src/ -g -pedantic -std=gnu99
 
 sccz80$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS) -lm
