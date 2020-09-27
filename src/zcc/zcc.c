@@ -430,7 +430,7 @@ static option options[] = {
     { 0, "clib", OPT_STRING,  "Set the target clib type" , &c_clib, NULL, 0},
     { 0, "crt0", OPT_STRING,  "Override the crt0 assembler file to use" , &c_crt0, NULL, 0},
     { 0, "startuplib", OPT_STRING,  "Override STARTUPLIB - compiler base support routines" , &c_startuplib, NULL, 0},
-    { 0, "-no-crt", OPT_BOOL,  "Link without crt0 file" , &c_nocrt, NULL, 0},
+    { 0, "no-crt", OPT_BOOL|OPT_DOUBLE_DASH,  "Link without crt0 file" , &c_nocrt, NULL, 0},
     { 0, "startup", OPT_INT,  "Set the startup type" , &c_startup, NULL, 0},
     { 0, "startupoffset", OPT_INT|OPT_PRIVATE,  "Startup offset value (internal)" , &c_startupoffset, NULL, 0},
     { 0, "zorg", OPT_INT,  "Set the origin (only certain targets)" , &c_zorg, NULL, 0},
@@ -1111,7 +1111,7 @@ int main(int argc, char **argv)
 
         fclose(fp);
     }
-
+    printf("----> NOCRT = %d\n",c_nocrt);
     /* Activate target's crt file */
     if ((c_nocrt == 0) && build_bin) {
         /* append target crt to end of filelist */
