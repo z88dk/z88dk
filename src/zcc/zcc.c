@@ -1111,7 +1111,6 @@ int main(int argc, char **argv)
 
         fclose(fp);
     }
-    printf("----> NOCRT = %d\n",c_nocrt);
     /* Activate target's crt file */
     if ((c_nocrt == 0) && build_bin) {
         /* append target crt to end of filelist */
