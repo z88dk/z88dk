@@ -35,6 +35,13 @@ endif
 
 Z88DK_PATH	= $(shell pwd)
 SDCC_PATH	= $(Z88DK_PATH)/src/sdcc-build
+SDCC_VERSION    = 11722
+
+ifdef BUILD_SDCC
+ifdef BUILD_SDCC_HTTP
+SDCC_DEPS = zsdcc_r$(SDCC_VERSION)_src.tar.gz
+endif
+endif
 
 # --> End of Configurable Options
 
@@ -71,11 +78,21 @@ src/config.h:
 	@mkdir -p bin
 
 
-bin/zsdcc$(EXESUFFIX):
+$(SDCC_PATH)/configure: $(SDCC_DEPS)
+ifdef BUILD_SDCC_HTTP
+	tar xzf $^
+	touch $@
+else
+	svn checkout -r $(SDCC_VERSION) https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH) 
+	patch -d $(SDCC_PATH) -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
+endif
+
+zsdcc_r$(SDCC_VERSION)_src.tar.gz:
+	curl http://nightly/zsdcc/zsdcc_r$(SDCC_VERSION)_src.tar.gz -o zsdcc_r$(SDCC_VERSION)_src.tar.gz
+
+
+$(SDCC_PATH)/Makefile: $(SDCC_PATH)/configure
 ifdef BUILD_SDCC
-	$(RM) -r $(SDCC_PATH)
-	svn checkout -r 11722 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
-	cd $(SDCC_PATH) && patch -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 	cd $(SDCC_PATH) && CC=$(OCC) ./configure \
 		--disable-ds390-port --disable-ds400-port \
 		--disable-hc08-port --disable-s08-port --disable-mcs51-port \
@@ -84,11 +101,21 @@ ifdef BUILD_SDCC
 		--disable-pdk13-port --disable-pdk14-port \
 		--disable-pdk15-port --disable-pdk16-port \
 		--disable-ucsim --disable-device-lib --disable-packihx
-	cd $(SDCC_PATH) && $(MAKE)
-	cd $(SDCC_PATH) && mv ./bin/sdcc  $(Z88DK_PATH)/bin/zsdcc
-	cd $(SDCC_PATH) && mv ./bin/sdcpp $(Z88DK_PATH)/bin/zsdcpp
-	$(RM) -fR $(SDCC_PATH)
 endif
+
+
+$(SDCC_PATH)/bin/sdcc: $(SDCC_PATH)/Makefile
+ifdef BUILD_SDCC
+	$(MAKE) -C $(SDCC_PATH)
+endif
+
+
+bin/zsdcc$(EXESUFFIX): $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)
+ifdef BUILD_SDCC
+	cp $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/zsdcc$(EXESUFFIX)
+	cp $(SDCC_PATH)/bin/sdcpp$(EXESUFFIX) $(Z88DK_PATH)/bin/zsdcpp$(EXESUFFIX)
+endif
+
 
 bin/z88dk-appmake$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/appmake PREFIX=`pwd` install
@@ -215,6 +242,11 @@ clean-bins:
 	$(MAKE) -C testsuite clean
 	$(MAKE) -C src/z88dk-lib clean
 	$(RM) -r $(SDCC_PATH)
+ifdef BUILD_SDCC
+ifdef BUILD_SDCC_HTTP
+	$(RM) $(SDCC_DEPS)
+endif
+endif
 	#if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
 
 .PHONY: test testsuite
