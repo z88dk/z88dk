@@ -4,6 +4,17 @@
 
 Z88DK is a collection of software development tools that targets the 8080 and z80 family of machines.  It allows development of programs in C, assembly language or any mixture of the two.  What makes z88dk unique is its ease of use, built-in support for many z80 machines and its extensive set of assembly language library subroutines implementing the C standard and extensions.
 
+## INSTALLATION
+
+There are several ways to install z88dk.
+
+1. Use the [Most Recent Official Release](https://github.com/z88dk/z88dk/releases) currently 2.0 dated 3 Feb 2020.  Follow these [installation instructions](https://github.com/z88dk/z88dk/wiki/installation).
+2. Get the [Nightly Build](http://nightly.z88dk.org/).  Every night we build complete binary packages for windows and osx and generate source packages for everyone else.  The same [installation instructions](https://github.com/z88dk/z88dk/wiki/installation) apply.  Using a nightly build means you can keep up with bugfixes and new features rather than having to wait an entire year for a release to occur.
+3. Use the [Nightly Docker image](https://github.com/z88dk/z88dk/wiki/Docker-Usage)
+4. Use the Snap package on Linux (coming soon)
+5. Use GitHub and build yourself. The z88dk repository uses git submodules, these are not automatically downloaded by git by default so you will have to either adjust your clone line, or retrieve them manually. To clone with submodules use `git clone --recursive https://github.com/z88dk/z88dk.git`. To add the submodules to an already existing clone use `git submodule update --init --recursive`. To build the following [instructions](https://github.com/z88dk/z88dk/wiki/installation#linux--unix) should be followed.
+
+
 ## THE TOOLS
 
 Many tools have a ` z88dk-` prefix to distinguish them from tools from other packages that may be installed with the same name. The documentation
@@ -38,16 +49,6 @@ The assembly language libraries supplied by z88dk give it performance advantages
 * **Sieve of Eratosthenes**  Popular benchmark for small machine compilers because just about everything is able to compile it.  As a benchmark it doesn't reveal much more than loop overhead.
 * **Whetstone 1.2**  Whetstone is a common synthetic floating point benchmark.
 * **Program Size**  Program size has great importance for small machines.  A collection of test programs were compiled for the common cp/m target and resulting binary sizes were compared.
-
-## INSTALLATION
-
-There are several ways to install z88dk.
-
-1. Use the [Most Recent Official Release](https://github.com/z88dk/z88dk/releases) currently 2.0 dated 3 Feb 2020.  Follow these [installation instructions](https://github.com/z88dk/z88dk/wiki/installation).
-2. Get the [Nightly Build](http://nightly.z88dk.org/).  Every night we build complete binary packages for windows and osx and generate source packages for everyone else.  The same [installation instructions](https://github.com/z88dk/z88dk/wiki/installation) apply.  Using a nightly build means you can keep up with bugfixes and new features rather than having to wait an entire year for a release to occur.
-3. Use the [Nightly Docker image](https://github.com/z88dk/z88dk/wiki/Docker-Usage)
-4. Use the Snap package on Linux (coming soon)
-5. Use GitHub and build yourself. The z88dk repository uses git submodules, these are not automatically downloaded by git by default so you will have to either adjust your clone line, or retrieve them manually. To clone with submodules use `git clone --recursive https://github.com/z88dk/z88dk.git`. To add the submodules to an already existing clone use `git submodule update --init --recursive`. To build the following [instructions](https://github.com/z88dk/z88dk/wiki/installation#linux--unix) should be followed.
 
 ## USING Z88DK
 
