@@ -79,6 +79,7 @@ src/config.h:
 
 
 $(SDCC_PATH)/configure: $(SDCC_DEPS)
+ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
 	tar xzf $^
 	touch $@
@@ -86,9 +87,10 @@ else
 	svn checkout -r $(SDCC_VERSION) https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH) 
 	patch -d $(SDCC_PATH) -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 endif
+endif
 
 zsdcc_r$(SDCC_VERSION)_src.tar.gz:
-	curl http://nightly/zsdcc/zsdcc_r$(SDCC_VERSION)_src.tar.gz -o zsdcc_r$(SDCC_VERSION)_src.tar.gz
+	curl http://nightly.z88dk.org/zsdcc/zsdcc_r$(SDCC_VERSION)_src.tar.gz -o zsdcc_r$(SDCC_VERSION)_src.tar.gz
 
 
 $(SDCC_PATH)/Makefile: $(SDCC_PATH)/configure
