@@ -26,8 +26,6 @@ parts:
       snapcraftctl pull
       version="$(git rev-list --count HEAD)-$(git rev-parse --short HEAD)-$(date +%Y%m%d)"
       snapcraftctl set-version "$version"
-    build-environment:
-      - BUILD_SDCC: "1"
     override-build: |
       ./build.sh -i $SNAP 
       make DESTDIR=$SNAPCRAFT_PART_INSTALL install
