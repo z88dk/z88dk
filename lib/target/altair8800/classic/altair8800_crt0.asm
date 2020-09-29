@@ -21,7 +21,7 @@
 
 
         defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = 65280
+        defc    TAR__register_sp = 0xffff
 	defc	CRT_KEY_DEL = 127
 	defc	__CPU_CLOCK = 2000000
         INCLUDE "crt/classic/crt_rules.inc"
@@ -123,6 +123,17 @@ cleanup:
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
+IFNDEF CRT_ORG_BSS
+        defc CRT_ORG_BSS = $C000   ; Ram variables are kept in RAM in high memory
+ENDIF
+        defc    __crt_org_bss = CRT_ORG_BSS
+
+        ; If we were given a model then use it
+        IFDEF CRT_MODEL
+            defc __crt_model = CRT_MODEL
+        ELSE
+            defc __crt_model = 1
+        ENDIF
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm" 
 	
