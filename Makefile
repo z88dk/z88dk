@@ -25,7 +25,6 @@ INSTALL ?= install
 CFLAGS ?= -O2
 CC ?= gcc
 # Prefix for executables (eg z88dk-, hence z88dk-z80asm, z88dk-copt etc)
-EXEC_PREFIX ?=
 CROSS ?= 0
 
 ifneq (, $(shell which ccache))
@@ -45,7 +44,7 @@ endif
 
 # --> End of Configurable Options
 
-export CC INSTALL CFLAGS EXEC_PREFIX CROSS
+export CC INSTALL CFLAGS CROSS
 
 BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(EXESUFFIX) \
 	bin/z88dk-ucpp$(EXESUFFIX) bin/sccz80$(EXESUFFIX) bin/z88dk-z80asm$(EXESUFFIX) \
@@ -66,13 +65,11 @@ src/config.h:
 	$(shell if [ "${git_count}" != "" ]; then \
 		echo '#define PREFIX "${prefix_share}"' > src/config.h; \
 		echo '#define UNIX 1' >> src/config.h; \
-		echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h; \
 		echo '#define Z88DK_VERSION "${git_count}-${git_rev}-${version}"' >> src/config.h; \
 	fi)
 	$(shell if [ ! -f src/config.h ]; then \
 		echo '#define PREFIX "${prefix_share}"' > src/config.h; \
 		echo '#define UNIX 1' >> src/config.h; \
-		echo '#define EXEC_PREFIX "${EXEC_PREFIX}"' >> src/config.h; \
 		echo '#define Z88DK_VERSION "unknown-unknown-${version}"' >> src/config.h; \
 		fi)
 	@mkdir -p bin

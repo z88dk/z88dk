@@ -44,7 +44,7 @@ sccz80$(EXESUFFIX): $(OBJS)
 	$(CC) $(LDFLAGS) -o sccz80$(EXESUFFIX) $(OBJS) -lm
 
 install: sccz80$(EXESUFFIX)
-	$(INSTALL) -m 755 sccz80$(EXESUFFIX) $(PREFIX)/bin/$(EXEC_PREFIX)sccz80$(EXESUFFIX)
+	$(INSTALL) -m 755 sccz80$(EXESUFFIX) $(PREFIX)/bin/sccz80$(EXESUFFIX)
 
 clean :
 	$(RM) *.o *~ core sccz80$(EXESUFFIX)
