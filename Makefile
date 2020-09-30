@@ -73,7 +73,7 @@ src/config.h:
 
 bin/zsdcc$(EXESUFFIX):
 ifdef BUILD_SDCC
-	svn checkout -r 11869 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
+	svn checkout -r 11877 https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
 	cd $(SDCC_PATH) && patch -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 	cd $(SDCC_PATH) && CC=$(OCC) ./configure \
 		--disable-ds390-port --disable-ds400-port \
@@ -82,6 +82,7 @@ ifdef BUILD_SDCC
 		--disable-tlcs90-port --disable-xa51-port --disable-stm8-port \
 		--disable-pdk13-port --disable-pdk14-port \
 		--disable-pdk15-port --disable-pdk16-port \
+		--disable-r2k-port --disable-r3ka-port \
 		--disable-ucsim --disable-device-lib --disable-packihx
 	cd $(SDCC_PATH) && $(MAKE)
 	cd $(SDCC_PATH) && mv ./bin/sdcc  $(Z88DK_PATH)/bin/zsdcc
