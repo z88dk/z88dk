@@ -82,7 +82,6 @@ ifdef BUILD_SDCC
 		--disable-tlcs90-port --disable-xa51-port --disable-stm8-port \
 		--disable-pdk13-port --disable-pdk14-port \
 		--disable-pdk15-port --disable-pdk16-port \
-		--disable-r2k-port --disable-r3ka-port \
 		--disable-ucsim --disable-device-lib --disable-packihx
 	cd $(SDCC_PATH) && $(MAKE)
 	cd $(SDCC_PATH) && mv ./bin/sdcc  $(Z88DK_PATH)/bin/zsdcc
