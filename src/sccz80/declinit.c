@@ -344,23 +344,46 @@ constdecl:
                     dofloat(MATHS_IEEE16, value, fa);
                     defword();
                     outdec(fa[1] << 8 | fa[0]);
-                } else if (type->kind == KIND_LONG ){
+                } else if (type->kind == KIND_LONGLONG ){
+                    uint32_t val = (uint32_t)((int64_t)value & 0xffffffff);
                     /* there appears to be a bug in z80asm regarding defq */
                     defbyte();
-                    outdec(((uint32_t)value % 65536UL) % 256);
+                    outdec(((uint32_t)val % 65536UL) % 256);
                     outbyte(',');
-                    outdec(((uint32_t)value % 65536UL) / 256);
+                    outdec(((uint32_t)val % 65536UL) / 256);
                     outbyte(',');
-                    outdec(((uint32_t)value / 65536UL) % 256);
+                    outdec(((uint32_t)val / 65536UL) % 256);
                     outbyte(',');
-                    outdec(((uint32_t)value / 65536UL) / 256);
-                } else if (type->kind == KIND_CPTR) {
+                    outdec(((uint32_t)val / 65536UL) / 256);
+                    nl();
+                    val = (uint32_t)(((int64_t)value >> 32) & 0xffffffff);
                     defbyte();
-                    outdec(((uint32_t)value % 65536UL) % 256);
+                    outdec(((uint32_t)val % 65536UL) % 256);
                     outbyte(',');
-                    outdec(((uint32_t)value % 65536UL) / 256);
+                    outdec(((uint32_t)val % 65536UL) / 256);
                     outbyte(',');
-                    outdec(((uint32_t)value / 65536UL) % 256);
+                    outdec(((uint32_t)val / 65536UL) % 256);
+                    outbyte(',');
+                    outdec(((uint32_t)val / 65536UL) / 256);
+                } else if (type->kind == KIND_LONG ){
+                    uint32_t val = (int32_t)(int64_t)value;
+                    /* there appears to be a bug in z80asm regarding defq */
+                    defbyte();
+                    outdec(((uint32_t)val % 65536UL) % 256);
+                    outbyte(',');
+                    outdec(((uint32_t)val % 65536UL) / 256);
+                    outbyte(',');
+                    outdec(((uint32_t)val / 65536UL) % 256);
+                    outbyte(',');
+                    outdec(((uint32_t)val / 65536UL) / 256);
+                } else if (type->kind == KIND_CPTR) {
+                    uint32_t val = (int32_t)(int64_t)value;
+                    defbyte();
+                    outdec(((uint32_t)val % 65536UL) % 256);
+                    outbyte(',');
+                    outdec(((uint32_t)val % 65536UL) / 256);
+                    outbyte(',');
+                    outdec(((uint32_t)val / 65536UL) % 256);
                 } else {
                     if (type->kind == KIND_CHAR ) 
                         defbyte();
