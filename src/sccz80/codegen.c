@@ -1958,8 +1958,9 @@ static int add_to_high_word(int64_t value)
     return 1; // Handled it
 }
 
-void zadd_const(LVALUE *lval, int64_t value)
+void zadd_const(LVALUE *lval, int64_t value64)
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONGLONG ) {
         // TODO: If 2 <= value <= 255 then there's a libsrc call to add a
         if ( value == 1 ) {
@@ -1968,7 +1969,7 @@ void zadd_const(LVALUE *lval, int64_t value)
             inc(lval);
         } else if ( value != 0 ) {
             llpush();       
-            vllongconst(value);
+            vllongconst(value64);
             zadd(lval);
         }
         return;
@@ -2179,11 +2180,12 @@ void mult(LVALUE* lval)
     }
 }
 
-void mult_const(LVALUE *lval, int64_t value)
+void mult_const(LVALUE *lval, int64_t value64)
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONGLONG ) {
         int c = 0;
-        int64_t p = value;
+        int64_t p = value64;
         // Determine if it's a power of two:
         while (((p & 1) == 0) && p > 1) { /* While x is even and > 1 */
             c++;
@@ -2293,11 +2295,12 @@ static void add_if_negative(LVALUE *lval, int32_t toadd)
     postlabel(label);
 }
 
-void zdiv_const(LVALUE *lval, int64_t value)
+void zdiv_const(LVALUE *lval, int64_t value64)
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONGLONG ) {
         llpush();       
-        vllongconst(value);
+        vllongconst(value64);
         zdiv(lval);
         return;
     } else if ( lval->val_type == KIND_LONG && ulvalue(lval) ) {
@@ -2461,9 +2464,10 @@ void negate_if_negative(LVALUE *lval, int64_t value)
     postlabel(label);
 }
 
-void zmod_const(LVALUE *lval, int64_t value)
+void zmod_const(LVALUE *lval, int64_t value64)
 {
     LVALUE  templval={0};
+    int32_t value = (int32_t)value64;
 
     templval.val_type = KIND_INT;
     if ( ulvalue(lval) ) 
@@ -2493,7 +2497,7 @@ void zmod_const(LVALUE *lval, int64_t value)
         }
     } else if ( lval->val_type == KIND_LONGLONG) {
         llpush();
-        vllongconst(value);
+        vllongconst(value64);
         zmod(lval);
         return;        
     }
@@ -2652,11 +2656,12 @@ int zor_handle_pow2(int64_t value)
 }
 
 
-void zor_const(LVALUE *lval, int64_t value)
+void zor_const(LVALUE *lval, int64_t value64)
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONGLONG ) {
         llpush();
-        vllongconst(value);
+        vllongconst(value64);
         zor(lval);
     } else if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( zor_handle_pow2(value) ) {
@@ -2719,11 +2724,12 @@ void zxor(LVALUE *lval)
     }
 }
 
-void zxor_const(LVALUE *lval, int64_t value)
+void zxor_const(LVALUE *lval, int64_t value64)
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONGLONG ) {
         llpush();
-        vllongconst(value);
+        vllongconst(value64);
         zxor(lval);
     } else if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( (value & 0xFFFFFF00) == 0 ) {
@@ -2787,11 +2793,12 @@ void zand(LVALUE* lval)
     }
 }
 
-void zand_const(LVALUE *lval, int64_t value)
+void zand_const(LVALUE *lval, int64_t value64)
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONGLONG ) {
         llpush();
-        vllongconst(value);
+        vllongconst(value64);
         zand(lval);
     } else if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 ) {
@@ -2905,8 +2912,9 @@ void asr(LVALUE* lval)
     }
 }
 
-void asr_const(LVALUE *lval, int64_t value)
+void asr_const(LVALUE *lval, int64_t value64)
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_CHAR && ulvalue(lval) ) {
         int i;
         if ( value == 0 ) {
@@ -3341,8 +3349,9 @@ void asl_16bit_const(LVALUE *lval, int value)
     }
 }
 
-void asl_const(LVALUE *lval, int64_t value)
+void asl_const(LVALUE *lval, int64_t value64)
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR  ) { 
         switch ( value ) {
         case 0: 
@@ -3665,8 +3674,9 @@ void eq0(LVALUE* lval, int label)
 
 
 
-void zeq_const(LVALUE *lval, int64_t value) 
+void zeq_const(LVALUE *lval, int64_t value64) 
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 ) {
             if ( lval->val_type == KIND_CPTR) {
@@ -3734,7 +3744,7 @@ void zeq_const(LVALUE *lval, int64_t value)
         set_carry(lval);
     } else if ( lval->val_type == KIND_LONGLONG) {
         llpush(); 
-        vllongconst(value);
+        vllongconst(value64);
         zeq(lval);
     } else {
         if ( value == 0 ) {
@@ -3819,8 +3829,9 @@ void zeq(LVALUE* lval)
     }
 }
 
-void zne_const(LVALUE *lval, int64_t value) 
+void zne_const(LVALUE *lval, int64_t value64) 
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 ) {
             if ( lval->val_type == KIND_CPTR) {
@@ -3890,7 +3901,7 @@ void zne_const(LVALUE *lval, int64_t value)
         set_carry(lval);
     } else if ( lval->val_type == KIND_LONGLONG) {
         llpush(); 
-        vllongconst(value);
+        vllongconst(value64);
         zne(lval);
     } else {
         if ( value == 0 ) {
@@ -3975,8 +3986,9 @@ void zne(LVALUE* lval)
 }
 
 
-void zlt_const(LVALUE *lval, int64_t value)
+void zlt_const(LVALUE *lval, int64_t value64)
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 ) {
             if ( ulvalue(lval) ) {
@@ -4065,7 +4077,7 @@ void zlt_const(LVALUE *lval, int64_t value)
         }
     } else if ( lval->val_type == KIND_LONGLONG) {
         llpush();
-        vllongconst(value);
+        vllongconst(value64);
         zlt(lval);
     } else {
         const2(value & 0xffff);  // 7 bytes
@@ -4149,8 +4161,9 @@ void zlt(LVALUE* lval)
 
 
 
-void zle_const(LVALUE *lval, int64_t value)
+void zle_const(LVALUE *lval, int64_t value64)
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
        if ( value ==  0 && !IS_808x() ) {
             if ( lval->val_type == KIND_CPTR) {
@@ -4180,7 +4193,7 @@ void zle_const(LVALUE *lval, int64_t value)
         set_carry(lval);
     } else if ( lval->val_type == KIND_LONGLONG) {
         llpush();
-        vllongconst(value);
+        vllongconst(value64);
         zle(lval);
     } else {
         if ( value ==  0 && !IS_808x() ) {
@@ -4278,8 +4291,9 @@ void zle(LVALUE* lval)
     }
 }
 
-void zgt_const(LVALUE *lval, int64_t value)
+void zgt_const(LVALUE *lval, int64_t value64)
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 && ulvalue(lval) ) {
             if ( lval->val_type == KIND_CPTR ) {
@@ -4318,7 +4332,7 @@ void zgt_const(LVALUE *lval, int64_t value)
         set_carry(lval);
     } else if ( lval->val_type == KIND_LONGLONG) {
         llpush();
-        vllongconst(value);
+        vllongconst(value64);
         zgt(lval);
     } else {
         const2(value & 0xffff);  // 7 bytes
@@ -4400,8 +4414,9 @@ void zgt(LVALUE* lval)
 }
 
 
-void zge_const(LVALUE *lval, int64_t value)
+void zge_const(LVALUE *lval, int64_t value64)
 {
+    int32_t value = (int32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 ) {
             if ( ulvalue(lval) ) {
@@ -4431,7 +4446,7 @@ void zge_const(LVALUE *lval, int64_t value)
         }
     } else if ( lval->val_type == KIND_LONGLONG) {
         llpush();
-        vllongconst(value);
+        vllongconst(value64);
         zge(lval);
     } else {
         if ( value == 0 ) {

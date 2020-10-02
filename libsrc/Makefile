@@ -20,6 +20,7 @@ CPMLIBS = cpm_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib
 GENLIBS = z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib  lib3d.lib fastmath.lib preempt.lib sp1-all
 
 
+TOCREATE := $(call check_target,altair8800,altair8800_clib.lib)
 TOCREATE := $(call check_target,ace,ace_clib.lib gfxace.lib gfxaceudg.lib)
 TOCREATE += $(call check_target,abc80,abc80_clib.lib)
 TOCREATE += $(call check_target,abc800,abc800_clib.lib)
@@ -1597,6 +1598,14 @@ vector06c_clib.lib:
 	$(MAKE) -C gfx TARGET=vector06c FLAVOUR=wide
 	$(MAKE) -C games TARGET=vector06c
 	TARGET=vector06c TYPE=8080 $(LIBLINKER) -m8080 -DFORvector06c -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vector06c_clib @$(LISTFILE_DIRECTORY)/vector06c.lst
+
+altair8800_clib.lib:
+	@echo ''
+	@echo '--- Building Altair8800 Library ---'
+	@echo ''
+	$(call buildgeneric,altair8800,portable)
+	TARGET=altair8800 TYPE=8080 $(LIBLINKER) -m8080 -DFORaltair8800 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/altair8800_clib @$(LISTFILE_DIRECTORY)/altair8800.lst
+
 
 dai_clib.lib:
 	@echo ''

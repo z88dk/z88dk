@@ -56,12 +56,24 @@ target/$(1)/obj/config_private.inc: target/$(1)/config.m4
 	m4 -DCFG_C_DEF target/$(1)/config.m4 > target/$(1)/config_$(1).h
 	cp target/$(1)/config_$(1)_private.inc target/$(1)/obj/config_private.inc
 	@if [ "$(1)" = "zx" ]; then \
+		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 > arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm; \
+		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 > arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm; \
+		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm.m4 > arch/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm; \
+		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm.m4 > arch/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm; \
+		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm.m4 > arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm; \
+		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/nirvanam/z80/NIRVANAM_ENGINE.asm.m4 > arch/zx/nirvanam/z80/NIRVANAM_ENGINE.asm; \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" -Cm-Itarget/$(1)/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" -Cm-Itarget/$(1)/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
 		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 	fi;
 	@if [ "$(1)" = "zxn" ]; then \
+		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 > arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm; \
+		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 > arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm; \
+		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm.m4 > arch/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm; \
+		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm.m4 > arch/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm; \
+		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm.m4 > arch/zx/nirvanap/z80/NIRVANAP_ENGINE.asm; \
+		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/nirvanam/z80/NIRVANAM_ENGINE.asm.m4 > arch/zx/nirvanam/z80/NIRVANAM_ENGINE.asm; \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" -Cm-Itarget/$(1)/obj  arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" -Cm-Itarget/$(1)/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \

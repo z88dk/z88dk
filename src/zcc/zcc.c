@@ -26,7 +26,8 @@
 #include        <sys/stat.h>
 #include        "zcc.h"
 #include        "regex/regex.h"
-#include 	"dirname.h"
+#include        "dirname.h"
+#include        "option.h"
 
 #ifdef WIN32
 #include        <direct.h>
@@ -108,27 +109,24 @@ static void            SetNumber(arg_t *argument, char *arg);
 static void            SetStringConfig(arg_t *argument, char *arg);
 static void            LoadConfigFile(arg_t *argument, char *arg);
 static void            parse_cmdline_arg(char *arg);
-static void            SetBoolean(arg_t *arg, char *val);
-static void            AddPreProc(arg_t *arg, char *);
-static void            AddPreProcIncPath(arg_t *arg, char *);
-static void            AddToArgs(arg_t *arg, char *);
-static void            AddToArgsQuoted(arg_t *arg, char *);
-static void            AddToArgsQuotedFull(arg_t *argument, char *arg);
-static void            AddLinkLibrary(arg_t *arg, char *);
-static void            AddLinkSearchPath(arg_t *arg, char *);
+static void            AddPreProc(option *arg, char *);
+static void            AddPreProcIncPath(option *arg, char *);
+static void            AddToArgs(option *arg, char *);
+static void            AddToArgsQuoted(option *arg, char *);
+static void            AddLinkLibrary(option *arg, char *);
+static void            AddLinkSearchPath(option *arg, char *);
 static void            usage(const char *program);
 static void            print_help_text(const char *program);
-static void            SetString(arg_t *arg, char *);
-static void            GlobalDefc(arg_t *argument, char *);
-static void            Alias(arg_t *arg, char *);
-static void            PragmaDefine(arg_t *arg, char *);
-static void            PragmaExport(arg_t *arg, char *);
-static void            PragmaRedirect(arg_t *arg, char *);
-static void            PragmaNeed(arg_t *arg, char *);
-static void            PragmaBytes(arg_t *arg, char *);
-static void            PragmaInclude(arg_t *arg, char *);
+static void            GlobalDefc(option *argument, char *);
+static void            Alias(option *arg, char *);
+static void            PragmaDefine(option *arg, char *);
+static void            PragmaExport(option *arg, char *);
+static void            PragmaRedirect(option *arg, char *);
+static void            PragmaNeed(option *arg, char *);
+static void            PragmaBytes(option *arg, char *);
+static void            PragmaInclude(option *arg, char *);
 static void            AddArray(arg_t *arg, char *);
-static void            OptCodeSpeed(arg_t *arg, char *);
+static void            conf_opt_code_speed(option *arg, char *);
 static void            write_zcc_defined(char *name, int value, int export);
 
 static void           *mustmalloc(size_t);
@@ -249,13 +247,7 @@ static char           *c_clib = NULL;
 static int             c_startup = -2;
 static int             c_startupoffset = -1;
 static int             c_nostdlib = 0;
-static int             mgbz80 = 0;
-static int             m8080 = 0;
-static int             m8085 = 0;
-static int             mz180 = 0;
-static int             mr2k = 0;
-static int             mr3k = 0;
-static int             mz80n = 0;
+static int             c_cpu = 0;
 static int             c_nocrt = 0;
 static char           *c_crt_incpath = NULL;
 static int             processing_user_command_line_arg = 0;
@@ -297,7 +289,7 @@ static char  *c_z80asm_exe = "z88dk-z80asm";
 static char  *c_clang_exe = "zclang";
 static char  *c_llvm_exe = "zllvm-cbe";
 static char  *c_sdcc_exe = "zsdcc";
-static char  *c_sccz80_exe = EXEC_PREFIX "sccz80";
+static char  *c_sccz80_exe = "sccz80";
 static char  *c_cpp_exe = "z88dk-ucpp";
 static char  *c_sdcc_preproc_exe = "zsdcpp";
 static char  *c_zpragma_exe = "z88dk-zpragma";
@@ -417,87 +409,107 @@ static arg_t  config[] = {
     { "", 0, NULL, NULL }
 };
 
+static option options[] = {
+    { 'v', "verbose", OPT_BOOL,  "Output all commands that are run (-vn suppresses)" , &verbose, NULL, 0},
+    { 'h', "help", OPT_BOOL,  "Display this text" , &c_help, NULL, 0},
+    { 0, "o", OPT_STRING,  "Set the basename for linker output files" , &outputfile, NULL, 0},
+    { 0, "specs", OPT_BOOL,  "Print out compiler specs" , &c_print_specs, NULL, 0},
 
-static arg_t     myargs[] = {
-    { "z80-verb", AF_BOOL_TRUE, SetBoolean, &z80verbose, NULL, "Make the assembler more verbose" },
-    { "cleanup",  AF_BOOL_TRUE, SetBoolean, &cleanup, NULL,    "(default) Cleanup temporary files" },
-    { "no-cleanup", AF_BOOL_FALSE, SetBoolean, &cleanup, NULL, "Don't cleanup temporary files" },
-    { "create-app", AF_BOOL_TRUE, SetBoolean, &createapp, NULL, "Run appmake on the resulting binary to create emulator usable file" },
-    { "specs", AF_BOOL_TRUE, SetBoolean, &c_print_specs, NULL, "Print out compiler specs" },
-    { "compiler", AF_MORE, SetString, &c_compiler_type, NULL, "Set the compiler type from the command line (sccz80, sdcc)" },
-    { "m8080", AF_BOOL_TRUE, SetBoolean, &m8080, NULL, "Target the 8080 cpu" },
-    { "m8085", AF_BOOL_TRUE, SetBoolean, &m8085, NULL, "Target the 8085 cpu" },
-    { "mz80n", AF_BOOL_TRUE, SetBoolean, &mz80n, NULL, "Target the ZX Next z80n cpu" },
-    { "mz180", AF_BOOL_TRUE, SetBoolean, &mz180, NULL, "Target the z180 cpu" },
-    { "mgbz80", AF_BOOL_TRUE, SetBoolean, &mgbz80, NULL, "Target the gbz80 cpu" },
-    { "mr2k", AF_BOOL_TRUE, SetBoolean, &mr2k, NULL, "Target the Rabbit 2000 cpu" },
-    { "mr3k", AF_BOOL_TRUE, SetBoolean, &mr3k, NULL, "Target the Rabbit 3000 cpu" },
-    { "crt0", AF_MORE, SetString, &c_crt0, NULL, "Override the crt0 assembler file to use" },
-    { "startuplib", AF_MORE, SetString, &c_startuplib, NULL, "Override STARTUPLIB - compiler base support routines" },
-    { "-no-crt", AF_BOOL_TRUE, SetBoolean, &c_nocrt, NULL, "Link without crt0 file" },
-    { "pragma-redirect",AF_MORE,PragmaRedirect,NULL, NULL, "Redirect a function" },
-    { "pragma-define",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def" },
-    { "pragma-output",AF_MORE,PragmaDefine,NULL, NULL, "Define the option in zcc_opt.def (same as above)" },
-    { "pragma-export",AF_MORE,PragmaExport,NULL, NULL, "Define the option in zcc_opt.def and export as public" },
-    { "pragma-need",AF_MORE,PragmaNeed,NULL, NULL, "NEED the option in zcc_opt.def" },
-    { "pragma-bytes",AF_MORE,PragmaBytes,NULL, NULL, "Dump a string of bytes zcc_opt.def" },
-    { "pragma-include",AF_MORE,PragmaInclude,NULL, NULL, "Process include file containing pragmas" },
-    { "alias",AF_MORE,Alias,NULL, NULL, "Define a command line alias" },
-    { "subtype", AF_MORE, SetString, &c_subtype, NULL, "Set the target subtype" },
-    { "clib", AF_MORE, SetString, &c_clib, NULL, "Set the target clib type" },
-    { "startupoffset", AF_MORE, SetNumber, &c_startupoffset, NULL, "Startup offset value (internal)" },
-    { "startup", AF_MORE, SetNumber, &c_startup, NULL, "Set the startup type" },
-    { "zorg", AF_MORE, SetNumber, &c_zorg, NULL, "Set the origin (only certain targets)" },
-    { "nostdlib", AF_BOOL_TRUE, SetBoolean, &c_nostdlib, NULL, "If set ignore INCPATH, STARTUPLIB" },
-    { "Cm", AF_MORE, AddToArgs, &m4arg, NULL, "Add an option to m4" },
-    { "Cp", AF_MORE, AddToArgs, &cpparg, NULL, "Add an option to the preprocessor" },
-    { "Cc", AF_MORE, AddToArgs, &sccz80arg, NULL, "Add an option to sccz80" },
-    { "Cg", AF_MORE, AddToArgs, &clangarg, NULL, "Add an option to clang" },
-    { "Cs", AF_MORE, AddToArgs, &sdccarg, NULL, "Add an option to sdcc" },
-    { "Ca", AF_MORE, AddToArgsQuoted, &asmargs, NULL, "Add an option to the assembler" },
-    { "Cl", AF_MORE, AddToArgsQuoted, &linkargs, NULL, "Add an option to the linker" },
-    { "Co", AF_MORE, AddToArgs, &llvmopt, NULL, "Add an option to llvm-opt" },
-    { "Cv", AF_MORE, AddToArgs, &llvmarg, NULL, "Add an option to llvm-cbe" },
-    { "Cz", AF_MORE, AddToArgs, &appmakeargs, NULL, "Add an option to appmake" },
-    { "m4", AF_BOOL_TRUE, SetBoolean, &m4only, NULL, "Stop after processing m4 files" },
-    { "clang", AF_BOOL_TRUE, SetBoolean, &clangonly, NULL, "Stop after translating .c files to llvm ir" },
-    { "llvm", AF_BOOL_TRUE, SetBoolean, &llvmonly, NULL, "Stop after llvm-cbe generates new .cbe.c files" },
-    { "E", AF_BOOL_TRUE, SetBoolean, &preprocessonly, NULL, "Stop after preprocessing files" },
-    { "R", AF_BOOL_TRUE, SetBoolean, &relocate, NULL, "Generate relocatable code (deprecated)" },
-    { "-reloc-info", AF_BOOL_TRUE, SetBoolean, &relocinfo, NULL, "Generate binary file relocation information" },
-    { "D", AF_MORE, AddPreProc, NULL, NULL, "Define a preprocessor option" },
-    { "U", AF_MORE, AddPreProc, NULL, NULL, "Undefine a preprocessor option" },
-    { "I", AF_MORE, AddPreProcIncPath, NULL, NULL, "Add an include directory for the preprocessor" },
-    { "iquote", AF_MORE, AddToArgsQuotedFull, &cpparg, NULL, "Add a quoted include path for the preprocessor" },
-    { "isystem", AF_MORE, AddToArgsQuotedFull, &cpparg, NULL, "Add a system include path for the preprocessor" },
-    { "L", AF_MORE, AddLinkSearchPath, NULL, NULL, "Add a library search path" },
-    { "l", AF_MORE, AddLinkLibrary, NULL, NULL, "Add a library" },
-    { "O", AF_MORE, SetNumber, &peepholeopt, NULL, "Set the peephole optimiser setting for copt" },
-    { "SO", AF_MORE, SetNumber, &sdccpeepopt, NULL, "Set the peephole optimiser setting for sdcc-peephole" },
-    { "h", AF_BOOL_TRUE, SetBoolean, &c_help, NULL, "Display this text" },
-    { "v", AF_BOOL_TRUE, SetBoolean, &verbose, NULL, "Output all commands that are run (-vn suppresses)" },
-    { "bn", AF_MORE, SetString, &c_linker_output_file, NULL, "Set the output file for the linker stage" },
-    { "vn", AF_BOOL_FALSE, SetBoolean, &verbose, NULL, "Run the compile stages silently" },
-    { "c", AF_BOOL_TRUE, SetBoolean, &compileonly, NULL, "Stop after compiling .c .s .asm files to .o files" },
-    { "a", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Stop after compiling .c .s files to .asm files" },
-    { "S", AF_BOOL_TRUE, SetBoolean, &assembleonly, NULL, "Stop after compiling .c .s files to .asm files" },
-    { "-lstcwd", AF_BOOL_TRUE, SetBoolean, &lstcwd, NULL, "Paths in .lst files are relative to the current working dir" },
-    { "x", AF_BOOL_TRUE, SetBoolean, &makelib, NULL, "Make a library out of source files" },
-    { "-c-code-in-asm", AF_BOOL_TRUE, SetBoolean, &c_code_in_asm, NULL, "Add C code to .asm files" },
-    { "-opt-code-size", AF_BOOL_TRUE, SetBoolean, &opt_code_size, NULL, "Optimize for code size (sdcc only)" },
-    { "-opt-code-speed", AF_MORE, OptCodeSpeed, NULL, NULL, "Optimize for code speed (sccz80 only)" },
-    { "custom-copt-rules", AF_MORE, SetString, &c_coptrules_user, NULL, "Custom user copy rules" },
-    { "zopt", AF_BOOL_TRUE, SetBoolean, &zopt, NULL, "Enable llvm-optimizer (clang only)" },
-    { "m", AF_BOOL_TRUE, SetBoolean, &mapon, NULL, "Generate an output map of the final executable" },
-    { "g", AF_MORE, GlobalDefc, &globaldefrefile, &globaldefon, "Generate a global defc file of the final executable (-g, -gp, -gpf filename)" },
-    { "s", AF_BOOL_TRUE, SetBoolean, &symbolson, NULL, "Generate a symbol map of the final executable" },
-    { "-list", AF_BOOL_TRUE, SetBoolean, &lston, NULL, "Generate list files" },
-    { "o", AF_MORE, SetString, &outputfile, NULL, "Set the output files" },
-    { "set-r2l-by-default", AF_BOOL_TRUE, SetBoolean, &c_sccz80_r2l_calling, NULL, "(sccz80) Use r2l calling convention by default"},
-    { "+", NO, AddPreProc, NULL, NULL, NULL },                    /* Strips // comments in vcpp */
-    { "-fsigned-char", AF_BOOL_TRUE, SetBoolean, &sdcc_signed_char, NULL, NULL },    /* capture sdcc signed char flag */
-    { "M", AF_BOOL_TRUE, SetBoolean, &swallow_M, NULL, NULL },    /* swallow unsupported -M flag that configs are still generating (causes prob with sdcc) */
-    { "", 0, NULL, NULL }
+    { 0, "", OPT_HEADER, "CPU Targetting:", NULL, NULL, 0 },
+    { 0, "m8080", OPT_ASSIGN|OPT_INT, "Generate output for the i8080", &c_cpu, NULL, CPU_TYPE_8080 },
+    { 0, "m8085", OPT_ASSIGN|OPT_INT, "Generate output for the i8085", &c_cpu, NULL, CPU_TYPE_8085 },
+    { 0, "mz80", OPT_ASSIGN|OPT_INT, "Generate output for the z80", &c_cpu, NULL, CPU_TYPE_Z80 },
+    { 0, "mz80n", OPT_ASSIGN|OPT_INT, "Generate output for the z80n", &c_cpu, NULL, CPU_TYPE_Z80N },
+    { 0, "mz180", OPT_ASSIGN|OPT_INT, "Generate output for the z180", &c_cpu, NULL, CPU_TYPE_Z180 },
+    { 0, "mr2k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 2000", &c_cpu, NULL, CPU_TYPE_R2K },
+    { 0, "mr3k", OPT_ASSIGN|OPT_INT, "Generate output for the Rabbit 3000", &c_cpu, NULL, CPU_TYPE_R3K },
+    { 0, "mgbz80", OPT_ASSIGN|OPT_INT, "Generate output for the Gameboy Z80", &c_cpu, NULL, CPU_TYPE_GBZ80 },
+
+    { 0, "", OPT_HEADER, "Target options:", NULL, NULL, 0 },
+    { 0, "subtype", OPT_STRING,  "Set the target subtype" , &c_subtype, NULL, 0},
+    { 0, "clib", OPT_STRING,  "Set the target clib type" , &c_clib, NULL, 0},
+    { 0, "crt0", OPT_STRING,  "Override the crt0 assembler file to use" , &c_crt0, NULL, 0},
+    { 0, "startuplib", OPT_STRING,  "Override STARTUPLIB - compiler base support routines" , &c_startuplib, NULL, 0},
+    { 0, "no-crt", OPT_BOOL|OPT_DOUBLE_DASH,  "Link without crt0 file" , &c_nocrt, NULL, 0},
+    { 0, "startup", OPT_INT,  "Set the startup type" , &c_startup, NULL, 0},
+    { 0, "startupoffset", OPT_INT|OPT_PRIVATE,  "Startup offset value (internal)" , &c_startupoffset, NULL, 0},
+    { 0, "zorg", OPT_INT,  "Set the origin (only certain targets)" , &c_zorg, NULL, 0},
+    { 0, "nostdlib", OPT_BOOL,  "If set ignore INCPATH, STARTUPLIB", &c_nostdlib, NULL, 0},
+    { 0, "pragma-redirect", OPT_FUNCTION,  "Redirect a function" , NULL, PragmaRedirect, 0},
+    { 0, "pragma-define", OPT_FUNCTION,  "Define the option in zcc_opt.def" , NULL, PragmaDefine, 0},
+    { 0, "pragma-output", OPT_FUNCTION,  "Define the option in zcc_opt.def (same as above)" , NULL, PragmaDefine, 0},
+    { 0, "pragma-export", OPT_FUNCTION,  "Define the option in zcc_opt.def and export as public" , NULL, PragmaExport, 0},
+    { 0, "pragma-need", OPT_FUNCTION,  "NEED the option in zcc_opt.def" , NULL, PragmaNeed, 0},
+    { 0, "pragma-bytes", OPT_FUNCTION,  "Dump a string of bytes zcc_opt.def" , NULL, PragmaBytes, 0},
+    { 0, "pragma-include", OPT_FUNCTION,  "Process include file containing pragmas" , NULL, PragmaInclude, 0},
+
+    { 0, "", OPT_HEADER, "Lifecycle options:", NULL, NULL, 0 },
+    { 0, "m4", OPT_BOOL,  "Stop after processing m4 files" , &m4only, NULL, 0},
+    { 'E', "preprocess-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after preprocessing files" , &preprocessonly, NULL, 0},
+    { 'c', "compile-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after compiling .c .s .asm files to .o files" , &compileonly, NULL, 0},
+    { 'a', "assemble-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after compiling .c .s files to .asm files" , &assembleonly, NULL, 0},
+    { 'S', "assemble-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after compiling .c .s files to .asm files" , &assembleonly, NULL, 0},
+    { 'x', NULL, OPT_BOOL,  "Make a library out of source files" , &makelib, NULL, 0},
+    { 0, "create-app", OPT_BOOL,  "Run appmake on the resulting binary to create emulator usable file" , &createapp, NULL, 0},
+
+
+    { 0, "", OPT_HEADER, "M4 options:", NULL, NULL, 0 },
+    { 0, "Cm", OPT_FUNCTION,  "Add an option to m4" , &m4arg, AddToArgs, 0},
+
+    { 0, "", OPT_HEADER, "Preprocessor options:", NULL, NULL, 0 },
+    { 0, "Cp", OPT_FUNCTION,  "Add an option to the preprocessor" , &cpparg, AddToArgs, 0},
+    { 0, "D", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Define a preprocessor option" , NULL, AddPreProc, 0},
+    { 0, "U", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Undefine a preprocessor option" , NULL, AddPreProc, 0},
+    { 0, "I", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add an include directory for the preprocessor" , NULL, AddPreProcIncPath, 0},
+    { 0, "iquote", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a quoted include path for the preprocessor" , &cpparg, AddToArgsQuoted, 0},
+    { 0, "isystem", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a system include path for the preprocessor" , &cpparg, AddToArgsQuoted, 0},
+
+    { 0, "", OPT_HEADER, "Compiler (all) options:", NULL, NULL, 0 },
+    { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc)" , &c_compiler_type, NULL, 0},
+    { 0, "c-code-in-asm", OPT_BOOL|OPT_DOUBLE_DASH,  "Add C code to .asm files" , &c_code_in_asm, NULL, 0},
+
+    { 0, "", OPT_HEADER, "Compiler (sccz80) options:", NULL, NULL, 0 },
+    { 0, "Cc", OPT_FUNCTION,  "Add an option to sccz80" , &sccz80arg, AddToArgs, 0},
+    { 0, "set-r2l-by-default", OPT_BOOL,  "(sccz80) Use r2l calling convention by default", &c_sccz80_r2l_calling, NULL, 0},
+    { 0, "O", OPT_INT,  "Set the peephole optimiser setting for copt" , &peepholeopt, NULL, 0},
+    { 0, "opt-code-speed", OPT_FUNCTION|OPT_DOUBLE_DASH,  "Optimize for code speed (sccz80 only)" , NULL, conf_opt_code_speed, 0},
+    { 0, "", OPT_HEADER, "Compiler (sdcc) options:", NULL, NULL, 0 },
+    { 0, "Cs", OPT_FUNCTION,  "Add an option to sdcc" , &sdccarg, AddToArgs, 0},
+    { 0, "opt-code-size", OPT_BOOL|OPT_DOUBLE_DASH,  "Optimize for code size (sdcc only)" , &opt_code_size, NULL, 0},
+    { 0, "SO", OPT_INT,  "Set the peephole optimiser setting for sdcc-peephole" , &sdccpeepopt, NULL, 0},
+    { 0, "fsigned-char", OPT_BOOL|OPT_DOUBLE_DASH,  "Use signed chars by default" , &sdcc_signed_char, NULL, 0},
+    { 0, "", OPT_HEADER, "Compiler (clang/llvm) options:", NULL, NULL, 0 },
+    { 0, "Cg", OPT_FUNCTION,  "Add an option to clang" , &clangarg, AddToArgs, 0},
+    { 0, "clang", OPT_BOOL,  "Stop after translating .c files to llvm ir" , &clangonly, NULL, 0},
+    { 0, "llvm", OPT_BOOL,  "Stop after llvm-cbe generates new .cbe.c files" , &llvmonly, NULL, 0},
+    { 0, "Co", OPT_FUNCTION,  "Add an option to llvm-opt" , &llvmopt, AddToArgs, 0},
+    { 0, "Cv", OPT_FUNCTION,  "Add an option to llvm-cbe" , &llvmarg, AddToArgs, 0},
+    { 0, "zopt", OPT_BOOL,  "Enable llvm-optimizer (clang only)" , &zopt, NULL, 0},
+    { 0, "", OPT_HEADER, "Assembler options:", NULL, NULL, 0 },
+    { 0, "Ca", OPT_FUNCTION,  "Add an option to the assembler" , &asmargs, AddToArgsQuoted, 0},
+    { 0, "z80-verb", OPT_BOOL,  "Make the assembler more verbose" , &z80verbose, NULL, 0},
+    { 0, "", OPT_HEADER, "Linker options:", NULL, NULL, 0 },
+    { 0, "Cl", OPT_FUNCTION,  "Add an option to the linker" , &linkargs, AddToArgsQuoted, 0},
+    { 0, "bn", OPT_STRING,  "Set the output file for the linker stage" , &c_linker_output_file, NULL, 0},
+    { 0, "reloc-info", OPT_BOOL,  "Generate binary file relocation information" , &relocinfo, NULL, 0},
+    { 'm', "gen-map-file", OPT_BOOL,  "Generate an output map of the final executable" , &mapon, NULL, 0},
+    { 's', "gen-symbol-file", OPT_BOOL,  "Generate a symbol map of the final executable" , &symbolson, NULL, 0},
+    { 0, "list", OPT_BOOL|OPT_DOUBLE_DASH,  "Generate list files" , &lston, NULL, 0},
+    { 'R', NULL, OPT_BOOL|OPT_DEPRECATED,  "Generate relocatable code (deprecated)" , &relocate, NULL, 0},
+    { 0, NULL, OPT_HEADER, "Appmake options:", NULL, NULL, 0 },
+    { 0, "L", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library search path" , NULL, AddLinkSearchPath, 0},
+    { 0, "l", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library" , NULL, AddLinkLibrary, 0},
+    { 0, "Cz", OPT_FUNCTION,  "Add an option to appmake" , &appmakeargs, AddToArgs, 0},
+   
+    { 0, "", OPT_HEADER, "Misc options:", NULL, NULL, 0 },
+    { 0, "g", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Generate a global defc file of the final executable (-g -gp -gpf:filename)" , &globaldefrefile, GlobalDefc, 0},
+    { 0, "alias", OPT_FUNCTION,  "Define a command line alias" , NULL, Alias, 0},
+    { 0, "lstcwd", OPT_BOOL|OPT_DOUBLE_DASH,  "Paths in .lst files are relative to the current working dir" , &lstcwd, NULL, 0},
+    { 0, "custom-copt-rules", OPT_STRING,  "Custom user copt rules" , &c_coptrules_user, NULL, 0},
+    { 'M', NULL, OPT_BOOL|OPT_PRIVATE,  "Swallow -M option in configs" , &swallow_M, NULL, 0},
+    { 0, "vn", OPT_BOOL_FALSE|OPT_PRIVATE,  "Turn off command tracing" , &verbose, NULL, 0},
+    { 0, "", 0, NULL },
+
 };
 
 
@@ -515,28 +527,7 @@ cpu_map_t cpu_map[CPU_TYPE_SIZE] = {
 
 char *select_cpu(int n)
 {
-    if (mz180)
-        return cpu_map[CPU_TYPE_Z180].tool[n];
-
-    if (mr3k)
-        return cpu_map[CPU_TYPE_R3K].tool[n];
-
-    if (mr2k)
-        return cpu_map[CPU_TYPE_R2K].tool[n];
-
-    if (mz80n)
-        return cpu_map[CPU_TYPE_Z80N].tool[n];
-
-    if (m8080)
-        return cpu_map[CPU_TYPE_8080].tool[n];
-
-    if (m8085)
-        return cpu_map[CPU_TYPE_8085].tool[n];
-
-    if (mgbz80)
-        return cpu_map[CPU_TYPE_GBZ80].tool[n];
-
-    return cpu_map[CPU_TYPE_Z80].tool[n];
+    return cpu_map[c_cpu].tool[n];
 }
 
 
@@ -640,8 +631,7 @@ static char *changesuffix(char *name, char *suffix)
     return (r);
 }
 
-int
-process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum iostyle ios, int number, int needsuffix, int src_is_original)
+int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum iostyle ios, int number, int needsuffix, int src_is_original)
 {
     int             status, errs;
     int             tstore;
@@ -892,13 +882,16 @@ int main(int argc, char **argv)
     gargv = argv;        /* Point argv to start of command line */
 
     processing_user_command_line_arg = 1;
-    for (gargc = gc; gargc < argc; gargc++) {
-        if (argv[gargc][0] == '-')
+    argc = option_parse(&options[0], argc - 1, &argv[1]);
+    for (gargc = 1; gargc < argc+1; gargc++) {
+        // We have some options left over, it may well be an alias
+        if (argv[gargc][0] == '-') {
             parse_cmdline_arg(argv[gargc]);
-        else
+        } else {
             add_file_to_process(argv[gargc]);
+        }
     }
-    processing_user_command_line_arg = 0;
+    processing_user_command_line_arg = 0; 
 
     if (c_print_specs) {
         print_specs();
@@ -1047,7 +1040,7 @@ int main(int argc, char **argv)
 
 
     /* Peephole optimization level for sdcc */
-    if (compiler_type == CC_SDCC && !mgbz80)
+    if (compiler_type == CC_SDCC && c_cpu != CPU_TYPE_GBZ80)
     {
         switch (sdccpeepopt)
         {
@@ -1118,7 +1111,6 @@ int main(int argc, char **argv)
 
         fclose(fp);
     }
-
     /* Activate target's crt file */
     if ((c_nocrt == 0) && build_bin) {
         /* append target crt to end of filelist */
@@ -1148,15 +1140,26 @@ int main(int argc, char **argv)
     /* This nastiness is marked "HACK" in the loop below.  Maybe something better will come along later.         */
 
     /* Parse through the files, handling each one in turn */
-    for (i = 1; (i <= nfiles) && (i != 0); i += (i != 0))  /* HACK 1 OF 2 */
-    {
+    for (i = 1; (i <= nfiles) && (i != 0); i += (i != 0)) { /* HACK 1 OF 2 */
+        char   temp_filename[FILENAME_MAX+1];
+        char   *ext;
+
         if (i == nfiles) i = 0;                            /* HACK 2 OF 2 */
         if (verbose) printf("\nPROCESSING %s\n", original_filenames[i]);
     SWITCH_REPEAT:
         switch (get_filetype_by_suffix(filelist[i]))
         {
         case M4FILE:
-            if (process(".m4", "", "m4", (m4arg == NULL) ? "" : m4arg, filter, i, YES, YES))
+            // Strip off the .m4 suffix and find the underlying extension
+            snprintf(temp_filename,sizeof(temp_filename),"%s", filelist[i]);
+            ext = find_file_ext(temp_filename);
+            if ( ext != NULL ) {
+                *ext = 0;
+                ext = find_file_ext(temp_filename);
+            }
+            if ( ext == NULL) ext = "";
+
+            if (process(".m4", ext, "m4", (m4arg == NULL) ? "" : m4arg, filter, i, YES, YES))
                 exit(1);
             /* Disqualify recursive .m4 extensions */
             ft = get_filetype_by_suffix(filelist[i]);
@@ -1164,18 +1167,6 @@ int main(int argc, char **argv)
                 fprintf(stderr, "Cannot process recursive .m4 file %s\n", original_filenames[i]);
                 exit(1);
             }
-            /* Write processed file to original source location immediately */
-            ptr = stripsuffix(original_filenames[i], ".m4");
-            if (copy_file(filelist[i], "", ptr, "")) {
-                fprintf(stderr, "Couldn't write output file %s\n", ptr);
-                exit(1);
-            }
-            /* Copied file becomes the new original file */
-            free(original_filenames[i]);
-            free(filelist[i]);
-            original_filenames[i] = ptr;
-            filelist[i] = muststrdup(ptr);
-            /* No more processing for .h and .inc files */
             ft = get_filetype_by_suffix(filelist[i]);
             if ((ft == HDRFILE) || (ft == INCFILE)) continue;
             /* Continue processing macro expanded source file */
@@ -1971,55 +1962,17 @@ void BuildAsmLine(char *dest, size_t destlen, char *prefix)
 
 
 
-void SetBoolean(arg_t *arg, char *val)
-{
-    if ((arg->flags & AF_BOOL_TRUE)) {
-        *(int *)arg->data = YES;
-    }
-    else {
-        *(int *)arg->data = NO;
-    }
-}
-
-
-void SetString(arg_t *argument, char *arg)
-{
-    char  *ptr = arg + 1;
-
-    if (strncmp(ptr, argument->name, strlen(argument->name)) == 0) {
-        ptr += strlen(argument->name);
-    }
-    if (*ptr == '=') {
-        ptr++;
-    }
-
-    if (strlen(ptr)) {
-        *(char **)argument->data = muststrdup(ptr);
-    }
-    else {
-        /* Try the next argument up */
-        if ((gargc + 1) < max_argc && gargv[gargc + 1][0] != '-') {
-            /* Aha...non option comes next... */
-            gargc++;
-            *(char **)argument->data = muststrdup(gargv[gargc]);
-        }
-        else {
-            /* No option given.. */
-        }
-    }
-}
-
-void GlobalDefc(arg_t *argument, char *arg)
+void GlobalDefc(option *argument, char *arg)
 {
     char *ptr = arg + 1;
 
     if (*ptr++ == 'g') {
         /* global defc is on */
-        *argument->num_ptr = 0x1;
+        globaldefon = 0x1;
 
         if (*ptr == 'p') {
             /* make defc symbols public */
-            *argument->num_ptr |= 0x2;
+            globaldefon |= 0x2;
             ++ptr;
         }
 
@@ -2029,16 +1982,7 @@ void GlobalDefc(arg_t *argument, char *arg)
             while (isspace(*ptr) || (*ptr == '=') || (*ptr == ':')) ++ptr;
 
             if (*ptr != 0) {
-                *(char **)argument->data = muststrdup(ptr);
-            } else {
-                /* try following argument for filename */
-                if ((gargc + 1) < max_argc && gargv[gargc + 1][0] != '-') {
-                    /* Aha...non option comes next... */
-                    gargc++;
-                    *(char **)argument->data = muststrdup(gargv[gargc]);
-                } else {
-                    /* No option given.. */
-                }
+                globaldefrefile = muststrdup(ptr);
             }
         }
     }
@@ -2116,31 +2060,29 @@ void AddArray(arg_t *argument, char *arg)
 }
 
 
-void OptCodeSpeed(arg_t *argument, char *arg)
+void conf_opt_code_speed(option *argument, char *arg)
 {
+    char *sccz80_arg = NULL;
     if ( strstr(arg,"inlineints") != NULL || strstr(arg,"all") != NULL) {
         c_sccz80_inline_ints = 1;
     }
-    BuildOptions(&sccz80arg, arg);
+    zcc_asprintf(&sccz80_arg,"-%s%s=%s", argument->type & OPT_DOUBLE_DASH ? "-" : "",argument->long_name, arg);
+    BuildOptions(&sccz80arg, sccz80_arg);
+    free(sccz80_arg);
 }
 
 
-void AddToArgs(arg_t *argument, char *arg)
+void AddToArgs(option *argument, char *arg)
 {
-    BuildOptions(argument->data, arg + 3);
+    BuildOptions(argument->value, arg);
 }
 
-void AddToArgsQuoted(arg_t *argument, char *arg)
+void AddToArgsQuoted(option *argument, char *arg)
 {
-    BuildOptionsQuoted(argument->data, arg + 3);
+    BuildOptionsQuoted(argument->value, arg);
 }
 
-void AddToArgsQuotedFull(arg_t *argument, char *arg)
-{
-    BuildOptionsQuoted(argument->data, arg);
-}
-
-void AddPreProcIncPath(arg_t *argument, char *arg)
+void AddPreProcIncPath(option *argument, char *arg)
 {
     /* user-supplied inc path takes precedence over system-supplied inc path */
     if (processing_user_command_line_arg)
@@ -2149,14 +2091,14 @@ void AddPreProcIncPath(arg_t *argument, char *arg)
         BuildOptionsQuoted(&cpp_incpath_last, arg);
 }
 
-void AddPreProc(arg_t *argument, char *arg)
+void AddPreProc(option *argument, char *arg)
 {
     BuildOptions(&cpparg, arg);
     BuildOptions(&clangarg, arg);
 }
 
 
-void AddLinkLibrary(arg_t *argument, char *arg)
+void AddLinkLibrary(option *argument, char *arg)
 {
     /* user-supplied lib takes precedence over system-supplied lib */
     if (processing_user_command_line_arg)
@@ -2165,7 +2107,7 @@ void AddLinkLibrary(arg_t *argument, char *arg)
         BuildOptionsQuoted(&linker_linklib_last, arg);
 }
 
-void AddLinkSearchPath(arg_t *argument, char *arg)
+void AddLinkSearchPath(option *argument, char *arg)
 {
     /* user-supplied lib path takes precedence over system-supplied lib path */
     if (processing_user_command_line_arg)
@@ -2405,17 +2347,11 @@ void usage(const char *program)
 
 void print_help_text(const char *program)
 {
-    arg_t      *cur = &myargs[0];
     int         i;
 
     usage(program);
 
-    fprintf(stderr,"\nOptions:\n\n");
-
-    while (cur->help) {
-        fprintf(stderr,"-%-20s %s%s\n", cur->name, cur->flags & AF_DEPRECATED ? "(deprecated) " : "", cur->help);
-        cur++;
-    }
+    option_list(&options[0]);
 
     fprintf(stderr,"\nArgument Aliases:\n\n");
     for ( i = 0; i < aliases_num; i+=2 ) {
@@ -2456,25 +2392,15 @@ void print_help_text(const char *program)
 
 void parse_cmdline_arg(char *arg)
 {
-    arg_t          *pargs = myargs;
     int             i;
+    char           *tempargv[2];
 
-    while (pargs->setfunc) {
-        if ((pargs->flags & AF_MORE)) {
-            /* More info follows the option */
-            if (strncmp(arg + 1, pargs->name, strlen(pargs->name)) == 0) {
-                (*pargs->setfunc) (pargs, arg);
-                return;
-            }
-        }
-        else {
-            if (strcmp(arg + 1, pargs->name) == 0) {
-                (*pargs->setfunc) (pargs, arg);
-                return;
-            }
-        }
-        pargs++;
+    tempargv[1] = arg;
+
+    if ( option_parse(&options[0], 2, &tempargv[0]) == 0 ) {
+        return;
     }
+   
     for ( i = 0; i < aliases_num; i+=2 ) {
         if ( strcmp(arg, aliases[i]) == 0 ) {
             parse_option(muststrdup(aliases[i+1]));
@@ -2623,7 +2549,6 @@ static void configure_assembler()
     snprintf(buf,sizeof(buf),"-I\"%s\"",zcc_opt_dir);
     BuildOptions(&asmargs, buf);
     BuildOptions(&linkargs, buf);
-
 }
 
 
@@ -2653,8 +2578,8 @@ static void configure_compiler()
         c_compiler = c_sdcc_exe;
         c_cpp_exe = c_sdcc_preproc_exe;
         compiler_style = filter_outspecified_flag;
-                BuildOptions(&asmargs, "-D__SDCC");
-                BuildOptions(&linkargs, "-D__SDCC");
+        BuildOptions(&asmargs, "-D__SDCC");
+        BuildOptions(&linkargs, "-D__SDCC");
     }
     else {
         preprocarg = " -DSCCZ80 -DSMALL_C -D__SCCZ80";
@@ -2682,9 +2607,9 @@ static void configure_compiler()
 }
 
 
-void PragmaInclude(arg_t *arg, char *val)
+void PragmaInclude(option *arg, char *val)
 {
-    char *ptr = strip_outer_quotes(val + strlen(arg->name) + 1);
+    char *ptr = strip_outer_quotes(val);
 
     while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
@@ -2694,13 +2619,11 @@ void PragmaInclude(arg_t *arg, char *val)
     }
 }
 
-void PragmaRedirect(arg_t *arg, char *val)
+void PragmaRedirect(option *arg, char *val)
 {
     char *eql;
-    char *ptr = val + strlen(arg->name) + 1;
+    char *ptr = val;
     char *value = "";
-
-    while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
     if ((eql = strchr(ptr, '=')) != NULL) {
         *eql = 0;
@@ -2716,13 +2639,11 @@ void PragmaRedirect(arg_t *arg, char *val)
     }
 }
 
-void Alias(arg_t *arg, char *val)
+void Alias(option *arg, char *val)
 {
-    char *ptr = val + strlen(arg->name) + 1;
+    char *ptr = val;
     char *eql;
 
-    while ((*ptr == '=') || (*ptr == ':'))
-       ++ptr;
     if ((eql = strchr(ptr, '=')) != NULL) {
         *eql = 0;
         aliases = realloc(aliases, (aliases_num + 2) * sizeof(aliases[0]));
@@ -2732,13 +2653,11 @@ void Alias(arg_t *arg, char *val)
 }
 
 
-void PragmaDefine(arg_t *arg, char *val)
+void PragmaDefine(option *arg, char *val)
 {
-    char *ptr = val + strlen(arg->name) + 1;
+    char *ptr = val;
     int   value = 0;
     char *eql;
-
-    while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
     if ((eql = strchr(ptr, '=')) != NULL) {
         *eql = 0;
@@ -2747,13 +2666,11 @@ void PragmaDefine(arg_t *arg, char *val)
     write_zcc_defined(ptr, value, 0);
 }
 
-void PragmaExport(arg_t *arg, char *val)
+void PragmaExport(option *arg, char *val)
 {
-    char *ptr = val + strlen(arg->name) + 1;
+    char *ptr = val;
     int   value = 0;
     char *eql;
-
-    while ((*ptr == '=') || (*ptr == ':')) ++ptr;
 
     if ((eql = strchr(ptr, '=')) != NULL) {
         *eql = 0;
@@ -2772,24 +2689,20 @@ void write_zcc_defined(char *name, int value, int export)
     add_zccopt("ENDIF\n\n");
 }
 
-void PragmaNeed(arg_t *arg, char *val)
+void PragmaNeed(option *arg, char *val)
 {
-    char *ptr = val + strlen(arg->name) + 1;
-
-    while ((*ptr == '=') || (*ptr == ':')) ++ptr;
-
+    char *ptr = val;
+    
     add_zccopt("\nIF !NEED_%s\n", ptr);
     add_zccopt("\tDEFINE\tNEED_%s\n", ptr);
     add_zccopt("ENDIF\n\n");
 }
 
 
-void PragmaBytes(arg_t *arg, char *val)
+void PragmaBytes(option *arg, char *val)
 {
-    char *ptr = val + strlen(arg->name) + 1;
+    char *ptr = val;
     char *value;
-
-    while ((*ptr == '=') || (*ptr ==':')) ++ptr;
 
     if ((value = strchr(ptr, '=')) != NULL) {
         *value++ = 0;
