@@ -4,6 +4,9 @@ target/ondra/stdio/generic_console_ioctl
 target/ondra/stdio/generic_console_vpeek
 target/ondra/stdio/CRT_FONT
 target/ondra/graphics/w_pixeladdress
+stdio/inkey/getk
+stdio/inkey/fgetc_cons
+@input/input_keyboard.lst
 @gfx/wide/gfx_wide.lst
 @font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
