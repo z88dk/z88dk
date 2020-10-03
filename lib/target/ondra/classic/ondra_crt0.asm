@@ -23,6 +23,10 @@
 	EXTERN  __BSS_END_tail
 
 
+        IF !CLIB_FGETC_CONS_DELAY
+                defc CLIB_FGETC_CONS_DELAY = 150
+        ENDIF
+
         defc    CONSOLE_ROWS = 32
         defc    CONSOLE_COLUMNS = 40
         defc    TAR__clib_exit_stack_size = 32

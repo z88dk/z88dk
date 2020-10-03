@@ -45,7 +45,7 @@ PUBLIC in_keytranstbl
 	defb	':', '/', '*', ';', 255		; c x z v SHIFT
 	defb	' ', 255, 255, 255, 255 	; SP UN UN UN UN
 	defb	255, 255, 255, 255, 255		; UN NUM CS UN UPPER
-	defb	'>', '[', ']', '<',  13		; j k l h RET
+	defb	'>', '[', ']', '<',  12		; j k l h RET
 	defb   '\'', '(', ')', '&', '@'		; u i o y p
 	defb	',', '.',   9, 'B', 255		; n m UP b CTRL
 	defb	255,   8,  10, 255,  11		; UN LEFT DN UN RIGHT
@@ -58,7 +58,7 @@ PUBLIC in_keytranstbl
 	defb	  3,  24,  26,  22, 255		; c x z v SHIFT
 	defb	' ', 255, 255, 255, 255 	; SP UN UN UN UN
 	defb	255, 255, 255, 255, 255		; UN NUM CS UN UPPER
-	defb	 10,  11,  12,   8,  13		; j k l h RET
+	defb	 10,  11,  12,   8, 127		; j k l h RET
 	defb	 21,   9,  15,  25,  16		; u i o y p
 	defb	 14,  13,   9,   2, 255		; n m UP b CTRL
 	defb	255,   8,  10, 255,  11		; UN LEFT DN UN RIGHT

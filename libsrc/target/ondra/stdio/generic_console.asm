@@ -31,7 +31,40 @@ generic_console_set_ink:
 generic_console_scrollup:
 	push	bc
 	push	de
-
+	ld	b,0xf7	;top row
+scroll1:
+	ld	a,b
+	rrca
+	ld	l,a
+	ld	a,8
+	add	b
+	rrca
+	ld	e,a
+	ld	h,0xff
+	ld	d,h
+	ld	c,40	;number of columns
+scroll2:
+	ld	a,(hl)
+	ld	(de),a
+	dec	h
+	dec	d
+	dec	c
+	jr	nz,scroll2
+	djnz	scroll1
+	; TODO: Blank out bottom row
+	ld	b,0x07
+scroll3:
+	ld	a,b
+	rrca
+	ld	l,a
+	ld	h,0xff
+	ld	c,40
+scroll4:
+	ld	(hl),0
+	dec	h
+	dec	c
+	jr	nz,scroll4
+	djnz	scroll3
 	pop	de
 	pop	bc
 	ret
