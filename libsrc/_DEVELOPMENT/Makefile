@@ -23,6 +23,15 @@ install-clean:
 
 
 
+define extralib
+ $(1) = target
+ $(2) = compiler (sccz80,sdcc_ix,sdcc_iy)
+ $(3) = list file (without suffix)
+lib/$(2)/$(3).lib: target/$(1)/obj/config_private.inc target/$(1)/library/$(3).lst
+	$(Z80ASM) $(cpu) -d -Otarget/$(1)/obj/$(2) -Itarget/$(1)/obj -xlib/$(2)/$(3) -I$(Z88DK_LIB) @target/$(1)/library/$(3).lst
+endef
+
+
 define config
 .PHONY: clean-$(1)
 
@@ -32,7 +41,29 @@ target/zxn/obj/config_private.inc: lib/sccz80/z80.lib
 
 # Convenience target (eg make zx to build the zx libraries)
 .PHONY: $(1)
-$(1): lib/sccz80/$(1).lib lib/sdcc_ix/$(1).lib lib/sdcc_iy/$(1).lib
+
+LIBS_$(1) = lib/sccz80/$(1).lib lib/sdcc_ix/$(1).lib lib/sdcc_iy/$(1).lib
+
+# Look for extra libraries, filtering out the lst files for the main libs
+$(foreach extra, $(notdir $(patsubst %.lst,%, $(filter-out target/$(1)/library/$(1)_sccz80.lst, $(wildcard target/$(1)/library/*sccz80*.lst)))), \
+                $(eval $(call extralib,$(target),sccz80,$(extra))) \
+		LIBS_$(1) += lib/sccz80/$(extra).lib \
+        )
+$(foreach extra, $(notdir $(patsubst %.lst,%, $(filter-out target/$(1)/library/$(1)_sdcc_ix.lst, $(wildcard target/$(1)/library/*sdcc_ix*.lst)))), \
+                $(eval $(call extralib,$(target),sdcc_ix,$(extra))) \
+		LIBS_$(1) += lib/sdcc_ix/$(extra).lib \
+        )
+$(foreach extra, $(notdir $(patsubst %.lst,%, $(filter-out target/$(1)/library/$(1)_sdcc_iy.lst, $(wildcard target/$(1)/library/*sdcc_iy*.lst)))), \
+                $(eval $(call extralib,$(target),sdcc_iy,$(extra))) \
+		LIBS_$(1) += lib/sdcc_iy/$(extra).lib \
+        )
+$(foreach extra, $(notdir $(patsubst %.lst,%, $(filter-out target/$(1)/library/$(1)_asm.lst, $(wildcard target/$(1)/library/*asm*.lst)))), \
+                $(eval $(call extralib,$(target),asm,$(extra))) \
+		LIBS_$(1) += lib/asm/$(extra).lib \
+        )
+
+$(1): $$(LIBS_$(1))
+
 
 target/$(1)/obj/config_private.inc: target/$(1)/config.m4
 	@mkdir -p target/$(1)/obj/sccz80 target/$(1)/obj/sdcc_ix target/$(1)/obj/sdcc_iy
@@ -100,9 +131,7 @@ define make_clean
 
 clean-$(1):
 	@$(RM) -r target/$(1)/obj
-	@$(RM) lib/sccz80/$(1).lib
-	@$(RM) lib/sdcc_ix/$(1).lib
-	@$(RM) lib/sdcc_iy/$(1).lib
+	@$(RM) $(LIBS_$(1))
 endef
 
 define build_target
