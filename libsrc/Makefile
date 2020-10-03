@@ -1619,6 +1619,7 @@ ondra_clib.lib:
 	@echo '--- Building Ondra Library ---'
 	@echo ''
 	$(call buildgeneric,ondra,wide)
+	$(MAKE) -C games TARGET=ondra
 	TARGET=ondra TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORondra -x$(OUTPUT_DIRECTORY)/ondra_clib @$(LISTFILE_DIRECTORY)/ondra.lst
 
 # Homelab 3/4 - dom
