@@ -4605,12 +4605,6 @@
 =
 	ld	hl,0	;const
 
-	ld	l,(hl)
-	ld	h,%1
-	ld	a,l
-=
-	ld	a,(hl)
-
 	push	de
 	push	hl
 	ld	hl,%1	;const
