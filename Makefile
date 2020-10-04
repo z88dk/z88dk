@@ -103,7 +103,7 @@ ifdef BUILD_SDCC
 endif
 
 
-$(SDCC_PATH)/bin/sdcc: $(SDCC_PATH)/Makefile
+$(SDCC_PATH)/bin/sdcc$(EXESUFFIX): $(SDCC_PATH)/Makefile
 ifdef BUILD_SDCC
 	$(MAKE) -C $(SDCC_PATH)
 endif
