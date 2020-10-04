@@ -269,10 +269,9 @@ start:
         ld      (start1+1),sp
 IF __register_sp == 0
         ld      hl,$bfff	; 48K ?
-        ld      (hl),$55
-        ld      a,$AA
-        or      (hl)
-        inc     a
+	ld	a,$55
+        ld      (hl),a
+	cp	(hl)
         jr      z,has48k
         ld      hl,$3fff	; 48K.
 has48k:
