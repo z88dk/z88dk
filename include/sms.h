@@ -113,7 +113,10 @@ extern void __LIB__ set_sprite(int n, int x, int y, int tile) __smallc;
 extern int __LIB__ read_joypad1();
 extern int __LIB__ read_joypad2();
 extern void __LIB__ set_vdp_reg(int reg, int value) __smallc;
-extern void __LIB__ gotoxy(int x, int y) __smallc;
+#ifndef __CONIO_H__
+#define gotoxy(x,y) gotoxy_sms(x,y)
+extern void __LIB__ gotoxy_sms(int x, int y) __smallc;
+#endif
 extern void __LIB__ add_raster_int(void *ptr);
 extern void __LIB__ add_pause_int(void *ptr);
 extern void __LIB__ set_sound_freq(int channel, int freq) __smallc;

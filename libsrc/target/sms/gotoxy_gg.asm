@@ -1,6 +1,6 @@
 	SECTION code_clib
-	PUBLIC	gotoxy
-	PUBLIC	_gotoxy
+	PUBLIC	gotoxy_sms
+	PUBLIC	_gotoxy_sms
 	
 	INCLUDE "target/sms/sms.hdr"
 
@@ -12,8 +12,8 @@
 ; Places the software text cursor in the specified coordinates.
 ; Supposed to be used in conjunction with stdio
 ;==============================================================
-.gotoxy
-._gotoxy
+.gotoxy_sms
+._gotoxy_sms
 	ld	hl, 2
 	add	hl, sp
 IF FORgamegear
