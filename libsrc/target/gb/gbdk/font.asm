@@ -496,18 +496,17 @@ asm_load_z88dk_udg:
     ld      a,(font_current+2)
     ; Must be non-zero if the font system is setup (cant have a font in page zero)
     and     a
-    jr      z,set_udgs
+    jr      nz,set_udgs
     push    bc
     ld      hl,generic_console_font32
     ld      c,(hl)
     inc     hl
-    ld      h,(hl)
+    ld      b,(hl)
     call    asm_load_z88dk_font
     pop     bc
 set_udgs:
-    call    z,_font_init
     ld      hl,$8800    ;Tile 128 is the first UDG
-    ld      de,128 * 8
+    ld      de,64 * 8
     call    font_copy_compressed
     ret
     

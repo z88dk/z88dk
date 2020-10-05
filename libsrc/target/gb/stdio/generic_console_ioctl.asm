@@ -67,5 +67,5 @@ check_mode:
 set_mode:
     call    l_jphl		; Initialise the mode
     call    generic_console_cls
-    and	a
+    and	    a
     ret
