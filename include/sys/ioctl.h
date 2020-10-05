@@ -1,8 +1,8 @@
 #ifndef SYS_IOCTL_H
 #define SYS_IOCTL_H
 
-#include <sys/types.h>
 #include <sys/compiler.h>
+#include <stdint.h>
 
 extern int __LIB__ console_ioctl(uint16_t cmd, void *arg) __smallc;
 

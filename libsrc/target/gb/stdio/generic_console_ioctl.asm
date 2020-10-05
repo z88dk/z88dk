@@ -10,6 +10,7 @@
     EXTERN  __mode
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
+    EXTERN  generic_console_caps
     EXTERN  tmode
     EXTERN  tmode_load_udgs
     EXTERN  gmode
@@ -20,7 +21,9 @@
     INCLUDE	"ioctl.def"
 
     PUBLIC  CLIB_GENCON_CAPS
-    defc    CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS
+    defc    CLIB_GENCON_CAPS = CAP_MODE0
+    defc    CAP_MODE0 = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS 
+    defc    CAP_MODE1 = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_INVERSE | CAP_GENCON_BOLD | CAP_GENCON_UNDERLINE
 
 ; Entry:
 ; a = ioctl
@@ -59,12 +62,16 @@ check_mode:
     cp	    IOCTL_GENCON_SET_MODE
     scf
     ret     nz
+    ld      d,CAP_MODE1
     ld	    a,c		; The mode
     ld	    hl,gmode
     cp	    1		; Drawing mode
     jr	    z,set_mode
+    ld      d,CAP_MODE0
     ld	    hl,tmode	; Otherwise it's text mode...
 set_mode:
+    ld      a,d
+    ld      (generic_console_caps),a
     call    l_jphl		; Initialise the mode
     call    generic_console_cls
     and	    a
