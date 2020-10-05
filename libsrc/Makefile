@@ -21,7 +21,7 @@ GENLIBS = z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib mat
 
 
 TOCREATE := $(call check_target,altair8800,altair8800_clib.lib)
-TOCREATE := $(call check_target,ace,ace_clib.lib gfxace.lib gfxaceudg.lib)
+TOCREATE += $(call check_target,ace,ace_clib.lib gfxace.lib gfxaceudg.lib)
 TOCREATE += $(call check_target,abc80,abc80_clib.lib)
 TOCREATE += $(call check_target,abc800,abc800_clib.lib)
 TOCREATE += $(call check_target,adam,adam.lib $(CPMLIBS))
