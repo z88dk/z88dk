@@ -13,6 +13,9 @@
 	DEFC	RAM_Length = $2000
 	DEFC	Stack_Top  = $dff0
 
+        defc    CONSOLE_COLUMNS = 32
+        defc    CONSOLE_ROWS = 24
+
 	MODULE  sms_crt0
 
 ;-------

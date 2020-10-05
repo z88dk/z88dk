@@ -24,6 +24,7 @@ psg/sn76489/psg_envelope
 psg/sn76489/psg_init.asm
 psg/sn76489/set_psg.asm
 psg/sn76489/set_psg_callee.asm
+@font/font_8x8/font_8x8.lst
 @video/tms9918/video_tms9918.lst
 @stdio/stdio.lst
 @z80.lst
