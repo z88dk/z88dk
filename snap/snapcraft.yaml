@@ -56,7 +56,7 @@ apps:
     environment:
       ZCCCFG: "$SNAP/share/z88dk/lib/config"
     plugs: [home, removable-media]
-  z88dk-appmak:
+  z88dk-appmake:
     command: bin/z88dk-appmake
     plugs: [home, removable-media]
   z88dk-z80asm:
