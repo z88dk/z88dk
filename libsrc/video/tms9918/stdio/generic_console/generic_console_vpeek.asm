@@ -12,6 +12,8 @@
         EXTERN  __tms9918_text_xypos
 
         EXTERN  LDIRMV
+	EXTERN	CONSOLE_XOFFSET
+	EXTERN	CONSOLE_YOFFSET
 
         INCLUDE "video/tms9918/vdp.inc"
 
@@ -46,11 +48,14 @@ __tms9918_console_vpeek:
 vpeek_mode2:
         push    ix
         ld      a,c
+	add	CONSOLE_XOFFSET
         add     a
         add     a
         add     a
         ld      e,a        
-        ld      d,b
+	ld	a,CONSOLE_YOFFSET
+	add	b
+        ld      d,a
         ld      hl,-8
         add     hl,sp
         ld      sp,hl

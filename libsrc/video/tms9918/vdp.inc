@@ -10,7 +10,7 @@ IF FORsms
 	defc VDP_CMD     = $bf
 	defc VDP_STATUS  = $bf ; ?
 	defc VRAM_SIZE   = 16
-	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_DIRECT = 0
 	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 	

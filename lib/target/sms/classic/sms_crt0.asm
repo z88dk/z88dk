@@ -13,8 +13,6 @@
 	DEFC	RAM_Length = $2000
 	DEFC	Stack_Top  = $dff0
 
-        defc    CONSOLE_COLUMNS = 32
-        defc    CONSOLE_ROWS = 24
 
 	MODULE  sms_crt0
 
@@ -42,12 +40,26 @@
 	PUBLIC	_pause_flag	;This alternates between 0 and 1 every time pause is pressed
 	
 
+        PUBLIC  __GAMEGEAR_ENABLED
+
 	PUBLIC __IO_VDP_DATA
  	PUBLIC __IO_VDP_COMMAND
 	PUBLIC __IO_VDP_STATUS
 	defc __IO_VDP_DATA              = 0xbe
 	defc __IO_VDP_COMMAND           = 0xbf
 	defc __IO_VDP_STATUS            = 0xbf
+
+        if __GAMEGEAR__
+	    defc CONSOLE_XOFFSET = 6
+	    defc CONSOLE_YOFFSET = 3
+            defc CONSOLE_COLUMNS = 20
+            defc CONSOLE_ROWS = 18
+            defc __GAMEGEAR_ENABLED = 1
+        else
+            defc __GAMEGEAR_ENABLED = 0
+            defc CONSOLE_COLUMNS = 32
+            defc CONSOLE_ROWS = 24
+        endif
 
 
         defc    TAR__register_sp = Stack_Top
@@ -183,15 +195,37 @@ l_dcal:
 ; VDP Initialization
 ;---------------------------------
 DefaultInitialiseVDP:
-    push hl
-    push bc
         ld hl,_Data
         ld b,_End-_Data
         ld c,$bf
         otir
-    pop bc
-    pop hl
+IF __GAMEGEAR__
+    ; Load default palette for gamegear
+    EXTERN asm_load_palette_gamegear
+    ld hl,gg_palette
+    ld b,16
+    ld c,0
+    call asm_load_palette_gamegear
+ENDIF
     ret
+
+gg_palette:
+        defw 0x0000             ;transparent
+        defw 0x0000             ;00 00 00
+        defw 0x00a0             ;00 aa 00
+        defw 0x00f0             ;00 ff 00
+        defw 0x0500             ;00 00 55
+        defw 0x0f00             ;00 00 ff
+        defw 0x0005             ;55 00 00
+        defw 0x0ff0             ;00 ff ff
+        defw 0x000a             ;aa 00 00
+        defw 0x000f             ;ff 00 00
+        defw 0x0055             ;00 55 55
+        defw 0x00ff             ;ff ff 00
+        defw 0x0050             ;00 55 00
+        defw 0x0f0f             ;ff 00 ff
+        defw 0x0555             ;55 55 55
+        defw 0x0fff             ;ff ff ff
 
     DEFC SpriteSet          = 0       ; 0 for sprites to use tiles 0-255, 1 for 256+
     DEFC NameTableAddress   = $3800   ; must be a multiple of $800; usually $3800; fills $700 bytes (unstretched)
@@ -252,6 +286,7 @@ raster_procs:		defs	16	;Raster interrupt handlers
 pause_procs:		defs	16	;Pause interrupt handlers
 timer:			defw	0	;This is incremented every time a VBL/HBL interrupt happens
 _pause_flag:		defb	0	;This alternates between 0 and 1 every time pause is pressed
+__gamegear_flag:	defb	0	;Non zero if running on a gamegear
 
 
 ; DEFINE SECTIONS FOR BANKSWITCHING

@@ -11,6 +11,7 @@
 
 static char              help         = 0;
 static char             *binname      = NULL;
+static char             *extension    = ".sms";
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static int               romfill      = 255;
@@ -20,6 +21,7 @@ option_t sms_options[] = {
     { 'h', "help",      "Display this help",                OPT_BOOL,  &help    },
     { 'b', "binfile",   "Linked binary file",               OPT_STR,   &binname },
     { 'c', "crt0file",  "crt0 used to link binary",         OPT_STR,   &crtfile },
+    { 'e', "extension", "Extension for the ROM",            OPT_STR,   &extension },
     { 'o', "output",    "Name of output file",              OPT_STR,   &outfile },
     { 'f', "filler",    "Filler byte (default: 0xFF)",      OPT_INT,   &romfill },
     {  0,  NULL,        NULL,                               OPT_NONE,  NULL     }
@@ -68,7 +70,7 @@ int sms_exec(char *target)
     if (outfile == NULL)
     {
         strcpy(filename, binname);
-        suffix_change(filename, ".sms");
+        suffix_change(filename, extension);
     }
     else
         strcpy(filename, outfile);
