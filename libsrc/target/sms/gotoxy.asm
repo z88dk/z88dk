@@ -5,6 +5,8 @@
 	INCLUDE "target/sms/sms.hdr"
 
 	EXTERN	fputc_vdp_offs
+	EXTERN	CONSOLE_YOFFSET
+	EXTERN	CONSOLE_XOFFSET
 	
 ;==============================================================
 ; void gotoxy(int x, int y)
@@ -16,11 +18,14 @@
 ._gotoxy_sms
 	ld	hl, 2
 	add	hl, sp
-	ld	d, (hl)		; Y
+	ld	a,CONSOLE_YOFFSET
+	add	(hl)
+	ld	d,a	;Y
 	inc	hl
 	inc 	hl
-	ld	e, (hl)		; X
-
+	ld	a,CONSOLE_XOFFSET
+	add	(hl)
+	ld	e,a	;X
 	ld	l, d
 	ld	h, 0
 	add	hl, hl

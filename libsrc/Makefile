@@ -1420,7 +1420,6 @@ sms_clib.lib:
 	$(call buildgeneric,sms)
 	$(MAKE) -C video/tms9918 TARGET=sms
 	TARGET=sms TYPE=z80 $(LIBLINKER) -DFORsms -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sms_clib @$(LISTFILE_DIRECTORY)/sms.lst
-	TARGET=gg TYPE=z80 $(LIBLINKER) -DFORgamegear -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gamegear @$(LISTFILE_DIRECTORY)/gamegear.lst
 
 # Sega SC-3000 - stefano
 sc3000_clib.lib:

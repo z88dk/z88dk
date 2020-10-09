@@ -1,8 +1,11 @@
 target/sms/stdio/fputc_cons
+target/sms/stdio/generic_console
+target/sms/stdio/generic_console_vpeek
 target/sms/games/joystick
 target/shared/clock
 target/sms/clear_vram
 target/sms/load_palette
+target/sms/load_palette_gamegear
 target/sms/VRAMToHL
 target/sms/load_tiles
 target/sms/DrawOneLine

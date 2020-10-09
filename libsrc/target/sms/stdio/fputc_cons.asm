@@ -4,6 +4,8 @@
 	INCLUDE "target/sms/sms.hdr"
 
 	EXTERN	VRAMToHL
+        EXTERN  CONSOLE_YOFFSET
+        EXTERN  CONSOLE_XOFFSET
 	PUBLIC	fputc_vdp_offs
 	
 .fputc_cons_native
@@ -27,6 +29,7 @@ ENDIF
 	jr	nz,nocrlf
 
 	; Line break
+.linebreak
 	ld	a, (fputc_vdp_offs)
 	ld	l, a
 	ld	a, (fputc_vdp_offs+1)
@@ -34,7 +37,7 @@ ENDIF
 	ld	a, l
 	and	a, $C0
 	ld	l, a			; Calculates start of line
-	ld	de, 64
+	ld	de, +64 +(CONSOLE_XOFFSET * 2)
 	add	hl, de			; Calculates address of next line
 	ld	a, l
 	ld	(fputc_vdp_offs), a
@@ -48,6 +51,9 @@ ENDIF
 	jr	nz,nocls
 
 	; TODO: Implement CLS
+        ld      hl,+(CONSOLE_YOFFSET * 64 + CONSOLE_XOFFSET * 2)
+        ld      (fputc_vdp_offs),hl
+        ret
 
 .nocls
 	out	($be), a	; Outputs character
@@ -58,13 +64,16 @@ ENDIF
 	ld	h, a			; Loads char offset
 	inc	hl
 	inc	hl			; offset += 2
-	ld	a, l
-	ld	(fputc_vdp_offs), a
 	ld	a, h
 	ld	(fputc_vdp_offs+1), a	; Saves char offset
+	ld	a, l
+	ld	(fputc_vdp_offs), a
+	and	63
+	cp	64 - (CONSOLE_XOFFSET * 2)
+	jr	z,linebreak
 
 	ret
 
-	SECTION	bss_clib
+	SECTION	data_clib
 
-fputc_vdp_offs:         defw    0       ;Current character pointer
+fputc_vdp_offs:         defw    +(CONSOLE_YOFFSET * 64 + CONSOLE_XOFFSET * 2)       ;Current character pointer

@@ -5,6 +5,8 @@
 	INCLUDE "target/sms/sms.hdr"
 	
 	EXTERN	DrawOneLine
+        EXTERN  CONSOLE_YOFFSET
+        EXTERN  CONSOLE_XOFFSET
 	
 ;==============================================================
 ; void set_bkg_map(unsigned int *data, int x, int y, int w, int h)
@@ -22,10 +24,14 @@
 	ld	c, (hl)		; Width
 	inc	hl
 	inc	hl
-	ld	d, (hl)		; Y
+	ld	a,CONSOLE_YOFFSET
+	add	(hl)
+	ld	d,a		;Y
 	inc	hl
 	inc	hl
-	ld	e, (hl)		; X
+	ld	a,CONSOLE_XOFFSET
+	add (hl)		; X
+	ld	e,a
 	inc	hl
 	inc	hl
 	ld	a, (hl)

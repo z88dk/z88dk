@@ -26,6 +26,8 @@
         EXTERN  FILVRM
         EXTERN  LDIRVM
         EXTERN  LDIRMV
+	EXTERN	CONSOLE_XOFFSET
+	EXTERN	CONSOLE_YOFFSET
 
         INCLUDE "video/tms9918/vdp.inc"
 
@@ -207,11 +209,14 @@ not_underline:
 	pop	hl	;Get buffer back
 	pop	bc
         ld      a,c
+	add	CONSOLE_XOFFSET
         add     a
         add     a
         add     a
         ld      e,a
-        ld      d,b
+	ld	a,CONSOLE_YOFFSET
+	add	b
+        ld      d,a
         push    de
         ld      bc,8
         call    LDIRVM

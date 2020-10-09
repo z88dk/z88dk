@@ -2,6 +2,9 @@
 	PUBLIC	set_sprite
 	PUBLIC	_set_sprite
 
+        EXTERN  CONSOLE_YOFFSET
+        EXTERN  CONSOLE_XOFFSET
+
 ;==============================================================
 ; set_sprite(int n, int x, int y, int tile)	
 ;==============================================================
@@ -14,10 +17,14 @@
 	ld	d, (hl)		; Tile
 	inc	hl
 	inc	hl
-	ld	b, (hl)		; Y
+	ld	a,+(CONSOLE_YOFFSET * 8)
+	add (hl)		; Y
+	ld	b,a
 	inc	hl
 	inc	hl
-	ld	c, (hl)		; X
+	ld	a,+(CONSOLE_XOFFSET * 8)
+	add (hl)		; X
+	ld	c,a
 	inc	hl
 	inc	hl
 	ld	e, (hl)		; N

@@ -5,6 +5,9 @@
         EXTERN  __tms9918_pattern_name
         EXTERN  __console_w
 
+	EXTERN	CONSOLE_YOFFSET
+	EXTERN	CONSOLE_XOFFSET
+
 
 ; Entry: b = row, c = column
 __tms9918_text_xypos:
@@ -13,9 +16,14 @@ __tms9918_text_xypos:
         ld      hl,(__tms9918_pattern_name)
         and     a
         sbc     hl,de
-        inc     b
+	ld	a,b
+	add	CONSOLE_YOFFSET
+	ld	b,a
 xypos_1:
         add     hl,de
         djnz    xypos_1
+	ld	a,CONSOLE_XOFFSET
+	add	c
+	ld	c,a
         add     hl,bc
         ret

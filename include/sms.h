@@ -61,12 +61,23 @@
 // Bkg tile uses the second tileset
 #define BKG_ATTR_2NDTILESET 0x0100
 
-#define JOY_UP 0x01
-#define JOY_DOWN 0x02
-#define JOY_LEFT 0x04
-#define JOY_RIGHT 0x08
-#define JOY_FIREA 0x10
-#define JOY_FIREB 0x20
+#define __SMS_JOY_UP 0x01
+#define __SMS_JOY_DOWN 0x02
+#define __SMS_JOY_LEFT 0x04
+#define __SMS_JOY_RIGHT 0x08
+#define __SMS_JOY_FIREA 0x10
+#define __SMS_JOY_FIREB 0x20
+
+#ifndef JOY_UP
+// JOY_UP is defined in games.h using standard z88dk bits
+#define JOY_UP __SMS_JOY_UP
+#define JOY_DOWN __SMS_JOY_DOWN
+#define JOY_LEFT __SMS_JOY_LEFT
+#define JOY_RIGHT __SMS_JOY_RIGHT
+#define JOY_FIREA __SMS_JOY_FIREA
+#define JOY_FIREB __SMS_JOY_FIREB
+#endif
+
 
 typedef char               INT8;
 typedef unsigned char      UINT8;
@@ -103,26 +114,34 @@ typedef union _fixed {
 } fixed;
 
 extern void __LIB__ clear_vram();
+// Load a 6 bit palette - for both gamegear and sms
 extern void __LIB__ load_palette(unsigned char *data, int index, int count) __smallc;
+// Load a 12 bit palette - gamegear only
+extern void __LIB__ load_palette_gamegear(unsigned int *data, int index, int count) __smallc;
 extern void __LIB__ load_tiles(unsigned char *data, int index, int count, int bpp) __smallc;
 extern void __LIB__ set_bkg_map(unsigned int *data, int x, int y, int w, int h) __smallc;
 extern void __LIB__ scroll_bkg(int x, int y) __smallc;
 extern int __LIB__ get_vcount();
 extern int __LIB__ wait_vblank_noint();
 extern void __LIB__ set_sprite(int n, int x, int y, int tile) __smallc;
+
+// Following two methods return __SMS_JOY_XX
 extern int __LIB__ read_joypad1();
 extern int __LIB__ read_joypad2();
-extern void __LIB__ set_vdp_reg(int reg, int value) __smallc;
-#ifndef __CONIO_H__
+
+#ifndef gotoxy
+// gotoxy is defined in conio.h, so avoid the clash
 #define gotoxy(x,y) gotoxy_sms(x,y)
-extern void __LIB__ gotoxy_sms(int x, int y) __smallc;
 #endif
+extern void __LIB__ gotoxy_sms(int x, int y) __smallc;
+extern unsigned char standard_font[];  /* Actually data *not* a function */
+
+extern void __LIB__ set_vdp_reg(int reg, int value) __smallc;
 extern void __LIB__ add_raster_int(void *ptr);
 extern void __LIB__ add_pause_int(void *ptr);
 extern void __LIB__ set_sound_freq(int channel, int freq) __smallc;
 extern void __LIB__ set_sound_volume(int channel, int volume) __smallc;
 
-extern unsigned char standard_font[];  /* Actually data *not* a function */
 
 
 extern unsigned char pause_flag;
