@@ -20,10 +20,10 @@ libctest.sms: libctest.c
 	echo libctest.map libctest.sym
 
 pong_graphics.o: pong_graphics.asm batnball.til numbers.til bkg.til icons.til
-	z80asm -d pong_graphics.asm
+	z88dk-z80asm -d pong_graphics.asm
 
 testtxt_apk.o: testtxt_apk.asm testtxt.apk
-	z80asm -d testtxt_apk.asm
+	z88dk-z80asm -d testtxt_apk.asm
 
 pongmstr.sms: pong_graphics.o pongmstr.c
 	zcc +sms $(CFLAGS) pong_graphics.o pongmstr.c -o pongmstr.bin  -create-app
@@ -38,7 +38,7 @@ apktest.sms: testtxt_apk.o apktest.c
 	echo apktest.map apktest.sym
 
 chicken_graphics.o: chicken_graphics.asm road.til sidewalk.til car1.til
-	z80asm -d chicken_graphics.asm
+	z88dk-z80asm -d chicken_graphics.asm
 
 chicken.sms: chicken_graphics.o chicken.c
 	zcc +sms $(CFLAGS) chicken_graphics.o chicken.c -o chicken.bin  -create-app
