@@ -521,7 +521,6 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     } else {
         strcpy(disc_name, output_file);
     }
-
     cpm_create_filename(binary_name, cpm_filename, f->force_com_extension, 0);
 
     // Open the binary file
@@ -592,15 +591,13 @@ void cpm_create_filename(const char* binary, char* cpm_filename, char force_com_
     int dest = 0;
     char *ptr;
 
-    if ( (ptr = strchr(binary,'/') ) || (ptr = strrchr(binary,'\\')) ) {
-        binary = ptr + 1;
-    }
+    ptr = zbasename((char *)binary);
 
-    while (count < 8 && count < strlen(binary) && binary[count] != '.') {
-        if (binary[count] > 127) {
+    while (count < 8 && count < strlen(ptr) && ptr[count] != '.') {
+        if (ptr[count] > 127) {
             cpm_filename[count] = '_';
         } else {
-            cpm_filename[count] = toupper(binary[count]);
+            cpm_filename[count] = toupper(ptr[count]);
         }
         count++;
     }
@@ -618,19 +615,19 @@ void cpm_create_filename(const char* binary, char* cpm_filename, char force_com_
         cpm_filename[dest++] = 'O';
         cpm_filename[dest++] = 'M';
     } else {
-        while (count < strlen(binary) && binary[count] != '.') {
+        while (count < strlen(ptr) && ptr[count] != '.') {
             count++;
         }
-        if (count < strlen(binary)) {
-            while (dest < (12 + include_dot) && count < strlen(binary)) {
-                if (binary[count] == '.') {
+        if (count < strlen(ptr)) {
+            while (dest < (12 + include_dot) && count < strlen(ptr)) {
+                if (ptr[count] == '.') {
                     count++;
                     continue;
                 }
-                if (binary[count] > 127) {
+                if (ptr[count] > 127) {
                     cpm_filename[dest] = '_';
                 } else {
-                    cpm_filename[dest] = toupper(binary[count]);
+                    cpm_filename[dest] = toupper(ptr[count]);
                 }
                 dest++;
                 count++;
