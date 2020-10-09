@@ -3,9 +3,6 @@
     PUBLIC  joystick
     PUBLIC  _joystick
 
-    EXTERN  read_joypad1
-    EXTERN  read_joypad2
-
 
 joystick:
 _joystick:
