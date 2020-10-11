@@ -28,12 +28,84 @@ option_t lviv_options[] = {
     {  0,   NULL,        NULL,                               OPT_NONE,  NULL }
 };
 
+
+static void writebyte_lviv(uint8_t byte, FILE *fp, FILE *fpwav);
+
+
+
+
+static uint8_t    h_lvl = 0xff;
+static uint8_t    l_lvl = 0x00;
+
+
+static void lviv_bit(FILE* fpout, int bit)
+{
+    int  i;
+
+    if (bit) {
+
+        for ( i = 0; i < 15; i++ ) {
+            fputc(h_lvl, fpout);
+        }
+        for ( i = 0; i < 15; i++ ) {
+            fputc(l_lvl, fpout);
+        }
+        for ( i = 0; i < 15; i++ ) {
+            fputc(h_lvl, fpout);
+        }
+        for ( i = 0; i < 15; i++ ) {
+            fputc(l_lvl, fpout);
+        }
+    } else {
+        for ( i = 0; i < 30; i++ ) {
+            fputc(h_lvl, fpout);
+        }
+        for ( i = 0; i < 30; i++ ) {
+            fputc(l_lvl, fpout);
+        } 
+    }
+}
+
+static void lviv_pilot(FILE *fpout, int pilotLength)
+{
+    int i;
+    for ( i = 0; i < pilotLength; i++) {
+        lviv_bit(fpout,1);
+    }
+}
+
+static void lviv_emit_level(FILE *fpout, int length, int level)
+{
+    int i;
+    for ( i = 0; i < length; i++) {
+        fputc(level, fpout);
+    }
+}
+
+
+static void lviv_rawout(FILE *fpout, unsigned char b)
+{
+    unsigned char c[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
+    int i;
+
+    // Send bit 0 inverted
+    lviv_bit(fpout, 0);
+
+    for (i = 0; i < 8; i++)
+        lviv_bit(fpout, (b & c[i]) ? 1 : 0);
+
+    lviv_bit(fpout, 1);
+    lviv_bit(fpout, 1);
+}
+
+
 int lviv_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
     struct  stat binname_sb;
     FILE   *fpin;
     FILE   *fpout;
+    FILE   *fpwav;
     int     i,c;
     int     size;
     
@@ -129,6 +201,13 @@ int lviv_exec(char *target)
        // And now it's binding to bios, Mame ignores it, so will we
        fwrite(ram, 1, 14, fpout);
     } else {
+        suffix_change(filename,".raw");
+        if ( ( fpwav = fopen(filename, "wb")) == NULL ) {
+            exit_log(1,"Can't open output file %s\n", filename);
+        }
+        lviv_pilot(fpwav, 5190);
+
+
         /*
         CODE .LVT
             +0x00	9	"LVOV/2.0/"	Primary .LVT tape signature
@@ -149,16 +228,29 @@ int lviv_exec(char *target)
         writebyte('0', fpout);
         writebyte('/', fpout);
         writebyte(0xd0, fpout);	// CODE type
-        for ( i = 0 ; i < 6 ; i++ ) {
-            writebyte(i < strlen(tapename) ? tapename[i] : ' ', fpout);
+
+        for ( i = 0; i < 10; i++ ) {
+            lviv_rawout(fpwav,0xd0);
         }
-        writeword(origin, fpout);
-        writeword(origin+size-1, fpout);
-        writeword(exec, fpout);
+
+        for ( i = 0 ; i < 6 ; i++ ) {
+            writebyte_lviv(i < strlen(tapename) ? tapename[i] : ' ', fpout, fpwav);
+        }
+        lviv_emit_level(fpwav, 69370, l_lvl);
+        lviv_pilot(fpwav, 1298);
+
+        writebyte_lviv(origin % 256, fpout, fpwav);
+        writebyte_lviv(origin / 256, fpout, fpwav);
+        writebyte_lviv((origin+size-1) % 256, fpout, fpwav);
+        writebyte_lviv((origin+size-1) / 256, fpout, fpwav);
+        writebyte_lviv(exec % 256, fpout, fpwav);
+        writebyte_lviv(exec / 256, fpout, fpwav);
         for ( i = 0; i < size; i++ ) {
             c = fgetc(fpin);
-            writebyte(c,fpout);
+            writebyte_lviv(c,fpout, fpwav);
         }
+        fclose(fpwav);
+        raw2wav(filename);
     }
   
     fclose(fpin);
@@ -169,3 +261,8 @@ int lviv_exec(char *target)
 
 
 
+static void writebyte_lviv(uint8_t byte, FILE *fp, FILE *fpwav)
+{
+   lviv_rawout(fpwav,byte);
+   fputc(byte, fp);
+}
