@@ -49,6 +49,7 @@
     <ClCompile Include="..\..\src\appmake\homelab.c" />
     <ClCompile Include="..\..\src\appmake\inject.c" />
     <ClCompile Include="..\..\src\appmake\kc.c" />
+    <ClCompile Include="..\..\src\appmake\livi.c" />
     <ClCompile Include="..\..\src\appmake\lynx.c" />
     <ClCompile Include="..\..\src\appmake\m5.c" />
     <ClCompile Include="..\..\src\appmake\mamepp.c" />

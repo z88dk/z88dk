@@ -116,6 +116,9 @@ extern int       extract_exec(char *target);
 extern option_t  extract_options;
 extern char      extract_longhelp[];
 
+extern int       livi_exec(char *target);
+extern option_t  livi_options;
+
 extern int       lynx_exec(char *target);
 extern option_t  lynx_options;
 
@@ -359,6 +362,10 @@ struct {
       "Convert the Laser 350/500/700 .vz file to .cas, optionally to WAV",
       NULL,
       laser500_exec,    &laser500_options },
+    { "bin2lvt",  "livi",          "(C) 2020 z88dk",
+      "Generates an LVT file for the Livi PK-01",
+      NULL,
+      livi_exec,     &livi_options },
     { "lynxtap",  "lynx",      "(C) 2014 Stefano Bodrato",
       "Generates a tape file for the Camputers Lynx, opt. WAV",
       NULL,
