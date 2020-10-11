@@ -1,0 +1,53 @@
+
+
+
+; Single precision entry points
+	PUBLIC	___mbf32_FPADD
+	PUBLIC	___mbf32_SUBCDE
+	PUBLIC	___mbf32_FPMULT
+	PUBLIC	___mbf32_DVBCDE
+	PUBLIC	___mbf32_CMPNUM
+	PUBLIC	___mbf32_COS
+	PUBLIC	___mbf32_SIN
+	PUBLIC	___mbf32_TAN
+	PUBLIC	___mbf32_ATN
+	PUBLIC	___mbf32_LOG
+	PUBLIC	___mbf32_ABS
+	PUBLIC	___mbf32_SQR
+	PUBLIC	___mbf32_EXP
+	PUBLIC	___mbf32_FPINT
+	PUBLIC	___mbf32_FPREG
+	PUBLIC	___mbf32_FPEXP
+	PUBLIC	___mbf32_FPSIGN
+	PUBLIC	___mbf32_VALTYP
+	PUBLIC	___mbf32_BNORM
+	PUBLIC	___mbf32_POW
+
+	defc	___mbf32_FPADD	= $1082
+	defc	___mbf32_SUBCDE	= $107f
+	defc	___mbf32_FPMULT	= $11bc
+	defc	___mbf32_DVBCDE  = $121a + 2
+
+	defc	___mbf32_CMPNUM	= $133c
+	defc	___mbf32_BNORM	= $10d3 ; normalise bcde and place in FPREG (b must have reg)
+
+	defc	___mbf32_COS	= $1660
+	defc	___mbf32_SIN	= $1666
+	defc	___mbf32_TAN	= $16c3
+	defc	___mbf32_ATN	= $16d8
+	defc	___mbf32_LOG     = $117e
+	defc	___mbf32_ABS	= $12e8
+	defc	___mbf32_EXP	= $1599
+
+	defc	___mbf32_SQR	= $1554
+
+	defc	___mbf32_POW	= $155d + 2
+	defc	___mbf32_FPINT	= $1367
+
+
+	defc	___mbf32_FPREG	= $024d
+	defc	___mbf32_FPEXP	= $0250
+	defc	___mbf32_FPSIGN	= $0251
+	defc	___mbf32_VALTYP 	= 0
+
+
