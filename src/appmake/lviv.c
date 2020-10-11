@@ -15,7 +15,7 @@ static char              help         = 0;
 
 
 /* Options that are available for this module */
-option_t livi_options[] = {
+option_t lviv_options[] = {
     { 'h', "help",       "Display this help",                OPT_BOOL,  &help },
     { 'b', "binfile",    "Binary file to embed",             OPT_STR,   &binname },
     {  0,  "tapename",   "Name of the file in the LVT",      OPT_STR,   &tapename },
@@ -26,7 +26,7 @@ option_t livi_options[] = {
     {  0,   NULL,        NULL,                               OPT_NONE,  NULL }
 };
 
-int livi_exec(char *target)
+int lviv_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
     struct  stat binname_sb;
@@ -94,11 +94,12 @@ int livi_exec(char *target)
     writebyte('.', fpout);
     writebyte('0', fpout);
     writebyte('/', fpout);
+    writebyte(0xd0, fpout);	// CODE type
     for ( i = 0 ; i < 6 ; i++ ) {
         writebyte(i < strlen(tapename) ? tapename[i] : ' ', fpout);
     }
     writeword(origin, fpout);
-    writeword(origin+size+1, fpout);
+    writeword(origin+size-1, fpout);
     writeword(exec, fpout);
     for ( i = 0; i < size; i++ ) {
         c = fgetc(fpin);

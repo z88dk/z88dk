@@ -55,6 +55,7 @@ TOCREATE += $(call check_target,kc,kc_clib.lib)
 TOCREATE += $(call check_target,kramermc,kramermc_clib.lib)
 TOCREATE += $(call check_target,lambda, mlambda.lib mlambda_tiny.lib lambda_clib.lib gfxlambda.lib )
 TOCREATE += $(call check_target,laser500,laser500_clib.lib)
+TOCREATE += $(call check_target,lviv,lviv_clib.lib)
 TOCREATE += $(call check_target,lynx,lynx_clib.lib)
 TOCREATE += $(call check_target,m100,m100_clib.lib)
 TOCREATE += $(call check_target,m5,m5_clib.lib)
@@ -1597,6 +1598,13 @@ vector06c_clib.lib:
 	$(MAKE) -C gfx TARGET=vector06c FLAVOUR=wide
 	$(MAKE) -C games TARGET=vector06c
 	TARGET=vector06c TYPE=8080 $(LIBLINKER) -m8080 -DFORvector06c -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vector06c_clib @$(LISTFILE_DIRECTORY)/vector06c.lst
+
+lviv_clib.lib:
+	@echo ''
+	@echo '--- Building PK-01 Lviv/Lvov Library ---'
+	@echo ''
+	$(call buildgeneric,lviv,portable)
+	TARGET=lviv TYPE=8080 $(LIBLINKER) -m8080 -DFORlviv -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/lviv_clib @$(LISTFILE_DIRECTORY)/lviv.lst
 
 altair8800_clib.lib:
 	@echo ''
