@@ -21,6 +21,12 @@
     ld      hl,2
     add     hl,sp
     ld      c,(hl)
+    ld      a,c
+    cp      10
+    jr      nz,continue
+    call    continue
+    ld      c,13
+continue:
     rst     $30
     defb    ED_CHOUT ; editor - character out
     ret
