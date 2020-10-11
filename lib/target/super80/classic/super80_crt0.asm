@@ -123,6 +123,7 @@ program:
 	ld	c,@00110110
 	ld	a,c
 	out	($F0),a
+IF CRT_SUPER80_VDUEM
 	; So we're on the text page
 	ld	hl,$f000
 	ld	(hl),32
@@ -135,6 +136,7 @@ program:
 	cp	32
 	jr	z,is_super80v
 	res	2,c		;If bit 2 is zero, indicate we're on super80r
+ENDIF
 is_super80v:
 	ld	a,c
 	ld	(PORT_F0_COPY),a
