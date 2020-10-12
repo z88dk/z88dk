@@ -189,7 +189,7 @@ int px_exec(char* target)
     }
 
     if ((len > 16256) || (fullsize)) {
-        printf("\nPreaparing a 32K ROM image (27256 EPROM)\n\n");
+        printf("\nPreparing a 32K ROM image (27256 EPROM)\n\n");
         for (i = 0; i < 0x8000; i++) {
             writebyte(romimg[i], fpout);
         }
