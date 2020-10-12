@@ -52,6 +52,10 @@ IF !DEFINED_CRT_ORG_BSS
 	defc CRT_ORG_BSS =  RAM_Start   ; Static variables are kept in RAM
 	defc DEFINED_CRT_ORG_BSS = 1
 ENDIF
+IF !DEFINED_CRT_ORG_CODE
+	defc CRT_ORG_CODE =  ROM_Start   ; Static variables are kept in RAM
+	defc DEFINED_CRT_ORG_CODE = 1
+ENDIF
         defc    TAR__register_sp = -1
         defc    TAR__clib_exit_stack_size = 4
 
@@ -61,7 +65,7 @@ ENDIF
         INCLUDE "crt/classic/crt_rules.inc"
 
 
-	org    ROM_Start
+	org    CRT_ORG_CODE
 	
 
 ; reset
