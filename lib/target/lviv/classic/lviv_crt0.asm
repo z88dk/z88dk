@@ -25,6 +25,8 @@
 	defc	CRT_KEY_DEL = 127
 	defc	__CPU_CLOCK = 2500000
         INCLUDE "crt/classic/crt_rules.inc"
+        defc    CONSOLE_COLUMNS = 32
+        defc    CONSOLE_ROWS = 32
 
 IF      !DEFINED_CRT_ORG_CODE
         defc CRT_ORG_CODE = 0x0000
