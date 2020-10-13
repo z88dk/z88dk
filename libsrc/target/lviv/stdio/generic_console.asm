@@ -44,7 +44,32 @@ generic_console_set_ink:
 generic_console_scrollup:
     push    bc
     push    de
-
+    ld      a,$fd	;Page VRAM in
+    out     ($c2),a
+    ld      hl,16384 + 512
+    ld      de,16384
+    ld      bc,16384 - 512
+scroll1:
+    ld      a,(hl)
+    ld      (de),a
+    inc     hl
+    inc     de
+    dec     bc
+    ld      a,b
+    or      c
+    jp      nz,scroll1
+    ld      a,$ff	;Page VRAM out
+    out     ($c2),a
+    ld      bc,$1f00
+scroll2:
+    push    bc
+    ld      d,' '
+    call    generic_console_printc
+    pop     bc
+    inc     c
+    ld      a,c
+    cp      32
+    jp      nz,scroll2
     pop     de
     pop     bc
     ret
