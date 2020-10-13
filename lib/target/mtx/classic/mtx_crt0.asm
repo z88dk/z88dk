@@ -33,7 +33,7 @@
 ;--------
 
         IF !DEFINED_CRT_ORG_CODE
-            IF (startup=2)                 ; ROM ?
+            IF (startup=2)                 ; Attempt to use 48k on the MTX512
                 defc    CRT_ORG_CODE  = 16384+19
             ELSE
                 defc    CRT_ORG_CODE  = 32768+19
