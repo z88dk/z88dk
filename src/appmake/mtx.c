@@ -17,7 +17,6 @@ static char              audio        = 0;
 static char              fast         = 0;
 static char              khz_22       = 0;
 static char              mtb          = 0;
-static char              mtx          = 0;
 static char              dumb         = 0;
 static char              loud         = 0;
 static char              help         = 0;
@@ -37,7 +36,6 @@ option_t mtx_options[] = {
     {  0,  "22",       "22050hz bitrate option",     OPT_BOOL,  &khz_22 },
     {  0,  "loud",     "Louder audio volume",        OPT_BOOL,  &loud },
     {  0,  "mtb",      "MTB output file mode",       OPT_BOOL,  &mtb },
-    {  0,  "mtx",      "append MTX extension",       OPT_BOOL,  &mtx },
     {  0,  "dumb",     "Just convert to WAV a tape file",  OPT_BOOL,  &dumb },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &origin },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
@@ -142,10 +140,8 @@ int mtx_exec(char* target)
             strcpy(filename, binname);
             if (mtb)
                 suffix_change(filename, ".mtb");
-            else if (mtx)
-                suffix_change(filename, ".mtx");
             else
-                suffix_change(filename, "");
+                suffix_change(filename, ".mtx");
         } else {
             strcpy(filename, outfile);
         }
