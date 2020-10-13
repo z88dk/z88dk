@@ -8,8 +8,7 @@ int console_ioctl(uint16_t cmd, void *arg) __naked
 	EXTERN		generic_console_ioctl
 	EXTERN		__console_w
 	EXTERN		generic_console_flags
-	EXTERN		CLIB_GENCON_CAPS
-	PUBLIC		generic_console_caps
+	EXTERN          generic_console_caps
 
 ; fputc_cons_generic_ioctl(uint16_t request, void *arg) __smallc;
 ; Request at the moment is 8 bits
@@ -88,10 +87,6 @@ ENDIF
 	inc	hl
 	ld	(hl),d
 	jr	success
-
-	SECTION	data_clib
-generic_console_caps:
-	defb	CLIB_GENCON_CAPS
 
 #endasm
 }
