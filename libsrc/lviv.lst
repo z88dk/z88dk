@@ -1,6 +1,7 @@
 target/lviv/stdio/fputc_cons_native
 target/lviv/stdio/generic_console
 target/lviv/stdio/generic_console_ioctl
+target/lviv/stdio/generic_console_vpeek
 target/lviv/stdio/conio_vars
 target/lviv/stdio/CRT_FONT
 @stdio/stdio_8080.lst

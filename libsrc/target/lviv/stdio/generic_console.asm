@@ -19,10 +19,6 @@
     EXTERN    __lviv_ink
     EXTERN    __lviv_paper
 
-PUBLIC generic_console_vpeek
-generic_console_vpeek:
-    scf
-    ret
 
 generic_console_set_paper:
     and     3
