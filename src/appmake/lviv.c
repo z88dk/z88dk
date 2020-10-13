@@ -135,19 +135,21 @@ int lviv_exec(char *target)
     }
     
     if ( stat(binname, &binname_sb) < 0 ||
-         ( (fpin=fopen_bin(binname, NULL) ) == NULL )) {
+         ( (fpin=fopen_bin(binname, crtfile) ) == NULL )) {
         exit_log(1,"Can't open input file %s\n",binname);
-    }
-    
-    if ( ( fpout = fopen(binname, "rb")) == NULL ) {
-        exit_log(1,"Can't open input file %s\n", binname);
     }
     
     if ( ( fpout = fopen(filename, "wb")) == NULL ) {
         exit_log(1,"Can't open output file %s\n", filename);
     }
 
-    size = binname_sb.st_size;
+    if (fseek(fpin,0,SEEK_END)) {
+        fclose(fpin);
+        exit_log(1,"Couldn't determine size of file\n");
+    }
+
+    size=ftell(fpin);
+    fseek(fpin,0L,SEEK_SET);
 
     if ( snapshot ) {
         // Snapshots are only good for programs compiled without a ROM dependency

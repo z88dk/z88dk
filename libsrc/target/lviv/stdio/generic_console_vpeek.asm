@@ -1,5 +1,5 @@
     MODULE  generic_console_vpeek
-    SECTION code_clib
+    SECTION code_himem
     PUBLIC  generic_console_vpeek
 
     EXTERN  generic_console_xypos
