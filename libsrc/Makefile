@@ -948,6 +948,7 @@ smc777_cpm.lib:
 	@echo '--- Building Sony SMC-70/SMC-777 Library ---'
 	@echo ''
 	@$(RM) -f video/mc6845/*.o
+	@$(RM) -f psg/sn76489/*.o
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=smc777 FLAVOUR=wide
 	$(MAKE) -C psg TARGET=cpm SUBTYPE=smc777
 	$(MAKE) -C games TARGET=cpm SUBTYPE=smc777 TARGET_CFLAGS=-subtype=smc777
