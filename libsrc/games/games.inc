@@ -324,11 +324,6 @@ IF FORm100
         defc sndbit_mask   = 0
 ENDIF
 
-IF FORsmc777
-    defc sndbit_port	= $1c
-    defc sndbit_bit    = 4
-    defc sndbit_mask   = $15
-ENDIF
 
 IF FORmyvision
     defc sndbit_port	= 0
@@ -409,6 +404,12 @@ IF FORrx78
 	defc sndbit_bit    = 3
 	defc sndbit_mask   = $0F			; $0F for full volume output
 	defc JOYSTICK_inkey = 1
+ENDIF
+
+IF FORsmc777
+    defc sndbit_port   = $53           ; possibly valid also for Sony SMC 70
+    defc sndbit_bit    = 3
+    defc sndbit_mask   = $0F                   ; $0F for full volume output
 ENDIF
 
 
