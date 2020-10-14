@@ -1,6 +1,6 @@
 
 
-    SECTION   code_clib
+    SECTION   code_himem
 
     PUBLIC    generic_console_cls
     PUBLIC    generic_console_printc
