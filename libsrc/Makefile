@@ -705,6 +705,7 @@ mz_clib.lib:
 	@echo '--- Building Sharp MZ Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	@$(RM) -f psg/sn76489/*.o
 	$(MAKE) -C games TARGET=mz
 	$(call buildgeneric,mz)
 	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz -x$(OUTPUT_DIRECTORY)/mz_clib @$(LISTFILE_DIRECTORY)/mz.lst
@@ -872,6 +873,7 @@ mtx_clib.lib:
 	@echo '--- Building Memotech MTX Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	@$(RM) -f psg/sn76489/*.o
 	$(call buildgeneric,mtx)
 	$(MAKE) -C target/mtx
 	$(MAKE) -C games TARGET=mtx
@@ -987,6 +989,7 @@ m5_clib.lib:
 	@echo '--- Building SORD M5 Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	@$(RM) -f psg/sn76489/*.o
 	$(MAKE) -C games TARGET=m5
 	$(call buildgeneric,m5)
 	$(MAKE) -C video/tms9918 TARGET=m5
@@ -1119,6 +1122,7 @@ pasopia7_clib.lib:
 	@echo '--- Building Toshiba Pasopia7 Library ---'
 	@echo ''
 	@$(RM) -f video/mc6845/*.o
+	@$(RM) -f psg/sn76489/*.o
 	$(call buildgeneric,pasopia7,"gencon narrow")
 	$(MAKE) -C games TARGET=pasopia7
 	TARGET=pasopia7 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpasopia7 -x$(OUTPUT_DIRECTORY)/pasopia7_clib @$(LISTFILE_DIRECTORY)/pasopia7.lst
@@ -1189,6 +1193,7 @@ pv2000_clib.lib:
 	@echo '--- Building Casio PV-2000 Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	@$(RM) -f psg/sn76489/*.o
 	$(MAKE) -C games TARGET=pv2000
 	$(call buildgeneric,pv2000)
 	$(MAKE) -C games TARGET=pv2000
@@ -1222,6 +1227,7 @@ coleco_clib.lib:
 	@echo '--- Building Colecovision Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	@$(RM) -f psg/sn76489/*.o
 	$(MAKE) -C games TARGET=coleco
 	$(call buildgeneric,coleco)
 	$(MAKE) -C video/tms9918 TARGET=coleco
@@ -1241,6 +1247,7 @@ pencil2_clib.lib:
 	@echo '--- Building Pencil II Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	@$(RM) -f psg/sn76489/*.o
 	$(MAKE) -C games TARGET=pencil2
 	$(call buildgeneric,pencil2)
 	$(MAKE) -C video/tms9918 TARGET=pencil2
@@ -1417,6 +1424,7 @@ sms_clib.lib:
 	@echo '--- Building Sega Master System Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	@$(RM) -f psg/sn76489/*.o
 	$(MAKE) -C games TARGET=sms
 	$(call buildgeneric,sms)
 	$(MAKE) -C video/tms9918 TARGET=sms
@@ -1428,6 +1436,7 @@ sc3000_clib.lib:
 	@echo '--- Building SC-3000 System Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	@$(RM) -f psg/sn76489/*.o
 	$(MAKE) -C games TARGET=sc3000
 	$(call buildgeneric,sc3000)
 	$(MAKE) -C video/tms9918 TARGET=sc3000
