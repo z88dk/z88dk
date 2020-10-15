@@ -25,6 +25,10 @@ void memset3(char *ptr, int c, int s)
 {
     memset(ptr,c,s);
 }
+void memset4(char *ptr, int c, int s)
+{
+    memset(ptr,0,256);
+}
 
 void strcpy1(char *a,char *b)
 {

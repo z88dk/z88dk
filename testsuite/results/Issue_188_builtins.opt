@@ -96,6 +96,22 @@
 
 
 
+._memset4
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+	ld	e,0
+	ld	b,0
+.i_8
+	ld	(hl),e
+	inc	hl
+	djnz	i_8
+	pop	hl
+	ret
+
+
+
 ._strcpy1
 	ld	hl,4	;const
 	add	hl,sp
@@ -105,10 +121,10 @@
 	ld	hl,i_1+0
 	push	de
 	xor	a
-.i_8
+.i_9
 	cp	(hl)
 	ldi
-	jr	nz,i_8
+	jr	nz,i_9
 	pop	hl
 	ret
 
@@ -123,10 +139,10 @@
 	pop	de
 	push	de
 	xor	a
-.i_9
+.i_10
 	cp	(hl)
 	ldi
-	jr	nz,i_9
+	jr	nz,i_10
 	pop	hl
 	ret
 
@@ -312,6 +328,7 @@
 	GLOBAL	_memset1
 	GLOBAL	_memset2
 	GLOBAL	_memset3
+	GLOBAL	_memset4
 	GLOBAL	_strcpy1
 	GLOBAL	_strcpy2
 	GLOBAL	_memcpy1

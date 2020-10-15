@@ -4950,12 +4950,12 @@ void gen_builtin_memset(int32_t c, int32_t s)
                 ol("ld\t(hl),e");
             }
         }
-    } else if ( s < 256 ) {
+    } else if ( s <= 256 ) {
         int looplabel = getlabel();
         if ( c != -1 ) {
             outstr("\tld\te,"); outdec(c % 256); nl();
         }
-        outstr("\tld\tb,"); outdec(s); nl();
+        outstr("\tld\tb,"); outdec(s % 256); nl();
         postlabel(looplabel);
         ol("ld\t(hl),e");
         ol("inc\thl");
