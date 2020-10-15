@@ -4605,6 +4605,15 @@
 =
 	ld	hl,0	;const
 
+	ld	h,%1
+	%"and|or|xor"3	%2
+	ld	l,a
+	ld	h,%1
+=
+	%3	%2
+	ld	l,a
+	ld	h,%1
+
 	push	de
 	push	hl
 	ld	hl,%1	;const
@@ -4685,3 +4694,21 @@
 =
 	ld	bc,%eval(%1 256 * %2 +)
 	push	bc
+
+%eval 2 = %2 %1 -
+	ld	hl,%1	;const
+	call	l_gintspsp	;
+	ld	hl,%2	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;
+	push	hl
+
+	push	hl
+	pop	de
+=
+	ld	d,h
+	ld	e,l

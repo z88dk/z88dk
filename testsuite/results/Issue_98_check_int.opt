@@ -123,12 +123,12 @@
 
 
 ._sub_1
-	ld	hl,2	;const
-	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
-	pop	de
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	d,h
+	ld	e,l
 	call	l_mult
 	ld	de,2
 	ex	de,hl
@@ -150,12 +150,12 @@
 
 
 ._sub2_1
-	ld	hl,2	;const
-	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
-	pop	de
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	d,h
+	ld	e,l
 	call	l_mult
 	dec	hl
 	dec	hl
