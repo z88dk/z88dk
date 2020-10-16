@@ -24,10 +24,24 @@ asm_PSGlib_Stop:
    ret z
    
    ld a,PSGLatch|PSGChannel0|PSGVolumeData|0x0f    ; // latch channel 0, volume=0xF (silent)
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
+ENDIF
    
    ld a,PSGLatch|PSGChannel1|PSGVolumeData|0x0f    ; // latch channel 1, volume=0xF (silent)
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
+ENDIF
 
    ld a,(__PSGlib_Channel2SFX)
    
@@ -35,8 +49,14 @@ asm_PSGlib_Stop:
    jr nz, skip00
    
    ld a,PSGLatch|PSGChannel2|PSGVolumeData|0x0f    ; // latch channel 2, volume=0xF (silent)
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
-
+ENDIF
 skip00:
 
    ld a,(__PSGlib_Channel3SFX)
@@ -45,8 +65,14 @@ skip00:
    jr nz, skip01
    
    ld a,PSGLatch|PSGChannel3|PSGVolumeData|0x0f    ; // latch channel 3, volume=0xF (silent)
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
-
+ENDIF
 skip01:
 
    ld a,PSG_STOPPED

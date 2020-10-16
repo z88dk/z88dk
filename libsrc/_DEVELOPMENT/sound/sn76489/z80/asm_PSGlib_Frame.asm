@@ -76,7 +76,14 @@ _continue:
   jr z,_send2PSG_B               ; if no SFX is playing jump
   ld (__PSGlib_Channel3SFX),a         ; otherwise mark channel 3 as occupied
   ld a,PSGLatch|PSGChannel3|PSGVolumeData|0x0F   ; and silence channel 3
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
   out (PSGDataPort),a
+ENDIF
   jp _intLoop
 _ifchn2:
   ld (__PSGlib_Chan2LowTone),a        ; save tone LOW data
@@ -151,7 +158,14 @@ _otherCommands:
 _send2PSG_B:
   ld a,b
 _send2PSG_A:
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
   out (PSGDataPort),a              ; output the byte
+ENDIF
   jp _intLoop
 
 _sendVolume2PSG_B:
@@ -170,7 +184,14 @@ _no_overflow:
   ld a,c                           ; retrieve PSG command
   and 0xF0                         ; keep upper nibble
   or b                             ; set attenuated volume
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
   out (PSGDataPort),a              ; output the byte
+ENDIF
   jp _intLoop
 
 _output_NoLatch:

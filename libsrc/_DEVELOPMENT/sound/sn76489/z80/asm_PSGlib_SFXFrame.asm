@@ -57,7 +57,14 @@ _SFXvolumechn3:
   ld (__PSGlib_SFXChan3Volume),a
 
 _SFXoutbyte:
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
   out (PSGDataPort),a            ; output the byte
+ENDIF
   jp _intSFXLoop
   
 _skipSFXFrame:

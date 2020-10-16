@@ -44,11 +44,25 @@ asm_PSGlib_SFXStop:
    ld a,(__PSGlib_Chan2LowTone)
    and 0x0f
    or PSGLatch|PSGChannel2
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
+ENDIF
    
    ld a,(__PSGlib_Chan2HighTone)
    and 0x3f
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
+ENDIF
    
    ld a,(__PSGlib_Chan2Volume)
    
@@ -64,7 +78,14 @@ silchan2:
 outchan2:
 
    or PSGLatch|PSGChannel3|PSGVolumeData
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
+ENDIF
 
    ld a,PSG_STOPPED
    ld (__PSGlib_Channel2SFX),a
@@ -82,7 +103,14 @@ skipchan2:
    ld a,(__PSGlib_Chan3LowTone)
    and 0x0f
    or PSGLatch|PSGChannel3
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
+ENDIF
    
    ld a,(__PSGlib_Chan3Volume)
    
@@ -98,7 +126,14 @@ silchan3:
 outchan3:
 
    or PSGLatch|PSGChannel3|PSGVolumeData
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
+ENDIF
 
    ld a,PSG_STOPPED
    ld (__PSGlib_Channel3SFX),a

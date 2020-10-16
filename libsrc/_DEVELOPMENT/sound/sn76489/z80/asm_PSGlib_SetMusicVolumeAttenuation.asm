@@ -42,8 +42,14 @@ asm_PSGlib_SetMusicVolumeAttenuation:
 outchan0:
 
    or PSGLatch|PSGChannel0|PSGVolumeData
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
-	
+ENDIF
 	ld a,(__PSGlib_Chan1Volume)
    
    add a,l
@@ -55,8 +61,14 @@ outchan0:
 outchan1:
 
    or PSGLatch|PSGChannel1|PSGVolumeData
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
-
+ENDIF
 	ld a,(__PSGlib_Channel2SFX)
 	or a
 	jr nz, skipchan2
@@ -72,7 +84,14 @@ outchan1:
 outchan2:
 
    or PSGLatch|PSGChannel2|PSGVolumeData
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
+ENDIF
 	
 skipchan2:
 
@@ -91,6 +110,13 @@ skipchan2:
 outchan3:
 
    or PSGLatch|PSGChannel3|PSGVolumeData
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
+ENDIF
 	
 	ret

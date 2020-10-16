@@ -46,7 +46,14 @@ asm_PSGlib_RestoreVolumes:
 outchan0:
 
    or PSGLatch|PSGChannel0|PSGVolumeData
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
    out (PSGPort),a
+ENDIF
 	
 	ld a,(__PSGlib_Chan1Volume)
    
