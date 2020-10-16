@@ -16,6 +16,8 @@
 .getk
 ._getk
 	call	$79
+        ld      hl,0
+        ret     z
   
 IF STANDARDESCAPECHARS
 	cp	13
@@ -23,7 +25,5 @@ IF STANDARDESCAPECHARS
 	ld	a,10
 .not_return
 ENDIF
-
-	ld	h,0
 	ld	l,a
 	ret
