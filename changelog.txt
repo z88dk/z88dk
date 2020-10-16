@@ -6,7 +6,8 @@ z88dk vx.x.x - xx.xx.xxxx
 Detailed but incomplete changelist:
 
 - [classic] WYZTracker is now available for AY music and SFX
-- [classic] Vortex Track is now available for AY music and SFX
+- [classic] Vortex Tracker2 is now available for AY music and SFX
+- [classic] PSGLib is now available for SN76489 music and SFX
 - [classic] Interrupt code is now 8080 clean
 - [classic] +cpm: Vector06c disc creation
 - [classic] +dai: New target
@@ -16,6 +17,7 @@ Detailed but incomplete changelist:
 - [classic] +homelab2: New target for the Homelab 2 machine
 - [classic] +msx: Banking now works for both sdcc and sccz80
 - [classic] +msx: MegaROMs can now be created
+- [classic] +ondra: New target
 - [classic] +special: New target
 - [classic] +svi: Generic console now works again
 - [classic] +vector06c: New target
