@@ -83,6 +83,9 @@ IF HAVE16bitbus
   pop bc
 ELSE
   out (PSGDataPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
   jp _intLoop
 _ifchn2:
@@ -165,6 +168,9 @@ IF HAVE16bitbus
   pop bc
 ELSE
   out (PSGDataPort),a              ; output the byte
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
   jp _intLoop
 
@@ -191,6 +197,9 @@ IF HAVE16bitbus
   pop bc
 ELSE
   out (PSGDataPort),a              ; output the byte
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
   jp _intLoop
 

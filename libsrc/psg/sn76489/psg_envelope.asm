@@ -39,6 +39,9 @@ IF HAVE16bitbus
 	out	(c),a
 ELSE
 	out	(psgport), a	; Sends it
+  IF PSGLatchPort
+    in a,(PSGLatchPort)
+  ENDIF
 ENDIF
 
 	ret

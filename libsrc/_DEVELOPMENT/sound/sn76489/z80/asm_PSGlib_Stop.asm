@@ -30,7 +30,10 @@ IF HAVE16bitbus
   out (c),a
   pop bc
 ELSE
-   out (PSGPort),a
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
    
    ld a,PSGLatch|PSGChannel1|PSGVolumeData|0x0f    ; // latch channel 1, volume=0xF (silent)
@@ -40,7 +43,10 @@ IF HAVE16bitbus
   out (c),a
   pop bc
 ELSE
-   out (PSGPort),a
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
 
    ld a,(__PSGlib_Channel2SFX)
@@ -55,7 +61,10 @@ IF HAVE16bitbus
   out (c),a
   pop bc
 ELSE
-   out (PSGPort),a
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
 skip00:
 
@@ -71,7 +80,10 @@ IF HAVE16bitbus
   out (c),a
   pop bc
 ELSE
-   out (PSGPort),a
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
 skip01:
 

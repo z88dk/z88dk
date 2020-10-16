@@ -42,10 +42,13 @@ IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
 	or	a, $80
 	or	a, b		; Prepares the first byte of the command
 IF HAVE16bitbus
-        ld      bc,psgport
-        out     (c),a
+    ld      bc,psgport
+    out     (c),a
 ELSE
-	out	(psgport), a	; Sends it
+    out	(psgport), a	; Sends it
+  IF PSGLatchPort
+    in a,(PSGLatchPort)
+  ENDIF
 ENDIF
 	
 	ld	a, e
@@ -65,10 +68,13 @@ ENDIF
 	
 	or	a, b		; Puts them together
 IF HAVE16bitbus
-        ld      bc,psgport
-        out     (c),a
+    ld      bc,psgport
+    out     (c),a
 ELSE
-	out	(psgport), a	; Sends the second byte of the command
+    out	(psgport), a	; Sends the second byte of the command
+  IF PSGLatchPort
+    in a,(PSGLatchPort)
+  ENDIF
 ENDIF
 
 	ret

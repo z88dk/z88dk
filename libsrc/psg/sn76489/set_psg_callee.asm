@@ -27,13 +27,18 @@ _set_psg_callee:
    pop hl
    pop de
    ex (sp),hl
-	
 .asmentry
 
     LD	BC,psgport
-	OUT	(C),L
-	OUT	(C),E
-	ret
+    OUT	(C),L
+IF PSGLatchPort
+    in a,(PSGLatchPort)
+ENDIF
+    OUT	(C),E
+IF PSGLatchPort
+    in a,(PSGLatchPort)
+ENDIF
+    ret
 
 DEFC ASMDISP_SET_PSG_CALLEE = asmentry - set_psg_callee
 
