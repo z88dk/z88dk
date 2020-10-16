@@ -53,5 +53,5 @@ target/gal/psg/set_psg
 target/gal/psg/set_psg_callee
 target/gal/psg/get_psg
 target/gal/psg/psg_init
-@psg/psg.lst
+@psg/ay/psg.lst
 @z80.lst

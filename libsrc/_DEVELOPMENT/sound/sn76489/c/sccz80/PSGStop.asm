@@ -8,3 +8,10 @@ PUBLIC PSGStop
 EXTERN asm_PSGlib_Stop
 
 defc PSGStop = asm_PSGlib_Stop
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _PSGStop
+defc _PSGStop = PSGStop
+ENDIF
+

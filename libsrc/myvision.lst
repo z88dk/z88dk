@@ -13,7 +13,7 @@ target/myvision/psg/set_psg_callee
 target/myvision/psg/get_psg
 target/myvision/psg/psg_init
 target/myvision/psg/asm_wyz_hardware_out
-@psg/psg.lst
-@psg/wyz/psg_wyz.lst
+@psg/ay/psg.lst
+@psg/ay/wyz/psg_wyz.lst
 @interrupts/interrupts.lst
 @z80.lst

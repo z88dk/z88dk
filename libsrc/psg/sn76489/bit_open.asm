@@ -1,6 +1,7 @@
 	SECTION code_clib
 	
-	;INCLUDE	"psg/sn76489.inc"
+
+IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
 	
     PUBLIC     bit_open
     PUBLIC     _bit_open
@@ -31,7 +32,6 @@
 
 .bit_open_di
 ._bit_open_di
-	
 	ld a,i		; get the current status of the irq line
 	di
 	push af
@@ -74,3 +74,4 @@
 .bit_close
 ._bit_close
 	ret
+ENDIF

@@ -8,3 +8,10 @@ PUBLIC PSGSFXFrame
 EXTERN asm_PSGlib_SFXFrame
 
 defc PSGSFXFrame = asm_PSGlib_SFXFrame
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _PSGSFXFrame
+defc _PSGSFXFrame = PSGSFXFrame
+ENDIF
+

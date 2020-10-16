@@ -1,0 +1,12 @@
+
+
+INCLUDE "sn76489.inc"
+
+defc __IO_PSG = psgport
+
+defc __PSGLIB_PSG_STOPPED = 0
+defc __PSGLIB_PSG_PLAYING = 1
+
+defc __PSGLIB_SFX_CHANNEL2 = 0x01
+defc __PSGLIB_SFX_CHANNEL3 = 0x02
+defc __PSGLIB_SFX_CHANNELS2AND3 = 0x03

@@ -8,3 +8,10 @@ PUBLIC PSGSFXStop
 EXTERN asm_PSGlib_SFXStop
 
 defc PSGSFXStop = asm_PSGlib_SFXStop
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _PSGSFXStop
+defc _PSGSFXStop = PSGSFXStop
+ENDIF
+

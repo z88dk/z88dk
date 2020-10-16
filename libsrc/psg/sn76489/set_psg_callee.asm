@@ -10,6 +10,7 @@
 ;	$Id: set_psg_callee.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
         SECTION code_clib
 	PUBLIC	set_psg_callee
 	PUBLIC	_set_psg_callee
@@ -17,7 +18,7 @@
 	PUBLIC ASMDISP_SET_PSG_CALLEE
 
 
-	INCLUDE	"psg/sn76489.inc"
+	INCLUDE	"sn76489.inc"
 
 	
 set_psg_callee:
@@ -36,3 +37,4 @@ _set_psg_callee:
 
 DEFC ASMDISP_SET_PSG_CALLEE = asmentry - set_psg_callee
 
+ENDIF

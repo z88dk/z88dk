@@ -31,8 +31,8 @@ target/sv8000/psg/set_psg_callee
 target/sv8000/psg/get_psg
 target/sv8000/psg/psg_init
 target/sv8000/psg/asm_wyz_hardware_out
-@psg/psg.lst
-@psg/wyz/psg_wyz.lst
+@psg/ay/psg.lst
+@psg/ay/wyz/psg_wyz.lst
 target/sv8000/games/joystick
 games/obj/sv8000/joystick_type
 @games/games.lst

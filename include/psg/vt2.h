@@ -1,5 +1,5 @@
 /*
- * VortexTracker2 Tracker Library
+ * VortexTracker2 Tracker Library (AY819x)
  */
 
 #ifndef __PSG_VT2_H__

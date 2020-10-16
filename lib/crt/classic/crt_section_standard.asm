@@ -70,6 +70,7 @@
 		SECTION	code_font_fzx
 		SECTION	code_psg
 		SECTION	code_sound_ay
+		SECTION	code_PSGlib
 		SECTION	code_z80
 IF !__crt_org_graphics
 		SECTION code_graphics
@@ -150,6 +151,7 @@ IF !__crt_org_graphics
 ENDIF
 		SECTION bss_psg
 		SECTION bss_sound_ay
+		SECTION	bss_PSGlib
 		SECTION bss_user
 IF __crt_model > 0
         	SECTION DATA
@@ -165,6 +167,7 @@ IF __crt_model > 0
 		SECTION data_stdlib
 		SECTION data_psg
 		SECTION data_sound_ay
+		SECTION	data_PSGlib
 IF !__crt_org_graphics
 		SECTION data_graphics
 ENDIF

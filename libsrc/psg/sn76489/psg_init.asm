@@ -10,11 +10,12 @@
 ;	$Id: psg_init.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
         SECTION code_clib
 	PUBLIC	psg_init
 	PUBLIC	_psg_init
 	
-	INCLUDE	"psg/sn76489.inc"
+	INCLUDE	"sn76489.inc"
 
 psg_init:
 _psg_init:
@@ -30,3 +31,4 @@ _psg_init:
 	OUT	(C),A
 	
 	RET
+ENDIF

@@ -59,3 +59,7 @@ IF FORpasopia7
 ENDIF
 
 
+
+IF !psgport
+	defc psgport = $00		;Placeholder
+ENDIF

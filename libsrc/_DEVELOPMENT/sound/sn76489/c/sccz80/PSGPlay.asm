@@ -8,3 +8,10 @@ PUBLIC PSGPlay
 EXTERN asm_PSGlib_Play
 
 defc PSGPlay = asm_PSGlib_Play
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _PSGPlay
+defc _PSGPlay = PSGPlay
+ENDIF
+

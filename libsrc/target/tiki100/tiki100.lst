@@ -2,7 +2,7 @@ target/tiki100/psg/set_psg
 target/tiki100/psg/set_psg_callee
 target/tiki100/psg/get_psg
 target/tiki100/psg/psg_init
-@psg/psg.lst
+@psg/ay/psg.lst
 target/tiki100/graphics/clg
 target/tiki100/graphics/w_pixladdr
 target/tiki100/graphics/swapgfxbk

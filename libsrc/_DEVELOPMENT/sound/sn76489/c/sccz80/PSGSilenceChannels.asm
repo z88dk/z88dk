@@ -8,3 +8,10 @@ PUBLIC PSGSilenceChannels
 EXTERN asm_PSGlib_SilenceChannels
 
 defc PSGSilenceChannels = asm_PSGlib_SilenceChannels
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _PSGSilenceChannels
+defc _PSGSilenceChannels = PSGSilenceChannels
+ENDIF
+

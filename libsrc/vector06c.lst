@@ -28,5 +28,5 @@ target/vector06c/psg/set_psg
 target/vector06c/psg/set_psg_callee
 target/vector06c/psg/get_psg
 target/vector06c/psg/psg_init
-@psg/psg.lst
+@psg/ay/psg.lst
 @8080.lst

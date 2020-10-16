@@ -15,3 +15,10 @@ PSGSFXPlayLoop_callee:
    push af
 
    jp asm_PSGlib_SFXPlayLoop
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _PSGSFXPlayLoop_callee
+defc _PSGSFXPlayLoop_callee = PSGSFXPlayLoop_callee
+ENDIF
+

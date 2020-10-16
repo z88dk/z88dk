@@ -17,3 +17,10 @@ PSGSFXPlay:
 	push af
 
    jp asm_PSGlib_SFXPlay
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _PSGSFXPlay
+defc _PSGSFXPlay = PSGSFXPlay
+ENDIF
+

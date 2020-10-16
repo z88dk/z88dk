@@ -2,14 +2,7 @@
 @font/font_8x8/font_8x8.lst
 target/coleco/games/joystick
 games/obj/coleco/joystick_type
-psg/sn76489/bit_open
-psg/sn76489/psg_tone
-psg/sn76489/psg_volume
-psg/sn76489/psg_envelope
-psg/sn76489/psg_init.asm
-psg/sn76489/set_psg.asm
-psg/sn76489/set_psg_callee.asm
-@psg/psg.lst
+@psg/sn76489/sn76489.lst
 @video/tms9918/video_tms9918.lst
 @gfx/narrow/gfx_narrow.lst
 target/adam/cpm_platform_init
