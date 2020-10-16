@@ -57,7 +57,7 @@ void main()
           PSGSFXPlay(SOUND3_PSG, SFX_CHANNEL2);
           break;
       case ' ':
-//          PSGSilenceChannels();
+          PSGSilenceChannels();
           break;
       case 's':
           PSGRestoreVolumes();

@@ -10,11 +10,17 @@ SECTION code_PSGlib
 
 PUBLIC asm_PSGlib_SilenceChannels
 
-EXTERN asm_sms_psg_silence
+asm_PSGlib_SilenceChannels:
+   ; uses : f, bc, hl
 
-defc asm_PSGlib_SilenceChannels = asm_sms_psg_silence
+   ld hl,table_silence
+   ld c,__IO_PSG
 
-   ; void PSGSilenceChannels (void)
-   ; silence all the PSG channels
-   ;
-   ; uses  : f, bc, hl
+   ld b,4
+   otir
+
+   ret
+
+table_silence:
+
+   defb 0x9f, 0xbf, 0xdf, 0xff
