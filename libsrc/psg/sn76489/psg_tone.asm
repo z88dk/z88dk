@@ -1,5 +1,6 @@
 	SECTION code_clib
 	
+IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
 	PUBLIC	set_sound_freq
 	PUBLIC	_set_sound_freq
 	PUBLIC	psg_tone
@@ -13,7 +14,7 @@
 ; Sets the sound frequency for a given channel
 ;==============================================================
 
-	INCLUDE	"psg/sn76489.inc"
+	INCLUDE	"sn76489.inc"
 
 .set_sound_freq
 ._set_sound_freq
@@ -71,3 +72,4 @@ ELSE
 ENDIF
 
 	ret
+ENDIF

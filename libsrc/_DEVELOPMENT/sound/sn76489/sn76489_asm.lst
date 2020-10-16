@@ -1,0 +1,16 @@
+sound/sn76489/z80/__PSGlib_variables
+sound/sn76489/z80/asm_PSGlib_CancelLoop
+sound/sn76489/z80/asm_PSGlib_Frame
+sound/sn76489/z80/asm_PSGlib_GetStatus
+sound/sn76489/z80/asm_PSGlib_Play
+sound/sn76489/z80/asm_PSGlib_PlayNoRepeat
+sound/sn76489/z80/asm_PSGlib_RestoreVolumes
+sound/sn76489/z80/asm_PSGlib_SetMusicVolumeAttenuation
+sound/sn76489/z80/asm_PSGlib_SFXCancelLoop
+sound/sn76489/z80/asm_PSGlib_SFXFrame
+sound/sn76489/z80/asm_PSGlib_SFXGetStatus
+sound/sn76489/z80/asm_PSGlib_SFXPlay
+sound/sn76489/z80/asm_PSGlib_SFXPlayLoop
+sound/sn76489/z80/asm_PSGlib_SFXStop
+sound/sn76489/z80/asm_PSGlib_SilenceChannels
+sound/sn76489/z80/asm_PSGlib_Stop

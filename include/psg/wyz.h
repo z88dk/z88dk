@@ -1,5 +1,5 @@
 /*
- * WYZ Tracker Library
+ * WYZ Tracker Library (AY819x)
  */
 
 #ifndef __PSG_WYZ_H__

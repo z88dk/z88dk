@@ -1,0 +1,7 @@
+psg/ay/obj/${TYPE}/psg_channels
+psg/ay/obj/${TYPE}/psg_envelope
+psg/ay/obj/${TYPE}/psg_noise
+psg/ay/obj/${TYPE}/psg_noise_channels
+psg/ay/obj/${TYPE}/psg_tone
+psg/ay/obj/${TYPE}/psg_tone_channels
+psg/ay/obj/${TYPE}/psg_volume

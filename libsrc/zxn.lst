@@ -22,7 +22,7 @@ target/zx/psg/get_psg
 target/zx/psg/psg_init
 target/zx/psg/asm_wyz_hardware_out
 target/zx/psg/asm_vt2_hardware_out
-@psg/psg.lst
-@psg/wyz/psg_wyz.lst
-@psg/vt2/psg_vt2.lst
+@psg/ay/psg.lst
+@psg/ay/wyz/psg_wyz.lst
+@psg/ay/vt2/psg_vt2.lst
 @z80.lst

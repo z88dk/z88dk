@@ -6,16 +6,10 @@ target/pencil2/stdio/CRT_FONT
 @font/font_8x8/font_8x8.lst
 @video/tms9918/video_tms9918_nmi.lst
 @gfx/narrow/gfx_narrow.lst
-psg/sn76489/bit_open
+@psg/sn76489/sn76489.lst
 target/pencil2/games/joystick
 target/pencil2/games/keys_joystick
 games/obj/pencil2/joystick_type
 @games/games.lst
 @input/input_keyboard.lst
-psg/sn76489/psg_tone
-psg/sn76489/psg_volume
-psg/sn76489/psg_envelope
-psg/sn76489/psg_init.asm
-psg/sn76489/set_psg.asm
-psg/sn76489/set_psg_callee.asm
 @z80.lst

@@ -2,7 +2,7 @@ target/trs80/psg/set_psg
 target/trs80/psg/set_psg_callee
 target/trs80/psg/get_psg
 target/trs80/psg/psg_init
-@psg/psg.lst
+@psg/ay/psg.lst
 target/trs80/games/bit_open
 target/trs80/games/bit_open_di
 target/trs80/games/bit_close

@@ -10,6 +10,7 @@
 ;	$Id: set_psg.asm $
 ;
 
+IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
         SECTION code_clib
 	PUBLIC	set_psg
 	PUBLIC	_set_psg
@@ -31,3 +32,4 @@ _set_psg:
 	
 	jp set_psg_callee + ASMDISP_SET_PSG_CALLEE
 
+ENDIF

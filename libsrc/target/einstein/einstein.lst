@@ -7,5 +7,5 @@ target/einstein/psg/psg_init
 target/einstein/psg/get_psg
 target/einstein/psg/set_psg
 target/einstein/psg/set_psg_callee
-@psg/psg.lst
+@psg/ay/psg.lst
 @video/mc6845/mc6845.lst

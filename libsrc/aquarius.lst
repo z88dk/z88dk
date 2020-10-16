@@ -26,5 +26,5 @@ target/aquarius/psg/set_psg
 target/aquarius/psg/set_psg_callee
 target/aquarius/psg/get_psg
 target/aquarius/psg/psg_init
-@psg/psg.lst
+@psg/ay/psg.lst
 @z80.lst

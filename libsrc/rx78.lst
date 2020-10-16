@@ -9,14 +9,7 @@ target/rx78/stdio/fputc_cons_native
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
-psg/sn76489/bit_open
-psg/sn76489/psg_tone
-psg/sn76489/psg_volume
-psg/sn76489/psg_envelope
-psg/sn76489/psg_init.asm
-psg/sn76489/set_psg.asm
-psg/sn76489/set_psg_callee.asm
-@psg/psg.lst
+@psg/sn76489/sn76489.lst
 target/rx78/load_palette
 target/rx78/graphics/clg
 target/rx78/graphics/pixladdr
