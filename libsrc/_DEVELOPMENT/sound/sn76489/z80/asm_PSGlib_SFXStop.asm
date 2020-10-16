@@ -50,7 +50,10 @@ IF HAVE16bitbus
   out (c),a
   pop bc
 ELSE
-   out (PSGPort),a
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
    
    ld a,(__PSGlib_Chan2HighTone)
@@ -61,7 +64,10 @@ IF HAVE16bitbus
   out (c),a
   pop bc
 ELSE
-   out (PSGPort),a
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
    
    ld a,(__PSGlib_Chan2Volume)
@@ -84,7 +90,10 @@ IF HAVE16bitbus
   out (c),a
   pop bc
 ELSE
-   out (PSGPort),a
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
 
    ld a,PSG_STOPPED
@@ -109,7 +118,10 @@ IF HAVE16bitbus
   out (c),a
   pop bc
 ELSE
-   out (PSGPort),a
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
    
    ld a,(__PSGlib_Chan3Volume)
@@ -132,7 +144,10 @@ IF HAVE16bitbus
   out (c),a
   pop bc
 ELSE
-   out (PSGPort),a
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
 
    ld a,PSG_STOPPED

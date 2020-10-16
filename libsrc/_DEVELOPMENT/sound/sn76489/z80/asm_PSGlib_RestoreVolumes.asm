@@ -52,7 +52,10 @@ IF HAVE16bitbus
   out (c),a
   pop bc
 ELSE
-   out (PSGPort),a
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
 ENDIF
 	
 	ld a,(__PSGlib_Chan1Volume)
@@ -66,7 +69,17 @@ ENDIF
 outchan1:
 
    or PSGLatch|PSGChannel1|PSGVolumeData
-   out (PSGPort),a
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
+ENDIF
 
 skipchan01:
 
@@ -91,8 +104,17 @@ skipchan01:
 outchan2:
 
    or PSGLatch|PSGChannel2|PSGVolumeData
-   out (PSGPort),a
-
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
+ENDIF
 skipchan2:
 
    ld a,(__PSGlib_Channel3SFX)
@@ -116,6 +138,15 @@ skipchan2:
 outchan3:
 
    or PSGLatch|PSGChannel3|PSGVolumeData
-   out (PSGPort),a
-   
+IF HAVE16bitbus
+  push bc
+  ld bc,PSGDataPort
+  out (c),a
+  pop bc
+ELSE
+  out (PSGPort),a
+ IF PSGLatchPort
+  in a,(PSGLatchPort)
+ ENDIF
+ENDIF
    ret

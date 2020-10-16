@@ -23,12 +23,26 @@ _psg_init:
 	LD	BC,psgport
 	LD	A,$9F
 	OUT	(C),A
+IF PSGLatchPort
+    in a,(PSGLatchPort)
+ENDIF
 	LD	A,$BF
+IF PSGLatchPort
+    in a,(PSGLatchPort)
+ENDIF
 	OUT	(C),A
+IF PSGLatchPort
+    in a,(PSGLatchPort)
+ENDIF
 	LD	A,$DF
 	OUT	(C),A
-	LD	A,$FF
-	OUT	(C),A
-	
+IF PSGLatchPort
+    in a,(PSGLatchPort)
+ENDIF
+    LD	A,$FF
+    OUT	(C),A
+IF PSGLatchPort
+    in a,(PSGLatchPort)
+ENDIF
 	RET
 ENDIF

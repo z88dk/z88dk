@@ -12,7 +12,21 @@ PUBLIC asm_PSGlib_SilenceChannels
 
 asm_PSGlib_SilenceChannels:
    ; uses : f, bc, hl
-
+IF PSGLatchPORT
+    ld a,0x9f
+    out (__IO_PSG),a
+    in a,(PSGLatchPort)
+    ld a,0xbf
+    out (__IO_PSG),a
+    in a,(PSGLatchPort)
+    ld a,0xdf
+    out (__IO_PSG),a
+    in a,(PSGLatchPort)
+    ld a,0xff
+    out (__IO_PSG),a
+    in a,(PSGLatchPort)
+    ret
+ELSE
    ld hl,table_silence
    ld c,__IO_PSG
 
@@ -24,3 +38,4 @@ asm_PSGlib_SilenceChannels:
 table_silence:
 
    defb 0x9f, 0xbf, 0xdf, 0xff
+ENDIF
