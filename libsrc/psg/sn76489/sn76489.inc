@@ -18,6 +18,7 @@ ENDIF
 
 IF FORmtx
 	defc psgport	= $06
+	defc PSGLatchPort = $03
 ENDIF
 
 IF FORsms
