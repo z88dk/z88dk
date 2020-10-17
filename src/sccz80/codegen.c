@@ -1116,12 +1116,31 @@ void gen_call(int arg_count, const char *name, SYMBOL *sym)
 
 void gen_shortcall(Type *functype, int rst, int value) 
 {
-    if (functype->return_type->kind == KIND_LONGLONG) {
-        ol("ld\tbc,__i64_acc");
-        push("bc");
+    if ((functype->flags & SHORTCALL_HL) == SHORTCALL_HL) {
+        if ((functype->flags & FASTCALL) == FASTCALL) {
+            // preserve HL from FASTCALL into BC because hl is going to erase it
+            outfmt("\tld bc,\thl\n");
+        }
+        vconst(value);
+        outfmt("\trst\t%d\n", rst);
+    } else {
+        if (functype->return_type->kind == KIND_LONGLONG) {
+            ol("ld\tbc,__i64_acc");
+            push("bc");
+        }
+        outfmt("\trst\t%d\n",rst);
+        outfmt("\t%s\t%d\n", value < 0x100 ? "defb" : "defw", value);
     }
-    outfmt("\trst\t%d\n",rst);
-    outfmt("\t%s\t%d\n", value < 0x100 ? "defb" : "defw", value);
+}
+
+void gen_hl_call(Type *functype, int module, int address)
+{
+    if ((functype->flags & FASTCALL) == FASTCALL) {
+        // preserve HL from FASTCALL into BC because hl is going to erase it
+        outfmt("\tld bc,\thl\n");
+    }
+    vconst(module);
+    outfmt("\tcall\t%d\n", address);
 }
 
 void gen_bankedcall(SYMBOL *sym)
