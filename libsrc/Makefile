@@ -1602,7 +1602,7 @@ lviv_clib.lib:
 	@echo ''
 	@echo '--- Building PK-01 Lviv/Lvov Library ---'
 	@echo ''
-	$(call buildgeneric,lviv,portable)
+	$(call buildgeneric,lviv,"narrow portable")
 	TARGET=lviv TYPE=8080 $(LIBLINKER) -m8080 -DFORlviv -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/lviv_clib @$(LISTFILE_DIRECTORY)/lviv.lst
 
 altair8800_clib.lib:

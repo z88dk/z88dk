@@ -185,7 +185,7 @@ int lviv_exec(char *target)
        // And now we write the ROM
        fwrite(ram, 1, 0x4000, fpout);
        // And now the VRAM
-       memset(ram, 0, 0xc000);
+       memset(ram, 0, 0x4000);
        fwrite(ram, 1, 0x4000, fpout);
        // Onto the ports now - TODO, we should set some of them?
        fwrite(ram, 1, 0x100, fpout);

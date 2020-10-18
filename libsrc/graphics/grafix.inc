@@ -627,6 +627,13 @@ IF FORondra
 	defc maxy	= 256
 ENDIF
 
+IF FORlviv
+	DEFINE gotgfx
+	defc maxx	= 256
+	defc maxy	= 256
+ENDIF
+
+
 ; =============================================
 
 
