@@ -17,8 +17,8 @@ PUBLIC in_keytranstbl
 	defb	255, 255, 255, 255, 255		; UN NUM CS UN UPPER
 	defb	'j', 'k', 'l', 'h',  13		; j k l h RET
 	defb	'u', 'i', 'o', 'y', 'p'		; u i o y p
-	defb	'n', 'm',   9, 'b', 255		; n m UP b CTRL
-	defb	255,   8,  10, 255,  11		; UN LEFT DN UN RIGHT
+	defb	'n', 'm',  11, 'b', 255		; n m UP b CTRL
+	defb	255,   8,  10, 255,  9 		; UN LEFT DN UN RIGHT
 ; Upper
 	defb	'R', 'E', 'W', 'T', 'Q'		; r e w t q
 	defb	'F', 'D', 'S', 'G', 'A'		; f d s g a
@@ -27,8 +27,8 @@ PUBLIC in_keytranstbl
 	defb	255, 255, 255, 255, 255		; UN NUM CS UN UPPER
 	defb	'J', 'K', 'L', 'H',  13		; j k l h RET
 	defb	'U', 'I', 'O', 'Y', 'P'		; u i o y p
-	defb	'N', 'M',   9, 'B', 255		; n m UP b CTRL
-	defb	255,   8,  10, 255,  11		; UN LEFT DN UN RIGHT
+	defb	'N', 'M',  11, 'B', 255		; n m UP b CTRL
+	defb	255,   8,  10, 255,   9		; UN LEFT DN UN RIGHT
 ; Number 
 	defb	'4', '3', '2', '5', '1'		; r e w t q
 	defb	'F', 'D', 'S', 'G', 'A'		; f d s g a
@@ -37,8 +37,8 @@ PUBLIC in_keytranstbl
 	defb	255, 255, 255, 255, 255		; UN NUM CS UN UPPER
 	defb	'J', '{', '}', 'H',  13		; j k l h RET
 	defb	'7', '8', '9', '6', '0'		; u i o y p
-	defb	'N', 'M',   9, 'B', 255		; n m UP b CTRL
-	defb	255,   8,  10, 255,  11		; UN LEFT DN UN RIGHT
+	defb	'N', 'M',  11, 'B', 255		; n m UP b CTRL
+	defb	255,   8,  10, 255,   9		; UN LEFT DN UN RIGHT
 ; Symbols
 	defb	'$', '#','\"', '%', '!'		; r e w t q
 	defb	'^', '=', '+', '_', '-'		; f d s g a
@@ -47,8 +47,8 @@ PUBLIC in_keytranstbl
 	defb	255, 255, 255, 255, 255		; UN NUM CS UN UPPER
 	defb	'>', '[', ']', '<',  12		; j k l h RET
 	defb   '\'', '(', ')', '&', '@'		; u i o y p
-	defb	',', '.',   9, 'B', 255		; n m UP b CTRL
-	defb	255,   8,  10, 255,  11		; UN LEFT DN UN RIGHT
+	defb	',', '.',  11, 'B', 255		; n m UP b CTRL
+	defb	255,   8,  10, 255,   9		; UN LEFT DN UN RIGHT
 
 
 
@@ -60,6 +60,6 @@ PUBLIC in_keytranstbl
 	defb	255, 255, 255, 255, 255		; UN NUM CS UN UPPER
 	defb	 10,  11,  12,   8, 127		; j k l h RET
 	defb	 21,   9,  15,  25,  16		; u i o y p
-	defb	 14,  13,   9,   2, 255		; n m UP b CTRL
-	defb	255,   8,  10, 255,  11		; UN LEFT DN UN RIGHT
+	defb	 14,  13,  11,   2, 255		; n m UP b CTRL
+	defb	255,   8,  10, 255,   9		; UN LEFT DN UN RIGHT
 
