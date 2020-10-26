@@ -1254,6 +1254,7 @@ lm80c_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=lm80c
 	$(call buildgeneric,lm80c)
+	$(MAKE) -C target/lm80c
 	$(MAKE) -C video/tms9918 TARGET=lm80c
 	TARGET=lm80c TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlm80c -x$(OUTPUT_DIRECTORY)/lm80c_clib @$(LISTFILE_DIRECTORY)/lm80c.lst
 

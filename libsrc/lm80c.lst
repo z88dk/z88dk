@@ -1,5 +1,7 @@
 @stdio/ansicore.lst
 @stdio/stdio.lst
+target/lm80c/stdio/fgetc_cons
+target/lm80c/stdio/getk
 @font/font_8x8/font_8x8.lst
 @video/tms9918/video_tms9918_nmi.lst
 @gfx/narrow/gfx_narrow.lst
@@ -13,4 +15,5 @@ target/lm80c/psg/psg_init
 target/lm80c/psg/asm_wyz_hardware_out
 target/lm80c/psg/asm_vt2_hardware_out
 @games/games.lst
+@target/lm80c/rs232/rs232.lst
 @z80.lst

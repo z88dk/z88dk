@@ -38,6 +38,8 @@
         defc    TAR__register_sp = -1
         defc    TAR__fputc_cons_generic = 1
 
+        INCLUDE "target/lm80c/def/maths_mbf.def"
+
 	defc CRT_ORG_CODE = 0x8241
 
         INCLUDE "crt/classic/crt_rules.inc"
