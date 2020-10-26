@@ -343,6 +343,12 @@ IF FORhomelab2
     defc sndbit_mask   = 0
 ENDIF
 
+IF FORlm80c
+    defc sndbit_port	= 0
+    defc sndbit_bit    = 0
+    defc sndbit_mask   = 0
+ENDIF
+
 IF FORprimo
     defc sndbit_port	= $00 ;
     defc sndbit_bit    = 4
@@ -353,7 +359,6 @@ IF FORmikro80
     defc sndbit_port	= $4 ;
     defc sndbit_bit    = 1
     defc sndbit_mask   = $2	;
-
 ENDIF
 
 ; ********************************************************

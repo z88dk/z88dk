@@ -55,6 +55,7 @@ TOCREATE += $(call check_target,kc,kc_clib.lib)
 TOCREATE += $(call check_target,kramermc,kramermc_clib.lib)
 TOCREATE += $(call check_target,lambda, mlambda.lib mlambda_tiny.lib lambda_clib.lib gfxlambda.lib )
 TOCREATE += $(call check_target,laser500,laser500_clib.lib)
+TOCREATE += $(call check_target,lm80c,lm80c_clib.lib)
 TOCREATE += $(call check_target,lviv,lviv_clib.lib)
 TOCREATE += $(call check_target,lynx,lynx_clib.lib)
 TOCREATE += $(call check_target,m100,m100_clib.lib)
@@ -1244,6 +1245,19 @@ pencil2_clib.lib:
 	$(call buildgeneric,pencil2)
 	$(MAKE) -C video/tms9918 TARGET=pencil2
 	TARGET=pencil2 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORpencil2 -x$(OUTPUT_DIRECTORY)/pencil2_clib @$(LISTFILE_DIRECTORY)/pencil2.lst
+
+# LM80C - dom/stefano
+lm80c_clib.lib:
+	@echo ''
+	@echo '--- Building LM80-C Library ---'
+	@echo ''
+	$(MAKE) msxdeps
+	$(MAKE) -C games TARGET=lm80c
+	$(call buildgeneric,lm80c)
+	$(MAKE) -C video/tms9918 TARGET=lm80c
+	TARGET=lm80c TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlm80c -x$(OUTPUT_DIRECTORY)/lm80c_clib @$(LISTFILE_DIRECTORY)/lm80c.lst
+
+
 
 
 # Untested C lib for NC100 machines - dom
