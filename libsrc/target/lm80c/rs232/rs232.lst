@@ -1,0 +1,5 @@
+target/lm80c/rs232/rs232_close
+target/lm80c/rs232/rs232_get
+target/lm80c/rs232/rs232_init
+target/lm80c/rs232/rs232_params
+target/lm80c/rs232/rs232_put
