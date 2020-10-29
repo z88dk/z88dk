@@ -371,7 +371,7 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
         /* Second operator is long long */
         if (lval->val_type != KIND_LONGLONG) {
             zwiden_stack_to_llong(lval);
-            if ( lval->ltype->isunsigned ) {
+            if ( lval->ltype->isunsigned || lval->ltype->isunsigned ) {
                 lval->ltype = type_ulonglong;
             } else {
                 lval->ltype = type_longlong;
@@ -384,7 +384,7 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
     if (lval->val_type == KIND_LONGLONG) {
         if (lval2->val_type != KIND_LONGLONG ) {
             zconvert_to_llong(lval->ltype->isunsigned, lval2->val_type, lval2->ltype->isunsigned);
-            if ( lval->ltype->isunsigned ) {
+            if ( lval->ltype->isunsigned || lval->ltype->isunsigned) {
                 lval->ltype = type_ulonglong;
             } else {
                 lval->ltype = type_longlong;
@@ -400,12 +400,18 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
         /* Second operator is long */
         if (lval->val_type != KIND_LONG) {
             zwiden_stack_to_long(lval);
-            if ( lval->ltype->isunsigned ) {
+            if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
                 lval->ltype = type_ulong;
             } else {
                 lval->ltype = type_long;
             }
             lval->val_type = KIND_LONG;
+        } else {
+            if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
+                lval->ltype = type_ulong;
+            } else {
+                lval->ltype = type_long;
+            }
         }
         return;
     }
@@ -414,12 +420,17 @@ void widenintegers(LVALUE* lval, LVALUE* lval2)
         if (lval2->val_type != KIND_LONG && lval2->val_type != KIND_CPTR) {
             zconvert_to_long(lval->ltype->isunsigned, lval2->val_type, lval2->ltype->isunsigned);
         }
+        if ( lval->ltype->isunsigned || lval2->ltype->isunsigned) {
+            lval->ltype = type_ulong;
+        } else {
+            lval->ltype = type_long;
+        }
         return;
     }
 
     // Promote a char upto an int as necessary
     if ( lval->val_type == KIND_CHAR && lval2->val_type == KIND_INT ) {
-        if ( lval->ltype->isunsigned != lval2->ltype->isunsigned ) {
+        if ( lval->ltype->isunsigned || lval2->ltype->isunsigned ) {
             lval->ltype = type_uint;
         } else {
             lval->ltype = type_int;

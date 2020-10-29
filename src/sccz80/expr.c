@@ -627,6 +627,9 @@ int heirb(LVALUE* lval)
                     if ( val > lval->ltype->len && lval->ltype->len != -1 && lval->ltype->kind == KIND_ARRAY) {
                         warningfmt("unknown","Access of array at index %d is greater than size %d", val, lval->ltype->len);
                     }
+                    if ( ispointer(lval->ltype) && lval->ltype->ptr->kind == KIND_ARRAY) {
+                        val *= lval->ltype->ptr->size / lval->ltype->ptr->ptr->size;
+                    }
                     cscale(lval->ltype, &val);
                     val += lval->offset;
 

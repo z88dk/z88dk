@@ -63,7 +63,7 @@ int cmatch(char lit)
     blanks();
     if (eof)
         errorfmt("Unexpected end of file", 1);
-    if (line[lptr] == lit) {
+    if (toupper(line[lptr]) == toupper(lit)) {
         for ( i = 0; i < buffer_fps_num; i++ ) {
              fprintf(buffer_fps[i],"%c",line[lptr]);
         }
@@ -105,7 +105,7 @@ int rmatch2(char* lit)
 }
 
 /*
- * djm, reversible character match, used to scan for local statics
+ * djm, reversible character match (case insensitive)
  */
 
 int rcmatch(char lit)
@@ -113,7 +113,7 @@ int rcmatch(char lit)
     blanks();
     if (eof)
         errorfmt("Unexpected end of file", 1);
-    if (line[lptr] == lit) {
+    if (toupper(line[lptr]) == toupper(lit)) {
         return 1;
     }
     return 0;

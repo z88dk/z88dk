@@ -1,0 +1,75 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._func
+	ld	hl,(_y_endpos)
+	ld	bc,324
+	add	hl,bc
+	call	l_gint	;
+	ret
+
+
+
+._func2
+	ld	hl,(_x_endpos+20)
+	ld	bc,4
+	add	hl,bc
+	call	l_gint	;
+	ret
+
+
+
+._func3
+	ld	hl,(_iterations)
+	ld	de,(_iterations+2)
+	push	de
+	push	hl
+	ld	hl,(_stdcbench_end)
+	ld	de,(_stdcbench_start)
+	and	a
+	sbc	hl,de
+	ex	de,hl
+	ld	hl,(_stdcbench_end+2)
+	ld	bc,(_stdcbench_start+2)
+	sbc	hl,bc
+	ex	de,hl
+	ld	bc,56534
+	push	bc
+	ld	bc,20480
+	push	bc
+	call	l_long_div_u
+	call	l_long_mult
+	push	de
+	push	hl
+	ld	hl,100	;const
+	ld	de,0
+	call	l_long_div_u
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._y_endpos	defs	2
+._x_endpos	defs	32
+._stdcbench_end	defs	4
+._stdcbench_start	defs	4
+._iterations	defs	4
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_func
+	GLOBAL	_func2
+	GLOBAL	_func3
+
+
+
+

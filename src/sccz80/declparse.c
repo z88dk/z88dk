@@ -514,7 +514,8 @@ static Type *parse_type(void)
     type->len = 1;
     if ( swallow("const")) {
         type->isconst = 1;
-    } else if (swallow("volatile")) {
+    } 
+    if (swallow("volatile")) {
         //warningfmt("unsupported-feature","Volatile type not supported by compiler");
     }
 
@@ -883,7 +884,8 @@ Type *parse_decl(char name[], Type *base_type)
 
     if ( ispointer(base_type) && match("const")) {
         base_type->isconst = 1;
-    } else if ( ispointer(base_type) ) {
+    } 
+    if ( ispointer(base_type) ) {
         swallow("volatile");
     }
 
