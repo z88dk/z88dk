@@ -427,6 +427,7 @@ extern far char __LIB__ *strdup_far(far char *);
    extern int ffsll(long long i) __preserves_regs(b,c);
    extern int ffsll_callee(long long i) __preserves_regs(b,c) __z88dk_callee;
    #define ffsll(a) ffsll_callee(a)
+   #define __DISABLE_BUILTIN
 
    #ifndef __DISABLE_BUILTIN
 
