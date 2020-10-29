@@ -649,7 +649,10 @@ int heirb(LVALUE* lval)
                     }
                 } else {
                     /* non-constant subscript, calc at run time */
-                    if (ispointer(lval->ltype) ) {
+                    if ( ispointer(lval->ltype) && lval->ltype->ptr->kind == KIND_ARRAY) {
+                        LVALUE tmp = {0};
+                        mult_const(&tmp,lval->ltype->ptr->size / lval->ltype->ptr->ptr->size);
+                    } else if (ispointer(lval->ltype) ) {
                         scale(lval->ltype->ptr->kind, lval->ltype->ptr->tag);
                     } else if ( lval->ltype->kind == KIND_ARRAY ) {
                         LVALUE tmp = {0};
