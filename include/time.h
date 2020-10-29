@@ -55,6 +55,10 @@
 #define CLOCKS_PER_SEC 512
 #endif
 
+#ifdef __TESTTARGET__
+#define CLOCKS_PER_SEC 1000
+#endif
+
 #ifndef CLOCKS_PER_SEC
 #define CLOCKS_PER_SEC 50
 #endif
@@ -89,8 +93,6 @@ extern time_t __LIB__  __SAVEFRAME__ mktime(struct tm *tp);
 extern char __LIB__  __SAVEFRAME__ *asctime(struct tm *tp);
 extern char __LIB__  __SAVEFRAME__*ctime(time_t *t);
 
-
-/* This is a really simple fn which will barf over midnight,.. */
 
 #ifndef FAKECLOCK
 extern clock_t __LIB__ clock(void);

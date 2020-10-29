@@ -30,6 +30,7 @@
 #define CMD_RMDIR      26   /**< Remove a directory (hl=directory name) */
 
 #define CMD_GETTIME       30    /*< Get unix time (ret=dehl = 32 bit seconds)  */
+#define CMD_GETCLOCK	31    /*< Get millis since some time (ret=dehl = 32 bit milliseconds)  */
 
 #define CMD_IDE_SELECT 40   /**< Select unit (l) */
 #define CMD_IDE_ID     41   /**< Get number of logical blocks -> dehl  */

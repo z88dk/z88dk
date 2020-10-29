@@ -3,6 +3,7 @@ target/test/stdio/fputc_cons
 target/test/stdio/getk
 @stdio/stdio_8080.lst
 target/test/time/time
+target/test/time/clock
 @time/time.lst
 @8080.lst
 target/test/fcntl/close

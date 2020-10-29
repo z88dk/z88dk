@@ -26,6 +26,7 @@ lstoff
         defc    CMD_RMDIR = 26		;unimp
 
         defc    CMD_GETTIME = 30	;dehl=32 bit time
+        defc    CMD_GETCLOCK= 31	;dehl=milliseconds since some time
 
 	defc	CMD_IDE_SELECT = 40	; l = 0/1 = unit
 	defc	CMD_IDE_ID = 41
