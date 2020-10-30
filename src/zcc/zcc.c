@@ -918,6 +918,7 @@ int main(int argc, char **argv)
     {
         char tempdir[FILENAME_MAX+1];
 
+        unlink("zcc_opt.def");
 #ifndef WIN32
         char* ret = NULL;
 
