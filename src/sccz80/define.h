@@ -286,7 +286,7 @@ struct gototab_s {
 
 /*      Define the input line                   */
 
-#define LINESIZE        1024
+#define LINESIZE        65536
 #define LINEMAX         (LINESIZE-1)
 #define MPMAX           LINEMAX
 
