@@ -845,8 +845,8 @@ static void opt_code_speed(option *arg, char* val)
             c_speed_optimisation |= OPT_SUB16;
         } else if ( strncmp(ptr, "intcompare", 10) == 0 ) {
             c_speed_optimisation |= OPT_INT_COMPARE;
-        } else if ( strncmp(ptr, "intcompare", 10) == 0 ) {
-            c_speed_optimisation |= OPT_INT_COMPARE;
+        } else if ( strncmp(ptr, "charcompare", 10) == 0 ) {
+            c_speed_optimisation |= OPT_CHAR_COMPARE;
         } else if ( strncmp(ptr, "longcompare", 11) == 0 ) {
             c_speed_optimisation |= OPT_LONG_COMPARE;
         } else if ( strncmp(ptr, "ucharmult", 9) == 0 ) {

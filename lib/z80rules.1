@@ -3080,12 +3080,6 @@
 
 	jr	nz,ASMPC+3
 	scf
-	jp	nc,%1
-=
-	jp	nz,%1
-
-	jr	nz,ASMPC+3
-	scf
 	ld	hl,0	;const
 	rl	l
 =
