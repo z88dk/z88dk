@@ -1836,6 +1836,17 @@ static void quikmult(int type, int32_t size, char preserve)
         fivereg();
         ol("add\thl,hl");
         break;
+    case 20:
+        fivereg();
+        ol("add\thl,hl");
+        ol("add\thl,hl");
+        break;
+    case 40:
+        fivereg();
+        ol("add\thl,hl");
+        ol("add\thl,hl");
+        ol("add\thl,hl");
+        break;
     case 14:
         ol("add\thl,hl");
     case 7:

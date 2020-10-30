@@ -1,12 +1,22 @@
 
 
 
-static const int (*y_endpos)[16];
+static const int y_endpositions[20][16];
+static const int (*const volatile y_endpos)[16];
 static const int *x_endpos[16];
 
 
-int func() {
+int func0() {
+	return y_endpositions[10][2];
+}
+int func1() {
 	return y_endpos[10][2];
+}
+int func0b(int i) {
+	return y_endpositions[i][2];
+}
+int func1b(int i) {
+	return y_endpos[i][2];
 }
 int func2() {
 	return x_endpos[10][2];

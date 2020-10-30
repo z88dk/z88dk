@@ -8,9 +8,55 @@
 
 	SECTION	code_compiler
 
-._func
+._func0
+	ld	hl,(_y_endpositions+324)
+	ret
+
+
+
+._func1
 	ld	hl,(_y_endpos)
 	ld	bc,324
+	add	hl,bc
+	call	l_gint	;
+	ret
+
+
+
+._func0b
+	ld	hl,_y_endpositions
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	pop	de
+	add	hl,de
+	ld	bc,4
+	add	hl,bc
+	call	l_gint	;
+	ret
+
+
+
+._func1b
+	ld	hl,(_y_endpos)
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_gint	;
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	add	hl,hl
+	pop	de
+	add	hl,de
+	ld	bc,4
 	add	hl,bc
 	call	l_gint	;
 	ret
@@ -57,6 +103,7 @@
 
 
 	SECTION	bss_compiler
+._y_endpositions	defs	640
 ._y_endpos	defs	2
 ._x_endpos	defs	32
 ._stdcbench_end	defs	4
@@ -66,7 +113,10 @@
 
 
 
-	GLOBAL	_func
+	GLOBAL	_func0
+	GLOBAL	_func1
+	GLOBAL	_func0b
+	GLOBAL	_func1b
 	GLOBAL	_func2
 	GLOBAL	_func3
 

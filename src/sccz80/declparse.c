@@ -897,6 +897,7 @@ Type *parse_decl(char name[], Type *base_type)
             junk();
             return NULL;
         }
+        swallow("restrict");
         if ( amatch("__far"))
             base_type->isfar = 1;
         ptr = make_pointer(base_type);

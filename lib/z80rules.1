@@ -4763,3 +4763,14 @@
 	ld	hl,(%2)
 	ex	de,hl
 	ld	hl,(%1)
+
+	ld	h,0
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%2
+=
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%2
