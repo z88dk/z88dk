@@ -6,6 +6,9 @@
 static time_t start_time = 0;
 
 #ifdef WIN32
+#ifdef __MINGW32__
+#include <sys/time.h>
+#else
 // Extracted from: https://stackoverflow.com/questions/10905892/equivalent-of-gettimeday-for-windows
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -37,6 +40,8 @@ int gettimeofday(struct timeval * tp, struct timezone * tzp)
     tp->tv_usec = (long) (system_time.wMilliseconds * 1000);
     return 0;
 }
+#endif
+
 #else
 #include <sys/time.h>
 #endif
