@@ -112,6 +112,9 @@ typedef long           i32_t;      /* 32 bit signed type */
 #define _PROTOTYPE(x,y) x y
 #endif
 
+#ifndef NULL
+#define NULL ((void *)0)
+#endif
 
 
 #endif /* _TYPES_H */

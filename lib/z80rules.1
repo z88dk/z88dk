@@ -3080,12 +3080,6 @@
 
 	jr	nz,ASMPC+3
 	scf
-	jp	nc,%1
-=
-	jp	nz,%1
-
-	jr	nz,ASMPC+3
-	scf
 	ld	hl,0	;const
 	rl	l
 =
@@ -4712,3 +4706,71 @@
 =
 	ld	d,h
 	ld	e,l
+
+	%"inc|dec"	hl
+.%2
+	pop	hl
+	push	hl
+=
+.%2
+	pop	hl
+	push	hl
+
+%notcpu 8080
+%notcpu gbz80
+	ld	hl,(%1)
+	ld	de,(%1+2)
+	push	de
+	push	hl
+	ld	hl,(%2)
+	ld	de,(%2+2)
+	call	l_long_sub
+=
+	ld	hl,(%1)
+	ld	de,(%2)
+	and	a
+	sbc	hl,de
+	ex	de,hl
+	ld	hl,(%1+2)
+	ld	bc,(%2+2)
+	sbc	hl,bc
+	ex	de,hl
+
+%notcpu 8080
+%notcpu gbz80
+	ld	hl,(%1)
+	ld	de,(%1+2)
+	push	de
+	push	hl
+	ld	hl,(%2)
+	ld	de,(%2+2)
+	call	l_long_add
+=
+	ld	hl,(%1)
+	ld	de,(%2)
+	add	hl,de
+	ex	de,hl
+	ld	hl,(%1+2)
+	ld	bc,(%2+2)
+	adc	hl,bc
+	ex	de,hl
+
+	ld	hl,(%1)
+	ex	de,hl
+	ld	hl,(%2)
+	ex	de,hl
+=
+	ld	hl,(%2)
+	ex	de,hl
+	ld	hl,(%1)
+
+	ld	h,0
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%2
+=
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%2

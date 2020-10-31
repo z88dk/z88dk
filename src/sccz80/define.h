@@ -290,7 +290,7 @@ struct gototab_s {
 
 /*      Define the input line                   */
 
-#define LINESIZE        1024
+#define LINESIZE        65536
 #define LINEMAX         (LINESIZE-1)
 #define MPMAX           LINEMAX
 
@@ -415,7 +415,8 @@ enum optimisation {
         OPT_INT_COMPARE    = (1 << 5),
         OPT_LONG_COMPARE   = (1 << 6),
         OPT_UCHAR_MULT     = (1 << 7),
-        OPT_DOUBLE_CONST   = (1 << 8)
+        OPT_DOUBLE_CONST   = (1 << 8),
+        OPT_CHAR_COMPARE   = (1 << 9),
 };
 
 enum maths_mode {

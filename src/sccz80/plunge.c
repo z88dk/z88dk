@@ -314,8 +314,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 // Promote char here
                 if ( lval->val_type == KIND_CHAR && lval->const_val >= 256 ) {
                     lval->val_type = KIND_INT;
-                    lval->ltype = type_int;
-                }
+                    lval->ltype = type_uint;
+                } 
             } else {
                 lval->const_val = calc(lhs_val_type, lval->const_val, oper, lval2->const_val, is16bit);
                 if ( lval->val_type == KIND_CHAR && (lval->const_val < -127 || lval->const_val > 127) ) {

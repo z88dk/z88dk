@@ -116,8 +116,13 @@
 	dec	hl
 	dec	hl
 	call	l_gint	;
-	ld	de,20
-	call	l_mult
+	ld	b,h
+	ld	c,l
+	add	hl,hl
+	add	hl,hl
+	add	hl,bc
+	add	hl,hl
+	add	hl,hl
 	pop	de
 	add	hl,de
 	pop	de

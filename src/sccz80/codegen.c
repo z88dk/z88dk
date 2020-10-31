@@ -1855,6 +1855,17 @@ static void quikmult(int type, int32_t size, char preserve)
         fivereg();
         ol("add\thl,hl");
         break;
+    case 20:
+        fivereg();
+        ol("add\thl,hl");
+        ol("add\thl,hl");
+        break;
+    case 40:
+        fivereg();
+        ol("add\thl,hl");
+        ol("add\thl,hl");
+        ol("add\thl,hl");
+        break;
     case 14:
         ol("add\thl,hl");
     case 7:
@@ -3820,7 +3831,7 @@ void zeq(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     case KIND_CHAR:
-        if (c_speed_optimisation & OPT_INT_COMPARE ) {
+        if (c_speed_optimisation & OPT_CHAR_COMPARE ) {
             set_carry(lval);
             ol("ld\ta,l");
             ol("sub\te");
@@ -3976,7 +3987,7 @@ void zne(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     case KIND_CHAR:
-        if (c_speed_optimisation & OPT_INT_COMPARE ) {
+        if (c_speed_optimisation & OPT_CHAR_COMPARE ) {
             set_carry(lval);
             ol("ld\ta,l");
             ol("sub\te");
@@ -4139,11 +4150,10 @@ void zlt(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     case KIND_CHAR:
-        if (c_speed_optimisation & OPT_INT_COMPARE ) {
+        if (c_speed_optimisation & OPT_CHAR_COMPARE ) {
             if (ulvalue(lval)) {
                 ol("ld\ta,e");
                 ol("sub\tl");
-                ol("ccf");
             } else {
                 ol("ld\ta,e");
                 ol("sub\tl");
@@ -4265,10 +4275,10 @@ void zle(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     case KIND_CHAR:
-        if (c_speed_optimisation & OPT_INT_COMPARE && !IS_808x() ) {
+        if (c_speed_optimisation & OPT_CHAR_COMPARE && !IS_808x()) {
             if (ulvalue(lval)) { /* unsigned */
                 ol("ld\ta,e");
-                ol("sub\tl"); /* If l < e then carry set */
+                ol("sub\tl"); /* If l < e then carry clear */
                 ol("jr\tnz,ASMPC+3"); /* If zero, then set carry */
                 ol("scf");
             } else {
@@ -4394,18 +4404,17 @@ void zgt(LVALUE* lval)
         set_int(lval);
         break;
     case KIND_CHAR:
-        if (c_speed_optimisation & OPT_INT_COMPARE ) {
+        if (c_speed_optimisation & OPT_CHAR_COMPARE ) {
             if (ulvalue(lval)) {
-                ol("ld\ta,e");
-                ol("sub\tl");
+                ol("ld\ta,l");
+                ol("sub\te");
             } else {
-                ol("ld\ta,e");
-                ol("sub\tl");
+                ol("ld\ta,l");
+                ol("sub\te");
                 ol("rra");
                 ol("xor\te");
                 ol("xor\tl");
                 ol("rlca");
-                ol("ccf");
             }
             set_carry(lval);
             break;
@@ -4530,10 +4539,10 @@ void zge(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     case KIND_CHAR:
-        if (c_speed_optimisation & OPT_INT_COMPARE && !IS_808x()  ) {
+        if (c_speed_optimisation & OPT_CHAR_COMPARE && !IS_808x()) {
             if (ulvalue(lval)) {
                 ol("ld\ta,l");
-                ol("sub\te"); /* If l > e, carry set */
+                ol("sub\te"); /* If e (RHS) > l, carry set */
                 ol("jr\tnz,ASMPC+3"); /* If l == e then we need to set carry */
                 ol("scf");
             } else {
