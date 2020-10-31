@@ -331,6 +331,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
             nargs = 0;
         } else if ( functype->flags & SHORTCALL ) {
             gen_shortcall(functype, functype->funcattrs.shortcall_rst, functype->funcattrs.shortcall_value);
+        } else if ( functype->flags & HL_CALL ) {
+            gen_hl_call(functype, functype->funcattrs.hlcall_module, functype->funcattrs.hlcall_addr);
         } else if ( functype->flags & BANKED ) {
             gen_bankedcall(ptr);
         } else {

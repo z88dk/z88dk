@@ -130,6 +130,8 @@ struct type_s {
         int   params_offset;
         uint8_t  shortcall_rst;
         uint16_t shortcall_value;
+        uint16_t hlcall_module;
+        uint16_t hlcall_addr;
     } funcattrs;
 
     UT_hash_handle hh;
@@ -172,7 +174,9 @@ enum symbol_flags {
         CRITICAL = 0x1000,    /* Disable interrupts around the function */
         SDCCDECL = 0x2000,   /* Function uses sdcc convention for chars */
         SHORTCALL = 0x4000,   /* Function uses short call (via rst) */
-        BANKED = 0x8000      /* Call via the banked_call function */
+        SHORTCALL_HL = 0x8000,   /* Use ld HL,$addr style of shortcall */
+        BANKED = 0x10000,      /* Call via the banked_call function */
+        HL_CALL = 0x20000 /* Call via ld hl, (module) call (addr) */
 };
 
 

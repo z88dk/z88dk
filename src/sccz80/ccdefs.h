@@ -78,6 +78,7 @@ extern void gen_critical_enter(void);
 extern void gen_critical_leave(void);
 extern void gen_shortcall(Type *functype, int rst, int value);
 extern void gen_bankedcall(SYMBOL *sym);
+extern void gen_hl_call(Type *functype, int module, int address);
 extern void gen_emit_line(int);
 
 extern void gen_load_indirect(LVALUE *lval);

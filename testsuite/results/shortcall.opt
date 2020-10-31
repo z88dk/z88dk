@@ -60,6 +60,58 @@
 
 
 
+._hlfunc1
+	ld	hl,1	;const
+	ld	de,0
+	push	de
+	push	hl
+	ld	hl,2	;const
+	push	hl
+	ld	hl,5000	;const
+	rst	8
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._hlfunc2
+	ld	hl,1	;const
+	ld	de,0
+	push	de
+	push	hl
+	ld	hl,2	;const
+	push	hl
+	ld	hl,2000	;const
+	call	5000
+	pop	bc
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._hlfunc3
+	ld	hl,1	;const
+	ld	de,0
+	ld bc,	hl
+	ld	hl,5000	;const
+	rst	8
+	ret
+
+
+
+._hlfunc4
+	ld	hl,1	;const
+	ld	de,0
+	ld bc,	hl
+	ld	hl,2000	;const
+	call	5000
+	ret
+
+
+
 
 	SECTION	bss_compiler
 	SECTION	code_compiler
@@ -68,9 +120,17 @@
 
 	GLOBAL	_scall
 	GLOBAL	_scall2
+	GLOBAL	_hlcall1
+	GLOBAL	_hlcall2
+	GLOBAL	_hlcall3
+	GLOBAL	_hlcall4
 	GLOBAL	_func
 	GLOBAL	_func2
 	GLOBAL	_func3
+	GLOBAL	_hlfunc1
+	GLOBAL	_hlfunc2
+	GLOBAL	_hlfunc3
+	GLOBAL	_hlfunc4
 
 
 
