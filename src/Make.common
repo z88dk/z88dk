@@ -13,5 +13,6 @@ endif
 ifeq ($(EXESUFFIX),.exe)
   UNIXem_CFLAGS	:= -I../../ext/UNIXem/include
   UNIXem_OBJS	:= ../../ext/UNIXem/src/glob.o \
-		   ../../ext/UNIXem/src/dirent.o
+		   ../../ext/UNIXem/src/dirent.o \
+		   ../../ext/UNIXem/src/time.o
 endif
