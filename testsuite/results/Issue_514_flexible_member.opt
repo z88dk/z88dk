@@ -12,8 +12,10 @@
 	ld	hl,0	;const
 	push	hl
 	add	hl,sp
-	call	l_gint	;
-	ld	bc,8
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	ld	hl,8
 	add	hl,bc
 	ld	(hl),+(17 % 256)
 	inc	hl
@@ -28,8 +30,10 @@
 	ld	hl,0	;const
 	push	hl
 	add	hl,sp
-	call	l_gint	;
-	ld	bc,8
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	ld	hl,8
 	add	hl,bc
 	ld	(hl),+(17 % 256)
 	inc	hl

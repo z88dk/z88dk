@@ -83,8 +83,7 @@
 	ld	l,(hl)
 	ld	h,0
 	jp	i_6
-.i_7
-	jp	i_3
+	defc	i_7 = i_3
 .i_4
 	pop	bc
 	ret

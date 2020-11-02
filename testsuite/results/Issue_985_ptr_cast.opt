@@ -19,8 +19,9 @@
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	bc,30720
-	add	hl,bc
+	ld	a,120
+	add	h
+	ld	h,a
 	push	hl
 	ld	hl,(_x)
 	add	hl,hl
@@ -40,8 +41,9 @@
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	bc,30720
-	add	hl,bc
+	ld	a,120
+	add	h
+	ld	h,a
 	ex	de,hl
 	ld	hl,(_x)
 	add	hl,de

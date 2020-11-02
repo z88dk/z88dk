@@ -18,12 +18,6 @@
 	pop	bc
 	push	hl
 	push	de
-	ld	hl,0	;const
-	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
-	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -43,12 +37,6 @@
 	pop	bc
 	push	hl
 	push	de
-	ld	hl,0	;const
-	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
-	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -70,12 +58,6 @@
 	pop	bc
 	push	hl
 	push	de
-	ld	hl,0	;const
-	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
-	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -99,12 +81,6 @@
 	pop	bc
 	push	hl
 	push	de
-	ld	hl,0	;const
-	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
-	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -127,12 +103,6 @@
 	pop	bc
 	push	hl
 	push	de
-	ld	hl,0	;const
-	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
-	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de

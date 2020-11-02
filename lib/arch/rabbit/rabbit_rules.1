@@ -298,3 +298,12 @@
 	ld	hl,(hl+0)
 	ex	de,hl
 	ld	hl,%1
+
+%check -127 <= %1 <= 126
+	ld	bc,%1
+	add	hl,bc
+	ld	l,(hl)
+	ld	h,0
+=
+	ld	hl,(hl+%1)
+	ld	h,0

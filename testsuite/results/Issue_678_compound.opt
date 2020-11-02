@@ -19,9 +19,8 @@
 	ld	hl,0	;const
 	ld	de,1
 	call	l_long_eq
-	jr	c,i_4_i_3
-.i_3
-	jp	i_2
+	jp	nc,i_3
+	defc	i_3 = i_2
 .i_4_i_3
 	ld	hl,2	;const
 	add	hl,sp
@@ -94,9 +93,8 @@
 	or	l
 	or	d
 	or	e
-	jr	nz,i_13_i_12
-.i_12
-	jp	i_11
+	jp	z,i_12
+	defc	i_12 = i_11
 .i_13_i_12
 	ld	hl,2	;const
 	add	hl,sp

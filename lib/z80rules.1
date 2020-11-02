@@ -4774,3 +4774,177 @@
 	ld	a,l
 	ld	(de),a
 	ld	hl,%2
+
+	ld	l,a
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%1
+=
+	pop	de
+	ld	(de),a
+	ld	hl,%1
+
+	push	de
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	add	hl,hl
+	pop	de
+=
+	ld	hl,%eval(%1 2 -)	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	add	hl,hl
+
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	%1c	h
+	pop	de
+	pop	bc
+	push	hl
+	push	de
+=
+	pop	bc
+	pop	hl
+	%1c	h
+	push	hl
+	push	bc
+
+	jp	i_%1
+.%2
+	jp	i_%3
+=
+	jp	i_%1
+	defc	%2 = i_%3
+
+	jr	c,%1
+.%2
+	jp	i_%3
+.%1
+=
+	jp	nc,i_%3
+	defc	%2 = i_%3
+.%1
+
+	push	hl
+	ld	hl,%2	;const
+	add	hl,sp
+	ld	a,(hl)
+	pop	de
+=
+	ex	de,hl
+	ld	hl,%eval(%2 2 -)	;const
+	add	hl,sp
+	ld	a,(hl)
+
+.i_%1
+	jp	i_%2
+=
+	jp	i_%2
+	defc	i_%1 = i_%2
+
+	j%1	i_%2
+	jp	i_%3
+=
+	j%1	i_%2
+
+	jr	i_%1
+	defc	%2
+.i_%1
+=
+	defc	%2
+.i_%1
+
+%notcpu 8080
+%notcpu gbz80
+	call	l_gint	;%1
+	call	l_pint
+	ld	hl,%2
+=
+	ldi
+	ldi
+	ld	hl,%2
+
+	ld	h,%1
+	dec	h
+=
+	ld	h,%eval(%1 1 -)
+
+	ld	h,%1
+	inc	h
+=
+	ld	h,%eval(%1 1 +)
+
+	ld	hl,_%1
+	push	hl
+	ld	hl,%2	;const
+	add	hl,sp
+	call	l_gint	;%4
+	%3c	hl
+	pop	de
+=
+	ld	de,_%1
+	ld	hl,%eval(%2 2 -)	;const
+	add	hl,sp
+	call	l_gint	;%4
+	%3c	hl
+
+	call	l_gint	;
+	ld	a,h
+	or	l
+	jp	z,%1
+	pop	hl
+=
+	ld	a,(hl)
+	inc	hl
+	or	(hl)
+	jp	z,%1
+	pop	hl
+
+	jp	i_%1
+	defc	%2
+	jp	i_%3
+	defc	%4
+=
+	jp	i_%1
+	defc	%2
+	defc	%4
+
+	ld	hl,%1	;const
+	call	l_gintspsp	;%2
+	ld	hl,%3	;const
+	add	hl,sp
+	call	l_gint	;%4
+	pop	de
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%eval(%3 2 -)	;const
+	add	hl,sp
+	call	l_gint	;%4
+
+	ex	de,hl
+	call	l_pint
+=
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ex	de,hl
+
+	call	l_gint	;%1
+	ld	bc,%2
+	add	hl,bc
+=
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	ld	hl,%2
+	add	hl,bc

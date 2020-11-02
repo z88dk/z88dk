@@ -132,11 +132,14 @@
 
 ._strcpy2
 	ld	hl,4	;const
-	call	l_gintspsp	;
-	ld	hl,4	;const
 	add	hl,sp
-	call	l_gint	;
-	pop	de
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
 	push	de
 	xor	a
 .i_10
@@ -164,11 +167,14 @@
 
 ._memcpy2
 	ld	hl,4	;const
-	call	l_gintspsp	;
-	ld	hl,4	;const
 	add	hl,sp
-	call	l_gint	;
-	pop	de
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
 	push	de
 	ld	bc,10
 	ldir

@@ -2109,7 +2109,30 @@ void zadd_const(LVALUE *lval, int64_t value64)
         }
 
     } else {
-        addbchl(value);
+        if ( value % 256 == 0 ) {
+            switch ( value / 256 ) {
+            case 3:
+                ol("inc\th");
+            case 2:
+                ol("inc\th");
+            case 1:
+                ol("inc\th");
+                break;
+            case -3:
+                ol("dec\th");
+            case -2:
+                ol("dec\th");
+            case -1:
+                ol("dec\th");
+                break;
+            default:
+                loada(value / 256);
+                ol("add\th");
+                ol("ld\th,a");
+            }
+        } else {
+            addbchl(value);
+        }
     }
 }
 

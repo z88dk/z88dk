@@ -388,6 +388,8 @@
 	EXTERN	__rrslong_rrx_s
 	EXTERN	__rlslong_rrx_s
 	EXTERN	__rlulong_rrx_s
+        EXTERN  __muluchar
+        EXTERN  __mulschar
 
 	EXTERN	l_push_di
 	EXTERN	l_pop_ei

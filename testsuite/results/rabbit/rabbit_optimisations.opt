@@ -35,10 +35,9 @@
 
 
 ._or
-	ld	hl,(sp + 4)
-	push	hl
-	ld	hl,(sp + 4)
-	pop	de
+	ld	hl,(sp+4)
+	ex	de,hl
+	ld	hl,(sp + 2)
 	or	hl,de
 	push	hl
 	ld	hl,(sp + 6)
@@ -55,10 +54,9 @@
 
 
 ._and
-	ld	hl,(sp + 4)
-	push	hl
-	ld	hl,(sp + 4)
-	pop	de
+	ld	hl,(sp+4)
+	ex	de,hl
+	ld	hl,(sp + 2)
 	and	hl,de
 	push	hl
 	ld	hl,(sp + 6)

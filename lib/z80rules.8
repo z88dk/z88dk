@@ -279,3 +279,33 @@
 =
 	ld	l,a
 	or	h
+
+	ld	a,(hl)%1
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	ld	bc,%2
+	add	hl,bc
+=
+	ld	c,(hl)
+	inc	hl
+	ld	b,(hl)
+	ld	hl,%2
+	add	hl,bc
+
+	ex	de,hl%1
+	ex	de,hl%2
+=
+
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	cp	%1
+	jp	%2,%3
+	ld	hl,%4
+=
+	ld	a,(hl)
+	cp	%1
+	jp	%2,%3
+	ld	hl,%4

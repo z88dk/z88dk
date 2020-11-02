@@ -12,8 +12,10 @@
 	ld	hl,14	;const
 	add	hl,sp
 	ld	de,10	;const
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
 	ex	de,hl
-	call	l_pint
 	ret
 
 
@@ -22,8 +24,10 @@
 	ld	hl,14	;const
 	add	hl,sp
 	ld	de,10	;const
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
 	ex	de,hl
-	call	l_pint
 	pop	bc
 	ld	hl,16	;const
 	add	hl,sp
