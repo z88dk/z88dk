@@ -3,20 +3,36 @@
 # Add steps that publish test results, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/apps/c-cpp/gcc
 
+
+variables:
+  CCACHE_DIR: $(Pipeline.Workspace)/ccache
+  PERL5LIB: $(Pipeline.Workspace)/perl5
+
+
 trigger:
 - master
 
 pool:
   vmImage: 'Ubuntu 16.04'
 
+
 steps:
 - checkout: self
   submodules: true
+- task: Cache@1
+  inputs:
+    key: 'perl | "$(Agent.OS)"'
+    path: $(PERL5LIB)
+  displayName: perlcache
 - script: |
-     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl perl build-essential cpanminus
-     cpanm --local-lib=~/perl5 local::lib App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
-     eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl perl build-essential cpanminus ccache
+     cpanm --local-lib=$(PERL5LIB) local::lib App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
   displayName: "Install prerequisites"
+- task: Cache@2
+  inputs:
+    key: 'ccache | "$(Agent.OS)"'
+    path: $(CCACHE_DIR)
+  displayName: ccache
 - script: |
     ./build.sh -e -t
   displayName: 'build.sh'
