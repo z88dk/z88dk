@@ -45,6 +45,12 @@ do_tests=0
 
 DESTDIR=/usr/local
 
+builddir=`pwd $0`
+ZCCCFG=$builddir/lib/config
+PATH=$builddir/bin:$PATH
+export ZCCCFG
+export PATH
+
 
 while getopts "bcCehkltp:i:" arg; do       # Handle all given arguments
   case "$arg" in
