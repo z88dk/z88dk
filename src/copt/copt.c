@@ -229,8 +229,8 @@ int check_eval(char* pat, char** vars)
 
     x = sscanf(pat, "%d = %[^\n]s", &expected, expr);
     if (x != 2) {
-        fprintf(stderr, "warning: invalid use of '%%check_eval' in \"%s\"\n", pat);
-        fprintf(stderr, "format is '%%check_eval result = expr");
+        fprintf(stderr, "warning: invalid use of '%%eval' in \"%s\"\n", pat);
+        fprintf(stderr, "format is '%%eval result = expr");
         return 0;
     }
     return expected == rpn_eval(expr, vars);
@@ -748,6 +748,9 @@ int rpn_eval(const char* expr, char** vars)
         case '<':
             op2 = pop();
             push(pop() << op2);
+            break;
+        case '!':
+            push(!pop());
             break;
         case '/':
             op2 = pop();

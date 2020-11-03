@@ -4842,6 +4842,7 @@
 	add	hl,sp
 	ld	a,(hl)
 
+%eval 0 = %2 %1 - !
 .i_%1
 	jp	i_%2
 =
@@ -4948,3 +4949,5 @@
 	ld	b,(hl)
 	ld	hl,%2
 	add	hl,bc
+
+
