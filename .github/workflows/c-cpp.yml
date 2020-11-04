@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [ master ]
 
+
 jobs:
   build:
 
@@ -15,8 +16,14 @@ jobs:
     - uses: actions/checkout@v2
       with: 
         submodules: 'true'
+    - name: Cache multiple paths
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.ccache
+          ~/perl5
     - name: Install apt dependencies
-      run: sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl
+      run: sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl
     - name: Install perl prerequisites
       run: cpanm --local-lib=~/perl5 local::lib App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
     - name: Perl setup
@@ -27,6 +34,5 @@ jobs:
       run: ./build.sh -b
     - name: Build examples
       run: ./build.sh -b -l -e
-    - name: Build and run tests
+    - name: Build tests
       run: ./build.sh -b -l -t
-
