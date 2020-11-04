@@ -63,7 +63,7 @@ not_function_table:
 continue:
 	; l = flags
 	; c = character
-	; find the row divide by 5
+	; find the row divide by 6
 	ld	a,c
 	ld	c,255
 find_row:
