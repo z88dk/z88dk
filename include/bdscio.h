@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <ctype.h>
 #include <setjmp.h>
@@ -88,6 +89,7 @@
 #define eqs(a,b) (!strcmp(a,b)==0)
 
 #define error(a) puts_cons(a);exit(1)
+#define exec(a,b) execl(a,b)
 
 #define movmem(a,b,c) memcpy(b,a,c)
 
