@@ -34,7 +34,7 @@ endif
 
 Z88DK_PATH	= $(shell pwd)
 SDCC_PATH	= $(Z88DK_PATH)/src/sdcc-build
-SDCC_VERSION    = 11877
+SDCC_VERSION    = 11940
 
 ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
