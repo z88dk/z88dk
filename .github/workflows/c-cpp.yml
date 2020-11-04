@@ -22,6 +22,7 @@ jobs:
         path: |
           ~/.ccache
           ~/perl5
+        key: ${{ runner.os }}-cache
     - name: Install apt dependencies
       run: sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl
     - name: Install perl prerequisites
