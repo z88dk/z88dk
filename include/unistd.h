@@ -1,7 +1,5 @@
 /*
- *  Just a placeholder
- *
- *	$Id: unistd.h,v 1.3 2013-06-26 13:34:42 stefano Exp $
+ *	UNISTD.H
  */
 
 #ifndef __UNISTD_H__
@@ -13,6 +11,15 @@
 extern char *environ[];
 #define isatty(fd) fchkstd(fd)
 #define unlink(a) remove(a)
+
+
+/* Archaic version of execl(), used in the earlier C implementations */
+/* At the moment only CP/M is supported with a single "argument", the original fn name was exec() */
+extern int __LIB__ execl (const char *command, const char *args) __smallc;
+
+/* (Work in progress): Execute a command passing the argument structure */
+/* extern int __LIB__ execv (const char *command, char *args[]) __smallc; */
+
 
 
 #endif

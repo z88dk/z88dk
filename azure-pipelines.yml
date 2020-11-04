@@ -25,9 +25,9 @@ steps:
     path: $(PERL5LIB)
   displayName: perlcache
 - script: |
-     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl perl build-essential cpanminus ccache
-     cpanm --local-lib=$PERL5LIB local::lib App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
-     eval $(perl -I $PERL5LIB -Mlocal::lib)
+     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl ragel
+     cpanm --local-lib=$(PERL5LIB) local::lib App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
+     eval $(perl -I $(PERL5LIB) -Mlocal::lib)
   displayName: "Install prerequisites"
 - task: Cache@2
   inputs:
@@ -35,5 +35,14 @@ steps:
     path: $(CCACHE_DIR)
   displayName: ccache
 - script: |
-    ./build.sh -e -t
-  displayName: 'build.sh'
+    ./build.sh -l
+  displayName: 'Build binaries'
+- script: |
+    ./build.sh -b 
+  displayName: 'Build libraries'
+- script: |
+    ./build.sh -b -l -e
+  displayName: 'Build examples'
+- script: |
+    ./build.sh -b -l -t
+  displayName: 'Build and run tests'
