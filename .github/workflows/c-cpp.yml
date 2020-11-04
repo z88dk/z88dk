@@ -27,6 +27,6 @@ jobs:
       run: ./build.sh -b
     - name: Build examples
       run: ./build.sh -b -l -e
-    - name: Build tests
+    - name: Build and run tests
       run: ./build.sh -b -l -t
 
