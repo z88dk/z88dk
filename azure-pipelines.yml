@@ -43,6 +43,6 @@ steps:
 - script: |
     ./build.sh -b -l -e
   displayName: 'Build examples'
-#- script: |
-#    ./build.sh -b -l -t
-#  displayName: 'Build and run tests'
+- script: |
+    ./build.sh -b -l -t
+  displayName: 'Build and run tests'

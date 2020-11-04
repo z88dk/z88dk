@@ -2,7 +2,7 @@ name: z88dk
 
 on:
   push:
-    branches: [ master ]
+    branches: [ ** ]
   pull_request:
     branches: [ master ]
 
@@ -35,5 +35,5 @@ jobs:
       run: ./build.sh -b
     - name: Build examples
       run: ./build.sh -b -l -e
-#    - name: Build tests
-#      run: ./build.sh -b -l -t
+    - name: Build tests
+      run: ./build.sh -b -l -t
