@@ -101,6 +101,7 @@ void parsefcb(struct fcb *fc, unsigned char *name)
 
 
 EXTERN asm_toupper
+EXTERN asm_isdigit
 
 
 vstfcu:
@@ -119,7 +120,7 @@ vstfcu:
  PUSH	BC	;save BC
 	PUSH	HL		;save fcb pointer
 	call	igwsp	;ignore blanks and tabs	
-	call	isdec	;decimal digit?
+	call	asm_isdigit	 ;decimal digit?
 	JP	NC,setfc2	;if so, go process
 
 setfc0:
@@ -166,7 +167,7 @@ setfc3:
 	LD 	b,a	;put sum in B
 	INC	DE	;look at next char in text
 	LD	A,(DE)	;is it a digit?	
-	call	isdec
+	call	asm_isdigit
 	JP	NC,setfc3	;if so, go on looping and summing digits
 	CP	'/'	;make sure number is terminated by a slash
 	JP	Z,setfc4
@@ -261,6 +262,7 @@ setnm3:
 	INC	DE
 	JP	setnm3
 
+
 pad:
 	LD 	a,' '	;pad with B blanks
 pad2:
@@ -270,9 +272,6 @@ pad2:
 	JP	NZ,pad2
 	pop	BC
 	ret
-
-
-
 
 
 ;
@@ -293,17 +292,6 @@ legfc:
 	CP	'!'	;if less than exclamation pt, not legal char
 	ret		;else good enough
 
-;
-; Map character in A to upper case if it is lower case:
-;
-;
-;mapuc:
-;	CP	'a'
-;	RET	C
-;	CP	'z'+1
-;	RET	NC
-;	SUB	32	;if lower case, map to upper
-;	ret
 
 ;
 ; Ignore blanks and tabs at text pointed to by DE:
@@ -320,16 +308,6 @@ igwsp1:
 	JP	Z,igwsp1
 	ret
 
-;
-; Return Cy if char in A is not a decimal digit:
-;
-
-isdec:
-	CP	'0'
-	RET	C
-	CP	'9'+1
-	CCF
-	ret
 
 #endasm
 
