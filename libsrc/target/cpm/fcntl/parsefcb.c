@@ -4,7 +4,7 @@
  *
  *  27/1/2002 - djm
  *
- *  $Id: parsefcb.c,v 1.3 2013-06-06 08:58:32 stefano Exp $
+ *  $Id: parsefcb.c,   stefano Exp 4/11/2020 $
  */
 
 
@@ -39,7 +39,7 @@ void parsefcb(struct fcb *fc, unsigned char *name)
     }
 
     /* Now copy the name */
-    ptr = (void *)fc->name;
+    ptr = fc->name;
     
     /* Copy the name across upto the '.' or a '*' */
     while ( *name != '.' && *name != '*' && *name > ' ' &&
@@ -98,6 +98,9 @@ void parsefcb(struct fcb *fc, unsigned char *name)
 ;
 ; **** z88dk related note: usrnum is now (IX+41)
 ;
+
+
+EXTERN asm_toupper
 
 
 vstfcu:
@@ -195,7 +198,7 @@ vsetfcb:
 	LD 	a,0	; (for currently logged disk)
 	JP	NZ,setf1
 	LD	A,(DE)	;oh oh...we have a disk designator
-	call	mapuc	;make it upper case
+	call	asm_toupper	 ;make it upper case
 	SUB	'A'-1	;and fudge it a bit
 	INC	DE	;advance DE past disk designator to filename
 	INC	DE
@@ -277,7 +280,7 @@ pad2:
 ;
 
 legfc:
-	call	mapuc
+	call	asm_toupper
 	CP	'.'	; '.' is illegal in a filename or extension
 	SCF
 	RET	Z
@@ -293,14 +296,14 @@ legfc:
 ;
 ; Map character in A to upper case if it is lower case:
 ;
-
-mapuc:
-	CP	'a'
-	RET	C
-	CP	'z'+1
-	RET	NC
-	SUB	32	;if lower case, map to upper
-	ret
+;
+;mapuc:
+;	CP	'a'
+;	RET	C
+;	CP	'z'+1
+;	RET	NC
+;	SUB	32	;if lower case, map to upper
+;	ret
 
 ;
 ; Ignore blanks and tabs at text pointed to by DE:
