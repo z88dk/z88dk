@@ -28,10 +28,10 @@ jobs:
     - name: Perl setup
       run: eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
     - name: Build binaries
-      run: ./build.sh -l
+      run: eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib); ./build.sh -l
     - name: Build libraries
-      run: ./build.sh -b
+      run: eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib); ./build.sh -b
     - name: Build examples
-      run: ./build.sh -b -l -e
+      run: eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib); ./build.sh -b -l -e
     - name: Build tests
-      run: ./build.sh -b -l -t
+      run: eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib); ./build.sh -b -l -t
