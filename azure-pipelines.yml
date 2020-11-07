@@ -29,7 +29,7 @@ steps:
   displayName: perlcache
 - script: |
      sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl ragel libyaml-perl liblocal-lib-perl
-     cpanm --local-lib=$(PERL5LIB) App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
+     cpanm --local-lib=$(PERL5LIB) App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Toolkit Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
   displayName: "Install prerequisites"
 - task: Cache@2
   inputs:
