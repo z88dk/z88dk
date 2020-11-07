@@ -13,6 +13,7 @@ all : $(patsubst %.tt, ../%, $(wildcard *.tt))
 
 ../%.c : %.c.tt %.yaml
 	@echo $(PATH)
+	which tpage
 	$(TPAGE) --help
 	$(TPAGE) $< > $@~
 	mv $@~ $@
@@ -20,6 +21,7 @@ all : $(patsubst %.tt, ../%, $(wildcard *.tt))
 
 ../%.h : %.h.tt %.yaml
 	@echo $(PATH)
+	which tpage
 	$(TPAGE) --help
 	$(TPAGE) $< > $@~
 	mv $@~ $@
