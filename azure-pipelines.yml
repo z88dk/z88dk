@@ -12,6 +12,9 @@ variables:
 trigger:
 - master
 
+pr:
+  - master
+
 pool:
   vmImage: 'Ubuntu 16.04'
 
@@ -25,8 +28,8 @@ steps:
     path: $(PERL5LIB)
   displayName: perlcache
 - script: |
-     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl ragel
-     cpanm --local-lib=$(PERL5LIB) local::lib App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
+     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl ragel libyaml-perl liblocal-lib-perl
+     cpanm --local-lib=$(PERL5LIB) App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
      eval $(perl -I $(PERL5LIB) -Mlocal::lib)
   displayName: "Install prerequisites"
 - task: Cache@2
@@ -38,11 +41,11 @@ steps:
     ./build.sh -l
   displayName: 'Build binaries'
 - script: |
-    ./build.sh -b 
+    eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib); ./build.sh -b 
   displayName: 'Build libraries'
 - script: |
-    ./build.sh -b -l -e
+    eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib); ./build.sh -b -l -e
   displayName: 'Build examples'
 - script: |
-    ./build.sh -b -l -t
+    eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib); ./build.sh -b -l -t
   displayName: 'Build and run tests'
