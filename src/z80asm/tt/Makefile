@@ -12,11 +12,13 @@ TPAGE = perl -S tpage --include_path=.
 all : $(patsubst %.tt, ../%, $(wildcard *.tt))
 
 ../%.c : %.c.tt %.yaml
+	$(TPAGE) --help
 	$(TPAGE) $< > $@~
 	mv $@~ $@
 	dos2unix $@
 
 ../%.h : %.h.tt %.yaml
+	$(TPAGE) --help
 	$(TPAGE) $< > $@~
 	mv $@~ $@
 	dos2unix $@
