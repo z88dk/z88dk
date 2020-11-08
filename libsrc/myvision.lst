@@ -15,5 +15,4 @@ target/myvision/psg/psg_init
 target/myvision/psg/asm_wyz_hardware_out
 @psg/ay/psg.lst
 @psg/ay/wyz/psg_wyz.lst
-@interrupts/interrupts.lst
-@z80.lst
+

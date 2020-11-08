@@ -16,4 +16,4 @@ target/z9001/games/joystick
 @games/games.lst
 target/z9001/graphics/textpixl
 @gfx/text/gfx_text.lst
-@z80.lst
+

@@ -18,4 +18,4 @@ target/abc80/graphics/pointxy
 games/obj/${TARGET}/joystick
 target/abc80/abc80/abc_inv
 target/abc80/abc80/abc_cursor
-@z80.lst
+

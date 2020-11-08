@@ -20,4 +20,4 @@ target/tvc/tvc_get_border
 target/tvc/tvc_set_border
 target/tvc/tvc_set_paper
 target/tvc/tvc_set_ink
-@z80.lst
+

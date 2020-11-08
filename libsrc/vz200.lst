@@ -76,4 +76,4 @@ target/vz/vz_sound_callee
 target/vz/vz_soundcopy
 target/vz/vz_soundcopy_callee
 @video/mc6847/mc6847.lst
-@z80.lst
+

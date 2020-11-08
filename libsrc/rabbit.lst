@@ -35,3 +35,4 @@ _DEVELOPMENT/l/z80/ascii/l_num2char
 @rect/rect.lst
 @algorithm/alg.lst
 arch/z80/AsmCall
+@z80_crt0s/crt0.lst

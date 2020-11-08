@@ -19,4 +19,3 @@ target/ace/games/joystick
 @games/games.lst
 @target/ace/ace/ace.lst
 @input/input_keyboard.lst
-@z80.lst

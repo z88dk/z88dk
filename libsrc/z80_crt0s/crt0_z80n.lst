@@ -1,2 +1,2 @@
 @newlib-z80n.lst
-@crt0.lst
+@crt0_z80.lst

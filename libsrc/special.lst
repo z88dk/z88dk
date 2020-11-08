@@ -24,4 +24,4 @@ target/special/graphics/w_pointxy
 ;target/special/games/joystick
 ;target/special/games/keys_joystick
 ;@games/games.lst
-@8080.lst
+

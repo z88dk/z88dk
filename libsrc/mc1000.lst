@@ -50,4 +50,4 @@ target/mc1000/interrupts/add_raster_int
 @psg/ay/psg.lst
 @psg/ay/wyz/psg_wyz.lst
 @psg/ay/vt2/psg_vt2.lst
-@z80.lst
+

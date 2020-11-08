@@ -39,4 +39,4 @@ target/zx81/psg/set_psg_callee
 target/zx81/psg/get_psg
 target/zx81/psg/psg_init
 @psg/ay/psg.lst
-@z80.lst
+

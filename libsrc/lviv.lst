@@ -15,4 +15,4 @@ target/lviv/graphics/xorpixl
 target/lviv/graphics/pointxy
 @gfx/portable/gfx_portable.lst
 @gfx/narrow/gfx_narrow.lst
-@8080.lst
+

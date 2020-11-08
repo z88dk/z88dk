@@ -13,4 +13,4 @@ target/z1013/stdio/ansi/f_ansi_scrollup
 games/joystick
 target/z1013/graphics/textpixl
 @gfx/text/gfx_text.lst
-@z80.lst
+

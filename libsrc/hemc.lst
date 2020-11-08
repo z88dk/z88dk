@@ -4,4 +4,4 @@ target/hemc/stdio/getk
 target/hemc/stdio/fgetc_cons
 @stdio/stdio.lst
 @gfx/gencon/gfx_gencon1.lst
-@z80.lst
+

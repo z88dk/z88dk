@@ -8,4 +8,4 @@ target/cpm/cpm/cpm_platform_init
 @target/cpm/fcntl/fcntl.lst
 target/cpm/cpm/obj/${TYPE}/execl
 games/joystick
-@8080.lst
+

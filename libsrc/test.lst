@@ -5,7 +5,7 @@ target/test/stdio/getk
 target/test/time/time
 target/test/time/clock
 @time/time.lst
-@z80.lst
+
 target/test/fcntl/close
 target/test/fcntl/creat
 target/test/fcntl/fdgetpos

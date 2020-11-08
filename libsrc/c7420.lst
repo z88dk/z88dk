@@ -2,4 +2,4 @@ target/c7420/stdio/fgetc_cons
 target/c7420/stdio/getk
 target/c7420/stdio/fputc_cons
 @stdio/stdio.lst
-@z80.lst
+

@@ -19,7 +19,7 @@ target/g800/games/bit_close
 target/g800/games/bit_close_ei
 games/joystick
 @games/games.lst
-@z80.lst
+
 target/g800/graphics/clsgraph_850
 target/g800/graphics/getmaxx
 target/g800/graphics/getmaxy_850

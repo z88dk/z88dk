@@ -15,4 +15,4 @@ target/super80/games/bit_close
 target/super80/games/keys_joystick
 @games/games.lst
 @video/mc6845/mc6845.lst
-@z80.lst
+

@@ -28,4 +28,4 @@ target/svi/rs232/rs232_init
 target/svi/rs232/rs232_params
 target/svi/rs232/rs232_put
 @target/svi/arch_svi.lst
-@z80.lst
+
