@@ -12,7 +12,7 @@ TPAGE = perl -S tpage --include_path=.
 all : $(patsubst %.tt, ../%, $(wildcard *.tt))
 
 ../%.c : %.c.tt %.yaml
-	@echo $(PATH)
+	@echo $$PATH; perl -I ~/perl5/lib/perl5/ -Mlocal::lib; echo $$PATH
 	which tpage
 	$(TPAGE) --help
 	$(TPAGE) $< > $@~
@@ -20,7 +20,7 @@ all : $(patsubst %.tt, ../%, $(wildcard *.tt))
 	dos2unix $@
 
 ../%.h : %.h.tt %.yaml
-	@echo $(PATH)
+	@echo $$PATH; perl -I ~/perl5/lib/perl5/ -Mlocal::lib; echo $$PATH
 	which tpage
 	$(TPAGE) --help
 	$(TPAGE) $< > $@~
