@@ -21,35 +21,35 @@ ifeq ($(EXESUFFIX),.exe)
 				   ../../ext/UNIXem/src/dirent.o
 endif
 
-CC 				?= gcc
-INSTALL 		?= install
-CROSS			?= 0
+CC 		?= gcc
+INSTALL 	?= install
+CROSS		?= 0
 
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
-SRCS			:= $(filter-out test.c,$(wildcard *.c lib/*.c ../common/*.c ../../ext/regex/reg*.c))
-OBJS 			:= $(SRCS:.c=.o) \
-				   $(UNIXem_OBJS)
-DEPENDS			:= $(SRCS:.c=.d)
+SRCS		:= $(filter-out test.c,$(wildcard *.c lib/*.c ../common/*.c ../../ext/regex/reg*.c))
+OBJS 		:= $(SRCS:.c=.o) \
+		   $(UNIXem_OBJS)
+DEPENDS		:= $(SRCS:.c=.d)
 TEST_SRC_MAIN	:= $(wildcard t/test_*.c)
 TEST_SRC_LIB	:= t/testlib.c
 
 #------------------------------------------------------------------------------
 # variables
 #------------------------------------------------------------------------------
-TARGET 			= $(PROJ)$(EXESUFFIX)
+TARGET 		= $(PROJ)$(EXESUFFIX)
 
-OPT 			= -O3
+OPT 		= -O3
 
-STD 			= -std=gnu11
-LOCAL_LIB 		:= lib
+STD 		= -std=gnu11
+LOCAL_LIB 	:= lib
 LOCAL_CFLAGS 	+= -MMD -I. -I$(LOCAL_LIB) -It -g -Wall $(STD) $(OPT) \
-				   -I../common \
-				   -I../../ext/optparse \
-				   -I../../ext/regex \
-				   -I../../ext/uthash/src \
-				   $(UNIXem_CFLAGS)
+		   -I../common \
+		   -I../../ext/optparse \
+		   -I../../ext/regex \
+		   -I../../ext/uthash/src \
+		   $(UNIXem_CFLAGS)
 
 #------------------------------------------------------------------------------
 # main
@@ -62,9 +62,9 @@ $(TARGET): ../config.h $(OBJS)
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
 ../config.h:
-	@echo \#define PREFIX \"/usr/local/share/z88dk\" 				 > $@
-	@echo \#define UNIX 1											>> $@
-	@echo \#define EXEC_PREFIX \"\"									>> $@
+	@echo \#define PREFIX \"/usr/local/share/z88dk\"                 > $@
+	@echo \#define UNIX 1                                           >> $@
+	@echo \#define EXEC_PREFIX \"\"                                 >> $@
 	@echo \#define Z88DK_VERSION \"build-$(shell date +%Y%m%d)\"	>> $@
 
 %.o: %.c
@@ -109,12 +109,13 @@ clean::
 #------------------------------------------------------------------------------
 .PHONY: dev
 dev:
+	perl dev/cpu2/cpu.pl
 	perl asmstyle.pl dev/z80asm_lib/*.asm
 	$(MAKE) -C tt
 	$(MAKE) -C lib
 	$(MAKE) -f dev/Makefile
 	$(MAKE) all
-
+	
 clean::
 	$(MAKE) -C lib clean
 
@@ -146,6 +147,8 @@ clean::
 #------------------------------------------------------------------------------
 # test
 #------------------------------------------------------------------------------
+.PHONY: test testdev testlib
+
 all: t/libtestlib.a
 
 t/libtestlib.a : $(OBJS) $(TEST_SRC_LIB:.c=.o)
@@ -162,16 +165,12 @@ $(TEST_SRC_MAIN:.c=.o) : t/libtestlib.a
 clean::
 	$(RM) t/libtestlib.a t/*.o t/*.out lib/t/*.o lib/t/*.out $(TEST_SRC_MAIN:.c=$(EXESUFFIX))
 
-all:
-	perl dev/cpu2/cpu.pl
-
-test: $(TARGET) z80asm_lib
-	$(MAKE) dev
+test: $(TARGET) 
 	$(MAKE) z80asm_lib
 	$(MAKE) prove_c
 	$(MAKE) prove_perl
 
-testdev:
+testdev: dev test
 	$(MAKE) -C dev/z80asm_lib test
 	$(MAKE) -C dev/z80asm2 test
 	perl dev/cpu2/cpu.pl -s test
