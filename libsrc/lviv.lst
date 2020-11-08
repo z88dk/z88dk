@@ -15,5 +15,4 @@ target/lviv/graphics/xorpixl
 target/lviv/graphics/pointxy
 @gfx/portable/gfx_portable.lst
 @gfx/narrow/gfx_narrow.lst
-@input/input_keyboard.lst
 
