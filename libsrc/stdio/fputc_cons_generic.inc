@@ -97,8 +97,13 @@ handle_character:
 	; d = character to print
 	; e = raw character mode
 	ld	a,(__console_h)
+	dec	a
 	cp	b
-	jr	nz,handle_character_no_scroll
+	jr	nc,handle_character_no_scroll
+	sub	b
+	neg
+	ld	b,a
+scroll_loop:
 IF __CPU_INTEL__
 	ld	a,(hl)
 	rlca
@@ -108,6 +113,7 @@ ELSE
 	bit	6,(hl)
 	call	z,generic_console_scrollup
 ENDIF
+	djnz	scroll_loop
 	ld	a,(__console_h)
 	dec	a
 	ld	b,a
