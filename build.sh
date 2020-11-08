@@ -10,7 +10,7 @@ show_help_and_exit()
   if [ -n $1 ]; then rc=$1; else rc=0; fi
 
   echo ""
-  echo "Usage: $0 [-b][-c][-C][-e][-h][-k][-l][-p][-t]"
+  echo "Usage: $0 [-b][-c][-C][-e][-h][-k][-l][-p][-P PER5LIB][-t]"
   echo ""
   echo "  -b    Don't build binaries"
   echo "  -c    Clean build environment"
@@ -22,6 +22,7 @@ show_help_and_exit()
   echo "  -k    Keep building ignoring errors"
   echo "  -l    Don't build libraries"
   echo "  -p    TARGET Build specified targets"
+  echo "  -P    Set Perl local::lib environment variables before the build"
   echo "  -i    PATH Final installation directory"
   echo "  -t    Run tests"
   echo ""
@@ -42,6 +43,8 @@ do_clean_bin=0
 do_examples=0
 do_libbuild=1
 do_tests=0
+do_perl_local_lib=0
+perl_local_lib=""
 
 DESTDIR=/usr/local
 
@@ -52,7 +55,7 @@ export ZCCCFG
 export PATH
 
 
-while getopts "bcCehkltp:i:" arg; do       # Handle all given arguments
+while getopts "bcCehkltp:P:i:" arg; do       # Handle all given arguments
   case "$arg" in
     b)     do_build=0              ;;   # Don't build
     c)     do_clean=1              ;;   # clean except bin/*
@@ -61,7 +64,8 @@ while getopts "bcCehkltp:i:" arg; do       # Handle all given arguments
     k)     set +e                  ;;   # keep building ignoring errors
     l)     do_libbuild=0           ;;   # Don't build libraries
     p)     export TARGETS=$OPTARG  ;;
-    i)     DESTDIR=$OPTARG  ;;
+    P)     do_perl_local_lib=1; perl_local_lib=$OPTARG ;;
+    i)     DESTDIR=$OPTARG         ;;
     t)     do_tests=1              ;;   # Run tests as well
     h | *) show_help_and_exit 0    ;;   # Show help on demand
   esac
@@ -144,6 +148,11 @@ fi
 ZCCCFG=`pwd`/lib/config/                # Set ZCCCFG to the lib config directory
 mkdir -p $ZCCCFG                        # Guarantee that the directory exists
 export ZCCCFG
+
+
+if [ $do_perl_local_lib = 1 ]; then     # setup Perl local::lib environment
+  eval $(perl -I $perl_local_lib -Mlocal::lib)
+fi
 
 
 if [ $do_build = 1 ]; then              # Build binaries or not...
