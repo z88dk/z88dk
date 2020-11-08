@@ -10,4 +10,4 @@ target/homelab/games/keys_joystick.asm
 @games/games.lst
 target/homelab/graphics/textpixl
 @gfx/gencon/gfx_gencon.lst
-@z80.lst
+

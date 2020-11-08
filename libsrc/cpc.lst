@@ -115,4 +115,4 @@ target/cpc/psg/psg_init
 target/cpc/psg/asm_wyz_hardware_out
 @psg/ay/psg.lst
 @psg/ay/wyz/psg_wyz.lst
-@z80.lst
+

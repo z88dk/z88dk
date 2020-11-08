@@ -13,4 +13,4 @@ target/nascom/stdio/ansi/f_ansi_scrollup
 target/nascom/graphics/textpixl6
 @gfx/gencon/gfx_gencon6.lst
 games/joystick
-@z80.lst
+

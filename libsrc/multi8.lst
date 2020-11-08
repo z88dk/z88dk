@@ -26,4 +26,4 @@ target/multi8/psg/psg_init
 target/multi8/psg/asm_wyz_hardware_out
 @psg/ay/psg.lst
 @psg/ay/wyz/psg_wyz.lst
-@z80.lst
+

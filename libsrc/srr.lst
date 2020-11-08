@@ -11,4 +11,4 @@ target/srr/graphics/textpixl
 @gfx/gencon/gfx_gencon.lst
 target/srr/games/keys_joystick
 @games/games.lst
-@z80.lst
+

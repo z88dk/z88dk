@@ -16,4 +16,4 @@ target/kc/graphics/w_stencil_render
 gfx/wide/obj/${TARGET}/w_putsprite
 gfx/wide/obj/${TARGET}/w_dcircle_square
 @gfx/wide/gfx_wide.lst
-@z80.lst
+

@@ -91,4 +91,4 @@ target/osca/sdcard/sd_select_card
 target/osca/sdcard/sd_send_byte
 target/osca/sdcard/sd_spi_port_fast
 @sdcard/sdcard.lst
-@z80.lst
+

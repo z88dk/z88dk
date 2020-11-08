@@ -18,4 +18,4 @@ target/fp1100/graphics/w_xorpixl
 target/fp1100/graphics/w_pointxy
 @gfx/wide/gfx_wide.lst
 @font/font_8x8/font_8x8.lst
-@z80.lst
+

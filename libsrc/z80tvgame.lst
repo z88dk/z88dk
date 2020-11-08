@@ -12,4 +12,4 @@ target/z80tvgame/graphics/pixladdr
 target/z80tvgame/graphics/swapgfxbk
 target/z80tvgame/graphics/clsgraph
 @gfx/narrow/gfx_narrow.lst
-@z80.lst
+

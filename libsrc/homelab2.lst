@@ -8,4 +8,4 @@ target/homelab2/graphics/textpixl
 target/homelab2/games/joystick.asm
 target/homelab2/games/keys_joystick.asm
 @games/games.lst
-@z80.lst
+

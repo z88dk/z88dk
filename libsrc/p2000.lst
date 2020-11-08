@@ -21,4 +21,4 @@ target/p2000/games/bit_open_di
 target/p2000/games/bit_close
 target/p2000/games/bit_close_ei
 @games/games.lst
-@z80.lst
+

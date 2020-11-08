@@ -1,5 +1,0 @@
-target/sms/stdio/fputc_cons_gg
-target/sms/gotoxy_gg
-target/sms/load_palette_gg
-target/sms/set_sprite_gg
-target/sms/set_bkg_map_gg

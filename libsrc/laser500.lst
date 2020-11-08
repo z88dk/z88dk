@@ -36,4 +36,4 @@ target/laser500/games/joystick
 target/laser500/games/keys_joystick
 @games/games_mwr.lst
 games/obj/laser500/joystick_type
-@z80.lst
+

@@ -15,4 +15,4 @@ target/lynx/graphics/textpixl
 @video/mc6845/mc6845.lst
 target/lynx/games/keys_joystick
 @games/games.lst
-@z80.lst
+

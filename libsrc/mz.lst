@@ -19,4 +19,4 @@ target/mz/graphics/xorpixl
 target/mz/graphics/pointxy
 @gfx/narrow/gfx_narrow.lst
 @games/games.lst
-@z80.lst
+

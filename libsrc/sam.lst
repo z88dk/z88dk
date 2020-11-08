@@ -30,4 +30,4 @@ target/zx/games/bit_close
 target/zx/games/bit_close_ei
 @games/games.lst
 @target/zx/spectrum.lst
-@z80.lst
+

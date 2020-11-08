@@ -8,4 +8,4 @@ stdio/inkey/getk
 @gfx/narrow/gfx_narrow.lst
 @psg/sn76489/sn76489.lst
 @games/games.lst
-@z80.lst
+

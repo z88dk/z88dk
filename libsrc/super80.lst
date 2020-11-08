@@ -10,4 +10,4 @@ target/super80/games/bit_open
 target/super80/games/bit_close
 target/super80/games/keys_joystick
 @games/games.lst
-@z80.lst
+

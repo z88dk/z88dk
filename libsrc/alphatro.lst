@@ -13,4 +13,4 @@ target/alphatro/graphics/cleargraphics
 @video/mc6845/mc6845.lst
 target/alphatro/games/keys_joystick
 @games/games.lst
-@z80.lst
+

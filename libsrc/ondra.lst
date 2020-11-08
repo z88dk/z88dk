@@ -13,4 +13,4 @@ stdio/inkey/fgetc_cons
 target/ondra/games/joystick
 target/ondra/games/keys_joystick
 @games/games.lst
-@z80.lst
+

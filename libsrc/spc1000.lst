@@ -49,4 +49,4 @@ target/spc1000/psg/get_psg
 target/spc1000/psg/psg_init
 @psg/ay/psg.lst
 @video/mc6847/mc6847.lst
-@z80.lst
+
