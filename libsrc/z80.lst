@@ -37,3 +37,4 @@ _DEVELOPMENT/l/z80/ascii/l_num2char
 @algorithm/alg.lst
 arch/z80/AsmCall
 @interrupts/interrupts.lst
+@z80_crt0s/crt0.lst

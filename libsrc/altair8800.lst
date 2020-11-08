@@ -3,4 +3,4 @@ target/altair8800/stdio/fputc_cons_native
 target/altair8800/stdio/getk
 @stdio/stdio_8080.lst
 @time/time.lst
-@8080.lst
+

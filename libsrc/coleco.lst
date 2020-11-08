@@ -11,4 +11,4 @@ target/coleco/games/joystick
 target/coleco/games/coleco_joypad
 games/obj/coleco/joystick_type
 @games/games.lst
-@z80.lst
+

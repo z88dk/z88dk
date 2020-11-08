@@ -3,4 +3,4 @@ target/x07/stdio/fputc_cons
 target/x07/stdio/getk
 @stdio/stdio.lst
 games/joystick
-@z80.lst
+

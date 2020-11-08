@@ -13,4 +13,4 @@ target/pasopia7/games/joystick
 @games/games.lst
 @gfx/gencon/gfx_gencon1.lst
 @video/mc6845/mc6845.lst
-@z80.lst
+

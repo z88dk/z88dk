@@ -11,4 +11,4 @@ target/m100/graphics/plotpixl
 target/m100/graphics/respixl
 @gfx/portable/gfx_portable.lst
 @gfx/narrow/gfx_narrow.lst
-@8080.lst
+

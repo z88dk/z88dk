@@ -12,4 +12,4 @@ target/pencil2/games/keys_joystick
 games/obj/pencil2/joystick_type
 @games/games.lst
 @input/input_keyboard.lst
-@z80.lst
+

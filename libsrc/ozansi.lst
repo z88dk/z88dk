@@ -15,7 +15,7 @@ target/oz/graphics/stencil_render
 target/oz/graphics/swapgfxbk
 @gfx/narrow/gfx_narrow.lst
 games/joystick
-@z80.lst
+
 target/oz/oz/obj/oz/restore_a000
 target/oz/oz/obj/oz/ozcopy
 target/oz/oz/obj/oz/ozdetectmodel

@@ -24,4 +24,4 @@ target/cpm/cpm/obj/${TYPE}/cpm_platform_init
 @target/cpm/fcntl/fcntl.lst
 target/cpm/cpm/obj/${TYPE}/execl
 games/joystick
-@z80.lst
+

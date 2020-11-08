@@ -11,4 +11,4 @@ target/sc3000/time/clock
 target/sc3000/games/joystick
 target/sc3000/games/keys_joystick
 @games/games.lst
-@z80.lst
+

@@ -16,4 +16,4 @@ target/lm80c/psg/asm_wyz_hardware_out
 target/lm80c/psg/asm_vt2_hardware_out
 @games/games.lst
 @target/lm80c/rs232/rs232.lst
-@z80.lst
+

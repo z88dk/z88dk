@@ -82,5 +82,5 @@ target/z88/graphics/pixladdr
 target/z88/graphics/swapgfxbk
 target/z88/graphics/window
 @gfx/narrow/gfx_narrow.lst
-@z80.lst
+#
 

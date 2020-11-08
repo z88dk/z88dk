@@ -36,4 +36,4 @@ target/sv8000/psg/asm_wyz_hardware_out
 target/sv8000/games/joystick
 games/obj/sv8000/joystick_type
 @games/games.lst
-@z80.lst
+

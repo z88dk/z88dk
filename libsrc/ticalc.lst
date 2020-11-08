@@ -24,4 +24,4 @@ target/ticalc/games/bit_open_di
 target/ticalc/games/bit_close
 target/ticalc/games/bit_close_ei
 @games/games.lst
-@z80.lst
+

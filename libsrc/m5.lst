@@ -13,4 +13,4 @@ target/m5/games/joystick
 target/m5/games/keys_joystick
 @psg/sn76489/sn76489.lst
 @games/games.lst
-@z80.lst
+

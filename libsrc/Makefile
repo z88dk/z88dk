@@ -17,7 +17,8 @@ TOCREATE =
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
 CPMLIBS = cpm_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib
-GENLIBS = z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib  lib3d.lib fastmath.lib preempt.lib sp1-all
+GENLIBS = z80iy_crt0.lib z80n_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2k_crt0.lib z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib  lib3d.lib fastmath.lib preempt.lib sp1-all 
+GENLIBS += 8085_opt.lib ez80_opt.lib z180_opt.lib
 
 
 TOCREATE := $(call check_target,altair8800,altair8800_clib.lib)
@@ -138,23 +139,26 @@ all: $(TOCREATE)
 # Arg1: target
 # Arg2: Graphics flavour
 define buildgeneric
+	$(MAKE) -C stdio
+	$(MAKE) -C time
+	$(MAKE) -C font
+	$(MAKE) -C input
+	$(MAKE) -C stdlib TARGET=$(1)
+	$(MAKE) -C gfx TARGET=$(1) FLAVOUR=$(if $(2),$(2),narrow)
+	$(MAKE) -C psg TARGET=$(1)
+endef
+
+define buildcrt
 	$(MAKE) -C ctype
 	$(MAKE) -C libgen
 	$(MAKE) -C strings
 	$(MAKE) -C interrupts
 	$(MAKE) -C regex
-	$(MAKE) -C stdio
 	$(MAKE) -C setjmp
-	$(MAKE) -C time
 	$(MAKE) -C debug
 	$(MAKE) -C assert
-	$(MAKE) -C interrupts
 	$(MAKE) -C font
-	$(MAKE) -C input
-	$(MAKE) -C stdlib TARGET=$(1)
-	$(MAKE) -C gfx TARGET=$(1) FLAVOUR=$(if $(2),$(2),narrow)
 	$(MAKE) -C compress
-	$(MAKE) -C psg TARGET=$(1)
 	$(MAKE) -C alloc
 	$(MAKE) -C debug
 	$(MAKE) -C adt
@@ -162,6 +166,7 @@ define buildgeneric
 	$(MAKE) -C algorithm
 	$(MAKE) -C rect
 	$(MAKE) -C arch
+	$(MAKE) -C z80_crt0s
 endef
 
 #  short script to sort out ticalc dependencies
@@ -249,13 +254,6 @@ ndos.lib:
 
 gendos.lib:
 	$(MAKE) -C fcntl/gen_rnd
-
-# Startup code (such as division etc) common to all z80s - dom
-z80_crt0.lib:
-	@echo ''
-	@echo '--- Building Z80 crt0 Library ---'
-	@echo ''
-	$(MAKE) -C z80_crt0s
 
 # z88 library - dom
 z88_clib.lib:
@@ -1703,6 +1701,70 @@ sp1-zx81hr:
 
 sp1-clean:
 	$(MAKE) -C sprites/software/sp1 clean
+
+z80_crt0.lib:
+	@echo ''
+	@echo '--- Building z80 crt Library ---'
+	@echo ''
+	$(call buildcrt)
+	TYPE=z80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z80_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
+
+z80iy_crt0.lib:
+	@echo ''
+	@echo '--- Building ixiy crt Library ---'
+	@echo ''
+	$(call buildcrt)
+	TYPE=ixiy $(LIBLINKER) -mz80 -IXIY -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z80iy_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
+
+8080_crt0.lib:
+	@echo ''
+	@echo '--- Building 8080 crt Library ---'
+	@echo ''
+	$(call buildcrt)
+	TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8080_crt0 @$(LISTFILE_DIRECTORY)/8080.lst
+
+8085_opt.lib:
+	@echo ''
+	@echo '--- Building 8080 optimised crt routines---'
+	@echo ''
+	$(MAKE) -C z80_crt0s
+	TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/8085_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
+
+z180_opt.lib:
+	@echo ''
+	@echo '--- Building z180 optimised crt routines---'
+	@echo ''
+	$(MAKE) -C z80_crt0s
+	TYPE=z180 $(LIBLINKER) -mz180 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z180_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
+
+ez80_opt.lib:
+	@echo ''
+	@echo '--- Building ez80 optimised crt routines---'
+	@echo ''
+	$(MAKE) -C z80_crt0s
+	TYPE=ez80 $(LIBLINKER) -mz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/ez80_opt @$(LISTFILE_DIRECTORY)/z80_crt0s/crt0.lst
+
+z80n_crt0.lib:
+	@echo ''
+	@echo '--- Building z80n crt Library ---'
+	@echo ''
+	$(call buildcrt)
+	TYPE=z80n $(LIBLINKER) -mz80n -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/z80n_crt0 @$(LISTFILE_DIRECTORY)/z80.lst
+
+gbz80_crt0.lib:
+	@echo ''
+	@echo '--- Building gbz80 crt Library ---'
+	@echo ''
+	$(call buildcrt)
+	TYPE=gbz80 $(LIBLINKER) -mgbz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gbz80_crt0 @$(LISTFILE_DIRECTORY)/gbz80.lst
+
+
+r2k_crt0.lib:
+	@echo ''
+	@echo '--- Building r2k crt Library ---'
+	@echo ''
+	$(call buildcrt)
+	TYPE=r2k $(LIBLINKER) -mr2k -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/r2k_crt0 @$(LISTFILE_DIRECTORY)/rabbit.lst
 
 
 clean: classic-clean new-clean

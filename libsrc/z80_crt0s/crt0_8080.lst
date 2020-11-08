@@ -15,8 +15,6 @@ sccz80/crt0_z80/l_cm_de
 sccz80/crt0_z80/l_com
 sccz80/crt0_z80/l_compare_result
 sccz80/crt0_z80/l_deneg
-sccz80/crt0_z80/l_div
-sccz80/crt0_z80/l_div_u
 sccz80/crt0_z80/l_gchar
 sccz80/crt0_z80/l_gcharsp
 sccz80/crt0_z80/l_gcharspsp
