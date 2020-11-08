@@ -36,15 +36,19 @@ steps:
     key: 'ccache | "$(Agent.OS)"'
     path: $(CCACHE_DIR)
   displayName: ccache
-- script: |
-    eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib); ./build.sh -l
+- bash: |
+    eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+    ./build.sh -l
   displayName: 'Build binaries'
-- script: |
-    eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib); ./build.sh -b 
+- bash: |
+    eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+    ./build.sh -b 
   displayName: 'Build libraries'
-- script: |
-    eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib); ./build.sh -b -l -e
+- bash: |
+    eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+    ./build.sh -b -l -e
   displayName: 'Build examples'
-- script: |
-    eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib); ./build.sh -b -l -t
+- bash: |
+    eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+    ./build.sh -b -l -t
   displayName: 'Build and run tests'
