@@ -3,4 +3,3 @@ target/rcmx000/stdio/cnvtab
 target/rcmx000/stdio/getk
 target/rcmx000/stdio/fputc_cons
 @stdio/stdio_r2k.lst
-@rabbit.lst
