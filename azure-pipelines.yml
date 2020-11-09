@@ -20,15 +20,13 @@ pool:
 steps:
 - checkout: self
   submodules: true
-- bash: |
-    mkdir -p $PERL_CACHE
-  displayName: "create perlcache"
 - task: Cache@1
   inputs:
     key: 'perl_cache | "$(Agent.OS)"'
     path: $(PERL_CACHE)
   displayName: perlcache
 - bash: |
+    mkdir -p $PERL_CACHE
     find $PERL_CACHE -print
   displayName: "test 1"
 - bash: |
