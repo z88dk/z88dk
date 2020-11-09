@@ -8,6 +8,7 @@ target/cpm/fcntl/obj/${TYPE}/${DEVICE}/dir_move_next
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/dir_get_entry_type
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/dir_get_entry_name
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/dir_get_entry_size
+target/cpm/fcntl/obj/${TYPE}/${DEVICE}/execv
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/get_current_volume
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/get_dir_name
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/fdgetpos

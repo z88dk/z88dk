@@ -1,5 +1,5 @@
 /*
- *	UNISTD.H
+ *	$Id: unistd.h $
  */
 
 #ifndef __UNISTD_H__
@@ -18,7 +18,7 @@ extern char *environ[];
 extern int __LIB__ execl (const char *command, const char *args) __smallc;
 
 /* (Work in progress): Execute a command passing the argument structure */
-/* extern int __LIB__ execv (const char *command, char *args[]) __smallc; */
+extern int __LIB__ execv (const char *command, char *args[]) __smallc;
 
 
 
