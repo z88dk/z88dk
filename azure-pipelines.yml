@@ -27,12 +27,13 @@ steps:
     path: $(PERL5LIB)
   displayName: perlcache
 - bash: |
+     find $(PERL5LIB) -print
      sudo apt-get install -y cpanminus liblocal-lib-perl
      echo PERL5LIB=$(PERL5LIB)
      cpanm --local-lib $(PERL5LIB) Path::Tiny
      find $(PERL5LIB) -print
      perl -I $(PERL5LIB) -Mlocal::lib
-     perl -MPath::Tiny -e 1
+     perl -MPath::Tiny -e 'print "Path::Tiny compiled\n"'
   displayName: "test"
 #- bash: |
 #     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl libtemplate-plugin-yaml-perl ragel libyaml-perl liblocal-lib-perl
