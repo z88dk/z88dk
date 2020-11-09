@@ -26,10 +26,17 @@ steps:
     path: $(PERL_CACHE)
   displayName: perlcache
 - bash: |
-     sudo apt-get install -y cpanminus liblocal-lib-perl
-     echo PERL_CACHE=$PERL_CACHE
-     echo PERL5LIB=$PERL5LIB
-     find $PERL_CACHE -print
+    sudo apt-get install -y cpanminus liblocal-lib-perl
+    cpanm --local-lib=$PERL_CACHE Path::Tiny
+    echo PERL5LIB=$PERL5LIB
+    perl -I $PERL_CACHE -Mlocal::lib
+    eval $(perl -I $PERL_CACHE -Mlocal::lib)
+    echo PERL5LIB=$PERL5LIB
+  displayName: "Install prerequisites"
+- bash: |
+    echo PERL_CACHE=$PERL_CACHE
+    echo PERL5LIB=$PERL5LIB
+    find $PERL_CACHE -print
   displayName: "test"
 #- bash: |
 #     echo PERL_CACHE=$PERL_CACHE
