@@ -6,7 +6,7 @@
 
 variables:
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
-  PERL_CACHE: $HOME/perl5
+  PERL_CACHE: $(HOME)/perl5
 
 
 trigger:
@@ -31,13 +31,13 @@ steps:
      echo PERL_CACHE=$PERL_CACHE
      echo PERL5LIB=$PERL5LIB
   displayName: "test 01"
-- bash: |
-     echo PERL_CACHE=$PERL_CACHE
-     echo PERL5LIB=$PERL5LIB
-     cpanm --local-lib=$PERL_CACHE Path::Tiny
-     perl -I $PERL_CACHE -Mlocal::lib
-     perl -MPath::Tiny -e 'print "Path::Tiny compiled\n"'
-  displayName: "test 02"
+#- bash: |
+#     echo PERL_CACHE=$PERL_CACHE
+#     echo PERL5LIB=$PERL5LIB
+#     cpanm --local-lib=$PERL_CACHE Path::Tiny
+#     perl -I $PERL_CACHE -Mlocal::lib
+#     perl -MPath::Tiny -e 'print "Path::Tiny compiled\n"'
+#  displayName: "test 02"
 #- bash: |
 #     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl libtemplate-plugin-yaml-perl ragel libyaml-perl liblocal-lib-perl
 #     cpanm --local-lib=$(PERL_CACHE) App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
