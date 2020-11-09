@@ -26,6 +26,12 @@ steps:
     path: $(PERL_CACHE)
   displayName: perlcache
 - bash: |
+    eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)    
+    echo PERL_CACHE=$PERL_CACHE
+    echo PERL5LIB=$PERL5LIB
+    find $PERL_CACHE -print
+  displayName: "test 1"
+- bash: |
     sudo apt-get install -y cpanminus liblocal-lib-perl perl-doc
     eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
     cpanm Path::Tiny
@@ -37,7 +43,7 @@ steps:
     echo PERL_CACHE=$PERL_CACHE
     echo PERL5LIB=$PERL5LIB
     find $PERL_CACHE -print
-  displayName: "test"
+  displayName: "test 2"
 #- bash: |
 #     echo PERL_CACHE=$PERL_CACHE
 #     echo PERL5LIB=$PERL5LIB
