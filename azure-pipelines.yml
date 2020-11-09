@@ -25,7 +25,7 @@ steps:
   displayName: "create perlcache"
 - task: Cache@1
   inputs:
-    key: 'perl | "$(Agent.OS)"'
+    key: 'perl_cache | "$(Agent.OS)"'
     path: $(PERL_CACHE)
   displayName: perlcache
 - bash: |
