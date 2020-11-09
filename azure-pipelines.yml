@@ -6,7 +6,7 @@
 
 variables:
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
-  PERL_CACHE: $(Pipeline.Workspace)/perl5
+  PERL_CACHE: $(HOME)/perl5
 
 trigger:
 - master
