@@ -74,6 +74,8 @@ docls:
 	ret
 
 generic_console_scrollup:
+	push	bc
+	push	de
 	ld	b,8
 	ld	hl,SCREEN + 80
 	ld	de,SCREEN
@@ -109,6 +111,8 @@ scrollup_3:
 	ld	h,a
 	dec	c
 	jr	nz,scrollup_2
+	pop	de
+	pop	bc
 	ret
 
 ; c = x
