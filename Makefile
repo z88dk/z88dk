@@ -89,6 +89,11 @@ endif
 zsdcc_r$(SDCC_VERSION)_src.tar.gz:
 	curl http://nightly.z88dk.org/zsdcc/zsdcc_r$(SDCC_VERSION)_src.tar.gz -o zsdcc_r$(SDCC_VERSION)_src.tar.gz
 
+# Helper rule to build the zsdcc tarball for ci builds
+zsdcc-tarball: $(SDCC_PATH)/configure
+	@mkdir -p dist
+	tar --exclude=.svn -cvzf dist/zsdcc_r$(SDCC_VERSION)_src.tar.gz src/sdcc-build
+	
 
 $(SDCC_PATH)/Makefile: $(SDCC_PATH)/configure
 ifdef BUILD_SDCC
