@@ -6,7 +6,7 @@
 
 variables:
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
-  PERL5LIB: $(HOME)/perl5
+  PERL_CACHE: $(HOME)/perl5
 
 
 trigger:
@@ -21,23 +21,22 @@ pool:
 steps:
 - checkout: self
   submodules: true
-- task: Cache@1
-  inputs:
-    key: 'perl | "$(Agent.OS)"'
-    path: $(PERL5LIB)
-  displayName: perlcache
+#- task: Cache@1
+#  inputs:
+#    key: 'perl | "$(Agent.OS)"'
+#    path: $(PERL_CACHE)
+#  displayName: perlcache
 - bash: |
-     find $(PERL5LIB) -print
      sudo apt-get install -y cpanminus liblocal-lib-perl
+     echo PERL_CACHE=$(PERL_CACHE)
      echo PERL5LIB=$(PERL5LIB)
-     cpanm --local-lib $(PERL5LIB) Path::Tiny
-     find $(PERL5LIB) -print
-     perl -I $(PERL5LIB) -Mlocal::lib
+     cpanm --local-lib $(PERL_CACHE) Path::Tiny
+     perl -I $(PERL_CACHE) -Mlocal::lib
      perl -MPath::Tiny -e 'print "Path::Tiny compiled\n"'
   displayName: "test"
 #- bash: |
 #     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl libtemplate-plugin-yaml-perl ragel libyaml-perl liblocal-lib-perl
-#     cpanm --local-lib=$(PERL5LIB) App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
+#     cpanm --local-lib=$(PERL_CACHE) App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
 #  displayName: "Install prerequisites"
 #- task: Cache@2
 #  inputs:
@@ -45,14 +44,14 @@ steps:
 #    path: $(CCACHE_DIR)
 #  displayName: ccache
 #- script: |
-#    ./build.sh -P $(PERL5LIB) -l
+#    ./build.sh -P $(PERL_CACHE) -l
 #  displayName: 'Build binaries'
 #- script: |
-#    ./build.sh -P $(PERL5LIB) -b 
+#    ./build.sh -P $(PERL_CACHE) -b 
 #  displayName: 'Build libraries'
 #- script: |
-#    ./build.sh -P $(PERL5LIB) -b -l -e
+#    ./build.sh -P $(PERL_CACHE) -b -l -e
 #  displayName: 'Build examples'
 #- script: |
-#    ./build.sh -P $(PERL5LIB) -b -l -t
+#    ./build.sh -P $(PERL_CACHE) -b -l -t
 #  displayName: 'Build and run tests'
