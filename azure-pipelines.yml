@@ -26,7 +26,7 @@ steps:
     path: $(PERL_CACHE)
   displayName: perlcache
 - bash: |
-    sudo apt-get install -y cpanminus liblocal-lib-perl
+    sudo apt-get install -y cpanminus liblocal-lib-perl perl-doc
     cpanm --local-lib=$PERL_CACHE Path::Tiny
     perldoc -l Path::Tiny
     echo PERL5LIB=$PERL5LIB
