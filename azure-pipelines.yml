@@ -20,15 +20,15 @@ pool:
 steps:
 - checkout: self
   submodules: true
+- bash: |
+    mkdir -p $PERL_CACHE
+  displayName: "create perlcache"
 - task: Cache@1
   inputs:
     key: 'perl | "$(Agent.OS)"'
     path: $(PERL_CACHE)
   displayName: perlcache
 - bash: |
-    eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)    
-    echo PERL_CACHE=$PERL_CACHE
-    echo PERL5LIB=$PERL5LIB
     find $PERL_CACHE -print
   displayName: "test 1"
 - bash: |
