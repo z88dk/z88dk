@@ -29,13 +29,13 @@ steps:
 - bash: |
      sudo apt-get install -y cpanminus liblocal-lib-perl
      echo PERL_CACHE=$(PERL_CACHE)
-     echo PERL5LIB=$(PERL5LIB)
+     echo PERL5LIB=$PERL5LIB
   displayName: "test 01"
 - bash: |
-     echo PERL_CACHE=$(PERL_CACHE)
-     echo PERL5LIB=$(PERL5LIB)
-     cpanm --local-lib $(PERL_CACHE) Path::Tiny
-     perl -I $(PERL_CACHE) -Mlocal::lib
+     echo PERL_CACHE=$PERL_CACHE
+     echo PERL5LIB=$PERL5LIB
+     cpanm --local-lib $PERL_CACHE Path::Tiny
+     perl -I $PERL_CACHE -Mlocal::lib
      perl -MPath::Tiny -e 'print "Path::Tiny compiled\n"'
   displayName: "test 02"
 #- bash: |
