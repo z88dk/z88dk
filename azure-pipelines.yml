@@ -8,7 +8,6 @@ variables:
   CCACHE_DIR: $(Agent.BuildDirectory)/ccache
   PERL_CACHE: $(Agent.HomeDirectory)/perl5
 
-
 trigger:
 - master
 
@@ -28,11 +27,11 @@ steps:
   displayName: perlcache
 - bash: |
      set +x
-#     sudo apt-get install -y cpanminus liblocal-lib-perl
+     sudo apt-get install -y cpanminus liblocal-lib-perl
      echo PERL_CACHE=$PERL_CACHE
      echo PERL5LIB=$PERL5LIB
      find $PERL_CACHE -print
-  displayName: "test 01"
+  displayName: "test"
 #- bash: |
 #     echo PERL_CACHE=$PERL_CACHE
 #     echo PERL5LIB=$PERL5LIB
