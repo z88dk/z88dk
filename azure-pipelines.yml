@@ -22,29 +22,33 @@ pool:
 steps:
 - checkout: self
   submodules: true
-- task: Cache@1
-  inputs:
-    key: 'perl | "$(Agent.OS)"'
-    path: $(PERL5LIB)
-  displayName: perlcache
+#- task: Cache@1
+#  inputs:
+#    key: 'perl | "$(Agent.OS)"'
+#    path: $(PERL5LIB)
+#  displayName: perlcache
 - bash: |
-     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl libtemplate-plugin-yaml-perl ragel libyaml-perl liblocal-lib-perl
-     cpanm --local-lib=$(PERL5LIB) App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
-  displayName: "Install prerequisites"
-- task: Cache@2
-  inputs:
-    key: 'ccache | "$(Agent.OS)"'
-    path: $(CCACHE_DIR)
-  displayName: ccache
-- script: |
-    ./build.sh -P $(PERL5LIB) -l
-  displayName: 'Build binaries'
-- script: |
-    ./build.sh -P $(PERL5LIB) -b 
-  displayName: 'Build libraries'
-- script: |
-    ./build.sh -P $(PERL5LIB) -b -l -e
-  displayName: 'Build examples'
-- script: |
-    ./build.sh -P $(PERL5LIB) -b -l -t
-  displayName: 'Build and run tests'
+     echo PERL5LIB=$(PERL5LIB)
+     find $(PERL5LIB) -print
+  displayName: "test 01"
+#- bash: |
+#     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl libtemplate-plugin-yaml-perl ragel libyaml-perl liblocal-lib-perl
+#     cpanm --local-lib=$(PERL5LIB) App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
+#  displayName: "Install prerequisites"
+#- task: Cache@2
+#  inputs:
+#    key: 'ccache | "$(Agent.OS)"'
+#    path: $(CCACHE_DIR)
+#  displayName: ccache
+#- script: |
+#    ./build.sh -P $(PERL5LIB) -l
+#  displayName: 'Build binaries'
+#- script: |
+#    ./build.sh -P $(PERL5LIB) -b 
+#  displayName: 'Build libraries'
+#- script: |
+#    ./build.sh -P $(PERL5LIB) -b -l -e
+#  displayName: 'Build examples'
+#- script: |
+#    ./build.sh -P $(PERL5LIB) -b -l -t
+#  displayName: 'Build and run tests'
