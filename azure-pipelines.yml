@@ -29,6 +29,7 @@ steps:
 #  displayName: perlcache
 - bash: |
      echo PERL5LIB=$(PERL5LIB)
+     cpanm --local-lib=$(PERL5LIB) Path::Tiny
      find $(PERL5LIB) -print
   displayName: "test 01"
 #- bash: |
