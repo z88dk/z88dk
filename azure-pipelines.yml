@@ -18,7 +18,6 @@ pr:
 pool:
   vmImage: 'Ubuntu 16.04'
 
-
 steps:
 - checkout: self
   submodules: true
@@ -28,6 +27,7 @@ steps:
 #    path: $(PERL5LIB)
 #  displayName: perlcache
 - bash: |
+     sudo apt install -y cpanminus
      echo PERL5LIB=$(PERL5LIB)
      cpanm --local-lib=$(PERL5LIB) Path::Tiny
      find $(PERL5LIB) -print
