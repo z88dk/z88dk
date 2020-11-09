@@ -5,8 +5,8 @@
 
 
 variables:
-  CCACHE_DIR: $(Agent.BuildDirectory)/ccache
-  PERL_CACHE: $(Agent.HomeDirectory)/perl5
+  CCACHE_DIR: $(Pipeline.Workspace)/ccache
+  PERL_CACHE: $(Pipeline.Workspace)/perl5
 
 trigger:
 - master
