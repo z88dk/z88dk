@@ -12,6 +12,7 @@ CFILES = \
 	dir_get_entry_type.c \
 	dir_get_entry_name.c \
 	dir_get_entry_size.c \
+	execv.c \
 	get_current_volume.c \
 	get_dir_name.c \
 	fdtell.c \
