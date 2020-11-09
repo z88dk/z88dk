@@ -21,17 +21,18 @@ pool:
 steps:
 - checkout: self
   submodules: true
-#- task: Cache@1
-#  inputs:
-#    key: 'perl | "$(Agent.OS)"'
-#    path: $(PERL5LIB)
-#  displayName: perlcache
+- task: Cache@1
+  inputs:
+    key: 'perl | "$(Agent.OS)"'
+    path: $(PERL5LIB)
+  displayName: perlcache
 - bash: |
      sudo apt-get install -y cpanminus liblocal-lib-perl
      echo PERL5LIB=$(PERL5LIB)
      cpanm --local-lib $(PERL5LIB) Path::Tiny
      find $(PERL5LIB) -print
      perl -I $(PERL5LIB) -Mlocal::lib
+     perl -MPath::Tiny -e 1
   displayName: "test"
 #- bash: |
 #     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl libtemplate-plugin-yaml-perl ragel libyaml-perl liblocal-lib-perl
