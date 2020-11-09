@@ -6,7 +6,7 @@
 
 variables:
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
-  PERL5LIB: $(Pipeline.Workspace)/perl5
+  PERL5LIB: $(HOME)/perl5
 
 
 trigger:
@@ -27,12 +27,12 @@ steps:
 #    path: $(PERL5LIB)
 #  displayName: perlcache
 - bash: |
-     sudo apt install -y cpanminus
+     sudo apt-get install -y cpanminus liblocal-lib-perl
      echo PERL5LIB=$(PERL5LIB)
-     cpanm --local-lib=$(PERL5LIB) Path::Tiny
+     cpanm --local-lib $(PERL5LIB) Path::Tiny
      find $(PERL5LIB) -print
      perl -I $(PERL5LIB) -Mlocal::lib
-  displayName: "test 01"
+  displayName: "test"
 #- bash: |
 #     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl libtemplate-plugin-yaml-perl ragel libyaml-perl liblocal-lib-perl
 #     cpanm --local-lib=$(PERL5LIB) App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
