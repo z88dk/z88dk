@@ -6,7 +6,7 @@
 
 variables:
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
-  PERL_CACHE: $(HOME)/perl5
+  PERL_CACHE: $(Pipeline.Workspace)/perl5
 
 trigger:
 - master
@@ -26,7 +26,6 @@ steps:
     path: $(PERL_CACHE)
   displayName: perlcache
 - bash: |
-     set +x
      sudo apt-get install -y cpanminus liblocal-lib-perl
      echo PERL_CACHE=$PERL_CACHE
      echo PERL5LIB=$PERL5LIB
