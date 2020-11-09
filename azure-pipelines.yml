@@ -5,8 +5,8 @@
 
 
 variables:
-  CCACHE_DIR: $(Pipeline.Workspace)/ccache
   PERL_CACHE: $(Pipeline.Workspace)/perl5
+  CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
 trigger:
 - master
@@ -25,48 +25,29 @@ steps:
     key: 'perl_cache | "$(Agent.OS)"'
     path: $(PERL_CACHE)
   displayName: perlcache
+- task: Cache@2
+  inputs:
+    key: 'ccache | "$(Agent.OS)"'
+    path: $(CCACHE_DIR)
+  displayName: ccache
 - bash: |
-    mkdir -p $PERL_CACHE
-    find $PERL_CACHE -print
-  displayName: "test 1"
-- bash: |
-    sudo apt-get install -y cpanminus liblocal-lib-perl perl-doc
+    sudo apt-get install -y ccache libboost-all-dev texinfo texi2html gdb curl dos2unix ragel liblocal-lib-perl cpanminus
     eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
-    cpanm Path::Tiny
-    perldoc -l Path::Tiny
-    echo PERL5LIB=$PERL5LIB
+    cpanm App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
   displayName: "Install prerequisites"
-- bash: |
-    eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)    
-    echo PERL_CACHE=$PERL_CACHE
-    echo PERL5LIB=$PERL5LIB
-    find $PERL_CACHE -print
-  displayName: "test 2"
-#- bash: |
-#     echo PERL_CACHE=$PERL_CACHE
-#     echo PERL5LIB=$PERL5LIB
-#     cpanm --local-lib=$PERL_CACHE Path::Tiny
-#     perl -I $PERL_CACHE -Mlocal::lib
-#     perl -MPath::Tiny -e 'print "Path::Tiny compiled\n"'
-#  displayName: "test 02"
-#- bash: |
-#     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl libtemplate-plugin-yaml-perl ragel libyaml-perl liblocal-lib-perl
-#     cpanm --local-lib=$(PERL_CACHE) App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
-#  displayName: "Install prerequisites"
-#- task: Cache@2
-#  inputs:
-#    key: 'ccache | "$(Agent.OS)"'
-#    path: $(CCACHE_DIR)
-#  displayName: ccache
-#- script: |
-#    ./build.sh -P $(PERL_CACHE) -l
-#  displayName: 'Build binaries'
-#- script: |
-#    ./build.sh -P $(PERL_CACHE) -b 
-#  displayName: 'Build libraries'
-#- script: |
-#    ./build.sh -P $(PERL_CACHE) -b -l -e
-#  displayName: 'Build examples'
-#- script: |
-#    ./build.sh -P $(PERL_CACHE) -b -l -t
-#  displayName: 'Build and run tests'
+- script: |
+    eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
+    ./build.sh -l
+  displayName: 'Build binaries'
+- script: |
+    eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
+    ./build.sh -b 
+  displayName: 'Build libraries'
+- script: |
+    eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
+    ./build.sh -b -l -e
+  displayName: 'Build examples'
+- script: |
+    eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
+    ./build.sh -b -l -t
+  displayName: 'Build and run tests'
