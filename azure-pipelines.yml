@@ -5,44 +5,49 @@
 
 
 variables:
+  PERL_CACHE: $(Pipeline.Workspace)/perl5
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
-  PERL5LIB: $(Pipeline.Workspace)/perl5
-
 
 trigger:
 - master
 
+pr:
+  - master
+
 pool:
   vmImage: 'Ubuntu 16.04'
-
 
 steps:
 - checkout: self
   submodules: true
 - task: Cache@1
   inputs:
-    key: 'perl | "$(Agent.OS)"'
-    path: $(PERL5LIB)
+    key: 'perl_cache | "$(Agent.OS)"'
+    path: $(PERL_CACHE)
   displayName: perlcache
-- script: |
-     sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl ragel
-     cpanm --local-lib=$(PERL5LIB) local::lib App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
-     eval $(perl -I $(PERL5LIB) -Mlocal::lib)
-  displayName: "Install prerequisites"
 - task: Cache@2
   inputs:
     key: 'ccache | "$(Agent.OS)"'
     path: $(CCACHE_DIR)
   displayName: ccache
+- bash: |
+    sudo apt-get install -y ccache libboost-all-dev texinfo texi2html gdb curl dos2unix ragel liblocal-lib-perl cpanminus
+    eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
+    cpanm App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
+  displayName: "Install prerequisites"
 - script: |
+    eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
     ./build.sh -l
   displayName: 'Build binaries'
 - script: |
+    eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
     ./build.sh -b 
   displayName: 'Build libraries'
 - script: |
+    eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
     ./build.sh -b -l -e
   displayName: 'Build examples'
 - script: |
+    eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
     ./build.sh -b -l -t
   displayName: 'Build and run tests'
