@@ -515,8 +515,8 @@ Node *dofor()
         body = pair->node;
         postlabel(wq.loop); /* .loop                              */
         clearbuffer(buf3); /*         modification               */
-        gen_jp_label(wq.loop); /*         goto loop                  */
-        postlabel(l_condition); /* .exit                              */
+        gen_jp_label(l_condition); /*         goto loop                  */
+        postlabel(wq.exit; /* .exit                              */
     } else {
         clearbuffer(buf2); // Condition 
         buf4 = startbuffer(100);
