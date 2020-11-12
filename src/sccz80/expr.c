@@ -12,7 +12,7 @@
 static int        heir1a(LVALUE *lval);
 static int        heir2a(LVALUE *lval);
 static int        heir2b(LVALUE *lval);
-static int        heir234(LVALUE *lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int64_t value));
+static int        heir234(LVALUE *lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int64_t value), int ast_type);
 static int        heir2(LVALUE *lval);
 static int        heir3(LVALUE *lval);
 static int        heir4(LVALUE *lval);
@@ -25,9 +25,10 @@ static int        heirb(LVALUE *lval);
 static SYMBOL    *deref(LVALUE *lval, char isaddr);
 
 
-Kind expression(int  *con, zdouble *val, Type **type)
+struct nodepair *expression(int  *con, zdouble *val, Type **type)
 {
     LVALUE lval={0};
+    struct nodepair *pair = calloc(1,sizeof(*pair));
 
     if (heir1(&lval)) {
         rvalue(&lval);
@@ -35,7 +36,10 @@ Kind expression(int  *con, zdouble *val, Type **type)
     *con = lval.is_const;
     *val = lval.const_val;
     *type = lval.ltype;
-    return lval.ltype ? lval.ltype->kind : KIND_NONE;
+
+    pair->k = lval.ltype ? lval.ltype->kind : KIND_NONE;
+    pair->node = lval.node;
+    return pair;
 }
 
 int heir1(LVALUE* lval)
@@ -45,6 +49,7 @@ int heir1(LVALUE* lval)
     void (*oper)(LVALUE *) = NULL;
     void  (*doper)(LVALUE *lval) = NULL;
     void (*constoper)(LVALUE *lval, int64_t constvalue) = NULL;
+    int asttype;
     int k;
 
     setstage(&before, &start);
@@ -127,35 +132,46 @@ int heir1(LVALUE* lval)
 
         force(lval->val_type, lval2.val_type, lval->ltype->isunsigned, lval2.ltype->isunsigned, 0); /* 27.6.01 lval2.is_const); */
         smartstore(lval);
+        lval->node = ast_binop(OP_ASSIGN, lval->node, lval2.node);
         return 0;
     } else if (match("|=")) {
         oper = zor;
         constoper = zor_const;
+        asttype = OP_AOR;
     } else if (match("^=")) {
         oper = zxor;
         constoper = zxor_const;
+        asttype = OP_AXOR;
     } else if (match("&=")) {
         oper = zand;
         constoper = zand_const;
-    } else if (match("+="))
+        asttype = OP_AAND;
+    } else if (match("+=")) {
         oper = doper = zadd;
-    else if (match("-="))
+        asttype = OP_AADD;
+    } else if (match("-=")) {
         oper = doper = zsub;
-    else if (match("*=")) {
+        asttype = OP_ASUB;
+    } else if (match("*=")) {
         oper = doper = mult;
         constoper = mult_const;
+        asttype = OP_AMULT;
     } else if (match("/=")) {
         oper = doper = zdiv;
         constoper = zdiv_const;
+        asttype = OP_ADIV;
     } else if (match("%=")) {
         oper = zmod;
         constoper = zmod_const;
+        asttype = OP_AMOD;
     } else if (match(">>=")) {
         oper = asr;
         constoper = asr_const;
+        asttype = OP_ASSHR;
     } else if (match("<<=")) {
         oper = asl;
         constoper = asl_const;
+        asttype = OP_ASSHL;
     } else
         return k;
 
@@ -180,7 +196,7 @@ int heir1(LVALUE* lval)
     if (oper == zadd || oper == zsub)
         plnge2b(heir1, lval, &lval2, oper);
     else
-        plnge2a(heir1, lval, &lval2, oper, doper, constoper, NULL);
+        plnge2a(heir1, lval, &lval2, oper, doper, constoper, NULL, asttype);
 
     force(lval3.val_type, lval->val_type, lval3.ltype->isunsigned, lval->ltype->isunsigned, lval->is_const);
     smartstore(&lval3);
@@ -197,6 +213,7 @@ int heir1a(LVALUE* lval)
     int k;
     Kind temptype;
     Type *templtype;
+    Node *cond = lval->node;
 
     k = heir2a(lval);
     if (cmatch('?')) {
@@ -257,6 +274,9 @@ int heir1a(LVALUE* lval)
             postlabel(skiplab);
         } else
             postlabel(endlab);
+
+
+        lval->node = ast_conditional(cond, lval2.node, lval->node);
         /* result cannot be a constant, even if second expression is */
         lval->is_const = 0;
         return 0;
@@ -274,7 +294,7 @@ int heir2b(LVALUE* lval)
     return skim("&&", testjump, jumpnc, 0, 1, heir2, lval);
 }
 
-int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int64_t value))
+int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int64_t value), int ast_type)
 {
     LVALUE lval2={0};
     int k;
@@ -288,7 +308,7 @@ int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVA
     while (1) {
         if ((ch() == opch) && (nch() != '=') && (nch() != opch)) {
             inbyte();
-            plnge2a(heir, lval, &lval2, oper, NULL, constoper, NULL);
+            plnge2a(heir, lval, &lval2, oper, NULL, constoper, NULL, ast_type);
         } else
             return 0;
     }
@@ -296,17 +316,17 @@ int heir234(LVALUE* lval, int (*heir)(LVALUE *lval), char opch, void (*oper)(LVA
 
 int heir2(LVALUE* lval)
 {
-    return heir234(lval, heir3, '|', zor, zor_const);
+    return heir234(lval, heir3, '|', zor, zor_const, OP_OR);
 }
 
 int heir3(LVALUE* lval)
 {
-    return heir234(lval, heir4, '^', zxor, zxor_const);
+    return heir234(lval, heir4, '^', zxor, zxor_const, OP_XOR);
 }
 
 int heir4(LVALUE* lval)
 {
-    return heir234(lval, heir5, '&', zand, zand_const);
+    return heir234(lval, heir5, '&', zand, zand_const, OP_AND);
 }
 
 int heir5(LVALUE* lval)
@@ -322,9 +342,9 @@ int heir5(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (match("==")) {
-            plnge2a(heir6, lval, &lval2, zeq, zeq, zeq_const, NULL);
+            plnge2a(heir6, lval, &lval2, zeq, zeq, zeq_const, NULL, OP_EQ);
         } else if (match("!=")) {
-            plnge2a(heir6, lval, &lval2, zne, zne, zne_const, NULL);
+            plnge2a(heir6, lval, &lval2, zne, zne, zne_const, NULL, OP_NE);
         } else
             return 0;
     }
@@ -347,15 +367,15 @@ int heir6(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (match("<=")) {
-            plnge2a(heir7, lval, &lval2, zle, zle, zle_const, NULL);
+            plnge2a(heir7, lval, &lval2, zle, zle, zle_const, NULL, OP_LE);
         } else if (match(">=")) {
-            plnge2a(heir7, lval, &lval2, zge, zge, zge_const, NULL);
+            plnge2a(heir7, lval, &lval2, zge, zge, zge_const, NULL, OP_GE);
         } else if (ch() == '<' && nch() != '<') {
             inbyte();
-            plnge2a(heir7, lval, &lval2, zlt, zlt, zlt_const, NULL);
+            plnge2a(heir7, lval, &lval2, zlt, zlt, zlt_const, NULL, OP_LT);
         } else if (ch() == '>' && nch() != '>') {
             inbyte();
-            plnge2a(heir7, lval, &lval2, zgt, zgt, zgt_const, NULL);
+            plnge2a(heir7, lval, &lval2, zgt, zgt, zgt_const, NULL, OP_GT);
         } else
             return 0;
     }
@@ -380,11 +400,11 @@ int heir7(LVALUE* lval)
         if ((streq(line + lptr, ">>") == 2) && (streq(line + lptr, ">>=") == 0)) {
             inbyte();
             inbyte();
-            plnge2a(heir8, lval, &lval2, asr, NULL, asr_const, NULL);
+            plnge2a(heir8, lval, &lval2, asr, NULL, asr_const, NULL, OP_SSHR);
         } else if ((streq(line + lptr, "<<") == 2) && (streq(line + lptr, "<<=") == 0)) {
             inbyte();
             inbyte();
-            plnge2a(heir8, lval, &lval2, asl, NULL, asl_const, NULL);
+            plnge2a(heir8, lval, &lval2, asl, NULL, asl_const, NULL, OP_SSHL);
         } else
             return 0;
     }
@@ -429,11 +449,11 @@ int heir9(LVALUE* lval)
         rvalue(lval);
     while (1) {
         if (cmatch('*')) {
-            plnge2a(heira, lval, &lval2, mult, mult, mult_const, mult_dconst);
+            plnge2a(heira, lval, &lval2, mult, mult, mult_const, mult_dconst, OP_MULT);
         } else if (cmatch('/')) {
-            plnge2a(heira, lval, &lval2, zdiv, zdiv, zdiv_const, zdiv_dconst);
+            plnge2a(heira, lval, &lval2, zdiv, zdiv, zdiv_const, zdiv_dconst, OP_DIV);
         } else if (cmatch('%')) {
-            plnge2a(heira, lval, &lval2, zmod, zmod, zmod_const, NULL);
+            plnge2a(heira, lval, &lval2, zmod, zmod, zmod_const, NULL, OP_MOD);
         } else
             return 0;
     }
@@ -504,16 +524,17 @@ int heira(LVALUE *lval)
     buffer_fps_num = save_fps_num;
 
     if (match("++")) {
-        prestep(lval, 1, inc);
+        prestep(lval, 1, inc, OP_PRE_INC);
         return 0;
     } else if (match("--")) {
-        prestep(lval, -1, dec);
+        prestep(lval, -1, dec, OP_PRE_DEC);
         return 0;
     } else if (cmatch('~')) {
         if (heira(lval))
             rvalue(lval);
         intcheck(lval, lval);
         com(lval);
+        lval->node = ast_uop(OP_COMP, lval->node);
         lval->const_val = (int64_t)~(uint64_t)lval->const_val;
         lval->stage_add = NULL;
         return 0;
@@ -524,6 +545,7 @@ int heira(LVALUE *lval)
         lval->binop = lneg;
         lval->const_val = !lval->const_val;
         lval->stage_add = NULL;
+        lval->node = ast_uop(OP_LNEG, lval->node);
         return 0;
     } else if (cmatch('-')) {
         if (heira(lval))
@@ -531,6 +553,7 @@ int heira(LVALUE *lval)
         neg(lval);
         lval->const_val = -lval->const_val;
         lval->stage_add = NULL;
+        lval->node = ast_uop(OP_LNEG, lval->node);
         return 0;
     } else if (cmatch('*')) { /* unary * */
         if (heira(lval))
@@ -546,6 +569,7 @@ int heira(LVALUE *lval)
         lval->const_val = 1; /* omit rvalue() on func call */
         lval->stage_add = NULL;
         lval->stage_add_ltype = NULL;
+        lval->node = ast_uop(OP_DEREF, lval->node);
         return 1; /* dereferenced pointer is lvalue */
     } else if (cmatch('&')) {
         if (heira(lval) == 0) {
@@ -566,16 +590,17 @@ int heira(LVALUE *lval)
         /* global & non-array */
         address(lval->symbol);
         lval->indirect_kind = lval->symbol->ctype->kind;
+        lval->node = ast_uop(OP_ADDR, lval->node);
         return 0;
     }
 
     k = heirb(lval);
 
     if (match("++")) {
-        poststep(k, lval, 1, inc, dec);
+        poststep(k, lval, 1, inc, dec, OP_POST_INC);
         return 0;
     } else if (match("--")) {
-        poststep(k, lval, -1, dec, inc);
+        poststep(k, lval, -1, dec, inc, OP_POST_DEC);
         return 0;
     }
     return k;
@@ -685,7 +710,7 @@ int heirb(LVALUE* lval)
                      if (k && lval->const_val == 0)
                         rvalue(lval);
                     // Functino pointer call
-                    callfunction(NULL,lval->ltype);
+                    lval->node = callfunction(NULL,lval->ltype); // TODO, need to keep lval?
                     return_type = lval->ltype->ptr->return_type;
                     if ( return_type == NULL ) {
                         return_type = lval->ltype->ptr;
@@ -695,9 +720,9 @@ int heirb(LVALUE* lval)
                     // Normal function call
                     if ( ptr == NULL ) {
                         // However, we've turned it into a function pointer call
-                        callfunction(NULL,make_pointer(lval->ltype));
+                        lval->node = callfunction(NULL,make_pointer(lval->ltype));
                     } else {
-                        callfunction(ptr,NULL);
+                        lval->node = callfunction(ptr,NULL);
                     }
                     return_type = lval->ltype->return_type;
                     flags = lval->ltype->flags;

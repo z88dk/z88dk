@@ -9,30 +9,30 @@
 
 #include "ccdefs.h"
 
-static void     ns(void);
-static void     compound(void);
-static void     doiferror(void);
-static void     doif(void);
-static Type    *doexpr(void);
-static void     dowhile(void);
-static void     dodo(void);
-static void     dofor(void);
-static void     doswitch(void);
-static void     docase(void);
-static void     dodefault(void);
-static void     doreturn(char);
-static void     dobreak(void);
-static void     docont(void);
-static void     dostaticassert(void);
+static void ns(void);
+static Node *compound(void);
+static Node *doiferror(void);
+static Node *doif(void);
+static struct nodepair *doexpr(void);
+static Node *dowhile(void);
+static Node *dodo(void);
+static Node *dofor(void);
+static Node *doswitch(void);
+static Node *docase(void);
+static Node *dodefault(void);
+static Node *doreturn(char);
+static Node *dobreak(void);
+static Node *docont(void);
+static Node *dostaticassert(void);
 
 /*
  *      Some variables for goto and cleaning up after compound 
  *      statements
  */
 
-extern void dogoto(void);
-extern int dolabel(void);
-static void docritical(void);
+extern Node *dogoto(void);
+extern Node *dolabel(void);
+static Node *docritical(void);
 static int stkstor[MAX_LEVELS]; /* ZSp for each compound level */
 static int lastline = 0;
 
@@ -51,10 +51,12 @@ static int incritical = 0;  /* Are we in a __critical block */
  * this routine performs that statement
  * and returns a number telling which one
  */
-int statement()
+struct nodepair *statement()
 {
     int st;
     int locstatic; /* have we had the static keyword */
+    struct nodepair *pair = calloc(1,sizeof(*pair));
+    Node   *node;
 
     blanks();
     if (lineno != lastline) {
@@ -63,12 +65,16 @@ int statement()
             gen_emit_line(lineno);
     }
     if (ch() == 0 && eof) {
-        return (lastst = STEXP);
+        lastst = st;
+        pair->i = st;
+        return pair;
     } else {
 
         if (amatch("extern")) {
             dodeclare(EXTERNAL);
-            return lastst;
+            lastst = st;
+            pair->i = st;
+            return pair;
         }
         /* Ignore the register and auto keywords! */
         swallow("register");
@@ -77,8 +83,11 @@ int statement()
         /* Check to see if specified as static, and also for far and near */
         locstatic = amatch("static");
 
-        if ( declare_local(locstatic) ) {
-            return lastst;
+        if ( (node = declare_local(locstatic)) != NULL ) {
+            lastst = st;
+            pair->i = st;
+            pair->node = node;
+            return pair;
         }        
         /* not a definition */
         if (declared >= 0) {
@@ -89,73 +98,73 @@ int statement()
         switch (ch()) {
         case '{':
             inbyte();
-            compound();
+            pair->node = compound();
             st = lastst;
             break;
         case 'i':
             if (amatch("iferror")) {
-                doiferror();
+                pair->node = doiferror();
                 st = STIF;
             } else if (amatch("if")) {
-                doif();
+                pair->node = doif();
                 st = STIF;
             }
             break;
         case 'w':
             if (amatch("while")) {
-                dowhile();
+                pair->node = dowhile();
                 st = STWHILE;
             }
             break;
         case 'd':
             if (amatch("do")) {
-                dodo();
+                pair->node = dodo();
                 st = STDO;
             } else if (amatch("default")) {
-                dodefault();
+                pair->node = dodefault();
                 st = STDEF;
             }
             break;
         case 'f':
             if (amatch("for")) {
-                dofor();
+                pair->node = dofor();
                 st = STFOR;
             }
             break;
         case 's':
             if (amatch("switch")) {
-                doswitch();
+                pair->node = doswitch();
                 st = STSWITCH;
             }
             break;
         case 'c':
             if (amatch("case")) {
-                docase();
+                pair->node = docase();
                 st = STCASE;
             } else if (amatch("continue")) {
-                docont();
+                pair->node = docont();
                 ns();
                 st = STCONT;
             }
             break;
         case 'r':
             if (amatch("return")) {
-                doreturn(0);
+                pair->node = doreturn(0);
                 ns();
                 st = STRETURN;
             } else if (amatch("return_c")) {
-                doreturn(1);
+                pair->node = doreturn(1);
                 ns();
                 st = STRETURN;
             } else if (amatch("return_nc")) {
-                doreturn(2);
+                pair->node = doreturn(2);
                 ns();
                 st = STRETURN;
             }
             break;
         case 'b':
             if (amatch("break")) {
-                dobreak();
+                pair->node = dobreak();
                 ns();
                 st = STBREAK;
             }
@@ -166,43 +175,47 @@ int statement()
             break;
         case 'a':
             if (amatch("asm")) {
-                doasmfunc(YES);
+                pair->node = doasmfunc(YES);
                 ns();
                 st = STASM;
             }
             break;
         case 'g':
             if (amatch("goto")) {
-                dogoto();
+                pair->node = dogoto();
                 ns();
                 st = STGOTO;
             }
             break;
         case '#':
             if (match("#asm")) {
-                doasm();
+                pair->node = doasm();
                 st = STASM;
             }
             break;
         case '_':
             if (match("_Static_assert")) {
-                dostaticassert();
+                pair->node = dostaticassert();
                 st = STASSERT;
             } else if (match("__critical")) {
-                docritical();
+                pair->node = docritical();
                 st = STCRITICAL;
             }
         }
         if (st == -1) {
             /* if nothing else, assume it's an expression */
-            if (dolabel() == 0) {
-                doexpr();
+            pair->node = dolabel();
+
+            if ( pair->node == NULL ) {
+                pair->node = doexpr()->node;
                 ns();
             }
             st = STEXP;
         }
     }
-    return (lastst = st);
+    lastst = st;
+    pair->i = st;
+    return (pair);
 }
 
 /*
@@ -221,9 +234,10 @@ void ns()
  *
  * allow any number of statements to fall between "{}"
  */
-void compound()
+Node *compound()
 {
     SYMBOL* savloc;
+    array  *array = array_init(NULL);
 
     if (ncmp == MAX_LEVELS)
         errorfmt("Maximum nesting level reached (%d)", 1, ncmp);
@@ -232,27 +246,26 @@ void compound()
     savloc = locptr;
     declared = 0; /* may declare local variables */
     ++ncmp; /* new level open */
-    while (cmatch('}') == 0)
-        statement(); /* do one */
+    while (cmatch('}') == 0) {
+        struct nodepair *pair = statement(); /* do one */
+        array_add(array, pair->node);
+    }
     --ncmp; /* close current level */
+    // NODE: Remove 
     if (lastst != STRETURN) {
         modstk(stkstor[ncmp], KIND_NONE, NO, YES); /* delete local variable space */
     }
     Zsp = stkstor[ncmp];
-    locptr = savloc; /* delete local symbols */
+    // NODE: End remove
+    sym_undecl_frame(array, savloc, lastst != STRETURN);
+
+   // locptr = savloc; /* delete local symbols */
     declared = 0;
+    return ast_compound(array);
 }
 
-/*
- *    "iferror" statement
- *    This is z88dk specific and is used to check for
- *    an error from a package call..highly non standard!
- *
- *    I sense getting into trouble with purists but trying
- *    to combine C and asm compactly and efficiently requires
- *     this sort of extension (much like return_c/_nc
- */
-void doiferror()
+
+Node *doiferror()
 {
     int flab1, flab2;
     flab1 = getlabel(); /* Get label for false branch */
@@ -261,7 +274,7 @@ void doiferror()
     if (amatch("else") == 0) {
         /* no else, print false label and exit  */
         postlabel(flab1);
-        return;
+        return NULL;
     }
     /* an "if...else" statement. */
     flab2 = getlabel();
@@ -272,22 +285,27 @@ void doiferror()
     postlabel(flab1); /* print false label */
     statement(); /* and do 'else' clause */
     postlabel(flab2);
+    return NULL;
 }   
 
 /*
  *              "if" statement
  */
-void doif()
+Node *doif()
 {
     int flab1, flab2;
     int testtype;
     t_buffer *buf;
-    
+    Node *cond = NULL, *strue = NULL, *sfalse = NULL;
+    struct nodepair *pair;
+
     flab1 = getlabel(); /* get label for false branch */
-    testtype = test(flab1, YES); /* get expression, and branch false */
+    pair = test(flab1, YES); /* get expression, and branch false */
+    testtype = pair->i;
+    cond = pair->node;
 
     buf = startbuffer(100);
-    statement();
+    strue = statement()->node;
 
     if ( testtype == 0 ) {
         discardbuffer(buf);
@@ -303,16 +321,16 @@ void doif()
         } else if  (testtype ==  1 ) { /* Evaluate to true */
             clearbuffer(buf);
         }
-        return;
+        return ast_conditional(cond, strue, NULL);
     }
 
     clearbuffer(buf);
     if ( testtype == 1 ) {
         // We evaluated the if to true, so we can discard the else
         t_buffer *buf2 = startbuffer(100);
-        statement();
+        pair = statement();
         discardbuffer(buf2);
-        return;
+        return ast_conditional(cond, strue, NULL);
     } 
     /* an "if...else" statement. */
     flab2 = getlabel();
@@ -323,28 +341,37 @@ void doif()
     if ( testtype != 0 ) {
         postlabel(flab1); /* print false label */
     }
-    statement(); /* and do 'else' clause */
+    pair = statement(); /* and do 'else' clause */
+    sfalse = pair->node;
     if ( testtype != 0 ) {
         postlabel(flab2); /* print true label */
     }
+
+    return ast_conditional(cond, strue, sfalse);
 }
 
 /*
  * perform expression (including commas)
  */
-Type *doexpr()
+struct nodepair *doexpr()
 {
     char *before, *start;
     zdouble val;
     int    vconst;
     Type   *type_ptr;
+    array  *arr = array_init(NULL);
+    struct nodepair *pair;
 
     while (1) {
         setstage(&before, &start);
-        expression(&vconst, &val, &type_ptr);
+        pair = expression(&vconst, &val, &type_ptr);
+        array_add(arr, pair->node);
         clearstage(before, start);
-        if (ch() != ',')
-            return type_ptr;
+        if (ch() != ',') {
+            pair->type = type_ptr;
+            pair->node = ast_compound(arr);
+            return pair;
+        }
         inbyte();
     }
 }
@@ -352,46 +379,65 @@ Type *doexpr()
 /*
  *      "while" statement
  */
-void dowhile()
+Node *dowhile()
 {
     WHILE_TAB wq; /* allocate local queue */
     t_buffer  *buf;
+    struct nodepair *pair;
+    Node     *body;
     int       exprconstant;
+    array *arr = array_init(NULL);
 
     addwhile(&wq); /* add entry to queue */
     /* (for "break" statement) */
     buf = startbuffer(100);
     postlabel(wq.loop); /* loop label */
-    exprconstant = test(wq.exit, YES); /* see if true */
+    pair = test(wq.exit, YES); /* see if true */
+    exprconstant = pair->i;
     if ( exprconstant == 0 ) {
         t_buffer *buf2 = startbuffer(100);
-        statement();
+        pair = statement();
+        body = pair->node;
         discardbuffer(buf2);
         clearbuffer(buf);
     } else {
-        statement(); /* if so, do a statement */
+        pair = statement(); /* if so, do a statement */
+        body = pair->node;
         gen_jp_label(wq.loop); /* loop to label */
         postlabel(wq.exit); /* exit label */
         clearbuffer(buf);
     }
     delwhile(); /* delete queue entry */
+    array_add(arr, ast_label(wq.loop, NULL));
+    array_add(arr, ast_conditional(pair->node,body,ast_jump(wq.exit,NULL)));
+    array_add(arr, ast_jump(wq.loop, NULL));
+    array_add(arr, ast_label(wq.exit, NULL));
+
+    return ast_compound(arr);
 }
 
 /*
  * "do - while" statement
  */
-void dodo()
+Node *dodo()
 {
     WHILE_TAB wq;
     int top;
     int testresult;
+    struct nodepair *pair;
+    Node *body;
+    array *arr = array_init(NULL);
 
     addwhile(&wq);
     postlabel(top = getlabel());
-    statement();
+    pair = statement();
+    body = pair->node;
     needtoken("while");
     postlabel(wq.loop);
-    testresult = test(wq.exit, YES);
+    pair = test(wq.exit, YES);
+
+    testresult = pair->i;
+
     if ( testresult == 0 ) { // False
         // We don't need to do anything
     } else {
@@ -400,16 +446,29 @@ void dodo()
     }
     delwhile();
     ns();
+
+    array_add(arr,ast_label(top, NULL));
+    array_add(arr,body);
+    array_add(arr,ast_conditional(pair->node, ast_jump(top, NULL), NULL));
+    array_add(arr,ast_label(wq.exit, NULL));
+
+    return ast_compound(arr);
 }
 
 /*
  * "for" statement (zrin)
  */
-void dofor()
+Node *dofor()
 {
     WHILE_TAB wq;
     int l_condition;
     int savedsp;
+    struct nodepair *pair;
+    Node *init = NULL;
+    Node *cond = NULL;
+    Node *incr = NULL;
+    Node *body = NULL;
+    array *arr = array_init(NULL);
     int testresult = 1; // Default is true
 
     SYMBOL *savedloc;
@@ -423,54 +482,79 @@ void dofor()
     needchar('(');
     ++ncmp;
     if (cmatch(';') == 0) {
-        if ( declare_local(0) == 0 ) {
-            doexpr(); /*         initialization             */
+        if ( (init = declare_local(0)) == NULL ) { // TODO
+            pair = doexpr(); /*         initialization             */
+            init = pair->node;
             ns();
         }
         (wqptr-1)->sp = wq.sp = Zsp;
+        (wqptr-1)->loop_symptr = locptr;
     }
 
     buf2 = startbuffer(1); /* save condition to buf2 */
     if (cmatch(';') == 0) {
-        testresult = test(wq.exit, NO); /* expr 2 */
+        pair = test(wq.exit, NO); /* expr 2 */
+        testresult = pair->i;
+        cond = pair->node;
         ns();
     }
     suspendbuffer();
 
     buf3 = startbuffer(1); /* save modification to buf3 */
     if (cmatch(')') == 0) {
-        doexpr(); /* expr 3 */
+        pair = doexpr(); /* expr 3 */
+        incr = pair->node;
         needchar(')');
     }
     suspendbuffer();
 
-    if ( testresult != 0 ) {  /* So it's either true or non-constant */
-        gen_jp_label(l_condition); /*         goto condition             */
-        postlabel(wq.loop); /* .loop                              */
-        clearbuffer(buf3); /*         modification               */
+    if ( testresult != 0 ) {  /* So it's either true or non-constant */      
         postlabel(l_condition); /* .condition                         */
         clearbuffer(buf2); /*         if (!condition) goto exit  */
-        statement(); /*         statement                  */
+        pair = statement(); /*         statement                  */
+        body = pair->node;
+        postlabel(wq.loop); /* .loop                              */
+        clearbuffer(buf3); /*         modification               */
         gen_jp_label(wq.loop); /*         goto loop                  */
-        postlabel(wq.exit); /* .exit                              */
+        postlabel(l_condition); /* .exit                              */
     } else {
         clearbuffer(buf2); // Condition 
         buf4 = startbuffer(100);
-        statement(); // Evaluate it
+        pair = statement(); // Evaluate it
+        body = pair->node;
         discardbuffer(buf4);
     }
+
+    if ( init ) 
+        array_add(arr, init);
+    array_add(arr,ast_label(l_condition,NULL));
+    array_add(arr,ast_conditional(cond, NULL, ast_jump(wq.exit,NULL)));
+    if ( body )
+        array_add(arr,body);
+    array_add(arr,ast_label(wq.loop,NULL));
+    if ( incr ) 
+        array_add(arr,incr);
+    array_add(arr,ast_jump(l_condition,NULL));
+    array_add(arr,ast_label(wq.exit,NULL));
+
+    sym_undecl_frame(arr, savedloc, 1);
+
     --ncmp;
     modstk(savedsp, KIND_NONE, NO, YES);
     Zsp = savedsp;
-    locptr = savedloc;
+   // locptr = savedloc;
     declared = 0;
     delwhile();
+
+
+
+    return ast_compound(arr);
 }
 
 /*
  * "switch" statement
  */
-void doswitch()
+Node *doswitch()
 {
     WHILE_TAB wq;
     int endlab, swact, swdef;
@@ -484,7 +568,7 @@ void doswitch()
     addwhile(&wq);
     (wqptr - 1)->loop = 0;
     needchar('(');
-    switch_type = doexpr(); /* evaluate switch expression */
+    switch_type = doexpr()->type; /* evaluate switch expression */
     needchar(')');
     swdefault = 0;
     swactive = 1;
@@ -520,7 +604,7 @@ void doswitch()
 /*
  * "case" statement
  */
-void docase()
+Node *docase()
 {
     double value;
     Kind   valtype;
@@ -528,7 +612,7 @@ void docase()
         errorfmt("Not in switch", 0 );
     if (swnext > swend) {
         errorfmt("Too many cases", 0 );
-        return;
+        return NULL;
     }
     postlabel(swnext->label = getlabel());
     constexpr(&value,&valtype, 1);
@@ -537,9 +621,10 @@ void docase()
     swnext->value = value;
     needchar(':');
     ++swnext;
+    return NULL;
 }
 
-void dodefault()
+Node *dodefault()
 {
     if (swactive) {
         if (swdefault)
@@ -553,10 +638,12 @@ void dodefault()
 /*
  *      "return" statement
  */
-void doreturn(char type)
+Node *doreturn(char type)
 {
+    array *arr = array_init(NULL);
     /* if not end of statement, get an expression */
     if (endst() == 0) {
+        struct nodepair *pair;
         char *before, *start;
         zdouble val;
         int    vconst;
@@ -564,7 +651,8 @@ void doreturn(char type)
 
         while (1) {
             setstage(&before, &start);
-            expression(&vconst, &val, &type_ptr);
+            pair = expression(&vconst, &val, &type_ptr);
+            array_add(arr,pair->node);
             // If it's a constant and last, clear the load and load as a constant of the right
             // type
             if ( vconst && ch() != ',') {
@@ -574,7 +662,8 @@ void doreturn(char type)
                 lval.const_val = val;
                 load_constant(&lval);
                 gen_leave_function(currfn->ctype->return_type->kind, type, incritical);
-                return;
+                sym_undecl_frame(arr, STARTLOC, 0);
+                return ast_return(array_len(arr) == 1 ? array_get_byindex(arr,0) : ast_compound(arr));
             }
             clearstage(before, start);
             if (ch() != ',')
@@ -586,6 +675,8 @@ void doreturn(char type)
     } else {
         gen_leave_function(KIND_INT, type, incritical);
     }
+    sym_undecl_frame(arr, STARTLOC, 0);
+    return ast_return(array_len(arr) == 1 ? array_get_byindex(arr,0) : ast_compound(arr));
 }
 
 
@@ -593,47 +684,75 @@ void doreturn(char type)
 /*
  *      "break" statement
  */
-void dobreak()
+Node *dobreak()
 {
     WHILE_TAB* ptr;
+    SYMBOL *sptr;
+    array *arr = array_init(NULL);
 
     /* see if any "whiles" are open */
     if ((ptr = readwhile(wqptr)) == 0)
-        return; /* no */
+        return NULL; /* no */
     modstk(ptr->sp, KIND_NONE, NO, YES); /* else clean up stk ptr */
+
     gen_jp_label(ptr->exit); /* jump to exit label */
+
+    sptr = locptr;
+    while ( sptr != ptr->loop_symptr) {
+        SYMBOL *ptr = sptr - 1;
+        array_add(arr, ast_undecl(ptr));
+        --sptr;
+    }
+    array_add(arr,ast_jump(ptr->exit, NULL));
+
+    return ast_compound(arr);
 }
 
 /*
  *      "continue" statement
  */
-void docont()
+Node *docont()
 {
     WHILE_TAB* ptr;
+    SYMBOL *sptr;
+    array *arr = array_init(NULL);
 
     /* see if any "whiles" are open */
     ptr = wqptr;
     while (1) {
         if ((ptr = readwhile(ptr)) == 0)
-            return;
+            return NULL;
         /* try again if loop is zero (that's a switch statement) */
         if (ptr->loop)
             break;
     }
     modstk(ptr->sp, KIND_NONE, NO, YES); /* else clean up stk ptr */
     gen_jp_label(ptr->loop); /* jump to loop label */
+
+    sptr = locptr;
+    while ( sptr != ptr->loop_symptr) {
+        SYMBOL *ptr = sptr - 1;
+        array_add(arr, ast_undecl(ptr));
+        --sptr;
+    }
+
+    array_add(arr,ast_jump(ptr->loop, NULL));
+
+    return ast_compound(arr);
 }
 
-static void docritical(void)
+static Node *docritical(void)
 {
+    struct nodepair *pair;
     if ( incritical ) {
         errorfmt("Cannot nest __critical sections", 1);
     }
     incritical = 1;
     gen_critical_enter();
-    statement();
+    pair = statement();
     gen_critical_leave();
     incritical = 0;
+    return ast_critical(pair->node);
 }
 
 /*
@@ -653,7 +772,7 @@ static void docritical(void)
  *      New: 3/3/99 djm
  */
 
-void doasmfunc(char wantbr)
+Node *doasmfunc(char wantbr)
 {
     char c;
     int  lastwasLF = 0;
@@ -683,6 +802,7 @@ void doasmfunc(char wantbr)
     if ( !lastwasLF ) {
         outbyte('\n');
     }
+    return NULL;
 }
 
 /*
@@ -691,7 +811,7 @@ void doasmfunc(char wantbr)
  *      passed intact through parser
  */
 
-void doasm()
+Node *doasm()
 {
     cmode = 0; /* mark mode as "asm" */
 
@@ -709,6 +829,7 @@ void doasm()
     if (eof)
         errorfmt("Unterminated assembler code",1);
     cmode = 1; /* then back to parse level */
+    return NULL;
 }
 
 static void set_section(char **dest_section) 
@@ -763,7 +884,7 @@ void dopragma()
     }
 }
 
-static void dostaticassert() 
+static Node *dostaticassert() 
 {
     Kind   valtype;
     double val;
@@ -785,4 +906,5 @@ static void dostaticassert()
     gltptr = global_start;
     clearstage(before, NULL);
 
+    return NULL;
 }

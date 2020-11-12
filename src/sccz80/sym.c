@@ -47,6 +47,22 @@ SYMBOL* findloc(char* sname)
     return 0;
 }
 
+// Probably not needed since we should clear up at the end of a compound
+// statement...
+void sym_undecl_frame(array *arr, SYMBOL *target, int need_undecl)
+{
+    SYMBOL *current = locptr;
+
+    while (current != target) {
+        SYMBOL *ptr = current - 1;
+
+        if (need_undecl && ptr->name[0]) {
+            array_add(arr, ast_undecl(ptr));
+        }
+        ptr->name[0] = 0;
+        --current;
+    }
+}
 
 
 SYMBOL* addglb(

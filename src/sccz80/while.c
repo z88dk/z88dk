@@ -17,6 +17,7 @@ void addwhile(WHILE_TAB* ptr)
         errorfmt("Too many active whiles", 1 );
         return;
     }
+    wqptr->loop_symptr = locptr;
     ++wqptr;
 }
 

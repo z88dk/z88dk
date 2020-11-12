@@ -61,12 +61,14 @@ int constant(LVALUE* lval)
     if (fnumber(lval)) {
         load_constant(lval);
         lval->flags = FLAGS_NONE;
+        lval->node = ast_literal(lval->ltype, lval->const_val);
         return (1);
     } else if (number(lval) || pstr(lval)) {
         if (lval->val_type == KIND_LONG)
             vlongconst(lval->const_val);
         else
             vconst(lval->const_val);
+        lval->node = ast_literal(lval->ltype, lval->const_val);
         return (1);
     } else if (tstr(&val)) {
         lval->const_val = val;
@@ -77,6 +79,7 @@ int constant(LVALUE* lval)
         lval->flags = FLAGS_NONE;
         immedlit(litlab,lval->const_val);
         nl();
+        lval->node = ast_literal(lval->ltype, lval->const_val);
         return (1);
     } 
     lval->is_const = 0;

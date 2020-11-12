@@ -9,7 +9,7 @@
 
  #include "uthash.h"
  #include "utstring.h"
- 
+
 
 
 #define MALLOC(x)   malloc(x)
@@ -90,6 +90,8 @@ typedef struct {
     void    (*destructor)(void *);
 } array;
 
+
+typedef struct node_s Node;
 typedef struct type_s Type;
 
 
@@ -255,6 +257,7 @@ struct whiletab_s {
         int sp ;                /* stack pointer */
         int loop ;              /* label for top of loop */
         int exit ;              /* label at end of loop */
+        SYMBOL *loop_symptr;    /* Symbol pointer at start of loop */
 } ;
 
 #define NUMGOTO         100
@@ -403,6 +406,7 @@ struct lvalue_s {
         Type *cast_type;
         int  offset;
         int  base_offset;               /* Where the variable is located on the stack */
+        Node *node;                     /* Node that is built up as we recurse */
 } ;
 
 /* Enable optimisations that are longer than the conventional sequence */ 
@@ -428,6 +432,121 @@ enum maths_mode {
     MATHS_Z88,   // Special handling for z88 (subtype of MATHS_Z80)
     MATHS_IEEE16, // Used for _Float16
     MATHS_AM9511  // AM9511 math processor format
+};
+
+
+// AST types
+enum asttype {
+    AST_LITERAL,
+    AST_DECL,
+    AST_UNDECL,
+    AST_LOCAL_VAR,
+    AST_GLOBAL_VAR,
+    AST_FUNC_CALL,
+    AST_FUNCPTR_CALL,
+
+    AST_IF,
+    AST_TERNARY,
+    AST_LABEL,
+    AST_JUMP,
+    AST_RETURN,
+    AST_COMPOUND_STMT,
+    AST_DEREF,
+    AST_ADDR,
+    AST_CRITICAL,
+    
+  
+    OP_SIZEOF,
+    OP_CAST,
+    OP_USHR,
+    OP_USHL,
+    OP_SSHR,
+    OP_SSHL,
+    OP_PRE_INC,
+    OP_POST_INC,
+    OP_PRE_DEC,
+    OP_POST_DEC,
+    OP_MULT,
+    OP_DIV,
+    OP_MOD,
+    OP_ADD,
+    OP_SUB,
+    OP_OR,
+    OP_AND,
+    OP_XOR,
+    OP_ASSIGN,
+    OP_AMULT,
+    OP_ADIV,
+    OP_AMOD,
+    OP_AADD,
+    OP_ASUB,
+    OP_AOR,
+    OP_AAND,
+    OP_AXOR,
+    OP_ASSHR,
+    OP_ASSHL,
+
+    OP_EQ,
+    OP_NE,
+    OP_GT,
+    OP_GE,
+    OP_LT,
+    OP_LE,
+
+    OP_COMP,
+    OP_LNEG,
+    OP_NEG,
+    OP_DEREF,
+    OP_ADDR
+};
+
+
+struct node_s {
+    enum asttype ast_type;
+    const char *filename;
+    int         line;
+    Type       *type;
+     SYMBOL   *sym;   // Defining a variable - TODO, may change
+    union {
+         zdouble   zval;  // Constant
+         // Binary operators
+         struct {
+             Node *left;
+             Node *right;
+         };
+         // Unary operators
+         struct {
+             Node *operand;
+         };
+         // Functions
+         struct {
+             array *args;  
+         };
+         // Ternary or if
+         struct {
+             Node *cond;
+             Node *then;
+             Node *els;
+         };
+         // Goto/labels
+         struct {
+             int    label;
+             const char  *labelname;
+         };
+         struct {		// Initialising variable
+             Node *declvar;
+             array *declinit;
+         };
+         Node *retval;   // Return value
+         array *stmts;          // Compound statements
+    };
+};
+
+struct nodepair {
+    Node *node;
+    int   i;
+    Kind  k;
+    Type  *type;
 };
 
 

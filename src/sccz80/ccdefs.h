@@ -22,6 +22,7 @@ typedef long double zdouble;
 
 #include "define.h"
 
+
 /*
  * 	Now the fix for HP-UX
  *	Darn short filename filesystems!
@@ -47,7 +48,7 @@ typedef long double zdouble;
  *      Prototypes
  */
 
-extern void     callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
+extern Node    *callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
 
 #include "codegen.h"
 
@@ -173,6 +174,7 @@ extern void       dofloat(enum maths_mode mode, double raw, unsigned char fa[]);
 extern int        initials(const char *dropname, Type *type);
 extern int        str_init(Type *tag);
 
+extern array     *array_init(void (*destructor)(void *));
 extern void       array_free(array *arr);
 extern size_t     array_len(array *arr);
 extern void       array_add(array *arr, void *elem);
@@ -185,7 +187,7 @@ extern Type      *default_function_with_type(const char *name, Type *return_type
 extern Type     *asm_function(const char *name);
 extern Type      *make_pointer(Type *base_type);
 extern Type      *dodeclare(enum storage_type storage);
-extern int        declare_local(int local_static);
+extern Node      *declare_local(int local_static);
 extern void       declare_func_kr();
 extern int        ispointer(Type *type);
 extern void       type_describe(Type *type, UT_string *output);
@@ -208,16 +210,16 @@ extern void       errorfmt(const char *fmt, int fatal, ...);
 extern void       parse_warning_option(const char *value);
 
 /* expr.c */
-extern Kind       expression(int *con, zdouble *val, Type **type);
+extern struct nodepair *expression(int *con, zdouble *val, Type **type);
 extern int        heir1(LVALUE *lval);
 extern int        heira(LVALUE *lval);
 
 
 /* goto.c */
 extern GOTO_TAB *gotoq; /* Pointer for gotoq */
-extern int      dolabel(void);
-extern void     dogoto(void);
-extern void     goto_cleanup(void);
+extern Node     *dolabel(void);
+extern Node     *dogoto(void);
+extern void      goto_cleanup(void);
 
 #include "io.h"
 extern void     discardbuffer(t_buffer *buf);
@@ -257,11 +259,28 @@ extern int      c_old_diagnostic_fmt;
 
 #include "misc.h"
 
+/* node.c */
+extern Node    *ast_decl(SYMBOL *sym, Node *declvar);
+extern Node    *ast_undecl(SYMBOL *sym);
+extern Node    *ast_function_call(int ast_type, Type *func_type, array *args);
+extern Node    *ast_local_var(SYMBOL *sym, const char *name);
+extern Node    *ast_global_var(SYMBOL *sym, const char *name);
+extern Node    *ast_conditional(Node *cond, Node *then, Node *nelse);
+extern Node    *ast_binop(int ast_type, Node *left, Node *right);
+extern Node    *ast_uop(int ast_type, Node *op);
+extern Node    *ast_return(Node *retval);
+extern Node    *ast_compound(array *nodes);
+extern Node    *ast_label(int label, const char *slabel);
+extern Node    *ast_jump(int label, const char *slabel);
+extern Node    *ast_literal(Type *type, zdouble value);
+extern Node    *ast_critical(Node *node);
+extern void     print_ast(UT_string *output, Node *node);
+
 /* plunge.c */
 extern int      skim(char *opstr, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int dropval, int endval, int (*heir)(LVALUE* lval), LVALUE *lval);
 extern void     dropout(int k, void (*testfuncz)(LVALUE* lval, int label), void (*testfuncq)(int label), int exit1, LVALUE *lval);
 extern int      plnge1(int (*heir)(LVALUE* lval), LVALUE *lval);
-extern void     plnge2a(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int64_t constval), int (*dconstoper)(LVALUE *lval, double const_val, int isrhs));
+extern void     plnge2a(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval), void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int64_t constval), int (*dconstoper)(LVALUE *lval, double const_val, int isrhs), int ast_type);
 extern void     plnge2b(int (*heir)(LVALUE* lval), LVALUE *lval, LVALUE *lval2, void (*oper)(LVALUE *lval));
 extern void     load_constant(LVALUE *lval);
 
@@ -293,13 +312,13 @@ extern int      widen_if_float(LVALUE *lval, LVALUE *lval2, int operator_is_comm
 extern void     widenintegers(LVALUE *lval, LVALUE *lval2);
 extern int      dbltest(LVALUE *lval, LVALUE *lval2);
 extern void     result(LVALUE *lval, LVALUE *lval2);
-extern void     prestep(LVALUE *lval, int n, void (*step)(LVALUE *lval));
-extern void     poststep(int k, LVALUE *lval, int n, void (*step)(LVALUE *lval), void (*unstep)(LVALUE *lval));
+extern void     prestep(LVALUE *lval, int n, void (*step)(LVALUE *lval), int ast_type);
+extern void     poststep(int k, LVALUE *lval, int n, void (*step)(LVALUE *lval), void (*unstep)(LVALUE *lval), int ast_type);
 extern void     smartpush(LVALUE *lval, char *before);
 extern void     smartstore(LVALUE *lval);
 extern void     rvaluest(LVALUE *lval);
 extern void     rvalue(LVALUE *lval);
-extern int      test(int label, int parens);
+extern struct nodepair *test(int label, int parens);
 extern int      constexpr(double *val, Kind *valtype, int flag);
 extern void     cscale(Type *type, int *val);
 extern int      docast(LVALUE *lval,LVALUE *dest_lval);
@@ -310,11 +329,11 @@ extern int      check_range(LVALUE *lval, int32_t min_value, int32_t max_value) 
 extern void     check_assign_range(Type *type, double const_value);
 
 /* stmt.c */
-extern int      statement(void);
+extern struct nodepair *statement(void);
 extern void     gen_leave_function(Kind save,char type, int incritical);
-extern void     doasm(void);
+extern Node    *doasm(void);
 extern void     dopragma(void);
-extern void     doasmfunc(char wantbr);
+extern Node    *doasmfunc(char wantbr);
 
 
 /* sym.c */
@@ -323,6 +342,9 @@ extern SYMBOL  *findglb(const char *sname);
 extern SYMBOL  *findloc(char *sname);
 extern SYMBOL  *addglb(char *sname, Type *type, enum ident_type id, Kind kind, int value, enum storage_type storage);
 extern SYMBOL  *addloc(char *sname, enum ident_type id, Kind kind);
+extern void     sym_undecl_frame(array *arr, SYMBOL *target, int need_undecl);
+
+
 
 /* while.c */
 extern void     addwhile(WHILE_TAB *ptr);

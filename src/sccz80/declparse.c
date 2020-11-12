@@ -956,16 +956,17 @@ Type *parse_expr_type()
 
 /** \brief Declare a local variableif we need to
  */
-int declare_local(int local_static)
+Node *declare_local(int local_static)
 {
     Type *type;
     Type *base_type = NULL;
     SYMBOL *sym;
+    array *arr = array_init(NULL);
 
     do {
         type = dodeclare2(&base_type, MODE_NONE);
         if ( type == NULL ) {
-            return 0;
+            return NULL;
         }
         if ( local_static ) {
             char  namebuf[NAMESIZE * 2 + 10];
@@ -978,6 +979,7 @@ int declare_local(int local_static)
             } else {
                 sym->bss_section = STRDUP(get_section_name(sym->ctype->namespace, c_bss_section));
             }
+            array_add(arr, ast_decl(sym, NULL)); // TODO:: init
         } else {
             int size = type->size;
 
@@ -1005,18 +1007,22 @@ int declare_local(int local_static)
                     Zsp = modstk(Zsp - declared, KIND_NONE, NO, YES);
                     declared = 0;
                     copy_to_stack(newname, 0, alloc_size);
+                    array_add(arr, ast_decl(sym, NULL)); // TODO: init
                 } else {
                     Kind expr;
                     Type *expr_type;
                     char *before, *start;
                     int   vconst;
+                    struct nodepair *pair;
                     zdouble val;
 
                     Zsp = modstk(Zsp - (declared - type->size), KIND_NONE, NO, YES);
                     declared = 0;
                     setstage(&before, &start);
-                    expr = expression(&vconst, &val, &expr_type);
+                    pair = expression(&vconst, &val, &expr_type);
+                    expr = pair->k;
 
+                    array_add(arr, ast_decl(sym, pair->node)); // TODO: init
                     if ( expr_type->kind == KIND_VOID ) {
                         warningfmt("void","Assigning from a void expression");
                     }
@@ -1038,11 +1044,13 @@ int declare_local(int local_static)
                     }
                     gen_store_to_tos(type->kind);
                 }
+            } else {
+                array_add(arr, ast_decl(sym, NULL)); // TODO: init
             }
         }
     } while ( cmatch(','));
     needchar(';');
-    return 1;
+    return array_len(arr) == 1 ? array_get_byindex(arr,0) : ast_compound(arr);
 }
 
 // Only called for globals
@@ -1868,7 +1876,15 @@ static void declfunc(Type *functype, enum storage_type storage)
     
     stackargs = where;
     lastst = STEXP;
-    if (statement() != STRETURN && (functype->flags & NAKED) == 0 ) {
+    struct nodepair *pair  = statement();
+    {
+        UT_string *output;
+        utstring_new(output);
+        print_ast(output, pair->node);
+        printf("%s\n", utstring_body(output));
+        utstring_free(output);
+    }
+    if (pair->i != STRETURN && (functype->flags & NAKED) == 0 ) {
         if ( functype->return_type->kind != KIND_VOID && lastst != STASM) {
             warningfmt("return-type","Control reaches end of non-void function");
         }

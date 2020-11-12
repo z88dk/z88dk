@@ -60,6 +60,7 @@ int primary(LVALUE* lval)
             lval->val_type = lval->indirect_kind = ptr->type;
             lval->flags = ptr->flags;
             lval->ptr_type = KIND_NONE;
+            lval->node = ast_local_var(ptr, sname);
             if ( ispointer(lval->ltype) ) {
                 lval->ptr_type = ptr->ctype->ptr->kind;
                 /* djm long pointers */
@@ -82,6 +83,7 @@ int primary(LVALUE* lval)
             if (ptr->ctype->kind != KIND_FUNC && !(ptr->ctype->kind == KIND_PTR && ptr->ctype->ptr->kind == KIND_FUNC) ) {
                 if (ptr->ident == ID_ENUM)
                     errorfmt("Unknown symbol: %s", 1, sname);
+                lval->node = ast_global_var(ptr, sname);
                 if (ptr->ctype->kind == KIND_ENUM) {
                     lval->symbol = NULL;
                     lval->ltype = type_int;
@@ -146,7 +148,7 @@ int primary(LVALUE* lval)
         return (0);
     }
     if (constant(lval)) {
-        // lval->ltype is set by constant()
+        // lval->ltype is set by constant(), also sets up lval->node
         lval->symbol = NULL;
         lval->indirect_kind = KIND_NONE;
         return (0);
@@ -495,7 +497,8 @@ void result(LVALUE* lval, LVALUE* lval2)
 void prestep(
     LVALUE* lval,
     int n,
-    void (*step)(LVALUE *lval))
+    void (*step)(LVALUE *lval),
+    int ast_type)
 {
     if (heira(lval) == 0) {
         needlval();
@@ -504,6 +507,7 @@ void prestep(
             addstk(lval);
             gen_save_pointer(lval);
         }
+        lval->node = ast_uop(ast_type, lval->node);
         rvalue(lval);
         //intcheck(lval, lval);
         switch (lval->ptr_type) {
@@ -540,11 +544,13 @@ void poststep(
     LVALUE* lval,
     int n,
     void (*step)(LVALUE *lval),
-    void (*unstep)(LVALUE *lval))
+    void (*unstep)(LVALUE *lval),
+    int ast_type)
 {
     if (k == 0) {
         needlval();
     } else {
+        lval->node = ast_uop(ast_type, lval->node);
         if (lval->indirect_kind) {
             addstk(lval);
             gen_save_pointer(lval);
@@ -743,10 +749,11 @@ void check_assign_range(Type *type, double const_value)
  * \retval 0 - If constant false
  * \retval -1 - Not constant
  */
-int test(int label, int parens)
+struct nodepair *test(int label, int parens)
 {
     char *before, *start;
     LVALUE lval={0};
+    struct nodepair *pair = calloc(1,sizeof(*pair));
     
     if (parens)
         needchar('(');
@@ -767,11 +774,15 @@ int test(int label, int parens)
         lval.binop = NULL;
         if (lval.const_val) {
             /* true constant, perform body */
-            return lval.const_val;
+            pair->i = lval.const_val;
+            pair->node = lval.node;
+            return pair;
         }
         /* false constant, jump round body */
       //  gen_jp_label(label);
-        return 0;
+        pair->i = 0;
+        pair->node = lval.node;
+        return pair;
     }
     
     if (lval.binop == dummy || check_lastop_was_testjump(&lval)) {
@@ -784,7 +795,10 @@ int test(int label, int parens)
         jumpnc(label);
     }
     clearstage(before, start);
-    return -1;
+
+    pair->node = lval.node;
+    pair->i = -1;
+    return pair;
 }
 
 /*
@@ -798,10 +812,12 @@ int constexpr(double *val, Kind *type, int flag)
     int con;
     int savesp = Zsp;
     int valtype;
+    struct nodepair *pair;
     Type   *type_ptr;
     
     setstage(&before, &start);
-    valtype = expression(&con, &valtemp, &type_ptr);
+    pair = expression(&con, &valtemp, &type_ptr);
+    valtype = pair->i;
     *val = valtemp;
     clearstage(before, 0); /* scratch generated code */
     *type = valtype;

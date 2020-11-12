@@ -127,7 +127,8 @@ int operator_is_commutative(void (*oper)(LVALUE *lval))
  */
 void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper)(LVALUE *lval),
              void (*doper)(LVALUE *lval), void (*constoper)(LVALUE *lval, int64_t constval),
-             int (*dconstoper)(LVALUE *lval, double constval, int isrhs))
+             int (*dconstoper)(LVALUE *lval, double constval, int isrhs),
+             int ast_type)
 {
     char *before, *start;
     char *before_constlval, *start_constlval;
@@ -147,6 +148,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (plnge1(heir, lval2))
             rvalue(lval2);
         rhs_val_type = lval2->val_type;
+        lval->node = ast_binop(ast_type, lval->node, lval2->node);
         setstage(&before_constlval, &start_constlval);
 
         lval->stage_add = stagenext;
@@ -237,6 +239,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (plnge1(heir, lval2))
             rvalue(lval2);
         rhs_val_type = lval2->val_type;
+        lval->node = ast_binop(ast_type, lval->node, lval2->node);
 
         if (lval2->is_const) {
 
@@ -323,7 +326,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                     lval->ltype = type_int;
                 }
             }
-
+            lval->node = ast_literal(lval->ltype, lval->const_val);
             // Promote as necessary
             if ( kind_is_floating(lhs_val_type) || kind_is_floating(rhs_val_type) ) {
                 // This is a constant, so it will be pulled out as FLOAT16 as necessary
@@ -450,6 +453,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if (plnge1(heir, lval2))
             rvalue(lval2);
 
+        lval->node = ast_binop(oper == zadd ? OP_ADD : OP_SUB, lval->node, lval2->node);
         rhs_val_type = lval2->val_type;
 
         if (lval->ptr_type != KIND_NONE ) {
@@ -553,7 +557,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
         if (plnge1(heir, lval2))
             rvalue(lval2);
-
+        lval->node = ast_binop(oper == zadd ? OP_ADD : OP_SUB, lval->node, lval2->node);
         rhs_val_type = lval2->val_type;
         if (lval2->is_const) {
             /* constant on right */
@@ -647,6 +651,8 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lval->ltype = get_float_type(lval->val_type);
         }
         clearstage(before, 0);  // Wipe all of the code generated
+        printf("Ltype %p\n",lval->ltype);
+        lval->node = ast_literal(lval->ltype, lval->const_val);
         Zsp = oldsp;
     } else if (lval2->is_const == 0) {
         /* right operand not constant */

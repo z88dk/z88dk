@@ -72,7 +72,7 @@ static FILE* w32_tmpfile()
  *      zero, will call the contents of HL
  */
 
-void callfunction(SYMBOL *ptr, Type *fnptr_type)
+Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
 {
     int isscanf = 0;
     uint32_t format_option = 0;
@@ -95,6 +95,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     enum symbol_flags builtin_flags = 0;
     char   *funcname = "(unknown)";
     Type   *functype = ptr ? ptr->ctype: fnptr_type->ptr;
+    array  *function_args = array_init(NULL);
+    Node   *node;
     
     if ( functype->kind != KIND_FUNC ) {
         warningfmt("incompatible-pointer-types","Calling via non-function pointer");
@@ -109,8 +111,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
 
     if (ptr && (strcmp(ptr->name, "asm") == 0 || strcmp(ptr->name,"__asm__") == 0) ) {
         /* We're calling asm("code") */
-        doasmfunc(NO);
-        return;
+        return doasmfunc(NO);
     }
 
     if (ptr ) {
@@ -121,6 +122,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     while (ch() != ')') {
         char *before, *start;
         Type *type;
+        struct nodepair *pair;
+
         if (endst()) {
             break;
         }
@@ -130,7 +133,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         push_buffer_fp(tmpfiles[argnumber]);
 
         setstage(&before, &start);
-        expr = expression(&vconst, &val, &type);
+        pair = expression(&vconst, &val, &type);
+        array_add(function_args, pair->node);
         if ( argnumber < 5 ) {
             isconstarg[argnumber] = vconst;
             constargval[argnumber] = val;
@@ -145,6 +149,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     needchar(')'); 
     Zsp = savesp;
     saveline = lineno;
+
+    node = ast_function_call(function_pointer_call ? AST_FUNCPTR_CALL : AST_FUNC_CALL, functype, function_args);
 
     //  if ( ptr == NULL ) ptr = fnptr;
     if ( functype->funcattrs.oldstyle == 0 && functype->funcattrs.hasva == 0 && array_len(functype->parameters) < argnumber  ) {
@@ -224,6 +230,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     buffer_fps_num = 0;
     while ( tmpfiles[argnumber+1] ) {
         Type *type;        
+        struct nodepair *pair;
         char *before, *start;
 
         argnumber++;
@@ -241,7 +248,8 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         }
         /* ordinary call */
         setstage(&before, &start);
-        expr = expression(&vconst, &val, &type);
+        pair = expression(&vconst, &val, &type);
+        expr = pair->k;
         if (expr == KIND_CARRY) {
             gen_conv_carry2int();
             expr = KIND_INT;
@@ -364,6 +372,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
 #endif
             Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE || c_fp_size < 6, preserve, YES);  /* clean up arguments - we know what type is MOOK */
     }
+    return node;
 }
 
 static int SetWatch(char* sym, int* type)
