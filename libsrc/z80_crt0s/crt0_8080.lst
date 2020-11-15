@@ -38,7 +38,6 @@ sccz80/crt0_z80/l_jphl
 sccz80/crt0_z80/l_le
 sccz80/crt0_z80/l_lneg
 sccz80/crt0_z80/l_lt
-sccz80/crt0_z80/l_mul
 sccz80/crt0_z80/l_neg
 sccz80/crt0_z80/l_or
 sccz80/crt0_z80/l_pint

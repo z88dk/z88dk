@@ -674,7 +674,7 @@ cpm8080_clib.lib:
 	@echo '--- Building CP/M Library (8080)---'
 	@echo ''
 	$(RM) target/cpm/stdio/*.o target/cpm/cpm/*.o
-	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(LISTFILE_DIRECTORY)/cpm_8080.lst
+	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(LISTFILE_DIRECTORY)/cpm_8080.lst
 
 cpmdevice.lib:
 	@echo ''
