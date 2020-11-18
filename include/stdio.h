@@ -98,6 +98,11 @@ struct filestr {
         uint8_t   reserved2;
 };
 
+
+/* Get a file file descriptor from a file pointer */
+#define fileno(f) (f->desc.fd)
+
+
 /* extra may point to an asm label that can be used to add extra stdio functionality
  * Entry: ix = fp for all 
  */
