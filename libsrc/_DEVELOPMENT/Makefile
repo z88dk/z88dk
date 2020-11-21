@@ -17,6 +17,7 @@ all: $(TARGET)
 
 clean: $(addprefix clean-,$(TARGET))
 	@find . -name '*.err' | xargs $(RM)
+	$(RM) config_private.inc
 
 install-clean:
 	$(RM) -fr target/*/obj
