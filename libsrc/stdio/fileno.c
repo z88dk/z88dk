@@ -7,6 +7,7 @@
  *  $Id: fileno.c $
  */
 
+#define ANSI_STDIO
 #include <stdio.h>
 
 extern int __LIB__	fileno(FILE *fp) __z88dk_fastcall
