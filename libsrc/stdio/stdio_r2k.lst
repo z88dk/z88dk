@@ -19,6 +19,7 @@ stdio/obj/r2k/fgetpos
 stdio/obj/r2k/fgets
 stdio/obj/r2k/fgets_cons
 stdio/obj/r2k/fgets_cons_erase_character
+stdio/obj/r2k/fileno
 stdio/obj/r2k/fmemopen
 stdio/obj/r2k/fopen
 stdio/obj/r2k/fprintf
