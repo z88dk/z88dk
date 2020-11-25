@@ -99,10 +99,6 @@ struct filestr {
 };
 
 
-/* Get a file file descriptor from a file pointer */
-#define fileno(f) (f->desc.fd)
-
-
 /* extra may point to an asm label that can be used to add extra stdio functionality
  * Entry: ix = fp for all 
  */
@@ -173,6 +169,9 @@ extern struct filestr _sgoioblk_end;
 
 #define clearerr(f)
 extern FILE __LIB__ *fopen_zsock(char *name);
+
+/* Get a file file descriptor from a file pointer */
+extern int __LIB__ fileno(FILE *stream) __smallc __z88dk_fastcall;
 
 /* Our new and improved functions!! */
 
