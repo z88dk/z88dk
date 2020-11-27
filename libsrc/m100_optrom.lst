@@ -1,0 +1,8 @@
+target/m100/stdio/fgetc_cons
+target/m100/stdio/fputc_cons
+target/m100/stdio/getk
+target/m100/stdio/generic_console
+@stdio/stdio_8080.lst
+@time/time.lst
+
+

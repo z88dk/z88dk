@@ -59,7 +59,7 @@ TOCREATE += $(call check_target,laser500,laser500_clib.lib)
 TOCREATE += $(call check_target,lm80c,lm80c_clib.lib)
 TOCREATE += $(call check_target,lviv,lviv_clib.lib)
 TOCREATE += $(call check_target,lynx,lynx_clib.lib)
-TOCREATE += $(call check_target,m100,m100_clib.lib)
+TOCREATE += $(call check_target,m100,m100_clib.lib m100_optrom_clib.lib)
 TOCREATE += $(call check_target,m5,m5_clib.lib)
 TOCREATE += $(call check_target,mc1000,mc1000_clib.lib)
 TOCREATE += $(call check_target,mikro80,mikro80_clib.lib)
@@ -1598,9 +1598,18 @@ m100_clib.lib:
 	@echo ''
 	@echo '--- Building m100 Library ---'
 	@echo ''
+	$(RM) target/m100/stdio/*.o
 	$(call buildgeneric,m100,"portable narrow")
 	$(MAKE) -C games TARGET=m100
 	TARGET=m100 TYPE=8080 $(LIBLINKER) -m8080 -DFORm100 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m100_clib @$(LISTFILE_DIRECTORY)/m100.lst
+
+m100_optrom_clib.lib:
+	@echo ''
+	@echo '--- Building m100 Library (OPTROM stdio-only version) ---'
+	@echo ''
+	$(RM) target/m100/stdio/*.o
+	$(call buildgeneric,m100,"portable narrow")
+	TARGET=m100 TYPE=8080 $(LIBLINKER) -m8080 -DFORm100 -D__OPTROM__ -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m100_optrom_clib @$(LISTFILE_DIRECTORY)/m100_optrom.lst
 
 vector06c_clib.lib:
 	@echo ''
