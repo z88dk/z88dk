@@ -19,6 +19,7 @@ stdio/obj/binary/fgetpos
 stdio/obj/binary/fgets
 stdio/obj/binary/fgets_cons
 stdio/obj/binary/fgets_cons_erase_character
+stdio/obj/binary/fileno
 stdio/obj/binary/fmemopen
 stdio/obj/binary/fopen
 stdio/obj/binary/fprintf

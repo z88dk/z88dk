@@ -19,6 +19,7 @@ stdio/obj/ixiy/fgetpos
 stdio/obj/ixiy/fgets
 stdio/obj/ixiy/fgets_cons
 stdio/obj/ixiy/fgets_cons_erase_character
+stdio/obj/ixiy/fileno
 stdio/obj/ixiy/fmemopen
 stdio/obj/ixiy/fopen
 stdio/obj/ixiy/fprintf

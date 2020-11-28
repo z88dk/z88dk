@@ -279,6 +279,7 @@
 	GLOBAL	__sgoioblk
 	GLOBAL	__sgoioblk_end
 	GLOBAL	fopen_zsock
+	GLOBAL	fileno
 	GLOBAL	fopen
 	GLOBAL	freopen
 	GLOBAL	fdopen
