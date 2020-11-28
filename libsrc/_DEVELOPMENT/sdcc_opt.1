@@ -68,7 +68,7 @@
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
-	EXTERN _banked_call
+	EXTERN banked_call
 	EXTERN _banked_ret
 	EXTERN ___fs2schar
 	EXTERN ___fs2schar_callee
@@ -558,23 +558,23 @@ __xinit_%0
 =
 	ld	hl,sp + %2
 
-	call	_banked_call
+	call	banked_call
 	DEFW	%1
 	DEFW 0
 =
-	call	_banked_call
+	call	banked_call
 	defq	%1
 
 	call	___sdcc_bcall
 	DEFW	%1
 	DEFW	%2
 =
-	call	_banked_call
+	call	banked_call
 	defq	%1
 
 	ld	e,%1
 	ld	hl,%2
 	call	___sdcc_bcall_ehl
 =
-	call	_banked_call
+	call	banked_call
 	defq	%2
