@@ -558,23 +558,23 @@ __xinit_%0
 =
 	ld	hl,sp + %2
 
-	call	banked_call
+	call	_banked_call
 	DEFW	%1
 	DEFW 0
 =
-	call	banked_call
+	call	_banked_call
 	defq	%1
 
 	call	___sdcc_bcall
 	DEFW	%1
 	DEFW	%2
 =
-	call	banked_call
+	call	_banked_call
 	defq	%1
 
 	ld	e,%1
 	ld	hl,%2
 	call	___sdcc_bcall_ehl
 =
-	call	banked_call
+	call	_banked_call
 	defq	%2
