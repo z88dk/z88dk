@@ -11,14 +11,9 @@
 ; ROMCALL; DEFW ROM_ADDR
 ; ...and be conditionally compiled depending on the subtype we use.
 
+	EXTERN	ROMCALL_OP ; it's defined in m100_crt0.asm
 #define ROMCALL defb ROMCALL_OP
-
-IF __OPTROM__
-ROMCALL_OP EQU $F7 ; rst 6 if calling from OPTROM
-ELSE
-ROMCALL_OP EQU $CD ; normall CALL if calling from RAM
-ENDIF
-
+	
 ; ROM calls:
 
 defc	KYREAD	= $12CB	; wait for key from the keyboard

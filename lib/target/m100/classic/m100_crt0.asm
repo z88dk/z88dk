@@ -18,6 +18,8 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
+	PUBLIC	ROMCALL_OP	; Opcode to use for ROM calls
+
         IF !CLIB_FGETC_CONS_DELAY
                 defc CLIB_FGETC_CONS_DELAY = 150
         ENDIF
@@ -34,8 +36,10 @@
         INCLUDE "crt/classic/crt_rules.inc"
         
 	IF startup = 1 
+		defc	ROMCALL_OP = $CD	; CALL
 		INCLUDE	"target/m100/classic/ram.asm"
         ELSE
+		defc	ROMCALL_OP = $F7	; RST6
 		INCLUDE	"target/m100/classic/optrom.asm"
 	ENDIF
  

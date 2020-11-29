@@ -90,15 +90,14 @@ stdcall:
 	
 	push	hl
 	push	de
-	
-	defb	$38	; ldsi $06, 8085 undocumented opcode
-	defb	$06
 
-	defb	$ed ; lhlx undocumented 8085 opcode
+	ldsi	$06	
+
+	lhlx
 	dec	hl
 	dec	hl
 	ex	de, hl
-	defb	$ed ; lhlx undocumented 8085 opcode
+	lhlx
 	
 	pop	de
 	ex	(sp), hl
@@ -108,9 +107,8 @@ intcall:
 	push	hl
 	push	de
 	
-	defb	$38	; ldsi $04, 8085 undocumented opcode
-	defb	$04
-	defb	$ed ; lhlx undocumented 8085 opcode
+	ldsi	$04
+	lhlx
 
 	dec	hl
 	dec	hl
@@ -119,7 +117,8 @@ intcall:
 
 	push	hl	
 	ld	hl, OPON
-	defb	$d9	; shlx, 8085 undocumented opcode
+
+	shlx
 	pop	hl
 	pop	de
 	ex	(sp), hl	
