@@ -27,11 +27,13 @@
         defc    TAR__clib_exit_stack_size = 4
 ;	defc    TAR__fputc_cons_generic = 1
         defc    TAR__register_sp = -1 
-	defc	CRT_KEY_DEL = 12
+	defc	CRT_KEY_DEL = 8
 	defc	__CPU_CLOCK = 2400000
 
 	defc	CONSOLE_COLUMNS = 40
 	defc	CONSOLE_ROWS = 8
+	defc	CLIB_DISABLE_FGETS_CURSOR = 1
+
 
         INCLUDE "crt/classic/crt_rules.inc"
         
