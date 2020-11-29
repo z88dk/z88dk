@@ -1592,15 +1592,13 @@ special_clib.lib:
 	$(call buildgeneric,special,"wide portable")
 	TARGET=special TYPE=8080 $(LIBLINKER) -m8080 -DFORspecial -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/special_clib.lib @$(LISTFILE_DIRECTORY)/special.lst
 
-
-
 m100_clib.lib:
 	@echo ''
 	@echo '--- Building m100 Library ---'
 	@echo ''
 	$(call buildgeneric,m100,"portable narrow")
 	$(MAKE) -C games TARGET=m100
-	TARGET=m100 TYPE=8080 $(LIBLINKER) -m8080 -DFORm100 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m100_clib @$(LISTFILE_DIRECTORY)/m100.lst
+	TARGET=m100 TYPE=8080 $(LIBLINKER) -m8085 -DFORm100 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m100_clib @$(LISTFILE_DIRECTORY)/m100.lst
 
 vector06c_clib.lib:
 	@echo ''
