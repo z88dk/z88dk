@@ -25,3 +25,6 @@ defc	CURPOS	= $427C	; position cursor; H=column (1-40), L=row(1-8)
 defc	CURSON	= $4249	; turn cursor on
 defc	CURSOFF	= $424E	; ...and off
 defc	BEEP	= $4229	; sound the beeper
+
+defc	LCDSET	= $744C ; LCD set pixel (D, E)
+defc	LCDRES	= $744D ; LCD reset pixel (D, E)
