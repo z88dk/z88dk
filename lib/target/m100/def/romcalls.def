@@ -21,7 +21,7 @@ defc	KYPEND	= $13DB	; check keyboard queue for pending characters
 
 defc	CLS	= $4231	; clear screen
 defc	CHROUT	= $4B44	; print character in reg. A to LCD/printer
-defc	CURPOS	= $42C7	; position cursor; H=column (1-40), L=row(1-8)
+defc	CURPOS	= $427C	; position cursor; H=column (1-40), L=row(1-8)
 defc	CURSON	= $4249	; turn cursor on
 defc	CURSOFF	= $424E	; ...and off
 defc	BEEP	= $4229	; sound the beeper
