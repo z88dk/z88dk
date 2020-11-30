@@ -1,0 +1,30 @@
+; M100 firmware macros and defs
+; Applicable to American M100/M102 ONLY (probably, I've never seen any European M100)
+; Nov 2020
+;
+; M100 system ROM aka firmware can be called in atleast a couple of ways
+; If we're calling it from OPTROM made with Stephen Adolph's template, we do
+; RST 6; DEFW ROM_ADDR
+; And if we're calling from normal RAM, then we simply do CALL ROM_ADDR
+
+; With ROMCALL macro, all ROM calls (except RSTs) can be abstracted into
+; ROMCALL; DEFW ROM_ADDR
+; ...and be conditionally compiled depending on the subtype we use.
+
+	EXTERN	ROMCALL_OP ; it's defined in m100_crt0.asm
+#define ROMCALL defb ROMCALL_OP
+	
+; ROM calls:
+
+defc	KYREAD	= $12CB	; wait for key from the keyboard
+defc	KYPEND	= $13DB	; check keyboard queue for pending characters
+
+defc	CLS	= $4231	; clear screen
+defc	CHROUT	= $4B44	; print character in reg. A to LCD/printer
+defc	CURPOS	= $427C	; position cursor; H=column (1-40), L=row(1-8)
+defc	CURSON	= $4249	; turn cursor on
+defc	CURSOFF	= $424E	; ...and off
+defc	BEEP	= $4229	; sound the beeper
+
+defc	LCDSET	= $744C ; LCD set pixel (D, E)
+defc	LCDRES	= $744D ; LCD reset pixel (D, E)

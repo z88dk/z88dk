@@ -19,9 +19,12 @@
 
 			EXTERN	__gfx_coords
 			EXTERN	base_graphics
-
+	INCLUDE "target/m100/def/romcalls.def"
 .plotpixel
 			ld	d,h
 			ld	e,l
 			ld	(__gfx_coords),hl
-			jp	$744C
+			ROMCALL
+			defw	LCDSET
+			ret
+

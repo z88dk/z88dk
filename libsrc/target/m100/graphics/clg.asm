@@ -11,10 +11,11 @@
                 PUBLIC    _clg
 				
 			EXTERN w_pixeladdress
-
+	INCLUDE "target/m100/def/romcalls.def"
 ;		INCLUDE  "target/kc/def/caos.def"
 
 .clg
 ._clg
-	ld	a,12
-	jp	$20
+	ROMCALL
+	defw	CLS
+	ret
