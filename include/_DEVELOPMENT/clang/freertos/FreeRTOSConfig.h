@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.3.0
+ * FreeRTOS Kernel V10.4.1
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -19,10 +19,9 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * http://www.FreeRTOS.org
- * http://aws.amazon.com/freertos
+ * https://www.FreeRTOS.org
+ * https://github.com/FreeRTOS
  *
- * 1 tab == 4 spaces!
  */
 
 
@@ -41,12 +40,17 @@
  * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
  * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
  *
- * See http://www.freertos.org/a00110.html.
+ * See https://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
 // And on to the things the same no matter the Z80 type...
 #define configUSE_PREEMPTION                1
-#define configUSE_IDLE_HOOK                 0
+
+// Define configUSE_IDLE_HOOK
+#ifndef configUSE_IDLE_HOOK
+    #define configUSE_IDLE_HOOK             0
+#endif
+
 #define configUSE_TICK_HOOK                 0
 #define configCPU_CLOCK_HZ                  ( ( uint32_t ) __CPU_CLOCK )
 #define configMAX_PRIORITIES                4
@@ -72,7 +76,11 @@
 #define configUSE_TIMERS                    1
 #define configTIMER_TASK_PRIORITY           ( ( UBaseType_t ) 3 )
 #define configTIMER_QUEUE_LENGTH            ( ( UBaseType_t ) 10 )
-#define configTIMER_TASK_STACK_DEPTH        ( 85 )
+#define configTIMER_TASK_STACK_DEPTH        configMINIMAL_STACK_SIZE
+
+/* Co-routine definitions. */
+#define configUSE_CO_ROUTINES               0
+#define configMAX_CO_ROUTINE_PRIORITIES     ( (UBaseType_t ) 2 )
 
 /* Set the stack depth type to be uint16_t. */
 #define configSTACK_DEPTH_TYPE              uint16_t
@@ -95,5 +103,28 @@ to exclude the API function. */
 #define INCLUDE_xTaskGetIdleTaskHandle          0 // create an idle task handle.
 #define INCLUDE_xTaskGetCurrentTaskHandle       0
 #define INCLUDE_uxTaskGetStackHighWaterMark     1
+
+/**
+ * configASSERT macro: https://www.freertos.org/a00110.html#configASSERT
+ */
+#ifndef configASSERT
+    /**
+     * Enable configASSERT macro by default if it is not defined.
+     */
+    #ifndef configDEFAULT_ASSERT
+        #define configDEFAULT_ASSERT 1
+    #endif
+
+    /**
+     * Define a hook method for configASSERT macro if configASSERT is enabled.
+     */
+    #if configDEFAULT_ASSERT == 1
+        extern void vApplicationAssertHook();
+        #define configASSERT( x ) if (( x ) == 0) { vApplicationAssertHook(); }
+    #endif
+
+#else
+    #define configDEFAULT_ASSERT 0
+#endif
 
 #endif /* FREERTOS_CONFIG_H */

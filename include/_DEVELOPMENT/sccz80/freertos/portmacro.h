@@ -18,8 +18,6 @@
  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * 1 tab == 4 spaces!
- *
  * This file is NOT part of the FreeRTOS distribution.
  *
  */
@@ -47,16 +45,16 @@ extern "C" {
 
 /* Type definitions. */
 
-typedef uint16_t StackType_t;
-typedef int8_t BaseType_t;
-typedef uint8_t UBaseType_t;
+typedef uint16_t                    StackType_t;
+typedef int8_t                      BaseType_t;
+typedef uint8_t                     UBaseType_t;
 
 #if configUSE_16_BIT_TICKS == 1
-    typedef uint16_t TickType_t;
-    #define portMAX_DELAY ( TickType_t ) 0xffff
+    typedef uint16_t                TickType_t;
+    #define portMAX_DELAY           ( TickType_t ) 0xffff
 #else
-    typedef uint32_t TickType_t;
-    #define portMAX_DELAY ( TickType_t ) 0xffffffffUL
+    typedef uint32_t                TickType_t;
+    #define portMAX_DELAY           ( TickType_t ) 0xffffffffUL
 #endif
 
 /*-----------------------------------------------------------*/
@@ -419,7 +417,12 @@ typedef uint8_t UBaseType_t;
 /*-----------------------------------------------------------*/
 
 /* Kernel utilities. */
+/*
 extern void vPortYield( void );
+ */
+extern void __LIB__ vPortYield(void) __smallc;
+
+
 #define portYIELD()                 vPortYield()
 
 /*-----------------------------------------------------------*/
