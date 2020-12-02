@@ -1323,6 +1323,6 @@ typedef StaticStreamBuffer_t StaticMessageBuffer_t;
 /* *INDENT-ON* */
 
 /* Board specific configuration options. */
-#include "include/FreeRTOSBoardDefs.h"
+#include "freertos/FreeRTOSBoardDefs.h"
 
 #endif /* INC_FREERTOS_H */
