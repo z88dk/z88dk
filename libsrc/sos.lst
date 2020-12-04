@@ -21,10 +21,11 @@ target/sos/sos/obj/sos/sos_ropen
 target/sos/sos/obj/sos/sos_wopen
 target/sos/sos/obj/sos/sos_rdd
 target/sos/sos/obj/sos/sos_wrd
+target/sos/sos/obj/sos/sos_variables
 target/sos/sos/tape/rnd_saveblock
 target/sos/sos/tape/rnd_loadblock
 target/sos/sos/tape/tape_save
 target/sos/sos/tape/tape_save_block
 target/sos/sos/tape/tape_load
 target/sos/sos/tape/tape_load_block
-
+@z80.lst
