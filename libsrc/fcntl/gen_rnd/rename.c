@@ -2,9 +2,10 @@
  *	Rename 
  *
  *
- *	$Id: rename.c,v 1.1 2014-01-14 07:48:41 stefano Exp $
+ *	$Id: rename.c $
  */
 
+#include <stdio.h>
 #include <fcntl.h>
 #include <malloc.h>
 #include <string.h>
