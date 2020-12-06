@@ -583,7 +583,8 @@ int enter_file(struct lexer_state *ls, unsigned long flags)
 		return 1;
 	}
 	print_line_info(ls, flags);
-	ls->oline --;	/* emitted #line troubled oline */
+	ls->oline --;	/* emitted #line troubled oline as well as line */
+	ls->line --;
 	return 0;
 }
 
