@@ -28,4 +28,3 @@ target/sos/sos/tape/tape_save
 target/sos/sos/tape/tape_save_block
 target/sos/sos/tape/tape_load
 target/sos/sos/tape/tape_load_block
-@z80.lst
