@@ -4,15 +4,13 @@
  *
  *	Stefano Bodrato - March 2012
  *
- *	$Id: remove.c,v 1.1 2012-03-21 10:20:23 stefano Exp $
+ *	$Id: remove.c$
 */
 
-//#include <fcntl.h>
-
-//#include <stdio.h>
+#include <stdio.h>
 #include <flos.h>
 
 int remove(char *name)
 {
-//	erase_file(name);
+	erase_file(name);
 }
