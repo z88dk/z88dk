@@ -14,3 +14,6 @@ defc SCR_MODE = $81e0
 
 ; Address of name table in VDP memory
 defc SCR_NAM_TB = $81e2
+
+; Cursor state, 0 = off, 1 =on
+defc CRSR_STATE = $81E9
