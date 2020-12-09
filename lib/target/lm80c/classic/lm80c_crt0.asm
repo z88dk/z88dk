@@ -34,10 +34,16 @@
         defc    PSG_AY_REG = @01000000
         defc    PSG_AY_DATA = @01000001
 
+        EXTERN    nmi_vectors
+        EXTERN    asm_interrupt_handler
+        EXTERN    __vdp_enable_status
+        EXTERN    VDP_STATUS
+
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = -1
         defc    TAR__fputc_cons_generic = 1
 
+        INCLUDE "target/lm80c/def/lm80c.def"
         INCLUDE "target/lm80c/def/maths_mbf.def"
 
 	defc CRT_ORG_CODE = 0x8241
@@ -67,6 +73,12 @@ start:
 	ENDIF
 
 
+	; Setup NMI if required
+	ld	hl,interrupt
+	ld	(NMIUSR+1),hl
+	ld	a,195	;JP
+	ld	(NMIUSR),a
+
         call    _main
 cleanup:
 ;
@@ -75,6 +87,10 @@ cleanup:
         push    hl
         call    crt0_exit
 
+	; We should probably disable VDP interrupts before doing this
+	ld	hl,$45ED	;retn
+	ld	(NMIUSR),hl
+
         pop     bc
 start1:
         ld      sp,0
@@ -82,6 +98,23 @@ start1:
 
 l_dcal:
         jp      (hl)
+
+; VDP interrupt
+        EXTERN    __vdp_enable_status
+        EXTERN    VDP_STATUS
+interrupt:
+        push    af
+        push    hl
+        ld      a,(__vdp_enable_status)
+        rlca
+        jr      c,no_vbl
+        in      a,(VDP_STATUS)
+no_vbl:
+        ld      hl,nmi_vectors
+        call    asm_interrupt_handler
+        pop     hl
+        pop     af
+        retn
 
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm" 
