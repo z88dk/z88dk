@@ -6,8 +6,11 @@
    
 */
 
-// zcc +zx -vn chessboard.c -o chessboard -lndos -create-app
+// zcc +zx chessboard.c -o chessboard -lndos -create-app
+// zcc +c128 -create-app -lgfx128hr -DFANCY -DSARGON chessboard.c
+//
 // optional: -DMIDSIZE, -DFANCY
+// yet another option : -DFANCY -DSARGON
 
 #ifdef MIDSIZE
    #include "chessb16.h"

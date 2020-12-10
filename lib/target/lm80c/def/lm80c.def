@@ -1,4 +1,19 @@
 
 
 
- defc LASTKEYPRSD = $822c
+defc LASTKEYPRSD = $822c
+
+; Vector for setting nmi handler
+defc NMIUSR = $8061
+
+; BASIC screen mode 1 = graphics 1, 2 = graphics 2, 0 = text, 3 = multicolour
+; Modes 1, 2 match our settings
+; Mode 0 is swapped around
+defc SCR_MODE = $81e0
+
+
+; Address of name table in VDP memory
+defc SCR_NAM_TB = $81e2
+
+; Cursor state, 0 = off, 1 =on
+defc CRSR_STATE = $81E9
