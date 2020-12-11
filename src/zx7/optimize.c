@@ -87,7 +87,7 @@ Optimal* optimize(unsigned char *input_data, size_t input_size, long skip) {
         best_len = 1;
         for (match = &matches[match_index]; *match != 0 && best_len < MAX_LEN; match = &match_slots[*match]) {
             offset = i - *match;
-            if (offset > MAX_OFFSET) {
+            if (offset >= MAX_OFFSET) {
                 *match = 0;
                 break;
             }
