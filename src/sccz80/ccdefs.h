@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-
+#include <math.h>
 
 typedef long double zdouble;
 
@@ -285,8 +285,8 @@ extern void     pop_buffer_fp(void);
 
 /* primary.c */
 extern int      primary(LVALUE *lval);
-extern zdouble  calc(Kind left_kind, zdouble left, void (*oper)(LVALUE *), zdouble right, int is16bit);
-extern zdouble  calcun(Kind left_kind, zdouble left, void (*oper)(LVALUE *), zdouble right);
+extern zdouble  calc(Kind left_kind, zdouble left, void (*oper)(LVALUE *), Kind right_kind, zdouble right, int is16bit);
+extern zdouble  calcun(Kind left_kind, zdouble left, void (*oper)(LVALUE *), Kind right_kind, zdouble right);
 extern int      intcheck(LVALUE *lval, LVALUE *lval2);
 extern void     force(Kind to, Kind from, char to_sign, char from_sign, int lconst);
 extern int      widen_if_float(LVALUE *lval, LVALUE *lval2, int operator_is_commutative);

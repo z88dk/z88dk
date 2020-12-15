@@ -166,9 +166,17 @@ zdouble calc(
     Kind   left_kind,
     zdouble left,
     void (*oper)(LVALUE *),
+    Kind   right_kind,
     zdouble right, int is16bit)
 {
+    if ( !kind_is_floating(left_kind) && !kind_is_floating(right_kind)) {
+        left = truncl(left);
+        right = truncl(right);
+    }
     if (oper == zdiv && right != 0.0) {
+        if ( !kind_is_floating(left_kind) && !kind_is_floating(right_kind)) {
+            return ((int64_t)left / (int64_t)right);
+        }
         return (left / right);
     } else if (oper == zmod)
         return ((int)left % (int)right);
@@ -197,12 +205,21 @@ zdouble calcun(
     Kind   left_kind,
     zdouble left,
     void (*oper)(LVALUE *),
+    Kind   right_kind,
     zdouble right)
 {
+    if ( !kind_is_floating(left_kind) && !kind_is_floating(right_kind)) {
+        left = truncl(left);
+        right = truncl(right);
+    }
+
     if (oper == zdiv)   {
+        if ( !kind_is_floating(left_kind) && !kind_is_floating(right_kind)) {
+            return ((uint64_t)left / (uint64_t)right);
+        }
         return (left / right);
     } else if (oper == zmod)
-        return ((unsigned int)left % (unsigned int)right);
+        return ((uint64_t)left % (uint64_t)right);
     else if (oper == zle)
         return (left <= right);
     else if (oper == zge)
