@@ -21,6 +21,8 @@ jobs:
           ~/.ccache
           ~/perl5
         key: ${{ runner.os }}-cache
+    - name: Update apt 
+      run: sudo apt update
     - name: Install apt dependencies
       run: sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl ragel libyaml-perl liblocal-lib-perl
     - name: Install perl prerequisites
