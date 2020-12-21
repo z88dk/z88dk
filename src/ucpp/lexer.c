@@ -524,21 +524,15 @@ static inline int read_char(struct lexer_state *ls)
 				ls->copy_line[ls->cli ++] = c;
 			}
 		}
-		if (ls->macfile && c == '\n') {
-			ls->macfile = 0;
-			continue;
-		}
-		ls->macfile = 0;
 		if (c == '\r') {
 			/*
-			 * We found a '\r'; we handle it as a newline
-			 * and ignore the next newline. This should work
-			 * with all combinations of Msdos, MacIntosh and
-			 * Unix files on these three platforms. On other
-			 * platforms, native file formats are always
-			 * supported.
+			 * We found a '\r'; we handle it as a newline.
+			 * For '\r\n' cases (Windows) prefer to ignore this one and use '\n' later.
 			 */
-			ls->macfile = 1;
+            if (ls->pbuf != ls->ebuf && ls->input_buf[ls->pbuf] == '\n')
+            {
+                continue;
+            }
 			c = '\n';
 		}
 		break;
