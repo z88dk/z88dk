@@ -92,6 +92,22 @@ include(__link__.m4)
     #define portARCH_NAME    NULL
 #endif
 
+#ifndef portUSING_MPU_WRAPPERS
+    #define portUSING_MPU_WRAPPERS 0
+#endif
+
+#ifndef PRIVILEGED_FUNCTION
+    #define PRIVILEGED_FUNCTION
+#endif
+
+#ifndef PRIVILEGED_DATA
+    #define PRIVILEGED_DATA
+#endif
+
+#ifndef FREERTOS_SYSTEM_CALL
+    #define FREERTOS_SYSTEM_CALL
+#endif
+
 /* *INDENT-OFF* */
 #ifdef __cplusplus
     extern "C" {
