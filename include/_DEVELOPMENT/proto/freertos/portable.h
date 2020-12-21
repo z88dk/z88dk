@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.1
+ * FreeRTOS Kernel V10.4.3
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -90,22 +90,6 @@ include(__link__.m4)
 
 #ifndef portARCH_NAME
     #define portARCH_NAME    NULL
-#endif
-
-#ifndef portUSING_MPU_WRAPPERS
-    #define portUSING_MPU_WRAPPERS 0
-#endif
-
-#ifndef PRIVILEGED_FUNCTION
-    #define PRIVILEGED_FUNCTION
-#endif
-
-#ifndef PRIVILEGED_DATA
-    #define PRIVILEGED_DATA
-#endif
-
-#ifndef FREERTOS_SYSTEM_CALL
-    #define FREERTOS_SYSTEM_CALL
 #endif
 
 /* *INDENT-OFF* */
