@@ -102,9 +102,10 @@ to exclude the API function. */
 #define INCLUDE_vResumeFromISR                  1
 #define INCLUDE_xTaskDelayUntil                 1
 #define INCLUDE_vTaskDelay                      1
-#define INCLUDE_xTaskGetSchedulerState          0
+#define INCLUDE_eTaskGetState                   1
+#define INCLUDE_xTaskGetSchedulerState          1
 #define INCLUDE_xTaskGetIdleTaskHandle          0 // create an idle task handle.
-#define INCLUDE_xTaskGetCurrentTaskHandle       0
+#define INCLUDE_xTaskGetCurrentTaskHandle       1
 #define INCLUDE_uxTaskGetStackHighWaterMark     1
 
 /**
