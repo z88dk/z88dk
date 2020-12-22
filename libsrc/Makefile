@@ -47,6 +47,7 @@ TOCREATE += $(call check_target,fp1100,fp1100_clib.lib)
 TOCREATE += $(call check_target,g800,g800_clib.lib)
 TOCREATE += $(call check_target,gal,gal_clib.lib)
 TOCREATE += $(call check_target,gb,gb_clib.lib)
+TOCREATE += $(call check_target,gl,gl_clib.lib)
 TOCREATE += $(call check_target,hemc,hemc_clib.lib)
 TOCREATE += $(call check_target,hgmc,hgmc_clib.lib)
 TOCREATE += $(call check_target,homelab,homelab_clib.lib)
@@ -1255,6 +1256,17 @@ lm80c_clib.lib:
 	$(MAKE) -C target/lm80c
 	$(MAKE) -C video/tms9918 TARGET=lm80c
 	TARGET=lm80c TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlm80c -x$(OUTPUT_DIRECTORY)/lm80c_clib @$(LISTFILE_DIRECTORY)/lm80c.lst
+
+
+# Genius Leader - dom/stefano
+gl_clib.lib:
+	@echo ''
+	@echo '--- Building Genius Leader Library ---'
+	@echo ''
+	$(call buildgeneric,gl)
+	TARGET=gl TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl -x$(OUTPUT_DIRECTORY)/gl_clib @$(LISTFILE_DIRECTORY)/gl.lst
+
+
 
 
 

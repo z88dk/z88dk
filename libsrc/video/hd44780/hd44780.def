@@ -1,0 +1,40 @@
+; HD44780 definitions
+
+
+defc LCD_CLEARDISPLAY = $01
+defc LCD_RETURNHOME = $02
+defc LCD_ENTRYMODESET = $04
+defc LCD_DISPLAYCONTROL = $08
+defc LCD_CURSORSHIFT = $10
+defc LCD_FUNCTIONSET = $20
+defc LCD_SETCGRAMADDR = $40
+defc LCD_SETDDRAMADDR = $80
+
+; Flags for display entry mode
+defc LCD_ENTRYRIGHT = $00
+defc LCD_ENTRYLEFT = $02
+defc LCD_ENTRYSHIFTINCREMENT = $01
+defc LCD_ENTRYSHIFTDECREMENT = $00
+
+; flags for display on/off control
+defc LCD_DISPLAYON = $04
+defc LCD_DISPLAYOFF = $00
+defc LCD_CURSORON = $02
+defc LCD_CURSOROFF = $00
+defc LCD_BLINKON = $01
+defc LCD_BLINKOFF = $00
+
+; Flags for display/cursor shift
+defc LCD_DISPLAYMOVE = $08
+defc LCD_CURSORMOVE = $00
+defc LCD_MOVERIGHT = $04
+defc LCD_MOVELEFT = $00
+
+; Flags for function set
+defc LCD_8BITMODE = 0x10
+defc LCD_4BITMODE = $00
+defc LCD_2LINE = $08
+defc LCD_1LINE = $00
+defc LCD_5x10DOTS = $04
+defc LCD_5x8DOTS = $00
+
