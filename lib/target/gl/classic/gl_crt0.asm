@@ -1,5 +1,5 @@
 ;
-;	Startup for Genius Leader
+;	Startup for Genius Leader 2000/4000/6000sl
 ;
 
 	module	gl_crt0 
@@ -22,6 +22,7 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 IF GL_TARGET_GL2000
+	defc	__CPU_CLOCK = 4000000
 	defc	CONSOLE_COLUMNS = 20
 	defc	CONSOLE_ROWS = 2
 	defc    LCD_DATA_PORT = 0x0b
@@ -35,10 +36,16 @@ IF GL_TARGET_GL2000
 	EXTERN  asm_lcd_get_ddram_addr_2x20
 	PUBLIC  asm_lcd_get_ddram_addr
 	defc	asm_lcd_get_ddram_addr = asm_lcd_get_ddram_addr_2x20
+	PUBLIC	LCD_DATA_PORT
+	PUBLIC	LCD_CONTROL_PORT
+	PUBLIC	LCD_VRAM
+	PUBLIC	VGL_KEY_STATUS_ADDRESS
+	PUBLIC	VGL_KEY_CURRENT_ADDRESS
 ENDIF
 
 
 IF GL_TARGET_GL4000
+	defc	__CPU_CLOCK = 4000000
 	defc	CONSOLE_COLUMNS = 20
 	defc	CONSOLE_ROWS = 4
 	defc    LCD_DATA_PORT = 0x0b
@@ -52,13 +59,24 @@ IF GL_TARGET_GL4000
 	EXTERN  asm_lcd_get_ddram_addr_gl4000
 	PUBLIC  asm_lcd_get_ddram_addr
 	defc	asm_lcd_get_ddram_addr = asm_lcd_get_ddram_addr_gl4000
-ENDIF
-
 	PUBLIC	LCD_DATA_PORT
 	PUBLIC	LCD_CONTROL_PORT
 	PUBLIC	LCD_VRAM
 	PUBLIC	VGL_KEY_STATUS_ADDRESS
 	PUBLIC	VGL_KEY_CURRENT_ADDRESS
+ENDIF
+
+IF GL_TARGET_GL6000
+	defc	__CPU_CLOCK = 8000000
+	; The display seems to be reconfigurable, default is 240x100
+	defc	CONSOLE_COLUMNS = 30
+	defc	CONSOLE_ROWS = 12
+
+        defc    TAR__register_sp = 0xdf00
+	defc	CRT_ORG_BSS = 0xc000	
+	defc	CRT_ORG_CODE = 0x8000
+ENDIF
+
 
 
 	EXTERN	asm_lcd_init
@@ -69,7 +87,6 @@ ENDIF
         defc    TAR__fputc_cons_generic = 1
         defc    TAR__no_ansifont = 1
         defc    TAR__clib_exit_stack_size = 0
-	defc	__CPU_CLOCK = 4000000
         INCLUDE "crt/classic/crt_rules.inc"
 
 	org	  CRT_ORG_CODE

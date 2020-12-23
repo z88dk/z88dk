@@ -48,6 +48,7 @@ TOCREATE += $(call check_target,g800,g800_clib.lib)
 TOCREATE += $(call check_target,gal,gal_clib.lib)
 TOCREATE += $(call check_target,gb,gb_clib.lib)
 TOCREATE += $(call check_target,gl,gl_clib.lib)
+TOCREATE += $(call check_target,gl6000,gl6000_clib.lib)
 TOCREATE += $(call check_target,hemc,hemc_clib.lib)
 TOCREATE += $(call check_target,hgmc,hgmc_clib.lib)
 TOCREATE += $(call check_target,homelab,homelab_clib.lib)
@@ -1258,14 +1259,23 @@ lm80c_clib.lib:
 	TARGET=lm80c TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlm80c -x$(OUTPUT_DIRECTORY)/lm80c_clib @$(LISTFILE_DIRECTORY)/lm80c.lst
 
 
-# Genius Leader - dom/stefano
+# Genius Leader 2000/4000 - dom
 gl_clib.lib:
 	@echo ''
-	@echo '--- Building Genius Leader Library ---'
+	@echo '--- Building Genius Leader 2000/4000 Library ---'
 	@echo ''
 	$(call buildgeneric,gl)
 	$(MAKE) -C games TARGET=gl
 	TARGET=gl TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl -x$(OUTPUT_DIRECTORY)/gl_clib @$(LISTFILE_DIRECTORY)/gl.lst
+
+
+# Genius Leader 6000 - dom
+gl6000_clib.lib:
+	@echo ''
+	@echo '--- Building Genius Leader 6000 Library ---'
+	@echo ''
+	$(call buildgeneric,gl)
+	TARGET=gl TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl6000 -x$(OUTPUT_DIRECTORY)/gl6000_clib @$(LISTFILE_DIRECTORY)/gl6000.lst
 
 
 
