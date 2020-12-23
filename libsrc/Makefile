@@ -1264,6 +1264,7 @@ gl_clib.lib:
 	@echo '--- Building Genius Leader Library ---'
 	@echo ''
 	$(call buildgeneric,gl)
+	$(MAKE) -C games TARGET=gl
 	TARGET=gl TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl -x$(OUTPUT_DIRECTORY)/gl_clib @$(LISTFILE_DIRECTORY)/gl.lst
 
 
