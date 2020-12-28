@@ -444,6 +444,8 @@ enum asttype {
     AST_GLOBAL_VAR,
     AST_FUNC_CALL,
     AST_FUNCPTR_CALL,
+    AST_SWITCH,
+    AST_SWITCH_CASE,
 
     AST_IF,
     AST_TERNARY,
@@ -493,6 +495,7 @@ enum asttype {
     OP_LT,
     OP_LE,
 
+
     OP_COMP,
     OP_LNEG,
     OP_NEG,
@@ -530,12 +533,22 @@ struct node_s {
          };
          // Goto/labels
          struct {
-             int    label;
+             int          label;
              const char  *labelname;
          };
          struct {		// Initialising variable
              Node *declvar;
              array *declinit;
+         };
+         // Switch (also sets type)
+         struct {
+             Node  *sw_expr;    // What we switch on
+             array *sw_body;    // Contains all the code
+         };
+         // Switch case jumps
+         struct {
+             Node   *sw_value;
+             int     sw_label;
          };
          Node *retval;   // Return value
          array *stmts;          // Compound statements

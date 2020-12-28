@@ -53,7 +53,7 @@ static int incritical = 0;  /* Are we in a __critical block */
  */
 struct nodepair *statement()
 {
-    int st;
+    int st = 0;
     int locstatic; /* have we had the static keyword */
     struct nodepair *pair = calloc(1,sizeof(*pair));
     Node   *node;
@@ -516,7 +516,7 @@ Node *dofor()
         postlabel(wq.loop); /* .loop                              */
         clearbuffer(buf3); /*         modification               */
         gen_jp_label(l_condition); /*         goto loop                  */
-        postlabel(wq.exit; /* .exit                              */
+        postlabel(wq.exit) ; /* .exit                              */
     } else {
         clearbuffer(buf2); // Condition 
         buf4 = startbuffer(100);
@@ -561,6 +561,8 @@ Node *doswitch()
     SW_TAB *swnex, *swptr;
     Type   *switch_type;
     t_buffer* buf;
+    struct nodepair *pair, *sw_expr;
+    array *arr = array_init(NULL);
 
     swact = swactive;
     swdef = swdefault;
@@ -568,37 +570,50 @@ Node *doswitch()
     addwhile(&wq);
     (wqptr - 1)->loop = 0;
     needchar('(');
-    switch_type = doexpr()->type; /* evaluate switch expression */
+    sw_expr = doexpr(); /* evaluate switch expression */
+    switch_type = sw_expr->type;
     needchar(')');
     swdefault = 0;
     swactive = 1;
-    endlab = getlabel();
-    /* gen_jp_label(endlab) ; */
+
 
     buf = startbuffer(100);
-    statement(); /* cases, etc. */
+    pair = statement(); /* cases, etc. */
     /* gen_jp_label(wq.exit) ; */
     suspendbuffer();
 
-    postlabel(endlab);
     gen_switch_preamble(switch_type->kind);
+    array_add(arr,ast_switch(switch_type, sw_expr->node, pair->node));
+
+    // Switch needs:
+    // - switch expr
+    // - cases
+    // - default
+
     while (swptr < swnext ) {
         gen_switch_case(switch_type->kind, swptr->value, swptr->label);
+        array_add(arr, ast_switch_case(switch_type, ast_literal(switch_type, swptr->value), swptr->label));
         ++swptr;
     }
     gen_switch_postamble(switch_type->kind);
-    if (swdefault)
+    if (swdefault) {
+        array_add(arr, ast_jump(swdefault,NULL));
         gen_jp_label(swdefault);
-    else
+    } else {
+        array_add(arr, ast_jump(wq.exit,NULL));
         gen_jp_label(wq.exit);
+    }
 
     clearbuffer(buf);
 
+    array_add(arr, ast_label(wq.exit,NULL));
     postlabel(wq.exit);
     delwhile();
     swnext = swnex;
     swdefault = swdef;
     swactive = swact;
+
+    return ast_compound(arr);
 }
 
 /*
@@ -621,7 +636,7 @@ Node *docase()
     swnext->value = value;
     needchar(':');
     ++swnext;
-    return NULL;
+    return ast_label((swnext-1)->label, NULL);
 }
 
 Node *dodefault()
@@ -633,6 +648,7 @@ Node *dodefault()
         errorfmt("Not in switch", 0 );
     needchar(':');
     postlabel(swdefault = getlabel());
+    return ast_label(swdefault, NULL);
 }
 
 /*

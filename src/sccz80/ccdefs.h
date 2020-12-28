@@ -274,6 +274,8 @@ extern Node    *ast_label(int label, const char *slabel);
 extern Node    *ast_jump(int label, const char *slabel);
 extern Node    *ast_literal(Type *type, zdouble value);
 extern Node    *ast_critical(Node *node);
+extern Node    *ast_switch(Type *sw_type, Node *sw_Expr, Node *case_code);
+extern Node    *ast_switch_case(Type *sw_type, Node *sw_value, int label);
 extern void     print_ast(UT_string *output, Node *node);
 
 /* plunge.c */
