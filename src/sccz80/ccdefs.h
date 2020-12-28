@@ -93,6 +93,8 @@ extern void gen_switch_postamble(Kind kind);
 extern void gen_jp_label(int label);
 extern void gen_save_pointer(LVALUE *lval);
 
+extern int gen_restore_frame_after_call(int offset, Kind save, int saveaf, int usebc);
+
 extern void opjump(char *, int);
 extern void testjump(LVALUE *,int label);
 extern void zerojump(void (*oper)(LVALUE *,int), int label, LVALUE *lval);

@@ -40,11 +40,10 @@ extern char Filenorig[];
 
 #ifdef USEFRAME
 extern int CheckOffset(int);
-extern void FrameP(void);
 extern void PutFrame(char,int);
-extern void RestoreSP(char);
 extern void OutIndex(int);
 #endif
+
 
 static void swap(void);
 static void dpush_under(Kind val_type);
@@ -1459,6 +1458,19 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     if (type)
         setcond(type);
     ol("ret"); nl(); nl(); /* and exit function */
+}
+
+
+int gen_restore_frame_after_call(int offset, Kind save, int saveaf, int usebc)
+{
+    if ( c_framepointer_is_ix != -1 ) {
+        ot("ld\tsp,");
+        outstr(FRAME_REGISTER);
+        nl();
+        return Zsp + offset;
+    }
+
+    return modstk(Zsp + offset, save, saveaf, usebc);
 }
 
 /* Modify the stack pointer to the new value indicated 
@@ -4850,45 +4862,25 @@ void OutIndex(int val)
     outstr(")");
 }
 
-void RestoreSP(char saveaf)
-{
-    if (saveaf)
-         ol("ex\taf,af");
-    ot("ld\tsp,");
-    FrameP();
-    nl();
-    if (saveaf)
-         ol("ex\taf,af");
-}
 
-void setframe(void)
-{
-#ifdef USEFRAME
-    if (c_framepointer_is_ix == -1)
-        return;
-    ot("ld\t");
-    FrameP();
-    outstr(",0\n");
-    ot("add\t");
-    FrameP();
-    outstr(",sp\n");
-#endif
-}
 
 #endif
-
-void FrameP(void)
-{
-    outstr(c_framepointer_is_ix ? "ix" : "iy");
-}
 
 void gen_push_frame(void)
 {
     if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         if ( !IS_808x() && !IS_GBZ80() ) {
             ot("push\t");
-            FrameP();
+            outstr(FRAME_REGISTER);
             nl();
+            if ( c_framepointer_is_ix != -1) {
+                ot("ld\t");
+                outstr(FRAME_REGISTER);
+                outstr(",0\n");
+                ot("add\t");
+                outstr(FRAME_REGISTER);
+                outstr(",sp\n");
+            }
         } else {
             ol("push\taf");
         }
@@ -4900,7 +4892,7 @@ void gen_pop_frame(void)
     if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         if ( !IS_808x() && !IS_GBZ80() ) {
             ot("pop\t");
-            FrameP();
+            outstr(FRAME_REGISTER);
             nl();
         } else {
             ol("pop\taf");
