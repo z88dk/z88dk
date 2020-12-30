@@ -23,6 +23,8 @@ static int      saveline;    /* copy of lineno  "    " */
 static int      saveinfn;    /* copy of infunc  "    " */
 static int      filenum; /* next argument to be used */
 
+UT_string       *debug_utstr;
+
 static Type *type_double4 = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
 static Type *type_double8 = &(Type){ KIND_DOUBLE, 8, 0, .len=1 }; 
 
@@ -58,6 +60,7 @@ char *c_init_section = "code_crt_init";
 
 
 
+static void dumpdebug(void);
 static void dumpfns(void);
 static void dumpvars(void);
 static void parse(void);
@@ -266,17 +269,26 @@ int main(int argc, char** argv)
         WriteDefined("CPU_GBZ80", 1);
     }
 
+    utstring_new(debug_utstr );
+
     litlab = getlabel(); /* Get labels for function lits*/
     openout(); /* get the output file */
     openin(); /* and initial input file */
     gen_file_header(); /* intro code */
     parse(); /* process ALL input */
+
+
+
+
     /* dump literal queues, with label */
     /* litq starts from 1, so literp has to be -1 */
     dumplits(0, YES, litptr - 1, litlab, litq + 1);
     write_constant_queue();
     dumpvars();
     dumpfns();
+
+    dumpdebug();
+
     gen_file_footer(); /* follow-up code */
     closeout();
     errsummary(); /* summarize errors */
@@ -400,6 +412,18 @@ void info()
 }
 
 
+static void dumpdebug(void)
+{
+    const char *debug = utstring_body(debug_utstr);
+    const char *end = NULL;
+
+    gen_switch_section("__ADBDEBUG");
+    while ( ( end = strchr(debug,'\n')) != NULL ) {
+        defmesg();
+        outfmt("%.*s\\n\"\n", end - debug, debug);
+        debug = end+1;        
+    }
+}
 
 /*
  ***********************************************************************
@@ -439,6 +463,7 @@ static void dumpfns()
                 } else if ( storage != LSTATIC && storage != TYPDEF ) {
                     GlobalPrefix();                    
                     outname(ptr->name, dopref(ptr)); nl();
+                    debug_write_symbol(ptr);
                 }
             }
         }

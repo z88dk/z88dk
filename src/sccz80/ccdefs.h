@@ -49,6 +49,11 @@ typedef long double zdouble;
 
 extern void     callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
 
+
+/* cdbfile.c */
+extern void     debug_write_module();
+extern void     debug_write_symbol(SYMBOL *sym);
+
 #include "codegen.h"
 
 extern void gen_comment(const char *comment);
@@ -324,7 +329,7 @@ extern SYMBOL  *findstc(char *sname);
 extern SYMBOL  *findglb(const char *sname);
 extern SYMBOL  *findloc(char *sname);
 extern SYMBOL  *addglb(char *sname, Type *type, enum ident_type id, Kind kind, int value, enum storage_type storage);
-extern SYMBOL  *addloc(char *sname, enum ident_type id, Kind kind);
+extern SYMBOL  *addloc(char *sname, Type *type, enum ident_type id, Kind kind, int where);
 
 /* while.c */
 extern void     addwhile(WHILE_TAB *ptr);

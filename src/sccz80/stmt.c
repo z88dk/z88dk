@@ -88,6 +88,7 @@ int statement()
         st = -1;
         switch (ch()) {
         case '{':
+            ++scope_block;
             inbyte();
             compound();
             st = lastst;
