@@ -97,7 +97,9 @@ int primary(LVALUE* lval)
                 lval->indirect_kind = KIND_NONE;
                 lval->val_type = ptr->ctype->kind;
                 lval->flags = ptr->flags;
-                lval->ptr_type = KIND_NONE;
+                if ( ispointer(lval->ltype) ) {
+                    lval->ptr_type = ptr->ctype->ptr->kind;
+                }
                 if (lval->ltype->kind != KIND_ARRAY && lval->ltype->kind != KIND_STRUCT ) {
                     return (1);
                 }
