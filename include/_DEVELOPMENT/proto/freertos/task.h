@@ -151,7 +151,7 @@ typedef struct xTASK_STATUS
     eTaskState eCurrentState;                        /* The state in which the task existed when the structure was populated. */
     UBaseType_t uxCurrentPriority;                   /* The priority at which the task was running (may be inherited) when the structure was populated. */
     UBaseType_t uxBasePriority;                      /* The priority to which the task will return if the task's current priority has been inherited to avoid unbounded priority inversion when obtaining a mutex.  Only valid if configUSE_MUTEXES is defined as 1 in FreeRTOSConfig.h. */
-    TickType_t ulRunTimeCounter;                     /* The total run time allocated to the task so far, as defined by the run time stats clock.  See https://www.FreeRTOS.org/rtos-run-time-stats.html.  Only valid when configGENERATE_RUN_TIME_STATS is defined as 1 in FreeRTOSConfig.h. */
+    uint32_t ulRunTimeCounter;                       /* The total run time allocated to the task so far, as defined by the run time stats clock.  See https://www.FreeRTOS.org/rtos-run-time-stats.html.  Only valid when configGENERATE_RUN_TIME_STATS is defined as 1 in FreeRTOSConfig.h. */
     StackType_t * pxStackBase;                       /* Points to the lowest address of the task's stack area. */
     configSTACK_DEPTH_TYPE usStackHighWaterMark;     /* The minimum amount of stack space that has remained for the task since the task was created.  The closer this value is to zero the closer the task has come to overflowing its stack. */
 } TaskStatus_t;
@@ -1791,7 +1791,7 @@ __OPROTO(,,TaskHandle_t,,xTaskGetIdleTaskHandle,void)
  *  {
  *  TaskStatus_t *pxTaskStatusArray;
  *  volatile UBaseType_t uxArraySize, x;
- *  TickType_t ulTotalRunTime, ulStatsAsPercentage;
+ *  uint32_t ulTotalRunTime, ulStatsAsPercentage;
  *
  *      // Make sure the write buffer does not contain a string.
  * pcWriteBuffer = 0x00;
@@ -1848,9 +1848,9 @@ __OPROTO(,,TaskHandle_t,,xTaskGetIdleTaskHandle,void)
 /*
 UBaseType_t uxTaskGetSystemState( TaskStatus_t * const pxTaskStatusArray,
                                   const UBaseType_t uxArraySize,
-                                  TickType_t * const pulTotalRunTime ) PRIVILEGED_FUNCTION;
+                                  uint32_t * const pulTotalRunTime ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,UBaseType_t,,uxTaskGetSystemState,TaskStatus_t * const pxTaskStatusArray,const UBaseType_t uxArraySize,TickType_t * const pulTotalRunTime)
+__OPROTO(,,UBaseType_t,,uxTaskGetSystemState,TaskStatus_t * const pxTaskStatusArray,const UBaseType_t uxArraySize,uint32_t * const pulTotalRunTime)
 
 /**
  * task. h
@@ -1961,7 +1961,7 @@ __OPROTO(,,void,,vTaskGetRunTimeStats,char * pcWriteBuffer)
 
 /**
  * task. h
- * <PRE>TickType_t ulTaskGetIdleRunTimeCounter( void );</PRE>
+ * <PRE>uint32_t ulTaskGetIdleRunTimeCounter( void );</PRE>
  *
  * configGENERATE_RUN_TIME_STATS and configUSE_STATS_FORMATTING_FUNCTIONS
  * must both be defined as 1 for this function to be available.  The application
@@ -1988,9 +1988,9 @@ __OPROTO(,,void,,vTaskGetRunTimeStats,char * pcWriteBuffer)
  * \ingroup TaskUtils
  */
 /*
-TickType_t ulTaskGetIdleRunTimeCounter( void ) PRIVILEGED_FUNCTION;
+uint32_t ulTaskGetIdleRunTimeCounter( void ) PRIVILEGED_FUNCTION;
  */
-__OPROTO(,,TickType_t,,ulTaskGetIdleRunTimeCounter,void)
+__OPROTO(,,uint32_t,,ulTaskGetIdleRunTimeCounter,void)
 
 /**
  * task. h
