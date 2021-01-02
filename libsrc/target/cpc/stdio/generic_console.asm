@@ -126,13 +126,12 @@ generic_console_printc:
 	sub	128 - 32
 	ld	de,(generic_console_udg32)
 not_udg:
-	sub	32
 	ld	l,a
 	ld	h,0
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
-	ld	de,(generic_console_font32)
+	dec	h
 	add	hl,de
 	push	hl		;Save font
 	call	generic_console_calc_screen_address
