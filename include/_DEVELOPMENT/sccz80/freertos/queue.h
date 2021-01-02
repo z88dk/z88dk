@@ -1268,7 +1268,7 @@ extern void __LIB__ vQueueDelete(QueueHandle_t xQueue) __smallc;
  *  if( xHigherPriorityTaskWoken )
  *  {
  *      // Actual macro used here is port specific.
- *      portYIELD_FROM_ISR ();
+ *      portYIELD_FROM_ISR();
  *  }
  * }
  * </pre>
@@ -1659,7 +1659,7 @@ extern BaseType_t __LIB__ xQueueGiveMutexRecursive(QueueHandle_t xMutex) __small
 #endif
 
 /*
- * Generic version of the function used to creaet a queue using dynamic memory
+ * Generic version of the function used to create a queue using dynamic memory
  * allocation.  This is called by other functions and macros that create other
  * RTOS objects that use the queue structure as their base.
  */
@@ -1675,7 +1675,7 @@ extern BaseType_t __LIB__ xQueueGiveMutexRecursive(QueueHandle_t xMutex) __small
 #endif
 
 /*
- * Generic version of the function used to creaet a queue using dynamic memory
+ * Generic version of the function used to create a queue using dynamic memory
  * allocation.  This is called by other functions and macros that create other
  * RTOS objects that use the queue structure as their base.
  */
