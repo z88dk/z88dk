@@ -58,7 +58,7 @@ ansipalette:
         defb    26     ;WHITE -> WHITE
         defb    18     ;GREEN -> BRIGHT GREEN
         defb    10     ;CYAN -> CYAN
-        defb    7      ;RED -> BRIGHT RED
+        defb    6      ;RED -> BRIGHT RED
         defb    8      ;MAGENTA -> BRIGHT MAGENTA
         defb    3      ;BROWN -> RED
         defb    13     ;LIGHTGRAY -> WHITE
