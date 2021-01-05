@@ -8,9 +8,8 @@ target/ts2068/stdio/ansi/f_ansi_scrollup
 @target/zx/stdio/stdio.lst
 @stdio/ansicore.lst
 @stdio/stdio.lst
-target/ts2068/graphics_hr/zx_hardcopy
-@target/zx-common/timex_zxn_graphics.lst
 @target/ts2068/gfx2068hr.lst
+@target/zx-common/timex_zxn_graphics.lst
 target/shared/clock
 target/zx/games/obj/${TARGET}/joystick
 @games/games.lst
