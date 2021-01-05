@@ -215,9 +215,11 @@ IF FORosborne1
 ENDIF
 
 IF FORzx
+ IF !FORts2068
 	DEFINE gotgfx
 	defc maxx	= 256
 	defc maxy	= 192
+ ENDIF
 ENDIF
 
 IF FORcpc
