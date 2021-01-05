@@ -292,7 +292,7 @@ IF FORc128hr480
 	defc maxy	= 480
 ENDIF
 
-IF FORgfx2068hr
+IF FORts2068
 	DEFINE gotgfx
 	defc maxx       = 512
 	defc maxy       = 192
