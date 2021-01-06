@@ -2,7 +2,7 @@
 	SECTION	code_clib
 	PUBLIC	w_pixeladdress
 
-	EXTERN	pixeladdress_MODE0
+	EXTERN	w_pixeladdress_MODE0
 	EXTERN	pixeladdress_MODE6
 	EXTERN	__zx_screenmode
 
@@ -17,6 +17,6 @@
 w_pixeladdress:
         ld      a,(__zx_screenmode)
         cp      3
-        jp      c,pixeladdress_MODE0
+        jp      c,w_pixeladdress_MODE0
         jp      pixeladdress_MODE6
 
