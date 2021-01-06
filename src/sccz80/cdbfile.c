@@ -1,7 +1,7 @@
 #include "ccdefs.h"
 
 
-static void write_cdb_type(Type *type,int comma);
+static void write_cdb_type(UT_string *output, Type *type,int comma);
 
 
 void debug_write_module()
@@ -9,70 +9,96 @@ void debug_write_module()
     utstring_printf(debug_utstr,"M:%.*s\n",(int)strlen(Filename)-2,Filename+1);
 }
 
+
+static void encode_cdbstring(UT_string *dest, const char *toencode)
+{
+    char c;
+
+    while ( ( c = *toencode++) != 0 ) {
+        if ( isalpha(c)) {
+            utstring_printf(dest, "%c", c);
+        } else {
+            utstring_printf(dest, "_%02x",c);
+        }
+    }    
+}
+
+
 /* C = code, E = data, B = stack */
 
 // Write the cdb declaration
 void debug_write_symbol(SYMBOL *sym)
 {
+    UT_string *temp;
+
+    utstring_new(temp);
+
     if ( sym->storage == LSTATIC) {
         if ( sym->ctype->kind != KIND_FUNC ) {
-            utstring_printf(debug_utstr,"S:F%.*s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,sym->name,sym->level);
+            utstring_printf(temp,"S:F%.*s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,sym->name,sym->level);
         } else {
-            utstring_printf(debug_utstr,"F:F%.*s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,sym->name,sym->level);
+            utstring_printf(temp,"F:F%.*s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,sym->name,sym->level);
         }
-        utstring_printf(debug_utstr,"%d", sym->scope_block); // Scope block
-        utstring_printf(debug_utstr,"(");
-        utstring_printf(debug_utstr,"{%d}", sym->ctype->size);
-        write_cdb_type(sym->ctype, 0);
-        utstring_printf(debug_utstr,")");
+        utstring_printf(temp,"%d", sym->scope_block); // Scope block
+        utstring_printf(temp,"(");
+        utstring_printf(temp,"{%d}", sym->ctype->size);
+        write_cdb_type(temp, sym->ctype, 0);
+        utstring_printf(temp,")");
         if ( sym->ctype->kind != KIND_FUNC ) {
-            utstring_printf(debug_utstr,",E,0,0");
+            utstring_printf(temp,",E,0,0");
         } else {
-            utstring_printf(debug_utstr,",C,0,0");
+            utstring_printf(temp,",C,0,0");
         }
     } else if ( sym->storage == STATIK ) {
         if ( sym->ctype->kind != KIND_FUNC ) {
-            utstring_printf(debug_utstr,"S:G$%s$%d_0$",sym->name, sym->level);
+            utstring_printf(temp,"S:G$%s$%d_0$",sym->name, sym->level);
         } else {
-            utstring_printf(debug_utstr,"F:G$%s$%d_0$",sym->name, sym->level);
+            utstring_printf(temp,"F:G$%s$%d_0$",sym->name, sym->level);
         }
-        utstring_printf(debug_utstr,"%d", sym->scope_block); // Scope block
-        utstring_printf(debug_utstr,"(");
-        utstring_printf(debug_utstr,"{%d}", sym->ctype->size);
-        write_cdb_type(sym->ctype, 0);
-        utstring_printf(debug_utstr,")");
+        utstring_printf(temp,"%d", sym->scope_block); // Scope block
+        utstring_printf(temp,"(");
+        utstring_printf(temp,"{%d}", sym->ctype->size);
+        write_cdb_type(temp, sym->ctype, 0);
+        utstring_printf(temp,")");
         if ( sym->ctype->kind != KIND_FUNC ) {
-            utstring_printf(debug_utstr,",E,0,0");
+            utstring_printf(temp,",E,0,0");
         } else {
-            utstring_printf(debug_utstr,",C,0,0,0,0,0");
+            utstring_printf(temp,",C,0,0,0,0,0");
         }
     } else if ( sym->storage == STKLOC ) {
-        utstring_printf(debug_utstr,"S:L%.*s.%s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,currfn->name,sym->name,sym->level);
-        utstring_printf(debug_utstr,"%d", sym->scope_block); // Scope block
-        utstring_printf(debug_utstr,"(");
-        utstring_printf(debug_utstr,"{%d}", sym->ctype->size);
-        write_cdb_type(sym->ctype, 0);
-        utstring_printf(debug_utstr,")");
-        utstring_printf(debug_utstr,",B,1,%d",sym->offset.i);
+        utstring_printf(temp,"S:L%.*s.%s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,currfn->name,sym->name,sym->level);
+        utstring_printf(temp,"%d", sym->scope_block); // Scope block
+        utstring_printf(temp,"(");
+        utstring_printf(temp,"{%d}", sym->ctype->size);
+        write_cdb_type(temp, sym->ctype, 0);
+        utstring_printf(temp,")");
+        utstring_printf(temp,",B,1,%d",sym->offset.i);
     } else {
         return;
     }
+    // Encode the cdbstring and output it as a defc
+    utstring_printf(debug2_utstr,"\tdefc\t__CDBINFO__");
+    encode_cdbstring(debug2_utstr, utstring_body(temp));
+    utstring_printf(debug2_utstr," = 1\n");
+
+    utstring_concat(debug_utstr, temp);
+    utstring_free(temp);
     utstring_printf(debug_utstr,"\n");
 }
 
 void debug_write_type(Type *type)
 {
     int i;
-    printf("WRite type %d\n",type->kind);
+
     utstring_printf(debug_utstr,"T:F%.*s$%s",(int)strlen(Filename)-2,Filename+1,type->name);
-    write_cdb_type(type, 0);
+    write_cdb_type(debug_utstr, type, 0);
 
     if ( type->kind == KIND_STRUCT) {
         utstring_printf(debug_utstr,"[");
         for ( i = 0; i < array_len(type->fields); i++) {
             Type *f = array_get_byindex(type->fields, i);
             utstring_printf(debug_utstr,"({%d}S:S$%s$0_0$0(",(int)f->offset,f->name);
-            write_cdb_type(f,0);
+            write_cdb_type(debug_utstr, f,0);
             utstring_printf(debug_utstr,"),Z,0,0)");
         }
         utstring_printf(debug_utstr,"]");
@@ -82,15 +108,15 @@ void debug_write_type(Type *type)
     utstring_printf(debug_utstr,"\n");
 } 
 
-void write_cdb_type(Type *type,int comma)
+void write_cdb_type(UT_string *output, Type *type,int comma)
 {
     if ( type->ptr ) {
         if ( type->kind == KIND_ARRAY ) {
-            utstring_printf(debug_utstr,"%sDA%dd", comma ? "," : "",type->len);
+            utstring_printf(output,"%sDA%dd", comma ? "," : "",type->len);
         } else {
-            utstring_printf(debug_utstr,"%sDG", comma ? "," : "");
+            utstring_printf(output,"%sDG", comma ? "," : "");
         }
-        write_cdb_type(type->ptr, 1);
+        write_cdb_type(output, type->ptr, 1);
         return;
     }
 
@@ -98,33 +124,33 @@ void write_cdb_type(Type *type,int comma)
     case KIND_NONE:
         return;
     case KIND_VOID:
-        utstring_printf(debug_utstr,"%sDV",comma ? "," : "");
+        utstring_printf(output,"%sDV",comma ? "," : "");
         break;
     case KIND_CHAR:
-        utstring_printf(debug_utstr,"%sSC:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
+        utstring_printf(output,"%sSC:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
         break;
     case KIND_SHORT:
-        utstring_printf(debug_utstr,"%sSI:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
+        utstring_printf(output,"%sSI:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
         break;
     case KIND_INT:
-        utstring_printf(debug_utstr,"%sSI:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
+        utstring_printf(output,"%sSI:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
         break;
     case KIND_LONG:
-        utstring_printf(debug_utstr,"%sSL:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
+        utstring_printf(output,"%sSL:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
         break;
     case KIND_LONGLONG:
         // This is wrong, but so is sdcc
-        utstring_printf(debug_utstr,"%sSI:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
+        utstring_printf(output,"%sSI:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
         break;
     case KIND_FLOAT:
     case KIND_DOUBLE:    
-        utstring_printf(debug_utstr,"%sSF:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
+        utstring_printf(output,"%sSF:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
         break;
     case KIND_FLOAT16:
-        utstring_printf(debug_utstr,"%sS6:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
+        utstring_printf(output,"%sS6:%s", comma ? "," : "", type->isunsigned ? "U" : "S");
         break;
     case KIND_ARRAY:
-        utstring_printf(debug_utstr,"%sDA%d", comma ? "," : "", type->size);
+        utstring_printf(output,"%sDA%d", comma ? "," : "", type->size);
         break;
     case KIND_PTR:
         break;
@@ -132,11 +158,11 @@ void write_cdb_type(Type *type,int comma)
        // utstring_printf(output,"*__far ");
         break;
     case KIND_STRUCT:
-        utstring_printf(debug_utstr,"%sST_%s", comma ? "," : "", type->name);
+        utstring_printf(output,"%sST_%s", comma ? "," : "", type->name);
         break;
     case KIND_FUNC:
-        utstring_printf(debug_utstr,"%sDF", comma ? "," : "");
-        write_cdb_type(type->return_type, 1);
+        utstring_printf(output,"%sDF", comma ? "," : "");
+        write_cdb_type(output,type->return_type, 1);
         return;
     case KIND_ELLIPSES:
         return;
