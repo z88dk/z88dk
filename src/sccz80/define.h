@@ -389,7 +389,7 @@ struct lvalue_s {
         SYMBOL *symbol ;                /* symbol table address, or 0 for constant */
         Type   *ltype;
         Kind    indirect_kind;                  /* type of indirect object, 0 for static object */
-        int ptr_type ;                  /* type of pointer or array, 0 for other idents */
+        Kind ptr_type ;                  /* type of pointer or array, 0 for other idents */
         int is_const ;                  /* true if constant expression */
         zdouble const_val ;                        /* value of constant expression (& other uses) */
         void (*binop)(LVALUE *lval) ;                /* function address of highest/last binary operator */
