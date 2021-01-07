@@ -50,7 +50,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 .vertical
                 sla     e
                 rl      d
+		push	de
+		push	hl
+		push	bc
                 call    pointxy
+		pop	bc
+		pop	hl
+		pop	de
                 jr      z,jv
                 inc     de
 .jv
@@ -60,7 +66,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 .horizontal
                 sla     e
                 rl      d
+		push	de
+		push	hl
+		push	bc
                 call    pointxy
+		pop	bc
+		pop	hl
+		pop	de
                 jr      z,jh
                 inc     de
 .jh
