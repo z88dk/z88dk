@@ -53,6 +53,7 @@ extern void     callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
 /* cdbfile.c */
 extern void     debug_write_module();
 extern void     debug_write_symbol(SYMBOL *sym);
+extern void     debug_write_type(Type *type);
 
 #include "codegen.h"
 

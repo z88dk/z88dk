@@ -15,6 +15,8 @@ extern unsigned _stklen = 8192U; /* Default stack size 4096 bytes is too small. 
 
 static char   *c_output_extension = "asm";
 static char   *c_output_file = NULL;
+static char    c_debug_adb_file = 0;
+static char    c_debug_adb_defc = 0;
 
 static int      gargc; /* global copies of command line args */
 static char   **gargv;
@@ -134,6 +136,8 @@ static option  sccz80_opts[] = {
 #endif
     { 0, "W", OPT_FUNCTION, "<type> Enable a class of warnings", NULL,  SetWarning, 0 },
     { 0, "", OPT_HEADER, "Debugging options", NULL, NULL, 0 },
+    { 0, "debugadbs", OPT_BOOL, "Create adb/cdb debug section", &c_debug_adb_file, NULL, 0 },
+    { 0, "debugadbd", OPT_BOOL, "Create adb/cdb debug defc", &c_debug_adb_defc, NULL, 0 },
     { 0, "cc", OPT_BOOL, "Intersperse the assembler output with the source C code", &c_intermix_ccode, NULL, 0 },
     { 0, "debug", OPT_INT, "=<val> Enable some extra logging", &debuglevel, NULL, 0 },
     { 0, "ext", OPT_STRING, "=<ext> Set the file extension for the generated output", &c_output_extension, NULL, 0 },
@@ -290,8 +294,12 @@ int main(int argc, char** argv)
     dumpvars();
     dumpfns();
 
-    dumpsymdebug();
-    dumpdebug();
+    if ( c_debug_adb_defc ) {
+        dumpsymdebug();
+    }
+    if ( c_debug_adb_file ) {
+        dumpdebug();
+    }
 
     gen_file_footer(); /* follow-up code */
     closeout();
