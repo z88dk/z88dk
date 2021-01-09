@@ -76,7 +76,9 @@ void read_symbol_file(char *filename)
                 free(argv);
                 continue;
             }
-            if ( strncmp(argv[0], "__C_LINE_",9) ) {
+            if ( strncmp(argv[0],"__CDBINFO__",11) == 0 ) {
+                debug_add_info_encoded(argv[0] + 11);
+            } else if ( strncmp(argv[0], "__C_LINE_",9) ) {
                 symbol *sym = calloc(1,sizeof(*sym));
 
                 sym->name = strdup(argv[0]);

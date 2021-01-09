@@ -77,6 +77,9 @@ void debug_write_symbol(SYMBOL *sym)
         return;
     }
     // Encode the cdbstring and output it as a defc
+    utstring_printf(debug2_utstr,"\tPUBLIC\t__CDBINFO__");
+    encode_cdbstring(debug2_utstr, utstring_body(temp));
+    utstring_printf(debug2_utstr,"\n");
     utstring_printf(debug2_utstr,"\tdefc\t__CDBINFO__");
     encode_cdbstring(debug2_utstr, utstring_body(temp));
     utstring_printf(debug2_utstr," = 1\n");
