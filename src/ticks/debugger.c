@@ -472,12 +472,7 @@ static int cmd_watch(int argc, char **argv)
             } 
             i++;
         }
-    } else if ( argc == 2 && strcmp(argv[1],"--help") == 0 ) {
-        printf("watch delete [index]              - Delete breakpoint\n");
-        printf("watch disable [index]             - Disable breakpoint\n");
-        printf("watch enable [index]              - Enabled breakpoint\n");
-        printf("watch read [address]              - Break when [address] is read\n");
-        printf("watch write [address]             - Break when [address] is written\n");
+
     } else if ( argc == 3 && (strcmp(argv[1],"read") == 0 || (breakwrite=1,strcmp(argv[1],"write") == 0)) ) {
         char *end;
         const char *sym;
@@ -562,14 +557,6 @@ static int cmd_break(int argc, char **argv)
             } 
             i++;
         }
-    } else if ( argc == 2 && strcmp(argv[1],"--help") == 0 ) {
-        printf("break [address/label]             - Break at address\n");
-        printf("break delete [index]              - Delete breakpoint\n");
-        printf("break disable [index]             - Disable breakpoint\n");
-        printf("break enable [index]              - Enabled breakpoint\n");
-        printf("break memory8 [address] [value]   - Break when [address/label] is value\n");
-        printf("break memory16 [address] [value]  - Break when [address/label] is value\n");
-        printf("break register [register] [value] - Break when [register] is value\n");
     } else if ( argc == 2 ) {
         char *end;
         const char *sym;
@@ -841,14 +828,31 @@ static int cmd_help(int argc, char **argv)
 {
     command *cmd = &commands[0];
 
-    while ( cmd->cmd != NULL ) {
-        if (interact_with_tty)
-            printf(FNT_CLR"%-7s\t%-20s"FNT_RST"\t%s\n",cmd->cmd, cmd->options, cmd->help);
-        else // Original output for non-active tty
-            printf("%-10s\t%-20s\t%s\n",cmd->cmd, cmd->options, cmd->help);
 
-         cmd++;
-     }
+    if ( argc == 1 ) {
+        while ( cmd->cmd != NULL ) {
+            if (interact_with_tty)
+                printf(FNT_CLR"%-7s\t%-20s"FNT_RST"\t%s\n",cmd->cmd, cmd->options, cmd->help);
+            else // Original output for non-active tty
+                printf("%-10s\t%-20s\t%s\n",cmd->cmd, cmd->options, cmd->help);
+
+             cmd++;
+         }
+    } else if ( strcmp(argv[1],"break") == 0 ) {
+        printf("break [address/label]             - Break at address\n");
+        printf("break delete [index]              - Delete breakpoint\n");
+        printf("break disable [index]             - Disable breakpoint\n");
+        printf("break enable [index]              - Enabled breakpoint\n");
+        printf("break memory8 [address] [value]   - Break when [address/label] is value\n");
+        printf("break memory16 [address] [value]  - Break when [address/label] is value\n");
+        printf("break register [register] [value] - Break when [register] is value\n");
+    } else if ( strcmp(argv[1],"watch") == 0 ) {
+        printf("watch delete [index]              - Delete breakpoint\n");
+        printf("watch disable [index]             - Disable breakpoint\n");
+        printf("watch enable [index]              - Enabled breakpoint\n");
+        printf("watch read [address]              - Break when [address] is read\n");
+        printf("watch write [address]             - Break when [address] is written\n");
+    }
      return 0;
 }
 
