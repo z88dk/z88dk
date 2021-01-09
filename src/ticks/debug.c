@@ -3,6 +3,8 @@
 
 
 #include "ticks.h"
+#include <ctype.h>
+#include <stdio.h>
 
 // F:G$main$0_0$0({2}DF,SI:S),C,0,0,0,0,0
 typedef struct {

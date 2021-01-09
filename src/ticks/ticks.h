@@ -130,6 +130,8 @@ extern void      hook_rc2014(void);
 extern void      hook_console_init(hook_command *cmds);
 extern void      debugger_init();
 extern void      debugger();
+extern void      debugger_write_memory(int addr, uint8_t val);
+extern void      debugger_read_memory(int addr);
 extern int       disassemble2(int pc, char *buf, size_t buflen, int compact);
 extern void      read_symbol_file(char *filename);
 extern const char     *find_symbol(int addr, symboltype preferred_symtype);
