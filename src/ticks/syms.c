@@ -8,9 +8,6 @@ static symbol  *symbols[65536] = {0};
 static symbol  *symbols_byname = NULL;
 
 
-static cfile   *cfiles = NULL;
-
-static cline    *clines[65536] = {0};
 
 static void demangle_filename(const char *input, char *buf, size_t buflen, int *lineno)
 {
@@ -34,38 +31,7 @@ static int symbol_compare(const void *p1, const void *p2)
     return s2->address - s1->address;
 }
 
-static void add_cline(const char *filename, int lineno, const char *address)
-{                  
-    cfile *cf;
-    cline *cl;
-    HASH_FIND_STR(cfiles, filename, cf);
-    if ( cf == NULL ) {
-        cf = calloc(1,sizeof(*cf));
-        cf->file = strdup(filename);
-        cf->lines = NULL;
-        HASH_ADD_KEYPTR(hh, cfiles, cf->file, strlen(cf->file), cf);
-    }
 
-    cl = calloc(1,sizeof(*cl));
-    cl->line = lineno;
-    cl->file = cf;
-    cl->address = strtol(address + 1, NULL, 16);
-    HASH_ADD_INT(cf->lines, line, cl);
-    printf("Cline at %04x\n",cl->address);
-    clines[cl->address] = cl;  // TODO Banking
-}
-
-int symbols_find_source_file(int address, const char **filename, int *lineno)
-{
-    while ( clines[address] == NULL && address > 0 ) {
-        address--;
-    }
-    if ( clines[address] == NULL) return -1;
-    *filename = clines[address]->file->file;
-    *lineno = clines[address]->line;
-
-    return 0;
-}
 
 
 void read_symbol_file(char *filename)
@@ -122,11 +88,11 @@ void read_symbol_file(char *filename)
                 char  *ptr;
 
                 demangle_filename(argv[9], filename, sizeof(filename),&lineno);
-                add_cline(filename, lineno, argv[2]);
+                debug_add_cline(filename, lineno, argv[2]);
 
                 if ( ( ptr = strchr(filename,':')) != NULL ) {
                     *ptr = 0;
-                    add_cline(filename, lineno, argv[2]);
+                    debug_add_cline(filename, lineno, argv[2]);
                 }
 
             }
@@ -155,28 +121,10 @@ int symbol_resolve(char *name)
     }
 
     /* Check for it being a file */
-    if ( ( ptr = strrchr(name, ':') ) != NULL ) {
-        char filename[FILENAME_MAX+1];
-        int  line;
-        cfile *cf;
-
-        snprintf(filename, sizeof(filename),"%.*s", (int)(ptr - name), name);
-        line = atoi(ptr+1);
-
-        HASH_FIND_STR(cfiles, filename, cf);
-
-        if ( cf != NULL ) {
-            cline *cl;
-
-            HASH_FIND_INT(cf->lines, &line, cl);
-
-            if ( cl != NULL ) {
-                return cl->address;
-            }
-        }
-    }
-    return -1;
+    return debug_resolve_source(name);
 }
+    
+
 
 // Find a symbol lower than where we were
 int symbol_find_lower(int addr, symboltype preferred_type, char *buf, size_t buflen)

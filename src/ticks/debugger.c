@@ -876,7 +876,7 @@ static int cmd_list(int argc, char **argv)
     const char *filename;
     int   lineno;
 
-    if ( symbols_find_source_file(addr, &filename, &lineno) < 0 ) {
+    if ( debug_find_source_location(addr, &filename, &lineno) < 0 ) {
         printf("No mapping found for $%04x\n",pc);
     } else {
         srcfile_display(filename, lineno - 5, 10, lineno);
