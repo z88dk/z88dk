@@ -30,6 +30,9 @@
     <ClCompile Include="..\..\src\copt\regex\regfree.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\common\option.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\zcc\zcc.h">
