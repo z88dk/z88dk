@@ -136,10 +136,10 @@ static option  sccz80_opts[] = {
 #endif
     { 0, "W", OPT_FUNCTION, "<type> Enable a class of warnings", NULL,  SetWarning, 0 },
     { 0, "", OPT_HEADER, "Debugging options", NULL, NULL, 0 },
-    { 0, "debugadbs", OPT_BOOL, "Create adb/cdb debug section", &c_debug_adb_file, NULL, 0 },
-    { 0, "debugadbd", OPT_BOOL, "Create adb/cdb debug defc", &c_debug_adb_defc, NULL, 0 },
+    { 0, "debug-sect", OPT_BOOL, "Create adb/cdb debug section", &c_debug_adb_file, NULL, 0 },
+    { 0, "debug-defc", OPT_BOOL, "Create adb/cdb debug defc", &c_debug_adb_defc, NULL, 0 },
     { 0, "cc", OPT_BOOL, "Intersperse the assembler output with the source C code", &c_intermix_ccode, NULL, 0 },
-    { 0, "debug", OPT_INT, "=<val> Enable some extra logging", &debuglevel, NULL, 0 },
+    { 0, "intlog", OPT_INT, "=<val> Enable some extra logging", &debuglevel, NULL, 0 },
     { 0, "ext", OPT_STRING, "=<ext> Set the file extension for the generated output", &c_output_extension, NULL, 0 },
     { 0, "D", OPT_FUNCTION, "Define a preprocessor directive", NULL, SetDefine, 0 },
     { 0, "U", OPT_FUNCTION, "Undefine a preprocessor directive", NULL, SetUndefine, 0 },
@@ -262,6 +262,13 @@ int main(int argc, char** argv)
         c_fp_exponent_bias = 0;
         c_fp_mantissa_bytes = 3;
         c_fp_size = 4;
+    }
+
+    if ( c_debug_adb_file || c_debug_adb_defc ) {
+        // Turn on the framepointer entry so we can get local variables
+        if ( !IS_808x() && !IS_GBZ80() && c_framepointer_is_ix == -1 ) {
+            c_framepointer_is_ix = 1;
+        }
     }
 
 
