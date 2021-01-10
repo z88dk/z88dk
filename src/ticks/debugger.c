@@ -106,6 +106,7 @@ static int cmd_set(int argc, char **argv);
 static int cmd_out(int argc, char **argv);
 static int cmd_trace(int argc, char **argv);
 static int cmd_hotspot(int argc, char **argv);
+static int cmd_list(int argc, char **argv);
 static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
 static void print_hotspots();
@@ -125,6 +126,7 @@ static command commands[] = {
     { "out",    cmd_out,           "<address> <value>", "Send to IO bus"},
     { "trace",  cmd_trace,         "<on/off>", "Disassemble every instruction"},
     { "hotspot",cmd_hotspot,       "<on/off>", "Track address counts and write to hotspots file"},
+    { "list",   cmd_list,          "<address>",   "List the source code at the given address"},
     { "help",   cmd_help,          "",   "Display this help text" },
     { "quit",   cmd_quit,          "",   "Quit ticks"},
     { NULL, NULL, NULL }
@@ -277,10 +279,11 @@ void debugger()
 
     /* In the debugger, loop continuously for commands */
 
+    symbol_find_lower(pc,SYM_ADDRESS,buf,sizeof(buf));
     if (interact_with_tty)
-        snprintf(prompt,sizeof(prompt), "\n" FNT_BCK "    $%04x    >" FNT_RST " ", pc);     // TODO: Symbol address
+        snprintf(prompt,sizeof(prompt), "\n" FNT_BCK "    $%04x    (%s)>" FNT_RST " ", pc, buf);
     else                                                                                // Original output for non-active tty
-        snprintf(prompt,sizeof(prompt), " %04x >", pc);                                 // TODO: Symbol address
+        snprintf(prompt,sizeof(prompt), " %04x (%s)>", pc, buf);
 
     while ( (line = linenoise(prompt) ) != NULL ) {
         int argc;
@@ -328,6 +331,8 @@ static int cmd_next(int argc, char **argv)
 
     // Set a breakpoint after the call
     switch ( opcode ) {
+    case 0xed: // ED prefix
+    case 0xcb: // CB prefix
     case 0xc4:
     case 0xcc:
     case 0xcd:
@@ -863,6 +868,22 @@ static int cmd_quit(int argc, char **argv)
     exit(0);
 }
 
+
+
+static int cmd_list(int argc, char **argv)
+{
+    int addr = pc;
+    const char *filename;
+    int   lineno;
+
+    if ( symbols_find_source_file(addr, &filename, &lineno) < 0 ) {
+        printf("No mapping found for $%04x\n",pc);
+    } else {
+        srcfile_display(filename, lineno - 5, 10, lineno);
+    }
+
+    return 0;
+}
 
 
 static void print_hotspots()

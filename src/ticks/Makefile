@@ -8,7 +8,7 @@ endif
 
 include ../Make.common
 
-OBJS = ticks.o hook_cpm.o hook_console.o hook_io.o hook_misc.o hook.o debugger.o linenoise.o utf8.o syms.o disassembler_alg.o memory.o am9511.o acia.o hook_rc2014.o debug.o $(UNIXem_OBJS)
+OBJS = ticks.o hook_cpm.o hook_console.o hook_io.o hook_misc.o hook.o debugger.o linenoise.o utf8.o syms.o disassembler_alg.o memory.o am9511.o acia.o hook_rc2014.o debug.o srcfile.o $(UNIXem_OBJS)
 
 
 DISOBJS = disassembler_main.o  syms.o disassembler_alg.o debug.o

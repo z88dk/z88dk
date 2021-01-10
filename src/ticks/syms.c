@@ -10,6 +10,8 @@ static symbol  *symbols_byname = NULL;
 
 static cfile   *cfiles = NULL;
 
+static cline    *clines[65536] = {0};
+
 static void demangle_filename(const char *input, char *buf, size_t buflen, int *lineno)
 {
     char *start = buf;
@@ -46,9 +48,25 @@ static void add_cline(const char *filename, int lineno, const char *address)
 
     cl = calloc(1,sizeof(*cl));
     cl->line = lineno;
+    cl->file = cf;
     cl->address = strtol(address + 1, NULL, 16);
     HASH_ADD_INT(cf->lines, line, cl);
+    printf("Cline at %04x\n",cl->address);
+    clines[cl->address] = cl;  // TODO Banking
 }
+
+int symbols_find_source_file(int address, const char **filename, int *lineno)
+{
+    while ( clines[address] == NULL && address > 0 ) {
+        address--;
+    }
+    if ( clines[address] == NULL) return -1;
+    *filename = clines[address]->file->file;
+    *lineno = clines[address]->line;
+
+    return 0;
+}
+
 
 void read_symbol_file(char *filename)
 {
@@ -78,7 +96,7 @@ void read_symbol_file(char *filename)
             }
             if ( strncmp(argv[0],"__CDBINFO__",11) == 0 ) {
                 debug_add_info_encoded(argv[0] + 11);
-            } else if ( strncmp(argv[0], "__C_LINE_",9) ) {
+            } else if ( strncmp(argv[0], "__C_LINE_",9) && strncmp(argv[0], "__ASM_LINE_",11) ) {
                 symbol *sym = calloc(1,sizeof(*sym));
 
                 sym->name = strdup(argv[0]);
@@ -98,7 +116,7 @@ void read_symbol_file(char *filename)
                 }
                 HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
             } else if ( argc > 9 ) {
-                /* It's a cline symbol */
+                /* It's a cline/asmline symbol */
                 char   filename[FILENAME_MAX+1];
                 int    lineno;
                 char  *ptr;
@@ -158,6 +176,40 @@ int symbol_resolve(char *name)
         }
     }
     return -1;
+}
+
+// Find a symbol lower than where we were
+int symbol_find_lower(int addr, symboltype preferred_type, char *buf, size_t buflen)
+{
+    symbol *sym;
+    int     original_address = addr;
+
+    buf[0] = 0;
+
+    if ( addr < 0 ) {
+        return -1;
+    }
+    
+    while ( (sym = symbols[addr % 65536]) == NULL && addr > 0 ) {
+        addr--;
+    }
+
+    while ( sym != NULL ) {
+        if ( preferred_type == SYM_ANY ) {
+            break;
+        }
+        if ( preferred_type == sym->symtype ) {
+            break;
+        }
+        sym = sym->next;
+    }
+
+    if ( sym != NULL ) {
+        snprintf(buf,buflen,"%s+%d", sym->name, original_address-addr);
+        return 0;
+    }
+    return -1;
+
 }
 
 const char *find_symbol(int addr, symboltype preferred_type)

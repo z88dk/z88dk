@@ -37,7 +37,6 @@ char Filenorig[FILENAME_LEN + 1];
 int c_notaltreg; /* No alternate registers */
 int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
 int c_disable_builtins = 0;
-int c_line_labels = 0;
 int c_cline_directive = 0;
 int c_cpu = CPU_Z80;
 int c_old_diagnostic_fmt = 0;
@@ -265,6 +264,7 @@ int main(int argc, char** argv)
     }
 
     if ( c_debug_adb_file || c_debug_adb_defc ) {
+        c_cline_directive = 1;
         // Turn on the framepointer entry so we can get local variables
         if ( !IS_808x() && !IS_GBZ80() && c_framepointer_is_ix == -1 ) {
             c_framepointer_is_ix = 1;

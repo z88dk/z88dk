@@ -31,18 +31,20 @@ struct symbol_s {
     UT_hash_handle hh;
 };
 
+typedef struct cfile_s cfile;
 
 typedef struct {
     int             line;
     int             address;
-    UT_hash_handle hh;
+    cfile          *file;
+    UT_hash_handle  hh;
 } cline;
 
-typedef struct {
+struct cfile_s {
     char          *file;
     cline         *lines;
     UT_hash_handle hh;
-} cfile;
+};
 
 extern unsigned char a,b,c,d,e,h,l;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_;
@@ -137,7 +139,9 @@ extern void      read_symbol_file(char *filename);
 extern const char     *find_symbol(int addr, symboltype preferred_symtype);
 extern symbol   *find_symbol_byname(const char *name);
 extern int symbol_resolve(char *name);
+extern int symbols_find_source_file(int address, const char **filename, int *lineno);
 extern char **parse_words(char *line, int *argc);
+extern int symbol_find_lower(int addr, symboltype preferred_type, char *buf, size_t buflen);
 
 extern void memory_init(char *model);
 extern void memory_handle_paging(int port, int value);
@@ -167,6 +171,13 @@ extern void apu_write_command(uint8_t cmd);
 
 extern int hook_console_out(int port, int value);
 extern int hook_console_in(int port);
+
+// srcfile
+extern void srcfile_display(const char *filename, int start_line, int count, int highlight);
+
+
+// debug
+extern void debug_add_info_encoded(char *encoded);
 
 #ifndef WIN32
 extern int kbhit();
