@@ -468,7 +468,7 @@ static option options[] = {
     { 0, "", OPT_HEADER, "Compiler (all) options:", NULL, NULL, 0 },
     { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc)" , &c_compiler_type, NULL, 0},
     { 0, "c-code-in-asm", OPT_BOOL|OPT_DOUBLE_DASH,  "Add C code to .asm files" , &c_code_in_asm, NULL, 0},
-    { 'g', NULL, OPT_BOOL, "Enable debugging support", &c_generate_debug_info, NULL, 0 },
+    { 0, "debug", OPT_BOOL, "Enable debugging support", &c_generate_debug_info, NULL, 0 },
     { 0, "", OPT_HEADER, "Compiler (sccz80) options:", NULL, NULL, 0 },
     { 0, "Cc", OPT_FUNCTION,  "Add an option to sccz80" , &sccz80arg, AddToArgs, 0},
     { 0, "set-r2l-by-default", OPT_BOOL,  "(sccz80) Use r2l calling convention by default", &c_sccz80_r2l_calling, NULL, 0},
@@ -1531,6 +1531,10 @@ int main(int argc, char **argv)
         if (lston && copy_file(c_crt0, ".lis", filenamebuf, ".lis")) {
             fprintf(stderr, "Cannot copy crt0 list file\n");
             status = 1;
+        }
+
+        if (c_generate_debug_info && copy_file(c_crt0, ".adb", filenamebuf, ".adb")) {
+            // Ignore error
         }
 
         if (createapp) {
@@ -2822,6 +2826,7 @@ void remove_temporary_files(void)
             remove_file_with_extension(temporary_filenames[j], ".opt");
             remove_file_with_extension(temporary_filenames[j], ".o");
             remove_file_with_extension(temporary_filenames[j], ".map");
+            remove_file_with_extension(temporary_filenames[j], ".adb");
             remove_file_with_extension(temporary_filenames[j], ".sym");
             remove_file_with_extension(temporary_filenames[j], ".def");
             remove_file_with_extension(temporary_filenames[j], ".tmp");
