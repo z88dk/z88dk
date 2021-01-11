@@ -93,8 +93,9 @@ void main()
 {
 int i;
 
+	//fputc_cons(12);		// this command initializes the screen colours, add for a different look-and-feel
 	outp(0xD018,0x8C);		// Set character generator ptr to 14336
-
+	
 	/* Load user defined graphics (reversed) onto character set */	
 	for (i=0; i<128; i++)
 		udg[i+8]=sprites[i]^0xff;
