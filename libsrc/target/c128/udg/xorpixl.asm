@@ -76,7 +76,6 @@
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 			ld	a,(hl)		; get current symbol from screen
-			sub offsetch
 			ld	e,a		; ..and its copy
 			
 			ex	(sp),hl		; save char address <=> restore x,y  (y=h, x=l)
@@ -106,7 +105,6 @@
 			add	a,a		; move down the bit
 .evenrow
 			xor	e
-			add offsetch
 
 			pop	hl
 			ld	(hl),a
