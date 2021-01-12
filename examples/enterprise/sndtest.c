@@ -72,7 +72,7 @@ void main()
 		}
 	}
 
-	while (getk()!=13) {};
+	while (getk()!=10) {};
 
 	// BEL (CTRL-G)
 	//exos_write_character(DEFAULT_SOUND, 7);

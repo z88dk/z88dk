@@ -78,7 +78,7 @@ l110:	     k++;
 	  }
 	}
 
-	while (getk()!=13);
+	while (getk()!=10);
 
 }
 
