@@ -2,7 +2,7 @@
  *  D E A T H   S T A R  -  Commodore 128 text version
  * 
  * How to build:
- * zcc +c128 -create-app -zorg=20000 -DSOUND dstar.c
+ * zcc +c128 -create-app -zorg=20000 -DSOUND -DCOLOR dstar.c
  * 
  * 
  * 
@@ -93,9 +93,9 @@ void main()
 {
 int i;
 
-	//fputc_cons(12);		// this command initializes the screen colours, add for a different look-and-feel
+	//fputc_cons(12);			// this command initializes the screen colours, add for a different look-and-feel
 	outp(0xD018,0x8C);		// Set character generator ptr to 14336
-	
+
 	/* Load user defined graphics (reversed) onto character set */	
 	for (i=0; i<128; i++)
 		udg[i+8]=sprites[i]^0xff;
@@ -331,5 +331,20 @@ void putpic(int x, int y, int picture) {
 		display[164+y*80+40+x*2]=1+4*picture-3;				
 		display[164+y*80+40+x*2+1]=1+4*picture-1;
 	}
+
+#if defined(COLOR)
+	if (y>8) {
+		display_attr[164+y*80+x*2]=208;
+		display_attr[164+y*80+x*2+1]=208;
+		display_attr[164+y*80+40+x*2]=208;
+		display_attr[164+y*80+40+x*2+1]=208;
+	} else {
+		display_attr[164+y*80+x*2]=color[picture];
+		display_attr[164+y*80+x*2+1]=color[picture];
+		display_attr[164+y*80+40+x*2]=color[picture];
+		display_attr[164+y*80+40+x*2+1]=color[picture];
+	}
+#endif
+
 }
 
