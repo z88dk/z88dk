@@ -33,7 +33,7 @@ TOCREATE += $(call check_target,aussie,aussie.lib $(CPMLIBS))
 TOCREATE += $(call check_target,bee,bee_clib.lib microbee.lib $(CPMLIBS))
 TOCREATE += $(call check_target,bic,bic.lib $(CPMLIBS))
 TOCREATE += $(call check_target,bit90,bit90.lib coleco_clib.lib)
-TOCREATE += $(call check_target,c128,c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib)
+TOCREATE += $(call check_target,c128,c128ansi_clib.lib gfx128.lib gfx128udg.lib gfx128hr.lib gfx128hr480.lib)
 TOCREATE += $(call check_target,c7420,c7420_clib.lib)
 TOCREATE += $(call check_target,coleco,coleco_clib.lib)
 TOCREATE += $(call check_target,cpc,cpc_clib.lib cpcfs.lib cpc_math.lib)
@@ -1348,7 +1348,7 @@ c128ansi_clib.lib:
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/target/c128/c128_cpm.lst
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
 
-# C128 Base text mode graphics lib - Stefano
+# C128 Base LO-REZ text mode graphics lib - Stefano
 gfx128.lib:
 	@echo ''
 	@echo '--- Building Commodore 128 Base Graphics Library ---'
@@ -1357,6 +1357,17 @@ gfx128.lib:
 	$(MAKE) -C target/c128
 	$(MAKE) -C gfx TARGET=c128 FLAVOUR="text narrow"
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/gfx128 @$(LISTFILE_DIRECTORY)/target/c128/gfx128.lst
+
+# C128 LO-REZ UDG mode graphics lib - Stefano
+gfx128udg.lib:
+	@echo ''
+	@echo '--- Building Commodore 128 UDG Based Graphics Library ---'
+	@echo ''
+	$(RM) target/c128/graphics/*.o
+	$(RM) target/c128/graphics/udg/*.o
+	$(MAKE) -C target/c128
+	$(MAKE) -C gfx TARGET=c128 FLAVOUR="narrow text6"
+	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128udg -x$(OUTPUT_DIRECTORY)/gfx128udg @$(LISTFILE_DIRECTORY)/target/c128/gfx128udg.lst
 
 # C128 HRG graphics lib - Stefano
 gfx128hr.lib:
