@@ -45,6 +45,20 @@ extern unsigned char sprites[];
 extern unsigned char display[] @0x2000;
 extern unsigned char udg[] @12288;
 
+/*
+0 : Black	1 : White		2 :Red
+3 : Cyan	4 : Violet		5 : Light green
+6 : Blue	7 : Yellow		8 : Light red
+9 : Brown	A : Light red	B : Grey 1
+C : Grey 2	D : Light green	E : Light blue
+F : Grey 3
+*/
+
+#ifdef COLOR
+	extern unsigned char display_attr[] @0x1000;
+	char color[]={0xF1,0x9F,0x61,0x61,0xF1};
+#endif
+
 
 #asm
 
