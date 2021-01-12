@@ -80,7 +80,6 @@
 ;--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
 			ld	a,(hl)		; get current symbol from screen
-			sub offsetch
 			ld	e,a		; ..and its copy
 			
 			pop	hl		;  restore x,y  (y=h, x=l)
