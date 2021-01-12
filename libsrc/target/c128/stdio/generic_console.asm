@@ -8,7 +8,6 @@
 		PUBLIC		generic_console_vpeek
 		PUBLIC		generic_console_scrollup
 		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_ioctl
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_attribute
@@ -20,12 +19,7 @@
 		defc		DISPLAY = $2000
 		defc		COLOUR_MAP = $1000
 
-		INCLUDE		"ioctl.def"
-		PUBLIC          CLIB_GENCON_CAPS
-		defc            CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR 
 
-generic_console_ioctl:
-	scf
 generic_console_set_attribute:
 	ret
 
@@ -116,4 +110,20 @@ generic_console_scrollup_4:
 	pop	bc
 	pop	de
 	ret
+
+
+	SECTION	code_crt_init
+	EXTERN	CRT_FONT
+
+	ld	hl,CRT_FONT
+	ld	a,h
+	or	l
+	jr	z,no_set_font
+	ld	a,$8c	;Character generator to $3000
+	ld	bc,$d018
+	out	(c),a
+	ld	de,$3100
+	ld	bc,768
+	ldir
+no_set_font:
 
