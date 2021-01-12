@@ -383,6 +383,13 @@ IF FORc128
 	defc blankch	= 32
 ENDIF
 
+IF FORc128udg
+	DEFINE gotgfx
+	defc maxx	= 80
+	defc maxy	= 75
+	defc blankch	= 0
+ENDIF
+
 IF FORfp1100
 	DEFINE gotgfx
 	defc maxx	= 640
