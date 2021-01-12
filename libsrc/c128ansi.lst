@@ -1,5 +1,7 @@
 target/c128/stdio/fgetc_cons
 target/c128/stdio/getk
+target/c128/stdio/generic_console
+target/c128/stdio/conio_vars
 @stdio/ansicore.lst
 target/c128/stdio/ansi/f_ansi_attr
 target/c128/stdio/ansi/f_ansi_bel
