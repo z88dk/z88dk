@@ -14,6 +14,7 @@
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
+		EXTERN		conio_map_colour
 		EXTERN		__c128_attr
 
 		defc		DISPLAY = $2000
@@ -24,6 +25,9 @@ generic_console_set_attribute:
 	ret
 
 generic_console_set_ink:
+	call	conio_map_colour
+	and	15
+	ld	(__c128_attr),a
 	ret
 
 	

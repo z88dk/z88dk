@@ -3,6 +3,7 @@ target/c128/stdio/getk
 target/c128/stdio/generic_console
 target/c128/stdio/generic_console_ioctl
 target/c128/stdio/conio_vars
+target/c128/stdio/conio_map_colour
 target/c128/stdio/CRT_FONT
 @stdio/ansicore.lst
 target/c128/stdio/ansi/f_ansi_attr
