@@ -57,13 +57,15 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 ;Strange squeak hl=300,de=2
 ;Game up hl=300,de=10 inc de
 ;-like a PACMAN sound
-.fx6      ld    b,1  
-.fx6_1    push  bc  
-          ld    hl,300  
-          ld    de,10  
+.fx6
+          call  bit_open_di
+          ld    b,1
+.fx6_1    push  bc
+          ld    hl,300
+          ld    de,10
 .fx6_2    push  hl
           push  de
-          call  beeper  
+          call  beeper
           pop   de
           pop   hl
 ;      inc  de           ;if added in makes different sound..
@@ -73,7 +75,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr    nc,fx6_2
           pop   bc
           djnz  fx6_1
-          ret 
+          jp    bit_close_ei
           
           
 ;Use during key defines?
@@ -86,12 +88,13 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 .fx2_2    djnz  fx2_2  
           inc   e  
           jr    nz,fx2_1  
-          call  bit_close_ei
-          ret
+          jp    bit_close_ei
           
           
 ;Laser repeat sound
-.fx5      ld    b,1  
+.fx5
+          call  bit_open_di
+          ld    b,1  
 .fx5_1    push  bc  
           ld    hl,1200  
           ld    de,6  
@@ -104,9 +107,9 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           and   a  
           sbc   hl,bc  
           jr    nc,fx5_2  
-          pop   bc  
-          djnz  fx5_1  
-          ret   
+          pop   bc
+          djnz  fx5_1
+          jp    bit_close_ei
           
           
 ;Eating sound
@@ -124,8 +127,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr    z,zap0_3
           ex	af,af
           jr    zap0_1  
-.zap0_3   call  bit_close_ei
-          ret
+.zap0_3   jp    bit_close_ei
           
           
 ;Clackson sound
@@ -150,8 +152,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 .clackson_FR_2
           ld      l,255
           djnz    clackson_loop
-          call	bit_close_ei
-          ret
+          jp      bit_close_ei
           
           
 ;Beep thing
@@ -175,12 +176,12 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           djnz  zap3_3
           pop   bc
           djnz  zap3_1
-          call  bit_close_ei
-          ret
+          jp    bit_close_ei
           
 ;Sound for warp
           
 .warpcall
+          call  bit_open_di
           ld    hl,1600  
           ld    (warps+1),hl  
           ld    hl,-800  
@@ -193,7 +194,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           call warps
           pop  bc
           djnz warpcall1
-          ret   
+          jp    bit_close_ei
+
           
 .warps    ld    hl,1600  
           ld    de,6  
