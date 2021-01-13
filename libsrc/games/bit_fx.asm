@@ -31,10 +31,6 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
 .bit_fx
 ._bit_fx
-          pop  bc
-          pop  de
-          push de
-          push bc
 
         IF sndbit_port >= 256
           exx
@@ -42,18 +38,18 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
         ENDIF
 
-          ld    a,e  
-          cp    8  
-          ret   nc  
-          add   a,a  
-          ld    e,a  
+          ld    a,l
+          cp    8
+          ret   nc
+          add   a,a
+          ld    e,a
           ld    d,0  
-          ld    hl,table  
-          add   hl,de  
-          ld    a,(hl)  
-          inc   hl  
-          ld    h,(hl)  
-          ld    l,a  
+          ld    hl,table
+          add   hl,de
+          ld    a,(hl)
+          inc   hl
+          ld    h,(hl)
+          ld    l,a
           jp    (hl)  
           
 .table    defw    fx2           ; effect #0
