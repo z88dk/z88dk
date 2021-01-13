@@ -29,6 +29,9 @@ extern void __LIB__ bit_synth(int duration, int frequency1, int frequency2, int 
 
 /* "period": the higher value, the lower tone ! */
 extern void __LIB__ bit_beep(int duration, int period) __smallc;
+extern void __LIB__ bit_beep_callee(int duration, int period) __smallc __z88dk_callee;
+#define bit_beep(a,b) bit_beep_callee(a,b)
+
 
 /* Real frequency !  Duration is in ms */
 extern void __LIB__ bit_frequency(double_t duration, double_t frequency) __smallc;
