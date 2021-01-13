@@ -9,6 +9,7 @@ games/obj/${TARGET}/bit_fx4
 games/obj/${TARGET}/bit_synth
 games/obj/${TARGET}/bit_frequency
 games/obj/${TARGET}/bit_beep
+games/obj/${TARGET}/bit_beep_callee
 games/obj/${TARGET}/__bit_irqstatus
 games/obj/${TARGET}/__snd_tick
 games/obj/${TARGET}/bit_open
