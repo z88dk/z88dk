@@ -23,12 +23,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
 .bit_fx4
 ._bit_fx4
-          pop  bc
-          pop  de
-          push de
-          push bc
-          
-          ld    a,e  
+          ld    a,l
           cp    8
           ret   nc  
           add   a,a  
