@@ -136,8 +136,7 @@ void Gamekeys(void)
 		case K_SWITCH:
 		  PieceIsBall^=1;   /* Toggle ball/box */
 		  #ifdef SOUND
-		    //bit_fx4 (5);
-			bit_click();
+		    bit_fx4 (5);
 		  #endif
 		  while (getk() == K_SWITCH) {}
 		  break;
@@ -154,8 +153,7 @@ void Gamekeys(void)
 		  /* fall thrue */
 		case K_CLEAR:
 		  #ifdef SOUND
-		    //bit_fx4 (3);
-			bit_click();
+		    bit_fx4 (3);
 		  #endif
 		  SetupLevel();
 	}
@@ -202,9 +200,7 @@ void SetupLevel(void)
 	DrawBoard(); /* Display the clean Board */
 
 #ifdef SOUND
-	//bit_fx4 (1);
-	//bit_click();
-	bit_fx4 (5);
+	bit_fx4 (1);
 #endif
 }
 
@@ -291,8 +287,7 @@ void MovePiece(char *ptr, char plusx, char plusy)
 			putpic (x+plusx,y+plusy,BUBB);
 
 			#ifdef SOUND
-			//bit_fx2 (5);
-			bit_click();
+			bit_fx2 (5);
 			#endif
 		}
 
@@ -308,9 +303,8 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		putpic (x+plusx,y+plusy,temp);
 
 		#ifdef SOUND
-		//bit_fx2 (6);
+		bit_fx2 (2);
 		//bit_fx4 (2);
-		bit_click();
 		#endif
 
 		(*ptr) += temp2;
