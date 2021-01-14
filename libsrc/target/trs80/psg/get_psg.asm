@@ -7,10 +7,10 @@
 ;	Get a PSG register.
 ;
 ;
-;	$Id: get_psg.asm,v 1.2 2016-06-10 21:13:58 dom Exp $
+;	$Id: get_psg.asm $
 ;
 
-        SECTION code_clib
+	SECTION	 smc_clib
 	PUBLIC	get_psg
 	PUBLIC	get_psg2
 	PUBLIC	_get_psg
