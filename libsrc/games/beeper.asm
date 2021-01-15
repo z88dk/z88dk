@@ -1,4 +1,4 @@
-; $Id: beeper.asm $
+; $Id: beeper.asm,v 1.6 2016-04-23 21:06:31 dom Exp $
 ;
 ; Generic 1 bit sound functions
 ;
@@ -11,6 +11,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
     ;EXTERN      bit_open_di
     ;EXTERN      bit_close_ei
+	
+    EXTERN      __snd_tick
 
 ;
 ; Ported by Dominic Morris
@@ -40,6 +42,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld   ix,beixp3
           add  ix,bc
           ;call bit_open_di
+          ld	a,(__snd_tick)
+
 .beixp3
           nop
           nop
