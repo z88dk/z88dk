@@ -104,7 +104,10 @@ extern void __LIB__ bit_play(unsigned char melody[]);
 #endif
 
 #ifdef TRS80
-  #define BEEP_TSTATES 221750.0 /* 1.774 Mhz */
+  //#define BEEP_TSTATES 221750.0 /* 1.774 Mhz , TRS 80 Model I */
+  #define BEEP_TSTATES 275000.0 /* 2.03 Mhz , EACA EG2000 */
+  //#define BEEP_TSTATES 287500.0 /* 2.2 Mhz , TRS 80 Model III */
+  //#define BEEP_TSTATES 500000.0  /* (4 Mhz) Model II, Model IV or modified Model III */
 #endif
 
 #ifdef VG5000
