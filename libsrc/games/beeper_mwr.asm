@@ -13,6 +13,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
     PUBLIC     beeper
     PUBLIC     _beeper
     INCLUDE  "games/games.inc"
+
     EXTERN     __snd_tick
 
     ;EXTERN      bit_open_di
@@ -31,6 +32,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld   ix,beixp3
           add  ix,bc
           ;call bit_open_di
+          ld	a,(__snd_tick)
+
 .beixp3
           nop
           nop
