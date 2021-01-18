@@ -6,6 +6,7 @@ games/obj/${TARGET}/bit_fx
 games/obj/${TARGET}/bit_fx2
 games/obj/${TARGET}/bit_fx3
 games/obj/${TARGET}/bit_fx4
+games/obj/${TARGET}/bit_fx5
 games/obj/${TARGET}/bit_synth
 games/obj/${TARGET}/bit_frequency
 games/obj/${TARGET}/beeper
