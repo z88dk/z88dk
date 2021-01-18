@@ -17,20 +17,33 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           SECTION    smc_clib
           PUBLIC     bit_synth
           PUBLIC     _bit_synth
+          PUBLIC     bit_synth_callee
+          PUBLIC     _bit_synth_callee
           INCLUDE  "games/games.inc"
 
           EXTERN      bit_open_di
           EXTERN      bit_close_ei
 
+
+.bit_synth_callee
+._bit_synth_callee
+		pop hl
+		ld	(ret_addr1+1),hl
+		call bit_synth
+		pop  de
+		pop  de
+		pop  de
+		pop  de
+		pop  de
+.ret_addr1
+		jp   0
+
 .bit_synth
 ._bit_synth
 
-        IF sndbit_port >= 256
-          exx
-          ld   bc,sndbit_port
-          exx
-        ENDIF
-
+		pop hl
+		ld	(ret_addr+1),hl
+		  push    ix
           ld      ix,2
           add     ix,sp
           ld      a,(ix+8)
@@ -63,6 +76,13 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld      a,sndbit_mask
 .FR4_blank
           ld      (FR1_tick+1),a
+
+
+        IF sndbit_port >= 256
+          exx
+          ld   bc,sndbit_port
+          exx
+        ENDIF
 
           call    bit_open_di
           ld      h,1
@@ -142,6 +162,10 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr      nz,loop2
           djnz    loop
           call	bit_close_ei
+		  pop   ix
+.ret_addr
+          jp	0
 
-          ret
+
+
 ENDIF
