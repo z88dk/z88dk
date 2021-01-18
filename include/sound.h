@@ -32,6 +32,10 @@ extern void __LIB__ bit_beep(int duration, int period) __smallc;
 extern void __LIB__ bit_beep_callee(int duration, int period) __smallc __z88dk_callee;
 #define bit_beep(a,b) bit_beep_callee(a,b)
 
+/* "period": the higher value, the lower the simulated white noise frequency cutoff ! */
+extern void __LIB__ bit_noise(int duration, int period) __smallc;
+extern void __LIB__ bit_noise_callee(int duration, int period) __smallc __z88dk_callee;
+#define bit_noise(a,b) bit_noise_callee(a,b)
 
 /* Real frequency !  Duration is in ms */
 extern void __LIB__ bit_frequency(double_t duration, double_t frequency) __smallc;
