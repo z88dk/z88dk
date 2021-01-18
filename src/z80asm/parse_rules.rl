@@ -1,7 +1,7 @@
 /*
 Z88DK Z80 Module Assembler
 
-Copyright (C) Paulo Custodio, 2011-2020
+Copyright (C) Paulo Custodio, 2011-2021
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -522,7 +522,7 @@ Define rules for a ragel-based parser.
 			asm_INCLUDE(Str_data(name));
 		}
 
-		| label? _TK_BINARY string _TK_NEWLINE @{
+		| label? ( _TK_BINARY | _TK_INCBIN ) string _TK_NEWLINE @{
 			DO_STMT_LABEL();
 			asm_BINARY(Str_data(name));
 		}
