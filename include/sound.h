@@ -7,7 +7,7 @@
 /*
  *	Sound support code
  *
- *	$Id: sound.h,v 1.24 2016-11-15 08:11:10 stefano Exp $
+ *	$Id: sound.h $
  */
 
 
@@ -23,6 +23,7 @@ extern void __LIB__ bit_fx(int effect) __smallc __z88dk_fastcall;
 extern void __LIB__ bit_fx2(int effect) __smallc __z88dk_fastcall;
 extern void __LIB__ bit_fx3(int effect) __smallc __z88dk_fastcall;
 extern void __LIB__ bit_fx4(int effect) __smallc __z88dk_fastcall;
+extern void __LIB__ bit_fx5(int effect) __smallc __z88dk_fastcall;
 
 /* 1 BIT SYNTH - Polyphony and multitimbric effects */
 extern void __LIB__ bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4) __smallc;
