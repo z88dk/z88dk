@@ -2,7 +2,7 @@
  *  D E A T H   S T A R  -  Colour Genie EG-2000 version
  * 
  * How to build:
- * zcc +trs80 -subtype=eg2000disk -create-app dstar.c
+ * zcc +trs80 -subtype=eg2000disk -create-app -DSOUND dstar.c
  * 
  * 
  * 

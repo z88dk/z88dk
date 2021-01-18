@@ -3,6 +3,7 @@ target/zx-common/graphics/obj/${TARGET}/res_MODE0
 target/zx-common/graphics/obj/${TARGET}/pointxy_MODE0
 target/zx-common/graphics/obj/${TARGET}/plot_MODE6
 target/zx-common/graphics/obj/${TARGET}/pixladdr_MODE6
+target/zx-common/graphics/obj/${TARGET}/w_pixladdr
 target/zx-common/graphics/obj/${TARGET}/w_xorpixl
 target/zx-common/graphics/obj/${TARGET}/getmaxx
 target/zx-common/graphics/obj/${TARGET}/xor_MODE64

@@ -1,0 +1,128 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._iinc
+	ld	hl,(_pint)
+	inc	hl
+	inc	hl
+	ld	(_pint),hl
+	dec	hl
+	dec	hl
+	call	l_gint	;
+	ret
+
+
+
+._linc
+	ld	hl,(_plong)
+	ld	bc,4
+	add	hl,bc
+	ld	(_plong),hl
+	ld	bc,-4
+	add	hl,bc
+	call	l_glong
+	ret
+
+
+
+._llinc
+	ld	hl,(_plonglong)
+	ld	bc,8
+	add	hl,bc
+	ld	(_plonglong),hl
+	ld	bc,-8
+	add	hl,bc
+	call	l_i64_load
+	pop	de
+	pop	hl
+	push	hl
+	push	de
+	call	l_i64_copy
+	ret
+
+
+
+._stinc
+	ld	hl,(_pstr)
+	ld	bc,10
+	add	hl,bc
+	ld	(_pstr),hl
+	ld	bc,-10
+	add	hl,bc
+	ret
+
+
+
+._idec
+	ld	hl,(_pint)
+	dec	hl
+	dec	hl
+	ld	(_pint),hl
+	inc	hl
+	inc	hl
+	call	l_gint	;
+	ret
+
+
+
+._ldec
+	ld	hl,(_plong)
+	ld	bc,-4
+	add	hl,bc
+	ld	(_plong),hl
+	ld	bc,4
+	add	hl,bc
+	call	l_glong
+	ret
+
+
+
+._lldec
+	ld	hl,(_plonglong)
+	ld	bc,-8
+	add	hl,bc
+	ld	(_plonglong),hl
+	ld	bc,8
+	add	hl,bc
+	call	l_i64_load
+	pop	de
+	pop	hl
+	push	hl
+	push	de
+	call	l_i64_copy
+	ret
+
+
+
+
+	SECTION	bss_compiler
+._pint	defs	2
+._plong	defs	2
+._plonglong	defs	2
+._pstr	defs	2
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_pint
+	GLOBAL	_plong
+	GLOBAL	_plonglong
+	GLOBAL	_pstr
+	GLOBAL	_iinc
+	GLOBAL	_linc
+	GLOBAL	_llinc
+	GLOBAL	_stinc
+	GLOBAL	_idec
+	GLOBAL	_ldec
+	GLOBAL	_lldec
+
+
+
+

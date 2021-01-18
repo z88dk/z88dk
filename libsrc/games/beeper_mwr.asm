@@ -1,4 +1,4 @@
-; $Id: beeper_mwr.asm,v 1.5 2016-06-11 20:52:25 dom Exp $
+; $Id: beeper_mwr.asm $
 ;
 ; 1 bit sound library - version for "memory write" I/O architectures
 ; by Stefano Bodrato, 31/03/08
@@ -13,14 +13,15 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
     PUBLIC     beeper
     PUBLIC     _beeper
     INCLUDE  "games/games.inc"
+
     EXTERN     __snd_tick
 
-    EXTERN      bit_open_di
-    EXTERN      bit_close_ei
+    ;EXTERN      bit_open_di
+    ;EXTERN      bit_close_ei
 
 .beeper
 ._beeper
-	push	ix
+          push	ix
           ld   a,l
           srl  l
           srl  l
@@ -30,7 +31,9 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld   b,0
           ld   ix,beixp3
           add  ix,bc
-          call bit_open_di
+          ;call bit_open_di
+          ld	a,(__snd_tick)
+
 .beixp3
           nop
           nop
@@ -60,7 +63,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           inc  c
           jp   (ix)
 .be_end
-          call   bit_close_ei
-	pop	ix
+          ;call   bit_close_ei
+          pop	ix
           ret
 ENDIF

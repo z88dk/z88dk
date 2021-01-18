@@ -12,13 +12,13 @@
 	PUBLIC	ansi_attr
 
 	EXTERN	INVRS
-	EXTERN	ATTR
+	EXTERN  __c128_attr
 
 .ansi_attr
         and     a
         jr      nz,noreset
         ld      a,1		;White on black
-        ld      (ATTR+1),a
+        ld      (__c128_attr),a
 	xor	a
 	ld	(INVRS+1),a
         ret
@@ -76,7 +76,7 @@
 .noCreverse
         cp      8
         jr      nz,noinvis
-        ld      a,(ATTR+1)
+        ld      a,(__c128_attr)
         ld      (oldattr),a
         and     @11110000
         ld      e,a
@@ -85,7 +85,7 @@
         rra
         rra
         or      e
-        ld      (ATTR+1),a
+        ld      (__c128_attr),a
         ret
 .oldattr
         defb     0
@@ -93,7 +93,7 @@
         cp      28
         jr      nz,nocinvis
         ld      a,(oldattr)
-        ld      (ATTR+1),a
+        ld      (__c128_attr),a
         ret
 .nocinvis
         cp      30
@@ -103,7 +103,7 @@
         sub     30
         call	palette
 ;''''''''''''''''''''''
-        ld      (ATTR+1),a
+        ld      (__c128_attr),a
         ret
 .nofore
         cp      40
@@ -115,7 +115,8 @@
 ;''''''''''''''''''''''
 ;	ld	(53280),a	;border
 ;	ld	(53281),a	;background
-        ld      (ATTR+1),a
+;        ld      (__c128_attr),a
+	ld	(__c128_attr),a
 	ld	a,128
 	ld	(INVRS+1),a
 .noback

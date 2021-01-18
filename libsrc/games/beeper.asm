@@ -9,8 +9,10 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
     PUBLIC     _beeper
     INCLUDE  "games/games.inc"
 
-    EXTERN      bit_open_di
-    EXTERN      bit_close_ei
+    ;EXTERN      bit_open_di
+    ;EXTERN      bit_close_ei
+	
+    EXTERN      __snd_tick
 
 ;
 ; Ported by Dominic Morris
@@ -24,7 +26,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
 .beeper
 ._beeper
-	push	ix
+          push	ix
         IF sndbit_port >= 256
           exx
           ld   bc,sndbit_port
@@ -39,7 +41,9 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld   b,0
           ld   ix,beixp3
           add  ix,bc
-          call bit_open_di
+          ;call bit_open_di
+          ld	a,(__snd_tick)
+
 .beixp3
           nop
           nop
@@ -77,8 +81,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           inc  c
           jp   (ix)
 .be_end
-	pop	ix
-          call   bit_close_ei
+          pop	ix
+          ;call   bit_close_ei
           ret
 
 ENDIF

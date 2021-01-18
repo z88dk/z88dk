@@ -17,10 +17,10 @@
 	PUBLIC	ansi_CHAR
 	
 	PUBLIC	INVRS
-	PUBLIC	ATTR
 
 	EXTERN	__console_y
 	EXTERN	__console_x
+	EXTERN	__c128_attr
 	
 	
 .ansi_CHAR
@@ -62,7 +62,7 @@
 
 	ld	de,$1000
 	sbc	hl,de		; Color map location
-.ATTR
-	ld	(hl),1		; This byte is the current attribute
+	ld	a,(__c128_attr)
+	ld	(hl),a		; This byte is the current attribute
 
 	ret

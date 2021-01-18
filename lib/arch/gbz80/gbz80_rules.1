@@ -10,12 +10,12 @@
 =
 	ld	hl,sp+%1
 
-	ld	hl,%1
+	ld	hl,_%1
 	ex	de,hl
+	ld	hl,%2
 =
-	ld	e,l
-	ld	d,h
-	ld	hl,%1
+	ld	de,_%1
+	ld	hl,%2
 
 	ld	hl,(%1)
 =

@@ -7,14 +7,12 @@
 
 #if defined(__CLANG)
 
-
 typedef unsigned char * va_list;
 
 #define va_start(marker, last)  { marker = (va_list)&last + sizeof(last); }
 #define va_arg(marker, type)    *((type *)((marker += sizeof(type)) - sizeof(type)))
 #define va_copy(dest, src)      { dest = src; }
 #define va_end(marker)          { marker = (va_list) 0; };
-
 
 #elif defined(__SDCC) || defined(__Z88DK_R2L_CALLING_CONVENTION)
 
@@ -60,6 +58,7 @@ typedef unsigned char * va_list;
 #define va_ptr(marker, type)    *((type *)(marker - sizeof(type)))
 
 #elif defined(__SCCZ80)
+#warning stdarg.h has many caveats when used in left-to-right mode.
 
 // SCCZ80
 // l->r parameter passing means compiler must tell us how many params are on the stack

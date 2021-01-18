@@ -164,6 +164,7 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\common\option.c" />
     <ClCompile Include="..\..\src\copt\regex\regcomp.c" />
     <ClCompile Include="..\..\src\copt\regex\regerror.c" />
     <ClCompile Include="..\..\src\copt\regex\regexec.c" />

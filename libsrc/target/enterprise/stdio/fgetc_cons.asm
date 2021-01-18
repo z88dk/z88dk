@@ -1,5 +1,5 @@
 ;
-;	MSX C Library
+;	Enterprise 64/128 C Library
 ;
 ;	getkey() Wait for keypress
 ;

@@ -7,8 +7,15 @@
 
 	SECTION	code_graphics
 	PUBLIC	pixeladdress_MODE0
+	PUBLIC	w_pixeladdress_MODE0
 	EXTERN	__zx_screenmode
 
+; Entry  hl = x
+;        de = y
+w_pixeladdress_MODE0:
+	; Move into the regular 8 bit registers (h=x, l=y)
+	ex	de,hl
+	ld	h,e
 ; ******************************************************************
 ;
 ; Get absolute  pixel address in map of virtual (x,y) coordinate.

@@ -29,7 +29,17 @@
 	PUBLIC    l_dcal
 
 
+	defc	CONSOLE_COLUMNS = 32
+	defc	CONSOLE_ROWS = 24
 
+	defc	__CPU_CLOCK = 3580000
+
+IF startup = 3
+	; ROM
+	INCLUDE	"target/svi/classic/rom.asm"
+ELSE
+        defc    TAR__clib_exit_stack_size = 32
+        defc    TAR__register_sp = -1
 
 ; Now, getting to the real stuff now!
 
@@ -40,12 +50,6 @@ ENDIF
 IFNDEF CRT_ORG_CODE
 		defc CRT_ORG_CODE  = 34816
 ENDIF
-	defc	CONSOLE_COLUMNS = 32
-	defc	CONSOLE_ROWS = 24
-
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
-	defc	__CPU_CLOCK = 3580000
         INCLUDE "crt/classic/crt_rules.inc"
 	org CRT_ORG_CODE
 
@@ -95,6 +99,9 @@ ENDIF
 l_dcal:
         jp      (hl)
 
+ENDIF
+
+	; All startup modes follow on here
 
         INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE	"crt/classic/crt_section.asm"

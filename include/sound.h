@@ -7,7 +7,7 @@
 /*
  *	Sound support code
  *
- *	$Id: sound.h,v 1.24 2016-11-15 08:11:10 stefano Exp $
+ *	$Id: sound.h $
  */
 
 
@@ -19,16 +19,24 @@ extern void __LIB__ bit_close();
 extern void __LIB__ bit_click();
 
 /* Sound effects; every library contains 8 different sounds (effect no. 0..7) */
-extern void __LIB__ bit_fx(int effect);
-extern void __LIB__ bit_fx2(int effect);
-extern void __LIB__ bit_fx3(int effect);
-extern void __LIB__ bit_fx4(int effect);
+extern void __LIB__ bit_fx(int effect) __smallc __z88dk_fastcall;
+extern void __LIB__ bit_fx2(int effect) __smallc __z88dk_fastcall;
+extern void __LIB__ bit_fx3(int effect) __smallc __z88dk_fastcall;
+extern void __LIB__ bit_fx4(int effect) __smallc __z88dk_fastcall;
+extern void __LIB__ bit_fx5(int effect) __smallc __z88dk_fastcall;
 
 /* 1 BIT SYNTH - Polyphony and multitimbric effects */
 extern void __LIB__ bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4) __smallc;
 
 /* "period": the higher value, the lower tone ! */
 extern void __LIB__ bit_beep(int duration, int period) __smallc;
+extern void __LIB__ bit_beep_callee(int duration, int period) __smallc __z88dk_callee;
+#define bit_beep(a,b) bit_beep_callee(a,b)
+
+/* "period": the higher value, the lower the simulated white noise frequency cutoff ! */
+extern void __LIB__ bit_noise(int duration, int period) __smallc;
+extern void __LIB__ bit_noise_callee(int duration, int period) __smallc __z88dk_callee;
+#define bit_noise(a,b) bit_noise_callee(a,b)
 
 /* Real frequency !  Duration is in ms */
 extern void __LIB__ bit_frequency(double_t duration, double_t frequency) __smallc;
@@ -101,7 +109,10 @@ extern void __LIB__ bit_play(unsigned char melody[]);
 #endif
 
 #ifdef TRS80
-  #define BEEP_TSTATES 221750.0 /* 1.774 Mhz */
+  //#define BEEP_TSTATES 221750.0 /* 1.774 Mhz , TRS 80 Model I */
+  #define BEEP_TSTATES 275000.0 /* 2.03 Mhz , EACA EG2000 */
+  //#define BEEP_TSTATES 287500.0 /* 2.2 Mhz , TRS 80 Model III */
+  //#define BEEP_TSTATES 500000.0  /* (4 Mhz) Model II, Model IV or modified Model III */
 #endif
 
 #ifdef VG5000
