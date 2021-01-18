@@ -144,7 +144,7 @@ static Type *tag_hash = NULL;
 void add_tag(Type *type)
 {
     // addglb
-    HASH_ADD_STR(tag_hash, name, type);    
+    HASH_ADD_STR(tag_hash, name, type);   
 }
 
 Type *find_tag(const char *name)
@@ -472,6 +472,7 @@ Type *parse_struct(Type *type, char isstruct)
         }
         str->size = size;  // It's now defined
         str->weak = 0;
+        debug_write_type(str);
     }
     // TODO: Only pointers to weak structures are valid
     type->kind = KIND_STRUCT;
@@ -983,10 +984,8 @@ int declare_local(int local_static)
 
             if  ( size < 0 ) size = 0;
 
-            sym = addloc(type->name, ID_VARIABLE, type->kind);
-            sym->ctype = type;
             declared += size;                        
-            sym->offset.i = Zsp - declared;
+            sym = addloc(type->name, type, ID_VARIABLE, type->kind, Zsp - declared);
             if ( cmatch('=')) {
                 sym->isassigned = 1;
                 sym->initialised = 1;
@@ -1772,9 +1771,7 @@ static void declfunc(Type *functype, enum storage_type storage)
                 continue;
             } 
             // Create a local variable
-            ptr = addloc(ptype->name, ID_VARIABLE, ptype->kind);
-            ptr->ctype = ptype;
-            ptr->offset.i = where;
+            ptr = addloc(ptype->name, ptype, ID_VARIABLE, ptype->kind, where);
             type_describe(ptype, str);
             outfmt("; parameter '%s' at sp+%d size(%d)\n",utstring_body(str),where, ptype->size);
             utstring_free(str);
@@ -1783,6 +1780,7 @@ static void declfunc(Type *functype, enum storage_type storage)
         }
     } else {
         int i;
+        ++scope_block;
         for ( i = 0; i < array_len(functype->parameters); i++ ) {
             SYMBOL    *ptr;
             UT_string *str;            
@@ -1795,9 +1793,7 @@ static void declfunc(Type *functype, enum storage_type storage)
                 continue;
             }
             // Create a local variable
-            ptr = addloc(ptype->name, ID_VARIABLE, ptype->kind);
-            ptr->ctype = ptype;            
-            ptr->offset.i = where;
+            ptr = addloc(ptype->name, ptype, ID_VARIABLE, ptype->kind, where);
 
             type_describe(ptype, str);            
             outfmt("; parameter '%s' at %d size(%d)\n", utstring_body(str),where, ptype->size);  

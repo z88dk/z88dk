@@ -347,6 +347,7 @@ static int    c_aliases_array_num = 0;
 static char **aliases = NULL;
 static int    aliases_num = 0;
 
+static char   c_generate_debug_info = 0;
 static char   c_help = 0;
 
 static arg_t  config[] = {
@@ -467,7 +468,7 @@ static option options[] = {
     { 0, "", OPT_HEADER, "Compiler (all) options:", NULL, NULL, 0 },
     { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc)" , &c_compiler_type, NULL, 0},
     { 0, "c-code-in-asm", OPT_BOOL|OPT_DOUBLE_DASH,  "Add C code to .asm files" , &c_code_in_asm, NULL, 0},
-
+    { 0, "debug", OPT_BOOL, "Enable debugging support", &c_generate_debug_info, NULL, 0 },
     { 0, "", OPT_HEADER, "Compiler (sccz80) options:", NULL, NULL, 0 },
     { 0, "Cc", OPT_FUNCTION,  "Add an option to sccz80" , &sccz80arg, AddToArgs, 0},
     { 0, "set-r2l-by-default", OPT_BOOL,  "(sccz80) Use r2l calling convention by default", &c_sccz80_r2l_calling, NULL, 0},
@@ -1532,6 +1533,10 @@ int main(int argc, char **argv)
             status = 1;
         }
 
+        if (c_generate_debug_info && compiler_type == CC_SDCC && copy_file(c_crt0, ".adb", filenamebuf, ".adb")) {
+            // Ignore error
+        }
+
         if (createapp) {
             /* Building an application - run the appmake command on it */
             snprintf(buffer, sizeof(buffer), "%s %s -b \"%s\" -c \"%s\"", c_appmake_exe, appmakeargs ? appmakeargs : "", outputfile, c_crt0);
@@ -2547,6 +2552,12 @@ static void configure_assembler()
     if (linker) {
         c_linker = linker;
     }
+    if ( c_generate_debug_info) {
+        mapon = 1;
+        BuildOptions(&asmargs, "-m");
+        BuildOptions(&asmargs, "-debug");
+        BuildOptions(&linkargs, "-debug");
+    }
     snprintf(buf,sizeof(buf),"-I\"%s\"",zcc_opt_dir);
     BuildOptions(&asmargs, buf);
     BuildOptions(&linkargs, buf);
@@ -2573,6 +2584,9 @@ static void configure_compiler()
         add_option_to_compiler(buf);
         if (sdccarg) {
             add_option_to_compiler(sdccarg);
+        }
+        if ( c_generate_debug_info) {
+            add_option_to_compiler("--debug");
         }
         preprocarg = " -D__SDCC";
         BuildOptions(&cpparg, preprocarg);
@@ -2601,6 +2615,9 @@ static void configure_compiler()
             add_option_to_compiler("-set-r2l-by-default");
             preprocarg = " -DZ88DK_R2L_CALLING_CONVENTION";
             BuildOptions(&cpparg, preprocarg);
+        }
+        if ( c_generate_debug_info) {
+            add_option_to_compiler("-debug-defc");
         }
         c_compiler = c_sccz80_exe;
         compiler_style = outspecified_flag;
@@ -2809,6 +2826,7 @@ void remove_temporary_files(void)
             remove_file_with_extension(temporary_filenames[j], ".opt");
             remove_file_with_extension(temporary_filenames[j], ".o");
             remove_file_with_extension(temporary_filenames[j], ".map");
+            remove_file_with_extension(temporary_filenames[j], ".adb");
             remove_file_with_extension(temporary_filenames[j], ".sym");
             remove_file_with_extension(temporary_filenames[j], ".def");
             remove_file_with_extension(temporary_filenames[j], ".tmp");

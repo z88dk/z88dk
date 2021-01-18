@@ -52,11 +52,13 @@ void memory_init(char *model) {
 
 uint8_t get_memory(int pc)
 {
+  debugger_read_memory(pc);
   return  *get_memory_addr(pc);
 }
 
 uint8_t put_memory(int pc, uint8_t b)
 {
+  debugger_write_memory(pc, b);
   if (pc < rom_size)
     return *get_memory_addr(pc);
   else

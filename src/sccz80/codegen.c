@@ -199,6 +199,7 @@ void DoLibHeader(void)
                 segment++;
             else
                 segment = filen;
+            debug_write_module();
             outstr(segment);
         } else {
             /* This handles files produced by a filter cpp */
@@ -212,6 +213,7 @@ void DoLibHeader(void)
             else
                 segment = filen;
             outstr("scp_"); /* alpha id incase tmpfile is numeric */
+            debug_write_module();
             outstr(segment);
         }
         nl();
@@ -1463,13 +1465,6 @@ void gen_leave_function(Kind vartype, char type, int incritical)
 
 int gen_restore_frame_after_call(int offset, Kind save, int saveaf, int usebc)
 {
-    if ( c_framepointer_is_ix != -1 ) {
-        ot("ld\tsp,");
-        outstr(FRAME_REGISTER);
-        nl();
-        return Zsp + offset;
-    }
-
     return modstk(Zsp + offset, save, saveaf, usebc);
 }
 

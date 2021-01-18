@@ -214,6 +214,7 @@ struct symbol_s {
                                 bit 2 = access via far methods
                               */
         int level;           /* Compound level that this variable is declared at */
+        int scope_block;     /* Scope block throughout file? */
         UT_hash_handle  hh;
 
 };
@@ -439,5 +440,10 @@ enum maths_mode {
         printf("%s\n", utstring_body(output)); \
         utstring_free(output); \
     } while (0)
+
+
+extern UT_string *debug_utstr;
+extern UT_string *debug2_utstr;
+extern int        scope_block;
 
 #endif

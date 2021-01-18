@@ -27,7 +27,9 @@
 typedef enum {
     BREAK_PC,
     BREAK_CHECK8,
-    BREAK_CHECK16
+    BREAK_CHECK16,
+    BREAK_READ,
+    BREAK_WRITE,
 } breakpoint_type;
 
 typedef struct breakpoint {
@@ -98,11 +100,13 @@ static int cmd_continue(int argc, char **argv);
 static int cmd_disassemble(int argc, char **argv);
 static int cmd_registers(int argc, char **argv);
 static int cmd_break(int argc, char **argv);
+static int cmd_watch(int argc, char **argv);
 static int cmd_examine(int argc, char **argv);
 static int cmd_set(int argc, char **argv);
 static int cmd_out(int argc, char **argv);
 static int cmd_trace(int argc, char **argv);
 static int cmd_hotspot(int argc, char **argv);
+static int cmd_list(int argc, char **argv);
 static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
 static void print_hotspots();
@@ -116,11 +120,13 @@ static command commands[] = {
     { "dis",    cmd_disassemble,   "[<address>]",  "Disassemble from pc/<address>" },
     { "reg",    cmd_registers,     "",  "Display the registers" },
     { "break",  cmd_break,         "<address/label>",  "Handle breakpoints" },
+    { "watch",  cmd_watch,         "<address/label>",  "Handle watchpoints" },
     { "x",      cmd_examine,       "<address>",   "Examine memory" },
     { "set",    cmd_set,           "<hl/h/l/...> <value>",  "Set registers" },
     { "out",    cmd_out,           "<address> <value>", "Send to IO bus"},
     { "trace",  cmd_trace,         "<on/off>", "Disassemble every instruction"},
     { "hotspot",cmd_hotspot,       "<on/off>", "Track address counts and write to hotspots file"},
+    { "list",   cmd_list,          "<address>",   "List the source code at the given address"},
     { "help",   cmd_help,          "",   "Display this help text" },
     { "quit",   cmd_quit,          "",   "Quit ticks"},
     { NULL, NULL, NULL }
@@ -128,6 +134,7 @@ static command commands[] = {
 
 
 static breakpoint *breakpoints;
+static breakpoint *watchpoints;
 
        int debugger_active = 0;
 static int next_address = -1;
@@ -166,7 +173,40 @@ static void completion(const char *buf, linenoiseCompletions *lc, void *ctx)
     }
 }
 
+void debugger_write_memory(int addr, uint8_t val)
+{
+    breakpoint *elem;
+    int         i;
+    LL_FOREACH(watchpoints, elem) {
+        if ( elem->enabled == 0 ) {
+            continue;
+        }
+        if ( elem->type == BREAK_WRITE && elem->value == addr ) {
+            printf("Hit watchpoint %d\n",i);
+            debugger_active = 1;
+            break;
+        }
+        i++;
+    }
+}
 
+void debugger_read_memory(int addr)
+{
+    breakpoint *elem;
+    int         i;
+
+    LL_FOREACH(watchpoints, elem) {
+        if ( elem->enabled == 0 ) {
+            continue;
+        }
+        if ( elem->type == BREAK_READ && elem->value == addr ) {
+            printf("Hit watchpoint %d\n",i);
+            debugger_active = 1;
+            break;
+        }
+        i++;
+    }
+}
 
 void debugger()
 {
@@ -239,10 +279,11 @@ void debugger()
 
     /* In the debugger, loop continuously for commands */
 
+    symbol_find_lower(pc,SYM_ADDRESS,buf,sizeof(buf));
     if (interact_with_tty)
-        snprintf(prompt,sizeof(prompt), "\n" FNT_BCK "    $%04x    >" FNT_RST " ", pc);     // TODO: Symbol address
+        snprintf(prompt,sizeof(prompt), "\n" FNT_BCK "    $%04x    (%s)>" FNT_RST " ", pc, buf);
     else                                                                                // Original output for non-active tty
-        snprintf(prompt,sizeof(prompt), " %04x >", pc);                                 // TODO: Symbol address
+        snprintf(prompt,sizeof(prompt), " %04x (%s)>", pc, buf);
 
     while ( (line = linenoise(prompt) ) != NULL ) {
         int argc;
@@ -290,6 +331,8 @@ static int cmd_next(int argc, char **argv)
 
     // Set a breakpoint after the call
     switch ( opcode ) {
+    case 0xed: // ED prefix
+    case 0xcb: // CB prefix
     case 0xc4:
     case 0xcc:
     case 0xcd:
@@ -415,6 +458,91 @@ static int cmd_registers(int argc, char **argv)
 }
 
 
+static int cmd_watch(int argc, char **argv)
+{
+    int breakwrite = 0;
+
+    if ( argc == 1 ) {
+        breakpoint *elem;
+        int         i = 1;
+
+        /* Just show the breakpoints */
+        LL_FOREACH(watchpoints, elem) {
+            if ( elem->type == BREAK_READ) {
+                const char *sym = find_symbol(elem->value, SYM_ADDRESS);
+                printf("%d:\t(read) @$%04x (%s) %s\n",i, elem->value,sym ? sym : "<unknown>", elem->enabled ? "" : " (disabled)");
+            } else if ( elem->type == BREAK_WRITE) {
+                const char *sym = find_symbol(elem->value, SYM_ADDRESS);
+                printf("%d:\t(read) @$%04x (%s) %s\n",i, elem->value,sym ? sym : "<unknown>", elem->enabled ? "" : " (disabled)");
+            } 
+            i++;
+        }
+
+    } else if ( argc == 3 && (strcmp(argv[1],"read") == 0 || (breakwrite=1,strcmp(argv[1],"write") == 0)) ) {
+        char *end;
+        const char *sym;
+        breakpoint *elem;
+        int value = parse_number(argv[2], &end);
+
+        if ( end != argv[2] ) {
+            elem = malloc(sizeof(*elem));
+            elem->type = breakwrite ? BREAK_WRITE : BREAK_READ;
+            elem->value = value;
+            elem->enabled = 1;
+            LL_APPEND(watchpoints, elem);
+            sym = find_symbol(value, SYM_ADDRESS);
+            printf("Adding %s watchpoint at '%s' $%04x (%s)\n",breakwrite ? "write" : "read", argv[2], value,  sym ? sym : "<unknown>");
+        } else {
+            int value = symbol_resolve(argv[2]);
+
+            if ( value != -1 ) {
+                elem = malloc(sizeof(*elem));
+                elem->type = breakwrite ? BREAK_WRITE : BREAK_READ;
+                elem->value = value;
+                elem->enabled = 1;
+                LL_APPEND(watchpoints, elem);
+                sym = find_symbol(value, SYM_ADDRESS);
+                printf("Adding %s watchpoint at '%s', $%04x (%s)\n",breakwrite ? "write" : "read", argv[2], value, sym ? sym : "<unknown>");
+            } else {
+                printf("Cannot set watchpoint on '%s'\n",argv[1]);
+            }
+        }
+    } else if ( argc == 3 && strcmp(argv[1],"delete") == 0 ) {
+        int num = atoi(argv[2]);
+        breakpoint *elem;
+        LL_FOREACH(watchpoints, elem) {
+            num--;
+            if ( num == 0 ) {
+                printf("Deleting watchpoint %d\n",atoi(argv[2]));
+                LL_DELETE(breakpoints,elem); // TODO: Freeing
+                break;
+            }
+        }
+    } else if ( argc == 3 && strcmp(argv[1],"disable") == 0 ) {
+        int num = atoi(argv[2]);
+        breakpoint *elem;
+        LL_FOREACH(watchpoints, elem) {
+            num--;
+            if ( num == 0 ) {
+                printf("Disabling watchpoint %d\n",atoi(argv[2]));
+                elem->enabled = 0;
+                break;
+            }
+        }
+    } else if ( argc == 3 && strcmp(argv[1],"enable") == 0 ) {
+        int num = atoi(argv[2]);
+        breakpoint *elem;
+        LL_FOREACH(watchpoints, elem) {
+            num--;
+            if ( num == 0 ) {
+                printf("Enabling watchpoint %d\n",atoi(argv[2]));
+                elem->enabled = 1;
+                break;
+            }
+        }
+    } 
+    return 0;
+}
 
 static int cmd_break(int argc, char **argv)
 {
@@ -431,17 +559,9 @@ static int cmd_break(int argc, char **argv)
                 printf("%d\t%s = $%02x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
             } else if ( elem->type == BREAK_CHECK16 ) {
                 printf("%d\t%s = $%04x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
-            }
+            } 
             i++;
         }
-    } else if ( argc == 2 && strcmp(argv[1],"--help") == 0 ) {
-        printf("break [address/label]             - Break at address\n");
-        printf("break delete [index]              - Delete breakpoint\n");
-        printf("break disable [index]             - Disable breakpoint\n");
-        printf("break enable [index]              - Enabled breakpoint\n");
-        printf("break memory8 [address] [value]   - Break when [address/label] is value\n");
-        printf("break memory16 [address] [value]  - Break when [address/label] is value\n");
-        printf("break register [register] [value] - Break when [register] is value\n");
     } else if ( argc == 2 ) {
         char *end;
         const char *sym;
@@ -713,14 +833,31 @@ static int cmd_help(int argc, char **argv)
 {
     command *cmd = &commands[0];
 
-    while ( cmd->cmd != NULL ) {
-        if (interact_with_tty)
-            printf(FNT_CLR"%-7s\t%-20s"FNT_RST"\t%s\n",cmd->cmd, cmd->options, cmd->help);
-        else // Original output for non-active tty
-            printf("%-10s\t%-20s\t%s\n",cmd->cmd, cmd->options, cmd->help);
 
-         cmd++;
-     }
+    if ( argc == 1 ) {
+        while ( cmd->cmd != NULL ) {
+            if (interact_with_tty)
+                printf(FNT_CLR"%-7s\t%-20s"FNT_RST"\t%s\n",cmd->cmd, cmd->options, cmd->help);
+            else // Original output for non-active tty
+                printf("%-10s\t%-20s\t%s\n",cmd->cmd, cmd->options, cmd->help);
+
+             cmd++;
+         }
+    } else if ( strcmp(argv[1],"break") == 0 ) {
+        printf("break [address/label]             - Break at address\n");
+        printf("break delete [index]              - Delete breakpoint\n");
+        printf("break disable [index]             - Disable breakpoint\n");
+        printf("break enable [index]              - Enabled breakpoint\n");
+        printf("break memory8 [address] [value]   - Break when [address/label] is value\n");
+        printf("break memory16 [address] [value]  - Break when [address/label] is value\n");
+        printf("break register [register] [value] - Break when [register] is value\n");
+    } else if ( strcmp(argv[1],"watch") == 0 ) {
+        printf("watch delete [index]              - Delete breakpoint\n");
+        printf("watch disable [index]             - Disable breakpoint\n");
+        printf("watch enable [index]              - Enabled breakpoint\n");
+        printf("watch read [address]              - Break when [address] is read\n");
+        printf("watch write [address]             - Break when [address] is written\n");
+    }
      return 0;
 }
 
@@ -731,6 +868,22 @@ static int cmd_quit(int argc, char **argv)
     exit(0);
 }
 
+
+
+static int cmd_list(int argc, char **argv)
+{
+    int addr = pc;
+    const char *filename;
+    int   lineno;
+
+    if ( debug_find_source_location(addr, &filename, &lineno) < 0 ) {
+        printf("No mapping found for $%04x\n",pc);
+    } else {
+        srcfile_display(filename, lineno - 5, 10, lineno);
+    }
+
+    return 0;
+}
 
 
 static void print_hotspots()
