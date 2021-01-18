@@ -1533,7 +1533,7 @@ int main(int argc, char **argv)
             status = 1;
         }
 
-        if (c_generate_debug_info && copy_file(c_crt0, ".adb", filenamebuf, ".adb")) {
+        if (c_generate_debug_info && compiler_type == CC_SDCC && copy_file(c_crt0, ".adb", filenamebuf, ".adb")) {
             // Ignore error
         }
 
