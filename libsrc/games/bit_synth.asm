@@ -21,9 +21,10 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           PUBLIC     _bit_synth_callee
 		  
           ;  ASM driven bending for special effects  ;)
-          PUBLIC     bit_synth_sub
-		  ; FR*_tick should hold the XOR instruction.
-		  ; FR*_tick+1 should be set to 0 or to sndbit_mask
+          PUBLIC     bit_synth_sub    ; entry
+          PUBLIC     bit_synth_len    ; duration
+          ; FR*_tick should hold the XOR instruction.
+          ; FR*_tick+1 should be set to 0 or to sndbit_mask
           PUBLIC     FR1_tick
           PUBLIC     FR2_tick
           PUBLIC     FR3_tick
@@ -62,7 +63,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld      ix,2
           add     ix,sp
           ld      a,(ix+8)
-          ld      (LEN+1),a
+          ld      (bit_synth_len+1),a
           ld      a,(ix+6)
           and     a
           jr      z,FR1_blank
@@ -103,6 +104,10 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
 
 .bit_synth_sub
+          push    hl
+          push    de
+          push    bc
+
         IF sndbit_port >= 256
           exx
           ld   bc,sndbit_port
@@ -113,7 +118,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld      l,h
           ld      d,h
           ld      e,h
-.LEN
+.bit_synth_len
           ld      b,50
 .loop
           ld      c,4
@@ -185,6 +190,11 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           dec     c
           jr      nz,loop2
           djnz    loop
+
+          pop     bc
+          pop     de
+          pop     hl
+
 		  ret
 
 ENDIF
