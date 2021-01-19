@@ -12,6 +12,13 @@ void main()
 {
 
 /*
+double x;
+
+for (x=0.0; x<6.0; x+=0.1)
+	bit_noise(50,30*(sin(x)+2.0));
+*/
+
+/*
 	261.625565290         C
 	277.182631135         C#
 	293.664768100         D
@@ -25,6 +32,22 @@ void main()
 	466.163761616         A#
 	493.883301378         B
 */
+
+	synth_phase(0x2200);
+	synth_play("C8DEb4DC8");
+	synth_phase(0x2200);
+	synth_play("C8DEb4DC8");
+	synth_phase(0x1212);
+	synth_play("C8DEb4DC8");
+	bit_play("C8DEb4DC8");
+	synth_phase(0x3123);
+	synth_play("C8DEb4DC8");
+	synth_phase(0x1234);
+	synth_play("C8DEb4DC8");
+
+	synth_play("G8Ab4G8");
+	synth_play("G8Ab4G8");
+	synth_play("C8");
 
 //bit_play("C--C-CC+C++C+++C++++");
 
