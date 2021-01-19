@@ -42,8 +42,16 @@ extern void __LIB__ bit_noise_callee(int duration, int period) __smallc __z88dk_
 extern void __LIB__ bit_frequency(double_t duration, double_t frequency) __smallc;
 
 /* Play a song (example: "2A--A-B-CDEFGAB5C+") */
-extern void __LIB__ bit_play(unsigned char melody[]);
+extern void __LIB__ bit_play(unsigned char melody[]) __smallc __z88dk_fastcall;
+extern void __LIB__ synth_play(unsigned char melody[]) __smallc __z88dk_fastcall;
 
+/* Set up the synth phase parameters (4 hex digits, e.g. 0x1234) */
+extern void __LIB__ synth_phase(unsigned int phase) __smallc __z88dk_fastcall;
+
+extern int synth_phase_1;
+extern int synth_phase_2;
+extern int synth_phase_3;
+extern int synth_phase_4;
 
 /* Platform specific parameters (mainly timing stuff) 
 
