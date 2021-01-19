@@ -19,6 +19,21 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           PUBLIC     _bit_synth
           PUBLIC     bit_synth_callee
           PUBLIC     _bit_synth_callee
+		  
+          ;  ASM driven bending for special effects  ;)
+          PUBLIC     bit_synth_sub
+		  ; FR*_tick should hold the XOR instruction.
+		  ; FR*_tick+1 should be set to 0 or to sndbit_mask
+          PUBLIC     FR1_tick
+          PUBLIC     FR2_tick
+          PUBLIC     FR3_tick
+          PUBLIC     FR4_tick
+		  ; FR_*+1 needs to be loaded with the 4 sound periods
+          PUBLIC     FR_1
+          PUBLIC     FR_2
+          PUBLIC     FR_3
+          PUBLIC     FR_4
+		  		  
           INCLUDE  "games/games.inc"
 
           EXTERN      bit_open_di
@@ -78,13 +93,22 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld      (FR1_tick+1),a
 
 
+          call    bit_open_di		  
+		  call    bit_synth_sub
+		  pop     ix
+          call    bit_close_ei
+
+.ret_addr
+          jp      0
+
+
+.bit_synth_sub
         IF sndbit_port >= 256
           exx
           ld   bc,sndbit_port
           exx
         ENDIF
 
-          call    bit_open_di
           ld      h,1
           ld      l,h
           ld      d,h
@@ -161,11 +185,6 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           dec     c
           jr      nz,loop2
           djnz    loop
-          call	bit_close_ei
-		  pop   ix
-.ret_addr
-          jp	0
-
-
+		  ret
 
 ENDIF
