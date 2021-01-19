@@ -1,5 +1,5 @@
 /*
-; $Id: bit_play.c,v 1.4 2016-04-23 08:05:41 dom Exp $
+; $Id: bit_play.c $
 ;
 ; Generic 1 bit sound functions
 ; play a melody (integer approx to optimize speed and size)
