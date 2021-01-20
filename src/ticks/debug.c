@@ -113,7 +113,6 @@ void debug_add_cline(const char *filename, int lineno, const char *address)
     cl->file = cf;
     cl->address = strtol(address + 1, NULL, 16);
     HASH_ADD_INT(cf->lines, line, cl);
-    printf("Cline at %04x\n",cl->address);
     clines[cl->address] = cl;  // TODO Banking
 }
 
