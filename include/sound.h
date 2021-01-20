@@ -15,7 +15,9 @@
 
 
 extern void  __LIB__ bit_open();
+extern void  __LIB__ bit_open_di();
 extern void __LIB__ bit_close();
+extern void __LIB__ bit_close_ei();
 extern void __LIB__ bit_click();
 
 /* Sound effects; every library contains 8 different sounds (effect no. 0..7) */
