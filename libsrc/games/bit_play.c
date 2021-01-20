@@ -105,5 +105,11 @@ while ( *melody != 0 )
 	if (*melody>'0' && *melody<='9') duration=(*melody++)-48;
 	if ((*melody >= 'A' && *melody <= 'H') || *melody==0)
 		bit_beep ( (double)(sound*duration)/12., (BEEP_TSTATES/(double)sound)-30. );
+#ifdef __ZX81__
+	bit_open_di();
+#endif
    }
+#ifdef __ZX81__
+   bit_close_ei();
+#endif
 }
