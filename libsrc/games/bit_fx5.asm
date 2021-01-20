@@ -2,7 +2,7 @@
 ;
 ; Generic platform sound effects module.
 ;
-; Library #4 by Stefano Bodrato
+; Library #5 by Stefano Bodrato
 ;
 
 IF !__CPU_GBZ80__ && !__CPU_INTEL__
