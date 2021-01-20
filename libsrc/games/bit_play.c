@@ -25,6 +25,10 @@ void bit_play(unsigned char melody[])
 int sound;
 int duration=2;
 
+#ifdef __ZX81__
+	bit_open_di();
+#endif
+
 while ( *melody != 0 )
    {
    switch (*melody++) {
