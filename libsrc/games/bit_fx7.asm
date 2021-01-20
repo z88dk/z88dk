@@ -5,13 +5,13 @@
 ;
 ; Generic platform sound effects module.
 ;
-; Library #7 by Stefano Bodrato
+; Library #4 by Stefano Bodrato
 ;
 
 IF !__CPU_GBZ80__ && !__CPU_INTEL__
           SECTION    code_clib
-          PUBLIC     bit_fx4
-          PUBLIC     _bit_fx4
+          PUBLIC     bit_fx7
+          PUBLIC     _bit_fx7
           INCLUDE  "games/games.inc"
 
           EXTERN      noise
@@ -24,8 +24,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 ;Sound routine..enter in with e holding the desired effect!
 
 
-.bit_fx4
-._bit_fx4
+.bit_fx7
+._bit_fx7
           ld    a,l
           cp    8
           ret   nc  
