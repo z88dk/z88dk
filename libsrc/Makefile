@@ -21,7 +21,7 @@ GENLIBS = z80iy_crt0.lib z80n_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2k_crt0.lib
 GENLIBS += 8085_opt.lib ez80_opt.lib z180_opt.lib
 
 
-TOCREATE := $(call check_target,altair8800,altair8800_clib.lib)
+TOCREATE := $(call check_target,altair8800,altair8800_clib.lib gfxvti.lib)
 TOCREATE += $(call check_target,ace,ace_clib.lib gfxace.lib gfxaceudg.lib)
 TOCREATE += $(call check_target,abc80,abc80_clib.lib)
 TOCREATE += $(call check_target,abc800,abc800_clib.lib)
@@ -1692,6 +1692,12 @@ homelab2_clib.lib:
 	$(MAKE) -C games TARGET=homelab2
 	TARGET=homelab2 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhomelab2 -x$(OUTPUT_DIRECTORY)/homelab2_clib @$(LISTFILE_DIRECTORY)/homelab2.lst
 
+gfxvti.lib:
+	@echo ''
+	@echo '--- Building VTI graphics Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=altair8800 SUBTYPE=vti FLAVOUR="gencon portable"
+	TARGET=vti TYPE=8080 $(LIBLINKER) -DFORvti -x$(OUTPUT_DIRECTORY)/gfxvti @$(LISTFILE_DIRECTORY)/video/vti/video_vti.lst
 
 # Preempt multitasking library - dom
 preempt.lib:
