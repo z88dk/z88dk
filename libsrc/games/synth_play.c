@@ -110,5 +110,11 @@ while ( *melody != 0 )
 	if ((*melody >= 'A' && *melody <= 'H') || *melody==0)
 		//bit_beep ( (double)(sound*duration)/12., (BEEP_TSTATES/(double)sound)-30. );
 		bit_synth ( (double)(sound*duration)/46., ((BEEP_TSTATES/SYNTH_CONST)/(double)sound)-(double)synth_phase_1,(BEEP_TSTATES/(SYNTH_CONST*(double)sound))-(double)synth_phase_2,(BEEP_TSTATES/(SYNTH_CONST*(double)sound))-(double)synth_phase_3,(BEEP_TSTATES/(SYNTH_CONST*(double)sound))-(double)synth_phase_4);
+#ifdef __ZX81__
+	bit_open_di();
+#endif
    }
+#ifdef __ZX81__
+   bit_close_ei();
+#endif
 }
