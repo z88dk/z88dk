@@ -181,8 +181,6 @@ ENDIF
    ; bc = base
    ; hl = char *
 
-   push bc
-
    ld d,b
    ld e,b
 
