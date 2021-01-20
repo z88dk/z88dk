@@ -168,6 +168,7 @@ define buildcrt
 	$(MAKE) -C algorithm
 	$(MAKE) -C rect
 	$(MAKE) -C arch
+	$(MAKE) -C stdlib
 	$(MAKE) -C z80_crt0s
 endef
 
