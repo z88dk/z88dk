@@ -1,5 +1,5 @@
 /*
- *   $Id: othello.c,v 1.8 2015-08-10 12:55:57 stefano Exp $
+ *   $Id: othello.c $
  * 
  *   z88dk port of the 'historical' game by Leor Zolman
  *
@@ -948,10 +948,10 @@ int main()
 
 #ifdef ANSITEXT
 	printf("%c\nWelcome to the %c[7m OTHELLO %c[27m program!\n",12,27,27);
-	printf("\nNote: %c[4m BLACK ALWAYS GOES FIRST %c[24m ...Good luck!!!\n\n\n",27,27);
+	printf("\nNote: %c[4m BLACK ALWAYS GOES FIRST\n    %c[24m ...Good luck!!!\n\n\n",27,27);
 #else
 	printf("%c\nWelcome to the OTHELLO program!\n",12);
-	printf("\nNote: BLACK ALWAYS GOES FIRST   ...Good luck!!!\n\n\n");
+	printf("\nNote: BLACK ALWAYS GOES FIRST\n     ...Good luck!!!\n\n\n");
 #endif
 	printf("Do you want to go first? ");
 	if (toupper(getchar()) == 'Y') 
