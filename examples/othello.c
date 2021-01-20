@@ -27,6 +27,7 @@
  *   zcc +ace -O3 -lndos -create-app -DREDEFINED_FONT othello.c
  *   zcc +srr -O3 -lndos -create-app -DREDEFINED_FONT othello.c
  *   zcc +zx -O3 -lndos -create-app -DREDEFINED_FONT othello.c
+ *   zcc +trs80 -subtype=eg2000disk -O3 -lndos -create-app -DREDEFINED_FONT othello.c
  */
 
 
@@ -92,13 +93,8 @@ commands may be typed:
 /* z88dk specific opt */
 #pragma printf = "%c %u"
 #ifdef SCCZ80
-int cntbrd(char b[64], char p) __smallc __z88dk_callee;
 void prtbrd(char b[64]) __z88dk_fastcall;
 int prtscr(char b[64]) __z88dk_fastcall;
-void putmov(char b[64], char p, int x, int y) __smallc __z88dk_callee;
-char notak1(char b[64], char p,char o,char e,int x,int y,int m,int n) __smallc __z88dk_callee;
-char notake(char b[64],char p,char o,char e,int x,int y) __smallc __z88dk_callee;
-int fillmt(char b[64], char p, char o, char e, struct mt t[64]) __smallc __z88dk_callee;
 #endif
 
 #define BLACK '*'
@@ -106,6 +102,12 @@ int fillmt(char b[64], char p, char o, char e, struct mt t[64]) __smallc __z88dk
 #define EMPTY '-'
 
 #ifdef __SPECTRUM__
+#define G_BLACK 128
+#define G_WHITE 129
+#define G_EMPTY 130
+#endif
+
+#ifdef __TRS80__
 #define G_BLACK 128
 #define G_WHITE 129
 #define G_EMPTY 130
@@ -936,6 +938,10 @@ int main()
 
 	#ifdef __SORCERER__
 		memcpy(0xfe08, whitepiece,24);
+	#endif
+
+	#ifdef __TRS80__
+		memcpy(0xf400, whitepiece,24);
 	#endif
 
 #endif
