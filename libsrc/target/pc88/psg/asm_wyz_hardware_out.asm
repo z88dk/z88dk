@@ -21,10 +21,6 @@ asm_wyz_hardware_out:
     XOR     A
 NO_BACKUP_ENVOLVENTE:
     ld      bc,(psg_port)
-busy:
-    in      a,(c)
-    rlca
-    jr      c,busy
     LD      HL,asm_wyz_PSG_REG_SEC
 LOUT:
     OUT     (C),A
