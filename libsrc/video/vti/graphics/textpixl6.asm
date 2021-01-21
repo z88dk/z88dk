@@ -23,79 +23,79 @@ textpixl:
 ;       .. .. .. ..
 
 
-	defb	0,   32,   4,   36
+	defb	63,  31,  59,   27
 
 ;       .. X. .X XX
 ;       X. X. X. X.
 ;       .. .. .. ..
-	defb	 16, 48,   20,  52
+	defb	 47, 15,   43,  11
 
 ;       .. X. .X XX
 ;       .X .X .X .X
 ;       .. .. .. ..
-	defb      2,  34,   6,  38
+	defb     61,  29,  57,  25
 
 ;       .. X. .X XX
 ;       XX XX XX XX
 ;       .. .. .. ..
-	defb	 18,  50,  22,  54
+	defb	 45,  13,  41,   9
 
 ;	.. X. .X XX
 ;	.. .. .. ..
 ;	X. X. X. X.
-	defb      8,  40,  12,  44
+	defb     55,  23,  51,  19
 
 ;	.. X. .X XX
 ;	X. X. X. X.
 ;	X. X. X. X.
-	defb	 24,  56,  28,  60
+	defb	 39,   7,  35,   3
 
 ;	.. X. .X XX
 ;       .X .X .X .X
 ;       X. X. X  X.
-	defb	 10,  42,  14,  46
+	defb	 53,  21,  49,  17
 
 ;	.. X. .X XX
 ;	XX XX XX XX
 ;	X. X. X. X.
-	defb	 26,  58,  30,  62
+	defb	 37,   5,  33,   1
 
 ;	.. X. .X XX
 ;	.. .. .. ..
 ;	.X .X .X .X
-	defb	  1,  33,   5,  37
+	defb	 62,  30,  58,  26
 
 ;	.. X. .X XX
 ;       X. X. X. X.
 ;       .X .X .X .X
-	defb	 17,  49,  21,  53
+	defb	 46,  14,  42,  10
 
 ;	.. X. .X XX
 ;	.X .X .X .X
 ;	.X .X .X .X
-	defb	  3,  35,   7,  39
+	defb	 60,  28,  56,  24
 
 ;	.. X. .X XX
 ;	XX XX XX XX
 ;	.X .X .X .X
-	defb	 19,  51,  23,  55
+	defb	 44,  12,  40,   8
 
 ;	.. X. .X XX
 ;       .. .. .. ..
 ;       XX XX XX XX
-	defb	  9,  41,  13,  45
+	defb	 54,  12,  50,  18
 
 ;	.. X. .X XX
 ;       X. X. X. X.
 ; 	XX XX XX XX
-	defb	 25,  57,  29,  61
+	defb	 38,   6,  34,   2
 
 ;	.. X. .X XX
 ;	.X .X .X .X
 ;	XX XX XX XX
-	defb	 11,  43,  15,  47
+	defb	 52,  20,  48,  16
 
 ;	.. X. .X XX
 ;	XX XX XX XX
 ;	XX XX XX XX
-	defb	 27,  59,  31,  63
+	defb	 36,   4,  32,   0

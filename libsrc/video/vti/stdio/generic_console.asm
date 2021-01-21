@@ -37,7 +37,7 @@ generic_console_cls:
 	ld	hl,VTI_DISPLAY
 	ld	de,VTI_DISPLAY+1
 	ld	bc,+(COLUMNS * ROWS) -1
-	ld	(hl),32
+	ld	(hl),32 + 0x80
 	ldir
 	ret
 
@@ -73,6 +73,7 @@ generic_console_pointxy:
 	ld	a,(hl)
 	rlca
 	ret	c	;An ascii character was place, so this will treat it as blank
+	rrca
 	and	63	;Back to the graphics
 	ret
 
@@ -109,7 +110,7 @@ generic_console_scrollup:
 	ex	de,hl
 	ld	b,COLUMNS
 generic_console_scrollup_3:
-	ld	(hl),32
+	ld	(hl),32 + 0x80
 	inc	hl
 	djnz	generic_console_scrollup_3
 	pop	bc
@@ -123,7 +124,7 @@ generic_console_scrollup_3:
 	EXTERN	__console_w
 	EXTERN	__console_h
 
-	ld	a,ROWS
-	ld	(__console_w),a
 	ld	a,COLUMNS
+	ld	(__console_w),a
+	ld	a,ROWS
 	ld	(__console_h),a

@@ -642,6 +642,14 @@ IF FORlviv
 	defc maxy	= 256
 ENDIF
 
+IF FORvti
+	DEFINE gotgfx
+	defc maxx	= 128
+	defc maxy	= 48
+	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
+	defc blankch    = 160
+ENDIF
+
 
 ; =============================================
 
