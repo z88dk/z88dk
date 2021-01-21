@@ -192,9 +192,9 @@ IF __crt_org_graphics
 		SECTION HIMEM_END
 ENDIF
 
-		SECTION __DEBUG
-		org	0
-		SECTION	__ADBDEBUG
+;		SECTION __DEBUG
+;		org	0
+;		SECTION	__ADBDEBUG
 
 IF CRT_APPEND_MMAP
 		INCLUDE "./mmap.inc"
