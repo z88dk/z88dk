@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Fri Sep 25 14:55:22 2020
+;	Module compile time: Thu Jan 21 15:20:29 2021
 
 
 	C_LINE	0,"sinf16.c"
@@ -226,15 +226,8 @@
 	ex	de,hl
 	ld	hl,9	;const
 	add	hl,sp
-	ld	a,(hl)	;l_gint
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	ex	de,hl	;l_pint
-	ld	(hl),e
-	inc	hl
-	ld	(hl),d
- 	ex	de,hl
+	ldi
+	ldi
 	ld	hl,7	;const
 	add	hl,sp
 	ld	e,(hl)
@@ -384,11 +377,10 @@
 	ld	hl,1	;const
 	add	hl,sp
 	push	hl
-	ld	a,(hl)	;l_gint
+	ld	c,(hl)
 	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	ld	bc,-4
+	ld	b,(hl)
+	ld	hl,-4
 	add	hl,bc
 	pop	de
 	ex	de,hl	;l_pint
