@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.3 #11868 (Linux)
+; Version 4.0.7 #12016 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -55,6 +55,8 @@
 	EXTERN __mulschar_callee
 	EXTERN __mulsuchar
 	EXTERN __mulsuchar_callee
+	EXTERN __muluchar
+	EXTERN __muluchar_callee
 	EXTERN __muluschar
 	EXTERN __muluschar_callee
 	EXTERN __rlslonglong
@@ -68,7 +70,7 @@
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
-	EXTERN _banked_call
+	EXTERN banked_call
 	EXTERN _banked_ret
 	EXTERN ___fs2schar
 	EXTERN ___fs2schar_callee
@@ -432,8 +434,9 @@ _am9511_round:
 	ld	(ix-12),a
 	ld	a,(ix-1)
 	ld	(ix-11),a
-	ld	(ix-4),0x00
-	ld	(ix-3),0x00
+	xor	a, a
+	ld	(ix-4),a
+	ld	(ix-3),a
 	ld	a,(ix-12)
 	and	a,0x80
 	ld	(ix-2),a
@@ -448,11 +451,11 @@ l_am9511_round_00141:
 	rr	(ix-4)
 	dec	a
 	jr	NZ, l_am9511_round_00141
-	ld	h,(ix-3)
+	ld	l,(ix-3)
 	ld	a,(ix-4)
 	add	a,0x81
 	ld	(ix-10),a
-	ld	a, h
+	ld	a, l
 	adc	a,0xff
 	ld	(ix-9),a
 	ld	a,(ix-10)
@@ -535,17 +538,17 @@ l_am9511_round_00147:
 l_am9511_round_00148:
 	dec	a
 	jr	NZ, l_am9511_round_00147
-	ld	a,(ix-14)
-	add	a, c
+	ld	a, c
+	add	a,(ix-14)
 	ld	c, a
-	ld	a,(ix-13)
-	adc	a, b
+	ld	a, b
+	adc	a,(ix-13)
 	ld	b, a
-	ld	a,(ix-12)
-	adc	a, e
+	ld	a, e
+	adc	a,(ix-12)
 	ld	e, a
-	ld	a,(ix-11)
-	adc	a, d
+	ld	a, d
+	adc	a,(ix-11)
 	ld	d, a
 	ld	a, l
 	cpl
@@ -601,11 +604,11 @@ l_am9511_round_00113:
 	inc	hl
 	ld	d, (hl)
 	inc	hl
-	ld	a,(hl)
+	ld	c, (hl)
 	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	ex	de, hl
+	ld	h, (hl)
+	ld	l,c
+	ex	de,hl
 l_am9511_round_00114:
 	ld	sp, ix
 	pop	ix

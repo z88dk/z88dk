@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.3 #11868 (Linux)
+; Version 4.0.7 #12016 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -55,6 +55,8 @@
 	EXTERN __mulschar_callee
 	EXTERN __mulsuchar
 	EXTERN __mulsuchar_callee
+	EXTERN __muluchar
+	EXTERN __muluchar_callee
 	EXTERN __muluschar
 	EXTERN __muluschar_callee
 	EXTERN __rlslonglong
@@ -68,7 +70,7 @@
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
-	EXTERN _banked_call
+	EXTERN banked_call
 	EXTERN _banked_ret
 	EXTERN ___fs2schar
 	EXTERN ___fs2schar_callee
@@ -426,8 +428,8 @@ _m32_cosf:
 	add	hl, sp
 	ld	sp, hl
 	ld	(ix-5),0x01
-	ld	(ix-9),c
-	ld	(ix-8),b
+	pop	hl
+	push	bc
 	ld	(ix-7),e
 	ld	(ix-6),d
 	push	bc
@@ -446,8 +448,8 @@ _m32_cosf:
 	ld	a, d
 	xor	a,0x80
 	ld	(ix-6),a
-	ld	(ix-9),c
-	ld	(ix-8),b
+	pop	hl
+	push	bc
 	ld	(ix-7),e
 l_m32_cosf_00102:
 	pop	bc
@@ -464,8 +466,11 @@ l_m32_cosf_00102:
 	push	de
 	push	hl
 	call	___fs2sint_callee
-	ld	(ix-4),l
-	ld	(ix-3),h
+	ex	de, hl
+	ld	(ix-4),e
+	ld	l, e
+	ld	(ix-3),d
+	ld	h,d
 	push	hl
 	call	___uint2fs_callee
 	ld	c, l
@@ -489,7 +494,8 @@ l_m32_cosf_00104:
 	ld	a,(ix-4)
 	and	a,0x07
 	ld	(ix-2),a
-	ld	(ix-1),0x00
+	xor	a, a
+	ld	(ix-1),a
 	ld	a,0x03
 	cp	a,(ix-2)
 	ld	a,0x00
@@ -528,16 +534,13 @@ l_m32_cosf_00108:
 	ld	h,(ix-8)
 	push	hl
 	call	___fssub_callee
-	ld	(ix-9),l
-	ld	(ix-8),h
+	ex	(sp),hl
 	ld	(ix-7),e
 	ld	(ix-6),d
-	pop	bc
-	pop	de
-	push	de
-	ld	l,c
-	ld	h,b
-	push	hl
+	ld	l,(ix-9)
+	ld	h,(ix-8)
+	ld	e,(ix-7)
+	ld	d,(ix-6)
 	call	_m32_sqrf
 	ld	a,(ix-2)
 	dec	a

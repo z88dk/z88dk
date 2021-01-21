@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.3 #11868 (Linux)
+; Version 4.0.7 #12016 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -55,6 +55,8 @@
 	EXTERN __mulschar_callee
 	EXTERN __mulsuchar
 	EXTERN __mulsuchar_callee
+	EXTERN __muluchar
+	EXTERN __muluchar_callee
 	EXTERN __muluschar
 	EXTERN __muluschar_callee
 	EXTERN __rlslonglong
@@ -68,7 +70,7 @@
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
-	EXTERN _banked_call
+	EXTERN banked_call
 	EXTERN _banked_ret
 	EXTERN ___fs2schar
 	EXTERN ___fs2schar_callee
@@ -438,19 +440,19 @@ _m32_atan2f:
 	or	a,(ix+9)
 	or	a,(ix+8)
 	jp	Z, l_m32_atan2f_00117
-	ld	e,(ix+10)
-	ld	d,(ix+11)
 	ld	l,(ix+8)
 	ld	h,(ix+9)
+	ld	e,(ix+10)
+	ld	d,(ix+11)
 	call	_m32_fabsf
 	ld	(ix-5),l
 	ld	(ix-4),h
 	ld	(ix-3),e
 	ld	(ix-2),d
-	ld	e,(ix+6)
-	ld	d,(ix+7)
 	ld	l,(ix+4)
 	ld	h,(ix+5)
+	ld	e,(ix+6)
+	ld	d,(ix+7)
 	call	_m32_fabsf
 	push	hl
 	push	de
@@ -476,8 +478,7 @@ _m32_atan2f:
 	ld	h,(ix-4)
 	push	hl
 	call	___fslt_callee
-	ld	a, l
-	or	a, a
+	bit	0,l
 	jr	NZ,l_m32_atan2f_00107
 	ld	l,(ix+10)
 	ld	h,(ix+11)
