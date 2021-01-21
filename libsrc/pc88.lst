@@ -35,4 +35,5 @@ target/pc88/psg/asm_wyz_hardware_out
 @psg/ay/psg.lst
 @psg/ay/wyz/psg_wyz.lst
 target/pc88/interrupt/add_raster_int
+target/pc88/interrupt/im1_init
 
