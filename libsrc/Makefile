@@ -1697,7 +1697,7 @@ gfxvti.lib:
 	@echo '--- Building VTI graphics Library ---'
 	@echo ''
 	$(MAKE) -C gfx TARGET=altair8800 SUBTYPE=vti FLAVOUR="gencon portable"
-	TARGET=vti TYPE=8080 $(LIBLINKER) -DFORvti -x$(OUTPUT_DIRECTORY)/gfxvti @$(LISTFILE_DIRECTORY)/video/vti/video_vti.lst
+	TARGET=vti TYPE=8080 $(LIBLINKER) -m8080 -DFORvti -x$(OUTPUT_DIRECTORY)/gfxvti @$(LISTFILE_DIRECTORY)/video/vti/video_vti.lst
 
 # Preempt multitasking library - dom
 preempt.lib:

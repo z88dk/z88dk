@@ -24,9 +24,14 @@
         defc    TAR__register_sp = 0xfd00
 	defc	CRT_KEY_DEL = 127
 	defc	__CPU_CLOCK = 2000000
-	; Just default these to something
-	defc	CONSOLE_ROWS = 25
-	defc	CONSOLE_COLUMNS = 80
+
+        ; Default to some "sensible" values
+        IF !CONSOLE_ROWS
+           defc CONSOLE_ROWS = 25
+        ENDIF
+        IF !CONSOLE_ROWS
+           defc CONSOLE_COLUMNS = 80
+        ENDIF
         INCLUDE "crt/classic/crt_rules.inc"
 
 IF      !DEFINED_CRT_ORG_CODE

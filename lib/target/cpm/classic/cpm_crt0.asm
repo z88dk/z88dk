@@ -57,6 +57,14 @@
 		ENDIF
 	ENDIF
 
+        ; Default to some "sensible" values
+        IF !CONSOLE_ROWS
+           defc CONSOLE_ROWS = 25
+        ENDIF
+        IF !CONSOLE_ROWS
+           defc CONSOLE_COLUMNS = 80
+        ENDIF
+
 	org     CRT_ORG_CODE
 
 
