@@ -4,10 +4,16 @@
 		PUBLIC	fgetc_cons
 		PUBLIC	_fgetc_cons
  
-                INCLUDE  "target/lm80c/def/lm80c.def"
+		EXTERN	LASTKEYPRSD
 
 .fgetc_cons
 ._fgetc_cons
+	ld	hl,32768
+loop:
+	dec	hl
+	ld	a,h
+	or	l
+	jr	nz,loop
 .getkey1
 	ld	a,(LASTKEYPRSD)
 	and	a

@@ -1,7 +1,21 @@
 
 
+PUBLIC LASTKEYPRSD
+PUBLIC BASTXT
+PUBLIC TOKENSYS
+PUBLIC CHR4VID
+PUBLIC CHAR2VID
 
+IF __LM80C_FIRMWARE_314
+
+defc FWN = 314
+defc BASTXT = $8241
+defc TOKENSYS = $ab
 defc LASTKEYPRSD = $822c
+defc CHR4VID = $81EC
+defc CHAR2VID = $06c8
+
+
 
 ; Vector for setting nmi handler
 defc NMIUSR = $8061
@@ -11,9 +25,34 @@ defc NMIUSR = $8061
 ; Mode 0 is swapped around
 defc SCR_MODE = $81e0
 
-
 ; Address of name table in VDP memory
 defc SCR_NAM_TB = $81e2
 
 ; Cursor state, 0 = off, 1 =on
 defc CRSR_STATE = $81E9
+
+
+
+ENDIF
+
+IF __LM80C_FIRMWARE_319
+
+defc FWN = 319
+defc BASTXT = $8247
+defc TOKENSYS = $ac
+defc LASTKEYPRSD = $821a
+defc CHR4VID = $81da
+defc CHAR2VID = $076c
+
+ENDIF
+
+IF __LM80C_FIRMWARE64K_105
+
+defc FWN = 105
+defc BASTXT = $538c
+defc LASTKEYPRSD = $535f
+defc TOKENSYS = $ac
+defc CHR4VID = $531f
+defc CHAR2VID = $074b
+
+ENDIF

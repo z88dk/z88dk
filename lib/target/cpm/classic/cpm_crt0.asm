@@ -58,10 +58,10 @@
 	ENDIF
 
         ; Default to some "sensible" values
-        IF !CONSOLE_ROWS
-           defc CONSOLE_ROWS = 25
+        IF !DEFINED_CONSOLE_ROWS
+           defc CONSOLE_ROWS = 24
         ENDIF
-        IF !CONSOLE_ROWS
+        IF !DEFINED_CONSOLE_ROWS
            defc CONSOLE_COLUMNS = 80
         ENDIF
 
