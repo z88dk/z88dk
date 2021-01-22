@@ -650,6 +650,13 @@ IF FORvti
 	defc blankch    = 160
 ENDIF
 
+IF FORvio
+	DEFINE gotgfx
+	defc maxx	= 160
+	defc maxy	= 72
+	defc blankch    = 32
+ENDIF
+
 
 ; =============================================
 
