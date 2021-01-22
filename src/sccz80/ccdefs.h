@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-
+#include <math.h>
 
 typedef long double zdouble;
 
@@ -48,6 +48,12 @@ typedef long double zdouble;
  */
 
 extern void     callfunction(SYMBOL *ptr, Type *func_ptr_call_type);
+
+
+/* cdbfile.c */
+extern void     debug_write_module();
+extern void     debug_write_symbol(SYMBOL *sym);
+extern void     debug_write_type(Type *type);
 
 #include "codegen.h"
 
@@ -92,6 +98,8 @@ extern void gen_switch_case(Kind kind, int64_t value, int label);
 extern void gen_switch_postamble(Kind kind);
 extern void gen_jp_label(int label);
 extern void gen_save_pointer(LVALUE *lval);
+
+extern int gen_restore_frame_after_call(int offset, Kind save, int saveaf, int usebc);
 
 extern void opjump(char *, int);
 extern void testjump(LVALUE *,int label);
@@ -285,8 +293,8 @@ extern void     pop_buffer_fp(void);
 
 /* primary.c */
 extern int      primary(LVALUE *lval);
-extern zdouble  calc(Kind left_kind, zdouble left, void (*oper)(LVALUE *), zdouble right, int is16bit);
-extern zdouble  calcun(Kind left_kind, zdouble left, void (*oper)(LVALUE *), zdouble right);
+extern zdouble  calc(Kind left_kind, zdouble left, void (*oper)(LVALUE *), Kind right_kind, zdouble right, int is16bit);
+extern zdouble  calcun(Kind left_kind, zdouble left, void (*oper)(LVALUE *), Kind right_kind, zdouble right);
 extern int      intcheck(LVALUE *lval, LVALUE *lval2);
 extern void     force(Kind to, Kind from, char to_sign, char from_sign, int lconst);
 extern int      widen_if_float(LVALUE *lval, LVALUE *lval2, int operator_is_commutative);
@@ -322,7 +330,7 @@ extern SYMBOL  *findstc(char *sname);
 extern SYMBOL  *findglb(const char *sname);
 extern SYMBOL  *findloc(char *sname);
 extern SYMBOL  *addglb(char *sname, Type *type, enum ident_type id, Kind kind, int value, enum storage_type storage);
-extern SYMBOL  *addloc(char *sname, enum ident_type id, Kind kind);
+extern SYMBOL  *addloc(char *sname, Type *type, enum ident_type id, Kind kind, int where);
 
 /* while.c */
 extern void     addwhile(WHILE_TAB *ptr);

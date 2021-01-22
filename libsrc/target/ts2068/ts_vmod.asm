@@ -4,11 +4,13 @@
 SECTION code_clib
 PUBLIC ts_vmod
 PUBLIC _ts_vmod
+EXTERN __zx_screenmode
 
 .ts_vmod
 ._ts_vmod
 
    ld a,l
+   ld (__zx_screenmode),a
    and $3f
    xor $38                     ; invert paper bits to settings expected by port $ff
    ld l,a

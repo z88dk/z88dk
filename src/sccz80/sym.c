@@ -83,15 +83,21 @@ SYMBOL* addglb(
     initialise_sym(ptr, sname, id, kind, storage);
     ptr->offset.i = value;
     ptr->ctype = type;
-    HASH_ADD_STR(symtab, name, ptr);   
+    ptr->level = ncmp;
+    ptr->scope_block = scope_block;
+    HASH_ADD_STR(symtab, name, ptr);  
+    if ( id == ID_VARIABLE)
+        debug_write_symbol(ptr); 
     ++glbcnt;
     return (ptr);
 }
 
 SYMBOL* addloc(
-    char* sname,
+    char *sname,
+    Type *type,
     enum ident_type id,
-    Kind kind)
+    Kind kind,
+    int  offset)
 {
     SYMBOL* cptr;
 
@@ -105,7 +111,11 @@ SYMBOL* addloc(
     }
     cptr = locptr++;
     initialise_sym(cptr, sname, id, kind, STKLOC);
+    cptr->ctype = type;
     cptr->level = ncmp;
+    cptr->scope_block = scope_block;
+    cptr->offset.i = offset;
+    debug_write_symbol(cptr);
     return cptr;
 }
 

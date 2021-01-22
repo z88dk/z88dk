@@ -214,6 +214,7 @@ struct symbol_s {
                                 bit 2 = access via far methods
                               */
         int level;           /* Compound level that this variable is declared at */
+        int scope_block;     /* Scope block throughout file? */
         UT_hash_handle  hh;
 
 };
@@ -389,7 +390,7 @@ struct lvalue_s {
         SYMBOL *symbol ;                /* symbol table address, or 0 for constant */
         Type   *ltype;
         Kind    indirect_kind;                  /* type of indirect object, 0 for static object */
-        int ptr_type ;                  /* type of pointer or array, 0 for other idents */
+        Kind ptr_type ;                  /* type of pointer or array, 0 for other idents */
         int is_const ;                  /* true if constant expression */
         zdouble const_val ;                        /* value of constant expression (& other uses) */
         void (*binop)(LVALUE *lval) ;                /* function address of highest/last binary operator */
@@ -439,5 +440,10 @@ enum maths_mode {
         printf("%s\n", utstring_body(output)); \
         utstring_free(output); \
     } while (0)
+
+
+extern UT_string *debug_utstr;
+extern UT_string *debug2_utstr;
+extern int        scope_block;
 
 #endif

@@ -170,6 +170,9 @@ extern option_t  pasopia7_options;
 extern int       pc88_exec(char *target);
 extern option_t  pc88_options;
 
+extern int       pc88disc_exec(char *target);
+extern option_t  pc88disc_options;
+
 extern int       p2000_exec(char *target);
 extern option_t  p2000_options;
 
@@ -446,6 +449,10 @@ struct {
       "PC-8801 T88 format conversion utility",
       NULL,
       pc88_exec,    &pc88_options },
+    { "bin2d88",   "pc88disc",   "(C) 2021 z88dk",
+      "Create a PC88 bootable d88 disc",
+      NULL,
+      pc88disc_exec,    &pc88disc_options },
     { "bin2ptp",   "pmd85",       "(C) 2020 z88dk",
       "Create a PMD85 ptp file",
       NULL,

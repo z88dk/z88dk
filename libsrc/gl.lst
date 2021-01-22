@@ -1,0 +1,11 @@
+@stdio/stdio.lst
+target/gl/stdio/fgetc_cons
+target/gl/stdio/getk
+target/gl/video/asm_lcd_get_ddram_addr_gl4000
+@video/hd44780/video_hd44780.lst
+target/gl/games/bit_open
+target/gl/games/bit_open_di
+target/gl/games/bit_close
+target/gl/games/bit_close_ei
+@games/games.lst
+

@@ -70,23 +70,15 @@ ENDIF
 start:
 
 IF (!DEFINED_startup || (startup=1))
-		ld	a,$FF				; back to main ROM
-		out ($71),a				; bank switching
-		
-		
-		ld	hl,($f302)
-		ld	(timer_retaddr+1),hl
-		
-		ld	hl,pc88_timer
-		ld ($f302),hl			; JP location for timer interrupt
-		
+	ld	a,$FF				; back to main ROM
+	out ($71),a				; bank switching
 ENDIF
 
         ld      (start1+1),sp
 		
 		; Last minute hack to keep the stack in a safe place and permit the hirez graphics to page
 		; the GVRAM banks in and out
-		ld	sp,$BFFF
+	ld	sp,$BFFF
 		
 	; Increase to cover ROM banking (useless at the moment, we're wasting 18 bytes!!)
 	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18
@@ -115,9 +107,9 @@ IF (startup=2)
 ELSE
 
 ;** If NOT IDOS mode, just get rid of BASIC screen behaviour **
-	;call ERAFNK	; Hide function key strings
-	call    _main
+	call $4021	; Hide function key strings
 ENDIF
+	call    _main
 	;call TOTEXT ;- force text mode on exit
 ;**
 	
@@ -132,14 +124,11 @@ cleanup:
 start1:
         ld      sp,0
 		
-		ld		a,$FF		; restore Main ROM
-		out     ($71),a
+	ld	a,$FF		; restore Main ROM
+	out     ($71),a
 		
-		ld      hl,(timer_retaddr+1)	; restore interrupt pointers
-		ld      ($f302),hl
-
-		ld	a,($EC85)
-		ld	(defltdsk),a
+	ld	a,($EC85)
+	ld	(defltdsk),a
 
         ret
 
@@ -148,40 +137,13 @@ l_dcal:
 
 
 
-; Timer interrupt handler extension, usual jiffy driven interrupt (1/60 sec.)
-
-pc88_timer:
-		push hl
-		push af
-		
-		ld		a,1			; set interrupt levels to disable also the "VRTC interrupt"
-		out     ($E4),a
-		
-		ld	hl,(FRAMES)
-		inc	hl
-		ld	(FRAMES),hl
-		ld	a,h
-		or	l
-		jr	nz,skip_msw
-		ld	hl,(FRAMES+2)
-		inc	hl
-		ld	(FRAMES+2),hl
-skip_msw:
-
-		pop	af
-		pop	hl
-
-timer_retaddr:
-		jp	0
-
-
 ; ROM interposer. This could be, sooner or later, moved to a convenient position in RAM
 ; (e.g.  just before $C000) to be able to bounce between different RAM/ROM pages
 pc88bios:
 	push	af
-	ld		a,$FF		; MAIN ROM
+	ld	a,$FF		; MAIN ROM
 	out     ($71),a
-	pop		af
+	pop	af
 	jp	(ix)
 	
 
@@ -197,17 +159,7 @@ pc88bios:
 	SECTION		bss_crt
 
 
-	PUBLIC	FRAMES
-	PUBLIC	brksave
 	PUBLIC	defltdsk
-
-FRAMES:
-		defw	0
-		defw	0
-
-brksave:	defb	1		; Keeping the BREAK enable flag, used by pc88_break, etc..
-
-
 
 ; This last part at the moment is useless, but doesn't harm
 
@@ -230,3 +182,7 @@ redir_fopen_flagr:	defb	'r',0
 ENDIF
 ENDIF
 ENDIF 
+
+IF (!DEFINED_startup || (startup=1))
+        INCLUDE "target/pc88/classic/bootstrap.asm"
+ENDIF

@@ -158,7 +158,6 @@ struct lexer_state {
 	size_t pbuf;
 	int lka[2];
 	int nlka;
-	int macfile;
 	int last;
 	int discard;
 	unsigned long utf8;

@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.3 #11868 (Linux)
+; Version 4.0.7 #12017 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -55,6 +55,8 @@
 	EXTERN __mulschar_callee
 	EXTERN __mulsuchar
 	EXTERN __mulsuchar_callee
+	EXTERN __muluchar
+	EXTERN __muluchar_callee
 	EXTERN __muluschar
 	EXTERN __muluschar_callee
 	EXTERN __rlslonglong
@@ -68,7 +70,7 @@
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
-	EXTERN _banked_call
+	EXTERN banked_call
 	EXTERN _banked_ret
 	EXTERN ___fs2schar
 	EXTERN ___fs2schar_callee
@@ -409,10 +411,10 @@ _am9511_modf:
 	ld	a, l
 	or	a, a
 	jr	Z,l_am9511_modf_00102
-	ld	e,(ix+6)
-	ld	d,(ix+7)
 	ld	l,(ix+4)
 	ld	h,(ix+5)
+	ld	e,(ix+6)
+	ld	d,(ix+7)
 	call	_ceil_fastcall
 	ld	c, l
 	ld	b, h
@@ -427,10 +429,10 @@ _am9511_modf:
 	ld	(hl), d
 	jr	l_am9511_modf_00103
 l_am9511_modf_00102:
-	ld	e,(ix+6)
-	ld	d,(ix+7)
 	ld	l,(ix+4)
 	ld	h,(ix+5)
+	ld	e,(ix+6)
+	ld	d,(ix+7)
 	call	_floor_fastcall
 	ld	c, l
 	ld	b, h

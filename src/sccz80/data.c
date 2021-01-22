@@ -76,6 +76,8 @@ int nxtlab, /* next avail label # */
     infunc, /* "inside function" flag */
     c_verbose; /* Verbose to screen */
 
+int      scope_block; /* */
+
 FILE    *input; /* iob # for input file */
 FILE    *output; /* iob # for output file (if any) */
 FILE    *inpt2; /* iob # for "include" file */

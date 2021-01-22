@@ -29,11 +29,6 @@ void main()
 	// CLRHOME
 	exos_write_character(DEFAULT_VIDEO, 0x1A);
 
-	// set beam on
-	esccmd_cmd='S';
-	exos_write_block(DEFAULT_VIDEO, 2, esccmd);
-
-
 	xmax=210;
 	ymax=210;
 	
@@ -83,7 +78,7 @@ l110:	     k++;
 	  }
 	}
 
-	while (getk()!=13);
+	while (getk()!=10);
 
 }
 

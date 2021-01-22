@@ -226,7 +226,13 @@ IF FORz80tvgame
 	defc	sndbit_mask = 1
 ENDIF
 
-; Compatibily ones only, the following ports don't have a beeper
+IF FORgl
+	defc	sndbit_port = $12
+	defc	sndbit_bit = 3
+	defc	sndbit_mask = 8
+ENDIF
+
+; Compatibility ones only, the following ports don't have a beeper
 IF FORondra
         defc sndbit_port   = 0
         defc sndbit_bit    = 0

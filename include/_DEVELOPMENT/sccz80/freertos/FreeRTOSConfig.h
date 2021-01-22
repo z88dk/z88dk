@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.1
+ * FreeRTOS Kernel V10.4.3
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -58,8 +58,6 @@
 #define configMINIMAL_STACK_SIZE            ( 85 )
 #define configMAX_TASK_NAME_LEN             ( 8 )
 
-#define configASSERT
-
 #define configQUEUE_REGISTRY_SIZE           0
 #define configCHECK_FOR_STACK_OVERFLOW      0
 
@@ -100,34 +98,13 @@ to exclude the API function. */
 #define INCLUDE_vTaskCleanUpResources           1
 #define INCLUDE_vTaskSuspend                    1
 #define INCLUDE_vResumeFromISR                  1
-#define INCLUDE_vTaskDelayUntil                 1
+#define INCLUDE_xTaskDelayUntil                 1
 #define INCLUDE_vTaskDelay                      1
-#define INCLUDE_xTaskGetSchedulerState          0
+#define INCLUDE_eTaskGetState                   1
+#define INCLUDE_xTaskGetSchedulerState          1
 #define INCLUDE_xTaskGetIdleTaskHandle          0 // create an idle task handle.
-#define INCLUDE_xTaskGetCurrentTaskHandle       0
+#define INCLUDE_xTaskGetCurrentTaskHandle       1
 #define INCLUDE_uxTaskGetStackHighWaterMark     1
 
-/**
- * configASSERT macro: https://www.freertos.org/a00110.html#configASSERT
- */
-#ifndef configASSERT
-    /**
-     * Enable configASSERT macro by default if it is not defined.
-     */
-    #ifndef configDEFAULT_ASSERT
-        #define configDEFAULT_ASSERT 1
-    #endif
-
-    /**
-     * Define a hook method for configASSERT macro if configASSERT is enabled.
-     */
-    #if configDEFAULT_ASSERT == 1
-        extern void vApplicationAssertHook();
-        #define configASSERT( x ) if (( x ) == 0) { vApplicationAssertHook(); }
-    #endif
-
-#else
-    #define configDEFAULT_ASSERT 0
-#endif
 
 #endif /* FREERTOS_CONFIG_H */

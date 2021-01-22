@@ -3,7 +3,7 @@ include(__link__.m4)
 #ifndef __STDARG_H__
 #define __STDARG_H__
 
-#ifdef __CLANG
+#if defined(__CLANG)
 
 typedef unsigned char * va_list;
 
@@ -12,11 +12,9 @@ typedef unsigned char * va_list;
 #define va_copy(dest, src)      { dest = src; }
 #define va_end(marker)          { marker = (va_list) 0; };
 
-#endif
+#elif defined(__SDCC) || defined(__Z88DK_R2L_CALLING_CONVENTION)
 
-#ifdef __SDCC
-
-// SDCC
+// SDCC (or sccz80 with r2l mode)
 // r->l parameter passing means there are no issues
 
 /*-------------------------------------------------------------------------
@@ -57,9 +55,8 @@ typedef unsigned char * va_list;
 
 #define va_ptr(marker, type)    *((type *)(marker - sizeof(type)))
 
-#endif
-
-#ifdef __SCCZ80
+#elif defined(__SCCZ80)
+#warning stdarg.h has many caveats when used in left-to-right mode.
 
 // SCCZ80
 // l->r parameter passing means compiler must tell us how many params are on the stack

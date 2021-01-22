@@ -3,7 +3,7 @@
 ;	Version for the 2x3 graphics symbols using generic console
 ;
 
-IF !__CPU_GBZ80__ & !__CPU_INTEL__
+IF !__CPU_GBZ80__ 
 	INCLUDE	"graphics/grafix.inc"
 
 	EXTERN	textpixl
@@ -15,6 +15,7 @@ IF !__CPU_GBZ80__ & !__CPU_INTEL__
 	EXTERN	__console_w
 	EXTERN	__console_h
 	EXTERN	__gfx_coords
+
 
 
         ld      a,(__console_w)
@@ -32,25 +33,18 @@ IF !__CPU_GBZ80__ & !__CPU_INTEL__
         ret     c
 
 	ld	(__gfx_coords),hl
-	push	ix
 	push	bc		;Save entry bc
-	ld	ix,-4		;ix + 0 = orig x
-				;ix + 1 = orig y
-				;ix + 2 = reduced x
-				;ix + 3 = reduced y
-	add	ix,sp		
-	ld	sp,ix
-	ld	(ix+0),h
-	ld	(ix+1),l
 
 	ld	c,h		; x
 	ld	de,div3
 	ld	h,0		;l = y
 	add	hl,de
 	ld	b,(hl)		; y / 3
-	srl	c		; x / 2
-	ld	(ix+2),c
-	ld	(ix+3),b
+	and	a		; x/2
+	ld	a,c
+	rra
+	ld	c,a
+	push	bc		;Save reduced coordinates
 IF USEplotc
 	call	generic_console_pointxy
 ELSE
@@ -76,26 +70,33 @@ ELSE
 ENDIF
 chfound:
 
+	; e = pixels set at the coordinate
+	pop	hl
+	push	hl
+
 	;Find the modulus of orig y /3
-	ld	l,(ix+3)
-	ld	a,(ix+1)
-	sub	l
-	sub	l
-	sub	l
-	ld	l,a		;Remainder, 0..2
+	ld	a,(__gfx_coords)	;original y
+	sub	h			;reduced y
+	sub	h
+	sub	h
+	ld	h,a		;Remainder, 0..2
+	rrca			;Carry set if odd
 	ld	a,1 		;Pixel we want to draw
 	jr	z,iszero
 	; Now values 1 or 2
-	bit	0,l
-	jr	nz,is1
+	jr	c,is1
 	add	a
 	add	a
 is1:
 	add	a
 	add	a
 iszero:
-	bit	0,(ix+0)	;original x
-	jr	z, evencol
+	ld	h,a	;Save pixel to set for a moment
+	
+	ld	a,(__gfx_coords+1)	;original x
+	rrca
+	ld	a,h
+	jr	nc, evencol
 	add	a
 evencol:
 IF NEEDplot
@@ -110,6 +111,7 @@ IF NEEDxor
 ENDIF
 IF NEEDpoint
 	and	e
+	pop	bc	;Dump reduced coordinates
 ELSE
   IF USEindex
 	; The character is the index
@@ -120,8 +122,7 @@ ELSE
 	add	hl,de
 	ld	a,(hl)
   ENDIF
-	ld	c,(ix+2)
-	ld	b,(ix+3)
+	pop	bc		;Get back reduced coordinates
   IF USEplotc
 	ld	d,a
 	ld	e,1		;pixel6 mode
@@ -132,10 +133,7 @@ ELSE
 	call	generic_console_printc
   ENDIF
 ENDIF
-	pop	bc		;dump buffer
-	pop	bc
 	pop	bc		;restore callers
-	pop	ix		;restore callers
 	ret
 
 ENDIF

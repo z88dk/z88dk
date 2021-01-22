@@ -18,10 +18,6 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
 .bit_fx2
 ._bit_fx2
-          pop  bc
-          pop  de
-          push de
-          push bc
 
         IF sndbit_port >= 256
           exx
@@ -29,7 +25,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
         ENDIF
 
-          ld    a,e  
+          ld    a,l
           cp    8  
           ret   nc  
           add   a,a  

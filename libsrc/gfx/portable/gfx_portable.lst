@@ -1,4 +1,5 @@
 @gfx/common/gfx_common.lst
+gfx/portable/obj/${TYPE}/__gfx_coords
 gfx/portable/obj/${TYPE}/boxdraw
 gfx/portable/obj/${TYPE}/circle
 gfx/portable/obj/${TYPE}/circledraw

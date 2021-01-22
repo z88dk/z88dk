@@ -1,4 +1,4 @@
-; $Id: bit_beep.asm,v 1.4 2016-04-23 21:06:32 dom Exp $
+; $Id: bit_beep.asm $
 ;
 ; 1 bit sound functions
 ;
@@ -9,6 +9,9 @@
     PUBLIC     _bit_beep
     EXTERN      beeper
 
+    EXTERN      bit_open_di
+    EXTERN      bit_close_ei
+
 ;
 ; Stub by Stefano Bodrato - 8/10/2001
 ;
@@ -16,10 +19,13 @@
 
 .bit_beep
 ._bit_beep
+          call bit_open_di
           pop bc
           pop hl
           pop de
           push de
           push hl
           push bc
-          jp beeper
+		  
+          call beeper
+		  jp bit_close_ei

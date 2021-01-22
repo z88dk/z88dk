@@ -355,14 +355,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         if ( function_pointer_call && fnptr_type->kind == KIND_CPTR && nargs ) {
             nargs += 4;
         }
-#ifdef USEFRAME
-        if (c_framepointer_is_ix != -1) {
-            if (nargs)
-                RestoreSP(preserve);
-            Zsp += nargs;
-        } else
-#endif
-            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE || c_fp_size < 6, preserve, YES);  /* clean up arguments - we know what type is MOOK */
+        Zsp = gen_restore_frame_after_call(nargs,functype->return_type->kind != KIND_DOUBLE || c_fp_size < 6, preserve, YES);  /* clean up arguments - we know what type is MOOK */
     }
 }
 

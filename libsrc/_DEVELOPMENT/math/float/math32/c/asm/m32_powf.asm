@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.3 #11868 (Linux)
+; Version 4.0.7 #12017 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -55,6 +55,8 @@
 	EXTERN __mulschar_callee
 	EXTERN __mulsuchar
 	EXTERN __mulsuchar_callee
+	EXTERN __muluchar
+	EXTERN __muluchar_callee
 	EXTERN __muluschar
 	EXTERN __muluschar_callee
 	EXTERN __rlslonglong
@@ -68,7 +70,7 @@
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
-	EXTERN _banked_call
+	EXTERN banked_call
 	EXTERN _banked_ret
 	EXTERN ___fs2schar
 	EXTERN ___fs2schar_callee
@@ -438,8 +440,7 @@ l_m32_powf_00102:
 	push	hl
 	push	hl
 	call	___fslt_callee
-	ld	a, l
-	or	a, a
+	bit	0,l
 	jr	NZ,l_m32_powf_00104
 	ld	hl,0x0000
 	ld	e,l
@@ -480,10 +481,10 @@ l_m32_powf_00106:
 	ld	a, l
 	or	a, a
 	jr	Z,l_m32_powf_00108
-	ld	e,(ix+6)
-	ld	d,(ix+7)
 	ld	l,(ix+4)
 	ld	h,(ix+5)
+	ld	e,(ix+6)
+	ld	d,(ix+7)
 	call	_m32_invf
 	jp	l_m32_powf_00117
 l_m32_powf_00108:
@@ -501,10 +502,10 @@ l_m32_powf_00108:
 	ld	a, l
 	or	a, a
 	jr	Z,l_m32_powf_00110
-	ld	e,(ix+6)
-	ld	d,(ix+7)
 	ld	l,(ix+4)
 	ld	h,(ix+5)
+	ld	e,(ix+6)
+	ld	d,(ix+7)
 	call	_m32_sqrtf
 	jp	l_m32_powf_00117
 l_m32_powf_00110:
@@ -522,10 +523,10 @@ l_m32_powf_00110:
 	ld	a, l
 	or	a, a
 	jr	Z,l_m32_powf_00112
-	ld	e,(ix+6)
-	ld	d,(ix+7)
 	ld	l,(ix+4)
 	ld	h,(ix+5)
+	ld	e,(ix+6)
+	ld	d,(ix+7)
 	call	_m32_invsqrtf
 	jp	l_m32_powf_00117
 l_m32_powf_00112:
@@ -543,10 +544,10 @@ l_m32_powf_00112:
 	ld	a, l
 	or	a, a
 	jr	Z,l_m32_powf_00114
-	ld	e,(ix+6)
-	ld	d,(ix+7)
 	ld	l,(ix+4)
 	ld	h,(ix+5)
+	ld	e,(ix+6)
+	ld	d,(ix+7)
 	call	_m32_sqrf
 	jr	l_m32_powf_00117
 l_m32_powf_00114:
@@ -564,18 +565,18 @@ l_m32_powf_00114:
 	ld	a, l
 	or	a, a
 	jr	Z,l_m32_powf_00116
-	ld	e,(ix+6)
-	ld	d,(ix+7)
 	ld	l,(ix+4)
 	ld	h,(ix+5)
+	ld	e,(ix+6)
+	ld	d,(ix+7)
 	call	_m32_sqrf
 	call	_m32_invf
 	jr	l_m32_powf_00117
 l_m32_powf_00116:
-	ld	e,(ix+6)
-	ld	d,(ix+7)
 	ld	l,(ix+4)
 	ld	h,(ix+5)
+	ld	e,(ix+6)
+	ld	d,(ix+7)
 	call	_m32_logf
 	ld	c, l
 	ld	l,(ix+10)

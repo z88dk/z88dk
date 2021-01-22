@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.3 #11868 (Linux)
+; Version 4.0.7 #12017 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -55,6 +55,8 @@
 	EXTERN __mulschar_callee
 	EXTERN __mulsuchar
 	EXTERN __mulsuchar_callee
+	EXTERN __muluchar
+	EXTERN __muluchar_callee
 	EXTERN __muluschar
 	EXTERN __muluschar_callee
 	EXTERN __rlslonglong
@@ -68,7 +70,7 @@
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
-	EXTERN _banked_call
+	EXTERN banked_call
 	EXTERN _banked_ret
 	EXTERN ___fs2schar
 	EXTERN ___fs2schar_callee
@@ -485,8 +487,7 @@ l_m32_log2f_00102:
 	push	de
 	push	hl
 	call	___fssub_callee
-	ld	(ix-14),l
-	ld	(ix-13),h
+	ex	(sp),hl
 	ld	(ix-12),e
 	ld	(ix-11),d
 	jr	l_m32_log2f_00105
@@ -498,17 +499,14 @@ l_m32_log2f_00104:
 	push	de
 	push	bc
 	call	___fssub_callee
-	ld	(ix-14),l
-	ld	(ix-13),h
+	ex	(sp),hl
 	ld	(ix-12),e
 	ld	(ix-11),d
 l_m32_log2f_00105:
-	pop	bc
-	pop	de
-	push	de
-	ld	l,c
-	ld	h,b
-	push	hl
+	ld	l,(ix-14)
+	ld	h,(ix-13)
+	ld	e,(ix-12)
+	ld	d,(ix-11)
 	call	_m32_sqrf
 	ld	(ix-10),l
 	ld	(ix-9),h
@@ -540,10 +538,10 @@ l_m32_log2f_00105:
 	ld	(ix-5),h
 	ld	(ix-4),e
 	ld	(ix-3),d
-	ld	e,(ix-8)
-	ld	d,(ix-7)
 	ld	l,(ix-10)
 	ld	h,(ix-9)
+	ld	e,(ix-8)
+	ld	d,(ix-7)
 	call	_m32_div2f
 	push	de
 	push	hl

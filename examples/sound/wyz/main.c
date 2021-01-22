@@ -12,8 +12,16 @@
 #include <stdlib.h>
 
 
-#if __PC6001__ | __MULTI8__
+#if __PC6001__ | __MULTI8__ | __LM80C__ 
 #define NO_INTERRUPT 1
+#endif
+
+#ifdef __LM80C__
+#define getk() 0
+#endif
+
+#ifdef __PC88__
+extern void __LIB__ add_raster_int(isr_t handler);
 #endif
 
 extern wyz_song mysong;

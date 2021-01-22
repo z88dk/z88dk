@@ -38,6 +38,8 @@
 	defc __CPU_CLOCK = 4000000
 	INCLUDE	"crt/classic/crt_rules.inc"
 
+	INCLUDE "target/cpc/def/cpcfirm.def"
+
 ;--------
 ; Set an origin for the application (-zorg=) default to $1200
 ;--------
@@ -53,6 +55,29 @@ ENDIF
 ;--------
 
 start:
+;;------------------------------------------------------------------------
+;; store the drive number the loader was run from
+	ld hl,($be7d)
+	ld a,(hl)                  
+	ld (drive+1),a
+
+;;------------------------------------------------------------------------
+	ld c,$ff					;; disable all roms
+	ld hl,start2					;; execution address for program
+	call mc_start_program		;; start it
+
+;;------------------------------------------------------------------------
+
+.start2
+	call kl_rom_walk			;; enable all roms 
+
+;;------------------------------------------------------------------------
+;; when AMSDOS is enabled, the drive reverts back to drive 0!
+;; This will restore the drive number to the drive the loader was run from
+.drive  ld a,0
+	ld hl,($be7d)
+	ld (hl),a
+
 
         di
         ld      (start1+1),sp
@@ -66,6 +91,8 @@ start:
 	; install interrupt interposer
 	call    cpc_enable_process_exx_set
 	ei
+
+
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer

@@ -141,7 +141,9 @@
 #ifdef SOUND
 #include <sound.h>
 #endif
-
+#ifdef SOUNDB
+#include <sound.h>
+#endif
 
 
 /* #define spritesize 4   -->  minimalistic, 64x36 pixels  */
@@ -233,9 +235,15 @@ void Gamekeys(void)
 		  #ifdef SOUND
 		    bit_fx4 (5);
 		  #endif
+		  #ifdef SOUNDB
+			bit_fx6 (6);
+		  #endif
 		  while (getk() == K_SWITCH) {}
 		  break;
 		case K_EXIT:
+		  #ifdef SOUNDB
+		  bit_fx6 (4);
+		  #endif
 		  exit(0);
 		case K_NEXTLEV:    /* Okay this IS cheating... */
 		  if(++Level==MAXLEVEL)
@@ -249,6 +257,9 @@ void Gamekeys(void)
 		case K_CLEAR:
 		  #ifdef SOUND
 		    bit_fx4 (3);
+		  #endif
+		  #ifdef SOUNDB
+			bit_fx6 (1);
 		  #endif
 		  SetupLevel();
 	}
@@ -296,6 +307,9 @@ void SetupLevel(void)
 
 #ifdef SOUND
 	bit_fx4 (1);
+#endif
+#ifdef SOUNDB
+	bit_fx6 (0);
 #endif
 }
 
@@ -394,6 +408,9 @@ void MovePiece(char *ptr, char plusx, char plusy)
 			#ifdef SOUND
 			bit_fx2 (5);
 			#endif
+			#ifdef SOUNDB
+			bit_fx6 (3);
+			#endif
 		}
 		
 		*(locn+temp2) = *locn;
@@ -410,6 +427,9 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		
 		#ifdef SOUND
 		bit_fx2 (2);
+		#endif
+		#ifdef SOUNDB
+		bit_fx6 (7);
 		#endif
 
 		(*ptr) += temp2;

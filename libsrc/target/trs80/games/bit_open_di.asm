@@ -10,8 +10,9 @@
     SECTION code_clib
     PUBLIC     bit_open_di
     PUBLIC     _bit_open_di
-    EXTERN     __snd_tick
+    ;EXTERN     __snd_tick
     EXTERN     __bit_irqstatus
+	EXTERN     bit_open
 
     INCLUDE  "games/games.inc"
     
@@ -26,7 +27,4 @@
         ld (__bit_irqstatus),hl
         pop hl
         
-          ld   a,1
-          ld   (__snd_tick),a
-
-        ret
+        jp bit_open

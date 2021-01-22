@@ -1,0 +1,7 @@
+@stdio/stdio.lst
+target/gl6000/stdio/CRT_FONT
+target/gl6000/stdio/generic_console
+target/gl6000/stdio/generic_console_ioctl
+target/gl6000/stdio/generic_console_vpeek
+target/gl6000/video/asm_lcd_init
+@font/font_8x8/font_8x8.lst
