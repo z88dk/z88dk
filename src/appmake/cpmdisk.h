@@ -33,7 +33,7 @@ typedef struct {
     uint8_t   alternate_sides;
     uint8_t   has_skew;
     uint16_t  skew_track_start;
-    uint8_t   skew_tab[16];
+    uint8_t   skew_tab[32];
 } disc_spec;
 
 typedef struct disc_handle_s disc_handle;
