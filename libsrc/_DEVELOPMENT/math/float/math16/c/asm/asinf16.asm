@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jan 21 15:20:29 2021
+;	Module compile time: Fri Jan 22 11:55:23 2021
 
 
 	C_LINE	0,"asinf16.c"

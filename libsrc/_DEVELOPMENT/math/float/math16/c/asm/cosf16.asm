@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jan 21 15:20:31 2021
+;	Module compile time: Fri Jan 22 11:55:24 2021
 
 
 	C_LINE	0,"cosf16.c"
