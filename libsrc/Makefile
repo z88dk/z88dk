@@ -21,7 +21,7 @@ GENLIBS = z80iy_crt0.lib z80n_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2k_crt0.lib
 GENLIBS += 8085_opt.lib ez80_opt.lib z180_opt.lib
 
 
-TOCREATE := $(call check_target,altair8800,altair8800_clib.lib gfxvti.lib)
+TOCREATE := $(call check_target,altair8800,altair8800_clib.lib gfxvti.lib gfxvdm.lib)
 TOCREATE += $(call check_target,ace,ace_clib.lib gfxace.lib gfxaceudg.lib)
 TOCREATE += $(call check_target,abc80,abc80_clib.lib)
 TOCREATE += $(call check_target,abc800,abc800_clib.lib)
@@ -1705,6 +1705,14 @@ gfxvio.lib:
 	@echo ''
 	$(MAKE) -C gfx TARGET=altair8800 SUBTYPE=vio FLAVOUR="gencon portable"
 	TARGET=vio TYPE=8080 $(LIBLINKER) -m8080 -DFORvio -x$(OUTPUT_DIRECTORY)/gfxvio @$(LISTFILE_DIRECTORY)/video/vio/video_vio.lst
+
+gfxvdm.lib:
+	@echo ''
+	@echo '--- Building VDM graphics Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=altair8800 SUBTYPE=vdm FLAVOUR="gencon portable"
+	TARGET=vdm TYPE=8080 $(LIBLINKER) -m8080 -DFORvdm -x$(OUTPUT_DIRECTORY)/gfxvdm @$(LISTFILE_DIRECTORY)/video/vdm/video_vdm.lst
+
 
 # Preempt multitasking library - dom
 preempt.lib:

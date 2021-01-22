@@ -60,15 +60,15 @@ IF NEEDpoint
 		pop	bc
 ELSE
 		pop	bc		;original coordinates
-IF USEplotc
+  IF USEplotc
 		ld	d,a
                 ld      e,0             ;pixel4 mode
                 call    generic_console_plotc
-ELSE
+  ELSE
 		ld	d,a
 		ld	e,1		;raw mode
 		call	generic_console_printc
-ENDIF
+  ENDIF
 ENDIF
 		pop	bc
 		ret

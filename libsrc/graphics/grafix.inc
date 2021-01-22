@@ -657,6 +657,13 @@ IF FORvio
 	defc blankch    = 32
 ENDIF
 
+IF FORvdm
+	DEFINE gotgfx
+	defc maxx	= 64
+	defc maxy	= 16
+	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
 
 ; =============================================
 
