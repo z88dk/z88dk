@@ -15,7 +15,7 @@ if ($Config{osname} eq 'MSWin32') {
     eval q(use Win32::Autoglob); $@ and die $@;
 }
 
-my $TAB = 3;
+my $TAB = 4;
 my $OPCODE = 2*$TAB;
 my $ARGS = 4*$TAB;
 my $COMMENT = 10*$TAB;
@@ -48,7 +48,7 @@ sub parse_line {
     my %ret;
     
     # line comment
-    if (/^(;.*|\s*)$/) {
+    if (/^(\s*;.*|\s*)$/) {
         $ret{line_comment} = $1;
     }
     else {
@@ -72,6 +72,7 @@ sub parse_line {
             }
         }
         elsif (s/^\s*(;.*)//)                       { $ret{comment} = $1; }
+        elsif (s/^\s*({|})//)                       { $ret{opcode} = $1; $ret{args} = ''; }
         /\S/ and die "cannot parse: $_";
     }
     return \%ret;
