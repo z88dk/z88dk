@@ -9,14 +9,21 @@ Detailed but incomplete changelist:
 - [classic] Vortex Tracker2 is now available for AY music and SFX
 - [classic] PSGLib is now available for SN76489 music and SFX
 - [classic] Interrupt code is now 8080 clean
-- [classic] +cpm: Vector06c disc creation
+- [classic] +altair8800: Bare metal target available
+- [classic] +c128: Generic console and 1 bit sound
+- [classic] +cpm: Vector06c, z80pack disc creation
+- [classic] +cpm: Support for VTI, VDM and VIO graphic boards
 - [classic] +dai: New target
 - [classic] +gb: Banking now works for both sdcc and sccz80
 - [classic] +gb: MBF32 floating point maths is now available
-- [classic] +homelab: New target for the Homelab 3/4 machine
-- [classic] +homelab2: New target for the Homelab 2 machine
+- [classic] +gl: New target: Genius Leader machines (incomplete)
+- [classic] +homelab: New target: Homelab 3/4 machine
+- [classic] +homelab2: New target: Homelab 2 machine
+- [classic] +lm80c: New target for the homebrew LM-80C
+- [classic] +lviv: New target (incomplete)
 - [classic] +msx: Banking now works for both sdcc and sccz80
 - [classic] +msx: MegaROMs can now be created
+- [classic] +pc88: Bootable discs can be created
 - [classic] +ondra: New target
 - [classic] +special: New target
 - [classic] +svi: Generic console now works again
@@ -24,10 +31,10 @@ Detailed but incomplete changelist:
 - [classic] +zx: The enter key now works with ROM input
 - [classic] +zx: Banked code support.
 - [classic] +zx: 128k .TAP and .DSK images can be created
-- [classic] +zxn: New target
+- [classic] +zxn: New target: Spectrum Next
 - [classic] all: IEEE-754 16 bit (adjunct) maths library
 - [classic] all: DAI 8080 (Am9511) 32 bit maths library
-- [newlib] +zx WYZTRacker is now available
+- [newlib] +zx WYZTracker is now available
 - [newlib] all: IEEE-754 16 bit (adjunct) maths library
 - [sccz80] genmath/math48: Fixes to builtin ldexp implementation
 - [sccz80] Bitfields now work and on the 8080
