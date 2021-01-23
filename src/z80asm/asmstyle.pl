@@ -56,9 +56,19 @@ sub parse_line {
         if (s/^\s*\.\s*(\w+)\s*//)                  { $ret{label} = $1; } 
         elsif (s/^\s*(\w+)\s*:\s*//)                { $ret{label} = $1; } 
         elsif (s/^\s*(\w+)\s+(equ)\b/$2/i)          { $ret{label} = $1; }
-    
+
+        # macro 
+        if (s/^\s*(\w+)\s*MACRO\b//i) {
+            $ret{macro_label} = $1;
+            $ret{args} = '';
+            while (/\S/) {
+                if (s/^\s*,\s*//)                   { $ret{args} .= ", "; }
+                elsif (s/^\s*(.)//)                 { $ret{args} .= $1; }
+                else { die; }
+	    }
+        }
         # opcode
-        if (s/^\s*(\w+)\s*//) {
+        elsif (s/^\s*(\w+)\s*//) {
             $ret{opcode} = $1;
             $ret{args} = '';
             while (/\S/) {
@@ -110,6 +120,13 @@ sub format_line {
             if ($line->{opcode}) {
                 $out = tab_to_newline($out, $OPCODE, $fh);
                 $out .= $line->{opcode};
+                $out = tab_to($out, $ARGS);
+                $out .= $line->{args};
+            }
+            if ($line->{macro_label}) {
+                $out = $line->{macro_label};
+                $out = tab_to($out, $OPCODE, $fh);
+                $out .= "MACRO";
                 $out = tab_to($out, $ARGS);
                 $out .= $line->{args};
             }
