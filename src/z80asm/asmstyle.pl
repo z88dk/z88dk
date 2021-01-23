@@ -19,6 +19,7 @@ my $TAB = 4;
 my $OPCODE = 2*$TAB;
 my $ARGS = 4*$TAB;
 my $COMMENT = 10*$TAB;
+my $DEFVARS = 6*$TAB;
 my $LEVEL = 0;
 
 @ARGV or die "Usage: ",path($0)->basename," FILES...\n";
@@ -57,8 +58,19 @@ sub parse_line {
         elsif (s/^\s*(\w+)\s*:\s*//)                { $ret{label} = $1; } 
         elsif (s/^\s*(\w+)\s+(equ)\b/$2/i)          { $ret{label} = $1; }
 
+        # defvars
+        if (s/^\s*(\w+)\s*DS\.\b//i) {
+            $ret{defvars} = $1;
+            $ret{args} = '';
+            while (/\S/) {
+                if (s/^\s+//)                       { $ret{args} .= " "; }
+                elsif (s/^\s*(;.*)//)               { $ret{comment} = $1; }
+                elsif (s/^\s*(.)//)                 { $ret{args} .= $1; }
+                else { die; }
+	    }
+        }
         # macro 
-        if (s/^\s*(\w+)\s*MACRO\b//i) {
+        elsif (s/^\s*(\w+)\s*MACRO\b//i) {
             $ret{macro_label} = $1;
             $ret{args} = '';
             while (/\S/) {
@@ -128,6 +140,13 @@ sub format_line {
                 $out = tab_to($out, $OPCODE, $fh);
                 $out .= "MACRO";
                 $out = tab_to($out, $ARGS);
+                $out .= $line->{args};
+            }
+            if ($line->{defvars}) {
+                $out = tab_to($out, $OPCODE+1, $fh);
+                $out .= $line->{defvars};
+                $out = tab_to($out, $DEFVARS);
+                $out .= "ds.";
                 $out .= $line->{args};
             }
         }
