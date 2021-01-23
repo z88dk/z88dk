@@ -320,11 +320,7 @@ sub add_label_suffix {
 	return 
 		imap {
 			for ($_->{text}) {
-				if ( $_ =~ /^\s*IF\s*/ ) { next; }
-				elsif ( $_ =~ /^\s*IFDEF\s*/ ) { next; }
-				elsif ( $_ =~ /^\s*IFNDEF\s*/ ) { next; }
-				elsif ( $_ =~ /^\s*ELSE\s*/ ) { next; }
-				elsif ( $_ =~ /^\s*ENDIF\s*/ ) { next; }
+				if ( $_ =~ /^\s*(IF|IFDEF|IFNDEF|ELSE|ENDIF)/i ) { next; }
 				s/^(\w+)\s+(\w+)/$1: $2/;
 				s/^(\w+)\s*$/$1:/;
 			}
