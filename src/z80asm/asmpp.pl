@@ -446,7 +446,7 @@ sub convert_expr_it {
 	my($in) = @_;
 	return imap {
 		for ($_->{text}) {
-			if ( $_ =~ /^ [\#\*]? \s* BINARY \s+ $QFILE_RE /ix ) {
+			if ( $_ =~ /^\s*BINARY\s*/i ) {
 				# Skip 'binary' directive.
 				next;
 			}
