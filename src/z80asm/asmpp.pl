@@ -320,6 +320,7 @@ sub add_label_suffix {
 	return 
 		imap {
 			for ($_->{text}) {
+				if ( $_ =~ /^\s*(IF|IFDEF|IFNDEF|ELSE|ENDIF)/i ) { next; }
 				s/^(\w+)\s+(\w+)/$1: $2/;
 				s/^(\w+)\s*$/$1:/;
 			}
@@ -441,6 +442,10 @@ sub convert_expr_it {
 	my($in) = @_;
 	return imap {
 		for ($_->{text}) {
+			if ( $_ =~ /^\s*BINARY\s*/i ) {
+				# Skip 'binary' directive.
+				next;
+			}
 			s{ [\%\@] ( [\'\"] ) (?<str> [\-\#]+ ) \g{-2} 
 			 }{ oct('0b'.join('', 
 							  map {$_ eq '#' ? '1' : '0'}
@@ -468,7 +473,6 @@ sub convert_expr_it {
 			s/ \. EQU \. / == /gxi;
 			s/ \. GT  \. / > /gxi;
 			s/ \. LT  \. / < /gxi;
-			
 			s/ \. HIGH \. \s* ( $EXPR_RE ) / '('.high_expr($1).')' /egxi;
 			s/ \. LOW  \. \s* ( $EXPR_RE ) / '('.low_expr($1).')'  /egxi;
 		}
