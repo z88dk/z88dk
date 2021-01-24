@@ -166,6 +166,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\common\option.c" />
     <ClCompile Include="..\..\src\sccz80\callfunc.c" />
+    <ClCompile Include="..\..\src\sccz80\cdbfile.c" />
     <ClCompile Include="..\..\src\sccz80\codegen.c" />
     <ClCompile Include="..\..\src\sccz80\const.c" />
     <ClCompile Include="..\..\src\sccz80\data.c" />

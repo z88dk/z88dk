@@ -70,6 +70,7 @@
     <ClCompile Include="..\..\src\appmake\p2000.c" />
     <ClCompile Include="..\..\src\appmake\pasopia7.c" />
     <ClCompile Include="..\..\src\appmake\pc88.c" />
+    <ClCompile Include="..\..\src\appmake\pc88disc.c" />
     <ClCompile Include="..\..\src\appmake\pmd85.c" />
     <ClCompile Include="..\..\src\appmake\px.c" />
     <ClCompile Include="..\..\src\appmake\residos.c" />

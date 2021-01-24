@@ -245,5 +245,8 @@
     <ClCompile Include="..\..\src\appmake\ondra.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\appmake\pc88disc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

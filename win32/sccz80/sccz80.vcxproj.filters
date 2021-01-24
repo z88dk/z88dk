@@ -75,6 +75,9 @@
     <ClCompile Include="..\..\src\common\option.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\sccz80\cdbfile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\sccz80\ccdefs.h">

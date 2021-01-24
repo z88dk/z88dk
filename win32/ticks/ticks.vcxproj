@@ -168,6 +168,7 @@
     <ClCompile Include="..\..\ext\UNIXem\src\time.c" />
     <ClCompile Include="..\..\src\ticks\acia.c" />
     <ClCompile Include="..\..\src\ticks\am9511.c" />
+    <ClCompile Include="..\..\src\ticks\debug.c" />
     <ClCompile Include="..\..\src\ticks\debugger.c" />
     <ClCompile Include="..\..\src\ticks\disassembler_alg.c" />
     <ClCompile Include="..\..\src\ticks\hook.c" />
@@ -178,6 +179,7 @@
     <ClCompile Include="..\..\src\ticks\hook_rc2014.c" />
     <ClCompile Include="..\..\src\ticks\linenoise.c" />
     <ClCompile Include="..\..\src\ticks\memory.c" />
+    <ClCompile Include="..\..\src\ticks\srcfile.c" />
     <ClCompile Include="..\..\src\ticks\syms.c" />
     <ClCompile Include="..\..\src\ticks\ticks.c" />
     <ClCompile Include="..\..\src\ticks\utf8.c" />
