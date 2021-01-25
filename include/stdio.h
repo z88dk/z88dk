@@ -343,6 +343,24 @@ extern int __LIB__ printk(const char *fmt,...) __vasmallc;
 extern void __LIB__ perror(char *msg) __z88dk_fastcall;
 
 
+/* We have multiple methods of outputting a character to the console.
+   Normally they are setup at the linking stage, but sometimes we may
+   need multiple methods linked into the program (for example systems
+   with a serial port and a graphics card).
+ */
+
+typedef int (*fputc_cons_func)(char c);
+/* Set the fputc_cons implementation, return the old one */
+extern fputc_cons_func __LIB__ set_fputc_cons(fputc_cons_func func);
+
+/* Implementation that uses the ROM/firmware */
+extern int __LIB__ fputc_cons_native(char c);
+/* Implementation that uses the generic console */
+extern int __LIB__ fputc_cons_generic(char c);
+/* Implementation that uses the ansi terminal */
+extern int __LIB__ fputc_cons_ansi(char c);
+
+
 /*
  *  MICRO C compatibility:  keep at bottom of this file
  *  Some of Dunfield's Micro C code can be ported with the '-DMICROC' parameter

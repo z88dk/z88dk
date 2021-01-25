@@ -3,6 +3,7 @@
 #
 # Aliases used by the classic library
 #
+ALIAS   --conio-selector -pragma-redirect:fputc_cons=fputc_cons_selector -pragma-define:CLIB_DISABLE_FGETS_CURSOR=0
 ALIAS   --generic-console -pragma-redirect:fputc_cons=fputc_cons_generic -pragma-define:CLIB_DISABLE_FGETS_CURSOR=0 
 ALIAS   --hardware-keyboard -pragma-redirect:fgetc_cons=fgetc_cons_inkey -pragma-redirect:getk=getk_inkey 
 
