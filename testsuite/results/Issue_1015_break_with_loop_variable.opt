@@ -148,6 +148,10 @@
 	GLOBAL	getk_inkey
 	GLOBAL	printk
 	GLOBAL	perror
+	GLOBAL	set_fputc_cons
+	GLOBAL	fputc_cons_native
+	GLOBAL	fputc_cons_generic
+	GLOBAL	fputc_cons_ansi
 	GLOBAL	_main
 
 
