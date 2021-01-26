@@ -61,7 +61,7 @@
         IF !DEFINED_CONSOLE_ROWS
            defc CONSOLE_ROWS = 24
         ENDIF
-        IF !DEFINED_CONSOLE_ROWS
+        IF !DEFINED_CONSOLE_COLUMNS
            defc CONSOLE_COLUMNS = 80
         ENDIF
 
