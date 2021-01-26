@@ -42,6 +42,11 @@ extern void __LIB__ bit_noise(int duration, int period) __smallc;
 extern void __LIB__ bit_noise_callee(int duration, int period) __smallc __z88dk_callee;
 #define bit_noise(a,b) bit_noise_callee(a,b)
 
+/* "period": the higher value, the lower tone !  pattern: the "on/off" pattern defining the sound patch, zero terminated */
+extern void __LIB__ patch_beep(int duration, int period, void *pattern) __smallc;
+extern void __LIB__ patch_beep_callee(int duration, int period, void *pattern) __smallc __z88dk_callee;
+#define patch_beep(a,b,c) patch_beep_callee(a,b,c)
+
 /* Real frequency !  Duration is in ms */
 extern void __LIB__ bit_frequency(double_t duration, double_t frequency) __smallc;
 
