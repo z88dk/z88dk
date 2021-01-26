@@ -16,6 +16,9 @@ games/obj/${TARGET}/bit_frequency
 games/obj/${TARGET}/beeper
 games/obj/${TARGET}/bit_beep
 games/obj/${TARGET}/bit_beep_callee
+games/obj/${TARGET}/patch_beeper
+games/obj/${TARGET}/patch_beep
+games/obj/${TARGET}/patch_beep_callee
 games/obj/${TARGET}/noise
 games/obj/${TARGET}/bit_noise
 games/obj/${TARGET}/bit_noise_callee
