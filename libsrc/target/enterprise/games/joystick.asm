@@ -13,12 +13,23 @@
 
 .joystick
 ._joystick
-	;__FASTALL__ : joystick no. in HL
-		
-	ld	c,l
-	ld	b,FN_JOY
-	rst   30h
-	defb  11
+	;__FASTCALL__ : joystick no. in HL
+
+	; L = 0: internal joystick
+	; L = 1: external 1
+	; L = 2: external 2
+
+	ld    a,69h     ; keyboard channel
+	ld    c,l       ; joystick number
+	ld    b,FN_JOY  ; sub-function: read joystick directly
+	rst   30h       ; EXOS
+	defb  11        ; special function
+
+	; b0: right
+	; b1: left
+	; b2: down
+	; b3: up
+	; b4: fire
 
 	ld	h,0
 	ld	l,c
