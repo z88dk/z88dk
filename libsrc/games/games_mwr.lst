@@ -1,6 +1,7 @@
 games/obj/${TARGET}/joystick
 games/obj/${TARGET}/bit_click_mwr
 games/obj/${TARGET}/bit_play
+games/obj/${TARGET}/buzzer_play
 games/obj/${TARGET}/synth_play
 games/obj/${TARGET}/synth_phase
 games/obj/${TARGET}/psg_play
