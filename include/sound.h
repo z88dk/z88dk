@@ -52,15 +52,46 @@ extern void __LIB__ bit_frequency(double_t duration, double_t frequency) __small
 
 /* Play a song (example: "2A--A-B-CDEFGAB5C+") */
 extern void __LIB__ bit_play(unsigned char melody[]) __smallc __z88dk_fastcall;
-extern void __LIB__ synth_play(unsigned char melody[]) __smallc __z88dk_fastcall;
 
 /* Set up the synth phase parameters (4 hex digits, e.g. 0x1234) */
 extern void __LIB__ synth_phase(unsigned int phase) __smallc __z88dk_fastcall;
 
+/* Direct access to the synth phase parameters for manual bending effects */
 extern int synth_phase_1;
 extern int synth_phase_2;
 extern int synth_phase_3;
 extern int synth_phase_4;
+
+/* As for bit_play, but using 4 virtual oscillators.  Lacks of precision, but cool sounds. */
+extern void __LIB__ synth_play(unsigned char melody[]) __smallc __z88dk_fastcall;
+
+/* Yet another way to play a melody.  Good for bass parts. 'soundpatch' is a zero terminated pattern */
+extern void __LIB__ buzzer_play(char *soundpatch, char *melody) __smallc;
+
+/* Sound patches for buzzer_play. */
+/* Some of them can be long and should be put in a static variable */
+#define BUZZ_BASS      "\x01\xF0"
+#define BUZZ_BASS2     "\x0F\x80"
+#define BUZZ_BASS3     "\x3F\x04"
+#define BUZZ_JAMBASS   "\xFF\x80"
+#define BUZZ_TREMBASS  "\x0F\x1E\x0F\x80"
+#define BUZZ_LOW       "\x5C\x5C"
+#define BUZZ_MID       "\xCF"
+#define BUZZ_MID2      "\x02"
+#define BUZZ_HIGH      "\x22"
+#define BUZZ_RESONATE  "\x22\x22"
+#define BUZZ_RESONATE2 "\xAA\xBA"
+
+/* Example on how to 'SQUELCH' the sound tail in complex sound patches:
+// wah wah buzzer
+char wahwah_buzzer[]={0xcF,0xcF,0xcF,0xcF,0xcF,0xcF,0xcF,0xcF,0xcF,0x0F,0x0F,3,3,3,3,3,3,3,3,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,0};
+// buzzer hit
+char buzzer_hit[]={0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,2,2,2,2,2,2,2,2,2,0xcF,0xcF,0xcF,0xcF,0x5C,0x5C,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,0};
+ */
+
+
+
+
 
 /* Platform specific parameters (mainly timing stuff) 
 
