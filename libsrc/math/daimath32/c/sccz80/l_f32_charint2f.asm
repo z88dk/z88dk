@@ -6,6 +6,8 @@
 	PUBLIC	l_f32_uint2f
 	PUBLIC	l_f32_schar2f
 	PUBLIC	l_f32_sint2f
+	PUBLIC  l_f32_ulong2f
+	PUBLIC  l_f32_slong2f
 
 	EXTERN	___dai32_xflt
 	EXTERN	___dai32_fpac
@@ -28,6 +30,8 @@ l_f32_sint2f:
     sbc     a
     ld      e,a
     ld      d,a
+l_f32_ulong2f:
+l_f32_slong2f:
 do_float:
     ld      a,h
     ld      h,l
