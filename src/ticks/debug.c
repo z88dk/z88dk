@@ -91,7 +91,7 @@ void debug_add_info_encoded(char *encoded)
 
 
     }
-    printf("Decoded cdb: <%s>\n",encoded);
+  //  printf("Decoded cdb: <%s>\n",encoded);
 
 }
 

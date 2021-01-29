@@ -134,30 +134,32 @@ int symbol_find_lower(int addr, symboltype preferred_type, char *buf, size_t buf
 
     buf[0] = 0;
 
-    if ( addr < 0 ) {
-        return -1;
-    }
+    while ( 1 ) {
+        if ( addr < 0 ) {
+            return -1;
+        }
     
-    while ( (sym = symbols[addr % 65536]) == NULL && addr > 0 ) {
+        while ( (sym = symbols[addr % 65536]) == NULL && addr > 0 ) {
+            addr--;
+        }
+
+        while ( sym != NULL ) {
+            if ( preferred_type == SYM_ANY ) {
+                break;
+            }
+            // Skip over internal labels?
+            if ( preferred_type == sym->symtype && strncmp(sym->name,"i_",2)) {
+                break;
+            }
+            sym = sym->next;
+        }
+
+        if ( sym != NULL ) {
+            snprintf(buf,buflen,"%s+%d", sym->name, original_address-addr);
+            return 0;
+        } 
         addr--;
     }
-
-    while ( sym != NULL ) {
-        if ( preferred_type == SYM_ANY ) {
-            break;
-        }
-        if ( preferred_type == sym->symtype ) {
-            break;
-        }
-        sym = sym->next;
-    }
-
-    if ( sym != NULL ) {
-        snprintf(buf,buflen,"%s+%d", sym->name, original_address-addr);
-        return 0;
-    }
-    return -1;
-
 }
 
 const char *find_symbol(int addr, symboltype preferred_type)
