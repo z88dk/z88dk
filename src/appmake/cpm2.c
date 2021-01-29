@@ -15,6 +15,7 @@ static char             *c_output_file      = NULL;
 static char             *c_boot_filename     = NULL;
 static char             *c_disc_container    = "dsk";
 static char             *c_extension         = NULL;
+static char              c_disable_com_file_creation = 0;
 static char              help         = 0;
 
 
@@ -28,6 +29,7 @@ option_t cpm2_options[] = {
     { 's', "bootfile", "Name of the boot file",      OPT_STR,   &c_boot_filename },
     {  0,  "container", "Type of container (raw,dsk)", OPT_STR, &c_disc_container },
     {  0,  "extension", "Extension for the output file", OPT_STR, &c_extension},
+    {  0,  "no-com-file", "Don't create a separate .com file", OPT_BOOL, &c_disable_com_file_creation },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -583,6 +585,8 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
 
     disc_write_file(h, cpm_filename, filebuf, binlen);
 
+  
+
     if ( f->extra_hook ) {
         f->extra_hook(h);
     }
@@ -591,6 +595,24 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
         exit_log(1, "Can't write disc image\n");
     }
     disc_free(h);
+
+    if ( c_disable_com_file_creation == 0 ) {
+        FILE *fpout;
+        int   i;
+
+        // Create a .com file alongside the binary so that we have a complete file for copying in other ways
+        any_suffix_change(disc_name, ".com", '.');
+
+        if ((fpout = fopen(disc_name, "wb")) == NULL) {
+            exit_log(1,"Can't open output file: %s\n",disc_name);
+        }
+
+        for (i = 0; i < binlen; i++) {
+            writebyte(((unsigned char *)filebuf)[i], fpout);
+        }
+        fclose(fpout);
+    }
+
 
     return 0;
 }
