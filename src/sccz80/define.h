@@ -128,6 +128,7 @@ struct type_s {
         char  hasva;
         char  oldstyle;
         int   params_offset;
+        int       interrupt;  // IRQ number?
         uint8_t  shortcall_rst;
         uint16_t shortcall_value;
         uint16_t hlcall_module;
@@ -164,19 +165,20 @@ enum symbol_flags {
     //    UNSIGNED = 1,
     //    FARPTR = 0x02,
         FARACC = 0x04,
-        FASTCALL = 0x08,     /* for certain lib calls only */
-        CALLEE = 0x40,      /* Called function pops regs */
-        LIBRARY = 0x80,    /* Lib routine */
-        SAVEFRAME = 0x100,  /* Save framepointer */
-        SMALLC = 0x200,      /* L->R calling order */
+        FASTCALL = 0x08,      /* for certain lib calls only */
+        CALLEE = 0x40,        /* Called function pops regs */
+        LIBRARY = 0x80,       /* Lib routine */
+        SAVEFRAME = 0x100,    /* Save framepointer */
+        SMALLC = 0x200,       /* L->R calling order */
         FLOATINGDECL = 0x400, /* For a function pointer, the calling convention is floating */
-        NAKED = 0x800,      /* Function is naked - don't generate any code */
+        NAKED = 0x800,        /* Function is naked - don't generate any code */
         CRITICAL = 0x1000,    /* Disable interrupts around the function */
-        SDCCDECL = 0x2000,   /* Function uses sdcc convention for chars */
+        SDCCDECL = 0x2000,    /* Function uses sdcc convention for chars */
         SHORTCALL = 0x4000,   /* Function uses short call (via rst) */
         SHORTCALL_HL = 0x8000,   /* Use ld HL,$addr style of shortcall */
         BANKED = 0x10000,      /* Call via the banked_call function */
-        HL_CALL = 0x20000 /* Call via ld hl, (module) call (addr) */
+        HL_CALL = 0x20000,    /* Call via ld hl, (module) call (addr) */
+        INTERRUPT = 0x40000   /* Function is used for interrupts */
 };
 
 

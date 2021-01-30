@@ -1443,6 +1443,12 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     }
     gen_pop_frame(); /* Restore previous frame pointer */
 
+
+    if ( (currfn->flags & INTERRUPT) == INTERRUPT ) {
+        gen_interrupt_leave(currfn);
+        return;
+    }
+
     /* Naked has already returned */
     if ( (currfn->flags & CRITICAL) == CRITICAL || incritical) {
         gen_critical_leave();
@@ -5120,6 +5126,62 @@ void gen_intrinsic_out(SYMBOL *sym)
         ol("out\t(c),a");
     }
 }
+
+
+int zinterruptoffset(SYMBOL *sym)
+{
+    if ( IS_808x() || IS_GBZ80() ) {
+        return 8;
+    }
+    return 12;
+}
+
+void gen_interrupt_enter(SYMBOL *func)
+{
+    // __critical __interrupt(0) -> push
+    // __interrupt -> ei push
+    // __critical __interrupt -> push
+    if ( (func->ctype->flags & CRITICAL) == 0 && func->ctype->funcattrs.interrupt < 0 ) {
+        ol("ei");
+    }
+
+    ol("push\taf");
+    ol("push\tbc");
+    ol("push\tde");
+    ol("push\thl");
+    if ( !IS_808x() && !IS_GBZ80() ) {
+        ol("push\tix");
+        ol("push\tiy");
+    }
+
+}
+void gen_interrupt_leave(SYMBOL *func)
+{
+    if ( !IS_808x() && !IS_GBZ80() ) {
+        ol("pop\tiy");
+        ol("pop\tix");
+    }
+    ol("pop\thl");
+    ol("pop\tde");
+    ol("pop\tbc");
+    ol("pop\taf");
+
+    // __critical __interrupt(0) -> ei, reti
+    // __interrupt -> reti
+    // __critical __interrupt -> retn
+
+    if ( (func->ctype->flags & CRITICAL) == CRITICAL && func->ctype->funcattrs.interrupt < 0 ) {
+        ol("retn");
+    } else if ( (func->ctype->flags & CRITICAL) == 0 && func->ctype->funcattrs.interrupt < 0 ) {
+        ol("reti");
+    } else {
+        ol("ei");
+        ol("reti");
+    }
+    nl();
+    nl();
+}
+
 
 
 void gen_critical_enter(void)
