@@ -2,10 +2,7 @@
 ;
 ;	Daniel Wallner March 2002
 ;
-;	$Id: embedded_crt0.asm,v 1.19 2016-07-13 22:12:25 dom Exp $
-;
-; (DM) Could this do with a cleanup to ensure rstXX functions are
-; available?
+
 
 	DEFC	ROM_Start  = $0000
 	DEFC	RAM_Start  = $8000
@@ -27,6 +24,8 @@
         EXTERN    _main           ;main() is always external to crt0 code
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
+	EXTERN	  asm_im1_handler
+	EXTERN	  asm_nmi_handler
 
 IF DEFINED_CRT_ORG_BSS
         defc    __crt_org_bss = CRT_ORG_BSS
@@ -43,25 +42,81 @@ ENDIF
 	defc	__CPU_CLOCK = 4000000
 	INCLUDE	"crt/classic/crt_rules.inc"
 
+
 	org    	CRT_ORG_CODE
 
 	jp	start
+IF CRT_ORG_CODE = 0x0000
+        defs    $0008-ASMPC
+if (ASMPC<>$0008)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      restart08
+
+        defs    $0010-ASMPC
+if (ASMPC<>$0010)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      restart10
+
+        defs    $0018-ASMPC
+if (ASMPC<>$0018)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      restart18
+
+        defs    $0020-ASMPC
+if (ASMPC<>$0020)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      restart20
+
+    defs        $0028-ASMPC
+if (ASMPC<>$0028)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      restart28
+        defs    $0030-ASMPC
+if (ASMPC<>$0030)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      restart30
+
+        defs    $0038-ASMPC
+if (ASMPC<>$0038)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      asm_im1_handler
+
+        defs    $0066-ASMPC
+if (ASMPC<>$0066)
+        defs    CODE_ALIGNMENT_ERROR
+endif
+        jp      asm_nmi_handler
+
+; Restart routines, nothing sorted yet
+restart08:
+restart10:
+restart18:
+restart20:
+restart28:
+restart30:
+        ret
+ENDIF
+
+
 start:
-; Make room for the atexit() stack
 	INCLUDE	"crt/classic/crt_init_sp.asm"
+	; Make room for the atexit() stack
 	INCLUDE	"crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
 	ld      (exitsp),sp
 
-; Entry to the user code
+	; Entry to the user code
 	call    _main
-
+	; Exit code is in hl
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
-	push	hl
-    call    crt0_exit
+        call    crt0_exit
 
 
 endloop:
