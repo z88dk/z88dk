@@ -26,7 +26,8 @@
 
 
         defc    TAR__clib_exit_stack_size = 0
-        defc    TAR__register_sp = 0xea00		;Guess
+        defc    TAR__register_sp = 0xea00
+	defc    TAR__fputc_cons_generic = 1
 	defc	CRT_KEY_DEL = 127
 	defc	__CPU_CLOCK = 2000000
 	
