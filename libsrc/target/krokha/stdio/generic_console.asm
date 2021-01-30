@@ -12,6 +12,8 @@
                 PUBLIC          generic_console_set_attribute
                 EXTERN		generic_console_flags
 
+		EXTERN		asm_toupper
+
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
 		
@@ -37,7 +39,7 @@ cls_1:
 	dec	bc
 	ld	a,b
 	or	c
-	jr	nz,cls_1
+	jp	nz,cls_1
 	ret
 
 
@@ -46,6 +48,14 @@ cls_1:
 ; a = d = character to print
 ; e = raw
 generic_console_printc:
+	ld	a,e
+	and	a
+	jp	nz,rawmode
+	ld	a,d
+	call	asm_toupper
+	ld	d,a
+rawmode:
+	ld	a,d
 	call	xypos	;Preserves a
 	ld	(hl),a
 	ret
@@ -84,7 +94,7 @@ generic_console_scrollup:
 	push	bc
 	ld	hl, DISPLAY + 1
 	ld	de, DISPLAY
-	ld	bc,+(CONSOLE_COLUMNS*CONSOLE_ROWS)-1
+	ld	bc,+(CONSOLE_COLUMNS*(CONSOLE_ROWS-1))-1
 scroll1:
 	ld	a,(hl)
 	ld	(de),a

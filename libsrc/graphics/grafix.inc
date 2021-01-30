@@ -664,6 +664,11 @@ IF FORvdm
 	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
 ENDIF
 
+IF FORkrokha
+	DEFINE gotgfx
+	defc maxx	= 964 
+	defc maxy	= 64
+ENDIF
 
 ; =============================================
 

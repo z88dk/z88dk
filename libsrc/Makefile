@@ -1697,7 +1697,7 @@ krokha_clib.lib:
 	@echo ''
 	@echo '--- Building Krokha (tiny) Library ---'
 	@echo ''
-	$(call buildgeneric,krokha)
+	$(call buildgeneric,krokha,"gencon portable")
 	#$(MAKE) -C games TARGET=homelab2
 	TARGET=krokha TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORkrokha -x$(OUTPUT_DIRECTORY)/krokha_clib @$(LISTFILE_DIRECTORY)/krokha.lst
 

@@ -1,4 +1,6 @@
 target/krokha/stdio/generic_console
+target/krokha/graphics/textpixl
+@gfx/gencon/gfx_gencon_portable.lst
 @stdio/stdio_8080.lst
 @time/time.lst
 
