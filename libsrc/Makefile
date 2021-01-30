@@ -56,6 +56,7 @@ TOCREATE += $(call check_target,homelab2,homelab2_clib.lib)
 TOCREATE += $(call check_target,kaypro,gfxkp.lib $(CPMLIBS))
 TOCREATE += $(call check_target,kc,kc_clib.lib)
 TOCREATE += $(call check_target,kramermc,kramermc_clib.lib)
+TOCREATE += $(call check_target,krokha,krokha_clib.lib)
 TOCREATE += $(call check_target,lambda, mlambda.lib mlambda_tiny.lib lambda_clib.lib gfxlambda.lib )
 TOCREATE += $(call check_target,laser500,laser500_clib.lib)
 TOCREATE += $(call check_target,lm80c,lm80c_clib.lib)
@@ -1691,6 +1692,14 @@ homelab2_clib.lib:
 	$(call buildgeneric,homelab2,"gencon narrow")
 	$(MAKE) -C games TARGET=homelab2
 	TARGET=homelab2 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhomelab2 -x$(OUTPUT_DIRECTORY)/homelab2_clib @$(LISTFILE_DIRECTORY)/homelab2.lst
+
+krokha_clib.lib:
+	@echo ''
+	@echo '--- Building Krokha (tiny) Library ---'
+	@echo ''
+	$(call buildgeneric,krokha)
+	#$(MAKE) -C games TARGET=homelab2
+	TARGET=krokha TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORkrokha -x$(OUTPUT_DIRECTORY)/krokha_clib @$(LISTFILE_DIRECTORY)/krokha.lst
 
 gfxvti.lib:
 	@echo ''

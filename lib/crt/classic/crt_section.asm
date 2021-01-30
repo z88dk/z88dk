@@ -108,10 +108,10 @@ IF CRT_ENABLE_STDIO = 1
 __sgoioblk:     defs    CLIB_FOPEN_MAX * 10      ;stdio control block
 __sgoioblk_end:   		 ;end of stdio control block
 ENDIF
-		PUBLIC	base_graphics
 		PUBLIC	exitsp
 		PUBLIC	exitcount
 IF !DEFINED_basegraphics
+		PUBLIC	base_graphics
 base_graphics:   defw    0       ;Address of graphics map
 ENDIF
 exitsp:          defw    0       ;atexit() stack

@@ -1,0 +1,4 @@
+target/krokha/stdio/generic_console
+@stdio/stdio_8080.lst
+@time/time.lst
+
