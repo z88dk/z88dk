@@ -9,6 +9,7 @@
         PUBLIC          generic_console_set_paper
         PUBLIC          generic_console_set_attribute
 	PUBLIC		generic_console_xypos
+	PUBLIC		generic_console_ioctl
 
 
         EXTERN          CONSOLE_COLUMNS
@@ -19,15 +20,20 @@
 	;EXTERN		generic_console_flags
 	;EXTERN		conio_map_colour
 
+         INCLUDE "ioctl.def"
+         PUBLIC  CLIB_GENCON_CAPS
+         defc    CLIB_GENCON_CAPS = 0
+
 	INCLUDE "target/m100/def/romcalls.def"
 
+generic_console_ioctl:
+	scf
 generic_console_set_paper:
 generic_console_set_attribute:
-	ret
-
-
 generic_console_set_ink:
 	ret
+
+
 
 generic_console_scrollup:
 	push	bc
