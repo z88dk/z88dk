@@ -232,6 +232,12 @@ IF FORgl
 	defc	sndbit_mask = 8
 ENDIF
 
+IF FORkrokha
+	defc	sndbit_port = 0xf7ff
+	defc	sndbit_bit = 1
+	defc	sndbit_mask = 2
+ENDIF
+
 ; Compatibility ones only, the following ports don't have a beeper
 IF FORondra
         defc sndbit_port   = 0

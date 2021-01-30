@@ -1698,7 +1698,7 @@ krokha_clib.lib:
 	@echo '--- Building Krokha (tiny) Library ---'
 	@echo ''
 	$(call buildgeneric,krokha,"gencon portable")
-	#$(MAKE) -C games TARGET=homelab2
+	$(MAKE) -C games TARGET=krokha
 	TARGET=krokha TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORkrokha -x$(OUTPUT_DIRECTORY)/krokha_clib @$(LISTFILE_DIRECTORY)/krokha.lst
 
 gfxvti.lib:

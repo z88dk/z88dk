@@ -1,5 +1,8 @@
 target/krokha/stdio/generic_console
 target/krokha/graphics/textpixl
+target/krokha/games/joystick
+target/krokha/games/joystick
+@games/games_mwr.lst
 @gfx/gencon/gfx_gencon_portable.lst
 @stdio/stdio_8080.lst
 @time/time.lst

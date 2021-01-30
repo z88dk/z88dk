@@ -22,12 +22,14 @@ IF !__CPU_GBZ80__
           ld   a,(__snd_tick)
           xor  sndbit_mask
 
-        IF sndbit_port > 255
+   IF sndbit_port > 255
+      IF !__CPU_INTEL__	
           ld   bc,sndbit_port
           out  (c),a
-        ELSE
+      ENDIF
+   ELSE
           out  (sndbit_port),a
-        ENDIF
+   ENDIF
 
           ld   (__snd_tick),a
           ret
