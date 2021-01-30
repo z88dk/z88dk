@@ -19,6 +19,7 @@ Detailed but incomplete changelist:
 - [classic] +gl: New target: Genius Leader machines (incomplete)
 - [classic] +homelab: New target: Homelab 3/4 machine
 - [classic] +homelab2: New target: Homelab 2 machine
+- [classic] +krokha: New target: Krokha (tiny) console
 - [classic] +lm80c: New target for the homebrew LM-80C
 - [classic] +lviv: New target (incomplete)
 - [classic] +msx: Banking now works for both sdcc and sccz80
