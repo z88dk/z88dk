@@ -39,11 +39,12 @@ Detailed but incomplete changelist:
 - [newlib] +zx: WYZTracker is now available
 - [newlib] all: IEEE-754 16 bit (adjunct) maths library
 - [sccz80] genmath/math48: Fixes to builtin ldexp implementation
-- [sccz80] Bitfields now work and on the 8080
+- [sccz80] Bitfields now work on the 8080
 - [sccz80] Code generator fixes for gbz80
 - [sccz80] Support for long long integer types
 - [sccz80] Support added for IEEE-754 16 bit floating point numbers
 - [sccz80] Support added for Am9511 32 bit floating point numbers
+- [sccz80] Support for generating __interrupt functions
 - [z80asm] Linking speed cleanup
 - [z80asm] db/dw/ds etc synonyms are now accepted
 - [zsdcc] Upgraded to SDCC 4.0.7 r12036 (bugfixes)
