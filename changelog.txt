@@ -35,7 +35,8 @@ Detailed but incomplete changelist:
 - [classic] +zxn: New target: Spectrum Next
 - [classic] all: IEEE-754 16 bit (adjunct) maths library
 - [classic] all: DAI 8080 (Am9511) 32 bit maths library
-- [newlib] +zx WYZTracker is now available
+- [newlib] +rc2014: APU Module (Am9511) support
+- [newlib] +zx: WYZTracker is now available
 - [newlib] all: IEEE-754 16 bit (adjunct) maths library
 - [sccz80] genmath/math48: Fixes to builtin ldexp implementation
 - [sccz80] Bitfields now work and on the 8080
