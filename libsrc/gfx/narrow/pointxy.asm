@@ -6,7 +6,7 @@
 	EXTERN	pixeladdress
 
 ;
-;	$Id: pointxy.asm,v 1.5 2016-04-13 21:09:09 dom Exp $
+;	$Id: pointxy.asm $
 ;
 
 ; ******************************************************************
@@ -25,18 +25,6 @@
 ;  af....../.... different
 ;
 .pointxy
-			IF maxx <> 256
-				ld	a,h
-				cp	maxx
-				ret	nc
-			ENDIF
-
-			IF maxy <> 256
-				ld	a,l
-				cp	maxy
-				ret	nc			; y0	out of range
-			ENDIF
-
 				push	bc
 				push	de
 				push	hl
