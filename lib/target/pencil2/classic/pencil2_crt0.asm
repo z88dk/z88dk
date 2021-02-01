@@ -46,26 +46,60 @@
 	org	  CRT_ORG_CODE
 	defm	"COPYRIGHT SOUNDIC"
 	jp	program		;Where to start execution from
-	jp	nmi_int		;8013
-	jp	restart08	;8017
-	jp	restart10	;801a
-	jp	restart18	;801d
-	jp	restart20	;8020
-	jp	restart28	;8023
-	jp	restart30 	;8026
-	jp	asm_im1_handler	;Maskable interrupt
-
+IF (__crt_enable_nmi = 1)
+        EXTERN  _z80_nmi
+        jp      _z80_nmi
+ELSE
+        jp      nmi_int         ;NMI
+ENDIF
+IF ((__crt_enable_rst & $0202) = $0002)
+        EXTERN  _z80_rst_08h
+        jp      _z80_rst_08h
+ELSE
+        jp      restart_ret
+ENDIF
+IF ((__crt_enable_rst & $0404) = $0004)
+        EXTERN  _z80_rst_10h
+        jp      _z80_rst_10h
+ELSE
+        jp      restart_ret
+ENDIF
+IF ((__crt_enable_rst & $0808) = $0008)
+        EXTERN  _z80_rst_18h
+        jp      _z80_rst_18h
+ELSE
+        jp      restart_ret
+ENDIF
+IF ((__crt_enable_rst & $1010) = $0010)
+        EXTERN  _z80_rst_20h
+        jp      _z80_rst_20h
+ELSE
+        jp      restart_ret
+ENDIF
+IF ((__crt_enable_rst & $2020) = $0020)
+        EXTERN  _z80_rst_28h
+        jp      _z80_rst_28h
+ELSE
+        jp      restart_ret
+ENDIF
+IF ((__crt_enable_rst & $4040) = $0040)
+        EXTERN  _z80_rst_30h
+        jp      _z80_rst_30h
+ELSE
+        jp      restart_ret
+ENDIF
+IF ((__crt_enable_rst & $8080) = $0080)
+        EXTERN  _z80_rst_38h
+        jp      _z80_rst_38h
+ELSE
+        jp      asm_im1_handler ;Maskable interrupt
+ENDIF
 	defs	$8034 - $802c
 	defm "Z88DK!** **!2019"
 
 
 ; Restart routines, nothing sorted yet
-restart08:
-restart10:
-restart18:
-restart20:
-restart28:
-restart30:
+restart_ret:
 	ret
 
 program:
@@ -89,6 +123,7 @@ cleanup:
 
 
 
+IF (__crt_enable_nmi <> 1)
 nmi_int:
 	push	af
 	push	hl
@@ -102,6 +137,7 @@ no_vbl:
 	pop	hl
 	pop	af
 	retn
+ENDIF
 
 
 ; Safe BIOS call

@@ -5142,7 +5142,8 @@ void gen_interrupt_enter(SYMBOL *func)
     // __interrupt -> ei push
     // __critical __interrupt -> push
     if ( (func->ctype->flags & CRITICAL) == 0 && func->ctype->funcattrs.interrupt < 0 ) {
-        ol("ei");
+        if ( c_cpu & CPU_RABBIT ) ol("ipres");
+        else ol("ei");
     }
 
     ol("push\taf");
@@ -5171,11 +5172,13 @@ void gen_interrupt_leave(SYMBOL *func)
     // __critical __interrupt -> retn
 
     if ( (func->ctype->flags & CRITICAL) == CRITICAL && func->ctype->funcattrs.interrupt < 0 ) {
-        ol("retn");
+        if ( c_cpu & CPU_RABBIT ) ol("ret");
+        else ol("retn");
     } else if ( (func->ctype->flags & CRITICAL) == 0 && func->ctype->funcattrs.interrupt < 0 ) {
         ol("reti");
     } else {
-        ol("ei");
+        if ( c_cpu & CPU_RABBIT ) ol("ipres");
+        else ol("ei");
         ol("reti");
     }
     nl();

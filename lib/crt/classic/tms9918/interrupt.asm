@@ -1,6 +1,6 @@
 	EXTERN	VDP_STATUS
 
-tms9118_interrupt:
+tms9918_interrupt:
 	push	af
 	push	hl
 	ld	a, +(VDP_STATUS >> 16)

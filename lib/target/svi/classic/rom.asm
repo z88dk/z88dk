@@ -12,6 +12,14 @@
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = 0xffff
 
+        ; VDP signals delivered to im1 usually
+        defc TAR__crt_enable_rst = $8080
+        defc _z80_rst_38h = tms9918_interrupt
+
+	; NMI can get VDP, but only in certain hardware configs - later
+	defc TAR__crt_enable_nmi = -1	; Just gets us a retn
+
+
         INCLUDE "crt/classic/crt_rules.inc"
 
 	org	  CRT_ORG_CODE
@@ -23,67 +31,12 @@ endif
 	ld	sp,0xffff
 	jp	program
 
-	defs	$0008-ASMPC
-if (ASMPC<>$0008)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart08
+	INCLUDE	"crt/classic/crt_z80_rsts.asm"
 
-	defs	$0010-ASMPC
-if (ASMPC<>$0010)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart10
-
-	defs	$0018-ASMPC
-if (ASMPC<>$0018)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart18
-
-	defs	$0020-ASMPC
-if (ASMPC<>$0020)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart20
-
-    defs	$0028-ASMPC
-if (ASMPC<>$0028)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart28
-
-	defs	$0030-ASMPC
-if (ASMPC<>$0030)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart30
-
-	defs	$0038-ASMPC
-if (ASMPC<>$0038)
-        defs    CODE_ALIGNMENT_ERROR
-endif
 	; IM1 interrupt routine
-	INCLUDE "crt/classic/tms9118/interrupt.asm"
+	INCLUDE "crt/classic/tms9918/interrupt.asm"
 	ei
 	reti
-
-	defs	$0066 - ASMPC
-if (ASMPC<>$0066)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-nmi:
-	; Should jump to pause
-	retn
-
-; Restart routines, nothing sorted yet
-restart10:
-restart08:
-restart18:
-restart20:
-restart28:
-restart30:
-	ret
 
 int_VBL:
         ld      hl,im1_vectors

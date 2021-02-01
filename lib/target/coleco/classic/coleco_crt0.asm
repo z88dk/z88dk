@@ -45,30 +45,65 @@
 
 	org	  CRT_ORG_CODE
 
-	defb	0x55, 0xaa	;Title screen + 12 second delay, swap to not slip it
+	defb	0x55, 0xaa	;Title screen + 12 second delay, swap to not skip it
 	defw	0		;Sprite name table for BIOS
 	defw	0		;Sprite order table for BIOS
 	defw	0		;Buffer for BIOS
 	defw	0		;Controller map for bios
 	defw	program		;Where to start execution from
-	jp	restart08
-	jp	restart10
-	jp	restart18
-	jp	restart20
-	jp	restart28
-	jp	restart30
+IF ((__crt_enable_rst & $0202) = $0002)
+        EXTERN  _z80_rst_08h
+        jp      _z80_rst_08h
+ELSE
+	jp	restart_ret
+ENDIF
+IF ((__crt_enable_rst & $0404) = $0004)
+        EXTERN  _z80_rst_10h
+        jp      _z80_rst_10h
+ELSE
+	jp	restart_ret
+ENDIF
+IF ((__crt_enable_rst & $0808) = $0008)
+        EXTERN  _z80_rst_18h
+        jp      _z80_rst_18h
+ELSE
+	jp	restart_ret
+ENDIF
+IF ((__crt_enable_rst & $1010) = $0010)
+        EXTERN  _z80_rst_20h
+        jp      _z80_rst_20h
+ELSE
+	jp	restart_ret
+ENDIF
+IF ((__crt_enable_rst & $2020) = $0020)
+        EXTERN  _z80_rst_28h
+        jp      _z80_rst_28h
+ELSE
+	jp	restart_ret
+ENDIF
+IF ((__crt_enable_rst & $4040) = $0040)
+        EXTERN  _z80_rst_30h
+        jp      _z80_rst_30h
+ELSE
+	jp	restart_ret
+ENDIF
+IF ((__crt_enable_rst & $8080) = $0080)
+	EXTERN	_z80_rst_38h
+        jp      _z80_rst_38h
+ELSE
 	jp	asm_im1_handler	;Maskable interrupt
+ENDIF
+IF (__crt_enable_nmi = 1)
+	EXTERN	_z80_nmi
+	jp	_z80_nmi
+ELSE
 	jp	nmi_int		;NMI
+ENDIF
 	defm	" / / "		;TODO: Make it customisable
 	
 
 ; Restart routines, nothing sorted yet
-restart08:
-restart10:
-restart18:
-restart20:
-restart28:
-restart30:
+restart_ret:
 	ret
 
 program:
@@ -92,6 +127,7 @@ cleanup:
 
 
 
+IF (__crt_enable_nmi <> 1)
 nmi_int:
 	push	af
 	push	hl
@@ -105,6 +141,7 @@ no_vbl:
 	pop	hl
 	pop	af
 	retn
+ENDIF
 
 
 ; Safe BIOS call

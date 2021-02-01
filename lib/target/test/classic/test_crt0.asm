@@ -30,7 +30,22 @@
         defc    TAR__register_sp = 65280
 	defc	CRT_KEY_DEL = 127
 	defc	__CPU_CLOCK = 4000000
+
+
+
+IF !__CPU_RABBIT__ && !__CPU_GBZ80__
+    IF CRT_ORG_CODE = 0x0000
+	; We want to intercept rst38 to our interrupt routine
+	defc	TAR__crt_enable_rst = $8080
+	EXTERN	asm_im1_handler
+	defc	_z80_rst_38h = asm_im1_handler
+    ENDIF
+ENDIF
+
+
         INCLUDE "crt/classic/crt_rules.inc"
+
+
 
 IF      !DEFINED_CRT_ORG_CODE
         defc CRT_ORG_CODE = 0x0000
@@ -46,61 +61,7 @@ endif
 
 	jp	program
 
-	defs	$0008-ASMPC
-if (ASMPC<>$0008)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart08
-
-	defs	$0010-ASMPC
-if (ASMPC<>$0010)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart10
-
-	defs	$0018-ASMPC
-if (ASMPC<>$0018)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart18
-
-	defs	$0020-ASMPC
-if (ASMPC<>$0020)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart20
-
-    defs	$0028-ASMPC
-if (ASMPC<>$0028)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart28
-
-	defs	$0030-ASMPC
-if (ASMPC<>$0030)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart30
-
-	defs	$0038-ASMPC
-if (ASMPC<>$0038)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-IF !__CPU_RABBIT__ && !__CPU_GBZ80__
-	jp	asm_im1_handler
-ELSE
-	ret
-ENDIF
-
-; Restart routines, nothing sorted yet
-restart08:
-restart10:
-restart18:
-restart20:
-restart28:
-restart30:
-	ret
-
+	INCLUDE	"crt/classic/crt_z80_rsts.asm"
 ENDIF
 
 program:
