@@ -41,7 +41,7 @@ IF CRT_ORG_CODE = 0x0000
         ; We want to intercept rst38 to our interrupt routine
         defc    TAR__crt_enable_rst = $8080
         EXTERN  asm_im1_handler
-        defc    _z80_rst_38h = asm_im1_bandler
+        defc    _z80_rst_38h = asm_im1_handler
 	IFNDEF CRT_ENABLE_NMI
             defc	TAR__crt_enable_nmi = 2
 	    EXTERN	asm_nmi_handler
