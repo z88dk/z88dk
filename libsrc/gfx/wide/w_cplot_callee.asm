@@ -1,7 +1,7 @@
 
 ; ----- void __CALLEE__ cplot_callee(int x, int y, int c)
 
-SECTION code_clib
+SECTION code_graphics
 PUBLIC cplot_callee
 PUBLIC _cplot_callee
 PUBLIC ASMDISP_CPLOT_CALLEE
