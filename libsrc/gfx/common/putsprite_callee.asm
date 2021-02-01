@@ -8,7 +8,7 @@
 ;
 
 IF !__CPU_GBZ80__
-SECTION code_clib
+SECTION code_graphics
 PUBLIC putsprite_callee
 PUBLIC _putsprite_callee
 
