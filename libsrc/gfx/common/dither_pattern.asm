@@ -6,7 +6,7 @@
 ;
 ;	Stefano Bodrato, 18/3/2009
 ;
-;	$Id: dither_pattern.asm,v 1.3 2016-04-22 20:17:17 dom Exp $
+;	$Id: dither_pattern.asm $
 ;
 
 	SECTION  code_graphics
@@ -35,7 +35,7 @@
 		ld	a,(hl)
 		ret
 
-        SECTION rodata_clib
+        SECTION rodata_graphics
 _dithpat:
 	
 	defb	@00000010	; 1
