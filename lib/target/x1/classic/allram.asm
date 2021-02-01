@@ -4,6 +4,26 @@
 ;
 ;
 
+	defc	CRT_ORG_CODE = 0x0000
+	defc	TAR__register_sp = 0x0000
+
+        ; We want to intercept rst38 to our interrupt manager that reads the 
+	; keyboard
+        defc    TAR__crt_enable_rst = $8080
+        EXTERN  asm_im1_handler
+        defc    _z80_rst_38h = asm_im1_handler
+
+	; Add NMI for good measure
+        IFNDEF CRT_ENABLE_NMI
+            defc        TAR__crt_enable_nmi = 2
+            EXTERN      asm_nmi_handler
+            defc        _z80_nmi = asm_nmi_handler
+        ENDIF	
+
+	INCLUDE	"crt/classic/crt_rules.inc"
+
+	org	CRT_ORG_CODE
+
         EXTERN asm_im1_handler
         EXTERN asm_nmi_handler
         EXTERN im1_install_isr
@@ -14,56 +34,7 @@ endif
     di
     jp      program
 
-    defs    $0008-ASMPC
-if (ASMPC<>$0008)
-    defs    CODE_ALIGNMENT_ERROR
-endif
-    jp      restart08
-
-    defs    $0010-ASMPC
-if (ASMPC<>$0010)
-    defs    CODE_ALIGNMENT_ERROR
-endif
-    jp      restart10
-
-    defs    $0018-ASMPC
-if (ASMPC<>$0018)
-    defs    CODE_ALIGNMENT_ERROR
-endif
-    jp      restart18
-
-    defs    $0020-ASMPC
-if (ASMPC<>$0020)
-    defs    CODE_ALIGNMENT_ERROR
-endif
-    jp      restart20
-
-defs        $0028-ASMPC
-if (ASMPC<>$0028)
-    defs    CODE_ALIGNMENT_ERROR
-endif
-    jp      restart28
-    defs    $0030-ASMPC
-    defs    $0038-ASMPC
-if (ASMPC<>$0038)
-    defs    CODE_ALIGNMENT_ERROR
-endif
-    jp      asm_im1_handler
-
-    defs    $0066 - ASMPC
-if (ASMPC<>$0066)
-    defs    CODE_ALIGNMENT_ERROR
-endif
-    jp      asm_nmi_handler
-
-restart10:
-restart08:
-restart18:
-restart20:
-restart28:
-restart30:
-    ret
-
+    INCLUDE "crt/classic/crt_z80_rsts.asm"
 
 program:
 ; Make room for the atexit() stack
@@ -78,10 +49,8 @@ IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
     ; Install the keyboard interrupt handler
-    ld      hl,asm_x1_keyboard_handler
-    push    hl
-    call    im1_install_isr
-    pop     bc
+    ld      de,asm_x1_keyboard_handler
+    call    asm_im1_install_isr
     im      1
     ei
   

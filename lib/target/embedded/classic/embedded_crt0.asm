@@ -36,6 +36,18 @@ ENDIF
 IF      !CRT_ORG_CODE
 	defc	CRT_ORG_CODE = ROM_Start
 ENDIF
+
+IF CRT_ORG_CODE = 0x0000
+        ; We want to intercept rst38 to our interrupt routine
+        defc    TAR__crt_enable_rst = $8080
+        EXTERN  asm_im1_handler
+        defc    _z80_rst_38h = asm_im1_bandler
+	IFNDEF CRT_ENABLE_NMI
+            defc	TAR__crt_enable_nmi = 2
+	    EXTERN	asm_nmi_handler
+    	    defc	_z80_nmi = asm_nmi_handler
+        ENDIF
+ENDIF
 	
 	defc	TAR__register_sp = Stack_Top
         defc    TAR__clib_exit_stack_size = 32
@@ -45,65 +57,11 @@ ENDIF
 
 	org    	CRT_ORG_CODE
 
-	jp	start
+
 IF CRT_ORG_CODE = 0x0000
-        defs    $0008-ASMPC
-if (ASMPC<>$0008)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-        jp      restart08
-
-        defs    $0010-ASMPC
-if (ASMPC<>$0010)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-        jp      restart10
-
-        defs    $0018-ASMPC
-if (ASMPC<>$0018)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-        jp      restart18
-
-        defs    $0020-ASMPC
-if (ASMPC<>$0020)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-        jp      restart20
-
-    defs        $0028-ASMPC
-if (ASMPC<>$0028)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-        jp      restart28
-        defs    $0030-ASMPC
-if (ASMPC<>$0030)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-        jp      restart30
-
-        defs    $0038-ASMPC
-if (ASMPC<>$0038)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-        jp      asm_im1_handler
-
-        defs    $0066-ASMPC
-if (ASMPC<>$0066)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-        jp      asm_nmi_handler
-
-; Restart routines, nothing sorted yet
-restart08:
-restart10:
-restart18:
-restart20:
-restart28:
-restart30:
-        ret
+	jp	start
+	INCLUDE	"crt/classic/crt_z80_rsts.asm"
 ENDIF
-
 
 start:
 	INCLUDE	"crt/classic/crt_init_sp.asm"

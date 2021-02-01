@@ -22,15 +22,6 @@
     EXTERN  asm_x1_keyboard_handler
 
 
-    IF      !DEFINED_CRT_ORG_CODE
-        IF (startup=2)
-            defc    CRT_ORG_CODE  = 32768
-    	    defc    TAR__register_sp = 0xFDFF
-        ELSE
-            defc    CRT_ORG_CODE  = 0
-            defc    TAR__register_sp = 65535
-        ENDIF
-    ENDIF
 
     defc    CONSOLE_COLUMNS = 40
     defc    CONSOLE_ROWS = 25
@@ -38,9 +29,6 @@
     defc	TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 32
     defc	__CPU_CLOCK = 4000000
-    INCLUDE "crt/classic/crt_rules.inc"
-
-    org     CRT_ORG_CODE
 
 
 IF (!DEFINED_startup | (startup=1))

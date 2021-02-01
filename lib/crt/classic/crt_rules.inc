@@ -17,6 +17,25 @@
       ENDIF
    ENDIF
 
+   IFNDEF TAR__crt_enable_rst
+       defc TAR__crt_enable_rst = 0x0000
+   ENDIF
+
+   IFDEF CRT_ENABLE_RST
+      defc __crt_enable_rst = CRT_ENABLE_RST | TAR__crt_enable_rst
+   ELSE
+      defc __crt_enable_rst = TAR__crt_enable_rst
+   ENDIF
+
+   IFDEF CRT_ENABLE_NMI
+      defc __crt_enable_nmi = CRT_ENABLE_NMI
+   ELSE
+     IFNDEF TAR__crt_enable_nmi
+        defc TAR__crt_enable_nmi = 0
+     ENDIF
+     defc __crt_enable_nmi = TAR__crt_enable_nmi
+   ENDIF
+
    IFNDEF CRT_ENABLE_STDIO
        defc CRT_ENABLE_STDIO = 1
    ENDIF
