@@ -53,3 +53,7 @@ __vram_out:	defb	VRAM_OUT
 	PUBLIC	__port29_copy
 __port29_copy:	defb	0
 
+; Create the bootstrap as well
+IF startup = 2
+	INCLUDE	"target/multi8/classic/bootstrap.asm"
+ENDIF

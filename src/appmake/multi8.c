@@ -25,15 +25,17 @@ option_t multi8_options[] = {
 };
 
 
+static void write_block(FILE *fpout, FILE *fpin, int pos, int len);
+
 int multi8_exec(char *target)
 {
     char    filename[FILENAME_MAX+1];
     FILE    *fpin, *fpout;
-    long    pos;
-    int     c;
-    int     i;
-    int     len;
-    int     cksum = 0;
+    FILE    *bootstrap_fp = NULL;
+    int      bootlen;
+    long     pos;
+    int      len;
+    int      bootstrap = 0;
 
     if ( help )
         return -1;
@@ -58,25 +60,64 @@ int multi8_exec(char *target)
     }
 
 
+    if (parameter_search(crtfile, ".map", "__multi8_bootstrap_built") > 0) {
+        bootstrap = 1;
+    }
+
+
+
    if ( (fpin=fopen_bin(binname, crtfile) ) == NULL ) {
         exit_log(1,"Can't open input file %s\n",binname);
     }
 
     /* Determine size of input file */
     if ( fseek(fpin,0,SEEK_END) ) {
-        fclose(fpin);
         exit_log(1,"Couldn't determine size of file\n");
         fclose(fpin);
     }
 
     len=ftell(fpin);
-
     fseek(fpin,0L,SEEK_SET);
 
+
     if ( (fpout=fopen(filename,"wb") ) == NULL ) {
-        fclose(fpin);
         exit_log(1,"Can't open output file\n");
     }
+
+    if ( bootstrap ) {
+        char  bootname[FILENAME_MAX+1];
+
+        strcpy(bootname, binname);
+        suffix_change(bootname, "_BOOTSTRAP.bin");
+        if ( (bootstrap_fp=fopen_bin(bootname, crtfile) ) == NULL ) {
+            exit_log(1,"Can't open bootstrap file %s\n",bootname);
+        }
+        if ( fseek(bootstrap_fp,0,SEEK_END) ) {
+            fclose(bootstrap_fp);
+            exit_log(1,"Couldn't determine size of bootstrap file\n");
+        }
+        bootlen = ftell(bootstrap_fp);
+        fseek(bootstrap_fp,0L,SEEK_SET);
+    }
+
+    // Write the bootstrap if we need to
+    if ( bootstrap_fp != NULL ) {
+        write_block(fpout, bootstrap_fp, 0xc000, bootlen);
+        fclose(bootstrap_fp);
+    }
+
+    write_block(fpout, fpin, pos, len);
+
+    fclose(fpin);
+    fclose(fpout);
+
+    return 0;
+}
+
+static void write_block(FILE *fpout, FILE *fpin, int pos, int len) 
+{
+    int cksum = 0;
+    int i,c;
 
     writebyte(0x3a, fpout);
     writebyte(pos / 256, fpout);
@@ -90,7 +131,7 @@ int multi8_exec(char *target)
          }
          writebyte(0x3a,fpout);
          writebyte(0xff,fpout);
-	 cksum = 255;
+         cksum = 255;
       }
       c=getc(fpin);
       cksum += c;
@@ -115,10 +156,5 @@ int multi8_exec(char *target)
     writebyte(0x3a,fpout);
     writebyte(0x00,fpout);
     writebyte(0x00,fpout);
-
-    fclose(fpin);
-    fclose(fpout);
-
-    return 0;
 }
 
