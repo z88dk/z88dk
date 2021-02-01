@@ -9,7 +9,6 @@ gfx/wide/obj/${TARGET}/w_clga
 gfx/wide/obj/${TARGET}/w_clga_callee
 gfx/wide/obj/${TARGET}/w_cplot_callee
 gfx/wide/obj/${TARGET}/w_dcircle
-gfx/wide/obj/${TARGET}/w_dcircle_square
 gfx/wide/obj/${TARGET}/w_draw
 gfx/wide/obj/${TARGET}/w_draw_callee
 gfx/wide/obj/${TARGET}/w_drawb
