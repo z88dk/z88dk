@@ -100,7 +100,9 @@ ENDIF
 		SECTION ROMABLE_END
 IF !__crt_model
 		SECTION DATA
+IF !__crt_org_graphics
 		SECTION smc_clib
+ENDIF
 		SECTION smc_user
                 SECTION data_driver
 		SECTION data_clib
@@ -157,7 +159,9 @@ IF __crt_model > 0
         	SECTION DATA
 		org	-1
 		defb	0		; control name of data binary
+IF !__crt_org_graphics
 		SECTION smc_clib
+ENDIF
 		SECTION smc_fp
 		SECTION smc_user
                 SECTION data_driver
@@ -181,6 +185,7 @@ ENDIF
 IF __crt_org_graphics
 		SECTION	HIMEM
 		org	__crt_org_graphics
+		SECTION smc_clib
 		SECTION code_graphics
 		SECTION code_himem
 		SECTION rodata_graphics
