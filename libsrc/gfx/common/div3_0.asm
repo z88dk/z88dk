@@ -11,10 +11,10 @@
 ;	then dividing by 3
 ;
 ;
-;	$Id: div3.asm,v 1.4 2016-06-16 19:53:50 dom Exp $
+;	$Id: div3.asm $
 ;
 
-        SECTION rodata_clib
+        SECTION rodata_graphics
 	PUBLIC	div3_0
 
 .div3_0
