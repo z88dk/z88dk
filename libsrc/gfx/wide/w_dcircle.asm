@@ -260,7 +260,7 @@ IF !__CPU_INTEL__
 		jp l9905
 
 		
-	SECTION smc_clib
+;	SECTION smc_clib
 	
 .do_w_plot
 		jp (ix)
