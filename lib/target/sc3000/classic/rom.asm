@@ -45,7 +45,7 @@ endif
 	INCLUDE	"crt/classic/crt_z80_rsts.asm"
 
 	; Interrupt routine, defines tms9918_interrupt
-	INCLUDE	"crt/classic/tms9118/interrupt.asm"
+	INCLUDE	"crt/classic/tms9918/interrupt.asm"
 	ei
 	reti
 

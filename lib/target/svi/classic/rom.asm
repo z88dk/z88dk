@@ -34,7 +34,7 @@ endif
 	INCLUDE	"crt/classic/crt_z80_rsts.asm"
 
 	; IM1 interrupt routine
-	INCLUDE "crt/classic/tms9118/interrupt.asm"
+	INCLUDE "crt/classic/tms9918/interrupt.asm"
 	ei
 	reti
 

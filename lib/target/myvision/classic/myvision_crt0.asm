@@ -45,7 +45,7 @@
 
         ; VDP signals delivered to im1
         defc TAR__crt_enable_rst = $8080
-        defc _z80_rst_38h = tms9918_interrupt
+	defc _z80_rst_38h = tms9918_interrupt
 
 	; No NMI on this machine
 
@@ -62,7 +62,7 @@ endif
 
 	INCLUDE	"crt/classic/crt_z80_rsts.asm"
 
-        INCLUDE "crt/classic/tms9118/interrupt.asm"
+        INCLUDE "crt/classic/tms9918/interrupt.asm"
         ei
         reti
 

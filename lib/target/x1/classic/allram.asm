@@ -26,7 +26,7 @@
 
         EXTERN asm_im1_handler
         EXTERN asm_nmi_handler
-        EXTERN im1_install_isr
+        EXTERN asm_im1_install_isr
 
 if (ASMPC<>$0000)
     defs    CODE_ALIGNMENT_ERROR
