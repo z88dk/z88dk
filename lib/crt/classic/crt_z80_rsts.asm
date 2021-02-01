@@ -97,7 +97,11 @@ IF ((__crt_enable_rst & $80) = $80)
     ENDIF
         jp      _z80_rst_38h
 ELSE
+  IF __CPU_RABBIT__
+        ipres
+  ELSE
 	ei
+  ENDIF
   IF __CPU_INTEL__
   	ret
   ELSE
@@ -118,7 +122,11 @@ IF !__CPU_INTEL__
       IF (__crt_enable_nmi > 1)
         jp _z80_nmi
       ELSE
+       IF __CPU_RABBIT__
+        ret
+       ELSE
         retn
+       ENDIF
       ENDIF
     ENDIF
   ENDIF
