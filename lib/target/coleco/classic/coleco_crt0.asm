@@ -93,7 +93,7 @@ IF ((__crt_enable_rst & $8080) = $0080)
 ELSE
 	jp	asm_im1_handler	;Maskable interrupt
 ENDIF
-IF (__crt_enable_nmi = 1)
+IF (__crt_enable_nmi > 1)
 	EXTERN	_z80_nmi
 	jp	_z80_nmi
 ELSE
@@ -127,7 +127,7 @@ cleanup:
 
 
 
-IF (__crt_enable_nmi <> 1)
+IF (__crt_enable_nmi <= 1)
 nmi_int:
 	push	af
 	push	hl

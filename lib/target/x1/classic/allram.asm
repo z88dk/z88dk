@@ -15,7 +15,7 @@
 
 	; Add NMI for good measure
         IFNDEF CRT_ENABLE_NMI
-            defc        TAR__crt_enable_nmi = 2
+            defc        TAR__crt_enable_nmi = 1
             EXTERN      asm_nmi_handler
             defc        _z80_nmi = asm_nmi_handler
         ENDIF	

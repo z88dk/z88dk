@@ -46,7 +46,7 @@
 	org	  CRT_ORG_CODE
 	defm	"COPYRIGHT SOUNDIC"
 	jp	program		;Where to start execution from
-IF (__crt_enable_nmi = 1)
+IF (__crt_enable_nmi > 1)
         EXTERN  _z80_nmi
         jp      _z80_nmi
 ELSE
@@ -123,7 +123,7 @@ cleanup:
 
 
 
-IF (__crt_enable_nmi <> 1)
+IF (__crt_enable_nmi <= 1)
 nmi_int:
 	push	af
 	push	hl

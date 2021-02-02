@@ -115,11 +115,11 @@ IF !__CPU_INTEL__
     IF (ASMPC<>$0066)
         defs    CODE_ALIGNMENT_ERROR
     ENDIF
-    IF (__crt_enable_nmi = 1)
+    IF (__crt_enable_nmi > 1)
         EXTERN _z80_nmi
         jp _z80_nmi
     ELSE
-      IF (__crt_enable_nmi > 1)
+      IF (__crt_enable_nmi = 1)
         jp _z80_nmi
       ELSE
        IF __CPU_RABBIT__

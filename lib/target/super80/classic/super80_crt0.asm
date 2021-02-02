@@ -41,7 +41,7 @@
         EXTERN asm_im1_handler
         defc _z80_rst_38h = asm_im1_handler
 	IFNDEF CRT_ENABLE_NMI
-            defc        TAR__crt_enable_nmi = 2
+            defc        TAR__crt_enable_nmi = 1
             EXTERN      asm_nmi_handler
             defc        _z80_nmi = asm_nmi_handler
         ENDIF
