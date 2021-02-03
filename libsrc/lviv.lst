@@ -15,4 +15,6 @@ target/lviv/graphics/xorpixl
 target/lviv/graphics/pointxy
 @gfx/portable/gfx_portable.lst
 @gfx/narrow/gfx_narrow.lst
-
+stdio/inkey/getk
+stdio/inkey/fgetc_cons
+@input/input_keyboard.lst
