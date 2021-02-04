@@ -21,13 +21,18 @@
 
 
         defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = 0xa000		;Guess
+        defc    TAR__register_sp = 0xa000
 	defc	CRT_KEY_DEL = 127
 	defc	__CPU_CLOCK = 2500000
+
+        IF !CLIB_FGETC_CONS_DELAY
+                defc CLIB_FGETC_CONS_DELAY = 150
+        ENDIF
 
         defc TAR__crt_enable_rst = $8080
         EXTERN asm_im1_handler
         defc _z80_rst_38h = asm_im1_handler
+	defc TAR__crt_enable_nmi = -1		;Disable NMI
 
 
         INCLUDE "crt/classic/crt_rules.inc"
@@ -49,6 +54,7 @@ endif
 	jp	program
 
 	INCLUDE	"crt/classic/crt_z80_rsts.asm"
+ENDIF
 
 program:
         INCLUDE "crt/classic/crt_init_sp.asm"

@@ -60,21 +60,21 @@ gotit:
 	rrca
 	rrca
 	and	15	;That gets the row
-	or	e
+	or	e	;Ctrl/shift modifiers
 	ld	e,a	;That's safe now
 	; Now calculate the mask, 
-	ld	d,@10000000
-maskloop:
 	ld	a,b
 	and	7
-	jp	z,got_mask
-	ld	h,a
-	ld	a,d
-	rrca
-	ld	d,a
+	ld	b,a
+	ld	a,@00000001
+	inc	b
+maskloop:
 	dec	b
+	jp	z,got_mask
+	rlca
 	jp	maskloop
 got_mask:
+	ld	d,a
 	ex	de,hl
 	and	a
 	ret

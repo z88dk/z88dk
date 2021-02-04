@@ -4,23 +4,23 @@
 ; this key translation table to emulate a PC keyboard with the 'CTRL' key
 
 SECTION rodata_clib
-PUBLIC in_keytranstbl
+PUBLIC in_keytranstbl_qwerty
 
 
-; This is a JCUKEN keyboard layout
-.in_keytranstbl
+; This is a QWERTY keyboard layout
+.in_keytranstbl_qwerty
 
 
 ;Unshifted - 8 rows, 64 bytes + 4 rows, 32 bytes
 ; PPI2 PORTA
 	defb	'6', '7', '8', 255,   7, '-', '0', '9'	; 6 7 8 INS TAB - 0 9
-	defb	'g', '[', ']',  13, 127, ':', 'h', 'z'	; G [ ] RET DEL * H Z
-	defb	'r', 'o', 'l',  12, '.','\\', 'v', 'd'	; r o l BKSP . \ v d
-	defb	' ', 'b', '@', 255, '_', 255, '/', ','	; SP b @ RSHIFT _ RCTRL / ,
+	defb	'u', 'i', 'o',  13, 127, ']', '[', 'p'	; G [ ] RET DEL * H Z
+	defb	'h', 'j', 'k',  12, 255,'\\', ';', 'l'	; r o l BKSP . \ v d
+	defb	' ', ',', '.', 255, '_', 255, '/', 255	; SP b @ RSHIFT _ RCTRL / ,
 	defb	 27, 128, 129, '5', '4', '3', '2', '1'	; ESC F1 F2 5 4 3 2 1
-	defb	255, 255, 'j', 'n', 'e', 'k', 'u', 'c'	; UN UN j n e k u c
-	defb	';', 255,   6, 'p', 'a', 'w', 'y', 'f'	; ; LCTRL CAPS p a w y f
-	defb	255, 'q', '^', 'x', 't', 'i', 'm', 's'	; LSHIFT q ^ x t i m s
+	defb	255, 255, 'q', 'y', 't', 'r', 'e', 'w'	; UN UN j n e k u c
+	defb	';', 255,   6, 'g', 'f', 'd', 's', 'a'	; ; LCTRL CAPS p a w y f
+	defb	255, 'z', 'x', 'm', 'n', 'b', 'v', 'c'	; LSHIFT q ^ x t i m s
 ; PP2 PORTC
 	defb	255, 255, 255, 255, 133, 132, 131, 130  ; UN UN UN UN F6 F5 F4 F3
 	defb	255, 255, 255, 255, 134, 135, 136, 137  ; UN UN UN UN F7 F8 F9 F10
@@ -30,13 +30,13 @@ PUBLIC in_keytranstbl
 ; Shifted
 ; PPI2 PORTA
 	defb	'&','\'', '(', 255,   7, '=', '0', ')'	; 6 7 8 INS TAB - 0 9
-	defb	'G', '{', '}',  13,  12, '*', 'H', 'Z'	; G [ ] RET DEL * H Z
-	defb	'R', 'O', 'L', 127, '>', '|', 'V', 'D'	; r o l BKSP . \ v d
-	defb	' ', 'B', '@', 255, '_', 255, '?', '<'	; SP b @ RSHIFT _ RCTRL / ,
-	defb	 27, 128, 129, '%', '$', '#','\"', '!'	; ESC F1 F2 5 4 3 2 1
-	defb	255, 255, 'J', 'N', 'E', 'K', 'U', 'C'	; UN UN j n e k u c
-	defb	'+', 255,   6, 'P', 'A', 'W', 'Y', 'F'	; ; LCTRL CAPS p a w y f
-	defb	255, 'Q', '~', 'X', 'T', 'I', 'M', 'S'	; LSHIFT q ^ x t i m s
+	defb	'U', 'I', 'O',  13, 127, '}', '{', 'P'	; G [ ] RET DEL * H Z
+	defb	'H', 'J', 'K',  12, 255,'\\', ':', 'L'	; r o l BKSP . \ v d
+	defb	' ', '<', '>', 255, '-', 255, '?', 255	; SP b @ RSHIFT _ RCTRL / ,
+	defb	 27, 128, 129, '%', '$', '#', '@', '!'	; ESC F1 F2 5 4 3 2 1
+	defb	255, 255, 'Q', 'Y', 'T', 'R', 'E', 'W'	; UN UN j n e k u c
+	defb	':', 255,   6, 'G', 'F', 'D', 'S', 'A'	; ; LCTRL CAPS p a w y f
+	defb	255, 'Z', 'X', 'M', 'N', 'B', 'V', 'C'	; LSHIFT q ^ x t i m s
 ; PP2 PORTC
 	defb	255, 255, 255, 255, 133, 132, 131, 130  ; UN UN UN UN F6 F5 F4 F3
 	defb	255, 255, 255, 255, 134, 135, 136, 137  ; UN UN UN UN F7 F8 F9 F10

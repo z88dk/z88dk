@@ -25,22 +25,18 @@ EXTERN in_keytranstbl
 	ld	a,l
 	and	15
 	cp	8
-	jp	z,second_keyboard_port
+	jp	nc,second_keyboard_port
 ; Consider the first keyboard port
-	ld	d,@11111110
-	ld	e,a
+	ld	c,a
+	ld	a,@11111110
+	inc	c
 calc_mask:
-	ld	a,e
-	and	15
-	jr	z,got_mask
-	ld	a,d
+	dec	c
+	jp	z,got_mask
 	rlca
-	ld	d,a
-	dec	e
 	jp	calc_mask
 got_mask:
-	; d = mask for key row
-	ld	a,d
+	; a = mask for key row
 	out	($d0),a		;ppi1 port a
 	in	a,($d1)		;ppi1 port b
 scan_rejoin:
@@ -48,6 +44,9 @@ scan_rejoin:
 	and	h
 	jp	z,no_key
 
+	ld	hl,1
+	scf
+	ret
 
 check_modifiers:
 	; Now we need to check for control + shift
@@ -63,9 +62,9 @@ check_modifiers:
 	out	($d0),a
 	in	a,($d1)
 	cpl
-	and	@10000000
+	and	@00000001
 	or	e		;So if nz, shift is pressed
-	ld	c,@00000001
+	ld	c,@10000000
 	jp	nz,check_control
 	ld	c,0
 
@@ -101,21 +100,17 @@ no_key:
 	ret
 
 second_keyboard_port:
-        ld      d,@11111110
 	sub	8
-	ld	e,a
+	ld	c,a
+        ld      a,@11111110
+	inc	c
 calc_mask2:
-	ld	a,e
-	and	a
+	dec	c
 	jp	z,got_mask2
-        ld      a,d
         rlca
-        ld      d,a
-        dec     e
-	jr	calc_mask2
+	jp	calc_mask2
 got_mask2:
-        ; d = mask for key row
-        ld      a,d
+        ; a = mask for key row
         out     ($d2),a         ;ppi1 port a
         in      a,($d2)         ;ppi1 port b
 	jp	scan_rejoin
