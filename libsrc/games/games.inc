@@ -238,6 +238,12 @@ IF FORkrokha
 	defc	sndbit_mask = 2
 ENDIF
 
+IF FORlviv
+        defc sndbit_port   = $c2
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 1
+ENDIF
+
 ; Compatibility ones only, the following ports don't have a beeper
 IF FORondra
         defc sndbit_port   = 0
