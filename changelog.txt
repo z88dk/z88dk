@@ -21,7 +21,7 @@ Detailed but incomplete changelist:
 - [classic] +homelab2: New target: Homelab 2 machine
 - [classic] +krokha: New target: Krokha (tiny) console
 - [classic] +lm80c: New target for the homebrew LM-80C
-- [classic] +lviv: New target (incomplete)
+- [classic] +lviv: New target for the Lviv/Lvov PK-01
 - [classic] +msx: Banking now works for both sdcc and sccz80
 - [classic] +msx: MegaROMs can now be created
 - [classic] +pc88: Bootable discs can be created
