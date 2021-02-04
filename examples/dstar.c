@@ -78,10 +78,7 @@
  *      zcc +vz -Dspritesize=7 -DSOUND -odztar.vz dstar.c
  *
  *      TIKI1-100
- *      add the following two lines on top of this file:
- *         #pragma output nogfxglobals
- *         char foo [28000]
- *      zcc +cpm -ltiki100 -o dstar.com -Dspritesize=28 dstar.c
+ *      zcc +cpm -subtype=tiki100 -o dstar.com -Dspritesize=28 dstar.c
  *
  *      MSXDOS:
  *      zcc +msx -Dspritesize=16 -DSOUND -startup=2 dstar.c
@@ -195,7 +192,14 @@
 #define spritesize 6
 #endif
 
+
 #include "dstar.h"
+
+
+#ifdef __TIKI100__
+#include "tiki100.h"
+#endif
+
  
 void main()
 {
@@ -321,6 +325,9 @@ void DrawBoard(void)
 
 	ptr = Board;
 
+#ifdef __TIKI100__
+	gr_defmod(1);
+#endif
 
 	clg(); /* clear the screen */
 
