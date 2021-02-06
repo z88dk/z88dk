@@ -98,7 +98,6 @@ ENDIF
 	ld	b,0
 	ld	hl,argv_start
 	add	hl,bc	; now points to end of the command line
-	defc DEFINED_noredir = 1
 	INCLUDE "crt/classic/crt_command_line.asm"
 	push	hl	;argv
 	push	bc	;argc
@@ -127,3 +126,10 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 
 	SECTION rodata_clib
 end:            defb    0               ; null file name
+
+IF !DEFINED_noredir
+IF CRT_ENABLE_STDIO = 1
+redir_fopen_flag:               defb    'w',0
+redir_fopen_flagr:              defb    'r',0
+ENDIF
+ENDIF
