@@ -39,7 +39,7 @@ int kbhit(void)
         ungetc(ch, stdin);
         return 1;
     }
-    return 0;
+    return -1;
 }
 
 
@@ -112,10 +112,14 @@ static void cmd_readkey(void)
     else
         val = getchar();        // read in cooked mode if redirected from a file
 
-    l = val % 256;
-    h = val / 256;
-
-    SET_ERROR(Z88DK_ENONE);
+    if ( val != -1 ) {
+        l = val % 256;
+        h = val / 256;
+        SET_ERROR(Z88DK_ENONE);
+    } else {
+        SET_ERROR(Z88DK_EINVAL);
+        l = h = 255;
+    }
 }
 
 static void cmd_pollkey(void)
