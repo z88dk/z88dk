@@ -13,14 +13,14 @@ int open(char *name, int flags, mode_t mode) __naked
     inc     a
     and     3
     inc     hl
-    ld      c,8		; esx_mode_open_creat
-    bit     0,(hl)	;O_APPEND
-    jr      z,not_o_append
     ld      c,0		; esx_mode_open_exist
-not_o_append:
+    bit     2,(hl)      ;O_CREAT
+    jr      z,not_o_creat
+    ld      c,8         ; esx_mode_open_crea
     bit     1,(hl)	;O_TRUNC
     jr      z,not_o_trunc
-    ld	    c,$0c		; esx_mode_creat_trunc
+    ld	    c,$0c	; esx_mode_creat_trunc
+not_o_creat:
 not_o_trunc:
     or      c		; add in open mode
     ld      b,a
@@ -31,7 +31,7 @@ not_o_trunc:
     ex      de,hl
     ld      a,$2a	;*
     call    asm_esxdos_f_open
-    jr      nc,end
+    jr      c,end
     ld      h,0
 end:
     pop     ix
