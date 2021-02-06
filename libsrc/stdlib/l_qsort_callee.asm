@@ -1,6 +1,7 @@
 ; void __CALLEE__ l_qsort_callee(void *base, unsigned int size, void *cmp)
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC l_qsort_callee
 PUBLIC _l_qsort_callee
 PUBLIC ASMDISP_L_QSORT_CALLEE

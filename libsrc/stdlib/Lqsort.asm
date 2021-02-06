@@ -1,6 +1,7 @@
 ; 05.2005 aralbrec
 ; iterative qsort, partition element taken from middle
 
+SECTION code_clib
 PUBLIC Lqsort
 EXTERN l_jpix
 

@@ -1,6 +1,7 @@
 ; 05.2005 aralbrec
 ; binary search
 
+SECTION code_clib
 PUBLIC Lbsearch
 EXTERN l_jpix
 
