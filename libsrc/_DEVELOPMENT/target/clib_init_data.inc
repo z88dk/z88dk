@@ -31,7 +31,12 @@
       ld a,b
       or c
 
+    IF (__crt_model = 2)
       EXTERN   asm_dzx7_standard
       call nz, asm_dzx7_standard
+    ELIF (__crt_model = 3)
+      EXTERN   asm_dzx0_standard
+      call nz, asm_dzx0_standard
+    ENDIF
 
    ENDIF

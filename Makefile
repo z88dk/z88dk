@@ -52,7 +52,7 @@ BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(
 	bin/z88dk-z80nm$(EXESUFFIX) bin/z88dk-zobjcopy$(EXESUFFIX)  \
 	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
 	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
-	bin/z88dk-lib$(EXESUFFIX)
+	bin/z88dk-lib$(EXESUFFIX) bin/z88dk-zx0$(EXESUFFIX)
 	
 ALL = $(BINS) testsuite
 
@@ -147,6 +147,9 @@ bin/z88dk-zpragma$(EXESUFFIX): src/config.h
 
 bin/z88dk-zx7$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/zx7 PREFIX=`pwd` install
+
+bin/z88dk-zx0$(EXESUFFIX): src/config.h
+	$(MAKE) -C src/zx0 PREFIX=`pwd` install
 
 bin/z88dk-z80nm$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/z80nm PREFIX=`pwd` install
