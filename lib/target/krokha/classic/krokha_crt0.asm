@@ -86,6 +86,13 @@ cleanup:
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
 
+        ; If we were given a model then use it
+        IFDEF CRT_MODEL
+            defc __crt_model = CRT_MODEL
+        ELSE
+            defc __crt_model = 1
+        ENDIF
+
 	INCLUDE "crt/classic/crt_runtime_selection.asm" 
 	
 	INCLUDE	"crt/classic/crt_section.asm"
