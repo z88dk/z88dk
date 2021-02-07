@@ -5,7 +5,8 @@
 ;
 ; crt_model = 0		; everything in RAM
 ; crt_model = 1		; ROM model, data section copied
-; crt_model = 2		; ROM model, data section compressed
+; crt_model = 2		; ROM model, data section compressed with zx7
+; crt_model = 3		; ROM model, data section compressed with zx0
 
 ; Include the default memory map. You can override this
 
@@ -68,7 +69,7 @@ IF DEFINED_USING_amalloc
 	ld	(_heap),hl
   ENDIF
 ENDIF
-IF ( __crt_model & 1 )
+IF ( __crt_model = 1 )
 	; Just copy the DATA section
 	EXTERN	__ROMABLE_END_tail
 	EXTERN	__DATA_head
@@ -77,15 +78,18 @@ IF ( __crt_model & 1 )
 	ld	de,__DATA_head
 	ld	bc,__DATA_END_tail - __DATA_head
 	ldir
-ENDIF
-IF ( __crt_model & 2 )
-	; Decompress the DATA section
+ELIF ( __crt_model >= 2 )
 	EXTERN	__ROMABLE_END_tail
 	EXTERN	__DATA_head
-	EXTERN	asm_dzx7_standard
 	ld	hl,__ROMABLE_END_tail
 	ld	de,__DATA_head
+   IF ( __crt_model = 2)
+	EXTERN	asm_dzx7_standard
 	call    asm_dzx7_standard
+   ELIF ( __crt_model = 3)
+	EXTERN	asm_dzx0_standard
+	call    asm_dzx0_standard
+   ENDIF
 ENDIF
 	
 		SECTION code_crt_init_exit

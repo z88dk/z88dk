@@ -68,6 +68,12 @@ apps:
   z88dk-ticks:
     command: bin/z88dk-ticks
     plugs: [home, removable-media]
+  z88dk-zx0:
+    command: bin/z88dk-zx0
+    plugs: [home, removable-media]
+  z88dk-dzx0:
+    command: bin/z88dk-dzx0
+    plugs: [home, removable-media]
   z88dk-zx7:
     command: bin/z88dk-zx7
     plugs: [home, removable-media]

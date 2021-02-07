@@ -347,10 +347,23 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
 
     } else if ( crt_model == 2 ) {
 
-        // 2: compressed rom model, complete binary is "*_CODE.bin" + zx7("*_DATA.bin")
+        // 2: compressed zx7 rom model, complete binary is "*_CODE.bin" + zx7("*_DATA.bin")
 
         get_temporary_filename(tname);
         snprintf(cmdline, FILENAME_MAX*2 + 127, "z88dk-zx7 -f %s %s", name, tname);
+
+        if (system(cmdline) != 0)
+            exit_log(1, "ERROR: Unable to compress %s\n", name);
+
+        if ((fdata = fopen(tname, "rb")) == NULL)
+            exit_log(1, "ERROR: Unable to open compressed data file %s\n", tname);
+
+    } else if ( crt_model == 3 ) {
+
+        // 3: compressed zx0 rom model, complete binary is "*_CODE.bin" + zx0("*_DATA.bin")
+
+        get_temporary_filename(tname);
+        snprintf(cmdline, FILENAME_MAX*2 + 127, "z88dk-zx0 -f %s %s", name, tname);
 
         if (system(cmdline) != 0)
             exit_log(1, "ERROR: Unable to compress %s\n", name);

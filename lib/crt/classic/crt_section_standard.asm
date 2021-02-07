@@ -14,7 +14,8 @@
 ;
 ; crt_model = 0		; everything in RAM
 ; crt_model = 1		; ROM model, data section copied
-; crt_model = 2		; ROM model, data section compressed
+; crt_model = 2		; ROM model, data section compressed (zx7)
+; crt_model = 3		; ROM model, data section compressed (zx0)
 
 		SECTION CODE
 
@@ -31,6 +32,7 @@
 		SECTION code_l_sdcc
 		SECTION code_l_sccz80
 		SECTION code_compress_zx7
+		SECTION code_compress_zx0
 		SECTION code_compress_aplib
 		SECTION code_ctype
 		SECTION code_esxdos
@@ -100,18 +102,18 @@ ENDIF
 		SECTION ROMABLE_END
 IF !__crt_model
 		SECTION DATA
-IF !__crt_org_graphics
+  IF !__crt_org_graphics
 		SECTION smc_clib
-ENDIF
+  ENDIF
 		SECTION smc_user
                 SECTION data_driver
 		SECTION data_clib
 		SECTION data_stdlib
 		SECTION data_psg
 		SECTION data_sound_ay
-IF !__crt_org_graphics
+  IF !__crt_org_graphics
 		SECTION data_graphics
-ENDIF
+  ENDIF
 		SECTION data_crt
 		SECTION data_fp_mbf32
 		SECTION data_arch
