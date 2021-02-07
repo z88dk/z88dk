@@ -1,5 +1,5 @@
 
-	SECTION data_fp_mbfs
+	SECTION data_fp_mbf32
 
 	PUBLIC	DIVSUP
 	PUBLIC	DIV1
