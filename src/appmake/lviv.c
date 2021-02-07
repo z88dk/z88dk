@@ -187,7 +187,18 @@ int lviv_exec(char *target)
        // And now the VRAM
        memset(ram, 0, 0x4000);
        fwrite(ram, 1, 0x4000, fpout);
-       // Onto the ports now - TODO, we should set some of them?
+       // Onto the ports now 
+       // 00 8F 02 88 FD FF FD 8A
+       memset(ram, 0, 0x100);
+       ram[0xc0] = 0x00;
+       ram[0xc1] = 0x8f;
+       ram[0xc2] = 0x02;
+       ram[0xc3] = 0x88;
+       ram[0xd0] = 0xfd;
+       ram[0xd1] = 0xff;
+       ram[0xd2] = 0xfd;
+       ram[0xd3] = 0x8a;
+
        fwrite(ram, 1, 0x100, fpout);
        // And now registers
        writebyte(0, fpout); // B
@@ -198,7 +209,7 @@ int lviv_exec(char *target)
        writebyte(0, fpout); // L
        writebyte(0, fpout); // A
        writebyte(0, fpout); // F
-       writeword(0, fpout); // SP
+       writeword(0xc000, fpout); // SP
        writeword(exec, fpout); // PC
        // And now it's binding to bios, Mame ignores it, so will we
        fwrite(ram, 1, 14, fpout);
