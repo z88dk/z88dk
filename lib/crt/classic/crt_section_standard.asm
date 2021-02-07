@@ -113,6 +113,7 @@ IF !__crt_org_graphics
 		SECTION data_graphics
 ENDIF
 		SECTION data_crt
+		SECTION data_fp_mbf32
 		SECTION data_arch
 		SECTION data_compiler
 		SECTION data_user
