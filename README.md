@@ -8,7 +8,7 @@ Z88DK is a collection of software development tools that targets the 8080 and z8
 
 There are several ways to install z88dk.
 
-1. Use the [Most Recent Official Release](https://github.com/z88dk/z88dk/releases) currently 2.0 dated 3 Feb 2020.  Follow these [installation instructions](https://github.com/z88dk/z88dk/wiki/installation).
+1. Use the [Most Recent Official Release](https://github.com/z88dk/z88dk/releases) currently 2.1 dated 7 Feb 2021.  Follow these [installation instructions](https://github.com/z88dk/z88dk/wiki/installation).
 2. Get the [Nightly Build](http://nightly.z88dk.org/).  Every night we build complete binary packages for windows and osx and generate source packages for everyone else.  The same [installation instructions](https://github.com/z88dk/z88dk/wiki/installation) apply.  Using a nightly build means you can keep up with bugfixes and new features rather than having to wait an entire year for a release to occur.
 3. Use the [Nightly Docker image](https://github.com/z88dk/z88dk/wiki/Docker-Usage)
 4. Use the [Snap package](https://github.com/z88dk/z88dk/wiki/Snap-usage) on Linux
