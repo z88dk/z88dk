@@ -165,7 +165,7 @@ extern void srcfile_display(const char *filename, int start_line, int count, int
 // debug
 extern void debug_add_info_encoded(char *encoded);
 extern int debug_find_source_location(int address, const char **filename, int *lineno);
-extern void debug_add_cline(const char *filename, int lineno, const char *address);
+extern void debug_add_cline(const char *filename, int lineno, int level, int scope, const char *address);
 extern int debug_resolve_source(char *name);
 
 #ifndef WIN32

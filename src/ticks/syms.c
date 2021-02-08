@@ -9,18 +9,27 @@ static symbol  *symbols_byname = NULL;
 
 
 
-static void demangle_filename(const char *input, char *buf, size_t buflen, int *lineno)
+static int demangle_filename(const char *input, char *filename, char *funcname, int *lineno, int *level, int *scope)
 {
-    char *start = buf;
-    char *ptr;
-
     *lineno = -1;
-    ptr = strrchr(input, ':');
+    *level = -1;
+    *scope = -1;
 
-    if ( ptr != NULL ) {
-        snprintf(buf,buflen,"%.*s", (int)(ptr - input), input);
-        *lineno = atoi(ptr+1);
+    // Full packed format
+    if ( sscanf(input,"%[^:]::%[^:]::%d::%d:%d",filename,funcname, level, scope, lineno) == 5 ) {
+        return 0;
     }
+
+    // Classic in function format: adv_a.c::CHKAWAY:2206
+    if ( sscanf(input,"%[^:]::%[^:]:%d",filename,funcname, lineno) == 3 ) {
+        return 0;
+    }
+
+    // Just a waypoint file:line
+    if ( sscanf(input,"%[^:]:%d",filename,lineno) == 2 ) {
+        return 0;
+    }
+    return -1;
 }
 
 
@@ -84,17 +93,14 @@ void read_symbol_file(char *filename)
             } else if ( argc > 9 ) {
                 /* It's a cline/asmline symbol */
                 char   filename[FILENAME_MAX+1];
+                char   funcname[FILENAME_MAX+1];
                 int    lineno;
+                int    level;;
+                int    scope_block;
                 char  *ptr;
 
-                demangle_filename(argv[9], filename, sizeof(filename),&lineno);
-                debug_add_cline(filename, lineno, argv[2]);
-
-                if ( ( ptr = strchr(filename,':')) != NULL ) {
-                    *ptr = 0;
-                    debug_add_cline(filename, lineno, argv[2]);
-                }
-
+                demangle_filename(argv[9], filename, funcname, &lineno,&level, &scope_block);;
+                debug_add_cline(filename, lineno, level, scope_block, argv[2]);
             }
             free(argv);
         }

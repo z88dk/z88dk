@@ -4791,7 +4791,7 @@ void gen_emit_line(int line)
     }
 
     if ( currfn ) {
-        outfmt("\tC_LINE\t%d,\"%s::%s\"\n", line, filen,currfn->name);
+        outfmt("\tC_LINE\t%d,\"%s::%s::%d::%d\"\n", line, filen,currfn->name,ncmp,scope_block);
     } else {
         outfmt("\tC_LINE\t%d,\"%s\"\n", line, filen);
     }

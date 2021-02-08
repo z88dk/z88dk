@@ -13,6 +13,8 @@ typedef struct {
     int             line;
     int             address;
     cfile          *file;
+    int             level;
+    int             scope_block;
     UT_hash_handle  hh;
 } cline;
 
@@ -96,7 +98,7 @@ void debug_add_info_encoded(char *encoded)
 }
 
 
-void debug_add_cline(const char *filename, int lineno, const char *address)
+void debug_add_cline(const char *filename, int lineno, int level, int scope_block, const char *address)
 {                  
     cfile *cf;
     cline *cl;
@@ -112,6 +114,8 @@ void debug_add_cline(const char *filename, int lineno, const char *address)
     cl->line = lineno;
     cl->file = cf;
     cl->address = strtol(address + 1, NULL, 16);
+    cl->level = level;
+    cl->scope_block = scope_block;
     HASH_ADD_INT(cf->lines, line, cl);
     clines[cl->address] = cl;  // TODO Banking
 }
