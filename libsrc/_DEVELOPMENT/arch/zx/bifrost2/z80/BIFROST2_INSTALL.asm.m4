@@ -23,10 +23,10 @@ defc DELAY_ADDR = 56541+(__BIFROST2_TOTAL_ROWS*43)-((__BIFROST2_TOTAL_ROWS/22)*1
 ; -----------------------------------------------------------------------------
 
 multi48:
-BINARY  "bifrost2_engine_48.bin.zx7"
+BINARY  "bifrost2_engine_48.bin.zx0"
 
 multip3:
-BINARY  "bifrost2_engine_p3.bin.zx7"
+BINARY  "bifrost2_engine_p3.bin.zx0"
 
 multiend:
 
@@ -36,110 +36,116 @@ multiend:
 
 defs 65041 - 51625 - ASMPC
 
-; INLINE DZX7_TURBO SO THAT NO SYMBOLS ARE EXPORTED
+; INLINE DZX0_TURBO SO THAT NO SYMBOLS ARE EXPORTED
 
-asm_dzx7_turbo:
+; -----------------------------------------------------------------------------
+; ZX0 decoder by Einar Saukas & introspec
+; "Turbo" version (128 bytes, 20% faster)
+; -----------------------------------------------------------------------------
+; Parameters:
+;   HL: source address (compressed data)
+;   DE: destination address (decompressing)
+; -----------------------------------------------------------------------------
 
-; enter : hl = void *src
-;         de = void *dst
 
+
+; Entry: hl = void *src
+;        de = void *dst
+;
+; Uses: af, bc, de, hl
+asm_dzx0_turbo:
+dzx0_turbo:
+        ld      bc, $ffff               ; preserve default offset 1
+        ld      (dzx0t_last_offset+1), bc
+        inc     bc
         ld      a, $80
-        
-dzx7t_copy_byte_loop:
-
-        ldi                             ; copy literal byte
-        
-dzx7t_main_loop:
-
-        add     a, a                    ; check next bit
-        call    z, dzx7t_load_bits      ; no more bits left?
-        jr      nc, dzx7t_copy_byte_loop ; next bit indicates either literal or sequence
-
-; determine number of bits used for length (Elias gamma coding)
-
-        push    de
-        ld      bc, 1
-        ld      d, b
-        
-dzx7t_len_size_loop:
-
-        inc     d
-        add     a, a                    ; check next bit
-        call    z, dzx7t_load_bits      ; no more bits left?
-        jr      nc, dzx7t_len_size_loop
-        jp      dzx7t_len_value_start
-
-; determine length
-
-dzx7t_len_value_loop:
-
-        add     a, a                    ; check next bit
-        call    z, dzx7t_load_bits      ; no more bits left?
-        rl      c
-        rl      b
-        jr      c, dzx7t_exit           ; check end marker
-
-dzx7t_len_value_start:
-
-        dec     d
-        jr      nz, dzx7t_len_value_loop
-        inc     bc                      ; adjust length
-
-; determine offset
-
-        ld      e, (hl)                 ; load offset flag (1 bit) + offset value (7 bits)
-        inc     hl
-        
-IF __z80_cpu_info & $02
-
-        defb $cb, $33                   ; opcode for undocumented instruction "SLL E" aka "SLS E"
-
-ELSE
-
-        sla e
-        inc e
-
-ENDIF
-        
-        jr      nc, dzx7t_offset_end    ; if offset flag is set, load 4 extra bits
-        add     a, a                    ; check next bit
-        call    z, dzx7t_load_bits      ; no more bits left?
-        rl      d                       ; insert first bit into D
-        add     a, a                    ; check next bit
-        call    z, dzx7t_load_bits      ; no more bits left?
-        rl      d                       ; insert second bit into D
-        add     a, a                    ; check next bit
-        call    z, dzx7t_load_bits      ; no more bits left?
-        rl      d                       ; insert third bit into D
-        add     a, a                    ; check next bit
-        call    z, dzx7t_load_bits      ; no more bits left?
-        ccf
-        jr      c, dzx7t_offset_end
-        inc     d                       ; equivalent to adding 128 to DE
-        
-dzx7t_offset_end:
-
-        rr      e                       ; insert inverted fourth bit into E
-
-; copy previous sequence
-
-        ex      (sp), hl                ; store source, restore destination
-        push    hl                      ; store destination
-        sbc     hl, de                  ; HL = destination - offset - 1
-        pop     de                      ; DE = destination
-        ldir
-        
-dzx7t_exit:
-
-        pop     hl                      ; restore source address (compressed data)
-        jp      nc, dzx7t_main_loop
-
-dzx7t_load_bits:
-
+        jr      dzx0t_literals
+dzx0t_new_offset:
+        inc     c                       ; obtain offset MSB
+        add     a, a
+        jp      nz, dzx0t_new_offset_skip
         ld      a, (hl)                 ; load another group of 8 bits
         inc     hl
         rla
-        ret
+dzx0t_new_offset_skip:
+        call    nc, dzx0t_elias
+        ex      af, af'                 ; adjust for negative offset
+        xor     a
+        sub     c
+        ret     z                       ; check end marker
+        ld      b, a
+        ex      af, af'
+        ld      c, (hl)                 ; obtain offset LSB
+        inc     hl
+        rr      b                       ; last offset bit becomes first length bit
+        rr      c
+        ld      (dzx0t_last_offset+1), bc ; preserve new offset
+        ld      bc, 1                   ; obtain length
+        call    nc, dzx0t_elias
+        inc     bc
+dzx0t_copy:
+        push    hl                      ; preserve source
+dzx0t_last_offset:
+        ld      hl, 0                   ; restore offset
+        add     hl, de                  ; calculate destination - offset
+        ldir                            ; copy from offset
+        pop     hl                      ; restore source
+        add     a, a                    ; copy from literals or new offset?
+        jr      c, dzx0t_new_offset
+dzx0t_literals:
+        inc     c                       ; obtain length
+        add     a, a
+        jp      nz, dzx0t_literals_skip
+        ld      a, (hl)                 ; load another group of 8 bits
+        inc     hl
+        rla
+dzx0t_literals_skip:
+        call    nc, dzx0t_elias
+        ldir                            ; copy literals
+        add     a, a                    ; copy from last offset or new offset?
+        jr      c, dzx0t_new_offset
+        inc     c                       ; obtain length
+        add     a, a
+        jp      nz, dzx0t_last_offset_skip
+        ld      a, (hl)                 ; load another group of 8 bits
+        inc     hl
+        rla
+dzx0t_last_offset_skip:
+        call    nc, dzx0t_elias
+        jp      dzx0t_copy
+dzx0t_elias:
+        add     a, a                    ; interlaced Elias gamma coding
+        rl      c
+        add     a, a
+        jr      nc, dzx0t_elias
+        ret     nz
+dzx0t_elias_reload:
+        ld      a, (hl)                 ; load another group of 8 bits
+        inc     hl
+        rla
+        ret     c
+        add     a, a
+        rl      c
+        rl      b
+        add     a, a
+        ret     c
+        add     a, a
+        rl      c
+        rl      b
+        add     a, a
+        ret     c
+        add     a, a
+        rl      c
+        rl      b
+        add     a, a
+        ret     c
+        add     a, a
+        rl      c
+        rl      b
+        add     a, a
+        jp      dzx0t_elias_reload
+; -----------------------------------------------------------------------------
+
 
 ; -----------------------------------------------------------------------------
 ; Address: 65226 INSTALLER
@@ -180,7 +186,7 @@ installp3:
         ex      de, hl
         inc     hl
         ld      de, 51625
-        call    asm_dzx7_turbo
+        call    asm_dzx0_turbo
 
         ex      af, af'
         ld      (DELAY_ADDR), a

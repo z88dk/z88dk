@@ -9,10 +9,11 @@ include(__link__.m4)
 //////////////////////////////////////////////////////////////
 //                                                          //
 // Further information is available at:                     //
-// https://github.com/einar-saukas/ZX0
+// https://github.com/einar-saukas/ZX0                      //
+//                                                          //
 //                                                          //
 //////////////////////////////////////////////////////////////
-// crts can use dzx0_standard() to decompress the data segment  //
+// crts use dzx0_standard() to decompress the data segment  //
 //////////////////////////////////////////////////////////////
 
 /*
@@ -35,6 +36,21 @@ include(__link__.m4)
    
      The fastest version of the decompressor.
    
+   Decompression of rcs+zx0 data.  rcs is a separate utility
+   that re-orders screen graphics to improve compression ratio.
+   The mangling only makes sense on the zx spectrum target
+   as the re-ordering is a function of the storage format on
+   that machine.  The routines are kept available for all targets
+   to allow all targets to decompress this sort of data.
+   
+   * dzx0_smart_rcs()
+   
+     The smallest version of the integrated zx0+rcs decompressor.
+   
+   * dzx0_agile_rcs()
+   
+     The fastest version of the integrated zx0+rcs decompressor.
+
 */
 
 __DPROTO(,,unsigned char,*,dzx0_standard,void *src,void *dst)
@@ -43,6 +59,10 @@ __DPROTO(,,unsigned char,*,dzx0_turbo,void *src,void *dst)
 __DPROTO(,,unsigned char,*,dzx0_turbo_back,void *src,void *dst)
 __DPROTO(,,unsigned char,*,dzx0_mega,void *src,void *dst)
 __DPROTO(,,unsigned char,*,dzx0_mega_back,void *src,void *dst)
+
+__DPROTO(,,unsigned char,*,dzx0_smart_rcs,void *src,void *dst)
+__DPROTO(,,unsigned char,*,dzx0_smart_rcs_back,void *src,void *dst)
+__DPROTO(,,unsigned char,*,dzx0_agile_rcs,void *src,void *dst)
 
 
 #endif
