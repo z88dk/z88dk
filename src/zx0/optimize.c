@@ -82,7 +82,7 @@ BLOCK* optimize(unsigned char *input_data, int input_size, int skip, int offset_
         best_length_size = 2;
         max_offset = offset_ceiling(index, offset_limit);
         for (offset = 1; offset <= max_offset; offset++) {
-            if (index >= offset && input_data[index] == input_data[index-offset]) {
+            if (index != skip && index >= offset && input_data[index] == input_data[index-offset]) {
                 /* copy from last offset */
                 if (last_literal[offset]) {
                     length = index-last_literal[offset]->index;
