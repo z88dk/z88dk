@@ -1,0 +1,8 @@
+target/bondwell/graphics/cleargraphics
+target/bondwell/graphics/swapgfxbk
+target/bondwell/graphics/textpixl6
+target/bondwell/ioctl/generic_console
+target/bondwell/ioctl/generic_console_scrollup
+target/bondwell/ioctl/generic_console_xypos
+target/bondwell/ioctl/generic_console_ioctl
+@gfx/gencon/gfx_gencon6.lst
