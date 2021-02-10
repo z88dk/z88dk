@@ -1,7 +1,11 @@
 
 #include <sound.h>
 
-/* RAW sound block (bugle.raw) */
+/*
+   RAW sound block (bugle.raw)
+   possibly valid 4bit audio conversion tool for che C128:  https://github.com/sgjava/garage/blob/master/commodore/cpm/sgctools/src/zbcnv.c
+   Alternatively, 'vox' is able to produce raw 8 bit unsigned sound sources still playing reasonably well
+*/
 
 extern char rawsound[]={
 0x66, 0x67, 0x89, 0xAC, 0xCC, 0xA9, 0x74, 0x32, 0x34, 0x45, 0x67, 0x78, 0x89, 0x99, 0x99, 0x98, 
@@ -395,5 +399,4 @@ int main()
 {
 	playzb4(rawsound,sizeof(rawsound));
 }
-
 
