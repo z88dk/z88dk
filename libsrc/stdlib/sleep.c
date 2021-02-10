@@ -41,7 +41,7 @@ sleep:
 	call	msleep
 	pop	hl
 	dec	hl
-	jr	sleep
+	jp	sleep
 #endasm
 }
 #endif
