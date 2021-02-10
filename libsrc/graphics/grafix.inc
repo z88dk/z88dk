@@ -207,6 +207,12 @@ IF FORbondwell
 	defc maxy	= 75
 ENDIF
 
+IF FORbondwell2
+	DEFINE gotgfx
+	defc maxx	= 640
+	defc maxy	= 200
+ENDIF
+
 IF FORkaypro83
 	DEFINE gotgfx
 	defc maxx	= 80
