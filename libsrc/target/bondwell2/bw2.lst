@@ -1,4 +1,5 @@
 target/bondwell2/graphics/cleargraphics
 target/bondwell2/graphics/swapgfxbk
 target/bondwell2/graphics/w_pixladdr
+gfx/wide/obj/${TARGET}/w_putsprite3
 @gfx/wide/gfx_wide.lst
