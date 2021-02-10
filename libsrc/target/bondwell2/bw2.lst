@@ -1,0 +1,4 @@
+target/bondwell2/graphics/cleargraphics
+target/bondwell2/graphics/swapgfxbk
+target/bondwell2/graphics/w_pixladdr
+@gfx/wide/gfx_wide.lst
