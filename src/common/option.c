@@ -89,6 +89,8 @@ int option_parse(option *args, int argc, char **argv)
                         /* Otherwise it's the next argument */
                         if ( myarg->type & OPT_INCLUDE_OPT) {
                             val = argv[i];
+                        } else if ( myarg->type & OPT_DEFAULT_VALUE ) {
+                            val = (char*) myarg->data;
                         } else if ( i+1 < argc ) {
                             i++;
                             val = argv[i];

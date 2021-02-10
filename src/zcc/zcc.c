@@ -470,12 +470,12 @@ static option options[] = {
     { 0, "", OPT_HEADER, "Compiler (all) options:", NULL, NULL, 0 },
     { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc)" , &c_compiler_type, NULL, 0},
     { 0, "c-code-in-asm", OPT_BOOL|OPT_DOUBLE_DASH,  "Add C code to .asm files" , &c_code_in_asm, NULL, 0},
+    { 0, "opt-code-speed", OPT_FUNCTION|OPT_DOUBLE_DASH|OPT_DEFAULT_VALUE,  "Optimize for code speed" , NULL, conf_opt_code_speed, (intptr_t)"all"},
     { 0, "debug", OPT_BOOL, "Enable debugging support", &c_generate_debug_info, NULL, 0 },
     { 0, "", OPT_HEADER, "Compiler (sccz80) options:", NULL, NULL, 0 },
     { 0, "Cc", OPT_FUNCTION,  "Add an option to sccz80" , &sccz80arg, AddToArgs, 0},
     { 0, "set-r2l-by-default", OPT_BOOL,  "(sccz80) Use r2l calling convention by default", &c_sccz80_r2l_calling, NULL, 0},
     { 0, "O", OPT_INT,  "Set the peephole optimiser setting for copt" , &peepholeopt, NULL, 0},
-    { 0, "opt-code-speed", OPT_FUNCTION|OPT_DOUBLE_DASH,  "Optimize for code speed (sccz80 only)" , NULL, conf_opt_code_speed, 0},
     { 0, "", OPT_HEADER, "Compiler (sdcc) options:", NULL, NULL, 0 },
     { 0, "Cs", OPT_FUNCTION,  "Add an option to sdcc" , &sdccarg, AddToArgs, 0},
     { 0, "opt-code-size", OPT_BOOL|OPT_DOUBLE_DASH,  "Optimize for code size (sdcc only)" , &opt_code_size, NULL, 0},
@@ -2091,6 +2091,9 @@ void conf_opt_code_speed(option *argument, char *arg)
     zcc_asprintf(&sccz80_arg,"-%s%s=%s", argument->type & OPT_DOUBLE_DASH ? "-" : "",argument->long_name, arg);
     BuildOptions(&sccz80arg, sccz80_arg);
     free(sccz80_arg);
+
+    // Add the option to sdcc as well since it has one of the same name
+    BuildOptions(&sdccarg, "--opt-code-speed");
 }
 
 
