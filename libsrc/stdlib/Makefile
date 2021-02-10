@@ -9,10 +9,9 @@ TARGET ?= test
 include ../Make.config
 
 GENOBJECTS = unbcd.o wcmatch.o getopt.o
-CUSTOBJECTS = sleep.o 
 ASMFILES = $(wildcard *.asm)
-ASMFILES_8080 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *search*.asm *sort*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
-ASMFILES_GBZ80 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *search*.asm *sort*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
+ASMFILES_8080 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *search*.asm *sort*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm) 
+ASMFILES_GBZ80 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *search*.asm *sort*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm) 
 
 
 NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm"
@@ -38,10 +37,10 @@ NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy 
 space :=
 space +=
 
-OBJECTS = $(CUSTOBJECTS) $(GENOBJECTS) $(ASMFILES:.asm=.o)
-OBJECTS_8080 = $(CUSTOBJECTS) $(GENOBJECTS) $(ASMFILES_8080:.asm=.o) 
+OBJECTS = $(GENOBJECTS) $(ASMFILES:.asm=.o)
+OBJECTS_8080 = $(GENOBJECTS) $(ASMFILES_8080:.asm=.o) 
 OBJECTS_GBZ80 = $(GENOBJECTS) $(ASMFILES_GBZ80:.asm=.o) 
-CLASSIC_OBJECTS = $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS))  $(addprefix obj/$(TARGET)/,$(CUSTOBJECTS))  $(addprefix obj/z80n/,$(OBJECTS)) $(addprefix obj/8080/,$(OBJECTS_8080)) $(addprefix obj/gbz80/,$(OBJECTS_GBZ80))
+CLASSIC_OBJECTS = $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS)) $(addprefix obj/z80n/,$(OBJECTS)) $(addprefix obj/8080/,$(OBJECTS_8080)) $(addprefix obj/gbz80/,$(OBJECTS_GBZ80))
 
 
 .PHONY: dirs  $(NEWLIB_TARGETS)

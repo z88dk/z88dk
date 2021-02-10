@@ -148,7 +148,7 @@ define buildgeneric
 	$(MAKE) -C time
 	$(MAKE) -C font
 	$(MAKE) -C input
-	$(MAKE) -C stdlib TARGET=$(1)
+	$(MAKE) -C stdlib 
 	$(MAKE) -C gfx TARGET=$(1) FLAVOUR=$(if $(2),$(2),narrow)
 	$(MAKE) -C psg TARGET=$(1)
 endef
@@ -442,6 +442,7 @@ zx80_clib.lib:
 	$(MAKE) zx81deps
 	$(call buildgeneric,zx80)
 	$(MAKE) -C games TARGET=zx80
+	$(MAKE) -C target/zx80 
 	TARGET=zx80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx80 -x$(OUTPUT_DIRECTORY)/zx80_clib @$(LISTFILE_DIRECTORY)/zx80.lst
 	$(MAKE) zx81deps
 

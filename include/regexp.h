@@ -7,6 +7,8 @@
 #ifndef __REGEXP_H
 #define __REGEXP_H
 
+#include <sys/compiler.h>
+
 #define NSUBEXP  10
 
 typedef struct regexp {
