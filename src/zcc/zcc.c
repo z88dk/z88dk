@@ -252,6 +252,7 @@ static int             c_nocrt = 0;
 static char           *c_crt_incpath = NULL;
 static int             processing_user_command_line_arg = 0;
 static char            c_sccz80_r2l_calling;
+static char            c_copy_m4_processed_files;
 
 static char            filenamebuf[FILENAME_MAX + 1];
 #ifdef WIN32
@@ -456,6 +457,7 @@ static option options[] = {
 
     { 0, "", OPT_HEADER, "M4 options:", NULL, NULL, 0 },
     { 0, "Cm", OPT_FUNCTION,  "Add an option to m4" , &m4arg, AddToArgs, 0},
+    { 0, "copy-back-after-m4", OPT_BOOL, "Copy files back after processing with m4",&c_copy_m4_processed_files, NULL, 0 },
 
     { 0, "", OPT_HEADER, "Preprocessor options:", NULL, NULL, 0 },
     { 0, "Cp", OPT_FUNCTION,  "Add an option to the preprocessor" , &cpparg, AddToArgs, 0},
@@ -1169,6 +1171,20 @@ int main(int argc, char **argv)
                 fprintf(stderr, "Cannot process recursive .m4 file %s\n", original_filenames[i]);
                 exit(1);
             }
+            if ( c_copy_m4_processed_files ) {
+                /* Write processed file to original source location immediately */		
+                 ptr = stripsuffix(original_filenames[i], ".m4");		
+                 if (copy_file(filelist[i], "", ptr, "")) {		
+                     fprintf(stderr, "Couldn't write output file %s\n", ptr);		
+                     exit(1);		
+                 }		
+                 /* Copied file becomes the new original file */		
+                 free(original_filenames[i]);		
+                 free(filelist[i]);		
+                 original_filenames[i] = ptr;		
+                 filelist[i] = muststrdup(ptr);
+            }
+            /* No more processing for .h and .inc files */
             ft = get_filetype_by_suffix(filelist[i]);
             if ((ft == HDRFILE) || (ft == INCFILE)) continue;
             /* Continue processing macro expanded source file */
