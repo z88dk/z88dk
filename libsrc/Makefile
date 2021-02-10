@@ -34,6 +34,7 @@ TOCREATE += $(call check_target,bee,bee_clib.lib microbee.lib $(CPMLIBS))
 TOCREATE += $(call check_target,bic,bic.lib $(CPMLIBS))
 TOCREATE += $(call check_target,bit90,bit90.lib coleco_clib.lib)
 TOCREATE += $(call check_target,bondwell,bondwell.lib $(CPMLIBS))
+TOCREATE += $(call check_target,bondwell2,bondwell2.lib $(CPMLIBS))
 TOCREATE += $(call check_target,c128,c128ansi_clib.lib gfx128.lib gfx128udg.lib gfx128hr.lib gfx128hr480.lib)
 TOCREATE += $(call check_target,c7420,c7420_clib.lib)
 TOCREATE += $(call check_target,coleco,coleco_clib.lib)
@@ -651,6 +652,13 @@ bondwell.lib:
 	$(MAKE) -C games TARGET=cpm SUBTYPE=bondwell
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=bondwell
 	TARGET=bondwell TYPE=z80 $(LIBLINKER) -DFORbondwell -x$(OUTPUT_DIRECTORY)/bondwell @$(LISTFILE_DIRECTORY)/target/bondwell/bw.lst
+
+bondwell2.lib:
+	@echo ''
+	@echo '--- Building Bondwell 2 Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=bondwell2
+	TARGET=bondwell2 TYPE=z80 $(LIBLINKER) -DFORbondwell2 -x$(OUTPUT_DIRECTORY)/bondwell2 @$(LISTFILE_DIRECTORY)/target/bondwell2/bw2.lst
 
 gfxosborne1.lib:
 	@echo ''
