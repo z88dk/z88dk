@@ -211,9 +211,14 @@ void debugger_read_memory(int addr)
 
 void debugger()
 {
+    static char *last_line = NULL;
     char   buf[256];
     char   prompt[100];
     char  *line;
+
+    if ( last_line == NULL ) {
+        last_line = strdup("");
+    }
 
     if ( trace ) {
         cmd_registers(0, NULL);
@@ -289,6 +294,14 @@ void debugger()
     while ( (line = linenoise(prompt) ) != NULL ) {
         int argc;
         char **argv;
+
+        if ( line == NULL || line[0] == '\0') {
+            line = strdup(last_line);
+        } else {
+            free(last_line);
+            last_line = strdup(line);
+        }
+
         if (line[0] != '\0' && line[0] != '/') {
             int return_to_execution = 0;
             linenoiseHistoryAdd(line); /* Add to the history. */
@@ -427,12 +440,13 @@ static int cmd_disassemble(int argc, char **argv)
 {
     char  buf[256];
     int   i = 0;
-    int   where = pc;
+    static int  where = -1;
 
     if ( argc == 2 ) {
         where = parse_address(argv[1]);
-        if ( where == -1 ) where = pc;
     }
+
+    if ( where == -1 ) where = pc;
 
     while ( i < 10 ) {
        where += disassemble2(where, buf, sizeof(buf), 0);
@@ -711,36 +725,37 @@ static int cmd_break(int argc, char **argv)
 
 static int cmd_examine(int argc, char **argv)
 {
+    static int addr = -1;
+    char  abuf[17];
+    int    i;
+
     if ( argc == 2 ) {
-        char *end;
-        int addr = parse_address(argv[1]);
+        addr = parse_address(argv[1]);
+    }
 
-        if ( addr != -1  ) {
-            char  abuf[17];
-            int    i;
+    if ( addr == -1 ) addr = pc;
 
-            abuf[16] = 0;                                       // Zero terminated string
-            addr %= 0x10000;                                    // First address with overflow correction
 
-            for ( i = 0; i < 128; i++ ) {
-                uint8_t b = get_memory(addr);
-                abuf[i % 16] = isprint(b) ? ((char) b) : '.';   // Prepare end of dump in ASCII format
+    abuf[16] = 0;                                       // Zero terminated string
+    addr %= 0x10000;                                    // First address with overflow correction
 
-                if ( i % 16 == 0 ) {                            // Handle line prefix 
-                    if (interact_with_tty) {
-                        printf(FNT_CLR"%04X"FNT_RST":   ", addr);
-                    } else {
-                        printf("%04X:   ", addr);               // Non-color output for non-active tty
-                    }
-                }
+    for ( i = 0; i < 128; i++ ) {
+        uint8_t b = get_memory(addr);
+        abuf[i % 16] = isprint(b) ? ((char) b) : '.';   // Prepare end of dump in ASCII format
 
-                printf("%02X ", b);                             // Hex dump of actual byte
-
-                if (i % 16 == 15) printf("   %s\n", abuf);      // Suffix line with ASCII dump
-
-                addr = (addr + 1) % 0x10000;                    // Next address with overflow correction
+        if ( i % 16 == 0 ) {                            // Handle line prefix 
+            if (interact_with_tty) {
+                printf(FNT_CLR"%04X"FNT_RST":   ", addr);
+            } else {
+                printf("%04X:   ", addr);               // Non-color output for non-active tty
             }
         }
+
+        printf("%02X ", b);                             // Hex dump of actual byte
+
+        if (i % 16 == 15) printf("   %s\n", abuf);      // Suffix line with ASCII dump
+
+        addr = (addr + 1) % 0x10000;                    // Next address with overflow correction
     }
     return 0;
 }
