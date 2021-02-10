@@ -11,8 +11,14 @@
  */
 
 
-/* 1 bit sound library */
 
+#ifdef __C128__
+#include <c128/cia.h>
+#include <c128/sid.h>
+#endif
+
+
+/* 1 bit sound library */
 
 extern void  __LIB__ bit_open();
 extern void  __LIB__ bit_open_di();
@@ -90,7 +96,14 @@ char buzzer_hit[]={0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,2
  */
 
 
+/* 4bit sample player at 8khz, inherited from the C128 functions
+ * so far ported to the Bondwell 12/14 */
 
+#ifdef __C128__
+#define playzb4(a,b) setintctrlcia(cia2,ciaClearIcr);settimeracia(cia2,timervalcia(8000L),ciaCPUCont);playzb4sid(a,b);
+#else
+extern void __LIB__ playzb4(unsigned char *SamStart, unsigned int SamLen) __smallc;
+#endif
 
 
 /* Platform specific parameters (mainly timing stuff) 
