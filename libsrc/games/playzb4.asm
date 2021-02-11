@@ -81,8 +81,8 @@ do_sound:
 	ld	a,(hl)
 
 ;  LOOP UNROLLING !!
-;	ld b,6
-;byte1:
+	ld b,4
+byte1:
 	  rlca
 	  ld   l,a
 	  sbc  a,a	; 0 or FF
@@ -100,95 +100,7 @@ do_sound:
 	ENDIF
 
 	  ld a,l
-	;djnz byte1
-	  rlca
-	  ld   l,a
-;  LOOP UNROLLING !!
-	  sbc  a,a	; 0 or FF
-	  and  sndbit_mask
-	  ld   c,a
-	  ld   a,(__snd_tick)
-	  xor  c
-	  
-	IF sndbit_port >= 256
-	  exx
-	  out  (c),a                   ;9 T slower
-	  exx
-	ELSE
-	  out  (sndbit_port),a
-	ENDIF
-	
-	  ld a,l
-	  rlca
-	  ld   l,a
-
-	  sbc  a,a	; 0 or FF
-	  and  sndbit_mask
-	  ld   c,a
-	  ld   a,(__snd_tick)
-	  xor  c
-	  
-	IF sndbit_port >= 256
-	  exx
-	  out  (c),a                   ;9 T slower
-	  exx
-	ELSE
-	  out  (sndbit_port),a
-	ENDIF
-	
-	  ld a,l
-	  rlca
-	  ld   l,a
-
-	  sbc  a,a	; 0 or FF
-	  and  sndbit_mask
-	  ld   c,a
-	  ld   a,(__snd_tick)
-	  xor  c
-	  
-	IF sndbit_port >= 256
-	  exx
-	  out  (c),a                   ;9 T slower
-	  exx
-	ELSE
-	  out  (sndbit_port),a
-	ENDIF
-	
-	  ld a,l
-	  rlca
-	  ld   l,a
-
-	  sbc  a,a	; 0 or FF
-	  and  sndbit_mask
-	  ld   c,a
-	  ld   a,(__snd_tick)
-	  xor  c
-	  
-	IF sndbit_port >= 256
-	  exx
-	  out  (c),a                   ;9 T slower
-	  exx
-	ELSE
-	  out  (sndbit_port),a
-	ENDIF
-	
-	  ld a,l
-	  rlca
-	  ld   l,a
-
-	  sbc  a,a	; 0 or FF
-	  and  sndbit_mask
-	  ld   c,a
-	  ld   a,(__snd_tick)
-	  xor  c
-	  
-	IF sndbit_port >= 256
-	  exx
-	  out  (c),a                   ;9 T slower
-	  exx
-	ELSE
-	  out  (sndbit_port),a
-	ENDIF
+	djnz byte1
 
 	;pop de
 	pop hl
@@ -200,37 +112,37 @@ do_sound:
 	SECTION rodata_clib
 
 _dithpat:
-	
+
 	defb	@00000000	; 0
-	
+
 	defb	@00000000	; 1
-	
-	defb	@00000100	; 2
 
-	defb	@00001100	; 3
+	defb	@00000000	; 2
 
-	defb	@00010100	; 4
+	defb	@00000000	; 3
 
-	defb	@00101000	; 5
+	defb	@00010000	; 4
 
-	defb	@00111001	; 6
+	defb	@01000000	; 5
 
-	defb	@10001011	; 7
+	defb	@00110000	; 6
 
-	defb	@10101110	; 8
+	defb	@11000000	; 7
 
-	defb	@11001100	; 9
+	defb	@10100000	; 8
 
-	defb	@11001100	; 10
+	defb	@10100000	; 9
 
-	defb	@11011101	; 11
+	defb	@11100000	; 10
 
-	defb	@11011101	; 12
+	defb	@01110000	; 11
 
-	defb	@11011111	; 13
+	defb	@11010000	; 12
 
-	defb	@11111101	; 14
+	defb	@10110000	; 13
 
-	defb	@11111111	; 15
+	defb	@11110000	; 14
+
+	defb	@11110000	; 15
 
 ENDIF
