@@ -23,6 +23,7 @@ games/obj/${TARGET}/patch_beep_callee
 games/obj/${TARGET}/noise
 games/obj/${TARGET}/bit_noise
 games/obj/${TARGET}/bit_noise_callee
+games/obj/${TARGET}/playzb4
 games/obj/${TARGET}/__bit_irqstatus
 games/obj/${TARGET}/__snd_tick
 games/obj/${TARGET}/bit_open
