@@ -104,7 +104,10 @@
  *      zcc +spc1000 -Dspritesize=16 -create-app dstar.c
  *
  *      Commodore 128:
- *      zcc +c128 -lgfx128hr -create-app -lm -Dspritesize=21 dstar.c
+ *      zcc +c128 -lgfx128hr -create-app -Dspritesize=21 dstar.c
+ *
+ *      Bondwell 2:
+ *      zcc +cpm -subtype=bw2 -create-app -Dspritesize=21 dstar.c
  *
  *      ZX81, various HRG flavours (see also the specific target version):
  *      zcc +zx81 -O3 -clib=mt  -create-app -Dspritesize=15 dstar.c
