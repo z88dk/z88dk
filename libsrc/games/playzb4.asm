@@ -13,6 +13,8 @@
 ; play 4 bit pulse wave encoded data using sid master volume
 
 
+IF !__CPU_GBZ80__ && !__CPU_INTEL__
+
 	SECTION code_clib
 	
 	PUBLIC	playzb4
@@ -230,3 +232,5 @@ _dithpat:
 	defb	@11111101	; 14
 
 	defb	@11111111	; 15
+
+ENDIF
