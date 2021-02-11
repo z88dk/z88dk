@@ -36,6 +36,20 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst);
 #endif
  
 #ifdef _WIN32
+
+static char **tmpfiles = NULL;
+static int    tmpfiles_num = 0;
+
+
+static void cleanup_tmpfiles() {
+    int  i;
+
+    for ( i = 0; i < tmpfiles_num; i++ ) {
+        unlink(tmpfiles[i]);
+        free(tmpfiles[i]);
+    }
+}
+
 static FILE* w32_tmpfile()
 {
     static char tmpnambuf[FILENAME_MAX+1];
@@ -48,12 +62,16 @@ static FILE* w32_tmpfile()
         snprintf(tmpnambuf, sizeof(tmpnambuf), 
                  "sccz80%08X%04X",_getpid(), ((unsigned int)time(NULL)) & 0xffff);
         inited = 1;
+        atexit(cleanup_tmpfiles);
     }
 
     if ((tmpnam = _tempnam(".\\", tmpnambuf)) == NULL) {
         fprintf(stderr, "Failed to create temporary filename\n");
         exit(1);
     }
+
+    tmpfiles = REALLOC(tmpfiles, (tmpfiles_num+1) * sizeof(tmpfiles[0]));
+    tmpfiles[tmpfiles_num++] = strdup(tmpnam);
 
     if ((fp = fopen(tmpnam, "w+")) == NULL) {
         perror(tmpnam);
@@ -62,6 +80,8 @@ static FILE* w32_tmpfile()
     
     return fp;
 }
+
+
 #endif
    
 /*
