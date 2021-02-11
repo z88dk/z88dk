@@ -126,10 +126,8 @@ int symbol_resolve(char *name)
         return sym->address;
     }
 
-    /* Check for it being a file */
-    return debug_resolve_source(name);
+    return -1;
 }
-    
 
 
 // Find a symbol lower than where we were

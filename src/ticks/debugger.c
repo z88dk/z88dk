@@ -408,6 +408,7 @@ static int parse_number(char *str, char **end)
  */
 static int parse_address(char *arg)
 {
+    char temp[1024];
     int  where;
     char *end;
 
@@ -415,8 +416,12 @@ static int parse_address(char *arg)
     if ( end == arg ) {
         where = symbol_resolve(arg);
         if ( where == -1 ) {
-            // And now try to resolve a line expression
-            where = debug_resolve_source(arg);
+            snprintf(temp,sizeof(temp),"_%s",arg);
+            where = symbol_resolve(temp);
+            if ( where == -1 ) {
+                // And now try to resolve a line expression
+                where = debug_resolve_source(arg);
+            }
         }
     }
     return where;
