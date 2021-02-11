@@ -293,10 +293,12 @@ void debugger()
 
     while ( (line = linenoise(prompt) ) != NULL ) {
         int argc;
+        char freeline = 0;
         char **argv;
 
         if ( line == NULL || line[0] == '\0') {
             line = strdup(last_line);
+            freeline = 1;
         } else {
             free(last_line);
             last_line = strdup(line);
@@ -321,12 +323,14 @@ void debugger()
                 }
                 free(argv);
             }
+            if ( freeline ) free(line);
             if ( return_to_execution ) {
                 /* Out of the linenoise loop */
                 break;
             }
         } else {
             /* Empty line is step */
+            if ( freeline ) free(line);
             debugger_active = 1;
             break;
         }
