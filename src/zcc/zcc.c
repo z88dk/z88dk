@@ -493,6 +493,8 @@ static option options[] = {
     { 0, "z80-verb", OPT_BOOL,  "Make the assembler more verbose" , &z80verbose, NULL, 0},
     { 0, "", OPT_HEADER, "Linker options:", NULL, NULL, 0 },
     { 0, "Cl", OPT_FUNCTION,  "Add an option to the linker" , &linkargs, AddToArgsQuoted, 0},
+    { 0, "L", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library search path" , NULL, AddLinkSearchPath, 0},
+    { 0, "l", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library" , NULL, AddLinkLibrary, 0},
     { 0, "bn", OPT_STRING,  "Set the output file for the linker stage" , &c_linker_output_file, NULL, 0},
     { 0, "reloc-info", OPT_BOOL,  "Generate binary file relocation information" , &relocinfo, NULL, 0},
     { 'm', "gen-map-file", OPT_BOOL,  "Generate an output map of the final executable" , &mapon, NULL, 0},
@@ -500,8 +502,6 @@ static option options[] = {
     { 0, "list", OPT_BOOL|OPT_DOUBLE_DASH,  "Generate list files" , &lston, NULL, 0},
     { 'R', NULL, OPT_BOOL|OPT_DEPRECATED,  "Generate relocatable code (deprecated)" , &relocate, NULL, 0},
     { 0, NULL, OPT_HEADER, "Appmake options:", NULL, NULL, 0 },
-    { 0, "L", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library search path" , NULL, AddLinkSearchPath, 0},
-    { 0, "l", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library" , NULL, AddLinkLibrary, 0},
     { 0, "Cz", OPT_FUNCTION,  "Add an option to appmake" , &appmakeargs, AddToArgs, 0},
    
     { 0, "", OPT_HEADER, "Misc options:", NULL, NULL, 0 },
