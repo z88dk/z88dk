@@ -153,7 +153,7 @@ int lviv_exec(char *target)
 
     if ( snapshot ) {
         // Snapshots are only good for programs compiled without a ROM dependency
-        unsigned char *ram = calloc(1,sizeof(49152));
+        unsigned char *ram = calloc(1,49152);
         // Mame understands v2 of the snapshot format, so that's what we'll generate
         /*
         +0x00	16	"LVOV/DUMP/2.0/H+"	.SAV Dump signature
