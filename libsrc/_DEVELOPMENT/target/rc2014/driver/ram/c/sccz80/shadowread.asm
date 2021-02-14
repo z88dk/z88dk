@@ -5,6 +5,9 @@ SECTION code_driver
 
 PUBLIC shadowread
 
+EXTERN asm_cpu_push_di
+EXTERN asm_cpu_pop_ei
+
 EXTERN asm_shadowread
 
 shadowread:
@@ -38,15 +41,18 @@ ELSE
    push af
 ENDIF
 
+   call asm_cpu_push_di
+
    ld a,1   ; set up read from shadow ram
 
 IF __CLASSIC && __CPU_GBZ80__
    call asm_shadowread
    ld d,h
    ld e,l
-   ret
+   jp asm_cpu_pop_ei
 ELSE 
-   jp asm_shadowread
+   call asm_shadowread
+   jp asm_cpu_pop_ei
 ENDIF
 
 ; SDCC bridge for Classic

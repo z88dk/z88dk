@@ -5,6 +5,9 @@ SECTION code_driver
 
 PUBLIC shadowwrite
 
+EXTERN asm_cpu_push_di
+EXTERN asm_cpu_pop_ei
+
 EXTERN asm_shadowwrite
 
 shadowwrite:
@@ -38,15 +41,18 @@ ELSE
    push af
 ENDIF
 
+   call asm_cpu_push_di
+
    xor a    ; set up write to shadow ram
 
 IF __CLASSIC && __CPU_GBZ80__
    call asm_shadowwrite
    ld d,h
    ld e,l
-   ret
+   jp asm_cpu_pop_ei
 ELSE 
-   jp asm_shadowwrite
+   call asm_shadowwrite
+   jp asm_cpu_pop_ei
 ENDIF
 
 ; SDCC bridge for Classic

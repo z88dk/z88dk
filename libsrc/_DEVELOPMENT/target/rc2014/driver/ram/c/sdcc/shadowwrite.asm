@@ -5,6 +5,9 @@ SECTION code_driver
 
 PUBLIC _shadowwrite
 
+EXTERN asm_cpu_push_di
+EXTERN asm_cpu_pop_ei
+
 EXTERN asm_shadowwrite
 
 _shadowwrite:
@@ -19,6 +22,9 @@ _shadowwrite:
    push de
    push af
 
+   call asm_cpu_push_di
+   
    xor a    ; set up write to shadow ram
 
-   jp asm_shadowwrite
+   call asm_shadowwrite
+   jp asm_cpu_pop_ei
