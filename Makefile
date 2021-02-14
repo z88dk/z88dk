@@ -188,6 +188,7 @@ install: install-clean
 	$(MAKE) -C src/zcc PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/zx0 PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/z80nm PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/zobjcopy PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/ticks PREFIX=$(DESTDIR) install
@@ -244,6 +245,7 @@ clean-bins:
 	$(MAKE) -C src/zobjcopy clean
 	$(MAKE) -C src/zpragma clean
 	$(MAKE) -C src/zx7 clean
+	$(MAKE) -C src/zx0 clean
 	$(MAKE) -C support clean
 	$(MAKE) -C test clean
 	$(MAKE) -C testsuite clean
