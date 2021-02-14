@@ -1,0 +1,4 @@
+target/rc2014/driver/ram/c/sdcc/shadowread
+target/rc2014/driver/ram/c/sdcc/shadowread_callee
+target/rc2014/driver/ram/c/sdcc/shadowwrite
+target/rc2014/driver/ram/c/sdcc/shadowwrite_callee
