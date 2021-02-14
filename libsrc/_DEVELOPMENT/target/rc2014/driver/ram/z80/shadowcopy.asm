@@ -27,9 +27,10 @@ PUBLIC asm_shadowwrite
 
 .asm_shadowread
     out (__IO_RAM_TOGGLE),a ; now in other bank
-    rra                     ; move current bank to carry
 
 .asm_shadowwrite
+    rra                     ; move current bank to carry
+
     ld a,c                  ; swap BC to use cheap djnz inner loop
     dec bc
     inc b
