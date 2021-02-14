@@ -7,7 +7,7 @@ include ../../support/multitarget_build/Makefile
 # Hello world 
 WORLD_TARGETS = abc80 abc800 ace alphatro altair8800 aquarius bee c128 c7420 coleco cpc cpm dai \
 	enterprise fp1100 \
-	g800 gal hemc hgmc homelab homelab2 kc kramermc lambda laser500 lynx m5 m100 mc1000 mikro80 \
+	g800 gal hemc hgmc homelab homelab2 kc kramermc lambda laser500 lviv lynx m5 m100 mc1000 mikro80 \
 	msx mtx multi8 myvision mz mz2500 nascom nc newbrain ondra osca oz p2000 pacman pasopia7 pc6001 \
 	pencil2 pps primo pv1000  \
 	pv2000 rcmx000 rx78 sam sc3000 sos spc1000 special srr svi test ti82 ti83 ti85 ti86 ti8x \
@@ -16,7 +16,7 @@ WORLD_TARGETS = abc80 abc800 ace alphatro altair8800 aquarius bee c128 c7420 col
 WORLD_TARGETS += cpm_px8 cpm_px4 cpm_einstein cpm_attache cpm_osborne1 cpm_kaypro83 cpm_kaypro84 \
 	cpm_mz2500 cpm_microbee cpm_qc10 cpm_nascom cpm_tiki100 cpm_svi cpm_dmv cpm_adam \
 	cpm_smc777 cpm_rc700 cpm_fp1100 cpm_x1 cpm_lynx cpm_bic cpm_excali64 cpm_vector06c \
-	cpm_zxplus3
+	cpm_zxplus3 cpm_bondwell cpm_bw2
 
 LDFLAGS_world = -lndos -pragma-define:CLIB_OPT_PRINTF=0x00000001
 
