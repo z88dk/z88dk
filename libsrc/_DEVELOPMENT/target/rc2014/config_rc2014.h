@@ -44,8 +44,8 @@
 #define __IO_DIO_PORT  0x00
 #define __IO_CF_PORT  0x10
 #define __IO_PIO_PORT_BASE  0x20
-#define __IO_PROM_RESET  0x30
-#define __IO_PROM_TOGGLE  0x38
+#define __IO_RAM_TOGGLE  0x30
+#define __IO_ROM_TOGGLE  0x38
 
 
 
