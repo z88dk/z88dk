@@ -2,15 +2,15 @@
 
 	INCLUDE	"target/msx/def/msxdos2.def"
 
-	PUBLIC	getwd
-	PUBLIC	_getwd
+	PUBLIC	getcwd
+	PUBLIC	_getcwd
 
 	EXTERN	MSXDOS
 	EXTERN	msxdos_error
 
 ; (char *,size_t len)
-getwd:
-_getwd:
+getcwd:
+_getcwd:
 	push	ix
 	ld	ix,0
 	add	ix,sp

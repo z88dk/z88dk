@@ -36,6 +36,20 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst);
 #endif
  
 #ifdef _WIN32
+
+static char **tmpfiles = NULL;
+static int    tmpfiles_num = 0;
+
+
+static void cleanup_tmpfiles() {
+    int  i;
+
+    for ( i = 0; i < tmpfiles_num; i++ ) {
+        unlink(tmpfiles[i]);
+        free(tmpfiles[i]);
+    }
+}
+
 static FILE* w32_tmpfile()
 {
     static char tmpnambuf[FILENAME_MAX+1];
@@ -48,12 +62,16 @@ static FILE* w32_tmpfile()
         snprintf(tmpnambuf, sizeof(tmpnambuf), 
                  "sccz80%08X%04X",_getpid(), ((unsigned int)time(NULL)) & 0xffff);
         inited = 1;
+        atexit(cleanup_tmpfiles);
     }
 
     if ((tmpnam = _tempnam(".\\", tmpnambuf)) == NULL) {
         fprintf(stderr, "Failed to create temporary filename\n");
         exit(1);
     }
+
+    tmpfiles = REALLOC(tmpfiles, (tmpfiles_num+1) * sizeof(tmpfiles[0]));
+    tmpfiles[tmpfiles_num++] = strdup(tmpnam);
 
     if ((fp = fopen(tmpnam, "w+")) == NULL) {
         perror(tmpnam);
@@ -62,6 +80,8 @@ static FILE* w32_tmpfile()
     
     return fp;
 }
+
+
 #endif
    
 /*
@@ -363,14 +383,7 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
         if ( function_pointer_call && fnptr_type->kind == KIND_CPTR && nargs ) {
             nargs += 4;
         }
-#ifdef USEFRAME
-        if (c_framepointer_is_ix != -1) {
-            if (nargs)
-                RestoreSP(preserve);
-            Zsp += nargs;
-        } else
-#endif
-            Zsp = modstk(Zsp + nargs, functype->return_type->kind != KIND_DOUBLE || c_fp_size < 6, preserve, YES);  /* clean up arguments - we know what type is MOOK */
+        Zsp = gen_restore_frame_after_call(nargs,functype->return_type->kind != KIND_DOUBLE || c_fp_size < 6, preserve, YES);  /* clean up arguments - we know what type is MOOK */
     }
     return node;
 }

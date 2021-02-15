@@ -144,7 +144,7 @@ static Type *tag_hash = NULL;
 void add_tag(Type *type)
 {
     // addglb
-    HASH_ADD_STR(tag_hash, name, type);    
+    HASH_ADD_STR(tag_hash, name, type);   
 }
 
 Type *find_tag(const char *name)
@@ -472,6 +472,7 @@ Type *parse_struct(Type *type, char isstruct)
         }
         str->size = size;  // It's now defined
         str->weak = 0;
+        debug_write_type(str);
     }
     // TODO: Only pointers to weak structures are valid
     type->kind = KIND_STRUCT;
@@ -627,6 +628,19 @@ static void parse_trailing_modifiers(Type *type)
         } else if ( amatch("__critical")) {
             type->flags |= CRITICAL;
             continue;
+        } else if ( amatch("__interrupt")) {
+            type->flags |= INTERRUPT;
+            type->funcattrs.interrupt = -1;  // Not set
+            if ( cmatch('(')) {
+                double intval;
+                Kind valtype;
+                if (constexpr(&intval, &valtype, 0) == 0 ) {
+                    errorfmt("Expecting an interrupt parameter",1);
+                } else {
+                    type->funcattrs.interrupt = intval;
+                    needchar(')');
+                }
+            }
         } else if ( amatch("__banked")) {
             type->flags |= BANKED;
         } else if ( amatch("__z88dk_hl_call")) {
@@ -985,10 +999,8 @@ Node *declare_local(int local_static)
 
             if  ( size < 0 ) size = 0;
 
-            sym = addloc(type->name, ID_VARIABLE, type->kind);
-            sym->ctype = type;
             declared += size;                        
-            sym->offset.i = Zsp - declared;
+            sym = addloc(type->name, type, ID_VARIABLE, type->kind, Zsp - declared);
             if ( cmatch('=')) {
                 sym->isassigned = 1;
                 sym->initialised = 1;
@@ -1480,6 +1492,14 @@ void flags_describe(Type *type, int32_t flags, UT_string *output)
         utstring_printf(output,"__critical ");
     }
 
+    if ( flags & INTERRUPT ) {
+        if ( type->funcattrs.interrupt < 0 ) {
+            utstring_printf(output,"__interrupt ");
+        } else {
+            utstring_printf(output,"__interrupt(%d) ",type->funcattrs.interrupt);
+        }
+    }
+
     if ( flags & SHORTCALL ) {
         if ( flags & SHORTCALL_HL ) {
             utstring_printf(output,"__z88dk_shortcall_hl(%d,%d) ", type->funcattrs.shortcall_rst, type->funcattrs.shortcall_value);
@@ -1717,6 +1737,7 @@ static void declfunc(Type *functype, enum storage_type storage)
         functype->funcattrs.shortcall_value = currfn->ctype->funcattrs.shortcall_value;
     } else {
         currfn = addglb(functype->name, functype, ID_VARIABLE, functype->kind, 0, storage);
+        currfn->flags = functype->flags;
     }
     currfn->func_defined = 1; 
     
@@ -1738,9 +1759,13 @@ static void declfunc(Type *functype, enum storage_type storage)
     if (c_framepointer_is_ix != -1 || (functype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME )
         where += 2;
 
-    if ( (functype->flags & (CRITICAL|NAKED)) == CRITICAL ) {
+    if ( functype->flags & INTERRUPT ) {
+        where += zinterruptoffset(currfn);
+    } else if ( (functype->flags & (CRITICAL|NAKED)) == CRITICAL ) {
         where += zcriticaloffset();
     }
+
+
 
     // Functions that return long long have a buffer stuffed into them
     if (functype->return_type->kind == KIND_LONGLONG ) {
@@ -1780,9 +1805,7 @@ static void declfunc(Type *functype, enum storage_type storage)
                 continue;
             } 
             // Create a local variable
-            ptr = addloc(ptype->name, ID_VARIABLE, ptype->kind);
-            ptr->ctype = ptype;
-            ptr->offset.i = where;
+            ptr = addloc(ptype->name, ptype, ID_VARIABLE, ptype->kind, where);
             type_describe(ptype, str);
             outfmt("; parameter '%s' at sp+%d size(%d)\n",utstring_body(str),where, ptype->size);
             utstring_free(str);
@@ -1791,6 +1814,7 @@ static void declfunc(Type *functype, enum storage_type storage)
         }
     } else {
         int i;
+        ++scope_block;
         for ( i = 0; i < array_len(functype->parameters); i++ ) {
             SYMBOL    *ptr;
             UT_string *str;            
@@ -1803,9 +1827,7 @@ static void declfunc(Type *functype, enum storage_type storage)
                 continue;
             }
             // Create a local variable
-            ptr = addloc(ptype->name, ID_VARIABLE, ptype->kind);
-            ptr->ctype = ptype;            
-            ptr->offset.i = where;
+            ptr = addloc(ptype->name, ptype, ID_VARIABLE, ptype->kind, where);
 
             type_describe(ptype, str);            
             outfmt("; parameter '%s' at %d size(%d)\n", utstring_body(str),where, ptype->size);  
@@ -1831,9 +1853,14 @@ static void declfunc(Type *functype, enum storage_type storage)
     reset_namespace();
         
     
-    if ( (functype->flags & CRITICAL) == CRITICAL ) {
+   
+
+    if ( (functype->flags & INTERRUPT) == INTERRUPT ) {
+        gen_interrupt_enter(currfn);
+    } else if ( (functype->flags & CRITICAL) == CRITICAL ) {
         gen_critical_enter();
     }
+
     gen_push_frame();
 
     if (array_len(functype->parameters) && (functype->flags & (FASTCALL|NAKED)) == FASTCALL ) {

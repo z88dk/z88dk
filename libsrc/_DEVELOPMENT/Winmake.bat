@@ -5,7 +5,8 @@ setlocal ENABLEDELAYEDEXPANSION
 
 @rem must have leading and trailing space
 
-set alltargets= z80 cpm m math16 math32 rc2014 scz180 sms vgl yaz180 z180 zx zxn 
+set alltargets= z80 am9511 cpm hbios m math16 math32 rc2014 scz180 sms vgl yaz180 z180 zx zxn 
+set z88dklib=../../lib
 
 if "%1" == "" (
    echo.
@@ -63,15 +64,15 @@ for %%t in (%targets%) do (
       if "%%t" == "zx" (
          zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
          zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
-         z88dk-zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
-         z88dk-zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
+         z88dk-zx0 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
+         z88dk-zx0 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
       )
 
       if "%%t" == "zxn" (
          zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin
          zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
-         z88dk-zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
-         z88dk-zx7 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
+         z88dk-zx0 -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin
+         z88dk-zx0 -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin
       )
 
       if exist target\%%t\library\%%t_macro.lst (
@@ -81,7 +82,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_sccz80.lib
       
-      z80asm !cpu! -x%%t_sccz80 -D__SCCZ80 @target/%%t/library/%%t_sccz80.lst
+      z88dk-z80asm !cpu! -x%%t_sccz80 -I!z88dklib! -D__SCCZ80 @target/%%t/library/%%t_sccz80.lst
       move /Y %%t_sccz80.lib lib/sccz80/%%t.lib
 
       del /S *.o > nul 2>&1
@@ -89,7 +90,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_sdcc_ix.lib
 
-      z80asm !cpu! -x%%t_sdcc_ix -D__SDCC -D__SDCC_IX @target/%%t/library/%%t_sdcc_ix.lst
+      z88dk-z80asm !cpu! -x%%t_sdcc_ix -I!z88dklib! -D__SDCC -D__SDCC_IX @target/%%t/library/%%t_sdcc_ix.lst
       move /Y %%t_sdcc_ix.lib lib/sdcc_ix/%%t.lib
 
       del /S *.o > nul 2>&1
@@ -97,7 +98,7 @@ for %%t in (%targets%) do (
 
       echo   %%t_sdcc_iy.lib
 
-      z80asm !cpu! -IXIY -x%%t_sdcc_iy -D__SDCC -D__SDCC_IY @target/%%t/library/%%t_sdcc_iy.lst
+      z88dk-z80asm !cpu! -IXIY -x%%t_sdcc_iy -I!z88dklib! -D__SDCC -D__SDCC_IY @target/%%t/library/%%t_sdcc_iy.lst
       move /Y %%t_sdcc_iy.lib lib/sdcc_iy/%%t.lib
 
       del /S *.o > nul 2>&1

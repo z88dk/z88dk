@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.3 #11868 (Linux)
+; Version 4.0.7 #12017 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -55,6 +55,8 @@
 	EXTERN __mulschar_callee
 	EXTERN __mulsuchar
 	EXTERN __mulsuchar_callee
+	EXTERN __muluchar
+	EXTERN __muluchar_callee
 	EXTERN __muluschar
 	EXTERN __muluschar_callee
 	EXTERN __rlslonglong
@@ -68,7 +70,7 @@
 	EXTERN ___sdcc_call_hl
 	EXTERN ___sdcc_call_iy
 	EXTERN ___sdcc_enter_ix
-	EXTERN _banked_call
+	EXTERN banked_call
 	EXTERN _banked_ret
 	EXTERN ___fs2schar
 	EXTERN ___fs2schar_callee
@@ -429,16 +431,17 @@ _m32_asinhf:
 	ld	(ix-1),d
 	ld	l,(ix-4)
 	ld	h,(ix-3)
-	call	_m32_fabsf
-	call	_m32_mul2f
-	ld	(ix-12),l
-	ld	(ix-11),h
-	ld	(ix-10),e
-	ld	(ix-9),d
 	ld	e,(ix-2)
 	ld	d,(ix-1)
+	call	_m32_fabsf
+	call	_m32_mul2f
+	ex	(sp), hl
+	ld	(ix-10),e
+	ld	(ix-9),d
 	ld	l,(ix-4)
 	ld	h,(ix-3)
+	ld	e,(ix-2)
+	ld	d,(ix-1)
 	call	_m32_sqrf
 	ld	bc,0x3f80
 	push	bc
@@ -452,10 +455,10 @@ _m32_asinhf:
 	ld	(ix-7),h
 	ld	(ix-6),e
 	ld	(ix-5),d
-	ld	e,(ix-2)
-	ld	d,(ix-1)
 	ld	l,(ix-4)
 	ld	h,(ix-3)
+	ld	e,(ix-2)
+	ld	d,(ix-1)
 	call	_m32_fabsf
 	push	de
 	push	hl

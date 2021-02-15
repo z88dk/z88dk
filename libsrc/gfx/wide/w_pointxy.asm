@@ -2,7 +2,7 @@
 
         SECTION code_graphics
 	PUBLIC	w_pointxy
-	EXTERN		l_graphics_cmp
+	;EXTERN		l_graphics_cmp
 
 
 	EXTERN	w_pixeladdress
@@ -29,17 +29,17 @@
 ;  af....../.... different
 ;
 .w_pointxy
-                        push    hl
-                        ld      hl,maxy
-                        call    l_graphics_cmp
-                        pop     hl
-                        ret     nc               ; Return if Y overflows
+                        ;push    hl
+                        ;ld      hl,maxy
+                        ;call    l_graphics_cmp
+                        ;pop     hl
+                        ;ret     nc               ; Return if Y overflows
 
-                        push    de
-                        ld      de,maxx
-                        call    l_graphics_cmp
-                        pop     de
-                        ret     c               ; Return if X overflows
+                        ;push    de
+                        ;ld      de,maxx
+                        ;call    l_graphics_cmp
+                        ;pop     de
+                        ;ret     c               ; Return if X overflows
                         
                         call    w_pixeladdress
                         ld      b,a

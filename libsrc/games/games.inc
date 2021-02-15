@@ -207,10 +207,16 @@ IF FORaussie
         defc sndbit_mask   = 128	; bit 6 should stay 'on'
 ENDIF
 
+IF FORbondwell
+        defc sndbit_port   = $50
+        defc sndbit_bit    = 7
+        defc sndbit_mask   = $80
+ENDIF
+
 IF FORpasopia7
-    defc sndbit_port	= $30	
+    defc sndbit_port	= $30
     defc sndbit_bit    = 7
-    defc sndbit_mask   = $80	
+    defc sndbit_mask   = $80
 ENDIF
 
 IF FORsuper80
@@ -226,7 +232,25 @@ IF FORz80tvgame
 	defc	sndbit_mask = 1
 ENDIF
 
-; Compatibily ones only, the following ports don't have a beeper
+IF FORgl
+	defc	sndbit_port = $12
+	defc	sndbit_bit = 3
+	defc	sndbit_mask = 8
+ENDIF
+
+IF FORkrokha
+	defc	sndbit_port = 0xf7ff
+	defc	sndbit_bit = 1
+	defc	sndbit_mask = 2
+ENDIF
+
+IF FORlviv
+        defc sndbit_port   = $c2
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 1
+ENDIF
+
+; Compatibility ones only, the following ports don't have a beeper
 IF FORondra
         defc sndbit_port   = 0
         defc sndbit_bit    = 0

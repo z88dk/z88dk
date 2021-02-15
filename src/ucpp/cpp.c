@@ -335,7 +335,6 @@ static void reinit_lexer_state(struct lexer_state *ls, int wb)
 	ls->input = 0;
 	ls->ebuf = ls->pbuf = 0;
 	ls->nlka = 0;
-	ls->macfile = 0;
 	ls->discard = 1;
 	ls->last = 0;		/* we suppose '\n' is not 0 */
 	ls->line = 1;

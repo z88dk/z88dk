@@ -14,6 +14,7 @@ endif
 INSTALL ?= install
 
 OBJS =	callfunc.o     	\
+	cdbfile.o     	\
 	codegen.o	\
 	const.o		\
 	data.o		\

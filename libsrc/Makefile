@@ -16,12 +16,12 @@ TOCREATE =
 # $2 = libs
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
-CPMLIBS = cpm_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib
+CPMLIBS = cpm_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxvio.lib
 GENLIBS = z80iy_crt0.lib z80n_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2k_crt0.lib z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib  lib3d.lib fastmath.lib preempt.lib sp1-all 
 GENLIBS += 8085_opt.lib ez80_opt.lib z180_opt.lib
 
 
-TOCREATE := $(call check_target,altair8800,altair8800_clib.lib)
+TOCREATE := $(call check_target,altair8800,altair8800_clib.lib gfxvti.lib gfxvdm.lib)
 TOCREATE += $(call check_target,ace,ace_clib.lib gfxace.lib gfxaceudg.lib)
 TOCREATE += $(call check_target,abc80,abc80_clib.lib)
 TOCREATE += $(call check_target,abc800,abc800_clib.lib)
@@ -33,7 +33,9 @@ TOCREATE += $(call check_target,aussie,aussie.lib $(CPMLIBS))
 TOCREATE += $(call check_target,bee,bee_clib.lib microbee.lib $(CPMLIBS))
 TOCREATE += $(call check_target,bic,bic.lib $(CPMLIBS))
 TOCREATE += $(call check_target,bit90,bit90.lib coleco_clib.lib)
-TOCREATE += $(call check_target,c128,c128ansi_clib.lib gfx128.lib gfx128hr.lib gfx128hr480.lib)
+TOCREATE += $(call check_target,bondwell,bondwell.lib $(CPMLIBS))
+TOCREATE += $(call check_target,bondwell2,bondwell2.lib $(CPMLIBS))
+TOCREATE += $(call check_target,c128,c128ansi_clib.lib gfx128.lib gfx128udg.lib gfx128hr.lib gfx128hr480.lib)
 TOCREATE += $(call check_target,c7420,c7420_clib.lib)
 TOCREATE += $(call check_target,coleco,coleco_clib.lib)
 TOCREATE += $(call check_target,cpc,cpc_clib.lib cpcfs.lib cpc_math.lib)
@@ -47,6 +49,8 @@ TOCREATE += $(call check_target,fp1100,fp1100_clib.lib)
 TOCREATE += $(call check_target,g800,g800_clib.lib)
 TOCREATE += $(call check_target,gal,gal_clib.lib)
 TOCREATE += $(call check_target,gb,gb_clib.lib)
+TOCREATE += $(call check_target,gl,gl_clib.lib)
+TOCREATE += $(call check_target,gl6000,gl6000_clib.lib)
 TOCREATE += $(call check_target,hemc,hemc_clib.lib)
 TOCREATE += $(call check_target,hgmc,hgmc_clib.lib)
 TOCREATE += $(call check_target,homelab,homelab_clib.lib)
@@ -54,6 +58,7 @@ TOCREATE += $(call check_target,homelab2,homelab2_clib.lib)
 TOCREATE += $(call check_target,kaypro,gfxkp.lib $(CPMLIBS))
 TOCREATE += $(call check_target,kc,kc_clib.lib)
 TOCREATE += $(call check_target,kramermc,kramermc_clib.lib)
+TOCREATE += $(call check_target,krokha,krokha_clib.lib)
 TOCREATE += $(call check_target,lambda, mlambda.lib mlambda_tiny.lib lambda_clib.lib gfxlambda.lib )
 TOCREATE += $(call check_target,laser500,laser500_clib.lib)
 TOCREATE += $(call check_target,lm80c,lm80c_clib.lib)
@@ -112,7 +117,7 @@ TOCREATE += $(call check_target,ti83p,ti83p_clib.lib)
 TOCREATE += $(call check_target,ti85,ti85_clib.lib)
 TOCREATE += $(call check_target,ti86,ti86_clib.lib)
 TOCREATE += $(call check_target,tiki100,tiki100.lib $(CPMLIBS))
-TOCREATE += $(call check_target,trs80, trs80_clib.lib trsdos.lib gfxtrs80.lib gfxeg2000.lib)
+TOCREATE += $(call check_target,trs80, trs80_clib.lib trsdos.lib gfxtrs80.lib gfxeg2000.lib grafyx3.lib grafyx4.lib)
 TOCREATE += $(call check_target,ts2068, ts2068_clib.lib m2068.lib)
 TOCREATE += $(call check_target,tvc, tvc_clib.lib)
 TOCREATE += $(call check_target,vector06c,vector06c_clib.lib)
@@ -143,7 +148,7 @@ define buildgeneric
 	$(MAKE) -C time
 	$(MAKE) -C font
 	$(MAKE) -C input
-	$(MAKE) -C stdlib TARGET=$(1)
+	$(MAKE) -C stdlib 
 	$(MAKE) -C gfx TARGET=$(1) FLAVOUR=$(if $(2),$(2),narrow)
 	$(MAKE) -C psg TARGET=$(1)
 endef
@@ -166,6 +171,7 @@ define buildcrt
 	$(MAKE) -C algorithm
 	$(MAKE) -C rect
 	$(MAKE) -C arch
+	$(MAKE) -C stdlib
 	$(MAKE) -C z80_crt0s
 endef
 
@@ -436,6 +442,7 @@ zx80_clib.lib:
 	$(MAKE) zx81deps
 	$(call buildgeneric,zx80)
 	$(MAKE) -C games TARGET=zx80
+	$(MAKE) -C target/zx80 
 	TARGET=zx80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORzx80 -x$(OUTPUT_DIRECTORY)/zx80_clib @$(LISTFILE_DIRECTORY)/zx80.lst
 	$(MAKE) zx81deps
 
@@ -639,6 +646,21 @@ attache.lib:
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=attache
 	TARGET=attache TYPE=z80 $(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/attache @$(LISTFILE_DIRECTORY)/target/attache/attache.lst
 
+bondwell.lib:
+	@echo ''
+	@echo '--- Building Bondwell 12/14 Library ---'
+	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=bondwell
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=bondwell
+	TARGET=bondwell TYPE=z80 $(LIBLINKER) -DFORbondwell -x$(OUTPUT_DIRECTORY)/bondwell @$(LISTFILE_DIRECTORY)/target/bondwell/bw.lst
+
+bondwell2.lib:
+	@echo ''
+	@echo '--- Building Bondwell 2 Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=bondwell2
+	TARGET=bondwell2 TYPE=z80 $(LIBLINKER) -DFORbondwell2 -x$(OUTPUT_DIRECTORY)/bondwell2 @$(LISTFILE_DIRECTORY)/target/bondwell2/bw2.lst
+
 gfxosborne1.lib:
 	@echo ''
 	@echo '--- Building Osborne 1 graphics Library ---'
@@ -674,7 +696,7 @@ cpm8080_clib.lib:
 	@echo '--- Building CP/M Library (8080)---'
 	@echo ''
 	$(RM) target/cpm/stdio/*.o target/cpm/cpm/*.o
-	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(LISTFILE_DIRECTORY)/cpm_8080.lst
+	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(LISTFILE_DIRECTORY)/cpm_8080.lst
 
 cpmdevice.lib:
 	@echo ''
@@ -1257,6 +1279,27 @@ lm80c_clib.lib:
 	TARGET=lm80c TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlm80c -x$(OUTPUT_DIRECTORY)/lm80c_clib @$(LISTFILE_DIRECTORY)/lm80c.lst
 
 
+# Genius Leader 2000/4000 - dom
+gl_clib.lib:
+	@echo ''
+	@echo '--- Building Genius Leader 2000/4000 Library ---'
+	@echo ''
+	$(call buildgeneric,gl)
+	$(MAKE) -C games TARGET=gl
+	TARGET=gl TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl -x$(OUTPUT_DIRECTORY)/gl_clib @$(LISTFILE_DIRECTORY)/gl.lst
+
+
+# Genius Leader 6000 - dom
+gl6000_clib.lib:
+	@echo ''
+	@echo '--- Building Genius Leader 6000 Library ---'
+	@echo ''
+	$(call buildgeneric,gl)
+	TARGET=gl TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl6000 -x$(OUTPUT_DIRECTORY)/gl6000_clib @$(LISTFILE_DIRECTORY)/gl6000.lst
+
+
+
+
 
 
 # Untested C lib for NC100 machines - dom
@@ -1325,7 +1368,7 @@ c128ansi_clib.lib:
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128cpm @$(LISTFILE_DIRECTORY)/target/c128/c128_cpm.lst
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/c128ansi_clib @$(LISTFILE_DIRECTORY)/c128ansi.lst
 
-# C128 Base text mode graphics lib - Stefano
+# C128 Base LO-REZ text mode graphics lib - Stefano
 gfx128.lib:
 	@echo ''
 	@echo '--- Building Commodore 128 Base Graphics Library ---'
@@ -1334,6 +1377,17 @@ gfx128.lib:
 	$(MAKE) -C target/c128
 	$(MAKE) -C gfx TARGET=c128 FLAVOUR="text narrow"
 	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128 -x$(OUTPUT_DIRECTORY)/gfx128 @$(LISTFILE_DIRECTORY)/target/c128/gfx128.lst
+
+# C128 LO-REZ UDG mode graphics lib - Stefano
+gfx128udg.lib:
+	@echo ''
+	@echo '--- Building Commodore 128 UDG Based Graphics Library ---'
+	@echo ''
+	$(RM) target/c128/graphics/*.o
+	$(RM) target/c128/graphics/udg/*.o
+	$(MAKE) -C target/c128
+	$(MAKE) -C gfx TARGET=c128 FLAVOUR="narrow text6"
+	TARGET=c128 TYPE=z80 $(LIBLINKER) -DFORc128udg -x$(OUTPUT_DIRECTORY)/gfx128udg @$(LISTFILE_DIRECTORY)/target/c128/gfx128udg.lst
 
 # C128 HRG graphics lib - Stefano
 gfx128hr.lib:
@@ -1511,6 +1565,22 @@ gfxeg2000.lib:
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="narrow" SUBTYPE=eg2000
 	TARGET=eg2000 TYPE=z80 $(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/target/trs80/gfxeg2000.lst
 
+grafyx3.lib:
+	@echo ''
+	@echo '--- Building GrafyxSolution (model 3) Libraries ---'
+	@echo ''
+	$(RM) target/trs80/grafyx/*.o
+	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=grafyx3
+	TARGET=grafyx3 TYPE=z80 $(LIBLINKER) -DFORgrafyx3 -x$(OUTPUT_DIRECTORY)/grafyx3 @$(LISTFILE_DIRECTORY)/target/trs80/grafyx.lst
+
+grafyx4.lib:
+	@echo ''
+	@echo '--- Building GrafyxSolution (model 4) Libraries ---'
+	@echo ''
+	$(RM) target/trs80/grafyx/*.o
+	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=grafyx4
+	TARGET=grafyx4 TYPE=z80 $(LIBLINKER) -DFORgrafyx4 -x$(OUTPUT_DIRECTORY)/grafyx4 @$(LISTFILE_DIRECTORY)/target/trs80/grafyx.lst
+
 trsdos.lib:
 	$(MAKE) -C target/trs80/fcntl
 
@@ -1592,15 +1662,13 @@ special_clib.lib:
 	$(call buildgeneric,special,"wide portable")
 	TARGET=special TYPE=8080 $(LIBLINKER) -m8080 -DFORspecial -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/special_clib.lib @$(LISTFILE_DIRECTORY)/special.lst
 
-
-
 m100_clib.lib:
 	@echo ''
 	@echo '--- Building m100 Library ---'
 	@echo ''
 	$(call buildgeneric,m100,"portable narrow")
 	$(MAKE) -C games TARGET=m100
-	TARGET=m100 TYPE=8080 $(LIBLINKER) -m8080 -DFORm100 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m100_clib @$(LISTFILE_DIRECTORY)/m100.lst
+	TARGET=m100 TYPE=8080 $(LIBLINKER) -m8085 -DFORm100 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/m100_clib @$(LISTFILE_DIRECTORY)/m100.lst
 
 vector06c_clib.lib:
 	@echo ''
@@ -1616,6 +1684,7 @@ lviv_clib.lib:
 	@echo '--- Building PK-01 Lviv/Lvov Library ---'
 	@echo ''
 	$(call buildgeneric,lviv,"narrow portable")
+	$(MAKE) -C games TARGET=lviv
 	TARGET=lviv TYPE=8080 $(LIBLINKER) -m8080 -DFORlviv -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/lviv_clib @$(LISTFILE_DIRECTORY)/lviv.lst
 
 altair8800_clib.lib:
@@ -1658,6 +1727,35 @@ homelab2_clib.lib:
 	$(call buildgeneric,homelab2,"gencon narrow")
 	$(MAKE) -C games TARGET=homelab2
 	TARGET=homelab2 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhomelab2 -x$(OUTPUT_DIRECTORY)/homelab2_clib @$(LISTFILE_DIRECTORY)/homelab2.lst
+
+krokha_clib.lib:
+	@echo ''
+	@echo '--- Building Krokha (tiny) Library ---'
+	@echo ''
+	$(call buildgeneric,krokha,"gencon portable")
+	$(MAKE) -C games TARGET=krokha
+	TARGET=krokha TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORkrokha -x$(OUTPUT_DIRECTORY)/krokha_clib @$(LISTFILE_DIRECTORY)/krokha.lst
+
+gfxvti.lib:
+	@echo ''
+	@echo '--- Building VTI graphics Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=altair8800 SUBTYPE=vti FLAVOUR="gencon portable"
+	TARGET=vti TYPE=8080 $(LIBLINKER) -m8080 -DFORvti -x$(OUTPUT_DIRECTORY)/gfxvti @$(LISTFILE_DIRECTORY)/video/vti/video_vti.lst
+
+gfxvio.lib:
+	@echo ''
+	@echo '--- Building VIO graphics Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=altair8800 SUBTYPE=vio FLAVOUR="gencon portable"
+	TARGET=vio TYPE=8080 $(LIBLINKER) -m8080 -DFORvio -x$(OUTPUT_DIRECTORY)/gfxvio @$(LISTFILE_DIRECTORY)/video/vio/video_vio.lst
+
+gfxvdm.lib:
+	@echo ''
+	@echo '--- Building VDM graphics Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=altair8800 SUBTYPE=vdm FLAVOUR="gencon portable"
+	TARGET=vdm TYPE=8080 $(LIBLINKER) -m8080 -DFORvdm -x$(OUTPUT_DIRECTORY)/gfxvdm @$(LISTFILE_DIRECTORY)/video/vdm/video_vdm.lst
 
 
 # Preempt multitasking library - dom

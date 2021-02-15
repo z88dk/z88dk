@@ -7,6 +7,9 @@ target/lviv/stdio/CRT_FONT
 @stdio/stdio_8080.lst
 @font/font_8x8/font_8x8.lst
 @time/time.lst
+target/lviv/games/joystick
+target/lviv/games/keys_joystick
+@games/games.lst
 target/lviv/graphics/clg
 target/lviv/graphics/pixladdr
 target/lviv/graphics/plotpixl
@@ -15,4 +18,7 @@ target/lviv/graphics/xorpixl
 target/lviv/graphics/pointxy
 @gfx/portable/gfx_portable.lst
 @gfx/narrow/gfx_narrow.lst
-
+target/lviv/input/in_keytranstbl_qwerty
+stdio/inkey/getk
+stdio/inkey/fgetc_cons
+@input/input_keyboard.lst

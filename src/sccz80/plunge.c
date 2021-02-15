@@ -313,14 +313,14 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if ( lval->is_const && lval2->is_const ) {
             int is16bit = lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR;
             if (lval->ltype->isunsigned || lval2->ltype->isunsigned ) {
-                lval->const_val = calcun(lhs_val_type, lval->const_val, oper, lval2->const_val);
+                lval->const_val = calcun(lhs_val_type, lval->const_val, oper, rhs_val_type, lval2->const_val);
                 // Promote char here
                 if ( lval->val_type == KIND_CHAR && lval->const_val >= 256 ) {
                     lval->val_type = KIND_INT;
                     lval->ltype = type_uint;
                 } 
             } else {
-                lval->const_val = calc(lhs_val_type, lval->const_val, oper, lval2->const_val, is16bit);
+                lval->const_val = calc(lhs_val_type, lval->const_val, oper, rhs_val_type, lval2->const_val, is16bit);
                 if ( lval->val_type == KIND_CHAR && (lval->const_val < -127 || lval->const_val > 127) ) {
                     lval->val_type = KIND_INT;
                     lval->ltype = type_int;

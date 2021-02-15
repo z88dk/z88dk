@@ -411,6 +411,7 @@
 	GLOBAL	__sgoioblk
 	GLOBAL	__sgoioblk_end
 	GLOBAL	fopen_zsock
+	GLOBAL	fileno
 	GLOBAL	fopen
 	GLOBAL	freopen
 	GLOBAL	fdopen
@@ -464,6 +465,10 @@
 	GLOBAL	getk_inkey
 	GLOBAL	printk
 	GLOBAL	perror
+	GLOBAL	set_fputc_cons
+	GLOBAL	fputc_cons_native
+	GLOBAL	fputc_cons_generic
+	GLOBAL	fputc_cons_ansi
 	GLOBAL	_placeholder
 	GLOBAL	_s_fastcall
 	GLOBAL	_test2

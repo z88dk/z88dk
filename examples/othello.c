@@ -1,5 +1,5 @@
 /*
- *   $Id: othello.c,v 1.8 2015-08-10 12:55:57 stefano Exp $
+ *   $Id: othello.c $
  * 
  *   z88dk port of the 'historical' game by Leor Zolman
  *
@@ -27,6 +27,7 @@
  *   zcc +ace -O3 -lndos -create-app -DREDEFINED_FONT othello.c
  *   zcc +srr -O3 -lndos -create-app -DREDEFINED_FONT othello.c
  *   zcc +zx -O3 -lndos -create-app -DREDEFINED_FONT othello.c
+ *   zcc +trs80 -subtype=eg2000disk -O3 -lndos -create-app -DREDEFINED_FONT othello.c
  */
 
 
@@ -92,13 +93,8 @@ commands may be typed:
 /* z88dk specific opt */
 #pragma printf = "%c %u"
 #ifdef SCCZ80
-int cntbrd(char b[64], char p) __smallc __z88dk_callee;
 void prtbrd(char b[64]) __z88dk_fastcall;
 int prtscr(char b[64]) __z88dk_fastcall;
-void putmov(char b[64], char p, int x, int y) __smallc __z88dk_callee;
-char notak1(char b[64], char p,char o,char e,int x,int y,int m,int n) __smallc __z88dk_callee;
-char notake(char b[64],char p,char o,char e,int x,int y) __smallc __z88dk_callee;
-int fillmt(char b[64], char p, char o, char e, struct mt t[64]) __smallc __z88dk_callee;
 #endif
 
 #define BLACK '*'
@@ -106,6 +102,12 @@ int fillmt(char b[64], char p, char o, char e, struct mt t[64]) __smallc __z88dk
 #define EMPTY '-'
 
 #ifdef __SPECTRUM__
+#define G_BLACK 128
+#define G_WHITE 129
+#define G_EMPTY 130
+#endif
+
+#ifdef __TRS80__
 #define G_BLACK 128
 #define G_WHITE 129
 #define G_EMPTY 130
@@ -938,14 +940,18 @@ int main()
 		memcpy(0xfe08, whitepiece,24);
 	#endif
 
+	#ifdef __TRS80__
+		memcpy(0xf400, whitepiece,24);
+	#endif
+
 #endif
 
 #ifdef ANSITEXT
 	printf("%c\nWelcome to the %c[7m OTHELLO %c[27m program!\n",12,27,27);
-	printf("\nNote: %c[4m BLACK ALWAYS GOES FIRST %c[24m ...Good luck!!!\n\n\n",27,27);
+	printf("\nNote: %c[4m BLACK ALWAYS GOES FIRST\n    %c[24m ...Good luck!!!\n\n\n",27,27);
 #else
 	printf("%c\nWelcome to the OTHELLO program!\n",12);
-	printf("\nNote: BLACK ALWAYS GOES FIRST   ...Good luck!!!\n\n\n");
+	printf("\nNote: BLACK ALWAYS GOES FIRST\n     ...Good luck!!!\n\n\n");
 #endif
 	printf("Do you want to go first? ");
 	if (toupper(getchar()) == 'Y') 

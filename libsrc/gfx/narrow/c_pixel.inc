@@ -17,14 +17,14 @@
 	cp	maxy / 4
 	ret	nc
 IF __CPU_INTEL__
-	rrca
-	rrca
-	and	@00111111
+	rlca
+	rlca
+	and	@11111100
 	ld	l,a
 	ld	a,h
-	rrca
-	rrca
-	and	@00111111
+	rlca
+	rlca
+	and	@11111100
 	ld	h,a
 ELSE
 	sla	h

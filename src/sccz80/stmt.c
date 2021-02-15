@@ -97,6 +97,7 @@ struct nodepair *statement()
         st = -1;
         switch (ch()) {
         case '{':
+            ++scope_block;
             inbyte();
             pair->node = compound();
             st = lastst;

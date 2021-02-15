@@ -39,7 +39,7 @@ void strtol_tests()
     }
 }
 
-
+#ifndef __8080__
 void strtoul_tests()
 {
     struct strtol_data *test = &data[0];
@@ -59,6 +59,7 @@ void strtoul_tests()
         test++;
     }
 }
+#endif
 
 
 int test_strtol()
@@ -66,6 +67,8 @@ int test_strtol()
     suite_setup("strto.l() Tests");
 
     suite_add_test(strtol_tests);
+#ifndef __8080__
     suite_add_test(strtoul_tests);
+#endif
     return suite_run();
 }

@@ -40,11 +40,10 @@ extern char Filenorig[];
 
 #ifdef USEFRAME
 extern int CheckOffset(int);
-extern void FrameP(void);
 extern void PutFrame(char,int);
-extern void RestoreSP(char);
 extern void OutIndex(int);
 #endif
+
 
 static void swap(void);
 static void dpush_under(Kind val_type);
@@ -200,6 +199,7 @@ void DoLibHeader(void)
                 segment++;
             else
                 segment = filen;
+            debug_write_module();
             outstr(segment);
         } else {
             /* This handles files produced by a filter cpp */
@@ -213,6 +213,7 @@ void DoLibHeader(void)
             else
                 segment = filen;
             outstr("scp_"); /* alpha id incase tmpfile is numeric */
+            debug_write_module();
             outstr(segment);
         }
         nl();
@@ -1442,6 +1443,12 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     }
     gen_pop_frame(); /* Restore previous frame pointer */
 
+
+    if ( (currfn->flags & INTERRUPT) == INTERRUPT ) {
+        gen_interrupt_leave(currfn);
+        return;
+    }
+
     /* Naked has already returned */
     if ( (currfn->flags & CRITICAL) == CRITICAL || incritical) {
         gen_critical_leave();
@@ -1459,6 +1466,12 @@ void gen_leave_function(Kind vartype, char type, int incritical)
     if (type)
         setcond(type);
     ol("ret"); nl(); nl(); /* and exit function */
+}
+
+
+int gen_restore_frame_after_call(int offset, Kind save, int saveaf, int usebc)
+{
+    return modstk(Zsp + offset, save, saveaf, usebc);
 }
 
 /* Modify the stack pointer to the new value indicated 
@@ -4778,7 +4791,7 @@ void gen_emit_line(int line)
     }
 
     if ( currfn ) {
-        outfmt("\tC_LINE\t%d,\"%s::%s\"\n", line, filen,currfn->name);
+        outfmt("\tC_LINE\t%d,\"%s::%s::%d::%d\"\n", line, filen,currfn->name,ncmp,scope_block);
     } else {
         outfmt("\tC_LINE\t%d,\"%s\"\n", line, filen);
     }
@@ -4850,45 +4863,25 @@ void OutIndex(int val)
     outstr(")");
 }
 
-void RestoreSP(char saveaf)
-{
-    if (saveaf)
-         ol("ex\taf,af");
-    ot("ld\tsp,");
-    FrameP();
-    nl();
-    if (saveaf)
-         ol("ex\taf,af");
-}
 
-void setframe(void)
-{
-#ifdef USEFRAME
-    if (c_framepointer_is_ix == -1)
-        return;
-    ot("ld\t");
-    FrameP();
-    outstr(",0\n");
-    ot("add\t");
-    FrameP();
-    outstr(",sp\n");
-#endif
-}
 
 #endif
-
-void FrameP(void)
-{
-    outstr(c_framepointer_is_ix ? "ix" : "iy");
-}
 
 void gen_push_frame(void)
 {
     if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         if ( !IS_808x() && !IS_GBZ80() ) {
             ot("push\t");
-            FrameP();
+            outstr(FRAME_REGISTER);
             nl();
+            if ( c_framepointer_is_ix != -1) {
+                ot("ld\t");
+                outstr(FRAME_REGISTER);
+                outstr(",0\n");
+                ot("add\t");
+                outstr(FRAME_REGISTER);
+                outstr(",sp\n");
+            }
         } else {
             ol("push\taf");
         }
@@ -4900,7 +4893,7 @@ void gen_pop_frame(void)
     if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         if ( !IS_808x() && !IS_GBZ80() ) {
             ot("pop\t");
-            FrameP();
+            outstr(FRAME_REGISTER);
             nl();
         } else {
             ol("pop\taf");
@@ -5133,6 +5126,65 @@ void gen_intrinsic_out(SYMBOL *sym)
         ol("out\t(c),a");
     }
 }
+
+
+int zinterruptoffset(SYMBOL *sym)
+{
+    if ( IS_808x() || IS_GBZ80() ) {
+        return 8;
+    }
+    return 12;
+}
+
+void gen_interrupt_enter(SYMBOL *func)
+{
+    // __critical __interrupt(0) -> push
+    // __interrupt -> ei push
+    // __critical __interrupt -> push
+    if ( (func->ctype->flags & CRITICAL) == 0 && func->ctype->funcattrs.interrupt < 0 ) {
+        if ( c_cpu & CPU_RABBIT ) ol("ipres");
+        else ol("ei");
+    }
+
+    ol("push\taf");
+    ol("push\tbc");
+    ol("push\tde");
+    ol("push\thl");
+    if ( !IS_808x() && !IS_GBZ80() ) {
+        ol("push\tix");
+        ol("push\tiy");
+    }
+
+}
+void gen_interrupt_leave(SYMBOL *func)
+{
+    if ( !IS_808x() && !IS_GBZ80() ) {
+        ol("pop\tiy");
+        ol("pop\tix");
+    }
+    ol("pop\thl");
+    ol("pop\tde");
+    ol("pop\tbc");
+    ol("pop\taf");
+
+    // __critical __interrupt(0) -> ei, reti
+    // __interrupt -> reti
+    // __critical __interrupt -> retn
+
+    if ( (func->ctype->flags & CRITICAL) == CRITICAL && func->ctype->funcattrs.interrupt < 0 ) {
+        if ( c_cpu & CPU_RABBIT ) ol("ret");
+        else ol("retn");
+    } else if ( (func->ctype->flags & CRITICAL) == 0 && func->ctype->funcattrs.interrupt < 0 ) {
+        ol("reti");
+    } else {
+        if ( c_cpu & CPU_RABBIT ) ol("ipres");
+        else ol("ei");
+        ol("reti");
+    }
+    nl();
+    nl();
+}
+
 
 
 void gen_critical_enter(void)

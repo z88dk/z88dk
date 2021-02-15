@@ -15,6 +15,8 @@ extern unsigned _stklen = 8192U; /* Default stack size 4096 bytes is too small. 
 
 static char   *c_output_extension = "asm";
 static char   *c_output_file = NULL;
+static char    c_debug_adb_file = 0;
+static char    c_debug_adb_defc = 0;
 
 static int      gargc; /* global copies of command line args */
 static char   **gargv;
@@ -22,6 +24,9 @@ static SYMBOL  *savecurr;    /* copy of currfn for #include */
 static int      saveline;    /* copy of lineno  "    " */
 static int      saveinfn;    /* copy of infunc  "    " */
 static int      filenum; /* next argument to be used */
+
+UT_string       *debug_utstr;
+UT_string       *debug2_utstr;
 
 static Type *type_double4 = &(Type){ KIND_DOUBLE, 4, 0, .len=1 }; 
 static Type *type_double8 = &(Type){ KIND_DOUBLE, 8, 0, .len=1 }; 
@@ -32,7 +37,6 @@ char Filenorig[FILENAME_LEN + 1];
 int c_notaltreg; /* No alternate registers */
 int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
 int c_disable_builtins = 0;
-int c_line_labels = 0;
 int c_cline_directive = 0;
 int c_cpu = CPU_Z80;
 int c_old_diagnostic_fmt = 0;
@@ -58,6 +62,8 @@ char *c_init_section = "code_crt_init";
 
 
 
+static void dumpsymdebug(void);
+static void dumpdebug(void);
 static void dumpfns(void);
 static void dumpvars(void);
 static void parse(void);
@@ -114,11 +120,9 @@ static option  sccz80_opts[] = {
     { 0, "initseg", OPT_STRING|OPT_DOUBLE_DASH, "=<name> Set the initialisation section name", &c_init_section, NULL, 0 },
     { 0, "gcline", OPT_BOOL, "Generate C_LINE directives", &c_cline_directive, NULL, 0 },
     { 0, "opt-code-speed", OPT_FUNCTION|OPT_STRING|OPT_DOUBLE_DASH, "Optimise for speed not size", NULL, opt_code_speed, 0},
-#ifdef USEFRAME
-    { 0, "", OPT_HEADER, "Framepointer configuration:", NULL, NULL, 0 },
+    { 0, "", OPT_HEADER, "Framepointer configuration (for debugging):", NULL, NULL, 0 },
     { 0, "frameix", OPT_ASSIGN|OPT_INT, "Use ix as the frame pointer", &c_framepointer_is_ix, NULL, 1},
     { 0, "frameiy", OPT_ASSIGN|OPT_INT, "Use iy as the frame pointer", &c_framepointer_is_ix, NULL, 0},
-#endif
     { 0, "zcc-opt", OPT_STRING, "Location for zcc_opt.def", &c_zcc_opt, NULL, (intptr_t)(void *)"zcc_opt.def"},
 
     { 0, "", OPT_HEADER, "Error/warning handling:", NULL, NULL, 0 },
@@ -131,8 +135,10 @@ static option  sccz80_opts[] = {
 #endif
     { 0, "W", OPT_FUNCTION, "<type> Enable a class of warnings", NULL,  SetWarning, 0 },
     { 0, "", OPT_HEADER, "Debugging options", NULL, NULL, 0 },
+    { 0, "debug-sect", OPT_BOOL, "Create adb/cdb debug section", &c_debug_adb_file, NULL, 0 },
+    { 0, "debug-defc", OPT_BOOL, "Create adb/cdb debug defc", &c_debug_adb_defc, NULL, 0 },
     { 0, "cc", OPT_BOOL, "Intersperse the assembler output with the source C code", &c_intermix_ccode, NULL, 0 },
-    { 0, "debug", OPT_INT, "=<val> Enable some extra logging", &debuglevel, NULL, 0 },
+    { 0, "intlog", OPT_INT, "=<val> Enable some extra logging", &debuglevel, NULL, 0 },
     { 0, "ext", OPT_STRING, "=<ext> Set the file extension for the generated output", &c_output_extension, NULL, 0 },
     { 0, "D", OPT_FUNCTION, "Define a preprocessor directive", NULL, SetDefine, 0 },
     { 0, "U", OPT_FUNCTION, "Undefine a preprocessor directive", NULL, SetUndefine, 0 },
@@ -257,6 +263,14 @@ int main(int argc, char** argv)
         c_fp_size = 4;
     }
 
+    if ( c_debug_adb_file || c_debug_adb_defc ) {
+        c_cline_directive = 1;
+        // Turn on the framepointer entry so we can get local variables
+        if ( !IS_808x() && !IS_GBZ80() && c_framepointer_is_ix == -1 ) {
+            c_framepointer_is_ix = 1;
+        }
+    }
+
 
     if ( c_cpu == CPU_8080 ) {
         c_notaltreg = 1;
@@ -268,17 +282,32 @@ int main(int argc, char** argv)
         WriteDefined("CPU_GBZ80", 1);
     }
 
+    utstring_new(debug_utstr);
+    utstring_new(debug2_utstr);
+
     litlab = getlabel(); /* Get labels for function lits*/
     openout(); /* get the output file */
     openin(); /* and initial input file */
     gen_file_header(); /* intro code */
     parse(); /* process ALL input */
+
+
+
+
     /* dump literal queues, with label */
     /* litq starts from 1, so literp has to be -1 */
     dumplits(0, YES, litptr - 1, litlab, litq + 1);
     write_constant_queue();
     dumpvars();
     dumpfns();
+
+    if ( c_debug_adb_defc ) {
+        dumpsymdebug();
+    }
+    if ( c_debug_adb_file ) {
+        dumpdebug();
+    }
+
     gen_file_footer(); /* follow-up code */
     closeout();
     errsummary(); /* summarize errors */
@@ -402,6 +431,29 @@ void info()
 }
 
 
+static void dumpdebug(void)
+{
+    const char *debug = utstring_body(debug_utstr);
+    const char *end = NULL;
+
+    gen_switch_section("__ADBDEBUG");
+    while ( ( end = strchr(debug,'\n')) != NULL ) {
+        defmesg();
+        outfmt("%.*s\\n\"\n", end - debug, debug);
+        debug = end+1;        
+    }
+}
+
+static void dumpsymdebug(void)
+{
+    const char *debug = utstring_body(debug2_utstr);
+    const char *end = NULL;
+
+    while ( ( end = strchr(debug,'\n')) != NULL ) {
+        outfmt("%.*s\n", end - debug, debug);
+        debug = end+1;        
+    }
+}
 
 /*
  ***********************************************************************
@@ -441,6 +493,9 @@ static void dumpfns()
                 } else if ( storage != LSTATIC && storage != TYPDEF ) {
                     GlobalPrefix();                    
                     outname(ptr->name, dopref(ptr)); nl();
+                    if ( storage != STATIK ) {
+                        debug_write_symbol(ptr);
+                    }
                 }
             }
         }

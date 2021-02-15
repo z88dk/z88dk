@@ -11,4 +11,4 @@ $(OUTPUT_DIRECTORY)/msxdos2.lib: $(ASM)
 
 clean:
 	$(RM) -f *.o
-	$(RM) $(OUTPUT_DIRECTORY)/msxdos2.lib
+	#$(RM) $(OUTPUT_DIRECTORY)/msxdos2.lib

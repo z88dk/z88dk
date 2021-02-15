@@ -1,9 +1,13 @@
 Z88DK Z80 Module Assembler Change Log
 =====================================
 
+2021
+----
+- 2021-01-18 Fix #1671: Define INCBIN as alias to BINARY
+
 2020
 ----
-- 2020-02-09 Defined the following aliases:
+- 2020-02-09 Fix #1221: add aliases to defx instructions
   defb, byte, db
   defm, dm
   defw, word, dw
@@ -11,6 +15,8 @@ Z88DK Z80 Module Assembler Change Log
   defp, ptr, dp (24-bit pointer)
   defq, dword, dq (32-bit word)
   defs, ds (define shift)
+- 2020-08-02 Add -Dvar=nn to define a numeric variable in the command line
+- 2020-05-14 Fix #1451: link very slow on Windows
 
 2019
 ----

@@ -1,5 +1,5 @@
 
-	SECTION bss_fp_mbfs
+	SECTION bss_fp_mbf32
 
 	PUBLIC	FPREG
 	PUBLIC	FPEXP

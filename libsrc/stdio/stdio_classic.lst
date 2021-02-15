@@ -19,6 +19,7 @@ stdio/obj/fgetpos
 stdio/obj/fgets
 stdio/obj/fgets_cons
 stdio/obj/fgets_cons_erase_character
+stdio/obj/fileno
 stdio/obj/fmemopen
 stdio/obj/fopen
 stdio/obj/fprintf

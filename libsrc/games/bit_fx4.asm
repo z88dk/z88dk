@@ -1,4 +1,4 @@
-; $Id: bit_fx4.asm,v 1.4 2016-04-23 21:06:32 dom Exp $
+; $Id: bit_fx4.asm  $
 ;
 ; Generic platform sound effects module.
 ;
@@ -23,12 +23,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
 .bit_fx4
 ._bit_fx4
-          pop  bc
-          pop  de
-          push de
-          push bc
-          
-          ld    a,e  
+          ld    a,l
           cp    8
           ret   nc  
           add   a,a  
@@ -53,7 +48,9 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           
           
 ; Strange squeak
-.fx1      ld    b,1  
+.fx1
+          call  bit_open_di
+          ld    b,1  
 .fx1_1    push  bc  
           ld    hl,600
           ld    de,2
@@ -77,11 +74,12 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr    nc,fx1_2
           pop   bc
           djnz  fx1_1
-          ret 
-          
+          jp    bit_close_ei
+
           
 ; Sort of "audio tape rewind" effect
 .fx2      
+          call  bit_open_di
           ld    hl,1024
 .fx2_1    
           ld    de,1
@@ -97,11 +95,12 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld	a,h
           or	l
           jr	nz,fx2_1
-          ret 
+          jp    bit_close_ei
           
           
 ; FX3 effect
 .fx3
+          call  bit_open_di
           ld    hl,30
           ld    de,1
 .fx3_1    
@@ -121,11 +120,12 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld	a,h
           or	l
           jr	nz,fx3_1
-          ret 
+          jp    bit_close_ei
           
           
 ; FX4 effect
 .fx4
+          call  bit_open_di
           ld	hl,1124
           ld    de,1
 .fx4_1    
@@ -148,12 +148,13 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld	a,l
           and	a
           jr	nz,fx4_1
-          ret 
+          jp    bit_close_ei
           
          
 ; Strange descending squeak 
 ; FX5 effect
 .fx5
+          call  bit_open_di
           ld	hl,200
           ld    de,1
 .fx5_1    
@@ -183,11 +184,12 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld	a,l
           and	a
           jr	nz,fx5_1
-          ret 
+          jp    bit_close_ei
           
           
 ; FX6 effect
 .fx6
+          call  bit_open_di
           ld	hl,300
           ld    de,1
 .fx6_1    
@@ -210,11 +212,12 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld	a,l
           and	50
           jr	nz,fx6_1
-          ret
+          jp    bit_close_ei
           
           
 ; FX7 effect
 .fx7
+          call  bit_open_di
           ld	hl,1000
           ld    de,1
 .fx7_1    
@@ -236,11 +239,13 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld	a,l
           and	50
           jr	nz,fx7_1
-          ret
+          jp    bit_close_ei
           
           
 ; FX8 effect
-.fx8      ld    b,1  
+.fx8
+          call  bit_open_di
+          ld    b,1  
 .fx8_1    push  bc  
           ld    hl,2600
           ld    de,2
@@ -268,6 +273,6 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ret 
           ld	hl,100
           ld    de,1
-          ret
+          jp    bit_close_ei
 
 ENDIF

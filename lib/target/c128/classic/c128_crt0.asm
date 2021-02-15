@@ -30,7 +30,7 @@
         defc    CONSOLE_ROWS = 25
 
         IF      !DEFINED_CRT_ORG_CODE
-                defc    CRT_ORG_CODE  = $3000	; no, use a fixed entry location at $3000, 'appmake' is not ready for different values!
+                defc    CRT_ORG_CODE  = $5000	
         ENDIF
 
 	defc	TAR__no_ansifont = 1

@@ -47,15 +47,17 @@
 	defc	__CPU_CLOCK = 4000000
         INCLUDE "crt/classic/crt_rules.inc"
 
-	IF (startup=2)
-		IF !DEFINED_CRT_ORG_CODE
-            defc    CRT_ORG_CODE  = 32768
-		ENDIF
-	ELSE
 		IF !DEFINED_CRT_ORG_CODE
             defc    CRT_ORG_CODE  = $100
 		ENDIF
-	ENDIF
+
+        ; Default to some "sensible" values
+        IF !DEFINED_CONSOLE_ROWS
+           defc CONSOLE_ROWS = 24
+        ENDIF
+        IF !DEFINED_CONSOLE_COLUMNS
+           defc CONSOLE_COLUMNS = 80
+        ENDIF
 
 	org     CRT_ORG_CODE
 
@@ -96,19 +98,6 @@ err8080:
 	defm	"This program requires a Z80 CPU."
 	defb	13,10,'$'
 isz80:
-ENDIF
-
-IF (startup=2)
-	;EXTERN ASMTAIL
-		ld	hl,$100
-		ld  de,CRT_ORG_CODE
-		ld  bc,$4000-$100	; max. code size is about 16K
-		ldir
-IF !DEFINED_noprotectmsdos
-		jp  CRT_ORG_CODE+14
-ELSE
-		jp  CRT_ORG_CODE+14-start+begin
-ENDIF
 ENDIF
 
 	nop	 ;   Those extra bytes fix the Amstrad NC's ZCN support !!?!

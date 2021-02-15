@@ -14,10 +14,10 @@
 	PUBLIC	pc88_breakon
 	PUBLIC	_pc88_breakon
 
-	EXTERN	brksave
+	EXTERN	__brksave
 
 pc88_breakon:
 _pc88_breakon:
 	xor a
-	ld	(brksave),a
+	ld	(__brksave),a
 	ret

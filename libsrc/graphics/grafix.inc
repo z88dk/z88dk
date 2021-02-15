@@ -201,6 +201,18 @@ IF FORkaypro
 	defc maxy	= 100
 ENDIF
 
+IF FORbondwell
+	DEFINE gotgfx
+	defc maxx	= 160
+	defc maxy	= 75
+ENDIF
+
+IF FORbondwell2
+	DEFINE gotgfx
+	defc maxx	= 640
+	defc maxy	= 200
+ENDIF
+
 IF FORkaypro83
 	DEFINE gotgfx
 	defc maxx	= 80
@@ -215,9 +227,11 @@ IF FORosborne1
 ENDIF
 
 IF FORzx
+ IF !FORts2068
 	DEFINE gotgfx
 	defc maxx	= 256
 	defc maxy	= 192
+ ENDIF
 ENDIF
 
 IF FORcpc
@@ -292,7 +306,7 @@ IF FORc128hr480
 	defc maxy	= 480
 ENDIF
 
-IF FORgfx2068hr
+IF FORts2068
 	DEFINE gotgfx
 	defc maxx       = 512
 	defc maxy       = 192
@@ -381,6 +395,13 @@ IF FORc128
 	defc blankch	= 32
 ENDIF
 
+IF FORc128udg
+	DEFINE gotgfx
+	defc maxx	= 80
+	defc maxy	= 75
+	defc blankch	= 0
+ENDIF
+
 IF FORfp1100
 	DEFINE gotgfx
 	defc maxx	= 640
@@ -420,6 +441,18 @@ IF FOReg2000
 	DEFINE gotgfx
 	defc maxx	= 160
 	defc maxy	= 102
+ENDIF
+
+IF FORgrafyx3
+	DEFINE gotgfx
+	defc maxx	= 512
+	defc maxy	= 192
+ENDIF
+
+IF FORgrafyx4
+	DEFINE gotgfx
+	defc maxx	= 640
+	defc maxy	= 240
 ENDIF
 
 IF FORp2000
@@ -633,6 +666,33 @@ IF FORlviv
 	defc maxy	= 256
 ENDIF
 
+IF FORvti
+	DEFINE gotgfx
+	defc maxx	= 128
+	defc maxy	= 48
+	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
+	defc blankch    = 160
+ENDIF
+
+IF FORvio
+	DEFINE gotgfx
+	defc maxx	= 160
+	defc maxy	= 72
+	defc blankch    = 32
+ENDIF
+
+IF FORvdm
+	DEFINE gotgfx
+	defc maxx	= 64
+	defc maxy	= 16
+	defc USEplotc   = 1		; We call generic_console_plotc, not _printc for text mode
+ENDIF
+
+IF FORkrokha
+	DEFINE gotgfx
+	defc maxx	= 964 
+	defc maxy	= 64
+ENDIF
 
 ; =============================================
 

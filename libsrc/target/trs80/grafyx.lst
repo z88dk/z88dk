@@ -1,0 +1,7 @@
+target/trs80/grafyx/clsgraph
+target/trs80/grafyx/w_plotpixl
+target/trs80/grafyx/w_xorpixl
+target/trs80/grafyx/w_respixl
+target/trs80/grafyx/w_pointxy
+target/trs80/grafyx/w_putsprite
+@gfx/wide/gfx_wide.lst

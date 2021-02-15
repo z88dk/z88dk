@@ -34,7 +34,7 @@ endif
 
 Z88DK_PATH	= $(shell pwd)
 SDCC_PATH	= $(Z88DK_PATH)/src/sdcc-build
-SDCC_VERSION    = 11940
+SDCC_VERSION    = 12036
 
 ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
@@ -52,7 +52,7 @@ BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(
 	bin/z88dk-z80nm$(EXESUFFIX) bin/z88dk-zobjcopy$(EXESUFFIX)  \
 	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
 	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
-	bin/z88dk-lib$(EXESUFFIX)
+	bin/z88dk-lib$(EXESUFFIX) bin/z88dk-zx0$(EXESUFFIX)
 	
 ALL = $(BINS) testsuite
 
@@ -148,6 +148,9 @@ bin/z88dk-zpragma$(EXESUFFIX): src/config.h
 bin/z88dk-zx7$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/zx7 PREFIX=`pwd` install
 
+bin/z88dk-zx0$(EXESUFFIX): src/config.h
+	$(MAKE) -C src/zx0 PREFIX=`pwd` install
+
 bin/z88dk-z80nm$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/z80nm PREFIX=`pwd` install
 
@@ -185,6 +188,7 @@ install: install-clean
 	$(MAKE) -C src/zcc PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR) install
+	$(MAKE) -C src/zx0 PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/z80nm PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/zobjcopy PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/ticks PREFIX=$(DESTDIR) install
@@ -241,6 +245,7 @@ clean-bins:
 	$(MAKE) -C src/zobjcopy clean
 	$(MAKE) -C src/zpragma clean
 	$(MAKE) -C src/zx7 clean
+	$(MAKE) -C src/zx0 clean
 	$(MAKE) -C support clean
 	$(MAKE) -C test clean
 	$(MAKE) -C testsuite clean

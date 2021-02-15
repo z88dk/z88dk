@@ -6,6 +6,17 @@
 ;
 
 
+IF      !DEFINED_CRT_ORG_CODE
+    defc CRT_ORG_CODE = 0x8000
+ENDIF
+
+    defc TAR__register_sp = 0xFDFF
+
+
+    INCLUDE "crt/classic/crt_rules.inc"
+
+    org     CRT_ORG_CODE
+
 
 if (CRT_ORG_CODE < 32768)
     defs    ZORG_TOO_LOW

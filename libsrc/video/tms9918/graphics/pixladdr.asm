@@ -46,6 +46,8 @@ IF VDP_CMD < 0
 	ld	a,h		;4
 	and	@00111111	;7
 	ld	(-VDP_CMD),a
+	push	bc
+	pop	bc
 	ld	a,(-VDP_DATAIN)
 ELSE
         push    bc
@@ -55,6 +57,8 @@ ELSE
 	and	@00111111	; masked with "read command" bits
 	out	(c), a
         ld      bc,VDP_DATAIN
+	push	bc
+	pop	bc
         in      a,(c)
         pop     bc
 ENDIF
@@ -82,6 +86,8 @@ IF VDP_CMD < 0
 	or	@01000000
 	ld	(-VDP_CMD),a
 	ld	a,(__tms9918_pixelbyte)
+	push	bc
+	pop	bc
 	ld	(-VDP_DATA),a
 	; And support colour as well
 	ld	a,e
@@ -92,6 +98,8 @@ IF VDP_CMD < 0
 	or	@01000000
 	ld	(-VDP_CMD),a
 	ld	a,(__tms9918_attribute)
+	push	bc
+	pop	bc
 	ld	(-VDP_DATA),a
 ELSE
         ld      bc,VDP_CMD
@@ -102,8 +110,12 @@ ELSE
         out     (c),a
         ld      a,(__tms9918_pixelbyte) ; Can it be optimized ? what about VDP timing ?
         ld      bc,VDP_DATA
+	push	bc
+	pop	bc
         out     (c),a
         ld      bc,VDP_CMD
+	push	bc
+	pop	bc
         out     (c),e
         ld      a,d		; MSB of video mem ptr
 	add	$20

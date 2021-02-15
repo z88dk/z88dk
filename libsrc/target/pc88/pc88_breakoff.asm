@@ -14,10 +14,10 @@
 	PUBLIC	pc88_breakoff
 	PUBLIC	_pc88_breakoff
 	
-	EXTERN	brksave
+	EXTERN	__brksave
 
 pc88_breakoff:
 _pc88_breakoff:
 	ld	a,1
-	ld	(brksave),a
+	ld	(__brksave),a
 	ret

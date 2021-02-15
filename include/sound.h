@@ -7,34 +7,103 @@
 /*
  *	Sound support code
  *
- *	$Id: sound.h,v 1.24 2016-11-15 08:11:10 stefano Exp $
+ *	$Id: sound.h $
  */
+
+
+
+#ifdef __C128__
+#include <c128/cia.h>
+#include <c128/sid.h>
+#endif
 
 
 /* 1 bit sound library */
 
-
 extern void  __LIB__ bit_open();
+extern void  __LIB__ bit_open_di();
 extern void __LIB__ bit_close();
+extern void __LIB__ bit_close_ei();
 extern void __LIB__ bit_click();
 
 /* Sound effects; every library contains 8 different sounds (effect no. 0..7) */
-extern void __LIB__ bit_fx(int effect);
-extern void __LIB__ bit_fx2(int effect);
-extern void __LIB__ bit_fx3(int effect);
-extern void __LIB__ bit_fx4(int effect);
+extern void __LIB__ bit_fx(int effect) __smallc __z88dk_fastcall;
+extern void __LIB__ bit_fx2(int effect) __smallc __z88dk_fastcall;
+extern void __LIB__ bit_fx3(int effect) __smallc __z88dk_fastcall;
+extern void __LIB__ bit_fx4(int effect) __smallc __z88dk_fastcall;
+extern void __LIB__ bit_fx5(int effect) __smallc __z88dk_fastcall;
+extern void __LIB__ bit_fx6(int effect) __smallc __z88dk_fastcall;
+extern void __LIB__ bit_fx7(int effect) __smallc __z88dk_fastcall;
 
 /* 1 BIT SYNTH - Polyphony and multitimbric effects */
 extern void __LIB__ bit_synth(int duration, int frequency1, int frequency2, int frequency3, int frequency4) __smallc;
 
 /* "period": the higher value, the lower tone ! */
 extern void __LIB__ bit_beep(int duration, int period) __smallc;
+extern void __LIB__ bit_beep_callee(int duration, int period) __smallc __z88dk_callee;
+#define bit_beep(a,b) bit_beep_callee(a,b)
+
+/* "period": the higher value, the lower the simulated white noise frequency cutoff ! */
+extern void __LIB__ bit_noise(int duration, int period) __smallc;
+extern void __LIB__ bit_noise_callee(int duration, int period) __smallc __z88dk_callee;
+#define bit_noise(a,b) bit_noise_callee(a,b)
+
+/* "period": the higher value, the lower tone !  pattern: the "on/off" pattern defining the sound patch, zero terminated */
+extern void __LIB__ patch_beep(int duration, int period, void *pattern) __smallc;
+extern void __LIB__ patch_beep_callee(int duration, int period, void *pattern) __smallc __z88dk_callee;
+#define patch_beep(a,b,c) patch_beep_callee(a,b,c)
 
 /* Real frequency !  Duration is in ms */
 extern void __LIB__ bit_frequency(double_t duration, double_t frequency) __smallc;
 
 /* Play a song (example: "2A--A-B-CDEFGAB5C+") */
-extern void __LIB__ bit_play(unsigned char melody[]);
+extern void __LIB__ bit_play(unsigned char melody[]) __smallc __z88dk_fastcall;
+
+/* Set up the synth phase parameters (4 hex digits, e.g. 0x1234) */
+extern void __LIB__ synth_phase(unsigned int phase) __smallc __z88dk_fastcall;
+
+/* Direct access to the synth phase parameters for manual bending effects */
+extern int synth_phase_1;
+extern int synth_phase_2;
+extern int synth_phase_3;
+extern int synth_phase_4;
+
+/* As for bit_play, but using 4 virtual oscillators.  Lacks of precision, but cool sounds. */
+extern void __LIB__ synth_play(unsigned char melody[]) __smallc __z88dk_fastcall;
+
+/* Yet another way to play a melody.  Good for bass parts. 'soundpatch' is a zero terminated pattern */
+extern void __LIB__ buzzer_play(char *soundpatch, char *melody) __smallc;
+
+/* Sound patches for buzzer_play. */
+/* Some of them can be long and should be put in a static variable */
+#define BUZZ_BASS      "\x01\xF0"
+#define BUZZ_BASS2     "\x0F\x80"
+#define BUZZ_BASS3     "\x3F\x04"
+#define BUZZ_JAMBASS   "\xFF\x80"
+#define BUZZ_TREMBASS  "\x0F\x1E\x0F\x80"
+#define BUZZ_LOW       "\x5C\x5C"
+#define BUZZ_MID       "\xCF"
+#define BUZZ_MID2      "\x02"
+#define BUZZ_HIGH      "\x22"
+#define BUZZ_RESONATE  "\x22\x22"
+#define BUZZ_RESONATE2 "\xAA\xBA"
+
+/* Example on how to 'SQUELCH' the sound tail in complex sound patches:
+// wah wah buzzer
+char wahwah_buzzer[]={0xcF,0xcF,0xcF,0xcF,0xcF,0xcF,0xcF,0xcF,0xcF,0x0F,0x0F,3,3,3,3,3,3,3,3,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,0};
+// buzzer hit
+char buzzer_hit[]={0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,0x22,2,2,2,2,2,2,2,2,2,0xcF,0xcF,0xcF,0xcF,0x5C,0x5C,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,0};
+ */
+
+
+/* 4bit sample player at 8khz, inherited from the C128 functions
+ * so far ported to the Bondwell 12/14 */
+
+#ifdef __C128__
+#define playzb4(a,b) setintctrlcia(cia2,ciaClearIcr);settimeracia(cia2,timervalcia(8000L),ciaCPUCont);playzb4sid(a,b);
+#else
+extern void __LIB__ playzb4(unsigned char *SamStart, unsigned int SamLen) __smallc;
+#endif
 
 
 /* Platform specific parameters (mainly timing stuff) 
@@ -101,7 +170,10 @@ extern void __LIB__ bit_play(unsigned char melody[]);
 #endif
 
 #ifdef TRS80
-  #define BEEP_TSTATES 221750.0 /* 1.774 Mhz */
+  //#define BEEP_TSTATES 221750.0 /* 1.774 Mhz , TRS 80 Model I */
+  #define BEEP_TSTATES 275000.0 /* 2.03 Mhz , EACA EG2000 */
+  //#define BEEP_TSTATES 287500.0 /* 2.2 Mhz , TRS 80 Model III */
+  //#define BEEP_TSTATES 500000.0  /* (4 Mhz) Model II, Model IV or modified Model III */
 #endif
 
 #ifdef VG5000

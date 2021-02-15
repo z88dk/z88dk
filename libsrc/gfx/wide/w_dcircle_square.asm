@@ -11,7 +11,7 @@
 
 
 IF !__CPU_INTEL__
-	SECTION code_clib
+	SECTION code_graphics
 	PUBLIC w_draw_circle
 	EXTERN l_graphics_cmp
 
@@ -260,13 +260,13 @@ IF !__CPU_INTEL__
 		jp l9905
 
 		
-	SECTION smc_clib
+;	SECTION smc_clib
 	
 .do_w_plot
 		jp (ix)
 
 
-	SECTION bss_clib
+	SECTION bss_graphics
 
 
 .x0l     defb    0

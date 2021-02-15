@@ -13,7 +13,7 @@ description: |
   set of assembly language library subroutines implementing the C standard 
   and extensions.
 
-grade: devel 
+grade: stable 
 confinement: strict
 
 
@@ -67,6 +67,12 @@ apps:
     plugs: [home, removable-media]
   z88dk-ticks:
     command: bin/z88dk-ticks
+    plugs: [home, removable-media]
+  z88dk-zx0:
+    command: bin/z88dk-zx0
+    plugs: [home, removable-media]
+  z88dk-dzx0:
+    command: bin/z88dk-dzx0
     plugs: [home, removable-media]
   z88dk-zx7:
     command: bin/z88dk-zx7

@@ -30,7 +30,7 @@ l_ret:	ret
 start:
 	di
 	; Overwrite the system vbl interrupt handler with ours
-	ld	hl,tms9118_interrupt
+	ld	hl,tms9918_interrupt
 	ld	($7006),hl
 
 
@@ -70,7 +70,7 @@ cleanup_exit:
 
 
 
-	INCLUDE	"crt/classic/tms9118/interrupt.asm"
+	INCLUDE	"crt/classic/tms9918/interrupt.asm"
 	ei
 	reti
 

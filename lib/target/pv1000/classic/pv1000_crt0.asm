@@ -44,6 +44,16 @@
         defc    TAR__register_sp = 0xbfff
 	defc	CRT_KEY_DEL = 127
 	defc	__CPU_CLOCK = 3579000
+
+        ; We want to intercept rst38 to our interrupt routine
+        defc    TAR__crt_enable_rst = $8080
+        EXTERN  asm_im1_handler
+        defc    _z80_rst_38h = asm_im1_handler
+
+	; The machine doesn't have NMI
+        defc        TAR__crt_enable_nmi = 0
+
+
         INCLUDE "crt/classic/crt_rules.inc"
 
 	org	  CRT_ORG_CODE
@@ -54,79 +64,7 @@ endif
 
 	jp	program
 
-	defs	$0008-ASMPC
-if (ASMPC<>$0008)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart08
-
-	defs	$0010-ASMPC
-if (ASMPC<>$0010)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart10
-
-	defs	$0018-ASMPC
-if (ASMPC<>$0018)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart18
-
-	defs	$0020-ASMPC
-if (ASMPC<>$0020)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart20
-
-    defs	$0028-ASMPC
-if (ASMPC<>$0028)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart28
-
-	defs	$0030-ASMPC
-if (ASMPC<>$0030)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-	jp	restart30
-
-	defs	$0038-ASMPC
-if (ASMPC<>$0038)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-; IM1 interrupt routine
-	push	af
-	push	hl
-	in	a,($bf)
-	ld	hl,im1_vectors
-	call	asm_interrupt_handler
-	pop	hl
-	pop	af
-	ei
-	reti
-
-
-	defs	$0066 - ASMPC
-if (ASMPC<>$0066)
-        defs    CODE_ALIGNMENT_ERROR
-endif
-nmi:
-	push	af
-	push	hl
-	ld	hl,nmi_vectors
-	call	asm_interrupt_handler
-	pop	hl
-	pop	af
-	retn
-
-; Restart routines, nothing sorted yet
-restart10:
-restart08:
-restart18:
-restart20:
-restart28:
-restart30:
-	ret
+	INCLUDE	"crt/classic/crt_z80_rsts.asm"
 
 program:
         INCLUDE "crt/classic/crt_init_sp.asm"
@@ -150,7 +88,7 @@ cleanup:
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
-; Font location - this is far to generous - we should add in extra
+; Font location - this is far too generous - we should add in extra
 ; symbols
 	defs	10 * 32-ASMPC
 if (ASMPC<>(10 * 32))

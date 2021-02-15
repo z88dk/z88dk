@@ -12,6 +12,7 @@ stdio/ansi/ansifont_f5
 stdio/ansi/ansifont_f6
 stdio/ansi/ansifont_f8
 @compress/zx7/zx7.lst
+@compress/zx0/compress_zx0.lst
 _DEVELOPMENT/stdlib/z80/asm_lltoa
 _DEVELOPMENT/stdlib/z80/asm_ulltoa
 _DEVELOPMENT/stdlib/z80/asm_strtoll

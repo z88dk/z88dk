@@ -1,5 +1,5 @@
 /*
-; $Id: bit_play.c,v 1.4 2016-04-23 08:05:41 dom Exp $
+; $Id: bit_play.c $
 ;
 ; Generic 1 bit sound functions
 ; play a melody (integer approx to optimize speed and size)
@@ -24,6 +24,10 @@ void bit_play(unsigned char melody[])
 {
 int sound;
 int duration=2;
+
+#ifdef __ZX81__
+	bit_open_di();
+#endif
 
 while ( *melody != 0 )
    {
@@ -105,5 +109,11 @@ while ( *melody != 0 )
 	if (*melody>'0' && *melody<='9') duration=(*melody++)-48;
 	if ((*melody >= 'A' && *melody <= 'H') || *melody==0)
 		bit_beep ( (double)(sound*duration)/12., (BEEP_TSTATES/(double)sound)-30. );
+#ifdef __ZX81__
+	bit_open_di();
+#endif
    }
+#ifdef __ZX81__
+   bit_close_ei();
+#endif
 }

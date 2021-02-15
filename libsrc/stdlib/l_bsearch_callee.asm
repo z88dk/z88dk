@@ -1,6 +1,7 @@
 ; void __CALLEE__ *l_bsearch_callee(void *key, void *base, unsigned int n, void *cmp)
 ; 01.2007 aralbrec
 
+SECTION code_clib
 PUBLIC l_bsearch_callee
 PUBLIC _l_bsearch_callee
 PUBLIC ASMDISP_L_BSEARCH_CALLEE

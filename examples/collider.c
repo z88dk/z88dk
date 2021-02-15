@@ -354,23 +354,23 @@ main()
 
 	draw_board ();
 	
-	player1->x=46;
-	player1->oldx=46;
-	player1->y=56;
-	player1->oldy=46;
-	player1->direction=MOVE_RIGHT;
-	player1->score=0;
-	player1->sprite=car_right;
-	player1->oldsprite=car_right;
+	player1.x=46;
+	player1.oldx=46;
+	player1.y=56;
+	player1.oldy=46;
+	player1.direction=MOVE_RIGHT;
+	player1.score=0;
+	player1.sprite=car_right;
+	player1.oldsprite=car_right;
 
-	player2->x=46;
-	player2->oldx=46;
-	player2->y=20;
-	player2->oldy=20;
-	player2->direction=MOVE_RIGHT;
-	player2->score=0;
-	player2->sprite=car_right;
-	player2->oldsprite=car_right;
+	player2.x=46;
+	player2.oldx=46;
+	player2.y=20;
+	player2.oldy=20;
+	player2.direction=MOVE_RIGHT;
+	player2.score=0;
+	player2.sprite=car_right;
+	player2.oldsprite=car_right;
 
 	while (1) 
 	{
@@ -381,33 +381,33 @@ main()
 /*
 // Unfinished steering control variant, example on how to use multipoint()
 
-	  b = multipoint(HORIZONTAL, 8, player1->x, player1->y+7);
-	  c = multipoint(HORIZONTAL, 8, player1->x, player1->y+8);   // Extra check to avoid confusion with side borders
-	  if ((joystick(stick) & MOVE_DOWN) && (player1->direction & (MOVE_LEFT | MOVE_RIGHT)) && ((b ==1)||((b==128)&&(c==0))))
-	      player1->y+=9;
+	  b = multipoint(HORIZONTAL, 8, player1.x, player1.y+7);
+	  c = multipoint(HORIZONTAL, 8, player1.x, player1.y+8);   // Extra check to avoid confusion with side borders
+	  if ((joystick(stick) & MOVE_DOWN) && (player1.direction & (MOVE_LEFT | MOVE_RIGHT)) && ((b ==1)||((b==128)&&(c==0))))
+	      player1.y+=9;
 	  
-	  b = multipoint(HORIZONTAL, 8, player1->x, player1->y-2);
-	  c = multipoint(HORIZONTAL, 8, player1->x, player1->y-3);   // Extra check to avoid confusion with side borders
-	  if ((joystick(stick) & MOVE_UP) && (player1->direction & (MOVE_LEFT)) && ((b ==1)||((b==128)&&(c==0))))
-	      player1->y-=9;
-	  if ((joystick(stick) & MOVE_UP) && (player1->direction & (MOVE_RIGHT)) && ((b ==128)||((b==1)&&(c==0))))
-	      player1->y-=9;
+	  b = multipoint(HORIZONTAL, 8, player1.x, player1.y-2);
+	  c = multipoint(HORIZONTAL, 8, player1.x, player1.y-3);   // Extra check to avoid confusion with side borders
+	  if ((joystick(stick) & MOVE_UP) && (player1.direction & (MOVE_LEFT)) && ((b ==1)||((b==128)&&(c==0))))
+	      player1.y-=9;
+	  if ((joystick(stick) & MOVE_UP) && (player1.direction & (MOVE_RIGHT)) && ((b ==128)||((b==1)&&(c==0))))
+	      player1.y-=9;
 	  
-	  b = multipoint(VERTICAL, 8, player1->x+7, player1->y);
-	  c = multipoint(VERTICAL, 8, player1->x+8, player1->y);   // Extra check to avoid confusion with horizontal borders
-	  if ((joystick(stick) & MOVE_RIGHT) && (player1->direction == MOVE_DOWN) && ((b ==1)||((b==128)&&(c==0))))
-	      player1->x+=9;
-	  if ((joystick(stick) & MOVE_RIGHT) && (player1->direction == MOVE_UP) && ((b==1)||((b==128)&&(c==0))))
-	      player1->x+=9;
+	  b = multipoint(VERTICAL, 8, player1.x+7, player1.y);
+	  c = multipoint(VERTICAL, 8, player1.x+8, player1.y);   // Extra check to avoid confusion with horizontal borders
+	  if ((joystick(stick) & MOVE_RIGHT) && (player1.direction == MOVE_DOWN) && ((b ==1)||((b==128)&&(c==0))))
+	      player1.x+=9;
+	  if ((joystick(stick) & MOVE_RIGHT) && (player1.direction == MOVE_UP) && ((b==1)||((b==128)&&(c==0))))
+	      player1.x+=9;
 */
 	  
 	  player_step(player1);
 	  player_step(player2);
 
 	  // Collision
-	  if (((player1->x >> 3) == (player2->x >> 3)) && ((player1->y >> 3) == (player2->y >> 3))) {
+	  if (((player1.x >> 3) == (player2.x >> 3)) && ((player1.y >> 3) == (player2.y >> 3))) {
 		for (x=0 ; x<36; x+=9) {
-			putsprite (SPR_XOR, player1->x, player1->y, explosion+x);
+			putsprite (SPR_XOR, player1.x, player1.y, explosion+x);
 	#ifdef SOUND
 		if (x<20) bit_fx3(7);
 			bit_fx3(2);
@@ -416,7 +416,7 @@ main()
 	#endif
 		}
 		for (x=0 ; x<27; x+=9) {
-			putsprite (SPR_XOR, player1->x, player1->y, explosion+x);
+			putsprite (SPR_XOR, player1.x, player1.y, explosion+x);
 	#ifdef SOUND
 			bit_fx3(2);			
 	#else
@@ -433,21 +433,21 @@ main()
 	  // Steering (only on specific positions)
 	  for (x=0 ; x<160; x+=5) {
 	  // Opponent
-	      if ((player2->x == deviations[x+1]) &&
-	      (player2->y == deviations[x+2]) &&
+	      if ((player2.x == deviations[x+1]) &&
+	      (player2.y == deviations[x+2]) &&
 		  ((rand()&3) == 0)) {
-			player2->x+=deviations[x+3];
-			player2->y+=deviations[x+4];
+			player2.x+=deviations[x+3];
+			player2.y+=deviations[x+4];
 		  }
 				
 	  
 	  // Player
 	  if ((joystick(stick) & deviations[x]) &&
-	      (player1->x == deviations[x+1]) &&
-	      (player1->y == deviations[x+2]))
+	      (player1.x == deviations[x+1]) &&
+	      (player1.y == deviations[x+2]))
 	    {
-			player1->x+=deviations[x+3];
-			player1->y+=deviations[x+4];
+			player1.x+=deviations[x+3];
+			player1.y+=deviations[x+4];
 			break;
 	    }		
 	  }

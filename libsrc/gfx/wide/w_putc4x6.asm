@@ -202,7 +202,7 @@ IF !__CPU_INTEL__
 
 
  
-        SECTION rodata_clib
+        SECTION rodata_graphics
 	
 ; 4x5 font (it will be 4x6 because the driver adds a bottom blank row) 
 .font4x5

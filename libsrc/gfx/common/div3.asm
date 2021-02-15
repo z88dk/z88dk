@@ -5,10 +5,10 @@
 ;	Divide by three lookup table
 ;
 ;
-;	$Id: div3.asm,v 1.4 2016-06-16 19:53:50 dom Exp $
+;	$Id: div3.asm $
 ;
 
-        SECTION rodata_clib
+        SECTION rodata_graphics
 	PUBLIC	div3
 
 .div3

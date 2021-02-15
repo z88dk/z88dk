@@ -5,6 +5,7 @@ target/ts2068/stdio/ansi/f_ansi_char
 target/ts2068/stdio/ansi/f_ansi_cls
 target/ts2068/stdio/ansi/f_ansi_dline
 target/ts2068/stdio/ansi/f_ansi_scrollup
+target/ts2068/obj/ts2068/ts_vmod
 @target/zx/stdio/stdio.lst
 @stdio/ansicore.lst
 @stdio/stdio.lst
@@ -27,4 +28,3 @@ target/ts2068/psg/asm_vt2_hardware_out
 @psg/ay/vt2/psg_vt2.lst
 @target/ts2068/newlib/newlib.lst
 @psg/ay/psg.lst
-

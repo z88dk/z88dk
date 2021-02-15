@@ -1,0 +1,10 @@
+target/bondwell/graphics/cleargraphics
+target/bondwell/graphics/swapgfxbk
+target/bondwell/graphics/textpixl6
+target/bondwell/ioctl/generic_console
+target/bondwell/ioctl/generic_console_scrollup
+target/bondwell/ioctl/generic_console_xypos
+target/bondwell/ioctl/generic_console_ioctl
+target/bondwell/playzb4
+@gfx/gencon/gfx_gencon6.lst
+@games/games.lst

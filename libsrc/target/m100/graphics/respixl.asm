@@ -17,10 +17,12 @@
 
 			EXTERN	__gfx_coords
 			EXTERN	base_graphics
-
+	INCLUDE "target/m100/def/romcalls.def"
 .respixel
 			ld	d,h
 			ld	e,l
 			ld	(__gfx_coords),hl
-			jp	$744D
+			ROMCALL
+			defw	LCDRES
+			ret
 

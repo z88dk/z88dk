@@ -78,10 +78,7 @@
  *      zcc +vz -Dspritesize=7 -DSOUND -odztar.vz dstar.c
  *
  *      TIKI1-100
- *      add the following two lines on top of this file:
- *         #pragma output nogfxglobals
- *         char foo [28000]
- *      zcc +cpm -ltiki100 -o dstar.com -Dspritesize=28 dstar.c
+ *      zcc +cpm -subtype=tiki100 -o dstar.com -Dspritesize=28 dstar.c
  *
  *      MSXDOS:
  *      zcc +msx -Dspritesize=16 -DSOUND -startup=2 dstar.c
@@ -107,7 +104,10 @@
  *      zcc +spc1000 -Dspritesize=16 -create-app dstar.c
  *
  *      Commodore 128:
- *      zcc +c128 -lgfx128hr -create-app -lm -Dspritesize=21 dstar.c
+ *      zcc +c128 -lgfx128hr -create-app -Dspritesize=21 dstar.c
+ *
+ *      Bondwell 2:
+ *      zcc +cpm -subtype=bw2 -create-app -Dspritesize=21 dstar.c
  *
  *      ZX81, various HRG flavours (see also the specific target version):
  *      zcc +zx81 -O3 -clib=mt  -create-app -Dspritesize=15 dstar.c
@@ -141,7 +141,9 @@
 #ifdef SOUND
 #include <sound.h>
 #endif
-
+#ifdef SOUNDB
+#include <sound.h>
+#endif
 
 
 /* #define spritesize 4   -->  minimalistic, 64x36 pixels  */
@@ -193,7 +195,14 @@
 #define spritesize 6
 #endif
 
+
 #include "dstar.h"
+
+
+#ifdef __TIKI100__
+#include "tiki100.h"
+#endif
+
  
 void main()
 {
@@ -233,9 +242,15 @@ void Gamekeys(void)
 		  #ifdef SOUND
 		    bit_fx4 (5);
 		  #endif
+		  #ifdef SOUNDB
+			bit_fx6 (6);
+		  #endif
 		  while (getk() == K_SWITCH) {}
 		  break;
 		case K_EXIT:
+		  #ifdef SOUNDB
+		  bit_fx6 (4);
+		  #endif
 		  exit(0);
 		case K_NEXTLEV:    /* Okay this IS cheating... */
 		  if(++Level==MAXLEVEL)
@@ -249,6 +264,9 @@ void Gamekeys(void)
 		case K_CLEAR:
 		  #ifdef SOUND
 		    bit_fx4 (3);
+		  #endif
+		  #ifdef SOUNDB
+			bit_fx6 (1);
 		  #endif
 		  SetupLevel();
 	}
@@ -297,6 +315,9 @@ void SetupLevel(void)
 #ifdef SOUND
 	bit_fx4 (1);
 #endif
+#ifdef SOUNDB
+	bit_fx6 (0);
+#endif
 }
 
 
@@ -307,6 +328,9 @@ void DrawBoard(void)
 
 	ptr = Board;
 
+#ifdef __TIKI100__
+	gr_defmod(1);
+#endif
 
 	clg(); /* clear the screen */
 
@@ -394,6 +418,9 @@ void MovePiece(char *ptr, char plusx, char plusy)
 			#ifdef SOUND
 			bit_fx2 (5);
 			#endif
+			#ifdef SOUNDB
+			bit_fx6 (3);
+			#endif
 		}
 		
 		*(locn+temp2) = *locn;
@@ -410,6 +437,9 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		
 		#ifdef SOUND
 		bit_fx2 (2);
+		#endif
+		#ifdef SOUNDB
+		bit_fx6 (7);
 		#endif
 
 		(*ptr) += temp2;

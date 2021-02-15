@@ -10,6 +10,8 @@
 	EXTERN	__cpc_mode
 	EXTERN	__console_w
 	EXTERN	cpc_setmode
+	EXTERN  cpc_set_ansi_palette
+	EXTERN  generic_console_cls
 
         PUBLIC  CLIB_GENCON_CAPS
         defc    CLIB_GENCON_CAPS = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS
@@ -53,6 +55,8 @@ set_mode:
 	ld	(__console_w),a
 	ld	a,l
 	call	cpc_setmode
+	call	cpc_set_ansi_palette
+	call	generic_console_cls
 	jr	success
 failure:
 	scf

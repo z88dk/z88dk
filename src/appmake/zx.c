@@ -238,12 +238,10 @@ int zx_exec(char *target)
     snprintf(filename, sizeof(filename) - 4, "%s", zxc.crtfile);
     suffix_change(filename, ".map");
 
-    if ((fmap = fopen(filename, "r")) == NULL)
-        exit_log(1, "Error: Cannot open map file %s\n", filename);
-
-    mb_enumerate_banks(fmap, zxc.binname, &memory, &aligned);
-
-    fclose(fmap);
+    if ((fmap = fopen(filename, "r")) != NULL) {
+        mb_enumerate_banks(fmap, zxc.binname, &memory, &aligned);
+        fclose(fmap);
+    }
 
     // exclude unwanted banks
 

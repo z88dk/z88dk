@@ -1,7 +1,7 @@
 /*
  *	CP/M disc generator
  *
- *      $Id: cpm2.c,v 1.6 2016-06-26 00:46:55 aralbrec Exp $
+ *      $Id: cpm2.c $
  */
 
 #include "appmake.h"
@@ -15,6 +15,7 @@ static char             *c_output_file      = NULL;
 static char             *c_boot_filename     = NULL;
 static char             *c_disc_container    = "dsk";
 static char             *c_extension         = NULL;
+static char              c_disable_com_file_creation = 0;
 static char              help         = 0;
 
 
@@ -28,11 +29,14 @@ option_t cpm2_options[] = {
     { 's', "bootfile", "Name of the boot file",      OPT_STR,   &c_boot_filename },
     {  0,  "container", "Type of container (raw,dsk)", OPT_STR, &c_disc_container },
     {  0,  "extension", "Extension for the output file", OPT_STR, &c_extension},
+    {  0,  "no-com-file", "Don't create a separate .com file", OPT_BOOL, &c_disable_com_file_creation },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
 static void              dump_formats();
 static void              bic_write_system_file(disc_handle *h);
+
+
 
 static disc_spec einstein_spec = {
     .name = "Einstein",
@@ -46,6 +50,7 @@ static disc_spec einstein_spec = {
     .directory_entries = 64,
     .extent_size = 2048
 };
+
 
 static disc_spec attache_spec = {
     .name = "Attache",
@@ -62,6 +67,7 @@ static disc_spec attache_spec = {
     .first_sector_offset = 1,
 };
 
+
 static disc_spec osborne_spec = {
     .name = "Osborne",
     .sectors_per_track = 5,
@@ -76,6 +82,7 @@ static disc_spec osborne_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 1,
 };
+
 
 static disc_spec dmv_spec = {
     .name = "NEC DMV",
@@ -108,6 +115,7 @@ static disc_spec cpcsystem_spec = {
     .first_sector_offset = 0x41,
 };
 
+
 static disc_spec microbee_spec = {
     .name = "Microbee",
     .sectors_per_track = 10,
@@ -128,6 +136,38 @@ static disc_spec microbee_spec = {
     .skew_tab = { 1, 4, 7, 0, 3, 6, 9, 2, 5, 8 }
 };
 
+// Unverified gap size
+static disc_spec bondwell12_spec = {
+    .name = "Bondwell12",
+    .sectors_per_track = 18,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 12,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+};
+
+
+static disc_spec bondwell2_spec = {
+    .name = "Bondwell2",
+    .sectors_per_track = 18,
+    .tracks = 80,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+};
+
 
 static disc_spec kayproii_spec = {
     .name = "KayproII",
@@ -143,6 +183,7 @@ static disc_spec kayproii_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 0,
 };
+
 
 static disc_spec mz2500cpm_spec = {
     .name = "MZ2500CPM",
@@ -160,6 +201,7 @@ static disc_spec mz2500cpm_spec = {
     .alternate_sides = 1
 };
 
+
 static disc_spec nascom_spec = {
     .name = "Nascom",
     .sectors_per_track = 10,
@@ -174,6 +216,7 @@ static disc_spec nascom_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 1,
 };
+
 
 static disc_spec qc10_spec = {
     .name = "QC10",
@@ -191,6 +234,7 @@ static disc_spec qc10_spec = {
     .alternate_sides = 1,
 };
 
+
 static disc_spec tiki100_spec = {
     .name = "Tiki100",
     .sectors_per_track = 10,
@@ -206,6 +250,7 @@ static disc_spec tiki100_spec = {
     .first_sector_offset = 1,
 };
 
+
 static disc_spec svi40ss_spec = {
     .name = "SVI40SS",
     .sectors_per_track = 17,
@@ -220,6 +265,7 @@ static disc_spec svi40ss_spec = {
     .byte_size_extents = 1,
     .first_sector_offset = 1,
 };
+
 
 static disc_spec col1_spec = {
     .name = "ColAdam",
@@ -327,6 +373,7 @@ static disc_spec lynx_spec = {
     .first_sector_offset = 1,
 };
 
+
 static disc_spec rc700_spec = {
     .name = "RC-700",
     .sectors_per_track = 9,
@@ -344,6 +391,7 @@ static disc_spec rc700_spec = {
     .has_skew = 1,
     .skew_tab = { 0, 2, 4, 6, 8, 1, 3, 5, 7 }
 };
+
 
 static disc_spec sharpx1_spec = {
     .name = "Sharp-X1",
@@ -396,6 +444,25 @@ static disc_spec vector06c_spec = {
 };
 
 
+static disc_spec z80pack_spec = {
+    .name = "Z80pack",
+    .sectors_per_track = 26,
+    .tracks = 77,
+    .sides = 1,
+    .sector_size = 128,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .alternate_sides = 0,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .has_skew = 1,
+    .skew_tab = { 0x00, 0x06, 0x0C, 0x12, 0x18, 0x04, 0x0A, 0x10, 0x16, 0x02, 0x08, 0x0E, 0x14, 0x01, 0x07, 0x0d, 0x13, 0x19, 0x05, 0x0b, 0x11, 0x17, 0x03, 0x09, 0x0f, 0x15 }
+};
+
+
 
 
 static struct formats {
@@ -407,28 +474,31 @@ static struct formats {
      char           force_com_extension;
      void         (*extra_hook)(disc_handle *handle);
 } formats[] = {
-    { "attache",   "Otrona Attache'",    &attache_spec, 0, NULL, 1 },
-    { "bic",       "BIC / A5105",	 &bic_spec, 0, NULL, 1, bic_write_system_file },
-    { "cpcsystem", "CPC System Disc",    &cpcsystem_spec, 0, NULL, 0 },
-    { "col1",      "Coleco ADAM 40T SSDD", &col1_spec, 0, NULL, 1 },
-    { "dmv",       "NCR Decision Mate",  &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
-    { "einstein",  "Tatung Einstein",    &einstein_spec, 0, NULL, 1 },
-    { "excali64",  "Excalibur 64",       &excali_spec, 0, NULL, 1 },
-    { "fp1100",    "Casio FP1100",       &fp1100_spec, 0, NULL, 1 },
-    { "kayproii",  "Kaypro ii",          &kayproii_spec, 0, NULL, 1 },
-    { "lynx",      "Camputers Lynx",     &lynx_spec, 0, NULL, 1 },
-    { "microbee-ds80",  "Microbee DS80", &microbee_spec, 0, NULL, 1 },
-    { "nascomcpm", "Nascom CPM",         &nascom_spec, 0, NULL, 1 },
-    { "mz2500cpm", "Sharp MZ2500 - CPM", &mz2500cpm_spec, 0, NULL, 1 },
-    { "osborne1",  "Osborne 1",          &osborne_spec, 0, NULL, 1 },
-    { "plus3",     "Spectrum +3 173k",   &plus3_spec, 0, NULL, 1 },
-    { "qc10",      "Epson QC-10, QX-10", &qc10_spec, 0, NULL, 1 },
+    { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
+    { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
+    { "bw12",      "Bondwell 12/14",        &bondwell12_spec, 0, NULL, 1 },
+    { "bw2",       "Bondwell Model 2",      &bondwell2_spec, 0, NULL, 1 },
+    { "cpcsystem", "CPC System Disc",       &cpcsystem_spec, 0, NULL, 0 },
+    { "col1",      "Coleco ADAM 40T SSDD",  &col1_spec, 0, NULL, 1 },
+    { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
+    { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
+    { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
+    { "fp1100",    "Casio FP1100",          &fp1100_spec, 0, NULL, 1 },
+    { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
+    { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
+    { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
+    { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
+    { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
+    { "osborne1",  "Osborne 1",             &osborne_spec, 0, NULL, 1 },
+    { "plus3",     "Spectrum +3 173k",      &plus3_spec, 0, NULL, 1 },
+    { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
-    { "sharpx1",   "Sharp X1",&sharpx1_spec, 0, NULL, 1 },
-    { "smc777",    "Sony SMC-70/SMC-777",&smc777_spec, 0, NULL, 1 },
-    { "svi-40ss",   "SVI 40ss (174k)",   &svi40ss_spec, 0, NULL, 1 },
-    { "tiki100-40t","Tiki 100 (200k)",   &tiki100_spec, 0, NULL, 1 },
-    { "vector06c",  "Vector 06c",        &vector06c_spec, 0, NULL, 1 },
+    { "sharpx1",   "Sharp X1",              &sharpx1_spec, 0, NULL, 1 },
+    { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
+    { "svi-40ss",   "SVI 40ss (174k)",      &svi40ss_spec, 0, NULL, 1 },
+    { "tiki100-40t","Tiki 100 (200k)",      &tiki100_spec, 0, NULL, 1 },
+    { "vector06c",  "Vector 06c",           &vector06c_spec, 0, NULL, 1 },
+    { "z80pack",    "z80pack 8\" format",   &z80pack_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
 
@@ -564,6 +634,8 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
 
     disc_write_file(h, cpm_filename, filebuf, binlen);
 
+  
+
     if ( f->extra_hook ) {
         f->extra_hook(h);
     }
@@ -572,6 +644,24 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
         exit_log(1, "Can't write disc image\n");
     }
     disc_free(h);
+
+    if ( c_disable_com_file_creation == 0 ) {
+        FILE *fpout;
+        int   i;
+
+        // Create a .com file alongside the binary so that we have a complete file for copying in other ways
+        any_suffix_change(disc_name, ".com", '.');
+
+        if ((fpout = fopen(disc_name, "wb")) == NULL) {
+            exit_log(1,"Can't open output file: %s\n",disc_name);
+        }
+
+        for (i = 0; i < binlen; i++) {
+            writebyte(((unsigned char *)filebuf)[i], fpout);
+        }
+        fclose(fpout);
+    }
+
 
     return 0;
 }

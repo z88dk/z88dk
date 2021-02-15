@@ -1,5 +1,7 @@
 #include "stdlib_tests.h"
 
+#ifndef __8080__
+
 void t_sqrt_0()
 {
     Assert(isqrt(0) == 0, "Integer square root of 0 should be 0");
@@ -1962,3 +1964,4 @@ int test_isqrt2()
     return suite_run();
 }
 
+#endif

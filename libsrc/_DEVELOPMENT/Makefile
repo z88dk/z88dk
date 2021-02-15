@@ -5,7 +5,7 @@
 
 
 Z80ASM = z88dk-z80asm
-ZX7 = z88dk-zx7
+ZX0 = z88dk-zx0
 
 TARGET = am9511 cpm hbios m math16 math32 rc2014 scz180 sms vgl yaz180 z180 z80 zx zxn
 
@@ -17,6 +17,7 @@ all: $(TARGET)
 
 clean: $(addprefix clean-,$(TARGET))
 	@find . -name '*.err' | xargs $(RM)
+	$(RM) config_private.inc
 
 install-clean:
 	$(RM) -fr target/*/obj
@@ -64,8 +65,8 @@ target/$(1)/obj/config_private.inc: target/$(1)/config.m4
 		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/nirvanam/z80/NIRVANAM_ENGINE.asm.m4 > arch/zx/nirvanam/z80/NIRVANAM_ENGINE.asm; \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" -Cm-Itarget/$(1)/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" -Cm-Itarget/$(1)/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
-		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
-		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
+		$(ZX0) -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
+		$(ZX0) -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 	fi;
 	@if [ "$(1)" = "zxn" ]; then \
 		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 > arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm; \
@@ -76,8 +77,8 @@ target/$(1)/obj/config_private.inc: target/$(1)/config.m4
 		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/nirvanam/z80/NIRVANAM_ENGINE.asm.m4 > arch/zx/nirvanam/z80/NIRVANAM_ENGINE.asm; \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DSTRIPVECTOR" -Cm-Itarget/$(1)/obj  arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
 		zcc +z80 -vn -clib=new --no-crt -g -Ca"-DPLUS3 -DSTRIPVECTOR" -Cm-Itarget/$(1)/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 -o arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
-		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
-		$(ZX7) -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
+		$(ZX0) -f arch/zx/bifrost2/z80/bifrost2_engine_48.bin; \
+		$(ZX0) -f arch/zx/bifrost2/z80/bifrost2_engine_p3.bin; \
 	fi;
 	@if [ -f target/$(1)/library/$(1)_macro.lst ]; then \
 		zcc +z80 -vn -clib=new -m4 -Cm-Itarget/$(1)/obj --lstcwd @target/$(1)/library/$(1)_macro.lst; \

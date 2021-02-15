@@ -252,6 +252,7 @@ static int             c_nocrt = 0;
 static char           *c_crt_incpath = NULL;
 static int             processing_user_command_line_arg = 0;
 static char            c_sccz80_r2l_calling;
+static char            c_copy_m4_processed_files;
 
 static char            filenamebuf[FILENAME_MAX + 1];
 #ifdef WIN32
@@ -347,6 +348,7 @@ static int    c_aliases_array_num = 0;
 static char **aliases = NULL;
 static int    aliases_num = 0;
 
+static char   c_generate_debug_info = 0;
 static char   c_help = 0;
 
 static arg_t  config[] = {
@@ -455,6 +457,7 @@ static option options[] = {
 
     { 0, "", OPT_HEADER, "M4 options:", NULL, NULL, 0 },
     { 0, "Cm", OPT_FUNCTION,  "Add an option to m4" , &m4arg, AddToArgs, 0},
+    { 0, "copy-back-after-m4", OPT_BOOL, "Copy files back after processing with m4",&c_copy_m4_processed_files, NULL, 0 },
 
     { 0, "", OPT_HEADER, "Preprocessor options:", NULL, NULL, 0 },
     { 0, "Cp", OPT_FUNCTION,  "Add an option to the preprocessor" , &cpparg, AddToArgs, 0},
@@ -467,12 +470,12 @@ static option options[] = {
     { 0, "", OPT_HEADER, "Compiler (all) options:", NULL, NULL, 0 },
     { 0, "compiler", OPT_STRING,  "Set the compiler type from the command line (sccz80,sdcc)" , &c_compiler_type, NULL, 0},
     { 0, "c-code-in-asm", OPT_BOOL|OPT_DOUBLE_DASH,  "Add C code to .asm files" , &c_code_in_asm, NULL, 0},
-
+    { 0, "opt-code-speed", OPT_FUNCTION|OPT_DOUBLE_DASH|OPT_DEFAULT_VALUE,  "Optimize for code speed" , NULL, conf_opt_code_speed, (intptr_t)"all"},
+    { 0, "debug", OPT_BOOL, "Enable debugging support", &c_generate_debug_info, NULL, 0 },
     { 0, "", OPT_HEADER, "Compiler (sccz80) options:", NULL, NULL, 0 },
     { 0, "Cc", OPT_FUNCTION,  "Add an option to sccz80" , &sccz80arg, AddToArgs, 0},
     { 0, "set-r2l-by-default", OPT_BOOL,  "(sccz80) Use r2l calling convention by default", &c_sccz80_r2l_calling, NULL, 0},
     { 0, "O", OPT_INT,  "Set the peephole optimiser setting for copt" , &peepholeopt, NULL, 0},
-    { 0, "opt-code-speed", OPT_FUNCTION|OPT_DOUBLE_DASH,  "Optimize for code speed (sccz80 only)" , NULL, conf_opt_code_speed, 0},
     { 0, "", OPT_HEADER, "Compiler (sdcc) options:", NULL, NULL, 0 },
     { 0, "Cs", OPT_FUNCTION,  "Add an option to sdcc" , &sdccarg, AddToArgs, 0},
     { 0, "opt-code-size", OPT_BOOL|OPT_DOUBLE_DASH,  "Optimize for code size (sdcc only)" , &opt_code_size, NULL, 0},
@@ -490,6 +493,8 @@ static option options[] = {
     { 0, "z80-verb", OPT_BOOL,  "Make the assembler more verbose" , &z80verbose, NULL, 0},
     { 0, "", OPT_HEADER, "Linker options:", NULL, NULL, 0 },
     { 0, "Cl", OPT_FUNCTION,  "Add an option to the linker" , &linkargs, AddToArgsQuoted, 0},
+    { 0, "L", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library search path" , NULL, AddLinkSearchPath, 0},
+    { 0, "l", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library" , NULL, AddLinkLibrary, 0},
     { 0, "bn", OPT_STRING,  "Set the output file for the linker stage" , &c_linker_output_file, NULL, 0},
     { 0, "reloc-info", OPT_BOOL,  "Generate binary file relocation information" , &relocinfo, NULL, 0},
     { 'm', "gen-map-file", OPT_BOOL,  "Generate an output map of the final executable" , &mapon, NULL, 0},
@@ -497,8 +502,6 @@ static option options[] = {
     { 0, "list", OPT_BOOL|OPT_DOUBLE_DASH,  "Generate list files" , &lston, NULL, 0},
     { 'R', NULL, OPT_BOOL|OPT_DEPRECATED,  "Generate relocatable code (deprecated)" , &relocate, NULL, 0},
     { 0, NULL, OPT_HEADER, "Appmake options:", NULL, NULL, 0 },
-    { 0, "L", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library search path" , NULL, AddLinkSearchPath, 0},
-    { 0, "l", OPT_FUNCTION|OPT_INCLUDE_OPT,  "Add a library" , NULL, AddLinkLibrary, 0},
     { 0, "Cz", OPT_FUNCTION,  "Add an option to appmake" , &appmakeargs, AddToArgs, 0},
    
     { 0, "", OPT_HEADER, "Misc options:", NULL, NULL, 0 },
@@ -1168,6 +1171,20 @@ int main(int argc, char **argv)
                 fprintf(stderr, "Cannot process recursive .m4 file %s\n", original_filenames[i]);
                 exit(1);
             }
+            if ( c_copy_m4_processed_files ) {
+                /* Write processed file to original source location immediately */		
+                 ptr = stripsuffix(original_filenames[i], ".m4");		
+                 if (copy_file(filelist[i], "", ptr, "")) {		
+                     fprintf(stderr, "Couldn't write output file %s\n", ptr);		
+                     exit(1);		
+                 }		
+                 /* Copied file becomes the new original file */		
+                 free(original_filenames[i]);		
+                 free(filelist[i]);		
+                 original_filenames[i] = ptr;		
+                 filelist[i] = muststrdup(ptr);
+            }
+            /* No more processing for .h and .inc files */
             ft = get_filetype_by_suffix(filelist[i]);
             if ((ft == HDRFILE) || (ft == INCFILE)) continue;
             /* Continue processing macro expanded source file */
@@ -1530,6 +1547,10 @@ int main(int argc, char **argv)
         if (lston && copy_file(c_crt0, ".lis", filenamebuf, ".lis")) {
             fprintf(stderr, "Cannot copy crt0 list file\n");
             status = 1;
+        }
+
+        if (c_generate_debug_info && compiler_type == CC_SDCC && copy_file(c_crt0, ".adb", filenamebuf, ".adb")) {
+            // Ignore error
         }
 
         if (createapp) {
@@ -2070,6 +2091,9 @@ void conf_opt_code_speed(option *argument, char *arg)
     zcc_asprintf(&sccz80_arg,"-%s%s=%s", argument->type & OPT_DOUBLE_DASH ? "-" : "",argument->long_name, arg);
     BuildOptions(&sccz80arg, sccz80_arg);
     free(sccz80_arg);
+
+    // Add the option to sdcc as well since it has one of the same name
+    BuildOptions(&sdccarg, "--opt-code-speed");
 }
 
 
@@ -2547,6 +2571,12 @@ static void configure_assembler()
     if (linker) {
         c_linker = linker;
     }
+    if ( c_generate_debug_info) {
+        mapon = 1;
+        BuildOptions(&asmargs, "-m");
+        BuildOptions(&asmargs, "-debug");
+        BuildOptions(&linkargs, "-debug");
+    }
     snprintf(buf,sizeof(buf),"-I\"%s\"",zcc_opt_dir);
     BuildOptions(&asmargs, buf);
     BuildOptions(&linkargs, buf);
@@ -2573,6 +2603,9 @@ static void configure_compiler()
         add_option_to_compiler(buf);
         if (sdccarg) {
             add_option_to_compiler(sdccarg);
+        }
+        if ( c_generate_debug_info) {
+            add_option_to_compiler("--debug");
         }
         preprocarg = " -D__SDCC";
         BuildOptions(&cpparg, preprocarg);
@@ -2601,6 +2634,9 @@ static void configure_compiler()
             add_option_to_compiler("-set-r2l-by-default");
             preprocarg = " -DZ88DK_R2L_CALLING_CONVENTION";
             BuildOptions(&cpparg, preprocarg);
+        }
+        if ( c_generate_debug_info) {
+            add_option_to_compiler("-debug-defc");
         }
         c_compiler = c_sccz80_exe;
         compiler_style = outspecified_flag;
@@ -2809,6 +2845,7 @@ void remove_temporary_files(void)
             remove_file_with_extension(temporary_filenames[j], ".opt");
             remove_file_with_extension(temporary_filenames[j], ".o");
             remove_file_with_extension(temporary_filenames[j], ".map");
+            remove_file_with_extension(temporary_filenames[j], ".adb");
             remove_file_with_extension(temporary_filenames[j], ".sym");
             remove_file_with_extension(temporary_filenames[j], ".def");
             remove_file_with_extension(temporary_filenames[j], ".tmp");

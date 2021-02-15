@@ -4,4 +4,5 @@ gfx/text6/obj/${TARGET}/plotpixl
 gfx/text6/obj/${TARGET}/respixl
 gfx/text6/obj/${TARGET}/xorpixl
 gfx/text6/obj/${TARGET}/clsgraph
+gfx/narrow/obj/${TARGET}/getsprite2
 @gfx/narrow/gfx_narrow.lst

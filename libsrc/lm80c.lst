@@ -1,5 +1,6 @@
 @stdio/ansicore.lst
 @stdio/stdio.lst
+target/lm80c/stdio/fputc_cons_native
 target/lm80c/stdio/fgetc_cons
 target/lm80c/stdio/getk
 @font/font_8x8/font_8x8.lst

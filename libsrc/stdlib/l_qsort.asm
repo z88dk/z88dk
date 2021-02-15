@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC l_qsort
 PUBLIC _l_qsort
 EXTERN l_qsort_callee

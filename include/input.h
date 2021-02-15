@@ -121,7 +121,7 @@ extern void __LIB__ in_WaitForNoKey(void);
  * Example using Sinclair Spectrum joystick functions:
  *
  *   uchar choice, dirs;
- *   void *joyfunc;                * pointer to joystick function  *
+ *   uint (*joyfunc)(struct in_UDK *) __z88dk_fastcall;    * pointer to joystick function  *
  *   char *joynames[];             * an array of joystick names    *
  *   struct in_UDK k;
  *

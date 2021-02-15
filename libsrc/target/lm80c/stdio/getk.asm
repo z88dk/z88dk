@@ -3,7 +3,7 @@
 		PUBLIC	getk
 		PUBLIC	_getk
 
-                INCLUDE  "target/lm80c/def/lm80c.def"
+		EXTERN	LASTKEYPRSD
 
 .getk
 ._getk

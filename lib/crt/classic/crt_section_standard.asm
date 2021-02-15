@@ -14,7 +14,8 @@
 ;
 ; crt_model = 0		; everything in RAM
 ; crt_model = 1		; ROM model, data section copied
-; crt_model = 2		; ROM model, data section compressed
+; crt_model = 2		; ROM model, data section compressed (zx7)
+; crt_model = 3		; ROM model, data section compressed (zx0)
 
 		SECTION CODE
 
@@ -31,6 +32,7 @@
 		SECTION code_l_sdcc
 		SECTION code_l_sccz80
 		SECTION code_compress_zx7
+		SECTION code_compress_zx0
 		SECTION code_compress_aplib
 		SECTION code_ctype
 		SECTION code_esxdos
@@ -100,17 +102,20 @@ ENDIF
 		SECTION ROMABLE_END
 IF !__crt_model
 		SECTION DATA
+  IF !__crt_org_graphics
 		SECTION smc_clib
+  ENDIF
 		SECTION smc_user
                 SECTION data_driver
 		SECTION data_clib
 		SECTION data_stdlib
 		SECTION data_psg
 		SECTION data_sound_ay
-IF !__crt_org_graphics
+  IF !__crt_org_graphics
 		SECTION data_graphics
-ENDIF
+  ENDIF
 		SECTION data_crt
+		SECTION data_fp_mbf32
 		SECTION data_arch
 		SECTION data_compiler
 		SECTION data_user
@@ -157,7 +162,9 @@ IF __crt_model > 0
         	SECTION DATA
 		org	-1
 		defb	0		; control name of data binary
+IF !__crt_org_graphics
 		SECTION smc_clib
+ENDIF
 		SECTION smc_fp
 		SECTION smc_user
                 SECTION data_driver
@@ -181,6 +188,7 @@ ENDIF
 IF __crt_org_graphics
 		SECTION	HIMEM
 		org	__crt_org_graphics
+		SECTION smc_clib
 		SECTION code_graphics
 		SECTION code_himem
 		SECTION rodata_graphics
@@ -191,6 +199,10 @@ IF __crt_org_graphics
 		SECTION bss_himem
 		SECTION HIMEM_END
 ENDIF
+
+;		SECTION __DEBUG
+;		org	0
+;		SECTION	__ADBDEBUG
 
 IF CRT_APPEND_MMAP
 		INCLUDE "./mmap.inc"

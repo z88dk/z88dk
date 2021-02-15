@@ -17,6 +17,7 @@
 #define OPT_PRIVATE      256    // Don't show in help
 #define OPT_INCLUDE_OPT  512    // Pass the full option to the function
 #define OPT_DOUBLE_DASH  1024   // Long option needs a -- 
+#define OPT_DEFAULT_VALUE 2048  // Default value held in data
 
 
 typedef struct option_s option;

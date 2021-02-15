@@ -22,7 +22,7 @@ target/sms/add_raster_int
 target/sms/add_pause_int
 @psg/sn76489/sn76489.lst
 @games/games.lst
-@font/font_8x8/font_8x8.lst
 @video/tms9918/video_tms9918.lst
+@gfx/narrow/gfx_narrow.lst
 @stdio/stdio.lst
-
+@font/font_8x8/font_8x8.lst

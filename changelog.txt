@@ -1,7 +1,14 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
-z88dk vx.x.x - xx.xx.xxxx
+z88dk v2.2 - xx.xx.xxx
+
+Detailed but incomplete changelist:
+
+- [appmake] Compressed ROM data sections can now use zx0
+
+
+z88dk v2.1 - 07.02.2021
 
 Detailed but incomplete changelist:
 
@@ -9,14 +16,22 @@ Detailed but incomplete changelist:
 - [classic] Vortex Tracker2 is now available for AY music and SFX
 - [classic] PSGLib is now available for SN76489 music and SFX
 - [classic] Interrupt code is now 8080 clean
-- [classic] +cpm: Vector06c disc creation
+- [classic] +altair8800: Bare metal target available
+- [classic] +c128: Generic console and 1 bit sound
+- [classic] +cpm: Vector06c, z80pack disc creation
+- [classic] +cpm: Support for VTI, VDM and VIO graphic boards
 - [classic] +dai: New target
 - [classic] +gb: Banking now works for both sdcc and sccz80
 - [classic] +gb: MBF32 floating point maths is now available
-- [classic] +homelab: New target for the Homelab 3/4 machine
-- [classic] +homelab2: New target for the Homelab 2 machine
+- [classic] +gl: New target: Genius Leader machines (incomplete)
+- [classic] +homelab: New target: Homelab 3/4 machine
+- [classic] +homelab2: New target: Homelab 2 machine
+- [classic] +krokha: New target: Krokha (tiny) console
+- [classic] +lm80c: New target for the homebrew LM-80C
+- [classic] +lviv: New target for the Lviv/Lvov PK-01
 - [classic] +msx: Banking now works for both sdcc and sccz80
 - [classic] +msx: MegaROMs can now be created
+- [classic] +pc88: Bootable discs can be created
 - [classic] +ondra: New target
 - [classic] +special: New target
 - [classic] +svi: Generic console now works again
@@ -24,20 +39,22 @@ Detailed but incomplete changelist:
 - [classic] +zx: The enter key now works with ROM input
 - [classic] +zx: Banked code support.
 - [classic] +zx: 128k .TAP and .DSK images can be created
-- [classic] +zxn: New target
+- [classic] +zxn: New target: Spectrum Next
 - [classic] all: IEEE-754 16 bit (adjunct) maths library
 - [classic] all: DAI 8080 (Am9511) 32 bit maths library
-- [newlib] +zx WYZTRacker is now available
+- [newlib] +rc2014: APU Module (Am9511) support
+- [newlib] +zx: WYZTracker is now available
 - [newlib] all: IEEE-754 16 bit (adjunct) maths library
 - [sccz80] genmath/math48: Fixes to builtin ldexp implementation
-- [sccz80] Bitfields now work and on the 8080
+- [sccz80] Bitfields now work on the 8080
 - [sccz80] Code generator fixes for gbz80
 - [sccz80] Support for long long integer types
 - [sccz80] Support added for IEEE-754 16 bit floating point numbers
 - [sccz80] Support added for Am9511 32 bit floating point numbers
+- [sccz80] Support for generating __interrupt functions
 - [z80asm] Linking speed cleanup
 - [z80asm] db/dw/ds etc synonyms are now accepted
-- [zsdcc] Upgraded to SDCC 4.0.4 r11940 (bugfixes)
+- [zsdcc] Upgraded to SDCC 4.0.7 r12036 (bugfixes)
 
 z88dk v2.0 - 03.02.2020
 

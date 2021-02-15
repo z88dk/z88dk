@@ -1,5 +1,6 @@
 ; CALLER linkage for function pointers
 
+SECTION code_clib
 PUBLIC l_bsearch
 PUBLIC _l_bsearch
 EXTERN l_bsearch_callee
