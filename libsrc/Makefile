@@ -650,6 +650,7 @@ bondwell.lib:
 	@echo ''
 	@echo '--- Building Bondwell 12/14 Library ---'
 	@echo ''
+	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C games TARGET=cpm SUBTYPE=bondwell
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=bondwell
 	TARGET=bondwell TYPE=z80 $(LIBLINKER) -DFORbondwell -x$(OUTPUT_DIRECTORY)/bondwell @$(LISTFILE_DIRECTORY)/target/bondwell/bw.lst
