@@ -81,3 +81,11 @@ IF FORx1
 	defc	register_r = 0x1801
 	defc	register_w = 0x1801
 ENDIF
+
+IF FORbondwell
+	defc	address_r = 0x10
+	defc	status_r = 0 
+	defc	address_w = 0x10
+	defc	register_r = 0x11
+	defc	register_w = 0x11
+ENDIF
