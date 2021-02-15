@@ -94,6 +94,7 @@ TOCREATE += $(call check_target,pv1000,pv1000_clib.lib)
 TOCREATE += $(call check_target,pv2000,pv2000_clib.lib)
 TOCREATE += $(call check_target,px4,px4.lib $(CPMLIBS))
 TOCREATE += $(call check_target,px8,px8.lib $(CPMLIBS))
+TOCREATE += $(call check_target,radio86,radio86_clib.lib)
 TOCREATE += $(call check_target,rcmx000,rcmx000_clib.lib)
 TOCREATE += $(call check_target,rc700,rc700.lib $(CPMLIBS))
 TOCREATE += $(call check_target,rex,rex_clib.lib)
@@ -1736,6 +1737,14 @@ krokha_clib.lib:
 	$(call buildgeneric,krokha,"gencon portable")
 	$(MAKE) -C games TARGET=krokha
 	TARGET=krokha TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORkrokha -x$(OUTPUT_DIRECTORY)/krokha_clib @$(LISTFILE_DIRECTORY)/krokha.lst
+
+radio86_clib.lib:
+	@echo ''
+	@echo '--- Building Radio86 Library ---'
+	@echo ''
+	$(call buildgeneric,radio86)
+	TARGET=radio86 TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORradio86 -x$(OUTPUT_DIRECTORY)/radio86_clib @$(LISTFILE_DIRECTORY)/radio86.lst
+
 
 gfxvti.lib:
 	@echo ''

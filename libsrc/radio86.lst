@@ -1,0 +1,6 @@
+target/radio86/stdio/fgetc_cons
+target/radio86/stdio/getk
+target/radio86/stdio/fputc_cons_native
+@stdio/stdio_8080.lst
+@time/time.lst
+
