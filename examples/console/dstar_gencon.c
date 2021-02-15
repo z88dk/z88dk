@@ -6,6 +6,7 @@
  *     -DUSE_JOYSTICK switches to using the joystick
  *     -DUSE_UDGS uses UDGs for the characters
  *     -DSWITCH_MODE=x switches to screenmode x for display
+ *     -DSOUND or -DSOUNDB adds bells and whistles if available
  */
 
 
@@ -15,6 +16,13 @@
 #include <ctype.h>
 #include <games.h>
 #include <sys/ioctl.h>
+
+#ifdef SOUND
+#include <sound.h>
+#endif
+#ifdef SOUNDB
+#include <sound.h>
+#endif
 
 
 /* Key definitions, change these to define your keys! */
@@ -42,7 +50,7 @@
 #ifdef USE_UDGS
 static const unsigned char blocks[] = { ' ', 128, 129, 130, 131 };
 #else
-static const unsigned char blocks[] = { ' ', 'X', '@', '#', '$' };
+static const unsigned char blocks[] = { ' ', 'X', 'o', '@', '#' };
 #endif
 static unsigned char balloffset; /* Ball position */
 static unsigned char boxoffset;  /* Box position */
@@ -509,10 +517,25 @@ static void gamekeys()
       break;
     case K_SWITCH:
       ballorbox ^= 1; /* Toggle ball/box */
+		  #ifdef SOUND
+		    bit_fx4 (5);
+		  #endif
+		  #ifdef SOUNDB
+			bit_fx6 (6);
+		  #endif
       break;
     case K_EXIT:
+		  #ifdef SOUNDB
+		  bit_fx6 (4);
+		  #endif
       exit(0);
     case K_CLEAR:
+		  #ifdef SOUND
+		    bit_fx4 (3);
+		  #endif
+		  #ifdef SOUNDB
+			bit_fx6 (1);
+		  #endif
       setuplevel();
   }
 }
@@ -675,6 +698,12 @@ static void setuplevel()
   *(ptr2 + balloffset) = BALL;
   *(ptr2 + boxoffset) = BOX;
   drawboard();
+#ifdef SOUND
+	bit_fx4 (1);
+#endif
+#ifdef SOUNDB
+	bit_fx6 (0);
+#endif
 }
 
 static void drawboard()
@@ -689,6 +718,16 @@ static void drawboard()
       putch(blocks[*ptr++]);
     }
   }
+#ifdef SOUND
+	bit_open();
+	bit_click();
+	bit_close();
+#endif
+#ifdef SOUNDB
+	bit_open();
+	bit_click();
+	bit_close();
+#endif
 }
 
 
