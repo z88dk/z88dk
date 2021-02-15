@@ -1,12 +1,12 @@
 
 ; void *shadowread(void * restrict s1, const void * restrict s2, size_t n)
 
-SECTION code_driver
+SECTION smc_lib
 
 PUBLIC shadowread
 
-EXTERN asm_cpu_push_di
-EXTERN asm_cpu_pop_ei
+EXTERN asm_push_di
+EXTERN asm_pop_ei_jp
 
 EXTERN asm_shadowcopy
 
@@ -41,7 +41,7 @@ ELSE
    push af
 ENDIF
 
-   call asm_cpu_push_di
+   call asm_push_di
 
    ld a,$01     ; set up read from shadow ram
 
@@ -49,10 +49,10 @@ IF __CLASSIC && __CPU_GBZ80__
    call asm_shadowcopy
    ld d,h
    ld e,l
-   jp asm_cpu_pop_ei
+   jp asm_pop_ei_jp
 ELSE 
    call asm_shadowcopy
-   jp asm_cpu_pop_ei
+   jp asm_pop_ei_jp
 ENDIF
 
 ; SDCC bridge for Classic

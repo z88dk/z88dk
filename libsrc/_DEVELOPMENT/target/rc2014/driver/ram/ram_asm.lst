@@ -1,1 +1,3 @@
-target/rc2014/driver/ram/z80/shadowcopy
+target/rc2014/driver/ram/z80/asm_shadowcopy
+target/rc2014/driver/ram/z80/asm_push_di
+target/rc2014/driver/ram/z80/asm_pop_ei

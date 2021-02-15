@@ -1,12 +1,12 @@
 
 ; void *shadowwrite(void * restrict s1, const void * restrict s2, size_t n)
 
-SECTION code_driver
+SECTION smc_lib
 
 PUBLIC shadowwrite_callee
 
-EXTERN asm_cpu_push_di
-EXTERN asm_cpu_pop_ei
+EXTERN asm_push_di
+EXTERN asm_pop_ei_jp
 
 EXTERN asm_shadowcopy
 
@@ -18,12 +18,12 @@ shadowwrite_callee:
    pop de
    push af
 
-   call asm_cpu_push_di
+   call asm_push_di
 
    xor a    ; set up write to shadow ram
 
    call asm_shadowcopy
-   jp asm_cpu_pop_ei
+   jp asm_pop_ei_jp
 
 ; SDCC bridge for Classic
 IF __CLASSIC
