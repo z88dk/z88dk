@@ -155,12 +155,14 @@ ENDIF
    ; this is to support shadowwrite() and shadowread() functions
    ; the asm_shadowcopy function can be further relocated if needed
 
-   out(__IO_RAM_TOGGLE),$01
+   ld a,$01
+   out (__IO_RAM_TOGGLE),a
    include "../clib_init_data.inc"
 
    ; initialize data section
 
-   out(__IO_RAM_TOGGLE),$00
+   xor a
+   out (__IO_RAM_TOGGLE),a
    include "../clib_init_data.inc"
 
    ; initialize bss section

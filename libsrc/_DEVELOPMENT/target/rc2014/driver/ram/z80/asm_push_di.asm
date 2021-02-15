@@ -3,7 +3,7 @@
 ; Stefano Bodrato
 ; ===============================================================
 ;
-; void z80_push_di(void)
+; void asm_push_di(void)
 ;
 ; Save the current ei/di status on the stack and disable ints.
 ;
