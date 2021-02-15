@@ -8,7 +8,7 @@ PUBLIC _shadowwrite_callee
 EXTERN asm_cpu_push_di
 EXTERN asm_cpu_pop_ei
 
-EXTERN asm_shadowwrite
+EXTERN asm_shadowcopy
 
 _shadowwrite_callee:
 
@@ -22,5 +22,5 @@ _shadowwrite_callee:
 
    xor a    ; set up write to shadow ram
 
-   call asm_shadowwrite
+   call asm_shadowcopy
    jp asm_cpu_pop_ei

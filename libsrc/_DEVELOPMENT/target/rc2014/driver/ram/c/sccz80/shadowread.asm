@@ -8,7 +8,7 @@ PUBLIC shadowread
 EXTERN asm_cpu_push_di
 EXTERN asm_cpu_pop_ei
 
-EXTERN asm_shadowread
+EXTERN asm_shadowcopy
 
 shadowread:
 IF __CPU_GBZ80__ | __CPU_INTEL__
@@ -43,15 +43,15 @@ ENDIF
 
    call asm_cpu_push_di
 
-   ld a,1   ; set up read from shadow ram
+   ld a,$01     ; set up read from shadow ram
 
 IF __CLASSIC && __CPU_GBZ80__
-   call asm_shadowread
+   call asm_shadowcopy
    ld d,h
    ld e,l
    jp asm_cpu_pop_ei
 ELSE 
-   call asm_shadowread
+   call asm_shadowcopy
    jp asm_cpu_pop_ei
 ENDIF
 

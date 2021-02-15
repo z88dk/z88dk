@@ -1,17 +1,19 @@
 
 INCLUDE "config_private.inc"
 
-SECTION code_driver
+SECTION smc_driver
 
-PUBLIC asm_shadowcopy_begin
+PUBLIC asm_shadowcopy
 PUBLIC asm_shadowcopy_end
-
-PUBLIC asm_shadowread
-PUBLIC asm_shadowwrite
 
 ;   @feilipu February 2021
 ;
 ;   The RAM bank is toggled by outputting 1/0 to 0x0030
+;
+;   This code is located in the DATA section and, for ROM builds,
+;   is copied to both main and shadow RAM banks during initialisation.
+;
+;   If desired, this code can be relocated wherever it suits the user.
 ;
 ;   On entry: Interrupts disabled unless you know better
 ;             A  = Source RAM bank (0 / 1)
@@ -23,15 +25,11 @@ PUBLIC asm_shadowwrite
 ;             IX IY I AF' BC' DE' HL' preserved
 ;             carry reset
 
-.asm_shadowcopy_begin
+.asm_shadowcopy
+    out (__IO_RAM_TOGGLE),a ; now in initial bank
+    rra                     ; move current bank number into carry
 
-.asm_shadowread
-    out (__IO_RAM_TOGGLE),a ; now in other bank
-
-.asm_shadowwrite
-    rra                     ; move current bank to carry
-
-    ld a,c                  ; swap BC to use cheap djnz inner loop
+    ld a,c                  ; swap BC to use cheap djnz for LSB loop
     dec bc
     inc b
     ld c,b
@@ -41,25 +39,25 @@ PUBLIC asm_shadowwrite
     ld a,(hl)               ; get the byte
     inc hl
 
-    ccf                     ; toggle bank
-    rla                     ; carry to bit 0
+    ccf                     ; toggle bank number
+    rla                     ; bank number in carry into bit 0
     out (__IO_RAM_TOGGLE),a ; now in other bank
-    rra                     ; recover carry and byte
+    rra                     ; recover byte and save bank number in carry
 
     ld (de),a               ; store the byte
     inc de
 
-    ccf                     ; toggle bank
-    rla                     ; carry to bit 0
+    ccf                     ; toggle bank number
+    rla                     ; bank number in carry to bit 0
     out (__IO_RAM_TOGGLE),a ; now in other bank
-    rra                     ; recover carry
+    rra                     ; save bank number in carry
 
-    djnz copyloop           ; decrement LSB (without affecting carry)
+    djnz copyloop           ; decrement LSB
 
-    dec c                   ; decrement MSB (without affecting carry)
+    dec c                   ; decrement MSB
     jr NZ,copyloop
 
-    xor a                   ; get to front bank
+    xor a                   ; get front bank number
     out (__IO_RAM_TOGGLE),a ; now in front bank
     ret
 

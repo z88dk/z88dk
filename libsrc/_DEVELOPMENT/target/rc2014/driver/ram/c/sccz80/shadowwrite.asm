@@ -8,7 +8,7 @@ PUBLIC shadowwrite
 EXTERN asm_cpu_push_di
 EXTERN asm_cpu_pop_ei
 
-EXTERN asm_shadowwrite
+EXTERN asm_shadowcopy
 
 shadowwrite:
 IF __CPU_GBZ80__ | __CPU_INTEL__
@@ -46,12 +46,12 @@ ENDIF
    xor a    ; set up write to shadow ram
 
 IF __CLASSIC && __CPU_GBZ80__
-   call asm_shadowwrite
+   call asm_shadowcopy
    ld d,h
    ld e,l
    jp asm_cpu_pop_ei
 ELSE 
-   call asm_shadowwrite
+   call asm_shadowcopy
    jp asm_cpu_pop_ei
 ENDIF
 

@@ -8,7 +8,7 @@ PUBLIC _shadowread
 EXTERN asm_cpu_push_di
 EXTERN asm_cpu_pop_ei
 
-EXTERN asm_shadowread
+EXTERN asm_shadowcopy
 
 _shadowread:
 
@@ -24,7 +24,7 @@ _shadowread:
 
    call asm_cpu_push_di
    
-   ld a,1   ; set up read from shadow ram
+   ld a,$01     ; set up read from shadow ram
 
-   call asm_shadowread
+   call asm_shadowcopy
    jp asm_cpu_pop_ei
