@@ -33,9 +33,7 @@
 
         defc CRT_ORG_CODE = 0x0000
 
-        defc    TAR__crt_enable_rst = $8080
-        EXTERN  asm_im1_handler
-        defc    _z80_rst_38h = asm_im1_handler
+        defc    TAR__crt_enable_rst = $0000
 
         INCLUDE "crt/classic/crt_rules.inc"
         defc    CONSOLE_COLUMNS = 64
