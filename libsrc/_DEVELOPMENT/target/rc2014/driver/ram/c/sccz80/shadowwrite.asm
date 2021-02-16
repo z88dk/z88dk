@@ -43,15 +43,18 @@ ENDIF
 
    call asm_push_di
 
-   xor a    ; set up write to shadow ram
+   ld a,b
+   or c
+
+   ld a,$00     ; set up write to shadow ram
 
 IF __CLASSIC && __CPU_GBZ80__
-   call asm_shadowcopy
+   call NZ,asm_shadowcopy
    ld d,h
    ld e,l
    jp asm_pop_ei_jp
 ELSE 
-   call asm_shadowcopy
+   call NZ,asm_shadowcopy
    jp asm_pop_ei_jp
 ENDIF
 
