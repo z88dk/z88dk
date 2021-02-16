@@ -10,7 +10,7 @@ EXTERN asm_pop_ei_jp
 
 EXTERN asm_shadowcopy
 
-_shadowwrite:
+._shadowwrite
 
    pop af
    pop de

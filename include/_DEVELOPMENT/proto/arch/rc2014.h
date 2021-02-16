@@ -72,8 +72,8 @@ __sfr __at __IO_LUT_RESULT_LSB      io_lut_result_lsb;
 
 // provide shadow RAM copy function for SC114, Wesley, and feilipu Memory Modules
 
-__DPROTO(,,void,*,shadowwrite,void *dst,const void *src,size_t n)
-__DPROTO(,,void,*,shadowread,void *dst,const void *src,size_t n)
+__DPROTO(`iyh,iyl',`iyh,iyl',void,*,shadowwrite,void *dst,const void *src,size_t n)
+__DPROTO(`iyh,iyl',`iyh,iyl',void,*,shadowread,void *dst,const void *src,size_t n)
 
 // provide lut functions
 

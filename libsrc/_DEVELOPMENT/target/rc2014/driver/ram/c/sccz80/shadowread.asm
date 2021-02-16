@@ -10,7 +10,7 @@ EXTERN asm_pop_ei_jp
 
 EXTERN asm_shadowcopy
 
-shadowread:
+.shadowread
 IF __CPU_GBZ80__ | __CPU_INTEL__
    ld hl,sp+2
    ld c,(hl)

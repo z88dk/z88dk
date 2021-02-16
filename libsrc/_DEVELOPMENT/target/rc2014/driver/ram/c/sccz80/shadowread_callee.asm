@@ -10,7 +10,7 @@ EXTERN asm_pop_ei_jp
 
 EXTERN asm_shadowcopy
 
-shadowread_callee:
+.shadowread_callee
 
    pop af
    pop bc
