@@ -1,6 +1,6 @@
 /*
  *	Open a file on Microdrive
- *	Stefano Bodrato - Jan. 2005
+ *	Stefano Bodrato - Jan. 2005--2021
  *
  *	int open(char *name, int flags, mode_t mode)
  *	returns handle to file
@@ -27,13 +27,15 @@ int open(char *name, int flags, mode_t mode)
 int if1_filestatus;
 struct M_CHAN *if1_file;
 
-
-//if (if1_file = malloc(sizeof(struct M_CHAN)) == 0)
-//	return (-1);
+// TODO:  Add drive number support, (only first drive ATM)
+// "1," currently is used to initializes "if1_file->drive" in struct
 
 if1_file = malloc(sizeof(struct M_CHAN));
 if (if1_file == 0) return (-1);
 if1_filestatus = if1_load_record(1, (char *)name, 0, if1_file);
+
+(if1_file)->flags=flags;
+(if1_file)->mode=mode;
 
 switch ( flags & 0xff ) {
 	case O_RDONLY:
@@ -50,19 +52,29 @@ switch ( flags & 0xff ) {
 		*/
 		// RESET FILE COUNTER
 		(if1_file)->position=0;
-		(if1_file)->flags=flags;
-		(if1_file)->mode=mode;
 		return(if1_file);
 		break;
 
 	case O_WRONLY:
 		if (if1_filestatus != -1)
 		{
-			//printf("\nfile already exists\n");
+			// FILE ALREADY EXISTING
+			if1_remove_file(1,(char *)name);
+		}
+		if1_touch_file(1,(char *)name);
+		if1_filestatus = if1_load_record(1, (char *)name, 0, if1_file);
+		if (if1_filestatus == -1)
+		{
+			// FILE NOT FOUND
 			free(if1_file);
 			return(-1);
 		}
-		return(-1);	// not still implemented
+/*		
+#pragma printf %u
+		if ((if1_file)->reclen >0) printf ("\n reclen: %u\n",(if1_file)->reclen);
+		else  printf ("\n reclen is zero\n");
+*/	
+		return(if1_file);
 		break;
 
 	case O_APPEND:
@@ -76,9 +88,12 @@ switch ( flags & 0xff ) {
 		(if1_file)->flags=flags;
 		(if1_file)->mode=mode;
 		lseek((int)(if1_file), 0, SEEK_END);
+		return(if1_file);
 		break;
 
 	}
+	
+	free (if1_file);
 	return(-1);
 }
 
