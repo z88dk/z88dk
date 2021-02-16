@@ -23,7 +23,7 @@ IF __CRTCFG = 0
    defc TAR__crt_org_data              = 0xC000
    defc TAR__crt_org_bss               = -1
 
-   defc TAR__crt_model                 = 2
+   defc TAR__crt_model                 = 3
 
    defc TAR__register_sp               = __BIOS_SP
    defc TAR__crt_stack_size            = 256
