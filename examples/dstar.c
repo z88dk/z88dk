@@ -218,23 +218,29 @@ void main()
 void Gamekeys(void)
 {
 	char *charptr;
+	int k;
 
     /* Set up a pointer to the variable we want to change
      * (either the box or the ball) */
 	charptr = PieceIsBall ? &BoxOffset : &BallOffset;
+	
 
 	switch(getk())
 	{
 		case K_DOWN:
+		case K_DOWN|0x20:
 		  MovePiece(charptr,0,+1);
 		  break;
 		case K_UP:
+		case K_UP|0x20:
 		  MovePiece(charptr,0,-1);
 		  break;
 		case K_RIGHT:
+		case K_RIGHT|0x20:
 		  MovePiece(charptr,+1,0);
 		  break;
 		case K_LEFT:
+		case K_LEFT|0x20:
 		  MovePiece(charptr,-1,0);
 		  break;
 		case K_SWITCH:
@@ -248,6 +254,7 @@ void Gamekeys(void)
 		  while (getk() == K_SWITCH) {}
 		  break;
 		case K_EXIT:
+		case K_EXIT|0x20:
 		  #ifdef SOUNDB
 		  bit_fx6 (4);
 		  #endif
@@ -262,6 +269,7 @@ void Gamekeys(void)
 		  { ++Level; break; }
 		  /* fall thrue */
 		case K_CLEAR:
+		case K_CLEAR|0x20:
 		  #ifdef SOUND
 		    bit_fx4 (3);
 		  #endif
