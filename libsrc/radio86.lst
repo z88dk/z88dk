@@ -2,6 +2,9 @@ target/radio86/stdio/fgetc_cons
 target/radio86/stdio/getk
 target/radio86/stdio/fputc_cons_native
 target/radio86/stdio/generic_console
+target/radio86/graphics/textpixl
+target/radio86/graphics/getmaxy1
 @stdio/stdio_8080.lst
 @time/time.lst
+@gfx/gencon/gfx_gencon1_portable.lst
 

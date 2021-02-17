@@ -41,7 +41,7 @@ generic_console_cls:
 generic_console_scrollup:
 	push	de
 	push	bc
-	ld	hl,+(((CONSOLE_ROWS-1) * 256)) + $2020
+	ld	hl,$2038
 	ld	(printc_str+2),hl
 	ld	a,10
 	ld	(printc_str+4),a

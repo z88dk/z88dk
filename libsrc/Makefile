@@ -1742,7 +1742,7 @@ radio86_clib.lib:
 	@echo ''
 	@echo '--- Building Radio86 Library ---'
 	@echo ''
-	$(call buildgeneric,radio86)
+	$(call buildgeneric,radio86,"gencon portable")
 	TARGET=radio86 TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORradio86 -x$(OUTPUT_DIRECTORY)/radio86_clib @$(LISTFILE_DIRECTORY)/radio86.lst
 
 

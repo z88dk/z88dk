@@ -1,6 +1,6 @@
 ;
 ;
-;	Support char table (pseudo graph symbols) for the Krokha
+;	Support char table (pseudo graph symbols) for the Radio86-RK
 ;	Sequence: blank, top-left, top-right, top-half, bottom-left, left-half, etc..
 ;
 ;
@@ -23,6 +23,6 @@
 
 .textpixl
 	defb	  0,   1,   2,   3
-	defb	 16,  17,  18,   19
+	defb	 16,  17,  18,   19 
 	defb	  4,   5,   6,   7
 	defb	 20,  21,  22,  23
