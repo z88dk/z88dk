@@ -6,6 +6,7 @@ z88dk v2.2 - xx.xx.xxx
 Detailed but incomplete changelist:
 
 - [appmake] Compressed ROM data sections can now use zx0
+- [newlib] +rc2014: Support for shadow RAM copying
 
 
 z88dk v2.1 - 07.02.2021

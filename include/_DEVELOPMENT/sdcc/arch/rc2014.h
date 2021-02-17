@@ -74,13 +74,13 @@ __sfr __at __IO_LUT_RESULT_LSB      io_lut_result_lsb;
 
 // provide shadow RAM copy function for SC114, Wesley, and feilipu Memory Modules
 
-extern void *shadowwrite(void *dst,const void *src,size_t n);
-extern void *shadowwrite_callee(void *dst,const void *src,size_t n) __z88dk_callee;
+extern void *shadowwrite(void *dst,const void *src,size_t n) __preserves_regs(iyh,iyl);
+extern void *shadowwrite_callee(void *dst,const void *src,size_t n) __preserves_regs(iyh,iyl) __z88dk_callee;
 #define shadowwrite(a,b,c) shadowwrite_callee(a,b,c)
 
 
-extern void *shadowread(void *dst,const void *src,size_t n);
-extern void *shadowread_callee(void *dst,const void *src,size_t n) __z88dk_callee;
+extern void *shadowread(void *dst,const void *src,size_t n) __preserves_regs(iyh,iyl);
+extern void *shadowread_callee(void *dst,const void *src,size_t n) __preserves_regs(iyh,iyl) __z88dk_callee;
 #define shadowread(a,b,c) shadowread_callee(a,b,c)
 
 

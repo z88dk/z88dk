@@ -660,6 +660,7 @@ bondwell2.lib:
 	@echo ''
 	@echo '--- Building Bondwell 2 Library ---'
 	@echo ''
+	@$(RM) -f video/msm6255/*.o
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=bondwell2
 	TARGET=bondwell2 TYPE=z80 $(LIBLINKER) -DFORbondwell2 -x$(OUTPUT_DIRECTORY)/bondwell2 @$(LISTFILE_DIRECTORY)/target/bondwell2/bw2.lst
 

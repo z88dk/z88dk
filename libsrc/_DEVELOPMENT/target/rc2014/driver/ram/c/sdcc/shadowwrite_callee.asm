@@ -10,7 +10,7 @@ EXTERN asm_pop_ei_jp
 
 EXTERN asm_shadowcopy
 
-_shadowwrite_callee:
+._shadowwrite_callee
 
    pop af
    pop de
@@ -20,7 +20,10 @@ _shadowwrite_callee:
 
    call asm_push_di
 
-   xor a    ; set up write to shadow ram
+   ld a,b
+   or c
 
-   call asm_shadowcopy
+   ld a,$00     ; set up write to shadow ram
+
+   call NZ,asm_shadowcopy
    jp asm_pop_ei_jp

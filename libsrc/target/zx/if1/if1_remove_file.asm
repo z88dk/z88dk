@@ -5,7 +5,7 @@
 ;
 ;	int if1_remove (int drive, char *filename);
 ;	
-;	$Id: if1_remove_file.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;	$Id: if1_remove_file.asm $
 ;
 
 		SECTION code_clib
@@ -21,6 +21,7 @@
 if1_remove_file:
 _if1_remove_file:
 
+		;; TODO:  check for possible IX corruption here
 		rst	8
 		defb 	31h		; Create Interface 1 system vars if required
 
@@ -39,6 +40,7 @@ _if1_remove_file:
 		push	hl
 		call	if1_setname
 		ld	($5cda),hl	; length
+		pop	hl
 		pop	de
 		ld	($5cdc),hl	; pointer to filename
 

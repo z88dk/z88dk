@@ -10,7 +10,7 @@ EXTERN asm_pop_ei_jp
 
 EXTERN asm_shadowcopy
 
-_shadowread_callee:
+._shadowread_callee
 
    pop af
    pop de
@@ -20,7 +20,10 @@ _shadowread_callee:
 
    call asm_push_di
 
+   ld a,b
+   or c
+
    ld a,$01     ; set up read from shadow ram
 
-   call asm_shadowcopy
+   call NZ,asm_shadowcopy
    jp asm_pop_ei_jp

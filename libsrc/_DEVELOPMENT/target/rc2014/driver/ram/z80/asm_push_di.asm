@@ -15,7 +15,7 @@ SECTION smc_clib
 
 PUBLIC asm_push_di
 
-asm_push_di:
+.asm_push_di
 
    ; exit  : stack = ei_di_status
    ;

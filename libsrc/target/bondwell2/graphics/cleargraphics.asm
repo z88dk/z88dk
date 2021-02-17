@@ -1,12 +1,12 @@
 ;
-;       Bondwell 2 pseudo graphics routines
+;       Bondwell 2 graphics routines
 ;
 ;       Stefano Bodrato 2021
 ;
 
 	INCLUDE	"graphics/grafix.inc"
 
-	SECTION	code_clib
+        SECTION   code_graphics
 	
 	PUBLIC	cleargraphics
 	PUBLIC	_cleargraphics
@@ -14,6 +14,9 @@
 	PUBLIC	_clg
 
 	EXTERN	base_graphics
+
+	EXTERN    swapgfxbk
+	EXTERN    swapgfxbk1
 
 ;
 ;	$Id: clsgraph.asm $
@@ -28,7 +31,8 @@
 ._clg
 .cleargraphics
 ._cleargraphics
-	ld	e,$1a
+
+	ld	e,$1a			; USE BDOS to home the CP/M cursor
 	ld	c,2
 	push ix
 	call 5
@@ -48,4 +52,14 @@
 	dec		c
 	out		(c),a
 	
-	ret
+	; clean first text row to hide the cursor
+	ld		h,a
+	ld		l,a
+	ld		d,a
+	ld		e,1	
+	ld		bc,80*8
+	
+	call	swapgfxbk
+	ld		(hl),0
+	ldir
+	jp		swapgfxbk1

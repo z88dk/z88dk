@@ -8,7 +8,7 @@
  *	1	SEEK_CUR from current position
  *	2	SEEK_END from end of file (always -ve)
  *
- *	$Id: lseek.c,v 1.1 2005-02-18 08:35:53 stefano Exp $
+ *	$Id: lseek.c $
 */
 
 #include <fcntl.h>
@@ -29,6 +29,7 @@ long lseek(int handle, long posn, int whence)
 		case SEEK_SET:
 			if1_load_record(if1_file->drive, if1_file->name, (int)(posn / 512), if1_file);
 			if1_file->position=posn;
+			// TODO: update the local record pointers for write access
 			break;
 		
 		case SEEK_CUR:

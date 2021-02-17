@@ -11,7 +11,7 @@
 ;       MAKE_M can't be called with the 'hook code' system because
 ;       the first issue of the interface one just doesn't have it.
 ;       
-;       $Id: if1_rommap.asm,v 1.4 2016-07-01 22:08:20 dom Exp $
+;       $Id: if1_rommap.asm $
 ;
 
 		SECTION   code_clib
@@ -30,6 +30,7 @@
 
 if1_rommap:     ; start creating an 'M' channel
 
+				;; TODO:  check for possible IX corruption here
                 rst     8
                 defb    31h             ; Create Interface 1 system vars if required
 
@@ -48,14 +49,14 @@ paged:
                 jr      z,rom1
                 ld      hl,rom2tab      ; JP table for ROM 2
 
-                ld		a,(1d79h)		; basing on an old paper, it should be the
-										; first byte of SCAN_M in issue 3 IF1
-                cp		205
-                jr		z,rom2
-                
-                ld		hl,rom3tab
-
-rom2:
+;                ld		a,(1d79h)		; basing on an old paper, it should be the
+;										; first byte of SCAN_M in issue 3 IF1
+;                cp		205
+;                jr		z,rom2
+;                
+;                ld		hl,rom3tab
+;
+;rom2:
                 ld      bc,24           ; 8 jumps * 3 bytes
                 ;ld     bc,30           ; 10 jumps * 3 bytes
                 ld      de,jptab        ; JP table dest addr
@@ -82,7 +83,7 @@ FETCH_H:        JP 12C4h        ; fetch header
 IF OLDIF1MOTOR
   MOTOR:        JP 17F7h        ; select drive motor
 ELSE
-  MOTOR2:       JP 17F7h        ; select drive motor
+  MOTOR2:       JP 17F7h        ; select drive motor (rename the label ro permit customization)
 ENDIF
 
 RD_BUFF:        JP 18A9h        ; get buffer
@@ -113,18 +114,18 @@ rom2tab:
 ; Jump table image (rom3)  ..based on the Pennel's book
 ;
 
-rom3tab:
-                JP 10A5h
-                JP 138Eh
-                JP 13A9h
-                JP 1532h ;MOTOR
-                JP 15EBh ;RD_BUFF
-                JP 1D7Bh ;ERASEM
-                JP 1D45h ;FREESECT	; - ?? we just suppose this one
-                JP 15A2h ;DEL_S_1
-
-                ;JP 199Dh ;LDBYTS ???
-                ;JP 18DFh ;SVBYTS ???
+;rom3tab:
+;                JP 10A5h
+;                JP 138Eh
+;                JP 13A9h
+;                JP 1532h ;MOTOR
+;                JP 15EBh ;RD_BUFF
+;                JP 1D7Bh ;ERASEM
+;                JP 1D45h ;FREESECT	; - ?? we just suppose this one
+;                JP 15A2h ;DEL_S_1
+;
+;                ;JP 199Dh ;LDBYTS ???
+;                ;JP 18DFh ;SVBYTS ???
 
 IF !OLDIF1MOTOR
 
@@ -217,5 +218,6 @@ nopres:
         ret                     ; ...and return
 
 ENDIF
+
 		SECTION bss_clib
 mdvbuffer:      defw    0

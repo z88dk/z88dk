@@ -10,7 +10,7 @@ EXTERN asm_pop_ei_jp
 
 EXTERN asm_shadowcopy
 
-shadowwrite_callee:
+.shadowwrite_callee
 
    pop af
    pop bc
@@ -20,9 +20,12 @@ shadowwrite_callee:
 
    call asm_push_di
 
-   xor a    ; set up write to shadow ram
+   ld a,b
+   or c
 
-   call asm_shadowcopy
+   ld a,$00     ; set up write to shadow ram
+
+   call NZ,asm_shadowcopy
    jp asm_pop_ei_jp
 
 ; SDCC bridge for Classic

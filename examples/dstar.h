@@ -40,7 +40,7 @@ char Board[144];        /* Space for decompressed Level */
 #define K_CLEAR   '9'
 #endif
 
-#if __MC1000__ || defined  __VZ200__ || defined __NASCOM__ || defined __TRS80__ || defined __GAL__ || defined __MTX__ || defined __C128__ || defined __MULTI8__
+#ifndef K_UP
 #define K_UP       'Q'  /* arrow up     */
 #define K_DOWN     'A' /* arrow down   */
 #define K_LEFT     'O'  /* arrow left   */
@@ -48,17 +48,6 @@ char Board[144];        /* Space for decompressed Level */
 #define K_SWITCH   ' '  /* [SPACE]      */
 #define K_EXIT     'G' /* [Esc]/[Quit] */
 #define K_CLEAR    'H'
-#endif
-
-//#if defined __SPECTRUM__ || defined __Z88__ || defined __ACE__ || defined __CPC__
-#ifndef K_UP
-#define K_UP       'q'  /* arrow up     */
-#define K_DOWN     'a' /* arrow down   */
-#define K_LEFT     'o'  /* arrow left   */
-#define K_RIGHT    'p'  /* arrow right  */
-#define K_SWITCH   ' '  /* [SPACE]      */
-#define K_EXIT     'g' /* [Esc]/[Quit] */
-#define K_CLEAR    'h'
 #endif
 
 

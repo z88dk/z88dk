@@ -19,7 +19,7 @@ SECTION smc_clib
 
 PUBLIC asm_pop_ei_jp
 
-asm_pop_ei_jp:
+.asm_pop_ei_jp
 
    ; enter : stack = ret, ei_di_status
    ;
@@ -28,12 +28,12 @@ asm_pop_ei_jp:
    pop af                      ; af = ei_di_status
    jp po, di_state
 
-ei_state:
+.ei_state
 
    ei
    ret
 
-di_state:
+.di_state
 
    di
    ret
