@@ -6,16 +6,11 @@
 
 		INCLUDE		"msm6255.inc"
 
-; Set the state of the hardware cursor
-;
-; Mode control reg: **
-; Entry: l = cursor state:
 
+;	Set the mode of LCD controller
 	
 ;	0000000x -> GRAPHICS (1), TEXT (0)
-
 ;	00000xx0 -> 4bit parallel (01) / serial (00) / serial EVEN-ODD (10) -> Bondwell 2 is EVEN-ODD
-	
 ;	0000x000 -> Display ON/OFF
 ;	000x0000 -> TEXT Cursor blinking	(e.g. 3D)
 ;	00x00000 -> TEXT Cursor ON/OFF
