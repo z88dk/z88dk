@@ -12,6 +12,7 @@ static char             *crtfile      = NULL;
 static int               origin       = -1;
 static int               exec         = -1;
 static char              help         = 0;
+static char              rkrmame      = 0;
 static char              rkr          = 0;
 static char              rks          = 0;
 static char              rk8          = 0;
@@ -28,7 +29,8 @@ option_t rk_options[] = {
     {  0 , "exec",       "Starting execution address",       OPT_INT,   &exec },
     { 'c', "crt0file",   "crt0 used to link binary",         OPT_STR,   &crtfile },
     { 'o', "output",     "Name of output file",              OPT_STR,   &outfile },
-    {  0,  "rkr",        "Create an .rkr file",              OPT_BOOL,  &rkr },
+    {  0,  "rkrmame",    "Create an .rkr for Radio86/Mame",  OPT_BOOL,  &rkrmame },
+    {  0,  "rkr",        "Create an .rkr for Radio86/emu80", OPT_BOOL,  &rkr },
     {  0,  "rks",        "Create an .rks file",              OPT_BOOL,  &rks },
     {  0,  "rk8",        "Create an .rk8 file",              OPT_BOOL,  &rk8 },
     {  0,   NULL,        NULL,                               OPT_NONE,  NULL }
@@ -42,6 +44,8 @@ int rk_exec(char *target)
       return rk_create(".rk8", 1);
    else if ( rkr ) 
       return rk_create(".rkr", 1);
+   else if ( rkrmame ) 
+      return rk_create(".rkr", 0);
    return -1;
 }
 
