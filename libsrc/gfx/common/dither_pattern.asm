@@ -35,7 +35,8 @@
 		ld	a,(hl)
 		ret
 
-        SECTION rodata_graphics
+
+	SECTION	rodata_graphics
 _dithpat:
 	
 	defb	@00000010	; 1
