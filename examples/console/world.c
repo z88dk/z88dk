@@ -8,6 +8,6 @@
 
 main()
 {
-	printf("Hello world! %d\n",12);
+	printf("Hello world! %c\n",12);
 	fgetc_cons();
 }
