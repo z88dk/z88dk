@@ -131,7 +131,7 @@ setfc0:
 	;;LD 	c,gsuser  ;else get current effective user number
 	ld	c,32
 	LD 	e,0ffh
-IF !__CPU_INTEL
+IF !__CPU_INTEL__
 	push	ix
 	call	5
 	pop	ix
