@@ -20,8 +20,8 @@ generic_console_cls:
 
 	SECTION	code_rodata
 
-	; Switches to graphics mode, sets VRAM to 0x00
-initscr:        defb    27, '1', '$'
+	; clears screen, sets up VRAM as 0
+initscr:        defb    0x1a, '$'
 
         SECTION code_crt_init
 
