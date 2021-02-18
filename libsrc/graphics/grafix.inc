@@ -443,6 +443,12 @@ IF FOReg2000
 	defc maxy	= 102
 ENDIF
 
+IF FORhrg1
+	DEFINE gotgfx
+	defc maxx	= 384
+	defc maxy	= 192
+ENDIF
+
 IF FORgrafyx3
 	DEFINE gotgfx
 	defc maxx	= 512

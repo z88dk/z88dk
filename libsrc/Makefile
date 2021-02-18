@@ -118,7 +118,7 @@ TOCREATE += $(call check_target,ti83p,ti83p_clib.lib)
 TOCREATE += $(call check_target,ti85,ti85_clib.lib)
 TOCREATE += $(call check_target,ti86,ti86_clib.lib)
 TOCREATE += $(call check_target,tiki100,tiki100.lib $(CPMLIBS))
-TOCREATE += $(call check_target,trs80, trs80_clib.lib trsdos.lib gfxtrs80.lib gfxeg2000.lib grafyx3.lib grafyx4.lib)
+TOCREATE += $(call check_target,trs80, trs80_clib.lib trsdos.lib gfxtrs80.lib gfxeg2000.lib grafyx3.lib grafyx4.lib gfxhrg1.lib)
 TOCREATE += $(call check_target,ts2068, ts2068_clib.lib m2068.lib)
 TOCREATE += $(call check_target,tvc, tvc_clib.lib)
 TOCREATE += $(call check_target,vector06c,vector06c_clib.lib)
@@ -1568,9 +1568,16 @@ gfxeg2000.lib:
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="narrow" SUBTYPE=eg2000
 	TARGET=eg2000 TYPE=z80 $(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/target/trs80/gfxeg2000.lst
 
+gfxhrg1.lib:
+	@echo ''
+	@echo '--- Building HRG1 TRS80 Model I Libraries ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=hrg1
+	TARGET=hrg1 TYPE=z80 $(LIBLINKER) -DFORhrg1 -x$(OUTPUT_DIRECTORY)/gfxhrg1 @$(LISTFILE_DIRECTORY)/target/trs80/gfxhrg1.lst
+
 grafyx3.lib:
 	@echo ''
-	@echo '--- Building GrafyxSolution (model 3) Libraries ---'
+	@echo '--- Building GrafyxSolution (Model 3) Libraries ---'
 	@echo ''
 	$(RM) target/trs80/grafyx/*.o
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=grafyx3
@@ -1578,7 +1585,7 @@ grafyx3.lib:
 
 grafyx4.lib:
 	@echo ''
-	@echo '--- Building GrafyxSolution (model 4) Libraries ---'
+	@echo '--- Building GrafyxSolution (Model 4) Libraries ---'
 	@echo ''
 	$(RM) target/trs80/grafyx/*.o
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=grafyx4
