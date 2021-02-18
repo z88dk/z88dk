@@ -23,63 +23,61 @@
  ;  ,nor QX/M, its clock is not BCD based.  A specific library could be necessary.
  ;
  ; --------
- ; $Id: clock.asm,v 1.4 2016-04-23 19:43:57 dom Exp $
  ;
  ;
 
 IF !__CPU_INTEL__
-	SECTION		code_clib
+SECTION		code_clib
 PUBLIC clock
 PUBLIC _clock
 
-EXTERN l_mult, l_long_mult, l_long_add
+EXTERN l_mult, l_long_mult, l_long_add, __bdos
 
 clock:
 _clock:
-
-		ld		hl,(1)
-		ld		de,04bh		; TIME BIOS entry (CP/M 3 but present also elsewhere)
-		add		hl,de
-		ld		a,(hl)
-		cp		0xc3		; jp instruction (existing BIOS entry)?
-		jr		nz,nodtbios
-		ld		de,timegot
-		push	de
-		ld		de,px_year
-		xor		a
-		ld		(de),a
-		ld		c,a
-		jp		(hl)
+	ld	hl,(1)
+	ld	de,04bh		; TIME BIOS entry (CP/M 3 but present also elsewhere)
+	add	hl,de
+	ld	a,(hl)
+	cp	0xc3		; jp instruction (existing BIOS entry)?
+	jr	nz,nodtbios
+	ld	de,timegot
+	push	de
+	ld	de,px_year
+	xor	a
+	ld	(de),a
+	ld	c,a
+	jp	(hl)
 timegot:
-		ld		a,(px_year)
-		and		a
-		jr		z,cpm3_bios
+	ld	a,(px_year)
+	and	a
+	jr	z,cpm3_bios
 
-		; We found a value in px_year, so it is not a CP/M 3 BIOS entry.
-		;	Current day is more than enough for clock(), we leave refinements to time()
-		ld		a,(jdate+1)		; Day in the month
-		call    unbcd 
-		ld		(jdate),hl
-		jr		nompmii
+	; We found a value in px_year, so it is not a CP/M 3 BIOS entry.
+	;	Current day is more than enough for clock(), we leave refinements to time()
+	ld	a,(jdate+1)		; Day in the month
+	call    unbcd 
+	ld	(jdate),hl
+	jr	nompmii
 		
 cpm3_bios:
-		; It is a true CP/M 3 BIOS, so pick the resulting clock data and copy to jdate
-		ld		hl,(1)
-		ld		de,(-0ch)	; System Control Block
-		add		hl,de
-		ld		de,jdate
-		ld		bc,5
-		ldir
-		jr		nompmii
+	; It is a true CP/M 3 BIOS, so pick the resulting clock data and copy to jdate
+	ld	hl,(1)
+	ld	de,(-0ch)	; System Control Block
+	add	hl,de
+	ld	de,jdate
+	ld	bc,5
+	ldir
+	jr	nompmii
 
 nodtbios:
         ld      de,jdate    ; pointer to date/time bufr
         ld      c,105       ; C=return date/time function
-        call    5           ; get date/time
+        call    __bdos      ; get date/time
 
         push    af
         ld      c,12
-        call    5           ; check version
+        call    __bdos      ; check version
         pop     af
 
         ld      c,a
@@ -116,14 +114,6 @@ nompmii:
         call    l_long_add
         ret
 
-px_year: defb	0			; Epson PX BIOSes load it with the current year
-
-jdate:	defs	2           ; Day count, starting on 1st January 1978 (add 2922 days to move epoch to 1970)
-hours:	defs	1
-mins:	defs	1
-secs:	defs	1
-
-jdatepx2: defs 6			; safety margin 
 
 unbcd:
 	push	bc
@@ -142,4 +132,15 @@ unbcd:
 	ld  l,a
 	ld  h,0
 	ret
+
+	SECTION bss_clib
+px_year: defb	0			; Epson PX BIOSes load it with the current year
+
+jdate:	defs	2           ; Day count, starting on 1st January 1978 (add 2922 days to move epoch to 1970)
+hours:	defs	1
+mins:	defs	1
+secs:	defs	1
+
+jdatepx2: defs 6			; safety margin 
+
 ENDIF

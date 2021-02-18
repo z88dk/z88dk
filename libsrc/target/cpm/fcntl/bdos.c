@@ -17,7 +17,13 @@ int bdos(int func,int arg)
 	ld	d,(hl)
 	inc	hl
 	ld	c,(hl)	;func
+IF !__CPU_INTEL__
+	push	ix
 	call	5
+	pop	ix
+ELSE
+	call	5
+ENDIF
 	ld	l,a
 	rla		;make -ve if error
 	sbc	a,a

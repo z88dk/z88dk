@@ -14,13 +14,14 @@
 	SECTION	code_clib
 	PUBLIC	fgetc_cons
 	PUBLIC	_fgetc_cons
+	EXTERN	__bdos
 
 .fgetc_cons
 ._fgetc_cons
 
 	LD 	c,6
 	ld	e,255
-	call	5
+	call	__bdos
 	and	a
 	jr	z,fgetc_cons
 IF STANDARDESCAPECHARS

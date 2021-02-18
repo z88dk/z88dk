@@ -7,24 +7,22 @@
 ;        Video memory paging.
 ;
 
-		SECTION   smc_clib
+	SECTION   code_graphics
 		
-		PUBLIC    swapgfxbk
-		PUBLIC    _swapgfxbk
+	PUBLIC    swapgfxbk
+	PUBLIC    _swapgfxbk
 
-		PUBLIC    swapgfxbk1
-		PUBLIC    _swapgfxbk1
+	PUBLIC    swapgfxbk1
+	PUBLIC    _swapgfxbk1
 
 
 
 .swapgfxbk
 ._swapgfxbk
-
-; save current bank
 	in      a,(2)     ; PPIC, get current bank
-	ld      (swapgfxbk1+1),a
+	ld      (bankval),a
 
-;set VRAM bank
+	;set VRAM bank
 	ld      a,1		; no mask, to keep the NMI disabled
 	out     (2),a     ; PPIC, set VRAM bank
 	
@@ -33,19 +31,22 @@
 
 .swapgfxbk1
 ._swapgfxbk1
-	ld		a,0		; <---  SELF MODIFYING CODE
+	ld		a,(bankval)
 	out		(2),a          ; PPIC, restore previous memory bank
-
 	ret
 
 
+	SECTION	bss_graphics
 
-		SECTION code_crt_init
+bankval:	defb	0
 
-			EXTERN  __BSS_END_tail
-			EXTERN  __HIMEM_head
-			EXTERN  __HIMEM_END_tail
-			ld      hl,__BSS_END_tail
-			ld      de,__HIMEM_head
-			ld      bc,__HIMEM_END_tail - __HIMEM_head
-			ldir
+
+	SECTION code_crt_init
+
+	EXTERN  __BSS_END_tail
+	EXTERN  __HIMEM_head
+	EXTERN  __HIMEM_END_tail
+	ld      hl,__BSS_END_tail
+	ld      de,__HIMEM_head
+	ld      bc,__HIMEM_END_tail - __HIMEM_head
+	ldir

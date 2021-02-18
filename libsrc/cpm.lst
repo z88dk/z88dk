@@ -2,6 +2,7 @@ target/cpm/stdio/obj/${TYPE}/fgetc_cons
 target/cpm/stdio/obj/${TYPE}/getk
 target/cpm/stdio/obj/${TYPE}/fputc_cons
 target/cpm/stdio/obj/${TYPE}/generic_console
+target/cpm/cpm/__bdos
 @stdio/stdio_binary.lst
 @time/time.lst
 target/cpm/time/obj/${TYPE}/clock
