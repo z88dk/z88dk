@@ -5,6 +5,7 @@ gfx/common/obj/${TARGET}/cplot
 gfx/common/obj/${TARGET}/dither_pattern
 gfx/common/obj/${TARGET}/div3
 gfx/common/obj/${TARGET}/div3_0
+gfx/common/obj/${TARGET}/div3_192
 gfx/common/obj/${TARGET}/draw_profile
 gfx/common/obj/${TARGET}/getmaxx
 gfx/common/obj/${TARGET}/getmaxy
