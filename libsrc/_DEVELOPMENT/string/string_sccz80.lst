@@ -24,6 +24,8 @@ string/c/sccz80/memrchr
 string/c/sccz80/memrchr_callee
 string/c/sccz80/memset
 string/c/sccz80/memset_callee
+string/c/sccz80/memset_wr
+string/c/sccz80/memset_wr_callee
 string/c/sccz80/memswap
 string/c/sccz80/memswap_callee
 string/c/sccz80/rawmemchr

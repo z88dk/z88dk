@@ -83,6 +83,9 @@ extern void *memrchr(const void *s,int c,size_t n);
 extern void *memset(void *s,int c,size_t n);
 
 
+extern void *memset_wr(void *s,int c,size_t n);
+
+
 extern void *memswap(void *s1,void *s2,size_t n);
 
 

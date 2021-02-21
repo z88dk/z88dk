@@ -28,6 +28,8 @@ string/c/sdcc_ix/memrchr
 string/c/sdcc_ix/memrchr_callee
 string/c/sdcc_ix/memset
 string/c/sdcc_ix/memset_callee
+string/c/sdcc_ix/memset_wr
+string/c/sdcc_ix/memset_wr_callee
 string/c/sdcc_ix/memswap
 string/c/sdcc_ix/memswap_callee
 string/c/sdcc_ix/rawmemchr
