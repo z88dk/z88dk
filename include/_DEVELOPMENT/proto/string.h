@@ -37,6 +37,7 @@ __DPROTO(,,void,*,memmem,const void *haystack,size_t haystack_len,const void *ne
 __DPROTO(,,void,*,memmove,void *dst,const void *src,size_t n)
 __DPROTO(,,void,*,memrchr,const void *s,int c,size_t n)
 __DPROTO(,,void,*,memset,void *s,int c,size_t n)
+__DPROTO(,,void,*,memset_wr,void *s,int c,size_t n)
 __DPROTO(,,void,*,memswap,void *s1,void *s2,size_t n)
 __DPROTO(,,char,*,stpcpy,char *dst,const char *src)
 __DPROTO(,,char,*,stpncpy,char *dst,const char *src,size_t n)
