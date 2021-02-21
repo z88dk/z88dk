@@ -247,6 +247,8 @@
 	GLOBAL	memrchr_callee
 	GLOBAL	memset
 	GLOBAL	memset_callee
+	GLOBAL	memset_wr
+	GLOBAL	memset_wr_callee
 	GLOBAL	memswap
 	GLOBAL	memswap_callee
 	GLOBAL	stpcpy
