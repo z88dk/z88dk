@@ -101,6 +101,7 @@ struct type_s {
     char      explicitly_signed;  // Set if "signed" in type definition
     char      isconst;
     char      isfar;  // Valid for pointers/array
+    char      isvolatile;
     char      name[NAMESIZE]; 
     char     *namespace; // Which namespace is this object in
     

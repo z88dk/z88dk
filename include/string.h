@@ -129,8 +129,8 @@ extern void __LIB__ *memset_callee(void *s,int c,size_t n) __smallc __z88dk_call
 /* memset_wr() is less optimised than memset, but should be used when the
  * area being cleared can't be read (eg VRAM in certain machines)
  */
-extern void __LIB__ *memset_wr(void *s,int c,size_t n) __smallc;
-extern void __LIB__ *memset_wr_callee(void *s,int c,size_t n) __smallc __z88dk_callee;
+extern void __LIB__ *memset_wr(volatile void *s,int c,size_t n) __smallc;
+extern void __LIB__ *memset_wr_callee(volatile void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memset_wr(a,b,c) memset_wr_callee(a,b,c)
 
 

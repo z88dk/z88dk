@@ -88,7 +88,8 @@ int heir1(LVALUE* lval)
             if ( type_matches(lval->ltype, rhs) == 0 && lval->ltype->ptr->kind != KIND_VOID && 
                     ! (ispointer(rhs) && rhs->ptr->kind == KIND_VOID) )  {
                 if ( ispointer(lval->ltype) && lval2.is_const && lval2.const_val == 0 ) {
-                } else {
+                    // All good
+                } else if ( type_matches_pointer(lval->ltype, lval2.ltype) == 0 ) {
                     UT_string *str;
 
                     utstring_new(str);

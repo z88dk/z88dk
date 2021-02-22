@@ -289,6 +289,18 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
                 } else {
                     expr = ForceArgs(prototype, type, vconst);
                 }
+            } else if ( prototype->kind != KIND_ELLIPSES && ispointer(prototype)) {
+                if ( type_matches_pointer(prototype, type) == 0 ) {
+                    UT_string *str;
+                    
+                    utstring_new(str);
+                    utstring_printf(str,"Converting type: ");
+                    type_describe(type,str);
+                    utstring_printf(str," to ");
+                    type_describe(prototype, str);
+                    warningfmt("incompatible-pointer-types","%s", utstring_body(str));
+                    utstring_free(str);
+                }
             }
             // if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
             //     warning(W_PARAM_CALLINGCONVENTION_MISMATCH, funcname, argnumber, "__smallc/__stdc");
@@ -458,7 +470,7 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst)
             // Pointer to pointer
             if ( dest->kind == KIND_PTR && src->kind == KIND_CPTR ) {
                 warningfmt("incompatible-pointer-types","Narrowing pointer from far to near");
-            } else if ( type_matches(src, dest) == 0 && src->ptr->kind != KIND_VOID && dest->ptr->kind != KIND_VOID ) {
+            } else if ( type_matches_pointer(dest, src) == 0 ) {
                 UT_string *str;
                 
                 utstring_new(str);
