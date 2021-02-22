@@ -1623,12 +1623,15 @@ void type_describe(Type *type, UT_string *output)
 int type_matches_pointer(Type *t1, Type *t2)
 {
     Type *p1, *p2;
+
     if ( type_matches(t1, t2) ) {
         return 1;
     }
 
     p1 = t1->ptr;
     p2 = t2->ptr;
+
+    if ( p1 == NULL || p2 == NULL ) return 0;
 
     // LHS is const void *, RHS is anything
     if ( p1->kind == KIND_VOID ) {
