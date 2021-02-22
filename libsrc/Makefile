@@ -1577,7 +1577,7 @@ gfxhrg1.lib:
 
 grafyx4_3.lib:
 	@echo ''
-	@echo '--- Building GrafyxSolution (Model 3) Libraries ---'
+	@echo '--- Building GrafyxSolution (M4 on Model III) Libraries ---'
 	@echo ''
 	$(RM) target/trs80/grafyx/*.o
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=grafyx3
@@ -1585,7 +1585,7 @@ grafyx4_3.lib:
 
 grafyx4.lib:
 	@echo ''
-	@echo '--- Building GrafyxSolution (Model 4) Libraries ---'
+	@echo '--- Building GrafyxSolution (M4 on Model 4) Libraries ---'
 	@echo ''
 	$(RM) target/trs80/grafyx/*.o
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=grafyx4
@@ -1933,4 +1933,3 @@ install-clean: classic-clean new-install-clean
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs
-
