@@ -8,6 +8,12 @@
 ; Exit:	  bc = argc
 ;         hl = argv
 
+	jr argv_begin
+	
+redir_fopen_flag:		defb	'w',0
+redir_fopen_flagr:		defb	'r',0
+
+argv_begin:
     ld      de,0	;NULL pointer at end of array, just in case
     push    de
 ; Try to find the end of the arguments
