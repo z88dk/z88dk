@@ -173,15 +173,6 @@ __fcb:		defs	420,0	;file control block (10 files) (MAXFILE)
 ENDIF
 ENDIF
 
-        SECTION rodata_clib
-IF (startup=2)
-IF !DEFINED_noredir
-IF CRT_ENABLE_STDIO = 1
-redir_fopen_flag:	defb	'w',0
-redir_fopen_flagr:	defb	'r',0
-ENDIF
-ENDIF
-ENDIF 
 
 IF (!DEFINED_startup || (startup=1))
         INCLUDE "target/pc88/classic/bootstrap.asm"
