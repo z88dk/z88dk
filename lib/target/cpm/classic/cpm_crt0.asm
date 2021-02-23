@@ -151,10 +151,11 @@ ENDIF
 
         ld	hl,$80
         ld      a,(hl)
-        ld      b,0
+        ;ld      b,0
+		ld      b,h
         and     a
         jr      z,argv_done
-	inc	hl
+        ;inc	hl
         ld      c,a
         add     hl,bc   ;now points to the end of the command line
 
@@ -270,12 +271,4 @@ ENDIF
 _vdcDispMem:				; Label used by "c128cpm.lib" only
 end:		defb	0		; null file name
 
-
-	SECTION  rodata_clib
-IF !DEFINED_noredir
-IF CRT_ENABLE_STDIO = 1
-redir_fopen_flag:		defb	'w',0
-redir_fopen_flagr:		defb	'r',0
-ENDIF
-ENDIF
 
