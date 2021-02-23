@@ -102,11 +102,3 @@ IF !DEFINED_nofileio
 __fcb:          defs    420,0   ;file control block (10 files) (MAXFILE)
 ENDIF
 
-        SECTION rodata_clib
-
-IF !DEFINED_noredir
-IF CRT_ENABLE_STDIO = 1
-redir_fopen_flag:       defb    'w',0
-redir_fopen_flagr:      defb    'r',0
-ENDIF
-ENDIF
