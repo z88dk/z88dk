@@ -89,7 +89,7 @@ skipblank:
 	jr	z,skipblank
 	ld	a,(hl)
 	and	a
-	jr	z,argv_done
+	jp	z,argv_done
 	dec	hl
 find_end:
 	inc	hl

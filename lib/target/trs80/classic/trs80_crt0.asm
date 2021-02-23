@@ -129,7 +129,7 @@ cmdline:
 	jr	nz,nocr
 	xor a
 	ld	(hl),a
-	jr  argv_done
+	jp  argv_done
 nocr:
 	dec	hl
 find_end:
