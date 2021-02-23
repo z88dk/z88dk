@@ -360,15 +360,6 @@ current_asciicode	ds.b 1
 	ld	(base_graphics),hl
 
 
-        SECTION  rodata_clib
-IF !DEFINED_noredir
-IF CRT_ENABLE_STDIO = 1
-redir_fopen_flag:               defb    'w',0
-redir_fopen_flagr:              defb    'r',0
-ENDIF
-ENDIF
-
-
 
 ; SD CARD interface
 IF DEFINED_NEED_SDCARD
