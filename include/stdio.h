@@ -340,7 +340,7 @@ extern int __LIB__ getk_inkey();
 extern int __LIB__ printk(const char *fmt,...) __vasmallc;
 
 /* Error handler (mostly an empty fn) */
-extern void __LIB__ perror(char *msg) __z88dk_fastcall;
+extern void __LIB__ perror(const char *msg) __z88dk_fastcall;
 
 
 /* We have multiple methods of outputting a character to the console.

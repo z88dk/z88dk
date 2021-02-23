@@ -127,8 +127,8 @@ extern void *memset_callee(void *s,int c,size_t n) __z88dk_callee;
 #define memset(a,b,c) memset_callee(a,b,c)
 
 
-extern void *memset_wr(void *s,int c,size_t n);
-extern void *memset_wr_callee(void *s,int c,size_t n) __z88dk_callee;
+extern void *memset_wr(volatile void *s,int c,size_t n);
+extern void *memset_wr_callee(volatile void *s,int c,size_t n) __z88dk_callee;
 #define memset_wr(a,b,c) memset_wr_callee(a,b,c)
 
 

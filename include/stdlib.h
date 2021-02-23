@@ -123,7 +123,7 @@ extern int  __LIB__  atexit(void *fcn) __z88dk_fastcall;
 // int system(char *s);                     /* might be implemented in target's library but doubtful */
 // char *getenv(char *name);                /* might be implemented in target's library but doubtful */
 
-extern int  __LIB__  getopt (int, char **, char *) __smallc;
+extern int  __LIB__  getopt (int, char **, const char *) __smallc;
 extern   char *optarg;                      /* getopt(3) external variables */
 extern   int opterr;
 extern   int optind;

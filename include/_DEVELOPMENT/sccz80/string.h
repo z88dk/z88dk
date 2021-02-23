@@ -121,8 +121,8 @@ extern void __LIB__ *memset_callee(void *s,int c,size_t n) __smallc __z88dk_call
 #define memset(a,b,c) memset_callee(a,b,c)
 
 
-extern void __LIB__ *memset_wr(void *s,int c,size_t n) __smallc;
-extern void __LIB__ *memset_wr_callee(void *s,int c,size_t n) __smallc __z88dk_callee;
+extern void __LIB__ *memset_wr(volatile void *s,int c,size_t n) __smallc;
+extern void __LIB__ *memset_wr_callee(volatile void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memset_wr(a,b,c) memset_wr_callee(a,b,c)
 
 
