@@ -127,9 +127,3 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 	SECTION rodata_clib
 end:            defb    0               ; null file name
 
-IF !DEFINED_noredir
-IF CRT_ENABLE_STDIO = 1
-redir_fopen_flag:               defb    'w',0
-redir_fopen_flagr:              defb    'r',0
-ENDIF
-ENDIF
