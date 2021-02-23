@@ -137,10 +137,5 @@ end:    defb    0               ; null file name
 ; at runtime before creating a file is perfectly legal.
 	PUBLIC    _RND_BLOCKSIZE;
 _RND_BLOCKSIZE:	defw	1000
-IF !DEFINED_noredir
-IF CRT_ENABLE_STDIO = 1
-redir_fopen_flag:	defb	'w', 0
-redir_fopen_flagr:	defb	'r', 0
-ENDIF
-ENDIF
+
 
