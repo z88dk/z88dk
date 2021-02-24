@@ -41,11 +41,9 @@ _if1_load_record:
                 ld      a,(ix+6)
                 ld      hl,-1
                 and     a               ; drive no. = 0 ?
-                jp	z,if_load_record_exit               ; yes, return -1
-                dec     a
-                cp      8               ; drive no. >8 ?
-                jp	nc,if_load_record_exit              ; yes, return -1
-                inc     a
+                jp      z,if_load_record_exit               ; yes, return -1
+                cp      9               ; drive no. >8 ?				
+                jp      nc,if_load_record_exit              ; yes, return -1
 
                 ld      (driveno),a     ; drive number selected (d_str1)
 
@@ -70,8 +68,10 @@ _if1_load_record:
                 call    if1_rommap
 
 
-                ld      hl,(driveno)    ; drive number selected
-                ld      (5CD6h),hl      ; d_str1
+                ;ld      hl,(driveno)    ; drive number selected
+                ;ld      (5CD6h),hl      ; d_str1
+                ld      a,(driveno)    ; drive number selected
+                ld      (5CD6h),a      ; d_str1
 
                 ld      a,'M'
                 ld      (5CD9h),A       ; l_str1 (device type = "M")
