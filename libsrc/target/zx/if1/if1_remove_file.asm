@@ -32,7 +32,12 @@ _if1_remove_file:
 		push	de
 		push	af
 
-		ld	a,c
+		ld      a,c
+		ld      hl,-1
+		and     a               ; drive no. = 0 ?
+		ret     z               ; yes, return -1
+		cp      9               ; drive no. >8 ?
+		ret     nc              ; yes, return -1
 		ld	($5cd6),a
 			
 		push	de
