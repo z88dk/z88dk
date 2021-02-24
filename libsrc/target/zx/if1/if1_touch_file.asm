@@ -31,10 +31,16 @@ _if1_touch_file:
 		push	bc
 		push	de
 		push	hl
-		push	ix	;save callers
 
-		ld	a,c
+		ld      a,c
+		ld      hl,-1
+		and     a               ; drive no. = 0 ?
+		ret     z               ; yes, return -1
+		cp      9               ; drive no. >8 ?
+		ret     nc              ; yes, return -1
 		ld	($5cd6),a
+
+		push	ix	;save callers
 			
 		push	de
 		ld	hl,filename	; filename location
