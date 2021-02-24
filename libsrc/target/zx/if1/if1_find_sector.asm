@@ -9,7 +9,7 @@
 ;	which sector can be written !!!.
 ;
 ;	
-;	$Id: if1_find_sector.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;	$Id: if1_find_sector.asm $
 ;
 
                 SECTION   code_clib
@@ -26,9 +26,17 @@ _if1_find_sector:
 		pop	bc	;driveno
 		push	bc
 		push	af
-		push	ix	;save callers
-		ld	a,c
+
+		ld      a,c
+		ld      hl,-1
+		and     a               ; drive no. = 0 ?
+		ret     z               ; yes, return -1
+		cp      9               ; drive no. >8 ?
+		ret     nc              ; yes, return -1
 		ld	($5cd6),a
+
+		push	ix	;save callers
+
 		
 		ld	hl,4
 		ld	($5cda),hl	; filename length
