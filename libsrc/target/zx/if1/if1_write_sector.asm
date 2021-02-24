@@ -6,7 +6,7 @@
 ;	Writes the specified sector to the specified drive.
 ;
 ;	
-;	$Id: if1_write_sector.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;	$Id: if1_write_sector.asm $
 ;
 
 		SECTION code_clib
@@ -30,10 +30,9 @@ _if1_write_sector:
 		ld	hl,-1
 		and	a		; drive no. = 0 ?
 		jr	z,write_sector_exit		; yes, return -1
-		dec	a
-		cp	8		; drive no. >8 ?
+		cp	9		; drive no. >8 ?
 		jr	nc,write_sector_exit		; yes, return -1
-		inc	a
+
 		push	af
 
 		ld	a,(ix+2)	; sector number
