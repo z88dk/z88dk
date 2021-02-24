@@ -166,7 +166,6 @@ define buildcrt
 	$(MAKE) -C font
 	$(MAKE) -C compress
 	$(MAKE) -C alloc
-	$(MAKE) -C debug
 	$(MAKE) -C adt
 	$(MAKE) -C adt-newlib
 	$(MAKE) -C algorithm
