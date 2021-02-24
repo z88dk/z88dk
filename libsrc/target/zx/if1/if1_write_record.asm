@@ -28,10 +28,9 @@ _if1_write_record:
 		ld	hl,-1
 		and	a		; drive no. = 0 ?
 		jr	z,if1_write_record_exit		; yes, return -1
-		dec	a
-		cp	8		; drive no. >8 ?
+		cp	9		; drive no. >8 ?
 		jr	nc,if1_write_record_exit		; yes, return -1
-		inc	a
+
 		;push	af
 
 		ld	($5cd6),a
