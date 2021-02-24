@@ -33,12 +33,10 @@ _if1_mdv_status:
                 ld      hl,-1
                 and     a               ; drive no. = 0 ?
                 ret     z               ; yes, return -1
-                dec     a
-                cp      8               ; drive no. >8 ?
+                cp      9               ; drive no. >8 ?
                 ret     nc              ; yes, return -1
-                inc     a
 
-		push	af
+                push	af
                 call    if1_rommap
                 pop	af
                 
