@@ -17,6 +17,11 @@
 
 if1_write_record:
 _if1_write_record:
+
+		;; TODO:  THIS FUNCTION DOES NOT WORK YET !
+		;;        - filename etc.. missing
+		;; ==========================================
+
 		;; TODO:  check for possible IX corruption here
 		rst	8
 		defb 	31h		; Create Interface 1 system vars if required
@@ -35,10 +40,10 @@ _if1_write_record:
 
 		ld	($5cd6),a
 		
-		ld	hl,1
-		ld	($5cda),hl	; filename length
-		ld	hl,filename	; filename location
-		ld	(5cdch),hl	; pointer to filename
+		;ld	hl,1
+		;ld	($5cda),hl	; filename length
+		;ld	hl,filename	; filename location
+		;ld	(5cdch),hl	; pointer to filename
 
 		ld	l,(ix+0)	; buffer
 		ld	h,(ix+1)
@@ -64,5 +69,5 @@ if1_write_record_exit:
 		pop	ix		; restore callers
 		ret
 
-		SECTION rodata_clib	
-filename:	defm	3
+;		SECTION bss_clib	
+;filename:	defm	3
