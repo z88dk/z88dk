@@ -19,7 +19,7 @@
 		
 		EXTERN	mdvbuffer
 		;PUBLIC	if1_sect_read
-		PUBLIC	if1_verifymode
+		;PUBLIC	if1_verifymode
 
 
 
