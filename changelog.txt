@@ -7,6 +7,7 @@ Detailed but incomplete changelist:
 
 - [appmake] Compressed ROM data sections can now use zx0
 - [newlib] +rc2014: Support for shadow RAM copying
+- [zsdcc] Upgraded to SDCC 4.1.0 r12070 (bugfixes)
 
 
 z88dk v2.1 - 07.02.2021

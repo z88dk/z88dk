@@ -1,6 +1,6 @@
 Index: src/SDCCasm.c
 ===================================================================
---- src/SDCCasm.c	(revision 12036)
+--- src/SDCCasm.c	(revision 12070)
 +++ src/SDCCasm.c	(working copy)
 @@ -403,8 +403,8 @@
  static const ASM_MAPPING _asxxxx_mapping[] = {
@@ -23,7 +23,7 @@ Index: src/SDCCasm.c
     "; ---------------------------------\n"
 Index: src/SDCCglue.c
 ===================================================================
---- src/SDCCglue.c	(revision 12036)
+--- src/SDCCglue.c	(revision 12070)
 +++ src/SDCCglue.c	(working copy)
 @@ -195,7 +195,7 @@
             (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
@@ -84,9 +84,9 @@ Index: src/SDCCglue.c
  
 Index: src/SDCCmain.c
 ===================================================================
---- src/SDCCmain.c	(revision 12036)
+--- src/SDCCmain.c	(revision 12070)
 +++ src/SDCCmain.c	(working copy)
-@@ -505,16 +505,15 @@
+@@ -514,16 +514,15 @@
  {
    int i;
  
@@ -112,7 +112,7 @@ Index: src/SDCCmain.c
  static void
 Index: src/SDCCopt.c
 ===================================================================
---- src/SDCCopt.c	(revision 12036)
+--- src/SDCCopt.c	(revision 12070)
 +++ src/SDCCopt.c	(working copy)
 @@ -1010,7 +1010,7 @@
        /* TODO: Eliminate it, convert any SEND of volatile into DUMMY_READ_VOLATILE. */
@@ -176,9 +176,9 @@ Index: src/SDCCopt.c
                  continue;
 Index: src/z80/peep.c
 ===================================================================
---- src/z80/peep.c	(revision 12036)
+--- src/z80/peep.c	(revision 12070)
 +++ src/z80/peep.c	(working copy)
-@@ -251,6 +251,88 @@
+@@ -225,6 +225,88 @@
    return(found && found < end);
  }
  
@@ -267,7 +267,7 @@ Index: src/z80/peep.c
  static bool
  z80MightBeParmInCallFromCurrentFunction(const char *what)
  {
-@@ -408,6 +490,8 @@
+@@ -382,6 +464,8 @@
  static bool
  z80MightRead(const lineNode *pl, const char *what)
  {
@@ -276,7 +276,7 @@ Index: src/z80/peep.c
    if(strcmp(what, "iyl") == 0 || strcmp(what, "iyh") == 0)
      what = "iy";
    if(strcmp(what, "ixl") == 0 || strcmp(what, "ixh") == 0)
-@@ -416,6 +500,16 @@
+@@ -390,6 +474,16 @@
    if(ISINST(pl->line, "call") && strcmp(what, "sp") == 0)
      return TRUE;
  
@@ -293,7 +293,7 @@ Index: src/z80/peep.c
    if(strcmp(pl->line, "call\t__initrleblock") == 0 && (strchr(what, 'd') != 0 || strchr(what, 'e') != 0))
      return TRUE;
  
-@@ -864,6 +958,7 @@
+@@ -838,6 +932,7 @@
      return(true);
    if(ISINST(pl->line, "call") && strchr(pl->line, ',') == 0)
      {
@@ -301,7 +301,7 @@ Index: src/z80/peep.c
        const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
        const bool *preserved_regs;
  
-@@ -870,6 +965,16 @@
+@@ -844,6 +939,16 @@
        if(!strcmp(what, "ix"))
          return(false);
  
