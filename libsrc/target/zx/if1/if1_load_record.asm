@@ -20,7 +20,7 @@
                 EXTERN    mdvbuffer
 
                 EXTERN     if1_checkblock
-                EXTERN    if1_sect_read
+                ;EXTERN    if1_sect_read
 
                 EXTERN     if1_setname
 
@@ -112,8 +112,8 @@ copyname:
                 ld      (ix+0Dh),a      ; CHREC
                 res     0,(ix+18h)      ; set CHFLAG to "read" mode
  
-                xor     a
-                ld      (if1_sect_read),a       ; flag for "sector read"
+                ;xor     a
+                ;ld      (if1_sect_read),a       ; flag for "sector read"
 
                 ld      hl,04FBh
                 ld      (5CC9h),hl      ; SECTOR
@@ -166,9 +166,9 @@ nxt_sect:
                 call    next_sector     ; Decrease sector counter and check if we reached zero
                 jr      nz,do_read
 
-                ld      a,(if1_sect_read)       ; flag for "sector read"
-                or      a
-                jr      z,sect_notfound
+                ;ld      a,(if1_sect_read)       ; flag for "sector read"
+                ;or      a
+                ;jr      z,sect_notfound
 
 
 sectread:
