@@ -7,8 +7,9 @@
 ;	if1_checkblock:
 ;	 - check the loaded block for integrity
 ;	 - other various checks
+;	 - when a checksum is reported wrong, it is automatically fixed
 ;	
-;	$Id: if1_checkblock.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;	$Id: if1_checkblock.asm $
 ;
 
 		SECTION code_clib
@@ -17,7 +18,7 @@
 		EXTERN	if1_checksum
 		
 		EXTERN	mdvbuffer
-		PUBLIC	if1_sect_read
+		;PUBLIC	if1_sect_read
 		PUBLIC	if1_verifymode
 
 
@@ -30,7 +31,7 @@ if1_checkblock:
 		ld	bc,14
 		call	if1_checksum
 
-		ld	hl,status	; D70E
+		ld	hl,status
 		ld	(hl),1
 ;
 		jr	nz,chksector
@@ -60,17 +61,17 @@ chksector:
 		inc	a
 		inc	a
 chk2:
-		ld	hl,if1_sect_read		; flag for "sector read"
-		cp	(hl)
-		ret	c
-		ret	z
-		ld	(hl),a
-		ld	b,a
+		;ld	hl,if1_sect_read		; flag for "sector read"
+		;cp	(hl)
+		;ret	c
+		;ret	z
+		;ld	(hl),a
+;		ld	b,a
 		
-		ld	a,(if1_verifymode)
-		bit	2,a
-		ld	a,b
-		ret	nz
+;		ld	a,(if1_verifymode)
+;		bit	2,a
+;		ld	a,b
+;		ret	nz
 
 ; Copy microdrive channel to work buffer
 		push	ix
@@ -83,5 +84,5 @@ chk2:
 
 		SECTION bss_clib
 status:		defb	0
-if1_sect_read:	defb	0
-if1_verifymode:	defb	0
+;if1_sect_read:	defb	0
+;if1_verifymode:	defb	0
