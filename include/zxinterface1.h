@@ -102,7 +102,7 @@ extern int __LIB__ if1_load_sector (int drive, int sector, struct M_CHAN *buffer
 // Write the sector in "buffer"
 extern int __LIB__ if1_write_sector (int drive, int sector, struct M_CHAN *buffer) __smallc;
 
-// Add a record containing the data in "buffer"
+// *NOT WORKING* - Add a record containing the data in the "sector buffer"
 extern int __LIB__ if1_write_record (int drive, struct M_CHAN *buffer) __smallc;
 
 // Put a 10 characters file name at the specified location; return with the file name length

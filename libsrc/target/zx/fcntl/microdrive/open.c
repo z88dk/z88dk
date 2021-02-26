@@ -15,6 +15,8 @@
  *	$Id: open.c $
  */
 
+// #include <debug.h>
+
 #include <fcntl.h>
 #include <zxinterface1.h>
 
@@ -37,6 +39,10 @@ if1_filestatus = if1_load_record(1, (char *)name, 0, if1_file);
 (if1_file)->flags=flags;
 (if1_file)->mode=mode;
 
+// RESET FILE POINTER
+(if1_file)->position=0;
+
+
 switch ( flags & 0xff ) {
 	case O_RDONLY:
 		if (if1_filestatus == -1)
@@ -45,13 +51,7 @@ switch ( flags & 0xff ) {
 			free(if1_file);
 			return(-1);
 		}
-		/*
-		    DEBUGGING: "hdname" could be useful to check if the disk has been changed
-			printf("\nread only :  %u  - %s\n",if1_file, if1_getname( (char *) ((if1_file)->name)) );
-			printf ("--%s--",if1_getname( (char*) ((if1_file)->hdname)) );
-		*/
-		// RESET FILE COUNTER
-		(if1_file)->position=0;
+
 		return(if1_file);
 		break;
 
@@ -69,11 +69,6 @@ switch ( flags & 0xff ) {
 			free(if1_file);
 			return(-1);
 		}
-/*		
-#pragma printf %u
-		if ((if1_file)->reclen >0) printf ("\n reclen: %u\n",(if1_file)->reclen);
-		else  printf ("\n reclen is zero\n");
-*/	
 		return(if1_file);
 		break;
 
@@ -84,13 +79,9 @@ switch ( flags & 0xff ) {
 			free(if1_file);
 			return(-1);
 		}
-		(if1_file)->position=0;
-		(if1_file)->flags=flags;
-		(if1_file)->mode=mode;
 		lseek((int)(if1_file), 0, SEEK_END);
 		return(if1_file);
 		break;
-
 	}
 	
 	free (if1_file);
