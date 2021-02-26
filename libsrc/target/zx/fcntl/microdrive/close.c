@@ -26,21 +26,9 @@ int flags;
 
 	if ((flags == O_APPEND) || (flags == O_WRONLY))
 	{
-		//printf ("\nClosing file on drive \n",);
-
-		if1_write_record (if1_file->drive, if1_file);
-		
-/* DEBUG - experiments to see how the M_CHAN structure survived
-		#pragma printf %u
-		printf ("\n Cartridge name: %s",if1_getname( (char *) if1_file->hdname));
-		printf ("\n File name: %s",if1_getname( (char *) if1_file->name));
-		printf ("\nRecord flags: ");
-		int x;
-		for (x=7; x >-1; x--)  (if1_file->recflg & (2^x)) ? fputc_cons('1') : fputc_cons('0');
-		printf ("\n");
-*/
-		
-		//if1_file->recflg |= 2;	// Set EOF bit on last record
+		if1_file->recflg |= 2;	// Set EOF bit on last record
+		// This will overwrite/finalize the current sector.
+		if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
 	}
 
 	free(fd);
