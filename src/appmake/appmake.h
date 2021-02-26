@@ -182,6 +182,9 @@ extern option_t  px_options;
 extern int       rk_exec(char *target);
 extern option_t  rk_options;
 
+extern int       smc777_exec(char *target);
+extern option_t  smc777_options;
+
 extern int       sorcerer_exec(char *target);
 extern option_t  sorcerer_options;
 
@@ -477,6 +480,10 @@ struct {
       "Embed a binary inside a rom, padding if necessary",
       NULL,
       rom_exec,    &rom_options },
+    { "bin2smc",  "smc777",   "(C) 2021 z88dk",
+      "Create a SMC-777 bootable d88 disc",
+      NULL,
+      smc777_exec,    &smc777_options },
     { "sentinel",  "sos",       "(C) 2013 Stefano Bodrato",
       "Add a header for S-OS (The Sentinel)",
       NULL,

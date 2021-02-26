@@ -102,7 +102,7 @@ TOCREATE += $(call check_target,rx78,rx78_clib.lib)
 TOCREATE += $(call check_target,s1mp3,s1mp3_clib.lib)
 TOCREATE += $(call check_target,sam,sam_clib.lib)
 TOCREATE += $(call check_target,sc3000,sc3000_clib.lib)
-TOCREATE += $(call check_target,smc777,smc777_cpm.lib $(CPMLIBS))
+TOCREATE += $(call check_target,smc777,smc777_clib.lib smc777_cpm.lib $(CPMLIBS))
 TOCREATE += $(call check_target,sms,sms_clib.lib)
 TOCREATE += $(call check_target,spc1000,spc1000_clib.lib)
 TOCREATE += $(call check_target,srr,srr_clib.lib)
@@ -964,9 +964,19 @@ excali64_clib.lib:
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_cpm @$(LISTFILE_DIRECTORY)/target/excali64/excali64.lst
 
 # SMC-777 library 
-smc777_cpm.lib:
+smc777_clib.lib:
 	@echo ''
 	@echo '--- Building Sony SMC-70/SMC-777 Library ---'
+	@echo ''
+	@$(RM) -f video/mc6845/*.o
+	$(MAKE) -C gfx TARGET=smc777 FLAVOUR=wide
+	$(MAKE) -C psg TARGET=smc777
+	$(MAKE) -C games TARGET=smc777 
+	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_clib @$(LISTFILE_DIRECTORY)/smc777.lst
+
+smc777_cpm.lib:
+	@echo ''
+	@echo '--- Building Sony SMC-70/SMC-777 CP/M Library ---'
 	@echo ''
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=smc777 FLAVOUR=wide
