@@ -20,7 +20,7 @@
                 EXTERN    mdvbuffer
 
                 EXTERN     if1_checkblock
-                ;EXTERN    if1_sect_read
+                EXTERN    if1_sect_ready
 
                 EXTERN    MAKE_M
                 EXTERN    CLOSE_M
@@ -126,9 +126,9 @@ nextrec:
         ;       ret
         ;noverify:
 
-                ;ld      a,(if1_sect_read)       ; flag for "sector read"
-                ;or      a
-                ;jr      z,sect_notfound
+                ld      a,(if1_sect_ready)       ; flag for "sector read"
+                or      a
+                jr      z,sect_notfound
 
 sectread:
                 call    CLOSE_M         ; close file
