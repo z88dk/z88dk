@@ -17,6 +17,7 @@
 		
 		EXTERN	MAKE_M
 		EXTERN	MOTOR
+		EXTERN	WR_SECT
 
 
 if1_write_sector:
@@ -73,13 +74,16 @@ __mdvbuffer:	ld	hl,0
 		ldir
 
 		set	0,(ix+18h)	; set CHFLAG to "write" mode
+
+		;call	1
+		;
+		;rst	8
+		;defb	2Ah		; Write a sector to drive
+
+		LD		HL,$00FF	; set counter to ensure at least one revolution 
+		call	WR_SECT
+
 		call	1
-
-		;RST	8
-		;defb	22h		; Open a temp "M" channel
-
-		rst	8
-		defb	2Ah		; Write a sector to drive
 
 		xor	a
 		rst	8
