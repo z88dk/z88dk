@@ -27,7 +27,7 @@ int readbyte(int fd)
 	if1_file = (void *) fd;
 	//printf ("-- reading '%s' - %u --",if1_getname( (char *) if1_file->hdname ), fd);
 
-	if ( (int) (if1_file->position / 512) > if1_file->record )
+	if ( (int) (if1_file->position / 512L) > if1_file->record )
 	{
 		//DEBUG:
 		//printf ("\nNext record in file: %u  ",if1_file->record + 1);
@@ -43,8 +43,8 @@ int readbyte(int fd)
 		if (if1_filestatus == -1) return (EOF);
 		
 	}
-	if ( ((int) (if1_file->position) % 512) >= if1_file->reclen ) return EOF;
+	if ( ((int) (if1_file->position) % 512L) >= if1_file->reclen ) return EOF;
 
-	return ( *(unsigned char *) (if1_file->data + ( (int)(if1_file->position++) % 512)) );
+	return ( *(unsigned char *) (if1_file->data + ( (int)(if1_file->position++) % 512L)) );
 
 }
