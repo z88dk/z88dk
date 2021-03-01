@@ -1,8 +1,10 @@
 close
 lseek
 open
+read
 readbyte
 remove
 rename
 fdtell
+write
 writebyte
