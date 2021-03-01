@@ -10,7 +10,7 @@
 ;       1: Cartridge is write protected
 ;       2: Microdrive not present
 ;
-;       $Id: if1_mdv_status.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;       $Id: if1_mdv_status.asm $
 ;
 
 		SECTION   code_clib
@@ -24,12 +24,9 @@
 if1_mdv_status:
 _if1_mdv_status:
 
-                pop	hl
-                pop	bc
-                push	bc
-                push	hl
+; __FASTCALL__
 
-                ld      a,c
+                ld      a,l
                 ld      hl,-1
                 and     a               ; drive no. = 0 ?
                 ret     z               ; yes, return -1
