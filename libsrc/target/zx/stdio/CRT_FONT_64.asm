@@ -1,7 +1,7 @@
 
 
 
-        SECTION         rodata_clib
+        SECTION         rodata_font_4x8
 	PUBLIC		CRT_FONT_64
 
 CRT_FONT_64:

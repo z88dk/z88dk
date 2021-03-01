@@ -42,7 +42,7 @@
 
 
 		; Variables that can be adjusted by platform specific code
-		PUBLIC		generic_console_flags
+		EXTERN		generic_console_flags
 
 		EXTERN		generic_console_scrollup
 		EXTERN		generic_console_printc
@@ -562,10 +562,3 @@ ENDIF
 params_left:	defb	0		; Number of parameters left to read
 parameters:	defb	0		; We only have up-to two parameters
 parameter_processor:	defw	0	; Where we go to when we need to process
-
-generic_console_flags:		defb	0		; bit 0 = raw mode enabled
-							; bit 3 = underline
-							; bit 4 = bold
-							; bit 6 = vscroll disabled
-							; bit 7 = inverse on
-
