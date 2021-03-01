@@ -6,7 +6,7 @@
 
 include ../../../../Make.config
 
-OBJECTS = open.o close.o readbyte.o writebyte.o remove.o rename.o lseek.o fdtell.o
+OBJECTS = open.o close.o read.o write.o readbyte.o writebyte.o remove.o rename.o lseek.o fdtell.o
 
 all: $(OUTPUT_DIRECTORY)/zxmdv.lib
 
