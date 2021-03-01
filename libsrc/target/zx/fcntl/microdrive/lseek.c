@@ -9,7 +9,7 @@
  *	2	SEEK_END from end of file (always -ve)
  *
  *	$Id: lseek.c $
-*/
+ */
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -27,7 +27,7 @@ long lseek(int handle, long posn, int whence)
 
 	switch (whence) {
 		case SEEK_SET:
-			if1_load_record(if1_file->drive, if1_file->name, (int)(posn / 512), if1_file);
+			if1_load_record(if1_file->drive, if1_file->name, (int)(posn / 512L), if1_file);
 			if1_file->position=posn;
 			// TODO: update the local record pointers for write access
 			break;
@@ -43,8 +43,8 @@ long lseek(int handle, long posn, int whence)
 			while ((if1_file->recflg && 1) == 0)
 				if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, ++if1_file->record, if1_file);
 			// now get the latest position and add the offest
-			position = if1_file->record * 512 + if1_file->reclen + posn;
-			lseek(handle, position, SEEK_SET);
+			if1_file->position = (long) if1_file->record * 512L + (long) if1_file->reclen;
+			//lseek(handle, position, SEEK_SET);
 			break;
 	}
 	return (if1_file->position);
