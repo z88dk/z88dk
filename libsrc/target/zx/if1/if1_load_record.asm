@@ -10,26 +10,29 @@
 ;       2/3 record:     record number
 ;       0/1 buffer
 ;
-;       $Id: if1_load_record.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;       $Id: if1_load_record.asm $
 ;
+
 		SECTION   code_clib
-                PUBLIC    if1_load_record
-                PUBLIC    _if1_load_record
 
-                EXTERN     if1_rommap
-                EXTERN    mdvbuffer
 
-                EXTERN     if1_checkblock
-                ;EXTERN    if1_sect_read
+		PUBLIC    if1_load_record
+		PUBLIC    _if1_load_record
 
-                EXTERN     if1_setname
+		EXTERN     if1_rommap
+		EXTERN    mdvbuffer
 
-                EXTERN    MAKE_M
-                EXTERN    CLOSE_M
-                EXTERN    FETCH_H
-                EXTERN    MOTOR
-                EXTERN    RD_BUFF
-                
+		EXTERN     if1_checkblock
+		EXTERN    if1_sect_ready
+
+		EXTERN     if1_setname
+
+		EXTERN    MAKE_M
+		EXTERN    CLOSE_M
+		EXTERN    FETCH_H
+		EXTERN    MOTOR
+		EXTERN    RD_BUFF
+
 
 
 if1_load_record:
@@ -113,7 +116,7 @@ copyname:
                 res     0,(ix+18h)      ; set CHFLAG to "read" mode
  
                 ;xor     a
-                ;ld      (if1_sect_read),a       ; flag for "sector read"
+                ;ld      (if1_sect_ready),a       ; flag for "sector read"
 
                 ld      hl,04FBh
                 ld      (5CC9h),hl      ; SECTOR
@@ -166,9 +169,9 @@ nxt_sect:
                 call    next_sector     ; Decrease sector counter and check if we reached zero
                 jr      nz,do_read
 
-                ;ld      a,(if1_sect_read)       ; flag for "sector read"
-                ;or      a
-                ;jr      z,sect_notfound
+                ld      a,(if1_sect_ready)       ; flag for "sector read"
+                or      a
+                jr      z,sect_notfound
 
 
 sectread:
@@ -191,8 +194,8 @@ sect_notfound:
 error_exit:
                 call    1               ; unpage
                 ei
-;               xor     a
-;               ld      (if1_sect_read),a       ; flag for "sector read"
+                ;xor     a
+                ;ld      (if1_sect_read),a       ; flag for "sector read"
                 ld      hl,-1           ; sector not found
 		jr	if_load_record_exit
 
