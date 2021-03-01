@@ -43,6 +43,14 @@ if1_filestatus = if1_load_record(1, (char *)name, 0, if1_file);
 (if1_file)->position=0L;
 
 
+// If the file exists and the 'APPEND' flag is set..
+if ((flags & O_APPEND) && (if1_filestatus != -1)){
+	lseek((int)(if1_file), 0, SEEK_END);
+	if1_file->recflg &= 0xFD;	// Reset EOF bit
+	return(if1_file);
+}
+
+
 switch ( flags & 0xff ) {
 	case O_RDONLY:
 		if (if1_filestatus == -1)
@@ -55,6 +63,7 @@ switch ( flags & 0xff ) {
 		return(if1_file);
 		break;
 
+	// We get here also to 'APPEND' to a non-existing file
 	case O_WRONLY:
 		if (if1_filestatus != -1)
 		{
@@ -72,26 +81,6 @@ switch ( flags & 0xff ) {
 		}
 		*/
 
-		if1_file->recflg &= 0xFD;	// Reset EOF bit		
-		return(if1_file);
-		break;
-
-	case O_APPEND:
-		if (if1_filestatus == -1)
-		{
-			if1_touch_file(1,(char *)name);
-			if1_filestatus = if1_load_record(1, (char *)name, 0, if1_file);
-			/*
-			if (if1_filestatus == -1)
-			{
-				// FILE NOT FOUND
-				free(if1_file);
-				return(-1);
-			}
-			*/
-		} else
-			lseek((int)(if1_file), 0, SEEK_END);
-		
 		if1_file->recflg &= 0xFD;	// Reset EOF bit		
 		return(if1_file);
 		break;
