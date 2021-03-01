@@ -100,13 +100,13 @@ extern int __LIB__ if1_load_sector (int drive, int sector, struct M_CHAN *buffer
 // Write the sector in "buffer"
 extern int __LIB__ if1_write_sector (int drive, int sector, struct M_CHAN *buffer) __smallc;
 
-// *NOT WORKING* - Add a record containing the data in the "sector buffer"
-extern int __LIB__ if1_write_record (int drive, struct M_CHAN *buffer) __smallc;
+// Add a record containing the data in the "sector buffer"
+#define if1_write_record(n,b) if1_write_sector(n, if1_find_sector(n), b)
 
 // Put a 10 characters file name at the specified location; return with the file name length
 extern int __LIB__ if1_setname(char* name, char *location) __smallc;
 
-extern char __LIB__ *if1_getname(char *location);
+extern char __LIB__ *if1_getname(char *location) __z88dk_fastcall;
 
 // Delete a file
 extern int __LIB__ if1_remove_file(int drive, char *filename) __smallc;
@@ -121,10 +121,10 @@ extern int __LIB__ if1_init_file (int drive, char *filename, struct M_CHAN *buff
 extern void __LIB__ if1_update_map (int drive, char *mdvmap) __smallc;
 
 // Find a free sector
-extern int __LIB__ if1_find_sector (int drive);
+extern int __LIB__ if1_find_sector (int drive) __z88dk_fastcall;
 
 // Find a free sector in the specified map
-extern int __LIB__ if1_find_sector_map (char *mdvmap);
+extern int __LIB__ if1_find_sector_map (char *mdvmap) __z88dk_fastcall;
 
 // Returns true if the current program has been loaded from microdrive
 extern bool_t __LIB__ if1_from_mdv();
@@ -139,9 +139,9 @@ extern int __LIB__ if1_edition();
 extern int __LIB__ zx_interface1();
 
 // Returns the microdrive status 0=ok, 1=wr protect, 2=not present
-extern int __LIB__ if1_mdv_status(int drive);
+extern int __LIB__ if1_mdv_status(int drive) __z88dk_fastcall;
 
 // Count the free sectors in the given drive
-extern int __LIB__   if1_free_sectors(int drive);
+extern int __LIB__   if1_free_sectors(int drive) __z88dk_fastcall;
 
 #endif /* _ZXINTERFACE1_H */
