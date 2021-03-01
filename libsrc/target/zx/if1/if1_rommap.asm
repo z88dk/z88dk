@@ -25,6 +25,7 @@
                 PUBLIC    ERASEM
 ;                PUBLIC    ADD_RECD
                 PUBLIC    DEL_S_1
+                PUBLIC    WR_SECT
 
                 PUBLIC    mdvbuffer
 
@@ -57,8 +58,7 @@ paged:
 ;                ld		hl,rom3tab
 ;
 ;rom2:
-                ld      bc,24           ; 8 jumps * 3 bytes
-                ;ld     bc,30           ; 10 jumps * 3 bytes
+                ld      bc,27           ; 9 jumps * 3 bytes
                 ld      de,jptab        ; JP table dest addr
                 ldir
                 
@@ -90,6 +90,7 @@ RD_BUFF:        JP 18A9h        ; get buffer
 ERASEM:         JP 1D6Eh        ; delete a file from cartridge
 FREESECT:       JP 1D38h        ; add a record to file
 DEL_S_1:        JP 1867h        ; 1ms delay
+WR_SECT:        JP 1A91h+3      ; write sector (skipping "LD HL,$00F0")
 
 ;LDBYTS:                JP 15ACh        ;
 ;SVBYTS:                JP 14EEh        ;
@@ -102,12 +103,13 @@ rom2tab:
                 JP 10A5h
                 JP 138Eh
                 JP 13A9h
-                JP 1532h ;MOTOR
-                JP 15EBh ;RD_BUFF
-                JP 1D79h ;ERASEM
-                JP 1D43h ;FREESECT
-                JP 15A2h ;DEL_S_1
-
+                JP 1532h    ;MOTOR
+                JP 15EBh    ;RD_BUFF
+                JP 1D79h    ;ERASEM
+                JP 1D43h    ;FREESECT
+                JP 15A2h    ;DEL_S_1
+				JP 1F85h+3  ; WR_SECT (skipping "LD HL,$00FF")
+				
                 ;JP 199Dh ;LDBYTS
                 ;JP 18DFh ;SVBYTS
 
@@ -123,6 +125,7 @@ rom2tab:
 ;                JP 1D7Bh ;ERASEM
 ;                JP 1D45h ;FREESECT	; - ?? we just suppose this one
 ;                JP 15A2h ;DEL_S_1
+;                JP ????? ; WR_SECT
 ;
 ;                ;JP 199Dh ;LDBYTS ???
 ;                ;JP 18DFh ;SVBYTS ???
