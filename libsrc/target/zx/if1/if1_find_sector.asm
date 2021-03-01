@@ -12,20 +12,20 @@
 ;	$Id: if1_find_sector.asm $
 ;
 
-                SECTION   code_clib
+		SECTION   code_clib
 		PUBLIC 	if1_find_sector
 		PUBLIC 	_if1_find_sector
 
 
 if1_find_sector:
 _if1_find_sector:
+
+		push hl
+		
 		rst	8
 		defb 	31h		; Create Interface 1 system vars if required
 
-		pop	af
 		pop	bc	;driveno
-		push	bc
-		push	af
 
 		ld      a,c
 		ld      hl,-1
@@ -50,22 +50,13 @@ _if1_find_sector:
 		defb	22h		; Open temporary 'M' channel (touch)
 		; Now IX points to the newly created channel
 
-		rst	8		; Close & save
-		defb	23h
-
-		rst	8
-		defb	22h		; Open for reading
-
 		ld	a,(ix+29h)	; pick the sector number...
 		ld	l,a
 		ld	h,0
 		push	hl		; ..and save it onto the stack
 
-		rst	8		; Close
-		defb	23h
-
-		rst	8		; Erase
-		defb	24h
+		rst	8
+		defb	2Ch		; Reclaim an "M" channel
 		
 		pop	hl
 		pop	ix		;restore callers
