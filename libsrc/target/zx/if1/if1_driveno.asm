@@ -29,7 +29,7 @@ _if1_filename:
 	ld	a,(hl)
 	dec hl
 	cp ':'
-	ret z
+	ret nz
 	inc hl
 	inc hl
 	ret
@@ -54,7 +54,7 @@ _if1_driveno:
 	
 get_letter:
 	call asm_toupper
-	sub 'A'
+	sub 'A'-1
 		
 driveno_ret:
 	ld	h,0
