@@ -147,6 +147,9 @@ extern int __LIB__ zx_interface1();
 // Returns the microdrive status 0=ok, 1=wr protect, 2=not present
 extern int __LIB__ if1_mdv_status(int drive) __z88dk_fastcall;
 
+// Test a Microdrive map to check if it is full (1 if full, otherwise 0)
+extern int __LIB__ if1_mdv_full(void *map) __z88dk_fastcall;
+
 // Count the free sectors in the given drive
 extern int __LIB__   if1_free_sectors(int drive) __z88dk_fastcall;
 
