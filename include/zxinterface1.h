@@ -90,6 +90,12 @@ struct N_CHAN {
 
 #endif /*__ZX_CHANNELS__*/
 
+// Extract the drive number from a file path (e.g. "a:filename")
+extern int __LIB__ if1_driveno (char *filename) __z88dk_fastcall;
+extern int if1_default_drv;
+
+// Remove the drive specifier (if present) from a file path
+extern int __LIB__ if1_filename (char *filename) __z88dk_fastcall;
 
 // Load a sector identified by file name and record number
 extern int __LIB__ if1_load_record (int drive, char *filename, int record, struct M_CHAN *buffer) __smallc;
