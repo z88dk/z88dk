@@ -453,6 +453,33 @@ IF NEED_ansiterminal
                 defc ansifont_is_packed = 0
 	    ENDIF
 	ENDIF
+
+	IF (ansipixels = 512)	
+		IF (ansicolumns = 48)
+			defc ansicharacter_pixelwidth = 9
+			IF !DEFINED_ansifont
+				EXTERN ansifont_f8
+				defc ansifont = ansifont_f8
+				defc ansifont_is_packed = 0
+			ENDIF
+		ENDIF
+		IF (ansicolumns = 80)
+			defc ansicharacter_pixelwidth = 6
+			IF !DEFINED_ansifont
+				EXTERN ansifont_f6
+				defc ansifont = ansifont_f6
+				defc ansifont_is_packed = 0
+			ENDIF
+		ENDIF
+		IF (ansicolumns = 160)
+			defc ansicharacter_pixelwidth = 3
+			IF !DEFINED_ansifont
+				EXTERN ansifont_f4pack
+				defc ansifont = ansifont_f4pack
+				defc ansifont_is_packed = 1
+			ENDIF
+		ENDIF	
+	ENDIF
 	
 	IF (ansipixels = 256)	
 		IF (ansicolumns = 24)
