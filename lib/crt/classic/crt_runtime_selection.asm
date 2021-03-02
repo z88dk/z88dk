@@ -332,6 +332,36 @@ IF NEED_ansiterminal
 	defc DEFINED_puts_cons = 1
 	defc fputc_cons = fputc_cons_ansi
 
+	; Bridge VT100 to gencon
+        IF DEFINED_CLIB_ANSITERMINAL_BRIDGE
+            PUBLIC ansi_attr
+            PUBLIC ansi_BEL
+            PUBLIC ansi_cls
+            PUBLIC ansi_CHAR
+            PUBLIC ansi_del_line
+            PUBLIC ansi_SCROLLUP
+            EXTERN __gencon_ansi_attr
+            EXTERN __gencon_ansi_BEL
+            EXTERN __gencon_ansi_cls
+            EXTERN __gencon_ansi_CHAR
+            EXTERN __gencon_ansi_del_line
+            EXTERN __gencon_ansi_SCROLLUP
+            defc ansi_attr = __gencon_ansi_attr
+            defc ansi_BEL = __gencon_ansi_BEL
+            defc ansi_cls = __gencon_ansi_cls
+            defc ansi_CHAR = __gencon_ansi_CHAR
+            defc ansi_del_line = __gencon_ansi_del_line
+            defc ansi_SCROLLUP = __gencon_ansi_SCROLLUP
+
+            ; We're using gencon, don't include an ANSIfont
+            UNDEFINE TAR__no_ansifont
+            defc TAR__no_ansifont = 1
+	    IF !DEFINED_ansicolumns
+                defc ansicolumns = CONSOLE_COLUMNS
+                defc DEFINED_ansicolumns = 1
+            ENDIF
+        ENDIF
+
        	PUBLIC ansicolumns
 
 	IF !TAR__no_ansifont
@@ -422,6 +452,33 @@ IF NEED_ansiterminal
 	        defc ansifont = ansifont_f8
                 defc ansifont_is_packed = 0
 	    ENDIF
+	ENDIF
+
+	IF (ansipixels = 512)	
+		IF (ansicolumns = 48)
+			defc ansicharacter_pixelwidth = 9
+			IF !DEFINED_ansifont
+				EXTERN ansifont_f8
+				defc ansifont = ansifont_f8
+				defc ansifont_is_packed = 0
+			ENDIF
+		ENDIF
+		IF (ansicolumns = 80)
+			defc ansicharacter_pixelwidth = 6
+			IF !DEFINED_ansifont
+				EXTERN ansifont_f6
+				defc ansifont = ansifont_f6
+				defc ansifont_is_packed = 0
+			ENDIF
+		ENDIF
+		IF (ansicolumns = 160)
+			defc ansicharacter_pixelwidth = 3
+			IF !DEFINED_ansifont
+				EXTERN ansifont_f4pack
+				defc ansifont = ansifont_f4pack
+				defc ansifont_is_packed = 1
+			ENDIF
+		ENDIF	
 	ENDIF
 	
 	IF (ansipixels = 256)	

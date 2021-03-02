@@ -48,6 +48,7 @@
 	    defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
         ENDIF
 
+
         PUBLIC    _FRAMES
         IF startup != 2
                 defc  _FRAMES = 23672 ; Timer	
@@ -67,8 +68,16 @@
         ENDIF
 
 	; We default to the 64 column terminal driver
-        defc    CONSOLE_COLUMNS = 64
+	; Check whether to default to 32 column display
         defc    CONSOLE_ROWS = 24
+	IF !DEFINED_CLIB_ZX_CONIO32
+	    defc CLIB_ZX_CONIO32 = 0
+            defc CONSOLE_COLUMNS = 64
+        ELSE
+            defc CONSOLE_COLUMNS = 32
+        ENDIF
+        PUBLIC __CLIB_ZX_CONIO32
+        defc __CLIB_ZX_CONIO32 = CLIB_ZX_CONIO32
 
 	IF !CLIB_FGETC_CONS_DELAY
 		defc CLIB_FGETC_CONS_DELAY = 100

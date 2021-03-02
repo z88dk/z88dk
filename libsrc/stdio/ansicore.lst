@@ -5,3 +5,9 @@ stdio/ansi/fputc_cons
 stdio/ansi/f_ansi_dsr6
 stdio/ansi/vtrendition
 stdio/ansi/generic/f_ansi_dline_generic
+stdio/ansi/gencon/f_ansi_char
+stdio/ansi/gencon/f_ansi_dline
+stdio/ansi/gencon/f_ansi_attr
+stdio/ansi/gencon/f_ansi_cls
+stdio/ansi/gencon/f_ansi_bel
+stdio/ansi/gencon/f_ansi_scrollup

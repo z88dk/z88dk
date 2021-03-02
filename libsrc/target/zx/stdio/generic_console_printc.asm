@@ -307,3 +307,13 @@ expect_flags:	defb	0		; bit 0 - expect flash
 	SECTION	data_clib
 
 print_routine:	defw	print64
+
+	SECTION	code_crt_init
+
+	EXTERN	__CLIB_ZX_CONIO32
+	ld	a,__CLIB_ZX_CONIO32
+	and	a
+	jr	z,no_set_32col
+	ld	hl,print32
+	ld	(print_routine),hl
+no_set_32col:

@@ -1,6 +1,6 @@
 
 
-	SECTION	rodata_clib
+	SECTION	rodata_font_ansi
 
 	PUBLIC	ansifont_f6
 
