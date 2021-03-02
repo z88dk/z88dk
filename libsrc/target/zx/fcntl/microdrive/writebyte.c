@@ -25,12 +25,22 @@ int writebyte(int fd, int byte)
 	//unsigned char	mychar;
 	
 	if1_file = (void *) fd;
-	//printf ("-- reading '%s' - %u --",if1_getname( (char *) if1_file->hdname ), fd);
+
+	// Was the Microdrive full?  (see below)
+	if (if1_file->hdflag > 127)  return(-1);
+
 
 	if ( (if1_file->position != 0L) && ((int) ((if1_file->position ) % 512L) == 0L) )
 	{
 		// This will overwrite/finalize the current sector.
 		if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
+
+	// Microdrive full ?
+	// We alwayse reserve one sector to prevent the 'ERASE' crash bug
+	if (if1_free_sectors(if1_file->drive)<1) {
+		if1_file->hdflag |= 128;
+		return(-1);
+	}
 		
 		if1_file->reclen=0;
 		if1_file->bytecount=0;
