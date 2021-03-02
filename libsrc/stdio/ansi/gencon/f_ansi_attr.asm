@@ -9,6 +9,7 @@
 	PUBLIC	__gencon_ansi_attr
 
 	EXTERN  generic_console_flags
+	EXTERN  generic_console_set_attribute
 	EXTERN  generic_console_set_ink
 	EXTERN  generic_console_set_paper
 
@@ -91,6 +92,9 @@ got_attribute:
 	inc	hl
 	or	(hl)
 	ld	(generic_console_flags),a
+	push	bc
+	call	generic_console_set_attribute
+	pop	bc
 	pop	hl
 	ret
 
