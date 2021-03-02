@@ -29,6 +29,9 @@ int open(char *name, int flags, mode_t mode)
 int if1_filestatus;
 struct M_CHAN *if1_file;
 
+// Exit if 'microdrive not present'
+if (if1_mdv_status(if1_driveno(name)) == 2) return (-1);
+
 if1_file = malloc(sizeof(struct M_CHAN));
 if (if1_file == 0) return (-1);
 if1_filestatus = if1_load_record(if1_driveno(name), if1_filename(name), 0, if1_file);
@@ -49,7 +52,9 @@ if ((flags & O_APPEND) && (if1_filestatus != -1)){
 
 
 switch ( flags & 0xff ) {
+
 	case O_RDONLY:
+
 		if (if1_filestatus == -1)
 		{
 			// FILE NOT FOUND
@@ -60,23 +65,32 @@ switch ( flags & 0xff ) {
 		return(if1_file);
 		break;
 
+
+
 	// We get here also to 'APPEND' to a non-existing file
 	case O_WRONLY:
+	
+		// Exit if 'microdrive not present' or 'write protected'
+		if (if1_mdv_status(if1_driveno(name)))
+		{
+			free(if1_file);
+			return(-1);
+		}
+
+		// Microdrive full ?
+		if (if1_free_sectors(if1_driveno(name))<1) {
+			free(if1_file);
+			return(-1);
+		}
+
 		if (if1_filestatus != -1)
 		{
 			// FILE ALREADY EXISTING
 			if1_remove_file(if1_driveno(name), if1_filename(name));
-		}
+		}		
+			
 		if1_touch_file(if1_driveno(name), if1_filename(name));
 		if1_filestatus = if1_load_record(if1_driveno(name), if1_filename(name), 0, if1_file);
-		/*
-		if (if1_filestatus == -1)
-		{
-			// FILE NOT FOUND
-			free(if1_file);
-			return(-1);
-		}
-		*/
 
 		if1_file->recflg &= 0xFD;	// Reset EOF bit		
 		return(if1_file);
