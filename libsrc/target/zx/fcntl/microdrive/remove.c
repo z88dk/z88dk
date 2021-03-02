@@ -14,5 +14,8 @@
 
 int remove(char *name)
 {
+  // Exit if 'microdrive not present' or 'write protected'
+	if (if1_mdv_status(if1_driveno(name))) return (-1);
+
 	if1_remove_file (if1_driveno(name), if1_filename(name));
 }
