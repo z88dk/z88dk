@@ -29,12 +29,9 @@ int open(char *name, int flags, mode_t mode)
 int if1_filestatus;
 struct M_CHAN *if1_file;
 
-// TODO:  Add drive number support, (only first drive ATM)
-// "1," currently is used to initializes "if1_file->drive" in struct
-
 if1_file = malloc(sizeof(struct M_CHAN));
 if (if1_file == 0) return (-1);
-if1_filestatus = if1_load_record(1, (char *)name, 0, if1_file);
+if1_filestatus = if1_load_record(if1_driveno(name), if1_filename(name), 0, if1_file);
 
 (if1_file)->flags=flags;
 (if1_file)->mode=mode;
@@ -68,10 +65,10 @@ switch ( flags & 0xff ) {
 		if (if1_filestatus != -1)
 		{
 			// FILE ALREADY EXISTING
-			if1_remove_file(1,(char *)name);
+			if1_remove_file(if1_driveno(name), if1_filename(name));
 		}
-		if1_touch_file(1,(char *)name);
-		if1_filestatus = if1_load_record(1, (char *)name, 0, if1_file);
+		if1_touch_file(if1_driveno(name), if1_filename(name));
+		if1_filestatus = if1_load_record(if1_driveno(name), if1_filename(name), 0, if1_file);
 		/*
 		if (if1_filestatus == -1)
 		{
