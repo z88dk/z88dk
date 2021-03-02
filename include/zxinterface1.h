@@ -38,7 +38,7 @@ struct M_CHAN {
 	char    name[10];	/* 0E - file name */
 	u8_t	flag;		/* 18 - CHFLAG "0000000x", bit 0 used */
 	u8_t	drive;		/* 19 - drive number (0-7)*/
-	u16_t	map;		/* 1A -Address of MAP for this microdrive.*/
+	u16_t	map;		/* 1A - Address of MAP for this microdrive.*/
 	char    hdpreamble[12];	/* 1C - 12 bytes of header preamble */
 	u8_t	hdflag;		/* 28 - bit 0 used */
 	u8_t	sector;		/* 29 - sector number */
@@ -130,6 +130,7 @@ extern void __LIB__ if1_update_map (int drive, char *mdvmap) __smallc;
 extern int __LIB__ if1_find_sector (int drive) __z88dk_fastcall;
 
 // Find a free sector in the specified map
+// ** requires if1_update_map() **
 extern int __LIB__ if1_find_sector_map (char *mdvmap) __z88dk_fastcall;
 
 // Returns true if the current program has been loaded from microdrive
@@ -148,7 +149,8 @@ extern int __LIB__ zx_interface1();
 extern int __LIB__ if1_mdv_status(int drive) __z88dk_fastcall;
 
 // Test a Microdrive map to check if it is full (1 if full, otherwise 0)
-extern int __LIB__ if1_mdv_full(void *map) __z88dk_fastcall;
+// ** requires if1_update_map() **
+extern int __LIB__ if1_mdv_full(char *mdvmap) __z88dk_fastcall;
 
 // Count the free sectors in the given drive
 extern int __LIB__   if1_free_sectors(int drive) __z88dk_fastcall;
