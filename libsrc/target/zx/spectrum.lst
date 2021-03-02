@@ -55,6 +55,7 @@ target/zx/diagnostic/zx_zxmmc
 target/zx/diagnostic/zx_ulaplus
 target/zx/if1/if1_checkblock
 target/zx/if1/if1_checksum
+target/zx/if1/if1_driveno
 target/zx/if1/if1_find_sector
 target/zx/if1/if1_find_sector_map
 target/zx/if1/if1_free_sectors
