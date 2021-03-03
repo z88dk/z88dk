@@ -71,8 +71,7 @@ long lseek(int handle, long posn, int whence)
 
 	
 	// Are we moving to a different sector ?
-	if ((position % 512L) != ((if1_file->position ) % 512L)) {
-
+	if ((position / 512L) != ((if1_file->position ) / 512L)) {
 		// If we're in WRITE or APPEND mode, let's save the current file record
 		if (flags == O_WRONLY)
 			if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
