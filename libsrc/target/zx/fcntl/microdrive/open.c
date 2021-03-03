@@ -29,6 +29,8 @@ int open(char *name, int flags, mode_t mode)
 int if1_filestatus;
 struct M_CHAN *if1_file;
 
+
+
 // Exit if 'microdrive not present'
 if (if1_mdv_status(if1_driveno(name)) == 2) return (-1);
 
@@ -41,6 +43,7 @@ if1_filestatus = if1_load_record(if1_driveno(name), if1_filename(name), 0, if1_f
 
 // RESET FILE POINTER
 (if1_file)->position=0L;
+
 
 
 // If the file exists and the 'APPEND' flag is set..
@@ -68,7 +71,7 @@ switch ( flags & 0xff ) {
 
 
 
-	// We get here also to 'APPEND' to a non-existing file
+	// We get here also to 'APPEND' to a non-existing file ( flags & 0xff ) 
 	case O_WRONLY:
 	
 		// Exit if 'microdrive not present' or 'write protected'
@@ -93,7 +96,8 @@ switch ( flags & 0xff ) {
 		if1_touch_file(if1_driveno(name), if1_filename(name));
 		if1_filestatus = if1_load_record(if1_driveno(name), if1_filename(name), 0, if1_file);
 
-		if1_file->recflg &= 0xFD;	// Reset EOF bit		
+		if1_file->recflg |= 2;	// Set EOF bit
+		
 		return(if1_file);
 		break;
 	}
