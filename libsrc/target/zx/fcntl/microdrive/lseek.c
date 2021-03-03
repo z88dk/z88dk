@@ -66,8 +66,8 @@ long lseek(int handle, long posn, int whence)
 
 
 	// Overflow ?
-	if ((position < 0L)|| (position > if1_file->position))
-		return (-1);
+	//if ((position < 0L) || (position > if1_file->position))
+	//	return (-1);
 
 	
 	// Are we moving to a different sector ?
