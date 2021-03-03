@@ -21,31 +21,58 @@ long lseek(int handle, long posn, int whence)
 	struct M_CHAN *if1_file;
 	int 	if1_filestatus;
 	long	position;
-	//unsigned char	mychar;
+	
 	
 	if1_file = (void *) handle;
-
-	switch (whence) {
-		case SEEK_SET:
-			if1_load_record(if1_file->drive, if1_file->name, (int)(posn / 512L), if1_file);
-			if1_file->position=posn;
-			// TODO: update the local record pointers for write access
-			break;
+	
+	
+	// Let's begin by moving to the file tail if necessary
+	if (whence == SEEK_END) {
+		if ((posn != 200L) && ((if1_file)->flags & O_WRONLY))
+			if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
 		
-		case SEEK_CUR:
-			position = if1_file->position + posn;
-			lseek(handle, position, SEEK_SET);
-			break;
-
-		case SEEK_END:
-			if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, 0, if1_file);
-			// Move up to end of file
-			while ((if1_file->recflg && 1) == 0)
-				if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, ++if1_file->record, if1_file);
-			// now get the latest position and add the offest
-			if1_file->position = (long) if1_file->record * 512L + (long) if1_file->reclen;
-			//lseek(handle, position, SEEK_SET);
-			break;
+		if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, 0, if1_file);
+		// Move up to end of file
+		while ((if1_file->recflg && 1) == 0)
+			if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, ++if1_file->record, if1_file);			
+		// Now get the latest position and add the offest
+		if1_file->position = (long) if1_file->record * 512L + (long) if1_file->reclen;
+		if1_file->recflg &= 0xFD;	// Reset EOF bit
 	}
-	return (if1_file->position);
+
+	
+	// Force a static positioning if requested
+	if (whence == SEEK_SET)
+		position = posn;
+	else {
+		// SEEK_CUR
+		// SEEK_END (finalizing)
+		// Relative positioning, 999999L is a 'flag' used when opening for append
+		position = if1_file->position;
+		if ((posn != 0L) || (posn != 999999L))
+			position += posn;
+	}
+
+
+	// Overflow ?
+	if ((position < 0L)|| (position > if1_file->position))
+		return (-1);
+
+	
+	// Are we moving to a different sector ?
+	if ((position % 512L) != ((if1_file->position ) % 512L)) {
+		// If we're in WRITE or APPEND mode, let's save the current file record
+		if ((if1_file)->flags & O_WRONLY) {
+			// Set the EOF bit if we are moving away from the last record
+			if (position < if1_file->position)
+				if1_file->recflg |= 2;
+			if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
+		}
+		// Now let's pick the new file record, (needed both for READing/WRITing)
+		if1_load_record(if1_file->drive, if1_file->name, (int)(posn / 512L), if1_file);
+			// Here we could fine-tune the internal record pointers
+			// ATM we're using the if1_file->position everywhere, so this is not mandatory
+	}
+
+	return (if1_file->position = position);
 }
