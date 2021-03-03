@@ -41,14 +41,14 @@ long lseek(int handle, long posn, int whence)
 			sector = if1_file->sector;
 			if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, ++if1_file->record, if1_file);
 			// Fix a possibly missing EOF
+			// please note that if1_load_record() can take a while before failing
 			if (if1_filestatus == -1) {
 				if1_filestatus = if1_load_sector(if1_file->drive, sector, if1_file);
 				if1_file->recflg |= 2;
 			}
 		}
-		// Now get the latest position and add the offest
+		// Now get the current position in LONG format for our C driver
 		if1_file->position = (long) if1_file->record * 512L + (long) if1_file->reclen;
-		if1_file->recflg &= 0xFD;	// Reset EOF bit
 	}
 
 	
@@ -72,15 +72,13 @@ long lseek(int handle, long posn, int whence)
 	
 	// Are we moving to a different sector ?
 	if ((position % 512L) != ((if1_file->position ) % 512L)) {
+
 		// If we're in WRITE or APPEND mode, let's save the current file record
-		if (flags == O_WRONLY) {
-			// Set the EOF bit if we are moving away from the last record
-			if (position < if1_file->position)
-				if1_file->recflg |= 2;
+		if (flags == O_WRONLY)
 			if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
-		}
+
 		// Now let's pick the new file record, (needed both for READing/WRITing)
-		if1_load_record(if1_file->drive, if1_file->name, (int)(posn / 512L), if1_file);
+		if1_load_record(if1_file->drive, if1_file->name, (int)(position / 512L), if1_file);
 			// Here we could fine-tune the internal record pointers
 			// ATM we're using the if1_file->position everywhere, so this is not mandatory
 	}
