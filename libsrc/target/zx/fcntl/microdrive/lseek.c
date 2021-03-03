@@ -42,7 +42,6 @@ long lseek(int handle, long posn, int whence)
 			if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, ++if1_file->record, if1_file);
 			// Fix a possibly missing EOF
 			if (if1_filestatus == -1) {
-				fputc_cons ('.');
 				if1_filestatus = if1_load_sector(if1_file->drive, sector, if1_file);
 				if1_file->recflg |= 2;
 			}
