@@ -45,8 +45,9 @@ if1_filestatus = if1_load_record(if1_driveno(name), if1_filename(name), 0, if1_f
 
 // If the file exists and the 'APPEND' flag is set..
 if ((flags & O_APPEND) && (if1_filestatus != -1)){
-	lseek((int)(if1_file), 0, SEEK_END);
-	if1_file->recflg &= 0xFD;	// Reset EOF bit
+	// We pass a special offset value to lseek()
+	// on the "open for append" event
+	lseek((int)(if1_file), 999999L, SEEK_END);
 	return(if1_file);
 }
 
