@@ -22,7 +22,7 @@ int writebyte(int fd, int byte)
 {
 	struct M_CHAN *if1_file;
 	int 	if1_filestatus;
-	//unsigned char	mychar;
+
 	
 	if1_file = (void *) fd;
 
@@ -55,6 +55,7 @@ int writebyte(int fd, int byte)
 		   Let's spot a free one and assign the fresh value to the current buffer.
 		*/
 		if1_file->record = if1_find_sector(if1_file->drive);
+		//if1_find_sector_map(if1_file->map)
 		if1_file->sector = if1_file->record;
 	}
 
