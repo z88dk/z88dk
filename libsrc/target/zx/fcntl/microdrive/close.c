@@ -19,15 +19,14 @@ int close(int fd)
 {
 
 struct M_CHAN *if1_file;
-int flags;
 
 	if1_file = (void *) fd;
-	flags = (if1_file)->flags & 0xff;
 
-	if ((flags == O_APPEND) || (flags == O_WRONLY))
+	if (((if1_file)->flags & 0xff) == O_WRONLY)
 	{
-		if1_file->recflg |= 2;	// Set EOF bit on last record
 		// This will overwrite/finalize the current sector.
+		lseek(fd, 0L, SEEK_END);
+		if1_file->recflg |= 2;	// Set EOF bit on last record
 		if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
 	}
 
