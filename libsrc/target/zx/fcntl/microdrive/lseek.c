@@ -18,23 +18,35 @@
 
 long lseek(int handle, long posn, int whence)
 {
-	struct M_CHAN *if1_file;
+	
+	struct	M_CHAN *if1_file;
 	int 	if1_filestatus;
 	long	position;
+	int		flags;
+	int		sector;
 	
 	
 	if1_file = (void *) handle;
+	flags = (if1_file)->flags & 0xff;
 	
 	
 	// Let's begin by moving to the file tail if necessary
 	if (whence == SEEK_END) {
-		if ((posn != 200L) && ((if1_file)->flags & O_WRONLY))
+		if ((posn != 999999L) && (flags == O_WRONLY))
 			if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
 		
 		if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, 0, if1_file);
 		// Move up to end of file
-		while ((if1_file->recflg && 1) == 0)
-			if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, ++if1_file->record, if1_file);			
+		while ((if1_file->recflg & 2) == 0) {
+			sector = if1_file->sector;
+			if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, ++if1_file->record, if1_file);
+			// Fix a possibly missing EOF
+			if (if1_filestatus == -1) {
+				fputc_cons ('.');
+				if1_filestatus = if1_load_sector(if1_file->drive, sector, if1_file);
+				if1_file->recflg |= 2;
+			}
+		}
 		// Now get the latest position and add the offest
 		if1_file->position = (long) if1_file->record * 512L + (long) if1_file->reclen;
 		if1_file->recflg &= 0xFD;	// Reset EOF bit
@@ -62,7 +74,7 @@ long lseek(int handle, long posn, int whence)
 	// Are we moving to a different sector ?
 	if ((position % 512L) != ((if1_file->position ) % 512L)) {
 		// If we're in WRITE or APPEND mode, let's save the current file record
-		if ((if1_file)->flags & O_WRONLY) {
+		if (flags == O_WRONLY) {
 			// Set the EOF bit if we are moving away from the last record
 			if (position < if1_file->position)
 				if1_file->recflg |= 2;
