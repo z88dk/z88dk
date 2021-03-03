@@ -28,8 +28,6 @@
 
 
 if1_checkblock:
-		xor     a
-		ld      (if1_sect_ready),a       ; flag for "sector read"
 
 		push	ix
 		pop	hl
