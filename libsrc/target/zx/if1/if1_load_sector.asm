@@ -77,21 +77,21 @@ _if1_load_sector:
                 ld      (ix+0Dh),a      ; CHREC
                 res     0,(ix+18h)      ; set CHFLAG to "read" mode
  
-                ;xor     a
-                ;ld      (if1_sect_read),a       ; flag for "sector read"
+                xor     a
+                ld      (if1_sect_ready),a       ; flag for "sector read"
 
-                ld      hl,04FBh
+                ;ld      hl,255*5		; set sector counter
+				ld      hl,256*4		; set sector counter (retries slightly reduced)
                 ld      (5CC9h),hl      ; SECTOR
 
 
-
-; *** scelta routine ***
 
                 ld      a,(driveno)     ; drive number selected
                 call    MOTOR           ; select drive motor
 IF !OLDIF1MOTOR
                 jr      nz,error_exit
 ENDIF
+
 
 
 nxtsector:
@@ -168,6 +168,7 @@ next_sector:
                 ld      a,l
                 or      h
                 ret
+
 
 		SECTION bss_clib
 ;; various flags
