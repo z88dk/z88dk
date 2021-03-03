@@ -88,7 +88,20 @@ struct N_CHAN {
 	char    data[255];	/* 255 byte data buffer */
 };
 
+
+/* NON-PRINT files header struct
+   on microdrive data block      */
+struct zxmdvhdr {
+   unsigned char   type;        /* 0=BASIC, 3=CODE block, etc... */
+   size_t          length;
+   size_t          address;
+   size_t          pgm_length;
+   size_t          autorun;     /* BASIC program line for autorun */
+   char            data[503]
+};
+
 #endif /*__ZX_CHANNELS__*/
+
 
 // Extract the drive number from a file path (e.g. "a:filename")
 extern int __LIB__ if1_driveno (char *filename) __z88dk_fastcall;
