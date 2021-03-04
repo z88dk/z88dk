@@ -16,7 +16,7 @@
  *      O_TRUNC = 512
  *
  * -----
- * $Id: open.c,v 1.2 2016-06-13 19:55:47 dom Exp $
+ * $Id: open.c $
  */
 
 #include <cpm.h>
@@ -38,7 +38,7 @@ int open(char *name, int flags, mode_t mode)
             fc->name[5] |= 0x80;    /* read only mode */
         uid = getuid();
         setuid(fc->uid);
-        if ( (flags & O_TRUNC) == O_TRUNC)
+        if (flags & O_TRUNC)
             remove(name);
 		
         if ( bdos(CPM_OPN,fc) == -1 ) {
