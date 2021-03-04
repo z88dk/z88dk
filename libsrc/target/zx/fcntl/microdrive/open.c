@@ -10,6 +10,7 @@
  *
  *	O_RDONLY = 0
  *	O_WRONLY = 1    Starts afresh?!?!?
+ *	O_RDWR   = 2
  *	O_APPEND = 256
  *
  *	$Id: open.c $
@@ -28,7 +29,6 @@ int open(char *name, int flags, mode_t mode)
 {
 int if1_filestatus;
 struct M_CHAN *if1_file;
-
 
 
 // Exit if 'microdrive not present'
@@ -55,52 +55,52 @@ if ((flags & O_APPEND) && (if1_filestatus != -1)){
 }
 
 
+
 switch ( flags & 0xff ) {
 
 	case O_RDONLY:
-
 		if (if1_filestatus == -1)
 		{
 			// FILE NOT FOUND
 			free(if1_file);
 			return(-1);
 		}
-
 		return(if1_file);
 		break;
-
 
 
 	// We get here also to 'APPEND' to a non-existing file ( flags & 0xff ) 
 	case O_WRONLY:
+	case O_RDWR:
 	
-		// Exit if 'microdrive not present' or 'write protected'
-		if (if1_mdv_status(if1_driveno(name)))
+		// Exit if 'microdrive not present' or 'write protected' or 'Microdrive full'
+		if (if1_mdv_status(if1_driveno(name)) || (if1_free_sectors(if1_driveno(name))<1))
 		{
 			free(if1_file);
 			return(-1);
 		}
 
-		// Microdrive full ?
-		if (if1_free_sectors(if1_driveno(name))<1) {
-			free(if1_file);
-			return(-1);
-		}
-
+		// If we got the file already..
 		if (if1_filestatus != -1)
 		{
-			// FILE ALREADY EXISTING
-			if1_remove_file(if1_driveno(name), if1_filename(name));
-		}		
-			
+			if (flags & O_RDWR)
+				return(if1_file);
+
+			if (flags & O_WRONLY)
+				// FILE ALREADY EXISTING
+				if1_remove_file(if1_driveno(name), if1_filename(name));
+		}
+
+		// let's create a new file
 		if1_touch_file(if1_driveno(name), if1_filename(name));
 		if1_filestatus = if1_load_record(if1_driveno(name), if1_filename(name), 0, if1_file);
-
 		if1_file->recflg |= 2;	// Set EOF bit
-		
+
 		return(if1_file);
 		break;
+		
 	}
+
 	
 	free (if1_file);
 	return(-1);
