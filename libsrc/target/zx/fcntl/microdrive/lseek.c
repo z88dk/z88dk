@@ -30,8 +30,7 @@ long lseek(int handle, long posn, int whence)
 	
 	// Let's begin by moving to the file tail if necessary
 	if (whence == SEEK_END) {
-		// ((if1_file)->flags & 0xff) -> file open in write mode
-		if ((posn != 999999L) && ((if1_file)->flags & 0xff))
+		if ((if1_file)->flags & 0xff);  //  -> file open in write mode
 			if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
 		
 		if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, 0, if1_file);
@@ -57,9 +56,8 @@ long lseek(int handle, long posn, int whence)
 	else {
 		// SEEK_CUR
 		// SEEK_END (finalizing)
-		// Relative positioning, 999999L is a 'flag' used when opening for append
 		position = if1_file->position;
-		if ((posn != 0L) || (posn != 999999L))
+		if (posn != 0L)
 			position += posn;
 	}
 
