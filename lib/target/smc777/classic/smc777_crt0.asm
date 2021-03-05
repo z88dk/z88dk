@@ -5,6 +5,9 @@
 	module smc777_crt0
 
 
+        defc    crt0 = 1
+        INCLUDE "zcc_opt.def"
+
         EXTERN    _main           ;main() is always external to crt0 code
         EXTERN    asm_im1_handler
 
