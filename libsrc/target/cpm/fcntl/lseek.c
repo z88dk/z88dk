@@ -16,7 +16,7 @@ long lseek(int fd,long posn, int whence)
 {
 	struct	fcb *fc;
 	long	pos;
-	char buffer[1];
+	char	buffer;
 
 	if(fd >= MAXFILE)
 		return -1L;
@@ -31,17 +31,16 @@ long lseek(int fd,long posn, int whence)
 		pos = fc->rwptr + posn;
 		break;
 	case 2:
-		if (fc->mode & _IOTEXT) {
-			while (read(fd,buffer,1) != EOF) {
-					if (buffer[0]==__STDIO_EOFMARKER) break;
-			}
+		bdos(CPM_CFS,fc);
+		pos = (unsigned long) (fc->ranrec[0] + 256 * fc->ranrec[1]) * 128L;
+		if (fc->ranrec[2]&1)
+			pos += 8388608L;
+		if ((fc->mode & _IOTEXT) && (pos > 0)) {
+			while ((read(fd,&buffer,1) != -1) && (buffer != __STDIO_EOFMARKER)) {}
 			pos = fc->rwptr-1;
-		} else {
-			bdos(CPM_CFS,fc);
-			pos = (unsigned long) (fc->ranrec[0] + 256 * fc->ranrec[1]) * 128L;
-			if (fc->ranrec[2]&1)
-				pos += 8388608L;
 		}
+		pos = pos + posn;
+		break;
 	}
 
 	if (pos < 0L)
