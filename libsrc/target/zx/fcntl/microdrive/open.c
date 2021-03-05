@@ -30,9 +30,14 @@ int if1_filestatus;
 struct M_CHAN *if1_file;
 
 
+// Exit if 'microdrive not present'
+if (if1_mdv_status(if1_driveno(name)) == 2) return (-1);
+
+
 if1_file = malloc(sizeof(struct M_CHAN));
 if (if1_file == 0) return (-1);
 if1_filestatus = if1_load_record(if1_driveno(name), if1_filename(name), 0, if1_file);
+
 
 (if1_file)->flags=flags;
 (if1_file)->mode=mode;
@@ -43,7 +48,7 @@ if1_filestatus = if1_load_record(if1_driveno(name), if1_filename(name), 0, if1_f
 
 // If the file exists and the 'APPEND' flag is set..
 if ((flags & O_APPEND) && (if1_filestatus != -1)){
-	lseek((int)(if1_file), 0, SEEK_END);
+	lseek((int)(if1_file), 0L, SEEK_END);
 	if1_file->recflg &= 0xFD;	// Reset EOF bit
 	return(if1_file);
 }
@@ -63,6 +68,13 @@ switch ( flags & 0xff ) {
 
 	// We get here also to 'APPEND' to a non-existing file
 	case O_WRONLY:
+
+		// Exit if 'microdrive not present' or 'write protected' or 'Microdrive full'
+		if (if1_mdv_status(if1_driveno(name)) || (if1_free_sectors(if1_driveno(name))<1)) {
+			free(if1_file);
+			return(-1);
+		}
+
 		if (if1_filestatus != -1)
 		{
 			// FILE ALREADY EXISTING
