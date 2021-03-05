@@ -22,11 +22,11 @@ struct M_CHAN *if1_file;
 
 	if1_file = (void *) fd;
 
-	if (((if1_file)->flags & 0xff) == O_WRONLY)
+	if ((if1_file)->flags & 0xff)	// Are we WRITING ?
 	{
-		// This will overwrite/finalize the current sector.
-		lseek(fd, 0L, SEEK_END);
+		// TODO: avoiding leaving EOF halfway in the file
 		if1_file->recflg |= 2;	// Set EOF bit on last record
+		// This will overwrite/finalize the current sector.
 		if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
 	}
 
