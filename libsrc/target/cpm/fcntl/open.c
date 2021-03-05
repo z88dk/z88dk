@@ -61,10 +61,13 @@ int open(char *name, int flags, mode_t mode)
 	
 	/* we keep an extra byte in the FCB struct to support random access,
 	   but at the moment we use only a "TEXT/BINARY" discrimination flag */
+
 	fc->mode = mode & _IOTEXT;
 
     fd =  (fc - &_fcb[0]);
-    if (flags & O_APPEND)
+    if (flags & O_APPEND) {
+		fc->use=U_RDWR;
         lseek(fd,0L,SEEK_END);
+	}
     return fd;
 }
