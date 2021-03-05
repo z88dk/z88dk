@@ -22,22 +22,21 @@ long lseek(int handle, long posn, int whence)
 	struct	M_CHAN *if1_file;
 	int 	if1_filestatus;
 	long	position;
-	int		flags;
 	int		sector;
 	
 	
 	if1_file = (void *) handle;
-	flags = (if1_file)->flags & 0xff;
 	
 	
 	// Let's begin by moving to the file tail if necessary
 	if (whence == SEEK_END) {
-		if ((posn != 999999L) && (flags == O_WRONLY))
+		// ((if1_file)->flags & 0xff) -> file open in write mode
+		if ((posn != 999999L) && ((if1_file)->flags & 0xff))
 			if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
 		
 		if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, 0, if1_file);
 		// Move up to end of file
-		while ((if1_file->recflg & 2) == 0) {
+		while (!(if1_file->recflg & 2)) {
 			sector = if1_file->sector;
 			if1_filestatus = if1_load_record(if1_file->drive, if1_file->name, ++if1_file->record, if1_file);
 			// Fix a possibly missing EOF
@@ -66,18 +65,18 @@ long lseek(int handle, long posn, int whence)
 
 
 	// Overflow ?
-	//if ((position < 0L) || (position > if1_file->position))
-	//	return (-1);
+	if (position < 0L)
+		return (-1);
 
 	
 	// Are we moving to a different sector ?
-	if ((position / 512L) != ((if1_file->position ) / 512L)) {
+	if (if1_recnum(position) != if1_recnum(if1_file->position)) {
 		// If we're in WRITE or APPEND mode, let's save the current file record
-		if (flags == O_WRONLY)
+		if ((if1_file)->flags & 0xff)
 			if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
 
 		// Now let's pick the new file record, (needed both for READing/WRITing)
-		if1_load_record(if1_file->drive, if1_file->name, (int)(position / 512L), if1_file);
+		if1_load_record(if1_file->drive, if1_file->name, if1_recnum(position), if1_file);
 			// Here we could fine-tune the internal record pointers
 			// ATM we're using the if1_file->position everywhere, so this is not mandatory
 	}
