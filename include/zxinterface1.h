@@ -40,12 +40,14 @@ struct M_CHAN {
 	u8_t	drive;		/* 19 - drive number (0-7)*/
 	u16_t	map;		/* 1A - Address of MAP for this microdrive.*/
 	char    hdpreamble[12];	/* 1C - 12 bytes of header preamble */
+	// FETCH_H gets 14 bytes (+checksum) starting from here
 	u8_t	hdflag;		/* 28 - bit 0 used */
 	u8_t	sector;		/* 29 - sector number */
 	u16_t	unused;		/* 2A - */
 	char    hdname[10];	/* 2C - cartridge name */
 	u8_t	hdchk;		/* 36 - Header checksum */
 	char    dpreamble[12];	/* 37 - 12 bytes of data block preamble */
+	// RD_BUFF gets the data block
 	u8_t	recflg;		/* 43 - bit 1 set for EOF, bit 2 set for PRINT file type */
 	u8_t	recnum;		/* 44 - Record number in the range 0-255 */
 	u16_t	reclen;		/* 45 - Number of databytes in record 0-512 */
@@ -59,11 +61,6 @@ struct M_CHAN {
 	long	position;	/** NEW** - current position in file */
 	int	flags;
 	mode_t	mode;
-};
-
-
-struct M_SECT {
-	char    foo[3072];
 };
 
 
