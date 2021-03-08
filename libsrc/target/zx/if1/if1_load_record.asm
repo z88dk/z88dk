@@ -19,13 +19,14 @@
 		PUBLIC    if1_load_record
 		PUBLIC    _if1_load_record
 
-		EXTERN     if1_rommap
+		EXTERN    if1_rommap
 		EXTERN    mdvbuffer
 
-		EXTERN     if1_checkblock
+		EXTERN    if1_checkblock
 		EXTERN    if1_sect_ready
+		EXTERN    mdv_seek_count
 
-		EXTERN     if1_setname
+		EXTERN    if1_setname
 
 		EXTERN    MAKE_M
 		EXTERN    CLOSE_M
@@ -119,7 +120,7 @@ copyname:
                 ld      (if1_sect_ready),a       ; flag for "sector read"
 
                 ;ld      hl,255*5		; set sector counter
-				ld      hl,256*4		; set sector counter (retries slightly reduced)
+				ld      hl,(mdv_seek_count)		; set sector counter (retries slightly reduced)
                 ld      (5CC9h),hl      ; SECTOR
 
 
