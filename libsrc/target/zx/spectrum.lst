@@ -68,6 +68,7 @@ target/zx/if1/if1_load_record
 target/zx/if1/if1_load_sector
 target/zx/if1/if1_mdv_full
 target/zx/if1/if1_mdv_status
+target/zx/if1/if1_next_file
 target/zx/if1/if1_recnum
 target/zx/if1/if1_remove_file
 target/zx/if1/if1_rommap
