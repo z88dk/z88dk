@@ -5,7 +5,6 @@
 	SECTION	BOOTSTRAP
 	EXTERN	__DATA_END_tail
 
-	; The code is loaded to $c000 by default, we copy up
 	org	$f000
 	
 	di
@@ -14,7 +13,33 @@
 	ld	bc,512
 	ldir
 	jp	entry
+
+console_defn:
+	defb	"0,25,0,1",0
+
 entry:
+	xor	a
+	ld	($e6a7),a	;Disable cursor
+	call	$428b		;Stop cursor blink
+	ld	hl,console_defn	; 
+	call	$7071		; Console entry
+	call	$5f0e		; Text screen area
+	ld	a,%00000001	; Colour, 80 column text mode
+	out	($30),a
+;        --x- ---- graphics hires
+;        ---x ---- graphic color yes (1) / no (0)
+;        ---- x--- graphic display yes (1) / no (0)
+;        ---- -x-- Basic N (1) / N88 (0)
+;        ---- --x- RAM select yes (1) / no (0)
+;        ---- ---x VRAM 200 lines (1) / 400 lines (0) in 1bpp mode
+	ld	a,%00111011	; Hires, 25 row, color graphics mode, graphics on, N88 basic, 64k mode, 200 line resolution
+	out	($31),a
+
+      xor                     a                                               ;
+        out                     ($E6),a
+        out                     ($E4),a
+
+
 	ld	hl,CRT_ORG_CODE
 	ld	b, +((__DATA_END_tail - CRT_ORG_CODE) / 256) + 1
 	ld	c,0
