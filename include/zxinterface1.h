@@ -95,12 +95,13 @@ struct zxmdvhdr {
    unsigned char   type;        /* 0=BASIC, 3=CODE block, etc... */
    size_t          length;
    size_t          address;
-   size_t          pgm_length;
+   size_t          offset;
    size_t          autorun;     /* BASIC program line for autorun */
    char            data[503]
 };
 
 #endif /*__ZX_CHANNELS__*/
+
 
 
 // Extract the drive number from a file path (e.g. "a:filename")
@@ -116,11 +117,20 @@ extern int __LIB__ if1_load_record (int drive, char *filename, int record, struc
 // Load a sector identified by the sector number
 extern int __LIB__ if1_load_sector (int drive, int sector, struct M_CHAN *buffer) __smallc;
 
+// Microdrive tape seek timeout (originally 255*5 sectors, set to 256*4 in z88dk)
+extern int mdv_seek_count;
+
 // Write the sector in "buffer"
 extern int __LIB__ if1_write_sector (int drive, int sector, struct M_CHAN *buffer) __smallc;
 
 // Add a record containing the data in the "sector buffer"
 #define if1_write_record(n,b) if1_write_sector(n, if1_find_sector(n), b)
+
+// Get the (int) sector number out from the (long) file pointer
+extern int __LIB__ if1_recnum (long fp) __z88dk_fastcall;
+
+// Get the (int) position within a record out from the (long) file pointer
+extern int __LIB__ if1_bytecount (long fp) __z88dk_fastcall;
 
 // Put a 10 characters file name at the specified location; return with the file name length
 extern int __LIB__ if1_setname(char* name, char *location) __smallc;
