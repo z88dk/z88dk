@@ -112,10 +112,15 @@ extern int if1_default_drv;
 extern int __LIB__ if1_filename (char *filename) __z88dk_fastcall;
 
 // Load a sector identified by file name and record number
+// On exit: current sector number
 extern int __LIB__ if1_load_record (int drive, char *filename, int record, struct M_CHAN *buffer) __smallc;
 
 // Load a sector identified by the sector number
 extern int __LIB__ if1_load_sector (int drive, int sector, struct M_CHAN *buffer) __smallc;
+
+// Load the next sector referring to a first file record
+// On exit: current sector number
+extern int __LIB__ if1_next_file (int drive, struct M_CHAN *buffer) __smallc;
 
 // Microdrive tape seek timeout (originally 255*5 sectors, set to 256*4 in z88dk)
 extern int mdv_seek_count;
