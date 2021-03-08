@@ -202,6 +202,23 @@ static disc_spec mz2500cpm_spec = {
 };
 
 
+static disc_spec ts803_spec = {
+    .name = "TS803",
+    .sectors_per_track = 18,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 128,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
 static disc_spec nascom_spec = {
     .name = "Nascom",
     .sectors_per_track = 10,
@@ -497,6 +514,7 @@ static struct formats {
     { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
     { "svi-40ss",   "SVI 40ss (174k)",      &svi40ss_spec, 0, NULL, 1 },
     { "tiki100-40t","Tiki 100 (200k)",      &tiki100_spec, 0, NULL, 1 },
+    { "ts803",      "Televideo TS803/TPC1", &ts803_spec, 0, NULL, 1 },
     { "vector06c",  "Vector 06c",           &vector06c_spec, 0, NULL, 1 },
     { "z80pack",    "z80pack 8\" format",   &z80pack_spec, 0, NULL, 1 },
     { NULL, NULL }
