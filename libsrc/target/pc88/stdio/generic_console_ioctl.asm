@@ -20,6 +20,8 @@
 
 	defc    CLIB_GENCON_CAPS_MODE2 = CAP_GENCON_FG_COLOUR | CAP_GENCON_BG_COLOUR | CAP_GENCON_INVERSE | CAP_GENCON_CUSTOM_FONT | CAP_GENCON_UDGS | CAP_GENCON_BOLD | CAP_GENCON_UNDERLINE
 
+	EXTERN	__CLIB_PC8800_HAS_BASIC
+
 ; a = ioctl
 ; de = arg
 generic_console_ioctl:
@@ -51,21 +53,40 @@ check_mode:
 	jr	z,set_mode
 	ld	l,CLIB_GENCON_CAPS
 	cp	1
-	ld	bc,$2519
+	ld	bc,$2819
 	jr	nz,failure
 set_mode:
 	ld	(__pc88_mode),a
+	ld	h,a		;Save mode
 	ld	a,b
 	ld	(__console_w),a
 	ld	a,c
 	ld	(__console_h),a
 	ld	a,l
 	ld	(generic_console_caps),a
+	ld	a,__CLIB_PC8800_HAS_BASIC
+	and	a
+	push	af
+	call	z,set_mode_direct
+	pop	af
         ld      ix,$6f6b                ; CRTSET
-        call    pc88bios
+        call    nz,pc88bios
 	call	generic_console_cls
 	and	a
 	ret
 failure:
 	scf
 	ret
+
+; We're only considering the text resolution here
+; h = mode
+set_mode_direct:
+	ld      c,%00000000     ; 40 column text mode
+	dec	h
+	jr	z,out_mode
+	ld	c,%00000001	; 80 column text mode
+out_mode:
+	ld	a,c
+        out     ($30),a
+	ret
+

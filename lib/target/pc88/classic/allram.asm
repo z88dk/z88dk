@@ -6,6 +6,7 @@
 	defc    CRT_ORG_CODE  = 0x0000
         defc    TAR__register_sp = 0xc000
         defc    TAR__clib_exit_stack_size = 32
+	defc    TAR__fputc_cons_generic = 1
 
 	; No interrupts registered
         defc    TAR__crt_enable_rst = $0000
