@@ -65,4 +65,4 @@ driveno_ret:
 		SECTION data_clib
 if1_default_drv:
 _if1_default_drv:
-		defb 1
+		defw 1
