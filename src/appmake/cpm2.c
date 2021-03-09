@@ -495,6 +495,7 @@ static struct formats {
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bw12",      "Bondwell 12/14",        &bondwell12_spec, 0, NULL, 1 },
     { "bw2",       "Bondwell Model 2",      &bondwell2_spec, 0, NULL, 1 },
+    { "cpccom",    "CPC CP/M Sys Format",   &cpcsystem_spec, 0, NULL, 1 },
     { "cpcsystem", "CPC System Disc",       &cpcsystem_spec, 0, NULL, 0 },
     { "col1",      "Coleco ADAM 40T SSDD",  &col1_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
