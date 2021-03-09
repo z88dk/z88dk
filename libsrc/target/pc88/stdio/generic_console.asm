@@ -21,6 +21,9 @@
 		EXTERN		__pc88_paper
 		EXTERN		printc_MODE2
 		EXTERN		scrollup_MODE2
+		EXTERN		__pc88_attr
+		EXTERN		generic_console_flags
+		EXTERN		__console_x
 
 
 		defc		DISPLAY = 0xf3c8
@@ -35,8 +38,93 @@ generic_console_set_paper:
 generic_console_set_ink:
 	and	7
 	ld	(__pc88_ink),a
-generic_console_set_attribute:
+	rrca
+	rrca
+	rrca
+	or	8	;colour specification
+	ld	h,8
+	ld	l,a
+	call	set_attribute
 	ret
+
+generic_console_set_attribute:
+	ld	hl,__pc88_attr
+	ld	(hl),0
+	ld	a,(generic_console_flags)
+	bit	7,a
+	jr	z,not_inverse
+	set	2,(hl)
+not_inverse:
+	bit	3,a	;underline
+	jr	z,not_underline
+	set	5,(hl)
+not_underline:
+	bit	2,a
+	jr	z,no_blink
+	set	1,(hl)
+no_blink:
+	bit	4,a
+	jr	z,not_bold
+	set	4,(hl)
+	set	5,(hl)
+not_bold:
+	ld	l,(hl)
+	ld	h,0
+	call	set_attribute
+	ret
+
+; Enter l = attribute to set
+; h = 0: decoration, h = 8: colour
+set_attribute:
+	ld	bc,(__console_x)
+set_attribute_at_position:
+	in	a,($32)
+	push	af
+	res	4,a
+	out	($32),a
+	push	ix
+	call	search_and_place_attribute
+	pop	ix
+	pop	af
+	out	($32),a
+	ret
+
+search_and_place_attribute:
+	push	bc
+	call	xypos_attr_row	;ix = address
+	pop	de		;e = x position
+	ld	b,20		;number of decorators
+loop:
+	ld	a,(ix+0)
+	cp	e
+	jr	nz,check_empty
+	; It's a coordinate at the same x position, lets check the type
+	;We should increment the column regardless since we can't have
+	;more than 1 attribute set at the same x coord
+	inc	e
+	ld	a,(ix+1)
+	and	@00001000
+	cp	h
+	jr	nz,check_empty
+	; It's an attribute at the right column and of the right type
+	; lets overwrite it with our new value
+	ld	(ix+1),l
+	ret
+check_empty:
+	bit	7,(ix+0)
+	jr	nz,got_free_slot
+	inc	ix
+	inc	ix
+	djnz	loop
+	ret
+got_free_slot:
+	ld	(ix+0),e	;X coordinate
+	ld	(ix+1),l
+	ret
+
+
+
+
 
 	
 
@@ -60,7 +148,6 @@ clear_text:
 	push	af
 	res	4,a
 	out	($32),a
-
 	; Clearing for text
 	ld	hl, DISPLAY
 	ld	c,25
@@ -70,18 +157,47 @@ cls_2:
 	ld	(hl),' '
 	inc	hl
 	djnz	cls_2
-	ld	b,20
-cls_3:
-	ld	(hl),0
-	inc	hl
-	ld	(hl),0
-	inc	hl
-	djnz	cls_3
+	call	clear_row_attribute
 	dec	c
 	jr	nz,cls_1
 	pop	af
 	out	($32),a
 	ret
+
+
+clear_row_attribute:
+	ld	b,20		;20 attributes
+	ld	d,0
+	ld	a,(__pc88_ink)
+	cp	7
+	jr	z,no_set_colour
+	ld	(hl),d	;Column
+	inc	d
+	inc	hl
+	rrca
+	rrca
+	rrca
+	or	8
+	ld	(hl),a
+	inc	hl
+	dec	b
+no_set_colour:
+	ld	a,(__pc88_attr)
+	and	a
+	jr	z,no_set_decoration
+	ld	(hl),d
+	inc	hl
+	ld	(hl),a
+	inc	hl
+	dec	b
+no_set_decoration:
+	ld	(hl),0x80
+	inc	hl
+	ld	(hl),0xe8
+	inc	hl
+	djnz	no_set_decoration
+	ret
+
 
 clear_plane:
 	ld	hl,$c000
@@ -104,13 +220,12 @@ generic_console_printc:
 	call	generic_console_scale
 	call	xypos
 not_40_col:
-	pop	de
+	pop	de	;d = character to write
 	in	a,($32)
 	ld	e,a
 	res	4,a
 	out	($32),a
 	ld	(hl),d
-	; TODO: Attribute
 	ld	a,e
 	out	($32),a
 	ret
@@ -154,6 +269,16 @@ no_scale:
         pop     af
         ret
 
+; b = y
+; c = x (scaled to 80 columns)
+xypos_attr_row:
+	ld	ix,DISPLAY-40
+	ld	de,120
+	inc	b
+xypos_attr_1:
+	add	ix,de
+	djnz	xypos_attr_1
+	ret
 
 
 xypos:
@@ -189,11 +314,8 @@ generic_console_scrollup_3:
 	ld	(hl),32
 	inc	hl
 	djnz	generic_console_scrollup_3
-	ld	b,40
-scroll_2:
-	ld	(hl),0
 	inc	hl
-	djnz	scroll_2
+	call	clear_row_attribute
 	pop	af
 	out	($32),a
 	pop	bc

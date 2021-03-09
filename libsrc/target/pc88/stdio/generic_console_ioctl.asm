@@ -81,10 +81,10 @@ failure:
 ; We're only considering the text resolution here
 ; h = mode
 set_mode_direct:
-	ld      c,%00000000     ; 40 column text mode
+	ld      c,%00000000     ; 40 column text mode + colour
 	dec	h
 	jr	z,out_mode
-	ld	c,%00000001	; 80 column text mode
+	ld	c,%00000001	; 80 column text mode + colour
 out_mode:
 	ld	a,c
         out     ($30),a

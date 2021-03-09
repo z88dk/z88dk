@@ -20,6 +20,7 @@ target/pc88/stdio/printc_MODE2
 target/pc88/stdio/conio_vars
 target/pc88/stdio/CRT_FONT
 @stdio/stdio_binary.lst
+@stdio/ansicore.lst
 @font/font_8x8/font_8x8.lst
 target/pc88/games/bit_open
 target/pc88/games/bit_open_di

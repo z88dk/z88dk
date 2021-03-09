@@ -35,9 +35,9 @@ entry:
 	ld	a,%00111011	; Hires, 25 row, color graphics mode, graphics on, N88 basic, 64k mode, 200 line resolution
 	out	($31),a
 
-      xor                     a                                               ;
-        out                     ($E6),a
-        out                     ($E4),a
+	xor	a	;Disable interrupts
+        out	($E6),a
+        out	($E4),a
 
 
 	ld	hl,CRT_ORG_CODE
