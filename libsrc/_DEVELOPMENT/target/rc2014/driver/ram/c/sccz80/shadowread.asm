@@ -46,7 +46,7 @@ ENDIF
    ld a,b
    or c
 
-   ld a,$01     ; set up read from shadow ram
+   scf          ; set up read from shadow ram
 
 IF __CLASSIC && __CPU_GBZ80__
    call NZ,asm_shadowcopy

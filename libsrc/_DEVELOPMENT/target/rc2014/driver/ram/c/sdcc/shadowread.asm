@@ -27,7 +27,7 @@ EXTERN asm_shadowcopy
    ld a,b
    or c
 
-   ld a,$01     ; set up read from shadow ram
+   scf          ; set up read from shadow ram
 
    call NZ,asm_shadowcopy
    jp asm_pop_ei_jp
