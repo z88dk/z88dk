@@ -15,6 +15,8 @@ static char             *c_output_file      = NULL;
 static char             *c_boot_filename     = NULL;
 static char             *c_disc_container    = "dsk";
 static char             *c_extension         = NULL;
+
+static char              c_force_com_extension   = 0;
 static char              c_disable_com_file_creation = 0;
 static char              help         = 0;
 
@@ -29,6 +31,7 @@ option_t cpm2_options[] = {
     { 's', "bootfile", "Name of the boot file",      OPT_STR,   &c_boot_filename },
     {  0,  "container", "Type of container (raw,dsk)", OPT_STR, &c_disc_container },
     {  0,  "extension", "Extension for the output file", OPT_STR, &c_extension},
+    {  0,  "force-com-ext", "Always force COM extension", OPT_BOOL, &c_force_com_extension},
     {  0,  "no-com-file", "Don't create a separate .com file", OPT_BOOL, &c_disable_com_file_creation },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
@@ -609,7 +612,7 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     } else {
         strcpy(disc_name, output_file);
     }
-    cpm_create_filename(binary_name, cpm_filename, f->force_com_extension, 0);
+    cpm_create_filename(binary_name, cpm_filename, (f->force_com_extension || c_force_com_extension), 0);
 
     // Open the binary file
     if ((binary_fp = fopen_bin(binary_name, crt_filename)) == NULL) {
