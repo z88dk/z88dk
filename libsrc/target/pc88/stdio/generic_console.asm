@@ -77,6 +77,7 @@ not_bold:
 ; h = 0: decoration, h = 8: colour
 set_attribute:
 	ld	bc,(__console_x)
+	call	generic_console_scale
 set_attribute_at_position:
 	in	a,($32)
 	push	af
@@ -332,4 +333,5 @@ generic_console_scrollup_3:
 	ld	a,($E6C0)
 	set	1,a
 	ld	($E6C0),a
+	ld	a,%00000001	;80 column, colour mode
 	out	($30),a
