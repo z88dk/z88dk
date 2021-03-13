@@ -40,6 +40,7 @@ start:
 	call	$4021	; Hide function key strings
 	call    _main
 
+cleanup:
         call    crt0_exit
 
 start1:

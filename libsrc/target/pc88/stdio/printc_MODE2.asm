@@ -14,6 +14,7 @@
 
 	defc	ALU = 1
 
+	INCLUDE "target/pc88/def/pc88.def"
 
 printc_MODE2:
         ld      a,d
@@ -148,11 +149,11 @@ ENDIF
 	pop	bc
 	djnz	loop
 IF ALU
-	xor	a		;Turn off extended gbram
-	out	($35),a
 	in	a,($32)		;Enable ALU
 	res	6,a
 	out	($32),a
+	xor	a		;Turn off extended gbram
+	out	($35),a
 ENDIF
 	call	l_pop_ei
 	ret
@@ -172,6 +173,32 @@ generic_console_xypos_graphics_1:
 
 scrollup_MODE2:
 	call	l_push_di
+IF ALU
+	ld	a,@10010000		;Turn on expanded gvram
+	out	(EXPANDED_GVRAM_CTRL),a
+	in	a,(ALU_MODE_CTRL)	;Enable ALU
+	set	6,a
+	out	(ALU_MODE_CTRL),a
+	; Move up
+	ld	hl,$c000 + 80 * 8
+	ld	de,$c000
+	ld	bc,80*192
+	ldir
+	; And now blank the bottom line with the current paper
+	ex	de,hl	;hl
+	ld	d,h
+	ld	e,l
+	inc	de
+	ld	a,(__pc88_paper)
+	ld	(hl),a
+	ld	bc,+(80*8) -1
+	ldir
+	in	a,(ALU_MODE_CTRL)	;Disable ALU
+	res	6,a
+	out	(ALU_MODE_CTRL),a
+	ld	a,$00			;Turn off expanded gvram
+	out	(EXPANDED_GVRAM_CTRL),a
+ELSE
 	ld	a,(__pc88_paper)
 	ld	d,a
 	out	($5c),a
@@ -181,6 +208,7 @@ scrollup_MODE2:
 	out	($5d),a
 	call	scroll_gfx
 	ld	($5f),a
+ENDIF
 	call	l_pop_ei
 	pop	bc
 	pop	de

@@ -1,36 +1,38 @@
 
 
-		SECTION		code_clib
+	SECTION		code_clib
 
-		PUBLIC		generic_console_cls
-		PUBLIC		generic_console_vpeek
-		PUBLIC		generic_console_plotc
-		PUBLIC		generic_console_printc
-		PUBLIC		generic_console_scrollup
-                PUBLIC          generic_console_set_ink
-                PUBLIC          generic_console_set_paper
-                PUBLIC          generic_console_set_attribute
-		PUBLIC		generic_console_pointxy
-		PUBLIC		__pc88_clear_text
-		PUBLIC		__pc88_clear_hires
+	PUBLIC		generic_console_cls
+	PUBLIC		generic_console_vpeek
+	PUBLIC		generic_console_plotc
+	PUBLIC		generic_console_printc
+	PUBLIC		generic_console_scrollup
+        PUBLIC          generic_console_set_ink
+        PUBLIC          generic_console_set_paper
+        PUBLIC          generic_console_set_attribute
+	PUBLIC		generic_console_pointxy
+	PUBLIC		__pc88_clear_text
+	PUBLIC		__pc88_clear_hires
 
-		EXTERN		CONSOLE_COLUMNS
-		EXTERN		CONSOLE_ROWS
-		EXTERN		asm_toupper
-		EXTERN		l_push_di
-		EXTERN		l_pop_ei
-		EXTERN		__pc88_mode
-		EXTERN		__pc88_ink
-		EXTERN		__pc88_textink
-		EXTERN		__pc88_paper
-		EXTERN		printc_MODE2
-		EXTERN		scrollup_MODE2
-		EXTERN		__pc88_attr
-		EXTERN		generic_console_flags
-		EXTERN		__console_x
+	EXTERN		CONSOLE_COLUMNS
+	EXTERN		CONSOLE_ROWS
+	EXTERN		asm_toupper
+	EXTERN		l_push_di
+	EXTERN		l_pop_ei
+	EXTERN		__pc88_mode
+	EXTERN		__pc88_ink
+	EXTERN		__pc88_textink
+	EXTERN		__pc88_paper
+	EXTERN		printc_MODE2
+	EXTERN		scrollup_MODE2
+	EXTERN		__pc88_attr
+	EXTERN		generic_console_flags
+	EXTERN		__console_x
 
+	INCLUDE	"target/pc88/def/pc88.def"
 
-		defc		DISPLAY = 0xf3c8
+	defc		DISPLAY = 0xf3c8
+	defc		ALU = 1
 
 
 
@@ -296,8 +298,25 @@ generic_console_cls:
 	and	a
 	jr	z,__pc88_clear_text
 __pc88_clear_hires:
-	; Clear the hires planes
 	call	l_push_di
+IF ALU
+        ld      a,$80                   ;Turn on expanded gvram
+        out     (EXPANDED_GVRAM_CTRL),a
+        in      a,(ALU_MODE_CTRL)       ;Enable ALU
+        set     6,a
+        out     (ALU_MODE_CTRL),a
+	ld	a,(__pc88_paper)
+	out	(EXPANDED_ALU_CTRL),a
+	ld	a,255
+	call	clear_plane
+        in      a,(ALU_MODE_CTRL)       ;Disable ALU
+        res     6,a
+        out     (ALU_MODE_CTRL),a
+        ld      a,$00                   ;Turn off expanded gvram
+        out     (EXPANDED_GVRAM_CTRL),a
+ELSE
+	; Clear the hires planes
+	xor	a
 	out	($5e),a		;Switch to green
 	call	clear_plane
 	out	($5d),a		;Switch to red
@@ -305,6 +324,7 @@ __pc88_clear_hires:
 	out	($5c),a		;Switch to blue
 	call	clear_plane
 	out	($5f),a		;Back to main memory
+ENDIF
 	call	l_pop_ei
 	ret
 
@@ -345,7 +365,7 @@ clear_plane:
 	ld	hl,$c000
 	ld	de,$c001
 	ld	bc,15999	;80x200 - 1
-	ld	(hl),0
+	ld	(hl),a
 	ldir
 	ret
 
