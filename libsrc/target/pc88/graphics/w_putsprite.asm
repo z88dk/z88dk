@@ -9,15 +9,16 @@
 ; $Id: w_putsprite.asm $
 ;
 
-	SECTION   smc_clib
+	SECTION   code_driver	; Actually smc_clib
         PUBLIC    putsprite
         PUBLIC    _putsprite
         EXTERN    w_pixeladdress
 
-        EXTERN    swapgfxbk
-        EXTERN    swapgfxbk1
+	EXTERN	l_push_di
+	EXTERN	l_pop_ei
 
         INCLUDE "graphics/grafix.inc"
+	INCLUDE	"target/pc88/def/pc88.def"
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
@@ -54,7 +55,8 @@
         ld      (ortype),a      ; Self modifying code
         ld      (ortype2),a     ; Self modifying code
 
-        call    swapgfxbk
+	call	l_push_di
+	out	(GVRAM_SEL_2),a	;Select green
         ; @@@@@@@@@@@@
         ld      h,b
         ld      l,c
@@ -119,7 +121,7 @@
         pop     de
          pop      bc                ;Restore data
          djnz     _oloop
-         jp       swapgfxbk1
+         jp       leave
 
 
 .putspritew
@@ -166,7 +168,7 @@
 
          pop      bc                ;Restore data
          djnz     woloop
-         jp       swapgfxbk1
+         jp      leave 
         
 
 .wover_1 ld       c,(ix+2)
@@ -187,7 +189,10 @@
 
          pop      bc
          djnz     woloop
-         jp       swapgfxbk1
+leave:
+	out	(MAINRAM_SEL),a	;Select main ram
+	call	l_pop_ei
+	ret
 
 
 	SECTION  bss_graphics
