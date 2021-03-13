@@ -2,6 +2,7 @@
 	SECTION	code_clib
 	PUBLIC	printc_MODE2
 	PUBLIC	scrollup_MODE2
+	PUBLIC	generic_console_xypos_graphics
 
 	EXTERN	__pc88_ink
 	EXTERN	__pc88_paper

@@ -25,6 +25,7 @@
 	EXTERN		__pc88_paper
 	EXTERN		printc_MODE2
 	EXTERN		scrollup_MODE2
+	EXTERN		vpeek_MODE2
 	EXTERN		__pc88_attr
 	EXTERN		generic_console_flags
 	EXTERN		__console_x
@@ -317,22 +318,22 @@ IF ALU
 ELSE
 	; Clear the hires planes
 	xor	a
-	out	($5e),a		;Switch to green
+	out	(GVRAM_SEL_0),a		;Switch to green
 	call	clear_plane
-	out	($5d),a		;Switch to red
+	out	(GVRAM_SEL_1),a		;Switch to red
 	call	clear_plane
-	out	($5c),a		;Switch to blue
+	out	(GVRAM_SEL_2),a		;Switch to blue
 	call	clear_plane
-	out	($5f),a		;Back to main memory
+	out	(MAINRAM_SEL),a		;Back to main memory
 ENDIF
 	call	l_pop_ei
 	ret
 
 __pc88_clear_text:
-	in	a,($32)
+	in	a,(ALU_MODE_CTRL)
 	push	af
 	res	4,a
-	out	($32),a
+	out	(ALU_MODE_CTRL),a
 	; Clearing for text
 	ld	hl, DISPLAY
 	ld	c,25
@@ -346,7 +347,7 @@ cls_2:
 	dec	c
 	jr	nz,cls_1
 	pop	af
-	out	($32),a
+	out	(ALU_MODE_CTRL),a
 	ret
 
 
@@ -373,10 +374,10 @@ clear_plane:
 ; b = y
 ; a = d = character to print
 generic_console_plotc:
-	in	a,($32)
+	in	a,(ALU_MODE_CTRL)
 	push	af
 	res	4,a
-	out	($32),a
+	out	(ALU_MODE_CTRL),a
 	ld	a,d
 	call	generic_console_scale
 	push	bc
@@ -389,7 +390,7 @@ generic_console_plotc:
 	pop	bc
 	call	insert_attribute
 	pop	af
-	out	($32),a
+	out	(ALU_MODE_CTRL),a
 	ret
 
 
@@ -407,20 +408,20 @@ generic_console_printc:
 	call	xypos
 	pop	bc	;coordinates back
 	pop	de	;d = character to write
-	in	a,($32)
+	in	a,(ALU_MODE_CTRL)
 	push	af
 	res	4,a
-	out	($32),a
+	out	(ALU_MODE_CTRL),a
 	ld	(hl),d	;place character
 	ld	de,(__pc88_textink)
 	call	insert_attribute
 	pop	af
-	out	($32),a
+	out	(ALU_MODE_CTRL),a
 	ret
 
 
 generic_console_pointxy:
-	call	generic_console_vpeek
+	call	generic_console_vpeek_text
 	and	a
 	ret
 
@@ -431,17 +432,19 @@ generic_console_pointxy:
 ;        a = character,
 ;        c = failure
 generic_console_vpeek:
+	ld	a,(__pc88_mode)
+	cp	2
+	jp	z,vpeek_MODE2
+generic_console_vpeek_text:
 	call	generic_console_scale
         call    xypos
-	in	a,($32)
+	in	a,(ALU_MODE_CTRL)
 	ld	c,a
 	res	4,a
-	out	($32),a
-
+	out	(ALU_MODE_CTRL),a
 	ld	d,(hl)
-
 	ld	a,c
-	out	($32),a
+	out	(ALU_MODE_CTRL),a
 	ld	a,d
 	and	a
 	ret
@@ -488,10 +491,10 @@ generic_console_scrollup:
 	ld	a,(__pc88_mode)
 	cp	2
 	jp	z,scrollup_MODE2
-	in	a,($32)
+	in	a,(ALU_MODE_CTRL)
 	push	af
 	res	4,a
-	out	($32),a
+	out	(ALU_MODE_CTRL),a
 	ld	hl, DISPLAY + 120
 	ld	de, DISPLAY
 	ld	bc, 120 * 24
@@ -505,7 +508,7 @@ generic_console_scrollup_3:
 	inc	hl
 	call	clear_row_attribute
 	pop	af
-	out	($32),a
+	out	(ALU_MODE_CTRL),a
 	pop	bc
 	pop	de
 	ret
