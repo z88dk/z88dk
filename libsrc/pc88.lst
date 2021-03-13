@@ -11,6 +11,7 @@ target/pc88/pc88_cursoroff
 target/pc88/pc88_cursoron
 target/pc88/pc88_locate
 target/pc88/pc88_crtset
+target/pc88/pc88_wait_vblank
 target/pc88/stdio/fgetc_cons
 target/pc88/stdio/getk
 target/pc88/stdio/fputc_cons

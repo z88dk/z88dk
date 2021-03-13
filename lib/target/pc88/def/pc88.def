@@ -23,6 +23,7 @@
 	defc ALU_MODE_CTRL = 0x32
 	defc EXPANDED_ALU_CTRL = 0x34
 	defc EXPANDED_GVRAM_CTRL = 0x35
+	defc SYS_MODE_SENSE = 0x40
 	defc FM_REG_0 = 0x44
 	defc FM_REG_1 = 0x45
 	defc FM_REG_2 = 0x46

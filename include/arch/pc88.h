@@ -175,6 +175,8 @@ ld ($c002),a   ; operation commands a vram 'copy'.
 */
 __sfr __at 0x35 EXPANDED_GVRAM_CTRL;
 
+__sfr __at 0x40 SYS_MODE_SENSE;
+
 // OPN sound
 __sfr __at 0x44 FM_REG_0;	// <FR/MR - OPN, FH/MH> - OPNA SSG/FM1-3
 __sfr __at 0x45 FM_REG_1;	// <FR/MR - OPN, FH/MH> - OPNA SSG/FM1-3
@@ -276,6 +278,8 @@ __sfr __at 0x71 ROM_EXPANSION_SEL;
 /* W: Increment TEXTWIN_OFS */
 __sfr __at 0x78 TEXTWIN_INC_REG;
 
+
+extern void __LIB__ pc88_wait_vblank();
 
 
 // Misc functions that use the firmware
