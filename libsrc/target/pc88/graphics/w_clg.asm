@@ -14,6 +14,7 @@
 
 .clg
 ._clg
+	ret
 
 	ld a,($E6A7)		; CursorMode
 	res	0,a				; hide cursor

@@ -60,11 +60,10 @@ check_mode:
 set_mode:
 	ld	(__pc88_mode),a
 	ld	h,a		;Save reduced mode (needed for IPL mode setting)
-	ld	a,e		;Specified mode, let's extract bit 4
-	rrca
-	rrca
-	rrca
-	rrca
+	ld	a,e		;Specified mode, let's extract bit 5
+	rlca
+	rlca
+	rlca
 	and	1		;Mode 0 = hires, mode 1 = lores
 	ld	(__pc88_gfxmode),a
 	ld	a,l

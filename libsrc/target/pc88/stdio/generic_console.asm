@@ -4,12 +4,15 @@
 
 		PUBLIC		generic_console_cls
 		PUBLIC		generic_console_vpeek
+		PUBLIC		generic_console_plotc
 		PUBLIC		generic_console_printc
 		PUBLIC		generic_console_scrollup
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_attribute
 		PUBLIC		generic_console_pointxy
+		PUBLIC		__pc88_clear_text
+		PUBLIC		__pc88_clear_hires
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
@@ -18,6 +21,7 @@
 		EXTERN		l_pop_ei
 		EXTERN		__pc88_mode
 		EXTERN		__pc88_ink
+		EXTERN		__pc88_textink
 		EXTERN		__pc88_paper
 		EXTERN		printc_MODE2
 		EXTERN		scrollup_MODE2
@@ -42,9 +46,7 @@ generic_console_set_ink:
 	rrca
 	rrca
 	or	8	;colour specification
-	ld	h,8
-	ld	l,a
-	call	set_attribute
+	ld	(__pc88_textink),a
 	ret
 
 generic_console_set_attribute:
@@ -64,75 +66,236 @@ not_underline:
 	set	1,(hl)
 no_blink:
 	bit	4,a
-	jr	z,not_bold
+	ret	z
 	set	4,(hl)
 	set	5,(hl)
-not_bold:
-	ld	l,(hl)
-	ld	h,0
-	call	set_attribute
 	ret
 
-; Enter l = attribute to set
-; h = 0: decoration, h = 8: colour
-set_attribute:
-	ld	bc,(__console_x)
-	call	generic_console_scale
-set_attribute_at_position:
-	in	a,($32)
-	push	af
-	res	4,a
-	out	($32),a
+
+; Entry:  b = y
+;	  c = x (scale to 80)
+;	  e = colour
+;	  d = decoration
+insert_attribute:
+	push	de	;save attributue
+	push	bc	;save cooards
+	call	xypos_attr_row
+	ld	hl,expand_buf
+	exx
 	push	ix
-	call	search_and_place_attribute
-	pop	ix
-	pop	af
-	out	($32),a
+	call	expand		;So we now have an expanded buffer
+	pop	hl		;screen attributes into hl'
+	exx
+	pop	bc		;coordinates
+	ld	hl,expand_buf
+	ld	b,0
+	add	hl,bc
+	add	hl,bc
+	pop	de		;attribute back
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	ld	a,(__pc88_mode)
+	cp	1
+	jr	nz,no_40col_attr
+	inc	hl
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+no_40col_attr:
+	ld	ix,expand_buf
+	call	compress
 	ret
 
-search_and_place_attribute:
-	push	bc
-	call	xypos_attr_row	;ix = address
-	pop	de		;e = x position
-	ld	b,20		;number of decorators
-loop:
-	ld	a,(ix+0)
+	
+
+
+load_attributes:
+        inc     ix
+        inc     ix      ;Now points to next attribute X coord
+        bit     3,(ix-1)
+        jr      z,is_decoration
+        ld      c,(ix-1)
+        ret
+is_decoration:
+        ld      b,(ix-1)
+        ret
+
+
+; Entry:        ix  = screen
+;               hl' = expanded buffer
+expand:
+        ; In flight we use c' as colour, b' as decoration
+        exx
+        ld      bc,$00e8
+        call    load_attributes
+        exx
+
+        ld      b,0     ;80 columns needed
+        ld      c,19    ;20 attributes available
+
+expand_loop:
+                ; Have we expanded all the attribute columns?
+        ld      a,c
+        and     a
+        jr      z,place_attr
+                ; If it's a placeholder then just copy existing values
+        ld      a,(ix+0)
+        bit     7,a
+        jr      nz,place_attr
+                ; Is the column in the attr map where we expanding to?
+        cp      b
+                ; Nope, just keep padding out
+        jr      nz,place_attr
+                ; We've got to the column where the new attribute starts
+        exx
+        call    load_attributes
+        exx
+        dec     c               ;We've loaded an attribute
+
+place_attr:
+        inc     b               ;We're about to place another column
+        exx
+        ld      (hl),c
+        inc     hl
+        ld      (hl),b
+        inc     hl
+        exx
+        ld      a,b
+        cp      80
+        jr      nz,expand_loop
+        ret
+
+; Recompress the expanded buffer into the compresse attributes
+; If colour + deco exchange rapidly then the attributes will
+; be misplaced
+compress:
+	ld	b,1
+        ld      c,20            ;20 attribute spaces
+        ; ix = expanded buffer
+        ; hl' = screen buffer
+        ; c' = current colour
+        ; b' = current decoration
+        ; e' = current attr column
+        exx
+        ld      de,0             ;current attr column
+		; We need to place an attribute at column 0, so fudge
+		; around and place one of them
+        ld      c,(ix+0)
+        ld      b,(ix+1)
+	ld	a,b
+	and	a
+	jr	z,flip1
+	set	0,d
+flip1:
+	ld	a,c
+	cp	$e8
+	jr	z,flip2
+	set	1,d
+flip2:			; Do we need to set either colour or decoration?
+	ld	a,d
+	and	a
+	jr	nz,flip3
+			; Nothing mandatory, force colour
+	set	1,d
+flip3:
+
+	; Do decoration first (if both colour and deco defined)
+	bit	0,d
+	jr	z,no_place_initial_deco
+        ld      (hl),e
+        inc     hl
+        ld      (hl),b
+        inc     hl
+        inc     e
+	exx
+	dec	c
+	exx
+no_place_initial_deco:
+	bit	1,d
+	jr	z,no_place_initial_col
+        ld      (hl),e
+        inc     hl
+        ld      (hl),c
+        inc     hl
+        inc     e       ;attribute column
+        exx
+        dec     c
+        exx
+no_place_initial_col:
+        exx
+        inc     ix
+        inc     ix
+        ; And loop over the remaining columns
+compress_loop:
+		; Have we filled all attributes?
+        ld      a,c
+        and     a
+        ret     z       ;We have filled everything
+	ld	a,b
+	exx
 	cp	e
-	jr	nz,check_empty
-	; It's a coordinate at the same x position, lets check the type
-	;We should increment the column regardless since we can't have
-	;more than 1 attribute set at the same x coord
-	inc	e
-	ld	a,(ix+1)
-	and	@00001000
-	cp	h
-	jr	nz,check_empty
-	; It's an attribute at the right column and of the right type
-	; lets overwrite it with our new value
-	ld	(ix+1),l
-	ret
-check_empty:
-	bit	7,(ix+0)
-	jr	nz,got_free_slot
-	inc	ix
-	inc	ix
-	djnz	loop
-	ret
-got_free_slot:
-	ld	(ix+0),e	;X coordinate
-	ld	(ix+1),l
-	ret
+	jr	c,noset_attr_x
+	ld	e,a
+noset_attr_x:
+        ld      a,(ix+0)        ;Colour
+        cp      c
+        jp      z,no_place_colour
+		; The colour changed, put it in position
+        ld      c,a
+        ld      (hl),e
+        inc     hl
+        ld      (hl),c
+        inc     hl
+        inc     e
+        exx
+        dec     c		;We've placed another attribute, dec space
+        exx
+no_place_colour:
+        ld      a,(ix+1)
+        cp      b
+        jp      z,no_place_attr
+        ld      b,a
+        ld      (hl),e
+        inc     hl
+        ld      (hl),b
+        inc     hl
+        inc     e
+        exx
+        dec     c
+        exx
+no_place_attr:
+        inc     ix
+        inc     ix
+        exx
+	inc	b
+	ld	a,b
+	cp	80
+	jr	nz,compress_loop
+pad_buf:
+        ld      a,c
+        and     a
+        ret     z
+        exx
+        ld      (hl),0x80
+        inc     hl
+        ld      (hl),0xe8
+        inc     hl
+        exx
+        dec     c
+        jr      pad_buf
 
 
 
-
-
+	
+	
 	
 
 generic_console_cls:
 	ld	a,(__pc88_mode)
 	and	a
-	jr	z,clear_text
+	jr	z,__pc88_clear_text
+__pc88_clear_hires:
 	; Clear the hires planes
 	call	l_push_di
 	out	($5e),a		;Switch to green
@@ -143,8 +306,9 @@ generic_console_cls:
 	call	clear_plane
 	out	($5f),a		;Back to main memory
 	call	l_pop_ei
+	ret
 
-clear_text:
+__pc88_clear_text:
 	in	a,($32)
 	push	af
 	res	4,a
@@ -155,7 +319,7 @@ clear_text:
 cls_1:
 	ld	b,80
 cls_2:
-	ld	(hl),' '
+	ld	(hl),0
 	inc	hl
 	djnz	cls_2
 	call	clear_row_attribute
@@ -168,29 +332,6 @@ cls_2:
 
 clear_row_attribute:
 	ld	b,20		;20 attributes
-	ld	d,0
-	ld	a,(__pc88_ink)
-	cp	7
-	jr	z,no_set_colour
-	ld	(hl),d	;Column
-	inc	d
-	inc	hl
-	rrca
-	rrca
-	rrca
-	or	8
-	ld	(hl),a
-	inc	hl
-	dec	b
-no_set_colour:
-	ld	a,(__pc88_attr)
-	and	a
-	jr	z,no_set_decoration
-	ld	(hl),d
-	inc	hl
-	ld	(hl),a
-	inc	hl
-	dec	b
 no_set_decoration:
 	ld	(hl),0x80
 	inc	hl
@@ -208,6 +349,29 @@ clear_plane:
 	ldir
 	ret
 
+; c = x
+; b = y
+; a = d = character to print
+generic_console_plotc:
+	in	a,($32)
+	push	af
+	res	4,a
+	out	($32),a
+	ld	a,d
+	call	generic_console_scale
+	push	bc
+	call	xypos
+	ld	(hl),a
+	ld	a,(__pc88_textink)
+	or	24
+	ld	e,a
+	ld	d,0
+	pop	bc
+	call	insert_attribute
+	pop	af
+	out	($32),a
+	ret
+
 
 ; c = x
 ; b = y
@@ -219,15 +383,18 @@ generic_console_printc:
 	jp	z,printc_MODE2
 	push	de
 	call	generic_console_scale
+	push	bc
 	call	xypos
-not_40_col:
+	pop	bc	;coordinates back
 	pop	de	;d = character to write
 	in	a,($32)
-	ld	e,a
+	push	af
 	res	4,a
 	out	($32),a
-	ld	(hl),d
-	ld	a,e
+	ld	(hl),d	;place character
+	ld	de,(__pc88_textink)
+	call	insert_attribute
+	pop	af
 	out	($32),a
 	ret
 
@@ -312,7 +479,7 @@ generic_console_scrollup:
 	ex	de,hl
 	ld	b,80
 generic_console_scrollup_3:
-	ld	(hl),32
+	ld	(hl),0
 	inc	hl
 	djnz	generic_console_scrollup_3
 	inc	hl
@@ -322,6 +489,10 @@ generic_console_scrollup_3:
 	pop	bc
 	pop	de
 	ret
+
+	SECTION		bss_driver
+
+expand_buf:	defs	160
 
 	SECTION 	code_crt_init
 

@@ -12,6 +12,8 @@
 	EXTERN	l_push_di
 	EXTERN	l_pop_ei
 
+	defc	ALU = 1
+
 
 printc_MODE2:
         ld      a,d
@@ -33,12 +35,20 @@ not_udg:
         dec     h               ;-32 characters
         ex      de,hl           ;hl = screen, de = font
 
+
         ld      a,(generic_console_flags)
         rlca            ;get bit 7 out
         sbc     a
         ld      c,a     ; c = 0/ c = 255
 
 	call	l_push_di
+IF ALU
+	ld	a,$80		;Turn on expanded gvram
+	out	($35),a
+	in	a,($32)		;Enable ALU
+	set	6,a
+	out	($32),a
+ENDIF
 	ld	b,8
 loop:	push	bc
 	ld	a,b
@@ -60,6 +70,18 @@ not_last_row:
 	or	b
 no_bold:
 	xor	c
+IF ALU
+	ld	c,a
+	ld	a,(__pc88_ink)
+	out	($34),a
+	ld	(hl),c
+	ld	a,c
+	cpl
+	ld	c,a
+	ld	a,(__pc88_paper)
+	out	($34),a
+	ld	(hl),c
+ELSE
 	exx
 	ld	h,a		;save ink version
 	cpl
@@ -118,12 +140,20 @@ no_bold:
 	ld	(hl),a	;And write it
 
 	out	($5f),a	;Back to main memory
+ENDIF
 
 	inc	de
 	ld	bc,80	;Next row
 	add	hl,bc
 	pop	bc
 	djnz	loop
+IF ALU
+	xor	a		;Turn off extended gbram
+	out	($35),a
+	in	a,($32)		;Enable ALU
+	res	6,a
+	out	($32),a
+ENDIF
 	call	l_pop_ei
 	ret
 
