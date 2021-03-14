@@ -101,7 +101,7 @@ noset_green:
 noset_red:
 	ld	(hl),a
 	out	($5f),a		;Back to main memory
-  ENDIF
+;  ENDIF
 plot_exit:
 ENDIF
 
