@@ -93,6 +93,7 @@ ENDIF
         ld      a,(hl)          ; hide the first 6 bytes of REM line
         jp      start           ; invisible
 	defc	DEFINED_basegraphics = 1
+	PUBLIC	base_graphics
 _base_graphics:                 ; Address of the Graphics map..
 base_graphics:			; it is POKEable at address 16518/16519
 IF DEFINED_hrgpage
