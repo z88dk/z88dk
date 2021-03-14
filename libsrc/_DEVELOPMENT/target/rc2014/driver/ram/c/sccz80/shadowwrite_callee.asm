@@ -21,9 +21,7 @@ EXTERN asm_shadowcopy
    call asm_push_di
 
    ld a,b
-   or c
-
-   ld a,$00     ; set up write to shadow ram
+   or c         ; also set up write to shadow ram
 
    call NZ,asm_shadowcopy
    jp asm_pop_ei_jp

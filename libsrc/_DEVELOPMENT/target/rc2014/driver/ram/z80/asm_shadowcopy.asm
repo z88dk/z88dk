@@ -8,7 +8,7 @@ PUBLIC asm_shadowcopy_end
 
 ;   @feilipu February 2021
 ;
-;   The RAM bank is toggled by outputting 1/0 to 0x0030
+;   The RAM bank is toggled by outputting 0/1 to 0x0030
 ;
 ;   This code is located in the DATA section and, for ROM builds,
 ;   is copied to both main and shadow RAM banks during initialisation.
@@ -16,16 +16,17 @@ PUBLIC asm_shadowcopy_end
 ;   If desired, this code can be relocated wherever it suits the user.
 ;
 ;   On entry: Interrupts disabled unless you know better
-;             A  = Source RAM bank (0 / 1)
 ;             HL = Source start address (in RAM)
 ;             DE = Destination start address (in RAM)
 ;             BC = Number of bytes to copy
+;             carry = Source RAM bank (set = shadow bank)
 ;
 ;   On exit:  AF BC DE HL not specified
-;             IX IY I AF' BC' DE' HL' preserved
+;             IX IY AF' BC' DE' HL' preserved
 ;             carry reset
 
 .asm_shadowcopy
+    rla                     ; get source bank number into A
     out (__IO_RAM_TOGGLE),a ; now in initial bank
     rra                     ; move current bank number into carry
 
@@ -57,7 +58,7 @@ PUBLIC asm_shadowcopy_end
     dec c                   ; decrement MSB
     jr NZ,copyloop
 
-    xor a                   ; get front bank number
+    xor a                   ; get front bank
     out (__IO_RAM_TOGGLE),a ; now in front bank
     ret
 

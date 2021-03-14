@@ -240,6 +240,12 @@ IF FORcpc
 	defc maxy	= 200
 ENDIF
 
+IF FORpcw
+	DEFINE gotgfx
+	defc maxx	= 720
+	defc maxy	= 256
+ENDIF
+
 IF FOReinstein
 	DEFINE gotgfx
 	defc maxx	= 256

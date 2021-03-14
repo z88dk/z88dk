@@ -40,12 +40,14 @@ struct M_CHAN {
 	u8_t	drive;		/* 19 - drive number (0-7)*/
 	u16_t	map;		/* 1A - Address of MAP for this microdrive.*/
 	char    hdpreamble[12];	/* 1C - 12 bytes of header preamble */
+	// FETCH_H gets 14 bytes (+checksum) starting from here
 	u8_t	hdflag;		/* 28 - bit 0 used */
 	u8_t	sector;		/* 29 - sector number */
 	u16_t	unused;		/* 2A - */
 	char    hdname[10];	/* 2C - cartridge name */
 	u8_t	hdchk;		/* 36 - Header checksum */
 	char    dpreamble[12];	/* 37 - 12 bytes of data block preamble */
+	// RD_BUFF gets the data block
 	u8_t	recflg;		/* 43 - bit 1 set for EOF, bit 2 set for PRINT file type */
 	u8_t	recnum;		/* 44 - Record number in the range 0-255 */
 	u16_t	reclen;		/* 45 - Number of databytes in record 0-512 */
@@ -59,11 +61,6 @@ struct M_CHAN {
 	long	position;	/** NEW** - current position in file */
 	int	flags;
 	mode_t	mode;
-};
-
-
-struct M_SECT {
-	char    foo[3072];
 };
 
 
@@ -95,12 +92,13 @@ struct zxmdvhdr {
    unsigned char   type;        /* 0=BASIC, 3=CODE block, etc... */
    size_t          length;
    size_t          address;
-   size_t          pgm_length;
+   size_t          offset;
    size_t          autorun;     /* BASIC program line for autorun */
    char            data[503]
 };
 
 #endif /*__ZX_CHANNELS__*/
+
 
 
 // Extract the drive number from a file path (e.g. "a:filename")
@@ -111,16 +109,30 @@ extern int if1_default_drv;
 extern int __LIB__ if1_filename (char *filename) __z88dk_fastcall;
 
 // Load a sector identified by file name and record number
+// On exit: current sector number
 extern int __LIB__ if1_load_record (int drive, char *filename, int record, struct M_CHAN *buffer) __smallc;
 
 // Load a sector identified by the sector number
 extern int __LIB__ if1_load_sector (int drive, int sector, struct M_CHAN *buffer) __smallc;
+
+// Load the next sector referring to a first file record
+// On exit: current sector number
+extern int __LIB__ if1_next_file (int drive, struct M_CHAN *buffer) __smallc;
+
+// Microdrive tape seek timeout (originally 255*5 sectors, set to 256*4 in z88dk)
+extern int mdv_seek_count;
 
 // Write the sector in "buffer"
 extern int __LIB__ if1_write_sector (int drive, int sector, struct M_CHAN *buffer) __smallc;
 
 // Add a record containing the data in the "sector buffer"
 #define if1_write_record(n,b) if1_write_sector(n, if1_find_sector(n), b)
+
+// Get the (int) sector number out from the (long) file pointer
+extern int __LIB__ if1_recnum (long fp) __z88dk_fastcall;
+
+// Get the (int) position within a record out from the (long) file pointer
+extern int __LIB__ if1_bytecount (long fp) __z88dk_fastcall;
 
 // Put a 10 characters file name at the specified location; return with the file name length
 extern int __LIB__ if1_setname(char* name, char *location) __smallc;

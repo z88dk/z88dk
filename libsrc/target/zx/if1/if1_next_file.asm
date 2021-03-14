@@ -3,18 +3,17 @@
 ;
 ;       Pick a sector with a given sector number
 ;
-;       int if1_load_sector (int drive, int sector, struct M_CHAN buffer);
-;       
-;       4/5 drive:      1-8 for microdrive number
-;       2/3 sector number
-;       0/1 buffer
+;       int if1_next_file (int drive, struct M_CHAN buffer);
 ;
-;       $Id: if1_load_sector.asm $
+;       On exit, the functions gives the current sector number
+;
+;
+;       $Id: if1_next_file.asm $
 ;
 
 		SECTION   code_clib
-                PUBLIC    if1_load_sector
-                PUBLIC    _if1_load_sector
+                PUBLIC    if1_next_file
+                PUBLIC    _if1_next_file
 
                 EXTERN     if1_rommap
                 EXTERN    mdvbuffer
@@ -31,23 +30,23 @@
                 
 
 
-if1_load_sector:
-_if1_load_sector:
+if1_next_file:
+_if1_next_file:
 		push	ix	;save callers
                 ld      ix,4
                 add     ix,sp
 
-                ld      a,(ix+4)
+                ld      a,(ix+2)
                 ld      hl,-1
                 and     a               ; drive no. = 0 ?
-                jp      z,if_load_sector_exit               ; yes, return -1
+                jp      z,if_next_file_exit               ; yes, return -1
                 cp      9               ; drive no. >8 ?
-                jr      nc,if_load_sector_exit              ; yes, return -1
+                jr      nc,if_next_file_exit              ; yes, return -1
 
                 ld      (driveno),a     ; drive number selected (d_str1)
 
-                ld      a,(ix+2)        ; sector number
-                ld      (sector),a
+                ;ld      a,(ix+2)        ; sector number
+                ;ld      (sector),a
 
                 ld      l,(ix+0)        ; buffer
                 ld      h,(ix+1)
@@ -74,8 +73,8 @@ _if1_load_sector:
 ; Copy parameters from work buffer to actual channel
                 ld      a,(driveno)     ; drive number selected
                 ld      (ix+19h),A      ; CHDRIV
-                ld      a,(sector)      
-                ld      (ix+0Dh),a      ; CHREC
+                ;ld      a,(sector)      
+                ;ld      (ix+0Dh),a      ; CHREC
                 res     0,(ix+18h)      ; set CHFLAG to "read" mode
  
                 xor     a
@@ -98,13 +97,17 @@ ENDIF
 nxtsector:
                 call    FETCH_H         ; fetch header
 
-                ld      a,(ix+29h)      ; HDNUMB: sector number
-                cp      (ix+0Dh)        ; CHREC
-                jr      nz,nextrec
+                ;ld      a,(ix+29h)      ; HDNUMB: sector number
+                ;cp      (ix+0Dh)        ; CHREC
+                ;jr      nz,nextrec
 
                 ld      de,001Bh
                 add     hl,de
                 call    RD_BUFF         ; get buffer
+
+                ld      a,(ix+43h)      ; flags
+				and		2				; EOF?
+                jr      z,nextrec
 
                 call    if1_checkblock  ; various checks
                 cp      4
@@ -132,6 +135,9 @@ nextrec:
                 jr      z,sect_notfound
 
 sectread:
+                ld      a,(ix+29h)      ; save the current sector number
+                ld      (sector),a
+				
                 call    CLOSE_M         ; close file
                 call    1               ; unpage
                 ei
@@ -139,7 +145,7 @@ sectread:
                 ld      a,(sector)
                 ld      l,a
                 ld      h,0             ; Return the sector number
-if_load_sector_exit:
+if_next_file_exit:
 		pop	ix		; restore callers
                 ret
 
@@ -149,17 +155,20 @@ error_exit:
                 call    1                       ; unpage
                 ei
                 ld      hl,-1                   ; sector not found
-		jr	if_load_sector_exit
+		jr	if_next_file_exit
 
 ; close file, and go back to main
 ok_close:
+                ld      a,(ix+29h)      ; save the current sector number
+                ld      (sector),a
+				
                 call    CLOSE_M         ; close file
 		call    1               ; unpage
                 ei
                 ld      a,(sector)
                 ld      l,a
                 ld      h,0             ; Return the sector number
-		jr	if_load_sector_exit
+		jr	if_next_file_exit
 
 ; Decrease sector counter and check if we reached zero
 next_sector:

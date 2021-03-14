@@ -86,6 +86,7 @@ TOCREATE += $(call check_target,pacman,pacman_clib.lib)
 TOCREATE += $(call check_target,pasopia7,pasopia7_clib.lib)
 TOCREATE += $(call check_target,pc6001,pc6001_clib.lib)
 TOCREATE += $(call check_target,pc88,pc88_clib.lib)
+TOCREATE += $(call check_target,pcw,pcw.lib $(CPMLIBS))
 TOCREATE += $(call check_target,pencil2,pencil2_clib.lib)
 TOCREATE += $(call check_target,pmd85,pmd85_clib.lib)
 TOCREATE += $(call check_target,pps,pps_clib.lib)
@@ -1368,6 +1369,14 @@ cpc_math.lib:
 	@echo '--- Building Amstrad CPC Maths Libraries ---'
 	@echo ''
 	$(MAKE) -C math/cpcmath 
+
+# Amstrad PCW libraries - Stefano
+pcw.lib:
+	@echo ''
+	@echo '--- Building Amstrad PCW Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=pcw
+	TARGET=pcw TYPE=z80 $(LIBLINKER) -DFORpcw -x$(OUTPUT_DIRECTORY)/pcw @$(LISTFILE_DIRECTORY)/target/pcw/pcw.lst
 
 # Commodore 128 (Z80 mode) library - Stefano
 c128ansi_clib.lib: 

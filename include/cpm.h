@@ -193,4 +193,108 @@ extern int __LIB__ a_driveb();
 /* Serial Port available ? */
 extern int __LIB__ a_serialport();
 
+
+
+/***************************/
+/* GSX graphics extensions */
+/***************************/
+
+/* GIOS parameter block structure */
+struct GSX_PB {
+	void *control;    /* Addr of control array */
+	void *intin;      /* Addr of integer input array */
+	void *ptsin;      /* Addr of pixel input array */
+	void *intout;     /* Addr of integer input array */
+	void *ptsout;     /* Addr of pixel input array */
+};
+
+
+/* GSX functions */
+#define GSX_OPEN       1      /* Open workstation, n_intin=0 */
+#define GSX_CLOSE      2      /* Close workstation, n_intin=0 */
+#define GSX_CLEAR      3      /* Clear picture, n_intin=0 */
+#define GSX_OUTPUT     4      /* Output graphics, n_intin=0 */
+
+#define GSX_ESC        5      /* Special function entered via ESC code */
+
+#define GSX_POLYLINE   6      /* Draw a polyline, n_ptsin=number of points */
+#define GSX_MARKERS    7      /* Plot a group of markers, n_ptsin=number of markers */
+#define GSX_TEXT       8      /* Draw text, n_ptsin=1, n_intin=characters number */
+#define GSX_POLYGON    9      /* Draw a filled polygon, n_ptsin=vertices number */
+#define GSX_COLORS     10     /* Output colour index array, n_ptsin=2 */
+
+#define GSX_DRAW       11     /* General drawing primitive */
+
+#define GSX_T_SZ       12     /* Set text size, n_ptsin=1 */
+#define GSX_T_D        13     /* Set text direction, n_intin=3 */
+#define GSX_PALETTE    14     /* Set colour index (palette registers), n_intin=4 */
+#define GSX_L_STYLE    15     /* Set line style, n_intin=1 */
+#define GSX_L_WIDTH    16     /* Set line width, n_ptsin=1 */
+#define GSX_L_COLOR    17     /* Set line colour, n_intin=1 */
+#define GSX_M_TYPE     18     /* Set marker type, n_intin=1 */
+#define GSX_M_HEIGHT   19     /* Set marker height, n_ptsin=1 */
+#define GSX_M_COLOR    20     /* Set marker colour, n_intin=1 */
+#define GSX_T_FONT     21     /* Set text font, n_intin=1 */
+#define GSX_T_COLOR    22     /* Set text colour, n_intin=1 */
+#define GSX_F_STYLE    23     /* Set fill style, n_intin=1 (0=transparent, 1=solid, 2=pattern, 3=hatch) */
+#define GSX_F_INDEX    24     /* Set fill index, n_intin=1 used only with styles 2 & 3*/
+#define GSX_F_COLOR    25     /* Set fill colour, n_intin=1 */
+#define GSX_GETPALETTE 26     /* Read palette, n_intin=2 */
+#define GSX_CELLARRAY  27     /* Inquire cell array, n_ptsin=2, n_intin=max length of colour index array */
+#define GSX_GETMOUSEXY 28     /* Get coordinates where mouse or tablet key was pressed, n_ptsin=1, n_intin=1 */
+#define GSX_GETVALU    29     /* Read valuator. In request mode: n_intin=2, in samplemode, n_intin=1 */
+#define GSX_CHOICE     30     /* Read choice, n_intin=1 */
+#define GSX_GETSTRING  31     /* Read string. In request mode: n_intin=3, in samplemode, n_intin=2 */
+#define GSX_WRTMODE    32     /* Set writing mode, n_intin=1 */
+#define GSX_INPUTMODE  33     /* Set input mode, n_intin=2 */
+
+
+/* GSX_ESCAPE related */
+#define ESC_GT_SIZE     1    /* Get text screen size in characters */
+#define ESC_GRAPHICS    2    /* Enter in graphics mode */
+#define ESC_TEXT        3    /* Enter in text mode */
+#define ESC_CUR_UP      4    /* Text cursor up */
+#define ESC_CUR_DOWN    5    /* Text cursor down */
+#define ESC_CUR_LEFT    6    /* Text cursor left */
+#define ESC_CUR_RIGHT   7    /* Text cursor right */
+#define ESC_CLS         8    /* Clear text screen */
+#define ESC_C_BOTTOM    9    /* Clear text from cursor to end of screen */
+#define ESC_C_EOL       10   /* Clear text from cursor to end of line */
+#define ESC_SETXY       11   /* Move text cursor to coordinates given in "intin" */
+#define ESC_PRINT       12   /* Print (to text screen), 16bit-characters text in "intin" */
+#define ESC_INVERSE     13   /* Select reverse video */
+#define ESC_TRUE        14   /* Cancel reverse video */
+#define ESC_GETXY       15   /* Return the coordinates of the text cursor in "intout" */
+#define ESC_MOUSE       16   /* Do we have a mouse or a tablet? 1/0 in "intout" */
+#define ESC_COPY        17   /* Send a screen hardcopy to the printer */
+#define ESC_MOUSE_XY    18   /* Place mouse, enter with n_ptsin=1 */
+#define ESC_MOUSE_OFF   19   /* Remove the graphic cursor */
+
+
+/* GSX_DRAW related */
+#define DRAW_BAR        1    /* Draw filled bar, n_ptsin=2, ptsin = diagonally opposite corners */
+#define DRAW_ARC        2    /* Draw arc, n_ptsin=4, n_intin=2 */
+#define DRAW_PIESLICE   3    /* Draw pie slice,as for arc */
+#define DRAW_CIRCLE     4    /* Draw circle n_ptsin=3, ptsin=centre, a point and (radius,0) */
+#define DRAW_TEXT       5    /* Draw text, n_ptsin=1, n_intin=no.chars, ptsin=coordinates, intin=16bit-characters */
+
+
+struct GSX_CTL {
+	int	fn;         /* GSX function, 1-33 */
+	int	n_ptsin;    /* number of pts in ptsin */
+	int	n_ptsout;   /* number of pts in ptsout */
+	int	n_intin;    /* number of pts in intin */
+	int	n_intout;   /* number of pts in intin */
+	int	xctrl;      /* for special uses */
+};
+
+
+/* GSX GIOS Parameter block */
+extern struct GSX_PB gios_pb;
+
+/* GSX GIOS Control block */
+extern struct GSX_CTL gios_ctl;
+
+
+
 #endif

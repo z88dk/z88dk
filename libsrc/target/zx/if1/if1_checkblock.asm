@@ -22,6 +22,8 @@
 		EXTERN	if1_checksum
 		
 		EXTERN	mdvbuffer
+
+		PUBLIC	mdv_seek_count
 		PUBLIC	if1_sect_ready
 		;PUBLIC	if1_verifymode
 
@@ -86,6 +88,10 @@ chk2:
 		ldir
 		ret
 
+		SECTION data_clib
+	; in the Interface 1 ROM it is usually set to 255*5
+	; we risk to reduce it roughly by 1 tape revolution
+mdv_seek_count:		defw	256*4
 
 		SECTION bss_clib
 status:		defb	0

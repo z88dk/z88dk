@@ -15,6 +15,8 @@ static char             *c_output_file      = NULL;
 static char             *c_boot_filename     = NULL;
 static char             *c_disc_container    = "dsk";
 static char             *c_extension         = NULL;
+
+static char              c_force_com_extension   = 0;
 static char              c_disable_com_file_creation = 0;
 static char              help         = 0;
 
@@ -29,6 +31,7 @@ option_t cpm2_options[] = {
     { 's', "bootfile", "Name of the boot file",      OPT_STR,   &c_boot_filename },
     {  0,  "container", "Type of container (raw,dsk)", OPT_STR, &c_disc_container },
     {  0,  "extension", "Extension for the output file", OPT_STR, &c_extension},
+    {  0,  "force-com-ext", "Always force COM extension", OPT_BOOL, &c_force_com_extension},
     {  0,  "no-com-file", "Don't create a separate .com file", OPT_BOOL, &c_disable_com_file_creation },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
@@ -116,6 +119,39 @@ static disc_spec cpcsystem_spec = {
 };
 
 
+static disc_spec pcw40_spec = {
+    .name = "PCW40",
+    .sectors_per_track = 9,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 64,
+    .extent_size = 1024,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
+};
+
+
+static disc_spec pcw80_spec = {
+    .name = "PCW80",
+    .sectors_per_track = 9,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x2a,
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+    .alternate_sides = 1,
+};
+
+
 static disc_spec microbee_spec = {
     .name = "Microbee",
     .sectors_per_track = 10,
@@ -199,6 +235,23 @@ static disc_spec mz2500cpm_spec = {
     .byte_size_extents = 0,
     .first_sector_offset = 1,
     .alternate_sides = 1
+};
+
+
+static disc_spec ts803_spec = {
+    .name = "TS803",
+    .sectors_per_track = 18,
+    .tracks = 40,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 128,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 1,
 };
 
 
@@ -490,6 +543,8 @@ static struct formats {
     { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1",             &osborne_spec, 0, NULL, 1 },
+    { "pcw80",     "Amstrad PCW, 80T",      &pcw80_spec, 16, "\x03\x81\x50\x09\x02\x01\x04\x04\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
+    { "pcw40",     "Amstrad PCW, 40T",      &pcw40_spec, 16, "\x00\x00\x28\x09\x02\x01\x03\x02\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "plus3",     "Spectrum +3 173k",      &plus3_spec, 0, NULL, 1 },
     { "qc10",      "Epson QC-10, QX-10",    &qc10_spec, 0, NULL, 1 },
     { "rc700",     "Regnecentralen RC-700", &rc700_spec, 0, NULL, 1 },
@@ -497,6 +552,7 @@ static struct formats {
     { "smc777",    "Sony SMC-70/SMC-777",   &smc777_spec, 0, NULL, 1 },
     { "svi-40ss",   "SVI 40ss (174k)",      &svi40ss_spec, 0, NULL, 1 },
     { "tiki100-40t","Tiki 100 (200k)",      &tiki100_spec, 0, NULL, 1 },
+    { "ts803",      "Televideo TS803/TPC1", &ts803_spec, 0, NULL, 1 },
     { "vector06c",  "Vector 06c",           &vector06c_spec, 0, NULL, 1 },
     { "z80pack",    "z80pack 8\" format",   &z80pack_spec, 0, NULL, 1 },
     { NULL, NULL }
@@ -591,7 +647,7 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     } else {
         strcpy(disc_name, output_file);
     }
-    cpm_create_filename(binary_name, cpm_filename, f->force_com_extension, 0);
+    cpm_create_filename(binary_name, cpm_filename, (f->force_com_extension || c_force_com_extension), 0);
 
     // Open the binary file
     if ((binary_fp = fopen_bin(binary_name, crt_filename)) == NULL) {
