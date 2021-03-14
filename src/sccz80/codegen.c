@@ -1489,7 +1489,14 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
 
     if (k == 0)
         return newsp;
-    if ( (c_cpu & (CPU_GBZ80|CPU_RABBIT)) && abs(k) > 1 && abs(k) <= 127 ) {
+    if ( (c_cpu & CPU_RABBIT) && abs(k) > 1 && abs(k) <= 127 ) {
+	/* Rabbit is 4 clocks so always makes sense to use this -pop
+	is 7 clocks */
+        outstr("\tadd\tsp,"); outdec(k); nl();
+        return newsp;
+    }
+    if ( (c_cpu & CPU_GBZ80) && abs(k) > 2 && abs(k) <= 127 ) {
+	/* gbz80 is 16 clocks, 2 bytes; pop xx is 12 clocks, 1 byte */
         outstr("\tadd\tsp,"); outdec(k); nl();
         return newsp;
     }
