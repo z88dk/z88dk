@@ -25,13 +25,7 @@
 
 .swapgfxbk
 ._swapgfxbk
-		di
-		out ($5e),a		; green	plane GVRAM page
-		ret
-
 .swapgfxbk1
 ._swapgfxbk1
-		ei
-		out ($5f),a		; back to standard RAM
 		ret
 

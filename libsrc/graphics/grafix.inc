@@ -59,15 +59,10 @@ ENDIF
 
 IF FORpc88
 	DEFINE gotgfx
-	defc maxx	= 160
-	defc maxy	= 100
-ENDIF
-
-IF FORpc88hr200
-	DEFINE gotgfx
 	defc maxx	= 640
 	defc maxy	= 200
 ENDIF
+
 
 IF FORvz
 	DEFINE gotgfx

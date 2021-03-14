@@ -384,19 +384,9 @@ pc88_clib.lib:
 	@echo '--- Building PC8801 Library ---'
 	@echo ''
 	$(MAKE) -C psg TARGET=pc88
-	$(call buildgeneric,pc88,"wide narrow")
+	$(call buildgeneric,pc88,"wide")
 	$(MAKE) -C games TARGET=pc88
 	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(LISTFILE_DIRECTORY)/pc88.lst
-	@echo ''
-	@echo '--- Building PC8801 160x100 graphics Library ---'
-	@echo ''
-	$(MAKE) -C gfx TARGET=pc88 FLAVOUR="narrow"
-	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -x$(OUTPUT_DIRECTORY)/gfxpc88 @$(LISTFILE_DIRECTORY)/target/pc88/gfxpc88.lst
-	@echo ''
-	@echo '--- Building PC8801 640x200 Mono Graphics Library ---'
-	@echo ''
-	$(MAKE) -C gfx TARGET=pc88 SUBTYPE=pc88hr200 FLAVOUR="wide"
-	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88hr200 -x$(OUTPUT_DIRECTORY)/gfxpc88hr200 @$(LISTFILE_DIRECTORY)/target/pc88/gfxpc88hr200.lst
 
 # Native for sprinter - dom
 pps_clib.lib:

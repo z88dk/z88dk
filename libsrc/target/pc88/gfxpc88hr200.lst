@@ -1,6 +1,0 @@
-target/pc88/graphics/w_clg
-target/pc88/graphics/w_pixladdr
-target/pc88/graphics/w_putsprite
-target/pc88/graphics/w_stencil_render
-target/pc88/graphics/swapgfxbk_hr
-@gfx/wide/gfx_wide.lst

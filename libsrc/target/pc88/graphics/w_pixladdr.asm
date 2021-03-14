@@ -10,7 +10,6 @@
 ;	 a = pixel number
 ; Uses: a, bc, de, hl
 .w_pixeladdress
-;	push bc
 	; Reduce x down to the byte number
 	ld	a,l		;Save lower of number
 	srl	h		;Max 640
@@ -41,6 +40,5 @@
 	xor	0x07
 	ld	d,h
 	ld	e,l
-;	pop bc
 	ret
 
