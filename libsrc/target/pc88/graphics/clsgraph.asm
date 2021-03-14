@@ -12,5 +12,5 @@ cleargraphics:
 _cleargraphics:
 	ld	a,(__pc88_gfxmode)
 	and	a
-	jr	z,__pc88_clear_hires
+	jp	z,__pc88_clear_hires
 	jp	__pc88_clear_text
