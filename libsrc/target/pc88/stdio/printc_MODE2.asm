@@ -12,8 +12,8 @@
 
 	EXTERN	l_push_di
 	EXTERN	l_pop_ei
+	EXTERN	__CLIB_PC8800_V2_ENABLED
 
-	defc	ALU = 1
 
 	INCLUDE "target/pc88/def/pc88.def"
 
@@ -44,13 +44,18 @@ not_udg:
         ld      c,a     ; c = 0/ c = 255
 
 	call	l_push_di
-IF ALU
+;IF ALU
+	; I understand this code has no effect on a V1
+	ld	a,__CLIB_PC8800_V2_ENABLED
+	and	a
+	jp	z,printc_skip_v2_setup
 	ld	a,$80		;Turn on expanded gvram
 	out	($35),a
 	in	a,($32)		;Enable ALU
 	set	6,a
 	out	($32),a
-ENDIF
+;ENDIF
+printc_skip_v2_setup:
 	ld	b,8
 loop:	push	bc
 	ld	a,b
@@ -72,7 +77,11 @@ not_last_row:
 	or	b
 no_bold:
 	xor	c
-IF ALU
+	ex	af,af
+	ld	a,__CLIB_PC8800_V2_ENABLED
+	and	a
+	jp	z,printc_v1_only
+	ex	af,af
 	ld	c,a
 	ld	a,(__pc88_ink)
 	out	($34),a
@@ -83,7 +92,9 @@ IF ALU
 	ld	a,(__pc88_paper)
 	out	($34),a
 	ld	(hl),c
-ELSE
+	jp	printc_next_row
+printc_v1_only:
+	ex	af,af
 	exx
 	ld	h,a		;save ink version
 	cpl
@@ -140,22 +151,22 @@ ELSE
 	out	($5d),a	;Switch to red
 	exx
 	ld	(hl),a	;And write it
-
 	out	($5f),a	;Back to main memory
-ENDIF
 
+printc_next_row:
 	inc	de
 	ld	bc,80	;Next row
 	add	hl,bc
 	pop	bc
 	djnz	loop
-IF ALU
-	in	a,($32)		;Enable ALU
+;IF ALU
+	; This has no effect on a V1
+	in	a,($32)		;Disable ALU
 	res	6,a
 	out	($32),a
 	xor	a		;Turn off extended gbram
 	out	($35),a
-ENDIF
+;ENDIF
 	call	l_pop_ei
 	ret
 
@@ -174,7 +185,10 @@ generic_console_xypos_graphics_1:
 
 scrollup_MODE2:
 	call	l_push_di
-IF ALU
+;IF ALU
+	ld	a,__CLIB_PC8800_V2_ENABLED
+	and	a
+	jp	z,scrollup_v1_only
 	ld	a,@10010000		;Turn on expanded gvram
 	out	(EXPANDED_GVRAM_CTRL),a
 	in	a,(ALU_MODE_CTRL)	;Enable ALU
@@ -199,7 +213,9 @@ IF ALU
 	out	(ALU_MODE_CTRL),a
 	ld	a,$00			;Turn off expanded gvram
 	out	(EXPANDED_GVRAM_CTRL),a
-ELSE
+	jp	scroll_exit
+;ELSE
+scrollup_v1_only:
 	ld	a,(__pc88_paper)
 	ld	d,a
 	out	($5c),a
@@ -209,7 +225,8 @@ ELSE
 	out	($5d),a
 	call	scroll_gfx
 	ld	($5f),a
-ENDIF
+;ENDIF
+scroll_exit:
 	call	l_pop_ei
 	pop	bc
 	pop	de

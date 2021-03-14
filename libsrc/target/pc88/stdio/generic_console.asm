@@ -29,11 +29,11 @@
 	EXTERN		__pc88_attr
 	EXTERN		generic_console_flags
 	EXTERN		__console_x
+	EXTERN		__CLIB_PC8800_V2_ENABLED
 
 	INCLUDE	"target/pc88/def/pc88.def"
 
 	defc		DISPLAY = 0xf3c8
-	defc		ALU = 1
 
 
 
@@ -300,7 +300,10 @@ generic_console_cls:
 	jr	z,__pc88_clear_text
 __pc88_clear_hires:
 	call	l_push_di
-IF ALU
+;IF ALU
+	ld	a,__CLIB_PC8800_V2_ENABLED
+	and	a
+	jp	z,cls_v1_only
         ld      a,$80                   ;Turn on expanded gvram
         out     (EXPANDED_GVRAM_CTRL),a
         in      a,(ALU_MODE_CTRL)       ;Enable ALU
@@ -315,7 +318,10 @@ IF ALU
         out     (ALU_MODE_CTRL),a
         ld      a,$00                   ;Turn off expanded gvram
         out     (EXPANDED_GVRAM_CTRL),a
-ELSE
+	call	l_pop_ei
+	ret
+;ELSE
+cls_v1_only:
 	; Clear the hires planes
 	xor	a
 	out	(GVRAM_SEL_0),a		;Switch to green
@@ -325,7 +331,7 @@ ELSE
 	out	(GVRAM_SEL_2),a		;Switch to blue
 	call	clear_plane
 	out	(MAINRAM_SEL),a		;Back to main memory
-ENDIF
+;ENDIF
 	call	l_pop_ei
 	ret
 

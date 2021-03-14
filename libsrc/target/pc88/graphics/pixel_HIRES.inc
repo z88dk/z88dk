@@ -9,8 +9,7 @@
 	EXTERN	__pc88_paper
 	EXTERN	l_push_di
 	EXTERN	l_pop_ei
-
-	defc	ALU = 1
+	EXTERN	__CLIB_PC8800_V2_ENABLED
 
 ; Generic code to handle the pixel commands
 ; Define NEEDxxx before including
@@ -57,7 +56,10 @@ ENDIF
 	ld	c,a
 
 IF NEEDplot|NEEDunplot
-  IF ALU
+ ; IF ALU
+	ld	a,__CLIB_PC8800_V2_ENABLED
+	and	a
+	jp	z,plot_v1_only
         ld      a,$80           ;Turn on expanded gvram
         out     ($35),a
         in      a,($32)         ;Enable ALU
@@ -71,7 +73,9 @@ IF NEEDplot|NEEDunplot
         out     ($35),a
 	ld	b,a
         out     ($32),a
-  ELSE
+	jp	plot_exit
+;  ELSE
+plot_v1_only:
 	out	($5c),a		;Switch to blue plane
 	ld	a,(hl)
 	and	e
@@ -98,6 +102,7 @@ noset_red:
 	ld	(hl),a
 	out	($5f),a		;Back to main memory
   ENDIF
+plot_exit:
 ENDIF
 
 IF NEEDxor
