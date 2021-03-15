@@ -22,8 +22,8 @@ target/cpm/cpm/obj/${TYPE}/a_driveb
 target/cpm/cpm/obj/${TYPE}/a_serialport
 target/cpm/cpm/obj/${TYPE}/a_keyspeed
 target/cpm/cpm/obj/${TYPE}/cpm_platform_init
-target/cpm/cpm/obj/${TYPE}/gsx_pb
 @target/cpm/fcntl/fcntl.lst
+@target/cpm/gsx.lst
 target/cpm/cpm/obj/${TYPE}/execl
 games/joystick
 
