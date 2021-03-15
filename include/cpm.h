@@ -217,12 +217,12 @@ struct GSX_CTL {
 	int	n_ptsout;   /* number of pts in ptsout */
 	int	n_intin;    /* number of values in intin */
 	int	n_intout;   /* number of values in intout */
-	int	xctrl;      /* for special uses */
+	int	special;    /* for special uses (e.g. in-ESC functions) */
 };
 
 
 /* GSX functions */
-#define GSX_OPEN       1      /* Open workstation, n_intin=0 */
+#define GSX_OPEN       1      /* Open workstation, n_intin=10, n_ptsin=0 */
 #define GSX_CLOSE      2      /* Close workstation, n_intin=0 */
 #define GSX_CLEAR      3      /* Clear picture, n_intin=0 */
 #define GSX_OUTPUT     4      /* Output graphics, n_intin=0 */
@@ -260,27 +260,6 @@ struct GSX_CTL {
 #define GSX_WRTMODE    32     /* Set writing mode, n_intin=1 */
 #define GSX_INPUTMODE  33     /* Set input mode, n_intin=2 */
 
-
-/* GSX_ESCAPE related */
-#define ESC_GT_SIZE     1    /* Get text screen size in characters */
-#define ESC_GRAPHICS    2    /* Enter in graphics mode */
-#define ESC_TEXT        3    /* Enter in text mode */
-#define ESC_CUR_UP      4    /* Text cursor up */
-#define ESC_CUR_DOWN    5    /* Text cursor down */
-#define ESC_CUR_LEFT    6    /* Text cursor left */
-#define ESC_CUR_RIGHT   7    /* Text cursor right */
-#define ESC_CLS         8    /* Clear text screen */
-#define ESC_C_BOTTOM    9    /* Clear text from cursor to end of screen */
-#define ESC_C_EOL       10   /* Clear text from cursor to end of line */
-#define ESC_SETXY       11   /* Move text cursor to coordinates given in "intin" */
-#define ESC_PRINT       12   /* Print (to text screen), 16bit-characters text in "intin" */
-#define ESC_INVERSE     13   /* Select reverse video */
-#define ESC_TRUE        14   /* Cancel reverse video */
-#define ESC_GETXY       15   /* Return the coordinates of the text cursor in "intout" */
-#define ESC_MOUSE       16   /* Do we have a mouse or a tablet? 1/0 in "intout" */
-#define ESC_COPY        17   /* Send a screen hardcopy to the printer */
-#define ESC_MOUSE_XY    18   /* Place mouse, enter with n_ptsin=1 */
-#define ESC_MOUSE_OFF   19   /* Remove the graphic cursor */
 
 /* GSX_DRAW related */
 #define DRAW_BAR        1    /* Draw filled bar, n_ptsin=2, ptsin = diagonally opposite corners */
@@ -345,6 +324,10 @@ extern int  __LIB__   gios(int fn) __z88dk_fastcall;
 /* Invoke an already defined GSX function */
 #define M_GSX() bdos(CPM_GSX,gios_pb)
 
+extern int __LIB__ gios_1pm(int fn, int parm) __smallc;
+extern int __LIB__ gios_1pm_callee(int fn, int parm) __smallc __z88dk_callee;
+#define gios_1pm(a,b) gios_1pm_callee(a,b)
+
 /* GSX, load text parameter */
 extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
 
@@ -359,45 +342,73 @@ extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
 /* Output graphics (update graphics workstation) */
 #define gios_update() gios_ctl.n_intin=0;gios(GSX_OUTPUT)
 
-/* Clear picture */
+/* Clear picture (hide cursor) */
 #define gios_clg() gios_ctl.n_intin=0;gios(GSX_CLEAR)
 
-
 /* Set line style */
-#define gios_l_style(style) gios_ctl.n_intin=1;gios_intin[0]=style;gios(GSX_L_STYLE)
+#define gios_l_style(style) gios_1pm(GSX_L_STYLE,style)
 
 /* Set line width */
 #define gios_l_width(width) gios_ctl.n_ptsin=1;gios_ptsin[0]=width;gios_ptsin[1]=0;gios(GSX_L_WIDTH)
 
 /* Set line colour */
-#define gios_l_color(color) gios_ctl.n_intin=1;gios_intin[0]=color;gios(GSX_L_COLOR)
+#define gios_l_color(color) gios_1pm(GSX_L_COLOR,color)
 
 /* Draw a line */
 #define gios_draw(x1,y1,x2,y2) gios_ctl.n_ptsin=2;gios_ptsin[0]=x1;gios_ptsin[1]=y1;gios_ptsin[2]=x2;gios_ptsin[3]=y2;gios(GSX_POLYLINE)
 
-/* Relative drawing */
+/* Relative coord. drawing */
 #define gios_drawr(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2];gios_ptsin[1]=gios_ptsin[3];gios_ptsin[2]=gios_ptsin[2]+x1;gios_ptsin[3]=gios_ptsin[3]+y1;gios(GSX_POLYLINE)
+
+/* Absolute coord. drawing */
+#define gios_drawto(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2];gios_ptsin[1]=gios_ptsin[3];gios_ptsin[2]=x1;gios_ptsin[3]=y1;gios(GSX_POLYLINE)
 
 /* Plot a pixel */
 #define gios_plot(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2]=x1;gios_ptsin[1]=gios_ptsin[3]=y1;gios(GSX_POLYLINE)
 
 
 /* Set marker type */
-#define gios_m_type(type) gios_ctl.n_intin=1;gios_intin[0]=type;gios(GSX_M_TYPE)
+#define gios_m_type(type) gios_1pm(GSX_M_TYPE,type)
 
 /* Set marker size */
 #define gios_m_height(height) gios_ctl.n_ptsin=1;gios_ptsin[0]=0;gios_ptsin[1]=height;gios(GSX_M_HEIGHT)
 
 /* Set marker colour */
-#define gios_m_color(color) gios_ctl.n_intin=1;gios_intin[0]=color;gios(GSX_M_COLOR)
+#define gios_m_color(color) gios_1pm(GSX_M_COLOR,color)
 
 
 /* Set text font */
-#define gios_t_font(font) gios_ctl.n_intin=1;gios_intin[0]=font;gios(GSX_T_FONT)
+#define gios_t_font(font) gios_1pm(GSX_T_FONT,font)
 
 /* Set text colour */
-#define gios_t_colour(color) gios_ctl.n_intin=1;gios_intin[0]=color;gios(GSX_T_COLOR)
+#define gios_t_colour(color) gios_1pm(GSX_T_COLOR,color)
+
+/* Set text size */
+#define gios_t_size(height) gios_ctl.n_ptsin=1;gios_ptsin[0]=0;gios_ptsin[1]=height;gios(GSX_T_SIZE)
 
 
+/* GSX_ESCAPE related: gios_esc(ESC_x) */
+#define ESC_GT_SIZE     1    /* Get text screen size in characters */
+#define ESC_GRAPHICS    2    /* Enter in graphics mode */
+#define ESC_TEXT        3    /* Enter in text mode */
+#define ESC_CUR_UP      4    /* Text cursor up */
+#define ESC_CUR_DOWN    5    /* Text cursor down */
+#define ESC_CUR_LEFT    6    /* Text cursor left */
+#define ESC_CUR_RIGHT   7    /* Text cursor right */
+#define ESC_CLS         8    /* Clear text screen */
+#define ESC_C_BOTTOM    9    /* Clear text from cursor to end of screen */
+#define ESC_C_EOL       10   /* Clear text from cursor to end of line */
+#define ESC_SETXY       11   /* Move text cursor to coordinates given in "intin" */
+#define ESC_PRINT       12   /* Print (to text screen), 16bit-characters text in "intin" */
+#define ESC_INVERSE     13   /* Select reverse video */
+#define ESC_TRUE        14   /* Cancel reverse video */
+#define ESC_GETXY       15   /* Return the coordinates of the text cursor in "intout" */
+#define ESC_MOUSE       16   /* Do we have a mouse or a tablet? 1/0 in "intout" */
+#define ESC_COPY        17   /* Send a screen hardcopy to the printer */
+#define ESC_MOUSE_XY    18   /* Place mouse, enter with n_ptsin=1 */
+#define ESC_MOUSE_OFF   19   /* Remove the graphic cursor */
+
+/* Invoke a special GSX function */
+extern int  __LIB__   gios_esc(int esc_code) __z88dk_fastcall;
 
 #endif
