@@ -108,6 +108,7 @@ extern struct fcb  _fcb[MAXFILE];
 #define CPM_WRAN 34              /* write random record */
 #define CPM_CFS  35              /* compute file size */
 #define CPM_DSEG 51              /* set DMA segment */
+#define CPM_GSX 115              /* enter GSX */
 
 
 /* The CPM bdos call */
@@ -195,9 +196,10 @@ extern int __LIB__ a_serialport();
 
 
 
-/***************************/
-/* GSX graphics extensions */
-/***************************/
+/****************************************************************/
+/* GSX graphics extensions                                      */
+/* After compiling, use GENGRAF.COM on the newly built COM file */
+/****************************************************************/
 
 /* GIOS parameter block structure */
 struct GSX_PB {
@@ -209,8 +211,18 @@ struct GSX_PB {
 };
 
 
+struct GSX_CTL {
+	int	fn;         /* GSX function, 1-33 */
+	int	n_ptsin;    /* number of pts in ptsin */
+	int	n_ptsout;   /* number of pts in ptsout */
+	int	n_intin;    /* number of values in intin */
+	int	n_intout;   /* number of values in intout */
+	int	special;    /* for special uses (e.g. in-ESC functions) */
+};
+
+
 /* GSX functions */
-#define GSX_OPEN       1      /* Open workstation, n_intin=0 */
+#define GSX_OPEN       1      /* Open workstation, n_intin=10, n_ptsin=0 */
 #define GSX_CLOSE      2      /* Close workstation, n_intin=0 */
 #define GSX_CLEAR      3      /* Clear picture, n_intin=0 */
 #define GSX_OUTPUT     4      /* Output graphics, n_intin=0 */
@@ -225,8 +237,8 @@ struct GSX_PB {
 
 #define GSX_DRAW       11     /* General drawing primitive */
 
-#define GSX_T_SZ       12     /* Set text size, n_ptsin=1 */
-#define GSX_T_D        13     /* Set text direction, n_intin=3 */
+#define GSX_T_SIZE     12     /* Set text size, n_ptsin=1 */
+#define GSX_T_ANGLE    13     /* Set text direction, n_intin=3 */
 #define GSX_PALETTE    14     /* Set colour index (palette registers), n_intin=4 */
 #define GSX_L_STYLE    15     /* Set line style, n_intin=1 */
 #define GSX_L_WIDTH    16     /* Set line width, n_ptsin=1 */
@@ -249,7 +261,133 @@ struct GSX_PB {
 #define GSX_INPUTMODE  33     /* Set input mode, n_intin=2 */
 
 
-/* GSX_ESCAPE related */
+/* GSX_DRAW related */
+#define DRAW_BAR        1    /* Draw filled bar, n_ptsin=2, ptsin = diagonally opposite corners */
+#define DRAW_ARC        2    /* Draw arc, n_ptsin=4, n_intin=2 */
+#define DRAW_PIESLICE   3    /* Draw pie slice,as for arc */
+#define DRAW_CIRCLE     4    /* Draw circle n_ptsin=3, ptsin=centre, a point and (radius,0) */
+#define DRAW_TEXT       5    /* Draw text, n_ptsin=1, n_intin=no.chars, ptsin=coordinates, intin=16bit-characters */
+
+/* Line style attributes */
+#define L_SOLID         0    /* Normal line drawing */
+#define L_DASH          1    /* Dashes */
+#define L_DOT           2    /* Dotted line */
+#define L_DASHDOT       3    /* Alterning dashes and dots */
+#define L_LONGDASH      4    /* Long dashes */
+
+/* Marker attributes */
+#define M_PIX           0    /* Single pixel */
+#define M_PLUS          1    /* '+' symbol */
+#define M_ASTERISK      2    /* '*' symbol */
+#define M_CIRCLE        3    /* 'O' symbol */
+#define M_X             4    /* 'X' symbol */
+
+/* Fill attributes */
+#define F_EMPTY         0    /* No fill */
+#define F_FULL          1    /* Solid fill */
+#define F_HALFTONE      2    /*  */
+#define F_HATCH         3    /*  */
+
+/* Hatch types */
+#define H_VERTICAL      0
+#define H_HORIZONTAL    1
+#define H_DEG45         2
+#define H_DEG315        3
+#define H_CROSS         4
+#define H_X             5
+
+
+/* GSX GIOS Parameter block */
+extern struct GSX_PB gios_pb;
+
+/* GSX GIOS Control block */
+extern struct GSX_CTL gios_ctl;
+
+
+/* GSX GIOS input value list */
+extern int gios_intin[];
+
+/* GSX GIOS input coordinate list */
+extern int gios_ptsin[];
+
+/* GSX GIOS reslut (values) */
+extern int gios_intout[];
+
+/* GSX GIOS reslut (coordinates) */
+extern int gios_ptsout[];
+
+
+
+/* Invoke a GSX function (setting the GIOS fn number) */
+extern int  __LIB__   gios(int fn) __z88dk_fastcall;
+
+/* Invoke an already defined GSX function */
+#define M_GSX() bdos(CPM_GSX,gios_pb)
+
+extern int __LIB__ gios_1pm(int fn, int parm) __smallc;
+extern int __LIB__ gios_1pm_callee(int fn, int parm) __smallc __z88dk_callee;
+#define gios_1pm(a,b) gios_1pm_callee(a,b)
+
+/* GSX, load text parameter */
+extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
+
+
+/* Open graphics workstation (colour 1, solid styles) */
+/* 'device_id' is defined in assign.sys, usually 1=screen, 21=printer */
+#define gios_open(device_id) gios_ctl.n_ptsin=0;gios_ctl.n_intin=10;gios_intin[0]=device_id;gios_intin[2]=gios_intin[4]=gios_intin[6]=gios_intin[8]=gios_intin[9]=1;gios_intin[1]=gios_intin[3]=gios_intin[5]=gios_intin[7]=0;gios(GSX_OPEN);gios_ctl.n_intin=1;gios_intin[0]=0;gios(GSX_L_STYLE)
+
+/* Close graphics workstation */
+#define gios_close() gios_ctl.n_intin=0;gios(GSX_CLOSE)
+
+/* Output graphics (update graphics workstation) */
+#define gios_update() gios_ctl.n_intin=0;gios(GSX_OUTPUT)
+
+/* Clear picture (hide cursor) */
+#define gios_clg() gios_ctl.n_intin=0;gios(GSX_CLEAR)
+
+/* Set line style */
+#define gios_l_style(style) gios_1pm(GSX_L_STYLE,style)
+
+/* Set line width */
+#define gios_l_width(width) gios_ctl.n_ptsin=1;gios_ptsin[0]=width;gios_ptsin[1]=0;gios(GSX_L_WIDTH)
+
+/* Set line colour */
+#define gios_l_color(color) gios_1pm(GSX_L_COLOR,color)
+
+/* Draw a line */
+#define gios_draw(x1,y1,x2,y2) gios_ctl.n_ptsin=2;gios_ptsin[0]=x1;gios_ptsin[1]=y1;gios_ptsin[2]=x2;gios_ptsin[3]=y2;gios(GSX_POLYLINE)
+
+/* Relative coord. drawing */
+#define gios_drawr(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2];gios_ptsin[1]=gios_ptsin[3];gios_ptsin[2]=gios_ptsin[2]+x1;gios_ptsin[3]=gios_ptsin[3]+y1;gios(GSX_POLYLINE)
+
+/* Absolute coord. drawing */
+#define gios_drawto(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2];gios_ptsin[1]=gios_ptsin[3];gios_ptsin[2]=x1;gios_ptsin[3]=y1;gios(GSX_POLYLINE)
+
+/* Plot a pixel */
+#define gios_plot(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2]=x1;gios_ptsin[1]=gios_ptsin[3]=y1;gios(GSX_POLYLINE)
+
+
+/* Set marker type */
+#define gios_m_type(type) gios_1pm(GSX_M_TYPE,type)
+
+/* Set marker size */
+#define gios_m_height(height) gios_ctl.n_ptsin=1;gios_ptsin[0]=0;gios_ptsin[1]=height;gios(GSX_M_HEIGHT)
+
+/* Set marker colour */
+#define gios_m_color(color) gios_1pm(GSX_M_COLOR,color)
+
+
+/* Set text font */
+#define gios_t_font(font) gios_1pm(GSX_T_FONT,font)
+
+/* Set text colour */
+#define gios_t_colour(color) gios_1pm(GSX_T_COLOR,color)
+
+/* Set text size */
+#define gios_t_size(height) gios_ctl.n_ptsin=1;gios_ptsin[0]=0;gios_ptsin[1]=height;gios(GSX_T_SIZE)
+
+
+/* GSX_ESCAPE related: gios_esc(ESC_x) */
 #define ESC_GT_SIZE     1    /* Get text screen size in characters */
 #define ESC_GRAPHICS    2    /* Enter in graphics mode */
 #define ESC_TEXT        3    /* Enter in text mode */
@@ -270,31 +408,7 @@ struct GSX_PB {
 #define ESC_MOUSE_XY    18   /* Place mouse, enter with n_ptsin=1 */
 #define ESC_MOUSE_OFF   19   /* Remove the graphic cursor */
 
-
-/* GSX_DRAW related */
-#define DRAW_BAR        1    /* Draw filled bar, n_ptsin=2, ptsin = diagonally opposite corners */
-#define DRAW_ARC        2    /* Draw arc, n_ptsin=4, n_intin=2 */
-#define DRAW_PIESLICE   3    /* Draw pie slice,as for arc */
-#define DRAW_CIRCLE     4    /* Draw circle n_ptsin=3, ptsin=centre, a point and (radius,0) */
-#define DRAW_TEXT       5    /* Draw text, n_ptsin=1, n_intin=no.chars, ptsin=coordinates, intin=16bit-characters */
-
-
-struct GSX_CTL {
-	int	fn;         /* GSX function, 1-33 */
-	int	n_ptsin;    /* number of pts in ptsin */
-	int	n_ptsout;   /* number of pts in ptsout */
-	int	n_intin;    /* number of pts in intin */
-	int	n_intout;   /* number of pts in intin */
-	int	xctrl;      /* for special uses */
-};
-
-
-/* GSX GIOS Parameter block */
-extern struct GSX_PB gios_pb;
-
-/* GSX GIOS Control block */
-extern struct GSX_CTL gios_ctl;
-
-
+/* Invoke a special GSX function */
+extern int  __LIB__   gios_esc(int esc_code) __z88dk_fastcall;
 
 #endif

@@ -1,0 +1,64 @@
+
+;
+; Invoke a GSX/GIOS function with 2 coordinates (4 values) in "ptsin"
+;
+
+;
+; $Id: gios_2px_callee.asm $
+;
+
+SECTION code_clib
+
+PUBLIC	gios_2px_callee
+PUBLIC	_gios_2px_callee
+
+EXTERN	gios
+EXTERN	gios_ctl
+EXTERN	gios_ptsin
+
+PUBLIC ASMDISP_GIOS_2PX
+
+
+gios_2px_callee:
+_gios_2px_callee:
+
+	pop bc
+	ld	hl,gios_ptsin+7
+	pop	de
+	ld	(hl),d
+	dec hl
+	ld	(hl),e
+	dec hl
+	pop	de
+	ld	(hl),d
+	dec hl
+	ld	(hl),e
+	dec hl
+	pop	de
+	ld	(hl),d
+	dec hl
+	ld	(hl),e
+	dec hl
+	pop	de
+	ld	(hl),d
+	dec hl
+	ld	(hl),e
+	pop	de		; fn
+	push bc
+	
+.asmentry
+
+	
+	ld	a,2				; 2 xy coordinates = (4 int parameters)
+	ld	hl,gios_ctl+2	; n_ptsin
+	ld	(hl),a
+	inc hl
+	ld	(hl),0
+	ld	h,d			; fn
+	ld	l,e
+	jp	gios
+
+
+
+DEFC ASMDISP_GIOS_2PX = asmentry - gios_2px_callee
+
