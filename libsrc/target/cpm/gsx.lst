@@ -1,3 +1,6 @@
 target/cpm/gsx/gsx_pb
 target/cpm/gsx/gios
+target/cpm/gsx/gios_1pm
+target/cpm/gsx/gios_1pm_callee
+target/cpm/gsx/gios_esc
 target/cpm/gsx/gios_text
