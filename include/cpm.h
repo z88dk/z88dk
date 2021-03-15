@@ -108,6 +108,7 @@ extern struct fcb  _fcb[MAXFILE];
 #define CPM_WRAN 34              /* write random record */
 #define CPM_CFS  35              /* compute file size */
 #define CPM_DSEG 51              /* set DMA segment */
+#define CPM_GSX 115              /* enter GSX */
 
 
 /* The CPM bdos call */
@@ -195,9 +196,10 @@ extern int __LIB__ a_serialport();
 
 
 
-/***************************/
-/* GSX graphics extensions */
-/***************************/
+/****************************************************************/
+/* GSX graphics extensions                                      */
+/* After compiling, use GENGRAF.COM on the newly built COM file */
+/****************************************************************/
 
 /* GIOS parameter block structure */
 struct GSX_PB {
@@ -206,6 +208,16 @@ struct GSX_PB {
 	void *ptsin;      /* Addr of pixel input array */
 	void *intout;     /* Addr of integer input array */
 	void *ptsout;     /* Addr of pixel input array */
+};
+
+
+struct GSX_CTL {
+	int	fn;         /* GSX function, 1-33 */
+	int	n_ptsin;    /* number of pts in ptsin */
+	int	n_ptsout;   /* number of pts in ptsout */
+	int	n_intin;    /* number of values in intin */
+	int	n_intout;   /* number of values in intout */
+	int	xctrl;      /* for special uses */
 };
 
 
@@ -270,7 +282,6 @@ struct GSX_PB {
 #define ESC_MOUSE_XY    18   /* Place mouse, enter with n_ptsin=1 */
 #define ESC_MOUSE_OFF   19   /* Remove the graphic cursor */
 
-
 /* GSX_DRAW related */
 #define DRAW_BAR        1    /* Draw filled bar, n_ptsin=2, ptsin = diagonally opposite corners */
 #define DRAW_ARC        2    /* Draw arc, n_ptsin=4, n_intin=2 */
@@ -278,15 +289,33 @@ struct GSX_PB {
 #define DRAW_CIRCLE     4    /* Draw circle n_ptsin=3, ptsin=centre, a point and (radius,0) */
 #define DRAW_TEXT       5    /* Draw text, n_ptsin=1, n_intin=no.chars, ptsin=coordinates, intin=16bit-characters */
 
+/* Line style attributes */
+#define L_SOLID         0    /* Normal line drawing */
+#define L_DASH          1    /* Dashes */
+#define L_DOT           2    /* Dotted line */
+#define L_DASHDOT       3    /* Alterning dashes and dots */
+#define L_LONGDASH      4    /* Long dashes */
 
-struct GSX_CTL {
-	int	fn;         /* GSX function, 1-33 */
-	int	n_ptsin;    /* number of pts in ptsin */
-	int	n_ptsout;   /* number of pts in ptsout */
-	int	n_intin;    /* number of pts in intin */
-	int	n_intout;   /* number of pts in intin */
-	int	xctrl;      /* for special uses */
-};
+/* Marker attributes */
+#define M_PIX           0    /* Single pixel */
+#define M_PLUS          1    /* '+' symbol */
+#define M_ASTERISK      2    /* '*' symbol */
+#define M_CIRCLE        3    /* 'O' symbol */
+#define M_X             4    /* 'X' symbol */
+
+/* Fill attributes */
+#define F_EMPTY         0    /* No fill */
+#define F_FULL          1    /* Solid fill */
+#define F_HALFTONE      2    /*  */
+#define F_HATCH         3    /*  */
+
+/* Hatch types */
+#define H_VERTICAL      0
+#define H_HORIZONTAL    1
+#define H_DEG45         2
+#define H_DEG315        3
+#define H_CROSS         4
+#define H_X             5
 
 
 /* GSX GIOS Parameter block */
@@ -296,5 +325,49 @@ extern struct GSX_PB gios_pb;
 extern struct GSX_CTL gios_ctl;
 
 
+/* GSX GIOS input value list */
+extern int gios_intin[];
+
+/* GSX GIOS input coordinate list */
+extern int gios_ptsin[];
+
+/* GSX GIOS reslut (values) */
+extern int gios_intout[];
+
+/* GSX GIOS reslut (coordinates) */
+extern int gios_ptsout[];
+
+
+
+/* Invoke a GSX function (setting the GIOS fn number) */
+extern int  __LIB__   gios(int fn) __z88dk_fastcall;
+
+/* Invoke an already defined GSX function */
+#define M_GSX() bdos(CPM_GSX,gios_pb)
+
+/* GSX, load text parameter */
+extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
+
+/* Open graphics workstation (colour 1, solid styles) */
+/* 'device_id' is defined in assign.sys, usually 1=screen, 21=printer */
+#define gios_open(device_id) gios_ctl.n_ptsin=0;gios_ctl.n_intin=10;gios_intin[0]=device_id;gios_intin[2]=gios_intin[4]=gios_intin[6]=gios_intin[8]=gios_intin[9]=1;gios_intin[1]=gios_intin[3]=gios_intin[5]=gios_intin[7]=0;gios(GSX_OPEN)
+
+/* Close graphics workstation */
+#define gios_close() gios_ctl.n_intin=0;gios(GSX_CLOSE)
+
+/* Clear picture */
+#define gios_clg() gios_ctl.n_intin=0;gios(GSX_CLEAR)
+
+/* Draw a line */
+#define gios_draw(x1,y1,x2,y2) gios_ctl.n_ptsin=2;gios_ptsin[0]=x1;gios_ptsin[1]=y1;gios_ptsin[2]=x2;gios_ptsin[3]=y2;gios(GSX_POLYLINE)
+
+/* Relative drawing */
+#define gios_drawr(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2];gios_ptsin[1]=gios_ptsin[3];gios_ptsin[2]=gios_ptsin[2]+x1;gios_ptsin[3]=gios_ptsin[3]+y1;gios(GSX_POLYLINE)
+
+/* Plot a pixel */
+#define gios_plot(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2]=x1;gios_ptsin[1]=gios_ptsin[3]=y1;gios(GSX_POLYLINE)
+
+/* Output graphics (update graphics workstation) */
+#define gios_update() gios_ctl.n_intin=0;gios(GSX_OUTPUT)
 
 #endif
