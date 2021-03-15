@@ -237,8 +237,8 @@ struct GSX_CTL {
 
 #define GSX_DRAW       11     /* General drawing primitive */
 
-#define GSX_T_SZ       12     /* Set text size, n_ptsin=1 */
-#define GSX_T_D        13     /* Set text direction, n_intin=3 */
+#define GSX_T_SIZE     12     /* Set text size, n_ptsin=1 */
+#define GSX_T_ANGLE    13     /* Set text direction, n_intin=3 */
 #define GSX_PALETTE    14     /* Set colour index (palette registers), n_intin=4 */
 #define GSX_L_STYLE    15     /* Set line style, n_intin=1 */
 #define GSX_L_WIDTH    16     /* Set line width, n_ptsin=1 */
@@ -348,15 +348,29 @@ extern int  __LIB__   gios(int fn) __z88dk_fastcall;
 /* GSX, load text parameter */
 extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
 
+
 /* Open graphics workstation (colour 1, solid styles) */
 /* 'device_id' is defined in assign.sys, usually 1=screen, 21=printer */
-#define gios_open(device_id) gios_ctl.n_ptsin=0;gios_ctl.n_intin=10;gios_intin[0]=device_id;gios_intin[2]=gios_intin[4]=gios_intin[6]=gios_intin[8]=gios_intin[9]=1;gios_intin[1]=gios_intin[3]=gios_intin[5]=gios_intin[7]=0;gios(GSX_OPEN)
+#define gios_open(device_id) gios_ctl.n_ptsin=0;gios_ctl.n_intin=10;gios_intin[0]=device_id;gios_intin[2]=gios_intin[4]=gios_intin[6]=gios_intin[8]=gios_intin[9]=1;gios_intin[1]=gios_intin[3]=gios_intin[5]=gios_intin[7]=0;gios(GSX_OPEN);gios_ctl.n_intin=1;gios_intin[0]=0;gios(GSX_L_STYLE)
 
 /* Close graphics workstation */
 #define gios_close() gios_ctl.n_intin=0;gios(GSX_CLOSE)
 
+/* Output graphics (update graphics workstation) */
+#define gios_update() gios_ctl.n_intin=0;gios(GSX_OUTPUT)
+
 /* Clear picture */
 #define gios_clg() gios_ctl.n_intin=0;gios(GSX_CLEAR)
+
+
+/* Set line style */
+#define gios_l_style(style) gios_ctl.n_intin=1;gios_intin[0]=style;gios(GSX_L_STYLE)
+
+/* Set line width */
+#define gios_l_width(width) gios_ctl.n_ptsin=1;gios_ptsin[0]=width;gios_ptsin[1]=0;gios(GSX_L_WIDTH)
+
+/* Set line colour */
+#define gios_l_color(color) gios_ctl.n_intin=1;gios_intin[0]=color;gios(GSX_L_COLOR)
 
 /* Draw a line */
 #define gios_draw(x1,y1,x2,y2) gios_ctl.n_ptsin=2;gios_ptsin[0]=x1;gios_ptsin[1]=y1;gios_ptsin[2]=x2;gios_ptsin[3]=y2;gios(GSX_POLYLINE)
@@ -367,7 +381,23 @@ extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
 /* Plot a pixel */
 #define gios_plot(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2]=x1;gios_ptsin[1]=gios_ptsin[3]=y1;gios(GSX_POLYLINE)
 
-/* Output graphics (update graphics workstation) */
-#define gios_update() gios_ctl.n_intin=0;gios(GSX_OUTPUT)
+
+/* Set marker type */
+#define gios_m_type(type) gios_ctl.n_intin=1;gios_intin[0]=type;gios(GSX_M_TYPE)
+
+/* Set marker size */
+#define gios_m_height(height) gios_ctl.n_ptsin=1;gios_ptsin[0]=0;gios_ptsin[1]=height;gios(GSX_M_HEIGHT)
+
+/* Set marker colour */
+#define gios_m_color(color) gios_ctl.n_intin=1;gios_intin[0]=color;gios(GSX_M_COLOR)
+
+
+/* Set text font */
+#define gios_t_font(font) gios_ctl.n_intin=1;gios_intin[0]=font;gios(GSX_T_FONT)
+
+/* Set text colour */
+#define gios_t_colour(color) gios_ctl.n_intin=1;gios_intin[0]=color;gios(GSX_T_COLOR)
+
+
 
 #endif
