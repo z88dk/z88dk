@@ -134,6 +134,9 @@ extern option_t  mameql_options;
 extern int       mc_exec(char *target);
 extern option_t  mc_options;
 
+extern int       mgt_exec(char *target);
+extern option_t  mgt_options;
+
 extern int       msx_exec(char *target);
 extern option_t  msx_options;
 
@@ -392,6 +395,10 @@ struct {
       "Generates a CAS file for the CCE MC-1000, optional WAV file",
       NULL,
       mc_exec,   &mc_options },
+    { "bin2mgt",  "mgt",      "(C) 2021 z88dk",
+      "Creates an MGT disc",
+      NULL,
+      mgt_exec,     &mgt_options },
     { "bin2msx",  "msx",      "(C) 2001 Stefano Bodrato",
       "Adds a file header to enable the program to be loaded using 'bload \"file.bin\",r",
       NULL,
