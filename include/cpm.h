@@ -321,14 +321,20 @@ extern int gios_ptsout[];
 /* Invoke a GSX function (setting the GIOS fn number) */
 extern int  __LIB__   gios(int fn) __z88dk_fastcall;
 
-/* Invoke an already defined GSX function */
+/* Invoke an already set-up GSX function */
 #define M_GSX() bdos(CPM_GSX,gios_pb)
 
+/* Invoke a GSX function requiring one single parameter */
 extern int __LIB__ gios_1pm(int fn, int parm) __smallc;
 extern int __LIB__ gios_1pm_callee(int fn, int parm) __smallc __z88dk_callee;
 #define gios_1pm(a,b) gios_1pm_callee(a,b)
 
-/* GSX, load text parameter */
+/* Invoke a GSX function requiring 2 XY coordinates (4 values in 'ptsin') */
+extern int __LIB__ gios_2px(int fn, int x1, int y1, int x2, int y2) __smallc;
+extern int __LIB__ gios_2px_callee(int fn, int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
+#define gios_2px(f,a,b,c,d) gios_2px_callee(f,a,b,c,d)
+
+/* GSX, load text parameter in 'intin' */
 extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
 
 
@@ -355,16 +361,16 @@ extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
 #define gios_l_color(color) gios_1pm(GSX_L_COLOR,color)
 
 /* Draw a line */
-#define gios_draw(x1,y1,x2,y2) gios_ctl.n_ptsin=2;gios_ptsin[0]=x1;gios_ptsin[1]=y1;gios_ptsin[2]=x2;gios_ptsin[3]=y2;gios(GSX_POLYLINE)
+#define gios_draw(x1,y1,x2,y2) gios_2px(GSX_POLYLINE,x1,y1,x2,y2)
 
 /* Relative coord. drawing */
-#define gios_drawr(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2];gios_ptsin[1]=gios_ptsin[3];gios_ptsin[2]=gios_ptsin[2]+x1;gios_ptsin[3]=gios_ptsin[3]+y1;gios(GSX_POLYLINE)
+#define gios_drawr(x1,y1) gios_2px(GSX_POLYLINE,gios_ptsin[2],gios_ptsin[3],gios_ptsin[2]+x1,gios_ptsin[3]+y1)
 
 /* Absolute coord. drawing */
-#define gios_drawto(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2];gios_ptsin[1]=gios_ptsin[3];gios_ptsin[2]=x1;gios_ptsin[3]=y1;gios(GSX_POLYLINE)
+#define gios_drawto(x1,y1) gios_2px(GSX_POLYLINE,gios_ptsin[2],gios_ptsin[3],x1,y1)
 
 /* Plot a pixel */
-#define gios_plot(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2]=x1;gios_ptsin[1]=gios_ptsin[3]=y1;gios(GSX_POLYLINE)
+#define gios_plot(x1,y1) gios_2px(GSX_POLYLINE,x1,y1,x1,y1)
 
 
 /* Set marker type */
