@@ -360,6 +360,15 @@ extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
 /* Clear picture (hide cursor) */
 #define gios_clg() gios_ctl.n_intin=0;gios(GSX_CLEAR)
 
+/* GSX_WRTMODE related */
+#define W_REPLACE       1
+#define W_OVERSTRIKE    2
+#define W_COMPLEMENT    3    /* XOR */
+#define W_ERASE         4
+
+/* Set writing mode */
+#define gios_wmode(mode) gios_1pm(GSX_WRTMODE,mode)
+
 /* Set line style */
 #define gios_l_style(style) gios_1pm(GSX_L_STYLE,style)
 
