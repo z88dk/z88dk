@@ -1,0 +1,26 @@
+
+
+; IO Ports
+
+	; Controls 0x0000 - 0x7fff
+	; WHLBBBBB  
+	; B=Bank 
+	; L=Low rom off (1=off)
+	; H=High rom on (1=on)
+	; W=Write protect &0000-&3FFF
+	defc	LMPR = 250
+
+	; Controls 0x8000 - ffff
+	; B=Bank 
+	; C=mode 3 color lookup
+	; M=use external memory expansion
+	defc	HMPR = 251
+
+	; Controls video mode
+	; OMMBBBBB	
+	; B=Video Bank
+	; M=Mode
+	; O=midi Io
+	defc	VMPR = 252
+
+		
