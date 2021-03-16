@@ -1,7 +1,12 @@
 target/sam/stdio/fgetc_cons
 target/sam/stdio/fputc_cons
 target/sam/stdio/getk
+target/sam/stdio/asm_sam_set_mode
+target/sam/stdio/generic_console_cls
+target/sam/stdio/generic_console_scrollup
+target/sam/stdio/printc_SAM
 @stdio/ansicore.lst
+@target/zx/stdio/stdio.lst
 target/sam/stdio/ansi/f_ansi_attr
 target/sam/stdio/ansi/f_ansi_bel
 target/sam/stdio/ansi/f_ansi_char
@@ -29,5 +34,6 @@ target/zx/games/bit_open_di
 target/zx/games/bit_close
 target/zx/games/bit_close_ei
 @games/games.lst
+@font/font_8x8/font_8x8.lst
 @target/zx/spectrum.lst
 

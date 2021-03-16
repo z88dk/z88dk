@@ -1,6 +1,6 @@
 
-		SECTION	bss_clib
+    SECTION bss_clib
 
-		GLOBAL	__SYSVAR_BORDCR
+    GLOBAL  __SYSVAR_BORDCR
 
-__SYSVAR_BORDCR:	defb	0
+__SYSVAR_BORDCR:    defb	0

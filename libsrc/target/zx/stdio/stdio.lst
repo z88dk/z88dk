@@ -1,8 +1,15 @@
+target/zx/stdio/obj/${TARGET}/__zx_printc32
+target/zx/stdio/obj/${TARGET}/__zx_printc64
+target/zx/stdio/obj/${TARGET}/__zx_printc_attr
+target/zx/stdio/obj/${TARGET}/__zx_scrollup
+target/zx/stdio/obj/${TARGET}/__zx_vpeek
 target/zx/stdio/obj/${TARGET}/fputc_cons
 target/zx/stdio/obj/${TARGET}/CRT_FONT
+target/zx/stdio/obj/${TARGET}/CRT_FONT_64
+target/zx/stdio/obj/${TARGET}/CRT_FONT_FZX
 target/zx/stdio/obj/${TARGET}/generic_console_vpeek
 target/zx/stdio/obj/${TARGET}/generic_console_attrs
-target/zx/stdio/obj/${TARGET}/CRT_FONT_64
+target/zx/stdio/obj/${TARGET}/generic_console_calc_screen_address
 target/zx/stdio/obj/${TARGET}/fputc_cons_fzx
 target/zx/stdio/obj/${TARGET}/generic_console_printc
 target/zx/stdio/obj/${TARGET}/generic_console_cls
@@ -11,7 +18,6 @@ target/zx/stdio/obj/${TARGET}/fgetc_cons
 target/zx/stdio/obj/${TARGET}/conio_map_colour
 target/zx/stdio/obj/${TARGET}/getk
 target/zx/stdio/obj/${TARGET}/generic_console_ioctl
-target/zx/stdio/obj/${TARGET}/CRT_FONT_FZX
 target/zx/stdio/obj/${TARGET}/bordercolour
 target/zx/stdio/obj/${TARGET}/getk_rom
 target/zx/stdio/obj/${TARGET}/fgetc_cons_rom
