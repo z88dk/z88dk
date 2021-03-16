@@ -6,7 +6,6 @@ target/sam/stdio/generic_console_cls
 target/sam/stdio/generic_console_scrollup
 target/sam/stdio/printc_SAM
 @stdio/ansicore.lst
-@target/zx/stdio/stdio.lst
 target/sam/stdio/ansi/f_ansi_attr
 target/sam/stdio/ansi/f_ansi_bel
 target/sam/stdio/ansi/f_ansi_char
@@ -15,6 +14,7 @@ target/sam/stdio/ansi/f_ansi_default
 target/sam/stdio/ansi/f_ansi_dline
 target/sam/stdio/ansi/f_ansi_restore
 target/sam/stdio/ansi/f_ansi_scrollup
+@target/zx/stdio/stdio.lst
 @stdio/stdio.lst
 target/shared/clock
 @target/zx/input_zx.lst
