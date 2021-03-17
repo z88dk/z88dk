@@ -4,7 +4,7 @@ target/sam/stdio/getk
 target/sam/stdio/asm_sam_set_mode
 target/sam/stdio/generic_console_cls
 target/sam/stdio/generic_console_scrollup
-target/sam/stdio/printc_SAM
+target/sam/stdio/__sam_printc
 @stdio/ansicore.lst
 target/sam/stdio/ansi/f_ansi_attr
 target/sam/stdio/ansi/f_ansi_bel
