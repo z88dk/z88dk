@@ -23,7 +23,7 @@ void undraw(int x1,int y1,int x2,int y2)
 
 	esccmd_cmd='A'; // set beam position
 	esccmd_x=x1*2;
-	esccmd_y=972-y1*4;
+	esccmd_y=971-y1*4;
 	exos_write_block(DEFAULT_VIDEO, 6, esccmd);
 
 	esccmd_cmd='S'; // set beam on
@@ -31,7 +31,7 @@ void undraw(int x1,int y1,int x2,int y2)
 
 	esccmd_cmd='A'; // set beam position
 	esccmd_x=x2*2;
-	esccmd_y=972-y2*4;
+	esccmd_y=971-y2*4;
 	exos_write_block(DEFAULT_VIDEO, 6, esccmd);
 
 	esccmd_cmd='s'; // set beam off
