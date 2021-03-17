@@ -17,6 +17,8 @@
 	  
 	  zcc +ts2068 -lgfx2068hr -lm -Dhires -create-app globe.c
 	  
+	  zcc  +enterprise  -lm -create-app -lgfxephr -Dhires -lm globe.c
+	   
 	  zcc +cpm -startup=2 -oglobe.com -ltiki100 -Dhires -lm globe.c
 
 	  zcc +zx81 -clib=wrx -subtype=wrx -create-app -lm -DVIEW=1 globe.c
