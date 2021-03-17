@@ -48,10 +48,8 @@ _gios_2px_callee:
 	
 .asmentry
 
-	
-	ld	a,2				; 2 xy coordinates = (4 int parameters)
 	ld	hl,gios_ctl+2	; n_ptsin
-	ld	(hl),a
+	ld	(hl),2			; 2 xy coordinates = (4 int parameters)
 	inc hl
 	ld	(hl),0
 	ld	h,d			; fn

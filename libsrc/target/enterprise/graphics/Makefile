@@ -10,6 +10,7 @@ EPFILES = \
 	clg.c circle.c uncircle.c setxy.c fill.c \
 	draw.c drawr.c drawto.c \
 	undraw.c undrawr.c undrawto.c \
+	xordraw.c xordrawr.c xordrawto.c \
 	plot.c  unplot.c xorplot.c
 
 EPOBJECTS = $(EPFILES:.c=.o)

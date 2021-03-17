@@ -2,7 +2,7 @@ include ../../Make.config
 
 TARGET = cpm 
 
-SUBDIRS = fcntl stdio time cpm
+SUBDIRS = graphics fcntl stdio time cpm
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 ASMFILES = $(wildcard *.asm)

@@ -266,7 +266,7 @@ struct GSX_CTL {
 #define DRAW_ARC        2    /* Draw arc, n_ptsin=4, n_intin=2 */
 #define DRAW_PIESLICE   3    /* Draw pie slice,as for arc */
 #define DRAW_CIRCLE     4    /* Draw circle n_ptsin=3, ptsin=centre, a point and (radius,0) */
-#define DRAW_TEXT       5    /* Draw text, n_ptsin=1, n_intin=no.chars, ptsin=coordinates, intin=16bit-characters */
+#define DRAW_TEXT       5    /* Device specific output, n_ptsin=1, n_intin=no.chars, ptsin=coordinates, intin=16bit-characters */
 
 /* Line style attributes */
 #define L_SOLID         0    /* Normal line drawing */
@@ -321,15 +321,30 @@ extern int gios_ptsout[];
 /* Invoke a GSX function (setting the GIOS fn number) */
 extern int  __LIB__   gios(int fn) __z88dk_fastcall;
 
-/* Invoke an already defined GSX function */
+/* Invoke an already set-up GSX function */
 #define M_GSX() bdos(CPM_GSX,gios_pb)
 
+/* Invoke a GSX function requiring one single parameter */
 extern int __LIB__ gios_1pm(int fn, int parm) __smallc;
 extern int __LIB__ gios_1pm_callee(int fn, int parm) __smallc __z88dk_callee;
 #define gios_1pm(a,b) gios_1pm_callee(a,b)
 
-/* GSX, load text parameter */
+/* Invoke a GSX function requiring 2 XY coordinates (4 values in 'ptsin') */
+extern int __LIB__ gios_2px(int fn, int x1, int y1, int x2, int y2) __smallc;
+extern int __LIB__ gios_2px_callee(int fn, int x1, int y1, int x2, int y2) __smallc __z88dk_callee;
+#define gios_2px(f,a,b,c,d) gios_2px_callee(f,a,b,c,d)
+
+/* Invoke a GSX function requiring 1 XY coordinate (2 values in 'ptsin') */
+extern int __LIB__ gios_1px(int fn, int x1, int y1) __smallc;
+extern int __LIB__ gios_1px_callee(int fn, int x1, int y1) __smallc __z88dk_callee;
+#define gios_1px(f,a,b) gios_1px_callee(f,a,b)
+
+
+/* GSX, load text parameter in 'intin' */
 extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
+
+/* Print text 't' at x,y graphics coordinates */
+#define gios_put_text(x,y,t) gios_text(t);gios_1px(GSX_TEXT,x,y)
 
 
 /* Open graphics workstation (colour 1, solid styles) */
@@ -345,33 +360,45 @@ extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
 /* Clear picture (hide cursor) */
 #define gios_clg() gios_ctl.n_intin=0;gios(GSX_CLEAR)
 
+/* GSX_WRTMODE related */
+#define W_REPLACE       1
+#define W_OVERSTRIKE    2
+#define W_COMPLEMENT    3    /* XOR */
+#define W_ERASE         4
+
+/* Set writing mode */
+#define gios_wmode(mode) gios_1pm(GSX_WRTMODE,mode)
+
 /* Set line style */
 #define gios_l_style(style) gios_1pm(GSX_L_STYLE,style)
 
 /* Set line width */
-#define gios_l_width(width) gios_ctl.n_ptsin=1;gios_ptsin[0]=width;gios_ptsin[1]=0;gios(GSX_L_WIDTH)
+#define gios_l_width(width) gios_1px(GSX_L_WIDTH,width,0)
 
 /* Set line colour */
 #define gios_l_color(color) gios_1pm(GSX_L_COLOR,color)
 
 /* Draw a line */
-#define gios_draw(x1,y1,x2,y2) gios_ctl.n_ptsin=2;gios_ptsin[0]=x1;gios_ptsin[1]=y1;gios_ptsin[2]=x2;gios_ptsin[3]=y2;gios(GSX_POLYLINE)
+#define gios_draw(x1,y1,x2,y2) gios_2px(GSX_POLYLINE,x1,y1,x2,y2)
 
 /* Relative coord. drawing */
-#define gios_drawr(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2];gios_ptsin[1]=gios_ptsin[3];gios_ptsin[2]=gios_ptsin[2]+x1;gios_ptsin[3]=gios_ptsin[3]+y1;gios(GSX_POLYLINE)
+#define gios_drawr(x1,y1) gios_2px(GSX_POLYLINE,gios_ptsin[2],gios_ptsin[3],gios_ptsin[2]+x1,gios_ptsin[3]+y1)
 
 /* Absolute coord. drawing */
-#define gios_drawto(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2];gios_ptsin[1]=gios_ptsin[3];gios_ptsin[2]=x1;gios_ptsin[3]=y1;gios(GSX_POLYLINE)
+#define gios_drawto(x1,y1) gios_2px(GSX_POLYLINE,gios_ptsin[2],gios_ptsin[3],x1,y1)
+
+/* Draw a box */
+#define gios_drawb(x1,y1,x2,y2) gios_ctl.special=DRAW_BAR;gios_2px(GSX_DRAW,x1,y1,x2,y2)
 
 /* Plot a pixel */
-#define gios_plot(x1,y1) gios_ctl.n_ptsin=2;gios_ptsin[0]=gios_ptsin[2]=x1;gios_ptsin[1]=gios_ptsin[3]=y1;gios(GSX_POLYLINE)
+#define gios_plot(x1,y1) gios_2px(GSX_POLYLINE,x1,y1,x1,y1)
 
 
 /* Set marker type */
 #define gios_m_type(type) gios_1pm(GSX_M_TYPE,type)
 
 /* Set marker size */
-#define gios_m_height(height) gios_ctl.n_ptsin=1;gios_ptsin[0]=0;gios_ptsin[1]=height;gios(GSX_M_HEIGHT)
+#define gios_m_height(height) gios_1px(GSX_M_HEIGHT,0,height)
 
 /* Set marker colour */
 #define gios_m_color(color) gios_1pm(GSX_M_COLOR,color)
@@ -384,7 +411,7 @@ extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
 #define gios_t_colour(color) gios_1pm(GSX_T_COLOR,color)
 
 /* Set text size */
-#define gios_t_size(height) gios_ctl.n_ptsin=1;gios_ptsin[0]=0;gios_ptsin[1]=height;gios(GSX_T_SIZE)
+#define gios_t_size(height) gios_1px(GSX_T_SIZE,0,height)
 
 
 /* GSX_ESCAPE related: gios_esc(ESC_x) */
