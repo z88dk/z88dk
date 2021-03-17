@@ -19,6 +19,8 @@
 
     MODULE  __sam_printc
     PUBLIC  __sam_printc
+    PUBLIC  __sam_xypos_MODE3
+    PUBLIC  __sam_xypos_MODE4
 
 
     EXTERN  __zx_32col_udgs
@@ -30,7 +32,14 @@
     EXTERN  __sam_MODE4_attr
     EXTERN  SCREEN_BASE
 
-
+; Print on screen for MODE 2,3,4
+;
+; The screen mode change routine, only switches to here for these modes, mode 1 is handled
+; by the standard +zx code, so there we get a choice of 32/64 characters
+;
+; Entry: b = y
+;        c = x
+;        d = character toprint
 __sam_printc:
     ld      a,d         ;save character
     exx
@@ -67,7 +76,7 @@ handle_characters:
 ; Mode 4: 16 colours per pixel
 ; p0 p0 p0 p0 p1 p1 p1 p1
 printc_MODE4:
-    call    xypos_MODE4
+    call    __sam_xypos_MODE4
     ld      b,8
 printc_MODE4_1:
     push    bc
@@ -130,7 +139,7 @@ printc_MODE4_is_paper2:
 
 ;p0 p0 p1 p1 p2 p2 p3
 printc_MODE3:
-    call    xypos_MODE3
+    call    __sam_xypos_MODE3
     ld      b,8
 printc_MODE3_1:
     push    bc
@@ -241,7 +250,7 @@ handle_attributes:
 ;        c = column
 ;
 ;Mode 3,4; Char rows are 1024 bytes
-xypos_MODE4:
+__sam_xypos_MODE4:
     ld      a,b
     add     a
     add     a       ;*4
@@ -253,7 +262,7 @@ xypos_MODE4:
     ld      l,c
     ret
 
-xypos_MODE3:
+__sam_xypos_MODE3:
     ld      a,b
     add     a
     add     a       ;*4

@@ -5,7 +5,7 @@
 
     PUBLIC  __zx_vpeek
 
-    EXTERN  generic_console_calc_screen_addr
+    EXTERN  __zx_gencon_xy_to_dfaddr
     EXTERN  screendollar
     EXTERN  screendollar_with_count
     EXTERN  __console_w
@@ -42,7 +42,7 @@ ENDIF
 continue:
     push    hl          ;Save buffer
     ex      de,hl       ;get it into de
-    call    generic_console_calc_screen_addr
+    call    __zx_gencon_xy_to_dfaddr
     ld      b,8
 vpeek_1:
     ld      a,(hl)
@@ -75,7 +75,7 @@ handle_64col:
     ex      de,hl
     srl     c
     ex      af,af        ;save flags
-    call    generic_console_calc_screen_addr
+    call    __zx_gencon_xy_to_dfaddr
     ;hl = screen
     ex      de,hl        ;de = screen, hl=buffer
     ex      af,af

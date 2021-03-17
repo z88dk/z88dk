@@ -845,9 +845,10 @@ sam_clib.lib:
 	@echo ''
 	@echo '--- Building Sam Coupe Library ---'
 	@echo ''
-	$(call buildgeneric,sam)
+	$(call buildgeneric,sam,wide)
 	$(MAKE) -C games TARGET=sam
 	$(MAKE) -C target/zx TARGET=sam
+	$(MAKE) -C target/zx-common TARGET=sam
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
 
 # Spectravideo SVI library - Stefano

@@ -24,7 +24,7 @@ asm_sam_set_mode:
     ld      b,32
     ld      hl,__sam_printc
     cp      3
-    jr      nz,set_it
+    jr      z,set_it
     ld      b,64
 set_it:
     ; Switch the hardware to the right mode

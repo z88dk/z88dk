@@ -1,15 +1,15 @@
 
-    MODULE  generic_console_calc_screen_addr
+    MODULE  __zx_gencon_xy_to_dfaddr
 
     SECTION code_clib
-    PUBLIC  generic_console_calc_screen_addr
+    PUBLIC  __zx_gencon_xy_to_dfaddr
 
     EXTERN  __zx_screenmode
 IF FORsam
     EXTERN  SCREEN_BASE
 ENDIF
 
-generic_console_calc_screen_addr:
+__zx_gencon_xy_to_dfaddr:
 IF FORts2068|FORzxn
     bit     0,c
     push    af

@@ -9,6 +9,7 @@
 	PUBLIC	pixeladdress_MODE0
 	PUBLIC	w_pixeladdress_MODE0
 	EXTERN	__zx_screenmode
+        EXTERN  SCREEN_BASE
 
 ; Entry  hl = x
 ;        de = y
@@ -56,6 +57,10 @@ IF FORzxn | FORts2068
 	cp	1
 	jr	nz,not_screen1
 	set	5,d
+ELIF FORsam
+        ld      a,d
+        sub     +(64 - (SCREEN_BASE / 256))
+        ld      d,a
 ENDIF
 not_screen1:
         ld	a,h

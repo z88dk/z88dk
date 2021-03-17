@@ -14,14 +14,14 @@
     EXTERN  generic_console_flags
 
 
-    EXTERN  generic_console_calc_screen_addr
+    EXTERN  __zx_gencon_xy_to_dfaddr
 
 
 
 __zx_printc64:
     srl     c    ; divide by 2
     ex      af,af    ; save the lowest bit
-    call    generic_console_calc_screen_addr
+    call    __zx_gencon_xy_to_dfaddr
     ex      de,hl    ; de = screen address
     ex      af,af
     ld      a,0x0f

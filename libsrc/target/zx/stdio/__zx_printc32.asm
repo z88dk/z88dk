@@ -16,10 +16,10 @@
     EXTERN  __zx_screenmode
     EXTERN  __zx_printc_attr
 
-    EXTERN  generic_console_calc_screen_addr
+    EXTERN  __zx_gencon_xy_to_dfaddr
 
 __zx_printc32:
-    call    generic_console_calc_screen_addr    ; hl = screen address, d preserved
+    call    __zx_gencon_xy_to_dfaddr    ; hl = screen address, d preserved
     ex      de,hl
     ld      bc,(__zx_32col_font)
     dec     b
