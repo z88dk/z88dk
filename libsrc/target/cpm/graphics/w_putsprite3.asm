@@ -23,8 +23,6 @@ IF !__CPU_INTEL__
    PUBLIC    _putsprite
 
 	EXTERN	plot_callee
-	EXTERN	unplot_callee
-	EXTERN	xorplot_callee
 
 ; GSX structure used to alter the 'write mode'
 	EXTERN	gios_ctl
