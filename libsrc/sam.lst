@@ -16,6 +16,7 @@ target/sam/stdio/ansi/f_ansi_dline
 target/sam/stdio/ansi/f_ansi_restore
 target/sam/stdio/ansi/f_ansi_scrollup
 @target/zx/stdio/stdio.lst
+target/sam/graphics/cleargraphics
 target/sam/graphics/getmaxx
 target/sam/graphics/getmaxy
 target/sam/graphics/pixeladdress_MODE2
