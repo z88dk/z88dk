@@ -9,12 +9,13 @@
  */
 
 #include <cpm.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ undrawr(int px, int py) __smallc;
 
 
 void undrawr(int x,int y)
 {
 	gios_wmode(W_ERASE);
-	gios_undrawr(48*x,128*(255-y));
+	gios_drawr(48*x,128*(255-y));
 	gios_wmode(W_REPLACE);
 }
