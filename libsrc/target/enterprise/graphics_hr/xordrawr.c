@@ -9,7 +9,8 @@
  */
 
 #include <enterprise.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ xordrawr(int px, int py) __smallc;
 
 
 void xordrawr(int x,int y)
