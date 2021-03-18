@@ -8,9 +8,11 @@ include ../../../Make.config
 
 EPFILES = \
 	clg.c setxy.c \
-	plot.c   draw.c    drawb.c   drawr.c   drawto.c \
-	unplot.c undraw.c  undrawb.c undrawr.c undrawto.c \
-	xorplot.c
+	plot.c   unplot.c  xorplot.c \
+	draw.c    drawb.c   drawr.c   drawto.c \
+	undraw.c  undrawb.c undrawr.c undrawto.c \
+	xordraw.c  xordrawb.c xordrawr.c xordrawto.c
+	
 	
 
 EPOBJECTS = $(EPFILES:.c=.o)
