@@ -9,8 +9,8 @@
  */
 
 #include <cpm.h>
-#include <graphics.h>
-
+//#include <graphics.h>
+extern void __LIB__ unplot(int x, int y) __smallc;
 
 void unplot(int x, int y)
 {
