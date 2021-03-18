@@ -860,5 +860,4 @@ This article wraps up our introductory look at working with sprites in C and
 SP1. The reader should now be able to display, colour and animate any sprite of
 any size using any of the SP1 draw functions. There's a lot of ground still to
 cover and we've still not even considered important issues such as collision
-detection, but for now it's time to move on and look at some of the other
-features the SP1 library brings.
+detection. Thats the topic of the [5th article](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_05_CollisionDetectionPt1.md) in the series.

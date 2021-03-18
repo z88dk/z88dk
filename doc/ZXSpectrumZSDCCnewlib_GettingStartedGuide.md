@@ -29,11 +29,20 @@ an excellent basis for Spectrum games written with Z88DK:
 | [SP1, Masked Sprites](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_02_SimpleMaskedSprite.md) | Masked sprites |
 | [SP1, Animated Sprites](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_03_AnimatedSprite.md) | Animated sprites |
 | [SP1, Bigger Sprites](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_04_BiggerSprites.md) | Bigger sprites, colour |
+| [SP1, Collision Detection](https://github.com/z88dk/z88dk/blob/master/doc/ZXSpectrumZSDCCnewlib_SP1_05_CollisionDetection.md) | Detecting collisions between sprites |
+
 
 These documents are a work in progress. Comments and suggestions are welcome in
 the [Z88DK Sinclair ZX forum](https://www.z88dk.org/forum/viewforum.php?id=2).
 
-Example code with pre-compiled TAP files and occasionally some further work
-and extensions can be found in the author's [Github project](https://github.com/derekfountain/z88dk-zxspectrum-examples).
 
-[Derek Fountain](http://www.derekfountain.org/), June, 2018
+| Further Reading | Covers        |
+| --------------- | ------------- |
+| [The author's Github project](https://github.com/derekfountain/z88dk-zxspectrum-examples) | Example code from this guide with pre-compiled TAP files and occasionally some further work and extensions. |
+| [Wonky One Key](https://github.com/derekfountain/zxwonkyonekey) | A game written by the author of this guide, uses lots of the techniques covered. |
+| [Jordi Sesmero's SP1 Tutorial](https://github.com/jsmolina/z88dk-tutorial-sp1) | Another tutorial on using the SP1 library, covers more topics than this guide albeit in less detail. Contains a nice [Pacman](https://spectrumcomputing.co.uk/forums/viewtopic.php?p=30569) example. |
+| [Antonio Mateus's SP1 Examples](https://github.com/antoniocmateus) | A selection of SP1 examples, including a nice [Breakout clone](https://github.com/antoniocmateus/z88dk_sp1_breakout) which uses tiles. |
+
+And of course, the [Programming Forum](https://spectrumcomputing.co.uk/forums/viewforum.php?f=6) at [Spectrum Computing](https://spectrumcomputing.co.uk/), where many of the best Spectrum developers are always ready to discuss everything to do with programming the ZX Spectrum.
+
+[Derek Fountain](http://www.derekfountain.org/), March, 2021
