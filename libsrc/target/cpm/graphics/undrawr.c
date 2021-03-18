@@ -16,6 +16,6 @@ extern void __LIB__ undrawr(int px, int py) __smallc;
 void undrawr(int x,int y)
 {
 	gios_wmode(W_ERASE);
-	gios_drawr(48*x,128*(255-y));
+	gios_drawr(48*x,-(y*128));
 	gios_wmode(W_REPLACE);
 }
