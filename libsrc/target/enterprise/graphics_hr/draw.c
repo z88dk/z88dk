@@ -9,7 +9,8 @@
  */
 
 #include <enterprise.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ draw(int x1, int y1, int x2, int y2) __smallc;
 
 
 void draw(int x1,int y1,int x2,int y2)
