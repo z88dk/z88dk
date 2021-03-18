@@ -9,7 +9,8 @@
  */
 
 #include <enterprise.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ setxy(int x, int y) __smallc;
 
 
 int setxy(int x, int y)
