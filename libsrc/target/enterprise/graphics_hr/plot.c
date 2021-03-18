@@ -9,7 +9,8 @@
  */
 
 #include <enterprise.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ plot(int x, int y) __smallc;
 
 
 void plot(int x, int y)
