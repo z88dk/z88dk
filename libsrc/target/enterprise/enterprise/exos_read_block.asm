@@ -5,12 +5,15 @@
 ;	exos_read_block(unsigned char channel, unsigned int byte_count, unsigned char *address);
 ;
 ;
-;	$Id: exos_read_block.asm,v 1.3 2016-06-19 20:17:32 dom Exp $
+;	$Id: exos_read_block.asm $
 ;
 
-        SECTION code_clib
+	SECTION code_clib
 	PUBLIC	exos_read_block
 	PUBLIC	_exos_read_block
+
+	EXTERN     exos_read_block_callee
+	EXTERN     ASMDISP_EXOS_READ_BLOCK_CALLEE
 
 exos_read_block:
 _exos_read_block:
@@ -24,10 +27,4 @@ _exos_read_block:
 	push de
 	push af
 
-	ld	a,l
-	rst   30h
-	defb  6
-	ld	h,0
-	ld	l,a
-
-	ret
+   jp exos_read_block_callee + ASMDISP_EXOS_READ_BLOCK_CALLEE
