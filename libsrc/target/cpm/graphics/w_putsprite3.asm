@@ -8,9 +8,8 @@
 ;
 
 ; GSX Graphics for CP/M
-; Uses plotpixel_callee altering its behavior with GSX_WRTMODE
+; Uses plot() altering its behavior with GSX_WRTMODE
 
-; THIS VERSION USES THE __CALLEE__ ENTRIES TO AVOID CONFLICTS WITH PLOT_C
 
 ;
 ;
@@ -22,7 +21,7 @@ IF !__CPU_INTEL__
 	PUBLIC    putsprite
    PUBLIC    _putsprite
 
-	EXTERN	plot_callee
+	EXTERN	plot
 
 ; GSX structure used to alter the 'write mode'
 	EXTERN	gios_ctl
@@ -99,10 +98,11 @@ IF !__CPU_INTEL__
 	push hl
 	push de
 
-	push hl
-	push de
+;	push hl
+;	push de
 
-	call	plot_callee
+	call	plot
+	
 	pop	de
 	pop	hl
 	pop	bc
