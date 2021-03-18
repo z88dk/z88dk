@@ -27,5 +27,6 @@ graphics/retrofit/unplot_callee
 target/enterprise/graphics_hr/xorplot
 graphics/retrofit/xorplot_callee
 target/enterprise/graphics_hr/setxy
+target/enterprise/graphics_hr/move
 gfx/wide/obj/${TARGET}/w_putsprite4
 @gfx/wide/gfx_wide.lst
