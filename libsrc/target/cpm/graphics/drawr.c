@@ -9,7 +9,8 @@
  */
 
 #include <cpm.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ drawr(int px, int py) __smallc;
 
 
 void drawr(int x,int y)
