@@ -32,4 +32,8 @@ target/cpm/graphics/xorplot
 graphics/retrofit/xorplot_callee
 target/cpm/graphics/xorplot
 target/cpm/graphics/w_putsprite3
+graphics/retrofit/w_plotpixl
+graphics/retrofit/w_respixl
+graphics/retrofit/w_setxy
+target/cpm/graphics/move
 @gfx/wide/gfx_wide.lst
