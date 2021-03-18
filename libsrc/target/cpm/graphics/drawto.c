@@ -9,7 +9,8 @@
  */
 
 #include <cpm.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ drawto(int x2, int y2) __smallc;
 
 
 void drawto(int x,int y)
