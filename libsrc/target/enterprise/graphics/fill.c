@@ -9,7 +9,8 @@
  */
 
 #include <enterprise.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ fill(int x, int y) __smallc;
 
 
 void fill(int x, int y)
