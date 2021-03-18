@@ -9,7 +9,8 @@
  */
 
 #include <enterprise.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ uncircle(int x, int y, int radius, int skip) __smallc;
 
 
 void uncircle(int x, int y, int radius, int skip)
