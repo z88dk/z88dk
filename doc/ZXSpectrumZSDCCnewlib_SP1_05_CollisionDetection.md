@@ -264,7 +264,7 @@ if the sprites were also approaching downwards, from the top?  Or the sides?
 More hotspots would be required, but you only need to check those on the leading
 edge of the sprite. So which hotspot to check depends on the direction of the
 sprite's travel. The chain and sprite code is in the [examples
-repository](https://github.com/derekfountain/z88dk-zxspectrum-examples/tree/master/SP1/05_CollisionDetection/chain.c.c)
+repository](https://github.com/derekfountain/z88dk-zxspectrum-examples/tree/master/SP1/05_CollisionDetection/chain.c)
 ready to be played with.
 
 ## Box Intersections
