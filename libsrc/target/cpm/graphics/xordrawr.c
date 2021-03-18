@@ -16,6 +16,6 @@ extern void __LIB__ xordrawr(int px, int py) __smallc;
 void xordrawr(int x,int y)
 {
 	gios_wmode(W_COMPLEMENT);
-	gios_drawr(48*x,128*(255-y));
+	gios_drawr(48*x,-(y*128));
 	gios_wmode(W_REPLACE);
 }
