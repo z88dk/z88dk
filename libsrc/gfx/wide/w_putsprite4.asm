@@ -7,9 +7,7 @@
 ; Apr 2017  - Stefano: Fixed bug for sprite pos coordinates wider than 255.
 ;
 
-; Uses plot_callee
-
-; THIS VERSION USES THE __CALLEE__ ENTRIES TO AVOID CONFLICTS WITH PLOT_C
+; SMC version (smaller than w_putsprite3) Uses plot, unplot, xorplot
 
 ;
 ;
@@ -21,9 +19,9 @@ IF !__CPU_INTEL__
 	PUBLIC    putsprite
    PUBLIC    _putsprite
 
-	EXTERN	plot_callee
-	EXTERN	unplot_callee
-	EXTERN	xorplot_callee
+	EXTERN	plot
+	EXTERN	unplot
+	EXTERN	xorplot
 
 
 ; __gfx_coords: h,l (vert-horz)
@@ -57,13 +55,13 @@ IF !__CPU_INTEL__
 
 ;--------------------------------------
 	
-	ld	hl,plot_callee
+	ld	hl,plot
 	ld	(smc_fn+1),hl
 
 	cp	182	; or(hl) opcode
 	jr	z,door
 
-	ld	hl,unplot_callee
+	ld	hl,unplot
 	ld	(smc_fn+1),hl
 
 	cp	166	; and(hl) opcode
@@ -71,7 +69,7 @@ IF !__CPU_INTEL__
 
 .doxor
 	; 174 - xor
-	ld	hl,xorplot_callee
+	ld	hl,xorplot
 	ld	(smc_fn+1),hl
 	
 	
@@ -99,11 +97,9 @@ IF !__CPU_INTEL__
 	push hl
 	push de
 
-	push hl
-	push de
-
 .smc_fn
-	call	plot_callee
+	call	plot
+
 	pop	de
 	pop	hl
 	pop	bc
