@@ -9,7 +9,8 @@
  */
 
 #include <enterprise.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ undrawto(int x2, int y2) __smallc;
 
 
 void undrawto(int x,int y)
