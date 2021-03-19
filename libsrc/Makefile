@@ -16,7 +16,7 @@ TOCREATE =
 # $2 = libs
 check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(2),)
 
-CPMLIBS = cpm_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxvio.lib
+CPMLIBS = cpm_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxvio.lib gfxgsx.lib
 GENLIBS = z80iy_crt0.lib z80n_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2k_crt0.lib z80_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib  lib3d.lib fastmath.lib preempt.lib sp1-all 
 GENLIBS += 8085_opt.lib ez80_opt.lib z180_opt.lib
 
@@ -676,7 +676,7 @@ x1_cpm.lib:
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=x1
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_cpm @$(LISTFILE_DIRECTORY)/target/x1/x1.lst
 
-cpm_clib.lib: 
+cpm_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Library ---'
 	@echo ''
@@ -684,6 +684,11 @@ cpm_clib.lib:
 	$(MAKE) -C target/cpm
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide
 	TARGET=cpm TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
+
+gfxgsx.lib:
+	@echo ''
+	@echo '--- Building GSX based Z88DK GFX Library ---'
+	@echo ''
 	TARGET=cpm TYPE=z80 $(LIBLINKER) -DFORcpm -x$(OUTPUT_DIRECTORY)/gfxgsx @$(LISTFILE_DIRECTORY)/target/cpm/gfxgsx.lst
 
 cpm8080_clib.lib:
