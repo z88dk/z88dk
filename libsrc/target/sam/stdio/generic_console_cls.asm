@@ -27,7 +27,7 @@ generic_console_cls:
 cls_MODE1:
     ld      hl,SCREEN_BASE
     ld      de,SCREEN_BASE+1
-    ld      bc,6143
+    ld      bc,6144
     ld      (hl),0
     ldir
     ld      a,(__zx_console_attr)

@@ -12,6 +12,11 @@
     SECTION code_clib
     PUBLIC  fputc_cons_native
 
+    EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+    PUBLIC  ___fputc_cons_native_protection
+    defc ___fputc_cons_native_protection = THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+
+
 
 .fputc_cons_native
     ld      hl,2

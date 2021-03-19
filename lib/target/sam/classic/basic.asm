@@ -8,6 +8,8 @@
 ;
 
 
+	PUBLIC	THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+	defc	THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE = 1
 
 	defc	TAR__no_ansifont = 1
         defc    TAR__clib_exit_stack_size = 32

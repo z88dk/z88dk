@@ -1,12 +1,17 @@
+; Following 3 routines call into the ROM
 target/sam/stdio/fgetc_cons
 target/sam/stdio/fputc_cons
 target/sam/stdio/getk
-target/sam/stdio/asm_sam_set_mode
+
+; Overrides for the +zx gencon
 target/sam/stdio/generic_console_cls
 target/sam/stdio/generic_console_scrollup
 target/sam/stdio/generic_console_vpeek
 target/sam/stdio/__sam_printc
 target/sam/stdio/__sam_vpeek
+target/sam/stdio/asm_sam_set_mode
+
+; TODO: Remove the ansi terminal..
 target/sam/stdio/ansi/f_ansi_attr
 target/sam/stdio/ansi/f_ansi_bel
 target/sam/stdio/ansi/f_ansi_char
@@ -15,7 +20,12 @@ target/sam/stdio/ansi/f_ansi_default
 target/sam/stdio/ansi/f_ansi_dline
 target/sam/stdio/ansi/f_ansi_restore
 target/sam/stdio/ansi/f_ansi_scrollup
+
+; We only want bits of +zx stdio, but take it all to keep
+; things simple (Our versions are above)
 @target/zx/stdio/stdio.lst
+
+; Pixel level routines for Sam
 target/sam/graphics/cleargraphics
 target/sam/graphics/getmaxx
 target/sam/graphics/getmaxy
@@ -40,26 +50,42 @@ target/sam/graphics/xor_MODE2
 target/sam/graphics/xor_MODE3
 target/sam/graphics/xor_MODE4
 target/zx/graphics/rowtab
+; Use MODE0 from zx-common
 target/zx-common/graphics/obj/${TARGET}/res_MODE0
 target/zx-common/graphics/obj/${TARGET}/pointxy_MODE0
 target/zx-common/graphics/obj/${TARGET}/xor_MODE0
 target/zx-common/graphics/obj/${TARGET}/plot_MODE0
 target/zx-common/graphics/obj/${TARGET}/pixladdr_MODE0
 target/zx-common/graphics/obj/${TARGET}/__set_zx_pixel_colour
+@gfx/wide/gfx_wide.lst
+
+; What are these used for?
 target/sam/variables
 
+; Need to rewrite the MODE0 scroll, then kill this include
+target/zx/graphics/rowtab
 
-@stdio/ansicore.lst
-@stdio/stdio.lst
-target/shared/clock
-@target/zx/input_zx.lst
-@gfx/wide/gfx_wide.lst
-target/sam/games/beeper
+
+; Keyboard is like +zx, but extended, so needs new routines
+@input/input_keyboard.lst
+; Joysticks on the SAM are +zx Sinclair sticks (we just alias them)
+target/sam/input/in_JoyStick1
+target/sam/input/in_Joystick2
+target/zx/input/in_JoySinclair1
+target/zx/input/in_JoySinclair2
+
+; Beeper sound is the same as +zx
 target/zx/games/bit_open
 target/zx/games/bit_open_di
 target/zx/games/bit_close
 target/zx/games/bit_close_ei
+
+; ??
+target/shared/clock
+
+; Just some standard stuff now
+@stdio/ansicore.lst
+@stdio/stdio.lst
 @games/games.lst
 @font/font_8x8/font_8x8.lst
-@target/zx/spectrum.lst
-
+@font/font_4x8/font_4x8.lst

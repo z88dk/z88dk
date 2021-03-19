@@ -12,6 +12,12 @@
     PUBLIC  fgetc_cons
     PUBLIC  _fgetc_cons
 
+    EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+    PUBLIC  ___fgetc_cons_protection
+    defc ___fgetc_cons_protection = THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+
+
+
 .fgetc_cons
 ._fgetc_cons
     xor     a

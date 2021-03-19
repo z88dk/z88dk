@@ -12,6 +12,12 @@
     PUBLIC  getk
     PUBLIC  _getk
 
+    EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+    PUBLIC  ___getk_protection
+    defc ___getk_protection = THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+
+
+
 .getk
 ._getk
     call    $0169
