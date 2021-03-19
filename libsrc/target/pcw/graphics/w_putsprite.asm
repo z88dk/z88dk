@@ -134,17 +134,6 @@ IF !__CPU_INTEL__
 		ex      af,af
 		pop bc
 		pop de
-
-;		ex af,af
-;		ld	a,8
-;		add l
-;		ld  l,a
-;		jr nc,noc1
-;		ld	a,2
-;		add h
-;		ld	h,a
-;.noc1
-;		ex af,af
         ;@@@@@@@@@@
 
 ._notedge djnz     _iloop
@@ -214,17 +203,7 @@ IF !__CPU_INTEL__
 		ex      af,af
 		pop bc
 		pop de
-;		ex af,af
-;		ld	a,8
-;		add l
-;		ld  l,a
-;		jr nc,noc2
-;		ld	a,2
-;		add h
-;		ld	h,a
-;.noc2
-;		ex af,af
-         ;@@@@@@@@@@
+        ;@@@@@@@@@@
 
 .wnotedge
 .wsmc2   cp       1
