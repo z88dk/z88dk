@@ -2,6 +2,7 @@ target/pcw/graphics/cleargraphics
 target/pcw/graphics/swapgfxbk
 target/pcw/graphics/w_pixladdr
 target/pcw/graphics/w_putsprite
+target/pcw/graphics/w_stencil_render
 @gfx/wide/gfx_wide.lst
 target/pcw/psg/set_psg
 target/pcw/psg/set_psg_callee
