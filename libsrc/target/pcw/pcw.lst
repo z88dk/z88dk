@@ -3,3 +3,8 @@ target/pcw/graphics/swapgfxbk
 target/pcw/graphics/w_pixladdr
 gfx/wide/obj/${TARGET}/w_putsprite3
 @gfx/wide/gfx_wide.lst
+target/pcw/psg/set_psg
+target/pcw/psg/set_psg_callee
+target/pcw/psg/get_psg
+target/pcw/psg/psg_init
+@psg/ay/psg.lst
