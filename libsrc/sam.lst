@@ -68,6 +68,8 @@ target/zx/graphics/rowtab
 
 ; Keyboard is like +zx, but extended, so needs new routines
 @input/input_keyboard.lst
+; Games.h uses different joystick routines
+target/sam/games/joystick
 ; Joysticks on the SAM are +zx Sinclair sticks (we just alias them)
 target/sam/input/in_Joystick1
 target/sam/input/in_Joystick2
