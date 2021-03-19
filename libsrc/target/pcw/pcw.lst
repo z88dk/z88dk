@@ -1,7 +1,7 @@
 target/pcw/graphics/cleargraphics
 target/pcw/graphics/swapgfxbk
 target/pcw/graphics/w_pixladdr
-gfx/wide/obj/${TARGET}/w_putsprite3
+target/pcw/graphics/w_putsprite
 @gfx/wide/gfx_wide.lst
 target/pcw/psg/set_psg
 target/pcw/psg/set_psg_callee
