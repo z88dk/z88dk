@@ -2,6 +2,8 @@ target/enterprise/graphics_hr/circle
 target/enterprise/graphics_hr/uncircle
 target/enterprise/graphics_hr/fill
 target/enterprise/graphics_hr/clg
+target/enterprise/graphics_hr/clga
+graphics/retrofit/clga_callee
 target/enterprise/graphics_hr/draw
 graphics/retrofit/draw_callee
 target/enterprise/graphics_hr/undraw
