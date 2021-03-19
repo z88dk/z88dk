@@ -1,7 +1,7 @@
 ; Following 3 routines call into the ROM
-target/sam/stdio/fgetc_cons
+target/sam/stdio/fgetc_cons_native
 target/sam/stdio/fputc_cons
-target/sam/stdio/getk
+target/sam/stdio/getk_native
 
 ; Overrides for the +zx gencon
 target/sam/stdio/generic_console_cls

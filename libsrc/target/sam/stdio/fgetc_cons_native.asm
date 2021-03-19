@@ -9,17 +9,17 @@
 
     SECTION code_clib
 
-    PUBLIC  fgetc_cons
-    PUBLIC  _fgetc_cons
+    PUBLIC  fgetc_cons_native
+    PUBLIC  _fgetc_cons_native
 
     EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
-    PUBLIC  ___fgetc_cons_protection
-    defc ___fgetc_cons_protection = THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+    PUBLIC  ___fgetc_cons_native_protection
+    defc ___fgetc_cons_native_protection = THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
 
 
 
-.fgetc_cons
-._fgetc_cons
+.fgetc_cons_native
+._fgetc_cons_native
     xor     a
     call    $0166	;flush keyboard buffer
 loop:

@@ -32,6 +32,9 @@
     EXTERN  __sam_MODE4_attr
     EXTERN  SCREEN_BASE
 
+    EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES
+    defc ___sam_printc_protection = THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES
+
 ; Print on screen for MODE 2,3,4
 ;
 ; The screen mode change routine, only switches to here for these modes, mode 1 is handled

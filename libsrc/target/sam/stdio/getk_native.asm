@@ -1,7 +1,7 @@
 ;
 ;       SAM Coupe C Library
 ;
-;	getk() Read key status
+;	getk_native() Read key status
 ;
 ;       We will corrupt any register
 ;
@@ -9,17 +9,17 @@
 
 
     SECTION code_clib
-    PUBLIC  getk
-    PUBLIC  _getk
+    PUBLIC  getk_native
+    PUBLIC  _getk_native
 
     EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
-    PUBLIC  ___getk_protection
-    defc ___getk_protection = THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+    PUBLIC  ___getk_native_protection
+    defc ___getk_native_protection = THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
 
 
 
-.getk
-._getk
+.getk_native
+._getk_native
     call    $0169
     ld      h,0
     jr      nz,gotkey
