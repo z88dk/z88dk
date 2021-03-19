@@ -10,7 +10,7 @@
 ; modified by Stefano Bodrato - nov 2010
 ;
 ;
-; The PCW requires  paging to access to the graphics memory
+; The Amstrad PCW requires  paging to access to the graphics memory
 ; we need to move swapgfxbk/swapgfxbk1 in order to permit
 ; the sprite data to be still accessible.
 ;
@@ -20,6 +20,7 @@
 
 IF !__CPU_INTEL__
         SECTION   code_graphics
+
         PUBLIC    putsprite
         PUBLIC    _putsprite
         EXTERN    w_pixeladdress
@@ -71,13 +72,16 @@ IF !__CPU_INTEL__
         ; @@@@@@@@@@@@
         ld      h,b
         ld      l,c
+        ld      (curx),hl
         ld      (oldx),hl
         ld      (cury),de
+		call    swapgfxbk
         call    w_pixeladdress
-		;ld		(addr_sv),hl
+         ld       c,a
+		call    swapgfxbk1
+		;ld		(addr_sv),de
        ; @@@@@@@@@@@@
          ld       hl,offsets_table
-         ld       c,a
          ld       b,0
          add      hl,bc
          ld       a,(hl)
@@ -116,11 +120,31 @@ IF !__CPU_INTEL__
         ;@@@@@@@@@@
         ;Go to next byte
         ;@@@@@@@@@@
+		push de
+		push bc
+         ld      hl,(curx)
+		 ld      de,8
+		 add     hl,de
+         ld      (curx),hl
+         ld      de,(cury)
 		ex      af,af
-		ld      a,8
-		add     l
-		ld      l,a
+		call    swapgfxbk
+        call    w_pixeladdress
+		call    swapgfxbk1
 		ex      af,af
+		pop bc
+		pop de
+
+;		ex af,af
+;		ld	a,8
+;		add l
+;		ld  l,a
+;		jr nc,noc1
+;		ld	a,2
+;		add h
+;		ld	h,a
+;.noc1
+;		ex af,af
         ;@@@@@@@@@@
 
 ._notedge djnz     _iloop
@@ -129,12 +153,18 @@ IF !__CPU_INTEL__
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-        ld      hl,(oldx)
-        ld      de,(cury)
-		inc		de
-		ld		(cury),de
+         ld      hl,(oldx)
+         ld      (curx),hl
+         ld      de,(cury)
+         inc     de
+         ld      (cury),de
+		ex      af,af
+		call    swapgfxbk
         call    w_pixeladdress
-		;ld		(addr_sv),hl
+		call    swapgfxbk1
+		ex      af,af
+         ;ld      h,d
+         ;ld      l,e
         ;@@@@@@@@@@
         pop     de
          pop      bc                ;Restore data
@@ -170,12 +200,31 @@ IF !__CPU_INTEL__
         ;@@@@@@@@@@
         ;Go to next byte
         ;@@@@@@@@@@
+		push de
+		push bc
+         ld      hl,(curx)
+		 ld      de,8
+		 add     hl,de
+         ld      (curx),hl
+         ld      de,(cury)
 		ex      af,af
-		ld      a,8
-		add     l
-		ld      l,a
+		call    swapgfxbk
+        call    w_pixeladdress
+		call    swapgfxbk1
 		ex      af,af
-        ;@@@@@@@@@@
+		pop bc
+		pop de
+;		ex af,af
+;		ld	a,8
+;		add l
+;		ld  l,a
+;		jr nc,noc2
+;		ld	a,2
+;		add h
+;		ld	h,a
+;.noc2
+;		ex af,af
+         ;@@@@@@@@@@
 
 .wnotedge
 .wsmc2   cp       1
@@ -189,14 +238,21 @@ IF !__CPU_INTEL__
         ;@@@@@@@@@@
         ;Go to next line
         ;@@@@@@@@@@
-        ld      hl,(oldx)
-        ld      de,(cury)
-		inc		de
-		ld		(cury),de
+         ld      hl,(oldx)
+         ld      (curx),hl
+         ld      de,(cury)
+         inc     de
+         ld      (cury),de
+		ex      af,af
+		call    swapgfxbk
         call    w_pixeladdress
-		;ld		(addr_sv),hl
+		call    swapgfxbk1
+		ex      af,af
+         ;ld      h,d
+         ;ld      l,e
         ;@@@@@@@@@@
         pop     de
+
          pop      bc                ;Restore data
          djnz     woloop
 
@@ -213,19 +269,21 @@ IF !__CPU_INTEL__
 		 jr nextline
 
 
+
+
 ;	SECTION	rodata_graphics
 .offsets_table
          defb   1,2,4,8,16,32,64,128
 
 
+
 ;	SECTION  bss_graphics
 .oldx
          defw   0
-;.addr_sv
-;         defw 0
+.curx
+         defw   0
 .cury
-         defw 0
-
+         defw   0
 
 
 ENDIF
