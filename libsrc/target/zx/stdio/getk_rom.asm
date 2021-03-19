@@ -1,28 +1,10 @@
-;
-;	Devilishly simple Spectrum Routines
-;
-;	getk() Read key status
-;
-;
-;
-;	$Id: getk_rom.asm  $
-;
+; getk() for use in ROMS, historical name
 
-		SECTION code_clib
-		PUBLIC	getk
-		PUBLIC	_getk
-		
-		    EXTERN in_Inkey
+    SECTION code_clib
+    PUBLIC  getk
+    PUBLIC  _getk
 
+    EXTERN  getk_inkey
 
-.getk
-._getk
-	call  in_Inkey
-	ld	a,l
-IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	l,10
-.not_return
-ENDIF
-	ret
+    defc getk = getk_inkey
+    defc _getk = getk

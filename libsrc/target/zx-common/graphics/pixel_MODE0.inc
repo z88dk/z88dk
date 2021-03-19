@@ -7,7 +7,7 @@
 	EXTERN	__set_zx_pixel_colour
 
 ; We enter here with: hl = x, de = y
-IF FORzxn | FORts2068
+IF FORzxn | FORts2068 | FORsam
 	ld	a,h
 	and	a
 	ret	nz

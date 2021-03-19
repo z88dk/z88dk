@@ -276,7 +276,7 @@ ENDIF
 
 IF FORsam
 	DEFINE gotgfx
-	defc maxx	= 256
+	defc maxx	= 512
 	defc maxy	= 192
 ENDIF
 
