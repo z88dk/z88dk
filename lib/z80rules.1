@@ -4871,15 +4871,17 @@
 	ldi
 	ld	hl,%2
 
+%check 0 <= %1 <= 255
 	ld	h,%1
 	dec	h
 =
-	ld	h,%eval(%1 1 -)
+	ld	h,%eval(%1 1 - 256 %%)
 
+%check 0 <= %1 <= 255
 	ld	h,%1
 	inc	h
 =
-	ld	h,%eval(%1 1 +)
+	ld	h,%eval(%1 1 + 256 %%)
 
 	ld	hl,_%1
 	push	hl
