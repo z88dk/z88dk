@@ -27,6 +27,7 @@
 ;   6 stop sound                    see cmd_stop_sound
 ;   7 no change
 
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
     MODULE etracker
     SECTION smc_clib
 
@@ -1073,3 +1074,4 @@ song_table_set_height:
 ; align $1000
 
 module:
+ENDIF
