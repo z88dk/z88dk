@@ -43,6 +43,8 @@
 	defc	CLIB_FGETC_CONS_DELAY = 150
         defc    CRT_KEY_DEL = 12
 
+        PUBLIC CLIB_SAM_IS_BASIC
+
 	defc	__CPU_CLOCK = 3580000
 
 	INCLUDE	"target/sam/def/sam.def"

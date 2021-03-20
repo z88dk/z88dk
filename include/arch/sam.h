@@ -25,4 +25,16 @@ __sfr __at 0xfe IO_KEYBOARD;   // Keyboard (read)
 __sfr __at 0xff IO_SOUND_DATA; // Data port for SAA1099
 __sfr __banked __at 0x1ff IO_SOUND_ADDRESS; // Address port for SAA1099
 
+// Palette mirror
+extern unsigned char *SAM_PALETTE_VALUES;
+
+// Set the entire palette in one go
+extern void __LIB__ sam_load_palette(unsigned char *data);
+
+// Set an individual palette pen
+extern void __LIB__ sam_set_palette(unsigned char index, unsigned char value) __smallc;
+
+// Switch screenmode
+extern void __LIB__ sam_set_screenmode(int mode);
+
 #endif

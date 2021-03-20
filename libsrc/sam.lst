@@ -9,7 +9,7 @@ target/sam/stdio/generic_console_scrollup
 target/sam/stdio/generic_console_vpeek
 target/sam/stdio/__sam_printc
 target/sam/stdio/__sam_vpeek
-target/sam/stdio/asm_sam_set_mode
+target/sam/stdio/__sam_set_mode
 target/sam/stdio/CRT_FONT
 
 ; This ANSI terminal only works with ROM code
@@ -64,6 +64,13 @@ target/zx-common/graphics/obj/${TARGET}/plot_MODE0
 target/zx-common/graphics/obj/${TARGET}/pixladdr_MODE0
 target/zx-common/graphics/obj/${TARGET}/__set_zx_pixel_colour
 @gfx/wide/gfx_wide.lst
+
+; Sam hardware functions
+target/sam/sam/SAM_PALETTE_VALUES
+target/sam/sam/sam_load_palette
+target/sam/sam/sam_set_palette
+target/sam/sam/sam_set_screenmode
+
 
 ; What are these used for?
 target/sam/variables

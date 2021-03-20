@@ -1,5 +1,6 @@
 ; CRT0 stub for high RAM
 
+    defc    CLIB_SAM_IS_BASIC = 0
     defc    CRT_ORG_CODE  = 0x8000
     defc    TAR__register_sp = 0xfd00
     defc    TAR__clib_exit_stack_size = 4

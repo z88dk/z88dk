@@ -1,19 +1,17 @@
-    MODULE  asm_sam_set_mode
+    MODULE  __sam_set_mode
 
-    PUBLIC  asm_sam_set_mode
+    PUBLIC  __sam_set_mode
 
-    EXTERN  __zx_screenmode
-    EXTERN  __zx_print_routine
+    EXTERN  asm_sam_set_screenmode
+
     EXTERN  __zx_printc64
     EXTERN  __sam_printc
-    EXTERN  __console_w
 
     INCLUDE "target/sam/def/sam.def"
 
-; Set the screen mode
+; Set the screen mode (called via ioctl)
 ; Entry: a = screen mode (1,2,3,4)
-; TODO: Rename, this does too much to be general purpose
-asm_sam_set_mode:
+__sam_set_mode:
     dec     a
     cp      4
     ret     nc
@@ -37,8 +35,5 @@ set_it:
     and     @10011111
     or      c
     out     (VMPR),a
-    ld      a,b
-    ld      (__console_w),a
-    ld      (__zx_print_routine),hl
     ret
     
