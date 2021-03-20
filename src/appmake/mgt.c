@@ -50,6 +50,7 @@ int mgt_exec(char *target)
     char    mgt_filename[11];
     char   *ptr;
     char    filename[FILENAME_MAX+1];
+    char  bootname[FILENAME_MAX+1];
     FILE    *fpin, *bootstrap_fp;
     const char *container_extension;
     disc_handle *h;
@@ -103,11 +104,23 @@ int mgt_exec(char *target)
     h = mgt_create();
     
     // Allow DOS discs to be created - write the autoboot file
+    // The DOS file may also be present as the BOOTSTRAP file so check that
+    bootstrap_fp = NULL;
+
+    strcpy(bootname, c_binary_name);
+    suffix_change(bootname, "_BOOTSTRAP.bin");
     if ( c_dos_file ) {
+        if ( (bootstrap_fp = fopen(c_dos_file, "r")) == NULL ) {
+            exit_log(1, "Cannot open override DOS file <%s>\n",c_dos_file);
+        }
+    } else {
+        bootstrap_fp=fopen_bin(bootname, c_crt_filename);
+    }
+
+    if ( bootstrap_fp != NULL ) {
         long boot_len;
         unsigned char *boot;
 
-        bootstrap_fp = fopen(c_dos_file, "r");
         fseek(bootstrap_fp, 0, SEEK_END);
         boot_len = ftell(bootstrap_fp);
         fseek(bootstrap_fp, 0L, SEEK_SET);
@@ -120,8 +133,7 @@ int mgt_exec(char *target)
             mgt_writefile(h, "SAMDOS2   ", MGT_SAM_CODE, 32768, 0, boot, boot_len);
         }
         free(boot);
-    }
-
+    } 
 
     strcpy(filename, c_binary_name);
     ptr = zbasename(filename);

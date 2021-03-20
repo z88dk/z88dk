@@ -75,3 +75,8 @@ l_dcal:
 
     INCLUDE "crt/classic/crt_section.asm"
 
+    SECTION BOOTSTRAP
+    org 0
+ 
+    ; Samdos source code is here: https://github.com/stefandrissen/samdos
+    BINARY "target/sam/classic/samdos2.bin"
