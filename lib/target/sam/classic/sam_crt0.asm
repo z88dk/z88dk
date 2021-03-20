@@ -41,6 +41,7 @@
         defc __CLIB_ZX_CONIO32 = CLIB_ZX_CONIO32
 	defc CONSOLE_ROWS = 24
 	defc	CLIB_FGETC_CONS_DELAY = 150
+        defc    CRT_KEY_DEL = 12
 
 	defc	__CPU_CLOCK = 3580000
 

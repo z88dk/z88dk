@@ -8,11 +8,12 @@
 static char             *c_binary_name       = NULL;
 static char             *c_crt_filename      = NULL;
 static char             *c_output_file       = NULL;
-static char             *c_boot_filename     = NULL;
+static char             *c_dos_file     = NULL;
 static char             *c_disc_container    = "raw";
+static int               c_origin            = -1;
+static char              c_zx_mode           = 0;
+static char              c_executable        = 0;
 static char              help         = 0;
-
-static void mgt_writefile(disc_handle *h, char *filename, int exec, unsigned char *data, size_t len);
 
 
 /* Options that are available for this module */
@@ -21,8 +22,11 @@ option_t mgt_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR|OPT_INPUT,   &c_binary_name },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &c_crt_filename },
     { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &c_output_file },
-    { 's', "bootfile", "Name of the boot file",      OPT_STR,   &c_boot_filename },
+    {  0,  "dosfile",  "Name of the DOS file",       OPT_STR,   &c_dos_file },
     {  0,  "container", "Type of container (raw,dsk)", OPT_STR, &c_disc_container },
+    {  0 , "org",      "Origin of the binary",       OPT_INT,   &c_origin },
+    {  0 , "zx",       "Create Spectrum +D discs",   OPT_BOOL,   &c_zx_mode },
+    { 'x', "exec",     "Make the file executable",   OPT_BOOL,  &c_executable },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -46,10 +50,12 @@ int mgt_exec(char *target)
     char    mgt_filename[11];
     char   *ptr;
     char    filename[FILENAME_MAX+1];
-    char    bootname[FILENAME_MAX+1];
     FILE    *fpin, *bootstrap_fp;
+    const char *container_extension;
     disc_handle *h;
     int i;
+    disc_writer_func writer;
+    int     origin;
     long    pos;
 
 
@@ -63,8 +69,23 @@ int mgt_exec(char *target)
         return -1;
     }
 
+    // Get the writer for function for the chosen disc container
+    if ( (writer = disc_get_writer(c_disc_container, &container_extension)) == NULL ) {
+        exit_log(1,"Cannot file disc container format <%s>\n",c_disc_container);
+    }
+    
+
+
     if ( ( fpin = fopen_bin(c_binary_name, c_crt_filename) ) == NULL ) {
         exit_log(1,"Cannot open binary file <%s>\n",c_binary_name);
+    }
+
+    if ( c_origin != -1 ) {
+       origin = c_origin;
+    } else {
+        if ( (origin = get_org_addr(c_crt_filename)) == -1 ) {
+            exit_log(1,"Could not find parameter CRT_ORG_CODE (not z88dk compiled?)\n");
+        }
     }
 
     if (fseek(fpin, 0, SEEK_END)) {
@@ -79,21 +100,25 @@ int mgt_exec(char *target)
     fclose(fpin);
 
 
-    h = disc_create(&mgt_spec);
-
+    h = mgt_create();
+    
     // Allow DOS discs to be created - write the autoboot file
-    if ( c_boot_filename ) {
+    if ( c_dos_file ) {
         long boot_len;
         unsigned char *boot;
 
-        bootstrap_fp = fopen(c_boot_filename, "r");
+        bootstrap_fp = fopen(c_dos_file, "r");
         fseek(bootstrap_fp, 0, SEEK_END);
         boot_len = ftell(bootstrap_fp);
         fseek(bootstrap_fp, 0L, SEEK_SET);
 
         boot = must_malloc(boot_len);
-        if (boot_len != fread(boot, 1, boot_len, bootstrap_fp)) { fclose(bootstrap_fp); exit_log(1, "Could not read required data from <%s>\n",c_boot_filename); }
-        mgt_writefile(h, "auto.bin  ", 1, boot, boot_len);
+        if (boot_len != fread(boot, 1, boot_len, bootstrap_fp)) { fclose(bootstrap_fp); exit_log(1, "Could not read required data from <%s>\n",c_dos_file); }
+        if ( c_zx_mode ) {
+            mgt_writefile(h, "GDOS      ", MGT_CODE, 8192, 0, boot, boot_len);
+        } else {
+            mgt_writefile(h, "SAMDOS2   ", MGT_SAM_CODE, 32768, 0, boot, boot_len);
+        }
         free(boot);
     }
 
@@ -110,15 +135,27 @@ int mgt_exec(char *target)
     }
     mgt_filename[10] = 0;
 
-    mgt_writefile(h, mgt_filename, 0, buf, pos);
+    if ( c_zx_mode ) {
+        mgt_writefile(h, mgt_filename, MGT_CODE,  origin, c_executable, buf, pos);    
+    } else {
+        mgt_writefile(h, c_executable ? "auto.bin  " : mgt_filename, MGT_SAM_CODE,  origin, c_executable, buf, pos);    
+    }    
 
-    suffix_change(filename, ".mgt");
-    disc_write_raw(h, filename);
+    if ( strcmp(c_disc_container,"raw") == 0 ) container_extension = ".mgt";
+
+    suffix_change(filename, container_extension );
+    writer(h, filename);
 
     return 0;
 }
 
-static void mgt_writefile(disc_handle *h, char mgt_filename[11], int isexec, unsigned char *data, size_t len)
+disc_handle *mgt_create(void) 
+{
+    return disc_create(&mgt_spec);
+}
+
+void mgt_writefile(disc_handle *h, char mgt_filename[11], mgt_filetype filetype, 
+                    int org, int isexec, unsigned char *data, size_t len)
 {
     unsigned char sector[512];
     unsigned char direntry[256];
@@ -196,10 +233,66 @@ static void mgt_writefile(disc_handle *h, char mgt_filename[11], int isexec, uns
         exit_log(1, "Not enough free space on disc to write file\n");
     }
 
+
+
+ 
+
+    /* SAMDOS Directory entry
+     * 0    = file type
+     * 1-10 = filename
+     * 11 = msb number sectors used
+     * 12 = lsb number sectors used
+     * 13 = start track
+     * 14 = start sector
+     * 15-209 sector map
+     * 210-219 = mgtpast and present (not used SAM)
+     * 220 = flags (MGT)
+     * 221-231 - filetype info
+     * 232-235 - spare 4 bytes
+     * 236 = start page number
+     * 237-238 = pageoffset (8000-bffff)
+     * 239 = numberof pages in length
+     * 240-241 = module filelength (0-16383)
+     * 242-244 = execution address
+     * 245-253 = spare 8 bytes
+     * 254-255 = reserved
+     */
+
+    /* Spectrum
+     * 0    = file type
+     * 1-10 = filename
+     * 11 = msb number sectors used
+     * 12 = lsb number sectors used
+     * 13 = start track
+     * 14 = start sector
+     * 15-209 sector map
+
+        BASIC (type 1)
+        ---------------
+        211      Always 0 (this is the id used in tape header)
+        212-213  Length
+        214-215  Memory start address ( PROG when loading - usually 23755)
+        216-217  Length without variables
+        218-219  Autostart line
+        NOTE: These 9 bytes are also the first 9 bytes of the file.
+
+        CODE FILE (type 4)
+        ------------------
+        211      Always 3 (this is the id used in tape header)
+        212-213  Length
+        214-315  Start address
+        216-217  Not used
+        218-219  Autorun address (0 if there is no autorun address)
+
+        SCREEN$ (type 7)
+        ----------------
+        Same as type 4 with Start=16384 and Length=6912
+    */
+
     // Prepare the directory entry
     memset(direntry, 0, sizeof(direntry));
     memset(sector, 0, sizeof(sector));
-    direntry[0] = sector[0] = 19; // SAM code (todo)
+    direntry[0] = sector[0] = filetype; // SAM code (todo)
     memcpy(direntry+1, mgt_filename, 10);
 
     i = (len + 9) / 510;  // number of sectors used
@@ -208,24 +301,60 @@ static void mgt_writefile(disc_handle *h, char mgt_filename[11], int isexec, uns
     direntry[13] = 0;            // Start Track
     direntry[14] = 0;            // Start sector
     direntry[220] = 0;           // Flags not set
-    
-    // Prepare the file header 
-    direntry[236] = sector[8] = 1;
-    direntry[237] = sector[3] = 0;
-    direntry[238] = sector[4] = 128;
-    direntry[239] = sector[7] = len / 16384;
-    direntry[240] = sector[1] = len % 256;
-    direntry[241] = sector[2] = (len % 16384) / 256;
 
-    if (isexec ) {
-        direntry[242] = 2; // Page
-        direntry[243] = 0; // lsb
-        direntry[244] = 128; // msb
-    } else {
-        direntry[242] = 0xff; // Page
-        direntry[243] = 0xff; // lsb
-        direntry[244] = 0xff; // msb
+
+    /* Disc file header
+     *
+     * SAM:
+     * 0 = file type
+     * 1-2 = modulolength
+     * 3-4 = offset start
+     * 5-6 = unused
+     * 7 = number of pages
+     * 8 = starting page
+     */
+    switch (filetype) {
+    case MGT_CODE:
+    case MGT_SCREEN:
+        /*
+         *   211      Always 3 (this is the id used in tape header)
+         *   212-213  Length
+         *   214-315  Start address
+         *   216-217  Not used
+         *   218-219  Autorun address (0 if there is no autorun address)
+         */
+        direntry[211] = sector[0] = 3;
+        direntry[212] = sector[1] = len % 256;
+        direntry[213] = sector[2] = len / 256;
+        direntry[214] = sector[3] = org / 256;
+        direntry[215] = sector[4] = org / 256;
+        if ( isexec ) {
+            direntry[218] = sector[7] = org / 256;
+            direntry[219] = sector[8] = org / 256;
+        }
+        break;
+
+    case MGT_SAM_CODE:
+        direntry[236] = sector[8] = 1;
+        direntry[237] = sector[3] = org % 256;
+        direntry[238] = sector[4] = org / 256;
+        direntry[239] = sector[7] = len / 16384;
+        direntry[240] = sector[1] = len % 256;
+        direntry[241] = sector[2] = (len % 16384) / 256;
+        if ( isexec ) {
+            direntry[242] = 2; // Page
+            direntry[243] = org % 256; // lsb
+            direntry[244] = org / 256; // msb
+        } else {
+            direntry[242] = 0xff; // Page
+            direntry[243] = 0xff; // lsb
+            direntry[244] = 0xff; // msb
+        }
+        break;
+    default:
+        exit_log(1, "Unsupported MGT file type %d\n",filetype);
     }
+   
     // Clear the map used for this file
     memset(usedmap, 0, 195);
 

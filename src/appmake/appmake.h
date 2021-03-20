@@ -736,3 +736,27 @@ extern void mb_generate_output_binary_complete(char *binname, int ihex, int fill
 extern void mb_delete_source_binaries(struct banked_memory *memory);
 extern void mb_cleanup_memory(struct banked_memory *memory);
 extern void mb_cleanup_aligned(struct aligned_data *aligned);
+
+
+/* mgt.c */
+typedef enum {
+    MGT_ERASE = 0,
+    MGT_BASIC = 1,
+    MGT_NUMBER_ARRAY = 2,
+    MGT_STRING_ARRAY = 3,
+    MGT_CODE = 4,
+    MGT_SNAP48K = 5,
+    MGT_MICRODRIVE = 6,
+    MGT_SCREEN = 7,
+    MGT_SPECIAL = 8,
+    MGT_SNAP128K = 9,
+    MGT_OPENTYPE = 10,
+    MGT_EXECUTE = 11,
+    MGT_SAM_BASIC = 16,
+    MGT_SAM_NUMBER_ARRAY = 17,
+    MGT_SAM_STRING_ARRAY = 18,
+    MGT_SAM_CODE = 19,
+    MGT_SAM_SCREEN = 20,
+} mgt_filetype;
+extern disc_handle *mgt_create(void);
+extern void mgt_writefile(disc_handle *h, char mgt_filename[11], mgt_filetype filetype, int org, int isexec, unsigned char *data, size_t len);

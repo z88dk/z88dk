@@ -25,13 +25,18 @@
 ;	$Id: f_ansi_char.asm,v 1.3 2016-06-12 16:06:43 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	ansi_CHAR
+    SECTION code_clib
+    PUBLIC	ansi_CHAR
 	
-	EXTERN	__console_y
-	EXTERN	__console_x
+    EXTERN	__console_y
+    EXTERN	__console_x
 
-	PUBLIC	UNDRLN
+    PUBLIC	UNDRLN
+
+    EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+    PUBLIC  ___ansi_char_native_protection
+    defc ___ansi_char_native_protection = THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
+
 	
 .ansi_CHAR
 	ld	b,a		; Save char to print

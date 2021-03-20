@@ -10,8 +10,9 @@ target/sam/stdio/generic_console_vpeek
 target/sam/stdio/__sam_printc
 target/sam/stdio/__sam_vpeek
 target/sam/stdio/asm_sam_set_mode
+target/sam/stdio/CRT_FONT
 
-; TODO: Remove the ansi terminal..
+; This ANSI terminal only works with ROM code
 target/sam/stdio/ansi/f_ansi_attr
 target/sam/stdio/ansi/f_ansi_bel
 target/sam/stdio/ansi/f_ansi_char
@@ -20,6 +21,11 @@ target/sam/stdio/ansi/f_ansi_default
 target/sam/stdio/ansi/f_ansi_dline
 target/sam/stdio/ansi/f_ansi_restore
 target/sam/stdio/ansi/f_ansi_scrollup
+
+; Keyboard is like +zx, but extended, so needs new routines
+; Pull it in before zxstdio so we get keyboard reading
+input/fgetc_cons
+@input/input_keyboard.lst
 
 ; We only want bits of +zx stdio, but take it all to keep
 ; things simple (Our versions are above)
@@ -66,8 +72,6 @@ target/sam/variables
 target/zx/graphics/rowtab
 
 
-; Keyboard is like +zx, but extended, so needs new routines
-@input/input_keyboard.lst
 ; Games.h uses different joystick routines
 target/sam/games/joystick
 ; Joysticks on the SAM are +zx Sinclair sticks (we just alias them)
