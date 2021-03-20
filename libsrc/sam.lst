@@ -71,6 +71,8 @@ target/sam/sam/sam_load_palette
 target/sam/sam/sam_set_palette
 target/sam/sam/sam_set_screenmode
 
+; Lets pull in etracker for the sound chip
+@psg/saa1099/saa1099.lst
 
 ; What are these used for?
 target/sam/variables

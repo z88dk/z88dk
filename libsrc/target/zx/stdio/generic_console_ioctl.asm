@@ -14,7 +14,7 @@
     EXTERN  __zx_print_routine
     EXTERN  __zx_printc64
 
-    EXTERN  asm_sam_set_mode
+    EXTERN  __sam_set_mode
     EXTERN  asm_zxn_copytiles
     EXTERN  generic_console_zxn_tile_printc
     EXTERN  generic_console_caps
@@ -78,10 +78,13 @@ IF FORsam
     cp      5
     jr      nc,failure
     push    af
-    call    asm_sam_set_mode    ;Sets up console_w for us
+    call    __sam_set_mode    ;Exits: b = console_w, hl=print routine
     pop     af
     dec     a                   ;Nice to have it 0-3 
     ld      (__zx_screenmode),a
+    ld      a,b
+    ld      (__console_w),a
+    ld      (__zx_print_routine),hl
     ld      a,CLIB_GENCON_CAPS
     ld      (generic_console_caps),a
     call    generic_console_cls
