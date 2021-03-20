@@ -1976,3 +1976,17 @@ void mb_cleanup_aligned(struct aligned_data *aligned)
     aligned->num = 0;
     aligned->array = NULL;
 }
+
+
+// This bit of code is used (rather than stat), because we create a temporary file
+// With all the sections included in it
+long get_file_size(FILE *fp) 
+{
+    long len;
+
+    fseek(fp, 0, SEEK_END);
+    len = ftell(fp);
+    fseek(fp, 0L, SEEK_SET);
+    return len;
+}
+

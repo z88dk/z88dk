@@ -88,14 +88,8 @@ int mgt_exec(char *target)
             exit_log(1,"Could not find parameter CRT_ORG_CODE (not z88dk compiled?)\n");
         }
     }
+    pos = get_file_size(fpin);
 
-    if (fseek(fpin, 0, SEEK_END)) {
-        fclose(fpin);
-        exit_log(1,"Couldn't determine size of file\n");
-    }
-
-    pos = ftell(fpin);
-    fseek(fpin, 0L, SEEK_SET);
     buf = must_malloc(pos);
     if (pos != fread(buf, 1, pos, fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n",c_binary_name); }
     fclose(fpin);
@@ -121,9 +115,7 @@ int mgt_exec(char *target)
         long boot_len;
         unsigned char *boot;
 
-        fseek(bootstrap_fp, 0, SEEK_END);
-        boot_len = ftell(bootstrap_fp);
-        fseek(bootstrap_fp, 0L, SEEK_SET);
+        boot_len = get_file_size(bootstrap_fp);
 
         boot = must_malloc(boot_len);
         if (boot_len != fread(boot, 1, boot_len, bootstrap_fp)) { fclose(bootstrap_fp); exit_log(1, "Could not read required data from <%s>\n",c_dos_file); }

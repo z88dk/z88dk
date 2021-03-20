@@ -658,6 +658,9 @@ extern void         zx_pilot(int pilot_len, FILE *fpout);
 extern void         zx_rawbit(FILE *fpout, int period);
 extern void         zx_rawout (FILE *fpout, unsigned char b, char fast);
 
+extern long         get_file_size(FILE *fp);
+
+
 /*  record size for bin2hex and other text encoding formats */
 extern int          bin2hex(FILE *input, FILE *output, int address, uint32_t len, int recsize, int eofrec);
 extern int          hexdigit(char digit);
