@@ -27,7 +27,7 @@
 ;   6 stop sound                    see cmd_stop_sound
 ;   7 no change
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
+IF __CPU_Z80__ | __CPU_Z80N__
     MODULE etracker
     SECTION smc_clib
 
