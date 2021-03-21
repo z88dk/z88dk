@@ -18,13 +18,7 @@ generic_console_cls:
 	call	swapgfxbk1
 	ret
 
-	SECTION	code_rodata
-
-	; clears screen, sets up VRAM as 0
-initscr:        defb    0x1a, '$'
-
         SECTION code_crt_init
-
-        ld      de,initscr
-        ld      c,9
+	ld	c,4
+	ld	e,0x1a		;Clears screen, sets up VRAM at 0
         call    __bdos
