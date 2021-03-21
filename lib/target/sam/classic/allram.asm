@@ -1,7 +1,7 @@
 ; CRT0 stub for allram Sam Coupe
 
     defc    CRT_ORG_CODE  = 0x0000
-    defc    TAR__register_sp = 0x8000
+    defc    TAR__register_sp = 0x0000       ;Not used
     defc    TAR__clib_exit_stack_size = 4
     defc    TAR__fputc_cons_generic = 1
     defc    CLIB_SAM_IS_BASIC = 0
@@ -17,7 +17,11 @@
 
     EXTERN  nmi_vectors
 
-    ; No interrupts registered
+    ; In allram we need to have a stack in low memory, make it so
+    IFNDEF CRT_STACK_SIZE
+        defc    CRT_STACK_SIZE = 1024
+    ENDIF
+
     defc    TAR__crt_enable_rst = $8080
     IFNDEF CRT_ENABLE_NMI
         defc        TAR__crt_enable_nmi = 1
@@ -53,7 +57,7 @@ setup_in_low_memory:
     ;; And fall into program
 program:
     ; Make room for the atexit() stack
-    INCLUDE "crt/classic/crt_init_sp.asm"
+    ld      sp,stacktop
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
     ld      (exitsp),sp
@@ -155,6 +159,12 @@ __sam_graphics_pageout:
     ex      af,af
     push    bc
     ret
+
+
+stack:
+
+    defs    CRT_STACK_SIZE
+stacktop:
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"
 
