@@ -50,7 +50,6 @@ int mgt_exec(char *target)
     char    mgt_filename[11];
     char   *ptr;
     char    filename[FILENAME_MAX+1];
-    char  bootname[FILENAME_MAX+1];
     FILE    *fpin, *bootstrap_fp;
     const char *container_extension;
     disc_handle *h;
@@ -96,19 +95,11 @@ int mgt_exec(char *target)
 
 
     h = mgt_create();
-    
-    // Allow DOS discs to be created - write the autoboot file
-    // The DOS file may also be present as the BOOTSTRAP file so check that
     bootstrap_fp = NULL;
-
-    strcpy(bootname, c_binary_name);
-    suffix_change(bootname, "_BOOTSTRAP.bin");
     if ( c_dos_file ) {
         if ( (bootstrap_fp = fopen(c_dos_file, "r")) == NULL ) {
             exit_log(1, "Cannot open override DOS file <%s>\n",c_dos_file);
         }
-    } else {
-        bootstrap_fp=fopen_bin(bootname, c_crt_filename);
     }
 
     if ( bootstrap_fp != NULL ) {
@@ -142,6 +133,9 @@ int mgt_exec(char *target)
     if ( c_zx_mode ) {
         mgt_writefile(h, mgt_filename, MGT_CODE,  origin, c_executable, buf, pos);    
     } else {
+        // If the origin is 0, then it's allram mode, but we start executing at
+        // 32768 when loaded
+        if ( origin == 0 ) origin = 32768;
         mgt_writefile(h, c_executable ? "auto.bin  " : mgt_filename, MGT_SAM_CODE,  origin, c_executable, buf, pos);    
     }    
 

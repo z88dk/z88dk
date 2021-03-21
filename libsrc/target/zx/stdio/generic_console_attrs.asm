@@ -1,6 +1,6 @@
     MODULE generic_console_attrs
 
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  generic_console_set_ink
     PUBLIC  generic_console_set_paper
     PUBLIC  generic_console_set_attribute

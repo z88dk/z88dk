@@ -2,6 +2,8 @@
     EXTERN  pixeladdress_MODE2
     EXTERN  __gfx_coords
     EXTERN  l_cmp
+    EXTERN  __sam_graphics_pagein
+    EXTERN  __sam_graphics_pageout
 
     INCLUDE "graphics/grafix.inc"
 
@@ -27,6 +29,7 @@
     ld      h,e
 
     push    bc    ;Save callers value
+    call    __sam_graphics_pagein
     call    pixeladdress_MODE2    ;hl = address, a = pixel number
     ld      b,a
     ld      a,@10000000
@@ -62,5 +65,6 @@ ELSE
     ld      a,(__zx_console_attr)
     ld      (hl),a
 ENDIF
+    call    __sam_graphics_pageout
     pop     bc        ;Restore callers
     ret

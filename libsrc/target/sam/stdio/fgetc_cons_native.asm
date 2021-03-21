@@ -7,7 +7,7 @@
 ;
 ;       Stefano Bodrato - Mar.2001
 
-    SECTION code_clib
+    SECTION code_driver
 
     PUBLIC  fgetc_cons_native
     PUBLIC  _fgetc_cons_native

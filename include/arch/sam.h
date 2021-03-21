@@ -37,4 +37,17 @@ extern void __LIB__ sam_set_palette(unsigned char index, unsigned char value) __
 // Switch screenmode
 extern void __LIB__ sam_set_screenmode(int mode);
 
+// Add an interrupt handler on FRAME interrupt
+extern void __LIB__ add_raster_int(void *ptr);
+
+// Add and remove line ISR handlers. Setting up the line
+// the interrupt is executed can be achieved as follows:
+//
+// IO_INTERRUPT = n;
+//
+// Where n is the line number
+extern void __LIB__ sam_install_line_isr(void *ptr);
+extern void __LIB__ sam_uninstall_line_isr(void *ptr);
+
+
 #endif

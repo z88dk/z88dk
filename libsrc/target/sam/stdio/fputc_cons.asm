@@ -9,7 +9,7 @@
 ;	Frode Tenneb� - 29/12/2002
 
 
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  fputc_cons_native
 
     EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_BASIC_SUBTYPE
@@ -50,7 +50,7 @@ direct:
     ld      (0x5C8C),a
     ret
 
-    SECTION bss_clib
+    SECTION bss_driver
 
 skip_count:	
     defb    0

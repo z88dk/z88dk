@@ -2,7 +2,7 @@
     MODULE  generic_console_ioctl
     PUBLIC  generic_console_ioctl
 
-    SECTION code_clib
+    SECTION code_driver
     INCLUDE "ioctl.def"
 
     EXTERN  generic_console_cls

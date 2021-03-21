@@ -8,7 +8,7 @@
 
     MODULE  __zx_scrollup
 
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  __zx_scrollup
     EXTERN  call_rom3
     EXTERN  __zx_screenmode
@@ -21,6 +21,8 @@
 IF FORsam
     defc    NOROMCALLS = 1
     EXTERN  SCREEN_BASE
+    EXTERN  __sam_graphics_pagein
+    EXTERN  __sam_graphics_pageout
 ENDIF
 
         
@@ -36,6 +38,9 @@ ENDIF
 IF NOROMCALLS
     ; TODO: Do this better without the big table
     ; Code to be used when the original ROM is missing or not available
+IF FORsam
+    call    __sam_graphics_pagein
+ENDIF
     push    ix
     ld      ix,zx_rowtab
     ld      a,8
@@ -115,6 +120,9 @@ ENDIF
     ldir
         
     pop     ix
+IF FORsam
+    call    __sam_graphics_pageout
+ENDIF
     pop     bc
     pop     de
     ret

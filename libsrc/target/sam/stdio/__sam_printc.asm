@@ -31,6 +31,8 @@
     EXTERN  __sam_MODE3_attr
     EXTERN  __sam_MODE4_attr
     EXTERN  SCREEN_BASE
+    EXTERN  __sam_graphics_pagein
+    EXTERN  __sam_graphics_pageout
 
     EXTERN  THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES
     defc ___sam_printc_protection = THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES
@@ -80,6 +82,7 @@ handle_characters:
 ; p0 p0 p0 p0 p1 p1 p1 p1
 printc_MODE4:
     call    __sam_xypos_MODE4
+    call    __sam_graphics_pagein
     ld      b,8
 printc_MODE4_1:
     push    bc
@@ -135,6 +138,7 @@ printc_MODE4_is_paper2:
     add     hl,de
     pop     bc
     djnz    printc_MODE4_1
+    call    __sam_graphics_pageout
     ret
 
 
@@ -143,6 +147,7 @@ printc_MODE4_is_paper2:
 ;p0 p0 p1 p1 p2 p2 p3
 printc_MODE3:
     call    __sam_xypos_MODE3
+    call    __sam_graphics_pagein
     ld      b,8
 printc_MODE3_1:
     push    bc
@@ -197,6 +202,7 @@ is_paper:
     add     hl,de
     pop     bc
     djnz    printc_MODE3_1
+    call    __sam_graphics_pageout
     ret
 
 
@@ -213,6 +219,7 @@ printc_MODE2:
     add     b
     ld      h,a
     ld      l,c
+    call    __sam_graphics_pagein
     ld      de,32
     ld      a,(__zx_console_attr)
     ld      c,a
@@ -239,12 +246,14 @@ handle_attributes:
     ; hl holds address of line of character below, lets go back
     exx
     bit     3,b
-    ret     z
+    jr      z,mode2_end
     exx
     and     a
     sbc     hl,de
     ld      a,255
     ld      (hl),a
+mode2_end:
+    call    __sam_graphics_pagein
     ret
 
 

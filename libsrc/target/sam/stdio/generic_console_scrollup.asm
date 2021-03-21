@@ -1,5 +1,5 @@
     MODULE  generic_console_scrollup
-    SECTION code_clib
+    SECTION code_driver
 
     PUBLIC  generic_console_scrollup
 
@@ -8,6 +8,8 @@
     EXTERN  __sam_MODE3_attr
     EXTERN  __sam_MODE4_attr
     EXTERN  __zx_scrollup
+    EXTERN  __sam_graphics_pagein
+    EXTERN  __sam_graphics_pageout
     EXTERN  SCREEN_BASE
     EXTERN  l_dcal
 
@@ -15,6 +17,7 @@
 generic_console_scrollup:
     push    de
     push    bc
+    call    __sam_graphics_pagein
     ld      a,(__zx_screenmode)
     add     a
     add     +(scrollup_table % 256)
@@ -27,6 +30,7 @@ generic_console_scrollup:
     ld      h,(hl)
     ld      l,a
     call    l_dcal
+    call    __sam_graphics_pageout
     pop     bc
     pop     de
     ret
@@ -97,7 +101,7 @@ scrollup:
     ret
 
 
-    SECTION rodata_clib
+    SECTION rodata_driver
 
 scrollup_table:
     defw    __zx_scrollup

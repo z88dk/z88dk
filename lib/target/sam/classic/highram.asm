@@ -12,10 +12,10 @@
     PUBLIC  THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES
     defc    THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES = 1
 
+    PUBLIC  __sam_graphics_pagein
+    PUBLIC  __sam_graphics_pageout
 
     INCLUDE "crt/classic/crt_rules.inc"
-
-    EXTERN  asm_im1_handler
 
     org     CRT_ORG_CODE
 
@@ -54,7 +54,7 @@ ENDIF
     ldir
     ld      a,195
     ld      ($fdfd),a
-    ld      hl,asm_im1_handler
+    ld      hl,int_handler
     ld      ($fdfe),hl
     ld      a,0xfe
     ld      i,a
@@ -68,6 +68,31 @@ cleanup:
 endloop:
     jr      endloop
 
+; Paging routines for graphics
+__sam_graphics_pagein:
+__sam_graphics_pageout:
+    ret
+
+; Interrupt handler
+
+    EXTERN  line_vectors
+    EXTERN  im1_vectors
+    EXTERN  asm_interrupt_handler
+int_handler:
+    push    af
+    push    hl
+    in      a,(STATUS)
+    ld      hl,im1_vectors
+    bit     3,a             ;Frame interrupt
+    jr      z,despatch
+    ld      hl,line_vectors
+    bit     0,a             ;Line interrupt
+despatch:
+    call    z, asm_interrupt_handler
+    pop     hl
+    pop     af
+    ei
+    ret
 
 l_dcal:
     jp      (hl)
@@ -76,8 +101,3 @@ l_dcal:
 
     INCLUDE "crt/classic/crt_section.asm"
 
-    SECTION BOOTSTRAP
-    org 0
- 
-    ; Samdos source code is here: https://github.com/stefandrissen/samdos
-    BINARY "target/sam/classic/samdos2.bin"

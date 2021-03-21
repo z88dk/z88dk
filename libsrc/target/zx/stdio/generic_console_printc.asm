@@ -4,7 +4,7 @@
 
     MODULE  generic_console_printc
     
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  generic_console_printc
         
     EXTERN  __zx_console_attr
@@ -131,7 +131,7 @@ skip_control_codes:
     ld      hl,(__zx_print_routine)
     jp      (hl)
 
-    SECTION bss_clib
+    SECTION bss_driver
 
 expect_flags:    defb    0        
             ; bit 0 - expect flash

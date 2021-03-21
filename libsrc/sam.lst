@@ -95,6 +95,12 @@ target/zx/games/bit_open_di
 target/zx/games/bit_close
 target/zx/games/bit_close_ei
 
+; Some extra interrupt code
+target/sam/interrupt/add_raster_int
+target/sam/interrupt/line_vectors
+target/sam/interrupt/sam_install_line_isr
+target/sam/interrupt/sam_uninstall_line_isr
+
 ; ??
 target/shared/clock
 

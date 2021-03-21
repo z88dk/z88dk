@@ -1,13 +1,14 @@
 
 
     MODULE  __zx_printc_attr
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  __zx_printc_attr
 
     EXTERN  __zx_screenmode
     EXTERN  __zx_console_attr
 IF FORsam
     EXTERN  SCREEN_BASE
+    EXTERN  __sam_graphics_pageout
 ENDIF
 
 
@@ -50,4 +51,5 @@ ENDIF
     ld      d,a
     ld      a,(__zx_console_attr)
     ld      (de),a
+    call    __sam_graphics_pageout
     ret

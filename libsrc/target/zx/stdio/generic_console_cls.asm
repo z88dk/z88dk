@@ -3,7 +3,7 @@
 ;
     MODULE  generic_console_cls
 
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  generic_console_cls
 
     EXTERN  generic_console_zxn_tile_cls

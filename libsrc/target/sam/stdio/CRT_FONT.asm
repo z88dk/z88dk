@@ -1,5 +1,5 @@
 
-    SECTION rodata_clib
+    SECTION rodata_driver
 
     PUBLIC  CRT_FONT
     EXTERN  _font_8x8_zx_system

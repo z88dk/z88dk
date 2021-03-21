@@ -1,7 +1,7 @@
     
 
     MODULE  __zx_vpeek
-    SECTION code_clib
+    SECTION code_driver
 
     PUBLIC  __zx_vpeek
 
@@ -13,6 +13,8 @@
     EXTERN  __zx_32col_font
     EXTERN  __zx_64col_font
     EXTERN  __zx_screenmode
+    EXTERN  __sam_graphics_pagein
+    EXTERN  __sam_graphics_pageout
 
     EXTERN  generic_console_zxn_tile_vpeek
 
@@ -43,6 +45,9 @@ continue:
     push    hl          ;Save buffer
     ex      de,hl       ;get it into de
     call    __zx_gencon_xy_to_dfaddr
+IF FORsam
+    call    __sam_graphics_pagein
+ENDIF
     ld      b,8
 vpeek_1:
     ld      a,(hl)
@@ -53,6 +58,9 @@ vpeek_1:
     pop     de        ;the buffer on the stack
     ld      hl,(__zx_32col_font)
 do_screendollar:
+IF FORsam
+    call    __sam_graphics_pageout
+ENDIF
     call    screendollar
     jr      nc,gotit
     ld      hl,(__zx_32col_udgs)
@@ -83,6 +91,9 @@ handle_64col:
     jr      nc,even_column
     ld      c,0x0f
 even_column:
+IF FORsam
+    call    __sam_graphics_pagein
+ENDIF
     ld      b,8
 vpeek_2:
     ld      a,(de)
