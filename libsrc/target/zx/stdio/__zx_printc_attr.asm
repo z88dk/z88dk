@@ -51,5 +51,7 @@ ENDIF
     ld      d,a
     ld      a,(__zx_console_attr)
     ld      (de),a
+IF FORsam
     call    __sam_graphics_pageout
+ENDIF
     ret
