@@ -68,6 +68,11 @@ program:
         INCLUDE "crt/classic/crt_init_amalloc.asm"
     ENDIF
 
+    ; Switch to mode 4
+    in      a,(VMPR)
+    or      @01100000
+    out     (VMPR),a
+
     ei
     ; Entry to the user code
     call    _main

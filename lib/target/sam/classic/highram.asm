@@ -34,11 +34,10 @@ IF DEFINED_USING_amalloc
 ENDIF
 
     ; Now, page the screen into 0000-0x7fff
-    ; We'll use mode0 so we can steal some +zx code
-    ; Switch to mode 0
+    ; Switch to mode 4
     in      a,(VMPR)
     ld      b,a
-    and     @10011111	;Switch to mode 0
+    or      @01100000
     out     (VMPR),a
     ld      a,b
     and     @00011111

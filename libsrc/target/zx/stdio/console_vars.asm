@@ -23,7 +23,6 @@ __zx_32col_udgs:
 __zx_print_routine:
     defw    0
 
-    SECTION bss_clib
 
 ; TS2068 screen mode (values in gencon mode)
 ; 0 = use screen 0
@@ -32,6 +31,10 @@ __zx_print_routine:
 ; 6 = hires
 ; bit 6 set = tilemap (ZXN)
 __zx_screenmode:
+IF FORsam
+    defb    3
+ELSE
     defb    0       ;If set TS2068 hrgmode is active
+ENDIF
 
 

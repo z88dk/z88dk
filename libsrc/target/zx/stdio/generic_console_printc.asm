@@ -143,6 +143,10 @@ expect_flags:    defb    0
 
     SECTION code_crt_init
 
+IF FORsam
+    EXTERN  __sam_printc
+    ld      hl,__sam_printc
+ELSE
     EXTERN  __CLIB_ZX_CONIO32
     ld      a,__CLIB_ZX_CONIO32
     and     a
@@ -150,4 +154,5 @@ expect_flags:    defb    0
     jr      z,no_set_32col
     ld      hl,__zx_printc32
 no_set_32col:
+ENDIF
     ld      (__zx_print_routine),hl
