@@ -34,7 +34,7 @@ ELIF NEEDplot | NEEDxor
     ld      a,(__sam_MODE4_attr)
 ENDIF
     ld      c,@00001111
-    jr      nz,pixel_zero
+    jr      z,pixel_zero
     ld      c,@11110000
 IF !NEEDpoint
     rrca
