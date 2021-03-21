@@ -3,7 +3,7 @@
 ; As with other targets, this won't work if the background isn't palette 0
 
     MODULE  __zx_vpeek
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  __sam_vpeek
     EXTERN  __zx_vpeek
 
@@ -14,6 +14,9 @@
     EXTERN  __zx_screenmode
     EXTERN  __sam_xypos_MODE3
     EXTERN  __sam_xypos_MODE4
+    EXTERN  __sam_graphics_pagein
+    EXTERN  __sam_graphics_pageout
+
 
 
     EXTERN  SCREEN_BASE
@@ -34,6 +37,7 @@ __sam_vpeek:
     jr      z,vpeek_MODE3
     ; Lets handle mode 4 here
     call    __sam_xypos_MODE4
+    call    __sam_graphics_pagein
     ld      b,8
 vpeek_MODE4_row_loop:
     push    bc
@@ -73,6 +77,7 @@ second_nibble_not_set:
     djnz    vpeek_MODE4_row_loop
  
 do_screendollar:
+    call    __sam_graphics_pageout
     pop     de        ;the buffer on the stack
     ld      hl,(__zx_32col_font)
     call    screendollar
@@ -92,6 +97,7 @@ gotit:
 
 vpeek_MODE3:
     call    __sam_xypos_MODE3
+    call    __sam_graphics_pagein
     ld      b,8
 vpeek_MODE3_row_loop:
     push    bc
@@ -135,6 +141,7 @@ vpeek_MODE2:
     add     b
     ld      h,a
     ld      l,c
+    call    __sam_graphics_pagein
     ld      b,8
 vpeek_MODE2_loop:
     ld      a,(hl)

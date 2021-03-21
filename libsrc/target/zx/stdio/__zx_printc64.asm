@@ -6,7 +6,7 @@
 
     MODULE  __zx_printc64
     
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  __zx_printc64
         
     EXTERN  __zx_handle_attributes
@@ -15,6 +15,7 @@
 
 
     EXTERN  __zx_gencon_xy_to_dfaddr
+    EXTERN  __sam_graphics_pagein
 
 
 
@@ -28,6 +29,9 @@ __zx_printc64:
     jr      c,not_even_column
     ld      a,0xf0
 not_even_column:
+IF FORsam
+    call    __sam_graphics_pagein
+ENDIF
     ; h = character
     ; de = screen address
     ; a = screen mask

@@ -1,4 +1,4 @@
-    SECTION code_clib
+    SECTION code_driver
 
     PUBLIC  generic_console_scrollup
     EXTERN  __zx_scrollup

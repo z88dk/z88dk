@@ -1,5 +1,5 @@
     MODULE  generic_console_cls
-    SECTION code_clib
+    SECTION code_driver
 
     PUBLIC  generic_console_cls
 
@@ -7,10 +7,14 @@
     EXTERN  __zx_console_attr
     EXTERN  __sam_MODE3_attr
     EXTERN  __sam_MODE4_attr
+    EXTERN  __sam_graphics_pagein
+    EXTERN  __sam_graphics_pageout
+    EXTERN  l_dcal
     EXTERN  SCREEN_BASE
 
 
 generic_console_cls:
+    call    __sam_graphics_pagein
     ld      a,(__zx_screenmode)
     add     a
     add     +(cls_table % 256)
@@ -22,7 +26,9 @@ generic_console_cls:
     inc     hl
     ld      h,(hl)
     ld      l,a
-    jp      (hl)
+    call    l_dcal
+    call    __sam_graphics_pageout
+    ret
 
 cls_MODE1:
     ld      hl,SCREEN_BASE
@@ -85,7 +91,7 @@ clear_block:
     ldir
     ret
 
-    SECTION rodata_clib
+    SECTION rodata_driver
 
 cls_table:
     defw    cls_MODE1

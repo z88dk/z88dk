@@ -2,6 +2,8 @@
     EXTERN  pixeladdress_MODE3
     EXTERN  __gfx_coords
     EXTERN  __sam_MODE3_attr
+    EXTERN  __sam_graphics_pagein
+    EXTERN  __sam_graphics_pageout
     EXTERN  l_cmp
 
 ; Generic code to handle the pixel commands
@@ -28,6 +30,7 @@
     ld      (__gfx_coords),hl       ;x
     ld      (__gfx_coords+2),de     ;y
     push    bc    ;Save callers value
+    call    __sam_graphics_pagein
     call    pixeladdress_MODE3    ;hl = address, a = pixel number
     ld      b,a
 IF NEEDunplot
@@ -60,5 +63,6 @@ ELIF NEEDpoint
     cpl
     and     (hl)
 ENDIF    
+    call    __sam_graphics_pageout
     pop     bc    ;Restore callers
     ret

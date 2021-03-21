@@ -6,7 +6,7 @@
 
     MODULE  __zx_printc32
     
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  __zx_printc32
     PUBLIC  __zx_handle_attributes
         
@@ -15,11 +15,15 @@
     EXTERN  generic_console_flags
     EXTERN  __zx_screenmode
     EXTERN  __zx_printc_attr
+    EXTERN  __sam_graphics_pagein
 
     EXTERN  __zx_gencon_xy_to_dfaddr
 
 __zx_printc32:
     call    __zx_gencon_xy_to_dfaddr    ; hl = screen address, d preserved
+IF FORsam
+    call    __sam_graphics_pagein
+ENDIF
     ex      de,hl
     ld      bc,(__zx_32col_font)
     dec     b

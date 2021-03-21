@@ -8,7 +8,7 @@
 ;       Stefano Bodrato - Mar.2001
 
 
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  getk_native
     PUBLIC  _getk_native
 

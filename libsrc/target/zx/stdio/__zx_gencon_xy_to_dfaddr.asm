@@ -1,7 +1,7 @@
 
     MODULE  __zx_gencon_xy_to_dfaddr
 
-    SECTION code_clib
+    SECTION code_driver
     PUBLIC  __zx_gencon_xy_to_dfaddr
 
     EXTERN  __zx_screenmode

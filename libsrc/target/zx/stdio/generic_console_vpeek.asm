@@ -1,5 +1,5 @@
 
-    SECTION code_clib
+    SECTION code_driver
 
     PUBLIC  generic_console_vpeek
     EXTERN  __zx_vpeek
