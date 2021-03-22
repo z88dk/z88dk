@@ -95,7 +95,7 @@ scrollup:
     ld      h,d
     ld      l,e
     inc     de
-    ld      bc,256
+    ld      bc,1024
     ld      (hl),a
     ldir
     ret

@@ -31,12 +31,8 @@
         PUBLIC    l_dcal
 	PUBLIC	  SCREEN_BASE
 
-        IF !DEFINED_CLIB_ZX_CONIO32
-            defc CLIB_ZX_CONIO32 = 0
-            defc CONSOLE_COLUMNS = 64
-        ELSE
-            defc CONSOLE_COLUMNS = 32
-        ENDIF
+        defc CLIB_ZX_CONIO32 = 0
+        defc CONSOLE_COLUMNS = 32
         PUBLIC __CLIB_ZX_CONIO32
         defc __CLIB_ZX_CONIO32 = CLIB_ZX_CONIO32
 	defc CONSOLE_ROWS = 24

@@ -19,11 +19,11 @@
     defc    TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -1
-    defc    CRT_KEY_DEL = 12
     defc    SCREEN_BASE = 16384
+    defc    CRT_ORG_CODE = 32768
     INCLUDE "crt/classic/crt_rules.inc"
 
-    org     32768
+    org     CRT_ORG_CODE
 
 start:
     ld      (start1+1),sp   ;Save entry stack

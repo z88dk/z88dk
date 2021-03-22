@@ -96,13 +96,12 @@ printc_MODE4_1:
     jr      printc_MODE4_not_bold
 printc_MODE4_no_underline:
     ld      a,(hl)
-    xor     c
     bit     4,b
-    ld      a,(hl)
     jr      z,printc_MODE4_not_bold
     rrca
     or      (hl)
 printc_MODE4_not_bold:
+    xor     c
     inc     hl
     exx
     
@@ -161,13 +160,13 @@ printc_MODE3_1:
     jr      printc_MODE3_not_bold
 printc_MODE3_no_underline:
     ld      a,(hl)
-    xor     c
     bit     4,b
     ld      a,(hl)
     jr      z,printc_MODE3_not_bold
     rrca
     or      (hl)
 printc_MODE3_not_bold:
+    xor     c
     inc     hl
     exx
 
@@ -237,7 +236,6 @@ no_32_bold:
     exx
     ld      (hl),a
     set     5,h
-    ld      a,(__zx_console_attr)
     ld      (hl),c
     res     5,h
     add     hl,de
@@ -253,7 +251,7 @@ handle_attributes:
     ld      a,255
     ld      (hl),a
 mode2_end:
-    call    __sam_graphics_pagein
+    call    __sam_graphics_pageout
     ret
 
 

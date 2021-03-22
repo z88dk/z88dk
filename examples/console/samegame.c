@@ -34,6 +34,18 @@
 #define SCORE_ROW 22
 #endif
 
+#ifdef __SAM__
+#define USE_COLOUR 1
+#define USE_BIGSPRITES 1
+#define ARENA_W 16
+#define ARENA_H 10
+#define X_OFFSET 0
+#define Y_OFFSET 0
+#define SCORE_ROW 22
+#define SWITCH_MODE 4
+#endif
+
+
 #ifndef ARENA_W
 #define USE_UDGS
 #define ARENA_W 20
@@ -239,13 +251,14 @@ int main()
   void *param = &udgs;
   console_ioctl(IOCTL_GENCON_SET_UDGS, &param);
 
-  putch(1);
-  putch(32);
 
 #ifdef SWITCH_MODE
    mode = SWITCH_MODE;
    console_ioctl(IOCTL_GENCON_SET_MODE, &mode);
 #endif
+  // switch zx clones into 32 column mode
+  putch(1);
+  putch(32);
 
 
     while ( 1 ) {
