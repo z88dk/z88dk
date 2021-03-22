@@ -97,7 +97,7 @@ int mgt_exec(char *target)
     h = mgt_create();
     bootstrap_fp = NULL;
     if ( c_dos_file ) {
-        if ( (bootstrap_fp = fopen(c_dos_file, "r")) == NULL ) {
+        if ( (bootstrap_fp = fopen(c_dos_file, "rb")) == NULL ) {
             exit_log(1, "Cannot open override DOS file <%s>\n",c_dos_file);
         }
     }
