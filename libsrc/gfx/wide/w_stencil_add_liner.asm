@@ -22,9 +22,9 @@ IF !__CPU_INTEL__
                 EXTERN     line_r
                 EXTERN     stencil_add_pixel 
 
-                EXTERN     swapgfxbk
-                EXTERN    swapgfxbk1
-		EXTERN	  __graphics_end
+                ;EXTERN     swapgfxbk
+                ;EXTERN    swapgfxbk1
+		;EXTERN	  __graphics_end
 
                 EXTERN    stencil_ptr
 
@@ -43,11 +43,13 @@ IF !__CPU_INTEL__
 		ld	h,(ix+7)
 		ld	l,(ix+6)	;x0
 
-				call    swapgfxbk
+				;call    swapgfxbk
 		
                 ld      ix,stencil_add_pixel
                 call      line_r
                 
-                jp      __graphics_end
+                ;jp      __graphics_end
+				pop ix
+				ret
 
 ENDIF
