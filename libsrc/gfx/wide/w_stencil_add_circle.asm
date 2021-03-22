@@ -22,11 +22,11 @@ IF !__CPU_INTEL__
                 EXTERN     w_draw_circle
                 EXTERN	stencil_add_pixel 
 
-                EXTERN     swapgfxbk
-                EXTERN    swapgfxbk1
+                ;EXTERN     swapgfxbk
+                ;EXTERN    swapgfxbk1
 
                 EXTERN	stencil_ptr
-		EXTERN	__graphics_end
+		;EXTERN	__graphics_end
 
 .stencil_add_circle
 ._stencil_add_circle
@@ -50,11 +50,13 @@ IF !__CPU_INTEL__
 		ld e,(ix+10)	;x
 		ld d,(ix+11)
 
-		call    swapgfxbk
+		;call    swapgfxbk
 		
                 ld      ix,stencil_add_pixel
                 call    w_draw_circle
                 
-                jp      __graphics_end
+                ;jp      __graphics_end
+				pop ix
+				ret
 
 ENDIF
