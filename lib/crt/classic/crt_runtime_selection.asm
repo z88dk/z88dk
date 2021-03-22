@@ -333,7 +333,7 @@ IF NEED_ansiterminal
 	defc fputc_cons = fputc_cons_ansi
 
 	; Bridge VT100 to gencon
-        IF DEFINED_CLIB_ANSITERMINAL_BRIDGE
+        IF DEFINED_CLIB_ANSITERMINAL_BRIDGE & CLIB_ANSITERMINAL_BRIDGE != 0
             PUBLIC ansi_attr
             PUBLIC ansi_BEL
             PUBLIC ansi_cls
