@@ -2,6 +2,7 @@ target/bondwell2/graphics/cleargraphics
 target/bondwell2/graphics/swapgfxbk
 target/bondwell2/graphics/w_pixladdr
 target/bondwell2/graphics/w_putsprite
+target/bondwell2/graphics/w_stencil_render
 target/bondwell2/stdio/generic_console
 target/bondwell2/stdio/generic_console_cls
 target/bondwell2/stdio/generic_console_vpeek
