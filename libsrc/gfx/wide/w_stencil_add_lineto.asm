@@ -26,7 +26,7 @@ IF !__CPU_INTEL__
                 ;EXTERN    swapgfxbk1
 
                 EXTERN    stencil_ptr
-		EXTERN    __graphics_end
+		;EXTERN    __graphics_end
 
 .stencil_add_lineto
 ._stencil_add_lineto
