@@ -165,10 +165,10 @@ IF !__CPU_INTEL__
 
 
 .bitmaskr		ld	a,0
+			call	mask_pattern
 			ex af,af
 			call	swapgfxbk
 			ex af,af
-			call	mask_pattern
 			ld	(hl),a
 			call	swapgfxbk1
 
