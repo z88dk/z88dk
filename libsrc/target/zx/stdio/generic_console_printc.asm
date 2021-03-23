@@ -158,6 +158,12 @@ expect_flags:    defb    0
     ; If we've forced 32 column mode at the crt0 level, then
     ; switch to it
     EXTERN  __CLIB_ZX_CONIO32
+IF FORsam
+    ld      hl,__zx_printc64
+    ld      (__zx_print_routine),hl
+    ld      a,64
+    ld      (__zx_mode0_console_w),a
+ELSE
     ld      a,__CLIB_ZX_CONIO32
     and     a
     ld      a,64
@@ -169,3 +175,4 @@ no_set_32col:
     ld      (__zx_print_routine),hl
     ld      (__console_w),a
     ld      (__zx_mode0_console_w),a
+ENDIF
