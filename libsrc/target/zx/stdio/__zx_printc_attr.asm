@@ -27,7 +27,7 @@ IF FORts2068|FORzxn
     jr      nz,not_hi_colour
     set     5,d
     ld      a,(__zx_console_attr)
-    ld      b,7
+    ld      b,8
 hires_set_attr:
     ld      (de),a
     dec     d

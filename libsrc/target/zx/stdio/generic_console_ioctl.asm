@@ -11,12 +11,10 @@
     EXTERN  __zx_32col_udgs
     EXTERN  __zx_screenmode
     EXTERN  __console_w
-    EXTERN  __zx_print_routine
-    EXTERN  __zx_printc64
+    EXTERN  __zx_mode0_console_w
 
-    EXTERN  __sam_set_mode
+    EXTERN  asm_sam_set_screenmode
     EXTERN  asm_zxn_copytiles
-    EXTERN  generic_console_zxn_tile_printc
     EXTERN  generic_console_caps
 
 
@@ -77,28 +75,21 @@ IF FORsam
     jr      z,failure
     cp      5
     jr      nc,failure
-    push    af
-    call    __sam_set_mode    ;Exits: b = console_w, hl=print routine
-    pop     af
-    dec     a                   ;Nice to have it 0-3 
-    ld      (__zx_screenmode),a
-    ld      a,b
-    ld      (__console_w),a
-    ld      (__zx_print_routine),hl
+    call    asm_sam_set_screenmode
     ld      a,CLIB_GENCON_CAPS
     ld      (generic_console_caps),a
     call    generic_console_cls
     jr      success
-ENDIF
-IF FORts2068 | FORzxn
+ELIF FORts2068 | FORzxn
     cp      IOCTL_GENCON_SET_MODE
     jr      nz,failure
+    ld      a,(__zx_mode0_console_w)
+    ld      l,a
     ld      a,c
     ; 0 = screen 0
     ; 1 = screen 1
     ; 2 = high colour
     ; 6 = hires
-    ld      l,64
     ld      h,CLIB_GENCON_CAPS
     cp      0
     jr      z,set_mode
@@ -107,12 +98,12 @@ IF FORts2068 | FORzxn
     cp      2
     jr      z,set_mode
     and     7
+    sla     l
     cp      6
-    ld      l,128
     ld      h,CLIB_GENCON_CAPS_TIMEX_HIRES
-IF !FORzxn
+  IF !FORzxn
     jr      nz,failure
-ELSE
+  ELSE
     jr      z,set_mode
 ;zxn modes
     ld      a,c
@@ -136,18 +127,16 @@ ELSE
     ld      l,80
 set_tilemap_size:
     ld      (__console_w),hl
-    ld      hl,generic_console_zxn_tile_printc
-    ld      (__zx_print_routine),hl
     ld      a,CLIB_GENCON_CAPS_TILEMAP
     ld      (generic_console_caps),a
     call    generic_console_cls
     jr      success
-ENDIF
+  ENDIF
 set_mode:
     ld      (__zx_screenmode),a
     ld      a,h
     ld      (generic_console_caps),a
-    ld      h,$18
+    ld      h,$18		;Console height
     ld      (__console_w),hl
     in      a,($ff)
     and     @1100000
@@ -156,8 +145,6 @@ set_mode:
     and     @00111111
     or      b
     out     ($ff),a
-    ld      hl,__zx_printc64
-    ld      (__zx_print_routine),hl
     call    generic_console_cls
     jp      success
 ENDIF

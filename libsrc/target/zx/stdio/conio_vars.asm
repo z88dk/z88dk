@@ -14,6 +14,10 @@ IF FORzxn
 __zx_ink_colour:
     defb    15      ;Default ink colour
 ENDIF
+    PUBLIC  __zx_mode0_console_w
+    EXTERN  CONSOLE_COLUMNS
+__zx_mode0_console_w:
+    defb    CONSOLE_COLUMNS
 
 IF FORsam
     PUBLIC  __sam_MODE3_attr
@@ -25,4 +29,3 @@ __sam_MODE3_attr:
 __sam_MODE4_attr:
     defb    @11110000, @00000000        ;ink = pen15, paper = pen0
 ENDIF
-

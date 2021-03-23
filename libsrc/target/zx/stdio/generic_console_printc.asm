@@ -16,8 +16,10 @@
     EXTERN  __zx_printc64
     EXTERN  generic_console_flags
     EXTERN  __zx_screenmode
+    EXTERN  __zx_mode0_console_w
     EXTERN  __zx_print_routine
     EXTERN  generic_console_zxn_tile_printc
+    EXTERN  __sam_printc
 
 IF FORsam
     EXTERN  SCREEN_BASE
@@ -95,6 +97,7 @@ ENDIF
 set_width:
     ld      (__zx_print_routine),hl
     ld      ( __console_w),a
+    ld      ( __zx_mode0_console_w),a
     ret
 
 set_font_hi:
@@ -128,6 +131,15 @@ generic_console_printc:
     cp      32
     jp      c,handle_controls
 skip_control_codes:
+IF FORsam
+    ld      a,(__zx_screenmode)
+    and     a
+    jp      nz,__sam_printc
+ELIF FORzxn
+    ld      a,(__zx_screenmode)
+    bit     6,a
+    jp      nz,generic_console_zxn_tile_printc
+ENDIF
     ld      hl,(__zx_print_routine)
     jp      (hl)
 
@@ -143,16 +155,17 @@ expect_flags:    defb    0
 
     SECTION code_crt_init
 
-IF FORsam
-    EXTERN  __sam_printc
-    ld      hl,__sam_printc
-ELSE
+    ; If we've forced 32 column mode at the crt0 level, then
+    ; switch to it
     EXTERN  __CLIB_ZX_CONIO32
     ld      a,__CLIB_ZX_CONIO32
     and     a
+    ld      a,64
     ld      hl,__zx_printc64
     jr      z,no_set_32col
+    ld      a,32
     ld      hl,__zx_printc32
 no_set_32col:
-ENDIF
     ld      (__zx_print_routine),hl
+    ld      (__console_w),a
+    ld      (__zx_mode0_console_w),a

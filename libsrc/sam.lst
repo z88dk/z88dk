@@ -30,6 +30,7 @@ input/fgetc_cons
 ; We only want bits of +zx stdio, but take it all to keep
 ; things simple (Our versions are above)
 @target/zx/stdio/stdio.lst
+target/zx/obj/${TARGET}/zx_border
 
 ; Pixel level routines for Sam
 target/sam/graphics/cleargraphics
@@ -69,7 +70,6 @@ target/zx-common/graphics/obj/${TARGET}/__set_zx_pixel_colour
 target/sam/sam/SAM_PALETTE_VALUES
 target/sam/sam/sam_load_palette
 target/sam/sam/sam_set_palette
-target/sam/sam/sam_set_screenmode
 
 ; Lets pull in etracker for the sound chip
 @psg/saa1099/saa1099.lst

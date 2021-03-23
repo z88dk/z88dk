@@ -1,30 +1,46 @@
     MODULE  __sam_set_mode
 
-    PUBLIC  __sam_set_mode
-
-    EXTERN  asm_sam_set_screenmode
-
-    EXTERN  __zx_printc64
-    EXTERN  __sam_printc
+    PUBLIC  sam_set_screenmode
+    PUBLIC  _sam_set_screenmode
+    PUBLIC  asm_sam_set_screenmode
+    EXTERN  __zx_mode0_console_w
+    EXTERN  __console_w
+    EXTERN  __zx_screenmode
+    EXTERN  CLIB_SAM_IS_BASIC
 
     INCLUDE "target/sam/def/sam.def"
 
+
+
+sam_set_screenmode:
+_sam_set_screenmode:
+    ld      hl,2
+    add     hl,sp
+    ld      a,(hl)
+
 ; Set the screen mode (called via ioctl)
 ; Entry: a = screen mode (1,2,3,4)
-__sam_set_mode:
+asm_sam_set_screenmode:
     dec     a
     cp      4
     ret     nc
-    ld      hl,__zx_printc64
-    ld      b,64
+    ld      c,a
+    ld      a,(__zx_mode0_console_w)
+    ld      b,a
+    ld      a,c
     and     a
-    jr      z,set_it
+    jr      z,set_it    ;Mode 1
     ld      b,32
-    ld      hl,__sam_printc
-    cp      3
+    cp      1           ;Mode 2
     jr      z,set_it
-    ld      b,64
+    cp      3           ;Mode 4
+    jr      z,set_it
+    ld      b,64        ;We're in mode3
 set_it:
+    ld      (__zx_screenmode),a
+    ld      c,CLIB_SAM_IS_BASIC
+    rrc     c
+    jr      c,is_basic
     ; Switch the hardware to the right mode
     rrca
     rrca
@@ -35,5 +51,14 @@ set_it:
     and     @10011111
     or      c
     out     (VMPR),a
+    ld      a,b
+    ld      (__console_w),a
     ret
-    
+
+is_basic:
+    push    bc
+    call    JMODE
+    pop     bc
+    ld      a,b
+    ld      (__console_w),a
+    ret
