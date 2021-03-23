@@ -1,5 +1,7 @@
 target/pcw/graphics/cleargraphics
 target/pcw/graphics/swapgfxbk
+target/pcw/graphics/w_bksave
+target/pcw/graphics/w_bkrestore
 target/pcw/graphics/w_pixladdr
 target/pcw/graphics/w_putsprite
 target/pcw/graphics/w_stencil_render
