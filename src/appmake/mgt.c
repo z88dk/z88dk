@@ -77,7 +77,7 @@ int mgt_exec(char *target)
     }
     
     if ( c_dos_file == NULL ) {
-        c_default_dos_file = c_dos_file;
+        c_dos_file = c_default_dos_file;
     }
 
 

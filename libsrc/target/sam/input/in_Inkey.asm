@@ -37,8 +37,9 @@ loop:
    rlc b
    jr c,loop
    ; Now consider the extra row
+   ld bc,$fffe
    in a,(c)
-   or @11100000
+   or (hl)
    cp $ff
    jr nz,keyhit
 nokey:
@@ -77,7 +78,7 @@ no_sym:
    in  a,($fe)
    and 1
    jr  nz,done
-   ld  bc,72 * 3
+   ld  c,72 * 3
 done:
    ld  hl,in_keytranstbl
    add hl,de

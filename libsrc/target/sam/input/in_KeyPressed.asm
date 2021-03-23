@@ -48,6 +48,7 @@ noctrl:
  ; If the mask & b11100000 then we read 0xf9
    ld b,$ff
    ld a,l
+   and 15
    cp 8
    jr z,read_port
    ld a,h
