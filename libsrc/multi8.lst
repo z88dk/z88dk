@@ -6,6 +6,7 @@ target/multi8/stdio/generic_console_ioctl
 target/multi8/stdio/generic_console_vpeek
 target/multi8/stdio/conio_vars
 target/multi8/stdio/conio_map_colour
+target/multi8/stdio/printc_MODE2
 target/multi8/stdio/CRT_FONT
 @font/font_8x8/font_8x8.lst
 target/multi8/tape_load
