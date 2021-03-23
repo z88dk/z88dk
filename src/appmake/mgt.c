@@ -8,7 +8,8 @@
 static char             *c_binary_name       = NULL;
 static char             *c_crt_filename      = NULL;
 static char             *c_output_file       = NULL;
-static char             *c_dos_file     = NULL;
+static char             *c_dos_file          = NULL;
+static char             *c_default_dos_file  = NULL;
 static char             *c_disc_container    = "raw";
 static int               c_origin            = -1;
 static char              c_zx_mode           = 0;
@@ -22,6 +23,7 @@ option_t mgt_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR|OPT_INPUT,   &c_binary_name },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &c_crt_filename },
     { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &c_output_file },
+    {  0,  "default-dosfile",  "Name of the default DOS file",       OPT_STR,   &c_default_dos_file },
     {  0,  "dosfile",  "Name of the DOS file",       OPT_STR,   &c_dos_file },
     {  0,  "container", "Type of container (raw,dsk)", OPT_STR, &c_disc_container },
     {  0 , "org",      "Origin of the binary",       OPT_INT,   &c_origin },
@@ -74,6 +76,9 @@ int mgt_exec(char *target)
         exit_log(1,"Cannot file disc container format <%s>\n",c_disc_container);
     }
     
+    if ( c_dos_file == NULL ) {
+        c_default_dos_file = c_dos_file;
+    }
 
 
     if ( ( fpin = fopen_bin(c_binary_name, c_crt_filename) ) == NULL ) {
