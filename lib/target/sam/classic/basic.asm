@@ -13,6 +13,9 @@
 
     defc    CLIB_SAM_IS_BASIC = 1
 
+    UNDEFINE CONSOLE_ROWS
+    defc    CONSOLE_ROWS = 22
+
     ; Point palette store to the system variables
     PUBLIC  SAM_PALETTE_VALUES
     defc    SAM_PALETTE_VALUES = 0x55D8
@@ -66,6 +69,10 @@ ENDIF
     ; set stream to channel 's' (upper screen)
     ld a,2
     call $112 ; JSETSTRM
+  
+    EXTERN __zx_mode0_console_w
+    ld      a,32
+    ld      (__zx_mode0_console_w),a
 
 ;   End of SAM stuff
 
