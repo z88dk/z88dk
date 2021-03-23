@@ -12,6 +12,12 @@
  
  ZX Spectrum:
  zcc +zx -lndos -create-app -DSOUND hawk.c
+
+ TS2068:
+ zcc +ts2068 -lndos -create-app -DSOUND -DWIDE hawk.c
+
+ BONDWELL2:
+ zcc +cpm -subtype=bw2 -lndos -create-app -DWIDE hawk.c           
  
  ZX 81 WRX:
  zcc +zx81 -subtype=wrx64 -clib=wrx64 -create-app hawk.c
@@ -33,7 +39,7 @@
 #include <sound.h>
 #endif
 
-#ifdef __TS2068__
+#ifdef WIDE
 #define BKSTRUCT_OFFSET  4
 #define BKSTRUCT_YPOS_OFFSET  4
 #else
