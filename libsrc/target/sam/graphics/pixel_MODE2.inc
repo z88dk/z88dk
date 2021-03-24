@@ -13,11 +13,11 @@
 ; Define NEEDxxx before including
 
     ; Called via a w_ routine, so we enter with 16 bit coordinates
-    push    hl              ;save x
-    ld      hl,192          ;hl = maxy
-    inc     hl
-    call    l_cmp
-    pop     hl
+    ld      a,d
+    and     a
+    ret     nz
+    ld      a,e
+    cp      192
     ret     nc
 
     ld      a,h

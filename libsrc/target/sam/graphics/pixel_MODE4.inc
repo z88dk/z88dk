@@ -10,14 +10,13 @@
 ; Define NEEDxxx before including
 
     ; Called via a w_ routine, so we enter with 16 bit coordinates
-    push    hl              ;save x
-    ld      hl,192          ;hl = maxy
-    inc     hl
-    call    l_cmp
-    pop     hl
+    ld      a,d      ;Check y 
+    ret     nz
+    ld      a,e
+    cp      192
     ret     nc
 
-    ld      a,h
+    ld      a,h      ;Check x
     and     a
     ret     nz
     ld      (__gfx_coords),hl       ;x
@@ -27,7 +26,6 @@
     push    bc    ;Save callers value
     call    __sam_graphics_pagein
     call    pixeladdress_MODE4    ;hl = address, a = pixel number
-    ld      b,a
 IF NEEDunplot
     ld      a,(__sam_MODE4_attr+1)    ;paper
 ELIF NEEDplot | NEEDxor

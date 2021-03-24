@@ -12,11 +12,10 @@
     ; This is wide
     ; hl = x
     ; de = y
-    push    hl              ;save x
-    ld      hl,192          ;hl = maxy
-    inc     hl
-    call    l_cmp
-    pop     hl
+    ld      a,d      ;Check y
+    ret     nz
+    ld      a,e
+    cp      192
     ret     nc
 
     ex      de,hl           ;de = x, hl = y
