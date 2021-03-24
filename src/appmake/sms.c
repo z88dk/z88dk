@@ -213,6 +213,7 @@ int sms_exec(char *target)
 
     fprintf(stderr, "Adding main banks 0x00,0x01%s (%d bytes free)\n", (len > 0x8000) ? ",0x02" : "", ((len > 0x8000) ? 0xc000 : 0x8000)-len-16*(sega_present+sdsc_present));
 
+    suffix_change(binname,"");
     count = 0;
     for (i = 0x02 + (len > 0x8000); i <= 0x1f; ++i)
     {
