@@ -706,8 +706,8 @@ ENDIF
 ; We keep an average value
 IF FORcpm
 	DEFINE gotgfx
-	defc maxx	= 680		; We will multiply the x coordinate by 48
-	defc maxy	= 256		; We will multiply the y coordinate by 128
+	defc maxx	= 1024		; foo value hopefully larger than the max X resolution
+	defc maxy	= 768		; foo value hopefully larger than the max Y resolution
 ENDIF
 
 ; =============================================
