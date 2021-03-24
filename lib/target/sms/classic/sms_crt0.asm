@@ -251,7 +251,7 @@ _Data:
     ;     ``------- Line interrupt spacing ($ff to disable) 
 _End:
 
-
+IF CRT_ENABLE_BANKED_CALLS = 1
     GLOBAL  banked_call
     defc    MAPPER_ADDRESS_8000 = 0xffff
 
@@ -286,7 +286,7 @@ banked_call:
     ld      (MAPPER_ADDRESS_8000),a
     push    bc
     ret
-
+ENDIF
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"
 
@@ -306,6 +306,7 @@ banked_call:
     INCLUDE    "crt/classic/crt_section.asm"
 
 
+IF CRT_ENABLE_BANKED_CALLS = 1
         SECTION bss_driver
 mainsp: defw    0
 tempstack:      defs    CLIB_BANKING_STACK_SIZE
@@ -313,7 +314,7 @@ __current_bank: defb    2
 
         SECTION data_driver
 tempsp: defw    tempstack + CLIB_BANKING_STACK_SIZE
-
+ENDIF
 
         SECTION bss_crt
 raster_procs:       defs    16    ;Raster interrupt handlers
