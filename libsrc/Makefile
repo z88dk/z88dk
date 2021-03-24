@@ -682,13 +682,13 @@ cpm_clib.lib:
 	@echo ''
 	$(call buildgeneric,cpm)
 	$(MAKE) -C target/cpm
-	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide
 	TARGET=cpm TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
 
 gfxgsx.lib:
 	@echo ''
 	@echo '--- Building GSX based Z88DK GFX Library ---'
 	@echo ''
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide
 	TARGET=cpm TYPE=z80 $(LIBLINKER) -DFORcpm -x$(OUTPUT_DIRECTORY)/gfxgsx @$(LISTFILE_DIRECTORY)/target/cpm/gfxgsx.lst
 
 cpm8080_clib.lib:
