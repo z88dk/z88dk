@@ -33,11 +33,12 @@
 ._gsx_yscale
         ld      de,(_gsx_yscale_factor)
         call    l_mult
-        ld      de,32774
+        ;ld      de,32768
+		ld      de,32767
         ex      de,hl
         and     a
         sbc     hl,de
-		jp      l_neg
+		ret
 
 
 .gsx_yoffs
