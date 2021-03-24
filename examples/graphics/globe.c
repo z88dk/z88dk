@@ -19,7 +19,7 @@
 	  
 	  zcc  +enterprise  -lm -create-app -lgfxephr -Dhires -lm globe.c
 	   
-	  zcc +cpm -startup=2 -oglobe.com -ltiki100 -Dhires -lm globe.c
+	  zcc +cpm -subtype=tiki100 -create-app -Dhires -lm globe.c
 
 	  zcc +zx81 -clib=wrx -subtype=wrx -create-app -lm -DVIEW=1 globe.c
 	  (32K) zcc +zx81 -clib=wrxansi -subtype=wrx  -lndos -create-app -lm globe.c
@@ -28,8 +28,8 @@
 	  zcc +zx81 -clib=g007  -create-app -lm -DVIEW=1  globe.c
 	  zcc +zx81 -clib=mt -create-app -lm -VIEW=1 globe.c
 	
-	GSX graphics on CP/M:
-	  zcc +cpm -oglobe.com -lgfxgsx -Dhires -lm globe.c
+	GSX graphics on CP/M (please use GENGRAF on the resulting COM file):
+      zcc +cpm -oglobe -lgfxgsx -create-app -llib3d -lm -Dhires -pragma-redirect=fputc_cons=putc4x6 globe.c
 
 	$Id: globe.c $
 
