@@ -19,7 +19,6 @@
 				PUBLIC    _gsx_xscale_factor
 				
 				EXTERN    l_mult
-				EXTERN    l_neg
 
 .getmaxx
 ._getmaxx
@@ -30,8 +29,7 @@
 .gsx_xscale
 ._gsx_xscale
         ld      de,(_gsx_xscale_factor)
-        call    l_mult
-		jp      l_neg
+		jp      l_mult
 
 
 
