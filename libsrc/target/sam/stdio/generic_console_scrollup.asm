@@ -89,13 +89,13 @@ scrollup_MODE3:
 scrollup:
     ld      hl,SCREEN_BASE + 1024
     ld      de,SCREEN_BASE
-    ld      bc,24576 - 1024 - 1
+    ld      bc,24576 - 1024
     ld      (hl),0
     ldir
     ld      h,d
     ld      l,e
     inc     de
-    ld      bc,1024
+    ld      bc,1023
     ld      (hl),a
     ldir
     ret

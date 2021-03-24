@@ -112,11 +112,15 @@ ELSE
     ld      hl,22528 + 32
     ld      de,22528
 ENDIF
-    ld      bc,768
+    ld      bc,768-32
     ldir
+    ex      de,hl
+    ld      d,h
+    ld      e,l
+    inc     de
     ld      a,(__zx_console_attr)
     ld      (hl),a
-    ld      bc,32
+    ld      bc,31
     ldir
         
     pop     ix

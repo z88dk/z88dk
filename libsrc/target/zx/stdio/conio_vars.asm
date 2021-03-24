@@ -8,7 +8,11 @@
     SECTION data_clib
 
 __zx_console_attr:
+IF FORsam
+    defb   7
+ELSE
     defb    56      ;Default attribute
+ENDIF
 IF FORzxn
     PUBLIC  __zx_ink_colour
 __zx_ink_colour:
