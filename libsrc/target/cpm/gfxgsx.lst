@@ -1,4 +1,8 @@
 target/cpm/graphics/clg
+target/cpm/graphics/getmaxx
+target/cpm/graphics/getmaxy
+target/cpm/graphics/clga
+graphics/retrofit/clga_callee
 target/cpm/graphics/draw
 graphics/retrofit/draw_callee
 target/cpm/graphics/drawb

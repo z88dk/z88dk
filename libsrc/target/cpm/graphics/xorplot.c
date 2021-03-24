@@ -12,10 +12,13 @@
 //#include <graphics.h>
 extern void __LIB__ xorplot(int x, int y) __smallc;
 
+extern int  __LIB__ gsx_xscale(int x) __z88dk_fastcall;
+extern int  __LIB__ gsx_yscale(int y) __z88dk_fastcall;
+
 
 void xorplot(int x, int y)
 {
 	gios_wmode(W_COMPLEMENT);
-	gios_plot(48*x,128*(255-y));
+	gios_plot(gsx_xscale(x),gsx_yscale(y));
 	gios_wmode(W_REPLACE);
 }

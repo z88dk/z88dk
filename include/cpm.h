@@ -282,20 +282,6 @@ struct GSX_CTL {
 #define M_CIRCLE        3    /* 'O' symbol */
 #define M_X             4    /* 'X' symbol */
 
-/* Fill attributes */
-#define F_EMPTY         0    /* No fill */
-#define F_FULL          1    /* Solid fill */
-#define F_HALFTONE      2    /*  */
-#define F_HATCH         3    /*  */
-
-/* Hatch types */
-#define H_VERTICAL      0
-#define H_HORIZONTAL    1
-#define H_DEG45         2
-#define H_DEG315        3
-#define H_CROSS         4
-#define H_X             5
-
 
 /* GSX GIOS Parameter block */
 extern struct GSX_PB gios_pb;
@@ -377,6 +363,26 @@ extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
 
 /* Set line colour */
 #define gios_l_color(color) gios_1pm(GSX_L_COLOR,color)
+
+/* Fill attributes */
+#define F_EMPTY         0    /* No fill (a.k.a. 'TRANSPARENT' or 'HOLLOW' */
+#define F_FULL          1    /* Solid fill */
+#define F_PATTERN       2    /* (also for 'HALFTONE') */
+#define F_HATCH         3    /*  */
+
+/* Set fill style */
+#define gios_f_style(style) gios_1pm(GSX_F_STYLE,style)
+
+/* Hatch types */
+#define H_VERTICAL      0
+#define H_HORIZONTAL    1
+#define H_DEG45         2
+#define H_DEG315        3
+#define H_CROSS         4
+#define H_X             5
+
+/* Set fill index (e.g. hatch style) */
+#define gios_f_index(style) gios_1pm(GSX_F_INDEX,style)
 
 /* Draw a line */
 #define gios_draw(x1,y1,x2,y2) gios_2px(GSX_POLYLINE,x1,y1,x2,y2)

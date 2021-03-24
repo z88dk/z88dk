@@ -12,10 +12,13 @@
 //#include <graphics.h>
 extern void __LIB__ undrawr(int px, int py) __smallc;
 
+extern int  __LIB__ gsx_xscale(int x) __z88dk_fastcall;
+extern int  __LIB__ gsx_yoffs(int y) __z88dk_fastcall;
+
 
 void undrawr(int x,int y)
 {
 	gios_wmode(W_ERASE);
-	gios_drawr(48*x,-(y*128));
+	gios_drawr(gsx_xscale(x),gsx_yoffs(y));
 	gios_wmode(W_REPLACE);
 }
