@@ -31,8 +31,8 @@ void clg()
 	gsx_maxx=gios_intout[0];
 	gsx_maxy=gios_intout[1];
 	
-	gsx_xscale_factor=32768/gsx_maxx;
-	gsx_yscale_factor=32768/gsx_maxy;
+	gsx_xscale_factor=32767/gsx_maxx;
+	gsx_yscale_factor=32767/gsx_maxy;
 
 	gios_l_style(1);
 	gios_clg();
