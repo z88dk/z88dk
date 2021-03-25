@@ -46,6 +46,15 @@ haveparm:
         push    hl
 
 	ld	hl,(1)
+
+	push hl
+	ld de,057h		; CPM Plus "userf" custom Amstrad BIOS calls
+	add hl,de
+	ld	a,(hl)
+	pop hl
+	cp	0xc3		; jp instruction (existing BIOS entry)?
+	jr	z,nodtbios	; if so, skip not-working direct DT BIOS entry
+
 	ld	de,04bh		; TIME BIOS entry (CP/M 3 but present also elsewhere)
 	add	hl,de
 	ld	a,(hl)
@@ -128,10 +137,10 @@ nodtbios:
         call    __bdos      ; get date/time
 
         push    af
-        
         ld      c,12
         call    __bdos      ; check version
         pop     af
+
         ld      c,a
         ld      a,l
         cp      02Fh        ; MP/M II or later (cpm3..) ?
