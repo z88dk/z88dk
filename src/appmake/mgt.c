@@ -94,7 +94,7 @@ int mgt_exec(char *target)
     }
     pos = get_file_size(fpin);
 
-    buf = must_malloc(pos);
+    buf = must_malloc(pos + 512);
     if (pos != fread(buf, 1, pos, fpin)) { fclose(fpin); exit_log(1, "Could not read required data from <%s>\n",c_binary_name); }
     fclose(fpin);
 
@@ -113,7 +113,7 @@ int mgt_exec(char *target)
 
         boot_len = get_file_size(bootstrap_fp);
 
-        boot = must_malloc(boot_len);
+        boot = must_malloc(boot_len + 512);
         if (boot_len != fread(boot, 1, boot_len, bootstrap_fp)) { fclose(bootstrap_fp); exit_log(1, "Could not read required data from <%s>\n",c_dos_file); }
         if ( c_zx_mode ) {
             mgt_writefile(h, "GDOS      ", MGT_CODE, 8192, 0, boot, boot_len);
