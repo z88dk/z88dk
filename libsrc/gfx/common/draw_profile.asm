@@ -32,6 +32,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
                 EXTERN		l_mult
                 EXTERN		l_div
 
+                EXTERN		getmaxx
+
 
 getbyte:
 	ld	hl,(_pic)
@@ -41,32 +43,32 @@ getbyte:
 	ret
 
 getx:
+	call getmaxx
+	ld	a,h
 	ld	hl,(_vx)
-IF maxx > 320
-	call getparmx
-ELSE
-	call getparm
-ENDIF
+	and $fe
+	jp  z,getparm
+
 ;IF maxx > 320
 ;	add hl,hl	; double size for X in wide mode !
 ;ENDIF
-	ret
 
-IF maxx > 320
-getparmx:		;cx=vx+percent*pic[x++]/50;  (double width)
+;getparmx:		;cx=vx+percent*pic[x++]/50;  (double width)
 	push hl
 	ld	de,(_percent)
 	call	getbyte
 	ld	h,0
 	ld	l,a
 	call l_mult
-IF ((maxx/(maxy+1))>1)
-	ld	de,25	; 50/2
-ELSE
-	ld	de,50
-ENDIF
+
+;IF ((maxx/(maxy+1))>1)
+;	ld	de,25	; 50/2
+;ELSE
+;	ld	de,50
+;ENDIF
+
+	ld	de,33
 	jr  perc_div
-ENDIF
 
 	
 	
