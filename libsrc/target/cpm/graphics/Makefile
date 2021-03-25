@@ -11,7 +11,8 @@ EPFILES = \
 	plot.c     unplot.c    xorplot.c \
 	draw.c     drawb.c     drawr.c     drawto.c \
 	undraw.c   undrawb.c   undrawr.c   undrawto.c \
-	xordraw.c  xordrawb.c  xordrawr.c  xordrawto.c
+	xordraw.c  xordrawb.c  xordrawr.c  xordrawto.c \
+	putc_gsx.c
 	
 	
 
