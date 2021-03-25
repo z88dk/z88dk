@@ -5,7 +5,7 @@
 ;
 ;		void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 ;
-;	$Id: draw_profile_nostencil.asm $
+;	$Id: draw_profile_nostencil.asm,v 1.3 2016-04-22 20:17:17 dom Exp $
 ;
 
 
@@ -30,7 +30,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
                 
                 EXTERN		l_mult
                 EXTERN		l_div
-				
+
                 EXTERN		getmaxx
 
 
@@ -48,7 +48,7 @@ getx:
 	ld	hl,(_vx)
 	call getparm
 	pop af
-	and a
+	and $fe
 	ret z
 	add hl,hl	; double size for X in wide mode !
 	ret
