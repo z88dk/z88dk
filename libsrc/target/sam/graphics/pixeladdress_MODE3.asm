@@ -13,23 +13,18 @@
 ;    z = pixel @1100000
 pixeladdress_MODE3:
     ex      de,hl
-    add     hl,hl   ;*2
-    add     hl,hl   ;*4
-    add     hl,hl   ;*8
-    add     hl,hl   ;*16
-    add     hl,hl   ;*32
-    add     hl,hl   ;*64
-    add     hl,hl   ;*128
-    ld      c,e     ;save x (lowest byte)
+    ld      a,h
+    ld      h,l    ;x128
+    ld      l,0
+    rra
+    rr      h
+    rr      l
+    ld      a,e     ;save x (lowest byte)
     ; Divide x by 4 to get the byte
     srl     d
     rr      e
-    srl     d
-    rr      e
-    ld      a,d
-    or      +(SCREEN_BASE / 256)
-    ld      d,a
+    srl     e
+    ld      d,+(SCREEN_BASE / 256)
     add     hl,de
-    ld      a,c
     and     3
     ret	

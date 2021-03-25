@@ -15,11 +15,11 @@ pixeladdress_MODE2:
     ld      a,l
     ld      l,h
     ld      h,0
-    add     hl,hl	;x32
-    add     hl,hl
-    add     hl,hl
-    add     hl,hl
-    add     hl,hl
+    add     hl,hl   ;x2
+    add     hl,hl   ;x4
+    add     hl,hl   ;x8
+    add     hl,hl   ;x16
+    add     hl,hl   ;x32
     ld      c,a
     srl     c
     srl     c

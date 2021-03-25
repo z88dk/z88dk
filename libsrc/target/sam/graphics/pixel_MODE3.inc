@@ -43,8 +43,9 @@ ENDIF
 rotate:
     rrc     c
     rrc     c
-    srl     a
-    srl     a
+    and     a
+    rrca
+    rrca
     djnz    rotate
 rotate_done:
     ld      b,a         ;Pixel colour to use
