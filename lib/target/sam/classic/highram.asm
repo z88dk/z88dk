@@ -83,10 +83,10 @@ int_handler:
     in      a,(STATUS)
     ld      hl,im1_vectors
     bit     3,a             ;Frame interrupt
-    jr      z,despatch
+    jr      z,dispatch
     ld      hl,line_vectors
     bit     0,a             ;Line interrupt
-despatch:
+dispatch:
     call    z, asm_interrupt_handler
     pop     hl
     pop     af

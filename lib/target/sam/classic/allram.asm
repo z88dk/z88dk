@@ -97,18 +97,20 @@ highpage:
 int_handler:
     push    af
     push    hl
+    in      a,(STATUS)
+    ld      l,a
     in      a,(HMPR)
     push    af
     ld      a,(highpage)
     out     (HMPR),a
 
-    in      a,(STATUS)
+    ld      a,l
     ld      hl,im1_vectors
     bit     3,a             ;Frame interrupt
-    jr      z,despatch
+    jr      z,dispatch
     ld      hl,line_vectors
     bit     0,a             ;Line interrupt
-despatch:
+dispatch:
     call    z, asm_interrupt_handler
     pop     af
     out     (HMPR),a

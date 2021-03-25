@@ -8,7 +8,9 @@
 #include <sys/ioctl.h>
 
 
-#define NO_INTERRUPT 1
+#ifdef __SAM__
+#include <arch/sam.h>
+#endif
 
 extern char mysong;
 
@@ -22,19 +24,12 @@ void playmusic(void) {
 
 
 void setup_int() {
-#ifndef NO_INTERRUPT
    add_raster_int(playmusic);
-#endif
 }
 
 
 void main()
 {
-   int  mode = 4;
-
-
-   console_ioctl(IOCTL_GENCON_SET_MODE,&mode);
-
    printf("%ceTracker example\n",12);
 
    // Load the tracker file
@@ -45,10 +40,7 @@ void main()
 
    // Just loop
    while  ( 1 ) {
-#ifdef NO_INTERRUPT
-       saa_etracker_play();
-       msleep(41);
-#endif
+      fgetc_cons();
    }
 }
 
