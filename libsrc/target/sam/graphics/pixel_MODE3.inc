@@ -13,6 +13,7 @@
     ; hl = x
     ; de = y
     ld      a,d      ;Check y
+    and     a
     ret     nz
     ld      a,e
     cp      192

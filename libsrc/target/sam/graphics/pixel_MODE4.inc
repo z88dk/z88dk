@@ -11,6 +11,7 @@
 
     ; Called via a w_ routine, so we enter with 16 bit coordinates
     ld      a,d      ;Check y 
+    and     a
     ret     nz
     ld      a,e
     cp      192
