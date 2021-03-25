@@ -40,4 +40,5 @@ graphics/retrofit/w_plotpixl
 graphics/retrofit/w_respixl
 graphics/retrofit/w_setxy
 target/cpm/graphics/move
+target/cpm/graphics/putc_gsx
 @gfx/wide/gfx_wide.lst
