@@ -10,6 +10,9 @@ target/sam/stdio/generic_console_vpeek
 target/sam/stdio/__sam_printc
 target/sam/stdio/__sam_vpeek
 target/sam/stdio/__sam_set_mode
+target/sam/stdio/printc_MODE2
+target/sam/stdio/printc_MODE3
+target/sam/stdio/printc_MODE4
 target/sam/stdio/CRT_FONT
 
 ; This ANSI terminal only works with ROM code
