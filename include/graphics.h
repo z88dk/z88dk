@@ -189,14 +189,15 @@ extern void __LIB__ xorcircle_callee(int x, int y, int radius, int skip) __small
 /* Init GFX mode and clear map */
 extern void __LIB__ clg(void);
 
+
 /* Clear area of graphics map */
-extern void __LIB__ clga(int tlx, int tly, int width, int height) __smallc;
-extern void __LIB__ clga_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
+extern void __LIB__ clga(int tlx, int tly, int tlx2, int tly2) __smallc;
+extern void __LIB__ clga_callee(int tlx, int tly, int tlx2, int tly2) __smallc __z88dk_callee;
 #define clga(a,b,c,d)           clga_callee(a,b,c,d)
 
 /* Invert an area in the graphics map */
-extern void __LIB__ xorclga(int tlx, int tly, int width, int height) __smallc;
-extern void __LIB__ xorclga_callee(int tlx, int tly, int width, int height) __smallc __z88dk_callee;
+extern void __LIB__ xorclga(int tlx, int tly, int tlx2, int tly2) __smallc;
+extern void __LIB__ xorclga_callee(int tlx, int tly, int tlx2, int tly2) __smallc __z88dk_callee;
 #define xorclga(a,b,c,d)           xorclga_callee(a,b,c,d)
 
 /* Draw a filled box in the graphics map */
