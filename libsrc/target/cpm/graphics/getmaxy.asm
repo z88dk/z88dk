@@ -49,12 +49,7 @@
 .gsx_yoffs
 ._gsx_yoffs
         ld      de,(_gsx_yscale_factor)
-		push   de
 		call   l_mult
-		pop    de
-		srl    d
-		rr     e
-		add    hl,de
 		jp     l_neg
 
 
