@@ -22,7 +22,8 @@ void xorborder(int x1,int y1,int x2,int y2)
 {
 	gios_wmode(W_COMPLEMENT);
 	gios_l_style(L_DOT);
-		gios_draw(gsx_xscale(x1),gsx_yscale(y1),gsx_xscale(x1+x2),gsx_yscale(y2));
+		gios_plot(gsx_xscale(x1),gsx_yscale(y1));
+		gios_drawr(gsx_xoffs(x2),0);
 		gios_drawr(0,gsx_yoffs(y2));
 		gios_drawr(gsx_xoffs(-x2),0);
 		gios_drawr(0,-gsx_yoffs(y2));
