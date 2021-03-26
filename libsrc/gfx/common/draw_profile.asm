@@ -61,13 +61,11 @@ getx:
 	ld	l,a
 	call l_mult
 
-;IF ((maxx/(maxy+1))>1)
-;	ld	de,25	; 50/2
-;ELSE
-;	ld	de,50
-;ENDIF
-
-	ld	de,33
+IF ((maxx/(maxy+1))>1)
+	ld	de,25	; 50/2
+ELSE
+	ld	de,50
+ENDIF
 	jr  perc_div
 
 	
