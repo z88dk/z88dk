@@ -268,13 +268,6 @@ struct GSX_CTL {
 #define DRAW_CIRCLE     4    /* Draw circle n_ptsin=3, ptsin=centre, a point and (radius,0) */
 #define DRAW_TEXT       5    /* Device specific output, n_ptsin=1, n_intin=no.chars, ptsin=coordinates, intin=16bit-characters */
 
-/* Line style attributes */
-#define L_SOLID         0    /* Normal line drawing */
-#define L_DASH          1    /* Dashes */
-#define L_DOT           2    /* Dotted line */
-#define L_DASHDOT       3    /* Alterning dashes and dots */
-#define L_LONGDASH      4    /* Long dashes */
-
 /* Marker attributes */
 #define M_PIX           0    /* Single pixel */
 #define M_PLUS          1    /* '+' symbol */
@@ -354,6 +347,13 @@ extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
 
 /* Set writing mode */
 #define gios_wmode(mode) gios_1pm(GSX_WRTMODE,mode)
+
+/* Line style attributes */
+#define L_SOLID         0    /* Normal line drawing */
+#define L_DASH          1    /* Dashes */
+#define L_DOT           2    /* Dotted line */
+#define L_DASHDOT       3    /* Alterning dashes and dots */
+#define L_LONGDASH      4    /* Long dashes */
 
 /* Set line style */
 #define gios_l_style(style) gios_1pm(GSX_L_STYLE,style)

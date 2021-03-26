@@ -32,8 +32,13 @@
 .gsx_yscale
 ._gsx_yscale
         ld      de,(_gsx_yscale_factor)
-        call    l_mult
-        ;ld      de,32768
+		push   de
+		call   l_mult
+		pop    de
+		srl    d
+		rr     e
+		add    hl,de
+
 		ld      de,32767
         ex      de,hl
         and     a
@@ -44,8 +49,8 @@
 .gsx_yoffs
 ._gsx_yoffs
         ld      de,(_gsx_yscale_factor)
-        call    l_mult
-		jp      l_neg
+		call   l_mult
+		jp     l_neg
 
 
 	SECTION  bss_graphics

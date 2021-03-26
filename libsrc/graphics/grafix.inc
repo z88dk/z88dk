@@ -706,8 +706,8 @@ ENDIF
 ; We keep an average value
 IF FORcpm
 	DEFINE gotgfx
-	defc maxx	= 1024		; foo value hopefully larger than the max X resolution
-	defc maxy	= 768		; foo value hopefully larger than the max Y resolution
+	defc maxx	= 1920		; foo value hopefully larger than the max X resolution
+	defc maxy	= 768		; we keep unbalanced proportions, assuming non-square pixels
 ENDIF
 
 ; =============================================
