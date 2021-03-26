@@ -1,15 +1,15 @@
 ;
-;       Generic pseudo graphics routines for text-only platforms
+;     Generic pseudo graphics routines for text-only platforms
 ;
-;       Point pixel at (x,y) coordinate.
+;     Point pixel at (x,y) coordinate.
 
 
 
-        SECTION code_graphics
-	PUBLIC	c_pointxy
-        defc    NEEDpoint= 1
+      SECTION code_graphics
+    PUBLIC    c_pointxy
+      defc    NEEDpoint= 1
 
 
-.c_pointxy			
-	INCLUDE "c_pixel.inc"
+.c_pointxy    
+    INCLUDE "c_pixel.inc"
 

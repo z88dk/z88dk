@@ -1,17 +1,17 @@
 ;
-;       Colour graphics routines
+;      Colour graphics routines
 ;
-;       cls ()  -- clear screen
+;      cls ()  -- clear screen
 ;
-;       Stefano Bodrato - 2018
+;      Stefano Bodrato - 2018
 ;
 ;
-;       $Id: cclg.asm $
+;      $Id: cclg.asm $
 ;
 
-			SECTION	code_graphics
-			PUBLIC    cclg
-         PUBLIC    _cclg
+    	SECTION	code_graphics
+    	PUBLIC    cclg
+        PUBLIC    _cclg
 
 	EXTERN	clg
 	

@@ -7,58 +7,67 @@
 ; ----- void __CALLEE__ undraw(int x, int y, int x2, int y2)
 ;
 ;
-;	$Id: w_undraw_callee.asm $
+;    $Id: w_undraw_callee.asm $
 ;
 
 IF !__CPU_INTEL__
-SECTION code_graphics
-PUBLIC undraw_callee
-PUBLIC _undraw_callee
-PUBLIC ASMDISP_UNDRAW_CALLEE
+    SECTION code_graphics
+    PUBLIC undraw_callee
+    PUBLIC _undraw_callee
+    PUBLIC ASMDISP_UNDRAW_CALLEE
 
-	EXTERN     swapgfxbk
-	EXTERN    swapgfxbk1
+    EXTERN     swapgfxbk
+    EXTERN    swapgfxbk1
 
-	EXTERN     w_line_r
-	EXTERN     w_respixel
-	EXTERN     __graphics_end
+    EXTERN     w_line_r
+    EXTERN     w_respixel
+    EXTERN     __graphics_end
+    INCLUDE "graphics/grafix.inc"
 
 
 
 .undraw_callee
 ._undraw_callee
-                pop af
-                pop     de      ;y2
-                pop     hl      ;x2
-                exx                     ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
-                pop de          ;y1
-                pop hl          ;x1
-                push af         ; ret addr
-		
+    pop af
+    pop     de      ;y2
+    pop     hl      ;x2
+    exx                     ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    pop de          ;y1
+    pop hl          ;x1
+    push af         ; ret addr
+
 .asmentry
 
-                push ix
-                push hl         ;x1
-                push de         ;y1
-		
-		call    swapgfxbk
-		call	w_respixel
+    push ix
+    push hl         ;x1
+    push de         ;y1
 
-                exx
-                ex      de,hl
-                pop     bc      ;y1
-                or      a
-                sbc     hl,bc
-                ex      de,hl
+IF NEED_swapgfxbk = 1
+    call    swapgfxbk
+ENDIF
+    call    w_respixel
 
-                pop     bc              ;x1
-                or      a
-                sbc     hl,bc
+    exx
+    ex      de,hl
+    pop     bc      ;y1
+    or      a
+    sbc     hl,bc
+    ex      de,hl
 
-		ld      ix,w_respixel
-		call    w_line_r
-		jp      __graphics_end
+    pop     bc              ;x1
+    or      a
+    sbc     hl,bc
 
+    ld      ix,w_respixel
+    call    w_line_r
+IF NEED_swapgfxbk
+    jp      __graphics_end
+ELSE
+  IF !__CPU_INTEL__ & !__CPU_GBZ80__
+    pop     ix
+  ENDIF
+    ret
+ENDIF
 
 DEFC ASMDISP_UNDRAW_CALLEE = asmentry - undraw_callee
 ENDIF

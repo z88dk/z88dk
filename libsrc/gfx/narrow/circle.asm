@@ -1,12 +1,12 @@
 ;
-;       Z88 Graphics Functions - Small C+ stubs
+;     Z88 Graphics Functions - Small C+ stubs
 ;
-;       Written around the Interlogic Standard Library
+;     Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
+;     Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: circle.asm $
+;    $Id: circle.asm $
 ;
 
 
@@ -14,24 +14,24 @@
 
 
 IF !__CPU_INTEL__ & !__CPU_GBZ80__
-		SECTION     code_graphics
-		
-		PUBLIC      circle
-		PUBLIC      _circle
+    SECTION    code_graphics
+    
+    PUBLIC    circle
+    PUBLIC    _circle
 
-		EXTERN      circle_callee
-		EXTERN      ASMDISP_CIRCLE_CALLEE
+    EXTERN    circle_callee
+    EXTERN    ASMDISP_CIRCLE_CALLEE
 
 
 .circle
 ._circle
-		push	ix
-		ld	ix,2
-		add	ix,sp
-		ld	e,(ix+2)	;skip
-		ld	d,(ix+4)	;radius
-		ld	c,(ix+6)	;y
-		ld	b,(ix+8)	;x
-		
-		jp circle_callee + ASMDISP_CIRCLE_CALLEE
+    push    ix
+    ld    ix,2
+    add    ix,sp
+    ld    e,(ix+2)    ;skip
+    ld    d,(ix+4)    ;radius
+    ld    c,(ix+6)    ;y
+    ld    b,(ix+8)    ;x
+    
+    jp circle_callee + ASMDISP_CIRCLE_CALLEE
 ENDIF

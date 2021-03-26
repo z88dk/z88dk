@@ -1,12 +1,12 @@
 ;
-;       Z88 Graphics Functions - Small C+ stubs
+;     Z88 Graphics Functions - Small C+ stubs
 ;
-;       Written around the Interlogic Standard Library
+;     Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
+;     Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: unplot.asm $
+;    $Id: unplot.asm $
 ;
 
 ; CALLER LINKAGE FOR FUNCTION POINTERS
@@ -14,24 +14,24 @@
 
 
 IF !__CPU_INTEL__ & !__CPU_GBZ80__
-		SECTION   code_graphics
-		
-		PUBLIC    unplot
-		PUBLIC	  _unplot
-		
-		EXTERN unplot_callee
-		EXTERN ASMDISP_UNPLOT_CALLEE
+    SECTION   code_graphics
+    
+    PUBLIC    unplot
+    PUBLIC    _unplot
+    
+    EXTERN unplot_callee
+    EXTERN ASMDISP_UNPLOT_CALLEE
 
-		
+    
 .unplot
 ._unplot
-	pop	af	; ret addr
-	pop hl	; y
-	pop de	; x
-	push de
-	push hl
-	ld	h,e
-	push	af	; ret addr
-		
+    pop    af    ; ret addr
+    pop hl    ; y
+    pop de    ; x
+    push de
+    push hl
+    ld    h,e
+    push    af    ; ret addr
+    
    jp unplot_callee + ASMDISP_UNPLOT_CALLEE
 ENDIF

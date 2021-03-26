@@ -43,7 +43,6 @@ target/pc6001/graphics/plot_MODE2
 target/pc6001/graphics/res_MODE2
 target/pc6001/graphics/xor_MODE2
 target/pc6001/graphics/pointxy_MODE2
-target/pc6001/graphics/swapgfxbk
 target/pc6001/graphics/textpixl6
 @gfx/narrow/gfx_narrow.lst
 target/pc6001/psg/set_psg

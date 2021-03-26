@@ -21,7 +21,6 @@ target/vz/graphics/clsgraph
 #target/vz/graphics/putsprite
 target/vz/graphics/bksave
 target/vz/graphics/bkrestore
-target/vz/graphics/swapgfxbk
 target/vz/graphics/getmaxx
 target/vz/graphics/getmaxy
 target/vz/graphics/plotpixl
@@ -38,7 +37,6 @@ target/vz/graphics/plot_MODE1
 target/vz/graphics/res_MODE1
 target/vz/graphics/xor_MODE1
 target/vz/graphics/pointxy_MODE1
-target/vz/graphics/swapgfxbk
 target/vz/graphics/textpixl
 @gfx/narrow/gfx_narrow.lst
 target/vz/games/bit_open

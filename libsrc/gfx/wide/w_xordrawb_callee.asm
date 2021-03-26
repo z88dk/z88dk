@@ -9,44 +9,52 @@
 ;
 
 IF !__CPU_INTEL__
- 	SECTION code_graphics
-	
-	PUBLIC	xordrawb_callee
-	PUBLIC	_xordrawb_callee
-	
-	PUBLIC	ASMDISP_XORDRAWB_CALLEE
+    SECTION code_graphics
+    
+    PUBLIC    xordrawb_callee
+    PUBLIC    _xordrawb_callee
+    
+    PUBLIC    ASMDISP_XORDRAWB_CALLEE
 
-	EXTERN	w_xorpixel
-	EXTERN	drawbox
+    EXTERN    w_xorpixel
+    EXTERN    drawbox
 
-	EXTERN	swapgfxbk
-	EXTERN	__graphics_end
+    EXTERN    swapgfxbk
+    EXTERN    __graphics_end
+    INCLUDE "graphics/grafix.inc"
 
-	
+    
 .xordrawb_callee
 ._xordrawb_callee
 
-		pop af
-		
-		pop de
-		pop	hl
-		exx			; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
-		pop de
-		pop hl
-		
-		push af		; ret addr
-		
-		exx
-		
+    pop af
+    
+    pop de
+    pop    hl
+    exx        ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
+    pop de
+    pop hl
+    
+    push af    ; ret addr
+    
+    exx
+    
 .asmentry
-		
-		push	ix
-		call    swapgfxbk
-		
-		ld      ix,w_xorpixel
-		call    drawbox
 
-		jp      __graphics_end
+    push    ix
+IF NEED_swapgfxbk = 1
+    call    swapgfxbk
+ENDIF
+    ld     ix,w_xorpixel
+    call    drawbox
 
+IF NEED_swapgfxbk
+    jp      __graphics_end
+ELSE
+  IF !__CPU_INTEL__ & !__CPU_GBZ80__
+    pop     ix
+  ENDIF
+    ret
+ENDIF
 DEFC ASMDISP_XORDRAWB_CALLEE = asmentry - xordrawb_callee
 ENDIF

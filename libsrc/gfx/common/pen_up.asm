@@ -1,15 +1,15 @@
 ;
-;       Turtle graphics library
-;       Stefano - 11/2017
+;      Turtle graphics library
+;      Stefano - 11/2017
 ;
-;       $Id: pen_up.asm $
+;      $Id: pen_up.asm $
 ;
 
-        SECTION   code_graphics
-        PUBLIC    pen_up
-        PUBLIC    _pen_up
-        
-        EXTERN __pen
+       SECTION   code_graphics
+       PUBLIC    pen_up
+       PUBLIC    _pen_up
+       
+       EXTERN __pen
 
 
 .pen_up

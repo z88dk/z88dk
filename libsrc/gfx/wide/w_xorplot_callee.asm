@@ -1,12 +1,12 @@
 ;
-;       Z88 Graphics Functions - Small C+ stubs
+;      Z88 Graphics Functions - Small C+ stubs
 ;
-;       Written around the Interlogic Standard Library
+;      Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
+;      Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: w_xorplot_callee.asm $
+;    $Id: w_xorplot_callee.asm $
 ;
 
 
@@ -15,32 +15,42 @@
 
 
 IF !__CPU_INTEL__
-        SECTION code_graphics
-		
-                PUBLIC    xorplot_callee
-                PUBLIC    _xorplot_callee
-				PUBLIC    ASMDISP_XORPLOT_CALLEE
-				
-                EXTERN     swapgfxbk
-                EXTERN    __graphics_end
+    SECTION code_graphics
+    
+    PUBLIC    xorplot_callee
+    PUBLIC    _xorplot_callee
+    PUBLIC    ASMDISP_XORPLOT_CALLEE
 
-                EXTERN     w_xorpixel
+    EXTERN    swapgfxbk
+    EXTERN    __graphics_end
+
+    EXTERN    w_xorpixel
+    INCLUDE "graphics/grafix.inc"
+
 
 .xorplot_callee
 ._xorplot_callee
 
    pop bc
-   pop de	; y
-   pop hl	; x
+   pop de    ; y
+   pop hl    ; x
    push bc
 
 .asmentry
 IF !__CPU_INTEL__
-		push	ix
+    push    ix
 ENDIF
-                call    swapgfxbk
-                call    w_xorpixel
-                jp      __graphics_end
-
+IF NEED_swapgfxbk = 1
+    call    swapgfxbk
+ENDIF
+    call    w_xorpixel
+IF NEED_swapgfxbk
+    jp      __graphics_end
+ELSE
+  IF !__CPU_INTEL__ & !__CPU_GBZ80__
+    pop     ix
+  ENDIF
+    ret
+ENDIF
 DEFC ASMDISP_XORPLOT_CALLEE = asmentry - xorplot_callee
 ENDIF

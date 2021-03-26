@@ -1,9 +1,9 @@
 ;
-;       Z88DK Graphics Functions
+;      Z88DK Graphics Functions
 ;
-;       Draw a "gfx profile" metadata stream - Stefano Bodrato 16/10/2009
+;      Draw a "gfx profile" metadata stream - Stefano Bodrato 16/10/2009
 ;
-;		void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
+;    void draw_profile(int dx, int dy, int scale, unsigned char *metapic);
 ;
 ;	$Id: draw_profile_nostencil.asm,v 1.3 2016-04-22 20:17:17 dom Exp $
 ;
@@ -12,26 +12,26 @@
 	INCLUDE	"graphics/grafix.inc"
 
 IF !__CPU_INTEL__ & !__CPU_GBZ80__
-		SECTION	  code_graphics
-                PUBLIC    draw_profile
-                PUBLIC    _draw_profile
+    SECTION	  code_graphics
+             PUBLIC    draw_profile
+             PUBLIC    _draw_profile
 
-                ;EXTERN     stencil_init
-                ;EXTERN     stencil_render
-                ;EXTERN		stencil_add_point
-                ;EXTERN		stencil_add_lineto
-                ;EXTERN		stencil_add_side
-                EXTERN		plot
-                EXTERN		unplot
-                EXTERN		draw
-                EXTERN		undraw
-                EXTERN		drawto
-                EXTERN		undrawto
-                
-                EXTERN		l_mult
-                EXTERN		l_div
+             ;EXTERN    stencil_init
+             ;EXTERN    stencil_render
+             ;EXTERN    stencil_add_point
+             ;EXTERN    stencil_add_lineto
+             ;EXTERN    stencil_add_side
+             EXTERN    plot
+             EXTERN    unplot
+             EXTERN    draw
+             EXTERN    undraw
+             EXTERN    drawto
+             EXTERN    undrawto
+             
+             EXTERN    l_mult
+             EXTERN    l_div
 
-                EXTERN		getmaxx
+             EXTERN    getmaxx
 
 
 getbyte:
@@ -58,7 +58,7 @@ gety:
 	call getparm
 	ret
 
-getparm:		;cx=vx+percent*pic[x++]/100;
+getparm:    ;cx=vx+percent*pic[x++]/100;
 	push hl
 	ld	de,(_percent)
 	call	getbyte
@@ -97,59 +97,59 @@ _draw_profile:
 	ld	l,(ix+8)
 	ld	(_vx),hl
 	
-	;ld      hl,-maxy*4	; create space for stencil on stack
-	;add     hl,sp		; The stack usage depends on the display height.
-	;ld      sp,hl
-	;ld		(_stencil),hl
+	;ld     hl,-maxy*4	; create space for stencil on stack
+	;add    hl,sp    ; The stack usage depends on the display height.
+	;ld     sp,hl
+	;ld    (_stencil),hl
 
 picture_loop:
-	ld		a,(repcnt)
-	and		a
-	jr		z,norepeat
-	dec		a
-	ld		(repcnt),a
-	ld		a,(repcmd)
-	jr		noend
+	ld    a,(repcnt)
+	and    a
+	jr    z,norepeat
+	dec    a
+	ld    (repcnt),a
+	ld    a,(repcmd)
+	jr    noend
 norepeat:
 	call	getbyte
-	and	a		; CMD_END ?
-	jr		nz,noend
+	and	a    ; CMD_END ?
+	jr    nz,noend
 	;******
 	; EXIT
 	;******
-	;ld      hl,maxy*2	; release the stack space for _stencil
-	;add     hl,sp
-	;ld      sp,hl
+	;ld     hl,maxy*2	; release the stack space for _stencil
+	;add    hl,sp
+	;ld     sp,hl
 	pop	ix
 	ret
 
 noend:
 	ld	e,a
-	and $0F		; 'dithering level'
+	and $0F    ; 'dithering level'
 	ld  h,0
 	ld  l,a
 	ld	(_dith),hl
 	ld	a,e
-	and $F0		; command
+	and $F0    ; command
 
 	;ld	hl,(_stencil)
 
-;#define CMD_AREA_INIT		0x80	/* no parms */
-;#define CMD_AREA_INITB		0x81	/* activate border mode */
-;#define REPEAT_COMMAND		0x82	/* times, command */
+;#define CMD_AREA_INIT    0x80	/* no parms */
+;#define CMD_AREA_INITB    0x81	/* activate border mode */
+;#define REPEAT_COMMAND    0x82	/* times, command */
 
-	cp  $80		; CMD_AREA_INIT (no parameters)
+	cp  $80    ; CMD_AREA_INIT (no parameters)
 	jr	nz,noinit
-	push hl		; _stencil
+	push hl    ; _stencil
 	ld	a,(_dith)
 	cp	2
 	jr	z,do_repeat
 	ld	hl,0
 	ld	(_areaptr),hl
-	and a			; no parameters ?
+	and a    	; no parameters ?
 	jr	z,just_init	; then, don't keep ptr for border
 	dec	a
-	jr	z,init_loop		;$81 ?
+	jr	z,init_loop    ;$81 ?
 	; else (82..) REPEAT_COMMAND
 do_repeat:
 	call getbyte
@@ -162,12 +162,12 @@ init_loop:
 	ld	(_areaptr),hl
 just_init:
 	pop	hl
-	push hl		; _stencil
+	push hl    ; _stencil
 	;;;;call stencil_init
 	jp	go_end1
 noinit:
 
-	cp  $F0		; CMD_AREA_CLOSE (no parameters ?)
+	cp  $F0    ; CMD_AREA_CLOSE (no parameters ?)
 	jr	nz,noclose
 ;----
 	call is_areamode
@@ -175,12 +175,12 @@ noinit:
 	push hl
 	ld	hl,(_areaptr)
 	ld	(_pic),hl	; update picture pointer to pass the area
-	ld	hl,0		; twice and draw the border
+	ld	hl,0    ; twice and draw the border
 	ld	(_areaptr),hl
 	pop hl
 noclsamode:
 ;----
-	push hl		; _stencil
+	push hl    ; _stencil
 	ld	hl,(_dith)
 	ld	a,l
 	sub 12
@@ -195,7 +195,7 @@ noclsamode:
 	pop hl
 	;ld	hl,(_stencil)	; 'render' can destroy the current parameter
 	push hl
-	;ld	e,1		; left side border
+	;ld	e,1    ; left side border
 	;call resize
 	;ld	e,-1	; right side border
 	;call resize
@@ -209,7 +209,7 @@ noclsamode:
 	;call vshrink	; lower side border
 	ld	hl,(_dith)
 	ld	a,l
-	sub	7		; adjust dithering to mid values
+	sub	7    ; adjust dithering to mid values
 	ld	l,a
 doclose:
 	jp	dorender
@@ -219,8 +219,8 @@ noclose:
 ;----
 	call is_areamode
 	jr	z,noamode	; if in 'area mode', we are doing twice;
-	pop	af			; in the first pass, plot/line CMDs 
-	or $80			; are changed to the equivalent area ones
+	pop	af    	; in the first pass, plot/line CMDs 
+	or $80    	; are changed to the equivalent area ones
 	push af
 noamode:
 ;----
@@ -228,9 +228,9 @@ noamode:
 	pop	af
 	push af
 	
-	cp	$30		; CMD_HLINETO (1 parameter)
+	cp	$30    ; CMD_HLINETO (1 parameter)
 	jr	z,xparm
-	cp	$B0		; CMD_AREA_HLINETO (1 parameter)
+	cp	$B0    ; CMD_AREA_HLINETO (1 parameter)
 	jr	nz,noxparm
 xparm:
 	call getx
@@ -238,9 +238,9 @@ xparm:
 	jr	twoparms
 noxparm:
 
-	cp	$40		; CMD_VLINETO (1 parameter)
+	cp	$40    ; CMD_VLINETO (1 parameter)
 	jr	z,yparm
-	cp	$C0		; CMD_AREA_VLINETO (1 parameter)
+	cp	$C0    ; CMD_AREA_VLINETO (1 parameter)
 	jr	nz,noyparm
 yparm:
 	call gety
@@ -248,16 +248,16 @@ yparm:
 	jr	twoparms
 noyparm:
 
-	cp  $50		; CMD_LINE (4 parameters ?)
+	cp  $50    ; CMD_LINE (4 parameters ?)
 	jr	z,fourparms
-	cp  $D0		; CMD_AREA_LINE (4 parameters ?)
+	cp  $D0    ; CMD_AREA_LINE (4 parameters ?)
 fourparms:
-	push af		; keep zero flag
+	push af    ; keep zero flag
 	call getx
 	ld	(_cx),hl
 	call gety
 	ld	(_cy),hl
-	pop	af		; recover zero flag
+	pop	af    ; recover zero flag
 	jr	nz,twoparms
 	call getx
 	ld	(_cx1),hl
@@ -319,7 +319,7 @@ noaline:
 	jr	nz,noplot
 	;ld	hl,(_stencil)
 	ld	a,(_dith)
-	and	a			; when possible drawto/undrawto are faster
+	and	a    	; when possible drawto/undrawto are faster
 	jr	nz,nopwhite
 	call unplot
 	jr	go_end2
@@ -340,14 +340,14 @@ plend2:
 	push de	; stencil ptr
 	ld	hl,(_dith)
 	ld	a,l
-	sub 12			; If color > 11, then fatten a bit
+	sub 12    	; If color > 11, then fatten a bit
 	jr	c,nothick	; the surface to be drawn
 
 	;push hl
 	;ld hl,(_stencil)	; adjust the right side
 	;ld	de,maxy
 	;add	hl,de
-	;ld e,1				; 1 bit larger
+	;ld e,1       ; 1 bit larger
 	;call resize
 	;pop hl
 	ld	a,l
@@ -366,15 +366,15 @@ dorender:
 
 noplot:
 
-	cp $20		; CMD_LINETO (x,y,dither),
+	cp $20    ; CMD_LINETO (x,y,dither),
 	jr c,go_end2
-	cp $50		; CMD_LINE
+	cp $50    ; CMD_LINE
 	jr z,line
 	jr nc,go_end2
 	; LINETO stuff
 	;ld hl,(_stencil)
 	ld a,(_dith)
-	and a				; when possible drawto/undrawto are faster
+	and a       ; when possible drawto/undrawto are faster
 	jr nz,nodtwhite
 	call undrawto
 	jr	go_end2
@@ -400,7 +400,7 @@ line:
 	push hl
 	;ld	hl,(_stencil)
 	ld	a,(_dith)
-	and	a			; when possible draw/undraw are faster
+	and	a    	; when possible draw/undraw are faster
 	jr	nz,nolwhite
 	call undraw
 	jp	go_end4
@@ -440,7 +440,7 @@ nolblack:
 
 ; NZ if we have prepared a ptr for two-pass mode
 is_areamode:
-	push hl		; _stencil
+	push hl    ; _stencil
 	ld	hl,_areaptr
 	ld	a,(hl)
 	inc	hl
@@ -448,23 +448,23 @@ is_areamode:
 	pop	hl
 	ret
 
-	SECTION		bss_graphics
+	SECTION    bss_graphics
 _areaptr:	defw	0
 
 _percent:	defw	0
-_cmd:		defb	0
-_dith:		defw	0
-_vx:		defw	0
-_vy:		defw	0
+_cmd:    defb	0
+_dith:    defw	0
+_vx:    defw	0
+_vy:    defw	0
 
-_cx:		defw	0
-_cy:		defw	0
-_cx1:		defw	0
-_cy1:		defw	0
+_cx:    defw	0
+_cy:    defw	0
+_cx1:    defw	0
+_cy1:    defw	0
 
-_pic:		defw	0
+_pic:    defw	0
 
-repcmd:		defb	0
-repcnt:		defb	0
+repcmd:    defb	0
+repcnt:    defb	0
 
 ENDIF

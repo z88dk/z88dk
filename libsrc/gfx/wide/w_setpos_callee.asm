@@ -1,34 +1,34 @@
 ;
-;       Z88 Graphics Functions - Small C+ stubs
+;      Z88 Graphics Functions - Small C+ stubs
 ;
-;       Written around the Interlogic Standard Library
+;      Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
+;      Stubs Written by D Morris - 30/9/98
 ;
 ; ----- void __CALLEE__ setpos(int x2, int y2)
 ;
-;	$Id: w_setpos_callee.asm $
+;    $Id: w_setpos_callee.asm $
 ;
 
-	SECTION   code_graphics
+    SECTION   code_graphics
 
-	PUBLIC    setpos_callee
-	PUBLIC    _setpos_callee
-	
-	PUBLIC    ASMDISP_SETPOS_CALLEE
+    PUBLIC    setpos_callee
+    PUBLIC    _setpos_callee
+    
+    PUBLIC    ASMDISP_SETPOS_CALLEE
 
-	EXTERN	w_setxy
+    EXTERN    w_setxy
 
 
 .setpos_callee
-._setpos_callee	
-	pop	af	; ret addr
-	pop de
-	pop hl
-	push	af	; ret addr
-	
+._setpos_callee    
+    pop    af    ; ret addr
+    pop de
+    pop hl
+    push    af    ; ret addr
+    
 .asmentry
-	jp	w_setxy
+    jp    w_setxy
 
 
 DEFC ASMDISP_SETPOS_CALLEE = asmentry - setpos_callee

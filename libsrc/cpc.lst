@@ -19,7 +19,6 @@ target/cpc/stdio/ansi/f_ansi_scrollup
 target/cpc/graphics/clg
 target/cpc/graphics/w_pixeladdress
 target/cpc/graphics/fill
-target/cpc/graphics/swapgfxbk
 target/cpc/graphics/w_putsprite
 target/cpc/graphics/w_clga
 @gfx/wide/gfx_wide.lst

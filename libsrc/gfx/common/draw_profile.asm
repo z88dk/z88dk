@@ -10,31 +10,31 @@
 
 
 IF !__CPU_GBZ80__ && !__CPU_INTEL__
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE	"graphics/grafix.inc"
 
 
-		SECTION	  code_graphics
-                PUBLIC    draw_profile
-                PUBLIC    _draw_profile
+    SECTION	  code_graphics
+    PUBLIC    draw_profile
+    PUBLIC    _draw_profile
 
-                EXTERN     stencil_init
-                EXTERN     stencil_render
-                EXTERN		stencil_add_point
-                EXTERN		stencil_add_lineto
-                EXTERN		stencil_add_side
-                EXTERN		plot
-                EXTERN		unplot
-                EXTERN		draw
-                EXTERN		undraw
-                EXTERN		drawto
-                EXTERN		undrawto
-                
-                EXTERN		l_mult
-                EXTERN		l_div
+    EXTERN     stencil_init
+    EXTERN     stencil_render
+    EXTERN		stencil_add_point
+    EXTERN		stencil_add_lineto
+    EXTERN		stencil_add_side
+    EXTERN		plot
+    EXTERN		unplot
+    EXTERN		draw
+    EXTERN		undraw
+    EXTERN		drawto
+    EXTERN		undrawto
 
-                EXTERN		getmaxx
-                EXTERN		getmaxy
-                EXTERN		l_neg
+    EXTERN		l_mult
+    EXTERN		l_div
+
+    EXTERN		getmaxx
+    EXTERN		getmaxy
+    EXTERN		l_neg
 
 
 getbyte:
