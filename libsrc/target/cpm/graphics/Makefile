@@ -8,7 +8,7 @@ include ../../../Make.config
 
 EPFILES = \
 	clg.c      clga.c      xorclga.c   setxy.c     move.c\
-	plot.c     unplot.c    xorplot.c \
+	plot.c     unplot.c    xorplot.c   xorborder.c \
 	draw.c     drawb.c     drawr.c     drawto.c \
 	undraw.c   undrawb.c   undrawr.c   undrawto.c \
 	xordraw.c  xordrawb.c  xordrawr.c  xordrawto.c \
