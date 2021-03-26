@@ -33,6 +33,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
                 EXTERN		l_div
 
                 EXTERN		getmaxx
+                EXTERN		getmaxy
+                EXTERN		l_neg
 
 
 getbyte:
@@ -102,6 +104,19 @@ perc_div:
 
 draw_profile:
 _draw_profile:
+
+	call getmaxx
+	ld	a,h
+	push	af
+	call	getmaxy
+	inc		hl
+	pop		af
+	and		a
+	jr		z,narrow_stack
+	add		hl,hl
+narrow_stack:
+	ld		(_sp_space),hl
+
 	push	ix
 	ld	ix,2
 	add ix,sp
@@ -115,21 +130,26 @@ _draw_profile:
 	rr l
 	ld	(_percent),hl
 	ld	l,(ix+6)
-IF (maxx > 256)
+;IF (maxx > 256)
 	ld	h,(ix+7)
-ENDIF
+;ENDIF
 	ld	(_vy),hl
 	ld	l,(ix+8)
-IF (maxx > 256)
+;IF (maxx > 256)
 	ld	h,(ix+9)
-ENDIF
+;ENDIF
 	ld	(_vx),hl
 	
-IF (maxx > 256)
-	ld      hl,-maxy*4	; create space for stencil on stack
-ELSE
-	ld      hl,-maxy*2	; create space for stencil on stack
-ENDIF
+;IF (maxx > 256)
+;	ld      hl,-maxy*4	; create space for stencil on stack
+;ELSE
+;	ld      hl,-maxy*2	; create space for stencil on stack
+;ENDIF
+	ld		hl,(_sp_space)
+	add		hl,hl
+
+	call	l_neg
+
 	add     hl,sp		; The stack usage depends on the display height.
 	ld      sp,hl
 	ld		(_stencil),hl
@@ -149,11 +169,14 @@ norepeat:
 	;******
 	; EXIT
 	;******
-IF (maxx > 256)
-	ld      hl,maxy*4	; release the stack space for _stencil
-ELSE
-	ld      hl,maxy*2	; release the stack space for _stencil
-ENDIF
+;IF (maxx > 256)
+;	ld      hl,maxy*4	; release the stack space for _stencil
+;ELSE
+;	ld      hl,maxy*2	; release the stack space for _stencil
+;ENDIF
+	ld		hl,(_sp_space)
+	add		hl,hl
+
 	add     hl,sp
 	ld      sp,hl
 	pop	ix
@@ -381,11 +404,14 @@ plend2:
 
 	push hl
 	ld hl,(_stencil)	; adjust the right side
-IF (maxx > 256)
-	ld	de,maxy*2
-ELSE
-	ld	de,maxy
-ENDIF
+
+;IF (maxx > 256)
+;	ld	de,maxy*2
+;ELSE
+;	ld	de,maxy
+;ENDIF
+	ld		de,(_sp_space)
+
 	add	hl,de
 	ld e,1				; 1 bit larger
 	call resize
@@ -560,5 +586,6 @@ repcnt:		defb	0
 
 ; moved into stack
 ;;_stencil:	defs	maxy*2
+_sp_space:	defw	0
 _stencil:	defw	0
 ENDIF
