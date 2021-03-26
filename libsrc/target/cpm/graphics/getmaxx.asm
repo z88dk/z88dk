@@ -16,6 +16,8 @@
                 PUBLIC    _gsx_maxx
                 PUBLIC    gsx_xscale
                 PUBLIC    _gsx_xscale
+                PUBLIC    gsx_xoffs
+                PUBLIC    _gsx_xoffs
 				PUBLIC    _gsx_xscale_factor
 				
 				EXTERN    l_mult
@@ -36,6 +38,12 @@
 		rr     e
 		add    hl,de
 		ret
+
+
+.gsx_xoffs
+._gsx_xoffs
+        ld      de,(_gsx_xscale_factor)
+		jp   l_mult
 
 
 
