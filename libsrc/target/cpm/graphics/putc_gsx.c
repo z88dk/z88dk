@@ -2,6 +2,7 @@
  *	CP/M GSX based graphics libraries
  *
  *	putc_gsx()
+ *  use with "-pragma-redirect=fputc_cons=_putc_gsx"
  *
  *	Stefano Bodrato - 2021
  *
@@ -31,9 +32,17 @@ void putc_gsx(int chr)
 		return(0);
 	}
 
+	// CR
 	if ((chr==10)||(chr==13)) {
 		putc_gsx_xc=0;
 		putc_gsx_yc += 9;
+		return(0);
+	}
+
+	// Backspace
+	if (chr==8) {
+		if (putc_gsx_xc >= 0) putc_gsx_xc-=8;
+		gios_put_text(gsx_xscale(putc_gsx_xc),gsx_yscale(putc_gsx_yc)," ");
 		return(0);
 	}
 		
