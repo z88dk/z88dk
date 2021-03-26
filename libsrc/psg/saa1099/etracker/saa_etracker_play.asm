@@ -1,4 +1,4 @@
-
+IF __CPU_Z80__ | __CPU_Z80N__
     SECTION code_clib
     PUBLIC  saa_etracker_play
     PUBLIC  _saa_etracker_play
@@ -18,3 +18,4 @@ _saa_etracker_play:
     ex      af,af
     pop     ix
     ret
+ENDIF
