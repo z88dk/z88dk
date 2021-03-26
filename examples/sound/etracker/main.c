@@ -16,9 +16,7 @@ extern char mysong;
 
 void playmusic(void) {
    M_PRESERVE_MAIN;
-   M_PRESERVE_INDEX;
    saa_etracker_play();
-   M_RESTORE_INDEX;
    M_RESTORE_MAIN;
 }
 
