@@ -25,6 +25,8 @@ target/cpm/graphics/xordraw
 graphics/retrofit/xordraw_callee
 target/cpm/graphics/xordrawb
 graphics/retrofit/xordrawb_callee
+target/cpm/graphics/xorborder
+graphics/retrofit/xorborder_callee
 target/cpm/graphics/xordrawr
 graphics/retrofit/xordrawr_callee
 target/cpm/graphics/xordrawto
