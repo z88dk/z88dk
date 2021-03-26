@@ -28,8 +28,14 @@
 
 .gsx_xscale
 ._gsx_xscale
-        ld      de,(_gsx_xscale_factor)
-		jp      l_mult
+        ld     de,(_gsx_xscale_factor)
+		push   de
+		call   l_mult
+		pop    de
+		srl    d
+		rr     e
+		add    hl,de
+		ret
 
 
 
