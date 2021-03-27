@@ -344,7 +344,7 @@ extern void  __LIB__  zx_colour(uchar colour) __z88dk_fastcall;
 #define zx_setink(i) fputc_cons(16); fputc_cons(48 + i)
 // Change the paper attr from now on
 // p can be any of: INK_BLACK, INK_BLUE,... to INK_WHITE
-#define zx_setpaper(p) fputc_cons(17); fputc_cons(48 + i)
+#define zx_setpaper(p) fputc_cons(17); fputc_cons(48 + p)
 // Get color attribute at given position
 extern uint  __LIB__              zx_attr(uchar row, uchar col) __smallc;
 extern uint  __LIB__              zx_screenstr(uchar row, uchar col) __smallc;
