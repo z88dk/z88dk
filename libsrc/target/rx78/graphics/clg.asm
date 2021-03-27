@@ -2,15 +2,15 @@
 ; Switch to graphics (hires) mode and clear screen
 ;
 
-	SECTION	  code_clib
-        PUBLIC    clg
-        PUBLIC    _clg
+    SECTION     code_clib
+      PUBLIC    clg
+      PUBLIC    _clg
 
-	EXTERN	generic_console_cls
+    EXTERN    generic_console_cls
 
-        INCLUDE "ioctl.def"
+      INCLUDE "ioctl.def"
 
 .clg
 ._clg
-	call	generic_console_cls
-        ret
+    call    generic_console_cls
+      ret
