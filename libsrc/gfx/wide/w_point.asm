@@ -1,12 +1,12 @@
 ;
-;       Z88 Graphics Functions - Small C+ stubs
+;      Z88 Graphics Functions - Small C+ stubs
 ;
-;       Written around the Interlogic Standard Library
+;      Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
+;      Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: w_point.asm $
+;    $Id: w_point.asm $
 ;
 
 ; CALLER LINKAGE FOR FUNCTION POINTERS
@@ -14,20 +14,20 @@
 ;Result is true/false
 
 
-		SECTION   code_graphics
-		
-		PUBLIC    point
-		PUBLIC	  _point
-		
-		EXTERN point_callee
-		EXTERN ASMDISP_POINT_CALLEE
+    SECTION   code_graphics
+    
+    PUBLIC    point
+    PUBLIC     _point
+    
+    EXTERN point_callee
+    EXTERN ASMDISP_POINT_CALLEE
 
 .point
 ._point
 
    pop af
-   pop de	; y
-   pop hl	; x
+   pop de    ; y
+   pop hl    ; x
    push hl
    push de
    push af

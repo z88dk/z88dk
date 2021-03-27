@@ -24,7 +24,6 @@ target/pc88/stdio/CRT_FONT
 target/pc88/graphics/w_pointxy
 target/pc88/graphics/w_xorpixl
 target/pc88/graphics/w_pixladdr
-target/pc88/graphics/swapgfxbk_hr
 target/pc88/graphics/w_respixl
 target/pc88/graphics/w_stencil_render
 target/pc88/graphics/lores_data

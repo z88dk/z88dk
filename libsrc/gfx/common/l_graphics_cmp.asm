@@ -2,7 +2,7 @@
 ; This is identical to l_cmp, 
 ; but we need to have a moveable copy to deal with the video pages
 
-	SECTION		code_graphics
+	SECTION    code_graphics
 	
 	PUBLIC	l_graphics_cmp
 

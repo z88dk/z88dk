@@ -1,12 +1,12 @@
 ;
-;       Z88 Graphics Functions - Small C+ stubs
+;      Z88 Graphics Functions - Small C+ stubs
 ;
-;       Written around the Interlogic Standard Library
+;      Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
+;      Stubs Written by D Morris - 30/9/98
 ;
 ;
-;	$Id: w_point_callee.asm $
+;    $Id: w_point_callee.asm $
 ;
 
 
@@ -15,42 +15,46 @@
 ;Result is true/false
 
 
-        SECTION code_graphics
-		
-                PUBLIC    point_callee
-                PUBLIC    _point_callee
-				PUBLIC    ASMDISP_POINT_CALLEE
-				
-                EXTERN     swapgfxbk
-                EXTERN    swapgfxbk1
+    SECTION code_graphics
 
-                EXTERN     w_pointxy
-				
+    PUBLIC    point_callee
+    PUBLIC    _point_callee
+    PUBLIC    ASMDISP_POINT_CALLEE
+
+    EXTERN    swapgfxbk
+    EXTERN    swapgfxbk1
+
+    EXTERN    w_pointxy
+    INCLUDE "graphics/grafix.inc"
+
 
 .point_callee
 ._point_callee
 
-   pop bc
-   pop de	; y
-   pop hl	; x
-   push bc
+    pop bc
+    pop de    ; y
+    pop hl    ; x
+    push bc
 
 .asmentry
 IF !__CPU_INTEL__
-		push	ix
+    push    ix
 ENDIF
-                call    swapgfxbk
-                call    w_pointxy
-				
-                push    af
-                call    swapgfxbk1
-                pop     af
+IF NEED_swapgfxbk = 1
+    call    swapgfxbk
+ENDIF             
+    call    w_pointxy
+IF NEED_swapgfxbk = 1
+    push       af
+    call    swapgfxbk1
+    pop    af
+ENDIF
 IF !__CPU_INTEL__
-		pop	ix
+    pop    ix
 ENDIF
-                ld      hl,1
-                ret     nz       ;pixel set
-                dec     hl
-                ret
+             ld     hl,1
+             ret    nz      ;pixel set
+             dec    hl
+             ret
 
 DEFC ASMDISP_POINT_CALLEE = asmentry - point_callee

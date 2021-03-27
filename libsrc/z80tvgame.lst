@@ -9,7 +9,6 @@ target/z80tvgame/stdio/fgetc_cons
 target/z80tvgame/games/joystick
 @games/games.lst
 target/z80tvgame/graphics/pixladdr
-target/z80tvgame/graphics/swapgfxbk
 target/z80tvgame/graphics/clsgraph
 @gfx/narrow/gfx_narrow.lst
 

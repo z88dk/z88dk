@@ -1,13 +1,13 @@
 ;
-;       Z88 Graphics Functions - Small C+ stubs
+;      Z88 Graphics Functions - Small C+ stubs
 ;
-;       Written around the Interlogic Standard Library
+;      Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
+;      Stubs Written by D Morris - 30/9/98
 ;
-;       Wide resolution (int type parameters) version by Stefano Bodrato
+;      Wide resolution (int type parameters) version by Stefano Bodrato
 ;
-;	$Id: w_xordrawr.asm $
+;    $Id: w_xordrawr.asm $
 ;
 
 
@@ -23,12 +23,12 @@ EXTERN ASMDISP_XORDRAWR_CALLEE
 .xordrawr
 ._xordrawr
 
-		pop	af
-		pop	de
-		pop	hl
-		push	hl
-		push	de
-		push	af
+    pop    af
+    pop    de
+    pop    hl
+    push    hl
+    push    de
+    push    af
 
 
    jp xordrawr_callee + ASMDISP_XORDRAWR_CALLEE

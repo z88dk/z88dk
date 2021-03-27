@@ -51,7 +51,6 @@ target/sam/graphics/pointxy_MODE4
 target/sam/graphics/res_MODE2
 target/sam/graphics/res_MODE3
 target/sam/graphics/res_MODE4
-target/sam/graphics/swapgfxbk
 target/sam/graphics/w_plotpixl
 target/sam/graphics/w_pointxy
 target/sam/graphics/w_respixl

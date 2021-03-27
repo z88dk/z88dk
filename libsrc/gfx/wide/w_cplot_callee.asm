@@ -1,34 +1,39 @@
 
 ; ----- void __CALLEE__ cplot_callee(int x, int y, int c)
 
-SECTION code_graphics
-PUBLIC cplot_callee
-PUBLIC _cplot_callee
-PUBLIC ASMDISP_CPLOT_CALLEE
+    SECTION code_graphics
+    PUBLIC cplot_callee
+    PUBLIC _cplot_callee
+    PUBLIC ASMDISP_CPLOT_CALLEE
 
-	EXTERN     swapgfxbk
-	EXTERN    swapgfxbk1
-	EXTERN    __gfx_color
-	EXTERN     w_cplotpixel
+    EXTERN    swapgfxbk
+    EXTERN    swapgfxbk1
+    EXTERN    __gfx_color
+    EXTERN    w_cplotpixel
+    INCLUDE "graphics/grafix.inc"
 
 
 .cplot_callee
 ._cplot_callee
 
-   pop af
-   pop bc
-   pop de
-   pop hl
-   push af
+    pop     af
+    pop     bc
+    pop     de
+    pop     hl
+    push    af
 
 .asmentry
-		ld	a,c
-		ld	(__gfx_color),a
-		call    swapgfxbk	; green page
-		
-		call	w_cplotpixel
-
-		jp      swapgfxbk1
+    ld      a,c
+    ld      (__gfx_color),a
+IF NEED_swapgfxbk = 1
+    call    swapgfxbk
+ENDIF    
+    call    w_cplotpixel
+IF NEED_swapgfxbk = 1
+    jp      swapgfxbk1
+ELSE
+    ret
+ENDIF
 
 DEFC ASMDISP_CPLOT_CALLEE = asmentry - cplot_callee
 

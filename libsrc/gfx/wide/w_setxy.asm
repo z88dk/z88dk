@@ -1,12 +1,12 @@
-	INCLUDE	"graphics/grafix.inc"
-	SECTION code_graphics
-	PUBLIC	w_setxy
-	EXTERN	l_graphics_cmp
+    INCLUDE    "graphics/grafix.inc"
+    SECTION code_graphics
+    PUBLIC    w_setxy
+    EXTERN    l_graphics_cmp
 
-	EXTERN	__gfx_coords
+    EXTERN    __gfx_coords
 
 ;
-;	$Id: w_setxy.asm $
+;    $Id: w_setxy.asm $
 ;
 
 ; ******************************************************************
@@ -22,31 +22,31 @@
 ;
 ; in:  hl,de = (x,y) coordinate
 ;
-; registers changed	after return:
+; registers changed    after return:
 ;  ..bcdehl/ixiy same
 ;  af....../.... different
 ;
 .w_setxy
 
-		push    hl
-		ld      hl,maxy
-		call    l_graphics_cmp
-		pop     hl
-		ret     nc               ; Return if Y overflows
+    push    hl
+    ld     hl,maxy
+    call    l_graphics_cmp
+    pop    hl
+    ret    nc            ; Return if Y overflows
 
-		push    de
-		ld      de,maxx
-		call    l_graphics_cmp
-		pop     de
-		ret     c               ; Return if X overflows
-		
-		ld      (__gfx_coords),hl	; store X
+    push    de
+    ld     de,maxx
+    call    l_graphics_cmp
+    pop    de
+    ret    c            ; Return if X overflows
+    
+    ld     (__gfx_coords),hl    ; store X
 IF __CPU_INTEL__
-		ex	de,hl
-		ld	(__gfx_coords+2),hl
-		ex	de,hl
+    ex    de,hl
+    ld    (__gfx_coords+2),hl
+    ex    de,hl
 ELSE
-		ld      (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
+    ld     (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
 ENDIF
 
-		ret
+    ret

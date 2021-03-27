@@ -10,7 +10,6 @@ target/smc777/stdio/fgetc_cons
 target/smc777/graphics/clg
 target/smc777/graphics/getmaxx
 target/smc777/graphics/getmaxy
-target/smc777/graphics/swapgfxbk
 target/smc777/graphics/textpixl
 target/smc777/graphics/w_pixladdr
 target/smc777/graphics/w_plotpixl

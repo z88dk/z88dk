@@ -17,7 +17,6 @@ target/rx78/graphics/plotpixl
 target/rx78/graphics/respixl
 target/rx78/graphics/xorpixl
 target/rx78/graphics/pointxy
-target/rx78/graphics/swapgfxbk
 @gfx/narrow/gfx_narrow.lst
 target/rx78/games/joystick
 target/rx78/games/keys_joystick

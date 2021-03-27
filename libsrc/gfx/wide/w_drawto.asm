@@ -1,13 +1,13 @@
 ;
-;       Z88 Graphics Functions - Small C+ stubs
+;      Z88 Graphics Functions - Small C+ stubs
 ;
-;       Written around the Interlogic Standard Library
+;      Written around the Interlogic Standard Library
 ;
-;       Stubs Written by D Morris - 30/9/98
+;      Stubs Written by D Morris - 30/9/98
 ;
-;       Wide resolution (int type parameters) version by Stefano Bodrato
+;      Wide resolution (int type parameters) version by Stefano Bodrato
 ;
-;	$Id: w_drawto.asm $
+;    $Id: w_drawto.asm $
 ;
 
 
@@ -23,14 +23,14 @@ EXTERN ASMDISP_DRAWTO_CALLEE
 .drawto
 ._drawto
 
-		pop	af
-		;pop bc
-		pop	de
-		pop	hl
-		push	hl
-		push	de
-		;push	bc
-		push	af
+    pop    af
+    ;pop bc
+    pop    de
+    pop    hl
+    push    hl
+    push    de
+    ;push    bc
+    push    af
 
 
    jp drawto_callee + ASMDISP_DRAWTO_CALLEE

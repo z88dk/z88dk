@@ -11,6 +11,7 @@ target/ts2068/obj/ts2068/ts_vmod
 @stdio/stdio.lst
 target/ts2068/graphics_hr/zx_hardcopy
 @target/zx-common/timex_zxn_graphics.lst
+;gfx/wide/obj/ts2068/w_stencil_render2
 @gfx/wide/gfx_wide.lst
 target/shared/clock
 target/zx/games/obj/${TARGET}/joystick

@@ -1,5 +1,4 @@
 target/bondwell/graphics/cleargraphics
-target/bondwell/graphics/swapgfxbk
 target/bondwell/graphics/textpixl6
 target/bondwell/ioctl/generic_console
 target/bondwell/ioctl/generic_console_scrollup
