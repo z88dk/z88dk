@@ -564,6 +564,7 @@ IF FORhgmc
     defc    maxx = 256
     defc    maxy = 256
     defc    WANT_swapgfxbk = 0
+    defc    BITS_reversed = 1
 ENDIF
 
 

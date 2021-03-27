@@ -151,6 +151,9 @@ ENDIF
     ; Prepare an edge byte, basing on the byte mask in A
     ; and on the pattern being set in (pattern1+1)
 .mask_pattern
+IF BITS_reversed
+    xor     255
+ENDIF
     ld    d,a    ; keep a copy of mask
     and    (hl)    ; mask data on screen
     ld    e,a    ; save masked data
