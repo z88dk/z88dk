@@ -3,6 +3,7 @@
 @libgen/libgen.lst
 @setjmp/setjmp.lst
 @stdlib/stdlib.lst
+@alloc/alloc.lst
 @strings/string.lst
 @regex/regex.lst
 stdio/ansi/ansifont_f3
@@ -31,7 +32,6 @@ _DEVELOPMENT/l/z80/ascii/l_valid_base
 _DEVELOPMENT/l/z80/ascii/l_num2char
 @adt/adt.lst
 @adt-newlib/adt.lst
-@alloc/alloc.lst
 @debug/debug.lst
 @rect/rect.lst
 @algorithm/alg.lst
