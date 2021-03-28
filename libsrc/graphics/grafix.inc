@@ -750,6 +750,13 @@ IF FORkrokha
     defc    WANT_swapgfxbk = 0
 ENDIF
 
+IF FORgl6000
+    DEFINE gotgfx
+    defc maxx    = 240
+    defc maxy    = 100
+    defc    WANT_swapgfxbk = 0
+ENDIF
+
 ; GSX virtual window is (32768 x 32768)
 ; HiRez display should stay between 512..800 px.
 ; We keep an average value

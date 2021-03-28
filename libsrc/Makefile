@@ -1304,7 +1304,8 @@ gl6000_clib.lib:
 	@echo '--- Building Genius Leader 6000 Library ---'
 	@echo ''
 	$(call buildgeneric,gl)
-	TARGET=gl TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl6000 -x$(OUTPUT_DIRECTORY)/gl6000_clib @$(LISTFILE_DIRECTORY)/gl6000.lst
+	$(MAKE) -C gfx TARGET=gl SUBTYPE=gl6000 FLAVOUR=narrow
+	TARGET=gl6000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl6000 -x$(OUTPUT_DIRECTORY)/gl6000_clib @$(LISTFILE_DIRECTORY)/gl6000.lst
 
 
 
