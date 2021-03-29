@@ -33,11 +33,11 @@ IF !__CPU_INTEL__
     push    bc
     ldir
     pop    bc
-    dec    bc
     ld    (hl),0
     push    bc
     ldir
     pop    bc
+    dec    bc
     ldir
     ret
 ENDIF
