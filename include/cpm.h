@@ -384,6 +384,19 @@ extern int  __LIB__   gios_text(const char *s) __z88dk_fastcall;
 /* Set fill index (e.g. hatch style) */
 #define gios_f_index(style) gios_1pm(GSX_F_INDEX,style)
 
+/* Default colors */
+#define GSX_BLACK       0
+#define GSX_RED         1
+#define GSX_GREEN       2
+#define GSX_BLUE        3
+#define GSX_CYAN        4
+#define GSX_YELLOW      5
+#define GSX_MAGENTA     6
+#define GSX_WHITE       7
+
+/* Set fill color */
+#define gios_f_color(color) gios_1pm(GSX_F_COLOR,color)
+
 /* Draw a line */
 #define gios_draw(x1,y1,x2,y2) gios_2px(GSX_POLYLINE,x1,y1,x2,y2)
 
