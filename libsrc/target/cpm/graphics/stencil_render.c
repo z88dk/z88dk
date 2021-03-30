@@ -20,14 +20,16 @@ extern int  __LIB__ getmaxy() __z88dk_fastcall;
 void stencil_render(int stencil_vector[], unsigned char intensity)
 {
 	int y, sr_maxy;
-	int xa,xb;
+	//int xa,xb;
 
 	sr_maxy=getmaxy()+1;
+		gios_l_width(0);
+
 
 	for (y=0;y<sr_maxy;y++) {
 
 		if (stencil_vector[y]<stencil_vector[y+sr_maxy]) {
-			
+			/*
 			
 			if (y&1) {
 
@@ -103,26 +105,28 @@ void stencil_render(int stencil_vector[], unsigned char intensity)
 				gios_draw(gsx_xscale(xa),gsx_yscale(y),gsx_xscale(xb),gsx_yscale(y));
 			else
 				gios_draw(gsx_xscale(xb),gsx_yscale(y),gsx_xscale(xa),gsx_yscale(y));
-
-	/*
+			*/
+			
+			//gios_l_color(1);
 			gios_wmode(W_ERASE);
 			gios_f_style(F_FULL);
 			gios_draw(gsx_xscale(stencil_vector[y]),gsx_yscale(y),gsx_xscale(stencil_vector[y+sr_maxy]),gsx_yscale(y));
 
+			//gios_l_color(0);
 			gios_wmode(W_COMPLEMENT);
 			gios_f_style(F_PATTERN);
 			gios_f_index(11-intensity);
 			gios_drawb(gsx_xscale(stencil_vector[y]),gsx_yscale(y),gsx_xscale(stencil_vector[y+sr_maxy]),gsx_yscale(y));
 
 			gios_update();
-*/
 
 		}
 
 	}
 
+	//gios_l_color(1);
 	gios_wmode(W_REPLACE);
-	gios_l_style(L_SOLID);
-	//gios_f_style(F_EMPTY);
+	//gios_l_style(L_SOLID);
+	gios_f_style(F_EMPTY);
 
 }
