@@ -12,7 +12,7 @@ EPFILES = \
 	draw.c     drawb.c     drawr.c     drawto.c \
 	undraw.c   undrawb.c   undrawr.c   undrawto.c \
 	xordraw.c  xordrawb.c  xordrawr.c  xordrawto.c \
-	putc_gsx.c
+	putc_gsx.c stencil_render.c
 	
 	
 
