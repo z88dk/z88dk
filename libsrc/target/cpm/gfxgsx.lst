@@ -45,4 +45,8 @@ graphics/retrofit/w_respixl
 graphics/retrofit/w_setxy
 target/cpm/graphics/move
 target/cpm/graphics/putc_gsx
+target/cpm/graphics/stencil_render
+gfx/wide/obj/${TARGET}/draw_profile_vy
+gfx/wide/obj/${TARGET}/stencil_init_vy
+gfx/wide/obj/${TARGET}/stencil_add_pixel_vy
 @gfx/wide/gfx_wide.lst
