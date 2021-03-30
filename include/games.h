@@ -454,6 +454,16 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 2
 #endif
 
+#ifdef __GL__
+#ifdef GL_TARGET_GL6000
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "QAOP-MN", "8246-05",  "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+#endif
+
+
 
 #ifndef GAME_DEVICES
 #ifdef DEFINE_JOYSTICK_TYPE
@@ -461,6 +471,7 @@ extern const unsigned char *joystick_type[];
 #endif
 	#define GAME_DEVICES 2
 #endif
+
 
 
 

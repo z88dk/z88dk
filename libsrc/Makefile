@@ -1305,6 +1305,7 @@ gl6000_clib.lib:
 	@echo ''
 	$(call buildgeneric,gl)
 	$(MAKE) -C gfx TARGET=gl SUBTYPE=gl6000 FLAVOUR=narrow
+	$(MAKE) -C games TARGET=gl SUBTYPE=gl6000 TARGET_CFLAGS=-clib=gl6000sl
 	TARGET=gl6000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl6000 -x$(OUTPUT_DIRECTORY)/gl6000_clib @$(LISTFILE_DIRECTORY)/gl6000.lst
 
 

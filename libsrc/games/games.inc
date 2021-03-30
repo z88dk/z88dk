@@ -349,6 +349,12 @@ IF FORm100
 ENDIF
 
 
+IF FORgl6000
+    defc sndbit_port	= 0
+    defc sndbit_bit    = 0
+    defc sndbit_mask   = 0
+ENDIF
+
 IF FORmyvision
     defc sndbit_port	= 0
     defc sndbit_bit    = 0
@@ -384,6 +390,7 @@ IF FORmikro80
     defc sndbit_bit    = 1
     defc sndbit_mask   = $2	;
 ENDIF
+
 
 ; ********************************************************
 ;  SN76489 PSG chip definitions

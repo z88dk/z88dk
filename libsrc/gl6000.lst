@@ -1,4 +1,6 @@
 @stdio/stdio.lst
+stdio/inkey/fgetc_cons
+stdio/inkey/getk
 target/gl6000/stdio/CRT_FONT
 target/gl6000/stdio/generic_console
 target/gl6000/stdio/generic_console_ioctl
@@ -8,3 +10,7 @@ target/gl6000/graphics/pixladdr.asm
 gfx/narrow/obj/gl6000/stencil_render
 @gfx/narrow/gfx_narrow.lst
 @font/font_8x8/font_8x8.lst
+@input/input_keyboard.lst
+target/gl6000/games/joystick
+target/gl6000/games/keys_joystick
+@games/games.lst
