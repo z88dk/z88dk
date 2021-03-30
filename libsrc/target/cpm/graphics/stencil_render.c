@@ -20,6 +20,7 @@ extern int  __LIB__ getmaxy() __z88dk_fastcall;
 void stencil_render(int stencil_vector[], unsigned char intensity)
 {
 	int y, sr_maxy;
+	int xa,xb;
 
 	sr_maxy=getmaxy()+1;
 
@@ -27,77 +28,82 @@ void stencil_render(int stencil_vector[], unsigned char intensity)
 
 		if (stencil_vector[y]<stencil_vector[y+sr_maxy]) {
 			
+			
 			if (y&1) {
+
+				xa=stencil_vector[y+sr_maxy];
+				xb=stencil_vector[y];
+
 				switch (intensity) {
 					case 0:
 					case 1:
 						gios_wmode(W_ERASE);
 						gios_l_style(L_SOLID);
-						gios_draw(gsx_xscale(stencil_vector[y]),gsx_yscale(y),gsx_xscale(stencil_vector[y+sr_maxy]),gsx_yscale(y));
 						break;
 					case 2:
 					case 3:
 						gios_wmode(W_REPLACE);
 						gios_l_style(L_DOT);
-						gios_draw(gsx_xscale(stencil_vector[y]),gsx_yscale(y),gsx_xscale(stencil_vector[y+sr_maxy]),gsx_yscale(y));
 						break;
 					case 4:
 					case 5:
 						gios_wmode(W_ERASE);
 						gios_l_style(L_SOLID);
-						gios_draw(gsx_xscale(stencil_vector[y]),gsx_yscale(y),gsx_xscale(stencil_vector[y+sr_maxy]),gsx_yscale(y));
 						break;
 					case 6:
 					case 7:
 						gios_wmode(W_REPLACE);
 						gios_l_style(L_DOT);
-						gios_draw(gsx_xscale(stencil_vector[y]),gsx_yscale(y),gsx_xscale(stencil_vector[y+sr_maxy]),gsx_yscale(y));
 						break;
 					case 8:
 					case 9:
 						gios_wmode(W_REPLACE);
 						gios_l_style(L_DASHDOT);
-						gios_draw(gsx_xscale(stencil_vector[y]),gsx_yscale(y),gsx_xscale(stencil_vector[y+sr_maxy]),gsx_yscale(y));
 						break;
 					case 10:
 					case 11:
 						gios_wmode(W_REPLACE);
 						gios_l_style(L_SOLID);
-						gios_draw(gsx_xscale(stencil_vector[y]),gsx_yscale(y),gsx_xscale(stencil_vector[y+sr_maxy]),gsx_yscale(y));
 						break;
 				}
-			} else {			
+			} else {
+				
+					xb=stencil_vector[y+sr_maxy];
+					xa=stencil_vector[y];
+
 					switch (intensity) {
 						case 0:
 						case 1:
 						case 2:
 							gios_wmode(W_ERASE);
 							gios_l_style(L_SOLID);
-							gios_draw(gsx_xscale(stencil_vector[y]),gsx_yscale(y),gsx_xscale(stencil_vector[y+sr_maxy]),gsx_yscale(y));
 							break;
 						case 3:
 						case 4:
 						case 5:
 							gios_wmode(W_REPLACE);
 							gios_l_style(L_DASHDOT);
-							gios_draw(gsx_xscale(stencil_vector[y]),gsx_yscale(y),gsx_xscale(stencil_vector[y+sr_maxy]),gsx_yscale(y));
 							break;
 						case 6:
 						case 7:
 						case 8:
 							gios_wmode(W_REPLACE);
 							gios_l_style(L_SOLID);
-							gios_draw(gsx_xscale(stencil_vector[y]),gsx_yscale(y),gsx_xscale(stencil_vector[y+sr_maxy]),gsx_yscale(y));
 							break;
 						case 9:
 						case 10:
 						case 11:
 							gios_wmode(W_REPLACE);
 							gios_l_style(L_SOLID);
-							gios_draw(gsx_xscale(stencil_vector[y]),gsx_yscale(y),gsx_xscale(stencil_vector[y+sr_maxy]),gsx_yscale(y));
 							break;
 				}
 			}
+			
+			if ((y/2)&1)
+				gios_draw(gsx_xscale(xa),gsx_yscale(y),gsx_xscale(xb),gsx_yscale(y));
+			else
+				gios_draw(gsx_xscale(xb),gsx_yscale(y),gsx_xscale(xa),gsx_yscale(y));
+
 	/*
 			gios_wmode(W_ERASE);
 			gios_f_style(F_FULL);
