@@ -1,0 +1,116 @@
+;
+;       Z88 Graphics Functions - Small C+ stubs
+;
+;       Written around the Interlogic Standard Library
+;
+;	Compute the line coordinates and put into a vector
+;	Basic concept by Rafael de Oliveira Jannone (calculate_side)
+;
+;	Internal function to update the area object's vectors
+;
+;       Stefano Bodrato - 13/3/2009
+;
+;
+;		This version uses 'wide' sized vectors but allocates a variable space on SP
+;		depending on getmaxy()
+;
+;	$Id: stencil_add_pixel_vy.asm $
+;
+
+; registers changed after return:
+;  ..bc..../ixiy same
+;  af..dehl/.... different
+
+
+IF !__CPU_INTEL__
+	INCLUDE	"graphics/grafix.inc"
+		SECTION   code_graphics
+                PUBLIC    stencil_add_pixel
+                PUBLIC    _stencil_add_pixel
+                PUBLIC	stencil_ptr
+                EXTERN	__gfx_coords
+                
+                EXTERN		l_graphics_cmp
+
+               EXTERN		getmaxy
+               EXTERN		getmaxx
+
+
+.stencil_add_pixel
+._stencil_add_pixel
+		push    hl
+		;ld      hl,maxy
+		push    de
+		call    getmaxy
+		inc     hl
+		ld      (yvect_smc+1),hl
+		pop     de
+		
+		call    l_graphics_cmp
+		pop     hl
+		ret     nc               ; Return if Y overflows
+
+		push    de
+		push    hl
+        call    getmaxx
+		inc     hl
+		ld      d,h
+		ld      e,l
+		pop     hl
+		;ld      de,maxx
+		call    l_graphics_cmp
+		pop     de
+		
+		ret     c               ; Return if X overflows
+
+		ld      (__gfx_coords),hl     ; store X
+		ld      (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
+
+		push hl			; X
+		ld	hl,(stencil_ptr) ; right side vector
+		add	hl,de
+		add	hl,de		; Y coordinate
+		ld	e,(hl)
+		inc hl
+		ld	d,(hl)
+		dec hl
+		ex	(sp),hl		; X <-> ptr to stencil
+		call	l_graphics_cmp	; X > original X ?  [carry set if DE < HL]
+		ex	de,hl
+		pop hl			; ptr to stencil
+		jr	c,noplot
+		ld	(hl),e		; yes, update vector
+		inc	hl
+		ld	(hl),d
+		dec hl
+.noplot
+		push de			; X
+		
+		;ld	de,maxy*2
+		;add	hl,de		; move to the right side vector
+		
+.yvect_smc
+		ld	de,0
+		add	hl,de		; move to the right side vector
+		add	hl,de		; move to the right side vector
+		
+		
+		;ld	de,(__gfx_coords)
+		;push de
+		ld	e,(hl)
+		inc hl
+		ld	d,(hl)
+		dec hl
+		ex	(sp),hl		; X <-> ptr to stencil
+		call	l_graphics_cmp	; X < original X ?   [carry set if DE < HL]
+		ex	de,hl
+		pop hl			; ptr to stencil
+		ret nc
+		ld	(hl),e		; yes, update vector
+		inc	hl
+		ld	(hl),d
+		ret
+
+		SECTION  bss_graphics
+.stencil_ptr	defw	0
+ENDIF
