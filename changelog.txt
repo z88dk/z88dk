@@ -6,8 +6,16 @@ z88dk v2.2 - xx.xx.xxx
 Detailed but incomplete changelist:
 
 - [appmake] Compressed ROM data sections can now use zx0
+- [all] Compressed data can now use ZX0 compression tools
+- [classic] ZX0 decompression functions added
 - [classic] +radio86: New target for the Radio86 family
 - [classic] +cpm: New subtypes for Bondwell 12/14 and 2
+- [classic] +cpm: GSX graphics library
+- [classic] +gl: GL6000 support improved
+- [classic] +pc88: Graphics reworked and optimised
+- [classic] +sam: Extensively reworked and improved
+- [classic] +zx: Improved Interface 1/Microdrive support
+- [newlib] ZX0 decompression functions added
 - [newlib] +rc2014: Support for shadow RAM copying
 - [zsdcc] Upgraded to SDCC 4.1.0 r12070 (bugfixes)
 
