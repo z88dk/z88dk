@@ -40,6 +40,7 @@ void xorclga(int x1,int y1,int x2,int y2)
 	gios_f_style(F_FULL);
 
 	gios_drawb(gsx_xscale(xa+2),gsx_yscale(ya+2),gsx_xscale(xb-2),gsx_yscale(yb-2));
+	gios_update();
 
 	gios_f_style(F_EMPTY);
 	gios_wmode(W_REPLACE);
