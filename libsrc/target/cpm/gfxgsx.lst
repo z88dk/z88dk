@@ -38,7 +38,6 @@ target/cpm/graphics/unplot
 graphics/retrofit/unplot_callee
 target/cpm/graphics/xorplot
 graphics/retrofit/xorplot_callee
-target/cpm/graphics/xorplot
 target/cpm/graphics/w_putsprite3
 graphics/retrofit/w_plotpixl
 graphics/retrofit/w_respixl
