@@ -17,7 +17,7 @@
 
 	EXTERN	errno
 
-	PUBLIC	ASMDISP_TRSDOS_TST_CALLEE
+	PUBLIC	asm_trsdos_tst
 
 ; int (unsigned int fn, char *hl_reg, char *de_reg);
 
@@ -33,7 +33,7 @@
 	
 	PUSH BC
 
-centry:
+asm_trsdos_tst:
 	ld	bc,retaddr
 	push bc
 	
@@ -50,5 +50,3 @@ retaddr:
 	
 	ret
 
-
-DEFC ASMDISP_TRSDOS_TST_CALLEE = centry - trsdos_tst_callee

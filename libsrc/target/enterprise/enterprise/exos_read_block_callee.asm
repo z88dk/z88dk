@@ -11,7 +11,7 @@
 	SECTION code_clib
 	PUBLIC	exos_read_block_callee
 	PUBLIC	_exos_read_block_callee
-	PUBLIC 	ASMDISP_EXOS_READ_BLOCK_CALLEE
+	PUBLIC 	asm_exos_read_block
 
 exos_read_block_callee:
 _exos_read_block_callee:
@@ -22,7 +22,7 @@ _exos_read_block_callee:
 	pop hl
 	push af
 
-.asmentry
+.asm_exos_read_block
 
 	ld	a,l
 	rst   30h
@@ -31,5 +31,3 @@ _exos_read_block_callee:
 	ld	l,a
 
 	ret
-
-DEFC ASMDISP_EXOS_READ_BLOCK_CALLEE = asmentry - _exos_read_block_callee

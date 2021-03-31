@@ -9,7 +9,7 @@
 SECTION code_clib
 PUBLIC extract_bits_callee
 PUBLIC _extract_bits_callee
-PUBLIC ASMDISP_EXTRACT_BITS_CALLEE
+PUBLIC asm_extract_bits
 EXTERN  extract_bits_sub
 
 .extract_bits_callee
@@ -20,7 +20,6 @@ EXTERN  extract_bits_sub
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_extract_bits
 	jp	extract_bits_sub
 
-DEFC ASMDISP_EXTRACT_BITS_CALLEE = asmentry - extract_bits_callee

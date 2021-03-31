@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC outp
 PUBLIC _outp
-EXTERN outp_callee
-EXTERN ASMDISP_OUTP_CALLEE
+EXTERN asm_outp
 
 .outp
 ._outp
@@ -16,4 +15,4 @@ EXTERN ASMDISP_OUTP_CALLEE
    push de
    push af
    
-   jp outp_callee + ASMDISP_OUTP_CALLEE
+   jp asm_outp

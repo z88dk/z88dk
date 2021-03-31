@@ -12,9 +12,8 @@
 	PUBLIC    exos_create_channel
 	PUBLIC    _exos_create_channel
 
-	EXTERN     exos_create_channel_callee
+	EXTERN     asm_exos_create_channel
 
-EXTERN ASMDISP_EXOS_CREATE_CHANNEL_CALLEE
 
 exos_create_channel:
 _exos_create_channel:
@@ -26,5 +25,5 @@ _exos_create_channel:
    push de
    push bc
    
-   jp exos_create_channel_callee + ASMDISP_EXOS_CREATE_CHANNEL_CALLEE
+   jp asm_exos_create_channel
 

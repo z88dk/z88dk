@@ -11,7 +11,7 @@
         SECTION code_clib
 PUBLIC	exos_capture_channel_callee
 PUBLIC	_exos_capture_channel_callee
-PUBLIC 	ASMDISP_EXOS_OPEN_CHANNEL_CALLEE
+PUBLIC 	asm_exos_capture_channel
 
 exos_capture_channel_callee:
 _exos_capture_channel_callee:
@@ -23,7 +23,7 @@ _exos_capture_channel_callee:
 ; enter : l = main channel number
 ;         e = secondary channel number
 
-.asmentry
+.asm_exos_capture_channel
 
 	ld	a,l		; main channel
 	ld	c,e		; sec. ch
@@ -32,6 +32,3 @@ _exos_capture_channel_callee:
 	ld	h,0
 	ld	l,a
 	ret
-
-
-DEFC ASMDISP_EXOS_OPEN_CHANNEL_CALLEE = asmentry - exos_capture_channel_callee

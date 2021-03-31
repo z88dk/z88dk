@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC im2_InstallISR_callee
 PUBLIC _im2_InstallISR_callee
-PUBLIC ASMDISP_IM2_INSTALLISR_CALLEE
+PUBLIC asm_im2_InstallISR
 
 .im2_InstallISR_callee
 ._im2_InstallISR_callee
@@ -13,7 +13,7 @@ PUBLIC ASMDISP_IM2_INSTALLISR_CALLEE
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_im2_InstallISR
 
 ; enter:  l = vector to install on (even by convention)
 ;        de = new ISR address
@@ -34,4 +34,3 @@ PUBLIC ASMDISP_IM2_INSTALLISR_CALLEE
    ex de,hl
    ret
 
-DEFC ASMDISP_IM2_INSTALLISR_CALLEE = asmentry - im2_InstallISR_callee

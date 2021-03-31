@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC wpoke_callee
 PUBLIC _wpoke_callee
-PUBLIC ASMDISP_WPOKE_CALLEE
+PUBLIC asm_wpoke
 
 .wpoke_callee
 ._wpoke_callee
@@ -19,11 +19,9 @@ ELSE
    ex (sp),hl
 ENDIF
 
-.asmentry
+.asm_wpoke
 
    ld (hl),e
    inc hl
    ld (hl),d
    ret
-
-DEFC ASMDISP_WPOKE_CALLEE = asmentry - wpoke_callee

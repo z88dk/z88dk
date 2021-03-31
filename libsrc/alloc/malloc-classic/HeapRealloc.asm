@@ -4,12 +4,24 @@ SECTION code_clib
 PUBLIC HeapRealloc
 PUBLIC _HeapRealloc
 
-EXTERN HeapRealloc_callee
-EXTERN ASMDISP_HEAPREALLOC_CALLEE
+EXTERN asm_HeapRealloc
 
 .HeapRealloc
 ._HeapRealloc
-
+IF __CPU_INTEL__ | __CPU_GBZ80__
+  ld hl,sp+2
+  ld c,(hl)
+  inc hl
+  ld b,(hl)
+  inc hl
+  ld e,(hl)
+  inc hl
+  ld d,(hl)
+  inc hl
+  ld a,(hl+)
+  ld h,(hl)
+  ex de,hl
+ELSE
    pop af
    pop bc
    pop hl
@@ -18,5 +30,6 @@ EXTERN ASMDISP_HEAPREALLOC_CALLEE
    push hl
    push bc
    push af
+ENDIF
    
-   jp HeapRealloc_callee + ASMDISP_HEAPREALLOC_CALLEE
+   jp asm_HeapRealloc

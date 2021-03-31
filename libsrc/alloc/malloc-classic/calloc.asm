@@ -4,8 +4,8 @@ SECTION code_clib
 PUBLIC calloc
 PUBLIC _calloc
 
-EXTERN HeapCalloc_callee
-EXTERN _heap, ASMDISP_HEAPCALLOC_CALLEE
+EXTERN asm_HeapCalloc
+EXTERN _heap
 
 .calloc
 ._calloc
@@ -18,4 +18,4 @@ EXTERN _heap, ASMDISP_HEAPCALLOC_CALLEE
    push bc
    
    ld bc,_heap
-   jp HeapCalloc_callee + ASMDISP_HEAPCALLOC_CALLEE
+   jp asm_HeapCalloc

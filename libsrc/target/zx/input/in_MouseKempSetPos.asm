@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC in_MouseKempSetPos
 PUBLIC _in_MouseKempSetPos
 
-EXTERN in_MouseKempSetPos_callee
-EXTERN CDISP_IN_MOUSEKEMPSETPOS_CALLEE
+EXTERN centry_in_MouseKempSetPos
 
 .in_MouseKempSetPos
 ._in_MouseKempSetPos
@@ -18,4 +17,4 @@ EXTERN CDISP_IN_MOUSEKEMPSETPOS_CALLEE
    push bc
    push de
    
-   jp in_MouseKempSetPos_callee + CDISP_IN_MOUSEKEMPSETPOS_CALLEE
+   jp centry_in_MouseKempSetPos

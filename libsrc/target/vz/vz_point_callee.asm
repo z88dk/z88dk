@@ -13,7 +13,7 @@ PUBLIC vz_point_callee
 PUBLIC _vz_point_callee
 PUBLIC cpoint_callee
 PUBLIC _cpoint_callee
-PUBLIC ASMDISP_VZ_POINT_CALLEE
+PUBLIC asm_vz_point
 EXTERN base_graphics
 
 .vz_point_callee
@@ -30,7 +30,7 @@ EXTERN base_graphics
    ; l = x
    ; h = y
 
-.asmentry
+.asm_vz_point
 
    ld a,h
    cp 64
@@ -68,6 +68,3 @@ EXTERN base_graphics
 	ld	l,a
    
    ret
-
-
-DEFC ASMDISP_VZ_POINT_CALLEE = asmentry - vz_point_callee

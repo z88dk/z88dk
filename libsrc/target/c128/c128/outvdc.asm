@@ -10,8 +10,7 @@
         SECTION code_clib
         PUBLIC    outvdc
         PUBLIC    _outvdc
-        EXTERN     outvdc_callee
-        EXTERN    ASMDISP_OUTVDC_CALLEE 
+        EXTERN     asm_outvdc
 
 outvdc:
 _outvdc:
@@ -21,4 +20,4 @@ _outvdc:
         push    hl
         push    de
         push    bc
-        jp outvdc_callee + ASMDISP_OUTVDC_CALLEE
+        jp asm_outvdc

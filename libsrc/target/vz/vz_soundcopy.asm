@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC vz_soundcopy
 PUBLIC _vz_soundcopy
-EXTERN vz_soundcopy_callee
-EXTERN ASMDISP_VZ_SOUNDCOPY_CALLEE
+EXTERN asm_vz_soundcopy
 
 .vz_soundcopy
 ._vz_soundcopy
@@ -30,5 +29,5 @@ EXTERN ASMDISP_VZ_SOUNDCOPY_CALLEE
    push bc
    push af
    
-   jp vz_soundcopy_callee + ASMDISP_VZ_SOUNDCOPY_CALLEE
+   jp asm_vz_soundcopy
 

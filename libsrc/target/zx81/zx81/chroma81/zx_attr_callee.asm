@@ -4,10 +4,9 @@
 SECTION code_clib
 PUBLIC zx_attr_callee
 PUBLIC _zx_attr_callee
-PUBLIC ASMDISP_ZX_ATTR_CALLEE
+PUBLIC asm_zx_attr
 
-EXTERN zx_cyx2aaddr_callee
-EXTERN ASMDISP_ZX_CYX2AADDR_CALLEE
+EXTERN asm_zx_cyx2aaddr
 
 .zx_attr_callee
 ._zx_attr_callee
@@ -18,15 +17,14 @@ EXTERN ASMDISP_ZX_CYX2AADDR_CALLEE
    ld h,l
    ld l,e
    
-.asmentry
+.asm_zx_attr
 
    ; h = char Y 0..23
    ; l = char X 0..31
    
-   call zx_cyx2aaddr_callee + ASMDISP_ZX_CYX2AADDR_CALLEE
+   call asm_zx_cyx2aaddr
    ld l,(hl)
    ld h,0
    
    ret
 
-DEFC ASMDISP_ZX_ATTR_CALLEE = asmentry - zx_attr_callee

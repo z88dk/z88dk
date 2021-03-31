@@ -5,8 +5,7 @@ PUBLIC vz_point
 PUBLIC _vz_point
 PUBLIC cpoint
 PUBLIC _cpoint
-EXTERN vz_point_callee
-EXTERN ASMDISP_VZ_POINT_CALLEE
+EXTERN asm_vz_point
 
 .vz_point
 ._vz_point
@@ -21,4 +20,4 @@ EXTERN ASMDISP_VZ_POINT_CALLEE
    push af
    ld h,e
 
-   jp vz_point_callee + ASMDISP_VZ_POINT_CALLEE
+   jp asm_vz_point

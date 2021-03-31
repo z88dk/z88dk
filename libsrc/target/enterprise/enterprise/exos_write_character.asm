@@ -12,9 +12,8 @@
 	PUBLIC    exos_write_character
 	PUBLIC    _exos_write_character
 
-	EXTERN     exos_write_character_callee
+	EXTERN     asm_exos_write_character
 
-EXTERN ASMDISP_EXOS_WRITE_CHARACTER_CALLEE
 
 exos_write_character:
 _exos_write_character:
@@ -26,5 +25,5 @@ _exos_write_character:
    push de
    push bc
    
-   jp exos_write_character_callee + ASMDISP_EXOS_WRITE_CHARACTER_CALLEE
+   jp asm_exos_write_character
 

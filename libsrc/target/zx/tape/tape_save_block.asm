@@ -4,8 +4,7 @@
 PUBLIC tape_save_block
 PUBLIC _tape_save_block
 
-EXTERN tape_save_block_callee
-EXTERN ASMDISP_TAPE_SAVE_BLOCK_CALLEE
+EXTERN asm_tape_save_block
 
 .tape_save_block
 ._tape_save_block
@@ -20,4 +19,4 @@ EXTERN ASMDISP_TAPE_SAVE_BLOCK_CALLEE
    push bc
    push hl
    
-   jp tape_save_block_callee + ASMDISP_TAPE_SAVE_BLOCK_CALLEE
+   jp asm_tape_save_block

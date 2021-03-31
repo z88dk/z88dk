@@ -11,7 +11,7 @@
         SECTION code_clib
 PUBLIC	exos_write_character_callee
 PUBLIC	_exos_write_character_callee
-PUBLIC 	ASMDISP_EXOS_WRITE_CHARACTER_CALLEE
+PUBLIC 	asm_exos_write_character
 
 exos_write_character_callee:
 _exos_write_character_callee:
@@ -23,7 +23,7 @@ _exos_write_character_callee:
 ; enter : e = unsigned char chr
 ;         l = unsigned char chan
 
-.asmentry
+.asm_exos_write_character
 
 	ld	a,l		; Variable
 	ld	b,e		; Value
@@ -32,7 +32,4 @@ _exos_write_character_callee:
 	ld	h,0
 	ld	l,a
 	ret
-
-
-DEFC ASMDISP_EXOS_WRITE_CHARACTER_CALLEE = asmentry - exos_write_character_callee
  

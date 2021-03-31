@@ -10,7 +10,7 @@
 
 
 PUBLIC tape_load_block_callee
-PUBLIC ASMDISP_TAPE_LOAD_BLOCK_CALLEE
+PUBLIC asm_tape_load_block
 
 EXTERN zx_fast
 EXTERN zx_slow
@@ -39,7 +39,7 @@ EXTERN  musamy_load
 	pop hl
 	push de
 
-.asmentry
+.asm_tape_load_block
 		LD (header+2),hl	; LOC
 		LD (header),bc	; LEN
 		
@@ -88,6 +88,3 @@ ENDIF
 
 		ld l,4	; file type error		
 		ret
-
-
-DEFC ASMDISP_TAPE_LOAD_BLOCK_CALLEE = asmentry - tape_load_block_callee

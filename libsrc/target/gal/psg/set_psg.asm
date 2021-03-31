@@ -10,12 +10,11 @@
 ;	$Id: set_psg.asm $
 ;
 
-        SECTION code_clib
-	PUBLIC	set_psg
-	PUBLIC	_set_psg
-	EXTERN		set_psg_callee
+    SECTION code_clib
+    PUBLIC	set_psg
+    PUBLIC	_set_psg
 
-	EXTERN ASMDISP_SET_PSG_CALLEE
+    EXTERN asm_set_psg
 	
 
 set_psg:
@@ -29,5 +28,5 @@ _set_psg:
 	push	de
 	push	bc
 	
-	jp set_psg_callee + ASMDISP_SET_PSG_CALLEE
+	jp asm_set_psg
 

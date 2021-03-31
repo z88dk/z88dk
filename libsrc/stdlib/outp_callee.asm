@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC outp_callee
 PUBLIC _outp_callee
-PUBLIC ASMDISP_OUTP_CALLEE
+PUBLIC asm_outp
 
 .outp_callee
 ._outp_callee
@@ -14,7 +14,7 @@ PUBLIC ASMDISP_OUTP_CALLEE
    pop bc
    push af
 
-.asmentry
+.asm_outp
 
    ; bc = port
    ; e = byte
@@ -34,5 +34,3 @@ ELSE
 ENDIF
 
    ret
-
-DEFC ASMDISP_OUTP_CALLEE = asmentry - outp_callee

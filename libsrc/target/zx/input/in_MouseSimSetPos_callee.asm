@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC in_MouseSimSetPos_callee
 PUBLIC _in_MouseSimSetPos_callee
-PUBLIC ASMDISP_IN_MOUSESIMSETPOS_CALLEE
+PUBLIC asm_in_MouseSimSetPos
 
 EXTERN l_setmem
 
@@ -18,7 +18,7 @@ EXTERN l_setmem
    ld c,e
    ex (sp),hl
 
-.asmentry
+.asm_in_MouseSimSetPos
 
 ; enter: C = x coord 0..255
 ;        B = y coord 0..191
@@ -36,4 +36,3 @@ EXTERN l_setmem
    ld (hl),c
    ret
 
-DEFC ASMDISP_IN_MOUSESIMSETPOS_CALLEE = asmentry - in_MouseSimSetPos_callee

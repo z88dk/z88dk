@@ -5,8 +5,8 @@ SECTION code_clib
 PUBLIC malloc
 PUBLIC _malloc
 
-EXTERN HeapAlloc_callee
-EXTERN _heap, ASMDISP_HEAPALLOC_CALLEE
+EXTERN asm_HeapAlloc
+EXTERN _heap
 
 .malloc
 ._malloc
@@ -15,4 +15,4 @@ EXTERN _heap, ASMDISP_HEAPALLOC_CALLEE
    ld b,h
    ld hl,_heap
 
-   jp HeapAlloc_callee + ASMDISP_HEAPALLOC_CALLEE
+   jp asm_HeapAlloc

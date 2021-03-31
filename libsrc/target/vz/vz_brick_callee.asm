@@ -11,7 +11,7 @@
 SECTION code_clib
 PUBLIC vz_brick_callee
 PUBLIC _vz_brick_callee
-PUBLIC ASMDISP_VZ_BRICK_CALLEE
+PUBLIC asm_vz_brick
 
 .vz_brick_callee
 ._vz_brick_callee
@@ -24,7 +24,7 @@ PUBLIC ASMDISP_VZ_BRICK_CALLEE
    ;  c = byte
    ; de = addr
 
-.asmentry
+.asm_vz_brick
 
    ld a,c                    ; bc = 6*c
    add a,a
@@ -92,4 +92,3 @@ PUBLIC ASMDISP_VZ_BRICK_CALLEE
    
    defb 170, 168, 175, 232, 170, 168
 
-DEFC ASMDISP_VZ_BRICK_CALLEE = asmentry - vz_brick_callee

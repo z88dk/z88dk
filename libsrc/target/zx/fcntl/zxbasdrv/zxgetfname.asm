@@ -18,8 +18,8 @@
 	EXTERN	zx_setint_callee
 	EXTERN	zx_setstr_callee
 	
-	EXTERN ASMDISP_ZX_SETSTR_CALLEE
-	EXTERN ASMDISP_ZX_SETINT_CALLEE
+	EXTERN asm_zx_setstr
+	EXTERN asm_zx_setint
 
 
 
@@ -65,7 +65,7 @@
 	;push	bc
 	ld	d,0
 	ld	e,a
-	call	zx_setint_callee + ASMDISP_ZX_SETINT_CALLEE
+	call	asm_zx_setint
 	;pop	bc
 	;pop	hl
 	pop	hl
@@ -79,7 +79,7 @@
 	ld	e,'N'		; n$
 	;push	hl
 	;push	de
-	call	zx_setstr_callee + ASMDISP_ZX_SETSTR_CALLEE
+	call	asm_zx_setstr
 	;pop	hl
 	;pop	bc
 	pop hl

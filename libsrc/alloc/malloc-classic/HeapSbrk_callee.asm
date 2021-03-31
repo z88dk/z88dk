@@ -4,10 +4,9 @@
 SECTION code_clib
 PUBLIC HeapSbrk_callee
 PUBLIC _HeapSbrk_callee
-PUBLIC ASMDISP_HEAPSBRK_CALLEE
+PUBLIC asm_HeapSbrk
 
-EXTERN HeapFree_callee
-EXTERN ASMDISP_HEAPFREE_CALLEE
+EXTERN asm_HeapFree
 
 .HeapSbrk_callee
 ._HeapSbrk_callee
@@ -18,7 +17,7 @@ EXTERN ASMDISP_HEAPFREE_CALLEE
    pop de
    push af
 
-.asmentry
+.asm_HeapSbrk
 
 ; Add a block of memory to the specified heap.  The
 ; block must be at least 4 bytes in size.  Adding a
@@ -48,6 +47,5 @@ EXTERN ASMDISP_HEAPFREE_CALLEE
    inc hl
    ld (hl),b
    inc hl
-   jp HeapFree_callee + ASMDISP_HEAPFREE_CALLEE
+   jp asm_HeapFree
 
-DEFC ASMDISP_HEAPSBRK_CALLEE = asmentry - HeapSbrk_callee

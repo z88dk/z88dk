@@ -13,7 +13,7 @@
 	PUBLIC	set_psg_callee
 	PUBLIC	_set_psg_callee
 
-	PUBLIC ASMDISP_SET_PSG_CALLEE
+	PUBLIC asm_set_psg
 
 	
 set_psg_callee:
@@ -23,7 +23,7 @@ _set_psg_callee:
    pop de	; Data
    ex (sp),hl
 	
-.asmentry
+.asm_set_psg
 	
 	di	
     	
@@ -53,4 +53,3 @@ _set_psg_callee:
 	ei
 	ret
 
-DEFC ASMDISP_SET_PSG_CALLEE = asmentry - set_psg_callee

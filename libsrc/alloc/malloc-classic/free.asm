@@ -5,11 +5,11 @@ SECTION code_clib
 PUBLIC free
 PUBLIC _free
 
-EXTERN HeapFree_callee
-EXTERN _heap, ASMDISP_HEAPFREE_CALLEE
+EXTERN asm_HeapFree
+EXTERN _heap
 
 .free
 ._free
 
    ld de,_heap
-   jp HeapFree_callee + ASMDISP_HEAPFREE_CALLEE
+   jp asm_HeapFree

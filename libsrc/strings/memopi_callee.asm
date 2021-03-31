@@ -5,7 +5,7 @@
 
 PUBLIC memopi_callee
 PUBLIC _memopi_callee
-PUBLIC ASMDISP_MEMOPI_CALLEE
+PUBLIC asm_memopi
 
 EXTERN l_jpix, memops
 
@@ -18,7 +18,7 @@ EXTERN l_jpix, memops
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_memopi
 
    ; enter : ix = OP
    ;         bc = uint n
@@ -144,4 +144,3 @@ ENDIF
    pop hl
    ret
 
-DEFC ASMDISP_MEMOPI_CALLEE = asmentry - memopi_callee

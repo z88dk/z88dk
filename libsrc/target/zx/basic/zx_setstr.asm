@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC zx_setstr
 PUBLIC _zx_setstr
 
-EXTERN zx_setstr_callee
-EXTERN ASMDISP_ZX_SETSTR_CALLEE
+EXTERN asm_zx_setstr
 
 .zx_setstr
 ._zx_setstr
@@ -18,4 +17,4 @@ EXTERN ASMDISP_ZX_SETSTR_CALLEE
    push hl
    push bc
    
-   jp zx_setstr_callee + ASMDISP_ZX_SETSTR_CALLEE
+   jp asm_zx_setstr

@@ -15,7 +15,7 @@
 SECTION code_clib
 PUBLIC	zx_getstr_callee
 PUBLIC	_zx_getstr_callee
-PUBLIC	ASMDISP_ZX_GETSTR_CALLEE
+PUBLIC	asm_zx_getstr
 EXTERN	call_rom3
 
 zx_getstr_callee:
@@ -29,7 +29,7 @@ _zx_getstr_callee:
 ; enter : hl = char *value
 ;          e = char variable
 
-.asmentry
+.asm_zx_getstr
 
 	ld	a,e
 	and	95
@@ -81,5 +81,4 @@ notfound:
 	ld	hl,-1
 	ret
 
-DEFC ASMDISP_ZX_GETSTR_CALLEE = asmentry - zx_getstr_callee
 

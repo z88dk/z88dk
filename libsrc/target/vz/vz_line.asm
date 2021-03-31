@@ -4,7 +4,7 @@ SECTION code_clib
 PUBLIC vz_line
 PUBLIC _vz_line
 EXTERN vz_line_callee
-EXTERN ASMDISP_VZ_LINE_CALLEE
+EXTERN asm_vz_line
 
 .vz_line
 ._vz_line
@@ -28,4 +28,4 @@ EXTERN ASMDISP_VZ_LINE_CALLEE
    ex af,af
    push af
    
-   jp vz_line_callee + ASMDISP_VZ_LINE_CALLEE
+   jp asm_vz_line

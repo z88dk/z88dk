@@ -4,8 +4,7 @@ SECTION code_clib
 PUBLIC HeapSbrk
 PUBLIC _HeapSbrk
 
-EXTERN HeapSbrk_callee
-EXTERN ASMDISP_HEAPSBRK_CALLEE
+EXTERN asm_HeapSbrk
 
 .HeapSbrk
 ._HeapSbrk
@@ -19,4 +18,4 @@ EXTERN ASMDISP_HEAPSBRK_CALLEE
    push bc
    push af
    
-   jp HeapSbrk_callee + ASMDISP_HEAPSBRK_CALLEE
+   jp asm_HeapSbrk

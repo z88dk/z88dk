@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC HeapAlloc_callee
 PUBLIC _HeapAlloc_callee
-PUBLIC ASMDISP_HEAPALLOC_CALLEE
+PUBLIC asm_HeapAlloc
 
 .HeapAlloc_callee
 ._HeapAlloc_callee
@@ -13,7 +13,7 @@ PUBLIC ASMDISP_HEAPALLOC_CALLEE
    pop bc
    ex (sp),hl
 
-.asmentry
+.asm_HeapAlloc
 
 ; Allocate memory from the indicated heap.  First fit algorithm.
 ;
@@ -172,4 +172,3 @@ ENDIF
    pop de                    ; junk lagger on stack
    ret
 
-DEFC ASMDISP_HEAPALLOC_CALLEE = asmentry - HeapAlloc_callee

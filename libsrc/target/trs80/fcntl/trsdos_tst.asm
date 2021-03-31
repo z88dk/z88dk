@@ -4,8 +4,7 @@
 	PUBLIC	trsdos_tst
 	PUBLIC	_trsdos_tst
 
-	EXTERN	trsdos_tst_callee
-	EXTERN	ASMDISP_TRSDOS_TST_CALLEE
+	EXTERN	asm_trsdos_tst
 
 
 ; (unsigned int fn, char *hl_reg, char *de_reg);
@@ -24,4 +23,4 @@
 	
 	PUSH BC
 
-	jp trsdos_tst_callee + ASMDISP_TRSDOS_TST_CALLEE
+	jp asm_trsdos_tst

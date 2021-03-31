@@ -11,7 +11,7 @@
 SECTION code_clib
 PUBLIC vz_gotoxy_callee
 PUBLIC _vz_gotoxy_callee
-PUBLIC ASMDISP_VZ_GOTOXY_CALLEE
+PUBLIC asm_vz_gotoxy
 
 .vz_gotoxy_callee
 ._vz_gotoxy_callee
@@ -24,7 +24,7 @@ PUBLIC ASMDISP_VZ_GOTOXY_CALLEE
    ; hl = y
    ; de = x
  
- .asmentry
+ .asm_vz_gotoxy
  
    ld a,l
    cp 16                     ; y < 16?
@@ -45,5 +45,3 @@ PUBLIC ASMDISP_VZ_GOTOXY_CALLEE
    add hl,de
    ld ($7820),hl             ; set cursor position
    ret
-
-DEFC ASMDISP_VZ_GOTOXY_CALLEE = asmentry - vz_gotoxy_callee

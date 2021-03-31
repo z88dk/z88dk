@@ -8,7 +8,7 @@
 
 PUBLIC tape_load_block_callee
 PUBLIC _tape_load_block_callee
-PUBLIC ASMDISP_TAPE_LOAD_BLOCK_CALLEE
+PUBLIC asm_tape_laod_block
 
 IF FORts2068
 EXTERN call_extrom
@@ -26,7 +26,7 @@ ENDIF
 	pop ix
 	push hl
 
-.asmentry
+.asm_tape_laod_block
 
 ; enter : ix = addr
 ;         de = len
@@ -65,5 +65,3 @@ ENDIF
         jr      loadblock2
 
 	ENDIF
-
-DEFC ASMDISP_TAPE_LOAD_BLOCK_CALLEE = asmentry - tape_load_block_callee

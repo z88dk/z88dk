@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC vz_brick
 PUBLIC _vz_brick
-EXTERN vz_brick_callee
-EXTERN ASMDISP_VZ_BRICK_CALLEE
+EXTERN asm_vz_brick
 
 .vz_brick
 ._vz_brick
@@ -16,4 +15,4 @@ EXTERN ASMDISP_VZ_BRICK_CALLEE
    push bc
    push hl
    
-   jp vz_brick_callee + ASMDISP_VZ_BRICK_CALLEE
+   jp asm_vz_brick
