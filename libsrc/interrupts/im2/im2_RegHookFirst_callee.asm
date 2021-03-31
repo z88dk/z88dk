@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC im2_RegHookFirst_callee
 PUBLIC _im2_RegHookFirst_callee
-PUBLIC ASMDISP_IM2_REGHOOKFIRST_CALLEE
+PUBLIC asm_im2_RegHookFirst
 EXTERN _im2_hookDisp
 
 .im2_RegHookFirst_callee
@@ -14,7 +14,7 @@ EXTERN _im2_hookDisp
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_im2_RegHookFirst
 
 ; enter: de = address of hook (subroutine)
 ;         l = interrupt vector where generic ISR is installed
@@ -44,4 +44,3 @@ EXTERN _im2_hookDisp
    ld e,c               ; de = old hook = new hook to insert
    jp loop
 
-DEFC ASMDISP_IM2_REGHOOKFIRST_CALLEE = asmentry - im2_RegHookFirst_callee

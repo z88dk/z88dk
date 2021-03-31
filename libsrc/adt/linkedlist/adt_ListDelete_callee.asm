@@ -5,10 +5,9 @@
 SECTION code_clib
 PUBLIC adt_ListDelete_callee
 PUBLIC _adt_ListDelete_callee
-PUBLIC ASMDISP_ADT_LISTDELETE_CALLEE
+PUBLIC asm_adt_ListDelete
 
-EXTERN adt_ListDeleteS_callee
-EXTERN ASMDISP_ADT_LISTDELETES_CALLEE
+EXTERN asm_adt_ListDeleteS
 
 EXTERN _u_free
 
@@ -20,7 +19,7 @@ EXTERN _u_free
    pop hl
    push bc
    
-.asmentry
+.asm_adt_ListDelete
 
 ; enter: hl = struct adt_List *
 ;        de = delete with HL = item
@@ -31,7 +30,7 @@ EXTERN _u_free
 ; uses : af, bc, de, hl, ix
 
    push hl
-   call adt_ListDeleteS_callee + ASMDISP_ADT_LISTDELETES_CALLEE
+   call asm_adt_ListDeleteS
    pop hl
    
    push hl
@@ -39,4 +38,3 @@ EXTERN _u_free
    pop hl
    ret
       
-DEFC ASMDISP_ADT_LISTDELETE_CALLEE = asmentry - adt_ListDelete_callee

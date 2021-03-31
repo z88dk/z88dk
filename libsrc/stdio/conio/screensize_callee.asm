@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC screensize_callee
 PUBLIC _screensize_callee
-PUBLIC ASMDISP_SCREENSIZE_CALLEE
+PUBLIC asm_screensize
 
 EXTERN	__console_w
 EXTERN	__console_h
@@ -18,7 +18,7 @@ EXTERN	__console_h
    pop bc
    push hl
 
-.asmentry
+.asm_screensize
 
    ; bc = x    de = y
    ld	a,(__console_w)
@@ -34,4 +34,3 @@ EXTERN	__console_h
 
    ret
 
-DEFC ASMDISP_SCREENSIZE_CALLEE = asmentry - screensize_callee

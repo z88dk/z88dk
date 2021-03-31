@@ -20,7 +20,7 @@ EXTERN cleanup, exitsp, exitcount
 
 EXTERN l_jphl
 
-PUBLIC ASMDISP_EXIT
+PUBLIC asm_exit
 
 ; FASTCALL
 
@@ -29,6 +29,7 @@ PUBLIC ASMDISP_EXIT
 
 .exit
 ._exit
+.asm_exit
 
    push hl                   ; save exit value
    
@@ -71,4 +72,3 @@ ENDIF
    ld a,l                    ; was here so left as is, something to do with z88?
    jp cleanup                ;  perhaps should be in the z88 crt0?
 
-DEFC ASMDISP_EXIT = 0

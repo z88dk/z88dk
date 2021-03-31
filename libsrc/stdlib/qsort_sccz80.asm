@@ -4,6 +4,7 @@
 ;
 
 
+SECTION code_clib
 PUBLIC qsort_sccz80
 PUBLIC _qsort_sccz80
 

@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC adt_QueuePushFront
 PUBLIC _adt_QueuePushFront
 
-EXTERN adt_QueuePushFront_callee
-EXTERN ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE
+EXTERN asm_adt_QueuePushFront
 
 .adt_QueuePushFront
 ._adt_QueuePushFront
@@ -18,4 +17,4 @@ EXTERN ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE
    push de
    push bc
    
-   jp adt_QueuePushFront_callee + ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE
+   jp asm_adt_QueuePushFront

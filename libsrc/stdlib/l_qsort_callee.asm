@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC l_qsort_callee
 PUBLIC _l_qsort_callee
-PUBLIC ASMDISP_L_QSORT_CALLEE
+PUBLIC asm_l_qsort
 EXTERN Lqsort, l_jpiy
 
 .l_qsort_callee
@@ -16,7 +16,7 @@ EXTERN Lqsort, l_jpiy
    pop bc
    push de
    
-.centry
+.asm_l_qsort
 
    ld ix,compare
    jp Lqsort
@@ -33,4 +33,3 @@ EXTERN Lqsort, l_jpiy
    pop hl
    ret
 
-DEFC ASMDISP_L_QSORT_CALLEE = centry - l_qsort_callee

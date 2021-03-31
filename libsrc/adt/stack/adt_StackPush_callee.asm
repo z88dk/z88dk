@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC adt_StackPush_callee
 PUBLIC _adt_StackPush_callee
-PUBLIC ASMDISP_ADT_STACKPUSH_CALLEE
+PUBLIC asm_adt_StackPush
 
 EXTERN _u_malloc
 
@@ -15,7 +15,7 @@ EXTERN _u_malloc
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_adt_StackPush
 
 ; push item onto stack and update stack ptr
 ;
@@ -63,4 +63,3 @@ EXTERN _u_malloc
    scf
    ret
 
-DEFC ASMDISP_ADT_STACKPUSH_CALLEE = asmentry - adt_StackPush_callee

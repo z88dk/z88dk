@@ -4,10 +4,10 @@
 SECTION code_clib
 PUBLIC adt_QueueDelete_callee
 PUBLIC _adt_QueueDelete_callee
-PUBLIC ASMDISP_ADT_QUEUEDELETE_CALLEE
+PUBLIC asm_adt_QueueDelete
 
 EXTERN adt_QueueDeleteS_callee
-EXTERN ASMDISP_ADT_QUEUEDELETES_CALLEE
+EXTERN asm_adt_QueueDeleteS
 
 EXTERN _u_free
 
@@ -18,14 +18,13 @@ EXTERN _u_free
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_adt_QueueDelete
 
    push hl
-   call adt_QueueDeleteS_callee + ASMDISP_ADT_QUEUEDELETES_CALLEE
+   call asm_adt_QueueDeleteS
    pop hl
    push hl
    call _u_free                 ; free struct adt_Queue container
    pop hl
    ret
 
-DEFC ASMDISP_ADT_QUEUEDELETE_CALLEE = asmentry - adt_QueueDelete_callee

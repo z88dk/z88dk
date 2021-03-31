@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC adt_ListConcat_callee
 PUBLIC _adt_ListConcat_callee
-PUBLIC ASMDISP_ADT_LISTCONCAT_CALLEE
+PUBLIC asm_adt_ListConcat
 
 EXTERN _u_free
 
@@ -16,7 +16,7 @@ EXTERN _u_free
    pop de
    push bc
 
-.asmentry
+.asm_adt_ListConcat
 
 ; enter: hl = list2, de = list1
 ; exit : list1 = list1 concat list2, list2 is deleted
@@ -153,5 +153,4 @@ EXTERN _u_free
    pop hl
    ret
 
-DEFC ASMDISP_ADT_LISTCONCAT_CALLEE = asmentry - adt_ListConcat_callee
 

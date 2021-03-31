@@ -19,7 +19,9 @@
 SECTION code_clib
 PUBLIC astar_Search
 PUBLIC _astar_Search
-PUBLIC ASMDISP_ASTAR_SEARCH_RESUME_SUCCESS, ASMDISP_ASTAR_SEARCH_RESUME_FAIL
+PUBLIC asm_astar_Search_resume_success
+PUBLIC asm_astar_Search_resume_fail
+
 
 EXTERN l_setmem, l_jpix, ADTHeapAdd, ADTHeapExtract, astar_DeletePath
 EXTERN _u_malloc, _u_free
@@ -70,6 +72,7 @@ EXTERN _astar_startNode, _astar_destNode
 
    ex de,hl
 
+.asm_astar_Search_resume_fail
 .resumefail
 
    push hl
@@ -248,6 +251,7 @@ EXTERN _astar_startNode, _astar_destNode
    pop hl
    pop hl
 
+.asm_astar_Search_resume_success
 .getnextpath
 
    ld ix,costcompare
@@ -355,5 +359,3 @@ EXTERN _astar_startNode, _astar_destNode
    ccf                       ; correct sense of carry flag for min heap
    ret
 
-DEFC ASMDISP_ASTAR_SEARCH_RESUME_SUCCESS = getnextpath - astar_Search
-DEFC ASMDISP_ASTAR_SEARCH_RESUME_FAIL = resumefail - astar_Search

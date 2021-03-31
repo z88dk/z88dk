@@ -7,8 +7,7 @@ SECTION code_clib
 PUBLIC adt_ListAppend
 PUBLIC _adt_ListAppend
 
-EXTERN adt_ListAppend_callee
-EXTERN ASMDISP_ADT_LISTAPPEND_CALLEE
+EXTERN asm_adt_ListAppend
 
 .adt_ListAppend
 ._adt_ListAppend
@@ -20,4 +19,4 @@ EXTERN ASMDISP_ADT_LISTAPPEND_CALLEE
    push bc
    push hl
    
-   jp adt_ListAppend_callee + ASMDISP_ADT_LISTAPPEND_CALLEE
+   jp asm_adt_ListAppend

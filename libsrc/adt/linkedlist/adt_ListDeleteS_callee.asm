@@ -5,7 +5,7 @@
 SECTION code_clib
 PUBLIC adt_ListDeleteS_callee
 PUBLIC _adt_ListDeleteS_callee
-PUBLIC ASMDISP_ADT_LISTDELETES_CALLEE
+PUBLIC asm_adt_ListDeleteS
 
 EXTERN l_jpix
 EXTERN _u_free
@@ -18,7 +18,7 @@ EXTERN _u_free
    pop hl
    push bc
 
-.asmentry
+.asm_adt_ListDeleteS
 
 ; enter: hl = struct adt_List *
 ;        de = delete with HL = item
@@ -81,4 +81,3 @@ ENDIF
 
    ret
 
-DEFC ASMDISP_ADT_LISTDELETES_CALLEE = asmentry - adt_ListDeleteS_callee

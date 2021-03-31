@@ -4,10 +4,9 @@
 SECTION code_clib
 PUBLIC adt_StackDelete_callee
 PUBLIC _adt_StackDelete_callee
-PUBLIC ASMDISP_ADT_STACKDELETE_CALLEE
+PUBLIC asm_adt_StackDelete
 
-EXTERN adt_StackDeleteS_callee
-EXTERN ASMDISP_ADT_STACKDELETES_CALLEE
+EXTERN asm_adt_StackDeleteS
 
 EXTERN _u_free
 
@@ -18,14 +17,13 @@ EXTERN _u_free
    pop de
    ex (sp),hl
    
-.asmentry
+.asm_adt_StackDelete
 
    push hl
-   call adt_StackDeleteS_callee + ASMDISP_ADT_STACKDELETES_CALLEE
+   call asm_adt_StackDeleteS
    pop hl
    push hl
    call _u_free
    pop hl
    ret
 
-DEFC ASMDISP_ADT_STACKDELETE_CALLEE = asmentry - adt_StackDelete_callee

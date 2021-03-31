@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC adt_StackDeleteS_callee
 PUBLIC _adt_StackDeleteS_callee
-PUBLIC ASMDISP_ADT_STACKDELETES_CALLEE
+PUBLIC asm_adt_StackDeleteS
 
 EXTERN l_jpix
 EXTERN _u_free
@@ -16,7 +16,7 @@ EXTERN _u_free
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_adt_StackDeleteS
 
 ; delete all items in stack but not adt_Stack struct itself
 ;
@@ -83,4 +83,3 @@ ENDIF
 
    ret
 
-DEFC ASMDISP_ADT_STACKDELETES_CALLEE = asmentry - adt_StackDeleteS_callee

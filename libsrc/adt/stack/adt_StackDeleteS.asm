@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC adt_StackDeleteS
 PUBLIC _adt_StackDeleteS
 
-EXTERN adt_StackDeleteS_callee
-EXTERN ASMDISP_ADT_STACKDELETES_CALLEE
+EXTERN asm_adt_StackDeleteS
 
 .adt_StackDeleteS
 ._adt_StackDeleteS
@@ -18,4 +17,4 @@ EXTERN ASMDISP_ADT_STACKDELETES_CALLEE
    push de
    push bc
    
-   jp adt_StackDeleteS_callee + ASMDISP_ADT_STACKDELETES_CALLEE
+   jp asm_adt_StackDeleteS

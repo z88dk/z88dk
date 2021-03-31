@@ -4,8 +4,7 @@ SECTION code_clib
 PUBLIC im2_CreateGenericISRLight
 PUBLIC _im2_CreateGenericISRLight
 
-EXTERN im2_CreateGenericISRLight_callee
-EXTERN ASMDISP_IM2_CREATEGENERICISRLIGHT_CALLEE
+EXTERN asm_im2_CreateGenericISRLight
 
 .im2_CreateGenericISRLight
 ._im2_CreateGenericISRLight
@@ -18,4 +17,4 @@ EXTERN ASMDISP_IM2_CREATEGENERICISRLIGHT_CALLEE
    push hl
    ld a,c
 
-   jp im2_CreateGenericISRLight_callee + ASMDISP_IM2_CREATEGENERICISRLIGHT_CALLEE
+   jp asm_im2_CreateGenericISRLight

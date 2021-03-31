@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC adt_ListSearch_callee
 PUBLIC _adt_ListSearch_callee
-PUBLIC ASMDISP_ADT_LISTSEARCH_CALLEE
+PUBLIC asm_adt_ListSearch
 
 EXTERN ADTListSearch, l_jpiy
 
@@ -16,7 +16,7 @@ EXTERN ADTListSearch, l_jpiy
    pop iy
    ex (sp),hl
 
-.asmentry
+.asm_adt_ListSearch
 
 ; enter: hl = struct adt_List *
 ;        de = item1 *
@@ -50,4 +50,3 @@ EXTERN ADTListSearch, l_jpiy
    scf
    ret
 
-DEFC ASMDISP_ADT_LISTSEARCH_CALLEE = asmentry - adt_ListSearch_callee

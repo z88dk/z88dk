@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC adt_ListPrepend
 PUBLIC _adt_ListPrepend
 
-EXTERN adt_ListPrepend_callee
-EXTERN ASMDISP_ADT_LISTPREPEND_CALLEE
+EXTERN adt_ListPrepend
 
 .adt_ListPrepend
 ._adt_ListPrepend
@@ -18,4 +17,4 @@ EXTERN ASMDISP_ADT_LISTPREPEND_CALLEE
    push bc
    push hl
    
-   jp adt_ListPrepend_callee + ASMDISP_ADT_LISTPREPEND_CALLEE
+   jp adt_ListPrepend

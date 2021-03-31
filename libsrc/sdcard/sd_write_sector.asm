@@ -16,8 +16,7 @@
 	PUBLIC	sd_write_sector
    PUBLIC   _sd_write_sector
 
-	EXTERN		sd_write_sector_callee
-	EXTERN	ASMDISP_SD_WRITE_SECTOR_CALLEE
+	EXTERN		asm_sd_write_sector
 
 sd_write_sector:
 _sd_write_sector:
@@ -30,5 +29,5 @@ _sd_write_sector:
 	
 	push af
 	
-	jp sd_write_sector_callee + ASMDISP_SD_WRITE_SECTOR_CALLEE
+	jp asm_sd_write_sector
 
