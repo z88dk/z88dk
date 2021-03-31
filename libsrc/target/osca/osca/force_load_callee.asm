@@ -19,11 +19,11 @@
 
     INCLUDE "target/osca/def/flos.def"
 
-        SECTION code_clib
-	PUBLIC  force_load_callee
-	PUBLIC  _force_load_callee
-	EXTERN   flos_err
-	PUBLIC  ASMDISP_FORCE_LOAD_CALLEE
+    SECTION code_clib
+    PUBLIC  force_load_callee
+    PUBLIC  _force_load_callee
+    EXTERN   flos_err
+    PUBLIC  asm_force_load
 	
 force_load_callee:
 _force_load_callee:
@@ -32,10 +32,9 @@ _force_load_callee:
 	pop hl	; data position
 	push de
 
-asmentry:
+asm_force_load:
 	ld	b,c
 
 	call	kjt_force_load
 	jp		flos_err
 
-DEFC ASMDISP_FORCE_LOAD_CALLEE = asmentry - force_load_callee

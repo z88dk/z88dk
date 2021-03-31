@@ -11,10 +11,10 @@
 
     INCLUDE "target/osca/def/flos.def"
 
-        SECTION code_clib
-	PUBLIC  find_file_callee
-	PUBLIC  _find_file_callee
-	PUBLIC  ASMDISP_FIND_FILE_CALLEE
+    SECTION code_clib
+    PUBLIC  find_file_callee
+    PUBLIC  _find_file_callee
+    PUBLIC  asm_find_file
 
 .find_file_callee
 ._find_file_callee
@@ -23,7 +23,7 @@
 	pop		hl	; ptr to file name
 	push	bc
 
-.asmentry
+.asm_find_file
 	push	ix		; save callers
 	push	hl
 	push	iy
@@ -80,4 +80,3 @@ err:
 	ld	hl,0	; flag was not zero
 	ret
 
-DEFC ASMDISP_FIND_FILE_CALLEE = asmentry - find_file_callee
