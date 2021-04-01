@@ -1,7 +1,7 @@
 include ../Make.config
 
 
-SUBDIRS = aplib zx7 zx0
+SUBDIRS = aplib zx7 zx0 zx1 zx2
 
 CLEANDIRS = $(SUBDIRS:%=clean-%) 
 
