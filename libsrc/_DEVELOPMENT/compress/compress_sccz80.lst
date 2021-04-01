@@ -1,3 +1,5 @@
 @compress/aplib/aplib_sccz80.lst
 @compress/zx7/zx7_sccz80.lst
 @compress/zx0/zx0_sccz80.lst
+@compress/zx1/zx1_sccz80.lst
+@compress/zx2/zx2_sccz80.lst

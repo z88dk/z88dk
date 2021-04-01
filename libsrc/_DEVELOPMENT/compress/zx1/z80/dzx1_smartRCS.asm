@@ -1,99 +1,86 @@
 ; -----------------------------------------------------------------------------
-; "Smart" integrated RCS+ZX0 decoder by Einar Saukas (113 bytes) - BACKWARDS
+; "Smart" integrated RCS+ZX1 decoder by Einar Saukas (112 bytes)
 ; -----------------------------------------------------------------------------
 ; Parameters:
-;   HL: last source address (compressed data)
-;   DE: last destination address (decompressing)
+;   HL: source address (compressed data)
+;   DE: destination address (decompressing)
 ; -----------------------------------------------------------------------------
 
-SECTION code_clib
-SECTION code_compress_zx0
-
-PUBLIC asm_dzx0_smartrcs_back
-
-
-; Enter: hl = void *src last
-;        de = void *dst last
-;
-; Uses: af, bc, de, hl
-asm_dzx0_smartrcs_back:
-
-dzx0_smartrcs_back:
-        ld      bc, 1                   ; preserve default offset 1
+dzx1_smartrcs:
+        ld      bc, $ffff               ; preserve default offset 1
         push    bc
-        dec     c
         ld      a, $80
-dzx0rb_literals:
-        call    dzx0rb_elias            ; obtain length
-dzx0rb_literals_loop:
-        call    dzx0rb_copy_byte        ; copy literals
-        jp      pe, dzx0rb_literals_loop
+dzx1r_literals:
+        call    dzx1r_elias             ; obtain length
+dzx1r_literals_loop:
+        call    dzx1r_copy_byte         ; copy literals
+        jp      pe, dzx1r_literals_loop
         add     a, a                    ; copy from last offset or new offset?
-        jr      c, dzx0rb_new_offset
-        call    dzx0rb_elias            ; obtain length
-dzx0rb_copy:
+        jr      c, dzx1r_new_offset
+        call    dzx1r_elias             ; obtain length
+dzx1r_copy:
         ex      (sp), hl                ; preserve source, restore offset
         push    hl                      ; preserve offset
         add     hl, de                  ; calculate destination - offset
-dzx0rb_copy_loop:
+dzx1r_copy_loop:
         push    hl                      ; copy from offset
         ex      de, hl
-        call    dzx0rb_convert
+        call    dzx1r_convert
         ex      de, hl
-        call    dzx0rb_copy_byte
+        call    dzx1r_copy_byte
         pop     hl
-        dec     hl
-        jp      pe, dzx0rb_copy_loop
+        inc     hl
+        jp      pe, dzx1r_copy_loop
         pop     hl                      ; restore offset
         ex      (sp), hl                ; preserve offset, restore source
         add     a, a                    ; copy from literals or new offset?
-        jr      nc, dzx0rb_literals
-dzx0rb_new_offset:
+        jr      nc, dzx1r_literals
+dzx1r_new_offset:
         inc     sp                      ; discard last offset
         inc     sp
-        call    dzx0rb_elias            ; obtain offset MSB
         dec     b
-        ret     z                       ; check end marker
-        dec     c                       ; adjust for positive offset
-        ld      b, c
         ld      c, (hl)                 ; obtain offset LSB
-        dec     hl
-        srl     b                       ; last offset bit becomes first length bit
-        rr      c
-        inc     bc
+        inc     hl
+        rr      c                       ; single byte offset?
+        jr      nc, dzx1r_msb_skip
+        ld      b, (hl)                 ; obtain offset MSB
+        inc     hl
+        rr      b                       ; replace last LSB bit with last MSB bit
+        inc     b
+        ret     z                       ; check end marker
+        rl      c
+dzx1r_msb_skip:
         push    bc                      ; preserve new offset
-        ld      bc, 1                   ; obtain length
-        call    c, dzx0rb_elias_backtrack
+        call    dzx1r_elias             ; obtain length
         inc     bc
-        jr      dzx0rb_copy
-dzx0rb_elias:
-        inc     c                       ; inverted interlaced Elias gamma coding
-dzx0rb_elias_loop:
+        jr      dzx1r_copy
+dzx1r_elias:
+        ld      bc, 1                   ; interlaced Elias gamma coding
+dzx1r_elias_loop:        
         add     a, a
-        jr      nz, dzx0rb_elias_skip
+        jr      nz, dzx1r_elias_skip    
         ld      a, (hl)                 ; load another group of 8 bits
-        dec     hl
+        inc     hl
         rla
-dzx0rb_elias_skip:
+dzx1r_elias_skip:        
         ret     nc
-dzx0rb_elias_backtrack:
         add     a, a
         rl      c
         rl      b
-        jr      dzx0rb_elias_loop
-dzx0rb_copy_byte:
+        jr      dzx1r_elias_loop
+dzx1r_copy_byte:
         push    de                      ; preserve destination
-        call    dzx0rb_convert          ; convert destination
-        ldd                             ; copy byte
+        call    dzx1r_convert           ; convert destination
+        ldi                             ; copy byte
         pop     de                      ; restore destination
-        dec     de                      ; update destination
+        inc     de                      ; update destination
         ret
 ; Convert an RCS address 010RRccc ccrrrppp to screen address 010RRppp rrrccccc
-dzx0rb_convert:
+dzx1r_convert:
         ex      af, af'
         ld      a, d                    ; A = 010RRccc
         cp      $58
-        jr      nc, dzx0rb_skip
+        jr      nc, dzx1r_skip
         xor     e
         and     $f8
         xor     e                       ; A = 010RRppp
@@ -104,7 +91,7 @@ dzx0rb_convert:
         rlca                            ; A = rrrccccc
         pop     de                      ; D = 010RRppp
         ld      e, a                    ; E = rrrccccc
-dzx0rb_skip:
+dzx1r_skip:
         ex      af, af'
         ret
 ; -----------------------------------------------------------------------------
