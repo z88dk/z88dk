@@ -1,6 +1,5 @@
 
-SECTION code_lib
-SECTION code_compress_zx1
+SECTION smc_compress
 
 PUBLIC asm_dzx1_mega_back
 

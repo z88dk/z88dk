@@ -33,6 +33,8 @@
 		SECTION code_l_sccz80
 		SECTION code_compress_zx7
 		SECTION code_compress_zx0
+		SECTION code_compress_zx1
+		SECTION code_compress_zx2
 		SECTION code_compress_aplib
 		SECTION code_ctype
 		SECTION code_esxdos
@@ -106,6 +108,8 @@ IF !__crt_model
   IF !__crt_org_graphics
 		SECTION smc_clib
   ENDIF
+		SECTION smc_fp
+		SECTION smc_compress
 		SECTION smc_user
                 SECTION data_driver
 		SECTION data_clib
@@ -167,6 +171,7 @@ IF !__crt_org_graphics
 		SECTION smc_clib
 ENDIF
 		SECTION smc_fp
+		SECTION smc_compress
 		SECTION smc_user
                 SECTION data_driver
 		SECTION data_crt

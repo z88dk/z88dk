@@ -1,6 +1,5 @@
 
-SECTION code_lib
-SECTION code_compress_zx0
+SECTION smc_compress
 
 PUBLIC asm_dzx0_agile_rcs
 
