@@ -1,3 +1,5 @@
 @compress/aplib/aplib_asm.lst
 @compress/zx7/zx7_asm.lst
 @compress/zx0/zx0_asm.lst
+@compress/zx1/zx1_asm.lst
+@compress/zx2/zx2_asm.lst

@@ -1,4 +1,5 @@
 
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 ; ===============================================================
 ; Dec 2012 by Einar Saukas
 ; "Smart" integrated RCS+ZX7 decoder by Einar Saukas (111 bytes)
@@ -158,3 +159,4 @@ dzx7r_skip:
 
         pop af
         ret
+ENDIF
