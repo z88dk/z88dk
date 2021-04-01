@@ -2,8 +2,8 @@ include ../../Make.config
 
 TARGET ?= test
 
-NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/compress/zx1/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/compress/zx1/z80/*.asm"
-NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy 
+NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/compress/zx1/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/compress/zx1/z80/asm*.asm"
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy  obj/newlib-gbz80
 
 space :=
 space +=
