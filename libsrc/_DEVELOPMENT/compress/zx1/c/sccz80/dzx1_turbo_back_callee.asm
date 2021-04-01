@@ -10,8 +10,15 @@ EXTERN asm_dzx1_turbo_back
 
 dzx1_turbo_back_callee:
 
+IF __CPU_GBZ80__
+   pop bc
+   pop de
+   pop hl
+   push bc
+ELSE
    pop hl
    pop de
    ex (sp),hl
+ENDIF
 
    jp asm_dzx1_turbo_back
