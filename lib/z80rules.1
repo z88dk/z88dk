@@ -4557,6 +4557,34 @@
 	ld	l,(hl)
 	ld	h,0
 
+	call	l_gchar
+	ld	a,h
+	or	l
+	jp	%1z,%2	;%3
+	ld	hl,%4
+=
+	ld	a,(hl)
+	and	a
+	jp	%1z,%2	;%3
+	ld	hl,%4
+
+
+%check 0 <= %1 <= 255
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+	pop	de
+	ld	a,l
+	and	%1
+	ld	l,a
+=
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+	pop	de
+
 %cpu gbz80
 	ld	hl,_%1
 	push	hl
@@ -5238,6 +5266,28 @@
 	out	(c),a
 	ld	hl,%3
 
+
+; Use stack less when we can
+=
+;
+
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	pop	de
+=
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%eval(%1 2 -)	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
 
 ; Odd constructs observed in ping
 =
