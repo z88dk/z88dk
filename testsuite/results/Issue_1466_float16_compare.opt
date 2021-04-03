@@ -25,9 +25,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_2
+	jp	z,i_2	;
 	call	_Yes
-	jp	i_3
+	jp	i_3	;EOS
 .i_2
 	call	_No
 .i_3
@@ -42,9 +42,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_4
+	jp	z,i_4	;
 	call	_Yes
-	jp	i_5
+	jp	i_5	;EOS
 .i_4
 	call	_No
 .i_5
@@ -59,9 +59,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_6
+	jp	z,i_6	;
 	call	_Yes
-	jp	i_7
+	jp	i_7	;EOS
 .i_6
 	call	_No
 .i_7
@@ -76,9 +76,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_8
+	jp	z,i_8	;
 	call	_Yes
-	jp	i_9
+	jp	i_9	;EOS
 .i_8
 	call	_No
 .i_9
@@ -93,9 +93,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_10
+	jp	z,i_10	;
 	call	_Yes
-	jp	i_11
+	jp	i_11	;EOS
 .i_10
 	call	_No
 .i_11
@@ -110,9 +110,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_12
+	jp	z,i_12	;
 	call	_Yes
-	jp	i_13
+	jp	i_13	;EOS
 .i_12
 	call	_No
 .i_13
@@ -127,9 +127,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_14
+	jp	z,i_14	;
 	call	_Yes
-	jp	i_15
+	jp	i_15	;EOS
 .i_14
 	call	_No
 .i_15
@@ -144,9 +144,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_16
+	jp	z,i_16	;
 	call	_Yes
-	jp	i_17
+	jp	i_17	;EOS
 .i_16
 	call	_No
 .i_17
@@ -164,9 +164,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_18
+	jp	z,i_18	;
 	call	_Yes
-	jp	i_19
+	jp	i_19	;EOS
 .i_18
 	call	_No
 .i_19
@@ -184,9 +184,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_20
+	jp	z,i_20	;
 	call	_Yes
-	jp	i_21
+	jp	i_21	;EOS
 .i_20
 	call	_No
 .i_21
@@ -206,9 +206,9 @@
 	call	deq
 	ld	a,h
 	or	l
-	jp	z,i_22
+	jp	z,i_22	;
 	call	_Yes
-	jp	i_23
+	jp	i_23	;EOS
 .i_22
 	call	_No
 .i_23
@@ -225,9 +225,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_24
+	jp	z,i_24	;
 	call	_Yes
-	jp	i_25
+	jp	i_25	;EOS
 .i_24
 	call	_No
 .i_25
@@ -246,9 +246,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_26
+	jp	z,i_26	;
 	call	_Yes
-	jp	i_27
+	jp	i_27	;EOS
 .i_26
 	call	_No
 .i_27
@@ -270,9 +270,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_28
+	jp	z,i_28	;
 	call	_Yes
-	jp	i_29
+	jp	i_29	;EOS
 .i_28
 	call	_No
 .i_29
@@ -291,9 +291,9 @@
 	call	deq
 	ld	a,h
 	or	l
-	jp	z,i_30
+	jp	z,i_30	;
 	call	_Yes
-	jp	i_31
+	jp	i_31	;EOS
 .i_30
 	call	_No
 .i_31
@@ -310,9 +310,9 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_32
+	jp	z,i_32	;
 	call	_Yes
-	jp	i_33
+	jp	i_33	;EOS
 .i_32
 	call	_No
 .i_33
@@ -327,9 +327,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_34
+	jp	z,i_34	;
 	call	_Yes
-	jp	i_35
+	jp	i_35	;EOS
 .i_34
 	call	_No
 .i_35
@@ -344,9 +344,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_36
+	jp	z,i_36	;
 	call	_Yes
-	jp	i_37
+	jp	i_37	;EOS
 .i_36
 	call	_No
 .i_37
@@ -361,9 +361,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_38
+	jp	z,i_38	;
 	call	_Yes
-	jp	i_39
+	jp	i_39	;EOS
 .i_38
 	call	_No
 .i_39
@@ -378,9 +378,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_40
+	jp	z,i_40	;
 	call	_Yes
-	jp	i_41
+	jp	i_41	;EOS
 .i_40
 	call	_No
 .i_41
@@ -397,9 +397,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_42
+	jp	z,i_42	;
 	call	_Yes
-	jp	i_43
+	jp	i_43	;EOS
 .i_42
 	call	_No
 .i_43
@@ -416,9 +416,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_44
+	jp	z,i_44	;
 	call	_Yes
-	jp	i_45
+	jp	i_45	;EOS
 .i_44
 	call	_No
 .i_45
@@ -435,9 +435,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_46
+	jp	z,i_46	;
 	call	_Yes
-	jp	i_47
+	jp	i_47	;EOS
 .i_46
 	call	_No
 .i_47
@@ -454,9 +454,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_48
+	jp	z,i_48	;
 	call	_Yes
-	jp	i_49
+	jp	i_49	;EOS
 .i_48
 	call	_No
 .i_49
@@ -474,9 +474,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_50
+	jp	z,i_50	;
 	call	_Yes
-	jp	i_51
+	jp	i_51	;EOS
 .i_50
 	call	_No
 .i_51
@@ -494,9 +494,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_52
+	jp	z,i_52	;
 	call	_Yes
-	jp	i_53
+	jp	i_53	;EOS
 .i_52
 	call	_No
 .i_53
@@ -517,9 +517,9 @@
 	call	dlt
 	ld	a,h
 	or	l
-	jp	z,i_54
+	jp	z,i_54	;
 	call	_Yes
-	jp	i_55
+	jp	i_55	;EOS
 .i_54
 	call	_No
 .i_55
@@ -536,9 +536,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_56
+	jp	z,i_56	;
 	call	_Yes
-	jp	i_57
+	jp	i_57	;EOS
 .i_56
 	call	_No
 .i_57
@@ -558,9 +558,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_58
+	jp	z,i_58	;
 	call	_Yes
-	jp	i_59
+	jp	i_59	;EOS
 .i_58
 	call	_No
 .i_59
@@ -583,9 +583,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_60
+	jp	z,i_60	;
 	call	_Yes
-	jp	i_61
+	jp	i_61	;EOS
 .i_60
 	call	_No
 .i_61
@@ -604,9 +604,9 @@
 	call	dlt
 	ld	a,h
 	or	l
-	jp	z,i_62
+	jp	z,i_62	;
 	call	_Yes
-	jp	i_63
+	jp	i_63	;EOS
 .i_62
 	call	_No
 .i_63
@@ -623,9 +623,9 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_64
+	jp	z,i_64	;
 	call	_Yes
-	jp	i_65
+	jp	i_65	;EOS
 .i_64
 	call	_No
 .i_65

@@ -11,7 +11,7 @@
 	ld	(%1),a
 	ld	hl,%2
 
-	jp	%0
+	jp	%0	;%5
 .%0
 =
 .%0
@@ -206,53 +206,53 @@
 =
 	call	l_f64_dldpsh
 
-	jp	nz,%1
-	jp	%2
+	jp	nz,%1	;%3
+	jp	%2	;%4
 .%1
 =
-	jp	z,%2
+	jp	z,%2	;%4
 .%1
 
-	jp	z,%1
-	jp	%2
+	jp	z,%1	;%3
+	jp	%2	;%4
 .%1
 =
-	jp	nz,%2
+	jp	nz,%2	;%4
 .%1
 
-	jp	nz,%1
-	jp	z,%2
+	jp	nz,%1	;%3
+	jp	z,%2	;%4
 .%1
 =
-	jp	z,%2
+	jp	z,%4	;%4
 .%1
 
-	jp	z,%1
-	jp	nz,%2
+	jp	z,%1	;%3
+	jp	nz,%2	;%4
 .%1
 =
-	jp	nz,%2
+	jp	nz,%2	;%4
 .%1
 
-	jp	z,%1
+	jp	z,%1	;%3
 	call	%2
 .%1
 =
 	call	nz,%2
 .%1
 
-	jp	nz,%1
+	jp	nz,%1	;%3
 	call	%2
 .%1
 =
 	call	z,%2
 .%1
 
-	jp	z,%1
-	jp	%2
+	jp	z,%1	;%3
+	jp	%2	;%4
 .%1
 =
-	jp	nz,%2
+	jp	nz,%2	;%4
 .%1
 
 	ld	hl,%1	;const
@@ -267,14 +267,14 @@
 =
 	ld	(%1),%2
 
-	jp	z,%1
+	jp	z,%1	;%3
 	ret
 .%1
 =
 	ret	nz
 .%1
 
-	jp	nz,%1
+	jp	nz,%1	;%3
 	ret
 .%1
 =
@@ -314,11 +314,11 @@
 	ld	de,0
 	ex	de,hl
 	call	l_eq
-	jp	c,%1
+	jp	c,%1	;%3
 =
 	ld	a,h
 	or	l
-	jp	z,%1
+	jp	z,%1	;%3
 
 ;;; Fixes up a bug in these rules
 	ld	(hl),+(%1 %% 256)
@@ -405,14 +405,14 @@
 
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%3
 	ld	hl,0	;const
 	pop	bc
 	ret
 =
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%3
 	pop	bc
 	ret
 
@@ -457,11 +457,11 @@
 	ld	h,0
 
 	ld	hl,%1	;const
-	jp	%2
+	jp	%2	;%3
 	ld	hl,%1	;const
 =
 	ld	hl,%1	;const
-	jp	%2
+	jp	%2	;%3
 
 	pop	bc
 	pop	hl
@@ -551,10 +551,10 @@
 =
 	pop	de
 
-	jp	i_%1
-	jp	i_%2
+	jp	i_%1	;%3
+	jp	i_%2	;%4
 =
-	jp	i_%1
+	jp	i_%1	;%3
 
 %check 0 <= %2 <= 65535
 	ld	hl,%1	;const
@@ -596,96 +596,96 @@
 	ld	de,1	;const
 	ex	de,hl
 	call	l_eq
-	jp	nc,%1
+	jp	nc,%1	;%3
 =
 	dec	hl
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%3
 
 	ld	de,1	;const
 	ex	de,hl
 	call	l_eq
-	jp	c,%1
+	jp	c,%1	;%3
 =
 	dec	hl
 	ld	a,h
 	or	l
-	jp	z,%1
+	jp	z,%1	;%3
 
 	ld	de,65535	;const
 	ex	de,hl
 	call	l_ne
-	jp	nc,%1
+	jp	nc,%1	;%3
 =
 	inc	hl
 	ld	a,h
 	or	l
-	jp	z,%1
+	jp	z,%1	;%3
 
 	push	de
 	ld	hl,65535	;const
 	pop	de
 	call	l_eq
-	jp	nc,%1
+	jp	nc,%1	;%3
 =
 	inc	de
 	ld	a,d
 	or	e
-	jp	nz,%1
+	jp	nz,%1	;%3
 
 	push	de
 	ld	hl,65535	;const
 	pop	de
 	call	l_eq
-	jp	c,%1
+	jp	c,%1	;%3
 =
 	inc	de
 	ld	a,d
 	or	e
-	jp	z,%1
+	jp	z,%1	;%3
 
 	push	de
 	ld	hl,1	;const
 	pop	de
 	call	l_eq
-	jp	c,%1
+	jp	c,%1	;%3
 =
 	dec	de
 	ld	a,d
 	or	e
-	jp	z,%1
+	jp	z,%1	;%3
 
 	push	de
 	ld	hl,1	;const
 	pop	de
 	call	l_eq
-	jp	nc,%1
+	jp	nc,%1	;%3
 =
 	dec	de
 	ld	a,d
 	or	e
-	jp	nz,%1
+	jp	nz,%1	;%3
 
 	ld	de,65535	;const
 	ex	de,hl
 	call	l_eq
-	jp	nc,%1
+	jp	nc,%1	;%3
 =
 	inc	hl
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%3
 
 	ld	de,65535	;const
 	ex	de,hl
 	call	l_eq
-	jp	c,%1
+	jp	c,%1	;%3
 =
 	inc	hl
 	ld	a,h
 	or	l
-	jp	z,%1
+	jp	z,%1	;%3
 
 	ld	hl,0	;const
 	ld	de,0
@@ -747,9 +747,9 @@
 	push	de
 
 .%1
-	jp	%3
+	jp	%3	;%4
 .%2
-	jp	%1
+	jp	%1	;%5
 .%3
 =
 .%1
@@ -772,19 +772,19 @@
 
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%3
 	ld	hl,1	;const
 =
 	ld	a,h	
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%3
 	inc	hl
 
 	pop	hl
 	push	hl
 	ld	a,l
 	cp	%2
-	jp	z,%3
+	jp	z,%3	;%4
 	pop	hl
 	push	hl
 	ld	a,l
@@ -793,13 +793,13 @@
 	push	hl
 	ld	a,l
 	cp	%2
-	jp	z,%3
+	jp	z,%3	;%4
 
 	ld	hl,%1	;const
 	add	hl,sp
 	ld	a,(hl)
 	cp	%2
-	jp	z,%3
+	jp	z,%3	;%4
 	ld	hl,%1	;const
 	add	hl,sp
 	ld	a,(hl)
@@ -808,7 +808,7 @@
 	add	hl,sp
 	ld	a,(hl)
 	cp	%2
-	jp	z,%3
+	jp	z,%3	;%4
 
 	push	de
 	push	hl
@@ -991,22 +991,22 @@
 	dec	hl
 
 	ld	hl,0	;const
-	jp	%2
+	jp	%2	;%4
 .%1
 	ld	hl,1	;const
 .%2
 	ld	a,h
 	or	l
-	jp	z,%3
+	jp	z,%3	;%5
 =
 	ld	hl,0	;const
-	jp	%3
+	jp	%3	;%5
 .%1
 	ld	hl,1	;const
 .%2
 	ld	a,h
 	or	l
-	jp	z,%3
+	jp	z,%3	;%4
 
 	ld	hl,(%1)
 	ld	h,0
@@ -1068,70 +1068,70 @@
 	ld	(de),a
 	ld	a,h
 	or	l
-	jp	z,%1
+	jp	z,%1	;%3
 =
 	ld	a,l
 	ld	(de),a
 	and	a
-	jp	z,%1
+	jp	z,%1	;%3
 
 	ld	a,l
 	ld	(de),a
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%3
 =
 	ld	a,l
 	ld	(de),a
 	and	a
-	jp	nz,%1
+	jp	nz,%1	;%3
 
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,%1	;const
 	call	l_eq
-	jp	nc,%2
+	jp	nc,%2	;%4
 	ld	hl,%3
 =
 	ld	a,(hl)
 	cp	+(%1 % 256)
-	jp	nz,%2
+	jp	nz,%2	;%4
 	ld	hl,%3
 
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,%1	;const
 	call	l_eq
-	jp	c,%2
+	jp	c,%2	;%4
 	ld	hl,%3
 =
 	ld	a,(hl)
 	cp	+(%1 % 256)
-	jp	z,%2
+	jp	z,%2	;%4
 	ld	hl,%3
 
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,%1	;const
 	call	l_ne
-	jp	c,%2
+	jp	c,%2	;%4
 	ld	hl,%3
 =
 	ld	a,(hl)
 	cp	+(%1 % 256)
-	jp	nz,%2
+	jp	nz,%2	;%4
 	ld	hl,%3
 
 	ld	hl,(%1)
 	ld	h,0
 	ld	a,h
 	or	l
-	jp	nz,%2
+	jp	nz,%2	;%4
 	ld	hl,%3
 =
 	ld	a,(%1)
 	and	a
-	jp	nz,%2
+	jp	nz,%2	;%4
 	ld	hl,%3
 
 %notcpu gbz80
@@ -1163,13 +1163,13 @@
 	push	hl
 	ld	a,h
 	or	l
-	jp	z,%1
+	jp	z,%1	;%4
 =
 	pop	bc
 	push	hl
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%4
 
 %notcpu gbz80
 	push	hl
@@ -1221,19 +1221,19 @@
 	ld	hl,0	;const
 	ld	de,0
 	call	l_long_eq
-	jp	c,%1
+	jp	c,%1	;%4
 =
 	ld	a,h
 	or	l
 	or	e
 	or	d
-	jp	z,%1
+	jp	z,%1	;%4
 
 	pop	bc
 	push	hl
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%4
 	pop	bc
 	ret
 .%1
@@ -1258,9 +1258,9 @@
 .%1
 	ld	a,h
 	or	l
-	jp	z,%3
+	jp	z,%3	;%4
 =
-	jp	%3
+	jp	%3	;%4
 .%2
 
 	ld	hl,1	;const
@@ -1270,78 +1270,78 @@
 .%1
 	ld	a,h
 	or	l
-	jp	z,%3
+	jp	z,%3	;%4
 =
 	jr	%1_%2
 .%2
-	jp	%3
+	jp	%3	;%4
 .%1_%2
 
-	jp	n%0,%1
+	jp	n%0,%1	;%4
 	jr	%2
 .%1
-	jp	%3
+	jp	%3	;%5
 .%2
 =
 	jr	%0,%2
 .%1
-	jp	%3
+	jp	%3	;%5
 .%2
 
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%4
 	ld	hl,0	;const
-	jp	%2
+	jp	%2	;%5
 .%1
 =
 	ld	a,h
 	or	l
-	jp	z,%2
+	jp	z,%2	;%5
 .%1
 
-	jp	nc,%1
-	jp	%2
+	jp	nc,%1	;%4
+	jp	%2	;%5
 .%1
 =
-	jp	c,%2
+	jp	c,%2	;%5
 .%1
 
-	jp	c,%1
-	jp	%2
+	jp	c,%1	;%4
+	jp	%2	;%5
 .%1
 =
-	jp	nc,%2
+	jp	nc,%2	;%5
 .%1
 
 	jr	c,%1
 .%2
-	jp	%3
+	jp	%3	;%6
 .%1
-	jp	%4
+	jp	%4	;%7
 .%3
-	jp	%5
+	jp	%5	;%8
 .%4
 =
 	jr	c,%4
 .%2
 .%3
-	jp	%5
+	jp	%5	;%8
 .%1
 .%4
 
 	jr	z,%1
-	jp	nc,%2
+	jp	nc,%2	;%6
 .%1
 	jr	%3
 .%2
-	jp	%5
+	jp	%5	;%7
 .%3
 =
 	jr	z,%3
 	jr	c,%3
 .%2
-	jp	%5
+	jp	%5	;%7
 .%3
 
 	push	de
@@ -1553,14 +1553,14 @@
 	push	hl
 	ld	a,h
 	or	l
-	jp	%1
+	jp	%1	;%2
 	pop	hl
 	push	hl
 =
 	push	hl
 	ld	a,h
 	or	l
-	jp	%1
+	jp	%1	;%2
 
 %notcpu gbz80
 	push	hl
@@ -1613,7 +1613,7 @@
 	push	hl
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%2
 	pop	bc
 	ret
 =
@@ -1622,26 +1622,26 @@
 	or	l
 	ret	z
 	push	hl
-	jp	%1
+	jp	%1	;%2
 
 	ld	h,0
 	%1c	l
 	ld	a,h
 	or	l
-	jp	%2
+	jp	%2	;%5
 =
 	ld	h,0
 	%1c	l
-	jp	%2
+	jp	%2	;%5
 
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%5
 	ld	hl,0	;const
 =
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%5
 
 	ld	l,e
 	ld	h,d
@@ -1661,15 +1661,15 @@
 	ld	(de),a
 	ld	hl,%2
 
-	jp	z,%1
+	jp	z,%1	;%7
 	jr	%2
 .%1
-	jp	%3
+	jp	%3	;%8
 .%2
 =
 	jr	nz,%2
 .%1
-	jp	%3
+	jp	%3	;%8
 .%2
 
 	ld	hl,%1	;const
@@ -1677,7 +1677,7 @@
 	call	l_gint	;%9
 	ld	a,(hl)
 	cp	%2
-	jp	%3
+	jp	%3	;%8
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gint	;%9
@@ -1689,10 +1689,10 @@
 	call	l_gint	;%9
 	ld	a,(hl)
 	cp	%2
-	jp	%3
+	jp	%3	;%8
 	cp	%4
 
-	jp	nc,%1
+	jp	nc,%1	;%7
 	ld	hl,1	;const
 	jr	%2
 .%1
@@ -1700,27 +1700,27 @@
 .%2
 	ld	a,h
 	or	l
-	jp	nz,%3
+	jp	nz,%3	;%8
 	ld	hl,%4
 =
-	jp	c,%3
+	jp	c,%3	;%8
 .%1
 	jr	%1_%2
 .%2
 	ld	a,h
 	or	l
-	jp	nz,%3
+	jp	nz,%3	;%8
 .%1_%2
 	ld	hl,%4
 
-	jp	%1,%2
+	jp	%1,%2	;%5
 .%3
-	jp	%4
+	jp	%4	;%6
 .%2
 =
 	jr	%1,%2
 .%3
-	jp	%4
+	jp	%4	;%6
 .%2
 
 ; These next few rules deal with optimizing for testing a
@@ -1730,20 +1730,20 @@
 
 	ld	hl,0	;const
 	call	l_lt
-	jp	nc,%1
+	jp	nc,%1	;%3
 	ld	hl,%2
 =
 	bit	7,d
-	jp	z,%1
+	jp	z,%1	;%3
 	ld	hl,%2
 
 	ld	hl,0	;const
 	call	l_lt
-	jp	c,%1
+	jp	c,%1	;%3
 	ld	hl,%2
 =
 	bit	7,d
-	jp	nz,%1
+	jp	nz,%1	;%3
 	ld	hl,%2
 
 	ld	e,(hl)
@@ -1757,19 +1757,19 @@
 
 	ld	a,(hl)
 	bit	7,a
-	jp	nz,%1
+	jp	nz,%1	;%3
 =
 	ld	a,(hl)
 	rlca
-	jp	c,%1
+	jp	c,%1	;%3
 
 	ld	a,(hl)
 	bit	7,a
-	jp	z,%1
+	jp	z,%1	;%3
 =
 	ld	a,(hl)
 	rlca
-	jp	nc,%1
+	jp	nc,%1	;%3
 
 	ld	hl,%1	;const
 	push	hl
@@ -1830,13 +1830,13 @@
 	ld	hl,%1
 	ld	de,0	;const
 	call	l_eq
-	jp	c,%4
+	jp	c,%4	;%5
 	ld	hl,%3
 =
 	ld	hl,%1
 	ld	a,h
 	or	l
-	jp	z,%4
+	jp	z,%4	;%5
 	ld	hl,%3
 
 	ex	de,hl
@@ -1929,11 +1929,11 @@
 	ld	hl,(%1)
 	ld	h,0
 	call	l_eq
-	jp	nc,%2
+	jp	nc,%2	;%5
 =
 	ld	a,(%1)
 	cp	(hl)
-	jp	nz,%2
+	jp	nz,%2	;%5
 
 	ld	e,(hl)
 	inc	hl
@@ -1959,14 +1959,14 @@
 	ld	l,(hl)
 	ld	h,0
 
-	jp	nc,%1
+	jp	nc,%1	;%5
 	call	%2
 .%1
 =
 	call	c,%2
 .%1
 
-	jp	c,%1
+	jp	c,%1	;%5
 	call	%2
 .%1
 =
@@ -1991,13 +1991,13 @@
 	ld	hl,%1	;const
 	call	l_eq
 	ld	hl,%2
-	jp	c,%3
+	jp	c,%3	;%5
 	ld	hl,%4
 =
 	ld	a,(hl)
 	cp	+(%1 % 256)
 	ld	hl,%2
-	jp	z,%3
+	jp	z,%3	;%5
 	ld	hl,%4
 
 	jr	z,ASMPC+3
@@ -2074,11 +2074,11 @@
 	and	a
 	jr	nz,ASMPC+3
 	scf
-	jp	nc,%1
+	jp	nc,%1	;%5
 =
 	ld	a,(hl)
 	and	a
-	jp	nz,%1
+	jp	nz,%1	;%5
 
 	ld	l,a
 	ld	h,0
@@ -2089,10 +2089,10 @@
 	and	a
 	jr	nz,ASMPC+3
 	scf
-	jp	nc,%2
+	jp	nc,%2	;%5
 =
 	cp	+(%1 % 256)
-	jp	nz,%2
+	jp	nz,%2	;%5
 
 	ld	l,(hl)
 	ld	h,0
@@ -2117,20 +2117,20 @@
 	and	a
 	jr	nz,ASMPC+3
 	scf
-	jp	%2c,%1
+	jp	%2c,%1	;%5
 =
 	and	a
-	jp	%2z,%1
+	jp	%2z,%1	;%5
 
 	ld	l,(hl)
 	ld	h,0
 	ld	a,l
 	and	a
-	jp	%2z,%1
+	jp	%2z,%1	;%5
 =
 	ld	a,(hl)
 	and	a
-	jp	%2z,%1
+	jp	%2z,%1	;%5
 
 	ld	hl,(%1)
 	ld	h,0
@@ -2145,12 +2145,12 @@
 	ex	de,hl
 	ld	a,h
 	or	l
-	jp	z,%1
+	jp	z,%1	;%5
 	ld	hl,%2
 =
 	ld	a,d
 	or	e
-	jp	z,%1
+	jp	z,%1	;%5
 	ld	hl,%2
 
 	ld	hl,1	;const
@@ -2179,7 +2179,7 @@
 =
 	ld	hl,%2
 
-	jp	%1
+	jp	%1	;%5
 
 
 .%1
@@ -2230,23 +2230,23 @@
 	ld	h,(hl)
 	ld	l,a
 
-	jp	%1
+	jp	%1	;%5
 .%2
-	jp	%1
+	jp	%1	;%6
 .%3
 =
 .%2
-	jp	%1
+	jp	%1	;%5
 .%3
 
-	jp	z,%1
-	jp	%2
+	jp	z,%1	;%5
+	jp	%2	;%6
 .%1
 =
-	jp	nz,%2
+	jp	nz,%2	;%6
 .%1
 
-	jp	%1
+	jp	%1	;%5
 .%2
 .%1
 =
@@ -2310,22 +2310,22 @@
 	ex	de,hl
 	call	l_eq
 	ccf
-	jp	nc,%1
+	jp	nc,%1	;%5
 	pop	hl
 =
 	ld	a,h
 	or	l
-	jp	z,%1
+	jp	z,%1	;%5
 	pop	hl
 
 	ld	hl,0	;const
 	call	l_eq
-	jp	nc,%1
+	jp	nc,%1	;%5
 	ld	hl,%2
 =
 	ld	a,d
 	or	e
-	jp	nz,%1
+	jp	nz,%1	;%5
 	ld	hl,%2
 
 %notcpu 8080
@@ -2565,12 +2565,12 @@
 	ld	l,0
 	ld	a,h
 	or	l
-	jp	%1,%2
+	jp	%1,%2	;%5
 =
 	ld	h,a
 	ld	l,0
 	and	a
-	jp	%1,%2
+	jp	%1,%2	;%5
 
 %notcpu gbz80
 	ld	hl,_%1
@@ -2875,12 +2875,12 @@
 	ld	h,0
 	ld	a,h
 	or	l
-	jp	%1
+	jp	%1	;%5
 =
 	ld	l,a
 	ld	h,0
 	and	a
-	jp	%1
+	jp	%1	;%5
 
 	ld	l,(hl)
 	ld	h,0
@@ -3037,15 +3037,15 @@
 	scf
 	jr	z,ASMPC+3
 	ccf
-	jp	nc,%1
+	jp	nc,%1	;%5
 =
-	jp	nz,%1
+	jp	nz,%1	;%5
 
 	jr	z,ASMPC+3
 	scf
-	jp	nc,%1
+	jp	nc,%1	;%5
 =
-	jp	z,%1
+	jp	z,%1	;%5
 
 	scf
 	jr	z,ASMPC+3
@@ -3123,12 +3123,12 @@
 	ld	h,0
 	ld	a,l
 	sub	%2
-	jp	c,%4
+	jp	c,%4	;%5
 	ld	hl,%3
 =
 	ld	a,(_%1)
 	sub	%2
-	jp	c,%4
+	jp	c,%4	;%5
 	ld	hl,%3
 
 	ld	hl,(_%1)
@@ -3136,24 +3136,24 @@
 	ld	a,l
 	sub	%2
 	ccf
-	jp	c,%3
+	jp	c,%3	;%5
 	ld	hl,%4
 =
 	ld	a,(_%1)
 	sub	%2
-	jp	nc,%3
+	jp	nc,%3	;%5
 	ld	hl,%4
 
 	ld	hl,(_%1)
 	ld	h,0
 	ld	a,l
 	sub	%2
-	jp	nc,%3
+	jp	nc,%3	;%5
 	ld	hl,%4
 =
 	ld	a,(_%1)
 	sub	%2
-	jp	nc,%3
+	jp	nc,%3	;%5
 	ld	hl,%4
 
 	pop	hl
@@ -3194,9 +3194,9 @@
 
 	jr	nz,ASMPC+3
 	scf
-	jp	c,%1
+	jp	c,%1	;%5
 =
-	jp	z,%1
+	jp	z,%1	;%5
 
 	ld	hl,0	;const
 	jr	nz,ASMPC+3
@@ -3336,24 +3336,24 @@
 	ld	h,0
 	ld	a,l
 	cp	%2
-	jp	nz,%3
+	jp	nz,%3	;%5
 	ld	hl,%4
 =
 	ld	a,(_%1)
 	cp	%2
-	jp	nz,%3
+	jp	nz,%3	;%5
 	ld	hl,%4
 
 	ld	hl,(_%1)
 	ld	h,0
 	ld	a,l
 	and	+(128 %% 256)
-	jp	z,%2
+	jp	z,%2	;%5
 	ld	hl,%3
 =
 	ld	a,(_%1)
 	rlca
-	jp	nc,%2
+	jp	nc,%2	;%5
 	ld	hl,%3
 
 %eval 2 = %2 %1 -
@@ -3454,30 +3454,30 @@
 	ld	hl,(_%1)
 	ld	h,0
 	call	l_lneg
-	jp	nc,%2
+	jp	nc,%2	;%5
 =
 	ld	a,(_%1)
 	and	a
-	jp	nz,%2
+	jp	nz,%2	;%5
 
 	ld	l,(hl)
 	ld	h,0
 	call	l_lneg
-	jp	c,%1
+	jp	c,%1	;%5
 =
 	ld	a,(hl)
 	and	a
-	jp	z,%1
+	jp	z,%1	;%5
 
 	ld	l,(hl)
 	ld	h,0
 	ld	a,l
 	sub	%1
-	jp	%2c,%3
+	jp	%2c,%3	;%5
 =
 	ld	a,(hl)
 	sub	%1
-	jp	%2c,%3
+	jp	%2c,%3	;%5
 
 	ld	hl,(_%1)
 	ld	h,0
@@ -3494,12 +3494,12 @@
 	ld	h,0
 	ld	a,l
 	and	%2
-	jp	z,%3
+	jp	z,%3	;%5
 	ld	hl,%4
 =
 	ld	a,(_%1)
 	and	%2
-	jp	z,%3
+	jp	z,%3	;%5
 	ld	hl,%4
 
 	ld	hl,(_%1)
@@ -3544,11 +3544,11 @@
 	ld	de,0
 	ld	a,h
 	or	l
-	jp	z,%2
+	jp	z,%2	;%5
 	ld	hl,%3
 =
 	and	a
-	jp	z,%2
+	jp	z,%2	;%5
 	ld	hl,%3
 
 	ld	d,(hl)	;broken
@@ -3602,11 +3602,11 @@
 	ld	h,a
 	ld	l,0
 	and	a
-	jp	z,%2
+	jp	z,%2	;%5
 	ld	hl,%3
 =
 	and	%1
-	jp	z,%2
+	jp	z,%2	;%5
 	ld	hl,%3
 
 	ld	hl,(_%1)
@@ -3627,14 +3627,14 @@
 	and	a
 	jr	c,%2
 .%3
-	jp	%4
+	jp	%4	;%5
 .%2
 =
 	scf
 	jr	z,%2
 	and	a
 .%3
-	jp	%4
+	jp	%4	;%5
 .%2
 
 	ld	hl,(_%1)
@@ -3654,13 +3654,13 @@
 	ld	a,l
 	sub	e
 	and	a
-	jp	z,%1
+	jp	z,%1	;%5
 	pop	hl
 =
 	ld	a,(hl)
 	sub	e
 	and	a
-	jp	z,%1
+	jp	z,%1	;%5
 	pop	hl
 
 	call	l_glong2sp
@@ -3782,12 +3782,12 @@
 	ld	h,0
 	ld	a,l
 	and	a
-	jp	%2
+	jp	%2	;%5
 	ld	hl,%3
 =
 	ld	a,(_%1)
 	and	a
-	jp	%2
+	jp	%2	;%5
 	ld	hl,%3
 
 	ld	hl,%1	;const
@@ -3924,10 +3924,10 @@
 	ld	l,a
 	ld	h,0
 	call	l_lneg
-	jp	%2c,%1
+	jp	%2c,%1	;%5
 =
 	and	a
-	jp	%2z,%1
+	jp	%2z,%1	;%5
 
 %notcpu 8080
 	push	hl
@@ -3957,34 +3957,34 @@
 	ld	de,%1
 	and	a
 	sbc	hl,de
-	jp	%2,%3
+	jp	%2,%3	;%5
 	ld	hl,%4
 =
 	ld	a,(hl)
 	cp	%1
-	jp	%2,%3
+	jp	%2,%3	;%5
 	ld	hl,%4
 
 	call	l_gchar
 	ld	a,l
 	cp	%1
-	jp	%2,%3
+	jp	%2,%3	;%5
 	ld	hl,%4
 =
 	ld	a,(hl)
 	cp	%1
-	jp	%2,%3
+	jp	%2,%3	;%5
 	ld	hl,%4
 
 	call	l_gchar
 	ld	a,l
 	and	a
-	jp	%1
+	jp	%1	;%5
 	ld	hl,%2
 =
 	ld	a,(hl)
 	and	a
-	jp	%1
+	jp	%1	;%5
 	ld	hl,%2
 
 	call	l_gchar
@@ -4021,6 +4021,7 @@
 	ccf
 	j%4	%3
 
+%check 0 <= %1 <= 65535
 	inc	hl
 	ld	bc,%1
 	add	hl,bc
@@ -4028,6 +4029,7 @@
 	ld	bc,%eval( %1 1 +)
 	add	hl,bc
 
+%check 0 <= %1 <= 65535
 	dec	hl
 	ld	bc,%1
 	add	hl,bc
@@ -4125,11 +4127,11 @@
 	ld	de,0
 
 	sbc	hl,de
-	jp	nz,%1
+	jp	nz,%1	;%5
 	ld	hl,0	;const
 =
 	sbc	hl,de
-	jp	nz,%1
+	jp	nz,%1	;%5
 
 	push	hl
 	ld	hl,%1	;const
@@ -4346,13 +4348,13 @@
 	ccf
 	jr	c,%1
 .%2
-	jp	%3
+	jp	%3	;%5
 .%1
 	ld	hl,%4
 =
 	jr	nz,%1
 .%2
-	jp	%3
+	jp	%3	;%5
 .%1
 	ld	hl,%4
 
@@ -4372,7 +4374,7 @@
 	push	hl
 	ld	a,(hl)
 	cp	%1
-	jp	%2
+	jp	%2	;%5
 	pop	hl
 	push	hl
 	inc	hl
@@ -4380,7 +4382,7 @@
 	push	hl
 	ld	a,(hl)
 	cp	%1
-	jp	%2
+	jp	%2	;%5
 	inc	hl
 
 	push	hl
@@ -4413,7 +4415,7 @@
 
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%5
 	jr	%2
 .%1
 	ld	hl,1	;const
@@ -4468,13 +4470,13 @@
 	ld	de,1
 	and	a
 	sbc	hl,de
-	jp	nz,%1
+	jp	nz,%1	;%5
 	ld	hl,%2
 =
 	dec	hl
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%5
 	ld	hl,%2
 
 	and	%1
@@ -4489,17 +4491,18 @@
 	ld	l,(hl)
 	ld	h,0
 	call	l_lneg
-	jp	%1c,%2
+	jp	%1c,%2	;%5
 =
 	ld	a,(hl)
 	and	a
-	jp	%1z,%2
+	jp	%1z,%2	;%5
 
 	ld	a,h
 	and	+(255 %% 256)
 	ld	h,a
 =
 
+%notcpu 8080
 	ld	a,(hl)
 	or	128
 	ld	(hl),a
@@ -4514,12 +4517,12 @@
 	ld	h,0
 	ld	a,l
 	and	+%1
-	jp	%2,%3
+	jp	%2,%3	;%5
 	ld	hl,%4
 =
 	ld	a,+%1
 	and	(hl)
-	jp	%2,%3
+	jp	%2,%3	;%5
 	ld	hl,%4
 
 	call	l_gint	;
@@ -4553,6 +4556,34 @@
 =
 	ld	l,(hl)
 	ld	h,0
+
+	call	l_gchar
+	ld	a,h
+	or	l
+	jp	%1z,%2	;%3
+	ld	hl,%4
+=
+	ld	a,(hl)
+	and	a
+	jp	%1z,%2	;%3
+	ld	hl,%4
+
+
+%check 0 <= %1 <= 255
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+	pop	de
+	ld	a,l
+	and	%1
+	ld	l,a
+=
+	ld	a,l
+	and	%1
+	ld	l,a
+	ld	h,0
+	pop	de
 
 %cpu gbz80
 	ld	hl,_%1
@@ -4815,19 +4846,19 @@
 	push	hl
 	push	bc
 
-	jp	i_%1
+	jp	i_%1	;%5
 .%2
-	jp	i_%3
+	jp	i_%3	;%6
 =
-	jp	i_%1
+	jp	i_%1	;%5
 	defc	%2 = i_%3
 
 	jr	c,%1
 .%2
-	jp	i_%3
+	jp	i_%3	;%5
 .%1
 =
-	jp	nc,i_%3
+	jp	nc,i_%3	;%5
 	defc	%2 = i_%3
 .%1
 
@@ -4844,15 +4875,20 @@
 
 %eval 0 = %2 %1 - !
 .i_%1
-	jp	i_%2
+	jp	i_%2	;%5
 =
-	jp	i_%2
+	jp	i_%2	;%5
 	defc	i_%1 = i_%2
 
-	j%1	i_%2
-	jp	i_%3
+	jr	i_%2
+	jp	i_%3	;%5
 =
-	j%1	i_%2
+	jr	i_%2
+
+	jp	i_%2	;%4
+	jp	i_%3	;%5
+=
+	jp	i_%2	;%4
 
 	jr	i_%1
 	defc	%2
@@ -4900,23 +4936,23 @@
 	call	l_gint	;
 	ld	a,h
 	or	l
-	jp	z,%1
+	jp	z,%1	;%4
 	pop	hl
 =
 	ld	a,(hl)
 	inc	hl
 	or	(hl)
-	jp	z,%1
+	jp	z,%1	;%4
 	pop	hl
 
-	jp	i_%1
+	jp	i_%1	;%4
 	defc	%2
-	jp	i_%3
-	defc	%4
+	jp	i_%3	;%5
+	defc	%6
 =
-	jp	i_%1
+	jp	i_%1	;%4
 	defc	%2
-	defc	%4
+	defc	%6
 
 	ld	hl,%1	;const
 	call	l_gintspsp	;%2
@@ -4952,4 +4988,355 @@
 	ld	hl,%2
 	add	hl,bc
 
+	push	hl
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	or	%1
+	ld	l,a
+	pop	de
+	ld	a,l
+	ld	(de),a
+=
+	ld	a,(hl)
+	or	%1
+	ld	(hl),a
+	ld	l,a
+	ld	h,0
 
+; Try to eliminate dead loads
+=
+; XXXX
+
+	ld	l,%2
+	ld	h,0
+	jp	%1	;EOS
+=
+	jp	%1	;EOS
+
+	ex	de,hl
+	jp	%1	;EOS
+=
+	jp	%1	;EOS
+
+	%1c	hl
+	jp	%2	;EOS
+=
+	jp	%2	;EOS
+
+	ld	h,%1
+	ld	l,%2
+	jp	%3	;EOS
+=
+	jp	%3	;EOS
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	nz,%1	;EOS
+	jp	i_%3	;EOS
+=
+	ld	a,(hl)
+	and	a
+	jp	nz,%1	;EOS
+	jp	i_%3	;EOS
+
+	ld	de,32767
+	call	l_and
+=
+	res	7,h
+
+	ld	hl,_%1
+	ld	b,h
+	ld	c,l
+	ld	hl,%2
+=
+	ld	bc,_%1
+	ld	hl,%2
+
+; bit fields
+=
+;
+
+	ld	de,%2	;const
+	ex	de,hl
+	ld	a,l
+	and	%4
+	ld	l,a
+	ld	a,(de)
+	and	%3
+	or	l
+	ld	(de),a
+=
+	ld	a,(hl)
+	and	%3
+	or	%eval(%2 256 %% %4 &)
+	ld	(hl),a
+
+%notcpu 8080
+	rlca
+	and	1
+	jp	%5,%1	;%4
+=
+	bit	7,a
+	jp	%5,%1	;%4
+
+%notcpu 8080
+	rlca
+	bit	%2,a
+	jp	%5,%1	;%4
+=
+	bit	%eval(%2 1 -),a
+	jp	%5,%1	;%4
+
+	ld	de,0	;const
+	ex	de,hl
+	ld	a,l
+	rrca
+=
+	ld	de,0	;const
+	ex	de,hl
+	ld	a,l
+
+	rrca
+	and	%2
+	jp	%3z,%4	;%5
+	ld	hl,%6
+=
+	and	%eval(%2 1 <)
+	jp	%3z,%4	;%5
+	ld	hl,%6
+
+%notcpu 8080
+	ld	a,(hl)
+	and	1
+	jp	%2z,%3
+	ld	hl,%4
+=
+	bit	0,(hl)
+	jp	%2z,%3
+	ld	hl,%4
+
+%notcpu 8080
+	ld	a,(hl)
+	and	2
+	jp	%2z,%3
+	ld	hl,%4
+=
+	bit	1,(hl)
+	jp	%2z,%3
+	ld	hl,%4
+
+%notcpu 8080
+	ld	a,(hl)
+	and	4
+	jp	%2z,%3
+	ld	hl,%4
+=
+	bit	2,(hl)
+	jp	%2z,%3
+	ld	hl,%4
+
+%notcpu 8080
+	ld	a,(hl)
+	and	8
+	jp	%2z,%3
+	ld	hl,%4
+=
+	bit	3,(hl)
+	jp	%2z,%3
+	ld	hl,%4
+
+%notcpu 8080
+	ld	a,(hl)
+	and	16
+	jp	%2z,%3
+	ld	hl,%4
+=
+	bit	4,(hl)
+	jp	%2z,%3
+	ld	hl,%4
+
+%notcpu 8080
+	ld	a,(hl)
+	and	32
+	jp	%2z,%3
+	ld	hl,%4
+=
+	bit	5,(hl)
+	jp	%2z,%3
+	ld	hl,%4
+ 
+%notcpu 8080
+	ld	a,(hl)
+	and	64
+	jp	%2z,%3
+	ld	hl,%4
+=
+	bit	6,(hl)
+	jp	%2z,%3
+	ld	hl,%4
+
+%notcpu 8080
+	ld	a,(hl)
+	and	128
+	jp	%2z,%3
+	ld	hl,%4
+=
+	bit	7,(hl)
+	jp	%2z,%3
+	ld	hl,%4
+ 
+; Char constant comparisons
+=
+;
+
+%check 0 <= %1 <= 255
+	ld	l,a
+	ld	h,0
+	ld	de,%1
+	and	a
+	sbc	hl,de
+	ld	hl,1	;const
+	jr	%2z,ASMPC+3
+	dec	hl
+=
+	sub	%eval(%1 256 %%)
+	ld	hl,1	;const
+	jr	%2z,ASMPC+3
+	dec	hl
+
+	ld	l,a
+	ld	h,0
+	ld	a,h
+	or	l
+	ld	hl,%2	;const
+	jr	%3z,ASMPC+3
+=
+	and	a
+	ld	hl,%2	;const
+	jr	%3z,ASMPC+3
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	cp	%1
+	jp	%2z,%3	;%4
+	ld	hl,%5	;const
+=
+	ld	a,(hl)
+	cp	%1
+	jp	%2z,%3	;%4
+	ld	hl,%5	;const
+
+
+; long logical operations
+=
+;
+
+	call	l_glong
+	ld	a,l
+	and	%2
+	ld	l,a
+	ld	h,0
+	ld	de,0
+	ld	a,h
+	or	l
+	or	d
+	or	e
+	jp	%1	;%4
+=
+	ld	a,(hl)
+	and	%2
+	jp	%1	;%4
+
+; 16 bit port operations
+=
+;
+
+	ld	hl,%1	;const
+	ld	a,l
+	ld	bc,%2
+	out	(c),a
+	ld	hl,%3
+=
+	ld	a,%eval(%1 256 %%)
+	ld	bc,%2
+	out	(c),a
+	ld	hl,%3
+
+
+; Use stack less when we can
+=
+;
+
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	pop	de
+=
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	ld	hl,%eval(%1 2 -)	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+
+; Odd constructs observed in ping
+=
+;
+
+	ld	hl,(_%1)
+	ld	h,0
+	ex	de,hl
+	ld	hl,(_%2)
+	ld	h,0
+	call	l_or
+	ex	de,hl
+=
+	ld	a,(_%1)
+	ld	hl,_%2
+	or	(hl)
+	ld	e,a
+	ld	d,0
+
+	ld	e,a
+	ld	d,0
+	ld	hl,(_%1)
+	ld	h,0
+	call	l_or
+	ex	de,hl
+=
+	ld	hl,_%1
+	or	(hl)
+	ld	e,a
+	ld	d,0
+
+	ld	e,a
+	ld	d,0
+	ld	hl,(_%1)
+	ld	h,0
+	call	l_or
+	ld	a,l
+=
+	ld	hl,_%1
+	or	(hl)
+	ld	l,a
+	ld	h,0
+
+	ld	l,a
+	ld	h,0
+	and	a
+	jp	%1z,%2	;%3
+	ld	hl,%4
+=
+	and	a
+	jp	%1z,%2	;%3
+	ld	hl,%4

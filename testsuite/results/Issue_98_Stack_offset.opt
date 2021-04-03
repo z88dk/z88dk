@@ -15,7 +15,7 @@
 	push	bc
 	ld	a,h
 	or	l
-	jp	z,i_2
+	jp	z,i_2	;
 	ld	hl,4	;const
 	add	hl,sp
 	call	l_glong

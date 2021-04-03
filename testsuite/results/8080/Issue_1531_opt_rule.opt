@@ -41,12 +41,12 @@
 	or	l
 	jp	nz,ASMPC+4
 	scf
-	jp	nc,i_5
+	jp	nc,i_5	;
 	ld	hl,i_1+0
 	push	hl
 	call	_func
 	pop	bc
-	jp	i_6
+	jp	i_6	;EOS
 .i_5
 	ld	hl,i_1+12
 	push	hl

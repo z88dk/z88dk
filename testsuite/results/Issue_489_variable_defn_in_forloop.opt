@@ -12,7 +12,7 @@
 	push	bc
 	ld	hl,0	;const
 	push	hl
-	jp	i_4
+	jp	i_4	;EOS
 .i_2
 	pop	hl
 	inc	hl
@@ -27,13 +27,13 @@
 	ccf
 	rra
 	sbc	128
-	jp	nc,i_3
+	jp	nc,i_3	;
 	pop	hl
 	push	hl
 	push	hl
 	call	_func2
 	pop	bc
-	jp	i_2
+	jp	i_2	;EOS
 .i_3
 	pop	bc
 	ld	hl,100	;const
@@ -52,7 +52,7 @@
 	ld	e,l
 	push	de
 	push	hl
-	jp	i_7
+	jp	i_7	;EOS
 .i_5
 	ld	hl,0	;const
 	add	hl,sp
@@ -76,14 +76,14 @@
 	ccf
 	rra
 	sbc	128
-	jp	nc,i_6
+	jp	nc,i_6	;
 	ld	hl,0	;const
 	add	hl,sp
 	call	l_glong
 	push	hl
 	call	_func2
 	pop	bc
-	jp	i_5
+	jp	i_5	;EOS
 .i_6
 	pop	bc
 	pop	bc
