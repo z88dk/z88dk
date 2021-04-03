@@ -11,11 +11,9 @@
 ._func
 	ld	hl,2	;const
 	add	hl,sp
-	ld	l,(hl)
-	ld	h,0
-	ld	a,l
+	ld	a,(hl)
 	cp	128
-	jp	nz,i_2
+	jp	nz,i_2	;
 	ld	hl,0	;const
 	ret
 

@@ -71,7 +71,7 @@ int constant(LVALUE* lval)
     } else if (tstr(&val)) {
         lval->const_val = val;
         lval->is_const = 0; /* string address not constant */
-        lval->ltype = make_pointer(type_char);
+        lval->ltype = make_pointer(c_default_unsigned ? type_uchar : type_char);
         lval->ptr_type = KIND_CHAR; 
         lval->val_type = KIND_INT;
         lval->flags = FLAGS_NONE;

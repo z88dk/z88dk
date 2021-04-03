@@ -12,7 +12,7 @@
 	ld	hl,0	;const
 	push	hl
 	push	bc
-	jp	i_4
+	jp	i_4	;EOS
 .i_2
 	pop	de
 	pop	hl
@@ -31,7 +31,7 @@
 	ccf
 	rra
 	sbc	128
-	jp	nc,i_3
+	jp	nc,i_3	;
 	pop	bc
 	pop	hl
 	push	hl
@@ -77,14 +77,14 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	jp	i_2
+	jp	i_2	;EOS
 .i_3
 	ld	hl,0	;const
 	pop	de
 	pop	bc
 	push	hl
 	push	de
-	jp	i_9
+	jp	i_9	;EOS
 .i_7
 	pop	de
 	pop	hl
@@ -103,7 +103,7 @@
 	ccf
 	rra
 	sbc	128
-	jp	nc,i_8
+	jp	nc,i_8	;
 	pop	bc
 	pop	hl
 	push	hl
@@ -149,7 +149,7 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	jp	i_7
+	jp	i_7	;EOS
 .i_8
 	ld	hl,0	;const
 	pop	bc

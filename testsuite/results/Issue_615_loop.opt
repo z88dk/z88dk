@@ -27,8 +27,7 @@
 	ld	hl,(_var)
 	inc	hl
 	ld	(_var),hl
-	dec	hl
-	jp	i_7
+	jp	i_7	;EOS
 .i_6
 	ret
 
@@ -41,7 +40,7 @@
 	ld	hl,(_var)
 	ld	a,h
 	or	l
-	jp	nz,i_10
+	jp	nz,i_10	;EOS
 .i_9
 	ret
 
@@ -54,8 +53,7 @@
 	ld	hl,(_var)
 	inc	hl
 	ld	(_var),hl
-	dec	hl
-	jp	i_14
+	jp	i_14	;EOS
 	ld	hl,(_var)
 	ld	a,h
 	or	l
@@ -65,7 +63,7 @@
 .i_15
 	ld	a,h
 	or	l
-	jp	nz,i_13
+	jp	nz,i_13	;EOS
 .i_12
 	ret
 
@@ -88,7 +86,7 @@
 	ld	(_var),hl
 	dec	hl
 	call	_whilefunc
-	jp	i_18
+	jp	i_18	;EOS
 .i_19
 	ret
 
@@ -99,9 +97,9 @@
 	ld	hl,(_var)
 	ld	a,h
 	or	l
-	jp	z,i_21
+	jp	z,i_21	;
 	call	_whilefunc
-	jp	i_20
+	jp	i_20	;EOS
 .i_21
 	ret
 
@@ -122,7 +120,7 @@
 ._func3a
 	ld	hl,0	;const
 	push	hl
-	jp	i_27
+	jp	i_27	;EOS
 .i_25
 	pop	hl
 	inc	hl
@@ -133,7 +131,7 @@
 	ld	(_var),hl
 	dec	hl
 	call	_forfunc
-	jp	i_25
+	jp	i_25	;EOS
 .i_26
 	pop	bc
 	ret
@@ -143,7 +141,7 @@
 ._func3b
 	ld	hl,0	;const
 	push	hl
-	jp	i_30
+	jp	i_30	;EOS
 .i_28
 	pop	hl
 	inc	hl
@@ -156,9 +154,9 @@
 	push	hl
 	ld	a,h
 	or	l
-	jp	z,i_29
+	jp	z,i_29	;
 	call	_forfunc
-	jp	i_28
+	jp	i_28	;EOS
 .i_29
 	pop	bc
 	ret

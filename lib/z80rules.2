@@ -4,12 +4,12 @@
 	ld	hl,%1	;const
 	pop	de
 	call	l_ne
-	jp	c,%2
+	jp	c,%2	;%4
 	ld	hl,%3
 =
 	ld	a,(hl)
 	cp	+(%1 % 256)
-	jp	nz,%2
+	jp	nz,%2	;%4
 	ld	hl,%3
 
 	ld	l,(hl)
@@ -18,14 +18,14 @@
 	cp	%1
 	jr	%2,ASMPC+3
 	scf
-	jp	%3,%4
+	jp	%3,%4	;%8
 	ld	hl,%5
 =
 	ld	a,(hl)
 	cp	%1
 	jr	%2,ASMPC+3
 	scf
-	jp	%3,%4
+	jp	%3,%4	;%8
 	ld	hl,%5
 
 	ld	l,(hl)
@@ -34,12 +34,12 @@
 	ld	hl,%1	;const
 	pop	de
 	call	l_ne
-	jp	nc,%2
+	jp	nc,%2	;%8
 	ld	hl,%3
 =
 	ld	a,(hl)
 	cp	+(%1 % 256)
-	jp	z,%2
+	jp	z,%2	;%8
 	ld	hl,%3
 
 	ld	l,(hl)
@@ -48,12 +48,12 @@
 	ld	hl,%1	;const
 	pop	de
 	call	l_eq
-	jp	c,%2
+	jp	c,%2	;%8
 	ld	hl,%3
 =
 	ld	a,(hl)
 	cp	+(%1 % 256)
-	jp	z,%2
+	jp	z,%2	;%8
 	ld	hl,%3
 
 	ld	l,(hl)
@@ -62,12 +62,12 @@
 	ld	hl,%1	;const
 	pop	de
 	call	l_eq
-	jp	nc,%2
+	jp	nc,%2	;%8
 	ld	hl,%3
 =
 	ld	a,(hl)
 	cp	+(%1 % 256)
-	jp	nz,%2
+	jp	nz,%2	;%8
 	ld	hl,%3
 
 	ld	l,(hl)
@@ -78,12 +78,12 @@
 	call	l_and
 	ld	a,h
 	or	l
-	jp	nz,%2
+	jp	nz,%2	;%8
 	ld	hl,%3
 =
 	ld	a,(hl)
 	and	+(%1 % 256)
-	jp	nz,%2
+	jp	nz,%2	;%8
 	ld	hl,%3
 
 	ld	l,(hl)
@@ -94,12 +94,12 @@
 	call	l_and
 	ld	a,h
 	or	l
-	jp	z,%2
+	jp	z,%2	;%8
 	ld	hl,%3
 =
 	ld	a,(hl)
 	and	+(%1 % 256)
-	jp	z,%2
+	jp	z,%2	;%8
 	ld	hl,%3
 
 	push	hl
@@ -271,11 +271,11 @@
 	call	l_and
 	ld	a,h
 	or	l
-	jp	z,%2
+	jp	z,%2	;%8
 =
 	ld	a,(hl)
 	and	+(%1 % 256)
-	jp	z,%2
+	jp	z,%2	;%8
 	ld	l,a
 	ld	h,0
 
@@ -303,13 +303,13 @@
 	ld	hl,%2	;const
 	pop	de
 	call	l_ne
-	jp	c,%3
+	jp	c,%3	;%8
 =
 	ld	a,(hl)
 	and	+(%1 % 256)
 	cp	+(%2 % 256)
 	ld	hl,1
-	jp	nz,%3
+	jp	nz,%3	;%8
 	dec	hl
 
 	ld	l,(hl)
@@ -322,13 +322,13 @@
 	ld	hl,%2	;const
 	pop	de
 	call	l_ne
-	jp	nc,%3
+	jp	nc,%3	;%8
 =
 	ld	a,(hl)
 	and	+(%1 % 256)
 	cp	+(%2 % 256)
 	ld	hl,0
-	jp	z,%3
+	jp	z,%3	;%8
 	inc	hl
 
 	ld	l,(hl)
@@ -341,13 +341,13 @@
 	ld	hl,%2	;const
 	pop	de
 	call	l_ne
-	jp	nc,%3
+	jp	nc,%3	;%8
 =
 	ld	a,(hl)
 	or	+(%1 % 256)
 	cp	+(%2 % 256)
 	ld	hl,0
-	jp	z,%3
+	jp	z,%3	;%8
 	inc	hl
 
 	ld	l,(hl)
@@ -360,13 +360,13 @@
 	ld	hl,%2	;const
 	pop	de
 	call	l_ne
-	jp	nc,%3
+	jp	nc,%3	;%8
 =
 	ld	a,(hl)
 	xor	+(%1 % 256)
 	cp	+(%2 % 256)
 	ld	hl,0
-	jp	z,%3
+	jp	z,%3	;%8
 	inc	hl
 
 	ld	l,(hl)
@@ -379,13 +379,13 @@
 	ld	hl,%2	;const
 	pop	de
 	call	l_eq
-	jp	nc,%3
+	jp	nc,%3	;%8
 =
 	ld	a,(hl)
 	and	+(%1 % 256)
 	cp	+(%2 % 256)
 	ld	hl,0
-	jp	nz,%3
+	jp	nz,%3	;%8
 	inc	hl
 
 	ld	l,(hl)
@@ -398,13 +398,13 @@
 	ld	hl,%2	;const
 	pop	de
 	call	l_eq
-	jp	nc,%3
+	jp	nc,%3	;%8
 =
 	ld	a,(hl)
 	or	+(%1 % 256)
 	cp	+(%2 % 256)
 	ld	hl,0
-	jp	nz,%3
+	jp	nz,%3	;%8
 	inc	hl
 
 	ld	l,(hl)
@@ -417,13 +417,13 @@
 	ld	hl,%2	;const
 	pop	de
 	call	l_eq
-	jp	nc,%3
+	jp	nc,%3	;%8
 =
 	ld	a,(hl)
 	xor	+(%1 % 256)
 	cp	+(%2 % 256)
 	ld	hl,1
-	jp	nz,%3
+	jp	nz,%3	;%8
 	dec	hl
 
 	push	hl
@@ -789,24 +789,24 @@
 	ld	h,0
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%8
 	ld	hl,%2
 =
 	ld	a,(hl)
 	and	a
-	jp	nz,%1
+	jp	nz,%1	;%8
 	ld	hl,%2
 
 	ld	l,(hl)
 	ld	h,0
 	ld	a,h
 	or	l
-	jp	z,%1
+	jp	z,%1	;%8
 	ld	hl,%2
 =
 	ld	a,(hl)
 	and	a
-	jp	z,%1
+	jp	z,%1	;%8
 	ld	hl,%2
 
 	ld	l,(hl)
@@ -815,12 +815,12 @@
 	ld	hl,%1	;const
 	pop	de
 	call	l_ult
-	jp	nc,%2
+	jp	nc,%2	;%8
 	ld	hl,%3
 =
 	ld	a,(hl)
 	cp	+(%1 % 256)
-	jp	nc,%2
+	jp	nc,%2	;%8
 	ld	hl,%3
 
 	ld	l,(hl)
@@ -829,13 +829,13 @@
 	ld	hl,%1	;const
 	pop	de
 	call	l_ule
-	jp	nc,%2
+	jp	nc,%2	;%8
 	ld	hl,%3
 =
 	ld	a,(hl)
 	cp	+(%1 % 256)
 	jr	z,%2_ule
-	jp	nc,%2
+	jp	nc,%2	;%8
 .%2_ule
 	ld	hl,%3
 
@@ -846,13 +846,13 @@
 	ld	hl,%1	;const
 	pop	de
 	call	l_ugt
-	jp	nc,%2
+	jp	nc,%2	;%8
 	ld	hl,%3
 =
 	ld	a,(hl)
 	cp	+(%1 % 256)
-	jp	z,%2
-	jp	c,%2
+	jp	z,%2	;%8
+	jp	c,%2	;%8
 	ld	hl,%3
 
 	ld	l,(hl)
@@ -861,12 +861,12 @@
 	ld	hl,%1	;const
 	pop	de
 	call	l_uge
-	jp	nc,%2
+	jp	nc,%2	;%8
 	ld	hl,%3
 =
 	ld	a,(hl)
 	cp	+(%1 % 256)
-	jp	c,%2
+	jp	c,%2	;%8
 	ld	hl,%3
 
 	ld	(%1),hl
@@ -993,28 +993,28 @@
 	ld	e,l
 
 	and	+(1 % 256)
-	jp	z,%1
+	jp	z,%1	;%8
 =
 	rrca
-	jp	nc,%1
+	jp	nc,%1	;%8
 
 	and	+(1 % 256)
-	jp	nz,%1
+	jp	nz,%1	;%8
 =
 	rrca
-	jp	c,%1
+	jp	c,%1	;%8
 
 	and	+(128 % 256)
-	jp	z,%1
+	jp	z,%1	;%8
 =
 	rlca
-	jp	nc,%1
+	jp	nc,%1	;%8
 
 	and	+(128 % 256)
-	jp	nz,%1
+	jp	nz,%1	;%8
 =
 	rlca
-	jp	c,%1
+	jp	c,%1	;%8
 
 	call	htons
 =
@@ -1089,11 +1089,11 @@
 	ld	h,0
 	ld	a,h
 	or	l
-	jp	%1
+	jp	%1	;%8
 	ld	hl,%2
 =
 	and	a
-	jp	%1
+	jp	%1	;%8
 	ld	hl,%2
 
 	ld	de,256
@@ -1175,7 +1175,7 @@
 	ld	h,0
 	ld	a,h
 	or	l
-	jp	nz,%2
+	jp	nz,%2	;%8
 	ei
 .%2
 =
@@ -1390,22 +1390,22 @@ REMOVE THIS LINE FOR IT TO FIRE
 	ld	hl,0	;const
 	pop	de
 	call	l_ne
-	jp	nc,%2
+	jp	nc,%2	;%8
 =
 	pop	hl
 	ld	a,h
 	or	l
-	jp	z,%2
+	jp	z,%2	;%8
 
 	ld	hl,0	;const
 	pop	de
 	call	l_ne
-	jp	c,%2
+	jp	c,%2	;%8
 =
 	pop	hl
 	ld	a,h
 	or	l
-	jp	nz,%2
+	jp	nz,%2	;%8
 
 	call	l_neg
 	pop	de

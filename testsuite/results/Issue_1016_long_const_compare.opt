@@ -19,13 +19,13 @@
 	ld	bc,4
 	push	bc
 	call	l_long_lt
-	jp	nc,i_2
+	jp	nc,i_2	;
 	ld	hl,i_1+0
 	push	hl
 	ld	a,1
 	call	printf
 	pop	bc
-	jp	i_3
+	jp	i_3	;EOS
 .i_2
 	ld	hl,i_1+6
 	push	hl
@@ -39,13 +39,13 @@
 	ld	hl,4	;const
 	ld	de,0
 	call	l_long_gt
-	jp	nc,i_4
+	jp	nc,i_4	;
 	ld	hl,i_1+0
 	push	hl
 	ld	a,1
 	call	printf
 	pop	bc
-	jp	i_5
+	jp	i_5	;EOS
 .i_4
 	ld	hl,i_1+6
 	push	hl

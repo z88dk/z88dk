@@ -98,13 +98,13 @@
 	ld	hl,%1
 	ld	a,h
 	or	l
-	jp	%2
+	jp	%2	;%4
 	ld	hl,%1
 =
 	ld	hl,%1
 	ld	a,h
 	or	l
-	jp	%2
+	jp	%2	;%4
 
 	push	hl
 	pop	bc
@@ -388,20 +388,20 @@
 	ld	h,0
 	ld	a,h
 	or	l
-	jp	z,%1
+	jp	z,%1	;%4
 =
 	ld	a,l
 	and	a
-	jp	z,%1
+	jp	z,%1	;%4
 
 	ld	h,0
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%4
 =
 	ld	a,l
 	and	a
-	jp	nz,%1
+	jp	nz,%1	;%4
 
 	ld	l,a
 	ld	h,0
