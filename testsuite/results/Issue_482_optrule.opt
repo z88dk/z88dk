@@ -32,12 +32,11 @@
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
-	push	de
-	ld	hl,4	;const
+	ld	hl,2	;const
 	add	hl,sp
-	ld	e,(hl)
-	ld	d,0
-	pop	hl
+	ld	l,(hl)
+	ld	h,0
+	ex	de,hl
 	and	a
 	sbc	hl,de
 	pop	de

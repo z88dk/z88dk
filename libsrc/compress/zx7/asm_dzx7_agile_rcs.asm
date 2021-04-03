@@ -1,4 +1,5 @@
 
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 ; ===============================================================
 ; Dec 2012 by Einar Saukas
 ; "Agile" integrated RCS+ZX7 decoder by Einar Saukas (151 bytes)
@@ -10,6 +11,7 @@
 ;
 ; ===============================================================
 
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 SECTION code_clib
 SECTION code_compress_zx7
 
@@ -195,3 +197,5 @@ dzx7a_convert:
         pop     de                      ; D = 010RRppp
         ld      e, a                    ; E = rrrccccc
         ret
+ENDIF
+ENDIF

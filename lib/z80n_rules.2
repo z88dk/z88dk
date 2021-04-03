@@ -236,3 +236,9 @@
 	ld	a,l
 =
 	ld	l,a
+
+%check 0 <= %2 <= 65535
+	ld	hl,_%1
+	add	hl,%2
+=
+	ld	hl,_%1 + %2

@@ -17,7 +17,7 @@
 	call	l_f16_le
 	ld	a,h
 	or	l
-	jp	z,i_2
+	jp	z,i_2	;
 	ld	hl,0	;const
 	pop	bc
 	pop	af
@@ -33,7 +33,7 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_3
+	jp	z,i_3	;
 	ld	hl,15360	;const
 	pop	bc
 	pop	af
@@ -49,7 +49,7 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_4
+	jp	z,i_4	;
 	ld	hl,4	;const
 	add	hl,sp
 	call	l_gint	;

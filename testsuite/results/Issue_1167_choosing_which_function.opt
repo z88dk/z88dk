@@ -15,9 +15,9 @@
 	push	bc
 	ld	a,h
 	or	l
-	jp	z,i_2
+	jp	z,i_2	;
 	ld	hl,_func1
-	jp	i_3
+	jp	i_3	;
 .i_2
 	ld	hl,_func2
 .i_3

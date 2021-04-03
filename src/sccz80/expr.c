@@ -222,13 +222,13 @@ int heir1a(LVALUE* lval)
             /* evaluate 'true' expression */
             if (heir1(&lval2))
                 rvalue(&lval2);
-            gen_jp_label(endlab = getlabel());
+            gen_jp_label(endlab = getlabel(), 0);
             postlabel(falselab);
         } else {
             jumpnc(falselab = getlabel());
             if (heir1(&lval2))
                 rvalue(&lval2);
-            gen_jp_label(endlab = getlabel());
+            gen_jp_label(endlab = getlabel(), 0);
             postlabel(falselab);
         }
         needchar(':');
@@ -240,7 +240,7 @@ int heir1a(LVALUE* lval)
             zconvert_to_double(lval->val_type, lval2.val_type, lval->ltype->isunsigned);
             postlabel(endlab);
         } else if (lval2.val_type != lval->val_type && kind_is_floating(lval->val_type)) {
-            gen_jp_label(skiplab = getlabel());
+            gen_jp_label(skiplab = getlabel(),0);
             postlabel(endlab);
             zconvert_to_double(lval2.val_type, lval->val_type, lval2.ltype->isunsigned);
             postlabel(skiplab);
@@ -250,7 +250,7 @@ int heir1a(LVALUE* lval)
             lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             postlabel(endlab);
         } else if (lval2.val_type != KIND_LONG && lval->val_type == KIND_LONG) {
-            gen_jp_label(skiplab = getlabel());
+            gen_jp_label(skiplab = getlabel(),0);
             postlabel(endlab);
             widenintegers(lval, &lval2);
             lval->val_type = KIND_LONG;

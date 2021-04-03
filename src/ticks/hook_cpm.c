@@ -51,6 +51,8 @@ void hook_cpm(void)
         fflush(stdout);
         break;
     }
+    case 0x0e:  // DRV_SET
+        break;
     case 0x19:  // DRV_GET
         a = 0;  // Current drive is a
         break;

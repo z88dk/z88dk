@@ -1,4 +1,5 @@
 
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 ; ===============================================================
 ; Feb 2016 by Einar Saukas - BACKWARDS VARIANT
 ; "Agile" integrated RCS+ZX7 decoder by Einar Saukas (129 bytes)
@@ -173,3 +174,4 @@ dzx7a_convert_b:
         pop     de                      ; D = 010RRppp
         ld      e, a                    ; E = rrrccccc
         ret
+ENDIF

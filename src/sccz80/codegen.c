@@ -1253,9 +1253,9 @@ void gen_save_pointer(LVALUE *lval)
 
 
 /* Jump to specified internal label number */
-void gen_jp_label(int label)
+void gen_jp_label(int label, int end_of_scope)
 {
-    opjump("", label);
+    opjump("", label, end_of_scope);
 }
 
 /* Jump relative to specified internal label */
@@ -1268,11 +1268,15 @@ void jumpr(int label)
  * Output the jump code, with conditions as needed
  */
 
-void opjump(char* cc, int label)
+void opjump(char* cc, int label, int end_of_scope)
 {
     ot("jp\t");
     outstr(cc);
     printlabel(label);
+    outstr("\t;");
+    if ( end_of_scope ) {
+        outstr("EOS");
+    }
     nl();
 }
 
@@ -1286,12 +1290,12 @@ void opjumpr(char* cc, int label)
 
 void jumpc(int label)
 {
-    opjump("c,", label);
+    opjump("c,", label, 0);
 }
 
 void jumpnc(int label)
 {
-    opjump("nc,", label);
+    opjump("nc,", label, 0);
 }
 
 static void setcond(int val)
@@ -1329,7 +1333,7 @@ void testjump(LVALUE* lval, int label)
         ol("or\te");
         ol("exx");
     }
-    opjump("z,", label);
+    opjump("z,", label, 0);
 }
 
 
@@ -3742,7 +3746,7 @@ void eq0(LVALUE* lval, int label)
         ol("ld\ta,h");
         ol("or\tl");
     }
-    opjump("nz,", label);
+    opjump("nz,", label, 0);
 }
 
 
@@ -5445,7 +5449,7 @@ void gen_switch_case(Kind kind, int64_t value, int label)
             outdec(value);
             outstr("% 256)\n");
         }
-        opjump("z,", label);
+        opjump("z,", label, 0);
     } else {
         defword();
         printlabel(label); /* case label */

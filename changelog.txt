@@ -5,6 +5,9 @@ z88dk v2.2 - xx.xx.xxx
 
 Detailed but incomplete changelist:
 
+- [classic] +cpm: Amstrad, Televideo, Bondwell disc creation
+- [classic] +cpm: support for Bondwell 2 console and graphics
+- [classic] +cpm: Amstrad PCW Graphics library
 - [appmake] Compressed ROM data sections can now use zx0
 - [all] Compressed data can now use ZX0 compression tools
 - [classic] ZX0 decompression functions added

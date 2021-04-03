@@ -241,20 +241,20 @@
 
 
 	call	l_lneg
-	jp	c,%1
+	jp	c,%1	;%8
 =
 	bool	hl
 	dec	hl
 	bool	hl
-	jp	nz,%1
+	jp	nz,%1	;%8
 
 	call	l_lneg
-	jp	nc,%1
+	jp	nc,%1	;%8
 =
 	bool	hl
 	dec	hl
 	bool	hl
-	jp	z,%1
+	jp	z,%1	;%8
 
 	call	l_lneg
 	call	c,%1

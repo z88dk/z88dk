@@ -11,7 +11,7 @@
 ._test
 	ld	a,(_version)
 	sub	4
-	jp	nc,i_3
+	jp	nc,i_3	;
 	ld	hl,(_mem_size)
 	ld	de,(_mem_size+2)
 	push	de
@@ -19,7 +19,7 @@
 	ld	hl,0	;const
 	ld	de,1
 	call	l_long_eq
-	jp	nc,i_3
+	jp	nc,i_3	;
 	defc	i_3 = i_2
 .i_4_i_3
 	ld	hl,2	;const
@@ -37,7 +37,7 @@
 ._test_or
 	ld	a,(_version)
 	sub	4
-	jp	c,i_6
+	jp	c,i_6	;
 	ld	hl,(_mem_size)
 	ld	de,(_mem_size+2)
 	push	de
@@ -45,7 +45,7 @@
 	ld	hl,0	;const
 	ld	de,1
 	call	l_long_eq
-	jp	nc,i_5
+	jp	nc,i_5	;
 .i_6
 	ld	hl,2	;const
 	add	hl,sp
@@ -62,14 +62,14 @@
 ._test_value
 	ld	a,(_version)
 	sub	4
-	jp	c,i_9
+	jp	c,i_9	;
 	ld	hl,(_mem_size)
 	ld	de,(_mem_size+2)
 	ld	a,h
 	or	l
 	or	d
 	or	e
-	jp	z,i_8
+	jp	z,i_8	;
 .i_9
 	ld	hl,2	;const
 	add	hl,sp
@@ -86,14 +86,14 @@
 ._test_value_and
 	ld	a,(_version)
 	sub	4
-	jp	nc,i_12
+	jp	nc,i_12	;
 	ld	hl,(_mem_size)
 	ld	de,(_mem_size+2)
 	ld	a,h
 	or	l
 	or	d
 	or	e
-	jp	z,i_12
+	jp	z,i_12	;
 	defc	i_12 = i_11
 .i_13_i_12
 	ld	hl,2	;const
