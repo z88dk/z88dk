@@ -68,12 +68,9 @@
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
-	push	de
-	ld	hl,2	;const
-	add	hl,sp
-	ld	l,(hl)
+	pop	hl
+	push	hl
 	ld	h,0
-	pop	de
 	add	hl,de
 	ld	(hl),+(12 % 256 % 256)
 	jp	i_6	;EOS
