@@ -14,7 +14,7 @@
         SECTION   code_clib
         PUBLIC    cpc_SetColour_callee
         PUBLIC    _cpc_SetColour_callee
-        PUBLIC    ASMDISP_CPC_SETCOLOUR_CALLEE
+        PUBLIC    asm_cpc_SetColour
 
 .cpc_SetColour_callee
 ._cpc_SetColour_callee
@@ -27,7 +27,7 @@
    ; enter : l = color
    ;         e = color number
 
-.asmentry
+.asm_cpc_SetColour
 	ld	a,l
   	LD BC,$7F00                     ;Gate Array 
 	OUT (C),A                       ;Color number
@@ -37,4 +37,3 @@
 	RET
 	
 	
-DEFC ASMDISP_CPC_SETCOLOUR_CALLEE = asmentry - cpc_SetColour_callee
