@@ -14,7 +14,7 @@
         SECTION   code_clib
         PUBLIC    cpc_RLI_callee
         PUBLIC    _cpc_RLI_callee
-        PUBLIC    ASMDISP_CPC_RLI_CALLEE		
+        PUBLIC    asm_cpc_RLI	
 
 
 .cpc_RLI_callee
@@ -26,7 +26,7 @@
 	ex	(sp),hl	; pos
 	
 
-.asmentry
+.asm_cpc_RLI
 	ld	a,e
 	ld (_ancho+1),a
 	ld	a,c
@@ -72,4 +72,3 @@ add HL,BC
 jp ciclo0
 
 	
-DEFC ASMDISP_CPC_RLI_CALLEE = asmentry - cpc_RLI_callee

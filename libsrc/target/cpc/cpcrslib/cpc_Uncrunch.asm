@@ -12,8 +12,7 @@
         SECTION   code_clib
         PUBLIC    cpc_Uncrunch
         PUBLIC    _cpc_Uncrunch
-        EXTERN     cpc_Uncrunch_callee
-        EXTERN    ASMDISP_CPC_UNCRUNCH_CALLEE
+        EXTERN     asm_cpc_Uncrunch
 
 .cpc_Uncrunch
 ._cpc_Uncrunch
@@ -23,4 +22,4 @@
         push    de
         push    hl
         push    bc
-        jp cpc_Uncrunch_callee + ASMDISP_CPC_UNCRUNCH_CALLEE
+        jp asm_cpc_Uncrunch

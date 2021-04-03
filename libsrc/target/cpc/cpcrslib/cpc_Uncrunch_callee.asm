@@ -14,7 +14,7 @@
         SECTION   smc_clib
         PUBLIC    cpc_Uncrunch_callee
         PUBLIC    _cpc_Uncrunch_callee
-        PUBLIC    ASMDISP_CPC_UNCRUNCH_CALLEE
+        PUBLIC    asm_cpc_Uncrunch
 		
         EXTERN cpc_DisableFirmware
         EXTERN cpc_EnableFirmware
@@ -31,7 +31,7 @@
    ex (sp),hl
 	
 	
-.asmentry
+.asm_cpc_Uncrunch
 ; datos necesarios que vienen en la pila:
 ; ORIGEN	HL
 ; DESTINO	DE
@@ -303,4 +303,3 @@ exx            ; output the byte n times
 	jp cpc_EnableFirmware
 	
 	
-DEFC ASMDISP_CPC_UNCRUNCH_CALLEE = asmentry - cpc_Uncrunch_callee

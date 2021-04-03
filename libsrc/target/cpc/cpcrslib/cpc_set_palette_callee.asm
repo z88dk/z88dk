@@ -12,7 +12,7 @@
         PUBLIC    _cpc_set_palette_callee
         PUBLIC    cpc_SetInk_callee
         PUBLIC    _cpc_SetInk_callee
-        PUBLIC    ASMDISP_CPC_SET_PALETTE_CALLEE
+        PUBLIC    asm_cpc_set_palette
         EXTERN firmware
 
         INCLUDE "target/cpc/def/cpcfirm.def"              
@@ -30,7 +30,7 @@
    ; enter : l = pen
    ;         c = color
 
-.asmentry
+.asm_cpc_set_palette
 ;       ACTION Sets the colours of a PEN - if the two values supplied are different then the colours will alternate (flash)
 ;       ENTRY A contains the PEN number, B contains the first colour, and C holds the second colour
 	ld	a,l
@@ -39,4 +39,3 @@
 	defw scr_set_ink 
 	ret
 
-DEFC ASMDISP_CPC_SET_PALETTE_CALLEE = asmentry - cpc_set_palette_callee

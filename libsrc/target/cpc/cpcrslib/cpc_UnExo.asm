@@ -12,8 +12,7 @@
         SECTION   code_clib
         PUBLIC    cpc_UnExo
         PUBLIC    _cpc_UnExo
-        EXTERN     cpc_UnExo_callee
-        EXTERN    ASMDISP_CPCUNEXO_CALLEE
+        EXTERN     asm_cpc_UnExo
 
 .cpc_UnExo
 ._cpc_UnExo
@@ -34,7 +33,7 @@ push de
 push af
 
 	di
-        call cpc_UnExo_callee + ASMDISP_CPCUNEXO_CALLEE
+        call asm_cpc_UnExo
 	ei
 	ret
   

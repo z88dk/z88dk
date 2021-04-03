@@ -10,7 +10,7 @@
         SECTION   code_clib
         PUBLIC    cpc_rsx_strcpy_callee
         PUBLIC    _cpc_rsx_strcpy_callee
-        PUBLIC    ASMDISP_CPC_RSX_STRCPY_CALLEE
+        PUBLIC    asm_cpc_rsx_strcpy
         EXTERN     strlen
         EXTERN     malloc
 
@@ -26,7 +26,7 @@
    ;         de = char *dst
    ; exit  : hl = char *dst
 
-.asmentry
+.asm_cpc_rsx_strcpy
 
         push    de      ; cpcstr
 
@@ -57,4 +57,3 @@
 
         ret
 
-DEFC ASMDISP_CPC_RSX_STRCPY_CALLEE = asmentry - cpc_rsx_strcpy_callee
