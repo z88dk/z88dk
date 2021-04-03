@@ -5218,6 +5218,16 @@
 	ld	hl,%2	;const
 	jr	%3z,ASMPC+3
 
+	push	hl
+	ld	a,(hl)
+	and	%1
+	pop	de
+	ld	(de),a
+=
+	ld	a,(hl)
+	and	%1
+	ld	(hl),a
+
 	ld	l,(hl)
 	ld	h,0
 	ld	a,l
