@@ -16,7 +16,7 @@
 	PUBLIC	fillb_callee
 	PUBLIC	_fillb_callee
 	
-	PUBLIC	ASMDISP_FILLB_CALLEE
+	PUBLIC	asm_fillb
 
 	EXTERN	w_area
 
@@ -39,9 +39,8 @@
 		
 		exx
 		
-.asmentry
+.asm_fillb
 		
 		ld	a,2
 		jp	w_area
 
-DEFC ASMDISP_FILLB_CALLEE = asmentry - fillb_callee

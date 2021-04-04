@@ -16,7 +16,7 @@
 	PUBLIC	clga_callee
 	PUBLIC	_clga_callee
 	
-	PUBLIC	ASMDISP_CLGA_CALLEE
+	PUBLIC	asm_clga
 
 	EXTERN	w_area
 
@@ -39,9 +39,7 @@
 		
 		exx
 		
-.asmentry
+.asm_clga
 		
 		ld	a,1
 		jp	w_area
-
-DEFC ASMDISP_CLGA_CALLEE = asmentry - clga_callee

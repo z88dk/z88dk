@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC cplot
 PUBLIC _cplot
-EXTERN cplot_callee
-EXTERN ASMDISP_CPLOT_CALLEE
+EXTERN asm_cplot
 
 .cplot
 ._cplot
@@ -18,4 +17,4 @@ EXTERN ASMDISP_CPLOT_CALLEE
    push bc
    push af
 
-   jp cplot_callee + ASMDISP_CPLOT_CALLEE
+   jp asm_cplot

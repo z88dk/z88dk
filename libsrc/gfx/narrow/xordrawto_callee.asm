@@ -1,23 +1,13 @@
-;
-;     Z88 Graphics Functions - Small C+ stubs
-;
-;     Written around the Interlogic Standard Library
-;
-;     Stubs Written by D Morris - 30/9/98
-;
 ; ----- void __CALLEE__ xordrawto(int x2, int y2)
-;
-;    $Id: xordrawto_callee.asm $
-;
 
 IF !__CPU_INTEL__ & !__CPU_GBZ80__
-    SECTION   code_graphics
+    SECTION code_graphics
 
-    PUBLIC    xordrawto_callee
-    PUBLIC    _xordrawto_callee
+    PUBLIC  xordrawto_callee
+    PUBLIC  _xordrawto_callee
     
-    PUBLIC    ASMDISP_XORDRAWTO_CALLEE
-
+    PUBLIC  asm_xordrawto
+    
     EXTERN    swapgfxbk
     EXTERN    __graphics_end
     
@@ -29,14 +19,14 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 .xordrawto_callee
 ._xordrawto_callee    
-    pop    af    ; ret addr
-    pop de    ; y2
-    pop hl
-    ld    d,l    ; x2
+    pop     af    ; ret addr
+    pop     de    ; y2
+    pop     hl
+    ld      d,l    ; x2
     push    af    ; ret addr
     
-.asmentry
-    ld    hl,(__gfx_coords)
+.asm_xordrawto
+    ld      hl,(__gfx_coords)
     push    ix
 IF NEED_swapgfxbk = 1
     call    swapgfxbk
@@ -46,17 +36,15 @@ ENDIF
     call    respixel
     pop     de
     pop     hl
-    ld    ix,respixel
+    ld      ix,respixel
     call    Line
 IF NEED_swapgfxbk
     jp      __graphics_end
 ELSE
   IF !__CPU_INTEL__ & !__CPU_GBZ80__
-    pop    ix
+    pop     ix
   ENDIF
     ret
 ENDIF
 
-
-DEFC ASMDISP_XORDRAWTO_CALLEE = asmentry - xordrawto_callee
 ENDIF

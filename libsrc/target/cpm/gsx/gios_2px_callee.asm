@@ -16,7 +16,7 @@ EXTERN	gios
 EXTERN	gios_ctl
 EXTERN	gios_ptsin
 
-PUBLIC ASMDISP_GIOS_2PX
+PUBLIC asm_gios_2px
 
 
 gios_2px_callee:
@@ -46,7 +46,7 @@ _gios_2px_callee:
 	pop	de		; fn
 	push bc
 	
-.asmentry
+.asm_gios_2px
 
 	ld	hl,gios_ctl+2	; n_ptsin
 	ld	(hl),2			; 2 xy coordinates = (4 int parameters)
@@ -58,5 +58,4 @@ _gios_2px_callee:
 
 
 
-DEFC ASMDISP_GIOS_2PX = asmentry - gios_2px_callee
 

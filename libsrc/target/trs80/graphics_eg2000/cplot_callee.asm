@@ -11,7 +11,7 @@
 SECTION code_clib
 PUBLIC cplot_callee
 PUBLIC _cplot_callee
-PUBLIC ASMDISP_CPLOT_CALLEE
+PUBLIC asm_cplot
 
 .cplot_callee
 ._cplot_callee
@@ -22,7 +22,7 @@ PUBLIC ASMDISP_CPLOT_CALLEE
    pop de
    push af
 
-.asmentry
+.asm_cplot
 
    ld	a,c
    and 3
@@ -86,4 +86,3 @@ PUBLIC ASMDISP_CPLOT_CALLEE
 
 		ret
 
-DEFC ASMDISP_CPLOT_CALLEE = asmentry - cplot_callee

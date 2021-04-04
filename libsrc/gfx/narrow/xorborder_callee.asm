@@ -2,15 +2,15 @@
 IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION code_graphics
     
-    PUBLIC    xorborder_callee
-    PUBLIC   _xorborder_callee
+    PUBLIC  xorborder_callee
+    PUBLIC  _xorborder_callee
    
-    PUBLIC    ASMDISP_XORBORDER_CALLEE
+    PUBLIC  asm_xorborder
    
-    EXTERN    xorpixel
-    EXTERN    swapgfxbk
-    EXTERN    swapgfxbk1
-    INCLUDE    "graphics/grafix.inc"
+    EXTERN  xorpixel
+    EXTERN  swapgfxbk
+    EXTERN  swapgfxbk1
+    INCLUDE "graphics/grafix.inc"
 
 
 ;
@@ -32,16 +32,17 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 .xorborder_callee
 ._xorborder_callee
 
-    pop af
-    pop bc    ; height
-    pop de
-    ld    b,e    ; width
-    pop hl    ; x
-    pop    de
-    ld    h,e    ; y    
-    push af
+    pop     af
+    pop     bc    ; height
+    pop     de
+    ld      b,e    ; width
+    pop     hl    ; x
+    pop     de
+    ld      h,e    ; y    
+    push    af
     
-.asmentry
+.asm_xorborder
+
 
 IF NEED_swapgfxbk = 1
     call    swapgfxbk
@@ -51,39 +52,38 @@ ENDIF
 
 ; -- Vertical lines --
     push    hl
-    ld    a,h
-    add    a,b
+    ld      a,h
+    add     a,b
     ;ret    c    ; overflow ?
-    dec    a
-    ld    h,a
-    pop    de
+    dec     a
+    ld      h,a
+    pop     de
 .rowloop
     push    bc
     
-    inc    l
-    ex    de,hl
+    inc     l
+    ex      de,hl
     push    hl
     push    de
     call    xorpixel
-    pop    de
-    pop    hl
-    inc    l
+    pop     de
+    pop     hl
+    inc     l
+    pop     bc
+    dec     c
+    jr      nz,rowloop
 
-    pop    bc
-    dec    c
-    jr    nz,rowloop
-
-    pop    hl
-    pop    bc
+    pop     hl
+    pop     bc
 
 ; -- Horizontal lines --
     push    hl
-    ld    a,l
-    add    a,c
+    ld      a,l
+    add     a,c
     ;ret    c    ; overflow ?
-    dec    a
-    ld    l,a
-    pop    de
+    dec     a
+    ld      l,a
+    pop     de
 
 .vrowloop
     push    bc
@@ -91,20 +91,16 @@ ENDIF
     push    hl
     push    de
     call    xorpixel
-    pop    de
-    pop    hl
-    inc    h
-    ex    de,hl
-    inc    h
-
-    pop    bc
-
+    pop     de
+    pop     hl
+    inc     h
+    ex      de,hl
+    inc     h
+    pop     bc
     djnz    vrowloop
 IF NEED_swapgfxbk = 1
-    jp    swapgfxbk1
+    jp      swapgfxbk1
 ELSE
     ret
 ENDIF
-
-DEFC ASMDISP_XORBORDER_CALLEE = asmentry - xorborder_callee
 ENDIF

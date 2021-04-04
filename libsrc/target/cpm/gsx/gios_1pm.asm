@@ -12,8 +12,7 @@ SECTION code_clib
 PUBLIC	gios_1pm
 PUBLIC	_gios_1pm
 
-EXTERN ASMDISP_GIOS_1PM
-EXTERN gios_1pm_callee
+EXTERN asm_gios_1pm
 
 gios_1pm:
 _gios_1pm:
@@ -25,4 +24,4 @@ _gios_1pm:
    push de
    push af
    
-   jp gios_1pm_callee + ASMDISP_GIOS_1PM
+   jp asm_gios_1pm

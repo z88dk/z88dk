@@ -1,6 +1,6 @@
        INCLUDE "graphics/grafix.inc"
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
        SECTION code_graphics
        PUBLIC    w_plotpixel
 
@@ -30,30 +30,32 @@ IF !__CPU_INTEL__
 ;  afbcdehl/.... different
 ;
 .w_plotpixel
-                    push    hl
-                    ld     hl,maxy
-                    call    l_graphics_cmp
-                    pop    hl
-                    ret    nc            ; Return if Y overflows
+    push    hl
+    ld      hl,maxy
+    call    l_graphics_cmp
+    pop     hl
+    ret     nc            ; Return if Y overflows
 
-                    push    de
-                    ld     de,maxx
-                    call    l_graphics_cmp
-                    pop    de
-                    ret    c            ; Return if X overflows
-                    
-                    ld     (__gfx_coords),hl    ; store X
-                    ld     (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
-                    
-                    call    w_pixeladdress
-                    ld     b,a
-                    ld     a,1
-                    jr     z, or_pixel    ; pixel is at bit 0...
-.plot_position        rlca
-                    djnz    plot_position
-.or_pixel            ex     de,hl
-                    or     (hl)
-                    ld     (hl),a
-                    ret
+    push    de
+    ld      de,maxx
+    call    l_graphics_cmp
+    pop     de
+    ret     c            ; Return if X overflows
+
+    ld      (__gfx_coords),hl    ; store X
+    ld      (__gfx_coords+2),de   ; store Y: COORDS must be 2 bytes wider
+
+    call    w_pixeladdress
+    ld      b,a
+    ld      a,1
+    jr      z, or_pixel    ; pixel is at bit 0...
+.plot_position        
+    rlca
+    djnz    plot_position
+.or_pixel            
+    ex      de,hl
+    or      (hl)
+    ld      (hl),a
+    ret
 
 ENDIF

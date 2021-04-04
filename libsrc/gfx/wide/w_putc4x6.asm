@@ -11,7 +11,7 @@
 ; $Id: w_putc4x6.asm $
 ;
 
-IF !__CPU_INTEL__
+  IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION        code_graphics
 
 
@@ -170,9 +170,7 @@ ENDIF
 IF NEED_swapgfxbk
     jp      __graphics_end
 ELSE
-  IF !__CPU_INTEL__ & !__CPU_GBZ80__
     pop     ix
-  ENDIF
     ret
 ENDIF
 .do_nl

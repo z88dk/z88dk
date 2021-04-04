@@ -11,7 +11,7 @@
 SECTION code_clib
 PUBLIC cpoint_callee
 PUBLIC _cpoint_callee
-PUBLIC ASMDISP_CPOINT_CALLEE
+PUBLIC asm_cpoint
 
 .cpoint_callee
 ._cpoint_callee
@@ -22,7 +22,7 @@ PUBLIC ASMDISP_CPOINT_CALLEE
    pop de
    push af
 
-.asmentry
+.asm_cpoint
 
    ld h,e
    ld a,l
@@ -77,5 +77,3 @@ PUBLIC ASMDISP_CPOINT_CALLEE
    
    ret
 
-
-DEFC ASMDISP_CPOINT_CALLEE = asmentry - cpoint_callee

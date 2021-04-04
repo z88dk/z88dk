@@ -16,7 +16,7 @@ EXTERN	gios
 EXTERN	gios_ctl
 EXTERN	gios_ptsin
 
-PUBLIC ASMDISP_GIOS_1PX
+PUBLIC asm_gios_1px
 
 
 gios_1px_callee:
@@ -29,7 +29,7 @@ _gios_1px_callee:
 	pop de
 	push af
 	
-.asmentry
+.asm_gios_1px
 
 	ld	(gios_ptsin+2),hl
 	ld	h,b
@@ -46,5 +46,4 @@ _gios_1px_callee:
 
 
 
-DEFC ASMDISP_GIOS_1PX = asmentry - gios_1px_callee
 

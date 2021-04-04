@@ -12,8 +12,7 @@ SECTION code_clib
 PUBLIC	gios_2px
 PUBLIC	_gios_2px
 
-EXTERN ASMDISP_GIOS_2PX
-EXTERN gios_2px_callee
+EXTERN asm_gios_2px
 
 EXTERN	gios_ptsin
 
@@ -41,4 +40,4 @@ cploop:
 	ld	e,a
 	ld	d,0
    
-	jp gios_2px_callee + ASMDISP_GIOS_2PX
+	jp asm_gios_2px
