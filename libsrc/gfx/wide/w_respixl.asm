@@ -1,13 +1,13 @@
        INCLUDE "graphics/grafix.inc"
 
-IF !__CPU_INTEL__
-    SECTION     code_graphics
-    PUBLIC    w_respixel
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
+    SECTION code_graphics
+    PUBLIC  w_respixel
 
-    EXTERN    l_graphics_cmp
-    EXTERN    w_pixeladdress
+    EXTERN  l_graphics_cmp
+    EXTERN  w_pixeladdress
 
-    EXTERN    __gfx_coords
+    EXTERN  __gfx_coords
 
 ;
 ;      $Id: w_respixl.asm,v 1.5 2016-07-02 09:01:35 dom Exp $

@@ -32,7 +32,6 @@ IF !__CPU_INTEL__
     pop     bc    ;radius
     pop     hl    ; y
     pop     de    ; x
-
     ex      af,af
     push    af
     ex      af,af

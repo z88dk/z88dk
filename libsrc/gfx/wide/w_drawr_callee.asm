@@ -1,7 +1,7 @@
 ; ----- void __CALLEE__ drawr_callee(int x, int y)
 
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  drawr_callee
     PUBLIC  _drawr_callee

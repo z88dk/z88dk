@@ -11,7 +11,7 @@
 ; $Id: w_putc4x6.asm $
 ;
 
-  IF !__CPU_INTEL__ & !__CPU_GBZ80__
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION        code_graphics
 
 

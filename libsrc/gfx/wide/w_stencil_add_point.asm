@@ -14,7 +14,7 @@
 ;; void stencil_add_point(int x, int y, unsigned char *stencil)
 
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION   code_graphics
     PUBLIC    stencil_add_point
     PUBLIC    _stencil_add_point
