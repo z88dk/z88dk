@@ -76,6 +76,7 @@
 		SECTION	code_sound_ay
 		SECTION	code_PSGlib
 		SECTION	code_z80
+                SECTION code_sprite_sp1
 IF !__crt_org_graphics
 		SECTION code_graphics
 ENDIF
