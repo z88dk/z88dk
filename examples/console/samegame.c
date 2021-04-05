@@ -55,6 +55,9 @@
 #define SCORE_ROW 20
 #endif
 
+#ifndef TEXT_COLOUR
+#define TEXT_COLOUR 0
+#endif
 
 
 #define K_UP 'Q'
@@ -65,6 +68,7 @@
 #define K_RESET 'H'
 
 static uint8_t arena[ARENA_H][ARENA_W];
+static uint8_t oarena[ARENA_H][ARENA_W];
 static uint8_t playing;
 static int     cx;
 static int     cy;
@@ -285,6 +289,7 @@ static void moved()
 {
     reset();
     selected = 0;
+    oarena[cy][cx] = 0xff;
     highlight(cy, cx, arena[cy][cx]);
     if ( selected < 2 ) {
         reset();
@@ -318,6 +323,7 @@ static void handle_keys()
 #else
     uint8_t joy = readkeys();
 #endif
+    oarena[cy][cx] = 0xff;
     if ( joy & MOVE_LEFT ) {
         if ( cx > 0 ) {
             --cx;
@@ -392,6 +398,7 @@ static void initialise_level()
     for ( int i = 0; i < ARENA_H * ARENA_W; i++ ) {
        *ptr++ = (rand() & 3) + 1;;
     }
+    memset(oarena,0xff,ARENA_W * ARENA_H);
 }
 
 
@@ -457,6 +464,9 @@ static void prnum(int score)
 static void drawboard() 
 {
     draw_arena();
+#ifdef USE_COLOUR
+    textcolor(TEXT_COLOUR);
+#endif
     gotoxy(0,SCORE_ROW); cputs("Score: ");
 
     prnum(score);
@@ -466,7 +476,10 @@ static void draw_arena()
 {
     for ( int y = 0; y < ARENA_H; y++ ) {
         for ( int x = 0; x < ARENA_W; x++ ) {
-            print_sprite(y, x, arena[y][x]);
+            if ( arena[y][x] != oarena[y][x] ) {
+                print_sprite(y, x, arena[y][x]);
+                oarena[y][x] = arena[y][x];
+            }
         }
     }
 }
