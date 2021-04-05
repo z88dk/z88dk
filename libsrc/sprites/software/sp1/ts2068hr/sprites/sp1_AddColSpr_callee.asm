@@ -2,6 +2,7 @@
 ; 01.2008 aralbrec, Sprite Pack v3.0
 ; ts2068 hi-res version
 
+SECTION code_sprite_sp1
 PUBLIC sp1_AddColSpr_callee
 PUBLIC ASMDISP_SP1_ADDCOLSPR_CALLEE
 

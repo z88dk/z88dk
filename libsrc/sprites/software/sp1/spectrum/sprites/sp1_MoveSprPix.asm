@@ -1,6 +1,7 @@
 ; void sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, uchar *frame, uint x, uint y)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_MoveSprPix
 
 EXTERN sp1_MoveSprPix_callee

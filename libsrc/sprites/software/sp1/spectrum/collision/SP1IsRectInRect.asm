@@ -4,6 +4,7 @@
 ; sinclair spectrum version
 ; uses rectangles library
 
+SECTION code_sprite_sp1
 PUBLIC SP1IsRectInRect
 EXTERN RIsRectInRect8
 

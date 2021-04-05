@@ -1,6 +1,7 @@
 ; uint sp1_ScreenStr(uchar row, uchar col)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_ScreenStr
 
 EXTERN sp1_ScreenStr_callee

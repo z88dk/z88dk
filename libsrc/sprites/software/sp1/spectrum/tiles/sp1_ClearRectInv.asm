@@ -1,6 +1,7 @@
 ; void sp1_ClearRectInv(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_ClearRectInv
 
 EXTERN sp1_ClearRectInv_callee

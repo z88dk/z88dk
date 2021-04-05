@@ -2,6 +2,7 @@
 ; 02.2008 aralbrec
 ; ts2068 hi-res version
 
+SECTION code_sprite_sp1
 PUBLIC SP1PSPUSH
 
 ; exit  : hl = & struct sp1_pss to write to

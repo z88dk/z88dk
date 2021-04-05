@@ -1,6 +1,7 @@
 ; struct sp1_update *sp1_GetUpdateStruct(uchar row, uchar col)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_GetUpdateStruct
 
 EXTERN sp1_GetUpdateStruct_callee

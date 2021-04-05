@@ -3,6 +3,7 @@
 ; 05.2007 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+SECTION code_sprite_sp1
 PUBLIC sp1_InsertCharStruct_callee
 PUBLIC ASMDISP_SP1_INSERTCHARSTRUCT_CALLEE
 EXTERN SP1AddSprChar

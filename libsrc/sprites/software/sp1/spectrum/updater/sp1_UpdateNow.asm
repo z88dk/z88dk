@@ -3,6 +3,7 @@
 ; 01.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+SECTION code_sprite_sp1
 PUBLIC sp1_UpdateNow
 EXTERN SP1DrawUpdateStruct
 EXTERN SP1V_UPDATELISTH, SP1V_UPDATELISTT

@@ -4,6 +4,7 @@
 
 INCLUDE "spectrum/customize.asm"
 
+SECTION code_sprite_sp1
 PUBLIC sp1_GetUpdateStruct_callee
 PUBLIC ASMDISP_SP1_GETUPDATESTRUCT_CALLEE
 

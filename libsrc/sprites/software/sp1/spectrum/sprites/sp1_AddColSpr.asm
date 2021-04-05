@@ -1,6 +1,7 @@
 ; uint sp1_AddColSpr(struct sp1_ss *s, uchar type, int graphic, uchar plane)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_AddColSpr
 
 EXTERN sp1_AddColSpr_callee

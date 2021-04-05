@@ -1,6 +1,7 @@
 ; void sp1_ChangeSprType(struct sp1_cs *c, void *drawf)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_ChangeSprType
 
 EXTERN sp1_ChangeSprType_callee

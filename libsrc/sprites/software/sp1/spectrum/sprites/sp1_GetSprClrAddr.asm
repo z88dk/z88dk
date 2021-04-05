@@ -1,6 +1,7 @@
 ; void sp1_GetSprClrAddr(struct sp1_ss *s, uchar **sprdest)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_GetSprClrAddr
 
 EXTERN sp1_GetSprClrAddr_callee

@@ -1,6 +1,7 @@
 ; void sp1_GetTiles(struct sp1_Rect *r, struct sp1_tp *dest)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_GetTiles
 
 EXTERN sp1_GetTiles_callee

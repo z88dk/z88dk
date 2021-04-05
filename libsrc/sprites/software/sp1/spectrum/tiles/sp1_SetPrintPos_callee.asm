@@ -2,6 +2,7 @@
 ; 05.2006 aralbrec, Sprite Pack v3.0
 ; Sinclair Spectrum version
 
+SECTION code_sprite_sp1
 PUBLIC sp1_SetPrintPos_callee
 PUBLIC ASMDISP_SP1_SETPRINTPOS_CALLEE
 

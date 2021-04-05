@@ -1,6 +1,7 @@
 ; void sp1_IterateSprChar(struct sp1_ss *s, void *hook1)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_IterateSprChar
 
 EXTERN sp1_IterateSprChar_callee

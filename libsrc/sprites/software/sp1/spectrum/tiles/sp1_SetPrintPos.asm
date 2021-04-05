@@ -1,6 +1,7 @@
 ; void sp1_SetPrintPos(struct sp1_pss *ps, uchar row, uchar col)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_SetPrintPos
 
 EXTERN sp1_SetPrintPos_callee

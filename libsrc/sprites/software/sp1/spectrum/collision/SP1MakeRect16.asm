@@ -3,6 +3,7 @@
 ; 05.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+SECTION code_sprite_sp1
 PUBLIC SP1MakeRect16
 
 ; A straight conversion from struct_sp1_Rect
