@@ -1407,13 +1407,6 @@ REMOVE THIS LINE FOR IT TO FIRE
 	or	l
 	jp	nz,%2	;%8
 
-	call	l_neg
-	pop	de
-	call	l_lt
-=
-	pop	de
-	call	l_ge
-
 	ld	hl,0	;const
 	call	l_int2long_s
 =
