@@ -374,6 +374,11 @@ IF DEFINED_CRT_ORG_BSS
 	defc	__crt_org_bss = CRT_ORG_BSS
 ENDIF
 
+; Create a dedicated contended section
+IF CRT_ORG_CODE < 32768
+        SECTION CONTENDED
+ENDIF
+
 	INCLUDE	"crt/classic/crt_section.asm"
 
 	SECTION	code_crt_init
