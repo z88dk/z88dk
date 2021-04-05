@@ -188,7 +188,10 @@ void goto_cleanup(void)
     gptr = gotoq + 1;
     for (i = 0; i < gotocnt; i++) {
         if (gptr->sym) {
-            debug(DBG_GOTO, "Cleaning %s #%d\n", gptr->sym->name, i);
+            debug(DBG_GOTO, "Cleaning %s #%d jp to i_%d\n", gptr->sym->name, i, gptr->sym->size);
+            if (gptr->sym->size == 0 ) {
+                errorfmt("Unknown label: %s", 1, gptr->sym->name);
+            }
             postlabel(gptr->label);
             modstk((gptr->sym->offset.i) - (gptr->sp), KIND_NONE, NO, YES);
             gen_jp_label(gptr->sym->size,1); /* label label(!) */
