@@ -12,8 +12,7 @@ __addressmod setb4 spaceb4;
 
 // Put some variables into those address spaces
 extern spaceb1 int value_in_b1;
-extern spaceb1 int array_in_b1[10];
-extern spaceb4 char *string_in_b4;
+extern spaceb4 int array_in_b4[10];
 
 
 #endif

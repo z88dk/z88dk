@@ -253,14 +253,13 @@ static void switch_namespace(char *name)
 {
     namespace *ns;
 
-    if ( name == current_nspace || name == NULL ) {
+    if ( current_nspace == name || name == NULL ) {
         return;
     }
     current_nspace = name;
 
     if ( name != NULL ) {
         ns = get_namespace(name);
-
         if ( ns != NULL ) {
             gen_call(-1, ns->bank_function->name, ns->bank_function);
         }
@@ -798,6 +797,7 @@ void gen_load_indirect(LVALUE* lval)
 
     sign = lval->ltype->isunsigned;
     
+    switch_namespace(lval->ltype->namespace);
     /* Fetch from far pointer */
     if (flags & FARACC) { /* Access via far method */
         switch (typeobj) {

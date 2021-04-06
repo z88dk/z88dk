@@ -165,6 +165,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     needchar(')'); 
     Zsp = savesp;
     saveline = lineno;
+    reset_namespace();
 
     //  if ( ptr == NULL ) ptr = fnptr;
     if ( functype->funcattrs.oldstyle == 0 && functype->funcattrs.hasva == 0 && array_len(functype->parameters) < argnumber  ) {

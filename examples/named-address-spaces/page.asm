@@ -15,10 +15,11 @@ _setb4:
 _setb1:
     ld    a,1
 page:
-    call  l_push_di
+    di
+    or    16
     ld    bc,32765
     out   (c),a
     ld    (23388),a
-    call  l_pop_ei
+    ei
     ret
 
