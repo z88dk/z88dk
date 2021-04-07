@@ -404,11 +404,12 @@ ENDIF
 
 handle_cr:
 	ld	a,(__console_h)
-	sub	b
-	jr	nc,handle_cr_no_need_to_scroll
 	dec	a
-	jr	nz,handle_cr_no_need_to_scroll
+	sub	b
+	jr	z,scrollit
+	jr	nc,handle_cr_no_need_to_scroll
 	; Check if scroll is enabled
+scrollit:
 IF __CPU_INTEL__
 	ld	a,(hl)
 	rlca
