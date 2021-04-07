@@ -1715,7 +1715,7 @@ int type_matches(Type *t1, Type *t2)
 
     if ( t1->funcattrs.oldstyle == 0 ) {                
         if ( t1->parameters && t2->parameters) {
-            if ( (array_len(t1->parameters) != array_len(t2->parameters)) && array_len(t1->parameters) && array_len(t2->parameters) ) 
+            if ( array_len(t1->parameters) != array_len(t2->parameters)) 
                 return 0;
             for ( i = 0; i < array_len(t1->parameters); i++ ) {
                 Type *t1f = array_get_byindex(t1->parameters, i);
