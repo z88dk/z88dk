@@ -35,7 +35,7 @@
 ;  9 = right
 ; 10 = line feed
 ; 11 = up
-; 13 = down
+; 13 = cr
 ; 16, 32 +n = set ink
 ; 17, 32 +n = set paper
 ; 22,y+32,x+32 = Move to position
@@ -402,12 +402,12 @@ clear_eos_loop:
 ENDIF
 
 
-handle_cr:
+handle_lf:
 	ld	a,(__console_h)
 	dec	a
 	sub	b
 	jr	z,scrollit
-	jr	nc,handle_cr_no_need_to_scroll
+	jr	nc,handle_lf_no_need_to_scroll
 	; Check if scroll is enabled
 scrollit:
 IF __CPU_INTEL__
@@ -423,8 +423,9 @@ ENDIF
 	ld	a,(__console_h)
 	sub	2
 	ld	b,a
-handle_cr_no_need_to_scroll:
+handle_lf_no_need_to_scroll:
 	inc	b
+handle_cr:
 	ld	c,0
 	jp	store_coords
 
@@ -479,10 +480,13 @@ ENDIF
 	defw	left
 	defb	10, 10
 	defb	0
-	defw	handle_cr
+	defw	handle_lf
 	defb	12, 12
 	defb	0
 	defw	cls
+	defb	13, 13
+	defb	0
+	defw	handle_cr
 
 	defb	9, 'D'
 	defb	0
@@ -490,7 +494,7 @@ ENDIF
         defb	11, 'A'
 	defb	0
         defw	up
-        defb	13, 'B'
+        defb	255, 'B'
 	defb	0
         defw	down
 IF SUPPORT_vt52
