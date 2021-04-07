@@ -97,7 +97,9 @@ ENDIF
 set_width:
     ld      (__zx_print_routine),hl
     ld      ( __console_w),a
+IF FORts2068|FORzxn|FORsam
     ld      ( __zx_mode0_console_w),a
+ENDIF
     ret
 
 set_font_hi:
@@ -174,5 +176,7 @@ ELSE
 no_set_32col:
     ld      (__zx_print_routine),hl
     ld      (__console_w),a
+  IF FORts2068|FORzxn
     ld      (__zx_mode0_console_w),a
+  ENDIF
 ENDIF
