@@ -485,6 +485,7 @@ struct lnode* copylist(
 /* opt - replace instructions ending at r if possible */
 struct lnode* opt(struct lnode* r)
 {
+    char  titlebuf[128];
     char* vars[10];
     int i, lines;
     struct lnode *c, *p;
@@ -499,6 +500,7 @@ struct lnode* opt(struct lnode* r)
         p = o->o_old;
         if (p == 0)
             continue; /* skip empty rules */
+        titlebuf[0] = 0;
         for (i = 0; i < 10; i++)
             vars[i] = 0;
         lines = 0;
@@ -519,6 +521,8 @@ struct lnode* opt(struct lnode* r)
             } else if ( strncmp(p->l_text, "%eval", 5) == 0 ) {
                 if (!check_eval(p->l_text + 5, vars))
                     break;
+            } else if ( strncmp(p->l_text, "%title",6) == 0 ) {
+                snprintf(titlebuf,sizeof(titlebuf),"%s",p->l_text + 7);
             } else {
                 if (!match(c->l_text, p->l_text, vars))
                     break;
@@ -601,7 +605,9 @@ struct lnode* opt(struct lnode* r)
             global_again = 1; /* signalize changes */
             continue;
         }
-
+        if ( debug && strlen(titlebuf)) {
+            fprintf(stderr,"Firing rule: %s\n",titlebuf);
+        }
         /* fire the rule */
         r = rep(c, r->l_next, o->o_new, vars);
         activerule = 0;

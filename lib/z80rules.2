@@ -875,6 +875,7 @@
 	ld	(%1),hl
 
 #notcpu 8080
+#notcpu gbz80
 	ld	(%1),hl
 	ld	(%1+2),de
 	ld	hl,(%1)
@@ -1056,27 +1057,11 @@
 	pop	bc
 	push	hl
 =
-	ld	hl,-%1+2	;const
+	ld	hl,%eval(2 %1 -)	;const
 	add	hl,sp
 	ld	sp,hl
 	ld	hl,%2
 	push	hl
-
-	ld	hl,-%1	;const
-	add	hl,sp
-	ld	sp,hl
-	ld	hl,%2
-	pop	de
-	pop	bc
-	push	hl
-	push	de
-=
-	ld	hl,-%1+4	;const
-	add	hl,sp
-	ld	sp,hl
-	ld	hl,%2
-	push	hl
-	push	bc
 
 	call	l_gint	;%9
 	ld	a,l
@@ -1161,7 +1146,7 @@
 	ld	bc,%2
 	add	hl,bc
 =
-	ld	hl,%1+%2	;const
+	ld	hl,%eval(%1 %2 +)	;const
 
 ;Special rules for UZI here to optimize..
 ;saves abt 1k on scall1.c alone..
@@ -1202,7 +1187,7 @@
 	exx
 =
 	exx
-	ld	hl,%1+%2	;const
+	ld	hl,%eval(%1 %2 +)	;const
 	add	hl,sp
 	ld	sp,hl
 	exx

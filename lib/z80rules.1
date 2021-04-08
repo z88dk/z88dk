@@ -826,6 +826,7 @@
 	ld	c,%1
 	call	l_long_asr%2o
 
+%check 0 <= %1 <= 65535
 	ld	l,(hl)
 	ld	h,0
 	ld	de,%1
@@ -833,7 +834,7 @@
 =
 	ld	e,(hl)
 	ld	d,0
-	ld	hl,%1
+	ld	hl,%1	;const
 
 	call	l_gint	;%9
 	push	hl
@@ -1250,6 +1251,17 @@
 ; we do then it's a tad pointless and you'll suffer!!! <cackle?
 =
 ;
+
+	ld	de,%1	;const
+	ld	(hl),e
+	inc	hl
+	ld	(hl),d
+	jp	%2	;EOS
+=
+	ld	(hl),%eval(%1 256 %%)
+	inc	hl
+	ld	(hl),%eval(%1 256 /)
+	jp	%2	;EOS
 
 	ld	hl,0	;const
 	jr	%1
@@ -1851,7 +1863,7 @@
 	add	hl,de
 	dec	hl
 =
-	ld	hl,%1-1	;const
+	ld	hl,%eval(%1 1 -)	;const
 	add	hl,sp
 	pop	de
 	add	hl,de
@@ -3827,7 +3839,7 @@
 =
 	ld	a,(hl)
 	ex	de,hl
-	ld	hl,%1	;const
+	ld	hl,%eval(%1 2 -)	;const
 	add	hl,sp
 	add	(hl)
 	ld	(de),a
@@ -4738,7 +4750,7 @@
 	ld	d,h
 	ld	e,l
 
-	%"inc|dec"	hl
+	%"inc|dec"1	hl
 .%2
 	pop	hl
 	push	hl
@@ -5008,6 +5020,11 @@
 =
 ; XXXX
 
+	inc	%"h|l"2
+	jp	%1	;EOS
+=
+	jp	%1	;EOS
+
 	ld	l,%2
 	ld	h,0
 	jp	%1	;EOS
@@ -5187,10 +5204,50 @@
 	bit	7,(hl)
 	jp	%2z,%3
 	ld	hl,%4
- 
+
+; Char operators
+=
+;
+
+	ld	l,a
+	pop	de
+	ld	a,l
+	ld	(de),a
+=
+	ld	l,a
+	pop	de
+	ld	(de),a
+
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	call	l_eq
+	jp	%2c,%3	;%4
+	ld	hl,%5
+=
+	ld	a,(hl)
+	ld	hl,%1	;const
+	add	hl,sp
+	cp	(hl)
+	jp	%2z,%3	;%4
+	ld	hl,%5
+
 ; Char constant comparisons
 =
 ;
+
+	ld	l,(hl)
+	ld	h,0
+	ld	a,%1
+	sub	l
+	jp	%2c,%3
+=
+	ld	a,%1
+	sub	(hl)
+	jp	%2c,%3
 
 %check 0 <= %1 <= 255
 	ld	l,a
@@ -5240,6 +5297,28 @@
 	jp	%2z,%3	;%4
 	ld	hl,%5	;const
 
+%check 0 <= %1 <= 255
+%title 16bit <= becomes 8bit <=
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1	;const
+	call	l_uge
+	jp	%2c,%3
+	ld	hl,%4
+=
+	ld	a,%1
+	cp	(hl)
+	jp	%2c,%3
+	ld	hl,%4
+
+	ld	hl,%1	;const
+	ld	a,l
+	ld	(de),a
+	jp	%2	;EOS
+=
+	ld	a,%eval(%1 256 %%)
+	ld	(de),a
+	jp	%2	;EOS
 
 ; long logical operations
 =
@@ -5265,6 +5344,7 @@
 =
 ;
 
+%title 16 bit out, remove redundant hl load
 	ld	hl,%1	;const
 	ld	a,l
 	ld	bc,%2
@@ -5281,6 +5361,7 @@
 =
 ;
 
+%title Stack load bypass push/pop cycle
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -5303,6 +5384,7 @@
 =
 ;
 
+%title Replace uint16_t global or with uint8_t -> de
 	ld	hl,(_%1)
 	ld	h,0
 	ex	de,hl
@@ -5317,6 +5399,7 @@
 	ld	e,a
 	ld	d,0
 
+%title Replace 16 bit or with 8 bit or -> de
 	ld	e,a
 	ld	d,0
 	ld	hl,(_%1)
@@ -5329,6 +5412,7 @@
 	ld	e,a
 	ld	d,0
 
+%title Replace 16 bit or with 8 bit or -> hl
 	ld	e,a
 	ld	d,0
 	ld	hl,(_%1)
@@ -5341,6 +5425,7 @@
 	ld	l,a
 	ld	h,0
 
+%title Remove redundant load of char into hl
 	ld	l,a
 	ld	h,0
 	and	a
@@ -5350,3 +5435,58 @@
 	and	a
 	jp	%1z,%2	;%3
 	ld	hl,%4
+
+%title Load 8 bit value into integer
+	ld	l,(hl)
+	ld	h,0
+	pop	de
+	call	l_pint
+	ld	hl,%1	;const
+=
+	pop	de
+	ex	de,hl
+	ld	a,(de)
+	ld	(hl),a
+	inc	hl
+	ld	(hl),0
+	ld	hl,%1	;const
+
+%title Redundant sign extend
+	ld	a,l
+	rla
+	sbc	a
+	ld	h,a
+	pop	de
+	ld	a,l
+	ld	(de),a
+	jp	%2	;EOS
+=
+	pop	de
+	ld	a,l
+	ld	(de),a
+	jp	%2	;EOS
+
+%title Cleanup tail int8 copy
+	ld	l,(hl)
+	pop	de
+	ld	a,l
+	ld	(de),a
+	jp	%1	;EOS
+=
+	ld	a,(hl)
+	pop	hl
+	ld	(hl),a
+	jp	%1	;EOS
+
+%title Tail int16 constant store
+%check 0 <= %1 <= 255
+	ld	(hl),%1
+	inc	hl
+	ld	(hl),%1
+	jp	%2	;EOS
+=
+	ld	a,%1
+	ld	(hl),a
+	inc	hl
+	ld	(hl),a
+	jp	%2	;EOS

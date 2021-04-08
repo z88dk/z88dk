@@ -171,7 +171,7 @@
 	ld	bc,%1
 	add	hl,bc
 	ld	(hl),%2
-	ld	bc,%3-(%1)
+	ld	bc,%eval(%3 %1 -)
 	add	hl,bc
 
 %notcpu gbz80
@@ -330,7 +330,7 @@
 	ld	(%2),a
 	ld	hl,%3
 
-	ld	hl,%1-%1	;const
+	ld	hl,0	;const
 	add	hl,sp
 	ld	l,(hl)
 	ld	h,0
