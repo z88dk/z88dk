@@ -242,3 +242,14 @@
 	add	hl,%2
 =
 	ld	hl,_%1 + %2
+
+%title ZXNext register
+	ld	hl,%1	;const
+	push	hl
+	ld	hl,%2	;const
+	push	hl
+	pop	de
+	pop	hl
+=
+	ld	hl,%1	;const
+	ld	de,%2	;const

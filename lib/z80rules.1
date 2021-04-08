@@ -5490,3 +5490,67 @@
 	inc	hl
 	ld	(hl),a
 	jp	%2	;EOS
+
+%title Needless push/pop cycle
+	ld	l,(hl)
+	ld	h,0
+	push	hl
+	pop	de
+	pop	hl
+=
+	ld	e,(hl)
+	ld	d,0
+	pop	hl
+
+%title 8 bit static addition
+	ld	hl,(_%1)
+	ld	h,0
+	ex	de,hl
+	ld	a,(_%2)
+	add	e
+	ld	(%3),a
+	ld	hl,%4
+=
+	ld	hl,_%1
+	ld	a,(_%2)
+	add	(hl)
+	ld	(%3),a
+	ld	hl,%4
+
+%title Pointless unsigned8 extension #1
+	ld	h,0
+	ld	a,l
+	ld	(_%1),a
+	ld	hl,%2
+=
+	ld	a,l
+	ld	(_%1),a
+	ld	hl,%2
+
+%title Pointless unsigned8 extension #1
+	ld	h,0
+	ld	a,l
+	ld	(_%1),a
+	jp	%2	;EOS
+=
+	ld	a,l
+	ld	(_%1),a
+	jp	%2	;EOS
+
+%title Repeated load of 8 bit #1
+	ld	a,l
+	ld	(de),a
+	ld	a,l
+=
+	ld	a,l
+	ld	(de),a
+
+%title Repeated load of 8 bit #2
+	ld	h,0
+	ld	a,l
+	ld	(_%1),a
+	ld	h,0
+	ld	a,l
+=
+	ld	a,l
+	ld	(_%1),a
