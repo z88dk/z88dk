@@ -1,5 +1,6 @@
 
 #include <fcntl.h>
+#include <stdio.h>
 
 int remove(char *name) __naked
 {
