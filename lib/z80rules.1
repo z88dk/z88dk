@@ -5587,6 +5587,7 @@
 	ld	(hl),%4
 
 %title Replace with 16 bit store
+%notcpu gbz80
 	ld	hl,_%1
 	xor	a
 	ld	(hl),a
