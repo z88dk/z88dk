@@ -10,7 +10,7 @@
 
 ._func
 	ld	hl,1	;const
-	ld	(_foo+1+1),hl
+	ld	(_foo+2),hl
 	ld	hl,2	;const
 	ld	(_bar+4),hl
 	ret

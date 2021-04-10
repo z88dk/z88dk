@@ -52,7 +52,7 @@
 	push	hl
 	call	_func
 	pop	bc
-	ld	hl,(_selected_data+1+1)
+	ld	hl,(_selected_data+2)
 	ld	h,0
 	push	hl
 	call	_ifunc

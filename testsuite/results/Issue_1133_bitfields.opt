@@ -22,7 +22,7 @@
 	and	248
 	or	7
 	ld	(hl),a
-	ld	hl,_x+1+1
+	ld	hl,_x+2
 	ld	de,2	;const
 	ex	de,hl
 	ld	a,l
@@ -35,7 +35,7 @@
 	and	31
 	or	l
 	ld	(de),a
-	ld	hl,_x+1+1 + 1
+	ld	hl,_x+3
 	ld	a,(hl)
 	and	224
 	or	3
@@ -74,7 +74,7 @@
 
 
 ._func1b
-	ld	hl,_x+1+1
+	ld	hl,_x+2
 	ld	a,(hl)
 	rlca
 	rlca
@@ -87,7 +87,7 @@
 
 
 ._func1c
-	ld	hl,_x+1+1+1
+	ld	hl,_x+3
 	ld	a,(hl)
 	and	31
 	ld	l,a
@@ -98,7 +98,7 @@
 
 ._func2
 	ld	hl,_y
-	ld	(hl),+(1 % 256)
+	ld	(hl),1
 	ld	l,(hl)
 	ld	h,0
 	ret
@@ -147,7 +147,7 @@
 
 
 ._func3b
-	ld	hl,_z+1+1
+	ld	hl,_z+2
 	ld	e,(hl)
 	inc	hl
 	ld	a,(hl)
