@@ -14,7 +14,7 @@
         SECTION   code_clib
         PUBLIC    cpc_UnExo_callee
         PUBLIC    _cpc_UnExo_callee
-        PUBLIC    ASMDISP_CPCUNEXO_CALLEE
+        PUBLIC    asm_cpc_UnExo
 		
         EXTERN cpc_DisableFirmware
         EXTERN cpc_EnableFirmware
@@ -43,7 +43,7 @@ call deexo
 ei
 ret
 
-.asmentry
+.asm_cpc_UnExo
 .deexo
 		ld	ixh,128
 
@@ -178,4 +178,3 @@ dec	d
 defs	156	;tables for bits, baseL, baseH
 
 
-DEFC ASMDISP_CPCUNEXO_CALLEE = asmentry - cpc_UnExo_callee

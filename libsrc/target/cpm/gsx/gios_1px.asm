@@ -12,8 +12,7 @@ SECTION code_clib
 PUBLIC	gios_1px
 PUBLIC	_gios_1px
 
-EXTERN ASMDISP_GIOS_1PX
-EXTERN gios_1px_callee
+EXTERN asm_gios_1px
 
 EXTERN	gios_ptsin
 
@@ -29,4 +28,4 @@ _gios_1px:
 	push hl
 	push af
 
-	jp gios_1px_callee + ASMDISP_GIOS_1PX
+	jp asm_gios_1px

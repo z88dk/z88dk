@@ -15,7 +15,7 @@
 ;; void stencil_add_side(int x1, int y1, int x2, int y2, unsigned char *stencil)
 
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION   code_graphics
     PUBLIC    stencil_add_side
     PUBLIC    _stencil_add_side
@@ -59,9 +59,7 @@ ENDIF
 IF NEED_swapgfxbk
     jp      __graphics_end
 ELSE
-  IF !__CPU_INTEL__ & !__CPU_GBZ80__
     pop     ix
-  ENDIF
     ret
 ENDIF
 ENDIF

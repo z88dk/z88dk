@@ -12,7 +12,7 @@
 ;    $Id: w_stencil_init.asm,v 1.4 2016-04-23 20:37:40 dom Exp $
 ;
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
     INCLUDE    "graphics/grafix.inc"
     SECTION   code_graphics
     PUBLIC    stencil_init

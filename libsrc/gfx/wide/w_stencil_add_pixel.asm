@@ -19,7 +19,7 @@
 ;  af..dehl/.... different
 
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
     INCLUDE    "graphics/grafix.inc"
     SECTION   code_graphics
      PUBLIC    stencil_add_pixel

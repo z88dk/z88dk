@@ -15,7 +15,7 @@
         EXTERN     cpc_set_palette_callee
         EXTERN     cpc_SetInk
         EXTERN     _cpc_SetInk
-        EXTERN    ASMDISP_CPC_SET_PALETTE_CALLEE
+        EXTERN    asm_cpc_set_palette
 
 .cpc_SetInk
 ._cpc_SetInk
@@ -27,4 +27,4 @@
         push    bc
         push    hl
         push    de
-        jp cpc_set_palette_callee + ASMDISP_CPC_SET_PALETTE_CALLEE
+        jp asm_cpc_set_palette

@@ -7,7 +7,7 @@
 
 PUBLIC tape_save_block_callee
 PUBLIC _tape_save_block_callee
-PUBLIC ASMDISP_TAPE_SAVE_BLOCK_CALLEE
+PUBLIC asm_tape_save_block
 
 IF FORts2068
 EXTERN call_extrom
@@ -29,7 +29,7 @@ ENDIF
 ;         de = len
 ;          a = type
 
-.asmentry
+.asm_tape_save_block
 
 	IF FORts2068
 		ld		hl,$68
@@ -58,4 +58,3 @@ ENDIF
         jr      saveblock2
 	ENDIF
 
-DEFC ASMDISP_TAPE_SAVE_BLOCK_CALLEE = asmentry - tape_save_block_callee

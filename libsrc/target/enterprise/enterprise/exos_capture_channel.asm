@@ -12,9 +12,8 @@
 	PUBLIC    exos_capture_channel
 	PUBLIC    _exos_capture_channel
 
-	EXTERN     exos_capture_channel_callee
 
-EXTERN ASMDISP_EXOS_CAPTURE_CHANNEL_CALLEE
+    EXTERN asm_exos_capture_channel
 
 exos_capture_channel:
 _exos_capture_channel:
@@ -26,5 +25,4 @@ _exos_capture_channel:
    push de
    push bc
    
-   jp exos_capture_channel_callee + ASMDISP_EXOS_CAPTURE_CHANNEL_CALLEE
-
+   jp asm_exos_capture_channel

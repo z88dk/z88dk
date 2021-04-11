@@ -16,8 +16,7 @@
 	PUBLIC	msx_vpoke
 	PUBLIC	_msx_vpoke
 	
-EXTERN msx_vpoke_callee
-EXTERN ASMDISP_MSX_VPOKE_CALLEE
+EXTERN asm_msx_vpoke
 
 
 vpoke:
@@ -32,5 +31,5 @@ _msx_vpoke:
 	push	de	; value
 	push	bc	; RET address
 	
-   jp msx_vpoke_callee + ASMDISP_MSX_VPOKE_CALLEE
+   jp asm_msx_vpoke
 

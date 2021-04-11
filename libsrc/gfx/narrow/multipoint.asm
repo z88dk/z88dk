@@ -17,31 +17,27 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ; CALLER LINKAGE FOR FUNCTION POINTERS
 
 
-      SECTION code_graphics
-        PUBLIC    multipoint
-        PUBLIC    _multipoint
+    SECTION code_graphics
+    PUBLIC  multipoint
+    PUBLIC  _multipoint
 
-    EXTERN multipoint_callee
-    EXTERN ASMDISP_MULTIPOINT_CALLEE
-    
+    EXTERN  asm_multipoint
+
 
 .multipoint
 ._multipoint
-
-    pop    af    ; ret addr
-    pop hl    ; y
-    pop de    ; x
-    ld    h,e
-    pop bc
-    ld    b,c    ; length
-    pop de
-    ld    c,e    ; h/v
-    push de
-    push bc    ; just to re-balance the stack
-    push bc
-    push hl
+    pop     af    ; ret addr
+    pop     hl    ; y
+    pop     de    ; x
+    ld      h,e
+    pop     bc
+    ld      b,c    ; length
+    pop     de
+    ld      c,e    ; h/v
+    push    de
+    push    bc    ; just to re-balance the stack
+    push    bc
+    push    hl
     push    af    ; ret addr
-    
-    
-   jp multipoint_callee + ASMDISP_MULTIPOINT_CALLEE
+    jp asm_multipoint
 ENDIF

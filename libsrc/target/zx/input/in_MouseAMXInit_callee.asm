@@ -44,10 +44,10 @@
 SECTION code_clib
 PUBLIC in_MouseAMXInit_callee
 PUBLIC _in_MouseAMXInit_callee
-PUBLIC ASMDISP_IN_MOUSEAMXINIT_CALLEE
+PUBLIC asm_in_MouseAMXInit
 
 EXTERN im2_InstallISR_callee
-EXTERN ASMDISP_IM2_INSTALLISR_CALLEE
+EXTERN asm_im2_InstallISR
 
 EXTERN _in_AMXdeltaX, _in_AMXdeltaY
 EXTERN _in_AMXcoordX, _in_AMXcoordY
@@ -60,7 +60,7 @@ EXTERN _in_AMXcoordX, _in_AMXcoordY
    ex (sp),hl
    ld b,l
 
-.asmentry
+.asm_in_MouseAMXInit
 
 ; enter: B = im 2 vector for X interrupts (even, 0..254)
 ;        C = im 2 vector for Y interrupts (even, 0..254)
@@ -73,11 +73,11 @@ EXTERN _in_AMXcoordX, _in_AMXcoordY
 
    ld l,b
    ld de,XInterrupt
-   call im2_InstallISR_callee + ASMDISP_IM2_INSTALLISR_CALLEE
+   call asm_im2_InstallISR
 
    ld l,c
    ld de,YInterrupt
-   call im2_InstallISR_callee + ASMDISP_IM2_INSTALLISR_CALLEE
+   call asm_im2_InstallISR
 
    ld a,b
    out ($5f),a                ; PIO vector for X
@@ -170,4 +170,3 @@ EXTERN _in_AMXcoordX, _in_AMXcoordY
    ei
    reti
 
-DEFC ASMDISP_IN_MOUSEAMXINIT_CALLEE = asmentry - in_MouseAMXInit_callee

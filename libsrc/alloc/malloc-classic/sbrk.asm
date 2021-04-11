@@ -4,8 +4,7 @@ SECTION code_clib
 PUBLIC sbrk
 PUBLIC _sbrk
 
-EXTERN sbrk_callee
-EXTERN ASMDISP_SBRK_CALLEE
+EXTERN asm_sbrk
 
 .sbrk
 ._sbrk
@@ -17,4 +16,4 @@ EXTERN ASMDISP_SBRK_CALLEE
    push bc
    push de
    
-   jp sbrk_callee + ASMDISP_SBRK_CALLEE
+   jp asm_sbrk

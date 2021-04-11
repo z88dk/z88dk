@@ -12,8 +12,7 @@
 	PUBLIC	exos_write_block
 	PUBLIC	_exos_write_block
 
-	EXTERN     exos_write_block_callee
-	EXTERN     ASMDISP_EXOS_WRITE_BLOCK_CALLEE
+	EXTERN     asm_exos_write_block
 
 exos_write_block:
 _exos_write_block:
@@ -27,4 +26,4 @@ _exos_write_block:
 	push de
 	push af
 
-   jp exos_write_block_callee + ASMDISP_EXOS_WRITE_BLOCK_CALLEE
+   jp asm_exos_write_block

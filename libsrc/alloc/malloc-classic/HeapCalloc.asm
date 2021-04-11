@@ -4,8 +4,7 @@ SECTION code_clib
 PUBLIC HeapCalloc
 PUBLIC _HeapCalloc
 
-EXTERN HeapCalloc_callee
-EXTERN ASMDISP_HEAPCALLOC_CALLEE
+EXTERN asm_HeapCalloc
 
 .HeapCalloc
 ._HeapCalloc
@@ -19,4 +18,4 @@ EXTERN ASMDISP_HEAPCALLOC_CALLEE
    push de
    push af
    
-   jp HeapCalloc_callee + ASMDISP_HEAPCALLOC_CALLEE
+   jp asm_HeapCalloc

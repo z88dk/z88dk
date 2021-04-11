@@ -16,7 +16,7 @@ EXTERN	gios
 EXTERN	gios_ctl
 EXTERN	gios_intin
 
-PUBLIC ASMDISP_GIOS_1PM
+PUBLIC asm_gios_1pm
 
 
 gios_1pm_callee:
@@ -28,7 +28,7 @@ _gios_1pm_callee:
 	push	af
 
 
-.asmentry
+.asm_gios_1pm
 
 	ld	hl,gios_intin
 	ld	(hl),e
@@ -45,5 +45,4 @@ _gios_1pm_callee:
 
 
 
-DEFC ASMDISP_GIOS_1PM = asmentry - gios_1pm_callee
 

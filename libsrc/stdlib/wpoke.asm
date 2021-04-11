@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC wpoke
 PUBLIC _wpoke
-EXTERN wpoke_callee
-EXTERN ASMDISP_WPOKE_CALLEE
+EXTERN asm_wpoke
 
 .wpoke
 ._wpoke
@@ -16,5 +15,5 @@ EXTERN ASMDISP_WPOKE_CALLEE
    push de
    push af
    
-   jp wpoke_callee + ASMDISP_WPOKE_CALLEE
+   jp asm_wpoke
 

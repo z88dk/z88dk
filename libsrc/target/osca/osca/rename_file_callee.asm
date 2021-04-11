@@ -9,11 +9,11 @@
 
     INCLUDE "target/osca/def/flos.def"
 
-        SECTION code_clib
-	PUBLIC  rename_file_callee
-	PUBLIC  _rename_file_callee
-	EXTERN   flos_err
-	PUBLIC  ASMDISP_RENAME_FILE_CALLEE
+    SECTION code_clib
+    PUBLIC  rename_file_callee
+    PUBLIC  _rename_file_callee
+    EXTERN   flos_err
+    PUBLIC  asm_rename_file
 
 rename_file_callee:
 _rename_file_callee:
@@ -22,8 +22,7 @@ _rename_file_callee:
 	pop hl
 	push bc
 
-asmentry:
+asm_rename_file:
 	call	kjt_rename_file
 	jp   flos_err
 
-DEFC ASMDISP_RENAME_FILE_CALLEE = asmentry - rename_file_callee

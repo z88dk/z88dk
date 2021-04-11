@@ -4,8 +4,7 @@ SECTION code_clib
 PUBLIC realloc
 PUBLIC _realloc
 
-EXTERN realloc_callee
-EXTERN ASMDISP_REALLOC_CALLEE
+EXTERN asm_realloc
 
 .realloc
 ._realloc
@@ -17,4 +16,4 @@ EXTERN ASMDISP_REALLOC_CALLEE
    push bc
    push de
    
-   jp realloc_callee + ASMDISP_REALLOC_CALLEE
+   jp asm_realloc

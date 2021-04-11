@@ -3,14 +3,11 @@
 
 SECTION code_clib
 PUBLIC adt_ListInsert_callee
-PUBLIC _adt_ListInsert_callee
-PUBLIC ASMDISP_ADT_LISTINSERT_CALLEE
+PUBLIC asm_adt_ListInsert
 
-EXTERN adt_ListPrepend_callee
-EXTERN ASMDISP_ADT_LISTPREPEND2
+EXTERN asm_adt_ListPrepend2
+EXTERN asm_adt_ListAppend2
 
-EXTERN adt_ListAppend_callee
-EXTERN ASMDISP_ADT_LISTAPPEND2
 
 EXTERN ADTemptylistadd
 EXTERN _u_malloc
@@ -23,7 +20,7 @@ EXTERN _u_malloc
    pop de
    push hl
 
-.asmentry
+.asm_adt_ListInsert
 
 ; enter: de = struct adt_List *
 ;        bc = item *
@@ -64,9 +61,9 @@ EXTERN _u_malloc
    inc hl                 ; hl = list.state, de = new NODE.next, list count & item done
    ld a,(hl)
    or a
-   jp z, adt_ListPrepend_callee + ASMDISP_ADT_LISTPREPEND2  ; if current points before start of list
+   jp z, asm_adt_ListPrepend2  ; if current points before start of list
    dec a
-   jp nz, adt_ListAppend_callee + ASMDISP_ADT_LISTAPPEND2   ; if current points past end of list
+   jp nz, asm_adt_ListAppend2  ; if current points past end of list
    inc hl                 ; hl = list.current
 
    ; inserting into non-empty list -- insert before current item
@@ -127,5 +124,3 @@ EXTERN _u_malloc
    ld (hl),e              ; list.head = new NODE
    scf
    ret
-
-DEFC ASMDISP_ADT_LISTINSERT_CALLEE = asmentry - adt_ListInsert_callee

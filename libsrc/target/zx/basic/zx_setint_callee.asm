@@ -12,7 +12,7 @@
 SECTION code_clib
 PUBLIC	zx_setint_callee
 PUBLIC	_zx_setint_callee
-PUBLIC 	ASMDISP_ZX_SETINT_CALLEE
+PUBLIC 	asm_zx_setint
 EXTERN	call_rom3
 
 EXTERN	zx_locatenum
@@ -27,7 +27,7 @@ _zx_setint_callee:
 ; enter : de = int value
 ;         hl = char *variable
 
-.asmentry
+.asm_zx_setint
 
 	push	de
 	push	hl
@@ -124,5 +124,4 @@ store2:
 	
 	ret
  
- DEFC ASMDISP_ZX_SETINT_CALLEE = asmentry - zx_setint_callee
  

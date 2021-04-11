@@ -5,7 +5,7 @@ SECTION code_clib
 PUBLIC HeapFree_callee
 PUBLIC _HeapFree_callee
 PUBLIC MAHeapFree
-PUBLIC ASMDISP_HEAPFREE_CALLEE
+PUBLIC asm_HeapFree
 
 .HeapFree_callee
 ._HeapFree_callee
@@ -15,7 +15,7 @@ PUBLIC ASMDISP_HEAPFREE_CALLEE
    pop de
    push bc
 
-.asmentry
+.asm_HeapFree
 
 ; Return memory block to indicated heap.  Available
 ; blocks must be kept sorted in increasing order by
@@ -223,4 +223,3 @@ ENDIF
    ld (hl),a
    ret
 
-DEFC ASMDISP_HEAPFREE_CALLEE = asmentry - HeapFree_callee

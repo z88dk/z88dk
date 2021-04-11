@@ -25,7 +25,7 @@
 ;  }
 ;}
 
-
+SECTION code_clib
 PUBLIC qsort_sdcc_callee
 PUBLIC _qsort_sdcc_callee
 PUBLIC qsort_sdcc_enter

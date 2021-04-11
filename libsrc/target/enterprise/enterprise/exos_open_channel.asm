@@ -12,9 +12,8 @@
 	PUBLIC    exos_open_channel
 	PUBLIC    _exos_open_channel
 
-	EXTERN     exos_open_channel_callee
+	EXTERN     asm_exos_open_channel
 
-EXTERN ASMDISP_EXOS_OPEN_CHANNEL_CALLEE
 
 exos_open_channel:
 _exos_open_channel:
@@ -26,5 +25,5 @@ _exos_open_channel:
    push de
    push bc
    
-   jp exos_open_channel_callee + ASMDISP_EXOS_OPEN_CHANNEL_CALLEE
+   jp asm_exos_open_channel
 

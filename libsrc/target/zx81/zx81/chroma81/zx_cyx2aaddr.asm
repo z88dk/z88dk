@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC zx_cyx2aaddr
 PUBLIC _zx_cyx2aaddr
 
-EXTERN zx_cyx2aaddr_callee
-EXTERN ASMDISP_ZX_CYX2AADDR_CALLEE
+EXTERN asm_zx_cyx2aaddr
 
 .zx_cyx2aaddr
 ._zx_cyx2aaddr
@@ -19,4 +18,4 @@ EXTERN ASMDISP_ZX_CYX2AADDR_CALLEE
    push af
    
    ld h,e
-   jp zx_cyx2aaddr_callee + ASMDISP_ZX_CYX2AADDR_CALLEE
+   jp asm_zx_cyx2aaddr

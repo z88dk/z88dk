@@ -10,11 +10,10 @@
 ;	$Id: psg_init.asm,v 1.4 2016-06-10 21:13:58 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	psg_init
-	PUBLIC	_psg_init
-	EXTERN		set_psg_callee
-        EXTERN ASMDISP_SET_PSG_CALLEE
+    SECTION code_clib
+    PUBLIC	psg_init
+    PUBLIC	_psg_init
+    EXTERN asm_set_psg
 	
 psg_init:
 _psg_init:
@@ -46,4 +45,4 @@ skip:
 
 outpsg:
 	ld	c,a
-	jp set_psg_callee + ASMDISP_SET_PSG_CALLEE + 1
+	jp asm_set_psg + 1

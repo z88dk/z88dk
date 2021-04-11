@@ -15,7 +15,7 @@
 	EXTERN	zxhandl
 	
 	EXTERN	zx_setint_callee
-	EXTERN ASMDISP_ZX_SETINT_CALLEE
+	EXTERN asm_zx_setint
 	EXTERN	zx_goto
 	
 
@@ -39,8 +39,7 @@
 
 	ld	hl,svar
 	
-	call	zx_setint_callee + ASMDISP_ZX_SETINT_CALLEE
-
+	call	asm_zx_setint
 	ld	hl,7550		; BASIC routine for "close"
 .goto_basic
 	call	zx_goto

@@ -11,14 +11,14 @@
 ;
 
 IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
-        SECTION code_clib
-	PUBLIC	set_psg_callee
-	PUBLIC	_set_psg_callee
+    SECTION code_clib
+    PUBLIC	set_psg_callee
+    PUBLIC	_set_psg_callee
 
-	PUBLIC ASMDISP_SET_PSG_CALLEE
+    PUBLIC asm_set_psg
 
 
-	INCLUDE	"sn76489.inc"
+    INCLUDE	"sn76489.inc"
 
 	
 set_psg_callee:
@@ -27,7 +27,7 @@ _set_psg_callee:
    pop hl
    pop de
    ex (sp),hl
-.asmentry
+.asm_set_psg
 
     LD	BC,psgport
     OUT	(C),L
@@ -39,7 +39,5 @@ IF PSGLatchPort
     in a,(PSGLatchPort)
 ENDIF
     ret
-
-DEFC ASMDISP_SET_PSG_CALLEE = asmentry - set_psg_callee
 
 ENDIF

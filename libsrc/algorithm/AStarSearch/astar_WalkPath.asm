@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC astar_WalkPath
 PUBLIC _astar_WalkPath
-EXTERN astar_WalkPath_callee
-EXTERN ASMDISP_ASTAR_WALKPATH_CALLEE
+EXTERN asm_astar_WalkPath
 
 .astar_WalkPath
 ._astar_WalkPath
@@ -18,5 +17,5 @@ EXTERN ASMDISP_ASTAR_WALKPATH_CALLEE
    push bc
    push af
    
-   jp astar_WalkPath_callee + ASMDISP_ASTAR_WALKPATH_CALLEE
+   jp asm_astar_WalkPath
 

@@ -5,7 +5,8 @@ PUBLIC HeapAlloc
 PUBLIC _HeapAlloc
 
 EXTERN HeapAlloc_callee
-EXTERN ASMDISP_HEAPALLOC_CALLEE
+EXTERN asm_HeapAlloc
+
 
 .HeapAlloc
 ._HeapAlloc
@@ -17,4 +18,5 @@ EXTERN ASMDISP_HEAPALLOC_CALLEE
    push bc
    push de
    
-   jp HeapAlloc_callee + ASMDISP_HEAPALLOC_CALLEE
+   jp asm_HeapAlloc
+

@@ -15,7 +15,7 @@
 
 	PUBLIC	sd_read_sector_callee
    PUBLIC   _sd_read_sector_callee
-	PUBLIC	ASMDISP_SD_READ_SECTOR_CALLEE
+	PUBLIC	asm_sd_read_sector
 
 	EXTERN	sd_card_info
 	EXTERN	card_select
@@ -39,7 +39,7 @@ _sd_read_sector_callee:
 	pop ix	; SD_INFO struct
 	push af
 
-.asmentry
+.asm_sd_read_sector
 						; ptr to MMC mask to be used to select port
 	ld	a,(ix+1)		; or any other hw dependent reference to current slot
 	ld	(card_select), a
@@ -73,4 +73,3 @@ read_end:
 	ret
 
 
-DEFC ASMDISP_SD_READ_SECTOR_CALLEE = asmentry - sd_read_sector_callee

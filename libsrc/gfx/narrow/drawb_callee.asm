@@ -16,7 +16,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     PUBLIC    drawb_callee
     PUBLIC    _drawb_callee
 
-    PUBLIC    ASMDISP_DRAWB_CALLEE
+    PUBLIC    asm_drawb
 
     EXTERN    drawbox
     EXTERN    plotpixel
@@ -36,7 +36,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     ld    h,e    ; y    
     push af
     
-.asmentry
+.asm_drawb
     push ix
     ld    ix,plotpixel
 IF NEED_swapgfxbk = 1
@@ -51,5 +51,4 @@ ELSE
   ENDIF
     ret
 ENDIF
-DEFC ASMDISP_DRAWB_CALLEE = asmentry - drawb_callee
 ENDIF

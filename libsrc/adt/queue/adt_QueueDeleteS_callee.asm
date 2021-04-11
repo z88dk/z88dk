@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC adt_QueueDeleteS_callee
 PUBLIC _adt_QueueDeleteS_callee
-PUBLIC ASMDISP_ADT_QUEUEDELETES_CALLEE
+PUBLIC asm_adt_QueueDeleteS
 
 EXTERN l_jpix
 EXTERN _u_free
@@ -16,7 +16,7 @@ EXTERN _u_free
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_adt_QueueDeleteS
    push  ix		;save callers ix
 
 ; free all items in queue but not adt_Queue struct itself
@@ -80,4 +80,3 @@ ENDIF
 
    ret
 
-DEFC ASMDISP_ADT_QUEUEDELETES_CALLEE = asmentry - adt_QueueDeleteS_callee

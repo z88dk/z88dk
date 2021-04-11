@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC screensize
 PUBLIC _screensize
-EXTERN screensize_callee
-EXTERN ASMDISP_SCREENSIZE_CALLEE
+EXTERN asm_screensize
 
 .screensize
 ._screensize
@@ -16,4 +15,4 @@ EXTERN ASMDISP_SCREENSIZE_CALLEE
    push de
    push hl
    
-   jp screensize_callee + ASMDISP_SCREENSIZE_CALLEE
+   jp asm_screensize

@@ -11,7 +11,7 @@
 
 
 PUBLIC tape_save_block_callee
-PUBLIC ASMDISP_TAPE_SAVE_BLOCK_CALLEE
+PUBLIC asm_tape_save_block
 
 EXTERN  musamy_save
 
@@ -40,7 +40,7 @@ EXTERN zx_slow
 ;         de = len
 ;          a = type
 
-.asmentry
+.asm_tape_save_block
 
 		LD (header),a
 		
@@ -68,5 +68,3 @@ EXTERN zx_slow
 		pop hl
 		ret
 
-
-DEFC ASMDISP_TAPE_SAVE_BLOCK_CALLEE = asmentry - tape_save_block_callee

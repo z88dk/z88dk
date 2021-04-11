@@ -16,7 +16,7 @@
 	PUBLIC	psg_patch0
 ;	PUBLIC	psg_patch1
 	
-	PUBLIC ASMDISP_SET_PSG_CALLEE
+	PUBLIC asm_set_psg
 
 	
 set_psg_callee:
@@ -26,7 +26,7 @@ _set_psg_callee:
    pop de
    ex (sp),hl
 	
-.asmentry
+.asm_set_psg
 
 	
 psg_patch0:
@@ -37,4 +37,3 @@ psg_patch0:
 
 	ret
 
-DEFC ASMDISP_SET_PSG_CALLEE = asmentry - set_psg_callee

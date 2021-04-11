@@ -16,8 +16,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     PUBLIC    drawb
     PUBLIC    _drawb
 
-    EXTERN    drawb_callee
-    EXTERN    ASMDISP_DRAWB_CALLEE
+    EXTERN    asm_drawb
 
 
 .drawb
@@ -31,5 +30,5 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     ld    h,(ix+8)
     pop    ix
     
-   jp drawb_callee + ASMDISP_DRAWB_CALLEE
+   jp asm_drawb
 ENDIF

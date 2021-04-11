@@ -15,7 +15,7 @@
 	PUBLIC    drawr_callee
 	PUBLIC    _drawr_callee
 	
-	PUBLIC    ASMDISP_DRAWR_CALLEE
+	PUBLIC    asm_drawr
 
 	EXTERN    do_drawr
 
@@ -27,9 +27,8 @@
 	pop hl	; x
 	push	af	; ret addr
 	
-.asmentry
+.asm_drawr
 	ld		a,2
 	jp      do_drawr
 
 
-DEFC ASMDISP_DRAWR_CALLEE = asmentry - drawr_callee

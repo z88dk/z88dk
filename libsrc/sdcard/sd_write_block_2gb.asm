@@ -16,8 +16,7 @@
 	PUBLIC	sd_write_block_2gb
    PUBLIC   _sd_write_block_2gb
 
-	EXTERN		sd_write_block_2gb_callee
-	EXTERN	ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
+	EXTERN		asm_sd_write_block_2gb
 
 sd_write_block_2gb:
 _sd_write_block_2gb:
@@ -30,5 +29,5 @@ _sd_write_block_2gb:
 	
 	push af
 	
-	jp sd_write_block_2gb_callee + ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
+	jp asm_sd_write_block_2gb
 

@@ -11,7 +11,7 @@
         SECTION code_clib
 PUBLIC	set_exos_variable_callee
 PUBLIC	_set_exos_variable_callee
-PUBLIC 	ASMDISP_SET_EXOS_VARIABLE_CALLEE
+PUBLIC 	asm_set_exos_variable
 
 set_exos_variable_callee:
 _set_exos_variable_callee:
@@ -23,7 +23,7 @@ _set_exos_variable_callee:
 ; enter : e = unsigned char value
 ;         l = unsigned char variable
 
-.asmentry
+.asm_set_exos_variable
 
 	ld	b,1		; SET mode
 	ld	c,l		; Variable
@@ -35,5 +35,4 @@ _set_exos_variable_callee:
 	ret
 
 
-DEFC ASMDISP_SET_EXOS_VARIABLE_CALLEE = asmentry - set_exos_variable_callee
  

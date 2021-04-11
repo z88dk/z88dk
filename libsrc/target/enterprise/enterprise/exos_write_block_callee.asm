@@ -11,7 +11,7 @@
 	SECTION code_clib
 	PUBLIC	exos_write_block_callee
 	PUBLIC	_exos_write_block_callee
-	PUBLIC 	ASMDISP_EXOS_WRITE_BLOCK_CALLEE
+	PUBLIC 	asm_exos_write_block
 
 exos_write_block_callee:
 _exos_write_block_callee:
@@ -22,7 +22,7 @@ _exos_write_block_callee:
 	pop hl
 	push af
 
-.asmentry
+.asm_exos_write_block
 
 	ld	a,l
 	rst   30h
@@ -32,4 +32,3 @@ _exos_write_block_callee:
 
 	ret
 
-DEFC ASMDISP_EXOS_WRITE_BLOCK_CALLEE = asmentry - _exos_write_block_callee

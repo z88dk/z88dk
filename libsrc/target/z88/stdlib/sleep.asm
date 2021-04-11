@@ -21,7 +21,7 @@
 		PUBLIC    _sleep
 		EXTERN	l_mult
 		EXTERN	l_div_u
-		PUBLIC ASMDISP_SLEEP
+		PUBLIC asm_sleep
 
 ;sleep(int time);
 
@@ -33,7 +33,7 @@
         push    de
         push    hl
         
-.asmentry
+.asm_sleep
                 
 	ld	hl,100
 	call	l_mult
@@ -51,5 +51,4 @@
 	ld	b,h
 	ret	
 
-DEFC ASMDISP_SLEEP = asmentry - sleep
 

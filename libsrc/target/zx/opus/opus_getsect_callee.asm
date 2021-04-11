@@ -15,9 +15,8 @@
 SECTION code_clib
 PUBLIC	opus_getsect_callee
 PUBLIC	_opus_getsect_callee
-;PUBLIC	ASMDISP_OPUS_GETSECT_CALLEE
 
-PUBLIC	opus_getsect_asmentry
+PUBLIC	asm_opus_getsect
 
 	EXTERN	opus_rommap
 	EXTERN	P_DEVICE
@@ -31,7 +30,7 @@ _opus_getsect_callee:
 	pop bc		; c=drive#
 	push af
 
-opus_getsect_asmentry:
+asm_opus_getsect:
 
 
 	call	opus_rommap
@@ -45,4 +44,3 @@ opus_getsect_asmentry:
 	ld		hl,0
 	ret
 
-;DEFC ASMDISP_OPUS_GETSECT_CALLEE = opus_getsect_asmentry - opus_getsect_callee

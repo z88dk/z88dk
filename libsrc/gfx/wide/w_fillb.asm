@@ -1,39 +1,26 @@
-;
-; FILLB  -  draw a filled rect area
-;
-; Generic high resolution version
-;
+;void fillb_callee(int tlx, int tly, int width, int height)
 
-;
-;    $Id: w_fillb.asm $
-;
-
-IF !__CPU_INTEL__
-SECTION code_graphics
-PUBLIC fillb
-PUBLIC _fillb
-EXTERN fillb_callee
-EXTERN ASMDISP_FILLB_CALLEE
-
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+    SECTION code_graphics
+    PUBLIC  fillb
+    PUBLIC  _fillb
+    EXTERN  asm_fillb
     
 .fillb
 ._fillb
-
-    pop af
-    
-    pop de
-    pop    hl
+    pop     af
+    pop     de
+    pop     hl
     exx        ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
-    pop de
-    pop hl
+    pop     de
+    pop     hl
     
-    push hl
-    push de
+    push    hl
+    push    de
     exx
-    push hl
-    push de
+    push    hl
+    push    de
+    push    af    ; ret addr
     
-    push af    ; ret addr
-    
-   jp fillb_callee + ASMDISP_FILLB_CALLEE
+    jp      asm_fillb
 ENDIF

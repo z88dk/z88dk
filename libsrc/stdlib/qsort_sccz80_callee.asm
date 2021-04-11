@@ -25,7 +25,7 @@
 ;  }
 ;}
 
-
+SECTION code_clib
 PUBLIC qsort_sccz80_callee
 PUBLIC _qsort_sccz80_callee
 PUBLIC qsort_sccz80_enter

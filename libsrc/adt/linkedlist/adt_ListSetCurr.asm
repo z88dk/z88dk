@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC adt_ListSetCurr
 PUBLIC _adt_ListSetCurr
 
-EXTERN adt_ListSetCurr_callee
-EXTERN ASMDISP_ADT_LISTSETCURR_CALLEE
+EXTERN asm_adt_ListSetCurr
 
 .adt_ListSetCurr
 ._adt_ListSetCurr
@@ -18,4 +17,4 @@ EXTERN ASMDISP_ADT_LISTSETCURR_CALLEE
    push de
    push af
    
-   jp adt_ListSetCurr_callee + ASMDISP_ADT_LISTSETCURR_CALLEE
+   jp asm_adt_ListSetCurr

@@ -4,12 +4,11 @@
 ;       $Id: setcursorpos.asm,v 1.4 2016-06-19 20:58:00 dom Exp $
 ;
 
-        SECTION   code_clib
+SECTION   code_clib
 PUBLIC setcursorpos
 PUBLIC _setcursorpos
 
-EXTERN setcursorpos_callee
-EXTERN ASMDISP_SETCURSORPOS_CALLEE
+EXTERN asm_setcursorpos
 
 setcursorpos:
 _setcursorpos:
@@ -20,4 +19,4 @@ _setcursorpos:
    push hl
    push bc
    
-   jp setcursorpos_callee + ASMDISP_SETCURSORPOS_CALLEE
+   jp asm_setcursorpos

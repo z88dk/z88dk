@@ -4,8 +4,7 @@ SECTION code_clib
 PUBLIC im2_RemoveHook
 PUBLIC _im2_RemoveHook
 
-EXTERN im2_RemoveHook_callee
-EXTERN ASMDISP_REMOVEHOOK_CALLEE
+EXTERN asm_im2_RemoveHook
 
 .im2_RemoveHook
 ._im2_RemoveHook
@@ -17,5 +16,5 @@ EXTERN ASMDISP_REMOVEHOOK_CALLEE
    push de
    push bc
 
-   jp im2_RemoveHook_callee + ASMDISP_REMOVEHOOK_CALLEE
+   jp asm_im2_RemoveHook
    

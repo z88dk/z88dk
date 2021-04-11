@@ -12,8 +12,7 @@
 	PUBLIC	exos_read_block
 	PUBLIC	_exos_read_block
 
-	EXTERN     exos_read_block_callee
-	EXTERN     ASMDISP_EXOS_READ_BLOCK_CALLEE
+	EXTERN     asm_exos_read_block
 
 exos_read_block:
 _exos_read_block:
@@ -27,4 +26,4 @@ _exos_read_block:
 	push de
 	push af
 
-   jp exos_read_block_callee + ASMDISP_EXOS_READ_BLOCK_CALLEE
+   jp asm_exos_read_block

@@ -14,8 +14,7 @@
         PUBLIC    cpc_AssignKey
         PUBLIC    _cpc_AssignKey
 		
-        EXTERN     cpc_AssignKey_callee
-        EXTERN    ASMDISP_CPC_ASSIGNKEY_CALLEE
+        EXTERN    asm_cpc_AssignKey
 
 .cpc_AssignKey
 ._cpc_AssignKey
@@ -25,4 +24,4 @@
         push    de
         push    hl
         push    bc
-        jp cpc_AssignKey_callee + ASMDISP_CPC_ASSIGNKEY_CALLEE
+        jp asm_cpc_AssignKey

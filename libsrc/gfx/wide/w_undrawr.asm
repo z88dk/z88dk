@@ -1,35 +1,20 @@
-;
-;      Z88 Graphics Functions - Small C+ stubs
-;
-;      Written around the Interlogic Standard Library
-;
-;      Stubs Written by D Morris - 30/9/98
-;
-;      Wide resolution (int type parameters) version by Stefano Bodrato
-;
-;    $Id: w_undrawr.asm $
-;
+; ----- void undrawr(int x, int y)
 
 
-; CALLER LINKAGE FOR FUNCTION POINTERS
-
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION code_graphics
-    PUBLIC undrawr
-    PUBLIC _undrawr
-    EXTERN undrawr_callee
-    EXTERN ASMDISP_UNDRAWR_CALLEE
+    PUBLIC  undrawr
+    PUBLIC  _undrawr
+    EXTERN  asm_undrawr
 
 .undrawr
 ._undrawr
 
-    pop    af
-    pop    de
-    pop    hl
+    pop     af
+    pop     de
+    pop     hl
     push    hl
     push    de
     push    af
-
-
-   jp undrawr_callee + ASMDISP_UNDRAWR_CALLEE
+    jp      asm_undrawr
 ENDIF

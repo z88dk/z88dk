@@ -1,7 +1,4 @@
-;      Z88 Small C+ Graphics Functions
-;      Draw a circle on the Z88 map
-;      Adapted from my Spectrum Routine
-;      (C) 1995-1998 D.J.Morris
+; Usage: circle(int x, int y, int radius, int skip);
 ;
 ;    HiRez, NO radius correction square pixels assumed
 ;    variant: no table on stack, only one index register is used
@@ -10,7 +7,7 @@
 ;
 
 
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION    code_graphics
     PUBLIC w_draw_circle
     EXTERN l_graphics_cmp

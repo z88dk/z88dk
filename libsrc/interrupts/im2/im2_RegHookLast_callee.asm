@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC im2_RegHookLast_callee
 PUBLIC _im2_RegHookLast_callee
-PUBLIC ASMDISP_IM2_REGHOOKLAST_CALLEE
+PUBLIC asm_im2_RegHookLast
 EXTERN _im2_hookDisp
 
 .im2_RegHookLast_callee
@@ -14,7 +14,7 @@ EXTERN _im2_hookDisp
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_im2_RegHookLast
 
 ; enter: de = address of hook (subroutine)
 ;         l = interrupt vector where Generic ISR is installed
@@ -42,5 +42,3 @@ EXTERN _im2_hookDisp
    dec hl
    ld (hl),e
    ret
-
-DEFC ASMDISP_IM2_REGHOOKLAST_CALLEE = asmentry - im2_RegHookLast_callee

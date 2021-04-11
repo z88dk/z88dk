@@ -1,15 +1,3 @@
-;
-;     Z88 Graphics Functions - Small C+ stubs
-;
-;     Written around the Interlogic Standard Library
-;
-;     Stubs Written by D Morris - 30/9/98
-;
-;
-;    $Id: circle_callee.asm $
-;
-
-
 ; Usage: circle(int x, int y, int radius, int skip);
 
 
@@ -19,7 +7,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     PUBLIC    circle_callee
     PUBLIC    _circle_callee
 
-    PUBLIC    ASMDISP_CIRCLE_CALLEE
+    PUBLIC    asm_circle
 
     EXTERN    draw_circle
     EXTERN    plotpixel
@@ -31,22 +19,17 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
 .circle_callee
 ._circle_callee
-    pop    af
-    
-    pop    de    ; skip
-    pop    bc    ;radius
-    ld    d,c
-    pop    bc    ; y
-    pop    hl    ; x
-    ld    b,l
-    
+    pop     af
+    pop     de    ; skip
+    pop     bc    ;radius
+    ld      d,c
+    pop     bc    ; y
+    pop     hl    ; x
+    ld      b,l
     push    af
-
+.asm_circle
     push    ix
-    
-    
-.asmentry
-    ld    ix,plotpixel
+    ld      ix,plotpixel
 IF NEED_swapgfxbk = 1
     call    swapgfxbk
 ENDIF
@@ -59,5 +42,4 @@ ELSE
   ENDIF
     ret
 ENDIF
-DEFC ASMDISP_CIRCLE_CALLEE = asmentry - circle_callee
 ENDIF

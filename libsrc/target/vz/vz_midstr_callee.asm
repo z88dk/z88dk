@@ -11,7 +11,7 @@
 SECTION code_clib
 PUBLIC vz_midstr_callee
 PUBLIC _vz_midstr_callee
-PUBLIC ASMDISP_VZ_MIDSTR_CALLEE
+PUBLIC asm_vz_midstr
 
 .vz_midstr_callee
 ._vz_midstr_callee
@@ -24,11 +24,10 @@ PUBLIC ASMDISP_VZ_MIDSTR_CALLEE
    ; de = int pos
    ; hl = char *str
    
-.asmentry
+.asm_vz_midstr
 
    add hl,de
    ld l,(hl)
    ld h,0
    ret
 
-DEFC ASMDISP_VZ_MIDSTR_CALLEE = asmentry - vz_midstr_callee

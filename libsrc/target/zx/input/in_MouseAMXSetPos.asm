@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC in_MouseAMXSetPos
 PUBLIC _in_MouseAMXSetPos
 
-EXTERN in_MouseAMXSetPos_callee
-EXTERN CDISP_IN_MOUSEAMXSETPOS_CALLEE
+EXTERN centry_in_MouseAMXSetPos
 
 .in_MouseAMXSetPos
 ._in_MouseAMXSetPos
@@ -18,4 +17,4 @@ EXTERN CDISP_IN_MOUSEAMXSETPOS_CALLEE
    push bc
    push de
    
-   jp in_MouseAMXSetPos_callee + CDISP_IN_MOUSEAMXSETPOS_CALLEE
+   jp centry_in_MouseAMXSetPos

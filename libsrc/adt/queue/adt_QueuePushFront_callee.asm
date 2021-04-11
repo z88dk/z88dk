@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC adt_QueuePushFront_callee
 PUBLIC _adt_QueuePushFront_callee
-PUBLIC ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE
+PUBLIC asm_adt_QueuePushFront
 
 EXTERN _u_malloc
 
@@ -15,7 +15,7 @@ EXTERN _u_malloc
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_adt_QueuePushFront
 
 ; enter: HL = struct adt_Queue *
 ;        DE = item
@@ -68,4 +68,3 @@ EXTERN _u_malloc
    ld (hl),d
    ret
 
-DEFC ASMDISP_ADT_QUEUEPUSHFRONT_CALLEE = asmentry - adt_QueuePushFront_callee

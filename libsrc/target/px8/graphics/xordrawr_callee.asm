@@ -15,7 +15,7 @@
 	PUBLIC    xordrawr_callee
 	PUBLIC    _xordrawr_callee
 	
-	PUBLIC    ASMDISP_XORDRAWR_CALLEE
+	PUBLIC    asm_xordrawr
 
 	EXTERN    do_drawr
 
@@ -27,9 +27,8 @@
 	pop hl	; x
 	push	af	; ret addr
 	
-.asmentry
+.asm_xordrawr
 	ld		a,3
 	jp      do_drawr
 
 
-DEFC ASMDISP_XORDRAWR_CALLEE = asmentry - xordrawr_callee

@@ -9,7 +9,7 @@
         SECTION   code_clib
         PUBLIC    cpc_SetInkGphStr_callee
         PUBLIC    _cpc_SetInkGphStr_callee
-        PUBLIC    ASMDISP_CPC_SET_INKGPHSTR_CALLEE
+        PUBLIC    asm_cpc_SetInkGphStr
 		
         EXTERN colores_camb
 
@@ -24,7 +24,7 @@
    ld	c,l
    
 
-.asmentry
+.asm_cpc_SetInkGphStr
 	
 ld hl,colores_camb
 ld b,0
@@ -33,5 +33,3 @@ ld (hl),a
 	
 ret
 
-
-DEFC ASMDISP_CPC_SET_INKGPHSTR_CALLEE = asmentry - cpc_SetInkGphStr_callee

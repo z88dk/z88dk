@@ -11,10 +11,9 @@
 SECTION code_clib
 PUBLIC vz_line_callee
 PUBLIC _vz_line_callee
-PUBLIC ASMDISP_VZ_LINE_CALLEE
+PUBLIC asm_vz_line
 
-EXTERN vz_plot_callee
-EXTERN ASMDISP_VZ_PLOT_CALLEE
+EXTERN asm_vz_plot
 
 .vz_line_callee
 ._vz_line_callee
@@ -39,7 +38,7 @@ EXTERN ASMDISP_VZ_PLOT_CALLEE
    ; e = x2
    ; d = y2
    
-.asmentry
+.asm_vz_line
 
    ld a,e
    cp l
@@ -73,7 +72,7 @@ EXTERN ASMDISP_VZ_PLOT_CALLEE
    push bc
    push de
    push hl
-   call vz_plot_callee + ASMDISP_VZ_PLOT_CALLEE
+   call asm_vz_plot
    pop hl
    pop de
    pop bc
@@ -102,7 +101,7 @@ EXTERN ASMDISP_VZ_PLOT_CALLEE
    push bc
    push de
    push hl
-   call vz_plot_callee + ASMDISP_VZ_PLOT_CALLEE
+   call asm_vz_plot
    pop hl
    pop de
    pop bc
@@ -137,7 +136,7 @@ EXTERN ASMDISP_VZ_PLOT_CALLEE
    push bc
    push de
    push hl
-   call vz_plot_callee + ASMDISP_VZ_PLOT_CALLEE
+   call asm_vz_plot
    pop hl
    pop de
    pop bc
@@ -166,7 +165,7 @@ EXTERN ASMDISP_VZ_PLOT_CALLEE
    push bc
    push de
    push hl
-   call vz_plot_callee + ASMDISP_VZ_PLOT_CALLEE
+   call asm_vz_plot
    pop hl
    pop de
    pop bc
@@ -183,4 +182,3 @@ EXTERN ASMDISP_VZ_PLOT_CALLEE
    add a,e                   ; overflow += dx
    jp lupx1
 
-DEFC ASMDISP_VZ_LINE_CALLEE = asmentry - vz_line_callee

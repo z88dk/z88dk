@@ -680,7 +680,7 @@ cpm_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Library ---'
 	@echo ''
-	$(call buildgeneric,cpm)
+	$(call buildgeneric,cpm,"portable")
 	$(MAKE) -C target/cpm
 	TARGET=cpm TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
 	@echo ''

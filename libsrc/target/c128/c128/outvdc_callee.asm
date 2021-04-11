@@ -10,7 +10,7 @@
         SECTION code_clib
         PUBLIC    outvdc_callee
         PUBLIC    _outvdc_callee
-        PUBLIC    ASMDISP_OUTVDC_CALLEE
+        PUBLIC    asm_outvdc
 
 outvdc_callee:
 _outvdc_callee:
@@ -18,7 +18,7 @@ _outvdc_callee:
         pop de
         ex (sp),hl
         
-asmentry:
+asm_outvdc:
         ld      a,l
         ld      bc,0d600h       ;vdc status port
         out     (c),a           ;set reg to read
@@ -37,4 +37,3 @@ test7:
 ;  outp(vdcDataReg,RegVal);                    /* write register */
 ;}
 
-DEFC ASMDISP_OUTVDC_CALLEE = asmentry - outvdc_callee

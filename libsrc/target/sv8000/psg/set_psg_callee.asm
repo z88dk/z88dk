@@ -5,7 +5,7 @@
 	PUBLIC	set_psg_callee
 	PUBLIC	_set_psg_callee
 
-	PUBLIC ASMDISP_SET_PSG_CALLEE
+	PUBLIC asm_set_psg
 
 	
 set_psg_callee:
@@ -20,12 +20,11 @@ _set_psg_callee:
    pop de
    ex (sp),hl
 	
-asmentry:
+asm_set_psg:
 	ld	a,l
 	out	($c1),a
 	ld	a,e
 	out	($c0),a
 	ret
 
-DEFC ASMDISP_SET_PSG_CALLEE = asmentry - set_psg_callee
 

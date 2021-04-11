@@ -7,8 +7,7 @@ SECTION code_clib
 PUBLIC adt_ListAdd
 PUBLIC _adt_ListAdd
 
-EXTERN adt_ListAdd_callee
-EXTERN ASMDISP_ADT_LISTADD_CALLEE
+EXTERN asm_adt_ListAdd
 
 .adt_ListAdd
 ._adt_ListAdd
@@ -20,4 +19,4 @@ EXTERN ASMDISP_ADT_LISTADD_CALLEE
    push bc
    push hl
    
-   jp adt_ListAdd_callee + ASMDISP_ADT_LISTADD_CALLEE
+   jp asm_adt_ListAdd

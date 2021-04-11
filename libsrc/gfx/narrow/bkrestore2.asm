@@ -13,9 +13,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     PUBLIC    _bkrestore
     
     EXTERN    putsprite
-    EXTERN    clga_callee
-    EXTERN    ASMDISP_CLGA_CALLEE
-
+    EXTERN    asm_clga
 
 .bkrestore
 ._bkrestore
@@ -52,7 +50,7 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     ; HL    = (x,y)
     ; BC    = (width,heigth)
-    call clga_callee + ASMDISP_CLGA_CALLEE
+    call asm_clga
     
     call    putsprite
     

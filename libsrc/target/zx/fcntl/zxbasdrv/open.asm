@@ -14,7 +14,7 @@
 	EXTERN	zxhandl
 	
 	EXTERN	zx_setint_callee
-	EXTERN ASMDISP_ZX_SETINT_CALLEE
+	EXTERN asm_zx_setint
 	EXTERN	zx_goto
 	EXTERN	zxgetfname
 
@@ -35,7 +35,7 @@
 	ld	d,(hl)
 	
 	ld	hl,fvar		; BASIC variable F
-	call	zx_setint_callee + ASMDISP_ZX_SETINT_CALLEE
+	call	asm_zx_setint
 	
 	pop	hl
 
@@ -70,7 +70,7 @@
 	push de		; save file handle
 
 	ld	hl,svar		; BASIC variable S
-	call	zx_setint_callee + ASMDISP_ZX_SETINT_CALLEE
+	call	asm_zx_setint
 
 					; BASIC routine for "open"
 	ld	hl,7500		; now it is __FASTCALL__

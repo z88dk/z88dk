@@ -10,10 +10,10 @@
 ;	$Id: setcursorpos_callee.asm,v 1.5 2016-06-19 20:58:00 dom Exp $
 ;
 
-        SECTION   code_clib
+SECTION   code_clib
 PUBLIC	setcursorpos_callee
 PUBLIC	_setcursorpos_callee
-PUBLIC	ASMDISP_SETCURSORPOS_CALLEE
+PUBLIC	asm_setcursorpos
 
 
 setcursorpos_callee:
@@ -26,9 +26,8 @@ _setcursorpos_callee:
 ; enter : l = x
 ;         e = y
 
-.asmentry
+.asm_setcursorpos
 ;jr asmentry
 	ld h,e
 	jp	$201E
 
-DEFC ASMDISP_SETCURSORPOS_CALLEE = asmentry - setcursorpos_callee

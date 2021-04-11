@@ -4,10 +4,10 @@
 SECTION code_clib
 PUBLIC HeapCalloc_callee
 PUBLIC _HeapCalloc_callee
-PUBLIC ASMDISP_HEAPCALLOC_CALLEE
+PUBLIC asm_HeapCalloc
 
-EXTERN l_mult, HeapAlloc_callee
-EXTERN ASMDISP_HEAPALLOC_CALLEE
+EXTERN l_mult
+EXTERN asm_HeapAlloc
 
 .HeapCalloc_callee
 ._HeapCalloc_callee
@@ -18,7 +18,7 @@ EXTERN ASMDISP_HEAPALLOC_CALLEE
    pop bc
    push af
 
-.asmentry
+.asm_HeapCalloc
 
 ; Allocate memory from the indicated heap and clear it to zeroes
 ;
@@ -37,7 +37,7 @@ EXTERN ASMDISP_HEAPALLOC_CALLEE
    ld b,h
    pop hl
    push bc
-   call HeapAlloc_callee + ASMDISP_HEAPALLOC_CALLEE
+   call asm_HeapAlloc
    pop bc
    ret nc                    ; ret if fail
    
@@ -74,5 +74,3 @@ ENDIF
 
    scf
    ret
-
-DEFC ASMDISP_HEAPCALLOC_CALLEE = asmentry - HeapCalloc_callee

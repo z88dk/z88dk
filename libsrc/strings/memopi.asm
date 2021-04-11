@@ -2,8 +2,7 @@
 
 PUBLIC memopi
 PUBLIC _memopi
-EXTERN memopi_callee
-EXTERN ASMDISP_MEMOPI_CALLEE
+EXTERN asm_memopi
 
 .memopi
 ._memopi
@@ -19,4 +18,4 @@ EXTERN ASMDISP_MEMOPI_CALLEE
    push bc
    push af
    
-   jp memopi_callee + ASMDISP_MEMOPI_CALLEE
+   jp asm_memopi

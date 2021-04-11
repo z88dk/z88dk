@@ -5,8 +5,7 @@ PUBLIC vz_plot
 PUBLIC _vz_plot
 PUBLIC cplot
 PUBLIC _cplot
-EXTERN vz_plot_callee
-EXTERN ASMDISP_VZ_PLOT_CALLEE
+EXTERN asm_vz_plot
 
 .vz_plot
 ._vz_plot
@@ -23,4 +22,4 @@ EXTERN ASMDISP_VZ_PLOT_CALLEE
    push af
    ld h,e
 
-   jp vz_plot_callee + ASMDISP_VZ_PLOT_CALLEE
+   jp asm_vz_plot

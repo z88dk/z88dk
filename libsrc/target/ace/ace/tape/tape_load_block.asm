@@ -4,8 +4,7 @@
 PUBLIC tape_load_block
 PUBLIC _tape_load_block
 
-EXTERN tape_load_block_callee
-EXTERN ASMDISP_TAPE_LOAD_BLOCK_CALLEE
+EXTERN asm_tape_load_block
 
 .tape_load_block
 ._tape_load_block
@@ -19,4 +18,4 @@ EXTERN ASMDISP_TAPE_LOAD_BLOCK_CALLEE
    push bc
    push ix
    
-   jp tape_load_block_callee + ASMDISP_TAPE_LOAD_BLOCK_CALLEE
+   jp asm_tape_load_block

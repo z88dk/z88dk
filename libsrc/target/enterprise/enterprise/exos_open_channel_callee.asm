@@ -11,7 +11,7 @@
         SECTION code_clib
 PUBLIC	exos_open_channel_callee
 PUBLIC	_exos_open_channel_callee
-PUBLIC 	ASMDISP_EXOS_OPEN_CHANNEL_CALLEE
+PUBLIC 	asm_exos_open_channel
 
 exos_open_channel_callee:
 _exos_open_channel_callee:
@@ -23,7 +23,7 @@ _exos_open_channel_callee:
 ; enter : de = char *device
 ;         l = channel number
 
-.asmentry
+.asm_exos_open_channel
 
 	ld	a,l		; channel
 	rst   30h
@@ -31,7 +31,4 @@ _exos_open_channel_callee:
 	ld	h,0
 	ld	l,a
 	ret
-
-
-DEFC ASMDISP_EXOS_OPEN_CHANNEL_CALLEE = asmentry - exos_open_channel_callee
  

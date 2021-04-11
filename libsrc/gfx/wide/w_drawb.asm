@@ -1,39 +1,28 @@
-;
-; Drawb
-;
-; Generic high resolution version
-;
-
-;
-;    $Id: w_drawb.asm $
-;
-
-IF !__CPU_INTEL__
-SECTION code_graphics
-PUBLIC drawb
-PUBLIC _drawb
-EXTERN drawb_callee
-EXTERN ASMDISP_DRAWB_CALLEE
+; void drawb(int tlx, int tly, int width, int height)
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+    SECTION code_graphics
+    PUBLIC  drawb
+    PUBLIC  _drawb
+    EXTERN  asm_drawb
 
     
 .drawb
 ._drawb
 
-    pop af
+    pop     af
     
-    pop de
-    pop    hl
+    pop     de
+    pop     hl
     exx        ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
-    pop de
-    pop hl
+    pop     de
+    pop     hl
     
-    push hl
-    push de
+    push    hl
+    push    de
     exx
-    push hl
-    push de
+    push    hl
+    push    de
+    push    af    ; ret addr
     
-    push af    ; ret addr
-    
-   jp drawb_callee + ASMDISP_DRAWB_CALLEE
+    jp      asm_drawb
 ENDIF

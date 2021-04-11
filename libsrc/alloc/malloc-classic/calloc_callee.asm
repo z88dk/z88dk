@@ -4,10 +4,10 @@
 SECTION code_clib
 PUBLIC calloc_callee
 PUBLIC _calloc_callee
-EXTERN ASMDISP_CALLOC_CALLEE
+EXTERN asm_calloc
 
-EXTERN HeapCalloc_callee
-EXTERN _heap, ASMDISP_HEAPCALLOC_CALLEE
+EXTERN asm_HeapCalloc
+EXTERN _heap
 
 .calloc_callee
 ._calloc_callee
@@ -16,7 +16,7 @@ EXTERN _heap, ASMDISP_HEAPCALLOC_CALLEE
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_calloc
 
 ; enter : hl = number of objects
 ;         de = size of each object
@@ -25,6 +25,5 @@ EXTERN _heap, ASMDISP_HEAPCALLOC_CALLEE
 ; uses  : af, bc, de, hl
 
    ld bc,_heap
-   jp HeapCalloc_callee + ASMDISP_HEAPCALLOC_CALLEE
+   jp asm_HeapCalloc
 
-DEFC ASMDISP_CALLOC_CALLEE = asmentry - calloc_callee

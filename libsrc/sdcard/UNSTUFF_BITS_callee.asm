@@ -8,7 +8,7 @@
 
 PUBLIC UNSTUFF_BITS_callee
 PUBLIC _UNSTUFF_BITS_callee
-PUBLIC ASMDISP_UNSTUFF_BITS_CALLEE
+PUBLIC asm_UNSTUFF_BITS
 EXTERN  extract_bits_sub
 
 .UNSTUFF_BITS_callee
@@ -19,7 +19,7 @@ EXTERN  extract_bits_sub
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_UNSTUFF_BITS
 	push hl
 	ld hl,128	; bit count start on the rightmost bit of the 16 bytes block
 	and a
@@ -30,4 +30,3 @@ EXTERN  extract_bits_sub
 	jp extract_bits_sub
 
 
-DEFC ASMDISP_UNSTUFF_BITS_CALLEE = asmentry - UNSTUFF_BITS_callee

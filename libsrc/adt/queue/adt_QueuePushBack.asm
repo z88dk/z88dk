@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC adt_QueuePushBack
 PUBLIC _adt_QueuePushBack
 
-EXTERN adt_QueuePushBack_callee
-EXTERN ASMDISP_ADT_QUEUEPUSHBACK_CALLEE
+EXTERN asm_adt_QueuePushBack
 
 .adt_QueuePushBack
 ._adt_QueuePushBack
@@ -18,4 +17,4 @@ EXTERN ASMDISP_ADT_QUEUEPUSHBACK_CALLEE
    push de
    push bc
    
-   jp adt_QueuePushBack_callee + ASMDISP_ADT_QUEUEPUSHBACK_CALLEE
+   jp asm_adt_QueuePushBack

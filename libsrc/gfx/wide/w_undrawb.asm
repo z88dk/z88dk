@@ -1,39 +1,27 @@
-;
-; UnDrawbox
-;
-; Generic high resolution version
-;
+; void undrawb_callee(int tlx, int tly, int width, int height)
 
-;
-;    $Id: w_undrawb.asm $
-;
-
-IF !__CPU_INTEL__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION code_graphics
-    PUBLIC undrawb
-    PUBLIC _undrawb
-    EXTERN undrawb_callee
-    EXTERN ASMDISP_UNDRAWB_CALLEE
+    PUBLIC  undrawb
+    PUBLIC  _undrawb
+    EXTERN  asm_undrawb
 
-    
 .undrawb
 ._undrawb
-
-    pop af
+    pop     af
     
-    pop de
-    pop    hl
+    pop     de
+    pop     hl
     exx        ; w_plotpixel and swapgfxbk must not use the alternate registers, no problem with w_line_r
-    pop de
-    pop hl
+    pop     de
+    pop     hl
     
-    push hl
-    push de
+    push    hl
+    push    de
     exx
-    push hl
-    push de
+    push    hl
+    push    de
+    push    af    ; ret addr
     
-    push af    ; ret addr
-    
-   jp undrawb_callee + ASMDISP_UNDRAWB_CALLEE
+    jp      asm_undrawb
 ENDIF

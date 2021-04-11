@@ -7,7 +7,7 @@
 
 PUBLIC tape_save_block_callee
 PUBLIC _tape_save_block_callee
-PUBLIC ASMDISP_TAPE_SAVE_BLOCK_CALLEE
+PUBLIC asm_tape_save_block
 
 EXTERN __SYSVAR_BORDCR
 
@@ -26,7 +26,7 @@ EXTERN __SYSVAR_BORDCR
 ;         de = len
 ;          a = type
 
-.asmentry
+.asm_tape_save_block
 		
 		CALL    SA_BYTES
 		
@@ -162,4 +162,3 @@ EXTERN __SYSVAR_BORDCR
 
 
 
-DEFC ASMDISP_TAPE_SAVE_BLOCK_CALLEE = asmentry - tape_save_block_callee

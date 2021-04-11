@@ -16,8 +16,7 @@
 	PUBLIC	sd_read_sector
    PUBLIC   _sd_read_sector
 
-	EXTERN		sd_read_sector_callee
-	EXTERN	ASMDISP_SD_READ_SECTOR_CALLEE
+	EXTERN		asm_sd_read_sector
 
 sd_read_sector:
 _sd_read_sector:
@@ -30,5 +29,5 @@ _sd_read_sector:
 	
 	push af
 	
-	jp sd_read_sector_callee + ASMDISP_SD_READ_SECTOR_CALLEE
+	jp asm_sd_read_sector
 

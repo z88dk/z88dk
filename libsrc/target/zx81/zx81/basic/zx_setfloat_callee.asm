@@ -12,7 +12,7 @@
 SECTION code_clib
 PUBLIC	zx_setfloat_callee
 PUBLIC	_zx_setfloat_callee
-PUBLIC 	ASMDISP_zx_setfloat_CALLEE
+PUBLIC 	asm_zx_setfloat
 
 EXTERN	zx_locatenum
 EXTERN	fa
@@ -32,7 +32,7 @@ _zx_setfloat_callee:
 ; enter : (FA) = float value
 ;         hl = char *variable
 
-.asmentry
+.asm_zx_setfloat
 
 	;push	de
 	push	hl
@@ -145,6 +145,4 @@ store2:
 	djnz	mvloop
 		
 	ret
- 
- DEFC ASMDISP_zx_setfloat_CALLEE = asmentry - zx_setfloat_callee
- 
+  

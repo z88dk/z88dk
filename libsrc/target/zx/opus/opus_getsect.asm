@@ -15,9 +15,7 @@
 SECTION code_clib
 PUBLIC opus_getsect
 PUBLIC _opus_getsect
-;EXTERN ASMDISP_OPUS_GETSECT_CALLEE
-EXTERN opus_getsect_callee
-EXTERN opus_getsect_asmentry
+EXTERN asm_opus_getsect
 
 .opus_getsect
 ._opus_getsect
@@ -31,5 +29,4 @@ EXTERN opus_getsect_asmentry
 	push de		; buffer location
 	push af
 
-	jp	opus_getsect_asmentry
-;   jp ASMDISP_OPUS_GETSECT_CALLEE + opus_getsect_callee
+	jp	asm_opus_getsect

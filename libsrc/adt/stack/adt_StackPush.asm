@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC adt_StackPush
 PUBLIC _adt_StackPush
 
-EXTERN adt_StackPush_callee
-EXTERN ASMDISP_ADT_STACKPUSH_CALLEE
+EXTERN asm_adt_StackPush
 
 .adt_StackPush
 ._adt_StackPush
@@ -18,4 +17,4 @@ EXTERN ASMDISP_ADT_STACKPUSH_CALLEE
    push de
    push bc
    
-   jp adt_StackPush_callee + ASMDISP_ADT_STACKPUSH_CALLEE
+   jp asm_adt_StackPush

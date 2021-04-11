@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC im2_CreateGenericISR_callee
 PUBLIC _im2_CreateGenericISR_callee
-PUBLIC ASMDISP_IM2_CREATEGENERICISR_CALLEE
+PUBLIC asm_im2_CreateGenericISR
 
 EXTERN IM2CreateCommon
 
@@ -17,7 +17,7 @@ EXTERN IM2CreateCommon
    push hl
    ld a,c
 
-.asmentry
+.asm_im2_CreateGenericISR
 
 ; enter:  a = maximum number of hooks
 ;        de = RAM address to copy ISR to
@@ -93,5 +93,3 @@ EXTERN IM2CreateCommon
 .JPHL
 
    jp (hl)
-
-DEFC ASMDISP_IM2_CREATEGENERICISR_CALLEE = asmentry - im2_CreateGenericISR_callee

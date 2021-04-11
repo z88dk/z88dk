@@ -4,8 +4,7 @@ SECTION code_clib
 PUBLIC HeapFree
 PUBLIC _HeapFree
 
-EXTERN HeapFree_callee
-EXTERN ASMDISP_HEAPFREE_CALLEE
+EXTERN asm_HeapFree
 
 .HeapFree
 ._HeapFree
@@ -17,4 +16,4 @@ EXTERN ASMDISP_HEAPFREE_CALLEE
    push hl
    push bc
    
-   jp HeapFree_callee + ASMDISP_HEAPFREE_CALLEE
+   jp asm_HeapFree

@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC adt_ListSearch
 PUBLIC _adt_ListSearch
 
-EXTERN adt_ListSearch_callee
-EXTERN ASMDISP_ADT_LISTSEARCH_CALLEE
+EXTERN asm_adt_ListSearch
 
 .adt_ListSearch
 ._adt_ListSearch
@@ -20,4 +19,4 @@ EXTERN ASMDISP_ADT_LISTSEARCH_CALLEE
    push de
    push bc
    
-   jp adt_ListSearch_callee + ASMDISP_ADT_LISTSEARCH_CALLEE
+   jp asm_adt_ListSearch

@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC zx_setfloat
 PUBLIC _zx_setfloat
 
-EXTERN zx_setfloat_callee
-EXTERN ASMDISP_zx_setfloat_CALLEE
+EXTERN asm_zx_setfloat
 EXTERN fa
 
 .zx_setfloat
@@ -24,5 +23,5 @@ EXTERN fa
 	ld	l,a		;  var name
 
 
-   jp zx_setfloat_callee + ASMDISP_zx_setfloat_CALLEE
+   jp asm_zx_setfloat
 

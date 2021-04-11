@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC vz_midstr
 PUBLIC _vz_midstr
-EXTERN vz_midstr_callee
-EXTERN ASMDISP_VZ_MIDSTR_CALLEE
+EXTERN asm_vz_midstr
 
 .vz_midstr
 ._vz_midstr
@@ -16,5 +15,4 @@ EXTERN ASMDISP_VZ_MIDSTR_CALLEE
    push de
    push af
    
-   jp vz_midstr_callee + ASMDISP_VZ_MIDSTR_CALLEE
-
+   jp asm_vz_midstr

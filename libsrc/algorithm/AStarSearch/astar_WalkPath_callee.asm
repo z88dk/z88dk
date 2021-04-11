@@ -6,7 +6,7 @@
 SECTION code_clib
 PUBLIC astar_WalkPath_callee
 PUBLIC _astar_WalkPath_callee
-PUBLIC ASMDISP_ASTAR_WALKPATH_CALLEE
+PUBLIC asm_astar_WalkPath
 
 .astar_WalkPath_callee
 ._astar_WalkPath_callee
@@ -25,7 +25,7 @@ PUBLIC ASMDISP_ASTAR_WALKPATH_CALLEE
    ;         
    ; uses  : af, bc, de, hl
 
-.asmentry
+.asm_astar_WalkPath
 
    ld a,d                    ; so many tests for zero, very annoying
    or e
@@ -76,4 +76,3 @@ PUBLIC ASMDISP_ASTAR_WALKPATH_CALLEE
    ex de,hl
    ret
 
-DEFC ASMDISP_ASTAR_WALKPATH_CALLEE = asmentry - astar_WalkPath_callee
