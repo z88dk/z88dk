@@ -272,13 +272,15 @@ extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned cha
 /////////////////////////////////////////////////////////////////
 
 // Joystick Functions
-
-extern unsigned int  __LIB__ in_JoyFuller(void);
-extern unsigned int  __LIB__ in_JoyKempston(void);
-extern unsigned int  __LIB__ in_JoySinclair1(void);
-extern unsigned int  __LIB__ in_JoySinclair2(void);
-extern unsigned int  __LIB__ in_JoyTimex1(void);
-extern unsigned int  __LIB__ in_JoyTimex2(void);
+// These are actually in_*(void), but usuall get assigned to
+// a function pointer that matches in_JoyKeyboard() so fudge
+// them around.
+extern unsigned int  __LIB__ in_JoyFuller() __z88dk_fastcall;
+extern unsigned int  __LIB__ in_JoyKempston() __z88dk_fastcall;
+extern unsigned int  __LIB__ in_JoySinclair1() __z88dk_fastcall;
+extern unsigned int  __LIB__ in_JoySinclair2() __z88dk_fastcall;
+extern unsigned int  __LIB__ in_JoyTimex1() __z88dk_fastcall;
+extern unsigned int  __LIB__ in_JoyTimex2() __z88dk_fastcall;
 
 // AMX Mouse
 //
