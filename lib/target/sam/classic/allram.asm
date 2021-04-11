@@ -6,6 +6,7 @@
     defc    TAR__fputc_cons_generic = 1
     defc    CLIB_SAM_IS_BASIC = 0
     defc    CRT_MAX_HEAP_ADDRESS = 65535
+    defc    CLIB_KBHIT_NOSTORE = 1
 
     PUBLIC  THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES
     defc    THIS_FUNCTION_ONLY_WORKS_WITH_RAM_SUBTYPES = 1

@@ -8,6 +8,7 @@
 
     EXTERN  getk
     EXTERN  fgetc_cons
+    EXTERN  CLIB_KBHIT_NOSTORE
 
 
 kbhit:
@@ -20,6 +21,9 @@ IF __CPU_GBZ80__
     or      h
     ret     nz
     call    getk
+    ld      a,CLIB_KBHIT_NOSTORE
+    and     a
+    ret     nz
     ld      de,kbhit_key
     ld      a,l
     ld      (de),a
@@ -35,6 +39,9 @@ ELSE
     or      l
     ret     nz		; we've got something pending
     call    getk		; read the keyboard
+    ld      a,CLIB_KBHIT_NOSTORE
+    and     a
+    ret     nz
     ld      (kbhit_key),hl
     ret
 ENDIF
