@@ -127,7 +127,7 @@ struct type_s {
     uint32_t  flags;        // Fast call etc
     struct {
         char  hasva;
-        char  oldstyle;
+        char  oldstyle;      // No arguments explicitly listed
         int   params_offset;
         int       interrupt;  // IRQ number?
         uint8_t  shortcall_rst;

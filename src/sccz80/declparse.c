@@ -1712,8 +1712,7 @@ int type_matches(Type *t1, Type *t2)
     } else if ( t1->fields || t2->fields ) {
         return 0;
     }
-
-    if ( t1->funcattrs.oldstyle == 0 ) {                
+    if ( t1->funcattrs.oldstyle == 0 && t2->funcattrs.oldstyle == 0 ) {                
         if ( t1->parameters && t2->parameters) {
             if ( array_len(t1->parameters) != array_len(t2->parameters)) 
                 return 0;
