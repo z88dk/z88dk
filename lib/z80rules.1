@@ -5637,3 +5637,91 @@
 	jr	z,ASMPC+3
 	ccf
 	jp	c,%2
+
+%title Clean up setting bit in char
+	push	hl
+	call	l_gchar
+	set	%1,l
+	ld	a,l
+	call	l_sxt
+	pop	de
+	ld	a,l
+	ld	(de),a
+.%2
+	ld	hl,%3
+=
+	set	%1,(hl)
+.%2
+	ld	hl,%3
+
+%title Pointless sign extension
+	ld	a,%1
+	call	l_sxt
+	pop	de
+	ld	a,l
+	ld	(de),a
+	jp	%2	;EOS
+=
+	ld	a,%1
+	pop	de
+	ld	(de),a
+	jp	%2	;EOS
+
+%title Remove negation, sign extension of char
+	call	l_gchar
+	call	l_neg
+	ld	a,l
+	call	l_sxt
+	pop	de
+	ld	a,l
+	ld	(de),a
+.%2
+	ld	hl,%3
+=
+	ld	a,(hl)
+	neg
+	pop	de
+	ld	(de),a
+.%2
+	ld	hl,%3
+
+%title Pointless 16 bit load for jump
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	cp	%1
+	jp	%2z,%3
+	ld	hl,%4
+=
+	ld	a,(hl)
+	cp	%1
+	jp	%2z,%3
+	ld	hl,%4
+
+%title Testing sign bit of char
+	call	l_gchar
+	ld	a,l
+	rla
+	jp	%2c,%3
+	ld	hl,%4
+=
+	ld	a,(hl)
+	rla
+	jp	%2c,%3
+	ld	hl,%4
+
+%title 8 bit logic being performed as 16 bit
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	call	l_%"and|xor|or"2
+=
+	ld	a,(hl)
+	ld	hl,%1	;const
+	add	hl,sp
+	%2	(hl)
+	ld	l,a
+	ld	h,0
