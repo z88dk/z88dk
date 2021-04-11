@@ -103,7 +103,9 @@ int heir1(LVALUE* lval)
             } else if ( lval->ltype->ptr->kind == KIND_FUNC && rhs->ptr->kind == KIND_FUNC ) {
                 // Check flag assignment
                 if ( (rhs->ptr->flags & FASTCALL) != (lval->ltype->ptr->flags & FASTCALL) ) {
-                    warningfmt("incompatible-function-types","Assigning %sFASTCALL function pointer with %sFASTCALL function", (lval->ltype->ptr->flags & FASTCALL) ? "" : "non-", (rhs->ptr->flags & FASTCALL) ? "" : "non-");
+                    if ( array_len(rhs->ptr->parameters) ) {
+                        warningfmt("incompatible-function-types","Assigning %sFASTCALL function pointer with %sFASTCALL function", (lval->ltype->ptr->flags & FASTCALL) ? "" : "non-", (rhs->ptr->flags & FASTCALL) ? "" : "non-");
+                    }
                 }
                 if ( (lval->ltype->ptr->flags & CALLEE) != (rhs->ptr->flags & CALLEE) ) {
                     warningfmt("incompatible-function-types","Assigning %sCALLEE function pointer with %sCALLEE function", (lval->ltype->ptr->flags & CALLEE) ? "" :  "non-",  (rhs->ptr->flags & CALLEE) ? "" : "non-");
