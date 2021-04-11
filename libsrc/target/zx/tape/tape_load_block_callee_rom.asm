@@ -7,7 +7,7 @@
 
 PUBLIC tape_load_block_callee
 PUBLIC _tape_load_block_callee
-PUBLIC asm_tape_laod_block
+PUBLIC asm_tape_load_block
 
 EXTERN __SYSVAR_BORDCR
 
@@ -21,7 +21,7 @@ EXTERN __SYSVAR_BORDCR
 	pop ix
 	push hl
 
-.asm_tape_laod_block
+.asm_tape_load_block
 
 ; enter : ix = addr
 ;         de = len

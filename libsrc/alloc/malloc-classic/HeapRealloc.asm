@@ -20,6 +20,7 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
   inc hl
   ld a,(hl+)
   ld h,(hl)
+  ld l,a
   ex de,hl
 ELSE
    pop af

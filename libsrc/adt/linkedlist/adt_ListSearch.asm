@@ -5,7 +5,6 @@ SECTION code_clib
 PUBLIC adt_ListSearch
 PUBLIC _adt_ListSearch
 
-EXTERN asm_adt_ListSetCurr
 EXTERN asm_adt_ListSearch
 
 .adt_ListSearch
