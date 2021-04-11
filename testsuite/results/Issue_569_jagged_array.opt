@@ -27,10 +27,10 @@
 	ld	hl,(_starField+4)
 	ld	bc,20
 	add	hl,bc
-	ld	(hl),+(10 % 256 % 256)
+	ld	(hl),10
 	ld	hl,1	;const
 	add	hl,sp
-	ld	(hl),+(0 % 256 % 256)
+	ld	(hl),0
 	jp	i_5	;EOS
 .i_3
 	ld	hl,1	;const
@@ -44,7 +44,7 @@
 	jp	z,i_4	;
 	ld	hl,0	;const
 	add	hl,sp
-	ld	(hl),+(0 % 256 % 256)
+	ld	(hl),0
 	jp	i_8	;EOS
 .i_6
 	ld	hl,0	;const
@@ -72,7 +72,7 @@
 	push	hl
 	ld	h,0
 	add	hl,de
-	ld	(hl),+(12 % 256 % 256)
+	ld	(hl),12
 	jp	i_6	;EOS
 	defc	i_7 = i_3
 .i_4

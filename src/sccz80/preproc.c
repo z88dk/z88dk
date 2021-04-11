@@ -126,6 +126,9 @@ void ifline()
         if (eof)
             return;
 
+        while (ch() == ' ' || ch() == '\t')
+            gch();
+
         if (ch() == '#') {
 
             if (match("#pragma")) {

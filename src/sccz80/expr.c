@@ -196,8 +196,6 @@ int heir1a(LVALUE* lval)
     int falselab, endlab, skiplab;
     LVALUE lval2={0};
     int k;
-    Kind temptype;
-    Type *templtype;
 
     k = heir2a(lval);
     if (cmatch('?')) {
@@ -208,17 +206,10 @@ int heir1a(LVALUE* lval)
         if ( lval->is_const ) {
             vconst(lval->const_val);
         }
+
         /* test condition, jump to false expression evaluation if necessary */
         if (check_lastop_was_testjump(lval)) {
-            // Always evaluated as an integer, so fake it temporarily
-            force(KIND_INT, lval->val_type, 0, lval->ltype->isunsigned, 0);
-            temptype = lval->val_type;
-            templtype = lval->ltype;
-            lval->val_type = KIND_INT; /* Force to integer */
-            lval->ltype = type_int;
             testjump(lval, falselab = getlabel());
-            lval->val_type = temptype;
-            lval->ltype = templtype;
             /* evaluate 'true' expression */
             if (heir1(&lval2))
                 rvalue(&lval2);
