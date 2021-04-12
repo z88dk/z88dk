@@ -288,6 +288,11 @@ static uint64_t parse_format_string(char *arg, CONVSPEC *specifiers)
                 arg++;
                 islong = 2;
             }
+        } else if ( *arg == 'h' ) {
+            arg++;
+            if ( *arg == 'h' ) arg++;
+        } else if ( *arg == 'z' ) {
+            arg++;
         }
 
         fmt = specifiers;

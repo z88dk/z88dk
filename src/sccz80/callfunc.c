@@ -549,6 +549,11 @@ static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr)
                 complex = 2;
             arg++;
             islong = 1;
+        } else if ( *arg == 'h' ) {
+            arg++;
+            if ( *arg == 'h' ) arg++;
+        } else if ( *arg == 'z' ) {
+            arg++; 
         }
         fmt = &printf_formats[0];
         while (fmt->fmt) {
