@@ -5308,8 +5308,8 @@
 	jp	%2z,%3	;%4
 	ld	hl,%5	;const
 
-%check 0 <= %1 <= 255
-%title 16bit <= becomes 8bit <=
+%check 1 <= %1 <= 255
+%title 16bit >= becomes 8bit >= 
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,%1	;const
@@ -5317,10 +5317,25 @@
 	jp	%2c,%3
 	ld	hl,%4
 =
-	ld	a,%1
+	ld	a,%eval(%1 1 -)
 	cp	(hl)
 	jp	%2c,%3
 	ld	hl,%4
+
+%title 16 bit <= becomes 8 bit <=
+%check 0 <= %2 <= 254
+	ld	hl,(_%1)
+	ld	h,0
+	ld	de,%2
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	ccf
+	jp	%3c,%4
+=
+	ld	a,(_%1)
+	cp	%eval(%2 1 +)
+	jp	%3c,%4
 
 	ld	hl,%1	;const
 	ld	a,l
