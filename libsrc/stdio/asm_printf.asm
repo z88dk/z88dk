@@ -212,7 +212,7 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
 ELSE
 	res	6,(ix-4)
 ENDIF
-	cp      'z'               ;size_t argument (i.e. integre)
+	cp      'z'               ;size_t argument (i.e. integer)
 	jr      z,get_next_char
 	cp	'h'               ;int sized argument
 	jr	nz,check_long_qualifier
@@ -224,7 +224,7 @@ ELSE
 ENDIF
 	cp      'h'
 	jr      nz,no_long_qualifier  ; Not promoted from a char
-        ; Just fall through for '%hh'
+        jr      get_next_char         ; It was %hh, pick up next character
 check_long_qualifier:
 	cp	'l'
 	jr	nz,no_long_qualifier
