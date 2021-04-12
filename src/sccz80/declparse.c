@@ -253,7 +253,7 @@ Type *make_array(Type *base_type,int32_t len)
     type->kind = KIND_ARRAY;
     type->ptr = base_type;
     type->len = len;
-    if ( len != - 1 ) {
+    if ( len > 0 ) {
         type->size = len * base_type->size;
     } else {
         type->size = -1;
