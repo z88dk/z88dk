@@ -1800,36 +1800,8 @@ preempt.lib:
 	$(MAKE) -C threading/preempt
 
 # SP1 sprite library - aralbrec
-sp1:
-	@echo
-	@echo SP1 Software Sprite Engine
-	@echo
-	@echo Prior to building the library you can customize several
-	@echo parameters such as display size, memory map, etc by editing
-	@echo the file "customize.asm" found in {z88dk}/libsrc/sprites/software/sp1/{target}
-	@echo Otherwise the defaults will be used.
-	@echo 
-	@echo You must specify a target machine to build the library.
-	@echo Only one version of the library can exist at a time.
-	@echo 
-	@echo "make sp1-spectrum      (256x192 pixel, 32x24 attribute)"
-	@echo "make sp1-ts2068hr      (512x192 pixel monochrome)"
-	@echo "make sp1-zx81hr        (256x192 pixel monochrome)"
-	@echo
-	@echo "make sp1-clean         (recommended prior to building)"
-	@echo
-
 sp1-all:
 	$(MAKE) -C sprites/software/sp1  sp1-all
-
-sp1-spectrum:
-	$(MAKE) -C sprites/software/sp1  sp1-spectrum
-
-sp1-ts2068hr:
-	$(MAKE) -C sprites/software/sp1  sp1-ts2068hr
-
-sp1-zx81hr:
-	$(MAKE) -C sprites/software/sp1  sp1-zx81hr
 
 sp1-clean:
 	$(MAKE) -C sprites/software/sp1 clean
