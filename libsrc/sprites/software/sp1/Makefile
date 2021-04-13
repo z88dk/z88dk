@@ -36,7 +36,6 @@ sp1-spectrum:
 	@echo making sinclair spectrum version
 	@echo
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1 @spectrum.lst
-	cp spectrum/spectrum-sp1.h ../../../../include/sprites/sp1.h
 	@echo
 	@echo all done
 	@echo
@@ -47,7 +46,6 @@ sp1-ts2068hr:
 	@echo making ts2068 hi-res version
 	@echo
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1 @ts2068hr.lst
-	cp ts2068hr/ts2068hr-sp1.h ../../../../include/sprites/sp1.h
 	@echo
 	@echo all done
 	@echo
@@ -58,7 +56,6 @@ sp1-zx81hr:
 	@echo making zx81 hrg version
 	@echo
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1 -IXIY @zx81hr.lst
-	cp zx81hr/zx81hr-sp1.h ../../../../include/sprites/sp1.h
 	@echo
 	@echo all done
 	@echo
