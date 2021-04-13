@@ -184,7 +184,7 @@ ENDIF
    ;   d = base
    ;   e = first numerical digit
 
-IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__ | __CLASSIC
 
    ld (ix+0),d
 
@@ -215,7 +215,7 @@ loop:
    call l_char2num             ; a = digit
    jr c, number_complete
 
-IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__ | __CLASSIC
 
    cp (ix+0)
    jr nc, number_complete
