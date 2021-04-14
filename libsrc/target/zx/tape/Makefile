@@ -3,10 +3,12 @@ include ../../../Make.config
 TARGET ?= zx
 
 ifeq ($(TARGET),zxn)
-   CFLAGS += -clib=classic
+   CFLAGS += -clib=classic 
 endif
 
 SUBDIRS = 
+
+CFLAGS += -I$(Z88DK_INCLUDE)/arch/zx
 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
