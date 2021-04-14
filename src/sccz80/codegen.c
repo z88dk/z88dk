@@ -4638,7 +4638,7 @@ void gen_conv_carry2int(void)
     if ( !IS_808x() ) {
         ol("rl\tl");
     } else {
-        ol("ld\ta,0");
+        ol("ld\ta,0\t;carry");
         ol("rla");
         ol("ld\tl,a");
     }
