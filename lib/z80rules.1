@@ -5740,3 +5740,277 @@
 	%2	(hl)
 	ld	l,a
 	ld	h,0
+
+%title 8 bit addition/subtraction being performed as 16bit
+%check -65535 <= %2 <= 65535
+	ld	hl,(_%1)
+	ld	h,0
+	ld	bc,%2
+	add	hl,bc
+	ld	a,l
+	ld	(_%1),a
+	ld	hl,%3
+=
+	ld	hl,_%1
+	ld	a,%eval(%2 256 %%)
+	add	(hl)
+	ld	(hl),a
+	ld	hl,%3
+
+%title Repeated logical operation
+	and	%1
+	ld	l,a
+	ld	a,l
+	and	%2
+	ld	l,a
+=
+	and	%2
+	ld	l,a
+
+%title Redundant 8bit load into hl
+	ld	l,a
+	ld	h,0
+	ld	(_%1),a
+.%2
+	ld	hl,%3
+=
+	ld	(_%1),a
+.%2
+	ld	hl,%3
+
+%title Pointless 16bit load to store 8bit
+	ld	hl,%1	;const
+	ld	a,l
+	ld	(_%2),a
+	jp	%3	;EOS
+=
+	ld	a,%eval(%1 256 %%)
+	ld	(_%2),a
+	jp	%3	;EOS
+
+%title Only load 8 bits rather than 16
+	ld	hl,(_%1)
+	ld	a,l
+	ld	(_%2),a
+	ld	hl,%3
+=
+	ld	a,(_%1)
+	ld	(_%2),a
+	ld	hl,%3
+
+%title 16bit addition that should be 8 bit
+%check -65535 <= %1 <= 65535
+	ld	l,(hl)
+	ld	h,0
+	ld	bc,%1
+	add	hl,bc
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%2
+=
+	ld	a,(hl)
+	add	%eval(%1 256 %%)
+	pop	de
+	ld	(de),a
+	ld	hl,%2
+
+%title 16 bit addition, but only care about lower 8
+%check -65535 <= %2 <= 65535
+	ld	hl,(_%1)
+	ld	bc,%2
+	add	hl,bc
+	ld	h,0
+=
+	ld	a,(_%1)
+	add	%eval(%2 256 %%)
+	ld	l,a
+	ld	h,0
+
+	ld	h,0
+	%"inc|dec"1	hl
+	ld	h,0
+=
+	%1	l
+	ld	h,0
+
+%title Pointless 8 bit extension at EOS
+	ld	l,(hl)
+	ld	h,0
+	pop	de
+	ld	a,l
+	ld	(de),a
+	jp	%1	;EOS
+=
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+	jp	%1	;EOS
+
+%title Sign extension, store drop
+	ld	a,l
+	call	l_sxt
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%1
+=
+	ld	a,l
+	pop	de
+	ld	(de),a
+	ld	hl,%1
+
+%title Repeatedly same value
+	xor	a
+	ld	(%1),a
+	xor	a
+=
+	xor	a
+	ld	(%1),a
+
+%title Loading via l to store 8 bit
+	ld	l,(hl)
+	pop	de
+	ld	a,l
+	ld	(de),a
+	ld	hl,%1
+=
+	ld	l,(hl)
+	pop	de
+	ld	(de),a
+	ld	hl,%1
+
+%title Redundant inc/decrement before load
+	%"inc|dec"1	hl
+	ld	hl,%2
+=
+	ld	hl,%2
+
+%title Redundant h+l load before hl load
+	ld	h,%1
+	ld	l,%2
+	ld	hl,%3
+=
+	ld	hl,%3
+
+%title Add two longs together (21 -> 18b)
+	push	hl
+	call	l_glong2sp
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_glong
+	call	l_long_add
+	pop	bc
+	call	l_plong
+	ld	hl,%2
+=
+	ex	de,hl
+	ld	hl,%eval(%1 6 -)	;const
+	add	hl,sp
+	ex	de,hl
+	ld	b,4
+.i_o%N
+	ld	a,(de)
+	adc	(hl)
+	ld	(hl),a
+	inc	hl
+	inc	de
+	djnz	i_o%N
+	ld	hl,%2
+
+%title Logical x |= y; x &= y; x ^= y; (21 -> 18b)
+	push	hl
+	call	l_glong2sp
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_glong
+	call	l_long_%"or|xor|and"3
+	pop	bc
+	call	l_plong
+	ld	hl,%2
+=
+	ex	de,hl
+	ld	hl,%eval(%1 6 -)	;const
+	add	hl,sp
+	ex	de,hl
+	ld	b,4
+.i_o%N
+	ld	a,(de)
+	%3	(hl)
+	ld	(hl),a
+	inc	hl
+	inc	de
+	djnz	i_o%N
+	ld	hl,%2
+
+%title uint8_t global logic
+%check -255 <= %3 <= 255
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	%2	%3
+	ld	l,a
+	ld	h,0
+=
+	ld	a,(_%1)
+	%2	%3
+	ld	l,a
+	ld	h,0
+
+%title uint8_t global logic
+	ld	h,0
+	ex	de,hl
+	ld	hl,(_%1)
+	ld	h,0
+	call	l_%"or|xor|and"2
+=
+	ld	h,0
+	ld	a,(_%1)
+	%2	l
+	ld	l,a
+
+%title uint8_t register bouncing
+%check -255 <= %3 <= 255
+	ld	l,a
+	ld	a,l
+	%2	%3
+	ld	l,a
+=
+	%2	%3
+	ld	l,a
+
+%title uint8_t register bouncing + check
+	and	%1
+	ld	l,a
+	ld	a,l
+	and	a
+=
+	and	%1
+	ld	l,a
+
+%title int32 store + redundant load
+	ld	(_%1),hl
+	ld	(_%1+2),de
+	ld	hl,(_%1)
+	ld	de,(_%1+2)
+=
+	ld	(_%1),hl
+	ld	(_%1+2),de
+
+%title memcpy return value not needed
+	push	de
+	ld	bc,%0
+	ldir
+	pop	hl
+	ld	hl,%1
+=
+	ld	bc,%0
+	ldir
+	ld	hl,%1
+
+%title Push/pop around ex
+	push	hl
+	ex	de,hl
+	pop	de
+=
+	ex	de,hl
