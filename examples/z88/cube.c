@@ -15,7 +15,7 @@
 #include <graphics.h>
 
 #ifdef __Z88_APPLICATION
-    #include <dor.h>
+    #include <arch/z88/dor.h>
 #endif
 
 #ifdef __MATH_MATH16
@@ -33,7 +33,7 @@
 #endif
 
 #ifdef __Z88_APPLICATION
-    #include <application.h>
+    #include <arch/z88/application.h>
 #endif
 
 #define MAX_X   256.0

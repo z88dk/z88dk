@@ -99,7 +99,7 @@ void printfar(far unsigned char *ptr)
 }
 
 
-#include <dor.h>
+#include <arch/z88/dor.h>
 
 #define HELP1	"A small demo application for testing the far malloc"
 #define HELP2	"and string functions."
@@ -111,7 +111,7 @@ void printfar(far unsigned char *ptr)
 #define APP_KEY  'F'
 #define APP_NAME "Far demo"
 
-#include <application.h>
+#include <arch/z88/application.h>
 
 
 

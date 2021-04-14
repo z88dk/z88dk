@@ -67,7 +67,7 @@ int main()
         exit(0);        /* Saves a bit of space on stack cleanup */
 }
 
-#include <dor.h>
+#include <arch/z88/dor.h>
 
 /*
  * We're a popup so APP_INFO is not needed
@@ -87,6 +87,6 @@ int main()
 #define APP_TYPE AT_Popd
 #define APP_TYPE2 AT2_Cl
 
-#include <application.h>
+#include <arch/z88/application.h>
 
 /* THE END! */

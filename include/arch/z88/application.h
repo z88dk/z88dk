@@ -169,7 +169,7 @@ void application_dor(void)
 
 .in_topics      defb    0
 
-#include <oz/command0.h>
+#include <arch/z88/oz/command0.h>
 
 ; end marker for end of topics
 
@@ -182,13 +182,13 @@ void application_dor(void)
 
 .in_commands    defb    0
 
-#include        <oz/command1.h>
-#include        <oz/command2.h>
-#include        <oz/command3.h>
-#include        <oz/command4.h>
-#include        <oz/command5.h>
-#include        <oz/command6.h>
-#include        <oz/command7.h>
+#include        <arch/z88/oz/command1.h>
+#include        <arch/z88/oz/command2.h>
+#include        <arch/z88/oz/command3.h>
+#include        <arch/z88/oz/command4.h>
+#include        <arch/z88/oz/command5.h>
+#include        <arch/z88/oz/command6.h>
+#include        <arch/z88/oz/command7.h>
 
 
 .in_coms_end    defb    0       ;end marker
@@ -209,14 +209,14 @@ void application_dor(void)
  * commands for topic n - we assume that there isn't more than 8k of em, if
  * there is then the whole DOR collapses!
  */
-#include <oz/help0.h>
-#include <oz/help1.h>
-#include <oz/help2.h>
-#include <oz/help3.h>
-#include <oz/help4.h>
-#include <oz/help5.h>
-#include <oz/help6.h>
-#include <oz/help7.h>
+#include <arch/z88/oz/help0.h>
+#include <arch/z88/oz/help1.h>
+#include <arch/z88/oz/help2.h>
+#include <arch/z88/oz/help3.h>
+#include <arch/z88/oz/help4.h>
+#include <arch/z88/oz/help5.h>
+#include <arch/z88/oz/help6.h>
+#include <arch/z88/oz/help7.h>
 .applname
         APPLNAME(APP_INFO)
 #pragma endasm
