@@ -10,7 +10,7 @@
 #undef __STDIO_CRLF        /* By default don't insert automatic linefeed in text mode */
 
 #ifdef __SPECTRUM__
-#include <spectrum.h>
+#include <arch/zx/spectrum.h>
 #endif
 
 #ifdef __LAMBDA__
