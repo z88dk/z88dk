@@ -406,7 +406,7 @@ ENDIF
 ; at runtime before creating a file is perfectly legal.
 _RND_BLOCKSIZE: defw    1000
 
-
+IF __MMAP != -1
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Define Memory Banks
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -492,4 +492,4 @@ _RND_BLOCKSIZE: defw    1000
    SECTION CODE_7
    SECTION RODATA_7
    SECTION BANK_7_END
-
+ENDIF
