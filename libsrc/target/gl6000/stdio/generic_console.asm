@@ -50,7 +50,7 @@ generic_console_scrollup:
 generic_console_cls:
 	ld	hl,VRAM
 	ld	de,VRAM+1
-	ld	bc,+(30 * 100 * 8) - 1
+	ld	bc,+(30 * 100) - 1
 	ld	(hl),0x00
 	ldir
 	ret
