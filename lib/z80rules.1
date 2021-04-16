@@ -6014,3 +6014,28 @@
 	pop	de
 =
 	ex	de,hl
+
+%title Redundant 16 bit constant load
+	ld	hl,%1	;const
+	ld	a,l
+	ld	(_%2),a
+.%3
+	ld	hl,%4
+=
+	ld	a,%eval(%1 256 %%)
+	ld	(_%2),a
+.%3
+	ld	hl,%4
+
+%title Bit test after 16 bit load
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	and	%2
+	jp	%3
+	ld	hl,%4
+=
+	ld	a,(_%1)
+	and	%2
+	jp	%3
+	ld	hl,%4
