@@ -1,8 +1,5 @@
 /*
  *  dirent.h
- *  Just a placeholder for now
- *
- *	$Id: dirent.h,v 1.1 2012-04-20 15:46:39 stefano Exp $
  */
 
 #ifndef __DIRENT_H__
@@ -10,13 +7,15 @@
 
 #include <sys/compiler.h>
 
-#if !defined(MAXNAMLEN)
-#define MAXNAMLEN 12
-#endif
+#define MAXNAMLEN 32
 
 struct DIR;
-struct dirent;
 typedef struct DIR DIR;
+
+struct dirent {
+    ino_t   d_ino;
+    char    d_name[MAXNAMLEN+1];
+};
 
 
 extern int __LIB__ closedir(DIR *);
