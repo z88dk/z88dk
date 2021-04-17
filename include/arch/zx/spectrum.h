@@ -481,4 +481,9 @@ extern void __LIB__ add_raster_int(isr_t handler);
 extern int  __LIB__  zxgetfname(char *zxfname);
 extern int  __LIB__  zxgetfname2(char *zxfname);
 
+struct dirent {
+    ino_t   d_ino;
+    char    d_name[12];
+};
+
 #endif

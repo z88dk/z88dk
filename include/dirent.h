@@ -7,16 +7,9 @@
 
 #include <sys/compiler.h>
 
-#define MAXNAMLEN 32
 
 struct DIR;
 typedef struct DIR DIR;
-
-struct dirent {
-    ino_t   d_ino;
-    char    d_name[MAXNAMLEN+1];
-};
-
 
 extern int __LIB__ closedir(DIR *);
 extern DIR __LIB__ *opendir(const char *);
