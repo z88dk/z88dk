@@ -158,6 +158,7 @@ ENDIF
         ;inc	hl
         ld      c,a
         add     hl,bc   ;now points to the end of the command line
+        dec     c
 
 
 	INCLUDE	"crt/classic/crt_command_line.asm"
