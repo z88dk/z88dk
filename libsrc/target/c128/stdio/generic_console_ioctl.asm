@@ -25,6 +25,9 @@ generic_console_ioctl:
 	ld	bc,768
 	ldir
 success:
+        ld      a,$8c   ;Character generator to $3000
+        ld      bc,$d018
+        out     (c),a
 	and	a
 	ret
 check_set_udg:
