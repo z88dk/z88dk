@@ -1,9 +1,8 @@
 ;
-;	Startup for V-Tech VZ-350/500/700?
+;	Startup for V-Tech Laser 350/500/700
 ;
 
-	module	vz700_crt0 
-
+	module	laser500_crt0
 
 ;--------
 ; Include zcc_opt.def to find out some info
