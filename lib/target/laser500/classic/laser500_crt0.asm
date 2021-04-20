@@ -24,7 +24,6 @@
 	defc	CONSOLE_COLUMNS = 40
 	defc	CONSOLE_ROWS = 24
 
-
         defc    TAR__no_ansifont = 1
 	defc	CRT_KEY_DEL = 12
 	defc	__CPU_CLOCK = 3694700
@@ -36,16 +35,5 @@ ELSE
 	INCLUDE	"target/laser500/classic/ram.asm"
 ENDIF
 
-   ; The extra key rows aren't implemented by Mame, so disable
-   ; scanning of them by default
-   PUBLIC __CLIB_LASER500_SCAN_EXTRA_ROWS
-   IFDEF CLIB_LASER500_SCAN_EXTRA_ROWS
-     defc __CLIB_LASER500_SCAN_EXTRA_ROWS = CLIB_LASER500_SCAN_EXTRA_ROWS
-   ELSE
-     defc __CLIB_LASER500_SCAN_EXTRA_ROWS = 0
-   ENDIF
-
-	INCLUDE "crt/classic/crt_runtime_selection.asm" 
-	
+	INCLUDE "crt/classic/crt_runtime_selection.asm"
 	INCLUDE	"crt/classic/crt_section.asm"
-
