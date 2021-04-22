@@ -287,19 +287,6 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
         if ( fcode == NULL ) {
             exit_log(1, "ERROR: File %s not found\n", fname);            
         }
-
-        /* We may have a data section */
-        strcpy(name, fname);
-        suffix_change(name, "_DATA.bin");
-        if ( stat(name, &st_file2) < 0 ) {
-             /* What about having a _HIMEM.bin file? */
-             strcpy(name, fname);
-             suffix_change(name, "_HIMEM.bin");
-             if ( stat(name, &st_file2) < 0 ) {
-                 /* Nope, everything was all in one file */
-                 return fcode;
-             }
-        }
     } else {
         // new c lib compile
 
