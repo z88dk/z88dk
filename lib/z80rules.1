@@ -2048,21 +2048,6 @@
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,%1	;const
-	add	hl,sp
-	ld	l,(hl)
-	ld	h,0
-	ld	a,l
-	sub	e
-=
-	ld	e,(hl)
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	a,(hl)
-	sub	e
-
-	ld	e,(hl)
-	ld	d,0
-	ld	hl,%1	;const
 	ld	a,l
 	sub	e
 =
@@ -2131,10 +2116,20 @@
 	ld	a,(hl)
 	%2	%3
 	ld	l,a
+	ld	h,0
 	ld	a,e
 
 	and	a
 	jr	nz,ASMPC+3
+	scf
+	jp	%2c,%1	;%5
+=
+	and	a
+	jp	%2z,%1	;%5
+
+%title Zero check on 8080
+	and	a
+	jp	nz,ASMPC+4
 	scf
 	jp	%2c,%1	;%5
 =
