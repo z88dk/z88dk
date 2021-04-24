@@ -52,6 +52,8 @@ if (ASMPC<>$0000)
 endif
 
 	jp	program
+noop:
+	ret
 
 	INCLUDE	"crt/classic/crt_z80_rsts.asm"
 
