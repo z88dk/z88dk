@@ -4,6 +4,39 @@
 #define STDIO_ASM
 #include <stdio.h>
 
+#ifdef __8080__
+int fread(void *ptr, size_t size, size_t nmemb, FILE *fp) {
+    if ( (fp->flags & (_IOUSE|_IOREAD|_IOSYSTEM)) == (_IOUSE|_IOREAD)) {
+        unsigned int len = size * nmemb;
+
+        if ( len == 0 ) return len;
+#ifdef STDIO_BINARY
+        unsigned int r;
+
+        while ( len ) {
+            unsigned char c = fgetc(fp);
+            if ( c == EOF ) break;
+            *(unsigned char *)ptr++ = c;
+            r++;
+        }
+        return r / size;
+#else
+        unsigned int c = fgetc(fp);
+
+        if ( c != EOF ) {
+            *(unsigned char *)ptr = c;
+            --len;
+            len = read(fp->desc.fd, ptr+1, len);
+            return (len+1) / size;
+        }
+#endif
+
+    }
+    return -1;
+}
+
+#else
+
 static int wrapper() __naked
 {
 #asm
@@ -11,7 +44,7 @@ static int wrapper() __naked
 	GLOBAL _fread
 fread:
 _fread:
-IF __CPU_INTEL__ | __CPU_GBZ80__
+IF __CPU_GBZ80__
 	ld      hl,-1
     ld      d,h
     ld      e,l
@@ -164,3 +197,4 @@ ENDIF
 ENDIF
 #endasm
 }
+#endif

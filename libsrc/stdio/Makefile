@@ -29,10 +29,10 @@ obj/binary/%.o: %.c
 
 
 obj/8080/%.o: %.asm
-	$(ZCC) +cpm -m8080 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
+	$(ZCC) +cpm -clib=8080 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
 obj/8080/%.o: %.c
-	$(ZCC) +cpm -m8080 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -DCPU_8080 -c -o $@ $^
+	$(ZCC) +cpm -clib=8080 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -DCPU_8080 -c -o $@ $^
 
 obj/gbz80/%.o: %.asm
 	$(ZCC) +test -mgbz80 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
