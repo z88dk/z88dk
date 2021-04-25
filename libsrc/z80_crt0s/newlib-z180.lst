@@ -1,2 +1,14 @@
 ../_DEVELOPMENT/z180/z180/asm_z180_delay_ms
 ../_DEVELOPMENT/z180/z180/asm_z180_delay_tstate
+../_DEVELOPMENT/math/integer/z180/l_z180_mulu_40_32x8
+../_DEVELOPMENT/math/integer/z180/l_z180_muls_32_16x16
+../_DEVELOPMENT/math/integer/z180/l_z180_mulu_32_16x16
+../_DEVELOPMENT/math/integer/z180/l_z180_mulu_32_32x32
+../_DEVELOPMENT/math/integer/z180/l_z180_mulu_64_32x32
+../_DEVELOPMENT/math/integer/z180/l_z180_mulu_16_16x8
+../_DEVELOPMENT/math/integer/z180/l_z180_mulu_16_16x16
+../_DEVELOPMENT/math/integer/z180/l_z180_mulu_64_64x64
+../_DEVELOPMENT/math/integer/z180/l_z180_muls_16_16x16
+../_DEVELOPMENT/math/integer/z180/l_z180_mulu_72_64x8
+../_DEVELOPMENT/math/integer/z180/l_z180_muls_16_16x8
+../_DEVELOPMENT/math/integer/z180/l_z180_mulu_24_16x8
