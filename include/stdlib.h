@@ -121,9 +121,19 @@ extern void __LIB__  exit(int status) __z88dk_fastcall;
 extern int  __LIB__  atexit(void *fcn) __z88dk_fastcall;
 
 // int system(char *s);                     /* might be implemented in target's library but doubtful */
-// char *getenv(char *name);                /* might be implemented in target's library but doubtful */
+
+// Environment variables, may be present in fcntl library
+extern char __LIB__ *getenv(const char *name); 
+extern char __LIB__ *getenv_r(const char *name, char *buf, size_t len) __smallc;
+extern int __LIB__ setenv(const char *name, const char *value, int overwrite) __smallc;
+extern int __LIB__ unsetenv(const char *name);
+
+
+
 
 extern int  __LIB__  getopt (int, char **, const char *) __smallc;
+
+
 extern   char *optarg;                      /* getopt(3) external variables */
 extern   int opterr;
 extern   int optind;
