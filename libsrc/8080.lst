@@ -8,4 +8,5 @@
 @strings/string.lst
 @regex/regex.lst
 @interrupts/interrupts_8080.lst
+@time/time.lst
 @z80_crt0s/crt0.lst

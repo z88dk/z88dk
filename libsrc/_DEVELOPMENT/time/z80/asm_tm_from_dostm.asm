@@ -1,5 +1,6 @@
 ; void tm_from_dostm(struct tm *,struct dos_tm *)
 
+IF !__CPU_INTEL__
 SECTION code_time
 
 PUBLIC asm_tm_from_dostm
@@ -104,3 +105,4 @@ no_adjust_month:
 ;   bits 15.11  hour (0-23)
 ;   bits 10..5  minute (0-59)
 ;   bits  4..0  seconds divided by two
+ENDIF

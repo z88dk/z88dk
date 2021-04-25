@@ -5,6 +5,6 @@ target/radio86/stdio/generic_console
 target/radio86/graphics/textpixl
 target/radio86/graphics/getmaxy1
 @stdio/stdio_8080.lst
-@time/time.lst
+
 @gfx/gencon/gfx_gencon1_portable.lst
 

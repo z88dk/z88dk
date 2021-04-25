@@ -14,3 +14,10 @@ tm_from_dostm_callee:
    push af
    
    jp asm_tm_from_dostm
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _tm_from_dostm_callee
+defc _tm_from_dostm_callee = tm_from_dostm_callee
+ENDIF
+

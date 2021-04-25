@@ -37,7 +37,7 @@ target/z88/stdlib/csleep
 target/z88/stdlib/getcwd
 target/z88/stdlib/mkdir
 target/z88/stdlib/sleep
-@time/time.lst
+
 target/z88/time/clock
 target/z88/time/time
 games/joystick

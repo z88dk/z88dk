@@ -1,5 +1,6 @@
 ; void dostm_from_tm(struct dos_tm *,struct tm *)
 
+IF !__CPU_INTEL__
 SECTION code_time
 
 PUBLIC asm_dostm_from_tm
@@ -85,3 +86,4 @@ asm_dostm_from_tm:
 ;   bits 15.11  hour (0-23)
 ;   bits 10..5  minute (0-59)
 ;   bits  4..0  seconds divided by two
+ENDIF

@@ -10,6 +10,6 @@ target/pacman/graphics/xorpixl
 target/pacman/graphics/pointxy
 @gfx/text6/gfx_text6.lst
 target/pacman/games/joystick
-@time/time.lst
+
 target/pacman/time/clock
 

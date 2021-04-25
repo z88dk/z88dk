@@ -1,6 +1,1 @@
-time/gmtime
-time/localtime
-time/mktime
-time/asctime
-time/ctime
-time/time_from_structtm
+stdlib/obj/${TYPE}/**/*.o
