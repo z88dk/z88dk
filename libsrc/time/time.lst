@@ -3,3 +3,4 @@ time/localtime
 time/mktime
 time/asctime
 time/ctime
+time/time_from_structtm

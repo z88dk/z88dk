@@ -5,6 +5,8 @@ target/msx/stdio/fputc_cons
 @stdio/ansicore.lst
 @stdio/stdio_binary.lst
 target/msx/time/clock
+target/msx/time/time
+target/msx/time/target_read_structtm
 @target/cpm/fcntl/fcntl.lst
 @video/tms9918/video_tms9918.lst
 @gfx/narrow/gfx_narrow.lst
@@ -24,4 +26,4 @@ target/msx/psg/asm_vt2_hardware_out
 @psg/ay/vt2/psg_vt2.lst
 @psg/ay/wyz/psg_wyz.lst
 @target/msx/arch_msx.lst
-
+@time/time.lst
