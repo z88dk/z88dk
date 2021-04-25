@@ -11,7 +11,6 @@ target/pps/stdio/ansi/f_ansi_cls
 target/pps/stdio/ansi/f_ansi_dline
 target/pps/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
-time/mktime
 target/pps/time/clock
 target/pps/time/time
 target/pps/fcntl/close
