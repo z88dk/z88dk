@@ -173,6 +173,7 @@ define buildcrt
 	$(MAKE) -C rect
 	$(MAKE) -C arch
 	$(MAKE) -C stdlib
+	$(MAKE) -C time
 	$(MAKE) -C z80_crt0s
 endef
 

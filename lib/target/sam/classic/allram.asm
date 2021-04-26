@@ -75,6 +75,16 @@ program:
     or      @01100000
     out     (VMPR),a
 
+IF !CRT_DISABLE_INT_TICK
+    EXTERN   tick_count_isr
+    EXTERN   asm_im1_install_isr
+    ld       de,tick_count_isr
+    call     asm_im1_install_isr
+    PUBLIC   _FRAMES
+    EXTERN   tick_count
+    defc     _FRAMES = tick_count
+ENDIF
+
     ei
     ; Entry to the user code
     call    _main

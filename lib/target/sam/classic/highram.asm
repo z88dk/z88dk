@@ -58,6 +58,16 @@ ENDIF
     ld      ($fdfe),hl
     ld      a,0xfe
     ld      i,a
+
+IF !CRT_DISABLE_INT_TICK
+    EXTERN   tick_count_isr
+    EXTERN   asm_im1_install_isr
+    ld       de,tick_count_isr
+    call     asm_im1_install_isr
+    PUBLIC   _FRAMES
+    EXTERN   tick_count
+    defc     _FRAMES = tick_count
+ENDIF
     im      2
     ei
 
