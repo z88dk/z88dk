@@ -60,16 +60,15 @@ ssize_t read(int fd, void *buf, size_t len)
             if ( ( size = SECSIZE - offset ) > len ) {
                 size = len;
             }
+            _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
             if ( size == SECSIZE ) {
                 bdos(CPM_SDMA,buf);
-                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
                 if ( bdos(CPM_RRAN,fc) ) {
                     setuid(uid);
                     return cnt-len;
                 }
             } else {
                 bdos(CPM_SDMA,buffer);
-                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
                 if ( bdos(CPM_RRAN,fc) ) {
                     setuid(uid);
                     return cnt-len;

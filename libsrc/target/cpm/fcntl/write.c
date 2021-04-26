@@ -54,16 +54,15 @@ ssize_t write(int fd, void *buf, size_t len)
             if ( (size = SECSIZE-offset) > len ) {
                 size = len;
             }
+            _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
             if ( size == SECSIZE ) {
                 bdos(CPM_SDMA,buf);
-                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
                 if ( bdos(CPM_WRAN,fc) ) {
                     setuid(uid);
                     return -1;   /* Not sure about this.. */
                 }
             } else {  /* Not the required size, read in the extent */
                 bdos(CPM_SDMA,buffer);
-                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
                 memset(buffer,26,SECSIZE);
                 bdos(CPM_RRAN,fc);
                 memcpy(buffer+offset,buf,size);
