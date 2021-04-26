@@ -10,6 +10,7 @@
  *  zcc +zx81ansi -oclock -startup=3 -lgfx81hr192 -lndos -create-app -llib3d -DDETAILED clock.c
  *  zcc +zx81 -oclock -startup=2 -lgfx81 -lndos -create-app -llib3d clock.c
  *  zcc +ts2068 -create-app -lm -lgfx2068hr -lm -llib3d -DDETAILED -Dhires clock.c
+ *  Add -DHAVE_TIME if the machine has a hardware clock that can be read
 
  $Id: clock.c,v 1.1 2012-11-07 15:10:06 stefano Exp $
 */
@@ -20,6 +21,7 @@
 #include <lib3d.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #ifdef hires
 #define XDIV 128
@@ -72,13 +74,24 @@ void main()
 #endif	
 	cx=getmaxx()/2;
 	cy=getmaxy()/2;
-	
+
+#ifdef HAVE_TIME
+        {
+            struct tm *tmp;
+            time_t tim = time(NULL);
+
+            tmp = gmtime(&tim);
+            k = tmp->tm_hour % 12;
+            j = tmp->tm_min;
+        }
+#else
 	printf("%cTime set..\n\n  Hours: ",12);
 	gets(hr);
 	k=atoi(hr);
 	printf("\n  Minutes: ");
 	scanf("%s",hr);
 	j=atoi(hr);
+#endif
 
 	k=k*5+(j/12);
 	if (k<15)
