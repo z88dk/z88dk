@@ -4,8 +4,7 @@
  *  27/1/2002 - djm
  *
  *  May, 2020 - feilipu - added sequential read
- *
- *  $Id: read.c,v 1.3 2013-06-06 08:58:32 stefano Exp $
+ *  Apr, 2021 -dom - remove sequential read
  */
 
 #include <fcntl.h>
@@ -63,7 +62,8 @@ ssize_t read(int fd, void *buf, size_t len)
             }
             if ( size == SECSIZE ) {
                 bdos(CPM_SDMA,buf);
-                if ( bdos(CPM_READ,fc) ) {
+                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
+                if ( bdos(CPM_RRAN,fc) ) {
                     setuid(uid);
                     return cnt-len;
                 }

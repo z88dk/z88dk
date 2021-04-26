@@ -4,8 +4,7 @@
  *  27/1/2002 - djm
  *
  *  May, 2020 - feilipu - added sequential write
- *
- *  $Id: write.c,v 1.5 2013-06-06 08:58:32 stefano Exp $
+ *  Apr, 2021 - dom - remove sequential write 
  */
 
 #include <fcntl.h>
@@ -57,16 +56,15 @@ ssize_t write(int fd, void *buf, size_t len)
             }
             if ( size == SECSIZE ) {
                 bdos(CPM_SDMA,buf);
-                if ( bdos(CPM_WRIT,fc) ) {
+                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
+                if ( bdos(CPM_WRAN,fc) ) {
                     setuid(uid);
                     return -1;   /* Not sure about this.. */
                 }
             } else {  /* Not the required size, read in the extent */
                 bdos(CPM_SDMA,buffer);
                 _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
-                /* Blank out the buffer to indicate EOF */
-                buffer[0] = 26;         /* ^Z */
-                memcpy(buffer+1,buffer,SECSIZE-1);
+                memset(buffer,26,SECSIZE);
                 bdos(CPM_RRAN,fc);
                 memcpy(buffer+offset,buf,size);
                 if ( bdos(CPM_WRAN,fc) ) {
