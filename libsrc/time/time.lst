@@ -1,1 +1,1 @@
-stdlib/obj/${TYPE}/**/*.o
+time/obj/${TYPE}/**/*.o
