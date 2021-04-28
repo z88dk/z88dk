@@ -70,10 +70,6 @@ ENDIF
 	ld	iy,$47FA
 	ei
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
-
     call    crt0_exit
 
 start1:

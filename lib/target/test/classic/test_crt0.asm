@@ -20,7 +20,6 @@
 ;--------
 
         EXTERN    _main           ;main() is always external to crt0 code
-        EXTERN    asm_im1_handler
 
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
@@ -36,7 +35,7 @@
 IF !__CPU_RABBIT__ && !__CPU_GBZ80__
     IF CRT_ORG_CODE = 0x0000
 	; We want to intercept rst38 to our interrupt routine
-	defc	TAR__crt_enable_rst = $8080
+	defc	TAR__crt_enable_rst = $0000
 	EXTERN	asm_im1_handler
 	defc	_z80_rst_38h = asm_im1_handler
     ENDIF
@@ -98,6 +97,7 @@ ENDIF
 	ld	b,0
 	ld	hl,argv_start
 	add	hl,bc	; now points to end of the command line
+	defc DEFINED_noredir = 1
 	INCLUDE "crt/classic/crt_command_line.asm"
 	push	hl	;argv
 	push	bc	;argc

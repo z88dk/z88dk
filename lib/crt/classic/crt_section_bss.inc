@@ -1,4 +1,4 @@
-   SECTION BSS
+    SECTION BSS
 IF __crt_org_bss
     org     __crt_org_bss
     defb    0   ; control name of bss binary

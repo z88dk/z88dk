@@ -73,6 +73,7 @@ ENDIF
 	ld	c,$56		;CLEAR
 	rst	$10
 ; Work out argc/argv - same as the CPM version 
+IF CRT_ENABLE_COMMANDLINE = 1
 	ld	hl,0		; NULL pointer at the end
 	push	hl
 	ld	b,0		;arguments
@@ -84,6 +85,7 @@ ENDIF
 	add	hl,bc		;now points to end of arguments
 
 	INCLUDE	"crt/classic/crt_command_line.asm"
+ENDIF
 
         push    hl      ;argv
         push    bc      ;argc
@@ -91,9 +93,6 @@ ENDIF
         pop     bc      ;kill argv
         pop     bc      ;kill argc
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
 	push	hl	;save return code
     call    crt0_exit
 

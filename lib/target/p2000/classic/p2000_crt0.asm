@@ -84,10 +84,6 @@ ENDIF
         call    _main
 
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
-
     call    crt0_exit
 
 

@@ -127,13 +127,7 @@ ENDIF
 		
         call    _main
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
-;        push    hl
         call    crt0_exit
-
-;        pop     bc
 start1:
         ld      sp,0
         ;ei

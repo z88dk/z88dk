@@ -203,9 +203,6 @@ find_end:
 	pop	bc	;kill argc
 
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
         push	hl		;save exit value
         call    crt0_exit
 
