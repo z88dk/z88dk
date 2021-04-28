@@ -27,6 +27,7 @@ CFILES = \
 	rename.c \
 	setfcb.c \
 	stat.c \
+	swapuid.c \
 	write.c \
 	writebyte.c 
 

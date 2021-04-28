@@ -21,11 +21,10 @@ int close(int fd)
 	return -1;
 
     fc = &_fcb[fd];
-    uid = getuid();       /* Get our uid, keep safe */
-    setuid(fc->uid);      /* Set it to that of the file */
+    uid = swapuid(fc->uid);      /* Set it to that of the file */
     if ( fc->use < U_CON )
 	bdos(CPM_CLS,fc);
     fc->use = 0;
-    setuid(uid);
+    swapuid(uid);
     return 0;
 }

@@ -53,8 +53,7 @@ ssize_t read(int fd, void *buf, size_t len)
     case U_READ:
     case U_RDWR:
         cnt = len;
-        uid = getuid();
-        setuid(fc->uid);
+        uid = swapuid(fc->uid);
         while ( len ) {
             offset = fc->rwptr%SECSIZE;
             if ( ( size = SECSIZE - offset ) > len ) {
@@ -64,13 +63,13 @@ ssize_t read(int fd, void *buf, size_t len)
             if ( size == SECSIZE ) {
                 bdos(CPM_SDMA,buf);
                 if ( bdos(CPM_RRAN,fc) ) {
-                    setuid(uid);
+                    swapuid(uid);
                     return cnt-len;
                 }
             } else {
                 bdos(CPM_SDMA,buffer);
                 if ( bdos(CPM_RRAN,fc) ) {
-                    setuid(uid);
+                    swapuid(uid);
                     return cnt-len;
                 }
                 memcpy(buf,buffer+offset,size);
@@ -79,7 +78,7 @@ ssize_t read(int fd, void *buf, size_t len)
             fc->rwptr += size;
             len -= size;
         }
-        setuid(uid);
+        swapuid(uid);
         return cnt-len;
         break;
     default:

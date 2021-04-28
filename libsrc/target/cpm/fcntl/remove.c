@@ -21,11 +21,10 @@ int remove(char *name)
     if ( setfcb(&fc,name) ) 
 	return 0;
 
-	uid = getuid();
-	setuid(fc.uid);
+	uid = swapuid(fc.uid);
 
     retval = bdos(CPM_DEL,&fc);
 
-    setuid(uid);
+    swapuid(uid);
     return retval;
 }

@@ -13,6 +13,6 @@ char tempdirname[] = "USER_0";
 
 int get_dir_name()
 {
-	tempdirname[5]='0'+getuid();
-	return tempdirname;
+    tempdirname[5]='0'+getuid();
+    return tempdirname;
 }
