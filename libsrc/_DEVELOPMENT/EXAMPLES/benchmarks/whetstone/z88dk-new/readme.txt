@@ -59,45 +59,45 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK April 20, 2020
+Z88DK April 28, 2021
 sccz80 / new c library / math48
 40 bit mantissa + 8 bit exponent
-5388 bytes less page zero
+5362 bytes less page zero
 
-cycle count  = 973210939
-time @ 4MHz  = 973210939 / 4x10^6 = 243.3027 seconds
-KWIPS        = 100*10*1 / 243.3027 = 4.1101
-MWIPS        = 4.1101 / 1000 = 0.0041101
+cycle count  = 972899568
+time @ 4MHz  = 972899568 / 4x10^6 = 243.2248 seconds
+KWIPS        = 100*10*1 / 243.2248 = 4.1114
+MWIPS        = 4.1114 / 1000 = 0.0041114
 
 
-Z88DK July 13, 2020
+Z88DK April 28, 2021
 sccz80 / new c library / math32
 24 bit mantissa + 8 bit exponent
-8823 bytes less page zero
+8927 bytes less page zero
 
-cycle count  = 653436776
-time @ 4MHz  = 653436776 / 4x10^6 = 163.3592 seconds
-KWIPS        = 100*10*1 / 163.3592 = 6.1215
-MWIPS        = 6.1215 / 1000 = 0.0061215
+cycle count  = 561121915
+time @ 4MHz  = 561121915 / 4x10^6 = 140.2804 seconds
+KWIPS        = 100*10*1 / 140.2804 = 7.1285
+MWIPS        = 7.1285 / 1000 = 0.0071285
 
 
-Z88DK April 20, 2020
-zsdcc #11566 / new c library / math48
+Z88DK April 28, 2021
+zsdcc #12070 / new c library / math48
 40 bit mantissa + 8 bit exponent internal, 24 bit mantissa + 8 bit exponent exposed by compiler
-6234 bytes less page zero
+6221 bytes less page zero
 
-cycle count  = 916707945
-time @ 4MHz  = 916707945 / 4x10^6 = 229.1770 seconds
-KWIPS        = 100*10*1 / 229.1770 = 4.3634
-MWIPS        = 4.3634 / 1000 = 0.0043634
+cycle count  = 914412771
+time @ 4MHz  = 914412771 / 4x10^6 = 228.6031 seconds
+KWIPS        = 100*10*1 / 228.6031 = 4.3743
+MWIPS        = 4.3743 / 1000 = 0.0043743
 
 
-Z88DK July 13, 2020
-zsdcc #11722 / new c library / math32
+Z88DK April 28, 2021
+zsdcc #12070 / new c library / math32
 24 bit mantissa + 8 bit exponent
-9681 bytes less page zero
+9794 bytes less page zero
 
-cycle count  = 663018211
-time @ 4MHz  = 663018211 / 4x10^6 = 165.7546 seconds
-KWIPS        = 100*10*1 / 165.7546 = 6.0330
-MWIPS        = 6.0330 / 1000 = 0.0060330
+cycle count  = 568841475
+time @ 4MHz  = 568841475 / 4x10^6 = 142.2103 seconds
+KWIPS        = 100*10*1 / 142.2103 = 7.0318
+MWIPS        = 7.0318 / 1000 = 0.0070318
