@@ -74,14 +74,12 @@ PUBLIC m32_mulu_32h_32x32
 
     pop hl
     adc hl,bc
-    ld b,h
-    ld c,l
 
     adc a,0
 
     ld e,d                      ; shift result down 8 bits
-    ld d,c
-    ld c,b
+    ld d,l
+    ld c,h
     ld b,a
     exx
 
@@ -107,14 +105,12 @@ PUBLIC m32_mulu_32h_32x32
 
     pop hl
     adc hl,bc
-    ld b,h
-    ld c,l
 
     adc a,0
 
     ld e,d                      ; shift result down 8 bits
-    ld d,c
-    ld c,b
+    ld d,l
+    ld c,h
     ld b,a
     exx
 
