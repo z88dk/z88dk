@@ -12,7 +12,7 @@ IF __CPU_Z80__
 SECTION code_clib
 SECTION code_fp_math32
 
-PUBLIC m32_mulu_32h_24x24
+PUBLIC m32_mulu_32h_24x24, m32_l0_mulu_32h_24x24
 
 ;------------------------------------------------------------------------------
 ;
@@ -44,14 +44,11 @@ PUBLIC m32_mulu_32h_24x24
     ld a,e                      ; set up first multiplier from e
     exx
 
-    ld c,l                      ; e' * lde
+.m32_l0_mulu_32h_24x24
+
+    ld c,l                      ; e' * lde (a*cde)
     call mulu_32_24x8           ; result in bcde
 
-    sla e                       ; check for significant bit for rounding
-    jr NC,no_rounding_e
-    set 0,d
-
-.no_rounding_e
     ld e,d                      ; shift result down 8 bits
     ld d,c
     ld c,b
@@ -68,7 +65,7 @@ PUBLIC m32_mulu_32h_24x24
 
     push hl                     ; preserve multiplier msb l
 
-                                ; d' * lde
+                                ; d' * lde (a*cde)
     call mulu_32_24x8           ; result in bcde
 
     push bc
@@ -84,11 +81,6 @@ PUBLIC m32_mulu_32h_24x24
     ld b,h
     ld c,l
 
-    sla e                       ; check for significant bit for rounding
-    jr NC,no_rounding_d
-    set 0,d
-
-.no_rounding_d
     ld e,d                      ; shift result down 8 bits
     ld d,c
     ld c,b
@@ -100,7 +92,7 @@ PUBLIC m32_mulu_32h_24x24
     pop de                      ; recover multiplicand
     pop bc
 
-    ld a,l                      ; l' * lde
+    ld a,l                      ; l' * lde (a*cde)
     call mulu_32_24x8           ; result in bcde
 
     push bc

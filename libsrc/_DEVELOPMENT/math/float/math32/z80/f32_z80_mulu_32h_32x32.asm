@@ -45,11 +45,6 @@ PUBLIC m32_mulu_32h_32x32
     ld c,l                      ; l' * dehl (a*bcde)
     call mulu_40_32x8           ; result in abcde
 
-    sla e                       ; check for significant bit for rounding
-    jr NC,no_rounding_l
-    set 0,d
-
-.no_rounding_l
     ld e,d                      ; shift result down 8 bits
     ld d,c
     ld c,b
@@ -84,11 +79,6 @@ PUBLIC m32_mulu_32h_32x32
 
     adc a,0
 
-    sla e                       ; check for significant bit for rounding
-    jr NC,no_rounding_h
-    set 0,d
-
-.no_rounding_h
     ld e,d                      ; shift result down 8 bits
     ld d,c
     ld c,b
@@ -122,11 +112,6 @@ PUBLIC m32_mulu_32h_32x32
 
     adc a,0
 
-    sla e                       ; check for significant bit for rounding
-    jr NC,no_rounding_e
-    set 0,d
-
-.no_rounding_e
     ld e,d                      ; shift result down 8 bits
     ld d,c
     ld c,b
@@ -154,11 +139,6 @@ PUBLIC m32_mulu_32h_32x32
 
     adc a,0                     ; result in ahlde
 
-    sla e                       ; check for significant bit for rounding
-    jr NC,no_rounding_d
-    set 0,d
-
-.no_rounding_d
     ld e,d                      ; shift result down 8 bits
     ld d,l
     ld l,h
