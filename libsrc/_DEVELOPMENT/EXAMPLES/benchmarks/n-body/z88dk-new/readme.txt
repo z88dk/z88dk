@@ -89,7 +89,7 @@ sccz80 / new / math32
 5149 bytes less page zero
 
 first number error : 5 * 10^(-7)
-second number error: 1 * 10^(-6)
+second number error: 1 * 10^(-4)
 
 cycle count  = 762845940
 time @ 4MHz  = 762845940 / 4*10^6 = 3 min 11 sec
