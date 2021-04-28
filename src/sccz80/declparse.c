@@ -494,6 +494,8 @@ static int chase_typedef(Type *type)
             /* So we've identified it, we should copy it */
             *type = *ptr->ctype;
             type->isconst |= wasconst;
+            if ( type->tag && type->size == -1) 
+                type->size = type->tag->size;
             return 0;
         }
     }
