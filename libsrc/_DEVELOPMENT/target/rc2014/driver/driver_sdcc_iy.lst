@@ -12,6 +12,5 @@
 @target/rc2014/driver/terminal/rc_01_output_basic.lst
 @target/rc2014/driver/ide/ide.lst
 @target/rc2014/driver/diskio/diskio_sdcc.lst
-@target/rc2014/driver/math/math32.lst
 @target/rc2014/driver/ram/ram_sdcc.lst
 @target/rc2014/driver/time/time_sdcc.lst

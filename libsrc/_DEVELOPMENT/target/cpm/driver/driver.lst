@@ -5,4 +5,3 @@
 @target/cpm/driver/character/cpm_00_input_reader.lst
 @target/cpm/driver/character/cpm_00_output_list.lst
 @target/cpm/driver/character/cpm_00_output_punch.lst
-@target/cpm/driver/math/math32.lst
