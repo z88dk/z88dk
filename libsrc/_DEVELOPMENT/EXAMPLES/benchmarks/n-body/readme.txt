@@ -52,15 +52,15 @@ RESULTS
 =======
 
 1.
-Z88DK June 28, 2020
-zsdcc #11690 / new
-4309 bytes less page zero
+Z88DK April 28, 2021
+zsdcc #12070 / new c library
+4332 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-4)
 
-cycle count  = 2247439592
-time @ 4MHz  = 2247439592 / 4*10^6 = 9 min 22 sec
+cycle count  = 2247889896
+time @ 4MHz  = 2247889896 / 4*10^6 = 9 min 22 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
@@ -100,56 +100,69 @@ time @ 4MHz  = 5306393684 / 4*10^6 = 22 min 07 sec
 Slow speed & large size due to float implementation in C.
 
 5.
-Z88DK April 20, 2020
-sccz80 / classic c library
-3814 bytes less page zero
+Z88DK April 28, 2021
+sccz80 / classic
+4493 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-8)
 
-cycle count  = 3624577433
-time @ 4MHz  = 3624577433 / 4*10^6 = 15 min 06 sec
+cycle count  = 3658052111
+time @ 4MHz  = 3658052111 / 4*10^6 = 15 min 14 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
 6.
-Z88DK June 28, 2020
+Z88DK April 28, 2021
 sccz80 / new c library
-3608 bytes less page zero
+3363 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-4)
 
-cycle count  = 2372283755
-time @ 4MHz  = 2372283755 / 4*10^6 = 9 min 53 sec
+cycle count  = 2376486525
+time @ 4MHz  = 2376486525 / 4*10^6 = 9 min 53 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
 7.
-Z88DK April 20, 2020
-zsdcc #11566 / classic
-4770 bytes less page zero
+Z88DK April 28, 2021
+zsdcc #12070 / classic
+5246 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-8)
 
-cycle count  = 2253531346
-time @ 4MHz  = 2253531346 / 4*10^6 = 9 min 23 sec
+cycle count  = 2253709929
+time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
 
 8.
-Z88DK June 28, 2020
-sccz80 / new / math32
-5264 bytes less page zero
+Z88DK April 28, 2021
+sccz80 / classic / math32
+6018 bytes less page zero
 
-first number error : 5 * 10^(-7)
-second number error: 1 * 10^(-4)
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-6)
 
-cycle count  = 1025105884
-time @ 4MHz  = 1025105884 / 4*10^6 = 4 min 16 sec
+cycle count  = 1006879853
+time @ 4MHz  = 1006879853 / 4*10^6 =  4 min 12 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
 
 9.
+Z88DK April 28, 2021
+sccz80 / new c library / math32
+5149 bytes less page zero
+
+first number error : 5 * 10^(-7)
+second number error: 1 * 10^(-6)
+
+cycle count  = 762845940
+time @ 4MHz  = 762845940 / 4*10^6 = 3 min 11 sec
+
+IEEE 32-bit float implementation, accurate to 7 significant digits.
+
+10.
 Z88DK June 28, 2020
 sccz80 / new / math16
 3222 bytes less page zero

@@ -1,6 +1,4 @@
 ;
-;  feilipu, 2019 April
-;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -14,185 +12,348 @@ INCLUDE "config_private.inc"
 SECTION code_clib
 SECTION code_fp_math32
 
-EXTERN m32_z80_mulu_de
-
 PUBLIC m32_mulu_32h_32x32
 
 ;------------------------------------------------------------------------------
 ;
+; feilipu, 2021 April
+;
 ; multiplication of two 32-bit numbers into the high bytes of 64-bit product
 ;
-; NOTE THIS IS NOT A TRUE MULTIPLY.
-; Carry in from low bytes is not calculated.
-; Rounding is done at 2^16.
 ;
-; enter : dehl  = 32-bit multiplier   = x
-;         dehl' = 32-bit multiplicand = y
+; enter : dehl  = 32-bit multiplicand  = x
+;         dehl' = 32-bit multiplier = y
 ;
 ; exit  : dehl = 32-bit product
 ;         carry reset
 ;
 ; uses  : af, bc, de, hl, af', bc', de', hl'
 
+IF __IO_LUT_MODULE_AVAILABLE == 0
 
 .m32_mulu_32h_32x32
 
-    ld c,l
-    ld b,h
-    push de
-    exx
-    pop bc
+    push de                     ; preserve multiplicand
     push hl
     exx
-    pop de
 
-    ; multiplication of two 32-bit numbers into a 32-bit product
-    ;
-    ; enter : de'de = 32-bit multiplier    = x
-    ;         bc'bc = 32-bit multiplicand  = y
-    ;
-    ; exit  : dehl = 32-bit product
-    ;         carry reset
-    ;
-    ; uses  : af, bc, de, hl, af', bc', de', hl'
+    push de                     ; preserve multiplier
+    push hl
 
-    ; save material for the byte p7 p6 = x3*y3 + p5 carry
-    exx                         ;'
-    ld h,d
-    ld l,b
-    push hl                     ;'x3 y3
+    ld a,l                      ; set up first multiplier from l
+    exx
 
-    ; save material for the byte p5 = x3*y2 + x2*y3 + p4 carry
-    ld l,c
-    push hl                     ;'x3 y2
-    ld h,b
-    ld l,e
-    push hl                     ;'y3 x2
-
-    ; save material for the byte p4 = x3*y1 + x2*y2 + x1*y3 + p3 carry
-    ld h,e
-    ld l,c
-    push hl                     ;'x2 y2
-    ld h,d
-    ld l,b
-    push hl                     ;'x3 y3
-    exx                         ;
-    ld l,b
-    ld h,d
-    push hl                     ; x1 y1
-
-    ; save material for the byte p3 = x3*y0 + x2*y1 + x1*y2 + x0*y3
-    push bc                     ; y1 y0
-    exx                         ;'
-    push de                     ;'x3 x2
-    push bc                     ;'y3 y2
-    exx                         ;
-;   push de                     ; x1 x0
-
-IF __IO_LUT_MODULE_AVAILABLE == 0
-
-    ; start doing the p3 byte
-
-    pop hl                      ; y3 y2
-    ld a,h
-    ld h,d
-    ld d,a
-    call m32_z80_mulu_de        ; y3*x0
     ex de,hl
-    call m32_z80_mulu_de        ; x1*y2
-
-    xor a                       ; zero A
-    add hl,de                   ; p4 p3
-    adc a,a                     ; p5
     ld b,h
-    ld c,l
-    ex af,af
+    ld c,l                      ; l' * dehl (a*bcde)
+    call mulu_40_32x8           ; result in abcde
 
-    pop hl                      ; x3 x2
-    pop de                      ; y1 y0
-    ld a,h
-    ld h,d
-    ld d,a
-    call m32_z80_mulu_de        ; x3*y0
+    ld e,d                      ; shift result down 8 bits
+    ld d,c
+    ld c,b
+    ld b,a
+    exx
+
+    pop af                      ; set up second multiplier from h
+    pop hl                      ; recover multiplier msb de
+
+    pop de                      ; recover multiplicand
+    pop bc
+    push bc
+    push de
+
+    push hl                     ; preserve multiplier msb de
+
+                                ; h' * dehl (a*bcde)
+    call mulu_40_32x8           ; result in abcde
+
+    push bc
+    push de
+    exx
+
+    pop hl                      ; sum terms
+    add hl,de
     ex de,hl
-    call m32_z80_mulu_de        ; y1*x2
 
-    ex af,af
-    add hl,de                   ; p4 p3
-    adc a,0                     ; p5
-    add hl,bc                   ; p4 p3
-    adc a,0                     ; p5
+    pop hl
+    adc hl,bc
 
-    ex af,af
-    ld a,l                      ; preserve p3 byte for rounding
-    ex af,af
+    adc a,0
 
-    ld c,h                      ; prepare BC for next cycle
-    ld b,a                      ; promote BC p5 p4
+    ld e,d                      ; shift result down 8 bits
+    ld d,l
+    ld c,h
+    ld b,a
+    exx
 
-    ; start doing the p4 byte
+    pop hl                      ; set up third multiply from e
 
-    pop hl                      ; x1 y1
-    pop de                      ; x3 y3
-    ld a,h
-    ld h,d
-    ld d,a
-    call m32_z80_mulu_de        ; x1*y3
+    pop de                      ; recover multiplicand
+    pop bc
+    push bc
+    push de
+
+    push hl                     ; preserve multiplier msb de
+
+    ld a,l                      ; e' * dehl (a*bcde)
+    call mulu_40_32x8           ; result in abcde
+
+    push bc
+    push de
+    exx
+
+    pop hl                      ; sum terms
+    add hl,de
     ex de,hl
-    call m32_z80_mulu_de        ; x3*y1
 
+    pop hl
+    adc hl,bc
 
-    xor a                       ; zero A
-    add hl,de                   ; p5 p4
-    adc a,a                     ; p6
-    add hl,bc                   ; p5 p4
-    adc a,0                     ; p6
+    adc a,0
 
-    pop de                      ; x2 y2
-    call m32_z80_mulu_de        ; x2*y2
+    ld e,d                      ; shift result down 8 bits
+    ld d,l
+    ld c,h
+    ld b,a
+    exx
 
-    add hl,de                   ; p5 p4
-    adc a,0                     ; p6
+    pop af                      ; set up fourth multiplier from d
 
-    ld c,l                      ; final p4 byte in C
-    ld l,h                      ; prepare HL for next cycle
-    ld h,a                      ; promote HL p6 p5
+    pop de                      ; recover multiplicand
+    pop bc
 
-    ex af,af
-    or a
-    jr Z,mul0                   ; use p3 to round p4
-    set 0,c
+                                ; d' * dehl (a*bcde)
+    call mulu_40_32x8           ; result in abcde
 
-.mul0
-    
-    ; start doing the p5 byte
+    push bc
+    push de
+    exx
 
-    pop de                      ; y3 x2
-    call m32_z80_mulu_de        ; y3*x2
+    pop hl                      ; sum terms
+    add hl,de
+    ex de,hl
 
-    xor a                       ; zero A
-    add hl,de                   ; p6 p5
-    adc a,a                     ; p7
+    pop hl
+    adc hl,bc
 
-    pop de                      ; x3 y2
-    call m32_z80_mulu_de        ; x3*y2
+    adc a,0                     ; result in ahlde
 
-    add hl,de                   ; p6 p5
-    adc a,0                     ; p7
+    ld e,d                      ; shift result down 8 bits
+    ld d,l
+    ld l,h
+    ld h,a
 
-    ld b,l                      ; final p5 byte in B
-    ld l,h                      ; prepare HL for next cycle
-    ld h,a                      ; promote HL p7 p6
+    ex de,hl
 
-    ; start doing the p6 p7 bytes
-    pop de                      ; y3 x3
-    call m32_z80_mulu_de        ; y3*x3
-
-    add hl,de                   ; p7 p6
-    ex de,hl                    ; p7 p6
-    ld h,b                      ; p5
-    ld l,c                      ; p4
     ret                         ; exit  : DEHL = 32-bit product
+
+
+
+.mulu_40_32x8
+
+    ; enter :   bcde = 32-bit multiplicand
+    ;              a = 8-bit multiplier
+    ;
+    ; exit  :  abcde = 40-bit result
+    ;
+    ; preserved: bc', de'
+    ; uses  : af, bc, de, hl, hl'
+
+    ; zero multiplier ?
+
+    or a
+    jr Z,exit_zero
+
+    ; setup multiply
+
+    push de
+
+    ld h,b
+    ld l,c
+    ld d,b
+    ld e,c
+
+    exx
+
+    pop hl
+
+    push bc     ; preserve bc'
+    push de     ; preserve de'
+
+    ld d,h
+    ld e,l
+
+    ;  de'de = 32-bit multiplicand
+    ;  hl'hl = 32-bit multiplicand, replicated
+    ;      a = 8-bit multiplier
+
+    ld c,0
+
+    ; eliminate leading zeroes
+
+.loop_00
+
+    add a,a
+    jr C,loop_11
+
+    add a,a
+    jr C,loop_12
+
+    add a,a
+    jr C,loop_13
+
+    add a,a
+    jr C,loop_14
+
+    add a,a
+    jr C,loop_15
+
+    add a,a
+    jr C,loop_16
+
+    add a,a
+    jr C,loop_17
+
+    add a,a
+    jr C,exit_18
+
+.exit_zero
+    xor a
+    ld b,a
+    ld c,a
+    ld d,a
+    ld e,a
+    ret
+
+
+.loop_11
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,loop_12
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.loop_12
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,loop_13
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.loop_13
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,loop_14
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.loop_14
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,loop_15
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.loop_15
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,loop_16
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.loop_16
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,loop_17
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.loop_17
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,exit_18
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.exit_18
+
+    ; ahl'hl = product
+    exx
+
+    pop de      ; restore de'
+    pop bc      ; restore bc'
+
+    push hl
+    exx
+
+    pop bc
+    ex de,hl
+
+    ; product in abcde
+    ret
 
 ELSE ;  feilipu, 2020 February
 
