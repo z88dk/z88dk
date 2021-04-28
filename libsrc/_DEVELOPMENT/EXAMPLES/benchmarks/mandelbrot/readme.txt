@@ -103,6 +103,16 @@ Internal 48-bit float implementation causes relative slowdown.
 
 5.
 Z88DK April 28, 2021
+zsdcc #12070 / new c library / math32
+3977 bytes less page zero
+
+cycle count  = 1414728459
+time @ 4MHz  = 1414728459 / 4*10^6 = 5 min 54 sec
+
+IEEE 32-bit float implementation.
+
+6.
+Z88DK April 28, 2021
 sccz80 / new c library
 1809 bytes less page zero
 
@@ -111,7 +121,7 @@ time @ 4MHz  = 3266168305 / 4*10^6 = 13 min 36 sec
 
 48-bit float implementation causes relative slowdown.
 
-6.
+7.
 Z88DK April 28, 2021
 sccz80 / classic c library
 2693 bytes less page zero
@@ -121,7 +131,7 @@ time @ 4MHz  = 3596657568 / 4*10^6 = 14 min 59 sec
 
 48-bit float implementation causes relative slowdown.
 
-7.
+8.
 SDCC 3.6.5 #9852 (MINGW64)
 5218 bytes less page zero
 
@@ -130,7 +140,7 @@ time @ 4MHz  = 10863431873 / 4*10^6 = 45 min 16 sec
 
 Large size & slow speed largely due to float implementation in C.
 
-8.
+9.
 Z88DK April 28, 2021
 sccz80 / classic c library / math32
 4561 bytes less page zero
@@ -140,7 +150,7 @@ time @ 4MHz  = 1137834177 / 4*10^6 =  4 min 44 sec
 
 IEEE 32-bit float implementation.
 
-9.
+10.
 Z88DK April 28, 2021
 sccz80 / new c library / math32
 3751 bytes less page zero
@@ -150,7 +160,7 @@ time @ 4MHz  = 1137834777 / 4*10^6 =  4 min 44 sec
 
 IEEE 32-bit float implementation.
 
-10.
+11.
 Z88DK June 13, 2020
 sccz80 / new c library / math16-fast
 1986 bytes less page zero

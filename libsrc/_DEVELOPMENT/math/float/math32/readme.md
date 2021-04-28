@@ -413,8 +413,8 @@ Library                     | Compiler | Ticks
 genmath                     | sccz80   | 3_596_657_568
 math48                      | zsdcc    | 3_766_086_833
 math48                      | sccz80   | 3_266_168_305
-math32                      | zsdcc    | 1_670_409_507
-math32                      | sccz80   | __1_137_834_177__
+math32                      | zsdcc    | 1_414_728_459
+math32                      | sccz80   | __1_137_834_777__
 math32_z80n                 | sccz80   | _0_922_658_537_
 math32_z80n            (opt)| sccz80   | __0_861_039_210__
 math32_z180                 | sccz80   | _0_892_842_610_

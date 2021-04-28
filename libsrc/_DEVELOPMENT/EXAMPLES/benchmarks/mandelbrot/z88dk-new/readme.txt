@@ -20,6 +20,9 @@ zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -O2 -clib=new mandelbrot.c -o mandelbro
 new/zsdcc
 zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 mandelbrot.c -o mandelbrot -lm -m -pragma-include:zpragma.inc -create-app
 
+math32/new/zsdcc
+zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 mandelbrot.c -o mandelbrot --math32 -m -pragma-include:zpragma.inc -create-app
+
 TIMING & VERIFICATION
 =====================
 
@@ -64,6 +67,13 @@ zsdcc #12070 / new
 
 cycle count  = 3736214166
 time @ 4MHz  = 3736214166 / 4*10^6 = 15 min 34 sec
+
+Z88DK April 28, 2021
+zsdcc #12070 / new / math32
+3977 bytes less page zero
+
+cycle count  = 1414728459
+time @ 4MHz  = 1414728459 / 4*10^6 = 5 min 54 sec
 
 
 Z88DK April 28, 2021
