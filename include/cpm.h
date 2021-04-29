@@ -14,9 +14,16 @@
 #include <sys/types.h>
 
 /* Maximum number of open files. If you want to change this then you
- * should recompile the CPM library and change the crt0 code to creat
- * enough space for the the FCBs */
-#define MAXFILE  10
+ * compile your program with -pragma-define:CPM_FCBS_MAX=xx
+ */
+#ifndef CPM_FCBS_MAX
+extern void *_CPM_FCBS_MAX;
+#define CPM_FCBS_MAX &_CPM_FCBS_MAX
+#endif
+
+
+
+#define MAXFILE CPM_FCBS_MAX
 
 /* If you want fileio to support devices then link with -lcpmdevice.
  * This adds the following devices: CON: RDR: PUN: LST: without this
@@ -74,7 +81,7 @@ struct sfcb {
 };
 
 
-extern struct fcb  _fcb[MAXFILE];
+extern struct fcb  _fcb[0];	// Has MAXFILES entries
 
 
 /* BDOS calls */
