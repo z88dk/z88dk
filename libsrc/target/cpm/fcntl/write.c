@@ -47,8 +47,7 @@ ssize_t write(int fd, void *buf, size_t len)
 #endif
     case U_WRITE:
     case U_RDWR:
-        uid = getuid();
-        setuid(fc->uid);
+        uid = swapuid(fc->uid);
         while ( len ) {
             offset = fc->rwptr%SECSIZE;
             if ( (size = SECSIZE-offset) > len ) {
@@ -58,7 +57,7 @@ ssize_t write(int fd, void *buf, size_t len)
             if ( size == SECSIZE ) {
                 bdos(CPM_SDMA,buf);
                 if ( bdos(CPM_WRAN,fc) ) {
-                    setuid(uid);
+                    swapuid(uid);
                     return -1;   /* Not sure about this.. */
                 }
             } else {  /* Not the required size, read in the extent */
@@ -67,7 +66,7 @@ ssize_t write(int fd, void *buf, size_t len)
                 bdos(CPM_RRAN,fc);
                 memcpy(buffer+offset,buf,size);
                 if ( bdos(CPM_WRAN,fc) ) {
-                    setuid(uid);
+                    swapuid(uid);
                     return -1;   /* Not sure about this.. */
                 }
             }
@@ -75,7 +74,7 @@ ssize_t write(int fd, void *buf, size_t len)
             fc->rwptr += size;
             len -= size;
         }
-        setuid(uid);
+        swapuid(uid);
         return cnt-len;
         break;
     default:

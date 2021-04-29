@@ -54,34 +54,34 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK April 20, 2020
-zsdcc #11566 / classic
-4770 bytes less page zero
+Z88DK April 28, 2021
+zsdcc #12070 / classic
+5246 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-8)
 
-cycle count  = 2253531346
-time @ 4MHz  = 2253531346 / 4*10^6 = 9 min 23 sec
+cycle count  = 2253709929
+time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
 
 
-Z88DK April 20, 2020
+Z88DK April 28, 2021
 sccz80 / classic
-3814 bytes less page zero
+4493 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-8)
 
-cycle count  = 3624577433
-time @ 4MHz  = 3624577433 / 4*10^6 = 15 min 06 sec
+cycle count  = 3658052111
+time @ 4MHz  = 3658052111 / 4*10^6 = 15 min 14 sec
 
 
-Z88DK June 2, 2020
+Z88DK April 28, 2021
 sccz80 / classic / math32
-5346 bytes less page zero
+6018 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-6)
 
-cycle count  = 1320690188
-time @ 4MHz  = 1320690188 / 4*10^6 =  5 min 30 sec
+cycle count  = 1006879853
+time @ 4MHz  = 1006879853 / 4*10^6 =  4 min 12 sec

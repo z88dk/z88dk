@@ -44,7 +44,7 @@ prematurely terminated so rerun with a higher counter if that is the case.
 
 To verify, extract the 480 bytes at address 0xc000 from "verify.bin":
 
-appmake +extract -b verify.bin -s 0xc000 -l 480 -o image.bin
+z88dk-appmake +extract -b verify.bin -s 0xc000 -l 480 -o image.bin
 
 Compare the contents of "image.bin" to "image-golden.bin" in the same directory.
 The pixels around the edge of the mandelbrot set can vary somewhat depending
@@ -55,25 +55,25 @@ the images to address 16384 to see a visual representation.
 RESULT
 ======
 
-Z88DK April 20, 2020
-zsdcc #11566 / classic
-2356 bytes less page zero
+Z88DK April 28, 2021
+zsdcc #12070 / classic
+2891 bytes less page zero
 
-cycle count  = 3783223422
-time @ 4MHz  = 3783223422 / 4*10^6 = 15 min 45 sec
+cycle count  = 3766086833
+time @ 4MHz  = 3766086833 / 4*10^6 = 15 min 41 sec
 
 
-Z88DK April 20, 2020
+Z88DK April 28, 2021
 sccz80 / classic
-2108 bytes less page zero
+2693 bytes less page zero
 
-cycle count  = 3591216622
-time @ 4MHz  = 3591216622 / 4*10^6 = 14 min 57 sec
+cycle count  = 3596657568
+time @ 4MHz  = 3596657568 / 4*10^6 = 14 min 59 sec
 
 
-Z88DK April 20, 2020
+Z88DK April 28, 2021
 sccz80 / classic / math32
-3859 bytes less page zero
+4561 bytes less page zero
 
-cycle count  = 1519179081
-time @ 4MHz  = 1519179081 / 4*10^6 =  6 min 20 sec
+cycle count  = 1137834177
+time @ 4MHz  = 1137834177 / 4*10^6 =  4 min 44 sec

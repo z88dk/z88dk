@@ -473,11 +473,11 @@ int heira(LVALUE *lval)
     /* Cast check, little kludge here */
     save_fps_num = buffer_fps_num;
     buffer_fps_num = 0;
-    if (rcmatch('(')) {
+    if (rcmatch('(') ) {
         Type  *ctype;
         klptr = lptr;
         lptr++;
-        if ( (ctype = parse_expr_type()) != NULL ) {
+        if ( ch() && (ctype = parse_expr_type()) != NULL ) {
             needchar(')');
             cast_lval.cast_type = ctype;
             for ( j = 0; j < save_fps_num; j++ ) {

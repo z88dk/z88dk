@@ -2,4 +2,3 @@
 @target/vgl/driver/terminal/vgl_01_input_4000.lst
 @target/vgl/driver/terminal/vgl_01_output_2000.lst
 @target/vgl/driver/terminal/vgl_01_output_4000.lst
-@target/vgl/driver/math/math32.lst

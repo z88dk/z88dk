@@ -13,7 +13,7 @@ Where not written by me, the functions were sourced from:
 
 This library is designed for z180, and z80n processors. Specifically, it is optimised for the z180 and [ZX Spectrum Next](https://www.specnext.com/) z80n as these processors have a hardware `16_8x8` multiply instruction that can substantially accelerate the floating point mantissa calculation.
 
-This library is also designed to be as fast as possible on the z80 processor. For the z80 it is built on the same core `16_8x8` multiply model, using an optimal unrolled shift+add algorithm.
+This library is also designed to be as fast as possible on the z80 processor, using a `32_24x8` basis multiply function.
 
 *@feilipu, May 2019*
 
@@ -29,7 +29,7 @@ This library is also designed to be as fast as possible on the z80 processor. Fo
 
   *  Made for the Spectrum Next. The z80n `mul de` and the z180 `mlt nn` multiply instructions are used to full advantage to accelerate all floating point calculations.
 
-  *  The z80 multiply (without a hardware instruction) is implemented with an unrolled equivalent to the z80n `mul de`, which is designed to have no side effect other than resetting the flag register.
+  *  The z80 multiply (without a hardware instruction) is implemented with a `32_24x8` unrolled multiply algorithm.
 
   *  Mantissa calculations are done with 24-bits and 8-bits for rounding. Rounding is a simple method, but can be if required it can be expanded to the IEEE standard with a performance penalty.
 
@@ -202,33 +202,21 @@ Using these intrinsic functions (and the compact assembly square root and polyno
 
 Although some algorithms from the Digi International functions remain in these intrinsic functions, they have been rewritten to exploit the z180 and z80n 8-bit multiply hardware capabilities, rather than the 16-bit capabilities of Rabbit processors. Hence the relationship is only of descent, like "West Side Story" is derived from "Romeo and Juliet".
 
-For the z80 CPU, with no hardware multiply, a replica of the z80n instruction `mul de` was created. Although the existing z88dk integer multiply routines could have been used, it is believed that since this routine is the heart of the entire library, it was worth optimising it for speed and to provide functional equivalence to the z80n hardware multiply instruction to simplify code maintenance.
+To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function.
 
-The `z80_mulu_de` has zero argument detection, leading zero detection, and is unrolled. With the exception of preserving `hl`, for equivalency with z80n `mul de`, it should be the fastest `16_8x8` linear multiply possible on a z80.
+By providing a specific square function, all squaring (found in square root, trigonometric functions) can use the `_fssqr` or the equivalent C version `sqr()`. This means that for the z180 and z80n the inverse `_fsinvsqrt` function uses `_fssqr` for 5 multiplies in its `mulu_32h_24x24` mantissa calculation, in some situations, instead of 8 multiplies with the normal `_fsmul` function, and also avoids the need to use the alternate register set.
 
-In the search for performance, an alternate table driven `16_8x8` multiply function was created. This function uses a 512 Byte table containing the 16-bit square of 8-bit numbers, to improve the multiply z80 performance. Alternate mantissa routines were written to suit this fast multiply function, and they are used where necessary. The table driven multiply function has been removed on January 28th 2020. Please [look at the commit](https://github.com/z88dk/z88dk/commit/efdd07c2e2229cac7cfef97ec01f478004846e39) to rebuild this option if needed.
-
-To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function. The resulting `mulu_32h_24x24` could be the fastest way to calculate an IEEE sized mantissa on a z80, z180, & z80n.
-
-By providing a specific square function, all squaring (found in square root, trigonometric functions) can use the `_fssqr` or the equivalent C version `sqr()`. This means that the inverse `_fsinvsqrt` function uses `_fssqr` for 5 multiplies in its `32h_24x24` mantissa calculation, in some situations, instead of 8 multiplies with the normal `_fsmul` function, and also avoids the need to use the alternate register set.
-
-#### mulu_z80_de and zero detection
-
-Zero detection is used in both the unrolled shift+add and the table driven `mulu_z80_de` options, and leading zero removal is implemented for the unrolled shift+add `mulu_z80_de` function. But one could question more generally about whether zero detection in the mantissa calculation is worth it or not?
-
-A lot of "integer like" decimal or their binary equivalent numbers have "short" mantissas, when represented in floating point. If we call a 24-bit mantissa made up of three bytes "abc", then quite often the b and c bytes end up being zero. I think this is a common case. Handling these with zero detection will be a big win, making many `mulu_z80_de` multiplies very fast (because the result is zero).
-
-Of course the other side of the argument is that integers should be handled by the integer library, and that calculating a 8 iteration polynomial estimation for `log()` (for example) will never have zeros in it, so carrying zero detection overhead for short mantissa floats is just wasteful.
-
-When benchmarking the library, using the spectral-norm example, it was found that for about 26% of `mulu_z80_de` function calls an early exit was achieved because of a zero multiplier or multiplicand. Specifically 4.94 million `zeroe` exits and 4.42 million `zerod` exits, from 34.6 million function entries. This one benchmark is not everything, but it does show the value of zero detection.
+For the z80 CPU, with no hardware multiply instruction, an efficient `mulu_32h_24x24` multiplication function was written for normal mantissa multiplies.
 
 #### mulu_32h_32x32
 
 The `mulu_32h_32x32` provides just the high order bytes from a 32-bit multiply calculation for the `_fsdiv` Newton-Raphson iteration. In this iteration calculation it is important to have access to the full 32-bits (rather than just 24-bits for normal mantissa calculations).
 
-The implementation of the `mulu_32h_32x32` is not a "correct" multiplication as the lower order bytes are not included in the carry calculation, for efficiency reasons. The calculation begins at the 3rd byte (of 8), and this byte provides carry bits into the 4th byte. Further rounding from the third byte is applied to the 4th byte. There are 11 multiplications required for this function.
+For the z180 and z80n, thee implementation of the `mulu_32h_32x32` is not a "correct" multiplication as the lower order bytes are not included in the carry calculation, for efficiency reasons. The calculation begins at the 3rd byte (of 8), and this byte provides carry bits into the 4th byte. Further rounding from the third byte is applied to the 4th byte. There are 11 multiplications required for this function.
 
 By calculating 3rd through to 7th bytes, but returning only byte 4 through 7, there is only maximally a small error in the least significant nibble of the 32-bit mantissa, which is discarded after rounding to 24-bit precision anyway. Doing this avoids calculating the 0th through 2nd bytes, which saves 5 `16_8x8` multiply operations, and the respective word push and pop baggage.
+
+For the z80 CPU, with no hardware multiply instruction, an efficient `mulu_32h_32x32` multiplication function was written for extended mantissa multiplies.
 
 #### _add()_ and _sub()_
 
@@ -386,13 +374,11 @@ Most of this gain is created by directly using the `invsqrt()` function. The opt
 Library                     | Compiler | Value 1       | Value 2       | Ticks
 -|-|-|-|-
 correct values              | -->      | -0.169075164  | -0.169087605
-math48                      | sccz80   | -0.169075164  | -0.169087605  | 2_402_023_498
+math48                      | sccz80   | -0.169075164  | -0.169087605  | 2_377_856_525
 mbf32                       | sccz80   | -0.1699168    | -0.1699168    | 1_939_334_701
 bbcmath                     | sccz80   | -0.16907516   | -0.16908760   | 1_655_789_776
-math32                      | sccz80   | -0.1690752    | -0.1690867    | _1_398_993_950_
-math32                 (opt)| sccz80   | -0.1690752    | -0.1690867    | __1_039_149_590__
-~~math32_fast~~    (deleted)| sccz80   | -0.1690752    | -0.1690867    | _1_198_780_765_ [*](https://github.com/z88dk/z88dk/commit/efdd07c2e2229cac7cfef97ec01f478004846e39)
-~~math32_fast~~ (opt, deleted)| sccz80   | -0.1690752    | -0.1690867    | __0_890_625_068__ [*](https://github.com/z88dk/z88dk/commit/efdd07c2e2229cac7cfef97ec01f478004846e39)
+math32                      | sccz80   | -0.1690752    | -0.1690867    | _1_006_879_853_
+math32                 (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_761_138_938__
 math32_z80n                 | sccz80   | -0.1690752    | -0.1690867    | _0_576_942_516_
 math32_z80n            (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_441_400_426__
 math32_z180                 | sccz80   | -0.1690752    | -0.1690867    | _0_563_700_933_
@@ -420,18 +406,15 @@ math32_z180            (opt)| sccz80   | -0.1690752    | -0.1690867    | __0_428
             }
 #endif
 ```
-And we get nearly a __10%__ improvement for the mandelbrot benchmark. This gain is achieved because the `sqr()` function optimises the mantissa calculation to 5 `16_8x8` multiplies, rather than 8 `16_8x8` multiplies required for full multiply.
+And for the z180 and z80n, we get nearly a __10%__ improvement for the mandelbrot benchmark. This gain is achieved because the `sqr()` function optimises the mantissa calculation to 5 `16_8x8` multiplies, rather than 8 `16_8x8` multiplies required for full multiply.
 
 Library                     | Compiler | Ticks
 -|-|-
-genmath                     | sccz80   | 3_589_992_847
-math48                      | sccz80   | 3_323_285_174
-math48                      | zsdcc    | 3_205_062_412
-math32                      | zsdcc    | 1_670_409_507
-math32                      | sccz80   | _1_653_612_845_
-math32                 (opt)| sccz80   | __1_433_305_904__
-~~math32_fast~~    (deleted)| sccz80   | _1_495_633_606_ [*](https://github.com/z88dk/z88dk/commit/efdd07c2e2229cac7cfef97ec01f478004846e39)
-~~math32_fast~~ (opt, deleted)| sccz80   | __1_306_278_647__ [*](https://github.com/z88dk/z88dk/commit/efdd07c2e2229cac7cfef97ec01f478004846e39)
+genmath                     | sccz80   | 3_596_657_568
+math48                      | zsdcc    | 3_766_086_833
+math48                      | sccz80   | 3_266_168_305
+math32                      | zsdcc    | 1_414_728_459
+math32                      | sccz80   | __1_137_834_777__
 math32_z80n                 | sccz80   | _0_922_658_537_
 math32_z80n            (opt)| sccz80   | __0_861_039_210__
 math32_z180                 | sccz80   | _0_892_842_610_
