@@ -1,6 +1,6 @@
 Index: src/SDCCasm.c
 ===================================================================
---- src/SDCCasm.c	(revision 12070)
+--- src/SDCCasm.c	(revision 12250)
 +++ src/SDCCasm.c	(working copy)
 @@ -403,8 +403,8 @@
  static const ASM_MAPPING _asxxxx_mapping[] = {
@@ -23,7 +23,7 @@ Index: src/SDCCasm.c
     "; ---------------------------------\n"
 Index: src/SDCCglue.c
 ===================================================================
---- src/SDCCglue.c	(revision 12070)
+--- src/SDCCglue.c	(revision 12250)
 +++ src/SDCCglue.c	(working copy)
 @@ -195,7 +195,7 @@
             (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
@@ -84,7 +84,7 @@ Index: src/SDCCglue.c
  
 Index: src/SDCCmain.c
 ===================================================================
---- src/SDCCmain.c	(revision 12070)
+--- src/SDCCmain.c	(revision 12250)
 +++ src/SDCCmain.c	(working copy)
 @@ -514,16 +514,15 @@
  {
@@ -112,9 +112,9 @@ Index: src/SDCCmain.c
  static void
 Index: src/SDCCopt.c
 ===================================================================
---- src/SDCCopt.c	(revision 12070)
+--- src/SDCCopt.c	(revision 12250)
 +++ src/SDCCopt.c	(working copy)
-@@ -1010,7 +1010,7 @@
+@@ -1016,7 +1016,7 @@
        /* TODO: Eliminate it, convert any SEND of volatile into DUMMY_READ_VOLATILE. */
        /* For now just convert back to call to make sure any volatiles are read. */
  
@@ -123,7 +123,7 @@ Index: src/SDCCopt.c
        goto convert;
      }
  
-@@ -1020,7 +1020,7 @@
+@@ -1026,7 +1026,7 @@
        if (bitVectIsZero (OP_USES (IC_RESULT (icc))) && (IS_OP_LITERAL (IC_LEFT (lastparam)) || !strcmp (bif->name, "__builtin_memcpy")))
          return;
        
@@ -132,7 +132,7 @@ Index: src/SDCCopt.c
        goto convert;
      }
    
-@@ -2133,10 +2133,11 @@
+@@ -2139,10 +2139,11 @@
    int i;
    int change = 0;
    iCode *ic, *newic;
@@ -145,7 +145,7 @@ Index: src/SDCCopt.c
  
    // Wide loop counter
    for (i = 0; i < count; i++)
-@@ -2326,8 +2327,8 @@
+@@ -2332,8 +2333,8 @@
              IS_ITEMP (right) && bitVectnBitsOn (OP_DEFS (right)) != 1)
              continue;
  
@@ -156,7 +156,7 @@ Index: src/SDCCopt.c
  
            if (lic)
              {
-@@ -2334,7 +2335,7 @@
+@@ -2340,7 +2341,7 @@
                if (lic->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (lic)) && !IS_OP_LITERAL (IC_RIGHT (lic)))
                  continue;
  
@@ -165,7 +165,7 @@ Index: src/SDCCopt.c
  
                if (litval > 0x7f)
                  continue;
-@@ -2347,7 +2348,7 @@
+@@ -2353,7 +2354,7 @@
                if (ric->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (ric)) && !IS_OP_LITERAL (IC_RIGHT (ric)))
                  continue;
  
@@ -176,7 +176,7 @@ Index: src/SDCCopt.c
                  continue;
 Index: src/z80/peep.c
 ===================================================================
---- src/z80/peep.c	(revision 12070)
+--- src/z80/peep.c	(revision 12250)
 +++ src/z80/peep.c	(working copy)
 @@ -225,6 +225,88 @@
    return(found && found < end);
