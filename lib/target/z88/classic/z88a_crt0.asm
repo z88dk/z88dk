@@ -246,7 +246,6 @@ _cpfar2near:
     ret
 ENDIF
 
--
     INCLUDE "crt/classic/crt_runtime_selection.asm"
 
 ;-------
