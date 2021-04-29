@@ -236,25 +236,11 @@ ENDIF
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"
     INCLUDE	"crt/classic/crt_section.asm"
-
+    INCLUDE "crt/classic/crt_cpm_fcntl.asm"
 
     SECTION code_crt_init
     ld      c,25
     call    5
     ld      (defltdsk),a
-
-
-    SECTION bss_crt
-
-;-----------------------
-; Some startup variables
-;-----------------------
-    PUBLIC  defltdsk
-defltdsk:       defb    0	;Default disc
-
-
-; TODO: Move this into c128 library
-    PUBLIC  _vdcDispMem
-_vdcDispMem:				; Label used by "c128cpm.lib" only
 
 

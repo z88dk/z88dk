@@ -91,11 +91,10 @@ l_dcal:
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"
     INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_cpm_fcntl.asm"
 
     SECTION bss_crt
 
     PUBLIC  brksave
-    PUBLIC  defltdsk
 brksave:    defb    1
-defltdsk:   defb    0       ; Default disc
 

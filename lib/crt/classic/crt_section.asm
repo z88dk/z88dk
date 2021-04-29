@@ -108,12 +108,7 @@ __sgoioblk:     defs    CLIB_FOPEN_MAX * 10      ;stdio control block
 __sgoioblk_end:   		 ;end of stdio control block
 ENDIF
 
-; CP/M style FCB support (CP/M + MSXDOS1)
-IF CRT_NEED_CPM_FCBS
-    PUBLIC  __fcb
-__fcb:
-    defs    CLIB_FOPEN_MAX * 43	; Each FCB is 43 bytes long
-ENDIF
+
 
 
 IF !DEFINED_basegraphics
