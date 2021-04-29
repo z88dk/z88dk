@@ -21,288 +21,338 @@ PUBLIC m32_mulu_32h_32x32
 ; multiplication of two 32-bit numbers into the high bytes of 64-bit product
 ;
 ;
-; enter : dehl  = 32-bit multiplicand  = x   x1x0
-;         dehl' = 32-bit multiplier    = y   y1y0
-;
-; exit  : dehl  = 32-bit product = z  z3z2 = y1y0 * x1x0
-;         carry reset
-;
-; uses  : af, bc, de, hl, bc', de', hl'
-
-IF __IO_LUT_MODULE_AVAILABLE == 0
-
-
-.m32_mulu_32h_32x32
-
-    push de                     ; preserve multiplicand x1
-    push de                     ; x1
-    exx
-
-    pop bc                      ; x1
-    push de                     ; preserve multiplier y1
-    push bc                     ; x1
-
-    push hl                     ; preserve multiplier y0
-    push de                     ; preserve multiplier y1
-
-    push hl                     ; preserve multiplier y0
-    exx
-
-    pop de                      ; y0
-    push hl                     ; preserve multiplicand x0
-
-    ; multiply lowest term x0*y0
-    call mulu_32_16x16          ; de*hl -> dehl
-
-    ex de,hl                    ; hlde z1 (partial)
-    pop de                      ; x0
-    ex (sp),hl                  ; y1 z1 (partial), abandon z0
-
-    ; multiply middle terms y1*x0
-    call mulu_32_16x16          ; de*hl -> dehl
-
-    pop bc
-    add hl,bc                   ; z1 (partial)
-    ld b,h
-    ld c,l
-
-    ld hl,0
-    adc hl,de                   ; z2 (partial)
-    ex de,hl
-    exx                         ; z2z1 (partial) de'bc'
-
-    pop de                      ; y0
-    pop hl                      ; x1
-
-    ; multiply middle terms y0*x1
-    call mulu_32_16x16          ; de*hl -> dehl
-
-    push de
-    push hl
-    exx
-
-    xor a
-
-    pop hl
-    add hl,bc                   ; z1 capture carry and abandon
-
-    pop hl
-    adc hl,de                   ; z2 (partial)
-    ex de,hl
-
-    adc a,a
-    ld b,0
-    ld c,a                      ; z3 (partial)
-
-    exx                         ; z3z2 (partial) bc'de'
-
-    pop de                      ; y1
-    pop hl                      ; x1
-
-    ; multiply top term y1*x1
-    call mulu_32_16x16          ; de*hl -> dehl
-
-    push de
-    push hl
-    exx
-
-    pop hl
-    add hl,de
-    ex de,hl                    ; z2
-
-    pop hl
-    adc hl,bc                   ; z3
-
-    ex de,hl                    ; z3z2 dehl
-
-    ret                         ; exit  : DEHL = 32-bit product
-
-
-; Made by Runer112
-; Analysed by Zeda
-; https://raw.githubusercontent.com/Zeda/z80float/master/common/mul16.z80
-; Tested by jacobly
-;
-; DE*HL --> DEHL
-;
-; enter : de   = 16-bit multiplicand  = x
-;         hl   = 16-bit multiplier = y
+; enter : dehl  = 32-bit multiplicand  = x
+;         dehl' = 32-bit multiplier = y
 ;
 ; exit  : dehl = 32-bit product
 ;         carry reset
 ;
-; uses  : af, bc, de, hl
+; uses  : af, bc, de, hl, af', bc', de', hl'
 
-.mulu_32_16x16
+IF __IO_LUT_MODULE_AVAILABLE == 0
 
-    ld a,d
-    ld d,0
+.m32_mulu_32h_32x32
+
+    push de                     ; preserve multiplicand
+    push hl
+    exx
+
+    push de                     ; preserve multiplier
+    push hl
+
+    ld a,l                      ; set up first multiplier from l
+    exx
+
+    ex de,hl
     ld b,h
-    ld c,l
+    ld c,l                      ; l' * dehl (a*bcde)
+    call mulu_40_32x8           ; result in abcde
+
+    ld e,d                      ; shift result down 8 bits
+    ld d,c
+    ld c,b
+    ld b,a
+    exx
+
+    pop af                      ; set up second multiplier from h
+    pop hl                      ; recover multiplier msb de
+
+    pop de                      ; recover multiplicand
+    pop bc
+    push bc
+    push de
+
+    push hl                     ; preserve multiplier msb de
+
+                                ; h' * dehl (a*bcde)
+    call mulu_40_32x8           ; result in abcde
+
+    push bc
+    push de
+    exx
+
+    pop hl                      ; sum terms
+    add hl,de
+    ex de,hl
+
+    pop hl
+    adc hl,bc
+
+    adc a,0
+
+    ld e,d                      ; shift result down 8 bits
+    ld d,l
+    ld c,h
+    ld b,a
+    exx
+
+    pop hl                      ; set up third multiply from e
+
+    pop de                      ; recover multiplicand
+    pop bc
+    push bc
+    push de
+
+    push hl                     ; preserve multiplier msb de
+
+    ld a,l                      ; e' * dehl (a*bcde)
+    call mulu_40_32x8           ; result in abcde
+
+    push bc
+    push de
+    exx
+
+    pop hl                      ; sum terms
+    add hl,de
+    ex de,hl
+
+    pop hl
+    adc hl,bc
+
+    adc a,0
+
+    ld e,d                      ; shift result down 8 bits
+    ld d,l
+    ld c,h
+    ld b,a
+    exx
+
+    pop af                      ; set up fourth multiplier from d
+
+    pop de                      ; recover multiplicand
+    pop bc
+
+                                ; d' * dehl (a*bcde)
+    call mulu_40_32x8           ; result in abcde
+
+    push bc
+    push de
+    exx
+
+    pop hl                      ; sum terms
+    add hl,de
+    ex de,hl
+
+    pop hl
+    adc hl,bc
+
+    adc a,0                     ; result in ahlde
+
+    ld e,d                      ; shift result down 8 bits
+    ld d,l
+    ld l,h
+    ld h,a
+
+    ex de,hl
+
+    ret                         ; exit  : DEHL = 32-bit product
+
+
+
+.mulu_40_32x8
+
+    ; enter :   bcde = 32-bit multiplicand
+    ;              a = 8-bit multiplier
+    ;
+    ; exit  :  abcde = 40-bit result
+    ;
+    ; preserved: bc', de'
+    ; uses  : af, bc, de, hl, hl'
+
+    ; zero multiplier ?
+
+    or a
+    jr Z,exit_zero
+
+    ; setup multiply
+
+    push de
+
+    ld h,b
+    ld l,c
+    ld d,b
+    ld e,c
+
+    exx
+
+    pop hl
+
+    push bc     ; preserve bc'
+    push de     ; preserve de'
+
+    ld d,h
+    ld e,l
+
+    ;  de'de = 32-bit multiplicand
+    ;  hl'hl = 32-bit multiplicand, replicated
+    ;      a = 8-bit multiplier
+
+    ld c,0
+
+    ; eliminate leading zeroes
+
+.loop_00
 
     add a,a
-    jr C,bit14
-    add a,a
-    jr C,bit13
-    add a,a
-    jr C,bit12
-    add a,a
-    jr C,bit11
-    add a,a
-    jr C,bit10
-    add a,a
-    jr C,bit9
-    add a,a
-    jr C,bit8
-    add a,a
-    jr C,bit7
+    jr C,loop_11
 
-    ld a,e
-    and %11111110
     add a,a
-    jr C,bit6
+    jr C,loop_12
+
     add a,a
-    jr C,bit5
+    jr C,loop_13
+
     add a,a
-    jr C,bit4
+    jr C,loop_14
+
     add a,a
-    jr C,bit3
+    jr C,loop_15
+
     add a,a
-    jr C,bit2
+    jr C,loop_16
+
     add a,a
-    jr C,bit1
+    jr C,loop_17
+
     add a,a
-    jr C,bit0
-    rr e
-    ret C
+    jr C,exit_18
 
-    ld h,d
-    ld l,e
-    ret
-
-.bit14
-    add hl,hl
-    adc a,a
-    jr NC,bit13
-    add hl,bc
-    adc a,d
-
-.bit13
-    add hl,hl
-    adc a,a
-    jr NC,bit12
-    add hl,bc
-    adc a,d
-
-.bit12
-    add hl,hl
-    adc a,a
-    jr NC,bit11
-    add hl,bc
-    adc a,d
-
-.bit11
-    add hl,hl
-    adc a,a
-    jr NC,bit10
-    add hl,bc
-    adc a,d
-
-.bit10
-    add hl,hl
-    adc a,a
-    jr NC,bit9
-    add hl,bc
-    adc a,d
-
-.bit9
-    add hl,hl
-    adc a,a
-    jr NC,bit8
-    add hl,bc
-    adc a,d
-
-.bit8
-    add hl,hl
-    adc a,a
-    jr NC,bit7
-    add hl,bc
-    adc a,d
-
-.bit7
+.exit_zero
+    xor a
+    ld b,a
+    ld c,a
     ld d,a
-    ld a,e
-    and %11111110
-    add hl,hl
-    adc a,a
-    jr NC,bit6
-    add hl,bc
-    adc a,0
-
-.bit6
-    add hl,hl
-    adc a,a
-    jr NC,bit5
-    add hl,bc
-    adc a,0
-
-.bit5
-    add hl,hl
-    adc a,a
-    jr NC,bit4
-    add hl,bc
-    adc a,0
-
-.bit4
-    add hl,hl
-    adc a,a
-    jr NC,bit3
-    add hl,bc
-    adc a,0
-
-.bit3
-    add hl,hl
-    adc a,a
-    jr NC,bit2
-    add hl,bc
-    adc a,0
-
-.bit2
-    add hl,hl
-    adc a,a
-    jr NC,bit1
-    add hl,bc
-    adc a,0
-
-.bit1
-    add hl,hl
-    adc a,a
-    jr NC,bit0
-    add hl,bc
-    adc a,0
-
-.bit0
-    add hl,hl
-    adc a,a
-    jr C,funkyCarry
-    rr e
     ld e,a
-    ret NC
-    add hl,bc
-    ret NC
-    inc e
-    ret NZ
-    inc d
     ret
 
-.funkyCarry
-    inc d
-    rr e
-    ld e,a
-    ret NC
-    add hl,bc
-    ret NC
-    inc e
+
+.loop_11
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,loop_12
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.loop_12
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,loop_13
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.loop_13
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,loop_14
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.loop_14
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,loop_15
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.loop_15
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,loop_16
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.loop_16
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,loop_17
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.loop_17
+
+    add hl,hl
+    exx
+    adc hl,hl
+    exx
+    adc a,a
+
+    jr NC,exit_18
+
+    add hl,de
+    exx
+    adc hl,de
+    exx
+    adc a,c
+
+.exit_18
+
+    ; ahl'hl = product
+    exx
+
+    pop de      ; restore de'
+    pop bc      ; restore bc'
+
+    push hl
+    exx
+
+    pop bc
+    ex de,hl
+
+    ; product in abcde
     ret
 
 ELSE ;  feilipu, 2020 February
