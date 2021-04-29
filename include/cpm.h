@@ -130,6 +130,9 @@ extern void __LIB__ putoffset(char *dest, long val) __smallc;
 #define setuid(u)  bdos(CPM_SUID,u)
 #define getuid()   bdos(CPM_SUID,0xFF)
 
+// Set the user number to requid, return the current one
+extern int __LIB__ swapuid(int reqid) __z88dk_fastcall;
+
 /* Write an offset as 3 bytes */
 extern void __LIB__ _putoffset(unsigned char *where,long offset) __smallc;
 
