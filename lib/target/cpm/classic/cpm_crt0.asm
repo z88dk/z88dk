@@ -38,11 +38,6 @@
         defc    CRT_ORG_CODE  = $100
     ENDIF
 
-    IF CRT_DISABLE_FILEIO = 0
-        defc    CRT_NEED_CPM_FCBS = 1
-    ELSE
-        defc    CRT_NEED_CPM_FCBS = 0
-    ENDIF
 
     ; Default to some "sensible" values
     IF !DEFINED_CONSOLE_ROWS

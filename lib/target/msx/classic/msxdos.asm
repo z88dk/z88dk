@@ -8,13 +8,6 @@
         defc CRT_ORG_CODE = $100   ; MSXDOS
     ENDIF
 
-    IF CLIB_MSXDOS = 1
-        IF CRT_DISABLE_FILEIO = 0
-          defc  CRT_NEED_CPM_FCBS = 1
-        ELSE
-          defc  CRT_NEED_CPM_FCBS = 0
-        ENDIF
-    ENDIF
 
     IF !DEFINED_MSXDOS
         defc MSXDOS = 5

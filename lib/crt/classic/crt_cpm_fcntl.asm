@@ -10,7 +10,7 @@
 
     SECTION bss_crt
 
-IF CRT_NEED_CPM_FCBS
+IF CLIB_DISABLE_FILEIO = 0
     SECTION bss_crt
     PUBLIC  __fcb
 __fcb:
