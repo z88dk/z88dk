@@ -12,7 +12,7 @@ classic/sccz80
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 mandelbrot.c -o mandelbrot.bin -lm -lndos -m
 
 classic/sccz80/math32
-zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
 
 classic/zsdcc
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 mandelbrot.c -o mandelbrot.bin -lmath48 -lndos -m
@@ -63,6 +63,13 @@ cycle count  = 3766086833
 time @ 4MHz  = 3766086833 / 4*10^6 = 15 min 41 sec
 
 
+Z88DK April 30, 2021
+zsdcc #12070 / classic / math32
+4804 bytes less page zero
+
+cycle count  = 1410662416
+time @ 4MHz  = 1410662416 / 4*10^6 = 5 min 53 sec
+
 Z88DK April 28, 2021
 sccz80 / classic
 2693 bytes less page zero
@@ -71,9 +78,9 @@ cycle count  = 3596657568
 time @ 4MHz  = 3596657568 / 4*10^6 = 14 min 59 sec
 
 
-Z88DK April 28, 2021
+Z88DK April 30, 2021
 sccz80 / classic / math32
-4561 bytes less page zero
+4559 bytes less page zero
 
-cycle count  = 1137834177
-time @ 4MHz  = 1137834177 / 4*10^6 =  4 min 44 sec
+cycle count  = 1142045217
+time @ 4MHz  = 1142045217 / 4*10^6 =  4 min 45 sec

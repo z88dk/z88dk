@@ -125,6 +125,16 @@ cycle count  = 9702197187
 time @ 4MHz  = 9702197187 / 4*10^6 = 40 min 25 sec
 
 8.
+Z88DK April 30, 2021
+zsdcc #12250 / new c library / math32
+5531 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 10531372867
+time @ 4MHz  = 10531372867 / 4*10^6 = 43 min 53 sec
+
+9.
 SDCC 3.6.5 #9852 (MINGW64)
 7495 bytes less page zero
 
