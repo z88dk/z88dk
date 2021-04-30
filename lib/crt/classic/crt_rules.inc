@@ -146,7 +146,12 @@
 
     ; Maximum number of fds available
     IF !DEFINED_CLIB_OPEN_MAX
-        DEFC    CLIB_OPEN_MAX = CLIB_FOPEN_MAX
+        ; Map this old nofileio pragma into a modern form
+        IF DEFINED_nofileio
+            defc    CLIB_OPEN_MAX = 0
+        ELSE
+            defc    CLIB_OPEN_MAX = CLIB_FOPEN_MAX
+        ENDIF
     ENDIF
     PUBLIC  __CLIB_OPEN_MAX
     defc    __CLIB_OPEN_MAX = CLIB_OPEN_MAX
@@ -160,20 +165,14 @@
       ENDIF
    ENDIF
 
-   ; Map this old pragma into a "modern" name
-   IF DEFINED_nofileio
-       defc CLIB_DISABLE_FILEIO = 1
-   ELIF !DEFINED_CLIB_DISABLE_FILEIO
-       defc CLIB_DISABLE_FILEIO = 0
-   ENDIF
 
    ; Map this old pragma into a "modern" name
    IF DEFINED_nostreams
        defc CRT_COMMANDLINE_REDIRECTION = 0
    ELIF !DEFINED_CRT_COMMANDLINE_REDIRECTION
        ; File redirection on command line arguments can only happen
-       ; if both stdio and fileio are enabled
-       IF CLIB_DISABLE_FILEIO = 0 && CRT_ENABLE_STDIO = 1
+       ; if stdio is enabled
+       IF CRT_ENABLE_STDIO = 1
            defc CRT_COMMANDLINE_REDIRECTION = 1
        ELSE
            defc CRT_COMMANDLINE_REDIRECTION = 0

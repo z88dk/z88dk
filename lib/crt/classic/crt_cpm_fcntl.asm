@@ -6,7 +6,7 @@
 
     SECTION bss_crt
 
-IF CLIB_DISABLE_FILEIO = 0
+IF CLIB_OPEN_MAX > 0
     SECTION bss_crt
     PUBLIC  __fcb
 __fcb:
