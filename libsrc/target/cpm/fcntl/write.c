@@ -57,7 +57,7 @@ ssize_t write(int fd, void *buf, size_t len)
             if ( size == SECSIZE ) {
                 // Write the full sector now, flush whatever we've got cached so we don't 
                 // write out of order
-                cpm_flush_cache(fc);
+                cpm_cache_flush(fc);
 
                 _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
                 bdos(CPM_SDMA,buf);
