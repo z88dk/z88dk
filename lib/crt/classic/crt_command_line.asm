@@ -143,6 +143,10 @@ argv_done_2:
     add     hl,sp	;address of argv
     ld      c,b
     ld      b,0
+ELSE
+    ld      hl,0    ;argv
+    ld      b,h     ;argc
+    ld      c,l
 ENDIF
 
 

@@ -64,10 +64,13 @@ IF CRT_ENABLE_COMMANDLINE = 1
     inc     hl
     add     hl,bc   ;now points to the end of the command line
     INCLUDE	"crt/classic/crt_command_line.asm"
+    push    hl	;argv
+    push    bc	;argc
+ELSE
+    ld      hl,0
+    push    hl  ;argv
+    push    hl  ;argc
 ENDIF
-
-    push    hl      ;argv
-    push    bc      ;argc
     call    _main		;Call user code
     pop     bc	;kill argv
     pop     bc	;kill argc

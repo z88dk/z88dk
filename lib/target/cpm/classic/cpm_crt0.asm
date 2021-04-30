@@ -151,9 +151,13 @@ IF CRT_ENABLE_COMMANDLINE = 1
     add     hl,bc   ;now points to the end of the command line
     dec     c
     INCLUDE	"crt/classic/crt_command_line.asm"
-ENDIF
     push    hl	;argv
     push    bc	;argc
+ELSE
+    ld      hl,0
+    push    hl  ;argv
+    push    hl  ;argc
+ENDIF
     call    _main		;Call user code
     pop     bc	;kill argv
     pop     bc	;kill argc
