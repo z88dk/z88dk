@@ -4,6 +4,7 @@
 
     PUBLIC  pixeladdress_MODE3
     EXTERN  SCREEN_BASE
+    EXTERN  __sam_MODE3_fatpix
 
 
 ; Entry: hl = x
@@ -12,6 +13,11 @@
 ;    a = pixel offset
 ;    z = pixel @1100000
 pixeladdress_MODE3:
+    ld      a,(__sam_MODE3_fatpix)
+    and     a
+    jr      z,not_fatpix
+    add     hl,hl
+not_fatpix:
     ex      de,hl
     ld      a,h
     ld      h,l    ;x128

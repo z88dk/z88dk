@@ -68,6 +68,9 @@ target/zx-common/graphics/obj/${TARGET}/pixladdr_MODE0
 target/zx-common/graphics/obj/${TARGET}/__set_zx_pixel_colour
 gfx/wide/obj/${TARGET}/w_dcircle_square
 @gfx/wide/gfx_wide.lst
+; Fatpix setting
+target/sam/sam/sam_set_fatpix
+target/sam/sam/graphics_vars
 
 ; Sam hardware functions
 target/sam/sam/SAM_PALETTE_VALUES

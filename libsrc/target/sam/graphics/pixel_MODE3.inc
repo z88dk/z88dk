@@ -2,6 +2,7 @@
     EXTERN  pixeladdress_MODE3
     EXTERN  __gfx_coords
     EXTERN  __sam_MODE3_attr
+    EXTERN  __sam_MODE3_fatpix
     EXTERN  __sam_graphics_pagein
     EXTERN  __sam_graphics_pageout
     EXTERN  l_cmp
@@ -38,6 +39,30 @@ IF NEEDunplot
 ELIF NEEDplot | NEEDxor
     ld      a,(__sam_MODE3_attr)
 ENDIF
+    ld      c,a
+    ex      af,af
+    ld      a,(__sam_MODE3_fatpix)
+    and     a
+    jr      z,not_fatpix
+    ; We have fatpix here, so we only have two pixels in each byte
+    ld      a,c
+    rrca
+    rrca
+    or      c
+    ld      c,a
+    ex      af,af
+    ld      a,c
+    ld      c,@00001111
+    jr      z,rotate_done
+    rrca
+    rrca
+    rrca
+    rrca
+    ld      c,@11110000
+    jr      rotate_done
+not_fatpix:
+    ex      af,af
+    ld      a,c
     ld      c,@00111111
     jr      z,rotate_done
 rotate:
