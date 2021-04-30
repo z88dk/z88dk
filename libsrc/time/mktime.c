@@ -1,7 +1,9 @@
 
 #include <time.h>
 
-static int yday[] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+// Number of days (-1) that have elapsed at the end of the month
+static int yday[] = { -1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333 };
+
 time_t mktime(struct tm *tp)
 {
     return tp->tm_sec + tp->tm_min*60 + tp->tm_hour*3600L + (yday[tp->tm_mon] + tp->tm_mday)*86400 +

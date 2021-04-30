@@ -30,8 +30,13 @@ target_read_structtm:
     ex      de,hl
     ld      hl,0
     ld      a,(clock_available)
-    and     a
-    ret     z       ;Exit with nc=error
+    dec     a
+    jp      z,read_sambus_clock
+    dec     a
+    jp      z,read_dallas_clock
+    ret
+
+read_sambus_clock:
     ex      de,hl
     ld      bc,CLOCK_PORT
     ld      d,@00000111
@@ -51,6 +56,7 @@ target_read_structtm:
     inc     hl
     ld      d,@11111111
     call    read_clock8         ;Read year
+normalise_year:
     dec     hl
     dec     hl
     ld      a,(hl)
@@ -69,6 +75,9 @@ read_clock8:
     ld      b,a
     in      a,(c)
     and     d
+
+
+
     ld      d,a
     add     a
     add     a
@@ -83,6 +92,62 @@ read_clock8:
     add     $10
     ld      b,a
     ret
+
+
+read_dallas_clock:
+    ex      de,hl       ;hl = struct tm
+    ld      e,0         ;seconds
+    call    read_dallas_decode
+    ld      e,2         ;minutes
+    call    read_dallas_decode
+    ld      e,4         ;hour
+    call    read_dallas_decode
+    ld      e,7         ;day
+    call    read_dallas_decode
+    ld      e,8         ;month
+    call    read_dallas_decode
+    dec     hl
+    dec     hl
+    dec     (hl)
+    inc     hl
+    inc     hl
+    ld      d,9         ;year
+    call    read_dallas_decode
+    jr      normalise_year
+
+read_dallas_decode:
+    call    read_dallas_reg
+    ld      e,a
+    and     $f0
+    rra
+    ld      d,a
+    rra
+    rra
+    sub     d
+    add     e
+    ld      (hl),a
+    inc     hl
+    ld      (hl),0
+    inc     hl
+    ret
+
+
+;- read A from clock addres E -
+
+read_dallas_reg:
+    ld      bc,$feef
+    out     (c),e
+    inc     b
+    in      a,(c)
+    ret
+
+write_dallas_reg:
+    ld      bc,$feef
+    out     (c),e
+    inc     b
+    out     (c),a
+    ret
+
 
 asm_clock_detect:
     LD      BC,$B0EF       ;BC = Year MSB of realtime clock
@@ -107,7 +172,30 @@ no_clk:
     OUT     (C),A          ;restore YEAR data.
 
     LD      a,e
-    ld      (clock_available),a
+    ld      hl,clock_available
+    ld      (hl),e
+    and     a
+    ret     nz
+    ; Detect dallas clock here
+    ld      de,$003f
+    call    read_dallas_reg
+    ex      af,af
+test_dallas:
+    ld      a,d
+    call    write_dallas_reg
+    call    read_dallas_reg
+    cp      d
+    jr      nz,finish_dallas_test
+    dec     d
+    jr      nz,test_dallas
+finish_dallas_test:
+    ex      af,af
+    call    write_dallas_reg
+    ex      af,af
+    ; If z then dallas clock
+    ld      (hl),0
+    ret     nz
+    ld      (hl),2      ;dallas clock available
     ret
 
 SECTION bss_clib
