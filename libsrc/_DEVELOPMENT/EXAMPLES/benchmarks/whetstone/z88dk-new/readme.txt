@@ -16,7 +16,7 @@ new/zsdcc/math48 : 40 bit mantissa internal, 24 bit mantissa presented by compil
 zcc +zx -vn -startup=4 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -DPRINTOUT whetstone.c -o whetstone -lm -m -create-app
 
 new/zsdcc/math32: 24 bit mantissa
-zcc +cpm -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -DPRINTOUT whetstone.c -o whetstone --math32 -m -create-app
+zcc +zx -vn -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -DPRINTOUT whetstone.c -o whetstone --math32 -m -create-app
 
 (These compile settings were found to give the best results).
 
@@ -34,7 +34,7 @@ new/sccz80/math48 : 40 bit mantissa
 zcc +z80 -vn -startup=0 -clib=new -O2 -DSTATIC -DTIMER whetstone.c -o whetstone -lm -m -pragma-include:zpragma.inc -create-app
 
 new/sccz80/math32 : 24 bit mantissa
-zcc +z80 -vn -startup=0 -clib=new -O2 -DSTATIC -DTIMER whetstone.c -o whetstone --math32 -m -pragma-include:zpragma.inc -create-app
+zcc +z80 -vn -startup=0 -clib=new -O3 --opt-code-speed=inlineints -DSTATIC -DTIMER whetstone.c -o whetstone --math32 -m -pragma-include:zpragma.inc -create-app
 
 new/zsdcc/math48 : 40 bit mantissa internal, 24 bit mantissa presented by compiler
 zcc +z80 -vn -startup=0 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER whetstone.c -o whetstone -lm -m -pragma-include:zpragma.inc -create-app
@@ -70,15 +70,15 @@ KWIPS        = 100*10*1 / 243.2248 = 4.1114
 MWIPS        = 4.1114 / 1000 = 0.0041114
 
 
-Z88DK April 28, 2021
+Z88DK April 30, 2021
 sccz80 / new c library / math32
 24 bit mantissa + 8 bit exponent
-8927 bytes less page zero
+8921 bytes less page zero
 
-cycle count  = 561121915
-time @ 4MHz  = 561121915 / 4x10^6 = 140.2804 seconds
-KWIPS        = 100*10*1 / 140.2804 = 7.1285
-MWIPS        = 7.1285 / 1000 = 0.0071285
+cycle count  = 567396426
+time @ 4MHz  = 567396426 / 4x10^6 = 141.8491 seconds
+KWIPS        = 100*10*1 / 141.8491 = 7.0497
+MWIPS        = 7.0497 / 1000 = 0.0070497
 
 
 Z88DK April 28, 2021
@@ -92,12 +92,12 @@ KWIPS        = 100*10*1 / 228.6031 = 4.3743
 MWIPS        = 4.3743 / 1000 = 0.0043743
 
 
-Z88DK April 28, 2021
-zsdcc #12070 / new c library / math32
+Z88DK April 30, 2021
+zsdcc #12250 / new c library / math32
 24 bit mantissa + 8 bit exponent
-9794 bytes less page zero
+10113 bytes less page zero
 
-cycle count  = 568841475
-time @ 4MHz  = 568841475 / 4x10^6 = 142.2103 seconds
-KWIPS        = 100*10*1 / 142.2103 = 7.0318
-MWIPS        = 7.0318 / 1000 = 0.0070318
+cycle count  = 576187434
+time @ 4MHz  = 576187434 / 4x10^6 = 144.0468 seconds
+KWIPS        = 100*10*1 / 144.0468 = 6.9421
+MWIPS        = 6.9421 / 1000 = 0.0069421

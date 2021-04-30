@@ -137,28 +137,28 @@ cycle count  = 2253709929
 time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
 
 8.
-Z88DK April 28, 2021
+Z88DK April 30, 2021
 sccz80 / classic / math32
 6018 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 1006879853
-time @ 4MHz  = 1006879853 / 4*10^6 =  4 min 12 sec
+cycle count  = 993265277
+time @ 4MHz  = 993265277 / 4*10^6 =  4 min 8 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
 
 9.
-Z88DK April 28, 2021
+Z88DK April 30, 2021
 sccz80 / new c library / math32
 5149 bytes less page zero
 
 first number error : 5 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 762845940
-time @ 4MHz  = 762845940 / 4*10^6 = 3 min 11 sec
+cycle count  = 754266702
+time @ 4MHz  = 754266702 / 4*10^6 = 3 min 8 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
 

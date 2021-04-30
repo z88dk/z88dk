@@ -69,14 +69,14 @@ time @ 4MHz  = 8628617805 / 4*10^6 = 35 min 57 sec
 Internal 48-bit float implementation causes relative slowdown.
 
 3.
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-3437 bytes less page zero
+Z88DK April 30, 2021
+zsdcc #12250 / classic c library / math48
+3984 bytes less page zero
 
 error: 2 * 10^(-9)
 
-cycle count  = 8624312042
-time @ 4MHz  = 8624312042 / 4*10^6 = 35 min 56 sec
+cycle count  = 8617785182
+time @ 4MHz  = 8617785182 / 4*10^6 = 35 min 54 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
@@ -115,6 +115,16 @@ time @ 4MHz  = 14688455657 / 4*10^6 = 61 min 12 sec
 [Issue #124](https://github.com/z88dk/z88dk/issues/124) Normalization is slow.
 
 7.
+Z88DK April 30, 2021
+sccz80 / classic c library / math32
+5842 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 9702197187
+time @ 4MHz  = 9702197187 / 4*10^6 = 40 min 25 sec
+
+8.
 SDCC 3.6.5 #9852 (MINGW64)
 7495 bytes less page zero
 

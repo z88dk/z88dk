@@ -51,14 +51,14 @@ IF __IO_LUT_MODULE_AVAILABLE == 0
     pop de                      ; y0
     push hl                     ; preserve multiplicand x0
 
-    ; multiply lowest term x0*y0
+    ; multiply lowest term y0*x0
     call mulu_32_16x16          ; de*hl -> dehl
 
     ex de,hl                    ; hlde z1 (partial)
     pop de                      ; x0
     ex (sp),hl                  ; y1 z1 (partial), abandon z0
 
-    ; multiply middle terms y1*x0
+    ; multiply middle term x0*y1
     call mulu_32_16x16          ; de*hl -> dehl
 
     pop bc
@@ -74,14 +74,12 @@ IF __IO_LUT_MODULE_AVAILABLE == 0
     pop de                      ; y0
     pop hl                      ; x1
 
-    ; multiply middle terms y0*x1
+    ; multiply middle term y0*x1
     call mulu_32_16x16          ; de*hl -> dehl
 
     push de
     push hl
     exx
-
-    xor a
 
     pop hl
     add hl,bc                   ; z1 capture carry and abandon
@@ -90,9 +88,8 @@ IF __IO_LUT_MODULE_AVAILABLE == 0
     adc hl,de                   ; z2 (partial)
     ex de,hl
 
-    adc a,a
-    ld b,0
-    ld c,a                      ; z3 (partial)
+    ld bc,0
+    rl c                        ; z3 (partial)
 
     exx                         ; z3z2 (partial) bc'de'
 
@@ -129,7 +126,6 @@ IF __IO_LUT_MODULE_AVAILABLE == 0
 ;         hl   = 16-bit multiplier = y
 ;
 ; exit  : dehl = 32-bit product
-;         carry reset
 ;
 ; uses  : af, bc, de, hl
 
