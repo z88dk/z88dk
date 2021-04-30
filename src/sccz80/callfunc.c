@@ -169,6 +169,7 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
     needchar(')'); 
     Zsp = savesp;
     saveline = lineno;
+    reset_namespace();
 
     node = ast_function_call(function_pointer_call ? AST_FUNCPTR_CALL : AST_FUNC_CALL, functype, function_args);
 
@@ -296,6 +297,18 @@ Node *callfunction(SYMBOL *ptr, Type *fnptr_type)
                      expr = prototype->kind;
                 } else {
                     expr = ForceArgs(prototype, type, vconst);
+                }
+            } else if ( prototype->kind != KIND_ELLIPSES && ispointer(prototype)) {
+                if ( type_matches_pointer(prototype, type) == 0 ) {
+                    UT_string *str;
+                    
+                    utstring_new(str);
+                    utstring_printf(str,"Converting type: ");
+                    type_describe(type,str);
+                    utstring_printf(str," to ");
+                    type_describe(prototype, str);
+                    warningfmt("incompatible-pointer-types","%s", utstring_body(str));
+                    utstring_free(str);
                 }
             }
             // if ( (protoarg & ( SMALLC << 16)) !=  (packedArgumentType & (SMALLC << 16)) ) {
@@ -467,7 +480,7 @@ static Kind ForceArgs(Type *dest, Type *src, int isconst)
             // Pointer to pointer
             if ( dest->kind == KIND_PTR && src->kind == KIND_CPTR ) {
                 warningfmt("incompatible-pointer-types","Narrowing pointer from far to near");
-            } else if ( type_matches(src, dest) == 0 && src->ptr->kind != KIND_VOID && dest->ptr->kind != KIND_VOID ) {
+            } else if ( type_matches_pointer(dest, src) == 0 ) {
                 UT_string *str;
                 
                 utstring_new(str);
@@ -545,6 +558,11 @@ static int SetMiniFunc(unsigned char* arg, uint32_t* format_option_ptr)
                 complex = 2;
             arg++;
             islong = 1;
+        } else if ( *arg == 'h' ) {
+            arg++;
+            if ( *arg == 'h' ) arg++;
+        } else if ( *arg == 'z' ) {
+            arg++; 
         }
         fmt = &printf_formats[0];
         while (fmt->fmt) {

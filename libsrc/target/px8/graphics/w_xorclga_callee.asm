@@ -16,7 +16,7 @@
 	PUBLIC	xorclga_callee
 	PUBLIC	_xorclga_callee
 	
-	PUBLIC	ASMDISP_XORCLGA_CALLEE
+	PUBLIC	asm_xorclga
 
 	EXTERN	w_area
 
@@ -39,9 +39,7 @@
 		
 		exx
 		
-.asmentry
+.asm_xorclga
 		
 		ld	a,3
 		jp	w_area
-
-DEFC ASMDISP_XORCLGA_CALLEE = asmentry - xorclga_callee

@@ -87,11 +87,11 @@ struct tm {
  * of timezones
  */
 
-extern struct tm __LIB__ __SAVEFRAME__ *gmtime(time_t *t);
-extern struct tm __LIB__  __SAVEFRAME__*localtime(time_t *t);
+extern struct tm __LIB__ __SAVEFRAME__ *gmtime(const time_t *t);
+extern struct tm __LIB__  __SAVEFRAME__*localtime(const time_t *t);
 extern time_t __LIB__  __SAVEFRAME__ mktime(struct tm *tp);
 extern char __LIB__  __SAVEFRAME__ *asctime(struct tm *tp);
-extern char __LIB__  __SAVEFRAME__*ctime(time_t *t);
+extern char __LIB__  __SAVEFRAME__*ctime(const time_t *t);
 
 
 #ifndef FAKECLOCK
@@ -146,9 +146,8 @@ struct dos_tm
    uint16_t date;
 };
 
-#if 0
-// Not yet ported from newlib to classic
 // dos time affects tm.tm_sec through tm.tm_year
+// Not available on 8080 targets
 
 extern void __LIB__ dostm_from_tm(struct dos_tm *,struct tm *) __smallc;
 extern void __LIB__ dostm_from_tm_callee(struct dos_tm *,struct tm *) __smallc __z88dk_callee;
@@ -158,7 +157,6 @@ extern void __LIB__ dostm_from_tm_callee(struct dos_tm *,struct tm *) __smallc _
 extern void __LIB__ tm_from_dostm(struct tm *,struct dos_tm *) __smallc;
 extern void __LIB__ tm_from_dostm_callee(struct tm *,struct dos_tm *) __smallc __z88dk_callee;
 #define tm_from_dostm(a,b) tm_from_dostm_callee(a,b)
-#endif
 
 
 #endif /* _TIME_H */

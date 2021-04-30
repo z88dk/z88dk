@@ -15,10 +15,12 @@
 
 if1_getname:
 _if1_getname:
-		pop	bc	; ret addr
-		pop	hl	; location
-		push	hl
-		push	bc
+
+; __FASTCALL__
+;		pop	bc	; ret addr
+;		pop	hl	; location
+;		push	hl
+;		push	bc
 		
 		ld	de,tempmdvname
 		push	de

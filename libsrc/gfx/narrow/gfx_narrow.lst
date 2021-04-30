@@ -12,7 +12,6 @@ gfx/narrow/obj/${TARGET}/dcircle
 gfx/narrow/obj/${TARGET}/dfill2
 gfx/narrow/obj/${TARGET}/draw
 gfx/narrow/obj/${TARGET}/draw_callee
-gfx/narrow/obj/${TARGET}/draw_profile_nostencil
 gfx/narrow/obj/${TARGET}/drawb
 gfx/narrow/obj/${TARGET}/drawb_callee
 gfx/narrow/obj/${TARGET}/drawbox

@@ -11,13 +11,10 @@
 ;
 
 IF !__CPU_INTEL__ & !__CPU_RABBIT__ & !__CPU_GBZ80__
-        SECTION code_clib
-	PUBLIC	set_psg
-	PUBLIC	_set_psg
-	EXTERN		set_psg_callee
-
-	EXTERN ASMDISP_SET_PSG_CALLEE
-	
+    SECTION code_clib
+    PUBLIC	set_psg
+    PUBLIC	_set_psg
+    EXTERN  asm_set_psg	
 
 set_psg:
 _set_psg:
@@ -30,6 +27,6 @@ _set_psg:
 	push	de
 	push	bc
 	
-	jp set_psg_callee + ASMDISP_SET_PSG_CALLEE
+	jp asm_set_psg
 
 ENDIF

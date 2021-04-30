@@ -16,8 +16,7 @@
         SECTION   code_clib
         PUBLIC    cpc_SetColour
         PUBLIC    _cpc_SetColour
-        EXTERN     cpc_SetColour_callee
-        EXTERN    ASMDISP_CPC_SETCOLOUR_CALLEE
+        EXTERN     asm_cpc_SetColour
 
 .cpc_SetColour
 ._cpc_SetColour
@@ -27,4 +26,4 @@
         push    de
         push    hl
         push    bc
-        jp cpc_SetColour_callee + ASMDISP_CPC_SETCOLOUR_CALLEE
+        jp asm_cpc_SetColour

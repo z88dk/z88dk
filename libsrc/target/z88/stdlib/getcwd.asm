@@ -13,14 +13,14 @@
 ; -----
 ; $Id: getcwd.asm,v 1.11 2016-03-06 21:56:32 dom Exp $
 
-                INCLUDE "syspar.def"
-                INCLUDE	"memory.def"
+    INCLUDE "syspar.def"
+    INCLUDE	"memory.def"
 
-		SECTION	  code_clib
-                PUBLIC    getcwd
-                PUBLIC    _getcwd
-                EXTERN    readbyte        ;standard.EXTERN
-                PUBLIC ASMDISP_GETCWD
+    SECTION	  code_clib
+    PUBLIC    getcwd
+    PUBLIC    _getcwd
+    EXTERN    readbyte        ;standard.EXTERN
+    PUBLIC asm_getcwd
 
 .getcwd
 ._getcwd
@@ -32,7 +32,7 @@
         push bc
         push hl
 
-.asmentry
+.asm_getcwd
 
         ; bc = int maxlen
         ; de = char *buffer
@@ -64,5 +64,3 @@
         dec     bc
         jr      getcwd2
         
- DEFC ASMDISP_GETCWD = asmentry - getcwd
- 

@@ -1,14 +1,14 @@
 ;
-;       Plot pixel at (x,y) coordinate.
+;     Plot pixel at (x,y) coordinate.
 
 
 
-        SECTION code_clib
-	PUBLIC	plotpixel
-	defc	NEEDplot = 1
+      SECTION code_clib
+    PUBLIC    plotpixel
+    defc    NEEDplot = 1
 
-.plotpixel			
-	INCLUDE "pixel.asm"
+.plotpixel          
+    INCLUDE "pixel.inc"
 
 
 

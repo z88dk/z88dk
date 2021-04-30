@@ -2,6 +2,7 @@
 ; 02.2008 aralbrec
 ; zx81 hi-res version
 
+SECTION code_sprite_sp1
 PUBLIC SP1PSPOP
 EXTERN SP1V_TEMP_IX
 

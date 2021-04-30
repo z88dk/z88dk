@@ -281,7 +281,7 @@ Node *doiferror()
     flab2 = getlabel();
     if (lastst != STRETURN) {
         /* if last statement of 'if' was 'return' we needn't skip 'else' code */
-        gen_jp_label(flab2);
+        gen_jp_label(flab2,0);
     }
     postlabel(flab1); /* print false label */
     statement(); /* and do 'else' clause */
@@ -337,7 +337,7 @@ Node *doif()
     flab2 = getlabel();
     if (lastst != STRETURN) {
         /* if last statement of 'if' was 'return' we needn't skip 'else' code */
-        gen_jp_label(flab2);
+        gen_jp_label(flab2,1);
     }
     if ( testtype != 0 ) {
         postlabel(flab1); /* print false label */
@@ -404,7 +404,7 @@ Node *dowhile()
     } else {
         pair = statement(); /* if so, do a statement */
         body = pair->node;
-        gen_jp_label(wq.loop); /* loop to label */
+        gen_jp_label(wq.loop,1); /* loop to label */
         postlabel(wq.exit); /* exit label */
         clearbuffer(buf);
     }
@@ -442,7 +442,7 @@ Node *dodo()
     if ( testresult == 0 ) { // False
         // We don't need to do anything
     } else {
-        gen_jp_label(top);
+        gen_jp_label(top, 1);
         postlabel(wq.exit);
     }
     delwhile();
@@ -510,13 +510,14 @@ Node *dofor()
     suspendbuffer();
 
     if ( testresult != 0 ) {  /* So it's either true or non-constant */      
+        gen_jp_label(l_condition,1); /*         goto loop                  */
+        postlabel(wq.loop); /* .loop                              */
+        clearbuffer(buf3); /*         modification               */
         postlabel(l_condition); /* .condition                         */
         clearbuffer(buf2); /*         if (!condition) goto exit  */
         pair = statement(); /*         statement                  */
         body = pair->node;
-        postlabel(wq.loop); /* .loop                              */
-        clearbuffer(buf3); /*         modification               */
-        gen_jp_label(l_condition); /*         goto loop                  */
+        gen_jp_label(wq.loop,1); /*         goto loop                  */
         postlabel(wq.exit) ; /* .exit                              */
     } else {
         clearbuffer(buf2); // Condition 
@@ -599,10 +600,10 @@ Node *doswitch()
     gen_switch_postamble(switch_type->kind);
     if (swdefault) {
         array_add(arr, ast_jump(swdefault,NULL));
-        gen_jp_label(swdefault);
+        gen_jp_label(swdefault,1);
     } else {
         array_add(arr, ast_jump(wq.exit,NULL));
-        gen_jp_label(wq.exit);
+        gen_jp_label(wq.exit,1);
     }
 
     clearbuffer(buf);
@@ -712,7 +713,7 @@ Node *dobreak()
         return NULL; /* no */
     modstk(ptr->sp, KIND_NONE, NO, YES); /* else clean up stk ptr */
 
-    gen_jp_label(ptr->exit); /* jump to exit label */
+    gen_jp_label(ptr->exit,1); /* jump to exit label */
 
     sptr = locptr;
     while ( sptr != ptr->loop_symptr) {
@@ -744,7 +745,7 @@ Node *docont()
             break;
     }
     modstk(ptr->sp, KIND_NONE, NO, YES); /* else clean up stk ptr */
-    gen_jp_label(ptr->loop); /* jump to loop label */
+    gen_jp_label(ptr->loop,1); /* jump to loop label */
 
     sptr = locptr;
     while ( sptr != ptr->loop_symptr) {

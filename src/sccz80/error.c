@@ -125,15 +125,17 @@ void warningfmt(const char *category, const char *fmt, ...)
     } else {
         int i;
         for ( i = 0; i < c_warning_categories_num; i++ ) {
+            if ( strncmp(c_warning_categories[i],"no-",3) == 0 &&
+                 strcmp(c_warning_categories[i]+3,category) == 0 ) {
+                return;
+            }
             if ( strcmp(c_warning_categories[i],category) == 0 ) {
                 pass = 1;
-                break;
             }
         }
         for ( i = 0; i < c_default_categories_num; i++ ) {
             if ( strcmp(c_default_categories[i],category) == 0 ) {
                 pass = 1;
-                break;
             }
         }
     }

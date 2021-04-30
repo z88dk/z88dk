@@ -12,9 +12,8 @@
 	PUBLIC    exos_redirect_channel
 	PUBLIC    _exos_redirect_channel
 
-	EXTERN     exos_redirect_channel_callee
+	EXTERN     asm_exos_redirect_channel
 
-EXTERN ASMDISP_EXOS_REDIRECT_CHANNEL_CALLEE
 
 exos_redirect_channel:
 _exos_redirect_channel:
@@ -26,5 +25,5 @@ _exos_redirect_channel:
    push de
    push bc
    
-   jp exos_redirect_channel_callee + ASMDISP_EXOS_REDIRECT_CHANNEL_CALLEE
+   jp asm_exos_redirect_channel
 

@@ -253,14 +253,13 @@ static void switch_namespace(char *name)
 {
     namespace *ns;
 
-    if ( name == current_nspace || name == NULL ) {
+    if ( current_nspace == name || name == NULL ) {
         return;
     }
     current_nspace = name;
 
     if ( name != NULL ) {
         ns = get_namespace(name);
-
         if ( ns != NULL ) {
             gen_call(-1, ns->bank_function->name, ns->bank_function);
         }
@@ -798,6 +797,7 @@ void gen_load_indirect(LVALUE* lval)
 
     sign = lval->ltype->isunsigned;
     
+    switch_namespace(lval->ltype->namespace);
     /* Fetch from far pointer */
     if (flags & FARACC) { /* Access via far method */
         switch (typeobj) {
@@ -1253,9 +1253,9 @@ void gen_save_pointer(LVALUE *lval)
 
 
 /* Jump to specified internal label number */
-void gen_jp_label(int label)
+void gen_jp_label(int label, int end_of_scope)
 {
-    opjump("", label);
+    opjump("", label, end_of_scope);
 }
 
 /* Jump relative to specified internal label */
@@ -1268,11 +1268,15 @@ void jumpr(int label)
  * Output the jump code, with conditions as needed
  */
 
-void opjump(char* cc, int label)
+void opjump(char* cc, int label, int end_of_scope)
 {
     ot("jp\t");
     outstr(cc);
     printlabel(label);
+    outstr("\t;");
+    if ( end_of_scope ) {
+        outstr("EOS");
+    }
     nl();
 }
 
@@ -1286,12 +1290,12 @@ void opjumpr(char* cc, int label)
 
 void jumpc(int label)
 {
-    opjump("c,", label);
+    opjump("c,", label, 0);
 }
 
 void jumpnc(int label)
 {
-    opjump("nc,", label);
+    opjump("nc,", label, 0);
 }
 
 static void setcond(int val)
@@ -1311,8 +1315,6 @@ void testjump(LVALUE* lval, int label)
     ol("or\tl");
 
     type = lval->val_type;
-    if (lval->binop == NULL)
-        type = lval->val_type;
 
     if (type == KIND_LONG && check_lastop_was_comparison(lval)) {
         ol("or\td");
@@ -1329,7 +1331,7 @@ void testjump(LVALUE* lval, int label)
         ol("or\te");
         ol("exx");
     }
-    opjump("z,", label);
+    opjump("z,", label, 0);
 }
 
 
@@ -1489,7 +1491,14 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
 
     if (k == 0)
         return newsp;
-    if ( (c_cpu & (CPU_GBZ80|CPU_RABBIT)) && abs(k) > 1 && abs(k) <= 127 ) {
+    if ( (c_cpu & CPU_RABBIT) && abs(k) > 1 && abs(k) <= 127 ) {
+	/* Rabbit is 4 clocks so always makes sense to use this -pop
+	is 7 clocks */
+        outstr("\tadd\tsp,"); outdec(k); nl();
+        return newsp;
+    }
+    if ( (c_cpu & CPU_GBZ80) && abs(k) > 2 && abs(k) <= 127 ) {
+	/* gbz80 is 16 clocks, 2 bytes; pop xx is 12 clocks, 1 byte */
         outstr("\tadd\tsp,"); outdec(k); nl();
         return newsp;
     }
@@ -2887,22 +2896,22 @@ void zand_const(LVALUE *lval, int64_t value64)
         } else if ( (value & 0xffffff00) == 0xffffff00 ) {
            // Only the bottom 8 bits
            ol("ld\ta,l");
-           outfmt("\tand\t+(%d %% 256)\n",(value & 0xff));
+           outfmt("\tand\t%d\n",(value & 0xff));
            ol("ld\tl,a");
         } else if ( (value & 0xffff00ff) == 0xffff00ff  ) {
            // Only the bits 15-8
            ol("ld\ta,h");
-           outfmt("\tand\t+(%d %% 256)\n",(value & 0xff00)>>8);
+           outfmt("\tand\t%d\n",(value & 0xff00)>>8);
            ol("ld\th,a");
         } else if ( (value & 0xff00ffff ) == 0xff00ffff) {
            // Only the bits 23-16
            ol("ld\ta,e");
-           outfmt("\tand\t+(%d %% 256)\n",(value & 0xff0000)>>16);
+           outfmt("\tand\t%d\n",(value & 0xff0000)>>16);
            ol("ld\te,a");
         } else if ( (value & 0x00ffffff) == 0x00ffffff ) {
            // Only the bits 32-23
            ol("ld\ta,d");
-           outfmt("\tand\t+(%d %% 256)\n",(value & 0xff000000) >> 24);
+           outfmt("\tand\t%d\n",(value & 0xff000000) >> 24);
            ol("ld\td,a");
         } else if ( (value & 0xffff0000) == 0x00000000 ) {
             LVALUE tval = {0};
@@ -2925,12 +2934,12 @@ void zand_const(LVALUE *lval, int64_t value64)
         } else if ( value >= 0 && value < 256 ) {
             // 6 bytes, library call is 6 bytes, this is faster
             ol("ld\ta,l");
-            outfmt("\tand\t+(%d %% 256)\n",value % 256);
+            outfmt("\tand\t%d\n",value % 256);
             ol("ld\tl,a");
             ol("ld\th,0");
         } else if ( value % 256 == 0 ) {
             ol("ld\ta,h");
-            outfmt("\tand\t+(%d %% 256)\n",(value & 0xff00) >> 8);
+            outfmt("\tand\t%d\n",(value & 0xff00) >> 8);
             ol("ld\th,a");
             ol("ld\tl,0");            
         } else if ( value == (uint16_t)0xffff ) {
@@ -3735,7 +3744,7 @@ void eq0(LVALUE* lval, int label)
         ol("ld\ta,h");
         ol("or\tl");
     }
-    opjump("nz,", label);
+    opjump("nz,", label, 0);
 }
 
 
@@ -4629,7 +4638,7 @@ void gen_conv_carry2int(void)
     if ( !IS_808x() ) {
         ol("rl\tl");
     } else {
-        ol("ld\ta,0");
+        ol("ld\ta,0\t;carry");
         ol("rla");
         ol("ld\tl,a");
     }
@@ -5438,7 +5447,7 @@ void gen_switch_case(Kind kind, int64_t value, int label)
             outdec(value);
             outstr("% 256)\n");
         }
-        opjump("z,", label);
+        opjump("z,", label, 0);
     } else {
         defword();
         printlabel(label); /* case label */

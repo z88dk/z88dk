@@ -10,26 +10,30 @@
 ;       2/3 record:     record number
 ;       0/1 buffer
 ;
-;       $Id: if1_load_record.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;       $Id: if1_load_record.asm $
 ;
+
 		SECTION   code_clib
-                PUBLIC    if1_load_record
-                PUBLIC    _if1_load_record
 
-                EXTERN     if1_rommap
-                EXTERN    mdvbuffer
 
-                EXTERN     if1_checkblock
-                EXTERN    if1_sect_read
+		PUBLIC    if1_load_record
+		PUBLIC    _if1_load_record
 
-                EXTERN     if1_setname
+		EXTERN    if1_rommap
+		EXTERN    mdvbuffer
 
-                EXTERN    MAKE_M
-                EXTERN    CLOSE_M
-                EXTERN    FETCH_H
-                EXTERN    MOTOR
-                EXTERN    RD_BUFF
-                
+		EXTERN    if1_checkblock
+		EXTERN    if1_sect_ready
+		EXTERN    mdv_seek_count
+
+		EXTERN    if1_setname
+
+		EXTERN    MAKE_M
+		EXTERN    CLOSE_M
+		EXTERN    FETCH_H
+		EXTERN    MOTOR
+		EXTERN    RD_BUFF
+
 
 
 if1_load_record:
@@ -41,11 +45,9 @@ _if1_load_record:
                 ld      a,(ix+6)
                 ld      hl,-1
                 and     a               ; drive no. = 0 ?
-                jp	z,if_load_record_exit               ; yes, return -1
-                dec     a
-                cp      8               ; drive no. >8 ?
-                jp	nc,if_load_record_exit              ; yes, return -1
-                inc     a
+                jp      z,if_load_record_exit               ; yes, return -1
+                cp      9               ; drive no. >8 ?				
+                jp      nc,if_load_record_exit              ; yes, return -1
 
                 ld      (driveno),a     ; drive number selected (d_str1)
 
@@ -70,8 +72,10 @@ _if1_load_record:
                 call    if1_rommap
 
 
-                ld      hl,(driveno)    ; drive number selected
-                ld      (5CD6h),hl      ; d_str1
+                ;ld      hl,(driveno)    ; drive number selected
+                ;ld      (5CD6h),hl      ; d_str1
+                ld      a,(driveno)    ; drive number selected
+                ld      (5CD6h),a      ; d_str1
 
                 ld      a,'M'
                 ld      (5CD9h),A       ; l_str1 (device type = "M")
@@ -113,16 +117,21 @@ copyname:
                 res     0,(ix+18h)      ; set CHFLAG to "read" mode
  
                 xor     a
-                ld      (if1_sect_read),a       ; flag for "sector read"
+                ld      (if1_sect_ready),a       ; flag for "sector read"
 
-                ld      hl,04FBh
+                ;ld      hl,255*5		; set sector counter
+				ld      hl,(mdv_seek_count)		; set sector counter (retries slightly reduced)
                 ld      (5CC9h),hl      ; SECTOR
+
+
 
                 ld      a,(driveno)     ; drive number selected
                 call    MOTOR           ; select drive motor
 IF !OLDIF1MOTOR
                 jr      nz,error_exit
 ENDIF
+
+
 
 do_read:
                 call    FETCH_H         ; fetch header
@@ -166,7 +175,7 @@ nxt_sect:
                 call    next_sector     ; Decrease sector counter and check if we reached zero
                 jr      nz,do_read
 
-                ld      a,(if1_sect_read)       ; flag for "sector read"
+                ld      a,(if1_sect_ready)       ; flag for "sector read"
                 or      a
                 jr      z,sect_notfound
 
@@ -191,8 +200,8 @@ sect_notfound:
 error_exit:
                 call    1               ; unpage
                 ei
-;               xor     a
-;               ld      (if1_sect_read),a       ; flag for "sector read"
+                ;xor     a
+                ;ld      (if1_sect_read),a       ; flag for "sector read"
                 ld      hl,-1           ; sector not found
 		jr	if_load_record_exit
 
@@ -204,6 +213,7 @@ next_sector:
                 ld      a,l
                 or      h
                 ret
+
 
 		SECTION bss_clib
 ; parameters and variables

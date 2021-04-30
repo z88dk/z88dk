@@ -5,7 +5,7 @@
 	PUBLIC	set_psg_callee
 	PUBLIC	_set_psg_callee
 
-	PUBLIC ASMDISP_SET_PSG_CALLEE
+	PUBLIC asm_set_psg
         EXTERN PSG_AY_REG
         EXTERN PSG_AY_DATA
 
@@ -22,12 +22,11 @@ _set_psg_callee:
    pop de
    ex (sp),hl
 	
-asmentry:
+asm_set_psg:
 	ld	a,l
 	out	(PSG_AY_REG),a
 	ld	a,e
 	out	(PSG_AY_DATA),a
 	ret
 
-DEFC ASMDISP_SET_PSG_CALLEE = asmentry - set_psg_callee
 

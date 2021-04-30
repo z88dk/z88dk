@@ -4,8 +4,7 @@
  *  27/1/2002 - djm
  *
  *  May, 2020 - feilipu - added sequential write
- *
- *  $Id: write.c,v 1.5 2013-06-06 08:58:32 stefano Exp $
+ *  Apr, 2021 - dom - remove sequential write 
  */
 
 #include <fcntl.h>
@@ -48,37 +47,37 @@ ssize_t write(int fd, void *buf, size_t len)
 #endif
     case U_WRITE:
     case U_RDWR:
-        uid = getuid();
-        setuid(fc->uid);
+        uid = swapuid(fc->uid);
         while ( len ) {
+            unsigned long record_nr = fc->rwptr/SECSIZE;
             offset = fc->rwptr%SECSIZE;
             if ( (size = SECSIZE-offset) > len ) {
                 size = len;
             }
             if ( size == SECSIZE ) {
-                bdos(CPM_SDMA,buf);
-                if ( bdos(CPM_WRIT,fc) ) {
-                    setuid(uid);
-                    return -1;   /* Not sure about this.. */
-                }
-            } else {  /* Not the required size, read in the extent */
-                bdos(CPM_SDMA,buffer);
+                // Write the full sector now, flush whatever we've got cached so we don't 
+                // write out of order
+                cpm_cache_flush(fc);
+
                 _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
-                /* Blank out the buffer to indicate EOF */
-                buffer[0] = 26;         /* ^Z */
-                memcpy(buffer+1,buffer,SECSIZE-1);
-                bdos(CPM_RRAN,fc);
-                memcpy(buffer+offset,buf,size);
+                bdos(CPM_SDMA,buf);
                 if ( bdos(CPM_WRAN,fc) ) {
-                    setuid(uid);
-                    return -1;   /* Not sure about this.. */
+                    swapuid(uid);
+                    return cnt-len;
                 }
+            } else {  /* Not the required size, read in the record to our cache */
+                if ( cpm_cache_get(fc, record_nr, 0) == - 1 ) {
+                    swapuid(uid);
+                    return cnt-len;
+                }
+                memcpy(fc->buffer+offset,buf,size);
+                fc->dirty = 1;
             }
             buf += size;
             fc->rwptr += size;
             len -= size;
         }
-        setuid(uid);
+        swapuid(uid);
         return cnt-len;
         break;
     default:

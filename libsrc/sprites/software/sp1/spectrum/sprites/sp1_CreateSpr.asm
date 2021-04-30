@@ -1,6 +1,7 @@
 ; struct sp1_ss *sp1_CreateSpr(void *drawf, uchar type, uchar height, int graphic, uchar plane)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_CreateSpr
 
 EXTERN sp1_CreateSpr_callee

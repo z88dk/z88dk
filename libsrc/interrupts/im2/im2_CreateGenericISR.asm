@@ -4,8 +4,7 @@ SECTION code_clib
 PUBLIC im2_CreateGenericISR
 PUBLIC _im2_CreateGenericISR
 
-EXTERN im2_CreateGenericISR_callee
-EXTERN ASMDISP_IM2_CREATEGENERICISR_CALLEE
+EXTERN asm_im2_CreateGenericISR
 
 .im2_CreateGenericISR
 ._im2_CreateGenericISR
@@ -18,4 +17,4 @@ EXTERN ASMDISP_IM2_CREATEGENERICISR_CALLEE
    push hl
    ld a,c
    
-   jp im2_CreateGenericISR_callee + ASMDISP_IM2_CREATEGENERICISR_CALLEE
+   jp asm_im2_CreateGenericISR

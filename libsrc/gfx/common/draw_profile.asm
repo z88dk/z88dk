@@ -10,28 +10,31 @@
 
 
 IF !__CPU_GBZ80__ && !__CPU_INTEL__
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE	"graphics/grafix.inc"
 
 
-		SECTION	  code_graphics
-                PUBLIC    draw_profile
-                PUBLIC    _draw_profile
+    SECTION	  code_graphics
+    PUBLIC    draw_profile
+    PUBLIC    _draw_profile
 
-                EXTERN     stencil_init
-                EXTERN     stencil_render
-                EXTERN		stencil_add_point
-                EXTERN		stencil_add_lineto
-                EXTERN		stencil_add_side
-                EXTERN		plot
-                EXTERN		unplot
-                EXTERN		draw
-                EXTERN		undraw
-                EXTERN		drawto
-                EXTERN		undrawto
-                
-                EXTERN		l_mult
-                EXTERN		l_div
+    EXTERN     stencil_init
+    EXTERN     stencil_render
+    EXTERN		stencil_add_point
+    EXTERN		stencil_add_lineto
+    EXTERN		stencil_add_side
+    EXTERN		plot
+    EXTERN		unplot
+    EXTERN		draw
+    EXTERN		undraw
+    EXTERN		drawto
+    EXTERN		undrawto
 
+    EXTERN		l_mult
+    EXTERN		l_div
+
+    EXTERN		getmaxx
+    EXTERN		getmaxy
+    EXTERN		l_neg
 
 getbyte:
 	ld	hl,(_pic)
@@ -41,32 +44,30 @@ getbyte:
 	ret
 
 getx:
+	call getmaxx
+	ld	a,h
 	ld	hl,(_vx)
-IF maxx > 320
-	call getparmx
-ELSE
-	call getparm
-ENDIF
+	and $fe
+	jp  z,getparm
+
 ;IF maxx > 320
 ;	add hl,hl	; double size for X in wide mode !
 ;ENDIF
-	ret
 
-IF maxx > 320
-getparmx:		;cx=vx+percent*pic[x++]/50;  (double width)
+;getparmx:		;cx=vx+percent*pic[x++]/50;  (double width)
 	push hl
 	ld	de,(_percent)
 	call	getbyte
 	ld	h,0
 	ld	l,a
 	call l_mult
+
 IF ((maxx/(maxy+1))>1)
 	ld	de,25	; 50/2
 ELSE
 	ld	de,50
 ENDIF
 	jr  perc_div
-ENDIF
 
 	
 	

@@ -5,6 +5,7 @@
 ; 
 
 
+		MODULE		generic_console_ADM3
 		SECTION		code_clib
 
 		PUBLIC		generic_console_cls
@@ -18,6 +19,7 @@
 
 		EXTERN		CONSOLE_COLUMNS
 		EXTERN		CONSOLE_ROWS
+		EXTERN		__bdos
 
 		INCLUDE		"ioctl.def"
 		PUBLIC          CLIB_GENCON_CAPS
@@ -42,7 +44,7 @@ generic_console_cls:
 	ldir
 	ld	e,$1A		;clear screen/home cursor
 	ld	c,2
-	call	5
+	call	__bdos
 	ret
 
 generic_console_scrollup:
@@ -60,10 +62,10 @@ cls_1:
 	djnz	cls_1
 	ld	e,10
 	ld	c,2
-	call	5
+	call	__bdos
 	ld	e,13
 	ld	c,2
-	call	5
+	call	__bdos
 	pop	bc
 	pop	hl
 	ret
@@ -98,7 +100,7 @@ loop:
 	push	hl
 	ld	e,a
 	ld	c,2
-	call	5
+	call	__bdos
 	pop	hl
 	inc	hl
 	jr	loop

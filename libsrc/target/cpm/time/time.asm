@@ -23,11 +23,11 @@
  ;
 
 IF !__CPU_INTEL__
-SECTION code_clib
+SECTION smc_clib
 PUBLIC time
 PUBLIC _time
 
-EXTERN l_mult, l_long_mult, l_long_add
+EXTERN l_mult, l_long_mult, l_long_add, __bdos
 
 time:
 _time:
@@ -45,93 +45,102 @@ _time:
 haveparm:
         push    hl
 
-		ld		hl,(1)
-		ld		de,04bh		; TIME BIOS entry (CP/M 3 but present also elsewhere)
-		add		hl,de
-		ld		a,(hl)
-		cp		0xc3		; jp instruction (existing BIOS entry)?
-		jr		nz,nodtbios
-		ld		de,timegot
-		push	de
-		ld		de,px_year
-		xor		a
-		ld		(de),a
-		ld		c,a
-		jp		(hl)
+	ld	hl,(1)
+
+	push hl
+	ld de,057h		; CPM Plus "userf" custom Amstrad BIOS calls
+	add hl,de
+	ld	a,(hl)
+	pop hl
+	cp	0xc3		; jp instruction (existing BIOS entry)?
+	jr	z,nodtbios	; if so, skip not-working direct DT BIOS entry
+
+	ld	de,04bh		; TIME BIOS entry (CP/M 3 but present also elsewhere)
+	add	hl,de
+	ld	a,(hl)
+	cp	0xc3		; jp instruction (existing BIOS entry)?
+	jr	nz,nodtbios
+	ld	de,timegot
+	push	de
+	ld	de,px_year
+	xor	a
+	ld	(de),a
+	ld	c,a
+	jp	(hl)
 timegot:
-		ld		a,(px_year)
-		and		a
-		jr		z,cpm3_bios
+	ld	a,(px_year)
+	and	a
+	jr	z,cpm3_bios
 		
-		; We found a value in px_year, so it is not a CP/M 3 BIOS entry, but an Epson laptop variant.
-		; We need to mix Year, Month and Day to make jdate
-		call    unbcd       ; decode year and put in HL
-		;ld		a,l
-		; TODO:  Leap year every 4 years only, needs refinement ..
-		and		3			; leap year ?
-		jr      nz,noleapsmc
-		ld		(february),a	; SMC patch for leap year: replace DEC HL w/NOP
+	; We found a value in px_year, so it is not a CP/M 3 BIOS entry, but an Epson laptop variant.
+	; We need to mix Year, Month and Day to make jdate
+	call    unbcd       ; decode year and put in HL
+	;ld	a,l
+	; TODO:  Leap year every 4 years only, needs refinement ..
+	and	3			; leap year ?
+	jr      nz,noleapsmc
+	ld	(february),a	; SMC patch for leap year: replace DEC HL w/NOP
 noleapsmc:
-		ld		b,l			; 1 byte is enough (max year count is 99)
-		ld		de,365
-		ld		hl,8035+1		; Days between [01/01/2000] and [01/01/1978]  +1 day to compensate the leap year in 2000
+	ld	b,l			; 1 byte is enough (max year count is 99)
+	ld	de,365
+	ld	hl,8035+1		; Days between [01/01/2000] and [01/01/1978]  +1 day to compensate the leap year in 2000
 yrloop:
-		ld		a,b
-		and		3			; leap year ?
-		jr		nz,noleap
-		inc		hl
+	ld	a,b
+	and	3			; leap year ?
+	jr	nz,noleap
+	inc	hl
 noleap:
-		add		hl,de
-		djnz    yrloop
-		push	hl
-		; months
-		ld		a,(jdate)		; Month
-		call    unbcd
-		dec		a
-		jr		z,month_done
-		ld		de,mdays
-		ld		h,0
-		ld		l,a
-		add		hl,hl	; words
-		add		hl,de
-		ld		a,(hl)
-		inc		hl
-		ld		h,(hl)
-		ld		l,a
+	add	hl,de
+	djnz    yrloop
+	push	hl
+	; months
+	ld	a,(jdate)		; Month
+	call    unbcd
+	dec	a
+	jr	z,month_done
+	ld	de,mdays
+	ld	h,0
+	ld	l,a
+	add	hl,hl	; words
+	add	hl,de
+	ld	a,(hl)
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
 february:
-		dec		hl
+	dec	hl
 month_done:
-		pop		de
-		add		hl,de
-		push	hl
-		;
-		ld		a,(jdate+1)		; Day in the month
-		call    unbcd
-		pop		de
-		add		hl,de
-		ld		(jdate),hl
-		jr		nompmii
+	pop	de
+	add	hl,de
+	push	hl
+	;
+	ld	a,(jdate+1)		; Day in the month
+	call    unbcd
+	pop	de
+	add	hl,de
+	ld	(jdate),hl
+	jr	nompmii
 		
 cpm3_bios:
-		; It is a true CP/M 3 BIOS, so pick the resulting clock data and copy to jdate
-		ld		hl,(1)
-		ld		de,(-0ch)	; System Control Block
-		add		hl,de
-		ld		de,jdate
-		ld		bc,5
-		ldir
-		jr		nompmii
+	; It is a true CP/M 3 BIOS, so pick the resulting clock data and copy to jdate
+	ld	hl,(1)
+	ld	de,(-0ch)	; System Control Block
+	add	hl,de
+	ld	de,jdate
+	ld	bc,5
+	ldir
+	jr	nompmii
 		
 nodtbios:
         ld      de,jdate    ; pointer to date/time bufr
         ld      c,105       ; C=return date/time function
-        call    5           ; get date/time
+        call    __bdos      ; get date/time
 
         push    af
-        
         ld      c,12
-        call    5           ; check version
+        call    __bdos      ; check version
         pop     af
+
         ld      c,a
         ld      a,l
         cp      02Fh        ; MP/M II or later (cpm3..) ?

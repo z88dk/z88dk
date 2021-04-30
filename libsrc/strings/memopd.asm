@@ -2,8 +2,7 @@
 
 PUBLIC memopd
 PUBLIC _memopd
-EXTERN memopd_callee
-EXTERN ASMDISP_MEMOPD_CALLEE
+EXTERN asm_memopd
 
 .memopd
 ._memopd
@@ -19,4 +18,4 @@ EXTERN ASMDISP_MEMOPD_CALLEE
    push bc
    push af
    
-   jp memopd_callee + ASMDISP_MEMOPD_CALLEE
+   jp asm_memopd

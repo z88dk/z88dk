@@ -10,7 +10,7 @@ target/special/stdio/fgetc_cons
 @stdio/stdio_8080.lst
 stdio/inkey/getk
 stdio/inkey/fgetc_cons
-@time/time.lst
+
 @font/font_8x8/font_8x8.lst
 target/special/graphics/clg
 target/special/graphics/w_pixladdr

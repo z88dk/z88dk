@@ -149,7 +149,7 @@ void rpn_handlecmds(int cmd)
 }
 
 
-#include <dor.h>
+#include <arch/z88/dor.h>
 
 #define HELP1   "A demo application made with z88dk - Small C+ Compiler"
 #define HELP2   "Liberated from the GBDK. Original author is probably"
@@ -168,7 +168,7 @@ void rpn_handlecmds(int cmd)
 #define TOPIC1_1CODE     $81
 
 
-#include <application.h>
+#include <arch/z88/application.h>
 
 
 

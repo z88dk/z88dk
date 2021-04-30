@@ -1,0 +1,42 @@
+
+; ROM routines
+
+    defc JMODE = $015a     ;a (0-3) = screen mode
+
+; IO Ports
+
+    ; Bit 0 = low for line interrupt
+    ; Bit 1 = low for mouse interrupt
+    ; Bit 2 = low for midi in interrupt
+    ; Bit 3 = low for frame interrupt
+    ; Bit 4 = low for midi out interrupt
+    ; Bit 5,6,7 = keyboard matrix
+    defc    STATUS = 249
+
+
+    ; Controls 0x0000 - 0x7fff
+    ; WHLBBBBB  
+    ; B=Bank 
+    ; L=Low rom off (1=off)
+    ; H=High rom on (1=on)
+    ; W=Write protect &0000-&3FFF
+    defc    LMPR = 250
+
+    ; Controls 0x8000 - ffff
+    ; B=Bank 
+    ; C=mode 3 color lookup
+    ; M=use external memory expansion
+    defc    HMPR = 251
+
+    ; Controls video mode
+    ; OMMBBBBB    
+    ; B=Video Bank
+    ; M=Mode
+    ; O=midi Io
+    defc    VMPR = 252
+
+    ; CLUT port
+    ; The high byte is set with the clut index to modify
+    defc    CLUT = $f8
+
+        

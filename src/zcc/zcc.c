@@ -433,8 +433,8 @@ static option options[] = {
     { 0, "crt0", OPT_STRING,  "Override the crt0 assembler file to use" , &c_crt0, NULL, 0},
     { 0, "startuplib", OPT_STRING,  "Override STARTUPLIB - compiler base support routines" , &c_startuplib, NULL, 0},
     { 0, "no-crt", OPT_BOOL|OPT_DOUBLE_DASH,  "Link without crt0 file" , &c_nocrt, NULL, 0},
-    { 0, "startup", OPT_INT,  "Set the startup type" , &c_startup, NULL, 0},
     { 0, "startupoffset", OPT_INT|OPT_PRIVATE,  "Startup offset value (internal)" , &c_startupoffset, NULL, 0},
+    { 0, "startup", OPT_INT,  "Set the startup type" , &c_startup, NULL, 0},
     { 0, "zorg", OPT_INT,  "Set the origin (only certain targets)" , &c_zorg, NULL, 0},
     { 0, "nostdlib", OPT_BOOL,  "If set ignore INCPATH, STARTUPLIB", &c_nostdlib, NULL, 0},
     { 0, "pragma-redirect", OPT_FUNCTION,  "Redirect a function" , NULL, PragmaRedirect, 0},
@@ -987,9 +987,9 @@ int main(int argc, char **argv)
         char cmdline[FILENAME_MAX + 128];
 
 #ifdef _WIN32
-        snprintf(cmdline, FILENAME_MAX + 127, "%s -zcc-opt=%s < \"%s\" > nul",c_zpragma_exe, zcc_opt_def, pragincname);
+        snprintf(cmdline, FILENAME_MAX + 127, "%s -zcc-opt=\"%s\" < \"%s\" > nul",c_zpragma_exe, zcc_opt_def, pragincname);
 #else
-        snprintf(cmdline, FILENAME_MAX + 127, "%s -zcc-opt=%s < \"%s\" > /dev/null",c_zpragma_exe, zcc_opt_def, pragincname);
+        snprintf(cmdline, FILENAME_MAX + 127, "%s -zcc-opt=\"%s\" < \"%s\" > /dev/null",c_zpragma_exe, zcc_opt_def, pragincname);
 #endif
         if (verbose) { printf("%s\n", cmdline); fflush(stdout); }
         if (-1 == system(cmdline)) {
@@ -1223,7 +1223,7 @@ int main(int argc, char **argv)
             /* past clang+llvm related pre-processing */
             if (compiler_type == CC_SDCC) {
                 char zpragma_args[1024];
-                snprintf(zpragma_args, sizeof(zpragma_args),"-zcc-opt=%s", zcc_opt_def);
+                snprintf(zpragma_args, sizeof(zpragma_args),"-zcc-opt=\"%s\"", zcc_opt_def);
                 if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
                 if (process(".i2", ".i", c_zpragma_exe, zpragma_args, filter, i, YES, NO))
@@ -1231,7 +1231,7 @@ int main(int argc, char **argv)
             }
             else {
                 char zpragma_args[1024];
-                snprintf(zpragma_args, sizeof(zpragma_args),"-sccz80 -zcc-opt=%s", zcc_opt_def);
+                snprintf(zpragma_args, sizeof(zpragma_args),"-sccz80 -zcc-opt=\"%s\"", zcc_opt_def);
 
                 if (process(".c", ".i2", c_cpp_exe, cpparg, c_stylecpp, i, YES, YES))
                     exit(1);
@@ -2621,7 +2621,7 @@ static void configure_compiler()
                 BuildOptions(&asmargs, "-D__SCCZ80");
                 BuildOptions(&linkargs, "-D__SCCZ80");
         /* Indicate to sccz80 what assembler we want */
-        snprintf(buf, sizeof(buf), "-ext=opt %s -zcc-opt=%s", select_cpu(CPU_MAP_TOOL_SCCZ80),zcc_opt_def);
+        snprintf(buf, sizeof(buf), "-ext=opt %s -zcc-opt=\"%s\"", select_cpu(CPU_MAP_TOOL_SCCZ80),zcc_opt_def);
         add_option_to_compiler(buf);
 
         if (sccz80arg) {

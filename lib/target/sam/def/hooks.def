@@ -1,0 +1,83 @@
+;
+; Hook codes for SAMDOS
+
+	; Initialise and look for AUTO file
+	defc	HK_INIT = 128
+
+	; Get file header
+	; Entry: ix = uifa (filetype and filename populated)
+	; Exit:  difa = ix+80
+	defc	HK_HGTHD = 129
+
+	; Load file
+	; Entry:
+	; ix = uifa
+	;  c = number of pages
+	; de = length modulo 16k
+	; hl = destination (8000-bfff)
+	; Destination page must be paged in to HMPR
+	defc	HK_HLOAD = 130
+
+	; Verify file
+	; Entry:
+	; ix = uifa
+	defc	HK_HVERY = 131
+
+	; Save file
+	; Entry:
+	; ix = uifa
+	defc	HK_HSAVE = 132
+
+	; Get address of DVAR
+	defc	HK_HVAR = 139
+
+	; Open a file
+	; Entry:
+	; ix = uifa
+	defc	HK_HOFLE = 147
+
+	; Save a byte
+	; Entry:
+	;  a = byte
+	defc	HK_SBYT = 148
+
+	; Write a sector to the disc
+	; Entry:
+	; d = track
+	; e = sector
+	; a = drive - 1/2
+	; hl = data
+	defc	HK_HWSAD = 149
+
+	; Save a block of data
+	; Entry:
+	; de = start of data
+	; bc = length
+	defv	HK_HSVBK = 150
+
+	; Close file sector map
+	defc	HK_CFSM = 152
+
+	; Get a file from disc
+	defc	HK_HGFLE = 158
+
+	; Load a byte
+	defc	HK_LBYT = 159
+
+	; Read a sector from disc
+	defc	HK_HRSAD = 160
+
+	; Load a block of data from disc
+	defc	HK_HLDBK = 161
+
+	; Restore disc drive to track 0
+	defc	HK_REST = 164
+
+	; Perform a directory listing
+	defc	HK_PCAT = 165
+
+	; Erase a file from disc
+	; Entry:
+	;  ix = uifa of file to erase
+	defc	HK_HERAZ = 166
+

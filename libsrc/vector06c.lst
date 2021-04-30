@@ -13,7 +13,7 @@ target/vector06c/asm_load_palette
 stdio/inkey/getk
 stdio/inkey/fgetc_cons
 @input/input_keyboard.lst
-@time/time.lst
+
 @font/font_8x8/font_8x8.lst
 @games/games.lst
 target/vector06c/graphics/clg

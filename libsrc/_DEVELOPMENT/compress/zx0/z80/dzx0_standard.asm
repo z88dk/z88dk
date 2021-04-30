@@ -7,17 +7,6 @@
 ;   DE: destination address (decompressing)
 ; -----------------------------------------------------------------------------
 
-
-SECTION code_clib
-SECTION code_compress_zx0
-
-PUBLIC asm_dzx0_standard
-
-; Entry: hl = void *src
-;        de = void *dst
-;
-; Uses: af, bc, de, hl
-asm_dzx0_standard:
 dzx0_standard:
         ld      bc, $ffff               ; preserve default offset 1
         push    bc

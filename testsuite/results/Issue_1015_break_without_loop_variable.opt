@@ -11,7 +11,7 @@
 ._main
 	ld	hl,0	;const
 	push	hl
-	jp	i_4
+	jp	i_4	;EOS
 .i_2
 	pop	hl
 	inc	hl
@@ -26,7 +26,7 @@
 	ccf
 	rra
 	sbc	128
-	jp	nc,i_3
+	jp	nc,i_3	;
 	push	bc
 	push	bc
 	ld	hl,4	;const
@@ -36,10 +36,10 @@
 	ld	d,(hl)
 	ld	hl,5
 	call	l_ge
-	jp	nc,i_5
+	jp	nc,i_5	;
 	pop	bc
 	pop	bc
-	jp	i_3
+	jp	i_3	;EOS
 .i_5
 	ld	hl,i_1+0
 	push	hl
@@ -53,7 +53,7 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	jp	i_2
+	jp	i_2	;EOS
 .i_3
 	pop	bc
 	ret
@@ -86,7 +86,7 @@
 	GLOBAL	chdir
 	GLOBAL	getwd
 	GLOBAL	rmdir
-	GLOBAL	_RND_BLOCKSIZE
+	GLOBAL	__RND_BLOCKSIZE
 	GLOBAL	rnd_loadblock
 	GLOBAL	rnd_saveblock
 	GLOBAL	rnd_erase

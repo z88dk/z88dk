@@ -4,8 +4,8 @@
 SECTION code_clib
 PUBLIC in_MouseAMXSetPos_callee
 PUBLIC _in_MouseAMXSetPos_callee
-PUBLIC ASMDISP_IN_MOUSEAMXSETPOS_CALLEE
-PUBLIC CDISP_IN_MOUSEAMXSETPOS_CALLEE
+PUBLIC asm_in_MouseAMXSetPos
+PUBLIC centry_in_MouseAMXSetPos
 
 EXTERN _in_AMXcoordX, _in_AMXcoordY
 
@@ -16,7 +16,7 @@ EXTERN _in_AMXcoordX, _in_AMXcoordY
    pop bc
    ex (sp),hl
 
-.centry
+.centry_in_MouseAMXSetPos
 
 ; bc = ycoord
 ; hl = xcoord
@@ -45,7 +45,7 @@ EXTERN _in_AMXcoordX, _in_AMXcoordY
    ld c,l
 
 
-.asmentry
+.asm_in_MouseAMXSetPos
 
 ; enter: C = x coord 0..255
 ;        B = y coord 0..191
@@ -56,5 +56,3 @@ EXTERN _in_AMXcoordX, _in_AMXcoordY
    ld (_in_AMXcoordY + 1),a
    ret
 
-DEFC ASMDISP_IN_MOUSEAMXSETPOS_CALLEE = asmentry - in_MouseAMXSetPos_callee
-DEFC CDISP_IN_MOUSEAMXSETPOS_CALLEE = centry - in_MouseAMXSetPos_callee

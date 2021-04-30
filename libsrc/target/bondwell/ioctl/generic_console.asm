@@ -64,3 +64,10 @@ generic_console_vpeek:
 	ret
 
 
+
+	SECTION	code_crt_init
+
+        EXTERN  asm_set_cursor_state
+
+        ld      l,$20
+        call    asm_set_cursor_state

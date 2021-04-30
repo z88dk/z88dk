@@ -1,115 +1,115 @@
 ;
-;	Fast background save
+;    Fast background save
 ;
-;	Generic version (just a bit slow)
+;    Generic version (just a bit slow)
 ;
-;	$Id: bkrestore3.asm $
+;    $Id: bkrestore3.asm $
 ;
 
 IF !__CPU_INTEL__ & !__CPU_GBZ80__
-	SECTION   code_clib
-	
-	PUBLIC    bkrestore
-	PUBLIC    _bkrestore
-	
-	EXTERN	plotpixel
-	EXTERN	respixel
+    SECTION   code_clib
+    
+    PUBLIC    bkrestore
+    PUBLIC    _bkrestore
+    
+    EXTERN    plotpixel
+    EXTERN    respixel
 
 
 
 .bkrestore
 ._bkrestore
 
-	; __FASTCALL__ !!   HL = sprite address
-	
-	push ix
+    ; __FASTCALL__ !!   HL = sprite address
+    
+    push ix
 
-	inc hl	; skip first X xs
-	inc hl	; skip first Y ys
-	
-	ld      d,(hl)	; x pos
-	inc hl
-	ld      e,(hl)	; Y pos
-	inc hl
-	
-	push   hl		; sprite addr
-	pop    ix
-	
-;	ld	h,a	; X
-;	ld	l,e	; Y
+    inc hl    ; skip first X xs
+    inc hl    ; skip first Y ys
+    
+    ld    d,(hl)    ; x pos
+    inc hl
+    ld    e,(hl)    ; Y pos
+    inc hl
+    
+    push   hl    ; sprite addr
+    pop    ix
+    
+;    ld    h,a    ; X
+;    ld    l,e    ; Y
 
-	ld	h,d
-	ld	l,e
+    ld    h,d
+    ld    l,e
 
-	ld	a,(ix+0)	; Width
-	ld	b,(ix+1)	; Height
-.oloopx	push	bc		;Save # of rows
-	push	af
+    ld    a,(ix+0)    ; Width
+    ld    b,(ix+1)    ; Height
+.oloopx    push    bc    ;Save # of rows
+    push    af
 
-	;ld	b,a		;Load width
-	ld	b,0		; Better, start from zero !!
+    ;ld    b,a    ;Load width
+    ld    b,0    ; Better, start from zero !!
 
-	ld	c,(ix+2)	;Load one line of image
+    ld    c,(ix+2)    ;Load one line of image
 
-.iloopx	;sla	c		;Test leftmost pixel
-	;jr	nc,noplotx	;See if a plot is needed
+.iloopx    ;sla    c    ;Test leftmost pixel
+    ;jr    nc,noplotx    ;See if a plot is needed
 
-	push	hl
-	;push	bc	; this should be done by the called routine
-	push	de
-	ld	a,h
-	add	a,b
-	ld	h,a
-	sla	c		;Test leftmost pixel
-	push af
-	call	nc, respixel
-	pop af
-	call	c,plotpixel
-	pop	de
-	;pop	bc
-	pop	hl
+    push    hl
+    ;push    bc    ; this should be done by the called routine
+    push    de
+    ld    a,h
+    add    a,b
+    ld    h,a
+    sla    c    ;Test leftmost pixel
+    push af
+    call    nc, respixel
+    pop af
+    call    c,plotpixel
+    pop    de
+    ;pop    bc
+    pop    hl
 
 ;.noplotx
 
-	inc	b	; witdh counter
-	
-	pop	af
-	push	af
-	
-	cp	b		; end of row ?
-	
-	jr	nz,noblkx
-	
-	inc	ix
-	ld	c,(ix+2)	;Load next byte of image
-	
-	jr noblockx
-	
+    inc    b    ; witdh counter
+    
+    pop    af
+    push    af
+    
+    cp    b    ; end of row ?
+    
+    jr    nz,noblkx
+    
+    inc    ix
+    ld    c,(ix+2)    ;Load next byte of image
+    
+    jr noblockx
+    
 .noblkx
-	
-	ld	a,b	; next byte in row ?
-	;dec	a
-	and	a
-	jr	z,iloopx
-	and	7
-	
-	jr	nz,iloopx
-	
+    
+    ld    a,b    ; next byte in row ?
+    ;dec    a
+    and    a
+    jr    z,iloopx
+    and    7
+    
+    jr    nz,iloopx
+    
 .blockx
-	inc	ix
-	ld	c,(ix+2)	;Load next byte of image
-	jr	iloopx
+    inc    ix
+    ld    c,(ix+2)    ;Load next byte of image
+    jr    iloopx
 
 .noblockx
 
-	inc	l
+    inc    l
 
-	pop	af
-	pop	bc		;Restore data
-	djnz	oloopx
-	
-	pop ix
-	ret
+    pop    af
+    pop    bc    ;Restore data
+    djnz    oloopx
+    
+    pop ix
+    ret
 
 
 ENDIF

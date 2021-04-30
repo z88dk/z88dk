@@ -5,12 +5,14 @@
 ;	exos_write_block(unsigned char channel, unsigned int byte_count, unsigned char *address);
 ;
 ;
-;	$Id: exos_write_block.asm,v 1.3 2016-06-19 20:17:32 dom Exp $
+;	$Id: exos_write_block.asm $
 ;
 
-        SECTION code_clib
+	SECTION code_clib
 	PUBLIC	exos_write_block
 	PUBLIC	_exos_write_block
+
+	EXTERN     asm_exos_write_block
 
 exos_write_block:
 _exos_write_block:
@@ -24,10 +26,4 @@ _exos_write_block:
 	push de
 	push af
 
-	ld	a,l
-	rst   30h
-	defb  8
-	ld	h,0
-	ld	l,a
-
-	ret
+   jp asm_exos_write_block

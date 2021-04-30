@@ -2,6 +2,7 @@
 ; 12.2006 aralbrec, Sprite Pack v3.0
 ; sinclair spectrum version
 
+SECTION code_sprite_sp1
 PUBLIC SP1DrawUpdateStruct
 PUBLIC SP1RETSPRDRAW
 EXTERN SP1V_ATTRBUFFER, SP1V_PIXELBUFFER, SP1V_TILEARRAY

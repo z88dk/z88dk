@@ -99,9 +99,6 @@ ENDIF
 	call    _main	;Call user program
 
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
 	push	hl
     call    crt0_exit
 

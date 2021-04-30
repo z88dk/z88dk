@@ -15,10 +15,11 @@
 SECTION		code_clib
 PUBLIC atol
 PUBLIC _atol
-PUBLIC ASMDISP_ATOL
+PUBLIC asm_atol
 
 .atol
 ._atol
+.asm_atol
 
    INCLUDE "integer.def"
    
@@ -37,5 +38,3 @@ PUBLIC ASMDISP_ATOL
    ld d,h
    ld e,l
    ret
-
-DEFC ASMDISP_ATOL = 0

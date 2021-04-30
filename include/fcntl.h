@@ -48,11 +48,12 @@ extern int __LIB__ writebyte(int fd, int c) __smallc;
 /* mkdir is defined in sys/stat.h */
 /* extern int __LIB__ mkdir(char *, int mode); */
 
+
 extern char __LIB__ *getcwd(char *buf, size_t maxlen) __smallc;
 extern int __LIB__ chdir(const char *dir) __smallc;
 extern char __LIB__ *getwd(char *buf);
 
-/* Following two only implemented for Sprinter ATM (20.11.2002) */
+/* Following two only implemented for Sprinter ATM (20.11.2002) + esxdos */
 extern int  __LIB__ rmdir(const char *);
 
 
@@ -67,15 +68,16 @@ extern int  __LIB__ rmdir(const char *);
 * but this comes at the cost of the malloc'd space for the internal buffer.
 * The current block size is kept in a control block (just the RND_FILE structure saved in a separate file),
 * so changing this value at runtime before creating a file is perfectly legal.
-
-In the target's CRT0 stubs the following lines must exist:
-
-PUBLIC _RND_BLOCKSIZE
-_RND_BLOCKSIZE:	defw	1000
-
+*
+* At linktime: -pragma-define:CLIB_RND_BLOCKSIZE=1000
 */
 
-extern unsigned int   RND_BLOCKSIZE;
+#ifndef RND_BLOCKSIZE
+extern void *_RND_BLOCKSIZE;
+#define RND_BLOCKSIZE &_RND_BLOCKSIZE
+#endif
+
+
 
 /* Used in the generic random file access library only */
 /* file will be split into blocks */

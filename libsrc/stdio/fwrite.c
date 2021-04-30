@@ -4,6 +4,23 @@
 #define STDIO_ASM
 #include <stdio.h>
 
+
+
+#ifdef __8080__
+int fwrite(void *ptr, size_t size, size_t nmemb, FILE *fp) {
+    if ( (fp->flags & (_IOUSE|_IOWRITE|_IOSYSTEM)) == (_IOUSE|_IOWRITE)) {
+        unsigned int len = size * nmemb;
+
+        if ( len == 0 ) return 0;
+
+        len = write(fp->desc.fd, ptr, len);
+        return (len+1) / size;
+    }
+    return -1;
+}
+
+#else
+
 static int wrapper() __naked
 {
 #asm
@@ -112,3 +129,4 @@ fwrite_direct:
 ENDIF
 #endasm
 }
+#endif

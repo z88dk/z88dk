@@ -11,6 +11,7 @@ and run in an emulator.
 
 sccz80/classic
 zcc +zx -vn -DSTATIC -DPRINTF -O2 spectral-norm.c -o spectral-norm -lm -lndos -create-app
+zcc +zx -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm --math32 -lndos -create-app
 error: 2 * 10^(-9)
 
 zsdcc/classic
@@ -27,9 +28,11 @@ This simplifies the use of TICKS for timing.
 
 sccz80/classic
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 spectral-norm.c -o spectral-norm.bin -lm -lndos -m
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
 
 zsdcc/classic
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 spectral-norm.c -o spectral-norm.bin -lmath48 -lndos -m
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
 
 The map file was used to look up symbols "TIMER_START" and "TIMER_STOP".
 These address bounds were given to TICKS to measure execution time.
@@ -48,21 +51,38 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-3437 bytes less page zero
+Z88DK April 30, 2021
+zsdcc #12250 / classic c library / math48
+3984 bytes less page zero
 
 error: 2 * 10^(-9)
 
-cycle count  = 8624312042
-time @ 4MHz  = 8624312042 / 4*10^6 = 35 min 56 sec
+cycle count  = 8617785182
+time @ 4MHz  = 8617785182 / 4*10^6 = 35 min 54 sec
 
+Z88DK April 30, 2021
+zsdcc #12250 / classic c library / math32
+6040 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 10515174190
+time @ 4MHz  = 10515174190 / 4*10^6 = 43 min 48 sec
 
 Z88DK April 20, 2020
-sccz80 / classic c library
+sccz80 / classic c library / genmath
 4137 bytes less page zero
 
 error: 2 * 10^(-9)
 
 cycle count  = 14688455657
 time @ 4MHz  = 14688455657 / 4*10^6 = 61 min 12 sec
+
+Z88DK April 30, 2021
+sccz80 / classic c library / math32
+5842 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 9702197187
+time @ 4MHz  = 9702197187 / 4*10^6 = 40 min 25 sec

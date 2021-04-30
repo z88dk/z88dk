@@ -13,15 +13,15 @@
 
 
 IF !__CPU_INTEL__ & !__CPU_GBZ80__
-                SECTION   smc_clib
-	PUBLIC    getsprite
-	PUBLIC    _getsprite
-	PUBLIC    getsprite_sub
-	EXTERN	pixeladdress
-	EXTERN     swapgfxbk
-        EXTERN	__graphics_end
+    SECTION   smc_clib
+    PUBLIC    getsprite
+    PUBLIC    _getsprite
+    PUBLIC    getsprite_sub
+    EXTERN    pixeladdress
+    EXTERN    swapgfxbk
+    EXTERN    __graphics_end
 
-	INCLUDE	"graphics/grafix.inc"
+    INCLUDE    "graphics/grafix.inc"
 
 ; __gfx_coords: d,e (vert-horz)
 ; sprite: (ix)
@@ -32,89 +32,97 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 .getsprite
 ._getsprite
 
-	push	ix
+    push    ix
 
-	ld      hl,4
-	add     hl,sp
-	ld      e,(hl)
-	inc     hl
-	ld      d,(hl)  ; sprite address
-	push	de
-	pop	ix
+    ld    hl,4
+    add    hl,sp
+    ld    e,(hl)
+    inc    hl
+    ld    d,(hl)  ; sprite address
+    push    de
+    pop    ix
 
-	inc     hl
-	ld      e,(hl)  
-	inc     hl
-	inc     hl
-	ld      d,(hl)	; x and y __gfx_coords
+    inc    hl
+    ld    e,(hl)  
+    inc    hl
+    inc    hl
+    ld    d,(hl)    ; x and y __gfx_coords
 
-	
+    
 .getsprite_sub
-	ld	h,d
-	ld	l,e
+    ld    h,d
+    ld    l,e
 
-	ld	(actcoord),hl	; save current coordinates
+    ld    (actcoord),hl    ; save current coordinates
 
-	call	swapgfxbk
-	call	pixeladdress
-	xor	7
-	
-	 ld       (_smc+1),a
-	 
-	ld	h,d
-	ld	l,e
+IF NEED_swapgfxbk = 1
+    call    swapgfxbk
+ENDIF
+    call    pixeladdress
+    xor    7
+    
+    ld     (_smc+1),a
+    
+    ld    h,d
+    ld    l,e
 
-         ld       e,(ix+0)
-         ld       b,(ix+1)
+    ld     e,(ix+0)
+    ld     b,(ix+1)
 
-	dec	e
-	srl	e
-	srl	e
-	srl	e
-	inc	e		; INT ((width-1)/8+1)
+    dec    e
+    srl    e
+    srl    e
+    srl    e
+    inc    e    ; INT ((width-1)/8+1)
 
-._oloop	push	bc	;Save # of rows
-	push	de	;Save # of bytes per row
+._oloop    push    bc    ;Save # of rows
+    push    de    ;Save # of bytes per row
 
-._iloop2	ld	a,(hl)
-		inc	hl
-		ld	d,(hl)
+._iloop2    ld    a,(hl)
+    inc    hl
+    ld    d,(hl)
 
-._smc		ld	b,1	;Load pixel position
-		inc	b
-		dec	b
-		jr	z,zpos
+._smc    ld    b,1    ;Load pixel position
+    inc    b
+    dec    b
+    jr    z,zpos
 
 ._iloop
-		rl	d
-		rl	a
-		djnz	_iloop
+    rl    d
+    rl    a
+    djnz    _iloop
 
 .zpos
-		ld	(ix+2),a
-		inc	ix
-		
-		dec	e
-		jr	nz,_iloop2
+    ld    (ix+2),a
+    inc    ix
+    
+    dec    e
+    jr    nz,_iloop2
 
-	; ---------
-	push	de
-        ld	hl,(actcoord)
-	inc	l
-	ld	(actcoord),hl
-	call	pixeladdress
-	ld	h,d
-	ld	l,e
-	pop	de
-	; ---------
+    ; ---------
+    push    de
+      ld    hl,(actcoord)
+    inc    l
+    ld    (actcoord),hl
+    call    pixeladdress
+    ld    h,d
+    ld    l,e
+    pop    de
+    ; ---------
 
-	pop	de
-	pop	bc                ;Restore data
-	djnz	_oloop
-	
-	jp	__graphics_end
-
-                SECTION         bss_graphics
+    pop    de
+    pop    bc        ;Restore data
+    djnz    _oloop
+    
+IF NEED_swapgfxbk
+    jp      __graphics_end
+ELSE
+  IF !__CPU_INTEL__ & !__CPU_GBZ80__
+    pop     ix
+  ENDIF
+    ret
+ENDIF
+        SECTION    bss_graphics
 .actcoord
-	 defw	0
+    defw    0
 ENDIF

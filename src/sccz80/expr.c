@@ -93,7 +93,8 @@ int heir1(LVALUE* lval)
             if ( type_matches(lval->ltype, rhs) == 0 && lval->ltype->ptr->kind != KIND_VOID && 
                     ! (ispointer(rhs) && rhs->ptr->kind == KIND_VOID) )  {
                 if ( ispointer(lval->ltype) && lval2.is_const && lval2.const_val == 0 ) {
-                } else {
+                    // All good
+                } else if ( type_matches_pointer(lval->ltype, lval2.ltype) == 0 ) {
                     UT_string *str;
 
                     utstring_new(str);
@@ -107,7 +108,9 @@ int heir1(LVALUE* lval)
             } else if ( lval->ltype->ptr->kind == KIND_FUNC && rhs->ptr->kind == KIND_FUNC ) {
                 // Check flag assignment
                 if ( (rhs->ptr->flags & FASTCALL) != (lval->ltype->ptr->flags & FASTCALL) ) {
-                    warningfmt("incompatible-function-types","Assigning %sFASTCALL function pointer with %sFASTCALL function", (lval->ltype->ptr->flags & FASTCALL) ? "" : "non-", (rhs->ptr->flags & FASTCALL) ? "" : "non-");
+                    if ( array_len(rhs->ptr->parameters) ) {
+                        warningfmt("incompatible-function-types","Assigning %sFASTCALL function pointer with %sFASTCALL function", (lval->ltype->ptr->flags & FASTCALL) ? "" : "non-", (rhs->ptr->flags & FASTCALL) ? "" : "non-");
+                    }
                 }
                 if ( (lval->ltype->ptr->flags & CALLEE) != (rhs->ptr->flags & CALLEE) ) {
                     warningfmt("incompatible-function-types","Assigning %sCALLEE function pointer with %sCALLEE function", (lval->ltype->ptr->flags & CALLEE) ? "" :  "non-",  (rhs->ptr->flags & CALLEE) ? "" : "non-");
@@ -224,27 +227,20 @@ int heir1a(LVALUE* lval)
         if ( lval->is_const ) {
             vconst(lval->const_val);
         }
+
         /* test condition, jump to false expression evaluation if necessary */
         if (check_lastop_was_testjump(lval)) {
-            // Always evaluated as an integer, so fake it temporarily
-            force(KIND_INT, lval->val_type, 0, lval->ltype->isunsigned, 0);
-            temptype = lval->val_type;
-            templtype = lval->ltype;
-            lval->val_type = KIND_INT; /* Force to integer */
-            lval->ltype = type_int;
             testjump(lval, falselab = getlabel());
-            lval->val_type = temptype;
-            lval->ltype = templtype;
             /* evaluate 'true' expression */
             if (heir1(&lval2))
                 rvalue(&lval2);
-            gen_jp_label(endlab = getlabel());
+            gen_jp_label(endlab = getlabel(), 0);
             postlabel(falselab);
         } else {
             jumpnc(falselab = getlabel());
             if (heir1(&lval2))
                 rvalue(&lval2);
-            gen_jp_label(endlab = getlabel());
+            gen_jp_label(endlab = getlabel(), 0);
             postlabel(falselab);
         }
         needchar(':');
@@ -256,7 +252,7 @@ int heir1a(LVALUE* lval)
             zconvert_to_double(lval->val_type, lval2.val_type, lval->ltype->isunsigned);
             postlabel(endlab);
         } else if (lval2.val_type != lval->val_type && kind_is_floating(lval->val_type)) {
-            gen_jp_label(skiplab = getlabel());
+            gen_jp_label(skiplab = getlabel(),0);
             postlabel(endlab);
             zconvert_to_double(lval2.val_type, lval->val_type, lval2.ltype->isunsigned);
             postlabel(skiplab);
@@ -266,7 +262,7 @@ int heir1a(LVALUE* lval)
             lval->ltype = lval->ltype->isunsigned ? type_ulong : type_long;
             postlabel(endlab);
         } else if (lval2.val_type != KIND_LONG && lval->val_type == KIND_LONG) {
-            gen_jp_label(skiplab = getlabel());
+            gen_jp_label(skiplab = getlabel(),0);
             postlabel(endlab);
             widenintegers(lval, &lval2);
             lval->val_type = KIND_LONG;
@@ -499,11 +495,11 @@ int heira(LVALUE *lval)
     /* Cast check, little kludge here */
     save_fps_num = buffer_fps_num;
     buffer_fps_num = 0;
-    if (rcmatch('(')) {
+    if (rcmatch('(') ) {
         Type  *ctype;
         klptr = lptr;
         lptr++;
-        if ( (ctype = parse_expr_type()) != NULL ) {
+        if ( ch() && (ctype = parse_expr_type()) != NULL ) {
             needchar(')');
             cast_lval.cast_type = ctype;
             for ( j = 0; j < save_fps_num; j++ ) {

@@ -10,7 +10,8 @@
 ;
 
 	SECTION	code_clib
-          PUBLIC  fputc_cons_native
+	PUBLIC  fputc_cons_native
+	EXTERN	__bdos
 
 ;
 ; Entry:        hl = points to char
@@ -28,26 +29,26 @@ IF STANDARDESCAPECHARS
 	jr	nz,nocrlf
 	ld	de,13
 	ld	c,2
-	call	5
+	call	__bdos
 	ld	de,10
 ELSE
         cp      13      ; CR ?
         jr      nz,nocrlf
         ld      c,2
-        call    5
+        call    __bdos
         ld      de,10
 ENDIF
 .nocrlf
 	ld      c,2
-	jp	5
+	jp	__bdos
 .docls
 ;	This is the ANSI CLS call
 	ld	e,27
 	ld	c,2
-	call	5
+	call	__bdos
 	ld	e,'['
 	ld	c,2
-	call	5
+	call	__bdos
 	ld	e,'J'
 	ld	c,2
-	jp	5
+	jp	__bdos

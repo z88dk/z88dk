@@ -50,14 +50,14 @@
 	ld	sp,hl
 	ld	hl,4	;const
 	add	hl,sp
-	ld	(hl),+(1 % 256)
-	inc	hl
-	ld	(hl),+(1 / 256)
+	ld	(hl),1
 	inc	hl
 	xor	a
 	ld	(hl),a
 	inc	hl
 	ld	(hl),a
+	inc	hl
+	ld	(hl),0
 	ld	hl,104	;const
 	add	hl,sp
 	ld	sp,hl

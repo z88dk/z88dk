@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC zx_getstr
 PUBLIC _zx_getstr
 
-EXTERN zx_getstr_callee
-EXTERN ASMDISP_ZX_GETSTR_CALLEE
+EXTERN asm_zx_getstr
 
 .zx_getstr
 ._zx_getstr
@@ -18,4 +17,4 @@ EXTERN ASMDISP_ZX_GETSTR_CALLEE
    push hl
    push bc
    
-   jp zx_getstr_callee + ASMDISP_ZX_GETSTR_CALLEE
+   jp asm_zx_getstr

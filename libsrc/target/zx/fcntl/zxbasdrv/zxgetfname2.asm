@@ -19,8 +19,8 @@
 	EXTERN	zx_setint_callee
 	EXTERN	zx_setstr_callee
 
-	EXTERN ASMDISP_ZX_SETSTR_CALLEE
-	EXTERN ASMDISP_ZX_SETINT_CALLEE
+	EXTERN asm_zx_setstr
+	EXTERN asm_zx_setint
 
 
 .zxgetfname2
@@ -67,7 +67,7 @@
 	ld	hl,dvar		; BASIC variable 'D'
 	ld	d,0
 	ld	e,c
-	call	zx_setint_callee + ASMDISP_ZX_SETINT_CALLEE
+	call	asm_zx_setint
 	pop	hl
 ;	jr	drvnum
 	
@@ -77,7 +77,7 @@
 	
 	push hl
 	ld	e,'N'		; n$
-	call	zx_setstr_callee + ASMDISP_ZX_SETSTR_CALLEE
+	call	asm_zx_setstr
 	pop hl
 
 	pop	af

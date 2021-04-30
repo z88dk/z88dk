@@ -14,15 +14,6 @@
 
         SECTION code_clib
 
-IF A64COL
-	INCLUDE "target/ts2068/stdio/ansi/f_ansi_attr64.asm"
-ELSE
-IF A80COL
-	INCLUDE "target/ts2068/stdio/ansi/f_ansi_attr85.asm"
-ELSE
-IF A85COL
-	INCLUDE "target/ts2068/stdio/ansi/f_ansi_attr85.asm"
-ELSE
 	PUBLIC	ansi_attr
 
 	EXTERN	INVRS
@@ -94,6 +85,3 @@ ELSE
         ret
 .noCreverse
         ret
-ENDIF
-ENDIF
-ENDIF

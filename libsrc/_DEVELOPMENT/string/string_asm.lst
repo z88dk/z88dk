@@ -13,6 +13,7 @@ string/z80/asm_memmem
 string/z80/asm_memmove
 string/z80/asm_memrchr
 string/z80/asm_memset
+string/z80/asm_memset_wr
 string/z80/asm_memswap
 string/z80/asm_rawmemchr
 string/z80/asm_rindex

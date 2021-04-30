@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC zx_pxy2aaddr_callee
 PUBLIC _zx_pxy2aaddr_callee
-PUBLIC ASMDISP_ZX_PXY2AADDR_CALLEE
+PUBLIC asm_zx_pxy2aaddr
 EXTERN HRG_LineStart
 
 .zx_pxy2aaddr_callee
@@ -15,7 +15,7 @@ EXTERN HRG_LineStart
    ex (sp),hl
    ld h,e
    
-.asmentry
+.asm_zx_pxy2aaddr
 
    ; enter:  l = pix X 0..255
    ;         h = pix Y 0..191
@@ -53,5 +53,3 @@ ENDIF
    add hl,de
    
    ret
-
-DEFC ASMDISP_ZX_PXY2AADDR_CALLEE = asmentry - zx_pxy2aaddr_callee

@@ -11,7 +11,7 @@
         SECTION code_clib
 PUBLIC	exos_create_channel_callee
 PUBLIC	_exos_create_channel_callee
-PUBLIC 	ASMDISP_EXOS_CREATE_CHANNEL_CALLEE
+PUBLIC 	asm_exos_create_channel
 
 exos_create_channel_callee:
 _exos_create_channel_callee:
@@ -23,7 +23,7 @@ _exos_create_channel_callee:
 ; enter : de = char *device
 ;         l = channel number
 
-.asmentry
+.asm_exos_create_channel
 
 	ld	a,l		; channel
 	rst   30h
@@ -33,5 +33,4 @@ _exos_create_channel_callee:
 	ret
 
 
-DEFC ASMDISP_EXOS_CREATE_CHANNEL_CALLEE = asmentry - exos_create_channel_callee
  

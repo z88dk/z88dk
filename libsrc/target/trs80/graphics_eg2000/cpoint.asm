@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC cpoint
 PUBLIC _cpoint
-EXTERN cpoint_callee
-EXTERN ASMDISP_CPOINT_CALLEE
+EXTERN asm_cpoint
 
 .cpoint
 ._cpoint
@@ -16,4 +15,4 @@ EXTERN ASMDISP_CPOINT_CALLEE
    push hl
    push af
 
-   jp cpoint_callee + ASMDISP_CPOINT_CALLEE
+   jp asm_cpoint

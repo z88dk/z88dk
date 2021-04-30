@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC zx_setint
 PUBLIC _zx_setint
 
-EXTERN zx_setint_callee
-EXTERN ASMDISP_ZX_SETINT_CALLEE
+EXTERN asm_zx_setint
 
 .zx_setint
 ._zx_setint
@@ -18,5 +17,5 @@ EXTERN ASMDISP_ZX_SETINT_CALLEE
    push de
    push bc
    
-   jp zx_setint_callee + ASMDISP_ZX_SETINT_CALLEE
+   jp asm_zx_setint
 

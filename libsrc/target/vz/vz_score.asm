@@ -4,7 +4,7 @@ SECTION code_clib
 PUBLIC vz_score
 PUBLIC _vz_score
 EXTERN vz_score_callee
-EXTERN ASMDISP_VZ_SCORE_CALLEE
+EXTERN asm_vz_score
 
 .vz_score
 ._vz_score
@@ -16,4 +16,4 @@ EXTERN ASMDISP_VZ_SCORE_CALLEE
    push bc
    push hl
    
-   jp vz_score_callee + ASMDISP_VZ_SCORE_CALLEE
+   jp asm_vz_score

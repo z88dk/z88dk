@@ -1,55 +1,47 @@
-;
-;       Z88 Graphics Functions - Small C+ stubs
-;
-;       Written around the Interlogic Standard Library
-;
-;       Stubs Written by D Morris - 30/9/98
-;
-;
-;	$Id: point_callee.asm $
-;
-
-
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
-; CALLER LINKAGE FOR FUNCTION POINTERS
-; ----- void  point(int x, int y)
+; ----- int point_callee(int x, int y)
 ;Result is true/false
 
 
-        SECTION code_graphics
-		
-                PUBLIC    point_callee
-                PUBLIC    _point_callee
-				PUBLIC    ASMDISP_POINT_CALLEE
-				
-                EXTERN     swapgfxbk
-                EXTERN    swapgfxbk1
+IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
-                EXTERN     pointxy
-				
+
+    SECTION code_graphics
+
+    PUBLIC  point_callee
+    PUBLIC  _point_callee
+    PUBLIC  asm_point
+
+    EXTERN  swapgfxbk
+    EXTERN  swapgfxbk1
+
+    EXTERN  pointxy
+    INCLUDE "graphics/grafix.inc"
+
 
 .point_callee
 ._point_callee
 
-	pop	af	; ret addr
-	pop hl	; y
-	pop de
-	ld	h,e	; x
-	push	af	; ret addr
+    pop     af    ; ret addr
+    pop     hl    ; y
+    pop     de
+    ld      h,e    ; x
+    push    af    ; ret addr
 
-.asmentry
-		push	ix
-                call    swapgfxbk
-                call    pointxy
-				
-                push    af
-                call    swapgfxbk1
-                pop     af
-		pop	ix
-                ld      hl,1
-                ret     nz       ;pixel set
-                dec     hl
-                ret
+.asm_point
+    push    ix
+IF NEED_swapgfxbk = 1
+    call    swapgfxbk
+ENDIF
+    call    pointxy
 
-DEFC ASMDISP_POINT_CALLEE = asmentry - point_callee
+    push    af
+IF NEED_swapgfxbk = 1
+    call    swapgfxbk1
+ENDIF
+    pop     af
+    pop     ix
+    ld      hl,1
+    ret     nz     ;pixel set
+    dec     hl
+    ret
 ENDIF

@@ -25,10 +25,10 @@ define(`__IO_CF_PORT', 0x10)    # Port Address for CF Module
 
 define(`__IO_PIO_PORT_BASE', 0x20)  # Port Address for 82C55 Module
 
-# Pageable ROM Port Definitions
+# Pageable Memory Port Definitions
 
-define(`__IO_PROM_RESET', 0x30)     # Port Address for PROM Reset
-define(`__IO_PROM_TOGGLE', 0x38)    # Port Address for PROM Toggle
+define(`__IO_RAM_TOGGLE', 0x30)     # Port Address for RAM Toggle
+define(`__IO_ROM_TOGGLE', 0x38)     # Port Address for ROM Toggle
 
 # LUT Module Port Definition
 
@@ -84,8 +84,8 @@ PUBLIC `__CPU_CLOCK'
 PUBLIC `__IO_DIO_PORT'
 PUBLIC `__IO_CF_PORT'
 PUBLIC `__IO_PIO_PORT_BASE'
-PUBLIC `__IO_PROM_RESET'
-PUBLIC `__IO_PROM_TOGGLE'
+PUBLIC `__IO_RAM_TOGGLE'
+PUBLIC `__IO_ROM_TOGGLE'
 PUBLIC `__IO_LUT_PORT_BASE'
 PUBLIC `__IO_APU_PORT_BASE'
 PUBLIC `__IO_APU0_PORT_BASE'
@@ -113,8 +113,8 @@ defc `__CPU_CLOCK' = __CPU_CLOCK
 defc `__IO_DIO_PORT' = __IO_DIO_PORT
 defc `__IO_CF_PORT' = __IO_CF_PORT
 defc `__IO_PIO_PORT_BASE' = __IO_PIO_PORT_BASE
-defc `__IO_PROM_RESET' = __IO_PROM_RESET
-defc `__IO_PROM_TOGGLE' = __IO_PROM_TOGGLE
+defc `__IO_RAM_TOGGLE' = __IO_RAM_TOGGLE
+defc `__IO_ROM_TOGGLE' = __IO_ROM_TOGGLE
 defc `__IO_LUT_PORT_BASE' = __IO_LUT_PORT_BASE
 defc `__IO_APU_PORT_BASE' = __IO_APU_PORT_BASE
 defc `__IO_APU0_PORT_BASE' = __IO_APU0_PORT_BASE
@@ -143,6 +143,6 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_DIO_PORT'  __IO_DIO_PORT
 `#define' `__IO_CF_PORT'  __IO_CF_PORT
 `#define' `__IO_PIO_PORT_BASE'  __IO_PIO_PORT_BASE
-`#define' `__IO_PROM_RESET'  __IO_PROM_RESET
-`#define' `__IO_PROM_TOGGLE'  __IO_PROM_TOGGLE
+`#define' `__IO_RAM_TOGGLE'  __IO_RAM_TOGGLE
+`#define' `__IO_ROM_TOGGLE'  __IO_ROM_TOGGLE
 ')

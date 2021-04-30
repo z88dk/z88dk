@@ -39,7 +39,6 @@ target/spc1000/graphics/plot_MODE2
 target/spc1000/graphics/res_MODE2
 target/spc1000/graphics/xor_MODE2
 target/spc1000/graphics/pointxy_MODE2
-target/spc1000/graphics/swapgfxbk
 target/spc1000/graphics/textpixl6
 @gfx/narrow/gfx_narrow.lst
 @video/tms9918/video_tms9918.lst

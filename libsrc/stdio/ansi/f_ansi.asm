@@ -78,22 +78,15 @@
 .noFF
 
 ;------------------------
-; cp     13  ; CR?
+cp     13  ; CR?
 ;------------------------
-; jr     nz,NoCR
-; ld     a,(__console_x)
-; xor    a
-; ld     (__console_x),a
-; jr     loopn
-;.NoCR
+ jr     nz,NoCR
+ ld     a,(__console_x)
+ xor    a
+ ld     (__console_x),a
+ jr     loopn
+.NoCR
 
-
-;------------------------
-; Temporary (?) patch.
-; CR becomes CR+LF
-;------------------------
-        cp 13
-        jr     z,isLF
 ;------------------------
 
         cp     10  ; LF?

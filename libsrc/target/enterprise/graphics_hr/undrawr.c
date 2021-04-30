@@ -9,7 +9,8 @@
  */
 
 #include <enterprise.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ undrawr(int px, int py) __smallc;
 
 
 void undrawr(int x,int y)

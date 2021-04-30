@@ -7,6 +7,7 @@
 
 	EXTERN	__zx_screenmode
 	EXTERN  __zx_console_attr
+        EXTERN  SCREEN_BASE
 
 ; Entry: de, hl = screen address
 ; 
@@ -24,7 +25,11 @@ __set_zx_pixel_colour:
         rra
         rra
         and     3
+IF FORsam
+	or	+(SCREEN_BASE / 256) + 24
+ELSE
         or      $58
+ENDIF
         or      d
         ld      h,a
 set_colour:

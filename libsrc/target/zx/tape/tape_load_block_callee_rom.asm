@@ -7,7 +7,7 @@
 
 PUBLIC tape_load_block_callee
 PUBLIC _tape_load_block_callee
-PUBLIC ASMDISP_TAPE_LOAD_BLOCK_CALLEE
+PUBLIC asm_tape_load_block
 
 EXTERN __SYSVAR_BORDCR
 
@@ -21,7 +21,7 @@ EXTERN __SYSVAR_BORDCR
 	pop ix
 	push hl
 
-.asmentry
+.asm_tape_load_block
 
 ; enter : ix = addr
 ;         de = len
@@ -210,4 +210,3 @@ EXTERN __SYSVAR_BORDCR
         RET      
 
 
-DEFC ASMDISP_TAPE_LOAD_BLOCK_CALLEE = asmentry - tape_load_block_callee

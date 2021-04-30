@@ -95,9 +95,6 @@ start:
         call    _main   ;Call user program
         
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
         push    hl		; keep return code
 
         call    crt0_exit

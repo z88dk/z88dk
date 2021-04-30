@@ -5,7 +5,22 @@ z88dk v2.2 - xx.xx.xxx
 
 Detailed but incomplete changelist:
 
+- [classic] +cpm: Amstrad, Televideo, Bondwell disc creation
+- [classic] +cpm: support for Bondwell 2 console and graphics
+- [classic] +cpm: Amstrad PCW Graphics library
 - [appmake] Compressed ROM data sections can now use zx0
+- [all] Compressed data can now use ZX0 compression tools
+- [classic] ZX0 decompression functions added
+- [classic] +radio86: New target for the Radio86 family
+- [classic] +cpm: New subtypes for Bondwell 12/14 and 2
+- [classic] +cpm: GSX graphics library
+- [classic] +gl: GL6000 support improved
+- [classic] +pc88: Graphics reworked and optimised
+- [classic] +sam: Extensively reworked and improved
+- [classic] +zx: Improved Interface 1/Microdrive support
+- [newlib] ZX0 decompression functions added
+- [newlib] +rc2014: Support for shadow RAM copying
+- [zsdcc] Upgraded to SDCC 4.1.4 r12250 (bugfixes)
 
 
 z88dk v2.1 - 07.02.2021

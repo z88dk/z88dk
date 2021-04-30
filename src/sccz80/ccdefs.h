@@ -101,12 +101,12 @@ extern int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar);
 extern void gen_switch_preamble(Kind kind);
 extern void gen_switch_case(Kind kind, int64_t value, int label);
 extern void gen_switch_postamble(Kind kind);
-extern void gen_jp_label(int label);
+extern void gen_jp_label(int label, int end_of_scope);
 extern void gen_save_pointer(LVALUE *lval);
 
 extern int gen_restore_frame_after_call(int offset, Kind save, int saveaf, int usebc);
 
-extern void opjump(char *, int);
+extern void opjump(char *cc, int label, int end_of_scope);
 extern void testjump(LVALUE *,int label);
 extern void zerojump(void (*oper)(LVALUE *,int), int label, LVALUE *lval);
 
@@ -204,6 +204,7 @@ extern void       declare_func_kr();
 extern int        ispointer(Type *type);
 extern void       type_describe(Type *type, UT_string *output);
 extern int        type_matches(Type *t1, Type *t2);
+extern int        type_matches_pointer(Type *t1, Type *t2);
 extern void       parse_addressmod(void);
 extern namespace *get_namespace(const char *name);
 extern void       check_pointer_namespace(Type *lhs, Type *rhs);

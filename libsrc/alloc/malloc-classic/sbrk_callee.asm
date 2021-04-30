@@ -4,10 +4,10 @@
 SECTION code_clib
 PUBLIC sbrk_callee
 PUBLIC _sbrk_callee
-PUBLIC ASMDISP_SBRK_CALLEE
+PUBLIC asm_sbrk
 
-EXTERN HeapSbrk_callee
-EXTERN _heap, ASMDISP_HEAPSBRK_CALLEE
+EXTERN asm_HeapSbrk
+EXTERN _heap
 
 .sbrk_callee
 ._sbrk_callee
@@ -16,12 +16,11 @@ EXTERN _heap, ASMDISP_HEAPSBRK_CALLEE
    pop bc
    ex (sp),hl
 
-.asmentry
+.asm_sbrk
    
    ; bc = size of block in bytes >- 4
    ; hl = address of block
    
    ld de,_heap
-   jp HeapSbrk_callee + ASMDISP_HEAPSBRK_CALLEE
+   jp asm_HeapSbrk
 
-DEFC ASMDISP_SBRK_CALLEE = asmentry - sbrk_callee

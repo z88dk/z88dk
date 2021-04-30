@@ -9,7 +9,8 @@
  */
 
 #include <enterprise.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ circle(int x, int y, int radius, int skip) __smallc;
 
 
 void circle(int x, int y, int radius, int skip)
@@ -23,7 +24,7 @@ void circle(int x, int y, int radius, int skip)
 
 	esccmd_cmd='A'; // set beam position
 	esccmd_x=x*2;
-	esccmd_y=972-y*4;
+	esccmd_y=971-y*4;
 	exos_write_block(DEFAULT_VIDEO, 6, esccmd);
 
 	esccmd_cmd='S'; // set beam on

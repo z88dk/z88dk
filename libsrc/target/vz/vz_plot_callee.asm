@@ -13,7 +13,7 @@ PUBLIC vz_plot_callee
 PUBLIC _vz_plot_callee
 PUBLIC cplot_callee
 PUBLIC _cplot_callee
-PUBLIC ASMDISP_VZ_PLOT_CALLEE
+PUBLIC asm_vz_plot
 EXTERN base_graphics
 
 .vz_plot_callee
@@ -32,7 +32,7 @@ EXTERN base_graphics
    ; h = y
    ; c = colour
 
-.asmentry
+.asm_vz_plot
 
    ld	a,c
    and 3
@@ -76,4 +76,3 @@ EXTERN base_graphics
    
    ret
 
-DEFC ASMDISP_VZ_PLOT_CALLEE = asmentry - vz_plot_callee

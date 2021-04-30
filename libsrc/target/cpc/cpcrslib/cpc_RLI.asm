@@ -15,8 +15,7 @@
         PUBLIC    cpc_RLI
         PUBLIC    _cpc_RLI
 		
-        EXTERN    cpc_RLI_callee
-        EXTERN    ASMDISP_CPC_RLI_CALLEE
+        EXTERN    asm_cpc_RLI
 		
 .cpc_RLI
 ._cpc_RLI
@@ -28,4 +27,4 @@
 		push bc
 		push de
         push af
-        jp cpc_RLI_callee + ASMDISP_CPC_RLI_CALLEE
+        jp asm_cpc_RLI

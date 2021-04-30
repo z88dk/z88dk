@@ -7,6 +7,7 @@
 **/*.lib
 **/*.lis
 **/*.map
+**/*.c.asm
 **/*.o
 **/*.orig
 **/*.vcxproj.user
@@ -70,9 +71,9 @@ include/_DEVELOPMENT/sccz80/lib/
 include/_DEVELOPMENT/sdcc/lib/
 libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm
 libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm
-libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_48.bin.zx7
+libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_48.bin.zx0
 libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_48.def
-libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_p3.bin.zx7
+libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_p3.bin.zx0
 libsrc/_DEVELOPMENT/arch/zx/bifrost2/z80/bifrost2_engine_p3.def
 libsrc/_DEVELOPMENT/arch/zx/bifrost_h/z80/BIFROSTH_ENGINE.asm
 libsrc/_DEVELOPMENT/arch/zx/bifrost_l/z80/BIFROSTL_ENGINE.asm

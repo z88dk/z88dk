@@ -10,7 +10,7 @@ WORLD_TARGETS = abc80 abc800 ace alphatro altair8800 aquarius bee c128 c7420 col
 	g800 gal hemc hgmc homelab homelab2 kc kramermc lambda laser500 lviv lynx m5 m100 mc1000 mikro80 \
 	msx mtx multi8 myvision mz mz2500 nascom nc newbrain ondra osca oz p2000 pacman pasopia7 pc6001 \
 	pencil2 pps primo pv1000  \
-	pv2000 rcmx000 rx78 sam sc3000 sos spc1000 special srr svi test ti82 ti83 ti85 ti86 ti8x \
+	pv2000 rcmx000 rx78 sam sc3000 smc777 sos spc1000 special srr svi test ti82 ti83 ti85 ti86 ti8x \
 	trs80 ts2068 vector06c vg5k vz x07 x1 z1013 z9001 z88 zx zx80 zx81 zxn
 
 WORLD_TARGETS += cpm_px8 cpm_px4 cpm_einstein cpm_attache cpm_osborne1 cpm_kaypro83 cpm_kaypro84 \
@@ -29,7 +29,7 @@ $(eval $(call build_app, $(WORLD_TARGETS), world.bin, world.c) )
 CONIO_TARGETS = abc80 ace alphatro aquarius bee cpc coleco cpm fp1100 gb hemc hgmc homelab homelab2 \
 	kramermc laser500 mc1000 mikro80  \
 	nascom ondra pmd85 pv1000 pps rx78 spc1000 srr super80 trs80 vg5k vz z1013 zx80 zx81 \
-	msx pv2000 sc3000 svi m5 mtx multi8 z80tvgame z9001 vector06c zx
+	msx pv2000 sc3000 smc777 svi m5 mtx multi8 z80tvgame z9001 vector06c zx
 
 CFLAGS_world_conio = --generic-console
 CFLAGS_cpm_world_conio = -pragma-define:CONSOLE_ROWS=25 -pragma-define:CONSOLE_COLUMNS=80

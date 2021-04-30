@@ -76,13 +76,8 @@ cleanup:
 	INC	HL
 	INC C
 	DJNZ	vdloop
-;
-;       Deallocate memory which has been allocated here!
-;
-;        push    hl
-    call    crt0_exit
 
-;        pop     bc
+    call    crt0_exit
 start1:
         ld      sp,0
 		ret

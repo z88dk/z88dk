@@ -194,7 +194,7 @@ enum blah2 { NA_DO_AUTO, NA_CONTINUE, NA_MAIN, NA_BEGIN, NA_RESTART };
 
 int nNextParseAction;
 
-VNDef* pvndCurrent;
+const VNDef* pvndCurrent;
 BYTE* pPredicateCurrent;
 BYTE* pActionCurrent;
 
@@ -1699,10 +1699,10 @@ void ClearScr()
 // ======================================================================
 */
 
-void PrintStr(unsigned char* hl)
+void PrintStr(const char *hl)
 {
 	unsigned char ch;
-	unsigned char *temphl;
+	const char *temphl;
 	int b;
 
 
@@ -1922,7 +1922,7 @@ void DO_AUTO()
 
 void SH_TELL()
 {
-	BYTE* pDirections;
+	const BYTE* pDirections;
 
 	if (GVARS[GVAR_02] > 0)
 		--GVARS[GVAR_02];

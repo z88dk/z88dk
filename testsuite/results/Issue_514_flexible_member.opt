@@ -17,9 +17,9 @@
 	ld	b,(hl)
 	ld	hl,8
 	add	hl,bc
-	ld	(hl),+(17 % 256)
+	ld	(hl),17
 	inc	hl
-	ld	(hl),+(17 / 256)
+	ld	(hl),0
 	ld	hl,2	;const
 	pop	bc
 	ret
@@ -35,9 +35,9 @@
 	ld	b,(hl)
 	ld	hl,8
 	add	hl,bc
-	ld	(hl),+(17 % 256)
+	ld	(hl),17
 	inc	hl
-	ld	(hl),+(17 / 256)
+	ld	(hl),0
 	ld	hl,2	;const
 	pop	bc
 	ret

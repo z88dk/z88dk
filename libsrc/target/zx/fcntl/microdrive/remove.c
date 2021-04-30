@@ -4,7 +4,7 @@
  *
  *	Stefano Bodrato - Feb. 2005
  *
- *	$Id: remove.c,v 1.2 2005-03-01 17:50:37 stefano Exp $
+ *	$Id: remove.c $
 */
 
 //#include <fcntl.h>
@@ -14,6 +14,8 @@
 
 int remove(char *name)
 {
-	if1_remove_file (1, name);
+  // Exit if 'microdrive not present' or 'write protected'
+	if (if1_mdv_status(if1_driveno(name))) return (-1);
 
+	if1_remove_file (if1_driveno(name), if1_filename(name));
 }

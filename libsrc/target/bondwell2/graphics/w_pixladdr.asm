@@ -32,7 +32,8 @@
 ;
 
 .w_pixeladdress
-
+        push bc
+		
         ld      b,h
         ld      c,l
                                 ;calc (y * 80) + (x / 8) + bit map start
@@ -67,6 +68,8 @@
         ld      a,c             ;a = x low byte
         and     07h             ;a = x mod 8
         
+        pop bc
+		
         ld	d,h
         ld	e,l
         

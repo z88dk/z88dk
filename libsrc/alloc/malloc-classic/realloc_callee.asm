@@ -4,10 +4,10 @@
 SECTION code_clib
 PUBLIC realloc_callee
 PUBLIC _realloc_callee
-PUBLIC ASMDISP_REALLOC_CALLEE
+PUBLIC asm_realloc
 
-EXTERN HeapRealloc_callee
-EXTERN _heap, ASMDISP_HEAPREALLOC_CALLEE
+EXTERN asm_HeapRealloc
+EXTERN _heap
 
 .realloc_callee
 ._realloc_callee
@@ -16,12 +16,11 @@ EXTERN _heap, ASMDISP_HEAPREALLOC_CALLEE
    pop bc
    ex (sp),hl
 
-.asmentry
+.asm_realloc
 
    ; hl = void *p
    ; bc = size
    
    ld de,_heap
-   jp HeapRealloc_callee + ASMDISP_HEAPREALLOC_CALLEE
+   jp asm_HeapRealloc
 
-DEFC ASMDISP_REALLOC_CALLEE = asmentry - realloc_callee

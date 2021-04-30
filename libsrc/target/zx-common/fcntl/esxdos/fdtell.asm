@@ -1,10 +1,11 @@
 
-                SECTION   code_clib
+MODULE   esx_fdtell           
+SECTION   code_esxdos
 
-                PUBLIC    fdtell
-                PUBLIC    _fdtell
+PUBLIC    fdtell
+PUBLIC    _fdtell
 
-		EXTERN	asm_esxdos_f_fgetpos
+EXTERN	asm_esxdos_f_fgetpos
 
 ;long fdtell(int fd)
 

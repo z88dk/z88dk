@@ -146,28 +146,25 @@ ELSE
 
 ENDIF
 
-        call    _main
+    call    _main
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
-	push	hl
+    push	hl
     call    crt0_exit
-	pop	bc
+    pop	bc
 start1:
-        ld      sp,0
+    ld      sp,0
 IF (startup=2)
-	di
-	halt
+    di
+    halt
 ELSE
-	jp (iy)		; To the Jupiter ACE FORTH system
+    jp (iy)		; To the Jupiter ACE FORTH system
 ENDIF
 
 l_dcal:
-        jp      (hl)
+    jp      (hl)
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.asm"
 
 ;---------------------------------------------------------------------------
 IF (startup=2) 
@@ -177,21 +174,21 @@ IF (startup=2)
 ;	defc sysdefvarsaddr = $2800-80   ; Close to the end of "PAD", the Forth interpreter workspace
 
 IF !CRT_ORG_BSS
-	defc CRT_ORG_BSS = 24576
-	defc DEFINED_CRT_ORG_BSS = 1
+    defc CRT_ORG_BSS = 24576
+    defc DEFINED_CRT_ORG_BSS = 1
 ENDIF
 
-        ; If we were given a model then use it
-        IF DEFINED_CRT_MODEL
-            defc __crt_model = CRT_MODEL
-        ELSE
-            defc __crt_model = 1
-        ENDIF
+; If we were given a model then use it
+IF DEFINED_CRT_MODEL
+    defc __crt_model = CRT_MODEL
+ELSE
+    defc __crt_model = 1
+ENDIF
 ENDIF
 
 IF DEFINED_CRT_ORG_BSS
 	defc	__crt_org_bss = CRT_ORG_BSS
 ENDIF
 
-	INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.asm"
 

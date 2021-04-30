@@ -11,7 +11,7 @@
 SECTION code_clib
 PUBLIC vz_soundcopy_callee
 PUBLIC _vz_soundcopy_callee
-PUBLIC ASMDISP_VZ_SOUNDCOPY_CALLEE
+PUBLIC asm_vz_soundcopy
 EXTERN __stdlib_seed
 
 .vz_soundcopy_callee
@@ -37,7 +37,7 @@ EXTERN __stdlib_seed
    ; c   = sound 2
    ; b   = sound 1
 
-.asmentry
+.asm_vz_soundcopy
 
    ld e,c
    ld d,b
@@ -89,5 +89,3 @@ EXTERN __stdlib_seed
    ld ($783b),a
 
    ret
-
-DEFC ASMDISP_VZ_SOUNDCOPY_CALLEE = asmentry - vz_soundcopy_callee

@@ -69,7 +69,7 @@ ansi_CHAR:
 	ld	bc,ansifont-256
 	add	hl,bc		;hl = bitmap to print
 
-	ld	b,7
+	ld	b,8
 	ld	a,(INVRS)
 	ld	c,a
 char_loop:
@@ -83,15 +83,13 @@ no_invers:
 	inc	d
 	djnz 	char_loop
 ; Now check for underline
-	ld	c,(hl)		;next row to print
+        dec	d
 	ld	a,(INVRS+2)
 	cp	24		;some magic change i think
 	jr	z,no_underline
-	ld	c,255
-no_underline:
-	ld	a,c
+	ld	a,255
 	ld	(de),a
-
+no_underline:
 ; Now convert display address into attribute
 	ld	a,d
 	rra	

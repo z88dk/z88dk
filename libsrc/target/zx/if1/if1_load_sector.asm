@@ -9,7 +9,7 @@
 ;       2/3 sector number
 ;       0/1 buffer
 ;
-;       $Id: if1_load_sector.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;       $Id: if1_load_sector.asm $
 ;
 
 		SECTION   code_clib
@@ -19,8 +19,9 @@
                 EXTERN     if1_rommap
                 EXTERN    mdvbuffer
 
-                EXTERN     if1_checkblock
-                EXTERN    if1_sect_read
+                EXTERN    if1_checkblock
+                EXTERN    if1_sect_ready
+                EXTERN    mdv_seek_count
 
                 EXTERN    MAKE_M
                 EXTERN    CLOSE_M
@@ -39,11 +40,9 @@ _if1_load_sector:
                 ld      a,(ix+4)
                 ld      hl,-1
                 and     a               ; drive no. = 0 ?
-                jp	z,if_load_sector_exit               ; yes, return -1
-                dec     a
-                cp      8               ; drive no. >8 ?
-                jr	nc,if_load_sector_exit              ; yes, return -1
-                inc     a
+                jp      z,if_load_sector_exit               ; yes, return -1
+                cp      9               ; drive no. >8 ?
+                jr      nc,if_load_sector_exit              ; yes, return -1
 
                 ld      (driveno),a     ; drive number selected (d_str1)
 
@@ -58,9 +57,10 @@ _if1_load_sector:
                 call    if1_rommap
 
 
-
-                ld      hl,(driveno)    ; drive number selected
-                ld      (5CD6h),hl      ; d_str1
+                ;ld      hl,(driveno)    ; drive number selected
+                ;ld      (5CD6h),hl      ; d_str1
+                ld      a,(driveno)    ; drive number selected
+                ld      (5CD6h),a      ; d_str1
 
                 ld      a,'M'
                 ld      (5CD9h),A       ; l_str1 (device type = "M")
@@ -79,20 +79,20 @@ _if1_load_sector:
                 res     0,(ix+18h)      ; set CHFLAG to "read" mode
  
                 xor     a
-                ld      (if1_sect_read),a       ; flag for "sector read"
+                ld      (if1_sect_ready),a       ; flag for "sector read"
 
-                ld      hl,04FBh
+                ;ld      hl,255*5		; set sector counter
+				ld      hl,(mdv_seek_count)		; set sector counter (retries slightly reduced)
                 ld      (5CC9h),hl      ; SECTOR
 
 
-
-; *** scelta routine ***
 
                 ld      a,(driveno)     ; drive number selected
                 call    MOTOR           ; select drive motor
 IF !OLDIF1MOTOR
                 jr      nz,error_exit
 ENDIF
+
 
 
 nxtsector:
@@ -127,7 +127,7 @@ nextrec:
         ;       ret
         ;noverify:
 
-                ld      a,(if1_sect_read)       ; flag for "sector read"
+                ld      a,(if1_sect_ready)       ; flag for "sector read"
                 or      a
                 jr      z,sect_notfound
 
@@ -169,6 +169,7 @@ next_sector:
                 ld      a,l
                 or      h
                 ret
+
 
 		SECTION bss_clib
 ;; various flags

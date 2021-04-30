@@ -18,11 +18,12 @@ struct fcb *getfcb(void)
     struct fcb  *fcb;
 
     for ( fcb = _fcb ; fcb < &_fcb[MAXFILE]; fcb++ ) {
-	if ( fcb->use == 0 ) {
-	    fcb->use   = U_READ;
-	    fcb->rwptr = 0;
-	    return fcb;
-	}
+        if ( fcb->use == 0 ) {
+            fcb->use   = U_READ;
+            fcb->rwptr = 0;
+            fcb->cached_record = 0xffffffff;
+            return fcb;
+        }
     }
     return NULL;
 }

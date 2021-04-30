@@ -13,29 +13,30 @@
 	PUBLIC	dither_pattern
 	
 .dither_pattern
-		and	a
-		ret	z
-		
-		cp	11
-		jr	c,nomax
-		ld	a,255
-		ret
+    and	a
+    ret	z
+    
+    cp	11
+    jr	c,nomax
+    ld	a,255
+    ret
 .nomax
-		rla
-		rla
-		and	@11111100
-		ld	l,a
-		ld	a,c	; Y
-		and	3
-		or	l
-		ld	l,a
-		ld	h,0
-		ld	de,_dithpat-4
-		add	hl,de
-		ld	a,(hl)
-		ret
+    rla
+    rla
+    and	@11111100
+    ld	l,a
+    ld	a,c	; Y
+    and	3
+    or	l
+    ld	l,a
+    ld	h,0
+    ld	de,_dithpat-4
+    add	hl,de
+    ld	a,(hl)
+    ret
 
-        SECTION rodata_graphics
+
+	SECTION	rodata_graphics
 _dithpat:
 	
 	defb	@00000010	; 1

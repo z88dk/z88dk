@@ -8,13 +8,12 @@
 ;	$Id: set_exos_variable.asm,v 1.4 2016-06-19 20:17:32 dom Exp $
 ;
 
-        SECTION code_clib
+    SECTION code_clib
 	PUBLIC	set_exos_variable
 	PUBLIC	_set_exos_variable
 
-	EXTERN set_exos_variable_callee
+	EXTERN asm_set_exos_variable
 
-EXTERN ASMDISP_SET_EXOS_VARIABLE_CALLEE
 
 set_exos_variable:
 _set_exos_variable:
@@ -26,5 +25,5 @@ _set_exos_variable:
    push de
    push bc
    
-   jp set_exos_variable_callee + ASMDISP_SET_EXOS_VARIABLE_CALLEE
+   jp asm_set_exos_variable
 

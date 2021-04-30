@@ -11,7 +11,7 @@
 SECTION code_clib
 PUBLIC vz_sound_callee
 PUBLIC _vz_sound_callee
-EXTERN ASMDISP_VZ_SOUND_CALLEE
+EXTERN asm_vz_sound
 
 .vz_sound_callee
 ._vz_sound_callee
@@ -24,9 +24,7 @@ EXTERN ASMDISP_VZ_SOUND_CALLEE
    ; bc = cycles
    ; hl = freq
  
- .asmentry                   ; similar to z88dk bit_beep()
+ .asm_vz_sound                   ; similar to z88dk bit_beep()
  
     jp $345c                 ; sound
- 
- DEFC ASMDISP_VZ_SOUND_CALLEE = asmentry - vz_sound_callee
- 
+  

@@ -15,7 +15,7 @@
 
 	PUBLIC	sd_write_block_2gb_callee
    PUBLIC   _sd_write_block_2gb_callee
-	PUBLIC	ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
+	PUBLIC	asm_sd_write_block_2gb
 
 	EXTERN	sd_card_info
 	EXTERN	card_select
@@ -41,7 +41,7 @@ _sd_write_block_2gb_callee:
 	pop ix	; SD_INFO struct
 	push af
 
-.asmentry
+.asm_sd_write_block_2gb
 
 IF SDHC_SUPPORT
 	ld a,(sd_card_info)
@@ -113,4 +113,3 @@ write_end:
 	ret
 
 
-DEFC ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE = asmentry - sd_write_block_2gb_callee

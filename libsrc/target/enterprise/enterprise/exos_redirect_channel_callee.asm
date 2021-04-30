@@ -11,7 +11,7 @@
         SECTION code_clib
 PUBLIC	exos_redirect_channel_callee
 PUBLIC	_exos_redirect_channel_callee
-PUBLIC 	ASMDISP_EXOS_REDIRECT_CHANNEL_CALLEE
+PUBLIC 	asm_exos_redirect_channel
 
 exos_redirect_channel_callee:
 _exos_redirect_channel_callee:
@@ -23,7 +23,7 @@ _exos_redirect_channel_callee:
 ; enter : l = main channel number
 ;         e = secondary channel number
 
-.asmentry
+.asm_exos_redirect_channel
 
 	ld	a,l		; main channel
 	ld	c,e		; sec. ch
@@ -34,4 +34,3 @@ _exos_redirect_channel_callee:
 	ret
 
 
-DEFC ASMDISP_EXOS_REDIRECT_CHANNEL_CALLEE = asmentry - exos_redirect_channel_callee

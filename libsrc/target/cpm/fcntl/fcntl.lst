@@ -1,5 +1,6 @@
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/bios
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/bdos
+target/cpm/fcntl/obj/${TYPE}/${DEVICE}/cache
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/close
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/creat
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/change_volume
@@ -24,5 +25,6 @@ target/cpm/fcntl/obj/${TYPE}/${DEVICE}/remove
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/rename
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/setfcb
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/stat
+target/cpm/fcntl/obj/${TYPE}/${DEVICE}/swapuid
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/write
 target/cpm/fcntl/obj/${TYPE}/${DEVICE}/writebyte

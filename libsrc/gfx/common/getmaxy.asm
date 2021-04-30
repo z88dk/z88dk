@@ -1,7 +1,7 @@
 ;
-;       Z88 Graphics Functions
+;      Z88 Graphics Functions
 ;
-;       Written around the Interlogic Standard Library
+;      Written around the Interlogic Standard Library
 ;
 ;	$Id: getmaxy.asm,v 1.5 2017-01-02 21:51:24 aralbrec Exp $
 ;
@@ -10,11 +10,11 @@
 	INCLUDE	"graphics/grafix.inc"
 
 
-                SECTION         code_graphics
-                PUBLIC    getmaxy
-                PUBLIC    _getmaxy
+             SECTION        code_graphics
+             PUBLIC    getmaxy
+             PUBLIC    _getmaxy
 
 .getmaxy
 ._getmaxy
-		ld	hl,maxy-1
-		ret
+    ld	hl,maxy-1
+    ret

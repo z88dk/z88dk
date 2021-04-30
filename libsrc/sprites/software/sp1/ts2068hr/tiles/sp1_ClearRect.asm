@@ -1,6 +1,7 @@
 ; void sp1_ClearRect(struct sp1_Rect *r, uchar tile, uchar rflag)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_ClearRect
 EXTERN sp1_ClearRect_callee
 EXTERN ASMDISP_SP1_CLEARRECT_CALLEE

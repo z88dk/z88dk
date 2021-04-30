@@ -523,7 +523,7 @@ void  dstar_handlecmds(int cmd)
     }
 }
 
-#include <dor.h>
+#include <arch/z88/dor.h>
 
 #define HELP1   "A demo application made with z88dk - Small C+ Compiler"
 #define HELP2   "Converted from a TI86 game found with source on"
@@ -557,6 +557,6 @@ void  dstar_handlecmds(int cmd)
 #define TOPIC1_2HELP1    "Use this to quit the game"
 #define TOPIC1_2HELP2    "Not that you'll ever get bored of the game!"
 
-#include <application.h>
+#include <arch/z88/application.h>
 #endif
 /* THE END! */

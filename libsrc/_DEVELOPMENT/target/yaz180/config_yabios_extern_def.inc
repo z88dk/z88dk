@@ -1,6 +1,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; yabios v2.0 provided labels found in common area 1 ;;;;;;;
+;;;; yabios v2.1 provided labels found in common area 1 ;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 EXTERN z180_int_int1
@@ -89,4 +89,5 @@ EXTERN asm_pchar                ; print contents of L to asci0/1, modifies AF & 
 EXTERN asm_pstring              ; print string from location in DE to asci0/1, modifies AF, DE, & HL
 EXTERN asm_rhex                 ; Returns byte in A, modifies HL
 EXTERN asm_rchar                ; Rx byte in L (A = byte Rx too) SCF if char read
+EXTERN asm_delay                ; short delay about 48 cycles * 65536 iterations
 

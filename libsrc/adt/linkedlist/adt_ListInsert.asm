@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC adt_ListInsert
 PUBLIC _adt_ListInsert
 
-EXTERN adt_ListInsert_callee
-EXTERN ASMDISP_ADT_LISTINSERT_CALLEE
+EXTERN asm_adt_ListInsert
 
 .adt_ListInsert
 ._adt_ListInsert
@@ -18,5 +17,5 @@ EXTERN ASMDISP_ADT_LISTINSERT_CALLEE
    push bc
    push hl
    
-   jp adt_ListInsert_callee + ASMDISP_ADT_LISTINSERT_CALLEE
+   jp asm_adt_ListInsert
 

@@ -98,13 +98,13 @@
 	ld	hl,%1
 	ld	a,h
 	or	l
-	jp	%2
+	jp	%2	;%4
 	ld	hl,%1
 =
 	ld	hl,%1
 	ld	a,h
 	or	l
-	jp	%2
+	jp	%2	;%4
 
 	push	hl
 	pop	bc
@@ -171,7 +171,7 @@
 	ld	bc,%1
 	add	hl,bc
 	ld	(hl),%2
-	ld	bc,%3-(%1)
+	ld	bc,%eval(%3 %1 -)
 	add	hl,bc
 
 %notcpu gbz80
@@ -303,7 +303,7 @@
 	ld	hl,%3
 =
 	ld	hl,%1
-	ld	a,+(%2 %% 256)	;const
+	ld	a,%eval(%2 256 %%)	;const
 	or	(hl)
 	ld	(hl),a
 	ld	hl,%3
@@ -330,7 +330,7 @@
 	ld	(%2),a
 	ld	hl,%3
 
-	ld	hl,%1-%1	;const
+	ld	hl,0	;const
 	add	hl,sp
 	ld	l,(hl)
 	ld	h,0
@@ -380,7 +380,7 @@
 	ld	hl,%3
 =
 	ld	hl,%1
-	ld	a,%2 %% 256
+	ld	a,%eval(%2 256 %%)
 	add	(hl)
 	ld	(hl),a
 	ld	hl,%3
@@ -388,20 +388,20 @@
 	ld	h,0
 	ld	a,h
 	or	l
-	jp	z,%1
+	jp	z,%1	;%4
 =
 	ld	a,l
 	and	a
-	jp	z,%1
+	jp	z,%1	;%4
 
 	ld	h,0
 	ld	a,h
 	or	l
-	jp	nz,%1
+	jp	nz,%1	;%4
 =
 	ld	a,l
 	and	a
-	jp	nz,%1
+	jp	nz,%1	;%4
 
 	ld	l,a
 	ld	h,0

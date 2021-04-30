@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC l_qsort
 PUBLIC _l_qsort
-EXTERN l_qsort_callee
-EXTERN ASMDISP_L_QSORT_CALLEE
+EXTERN asm_l_qsort
 
 .l_qsort
 ._l_qsort
@@ -18,4 +17,4 @@ EXTERN ASMDISP_L_QSORT_CALLEE
    push hl
    push de
    
-   jp l_qsort_callee + ASMDISP_L_QSORT_CALLEE
+   jp asm_l_qsort

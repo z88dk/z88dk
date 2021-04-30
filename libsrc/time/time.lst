@@ -1,5 +1,1 @@
-time/gmtime
-time/localtime
-time/mktime
-time/asctime
-time/ctime
+time/obj/${TYPE}/**/*.o

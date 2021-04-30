@@ -6,7 +6,7 @@ target/lviv/stdio/conio_vars
 target/lviv/stdio/CRT_FONT
 @stdio/stdio_8080.lst
 @font/font_8x8/font_8x8.lst
-@time/time.lst
+
 target/lviv/games/joystick
 target/lviv/games/keys_joystick
 @games/games.lst

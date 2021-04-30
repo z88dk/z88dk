@@ -1,7 +1,7 @@
 /*
  * Headerfile for Enterprise 64/128 specific stuff
  *
- * $Id: enterprise.h,v 1.9 2016-06-23 21:11:24 dom Exp $
+ * $Id: enterprise.h $
  */
 
 #ifndef __ENTERPRISE_H__
@@ -206,8 +206,15 @@ extern int __LIB__              exos_write_character(int channel, int character)
 extern int __LIB__    exos_write_character_callee(int channel,int character) __smallc __z88dk_callee;
 #define exos_write_character(a,b)   exos_write_character_callee(a,b)
 
+
 extern int __LIB__              exos_read_block(int channel, unsigned int byte_count, unsigned char *address) __smallc;
+extern int __LIB__       exos_read_block_callee(int channel, unsigned int byte_count, unsigned char *address) __smallc __z88dk_callee;
+#define exos_read_block(a,b,c)   exos_read_block_callee(a,b,c)
+
 extern int __LIB__              exos_write_block(int channel, unsigned int byte_count, unsigned char *address) __smallc;
+extern int __LIB__       exos_write_block_callee(int channel, unsigned int byte_count, unsigned char *address) __smallc __z88dk_callee;
+#define exos_write_block(a,b,c)   exos_write_block_callee(a,b,c)
+
 
 // Check if the line printer is ready (1=ready, 0 if not)
 extern int __LIB__ lpt_ready();

@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC zx_setcursorpos
 PUBLIC _zx_setcursorpos
 
-EXTERN zx_setcursorpos_callee
-EXTERN ASMDISP_ZX_SETCURSORPOS_CALLEE
+EXTERN asm_zx_setcursorpos
 
 zx_setcursorpos:
 _zx_setcursorpos:
@@ -17,4 +16,4 @@ _zx_setcursorpos:
    push de
    push bc
    
-   jp zx_setcursorpos_callee + ASMDISP_ZX_SETCURSORPOS_CALLEE
+   jp asm_zx_setcursorpos

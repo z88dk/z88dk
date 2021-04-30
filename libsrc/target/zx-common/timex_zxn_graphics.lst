@@ -24,3 +24,5 @@ target/zx-common/graphics/obj/${TARGET}/w_pointxy
 target/zx-common/graphics/obj/${TARGET}/asm_zxn_tilemap_palette
 target/zx-common/graphics/obj/${TARGET}/textpixl
 target/zx-common/graphics/obj/${TARGET}/getmaxy
+target/zx-common/graphics/obj/${TARGET}/w_stencil_render
+

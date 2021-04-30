@@ -13,7 +13,7 @@
 SECTION code_clib
 PUBLIC	zx_setcursorpos_callee
 PUBLIC	_zx_setcursorpos_callee
-PUBLIC	ASMDISP_ZX_SETCURSORPOS_CALLEE
+PUBLIC	asm_zx_setcursorpos
 
 EXTERN     zx_dfile_addr
 EXTERN     zx_coord_adj
@@ -35,12 +35,9 @@ _zx_setcursorpos_callee:
 ; enter : l = x
 ;         e = y
 
-.asmentry
+.asm_zx_setcursorpos
 ;jr asmentry
 	ld d,l
 	ld (COLUMN),de
 	call zx_coord_adj
 	jp zx_dfile_addr
-
-
-DEFC ASMDISP_ZX_SETCURSORPOS_CALLEE = asmentry - zx_setcursorpos_callee

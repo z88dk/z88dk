@@ -17,6 +17,9 @@
 
 .getk
 ._getk
+IF !__CPU_INTEL__
+	push ix
+ENDIF
 
 	call const
 	and  a
@@ -36,6 +39,9 @@
 .getk_end
 	ld   h,0
 	ld   l,a
+IF !__CPU_INTEL__
+	pop ix
+ENDIF
 	ret
 
 

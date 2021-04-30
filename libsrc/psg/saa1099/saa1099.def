@@ -1,0 +1,103 @@
+; saa1099 soundchip
+
+; datasheets:
+;   - 1986 November https://datasheetspdf_com/datasheet/SAA1099_html
+;   - 1984 August   https://www_opl3_com/wp-content/uploads/2020/04/SAA-1099v1_pdf
+
+;---------------------------------------------------------------
+
+;---------------------------------------------------------------
+
+; saa1099 soundchip registers
+
+;---------------------------------------------------------------
+; amplitude control - 4 bits right and 4 bits left
+
+saa_register_amplitude_0:           equ $00 ; rrrrllll
+saa_register_amplitude_1:           equ $01 ; rrrrllll
+saa_register_amplitude_2:           equ $02 ; rrrrllll
+saa_register_amplitude_3:           equ $03 ; rrrrllll
+saa_register_amplitude_4:           equ $04 ; rrrrllll
+saa_register_amplitude_5:           equ $05 ; rrrrllll
+
+;---------------------------------------------------------------
+; frequency control - 8 bits
+
+saa_register_frequency_tone_0:      equ $08 ; ffffffff
+saa_register_frequency_tone_1:      equ $09 ; ffffffff
+saa_register_frequency_tone_2:      equ $0a ; ffffffff
+saa_register_frequency_tone_3:      equ $0b ; ffffffff
+saa_register_frequency_tone_4:      equ $0c ; ffffffff
+saa_register_frequency_tone_5:      equ $0d ; ffffffff
+
+;---------------------------------------------------------------
+; octave control - 3 bits
+
+saa_register_octave_1_0:            equ $10 ; _111_000
+saa_register_octave_3_2:            equ $11 ; _333_222
+saa_register_octave_5_4:            equ $12 ; _555_444
+
+    ; 0    31 Hz  -  61 Hz
+    ; 1    61 Hz  - 122 Hz
+    ; 2   122 Hz  - 244 Hz
+    ; 3   245 Hz  - 488 Hz
+    ; 4   489 Hz  - 977 Hz
+    ; 5   978 Hz  - 1_95 kHz
+    ; 6  1_96 kHz - 3_91 kHz
+    ; 7  3_91 kHz - 7_81 kHz
+
+;---------------------------------------------------------------
+
+saa_register_frequency_enable:      equ $14 ; __543210
+saa_register_noise_enable:          equ $15 ; __543210
+
+;---------------------------------------------------------------
+
+saa_register_noise_generator_1_0:   equ $16 ; __11__00
+
+    saa_noise_0_31_3kHz:                equ  %00000000  ; 31_3 kHz
+    saa_noise_0_15_6kHz:                equ  %00000001  ; 15_6 kHz
+    saa_noise_0_7_6kHz:                 equ  %00000010  ;  7_6 kHz
+    saa_noise_0_variable:               equ  %00000011  ; 61 Hz - 15_6 kHz (frequency generator 0)
+
+    saa_noise_1_31_3kHz:                equ  %00000000  ; 31_3 kHz
+    saa_noise_1_15_6kHz:                equ  %00010000  ; 15_6 kHz
+    saa_noise_1_7_6kHz:                 equ  %00100000  ;  7_6 kHz
+    saa_noise_1_variable:               equ  %00110000  ; 61 Hz - 15_6 kHz (frequency generator 3)
+
+;---------------------------------------------------------------
+; envelope control
+
+saa_register_envelope_generator_0:  equ $18 ; e_cfttts
+saa_register_envelope_generator_1:  equ $19 ; e_cfttts
+
+    saa_envelope_left_right_same:       equ  %00000000  ; left and right the same
+    saa_envelope_left_right_inverse:    equ  %00000001  ; left and right inverse
+
+    saa_envelope_mode_zero:             equ  %00000000  ; zero amplitude
+    saa_envelope_mode_maximum:          equ  %00000010  ; maximum amplitude
+    saa_envelope_mode_decay:            equ  %00000100  ; single decay          \
+    saa_envelope_mode_repeat_decay:     equ  %00000110  ; repetitve decay       \\\\
+    saa_envelope_mode_triangle:         equ  %00001000  ; single triangular     /\
+    saa_envelope_mode_repeat_triangle:  equ  %00001010  ; repetitve triangular  /\/\
+    saa_envelope_mode_attack:           equ  %00001100  ; single attack         /
+    saa_envelope_mode_repeat_attack:    equ  %00001110  ; repetitive attack     ////
+
+    saa_envelope_bits_4:                equ  %00000000  ; 4 bits for envelope control (max 977 Hz)
+    saa_envelope_bits_3:                equ  %00010000  ; 3 bits for envelope control (max 1_95 kHz)
+
+    saa_envelope_internal_clock:        equ  %00000000  ; internal envelope clock (frequency generator 1 or 4)
+    saa_envelope_external_clock:        equ  %00100000  ; external envelope clock (address write pulse)
+
+    saa_envelope_reset:                 equ  %00000000  ; reset
+    saa_envelope_enabled:               equ  %10000000  ; enabled
+
+;---------------------------------------------------------------
+
+saa_register_sound_enable:          equ $1c ; ______re
+
+    saa_se_channels_disabled:           equ  %00000000  ; all channels disabled
+    saa_se_channels_enabled:            equ  %00000001  ; all channels enabled
+
+    saa_se_generators_enabled:          equ  %00000000  ; all generators enabled
+    saa_se_generators_reset:            equ  %00000010  ; all generators reset and synchronized (November 1986 datasheet)

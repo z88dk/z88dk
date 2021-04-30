@@ -16,7 +16,7 @@
         
         PUBLIC  msx_vpoke_direct
 
-        PUBLIC ASMDISP_MSX_VPOKE_CALLEE
+        PUBLIC asm_msx_vpoke
         EXTERN  l_tms9918_disable_interrupts
         EXTERN  l_tms9918_enable_interrupts
 
@@ -31,7 +31,7 @@ _msx_vpoke_callee:
         pop        hl        ; VRAM address
         push        bc
         
-.asmentry
+.asm_msx_vpoke
         ld        a,e
 msx_vpoke_direct:
         ex		af,af
@@ -62,4 +62,3 @@ ENDIF
         call    l_tms9918_enable_interrupts
         ret
         
-DEFC ASMDISP_MSX_VPOKE_CALLEE = asmentry - msx_vpoke_callee

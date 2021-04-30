@@ -3,7 +3,7 @@
 ;          startup=2  --> ROM mode (position code at location 0 and provide minimal interrupt services)
 ;
 ;          CRT_ORG_CODE = start address
-;	   CRT_ORG_BSS = address for bss variables
+;          CRT_ORG_BSS = address for bss variables
 ;          CRT_MODEL   = 0 (RAM), 1 = (ROM, code copied), 2 = (ROM, code compressed)
 ;
 ;       djm 18/5/99
@@ -12,78 +12,75 @@
 ;
 
 
-        MODULE  zx82_crt0
+    MODULE  zx82_crt0
 
-        
-;--------
-; Include zcc_opt.def to find out some info
-;--------
-
-        defc    crt0 = 1
-        INCLUDE "zcc_opt.def"
-
-;--------
-; Some scope definitions
-;--------
-
-        EXTERN    _main           ; main() is always external to crt0 code
-
-        PUBLIC    cleanup         ; jp'd to by exit()
-        PUBLIC    l_dcal          ; jp(hl)
-
-        PUBLIC    call_rom3       ; Interposer
-       
-        
-
-	PUBLIC	  __SYSVAR_BORDCR
-	defc	  __SYSVAR_BORDCR = 23624
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
 
-        IF DEFINED_ZXVGS
-            IF !DEFINED_CRT_ORG_CODE
-                DEFC    CRT_ORG_CODE = $5CCB     ; repleaces BASIC program
-		defc	DEFINED_CRT_ORG_CODE = 1
-            ENDIF
+    EXTERN    _main           ; main() is always external to crt0 code
+    PUBLIC    cleanup         ; jp'd to by exit()
+    PUBLIC    l_dcal          ; jp(hl)
+    PUBLIC    call_rom3       ; Interposer
 
-	    defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
+
+    PUBLIC  __SYSVAR_BORDCR
+    defc    __SYSVAR_BORDCR = 23624
+
+
+    IF DEFINED_ZXVGS
+        IF !DEFINED_CRT_ORG_CODE
+            defc    CRT_ORG_CODE = $5CCB     ; repleaces BASIC program
+            defc	DEFINED_CRT_ORG_CODE = 1
         ENDIF
+        defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
+    ENDIF
 
-        PUBLIC    _FRAMES
-        IF startup != 2
-                defc  _FRAMES = 23672 ; Timer	
-        ENDIF
+
+    PUBLIC    _FRAMES
+    IF startup != 2
+            defc  _FRAMES = 23672 ; Timer	
+    ENDIF
         
-        IF      !DEFINED_CRT_ORG_CODE
-            IF (startup=2)                 ; ROM ?
-                defc  CRT_ORG_CODE  = 0
-		defc	TAR__register_sp = 32767
+    IF      !DEFINED_CRT_ORG_CODE
+        IF (startup=2)                 ; ROM ?
+            defc    CRT_ORG_CODE  = 0
+            defc    TAR__register_sp = 32767
+        ELSE
+            IF DEFINED_CRT_TS2068_HRG
+                defc    CRT_ORG_CODE  = 40000
             ELSE
-                IF DEFINED_CRT_TS2068_HRG
-                    defc  CRT_ORG_CODE  = 40000
-                ELSE
-                    defc  CRT_ORG_CODE  = 32768
-                ENDIF
+                defc    CRT_ORG_CODE  = 32768
             ENDIF
         ENDIF
+    ENDIF
 
-	; We default to the 64 column terminal driver
-        defc    CONSOLE_COLUMNS = 64
-        defc    CONSOLE_ROWS = 24
+    ; We default to the 64 column terminal driver
+    ; Check whether to default to 32 column display
+    defc    CONSOLE_ROWS = 24
+    IF !DEFINED_CLIB_ZX_CONIO32
+        defc CLIB_ZX_CONIO32 = 0
+        defc CONSOLE_COLUMNS = 64
+    ELSE
+        defc CONSOLE_COLUMNS = 32
+    ENDIF
+    PUBLIC __CLIB_ZX_CONIO32
+    defc __CLIB_ZX_CONIO32 = CLIB_ZX_CONIO32
 
-	IF !CLIB_FGETC_CONS_DELAY
-		defc CLIB_FGETC_CONS_DELAY = 100
-	ENDIF
+    IF !CLIB_FGETC_CONS_DELAY
+        defc CLIB_FGETC_CONS_DELAY = 100
+    ENDIF
 
-	; We use the generic driver by default
-        defc    TAR__fputc_cons_generic = 1
+    ; We use the generic driver by default
+    defc    TAR__fputc_cons_generic = 1
 
-	defc	DEF__register_sp = -1
-        defc    TAR__clib_exit_stack_size = 32
-	defc	CRT_KEY_DEL = 12
-	defc __CPU_CLOCK = 3500000
-	INCLUDE	"crt/classic/crt_rules.inc"
+    defc    DEF__register_sp = -1
+    defc    TAR__clib_exit_stack_size = 32
+    defc    CRT_KEY_DEL = 12
+    defc    __CPU_CLOCK = 3500000
+    INCLUDE "crt/classic/crt_rules.inc"
 
-        org     CRT_ORG_CODE
+    org     CRT_ORG_CODE
 
 
 start:
@@ -92,41 +89,41 @@ start:
 
 IF (startup=2)
 
-	IF !CLIB_FGETC_CONS_DELAY
-		defc CLIB_FGETC_CONS_DELAY = 100
-	ENDIF
+    IF !CLIB_FGETC_CONS_DELAY
+        defc CLIB_FGETC_CONS_DELAY = 100
+    ENDIF
 
-        di          ; put hardware in a stable state
-        ld      a,$3F
-        ld      i,a
-        jr      init            ; go over rst 8, bypass shadow ROM
+    di          ; put hardware in a stable state
+    ld      a,$3F
+    ld      i,a
+    jr      init            ; go over rst 8, bypass shadow ROM
 
-        defs    $0008-ASMPC
+    defs    $0008-ASMPC
 if (ASMPC<>$0008)
-        defs    CODE_ALIGNMENT_ERROR
+    defs    CODE_ALIGNMENT_ERROR
 endif
 
-        ; --- rst 8 ---
-        ld      hl,($5c5d)      ; It was the address reached by CH-ADD.
-        nop                     ; one byte still, to jump over the
-                                ; Opus Discovery and similar shadowing traps
-        ; --- nothing more ?
+    ; --- rst 8 ---
+    ld      hl,($5c5d)      ; It was the address reached by CH-ADD.
+    nop                     ; one byte still, to jump over the
+                            ; Opus Discovery and similar shadowing traps
+    ; --- nothing more ?
 
 init:
 
-		INCLUDE	"crt/classic/crt_init_sp.asm"
-		
-        ld      a,@111000       ; White PAPER, black INK
-        call    zx_internal_cls
-        ld      (hl),0
-        ld      bc,42239
-        ldir
+    INCLUDE	"crt/classic/crt_init_sp.asm"
 
-		INCLUDE	"crt/classic/crt_init_atexit.asm"
-		call	crt0_init_bss
+    ld      a,@111000       ; White PAPER, black INK
+    call    zx_internal_cls
+    ld      (hl),0
+    ld      bc,42239
+    ldir
 
-		im      1
-        ei
+    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss
+
+    im      1
+    ei
 ELSE
 
         ; --- startup=[default] ---
@@ -139,15 +136,15 @@ ELSE
   IF !DEFINED_ZXVGS
         ld      (start1+1),sp   ; Save entry stack
   ENDIF
-	INCLUDE	"crt/classic/crt_init_sp.asm"
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss
+    ld      (exitsp),sp
 ; Optional definition for auto MALLOC init; it takes
 ; all the space between the end of the program and UDG
 IF DEFINED_USING_amalloc
-	defc	CRT_MAX_HEAP_ADDRESS = 65535 - 169
-	INCLUDE "crt/classic/crt_init_amalloc.asm"
+    defc    CRT_MAX_HEAP_ADDRESS = 65535 - 169
+    INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
   IF DEFINED_ZXVGS
@@ -168,9 +165,6 @@ IF DEFINED_NEEDresidos
 ENDIF
         call    _main           ; Call user program
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
         push    hl
       call    crt0_exit
 
@@ -179,37 +173,37 @@ cleanup:
 IF (startup=2)      ; ROM ?
 
 cleanup_exit:
-        rst     0
+    rst     0
 
-        defs    56-cleanup_exit-1
+    defs    56-cleanup_exit-1
 
 if (ASMPC<>$0038)
-        defs    CODE_ALIGNMENT_ERROR
+    defs    CODE_ALIGNMENT_ERROR
 endif
 
 ; ######## IM 1 MODE INTERRUPT ENTRY ########
 
-      INCLUDE "target/zx/classic/spec_crt0_rom_isr.asm"
+    INCLUDE "target/zx/classic/spec_crt0_rom_isr.asm"
 
 ; ########  END OF ROM INTERRUPT HANDLER ######## 
 
 PUBLIC zx_internal_cls
 zx_internal_cls:
-        ld      hl,$4000        ; cls
-        ld      d,h
-        ld      e,l
-        inc     de
-        ld      (hl),0
-        ld      bc,$1800
-        ldir
-        ld      (hl),a
-        ld      bc,768
-        ldir
-        rrca
-        rrca
-        rrca
-        out     (254),a
-        ret
+    ld      hl,$4000        ; cls
+    ld      d,h
+    ld      e,l
+    inc     de
+    ld      (hl),0
+    ld      bc,$1800
+    ldir
+    ld      (hl),a
+    ld      bc,768
+    ldir
+    rrca
+    rrca
+    rrca
+    out     (254),a
+    ret
 
 
 ELSE
@@ -234,34 +228,33 @@ l_dcal: jp      (hl)            ;Used for function pointer calls
 ; Runtime selection
 
 IF NEED_fzxterminal
-        PUBLIC          fputc_cons
-        PUBLIC          _fputc_cons
-	PUBLIC		_fgets_cons_erase_character
-	PUBLIC		fgets_cons_erase_character
-        EXTERN          fputc_cons_fzx
-        EXTERN          fgets_cons_erase_character_fzx
-        defc DEFINED_fputc_cons = 1
-        defc fputc_cons = fputc_cons_fzx
-        defc _fputc_cons = fputc_cons_fzx
-        defc fgets_cons_erase_character = fgets_cons_erase_character_fzx
-        defc _fgets_cons_erase_character = fgets_cons_erase_character_fzx
+    PUBLIC  fputc_cons
+    PUBLIC  _fputc_cons
+    PUBLIC  _fgets_cons_erase_character
+    PUBLIC  fgets_cons_erase_character
+    EXTERN  fputc_cons_fzx
+    EXTERN  fgets_cons_erase_character_fzx
+    defc    DEFINED_fputc_cons = 1
+    defc    fputc_cons = fputc_cons_fzx
+    defc    _fputc_cons = fputc_cons_fzx
+    defc    fgets_cons_erase_character = fgets_cons_erase_character_fzx
+    defc    _fgets_cons_erase_character = fgets_cons_erase_character_fzx
 ENDIF
 
-	INCLUDE	"crt/classic/crt_runtime_selection.asm"
+    INCLUDE	"crt/classic/crt_runtime_selection.asm"
 
 ;---------------------------------------------
 ; Some +3 stuff - this needs to be below 49152
 ;---------------------------------------------
 IF DEFINED_NEEDresidos
-        INCLUDE "target/zx/def/idedos.def"
+    INCLUDE "target/zx/def/idedos.def"
 
-        defc    ERR_NR=$5c3a            ; BASIC system variables
-        defc    ERR_SP=$5c3d
+    defc    ERR_NR=$5c3a            ; BASIC system variables
+    defc    ERR_SP=$5c3d
 
-	
-        PUBLIC    dodos
-	EXTERN	dodos_residos
-	defc	dodos = dodos_residos
+    PUBLIC    dodos
+    EXTERN  dodos_residos
+    defc    dodos = dodos_residos
 
 ; Detect an installed version of ResiDOS.
 ;
@@ -278,35 +271,35 @@ IF DEFINED_NEEDresidos
 ; or error 0 (OK) if ResiDOS v1.20+ is present. Therefore, we need
 ; to trap any errors here.
 residos_detect:
-        ld      hl,(ERR_SP)
-        push    hl                      ; save the existing ERR_SP
-        ld      hl,detect_error
-        push    hl                      ; stack error-handler return address
-        ld      hl,0
-        add     hl,sp
-        ld      (ERR_SP),hl             ; set the error-handler SP
-        rst     RST_HOOK                ; invoke the version info hook code
-        defb    HOOK_VERSION
-        pop     hl                      ; ResiDOS doesn't return, so if we get
-        jr      noresidos               ; here, some other hardware is present
+    ld      hl,(ERR_SP)
+    push    hl                      ; save the existing ERR_SP
+    ld      hl,detect_error
+    push    hl                      ; stack error-handler return address
+    ld      hl,0
+    add     hl,sp
+    ld      (ERR_SP),hl             ; set the error-handler SP
+    rst     RST_HOOK                ; invoke the version info hook code
+    defb    HOOK_VERSION
+    pop     hl                      ; ResiDOS doesn't return, so if we get
+    jr      noresidos               ; here, some other hardware is present
 detect_error:
-        pop     hl
-        ld      (ERR_SP),hl             ; restore the old ERR_SP
-        ld      a,(ERR_NR)
-        inc     a                       ; is the error code now "OK"?
-        jr      nz,noresidos            ; if not, ResiDOS was not detected
-        ex      de,hl                   ; get HL=ResiDOS version
-        push    hl                      ; save the version
-        ld      de,$0140                ; DE=minimum version to run with
-        and     a
-        sbc     hl,de
-        pop     bc                      ; restore the version to BC
-       ret     nc                      ; and return with it if at least v1.40
+    pop     hl
+    ld      (ERR_SP),hl             ; restore the old ERR_SP
+    ld      a,(ERR_NR)
+    inc     a                       ; is the error code now "OK"?
+    jr      nz,noresidos            ; if not, ResiDOS was not detected
+    ex      de,hl                   ; get HL=ResiDOS version
+    push    hl                      ; save the version
+    ld      de,$0140                ; DE=minimum version to run with
+    and     a
+    sbc     hl,de
+    pop     bc                      ; restore the version to BC
+    ret     nc                      ; and return with it if at least v1.40
 noresidos:
-        ld      bc,0                    ; no ResiDOS
-        ld      a,$ff
-        ld      (ERR_NR),a              ; clear error
-        ret
+    ld      bc,0                    ; no ResiDOS
+    ld      a,$ff
+    ld      (ERR_NR),a              ; clear error
+    ret
 
 
 ENDIF
@@ -316,22 +309,22 @@ ENDIF
 ; Call a routine in the spectrum ROM
 ; The routine to call is stored in the two bytes following
 call_rom3:
-        exx                      ; Use alternate registers
+    exx                      ; Use alternate registers
 IF DEFINED_NEED_ZXMMC
-        push    af
-        xor     a                ; standard ROM
-        out     ($7F),a          ; ZXMMC FASTPAGE
-        pop     af
+    push    af
+    xor     a                ; standard ROM
+    out     ($7F),a          ; ZXMMC FASTPAGE
+    pop     af
 ENDIF
-        ex      (sp),hl          ; get return address
-        ld      c,(hl)
-        inc     hl
-        ld      b,(hl)           ; BC=BASIC address
-        inc     hl
-        ex      (sp),hl          ; restore return address
-        push    bc
-        exx                      ; Back to the regular set
-        ret
+    ex      (sp),hl          ; get return address
+    ld      c,(hl)
+    inc     hl
+    ld      b,(hl)           ; BC=BASIC address
+    inc     hl
+    ex      (sp),hl          ; restore return address
+    push    bc
+    exx                      ; Back to the regular set
+    ret
 
         
 
@@ -362,37 +355,32 @@ ENDIF
 
 ; If we were given an address for the BSS then use it
 IF DEFINED_CRT_ORG_BSS
-	defc	__crt_org_bss = CRT_ORG_BSS
+    defc    __crt_org_bss = CRT_ORG_BSS
 ENDIF
 
-	INCLUDE	"crt/classic/crt_section.asm"
+; Create a dedicated contended section
+IF CRT_ORG_CODE < 32768
+    SECTION CONTENDED
+ENDIF
 
-	SECTION	code_crt_init
-        ld      a,@111000       ; White PAPER, black INK
-        ld      ($5c48),a       ; BORDCR
-        ld      ($5c8d),a       ; ATTR_P
-        ld      ($5c8f),a       ; ATTR_T
+    INCLUDE	"crt/classic/crt_section.asm"
 
-	SECTION bss_crt
+    SECTION	code_crt_init
+    ld      a,@111000       ; White PAPER, black INK
+    ld      ($5c48),a       ; BORDCR
+    ld      ($5c8d),a       ; ATTR_P
+    ld      ($5c8f),a       ; ATTR_T
+
+    SECTION bss_crt
 IF startup=2
-	PUBLIC  romsvc
+    PUBLIC  romsvc
 _FRAMES:        defs    3
 romsvc:         defs    10  ; Pointer to the end of the sysdefvars
                             ; used by the ROM version of some library
 ENDIF
 
 
-	SECTION rodata_clib
-; Default block size for "gendos.lib"
-; every single block (up to 36) is written in a separate file
-; the bigger RND_BLOCKSIZE, bigger can be the output file size
-; but this comes at cost of the malloc'd space for the internal buffer
-; Current block size is kept in a control block (just a structure saved
-; in a separate file, so changing this value
-; at runtime before creating a file is perfectly legal.
-_RND_BLOCKSIZE: defw    1000
-
-
+IF __MMAP != -1
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    ; Define Memory Banks
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -478,4 +466,4 @@ _RND_BLOCKSIZE: defw    1000
    SECTION CODE_7
    SECTION RODATA_7
    SECTION BANK_7_END
-
+ENDIF

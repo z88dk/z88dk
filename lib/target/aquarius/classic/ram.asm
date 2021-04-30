@@ -36,9 +36,6 @@ start:
 
         call    _main		;Call user program
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
     call    crt0_exit
 
 

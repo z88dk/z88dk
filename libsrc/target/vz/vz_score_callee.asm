@@ -11,7 +11,7 @@
 SECTION code_clib
 PUBLIC vz_score_callee
 PUBLIC _vz_score_callee
-EXTERN ASMDISP_VZ_SCORE_CALLEE
+EXTERN asm_vz_score
 
 .vz_score_callee
 ._vz_score_callee
@@ -24,7 +24,7 @@ EXTERN ASMDISP_VZ_SCORE_CALLEE
    ;  c = byte
    ; de = addr
    
-.asmentry
+.asm_vz_score
 
    ld a,c                    ; bc = 5*c
    add a,a
@@ -90,4 +90,3 @@ EXTERN ASMDISP_VZ_SCORE_CALLEE
    
    defb $3f, $33, $3f, $03, $3f
 
-DEFC ASMDISP_VZ_SCORE_CALLEE = asmentry - vz_score_callee

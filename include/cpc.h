@@ -252,13 +252,13 @@ extern char __LIB__    *cpc_rsx_strcpy_callee(char *, char *)  __smallc __z88dk_
 #define cpc_rsx_strcpy(a,b) cpc_rsx_strcpy_callee(a,b)
 
 // Data decompression, PUcrunch format
-extern void __LIB__              cpc_Uncrunch(char *, char *) __smallc ;
-extern void __LIB__    cpc_Uncrunch_callee(char *, char *)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_Uncrunch(void *src, void *dest) __smallc ;
+extern void __LIB__    cpc_Uncrunch_callee(void *, void *)  __smallc __z88dk_callee;
 #define cpc_Uncrunch(a,b) cpc_Uncrunch_callee(a,b)
 
 // Data decompression, Exomizer 2 format
-extern void __LIB__              cpc_UnExo(char *, char *) __smallc ;
-extern void __LIB__    cpc_UnExo_callee(char *, char *)  __smallc __z88dk_callee;
+extern void __LIB__              cpc_UnExo(void *src, void *dest) __smallc ;
+extern void __LIB__    cpc_UnExo_callee(void *, void *)  __smallc __z88dk_callee;
 #define cpc_UnExo(a,b) cpc_UnExo_callee(a,b)
 
 // Call RSX/Bar command

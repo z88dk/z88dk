@@ -4,8 +4,8 @@
 SECTION code_clib
 PUBLIC adt_ListPrepend_callee
 PUBLIC _adt_ListPrepend_callee
-PUBLIC ASMDISP_ADT_LISTPREPEND_CALLEE
-PUBLIC ASMDISP_ADT_LISTPREPEND2
+PUBLIC asm_adt_ListPrepend
+PUBLIC asm_adt_ListPrepend2
 
 EXTERN ADTemptylistadd
 EXTERN _u_malloc
@@ -18,7 +18,7 @@ EXTERN _u_malloc
    pop de
    push hl
 
-.asmentry
+.asm_adt_ListPrepend
 
 ; enter: de = struct adt_List *
 ;        bc = item *
@@ -58,6 +58,7 @@ EXTERN _u_malloc
 
    inc hl                 ; hl = LIST.state, de = new NODE.next, list count & item done
 
+.asm_adt_ListPrepend2
 .ADTListPrepend2
 
    ld (hl),1              ; current INLIST
@@ -96,5 +97,3 @@ EXTERN _u_malloc
    scf
    ret
 
-DEFC ASMDISP_ADT_LISTPREPEND_CALLEE = asmentry - adt_ListPrepend_callee
-DEFC ASMDISP_ADT_LISTPREPEND2 = ADTListPrepend2 - adt_ListPrepend_callee

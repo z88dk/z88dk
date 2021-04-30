@@ -15,7 +15,7 @@
 SECTION code_clib
 PUBLIC	zx_setstr_callee
 PUBLIC	_zx_setstr_callee
-PUBLIC	ASMDISP_ZX_SETSTR_CALLEE
+PUBLIC	asm_zx_setstr
 EXTERN	call_rom3
 
 zx_setstr_callee:
@@ -29,7 +29,7 @@ _zx_setstr_callee:
 ; enter : hl = char *value
 ;          e = char variable
 
-.asmentry
+.asm_zx_setstr
 	push	ix		;save callers ix - rom may corrupt it	
 	ld	a,e
 	and	95
@@ -130,4 +130,3 @@ ENDIF
 	ret
 	
 
-DEFC ASMDISP_ZX_SETSTR_CALLEE = asmentry - zx_setstr_callee

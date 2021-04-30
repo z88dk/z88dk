@@ -21,13 +21,13 @@
 	call	dlt
 	ld	a,h
 	or	l
-	jp	z,i_2
+	jp	z,i_2	;
 	ld	hl,i_1+0
 	push	hl
 	ld	a,1
 	call	printf
 	pop	bc
-	jp	i_3
+	jp	i_3	;EOS
 .i_2
 	ld	hl,i_1+6
 	push	hl
@@ -43,13 +43,13 @@
 	call	dgt
 	ld	a,h
 	or	l
-	jp	z,i_4
+	jp	z,i_4	;
 	ld	hl,i_1+0
 	push	hl
 	ld	a,1
 	call	printf
 	pop	bc
-	jp	i_5
+	jp	i_5	;EOS
 .i_4
 	ld	hl,i_1+6
 	push	hl
@@ -96,7 +96,7 @@
 	GLOBAL	chdir
 	GLOBAL	getwd
 	GLOBAL	rmdir
-	GLOBAL	_RND_BLOCKSIZE
+	GLOBAL	__RND_BLOCKSIZE
 	GLOBAL	rnd_loadblock
 	GLOBAL	rnd_saveblock
 	GLOBAL	rnd_erase

@@ -131,8 +131,13 @@ setfc0:
 	;;LD 	c,gsuser  ;else get current effective user number
 	ld	c,32
 	LD 	e,0ffh
-	call	5	;get current user area if implemented
-
+IF !__CPU_INTEL__
+	push	ix
+	call	5
+	pop	ix
+ELSE
+	call	5
+ENDIF
 
 	pop	DE	;restore text pointer
 setfc1:

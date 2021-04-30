@@ -29,9 +29,9 @@
 	inc	hl
 	ld	(hl),a
 	inc	hl
-	ld	(hl),+(16416 % 256)
+	ld	(hl),32
 	inc	hl
-	ld	(hl),+(16416 / 256)
+	ld	(hl),64
 	ld	hl,0	;const
 	add	hl,sp
 	call	l_glong

@@ -126,6 +126,13 @@ extern void __LIB__ *memset(void *s,int c,size_t n) __smallc;
 extern void __LIB__ *memset_callee(void *s,int c,size_t n) __smallc __z88dk_callee;
 #define memset(a,b,c) memset_callee(a,b,c)
 
+/* memset_wr() is less optimised than memset, but should be used when the
+ * area being cleared can't be read (eg VRAM in certain machines)
+ */
+extern void __LIB__ *memset_wr(volatile void *s,int c,size_t n) __smallc;
+extern void __LIB__ *memset_wr_callee(volatile void *s,int c,size_t n) __smallc __z88dk_callee;
+#define memset_wr(a,b,c) memset_wr_callee(a,b,c)
+
 
 extern void __LIB__ *memswap(void *s1,void *s2,size_t n) __smallc;
 extern void __LIB__ *memswap_callee(void *s1,void *s2,size_t n) __smallc __z88dk_callee;
@@ -399,7 +406,7 @@ extern far char __LIB__ *strdup_far(far char *);
    #define memset(a,b,c)   __builtin_memset(a,b,c)
    extern void __LIB__    *__builtin_memset(void *dst, int c, size_t n) __smallc;
    #endif
-   
+
    #ifndef __DISABLE_BUILTIN_MEMCPY
    #undef  memcpy
    #define memcpy(a,b,c)   __builtin_memcpy(a,b,c)

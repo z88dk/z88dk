@@ -26,7 +26,7 @@ define(`__BANK_SP', 0x003B)                         # location of each bank SP w
 # This will help when user banking is used, as all I/O is via system RAM
 
 define(`__COMMON_AREA_1_BASE', 0xF000)              # Base address of COMMON AREA 1
-define(`__COMMON_AREA_1_PHASE_DATA_SIZE', 0x0580)   # Size allowance for COMMON AREA 1 PHASE DATA
+define(`__COMMON_AREA_1_PHASE_DATA_SIZE', 0x05A0)   # Size allowance for COMMON AREA 1 PHASE DATA
 
 define(`__COMMON_AREA_1_PHASE_DATA', 0x`'eval(__COMMON_AREA_1_BASE,16))    # Origin of COMMON AREA 1 Data
 define(`__COMMON_AREA_1_PHASE_DRIVER', 0x`'eval(__COMMON_AREA_1_BASE+__COMMON_AREA_1_PHASE_DATA_SIZE,16))  # Origin of COMMON AREA 1 Drivers, after CA1 Data

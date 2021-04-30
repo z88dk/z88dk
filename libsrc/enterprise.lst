@@ -20,12 +20,14 @@ target/enterprise/enterprise/exos_display_page
 target/enterprise/enterprise/exos_open_channel
 target/enterprise/enterprise/exos_open_channel_callee
 target/enterprise/enterprise/exos_read_block
+target/enterprise/enterprise/exos_read_block_callee
 target/enterprise/enterprise/exos_read_character
 target/enterprise/enterprise/exos_redirect_channel
 target/enterprise/enterprise/exos_redirect_channel_callee
 target/enterprise/enterprise/exos_system_reset
 target/enterprise/enterprise/exos_system_status
 target/enterprise/enterprise/exos_write_block
+target/enterprise/enterprise/exos_write_block_callee
 target/enterprise/enterprise/exos_write_character
 target/enterprise/enterprise/exos_write_character_callee
 target/enterprise/enterprise/get_exos_variable

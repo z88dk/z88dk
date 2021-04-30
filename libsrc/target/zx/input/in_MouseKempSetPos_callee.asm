@@ -4,8 +4,8 @@
 SECTION code_clib
 PUBLIC in_MouseKempSetPos_callee
 PUBLIC _in_MouseKempSetPos_callee
-PUBLIC ASMDISP_IN_MOUSEKEMPSETPOS_CALLEE
-PUBLIC CDISP_IN_MOUSEKEMPSETPOS_CALLEE
+PUBLIC asm_in_MouseKempSetPos
+PUBLIC centry_in_MouseKempSetPos
 
 EXTERN INMouseKemp
 EXTERN _in_KempcoordX, _in_KempcoordY
@@ -17,7 +17,7 @@ EXTERN _in_KempcoordX, _in_KempcoordY
    pop bc
    ex (sp),hl
 
-.centry
+.centry_in_MouseKempSetPos
 
 ; bc = ycoord
 ; hl = xcoord
@@ -45,7 +45,7 @@ EXTERN _in_KempcoordX, _in_KempcoordY
 
    ld c,l
    
-.asmentry
+.asm_in_MouseKempSetPos
 
 ; enter: C = x coord 0..255
 ;        B = y coord 0..191
@@ -61,5 +61,3 @@ EXTERN _in_KempcoordX, _in_KempcoordY
 
    ret
 
-DEFC ASMDISP_IN_MOUSEKEMPSETPOS_CALLEE = asmentry - in_MouseKempSetPos_callee
-DEFC CDISP_IN_MOUSEKEMPSETPOS_CALLEE = centry - in_MouseKempSetPos_callee

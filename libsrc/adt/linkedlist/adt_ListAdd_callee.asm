@@ -4,14 +4,12 @@
 SECTION code_clib
 PUBLIC adt_ListAdd_callee
 PUBLIC _adt_ListAdd_callee
-PUBLIC ASMDISP_ADT_LISTADD_CALLEE
+PUBLIC asm_adt_ListAdd
 EXTERN _u_malloc
 
-EXTERN adt_ListPrepend_callee
-EXTERN ASMDISP_ADT_LISTPREPEND2
+EXTERN asm_adt_ListPrepend2
 
-EXTERN adt_ListAppend_callee
-EXTERN ASMDISP_ADT_LISTAPPEND2
+EXTERN asm_adt_ListAppend2
 
 EXTERN ADTemptylistadd
 
@@ -23,7 +21,7 @@ EXTERN ADTemptylistadd
    pop de
    push hl
 
-.asmentry
+.asm_adt_ListAdd
 
    ; enter: de = struct adt_List *
    ;        bc = item *
@@ -64,9 +62,9 @@ EXTERN ADTemptylistadd
    inc hl                    ; hl = LIST.state, de = new NODE.next, list count & item done
    ld a,(hl)
    or a
-   jp z, adt_ListPrepend_callee + ASMDISP_ADT_LISTPREPEND2  ; if current points before start of list
+   jp z, asm_adt_ListPrepend2  ; if current points before start of list
    dec a
-   jp nz, adt_ListAppend_callee + ASMDISP_ADT_LISTAPPEND2   ; if current points past end of list
+   jp nz, asm_adt_ListAppend2   ; if current points past end of list
    inc hl                    ; hl = LIST.current
 
    ; adding into non-empty list -- insert after current item
@@ -135,4 +133,3 @@ EXTERN ADTemptylistadd
    scf
    ret
 
-DEFC ASMDISP_ADT_LISTADD_CALLEE = asmentry - adt_ListAdd_callee

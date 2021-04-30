@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC l_bsearch_callee
 PUBLIC _l_bsearch_callee
-PUBLIC ASMDISP_L_BSEARCH_CALLEE
+PUBLIC asm_l_bsearch
 EXTERN Lbsearch, l_jpiy
 
 .l_bsearch_callee
@@ -17,7 +17,7 @@ EXTERN Lbsearch, l_jpiy
    pop bc
    push af
 
-.centry
+.asm_l_bsearch
 
    ld ix,compare
    jp Lbsearch
@@ -34,4 +34,3 @@ EXTERN Lbsearch, l_jpiy
    pop de
    ret
 
-DEFC ASMDISP_L_BSEARCH_CALLEE = centry - l_bsearch_callee

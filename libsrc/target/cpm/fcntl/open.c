@@ -16,7 +16,7 @@
  *      O_TRUNC = 512
  *
  * -----
- * $Id: open.c,v 1.2 2016-06-13 19:55:47 dom Exp $
+ * $Id: open.c $
  */
 
 #include <cpm.h>
@@ -36,35 +36,38 @@ int open(char *name, int flags, mode_t mode)
     if ( setfcb(fc,name) == 0 ) {  /* We had a real file, not a device */
         if ( (flags & O_RDONLY) && bdos(CPM_VERS,0) >= 0x30 )
             fc->name[5] |= 0x80;    /* read only mode */
-        uid = getuid();
-        setuid(fc->uid);
-        if ( (flags & O_TRUNC) == O_TRUNC)
+        uid = swapuid(fc->uid);
+        if (flags & O_TRUNC)
             remove(name);
 		
         if ( bdos(CPM_OPN,fc) == -1 ) {
             clearfcb(fc);
-            setuid(uid);
             if ( (flags & 0xff))  { /* If returned error and writer then create */
                 fd = creat(name,0);
+                swapuid(fd);
                 if ( fd == -1 )
                     return -1;
                 fc = &_fcb[fd];
                 fc->use = (flags + 1 ) & 0xff;
                 return fd;
             }
+            swapuid(uid);
             return -1;   /* An error */
         }
 
-        setuid(uid);
+        swapuid(uid);
         fc->use = (flags + 1 ) & 0xff;
     }
 	
 	/* we keep an extra byte in the FCB struct to support random access,
 	   but at the moment we use only a "TEXT/BINARY" discrimination flag */
+
 	fc->mode = mode & _IOTEXT;
 
     fd =  (fc - &_fcb[0]);
-    if (flags & O_APPEND)
+    if (flags & O_APPEND) {
+		fc->use=U_RDWR;
         lseek(fd,0L,SEEK_END);
+	}
     return fd;
 }

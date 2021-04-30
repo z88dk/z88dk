@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC im2_RemoveHook_callee
 PUBLIC _im2_RemoveHook_callee
-PUBLIC ASMDISP_IM2_REMOVEHOOK_CALLEE
+PUBLIC asm_im2_RemoveHook
 EXTERN IM2RemoveHook
 
 .im2_RemoveHook_callee
@@ -14,12 +14,10 @@ EXTERN IM2RemoveHook
    pop de
    ex (sp),hl
 
-.asmentry
+.asm_im2_RemoveHook
 
    call IM2RemoveHook
    ld hl,0
    ret nc
    inc l
    ret
-
-DEFC ASMDISP_IM2_REMOVEHOOK_CALLEE = asmentry - im2_RemoveHook_callee

@@ -39,7 +39,7 @@
  *   The scancode is used by in_KeyPressed and in_JoyKeyboard
  *   to scan the keyboard.
  *
- * uint in_Pause(uint msec)
+ * uint in_Pause(uint msec) (+zx/+ts2068 Only)
  *   Pause for a period of time measured in milliseconds.
  *   Return early if a key is pressed, reporting the amount of
  *   time remaining.  This must be a busy wait interval; resist
@@ -47,10 +47,10 @@
  *   with interrupts disabled.  If msec==0 wait until key
  *   is pressed.
  *
- * void in_Wait(unit msec)
+ * void in_Wait(unit msec) (+zx/+ts2068 Only)
  *   Similar to in_Pause but waits the entire period.
  *
- * void in_WaitForKey(void)
+ * void in_WaitForKey(void) 
  *   Wait until any key is pressed.
  *
  * void in_WaitForNoKey(void)
@@ -169,11 +169,15 @@ struct in_UDK {        /* user defined keys structure         */
 extern uint __LIB__  in_JoyKeyboard(struct in_UDK *u) __z88dk_fastcall;
 
 #ifdef SPECTRUM
-   #include <spectrum.h>
+   #include <arch/zx/spectrum.h>
 /*
    Adds: 1 in_JoyKempston, 2 in_JoySinclair1, 3 in_JoySinclair2,
          4 in_JoyFuller,   5 in_JoyTimex1,    6 in_JoyTimex2
 */
+#endif
+#ifdef __SAM__
+   #include <arch/sam.h>
+   // Adds in_Joystick1/in_Joystick2
 #endif
 
 
@@ -297,7 +301,7 @@ extern void __LIB__  in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uin
 #define in_MouseSim(a,b,c,d)      in_MouseSim_callee(a,b,c,d)
 #define in_MouseSimSetPos(a,b,c)  in_MouseSimSetPos_callee(a,b,c)
 
-#ifdef SPECTRUM
+#ifdef __SPECTRUM__
    #define IN_MAX_X    255  /* largest x coord  */
    #define IN_MAX_Y    191  /* largest y coord  */
    #include <spectrum.h>
@@ -308,6 +312,11 @@ extern void __LIB__  in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uin
    Both the AMX mouse and the Kempston mouse require variables to be declared,
    see spectrum.h for details.
 */
+#endif
+
+#ifdef __SAM__
+
+   #define IN_MAX_Y    191  /* largest y coord  */
 #endif
 
 

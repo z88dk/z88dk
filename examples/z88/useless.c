@@ -80,7 +80,7 @@ void  handlecmds(int cmd)
         }
 }
 
-#include <dor.h>
+#include <arch/z88/dor.h>
 
 #define HELP1   "A pointless demo application made with z88dk"
 #define HELP2   "Simply loops, points out menu selections and dies"
@@ -131,6 +131,6 @@ void  handlecmds(int cmd)
 #define TOPIC2_1HELP1    "Go on, leave me now!"
 
 
-#include <application.h>
+#include <arch/z88/application.h>
 
 /* THE END! */

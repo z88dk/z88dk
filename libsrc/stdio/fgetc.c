@@ -37,10 +37,12 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
     inc     de
     ld      a,(de)	;de = &fp_flags get flags
     and     a
+  IF __CPU_GBZ80__
+    jr      z,fgetc_assign_ret
+  ELSE
     ret     z
-	;	Check removed to allow READ+WRITE streams
-    ;and     _IOWRITE | _IOEOF	;check we`re not write/EOF
-	and     _IOEOF	;check we`re not write/EOF
+  ENDIF
+    and     _IOEOF	;check we`re not write/EOF
   IF __CPU_GBZ80__
     jr      nz,fgetc_assign_ret
   ELSE
@@ -98,25 +100,46 @@ fgetc_assign_ret:
     call    fchkstd	;check for stdin (stdout/err have failed already)
     pop     de	;ix back
     jr      c,no_stdin
-    call    fgetc_cons	;get from console
-    ret			;always succeeds - never EOF
+    call    fgetc_cons  ;get from console
+    ret	                ;always succeeds - never EOF
 .no_stdin
     ex      de,hl
     ld      e,(hl)
-    inc     hl		;fp_desc+1
+    inc     hl      ;fp_desc+1
     ld      d,(hl)
-    dec     hl		;fp_desc
+    dec     hl      ;fp_desc
     ex      de,hl
     push    de
-    call    readbyte	;readbyte sorts out stack (fastcall)
-    pop     de		;get fp back
+    call    readbyte    ;readbyte sorts out stack (fastcall)
+    pop     de          ;get fp back
   IF __GBZ80__
     jr      nc,fgetc_assign_ret
   ELSE
-    ret	nc		;no error so return (make sure other
-    			;implementations respect this!)
+#ifdef __STDIO_BINARY
+    push    de
+    inc     de
+    inc     de          ;de = &flags
+    ld      a,(de)
+    pop     de  
+    and     _IOTEXT     ;check for text mode
+    jr      z,not_text_fp
+    ld      a,l
+#ifdef __STDIO_EOFMARKER
+    cp      __STDIO_EOFMARKER	;compare with the EOF marker
+    jp      z,seteof
+#endif
+#ifdef __STDIO_CRLF
+    cp      13
+    jr      z,no_stdin		; Read again
+#endif
+#endif
+not_text_fp:
+    ld      a,h
+    inc     h
+    ret     nz
   ENDIF
 .seteof
+    ld      hl,-1
     inc     de	
     inc     de		;fp_flags
     ld      a,(de)

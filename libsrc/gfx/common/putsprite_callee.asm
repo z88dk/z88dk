@@ -12,7 +12,7 @@ SECTION code_graphics
 PUBLIC putsprite_callee
 PUBLIC _putsprite_callee
 
-	EXTERN     putsprite
+	EXTERN    putsprite
 	EXTERN	   __graphics_retaddr
 
 .putsprite_callee
@@ -24,12 +24,12 @@ PUBLIC _putsprite_callee
 	jp (hl)
 	
 .retaddr
-		pop bc ; *sprite
-		pop bc
-		pop bc
-		pop bc	; ortype
-		ld	hl,(__graphics_retaddr)
-		jp (hl)
+    pop bc ; *sprite
+    pop bc
+    pop bc
+    pop bc	; ortype
+    ld	hl,(__graphics_retaddr)
+    jp (hl)
 
 
 ENDIF

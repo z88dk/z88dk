@@ -15,9 +15,8 @@
 SECTION code_clib
 PUBLIC	opus_putsect_callee
 PUBLIC	_opus_putsect_callee
-;PUBLIC	ASMDISP_OPUS_PUTSECT_CALLEE
 
-PUBLIC	opus_putsect_asmentry
+PUBLIC	asm_opus_putsect
 
 	EXTERN	opus_rommap
 	EXTERN	P_DEVICE
@@ -32,7 +31,7 @@ _opus_putsect_callee:
 	push af
 
 
-opus_putsect_asmentry:
+asm_opus_putsect:
 
 
 	call	opus_rommap
@@ -46,4 +45,3 @@ opus_putsect_asmentry:
 	ld		hl,0
 	ret
 
-;DEFC ASMDISP_OPUS_PUTSECT_CALLEE = opus_putsect_asmentry - opus_putsect_callee

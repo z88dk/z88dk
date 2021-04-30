@@ -5,6 +5,8 @@ target/msx/stdio/fputc_cons
 @stdio/ansicore.lst
 @stdio/stdio_binary.lst
 target/msx/time/clock
+target/msx/time/time
+target/msx/time/target_read_structtm
 @target/cpm/fcntl/fcntl.lst
 @video/tms9918/video_tms9918.lst
 @gfx/narrow/gfx_narrow.lst

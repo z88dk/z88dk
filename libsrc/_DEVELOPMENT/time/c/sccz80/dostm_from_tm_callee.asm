@@ -13,3 +13,10 @@ dostm_from_tm_callee:
    ex (sp),hl
    
    jp asm_dostm_from_tm
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _dostm_from_tm_callee
+defc _dostm_from_tm_callee = dostm_from_tm_callee
+ENDIF
+

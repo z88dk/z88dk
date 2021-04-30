@@ -9,7 +9,7 @@
 ;	... no timestamp, just opens a file creating it if necessary and closes it immediately.
 ;	A temp buffer in the BASIC area is created and destroyed, so don't locate your code too low.
 ;	
-;	$Id: if1_touch_file.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;	$Id: if1_touch_file.asm $
 ;
 
 		SECTION code_clib
@@ -20,6 +20,8 @@
 
 if1_touch_file:
 _if1_touch_file:
+
+		;; TODO:  check for possible IX corruption here
 		rst	8
 		defb 	31h		; Create Interface 1 system vars if required
 
@@ -29,10 +31,16 @@ _if1_touch_file:
 		push	bc
 		push	de
 		push	hl
-		push	ix	;save callers
 
-		ld	a,c
+		ld      a,c
+		ld      hl,-1
+		and     a               ; drive no. = 0 ?
+		ret     z               ; yes, return -1
+		cp      9               ; drive no. >8 ?
+		ret     nc              ; yes, return -1
 		ld	($5cd6),a
+
+		push	ix	;save callers
 			
 		push	de
 		ld	hl,filename	; filename location

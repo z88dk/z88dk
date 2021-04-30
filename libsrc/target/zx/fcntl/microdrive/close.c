@@ -1,11 +1,11 @@
 /*
  *	Close a file on Microdrive
- *	Stefano Bodrato - Feb. 2005
+ *	Stefano Bodrato - Feb. 2005..2021
  *
  *	int close(int handle)
  *	closes file and frees memory
  *
- *	$Id: close.c,v 1.3 2014-01-20 09:15:31 stefano Exp $
+ *	$Id: close.c $
  */
 
 #include <fcntl.h>
@@ -14,17 +14,23 @@
 //#include <stdio.h>
 #include <malloc.h>
 
-int close(int handle)
+
+int close(int fd)
 {
 
-/* DEBUG - experiments to see how the M_CHAN structure survived
-struct M_CHAN * if1_file;
-if1_file = (char *) handle;
-printf ("-- closing '%s' - %u --",if1_getname( (char *) if1_file->hdname ), handle);
-*/
+struct M_CHAN *if1_file;
 
-free(handle);
-return 0;
+	if1_file = (void *) fd;
 
+	if ((if1_file)->flags & 0xff)	// Are we WRITING ?
+	{
+		// TODO: avoiding leaving EOF halfway in the file
+		if1_file->recflg |= 2;	// Set EOF bit on last record
+		// This will overwrite/finalize the current sector.
+		if1_write_sector (if1_file->drive, if1_file->sector, if1_file);
+	}
+
+	free(fd);
+	return 0;
 }
 

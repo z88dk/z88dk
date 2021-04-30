@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC bpoke
 PUBLIC _bpoke
-EXTERN bpoke_callee
-EXTERN ASMDISP_BPOKE_CALLEE
+EXTERN asm_bpoke
 
 .bpoke
 ._bpoke
@@ -16,5 +15,5 @@ EXTERN ASMDISP_BPOKE_CALLEE
    push de
    push af
    
-   jp bpoke_callee + ASMDISP_BPOKE_CALLEE
+   jp asm_bpoke
 

@@ -22,6 +22,7 @@ Type   *type_ulonglong = &(Type){ KIND_LONGLONG, 8, 1, .len=1 };
 static namespace  *namespaces = NULL;
 
 
+
 static void parse_namespace(Type *type);
 
 static int32_t needsub(void)
@@ -252,7 +253,7 @@ Type *make_array(Type *base_type,int32_t len)
     type->kind = KIND_ARRAY;
     type->ptr = base_type;
     type->len = len;
-    if ( len != - 1 ) {
+    if ( len > 0 ) {
         type->size = len * base_type->size;
     } else {
         type->size = -1;
@@ -493,6 +494,8 @@ static int chase_typedef(Type *type)
             /* So we've identified it, we should copy it */
             *type = *ptr->ctype;
             type->isconst |= wasconst;
+            if ( type->tag && type->size == -1) 
+                type->size = type->tag->size;
             return 0;
         }
     }
@@ -517,6 +520,7 @@ static Type *parse_type(void)
         type->isconst = 1;
     } 
     if (swallow("volatile")) {
+        type->isvolatile = 1;
         //warningfmt("unsupported-feature","Volatile type not supported by compiler");
     }
 
@@ -1543,6 +1547,10 @@ void type_describe(Type *type, UT_string *output)
     if ( type->isconst ) {
         utstring_printf(output,"const ");
     }
+
+    if ( type->isvolatile ) {
+        utstring_printf(output,"volatile ");
+    }
    
     switch ( type->kind ) {
     case KIND_NONE:
@@ -1614,10 +1622,62 @@ void type_describe(Type *type, UT_string *output)
 }
 
 /**
+ * Check that we can assign two pointers
+ * 
+ * We can assign two pointers if:
+ * 
+ * - Same type exactly
+ * - LHS is const void * and rhs is const * or just *
+ * - LHS is volatile void * and rhs is anything
+ */
+int type_matches_pointer(Type *t1, Type *t2)
+{
+    Type *p1, *p2;
+
+    if ( type_matches(t1, t2) ) {
+        return 1;
+    }
+
+    p1 = t1->ptr;
+    p2 = t2->ptr;
+
+    if ( p1 == NULL || p2 == NULL ) return 0;
+
+    // LHS is const void *, RHS is anything
+    if ( p1->kind == KIND_VOID ) {
+        if ( p1->isconst ) {
+            if (p1->isvolatile) {
+                return 1;
+            }
+            if (p2->isvolatile) {
+                return 0;
+            }
+        } else if (  p1->isvolatile == 0 && p2->isvolatile ) {
+            return 0;
+        }
+        return 1;
+    }
+
+
+    if ( p2->kind  == KIND_VOID ) {
+        if ( p1->isvolatile == 0 && p2->isvolatile)
+            return 0;
+        if ( p1->isconst == 0 && p2->isconst)
+            return 0;
+        return 1;
+    }
+
+    return 0;
+}
+
+/**
  * Performs a rough match of types (ignoring array lengths)
  * 
- * t1 = prototype
- * t2 = definition
+ * \param t1 = prototype/LHS
+ * \param t2 = definition/RHS
+ * 
+ * \retval 0 - Doesn't match
+ * \retval 1 - Does match
  */
 int type_matches(Type *t1, Type *t2)
 {
@@ -1662,10 +1722,9 @@ int type_matches(Type *t1, Type *t2)
     } else if ( t1->fields || t2->fields ) {
         return 0;
     }
-
-    if ( t1->funcattrs.oldstyle == 0 ) {                
+    if ( t1->funcattrs.oldstyle == 0 && t2->funcattrs.oldstyle == 0 ) {                
         if ( t1->parameters && t2->parameters) {
-            if ( array_len(t1->parameters) != array_len(t2->parameters))
+            if ( array_len(t1->parameters) != array_len(t2->parameters)) 
                 return 0;
             for ( i = 0; i < array_len(t1->parameters); i++ ) {
                 Type *t1f = array_get_byindex(t1->parameters, i);
@@ -1677,6 +1736,12 @@ int type_matches(Type *t1, Type *t2)
             return 0;
         }
     }
+
+    if ( t1->isvolatile == 0 && t2->isvolatile)
+        return 0;
+
+    if ( t1->isconst == 0 && t2->isconst)
+        return 0;
 
     /* If we get here then it's a good enough match */
     return 1;

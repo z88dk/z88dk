@@ -5,12 +5,11 @@
 ;
 
 
-        SECTION   code_clib
+SECTION   code_clib
 PUBLIC screen
 PUBLIC _screen
 
-EXTERN screen_callee
-EXTERN ASMDISP_screen_CALLEE
+EXTERN asm_screen
 
 screen:
 _screen:
@@ -21,4 +20,4 @@ _screen:
    push de
    push bc
    
-   jp screen_callee + ASMDISP_screen_CALLEE
+   jp asm_screen

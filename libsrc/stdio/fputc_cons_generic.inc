@@ -35,14 +35,14 @@
 ;  9 = right
 ; 10 = line feed
 ; 11 = up
-; 13 = down
+; 13 = cr
 ; 16, 32 +n = set ink
 ; 17, 32 +n = set paper
 ; 22,y+32,x+32 = Move to position
 
 
 		; Variables that can be adjusted by platform specific code
-		PUBLIC		generic_console_flags
+		EXTERN		generic_console_flags
 
 		EXTERN		generic_console_scrollup
 		EXTERN		generic_console_printc
@@ -402,13 +402,14 @@ clear_eos_loop:
 ENDIF
 
 
-handle_cr:
+handle_lf:
 	ld	a,(__console_h)
-	sub	b
-	jr	nc,handle_cr_no_need_to_scroll
 	dec	a
-	jr	nz,handle_cr_no_need_to_scroll
+	sub	b
+	jr	z,scrollit
+	jr	nc,handle_lf_no_need_to_scroll
 	; Check if scroll is enabled
+scrollit:
 IF __CPU_INTEL__
 	ld	a,(hl)
 	rlca
@@ -422,8 +423,9 @@ ENDIF
 	ld	a,(__console_h)
 	sub	2
 	ld	b,a
-handle_cr_no_need_to_scroll:
+handle_lf_no_need_to_scroll:
 	inc	b
+handle_cr:
 	ld	c,0
 	jp	store_coords
 
@@ -478,10 +480,13 @@ ENDIF
 	defw	left
 	defb	10, 10
 	defb	0
-	defw	handle_cr
+	defw	handle_lf
 	defb	12, 12
 	defb	0
 	defw	cls
+	defb	13, 13
+	defb	0
+	defw	handle_cr
 
 	defb	9, 'D'
 	defb	0
@@ -489,7 +494,7 @@ ENDIF
         defb	11, 'A'
 	defb	0
         defw	up
-        defb	13, 'B'
+        defb	255, 'B'
 	defb	0
         defw	down
 IF SUPPORT_vt52
@@ -562,10 +567,3 @@ ENDIF
 params_left:	defb	0		; Number of parameters left to read
 parameters:	defb	0		; We only have up-to two parameters
 parameter_processor:	defw	0	; Where we go to when we need to process
-
-generic_console_flags:		defb	0		; bit 0 = raw mode enabled
-							; bit 3 = underline
-							; bit 4 = bold
-							; bit 6 = vscroll disabled
-							; bit 7 = inverse on
-

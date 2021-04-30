@@ -28,6 +28,8 @@ section code_bifrost2
 section code_compress_aplib
 section code_compress_zx7
 section code_compress_zx0
+section code_compress_zx1
+section code_compress_zx2
 section code_ctype
 section code_driver_general
 section code_driver_character_input

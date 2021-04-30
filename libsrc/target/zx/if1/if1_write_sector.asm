@@ -6,10 +6,10 @@
 ;	Writes the specified sector to the specified drive.
 ;
 ;	
-;	$Id: if1_write_sector.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;	$Id: if1_write_sector.asm $
 ;
 
-		SECTION code_clib
+		SECTION smc_clib
 		PUBLIC 	if1_write_sector
 		PUBLIC 	_if1_write_sector
 		
@@ -17,6 +17,7 @@
 		
 		EXTERN	MAKE_M
 		EXTERN	MOTOR
+		EXTERN	WR_SECT
 
 
 if1_write_sector:
@@ -29,11 +30,10 @@ _if1_write_sector:
 		ld	a,(ix+4)
 		ld	hl,-1
 		and	a		; drive no. = 0 ?
-		jr	z,write_sector_exit		; yes, return -1
-		dec	a
-		cp	8		; drive no. >8 ?
-		jr	nc,write_sector_exit		; yes, return -1
-		inc	a
+		jr	z,write_sector_close		; yes, return -1
+		cp	9		; drive no. >8 ?
+		jr	nc,write_sector_close		; yes, return -1
+
 		push	af
 
 		ld	a,(ix+2)	; sector number
@@ -41,7 +41,7 @@ _if1_write_sector:
 
 		ld	l,(ix+0)	; buffer
 		ld	h,(ix+1)
-		ld	(mdvbuffer+1),hl  ; Self modifying code  :oP
+		ld	(__mdvbuffer+1),hl  ; Self modifying code  :oP
 
 		call	MAKE_M
 
@@ -66,7 +66,7 @@ ENDIF
 		add	hl,de
 		
 		push	hl
-mdvbuffer:	ld	hl,0
+__mdvbuffer:	ld	hl,0
 		add	hl,de
 		pop	de
 		
@@ -74,22 +74,30 @@ mdvbuffer:	ld	hl,0
 		ldir
 
 		set	0,(ix+18h)	; set CHFLAG to "write" mode
+
+		;call	1
+		;
+		;rst	8
+		;defb	2Ah		; Write a sector to drive
+
+		LD		HL,$00FF	; set counter to ensure at least one revolution 
+		call	WR_SECT
+
 		call	1
-
-		RST	8
-		defb	22h		; Open a temp "M" channel
-
-		rst	8
-		defb	2Ah		; Write a sector to drive
 
 		xor	a
 		rst	8
 		defb	21h		; Switch microdrive motor off (a=0)
 
-		RST	8
-		defb	2Ch		; Reclaim an "M" channel
+;		RST	8
+;		defb	2Ch		; Reclaim an "M" channel
 
 		ld	hl,0
 write_sector_exit:
+		push hl
+		RST	8
+		defb	2Ch		; Reclaim an "M" channel
+		pop hl
+write_sector_close:
 		pop	ix
 		ret

@@ -9,5 +9,7 @@ target/hgmc/stdio/fgetc_cons
 @font/font_8x8/font_8x8.lst
 target/hgmc/graphics/pixladdr
 target/hgmc/graphics/clg
+; Take the optimised bitmapped stencil render
+gfx/narrow/obj/hgmc/stencil_render
 @gfx/narrow/gfx_narrow.lst
 

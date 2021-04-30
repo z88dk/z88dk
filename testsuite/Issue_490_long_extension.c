@@ -5,5 +5,5 @@ void function(void *ptr, long val, int offs);
 
 void main()
 {
-    function(&main, 1, 3);
+    function((void *)&main, 1, 3);
 }

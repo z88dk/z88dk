@@ -1,5 +1,5 @@
 
-	SECTION		bss_graphics
+	SECTION    bss_graphics
 
 	PUBLIC	__graphics_retaddr
 

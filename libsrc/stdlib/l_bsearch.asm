@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC l_bsearch
 PUBLIC _l_bsearch
-EXTERN l_bsearch_callee
-EXTERN ASMDISP_L_BSEARCH_CALLEE
+EXTERN asm_l_bsearch
 
 .l_bsearch
 ._l_bsearch
@@ -20,4 +19,4 @@ EXTERN ASMDISP_L_BSEARCH_CALLEE
    push hl
    push af
    
-   jp l_bsearch_callee + ASMDISP_L_BSEARCH_CALLEE
+   jp asm_l_bsearch

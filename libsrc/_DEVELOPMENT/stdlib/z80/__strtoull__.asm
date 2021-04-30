@@ -41,7 +41,7 @@ __strtoull__:
    ;
    ; uses  : af, bc, de, hl, af', bc', de', hl', ix
 
-IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__ || __CLASSIC
 
    dec sp
    
@@ -153,7 +153,7 @@ positive:
    ;  a = first numerical digit
    ; hl = char *
 
-IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__ || __CLASSIC
 
    ld (ix+0),d
 
@@ -182,7 +182,7 @@ loop:
    call l_char2num             ; a = digit
    jr c, number_complete
 
-IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__ || __CLASSIC
 
    cp (ix+0)
    jr nc, number_complete
@@ -201,7 +201,7 @@ ENDIF
    push af                     ; save new digit
    push bc                     ; save char *
 
-IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__ || __CLASSIC
 
    ld a,(ix+0)
    call l_mulu_72_64x8
@@ -242,7 +242,7 @@ u_oflow:
    ld l,c
    ld h,b                      ; hl = char *
 
-IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
+IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__ || __CLASSIC
 
    ld c,(ix+0)
 

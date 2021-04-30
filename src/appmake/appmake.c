@@ -287,19 +287,6 @@ FILE *fopen_bin(const char *fname,const  char *crtfile)
         if ( fcode == NULL ) {
             exit_log(1, "ERROR: File %s not found\n", fname);            
         }
-
-        /* We may have a data section */
-        strcpy(name, fname);
-        suffix_change(name, "_DATA.bin");
-        if ( stat(name, &st_file2) < 0 ) {
-             /* What about having a _HIMEM.bin file? */
-             strcpy(name, fname);
-             suffix_change(name, "_HIMEM.bin");
-             if ( stat(name, &st_file2) < 0 ) {
-                 /* Nope, everything was all in one file */
-                 return fcode;
-             }
-        }
     } else {
         // new c lib compile
 
@@ -1976,3 +1963,17 @@ void mb_cleanup_aligned(struct aligned_data *aligned)
     aligned->num = 0;
     aligned->array = NULL;
 }
+
+
+// This bit of code is used (rather than stat), because we create a temporary file
+// With all the sections included in it
+long get_file_size(FILE *fp) 
+{
+    long len;
+
+    fseek(fp, 0, SEEK_END);
+    len = ftell(fp);
+    fseek(fp, 0L, SEEK_SET);
+    return len;
+}
+

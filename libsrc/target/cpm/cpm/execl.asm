@@ -25,6 +25,7 @@
 	EXTERN    _parsefcb
 	EXTERN    asm_toupper
 	EXTERN    l_gint
+	EXTERN	__bdos
 
 
 ;
@@ -33,7 +34,7 @@
 DEFC __BASE   =  0000H       ;either 0 or 4200h for CP/M systems
 DEFC __FCB    =  __BASE+5CH  ;default file control block
 DEFC __TBUFF  =  __BASE+80H  ;sector buffer
-DEFC __BDOS   =  __BASE+5    ;bdos entry point
+DEFC __BDOS   =  __bdos      ;bdos entry point
 DEFC __TPA    =  __BASE+100H ;transient program area
 DEFC __ERRV   =  255         ;error value returned by bdos calls
 

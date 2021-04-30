@@ -6,7 +6,7 @@
 include ../../../../Make.config
 
 OBJECTS = close.o fabandon.o findhand.o freehand.o open.o \
-	read.o readbyte.o write.o writebyte.o
+	read.o readbyte.o write.o writebyte.o opendir.o
 
 all: $(OUTPUT_DIRECTORY)/p3.lib
 

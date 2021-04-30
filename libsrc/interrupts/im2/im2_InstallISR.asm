@@ -4,8 +4,7 @@ SECTION code_clib
 PUBLIC im2_InstallISR
 PUBLIC _im2_InstallISR
 
-EXTERN im2_InstallISR_callee
-EXTERN ASMDISP_IM2_INSTALLISR_CALLEE
+EXTERN asm_im2_InstallISR
 
 .im2_InstallISR
 ._im2_InstallISR
@@ -17,4 +16,4 @@ EXTERN ASMDISP_IM2_INSTALLISR_CALLEE
    push de
    push af
    
-   jp im2_InstallISR_callee + ASMDISP_IM2_INSTALLISR_CALLEE
+   jp asm_im2_InstallISR

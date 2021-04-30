@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC adt_ListDeleteS
 PUBLIC _adt_ListDeleteS
 
-EXTERN adt_ListDeleteS_callee
-EXTERN ASMDISP_ADT_LISTDELETES_CALLEE
+EXTERN asm_adt_ListDeleteS
 
 .adt_ListDeleteS
 ._adt_ListDeleteS
@@ -18,4 +17,4 @@ EXTERN ASMDISP_ADT_LISTDELETES_CALLEE
    push de
    push bc
    
-   jp adt_ListDeleteS_callee + ASMDISP_ADT_LISTDELETES_CALLEE
+   jp asm_adt_ListDeleteS

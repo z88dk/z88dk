@@ -1,5 +1,6 @@
 ; int compare_dostm(struct dos_tm *a, struct dos_tm *b)
 
+IF !__CPU_INTEL__
 SECTION code_time
 
 PUBLIC asm_compare_dostm
@@ -152,3 +153,4 @@ asm_compare_dostm:
 ;   bits 15..9  year offset from 1980
 ;   bits  8..5  month (1 = Jan)
 ;   bits  4..0  day (1-31)
+ENDIF

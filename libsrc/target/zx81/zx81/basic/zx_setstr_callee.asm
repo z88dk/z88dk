@@ -13,7 +13,7 @@
 SECTION code_clib
 PUBLIC	zx_setstr_callee
 PUBLIC	_zx_setstr_callee
-PUBLIC	ASMDISP_ZX_SETSTR_CALLEE
+PUBLIC	asm_zx_setstr
 EXTERN	asctozx81
 
 zx_setstr_callee:
@@ -27,7 +27,7 @@ _zx_setstr_callee:
 ; enter : hl = char *value
 ;          e = char variable
 
-.asmentry
+.asm_zx_setstr
 	
 	ld	a,e
 	and	31
@@ -125,4 +125,3 @@ ENDIF
 	ex	de,hl
 	jr	loop
 
-DEFC ASMDISP_ZX_SETSTR_CALLEE = asmentry - zx_setstr_callee

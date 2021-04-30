@@ -3,6 +3,7 @@
 ; $Id: qsort.asm,v 1.4 2016-03-04 23:48:13 dom Exp $
 ;
 
+SECTION code_clib
 
 PUBLIC qsort_sdcc
 PUBLIC _qsort_sdcc

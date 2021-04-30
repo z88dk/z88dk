@@ -5,7 +5,6 @@ target/ts2068/graphics_hr/w_clga
 target/ts2068/graphics_hr/w_pixladdr
 target/ts2068/graphics_hr/fill
 graphics/retrofit/clga_callee
-target/zx/graphics/swapgfxbk
 target/ts2068/graphics_hr/w_putsprite
 target/ts2068/graphics_hr/w_stencil_render
 target/ts2068/graphics_hr/w_bksave

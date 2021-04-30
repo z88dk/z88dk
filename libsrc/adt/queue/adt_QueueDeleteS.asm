@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC adt_QueueDeleteS
 PUBLIC _adt_QueueDeleteS
 
-EXTERN adt_QueueDeleteS_callee
-EXTERN ASMDISP_ADT_QUEUEDELETES_CALLEE
+EXTERN asm_adt_QueueDeleteS
 
 .adt_QueueDeleteS
 ._adt_QueueDeleteS
@@ -18,4 +17,4 @@ EXTERN ASMDISP_ADT_QUEUEDELETES_CALLEE
    push de
    push bc
    
-   jp adt_QueueDeleteS_callee + ASMDISP_ADT_QUEUEDELETES_CALLEE
+   jp asm_adt_QueueDeleteS

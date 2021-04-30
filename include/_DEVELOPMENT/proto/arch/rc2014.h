@@ -33,8 +33,8 @@ extern unsigned char io_pio_ide_msb;
 extern unsigned char io_pio_ide_ctl;
 extern unsigned char io_pio_ide_config;
 
-extern unsigned char io_prom_reset;
-extern unsigned char io_prom_toggle;
+extern unsigned char io_ram_toggle;
+extern unsigned char io_rom_toggle;
 
 #else
 
@@ -59,8 +59,8 @@ __sfr __at __IO_PIO_IDE_MSB     io_pio_ide_msb;
 __sfr __at __IO_PIO_IDE_CTL     io_pio_ide_ctl;
 __sfr __at __IO_PIO_IDE_CONFIG  io_pio_ide_config;
 
-__sfr __at __IO_PROM_RESET      io_prom_reset;
-__sfr __at __IO_PROM_TOGGLE     io_prom_toggle;
+__sfr __at __IO_RAM_TOGGLE      io_ram_toggle;
+__sfr __at __IO_ROM_TOGGLE      io_rom_toggle;
 
 __sfr __at __IO_LUT_OPERAND_LATCH   io_lut_operand_latch;
 __sfr __at __IO_LUT_RESULT_MSB      io_lut_result_msb;
@@ -69,6 +69,11 @@ __sfr __at __IO_LUT_RESULT_LSB      io_lut_result_lsb;
 #endif
 
 // SYSTEM FUNCTIONS
+
+// provide shadow RAM copy function for SC114, Wesley, and feilipu Memory Modules
+
+__DPROTO(`iyh,iyl',`iyh,iyl',void,*,shadowwrite,void *dst,const void *src,size_t n)
+__DPROTO(`iyh,iyl',`iyh,iyl',void,*,shadowread,void *dst,const void *src,size_t n)
 
 // provide lut functions
 

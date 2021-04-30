@@ -1,0 +1,12 @@
+
+IF FORsam
+port_sound_data:                    equ $00ff ; 255
+port_sound_address:                 equ $01ff ; 511
+ENDIF
+
+IF !port_sound_data
+port_sound_data:                    equ $0000
+port_sound_address:                 equ $0000
+ENDIF
+
+

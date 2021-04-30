@@ -5,6 +5,7 @@
 
 ; FASTCALL
 
+SECTION code_sprite_sp1
 PUBLIC sp1_DrawUpdateStructIfVal
 EXTERN SP1DrawUpdateStruct
 

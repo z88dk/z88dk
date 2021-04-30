@@ -15,9 +15,7 @@
 SECTION code_clib
 PUBLIC opus_putsect
 PUBLIC _opus_putsect
-;EXTERN ASMDISP_OPUS_PUTSECT_CALLEE
-EXTERN opus_putsect_callee
-EXTERN opus_putsect_asmentry
+EXTERN asm_opus_putsect
 
 .opus_putsect
 ._opus_putsect
@@ -31,5 +29,4 @@ EXTERN opus_putsect_asmentry
 	push de		; buffer location
 	push af
 	
-	jp	opus_putsect_asmentry
-;   jp ASMDISP_OPUS_PUTSECT_CALLEE + opus_putsect_callee
+	jp	asm_opus_putsect

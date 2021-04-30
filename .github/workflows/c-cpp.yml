@@ -20,7 +20,7 @@ jobs:
         path: |
           ~/.ccache
           ~/perl5
-        key: ${{ runner.os }}-cache
+        key: ${{ runner.os }}-cache2
     - name: Update apt 
       run: sudo apt update
     - name: Install apt dependencies

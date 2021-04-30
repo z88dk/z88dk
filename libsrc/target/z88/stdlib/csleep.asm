@@ -13,13 +13,13 @@
 ; $Id: csleep.asm,v 1.9 2016-07-02 15:44:16 dom Exp $
 
 
-		MODULE  csleep_z88
-		SECTION	code_clib
-                INCLUDE "time.def"
+    MODULE  csleep_z88
+    SECTION	code_clib
+    INCLUDE "time.def"
 
-                PUBLIC    csleep
-                PUBLIC    _csleep
-                PUBLIC    ASMDISP_CSLEEP
+    PUBLIC    csleep
+    PUBLIC    _csleep
+    PUBLIC    asm_csleep
 
 
 ;csleep(int time);
@@ -32,7 +32,7 @@
         push    bc
         push    hl
 
-.asmentry
+.asm_csleep
 
         ld      a,b
         or      c
@@ -44,5 +44,4 @@
         ld      hl,0
         ret
 
-DEFC ASMDISP_CSLEEP = asmentry - csleep
 

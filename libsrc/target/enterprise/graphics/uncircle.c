@@ -9,7 +9,8 @@
  */
 
 #include <enterprise.h>
-#include <graphics.h>
+//#include <graphics.h>
+extern void __LIB__ uncircle(int x, int y, int radius, int skip) __smallc;
 
 
 void uncircle(int x, int y, int radius, int skip)
@@ -28,7 +29,7 @@ void uncircle(int x, int y, int radius, int skip)
 
 	esccmd_cmd='E'; // Ellipse
 	esccmd_x=radius*4;
-	esccmd_y=972-radius*4;
+	esccmd_y=971-radius*4;
 	exos_write_block(DEFAULT_VIDEO, 6, esccmd);
 
 	esccmd_cmd='s'; // set beam off

@@ -2,6 +2,7 @@
 ; 02.2008 aralbrec
 ; ts2068 hi-res version
 
+SECTION code_sprite_sp1
 PUBLIC SP1PSPOP
 
 ; enter : de  = & string to print (or something else)

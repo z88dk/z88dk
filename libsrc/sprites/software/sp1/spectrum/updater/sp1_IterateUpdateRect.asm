@@ -1,6 +1,7 @@
 ; void sp1_IterateUpdateRect(struct sp1_Rect *r, void *hook)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_IterateUpdateRect
 
 EXTERN sp1_IterateUpdateRect_callee

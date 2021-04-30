@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC in_MouseAMXInit
 PUBLIC _in_MouseAMXInit
 
-EXTERN in_MouseAMXInit_callee
-EXTERN ASMDISP_IN_MOUSEAMXINIT_CALLEE
+EXTERN asm_in_MouseAMXInit
 
 .in_MouseAMXInit
 ._in_MouseAMXInit
@@ -19,4 +18,4 @@ EXTERN ASMDISP_IN_MOUSEAMXINIT_CALLEE
    push hl
    
    ld b,e
-   jp in_MouseAMXInit_callee + ASMDISP_IN_MOUSEAMXINIT_CALLEE
+   jp asm_in_MouseAMXInit

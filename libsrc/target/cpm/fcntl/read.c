@@ -4,8 +4,7 @@
  *  27/1/2002 - djm
  *
  *  May, 2020 - feilipu - added sequential read
- *
- *  $Id: read.c,v 1.3 2013-06-06 08:58:32 stefano Exp $
+ *  Apr, 2021 -dom - remove sequential read
  */
 
 #include <fcntl.h>
@@ -54,33 +53,32 @@ ssize_t read(int fd, void *buf, size_t len)
     case U_READ:
     case U_RDWR:
         cnt = len;
-        uid = getuid();
-        setuid(fc->uid);
+        uid = swapuid(fc->uid);
         while ( len ) {
+            unsigned long record_nr = fc->rwptr/SECSIZE;
             offset = fc->rwptr%SECSIZE;
             if ( ( size = SECSIZE - offset ) > len ) {
                 size = len;
             }
+            _putoffset(fc->ranrec,record_nr);
             if ( size == SECSIZE ) {
                 bdos(CPM_SDMA,buf);
-                if ( bdos(CPM_READ,fc) ) {
-                    setuid(uid);
+                if ( bdos(CPM_RRAN,fc) ) {
+                    swapuid(uid);
                     return cnt-len;
                 }
             } else {
-                bdos(CPM_SDMA,buffer);
-                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
-                if ( bdos(CPM_RRAN,fc) ) {
-                    setuid(uid);
+                if ( cpm_cache_get(fc, record_nr, 1) ) {
+                    swapuid(uid);
                     return cnt-len;
                 }
-                memcpy(buf,buffer+offset,size);
+                memcpy(buf,fc->buffer+offset,size);
             }
             buf += size;
             fc->rwptr += size;
             len -= size;
         }
-        setuid(uid);
+        swapuid(uid);
         return cnt-len;
         break;
     default:

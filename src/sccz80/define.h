@@ -103,6 +103,7 @@ struct type_s {
     char      explicitly_signed;  // Set if "signed" in type definition
     char      isconst;
     char      isfar;  // Valid for pointers/array
+    char      isvolatile;
     char      name[NAMESIZE]; 
     char     *namespace; // Which namespace is this object in
     
@@ -128,7 +129,7 @@ struct type_s {
     uint32_t  flags;        // Fast call etc
     struct {
         char  hasva;
-        char  oldstyle;
+        char  oldstyle;      // No arguments explicitly listed
         int   params_offset;
         int       interrupt;  // IRQ number?
         uint8_t  shortcall_rst;

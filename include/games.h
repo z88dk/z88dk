@@ -253,6 +253,13 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 6
 #endif
 
+#ifdef __SAM__
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = {"Joystick 1","Joystick 2","QAOP-MN"};
+#endif
+	#define GAME_DEVICES 3
+#endif
+
 #ifdef __SPECTRUM__
 #ifdef DEFINE_JOYSTICK_TYPE
 	const unsigned char *joystick_type[] = {"Kempston","Sinclair 1","Sinclair 2","Cursor","Fuller","QAOP-MN"};
@@ -447,6 +454,16 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 2
 #endif
 
+#ifdef __GL__
+#ifdef GL_TARGET_GL6000
+#ifdef DEFINE_JOYSTICK_TYPE
+	const unsigned char *joystick_type[] = { "QAOP-MN", "8246-05",  "hjkl-sd", "Cursor"};
+#endif
+	#define GAME_DEVICES 4
+#endif
+#endif
+
+
 
 #ifndef GAME_DEVICES
 #ifdef DEFINE_JOYSTICK_TYPE
@@ -454,6 +471,7 @@ extern const unsigned char *joystick_type[];
 #endif
 	#define GAME_DEVICES 2
 #endif
+
 
 
 

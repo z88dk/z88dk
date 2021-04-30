@@ -11,7 +11,7 @@
 ._func
 .i_2
 	call	_func0
-	jp	i_2
+	jp	i_2	;EOS
 .i_3
 	ret
 
@@ -30,9 +30,9 @@
 	push	hl
 	ld	a,h
 	or	l
-	jp	z,i_7
+	jp	z,i_7	;
 	call	_func0
-	jp	i_6
+	jp	i_6	;EOS
 .i_7
 	pop	bc
 	ret

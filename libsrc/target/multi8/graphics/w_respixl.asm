@@ -12,5 +12,5 @@
 
 
 .w_respixel			
-	INCLUDE "w_pixel.asm"
+	INCLUDE "w_pixel.inc"
 

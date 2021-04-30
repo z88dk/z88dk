@@ -62,9 +62,9 @@
 	push	hl
 	ld	a,h
 	or	l
-	jp	z,i_11
+	jp	z,i_11	;
 	call	_resultif
-	jp	i_12
+	jp	i_12	;EOS
 .i_11
 	call	_resultelse
 .i_12

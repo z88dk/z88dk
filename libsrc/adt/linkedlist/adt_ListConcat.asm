@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC adt_ListConcat
 PUBLIC _adt_ListConcat
 
-EXTERN adt_ListConcat_callee
-EXTERN ASMDISP_ADT_LISTCONCAT_CALLEE
+EXTERN asm_adt_ListConcat
 
 .adt_ListConcat
 ._adt_ListConcat
@@ -18,4 +17,4 @@ EXTERN ASMDISP_ADT_LISTCONCAT_CALLEE
    push hl
    push bc
    
-   jp adt_ListConcat_callee + ASMDISP_ADT_LISTCONCAT_CALLEE
+   jp asm_adt_ListConcat

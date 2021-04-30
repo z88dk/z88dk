@@ -1,0 +1,14 @@
+
+
+defc WAITKEY = $f803	;Read keyboard: a = code read
+defc GETKEY = $f81b	;Read keyboard: a = code read, ff=nokey, fe=rus/lat
+defc QUERYKEY = $f812	;Check keyboard: a = $00 not pressed, a = $ff pressed
+
+
+defc VPEEK   = $f821	;Read screen at cursor: a = char read
+
+defc PUTCHAR = $f809	;Print character: c = char
+defc PRINTSTR = $f818	;Print \0 terminated string
+
+defc GETCURS = $f81e	;Get cursor position: h = row, l = column ($7602 = cursor)
+

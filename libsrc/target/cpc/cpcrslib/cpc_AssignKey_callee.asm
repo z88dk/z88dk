@@ -14,7 +14,7 @@
         SECTION   code_clib
         PUBLIC    cpc_AssignKey_callee
         PUBLIC    _cpc_AssignKey_callee
-        PUBLIC    ASMDISP_CPC_ASSIGNKEY_CALLEE
+        PUBLIC    asm_cpc_AssignKey
 		
 		EXTERN    tabla_teclas
 
@@ -27,7 +27,7 @@
    pop de
    push bc
    
-.asmentry
+.asm_cpc_AssignKey
 
     ;HL = linea, byte
 	;DE = value
@@ -67,4 +67,3 @@
 	ld (hl),b
 	ret
 	
-DEFC ASMDISP_CPC_ASSIGNKEY_CALLEE = asmentry - cpc_AssignKey_callee

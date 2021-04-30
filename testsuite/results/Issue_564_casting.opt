@@ -50,7 +50,7 @@
 
 
 ._func4
-	ld	hl,(_item+1+1)
+	ld	hl,(_item+2)
 	push	hl
 	call	_value
 	pop	bc

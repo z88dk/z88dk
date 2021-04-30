@@ -1,6 +1,6 @@
 ;
 ;
-;	Support char table (pseudo graph symbols) for the Super80-vduem
+;	Support char table (pseudo graph symbols) for the Krokha
 ;	Sequence: blank, top-left, top-right, top-half, bottom-left, left-half, etc..
 ;
 ;

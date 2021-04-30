@@ -4,9 +4,10 @@
 ;	if1_checksum (internal routine)
 ;
 ;	check BC bytes starting from HL 
-;	and compare with the following byte
+;	compare with the checksum stored in the following byte
+;   update the checksum if it wrong
 ;
-;	$Id: if1_checksum.asm,v 1.3 2016-07-01 22:08:20 dom Exp $
+;	$Id: if1_checksum.asm $
 ;
 
 	SECTION code_clib
@@ -29,5 +30,6 @@ noround:	ld	e,a
 		jr	nz,nxt_byte
 		ld	a,e
 		cp	(hl)
+		ld	(hl),a
 		pop	hl
 		ret

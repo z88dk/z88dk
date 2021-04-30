@@ -1,5 +1,5 @@
 
-        SECTION code_graphics
+       SECTION code_graphics
 	PUBLIC	rightbitmask
 
 ;
@@ -17,21 +17,21 @@
 ; OUT: A = bitmask at right side of bit	position of byte
 ;
 ;	Example:
-;			IN:	A = 6
-;			OUT:	A = @00111111	(bit	5 - 0 as mask)
+;    	IN:	A = 6
+;    	OUT:	A = @00111111	(bit	5 - 0 as mask)
 ;
 ;	registers changed after return:
-;		..bcdehl/ixiy	same
-;		af....../....	different
+;    ..bcdehl/ixiy	same
+;    af....../....	different
 ;
 
-.rightbitmask			cp  0				; 7-bitpos
-				ret	z			; no	bitmask to preserve...
-				push	bc
-				ld	b,a
-				xor	a
-.right_bitmask_loop		scf
-				rla				; create right	bitmask
-				djnz	right_bitmask_loop
-				pop	bc
-				ret
+.rightbitmask    	cp  0       ; 7-bitpos
+       ret	z    	; no	bitmask to preserve...
+       push	bc
+       ld	b,a
+       xor	a
+.right_bitmask_loop    scf
+       rla       ; create right	bitmask
+       djnz	right_bitmask_loop
+       pop	bc
+       ret

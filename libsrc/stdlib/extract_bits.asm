@@ -5,8 +5,7 @@ SECTION code_clib
 PUBLIC extract_bits
 PUBLIC _extract_bits
 
-EXTERN extract_bits_callee
-EXTERN ASMDISP_extract_bits_callee
+EXTERN asm_extract_bits
 
 .extract_bits
 ._extract_bits
@@ -20,4 +19,4 @@ EXTERN ASMDISP_extract_bits_callee
    push bc
    push af
 
-   jp extract_bits_callee + ASMDISP_extract_bits_callee
+   jp asm_extract_bits

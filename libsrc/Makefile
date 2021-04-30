@@ -86,6 +86,7 @@ TOCREATE += $(call check_target,pacman,pacman_clib.lib)
 TOCREATE += $(call check_target,pasopia7,pasopia7_clib.lib)
 TOCREATE += $(call check_target,pc6001,pc6001_clib.lib)
 TOCREATE += $(call check_target,pc88,pc88_clib.lib)
+TOCREATE += $(call check_target,pcw,pcw.lib $(CPMLIBS))
 TOCREATE += $(call check_target,pencil2,pencil2_clib.lib)
 TOCREATE += $(call check_target,pmd85,pmd85_clib.lib)
 TOCREATE += $(call check_target,pps,pps_clib.lib)
@@ -94,6 +95,7 @@ TOCREATE += $(call check_target,pv1000,pv1000_clib.lib)
 TOCREATE += $(call check_target,pv2000,pv2000_clib.lib)
 TOCREATE += $(call check_target,px4,px4.lib $(CPMLIBS))
 TOCREATE += $(call check_target,px8,px8.lib $(CPMLIBS))
+TOCREATE += $(call check_target,radio86,radio86_clib.lib)
 TOCREATE += $(call check_target,rcmx000,rcmx000_clib.lib)
 TOCREATE += $(call check_target,rc700,rc700.lib $(CPMLIBS))
 TOCREATE += $(call check_target,rex,rex_clib.lib)
@@ -101,7 +103,7 @@ TOCREATE += $(call check_target,rx78,rx78_clib.lib)
 TOCREATE += $(call check_target,s1mp3,s1mp3_clib.lib)
 TOCREATE += $(call check_target,sam,sam_clib.lib)
 TOCREATE += $(call check_target,sc3000,sc3000_clib.lib)
-TOCREATE += $(call check_target,smc777,smc777_cpm.lib $(CPMLIBS))
+TOCREATE += $(call check_target,smc777,smc777_clib.lib smc777_cpm.lib $(CPMLIBS))
 TOCREATE += $(call check_target,sms,sms_clib.lib)
 TOCREATE += $(call check_target,spc1000,spc1000_clib.lib)
 TOCREATE += $(call check_target,srr,srr_clib.lib)
@@ -117,7 +119,7 @@ TOCREATE += $(call check_target,ti83p,ti83p_clib.lib)
 TOCREATE += $(call check_target,ti85,ti85_clib.lib)
 TOCREATE += $(call check_target,ti86,ti86_clib.lib)
 TOCREATE += $(call check_target,tiki100,tiki100.lib $(CPMLIBS))
-TOCREATE += $(call check_target,trs80, trs80_clib.lib trsdos.lib gfxtrs80.lib gfxeg2000.lib grafyx3.lib grafyx4.lib)
+TOCREATE += $(call check_target,trs80, trs80_clib.lib trsdos.lib gfxtrs80.lib gfxeg2000.lib grafyx4_3.lib grafyx4.lib gfxhrg1.lib)
 TOCREATE += $(call check_target,ts2068, ts2068_clib.lib m2068.lib)
 TOCREATE += $(call check_target,tvc, tvc_clib.lib)
 TOCREATE += $(call check_target,vector06c,vector06c_clib.lib)
@@ -165,13 +167,13 @@ define buildcrt
 	$(MAKE) -C font
 	$(MAKE) -C compress
 	$(MAKE) -C alloc
-	$(MAKE) -C debug
 	$(MAKE) -C adt
 	$(MAKE) -C adt-newlib
 	$(MAKE) -C algorithm
 	$(MAKE) -C rect
 	$(MAKE) -C arch
 	$(MAKE) -C stdlib
+	$(MAKE) -C time
 	$(MAKE) -C z80_crt0s
 endef
 
@@ -383,19 +385,9 @@ pc88_clib.lib:
 	@echo '--- Building PC8801 Library ---'
 	@echo ''
 	$(MAKE) -C psg TARGET=pc88
-	$(call buildgeneric,pc88,"wide narrow")
+	$(call buildgeneric,pc88,"wide")
 	$(MAKE) -C games TARGET=pc88
 	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(LISTFILE_DIRECTORY)/pc88.lst
-	@echo ''
-	@echo '--- Building PC8801 160x100 graphics Library ---'
-	@echo ''
-	$(MAKE) -C gfx TARGET=pc88 FLAVOUR="narrow"
-	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -x$(OUTPUT_DIRECTORY)/gfxpc88 @$(LISTFILE_DIRECTORY)/target/pc88/gfxpc88.lst
-	@echo ''
-	@echo '--- Building PC8801 640x200 Mono Graphics Library ---'
-	@echo ''
-	$(MAKE) -C gfx TARGET=pc88 SUBTYPE=pc88hr200 FLAVOUR="wide"
-	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88hr200 -x$(OUTPUT_DIRECTORY)/gfxpc88hr200 @$(LISTFILE_DIRECTORY)/target/pc88/gfxpc88hr200.lst
 
 # Native for sprinter - dom
 pps_clib.lib:
@@ -650,6 +642,7 @@ bondwell.lib:
 	@echo ''
 	@echo '--- Building Bondwell 12/14 Library ---'
 	@echo ''
+	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C games TARGET=cpm SUBTYPE=bondwell
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="gencon narrow" SUBTYPE=bondwell
 	TARGET=bondwell TYPE=z80 $(LIBLINKER) -DFORbondwell -x$(OUTPUT_DIRECTORY)/bondwell @$(LISTFILE_DIRECTORY)/target/bondwell/bw.lst
@@ -658,6 +651,7 @@ bondwell2.lib:
 	@echo ''
 	@echo '--- Building Bondwell 2 Library ---'
 	@echo ''
+	@$(RM) -f video/msm6255/*.o
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=bondwell2
 	TARGET=bondwell2 TYPE=z80 $(LIBLINKER) -DFORbondwell2 -x$(OUTPUT_DIRECTORY)/bondwell2 @$(LISTFILE_DIRECTORY)/target/bondwell2/bw2.lst
 
@@ -683,13 +677,18 @@ x1_cpm.lib:
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=x1
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_cpm @$(LISTFILE_DIRECTORY)/target/x1/x1.lst
 
-cpm_clib.lib: 
+cpm_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Library ---'
 	@echo ''
-	$(call buildgeneric,cpm)
+	$(call buildgeneric,cpm,"portable")
 	$(MAKE) -C target/cpm
 	TARGET=cpm TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm_clib @$(LISTFILE_DIRECTORY)/cpm.lst
+	@echo ''
+	@echo '--- Building GSX based Z88DK GFX Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide
+	TARGET=cpm TYPE=z80 $(LIBLINKER) -DFORcpm -x$(OUTPUT_DIRECTORY)/gfxgsx @$(LISTFILE_DIRECTORY)/target/cpm/gfxgsx.lst
 
 cpm8080_clib.lib:
 	@echo ''
@@ -852,9 +851,10 @@ sam_clib.lib:
 	@echo ''
 	@echo '--- Building Sam Coupe Library ---'
 	@echo ''
-	$(call buildgeneric,sam)
+	$(call buildgeneric,sam,wide)
 	$(MAKE) -C games TARGET=sam
 	$(MAKE) -C target/zx TARGET=sam
+	$(MAKE) -C target/zx-common TARGET=sam
 	TARGET=sam TYPE=z80 $(LIBLINKER) -DFORsam -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sam_clib @$(LISTFILE_DIRECTORY)/sam.lst
 
 # Spectravideo SVI library - Stefano
@@ -962,9 +962,19 @@ excali64_clib.lib:
 	TARGET=excali64 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORexcali64 -x$(OUTPUT_DIRECTORY)/excali64_cpm @$(LISTFILE_DIRECTORY)/target/excali64/excali64.lst
 
 # SMC-777 library 
-smc777_cpm.lib:
+smc777_clib.lib:
 	@echo ''
 	@echo '--- Building Sony SMC-70/SMC-777 Library ---'
+	@echo ''
+	@$(RM) -f video/mc6845/*.o
+	$(MAKE) -C gfx TARGET=smc777 FLAVOUR=wide
+	$(MAKE) -C psg TARGET=smc777
+	$(MAKE) -C games TARGET=smc777 
+	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_clib @$(LISTFILE_DIRECTORY)/smc777.lst
+
+smc777_cpm.lib:
+	@echo ''
+	@echo '--- Building Sony SMC-70/SMC-777 CP/M Library ---'
 	@echo ''
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=smc777 FLAVOUR=wide
@@ -1295,7 +1305,9 @@ gl6000_clib.lib:
 	@echo '--- Building Genius Leader 6000 Library ---'
 	@echo ''
 	$(call buildgeneric,gl)
-	TARGET=gl TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl6000 -x$(OUTPUT_DIRECTORY)/gl6000_clib @$(LISTFILE_DIRECTORY)/gl6000.lst
+	$(MAKE) -C gfx TARGET=gl SUBTYPE=gl6000 FLAVOUR=narrow
+	$(MAKE) -C games TARGET=gl SUBTYPE=gl6000 TARGET_CFLAGS=-clib=gl6000sl
+	TARGET=gl6000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl6000 -x$(OUTPUT_DIRECTORY)/gl6000_clib @$(LISTFILE_DIRECTORY)/gl6000.lst
 
 
 
@@ -1356,6 +1368,14 @@ cpc_math.lib:
 	@echo '--- Building Amstrad CPC Maths Libraries ---'
 	@echo ''
 	$(MAKE) -C math/cpcmath 
+
+# Amstrad PCW libraries - Stefano
+pcw.lib:
+	@echo ''
+	@echo '--- Building Amstrad PCW Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=pcw
+	TARGET=pcw TYPE=z80 $(LIBLINKER) -DFORpcw -x$(OUTPUT_DIRECTORY)/pcw @$(LISTFILE_DIRECTORY)/target/pcw/pcw.lst
 
 # Commodore 128 (Z80 mode) library - Stefano
 c128ansi_clib.lib: 
@@ -1565,17 +1585,24 @@ gfxeg2000.lib:
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="narrow" SUBTYPE=eg2000
 	TARGET=eg2000 TYPE=z80 $(LIBLINKER) -DFOReg2000 -x$(OUTPUT_DIRECTORY)/gfxeg2000 @$(LISTFILE_DIRECTORY)/target/trs80/gfxeg2000.lst
 
-grafyx3.lib:
+gfxhrg1.lib:
 	@echo ''
-	@echo '--- Building GrafyxSolution (model 3) Libraries ---'
+	@echo '--- Building HRG1 TRS80 Model I Libraries ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=hrg1
+	TARGET=hrg1 TYPE=z80 $(LIBLINKER) -DFORhrg1 -x$(OUTPUT_DIRECTORY)/gfxhrg1 @$(LISTFILE_DIRECTORY)/target/trs80/gfxhrg1.lst
+
+grafyx4_3.lib:
+	@echo ''
+	@echo '--- Building GrafyxSolution (M4 on Model III) Libraries ---'
 	@echo ''
 	$(RM) target/trs80/grafyx/*.o
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=grafyx3
-	TARGET=grafyx3 TYPE=z80 $(LIBLINKER) -DFORgrafyx3 -x$(OUTPUT_DIRECTORY)/grafyx3 @$(LISTFILE_DIRECTORY)/target/trs80/grafyx.lst
+	TARGET=grafyx3 TYPE=z80 $(LIBLINKER) -DFORgrafyx3 -x$(OUTPUT_DIRECTORY)/grafyx4_3 @$(LISTFILE_DIRECTORY)/target/trs80/grafyx.lst
 
 grafyx4.lib:
 	@echo ''
-	@echo '--- Building GrafyxSolution (model 4) Libraries ---'
+	@echo '--- Building GrafyxSolution (M4 on Model 4) Libraries ---'
 	@echo ''
 	$(RM) target/trs80/grafyx/*.o
 	$(MAKE) -C gfx TARGET=trs80 FLAVOUR="wide" SUBTYPE=grafyx4
@@ -1736,6 +1763,14 @@ krokha_clib.lib:
 	$(MAKE) -C games TARGET=krokha
 	TARGET=krokha TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORkrokha -x$(OUTPUT_DIRECTORY)/krokha_clib @$(LISTFILE_DIRECTORY)/krokha.lst
 
+radio86_clib.lib:
+	@echo ''
+	@echo '--- Building Radio86 Library ---'
+	@echo ''
+	$(call buildgeneric,radio86,"gencon portable")
+	TARGET=radio86 TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORradio86 -x$(OUTPUT_DIRECTORY)/radio86_clib @$(LISTFILE_DIRECTORY)/radio86.lst
+
+
 gfxvti.lib:
 	@echo ''
 	@echo '--- Building VTI graphics Library ---'
@@ -1766,36 +1801,8 @@ preempt.lib:
 	$(MAKE) -C threading/preempt
 
 # SP1 sprite library - aralbrec
-sp1:
-	@echo
-	@echo SP1 Software Sprite Engine
-	@echo
-	@echo Prior to building the library you can customize several
-	@echo parameters such as display size, memory map, etc by editing
-	@echo the file "customize.asm" found in {z88dk}/libsrc/sprites/software/sp1/{target}
-	@echo Otherwise the defaults will be used.
-	@echo 
-	@echo You must specify a target machine to build the library.
-	@echo Only one version of the library can exist at a time.
-	@echo 
-	@echo "make sp1-spectrum      (256x192 pixel, 32x24 attribute)"
-	@echo "make sp1-ts2068hr      (512x192 pixel monochrome)"
-	@echo "make sp1-zx81hr        (256x192 pixel monochrome)"
-	@echo
-	@echo "make sp1-clean         (recommended prior to building)"
-	@echo
-
 sp1-all:
 	$(MAKE) -C sprites/software/sp1  sp1-all
-
-sp1-spectrum:
-	$(MAKE) -C sprites/software/sp1  sp1-spectrum
-
-sp1-ts2068hr:
-	$(MAKE) -C sprites/software/sp1  sp1-ts2068hr
-
-sp1-zx81hr:
-	$(MAKE) -C sprites/software/sp1  sp1-zx81hr
 
 sp1-clean:
 	$(MAKE) -C sprites/software/sp1 clean
@@ -1915,4 +1922,3 @@ install-clean: classic-clean new-install-clean
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs
-

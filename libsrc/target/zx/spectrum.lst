@@ -53,8 +53,10 @@ target/zx/diagnostic/zx_timexsound
 target/zx/diagnostic/zx_type
 target/zx/diagnostic/zx_zxmmc
 target/zx/diagnostic/zx_ulaplus
+target/zx/if1/if1_bytecount
 target/zx/if1/if1_checkblock
 target/zx/if1/if1_checksum
+target/zx/if1/if1_driveno
 target/zx/if1/if1_find_sector
 target/zx/if1/if1_find_sector_map
 target/zx/if1/if1_free_sectors
@@ -64,13 +66,15 @@ target/zx/if1/if1_init_file
 target/zx/if1/if1_edition
 target/zx/if1/if1_load_record
 target/zx/if1/if1_load_sector
+target/zx/if1/if1_mdv_full
 target/zx/if1/if1_mdv_status
+target/zx/if1/if1_next_file
+target/zx/if1/if1_recnum
 target/zx/if1/if1_remove_file
 target/zx/if1/if1_rommap
 target/zx/if1/if1_setname
 target/zx/if1/if1_touch_file
 target/zx/if1/if1_update_map
-target/zx/if1/if1_write_record
 target/zx/if1/if1_write_sector
 target/zx/opus/get_kempston
 target/zx/opus/set_kempston

@@ -5,10 +5,10 @@ SECTION code_clib
 PUBLIC HeapRealloc_callee
 PUBLIC _HeapRealloc_callee
 PUBLIC MAHeapRealloc
-PUBLIC ASMDISP_HEAPREALLOC_CALLEE
+PUBLIC asm_HeapRealloc
 
 EXTERN HeapAlloc_callee, HeapFree_callee
-EXTERN ASMDISP_HEAPALLOC_CALLEE, ASMDISP_HEAPFREE_CALLEE
+EXTERN asm_HeapAlloc, asm_HeapFree
 
 .HeapRealloc_callee
 ._HeapRealloc_callee
@@ -19,7 +19,7 @@ EXTERN ASMDISP_HEAPALLOC_CALLEE, ASMDISP_HEAPFREE_CALLEE
    pop de
    push af
 
-.asmentry
+.asm_HeapRealloc
 
 ; Grab a new memory block from the heap specified.
 ; Copy as much of the old block possible to
@@ -48,7 +48,7 @@ EXTERN ASMDISP_HEAPALLOC_CALLEE, ASMDISP_HEAPFREE_CALLEE
    jr nz, checksize
 
    ex de,hl                    ; ISO C wants a malloc to occur if realloc block == 0
-   jp HeapAlloc_callee + ASMDISP_HEAPALLOC_CALLEE
+   jp asm_HeapAlloc
 
 .checksize
 
@@ -66,7 +66,7 @@ EXTERN ASMDISP_HEAPALLOC_CALLEE, ASMDISP_HEAPFREE_CALLEE
    push hl
    push bc
    ex de,hl
-   call HeapAlloc_callee + ASMDISP_HEAPALLOC_CALLEE
+   call asm_HeapAlloc
    jr c, success
    
 .fail
@@ -140,10 +140,8 @@ ENDIF
    ; de = & heap, hl = & old block (+2)
    ; stack = & new block
    
-   call HeapFree_callee + ASMDISP_HEAPFREE_CALLEE  ; return old block to free list
+   call asm_HeapFree  ; return old block to free list
    
    pop hl
    scf
    ret
-
-DEFC ASMDISP_HEAPREALLOC_CALLEE = asmentry - HeapRealloc_callee

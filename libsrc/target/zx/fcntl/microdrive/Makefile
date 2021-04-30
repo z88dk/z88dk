@@ -1,12 +1,12 @@
 #
 # Makefile for ZX Microdrive file support
 #
-# $Id: Makefile,v 1.9 2016-07-02 15:41:39 dom Exp $
+# $Id: Makefile $
 
 
 include ../../../../Make.config
 
-OBJECTS = open.o close.o readbyte.o remove.o rename.o lseek.o fdtell.o
+OBJECTS = open.o close.o read.o write.o readbyte.o writebyte.o remove.o rename.o lseek.o fdtell.o
 
 all: $(OUTPUT_DIRECTORY)/zxmdv.lib
 

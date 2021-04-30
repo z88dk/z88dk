@@ -156,48 +156,48 @@ KWIPS        = 100*10*1 / 183.0901 = 5.4618
 MWIPS        = 5.4618 / 1000 = 0.0054618
 
 3.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library / math48
+Z88DK April 28, 2021
+zsdcc #12070 / new c library / math48
 24 bit mantissa + 8 bit exponent (internally 40+8)
-6234 bytes less page zero
+6221 bytes less page zero
 
-cycle count  = 916707945
-time @ 4MHz  = 916707945 / 4x10^6 = 229.1770 seconds
-KWIPS        = 100*10*1 / 229.1770 = 4.3634
-MWIPS        = 4.3634 / 1000 = 0.0043634
+cycle count  = 914412771
+time @ 4MHz  = 914412771 / 4x10^6 = 228.6031 seconds
+KWIPS        = 100*10*1 / 228.6031 = 4.3743
+MWIPS        = 4.3743 / 1000 = 0.0043743
 
 4.
-Z88DK April 20, 2020
-classic/zsdcc #11566/math48
+Z88DK April 28, 2021
+classic/zsdcc #12070/math48
 24 bit mantissa + 8 bit exponent (internally 40+8)
-7045 bytes less page zero
+7588 bytes less page zero
 
-cycle count  = 921228352
-time @ 4MHz  = 921228352 / 4x10^6 = 230.3071 seconds
-KWIPS        = 100*10*1 / 230.3071 = 4.3420
-MWIPS        = 4.3420 / 1000 = 0.0043420
+cycle count  = 920781972
+time @ 4MHz  = 920781972 / 4x10^6 = 230.1954 seconds
+KWIPS        = 100*10*1 / 230.1954 = 4.3441
+MWIPS        = 4.3441 / 1000 = 0.0043441
 
 5.
-Z88DK April 20, 2020
+Z88DK April 28, 2021
 sccz80 / new c library / math48 float package
 40 bit mantissa + 8 bit exponent
-5388 bytes less page zero
+5362 bytes less page zero
 
-cycle count  = 973210939
-time @ 4MHz  = 973210939 / 4x10^6 = 243.3027 seconds
-KWIPS        = 100*10*1 / 243.3027 = 4.1101
-MWIPS        = 4.1101 / 1000 = 0.0041101
+cycle count  = 972899568
+time @ 4MHz  = 972899568 / 4x10^6 = 243.2248 seconds
+KWIPS        = 100*10*1 / 243.2248 = 4.1114
+MWIPS        = 4.1114 / 1000 = 0.0041114
 
 6.
-Z88DK April 20, 2020
+Z88DK April 28, 2021
 sccz80 / classic c library / genmath float package
 40 bit mantissa + 8 bit exponent
-5744 bytes less page zero
+6359 bytes less page zero
 
-cycle count  = 1280818856
-time @ 4MHz  = 1280818856 / 4x10^6 = 320.2047 seconds
-KWIPS        = 100*10*1 / 322.1018 = 3.1230
-MWIPS        = 3.1230 / 1000 = 0.0031230
+cycle count  = 1283271893
+time @ 4MHz  = 1283271893 / 4x10^6 = 320.8179 seconds
+KWIPS        = 100*10*1 / 320.8179 = 3.1170
+MWIPS        = 3.1170 / 1000 = 0.0031170
 
 7.
 SDCC 3.6.5 #9842 (MINGW64)
@@ -212,26 +212,26 @@ MWIPS        = 1.8308 / 1000 = 0.0018308
 SDCC implements its float library in C.
 
 8.
-Z88DK July 13, 2020
-zsdcc #11722 / new c library / math32
+Z88DK April 30, 2021
+zsdcc #12250 / new c library / math32
 24 bit mantissa + 8 bit exponent
-9681 bytes less page zero
+10113 bytes less page zero
 
-cycle count  = 663018211
-time @ 4MHz  = 663018211 / 4x10^6 = 165.7546 seconds
-KWIPS        = 100*10*1 / 165.7546 = 6.0330
-MWIPS        = 6.0330 / 1000 = 0.0060330
+cycle count  = 576187434
+time @ 4MHz  = 576187434 / 4x10^6 = 144.0468 seconds
+KWIPS        = 100*10*1 / 144.0468 = 6.9421
+MWIPS        = 6.9421 / 1000 = 0.0069421
 
 9.
-Z88DK July 13, 2020
+Z88DK April 30, 2021
 sccz80 / new c library / math32
 24 bit mantissa + 8 bit exponent
-8823 bytes less page zero
+8921 bytes less page zero
 
-cycle count  = 653436776
-time @ 4MHz  = 653436776 / 4x10^6 = 163.3592 seconds
-KWIPS        = 100*10*1 / 163.3592 = 6.1215
-MWIPS        = 6.1215 / 1000 = 0.0061215
+cycle count  = 567396426
+time @ 4MHz  = 567396426 / 4x10^6 = 141.8491 seconds
+KWIPS        = 100*10*1 / 141.8491 = 7.0497
+MWIPS        = 7.0497 / 1000 = 0.0070497
 
 DQ.
 HITECH C MSDOS V750

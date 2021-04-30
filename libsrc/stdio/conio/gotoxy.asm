@@ -3,8 +3,7 @@
 SECTION code_clib
 PUBLIC gotoxy
 PUBLIC _gotoxy
-EXTERN gotoxy_callee
-EXTERN ASMDISP_GOTOXY_CALLEE
+EXTERN asm_gotoxy
 
 .gotoxy
 ._gotoxy
@@ -16,4 +15,4 @@ EXTERN ASMDISP_GOTOXY_CALLEE
    push de
    push hl
    
-   jp gotoxy_callee + ASMDISP_GOTOXY_CALLEE
+   jp asm_gotoxy

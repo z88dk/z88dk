@@ -4,6 +4,7 @@ CFILES = \
 	_putoffset.c \
 	bios.c \
 	bdos.c \
+	cache.c \
 	close.c \
 	creat.c \
 	change_volume.c \
@@ -27,6 +28,7 @@ CFILES = \
 	rename.c \
 	setfcb.c \
 	stat.c \
+	swapuid.c \
 	write.c \
 	writebyte.c 
 

@@ -15,7 +15,7 @@
 	PUBLIC    undrawr_callee
 	PUBLIC    _undrawr_callee
 	
-	PUBLIC    ASMDISP_UNDRAWR_CALLEE
+	PUBLIC    asm_undrawr
 
 	EXTERN    do_drawr
 
@@ -27,9 +27,8 @@
 	pop hl	; x
 	push	af	; ret addr
 	
-.asmentry
+.asm_undrawr
 	ld		a,1
 	jp      do_drawr
 
 
-DEFC ASMDISP_UNDRAWR_CALLEE = asmentry - undrawr_callee

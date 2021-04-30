@@ -23,20 +23,18 @@ int creat(char *nam, mode_t mode)
     name = nam;
 
     if ( ( fc = getfcb() ) == NULL )
-	return -1;
-
-    uid = getuid();
+        return -1;
 
     if ( setfcb(fc,name) == 0 ) {
-	remove(name);
-	setuid(fc->uid);
-	if ( bdos(CPM_MAKE,fc) == -1 ) {
-	    setuid(uid);
-	    fc->use = 0;
-	    return -1;
-	}
-	setuid(uid);
-	fc->use = U_WRITE;
+        remove(name);
+        uid = swapuid(fc->uid);
+        if ( bdos(CPM_MAKE,fc) == -1 ) {
+            swapuid(uid);
+            fc->use = 0;
+            return -1;
+        }
+        swapuid(uid);
+        fc->use = U_WRITE;
     }
     
     fd =  (fc - &_fcb[0]);

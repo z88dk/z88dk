@@ -1,6 +1,7 @@
 ; void *sp1_PreShiftSpr(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_PreShiftSpr
 
 EXTERN sp1_PreShiftSpr_callee

@@ -57,4 +57,9 @@ defc DSK_CONN = $FFA7	; info on diskdrive connections:  anything different
 			; from C9H means a connection is made
 
 
+defc _GDATE = $02a
+defc _SDATE = $02b
+defc _GTIME = $02c
+defc _STIME = $02d
+
 lston

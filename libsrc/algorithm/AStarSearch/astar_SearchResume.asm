@@ -6,7 +6,7 @@ SECTION code_clib
 PUBLIC astar_SearchResume
 PUBLIC _astar_SearchResume
 EXTERN astar_Search
-EXTERN ASMDISP_ASTAR_SEARCH_RESUME_SUCCESS, ASMDISP_ASTAR_SEARCH_RESUME_FAIL
+EXTERN asm_astar_Search_resume_success, asm_astar_Search_resume_fail
 
 ; enter : hl = path to start search with
 ;              if 0, search not resumed from path but from queue
@@ -18,10 +18,10 @@ EXTERN ASMDISP_ASTAR_SEARCH_RESUME_SUCCESS, ASMDISP_ASTAR_SEARCH_RESUME_FAIL
    or l
    jr nz,astar_SearchResume_ResumeFail
    push ix
-   call astar_Search + ASMDISP_ASTAR_SEARCH_RESUME_SUCCESS
+   call asm_astar_Search_resume_success
    pop  ix
    ret 
 .astar_SearchResume_ResumeFail
-   call astar_Search + ASMDISP_ASTAR_SEARCH_RESUME_FAIL
+   call asm_astar_Search_resume_fail
    pop ix
    ret

@@ -2,6 +2,7 @@
 ; 02.2008 aralbrec
 ; sinclair spectrum version
 
+SECTION code_sprite_sp1
 PUBLIC SP1PSPUSH
 
 ; enter : hl = & struct sp1_pss to write to

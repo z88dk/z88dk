@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC adt_ListSetCurr_callee
 PUBLIC _adt_ListSetCurr_callee
-PUBLIC ASMDISP_ADT_LISTSETCURR_CALLEE
+PUBLIC asm_adt_ListSetCurr
 
 .adt_ListSetCurr_callee
 ._adt_ListSetCurr_callee
@@ -13,7 +13,7 @@ PUBLIC ASMDISP_ADT_LISTSETCURR_CALLEE
    pop de
    ex (sp),hl
    
-.asmentry
+.asm_adt_ListSetCurr
 
 ; enter: hl = struct adt_List*
 ;        de = struct adt_ListNode*, if MSB = 0 no changes done
@@ -31,4 +31,3 @@ PUBLIC ASMDISP_ADT_LISTSETCURR_CALLEE
    ld (hl),e
    ret
 
-DEFC ASMDISP_ADT_LISTSETCURR_CALLEE = asmentry - adt_ListSetCurr_callee

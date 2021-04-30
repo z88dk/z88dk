@@ -1,6 +1,7 @@
 ; uchar sp1_ScreenAttr(uchar row, uchar col)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_ScreenAttr
 
 EXTERN sp1_ScreenAttr_callee

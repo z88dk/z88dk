@@ -4,7 +4,7 @@
 SECTION code_clib
 PUBLIC gotoxy_callee
 PUBLIC _gotoxy_callee
-PUBLIC ASMDISP_GOTOXY_CALLEE
+PUBLIC asm_gotoxy
 
 EXTERN __console_x
 EXTERN __console_y
@@ -17,7 +17,7 @@ EXTERN __console_y
    pop bc
    push hl
 
-.asmentry
+.asm_gotoxy
 
    ; c = x    e = y
    ld	a,c
@@ -27,4 +27,3 @@ EXTERN __console_y
 
    ret
 
-DEFC ASMDISP_GOTOXY_CALLEE = asmentry - gotoxy_callee

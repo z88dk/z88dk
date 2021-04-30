@@ -12,4 +12,4 @@
 
 
 .w_xorpixel			
-	INCLUDE "w_pixel.asm"
+	INCLUDE "w_pixel.inc"

@@ -7,7 +7,7 @@
 
 PUBLIC tape_save_block_callee
 PUBLIC _tape_save_block_callee
-PUBLIC ASMDISP_TAPE_SAVE_BLOCK_CALLEE
+PUBLIC asm_tape_save_block
 
 .tape_save_block_callee
 ._tape_save_block_callee
@@ -22,7 +22,6 @@ PUBLIC ASMDISP_TAPE_SAVE_BLOCK_CALLEE
 ;         de = len
 ;          c = type
 
-.asmentry
+.asm_tape_save_block
 		jp	$1820
 
-DEFC ASMDISP_TAPE_SAVE_BLOCK_CALLEE = asmentry - tape_save_block_callee

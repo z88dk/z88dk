@@ -7,7 +7,7 @@ target/pmd85/stdio/generic_console_ioctl
 @stdio/stdio_8080.lst
 stdio/inkey/getk
 stdio/inkey/fgetc_cons
-@time/time.lst
+
 @input/input_keyboard.lst
 @font/font_8x8/font_8x8.lst
 target/pmd85/games/joystick

@@ -31,6 +31,9 @@ zcc +z80 -vn -startup=0 -DSTATIC -DTIMER -O2 -clib=new spectral-norm.c -o spectr
 zsdcc/new
 zcc +z80 -vn -startup=0 -DSTATIC -DTIMER -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm -lm -m -create-app
 
+zsdcc/new/math32
+zcc +z80 -vn -startup=0 -DSTATIC -DTIMER -SO3 -clib=sdcc_iy --max-allocs-per-node200000 spectral-norm.c -o spectral-norm --math32 -m -create-app
+
 The map file was used to look up symbols "TIMER_START" and "TIMER_STOP".
 These address bounds were given to TICKS to measure execution time.
 
@@ -57,6 +60,14 @@ error: 2 * 10^(-9)
 cycle count  = 8628617805
 time @ 4MHz  = 8628617805 / 4*10^6 = 35 min 57 sec
 
+Z88DK April 30, 2021
+zsdcc #12250 / new c library / math32
+5531 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 10531372867
+time @ 4MHz  = 10531372867 / 4*10^6 = 43 min 53 sec
 
 Z88DK April 20, 2020
 sccz80 / new c library

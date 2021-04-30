@@ -1,6 +1,7 @@
 ; void sp1_InsertCharStruct(struct sp1_update *u, struct sp1_cs *cs)
 ; CALLER linkage for function pointers
 
+SECTION code_sprite_sp1
 PUBLIC sp1_InsertCharStruct
 
 EXTERN sp1_InsertCharStruct_callee

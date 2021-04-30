@@ -6,7 +6,7 @@ PUBLIC in_MouseSimSetPos
 PUBLIC _in_MouseSimSetPos
 
 EXTERN in_MouseSimSetPos_callee
-EXTERN ASMDISP_IN_MOUSESIMSETPOS_CALLEE
+EXTERN asm_in_MouseSetPos
 
 
 .in_MouseSimSetPos
@@ -23,4 +23,4 @@ EXTERN ASMDISP_IN_MOUSESIMSETPOS_CALLEE
    
    ld b,c
    ld c,e
-   jp in_MouseSimSetPos_callee + ASMDISP_IN_MOUSESIMSETPOS_CALLEE
+   jp asm_in_MouseSetPos

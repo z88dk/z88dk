@@ -42,6 +42,11 @@
         zcc +aquarius -lndos -create-app -DSOUND -DSIZE=6 -DCOMPACT=3 -DJOYSTICK_DIALOG -omicroman microman.c
 
 
+        Bondwell 12/14
+        ---------------
+        zcc +cpm -subtype=bondwell -create-app -DSIZE=6 -DCOMPACT=2 -DSOUND microman.c
+
+
         $Id: microman.c $
 
 */
@@ -585,6 +590,7 @@ int x,y;
 int dots;
 int scared;
 int score, lives;
+int stickystick;
 
 #if COMPACT!=3
 char scoretxt[7];
@@ -898,6 +904,7 @@ do_game:
 #endif
 
     direction=MOVE_RIGHT;
+	stickystick=direction;
   
     basepic=bgh;
 
@@ -996,7 +1003,12 @@ do_game:
   do {
 
     // Move MicroMan
-    a=joystick(stick);
+
+	if (a=joystick(stick))
+		stickystick=a;
+	else
+		a=stickystick;
+	
     
     b=1;
     

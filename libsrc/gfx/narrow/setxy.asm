@@ -1,11 +1,11 @@
-	INCLUDE	"graphics/grafix.inc"
-        SECTION code_graphics
-	PUBLIC	setxy
+    INCLUDE    "graphics/grafix.inc"
+      SECTION code_graphics
+    PUBLIC    setxy
 
-	EXTERN	__gfx_coords
+    EXTERN    __gfx_coords
 
 ;
-;	$Id: setxy.asm,v 1.7 2016-07-02 09:01:35 dom Exp $
+;    $Id: setxy.asm,v 1.7 2016-07-02 09:01:35 dom Exp $
 ;
 
 ; ******************************************************************
@@ -17,22 +17,22 @@
 ;
 ; X-range is always legal (0-255). Y-range must be 0 - 63.
 ;
-; in:  hl	= (x,y) coordinate
+; in:  hl    = (x,y) coordinate
 ;
-; registers changed	after return:
+; registers changed    after return:
 ;  ..bcdehl/ixiy same
 ;  af....../.... different
 ;
 .setxy
-		IF maxx <> 256
-			ld	a,h
-			cp	maxx
-			ret	nc
-		ENDIF
-		IF maxy <> 256
-			ld	a,l
-			cp	maxy
-			ret	nc			; out of range...
-		ENDIF
-			ld	(__gfx_coords),hl
-			ret
+    IF maxx <> 256
+    ld    a,h
+    cp    maxx
+    ret    nc
+    ENDIF
+    IF maxy <> 256
+    ld    a,l
+    cp    maxy
+    ret    nc    ; out of range...
+    ENDIF
+    ld    (__gfx_coords),hl
+    ret

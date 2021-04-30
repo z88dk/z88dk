@@ -14,8 +14,8 @@ SECTION code_clib
 PUBLIC strdup
 PUBLIC _strdup
 
-EXTERN HeapAlloc_callee
-EXTERN _heap, ASMDISP_HEAPALLOC_CALLEE
+EXTERN asm_HeapAlloc
+EXTERN _heap
 
 .strdup
 ._strdup
@@ -33,7 +33,7 @@ EXTERN _heap, ASMDISP_HEAPALLOC_CALLEE
    
    ld hl,_heap
    push bc
-   call HeapAlloc_callee + ASMDISP_HEAPALLOC_CALLEE
+   call asm_HeapAlloc
    pop bc
    pop de
    ret nc

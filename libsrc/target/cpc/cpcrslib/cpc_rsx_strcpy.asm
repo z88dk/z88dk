@@ -12,8 +12,7 @@
         SECTION   code_clib
         PUBLIC    cpc_rsx_strcpy
         PUBLIC    _cpc_rsx_strcpy
-        EXTERN     cpc_rsx_strcpy_callee
-        EXTERN    ASMDISP_CPC_RSX_STRCPY_CALLEE
+        EXTERN    asm_cpc_rsx_strcpy
 
 .cpc_rsx_strcpy
 ._cpc_rsx_strcpy
@@ -23,4 +22,4 @@
         push    de
         push    hl
         push    bc
-        jp cpc_rsx_strcpy_callee + ASMDISP_CPC_RSX_STRCPY_CALLEE
+        jp asm_cpc_rsx_strcpy

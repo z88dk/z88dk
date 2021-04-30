@@ -8,8 +8,7 @@ SECTION code_clib
 PUBLIC find_file
 PUBLIC _find_file
 
-EXTERN find_file_callee
-EXTERN ASMDISP_FIND_FILE_CALLEE
+EXTERN asm_find_file
 
 find_file:
 _find_file:
@@ -20,4 +19,4 @@ _find_file:
 	push	de
 	push	bc
 
-   jp find_file_callee + ASMDISP_FIND_FILE_CALLEE
+   jp asm_find_file
