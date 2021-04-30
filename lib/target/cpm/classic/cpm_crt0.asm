@@ -38,6 +38,10 @@
         defc    CRT_ORG_CODE  = $100
     ENDIF
 
+    IF !DEFINED_CLIB_OPEN_MAX
+        defc    DEFINED_CLIB_OPEN_MAX = 1
+        defc    CLIB_OPEN_MAX = 3
+    ENDIF
 
     ; Default to some "sensible" values
     IF !DEFINED_CONSOLE_ROWS

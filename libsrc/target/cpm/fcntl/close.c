@@ -22,8 +22,10 @@ int close(int fd)
 
     fc = &_fcb[fd];
     uid = swapuid(fc->uid);      /* Set it to that of the file */
-    if ( fc->use < U_CON )
-	bdos(CPM_CLS,fc);
+    if ( fc->use < U_CON ) {
+        cpm_cache_flush(fc);
+        bdos(CPM_CLS,fc);
+    }
     fc->use = 0;
     swapuid(uid);
     return 0;

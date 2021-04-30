@@ -10,7 +10,7 @@ IF CLIB_OPEN_MAX > 0
     SECTION bss_crt
     PUBLIC  __fcb
 __fcb:
-    defs    CLIB_OPEN_MAX * 43	; Each FCB is 43 bytes long
+    defs    CLIB_OPEN_MAX * 166	; Each FCB is 43 bytes long
 ENDIF
 
     PUBLIC  defltdsk

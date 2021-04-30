@@ -49,26 +49,29 @@ ssize_t write(int fd, void *buf, size_t len)
     case U_RDWR:
         uid = swapuid(fc->uid);
         while ( len ) {
+            unsigned long record_nr = fc->rwptr/SECSIZE;
             offset = fc->rwptr%SECSIZE;
             if ( (size = SECSIZE-offset) > len ) {
                 size = len;
             }
-            _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
             if ( size == SECSIZE ) {
+                // Write the full sector now, flush whatever we've got cached so we don't 
+                // write out of order
+                cpm_flush_cache(fc);
+
+                _putoffset(fc->ranrec,fc->rwptr/SECSIZE);
                 bdos(CPM_SDMA,buf);
                 if ( bdos(CPM_WRAN,fc) ) {
                     swapuid(uid);
-                    return -1;   /* Not sure about this.. */
+                    return cnt-len;
                 }
-            } else {  /* Not the required size, read in the extent */
-                bdos(CPM_SDMA,buffer);
-                memset(buffer,26,SECSIZE);
-                bdos(CPM_RRAN,fc);
-                memcpy(buffer+offset,buf,size);
-                if ( bdos(CPM_WRAN,fc) ) {
+            } else {  /* Not the required size, read in the record to our cache */
+                if ( cpm_cache_get(fc, record_nr, 0) == - 1 ) {
                     swapuid(uid);
-                    return -1;   /* Not sure about this.. */
+                    return cnt-len;
                 }
+                memcpy(fc->buffer+offset,buf,size);
+                fc->dirty = 1;
             }
             buf += size;
             fc->rwptr += size;

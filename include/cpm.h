@@ -12,6 +12,7 @@
 
 #include <sys/compiler.h>
 #include <sys/types.h>
+#include <stdint.h>
 
 /* Maximum number of open files. If you want to change this then you
  * compile your program with -pragma-define:CLIB_OPEN_MAX=xx
@@ -49,35 +50,43 @@ extern void *_CLIB_OPEN_MAX;
 #define __STDIO_CRLF       1    /* Automatically convert between CR and CRLF */
 
 struct fcb {
-    u8_t    drive;          /* drive code */
+    // 36 bytes of standard FCB
+    uint8_t drive;          /* drive code */
     char    name[8];        /* file name */
     char    ext[3];         /* file type */
-    u8_t    extent;         /* file extent */
+    uint8_t extent;         /* file extent */
     char    filler[2];      /* not used */
     char    records;        /* number of records in present extent */
     char    discmap[16];    /* CP/M disc map */
     char    next_record;    /* next record to read or write */
-    u8_t    ranrec[3];      /* random record number (24 bit no. ) */
+    uint8_t ranrec[3];      /* random record number (24 bit no. ) */
+    
 
     /* Below here is used by the library */
+    // 7 bytes used by the library
     unsigned long rwptr;    /* read/write pointer in bytes */
-    u8_t    use;            /* use flag */
-    u8_t    uid;            /* user id belonging to this file */
-    u8_t    mode;           /* TEXT/BINARY discrimination */
+    uint8_t    use;            /* use flag */
+    uint8_t    uid;            /* user id belonging to this file */
+    uint8_t    mode;           /* TEXT/BINARY discrimination */
+
+    // 133 bytes used for caching
+    unsigned long cached_record;   /* Record number that we have cached */
+    uint8_t    dirty;          /* Set if the buffer is dirty and needs writing to disc */
+    uint8_t    buffer[SECSIZE];
 };
 
 struct sfcb {
-    u8_t    drive;          /* drive code */
+    uint8_t    drive;          /* drive code */
     char    name[8];        /* file name */
     char    ext[3];         /* file type */
-    u8_t    pwdmode;        /* Password mode (0=no pwd): bit 7-Read, bit 6-Write, bit 4-Delete */
+    uint8_t    pwdmode;        /* Password mode (0=no pwd): bit 7-Read, bit 6-Write, bit 4-Delete */
     char    filler[10];     /* not used */
 	int 	c_date;			/* Create or Access date/time (depends on settings) */
-	u8_t	c_hours;
-	u8_t	c_minutes;
+	uint8_t	c_hours;
+	uint8_t	c_minutes;
 	int 	date;			/* Update date/time (days since January 1, 1978) */
-	u8_t	hours;
-	u8_t	minutes;
+	uint8_t	hours;
+	uint8_t	minutes;
 };
 
 
@@ -126,6 +135,10 @@ extern int __LIB__ bios(int func,int arg,int arg2) __smallc;
 /* Get a free FCB */
 
 extern struct fcb __LIB__ *getfcb(void);
+
+/* Internal caching calls */
+extern int __LIB__ cpm_cache_get(struct fcb *fcb, unsigned long record_nr, int for_read);
+extern int __LIB__ cpm_cache_flush(struct fcb *fcb);
 
 /* Fill up the filename stuff */
 extern int __LIB__ setfcb(struct fcb *fc, unsigned char *name) __smallc;

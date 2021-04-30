@@ -8,6 +8,15 @@
         defc CRT_ORG_CODE = $100   ; MSXDOS
     ENDIF
 
+    ; For MSXDOS 1 limit the number of open files to 3 to reduce memory usage
+    ; This can be overridden with -pragma-define:CLIB_OPEN_MAX=NN where NN
+    ; is your chosen number
+    IF CLIB_MSXDOS = 1
+        IF !DEFINED_CLIB_OPEN_MAX
+            defc    DEFINED_CLIB_OPEN_MAX = 1
+            defc    CLIB_OPEN_MAX = 3
+        ENDIF
+    ENDIF
 
     IF !DEFINED_MSXDOS
         defc MSXDOS = 5
@@ -87,7 +96,9 @@ l_dcal:
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"
     INCLUDE "crt/classic/crt_section.asm"
+IF CLIB_MSXDOS = 1
     INCLUDE "crt/classic/crt_cpm_fcntl.asm"
+ENDIF
 
     SECTION bss_crt
 
