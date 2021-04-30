@@ -14,16 +14,16 @@
 #include <sys/types.h>
 
 /* Maximum number of open files. If you want to change this then you
- * compile your program with -pragma-define:CPM_FCBS_MAX=xx
+ * compile your program with -pragma-define:CLIB_OPEN_MAX=xx
  */
-#ifndef CPM_FCBS_MAX
-extern void *_CPM_FCBS_MAX;
-#define CPM_FCBS_MAX &_CPM_FCBS_MAX
+#ifndef CLIB_OPEN_MAX
+extern void *_CLIB_OPEN_MAX;
+#define CLIB_OPEN_MAX &_CLIB_OPEN_MAX
 #endif
 
 
 
-#define MAXFILE CPM_FCBS_MAX
+#define MAXFILE CLIB_OPEN_MAX
 
 /* If you want fileio to support devices then link with -lcpmdevice.
  * This adds the following devices: CON: RDR: PUN: LST: without this

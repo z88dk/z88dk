@@ -144,6 +144,12 @@
     PUBLIC  __FOPEN_MAX
     defc    __FOPEN_MAX = CLIB_FOPEN_MAX
 
+    ; Maximum number of fds available
+    IF !DEFINED_CLIB_OPEN_MAX
+        DEFC    CLIB_OPEN_MAX = CLIB_FOPEN_MAX
+    ENDIF
+    PUBLIC  __CLIB_OPEN_MAX
+    defc    __CLIB_OPEN_MAX = CLIB_OPEN_MAX
 
    ; By default allow the command line options if available on the target/subtype
    IF !DEFINED_CRT_ENABLE_COMMANDLINE
