@@ -51,6 +51,7 @@ SYMBOL* findloc(char* sname)
 // statement...
 void sym_undecl_frame(array *arr, SYMBOL *target, int need_undecl)
 {
+    return; // TODO: Something is broken/called at the wrong point in time
     SYMBOL *current = locptr;
 
     while (current != target) {
