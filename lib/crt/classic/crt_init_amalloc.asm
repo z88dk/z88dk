@@ -5,7 +5,7 @@
 
 ; It works only with a _heap pointer defined somewhere else in the crt0.
 ; Such (long) pointer will hold, at startup, the (word) value of ASMTAIL
-; that points to che last used byte in the compiled program:
+; that points to the last used byte in the compiled program:
 
 ;IF DEFINED_USING_amalloc
 ;EXTERN ASMTAIL
@@ -19,58 +19,58 @@
 ; $Id: amalloc.def,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
 
 IF CRT_MAX_HEAP_ADDRESS
-	ld	hl,CRT_MAX_HEAP_ADDRESS
+    ld      hl,CRT_MAX_HEAP_ADDRESS
 ELSE
-	ld	hl,0
-	add	hl,sp
+    ld      hl,0
+    add     hl,sp
 ENDIF
-	; HL must hold SP or the end of free memory
-	push hl
+    ; HL must hold SP or the end of free memory
+    push    hl
 
-	ld	hl,_heap
-	ld	c,(hl)
-	inc	hl
-	ld	b,(hl)
-	inc bc
-	; compact way to do "mallinit()"
-	xor	a
-	ld	(hl),a
-	dec hl
-	ld	(hl),a
+    ld      hl,_heap
+    ld      c,(hl)
+    inc     hl
+    ld      b,(hl)
+    inc     bc
+    ; compact way to do "mallinit()"
+    xor     a
+    ld      (hl),a
+    dec     hl
+    ld      (hl),a
 
-	pop hl	; sp
-	sbc hl,bc	; hl = total free memory
-	ld d,h
-	ld e,l
+    pop     hl	; sp
+    sbc     hl,bc	; hl = total free memory
+    ld      d,h
+    ld      e,l
 IF __CPU_INTEL__
-	and	a
-	ld	a,d
-	rra
-	ld	d,a
-	ld	a,e
-	rra
-	ld	e,a
-	and	a
-	ld	a,d
-	rra
-	ld	d,a
-	ld	a,e
-	rra
-	ld	e,a
+    and     a
+    ld      a,d
+    rra
+    ld      d,a
+    ld      a,e
+    rra
+    ld      e,a
+    and     a
+    ld      a,d
+    rra
+    ld      d,a
+    ld      a,e
+    rra
+    ld      e,a
 ELSE
-	srl d
-	rr e
-	srl d
-	rr e
+    srl     d
+    rr      e
+    srl     d
+    rr      e
 ENDIF
 IF DEFINED_USING_amalloc_2
-	sbc hl,de	;  leave 2/4 of the free memory for the stack
+    sbc     hl,de	;  leave 2/4 of the free memory for the stack
 IF DEFINED_USING_amalloc_1
-	sbc hl,de	;  leave 3/4 of the free memory for the stack
+    sbc     hl,de	;  leave 3/4 of the free memory for the stack
 ENDIF
 ENDIF
-	sbc hl,de	;  leave 1/4 of the free memory for the stack
-	push bc ; main address for malloc area
-	push hl	; area size
-	EXTERN sbrk_callee
-	call	sbrk_callee
+    sbc     hl,de	;  leave 1/4 of the free memory for the stack
+    push    bc ; main address for malloc area
+    push    hl	; area size
+    EXTERN  sbrk_callee
+    call    sbrk_callee

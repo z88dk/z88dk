@@ -8,10 +8,12 @@
 ; Exit:	  bc = argc
 ;         hl = argv
 
-	jr argv_begin
-	
+IF CRT_ENABLE_COMMANDLINE = 1
+    jr      argv_begin
+
 redir_fopen_flag:		defb	'w',0
-redir_fopen_flagr:		defb	'r',0
+redir_fopen_flagr:		defb	'r'
+commandline_argv0:		defb	0
 
 argv_begin:
     ld      de,0	;NULL pointer at end of array, just in case
@@ -32,9 +34,7 @@ argv_loop_2:
     jr      nz,argv_loop_3
     inc     hl              ; We're now on the first character of the argument
     inc     c
-IF CRT_ENABLE_STDIO
-  IF !DEFINED_noredir
-    IF !DEFINED_nostreams
+IF CRT_COMMANDLINE_REDIRECTION = 1
         EXTERN freopen
         xor     a
         add     b
@@ -88,8 +88,6 @@ no_redir_stdout:
         dec	    hl
         jr      argv_zloop
 no_redir_stdin:
-    ENDIF
-  ENDIF
 ENDIF
     push    hl
     inc     b
@@ -138,11 +136,17 @@ argv_push_final_arg3:
     inc     b
     
 argv_done_2:
-    ld      hl,end	;name of program (NULL)
+    ld      hl,commandline_argv0	;name of program (NULL)
     push    hl
     inc     b
     ld      hl,0
     add     hl,sp	;address of argv
     ld      c,b
     ld      b,0
+ELSE
+    ld      hl,0    ;argv
+    ld      b,h     ;argc
+    ld      c,l
+ENDIF
+
 

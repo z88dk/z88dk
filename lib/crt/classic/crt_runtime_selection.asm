@@ -547,7 +547,7 @@ IF !DEFINED_getk
 ENDIF
 
 
-
+;TODO: These need to go into rules
 IF CONSOLE_COLUMNS
 	PUBLIC CONSOLE_COLUMNS
 ENDIF

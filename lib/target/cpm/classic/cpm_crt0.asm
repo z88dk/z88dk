@@ -13,53 +13,43 @@
 ; 	There are a couple of #pragma commands which affect
 ;	this file:
 ;
-;	#pragma output nostreams - No stdio disc files
-;	#pragma output nofileio  - No fileio at all, use in conjunction to "-lndos"
 ;	#pragma output noprotectmsdos - strip the MS-DOS protection header
 ;	#pragma output protect8080 - add a check to block the program when on an 8080 CPU (not compatible)
-;	#pragma output noredir   - do not insert the file redirection option while parsing the
-;	                           command line arguments (useless if "nostreams" is set)
-;	#pragma output nogfxglobals - No global variables for graphics (required for GFX on TIKI-100, Einstein, and Spectrum +3)
 ;
-;	These can cut down the size of the resultant executable
 
-	MODULE  cpm_crt0
+    MODULE  cpm_crt0
 
-;-------------------------------------------------
-; Include zcc_opt.def to find out some information
-;-------------------------------------------------
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
-        defc    crt0 = 1
-	INCLUDE "zcc_opt.def"
 
-;-----------------------
-; Some scope definitions
-;-----------------------
 
-	EXTERN	cpm_platform_init
-	EXTERN    _main		;main() is always external to crt0
+    EXTERN	cpm_platform_init
+    EXTERN    _main		;main() is always external to crt0
 
-	PUBLIC    cleanup		;jp'd to by exit()
-	PUBLIC    l_dcal		;jp(hl)
+    PUBLIC    cleanup		;jp'd to by exit()
+    PUBLIC    l_dcal		;jp(hl)
 
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
-	defc	__CPU_CLOCK = 4000000
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__register_sp = -1
+    defc	__CPU_CLOCK = 4000000
 
-		IF !DEFINED_CRT_ORG_CODE
-            defc    CRT_ORG_CODE  = $100
-		ENDIF
+    IF !DEFINED_CRT_ORG_CODE
+        defc    CRT_ORG_CODE  = $100
+    ENDIF
 
-        ; Default to some "sensible" values
-        IF !DEFINED_CONSOLE_ROWS
-           defc CONSOLE_ROWS = 24
-        ENDIF
-        IF !DEFINED_CONSOLE_COLUMNS
-           defc CONSOLE_COLUMNS = 80
-        ENDIF
 
-	org     CRT_ORG_CODE
+    ; Default to some "sensible" values
+    IF !DEFINED_CONSOLE_ROWS
+        defc    CONSOLE_ROWS = 24
+    ENDIF
+    IF !DEFINED_CONSOLE_COLUMNS
+        defc    CONSOLE_COLUMNS = 80
+    ENDIF
+
+    INCLUDE "crt/classic/crt_rules.inc"
+
+    org     CRT_ORG_CODE
 
 
 ;----------------------
@@ -103,22 +93,22 @@ ENDIF
 	nop	 ;   Those extra bytes fix the Amstrad NC's ZCN support !!?!
 	nop
 
-        ld	hl,0
-	add	hl,sp
-	ld      (start1+1),hl	;Save entry stack
+    ld      hl,0
+    add     hl,sp
+    ld      (start1+1),hl	;Save entry stack
 IF (startup=3)
-	; Increase to cover +3 MEM banking
-	defc	__clib_exit_stack_size_t  = __clib_exit_stack_size + 18 + 18
-	UNDEFINE __clib_exit_stack_size
-	defc	__clib_exit_stack_size = __clib_exit_stack_size_t
+    ; Increase to cover +3 MEM banking
+    defc    __clib_exit_stack_size_t  = __clib_exit_stack_size + 18 + 18
+    UNDEFINE __clib_exit_stack_size
+    defc    __clib_exit_stack_size = __clib_exit_stack_size_t
 ENDIF
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-        call    crt0_init_bss   
-	call	cpm_platform_init	;Any platform specific init
-	ld	hl,0
-	add	hl,sp
-	ld      (exitsp),hl
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss   
+    call    cpm_platform_init	;Any platform specific init
+    ld      hl,0
+    add     hl,sp
+    ld      (exitsp),hl
 
 ; Memory banking for Spectrum +3
 IF (startup=3)
@@ -149,44 +139,47 @@ IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
-        ld	hl,$80
-        ld      a,(hl)
-        ;ld      b,0
-		ld      b,h
-        and     a
-        jr      z,argv_done
-        ;inc	hl
-        ld      c,a
-        add     hl,bc   ;now points to the end of the command line
-        dec     c
+IF CRT_ENABLE_COMMANDLINE = 1
+    ld      hl,$80
+    ld      a,(hl)
+    ;ld      b,0
+    ld      b,h
+    and     a
+    jr      z,argv_done
+    ;inc	hl
+    ld      c,a
+    add     hl,bc   ;now points to the end of the command line
+    dec     c
+    INCLUDE	"crt/classic/crt_command_line.asm"
+    push    hl	;argv
+    push    bc	;argc
+ELSE
+    ld      hl,0
+    push    hl  ;argv
+    push    hl  ;argc
+ENDIF
+    call    _main		;Call user code
+    pop     bc	;kill argv
+    pop     bc	;kill argc
 
-
-	INCLUDE	"crt/classic/crt_command_line.asm"
-	push	hl	;argv
-	push	bc	;argc
-        call    _main		;Call user code
-	pop	bc	;kill argv
-	pop	bc	;kill argc
-
-	ld	a,(defltdsk)	;Restore default disc
-	ld	e,a
-	ld	c,14
-	call	5
+    ld      a,(defltdsk)	;Restore default disc
+    ld      e,a
+    ld      c,14
+    call    5
 
 cleanup:
-	push	hl		;Save return value
+    push    hl		;Save return value
     call    crt0_exit
-
-	pop	bc		;Get exit() value into bc
-start1:	ld      sp,0		;Pick up entry sp
-        jp	0
-		;ret
+    pop     bc		;Get exit() value into bc
+start1:	
+    ld      sp,0		;Pick up entry sp
+    jp      0
 
 l_dcal:	jp	(hl)		;Used for call by function ptr
 
 ; Memory banking for Spectrum +3
 IF (startup=3)
-		PUBLIC	pixelbyte
+    PUBLIC	pixelbyte
 pixelbyte:	defb	0		; temp byte storage for VDP driver
 
 p3_poke:
@@ -240,36 +233,13 @@ peekbyte_code:
 ENDIF
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_cpm_fcntl.asm"
 
-	INCLUDE	"crt/classic/crt_section.asm"
-
-
-	SECTION code_crt_init
-	ld	c,25
-	call	5
-	ld	(defltdsk),a
-
-	
-	SECTION bss_crt
-
-;-----------------------
-; Some startup variables
-;-----------------------
-		PUBLIC	defltdsk
-defltdsk:       defb    0	;Default disc
-
-IF !DEFINED_nofileio
-		PUBLIC	__fcb
-__fcb:		defs	430,0	;file control block (10 files) (MAXFILE)
-ENDIF
-
-
-;-----------------------------------------------------
-; Unneccessary file signature + target specific stuff
-;-----------------------------------------------------
-		PUBLIC	_vdcDispMem
-_vdcDispMem:				; Label used by "c128cpm.lib" only
-end:		defb	0		; null file name
+    SECTION code_crt_init
+    ld      c,25
+    call    5
+    ld      (defltdsk),a
 
 

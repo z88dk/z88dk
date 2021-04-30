@@ -133,10 +133,6 @@ z80start:
 ;		jr	z,brdloop ;no key pressed
 		
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
-
     call    crt0_exit
 
 

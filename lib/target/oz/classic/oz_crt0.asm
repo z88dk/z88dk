@@ -214,10 +214,6 @@ ENDIF
 
 ;------- Z88DK specific code (begin) -------
 cleanup:
-;
-;       Deallocate memory which has been allocated here!
-;
-
         call    crt0_exit
 
 

@@ -403,7 +403,7 @@
 	GLOBAL	chdir
 	GLOBAL	getwd
 	GLOBAL	rmdir
-	GLOBAL	_RND_BLOCKSIZE
+	GLOBAL	__RND_BLOCKSIZE
 	GLOBAL	rnd_loadblock
 	GLOBAL	rnd_saveblock
 	GLOBAL	rnd_erase

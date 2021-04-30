@@ -1,4 +1,7 @@
 
+; Rules for setting up defaults for configuring the build
+
+
    IFNDEF CRT_INITIALIZE_BSS
       defc CRT_INITIALIZE_BSS = 1
    ENDIF
@@ -36,6 +39,7 @@
      defc __crt_enable_nmi = TAR__crt_enable_nmi
    ENDIF
 
+   ; By default we want to have stdio working for us
    IFNDEF CRT_ENABLE_STDIO
        defc CRT_ENABLE_STDIO = 1
    ENDIF
@@ -132,7 +136,55 @@
    IF !DEFINED_CLIB_DEFAULT_SCREEN_MODE
        defc CLIB_DEFAULT_SCREEN_MODE = 0
    ENDIF
-      
+
+    ; Maximum number of FILEs available
+    IF !DEFINED_CLIB_FOPEN_MAX
+        DEFC    CLIB_FOPEN_MAX = 10
+    ENDIF
+    PUBLIC  __FOPEN_MAX
+    defc    __FOPEN_MAX = CLIB_FOPEN_MAX
+
+    ; Maximum number of fds available
+    IF !DEFINED_CLIB_OPEN_MAX
+        ; Map this old nofileio pragma into a modern form
+        IF DEFINED_nofileio
+            defc    CLIB_OPEN_MAX = 0
+        ELSE
+            defc    CLIB_OPEN_MAX = CLIB_FOPEN_MAX
+        ENDIF
+    ENDIF
+    PUBLIC  __CLIB_OPEN_MAX
+    defc    __CLIB_OPEN_MAX = CLIB_OPEN_MAX
+
+   ; By default allow the command line options if available on the target/subtype
+   IF !DEFINED_CRT_ENABLE_COMMANDLINE
+      IFDEF TAR__CRT_ENABLE_COMMANDLINE
+          defc CRT_ENABLE_COMMANDLINE = TAR__CRT_ENABLE_COMMANDLINE
+      ELSE
+          defc CRT_ENABLE_COMMANDLINE = 1
+      ENDIF
+   ENDIF
+
+
+   ; Map this old pragma into a "modern" name
+   IF DEFINED_nostreams
+       defc CRT_COMMANDLINE_REDIRECTION = 0
+   ELIF !DEFINED_CRT_COMMANDLINE_REDIRECTION
+       ; File redirection on command line arguments can only happen
+       ; if stdio is enabled
+       IF CRT_ENABLE_STDIO = 1
+           defc CRT_COMMANDLINE_REDIRECTION = 1
+       ELSE
+           defc CRT_COMMANDLINE_REDIRECTION = 0
+       ENDIF
+   ENDIF
+
+   ; Block size for the gendos library
+   IF !DEFINED_CLIB_RND_BLOCKSIZE
+      DEFC    CLIB_RND_BLOCKSIZE = 1000
+   ENDIF
+   PUBLIC  __RND_BLOCKSIZE
+   defc    __RND_BLOCKSIZE = CLIB_RND_BLOCKSIZE
 
    ; Custom memory map
    IF DEFINED_MMAP
