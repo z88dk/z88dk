@@ -186,6 +186,13 @@
    PUBLIC  __RND_BLOCKSIZE
    defc    __RND_BLOCKSIZE = CLIB_RND_BLOCKSIZE
 
+   ; Define the height of the font
+   IF !DEFINED_CLIB_FONT_HEIGHT
+      defc CLIB_FONT_HEIGHT = 8
+   ENDIF
+   PUBLIC __CLIB_FONT_HEIGHT
+   defc __CLIB_FONT_HEIGHT = CLIB_FONT_HEIGHT
+
    ; Custom memory map
    IF DEFINED_MMAP
        defc __MMAP = MMAP

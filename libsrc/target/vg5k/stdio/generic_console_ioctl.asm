@@ -2,8 +2,9 @@
 	MODULE	generic_console_ioctl
 	PUBLIC	generic_console_ioctl
 
-	EXTERN	set_character8
+	EXTERN	set_character
 	EXTERN	__vg5k_custom_font
+    EXTERN  __CLIB_FONT_HEIGHT
 
 	SECTION	code_clib
 	INCLUDE	"ioctl.def"
@@ -30,11 +31,11 @@ generic_console_ioctl:
 set_font:
 	push	bc
 	push	hl
-	call	set_character8
+	call	set_character
 	pop	hl
 	pop	bc
 	inc	c
-	ld	de,8
+	ld	de,__CLIB_FONT_HEIGHT
 	add	hl,de	
 	djnz	set_font
 success:
