@@ -13,21 +13,20 @@
 	pop	hl
 	push	hl
 	push	bc
-.i_4
 	call	l_case
-	defw	i_5
+	defw	i_4
 	defw	1
-	defw	i_6
+	defw	i_5
 	defw	3
 	defw	0
 	jp	i_3	;EOS
-.i_5
+.i_4
 	ld	hl,1	;const
 	push	hl
 	call	_dofunc
 	pop	bc
 	jp	i_3	;EOS
-.i_6
+.i_5
 	ld	hl,1	;const
 	push	hl
 	call	_dofunc

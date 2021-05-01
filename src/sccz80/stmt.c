@@ -260,7 +260,7 @@ Node *compound()
     // NODE: End remove
     sym_undecl_frame(array, savloc, lastst != STRETURN);
 
-   // locptr = savloc; /* delete local symbols */
+    locptr = savloc; /* delete local symbols */
     declared = 0;
     return ast_compound(array);
 }
@@ -544,7 +544,7 @@ Node *dofor()
     --ncmp;
     modstk(savedsp, KIND_NONE, NO, YES);
     Zsp = savedsp;
-   // locptr = savedloc;
+    locptr = savedloc;
     declared = 0;
     delwhile();
 
