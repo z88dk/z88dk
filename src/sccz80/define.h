@@ -547,7 +547,7 @@ struct node_s {
          // Switch (also sets type)
          struct {
              Node  *sw_expr;    // What we switch on
-             array *sw_body;    // Contains all the code
+             Node  *sw_body;    // Contains all the code
          };
          // Switch case jumps
          struct {

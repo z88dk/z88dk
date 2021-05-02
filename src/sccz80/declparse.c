@@ -1973,7 +1973,7 @@ static void declfunc(Type *functype, enum storage_type storage)
         UT_string *output;
         utstring_new(output);
         print_ast(output, pair->node);
-        printf("%s\n", utstring_body(output));
+        //printf("%s\n", utstring_body(output));
         utstring_free(output);
     }
     if (pair->i != STRETURN && (functype->flags & NAKED) == 0 ) {
