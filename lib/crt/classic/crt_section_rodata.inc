@@ -20,6 +20,8 @@ ENDIF
     SECTION rodata_font
     SECTION rodata_font_fzx
     SECTION rodata_font_4x8
+    SECTION rodata_font_6x8
     SECTION rodata_font_8x8
+    SECTION rodata_font_8x10
     SECTION rodata_font_ansi
     SECTION rodata_splib2
