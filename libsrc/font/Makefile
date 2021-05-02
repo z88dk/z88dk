@@ -1,7 +1,7 @@
 include ../Make.config
 
 
-SUBDIRS = fzx font_4x8 font_8x8
+SUBDIRS = fzx font_4x8 font_8x8 font_8x10
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 all: subdirs-all
