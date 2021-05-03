@@ -12,7 +12,7 @@ and run in an emulator.
 new/sccz80
 zcc +zx -vn -DSTATIC -DPRINTF -O2 -clib=new n-body.c -o n-body -lm -create-app
 zcc +zx -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints -clib=new n-body.c -o n-body --math32 -create-app
-zcc +cpm -v -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints -clib=new n-body.c -o n-body --math16 --math32 -create-app
+zcc +zx -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints -clib=new n-body.c -o n-body --math16 --math32 -create-app
 
 new/zsdcc
 zcc +zx -vn -DSTATIC -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node200000 n-body.c -o n-body -lm -create-app
