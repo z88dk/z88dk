@@ -158,13 +158,13 @@ time @ 4MHz  = 1142045217 / 4*10^6 =  4 min 45 sec
 
 IEEE 32-bit float implementation.
 
-12.
-Z88DK June 13, 2020
-sccz80 / new c library / math16-fast
-1986 bytes less page zero
+11.
+Z88DK May 3, 2021
+sccz80 / new c library / math16
+2050 bytes less page zero
 
-cycle count  =  965171871
-time @ 4MHz  =  965171871 / 4*10^6 =  4 min 01 sec
+cycle count  =  915024561
+time @ 4MHz  =  915024561 / 4*10^6 =  3 min 48 sec
 
 IEEE 16-bit float implementation.
 

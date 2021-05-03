@@ -15,7 +15,7 @@ math32/new/sccz80
 zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -O2 -clib=new mandelbrot.c -o mandelbrot --math32 -m -pragma-include:zpragma.inc -create-app
 
 math16/new/sccz80
-zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -O2 -clib=new mandelbrot.c -o mandelbrot --math16 -m -pragma-include:zpragma.inc -create-app
+zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -O3 --opt-code-speed=inlineints -clib=new mandelbrot.c -o mandelbrot --math16 -m -pragma-include:zpragma.inc -create-app
 
 new/zsdcc
 zcc +z80 -vn -DSTATIC -DTIMER -startup=0 -SO3 -clib=sdcc_iy --max-allocs-per-node200000 mandelbrot.c -o mandelbrot -lm -m -pragma-include:zpragma.inc -create-app
@@ -50,7 +50,7 @@ prematurely terminated so rerun with a higher counter if that is the case.
 
 To verify, extract the 480 bytes at address 0xc000 from "verify.bin":
 
-appmake +extract -b verify.bin -s 0xc000 -l 480 -o image.bin
+z88dk-appmake +extract -b verify.bin -s 0xc000 -l 480 -o image.bin
 
 Compare the contents of "image.bin" to "image-golden.bin" in the same directory.
 The pixels around the edge of the mandelbrot set can vary somewhat depending
@@ -67,6 +67,7 @@ zsdcc #12070 / new
 
 cycle count  = 3736214166
 time @ 4MHz  = 3736214166 / 4*10^6 = 15 min 34 sec
+
 
 Z88DK April 28, 2021
 zsdcc #12070 / new / math32
@@ -92,9 +93,9 @@ cycle count  = 1137834777
 time @ 4MHz  = 1137834777 / 4*10^6 =  4 min 44 sec
 
 
-Z88DK June 13, 2020
-sccz80 / new / math16-fast
-1986 bytes less page zero
+Z88DK May 3, 2021
+sccz80 / new / math16
+2050 bytes less page zero
 
-cycle count  =  965171871
-time @ 4MHz  =  965171871 / 4*10^6 =  4 min 01 sec
+cycle count  =  915024561
+time @ 4MHz  =  915024561 / 4*10^6 =  3 min 48 sec

@@ -12,7 +12,7 @@ and run in an emulator.
 new/sccz80
 zcc +zx -vn -DSTATIC -DPRINTF -O2 -clib=new n-body.c -o n-body -lm -create-app
 zcc +zx -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints -clib=new n-body.c -o n-body --math32 -create-app
-zcc +zx -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints -clib=new n-body.c -o n-body --math16 --math32 -create-app
+zcc +cpm -v -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints -clib=new n-body.c -o n-body --math16 --math32 -create-app
 
 new/zsdcc
 zcc +zx -vn -DSTATIC -DPRINTF -SO3 -clib=sdcc_iy --max-allocs-per-node200000 n-body.c -o n-body -lm -create-app
@@ -94,12 +94,12 @@ second number error: 1 * 10^(-4)
 cycle count  = 754266702
 time @ 4MHz  = 754266702 / 4*10^6 = 3 min 8 sec
 
-Z88DK June 28, 2020
+Z88DK May 3, 2021
 sccz80 / new / math16
-3222 bytes less page zero
+3309 bytes less page zero
 
 first number error : 5 * 10^(-4)
 second number error: 5 * 10^(-2)
 
-cycle count  = 384070543
-time @ 4MHz  = 384070543 / 4*10^6 = 1 min 36 sec
+cycle count  = 357718801
+time @ 4MHz  = 357718801 / 4*10^6 = 1 min 29 sec

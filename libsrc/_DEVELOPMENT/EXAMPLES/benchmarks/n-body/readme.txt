@@ -163,15 +163,15 @@ time @ 4MHz  = 754266702 / 4*10^6 = 3 min 8 sec
 IEEE 32-bit float implementation, accurate to 7 significant digits.
 
 10.
-Z88DK June 28, 2020
+Z88DK May 3, 2021
 sccz80 / new / math16
-3222 bytes less page zero
+3309 bytes less page zero
 
 first number error : 5 * 10^(-4)
 second number error: 5 * 10^(-2)
 
-cycle count  = 384070543
-time @ 4MHz  = 384070543 / 4*10^6 = 1 min 36 sec
+cycle count  = 357718801
+time @ 4MHz  = 357718801 / 4*10^6 = 1 min 29 sec
 
 IEEE 16-bit float implementation, accurate to 3 significant digits.
 
