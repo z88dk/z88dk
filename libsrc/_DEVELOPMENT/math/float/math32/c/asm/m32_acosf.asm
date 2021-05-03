@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.4 #12274 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -425,8 +425,8 @@ _m32_acosf:
 	ex	(sp), hl
 	ld	(ix-2),e
 	ld	(ix-1),d
-	ld	l,(ix-4)
-	ld	h,(ix-3)
+	pop	hl
+	push	hl
 	ld	e,(ix-2)
 	ld	d,(ix-1)
 	call	_m32_sqrf
@@ -438,16 +438,14 @@ _m32_acosf:
 	push	hl
 	call	___fssub_callee
 	call	_m32_sqrtf
-	ld	c, l
-	ld	l,(ix-2)
-	ld	b,h
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	push	de
+	ld	c,(ix-2)
+	ld	b,(ix-1)
 	push	bc
+	ld	c,(ix-4)
+	ld	b,(ix-3)
+	push	bc
+	push	de
+	push	hl
 	call	___fsdiv_callee
 	call	_m32_atanf
 	ld	sp, ix

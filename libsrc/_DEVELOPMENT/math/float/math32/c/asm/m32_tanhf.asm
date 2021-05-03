@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.4 #12274 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -425,11 +425,11 @@ _m32_tanhf:
 	push	af
 	push	af
 	call	_m32_expf
-	ex	(sp),hl
+	ex	(sp), hl
 	ld	(ix-6),e
 	ld	(ix-5),d
-	ld	l,(ix-8)
-	ld	h,(ix-7)
+	pop	hl
+	push	hl
 	ld	e,(ix-6)
 	ld	d,(ix-5)
 	call	_m32_invf
@@ -446,8 +446,8 @@ _m32_tanhf:
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
-	ld	l,(ix-8)
-	ld	h,(ix-7)
+	pop	hl
+	push	hl
 	ld	e,(ix-6)
 	ld	d,(ix-5)
 	call	_m32_invf

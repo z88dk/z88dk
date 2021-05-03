@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.4 #12274 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -422,16 +422,16 @@ _m32_sinf:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	c, l
-	ld	b, h
-	ld	hl, -9
-	add	hl, sp
-	ld	sp, hl
-	ld	(ix-5),0x01
-	pop	hl
-	push	bc
-	ld	(ix-7),e
-	ld	(ix-6),d
+	push	af
+	push	af
+	push	af
+	dec	sp
+	ld	(ix-3),0x01
+	ld	c,l
+	ld	b,h
+	ex	(sp),hl
+	ld	(ix-5),e
+	ld	(ix-4),d
 	push	bc
 	push	de
 	ld	hl,0x0000
@@ -445,20 +445,23 @@ _m32_sinf:
 	ld	a,l
 	or	a, a
 	jr	Z,l_m32_sinf_00102
-	ld	(ix-5),0xff
+	ld	(ix-3),0xff
 	ld	a, d
 	xor	a,0x80
-	ld	(ix-6),a
+	ld	(ix-4),a
 	pop	hl
 	push	bc
-	ld	(ix-7),e
+	ld	(ix-5),e
 l_m32_sinf_00102:
-	pop	bc
+	pop	de
 	pop	hl
 	push	hl
-	push	bc
+	push	de
+	ex	de,hl
+	pop	hl
 	push	hl
-	push	bc
+	push	de
+	push	hl
 	ld	hl,0x3fa2
 	push	hl
 	ld	hl,0xf983
@@ -467,44 +470,37 @@ l_m32_sinf_00102:
 	push	de
 	push	hl
 	call	___fs2sint_callee
-	ex	de, hl
-	ld	(ix-4),e
-	ld	l, e
-	ld	(ix-3),d
-	ld	h,d
+	push	hl
 	push	hl
 	call	___uint2fs_callee
-	ld	c, l
-	ld	b, h
-	bit	0,(ix-4)
+	pop	bc
+	bit	0, c
 	jr	Z,l_m32_sinf_00104
-	inc	(ix-4)
-	jr	NZ,l_m32_sinf_00141
-	inc	(ix-3)
-l_m32_sinf_00141:
+	inc	bc
+	push	bc
+	push	hl
 	ld	hl,0x3f80
+	ex	(sp), hl
 	push	hl
 	ld	hl,0x0000
-	push	hl
+	ex	(sp), hl
 	push	de
-	push	bc
+	push	hl
 	call	___fsadd_callee
-	ld	c, l
-	ld	b, h
+	pop	bc
 l_m32_sinf_00104:
-	ld	a,(ix-4)
+	ld	a, c
 	and	a,0x07
 	ld	(ix-2),a
-	xor	a, a
-	ld	(ix-1),a
+	ld	(ix-1),0x00
 	ld	a,0x03
 	cp	a,(ix-2)
 	ld	a,0x00
 	sbc	a,(ix-1)
 	jr	NC,l_m32_sinf_00106
 	xor	a, a
-	sub	a,(ix-5)
-	ld	(ix-5),a
+	sub	a,(ix-3)
+	ld	(ix-3),a
 	ld	a,(ix-2)
 	add	a,0xfc
 	ld	(ix-2),a
@@ -513,7 +509,7 @@ l_m32_sinf_00104:
 	ld	(ix-1),a
 l_m32_sinf_00106:
 	push	de
-	push	bc
+	push	hl
 	ld	hl,0x3f49
 	push	hl
 	ld	hl,0x0fdb
@@ -521,20 +517,20 @@ l_m32_sinf_00106:
 	call	___fsmul_callee
 	push	de
 	push	hl
+	ld	l,(ix-5)
+	ld	h,(ix-4)
+	push	hl
 	ld	l,(ix-7)
 	ld	h,(ix-6)
 	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
-	push	hl
 	call	___fssub_callee
-	ex	(sp),hl
-	ld	(ix-7),e
-	ld	(ix-6),d
-	ld	l,(ix-9)
-	ld	h,(ix-8)
-	ld	e,(ix-7)
-	ld	d,(ix-6)
+	ex	(sp), hl
+	ld	(ix-5),e
+	ld	(ix-4),d
+	pop	hl
+	push	hl
+	ld	e,(ix-5)
+	ld	d,(ix-4)
 	call	_m32_sqrf
 	ld	a,(ix-2)
 	dec	a
@@ -556,26 +552,26 @@ l_m32_sinf_00107:
 	push	de
 	push	bc
 	call	_m32_polyf
-	ld	(ix-4),l
-	ld	(ix-3),h
-	ld	(ix-2),e
-	ld	(ix-1),d
+	ld	(ix-7),l
+	ld	(ix-6),h
+	ld	(ix-5),e
+	ld	(ix-4),d
 	pop	de
 	pop	bc
 	push	de
 	push	bc
 	ld	hl,0x3f00
 	push	hl
-	ld	hl,0x0000
+	ld	h, l
 	push	hl
 	call	___fsmul_callee
 	push	de
 	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
+	ld	l,(ix-5)
+	ld	h,(ix-4)
 	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
+	ld	l,(ix-7)
+	ld	h,(ix-6)
 	push	hl
 	call	___fssub_callee
 	ld	bc,0x3f80
@@ -585,8 +581,6 @@ l_m32_sinf_00107:
 	push	de
 	push	hl
 	call	___fsadd_callee
-	ld	c, l
-	ld	b, h
 	jr	l_m32_sinf_00109
 l_m32_sinf_00108:
 	ld	hl,0x0003
@@ -596,39 +590,31 @@ l_m32_sinf_00108:
 	push	de
 	push	bc
 	call	_m32_polyf
-	ld	c, l
-	ld	l,(ix-7)
-	ld	b,h
-	ld	h,(ix-6)
-	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
-	push	hl
-	push	de
+	ld	c,(ix-5)
+	ld	b,(ix-4)
 	push	bc
+	ld	c,(ix-7)
+	ld	b,(ix-6)
+	push	bc
+	push	de
+	push	hl
 	call	___fsmul_callee
-	ld	c, l
-	ld	l,(ix-7)
-	ld	b,h
-	ld	h,(ix-6)
-	push	hl
-	ld	l,(ix-9)
-	ld	h,(ix-8)
-	push	hl
-	push	de
+	ld	c,(ix-5)
+	ld	b,(ix-4)
 	push	bc
+	ld	c,(ix-7)
+	ld	b,(ix-6)
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
-	ld	c, l
-	ld	b, h
 l_m32_sinf_00109:
-	bit	7,(ix-5)
+	bit	7,(ix-3)
 	jr	Z,l_m32_sinf_00113
 	ld	a, d
 	xor	a,0x80
 	ld	d, a
 l_m32_sinf_00113:
-	ld	l, c
-	ld	h, b
 	ld	sp, ix
 	pop	ix
 	ret

@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.4 #12274 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -425,8 +425,8 @@ _m32_asinf:
 	ex	(sp), hl
 	ld	(ix-2),e
 	ld	(ix-1),d
-	ld	l,(ix-4)
-	ld	h,(ix-3)
+	pop	hl
+	push	hl
 	ld	e,(ix-2)
 	ld	d,(ix-1)
 	call	_m32_sqrf

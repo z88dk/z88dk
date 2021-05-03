@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.4 #12274 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -478,7 +478,7 @@ _m32_atan2f:
 	ld	h,(ix-4)
 	push	hl
 	call	___fslt_callee
-	bit	0,l
+	bit	0, l
 	jr	NZ,l_m32_atan2f_00107
 	ld	l,(ix+10)
 	ld	h,(ix+11)
@@ -495,35 +495,27 @@ _m32_atan2f:
 	call	___fsdiv_callee
 	call	_m32_atanf
 	ld	a,(ix-1)
-	or	a,a
-	ld	c,l
-	ld	b,h
+	or	a, a
 	jr	Z,l_m32_atan2f_00105
 	bit	0,(ix-6)
 	jr	NZ,l_m32_atan2f_00102
-	ld	hl,0x4049
-	push	hl
-	ld	hl,0x0fdb
-	push	hl
-	push	de
+	ld	bc,0x4049
 	push	bc
+	ld	bc,0x0fdb
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
-	ld	c, l
-	ld	b, h
 	jr	l_m32_atan2f_00105
 l_m32_atan2f_00102:
-	ld	hl,0x4049
-	push	hl
-	ld	hl,0x0fdb
-	push	hl
-	push	de
+	ld	bc,0x4049
 	push	bc
+	ld	bc,0x0fdb
+	push	bc
+	push	de
+	push	hl
 	call	___fssub_callee
-	ld	c, l
-	ld	b, h
 l_m32_atan2f_00105:
-	ld	l, c
-	ld	h, b
 	jp	l_m32_atan2f_00119
 l_m32_atan2f_00107:
 	ld	l,(ix+6)
@@ -555,8 +547,6 @@ l_m32_atan2f_00107:
 	push	de
 	push	bc
 	call	___fssub_callee
-	ld	c, l
-	ld	b, h
 	jr	l_m32_atan2f_00110
 l_m32_atan2f_00109:
 	ld	hl,0x3fc9
@@ -566,11 +556,7 @@ l_m32_atan2f_00109:
 	push	de
 	push	bc
 	call	___fsadd_callee
-	ld	c, l
-	ld	b, h
 l_m32_atan2f_00110:
-	ld	l, c
-	ld	h, b
 	jr	l_m32_atan2f_00119
 l_m32_atan2f_00117:
 	ld	l,(ix+6)

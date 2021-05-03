@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.4 #12274 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -440,7 +440,7 @@ l_m32_powf_00102:
 	push	hl
 	push	hl
 	call	___fslt_callee
-	bit	0,l
+	bit	0, l
 	jr	NZ,l_m32_powf_00104
 	ld	hl,0x0000
 	ld	e,l
@@ -490,7 +490,7 @@ l_m32_powf_00106:
 l_m32_powf_00108:
 	ld	hl,0x3f00
 	push	hl
-	ld	hl,0x0000
+	ld	h, l
 	push	hl
 	ld	l,(ix+10)
 	ld	h,(ix+11)
@@ -511,7 +511,7 @@ l_m32_powf_00108:
 l_m32_powf_00110:
 	ld	hl,0xbf00
 	push	hl
-	ld	hl,0x0000
+	ld	h, l
 	push	hl
 	ld	l,(ix+10)
 	ld	h,(ix+11)
@@ -532,7 +532,7 @@ l_m32_powf_00110:
 l_m32_powf_00112:
 	ld	hl,0x4000
 	push	hl
-	ld	hl,0x0000
+	ld	h, l
 	push	hl
 	ld	l,(ix+10)
 	ld	h,(ix+11)
@@ -553,7 +553,7 @@ l_m32_powf_00112:
 l_m32_powf_00114:
 	ld	hl,0xc000
 	push	hl
-	ld	hl,0x0000
+	ld	h, l
 	push	hl
 	ld	l,(ix+10)
 	ld	h,(ix+11)

@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.4 #12274 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -442,6 +442,7 @@ _m32_logf:
 	call	___fslt_callee
 	bit	0,l
 	jr	NZ,l_m32_logf_00102
+	ld	c,l
 	ld	de,0xff00
 	ld	hl,0x0000
 	jp	l_m32_logf_00106
@@ -467,9 +468,10 @@ l_m32_logf_00102:
 	push	de
 	push	bc
 	call	___fslt_callee
+	ld	(ix-3),l
 	pop	de
 	pop	bc
-	ld	a,l
+	ld	a,(ix-3)
 	or	a, a
 	jr	Z,l_m32_logf_00104
 	ld	l,(ix-2)
@@ -487,7 +489,7 @@ l_m32_logf_00102:
 	push	de
 	push	hl
 	call	___fssub_callee
-	ex	(sp),hl
+	ex	(sp), hl
 	ld	(ix-16),e
 	ld	(ix-15),d
 	jr	l_m32_logf_00105
@@ -499,12 +501,12 @@ l_m32_logf_00104:
 	push	de
 	push	bc
 	call	___fssub_callee
-	ex	(sp),hl
+	ex	(sp), hl
 	ld	(ix-16),e
 	ld	(ix-15),d
 l_m32_logf_00105:
-	ld	l,(ix-18)
-	ld	h,(ix-17)
+	pop	hl
+	push	hl
 	ld	e,(ix-16)
 	ld	d,(ix-15)
 	call	_m32_sqrf
@@ -523,16 +525,14 @@ l_m32_logf_00105:
 	ld	h,(ix-17)
 	push	hl
 	call	_m32_polyf
-	ld	c, l
-	ld	l,(ix-12)
-	ld	b,h
-	ld	h,(ix-11)
-	push	hl
-	ld	l,(ix-14)
-	ld	h,(ix-13)
-	push	hl
-	push	de
+	ld	c,(ix-12)
+	ld	b,(ix-11)
 	push	bc
+	ld	c,(ix-14)
+	ld	b,(ix-13)
+	push	bc
+	push	de
+	push	hl
 	call	___fsmul_callee
 	ld	(ix-6),l
 	ld	(ix-5),h
@@ -545,12 +545,8 @@ l_m32_logf_00105:
 	ld	(ix-10),l
 	ld	(ix-9),h
 	ld	(ix-8),e
-	ld	l, e
 	ld	(ix-7),d
-	ld	h,d
-	push	hl
-	ld	l,(ix-10)
-	ld	h,(ix-9)
+	push	de
 	push	hl
 	ld	hl,0xb95e
 	push	hl
@@ -617,6 +613,7 @@ l_m32_logf_00105:
 	ld	h,(ix-5)
 	push	hl
 	call	___fsadd_callee
+	ld	c,l
 l_m32_logf_00106:
 	ld	sp, ix
 	pop	ix

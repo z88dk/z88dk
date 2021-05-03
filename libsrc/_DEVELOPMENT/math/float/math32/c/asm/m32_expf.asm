@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.4 #12274 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -441,34 +441,35 @@ _m32_expf:
 	ld	hl,0x0000
 	jp	l_m32_expf_00103
 l_m32_expf_00102:
-	pop	bc
+	pop	de
 	pop	hl
 	push	hl
-	push	bc
+	push	de
+	ex	de,hl
+	pop	hl
 	push	hl
-	push	bc
+	push	de
+	push	hl
 	ld	hl,0x3fb8
 	push	hl
 	ld	hl,0xaa3b
 	push	hl
 	call	___fsmul_callee
-	ld	bc,0x3f00
-	push	bc
-	ld	bc,0x0000
-	push	bc
-	push	de
+	ld	c, l
+	ld	b, h
+	ld	hl,0x3f00
 	push	hl
+	ld	h, l
+	push	hl
+	push	de
+	push	bc
 	call	___fsadd_callee
 	call	_m32_floorf
 	ld	(ix-8),l
 	ld	(ix-7),h
 	ld	(ix-6),e
-	ld	l, e
 	ld	(ix-5),d
-	ld	h,d
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
+	push	de
 	push	hl
 	ld	hl,0x3f31
 	push	hl
@@ -528,13 +529,11 @@ l_m32_expf_00102:
 	push	de
 	push	bc
 	call	_m32_polyf
-	ld	c, l
-	ld	l,(ix-6)
-	ld	b,h
-	ld	h,(ix-5)
-	push	hl
-	push	de
+	ld	c,(ix-6)
+	ld	b,(ix-5)
 	push	bc
+	push	de
+	push	hl
 	call	_m32_ldexpf
 l_m32_expf_00103:
 	ld	sp, ix
