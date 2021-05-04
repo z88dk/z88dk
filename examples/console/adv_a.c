@@ -1843,8 +1843,8 @@ void ShowRoom()
 	{
 		case 0:
 			draw_profile(60, 60, 160, mountain);
-			draw_profile(63, 63, 152, mountain);
-			draw(135,73,175,71);
+			//draw_profile(63, 63, 152, mountain);
+			//draw(135,73,175,71);
 			draw_profile(80, 80, 240, tree2);
 			draw_profile(80, 120, 80, mountain);
 			draw_profile(60, 110, 200, tree2);
@@ -2976,7 +2976,12 @@ int main()
 {
 	int n;
 
+
 	printf("%cE",27);
+#ifdef PICS
+	clg();
+#endif
+
 	for (;;)		/* restart game loop */
 	{
 		/* initialize the game variables */
