@@ -307,7 +307,7 @@ __DPROTO(,,half_t,,sqrtf16,half_t x)
 __DPROTO(,,half_t,,div2f16,half_t x)
 __DPROTO(,,half_t,,mul2f16,half_t x)
 __DPROTO(,,half_t,,mul10f16,half_t x)
-__DPROTO(,,half_t,,frexpf16,half_t x,int8_t *pw2)
+__DPROTO(,,half_t,,frexpf16,half_t x,int16_t *pw2)
 __DPROTO(,,half_t,,ldexpf16,half_t x,int16_t pw2)
 
 __DPROTO(,,half_t,,acosf16,half_t x)

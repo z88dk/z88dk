@@ -515,7 +515,7 @@ extern half_t mul2f16(half_t x);
 extern half_t mul10f16(half_t x);
 
 
-extern half_t frexpf16(half_t x,int8_t *pw2);
+extern half_t frexpf16(half_t x,int16_t *pw2);
 
 
 extern half_t ldexpf16(half_t x,int16_t pw2);

@@ -579,8 +579,8 @@ extern half_t __LIB__ mul2f16(half_t x) __smallc __z88dk_fastcall;
 extern half_t __LIB__ mul10f16(half_t x) __smallc __z88dk_fastcall;
 
 
-extern half_t __LIB__ frexpf16(half_t x,int8_t *pw2) __smallc;
-extern half_t __LIB__ frexpf16_callee(half_t x,int8_t *pw2) __smallc __z88dk_callee;
+extern half_t __LIB__ frexpf16(half_t x,int16_t *pw2) __smallc;
+extern half_t __LIB__ frexpf16_callee(half_t x,int16_t *pw2) __smallc __z88dk_callee;
 #define frexpf16(a,b) frexpf16_callee(a,b)
 
 

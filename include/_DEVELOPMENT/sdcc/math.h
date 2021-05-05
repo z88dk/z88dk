@@ -721,8 +721,8 @@ extern half_t mul10f16_fastcall(half_t x) __z88dk_fastcall;
 #define mul10f16(a) mul10f16_fastcall(a)
 
 
-extern half_t frexpf16(half_t x,int8_t *pw2);
-extern half_t frexpf16_callee(half_t x,int8_t *pw2) __z88dk_callee;
+extern half_t frexpf16(half_t x,int16_t *pw2);
+extern half_t frexpf16_callee(half_t x,int16_t *pw2) __z88dk_callee;
 #define frexpf16(a,b) frexpf16_callee(a,b)
 
 
