@@ -29,7 +29,13 @@ static void set_option(option *arg, char *value)
     } else if ( arg->type & OPT_BOOL_FALSE) {
         *(int *)arg->value = 0;
     } else if ( arg->type & OPT_INT ) {
-        *(int *)arg->value = atoi(value);
+        char  *end;
+        long val;
+
+        val = strtol(value,&end,0);
+        if ( end != value ) {
+            *(int *)arg->value = val;
+        }
     } else if ( arg->type & OPT_STRING ) {
         *(char **)arg->value = value;
     } 
