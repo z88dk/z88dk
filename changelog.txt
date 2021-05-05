@@ -20,7 +20,7 @@ Detailed but incomplete changelist:
 - [classic] +zx: Improved Interface 1/Microdrive support
 - [newlib] ZX0 decompression functions added
 - [newlib] +rc2014: Support for shadow RAM copying
-- [zsdcc] Upgraded to SDCC 4.1.4 r12274 (bugfixes)
+- [zsdcc] Upgraded to SDCC 4.1.6 r12288 (bugfixes)
 
 
 z88dk v2.1 - 07.02.2021
