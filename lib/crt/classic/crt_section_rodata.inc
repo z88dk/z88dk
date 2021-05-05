@@ -1,5 +1,6 @@
 ; RODATA sections defined by the classic library
 
+    SECTION RODATA
     SECTION rodata_fp
     SECTION rodata_fp_math48
     SECTION rodata_fp_math32
@@ -25,3 +26,4 @@ ENDIF
     SECTION rodata_font_8x10
     SECTION rodata_font_ansi
     SECTION rodata_splib2
+    SECTION RODATA_END
