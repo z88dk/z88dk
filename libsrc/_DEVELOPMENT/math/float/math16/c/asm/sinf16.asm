@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Fri Jan 22 11:55:23 2021
+;	Module compile time: Wed May  5 16:07:49 2021
 
 
 	C_LINE	0,"sinf16.c"
@@ -208,7 +208,7 @@
 ; Function sinf16 flags 0x00000288 __smallc __z88dk_fastcall 
 ; _Float16 half_tsinf16(_Float16 xx)
 ; parameter '_Float16 xx' at sp+2 size(2)
-	C_LINE	39,"sinf16.c::sinf16"
+	C_LINE	39,"sinf16.c::sinf16::0::0"
 .sinf16
 	GLOBAL	_sinf16
 ._sinf16
@@ -219,7 +219,7 @@
 	push	bc
 	dec	sp
 	pop	hl
-	ld	l,+(1 % 256)
+	ld	l,1
 	push	hl
 	ld	hl,7	;const
 	add	hl,sp
@@ -238,11 +238,16 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_2
+	jp	z,i_2	;
 	ld	hl,0	;const
 	add	hl,sp
-	ex	de,hl
-	ld	hl,65535
+	push	hl
+	ld	a,255
+	ld	l,a		;l_sxt
+	rla
+	sbc	a
+	ld	h,a
+	pop	de
 	ld	a,l
 	ld	(de),a
 	ld	hl,7	;const
@@ -298,12 +303,8 @@
  	ex	de,hl
 	ld	hl,1	;const
 	add	hl,sp
-	ld	a,(hl)
-	and	+(1 % 256)
-	ld	l,a
-	ld	h,0
-	and	a
-	jp	z,i_4
+	bit	0,(hl)
+	jp	z,i_4	;
 	ld	hl,1	;const
 	add	hl,sp
 	inc	(hl)
@@ -311,8 +312,6 @@
 	inc	hl
 	jr	nz,ASMPC+3
 	inc	(hl)
-	ld	h,(hl)
-	ld	l,a
 	ld	hl,5	;const
 	add	hl,sp
 	push	hl
@@ -333,7 +332,7 @@
 	add	hl,sp
 	push	hl
 	ld	a,(hl)
-	and	+(7 % 256)
+	and	7
 	ld	l,a
 	ld	h,0
 	pop	de
@@ -350,7 +349,7 @@
 	ld	hl,3
 	and	a
 	sbc	hl,de
-	jp	nc,i_5
+	jp	nc,i_5	;
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
@@ -367,12 +366,7 @@
 	ld	h,a
 	inc	hl
 	ld	a,l
-	ld	l,a		;l_sxt
-	rla
-	sbc	a
-	ld	h,a
 	pop	de
-	ld	a,l
 	ld	(de),a
 	ld	hl,1	;const
 	add	hl,sp
@@ -445,7 +439,7 @@
 	scf
 	jr	z,ASMPC+3
 	ccf
-	jp	c,i_8
+	jp	c,i_8	;
 	ld	hl,1	;const
 	add	hl,sp
 	ld	a,(hl)	;l_gint
@@ -455,7 +449,7 @@
 	ld	de,2
 	and	a
 	sbc	hl,de
-	jp	nz,i_7
+	jp	nz,i_7	;
 .i_8
 	ld	hl,5	;const
 	add	hl,sp
@@ -490,7 +484,7 @@
 	inc	hl
 	ld	(hl),d
  	ex	de,hl
-	jp	i_11
+	jp	i_11	;EOS
 .i_7
 	ld	hl,5	;const
 	add	hl,sp
@@ -531,14 +525,9 @@
 .i_11
 	ld	hl,0	;const
 	add	hl,sp
-	ld	a,(hl)	;l_gchar
-	ld	l,a
+	ld	a,(hl)
 	rla
-	sbc	a
-	ld	h,a
-	ld	a,l
-	rla
-	jp	nc,i_12
+	jp	nc,i_12	;
 	ld	hl,5	;const
 	add	hl,sp
 	ld	a,(hl)	;l_gint
@@ -548,7 +537,7 @@
 	ld	a,h
 	xor	128
 	ld	h,a
-	jp	i_13
+	jp	i_13	;
 .i_12
 	ld	hl,5	;const
 	add	hl,sp

@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Fri Jan 22 11:55:23 2021
+;	Module compile time: Wed May  5 16:07:48 2021
 
 
 	C_LINE	0,"logf16.c"
@@ -208,7 +208,7 @@
 ; Function logf16 flags 0x00000288 __smallc __z88dk_fastcall 
 ; _Float16 half_tlogf16(_Float16 x)
 ; parameter '_Float16 x' at sp+2 size(2)
-	C_LINE	50,"logf16.c::logf16"
+	C_LINE	50,"logf16.c::logf16::0::0"
 .logf16
 	GLOBAL	_logf16
 ._logf16
@@ -227,7 +227,7 @@
 	call	l_f16_le
 	ld	a,h
 	or	l
-	jp	z,i_2
+	jp	z,i_2	;
 	ld	hl,64511	;const
 	pop	bc
 	pop	bc
@@ -265,7 +265,7 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_3
+	jp	z,i_3	;
 	pop	hl
 	dec	hl
 	push	hl
@@ -286,7 +286,7 @@
 	inc	hl
 	ld	(hl),d
  	ex	de,hl
-	jp	i_5
+	jp	i_5	;EOS
 .i_3
 	ld	hl,8	;const
 	add	hl,sp

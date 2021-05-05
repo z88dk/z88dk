@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Fri Jan 22 11:55:24 2021
+;	Module compile time: Wed May  5 16:07:49 2021
 
 
 	C_LINE	0,"acosf16.c"
@@ -206,7 +206,7 @@
 ; Function acosf16 flags 0x00000288 __smallc __z88dk_fastcall 
 ; _Float16 half_tacosf16(_Float16 x)
 ; parameter '_Float16 x' at sp+2 size(2)
-	C_LINE	5,"acosf16.c::acosf16"
+	C_LINE	5,"acosf16.c::acosf16::0::0"
 .acosf16
 	GLOBAL	_acosf16
 ._acosf16

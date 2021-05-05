@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Fri Jan 22 11:55:24 2021
+;	Module compile time: Wed May  5 16:07:49 2021
 
 
 	C_LINE	0,"powf16.c"
@@ -208,7 +208,7 @@
 ; _Float16 half_tasm_f16_pow(_Float16 x, _Float16 y)
 ; parameter '_Float16 y' at sp+2 size(2)
 ; parameter '_Float16 x' at sp+4 size(2)
-	C_LINE	37,"powf16.c::asm_f16_pow"
+	C_LINE	37,"powf16.c::asm_f16_pow::0::0"
 .asm_f16_pow
 	GLOBAL	_asm_f16_pow
 ._asm_f16_pow
@@ -221,7 +221,7 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_2
+	jp	z,i_2	;
 	ld	hl,15360	;const
 	pop	bc
 	pop	af
@@ -241,7 +241,7 @@
 	call	l_f16_le
 	ld	a,h
 	or	l
-	jp	z,i_3
+	jp	z,i_3	;
 	ld	hl,0	;const
 	pop	bc
 	pop	af
@@ -260,7 +260,7 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_4
+	jp	z,i_4	;
 	ld	hl,4	;const
 	add	hl,sp
 	ld	a,(hl)	;l_gint
@@ -284,7 +284,7 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_5
+	jp	z,i_5	;
 	ld	hl,4	;const
 	add	hl,sp
 	ld	a,(hl)	;l_gint
@@ -309,7 +309,7 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_6
+	jp	z,i_6	;
 	ld	hl,4	;const
 	add	hl,sp
 	ld	a,(hl)	;l_gint
@@ -334,7 +334,7 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_8
+	jp	z,i_8	;
 	ld	hl,4	;const
 	add	hl,sp
 	ld	a,(hl)	;l_gint
@@ -359,7 +359,7 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_9
+	jp	z,i_9	;
 	ld	hl,4	;const
 	add	hl,sp
 	ld	e,(hl)
@@ -390,7 +390,7 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_10
+	jp	z,i_10	;
 	ld	hl,4	;const
 	add	hl,sp
 	ld	e,(hl)

@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Fri Jan 22 11:55:24 2021
+;	Module compile time: Wed May  5 16:07:49 2021
 
 
 	C_LINE	0,"atanf16.c"
@@ -207,7 +207,7 @@
 ; Function atanf16 flags 0x00000288 __smallc __z88dk_fastcall 
 ; _Float16 half_tatanf16(_Float16 f)
 ; parameter '_Float16 f' at sp+2 size(2)
-	C_LINE	24,"atanf16.c::atanf16"
+	C_LINE	24,"atanf16.c::atanf16::0::0"
 .atanf16
 	GLOBAL	_atanf16
 ._atanf16
@@ -228,7 +228,7 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_2
+	jp	z,i_2	;
 	ld	hl,0	;const
 	inc	sp
 	pop	bc
@@ -253,7 +253,7 @@
 	ld	a,l
 	ld	(de),a
 	and	a
-	jp	z,i_3
+	jp	z,i_3	;
 	pop	hl
 	push	hl
 	call	invf16
@@ -276,7 +276,7 @@
 	ld	h,0
 	ld	a,h
 	or	l
-	jp	z,i_4
+	jp	z,i_4	;
 	pop	hl
 	push	hl
 	ld	bc,15944	;const
@@ -295,13 +295,13 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_6
+	jp	z,i_6	;
 	pop	hl
 	push	hl
 	ld	a,h
 	xor	128
 	ld	h,a
-	jp	i_7
+	jp	i_7	;
 .i_6
 	pop	hl
 	push	hl

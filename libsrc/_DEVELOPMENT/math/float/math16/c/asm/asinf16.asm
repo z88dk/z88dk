@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Fri Jan 22 11:55:23 2021
+;	Module compile time: Wed May  5 16:07:49 2021
 
 
 	C_LINE	0,"asinf16.c"
@@ -206,7 +206,7 @@
 ; Function asinf16 flags 0x00000288 __smallc __z88dk_fastcall 
 ; _Float16 half_tasinf16(_Float16 x)
 ; parameter '_Float16 x' at sp+2 size(2)
-	C_LINE	5,"asinf16.c::asinf16"
+	C_LINE	5,"asinf16.c::asinf16::0::0"
 .asinf16
 	GLOBAL	_asinf16
 ._asinf16

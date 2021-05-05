@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Fri Jan 22 11:55:24 2021
+;	Module compile time: Wed May  5 16:07:49 2021
 
 
 	C_LINE	0,"expf16.c"
@@ -207,7 +207,7 @@
 ; Function expf16 flags 0x00000288 __smallc __z88dk_fastcall 
 ; _Float16 half_texpf16(_Float16 x)
 ; parameter '_Float16 x' at sp+2 size(2)
-	C_LINE	77,"expf16.c::expf16"
+	C_LINE	77,"expf16.c::expf16::0::0"
 .expf16
 	GLOBAL	_expf16
 ._expf16
@@ -218,7 +218,7 @@
 	call	l_f16_gt
 	ld	a,h
 	or	l
-	jp	z,i_2
+	jp	z,i_2	;
 	ld	hl,31743	;const
 	pop	bc
 	pop	bc
@@ -235,7 +235,7 @@
 	call	l_f16_lt
 	ld	a,h
 	or	l
-	jp	z,i_4
+	jp	z,i_4	;
 	ld	hl,0	;const
 	pop	bc
 	pop	bc
@@ -252,7 +252,7 @@
 	call	l_f16_eq
 	ld	a,h
 	or	l
-	jp	z,i_7
+	jp	z,i_7	;
 	ld	hl,15360	;const
 	pop	bc
 	pop	bc
