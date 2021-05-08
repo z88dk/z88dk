@@ -10,16 +10,25 @@ Detailed but incomplete changelist:
 - [classic] +cpm: Amstrad PCW Graphics library
 - [appmake] Compressed ROM data sections can now use zx0
 - [all] Compressed data can now use ZX0 compression tools
+- [all] math32 optimisations
 - [classic] ZX0 decompression functions added
 - [classic] +radio86: New target for the Radio86 family
 - [classic] +cpm: New subtypes for Bondwell 12/14 and 2
+- [classic] +cpm: Removal of code that made it incompatible with the z180
 - [classic] +cpm: GSX graphics library
+- [classic] +cpm/msxdos1: fcntl speedup via caching
+- [classic] +msx: (msxdos) Time functions now available
 - [classic] +gl: GL6000 support improved
 - [classic] +pc88: Graphics reworked and optimised
 - [classic] +sam: Extensively reworked and improved
+- [classic] +vg5k: 8x10 fonts and UDGs now usable
 - [classic] +zx: Improved Interface 1/Microdrive support
+- [classic] +zx: esxdos and plus3 fcntl enhancements
 - [newlib] ZX0 decompression functions added
 - [newlib] +rc2014: Support for shadow RAM copying
+- [newlib] +zxn: dot files are now created correctly
+- [sccz80] Temporary files now removed on windows
+- [sccz80] Bug fixes + optimisations
 - [zsdcc] Upgraded to SDCC 4.1.6 r12288 (bugfixes)
 
 
