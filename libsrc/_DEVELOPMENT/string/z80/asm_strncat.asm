@@ -40,9 +40,11 @@ asm0_strncat:
 
    push de                     ; save dst
    
+   push bc
    ex de,hl
    call __str_locate_nul       ; a = 0
    ex de,hl
+   pop bc
 
 loop:                          ; append src to dst
 IF __CPU_INTEL__ || __CPU_GBZ80__

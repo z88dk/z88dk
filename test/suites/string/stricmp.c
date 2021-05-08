@@ -5,7 +5,7 @@
 
 #include "string_tests.h"
 
-static int (*func)(char *x, char *y) __smallc;
+static int (*func)(const char *x,const  char *y) __smallc;
 
 void stricmp_equal_lower()
 {
