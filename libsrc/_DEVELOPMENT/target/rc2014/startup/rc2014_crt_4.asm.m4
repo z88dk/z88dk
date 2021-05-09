@@ -150,20 +150,23 @@ IF __crt_enable_commandline >= 1
 
 ENDIF
 
-   ; initialize data section to be identical in
-   ; both banks of RAM (if 128kB RAM is provided)
-   ; this is to support shadowwrite() and shadowread() functions
-   ; the asm_shadowcopy function can be further relocated if needed
-
-   ld a,$01
-   out (__IO_RAM_TOGGLE),a
-   include "../clib_init_data.inc"
-
    ; initialize data section
 
-   xor a
-   out (__IO_RAM_TOGGLE),a
    include "../clib_init_data.inc"
+
+   ; initialize data section to be identical in
+   ; both banks of RAM (where 128kB RAM is provided)
+   ; this is to support shadowwrite() and shadowread() functions
+   ; the asm_shadowcopy function can be further relocated if needed
+   ; the asm_shadowcopy RAM copy function is disabled by default
+
+   ; ld a,$01
+   ; out (__IO_RAM_TOGGLE),a
+
+   ; include "../clib_init_data.inc"
+
+   ; xor a
+   ; out (__IO_RAM_TOGGLE),a
 
    ; initialize bss section
 
