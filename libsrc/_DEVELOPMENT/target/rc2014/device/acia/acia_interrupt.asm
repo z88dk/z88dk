@@ -19,11 +19,11 @@
         jr Z,tx_check               ; if not, go check for bytes to transmit 
 
         in a,(__IO_ACIA_DATA_REGISTER)    ; Get the received byte from the ACIA 
-        ld l,a                      ; Move Rx byte to l
+        ld l,a                      ; move Rx byte to l
 
         ld a,(aciaRxCount)          ; Get the number of bytes in the Rx buffer
         cp __IO_ACIA_RX_SIZE - 1    ; check whether there is space in the buffer
-        jr NC, tx_check             ; buffer full,check if we can send something
+        jr NC,tx_check              ; buffer full,check if we can send something
 
         ld a,l                      ; get Rx byte from l
         ld hl,aciaRxCount
@@ -71,7 +71,7 @@ ENDIF
         and ~__IO_ACIA_CR_TEI_MASK  ; mask out the Tx interrupt bits
         or __IO_ACIA_CR_TDI_RTS0    ; mask out (disable) the Tx Interrupt,keep RTS low
         ld (aciaControl),a          ; write the ACIA control byte back
-        out (__IO_ACIA_CONTROL_REGISTER),a   ; Set the ACIA CTRL register
+        out (__IO_ACIA_CONTROL_REGISTER),a  ; Set the ACIA CTRL register
 
     tx_rts_check:
         ld a,(aciaRxCount)          ; get the current Rx count
@@ -80,9 +80,9 @@ ENDIF
 
         ld a,(aciaControl)          ; get the ACIA control echo byte
         and ~__IO_ACIA_CR_TEI_MASK  ; mask out the Tx interrupt bits
-        or __IO_ACIA_CR_TDI_RTS1    ; Set RTS high, and disable Tx Interrupt
+        or __IO_ACIA_CR_TDI_RTS1    ; set RTS high, and disable Tx Interrupt
         ld (aciaControl),a          ; write the ACIA control echo byte back
-        out (__IO_ACIA_CONTROL_REGISTER),a	; Set the ACIA CTRL register
+        out (__IO_ACIA_CONTROL_REGISTER),a  ; Set the ACIA CTRL register
 
     tx_end:
         pop hl

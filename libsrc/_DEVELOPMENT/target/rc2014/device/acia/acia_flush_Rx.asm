@@ -27,11 +27,11 @@
     _acia_flush_Rx:
 
         xor a
-        ld (aciaRxCount), a         ; reset the Rx counter (set 0)  		
+        ld (aciaRxCount),a          ; reset the Rx counter (set 0)
 
-        ld hl, aciaRxBuffer         ; load Rx buffer pointer home
-        ld (aciaRxIn), hl
-        ld (aciaRxOut), hl
+        ld hl,aciaRxBuffer          ; load Rx buffer pointer home
+        ld (aciaRxIn),hl
+        ld (aciaRxOut),hl
 
         ret
 

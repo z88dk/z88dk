@@ -18,14 +18,14 @@
         call _acia_flush_Tx
         
         call asm_z80_pop_ei         ; ei
-    	
+
         pop hl
         pop af
-    	
+
         ret
 
     _acia_flush_Tx:
-    
+
         xor a
         ld (aciaTxCount),a          ; reset the Tx counter (set 0)
 

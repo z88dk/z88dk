@@ -27,11 +27,11 @@
     _siob_flush_Rx:
 
         xor a
-        ld (siobRxCount), a         ; reset the Rx counter (set 0)  		
+        ld (siobRxCount),a          ; reset the Rx counter (set 0)  		
 
-        ld hl, siobRxBuffer         ; load Rx buffer pointer home
-        ld (siobRxIn), hl
-        ld (siobRxOut), hl
+        ld hl,siobRxBuffer          ; load Rx buffer pointer home
+        ld (siobRxIn),hl
+        ld (siobRxOut),hl
 
         ret
 

@@ -146,7 +146,9 @@ ENDIF
    ; initialize data section to be identical in
    ; both banks of RAM (where 128kB RAM is provided)
    ; this is to support shadowwrite() and shadowread() functions
-   ; the asm_shadowcopy function can be further relocated if needed
+   ; the asm_shadowcopy function must be available in both RAM
+   ; banks at the same address
+   ; asm_shadowcopy can then be further relocated as needed
    ; the asm_shadowcopy RAM copy function is disabled by default
 
    ; ld a,$01

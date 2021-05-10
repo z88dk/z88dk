@@ -70,7 +70,7 @@ siob_rx_get:
         ld l,a                      ; put it in L
         ld a,(siobRxCount)          ; get the number of bytes in the Rx buffer      
         cp __IO_SIO_RX_SIZE-1       ; check whether there is space in the buffer
-        jr NC, siob_rx_check        ; buffer full, check whether we need to drain H/W FIFO
+        jr NC,siob_rx_check         ; buffer full, check whether we need to drain H/W FIFO
         ld a,l                      ; get Rx byte from l
         ld hl,siobRxCount
         inc (hl)                    ; atomically increment Rx buffer count
@@ -88,7 +88,7 @@ ENDIF
 
 ;       ld a,(siobRxCount)          ; get the current Rx count
 ;       cp __IO_SIO_RX_FULLISH      ; compare the count with the preferred full size
-;       jr C, siob_rx_check         ; if the buffer is fullish reset the RTS line
+;       jr C,siob_rx_check          ; if the buffer is fullish reset the RTS line
                                     ; this means getting characters will be slower
                                     ; when the buffer is fullish,
                                     ; but we stop the lemmings.
@@ -124,7 +124,7 @@ __siob_interrupt_rx_error:
         in a,(__IO_SIOB_CONTROL_REGISTER)   ; load Read Register 1
                                             ; test whether we have error on SIOB
         and __IO_SIO_RR1_RX_FRAMING_ERROR|__IO_SIO_RR1_RX_OVERRUN|__IO_SIO_RR1_RX_PARITY_ERROR
-        jr Z, siob_interrupt_rx_exit        ; clear error, and exit
+        jr Z,siob_interrupt_rx_exit         ; clear error, and exit
         in a,(__IO_SIOB_DATA_REGISTER)      ; remove errored Rx byte from the SIOB
 
 siob_interrupt_rx_exit:
@@ -183,7 +183,7 @@ sioa_rx_get:
         ld l,a                      ; put it in L
         ld a,(sioaRxCount)          ; get the number of bytes in the Rx buffer      
         cp __IO_SIO_RX_SIZE-1       ; check whether there is space in the buffer
-        jr NC, sioa_rx_check        ; buffer full, check whether we need to drain H/W FIFO
+        jr NC,sioa_rx_check         ; buffer full, check whether we need to drain H/W FIFO
 
         ld a,l                      ; get Rx byte from l
         ld hl,sioaRxCount
@@ -202,7 +202,7 @@ ENDIF
 
 ;       ld a,(sioaRxCount)          ; get the current Rx count
 ;       cp __IO_SIO_RX_FULLISH      ; compare the count with the preferred full size
-;       jr C, sioa_rx_check         ; if the buffer is fullish reset the RTS line
+;       jr C,sioa_rx_check          ; if the buffer is fullish reset the RTS line
                                     ; this means getting characters will be slower
                                     ; when the buffer is fullish,
                                     ; but we stop the lemmings.
@@ -238,7 +238,7 @@ __sioa_interrupt_rx_error:
         in a,(__IO_SIOA_CONTROL_REGISTER)   ; load Read Register 1
                                             ; test whether we have error on SIOA
         and __IO_SIO_RR1_RX_FRAMING_ERROR|__IO_SIO_RR1_RX_OVERRUN|__IO_SIO_RR1_RX_PARITY_ERROR
-        jr Z, sioa_interrupt_rx_exit        ; clear error, and exit
+        jr Z,sioa_interrupt_rx_exit         ; clear error, and exit
 
         in a,(__IO_SIOA_DATA_REGISTER)      ; remove errored Rx byte from the SIOA
 

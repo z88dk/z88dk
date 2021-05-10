@@ -3,7 +3,7 @@
 ;; sio driver IM2 vector table ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
-IF (__Z80 != 0) && (__page_zero_present) && (__crt_org_vector_table > 0x100) && (__CRTCFG = 1)
+IF (__Z80 != 0) && (__page_zero_present) && (__crt_org_vector_table > 0x100)
 
     SECTION     interrupt_vectors
 
