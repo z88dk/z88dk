@@ -18,7 +18,7 @@
         defb    __IO_SIO_WR0_R4|__IO_SIO_WR0_EXT_INT_RESET
         defb    __IO_SIO_WR4_CLK_DIV_64|__IO_SIO_WR4_STOP_1|__IO_SIO_WR4_PARITY_NONE
         defb    __IO_SIO_WR0_R3
-        defb    __IO_SIO_WR3_RX_8BIT|__IO_SIO_WR3_RX_ENABLE
+        defb    __IO_SIO_WR3_RX_8BIT|__IO_SIO_WR3_AUTO_ENABLES|__IO_SIO_WR3_RX_ENABLE
         defb    __IO_SIO_WR0_R5
         defb    __IO_SIO_WR5_TX_DTR|__IO_SIO_WR5_TX_8BIT|__IO_SIO_WR5_TX_ENABLE|__IO_SIO_WR5_RTS
         defb    __IO_SIO_WR0_R1|__IO_SIO_WR0_EXT_INT_RESET
@@ -32,7 +32,7 @@
         defb    __IO_SIO_WR0_R4|__IO_SIO_WR0_EXT_INT_RESET
         defb    __IO_SIO_WR4_CLK_DIV_64|__IO_SIO_WR4_STOP_1|__IO_SIO_WR4_PARITY_NONE
         defb    __IO_SIO_WR0_R3
-        defb    __IO_SIO_WR3_RX_8BIT|__IO_SIO_WR3_RX_ENABLE
+        defb    __IO_SIO_WR3_RX_8BIT|__IO_SIO_WR3_AUTO_ENABLES|__IO_SIO_WR3_RX_ENABLE
         defb    __IO_SIO_WR0_R5
         defb    __IO_SIO_WR5_TX_DTR|__IO_SIO_WR5_TX_8BIT|__IO_SIO_WR5_TX_ENABLE|__IO_SIO_WR5_RTS
         defb    __IO_SIO_WR0_R1|__IO_SIO_WR0_EXT_INT_RESET

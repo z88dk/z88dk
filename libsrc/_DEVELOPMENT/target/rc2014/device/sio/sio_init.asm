@@ -3,19 +3,18 @@
 
     SECTION code_driver
 
-    PUBLIC  _sio_init
-
     EXTERN  _sioa_reset, _siob_reset
     EXTERN  __sio_init_async_rodata
 
     EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 
+    ; initialise the SIO device
+    ; interrupt vector table address and interrupt mode set by preamble
+
+    PUBLIC  _sio_init
+
     _sio_init:
-        call asm_z80_push_di        ; di
-
-        ; initialise the SIO interrupt vectors in preamble for IM 2
-
-        ; initialise the SIO
+        ld hl,__sio_init_async_rodata
                                     ; load the default SIO configuration
                                     ; ASYNC operation
                                     ; BAUD = 115200 8n1
@@ -23,14 +22,12 @@
                                     ; transmit enabled
                                     ; receive interrupt enabled
                                     ; transmit interrupt enabled
-
-        ld hl,__sio_init_async_rodata
         call _sio_io_ports          ; initialise the SIO for ASYNC via control Reg A & B
 
         call _sioa_reset            ; reset and empty the SIOA Tx & Rx buffers
         call _siob_reset            ; reset and empty the SIOB Tx & Rx buffers
 
-        jp asm_z80_pop_ei_jp        ; ei ret
+        ret                         ; ei ret
 
 
     ; Initialise the I/O ports from an array of addresses and values

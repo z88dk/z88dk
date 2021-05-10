@@ -27,11 +27,11 @@
     _sioa_flush_Rx:
 
         xor a
-        ld (sioaRxCount), a         ; reset the Rx counter (set 0)  		
+        ld (sioaRxCount),a          ; reset the Rx counter (set 0)  		
 
-        ld hl, sioaRxBuffer         ; load Rx buffer pointer home
-        ld (sioaRxIn), hl
-        ld (sioaRxOut), hl
+        ld hl,sioaRxBuffer          ; load Rx buffer pointer home
+        ld (sioaRxIn),hl
+        ld (sioaRxOut),hl
 
         ret
 

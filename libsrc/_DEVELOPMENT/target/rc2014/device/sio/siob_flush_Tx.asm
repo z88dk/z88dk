@@ -27,11 +27,11 @@
     _siob_flush_Tx:
     
         xor a
-        ld (siobTxCount), a         ; reset the Tx counter (set 0)
+        ld (siobTxCount),a          ; reset the Tx counter (set 0)
 
-        ld hl, siobTxBuffer         ; load Tx buffer pointer home
-        ld (siobTxIn), hl
-        ld (siobTxOut), hl
+        ld hl,siobTxBuffer          ; load Tx buffer pointer home
+        ld (siobTxIn),hl
+        ld (siobTxOut),hl
 
         ret
 

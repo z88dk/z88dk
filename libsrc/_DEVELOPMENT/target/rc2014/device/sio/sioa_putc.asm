@@ -50,7 +50,7 @@ IF __IO_SIO_TX_SIZE != 0x100
         or sioaTxBuffer&0xFF        ; locate base
         ld l,a                      ; return the low byte to l
 ENDIF
-        ld (sioaTxIn), hl           ; write where the next byte should be poked
+        ld (sioaTxIn),hl            ; write where the next byte should be poked
         ld l,0                      ; indicate Tx buffer was not full
         ret
 

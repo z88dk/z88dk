@@ -27,11 +27,11 @@
     _sioa_flush_Tx:
     
         xor a
-        ld (sioaTxCount), a         ; reset the Tx counter (set 0)
+        ld (sioaTxCount),a          ; reset the Tx counter (set 0)
 
-        ld hl, sioaTxBuffer         ; load Tx buffer pointer home
-        ld (sioaTxIn), hl
-        ld (sioaTxOut), hl
+        ld hl,sioaTxBuffer          ; load Tx buffer pointer home
+        ld (sioaTxIn),hl
+        ld (sioaTxOut),hl
 
         ret
 

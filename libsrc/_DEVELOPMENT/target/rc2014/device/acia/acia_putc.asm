@@ -15,7 +15,7 @@
         ;            carry reset
         ; modifies : af, hl
 
-        ld a,(aciaTxCount)          ; Get the number of bytes in the Tx buffer
+        ld a,(aciaTxCount)          ; get the number of bytes in the Tx buffer
         or a                        ; check whether the buffer is empty
         jr NZ,putc_buffer_tx        ; buffer not empty, so abandon immediate Tx
 
@@ -23,14 +23,14 @@
         and __IO_ACIA_SR_TDRE       ; check whether a byte can be transmitted
         jr Z,putc_buffer_tx         ; if not, so abandon immediate Tx
 
-        ld a,l                      ; Retrieve Tx character
+        ld a,l                      ; retrieve Tx character
         out (__IO_ACIA_DATA_REGISTER),a     ; immediately output the Tx byte to the ACIA
         ld l,0                      ; indicate Tx buffer was not full
         ret                         ; and just complete
 
     putc_buffer_tx:
         ld a,(aciaTxCount)          ; Get the number of bytes in the Tx buffer
-        cp __IO_ACIA_TX_SIZE - 1    ; check whether there is space in the buffer
+        cp __IO_ACIA_TX_SIZE-1      ; check whether there is space in the buffer
         jr NC,putc_buffer_tx_overflow   ; buffer full, so drop the Tx byte and return
 
         ld a,l                      ; Tx byte

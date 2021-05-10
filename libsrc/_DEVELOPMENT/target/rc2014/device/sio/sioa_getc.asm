@@ -22,7 +22,7 @@
         ret Z                       ; if the count is zero, then return
 
 ;       cp __IO_SIO_RX_EMPTYISH     ; compare the count with the preferred empty size
-;       jr NC, getc_clean_up        ; if the buffer NOT emptyish, don't change the RTS
+;       jr NC,getc_clean_up         ; if the buffer NOT emptyish, don't change the RTS
                                     ; this means retrieving characters will be slower
                                     ; when the buffer is emptyish.
                                     ; Better than the reverse case.
@@ -40,12 +40,12 @@
 ;       out (__IO_SIOA_CONTROL_REGISTER),a  ; write the SIOA R5 register
         
     getc_clean_up:
-        ld hl, sioaRxCount
+        ld hl,sioaRxCount
         di
         dec (hl)                    ; atomically decrement Rx count
-        ld hl, (sioaRxOut)          ; get the pointer to place where we pop the Rx byte
+        ld hl,(sioaRxOut)           ; get the pointer to place where we pop the Rx byte
         ei
-        ld a, (hl)                  ; get the Rx byte
+        ld a,(hl)                   ; get the Rx byte
 
         inc l                       ; move the Rx pointer low byte along
 IF __IO_SIO_RX_SIZE != 0x100
@@ -56,9 +56,9 @@ IF __IO_SIO_RX_SIZE != 0x100
         ld l,a                      ; return the low byte to l
         pop af
 ENDIF
-        ld (sioaRxOut), hl          ; write where the next byte should be popped
+        ld (sioaRxOut),hl           ; write where the next byte should be popped
 
-        ld l, a                     ; put the byte in hl
+        ld l,a                      ; put the byte in hl
         scf                         ; indicate char received
         ret
 
