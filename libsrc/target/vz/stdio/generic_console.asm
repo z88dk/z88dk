@@ -56,7 +56,7 @@ generic_console_set_ink:
 ; a = d = character to print
 ; e = raw
 generic_console_plotc:
-    inc     e
+    ld      e,1
 generic_console_printc:
     ld      d,a
     ld      a,(__vz200_mode)
@@ -134,7 +134,7 @@ generic_console_scrollup:
     ld      hl, (base_graphics)
     ld      d,h
     ld      e,l
-    ld      de, CONSOLE_COLUMNS
+    ld      bc, CONSOLE_COLUMNS
     add     hl,bc
     ld      bc,+ ((CONSOLE_COLUMNS) * (CONSOLE_ROWS-1))
     ldir
