@@ -15,7 +15,7 @@
 
 .getk
 ._getk
-		call	12020		;scan keyboard once
+	call	$2efd		;scan keyboard once
 
 IF STANDARDESCAPECHARS
 	cp	13
