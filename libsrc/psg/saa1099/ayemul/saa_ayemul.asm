@@ -1,4 +1,5 @@
 
+IF __CPU_Z80__ | __CPU_Z80N__
     SECTION smc_clib
     PUBLIC  asm_saa_ay_play
 
@@ -238,3 +239,4 @@ envconvert:
 
 pitchconvert: 
     INCLUDE     "ayemul/pitchtable.inc"
+ENDIF
