@@ -44,6 +44,10 @@
 
 	defc	__CPU_CLOCK = 6000000
 
+        IFNDEF CLIB_DEFAULT_SCREEN_MODE
+            defc       CLIB_DEFAULT_SCREEN_MODE = 4
+        ENDIF
+
 	INCLUDE	"target/sam/def/sam.def"
 
 IF (!DEFINED_startup || (startup=1))

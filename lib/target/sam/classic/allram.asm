@@ -70,10 +70,7 @@ program:
         INCLUDE "crt/classic/crt_init_amalloc.asm"
     ENDIF
 
-    ; Switch to mode 4
-    in      a,(VMPR)
-    or      @01100000
-    out     (VMPR),a
+    INCLUDE "target/sam/classic/sam_switchmode.inc"
 
 IF !CRT_DISABLE_INT_TICK
     EXTERN   tick_count_isr

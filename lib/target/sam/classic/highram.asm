@@ -35,7 +35,8 @@ IF DEFINED_USING_amalloc
 ENDIF
 
     ; Now, page the screen into 0000-0x7fff
-    ; Switch to mode 4
+    INCLUDE "target/sam/classic/sam_switchmode.inc"
+
     in      a,(VMPR)
     ld      b,a
     or      @01100000

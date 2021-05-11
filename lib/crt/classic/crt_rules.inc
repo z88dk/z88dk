@@ -133,7 +133,7 @@
    ; eg native = 40columns, CP/M = 80 columns. These should be explicitly defined
    ; if needed. So default to an unused value if not
    PUBLIC CLIB_DEFAULT_SCREEN_MODE
-   IF !DEFINED_CLIB_DEFAULT_SCREEN_MODE
+   IFNDEF CLIB_DEFAULT_SCREEN_MODE
        defc CLIB_DEFAULT_SCREEN_MODE = 0
    ENDIF
 
