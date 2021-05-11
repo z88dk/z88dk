@@ -44,9 +44,12 @@ extern void __LIB__ putsprite_callee(int ortype, int x, int y, void *sprite) __s
 /* Joystick (or whatever game device) control function */
 extern unsigned int __LIB__  joystick(int game_device) __z88dk_fastcall;
 
+
+/* Order fo rbelow is right, left, down, up, fire, fire2, fire3, fire4 */
 /* Internal keyboard joysticks that use inkey driver */
 extern uint8_t __LIB__ joystick_sc(int *scan_codes) __z88dk_fastcall;
-extern uint8_t __LIB__ kjoystick(uint8_t keycodes) __z88dk_fastcall;
+/* Takes an array of ascii codes to check for joystick (0 terminated) */
+extern uint8_t __LIB__ kjoystick(uint8_t *keycodes) __z88dk_fastcall;
 
 #define MOVE_RIGHT 1
 #define MOVE_LEFT  2
