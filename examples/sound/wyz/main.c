@@ -1,4 +1,5 @@
 // zcc +zx main.c sham.mus.asm effects.asm -create-app
+// zcc +sam main.c sham.mus.asm effects.asm -create-app
 #include <stdio.h>
 #include <intrinsic.h>
 #include <interrupt.h>
@@ -24,6 +25,11 @@
 extern void __LIB__ add_raster_int(isr_t handler);
 #endif
 
+#ifdef __SAM__
+#define NO_INTERRUPT_INIT 1
+#endif
+
+
 extern wyz_song mysong;
 extern wyz_effects myeffects;
 
@@ -41,7 +47,8 @@ void setup_int() {
 #if __SPECTRUM__
    zx_im2_init(0xd300, 0xd4);
    add_raster_int(0x38);
-#else
+#endif
+#ifndef NO_INTERRUPT_INIT
    im1_init();
 #endif
    add_raster_int(playmusic);
