@@ -149,7 +149,7 @@ IF CRT_ENABLE_COMMANDLINE = 1
     ;ld      b,0
     ld      b,h
     and     a
-    jr      z,argv_done
+    jp      z,argv_done
     ;inc	hl
     ld      c,a
     add     hl,bc   ;now points to the end of the command line
