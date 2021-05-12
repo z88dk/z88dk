@@ -2,7 +2,7 @@
 ;
 ;       djm 18/5/99
 ;
-;       $Id: pps_crt0.asm,v 1.20 2016-07-15 21:38:08 dom Exp $
+;       $Id: pps_crt0.asm $
 ;
 
 
@@ -71,7 +71,7 @@ IF CRT_ENABLE_COMMANDLINE = 1
     ld      hl,(start_prefix)
     ld      a,(hl)  ;length of arguments
     and     a
-    jr      z,argv_done
+    jp      z,argv_done
     ld      c,a
     add     hl,bc   ;now points to end of arguments
 
