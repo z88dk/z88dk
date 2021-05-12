@@ -68,7 +68,7 @@ IF CRT_ENABLE_COMMANDLINE = 1
     ld      a,(hl)
     ld      b,0
     and     a
-    jr      z,argv_done
+    jp      z,argv_done
     ld      c,a
     inc     hl
     add     hl,bc   ;now points to the end of the command line
