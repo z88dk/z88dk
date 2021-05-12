@@ -544,11 +544,20 @@ IF !DEFINED_getk
           defc _getk = getk_inkey
       ENDIF
    ENDIF
-ELSE
-      PUBLIC _getk
+ENDIF
+
+IF DEFINED_fgetc_cons
+  IF !DEFINED__fgetc_cons
       PUBLIC _fgetc_cons
-      defc _getk = getk
       defc _fgetc_cons = fgetc_cons
+  ENDIF
+ENDIF
+
+IF DEFINED_getk
+  IF !DEFINED__getk
+      PUBLIC _getk
+      defc _getk = getk
+  ENDIF
 ENDIF
 
 
