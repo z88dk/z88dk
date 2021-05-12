@@ -12,8 +12,15 @@ IF CRT_ENABLE_COMMANDLINE = 1
     jr      argv_begin
 
 redir_fopen_flag:		defb	'w',0
-redir_fopen_flagr:		defb	'r'
-commandline_argv0:		defb	0
+redir_fopen_flagr:		defb	'r',0
+commandline_argv0:
+	DEFINE NEED_name	; The next time we'll include zcc_opt.def
+				;  it will have the programs namestring.
+				; Usage in C file:
+				; #pragma string name xxxx
+	INCLUDE	"zcc_opt.def"
+	UNDEFINE NEED_name
+						defb	0
 
 argv_begin:
 	push    bc
