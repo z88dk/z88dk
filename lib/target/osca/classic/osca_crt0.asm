@@ -182,7 +182,7 @@ cmdline:
 	ld	bc,0
 	ld	a,(hl)
 	and	a
-	jr	z,argv_done
+	jp	z,argv_done
 	dec	hl
 find_end:
 	inc	hl
