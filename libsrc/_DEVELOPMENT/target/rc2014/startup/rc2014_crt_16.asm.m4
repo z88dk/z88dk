@@ -95,7 +95,8 @@ EXTERN _main
 
 IF __crt_include_preamble
 
-   include "crt_preamble.asm"  ; user provided preamble
+   include "crt_preamble.asm"
+   SECTION CODE
 
 ENDIF
 
