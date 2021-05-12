@@ -9,6 +9,9 @@
 #ifdef __MSX__
 #include <msx.h>
 #endif
+#ifdef __SAM__
+#include <arch/sam.h>
+#endif
 #include <psg/wyz.h>
 #include <stdlib.h>
 
@@ -75,22 +78,34 @@ void main()
       int k = getk();
       switch ( k ) {
       case '0':
+          asm("di");
           ay_wyz_start_effect(3, 0);
+          asm("ei");
           break;
       case '1':
+          asm("di");
           ay_wyz_start_effect(3, 1);
+          asm("ei");
           break;
       case '2':
+          asm("di");
           ay_wyz_start_effect(3, 2);
+          asm("ei");
           break;
       case '3':
+          asm("di");
           ay_wyz_start_effect(3, 3);
+          asm("ei");
           break;
       case ' ':
+          asm("di");
           ay_wyz_stop();
+          asm("ei");
           break;
       case 's':
+          asm("di");
           ay_wyz_start(0);
+          asm("ei");
           break;
       }
 #ifdef NO_INTERRUPT
