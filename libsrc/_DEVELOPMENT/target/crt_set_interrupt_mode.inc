@@ -1,13 +1,13 @@
    IF (__crt_org_vector_table > 0)
 
-      ; copy interrupt vector table to final destination
+      ; copy interrupt vector table to final location
 
-      EXTERN __interrupt_vectors_head
-      EXTERN __interrupt_vectors_size
+      EXTERN __code_crt_interrupt_vector_table_head
+      EXTERN __code_crt_interrupt_vector_table_size
 
-      ld hl,__interrupt_vectors_head
+      ld hl,__code_crt_interrupt_vector_table_head
       ld de,__crt_org_vector_table
-      ld bc,__interrupt_vectors_size
+      ld bc,__code_crt_interrupt_vector_table_size
 
       EXTERN asm_memcpy
       call   asm_memcpy
