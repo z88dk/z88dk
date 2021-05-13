@@ -22,7 +22,7 @@ section code_crt_exit
 section code_crt_return
 section code_crt_common
 
-IF (__crt_org_vector_table != 0) && (__crt_org_vector_table != -0x80) && (__crt_org_vector_table != -0x100)
+IF (__crt_org_vector_table) && (__crt_org_vector_table != -0x80) && (__crt_org_vector_table != -0x100)
 
 section code_crt_interrupt_vector_table
 
