@@ -5,18 +5,18 @@ all: binaries
 include ../../support/multitarget_build/Makefile
 
 # Hello world 
-WORLD_TARGETS = abc80 abc800 ace alphatro altair8800 aquarius bee c128 c7420 coleco cpc cpm dai \
-	enterprise fp1100 \
-	g800 gal hemc hgmc homelab homelab2 kc kramermc lambda laser500 lviv lynx m5 m100 mc1000 mikro80 \
+WORLD_TARGETS = abc80 abc800 ace alphatro altair8800 aquarius bee c128 c7420 coleco bit90 cpc cpm dai \
+	eg2000 enterprise fp1100 g800 gal gamegear gl  gl4000 gl6000  \
+	hemc hgmc homelab homelab2 kc kramermc lambda laser500 lviv lynx m5 m100 mc1000 mikro80 \
 	msx mtx multi8 myvision mz mz2500 nascom nc newbrain ondra osca oz p2000 pacman pasopia7 pc6001 \
 	pencil2 pps primo pv1000  \
-	pv2000 rcmx000 rx78 sam sc3000 smc777 sos spc1000 special srr svi test ti82 ti83 ti85 ti86 ti8x \
+	pv2000 rcmx000 rx78 sam sc3000 smc777 sms sos spc1000 special srr super80 super80_vduem svi svirom test ti82 ti83 ti85 ti86 ti8x \
 	trs80 ts2068 vector06c vg5k vz x07 x1 z1013 z9001 z88 zx zx80 zx81 zxn
 
 WORLD_TARGETS += cpm_px8 cpm_px4 cpm_einstein cpm_attache cpm_osborne1 cpm_kaypro83 cpm_kaypro84 \
 	cpm_mz2500 cpm_microbee cpm_qc10 cpm_nascom cpm_tiki100 cpm_svi cpm_dmv cpm_adam \
 	cpm_smc777 cpm_rc700 cpm_fp1100 cpm_x1 cpm_lynx cpm_bic cpm_excali64 cpm_vector06c \
-	cpm_zxplus3 cpm_bondwell cpm_bw2
+	cpm_zxplus3 cpm_bondwell cpm_bw2 cpm_8080
 
 LDFLAGS_world = -lndos -pragma-define:CLIB_OPT_PRINTF=0x00000001
 
@@ -28,7 +28,7 @@ $(eval $(call build_app, $(WORLD_TARGETS), world.bin, world.c) )
 
 CONIO_TARGETS = abc80 ace alphatro aquarius bee cpc coleco cpm fp1100 gb hemc hgmc homelab homelab2 \
 	kramermc laser500 mc1000 mikro80  \
-	nascom ondra pmd85 pv1000 pps rx78 spc1000 srr super80 trs80 vg5k vz z1013 zx80 zx81 \
+	nascom ondra pmd85 pv1000 pps rx78 sam spc1000 srr super80 super80_vduem trs80 vg5k vz z1013 zx80 zx81 \
 	msx pv2000 sc3000 smc777 svi m5 mtx multi8 z80tvgame z9001 vector06c zx
 
 CFLAGS_world_conio = --generic-console
@@ -69,7 +69,6 @@ LDFLAGS_zx_adva = -lndos
 CFLAGS_msx_adva = -subtype=rom
 
 $(eval $(call build_app, $(ADVA_TARGETS), adva.bin, adv_a.c) )
-
 
 
 
