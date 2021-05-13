@@ -94,7 +94,7 @@ sub parse_line {
             }
         }
         elsif (s/^\s*(;.*)//)                       { $ret{comment} = $1; }
-        elsif (s/^\s*({|})//)                       { $ret{opcode} = $1; $ret{args} = ''; }
+	elsif (s/^\s*(\{|\})//)                       { $ret{opcode} = $1; $ret{args} = ''; }
         /\S/ and die "cannot parse: $_";
     }
     return \%ret;
