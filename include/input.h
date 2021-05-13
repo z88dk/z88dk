@@ -304,7 +304,7 @@ extern void __LIB__  in_MouseSimSetPos_callee(struct in_UDM *u, uint xcoord, uin
 #ifdef __SPECTRUM__
    #define IN_MAX_X    255  /* largest x coord  */
    #define IN_MAX_Y    191  /* largest y coord  */
-   #include <spectrum.h>
+   #include <arch/zx/spectrum.h>
 /*
    Adds: 1 in_MouseKempInit, in_MouseKemp, in_MouseKempSetPos
          2 in_MouseAMXInit, in_MouseAMXInit2, in_MouseAMX, in_MouseAMXSetPos
