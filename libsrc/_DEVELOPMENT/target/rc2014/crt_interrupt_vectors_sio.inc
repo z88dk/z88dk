@@ -5,7 +5,7 @@
    
 IF (__Z80 != 0) && (__page_zero_present) && (__crt_org_vector_table > 0x100)
 
-    SECTION     interrupt_vectors
+    SECTION     code_crt_interrupt_vector_table
 
     EXTERN      __siob_interrupt_tx_empty
     EXTERN      __siob_interrupt_ext_status

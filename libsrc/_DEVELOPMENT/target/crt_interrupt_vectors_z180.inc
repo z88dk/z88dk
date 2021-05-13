@@ -7,7 +7,7 @@ IF (__Z180 != 0) && (__page_zero_present) && (__crt_org_vector_table > 0x100)
 ; defc __Z180_Z8L180 = 0x02
 ; defc __Z180_Z8S180 = 0x04
 
-SECTION interrupt_vectors
+SECTION code_crt_interrupt_vector_table
 
 EXTERN l_ret
 
