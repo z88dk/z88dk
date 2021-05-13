@@ -4,7 +4,7 @@
 # Aliases used by the classic library
 #
 ALIAS   --conio-selector -pragma-redirect:fputc_cons=fputc_cons_selector 
-ALIAS   --generic-console -pragma-redirect:fputc_cons=fputc_cons_generic 
+ALIAS   --generic-console -pragma-redirect:fputc_cons=fputc_cons_generic -D__HAVE_GENCON
 ALIAS   --hardware-keyboard -pragma-redirect:fgetc_cons=fgetc_cons_inkey -pragma-redirect:getk=getk_inkey 
 
 
