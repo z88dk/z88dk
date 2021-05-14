@@ -40,7 +40,9 @@ int main()
    c = time(NULL);
 #endif
 #ifdef __HAVE_FILEIO
+   fopen("asfsf","r");
    c = read(0, buf, 0);
+   fclose(NULL);
 #endif
 }
 
