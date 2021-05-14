@@ -790,27 +790,32 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
     struct section_bin *sb;
     int section_num;
 
-    char outname[9];
-    char outnamex[13];
+    char *dirname;
+    char outname[FILENAME_MAX+1];
+    char blockname[8+1];
+    char outnamex[FILENAME_MAX+1];
 
     int c;
     int z_dtx_filename, z_alt_filename;
 
     // determine output filename
 
-    if (zxc->outfile == NULL)
-        sprintf(outname, "%.8s", zxc->binname);
-    else
-        sprintf(outname, "%.8s", zxc->outfile);
-
-    suffix_change(outname, "");
+    if (zxc->outfile == NULL) {
+        snprintf(blockname, sizeof(blockname), "%.8s", zbasename(zxc->binname));
+                dirname = zdirname(zxc->binname);
+    } else {    
+        snprintf(blockname, sizeof(blockname), "%.8s", zbasename(zxc->outfile));
+          dirname = zdirname(zxc->outfile);
+    }
+    suffix_change(blockname, "");
 
     // truncate output filename to eight characters
+    blockname[8] = 0;
+    for (c = 0; blockname[c]; ++c)
+        blockname[c] = toupper(blockname[c]);
 
-    outname[8] = 0;
-    for (c = 0; outname[c]; ++c)
-        outname[c] = toupper(outname[c]);
-
+    snprintf(outname,sizeof(outname),"%s/%s",dirname,blockname);
+    
     // generate the dot command from section CODE
 
     if (mb_find_section(memory, "CODE", &mb, &section_num) == 0)
@@ -843,8 +848,7 @@ int zx_dot_command(struct zx_common *zxc, struct banked_memory *memory)
             remove(outname);
             exit_log(1, "Error: Section MAIN not found\n");
         }
-
-        sprintf(outnamex, "%s.X", outname);
+        snprintf(outnamex,sizeof(outnamex),"%s/%s.X",dirname,blockname);
 
         sb = &mb->secbin[section_num];
 

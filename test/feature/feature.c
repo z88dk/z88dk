@@ -14,7 +14,9 @@ int main()
    printf("x\n");
 #ifdef __HAVE_KEYBOARD
    c = fgetc_cons();
-//   c = getk();
+ #ifdef __HAVE_GETK
+   c = getk();
+ #endif
 #endif
 #ifdef __HAVE_INKEY
    c = in_LookupKey('2');
@@ -24,8 +26,12 @@ int main()
 #ifdef __HAVE_GFX
    plot(0,0);
    unplot(0,0);
-   //xorplot(0,0);
-   //point(0,0);
+ #ifdef __HAVE_GFX_XORPLOT
+   xorplot(0,0);
+ #endif
+ #ifdef __HAVE_GFX_POINTXY
+   point(0,0);
+ #endif
 #endif
 #ifdef __HAVE_ONEBITSOUND
    bit_click(1);
@@ -37,3 +43,12 @@ int main()
    c = read(0, buf, 0);
 #endif
 }
+
+#if defined(__Z88__) && defined(__Z88_APPLICATION)
+#include <arch/z88/dor.h>
+
+
+#include <arch/z88/application.h>
+
+
+#endif

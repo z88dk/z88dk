@@ -60,8 +60,8 @@ IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
-    ld      a,($F306)
-    ld      (defltdsk),a
+    ;ld      a,($F306)
+    ;ld      (defltdsk),a
 
 IF CRT_ENABLE_COMMANDLINE = 1
     ld      hl,$80

@@ -5,6 +5,7 @@
 
 #if defined(__ABC80__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -25,11 +26,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__ABC800__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -50,11 +52,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__ACE__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -75,11 +78,12 @@
 #define __GENCON_MAX_UDGS 32
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__ALPHATRO__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -100,11 +104,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__ALTAIR8800__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -125,11 +130,38 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
+
+#elif defined(__AQUARIUS__)  && defined(__ROM__)
+#define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
+// #define __HAVE_INKEY 0
+// #define __HAVE_ONEBITSOUND 0
+#define __HAVE_PSG_AY 1
+// #define __HAVE_PSG_AY_WYZ 0
+// #define __HAVE_PSG_AY_VT2 0
+// #define __HAVE_PSG_SN76489 0
+// #define __HAVE_PSG_SAA1099 0
+// #define __HAVE_INTERRUPTS 0
+#define __NEED_INTERRUPT_INIT 0
+#define __HAVE_RS232 1
+// #define __HAVE_FILEIO 0
+// #define __HAVE_TIME 0
+// #define __HAVE_VIDEO_MC6847 0
+// #define __HAVE_VIDEO_MC6845 0
+// #define __HAVE_VIDEO_VDP 0
+#define __HARDWARE_JOY1_INDEX -1
+#define __HARDWARE_JOY2_INDEX -1
+#define __GENCON_MAX_UDGS 0
+#define __HAVE_GFX 1
+// #define __HAVE_GFX_COLOUR 0
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__AQUARIUS__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
@@ -150,11 +182,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__BEE__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -175,11 +208,12 @@
 #define __GENCON_MAX_UDGS 112
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__C128__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -200,11 +234,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__C7420__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -225,11 +260,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__COLECO__)
 // #define __HAVE_KEYBOARD 0
+// #define __HAVE_GETK 0
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -250,11 +286,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__COLECO__)  && defined(__BIT90__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -275,11 +312,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPC__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
@@ -300,11 +338,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__PX8__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -325,11 +364,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__PX4__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -350,11 +390,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__AUSSIE__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -375,11 +416,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__CPC__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -400,11 +442,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__PCW__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
@@ -425,11 +468,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__EINSTEIN__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
@@ -450,11 +494,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__ATTACHE__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
@@ -475,11 +520,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__OSBORNE1__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -500,11 +546,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__BONDWELL__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -525,11 +572,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__BONDWELL2__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -550,11 +598,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__KAYPROII__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -575,11 +624,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__KAYPRO84__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -600,11 +650,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__MZ2500__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -625,11 +676,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__BEE__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -650,11 +702,12 @@
 #define __GENCON_MAX_UDGS 112
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__QX10__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -675,11 +728,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__NASCOM__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -700,11 +754,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__TIKI100__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
@@ -725,11 +780,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__DMV__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -750,11 +806,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__COLECOADAM__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -775,11 +832,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__SMC777__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -800,11 +858,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__PASOPIA__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -825,11 +884,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__MSX__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -850,11 +910,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__CPM__)  && defined(__BIC__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -875,11 +936,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__EXCALI64__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -900,11 +962,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__LYNX__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -925,11 +988,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__SHARPX1__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -950,11 +1014,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__RC700__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -975,11 +1040,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__FP1100__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1000,11 +1066,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__ZXPLUS3__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1025,11 +1092,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)  && defined(__VECTOR06C__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1050,11 +1118,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__CPM__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1075,11 +1144,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__DAI__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1100,11 +1170,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__ENTERPRISE__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -1125,11 +1196,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__EXCALI64__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1150,11 +1222,12 @@
 #define __GENCON_MAX_UDGS 128
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__FP1100__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1175,11 +1248,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__G800__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -1200,11 +1274,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__GAL__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -1225,11 +1300,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__GAL__)  && defined(__GALPLUSHIRES__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -1250,11 +1326,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__GAMEBOY__)
 // #define __HAVE_KEYBOARD 0
+// #define __HAVE_GETK 0
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1275,11 +1352,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__GL__)  && defined(GL_TARGET_GL2000)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -1300,11 +1378,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__GL__)  && defined(GL_TARGET_GL4000)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -1325,11 +1404,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__GL__)  && defined(GL_TARGET_GL6000)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -1350,11 +1430,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__HEMC__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1375,11 +1456,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__HGMC__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1400,11 +1482,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__HOMELAB__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1425,11 +1508,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__HOMELAB2__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1450,11 +1534,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__KC__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1475,11 +1560,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__KRAMERMC__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1500,11 +1586,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__KROKHA__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1525,11 +1612,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__LAMBDA__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1550,11 +1638,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__LASER500__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -1575,11 +1664,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__LM80C__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
@@ -1600,11 +1690,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__LVIV__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1625,11 +1716,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__LYNX__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1650,11 +1742,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__M100__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1675,11 +1768,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__M5__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1700,11 +1794,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__MC1000__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -1725,11 +1820,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__MIKRO80__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1750,11 +1846,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__MSX__)  && defined(CLIB_MSXDOS1)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -1775,11 +1872,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__MSX__)  && defined(CLIB_MSXDOS2)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -1800,11 +1898,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__MSX__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -1825,11 +1924,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__MTX__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1850,11 +1950,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__MULTI8__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
@@ -1875,11 +1976,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__MYVISION__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
@@ -1900,11 +2002,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SHARPMZ__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1925,11 +2028,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__MZ2500__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1950,11 +2054,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__NASCOM__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -1975,11 +2080,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__NC100__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2000,11 +2106,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__NEWBRAIN__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2025,11 +2132,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__ONDRA__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2050,11 +2158,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__OSCA__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2075,11 +2184,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__OZ__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2100,11 +2210,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__P2000__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2125,11 +2236,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__PACMAN__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2150,11 +2262,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__PASOPIA7__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2175,11 +2288,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
-#elif defined(__PC6001__)
+#elif defined(__PC6001__)  && defined(__ROM__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
@@ -2200,11 +2314,38 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
-#elif defined(__PC88__)
+#elif defined(__PC6001__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
+// #define __HAVE_INKEY 0
+// #define __HAVE_ONEBITSOUND 0
+#define __HAVE_PSG_AY 1
+#define __HAVE_PSG_AY_WYZ 1
+// #define __HAVE_PSG_AY_VT2 0
+// #define __HAVE_PSG_SN76489 0
+// #define __HAVE_PSG_SAA1099 0
+// #define __HAVE_INTERRUPTS 0
+#define __NEED_INTERRUPT_INIT 0
+// #define __HAVE_RS232 0
+// #define __HAVE_FILEIO 0
+// #define __HAVE_TIME 0
+#define __HAVE_VIDEO_MC6847 1
+// #define __HAVE_VIDEO_MC6845 0
+// #define __HAVE_VIDEO_VDP 0
+#define __HARDWARE_JOY1_INDEX -1
+#define __HARDWARE_JOY2_INDEX -1
+#define __GENCON_MAX_UDGS 128
+#define __HAVE_GFX 1
+#define __HAVE_GFX_COLOUR 1
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
+
+#elif defined(__PC88__)  && defined(__ALLRAM__)
+#define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -2225,11 +2366,38 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
+
+#elif defined(__PC88__)
+#define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
+// #define __HAVE_INKEY 0
+#define __HAVE_ONEBITSOUND 1
+#define __HAVE_PSG_AY 1
+#define __HAVE_PSG_AY_WYZ 1
+// #define __HAVE_PSG_AY_VT2 0
+// #define __HAVE_PSG_SN76489 0
+// #define __HAVE_PSG_SAA1099 0
+// #define __HAVE_INTERRUPTS 0
+#define __NEED_INTERRUPT_INIT 0
+// #define __HAVE_RS232 0
+// #define __HAVE_FILEIO 0
+// #define __HAVE_TIME 0
+// #define __HAVE_VIDEO_MC6847 0
+// #define __HAVE_VIDEO_MC6845 0
+// #define __HAVE_VIDEO_VDP 0
+#define __HARDWARE_JOY1_INDEX -1
+#define __HARDWARE_JOY2_INDEX -1
+#define __GENCON_MAX_UDGS 128
+#define __HAVE_GFX 1
+#define __HAVE_GFX_COLOUR 1
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__PENCIL2__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2250,11 +2418,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__PMD85__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2275,11 +2444,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SPRINTER__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2300,11 +2470,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__PRIMO__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -2325,11 +2496,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__PV1000__)
 // #define __HAVE_KEYBOARD 0
+// #define __HAVE_GETK 0
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2350,11 +2522,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__PV2000__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2375,11 +2548,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__RADIO86__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2400,11 +2574,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__REX__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2425,11 +2600,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__RX78__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2450,11 +2626,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__S1MP3__)
 // #define __HAVE_KEYBOARD 0
+// #define __HAVE_GETK 0
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2475,11 +2652,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
-#elif defined(__SAM__)
+#elif defined(__SAM__)  && defined(__ALLRAM__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2500,11 +2678,64 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
+
+#elif defined(__SAM__)  && defined(__HIGHRAM__)
+#define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
+#define __HAVE_INKEY 1
+// #define __HAVE_ONEBITSOUND 0
+// #define __HAVE_PSG_AY 0
+#define __HAVE_PSG_AY_WYZ 1
+// #define __HAVE_PSG_AY_VT2 0
+// #define __HAVE_PSG_SN76489 0
+#define __HAVE_PSG_SAA1099 1
+// #define __HAVE_INTERRUPTS 0
+#define __NEED_INTERRUPT_INIT 0
+// #define __HAVE_RS232 0
+// #define __HAVE_FILEIO 0
+#define __HAVE_TIME 1
+// #define __HAVE_VIDEO_MC6847 0
+// #define __HAVE_VIDEO_MC6845 0
+// #define __HAVE_VIDEO_VDP 0
+#define __HARDWARE_JOY1_INDEX -1
+#define __HARDWARE_JOY2_INDEX -1
+#define __GENCON_MAX_UDGS 128
+#define __HAVE_GFX 1
+#define __HAVE_GFX_COLOUR 1
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
+
+#elif defined(__SAM__)
+#define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
+#define __HAVE_INKEY 1
+// #define __HAVE_ONEBITSOUND 0
+// #define __HAVE_PSG_AY 0
+#define __HAVE_PSG_AY_WYZ 1
+// #define __HAVE_PSG_AY_VT2 0
+// #define __HAVE_PSG_SN76489 0
+#define __HAVE_PSG_SAA1099 1
+// #define __HAVE_INTERRUPTS 0
+#define __NEED_INTERRUPT_INIT 0
+// #define __HAVE_RS232 0
+// #define __HAVE_FILEIO 0
+#define __HAVE_TIME 1
+// #define __HAVE_VIDEO_MC6847 0
+// #define __HAVE_VIDEO_MC6845 0
+// #define __HAVE_VIDEO_VDP 0
+#define __HARDWARE_JOY1_INDEX -1
+#define __HARDWARE_JOY2_INDEX -1
+#define __GENCON_MAX_UDGS 0
+// #define __HAVE_GFX 0
+// #define __HAVE_GFX_COLOUR 0
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__SC3000__)  && defined(__ROM__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2525,11 +2756,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SC3000__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2550,11 +2782,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SMC777__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -2575,11 +2808,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
-#elif defined(__SMS__)
+#elif defined(__SMS__)  && defined(__GAMEGEAR__)
 // #define __HAVE_KEYBOARD 0
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2600,11 +2834,38 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
+
+#elif defined(__SMS__)
+// #define __HAVE_KEYBOARD 0
+#define __HAVE_GETK 1
+// #define __HAVE_INKEY 0
+// #define __HAVE_ONEBITSOUND 0
+// #define __HAVE_PSG_AY 0
+// #define __HAVE_PSG_AY_WYZ 0
+// #define __HAVE_PSG_AY_VT2 0
+#define __HAVE_PSG_SN76489 1
+// #define __HAVE_PSG_SAA1099 0
+#define __HAVE_INTERRUPTS 1
+#define __NEED_INTERRUPT_INIT 0
+// #define __HAVE_RS232 0
+// #define __HAVE_FILEIO 0
+// #define __HAVE_TIME 0
+// #define __HAVE_VIDEO_MC6847 0
+// #define __HAVE_VIDEO_MC6845 0
+#define __HAVE_VIDEO_VDP 1
+#define __HARDWARE_JOY1_INDEX -1
+#define __HARDWARE_JOY2_INDEX -1
+#define __GENCON_MAX_UDGS 128
+#define __HAVE_GFX 1
+#define __HAVE_GFX_COLOUR 1
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SOS__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2625,11 +2886,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__SPC1000__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
@@ -2650,11 +2912,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SPECIAL__)
 #define __HAVE_KEYBOARD 1
+// #define __HAVE_GETK 0
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2675,11 +2938,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SORCERER__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2700,11 +2964,12 @@
 #define __GENCON_MAX_UDGS 16
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SUPER80__)  && defined(__SUPER80_VDUEM__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2725,11 +2990,12 @@
 #define __GENCON_MAX_UDGS 112
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SUPER80__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -2750,11 +3016,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SV8000__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -2775,11 +3042,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SVI__)  && defined(__ROM__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2800,11 +3068,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SVI__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -2825,11 +3094,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__TI82__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -2850,11 +3120,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__TI83__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -2875,11 +3146,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__TI85__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -2900,11 +3172,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__TI86__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -2925,11 +3198,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__TI8x__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -2950,11 +3224,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__TRS80__)  && defined(__EG2000__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -2975,11 +3250,12 @@
 #define __GENCON_MAX_UDGS 32
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__TRS80__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -3000,11 +3276,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__TS2068__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -3025,11 +3302,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__TVC__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -3050,11 +3328,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__VECTOR06C__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -3075,11 +3354,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__VG5000__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -3100,11 +3380,12 @@
 #define __GENCON_MAX_UDGS 96
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__VZ200__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -3125,11 +3406,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__X07__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -3150,11 +3432,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__X1__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
@@ -3175,11 +3458,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__Z1013__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -3200,11 +3484,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__Z80TVGAME__)
 // #define __HAVE_KEYBOARD 0
+// #define __HAVE_GETK 0
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -3225,11 +3510,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__Z88__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 #define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
@@ -3250,11 +3536,12 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__Z9001__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -3275,11 +3562,38 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
+
+#elif defined(__SPECTRUM__)  && defined(__ROM__)
+#define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
+#define __HAVE_INKEY 1
+#define __HAVE_ONEBITSOUND 1
+#define __HAVE_PSG_AY 1
+#define __HAVE_PSG_AY_WYZ 1
+#define __HAVE_PSG_AY_VT2 1
+// #define __HAVE_PSG_SN76489 0
+// #define __HAVE_PSG_SAA1099 0
+#define __HAVE_INTERRUPTS 1
+#define __NEED_INTERRUPT_INIT 0
+// #define __HAVE_RS232 0
+// #define __HAVE_FILEIO 0
+// #define __HAVE_TIME 0
+// #define __HAVE_VIDEO_MC6847 0
+// #define __HAVE_VIDEO_MC6845 0
+// #define __HAVE_VIDEO_VDP 0
+#define __HARDWARE_JOY1_INDEX -1
+#define __HARDWARE_JOY2_INDEX -1
+#define __GENCON_MAX_UDGS 128
+#define __HAVE_GFX 1
+// #define __HAVE_GFX_COLOUR 0
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__SPECTRUM__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -3300,11 +3614,12 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__ZX80__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 // #define __HAVE_PSG_AY 0
@@ -3325,11 +3640,12 @@
 #define __GENCON_MAX_UDGS 0
 // #define __HAVE_GFX 0
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__ZX81__)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -3350,11 +3666,38 @@
 #define __GENCON_MAX_UDGS 0
 #define __HAVE_GFX 1
 // #define __HAVE_GFX_COLOUR 0
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
+
+#elif defined(__ZXNEXT)  && defined(__ESXDOS_DOT_COMMAND)
+#define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
+#define __HAVE_INKEY 1
+#define __HAVE_ONEBITSOUND 1
+#define __HAVE_PSG_AY 1
+#define __HAVE_PSG_AY_WYZ 1
+#define __HAVE_PSG_AY_VT2 1
+// #define __HAVE_PSG_SN76489 0
+// #define __HAVE_PSG_SAA1099 0
+// #define __HAVE_INTERRUPTS 0
+#define __NEED_INTERRUPT_INIT 0
+#define __HAVE_RS232 1
+#define __HAVE_FILEIO 1
+#define __HAVE_TIME 1
+// #define __HAVE_VIDEO_MC6847 0
+// #define __HAVE_VIDEO_MC6845 0
+// #define __HAVE_VIDEO_VDP 0
+#define __HARDWARE_JOY1_INDEX -1
+#define __HARDWARE_JOY2_INDEX -1
+#define __GENCON_MAX_UDGS 128
+#define __HAVE_GFX 1
+#define __HAVE_GFX_COLOUR 1
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 
 #elif defined(__ZXNEXT)
 #define __HAVE_KEYBOARD 1
+#define __HAVE_GETK 1
 #define __HAVE_INKEY 1
 #define __HAVE_ONEBITSOUND 1
 #define __HAVE_PSG_AY 1
@@ -3375,8 +3718,8 @@
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
-#define __HAVE_GFX_POINTXY 
-#define __HAVE_GFX_XORPLOT 
+#define __HAVE_GFX_POINTXY 1
+#define __HAVE_GFX_XORPLOT 1
 #endif
 
 #endif

@@ -34,7 +34,11 @@ ifneq ($(APPNAME),)
 all: $(foreach target, $(TARGETS),  build/$(target)/$(APPNAME) )
 endif
 
-# We have some ports with subtypes
+# We have some ports with subtypes so create targets for them
+Z88DKTARGET_aquarius_rom = aquarius
+ZCFLAGS_aquarius_rom = -subtype=rom
+ZLDFLAGS_aquarius_rom = 
+
 Z88DKTARGET_bit90 = coleco
 ZCFLAGS_bit90 = -subtype=bit90
 ZLDFLAGS_bit90 = 
@@ -47,6 +51,18 @@ Z88DKTARGET_super80_vduem = super80
 ZCFLAGS_super80_vduem = -clib=vduem
 ZLDFLAGS_super80_vduem = 
 
+Z88DKTARGET_msx_msxdos1 = msx
+ZCFLAGS_msx_msxdos1 = -subtype=msxdos
+ZLDFLAGS_msx_msxdos1 = 
+
+Z88DKTARGET_msx_msxdos2 = msx
+ZCFLAGS_msx_msxdos2 = -subtype=msxdos2
+ZLDFLAGS_msx_msxdos1 = 
+
+Z88DKTARGET_msx_rom = msx
+ZCFLAGS_msx_rom = -subtype=rom
+ZLDFLAGS_msx_rom = 
+
 Z88DKTARGET_gl4000 = gl
 ZCFLAGS_gl4000 = -clib=gl4000
 ZLDFLAGS_gl4000 = 
@@ -56,9 +72,37 @@ ZLDFLAGS_gl6000 =
 Z88DKTARGET_gamegear = sms
 ZCFLAGS_gamegear = -subtype=gamegear
 ZLDFLAGS_gamegear = 
-Z88DKTARGET_svirom = svi
-ZCFLAGS_svirom = -subtype=rom
-ZLDFLAGS_svirom = 
+
+Z88DKTARGET_pc6001_rom = pc6001
+ZCFLAGS_pc6001_rom = -subtype=rom
+ZLDFLAGS_pc6001_rom = 
+
+Z88DKTARGET_pc88_disk = pc88
+ZCFLAGS_pc88_disk = -subtype=disk
+ZLDFLAGS_pc88_disk = 
+
+Z88DKTARGET_sam_allram = sam
+ZCFLAGS_sam_allram = -subtype=allram
+ZLDFLAGS_sam_allram = 
+Z88DKTARGET_sam_highram = sam
+ZCFLAGS_sam_highram = -subtype=highram
+ZLDFLAGS_sam_highram = 
+
+Z88DKTARGET_svi_rom = svi
+ZCFLAGS_svi_rom = -subtype=rom
+ZLDFLAGS_svi_rom = 
+
+Z88DKTARGET_z88_app = z88
+ZCFLAGS_z88_app = -subtype=app
+ZLDFLAGS_z88_app = 
+
+Z88DKTARGET_zxn_dot = zxn
+ZCFLAGS_zxn_dot = -clib=classic -subtype=dot
+ZLDFLAGS_zxn_dot = -lesxdos
+
+Z88DKTARGET_zx_rom = zx
+ZCFLAGS_zx_rom = -subtype=rom
+ZLDFLAGS_zx_rom = -lndos
 
 
 # Setup the CP/M mappings to +cpm
