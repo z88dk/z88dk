@@ -110,6 +110,15 @@
      defc __CLIB_FGETC_CONS_DELAY = 50
    ENDIF
 
+   ; Delay when kbhit/getch() returns a cached key press
+   ; Delaying slightly means that typing is possible
+   PUBLIC __CLIB_KBHIT_DELAY
+   IFDEF CLIB_KBHIT_DELAY
+     defc __CLIB_KBHIT_DELAY = CLIB_KBHIT_DELAY
+   ELSE
+     defc __CLIB_KBHIT_DELAY = 0
+   ENDIF
+
    ; Some ports (looking at you tiki100) need to have graphics routines stored out
    ; of paging harm. Normally we'd just use code_driver and keep the routines close
    ; the start of the address space. However for tiki100, we need them at the end,

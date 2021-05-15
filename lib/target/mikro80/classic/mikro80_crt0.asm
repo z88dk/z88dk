@@ -22,7 +22,7 @@
         PUBLIC    cleanup         ;jp'd to by exit()
         PUBLIC    l_dcal          ;jp(hl)
 
-        IF !CLIB_FGETC_CONS_DELAY
+        IFNDEF CLIB_FGETC_CONS_DELAY
                 defc CLIB_FGETC_CONS_DELAY = 150
         ENDIF
 

@@ -20,7 +20,7 @@
 
 	PUBLIC	ROMCALL_OP	; Opcode to use for ROM calls
 
-        IF !CLIB_FGETC_CONS_DELAY
+        IFNDEF CLIB_FGETC_CONS_DELAY
                 defc CLIB_FGETC_CONS_DELAY = 150
         ENDIF
 
