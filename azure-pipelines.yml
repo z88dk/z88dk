@@ -31,6 +31,7 @@ steps:
     path: $(CCACHE_DIR)
   displayName: ccache
 - bash: |
+    sudo apt-get update
     sudo apt-get install -y ccache libboost-all-dev texinfo texi2html gdb curl dos2unix ragel liblocal-lib-perl cpanminus
     eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
     cpanm App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
