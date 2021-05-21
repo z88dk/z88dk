@@ -25,7 +25,7 @@
 	defc	CRT_KEY_DEL = 127
 	defc	__CPU_CLOCK = 2500000
 
-        IF !CLIB_FGETC_CONS_DELAY
+        IFNDEF CLIB_FGETC_CONS_DELAY
                 defc CLIB_FGETC_CONS_DELAY = 150
         ENDIF
 

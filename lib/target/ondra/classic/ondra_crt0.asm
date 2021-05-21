@@ -23,7 +23,7 @@
 	EXTERN  __BSS_END_tail
 
 
-        IF !CLIB_FGETC_CONS_DELAY
+        IFNDEF CLIB_FGETC_CONS_DELAY
                 defc CLIB_FGETC_CONS_DELAY = 150
         ENDIF
 

@@ -8,7 +8,8 @@
 
     EXTERN  getk
     EXTERN  fgetc_cons
-    EXTERN  CLIB_KBHIT_NOSTORE
+    EXTERN  msleep
+    EXTERN  __CLIB_KBHIT_DELAY
 
 
 kbhit:
@@ -21,9 +22,6 @@ IF __CPU_GBZ80__
     or      h
     ret     nz
     call    getk
-    ld      a,CLIB_KBHIT_NOSTORE
-    and     a
-    ret     nz
     ld      de,kbhit_key
     ld      a,l
     ld      (de),a
@@ -39,9 +37,6 @@ ELSE
     or      l
     ret     nz		; we've got something pending
     call    getk		; read the keyboard
-    ld      a,CLIB_KBHIT_NOSTORE
-    and     a
-    ret     nz
     ld      (kbhit_key),hl
     ret
 ENDIF
@@ -71,9 +66,13 @@ ELSE
 ENDIF
     ld      a,h
     or      l
-    ret     nz		; consume that keypress
-    ; We didn't have anything, lets just read the keyboard
-    call    fgetc_cons
+    jp      z,fgetc_cons
+    push    hl
+    ld      hl,__CLIB_KBHIT_DELAY
+    ld      a,h
+    or      l
+    call    nz,msleep
+    pop     hl
     ret
 
     SECTION	bss_clib

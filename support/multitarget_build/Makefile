@@ -34,10 +34,98 @@ ifneq ($(APPNAME),)
 all: $(foreach target, $(TARGETS),  build/$(target)/$(APPNAME) )
 endif
 
+# We have some ports with subtypes so create targets for them
+Z88DKTARGET_aquarius_rom = aquarius
+ZCFLAGS_aquarius_rom = -subtype=rom
+ZLDFLAGS_aquarius_rom = 
+
+Z88DKTARGET_bit90 = coleco
+ZCFLAGS_bit90 = -subtype=bit90
+ZLDFLAGS_bit90 = 
+
+Z88DKTARGET_eg2000 = trs80
+ZCFLAGS_eg2000 = -subtype=eg2000disk
+ZLDFLAGS_eg2000 = 
+
+Z88DKTARGET_galplus = gal
+ZCFLAGS_galplus = -subtype=galaxyp
+ZLDFLAGS_galplus = 
+
+Z88DKTARGET_super80_vduem = super80
+ZCFLAGS_super80_vduem = -clib=vduem
+ZLDFLAGS_super80_vduem = 
+
+Z88DKTARGET_msx_msxdos1 = msx
+ZCFLAGS_msx_msxdos1 = -subtype=msxdos
+ZLDFLAGS_msx_msxdos1 = 
+
+Z88DKTARGET_msx_msxdos2 = msx
+ZCFLAGS_msx_msxdos2 = -subtype=msxdos2
+ZLDFLAGS_msx_msxdos1 = 
+
+Z88DKTARGET_msx_rom = msx
+ZCFLAGS_msx_rom = -subtype=rom
+ZLDFLAGS_msx_rom = 
+
+Z88DKTARGET_gl4000 = gl
+ZCFLAGS_gl4000 = -clib=gl4000
+ZLDFLAGS_gl4000 = 
+Z88DKTARGET_gl6000 = gl
+ZCFLAGS_gl6000 = -clib=gl6000sl
+ZLDFLAGS_gl6000 = 
+Z88DKTARGET_gamegear = sms
+ZCFLAGS_gamegear = -subtype=gamegear
+ZLDFLAGS_gamegear = 
+
+Z88DKTARGET_m100_optrom = m100
+ZCFLAGS_m100_optrom = -subtype=optrom
+ZLDFLAGS_m100_optrom = 
+
+Z88DKTARGET_pc6001_rom = pc6001
+ZCFLAGS_pc6001_rom = -subtype=rom
+ZLDFLAGS_pc6001_rom = 
+
+Z88DKTARGET_pc88_disk = pc88
+ZCFLAGS_pc88_disk = -subtype=disk
+ZLDFLAGS_pc88_disk = 
+
+Z88DKTARGET_sam_allram = sam
+ZCFLAGS_sam_allram = -subtype=allram
+ZLDFLAGS_sam_allram = 
+Z88DKTARGET_sam_highram = sam
+ZCFLAGS_sam_highram = -subtype=highram
+ZLDFLAGS_sam_highram = 
+
+Z88DKTARGET_sc3000_rom = sc3000
+ZCFLAGS_sc3000_rom = -subtype=rom
+ZLDFLAGS_sc3000_rom = 
+
+Z88DKTARGET_svi_disk = svi
+ZCFLAGS_svi_disk = -subtype=disk
+ZLDFLAGS_svi_disk = 
+
+Z88DKTARGET_svi_rom = svi
+ZCFLAGS_svi_rom = -subtype=rom
+ZLDFLAGS_svi_rom = 
+
+Z88DKTARGET_z88_app = z88
+ZCFLAGS_z88_app = -subtype=app
+ZLDFLAGS_z88_app = 
+
+Z88DKTARGET_zxn_dot = zxn
+ZCFLAGS_zxn_dot = -clib=classic -subtype=dot
+ZLDFLAGS_zxn_dot = -lesxdos
+
+Z88DKTARGET_zx_rom = zx
+ZCFLAGS_zx_rom = -subtype=rom
+ZLDFLAGS_zx_rom = -lndos
+
+
 # Setup the CP/M mappings to +cpm
-CPMSUBTYPES = px pxansi px8 pxansi px4 px4ansi einstein attache osborne1 kaypro83 \
+CPMSUBTYPES = aussie px pxansi px8 pxansi px4 px4ansi einstein attache osborne1 kaypro83 \
 	kaypro84 mz2500 microbee qc10 nascom tiki100 svi dmv adam smc777 pasopia \
-	msx bic excali64 lynx x1 rc700 fp1100 zxplus3 vector06c bondwell bw2
+	msx bic excali64 lynx x1 rc700 fp1100 zxplus3 vector06c bondwell bw2  \
+	cpc pcw40 pcw80 
 
 define setup_cpm_subtypes
 Z88DKTARGET_cpm_$(1) = cpm
@@ -48,6 +136,9 @@ endef
 $(foreach subtype, $(CPMSUBTYPES), \
     $(eval $(call setup_cpm_subtypes,$(subtype))) \
 )
+Z88DKTARGET_cpm_8080 = cpm
+ZCFLAGS_cpm_8080 = -clib=8080
+ZLDFLAGS_cpm_8080 = 
 
 
 # ZXN is special, to target classic we need -clib=classic
@@ -120,6 +211,9 @@ endef
 
 
 $(foreach app, $(APPNAME), $(eval $(call build_app, $(TARGETS), $(app), $(COMMON_SRCS))) ) 
+
+print-% : ; $(info $* is a $(flavor $*) variable set to [$($*)]) @true
+
 
 # And build all the required rules
 
