@@ -120,7 +120,10 @@ sub format_line {
             $LEVEL-- if $line->{opcode} =~ /^el|^end/i;
             $out .= "  " x $LEVEL;
             $out .= $line->{opcode};
-            $out = tab($out);
+            # If there are no args, don't add a tab
+            if ("$line->{args}" ne "") {
+                $out = tab($out);
+            }
             $out .= $line->{args};
             $LEVEL++ if $line->{opcode} =~ /^el/i;
             $LEVEL++ if $line->{opcode} =~ /^if/i;
@@ -132,7 +135,10 @@ sub format_line {
             if ($line->{opcode}) {
                 $out = tab_to_newline($out, $OPCODE, $fh);
                 $out .= $line->{opcode};
-                $out = tab_to($out, $ARGS);
+                # If there are no args, don't add a tab
+                if ("$line->{args}" ne "") {
+                    $out = tab_to($out, $ARGS);
+                }
                 $out .= $line->{args};
             }
             if ($line->{macro_label}) {
