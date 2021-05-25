@@ -21,6 +21,7 @@ my $ARGS = 4*$TAB;
 my $COMMENT = 10*$TAB;
 my $DEFVARS = 6*$TAB;
 my $LEVEL = 0;
+my $DEFVARSLEVEL = 0;
 
 @ARGV or die "Usage: ",path($0)->basename," FILES...\n";
 for my $asm (@ARGV) {
@@ -65,7 +66,7 @@ sub parse_line {
             while (/\S/) {
                 if (s/^\s+//)                       { $ret{args} .= " "; }
                 elsif (s/^\s*(;.*)//)               { $ret{comment} = $1; }
-                elsif (s/^\s*(.)//)                 { $ret{args} .= $1; }
+                elsif (s/(\w+)//)                   { $ret{args} .= $1; }
                 else { die; }
 	    }
         }
@@ -128,12 +129,22 @@ sub format_line {
             $LEVEL++ if $line->{opcode} =~ /^el/i;
             $LEVEL++ if $line->{opcode} =~ /^if/i;
         }
+        elsif (($line->{opcode}//'') =~ /^(\{|\})$/i) {
+            $DEFVARSLEVEL-- if $line->{opcode} =~ /^\}$/i;
+
+            $out = tab_to_newline($out, $OPCODE, $fh);
+            $out .= " " x $TAB x $DEFVARSLEVEL;
+            $out .= $line->{opcode};
+
+            $DEFVARSLEVEL++ if $line->{opcode} =~ /^\{$/i;
+        }
         else {
             if ($line->{label}) {
                 $out .= $line->{label}.":";
             }
             if ($line->{opcode}) {
                 $out = tab_to_newline($out, $OPCODE, $fh);
+                $out .= " " x $TAB x $DEFVARSLEVEL;
                 $out .= $line->{opcode};
                 # If there are no args, don't add a tab
                 if ("$line->{args}" ne "") {
@@ -149,7 +160,8 @@ sub format_line {
                 $out .= $line->{args};
             }
             if ($line->{defvars}) {
-                $out = tab_to($out, $OPCODE+1, $fh);
+                $out = tab_to($out, $OPCODE, $fh);
+                $out .= " " x $TAB x $DEFVARSLEVEL;
                 $out .= $line->{defvars};
                 $out = tab_to($out, $DEFVARS);
                 $out .= "ds.";
