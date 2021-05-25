@@ -491,7 +491,7 @@ defc __IO_ACIA_SR_PE          = 0x40
 defc __IO_ACIA_SR_IRQ         = 0x80
 
 defc __IO_ACIA_RX_SIZE     = 0x100
-defc __IO_ACIA_RX_FULLISH  = 0xf8
+defc __IO_ACIA_RX_FULLISH  = 0xf0
 defc __IO_ACIA_RX_EMPTYISH = 0x08
 defc __IO_ACIA_TX_SIZE     = 0x10
 
@@ -612,7 +612,7 @@ defc __IO_SIO_RR1_RX_FRAMING_ERROR      = 0x40
 defc __IO_SIO_RR1_SDLC_EOF      = 0x80
 
 defc __IO_SIO_RX_SIZE      = 0x100
-defc __IO_SIO_RX_FULLISH      = 0xf8
+defc __IO_SIO_RX_FULLISH      = 0xf0
 defc __IO_SIO_RX_EMPTYISH      = 0x08
 defc __IO_SIO_TX_SIZE      = 0x10
 
