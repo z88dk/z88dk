@@ -329,7 +329,7 @@ extern int __LIB__ msx_type();
 // 1 = MSX 2
 // 2 = MSX 2+
 // 3 = MSX turbo R
-__at(0x2d) unsigned char MSX2_SUBTYPE;
+static __at(0x2d) unsigned char MSX2_SUBTYPE;
 
 // Detect the VRAM size (in KB)
 extern int __LIB__ msx_vram();

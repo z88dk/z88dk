@@ -136,7 +136,7 @@ define(`__IO_SIO_RR1_SDLC_EOF', 0x80)
 # Zilog SIO driver
 
 define(`__IO_SIO_RX_SIZE', 0x100)         # Size of the Rx Buffer
-define(`__IO_SIO_RX_FULLISH', 0x`'eval(__IO_SIO_RX_SIZE-8,16))
+define(`__IO_SIO_RX_FULLISH', 0x`'eval(__IO_SIO_RX_SIZE-16,16))
                                           # Fullness of the Rx Buffer, when NOT_RTS is signalled
 define(`__IO_SIO_RX_EMPTYISH', 0x08)      # Fullness of the Rx Buffer, when RTS is signalled
 define(`__IO_SIO_TX_SIZE', 0x10)          # Size of the Tx Buffer   
