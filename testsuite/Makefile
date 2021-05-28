@@ -51,4 +51,4 @@ rabbit/%.opt: rabbit/%.c
 	@rm $@.tmp2
 
 clean:
-	$(RM) -f $(OUTPUT) tmp*.opt zcc_opt.def 
+	$(RM) -f $(OUTPUT)
