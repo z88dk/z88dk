@@ -151,9 +151,9 @@ if [ $do_libbuild = 1 ]; then           # Build libraries or not...
 	  MAKEARG=""
   fi
   $MAKE -C libsrc $MAKEARG
-  $MAKE -C libsrc install $MAKEARG
-  $MAKE -C libsrc/_DEVELOPMENT $MAKEARG
-  $MAKE -C include/_DEVELOPMENT $MAKEARG
+  $MAKE -C libsrc install
+  $MAKE -C libsrc/_DEVELOPMENT $TARGETS
+  $MAKE -C include/_DEVELOPMENT
 fi
 
 
