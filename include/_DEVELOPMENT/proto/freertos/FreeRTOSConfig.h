@@ -1,6 +1,8 @@
 /*
- * FreeRTOS Kernel V10.4.3
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.4.4
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -61,6 +63,7 @@ include(__link__.m4)
 
 #define configUSE_TRACE_FACILITY            0
 #define configUSE_16_BIT_TICKS              1
+
 #define configUSE_MUTEXES                   1
 #define configUSE_RECURSIVE_MUTEXES         1
 #define configUSE_COUNTING_SEMAPHORES       1
@@ -76,10 +79,6 @@ include(__link__.m4)
 #define configTIMER_TASK_PRIORITY           ( ( UBaseType_t ) 3 )
 #define configTIMER_QUEUE_LENGTH            ( ( UBaseType_t ) 10 )
 #define configTIMER_TASK_STACK_DEPTH        configMINIMAL_STACK_SIZE
-
-/* Co-routine definitions. */
-#define configUSE_CO_ROUTINES               0
-#define configMAX_CO_ROUTINE_PRIORITIES     ( (UBaseType_t ) 2 )
 
 /* Set the stack depth type to be uint16_t. */
 #define configSTACK_DEPTH_TYPE              uint16_t

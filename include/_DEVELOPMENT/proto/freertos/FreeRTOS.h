@@ -1,6 +1,8 @@
 /*
- * FreeRTOS Kernel V10.4.3
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.4.4
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -108,10 +110,6 @@ include(__link__.m4)
     #error Missing definition:  configUSE_16_BIT_TICKS must be defined in FreeRTOSConfig.h as either 1 or 0.  See the Configuration section of the FreeRTOS API documentation for details.
 #endif
 
-#ifndef configUSE_CO_ROUTINES
-    #define configUSE_CO_ROUTINES    0
-#endif
-
 #ifndef INCLUDE_vTaskPrioritySet
     #define INCLUDE_vTaskPrioritySet    0
 #endif
@@ -126,6 +124,26 @@ include(__link__.m4)
 
 #ifndef INCLUDE_vTaskSuspend
     #define INCLUDE_vTaskSuspend    0
+#endif
+
+#ifdef INCLUDE_xTaskDelayUntil
+    #ifdef INCLUDE_vTaskDelayUntil
+        /* INCLUDE_vTaskDelayUntil was replaced by INCLUDE_xTaskDelayUntil.  Backward
+         * compatibility is maintained if only one or the other is defined, but
+         * there is a conflict if both are defined. */
+        #error INCLUDE_vTaskDelayUntil and INCLUDE_xTaskDelayUntil are both defined.  INCLUDE_vTaskDelayUntil is no longer required and should be removed
+    #endif
+#endif
+
+#ifndef INCLUDE_xTaskDelayUntil
+    #ifdef INCLUDE_vTaskDelayUntil
+        /* If INCLUDE_vTaskDelayUntil is set but INCLUDE_xTaskDelayUntil is not then
+         * the project's FreeRTOSConfig.h probably pre-dates the introduction of
+         * xTaskDelayUntil and setting INCLUDE_xTaskDelayUntil to whatever
+         * INCLUDE_vTaskDelayUntil is set to will ensure backward compatibility.
+         */
+        #define INCLUDE_xTaskDelayUntil INCLUDE_vTaskDelayUntil
+    #endif
 #endif
 
 #ifndef INCLUDE_xTaskDelayUntil
@@ -178,12 +196,6 @@ include(__link__.m4)
 
 #ifndef INCLUDE_xTaskGetCurrentTaskHandle
     #define INCLUDE_xTaskGetCurrentTaskHandle    0
-#endif
-
-#if configUSE_CO_ROUTINES != 0
-    #ifndef configMAX_CO_ROUTINE_PRIORITIES
-        #error configMAX_CO_ROUTINE_PRIORITIES must be greater than or equal to 1.
-    #endif
 #endif
 
 #ifndef configUSE_DAEMON_TASK_STARTUP_HOOK
@@ -957,7 +969,7 @@ include(__link__.m4)
 
 #ifndef configMIN
 
-/* The application writer has not provided their own MAX macro, so define
+/* The application writer has not provided their own MIN macro, so define
  * the following generic implementation. */
     #define configMIN( a, b )    ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
 #endif
@@ -975,7 +987,6 @@ include(__link__.m4)
     #define xTaskParameters               TaskParameters_t
     #define xTaskStatusType               TaskStatus_t
     #define xTimerHandle                  TimerHandle_t
-    #define xCoRoutineHandle              CoRoutineHandle_t
     #define pdTASK_HOOK_CODE              TaskHookFunction_t
     #define portTICK_RATE_MS              portTICK_PERIOD_MS
     #define pcTaskGetTaskName             pcTaskGetName
@@ -1032,6 +1043,11 @@ include(__link__.m4)
     #define configRUN_FREERTOS_SECURE_ONLY    0
 #endif
 
+#ifndef configRUN_ADDITIONAL_TESTS
+    #define configRUN_ADDITIONAL_TESTS    0
+#endif
+
+
 /* Sometimes the FreeRTOSConfig.h settings only allow a task to be created using
  * dynamically allocated RAM, in which case when any task is deleted it is known
  * that both the task's stack and TCB need to be freed.  Sometimes the
@@ -1083,7 +1099,7 @@ include(__link__.m4)
  * data hiding policy, so the real structures used by FreeRTOS to maintain the
  * state of tasks, queues, semaphores, etc. are not accessible to the application
  * code.  However, if the application writer wants to statically allocate such
- * an object then the size of the object needs to be know.  Dummy structures
+ * an object then the size of the object needs to be known.  Dummy structures
  * that are guaranteed to have the same size and alignment requirements of the
  * real objects are used for this purpose.  The dummy list and list item
  * structures below are used for inclusion in such a dummy structure.
@@ -1132,7 +1148,7 @@ typedef struct xSTATIC_LIST
  * strict data hiding policy.  This means the Task structure used internally by
  * FreeRTOS is not accessible to application code.  However, if the application
  * writer wants to statically allocate the memory required to create a task then
- * the size of the task object needs to be know.  The StaticTask_t structure
+ * the size of the task object needs to be known.  The StaticTask_t structure
  * below is provided for this purpose.  Its sizes and alignment requirements are
  * guaranteed to match those of the genuine structure, no matter which
  * architecture is being used, and no matter how the values in FreeRTOSConfig.h
@@ -1195,7 +1211,7 @@ typedef struct xSTATIC_TCB
  * strict data hiding policy.  This means the Queue structure used internally by
  * FreeRTOS is not accessible to application code.  However, if the application
  * writer wants to statically allocate the memory required to create a queue
- * then the size of the queue object needs to be know.  The StaticQueue_t
+ * then the size of the queue object needs to be known.  The StaticQueue_t
  * structure below is provided for this purpose.  Its sizes and alignment
  * requirements are guaranteed to match those of the genuine structure, no
  * matter which architecture is being used, and no matter how the values in
@@ -1266,7 +1282,7 @@ typedef struct xSTATIC_EVENT_GROUP
  * strict data hiding policy.  This means the software timer structure used
  * internally by FreeRTOS is not accessible to application code.  However, if
  * the application writer wants to statically allocate the memory required to
- * create a software timer then the size of the queue object needs to be know.
+ * create a software timer then the size of the queue object needs to be known.
  * The StaticTimer_t structure below is provided for this purpose.  Its sizes
  * and alignment requirements are guaranteed to match those of the genuine
  * structure, no matter which architecture is being used, and no matter how the
@@ -1294,12 +1310,12 @@ typedef struct xSTATIC_TIMER
  * internally by FreeRTOS is not accessible to application code.  However, if
  * the application writer wants to statically allocate the memory required to
  * create a stream buffer then the size of the stream buffer object needs to be
- * know.  The StaticStreamBuffer_t structure below is provided for this purpose.
- * Its size and alignment requirements are guaranteed to match those of the
- * genuine structure, no matter which architecture is being used, and no matter
- * how the values in FreeRTOSConfig.h are set.  Its contents are somewhat
- * obfuscated in the hope users will recognise that it would be unwise to make
- * direct use of the structure members.
+ * known.  The StaticStreamBuffer_t structure below is provided for this
+ * purpose.  Its size and alignment requirements are guaranteed to match those
+ * of the genuine structure, no matter which architecture is being used, and
+ * no matter how the values in FreeRTOSConfig.h are set.  Its contents are
+ * somewhat obfuscated in the hope users will recognise that it would be unwise
+ * to make direct use of the structure members.
  */
 typedef struct xSTATIC_STREAM_BUFFER
 {
