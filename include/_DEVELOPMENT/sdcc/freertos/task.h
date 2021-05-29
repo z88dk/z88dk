@@ -364,7 +364,7 @@ typedef enum
 /**
  * task. h
  * <pre>
-* TaskHandle_t xTaskCreateStatic( TaskFunction_t pxTaskCode,
+ * TaskHandle_t xTaskCreateStatic( TaskFunction_t pxTaskCode,
  *                               const char * const pcName,
  *                               const configSTACK_DEPTH_TYPE ulStackDepth,
  *                               void *pvParameters,
