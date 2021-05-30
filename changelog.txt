@@ -29,7 +29,7 @@ Detailed but incomplete changelist:
 - [newlib] +zxn: dot files are now created correctly
 - [sccz80] Temporary files now removed on windows
 - [sccz80] Bug fixes + optimisations
-- [zsdcc] Upgraded to SDCC 4.1.6 r12288 (bugfixes)
+- [zsdcc] Upgraded to SDCC 4.1.6 r12407 (bugfixes)
 
 
 z88dk v2.1 - 07.02.2021
