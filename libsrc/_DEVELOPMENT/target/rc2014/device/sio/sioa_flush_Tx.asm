@@ -13,19 +13,19 @@
         push af
         push hl
 
-        call asm_z80_push_di       ; di
-        
+        call asm_z80_push_di        ; di
+
         call _sioa_flush_Tx
-        
-        call asm_z80_pop_ei        ; ei
-    	
+
+        call asm_z80_pop_ei         ; ei
+
         pop hl
         pop af
-    	
+
         ret
 
     _sioa_flush_Tx:
-    
+
         xor a
         ld (sioaTxCount),a          ; reset the Tx counter (set 0)
 

@@ -15,7 +15,7 @@
         ;            carry reset if Rx buffer is empty
         ;
         ; modifies : af, hl
-        
+
         ld a,(sioaRxCount)          ; get the number of bytes in the Rx buffer
         ld l,a                      ; and put it in hl
         or a                        ; see if there are zero bytes available
@@ -26,19 +26,12 @@
                                     ; this means retrieving characters will be slower
                                     ; when the buffer is emptyish.
                                     ; Better than the reverse case.
-        
-;       ld a,__IO_SIO_WR0_R5        ; prepare for a read from R5
-;       out (__IO_SIOA_CONTROL_REGISTER),a  ; write to SIOA control register
-;       in a,(__IO_SIOA_CONTROL_REGISTER)   ; read from the SIOA R5 register
-;       ld l,a                      ; put it in L
-        
-;       ld a,__IO_SIO_WR0_R5        ; prepare for a write to R5
-;       out (__IO_SIOA_CONTROL_REGISTER),a  ; write to SIOA control register
 
-;       ld a,__IO_SIO_WR5_RTS       ; set the RTS
-;       or l                        ; with previous contents of R5
-;       out (__IO_SIOA_CONTROL_REGISTER),a  ; write the SIOA R5 register
-        
+        ld a,__IO_SIO_WR0_R5        ; prepare for a write to R5
+        out (__IO_SIOA_CONTROL_REGISTER),a  ; write to SIOA control register
+        ld a,__IO_SIO_WR5_TX_DTR|__IO_SIO_WR5_TX_8BIT|__IO_SIO_WR5_TX_ENABLE|__IO_SIO_WR5_RTS   ; set the RTS
+        out (__IO_SIOA_CONTROL_REGISTER),a  ; write the SIOA R5 register
+
     getc_clean_up:
         ld hl,sioaRxCount
         di

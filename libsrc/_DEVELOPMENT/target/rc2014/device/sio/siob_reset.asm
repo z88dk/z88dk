@@ -8,7 +8,7 @@
     _siob_reset:
 
         ; interrupts should be disabled
-        
+
         call _siob_flush_Rx
         call _siob_flush_Tx
 

@@ -35,7 +35,7 @@
         ld a,(sioaTxCount)          ; Get the number of bytes in the Tx buffer
         cp __IO_SIO_TX_SIZE-1       ; check whether there is space in the buffer
         jr NC,putc_buffer_tx_overflow   ; buffer full, so drop the Tx byte and return
-        
+
         ld a,l                      ; Tx byte
         ld hl,sioaTxCount
         inc (hl)                    ; atomic increment of Tx count

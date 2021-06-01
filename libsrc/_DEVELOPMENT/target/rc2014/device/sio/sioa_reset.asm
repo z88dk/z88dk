@@ -8,7 +8,7 @@
     _sioa_reset:
 
         ; interrupts should be disabled
-        
+
         call _sioa_flush_Rx
         call _sioa_flush_Tx
 
