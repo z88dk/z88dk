@@ -1,6 +1,8 @@
 /*
- * FreeRTOS Kernel V10.4.3
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS Kernel V10.4.4
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ *
+ * SPDX-License-Identifier: MIT
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -1268,7 +1270,7 @@ extern void vQueueDelete(QueueHandle_t xQueue);
  *  if( xHigherPriorityTaskWoken )
  *  {
  *      // Actual macro used here is port specific.
- *      portYIELD_FROM_ISR();
+ *      portYIELD_FROM_ISR ();
  *  }
  * }
  * </pre>
@@ -1489,42 +1491,6 @@ extern UBaseType_t uxQueueMessagesWaitingFromISR(const QueueHandle_t xQueue);
 
 
 /*
- * The functions defined above are for passing data to and from tasks.  The
- * functions below are the equivalents for passing data to and from
- * co-routines.
- *
- * These functions are called from the co-routine macro implementation and
- * should not be called directly from application code.  Instead use the macro
- * wrappers defined within croutine.h.
- */
-/*
-BaseType_t xQueueCRSendFromISR( QueueHandle_t xQueue,
-                                const void * pvItemToQueue,
-                                BaseType_t xCoRoutinePreviouslyWoken );
-BaseType_t xQueueCRReceiveFromISR( QueueHandle_t xQueue,
-                                   void * pvBuffer,
-                                   BaseType_t * pxTaskWoken );
-BaseType_t xQueueCRSend( QueueHandle_t xQueue,
-                         const void * pvItemToQueue,
-                         TickType_t xTicksToWait );
-BaseType_t xQueueCRReceive( QueueHandle_t xQueue,
-                            void * pvBuffer,
-                            TickType_t xTicksToWait );
- */
-extern BaseType_t xQueueCRSendFromISR(QueueHandle_t xQueue,const void * pvItemToQueue,BaseType_t xCoRoutinePreviouslyWoken);
-
-
-extern BaseType_t xQueueCRReceiveFromISR(QueueHandle_t xQueue,void * pvBuffer,BaseType_t * pxTaskWoken);
-
-
-extern BaseType_t xQueueCRSend(QueueHandle_t xQueue,const void * pvItemToQueue,TickType_t xTicksToWait);
-
-
-extern BaseType_t xQueueCRReceive(QueueHandle_t xQueue,void * pvBuffer,TickType_t xTicksToWait);
-
-
-
-/*
  * For internal use only.  Use xSemaphoreCreateMutex(),
  * xSemaphoreCreateCounting() or xSemaphoreGetMutexHolder() instead of calling
  * these functions directly.
@@ -1599,6 +1565,10 @@ extern BaseType_t xQueueGiveMutexRecursive(QueueHandle_t xMutex);
  * within FreeRTOSConfig.h for the registry to be available.  Its value
  * does not effect the number of queues, semaphores and mutexes that can be
  * created - just the number that the registry can hold.
+ *
+ * If vQueueAddToRegistry is called more than once with the same xQueue
+ * parameter, the registry will store the pcQueueName parameter from the
+ * most recent call to vQueueAddToRegistry.
  *
  * @param xQueue The handle of the queue being added to the registry.  This
  * is the handle returned by a call to xQueueCreate().  Semaphore and mutex

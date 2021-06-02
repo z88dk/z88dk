@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Phillip Stevens  All Rights Reserved.
+ * Copyright (C) 2021 Phillip Stevens  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -33,8 +33,6 @@
  * This includes
  * YAZ180 with Z8S180
  * SCZ180 with Z8S180
- * RC2014 with Z80
- * Spectrum Next with Z80N
  *
  * This file is NOT part of the FreeRTOS distribution.
  *
