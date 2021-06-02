@@ -1491,42 +1491,6 @@ extern UBaseType_t uxQueueMessagesWaitingFromISR(const QueueHandle_t xQueue);
 
 
 /*
- * The functions defined above are for passing data to and from tasks.  The
- * functions below are the equivalents for passing data to and from
- * co-routines.
- *
- * These functions are called from the co-routine macro implementation and
- * should not be called directly from application code.  Instead use the macro
- * wrappers defined within croutine.h.
- */
-/*
-BaseType_t xQueueCRSendFromISR( QueueHandle_t xQueue,
-                                const void * pvItemToQueue,
-                                BaseType_t xCoRoutinePreviouslyWoken );
-BaseType_t xQueueCRReceiveFromISR( QueueHandle_t xQueue,
-                                   void * pvBuffer,
-                                   BaseType_t * pxTaskWoken );
-BaseType_t xQueueCRSend( QueueHandle_t xQueue,
-                         const void * pvItemToQueue,
-                         TickType_t xTicksToWait );
-BaseType_t xQueueCRReceive( QueueHandle_t xQueue,
-                            void * pvBuffer,
-                            TickType_t xTicksToWait );
- */
-extern BaseType_t xQueueCRSendFromISR(QueueHandle_t xQueue,const void * pvItemToQueue,BaseType_t xCoRoutinePreviouslyWoken);
-
-
-extern BaseType_t xQueueCRReceiveFromISR(QueueHandle_t xQueue,void * pvBuffer,BaseType_t * pxTaskWoken);
-
-
-extern BaseType_t xQueueCRSend(QueueHandle_t xQueue,const void * pvItemToQueue,TickType_t xTicksToWait);
-
-
-extern BaseType_t xQueueCRReceive(QueueHandle_t xQueue,void * pvBuffer,TickType_t xTicksToWait);
-
-
-
-/*
  * For internal use only.  Use xSemaphoreCreateMutex(),
  * xSemaphoreCreateCounting() or xSemaphoreGetMutexHolder() instead of calling
  * these functions directly.
