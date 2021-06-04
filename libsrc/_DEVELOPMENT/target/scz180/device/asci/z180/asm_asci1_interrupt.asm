@@ -42,12 +42,6 @@ ENDIF
 
         ld hl, asci1RxCount
         inc (hl)                    ; atomically increment Rx buffer count
-        jr ASCI1_RX_CHECK           ; check for additional bytes
-
-ASCI1_RX_ERROR:
-        in0 a,(CNTLA1)              ; get the CNTRLA1 register
-        and ~  CNTLA1_EFR           ; to clear the error flag, EFR, to 0 
-        out0 (CNTLA1),a             ; and write it back
 
 ASCI1_RX_CHECK:                     ; Z8S180 has 4 byte Rx H/W FIFO
         in0 a,(STAT1)               ; load the ASCI1 status register
@@ -89,6 +83,12 @@ ASCI1_TX_END:
         pop af
         ei
         ret
+
+ASCI1_RX_ERROR:
+        in0 a,(CNTLA1)              ; get the CNTRLA1 register
+        and ~  CNTLA1_EFR           ; to clear the error flag, EFR, to 0 
+        out0 (CNTLA1),a             ; and write it back
+        jr ASCI1_RX_CHECK
 
     EXTERN asm_asci1_need
     defc NEED = asm_asci1_need

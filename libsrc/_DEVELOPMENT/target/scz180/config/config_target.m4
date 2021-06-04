@@ -19,8 +19,11 @@ define(`__CLOCKS_PER_SECOND', 50)
 
 # Z180 ASCI0 driver
 
-define(`__ASCI0_RX_SIZE', 0x100)  # Size of the Rx Buffer, must be 2^n >= 8
-define(`__ASCI0_TX_SIZE', 0x080)  # Size of the Tx Buffer, must be 2^n >= 8
+define(`__ASCI0_RX_SIZE', 0x100)                    # Size of the Rx Buffer, must be 2^n >= 8
+define(`__ASCI0_RX_FULLISH', 0x`'eval(__ASCI0_RX_SIZE-16,16))
+                                                    # Fullness of the Rx Buffer, when NOT_RTS is signalled
+define(`__ASCI0_RX_EMPTYISH', 0x08)                 # Fullness of the Rx Buffer, when RTS is signalled
+define(`__ASCI0_TX_SIZE', 0x080)                    # Size of the Tx Buffer, must be 2^n >= 8
 
 # Z180 ASCI1 driver
 
@@ -66,6 +69,8 @@ PUBLIC `__CPU_CLOCK'
 PUBLIC `__CLOCKS_PER_SECOND'
 
 PUBLIC `__ASCI0_RX_SIZE'
+PUBLIC `__ASCI0_RX_FULLISH'
+PUBLIC `__ASCI0_RX_EMPTYISH'
 PUBLIC `__ASCI0_TX_SIZE'
 
 PUBLIC `__ASCI1_RX_SIZE'
@@ -95,6 +100,8 @@ defc `__CPU_CLOCK' = __CPU_CLOCK
 defc `__CLOCKS_PER_SECOND' = __CLOCKS_PER_SECOND
 
 defc `__ASCI0_RX_SIZE' = __ASCI0_RX_SIZE
+defc `__ASCI0_RX_FULLISH' = __ASCI0_RX_FULLISH
+defc `__ASCI0_RX_EMPTYISH' = __ASCI0_RX_EMPTYISH
 defc `__ASCI0_TX_SIZE' = __ASCI0_TX_SIZE
 
 defc `__ASCI1_RX_SIZE' = __ASCI1_RX_SIZE
@@ -125,6 +132,8 @@ ifdef(`CFG_C_DEF',
 `#define' `__CLOCKS_PER_SECOND' __CLOCKS_PER_SECOND
 
 `#define' `__ASCI0_RX_SIZE'  __ASCI0_RX_SIZE
+`#define' `__ASCI0_RX_FULLISH'  __ASCI0_RX_FULLISH
+`#define' `__ASCI0_RX_EMPTYISH'  __ASCI0_RX_EMPTYISH
 `#define' `__ASCI0_TX_SIZE'  __ASCI0_TX_SIZE
 
 `#define' `__ASCI1_RX_SIZE'  __ASCI1_RX_SIZE

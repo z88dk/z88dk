@@ -44,6 +44,8 @@
 #define __CLOCKS_PER_SECOND 50
 
 #define __ASCI0_RX_SIZE  0x100
+#define __ASCI0_RX_FULLISH  0xf0
+#define __ASCI0_RX_EMPTYISH  0x08
 #define __ASCI0_TX_SIZE  0x080
 
 #define __ASCI1_RX_SIZE  0x100
