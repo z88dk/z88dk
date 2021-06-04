@@ -29,7 +29,7 @@ define config
 
 # +zx/+zxn use +z80 as part of the config stage so add the dependency
 target/zx/obj/config_private.inc: lib/sccz80/z80.lib
-target/zxn/obj/config_private.inc: lib/sccz80/z80.lib
+target/zxn/obj/config_private.inc: lib/sccz80/zx.lib
 
 # Convenience target (eg make zx to build the zx libraries)
 .PHONY: $(1)

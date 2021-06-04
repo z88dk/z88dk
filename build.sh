@@ -35,6 +35,23 @@ show_help_and_exit()
 set -e      # -e: exit on error; -u: exit on undefined variable
             # -e can be overidden by -k option
 
+case `uname -s` in                      # Insert default values for MAKE and INSTALL following used OS
+  SunOS)
+    MAKE="gmake"
+    INSTALL="ginstall"
+    export INSTALL
+    ;;
+  OpenBSD|NetBSD|FreeBSD)
+    MAKE="gmake"
+    INSTALL="install"
+    export INSTALL
+    ;;
+  *)
+    MAKE="make"
+    INSTALL="install"
+    export INSTALL
+    ;;
+esac
 
 do_build=1                              # Set initial (default)  values (build binaries and libraries)
 do_clean=0
@@ -60,7 +77,7 @@ while getopts "bcCehkltp:i:" arg; do       # Handle all given arguments
     e)     do_examples=1           ;;   # Build examples as well
     k)     set +e                  ;;   # keep building ignoring errors
     l)     do_libbuild=0           ;;   # Don't build libraries
-    p)     export TARGETS=$OPTARG  ;;
+    p)     TARGETS=$OPTARG  ;;
     i)     DESTDIR=$OPTARG  ;;
     t)     do_tests=1              ;;   # Run tests as well
     h | *) show_help_and_exit 0    ;;   # Show help on demand
@@ -76,19 +93,14 @@ if [ $do_clean     != 1 ]          \
 && [ $do_examples  != 1 ]; then
   show_help_and_exit 1
 fi
-                                        # Only execute the most complete clean of the two options
-if [ $do_clean     = 1 ]           \
-&& [ $do_clean_bin = 1 ]; then
-  do_clean=0
-fi
 
-if [ $do_clean = 1 ]; then              # Dont remove bin, as zsdcc and szdcpp must be built by hand in win32
-  make clean
+if [ $do_clean = 1 -o $do_clean_bin = 1 ]; then              # Dont remove bin, as zsdcc and szdcpp must be built by hand in win32
+  $MAKE clean
+  $MAKE -C libsrc clean
 fi
 
 
 if [ $do_clean_bin = 1 ]; then          # Remove bin => zsdcc and zdcpp must be built again by hand in win32
-  make clean
   echo "rm -rf bin"
   rm -rf bin
 fi
@@ -114,25 +126,6 @@ if [ -z "$CFLAGS" ]; then               # Insert default value for CFLAGS if CFL
 fi
 
 
-case `uname -s` in                      # Insert default values for MAKE and INSTALL following used OS
-  SunOS)
-    MAKE="gmake"
-    INSTALL="ginstall"
-    export INSTALL
-    ;;
-  OpenBSD|NetBSD|FreeBSD)
-    MAKE="gmake"
-    INSTALL="install"
-    export INSTALL
-    ;;
-  *)
-    MAKE="make"
-    INSTALL="install"
-    export INSTALL
-    ;;
-esac
-
-
 path=`pwd`/bin                          # Add bin directory to path if it's not already there
 mkdir -p $path                          # Guarantee that the directory exists
 if [ $PATH != *$path* ]; then
@@ -152,10 +145,14 @@ fi
 
 
 if [ $do_libbuild = 1 ]; then           # Build libraries or not...
-  $MAKE -C libsrc clean
-  $MAKE -C libsrc
+  if [ $TARGETS ]; then
+	  MAKEARG="TARGETS=$TARGETS"
+  else
+	  MAKEARG=""
+  fi
+  $MAKE -C libsrc $MAKEARG
   $MAKE -C libsrc install
-  $MAKE -C libsrc/_DEVELOPMENT
+  $MAKE -C libsrc/_DEVELOPMENT $TARGETS
   $MAKE -C include/_DEVELOPMENT
 fi
 
