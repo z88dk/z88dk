@@ -41,7 +41,7 @@
 
 #define __CPU_CLOCK  36864000
 
-#define __CLOCKS_PER_SECOND 256
+#define __CLOCKS_PER_SECOND  256
 
 #define __BIOS_SP   0xFFDE
 #define __BANK_SP   0x003B
@@ -51,6 +51,8 @@
 #define __COMMON_AREA_1_PHASE_DRIVER  0xf5a0
 
 #define __ASCI0_RX_SIZE  0x100
+#define __ASCI0_RX_FULLISH  0xf0
+#define __ASCI0_RX_EMPTYISH  0x08
 #define __ASCI0_TX_SIZE  0x080
 
 #define __ASCI1_RX_SIZE  0x100

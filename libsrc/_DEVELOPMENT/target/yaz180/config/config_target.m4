@@ -33,13 +33,16 @@ define(`__COMMON_AREA_1_PHASE_DRIVER', 0x`'eval(__COMMON_AREA_1_BASE+__COMMON_AR
 
 # Z180 ASCI0 driver
 
-define(`__ASCI0_RX_SIZE', 0x100)  # Size of the Rx Buffer, must be 2^n >= 8
-define(`__ASCI0_TX_SIZE', 0x080)  # Size of the Tx Buffer, must be 2^n >= 8
+define(`__ASCI0_RX_SIZE', 0x100)                    # Size of the Rx Buffer, must be 2^n >= 8
+define(`__ASCI0_RX_FULLISH', 0x`'eval(__ASCI0_RX_SIZE-16,16))
+                                                    # Fullness of the Rx Buffer, when NOT_RTS is signalled
+define(`__ASCI0_RX_EMPTYISH', 0x08)                 # Fullness of the Rx Buffer, when RTS is signalled
+define(`__ASCI0_TX_SIZE', 0x080)                    # Size of the Tx Buffer, must be 2^n >= 8
 
 # Z180 ASCI1 driver
 
-define(`__ASCI1_RX_SIZE', 0x100)  # Size of the Rx Buffer, must be 2^n >= 8
-define(`__ASCI1_TX_SIZE', 0x080)  # Size of the Tx Buffer, must be 2^n >= 8
+define(`__ASCI1_RX_SIZE', 0x100)                    # Size of the Rx Buffer, must be 2^n >= 8
+define(`__ASCI1_TX_SIZE', 0x080)                    # Size of the Tx Buffer, must be 2^n >= 8
 
 # I/O BASE ADDRESS OF INTERNAL PERIPHERALS
 
@@ -49,23 +52,23 @@ define(`__IO_BASE_ADDRESS', 0x`'eval(__IO_BASE_ADDRESS&0xc0,16))
 
 # I/O BREAK for Single Step Mode
 
-define(`__IO_BREAK', 0x2000)      # Any value written $2000->$3FFF, halts CPU
+define(`__IO_BREAK', 0x2000)                        # Any value written $2000->$3FFF, halts CPU
 
 # 82C55 PIO Definitions
 
-define(`__IO_PIO_PORT_BASE', 0x4000)        # Base Address for 82C55
+define(`__IO_PIO_PORT_BASE', 0x4000)                # Base Address for 82C55
 
 # PCA9665 I2C Definitions
 
-define(`__IO_PCA9665_1_PORT_BASE', 0xA000)  # Base Address for PCA9665 1 I/O
-define(`__IO_PCA9665_2_PORT_BASE', 0x8000)  # Base Address for PCA9665 2 I/O
+define(`__IO_PCA9665_1_PORT_BASE', 0xA000)          # Base Address for PCA9665 1 I/O
+define(`__IO_PCA9665_2_PORT_BASE', 0x8000)          # Base Address for PCA9665 2 I/O
 
 # Am9511A-1 APU Definitions
 
-define(`__APU_CMD_SIZE', 0x100)   # Size of the CMD Buffer, 255 Commands
-define(`__APU_PTR_SIZE', 0x100)   # Size of the Data PTR Buffer, 85 Operands
+define(`__APU_CMD_SIZE', 0x100)                     # Size of the CMD Buffer, 255 Commands
+define(`__APU_PTR_SIZE', 0x100)                     # Size of the Data PTR Buffer, 85 Operands
 
-define(`__IO_APU_PORT_BASE', 0xC000)        # Base Address for Am9511A
+define(`__IO_APU_PORT_BASE', 0xC000)                # Base Address for Am9511A
 
 #
 # END OF USER CONFIGURATION
@@ -93,6 +96,8 @@ PUBLIC `__COMMON_AREA_1_PHASE_DATA'
 PUBLIC `__COMMON_AREA_1_PHASE_DRIVER'
 
 PUBLIC `__ASCI0_RX_SIZE'
+PUBLIC `__ASCI0_RX_FULLISH'
+PUBLIC `__ASCI0_RX_EMPTYISH'
 PUBLIC `__ASCI0_TX_SIZE'
 
 PUBLIC `__ASCI1_RX_SIZE'
@@ -133,6 +138,8 @@ defc `__COMMON_AREA_1_PHASE_DATA' = __COMMON_AREA_1_PHASE_DATA
 defc `__COMMON_AREA_1_PHASE_DRIVER' = __COMMON_AREA_1_PHASE_DRIVER
 
 defc `__ASCI0_RX_SIZE' = __ASCI0_RX_SIZE
+defc `__ASCI0_RX_FULLISH' = __ASCI0_RX_FULLISH
+defc `__ASCI0_RX_EMPTYISH' = __ASCI0_RX_EMPTYISH
 defc `__ASCI0_TX_SIZE' = __ASCI0_TX_SIZE
 
 defc `__ASCI1_RX_SIZE' = __ASCI1_RX_SIZE
@@ -164,7 +171,7 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__CPU_CLOCK'  __CPU_CLOCK
 
-`#define' `__CLOCKS_PER_SECOND' __CLOCKS_PER_SECOND
+`#define' `__CLOCKS_PER_SECOND'  __CLOCKS_PER_SECOND
 
 `#define' `__BIOS_SP'   __BIOS_SP
 `#define' `__BANK_SP'   __BANK_SP
@@ -174,6 +181,8 @@ ifdef(`CFG_C_DEF',
 `#define' `__COMMON_AREA_1_PHASE_DRIVER'  __COMMON_AREA_1_PHASE_DRIVER
 
 `#define' `__ASCI0_RX_SIZE'  __ASCI0_RX_SIZE
+`#define' `__ASCI0_RX_FULLISH'  __ASCI0_RX_FULLISH
+`#define' `__ASCI0_RX_EMPTYISH'  __ASCI0_RX_EMPTYISH
 `#define' `__ASCI0_TX_SIZE'  __ASCI0_TX_SIZE
 
 `#define' `__ASCI1_RX_SIZE'  __ASCI1_RX_SIZE

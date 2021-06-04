@@ -145,110 +145,110 @@ PUBLIC asm_am9511a_cmd
 DEFC asm_am9511a_cmd                 = $FAB2
 
 PUBLIC asm_asci0_init
-DEFC asm_asci0_init                  = $FB26
+DEFC asm_asci0_init                  = $FB35
 
 PUBLIC asm_asci0_flush_Rx_di
-DEFC asm_asci0_flush_Rx_di           = $FB40
+DEFC asm_asci0_flush_Rx_di           = $FB4F
 
 PUBLIC _asci0_flush_Rx
-DEFC _asci0_flush_Rx                 = $FB40
+DEFC _asci0_flush_Rx                 = $FB4F
 
 PUBLIC asm_asci0_flush_Rx
-DEFC asm_asci0_flush_Rx              = $FB4A
+DEFC asm_asci0_flush_Rx              = $FB59
 
 PUBLIC asm_asci0_flush_Tx_di
-DEFC asm_asci0_flush_Tx_di           = $FB58
+DEFC asm_asci0_flush_Tx_di           = $FB67
 
 PUBLIC asm_asci0_flush_Tx
-DEFC asm_asci0_flush_Tx              = $FB62
+DEFC asm_asci0_flush_Tx              = $FB71
 
 PUBLIC asm_asci0_reset
-DEFC asm_asci0_reset                 = $FB70
+DEFC asm_asci0_reset                 = $FB7F
 
 PUBLIC asm_asci0_getc
-DEFC asm_asci0_getc                  = $FB7A
+DEFC asm_asci0_getc                  = $FB89
 
 PUBLIC _asci0_getc
-DEFC _asci0_getc                     = $FB7A
+DEFC _asci0_getc                     = $FB89
 
 PUBLIC asm_asci0_peekc
-DEFC asm_asci0_peekc                 = $FB90
+DEFC asm_asci0_peekc                 = $FBAB
 
 PUBLIC asm_asci0_pollc
-DEFC asm_asci0_pollc                 = $FB9C
+DEFC asm_asci0_pollc                 = $FBB7
 
 PUBLIC _asci0_pollc
-DEFC _asci0_pollc                    = $FB9C
+DEFC _asci0_pollc                    = $FBB7
 
 PUBLIC asm_asci0_putc
-DEFC asm_asci0_putc                  = $FBA4
+DEFC asm_asci0_putc                  = $FBBF
 
 PUBLIC asm_asci1_init
-DEFC asm_asci1_init                  = $FC43
+DEFC asm_asci1_init                  = $FC5E
 
 PUBLIC asm_asci1_flush_Rx_di
-DEFC asm_asci1_flush_Rx_di           = $FC5D
+DEFC asm_asci1_flush_Rx_di           = $FC78
 
 PUBLIC _asci1_flush_Rx
-DEFC _asci1_flush_Rx                 = $FC5D
+DEFC _asci1_flush_Rx                 = $FC78
 
 PUBLIC asm_asci1_flush_Rx
-DEFC asm_asci1_flush_Rx              = $FC67
+DEFC asm_asci1_flush_Rx              = $FC82
 
 PUBLIC asm_asci1_flush_Tx_di
-DEFC asm_asci1_flush_Tx_di           = $FC75
+DEFC asm_asci1_flush_Tx_di           = $FC90
 
 PUBLIC asm_asci1_flush_Tx
-DEFC asm_asci1_flush_Tx              = $FC7F
+DEFC asm_asci1_flush_Tx              = $FC9A
 
 PUBLIC asm_asci1_reset
-DEFC asm_asci1_reset                 = $FC8D
+DEFC asm_asci1_reset                 = $FCA8
 
 PUBLIC asm_asci1_getc
-DEFC asm_asci1_getc                  = $FC97
+DEFC asm_asci1_getc                  = $FCB2
 
 PUBLIC _asci1_getc
-DEFC _asci1_getc                     = $FC97
+DEFC _asci1_getc                     = $FCB2
 
 PUBLIC asm_asci1_peekc
-DEFC asm_asci1_peekc                 = $FCAD
+DEFC asm_asci1_peekc                 = $FCC8
 
 PUBLIC asm_asci1_pollc
-DEFC asm_asci1_pollc                 = $FCB9
+DEFC asm_asci1_pollc                 = $FCD4
 
 PUBLIC _asci1_pollc
-DEFC _asci1_pollc                    = $FCB9
+DEFC _asci1_pollc                    = $FCD4
 
 PUBLIC asm_asci1_putc
-DEFC asm_asci1_putc                  = $FCC1
+DEFC asm_asci1_putc                  = $FCDC
 
 PUBLIC ide_read_sector
-DEFC ide_read_sector                 = $FDFB
+DEFC ide_read_sector                 = $FE16
 
 PUBLIC ide_write_sector
-DEFC ide_write_sector                = $FE2B
+DEFC ide_write_sector                = $FE46
 
 PUBLIC asm_phexwd
-DEFC asm_phexwd                      = $FE62
+DEFC asm_phexwd                      = $FE7D
 
 PUBLIC asm_phex
-DEFC asm_phex                        = $FE6C
+DEFC asm_phex                        = $FE87
 
 PUBLIC asm_pchar
-DEFC asm_pchar                       = $FE7F
+DEFC asm_pchar                       = $FE9A
 
 PUBLIC asm_pstring
-DEFC asm_pstring                     = $FE58
+DEFC asm_pstring                     = $FE73
 
 PUBLIC asm_rhex
-DEFC asm_rhex                        = $FE89
+DEFC asm_rhex                        = $FEA4
 
 PUBLIC asm_rchar
-DEFC asm_rchar                       = $FEA3
+DEFC asm_rchar                       = $FEBE
 
 PUBLIC asm_delay
-DEFC asm_delay                       = $FEAD
+DEFC asm_delay                       = $FEC8
 
 PUBLIC _common1_phase_end
-DEFC _common1_phase_end              = $FEBC
+DEFC _common1_phase_end              = $FED7
 

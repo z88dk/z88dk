@@ -19,6 +19,14 @@
         or a                        ; see if there are zero bytes available
         ret Z                       ; if the count is zero, then return
 
+        cp __ASCI0_RX_EMPTYISH      ; compare the count with the preferred empty size
+        jr NC,asm_asci0_getc_cont   ; if the buffer not emptyish, don't change the RTS
+
+        in0 a,(CNTLA0)              ; get current value of control byte A
+        and ~CNTLA0_RTS0            ; clear /RTS
+        out0 (CNTLA0),a             ; write it back
+
+    asm_asci0_getc_cont:
         ld hl,asci0RxCount
         di
         dec (hl)                    ; atomically decrement Rx count
