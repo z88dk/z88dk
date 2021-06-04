@@ -10,8 +10,10 @@
 
 	SECTION	code_clib
 	PUBLIC	fgetc_cons
+	PUBLIC	_fgetc_cons
 
 .fgetc_cons
+._fgetc_cons
 
 .kwait
 	call	$336
