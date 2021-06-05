@@ -289,10 +289,10 @@ static char  *c_z80asm_exe = "z88dk-z80asm";
 
 static char  *c_clang_exe = "zclang";
 static char  *c_llvm_exe = "zllvm-cbe";
-static char  *c_sdcc_exe = "zsdcc";
-static char  *c_sccz80_exe = "sccz80";
+static char  *c_sdcc_exe = "z88dk-zsdcc";
+static char  *c_sccz80_exe = "z88dk-sccz80";
 static char  *c_cpp_exe = "z88dk-ucpp";
-static char  *c_sdcc_preproc_exe = "zsdcpp";
+static char  *c_sdcc_preproc_exe = "z88dk-zsdcpp";
 static char  *c_zpragma_exe = "z88dk-zpragma";
 static char  *c_copt_exe = "z88dk-copt";
 static char  *c_appmake_exe = "z88dk-appmake";

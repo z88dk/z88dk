@@ -80,7 +80,8 @@ static struct zx_tape zxt = {
     0,          // noloader
     0,          // noheader
     0,          // parity
-    0           // khz22
+    0,          // khz22
+    NULL	// bank order
 };
 
 static struct zx_sna zxs = {
@@ -155,6 +156,7 @@ option_t zx_options[] = {
     { 0 , "merge",     "Merge a custom loader from external TAP file", OPT_STR, &zxt.merge },
     { 0 , "blockname", "Name of the code block in tap file", OPT_STR, &zxt.blockname },
     { 0,  "clearaddr", "Address to CLEAR at",       OPT_INT,   &zxt.clear_address },
+    { 0,  "bank-order","Order banks this way in the tap file (default '01234567')", OPT_STR, &zxt.bank_order },
     { 0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
