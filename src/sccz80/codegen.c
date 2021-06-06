@@ -4112,7 +4112,8 @@ void zlt_const(LVALUE *lval, int64_t value64)
             ol("rla");  
         } else {
             ol("ld\ta,l");
-            outfmt("\tsub\t%d\n", (value % 256));
+            ol("xor\t128");
+            outfmt("\tsub\t%d\n", 128 | (value % 256));
         }
         set_carry(lval);
     } else if ( lval->val_type == KIND_INT || lval->val_type == KIND_PTR ) {
