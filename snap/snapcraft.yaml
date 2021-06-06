@@ -104,11 +104,5 @@ apps:
   z88dk-asmstyle.pl:
     command: bin/z88dk-asmstyle.pl
     plugs: [home, removable-media]
-  z88dk-zsdcc:
-    command: bin/z88dk-zsdcc
-    plugs: [home, removable-media]
-  z88dk-zsdcpp:
-    command: bin/z88dk-zsdcpp
-    plugs: [home, removable-media]
 
 
