@@ -88,6 +88,18 @@
     #define portARCH_NAME    NULL
 #endif
 
+#ifndef PRIVILEGED_FUNCTION
+    #define PRIVILEGED_FUNCTION
+#endif
+
+#ifndef PRIVILEGED_DATA
+    #define PRIVILEGED_DATA
+#endif
+
+#ifndef FREERTOS_SYSTEM_CALL
+    #define FREERTOS_SYSTEM_CALL
+#endif
+
 #ifndef configSTACK_ALLOCATION_FROM_SEPARATE_HEAP
     /* Defaults to 0 for backward compatibility. */
     #define configSTACK_ALLOCATION_FROM_SEPARATE_HEAP 0
