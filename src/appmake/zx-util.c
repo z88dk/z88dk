@@ -213,7 +213,6 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
     int		blockcount, bsnum_bank;
     unsigned char * loader;
     int		loader_len;
-    char    *bankOrder= (zxt->bank_order == NULL) ? "01234567" : zxt->bank_order;
 
     loader = turbo_loader;
     loader_len = sizeof(turbo_loader);
@@ -621,11 +620,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
              // Write the banks
             bsnum_bank = mb_find_bankspace(memory, "BANK");
             for ( i = 0; i < 8; i++ ) {
-	        int b = bankOrder[i] - '0';
-		if(b<0 || b>7) {
-                    exit_log(1,"Invalid bank number specified by --bank-order: '%c'\n", bankOrder[i]);
-		}
-                struct memory_bank *mb = &memory->bankspace[bsnum_bank].membank[b];
+                struct memory_bank *mb = &memory->bankspace[bsnum_bank].membank[i];
                 if (mb->num > 0) {     
                     int      j;              
                     unsigned char bank_buf[16384];

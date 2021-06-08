@@ -35,7 +35,6 @@ struct zx_tape
     char           noheader;
     unsigned char  parity;
     char           khz22;
-    char          *bank_order;
 };
 
 struct zx_sna
