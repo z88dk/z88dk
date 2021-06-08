@@ -15,17 +15,17 @@
                                     ; start doing the Rx stuff
         in0 a,(STAT1)               ; load the ASCI1 status register
         tst STAT1_RDRF              ; test whether we have received on ASCI1
-        jr Z,ASCI1_TX_CHECK         ; if not, go check for bytes to transmit
+        jr Z,asci1_tx_check         ; if not, go check for bytes to transmit
 
-ASCI1_RX_GET:
+    asci1_rx_get:
         in0 l,(RDR1)                ; move Rx byte from the ASCI1 RDR to l
 
         and STAT1_OVRN|STAT1_PE|STAT1_FE ; test whether we have error on ASCI1
-        jr NZ,ASCI1_RX_ERROR        ; drop this byte, clear error, and get the next byte
+        jr NZ,asci1_rx_error        ; drop this byte, clear error, and get the next byte
 
         ld a,(asci1RxCount)         ; get the number of bytes in the Rx buffer      
         cp __ASCI1_RX_SIZE-1        ; check whether there is space in the buffer
-        jr NC,ASCI1_RX_CHECK        ; buffer full, check whether we need to drain H/W FIFO
+        jr NC,asci1_rx_check        ; buffer full, check whether we need to drain H/W FIFO
 
         ld a,l                      ; get Rx byte from l
         ld hl,(asci1RxIn)           ; get the pointer to where we poke
@@ -43,18 +43,18 @@ ENDIF
         ld hl, asci1RxCount
         inc (hl)                    ; atomically increment Rx buffer count
 
-ASCI1_RX_CHECK:                     ; Z8S180 has 4 byte Rx H/W FIFO
+    asci1_rx_check:                 ; Z8S180 has 4 byte Rx H/W FIFO
         in0 a,(STAT1)               ; load the ASCI1 status register
         tst STAT1_RDRF              ; test whether we have received on ASCI1
-        jr NZ,ASCI1_RX_GET          ; if still more bytes in H/W FIFO, get them
+        jr NZ,asci1_rx_get          ; if still more bytes in H/W FIFO, get them
 
-ASCI1_TX_CHECK:                     ; now start doing the Tx stuff
+    asci1_tx_check:                 ; now start doing the Tx stuff
         and STAT1_TDRE              ; test whether we can transmit on ASCI1
-        jr Z,ASCI1_TX_END           ; if not, then end
+        jr Z,asci1_tx_end           ; if not, then end
 
         ld a,(asci1TxCount)         ; get the number of bytes in the Tx buffer
         or a                        ; check whether it is zero
-        jr Z,ASCI1_TX_TIE1_CLEAR    ; if the count is zero, then disable the Tx Interrupt
+        jr Z,asci1_tx_tie1_clear    ; if the count is zero, then disable the Tx Interrupt
 
         ld hl,(asci1TxOut)          ; get the pointer to place where we pop the Tx byte
         ld a,(hl)                   ; get the Tx byte
@@ -71,24 +71,24 @@ ENDIF
 
         ld hl,asci1TxCount
         dec (hl)                    ; atomically decrement current Tx count
-        jr NZ,ASCI1_TX_END          ; if we've more Tx bytes to send, we're done for now
+        jr NZ,asci1_tx_end          ; if we've more Tx bytes to send, we're done for now
 
-ASCI1_TX_TIE1_CLEAR:
+    asci1_tx_tie1_clear:
         in0 a,(STAT1)               ; get the ASCI1 status register
         and ~STAT1_TIE              ; mask out (disable) the Tx Interrupt
         out0 (STAT1),a              ; set the ASCI1 status register
 
-ASCI1_TX_END:
+    asci1_tx_end:
         pop hl
         pop af
         ei
         ret
 
-ASCI1_RX_ERROR:
+    asci1_rx_error:
         in0 a,(CNTLA1)              ; get the CNTRLA1 register
         and ~  CNTLA1_EFR           ; to clear the error flag, EFR, to 0 
         out0 (CNTLA1),a             ; and write it back
-        jr ASCI1_RX_CHECK
+        jr asci1_rx_check
 
     EXTERN asm_asci1_need
     defc NEED = asm_asci1_need
