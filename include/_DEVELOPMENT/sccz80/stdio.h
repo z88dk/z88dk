@@ -9,12 +9,16 @@
 
 // DATA STRUCTURES
 
-#ifndef _SIZE_T_DEFINED
-#define _SIZE_T_DEFINED
+#ifndef _SIZE_T
+#define _SIZE_T
 typedef unsigned int    size_t;
 #endif
 
+#ifndef _FPOS_T
+#define _FPOS_T
 typedef unsigned long   fpos_t;
+#endif
+
 typedef struct { unsigned char file[13];} FILE;
 
 #ifndef NULL

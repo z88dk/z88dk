@@ -53,8 +53,8 @@ typedef unsigned long long     uint_fast64_t;
 
 #endif
 
-#ifndef _INTPTR_T_DEFINED
-#define _INTPTR_T_DEFINED
+#ifndef _INTPTR_T
+#define _INTPTR_T
 typedef int                    intptr_t;
 #endif
 
