@@ -20,6 +20,14 @@
     PUBLIC  cleanup         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
+;--------
+; Set an origin for the application (-zorg=) default to $8100
+;--------
+
+IF      !DEFINED_CRT_ORG_CODE
+	defc    CRT_ORG_CODE  = $8100
+ENDIF
+
     defc    CONSOLE_ROWS = 32
     defc    CONSOLE_COLUMNS = 80
 
@@ -30,7 +38,7 @@
     defc	__CPU_CLOCK = 6000000
     INCLUDE "crt/classic/crt_rules.inc"
 
-    org     $8100 - 512
+    org     CRT_ORG_CODE - 512
 
     defw    $5845   ;EXE signature
     defb    $45     ;Reserved (EXE type)
