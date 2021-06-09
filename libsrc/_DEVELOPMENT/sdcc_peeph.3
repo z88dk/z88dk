@@ -969,7 +969,6 @@ replace restart
 	ld	(hl),a
 } by {
 	ld	a,(#%1)
-	ld	(hl),a
 	ld	hl,#%1
 	; peephole z88dk-bugfix-12a
 }
@@ -981,7 +980,6 @@ replace restart
 	ld	(hl),a
 } by {
 	ld	a,(#%1+%2)
-	ld	(hl),a
 	ld	hl,#%1 + %2
 	; peephole z88dk-bugfix-12b
 }
