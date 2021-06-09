@@ -71,8 +71,14 @@ typedef enum {
     RES_PARERR = 4  /* 4: Invalid Parameter */
 } DRESULT;
 
+#ifndef FF_DEFINED
+#ifndef _LBA_T
+#define _LBA_T
 /* FatFS for non exFAT file systems */
 typedef DWORD LBA_t;
+#endif
+#endif
+
 //
 // IDE DISK COMMANDS
 //

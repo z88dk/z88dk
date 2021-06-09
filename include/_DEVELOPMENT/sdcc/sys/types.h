@@ -15,20 +15,48 @@
 
 #ifndef _FLOAT_T
 #define _FLOAT_T
-#ifdef __SDCC
-typedef float float_t;
-#else
-typedef double float_t;
-#endif
+
+   #ifdef __CLANG
+   
+   typedef float float_t;
+   
+   #endif
+
+   #ifdef __SDCC
+   
+   typedef float float_t;
+   
+   #endif
+   
+   #ifdef __SCCZ80
+   
+   typedef double float_t;
+   
+   #endif
+   
 #endif
 
 #ifndef _DOUBLE_T
 #define _DOUBLE_T
-#ifdef __SDCC
-typedef float double_t;
-#else
-typedef double double_t;
-#endif
+
+   #ifdef __CLANG
+   
+   typedef float double_t;
+   
+   #endif
+
+   #ifdef __SDCC
+   
+   typedef float double_t;
+   
+   #endif
+   
+   #ifdef __SCCZ80
+   
+   typedef double double_t;
+   
+   #endif
+   
 #endif
 
 #ifndef _SIZE_T
