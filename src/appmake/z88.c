@@ -330,7 +330,7 @@ int z88_exec(char* target)
 
 static void SaveBank(unsigned offset, char *base, char *ext)
 {
-    SaveBlock(offset, 16394, base, ext);
+    SaveBlock(offset, 16384, base, ext);
 }
 
 static void SaveBlock(unsigned offset, size_t length, char* base, char* ext)
