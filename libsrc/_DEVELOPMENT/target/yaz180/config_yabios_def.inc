@@ -82,173 +82,173 @@ PUBLIC asm_z180_trap
 DEFC asm_z180_trap                   = $F5A0
 
 PUBLIC _call_far_rst
-DEFC _call_far_rst                   = $F5F6
+DEFC _call_far_rst                   = $F5FB
 
 PUBLIC _jp_far
-DEFC _jp_far                         = $F66E
+DEFC _jp_far                         = $F66F
 
 PUBLIC _jp_far_rst
-DEFC _jp_far_rst                     = $F674
+DEFC _jp_far_rst                     = $F675
 
 PUBLIC _exit_far
-DEFC _exit_far                       = $F72D
+DEFC _exit_far                       = $F728
 
 PUBLIC _memcpy_far
-DEFC _memcpy_far                     = $F76B
+DEFC _memcpy_far                     = $F764
 
 PUBLIC _load_hex_fastcall
-DEFC _load_hex_fastcall              = $F807
+DEFC _load_hex_fastcall              = $F800
 
 PUBLIC _bank_get_rel
-DEFC _bank_get_rel                   = $F8B8
+DEFC _bank_get_rel                   = $F8B1
 
 PUBLIC _bank_get_rel_fastcall
-DEFC _bank_get_rel_fastcall          = $F8BC
+DEFC _bank_get_rel_fastcall          = $F8B5
 
 PUBLIC _bank_get_abs
-DEFC _bank_get_abs                   = $F8CA
+DEFC _bank_get_abs                   = $F8C3
 
 PUBLIC _bank_get_abs_fastcall
-DEFC _bank_get_abs_fastcall          = $F8CE
+DEFC _bank_get_abs_fastcall          = $F8C7
 
 PUBLIC _lock_get
-DEFC _lock_get                       = $F8DA
+DEFC _lock_get                       = $F8D3
 
 PUBLIC _lock_get_fastcall
-DEFC _lock_get_fastcall              = $F8DE
+DEFC _lock_get_fastcall              = $F8D7
 
 PUBLIC _lock_try
-DEFC _lock_try                       = $F8E3
+DEFC _lock_try                       = $F8DC
 
 PUBLIC _lock_try_fastcall
-DEFC _lock_try_fastcall              = $F8E7
+DEFC _lock_try_fastcall              = $F8E0
 
 PUBLIC _lock_give
-DEFC _lock_give                      = $F8EF
+DEFC _lock_give                      = $F8E8
 
 PUBLIC _lock_give_fastcall
-DEFC _lock_give_fastcall             = $F8F3
+DEFC _lock_give_fastcall             = $F8EC
 
 PUBLIC asm_am9511a_isr
-DEFC asm_am9511a_isr                 = $F927
+DEFC asm_am9511a_isr                 = $F920
 
 PUBLIC asm_am9511a_reset
-DEFC asm_am9511a_reset               = $FA05
+DEFC asm_am9511a_reset               = $F9FE
 
 PUBLIC asm_am9511a_chk_idle
-DEFC asm_am9511a_chk_idle            = $FA5F
+DEFC asm_am9511a_chk_idle            = $FA58
 
 PUBLIC asm_am9511a_opp
-DEFC asm_am9511a_opp                 = $FA76
+DEFC asm_am9511a_opp                 = $FA6F
 
 PUBLIC asm_am9511a_cmd
-DEFC asm_am9511a_cmd                 = $FAB2
+DEFC asm_am9511a_cmd                 = $FAAB
 
 PUBLIC asm_asci0_init
-DEFC asm_asci0_init                  = $FB35
+DEFC asm_asci0_init                  = $FB2E
 
 PUBLIC asm_asci0_flush_Rx_di
-DEFC asm_asci0_flush_Rx_di           = $FB4F
+DEFC asm_asci0_flush_Rx_di           = $FB48
 
 PUBLIC _asci0_flush_Rx
-DEFC _asci0_flush_Rx                 = $FB4F
+DEFC _asci0_flush_Rx                 = $FB48
 
 PUBLIC asm_asci0_flush_Rx
-DEFC asm_asci0_flush_Rx              = $FB59
+DEFC asm_asci0_flush_Rx              = $FB52
 
 PUBLIC asm_asci0_flush_Tx_di
-DEFC asm_asci0_flush_Tx_di           = $FB67
+DEFC asm_asci0_flush_Tx_di           = $FB60
 
 PUBLIC asm_asci0_flush_Tx
-DEFC asm_asci0_flush_Tx              = $FB71
+DEFC asm_asci0_flush_Tx              = $FB6A
 
 PUBLIC asm_asci0_reset
-DEFC asm_asci0_reset                 = $FB7F
+DEFC asm_asci0_reset                 = $FB78
 
 PUBLIC asm_asci0_getc
-DEFC asm_asci0_getc                  = $FB89
+DEFC asm_asci0_getc                  = $FB82
 
 PUBLIC _asci0_getc
-DEFC _asci0_getc                     = $FB89
+DEFC _asci0_getc                     = $FB82
 
 PUBLIC asm_asci0_peekc
-DEFC asm_asci0_peekc                 = $FBAB
+DEFC asm_asci0_peekc                 = $FBA4
 
 PUBLIC asm_asci0_pollc
-DEFC asm_asci0_pollc                 = $FBB7
+DEFC asm_asci0_pollc                 = $FBB0
 
 PUBLIC _asci0_pollc
-DEFC _asci0_pollc                    = $FBB7
+DEFC _asci0_pollc                    = $FBB0
 
 PUBLIC asm_asci0_putc
-DEFC asm_asci0_putc                  = $FBBF
+DEFC asm_asci0_putc                  = $FBB8
 
 PUBLIC asm_asci1_init
-DEFC asm_asci1_init                  = $FC5E
+DEFC asm_asci1_init                  = $FC57
 
 PUBLIC asm_asci1_flush_Rx_di
-DEFC asm_asci1_flush_Rx_di           = $FC78
+DEFC asm_asci1_flush_Rx_di           = $FC71
 
 PUBLIC _asci1_flush_Rx
-DEFC _asci1_flush_Rx                 = $FC78
+DEFC _asci1_flush_Rx                 = $FC71
 
 PUBLIC asm_asci1_flush_Rx
-DEFC asm_asci1_flush_Rx              = $FC82
+DEFC asm_asci1_flush_Rx              = $FC7B
 
 PUBLIC asm_asci1_flush_Tx_di
-DEFC asm_asci1_flush_Tx_di           = $FC90
+DEFC asm_asci1_flush_Tx_di           = $FC89
 
 PUBLIC asm_asci1_flush_Tx
-DEFC asm_asci1_flush_Tx              = $FC9A
+DEFC asm_asci1_flush_Tx              = $FC93
 
 PUBLIC asm_asci1_reset
-DEFC asm_asci1_reset                 = $FCA8
+DEFC asm_asci1_reset                 = $FCA1
 
 PUBLIC asm_asci1_getc
-DEFC asm_asci1_getc                  = $FCB2
+DEFC asm_asci1_getc                  = $FCAB
 
 PUBLIC _asci1_getc
-DEFC _asci1_getc                     = $FCB2
+DEFC _asci1_getc                     = $FCAB
 
 PUBLIC asm_asci1_peekc
-DEFC asm_asci1_peekc                 = $FCC8
+DEFC asm_asci1_peekc                 = $FCC1
 
 PUBLIC asm_asci1_pollc
-DEFC asm_asci1_pollc                 = $FCD4
+DEFC asm_asci1_pollc                 = $FCCD
 
 PUBLIC _asci1_pollc
-DEFC _asci1_pollc                    = $FCD4
+DEFC _asci1_pollc                    = $FCCD
 
 PUBLIC asm_asci1_putc
-DEFC asm_asci1_putc                  = $FCDC
+DEFC asm_asci1_putc                  = $FCD5
 
 PUBLIC ide_read_sector
-DEFC ide_read_sector                 = $FE16
+DEFC ide_read_sector                 = $FE0F
 
 PUBLIC ide_write_sector
-DEFC ide_write_sector                = $FE46
+DEFC ide_write_sector                = $FE3F
 
 PUBLIC asm_phexwd
-DEFC asm_phexwd                      = $FE7D
+DEFC asm_phexwd                      = $FE76
 
 PUBLIC asm_phex
-DEFC asm_phex                        = $FE87
+DEFC asm_phex                        = $FE80
 
 PUBLIC asm_pchar
-DEFC asm_pchar                       = $FE9A
+DEFC asm_pchar                       = $FE93
 
 PUBLIC asm_pstring
-DEFC asm_pstring                     = $FE73
+DEFC asm_pstring                     = $FE6C
 
 PUBLIC asm_rhex
-DEFC asm_rhex                        = $FEA4
+DEFC asm_rhex                        = $FE9D
 
 PUBLIC asm_rchar
-DEFC asm_rchar                       = $FEBE
+DEFC asm_rchar                       = $FEB7
 
 PUBLIC asm_delay
-DEFC asm_delay                       = $FEC8
+DEFC asm_delay                       = $FEC1
 
 PUBLIC _common1_phase_end
-DEFC _common1_phase_end              = $FED7
+DEFC _common1_phase_end              = $FED0
 
