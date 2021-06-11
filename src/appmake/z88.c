@@ -70,6 +70,7 @@ static unsigned char appldef[]={ 19, 8 , 'N', 5 , 'A','P','P','L',0,255 };
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
+static char              c_installer    = 0;
 static char              help         = 0;
 
 static unsigned char    *memory;      /* Pointer to Z80 memory */
@@ -81,6 +82,7 @@ option_t z88_options[] = {
     { 'b', "binfile",  "Linked binary file",         OPT_STR,   &binname },
     { 'c', "crt0file", "crt0 file used in linking",  OPT_STR,   &crtfile },
     { 'o', "output",   "Name of output file",        OPT_STR,   &outfile },
+    {  0,  "installer","Generate installer files",   OPT_BOOL,  &c_installer },
     {  0,  NULL,       NULL,                         OPT_NONE,  NULL }
 };
 
@@ -292,16 +294,35 @@ int z88_exec(char* target)
 
     /* Okay, now thats done, we have to save the image as banks.. */
     if (pages == 4)
-        SaveBank(0, outfile, ".60");
+        SaveBank(0, outfile, c_installer ? ".ap3" : ".60");
     if (pages >= 3)
-        SaveBank(16384, outfile, ".61");
+        SaveBank(16384, outfile, c_installer ? ".ap2" : ".61");
     if (pages >= 2)
-        SaveBank(32768, outfile, ".62");
-    SaveBank(49152, outfile, ".63");
-   // Save a .epr version as well
-    if ( pages == 1 ) pages = 2;
-    SaveBlock( 65536 - (pages * 16384), pages * 16384, outfile, ".epr");
+        SaveBank(32768, outfile, c_installer ? ".ap1" : ".62");
+    SaveBank(49152, outfile, c_installer ? ".ap0" : ".63");
 
+    // Save a .epr version as well
+    SaveBlock( 65536 - (( pages == 1  ? 2 : pages) * 16384), ( pages == 1  ? 2 : pages) * 16384, outfile, ".epr");
+
+    if (c_installer ) {
+        // Generate a .app file
+        unsigned char *ptr = memory;
+        int i;
+
+        memset(ptr, 0, 40);
+        ptr[0] = 0x5a;
+        ptr[1] = 0xa5;
+        ptr[2] = 0x00;
+        ptr[3] = pages;
+
+        ptr = memory + 10;
+        for ( i = 0 ; i < pages; i++ ) {
+            *ptr = 0x00;
+            *ptr = 0x40;
+            ptr += 4;
+        }
+        SaveBlock(0, 40, outfile, ".app");
+    }
 
     return 0;
 }

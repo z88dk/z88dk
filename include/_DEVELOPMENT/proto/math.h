@@ -5,8 +5,8 @@ include(__link__.m4)
 
 // THE SELECTED FLOATING POINT PACKAGE MAY NOT SUPPORT ALL LISTED FUNCTIONS
 
-#ifndef _FLOAT_T_DEFINED
-#define _FLOAT_T_DEFINED
+#ifndef _FLOAT_T
+#define _FLOAT_T
 
    #ifdef __CLANG
    typedef float float_t;
@@ -22,8 +22,8 @@ include(__link__.m4)
    
 #endif
 
-#ifndef _DOUBLE_T_DEFINED
-#define _DOUBLE_T_DEFINED
+#ifndef _DOUBLE_T
+#define _DOUBLE_T
 
    #ifdef __CLANG
    typedef float double_t;
@@ -39,8 +39,8 @@ include(__link__.m4)
    
 #endif
 
-#ifndef _FLOAT16_T_DEFINED
-#define _FLOAT16_T_DEFINED
+#ifndef _FLOAT16_T
+#define _FLOAT16_T
 
    #ifndef __SCCZ80
    typedef short _Float16;      /* IEEE-754 half float type */  
