@@ -96,7 +96,6 @@ fi
 
 if [ $do_clean = 1 -o $do_clean_bin = 1 ]; then              # Dont remove bin, as zsdcc and szdcpp must be built by hand in win32
   $MAKE clean
-  $MAKE -C libsrc clean
 fi
 
 

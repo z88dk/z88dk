@@ -98,5 +98,11 @@ apps:
   z88dk-font2pv1000:
     command: bin/z88dk-font2pv1000
     plugs: [home, removable-media]
+  z88dk-asmpp.pl:
+    command: bin/z88dk-asmpp.pl
+    plugs: [home, removable-media]
+  z88dk-asmstyle.pl:
+    command: bin/z88dk-asmstyle.pl
+    plugs: [home, removable-media]
 
 

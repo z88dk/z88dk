@@ -56,7 +56,7 @@ BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(
 	
 ALL = $(BINS) testsuite
 
-ALL_EXT = bin/zsdcc$(EXESUFFIX)
+ALL_EXT = bin/z88dk-zsdcc$(EXESUFFIX)
 
 .PHONY: all
 all: 	$(ALL) $(ALL_EXT)
@@ -114,10 +114,10 @@ ifdef BUILD_SDCC
 endif
 
 
-bin/zsdcc$(EXESUFFIX): $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)
+bin/z88dk-zsdcc$(EXESUFFIX): $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)
 ifdef BUILD_SDCC
-	cp $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/zsdcc$(EXESUFFIX)
-	cp $(SDCC_PATH)/bin/sdcpp$(EXESUFFIX) $(Z88DK_PATH)/bin/zsdcpp$(EXESUFFIX)
+	cp $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
+	cp $(SDCC_PATH)/bin/sdcpp$(EXESUFFIX) $(Z88DK_PATH)/bin/z88dk-zsdcpp$(EXESUFFIX)
 endif
 
 
@@ -196,8 +196,8 @@ install: install-clean
 	$(MAKE) -C support/graphics PREFIX=$(DESTDIR) install
 	$(MAKE) -C support/basck PREFIX=$(DESTDIR) install
 	$(MAKE) -C support/pv1000 PREFIX=$(DESTDIR) install
-	if [ -f bin/zsdcpp$(EXESUFFIX) ]; then cp bin/zsdcpp$(EXESUFFIX) $(DESTDIR)/bin/; fi
-	if [ -f bin/zsdcc$(EXESUFFIX) ]; then cp bin/zsdcc$(EXESUFFIX) $(DESTDIR)/bin/; fi
+	if [ -f bin/z88dk-zsdcpp$(EXESUFFIX) ]; then cp bin/z88dk-zsdcpp$(EXESUFFIX) $(DESTDIR)/bin/; fi
+	if [ -f bin/z88dk-zsdcc$(EXESUFFIX) ]; then cp bin/z88dk-zsdcc$(EXESUFFIX) $(DESTDIR)/bin/; fi
 	cp -r include $(prefix_share)/
 	cp -r lib $(prefix_share)/
 	cp -r libsrc $(prefix_share)/
