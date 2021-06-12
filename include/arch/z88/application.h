@@ -86,7 +86,8 @@
 
 void application_dor(void)
 {
-#pragma asm
+#asm
+	SECTION	rodata_appdor
 ; Here we go, with lots of assembler!
         INCLUDE "dor.def"
 
@@ -219,7 +220,7 @@ void application_dor(void)
 #include <arch/z88/oz/help7.h>
 .applname
         APPLNAME(APP_INFO)
-#pragma endasm
+#endasm
 }
 
 
