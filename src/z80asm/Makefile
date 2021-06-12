@@ -124,8 +124,8 @@ clean::
 install: $(TARGET) z80asm_lib
 	$(INSTALL) $(TARGET)     $(PREFIX)/bin/$(TARGET)
 	$(INSTALL) $(TARGET)     $(PREFIX)/bin/z88dk-$(TARGET)
-	$(INSTALL) asmpp.pl      $(PREFIX)/bin/z88dk-asmpp.pl
-	$(INSTALL) asmstyle.pl   $(PREFIX)/bin/z88dk-asmstyle.pl
+	$(INSTALL) asmpp.pl      $(PREFIX)/bin/z88dk-asmpp
+	$(INSTALL) asmstyle.pl   $(PREFIX)/bin/z88dk-asmstyle
 	$(MAKE) -C dev/z80asm_lib install PREFIX=$(PREFIX_SHARE)
 
 #------------------------------------------------------------------------------
