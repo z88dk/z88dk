@@ -212,7 +212,7 @@ int z88_exec(char* target)
         }
     } else {
         fclose(binfile);
-        exit_log(1, "Binary file too large! Change the org!\n");
+        exit_log(1, "Binary file too large! Change the org! Origin=%d, program size=%d - %d bytes too large\n",zorg,filesize,labs(MAX_ADDR - zorg - filesize));
     }
     fclose(binfile);
 
