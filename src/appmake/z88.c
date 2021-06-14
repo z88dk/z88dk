@@ -225,13 +225,7 @@ int z88_exec(char* target)
     /*  We've read it in, so now construct the ROM header */
     hdr = (struct romheader*)(memory + MAX_ADDR);
 
-    /*
-     * Try to create some sort of unique card id number so we don't clash
-     * violently with other apps, we'll use time() which returns the time
-     * since a base - different for different OS, but hopefully consistent
-     * with different flavours of the OS
-     */
-
+    /* Try to create some sort of unique card id number */
     cardidno = time(NULL);
 
     hdr->cardid[0] = (cardidno % 256) & 127;
@@ -310,16 +304,16 @@ int z88_exec(char* target)
         int i;
 
         memset(ptr, 0, 40);
-        ptr[0] = 0x5a;
-        ptr[1] = 0xa5;
-        ptr[2] = 0x00;
-        ptr[3] = pages;
+        ptr[0] = 0xa5;
+        ptr[1] = 0x5a;
+        ptr[2] = pages;
+        ptr[3] = 0;
 
         ptr = memory + 10;
         for ( i = 0 ; i < pages; i++ ) {
-            *ptr = 0x00;
-            *ptr = 0x40;
-            ptr += 4;
+            *ptr++ = 0x00;
+            *ptr++ = 0x40;
+            ptr += 2;
         }
         SaveBlock(0, 40, outfile, ".app");
     }
