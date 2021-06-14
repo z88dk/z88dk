@@ -2,7 +2,7 @@
 ;
 ;       Stefano Bodrato - 22/08/2001
 ;
-;	$Id: c128_crt0.asm,v 1.28 2016/07/15 21:03:25 dom Exp $
+;	$Id: c128_crt0.asm $
 ;
 
 
@@ -94,8 +94,8 @@ z80start:
 	ld	a,$87	; Display addres at $2000...
 	out	(c),a	; ...and alternate (upper+lowercase) char set
 
-;	ld	a,11		;dark grey
-	xor	a	; black
+	ld	a,15		;light grey
+;	xor	a	; black
 	ld	bc,$d020
 	out	(c),a	;border
 	inc	c
