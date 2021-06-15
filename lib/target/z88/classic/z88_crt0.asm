@@ -41,6 +41,10 @@
         defc    CONSOLE_COLUMNS = 80
         defc    CONSOLE_ROWS = 8
 	defc	TAR__no_ansifont = 1
+        IFNDEF ansicolumns
+            defc DEFINED_ansicolumns = 1
+            defc ansicolumns = CONSOLE_COLUMNS
+        ENDIF
 
 	defc	__CPU_CLOCK = 3276800
 

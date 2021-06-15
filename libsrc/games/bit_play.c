@@ -20,7 +20,7 @@
 
 #include <sound.h>
 
-void bit_play(unsigned char melody[])
+void bit_play(char melody[])
 {
 int sound;
 int duration=2;

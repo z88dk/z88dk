@@ -57,7 +57,10 @@ extern void __LIB__ patch_beep_callee(int duration, int period, void *pattern) _
 extern void __LIB__ bit_frequency(double_t duration, double_t frequency) __smallc;
 
 /* Play a song (example: "2A--A-B-CDEFGAB5C+") */
-extern void __LIB__ bit_play(unsigned char melody[]) __smallc __z88dk_fastcall;
+extern void __LIB__ bit_play(char melody[]) __smallc __z88dk_fastcall;
+
+/* As above, on the PSG */
+extern void __LIB__ psg_play(char melody[]) __smallc __z88dk_fastcall;
 
 /* Set up the synth phase parameters (4 hex digits, e.g. 0x1234) */
 extern void __LIB__ synth_phase(unsigned int phase) __smallc __z88dk_fastcall;
@@ -69,7 +72,7 @@ extern int synth_phase_3;
 extern int synth_phase_4;
 
 /* As for bit_play, but using 4 virtual oscillators.  Lacks of precision, but cool sounds. */
-extern void __LIB__ synth_play(unsigned char melody[]) __smallc __z88dk_fastcall;
+extern void __LIB__ synth_play(char melody[]) __smallc __z88dk_fastcall;
 
 /* Yet another way to play a melody.  Good for bass parts. 'soundpatch' is a zero terminated pattern */
 extern void __LIB__ buzzer_play(char *soundpatch, char *melody) __smallc;

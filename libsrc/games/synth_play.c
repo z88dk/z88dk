@@ -24,7 +24,7 @@
 /* Frequency bias to "tune" bit_synth properly */
 #define SYNTH_CONST 8.0
 
-void synth_play(unsigned char melody[])
+void synth_play(char melody[])
 {
 int sound;
 int duration=2;
