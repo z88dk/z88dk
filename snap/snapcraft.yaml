@@ -30,9 +30,11 @@ parts:
       - BUILD_SDCC: "1"
       - BUILD_SDCC_HTTP: "1"
     override-build: |
-      ./build.sh -i $SNAP 
+      cpanm -n -L $SNAPCRAFT_PART_INSTALL App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences CPU::Z80::Assembler Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Text::Table
+      ./build.sh -i $SNAP
       make DESTDIR=$SNAPCRAFT_PART_INSTALL install
     build-packages:
+      - cpanminus
       - build-essential
       - dos2unix
       - libboost-all-dev
@@ -47,6 +49,8 @@ parts:
       - curl
     stage-packages:
       - libicu60
+      - perl-modules-5.26
+      - libperl5.26
       - libxml2
       - m4
 
@@ -99,9 +103,13 @@ apps:
     command: bin/z88dk-font2pv1000
     plugs: [home, removable-media]
   z88dk-asmpp:
+    environment:
+      PERL5LIB: "$SNAP/lib/perl5:$SNAP/usr/share/perl/5.26.1:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.26.1"
     command: bin/z88dk-asmpp
     plugs: [home, removable-media]
   z88dk-asmstyle:
+    environment:
+      PERL5LIB: "$SNAP/lib/perl5:$SNAP/usr/share/perl/5.26.1:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.26.1"
     command: bin/z88dk-asmstyle
     plugs: [home, removable-media]
 
