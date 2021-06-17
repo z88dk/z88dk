@@ -12,6 +12,7 @@
 
         SECTION code_clib
 	PUBLIC	ansi_cls
+	EXTERN current_attr
 
 .ansi_cls
 	ld	hl,$D000
@@ -22,8 +23,9 @@
 	ld	bc,40*25
 	ldir
 
+	ld	a,(current_attr)
 	ld	hl,$D800
-	ld	(hl),$70
+	ld	(hl),a
 	ld	d,h
 	ld	e,l
 	inc	de
