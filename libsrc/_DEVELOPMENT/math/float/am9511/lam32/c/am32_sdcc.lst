@@ -60,11 +60,15 @@ math/float/am9511/lam32/c/sdcc/___fsadd
 math/float/am9511/lam32/c/sdcc/___fsadd_callee
 math/float/am9511/lam32/c/sdcc/___fsdiv
 math/float/am9511/lam32/c/sdcc/___fsdiv_callee
+math/float/am9511/lam32/c/sdcc/___fseq
 math/float/am9511/lam32/c/sdcc/___fseq_callee
+math/float/am9511/lam32/c/sdcc/___fsgt
 math/float/am9511/lam32/c/sdcc/___fsgt_callee
+math/float/am9511/lam32/c/sdcc/___fslt
 math/float/am9511/lam32/c/sdcc/___fslt_callee
 math/float/am9511/lam32/c/sdcc/___fsmul
 math/float/am9511/lam32/c/sdcc/___fsmul_callee
+math/float/am9511/lam32/c/sdcc/___fsneq
 math/float/am9511/lam32/c/sdcc/___fsneq_callee
 math/float/am9511/lam32/c/sdcc/___fssub
 math/float/am9511/lam32/c/sdcc/___fssub_callee
