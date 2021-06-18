@@ -35,12 +35,15 @@ sharpmz_from_ascii:
 .isntchar
         ;add    a,63 ; For now...
         ld      hl,chmap
-.maploop
         ld      e,a
+.maploop
         ld      a,(hl)
         and     a
-        ret     z       ; We don't display the character since it isn't mapped
         ld      a,e
+		jr      nz,cont_remap
+		sub		80     ; remap to a graphics symbol if we miss a valid equivalent
+        ret
+.cont_remap
         cp      (hl)
         inc     hl
         jr      z,chfound
