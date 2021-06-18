@@ -90,7 +90,6 @@ typedef uint8_t                     UBaseType_t;
     do{                             \
         asm(                        \
             "pop af             \n" \
-            ";	di    ; unneeded  \n" \
             "jp PO,ASMPC+4      \n" \
             "ei                 \n" \
             );                      \
@@ -170,7 +169,6 @@ typedef uint8_t                     UBaseType_t;
             "pop de             \n" \
             "pop bc             \n" \
             "pop af  ; iff1:iff2\n" \
-            ";	di    ; unneeded  \n" \
             "jp PO,ASMPC+4      \n" \
             "ei                 \n" \
             "pop af             \n" \
@@ -229,7 +227,6 @@ typedef uint8_t                     UBaseType_t;
             "pop de             \n" \
             "pop bc             \n" \
             "pop af  ; iff1:iff2\n" \
-            ";	di    ; unneeded  \n" \
             "jp PO,ASMPC+4      \n" \
             "ei                 \n" \
             "pop af             \n" \
@@ -261,7 +258,6 @@ typedef uint8_t                     UBaseType_t;
     do{                             \
         __asm                       \
             pop af                  \
-            ;	di    ; unneeded    \
             jp PO,ASMPC+4           \
             ei                      \
         __endasm;                   \
@@ -340,8 +336,7 @@ typedef uint8_t                     UBaseType_t;
             pop hl                  \
             pop de                  \
             pop bc                  \
-            pop af  ; iff1:iff2     \
-            ;	di    ; unneeded    \
+            pop af      ; iff1:iff2 \
             jp PO,ASMPC+4           \
             ei                      \
             pop af                  \
@@ -399,8 +394,7 @@ typedef uint8_t                     UBaseType_t;
             pop hl                  \
             pop de                  \
             pop bc                  \
-            pop af  ; iff1:iff2     \
-            ;	di    ; unneeded    \
+            pop af      ; iff1:iff2 \
             jp PO,ASMPC+4           \
             ei                      \
             pop af                  \
