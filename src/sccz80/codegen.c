@@ -2552,9 +2552,7 @@ void zmod_const(LVALUE *lval, int64_t value64)
 
     if ( lval->val_type == KIND_LONG ) {
         if ( value <= 256 && value > 0 ) {
-            zmod_const(&templval, value);
-            const2(0);
-            return;
+            // Fall through to the logical and operation
         } else if ( value == 65536 && ulvalue(lval) ) {
             const2(0);
             return;
@@ -2621,6 +2619,10 @@ void zmod_const(LVALUE *lval, int64_t value64)
             const2(value & 0xffff);
             swap();
             zmod(&templval);
+    }
+    
+    if ( lval->val_type == KIND_LONG ) {
+        const2(0);
     }
 }
 
