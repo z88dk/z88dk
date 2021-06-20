@@ -84,9 +84,9 @@
 
 
 
-void application_dor(void)
+static void application_dor(void)
 {
-#asm
+__asm
 	SECTION	rodata_appdor
 ; Here we go, with lots of assembler!
         INCLUDE "dor.def"
@@ -105,10 +105,6 @@ void application_dor(void)
         jp      app_entrypoint
 	defs	8		;enquire_entry - written by appmake
 
-; Initally let us consider only single bank applications
-
-        defc    in_bank = 63
-
 ; Application DOR
 
 .in_dor defb    0,0,0   ; links to parent, brother, son
@@ -116,12 +112,12 @@ void application_dor(void)
 /* Packages use the son DOR link */
 #ifdef MAKE_PACKAGE
 	defw	in_package_dor
-	defb	in_bank
+	defb	60 + (in_package_dor / 16384)
 #else
         defw    0       ;brother_add
         defb    0       ;brother_bank
 #endif
-        defb    $83     ; DOR type - application
+        defb    0x83     ; DOR type - application
         defb    indorend-indorstart
 .indorstart     
         defb    '@'     ; key to info section
@@ -137,7 +133,7 @@ void application_dor(void)
         defw    0 	; safe workspace (used for startup vars)
                         ; and user specifed safe data (patched by appmake)
         defw    application_dor_entrypoint   ; entry point
-; These are set up by appmake, but we can define top for certain
+; These are set up by appmake
 .in_dor_seg_setup
 .in_dor_seg0
         defb    0       ; segment bindings
@@ -146,24 +142,24 @@ void application_dor(void)
 .in_dor_seg2
         defb    0
 .in_dor_seg3
-        defb    in_bank
+        defb    0
 .in_dor_app_type
         APPLBYTE(APP_TYPE)      ; at_bad etc
         APPLBYTE(APP_TYPE2)     ;caps lock
 .ininfend       defb    'H'     ; key to help section
         defb    inhlpend-inhlpstart
 .inhlpstart     defw    in_topics
-        defb    in_bank
+	defb	60 + (in_topics / 16384)
         defw    in_commands
-        defb    in_bank
+	defb	60 + (in_commands / 16384)
         defw    in_help
-        defb    in_bank
+	defb	60 + (in_help / 16384)
         defb    0,0,0   ; no tokens
 .inhlpend       defb    'N'     ; key to name section
         defb    innamend-innamstart
 .innamstart     
         APPLNAME(APP_NAME)
-.innamend       defb    $ff
+.innamend       defb    0xff
 .indorend
 
 ; topics, shoved in header file to make this one more readable!
@@ -197,7 +193,7 @@ void application_dor(void)
 
 ; Help entries
 
-.in_help        defb    $7f
+.in_help        defb    0x7f
         HELPTEXT(HELP1)
         HELPTEXT(HELP2)
         HELPTEXT(HELP3)
@@ -220,7 +216,7 @@ void application_dor(void)
 #include <arch/z88/oz/help7.h>
 .applname
         APPLNAME(APP_INFO)
-#endasm
+__endasm;
 }
 
 
