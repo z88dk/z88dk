@@ -6034,3 +6034,226 @@
 	and	%2
 	jp	%3
 	ld	hl,%4
+
+	ld	hl,_%1
+	inc	h
+=
+	ld	hl,_%1 + 256
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	%2,%3	;EOS
+.%4
+	ld	hl,%5
+=
+	ld	a,(_%1)
+	and	a
+	jp	%2,%3	;EOS
+.%4
+	ld	hl,%5
+
+%title Eliminate redundant load of a
+	ld	a,%1
+	cp	%2
+	jp	%3,%4	;%5
+	ld	a,(%1)
+=
+	ld	a,%1
+	cp	%2
+	jp	%3,%4	;%5
+
+%title Eliminate jp over ret (z)
+	jp	z,%1	;%2
+	ret
+
+
+.%1
+=
+	ret	nz
+.%1
+
+	ld	a,h
+	or	l
+	ret	%1
+.%2
+	ret
+=
+.%2
+	ret
+
+%title Pointless clearing top byte
+	ld	h,0
+	ld	a,%1
+	sub	%2
+	jp	%3c,%5	;
+	ld	hl,%8	;const
+	jr	%6
+.%5
+	ld	hl,%7	;const
+=
+	ld	a,%1
+	sub	%2
+	jp	%3c,%5	;
+	ld	hl,%8	;const
+	jr	%6
+.%5
+	ld	hl,%7	;const
+
+%title Store uint8 inline rather than extend
+	ld	hl,(_%1)
+	ld	h,0
+	call	l_pint
+	jp	%2	;EOS
+=
+	ld	a,(_%1)
+	ld	(de),a
+	jp	%2	;EOS
+
+%title Use 8 bit load for comparison
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,l
+	cp	%2
+	jp	z,%3	;%4
+	ld	hl,%5
+=
+	ld	a,(_%1)
+	cp	%2
+	jp	z,%3	;%4
+	ld	hl,%5
+
+%title Remove jump over
+	jp	nz,%1
+	jr	%2
+.%1
+=
+	jr	z,%2
+.%1
+
+	ld	a,(_%1)
+	cp	%2
+	jp	%3	;
+	ld	a,(_%1)
+=
+	ld	a,(_%1)
+	cp	%2
+	jp	%3	;
+
+%title Simplify char comparison
+	scf
+	jr	z,ASMPC+3
+	ccf
+	jp	c,%1	;%2
+=
+	jp	z,%1	;%2
+
+%title Remove dangling jp
+	ret
+
+
+	jp	%1	;EOS
+=
+	ret
+
+%title Trailing statement increment uchar
+	ld	hl,(_%1)
+	ld	h,0
+	inc	hl
+	ld	a,l
+	ld	(_%1),a
+	jp	%2	;EOS
+=
+	ld	hl,_%1
+	inc	(hl)
+	jp	%2	;EOS
+
+%title Assign uchar from stack variable
+	call	l_gint	;
+	ld	a,l
+	ld	(_%1),a
+	jp	%2	;EOS
+=
+	ld	a,(hl)
+	ld	(_%1),a
+	jp	%2	;EOS
+
+%title Tidy up logic
+	ld	hl,1	;const
+	jr	%2
+.%3
+	ld	hl,0	;const
+.%2
+	ld	a,h
+	or	l
+	jr	z,%5
+.%6
+	ld	hl,1	;const
+.%5
+=
+.%6
+	ld	hl,1	;const
+	jr	%5
+.%3
+	ld	hl,0	;const
+.%5
+
+%title Redundant hl load
+	ld	l,(hl)
+	ld	h,0
+	ld	a,l
+	ld	(_%1),a
+.%2
+	ld	hl,%3
+=
+	ld	a,(hl)
+	ld	(_%1),a
+.%2
+	ld	hl,%3
+
+%title remove redundant hl load at EOS
+	ld	l,(hl)
+	ld	a,l
+	ld	(_%1),a
+	jp	%2	;EOS
+=
+	ld	a,(hl)
+	ld	(_%1),a
+	jp	%2	;EOS
+
+%title Redundant uchar extension
+	ld	h,0
+	ld	a,l
+	sub	%1
+	jp	%2
+	ld	hl,%3
+=
+	ld	a,l
+	sub	%1
+	jp	%2
+	ld	hl,%3
+
+%title Remove forced uchar conversion of true/false
+	ld	hl,1	;const
+	jr	%2
+.%3
+	ld	hl,0	;const
+.%2
+	ld	h,0
+	ret
+=
+	ld	hl,1	;const
+	ret
+.%3
+	ld	hl,0	;const
+	ret
+
+%title Redundant push around load of static uint8
+	push	de
+	ld	hl,(_%1)
+	ld	h,0
+	pop	de
+=
+	ld	hl,(_%1)
+	ld	h,0
