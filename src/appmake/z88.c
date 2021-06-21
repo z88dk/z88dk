@@ -70,7 +70,8 @@ static unsigned char appldef[]={ 19, 8 , 'N', 5 , 'A','P','P','L',0,255 };
 static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
-static char              c_installer    = 0;
+static char              c_installer  = 0;
+static char             *c_oz5        = 0;
 static char              help         = 0;
 
 static unsigned char    *memory;      /* Pointer to Z80 memory */
@@ -90,7 +91,7 @@ option_t z88_options[] = {
 
 /* Prototypes for our functions */
 static void SaveBank(unsigned offset, char *base, char *ext);
-static void SaveBlock(unsigned offset, size_t length, char* base, char* ext);
+static void SaveBlock(unsigned char *buffer, unsigned offset, size_t length, char* base, char* ext);
 
 #define get_dor_parameter(variable, name) do { \
 	variable = parameter_search(crtfile,".map",name); \
@@ -287,35 +288,64 @@ int z88_exec(char* target)
     }
 
     /* Okay, now thats done, we have to save the image as banks.. */
-    if (pages == 4)
-        SaveBank(0, outfile, c_installer ? ".ap3" : ".60");
-    if (pages >= 3)
-        SaveBank(16384, outfile, c_installer ? ".ap2" : ".61");
-    if (pages >= 2)
+    if (pages == 4) {
+        SaveBank(0, outfile, ".60");
+        if (c_installer)  SaveBank(0, outfile,".ap3");
+    }
+    if (pages >= 3) {
+        SaveBank(16384, outfile, ".61");
+        if (c_installer)  SaveBank(16384, outfile,".ap2");
+    }
+    if (pages >= 2) {
         SaveBank(32768, outfile, c_installer ? ".ap1" : ".62");
-    SaveBank(49152, outfile, c_installer ? ".ap0" : ".63");
+        if (c_installer)  SaveBank(32768, outfile,".ap1");
+    }
+    SaveBank(49152, outfile, ".63");
+    SaveBank(49152, outfile,  ".ap0");
 
     // Save a .epr version as well
-    SaveBlock( 65536 - (( pages == 1  ? 2 : pages) * 16384), ( pages == 1  ? 2 : pages) * 16384, outfile, ".epr");
+    SaveBlock( memory, 65536 - (( pages == 1  ? 2 : pages) * 16384), ( pages == 1  ? 2 : pages) * 16384, outfile, ".epr");
 
     if (c_installer ) {
         // Generate a .app file
-        unsigned char *ptr = memory;
+        unsigned char *header = calloc(40, sizeof(char));
+        unsigned char *ptr = header;
         int i;
 
         memset(ptr, 0, 40);
         ptr[0] = 0xa5;
         ptr[1] = 0x5a;
         ptr[2] = pages;
-        ptr[3] = 0;
+        ptr[3] = c_oz5 ? 0xff : 0x00;
 
-        ptr = memory + 10;
+        ptr = header + 10;
         for ( i = 0 ; i < pages; i++ ) {
             *ptr++ = 0x00;
             *ptr++ = 0x40;
             ptr += 2;
         }
-        SaveBlock(0, 40, outfile, ".app");
+        SaveBlock(header, 0, 40, outfile, ".app");
+        
+        // OZ5 format now
+        {
+            int len = 40;
+            int blocklen;
+            for ( i = 0 ; i < pages; i++ ) {
+                // Compress
+                LZ49_encode(memory + ( 49152 - i*16384), 16384, &blocklen);
+
+                header = realloc(header, len + blocklen);
+                memcpy(header + len, memory + ( 49152 - i * 16384), blocklen);
+                len += blocklen;
+
+                // Adjust the header so it contains the length of the compressed block
+                header[10 + (i * 4) + 0] = blocklen % 256;
+                header[10 + (i * 4) + 1] = blocklen / 256;
+            }
+            SaveBlock(header, 0, len, outfile, ".a5p");
+        }
+
+        free(header);
     }
 
     return 0;
@@ -324,10 +354,10 @@ int z88_exec(char* target)
 
 static void SaveBank(unsigned offset, char *base, char *ext)
 {
-    SaveBlock(offset, 16384, base, ext);
+    SaveBlock(memory,offset, 16384, base, ext);
 }
 
-static void SaveBlock(unsigned offset, size_t length, char* base, char* ext)
+static void SaveBlock(unsigned char  *buffer, unsigned offset, size_t length, char *base, char* ext)
 {
     char name[FILENAME_MAX + 1];
     FILE* fp;
@@ -339,7 +369,7 @@ static void SaveBlock(unsigned offset, size_t length, char* base, char* ext)
         exit_log(1, "Can't open output file %s\n", name);
     }
 
-    if (fwrite(memory + offset, 1, length, fp) != length) {
+    if (fwrite(buffer + offset, 1, length, fp) != length) {
         exit_log(1, "Can't write to  output file %s\n", name);
     }
     fclose(fp);

@@ -763,3 +763,10 @@ typedef enum {
 } mgt_filetype;
 extern disc_handle *mgt_create(void);
 extern void mgt_writefile(disc_handle *h, char mgt_filename[11], mgt_filetype filetype, int org, int isexec, unsigned char *data, size_t len);
+
+
+
+/* lz49.c */
+extern unsigned char *LZ49_encode(unsigned char *data, int length, int *retlength);
+extern void LZ49_decode(unsigned char *data, unsigned char *odata);
+

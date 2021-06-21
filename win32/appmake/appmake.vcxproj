@@ -51,6 +51,7 @@
     <ClCompile Include="..\..\src\appmake\kc.c" />
     <ClCompile Include="..\..\src\appmake\lviv.c" />
     <ClCompile Include="..\..\src\appmake\lynx.c" />
+    <ClCompile Include="..\..\src\appmake\lz49.c" />
     <ClCompile Include="..\..\src\appmake\m5.c" />
     <ClCompile Include="..\..\src\appmake\mamepp.c" />
     <ClCompile Include="..\..\src\appmake\mameql.c" />
