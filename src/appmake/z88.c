@@ -71,7 +71,6 @@ static char             *binname      = NULL;
 static char             *crtfile      = NULL;
 static char             *outfile      = NULL;
 static char              c_installer  = 0;
-static char             *c_oz5        = 0;
 static char              help         = 0;
 
 static unsigned char    *memory;      /* Pointer to Z80 memory */
@@ -316,7 +315,7 @@ int z88_exec(char* target)
         ptr[0] = 0xa5;
         ptr[1] = 0x5a;
         ptr[2] = pages;
-        ptr[3] = c_oz5 ? 0xff : 0x00;
+        ptr[3] = 0x00;
 
         ptr = header + 10;
         for ( i = 0 ; i < pages; i++ ) {
@@ -330,13 +329,14 @@ int z88_exec(char* target)
         {
             int len = 40;
             int blocklen;
+            header[3]= 0xff; // Indicate compressed
             for ( i = 0 ; i < pages; i++ ) {
                 // Compress
-                LZ49_encode(memory + ( 49152 - i*16384), 16384, &blocklen);
-
+                unsigned char *comp = LZ49_encode(memory + ( 49152 - i*16384), 16384, &blocklen);
                 header = realloc(header, len + blocklen);
-                memcpy(header + len, memory + ( 49152 - i * 16384), blocklen);
+                memcpy(header + len, comp, blocklen);
                 len += blocklen;
+                free(comp);
 
                 // Adjust the header so it contains the length of the compressed block
                 header[10 + (i * 4) + 0] = blocklen % 256;
@@ -370,7 +370,7 @@ static void SaveBlock(unsigned char  *buffer, unsigned offset, size_t length, ch
     }
 
     if (fwrite(buffer + offset, 1, length, fp) != length) {
-        exit_log(1, "Can't write to  output file %s\n", name);
+        exit_log(1, "Can't write to output file %s\n", name);
     }
     fclose(fp);
 }
