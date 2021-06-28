@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.1.4 #12274 (Linux)
+; Version 4.1.6 #12419 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -424,14 +424,13 @@ _m32_cosf:
 	add	ix,sp
 	push	af
 	push	af
-	push	af
 	dec	sp
-	ld	(ix-3),0x01
+	ld	(ix-1),0x01
 	ld	c,l
 	ld	b,h
 	ex	(sp),hl
-	ld	(ix-5),e
-	ld	(ix-4),d
+	ld	(ix-3),e
+	ld	(ix-2),d
 	push	bc
 	push	de
 	ld	hl,0x0000
@@ -440,17 +439,17 @@ _m32_cosf:
 	push	de
 	push	bc
 	call	___fslt_callee
+	ld	a, l
 	pop	de
 	pop	bc
-	ld	a,l
 	or	a, a
 	jr	Z,l_m32_cosf_00102
 	ld	a, d
 	xor	a,0x80
-	ld	(ix-4),a
+	ld	(ix-2),a
 	pop	hl
 	push	bc
-	ld	(ix-5),e
+	ld	(ix-3),e
 l_m32_cosf_00102:
 	pop	de
 	pop	hl
@@ -472,11 +471,13 @@ l_m32_cosf_00102:
 	push	hl
 	push	hl
 	call	___uint2fs_callee
-	pop	bc
-	bit	0, c
+	ld	c, l
+	ld	b, h
+	pop	hl
+	bit	0, l
 	jr	Z,l_m32_cosf_00104
-	inc	bc
-	push	bc
+	inc	hl
+	push	hl
 	push	hl
 	ld	hl,0x3f80
 	ex	(sp), hl
@@ -484,69 +485,80 @@ l_m32_cosf_00102:
 	ld	hl,0x0000
 	ex	(sp), hl
 	push	de
-	push	hl
+	push	bc
 	call	___fsadd_callee
-	pop	bc
+	ld	c, l
+	ld	b, h
+	pop	hl
 l_m32_cosf_00104:
-	ld	a, c
+	ld	a, l
 	and	a,0x07
-	ld	(ix-2),a
-	ld	(ix-1),0x00
+	ld	l, a
+	ld	h,0x00
 	ld	a,0x03
-	cp	a,(ix-2)
+	cp	a, l
 	ld	a,0x00
-	sbc	a,(ix-1)
+	sbc	a, h
 	jr	NC,l_m32_cosf_00106
-	ld	(ix-3),0xff
-	ld	a,(ix-2)
+	ld	(ix-1),0xff
+	ld	a, l
 	add	a,0xfc
-	ld	(ix-2),a
-	ld	a,(ix-1)
+	ld	l, a
+	ld	a, h
 	adc	a,0xff
-	ld	(ix-1),a
+	ld	h, a
 l_m32_cosf_00106:
 	ld	a,0x01
-	cp	a,(ix-2)
+	cp	a, l
 	ld	a,0x00
-	sbc	a,(ix-1)
+	sbc	a, h
 	jr	NC,l_m32_cosf_00108
 	xor	a, a
-	sub	a,(ix-3)
-	ld	(ix-3),a
+	sub	a,(ix-1)
+	ld	(ix-1),a
 l_m32_cosf_00108:
+	push	hl
 	push	de
-	push	hl
-	ld	hl,0x3f49
-	push	hl
-	ld	hl,0x0fdb
-	push	hl
+	push	bc
+	ld	de,0x3f49
+	push	de
+	ld	de,0x0fdb
+	push	de
 	call	___fsmul_callee
 	push	de
 	push	hl
-	ld	l,(ix-5)
-	ld	h,(ix-4)
-	push	hl
-	ld	l,(ix-7)
-	ld	h,(ix-6)
-	push	hl
-	call	___fssub_callee
-	ex	(sp), hl
-	ld	(ix-5),e
-	ld	(ix-4),d
-	pop	hl
-	push	hl
+	ld	e,(ix-3)
+	ld	d,(ix-2)
+	push	de
 	ld	e,(ix-5)
 	ld	d,(ix-4)
+	push	de
+	call	___fssub_callee
+	ld	c, l
+	ld	b, h
+	pop	hl
+	inc	sp
+	inc	sp
+	push	bc
+	ld	(ix-3),e
+	ld	(ix-2),d
+	ex	de,hl
+	pop	hl
+	push	hl
+	push	de
+	ld	e,(ix-3)
+	ld	d,(ix-2)
 	call	_m32_sqrf
-	ld	a,(ix-2)
+	ld	c, l
+	ld	b, h
+	pop	hl
+	ld	a, l
 	dec	a
-	ld	c,l
-	ld	b,h
-	or	a,(ix-1)
+	or	a, h
 	jr	Z,l_m32_cosf_00109
-	ld	a,(ix-2)
+	ld	a, l
 	sub	a,0x02
-	or	a,(ix-1)
+	or	a, h
 	jr	NZ,l_m32_cosf_00110
 l_m32_cosf_00109:
 	ld	hl,0x0003
@@ -556,20 +568,20 @@ l_m32_cosf_00109:
 	push	de
 	push	bc
 	call	_m32_polyf
+	ld	c,(ix-3)
+	ld	b,(ix-2)
+	push	bc
 	ld	c,(ix-5)
 	ld	b,(ix-4)
-	push	bc
-	ld	c,(ix-7)
-	ld	b,(ix-6)
 	push	bc
 	push	de
 	push	hl
 	call	___fsmul_callee
+	ld	c,(ix-3)
+	ld	b,(ix-2)
+	push	bc
 	ld	c,(ix-5)
 	ld	b,(ix-4)
-	push	bc
-	ld	c,(ix-7)
-	ld	b,(ix-6)
 	push	bc
 	push	de
 	push	hl
@@ -585,10 +597,10 @@ l_m32_cosf_00110:
 	push	de
 	push	bc
 	call	_m32_polyf
-	ld	(ix-7),l
-	ld	(ix-6),h
-	ld	(ix-5),e
-	ld	(ix-4),d
+	ld	(ix-5),l
+	ld	(ix-4),h
+	ld	(ix-3),e
+	ld	(ix-2),d
 	pop	de
 	pop	bc
 	push	de
@@ -600,11 +612,11 @@ l_m32_cosf_00110:
 	call	___fsmul_callee
 	push	de
 	push	hl
+	ld	l,(ix-3)
+	ld	h,(ix-2)
+	push	hl
 	ld	l,(ix-5)
 	ld	h,(ix-4)
-	push	hl
-	ld	l,(ix-7)
-	ld	h,(ix-6)
 	push	hl
 	call	___fssub_callee
 	ld	bc,0x3f80
@@ -615,7 +627,7 @@ l_m32_cosf_00110:
 	push	hl
 	call	___fsadd_callee
 l_m32_cosf_00111:
-	bit	7,(ix-3)
+	bit	7,(ix-1)
 	jr	Z,l_m32_cosf_00115
 	ld	a, d
 	xor	a,0x80

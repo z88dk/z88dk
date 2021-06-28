@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.1.4 #12274 (Linux)
+; Version 4.1.6 #12419 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -422,28 +422,23 @@ _m32_tanf:
 	add	ix,sp
 	push	af
 	push	af
-	push	af
-	push	af
+	push	hl
+	push	de
+	call	_m32_sinf
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
-	call	_m32_sinf
-	ex	(sp), hl
-	ld	(ix-6),e
-	ld	(ix-5),d
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	ld	e,(ix-2)
-	ld	d,(ix-1)
+	pop	de
+	pop	hl
 	call	_m32_cosf
 	push	de
 	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
+	ld	l,(ix-2)
+	ld	h,(ix-1)
 	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	push	hl
 	call	___fsdiv
 	ld	sp,ix

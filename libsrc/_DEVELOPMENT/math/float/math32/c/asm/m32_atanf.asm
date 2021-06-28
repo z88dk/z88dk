@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.1.4 #12274 (Linux)
+; Version 4.1.6 #12419 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -464,9 +464,11 @@ l_m32_atanf_00102:
 	or	a,a
 	ld	c,l
 	jr	Z,l_m32_atanf_00104
+	ld	e,c
+	ld	d,b
 	pop	hl
 	push	hl
-	push	bc
+	push	de
 	ld	e,(ix-6)
 	ld	d,(ix-5)
 	call	_m32_invf
@@ -511,8 +513,8 @@ l_m32_atanf_00106:
 	ld	b,(ix-3)
 	push	bc
 	call	___fslt_callee
+	ld	a, l
 	pop	de
-	ld	a,l
 	pop	hl
 	or	a, a
 	jr	Z,l_m32_atanf_00109

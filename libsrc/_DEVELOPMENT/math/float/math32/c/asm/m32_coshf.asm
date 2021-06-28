@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.1.4 #12274 (Linux)
+; Version 4.1.6 #12419 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -423,21 +423,22 @@ _m32_coshf:
 	push	af
 	push	af
 	call	_m32_expf
-	ex	(sp), hl
+	push	hl
+	push	de
+	call	_m32_invf
+	ld	(ix-4),l
+	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
+	pop	de
 	pop	hl
-	push	hl
-	ld	e,(ix-2)
-	ld	d,(ix-1)
-	call	_m32_invf
+	ld	c,(ix-2)
+	ld	b,(ix-1)
+	push	bc
+	ld	c,(ix-4)
+	ld	b,(ix-3)
+	push	bc
 	push	de
-	push	hl
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
 	push	hl
 	call	___fsadd_callee
 	call	_m32_div2f
