@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.6 #12419 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -398,24 +398,22 @@ _am9511_atanh:
 	push	af
 	push	af
 	push	hl
-	ld	c,l
-	ld	b,h
 	push	de
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
-	push	de
+	ld	bc,0x3f80
 	push	bc
+	ld	bc,0x0000
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
 	pop	de
-	pop	bc
+	pop	hl
 	push	de
-	push	bc
+	push	hl
 	ld	hl,0x3f80
 	push	hl
 	ld	hl,0x0000

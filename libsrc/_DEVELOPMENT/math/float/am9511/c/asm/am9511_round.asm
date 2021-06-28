@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.6 #12419 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -419,7 +419,7 @@ _am9511_round:
 	push	bc
 	ld	e,(ix-16)
 	ld	d,(ix-15)
-	ld	hl,0x0014
+	ld	hl,20
 	add	hl, sp
 	ex	de, hl
 	ld	bc,0x0004
@@ -526,9 +526,11 @@ l_am9511_round_00146:
 	jp	l_am9511_round_00114
 l_am9511_round_00104:
 	ld	a,(ix-10)
-	inc	a
+	push	af
 	ld	bc,0x0000
 	ld	de,0x0040
+	pop	af
+	inc	a
 	jr	l_am9511_round_00148
 l_am9511_round_00147:
 	sra	d
@@ -600,15 +602,15 @@ l_am9511_round_00113:
 	ld	(hl), d
 	ld	hl,0
 	add	hl, sp
+	ld	c, (hl)
+	inc	hl
+	ld	b, (hl)
+	inc	hl
 	ld	e, (hl)
 	inc	hl
 	ld	d, (hl)
-	inc	hl
-	ld	c, (hl)
-	inc	hl
-	ld	h, (hl)
-	ld	l,c
-	ex	de,hl
+	ld	l, c
+	ld	h, b
 l_am9511_round_00114:
 	ld	sp, ix
 	pop	ix

@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.6 #12419 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -399,30 +399,28 @@ _am9511_cosh:
 	push	af
 	call	_exp_fastcall
 	push	hl
-	ld	c,l
-	ld	b,h
 	push	de
 	push	de
+	push	hl
+	ld	bc,0x3f80
 	push	bc
-	ld	hl,0x3f80
-	push	hl
-	ld	hl,0x0000
-	push	hl
+	ld	bc,0x0000
+	push	bc
 	call	___fsdiv_callee
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
 	pop	de
-	pop	bc
-	ld	l,(ix-2)
-	ld	h,(ix-1)
-	push	hl
-	ld	l,(ix-4)
-	ld	h,(ix-3)
-	push	hl
-	push	de
+	pop	hl
+	ld	c,(ix-2)
+	ld	b,(ix-1)
 	push	bc
+	ld	c,(ix-4)
+	ld	b,(ix-3)
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
 	call	_div2_fastcall
 	ld	sp, ix

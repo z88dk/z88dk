@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.6 #12419 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -404,8 +404,7 @@ _am9511_log2:
 	call	___fslt_callee
 	pop	de
 	pop	bc
-	ld	a,l
-	or	a, a
+	bit	0, l
 	jr	NZ,l_am9511_log2_00102
 	ld	de,0xdeff
 	ld	hl,0x59ef

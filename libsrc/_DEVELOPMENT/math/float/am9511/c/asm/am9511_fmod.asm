@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.6 #12419 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -460,8 +460,7 @@ l_am9511_fmod_00102:
 	call	___fslt_callee
 	pop	de
 	pop	bc
-	ld	a,l
-	or	a, a
+	bit	0, l
 	jr	NZ,l_am9511_fmod_00105
 	ld	l,(ix+10)
 	ld	h,(ix+11)
@@ -472,11 +471,11 @@ l_am9511_fmod_00102:
 	push	de
 	push	bc
 	call	___fssub_callee
-	ld	c, l
-	ld	b, h
+	jr	l_am9511_fmod_00106
 l_am9511_fmod_00105:
 	ld	l, c
 	ld	h, b
+l_am9511_fmod_00106:
 l_am9511_fmod_00103:
 	pop	ix
 	ret

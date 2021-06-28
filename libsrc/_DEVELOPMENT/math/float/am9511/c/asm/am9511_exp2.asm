@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.0.7 #12017 (Linux)
+; Version 4.1.6 #12419 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -409,7 +409,7 @@ l_am9511_exp2_00102:
 	ld	hl,0x7218
 	push	hl
 	call	___fsmul_callee
-	call	_exp_fastcall
+	jp	_exp_fastcall
 l_am9511_exp2_00103:
 	ret
 	SECTION IGNORE
