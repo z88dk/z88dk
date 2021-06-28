@@ -5,11 +5,13 @@
 ; 	CLS - Clear the screen
 ;	
 ;
-;	$Id: f_ansi_cls.asm,v 1.5 2016-06-12 16:06:42 dom Exp $
+;	$Id: f_ansi_cls.asm $
 ;
 
-        SECTION code_clib
+	SECTION code_clib
 	PUBLIC	ansi_cls
+
+	EXTERN		__c128_paper
 
 .ansi_cls
 	ld	hl,$2000	; Text
@@ -26,4 +28,9 @@
 	ld	bc,1023
 	ld	(hl),1
 	ldir
+	ld	bc,$D021
+	ld	a,(__c128_paper)
+	out (c),a
+	ld	bc,$D020	; BORDER
+	out (c),a
 	ret
