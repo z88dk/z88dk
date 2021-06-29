@@ -26,7 +26,6 @@ PUBLIC asm0_vfprintf_unlocked, asm1_vfprintf_unlocked
 EXTERN __stdio_verify_output, asm_strchrnul, __stdio_send_output_buffer
 EXTERN l_utod_hl, l_neg_hl, error_einval_zc
 EXTERN __stdio_nextarg_de, l_atou, __stdio_length_modifier, error_erange_zc
-EXTERN CLIB_32BIT_FLOATS
 
 asm_vfprintf_unlocked:
 
