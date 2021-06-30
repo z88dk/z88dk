@@ -107,6 +107,8 @@ PUBLIC  asm_am9511_compare, asm_am9511_compare_callee
 
     res 0,l             ;remove least significant bit
 
+    ld a,l
+
     exx                 ;right
     sub l
     ld c,a
