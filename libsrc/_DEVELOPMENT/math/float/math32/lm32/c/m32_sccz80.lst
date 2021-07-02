@@ -79,6 +79,8 @@ math/float/math32/lm32/c/sccz80/mul2
 math/float/math32/lm32/c/sccz80/mul2_fastcall
 math/float/math32/lm32/c/sccz80/mul10u
 math/float/math32/lm32/c/sccz80/mul10u_fastcall
+math/float/math32/lm32/c/sccz80/neg
+math/float/math32/lm32/c/sccz80/neg_fastcall
 math/float/math32/lm32/c/sccz80/poly
 math/float/math32/lm32/c/sccz80/poly_callee
 math/float/math32/lm32/c/sccz80/pow

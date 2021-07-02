@@ -80,6 +80,8 @@ math/float/am9511/lam32/c/sccz80/mul2
 math/float/am9511/lam32/c/sccz80/mul2_fastcall
 math/float/am9511/lam32/c/sccz80/mul10u
 math/float/am9511/lam32/c/sccz80/mul10u_fastcall
+math/float/am9511/lam32/c/sccz80/neg
+math/float/am9511/lam32/c/sccz80/neg_fastcall
 math/float/am9511/lam32/c/sccz80/pow
 math/float/am9511/lam32/c/sccz80/pow_callee
 math/float/am9511/lam32/c/sccz80/round

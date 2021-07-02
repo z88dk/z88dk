@@ -419,6 +419,9 @@ extern int __LIB__ isunordered_callee(double_t x,double_t y) __smallc __z88dk_ca
 
 #ifdef __MATH_MATH32
 
+extern double_t __LIB__ neg(double_t x) __smallc __z88dk_fastcall;
+
+
 extern double_t __LIB__ sqr(double_t x) __smallc __z88dk_fastcall;
 
 
@@ -454,6 +457,9 @@ extern double_t __LIB__ f32_fam9511(double_t x) __smallc __z88dk_fastcall;
 
 
 extern double_t __LIB__ fam9511_f32(double_t x) __smallc __z88dk_fastcall;
+
+
+extern double_t __LIB__ neg(double_t x) __smallc __z88dk_fastcall;
 
 
 extern double_t __LIB__ sqr(double_t x) __smallc __z88dk_fastcall;

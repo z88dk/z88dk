@@ -94,6 +94,8 @@ math/float/am9511/lam32/c/sdcc/mul10u
 math/float/am9511/lam32/c/sdcc/mul10u_fastcall
 math/float/am9511/lam32/c/sdcc/__mullong
 math/float/am9511/lam32/c/sdcc/__mullong_callee
+math/float/am9511/lam32/c/sdcc/neg
+math/float/am9511/lam32/c/sdcc/neg_fastcall
 math/float/am9511/lam32/c/sdcc/pow
 math/float/am9511/lam32/c/sdcc/pow_callee
 math/float/am9511/lam32/c/sdcc/round

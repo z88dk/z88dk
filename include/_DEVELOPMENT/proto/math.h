@@ -247,6 +247,7 @@ __DPROTO(,,int,,isunordered,double_t x,double_t y)
 
 #ifdef __MATH_MATH32
 
+__DPROTO(,,double_t,,neg,double_t x)
 __DPROTO(,,double_t,,sqr,double_t x)
 __DPROTO(,,double_t,,inv,double_t x)
 __DPROTO(,,double_t,,invsqrt,double_t x)
@@ -262,6 +263,7 @@ __DPROTO(,,double_t,,poly, const float x, const float d[], unsigned int n)
 
 __DPROTO(,,double_t,,f32_fam9511,double_t x)
 __DPROTO(,,double_t,,fam9511_f32,double_t x)
+__DPROTO(,,double_t,,neg,double_t x)
 __DPROTO(,,double_t,,sqr,double_t x)
 __DPROTO(,,double_t,,div2,double_t x)
 __DPROTO(,,double_t,,mul2,double_t x)

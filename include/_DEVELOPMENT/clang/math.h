@@ -371,6 +371,9 @@ extern int isunordered(double_t x,double_t y);
 
 #ifdef __MATH_MATH32
 
+extern double_t neg(double_t x);
+
+
 extern double_t sqr(double_t x);
 
 
@@ -404,6 +407,9 @@ extern double_t f32_fam9511(double_t x);
 
 
 extern double_t fam9511_f32(double_t x);
+
+
+extern double_t neg(double_t x);
 
 
 extern double_t sqr(double_t x);

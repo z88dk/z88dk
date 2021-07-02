@@ -493,6 +493,11 @@ extern int isunordered_callee(double_t x,double_t y) __z88dk_callee;
 
 #ifdef __MATH_MATH32
 
+extern double_t neg(double_t x);
+extern double_t neg_fastcall(double_t x) __z88dk_fastcall;
+#define neg(a) neg_fastcall(a)
+
+
 extern double_t sqr(double_t x);
 extern double_t sqr_fastcall(double_t x) __z88dk_fastcall;
 #define sqr(a) sqr_fastcall(a)
@@ -546,6 +551,11 @@ extern double_t f32_fam9511_fastcall(double_t x) __z88dk_fastcall;
 extern double_t fam9511_f32(double_t x);
 extern double_t fam9511_f32_fastcall(double_t x) __z88dk_fastcall;
 #define fam9511_f32(a) fam9511_f32_fastcall(a)
+
+
+extern double_t neg(double_t x);
+extern double_t neg_fastcall(double_t x) __z88dk_fastcall;
+#define neg(a) neg_fastcall(a)
 
 
 extern double_t sqr(double_t x);
