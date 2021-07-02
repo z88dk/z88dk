@@ -58,7 +58,7 @@ PUBLIC m32_fssub, m32_fssub_callee
 PUBLIC m32_fsadd, m32_fsadd_callee
 
 
-; enter here for floating subtract, x-y x on stack, y in dehl
+; enter here for floating subtract, x-y x on stack, y in dehl, result in dehl
 .m32_fssub
     ld a,d                      ; toggle the sign bit for subtraction
     xor 080h
@@ -97,14 +97,14 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     jp farejoin
 
 
-; enter here for floating subtract callee, x-y x on stack, y in dehl
+; enter here for floating subtract callee, x-y x on stack, y in dehl, result in dehl
 .m32_fssub_callee
     ld a,d                      ; toggle the sign bit for subtraction
     xor 080h
     ld d,a
 
 
-; enter here for floating add callee, x+y, x on stack, y in bcde, result in bcde
+; enter here for floating add callee, x+y, x on stack, y in dehl, result in dehl
 .m32_fsadd_callee
     ex de,hl                    ; DEHL -> HLDE
     ld b,h                      ; place op1.s in b[7]
