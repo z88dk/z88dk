@@ -2,7 +2,7 @@
 SECTION code_fp_am9511
 PUBLIC cam32_sdcc_atan2_callee
 
-EXTERN _am9511_atan2f
+EXTERN _am9511_atan2
 
 .cam32_sdcc_atan2_callee
     pop hl      ; return
@@ -16,7 +16,7 @@ EXTERN _am9511_atan2f
     push de     ; LHS
     push bc    
 
-    call _am9511_atan2f
+    call _am9511_atan2
     pop af
     pop af
     pop af
