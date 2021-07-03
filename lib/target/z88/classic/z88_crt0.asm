@@ -21,51 +21,42 @@
 ; - - - - - - - -
 
 
-	MODULE  z88_crt0
-
-;-------
-; Include zcc_opt.def to find out information about us
-;-------
-
-	defc	crt0 = 1
-	INCLUDE "zcc_opt.def"
+    MODULE  z88_crt0
 
 
-;-------
-; Some general scope declarations
-;-------
-
-	EXTERN    _main		;main() is always external to crt0 code
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
 
-        defc    CONSOLE_COLUMNS = 80
-        defc    CONSOLE_ROWS = 8
-	defc	TAR__no_ansifont = 1
-        IFNDEF ansicolumns
-            defc DEFINED_ansicolumns = 1
-            defc ansicolumns = CONSOLE_COLUMNS
-        ENDIF
+    EXTERN    _main		;main() is always external to crt0 code
 
-	defc	__CPU_CLOCK = 3276800
+
+    defc    CONSOLE_COLUMNS = 80
+    defc    CONSOLE_ROWS = 8
+    defc	TAR__no_ansifont = 1
+    IFNDEF ansicolumns
+        defc DEFINED_ansicolumns = 1
+        defc ansicolumns = CONSOLE_COLUMNS
+    ENDIF
+
+    defc	__CPU_CLOCK = 3276800
 
 ;-------
 ; Select which particular startup we want
 ;-------
 
-; User specified startup type, so do as they wish then drop out otherwise
-; Use -startup=1 for basic      } (For sake of completeness only - don't
-;     -startup=2 for app        } use them!)
-;     -startup=3 for code snippets
-        IF (startup=1)
-                INCLUDE "target/z88/classic/z88b_crt0.asm"
-        ENDIF
-        IF (startup=2)
-                INCLUDE "target/z88/classic/z88a_crt0.asm"
-        ENDIF
-	IF (startup=4)
-		INCLUDE "target/z88/classic/z88d_crt0.asm"
-	ENDIF
-	IF (startup=5)
-		INCLUDE "target/z88/classic/z88s_crt0.asm"
-	ENDIF
-
+    IF (startup=1)
+        INCLUDE "target/z88/classic/z88b_crt0.asm"
+    ENDIF
+    IF (startup=2)
+        INCLUDE "target/z88/classic/z88a_crt0.asm"
+    ENDIF
+    IF (startup=4)
+        INCLUDE "target/z88/classic/z88d_crt0.asm"
+    ENDIF
+    IF (startup=5)
+        INCLUDE "target/z88/classic/z88s_crt0.asm"
+    ENDIF
+    IF (startup=6)
+        INCLUDE "target/z88/classic/z88s5_crt0.asm"
+    ENDIF
