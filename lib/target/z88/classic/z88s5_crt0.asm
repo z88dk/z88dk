@@ -20,7 +20,7 @@
         defc    TAR__register_sp = -1
         defc	CRT_KEY_DEL = 127
         IF !DEFINED_CRT_ORG_CODE
-            defc    CRT_ORG_CODE = $4000
+            defc    CRT_ORG_CODE = $2000
         ENDIF
         INCLUDE "crt/classic/crt_rules.inc"
 

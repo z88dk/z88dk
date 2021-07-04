@@ -19,6 +19,9 @@ static char              help         = 0;
 
 static unsigned char    *memory;      /* Pointer to Z80 memory */
 
+
+static int offset_sizes[] = { 0, 8192, 24576, 40960, 57344 };
+
 /* Options that are available for this module */
 option_t z88elf_options[] = {
     { 'h', "help",     "Display this help",          OPT_BOOL,  &help},
@@ -90,6 +93,12 @@ int z88elf_exec(char* target)
 
     fclose(binfile);
 
+    // Find the bankcount
+    for ( bankcount = 0; bankcount < 4; bankcount++) {
+        if ( filesize < offset_sizes[bankcount]) {
+            break;
+        }
+    }
 
     // Now, lets construct the elf header
     memset(header,0,sizeof(header));
@@ -138,7 +147,6 @@ int z88elf_exec(char* target)
     header[41] = 0x00;
     header[42] = 0x20;  // PHT_SIZEOF                      ; program header entry size (32)
     header[43] = 0x00;
-    bankcount = (filesize / 16384)+1;
     header[44] = bankcount;  // number of program header entries
     header[45] = 0;
     header[46] = 0x28;  // SHT_SIZEOF                      ; section header entry size (40)
@@ -152,7 +160,7 @@ int z88elf_exec(char* target)
     // Now, create the PHT files for each bank
 
     for ( i = 0; i < bankcount; i++) {
-       int bankoffs  = (i*16384);
+       int bankoffs  = offset_sizes[i]; 
        int offset;
        *ptr++ = 0x01;   // PT_LOAD                         ; type
        *ptr++ = 0x00;
@@ -172,8 +180,12 @@ int z88elf_exec(char* target)
        *ptr++ = 0x00;
        *ptr++ = 0x00;
        *ptr++ = 0x00;
+
+       // Maximum size in this bank
+       int maxsize = i == 0 ? 8192 : 16384;
+
        offset = filesize - bankoffs;
-       if (offset > 0x4000) offset = 0x4000;
+       if (offset > maxsize) offset = maxsize;
        *ptr++ = offset % 256;  // filesize
        *ptr++ = offset / 256; 
        *ptr++ = 0x00;
