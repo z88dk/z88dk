@@ -115,24 +115,24 @@ time @ 4MHz  = 14688455657 / 4*10^6 = 61 min 12 sec
 [Issue #124](https://github.com/z88dk/z88dk/issues/124) Normalization is slow.
 
 7.
-Z88DK April 30, 2021
+Z88DK July 4, 2021
 sccz80 / classic c library / math32
-5842 bytes less page zero
+5875 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 9702197187
-time @ 4MHz  = 9702197187 / 4*10^6 = 40 min 25 sec
+cycle count  = 9718997187
+time @ 4MHz  = 9718997187 / 4*10^6 = 40 min 29 sec
 
 8.
-Z88DK April 30, 2021
-zsdcc #12250 / new c library / math32
-5531 bytes less page zero
+Z88DK July 4, 2021
+zsdcc #12419 / new c library / math32
+5453 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 10531372867
-time @ 4MHz  = 10531372867 / 4*10^6 = 43 min 53 sec
+cycle count  = 9947615066
+time @ 4MHz  = 9947615066 / 4*10^6 = 41 min 27 sec
 
 9.
 SDCC 3.6.5 #9852 (MINGW64)
