@@ -262,6 +262,9 @@ extern option_t  kc_options;
 extern int       z88_exec(char *target);
 extern option_t  z88_options;
 
+extern int       z88elf_exec(char *target);
+extern option_t  z88elf_options;
+
 extern int       z88shell_exec(char *target);
 extern option_t  z88shell_options;
 
@@ -575,6 +578,10 @@ struct {
       "Generates .63 and .62 files suitable for burning to EPROM",
       NULL,
       z88_exec,     &z88_options },
+    { "appelf",     "z88elf",      "(C) 2021 z88dk",
+      "Generates an elf file for the z88 OZ5 shell",
+      NULL,
+      z88elf_exec,     &z88elf_options },
     { "shellmak",   "z88shell", "(C) 2002,2003 Dominic Morris",   
       "Patches the header to ensure that the program is recognised by the shell",
       NULL,

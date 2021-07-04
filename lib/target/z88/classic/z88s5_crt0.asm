@@ -19,51 +19,13 @@
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -1
         defc	CRT_KEY_DEL = 127
-        defc    EXEC_ORG = $2000
-        PUBLIC ELFHDR_START
-	EXTERN	__BSS_END_tail
+        IF !DEFINED_CRT_ORG_CODE
+            defc    CRT_ORG_CODE = $4000
+        ENDIF
         INCLUDE "crt/classic/crt_rules.inc"
 
 
-        org	EXEC_ORG - EH_SIZEOF - PHT_SIZEOF
-
-
-.ELFHDR_START
-        defm    $7F, "ELF"
-        defb    ELFCLASS32                      ; 32-bit objects        e_ident[EI_CLASS]
-        defb    ELFDATA2LSB                     ; little endian         e_ident[EI_DATA]
-        defb    EV_CURRENT                      ; always                e_ident[EI_VERSION]
-        defb    ELFOSABI_OZ                     ; OZ                    e_ident[EI_OSABI]
-        defb    ELFABIVERSION                   ; unspecified
-        defs    7 
-
-        defw    ET_EXEC                         ; elf type
-        defw    EM_Z80                          ; machine architecture
-        defq    EV_CURRENT                      ; always CURRENT
-        defq    EXEC_ORG                        ; entry address
-        defq    PHT_START - ELFHDR_START        ; program header offset
-        defq    0                               ; section header offset
-        defq    0                               ; processor specific flags
-        defw    EH_SIZEOF                       ; elf header size in bytes (52)
-        defw    PHT_SIZEOF                      ; program header entry size (32)
-        defw    1                               ; number of program header entries
-        defw    SHT_SIZEOF                      ; section header entry size (40)
-        defw    0                               ; number of section header entries
-        defw    0                               ; section name string index
-
-;   PHT
-.PHT_START
-        defq    PT_LOAD                         ; type
-        defq    EXEC_ORG - ELFHDR_START        ; p_offset
-        defq    EXEC_ORG                        ; virtual address
-        defq    0                               ; physical address
-        defq     __BSS_END_tail - EXEC_ORG     ; file size
-        defq     __BSS_END_tail - EXEC_ORG     ; memory size requested
-        defq    PF_X | PF_R                     ; executable
-        defq    $10000                          ; 64k bank alignement
-
-
-
+        org	CRT_ORG_CODE
 
 ;-----------
 ; Code starts executing from here
