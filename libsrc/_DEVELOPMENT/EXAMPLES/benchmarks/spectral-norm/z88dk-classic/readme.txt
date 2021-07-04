@@ -60,14 +60,14 @@ error: 2 * 10^(-9)
 cycle count  = 8617785182
 time @ 4MHz  = 8617785182 / 4*10^6 = 35 min 54 sec
 
-Z88DK April 30, 2021
-zsdcc #12250 / classic c library / math32
-6040 bytes less page zero
+Z88DK July 4, 2021
+zsdcc #12419 / classic c library / math32
+6049 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 10515174190
-time @ 4MHz  = 10515174190 / 4*10^6 = 43 min 48 sec
+cycle count  = 10003973822
+time @ 4MHz  = 10003973822 / 4*10^6 = 41 min 41 sec
 
 Z88DK April 20, 2020
 sccz80 / classic c library / genmath
@@ -78,11 +78,11 @@ error: 2 * 10^(-9)
 cycle count  = 14688455657
 time @ 4MHz  = 14688455657 / 4*10^6 = 61 min 12 sec
 
-Z88DK April 30, 2021
+Z88DK July 4, 2021
 sccz80 / classic c library / math32
-5842 bytes less page zero
+5875 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 9702197187
-time @ 4MHz  = 9702197187 / 4*10^6 = 40 min 25 sec
+cycle count  = 9718997187
+time @ 4MHz  = 9718997187 / 4*10^6 = 40 min 29 sec

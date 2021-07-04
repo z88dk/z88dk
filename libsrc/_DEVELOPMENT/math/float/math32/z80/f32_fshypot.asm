@@ -52,6 +52,10 @@ PUBLIC m32_fshypot, m32_fshypot_callee
     push de
     push hl
     push bc                     ; return on stack
+
+    exx
+    push de                     ; sqrf(y) on stack
+    push hl
     jr rejoin
 
 
@@ -76,13 +80,14 @@ PUBLIC m32_fshypot, m32_fshypot_callee
     pop de
     push bc                     ; return on stack
 
-.rejoin
-    call m32_fssqr_fastcall     ; sqrf(x)
-    push de
-    push hl
-    
     exx
-    call m32_fsadd_callee       ; sqrf(x) + sqrf(y)
+    push de                     ; sqrf(y) on stack
+    push hl
+
+.rejoin
+    exx
+    call m32_fssqr_fastcall     ; sqrf(x)
+    call m32_fsadd_callee       ; sqrf(y) + sqrf(x)
     call m32_fssqrt_fastcall
     ret
 

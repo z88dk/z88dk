@@ -29,7 +29,7 @@ PUBLIC cam32_sdcc_read1_callee
     exx
     push de                     ; sdcc_float left
     push hl
-    exx                         ; sdcc_float right   
+    exx                         ; sdcc_float right
     push bc                     ; ret 1
     push af                     ; my return
     ret
