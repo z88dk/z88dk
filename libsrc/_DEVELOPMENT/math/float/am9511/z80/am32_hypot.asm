@@ -48,7 +48,7 @@ PUBLIC asm_am9511_hypot, asm_am9511_hypot_callee
     ;         dehl  = 32-bit product
     ;         carry reset
     ;
-    ; uses  : af, bc, de, hl, af', bc', de', hl'
+    ; uses  : af, bc, de, hl
 
     call asm_am9511_pushf_fastcall  ; y
 
@@ -86,7 +86,7 @@ PUBLIC asm_am9511_hypot, asm_am9511_hypot_callee
     ; exit  : dehl  = 32-bit product
     ;         carry reset
     ;
-    ; uses  : af, bc, de, hl, bc', de', hl'
+    ; uses  : af, bc, de, hl
 
     call asm_am9511_pushf_fastcall  ; y
 

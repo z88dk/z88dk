@@ -30,7 +30,7 @@ PUBLIC m32_sqr_32h_24x24
 ;
 ; exit  : hlde  = 32-bit product
 ;
-; uses  : af, bc, de, hl, af'
+; uses  : af, bc, de, hl, bc', de', hl'
 
 
 .m32_sqr_32h_24x24
