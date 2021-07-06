@@ -245,6 +245,8 @@
 	GLOBAL _mul2
 	GLOBAL _div2
 	GLOBAL _sqr
+	GLOBAL _neg_fastcall
+	GLOBAL _neg
 	GLOBAL _fam9511_f32_fastcall
 	GLOBAL _fam9511_f32
 	GLOBAL _f32_fam9511_fastcall

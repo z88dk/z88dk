@@ -257,6 +257,8 @@
 	GLOBAL _inv
 	GLOBAL _sqr_fastcall
 	GLOBAL _sqr
+	GLOBAL _neg_fastcall
+	GLOBAL _neg
 	GLOBAL _isunordered_callee
 	GLOBAL _isunordered
 	GLOBAL _islessgreater_callee
