@@ -17,13 +17,15 @@ float m32_atan2f (float y, float x)
                 else
                     v -= M_PI;
             }
-            return v;
         }
-        v = -m32_atanf(x/y);
-        if(x < 0.0)
-            v -= M_PI_2;
         else
-            v += M_PI_2;
+        {
+            v = -m32_atanf(x/y);
+            if(y < 0.0)
+                v -= M_PI_2;
+            else
+                v += M_PI_2;
+        }
         return v;
     }
     else

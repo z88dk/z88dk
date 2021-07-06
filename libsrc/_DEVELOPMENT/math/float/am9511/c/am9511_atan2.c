@@ -17,13 +17,15 @@ float am9511_atan2 (float y, float x)
                 else
                     v -= M_PI;
             }
-            return v;
         }
-        v = -atan(x/y);
-        if(x < 0.0)
+        else
+        {
+            v = -atan(x/y);
+            if(y < 0.0)
             v -= M_PI_2;
         else
             v += M_PI_2;
+        }
         return v;
     }
     else
