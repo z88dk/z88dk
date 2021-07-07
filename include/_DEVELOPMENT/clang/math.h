@@ -5,6 +5,8 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
+#include <stdint.h>
+
 // THE SELECTED FLOATING POINT PACKAGE MAY NOT SUPPORT ALL LISTED FUNCTIONS
 
 #ifndef _FLOAT_T
@@ -535,6 +537,9 @@ extern half_t asinf16(half_t x);
 
 
 extern half_t atanf16(half_t x);
+
+
+extern half_t atan2f16(half_t y,half_t x);
 
 
 

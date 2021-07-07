@@ -1,15 +1,15 @@
 
-#include "am9511_math.h"
+#include "math16.h"
 
-float am9511_atan2 (float y, float x)
+half_t atan2f16 (half_t y, half_t x)
 {
-    float v;
+    half_t v;
 
     if( x != 0.0)
     {
-        if(fabs(x) >= fabs(y))
+        if(fabsf16(x) >= fabsf16(y))
         {
-            v = atan(y/x);
+            v = atanf16(y/x);
             if( x < 0.0)
             {
                 if(y >= 0.0)
@@ -20,7 +20,7 @@ float am9511_atan2 (float y, float x)
         }
         else
         {
-            v = -atan(x/y);
+            v = -atanf16(x/y);
             if(y < 0.0)
                 v -= M_PI_2;
             else

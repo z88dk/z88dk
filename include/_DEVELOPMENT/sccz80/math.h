@@ -5,6 +5,8 @@
 #ifndef __MATH_H__
 #define __MATH_H__
 
+#include <stdint.h>
+
 // THE SELECTED FLOATING POINT PACKAGE MAY NOT SUPPORT ALL LISTED FUNCTIONS
 
 #ifndef _FLOAT_T
@@ -603,6 +605,11 @@ extern half_t __LIB__ asinf16(half_t x) __smallc __z88dk_fastcall;
 
 
 extern half_t __LIB__ atanf16(half_t x) __smallc __z88dk_fastcall;
+
+
+extern half_t __LIB__ atan2f16(half_t y,half_t x) __smallc;
+extern half_t __LIB__ atan2f16_callee(half_t y,half_t x) __smallc __z88dk_callee;
+#define atan2f16(a,b) atan2f16_callee(a,b)
 
 
 
