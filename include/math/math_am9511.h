@@ -37,7 +37,7 @@ extern double_t __LIB__ tan(double_t x);
 extern double_t __LIB__ asin(double_t x);
 extern double_t __LIB__ acos(double_t x);
 extern double_t __LIB__ atan(double_t x);
-extern double_t __LIB__ atan2(double_t x, double_t y) __smallc;
+extern double_t __LIB__ atan2(double_t y, double_t x) __smallc;
 
 /* Hyperbolic functions */
 extern double_t __LIB__ sinh(double_t x);
