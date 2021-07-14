@@ -206,6 +206,7 @@
 	GLOBAL	acosf16
 	GLOBAL	asinf16
 	GLOBAL	atanf16
+	GLOBAL	atan2f16
 	GLOBAL	cosf16
 	GLOBAL	sinf16
 	GLOBAL	tanf16

@@ -61,6 +61,8 @@ extern half_t __LIB__ mul10f16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ acosf16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ asinf16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ atanf16(half_t x) __z88dk_fastcall;
+extern half_t __LIB__ atan2f16(half_y,half_t x) __smallc;
+
 extern half_t __LIB__ cosf16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ sinf16(half_t x) __z88dk_fastcall;
 extern half_t __LIB__ tanf16(half_t x) __z88dk_fastcall;

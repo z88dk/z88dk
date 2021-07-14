@@ -6,9 +6,9 @@
 ;	Module compile time: Wed Jul  7 12:41:42 2021
 
 
-	C_LINE	0,"powf16.c"
+	C_LINE	0,"atan2f16.c"
 
-	MODULE	powf16_c
+	MODULE	atan2f16_c
 
 
 	INCLUDE "z80_crt0.hdr"
@@ -201,30 +201,156 @@
 	C_LINE	691,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/math.h"
 	C_LINE	692,"/home/phillip/Z80/z88dk/lib/config/../..//include/_DEVELOPMENT/sccz80/math.h"
 	C_LINE	35,"math16.h"
-	C_LINE	32,"powf16.c"
-	C_LINE	34,"powf16.c"
-	C_LINE	36,"powf16.c"
+	C_LINE	2,"atan2f16.c"
+	C_LINE	4,"atan2f16.c"
 	SECTION	code_compiler
 
-; Function asm_f16_pow flags 0x000002c0 __smallc __z88dk_callee 
-; _Float16 half_tasm_f16_pow(_Float16 x, _Float16 y)
-; parameter '_Float16 y' at sp+2 size(2)
-; parameter '_Float16 x' at sp+4 size(2)
-	C_LINE	37,"powf16.c::asm_f16_pow::0::0"
-.asm_f16_pow
-	GLOBAL	_asm_f16_pow
-._asm_f16_pow
-	pop	bc
-	pop	hl
-	push	hl
+; Function atan2f16_callee flags 0x000002c0 __smallc __z88dk_callee 
+; _Float16 half_tatan2f16_callee(_Float16 y, _Float16 x)
+; parameter '_Float16 x' at sp+2 size(2)
+; parameter '_Float16 y' at sp+4 size(2)
+	C_LINE	5,"atan2f16.c::atan2f16_callee::0::0"
+.atan2f16_callee
+	GLOBAL	_atan2f16_callee
+._atan2f16_callee
 	push	bc
-	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
 	ld	hl,0	;const
-	call	l_f16_eq
+	call	l_f16_ne
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	ld	hl,15360	;const
+	ld	hl,4	;const
+	add	hl,sp
+	ld	a,(hl)	;l_gint
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	call	fabsf16
+	push	hl
+	ld	hl,8	;const
+	add	hl,sp
+	ld	a,(hl)	;l_gint
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	call	fabsf16
+	call	l_f16_ge
+	ld	a,h
+	or	l
+	jp	z,i_3	;
+	ld	hl,6	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,6	;const
+	add	hl,sp
+	ld	a,(hl)	;l_gint
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	call	l_f16_div
+	call	atanf16
+	pop	bc
+	push	hl
+	ld	hl,4	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,0	;const
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_4	;
+	ld	hl,6	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,0	;const
+	call	l_f16_ge
+	ld	a,h
+	or	l
+	jp	z,i_5	;
+	pop	hl
+	push	hl
+	push	hl
+	ld	hl,16968	;const
+	call	l_f16_add
+	pop	bc
+	push	hl
+	jp	i_7	;EOS
+.i_5
+	pop	hl
+	push	hl
+	push	hl
+	ld	hl,16968	;const
+	call	l_f16_sub
+	pop	bc
+	push	hl
+	jp	i_8	;EOS
+	defc	i_7 = i_8
+	defc	i_4 = i_8
+.i_3
+	ld	hl,4	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,8	;const
+	add	hl,sp
+	ld	a,(hl)	;l_gint
+	inc	hl
+	ld	h,(hl)
+	ld	l,a
+	call	l_f16_div
+	call	atanf16
+	ld	a,h
+	xor	128
+	ld	h,a
+	pop	bc
+	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,0	;const
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_9	;
+	pop	hl
+	push	hl
+	push	hl
+	ld	hl,15944	;const
+	call	l_f16_sub
+	pop	bc
+	push	hl
+	jp	i_11	;EOS
+.i_9
+	pop	hl
+	push	hl
+	push	hl
+	ld	hl,15944	;const
+	call	l_f16_add
+	pop	bc
+	push	hl
+.i_11
+.i_8
+	pop	hl
 	pop	bc
 	pop	af
 	pop	af
@@ -233,204 +359,52 @@
 
 
 .i_2
-	ld	hl,4	;const
+	ld	hl,6	;const
 	add	hl,sp
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
 	push	de
 	ld	hl,0	;const
-	call	l_f16_le
+	call	l_f16_gt
 	ld	a,h
 	or	l
-	jp	z,i_3	;
+	jp	z,i_13	;
+	ld	hl,15944	;const
+	pop	bc
+	pop	bc
+	pop	af
+	pop	af
+	push	bc
+	ret
+
+
+.i_13
+	ld	hl,6	;const
+	add	hl,sp
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	ld	hl,0	;const
+	call	l_f16_lt
+	ld	a,h
+	or	l
+	jp	z,i_15	;
+	ld	hl,48712	;const
+	pop	bc
+	pop	bc
+	pop	af
+	pop	af
+	push	bc
+	ret
+
+
+.i_15
+.i_14
+.i_12
 	ld	hl,0	;const
 	pop	bc
-	pop	af
-	pop	af
-	push	bc
-	ret
-
-
-.i_3
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
-	push	hl
-	ld	hl,15360	;const
-	call	l_f16_eq
-	ld	a,h
-	or	l
-	jp	z,i_4	;
-	ld	hl,4	;const
-	add	hl,sp
-	ld	a,(hl)	;l_gint
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	pop	bc
-	pop	af
-	pop	af
-	push	bc
-	ret
-
-
-.i_4
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
-	push	hl
-	ld	hl,48128	;const
-	call	l_f16_eq
-	ld	a,h
-	or	l
-	jp	z,i_5	;
-	ld	hl,4	;const
-	add	hl,sp
-	ld	a,(hl)	;l_gint
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	call	invf16
-	pop	bc
-	pop	af
-	pop	af
-	push	bc
-	ret
-
-
-.i_5
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
-	push	hl
-	ld	hl,14336	;const
-	call	l_f16_eq
-	ld	a,h
-	or	l
-	jp	z,i_6	;
-	ld	hl,4	;const
-	add	hl,sp
-	ld	a,(hl)	;l_gint
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	call	sqrtf16
-	pop	bc
-	pop	af
-	pop	af
-	push	bc
-	ret
-
-
-.i_6
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
-	push	hl
-	ld	hl,47104	;const
-	call	l_f16_eq
-	ld	a,h
-	or	l
-	jp	z,i_8	;
-	ld	hl,4	;const
-	add	hl,sp
-	ld	a,(hl)	;l_gint
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	call	invsqrtf16
-	pop	bc
-	pop	af
-	pop	af
-	push	bc
-	ret
-
-
-.i_8
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
-	push	hl
-	ld	hl,16384	;const
-	call	l_f16_eq
-	ld	a,h
-	or	l
-	jp	z,i_9	;
-	ld	hl,4	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	push	de
-	ld	hl,6	;const
-	add	hl,sp
-	ld	a,(hl)	;l_gint
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	call	l_f16_mul
-	pop	bc
-	pop	af
-	pop	af
-	push	bc
-	ret
-
-
-.i_9
-	pop	bc
-	pop	hl
-	push	hl
-	push	bc
-	push	hl
-	ld	hl,49152	;const
-	call	l_f16_eq
-	ld	a,h
-	or	l
-	jp	z,i_10	;
-	ld	hl,4	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	push	de
-	ld	hl,6	;const
-	add	hl,sp
-	ld	a,(hl)	;l_gint
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	call	l_f16_mul
-	call	invf16
-	pop	bc
-	pop	af
-	pop	af
-	push	bc
-	ret
-
-
-.i_10
-	ld	hl,4	;const
-	add	hl,sp
-	ld	a,(hl)	;l_gint
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	call	log2f16
-	push	hl
-	ld	hl,4	;const
-	add	hl,sp
-	ld	a,(hl)	;l_gint
-	inc	hl
-	ld	h,(hl)
-	ld	l,a
-	call	l_f16_mul
-	call	exp2f16
 	pop	bc
 	pop	af
 	pop	af
@@ -604,7 +578,6 @@
 	GLOBAL	isnotequalf16_callee
 	GLOBAL	isunorderedf16
 	GLOBAL	isunorderedf16_callee
-	GLOBAL	asm_f16_pow
 
 
 ; --- End of Scope Defns ---

@@ -562,6 +562,11 @@ ENDIF
 
 IF (__SCCZ80 | __ASM) && (CLIB_OPT_PRINTF & $3fc00000)
 ; This is used for floats only so we can check the library spec
+
+IFNDEF CLIB_32BIT_FLOATS
+EXTERN CLIB_32BIT_FLOATS
+ENDIF
+
 printf_return_is_6:
    ld a,CLIB_32BIT_FLOATS
    and a

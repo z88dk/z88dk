@@ -19,7 +19,7 @@ defc   __CONFIG_Z88DK_INC_ = 1
 
 
 
-defc __Z88DK = 2000
+defc __Z88DK = 2100
 
 
 

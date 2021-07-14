@@ -1,15 +1,15 @@
 
-#include "m32_math.h"
+#include "math16.h"
 
-float m32_atan2f (float y, float x)
+half_t atan2f16 (half_t y, half_t x)
 {
-    float v;
+    half_t v;
 
     if( x != 0.0)
     {
-        if(m32_fabsf(x) >= m32_fabsf(y))
+        if(fabsf16(x) >= fabsf16(y))
         {
-            v = m32_atanf(y/x);
+            v = atanf16(y/x);
             if( x < 0.0)
             {
                 if(y >= 0.0)
@@ -20,7 +20,7 @@ float m32_atan2f (float y, float x)
         }
         else
         {
-            v = -m32_atanf(x/y);
+            v = -atanf16(x/y);
             if(y < 0.0)
                 v -= M_PI_2;
             else

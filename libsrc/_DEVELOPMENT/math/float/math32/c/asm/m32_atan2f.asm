@@ -257,6 +257,8 @@
 	GLOBAL _inv
 	GLOBAL _sqr_fastcall
 	GLOBAL _sqr
+	GLOBAL _neg_fastcall
+	GLOBAL _neg
 	GLOBAL _isunordered_callee
 	GLOBAL _isunordered
 	GLOBAL _islessgreater_callee
@@ -420,7 +422,7 @@ _m32_atan2f:
 	push	ix
 	ld	ix,0
 	add	ix,sp
-	ld	hl, -6
+	ld	hl, -5
 	add	hl, sp
 	ld	sp, hl
 	ld	hl,0x0000
@@ -433,27 +435,52 @@ _m32_atan2f:
 	ld	h,(ix+5)
 	push	hl
 	call	___fslt_callee
-	ld	(ix-6),l
+	ld	(ix-5),l
 	ld	a,(ix+11)
 	and	a,0x7f
 	or	a,(ix+10)
 	or	a,(ix+9)
 	or	a,(ix+8)
-	jp	Z, l_m32_atan2f_00117
+	jp	Z, l_m32_atan2f_00118
 	ld	l,(ix+8)
 	ld	h,(ix+9)
 	ld	e,(ix+10)
 	ld	d,(ix+11)
 	call	_m32_fabsf
-	ld	(ix-5),l
-	ld	(ix-4),h
-	ld	(ix-3),e
-	ld	(ix-2),d
+	ld	(ix-4),l
+	ld	(ix-3),h
+	ld	(ix-2),e
+	ld	(ix-1),d
 	ld	l,(ix+4)
 	ld	h,(ix+5)
 	ld	e,(ix+6)
 	ld	d,(ix+7)
 	call	_m32_fabsf
+	push	de
+	push	hl
+	ld	l,(ix-2)
+	ld	h,(ix-1)
+	push	hl
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	push	hl
+	call	___fslt_callee
+	bit	0,l
+	jr	NZ,l_m32_atan2f_00110
+	ld	l,(ix+10)
+	ld	h,(ix+11)
+	push	hl
+	ld	l,(ix+8)
+	ld	h,(ix+9)
+	push	hl
+	ld	l,(ix+6)
+	ld	h,(ix+7)
+	push	hl
+	ld	l,(ix+4)
+	ld	h,(ix+5)
+	push	hl
+	call	___fsdiv_callee
+	call	_m32_atanf
 	push	hl
 	push	de
 	ld	hl,0x0000
@@ -466,58 +493,35 @@ _m32_atan2f:
 	ld	h,(ix+9)
 	push	hl
 	call	___fslt_callee
-	ld	(ix-1),l
+	ld	a, l
 	pop	de
 	pop	bc
-	push	de
-	push	bc
-	ld	l,(ix-3)
-	ld	h,(ix-2)
-	push	hl
-	ld	l,(ix-5)
-	ld	h,(ix-4)
-	push	hl
-	call	___fslt_callee
-	bit	0, l
-	jr	NZ,l_m32_atan2f_00107
-	ld	l,(ix+10)
-	ld	h,(ix+11)
-	push	hl
-	ld	l,(ix+8)
-	ld	h,(ix+9)
-	push	hl
-	ld	l,(ix+6)
-	ld	h,(ix+7)
-	push	hl
-	ld	l,(ix+4)
-	ld	h,(ix+5)
-	push	hl
-	call	___fsdiv_callee
-	call	_m32_atanf
-	ld	a,(ix-1)
 	or	a, a
-	jr	Z,l_m32_atan2f_00105
-	bit	0,(ix-6)
+	jp	Z, l_m32_atan2f_00111
+	bit	0,(ix-5)
 	jr	NZ,l_m32_atan2f_00102
-	ld	bc,0x4049
-	push	bc
-	ld	bc,0x0fdb
-	push	bc
-	push	de
+	ld	hl,0x4049
 	push	hl
+	ld	hl,0x0fdb
+	push	hl
+	push	de
+	push	bc
 	call	___fsadd_callee
-	jr	l_m32_atan2f_00105
+	ld	c, l
+	ld	b, h
+	jr	l_m32_atan2f_00111
 l_m32_atan2f_00102:
-	ld	bc,0x4049
-	push	bc
-	ld	bc,0x0fdb
-	push	bc
-	push	de
+	ld	hl,0x4049
 	push	hl
+	ld	hl,0x0fdb
+	push	hl
+	push	de
+	push	bc
 	call	___fssub_callee
-l_m32_atan2f_00105:
-	jp	l_m32_atan2f_00119
-l_m32_atan2f_00107:
+	ld	c, l
+	ld	b, h
+	jr	l_m32_atan2f_00111
+l_m32_atan2f_00110:
 	ld	l,(ix+6)
 	ld	h,(ix+7)
 	push	hl
@@ -532,33 +536,37 @@ l_m32_atan2f_00107:
 	push	hl
 	call	___fsdiv_callee
 	call	_m32_atanf
-	ld	a,d
+	ld	a, d
 	xor	a,0x80
-	ld	d,a
-	ld	a,(ix-1)
-	or	a,a
-	ld	c,l
-	ld	b,h
-	jr	Z,l_m32_atan2f_00109
-	ld	hl,0x3fc9
-	push	hl
-	ld	hl,0x0fdb
-	push	hl
-	push	de
+	ld	d, a
+	ld	a,(ix-5)
+	or	a, a
+	jr	Z,l_m32_atan2f_00107
+	ld	bc,0x3fc9
 	push	bc
+	ld	bc,0x0fdb
+	push	bc
+	push	de
+	push	hl
 	call	___fssub_callee
-	jr	l_m32_atan2f_00110
-l_m32_atan2f_00109:
-	ld	hl,0x3fc9
-	push	hl
-	ld	hl,0x0fdb
-	push	hl
-	push	de
+	ld	c, l
+	ld	b, h
+	jr	l_m32_atan2f_00111
+l_m32_atan2f_00107:
+	ld	bc,0x3fc9
 	push	bc
+	ld	bc,0x0fdb
+	push	bc
+	push	de
+	push	hl
 	call	___fsadd_callee
-l_m32_atan2f_00110:
-	jr	l_m32_atan2f_00119
-l_m32_atan2f_00117:
+	ld	c, l
+	ld	b, h
+l_m32_atan2f_00111:
+	ld	l, c
+	ld	h, b
+	jr	l_m32_atan2f_00120
+l_m32_atan2f_00118:
 	ld	l,(ix+6)
 	ld	h,(ix+7)
 	push	hl
@@ -571,22 +579,22 @@ l_m32_atan2f_00117:
 	call	___fslt_callee
 	ld	a, l
 	or	a, a
-	jr	Z,l_m32_atan2f_00114
+	jr	Z,l_m32_atan2f_00115
 	ld	de,0x3fc9
 	ld	hl,0x0fdb
-	jr	l_m32_atan2f_00119
-l_m32_atan2f_00114:
-	ld	a,(ix-6)
+	jr	l_m32_atan2f_00120
+l_m32_atan2f_00115:
+	ld	a,(ix-5)
 	or	a, a
-	jr	Z,l_m32_atan2f_00118
+	jr	Z,l_m32_atan2f_00119
 	ld	de,0xbfc9
 	ld	hl,0x0fdb
-	jr	l_m32_atan2f_00119
-l_m32_atan2f_00118:
+	jr	l_m32_atan2f_00120
+l_m32_atan2f_00119:
 	ld	hl,0x0000
 	ld	e,l
 	ld	d,h
-l_m32_atan2f_00119:
+l_m32_atan2f_00120:
 	ld	sp, ix
 	pop	ix
 	ret

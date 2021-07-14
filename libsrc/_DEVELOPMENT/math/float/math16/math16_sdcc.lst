@@ -33,6 +33,16 @@ math/float/math16/c/sdcc/cm16_sdcc_sqrt
 math/float/math16/c/sdcc/cm16_sdcc_sub
 math/float/math16/c/sdcc/cm16_sdcc_sub_callee
 
+math/float/math16/c/sdcc/cm16_sdcc_acos
+math/float/math16/c/sdcc/cm16_sdcc_asin
+math/float/math16/c/sdcc/cm16_sdcc_atan
+math/float/math16/c/sdcc/cm16_sdcc_atan2
+math/float/math16/c/sdcc/cm16_sdcc_atan2_callee
+
+math/float/math16/c/sdcc/cm16_sdcc_cos
+math/float/math16/c/sdcc/cm16_sdcc_sin
+math/float/math16/c/sdcc/cm16_sdcc_tan
+
 math/float/math16/c/sdcc/cm16_sdcc___eq
 math/float/math16/c/sdcc/cm16_sdcc___eq_callee
 math/float/math16/c/sdcc/cm16_sdcc___gt
