@@ -19,6 +19,7 @@ target/multi8/graphics/w_plotpixl
 target/multi8/graphics/w_respixl
 target/multi8/graphics/w_xorpixl
 target/multi8/graphics/w_pointxy
+target/multi8/graphics/getmaxx
 @gfx/wide/gfx_wide.lst
 target/multi8/psg/set_psg
 target/multi8/psg/set_psg_callee

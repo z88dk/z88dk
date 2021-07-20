@@ -2,6 +2,7 @@
 	SECTION	  code_driver 
 
 	PUBLIC	w_pixeladdress
+        EXTERN  __gfx_fatpix
 
 
 ; Entry  hl = x
@@ -10,6 +11,11 @@
 ;	 a = pixel number
 ; Uses: a, bc, de, hl
 .w_pixeladdress
+        ld      a,(__gfx_fatpix)
+        and     a
+        jr      z,not_fatpix    ;We could just jump into the rotation properly
+        add     hl,hl
+not_fatpix:
 	; Reduce x down to the byte number
 	ld	b,l		;Save lower of number
 	srl	h		;Max 640
