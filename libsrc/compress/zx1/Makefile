@@ -3,7 +3,8 @@ include ../../Make.config
 TARGET ?= test
 
 NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/compress/zx1/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/compress/zx1/z80/asm*.asm"
-NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy  obj/newlib-gbz80
+NEWLIB_8080 := "$(NEWLIB_DIRECTORY)/compress/zx1/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/compress/zx1/8080/asm*.asm"
+NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy  obj/newlib-gbz80 obj/newlib-8080
 
 space :=
 space +=
@@ -27,7 +28,7 @@ obj/newlib-ixiy:
 	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 -IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/newlib-8080:  
-	@$(ASSEMBLER) -d -O=obj/8080/x -I.. -m8080 -D__CLASSIC $(NEWLIBGLOBS)
+	@$(ASSEMBLER) -d -O=obj/8080/x -I.. -m8080 -D__CLASSIC $(NEWLIB_8080)
 
 obj/newlib-gbz80:  
 	@$(ASSEMBLER) -d -O=obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(NEWLIBGLOBS)
