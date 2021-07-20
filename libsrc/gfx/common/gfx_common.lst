@@ -24,4 +24,7 @@ gfx/common/obj/${TARGET}/c_plot
 gfx/common/obj/${TARGET}/c_unplot
 gfx/common/obj/${TARGET}/c_xorplot
 gfx/common/obj/${TARGET}/c_point
+gfx/common/obj/${TARGET}/__gfx_fatpix
+gfx/common/obj/${TARGET}/gfx_set_fatpix
 @gfx/x11/x11.lst
+

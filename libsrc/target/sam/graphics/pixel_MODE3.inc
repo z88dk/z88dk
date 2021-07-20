@@ -2,7 +2,7 @@
     EXTERN  pixeladdress_MODE3
     EXTERN  __gfx_coords
     EXTERN  __sam_MODE3_attr
-    EXTERN  __sam_MODE3_fatpix
+    EXTERN  __gfx_fatpix
     EXTERN  __sam_graphics_pagein
     EXTERN  __sam_graphics_pageout
     EXTERN  l_cmp
@@ -41,7 +41,7 @@ ELIF NEEDplot | NEEDxor
 ENDIF
     ld      c,a
     ex      af,af
-    ld      a,(__sam_MODE3_fatpix)
+    ld      a,(__gfx_fatpix)
     and     a
     jr      z,not_fatpix
     ; We have fatpix here, so we only have two pixels in each byte

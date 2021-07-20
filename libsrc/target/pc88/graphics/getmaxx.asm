@@ -6,18 +6,23 @@
         PUBLIC    getmaxx
         PUBLIC    _getmaxx
 	EXTERN	  __pc88_gfxmode
-	EXTERN	__console_w
+	EXTERN	  __console_w
+        EXTERN    __gfx_fatpix
 
 .getmaxx
 ._getmaxx
-	ld	a,(__pc88_gfxmode)
-	ld	hl,639
-	and	a
-	ret	z
 	; We must be in lores mode here
 	ld	a,(__console_w)
 	add	a
 	dec	a
 	ld	l,a
 	ld	h,0
+	ld	a,(__pc88_gfxmode)
+        and     a
+        ret     nz
+        ld      hl,319
+        ld      a,(__gfx_fatpix)
+        and     a
+        ret     nz
+        ld      hl,639
 	ret
