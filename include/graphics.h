@@ -216,6 +216,13 @@ extern int y_4x6;
 extern int __LIB__ getmaxx(void);
 extern int __LIB__ getmaxy(void);
 
+/* Set FATPIX mode.
+ *
+ * Some targets have rectangular pixels in hires mode (eg SAM Coupe), setting
+ * fatpix doubles the width of pixels to make them "square"
+ */
+extern void __LIB__ gfx_set_fatpix(int enable);
+
 /* The "stencil" object is an evolution of a base concept introduced 
  * by Rafael de Oliveira Jannone in his gfx library: 
  * a convex area is defined by two byte vectors, pointing 
