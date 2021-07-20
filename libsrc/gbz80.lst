@@ -1,5 +1,6 @@
 @assert/assert.lst
 @alloc/alloc_gbz80.lst
+@compress/aplib/compress_aplib.lst
 @compress/zx7/zx7.lst
 @compress/zx1/compress_zx1.lst
 @compress/zx2/compress_zx2.lst
