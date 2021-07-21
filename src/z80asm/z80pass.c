@@ -108,6 +108,15 @@ Z80pass2(void)
 				patch_byte(expr->code_pos, (byte_t)value);
 				break;
 
+			case RANGE_HIGH_OFFSET:
+				if ((value & 0xff00) != 0) {
+					if ((value & 0xff00) != 0xff00)
+						warn_int_range(value);
+				}
+
+				patch_byte(expr->code_pos, (byte_t)(value & 0xff));
+				break;
+
 			case RANGE_WORD:
 				patch_word(expr->code_pos, (int)value);
 				break;

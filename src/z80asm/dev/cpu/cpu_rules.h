@@ -30258,7 +30258,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_GBZ80: 
 if (!expr_in_parens) return false;
-DO_stmt_n(0xF0);
+DO_stmt_h(0xF0);
 break;
 default: error_illegal_ident(); }
 }
@@ -30275,7 +30275,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_GBZ80: 
 if (!expr_in_parens) return false;
-DO_stmt_n(0xE0);
+DO_stmt_h(0xE0);
 break;
 default: error_illegal_ident(); }
 }

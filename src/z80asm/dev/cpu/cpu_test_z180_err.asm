@@ -5022,11 +5022,11 @@
  lddrx                          ; Error
  lddsr                          ; Error
  lddx                           ; Error
- ldh (-128), a                  ; Error
+ ldh (0), a                     ; Error
  ldh (127), a                   ; Error
  ldh (255), a                   ; Error
  ldh (c), a                     ; Error
- ldh a, (-128)                  ; Error
+ ldh a, (0)                     ; Error
  ldh a, (127)                   ; Error
  ldh a, (255)                   ; Error
  ldh a, (c)                     ; Error

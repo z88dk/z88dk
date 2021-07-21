@@ -96,6 +96,7 @@ typedef enum {
 	RANGE_BYTE_TO_WORD_UNSIGNED,    // unsigned byte extended to 16 bits
 	RANGE_BYTE_TO_WORD_SIGNED,      // signed byte sign-extended to 16 bits
 	RANGE_PTR24,					// 24-bit pointer
+	RANGE_HIGH_OFFSET,				// byte offset to 0xFF00 
 } range_t;
 
 /* return size in bytes of value of given range */

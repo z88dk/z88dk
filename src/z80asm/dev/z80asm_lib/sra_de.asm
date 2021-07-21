@@ -8,37 +8,37 @@
 ; z80   16    16
 ; z80n  16    16
 
-      SECTION  code_crt0_sccz80
-      PUBLIC   __z80asm__sra_de
+        SECTION code_crt0_sccz80
+        PUBLIC  __z80asm__sra_de
 
 __z80asm__sra_de:
 
-IF __CPU_INTEL__
-      push  af
+IF  __CPU_INTEL__
+        push    af
 
-      ld    a, d
-      rla                     ; save bit 7 in carry
-      ld    a, d
-      rra                     ; rotate right, maitain bit 7
-      ld    d, a
+        ld      a, d
+        rla                             ; save bit 7 in carry
+        ld      a, d
+        rra                             ; rotate right, maitain bit 7
+        ld      d, a
 
-      ld    a, e
-      rra   
-      ld    e, a
+        ld      a, e
+        rra
+        ld      e, a
 
-      jr    nc, carry0
+        jr      nc, carry0
 
-      pop   af
-      scf   
-      ret   
+        pop     af
+        scf
+        ret
 
 carry0:
-      pop   af
-      and   a
-      ret   
-ELSE  
-      sra   d
-      rr    e
-      ret   
-ENDIF 
+        pop     af
+        and     a
+        ret
+ELSE
+        sra     d
+        rr      e
+        ret
+ENDIF
 

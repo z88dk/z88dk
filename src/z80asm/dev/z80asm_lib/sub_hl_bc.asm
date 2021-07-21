@@ -8,21 +8,21 @@
 ; z80   80    80
 ; z80n  80    80
 
-      SECTION  code_crt0_sccz80
-      PUBLIC   __z80asm__sub_hl_bc
+        SECTION code_crt0_sccz80
+        PUBLIC  __z80asm__sub_hl_bc
 
 __z80asm__sub_hl_bc:
-      push  de
-      ld    d, a
+        push    de
+        ld      d, a
 
-      ld    a, l
-      sub   a, c
-      ld    l, a
+        ld      a, l
+        sub     a, c
+        ld      l, a
 
-      ld    a, h
-      sbc   a, b
-      ld    h, a
+        ld      a, h
+        sbc     a, b
+        ld      h, a
 
-      ld    a, d
-      pop   de
-      ret   
+        ld      a, d
+        pop     de
+        ret

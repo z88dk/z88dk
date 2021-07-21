@@ -8,11 +8,11 @@
 ; z80   15    15
 ; z80n  15    15
 
-      SECTION  code_crt0_sccz80
-      PUBLIC   __z80asm__sbc_hl_hl
+        SECTION code_crt0_sccz80
+        PUBLIC  __z80asm__sbc_hl_hl
 
 __z80asm__sbc_hl_hl:
-      ld    hl, 0
-      ret   nc
-      dec   hl
-      ret   
+        ld      hl, 0
+        ret     nc
+        dec     hl
+        ret

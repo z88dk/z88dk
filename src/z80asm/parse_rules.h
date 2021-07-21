@@ -78278,7 +78278,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_GBZ80:
 if (!expr_in_parens) return false;
-do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xF0), expr); } while(0);
+do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_h((0xF0), expr); } while(0);
 break;
 default: error_illegal_ident(); }
 }
@@ -78297,7 +78297,7 @@ default: error_illegal_ident(); }
 switch (opts.cpu) {
 case CPU_GBZ80:
 if (!expr_in_parens) return false;
-do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xE0), expr); } while(0);
+do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_h((0xE0), expr); } while(0);
 break;
 default: error_illegal_ident(); }
 }
