@@ -28,6 +28,9 @@ void add_opcode_jr_n(int opcode, struct Expr* expr, int asmpc_offset);
 /* add opcode followed by 8-bit unsigned expression */
 void add_opcode_n(int opcode, struct Expr *expr);
 
+/* add opcode followed by 8-bit offset to 0xff00 expression */
+void add_opcode_h(int opcode, struct Expr* expr);
+
 /* add opcode followed by 8-bit unsigned expression and a zero byte */
 void add_opcode_n_0(int opcode, struct Expr* expr);
 

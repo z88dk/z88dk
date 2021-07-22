@@ -370,6 +370,7 @@ static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
 			case 'L': expr->range = RANGE_DWORD;		break;
 			case 'J': expr->range = RANGE_JR_OFFSET;	break;
 			case 'P': expr->range = RANGE_PTR24;		break;
+			case 'H': expr->range = RANGE_HIGH_OFFSET;  break;
 			case '=': expr->range = RANGE_WORD;
 				xassert(strlen(target_name) > 0);
 				expr->target_name = spool_add(target_name);	// define expression as EQU
@@ -529,6 +530,15 @@ static void patch_exprs(ExprList* exprs)
 					warn_int_range(value);
 
 				patch_byte(expr->code_pos, (byte_t)value);
+				break;
+
+			case RANGE_HIGH_OFFSET:
+				if ((value & 0xff00) != 0) {
+					if ((value & 0xff00) != 0xff00)
+						warn_int_range(value);
+				}
+
+				patch_byte(expr->code_pos, (byte_t)(value & 0xff));
 				break;
 
 			case RANGE_BYTE_TO_WORD_UNSIGNED:

@@ -29,6 +29,7 @@ my %Tests;
 # asm placeholders:
 #	%s	signed byte
 #	%n	unsigned byte
+#   %h  high page offset
 #	%m	unsigned word
 #	%M	unsigned word, big-endian
 #	%j	jr offset
@@ -1270,8 +1271,8 @@ for my $cpu (@CPUS) {
 		}
 	}
 	elsif ($gameboy) {
-		add_opc($cpu, "ldh (%n), a", 0xE0, '%n');
-		add_opc($cpu, "ldh a, (%n)", 0xF0, '%n');
+		add_opc($cpu, "ldh (%h), a", 0xE0, '%h');
+		add_opc($cpu, "ldh a, (%h)", 0xF0, '%h');
 	
 		add_opc($cpu, "ld (c), a", 0xE2);
 		add_opc($cpu, "ldh (c), a", 0xE2);
@@ -1484,7 +1485,7 @@ for my $asm (sort keys %Opcodes) {
 	
 	# check for parens
 	my $parens;
-	if    ($asm =~ /\(%[nm]\)/) {		$parens = 'expr_in_parens'; }
+	if    ($asm =~ /\(%[nmh]\)/) {		$parens = 'expr_in_parens'; }
 	elsif ($asm =~ /%[snmjc]/) {		$parens = 'expr_no_parens'; }
 	else {								$parens = 'no_expr';   }
 		
@@ -1720,7 +1721,7 @@ sub parser_tokens {
 		elsif (/\G \( (\w+)		/gcx) { push @tokens, "_TK_IND_".uc($1); }
 		elsif (/\G , 			/gcx) { push @tokens, "_TK_COMMA"; }
 		elsif (/\G \) 			/gcx) { push @tokens, "_TK_RPAREN"; }
-		elsif (/\G \( %[nm] \)	/gcx) { push @tokens, "expr"; }
+		elsif (/\G \( %[nmh] \)	/gcx) { push @tokens, "expr"; }
 		elsif (/\G    %[snmMj]	/gcx) { push @tokens, "expr"; }
 		elsif (/\G \+ %[dsu]	/gcx) { push @tokens, "expr"; }
 		elsif (/\G    %[c]		/gcx) { push @tokens, "const_expr"; }
@@ -1840,6 +1841,9 @@ sub parse_code {
 	}
 	elsif ($bin =~ s/ %s$//) {
 		$stmt = "DO_stmt_d";
+	}
+	elsif ($bin =~ s/ %h$//) {
+		$stmt = "DO_stmt_h";
 	}
 	elsif ($bin =~ s/ %m %m$//) {
 		$stmt = "DO_stmt_nn";
@@ -2046,6 +2050,11 @@ sub add_tests {
 		add_tests($cpu, replace($asm, '%n', 255), replace($bin, '%n', 0xFF));
 		add_tests($cpu, replace($asm, '%n', 127), replace($bin, '%n', 0x7F));
 		add_tests($cpu, replace($asm, '%n', -128), replace($bin, '%n', 0x80));
+	}
+	elsif ($asm =~ /%h/) {
+		add_tests($cpu, replace($asm, '%h', 255), replace($bin, '%h', 0xFF));
+		add_tests($cpu, replace($asm, '%h', 127), replace($bin, '%h', 0x7F));
+		add_tests($cpu, replace($asm, '%h', 0), replace($bin, '%h', 0x00));
 	}
 	elsif ($asm =~ /%m/) {
 		add_tests($cpu, replace($asm, '%m', 65535), replace($bin, '%m %m', 0xFF." ".0xFF));

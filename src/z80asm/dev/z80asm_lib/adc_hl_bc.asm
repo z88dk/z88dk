@@ -8,12 +8,12 @@
 ; z80   15    15
 ; z80n  15    15
 
-      SECTION  code_crt0_sccz80
-      PUBLIC   __z80asm__adc_hl_bc
+        SECTION code_crt0_sccz80
+        PUBLIC  __z80asm__adc_hl_bc
 
 __z80asm__adc_hl_bc:
-      jr    nc, carry0
-      inc   hl
+        jr      nc, carry0
+        inc     hl
 carry0:
-      add   hl, bc
-      ret   
+        add     hl, bc
+        ret

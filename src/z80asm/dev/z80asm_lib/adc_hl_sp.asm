@@ -8,15 +8,15 @@
 ; z80   15    15
 ; z80n  15    15
 
-      SECTION  code_crt0_sccz80
-      PUBLIC   __z80asm__adc_hl_sp
+        SECTION code_crt0_sccz80
+        PUBLIC  __z80asm__adc_hl_sp
 
 __z80asm__adc_hl_sp:
-      jr    nc, carry0
-      inc   hl
+        jr      nc, carry0
+        inc     hl
 carry0:
-      inc   hl                ; compensate for return address on the stack
-      inc   hl
+        inc     hl                      ; compensate for return address on the stack
+        inc     hl
 
-      add   hl, sp
-      ret   
+        add     hl, sp
+        ret

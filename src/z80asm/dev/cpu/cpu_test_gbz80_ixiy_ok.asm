@@ -595,11 +595,11 @@
  ldd a, (de)                    ; 1A 1B
  ldd a, (hl)                    ; 3A
  lddr                           ; CD @__z80asm__lddr
- ldh (-128), a                  ; E0 80
+ ldh (0), a                     ; E0 00
  ldh (127), a                   ; E0 7F
  ldh (255), a                   ; E0 FF
  ldh (c), a                     ; E2
- ldh a, (-128)                  ; F0 80
+ ldh a, (0)                     ; F0 00
  ldh a, (127)                   ; F0 7F
  ldh a, (255)                   ; F0 FF
  ldh a, (c)                     ; F2
