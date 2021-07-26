@@ -88,6 +88,7 @@ TOCREATE += $(call check_target,pc6001,pc6001_clib.lib)
 TOCREATE += $(call check_target,pc88,pc88_clib.lib)
 TOCREATE += $(call check_target,pcw,pcw.lib $(CPMLIBS))
 TOCREATE += $(call check_target,pencil2,pencil2_clib.lib)
+TOCREATE += $(call check_target,pk8000,pk8000_clib.lib)
 TOCREATE += $(call check_target,pmd85,pmd85_clib.lib)
 TOCREATE += $(call check_target,pps,pps_clib.lib)
 TOCREATE += $(call check_target,primo,primo_clib.lib)
@@ -1705,6 +1706,15 @@ vector06c_clib.lib:
 	$(MAKE) -C gfx TARGET=vector06c FLAVOUR=wide
 	$(MAKE) -C games TARGET=vector06c
 	TARGET=vector06c TYPE=8080 $(LIBLINKER) -m8080 -DFORvector06c -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vector06c_clib @$(LISTFILE_DIRECTORY)/vector06c.lst
+
+pk8000_clib.lib:
+	@echo ''
+	@echo '--- Building PK8000 Library ---'
+	@echo ''
+	$(call buildgeneric,pk8000,portable)
+	#$(MAKE) -C gfx TARGET=vector06c FLAVOUR=wide
+	#$(MAKE) -C games TARGET=vector06c
+	TARGET=pk8000 TYPE=8080 $(LIBLINKER) -m8080 -DFORpk8000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pk8000_clib @$(LISTFILE_DIRECTORY)/pk8000.lst
 
 lviv_clib.lib:
 	@echo ''
