@@ -429,7 +429,8 @@ void *must_malloc(size_t sz)
 
     if ((p = malloc(sz)) == NULL)
         exit_log(1, "Error: Out of memory\n");
-
+    memset(p, 0, sz);
+    
     return p;
 }
 

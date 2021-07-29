@@ -68,6 +68,9 @@ extern option_t  abc80_options;
 extern int       acetap_exec(char *target);
 extern option_t  acetap_options;
 
+extern int       adam_exec(char *target);
+extern option_t  adam_options;
+
 extern int       aquarius_exec(char *target);
 extern option_t  aquarius_options;
 
@@ -302,6 +305,10 @@ struct {
       "Generates a .TAP for the Ace32 emulator, optional WAV file",
       NULL,
       acetap_exec,   &acetap_options },
+    { "bin2dpp",  "adam",    "(C) 2021 z88dk",
+      "Generates a .DDP for ADAM machines",
+      NULL,
+      adam_exec,   &adam_options },
     { "bin2caq",  "aquarius", "(C) 2001 Stefano Bodrato",
       "Creates a BASIC loader file and binary stored in variable array format",
       NULL,

@@ -29,6 +29,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\appmake\abc80.c" />
     <ClCompile Include="..\..\src\appmake\ace-tap.c" />
+    <ClCompile Include="..\..\src\appmake\adam.c" />
     <ClCompile Include="..\..\src\appmake\appmake.c" />
     <ClCompile Include="..\..\src\appmake\aquarius.c" />
     <ClCompile Include="..\..\src\appmake\c128.c" />
