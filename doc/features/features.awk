@@ -1,7 +1,6 @@
-/* Awk script to generate features.h from a CSV file
- *
- * Usage: awk -f proc.awk features.csv > features.h
- */
+# Awk script to generate features.h from a CSV file
+#
+#  Usage: awk -f proc.awk features.csv > features.h
 BEGIN {
    FS=","
    headers[0] = ""
