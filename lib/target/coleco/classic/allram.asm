@@ -1,4 +1,6 @@
-;	CRT0 stub for 64k adam
+;   CRT0 stub for 64k adam
+
+    INCLUDE     "target/coleco/def/eos.def"
 
 
     EXTERN  msx_set_mode
@@ -69,6 +71,27 @@ no_vbl:
     pop     af
     retn
 ENDIF
+
+
+; We're not using that much from EOS, so put these here
+; until we've got more functionality that should go into
+; a library
+PUBLIC fgetc_cons
+PUBLIC _fgetc_cons
+PUBLIC getk
+PUBLIC _getk
+fgetc_cons:
+_fgetc_cons:
+    call    ReadKeyboard
+    ld      l,a
+    ld      h,0
+    ret     nz
+    ld      l,0
+getk:
+_getk:
+    ret
+
+
 
 ; msxbios is a noop
 msxbios:

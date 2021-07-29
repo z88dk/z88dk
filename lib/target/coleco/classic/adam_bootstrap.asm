@@ -5,7 +5,6 @@
 
 
         SECTION     BOOTSTRAP
-        INCLUDE     "target/coleco/def/eos.def"
 
         EXTERN  __DATA_END_tail
 
