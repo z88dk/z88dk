@@ -78,17 +78,15 @@ ENDIF
 ; a library
 PUBLIC fgetc_cons
 PUBLIC _fgetc_cons
-PUBLIC getk
-PUBLIC _getk
 fgetc_cons:
 _fgetc_cons:
     call    ReadKeyboard
+    jr      nz,fgetc_cons
     ld      l,a
     ld      h,0
+    cp      13
     ret     nz
-    ld      l,0
-getk:
-_getk:
+    ld      l,10
     ret
 
 
