@@ -4984,6 +4984,12 @@
  ipset 3                        ; Error
  ipset 4                        ; Error
  ipset 4                        ; Error
+ j_lo -32768                    ; Error
+ j_lo 32767                     ; Error
+ j_lo 65535                     ; Error
+ j_lz -32768                    ; Error
+ j_lz 32767                     ; Error
+ j_lz 65535                     ; Error
  jlo -32768                     ; Error
  jlo 32767                      ; Error
  jlo 65535                      ; Error
@@ -5679,6 +5685,8 @@
  push ix                        ; Error
  push iy                        ; Error
  push su                        ; Error
+ r_lo                           ; Error
+ r_lz                           ; Error
  rdmode                         ; Error
  res -1, (hl)                   ; Error
  res -1, (hl)                   ; Error

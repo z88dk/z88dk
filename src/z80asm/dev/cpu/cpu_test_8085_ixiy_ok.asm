@@ -178,6 +178,36 @@
  bit.a 7, e                     ; 7B E6 80
  bit.a 7, h                     ; 7C E6 80
  bit.a 7, l                     ; 7D E6 80
+ c_c -32768                     ; DC 00 80
+ c_c 32767                      ; DC FF 7F
+ c_c 65535                      ; DC FF FF
+ c_m -32768                     ; FC 00 80
+ c_m 32767                      ; FC FF 7F
+ c_m 65535                      ; FC FF FF
+ c_nc -32768                    ; D4 00 80
+ c_nc 32767                     ; D4 FF 7F
+ c_nc 65535                     ; D4 FF FF
+ c_nv -32768                    ; E4 00 80
+ c_nv 32767                     ; E4 FF 7F
+ c_nv 65535                     ; E4 FF FF
+ c_nz -32768                    ; C4 00 80
+ c_nz 32767                     ; C4 FF 7F
+ c_nz 65535                     ; C4 FF FF
+ c_p -32768                     ; F4 00 80
+ c_p 32767                      ; F4 FF 7F
+ c_p 65535                      ; F4 FF FF
+ c_pe -32768                    ; EC 00 80
+ c_pe 32767                     ; EC FF 7F
+ c_pe 65535                     ; EC FF FF
+ c_po -32768                    ; E4 00 80
+ c_po 32767                     ; E4 FF 7F
+ c_po 65535                     ; E4 FF FF
+ c_v -32768                     ; EC 00 80
+ c_v 32767                      ; EC FF 7F
+ c_v 65535                      ; EC FF FF
+ c_z -32768                     ; CC 00 80
+ c_z 32767                      ; CC FF 7F
+ c_z 65535                      ; CC FF FF
  call -32768                    ; CD 00 80
  call 32767                     ; CD FF 7F
  call 65535                     ; CD FF FF
@@ -376,6 +406,48 @@
  inx h                          ; 23
  inx hl                         ; 23
  inx sp                         ; 33
+ j_c -32768                     ; DA 00 80
+ j_c 32767                      ; DA FF 7F
+ j_c 65535                      ; DA FF FF
+ j_k -32768                     ; FD 00 80
+ j_k 32767                      ; FD FF 7F
+ j_k 65535                      ; FD FF FF
+ j_m -32768                     ; FA 00 80
+ j_m 32767                      ; FA FF 7F
+ j_m 65535                      ; FA FF FF
+ j_nc -32768                    ; D2 00 80
+ j_nc 32767                     ; D2 FF 7F
+ j_nc 65535                     ; D2 FF FF
+ j_nk -32768                    ; DD 00 80
+ j_nk 32767                     ; DD FF 7F
+ j_nk 65535                     ; DD FF FF
+ j_nv -32768                    ; E2 00 80
+ j_nv 32767                     ; E2 FF 7F
+ j_nv 65535                     ; E2 FF FF
+ j_nx5 -32768                   ; DD 00 80
+ j_nx5 32767                    ; DD FF 7F
+ j_nx5 65535                    ; DD FF FF
+ j_nz -32768                    ; C2 00 80
+ j_nz 32767                     ; C2 FF 7F
+ j_nz 65535                     ; C2 FF FF
+ j_p -32768                     ; F2 00 80
+ j_p 32767                      ; F2 FF 7F
+ j_p 65535                      ; F2 FF FF
+ j_pe -32768                    ; EA 00 80
+ j_pe 32767                     ; EA FF 7F
+ j_pe 65535                     ; EA FF FF
+ j_po -32768                    ; E2 00 80
+ j_po 32767                     ; E2 FF 7F
+ j_po 65535                     ; E2 FF FF
+ j_v -32768                     ; EA 00 80
+ j_v 32767                      ; EA FF 7F
+ j_v 65535                      ; EA FF FF
+ j_x5 -32768                    ; FD 00 80
+ j_x5 32767                     ; FD FF 7F
+ j_x5 65535                     ; FD FF FF
+ j_z -32768                     ; CA 00 80
+ j_z 32767                      ; CA FF 7F
+ j_z 65535                      ; CA FF FF
  jc -32768                      ; DA 00 80
  jc 32767                       ; DA FF 7F
  jc 65535                       ; DA FF FF
@@ -412,15 +484,24 @@
  jp c, -32768                   ; DA 00 80
  jp c, 32767                    ; DA FF 7F
  jp c, 65535                    ; DA FF FF
+ jp k,-32768                    ; FD 00 80
+ jp k,32767                     ; FD FF 7F
+ jp k,65535                     ; FD FF FF
  jp m, -32768                   ; FA 00 80
  jp m, 32767                    ; FA FF 7F
  jp m, 65535                    ; FA FF FF
  jp nc, -32768                  ; D2 00 80
  jp nc, 32767                   ; D2 FF 7F
  jp nc, 65535                   ; D2 FF FF
+ jp nk,-32768                   ; DD 00 80
+ jp nk,32767                    ; DD FF 7F
+ jp nk,65535                    ; DD FF FF
  jp nv, -32768                  ; E2 00 80
  jp nv, 32767                   ; E2 FF 7F
  jp nv, 65535                   ; E2 FF FF
+ jp nx5,-32768                  ; DD 00 80
+ jp nx5,32767                   ; DD FF 7F
+ jp nx5,65535                   ; DD FF FF
  jp nz, -32768                  ; C2 00 80
  jp nz, 32767                   ; C2 FF 7F
  jp nz, 65535                   ; C2 FF FF
@@ -436,6 +517,9 @@
  jp v, -32768                   ; EA 00 80
  jp v, 32767                    ; EA FF 7F
  jp v, 65535                    ; EA FF FF
+ jp x5,-32768                   ; FD 00 80
+ jp x5,32767                    ; FD FF 7F
+ jp x5,65535                    ; FD FF FF
  jp z, -32768                   ; CA 00 80
  jp z, 32767                    ; CA FF 7F
  jp z, 65535                    ; CA FF FF
@@ -819,6 +903,16 @@
  push h                         ; E5
  push hl                        ; E5
  push psw                       ; F5
+ r_c                            ; D8
+ r_m                            ; F8
+ r_nc                           ; D0
+ r_nv                           ; E0
+ r_nz                           ; C0
+ r_p                            ; F0
+ r_pe                           ; E8
+ r_po                           ; E0
+ r_v                            ; E8
+ r_z                            ; C8
  ral                            ; 17
  rar                            ; 1F
  rc                             ; D8

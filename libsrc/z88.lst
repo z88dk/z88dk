@@ -82,5 +82,7 @@ target/z88/graphics/pixladdr
 target/z88/graphics/swapgfxbk
 target/z88/graphics/window
 @gfx/narrow/gfx_narrow.lst
-#
-
+@input/input_keyboard.lst
+target/z88/input/in_Pause
+target/z88/input/in_WaitForKey
+target/z88/input/in_WaitForNoKey

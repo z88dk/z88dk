@@ -313,6 +313,36 @@
  bsra de,b                      ; Error
  bsrf de,b                      ; Error
  bsrl de,b                      ; Error
+ c_c -32768                     ; Error
+ c_c 32767                      ; Error
+ c_c 65535                      ; Error
+ c_m -32768                     ; Error
+ c_m 32767                      ; Error
+ c_m 65535                      ; Error
+ c_nc -32768                    ; Error
+ c_nc 32767                     ; Error
+ c_nc 65535                     ; Error
+ c_nv -32768                    ; Error
+ c_nv 32767                     ; Error
+ c_nv 65535                     ; Error
+ c_nz -32768                    ; Error
+ c_nz 32767                     ; Error
+ c_nz 65535                     ; Error
+ c_p -32768                     ; Error
+ c_p 32767                      ; Error
+ c_p 65535                      ; Error
+ c_pe -32768                    ; Error
+ c_pe 32767                     ; Error
+ c_pe 65535                     ; Error
+ c_po -32768                    ; Error
+ c_po 32767                     ; Error
+ c_po 65535                     ; Error
+ c_v -32768                     ; Error
+ c_v 32767                      ; Error
+ c_v 65535                      ; Error
+ c_z -32768                     ; Error
+ c_z 32767                      ; Error
+ c_z 65535                      ; Error
  cmp a, ixh                     ; Error
  cmp a, ixl                     ; Error
  cmp a, iyh                     ; Error
@@ -803,6 +833,18 @@
  ipset -1                       ; Error
  ipset 4                        ; Error
  ipset 4                        ; Error
+ j_k -32768                     ; Error
+ j_k 32767                      ; Error
+ j_k 65535                      ; Error
+ j_nk -32768                    ; Error
+ j_nk 32767                     ; Error
+ j_nk 65535                     ; Error
+ j_nx5 -32768                   ; Error
+ j_nx5 32767                    ; Error
+ j_nx5 65535                    ; Error
+ j_x5 -32768                    ; Error
+ j_x5 32767                     ; Error
+ j_x5 65535                     ; Error
  jk -32768                      ; Error
  jk 32767                       ; Error
  jk 65535                       ; Error
@@ -813,6 +855,18 @@
  jnx5 32767                     ; Error
  jnx5 65535                     ; Error
  jp (c)                         ; Error
+ jp k,-32768                    ; Error
+ jp k,32767                     ; Error
+ jp k,65535                     ; Error
+ jp nk,-32768                   ; Error
+ jp nk,32767                    ; Error
+ jp nk,65535                    ; Error
+ jp nx5,-32768                  ; Error
+ jp nx5,32767                   ; Error
+ jp nx5,65535                   ; Error
+ jp x5,-32768                   ; Error
+ jp x5,32767                    ; Error
+ jp x5,65535                    ; Error
  jx5 -32768                     ; Error
  jx5 32767                      ; Error
  jx5 65535                      ; Error
