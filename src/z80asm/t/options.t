@@ -31,7 +31,7 @@ t_z80asm_capture("", 		$copyrightmsg, 	"", 0);
 # -v
 #------------------------------------------------------------------------------
 my $verbose_text = <<'END';
-Reading library 'z80asm-z80-.lib'
+Reading library 'z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
 Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'

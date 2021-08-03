@@ -16,11 +16,11 @@ require './t/testlib.pl';
 unlink_testfiles();
 spew("test.asm", "jp ASMPC");
 delete $ENV{Z80ASM};
-run("z80asm -b test.asm");
+run("./z88dk-z80asm -b test.asm");
 check_bin_file("test.bin", "\xC3\x00\x00");
 
 $ENV{Z80ASM} = "-r0x8000";
-run("z80asm -b test.asm");
+run("./z88dk-z80asm -b test.asm");
 check_bin_file("test.bin", "\xC3\x00\x80");
 
 delete $ENV{Z80ASM};

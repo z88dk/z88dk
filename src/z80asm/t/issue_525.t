@@ -29,15 +29,15 @@ path("test_dir/b/1/a.asm")->spew("defb 3");
 path("test_dir/b/2/a.asm")->spew("defb 4");
 
 unlink "test.bin";
-run("z80asm -b -otest.bin \"test_dir/**/*\"", 0, "", "");
+run("./z88dk-z80asm -b -otest.bin \"test_dir/**/*\"", 0, "", "");
 check_bin_file("test.bin", pack("C*", 1..4));
 
 unlink "test.bin";
-run("z80asm -b -otest.bin \"test_dir/*/*/*.asm\"", 0, "", "");
+run("./z88dk-z80asm -b -otest.bin \"test_dir/*/*/*.asm\"", 0, "", "");
 check_bin_file("test.bin", pack("C*", 1..4));
 
 unlink "test.bin";
-run("z80asm -b -otest.bin \"test_dir/**/*.asm\"", 0, "", "");
+run("./z88dk-z80asm -b -otest.bin \"test_dir/**/*.asm\"", 0, "", "");
 check_bin_file("test.bin", pack("C*", 1..4));
 
 path("test_dir")->remove_tree;

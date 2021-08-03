@@ -223,7 +223,7 @@ spew("test1.asm", <<"END");
 	defc REG = $REG
 	defc VAL = $VAL
 END
-run("z80asm test1.asm", 0, "", "");
+run("./z88dk-z80asm test1.asm", 0, "", "");
 
 z80asm(<<'END', "-mz80n -b -otest.bin test1.o", 0, "", "");
 	extern VER,HOR,REG,VAL

@@ -40,18 +40,18 @@ END
 # assemble
 unlink 'test0001.bin';
 spew("test.lst", join("\n", @list), "\n");
-run('z80asm -b "@test.lst"');
+run('./z88dk-z80asm -b "@test.lst"');
 check_bin_file('test0001.bin', $bin);
 
 # link only
 unlink 'test0001.bin';
 for (@list) { unlink "$_.asm"; }
-run('z80asm -b "@test.lst"');
+run('./z88dk-z80asm -b "@test.lst"');
 check_bin_file('test0001.bin', $bin);
 
 # make library
 unlink 'test.lib';
-run('z80asm -b -xtest "@test.lst"');
+run('./z88dk-z80asm -b -xtest "@test.lst"');
 ok -f 'test.lib';
 
 # use library

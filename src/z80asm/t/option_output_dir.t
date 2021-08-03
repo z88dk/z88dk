@@ -22,7 +22,7 @@ END
 
 # first run without -O
 unlink_output();
-run("z80asm -s -l -m -g -b test.asm");
+run("./z88dk-z80asm -s -l -m -g -b test.asm");
 for (@output) {
 	ok -f $_, "$_";
 }
@@ -32,7 +32,7 @@ ok ! -d "test_dir", "! test_dir";
 # second run with -O
 for my $dir ('test_dir', 'test_dir////sub//dir//') {	# use pairs of /, as they will be converted to \ in run()
 	unlink_output();
-	run("z80asm -s -l -m -g -b -O$dir test.asm");
+	run("./z88dk-z80asm -s -l -m -g -b -O$dir test.asm");
 	ok -d $dir, $dir;
 	for (@output) {
 		ok -f "$dir/$_", "$dir/$_";
@@ -49,7 +49,7 @@ mkdir("test_src/s1/s2");
 spew("test_src/s1/s2/test.asm",<<END);
 	ret
 END
-run("z80asm -s -l -m -g -b -O=test_dir test_src/s1/s2/test.asm");
+run("./z88dk-z80asm -s -l -m -g -b -O=test_dir test_src/s1/s2/test.asm");
 ok -d "test_dir/test_src/s1/s2", "test_dir/test_src/s1/s2";
 for (@output) {
 	ok -f "test_dir/test_src/s1/s2/$_", "test_dir/test_src/s1/s2/$_";

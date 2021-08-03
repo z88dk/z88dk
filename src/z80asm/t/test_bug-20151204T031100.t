@@ -39,7 +39,7 @@ spew("test.asm", "
 
 		defc var_2 = var_1
 ");
-run("z80asm -b -m test.asm");
+run("./z88dk-z80asm -b -m test.asm");
 ok -f "test_AAA.bin", "test_AAA.bin";
 ok -f "test.map", "no test.map";
 check_bin_file("test_AAA.bin", "\x02\x00\xCD\x02\x00");
@@ -82,7 +82,7 @@ spew("test.asm", "
 		SECTION BBB
 		defc var_2 = var_1
 ");
-run("z80asm -b -m test.asm");
+run("./z88dk-z80asm -b -m test.asm");
 ok -f "test_AAA.bin", "test_AAA.bin";
 ok -f "test.map", "no test.map";
 check_bin_file("test_AAA.bin", "\x02\x00\xCD\x02\x00");

@@ -34,7 +34,7 @@ main:
 	ret
 END
 
-run("z80asm -b -m test.asm test1.asm");
+run("./z88dk-z80asm -b -m test.asm test1.asm");
 check_text_file("test.map", <<'END');
 main                            = $0000 ; addr, local, , test, , test.asm:3
 func                            = $0004 ; addr, public, , test1, , test1.c:1
@@ -43,7 +43,7 @@ __tail                          = $000A ; const, public, def, , ,
 __size                          = $000A ; const, public, def, , ,
 END
 
-run("z80asm -b -debug test.asm test1.asm");
+run("./z88dk-z80asm -b -debug test.asm test1.asm");
 check_text_file("test.map", <<'END');
 main                            = $0000 ; addr, local, , test, , test.asm:3
 __ASM_LINE_3                    = $0000 ; addr, local, , test, , test.asm:3

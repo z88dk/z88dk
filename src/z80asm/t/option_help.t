@@ -16,7 +16,7 @@ my $config = slurp("../config.h");
 my($version) = $config =~ /Z88DK_VERSION\s*"(.*)"/;
 ok $version, "version $version";
 
-run("z80asm -h", 0, <<"END", "");
+run("./z88dk-z80asm -h", 0, <<"END", "");
 Z80 Module Assembler $version
 (c) InterLogic 1993-2009, Paulo Custodio 2011-2020
 
@@ -93,7 +93,7 @@ Appmake Options:
                          for above RAMTOP
 END
 
-run("z80asm -h=x", 1, "", <<END);
+run("./z88dk-z80asm -h=x", 1, "", <<END);
 Error: illegal option: -h=x
 END
 

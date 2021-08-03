@@ -1,13 +1,13 @@
 #------------------------------------------------------------------------------
 # Z88DK Z80 Module Assembler
 #
-# Build and test z80asm-*.lib
+# Build and test z88dk-z80asm-*.lib
 #
 # Copyright (C) Gunther Strube, InterLogic 1993-99
 # Copyright (C) Paulo Custodio, 2011-2019
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
-PROJ		:= z80asm
+PROJ		:= z88dk-z80asm
 
 INSTALL 	?= install
 Z80ASM_EXE	?= ../../$(PROJ)

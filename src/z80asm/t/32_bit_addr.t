@@ -43,7 +43,7 @@ path('test.asm')->spew(<<'END');
 	defq func2
 END
 
-run("z80asm -b -m -l test.asm test1.asm test2.asm");
+run("./z88dk-z80asm -b -m -l test.asm test1.asm test2.asm");
 
 check_bin_file('test_test1.bin', pack("C*",
 										#	section test1

@@ -30,7 +30,7 @@ path("test.asm")->spew(<<END);
 var: defw 0x1234
 END
 
-my $cmd = "./z80asm -l -b test.asm";
+my $cmd = "./z88dk-z80asm -l -b test.asm";
 ok 1, $cmd;
 my($stdout, $stderr, $return) = capture { system $cmd; };
 is $stdout, "", "stdout";

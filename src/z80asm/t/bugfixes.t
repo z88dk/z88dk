@@ -493,7 +493,7 @@ for my $op ("jr", "djnz", "jr nc,") {
 	pietro_loader:
 		ret
 ...
-	my $cmd = "z80asm -b test.asm";
+	my $cmd = "./z88dk-z80asm -b test.asm";
 	ok 1, $cmd;
 	my($stdout, $stderr, $return) = capture { system $cmd; };
 	is_text( $stdout, "", "stdout" );

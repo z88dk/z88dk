@@ -31,7 +31,7 @@ EXTERN MAIN
 defb (MAIN - 1) / 10 % 10 + '0'
 END
 
-run("z80asm -b test.asm test1.asm");
+run("./z88dk-z80asm -b test.asm test1.asm");
 check_bin_file("test.bin", "7");
 
 unlink_testfiles();

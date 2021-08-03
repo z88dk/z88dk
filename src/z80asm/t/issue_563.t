@@ -27,7 +27,7 @@ spew("test2.asm",<<END);
 		ret
 END
 
-run("z80asm -otestx.o test1.asm test2.asm");
+run("./z88dk-z80asm -otestx.o test1.asm test2.asm");
 z80nm("testx.o", <<'END');
 Object  file testx.o at $0000: Z80RMF14
   Name: testx
@@ -45,7 +45,7 @@ spew("test.asm", <<'END');
 		call main1
 END
 
-run("z80asm -b test.asm testx.o");
+run("./z88dk-z80asm -b test.asm testx.o");
 check_bin_file("test.bin", pack("C*", 0xCD, 0x03, 0x00, 0xC9));
 
 unlink_testfiles();

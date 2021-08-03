@@ -137,7 +137,7 @@ spew("test2.asm", "
 	}									
 	defb df16, df17, df18				;; 98 99 9A
 ");
-run("z80asm -b test.asm test1.asm test2.asm");
+run("./z88dk-z80asm -b test.asm test1.asm test2.asm");
 check_bin_file("test.bin", "\x80\x84\x88\x8E\x96\x96\x97\x98\x98\x98\x99\x9A");
 
 
@@ -160,7 +160,7 @@ spew("test.asm", "
 		df2	ds.q 16383					;; error: integer '65572' out of range
 	}
 ");
-run("z80asm -b test.asm", 1, "", <<END);
+run("./z88dk-z80asm -b test.asm", 1, "", <<END);
 Error at file 'test.asm' line 5: integer '65572' out of range
 END
 
@@ -172,7 +172,7 @@ spew("test.asm", "
 		df2	ds.q 16384					;; error: integer '65536' out of range
 	}
 ");
-run("z80asm -b test.asm", 1, "", <<END);
+run("./z88dk-z80asm -b test.asm", 1, "", <<END);
 Error at file 'test.asm' line 4: integer '65536' out of range
 END
 
@@ -181,7 +181,7 @@ unlink_testfiles();
 spew("test.asm", "
 	defvars 							;; error: syntax error
 ");
-run("z80asm -b test.asm", 1, "", <<END);
+run("./z88dk-z80asm -b test.asm", 1, "", <<END);
 Error at file 'test.asm' line 2: syntax error
 END
 
@@ -190,7 +190,7 @@ unlink_testfiles();
 spew("test.asm", "
 	defvars 0							;; error: missing {} block
 ");
-run("z80asm -b test.asm", 1, "", <<END);
+run("./z88dk-z80asm -b test.asm", 1, "", <<END);
 Error at file 'test.asm' line 3: missing {} block
 END
 
@@ -199,7 +199,7 @@ unlink_testfiles();
 spew("test.asm", "
 	defvars 0 {							;; error: {} block not closed
 ");
-run("z80asm -b test.asm", 1, "", <<END);
+run("./z88dk-z80asm -b test.asm", 1, "", <<END);
 Error at file 'test.asm' line 3: {} block not closed
 END
 

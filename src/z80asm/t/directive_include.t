@@ -51,7 +51,7 @@ mkdir("test_dir");
 
 spew("test_dir/test.inc", 'ld a,10');
 spew("test_dir/test.asm", 'include "test.inc"');
-run("z80asm -b test_dir/test.asm");
+run("./z88dk-z80asm -b test_dir/test.asm");
 check_bin_file("test_dir/test.bin", pack("C*", 0x3E, 10));
 
 # error_read_file
