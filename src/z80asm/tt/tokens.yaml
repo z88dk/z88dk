@@ -187,6 +187,10 @@ tokens:
   - name    : LO
   - name    : NV
   - name    : V
+  - name    : NK
+  - name    : K
+  - name    : NX5
+  - name    : X5
 
   # 8-bit registers
   - name    : B

@@ -4567,6 +4567,42 @@
  ipset 1                        ; ED 56
  ipset 2                        ; ED 4E
  ipset 3                        ; ED 5E
+ j_c -32768                     ; DA 00 80
+ j_c 32767                      ; DA FF 7F
+ j_c 65535                      ; DA FF FF
+ j_lo -32768                    ; EA 00 80
+ j_lo 32767                     ; EA FF 7F
+ j_lo 65535                     ; EA FF FF
+ j_lz -32768                    ; E2 00 80
+ j_lz 32767                     ; E2 FF 7F
+ j_lz 65535                     ; E2 FF FF
+ j_m -32768                     ; FA 00 80
+ j_m 32767                      ; FA FF 7F
+ j_m 65535                      ; FA FF FF
+ j_nc -32768                    ; D2 00 80
+ j_nc 32767                     ; D2 FF 7F
+ j_nc 65535                     ; D2 FF FF
+ j_nv -32768                    ; E2 00 80
+ j_nv 32767                     ; E2 FF 7F
+ j_nv 65535                     ; E2 FF FF
+ j_nz -32768                    ; C2 00 80
+ j_nz 32767                     ; C2 FF 7F
+ j_nz 65535                     ; C2 FF FF
+ j_p -32768                     ; F2 00 80
+ j_p 32767                      ; F2 FF 7F
+ j_p 65535                      ; F2 FF FF
+ j_pe -32768                    ; EA 00 80
+ j_pe 32767                     ; EA FF 7F
+ j_pe 65535                     ; EA FF FF
+ j_po -32768                    ; E2 00 80
+ j_po 32767                     ; E2 FF 7F
+ j_po 65535                     ; E2 FF FF
+ j_v -32768                     ; EA 00 80
+ j_v 32767                      ; EA FF 7F
+ j_v 65535                      ; EA FF FF
+ j_z -32768                     ; CA 00 80
+ j_z 32767                      ; CA FF 7F
+ j_z 65535                      ; CA FF FF
  jc -32768                      ; DA 00 80
  jc 32767                       ; DA FF 7F
  jc 65535                       ; DA FF FF
@@ -5422,6 +5458,18 @@
  push iy                        ; FD E5
  push psw                       ; F5
  push su                        ; ED 66
+ r_c                            ; D8
+ r_lo                           ; E8
+ r_lz                           ; E0
+ r_m                            ; F8
+ r_nc                           ; D0
+ r_nv                           ; E0
+ r_nz                           ; C0
+ r_p                            ; F0
+ r_pe                           ; E8
+ r_po                           ; E0
+ r_v                            ; E8
+ r_z                            ; C8
  ral                            ; 17
  rar                            ; 1F
  rc                             ; D8

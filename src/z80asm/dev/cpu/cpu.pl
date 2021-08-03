@@ -1072,7 +1072,7 @@ for my $cpu (@CPUS) {
 	}
 	
 	# DJNZ
-	# TODO: check that address is corretly computed in DJNZ B', LABEL - 76 10 FE or 76 10 FD
+	# TODO: check that address is correctly computed in DJNZ B', LABEL - 76 10 FE or 76 10 FD
 	if ($intel) {
 		# Emulate with "DEB B / JP NZ, nn" on 8080/8085
 		add_opc($cpu, "djnz %m", 		dec_r('b'), 
@@ -1113,10 +1113,11 @@ for my $cpu (@CPUS) {
 		
 		# TODO: Rabbit LJP not supported
 		add_opc($cpu, "jp $f, %m", 		jp_f($_f), '%m', '%m');
+		add_opc($cpu, "j$_f %m", 		jp_f($_f), '%m', '%m');
 		add_opc($cpu, "j$f %m", 		jp_f($_f), '%m', '%m') 
 			unless $f eq 'p'; #1318 do not define jp as jump-positive ( && !$intel; )
 	}
-	
+    
 	for ([hl => ()]) {
 		my($x, @pfx) = @$_;
 		add_opc($cpu, "jp ($x)", @pfx, 0xE9);
@@ -1164,6 +1165,7 @@ for my $cpu (@CPUS) {
 		}
 		else {
 			add_opc($cpu, "call $f, %m",call_f($_f), '%m', '%m');
+			add_opc($cpu, "c$_f %m", 	call_f($_f), '%m', '%m');
 			add_opc($cpu, "c$f %m", 	call_f($_f), '%m', '%m') 
 				unless $f eq 'p'; #1318 do not define cp as call-positive ( && !$intel; )
 		}
@@ -1182,6 +1184,7 @@ for my $cpu (@CPUS) {
 		next if $f !~ /^(nz|z|nc|c)$/ && $gameboy;
 		
 		add_opc($cpu, "ret $f",			ret_f($_f));
+		add_opc($cpu, "r$_f",			ret_f($_f));
 		add_opc($cpu, "r$f",			ret_f($_f));
 	}	
 
@@ -1376,13 +1379,20 @@ for my $cpu (@CPUS) {
 
 		# Jump on flag X5/K is set
 		add_opc($cpu, "jx5 %m",			0xFD, '%m', '%m');
+		add_opc($cpu, "j_x5 %m",		0xFD, '%m', '%m');
+		add_opc($cpu, "jp x5,%m",		0xFD, '%m', '%m');
 		add_opc($cpu, "jk %m",			0xFD, '%m', '%m');
+		add_opc($cpu, "j_k %m",			0xFD, '%m', '%m');
+		add_opc($cpu, "jp k,%m",		0xFD, '%m', '%m');
 
 		add_opc($cpu, "jnx5 %m",		0xDD, '%m', '%m');
+		add_opc($cpu, "j_nx5 %m",		0xDD, '%m', '%m');
+		add_opc($cpu, "jp nx5,%m",		0xDD, '%m', '%m');
 		add_opc($cpu, "jnk %m",			0xDD, '%m', '%m');
+		add_opc($cpu, "j_nk %m",		0xDD, '%m', '%m');
+		add_opc($cpu, "jp nk,%m",		0xDD, '%m', '%m');
 	}
 }
-
 
 #------------------------------------------------------------------------------
 # build cpu tables

@@ -135,6 +135,10 @@ TOKEN_RABBIT(LZ)        // issue #577
 TOKEN_RABBIT(LO)        // issue #577
 TOKEN_KW(NV, )
 TOKEN_KW(V, )
+TOKEN_8085(X5)
+TOKEN_8085(NX5)
+TOKEN_8085(K)
+TOKEN_8085(NK)
 
 /* 8-bit registers */
 TOKEN_KW(B, )
