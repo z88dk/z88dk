@@ -19,7 +19,7 @@
 
 
 ; patch build instructions:
-; z80asm -b lisp-patch.asm
+; z88dk-z80asm -b lisp-patch.asm
 ; appmake +zx -b lisp-patch.bin --org 65368
 
 

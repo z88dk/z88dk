@@ -17,13 +17,13 @@ require './t/testlib.pl';
 unlink_testfiles();
 
 # not possible to create empty library file
-run('z80asm -xtest.lib "test*.asm"', 1, '', <<'...');
+run('./z88dk-z80asm -xtest.lib "test*.asm"', 1, '', <<'...');
 Error: pattern 'test*.asm' returned no files
 ...
 
 # force the error and check behaviour
 spew("test.asm", "");
-run('z80asm -xtest.lib "test.asm"', 0, '', '');
+run('./z88dk-z80asm -xtest.lib "test.asm"', 0, '', '');
 ok -f "test.lib";
 my $bytes = slurp("test.lib");
 spew("test.lib", substr($bytes, 0, 8));		# invalid lib, only header
@@ -32,7 +32,7 @@ spew("test.asm", <<'...');
 	extern main
 	jp main
 ...
-run('z80asm -b -ltest.lib test.asm', 1, '', <<'...');
+run('./z88dk-z80asm -b -ltest.lib test.asm', 1, '', <<'...');
 Error at file 'test.asm' line 2: symbol 'main' not defined
 ...
 

@@ -25,7 +25,7 @@ test2.asm
 ...
 unlink "test2.lst";
 
-run('z80asm -b -otest.bin "@test1.lst"', 1, '', <<'...');
+run('./z88dk-z80asm -b -otest.bin "@test1.lst"', 1, '', <<'...');
 Error at file 'test1.lst' line 2: cannot read file 'test2.lst'
 ...
 
@@ -37,7 +37,7 @@ test2.asm
 ...
 unlink "test2.lst";
 
-run('z80asm -b -otest.bin "@test1.lst"', 1, '', <<'...');
+run('./z88dk-z80asm -b -otest.bin "@test1.lst"', 1, '', <<'...');
 Error at file 'test1.lst' line 2: pattern 'test2*.lst' returned no files
 ...
 

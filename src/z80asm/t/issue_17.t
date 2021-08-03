@@ -30,14 +30,14 @@ END
 		defb 3
 END
 
-	run("z80asm -b test.asm");
+	run("./z88dk-z80asm -b test.asm");
 	check_bin_file("test.bin", pack("C*", 1, 2, 3));
 	
 	spew("test.asm", <<END);
 		line 1, "test_dir${slash}test.inc"
 		ld
 END
-	run("z80asm test.asm", 1, "", <<END);
+	run("./z88dk-z80asm test.asm", 1, "", <<END);
 Error at file 'test_dir${slash}test.inc' line 1: syntax error
 END
 
@@ -45,7 +45,7 @@ END
 		c_line 1, "test_dir${slash}test.c"
 		ld
 END
-	run("z80asm test.asm", 1, "", <<END);
+	run("./z88dk-z80asm test.asm", 1, "", <<END);
 Error at file 'test_dir${slash}test.c' line 1: syntax error
 END
 

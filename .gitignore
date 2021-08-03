@@ -21,6 +21,7 @@
 bin/
 examples/console/_dir.txt
 examples/console/build/
+examples/c128/SGDEMO.T64
 examples/cpm/adv_a.def
 examples/cpm/ddir.def
 examples/cpm/enigma.def
@@ -59,12 +60,19 @@ examples/z88/app/useless.epr
 examples/z88/app/viewer.epr
 examples/z88/app/wc.epr
 examples/z88/cube.epr
+examples/z88/cube.ap0
 examples/z88/cubeflt16.epr
+examples/z88/cubeflt16.ap0
 examples/z88/dstar.epr
+examples/z88/dstar.ap0
 examples/z88/farmalloc.epr
+examples/z88/farmalloc.ap0
 examples/z88/rpn.epr
+examples/z88/rpn.ap0
 examples/z88/useless.epr
+examples/z88/useless.ap0
 examples/z88/wc.epr
+examples/z88/wc.ap0
 include/_DEVELOPMENT/clang/lib/
 include/_DEVELOPMENT/proto/lib/
 include/_DEVELOPMENT/sccz80/lib/
@@ -139,6 +147,8 @@ support/basck/z88dk-basck
 support/graphics/z88dk-z80svg
 support/pv1000/z88dk-font2pv1000
 t/**
+test/feature/_dir.txt
+test/feature/build/
 win32/*/Debug/
 win32/*/Release/
 win32/*/x64/

@@ -5,7 +5,8 @@
 # License: http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
-PROJ			:= z80asm
+BARE_PROJ	:= z80asm
+PROJ		:= z88dk-$(BARE_PROJ)
 
 # EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)
@@ -21,45 +22,43 @@ ifeq ($(EXESUFFIX),.exe)
 				   ../../ext/UNIXem/src/dirent.o
 endif
 
-CC 				?= gcc
-INSTALL 		?= install
-CROSS			?= 0
+CC 		?= gcc
+INSTALL 	?= install
+CROSS		?= 0
 
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
-SRCS			:= $(filter-out test.c,$(wildcard *.c lib/*.c ../common/*.c ../../ext/regex/reg*.c))
-OBJS 			:= $(SRCS:.c=.o) \
-				   $(UNIXem_OBJS)
-DEPENDS			:= $(SRCS:.c=.d)
+SRCS		:= $(filter-out test.c,$(wildcard *.c lib/*.c ../common/*.c ../../ext/regex/reg*.c))
+OBJS 		:= $(SRCS:.c=.o) \
+		   $(UNIXem_OBJS)
+DEPENDS		:= $(SRCS:.c=.d)
 TEST_SRC_MAIN	:= $(wildcard t/test_*.c)
 TEST_SRC_LIB	:= t/testlib.c
 
 #------------------------------------------------------------------------------
 # variables
 #------------------------------------------------------------------------------
-TARGET 			= $(PROJ)$(EXESUFFIX)
+OPT 		= -O3
 
-OPT 			= -O3
-
-STD 			= -std=gnu11
-LOCAL_LIB 		:= lib
+STD 		= -std=gnu11
+LOCAL_LIB	:= lib
 LOCAL_CFLAGS 	+= -MMD -I. -I$(LOCAL_LIB) -It -g -Wall $(STD) $(OPT) \
-				   -I../common \
-				   -I../../ext/optparse \
-				   -I../../ext/regex \
-				   -I../../ext/uthash/src \
-				   $(UNIXem_CFLAGS)
+		   -I../common \
+		   -I../../ext/optparse \
+		   -I../../ext/regex \
+		   -I../../ext/uthash/src \
+		   $(UNIXem_CFLAGS)
 
 #------------------------------------------------------------------------------
 # main
 #------------------------------------------------------------------------------
 .PHONY: all
 
-all: $(TARGET)
+all: $(PROJ)$(EXESUFFIX)
 
-$(TARGET): ../config.h $(OBJS)
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
+$(PROJ)$(EXESUFFIX): ../config.h $(OBJS)
+	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -o $(PROJ)$(EXESUFFIX) $(OBJS) $(LDFLAGS)
 
 ../config.h:
 	@echo \#define PREFIX \"/usr/local/share/z88dk\" 				 > $@
@@ -121,9 +120,9 @@ clean::
 #------------------------------------------------------------------------------
 # install
 #------------------------------------------------------------------------------
-install: $(TARGET) z80asm_lib
-	$(INSTALL) $(TARGET)     $(PREFIX)/bin/$(TARGET)
-	$(INSTALL) $(TARGET)     $(PREFIX)/bin/z88dk-$(TARGET)
+install: $(PROJ)$(EXESUFFIX) z80asm_lib
+	$(INSTALL) $(PROJ)$(EXESUFFIX)     $(PREFIX)/bin/$(PROJ)$(EXESUFFIX)
+	$(INSTALL) $(PROJ)$(EXESUFFIX)     $(PREFIX)/bin/$(BARE_PROJ)$(EXESUFFIX)
 	$(INSTALL) asmpp.pl      $(PREFIX)/bin/z88dk-asmpp
 	$(INSTALL) asmstyle.pl   $(PREFIX)/bin/z88dk-asmstyle
 	$(MAKE) -C dev/z80asm_lib install PREFIX=$(PREFIX_SHARE)
@@ -166,7 +165,7 @@ clean::
 all:
 	perl dev/cpu2/cpu.pl
 
-test: $(TARGET) z80asm_lib
+test: $(PROJ)$(EXESUFFIX) z80asm_lib
 	$(MAKE) dev
 	$(MAKE) z80asm_lib
 	$(MAKE) prove_c
@@ -182,14 +181,14 @@ testlib:
 
 prove_c: t/libtestlib.a $(TEST_SRC_MAIN:.c=.o) $(TEST_SRC_MAIN:.c=.out)
 
-prove_perl: $(TARGET)
+prove_perl: $(PROJ)$(EXESUFFIX)
 	perl -S prove -It2 --state=slow,save -j9 t2/*.t
 	perl -S prove t/*.t
 
 clean::
 	$(RM) zcc_opt.def zcc_proj.lst
 
-testzcc : $(TARGET)
+testzcc : $(PROJ)$(EXESUFFIX)
 	zcc +zx -lndos       -create-app -omicroman.bin ../../examples/microman.c
 	zcc +zx -lndos -lmzx -create-app -omandel.bin   ../../examples/graphics/mandel.c
 	eightyone microman.tap
@@ -201,7 +200,7 @@ clean::
 
 clean::
 	$(RM) -r *.dSYM
-	$(RM) $(TARGET) $(LOCAL_LIB)/$(TARGET) test* $(LOCAL_LIB)/test*
+	$(RM) $(PROJ)$(EXESUFFIX) $(LOCAL_LIB)/$(PROJ)$(EXESUFFIX) test* $(LOCAL_LIB)/test*
 	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/dev/*.tmp
 
 #------------------------------------------------------------------------------

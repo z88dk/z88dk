@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # Z88DK Z80 Macro Assembler
 #
-# Test z80asm-*.lib
+# Test z88dk-z80asm-*.lib
 #
 # Copyright (C) Paulo Custodio, 2011-2019
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0

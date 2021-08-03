@@ -59,12 +59,12 @@ for my $one_step (0, 1) {
 	spew("test2.asm", $test2_asm);
 
 	if ($one_step) {
-		run("z80asm -b -o=test -m test1.asm test2.asm");
+		run("./z88dk-z80asm -b -o=test -m test1.asm test2.asm");
 	}
 	else {
-		run("z80asm test1.asm");
-		run("z80asm test2.asm");
-		run("z80asm -b -o=test -m test1.o test2.o");
+		run("./z88dk-z80asm test1.asm");
+		run("./z88dk-z80asm test2.asm");
+		run("./z88dk-z80asm -b -o=test -m test1.o test2.o");
 	}
 
 
@@ -142,9 +142,9 @@ spew("test2.asm", <<'END');
 	defb "Hello", 0
 END
 
-run("z80asm test1.asm");
-run("z80asm test2.asm");
-run("z80asm -b -o=test -m test1.o test2.o");
+run("./z88dk-z80asm test1.asm");
+run("./z88dk-z80asm test2.asm");
+run("./z88dk-z80asm -b -o=test -m test1.o test2.o");
 
 ok -f "test_CODE.bin", "test_CODE.bin exists";
 ok -s "test_CODE.bin" >= 4, "test_CODE.bin size OK";

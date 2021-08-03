@@ -38,7 +38,7 @@ check_bin_file("test_BSS.bin", 	pack("C*", 0x01, 0x00));
 # compile and link in two step
 unlink_testfiles();
 z80asm($asm, "");
-run("z80asm -b test.o");
+run("./z88dk-z80asm -b test.o");
 check_bin_file("test.bin", 		pack("C*", 0xC9));
 check_bin_file("test_DATA.bin", 	pack("C*", 0x00, 0x00));
 check_bin_file("test_BSS.bin", 	pack("C*", 0x01, 0x00));

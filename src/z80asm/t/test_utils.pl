@@ -23,7 +23,7 @@ my $STOP_ON_ERR = grep {/-stop/} @ARGV;
 my $KEEP_FILES	= grep {/-keep/} @ARGV;
 my $test	 = "test";
 
-sub z80asm	 { $ENV{Z80ASM_EXE} || "./z80asm" }
+sub z80asm	 { $ENV{Z80ASM_EXE} || "./z88dk-z80asm" }
 
 my @TEST_EXT = (qw( asm lis inc bin map o lib sym def err
 					exe c cpp lst prj i reloc tap P ));

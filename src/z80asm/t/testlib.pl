@@ -111,7 +111,7 @@ sub z80asm {
 	$options //= "-b";
 	
 	spew("test.asm", $source);
-	run("z80asm $options test.asm", $return, $out, $err);
+	run("./z88dk-z80asm $options test.asm", $return, $out, $err);
 }
 
 sub appmake {

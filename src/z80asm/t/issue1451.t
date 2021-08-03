@@ -10,9 +10,9 @@ use strict;
 use warnings;
 use Test::More;
 
-my $got_zsdcc = `which zsdcc 2> /dev/null`;
+my $got_zsdcc = `which z88dk-zsdcc 2> /dev/null`;
 if (!$got_zsdcc) {
-    diag("zsdcc not found, test skipped");
+    diag("z88dk-zsdcc not found, test skipped");
     ok 1;
 }
 else {

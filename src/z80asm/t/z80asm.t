@@ -16,7 +16,7 @@ require './t/test_utils.pl';
 
 # empty input file
 path("test.asm")->spew("");
-run("./z80asm -b test.asm");
+run("./z88dk-z80asm -b test.asm");
 ok -f "test.o", 	"output object file exists";
 ok -f "test.bin", 	"output binary file exists";
 t_binary(path("test.bin")->slurp_raw, "");
@@ -34,7 +34,7 @@ path("test.asm")->spew(<<'END');
 	section BSS
 	org -1
 END
-run("./z80asm -b test.asm");
+run("./z88dk-z80asm -b test.asm");
 
 
 unlink_testfiles();

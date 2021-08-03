@@ -181,7 +181,7 @@ void parse_argv( int argc, char *argv[] )
 		process_files( arg, argc, argv );	/* process each source file */
 
 	make_output_dir();						/* create output directory if needed */
-	include_z80asm_lib();					/* search for z80asm-*.lib, append to library path */
+	include_z80asm_lib();					/* search for z88dk-z80asm-*.lib, append to library path */
 	define_assembly_defines();				/* defined options-dependent constants */
 }
 

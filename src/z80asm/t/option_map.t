@@ -55,7 +55,7 @@ my $bin = "\x06\x0A\x10\xFE\x00\x00\x06\x0A\x10\xFE\xC9";
 unlink_testfiles();
 spew("test.asm", $asm_s);
 spew("test1.asm", $asm1_s);
-run("z80asm -b test.asm test1.asm");
+run("./z88dk-z80asm -b test.asm test1.asm");
 ok ! -f "test.map", "no test.map";
 check_bin_file("test.bin", $bin);
 
@@ -64,7 +64,7 @@ check_bin_file("test.bin", $bin);
 unlink_testfiles();
 spew("test.asm", $asm_s);
 spew("test1.asm", $asm1_s);
-run("z80asm -b -m test.asm test1.asm");
+run("./z88dk-z80asm -b -m test.asm test1.asm");
 ok -f "test.map", "found test.map";
 check_bin_file("test.bin", $bin);
 check_text_file("test.map", <<'END');
@@ -78,7 +78,7 @@ END
 unlink_testfiles();
 spew("test.asm", $asm);
 spew("test1.asm", $asm1);
-run("z80asm -b -m test.asm test1.asm");
+run("./z88dk-z80asm -b -m test.asm test1.asm");
 ok -f "test.map", "found test.map";
 check_bin_file("test.bin", $bin);
 check_text_file("test.map", <<'END');

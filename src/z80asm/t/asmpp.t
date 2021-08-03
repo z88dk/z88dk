@@ -466,7 +466,7 @@ sub t_asmpp_error {
 		system $cmd;
 	};
 	ok $return != 0, "exit value";
-	$stdout =~ s/^z80asm -b.*\s*//;
+	$stdout =~ s/^z88dk-z80asm -b.*\s*//;
 	is_text($stdout, "", "stdout");
 	is_text($stderr, $error, "stderr");
 }

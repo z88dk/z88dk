@@ -7,7 +7,7 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 # Repository: https://github.com/z88dk/z88dk/
 #
-# Test loading of z80asm-*.lib
+# Test loading of z88dk-z80asm-*.lib
 
 use Modern::Perl;
 use Test::More;
@@ -33,8 +33,8 @@ path('testdir')->remove_tree;
 path('testdir/root/lib/config')->mkpath;
 
 # run with lib in current directory
-run("./z80asm -b -v test.asm", 0, <<'END', "");
-Reading library 'z80asm-z80-.lib'
+run("./z88dk-z80asm -b -v test.asm", 0, <<'END', "");
+Reading library 'z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
 Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
@@ -52,11 +52,11 @@ t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT
 
 # run with lib pointed bt ZCCCFG
 $ENV{ZCCCFG} = 'testdir/root/lib/config';
-move('z80asm-z80-.lib', $ENV{ZCCCFG}.'/../z80asm-z80-.lib');
-run("./z80asm -b -v test.asm", 0, <<'END', "");
-Library 'z80asm-z80-.lib' not found
-Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
-Reading library 'testdir/root/lib/z80asm-z80-.lib'
+move('z88dk-z80asm-z80-.lib', $ENV{ZCCCFG}.'/../z88dk-z80asm-z80-.lib');
+run("./z88dk-z80asm -b -v test.asm", 0, <<'END', "");
+Library 'z88dk-z80asm-z80-.lib' not found
+Library '/usr/local/share/z88dk/lib/z88dk-z80asm-z80-.lib' not found
+Reading library 'testdir/root/lib/z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
 Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
@@ -73,10 +73,10 @@ t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT
 delete $ENV{ZCCCFG};
 
 # point library with -L
-run("./z80asm -b -v -Ltestdir/root/lib test.asm", 0, <<'END', "");
-Library 'z80asm-z80-.lib' not found
-Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
-Reading library 'testdir/root/lib/z80asm-z80-.lib'
+run("./z88dk-z80asm -b -v -Ltestdir/root/lib test.asm", 0, <<'END', "");
+Library 'z88dk-z80asm-z80-.lib' not found
+Library '/usr/local/share/z88dk/lib/z88dk-z80asm-z80-.lib' not found
+Reading library 'testdir/root/lib/z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
 Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
@@ -93,10 +93,10 @@ t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT
 
 
 # run without library
-run("./z80asm -b -v test.asm", 1, <<'OUT', <<'ERR');
-Library 'z80asm-z80-.lib' not found
-Library '/usr/local/share/z88dk/lib/z80asm-z80-.lib' not found
-Library '/../z80asm-z80-.lib' not found
+run("./z88dk-z80asm -b -v test.asm", 1, <<'OUT', <<'ERR');
+Library 'z88dk-z80asm-z80-.lib' not found
+Library '/usr/local/share/z88dk/lib/z88dk-z80asm-z80-.lib' not found
+Library '/../z88dk-z80asm-z80-.lib' not found
 Predefined constant: __CPU_Z80__ = $0001
 Predefined constant: __CPU_ZILOG__ = $0001
 Assembling 'test.asm' to 'test.o'
@@ -111,27 +111,27 @@ ERR
 
 
 # restore z80asm-z80-.lib
-move('testdir/root/lib/z80asm-z80-.lib', 'z80asm-z80-.lib');
+move('testdir/root/lib/z88dk-z80asm-z80-.lib', 'z88dk-z80asm-z80-.lib');
 
 
 # test loading of each different library for different CPUs
-run("./z80asm -b -v                 test.asm", 0, exp_output("z80",		0, "z80asm-z80-.lib"), "");
-run("./z80asm -b -v           -IXIY test.asm", 0, exp_output("z80",		1, "z80asm-z80-ixiy.lib"), "");
+run("./z88dk-z80asm -b -v                 test.asm", 0, exp_output("z80",		0, "z88dk-z80asm-z80-.lib"), "");
+run("./z88dk-z80asm -b -v           -IXIY test.asm", 0, exp_output("z80",		1, "z88dk-z80asm-z80-ixiy.lib"), "");
 
-run("./z80asm -b -v -mz80           test.asm", 0, exp_output("z80",		0, "z80asm-z80-.lib"), "");
-run("./z80asm -b -v -mz80     -IXIY test.asm", 0, exp_output("z80",		1, "z80asm-z80-ixiy.lib"), "");
+run("./z88dk-z80asm -b -v -mz80           test.asm", 0, exp_output("z80",		0, "z88dk-z80asm-z80-.lib"), "");
+run("./z88dk-z80asm -b -v -mz80     -IXIY test.asm", 0, exp_output("z80",		1, "z88dk-z80asm-z80-ixiy.lib"), "");
 
-run("./z80asm -b -v -mz80n          test.asm", 0, exp_output("z80n",   	0, "z80asm-z80n-.lib"), "");
-run("./z80asm -b -v -mz80n    -IXIY test.asm", 0, exp_output("z80n",   	1, "z80asm-z80n-ixiy.lib"), "");
+run("./z88dk-z80asm -b -v -mz80n          test.asm", 0, exp_output("z80n",   	0, "z88dk-z80asm-z80n-.lib"), "");
+run("./z88dk-z80asm -b -v -mz80n    -IXIY test.asm", 0, exp_output("z80n",   	1, "z88dk-z80asm-z80n-ixiy.lib"), "");
 
-run("./z80asm -b -v -mz180          test.asm", 0, exp_output("z180",	0, "z80asm-z180-.lib"), "");
-run("./z80asm -b -v -mz180    -IXIY test.asm", 0, exp_output("z180",	1, "z80asm-z180-ixiy.lib"), "");
+run("./z88dk-z80asm -b -v -mz180          test.asm", 0, exp_output("z180",	0, "z88dk-z80asm-z180-.lib"), "");
+run("./z88dk-z80asm -b -v -mz180    -IXIY test.asm", 0, exp_output("z180",	1, "z88dk-z80asm-z180-ixiy.lib"), "");
 
-run("./z80asm -b -v -mr2k           test.asm", 0, exp_output("r2k",		0, "z80asm-r2k-.lib"), "");
-run("./z80asm -b -v -mr2k     -IXIY test.asm", 0, exp_output("r2k",		1, "z80asm-r2k-ixiy.lib"), "");
+run("./z88dk-z80asm -b -v -mr2k           test.asm", 0, exp_output("r2k",		0, "z88dk-z80asm-r2k-.lib"), "");
+run("./z88dk-z80asm -b -v -mr2k     -IXIY test.asm", 0, exp_output("r2k",		1, "z88dk-z80asm-r2k-ixiy.lib"), "");
 
-run("./z80asm -b -v -mr3k           test.asm", 0, exp_output("r3k",		0, "z80asm-r3k-.lib"), "");
-run("./z80asm -b -v -mr3k     -IXIY test.asm", 0, exp_output("r3k",		1, "z80asm-r3k-ixiy.lib"), "");
+run("./z88dk-z80asm -b -v -mr3k           test.asm", 0, exp_output("r3k",		0, "z88dk-z80asm-r3k-.lib"), "");
+run("./z88dk-z80asm -b -v -mr3k     -IXIY test.asm", 0, exp_output("r3k",		1, "z88dk-z80asm-r3k-ixiy.lib"), "");
 
 path('testdir')->remove_tree;
 unlink_testfiles();

@@ -37,7 +37,7 @@ spew("test.asm", <<'...');
 ...
 
 for (0..$#cond) {
-	run("z80asm -b $cond[$_] test.asm", 0, '', '');
+	run("./z88dk-z80asm -b $cond[$_] test.asm", 0, '', '');
 	check_bin_file("test.bin", pack("C*", $_));
 }
 
@@ -55,7 +55,7 @@ spew("test.asm", <<'...');
 ...
 
 for (0..$#cond) {
-	run("z80asm -b $cond[$_] test.asm", 0, '', '');
+	run("./z88dk-z80asm -b $cond[$_] test.asm", 0, '', '');
 	check_bin_file("test.bin", pack("C*", $_));
 }
 
@@ -77,7 +77,7 @@ spew("test.asm", <<'...');
 ...
 
 for (0..$#cond) {
-	run("z80asm -b $cond[$_] test.asm", 0, '', '');
+	run("./z88dk-z80asm -b $cond[$_] test.asm", 0, '', '');
 	check_bin_file("test.bin", pack("C*", $_));
 }
 
@@ -95,7 +95,7 @@ spew("test.asm", <<'...');
 ...
 
 for (0..$#cond) {
-	run("z80asm -b $cond[$_] test.asm", 0, '', '');
+	run("./z88dk-z80asm -b $cond[$_] test.asm", 0, '', '');
 	check_bin_file("test.bin", pack("C*", $_));
 }
 
@@ -124,7 +124,7 @@ spew("test.asm", <<'...');
 ...
 
 for (0..$#cond) {
-	run("z80asm -b $cond[$_] test.asm", 0, '', '');
+	run("./z88dk-z80asm -b $cond[$_] test.asm", 0, '', '');
 	check_bin_file("test.bin", pack("C*", $_));
 }
 
@@ -142,7 +142,7 @@ spew("test.asm", <<'...');
 ...
 
 for (0..$#cond) {
-	run("z80asm -b $cond[$_] test.asm", 0, '', '');
+	run("./z88dk-z80asm -b $cond[$_] test.asm", 0, '', '');
 	check_bin_file("test.bin", pack("C*", $_));
 }
 

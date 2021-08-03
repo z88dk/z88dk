@@ -96,11 +96,11 @@ for my $one_step (0, 1) {
 	spew("test_source.asm", $test_source);
 
 	if ($one_step) {
-		run("z80asm -b -o=test -m test_map.asm test_source.asm");
+		run("./z88dk-z80asm -b -o=test -m test_map.asm test_source.asm");
 	}
 	else {
-		run("z80asm test_map.asm test_source.asm");
-		run("z80asm -b -o=test -m test_map.o test_source.o");
+		run("./z88dk-z80asm test_map.asm test_source.asm");
+		run("./z88dk-z80asm -b -o=test -m test_map.o test_source.o");
 	}
 
 	check_bin_file("test_s0.bin", pack("C*", 0, 1, 2, 3));
