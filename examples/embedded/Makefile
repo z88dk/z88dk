@@ -2,7 +2,7 @@
 all: embedded_clib2.lib hello.bin sine.bin loop.bin savage.bin
 
 embedded_clib2.lib: fputc_cons.asm fgetc_cons.asm
-	z80asm -d -DFORembedded -xembedded_clib2 @clib2.lst
+	z88dk-z80asm -d -DFORembedded -xembedded_clib2 @clib2.lst
 
 ns16450.o: embedded_clib2.lib ns16450.h ns16450.c
 	zcc +embedded -vn -c ns16450.c 
