@@ -71,6 +71,21 @@ ragel, to expand token definition from token_def.h.
 #define TOKEN_ZXN(opcode)	 \
 	TOKEN_ZXN1(opcode, #opcode)
 
+#define TOKEN_8085_1(opcode, string)	 \
+	string <CAT> i										<NL> \
+	{													<NL> \
+		<TAB>		if (opts.cpu == CPU_8085) {			<NL> \
+		<TAB><TAB>		sym.tok        = TK_##opcode;	<NL> \
+		<TAB>		}									<NL> \
+		<TAB>		else {								<NL> \
+		<TAB><TAB>		sym.tok        = TK_NAME;		<NL> \
+		<TAB>		}									<NL> \
+		<TAB>		fbreak; 							<NL> \
+	};													<NL>
+
+#define TOKEN_8085(opcode)	 \
+	TOKEN_8085_1(opcode, #opcode)
+
 %%{
 machine lexer;
 

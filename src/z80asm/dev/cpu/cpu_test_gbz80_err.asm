@@ -1996,6 +1996,24 @@
  bsra de,b                      ; Error
  bsrf de,b                      ; Error
  bsrl de,b                      ; Error
+ c_m -32768                     ; Error
+ c_m 32767                      ; Error
+ c_m 65535                      ; Error
+ c_nv -32768                    ; Error
+ c_nv 32767                     ; Error
+ c_nv 65535                     ; Error
+ c_p -32768                     ; Error
+ c_p 32767                      ; Error
+ c_p 65535                      ; Error
+ c_pe -32768                    ; Error
+ c_pe 32767                     ; Error
+ c_pe 65535                     ; Error
+ c_po -32768                    ; Error
+ c_po 32767                     ; Error
+ c_po 65535                     ; Error
+ c_v -32768                     ; Error
+ c_v 32767                      ; Error
+ c_v 65535                      ; Error
  call lo, -32768                ; Error
  call lo, 32767                 ; Error
  call lo, 65535                 ; Error
@@ -4964,6 +4982,42 @@
  ipset 3                        ; Error
  ipset 4                        ; Error
  ipset 4                        ; Error
+ j_k -32768                     ; Error
+ j_k 32767                      ; Error
+ j_k 65535                      ; Error
+ j_lo -32768                    ; Error
+ j_lo 32767                     ; Error
+ j_lo 65535                     ; Error
+ j_lz -32768                    ; Error
+ j_lz 32767                     ; Error
+ j_lz 65535                     ; Error
+ j_m -32768                     ; Error
+ j_m 32767                      ; Error
+ j_m 65535                      ; Error
+ j_nk -32768                    ; Error
+ j_nk 32767                     ; Error
+ j_nk 65535                     ; Error
+ j_nv -32768                    ; Error
+ j_nv 32767                     ; Error
+ j_nv 65535                     ; Error
+ j_nx5 -32768                   ; Error
+ j_nx5 32767                    ; Error
+ j_nx5 65535                    ; Error
+ j_p -32768                     ; Error
+ j_p 32767                      ; Error
+ j_p 65535                      ; Error
+ j_pe -32768                    ; Error
+ j_pe 32767                     ; Error
+ j_pe 65535                     ; Error
+ j_po -32768                    ; Error
+ j_po 32767                     ; Error
+ j_po 65535                     ; Error
+ j_v -32768                     ; Error
+ j_v 32767                      ; Error
+ j_v 65535                      ; Error
+ j_x5 -32768                    ; Error
+ j_x5 32767                     ; Error
+ j_x5 65535                     ; Error
  jk -32768                      ; Error
  jk 32767                       ; Error
  jk 65535                       ; Error
@@ -4988,6 +5042,9 @@
  jp (c)                         ; Error
  jp (ix)                        ; Error
  jp (iy)                        ; Error
+ jp k,-32768                    ; Error
+ jp k,32767                     ; Error
+ jp k,65535                     ; Error
  jp lo, -32768                  ; Error
  jp lo, 32767                   ; Error
  jp lo, 65535                   ; Error
@@ -4997,9 +5054,15 @@
  jp m, -32768                   ; Error
  jp m, 32767                    ; Error
  jp m, 65535                    ; Error
+ jp nk,-32768                   ; Error
+ jp nk,32767                    ; Error
+ jp nk,65535                    ; Error
  jp nv, -32768                  ; Error
  jp nv, 32767                   ; Error
  jp nv, 65535                   ; Error
+ jp nx5,-32768                  ; Error
+ jp nx5,32767                   ; Error
+ jp nx5,65535                   ; Error
  jp p, -32768                   ; Error
  jp p, 32767                    ; Error
  jp p, 65535                    ; Error
@@ -5012,6 +5075,9 @@
  jp v, -32768                   ; Error
  jp v, 32767                    ; Error
  jp v, 65535                    ; Error
+ jp x5,-32768                   ; Error
+ jp x5,32767                    ; Error
+ jp x5,65535                    ; Error
  jpe -32768                     ; Error
  jpe 32767                      ; Error
  jpe 65535                      ; Error
@@ -5711,6 +5777,14 @@
  push ix                        ; Error
  push iy                        ; Error
  push su                        ; Error
+ r_lo                           ; Error
+ r_lz                           ; Error
+ r_m                            ; Error
+ r_nv                           ; Error
+ r_p                            ; Error
+ r_pe                           ; Error
+ r_po                           ; Error
+ r_v                            ; Error
  rdmode                         ; Error
  res -1, (hl)                   ; Error
  res -1, (hl)                   ; Error

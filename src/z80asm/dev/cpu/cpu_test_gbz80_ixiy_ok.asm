@@ -238,6 +238,18 @@
  bit.a 7, e                     ; CB 7B
  bit.a 7, h                     ; CB 7C
  bit.a 7, l                     ; CB 7D
+ c_c -32768                     ; DC 00 80
+ c_c 32767                      ; DC FF 7F
+ c_c 65535                      ; DC FF FF
+ c_nc -32768                    ; D4 00 80
+ c_nc 32767                     ; D4 FF 7F
+ c_nc 65535                     ; D4 FF FF
+ c_nz -32768                    ; C4 00 80
+ c_nz 32767                     ; C4 FF 7F
+ c_nz 65535                     ; C4 FF FF
+ c_z -32768                     ; CC 00 80
+ c_z 32767                      ; CC FF 7F
+ c_z 65535                      ; CC FF FF
  call -32768                    ; CD 00 80
  call 32767                     ; CD FF 7F
  call 65535                     ; CD FF FF
@@ -393,6 +405,18 @@
  inx h                          ; 23
  inx hl                         ; 23
  inx sp                         ; 33
+ j_c -32768                     ; DA 00 80
+ j_c 32767                      ; DA FF 7F
+ j_c 65535                      ; DA FF FF
+ j_nc -32768                    ; D2 00 80
+ j_nc 32767                     ; D2 FF 7F
+ j_nc 65535                     ; D2 FF FF
+ j_nz -32768                    ; C2 00 80
+ j_nz 32767                     ; C2 FF 7F
+ j_nz 65535                     ; C2 FF FF
+ j_z -32768                     ; CA 00 80
+ j_z 32767                      ; CA FF 7F
+ j_z 65535                      ; CA FF FF
  jc -32768                      ; DA 00 80
  jc 32767                       ; DA FF 7F
  jc 65535                       ; DA FF FF
@@ -774,6 +798,10 @@
  push h                         ; E5
  push hl                        ; E5
  push psw                       ; F5
+ r_c                            ; D8
+ r_nc                           ; D0
+ r_nz                           ; C0
+ r_z                            ; C8
  ral                            ; 17
  rar                            ; 1F
  rc                             ; D8
