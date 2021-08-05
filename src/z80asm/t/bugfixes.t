@@ -20,28 +20,6 @@ BEGIN {
 };
 
 #------------------------------------------------------------------------------
-# CH_0001: Assembly error messages should appear on stderr
-# BUG_0001: Error in expression during link
-# BUG_0001(a): during correction of BUG_0001, new symbol 
-z80asm(
-	asm => 	<<'ASM',
-			;; note: BUG_0001
-				JP NN			;; C3 06 00
-				JP NN			;; C3 06 00
-			NN:
-
-			;; note: BUG_0001(a)
-				EXTERN value
-				ld a,value - 0	;; 3E 0A
-ASM
-
-	asm1 => <<'ASM1',
-				PUBLIC value
-				DEFC   value = 10
-ASM1
-);
-
-#------------------------------------------------------------------------------
 # BUG_0002 : CreateLibFile and GetLibFile: buffer overrun
 note "BUG_0002";
 z80asm(

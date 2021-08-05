@@ -33,8 +33,7 @@ sub check_txt_file {
 }
 
 sub z80asm_ok {
-    my($options, @pairs) = @_;
-    $options ||= "-b";
+    my($options_files, @pairs) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
     # build $asm and $bin
@@ -51,7 +50,11 @@ sub z80asm_ok {
     unlink($bin_file);
     
     # assemble
-    run_ok("./z88dk-z80asm $options $asm_file");
+    $options_files ||= "-b";
+    my($options, $files) = split(/\|/, $options_files);
+    $files ||= $asm_file;
+
+    run_ok("./z88dk-z80asm $options $files");
     check_bin_file($bin_file, $bin);
 }
 
