@@ -646,7 +646,7 @@
  ld de, 32767                   ; 11 FF 7F
  ld de, 65535                   ; 11 FF FF
  ld de, bc                      ; 50 59
- ld de, hl                      ; 28 00
+ ld de, hl                      ; 54 5D
  ld de, hl+0                    ; 28 00
  ld de, hl+255                  ; 28 FF
  ld de, sp                      ; 38 00

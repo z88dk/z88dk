@@ -28357,15 +28357,8 @@ DO_stmt(0x59);
 }
 
 | label? _TK_LD _TK_DE _TK_COMMA _TK_HL _TK_NEWLINE @{
-switch (opts.cpu) {
-case CPU_8085: 
-DO_stmt(0x2800);
-break;
-case CPU_8080: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N: 
 DO_stmt(0x54);
 DO_stmt(0x5D);
-break;
-default: error_illegal_ident(); }
 }
 
 | label? _TK_LD _TK_DE _TK_COMMA _TK_HL expr _TK_NEWLINE @{

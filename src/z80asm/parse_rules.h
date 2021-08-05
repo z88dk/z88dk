@@ -76770,15 +76770,8 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x59); } while(0);
 	break;
 	case 2954:
 	{
-switch (opts.cpu) {
-case CPU_8085:
-do { asm_cond_LABEL(stmt_label); add_opcode(0x2800); } while(0);
-break;
-case CPU_8080: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x54); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5D); } while(0);
-break;
-default: error_illegal_ident(); }
 }
 	break;
 	case 2955:
