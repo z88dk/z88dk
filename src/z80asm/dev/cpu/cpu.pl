@@ -358,12 +358,12 @@ for my $cpu (@CPUS) {
 		# Add 00bb immediate to HL, result to DE (undocumented i8085)
 		add_opc_final($cpu, "ldhi %n",		0x28, '%n');
 		add_opc_final($cpu, "adi hl, %n",	0x28, '%n');
-		add_opc_final($cpu, "ld de, hl",	0x28, 0);
 		add_opc_final($cpu, "ld de, hl+%u",	0x28, '%u');
 	}
-	else {	
-		add_opc_final($cpu, "ld de, hl", 	0x54, 0x5D);
-	}
+    
+    # this 8085 instruction is slower, thanks @feilipu
+    # add_opc_final($cpu, "ld de, hl",	0x28, 0);       # 10 T
+    add_opc_final($cpu, "ld de, hl", 	0x54, 0x5D);    #  8 T
 
 	if ($cpu =~ /^z80/) {
 		add_opc_final($cpu, "ld de, ix", 0xDD, 0x54, 0xDD, 0x5D);
