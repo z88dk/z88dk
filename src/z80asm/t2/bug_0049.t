@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-BEGIN { use lib 't3'; require 'testlib.pl'; }
+BEGIN { use lib 't2'; require 'testlib.pl'; }
 
 # BUG_0049: Making a library with -d and 512 (win32) object files fails
 # - Too many open files
@@ -45,9 +45,9 @@ run_ok("./z88dk-z80asm -b -x${test} \"\@${test}.lst\"");
 ok -f "${test}.lib";
 
 # use library
-z80asm_ok(<<'END', "-b -l${test}", pack("v*", 1234, 1234));
-	extern lbl1234;
-	defw   lbl1234;
-END
+z80asm_ok("-b -l${test}", 
+          "extern lbl1234;" => "",
+          "defw   lbl1234;" => pack("v*", 1234, 1234));
 
+unlink_testfiles;
 done_testing;

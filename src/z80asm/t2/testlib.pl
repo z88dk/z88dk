@@ -12,54 +12,63 @@ sub check_bin_file {
     my($got_file, $exp) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
-    run_ok("hexdump -C $got_file > $got_file.hex");
+    run_ok("xxd -g1 $got_file > $got_file.hex");
     
     my $exp_file = ($got_file =~ s/\.\w+$/.exp/ir);
     path($exp_file)->spew_raw($exp);
-    run_ok("hexdump -C $exp_file > $exp_file.hex");
+    run_ok("xxd -g1 $exp_file > $exp_file.hex");
     
     run_ok("diff $exp_file.hex $got_file.hex");
+}
+
+sub check_txt_file {
+    my($got_file, $exp) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     
-    unlink("$got_file.hex", $exp_file, "$exp_file.hex") 
-        if Test::More->builder->is_passing;
+    my $exp_file = ($got_file =~ s/\.\w+$/.exp/ir);
+    path($exp_file)->spew($exp);
+    
+    run_ok("dos2unix -q $exp_file $got_file");
+    run_ok("diff $exp_file $got_file");
 }
 
 sub z80asm_ok {
-    my($asm, $options, $bin) = @_;
+    my($options, @pairs) = @_;
+    $options ||= "-b";
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
-    my $asm_file = "${test}_z80asm.asm";
-    my $bin_file = "${test}_z80asm.bin";
+    # build $asm and $bin
+    my($asm, $bin) = ("","");
+    while (my($a, $b) = splice(@pairs, 0, 2)) {
+        $asm .= "$a\n";
+        $bin .= $b;
+    }
+    
+    # save asm file
+    my $asm_file = "${test}.asm";
+    my $bin_file = "${test}.bin";
     path($asm_file)->spew($asm);
     unlink($bin_file);
     
+    # assemble
     run_ok("./z88dk-z80asm $options $asm_file");
     check_bin_file($bin_file, $bin);
-
-    unlink($asm_file, $bin_file, "${test}_o") 
-        if Test::More->builder->is_passing;
 }
 
 sub capture_ok {
     my($cmd, $exp_out) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
-    path("${test}_exp")->spew($exp_out);
-    $cmd .= " > ${test}_out";
-    run_ok($cmd);
-    run_ok("dos2unix -q ${test}_exp ${test}_out");
-    run_ok("diff ${test}_exp ${test}_out");
+    run_ok($cmd." > ${test}.out");
+    check_txt_file("${test}.out", $exp_out);
 }
 
 sub capture_nok {
     my($cmd, $exp_err) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-    
-    path("${test}_exp")->spew($exp_err);
-    $cmd .= " 2> ${test}_err";
-    run_nok($cmd);
-    run_ok("dos2unix -q ${test}_err ${test}_exp");
-    run_ok("diff ${test}_exp ${test}_err");
+
+    run_ok($cmd." 2> ${test}.err");
+    check_txt_file("${test}.err", $exp_err);
 }
 
 sub run_ok {
@@ -74,7 +83,19 @@ sub run_nok {
     ok 0!=system($cmd), $cmd;
 }
 
-END {
+sub bytes { return pack("C*", @_); }
+sub words { return pack("v*", @_); }
+sub words_be { return pack("n*", @_); }
+sub pointers {
+    my $bin = "";
+    for (@_) {
+        $bin .= pack("vC", $_ & 0xFFFF, ($_ >> 16) & 0xFF);
+    }
+    return $bin;
+}
+sub dwords { return pack("V*", @_); }
+
+sub unlink_testfiles {
     unlink(<${test}*>) 
         if Test::More->builder->is_passing;
 }
