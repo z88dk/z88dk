@@ -28,10 +28,18 @@ for my $n (-4, 0, 4) {
 		   "ldsi $n \n".
 		   "adi sp,$n \n".
 		   "ld de, sp$offset \n",		'-b -m8085'); 	
-	check_bin_file("test.bin", pack("C*", 
-			(0x28, $n & 0xFF) x 3,
-			(0x38, $n & 0xFF) x 3));
-	
+    if ($n == 0) {
+        check_bin_file("test.bin", pack("C*", 
+                (0x28, $n & 0xFF) x 2,
+                0x54, 0x5D,
+                (0x38, $n & 0xFF) x 3));
+    }
+    else {
+        check_bin_file("test.bin", pack("C*", 
+                (0x28, $n & 0xFF) x 3,
+                (0x38, $n & 0xFF) x 3));
+    }
+    
 	unlink_testfiles();
 	z80asm("ld hl, (ix$offset) \n".
 		   "ld (ix$offset), hl \n".
@@ -51,10 +59,12 @@ for my $n (-129, -128, 0, 255, 256) {
 
 	ok 1, "n=$n";
 	
-	unlink_testfiles();
-	z80asm("ld de, hl$offset",		'-b -m8085', 0, "", $warning); 	
-	check_bin_file("test.bin", pack("C*", 0x28, $n & 0xFF));
-
+    if ($n != 0) {
+        unlink_testfiles();
+        z80asm("ld de, hl$offset",		'-b -m8085', 0, "", $warning); 	
+        check_bin_file("test.bin", pack("C*", 0x28, $n & 0xFF));
+    }
+    
 	unlink_testfiles();
 	z80asm("ld de, sp$offset",		'-b -m8085', 0, "", $warning); 	
 	check_bin_file("test.bin", pack("C*", 0x38, $n & 0xFF));
