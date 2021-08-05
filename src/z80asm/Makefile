@@ -183,6 +183,7 @@ prove_c: t/libtestlib.a $(TEST_SRC_MAIN:.c=.o) $(TEST_SRC_MAIN:.c=.out)
 
 prove_perl: $(PROJ)$(EXESUFFIX)
 	perl -S prove -It2 --state=slow,save -j9 t2/*.t
+	perl -S prove      --state=slow,save -j9 t3/*.t
 	perl -S prove t/*.t
 
 clean::

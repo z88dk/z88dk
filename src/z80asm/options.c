@@ -366,6 +366,7 @@ static const char *search_source(const char *filename)
 {
 	const char *f;
 
+	// test plain filename
 	if (file_exists(filename))
 		return filename;
 
@@ -373,6 +374,7 @@ static const char *search_source(const char *filename)
 	if (file_exists(f))
 		return f;
 
+	// test filename - extension + ".asm"
 	f = get_asm_filename(filename);
 	if (file_exists(f))
 		return f;
@@ -381,6 +383,7 @@ static const char *search_source(const char *filename)
 	if (file_exists(f))
 		return f;
 
+	// test filename - extension + ".o"
 	f = get_obj_filename(filename);
 	if (file_exists(f))
 		return f;
@@ -389,6 +392,7 @@ static const char *search_source(const char *filename)
 	if (file_exists(f))
 		return f;
 
+	// not found
 	error_read_file(filename);
 	return filename;
 }

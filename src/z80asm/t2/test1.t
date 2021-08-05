@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------------
 use strict;
 use warnings;
-use testlib;
+BEGIN { use lib 't2'; use testlib; }
 
 note "Test issue #1221";
 my $test = test_name();
