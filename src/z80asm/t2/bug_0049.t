@@ -45,7 +45,7 @@ run_ok("./z88dk-z80asm -b -x${test} \"\@${test}.lst\"");
 ok -f "${test}.lib";
 
 # use library
-z80asm_ok("-b -l${test}", 
+z80asm_ok("-b -l${test}", "", "", 
           "extern lbl1234;" => "",
           "defw   lbl1234;" => pack("v*", 1234, 1234));
 

@@ -5,7 +5,7 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 # z80asm: support db, dw, ... as shortcuts to defb, defw, ...
 # https://github.com/z88dk/z88dk/issues/1221
 
-z80asm_ok("", 
+z80asm_ok("", "", "",
           'byte     1'          => bytes(1),
           'db       2'          => bytes(2),
           'defb     3'          => bytes(3),

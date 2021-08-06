@@ -24,27 +24,6 @@ require './t/test_utils.pl';
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
-# error_read_file
-# CH_0012 : wrappers on OS calls to raise fatal error
-unlink_testfiles();
-t_z80asm_capture(asm_file(), "",
-		"Error: cannot read file '".asm_file()."'\n",
-		1);
-
-unlink_testfiles();
-t_z80asm_error('
-	binary "'.inc_file().'"
-	',
-	"Error at file 'test.asm' line 2: cannot read file 'test.inc'",
-	"-l");
-
-unlink_testfiles();
-write_file(asm_file(), "nop");
-t_z80asm_capture("-b -lxxxx ".asm_file(), "",
-		"Error: cannot read file 'xxxx.lib'\n",
-		1);
-
-#------------------------------------------------------------------------------
 # error_expression
 unlink_testfiles();
 write_binfile(o_file(), objfile( NAME => "test",

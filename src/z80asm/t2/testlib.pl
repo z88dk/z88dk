@@ -33,12 +33,12 @@ sub check_txt_file {
 }
 
 sub z80asm_ok {
-    my($options_files, @pairs) = @_;
+    my($options, $files, $exp_warn, @pairs_asm_bin) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
     # build $asm and $bin
     my($asm, $bin) = ("","");
-    while (my($a, $b) = splice(@pairs, 0, 2)) {
+    while (my($a, $b) = splice(@pairs_asm_bin, 0, 2)) {
         $asm .= "$a\n";
         $bin .= $b;
     }
@@ -50,12 +50,26 @@ sub z80asm_ok {
     unlink($bin_file);
     
     # assemble
-    $options_files ||= "-b";
-    my($options, $files) = split(/\|/, $options_files);
+    $options ||= "-b";
     $files ||= $asm_file;
 
-    run_ok("./z88dk-z80asm $options $files");
+    run_ok("./z88dk-z80asm $options $files 2> ${test}.err");
     check_bin_file($bin_file, $bin);
+    check_txt_file("${test}.err", $exp_warn) if $exp_warn;
+}
+
+sub z80asm_nok {
+    my($options, $files, $asm, $exp_err) = @_;
+    
+    # save asm file
+    my $asm_file = "${test}.asm";
+    path($asm_file)->spew($asm);
+    
+    # assemble
+    $options ||= "-b";
+    $files ||= $asm_file;
+
+    capture_nok("./z88dk-z80asm $options $files", $exp_err);
 }
 
 sub capture_ok {
@@ -70,7 +84,7 @@ sub capture_nok {
     my($cmd, $exp_err) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    run_ok($cmd." 2> ${test}.err");
+    run_nok($cmd." 2> ${test}.err");
     check_txt_file("${test}.err", $exp_err);
 }
 
@@ -89,13 +103,7 @@ sub run_nok {
 sub bytes { return pack("C*", @_); }
 sub words { return pack("v*", @_); }
 sub words_be { return pack("n*", @_); }
-sub pointers {
-    my $bin = "";
-    for (@_) {
-        $bin .= pack("vC", $_ & 0xFFFF, ($_ >> 16) & 0xFF);
-    }
-    return $bin;
-}
+sub pointers { return join('', map {pack("vC", $_ & 0xFFFF, ($_ >> 16) & 0xFF)} @_); }
 sub dwords { return pack("V*", @_); }
 
 sub unlink_testfiles {

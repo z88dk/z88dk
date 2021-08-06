@@ -9,7 +9,7 @@ path("${test}1.asm")->spew(<<'END');
                 PUBLIC value
                 DEFC   value = 10
 END
-z80asm_ok("-b | ${test}.asm ${test}1.asm",
+z80asm_ok("-b", "${test}.asm ${test}1.asm", "",
           "     JP NN"          => bytes(0xc3).words(6),
           "     JP NN"          => bytes(0xc3).words(6),
           "NN:"                 => "",
