@@ -62,7 +62,7 @@ do_tests=0
 
 DESTDIR=/usr/local
 
-builddir=`pwd`
+builddir=`dirname $0`
 ZCCCFG=$builddir/lib/config
 PATH=$builddir/bin:$PATH
 export ZCCCFG
