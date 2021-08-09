@@ -6,10 +6,10 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 #ifdef WIN32
 #include        <io.h>
-#include        <sys/stat.h>
 #else
 #include        <unistd.h>
 #endif

@@ -27,8 +27,8 @@ CC ?= gcc
 # Prefix for executables (eg z88dk-, hence z88dk-z80asm, z88dk-copt etc)
 CROSS ?= 0
 
+OCC := $(CC)
 ifneq (, $(shell which ccache))
-   OCC := $(CC)
    CC := ccache $(CC)
 endif
 
