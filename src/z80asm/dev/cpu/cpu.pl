@@ -164,6 +164,10 @@ for my $cpu (@CPUS) {
 			}
 		}
 	}
+    
+    if ($cpu eq '8085') {
+        $DECODE{$cpu}[0x38] = 2;
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -530,7 +534,11 @@ for my $cpu (@CPUS) {
 		}
 	}
 	
-	if ($gameboy) {
+    if ($i8085) {
+		add_opc_final($cpu, "ld hl, sp",	0xeb, 0x38, 0,    0xeb);
+		add_opc_final($cpu, "ld hl, sp+%u",	0xeb, 0x38, '%u', 0xeb);
+    }
+	elsif ($gameboy) {
 		add_opc_final($cpu, "ldhl sp, %s",  0xF8, '%s');
 		add_opc_final($cpu, "ld hl, sp", 	0xF8, 0);
 		add_opc_final($cpu, "ld hl, sp+%s", 0xF8, '%s');
@@ -1352,14 +1360,14 @@ for my $cpu (@CPUS) {
                                             0xe5,0xd5,0xe1,0xd1); # ex de, hl
     }
     else {
-		add_opc_final($cpu, "ld de, sp",	0xeb,               # ex de, hl
-                                            0x21, 0, 0,         # ld hl, %n
-                                            0x39,               # add hl, sp
-                                            0xeb);              # ex de, hl
+		add_opc_final($cpu, "ld de, sp",	0xeb,                 # ex de, hl
+                                            0x21, 0, 0,           # ld hl, %n
+                                            0x39,                 # add hl, sp
+                                            0xeb);                # ex de, hl
 		add_opc_final($cpu, "ld de, sp+%u",	0xeb,               # ex de, hl
                                             0x21, '%u', 0,      # ld hl, %n
-                                            0x39,               # add hl, sp
-                                            0xeb);              # ex de, hl
+                                            0x39,                 # add hl, sp
+                                            0xeb);                # ex de, hl
     }
     
 	if ($i8085) {
@@ -1577,6 +1585,9 @@ for my $asm (sort keys %Tests) {
 			#	$skip = 1;
 			#}
 			
+            # special case: ld hl, sp+%u vs ld hl, sp+%s
+            $skip=1 if $asm =~ /ld hl, sp\+/;
+            
 			$fh{$cpu}{''}{err}->print($asmf."; Error\n") unless $skip;
 		}
 	}
