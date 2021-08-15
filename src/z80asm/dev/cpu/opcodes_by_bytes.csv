@@ -158,9 +158,9 @@
                                    |lxi h, %m    |            |             |                       |         |               |                 |              
                                    |lxi hl, %m   |            |             |                       |         |               |                 |              
                                    |             |            |             |                       |         |               |                 |              
-21 %s 00 39                        |ld hl, sp+%s |~           |             |ld hl, sp+%s           |~        |~              |~                |~             
+21 %s 00 39                        |ld hl, sp+%s |            |             |ld hl, sp+%s           |~        |~              |~                |~             
                                    |             |            |             |                       |         |               |                 |              
-21 00 00 39                        |ld hl, sp    |~           |             |ld hl, sp              |~        |~              |~                |~             
+21 00 00 39                        |ld hl, sp    |            |             |ld hl, sp              |~        |~              |~                |~             
                                    |             |            |             |                       |         |               |                 |              
 22                                 |             |            |ld (hl+), a  |                       |         |               |                 |              
                                    |             |            |ld (hli), a  |                       |         |               |                 |              
@@ -8590,6 +8590,10 @@ EB                                 |ex de, hl    |~           |             |ex 
 EB 21 %u 00 39 EB                  |ld de, sp+%u |            |             |ld de, sp+%u           |~        |~              |~                |~             
                                    |             |            |             |                       |         |               |                 |              
 EB 21 00 00 39 EB                  |ld de, sp    |            |             |ld de, sp              |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 38 %u EB                        |             |ld hl, sp+%u|             |                       |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 38 00 EB                        |             |ld hl, sp   |             |                       |         |               |                 |              
                                    |             |            |             |                       |         |               |                 |              
 EC                                 |             |            |             |or hl, de              |~        |               |                 |              
                                    |             |            |             |                       |         |               |                 |              

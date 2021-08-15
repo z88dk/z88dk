@@ -683,9 +683,9 @@
  ld hl, 65535                   ; 21 FF FF
  ld hl, bc                      ; 60 69
  ld hl, de                      ; 62 6B
- ld hl, sp                      ; 21 00 00 39
- ld hl, sp+-128                 ; 21 80 FF 39
- ld hl, sp+127                  ; 21 7F 00 39
+ ld hl, sp                      ; EB 38 00 EB
+ ld hl, sp+0                    ; EB 38 00 EB
+ ld hl, sp+255                  ; EB 38 FF EB
  ld l, (hl)                     ; 6E
  ld l, -128                     ; 2E 80
  ld l, 127                      ; 2E 7F
