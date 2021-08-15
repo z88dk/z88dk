@@ -17,6 +17,7 @@ extern void error_syntax(void);
 extern void error_syntax_expr(void);
 extern void error_invalid_squoted_string(void);
 extern void error_unclosed_string(void);
+extern void error_string_too_long(void);
 extern void error_divide_by_zero(void);
 extern void error_missing_block(void);
 extern void error_missing_close_block(void);
