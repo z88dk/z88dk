@@ -308,10 +308,7 @@ Define rules for a ragel-based parser.
 				string _TK_NEWLINE
 		  @{ DO_STMT_LABEL();
 			 Str_len(name) = str_compress_escapes(Str_data(name));
-			 if (Str_len(name) > value1)
-			 	error_string_too_long();
-			 else
-				asm_DEFS_str(value1, Str_data(name), Str_len(name)); }
+			 asm_DEFS_str(value1, Str_data(name), Str_len(name)); }
 		;
 
 	/*---------------------------------------------------------------------

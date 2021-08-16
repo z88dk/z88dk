@@ -145,7 +145,7 @@ void error_string_too_long(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
-	Str_append_sprintf( msg, "string is longer that the specified size" );
+	Str_append_sprintf( msg, "string longer than reserved space" );
 	do_error( ErrError, Str_data(msg) );
 	
 	STR_DELETE(msg);
