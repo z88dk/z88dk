@@ -43,17 +43,17 @@ IF __CPU_GBZ80__
    rla
    rl d
 ELSE
-   ld  a,e
+   ld a,e
    rla
-   ld  e,a
-   ld  a,d 
+   ld e,a
+   ld a,d 
    rla
-   ld  d,a
+   ld d,a
 ENDIF
    dec b
    jp  nz,loop
 IF __CPU_GBZ80__
-   ld  e,a
+   ld e,a
 ENDIF
    ret
 
