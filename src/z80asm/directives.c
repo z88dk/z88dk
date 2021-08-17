@@ -26,6 +26,30 @@ Assembly directives.
 static void check_org_align();
 
 /*-----------------------------------------------------------------------------
+*   Encoding for C_LINE and ASM_LINE
+*----------------------------------------------------------------------------*/
+static void url_encode(const char *s, char *enc)
+{
+    const char *hex = "0123456789abcdef";
+
+    int pos = 0;
+    for (int i = 0, t = strlen(s); i < t; i++)
+    {
+        if (('a' <= s[i] && s[i] <= 'z')
+        || ('A' <= s[i] && s[i] <= 'Z')
+        || ('0' <= s[i] && s[i] <= '9')) {
+            enc[pos++] = s[i];
+        } else {
+            enc[pos++] = '_';
+            enc[pos++] = hex[s[i] >> 4];
+            enc[pos++] = hex[s[i] & 15];
+        }
+    }
+
+    enc[pos] = '\0';
+}
+
+/*-----------------------------------------------------------------------------
 *   LABEL: define a label at the current location
 *----------------------------------------------------------------------------*/
 void asm_LABEL_offset(const char* name, int offset)
@@ -55,7 +79,10 @@ void asm_cond_LABEL(Str* label)
 	if (opts.debug_info && !scr_is_c_source()) {
 		STR_DEFINE(name, STR_SIZE);
 
-		Str_sprintf(name, "__ASM_LINE_%ld", get_error_line());
+		char fname_encoded[FILENAME_MAX * 2];
+		url_encode(src_filename(), fname_encoded);
+
+		Str_sprintf(name, "__ASM_LINE_%ld_%s", get_error_line(), fname_encoded);
 		if (!find_local_symbol(Str_data(name)))
 			asm_LABEL(Str_data(name));
 
@@ -177,7 +204,10 @@ void asm_C_LINE(int line_nr, const char* filename)
 	if (opts.debug_info) {
 		STR_DEFINE(name, STR_SIZE);
 
-		Str_sprintf(name, "__C_LINE_%ld", line_nr);
+		char fname_encoded[FILENAME_MAX * 2];
+		url_encode(filename, fname_encoded);
+
+		Str_sprintf(name, "__C_LINE_%ld_%s", line_nr, fname_encoded);
 		if (!find_local_symbol(Str_data(name)))
 			asm_LABEL(Str_data(name));
 
