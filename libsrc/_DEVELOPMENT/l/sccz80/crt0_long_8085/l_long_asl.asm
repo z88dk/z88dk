@@ -8,9 +8,10 @@
 ;       shifts are faster than doubling and ex with de/hl
 
 
-        SECTION   code_crt0_sccz80
-	PUBLIC l_long_asl
-	PUBLIC l_long_aslo
+    SECTION code_crt0_sccz80
+
+    PUBLIC l_long_asl
+    PUBLIC l_long_aslo
 
 
 ; Shift primary left by secondary
@@ -25,37 +26,18 @@
    pop hl
    pop de
    push bc
- 
+
 ; Optimised version enters with dehl=long, count = a
 .l_long_aslo
-   and 31 
+   and 31
    ret z
 
    ld b,a
-IF __CPU_GBZ80__
-   ld a,e	;Primary = dahl
-ENDIF
-   
-.loop
 
+.loop
    add hl,hl
-IF __CPU_GBZ80__
-   rla
-   rl d
-ELIF __CPU_8085__
    rl de
-ELSE
-   ld  a,e
-   rla
-   ld  e,a
-   ld  a,d 
-   rla
-   ld  d,a
-ENDIF
    dec b
    jp  nz,loop
-IF __CPU_GBZ80__
-   ld  e,a
-ENDIF
    ret
 
