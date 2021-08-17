@@ -18,6 +18,7 @@ EXTERN __retloc2
 ; Exit:     z = numbers the same
 ;           nz = numbers different
 ;           c/nc = sign of difference [set if secondary > primary]
+;           hl = 1
 ;
 ; Code takes secondary from primary
 
