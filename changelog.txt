@@ -29,6 +29,7 @@ Detailed but incomplete changelist:
 - [newlib] +zxn: dot files are now created correctly
 - [sccz80] Temporary files now removed on windows
 - [sccz80] Bug fixes + optimisations
+- [z80asm] Now supports assembling undocumented 8085 instructions
 - [zsdcc] Upgraded to SDCC 4.1.6 r12419 (bugfixes)
 
 
