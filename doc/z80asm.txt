@@ -1634,7 +1634,17 @@ current source file module.
 
 DEFS allocates a storage area of the given size with the given fill-byte. The
 fill-byte defaults to zero if not supplied. Both expressions need to be
-constants.
+constants. The default can be changed with the command line option "-f{value}".
+
+
+7.10a. DEFS <size>, "string"
+----------------------------
+
+Create a fixed-length string, filling the remaining space, if any, with the 
+filler byte (default zero).
+
+e.g.
+	DEFS 10, "hello" => "hello", 0,0,0,0,0
 
 
 7.11. DEFVARS <16-bit expression> '{' [<name>] [<storage_size> <size_multiplier>]

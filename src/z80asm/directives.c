@@ -339,6 +339,22 @@ void asm_DEFS(int count, int fill)
 		append_defs(count, fill);
 }
 
+void asm_DEFS_str(int count, const char* str, int len)
+{
+	if (count < 0 || count > 0x10000)
+		error_int_range(count);
+    else if (count < len)
+		error_string_too_long();
+    else {
+        int zeros = count - len;
+        while (len-- > 0)
+            add_opcode((*str++) & 0xFF);
+        while (zeros-- > 0)
+            add_opcode(opts.filler);
+    }
+}
+
+
 /*-----------------------------------------------------------------------------
 *   DEFB - add an expression or a string
 *----------------------------------------------------------------------------*/
