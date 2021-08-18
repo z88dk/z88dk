@@ -3,6 +3,7 @@ include(__link__.m4)
 #ifndef __ARCH_RC2014_H__
 #define __ARCH_RC2014_H__
 
+#include <stddef.h>
 #include <arch.h>
 
 // GLOBAL VARIABLES
