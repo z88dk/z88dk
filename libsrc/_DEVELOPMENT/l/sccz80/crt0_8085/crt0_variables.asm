@@ -1,4 +1,4 @@
-; 8080 has severe register constriction so we need some temporaries
+; 8085 has severe register constriction so we need some temporaries
 
 
 SECTION bss_crt

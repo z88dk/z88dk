@@ -33,27 +33,11 @@
    ret z
 
    ld b,a
-IF __CPU_GBZ80__
-   ld a,e    ;Primary = dahl
-ENDIF
 
 .loop
    add hl,hl
-IF __CPU_GBZ80__
-   rla
-   rl d
-ELSE
-   ld a,e
-   rla
-   ld e,a
-   ld a,d 
-   rla
-   ld d,a
-ENDIF
+   rl de
    dec b
    jp  nz,loop
-IF __CPU_GBZ80__
-   ld e,a
-ENDIF
    ret
 

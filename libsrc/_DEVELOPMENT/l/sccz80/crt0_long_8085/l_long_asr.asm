@@ -29,17 +29,8 @@ PUBLIC    l_long_asro
     ret    z
 
     ld    b,a
-IF __CPU_GBZ80__
-    ld    a,e    ; primary = dahl
-ENDIF
 
 .loop
-IF __CPU_GBZ80__
-    sra    d
-    rra
-    rr    h
-    rr    l
-ELSE
     ld    a,d
     rla
     ld    a,d
@@ -54,12 +45,8 @@ ELSE
     ld    a,l
     rra
     ld    l,a
-ENDIF
 
     dec    b
     jp    nz,loop
-IF __CPU_GBZ80__
-    ld    e,a
-ENDIF
 
     ret

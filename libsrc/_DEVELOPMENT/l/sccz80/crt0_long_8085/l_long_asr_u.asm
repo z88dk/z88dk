@@ -5,19 +5,18 @@
 
 SECTION   code_crt0_sccz80
 
-PUBLIC    l_long_asr
-PUBLIC    l_long_asro
+PUBLIC    l_long_asr_u
+PUBLIC    l_long_asr_uo
 
-; Entry:    dehl = long
-;        c = shift couter
-.l_long_asro
-    ld    a,c
-    jp    entry
+; Entry: dehl = long
+;           c = shift
+.l_long_asr_uo
+    ld a,c
+    jp entry
 
-; Entry:    l = counter
-;        sp + 2 = long to shift
 
-.l_long_asr
+; Shift primary (on stack) right by secondary,
+.l_long_asr_u
     pop    bc
     ld      a,l     ;temporary store for counter
     pop     hl
@@ -29,19 +28,9 @@ PUBLIC    l_long_asro
     ret    z
 
     ld    b,a
-IF __CPU_GBZ80__
-    ld    a,e    ; primary = dahl
-ENDIF
 
 .loop
-IF __CPU_GBZ80__
-    sra    d
-    rra
-    rr    h
-    rr    l
-ELSE
-    ld    a,d
-    rla
+    and    a
     ld    a,d
     rra
     ld    d,a
@@ -54,12 +43,8 @@ ELSE
     ld    a,l
     rra
     ld    l,a
-ENDIF
 
     dec    b
     jp    nz,loop
-IF __CPU_GBZ80__
-    ld    e,a
-ENDIF
 
     ret

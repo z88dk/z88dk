@@ -1,4 +1,4 @@
-; sccz80 crt0 library - 8080 version
+; sccz80 crt0 library - 8085 version
 
 SECTION code_crt0_sccz80
 
@@ -24,12 +24,8 @@ ccmul2: XOR     a
         RET     Z
 
         XOR     a
-        LD      a,e
-        RLA
-        LD      e,a
+        RL      de
         LD      a,d
-        RLA
-        LD      d,a
         OR      e
         RET     Z
         JP      ccmul1

@@ -13,3 +13,8 @@ EXTERN l_cmpbcde
     sbc a,b
     ret
 
+;.l_cmpbcde     ; 2 cycles more
+;   ex de,hl
+;   sub hl,bc
+;   ex de,hl
+;   ret
