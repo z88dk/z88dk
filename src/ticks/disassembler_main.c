@@ -25,7 +25,7 @@ static void usage(char *program)
     printf("  -mz180         Disassemble z180 code\n");
     printf("  -mez80         Disassemble ez80 code (short mode)\n");
     printf("  -mz80n         Disassemble z80n code\n");
-    printf("  -mr2ka         Disassemble Rabbit 2000 code\n");
+    printf("  -mr2ka         Disassemble Rabbit 2000A code\n");
     printf("  -mr3k          Disassemble Rabbit 3000 code\n");
     printf("  -mr800         Disassemble R800 code\n");
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");

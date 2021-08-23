@@ -115,9 +115,9 @@ src/ticks/ticks
 src/ticks/z88dk-dis
 src/ticks/z88dk-ticks
 src/ucpp/z88dk-ucpp
-src/z80asm/dev/cpu2/cpu_test_r2k_err.asm
-src/z80asm/dev/cpu2/cpu_test_r2k_ixiy_ok.asm
-src/z80asm/dev/cpu2/cpu_test_r2k_ok.asm
+src/z80asm/dev/cpu2/cpu_test_r2ka_err.asm
+src/z80asm/dev/cpu2/cpu_test_r2ka_ixiy_ok.asm
+src/z80asm/dev/cpu2/cpu_test_r2ka_ok.asm
 src/z80asm/dev/cpu2/cpu_test_r3k_err.asm
 src/z80asm/dev/cpu2/cpu_test_r3k_ixiy_ok.asm
 src/z80asm/dev/cpu2/cpu_test_r3k_ok.asm
