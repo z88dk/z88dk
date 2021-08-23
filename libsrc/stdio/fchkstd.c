@@ -24,7 +24,7 @@ int fchkstd(FILE *fp)
 {
 #ifdef Z80
 #asm
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(sp + 2)
 	ex	de,hl
 ELIF __CPU_GBZ80__

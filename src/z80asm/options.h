@@ -17,7 +17,7 @@
 #define CPU_Z80     (1 << 0)
 #define CPU_Z80N	(1 << 1)
 #define CPU_Z180    (1 << 2)
-#define CPU_R2K		(1 << 3)
+#define CPU_R2KA	(1 << 3)
 #define CPU_R3K		(1 << 4)
 #define CPU_8080	(1 << 5)
 #define CPU_8085	(1 << 6)
@@ -26,14 +26,14 @@
 #define CPU_Z80_NAME		"z80"
 #define CPU_Z80N_NAME		"z80n"
 #define CPU_Z180_NAME		"z180"
-#define CPU_R2K_NAME		"r2k"
+#define CPU_R2KA_NAME		"r2ka"
 #define CPU_R3K_NAME		"r3k"
 #define CPU_8080_NAME		"8080"
 #define CPU_8085_NAME		"8085"
 #define CPU_GBZ80_NAME		"gbz80"
 
 #define CPU_ZILOG	(CPU_Z80 | CPU_Z80N| CPU_Z180)
-#define CPU_RABBIT	(CPU_R2K | CPU_R3K)
+#define CPU_RABBIT	(CPU_R2KA | CPU_R3K)
 #define CPU_ALL		(CPU_ZILOG | CPU_RABBIT)
 #define CPU_NOT_Z80	(CPU_ALL & ~(CPU_Z80 | CPU_Z80N))
 

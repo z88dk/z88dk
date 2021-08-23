@@ -65,7 +65,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	; Call the seek function via the trampoline
 	dec	hl
 	dec	hl
-  IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__
 	ld	ix,hl
   ELSE
 	push	hl
@@ -75,7 +75,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 	ld	bc,0
 	ld	a,SEEK_CUR
 	ex	af,af
-  IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(ix+fp_extra)
   ELSE
 	ld	l,(ix+fp_extra)

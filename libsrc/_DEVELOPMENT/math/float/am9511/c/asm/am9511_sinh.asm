@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.1.6 #12419 (Linux)
+; Version 4.1.6 #12555 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -246,6 +246,8 @@
 	GLOBAL _mul2
 	GLOBAL _div2
 	GLOBAL _sqr
+	GLOBAL _neg_fastcall
+	GLOBAL _neg
 	GLOBAL _fam9511_f32_fastcall
 	GLOBAL _fam9511_f32
 	GLOBAL _f32_fam9511_fastcall

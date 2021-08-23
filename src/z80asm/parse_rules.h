@@ -45697,7 +45697,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
 	case 194:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -45706,7 +45706,7 @@ default: error_illegal_ident(); }
 	case 195:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD8E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD8E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -45715,7 +45715,7 @@ default: error_illegal_ident(); }
 	case 196:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -45724,7 +45724,7 @@ default: error_illegal_ident(); }
 	case 197:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD8E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD8E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -45785,7 +45785,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x8F); } while(0);
 	case 205:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8F); } while(0);
 break;
@@ -45795,7 +45795,7 @@ default: error_illegal_ident(); }
 	case 206:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x88); } while(0);
 break;
@@ -45805,7 +45805,7 @@ default: error_illegal_ident(); }
 	case 207:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x89); } while(0);
 break;
@@ -45815,7 +45815,7 @@ default: error_illegal_ident(); }
 	case 208:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8A); } while(0);
 break;
@@ -45825,7 +45825,7 @@ default: error_illegal_ident(); }
 	case 209:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8B); } while(0);
 break;
@@ -45835,7 +45835,7 @@ default: error_illegal_ident(); }
 	case 210:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8C); } while(0);
 break;
@@ -45845,7 +45845,7 @@ default: error_illegal_ident(); }
 	case 211:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
 break;
@@ -45855,7 +45855,7 @@ default: error_illegal_ident(); }
 	case 212:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8E00); } while(0); } else {
@@ -45867,7 +45867,7 @@ default: error_illegal_ident(); }
 	case 213:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD8E), expr); } while(0); } else {
@@ -45879,7 +45879,7 @@ default: error_illegal_ident(); }
 	case 214:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8E00); } while(0); } else {
@@ -45891,7 +45891,7 @@ default: error_illegal_ident(); }
 	case 215:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD8E), expr); } while(0); } else {
@@ -45903,7 +45903,7 @@ default: error_illegal_ident(); }
 	case 216:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8D); } while(0);
 break;
@@ -45913,7 +45913,7 @@ default: error_illegal_ident(); }
 	case 217:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xCE), expr); } while(0);
@@ -45953,7 +45953,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__adc_hl_bc");
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED4A); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -45966,7 +45966,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__adc_hl_de");
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED5A); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -45979,7 +45979,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__adc_hl_hl");
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED6A); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -45992,7 +45992,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__adc_hl_sp");
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED7A); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -46001,7 +46001,7 @@ default: error_illegal_ident(); }
 	case 227:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED4A); } while(0);
 break;
@@ -46011,7 +46011,7 @@ default: error_illegal_ident(); }
 	case 228:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED5A); } while(0);
 break;
@@ -46021,7 +46021,7 @@ default: error_illegal_ident(); }
 	case 229:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED6A); } while(0);
 break;
@@ -46031,7 +46031,7 @@ default: error_illegal_ident(); }
 	case 230:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED7A); } while(0);
 break;
@@ -46046,7 +46046,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
 	case 232:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46055,7 +46055,7 @@ default: error_illegal_ident(); }
 	case 233:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD8E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD8E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46064,7 +46064,7 @@ default: error_illegal_ident(); }
 	case 234:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46073,7 +46073,7 @@ default: error_illegal_ident(); }
 	case 235:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD8E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD8E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46169,7 +46169,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
 	case 250:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46178,7 +46178,7 @@ default: error_illegal_ident(); }
 	case 251:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD86), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD86), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46187,7 +46187,7 @@ default: error_illegal_ident(); }
 	case 252:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46196,7 +46196,7 @@ default: error_illegal_ident(); }
 	case 253:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD86), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD86), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46257,7 +46257,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x87); } while(0);
 	case 261:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x87); } while(0);
 break;
@@ -46267,7 +46267,7 @@ default: error_illegal_ident(); }
 	case 262:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x80); } while(0);
 break;
@@ -46277,7 +46277,7 @@ default: error_illegal_ident(); }
 	case 263:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x81); } while(0);
 break;
@@ -46287,7 +46287,7 @@ default: error_illegal_ident(); }
 	case 264:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x82); } while(0);
 break;
@@ -46297,7 +46297,7 @@ default: error_illegal_ident(); }
 	case 265:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x83); } while(0);
 break;
@@ -46307,7 +46307,7 @@ default: error_illegal_ident(); }
 	case 266:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x84); } while(0);
 break;
@@ -46317,7 +46317,7 @@ default: error_illegal_ident(); }
 	case 267:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
 break;
@@ -46327,7 +46327,7 @@ default: error_illegal_ident(); }
 	case 268:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8600); } while(0); } else {
@@ -46339,7 +46339,7 @@ default: error_illegal_ident(); }
 	case 269:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD86), expr); } while(0); } else {
@@ -46351,7 +46351,7 @@ default: error_illegal_ident(); }
 	case 270:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8600); } while(0); } else {
@@ -46363,7 +46363,7 @@ default: error_illegal_ident(); }
 	case 271:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD86), expr); } while(0); } else {
@@ -46375,7 +46375,7 @@ default: error_illegal_ident(); }
 	case 272:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x85); } while(0);
 break;
@@ -46385,7 +46385,7 @@ default: error_illegal_ident(); }
 	case 273:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xC6), expr); } while(0);
@@ -46401,7 +46401,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x80); } while(0);
 	case 275:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__add_bc_a");
 break;
@@ -46414,7 +46414,7 @@ default: error_illegal_ident(); }
 	case 276:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE5); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x21), expr); } while(0);
@@ -46443,7 +46443,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x82); } while(0);
 	case 279:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__add_de_a");
 break;
@@ -46456,7 +46456,7 @@ default: error_illegal_ident(); }
 	case 280:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE5); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x21), expr); } while(0);
@@ -46487,7 +46487,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x39); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF9); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
 break;
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_d((0x27), expr); } while(0);
 break;
@@ -46511,7 +46511,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x84); } while(0);
 	case 284:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__add_hl_a");
 break;
@@ -46544,7 +46544,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x39); } while(0);
 	case 289:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD5); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x11), expr); } while(0);
@@ -46561,7 +46561,7 @@ default: error_illegal_ident(); }
 	case 290:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x09); } while(0);
 break;
@@ -46571,7 +46571,7 @@ default: error_illegal_ident(); }
 	case 291:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x19); } while(0);
 break;
@@ -46581,7 +46581,7 @@ default: error_illegal_ident(); }
 	case 292:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x29); } while(0);
 break;
@@ -46591,7 +46591,7 @@ default: error_illegal_ident(); }
 	case 293:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x39); } while(0);
 break;
@@ -46606,7 +46606,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
 	case 295:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46615,7 +46615,7 @@ default: error_illegal_ident(); }
 	case 296:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD86), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD86), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46624,7 +46624,7 @@ default: error_illegal_ident(); }
 	case 297:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46633,7 +46633,7 @@ default: error_illegal_ident(); }
 	case 298:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD86), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD86), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46642,7 +46642,7 @@ default: error_illegal_ident(); }
 	case 299:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD09); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD09); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46651,7 +46651,7 @@ default: error_illegal_ident(); }
 	case 300:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD19); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD19); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46660,7 +46660,7 @@ default: error_illegal_ident(); }
 	case 301:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD29); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD29); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46669,7 +46669,7 @@ default: error_illegal_ident(); }
 	case 302:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD39); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD39); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46696,7 +46696,7 @@ default: error_illegal_ident(); }
 	case 305:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD09); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD09); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46705,7 +46705,7 @@ default: error_illegal_ident(); }
 	case 306:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD19); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD19); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46714,7 +46714,7 @@ default: error_illegal_ident(); }
 	case 307:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD29); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD29); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46723,7 +46723,7 @@ default: error_illegal_ident(); }
 	case 308:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD39); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD39); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -46760,7 +46760,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
 	case 313:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_d((0x27), expr); } while(0);
 break;
@@ -46806,7 +46806,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xC6)
 	case 318:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8F); } while(0);
 break;
@@ -46816,7 +46816,7 @@ default: error_illegal_ident(); }
 	case 319:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x88); } while(0);
 break;
@@ -46826,7 +46826,7 @@ default: error_illegal_ident(); }
 	case 320:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x89); } while(0);
 break;
@@ -46836,7 +46836,7 @@ default: error_illegal_ident(); }
 	case 321:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8A); } while(0);
 break;
@@ -46846,7 +46846,7 @@ default: error_illegal_ident(); }
 	case 322:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8B); } while(0);
 break;
@@ -46856,7 +46856,7 @@ default: error_illegal_ident(); }
 	case 323:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8C); } while(0);
 break;
@@ -46866,7 +46866,7 @@ default: error_illegal_ident(); }
 	case 324:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
 break;
@@ -46876,7 +46876,7 @@ default: error_illegal_ident(); }
 	case 325:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8E00); } while(0); } else {
@@ -46888,7 +46888,7 @@ default: error_illegal_ident(); }
 	case 326:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD8E), expr); } while(0); } else {
@@ -46900,7 +46900,7 @@ default: error_illegal_ident(); }
 	case 327:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8E00); } while(0); } else {
@@ -46912,7 +46912,7 @@ default: error_illegal_ident(); }
 	case 328:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD8E), expr); } while(0); } else {
@@ -46924,7 +46924,7 @@ default: error_illegal_ident(); }
 	case 329:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8D); } while(0);
 break;
@@ -46934,7 +46934,7 @@ default: error_illegal_ident(); }
 	case 330:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xCE), expr); } while(0);
@@ -46945,7 +46945,7 @@ default: error_illegal_ident(); }
 	case 331:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8F); } while(0);
 break;
@@ -46955,7 +46955,7 @@ default: error_illegal_ident(); }
 	case 332:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x88); } while(0);
 break;
@@ -46965,7 +46965,7 @@ default: error_illegal_ident(); }
 	case 333:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x89); } while(0);
 break;
@@ -46975,7 +46975,7 @@ default: error_illegal_ident(); }
 	case 334:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8A); } while(0);
 break;
@@ -46985,7 +46985,7 @@ default: error_illegal_ident(); }
 	case 335:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8B); } while(0);
 break;
@@ -46995,7 +46995,7 @@ default: error_illegal_ident(); }
 	case 336:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8C); } while(0);
 break;
@@ -47005,7 +47005,7 @@ default: error_illegal_ident(); }
 	case 337:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED4A); } while(0);
 break;
@@ -47015,7 +47015,7 @@ default: error_illegal_ident(); }
 	case 338:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED5A); } while(0);
 break;
@@ -47025,7 +47025,7 @@ default: error_illegal_ident(); }
 	case 339:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED6A); } while(0);
 break;
@@ -47035,7 +47035,7 @@ default: error_illegal_ident(); }
 	case 340:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED7A); } while(0);
 break;
@@ -47045,7 +47045,7 @@ default: error_illegal_ident(); }
 	case 341:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
 break;
@@ -47055,7 +47055,7 @@ default: error_illegal_ident(); }
 	case 342:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8E00); } while(0); } else {
@@ -47067,7 +47067,7 @@ default: error_illegal_ident(); }
 	case 343:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD8E), expr); } while(0); } else {
@@ -47079,7 +47079,7 @@ default: error_illegal_ident(); }
 	case 344:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8E00); } while(0); } else {
@@ -47091,7 +47091,7 @@ default: error_illegal_ident(); }
 	case 345:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD8E), expr); } while(0); } else {
@@ -47103,7 +47103,7 @@ default: error_illegal_ident(); }
 	case 346:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8D); } while(0);
 break;
@@ -47113,7 +47113,7 @@ default: error_illegal_ident(); }
 	case 347:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
 break;
@@ -47123,7 +47123,7 @@ default: error_illegal_ident(); }
 	case 348:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xCE), expr); } while(0);
@@ -47134,7 +47134,7 @@ default: error_illegal_ident(); }
 	case 349:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x87); } while(0);
 break;
@@ -47144,7 +47144,7 @@ default: error_illegal_ident(); }
 	case 350:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x80); } while(0);
 break;
@@ -47154,7 +47154,7 @@ default: error_illegal_ident(); }
 	case 351:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x81); } while(0);
 break;
@@ -47164,7 +47164,7 @@ default: error_illegal_ident(); }
 	case 352:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x82); } while(0);
 break;
@@ -47174,7 +47174,7 @@ default: error_illegal_ident(); }
 	case 353:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x83); } while(0);
 break;
@@ -47184,7 +47184,7 @@ default: error_illegal_ident(); }
 	case 354:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x84); } while(0);
 break;
@@ -47194,7 +47194,7 @@ default: error_illegal_ident(); }
 	case 355:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
 break;
@@ -47204,7 +47204,7 @@ default: error_illegal_ident(); }
 	case 356:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8600); } while(0); } else {
@@ -47216,7 +47216,7 @@ default: error_illegal_ident(); }
 	case 357:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD86), expr); } while(0); } else {
@@ -47228,7 +47228,7 @@ default: error_illegal_ident(); }
 	case 358:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8600); } while(0); } else {
@@ -47240,7 +47240,7 @@ default: error_illegal_ident(); }
 	case 359:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD86), expr); } while(0); } else {
@@ -47252,7 +47252,7 @@ default: error_illegal_ident(); }
 	case 360:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x85); } while(0);
 break;
@@ -47262,7 +47262,7 @@ default: error_illegal_ident(); }
 	case 361:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xC6), expr); } while(0);
@@ -47273,7 +47273,7 @@ default: error_illegal_ident(); }
 	case 362:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x87); } while(0);
 break;
@@ -47283,7 +47283,7 @@ default: error_illegal_ident(); }
 	case 363:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x80); } while(0);
 break;
@@ -47293,7 +47293,7 @@ default: error_illegal_ident(); }
 	case 364:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x81); } while(0);
 break;
@@ -47303,7 +47303,7 @@ default: error_illegal_ident(); }
 	case 365:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x82); } while(0);
 break;
@@ -47313,7 +47313,7 @@ default: error_illegal_ident(); }
 	case 366:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x83); } while(0);
 break;
@@ -47323,7 +47323,7 @@ default: error_illegal_ident(); }
 	case 367:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x84); } while(0);
 break;
@@ -47333,7 +47333,7 @@ default: error_illegal_ident(); }
 	case 368:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x09); } while(0);
 break;
@@ -47343,7 +47343,7 @@ default: error_illegal_ident(); }
 	case 369:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x19); } while(0);
 break;
@@ -47353,7 +47353,7 @@ default: error_illegal_ident(); }
 	case 370:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x29); } while(0);
 break;
@@ -47363,7 +47363,7 @@ default: error_illegal_ident(); }
 	case 371:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x39); } while(0);
 break;
@@ -47373,7 +47373,7 @@ default: error_illegal_ident(); }
 	case 372:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
 break;
@@ -47383,7 +47383,7 @@ default: error_illegal_ident(); }
 	case 373:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8600); } while(0); } else {
@@ -47395,7 +47395,7 @@ default: error_illegal_ident(); }
 	case 374:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD86), expr); } while(0); } else {
@@ -47407,7 +47407,7 @@ default: error_illegal_ident(); }
 	case 375:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8600); } while(0); } else {
@@ -47419,7 +47419,7 @@ default: error_illegal_ident(); }
 	case 376:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD86), expr); } while(0); } else {
@@ -47431,7 +47431,7 @@ default: error_illegal_ident(); }
 	case 377:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x85); } while(0);
 break;
@@ -47441,7 +47441,7 @@ default: error_illegal_ident(); }
 	case 378:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
 break;
@@ -47451,7 +47451,7 @@ default: error_illegal_ident(); }
 	case 379:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xC6), expr); } while(0);
@@ -47462,7 +47462,7 @@ default: error_illegal_ident(); }
 	case 380:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA7); } while(0);
 break;
@@ -47472,7 +47472,7 @@ default: error_illegal_ident(); }
 	case 381:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA0); } while(0);
 break;
@@ -47482,7 +47482,7 @@ default: error_illegal_ident(); }
 	case 382:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA1); } while(0);
 break;
@@ -47492,7 +47492,7 @@ default: error_illegal_ident(); }
 	case 383:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA2); } while(0);
 break;
@@ -47502,7 +47502,7 @@ default: error_illegal_ident(); }
 	case 384:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA3); } while(0);
 break;
@@ -47512,7 +47512,7 @@ default: error_illegal_ident(); }
 	case 385:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA4); } while(0);
 break;
@@ -47522,7 +47522,7 @@ default: error_illegal_ident(); }
 	case 386:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
 break;
@@ -47532,7 +47532,7 @@ default: error_illegal_ident(); }
 	case 387:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDA600); } while(0); } else {
@@ -47544,7 +47544,7 @@ default: error_illegal_ident(); }
 	case 388:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDA6), expr); } while(0); } else {
@@ -47556,7 +47556,7 @@ default: error_illegal_ident(); }
 	case 389:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDA600); } while(0); } else {
@@ -47568,7 +47568,7 @@ default: error_illegal_ident(); }
 	case 390:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDA6), expr); } while(0); } else {
@@ -47580,7 +47580,7 @@ default: error_illegal_ident(); }
 	case 391:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA5); } while(0);
 break;
@@ -47590,7 +47590,7 @@ default: error_illegal_ident(); }
 	case 392:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xE6), expr); } while(0);
@@ -47601,7 +47601,7 @@ default: error_illegal_ident(); }
 	case 393:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA7); } while(0);
 break;
@@ -47611,7 +47611,7 @@ default: error_illegal_ident(); }
 	case 394:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA0); } while(0);
 break;
@@ -47621,7 +47621,7 @@ default: error_illegal_ident(); }
 	case 395:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA1); } while(0);
 break;
@@ -47631,7 +47631,7 @@ default: error_illegal_ident(); }
 	case 396:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA2); } while(0);
 break;
@@ -47641,7 +47641,7 @@ default: error_illegal_ident(); }
 	case 397:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA3); } while(0);
 break;
@@ -47651,7 +47651,7 @@ default: error_illegal_ident(); }
 	case 398:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA4); } while(0);
 break;
@@ -47661,7 +47661,7 @@ default: error_illegal_ident(); }
 	case 399:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDC); } while(0);
 break;
@@ -47671,7 +47671,7 @@ default: error_illegal_ident(); }
 	case 400:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
 break;
@@ -47681,7 +47681,7 @@ default: error_illegal_ident(); }
 	case 401:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDA600); } while(0); } else {
@@ -47693,7 +47693,7 @@ default: error_illegal_ident(); }
 	case 402:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDA6), expr); } while(0); } else {
@@ -47705,7 +47705,7 @@ default: error_illegal_ident(); }
 	case 403:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDA600); } while(0); } else {
@@ -47717,7 +47717,7 @@ default: error_illegal_ident(); }
 	case 404:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDA6), expr); } while(0); } else {
@@ -47729,7 +47729,7 @@ default: error_illegal_ident(); }
 	case 405:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDDC); } while(0); } else {
@@ -47741,7 +47741,7 @@ default: error_illegal_ident(); }
 	case 406:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDDC); } while(0); } else {
@@ -47753,7 +47753,7 @@ default: error_illegal_ident(); }
 	case 407:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA5); } while(0);
 break;
@@ -47763,7 +47763,7 @@ default: error_illegal_ident(); }
 	case 408:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xE6), expr); } while(0);
@@ -47774,7 +47774,7 @@ default: error_illegal_ident(); }
 	case 409:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -47790,7 +47790,7 @@ default: error_illegal_ident(); }
 	case 410:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -47806,7 +47806,7 @@ default: error_illegal_ident(); }
 	case 411:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -47822,7 +47822,7 @@ default: error_illegal_ident(); }
 	case 412:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -47838,7 +47838,7 @@ default: error_illegal_ident(); }
 	case 413:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -47854,7 +47854,7 @@ default: error_illegal_ident(); }
 	case 414:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -47870,7 +47870,7 @@ default: error_illegal_ident(); }
 	case 415:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -47886,7 +47886,7 @@ default: error_illegal_ident(); }
 	case 416:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -47904,7 +47904,7 @@ default: error_illegal_ident(); }
 	case 417:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -47922,7 +47922,7 @@ default: error_illegal_ident(); }
 	case 418:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -47940,7 +47940,7 @@ default: error_illegal_ident(); }
 	case 419:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -47958,7 +47958,7 @@ default: error_illegal_ident(); }
 	case 420:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -47974,7 +47974,7 @@ default: error_illegal_ident(); }
 	case 421:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCC); } while(0);
 break;
@@ -47984,7 +47984,7 @@ default: error_illegal_ident(); }
 	case 422:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCC); } while(0); } else {
@@ -47996,7 +47996,7 @@ default: error_illegal_ident(); }
 	case 423:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCC); } while(0); } else {
@@ -48008,7 +48008,7 @@ default: error_illegal_ident(); }
 	case 424:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3F); } while(0);
 break;
@@ -48018,7 +48018,7 @@ default: error_illegal_ident(); }
 	case 425:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBF); } while(0);
 break;
@@ -48028,7 +48028,7 @@ default: error_illegal_ident(); }
 	case 426:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB8); } while(0);
 break;
@@ -48038,7 +48038,7 @@ default: error_illegal_ident(); }
 	case 427:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB9); } while(0);
 break;
@@ -48048,7 +48048,7 @@ default: error_illegal_ident(); }
 	case 428:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBA); } while(0);
 break;
@@ -48058,7 +48058,7 @@ default: error_illegal_ident(); }
 	case 429:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBB); } while(0);
 break;
@@ -48068,7 +48068,7 @@ default: error_illegal_ident(); }
 	case 430:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBC); } while(0);
 break;
@@ -48078,7 +48078,7 @@ default: error_illegal_ident(); }
 	case 431:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 break;
@@ -48088,7 +48088,7 @@ default: error_illegal_ident(); }
 	case 432:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else {
@@ -48100,7 +48100,7 @@ default: error_illegal_ident(); }
 	case 433:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else {
@@ -48112,7 +48112,7 @@ default: error_illegal_ident(); }
 	case 434:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else {
@@ -48124,7 +48124,7 @@ default: error_illegal_ident(); }
 	case 435:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else {
@@ -48136,7 +48136,7 @@ default: error_illegal_ident(); }
 	case 436:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBD); } while(0);
 break;
@@ -48146,7 +48146,7 @@ default: error_illegal_ident(); }
 	case 437:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xFE), expr); } while(0);
@@ -48157,7 +48157,7 @@ default: error_illegal_ident(); }
 	case 438:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBF); } while(0);
 break;
@@ -48167,7 +48167,7 @@ default: error_illegal_ident(); }
 	case 439:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB8); } while(0);
 break;
@@ -48177,7 +48177,7 @@ default: error_illegal_ident(); }
 	case 440:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB9); } while(0);
 break;
@@ -48187,7 +48187,7 @@ default: error_illegal_ident(); }
 	case 441:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBA); } while(0);
 break;
@@ -48197,7 +48197,7 @@ default: error_illegal_ident(); }
 	case 442:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBB); } while(0);
 break;
@@ -48207,7 +48207,7 @@ default: error_illegal_ident(); }
 	case 443:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBC); } while(0);
 break;
@@ -48217,7 +48217,7 @@ default: error_illegal_ident(); }
 	case 444:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 break;
@@ -48227,7 +48227,7 @@ default: error_illegal_ident(); }
 	case 445:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else {
@@ -48239,7 +48239,7 @@ default: error_illegal_ident(); }
 	case 446:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else {
@@ -48251,7 +48251,7 @@ default: error_illegal_ident(); }
 	case 447:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else {
@@ -48263,7 +48263,7 @@ default: error_illegal_ident(); }
 	case 448:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else {
@@ -48275,7 +48275,7 @@ default: error_illegal_ident(); }
 	case 449:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBD); } while(0);
 break;
@@ -48285,7 +48285,7 @@ default: error_illegal_ident(); }
 	case 450:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xFE), expr); } while(0);
@@ -48296,7 +48296,7 @@ default: error_illegal_ident(); }
 	case 451:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2F); } while(0);
 break;
@@ -48306,7 +48306,7 @@ default: error_illegal_ident(); }
 	case 452:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2F); } while(0);
 break;
@@ -48316,7 +48316,7 @@ default: error_illegal_ident(); }
 	case 453:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3D); } while(0);
 break;
@@ -48326,7 +48326,7 @@ default: error_illegal_ident(); }
 	case 454:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x05); } while(0);
 break;
@@ -48336,7 +48336,7 @@ default: error_illegal_ident(); }
 	case 455:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0B); } while(0);
 break;
@@ -48346,7 +48346,7 @@ default: error_illegal_ident(); }
 	case 456:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0D); } while(0);
 break;
@@ -48356,7 +48356,7 @@ default: error_illegal_ident(); }
 	case 457:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x15); } while(0);
 break;
@@ -48366,7 +48366,7 @@ default: error_illegal_ident(); }
 	case 458:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1B); } while(0);
 break;
@@ -48376,7 +48376,7 @@ default: error_illegal_ident(); }
 	case 459:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1D); } while(0);
 break;
@@ -48386,7 +48386,7 @@ default: error_illegal_ident(); }
 	case 460:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x25); } while(0);
 break;
@@ -48396,7 +48396,7 @@ default: error_illegal_ident(); }
 	case 461:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
 break;
@@ -48406,7 +48406,7 @@ default: error_illegal_ident(); }
 	case 462:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x35); } while(0);
 break;
@@ -48416,7 +48416,7 @@ default: error_illegal_ident(); }
 	case 463:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD3500); } while(0); } else {
@@ -48428,7 +48428,7 @@ default: error_illegal_ident(); }
 	case 464:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD35), expr); } while(0); } else {
@@ -48440,7 +48440,7 @@ default: error_illegal_ident(); }
 	case 465:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD3500); } while(0); } else {
@@ -48452,7 +48452,7 @@ default: error_illegal_ident(); }
 	case 466:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD35), expr); } while(0); } else {
@@ -48464,7 +48464,7 @@ default: error_illegal_ident(); }
 	case 467:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2D); } while(0);
 break;
@@ -48474,7 +48474,7 @@ default: error_illegal_ident(); }
 	case 468:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_jr((0x10), expr); } while(0);
@@ -48485,7 +48485,7 @@ default: error_illegal_ident(); }
 	case 469:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_jr((0x10), expr); } while(0);
@@ -48496,7 +48496,7 @@ default: error_illegal_ident(); }
 	case 470:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEB); } while(0);
 break;
@@ -48506,7 +48506,7 @@ default: error_illegal_ident(); }
 	case 471:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE3); } while(0);
 break;
@@ -48516,7 +48516,7 @@ default: error_illegal_ident(); }
 	case 472:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED54); } while(0);
 break;
@@ -48526,7 +48526,7 @@ default: error_illegal_ident(); }
 	case 473:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3C); } while(0);
 break;
@@ -48536,7 +48536,7 @@ default: error_illegal_ident(); }
 	case 474:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x04); } while(0);
 break;
@@ -48546,7 +48546,7 @@ default: error_illegal_ident(); }
 	case 475:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x03); } while(0);
 break;
@@ -48556,7 +48556,7 @@ default: error_illegal_ident(); }
 	case 476:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0C); } while(0);
 break;
@@ -48566,7 +48566,7 @@ default: error_illegal_ident(); }
 	case 477:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x14); } while(0);
 break;
@@ -48576,7 +48576,7 @@ default: error_illegal_ident(); }
 	case 478:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x13); } while(0);
 break;
@@ -48586,7 +48586,7 @@ default: error_illegal_ident(); }
 	case 479:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1C); } while(0);
 break;
@@ -48596,7 +48596,7 @@ default: error_illegal_ident(); }
 	case 480:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x24); } while(0);
 break;
@@ -48606,7 +48606,7 @@ default: error_illegal_ident(); }
 	case 481:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
 break;
@@ -48616,7 +48616,7 @@ default: error_illegal_ident(); }
 	case 482:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x34); } while(0);
 break;
@@ -48626,7 +48626,7 @@ default: error_illegal_ident(); }
 	case 483:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD3400); } while(0); } else {
@@ -48638,7 +48638,7 @@ default: error_illegal_ident(); }
 	case 484:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD34), expr); } while(0); } else {
@@ -48650,7 +48650,7 @@ default: error_illegal_ident(); }
 	case 485:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD3400); } while(0); } else {
@@ -48662,7 +48662,7 @@ default: error_illegal_ident(); }
 	case 486:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD34), expr); } while(0); } else {
@@ -48674,7 +48674,7 @@ default: error_illegal_ident(); }
 	case 487:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2C); } while(0);
 break;
@@ -48684,7 +48684,7 @@ default: error_illegal_ident(); }
 	case 488:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
@@ -48695,7 +48695,7 @@ default: error_illegal_ident(); }
 	case 489:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48708,7 +48708,7 @@ default: error_illegal_ident(); }
 	case 490:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48721,7 +48721,7 @@ default: error_illegal_ident(); }
 	case 491:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48734,7 +48734,7 @@ default: error_illegal_ident(); }
 	case 492:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48747,7 +48747,7 @@ default: error_illegal_ident(); }
 	case 493:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
@@ -48758,7 +48758,7 @@ default: error_illegal_ident(); }
 	case 494:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48771,7 +48771,7 @@ default: error_illegal_ident(); }
 	case 495:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48784,7 +48784,7 @@ default: error_illegal_ident(); }
 	case 496:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48797,7 +48797,7 @@ default: error_illegal_ident(); }
 	case 497:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48810,7 +48810,7 @@ default: error_illegal_ident(); }
 	case 498:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
@@ -48821,7 +48821,7 @@ default: error_illegal_ident(); }
 	case 499:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48834,7 +48834,7 @@ default: error_illegal_ident(); }
 	case 500:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48847,7 +48847,7 @@ default: error_illegal_ident(); }
 	case 501:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48860,7 +48860,7 @@ default: error_illegal_ident(); }
 	case 502:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48873,7 +48873,7 @@ default: error_illegal_ident(); }
 	case 503:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
@@ -48884,7 +48884,7 @@ default: error_illegal_ident(); }
 	case 504:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48897,7 +48897,7 @@ default: error_illegal_ident(); }
 	case 505:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48910,7 +48910,7 @@ default: error_illegal_ident(); }
 	case 506:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48923,7 +48923,7 @@ default: error_illegal_ident(); }
 	case 507:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48936,7 +48936,7 @@ default: error_illegal_ident(); }
 	case 508:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
@@ -48947,7 +48947,7 @@ default: error_illegal_ident(); }
 	case 509:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48960,7 +48960,7 @@ default: error_illegal_ident(); }
 	case 510:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48973,7 +48973,7 @@ default: error_illegal_ident(); }
 	case 511:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48986,7 +48986,7 @@ default: error_illegal_ident(); }
 	case 512:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -48999,7 +48999,7 @@ default: error_illegal_ident(); }
 	case 513:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
@@ -49010,7 +49010,7 @@ default: error_illegal_ident(); }
 	case 514:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49023,7 +49023,7 @@ default: error_illegal_ident(); }
 	case 515:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49036,7 +49036,7 @@ default: error_illegal_ident(); }
 	case 516:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49049,7 +49049,7 @@ default: error_illegal_ident(); }
 	case 517:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49062,7 +49062,7 @@ default: error_illegal_ident(); }
 	case 518:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
@@ -49079,7 +49079,7 @@ default: error_illegal_ident(); }
 	case 519:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
@@ -49098,7 +49098,7 @@ default: error_illegal_ident(); }
 	case 520:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
@@ -49117,7 +49117,7 @@ default: error_illegal_ident(); }
 	case 521:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
@@ -49136,7 +49136,7 @@ default: error_illegal_ident(); }
 	case 522:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
@@ -49155,7 +49155,7 @@ default: error_illegal_ident(); }
 	case 523:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
@@ -49166,7 +49166,7 @@ default: error_illegal_ident(); }
 	case 524:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49179,7 +49179,7 @@ default: error_illegal_ident(); }
 	case 525:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49192,7 +49192,7 @@ default: error_illegal_ident(); }
 	case 526:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49205,7 +49205,7 @@ default: error_illegal_ident(); }
 	case 527:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49218,7 +49218,7 @@ default: error_illegal_ident(); }
 	case 528:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
@@ -49229,7 +49229,7 @@ default: error_illegal_ident(); }
 	case 529:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49242,7 +49242,7 @@ default: error_illegal_ident(); }
 	case 530:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49255,7 +49255,7 @@ default: error_illegal_ident(); }
 	case 531:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49268,7 +49268,7 @@ default: error_illegal_ident(); }
 	case 532:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49281,7 +49281,7 @@ default: error_illegal_ident(); }
 	case 533:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x35); } while(0);
@@ -49292,7 +49292,7 @@ default: error_illegal_ident(); }
 	case 534:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49305,7 +49305,7 @@ default: error_illegal_ident(); }
 	case 535:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49318,7 +49318,7 @@ default: error_illegal_ident(); }
 	case 536:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49331,7 +49331,7 @@ default: error_illegal_ident(); }
 	case 537:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49344,7 +49344,7 @@ default: error_illegal_ident(); }
 	case 538:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x34); } while(0);
@@ -49355,7 +49355,7 @@ default: error_illegal_ident(); }
 	case 539:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49368,7 +49368,7 @@ default: error_illegal_ident(); }
 	case 540:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49381,7 +49381,7 @@ default: error_illegal_ident(); }
 	case 541:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49394,7 +49394,7 @@ default: error_illegal_ident(); }
 	case 542:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49407,7 +49407,7 @@ default: error_illegal_ident(); }
 	case 543:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A0B); } while(0);
@@ -49418,7 +49418,7 @@ default: error_illegal_ident(); }
 	case 544:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A03); } while(0);
@@ -49429,7 +49429,7 @@ default: error_illegal_ident(); }
 	case 545:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A); } while(0);
@@ -49440,7 +49440,7 @@ default: error_illegal_ident(); }
 	case 546:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A1B); } while(0);
@@ -49451,7 +49451,7 @@ default: error_illegal_ident(); }
 	case 547:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A13); } while(0);
@@ -49462,7 +49462,7 @@ default: error_illegal_ident(); }
 	case 548:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A); } while(0);
@@ -49473,7 +49473,7 @@ default: error_illegal_ident(); }
 	case 549:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -49485,7 +49485,7 @@ default: error_illegal_ident(); }
 	case 550:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -49497,7 +49497,7 @@ default: error_illegal_ident(); }
 	case 551:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -49508,7 +49508,7 @@ default: error_illegal_ident(); }
 	case 552:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -49520,7 +49520,7 @@ default: error_illegal_ident(); }
 	case 553:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -49532,7 +49532,7 @@ default: error_illegal_ident(); }
 	case 554:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49545,7 +49545,7 @@ default: error_illegal_ident(); }
 	case 555:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49558,7 +49558,7 @@ default: error_illegal_ident(); }
 	case 556:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49571,7 +49571,7 @@ default: error_illegal_ident(); }
 	case 557:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49584,7 +49584,7 @@ default: error_illegal_ident(); }
 	case 558:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
@@ -49596,7 +49596,7 @@ default: error_illegal_ident(); }
 	case 559:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x46); } while(0);
@@ -49607,7 +49607,7 @@ default: error_illegal_ident(); }
 	case 560:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49620,7 +49620,7 @@ default: error_illegal_ident(); }
 	case 561:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49633,7 +49633,7 @@ default: error_illegal_ident(); }
 	case 562:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49646,7 +49646,7 @@ default: error_illegal_ident(); }
 	case 563:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49659,7 +49659,7 @@ default: error_illegal_ident(); }
 	case 564:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
@@ -49671,7 +49671,7 @@ default: error_illegal_ident(); }
 	case 565:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4E); } while(0);
@@ -49682,7 +49682,7 @@ default: error_illegal_ident(); }
 	case 566:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49695,7 +49695,7 @@ default: error_illegal_ident(); }
 	case 567:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49708,7 +49708,7 @@ default: error_illegal_ident(); }
 	case 568:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49721,7 +49721,7 @@ default: error_illegal_ident(); }
 	case 569:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49734,7 +49734,7 @@ default: error_illegal_ident(); }
 	case 570:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x56); } while(0);
@@ -49745,7 +49745,7 @@ default: error_illegal_ident(); }
 	case 571:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49758,7 +49758,7 @@ default: error_illegal_ident(); }
 	case 572:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49771,7 +49771,7 @@ default: error_illegal_ident(); }
 	case 573:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49784,7 +49784,7 @@ default: error_illegal_ident(); }
 	case 574:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49797,7 +49797,7 @@ default: error_illegal_ident(); }
 	case 575:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
@@ -49809,7 +49809,7 @@ default: error_illegal_ident(); }
 	case 576:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5E); } while(0);
@@ -49820,7 +49820,7 @@ default: error_illegal_ident(); }
 	case 577:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49833,7 +49833,7 @@ default: error_illegal_ident(); }
 	case 578:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49846,7 +49846,7 @@ default: error_illegal_ident(); }
 	case 579:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49859,7 +49859,7 @@ default: error_illegal_ident(); }
 	case 580:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49872,7 +49872,7 @@ default: error_illegal_ident(); }
 	case 581:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x66); } while(0);
@@ -49883,7 +49883,7 @@ default: error_illegal_ident(); }
 	case 582:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49896,7 +49896,7 @@ default: error_illegal_ident(); }
 	case 583:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49909,7 +49909,7 @@ default: error_illegal_ident(); }
 	case 584:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49922,7 +49922,7 @@ default: error_illegal_ident(); }
 	case 585:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49935,7 +49935,7 @@ default: error_illegal_ident(); }
 	case 586:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE400); } while(0);
@@ -49946,7 +49946,7 @@ default: error_illegal_ident(); }
 	case 587:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDE4), expr); } while(0);
@@ -49957,7 +49957,7 @@ default: error_illegal_ident(); }
 	case 588:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49970,7 +49970,7 @@ default: error_illegal_ident(); }
 	case 589:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49983,7 +49983,7 @@ default: error_illegal_ident(); }
 	case 590:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -49996,7 +49996,7 @@ default: error_illegal_ident(); }
 	case 591:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50009,7 +50009,7 @@ default: error_illegal_ident(); }
 	case 592:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
@@ -50021,7 +50021,7 @@ default: error_illegal_ident(); }
 	case 593:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6E); } while(0);
@@ -50032,7 +50032,7 @@ default: error_illegal_ident(); }
 	case 594:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50045,7 +50045,7 @@ default: error_illegal_ident(); }
 	case 595:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50058,7 +50058,7 @@ default: error_illegal_ident(); }
 	case 596:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50071,7 +50071,7 @@ default: error_illegal_ident(); }
 	case 597:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50084,7 +50084,7 @@ default: error_illegal_ident(); }
 	case 598:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
@@ -50095,7 +50095,7 @@ default: error_illegal_ident(); }
 	case 599:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50108,7 +50108,7 @@ default: error_illegal_ident(); }
 	case 600:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50121,7 +50121,7 @@ default: error_illegal_ident(); }
 	case 601:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50134,7 +50134,7 @@ default: error_illegal_ident(); }
 	case 602:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50147,7 +50147,7 @@ default: error_illegal_ident(); }
 	case 603:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
@@ -50158,7 +50158,7 @@ default: error_illegal_ident(); }
 	case 604:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50171,7 +50171,7 @@ default: error_illegal_ident(); }
 	case 605:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50184,7 +50184,7 @@ default: error_illegal_ident(); }
 	case 606:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50197,7 +50197,7 @@ default: error_illegal_ident(); }
 	case 607:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50210,7 +50210,7 @@ default: error_illegal_ident(); }
 	case 608:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB16); } while(0);
@@ -50221,7 +50221,7 @@ default: error_illegal_ident(); }
 	case 609:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50234,7 +50234,7 @@ default: error_illegal_ident(); }
 	case 610:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50247,7 +50247,7 @@ default: error_illegal_ident(); }
 	case 611:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50260,7 +50260,7 @@ default: error_illegal_ident(); }
 	case 612:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50273,7 +50273,7 @@ default: error_illegal_ident(); }
 	case 613:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB06); } while(0);
@@ -50284,7 +50284,7 @@ default: error_illegal_ident(); }
 	case 614:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50297,7 +50297,7 @@ default: error_illegal_ident(); }
 	case 615:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50310,7 +50310,7 @@ default: error_illegal_ident(); }
 	case 616:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50323,7 +50323,7 @@ default: error_illegal_ident(); }
 	case 617:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50336,7 +50336,7 @@ default: error_illegal_ident(); }
 	case 618:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1E); } while(0);
@@ -50347,7 +50347,7 @@ default: error_illegal_ident(); }
 	case 619:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50360,7 +50360,7 @@ default: error_illegal_ident(); }
 	case 620:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50373,7 +50373,7 @@ default: error_illegal_ident(); }
 	case 621:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50386,7 +50386,7 @@ default: error_illegal_ident(); }
 	case 622:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50399,7 +50399,7 @@ default: error_illegal_ident(); }
 	case 623:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0E); } while(0);
@@ -50410,7 +50410,7 @@ default: error_illegal_ident(); }
 	case 624:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50423,7 +50423,7 @@ default: error_illegal_ident(); }
 	case 625:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50436,7 +50436,7 @@ default: error_illegal_ident(); }
 	case 626:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50449,7 +50449,7 @@ default: error_illegal_ident(); }
 	case 627:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50462,7 +50462,7 @@ default: error_illegal_ident(); }
 	case 628:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
@@ -50473,7 +50473,7 @@ default: error_illegal_ident(); }
 	case 629:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50486,7 +50486,7 @@ default: error_illegal_ident(); }
 	case 630:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50499,7 +50499,7 @@ default: error_illegal_ident(); }
 	case 631:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50512,7 +50512,7 @@ default: error_illegal_ident(); }
 	case 632:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50525,7 +50525,7 @@ default: error_illegal_ident(); }
 	case 633:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
@@ -50536,7 +50536,7 @@ default: error_illegal_ident(); }
 	case 634:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50549,7 +50549,7 @@ default: error_illegal_ident(); }
 	case 635:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50562,7 +50562,7 @@ default: error_illegal_ident(); }
 	case 636:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50575,7 +50575,7 @@ default: error_illegal_ident(); }
 	case 637:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50588,7 +50588,7 @@ default: error_illegal_ident(); }
 	case 638:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB26); } while(0);
@@ -50599,7 +50599,7 @@ default: error_illegal_ident(); }
 	case 639:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50612,7 +50612,7 @@ default: error_illegal_ident(); }
 	case 640:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50625,7 +50625,7 @@ default: error_illegal_ident(); }
 	case 641:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50638,7 +50638,7 @@ default: error_illegal_ident(); }
 	case 642:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50651,7 +50651,7 @@ default: error_illegal_ident(); }
 	case 643:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2E); } while(0);
@@ -50662,7 +50662,7 @@ default: error_illegal_ident(); }
 	case 644:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50675,7 +50675,7 @@ default: error_illegal_ident(); }
 	case 645:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50688,7 +50688,7 @@ default: error_illegal_ident(); }
 	case 646:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50701,7 +50701,7 @@ default: error_illegal_ident(); }
 	case 647:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50714,7 +50714,7 @@ default: error_illegal_ident(); }
 	case 648:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3E); } while(0);
@@ -50725,7 +50725,7 @@ default: error_illegal_ident(); }
 	case 649:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50738,7 +50738,7 @@ default: error_illegal_ident(); }
 	case 650:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50751,7 +50751,7 @@ default: error_illegal_ident(); }
 	case 651:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50764,7 +50764,7 @@ default: error_illegal_ident(); }
 	case 652:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50777,7 +50777,7 @@ default: error_illegal_ident(); }
 	case 653:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
@@ -50788,7 +50788,7 @@ default: error_illegal_ident(); }
 	case 654:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50801,7 +50801,7 @@ default: error_illegal_ident(); }
 	case 655:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50814,7 +50814,7 @@ default: error_illegal_ident(); }
 	case 656:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50827,7 +50827,7 @@ default: error_illegal_ident(); }
 	case 657:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50840,7 +50840,7 @@ default: error_illegal_ident(); }
 	case 658:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
@@ -50851,7 +50851,7 @@ default: error_illegal_ident(); }
 	case 659:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50864,7 +50864,7 @@ default: error_illegal_ident(); }
 	case 660:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50877,7 +50877,7 @@ default: error_illegal_ident(); }
 	case 661:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50890,7 +50890,7 @@ default: error_illegal_ident(); }
 	case 662:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50903,7 +50903,7 @@ default: error_illegal_ident(); }
 	case 663:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
@@ -50914,7 +50914,7 @@ default: error_illegal_ident(); }
 	case 664:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50927,7 +50927,7 @@ default: error_illegal_ident(); }
 	case 665:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50940,7 +50940,7 @@ default: error_illegal_ident(); }
 	case 666:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50953,7 +50953,7 @@ default: error_illegal_ident(); }
 	case 667:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50966,7 +50966,7 @@ default: error_illegal_ident(); }
 	case 668:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
@@ -50977,7 +50977,7 @@ default: error_illegal_ident(); }
 	case 669:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -50990,7 +50990,7 @@ default: error_illegal_ident(); }
 	case 670:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51003,7 +51003,7 @@ default: error_illegal_ident(); }
 	case 671:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51016,7 +51016,7 @@ default: error_illegal_ident(); }
 	case 672:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51029,7 +51029,7 @@ default: error_illegal_ident(); }
 	case 673:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
@@ -51040,7 +51040,7 @@ default: error_illegal_ident(); }
 	case 674:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51053,7 +51053,7 @@ default: error_illegal_ident(); }
 	case 675:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51066,7 +51066,7 @@ default: error_illegal_ident(); }
 	case 676:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51079,7 +51079,7 @@ default: error_illegal_ident(); }
 	case 677:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51092,7 +51092,7 @@ default: error_illegal_ident(); }
 	case 678:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
@@ -51103,7 +51103,7 @@ default: error_illegal_ident(); }
 	case 679:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51116,7 +51116,7 @@ default: error_illegal_ident(); }
 	case 680:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51129,7 +51129,7 @@ default: error_illegal_ident(); }
 	case 681:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51142,7 +51142,7 @@ default: error_illegal_ident(); }
 	case 682:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51155,7 +51155,7 @@ default: error_illegal_ident(); }
 	case 683:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
@@ -51166,7 +51166,7 @@ default: error_illegal_ident(); }
 	case 684:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51179,7 +51179,7 @@ default: error_illegal_ident(); }
 	case 685:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51192,7 +51192,7 @@ default: error_illegal_ident(); }
 	case 686:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51205,7 +51205,7 @@ default: error_illegal_ident(); }
 	case 687:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51218,7 +51218,7 @@ default: error_illegal_ident(); }
 	case 688:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
@@ -51229,7 +51229,7 @@ default: error_illegal_ident(); }
 	case 689:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51242,7 +51242,7 @@ default: error_illegal_ident(); }
 	case 690:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51255,7 +51255,7 @@ default: error_illegal_ident(); }
 	case 691:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51268,7 +51268,7 @@ default: error_illegal_ident(); }
 	case 692:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51281,7 +51281,7 @@ default: error_illegal_ident(); }
 	case 693:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
@@ -51292,7 +51292,7 @@ default: error_illegal_ident(); }
 	case 694:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51305,7 +51305,7 @@ default: error_illegal_ident(); }
 	case 695:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51318,7 +51318,7 @@ default: error_illegal_ident(); }
 	case 696:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51331,7 +51331,7 @@ default: error_illegal_ident(); }
 	case 697:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51344,7 +51344,7 @@ default: error_illegal_ident(); }
 	case 698:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
@@ -51355,7 +51355,7 @@ default: error_illegal_ident(); }
 	case 699:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51368,7 +51368,7 @@ default: error_illegal_ident(); }
 	case 700:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51381,7 +51381,7 @@ default: error_illegal_ident(); }
 	case 701:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51394,7 +51394,7 @@ default: error_illegal_ident(); }
 	case 702:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51407,7 +51407,7 @@ default: error_illegal_ident(); }
 	case 703:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
@@ -51424,7 +51424,7 @@ default: error_illegal_ident(); }
 	case 704:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
@@ -51443,7 +51443,7 @@ default: error_illegal_ident(); }
 	case 705:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
@@ -51462,7 +51462,7 @@ default: error_illegal_ident(); }
 	case 706:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
@@ -51481,7 +51481,7 @@ default: error_illegal_ident(); }
 	case 707:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
@@ -51500,7 +51500,7 @@ default: error_illegal_ident(); }
 	case 708:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
@@ -51511,7 +51511,7 @@ default: error_illegal_ident(); }
 	case 709:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51524,7 +51524,7 @@ default: error_illegal_ident(); }
 	case 710:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51537,7 +51537,7 @@ default: error_illegal_ident(); }
 	case 711:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51550,7 +51550,7 @@ default: error_illegal_ident(); }
 	case 712:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51563,7 +51563,7 @@ default: error_illegal_ident(); }
 	case 713:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
@@ -51574,7 +51574,7 @@ default: error_illegal_ident(); }
 	case 714:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51587,7 +51587,7 @@ default: error_illegal_ident(); }
 	case 715:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51600,7 +51600,7 @@ default: error_illegal_ident(); }
 	case 716:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51613,7 +51613,7 @@ default: error_illegal_ident(); }
 	case 717:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51626,7 +51626,7 @@ default: error_illegal_ident(); }
 	case 718:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x35); } while(0);
@@ -51637,7 +51637,7 @@ default: error_illegal_ident(); }
 	case 719:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51650,7 +51650,7 @@ default: error_illegal_ident(); }
 	case 720:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51663,7 +51663,7 @@ default: error_illegal_ident(); }
 	case 721:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51676,7 +51676,7 @@ default: error_illegal_ident(); }
 	case 722:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51689,7 +51689,7 @@ default: error_illegal_ident(); }
 	case 723:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x34); } while(0);
@@ -51700,7 +51700,7 @@ default: error_illegal_ident(); }
 	case 724:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51713,7 +51713,7 @@ default: error_illegal_ident(); }
 	case 725:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51726,7 +51726,7 @@ default: error_illegal_ident(); }
 	case 726:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51739,7 +51739,7 @@ default: error_illegal_ident(); }
 	case 727:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51752,7 +51752,7 @@ default: error_illegal_ident(); }
 	case 728:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A0B); } while(0);
@@ -51763,7 +51763,7 @@ default: error_illegal_ident(); }
 	case 729:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A03); } while(0);
@@ -51774,7 +51774,7 @@ default: error_illegal_ident(); }
 	case 730:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A); } while(0);
@@ -51785,7 +51785,7 @@ default: error_illegal_ident(); }
 	case 731:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A1B); } while(0);
@@ -51796,7 +51796,7 @@ default: error_illegal_ident(); }
 	case 732:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A13); } while(0);
@@ -51807,7 +51807,7 @@ default: error_illegal_ident(); }
 	case 733:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A); } while(0);
@@ -51818,7 +51818,7 @@ default: error_illegal_ident(); }
 	case 734:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -51830,7 +51830,7 @@ default: error_illegal_ident(); }
 	case 735:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -51842,7 +51842,7 @@ default: error_illegal_ident(); }
 	case 736:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -51853,7 +51853,7 @@ default: error_illegal_ident(); }
 	case 737:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -51865,7 +51865,7 @@ default: error_illegal_ident(); }
 	case 738:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -51877,7 +51877,7 @@ default: error_illegal_ident(); }
 	case 739:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51890,7 +51890,7 @@ default: error_illegal_ident(); }
 	case 740:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51903,7 +51903,7 @@ default: error_illegal_ident(); }
 	case 741:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51916,7 +51916,7 @@ default: error_illegal_ident(); }
 	case 742:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51929,7 +51929,7 @@ default: error_illegal_ident(); }
 	case 743:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
@@ -51941,7 +51941,7 @@ default: error_illegal_ident(); }
 	case 744:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x46); } while(0);
@@ -51952,7 +51952,7 @@ default: error_illegal_ident(); }
 	case 745:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51965,7 +51965,7 @@ default: error_illegal_ident(); }
 	case 746:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51978,7 +51978,7 @@ default: error_illegal_ident(); }
 	case 747:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -51991,7 +51991,7 @@ default: error_illegal_ident(); }
 	case 748:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52004,7 +52004,7 @@ default: error_illegal_ident(); }
 	case 749:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
@@ -52016,7 +52016,7 @@ default: error_illegal_ident(); }
 	case 750:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4E); } while(0);
@@ -52027,7 +52027,7 @@ default: error_illegal_ident(); }
 	case 751:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52040,7 +52040,7 @@ default: error_illegal_ident(); }
 	case 752:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52053,7 +52053,7 @@ default: error_illegal_ident(); }
 	case 753:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52066,7 +52066,7 @@ default: error_illegal_ident(); }
 	case 754:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52079,7 +52079,7 @@ default: error_illegal_ident(); }
 	case 755:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x56); } while(0);
@@ -52090,7 +52090,7 @@ default: error_illegal_ident(); }
 	case 756:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52103,7 +52103,7 @@ default: error_illegal_ident(); }
 	case 757:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52116,7 +52116,7 @@ default: error_illegal_ident(); }
 	case 758:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52129,7 +52129,7 @@ default: error_illegal_ident(); }
 	case 759:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52142,7 +52142,7 @@ default: error_illegal_ident(); }
 	case 760:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
@@ -52154,7 +52154,7 @@ default: error_illegal_ident(); }
 	case 761:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5E); } while(0);
@@ -52165,7 +52165,7 @@ default: error_illegal_ident(); }
 	case 762:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52178,7 +52178,7 @@ default: error_illegal_ident(); }
 	case 763:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52191,7 +52191,7 @@ default: error_illegal_ident(); }
 	case 764:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52204,7 +52204,7 @@ default: error_illegal_ident(); }
 	case 765:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52217,7 +52217,7 @@ default: error_illegal_ident(); }
 	case 766:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x66); } while(0);
@@ -52228,7 +52228,7 @@ default: error_illegal_ident(); }
 	case 767:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52241,7 +52241,7 @@ default: error_illegal_ident(); }
 	case 768:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52254,7 +52254,7 @@ default: error_illegal_ident(); }
 	case 769:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52267,7 +52267,7 @@ default: error_illegal_ident(); }
 	case 770:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52280,7 +52280,7 @@ default: error_illegal_ident(); }
 	case 771:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE400); } while(0);
@@ -52291,7 +52291,7 @@ default: error_illegal_ident(); }
 	case 772:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDE4), expr); } while(0);
@@ -52302,7 +52302,7 @@ default: error_illegal_ident(); }
 	case 773:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52315,7 +52315,7 @@ default: error_illegal_ident(); }
 	case 774:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52328,7 +52328,7 @@ default: error_illegal_ident(); }
 	case 775:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52341,7 +52341,7 @@ default: error_illegal_ident(); }
 	case 776:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52354,7 +52354,7 @@ default: error_illegal_ident(); }
 	case 777:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
@@ -52366,7 +52366,7 @@ default: error_illegal_ident(); }
 	case 778:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6E); } while(0);
@@ -52377,7 +52377,7 @@ default: error_illegal_ident(); }
 	case 779:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52390,7 +52390,7 @@ default: error_illegal_ident(); }
 	case 780:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52403,7 +52403,7 @@ default: error_illegal_ident(); }
 	case 781:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52416,7 +52416,7 @@ default: error_illegal_ident(); }
 	case 782:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52429,7 +52429,7 @@ default: error_illegal_ident(); }
 	case 783:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
@@ -52440,7 +52440,7 @@ default: error_illegal_ident(); }
 	case 784:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52453,7 +52453,7 @@ default: error_illegal_ident(); }
 	case 785:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52466,7 +52466,7 @@ default: error_illegal_ident(); }
 	case 786:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52479,7 +52479,7 @@ default: error_illegal_ident(); }
 	case 787:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52492,7 +52492,7 @@ default: error_illegal_ident(); }
 	case 788:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
@@ -52503,7 +52503,7 @@ default: error_illegal_ident(); }
 	case 789:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52516,7 +52516,7 @@ default: error_illegal_ident(); }
 	case 790:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52529,7 +52529,7 @@ default: error_illegal_ident(); }
 	case 791:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52542,7 +52542,7 @@ default: error_illegal_ident(); }
 	case 792:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52555,7 +52555,7 @@ default: error_illegal_ident(); }
 	case 793:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB16); } while(0);
@@ -52566,7 +52566,7 @@ default: error_illegal_ident(); }
 	case 794:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52579,7 +52579,7 @@ default: error_illegal_ident(); }
 	case 795:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52592,7 +52592,7 @@ default: error_illegal_ident(); }
 	case 796:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52605,7 +52605,7 @@ default: error_illegal_ident(); }
 	case 797:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52618,7 +52618,7 @@ default: error_illegal_ident(); }
 	case 798:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB06); } while(0);
@@ -52629,7 +52629,7 @@ default: error_illegal_ident(); }
 	case 799:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52642,7 +52642,7 @@ default: error_illegal_ident(); }
 	case 800:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52655,7 +52655,7 @@ default: error_illegal_ident(); }
 	case 801:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52668,7 +52668,7 @@ default: error_illegal_ident(); }
 	case 802:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52681,7 +52681,7 @@ default: error_illegal_ident(); }
 	case 803:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1E); } while(0);
@@ -52692,7 +52692,7 @@ default: error_illegal_ident(); }
 	case 804:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52705,7 +52705,7 @@ default: error_illegal_ident(); }
 	case 805:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52718,7 +52718,7 @@ default: error_illegal_ident(); }
 	case 806:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52731,7 +52731,7 @@ default: error_illegal_ident(); }
 	case 807:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52744,7 +52744,7 @@ default: error_illegal_ident(); }
 	case 808:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0E); } while(0);
@@ -52755,7 +52755,7 @@ default: error_illegal_ident(); }
 	case 809:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52768,7 +52768,7 @@ default: error_illegal_ident(); }
 	case 810:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52781,7 +52781,7 @@ default: error_illegal_ident(); }
 	case 811:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52794,7 +52794,7 @@ default: error_illegal_ident(); }
 	case 812:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52807,7 +52807,7 @@ default: error_illegal_ident(); }
 	case 813:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
@@ -52818,7 +52818,7 @@ default: error_illegal_ident(); }
 	case 814:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52831,7 +52831,7 @@ default: error_illegal_ident(); }
 	case 815:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52844,7 +52844,7 @@ default: error_illegal_ident(); }
 	case 816:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52857,7 +52857,7 @@ default: error_illegal_ident(); }
 	case 817:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52870,7 +52870,7 @@ default: error_illegal_ident(); }
 	case 818:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
@@ -52881,7 +52881,7 @@ default: error_illegal_ident(); }
 	case 819:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52894,7 +52894,7 @@ default: error_illegal_ident(); }
 	case 820:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52907,7 +52907,7 @@ default: error_illegal_ident(); }
 	case 821:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52920,7 +52920,7 @@ default: error_illegal_ident(); }
 	case 822:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52933,7 +52933,7 @@ default: error_illegal_ident(); }
 	case 823:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB26); } while(0);
@@ -52944,7 +52944,7 @@ default: error_illegal_ident(); }
 	case 824:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52957,7 +52957,7 @@ default: error_illegal_ident(); }
 	case 825:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52970,7 +52970,7 @@ default: error_illegal_ident(); }
 	case 826:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52983,7 +52983,7 @@ default: error_illegal_ident(); }
 	case 827:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -52996,7 +52996,7 @@ default: error_illegal_ident(); }
 	case 828:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2E); } while(0);
@@ -53007,7 +53007,7 @@ default: error_illegal_ident(); }
 	case 829:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53020,7 +53020,7 @@ default: error_illegal_ident(); }
 	case 830:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53033,7 +53033,7 @@ default: error_illegal_ident(); }
 	case 831:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53046,7 +53046,7 @@ default: error_illegal_ident(); }
 	case 832:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53059,7 +53059,7 @@ default: error_illegal_ident(); }
 	case 833:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3E); } while(0);
@@ -53070,7 +53070,7 @@ default: error_illegal_ident(); }
 	case 834:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53083,7 +53083,7 @@ default: error_illegal_ident(); }
 	case 835:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53096,7 +53096,7 @@ default: error_illegal_ident(); }
 	case 836:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53109,7 +53109,7 @@ default: error_illegal_ident(); }
 	case 837:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53122,7 +53122,7 @@ default: error_illegal_ident(); }
 	case 838:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
@@ -53133,7 +53133,7 @@ default: error_illegal_ident(); }
 	case 839:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53146,7 +53146,7 @@ default: error_illegal_ident(); }
 	case 840:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53159,7 +53159,7 @@ default: error_illegal_ident(); }
 	case 841:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53172,7 +53172,7 @@ default: error_illegal_ident(); }
 	case 842:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53185,7 +53185,7 @@ default: error_illegal_ident(); }
 	case 843:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
@@ -53196,7 +53196,7 @@ default: error_illegal_ident(); }
 	case 844:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53209,7 +53209,7 @@ default: error_illegal_ident(); }
 	case 845:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53222,7 +53222,7 @@ default: error_illegal_ident(); }
 	case 846:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53235,7 +53235,7 @@ default: error_illegal_ident(); }
 	case 847:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53248,7 +53248,7 @@ default: error_illegal_ident(); }
 	case 848:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
@@ -53259,7 +53259,7 @@ default: error_illegal_ident(); }
 	case 849:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53272,7 +53272,7 @@ default: error_illegal_ident(); }
 	case 850:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53285,7 +53285,7 @@ default: error_illegal_ident(); }
 	case 851:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53298,7 +53298,7 @@ default: error_illegal_ident(); }
 	case 852:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53311,7 +53311,7 @@ default: error_illegal_ident(); }
 	case 853:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
@@ -53322,7 +53322,7 @@ default: error_illegal_ident(); }
 	case 854:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53335,7 +53335,7 @@ default: error_illegal_ident(); }
 	case 855:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53348,7 +53348,7 @@ default: error_illegal_ident(); }
 	case 856:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53361,7 +53361,7 @@ default: error_illegal_ident(); }
 	case 857:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -53374,7 +53374,7 @@ default: error_illegal_ident(); }
 	case 858:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7F); } while(0);
 break;
@@ -53384,7 +53384,7 @@ default: error_illegal_ident(); }
 	case 859:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x78); } while(0);
 break;
@@ -53394,7 +53394,7 @@ default: error_illegal_ident(); }
 	case 860:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x79); } while(0);
 break;
@@ -53404,7 +53404,7 @@ default: error_illegal_ident(); }
 	case 861:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7A); } while(0);
 break;
@@ -53414,7 +53414,7 @@ default: error_illegal_ident(); }
 	case 862:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7B); } while(0);
 break;
@@ -53424,7 +53424,7 @@ default: error_illegal_ident(); }
 	case 863:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED57); } while(0);
 break;
@@ -53434,7 +53434,7 @@ default: error_illegal_ident(); }
 	case 864:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7C); } while(0);
 break;
@@ -53444,7 +53444,7 @@ default: error_illegal_ident(); }
 	case 865:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED5F); } while(0);
 break;
@@ -53454,7 +53454,7 @@ default: error_illegal_ident(); }
 	case 866:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A0B); } while(0);
 break;
@@ -53464,7 +53464,7 @@ default: error_illegal_ident(); }
 	case 867:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A03); } while(0);
 break;
@@ -53474,7 +53474,7 @@ default: error_illegal_ident(); }
 	case 868:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A); } while(0);
 break;
@@ -53484,7 +53484,7 @@ default: error_illegal_ident(); }
 	case 869:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A1B); } while(0);
 break;
@@ -53494,7 +53494,7 @@ default: error_illegal_ident(); }
 	case 870:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A13); } while(0);
 break;
@@ -53504,7 +53504,7 @@ default: error_illegal_ident(); }
 	case 871:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A); } while(0);
 break;
@@ -53514,7 +53514,7 @@ default: error_illegal_ident(); }
 	case 872:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -53525,7 +53525,7 @@ default: error_illegal_ident(); }
 	case 873:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -53536,7 +53536,7 @@ default: error_illegal_ident(); }
 	case 874:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 break;
@@ -53546,7 +53546,7 @@ default: error_illegal_ident(); }
 	case 875:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -53557,7 +53557,7 @@ default: error_illegal_ident(); }
 	case 876:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -53568,7 +53568,7 @@ default: error_illegal_ident(); }
 	case 877:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7E00); } while(0); } else {
@@ -53580,7 +53580,7 @@ default: error_illegal_ident(); }
 	case 878:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD7E), expr); } while(0); } else {
@@ -53592,7 +53592,7 @@ default: error_illegal_ident(); }
 	case 879:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7E00); } while(0); } else {
@@ -53604,7 +53604,7 @@ default: error_illegal_ident(); }
 	case 880:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD7E), expr); } while(0); } else {
@@ -53616,7 +53616,7 @@ default: error_illegal_ident(); }
 	case 881:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7D); } while(0);
 break;
@@ -53626,7 +53626,7 @@ default: error_illegal_ident(); }
 	case 882:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED77); } while(0);
 break;
@@ -53636,7 +53636,7 @@ default: error_illegal_ident(); }
 	case 883:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_in_parens) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x3A), expr); } while(0); } else {
@@ -53648,7 +53648,7 @@ default: error_illegal_ident(); }
 	case 884:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x47); } while(0);
 break;
@@ -53658,7 +53658,7 @@ default: error_illegal_ident(); }
 	case 885:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x40); } while(0);
 break;
@@ -53668,7 +53668,7 @@ default: error_illegal_ident(); }
 	case 886:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x41); } while(0);
 break;
@@ -53678,7 +53678,7 @@ default: error_illegal_ident(); }
 	case 887:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x42); } while(0);
 break;
@@ -53688,7 +53688,7 @@ default: error_illegal_ident(); }
 	case 888:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x43); } while(0);
 break;
@@ -53698,7 +53698,7 @@ default: error_illegal_ident(); }
 	case 889:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x44); } while(0);
 break;
@@ -53708,7 +53708,7 @@ default: error_illegal_ident(); }
 	case 890:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x46); } while(0);
 break;
@@ -53718,7 +53718,7 @@ default: error_illegal_ident(); }
 	case 891:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD4600); } while(0); } else {
@@ -53730,7 +53730,7 @@ default: error_illegal_ident(); }
 	case 892:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD46), expr); } while(0); } else {
@@ -53742,7 +53742,7 @@ default: error_illegal_ident(); }
 	case 893:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD4600); } while(0); } else {
@@ -53754,7 +53754,7 @@ default: error_illegal_ident(); }
 	case 894:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD46), expr); } while(0); } else {
@@ -53766,7 +53766,7 @@ default: error_illegal_ident(); }
 	case 895:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x45); } while(0);
 break;
@@ -53776,7 +53776,7 @@ default: error_illegal_ident(); }
 	case 896:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x06), expr); } while(0);
@@ -53787,7 +53787,7 @@ default: error_illegal_ident(); }
 	case 897:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED49); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -53796,7 +53796,7 @@ default: error_illegal_ident(); }
 	case 898:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED41); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -53805,7 +53805,7 @@ default: error_illegal_ident(); }
 	case 899:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_in_parens) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED4B), expr); } while(0); } else {
@@ -53817,7 +53817,7 @@ default: error_illegal_ident(); }
 	case 900:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4F); } while(0);
 break;
@@ -53827,7 +53827,7 @@ default: error_illegal_ident(); }
 	case 901:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x48); } while(0);
 break;
@@ -53837,7 +53837,7 @@ default: error_illegal_ident(); }
 	case 902:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x49); } while(0);
 break;
@@ -53847,7 +53847,7 @@ default: error_illegal_ident(); }
 	case 903:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4A); } while(0);
 break;
@@ -53857,7 +53857,7 @@ default: error_illegal_ident(); }
 	case 904:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4B); } while(0);
 break;
@@ -53867,7 +53867,7 @@ default: error_illegal_ident(); }
 	case 905:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4C); } while(0);
 break;
@@ -53877,7 +53877,7 @@ default: error_illegal_ident(); }
 	case 906:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4E); } while(0);
 break;
@@ -53887,7 +53887,7 @@ default: error_illegal_ident(); }
 	case 907:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD4E00); } while(0); } else {
@@ -53899,7 +53899,7 @@ default: error_illegal_ident(); }
 	case 908:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD4E), expr); } while(0); } else {
@@ -53911,7 +53911,7 @@ default: error_illegal_ident(); }
 	case 909:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD4E00); } while(0); } else {
@@ -53923,7 +53923,7 @@ default: error_illegal_ident(); }
 	case 910:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD4E), expr); } while(0); } else {
@@ -53935,7 +53935,7 @@ default: error_illegal_ident(); }
 	case 911:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4D); } while(0);
 break;
@@ -53945,7 +53945,7 @@ default: error_illegal_ident(); }
 	case 912:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x0E), expr); } while(0);
@@ -53956,7 +53956,7 @@ default: error_illegal_ident(); }
 	case 913:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x57); } while(0);
 break;
@@ -53966,7 +53966,7 @@ default: error_illegal_ident(); }
 	case 914:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x50); } while(0);
 break;
@@ -53976,7 +53976,7 @@ default: error_illegal_ident(); }
 	case 915:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x51); } while(0);
 break;
@@ -53986,7 +53986,7 @@ default: error_illegal_ident(); }
 	case 916:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x52); } while(0);
 break;
@@ -53996,7 +53996,7 @@ default: error_illegal_ident(); }
 	case 917:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x53); } while(0);
 break;
@@ -54006,7 +54006,7 @@ default: error_illegal_ident(); }
 	case 918:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x54); } while(0);
 break;
@@ -54016,7 +54016,7 @@ default: error_illegal_ident(); }
 	case 919:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x56); } while(0);
 break;
@@ -54026,7 +54026,7 @@ default: error_illegal_ident(); }
 	case 920:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD5600); } while(0); } else {
@@ -54038,7 +54038,7 @@ default: error_illegal_ident(); }
 	case 921:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD56), expr); } while(0); } else {
@@ -54050,7 +54050,7 @@ default: error_illegal_ident(); }
 	case 922:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD5600); } while(0); } else {
@@ -54062,7 +54062,7 @@ default: error_illegal_ident(); }
 	case 923:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD56), expr); } while(0); } else {
@@ -54074,7 +54074,7 @@ default: error_illegal_ident(); }
 	case 924:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x55); } while(0);
 break;
@@ -54084,7 +54084,7 @@ default: error_illegal_ident(); }
 	case 925:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x16), expr); } while(0);
@@ -54095,7 +54095,7 @@ default: error_illegal_ident(); }
 	case 926:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED59); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -54104,7 +54104,7 @@ default: error_illegal_ident(); }
 	case 927:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED51); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -54113,7 +54113,7 @@ default: error_illegal_ident(); }
 	case 928:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_in_parens) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED5B), expr); } while(0); } else {
@@ -54125,7 +54125,7 @@ default: error_illegal_ident(); }
 	case 929:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5F); } while(0);
 break;
@@ -54135,7 +54135,7 @@ default: error_illegal_ident(); }
 	case 930:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x58); } while(0);
 break;
@@ -54145,7 +54145,7 @@ default: error_illegal_ident(); }
 	case 931:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x59); } while(0);
 break;
@@ -54155,7 +54155,7 @@ default: error_illegal_ident(); }
 	case 932:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5A); } while(0);
 break;
@@ -54165,7 +54165,7 @@ default: error_illegal_ident(); }
 	case 933:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5B); } while(0);
 break;
@@ -54175,7 +54175,7 @@ default: error_illegal_ident(); }
 	case 934:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5C); } while(0);
 break;
@@ -54185,7 +54185,7 @@ default: error_illegal_ident(); }
 	case 935:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5E); } while(0);
 break;
@@ -54195,7 +54195,7 @@ default: error_illegal_ident(); }
 	case 936:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD5E00); } while(0); } else {
@@ -54207,7 +54207,7 @@ default: error_illegal_ident(); }
 	case 937:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD5E), expr); } while(0); } else {
@@ -54219,7 +54219,7 @@ default: error_illegal_ident(); }
 	case 938:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD5E00); } while(0); } else {
@@ -54231,7 +54231,7 @@ default: error_illegal_ident(); }
 	case 939:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD5E), expr); } while(0); } else {
@@ -54243,7 +54243,7 @@ default: error_illegal_ident(); }
 	case 940:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5D); } while(0);
 break;
@@ -54253,7 +54253,7 @@ default: error_illegal_ident(); }
 	case 941:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x1E), expr); } while(0);
@@ -54264,7 +54264,7 @@ default: error_illegal_ident(); }
 	case 942:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x67); } while(0);
 break;
@@ -54274,7 +54274,7 @@ default: error_illegal_ident(); }
 	case 943:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x60); } while(0);
 break;
@@ -54284,7 +54284,7 @@ default: error_illegal_ident(); }
 	case 944:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x61); } while(0);
 break;
@@ -54294,7 +54294,7 @@ default: error_illegal_ident(); }
 	case 945:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x62); } while(0);
 break;
@@ -54304,7 +54304,7 @@ default: error_illegal_ident(); }
 	case 946:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x63); } while(0);
 break;
@@ -54314,7 +54314,7 @@ default: error_illegal_ident(); }
 	case 947:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x64); } while(0);
 break;
@@ -54324,7 +54324,7 @@ default: error_illegal_ident(); }
 	case 948:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x66); } while(0);
 break;
@@ -54334,7 +54334,7 @@ default: error_illegal_ident(); }
 	case 949:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6600); } while(0); } else {
@@ -54346,7 +54346,7 @@ default: error_illegal_ident(); }
 	case 950:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD66), expr); } while(0); } else {
@@ -54358,7 +54358,7 @@ default: error_illegal_ident(); }
 	case 951:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6600); } while(0); } else {
@@ -54370,7 +54370,7 @@ default: error_illegal_ident(); }
 	case 952:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD66), expr); } while(0); } else {
@@ -54382,7 +54382,7 @@ default: error_illegal_ident(); }
 	case 953:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x65); } while(0);
 break;
@@ -54392,7 +54392,7 @@ default: error_illegal_ident(); }
 	case 954:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x26), expr); } while(0);
@@ -54403,7 +54403,7 @@ default: error_illegal_ident(); }
 	case 955:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED69); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -54412,7 +54412,7 @@ default: error_illegal_ident(); }
 	case 956:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED61); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -54421,7 +54421,7 @@ default: error_illegal_ident(); }
 	case 957:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE400); } while(0);
 break;
@@ -54431,7 +54431,7 @@ default: error_illegal_ident(); }
 	case 958:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDE4), expr); } while(0);
 break;
@@ -54441,7 +54441,7 @@ default: error_illegal_ident(); }
 	case 959:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE400); } while(0); } else {
@@ -54453,7 +54453,7 @@ default: error_illegal_ident(); }
 	case 960:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xE4), expr); } while(0); } else {
@@ -54465,7 +54465,7 @@ default: error_illegal_ident(); }
 	case 961:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE400); } while(0); } else {
@@ -54477,7 +54477,7 @@ default: error_illegal_ident(); }
 	case 962:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDE4), expr); } while(0); } else {
@@ -54489,7 +54489,7 @@ default: error_illegal_ident(); }
 	case 963:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xC400); } while(0);
 break;
@@ -54499,7 +54499,7 @@ default: error_illegal_ident(); }
 	case 964:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xC4), expr); } while(0);
 break;
@@ -54509,7 +54509,7 @@ default: error_illegal_ident(); }
 	case 965:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7C); } while(0); } else {
@@ -54521,7 +54521,7 @@ default: error_illegal_ident(); }
 	case 966:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7C); } while(0); } else {
@@ -54533,7 +54533,7 @@ default: error_illegal_ident(); }
 	case 967:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_in_parens) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x2A), expr); } while(0); } else {
@@ -54545,7 +54545,7 @@ default: error_illegal_ident(); }
 	case 968:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6F); } while(0);
 break;
@@ -54555,7 +54555,7 @@ default: error_illegal_ident(); }
 	case 969:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x68); } while(0);
 break;
@@ -54565,7 +54565,7 @@ default: error_illegal_ident(); }
 	case 970:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x69); } while(0);
 break;
@@ -54575,7 +54575,7 @@ default: error_illegal_ident(); }
 	case 971:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6A); } while(0);
 break;
@@ -54585,7 +54585,7 @@ default: error_illegal_ident(); }
 	case 972:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6B); } while(0);
 break;
@@ -54595,7 +54595,7 @@ default: error_illegal_ident(); }
 	case 973:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6C); } while(0);
 break;
@@ -54605,7 +54605,7 @@ default: error_illegal_ident(); }
 	case 974:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6E); } while(0);
 break;
@@ -54615,7 +54615,7 @@ default: error_illegal_ident(); }
 	case 975:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6E00); } while(0); } else {
@@ -54627,7 +54627,7 @@ default: error_illegal_ident(); }
 	case 976:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD6E), expr); } while(0); } else {
@@ -54639,7 +54639,7 @@ default: error_illegal_ident(); }
 	case 977:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6E00); } while(0); } else {
@@ -54651,7 +54651,7 @@ default: error_illegal_ident(); }
 	case 978:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD6E), expr); } while(0); } else {
@@ -54663,7 +54663,7 @@ default: error_illegal_ident(); }
 	case 979:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6D); } while(0);
 break;
@@ -54673,7 +54673,7 @@ default: error_illegal_ident(); }
 	case 980:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x2E), expr); } while(0);
@@ -54684,7 +54684,7 @@ default: error_illegal_ident(); }
 	case 981:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED44); } while(0);
 break;
@@ -54694,7 +54694,7 @@ default: error_illegal_ident(); }
 	case 982:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED44); } while(0);
 break;
@@ -54704,7 +54704,7 @@ default: error_illegal_ident(); }
 	case 983:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB7); } while(0);
 break;
@@ -54714,7 +54714,7 @@ default: error_illegal_ident(); }
 	case 984:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB0); } while(0);
 break;
@@ -54724,7 +54724,7 @@ default: error_illegal_ident(); }
 	case 985:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB1); } while(0);
 break;
@@ -54734,7 +54734,7 @@ default: error_illegal_ident(); }
 	case 986:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB2); } while(0);
 break;
@@ -54744,7 +54744,7 @@ default: error_illegal_ident(); }
 	case 987:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB3); } while(0);
 break;
@@ -54754,7 +54754,7 @@ default: error_illegal_ident(); }
 	case 988:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB4); } while(0);
 break;
@@ -54764,7 +54764,7 @@ default: error_illegal_ident(); }
 	case 989:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
 break;
@@ -54774,7 +54774,7 @@ default: error_illegal_ident(); }
 	case 990:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDB600); } while(0); } else {
@@ -54786,7 +54786,7 @@ default: error_illegal_ident(); }
 	case 991:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDB6), expr); } while(0); } else {
@@ -54798,7 +54798,7 @@ default: error_illegal_ident(); }
 	case 992:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDB600); } while(0); } else {
@@ -54810,7 +54810,7 @@ default: error_illegal_ident(); }
 	case 993:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDB6), expr); } while(0); } else {
@@ -54822,7 +54822,7 @@ default: error_illegal_ident(); }
 	case 994:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB5); } while(0);
 break;
@@ -54832,7 +54832,7 @@ default: error_illegal_ident(); }
 	case 995:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xF6), expr); } while(0);
@@ -54843,7 +54843,7 @@ default: error_illegal_ident(); }
 	case 996:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB7); } while(0);
 break;
@@ -54853,7 +54853,7 @@ default: error_illegal_ident(); }
 	case 997:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB0); } while(0);
 break;
@@ -54863,7 +54863,7 @@ default: error_illegal_ident(); }
 	case 998:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB1); } while(0);
 break;
@@ -54873,7 +54873,7 @@ default: error_illegal_ident(); }
 	case 999:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB2); } while(0);
 break;
@@ -54883,7 +54883,7 @@ default: error_illegal_ident(); }
 	case 1000:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB3); } while(0);
 break;
@@ -54893,7 +54893,7 @@ default: error_illegal_ident(); }
 	case 1001:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB4); } while(0);
 break;
@@ -54903,7 +54903,7 @@ default: error_illegal_ident(); }
 	case 1002:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEC); } while(0);
 break;
@@ -54913,7 +54913,7 @@ default: error_illegal_ident(); }
 	case 1003:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
 break;
@@ -54923,7 +54923,7 @@ default: error_illegal_ident(); }
 	case 1004:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDB600); } while(0); } else {
@@ -54935,7 +54935,7 @@ default: error_illegal_ident(); }
 	case 1005:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDB6), expr); } while(0); } else {
@@ -54947,7 +54947,7 @@ default: error_illegal_ident(); }
 	case 1006:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDB600); } while(0); } else {
@@ -54959,7 +54959,7 @@ default: error_illegal_ident(); }
 	case 1007:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDB6), expr); } while(0); } else {
@@ -54971,7 +54971,7 @@ default: error_illegal_ident(); }
 	case 1008:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDEC); } while(0); } else {
@@ -54983,7 +54983,7 @@ default: error_illegal_ident(); }
 	case 1009:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDEC); } while(0); } else {
@@ -54995,7 +54995,7 @@ default: error_illegal_ident(); }
 	case 1010:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB5); } while(0);
 break;
@@ -55005,7 +55005,7 @@ default: error_illegal_ident(); }
 	case 1011:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xF6), expr); } while(0);
@@ -55016,7 +55016,7 @@ default: error_illegal_ident(); }
 	case 1012:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF1); } while(0);
 break;
@@ -55026,7 +55026,7 @@ default: error_illegal_ident(); }
 	case 1013:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xC1); } while(0);
 break;
@@ -55036,7 +55036,7 @@ default: error_illegal_ident(); }
 	case 1014:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xC1); } while(0);
 break;
@@ -55046,7 +55046,7 @@ default: error_illegal_ident(); }
 	case 1015:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
 break;
@@ -55056,7 +55056,7 @@ default: error_illegal_ident(); }
 	case 1016:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
 break;
@@ -55066,7 +55066,7 @@ default: error_illegal_ident(); }
 	case 1017:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
 break;
@@ -55076,7 +55076,7 @@ default: error_illegal_ident(); }
 	case 1018:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
 break;
@@ -55086,7 +55086,7 @@ default: error_illegal_ident(); }
 	case 1019:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -55102,7 +55102,7 @@ default: error_illegal_ident(); }
 	case 1020:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -55118,7 +55118,7 @@ default: error_illegal_ident(); }
 	case 1021:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -55134,7 +55134,7 @@ default: error_illegal_ident(); }
 	case 1022:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -55150,7 +55150,7 @@ default: error_illegal_ident(); }
 	case 1023:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -55166,7 +55166,7 @@ default: error_illegal_ident(); }
 	case 1024:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -55182,7 +55182,7 @@ default: error_illegal_ident(); }
 	case 1025:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -55198,7 +55198,7 @@ default: error_illegal_ident(); }
 	case 1026:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB17); } while(0);
 break;
@@ -55208,7 +55208,7 @@ default: error_illegal_ident(); }
 	case 1027:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB10); } while(0);
 break;
@@ -55218,7 +55218,7 @@ default: error_illegal_ident(); }
 	case 1028:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB11); } while(0);
 break;
@@ -55228,7 +55228,7 @@ default: error_illegal_ident(); }
 	case 1029:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB12); } while(0);
 break;
@@ -55238,7 +55238,7 @@ default: error_illegal_ident(); }
 	case 1030:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF3); } while(0);
 break;
@@ -55248,7 +55248,7 @@ default: error_illegal_ident(); }
 	case 1031:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB13); } while(0);
 break;
@@ -55258,7 +55258,7 @@ default: error_illegal_ident(); }
 	case 1032:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB14); } while(0);
 break;
@@ -55268,7 +55268,7 @@ default: error_illegal_ident(); }
 	case 1033:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB16); } while(0);
 break;
@@ -55278,7 +55278,7 @@ default: error_illegal_ident(); }
 	case 1034:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0016); } while(0); } else {
@@ -55290,7 +55290,7 @@ default: error_illegal_ident(); }
 	case 1035:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB16), expr); } while(0); } else {
@@ -55302,7 +55302,7 @@ default: error_illegal_ident(); }
 	case 1036:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0016); } while(0); } else {
@@ -55314,7 +55314,7 @@ default: error_illegal_ident(); }
 	case 1037:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB16), expr); } while(0); } else {
@@ -55326,7 +55326,7 @@ default: error_illegal_ident(); }
 	case 1038:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB15); } while(0);
 break;
@@ -55336,7 +55336,7 @@ default: error_illegal_ident(); }
 	case 1039:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x17); } while(0);
 break;
@@ -55346,7 +55346,7 @@ default: error_illegal_ident(); }
 	case 1040:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB07); } while(0);
 break;
@@ -55356,7 +55356,7 @@ default: error_illegal_ident(); }
 	case 1041:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB00); } while(0);
 break;
@@ -55366,7 +55366,7 @@ default: error_illegal_ident(); }
 	case 1042:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB01); } while(0);
 break;
@@ -55376,7 +55376,7 @@ default: error_illegal_ident(); }
 	case 1043:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB02); } while(0);
 break;
@@ -55386,7 +55386,7 @@ default: error_illegal_ident(); }
 	case 1044:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB03); } while(0);
 break;
@@ -55396,7 +55396,7 @@ default: error_illegal_ident(); }
 	case 1045:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB04); } while(0);
 break;
@@ -55406,7 +55406,7 @@ default: error_illegal_ident(); }
 	case 1046:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB06); } while(0);
 break;
@@ -55416,7 +55416,7 @@ default: error_illegal_ident(); }
 	case 1047:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0006); } while(0); } else {
@@ -55428,7 +55428,7 @@ default: error_illegal_ident(); }
 	case 1048:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB06), expr); } while(0); } else {
@@ -55440,7 +55440,7 @@ default: error_illegal_ident(); }
 	case 1049:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0006); } while(0); } else {
@@ -55452,7 +55452,7 @@ default: error_illegal_ident(); }
 	case 1050:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB06), expr); } while(0); } else {
@@ -55464,7 +55464,7 @@ default: error_illegal_ident(); }
 	case 1051:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB05); } while(0);
 break;
@@ -55474,7 +55474,7 @@ default: error_illegal_ident(); }
 	case 1052:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x07); } while(0);
 break;
@@ -55484,7 +55484,7 @@ default: error_illegal_ident(); }
 	case 1053:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1F); } while(0);
 break;
@@ -55494,7 +55494,7 @@ default: error_illegal_ident(); }
 	case 1054:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB18); } while(0);
 break;
@@ -55504,7 +55504,7 @@ default: error_illegal_ident(); }
 	case 1055:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB19); } while(0);
 break;
@@ -55514,7 +55514,7 @@ default: error_illegal_ident(); }
 	case 1056:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1A); } while(0);
 break;
@@ -55524,7 +55524,7 @@ default: error_illegal_ident(); }
 	case 1057:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFB); } while(0);
 break;
@@ -55534,7 +55534,7 @@ default: error_illegal_ident(); }
 	case 1058:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1B); } while(0);
 break;
@@ -55544,7 +55544,7 @@ default: error_illegal_ident(); }
 	case 1059:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1C); } while(0);
 break;
@@ -55554,7 +55554,7 @@ default: error_illegal_ident(); }
 	case 1060:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFC); } while(0);
 break;
@@ -55564,7 +55564,7 @@ default: error_illegal_ident(); }
 	case 1061:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1E); } while(0);
 break;
@@ -55574,7 +55574,7 @@ default: error_illegal_ident(); }
 	case 1062:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB001E); } while(0); } else {
@@ -55586,7 +55586,7 @@ default: error_illegal_ident(); }
 	case 1063:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB1E), expr); } while(0); } else {
@@ -55598,7 +55598,7 @@ default: error_illegal_ident(); }
 	case 1064:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB001E); } while(0); } else {
@@ -55610,7 +55610,7 @@ default: error_illegal_ident(); }
 	case 1065:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB1E), expr); } while(0); } else {
@@ -55622,7 +55622,7 @@ default: error_illegal_ident(); }
 	case 1066:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDFC); } while(0); } else {
@@ -55634,7 +55634,7 @@ default: error_illegal_ident(); }
 	case 1067:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDFC); } while(0); } else {
@@ -55646,7 +55646,7 @@ default: error_illegal_ident(); }
 	case 1068:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1D); } while(0);
 break;
@@ -55656,7 +55656,7 @@ default: error_illegal_ident(); }
 	case 1069:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1F); } while(0);
 break;
@@ -55666,7 +55666,7 @@ default: error_illegal_ident(); }
 	case 1070:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0F); } while(0);
 break;
@@ -55676,7 +55676,7 @@ default: error_illegal_ident(); }
 	case 1071:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB08); } while(0);
 break;
@@ -55686,7 +55686,7 @@ default: error_illegal_ident(); }
 	case 1072:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB09); } while(0);
 break;
@@ -55696,7 +55696,7 @@ default: error_illegal_ident(); }
 	case 1073:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0A); } while(0);
 break;
@@ -55706,7 +55706,7 @@ default: error_illegal_ident(); }
 	case 1074:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0B); } while(0);
 break;
@@ -55716,7 +55716,7 @@ default: error_illegal_ident(); }
 	case 1075:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0C); } while(0);
 break;
@@ -55726,7 +55726,7 @@ default: error_illegal_ident(); }
 	case 1076:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0E); } while(0);
 break;
@@ -55736,7 +55736,7 @@ default: error_illegal_ident(); }
 	case 1077:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB000E); } while(0); } else {
@@ -55748,7 +55748,7 @@ default: error_illegal_ident(); }
 	case 1078:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB0E), expr); } while(0); } else {
@@ -55760,7 +55760,7 @@ default: error_illegal_ident(); }
 	case 1079:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB000E); } while(0); } else {
@@ -55772,7 +55772,7 @@ default: error_illegal_ident(); }
 	case 1080:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB0E), expr); } while(0); } else {
@@ -55784,7 +55784,7 @@ default: error_illegal_ident(); }
 	case 1081:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0D); } while(0);
 break;
@@ -55794,7 +55794,7 @@ default: error_illegal_ident(); }
 	case 1082:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0F); } while(0);
 break;
@@ -55804,7 +55804,7 @@ default: error_illegal_ident(); }
 	case 1083:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9F); } while(0);
 break;
@@ -55814,7 +55814,7 @@ default: error_illegal_ident(); }
 	case 1084:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x98); } while(0);
 break;
@@ -55824,7 +55824,7 @@ default: error_illegal_ident(); }
 	case 1085:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x99); } while(0);
 break;
@@ -55834,7 +55834,7 @@ default: error_illegal_ident(); }
 	case 1086:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9A); } while(0);
 break;
@@ -55844,7 +55844,7 @@ default: error_illegal_ident(); }
 	case 1087:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9B); } while(0);
 break;
@@ -55854,7 +55854,7 @@ default: error_illegal_ident(); }
 	case 1088:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9C); } while(0);
 break;
@@ -55864,7 +55864,7 @@ default: error_illegal_ident(); }
 	case 1089:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
 break;
@@ -55874,7 +55874,7 @@ default: error_illegal_ident(); }
 	case 1090:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9E00); } while(0); } else {
@@ -55886,7 +55886,7 @@ default: error_illegal_ident(); }
 	case 1091:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD9E), expr); } while(0); } else {
@@ -55898,7 +55898,7 @@ default: error_illegal_ident(); }
 	case 1092:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9E00); } while(0); } else {
@@ -55910,7 +55910,7 @@ default: error_illegal_ident(); }
 	case 1093:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD9E), expr); } while(0); } else {
@@ -55922,7 +55922,7 @@ default: error_illegal_ident(); }
 	case 1094:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9D); } while(0);
 break;
@@ -55932,7 +55932,7 @@ default: error_illegal_ident(); }
 	case 1095:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xDE), expr); } while(0);
@@ -55943,7 +55943,7 @@ default: error_illegal_ident(); }
 	case 1096:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9F); } while(0);
 break;
@@ -55953,7 +55953,7 @@ default: error_illegal_ident(); }
 	case 1097:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x98); } while(0);
 break;
@@ -55963,7 +55963,7 @@ default: error_illegal_ident(); }
 	case 1098:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x99); } while(0);
 break;
@@ -55973,7 +55973,7 @@ default: error_illegal_ident(); }
 	case 1099:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9A); } while(0);
 break;
@@ -55983,7 +55983,7 @@ default: error_illegal_ident(); }
 	case 1100:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9B); } while(0);
 break;
@@ -55993,7 +55993,7 @@ default: error_illegal_ident(); }
 	case 1101:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9C); } while(0);
 break;
@@ -56003,7 +56003,7 @@ default: error_illegal_ident(); }
 	case 1102:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED42); } while(0);
 break;
@@ -56013,7 +56013,7 @@ default: error_illegal_ident(); }
 	case 1103:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED52); } while(0);
 break;
@@ -56023,7 +56023,7 @@ default: error_illegal_ident(); }
 	case 1104:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED62); } while(0);
 break;
@@ -56033,7 +56033,7 @@ default: error_illegal_ident(); }
 	case 1105:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED72); } while(0);
 break;
@@ -56043,7 +56043,7 @@ default: error_illegal_ident(); }
 	case 1106:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
 break;
@@ -56053,7 +56053,7 @@ default: error_illegal_ident(); }
 	case 1107:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9E00); } while(0); } else {
@@ -56065,7 +56065,7 @@ default: error_illegal_ident(); }
 	case 1108:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD9E), expr); } while(0); } else {
@@ -56077,7 +56077,7 @@ default: error_illegal_ident(); }
 	case 1109:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9E00); } while(0); } else {
@@ -56089,7 +56089,7 @@ default: error_illegal_ident(); }
 	case 1110:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD9E), expr); } while(0); } else {
@@ -56101,7 +56101,7 @@ default: error_illegal_ident(); }
 	case 1111:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9D); } while(0);
 break;
@@ -56111,7 +56111,7 @@ default: error_illegal_ident(); }
 	case 1112:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xDE), expr); } while(0);
@@ -56122,7 +56122,7 @@ default: error_illegal_ident(); }
 	case 1113:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x37); } while(0);
 break;
@@ -56132,7 +56132,7 @@ default: error_illegal_ident(); }
 	case 1114:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -56148,7 +56148,7 @@ default: error_illegal_ident(); }
 	case 1115:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -56164,7 +56164,7 @@ default: error_illegal_ident(); }
 	case 1116:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -56180,7 +56180,7 @@ default: error_illegal_ident(); }
 	case 1117:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -56196,7 +56196,7 @@ default: error_illegal_ident(); }
 	case 1118:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -56212,7 +56212,7 @@ default: error_illegal_ident(); }
 	case 1119:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -56228,7 +56228,7 @@ default: error_illegal_ident(); }
 	case 1120:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -56244,7 +56244,7 @@ default: error_illegal_ident(); }
 	case 1121:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB27); } while(0);
 break;
@@ -56254,7 +56254,7 @@ default: error_illegal_ident(); }
 	case 1122:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB20); } while(0);
 break;
@@ -56264,7 +56264,7 @@ default: error_illegal_ident(); }
 	case 1123:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB21); } while(0);
 break;
@@ -56274,7 +56274,7 @@ default: error_illegal_ident(); }
 	case 1124:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB22); } while(0);
 break;
@@ -56284,7 +56284,7 @@ default: error_illegal_ident(); }
 	case 1125:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB23); } while(0);
 break;
@@ -56294,7 +56294,7 @@ default: error_illegal_ident(); }
 	case 1126:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB24); } while(0);
 break;
@@ -56304,7 +56304,7 @@ default: error_illegal_ident(); }
 	case 1127:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB26); } while(0);
 break;
@@ -56314,7 +56314,7 @@ default: error_illegal_ident(); }
 	case 1128:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0026); } while(0); } else {
@@ -56326,7 +56326,7 @@ default: error_illegal_ident(); }
 	case 1129:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB26), expr); } while(0); } else {
@@ -56338,7 +56338,7 @@ default: error_illegal_ident(); }
 	case 1130:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0026); } while(0); } else {
@@ -56350,7 +56350,7 @@ default: error_illegal_ident(); }
 	case 1131:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB26), expr); } while(0); } else {
@@ -56362,7 +56362,7 @@ default: error_illegal_ident(); }
 	case 1132:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB25); } while(0);
 break;
@@ -56372,7 +56372,7 @@ default: error_illegal_ident(); }
 	case 1133:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2F); } while(0);
 break;
@@ -56382,7 +56382,7 @@ default: error_illegal_ident(); }
 	case 1134:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB28); } while(0);
 break;
@@ -56392,7 +56392,7 @@ default: error_illegal_ident(); }
 	case 1135:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB29); } while(0);
 break;
@@ -56402,7 +56402,7 @@ default: error_illegal_ident(); }
 	case 1136:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2A); } while(0);
 break;
@@ -56412,7 +56412,7 @@ default: error_illegal_ident(); }
 	case 1137:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2B); } while(0);
 break;
@@ -56422,7 +56422,7 @@ default: error_illegal_ident(); }
 	case 1138:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2C); } while(0);
 break;
@@ -56432,7 +56432,7 @@ default: error_illegal_ident(); }
 	case 1139:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2E); } while(0);
 break;
@@ -56442,7 +56442,7 @@ default: error_illegal_ident(); }
 	case 1140:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB002E); } while(0); } else {
@@ -56454,7 +56454,7 @@ default: error_illegal_ident(); }
 	case 1141:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB2E), expr); } while(0); } else {
@@ -56466,7 +56466,7 @@ default: error_illegal_ident(); }
 	case 1142:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB002E); } while(0); } else {
@@ -56478,7 +56478,7 @@ default: error_illegal_ident(); }
 	case 1143:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB2E), expr); } while(0); } else {
@@ -56490,7 +56490,7 @@ default: error_illegal_ident(); }
 	case 1144:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2D); } while(0);
 break;
@@ -56500,7 +56500,7 @@ default: error_illegal_ident(); }
 	case 1145:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3F); } while(0);
 break;
@@ -56510,7 +56510,7 @@ default: error_illegal_ident(); }
 	case 1146:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB38); } while(0);
 break;
@@ -56520,7 +56520,7 @@ default: error_illegal_ident(); }
 	case 1147:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB39); } while(0);
 break;
@@ -56530,7 +56530,7 @@ default: error_illegal_ident(); }
 	case 1148:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3A); } while(0);
 break;
@@ -56540,7 +56540,7 @@ default: error_illegal_ident(); }
 	case 1149:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3B); } while(0);
 break;
@@ -56550,7 +56550,7 @@ default: error_illegal_ident(); }
 	case 1150:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3C); } while(0);
 break;
@@ -56560,7 +56560,7 @@ default: error_illegal_ident(); }
 	case 1151:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3E); } while(0);
 break;
@@ -56570,7 +56570,7 @@ default: error_illegal_ident(); }
 	case 1152:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB003E); } while(0); } else {
@@ -56582,7 +56582,7 @@ default: error_illegal_ident(); }
 	case 1153:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB3E), expr); } while(0); } else {
@@ -56594,7 +56594,7 @@ default: error_illegal_ident(); }
 	case 1154:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB003E); } while(0); } else {
@@ -56606,7 +56606,7 @@ default: error_illegal_ident(); }
 	case 1155:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB3E), expr); } while(0); } else {
@@ -56618,7 +56618,7 @@ default: error_illegal_ident(); }
 	case 1156:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3D); } while(0);
 break;
@@ -56628,7 +56628,7 @@ default: error_illegal_ident(); }
 	case 1157:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x97); } while(0);
 break;
@@ -56638,7 +56638,7 @@ default: error_illegal_ident(); }
 	case 1158:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x90); } while(0);
 break;
@@ -56648,7 +56648,7 @@ default: error_illegal_ident(); }
 	case 1159:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x91); } while(0);
 break;
@@ -56658,7 +56658,7 @@ default: error_illegal_ident(); }
 	case 1160:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x92); } while(0);
 break;
@@ -56668,7 +56668,7 @@ default: error_illegal_ident(); }
 	case 1161:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x93); } while(0);
 break;
@@ -56678,7 +56678,7 @@ default: error_illegal_ident(); }
 	case 1162:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x94); } while(0);
 break;
@@ -56688,7 +56688,7 @@ default: error_illegal_ident(); }
 	case 1163:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
 break;
@@ -56698,7 +56698,7 @@ default: error_illegal_ident(); }
 	case 1164:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9600); } while(0); } else {
@@ -56710,7 +56710,7 @@ default: error_illegal_ident(); }
 	case 1165:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD96), expr); } while(0); } else {
@@ -56722,7 +56722,7 @@ default: error_illegal_ident(); }
 	case 1166:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9600); } while(0); } else {
@@ -56734,7 +56734,7 @@ default: error_illegal_ident(); }
 	case 1167:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD96), expr); } while(0); } else {
@@ -56746,7 +56746,7 @@ default: error_illegal_ident(); }
 	case 1168:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x95); } while(0);
 break;
@@ -56756,7 +56756,7 @@ default: error_illegal_ident(); }
 	case 1169:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xD6), expr); } while(0);
@@ -56767,7 +56767,7 @@ default: error_illegal_ident(); }
 	case 1170:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x97); } while(0);
 break;
@@ -56777,7 +56777,7 @@ default: error_illegal_ident(); }
 	case 1171:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x90); } while(0);
 break;
@@ -56787,7 +56787,7 @@ default: error_illegal_ident(); }
 	case 1172:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x91); } while(0);
 break;
@@ -56797,7 +56797,7 @@ default: error_illegal_ident(); }
 	case 1173:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x92); } while(0);
 break;
@@ -56807,7 +56807,7 @@ default: error_illegal_ident(); }
 	case 1174:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x93); } while(0);
 break;
@@ -56817,7 +56817,7 @@ default: error_illegal_ident(); }
 	case 1175:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x94); } while(0);
 break;
@@ -56827,7 +56827,7 @@ default: error_illegal_ident(); }
 	case 1176:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
 break;
@@ -56837,7 +56837,7 @@ default: error_illegal_ident(); }
 	case 1177:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9600); } while(0); } else {
@@ -56849,7 +56849,7 @@ default: error_illegal_ident(); }
 	case 1178:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD96), expr); } while(0); } else {
@@ -56861,7 +56861,7 @@ default: error_illegal_ident(); }
 	case 1179:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9600); } while(0); } else {
@@ -56873,7 +56873,7 @@ default: error_illegal_ident(); }
 	case 1180:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD96), expr); } while(0); } else {
@@ -56885,7 +56885,7 @@ default: error_illegal_ident(); }
 	case 1181:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x95); } while(0);
 break;
@@ -56895,7 +56895,7 @@ default: error_illegal_ident(); }
 	case 1182:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
 break;
@@ -56905,7 +56905,7 @@ default: error_illegal_ident(); }
 	case 1183:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xD6), expr); } while(0);
@@ -56916,7 +56916,7 @@ default: error_illegal_ident(); }
 	case 1184:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAF); } while(0);
 break;
@@ -56926,7 +56926,7 @@ default: error_illegal_ident(); }
 	case 1185:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA8); } while(0);
 break;
@@ -56936,7 +56936,7 @@ default: error_illegal_ident(); }
 	case 1186:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA9); } while(0);
 break;
@@ -56946,7 +56946,7 @@ default: error_illegal_ident(); }
 	case 1187:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAA); } while(0);
 break;
@@ -56956,7 +56956,7 @@ default: error_illegal_ident(); }
 	case 1188:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAB); } while(0);
 break;
@@ -56966,7 +56966,7 @@ default: error_illegal_ident(); }
 	case 1189:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAC); } while(0);
 break;
@@ -56976,7 +56976,7 @@ default: error_illegal_ident(); }
 	case 1190:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
 break;
@@ -56986,7 +56986,7 @@ default: error_illegal_ident(); }
 	case 1191:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDAE00); } while(0); } else {
@@ -56998,7 +56998,7 @@ default: error_illegal_ident(); }
 	case 1192:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDAE), expr); } while(0); } else {
@@ -57010,7 +57010,7 @@ default: error_illegal_ident(); }
 	case 1193:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDAE00); } while(0); } else {
@@ -57022,7 +57022,7 @@ default: error_illegal_ident(); }
 	case 1194:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDAE), expr); } while(0); } else {
@@ -57034,7 +57034,7 @@ default: error_illegal_ident(); }
 	case 1195:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAD); } while(0);
 break;
@@ -57044,7 +57044,7 @@ default: error_illegal_ident(); }
 	case 1196:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xEE), expr); } while(0);
@@ -57055,7 +57055,7 @@ default: error_illegal_ident(); }
 	case 1197:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAF); } while(0);
 break;
@@ -57065,7 +57065,7 @@ default: error_illegal_ident(); }
 	case 1198:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA8); } while(0);
 break;
@@ -57075,7 +57075,7 @@ default: error_illegal_ident(); }
 	case 1199:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA9); } while(0);
 break;
@@ -57085,7 +57085,7 @@ default: error_illegal_ident(); }
 	case 1200:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAA); } while(0);
 break;
@@ -57095,7 +57095,7 @@ default: error_illegal_ident(); }
 	case 1201:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAB); } while(0);
 break;
@@ -57105,7 +57105,7 @@ default: error_illegal_ident(); }
 	case 1202:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAC); } while(0);
 break;
@@ -57115,7 +57115,7 @@ default: error_illegal_ident(); }
 	case 1203:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
 break;
@@ -57125,7 +57125,7 @@ default: error_illegal_ident(); }
 	case 1204:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDAE00); } while(0); } else {
@@ -57137,7 +57137,7 @@ default: error_illegal_ident(); }
 	case 1205:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDAE), expr); } while(0); } else {
@@ -57149,7 +57149,7 @@ default: error_illegal_ident(); }
 	case 1206:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDAE00); } while(0); } else {
@@ -57161,7 +57161,7 @@ default: error_illegal_ident(); }
 	case 1207:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDAE), expr); } while(0); } else {
@@ -57173,7 +57173,7 @@ default: error_illegal_ident(); }
 	case 1208:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAD); } while(0);
 break;
@@ -57183,7 +57183,7 @@ default: error_illegal_ident(); }
 	case 1209:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xEE), expr); } while(0);
@@ -57269,7 +57269,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
 	case 1225:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDA600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDA600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -57278,7 +57278,7 @@ default: error_illegal_ident(); }
 	case 1226:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDA6), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDA6), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -57287,7 +57287,7 @@ default: error_illegal_ident(); }
 	case 1227:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDA600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDA600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -57296,7 +57296,7 @@ default: error_illegal_ident(); }
 	case 1228:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDA6), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDA6), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -57357,7 +57357,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xA7); } while(0);
 	case 1236:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA7); } while(0);
 break;
@@ -57367,7 +57367,7 @@ default: error_illegal_ident(); }
 	case 1237:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA0); } while(0);
 break;
@@ -57377,7 +57377,7 @@ default: error_illegal_ident(); }
 	case 1238:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA1); } while(0);
 break;
@@ -57387,7 +57387,7 @@ default: error_illegal_ident(); }
 	case 1239:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA2); } while(0);
 break;
@@ -57397,7 +57397,7 @@ default: error_illegal_ident(); }
 	case 1240:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA3); } while(0);
 break;
@@ -57407,7 +57407,7 @@ default: error_illegal_ident(); }
 	case 1241:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA4); } while(0);
 break;
@@ -57417,7 +57417,7 @@ default: error_illegal_ident(); }
 	case 1242:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
 break;
@@ -57427,7 +57427,7 @@ default: error_illegal_ident(); }
 	case 1243:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDA600); } while(0); } else {
@@ -57439,7 +57439,7 @@ default: error_illegal_ident(); }
 	case 1244:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDA6), expr); } while(0); } else {
@@ -57451,7 +57451,7 @@ default: error_illegal_ident(); }
 	case 1245:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDA600); } while(0); } else {
@@ -57463,7 +57463,7 @@ default: error_illegal_ident(); }
 	case 1246:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDA6), expr); } while(0); } else {
@@ -57475,7 +57475,7 @@ default: error_illegal_ident(); }
 	case 1247:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA5); } while(0);
 break;
@@ -57485,7 +57485,7 @@ default: error_illegal_ident(); }
 	case 1248:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xE6), expr); } while(0);
@@ -57529,7 +57529,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x7D); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6F); } while(0);
 break;
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDC); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -57538,7 +57538,7 @@ default: error_illegal_ident(); }
 	case 1254:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDDC); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDDC); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -57547,7 +57547,7 @@ default: error_illegal_ident(); }
 	case 1255:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDDC); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDDC); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -57566,7 +57566,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xA4); } while(0);
 	case 1258:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDC); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -57575,7 +57575,7 @@ default: error_illegal_ident(); }
 	case 1259:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDC); } while(0);
 break;
@@ -57590,7 +57590,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
 	case 1261:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDA600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDA600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -57599,7 +57599,7 @@ default: error_illegal_ident(); }
 	case 1262:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDA6), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDA6), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -57608,7 +57608,7 @@ default: error_illegal_ident(); }
 	case 1263:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDA600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDA600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -57617,7 +57617,7 @@ default: error_illegal_ident(); }
 	case 1264:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDA6), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDA6), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -57626,7 +57626,7 @@ default: error_illegal_ident(); }
 	case 1265:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDDC); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDDC); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -57653,7 +57653,7 @@ default: error_illegal_ident(); }
 	case 1268:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDDC); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDDC); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -57704,7 +57704,7 @@ break;
 case CPU_8085:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x10); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2CCB1D); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -57713,7 +57713,7 @@ default: error_illegal_ident(); }
 	case 1275:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57747,7 +57747,7 @@ default: error_int_range(expr_value);
 }}
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+((1<<expr_value))); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57772,7 +57772,7 @@ default: error_int_range(expr_value);
 }}
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+((1<<expr_value))); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57797,7 +57797,7 @@ default: error_int_range(expr_value);
 }}
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+((1<<expr_value))); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57822,7 +57822,7 @@ default: error_int_range(expr_value);
 }}
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+((1<<expr_value))); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57847,7 +57847,7 @@ default: error_int_range(expr_value);
 }}
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+((1<<expr_value))); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57872,7 +57872,7 @@ default: error_int_range(expr_value);
 }}
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+((1<<expr_value))); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57887,7 +57887,7 @@ default: error_illegal_ident(); }
 	case 1282:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57904,7 +57904,7 @@ default: error_illegal_ident(); }
 	case 1283:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57921,7 +57921,7 @@ default: error_illegal_ident(); }
 	case 1284:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57938,7 +57938,7 @@ default: error_illegal_ident(); }
 	case 1285:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57965,7 +57965,7 @@ default: error_int_range(expr_value);
 }}
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+((1<<expr_value))); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57980,7 +57980,7 @@ default: error_illegal_ident(); }
 	case 1287:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -57995,7 +57995,7 @@ default: error_illegal_ident(); }
 	case 1288:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -58010,7 +58010,7 @@ default: error_illegal_ident(); }
 	case 1289:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -58025,7 +58025,7 @@ default: error_illegal_ident(); }
 	case 1290:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -58040,7 +58040,7 @@ default: error_illegal_ident(); }
 	case 1291:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -58055,7 +58055,7 @@ default: error_illegal_ident(); }
 	case 1292:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -58070,7 +58070,7 @@ default: error_illegal_ident(); }
 	case 1293:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -58085,7 +58085,7 @@ default: error_illegal_ident(); }
 	case 1294:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -58102,7 +58102,7 @@ default: error_illegal_ident(); }
 	case 1295:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -58119,7 +58119,7 @@ default: error_illegal_ident(); }
 	case 1296:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -58136,7 +58136,7 @@ default: error_illegal_ident(); }
 	case 1297:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -58153,7 +58153,7 @@ default: error_illegal_ident(); }
 	case 1298:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -58168,7 +58168,7 @@ default: error_illegal_ident(); }
 	case 1299:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCC); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -58177,7 +58177,7 @@ default: error_illegal_ident(); }
 	case 1300:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCC); } while(0);
 break;
@@ -58187,7 +58187,7 @@ default: error_illegal_ident(); }
 	case 1301:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCC); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCC); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58196,7 +58196,7 @@ default: error_illegal_ident(); }
 	case 1302:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCC); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCC); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58250,7 +58250,7 @@ default: error_illegal_ident(); }
 	case 1308:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3003); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xCD), expr); } while(0);
@@ -58265,7 +58265,7 @@ default: error_illegal_ident(); }
 	case 1309:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -58281,7 +58281,7 @@ default: error_illegal_ident(); }
 	case 1310:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -58297,7 +58297,7 @@ default: error_illegal_ident(); }
 	case 1311:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -58317,7 +58317,7 @@ default: error_illegal_ident(); }
 	case 1312:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3803); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xCD), expr); } while(0);
@@ -58332,7 +58332,7 @@ default: error_illegal_ident(); }
 	case 1313:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -58352,7 +58352,7 @@ default: error_illegal_ident(); }
 	case 1314:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2803); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xCD), expr); } while(0);
@@ -58367,7 +58367,7 @@ default: error_illegal_ident(); }
 	case 1315:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -58387,7 +58387,7 @@ default: error_illegal_ident(); }
 	case 1316:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -58407,7 +58407,7 @@ default: error_illegal_ident(); }
 	case 1317:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -58427,7 +58427,7 @@ default: error_illegal_ident(); }
 	case 1318:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -58447,7 +58447,7 @@ default: error_illegal_ident(); }
 	case 1319:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2003); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xCD), expr); } while(0);
@@ -58468,7 +58468,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xCD
 	case 1321:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3003); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xCD), expr); } while(0);
@@ -58488,7 +58488,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x3F); } while(0);
 	case 1323:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3F); } while(0);
 break;
@@ -58498,7 +58498,7 @@ default: error_illegal_ident(); }
 	case 1324:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -58514,7 +58514,7 @@ default: error_illegal_ident(); }
 	case 1325:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -58530,7 +58530,7 @@ default: error_illegal_ident(); }
 	case 1326:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -58595,7 +58595,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 	case 1336:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58604,7 +58604,7 @@ default: error_illegal_ident(); }
 	case 1337:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58613,7 +58613,7 @@ default: error_illegal_ident(); }
 	case 1338:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58622,7 +58622,7 @@ default: error_illegal_ident(); }
 	case 1339:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58713,7 +58713,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 	case 1353:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58722,7 +58722,7 @@ default: error_illegal_ident(); }
 	case 1354:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58731,7 +58731,7 @@ default: error_illegal_ident(); }
 	case 1355:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58740,7 +58740,7 @@ default: error_illegal_ident(); }
 	case 1356:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58801,7 +58801,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xFE)
 	case 1364:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3803); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xCD), expr); } while(0);
@@ -58816,7 +58816,7 @@ default: error_illegal_ident(); }
 	case 1365:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -58836,7 +58836,7 @@ default: error_illegal_ident(); }
 	case 1366:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2803); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xCD), expr); } while(0);
@@ -58886,7 +58886,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 	case 1374:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58895,7 +58895,7 @@ default: error_illegal_ident(); }
 	case 1375:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58904,7 +58904,7 @@ default: error_illegal_ident(); }
 	case 1376:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -58913,7 +58913,7 @@ default: error_illegal_ident(); }
 	case 1377:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59004,7 +59004,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 	case 1391:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59013,7 +59013,7 @@ default: error_illegal_ident(); }
 	case 1392:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59022,7 +59022,7 @@ default: error_illegal_ident(); }
 	case 1393:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59031,7 +59031,7 @@ default: error_illegal_ident(); }
 	case 1394:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59087,7 +59087,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xFE)
 	case 1401:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__cpd");
 break;
@@ -59100,7 +59100,7 @@ default: error_illegal_ident(); }
 	case 1402:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__cpdr");
 break;
@@ -59113,7 +59113,7 @@ default: error_illegal_ident(); }
 	case 1403:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -59133,7 +59133,7 @@ default: error_illegal_ident(); }
 	case 1404:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__cpi");
 break;
@@ -59152,7 +59152,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xFE)
 	case 1406:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__cpir");
 break;
@@ -59170,7 +59170,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x2F); } while(0);
 	case 1408:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2F); } while(0);
 break;
@@ -59185,7 +59185,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x2F); } while(0);
 	case 1410:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -59205,7 +59205,7 @@ default: error_illegal_ident(); }
 	case 1411:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 asm_cond_LABEL(stmt_label);
 Expr *target_expr = pop_expr(ctx);
@@ -59225,7 +59225,7 @@ default: error_illegal_ident(); }
 	case 1412:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2003); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xCD), expr); } while(0);
@@ -59340,7 +59340,7 @@ default: error_illegal_ident(); }
 	case 1423:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__daa");
 break;
@@ -59468,7 +59468,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x3D); } while(0);
 	case 1447:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3D); } while(0);
 break;
@@ -59483,7 +59483,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x05); } while(0);
 	case 1449:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x05); } while(0);
 break;
@@ -59498,7 +59498,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x0B); } while(0);
 	case 1451:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0B); } while(0);
 break;
@@ -59513,7 +59513,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x0D); } while(0);
 	case 1453:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0D); } while(0);
 break;
@@ -59528,7 +59528,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x15); } while(0);
 	case 1455:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x15); } while(0);
 break;
@@ -59543,7 +59543,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x1B); } while(0);
 	case 1457:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1B); } while(0);
 break;
@@ -59558,7 +59558,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x1D); } while(0);
 	case 1459:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1D); } while(0);
 break;
@@ -59573,7 +59573,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x25); } while(0);
 	case 1461:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x25); } while(0);
 break;
@@ -59588,7 +59588,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
 	case 1463:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
 break;
@@ -59603,7 +59603,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x35); } while(0);
 	case 1465:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD3500); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD3500); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59612,7 +59612,7 @@ default: error_illegal_ident(); }
 	case 1466:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD35), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD35), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59621,7 +59621,7 @@ default: error_illegal_ident(); }
 	case 1467:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD3500); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD3500); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59630,7 +59630,7 @@ default: error_illegal_ident(); }
 	case 1468:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD35), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD35), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59639,7 +59639,7 @@ default: error_illegal_ident(); }
 	case 1469:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD2B); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD2B); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59666,7 +59666,7 @@ default: error_illegal_ident(); }
 	case 1472:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD2B); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD2B); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59698,7 +59698,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x2D); } while(0);
 	case 1476:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2D); } while(0);
 break;
@@ -59732,7 +59732,7 @@ if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x05); } while(0);
 add_opcode_jr_n(0x20, pop_expr(ctx), 1);
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_jr((0x10), expr); } while(0);
 break;
@@ -59742,7 +59742,7 @@ default: error_illegal_ident(); }
 	case 1480:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_jr((0x10), expr); } while(0);
@@ -59763,7 +59763,7 @@ if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x05); } while(0);
 add_opcode_jr_n(0x20, pop_expr(ctx), 1);
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_jr((0x10), expr); } while(0);
 break;
@@ -59773,7 +59773,7 @@ default: error_illegal_ident(); }
 	case 1482:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__sub_hl_bc");
 break;
@@ -59795,7 +59795,7 @@ default: error_illegal_ident(); }
 	case 1484:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x08); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -59804,7 +59804,7 @@ default: error_illegal_ident(); }
 	case 1485:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x08); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -59819,7 +59819,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xD5); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEB); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -59828,7 +59828,7 @@ default: error_illegal_ident(); }
 	case 1487:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEB); } while(0);
 break;
@@ -59838,7 +59838,7 @@ default: error_illegal_ident(); }
 	case 1488:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE3); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -59847,7 +59847,7 @@ default: error_illegal_ident(); }
 	case 1489:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE3); } while(0);
 break;
@@ -59864,7 +59864,7 @@ break;
 case CPU_8080: case CPU_8085: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE3); } while(0);
 break;
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED54); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -59873,7 +59873,7 @@ default: error_illegal_ident(); }
 	case 1491:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED54); } while(0);
 break;
@@ -59883,7 +59883,7 @@ default: error_illegal_ident(); }
 	case 1492:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE3); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE3); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59892,7 +59892,7 @@ default: error_illegal_ident(); }
 	case 1493:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE3); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE3); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -59901,7 +59901,7 @@ default: error_illegal_ident(); }
 	case 1494:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD9); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -60148,7 +60148,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x3C); } while(0);
 	case 1520:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3C); } while(0);
 break;
@@ -60163,7 +60163,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x04); } while(0);
 	case 1522:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x04); } while(0);
 break;
@@ -60178,7 +60178,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x03); } while(0);
 	case 1524:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x03); } while(0);
 break;
@@ -60193,7 +60193,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x0C); } while(0);
 	case 1526:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0C); } while(0);
 break;
@@ -60208,7 +60208,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x14); } while(0);
 	case 1528:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x14); } while(0);
 break;
@@ -60223,7 +60223,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x13); } while(0);
 	case 1530:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x13); } while(0);
 break;
@@ -60238,7 +60238,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x1C); } while(0);
 	case 1532:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1C); } while(0);
 break;
@@ -60253,7 +60253,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x24); } while(0);
 	case 1534:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x24); } while(0);
 break;
@@ -60268,7 +60268,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
 	case 1536:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
 break;
@@ -60283,7 +60283,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x34); } while(0);
 	case 1538:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD3400); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD3400); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -60292,7 +60292,7 @@ default: error_illegal_ident(); }
 	case 1539:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD34), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD34), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -60301,7 +60301,7 @@ default: error_illegal_ident(); }
 	case 1540:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD3400); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD3400); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -60310,7 +60310,7 @@ default: error_illegal_ident(); }
 	case 1541:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD34), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD34), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -60319,7 +60319,7 @@ default: error_illegal_ident(); }
 	case 1542:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD23); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD23); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -60346,7 +60346,7 @@ default: error_illegal_ident(); }
 	case 1545:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD23); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD23); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -60378,7 +60378,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x2C); } while(0);
 	case 1549:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2C); } while(0);
 break;
@@ -60504,7 +60504,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x33); } while(0);
 	case 1570:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
 break;
@@ -60514,7 +60514,7 @@ default: error_illegal_ident(); }
 	case 1571:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8E00); } while(0); } else {
@@ -60526,7 +60526,7 @@ default: error_illegal_ident(); }
 	case 1572:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD8E), expr); } while(0); } else {
@@ -60538,7 +60538,7 @@ default: error_illegal_ident(); }
 	case 1573:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8E00); } while(0); } else {
@@ -60550,7 +60550,7 @@ default: error_illegal_ident(); }
 	case 1574:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD8E), expr); } while(0); } else {
@@ -60562,7 +60562,7 @@ default: error_illegal_ident(); }
 	case 1575:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
@@ -60573,7 +60573,7 @@ default: error_illegal_ident(); }
 	case 1576:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60586,7 +60586,7 @@ default: error_illegal_ident(); }
 	case 1577:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60599,7 +60599,7 @@ default: error_illegal_ident(); }
 	case 1578:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60612,7 +60612,7 @@ default: error_illegal_ident(); }
 	case 1579:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60625,7 +60625,7 @@ default: error_illegal_ident(); }
 	case 1580:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
 break;
@@ -60635,7 +60635,7 @@ default: error_illegal_ident(); }
 	case 1581:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8E00); } while(0); } else {
@@ -60647,7 +60647,7 @@ default: error_illegal_ident(); }
 	case 1582:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD8E), expr); } while(0); } else {
@@ -60659,7 +60659,7 @@ default: error_illegal_ident(); }
 	case 1583:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8E00); } while(0); } else {
@@ -60671,7 +60671,7 @@ default: error_illegal_ident(); }
 	case 1584:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD8E), expr); } while(0); } else {
@@ -60683,7 +60683,7 @@ default: error_illegal_ident(); }
 	case 1585:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
 break;
@@ -60693,7 +60693,7 @@ default: error_illegal_ident(); }
 	case 1586:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8600); } while(0); } else {
@@ -60705,7 +60705,7 @@ default: error_illegal_ident(); }
 	case 1587:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD86), expr); } while(0); } else {
@@ -60717,7 +60717,7 @@ default: error_illegal_ident(); }
 	case 1588:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8600); } while(0); } else {
@@ -60729,7 +60729,7 @@ default: error_illegal_ident(); }
 	case 1589:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD86), expr); } while(0); } else {
@@ -60741,7 +60741,7 @@ default: error_illegal_ident(); }
 	case 1590:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
@@ -60752,7 +60752,7 @@ default: error_illegal_ident(); }
 	case 1591:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60765,7 +60765,7 @@ default: error_illegal_ident(); }
 	case 1592:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60778,7 +60778,7 @@ default: error_illegal_ident(); }
 	case 1593:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60791,7 +60791,7 @@ default: error_illegal_ident(); }
 	case 1594:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60804,7 +60804,7 @@ default: error_illegal_ident(); }
 	case 1595:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
 break;
@@ -60814,7 +60814,7 @@ default: error_illegal_ident(); }
 	case 1596:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8600); } while(0); } else {
@@ -60826,7 +60826,7 @@ default: error_illegal_ident(); }
 	case 1597:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD86), expr); } while(0); } else {
@@ -60838,7 +60838,7 @@ default: error_illegal_ident(); }
 	case 1598:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8600); } while(0); } else {
@@ -60850,7 +60850,7 @@ default: error_illegal_ident(); }
 	case 1599:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD86), expr); } while(0); } else {
@@ -60862,7 +60862,7 @@ default: error_illegal_ident(); }
 	case 1600:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
@@ -60873,7 +60873,7 @@ default: error_illegal_ident(); }
 	case 1601:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60886,7 +60886,7 @@ default: error_illegal_ident(); }
 	case 1602:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60899,7 +60899,7 @@ default: error_illegal_ident(); }
 	case 1603:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60912,7 +60912,7 @@ default: error_illegal_ident(); }
 	case 1604:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60925,7 +60925,7 @@ default: error_illegal_ident(); }
 	case 1605:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
@@ -60936,7 +60936,7 @@ default: error_illegal_ident(); }
 	case 1606:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60949,7 +60949,7 @@ default: error_illegal_ident(); }
 	case 1607:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60962,7 +60962,7 @@ default: error_illegal_ident(); }
 	case 1608:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60975,7 +60975,7 @@ default: error_illegal_ident(); }
 	case 1609:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -60988,7 +60988,7 @@ default: error_illegal_ident(); }
 	case 1610:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
@@ -60999,7 +60999,7 @@ default: error_illegal_ident(); }
 	case 1611:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61012,7 +61012,7 @@ default: error_illegal_ident(); }
 	case 1612:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61025,7 +61025,7 @@ default: error_illegal_ident(); }
 	case 1613:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61038,7 +61038,7 @@ default: error_illegal_ident(); }
 	case 1614:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61051,7 +61051,7 @@ default: error_illegal_ident(); }
 	case 1615:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
@@ -61062,7 +61062,7 @@ default: error_illegal_ident(); }
 	case 1616:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61075,7 +61075,7 @@ default: error_illegal_ident(); }
 	case 1617:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61088,7 +61088,7 @@ default: error_illegal_ident(); }
 	case 1618:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61101,7 +61101,7 @@ default: error_illegal_ident(); }
 	case 1619:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61114,7 +61114,7 @@ default: error_illegal_ident(); }
 	case 1620:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
@@ -61125,7 +61125,7 @@ default: error_illegal_ident(); }
 	case 1621:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61138,7 +61138,7 @@ default: error_illegal_ident(); }
 	case 1622:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61151,7 +61151,7 @@ default: error_illegal_ident(); }
 	case 1623:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61164,7 +61164,7 @@ default: error_illegal_ident(); }
 	case 1624:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61177,7 +61177,7 @@ default: error_illegal_ident(); }
 	case 1625:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
@@ -61188,7 +61188,7 @@ default: error_illegal_ident(); }
 	case 1626:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61201,7 +61201,7 @@ default: error_illegal_ident(); }
 	case 1627:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61214,7 +61214,7 @@ default: error_illegal_ident(); }
 	case 1628:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61227,7 +61227,7 @@ default: error_illegal_ident(); }
 	case 1629:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61240,7 +61240,7 @@ default: error_illegal_ident(); }
 	case 1630:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -61257,7 +61257,7 @@ default: error_illegal_ident(); }
 	case 1631:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -61276,7 +61276,7 @@ default: error_illegal_ident(); }
 	case 1632:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -61295,7 +61295,7 @@ default: error_illegal_ident(); }
 	case 1633:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -61314,7 +61314,7 @@ default: error_illegal_ident(); }
 	case 1634:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -61333,7 +61333,7 @@ default: error_illegal_ident(); }
 	case 1635:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
@@ -61344,7 +61344,7 @@ default: error_illegal_ident(); }
 	case 1636:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61357,7 +61357,7 @@ default: error_illegal_ident(); }
 	case 1637:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61370,7 +61370,7 @@ default: error_illegal_ident(); }
 	case 1638:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61383,7 +61383,7 @@ default: error_illegal_ident(); }
 	case 1639:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61396,7 +61396,7 @@ default: error_illegal_ident(); }
 	case 1640:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
@@ -61407,7 +61407,7 @@ default: error_illegal_ident(); }
 	case 1641:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61420,7 +61420,7 @@ default: error_illegal_ident(); }
 	case 1642:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61433,7 +61433,7 @@ default: error_illegal_ident(); }
 	case 1643:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61446,7 +61446,7 @@ default: error_illegal_ident(); }
 	case 1644:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61459,7 +61459,7 @@ default: error_illegal_ident(); }
 	case 1645:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x35); } while(0);
@@ -61470,7 +61470,7 @@ default: error_illegal_ident(); }
 	case 1646:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61483,7 +61483,7 @@ default: error_illegal_ident(); }
 	case 1647:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61496,7 +61496,7 @@ default: error_illegal_ident(); }
 	case 1648:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61509,7 +61509,7 @@ default: error_illegal_ident(); }
 	case 1649:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61522,7 +61522,7 @@ default: error_illegal_ident(); }
 	case 1650:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x34); } while(0);
@@ -61533,7 +61533,7 @@ default: error_illegal_ident(); }
 	case 1651:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61546,7 +61546,7 @@ default: error_illegal_ident(); }
 	case 1652:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61559,7 +61559,7 @@ default: error_illegal_ident(); }
 	case 1653:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61572,7 +61572,7 @@ default: error_illegal_ident(); }
 	case 1654:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61585,7 +61585,7 @@ default: error_illegal_ident(); }
 	case 1655:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A0B); } while(0);
@@ -61596,7 +61596,7 @@ default: error_illegal_ident(); }
 	case 1656:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A03); } while(0);
@@ -61607,7 +61607,7 @@ default: error_illegal_ident(); }
 	case 1657:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A); } while(0);
@@ -61618,7 +61618,7 @@ default: error_illegal_ident(); }
 	case 1658:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A1B); } while(0);
@@ -61629,7 +61629,7 @@ default: error_illegal_ident(); }
 	case 1659:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A13); } while(0);
@@ -61640,7 +61640,7 @@ default: error_illegal_ident(); }
 	case 1660:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A); } while(0);
@@ -61651,7 +61651,7 @@ default: error_illegal_ident(); }
 	case 1661:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -61663,7 +61663,7 @@ default: error_illegal_ident(); }
 	case 1662:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -61675,7 +61675,7 @@ default: error_illegal_ident(); }
 	case 1663:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -61686,7 +61686,7 @@ default: error_illegal_ident(); }
 	case 1664:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -61698,7 +61698,7 @@ default: error_illegal_ident(); }
 	case 1665:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -61710,7 +61710,7 @@ default: error_illegal_ident(); }
 	case 1666:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61723,7 +61723,7 @@ default: error_illegal_ident(); }
 	case 1667:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61736,7 +61736,7 @@ default: error_illegal_ident(); }
 	case 1668:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61749,7 +61749,7 @@ default: error_illegal_ident(); }
 	case 1669:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61762,7 +61762,7 @@ default: error_illegal_ident(); }
 	case 1670:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -61774,7 +61774,7 @@ default: error_illegal_ident(); }
 	case 1671:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x46); } while(0);
@@ -61785,7 +61785,7 @@ default: error_illegal_ident(); }
 	case 1672:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61798,7 +61798,7 @@ default: error_illegal_ident(); }
 	case 1673:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61811,7 +61811,7 @@ default: error_illegal_ident(); }
 	case 1674:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61824,7 +61824,7 @@ default: error_illegal_ident(); }
 	case 1675:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61837,7 +61837,7 @@ default: error_illegal_ident(); }
 	case 1676:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -61849,7 +61849,7 @@ default: error_illegal_ident(); }
 	case 1677:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4E); } while(0);
@@ -61860,7 +61860,7 @@ default: error_illegal_ident(); }
 	case 1678:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61873,7 +61873,7 @@ default: error_illegal_ident(); }
 	case 1679:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61886,7 +61886,7 @@ default: error_illegal_ident(); }
 	case 1680:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61899,7 +61899,7 @@ default: error_illegal_ident(); }
 	case 1681:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61912,7 +61912,7 @@ default: error_illegal_ident(); }
 	case 1682:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x56); } while(0);
@@ -61923,7 +61923,7 @@ default: error_illegal_ident(); }
 	case 1683:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61936,7 +61936,7 @@ default: error_illegal_ident(); }
 	case 1684:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61949,7 +61949,7 @@ default: error_illegal_ident(); }
 	case 1685:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61962,7 +61962,7 @@ default: error_illegal_ident(); }
 	case 1686:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -61975,7 +61975,7 @@ default: error_illegal_ident(); }
 	case 1687:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -61987,7 +61987,7 @@ default: error_illegal_ident(); }
 	case 1688:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5E); } while(0);
@@ -61998,7 +61998,7 @@ default: error_illegal_ident(); }
 	case 1689:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62011,7 +62011,7 @@ default: error_illegal_ident(); }
 	case 1690:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62024,7 +62024,7 @@ default: error_illegal_ident(); }
 	case 1691:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62037,7 +62037,7 @@ default: error_illegal_ident(); }
 	case 1692:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62050,7 +62050,7 @@ default: error_illegal_ident(); }
 	case 1693:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x66); } while(0);
@@ -62061,7 +62061,7 @@ default: error_illegal_ident(); }
 	case 1694:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62074,7 +62074,7 @@ default: error_illegal_ident(); }
 	case 1695:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62087,7 +62087,7 @@ default: error_illegal_ident(); }
 	case 1696:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62100,7 +62100,7 @@ default: error_illegal_ident(); }
 	case 1697:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62113,7 +62113,7 @@ default: error_illegal_ident(); }
 	case 1698:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE400); } while(0);
@@ -62124,7 +62124,7 @@ default: error_illegal_ident(); }
 	case 1699:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDE4), expr); } while(0);
@@ -62135,7 +62135,7 @@ default: error_illegal_ident(); }
 	case 1700:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62148,7 +62148,7 @@ default: error_illegal_ident(); }
 	case 1701:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62161,7 +62161,7 @@ default: error_illegal_ident(); }
 	case 1702:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62174,7 +62174,7 @@ default: error_illegal_ident(); }
 	case 1703:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62187,7 +62187,7 @@ default: error_illegal_ident(); }
 	case 1704:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -62199,7 +62199,7 @@ default: error_illegal_ident(); }
 	case 1705:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6E); } while(0);
@@ -62210,7 +62210,7 @@ default: error_illegal_ident(); }
 	case 1706:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62223,7 +62223,7 @@ default: error_illegal_ident(); }
 	case 1707:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62236,7 +62236,7 @@ default: error_illegal_ident(); }
 	case 1708:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62249,7 +62249,7 @@ default: error_illegal_ident(); }
 	case 1709:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62262,7 +62262,7 @@ default: error_illegal_ident(); }
 	case 1710:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
@@ -62273,7 +62273,7 @@ default: error_illegal_ident(); }
 	case 1711:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62286,7 +62286,7 @@ default: error_illegal_ident(); }
 	case 1712:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62299,7 +62299,7 @@ default: error_illegal_ident(); }
 	case 1713:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62312,7 +62312,7 @@ default: error_illegal_ident(); }
 	case 1714:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62325,7 +62325,7 @@ default: error_illegal_ident(); }
 	case 1715:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
@@ -62336,7 +62336,7 @@ default: error_illegal_ident(); }
 	case 1716:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62349,7 +62349,7 @@ default: error_illegal_ident(); }
 	case 1717:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62362,7 +62362,7 @@ default: error_illegal_ident(); }
 	case 1718:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62375,7 +62375,7 @@ default: error_illegal_ident(); }
 	case 1719:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62388,7 +62388,7 @@ default: error_illegal_ident(); }
 	case 1720:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB16); } while(0);
@@ -62399,7 +62399,7 @@ default: error_illegal_ident(); }
 	case 1721:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62412,7 +62412,7 @@ default: error_illegal_ident(); }
 	case 1722:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62425,7 +62425,7 @@ default: error_illegal_ident(); }
 	case 1723:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62438,7 +62438,7 @@ default: error_illegal_ident(); }
 	case 1724:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62451,7 +62451,7 @@ default: error_illegal_ident(); }
 	case 1725:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB06); } while(0);
@@ -62462,7 +62462,7 @@ default: error_illegal_ident(); }
 	case 1726:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62475,7 +62475,7 @@ default: error_illegal_ident(); }
 	case 1727:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62488,7 +62488,7 @@ default: error_illegal_ident(); }
 	case 1728:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62501,7 +62501,7 @@ default: error_illegal_ident(); }
 	case 1729:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62514,7 +62514,7 @@ default: error_illegal_ident(); }
 	case 1730:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1E); } while(0);
@@ -62525,7 +62525,7 @@ default: error_illegal_ident(); }
 	case 1731:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62538,7 +62538,7 @@ default: error_illegal_ident(); }
 	case 1732:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62551,7 +62551,7 @@ default: error_illegal_ident(); }
 	case 1733:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62564,7 +62564,7 @@ default: error_illegal_ident(); }
 	case 1734:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62577,7 +62577,7 @@ default: error_illegal_ident(); }
 	case 1735:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0E); } while(0);
@@ -62588,7 +62588,7 @@ default: error_illegal_ident(); }
 	case 1736:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62601,7 +62601,7 @@ default: error_illegal_ident(); }
 	case 1737:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62614,7 +62614,7 @@ default: error_illegal_ident(); }
 	case 1738:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62627,7 +62627,7 @@ default: error_illegal_ident(); }
 	case 1739:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62640,7 +62640,7 @@ default: error_illegal_ident(); }
 	case 1740:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
@@ -62651,7 +62651,7 @@ default: error_illegal_ident(); }
 	case 1741:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62664,7 +62664,7 @@ default: error_illegal_ident(); }
 	case 1742:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62677,7 +62677,7 @@ default: error_illegal_ident(); }
 	case 1743:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62690,7 +62690,7 @@ default: error_illegal_ident(); }
 	case 1744:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62703,7 +62703,7 @@ default: error_illegal_ident(); }
 	case 1745:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
@@ -62714,7 +62714,7 @@ default: error_illegal_ident(); }
 	case 1746:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62727,7 +62727,7 @@ default: error_illegal_ident(); }
 	case 1747:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62740,7 +62740,7 @@ default: error_illegal_ident(); }
 	case 1748:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62753,7 +62753,7 @@ default: error_illegal_ident(); }
 	case 1749:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62766,7 +62766,7 @@ default: error_illegal_ident(); }
 	case 1750:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB26); } while(0);
@@ -62777,7 +62777,7 @@ default: error_illegal_ident(); }
 	case 1751:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62790,7 +62790,7 @@ default: error_illegal_ident(); }
 	case 1752:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62803,7 +62803,7 @@ default: error_illegal_ident(); }
 	case 1753:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62816,7 +62816,7 @@ default: error_illegal_ident(); }
 	case 1754:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62829,7 +62829,7 @@ default: error_illegal_ident(); }
 	case 1755:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2E); } while(0);
@@ -62840,7 +62840,7 @@ default: error_illegal_ident(); }
 	case 1756:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62853,7 +62853,7 @@ default: error_illegal_ident(); }
 	case 1757:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62866,7 +62866,7 @@ default: error_illegal_ident(); }
 	case 1758:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62879,7 +62879,7 @@ default: error_illegal_ident(); }
 	case 1759:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62892,7 +62892,7 @@ default: error_illegal_ident(); }
 	case 1760:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3E); } while(0);
@@ -62903,7 +62903,7 @@ default: error_illegal_ident(); }
 	case 1761:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62916,7 +62916,7 @@ default: error_illegal_ident(); }
 	case 1762:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62929,7 +62929,7 @@ default: error_illegal_ident(); }
 	case 1763:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62942,7 +62942,7 @@ default: error_illegal_ident(); }
 	case 1764:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62955,7 +62955,7 @@ default: error_illegal_ident(); }
 	case 1765:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
@@ -62966,7 +62966,7 @@ default: error_illegal_ident(); }
 	case 1766:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62979,7 +62979,7 @@ default: error_illegal_ident(); }
 	case 1767:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -62992,7 +62992,7 @@ default: error_illegal_ident(); }
 	case 1768:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63005,7 +63005,7 @@ default: error_illegal_ident(); }
 	case 1769:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63018,7 +63018,7 @@ default: error_illegal_ident(); }
 	case 1770:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
@@ -63029,7 +63029,7 @@ default: error_illegal_ident(); }
 	case 1771:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63042,7 +63042,7 @@ default: error_illegal_ident(); }
 	case 1772:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63055,7 +63055,7 @@ default: error_illegal_ident(); }
 	case 1773:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63068,7 +63068,7 @@ default: error_illegal_ident(); }
 	case 1774:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63081,7 +63081,7 @@ default: error_illegal_ident(); }
 	case 1775:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
@@ -63092,7 +63092,7 @@ default: error_illegal_ident(); }
 	case 1776:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63105,7 +63105,7 @@ default: error_illegal_ident(); }
 	case 1777:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63118,7 +63118,7 @@ default: error_illegal_ident(); }
 	case 1778:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63131,7 +63131,7 @@ default: error_illegal_ident(); }
 	case 1779:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63144,7 +63144,7 @@ default: error_illegal_ident(); }
 	case 1780:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
@@ -63155,7 +63155,7 @@ default: error_illegal_ident(); }
 	case 1781:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63168,7 +63168,7 @@ default: error_illegal_ident(); }
 	case 1782:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63181,7 +63181,7 @@ default: error_illegal_ident(); }
 	case 1783:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63194,7 +63194,7 @@ default: error_illegal_ident(); }
 	case 1784:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63207,7 +63207,7 @@ default: error_illegal_ident(); }
 	case 1785:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
 break;
@@ -63217,7 +63217,7 @@ default: error_illegal_ident(); }
 	case 1786:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDA600); } while(0); } else {
@@ -63229,7 +63229,7 @@ default: error_illegal_ident(); }
 	case 1787:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDA6), expr); } while(0); } else {
@@ -63241,7 +63241,7 @@ default: error_illegal_ident(); }
 	case 1788:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDA600); } while(0); } else {
@@ -63253,7 +63253,7 @@ default: error_illegal_ident(); }
 	case 1789:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDA6), expr); } while(0); } else {
@@ -63265,7 +63265,7 @@ default: error_illegal_ident(); }
 	case 1790:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
@@ -63276,7 +63276,7 @@ default: error_illegal_ident(); }
 	case 1791:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63289,7 +63289,7 @@ default: error_illegal_ident(); }
 	case 1792:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63302,7 +63302,7 @@ default: error_illegal_ident(); }
 	case 1793:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63315,7 +63315,7 @@ default: error_illegal_ident(); }
 	case 1794:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -63328,7 +63328,7 @@ default: error_illegal_ident(); }
 	case 1795:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
 break;
@@ -63338,7 +63338,7 @@ default: error_illegal_ident(); }
 	case 1796:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDA600); } while(0); } else {
@@ -63350,7 +63350,7 @@ default: error_illegal_ident(); }
 	case 1797:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDA6), expr); } while(0); } else {
@@ -63362,7 +63362,7 @@ default: error_illegal_ident(); }
 	case 1798:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDA600); } while(0); } else {
@@ -63374,7 +63374,7 @@ default: error_illegal_ident(); }
 	case 1799:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDA6), expr); } while(0); } else {
@@ -63386,7 +63386,7 @@ default: error_illegal_ident(); }
 	case 1800:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -63402,7 +63402,7 @@ default: error_illegal_ident(); }
 	case 1801:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -63420,7 +63420,7 @@ default: error_illegal_ident(); }
 	case 1802:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -63438,7 +63438,7 @@ default: error_illegal_ident(); }
 	case 1803:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -63456,7 +63456,7 @@ default: error_illegal_ident(); }
 	case 1804:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -63474,7 +63474,7 @@ default: error_illegal_ident(); }
 	case 1805:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -63490,7 +63490,7 @@ default: error_illegal_ident(); }
 	case 1806:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -63508,7 +63508,7 @@ default: error_illegal_ident(); }
 	case 1807:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -63526,7 +63526,7 @@ default: error_illegal_ident(); }
 	case 1808:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -63544,7 +63544,7 @@ default: error_illegal_ident(); }
 	case 1809:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -63562,7 +63562,7 @@ default: error_illegal_ident(); }
 	case 1810:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 break;
@@ -63572,7 +63572,7 @@ default: error_illegal_ident(); }
 	case 1811:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else {
@@ -63584,7 +63584,7 @@ default: error_illegal_ident(); }
 	case 1812:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else {
@@ -63596,7 +63596,7 @@ default: error_illegal_ident(); }
 	case 1813:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else {
@@ -63608,7 +63608,7 @@ default: error_illegal_ident(); }
 	case 1814:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else {
@@ -63620,7 +63620,7 @@ default: error_illegal_ident(); }
 	case 1815:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 break;
@@ -63630,7 +63630,7 @@ default: error_illegal_ident(); }
 	case 1816:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else {
@@ -63642,7 +63642,7 @@ default: error_illegal_ident(); }
 	case 1817:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else {
@@ -63654,7 +63654,7 @@ default: error_illegal_ident(); }
 	case 1818:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else {
@@ -63666,7 +63666,7 @@ default: error_illegal_ident(); }
 	case 1819:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else {
@@ -63678,7 +63678,7 @@ default: error_illegal_ident(); }
 	case 1820:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 break;
@@ -63688,7 +63688,7 @@ default: error_illegal_ident(); }
 	case 1821:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else {
@@ -63700,7 +63700,7 @@ default: error_illegal_ident(); }
 	case 1822:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else {
@@ -63712,7 +63712,7 @@ default: error_illegal_ident(); }
 	case 1823:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else {
@@ -63724,7 +63724,7 @@ default: error_illegal_ident(); }
 	case 1824:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else {
@@ -63736,7 +63736,7 @@ default: error_illegal_ident(); }
 	case 1825:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 break;
@@ -63746,7 +63746,7 @@ default: error_illegal_ident(); }
 	case 1826:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else {
@@ -63758,7 +63758,7 @@ default: error_illegal_ident(); }
 	case 1827:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else {
@@ -63770,7 +63770,7 @@ default: error_illegal_ident(); }
 	case 1828:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else {
@@ -63782,7 +63782,7 @@ default: error_illegal_ident(); }
 	case 1829:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else {
@@ -63794,7 +63794,7 @@ default: error_illegal_ident(); }
 	case 1830:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x35); } while(0);
 break;
@@ -63804,7 +63804,7 @@ default: error_illegal_ident(); }
 	case 1831:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD3500); } while(0); } else {
@@ -63816,7 +63816,7 @@ default: error_illegal_ident(); }
 	case 1832:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD35), expr); } while(0); } else {
@@ -63828,7 +63828,7 @@ default: error_illegal_ident(); }
 	case 1833:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD3500); } while(0); } else {
@@ -63840,7 +63840,7 @@ default: error_illegal_ident(); }
 	case 1834:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD35), expr); } while(0); } else {
@@ -63852,7 +63852,7 @@ default: error_illegal_ident(); }
 	case 1835:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x34); } while(0);
 break;
@@ -63862,7 +63862,7 @@ default: error_illegal_ident(); }
 	case 1836:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD3400); } while(0); } else {
@@ -63874,7 +63874,7 @@ default: error_illegal_ident(); }
 	case 1837:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD34), expr); } while(0); } else {
@@ -63886,7 +63886,7 @@ default: error_illegal_ident(); }
 	case 1838:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD3400); } while(0); } else {
@@ -63898,7 +63898,7 @@ default: error_illegal_ident(); }
 	case 1839:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD34), expr); } while(0); } else {
@@ -63910,7 +63910,7 @@ default: error_illegal_ident(); }
 	case 1840:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A0B); } while(0);
 break;
@@ -63920,7 +63920,7 @@ default: error_illegal_ident(); }
 	case 1841:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A03); } while(0);
 break;
@@ -63930,7 +63930,7 @@ default: error_illegal_ident(); }
 	case 1842:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A); } while(0);
 break;
@@ -63940,7 +63940,7 @@ default: error_illegal_ident(); }
 	case 1843:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A1B); } while(0);
 break;
@@ -63950,7 +63950,7 @@ default: error_illegal_ident(); }
 	case 1844:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A13); } while(0);
 break;
@@ -63960,7 +63960,7 @@ default: error_illegal_ident(); }
 	case 1845:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A); } while(0);
 break;
@@ -63970,7 +63970,7 @@ default: error_illegal_ident(); }
 	case 1846:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -63981,7 +63981,7 @@ default: error_illegal_ident(); }
 	case 1847:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -63992,7 +63992,7 @@ default: error_illegal_ident(); }
 	case 1848:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 break;
@@ -64002,7 +64002,7 @@ default: error_illegal_ident(); }
 	case 1849:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -64013,7 +64013,7 @@ default: error_illegal_ident(); }
 	case 1850:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -64024,7 +64024,7 @@ default: error_illegal_ident(); }
 	case 1851:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7E00); } while(0); } else {
@@ -64036,7 +64036,7 @@ default: error_illegal_ident(); }
 	case 1852:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD7E), expr); } while(0); } else {
@@ -64048,7 +64048,7 @@ default: error_illegal_ident(); }
 	case 1853:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7E00); } while(0); } else {
@@ -64060,7 +64060,7 @@ default: error_illegal_ident(); }
 	case 1854:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD7E), expr); } while(0); } else {
@@ -64072,7 +64072,7 @@ default: error_illegal_ident(); }
 	case 1855:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x3A), expr); } while(0);
@@ -64083,7 +64083,7 @@ default: error_illegal_ident(); }
 	case 1856:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A0B); } while(0);
@@ -64094,7 +64094,7 @@ default: error_illegal_ident(); }
 	case 1857:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A03); } while(0);
@@ -64105,7 +64105,7 @@ default: error_illegal_ident(); }
 	case 1858:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A); } while(0);
@@ -64116,7 +64116,7 @@ default: error_illegal_ident(); }
 	case 1859:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A1B); } while(0);
@@ -64127,7 +64127,7 @@ default: error_illegal_ident(); }
 	case 1860:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A13); } while(0);
@@ -64138,7 +64138,7 @@ default: error_illegal_ident(); }
 	case 1861:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A); } while(0);
@@ -64149,7 +64149,7 @@ default: error_illegal_ident(); }
 	case 1862:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -64161,7 +64161,7 @@ default: error_illegal_ident(); }
 	case 1863:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -64173,7 +64173,7 @@ default: error_illegal_ident(); }
 	case 1864:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -64184,7 +64184,7 @@ default: error_illegal_ident(); }
 	case 1865:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -64196,7 +64196,7 @@ default: error_illegal_ident(); }
 	case 1866:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -64208,7 +64208,7 @@ default: error_illegal_ident(); }
 	case 1867:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64221,7 +64221,7 @@ default: error_illegal_ident(); }
 	case 1868:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64234,7 +64234,7 @@ default: error_illegal_ident(); }
 	case 1869:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64247,7 +64247,7 @@ default: error_illegal_ident(); }
 	case 1870:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64260,7 +64260,7 @@ default: error_illegal_ident(); }
 	case 1871:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -64272,7 +64272,7 @@ default: error_illegal_ident(); }
 	case 1872:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x46); } while(0);
 break;
@@ -64282,7 +64282,7 @@ default: error_illegal_ident(); }
 	case 1873:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD4600); } while(0); } else {
@@ -64294,7 +64294,7 @@ default: error_illegal_ident(); }
 	case 1874:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD46), expr); } while(0); } else {
@@ -64306,7 +64306,7 @@ default: error_illegal_ident(); }
 	case 1875:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD4600); } while(0); } else {
@@ -64318,7 +64318,7 @@ default: error_illegal_ident(); }
 	case 1876:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD46), expr); } while(0); } else {
@@ -64330,7 +64330,7 @@ default: error_illegal_ident(); }
 	case 1877:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x46); } while(0);
@@ -64341,7 +64341,7 @@ default: error_illegal_ident(); }
 	case 1878:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64354,7 +64354,7 @@ default: error_illegal_ident(); }
 	case 1879:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64367,7 +64367,7 @@ default: error_illegal_ident(); }
 	case 1880:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64380,7 +64380,7 @@ default: error_illegal_ident(); }
 	case 1881:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64393,7 +64393,7 @@ default: error_illegal_ident(); }
 	case 1882:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED4B), expr); } while(0);
@@ -64404,7 +64404,7 @@ default: error_illegal_ident(); }
 	case 1883:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -64416,7 +64416,7 @@ default: error_illegal_ident(); }
 	case 1884:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4E); } while(0);
 break;
@@ -64426,7 +64426,7 @@ default: error_illegal_ident(); }
 	case 1885:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD4E00); } while(0); } else {
@@ -64438,7 +64438,7 @@ default: error_illegal_ident(); }
 	case 1886:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD4E), expr); } while(0); } else {
@@ -64450,7 +64450,7 @@ default: error_illegal_ident(); }
 	case 1887:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD4E00); } while(0); } else {
@@ -64462,7 +64462,7 @@ default: error_illegal_ident(); }
 	case 1888:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD4E), expr); } while(0); } else {
@@ -64474,7 +64474,7 @@ default: error_illegal_ident(); }
 	case 1889:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4E); } while(0);
@@ -64485,7 +64485,7 @@ default: error_illegal_ident(); }
 	case 1890:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64498,7 +64498,7 @@ default: error_illegal_ident(); }
 	case 1891:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64511,7 +64511,7 @@ default: error_illegal_ident(); }
 	case 1892:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64524,7 +64524,7 @@ default: error_illegal_ident(); }
 	case 1893:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64537,7 +64537,7 @@ default: error_illegal_ident(); }
 	case 1894:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x56); } while(0);
 break;
@@ -64547,7 +64547,7 @@ default: error_illegal_ident(); }
 	case 1895:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD5600); } while(0); } else {
@@ -64559,7 +64559,7 @@ default: error_illegal_ident(); }
 	case 1896:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD56), expr); } while(0); } else {
@@ -64571,7 +64571,7 @@ default: error_illegal_ident(); }
 	case 1897:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD5600); } while(0); } else {
@@ -64583,7 +64583,7 @@ default: error_illegal_ident(); }
 	case 1898:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD56), expr); } while(0); } else {
@@ -64595,7 +64595,7 @@ default: error_illegal_ident(); }
 	case 1899:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x56); } while(0);
@@ -64606,7 +64606,7 @@ default: error_illegal_ident(); }
 	case 1900:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64619,7 +64619,7 @@ default: error_illegal_ident(); }
 	case 1901:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64632,7 +64632,7 @@ default: error_illegal_ident(); }
 	case 1902:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64645,7 +64645,7 @@ default: error_illegal_ident(); }
 	case 1903:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64658,7 +64658,7 @@ default: error_illegal_ident(); }
 	case 1904:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED5B), expr); } while(0);
@@ -64669,7 +64669,7 @@ default: error_illegal_ident(); }
 	case 1905:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -64681,7 +64681,7 @@ default: error_illegal_ident(); }
 	case 1906:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5E); } while(0);
 break;
@@ -64691,7 +64691,7 @@ default: error_illegal_ident(); }
 	case 1907:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD5E00); } while(0); } else {
@@ -64703,7 +64703,7 @@ default: error_illegal_ident(); }
 	case 1908:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD5E), expr); } while(0); } else {
@@ -64715,7 +64715,7 @@ default: error_illegal_ident(); }
 	case 1909:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD5E00); } while(0); } else {
@@ -64727,7 +64727,7 @@ default: error_illegal_ident(); }
 	case 1910:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD5E), expr); } while(0); } else {
@@ -64739,7 +64739,7 @@ default: error_illegal_ident(); }
 	case 1911:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5E); } while(0);
@@ -64750,7 +64750,7 @@ default: error_illegal_ident(); }
 	case 1912:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64763,7 +64763,7 @@ default: error_illegal_ident(); }
 	case 1913:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64776,7 +64776,7 @@ default: error_illegal_ident(); }
 	case 1914:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64789,7 +64789,7 @@ default: error_illegal_ident(); }
 	case 1915:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64802,7 +64802,7 @@ default: error_illegal_ident(); }
 	case 1916:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x66); } while(0);
 break;
@@ -64812,7 +64812,7 @@ default: error_illegal_ident(); }
 	case 1917:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6600); } while(0); } else {
@@ -64824,7 +64824,7 @@ default: error_illegal_ident(); }
 	case 1918:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD66), expr); } while(0); } else {
@@ -64836,7 +64836,7 @@ default: error_illegal_ident(); }
 	case 1919:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6600); } while(0); } else {
@@ -64848,7 +64848,7 @@ default: error_illegal_ident(); }
 	case 1920:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD66), expr); } while(0); } else {
@@ -64860,7 +64860,7 @@ default: error_illegal_ident(); }
 	case 1921:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x66); } while(0);
@@ -64871,7 +64871,7 @@ default: error_illegal_ident(); }
 	case 1922:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64884,7 +64884,7 @@ default: error_illegal_ident(); }
 	case 1923:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64897,7 +64897,7 @@ default: error_illegal_ident(); }
 	case 1924:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64910,7 +64910,7 @@ default: error_illegal_ident(); }
 	case 1925:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -64923,7 +64923,7 @@ default: error_illegal_ident(); }
 	case 1926:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE400); } while(0);
 break;
@@ -64933,7 +64933,7 @@ default: error_illegal_ident(); }
 	case 1927:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDE4), expr); } while(0);
 break;
@@ -64943,7 +64943,7 @@ default: error_illegal_ident(); }
 	case 1928:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE400); } while(0); } else {
@@ -64955,7 +64955,7 @@ default: error_illegal_ident(); }
 	case 1929:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xE4), expr); } while(0); } else {
@@ -64967,7 +64967,7 @@ default: error_illegal_ident(); }
 	case 1930:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE400); } while(0); } else {
@@ -64979,7 +64979,7 @@ default: error_illegal_ident(); }
 	case 1931:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDE4), expr); } while(0); } else {
@@ -64991,7 +64991,7 @@ default: error_illegal_ident(); }
 	case 1932:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x2A), expr); } while(0);
@@ -65002,7 +65002,7 @@ default: error_illegal_ident(); }
 	case 1933:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE400); } while(0);
@@ -65013,7 +65013,7 @@ default: error_illegal_ident(); }
 	case 1934:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDE4), expr); } while(0);
@@ -65024,7 +65024,7 @@ default: error_illegal_ident(); }
 	case 1935:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65037,7 +65037,7 @@ default: error_illegal_ident(); }
 	case 1936:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65050,7 +65050,7 @@ default: error_illegal_ident(); }
 	case 1937:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65063,7 +65063,7 @@ default: error_illegal_ident(); }
 	case 1938:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65076,7 +65076,7 @@ default: error_illegal_ident(); }
 	case 1939:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -65088,7 +65088,7 @@ default: error_illegal_ident(); }
 	case 1940:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x020B); } while(0);
 break;
@@ -65098,7 +65098,7 @@ default: error_illegal_ident(); }
 	case 1941:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0203); } while(0);
 break;
@@ -65108,7 +65108,7 @@ default: error_illegal_ident(); }
 	case 1942:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x02); } while(0);
 break;
@@ -65118,7 +65118,7 @@ default: error_illegal_ident(); }
 	case 1943:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x121B); } while(0);
 break;
@@ -65128,7 +65128,7 @@ default: error_illegal_ident(); }
 	case 1944:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1213); } while(0);
 break;
@@ -65138,7 +65138,7 @@ default: error_illegal_ident(); }
 	case 1945:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x12); } while(0);
 break;
@@ -65148,7 +65148,7 @@ default: error_illegal_ident(); }
 	case 1946:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -65159,7 +65159,7 @@ default: error_illegal_ident(); }
 	case 1947:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -65170,7 +65170,7 @@ default: error_illegal_ident(); }
 	case 1948:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 break;
@@ -65180,7 +65180,7 @@ default: error_illegal_ident(); }
 	case 1949:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x70); } while(0);
 break;
@@ -65190,7 +65190,7 @@ default: error_illegal_ident(); }
 	case 1950:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x71); } while(0);
 break;
@@ -65200,7 +65200,7 @@ default: error_illegal_ident(); }
 	case 1951:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x72); } while(0);
 break;
@@ -65210,7 +65210,7 @@ default: error_illegal_ident(); }
 	case 1952:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x73); } while(0);
 break;
@@ -65220,7 +65220,7 @@ default: error_illegal_ident(); }
 	case 1953:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x74); } while(0);
 break;
@@ -65230,7 +65230,7 @@ default: error_illegal_ident(); }
 	case 1954:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDF400); } while(0);
 break;
@@ -65240,7 +65240,7 @@ default: error_illegal_ident(); }
 	case 1955:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x75); } while(0);
 break;
@@ -65250,7 +65250,7 @@ default: error_illegal_ident(); }
 	case 1956:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x36), expr); } while(0);
@@ -65261,7 +65261,7 @@ default: error_illegal_ident(); }
 	case 1957:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDF4), expr); } while(0);
 break;
@@ -65271,7 +65271,7 @@ default: error_illegal_ident(); }
 	case 1958:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -65282,7 +65282,7 @@ default: error_illegal_ident(); }
 	case 1959:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -65293,7 +65293,7 @@ default: error_illegal_ident(); }
 	case 1960:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7700); } while(0); } else {
@@ -65305,7 +65305,7 @@ default: error_illegal_ident(); }
 	case 1961:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7000); } while(0); } else {
@@ -65317,7 +65317,7 @@ default: error_illegal_ident(); }
 	case 1962:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7100); } while(0); } else {
@@ -65329,7 +65329,7 @@ default: error_illegal_ident(); }
 	case 1963:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7200); } while(0); } else {
@@ -65341,7 +65341,7 @@ default: error_illegal_ident(); }
 	case 1964:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7300); } while(0); } else {
@@ -65353,7 +65353,7 @@ default: error_illegal_ident(); }
 	case 1965:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7400); } while(0); } else {
@@ -65365,7 +65365,7 @@ default: error_illegal_ident(); }
 	case 1966:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF400); } while(0); } else {
@@ -65377,7 +65377,7 @@ default: error_illegal_ident(); }
 	case 1967:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7500); } while(0); } else {
@@ -65389,7 +65389,7 @@ default: error_illegal_ident(); }
 	case 1968:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65402,7 +65402,7 @@ default: error_illegal_ident(); }
 	case 1969:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD77), expr); } while(0); } else {
@@ -65414,7 +65414,7 @@ default: error_illegal_ident(); }
 	case 1970:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD70), expr); } while(0); } else {
@@ -65426,7 +65426,7 @@ default: error_illegal_ident(); }
 	case 1971:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD71), expr); } while(0); } else {
@@ -65438,7 +65438,7 @@ default: error_illegal_ident(); }
 	case 1972:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD72), expr); } while(0); } else {
@@ -65450,7 +65450,7 @@ default: error_illegal_ident(); }
 	case 1973:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD73), expr); } while(0); } else {
@@ -65462,7 +65462,7 @@ default: error_illegal_ident(); }
 	case 1974:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD74), expr); } while(0); } else {
@@ -65474,7 +65474,7 @@ default: error_illegal_ident(); }
 	case 1975:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xF4), expr); } while(0); } else {
@@ -65486,7 +65486,7 @@ default: error_illegal_ident(); }
 	case 1976:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD75), expr); } while(0); } else {
@@ -65498,7 +65498,7 @@ default: error_illegal_ident(); }
 	case 1977:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65511,7 +65511,7 @@ default: error_illegal_ident(); }
 	case 1978:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7700); } while(0); } else {
@@ -65523,7 +65523,7 @@ default: error_illegal_ident(); }
 	case 1979:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7000); } while(0); } else {
@@ -65535,7 +65535,7 @@ default: error_illegal_ident(); }
 	case 1980:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7100); } while(0); } else {
@@ -65547,7 +65547,7 @@ default: error_illegal_ident(); }
 	case 1981:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7200); } while(0); } else {
@@ -65559,7 +65559,7 @@ default: error_illegal_ident(); }
 	case 1982:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7300); } while(0); } else {
@@ -65571,7 +65571,7 @@ default: error_illegal_ident(); }
 	case 1983:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7400); } while(0); } else {
@@ -65583,7 +65583,7 @@ default: error_illegal_ident(); }
 	case 1984:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDF400); } while(0); } else {
@@ -65595,7 +65595,7 @@ default: error_illegal_ident(); }
 	case 1985:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7500); } while(0); } else {
@@ -65607,7 +65607,7 @@ default: error_illegal_ident(); }
 	case 1986:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65620,7 +65620,7 @@ default: error_illegal_ident(); }
 	case 1987:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD77), expr); } while(0); } else {
@@ -65632,7 +65632,7 @@ default: error_illegal_ident(); }
 	case 1988:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD70), expr); } while(0); } else {
@@ -65644,7 +65644,7 @@ default: error_illegal_ident(); }
 	case 1989:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD71), expr); } while(0); } else {
@@ -65656,7 +65656,7 @@ default: error_illegal_ident(); }
 	case 1990:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD72), expr); } while(0); } else {
@@ -65668,7 +65668,7 @@ default: error_illegal_ident(); }
 	case 1991:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD73), expr); } while(0); } else {
@@ -65680,7 +65680,7 @@ default: error_illegal_ident(); }
 	case 1992:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD74), expr); } while(0); } else {
@@ -65692,7 +65692,7 @@ default: error_illegal_ident(); }
 	case 1993:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDF4), expr); } while(0); } else {
@@ -65704,7 +65704,7 @@ default: error_illegal_ident(); }
 	case 1994:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD75), expr); } while(0); } else {
@@ -65716,7 +65716,7 @@ default: error_illegal_ident(); }
 	case 1995:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65729,7 +65729,7 @@ default: error_illegal_ident(); }
 	case 1996:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65742,7 +65742,7 @@ default: error_illegal_ident(); }
 	case 1997:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65755,7 +65755,7 @@ default: error_illegal_ident(); }
 	case 1998:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6E); } while(0);
 break;
@@ -65765,7 +65765,7 @@ default: error_illegal_ident(); }
 	case 1999:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6E00); } while(0); } else {
@@ -65777,7 +65777,7 @@ default: error_illegal_ident(); }
 	case 2000:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD6E), expr); } while(0); } else {
@@ -65789,7 +65789,7 @@ default: error_illegal_ident(); }
 	case 2001:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6E00); } while(0); } else {
@@ -65801,7 +65801,7 @@ default: error_illegal_ident(); }
 	case 2002:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD6E), expr); } while(0); } else {
@@ -65813,7 +65813,7 @@ default: error_illegal_ident(); }
 	case 2003:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6E); } while(0);
@@ -65824,7 +65824,7 @@ default: error_illegal_ident(); }
 	case 2004:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65837,7 +65837,7 @@ default: error_illegal_ident(); }
 	case 2005:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65850,7 +65850,7 @@ default: error_illegal_ident(); }
 	case 2006:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65863,7 +65863,7 @@ default: error_illegal_ident(); }
 	case 2007:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65876,7 +65876,7 @@ default: error_illegal_ident(); }
 	case 2008:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED7B), expr); } while(0);
@@ -65887,7 +65887,7 @@ default: error_illegal_ident(); }
 	case 2009:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x32), expr); } while(0);
@@ -65898,7 +65898,7 @@ default: error_illegal_ident(); }
 	case 2010:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED43), expr); } while(0);
@@ -65909,7 +65909,7 @@ default: error_illegal_ident(); }
 	case 2011:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED53), expr); } while(0);
@@ -65920,7 +65920,7 @@ default: error_illegal_ident(); }
 	case 2012:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x22), expr); } while(0);
@@ -65931,7 +65931,7 @@ default: error_illegal_ident(); }
 	case 2013:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65944,7 +65944,7 @@ default: error_illegal_ident(); }
 	case 2014:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
@@ -65957,7 +65957,7 @@ default: error_illegal_ident(); }
 	case 2015:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED73), expr); } while(0);
@@ -65968,7 +65968,7 @@ default: error_illegal_ident(); }
 	case 2016:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A0B); } while(0);
 break;
@@ -65978,7 +65978,7 @@ default: error_illegal_ident(); }
 	case 2017:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A1B); } while(0);
 break;
@@ -65988,7 +65988,7 @@ default: error_illegal_ident(); }
 	case 2018:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -65999,7 +65999,7 @@ default: error_illegal_ident(); }
 	case 2019:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x020B); } while(0);
 break;
@@ -66009,7 +66009,7 @@ default: error_illegal_ident(); }
 	case 2020:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x121B); } while(0);
 break;
@@ -66019,7 +66019,7 @@ default: error_illegal_ident(); }
 	case 2021:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -66030,7 +66030,7 @@ default: error_illegal_ident(); }
 	case 2022:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDA8); } while(0);
 break;
@@ -66040,7 +66040,7 @@ default: error_illegal_ident(); }
 	case 2023:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDB8); } while(0);
 break;
@@ -66060,7 +66060,7 @@ default: error_illegal_ident(); }
 	case 2025:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A03); } while(0);
 break;
@@ -66070,7 +66070,7 @@ default: error_illegal_ident(); }
 	case 2026:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A13); } while(0);
 break;
@@ -66080,7 +66080,7 @@ default: error_illegal_ident(); }
 	case 2027:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -66091,7 +66091,7 @@ default: error_illegal_ident(); }
 	case 2028:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0203); } while(0);
 break;
@@ -66101,7 +66101,7 @@ default: error_illegal_ident(); }
 	case 2029:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1213); } while(0);
 break;
@@ -66111,7 +66111,7 @@ default: error_illegal_ident(); }
 	case 2030:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -66122,7 +66122,7 @@ default: error_illegal_ident(); }
 	case 2031:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDA0); } while(0);
 break;
@@ -66132,7 +66132,7 @@ default: error_illegal_ident(); }
 	case 2032:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDB0); } while(0);
 break;
@@ -66192,7 +66192,7 @@ default: error_illegal_ident(); }
 	case 2038:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
 break;
@@ -66202,7 +66202,7 @@ default: error_illegal_ident(); }
 	case 2039:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDB600); } while(0); } else {
@@ -66214,7 +66214,7 @@ default: error_illegal_ident(); }
 	case 2040:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDB6), expr); } while(0); } else {
@@ -66226,7 +66226,7 @@ default: error_illegal_ident(); }
 	case 2041:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDB600); } while(0); } else {
@@ -66238,7 +66238,7 @@ default: error_illegal_ident(); }
 	case 2042:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDB6), expr); } while(0); } else {
@@ -66250,7 +66250,7 @@ default: error_illegal_ident(); }
 	case 2043:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
@@ -66261,7 +66261,7 @@ default: error_illegal_ident(); }
 	case 2044:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -66274,7 +66274,7 @@ default: error_illegal_ident(); }
 	case 2045:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -66287,7 +66287,7 @@ default: error_illegal_ident(); }
 	case 2046:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -66300,7 +66300,7 @@ default: error_illegal_ident(); }
 	case 2047:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -66313,7 +66313,7 @@ default: error_illegal_ident(); }
 	case 2048:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
 break;
@@ -66323,7 +66323,7 @@ default: error_illegal_ident(); }
 	case 2049:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDB600); } while(0); } else {
@@ -66335,7 +66335,7 @@ default: error_illegal_ident(); }
 	case 2050:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDB6), expr); } while(0); } else {
@@ -66347,7 +66347,7 @@ default: error_illegal_ident(); }
 	case 2051:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDB600); } while(0); } else {
@@ -66359,7 +66359,7 @@ default: error_illegal_ident(); }
 	case 2052:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDB6), expr); } while(0); } else {
@@ -66371,7 +66371,7 @@ default: error_illegal_ident(); }
 	case 2053:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -66387,7 +66387,7 @@ default: error_illegal_ident(); }
 	case 2054:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -66405,7 +66405,7 @@ default: error_illegal_ident(); }
 	case 2055:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -66423,7 +66423,7 @@ default: error_illegal_ident(); }
 	case 2056:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -66441,7 +66441,7 @@ default: error_illegal_ident(); }
 	case 2057:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -66459,7 +66459,7 @@ default: error_illegal_ident(); }
 	case 2058:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -66475,7 +66475,7 @@ default: error_illegal_ident(); }
 	case 2059:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -66493,7 +66493,7 @@ default: error_illegal_ident(); }
 	case 2060:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -66511,7 +66511,7 @@ default: error_illegal_ident(); }
 	case 2061:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -66529,7 +66529,7 @@ default: error_illegal_ident(); }
 	case 2062:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -66547,7 +66547,7 @@ default: error_illegal_ident(); }
 	case 2063:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB16); } while(0);
 break;
@@ -66557,7 +66557,7 @@ default: error_illegal_ident(); }
 	case 2064:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0016); } while(0); } else {
@@ -66569,7 +66569,7 @@ default: error_illegal_ident(); }
 	case 2065:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB16), expr); } while(0); } else {
@@ -66581,7 +66581,7 @@ default: error_illegal_ident(); }
 	case 2066:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0016); } while(0); } else {
@@ -66593,7 +66593,7 @@ default: error_illegal_ident(); }
 	case 2067:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB16), expr); } while(0); } else {
@@ -66605,7 +66605,7 @@ default: error_illegal_ident(); }
 	case 2068:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB06); } while(0);
 break;
@@ -66615,7 +66615,7 @@ default: error_illegal_ident(); }
 	case 2069:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0006); } while(0); } else {
@@ -66627,7 +66627,7 @@ default: error_illegal_ident(); }
 	case 2070:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB06), expr); } while(0); } else {
@@ -66639,7 +66639,7 @@ default: error_illegal_ident(); }
 	case 2071:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0006); } while(0); } else {
@@ -66651,7 +66651,7 @@ default: error_illegal_ident(); }
 	case 2072:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB06), expr); } while(0); } else {
@@ -66663,7 +66663,7 @@ default: error_illegal_ident(); }
 	case 2073:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1E); } while(0);
 break;
@@ -66673,7 +66673,7 @@ default: error_illegal_ident(); }
 	case 2074:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB001E); } while(0); } else {
@@ -66685,7 +66685,7 @@ default: error_illegal_ident(); }
 	case 2075:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB1E), expr); } while(0); } else {
@@ -66697,7 +66697,7 @@ default: error_illegal_ident(); }
 	case 2076:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB001E); } while(0); } else {
@@ -66709,7 +66709,7 @@ default: error_illegal_ident(); }
 	case 2077:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB1E), expr); } while(0); } else {
@@ -66721,7 +66721,7 @@ default: error_illegal_ident(); }
 	case 2078:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0E); } while(0);
 break;
@@ -66731,7 +66731,7 @@ default: error_illegal_ident(); }
 	case 2079:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB000E); } while(0); } else {
@@ -66743,7 +66743,7 @@ default: error_illegal_ident(); }
 	case 2080:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB0E), expr); } while(0); } else {
@@ -66755,7 +66755,7 @@ default: error_illegal_ident(); }
 	case 2081:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB000E); } while(0); } else {
@@ -66767,7 +66767,7 @@ default: error_illegal_ident(); }
 	case 2082:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB0E), expr); } while(0); } else {
@@ -66779,7 +66779,7 @@ default: error_illegal_ident(); }
 	case 2083:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
 break;
@@ -66789,7 +66789,7 @@ default: error_illegal_ident(); }
 	case 2084:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9E00); } while(0); } else {
@@ -66801,7 +66801,7 @@ default: error_illegal_ident(); }
 	case 2085:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD9E), expr); } while(0); } else {
@@ -66813,7 +66813,7 @@ default: error_illegal_ident(); }
 	case 2086:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9E00); } while(0); } else {
@@ -66825,7 +66825,7 @@ default: error_illegal_ident(); }
 	case 2087:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD9E), expr); } while(0); } else {
@@ -66837,7 +66837,7 @@ default: error_illegal_ident(); }
 	case 2088:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
@@ -66848,7 +66848,7 @@ default: error_illegal_ident(); }
 	case 2089:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -66861,7 +66861,7 @@ default: error_illegal_ident(); }
 	case 2090:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -66874,7 +66874,7 @@ default: error_illegal_ident(); }
 	case 2091:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -66887,7 +66887,7 @@ default: error_illegal_ident(); }
 	case 2092:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -66900,7 +66900,7 @@ default: error_illegal_ident(); }
 	case 2093:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
 break;
@@ -66910,7 +66910,7 @@ default: error_illegal_ident(); }
 	case 2094:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9E00); } while(0); } else {
@@ -66922,7 +66922,7 @@ default: error_illegal_ident(); }
 	case 2095:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD9E), expr); } while(0); } else {
@@ -66934,7 +66934,7 @@ default: error_illegal_ident(); }
 	case 2096:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9E00); } while(0); } else {
@@ -66946,7 +66946,7 @@ default: error_illegal_ident(); }
 	case 2097:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD9E), expr); } while(0); } else {
@@ -66958,7 +66958,7 @@ default: error_illegal_ident(); }
 	case 2098:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -66974,7 +66974,7 @@ default: error_illegal_ident(); }
 	case 2099:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -66992,7 +66992,7 @@ default: error_illegal_ident(); }
 	case 2100:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -67010,7 +67010,7 @@ default: error_illegal_ident(); }
 	case 2101:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -67028,7 +67028,7 @@ default: error_illegal_ident(); }
 	case 2102:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -67046,7 +67046,7 @@ default: error_illegal_ident(); }
 	case 2103:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -67062,7 +67062,7 @@ default: error_illegal_ident(); }
 	case 2104:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -67080,7 +67080,7 @@ default: error_illegal_ident(); }
 	case 2105:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -67098,7 +67098,7 @@ default: error_illegal_ident(); }
 	case 2106:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -67116,7 +67116,7 @@ default: error_illegal_ident(); }
 	case 2107:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -67134,7 +67134,7 @@ default: error_illegal_ident(); }
 	case 2108:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB26); } while(0);
 break;
@@ -67144,7 +67144,7 @@ default: error_illegal_ident(); }
 	case 2109:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0026); } while(0); } else {
@@ -67156,7 +67156,7 @@ default: error_illegal_ident(); }
 	case 2110:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB26), expr); } while(0); } else {
@@ -67168,7 +67168,7 @@ default: error_illegal_ident(); }
 	case 2111:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0026); } while(0); } else {
@@ -67180,7 +67180,7 @@ default: error_illegal_ident(); }
 	case 2112:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB26), expr); } while(0); } else {
@@ -67192,7 +67192,7 @@ default: error_illegal_ident(); }
 	case 2113:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2E); } while(0);
 break;
@@ -67202,7 +67202,7 @@ default: error_illegal_ident(); }
 	case 2114:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB002E); } while(0); } else {
@@ -67214,7 +67214,7 @@ default: error_illegal_ident(); }
 	case 2115:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB2E), expr); } while(0); } else {
@@ -67226,7 +67226,7 @@ default: error_illegal_ident(); }
 	case 2116:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB002E); } while(0); } else {
@@ -67238,7 +67238,7 @@ default: error_illegal_ident(); }
 	case 2117:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB2E), expr); } while(0); } else {
@@ -67250,7 +67250,7 @@ default: error_illegal_ident(); }
 	case 2118:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3E); } while(0);
 break;
@@ -67260,7 +67260,7 @@ default: error_illegal_ident(); }
 	case 2119:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB003E); } while(0); } else {
@@ -67272,7 +67272,7 @@ default: error_illegal_ident(); }
 	case 2120:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB3E), expr); } while(0); } else {
@@ -67284,7 +67284,7 @@ default: error_illegal_ident(); }
 	case 2121:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB003E); } while(0); } else {
@@ -67296,7 +67296,7 @@ default: error_illegal_ident(); }
 	case 2122:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB3E), expr); } while(0); } else {
@@ -67308,7 +67308,7 @@ default: error_illegal_ident(); }
 	case 2123:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
 break;
@@ -67318,7 +67318,7 @@ default: error_illegal_ident(); }
 	case 2124:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9600); } while(0); } else {
@@ -67330,7 +67330,7 @@ default: error_illegal_ident(); }
 	case 2125:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD96), expr); } while(0); } else {
@@ -67342,7 +67342,7 @@ default: error_illegal_ident(); }
 	case 2126:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9600); } while(0); } else {
@@ -67354,7 +67354,7 @@ default: error_illegal_ident(); }
 	case 2127:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD96), expr); } while(0); } else {
@@ -67366,7 +67366,7 @@ default: error_illegal_ident(); }
 	case 2128:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
@@ -67377,7 +67377,7 @@ default: error_illegal_ident(); }
 	case 2129:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67390,7 +67390,7 @@ default: error_illegal_ident(); }
 	case 2130:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67403,7 +67403,7 @@ default: error_illegal_ident(); }
 	case 2131:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67416,7 +67416,7 @@ default: error_illegal_ident(); }
 	case 2132:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67429,7 +67429,7 @@ default: error_illegal_ident(); }
 	case 2133:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
 break;
@@ -67439,7 +67439,7 @@ default: error_illegal_ident(); }
 	case 2134:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9600); } while(0); } else {
@@ -67451,7 +67451,7 @@ default: error_illegal_ident(); }
 	case 2135:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD96), expr); } while(0); } else {
@@ -67463,7 +67463,7 @@ default: error_illegal_ident(); }
 	case 2136:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9600); } while(0); } else {
@@ -67475,7 +67475,7 @@ default: error_illegal_ident(); }
 	case 2137:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD96), expr); } while(0); } else {
@@ -67487,7 +67487,7 @@ default: error_illegal_ident(); }
 	case 2138:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
 break;
@@ -67497,7 +67497,7 @@ default: error_illegal_ident(); }
 	case 2139:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDAE00); } while(0); } else {
@@ -67509,7 +67509,7 @@ default: error_illegal_ident(); }
 	case 2140:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDAE), expr); } while(0); } else {
@@ -67521,7 +67521,7 @@ default: error_illegal_ident(); }
 	case 2141:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDAE00); } while(0); } else {
@@ -67533,7 +67533,7 @@ default: error_illegal_ident(); }
 	case 2142:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDAE), expr); } while(0); } else {
@@ -67545,7 +67545,7 @@ default: error_illegal_ident(); }
 	case 2143:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
@@ -67556,7 +67556,7 @@ default: error_illegal_ident(); }
 	case 2144:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67569,7 +67569,7 @@ default: error_illegal_ident(); }
 	case 2145:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67582,7 +67582,7 @@ default: error_illegal_ident(); }
 	case 2146:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67595,7 +67595,7 @@ default: error_illegal_ident(); }
 	case 2147:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67608,7 +67608,7 @@ default: error_illegal_ident(); }
 	case 2148:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
 break;
@@ -67618,7 +67618,7 @@ default: error_illegal_ident(); }
 	case 2149:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDAE00); } while(0); } else {
@@ -67630,7 +67630,7 @@ default: error_illegal_ident(); }
 	case 2150:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDAE), expr); } while(0); } else {
@@ -67642,7 +67642,7 @@ default: error_illegal_ident(); }
 	case 2151:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDAE00); } while(0); } else {
@@ -67654,7 +67654,7 @@ default: error_illegal_ident(); }
 	case 2152:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDB); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDAE), expr); } while(0); } else {
@@ -67666,7 +67666,7 @@ default: error_illegal_ident(); }
 	case 2153:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
 break;
@@ -67676,7 +67676,7 @@ default: error_illegal_ident(); }
 	case 2154:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8E00); } while(0); } else {
@@ -67688,7 +67688,7 @@ default: error_illegal_ident(); }
 	case 2155:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD8E), expr); } while(0); } else {
@@ -67700,7 +67700,7 @@ default: error_illegal_ident(); }
 	case 2156:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8E00); } while(0); } else {
@@ -67712,7 +67712,7 @@ default: error_illegal_ident(); }
 	case 2157:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD8E), expr); } while(0); } else {
@@ -67724,7 +67724,7 @@ default: error_illegal_ident(); }
 	case 2158:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
@@ -67735,7 +67735,7 @@ default: error_illegal_ident(); }
 	case 2159:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67748,7 +67748,7 @@ default: error_illegal_ident(); }
 	case 2160:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67761,7 +67761,7 @@ default: error_illegal_ident(); }
 	case 2161:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67774,7 +67774,7 @@ default: error_illegal_ident(); }
 	case 2162:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67787,7 +67787,7 @@ default: error_illegal_ident(); }
 	case 2163:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
 break;
@@ -67797,7 +67797,7 @@ default: error_illegal_ident(); }
 	case 2164:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8E00); } while(0); } else {
@@ -67809,7 +67809,7 @@ default: error_illegal_ident(); }
 	case 2165:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD8E), expr); } while(0); } else {
@@ -67821,7 +67821,7 @@ default: error_illegal_ident(); }
 	case 2166:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8E00); } while(0); } else {
@@ -67833,7 +67833,7 @@ default: error_illegal_ident(); }
 	case 2167:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD8E), expr); } while(0); } else {
@@ -67845,7 +67845,7 @@ default: error_illegal_ident(); }
 	case 2168:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
 break;
@@ -67855,7 +67855,7 @@ default: error_illegal_ident(); }
 	case 2169:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8600); } while(0); } else {
@@ -67867,7 +67867,7 @@ default: error_illegal_ident(); }
 	case 2170:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD86), expr); } while(0); } else {
@@ -67879,7 +67879,7 @@ default: error_illegal_ident(); }
 	case 2171:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8600); } while(0); } else {
@@ -67891,7 +67891,7 @@ default: error_illegal_ident(); }
 	case 2172:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD86), expr); } while(0); } else {
@@ -67903,7 +67903,7 @@ default: error_illegal_ident(); }
 	case 2173:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
@@ -67914,7 +67914,7 @@ default: error_illegal_ident(); }
 	case 2174:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67927,7 +67927,7 @@ default: error_illegal_ident(); }
 	case 2175:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67940,7 +67940,7 @@ default: error_illegal_ident(); }
 	case 2176:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67953,7 +67953,7 @@ default: error_illegal_ident(); }
 	case 2177:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -67966,7 +67966,7 @@ default: error_illegal_ident(); }
 	case 2178:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
 break;
@@ -67976,7 +67976,7 @@ default: error_illegal_ident(); }
 	case 2179:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD8600); } while(0); } else {
@@ -67988,7 +67988,7 @@ default: error_illegal_ident(); }
 	case 2180:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD86), expr); } while(0); } else {
@@ -68000,7 +68000,7 @@ default: error_illegal_ident(); }
 	case 2181:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD8600); } while(0); } else {
@@ -68012,7 +68012,7 @@ default: error_illegal_ident(); }
 	case 2182:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD86), expr); } while(0); } else {
@@ -68024,7 +68024,7 @@ default: error_illegal_ident(); }
 	case 2183:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
@@ -68035,7 +68035,7 @@ default: error_illegal_ident(); }
 	case 2184:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68048,7 +68048,7 @@ default: error_illegal_ident(); }
 	case 2185:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68061,7 +68061,7 @@ default: error_illegal_ident(); }
 	case 2186:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68074,7 +68074,7 @@ default: error_illegal_ident(); }
 	case 2187:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68087,7 +68087,7 @@ default: error_illegal_ident(); }
 	case 2188:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x8E); } while(0);
@@ -68098,7 +68098,7 @@ default: error_illegal_ident(); }
 	case 2189:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68111,7 +68111,7 @@ default: error_illegal_ident(); }
 	case 2190:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68124,7 +68124,7 @@ default: error_illegal_ident(); }
 	case 2191:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68137,7 +68137,7 @@ default: error_illegal_ident(); }
 	case 2192:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68150,7 +68150,7 @@ default: error_illegal_ident(); }
 	case 2193:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
@@ -68161,7 +68161,7 @@ default: error_illegal_ident(); }
 	case 2194:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68174,7 +68174,7 @@ default: error_illegal_ident(); }
 	case 2195:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68187,7 +68187,7 @@ default: error_illegal_ident(); }
 	case 2196:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68200,7 +68200,7 @@ default: error_illegal_ident(); }
 	case 2197:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68213,7 +68213,7 @@ default: error_illegal_ident(); }
 	case 2198:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x86); } while(0);
@@ -68224,7 +68224,7 @@ default: error_illegal_ident(); }
 	case 2199:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68237,7 +68237,7 @@ default: error_illegal_ident(); }
 	case 2200:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68250,7 +68250,7 @@ default: error_illegal_ident(); }
 	case 2201:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68263,7 +68263,7 @@ default: error_illegal_ident(); }
 	case 2202:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68276,7 +68276,7 @@ default: error_illegal_ident(); }
 	case 2203:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
@@ -68287,7 +68287,7 @@ default: error_illegal_ident(); }
 	case 2204:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68300,7 +68300,7 @@ default: error_illegal_ident(); }
 	case 2205:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68313,7 +68313,7 @@ default: error_illegal_ident(); }
 	case 2206:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68326,7 +68326,7 @@ default: error_illegal_ident(); }
 	case 2207:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68339,7 +68339,7 @@ default: error_illegal_ident(); }
 	case 2208:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
@@ -68350,7 +68350,7 @@ default: error_illegal_ident(); }
 	case 2209:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68363,7 +68363,7 @@ default: error_illegal_ident(); }
 	case 2210:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68376,7 +68376,7 @@ default: error_illegal_ident(); }
 	case 2211:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68389,7 +68389,7 @@ default: error_illegal_ident(); }
 	case 2212:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68402,7 +68402,7 @@ default: error_illegal_ident(); }
 	case 2213:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -68419,7 +68419,7 @@ default: error_illegal_ident(); }
 	case 2214:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -68438,7 +68438,7 @@ default: error_illegal_ident(); }
 	case 2215:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -68457,7 +68457,7 @@ default: error_illegal_ident(); }
 	case 2216:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -68476,7 +68476,7 @@ default: error_illegal_ident(); }
 	case 2217:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -68495,7 +68495,7 @@ default: error_illegal_ident(); }
 	case 2218:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
@@ -68506,7 +68506,7 @@ default: error_illegal_ident(); }
 	case 2219:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68519,7 +68519,7 @@ default: error_illegal_ident(); }
 	case 2220:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68532,7 +68532,7 @@ default: error_illegal_ident(); }
 	case 2221:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68545,7 +68545,7 @@ default: error_illegal_ident(); }
 	case 2222:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68558,7 +68558,7 @@ default: error_illegal_ident(); }
 	case 2223:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
@@ -68569,7 +68569,7 @@ default: error_illegal_ident(); }
 	case 2224:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68582,7 +68582,7 @@ default: error_illegal_ident(); }
 	case 2225:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68595,7 +68595,7 @@ default: error_illegal_ident(); }
 	case 2226:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68608,7 +68608,7 @@ default: error_illegal_ident(); }
 	case 2227:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68621,7 +68621,7 @@ default: error_illegal_ident(); }
 	case 2228:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x35); } while(0);
@@ -68632,7 +68632,7 @@ default: error_illegal_ident(); }
 	case 2229:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68645,7 +68645,7 @@ default: error_illegal_ident(); }
 	case 2230:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68658,7 +68658,7 @@ default: error_illegal_ident(); }
 	case 2231:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68671,7 +68671,7 @@ default: error_illegal_ident(); }
 	case 2232:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68684,7 +68684,7 @@ default: error_illegal_ident(); }
 	case 2233:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x34); } while(0);
@@ -68695,7 +68695,7 @@ default: error_illegal_ident(); }
 	case 2234:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68708,7 +68708,7 @@ default: error_illegal_ident(); }
 	case 2235:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68721,7 +68721,7 @@ default: error_illegal_ident(); }
 	case 2236:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68734,7 +68734,7 @@ default: error_illegal_ident(); }
 	case 2237:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68747,7 +68747,7 @@ default: error_illegal_ident(); }
 	case 2238:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A0B); } while(0);
@@ -68758,7 +68758,7 @@ default: error_illegal_ident(); }
 	case 2239:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A03); } while(0);
@@ -68769,7 +68769,7 @@ default: error_illegal_ident(); }
 	case 2240:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A); } while(0);
@@ -68780,7 +68780,7 @@ default: error_illegal_ident(); }
 	case 2241:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A1B); } while(0);
@@ -68791,7 +68791,7 @@ default: error_illegal_ident(); }
 	case 2242:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A13); } while(0);
@@ -68802,7 +68802,7 @@ default: error_illegal_ident(); }
 	case 2243:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A); } while(0);
@@ -68813,7 +68813,7 @@ default: error_illegal_ident(); }
 	case 2244:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -68825,7 +68825,7 @@ default: error_illegal_ident(); }
 	case 2245:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -68837,7 +68837,7 @@ default: error_illegal_ident(); }
 	case 2246:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -68848,7 +68848,7 @@ default: error_illegal_ident(); }
 	case 2247:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -68860,7 +68860,7 @@ default: error_illegal_ident(); }
 	case 2248:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -68872,7 +68872,7 @@ default: error_illegal_ident(); }
 	case 2249:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68885,7 +68885,7 @@ default: error_illegal_ident(); }
 	case 2250:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68898,7 +68898,7 @@ default: error_illegal_ident(); }
 	case 2251:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68911,7 +68911,7 @@ default: error_illegal_ident(); }
 	case 2252:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68924,7 +68924,7 @@ default: error_illegal_ident(); }
 	case 2253:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -68936,7 +68936,7 @@ default: error_illegal_ident(); }
 	case 2254:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x46); } while(0);
@@ -68947,7 +68947,7 @@ default: error_illegal_ident(); }
 	case 2255:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68960,7 +68960,7 @@ default: error_illegal_ident(); }
 	case 2256:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68973,7 +68973,7 @@ default: error_illegal_ident(); }
 	case 2257:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68986,7 +68986,7 @@ default: error_illegal_ident(); }
 	case 2258:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -68999,7 +68999,7 @@ default: error_illegal_ident(); }
 	case 2259:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -69011,7 +69011,7 @@ default: error_illegal_ident(); }
 	case 2260:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4E); } while(0);
@@ -69022,7 +69022,7 @@ default: error_illegal_ident(); }
 	case 2261:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69035,7 +69035,7 @@ default: error_illegal_ident(); }
 	case 2262:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69048,7 +69048,7 @@ default: error_illegal_ident(); }
 	case 2263:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69061,7 +69061,7 @@ default: error_illegal_ident(); }
 	case 2264:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69074,7 +69074,7 @@ default: error_illegal_ident(); }
 	case 2265:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x56); } while(0);
@@ -69085,7 +69085,7 @@ default: error_illegal_ident(); }
 	case 2266:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69098,7 +69098,7 @@ default: error_illegal_ident(); }
 	case 2267:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69111,7 +69111,7 @@ default: error_illegal_ident(); }
 	case 2268:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69124,7 +69124,7 @@ default: error_illegal_ident(); }
 	case 2269:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69137,7 +69137,7 @@ default: error_illegal_ident(); }
 	case 2270:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -69149,7 +69149,7 @@ default: error_illegal_ident(); }
 	case 2271:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5E); } while(0);
@@ -69160,7 +69160,7 @@ default: error_illegal_ident(); }
 	case 2272:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69173,7 +69173,7 @@ default: error_illegal_ident(); }
 	case 2273:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69186,7 +69186,7 @@ default: error_illegal_ident(); }
 	case 2274:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69199,7 +69199,7 @@ default: error_illegal_ident(); }
 	case 2275:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69212,7 +69212,7 @@ default: error_illegal_ident(); }
 	case 2276:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x66); } while(0);
@@ -69223,7 +69223,7 @@ default: error_illegal_ident(); }
 	case 2277:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69236,7 +69236,7 @@ default: error_illegal_ident(); }
 	case 2278:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69249,7 +69249,7 @@ default: error_illegal_ident(); }
 	case 2279:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69262,7 +69262,7 @@ default: error_illegal_ident(); }
 	case 2280:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69275,7 +69275,7 @@ default: error_illegal_ident(); }
 	case 2281:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE400); } while(0);
@@ -69286,7 +69286,7 @@ default: error_illegal_ident(); }
 	case 2282:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDE4), expr); } while(0);
@@ -69297,7 +69297,7 @@ default: error_illegal_ident(); }
 	case 2283:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69310,7 +69310,7 @@ default: error_illegal_ident(); }
 	case 2284:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69323,7 +69323,7 @@ default: error_illegal_ident(); }
 	case 2285:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69336,7 +69336,7 @@ default: error_illegal_ident(); }
 	case 2286:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69349,7 +69349,7 @@ default: error_illegal_ident(); }
 	case 2287:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -69361,7 +69361,7 @@ default: error_illegal_ident(); }
 	case 2288:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6E); } while(0);
@@ -69372,7 +69372,7 @@ default: error_illegal_ident(); }
 	case 2289:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69385,7 +69385,7 @@ default: error_illegal_ident(); }
 	case 2290:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69398,7 +69398,7 @@ default: error_illegal_ident(); }
 	case 2291:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69411,7 +69411,7 @@ default: error_illegal_ident(); }
 	case 2292:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69424,7 +69424,7 @@ default: error_illegal_ident(); }
 	case 2293:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
@@ -69435,7 +69435,7 @@ default: error_illegal_ident(); }
 	case 2294:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69448,7 +69448,7 @@ default: error_illegal_ident(); }
 	case 2295:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69461,7 +69461,7 @@ default: error_illegal_ident(); }
 	case 2296:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69474,7 +69474,7 @@ default: error_illegal_ident(); }
 	case 2297:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69487,7 +69487,7 @@ default: error_illegal_ident(); }
 	case 2298:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
@@ -69498,7 +69498,7 @@ default: error_illegal_ident(); }
 	case 2299:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69511,7 +69511,7 @@ default: error_illegal_ident(); }
 	case 2300:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69524,7 +69524,7 @@ default: error_illegal_ident(); }
 	case 2301:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69537,7 +69537,7 @@ default: error_illegal_ident(); }
 	case 2302:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69550,7 +69550,7 @@ default: error_illegal_ident(); }
 	case 2303:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB16); } while(0);
@@ -69561,7 +69561,7 @@ default: error_illegal_ident(); }
 	case 2304:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69574,7 +69574,7 @@ default: error_illegal_ident(); }
 	case 2305:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69587,7 +69587,7 @@ default: error_illegal_ident(); }
 	case 2306:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69600,7 +69600,7 @@ default: error_illegal_ident(); }
 	case 2307:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69613,7 +69613,7 @@ default: error_illegal_ident(); }
 	case 2308:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB06); } while(0);
@@ -69624,7 +69624,7 @@ default: error_illegal_ident(); }
 	case 2309:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69637,7 +69637,7 @@ default: error_illegal_ident(); }
 	case 2310:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69650,7 +69650,7 @@ default: error_illegal_ident(); }
 	case 2311:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69663,7 +69663,7 @@ default: error_illegal_ident(); }
 	case 2312:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69676,7 +69676,7 @@ default: error_illegal_ident(); }
 	case 2313:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1E); } while(0);
@@ -69687,7 +69687,7 @@ default: error_illegal_ident(); }
 	case 2314:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69700,7 +69700,7 @@ default: error_illegal_ident(); }
 	case 2315:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69713,7 +69713,7 @@ default: error_illegal_ident(); }
 	case 2316:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69726,7 +69726,7 @@ default: error_illegal_ident(); }
 	case 2317:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69739,7 +69739,7 @@ default: error_illegal_ident(); }
 	case 2318:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0E); } while(0);
@@ -69750,7 +69750,7 @@ default: error_illegal_ident(); }
 	case 2319:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69763,7 +69763,7 @@ default: error_illegal_ident(); }
 	case 2320:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69776,7 +69776,7 @@ default: error_illegal_ident(); }
 	case 2321:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69789,7 +69789,7 @@ default: error_illegal_ident(); }
 	case 2322:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69802,7 +69802,7 @@ default: error_illegal_ident(); }
 	case 2323:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
@@ -69813,7 +69813,7 @@ default: error_illegal_ident(); }
 	case 2324:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69826,7 +69826,7 @@ default: error_illegal_ident(); }
 	case 2325:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69839,7 +69839,7 @@ default: error_illegal_ident(); }
 	case 2326:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69852,7 +69852,7 @@ default: error_illegal_ident(); }
 	case 2327:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69865,7 +69865,7 @@ default: error_illegal_ident(); }
 	case 2328:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
@@ -69876,7 +69876,7 @@ default: error_illegal_ident(); }
 	case 2329:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69889,7 +69889,7 @@ default: error_illegal_ident(); }
 	case 2330:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69902,7 +69902,7 @@ default: error_illegal_ident(); }
 	case 2331:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69915,7 +69915,7 @@ default: error_illegal_ident(); }
 	case 2332:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69928,7 +69928,7 @@ default: error_illegal_ident(); }
 	case 2333:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB26); } while(0);
@@ -69939,7 +69939,7 @@ default: error_illegal_ident(); }
 	case 2334:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69952,7 +69952,7 @@ default: error_illegal_ident(); }
 	case 2335:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69965,7 +69965,7 @@ default: error_illegal_ident(); }
 	case 2336:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69978,7 +69978,7 @@ default: error_illegal_ident(); }
 	case 2337:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -69991,7 +69991,7 @@ default: error_illegal_ident(); }
 	case 2338:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2E); } while(0);
@@ -70002,7 +70002,7 @@ default: error_illegal_ident(); }
 	case 2339:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70015,7 +70015,7 @@ default: error_illegal_ident(); }
 	case 2340:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70028,7 +70028,7 @@ default: error_illegal_ident(); }
 	case 2341:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70041,7 +70041,7 @@ default: error_illegal_ident(); }
 	case 2342:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70054,7 +70054,7 @@ default: error_illegal_ident(); }
 	case 2343:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3E); } while(0);
@@ -70065,7 +70065,7 @@ default: error_illegal_ident(); }
 	case 2344:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70078,7 +70078,7 @@ default: error_illegal_ident(); }
 	case 2345:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70091,7 +70091,7 @@ default: error_illegal_ident(); }
 	case 2346:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70104,7 +70104,7 @@ default: error_illegal_ident(); }
 	case 2347:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70117,7 +70117,7 @@ default: error_illegal_ident(); }
 	case 2348:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
@@ -70128,7 +70128,7 @@ default: error_illegal_ident(); }
 	case 2349:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70141,7 +70141,7 @@ default: error_illegal_ident(); }
 	case 2350:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70154,7 +70154,7 @@ default: error_illegal_ident(); }
 	case 2351:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70167,7 +70167,7 @@ default: error_illegal_ident(); }
 	case 2352:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70180,7 +70180,7 @@ default: error_illegal_ident(); }
 	case 2353:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
@@ -70191,7 +70191,7 @@ default: error_illegal_ident(); }
 	case 2354:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70204,7 +70204,7 @@ default: error_illegal_ident(); }
 	case 2355:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70217,7 +70217,7 @@ default: error_illegal_ident(); }
 	case 2356:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70230,7 +70230,7 @@ default: error_illegal_ident(); }
 	case 2357:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70243,7 +70243,7 @@ default: error_illegal_ident(); }
 	case 2358:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
@@ -70254,7 +70254,7 @@ default: error_illegal_ident(); }
 	case 2359:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70267,7 +70267,7 @@ default: error_illegal_ident(); }
 	case 2360:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70280,7 +70280,7 @@ default: error_illegal_ident(); }
 	case 2361:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70293,7 +70293,7 @@ default: error_illegal_ident(); }
 	case 2362:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70306,7 +70306,7 @@ default: error_illegal_ident(); }
 	case 2363:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
@@ -70317,7 +70317,7 @@ default: error_illegal_ident(); }
 	case 2364:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70330,7 +70330,7 @@ default: error_illegal_ident(); }
 	case 2365:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70343,7 +70343,7 @@ default: error_illegal_ident(); }
 	case 2366:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70356,7 +70356,7 @@ default: error_illegal_ident(); }
 	case 2367:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70369,7 +70369,7 @@ default: error_illegal_ident(); }
 	case 2368:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
 break;
@@ -70379,7 +70379,7 @@ default: error_illegal_ident(); }
 	case 2369:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDA600); } while(0); } else {
@@ -70391,7 +70391,7 @@ default: error_illegal_ident(); }
 	case 2370:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDA6), expr); } while(0); } else {
@@ -70403,7 +70403,7 @@ default: error_illegal_ident(); }
 	case 2371:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDA600); } while(0); } else {
@@ -70415,7 +70415,7 @@ default: error_illegal_ident(); }
 	case 2372:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDA6), expr); } while(0); } else {
@@ -70427,7 +70427,7 @@ default: error_illegal_ident(); }
 	case 2373:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
@@ -70438,7 +70438,7 @@ default: error_illegal_ident(); }
 	case 2374:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70451,7 +70451,7 @@ default: error_illegal_ident(); }
 	case 2375:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70464,7 +70464,7 @@ default: error_illegal_ident(); }
 	case 2376:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70477,7 +70477,7 @@ default: error_illegal_ident(); }
 	case 2377:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -70490,7 +70490,7 @@ default: error_illegal_ident(); }
 	case 2378:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA6); } while(0);
 break;
@@ -70500,7 +70500,7 @@ default: error_illegal_ident(); }
 	case 2379:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDA600); } while(0); } else {
@@ -70512,7 +70512,7 @@ default: error_illegal_ident(); }
 	case 2380:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDA6), expr); } while(0); } else {
@@ -70524,7 +70524,7 @@ default: error_illegal_ident(); }
 	case 2381:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDA600); } while(0); } else {
@@ -70536,7 +70536,7 @@ default: error_illegal_ident(); }
 	case 2382:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDA6), expr); } while(0); } else {
@@ -70548,7 +70548,7 @@ default: error_illegal_ident(); }
 	case 2383:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -70564,7 +70564,7 @@ default: error_illegal_ident(); }
 	case 2384:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -70582,7 +70582,7 @@ default: error_illegal_ident(); }
 	case 2385:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -70600,7 +70600,7 @@ default: error_illegal_ident(); }
 	case 2386:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -70618,7 +70618,7 @@ default: error_illegal_ident(); }
 	case 2387:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -70636,7 +70636,7 @@ default: error_illegal_ident(); }
 	case 2388:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -70652,7 +70652,7 @@ default: error_illegal_ident(); }
 	case 2389:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -70670,7 +70670,7 @@ default: error_illegal_ident(); }
 	case 2390:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -70688,7 +70688,7 @@ default: error_illegal_ident(); }
 	case 2391:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -70706,7 +70706,7 @@ default: error_illegal_ident(); }
 	case 2392:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -70724,7 +70724,7 @@ default: error_illegal_ident(); }
 	case 2393:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 break;
@@ -70734,7 +70734,7 @@ default: error_illegal_ident(); }
 	case 2394:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else {
@@ -70746,7 +70746,7 @@ default: error_illegal_ident(); }
 	case 2395:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else {
@@ -70758,7 +70758,7 @@ default: error_illegal_ident(); }
 	case 2396:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else {
@@ -70770,7 +70770,7 @@ default: error_illegal_ident(); }
 	case 2397:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else {
@@ -70782,7 +70782,7 @@ default: error_illegal_ident(); }
 	case 2398:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 break;
@@ -70792,7 +70792,7 @@ default: error_illegal_ident(); }
 	case 2399:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else {
@@ -70804,7 +70804,7 @@ default: error_illegal_ident(); }
 	case 2400:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else {
@@ -70816,7 +70816,7 @@ default: error_illegal_ident(); }
 	case 2401:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else {
@@ -70828,7 +70828,7 @@ default: error_illegal_ident(); }
 	case 2402:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else {
@@ -70840,7 +70840,7 @@ default: error_illegal_ident(); }
 	case 2403:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 break;
@@ -70850,7 +70850,7 @@ default: error_illegal_ident(); }
 	case 2404:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else {
@@ -70862,7 +70862,7 @@ default: error_illegal_ident(); }
 	case 2405:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else {
@@ -70874,7 +70874,7 @@ default: error_illegal_ident(); }
 	case 2406:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else {
@@ -70886,7 +70886,7 @@ default: error_illegal_ident(); }
 	case 2407:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else {
@@ -70898,7 +70898,7 @@ default: error_illegal_ident(); }
 	case 2408:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xBE); } while(0);
 break;
@@ -70908,7 +70908,7 @@ default: error_illegal_ident(); }
 	case 2409:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDBE00); } while(0); } else {
@@ -70920,7 +70920,7 @@ default: error_illegal_ident(); }
 	case 2410:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDBE), expr); } while(0); } else {
@@ -70932,7 +70932,7 @@ default: error_illegal_ident(); }
 	case 2411:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDBE00); } while(0); } else {
@@ -70944,7 +70944,7 @@ default: error_illegal_ident(); }
 	case 2412:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDBE), expr); } while(0); } else {
@@ -70956,7 +70956,7 @@ default: error_illegal_ident(); }
 	case 2413:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x35); } while(0);
 break;
@@ -70966,7 +70966,7 @@ default: error_illegal_ident(); }
 	case 2414:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD3500); } while(0); } else {
@@ -70978,7 +70978,7 @@ default: error_illegal_ident(); }
 	case 2415:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD35), expr); } while(0); } else {
@@ -70990,7 +70990,7 @@ default: error_illegal_ident(); }
 	case 2416:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD3500); } while(0); } else {
@@ -71002,7 +71002,7 @@ default: error_illegal_ident(); }
 	case 2417:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD35), expr); } while(0); } else {
@@ -71014,7 +71014,7 @@ default: error_illegal_ident(); }
 	case 2418:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x34); } while(0);
 break;
@@ -71024,7 +71024,7 @@ default: error_illegal_ident(); }
 	case 2419:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD3400); } while(0); } else {
@@ -71036,7 +71036,7 @@ default: error_illegal_ident(); }
 	case 2420:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD34), expr); } while(0); } else {
@@ -71048,7 +71048,7 @@ default: error_illegal_ident(); }
 	case 2421:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD3400); } while(0); } else {
@@ -71060,7 +71060,7 @@ default: error_illegal_ident(); }
 	case 2422:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD34), expr); } while(0); } else {
@@ -71072,7 +71072,7 @@ default: error_illegal_ident(); }
 	case 2423:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A0B); } while(0);
 break;
@@ -71082,7 +71082,7 @@ default: error_illegal_ident(); }
 	case 2424:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A03); } while(0);
 break;
@@ -71092,7 +71092,7 @@ default: error_illegal_ident(); }
 	case 2425:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A); } while(0);
 break;
@@ -71102,7 +71102,7 @@ default: error_illegal_ident(); }
 	case 2426:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A1B); } while(0);
 break;
@@ -71112,7 +71112,7 @@ default: error_illegal_ident(); }
 	case 2427:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A13); } while(0);
 break;
@@ -71122,7 +71122,7 @@ default: error_illegal_ident(); }
 	case 2428:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A); } while(0);
 break;
@@ -71132,7 +71132,7 @@ default: error_illegal_ident(); }
 	case 2429:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -71143,7 +71143,7 @@ default: error_illegal_ident(); }
 	case 2430:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -71154,7 +71154,7 @@ default: error_illegal_ident(); }
 	case 2431:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 break;
@@ -71164,7 +71164,7 @@ default: error_illegal_ident(); }
 	case 2432:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -71175,7 +71175,7 @@ default: error_illegal_ident(); }
 	case 2433:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -71186,7 +71186,7 @@ default: error_illegal_ident(); }
 	case 2434:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7E00); } while(0); } else {
@@ -71198,7 +71198,7 @@ default: error_illegal_ident(); }
 	case 2435:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD7E), expr); } while(0); } else {
@@ -71210,7 +71210,7 @@ default: error_illegal_ident(); }
 	case 2436:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7E00); } while(0); } else {
@@ -71222,7 +71222,7 @@ default: error_illegal_ident(); }
 	case 2437:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD7E), expr); } while(0); } else {
@@ -71234,7 +71234,7 @@ default: error_illegal_ident(); }
 	case 2438:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x3A), expr); } while(0);
@@ -71245,7 +71245,7 @@ default: error_illegal_ident(); }
 	case 2439:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A0B); } while(0);
@@ -71256,7 +71256,7 @@ default: error_illegal_ident(); }
 	case 2440:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A03); } while(0);
@@ -71267,7 +71267,7 @@ default: error_illegal_ident(); }
 	case 2441:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A); } while(0);
@@ -71278,7 +71278,7 @@ default: error_illegal_ident(); }
 	case 2442:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A1B); } while(0);
@@ -71289,7 +71289,7 @@ default: error_illegal_ident(); }
 	case 2443:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A13); } while(0);
@@ -71300,7 +71300,7 @@ default: error_illegal_ident(); }
 	case 2444:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A); } while(0);
@@ -71311,7 +71311,7 @@ default: error_illegal_ident(); }
 	case 2445:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -71323,7 +71323,7 @@ default: error_illegal_ident(); }
 	case 2446:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -71335,7 +71335,7 @@ default: error_illegal_ident(); }
 	case 2447:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -71346,7 +71346,7 @@ default: error_illegal_ident(); }
 	case 2448:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -71358,7 +71358,7 @@ default: error_illegal_ident(); }
 	case 2449:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
@@ -71370,7 +71370,7 @@ default: error_illegal_ident(); }
 	case 2450:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71383,7 +71383,7 @@ default: error_illegal_ident(); }
 	case 2451:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71396,7 +71396,7 @@ default: error_illegal_ident(); }
 	case 2452:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71409,7 +71409,7 @@ default: error_illegal_ident(); }
 	case 2453:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71422,7 +71422,7 @@ default: error_illegal_ident(); }
 	case 2454:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -71434,7 +71434,7 @@ default: error_illegal_ident(); }
 	case 2455:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x46); } while(0);
 break;
@@ -71444,7 +71444,7 @@ default: error_illegal_ident(); }
 	case 2456:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD4600); } while(0); } else {
@@ -71456,7 +71456,7 @@ default: error_illegal_ident(); }
 	case 2457:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD46), expr); } while(0); } else {
@@ -71468,7 +71468,7 @@ default: error_illegal_ident(); }
 	case 2458:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD4600); } while(0); } else {
@@ -71480,7 +71480,7 @@ default: error_illegal_ident(); }
 	case 2459:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD46), expr); } while(0); } else {
@@ -71492,7 +71492,7 @@ default: error_illegal_ident(); }
 	case 2460:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x46); } while(0);
@@ -71503,7 +71503,7 @@ default: error_illegal_ident(); }
 	case 2461:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71516,7 +71516,7 @@ default: error_illegal_ident(); }
 	case 2462:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71529,7 +71529,7 @@ default: error_illegal_ident(); }
 	case 2463:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71542,7 +71542,7 @@ default: error_illegal_ident(); }
 	case 2464:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71555,7 +71555,7 @@ default: error_illegal_ident(); }
 	case 2465:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED4B), expr); } while(0);
@@ -71566,7 +71566,7 @@ default: error_illegal_ident(); }
 	case 2466:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -71578,7 +71578,7 @@ default: error_illegal_ident(); }
 	case 2467:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4E); } while(0);
 break;
@@ -71588,7 +71588,7 @@ default: error_illegal_ident(); }
 	case 2468:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD4E00); } while(0); } else {
@@ -71600,7 +71600,7 @@ default: error_illegal_ident(); }
 	case 2469:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD4E), expr); } while(0); } else {
@@ -71612,7 +71612,7 @@ default: error_illegal_ident(); }
 	case 2470:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD4E00); } while(0); } else {
@@ -71624,7 +71624,7 @@ default: error_illegal_ident(); }
 	case 2471:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD4E), expr); } while(0); } else {
@@ -71636,7 +71636,7 @@ default: error_illegal_ident(); }
 	case 2472:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4E); } while(0);
@@ -71647,7 +71647,7 @@ default: error_illegal_ident(); }
 	case 2473:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71660,7 +71660,7 @@ default: error_illegal_ident(); }
 	case 2474:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71673,7 +71673,7 @@ default: error_illegal_ident(); }
 	case 2475:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71686,7 +71686,7 @@ default: error_illegal_ident(); }
 	case 2476:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71699,7 +71699,7 @@ default: error_illegal_ident(); }
 	case 2477:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x56); } while(0);
 break;
@@ -71709,7 +71709,7 @@ default: error_illegal_ident(); }
 	case 2478:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD5600); } while(0); } else {
@@ -71721,7 +71721,7 @@ default: error_illegal_ident(); }
 	case 2479:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD56), expr); } while(0); } else {
@@ -71733,7 +71733,7 @@ default: error_illegal_ident(); }
 	case 2480:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD5600); } while(0); } else {
@@ -71745,7 +71745,7 @@ default: error_illegal_ident(); }
 	case 2481:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD56), expr); } while(0); } else {
@@ -71757,7 +71757,7 @@ default: error_illegal_ident(); }
 	case 2482:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x56); } while(0);
@@ -71768,7 +71768,7 @@ default: error_illegal_ident(); }
 	case 2483:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71781,7 +71781,7 @@ default: error_illegal_ident(); }
 	case 2484:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71794,7 +71794,7 @@ default: error_illegal_ident(); }
 	case 2485:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71807,7 +71807,7 @@ default: error_illegal_ident(); }
 	case 2486:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71820,7 +71820,7 @@ default: error_illegal_ident(); }
 	case 2487:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED5B), expr); } while(0);
@@ -71831,7 +71831,7 @@ default: error_illegal_ident(); }
 	case 2488:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -71843,7 +71843,7 @@ default: error_illegal_ident(); }
 	case 2489:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5E); } while(0);
 break;
@@ -71853,7 +71853,7 @@ default: error_illegal_ident(); }
 	case 2490:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD5E00); } while(0); } else {
@@ -71865,7 +71865,7 @@ default: error_illegal_ident(); }
 	case 2491:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD5E), expr); } while(0); } else {
@@ -71877,7 +71877,7 @@ default: error_illegal_ident(); }
 	case 2492:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD5E00); } while(0); } else {
@@ -71889,7 +71889,7 @@ default: error_illegal_ident(); }
 	case 2493:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD5E), expr); } while(0); } else {
@@ -71901,7 +71901,7 @@ default: error_illegal_ident(); }
 	case 2494:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5E); } while(0);
@@ -71912,7 +71912,7 @@ default: error_illegal_ident(); }
 	case 2495:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71925,7 +71925,7 @@ default: error_illegal_ident(); }
 	case 2496:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71938,7 +71938,7 @@ default: error_illegal_ident(); }
 	case 2497:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71951,7 +71951,7 @@ default: error_illegal_ident(); }
 	case 2498:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -71964,7 +71964,7 @@ default: error_illegal_ident(); }
 	case 2499:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x66); } while(0);
 break;
@@ -71974,7 +71974,7 @@ default: error_illegal_ident(); }
 	case 2500:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6600); } while(0); } else {
@@ -71986,7 +71986,7 @@ default: error_illegal_ident(); }
 	case 2501:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD66), expr); } while(0); } else {
@@ -71998,7 +71998,7 @@ default: error_illegal_ident(); }
 	case 2502:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6600); } while(0); } else {
@@ -72010,7 +72010,7 @@ default: error_illegal_ident(); }
 	case 2503:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD66), expr); } while(0); } else {
@@ -72022,7 +72022,7 @@ default: error_illegal_ident(); }
 	case 2504:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x66); } while(0);
@@ -72033,7 +72033,7 @@ default: error_illegal_ident(); }
 	case 2505:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72046,7 +72046,7 @@ default: error_illegal_ident(); }
 	case 2506:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72059,7 +72059,7 @@ default: error_illegal_ident(); }
 	case 2507:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72072,7 +72072,7 @@ default: error_illegal_ident(); }
 	case 2508:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72085,7 +72085,7 @@ default: error_illegal_ident(); }
 	case 2509:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE400); } while(0);
 break;
@@ -72095,7 +72095,7 @@ default: error_illegal_ident(); }
 	case 2510:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDE4), expr); } while(0);
 break;
@@ -72105,7 +72105,7 @@ default: error_illegal_ident(); }
 	case 2511:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE400); } while(0); } else {
@@ -72117,7 +72117,7 @@ default: error_illegal_ident(); }
 	case 2512:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xE4), expr); } while(0); } else {
@@ -72129,7 +72129,7 @@ default: error_illegal_ident(); }
 	case 2513:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE400); } while(0); } else {
@@ -72141,7 +72141,7 @@ default: error_illegal_ident(); }
 	case 2514:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDE4), expr); } while(0); } else {
@@ -72153,7 +72153,7 @@ default: error_illegal_ident(); }
 	case 2515:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x2A), expr); } while(0);
@@ -72164,7 +72164,7 @@ default: error_illegal_ident(); }
 	case 2516:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE400); } while(0);
@@ -72175,7 +72175,7 @@ default: error_illegal_ident(); }
 	case 2517:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDE4), expr); } while(0);
@@ -72186,7 +72186,7 @@ default: error_illegal_ident(); }
 	case 2518:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72199,7 +72199,7 @@ default: error_illegal_ident(); }
 	case 2519:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72212,7 +72212,7 @@ default: error_illegal_ident(); }
 	case 2520:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72225,7 +72225,7 @@ default: error_illegal_ident(); }
 	case 2521:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72238,7 +72238,7 @@ default: error_illegal_ident(); }
 	case 2522:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
@@ -72250,7 +72250,7 @@ default: error_illegal_ident(); }
 	case 2523:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x020B); } while(0);
 break;
@@ -72260,7 +72260,7 @@ default: error_illegal_ident(); }
 	case 2524:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0203); } while(0);
 break;
@@ -72270,7 +72270,7 @@ default: error_illegal_ident(); }
 	case 2525:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x02); } while(0);
 break;
@@ -72280,7 +72280,7 @@ default: error_illegal_ident(); }
 	case 2526:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x121B); } while(0);
 break;
@@ -72290,7 +72290,7 @@ default: error_illegal_ident(); }
 	case 2527:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1213); } while(0);
 break;
@@ -72300,7 +72300,7 @@ default: error_illegal_ident(); }
 	case 2528:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x12); } while(0);
 break;
@@ -72310,7 +72310,7 @@ default: error_illegal_ident(); }
 	case 2529:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -72321,7 +72321,7 @@ default: error_illegal_ident(); }
 	case 2530:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -72332,7 +72332,7 @@ default: error_illegal_ident(); }
 	case 2531:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 break;
@@ -72342,7 +72342,7 @@ default: error_illegal_ident(); }
 	case 2532:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x70); } while(0);
 break;
@@ -72352,7 +72352,7 @@ default: error_illegal_ident(); }
 	case 2533:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x71); } while(0);
 break;
@@ -72362,7 +72362,7 @@ default: error_illegal_ident(); }
 	case 2534:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x72); } while(0);
 break;
@@ -72372,7 +72372,7 @@ default: error_illegal_ident(); }
 	case 2535:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x73); } while(0);
 break;
@@ -72382,7 +72382,7 @@ default: error_illegal_ident(); }
 	case 2536:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x74); } while(0);
 break;
@@ -72392,7 +72392,7 @@ default: error_illegal_ident(); }
 	case 2537:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDF400); } while(0);
 break;
@@ -72402,7 +72402,7 @@ default: error_illegal_ident(); }
 	case 2538:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x75); } while(0);
 break;
@@ -72412,7 +72412,7 @@ default: error_illegal_ident(); }
 	case 2539:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x36), expr); } while(0);
@@ -72423,7 +72423,7 @@ default: error_illegal_ident(); }
 	case 2540:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDF4), expr); } while(0);
 break;
@@ -72433,7 +72433,7 @@ default: error_illegal_ident(); }
 	case 2541:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -72444,7 +72444,7 @@ default: error_illegal_ident(); }
 	case 2542:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -72455,7 +72455,7 @@ default: error_illegal_ident(); }
 	case 2543:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7700); } while(0); } else {
@@ -72467,7 +72467,7 @@ default: error_illegal_ident(); }
 	case 2544:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7000); } while(0); } else {
@@ -72479,7 +72479,7 @@ default: error_illegal_ident(); }
 	case 2545:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7100); } while(0); } else {
@@ -72491,7 +72491,7 @@ default: error_illegal_ident(); }
 	case 2546:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7200); } while(0); } else {
@@ -72503,7 +72503,7 @@ default: error_illegal_ident(); }
 	case 2547:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7300); } while(0); } else {
@@ -72515,7 +72515,7 @@ default: error_illegal_ident(); }
 	case 2548:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7400); } while(0); } else {
@@ -72527,7 +72527,7 @@ default: error_illegal_ident(); }
 	case 2549:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF400); } while(0); } else {
@@ -72539,7 +72539,7 @@ default: error_illegal_ident(); }
 	case 2550:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7500); } while(0); } else {
@@ -72551,7 +72551,7 @@ default: error_illegal_ident(); }
 	case 2551:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72564,7 +72564,7 @@ default: error_illegal_ident(); }
 	case 2552:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD77), expr); } while(0); } else {
@@ -72576,7 +72576,7 @@ default: error_illegal_ident(); }
 	case 2553:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD70), expr); } while(0); } else {
@@ -72588,7 +72588,7 @@ default: error_illegal_ident(); }
 	case 2554:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD71), expr); } while(0); } else {
@@ -72600,7 +72600,7 @@ default: error_illegal_ident(); }
 	case 2555:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD72), expr); } while(0); } else {
@@ -72612,7 +72612,7 @@ default: error_illegal_ident(); }
 	case 2556:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD73), expr); } while(0); } else {
@@ -72624,7 +72624,7 @@ default: error_illegal_ident(); }
 	case 2557:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD74), expr); } while(0); } else {
@@ -72636,7 +72636,7 @@ default: error_illegal_ident(); }
 	case 2558:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xF4), expr); } while(0); } else {
@@ -72648,7 +72648,7 @@ default: error_illegal_ident(); }
 	case 2559:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD75), expr); } while(0); } else {
@@ -72660,7 +72660,7 @@ default: error_illegal_ident(); }
 	case 2560:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72673,7 +72673,7 @@ default: error_illegal_ident(); }
 	case 2561:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7700); } while(0); } else {
@@ -72685,7 +72685,7 @@ default: error_illegal_ident(); }
 	case 2562:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7000); } while(0); } else {
@@ -72697,7 +72697,7 @@ default: error_illegal_ident(); }
 	case 2563:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7100); } while(0); } else {
@@ -72709,7 +72709,7 @@ default: error_illegal_ident(); }
 	case 2564:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7200); } while(0); } else {
@@ -72721,7 +72721,7 @@ default: error_illegal_ident(); }
 	case 2565:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7300); } while(0); } else {
@@ -72733,7 +72733,7 @@ default: error_illegal_ident(); }
 	case 2566:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7400); } while(0); } else {
@@ -72745,7 +72745,7 @@ default: error_illegal_ident(); }
 	case 2567:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDF400); } while(0); } else {
@@ -72757,7 +72757,7 @@ default: error_illegal_ident(); }
 	case 2568:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7500); } while(0); } else {
@@ -72769,7 +72769,7 @@ default: error_illegal_ident(); }
 	case 2569:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72782,7 +72782,7 @@ default: error_illegal_ident(); }
 	case 2570:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD77), expr); } while(0); } else {
@@ -72794,7 +72794,7 @@ default: error_illegal_ident(); }
 	case 2571:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD70), expr); } while(0); } else {
@@ -72806,7 +72806,7 @@ default: error_illegal_ident(); }
 	case 2572:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD71), expr); } while(0); } else {
@@ -72818,7 +72818,7 @@ default: error_illegal_ident(); }
 	case 2573:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD72), expr); } while(0); } else {
@@ -72830,7 +72830,7 @@ default: error_illegal_ident(); }
 	case 2574:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD73), expr); } while(0); } else {
@@ -72842,7 +72842,7 @@ default: error_illegal_ident(); }
 	case 2575:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD74), expr); } while(0); } else {
@@ -72854,7 +72854,7 @@ default: error_illegal_ident(); }
 	case 2576:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDF4), expr); } while(0); } else {
@@ -72866,7 +72866,7 @@ default: error_illegal_ident(); }
 	case 2577:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD75), expr); } while(0); } else {
@@ -72878,7 +72878,7 @@ default: error_illegal_ident(); }
 	case 2578:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72891,7 +72891,7 @@ default: error_illegal_ident(); }
 	case 2579:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72904,7 +72904,7 @@ default: error_illegal_ident(); }
 	case 2580:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72917,7 +72917,7 @@ default: error_illegal_ident(); }
 	case 2581:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6E); } while(0);
 break;
@@ -72927,7 +72927,7 @@ default: error_illegal_ident(); }
 	case 2582:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6E00); } while(0); } else {
@@ -72939,7 +72939,7 @@ default: error_illegal_ident(); }
 	case 2583:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD6E), expr); } while(0); } else {
@@ -72951,7 +72951,7 @@ default: error_illegal_ident(); }
 	case 2584:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6E00); } while(0); } else {
@@ -72963,7 +72963,7 @@ default: error_illegal_ident(); }
 	case 2585:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD6E), expr); } while(0); } else {
@@ -72975,7 +72975,7 @@ default: error_illegal_ident(); }
 	case 2586:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6E); } while(0);
@@ -72986,7 +72986,7 @@ default: error_illegal_ident(); }
 	case 2587:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -72999,7 +72999,7 @@ default: error_illegal_ident(); }
 	case 2588:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -73012,7 +73012,7 @@ default: error_illegal_ident(); }
 	case 2589:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -73025,7 +73025,7 @@ default: error_illegal_ident(); }
 	case 2590:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -73038,7 +73038,7 @@ default: error_illegal_ident(); }
 	case 2591:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED7B), expr); } while(0);
@@ -73049,7 +73049,7 @@ default: error_illegal_ident(); }
 	case 2592:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x32), expr); } while(0);
@@ -73060,7 +73060,7 @@ default: error_illegal_ident(); }
 	case 2593:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED43), expr); } while(0);
@@ -73071,7 +73071,7 @@ default: error_illegal_ident(); }
 	case 2594:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED53), expr); } while(0);
@@ -73082,7 +73082,7 @@ default: error_illegal_ident(); }
 	case 2595:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x22), expr); } while(0);
@@ -73093,7 +73093,7 @@ default: error_illegal_ident(); }
 	case 2596:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -73106,7 +73106,7 @@ default: error_illegal_ident(); }
 	case 2597:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
@@ -73119,7 +73119,7 @@ default: error_illegal_ident(); }
 	case 2598:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED73), expr); } while(0);
@@ -73130,7 +73130,7 @@ default: error_illegal_ident(); }
 	case 2599:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A0B); } while(0);
 break;
@@ -73140,7 +73140,7 @@ default: error_illegal_ident(); }
 	case 2600:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A1B); } while(0);
 break;
@@ -73150,7 +73150,7 @@ default: error_illegal_ident(); }
 	case 2601:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -73161,7 +73161,7 @@ default: error_illegal_ident(); }
 	case 2602:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x020B); } while(0);
 break;
@@ -73171,7 +73171,7 @@ default: error_illegal_ident(); }
 	case 2603:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x121B); } while(0);
 break;
@@ -73181,7 +73181,7 @@ default: error_illegal_ident(); }
 	case 2604:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -73192,7 +73192,7 @@ default: error_illegal_ident(); }
 	case 2605:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDA8); } while(0);
 break;
@@ -73202,7 +73202,7 @@ default: error_illegal_ident(); }
 	case 2606:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDB8); } while(0);
 break;
@@ -73222,7 +73222,7 @@ default: error_illegal_ident(); }
 	case 2608:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A03); } while(0);
 break;
@@ -73232,7 +73232,7 @@ default: error_illegal_ident(); }
 	case 2609:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A13); } while(0);
 break;
@@ -73242,7 +73242,7 @@ default: error_illegal_ident(); }
 	case 2610:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -73253,7 +73253,7 @@ default: error_illegal_ident(); }
 	case 2611:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0203); } while(0);
 break;
@@ -73263,7 +73263,7 @@ default: error_illegal_ident(); }
 	case 2612:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1213); } while(0);
 break;
@@ -73273,7 +73273,7 @@ default: error_illegal_ident(); }
 	case 2613:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -73284,7 +73284,7 @@ default: error_illegal_ident(); }
 	case 2614:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDA0); } while(0);
 break;
@@ -73294,7 +73294,7 @@ default: error_illegal_ident(); }
 	case 2615:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDB0); } while(0);
 break;
@@ -73354,7 +73354,7 @@ default: error_illegal_ident(); }
 	case 2621:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
 break;
@@ -73364,7 +73364,7 @@ default: error_illegal_ident(); }
 	case 2622:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDB600); } while(0); } else {
@@ -73376,7 +73376,7 @@ default: error_illegal_ident(); }
 	case 2623:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDB6), expr); } while(0); } else {
@@ -73388,7 +73388,7 @@ default: error_illegal_ident(); }
 	case 2624:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDB600); } while(0); } else {
@@ -73400,7 +73400,7 @@ default: error_illegal_ident(); }
 	case 2625:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDB6), expr); } while(0); } else {
@@ -73412,7 +73412,7 @@ default: error_illegal_ident(); }
 	case 2626:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
@@ -73423,7 +73423,7 @@ default: error_illegal_ident(); }
 	case 2627:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -73436,7 +73436,7 @@ default: error_illegal_ident(); }
 	case 2628:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -73449,7 +73449,7 @@ default: error_illegal_ident(); }
 	case 2629:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -73462,7 +73462,7 @@ default: error_illegal_ident(); }
 	case 2630:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -73475,7 +73475,7 @@ default: error_illegal_ident(); }
 	case 2631:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
 break;
@@ -73485,7 +73485,7 @@ default: error_illegal_ident(); }
 	case 2632:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDB600); } while(0); } else {
@@ -73497,7 +73497,7 @@ default: error_illegal_ident(); }
 	case 2633:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDB6), expr); } while(0); } else {
@@ -73509,7 +73509,7 @@ default: error_illegal_ident(); }
 	case 2634:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDB600); } while(0); } else {
@@ -73521,7 +73521,7 @@ default: error_illegal_ident(); }
 	case 2635:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDB6), expr); } while(0); } else {
@@ -73533,7 +73533,7 @@ default: error_illegal_ident(); }
 	case 2636:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -73549,7 +73549,7 @@ default: error_illegal_ident(); }
 	case 2637:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -73567,7 +73567,7 @@ default: error_illegal_ident(); }
 	case 2638:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -73585,7 +73585,7 @@ default: error_illegal_ident(); }
 	case 2639:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -73603,7 +73603,7 @@ default: error_illegal_ident(); }
 	case 2640:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -73621,7 +73621,7 @@ default: error_illegal_ident(); }
 	case 2641:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -73637,7 +73637,7 @@ default: error_illegal_ident(); }
 	case 2642:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -73655,7 +73655,7 @@ default: error_illegal_ident(); }
 	case 2643:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -73673,7 +73673,7 @@ default: error_illegal_ident(); }
 	case 2644:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -73691,7 +73691,7 @@ default: error_illegal_ident(); }
 	case 2645:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -73709,7 +73709,7 @@ default: error_illegal_ident(); }
 	case 2646:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB16); } while(0);
 break;
@@ -73719,7 +73719,7 @@ default: error_illegal_ident(); }
 	case 2647:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0016); } while(0); } else {
@@ -73731,7 +73731,7 @@ default: error_illegal_ident(); }
 	case 2648:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB16), expr); } while(0); } else {
@@ -73743,7 +73743,7 @@ default: error_illegal_ident(); }
 	case 2649:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0016); } while(0); } else {
@@ -73755,7 +73755,7 @@ default: error_illegal_ident(); }
 	case 2650:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB16), expr); } while(0); } else {
@@ -73767,7 +73767,7 @@ default: error_illegal_ident(); }
 	case 2651:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB06); } while(0);
 break;
@@ -73777,7 +73777,7 @@ default: error_illegal_ident(); }
 	case 2652:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0006); } while(0); } else {
@@ -73789,7 +73789,7 @@ default: error_illegal_ident(); }
 	case 2653:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB06), expr); } while(0); } else {
@@ -73801,7 +73801,7 @@ default: error_illegal_ident(); }
 	case 2654:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0006); } while(0); } else {
@@ -73813,7 +73813,7 @@ default: error_illegal_ident(); }
 	case 2655:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB06), expr); } while(0); } else {
@@ -73825,7 +73825,7 @@ default: error_illegal_ident(); }
 	case 2656:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1E); } while(0);
 break;
@@ -73835,7 +73835,7 @@ default: error_illegal_ident(); }
 	case 2657:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB001E); } while(0); } else {
@@ -73847,7 +73847,7 @@ default: error_illegal_ident(); }
 	case 2658:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB1E), expr); } while(0); } else {
@@ -73859,7 +73859,7 @@ default: error_illegal_ident(); }
 	case 2659:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB001E); } while(0); } else {
@@ -73871,7 +73871,7 @@ default: error_illegal_ident(); }
 	case 2660:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB1E), expr); } while(0); } else {
@@ -73883,7 +73883,7 @@ default: error_illegal_ident(); }
 	case 2661:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0E); } while(0);
 break;
@@ -73893,7 +73893,7 @@ default: error_illegal_ident(); }
 	case 2662:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB000E); } while(0); } else {
@@ -73905,7 +73905,7 @@ default: error_illegal_ident(); }
 	case 2663:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB0E), expr); } while(0); } else {
@@ -73917,7 +73917,7 @@ default: error_illegal_ident(); }
 	case 2664:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB000E); } while(0); } else {
@@ -73929,7 +73929,7 @@ default: error_illegal_ident(); }
 	case 2665:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB0E), expr); } while(0); } else {
@@ -73941,7 +73941,7 @@ default: error_illegal_ident(); }
 	case 2666:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
 break;
@@ -73951,7 +73951,7 @@ default: error_illegal_ident(); }
 	case 2667:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9E00); } while(0); } else {
@@ -73963,7 +73963,7 @@ default: error_illegal_ident(); }
 	case 2668:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD9E), expr); } while(0); } else {
@@ -73975,7 +73975,7 @@ default: error_illegal_ident(); }
 	case 2669:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9E00); } while(0); } else {
@@ -73987,7 +73987,7 @@ default: error_illegal_ident(); }
 	case 2670:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD9E), expr); } while(0); } else {
@@ -73999,7 +73999,7 @@ default: error_illegal_ident(); }
 	case 2671:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
@@ -74010,7 +74010,7 @@ default: error_illegal_ident(); }
 	case 2672:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -74023,7 +74023,7 @@ default: error_illegal_ident(); }
 	case 2673:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -74036,7 +74036,7 @@ default: error_illegal_ident(); }
 	case 2674:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -74049,7 +74049,7 @@ default: error_illegal_ident(); }
 	case 2675:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -74062,7 +74062,7 @@ default: error_illegal_ident(); }
 	case 2676:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
 break;
@@ -74072,7 +74072,7 @@ default: error_illegal_ident(); }
 	case 2677:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9E00); } while(0); } else {
@@ -74084,7 +74084,7 @@ default: error_illegal_ident(); }
 	case 2678:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD9E), expr); } while(0); } else {
@@ -74096,7 +74096,7 @@ default: error_illegal_ident(); }
 	case 2679:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9E00); } while(0); } else {
@@ -74108,7 +74108,7 @@ default: error_illegal_ident(); }
 	case 2680:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD9E), expr); } while(0); } else {
@@ -74120,7 +74120,7 @@ default: error_illegal_ident(); }
 	case 2681:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -74136,7 +74136,7 @@ default: error_illegal_ident(); }
 	case 2682:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -74154,7 +74154,7 @@ default: error_illegal_ident(); }
 	case 2683:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -74172,7 +74172,7 @@ default: error_illegal_ident(); }
 	case 2684:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -74190,7 +74190,7 @@ default: error_illegal_ident(); }
 	case 2685:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -74208,7 +74208,7 @@ default: error_illegal_ident(); }
 	case 2686:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -74224,7 +74224,7 @@ default: error_illegal_ident(); }
 	case 2687:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -74242,7 +74242,7 @@ default: error_illegal_ident(); }
 	case 2688:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -74260,7 +74260,7 @@ default: error_illegal_ident(); }
 	case 2689:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -74278,7 +74278,7 @@ default: error_illegal_ident(); }
 	case 2690:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -74296,7 +74296,7 @@ default: error_illegal_ident(); }
 	case 2691:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB26); } while(0);
 break;
@@ -74306,7 +74306,7 @@ default: error_illegal_ident(); }
 	case 2692:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0026); } while(0); } else {
@@ -74318,7 +74318,7 @@ default: error_illegal_ident(); }
 	case 2693:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB26), expr); } while(0); } else {
@@ -74330,7 +74330,7 @@ default: error_illegal_ident(); }
 	case 2694:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0026); } while(0); } else {
@@ -74342,7 +74342,7 @@ default: error_illegal_ident(); }
 	case 2695:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB26), expr); } while(0); } else {
@@ -74354,7 +74354,7 @@ default: error_illegal_ident(); }
 	case 2696:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2E); } while(0);
 break;
@@ -74364,7 +74364,7 @@ default: error_illegal_ident(); }
 	case 2697:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB002E); } while(0); } else {
@@ -74376,7 +74376,7 @@ default: error_illegal_ident(); }
 	case 2698:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB2E), expr); } while(0); } else {
@@ -74388,7 +74388,7 @@ default: error_illegal_ident(); }
 	case 2699:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB002E); } while(0); } else {
@@ -74400,7 +74400,7 @@ default: error_illegal_ident(); }
 	case 2700:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB2E), expr); } while(0); } else {
@@ -74412,7 +74412,7 @@ default: error_illegal_ident(); }
 	case 2701:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3E); } while(0);
 break;
@@ -74422,7 +74422,7 @@ default: error_illegal_ident(); }
 	case 2702:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB003E); } while(0); } else {
@@ -74434,7 +74434,7 @@ default: error_illegal_ident(); }
 	case 2703:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB3E), expr); } while(0); } else {
@@ -74446,7 +74446,7 @@ default: error_illegal_ident(); }
 	case 2704:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB003E); } while(0); } else {
@@ -74458,7 +74458,7 @@ default: error_illegal_ident(); }
 	case 2705:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB3E), expr); } while(0); } else {
@@ -74470,7 +74470,7 @@ default: error_illegal_ident(); }
 	case 2706:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
 break;
@@ -74480,7 +74480,7 @@ default: error_illegal_ident(); }
 	case 2707:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9600); } while(0); } else {
@@ -74492,7 +74492,7 @@ default: error_illegal_ident(); }
 	case 2708:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD96), expr); } while(0); } else {
@@ -74504,7 +74504,7 @@ default: error_illegal_ident(); }
 	case 2709:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9600); } while(0); } else {
@@ -74516,7 +74516,7 @@ default: error_illegal_ident(); }
 	case 2710:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD96), expr); } while(0); } else {
@@ -74528,7 +74528,7 @@ default: error_illegal_ident(); }
 	case 2711:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
@@ -74539,7 +74539,7 @@ default: error_illegal_ident(); }
 	case 2712:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -74552,7 +74552,7 @@ default: error_illegal_ident(); }
 	case 2713:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -74565,7 +74565,7 @@ default: error_illegal_ident(); }
 	case 2714:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -74578,7 +74578,7 @@ default: error_illegal_ident(); }
 	case 2715:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -74591,7 +74591,7 @@ default: error_illegal_ident(); }
 	case 2716:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
 break;
@@ -74601,7 +74601,7 @@ default: error_illegal_ident(); }
 	case 2717:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9600); } while(0); } else {
@@ -74613,7 +74613,7 @@ default: error_illegal_ident(); }
 	case 2718:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD96), expr); } while(0); } else {
@@ -74625,7 +74625,7 @@ default: error_illegal_ident(); }
 	case 2719:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9600); } while(0); } else {
@@ -74637,7 +74637,7 @@ default: error_illegal_ident(); }
 	case 2720:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD96), expr); } while(0); } else {
@@ -74649,7 +74649,7 @@ default: error_illegal_ident(); }
 	case 2721:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
 break;
@@ -74659,7 +74659,7 @@ default: error_illegal_ident(); }
 	case 2722:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDAE00); } while(0); } else {
@@ -74671,7 +74671,7 @@ default: error_illegal_ident(); }
 	case 2723:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDAE), expr); } while(0); } else {
@@ -74683,7 +74683,7 @@ default: error_illegal_ident(); }
 	case 2724:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDAE00); } while(0); } else {
@@ -74695,7 +74695,7 @@ default: error_illegal_ident(); }
 	case 2725:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDAE), expr); } while(0); } else {
@@ -74707,7 +74707,7 @@ default: error_illegal_ident(); }
 	case 2726:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
@@ -74718,7 +74718,7 @@ default: error_illegal_ident(); }
 	case 2727:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -74731,7 +74731,7 @@ default: error_illegal_ident(); }
 	case 2728:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -74744,7 +74744,7 @@ default: error_illegal_ident(); }
 	case 2729:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -74757,7 +74757,7 @@ default: error_illegal_ident(); }
 	case 2730:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
@@ -74770,7 +74770,7 @@ default: error_illegal_ident(); }
 	case 2731:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
 break;
@@ -74780,7 +74780,7 @@ default: error_illegal_ident(); }
 	case 2732:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDAE00); } while(0); } else {
@@ -74792,7 +74792,7 @@ default: error_illegal_ident(); }
 	case 2733:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDAE), expr); } while(0); } else {
@@ -74804,7 +74804,7 @@ default: error_illegal_ident(); }
 	case 2734:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDAE00); } while(0); } else {
@@ -74816,7 +74816,7 @@ default: error_illegal_ident(); }
 	case 2735:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD3); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDAE), expr); } while(0); } else {
@@ -74828,7 +74828,7 @@ default: error_illegal_ident(); }
 	case 2736:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED5D); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -74837,7 +74837,7 @@ default: error_illegal_ident(); }
 	case 2737:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -74868,7 +74868,7 @@ default: error_illegal_ident(); }
 	case 2740:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xEA), expr); } while(0);
 break;
@@ -74878,7 +74878,7 @@ default: error_illegal_ident(); }
 	case 2741:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xE2), expr); } while(0);
 break;
@@ -74888,7 +74888,7 @@ default: error_illegal_ident(); }
 	case 2742:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFA), expr); } while(0);
 break;
@@ -74920,7 +74920,7 @@ default: error_illegal_ident(); }
 	case 2746:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xE2), expr); } while(0);
 break;
@@ -74978,7 +74978,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xE9); } while(0);
 	case 2754:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE9); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE9); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -74987,7 +74987,7 @@ default: error_illegal_ident(); }
 	case 2755:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE9); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE9); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -75006,7 +75006,7 @@ default: error_illegal_ident(); }
 	case 2757:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xEA), expr); } while(0);
 break;
@@ -75016,7 +75016,7 @@ default: error_illegal_ident(); }
 	case 2758:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xE2), expr); } while(0);
 break;
@@ -75026,7 +75026,7 @@ default: error_illegal_ident(); }
 	case 2759:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFA), expr); } while(0);
 break;
@@ -75052,7 +75052,7 @@ default: error_illegal_ident(); }
 	case 2762:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xE2), expr); } while(0);
 break;
@@ -75078,7 +75078,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xC2
 	case 2765:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xF2), expr); } while(0);
 break;
@@ -75088,7 +75088,7 @@ default: error_illegal_ident(); }
 	case 2766:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xEA), expr); } while(0);
 break;
@@ -75098,7 +75098,7 @@ default: error_illegal_ident(); }
 	case 2767:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xE2), expr); } while(0);
 break;
@@ -75108,7 +75108,7 @@ default: error_illegal_ident(); }
 	case 2768:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xEA), expr); } while(0);
 break;
@@ -75140,7 +75140,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xC3
 	case 2772:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xEA), expr); } while(0);
 break;
@@ -75150,7 +75150,7 @@ default: error_illegal_ident(); }
 	case 2773:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xE2), expr); } while(0);
 break;
@@ -75160,7 +75160,7 @@ default: error_illegal_ident(); }
 	case 2774:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_jr((0x38), expr); } while(0);
 break;
@@ -75174,7 +75174,7 @@ default: error_illegal_ident(); }
 	case 2775:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_jr((0x30), expr); } while(0);
 break;
@@ -75188,7 +75188,7 @@ default: error_illegal_ident(); }
 	case 2776:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_jr((0x20), expr); } while(0);
 break;
@@ -75202,7 +75202,7 @@ default: error_illegal_ident(); }
 	case 2777:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_jr((0x28), expr); } while(0);
 break;
@@ -75216,7 +75216,7 @@ default: error_illegal_ident(); }
 	case 2778:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_jr((0x18), expr); } while(0);
 break;
@@ -75230,7 +75230,7 @@ default: error_illegal_ident(); }
 	case 2779:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xEA), expr); } while(0);
 break;
@@ -75272,7 +75272,7 @@ default: error_illegal_ident(); }
 	case 2784:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xEA), expr); } while(0);
 break;
@@ -75282,7 +75282,7 @@ default: error_illegal_ident(); }
 	case 2785:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xE2), expr); } while(0);
 break;
@@ -75292,7 +75292,7 @@ default: error_illegal_ident(); }
 	case 2786:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFA), expr); } while(0);
 break;
@@ -75318,7 +75318,7 @@ default: error_illegal_ident(); }
 	case 2789:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xE2), expr); } while(0);
 break;
@@ -75344,7 +75344,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xC2
 	case 2792:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xF2), expr); } while(0);
 break;
@@ -75354,7 +75354,7 @@ default: error_illegal_ident(); }
 	case 2793:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xEA), expr); } while(0);
 break;
@@ -75364,7 +75364,7 @@ default: error_illegal_ident(); }
 	case 2794:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xE2), expr); } while(0);
 break;
@@ -75374,7 +75374,7 @@ default: error_illegal_ident(); }
 	case 2795:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xEA), expr); } while(0);
 break;
@@ -75425,7 +75425,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x7B); } while(0);
 	case 2803:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED57); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -75448,7 +75448,7 @@ default: error_illegal_ident(); }
 	case 2806:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED5F); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -75499,7 +75499,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3A); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
 break;
@@ -75512,7 +75512,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2A); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
 break;
@@ -75530,7 +75530,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3A); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
 break;
@@ -75543,7 +75543,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2A); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
 break;
@@ -75553,7 +75553,7 @@ default: error_illegal_ident(); }
 	case 2819:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -75562,7 +75562,7 @@ default: error_illegal_ident(); }
 	case 2820:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD7E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD7E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -75571,7 +75571,7 @@ default: error_illegal_ident(); }
 	case 2821:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -75580,7 +75580,7 @@ default: error_illegal_ident(); }
 	case 2822:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD7E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD7E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -75639,7 +75639,7 @@ default: error_illegal_ident(); }
 	case 2829:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED77); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -75648,7 +75648,7 @@ default: error_illegal_ident(); }
 	case 2830:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x3A), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x3E), expr); } while(0); }
 break;
 case CPU_GBZ80:
@@ -75660,7 +75660,7 @@ default: error_illegal_ident(); }
 	case 2831:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7F); } while(0);
 break;
@@ -75670,7 +75670,7 @@ default: error_illegal_ident(); }
 	case 2832:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x78); } while(0);
 break;
@@ -75680,7 +75680,7 @@ default: error_illegal_ident(); }
 	case 2833:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x79); } while(0);
 break;
@@ -75690,7 +75690,7 @@ default: error_illegal_ident(); }
 	case 2834:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7A); } while(0);
 break;
@@ -75700,7 +75700,7 @@ default: error_illegal_ident(); }
 	case 2835:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7B); } while(0);
 break;
@@ -75710,7 +75710,7 @@ default: error_illegal_ident(); }
 	case 2836:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED57); } while(0);
 break;
@@ -75720,7 +75720,7 @@ default: error_illegal_ident(); }
 	case 2837:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7C); } while(0);
 break;
@@ -75730,7 +75730,7 @@ default: error_illegal_ident(); }
 	case 2838:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED5F); } while(0);
 break;
@@ -75740,7 +75740,7 @@ default: error_illegal_ident(); }
 	case 2839:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A0B); } while(0);
 break;
@@ -75750,7 +75750,7 @@ default: error_illegal_ident(); }
 	case 2840:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A03); } while(0);
 break;
@@ -75760,7 +75760,7 @@ default: error_illegal_ident(); }
 	case 2841:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0A); } while(0);
 break;
@@ -75770,7 +75770,7 @@ default: error_illegal_ident(); }
 	case 2842:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A1B); } while(0);
 break;
@@ -75780,7 +75780,7 @@ default: error_illegal_ident(); }
 	case 2843:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A13); } while(0);
 break;
@@ -75790,7 +75790,7 @@ default: error_illegal_ident(); }
 	case 2844:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1A); } while(0);
 break;
@@ -75800,7 +75800,7 @@ default: error_illegal_ident(); }
 	case 2845:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -75811,7 +75811,7 @@ default: error_illegal_ident(); }
 	case 2846:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -75822,7 +75822,7 @@ default: error_illegal_ident(); }
 	case 2847:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 break;
@@ -75832,7 +75832,7 @@ default: error_illegal_ident(); }
 	case 2848:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
@@ -75843,7 +75843,7 @@ default: error_illegal_ident(); }
 	case 2849:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
@@ -75854,7 +75854,7 @@ default: error_illegal_ident(); }
 	case 2850:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7E00); } while(0); } else {
@@ -75866,7 +75866,7 @@ default: error_illegal_ident(); }
 	case 2851:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD7E), expr); } while(0); } else {
@@ -75878,7 +75878,7 @@ default: error_illegal_ident(); }
 	case 2852:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7E00); } while(0); } else {
@@ -75890,7 +75890,7 @@ default: error_illegal_ident(); }
 	case 2853:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD7E), expr); } while(0); } else {
@@ -75902,7 +75902,7 @@ default: error_illegal_ident(); }
 	case 2854:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7D); } while(0);
 break;
@@ -75912,7 +75912,7 @@ default: error_illegal_ident(); }
 	case 2855:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED77); } while(0);
 break;
@@ -75922,7 +75922,7 @@ default: error_illegal_ident(); }
 	case 2856:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_in_parens) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x3A), expr); } while(0); } else {
@@ -75969,7 +75969,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x46); } while(0);
 	case 2864:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD4600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD4600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -75978,7 +75978,7 @@ default: error_illegal_ident(); }
 	case 2865:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD46), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD46), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -75987,7 +75987,7 @@ default: error_illegal_ident(); }
 	case 2866:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD4600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD4600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -75996,7 +75996,7 @@ default: error_illegal_ident(); }
 	case 2867:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD46), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD46), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76052,7 +76052,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x06)
 	case 2874:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x47); } while(0);
 break;
@@ -76062,7 +76062,7 @@ default: error_illegal_ident(); }
 	case 2875:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x40); } while(0);
 break;
@@ -76072,7 +76072,7 @@ default: error_illegal_ident(); }
 	case 2876:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x41); } while(0);
 break;
@@ -76082,7 +76082,7 @@ default: error_illegal_ident(); }
 	case 2877:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x42); } while(0);
 break;
@@ -76092,7 +76092,7 @@ default: error_illegal_ident(); }
 	case 2878:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x43); } while(0);
 break;
@@ -76102,7 +76102,7 @@ default: error_illegal_ident(); }
 	case 2879:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x44); } while(0);
 break;
@@ -76112,7 +76112,7 @@ default: error_illegal_ident(); }
 	case 2880:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x46); } while(0);
 break;
@@ -76122,7 +76122,7 @@ default: error_illegal_ident(); }
 	case 2881:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD4600); } while(0); } else {
@@ -76134,7 +76134,7 @@ default: error_illegal_ident(); }
 	case 2882:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD46), expr); } while(0); } else {
@@ -76146,7 +76146,7 @@ default: error_illegal_ident(); }
 	case 2883:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD4600); } while(0); } else {
@@ -76158,7 +76158,7 @@ default: error_illegal_ident(); }
 	case 2884:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD46), expr); } while(0); } else {
@@ -76170,7 +76170,7 @@ default: error_illegal_ident(); }
 	case 2885:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x45); } while(0);
 break;
@@ -76180,7 +76180,7 @@ default: error_illegal_ident(); }
 	case 2886:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x06), expr); } while(0);
@@ -76225,7 +76225,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x01), expr); } while(0);
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED4B), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x01), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76234,7 +76234,7 @@ default: error_illegal_ident(); }
 	case 2892:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED49); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -76243,7 +76243,7 @@ default: error_illegal_ident(); }
 	case 2893:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED41); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -76252,7 +76252,7 @@ default: error_illegal_ident(); }
 	case 2894:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_in_parens) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED4B), expr); } while(0); } else {
@@ -76299,7 +76299,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x4E); } while(0);
 	case 2902:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD4E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD4E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76308,7 +76308,7 @@ default: error_illegal_ident(); }
 	case 2903:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD4E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD4E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76317,7 +76317,7 @@ default: error_illegal_ident(); }
 	case 2904:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD4E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD4E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76326,7 +76326,7 @@ default: error_illegal_ident(); }
 	case 2905:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD4E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD4E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76382,7 +76382,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x0E)
 	case 2912:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4F); } while(0);
 break;
@@ -76392,7 +76392,7 @@ default: error_illegal_ident(); }
 	case 2913:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x48); } while(0);
 break;
@@ -76402,7 +76402,7 @@ default: error_illegal_ident(); }
 	case 2914:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x49); } while(0);
 break;
@@ -76412,7 +76412,7 @@ default: error_illegal_ident(); }
 	case 2915:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4A); } while(0);
 break;
@@ -76422,7 +76422,7 @@ default: error_illegal_ident(); }
 	case 2916:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4B); } while(0);
 break;
@@ -76432,7 +76432,7 @@ default: error_illegal_ident(); }
 	case 2917:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4C); } while(0);
 break;
@@ -76442,7 +76442,7 @@ default: error_illegal_ident(); }
 	case 2918:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4E); } while(0);
 break;
@@ -76452,7 +76452,7 @@ default: error_illegal_ident(); }
 	case 2919:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD4E00); } while(0); } else {
@@ -76464,7 +76464,7 @@ default: error_illegal_ident(); }
 	case 2920:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD4E), expr); } while(0); } else {
@@ -76476,7 +76476,7 @@ default: error_illegal_ident(); }
 	case 2921:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD4E00); } while(0); } else {
@@ -76488,7 +76488,7 @@ default: error_illegal_ident(); }
 	case 2922:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD4E), expr); } while(0); } else {
@@ -76500,7 +76500,7 @@ default: error_illegal_ident(); }
 	case 2923:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4D); } while(0);
 break;
@@ -76510,7 +76510,7 @@ default: error_illegal_ident(); }
 	case 2924:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x0E), expr); } while(0);
@@ -76556,7 +76556,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x56); } while(0);
 	case 2932:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD5600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD5600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76565,7 +76565,7 @@ default: error_illegal_ident(); }
 	case 2933:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD56), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD56), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76574,7 +76574,7 @@ default: error_illegal_ident(); }
 	case 2934:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD5600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD5600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76583,7 +76583,7 @@ default: error_illegal_ident(); }
 	case 2935:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD56), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD56), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76639,7 +76639,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x16)
 	case 2942:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x57); } while(0);
 break;
@@ -76649,7 +76649,7 @@ default: error_illegal_ident(); }
 	case 2943:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x50); } while(0);
 break;
@@ -76659,7 +76659,7 @@ default: error_illegal_ident(); }
 	case 2944:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x51); } while(0);
 break;
@@ -76669,7 +76669,7 @@ default: error_illegal_ident(); }
 	case 2945:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x52); } while(0);
 break;
@@ -76679,7 +76679,7 @@ default: error_illegal_ident(); }
 	case 2946:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x53); } while(0);
 break;
@@ -76689,7 +76689,7 @@ default: error_illegal_ident(); }
 	case 2947:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x54); } while(0);
 break;
@@ -76699,7 +76699,7 @@ default: error_illegal_ident(); }
 	case 2948:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x56); } while(0);
 break;
@@ -76709,7 +76709,7 @@ default: error_illegal_ident(); }
 	case 2949:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD5600); } while(0); } else {
@@ -76721,7 +76721,7 @@ default: error_illegal_ident(); }
 	case 2950:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD56), expr); } while(0); } else {
@@ -76733,7 +76733,7 @@ default: error_illegal_ident(); }
 	case 2951:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD5600); } while(0); } else {
@@ -76745,7 +76745,7 @@ default: error_illegal_ident(); }
 	case 2952:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD56), expr); } while(0); } else {
@@ -76757,7 +76757,7 @@ default: error_illegal_ident(); }
 	case 2953:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x55); } while(0);
 break;
@@ -76767,7 +76767,7 @@ default: error_illegal_ident(); }
 	case 2954:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x16), expr); } while(0);
@@ -76832,7 +76832,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xD5); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
 break;
-case CPU_8080: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEB); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x210000); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x39); } while(0);
@@ -76856,7 +76856,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xD5); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
 break;
-case CPU_8080: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEB); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n_0((0x21), expr); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x39); } while(0);
@@ -76875,7 +76875,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x11), expr); } while(0);
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED5B), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x11), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76884,7 +76884,7 @@ default: error_illegal_ident(); }
 	case 2963:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED59); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -76893,7 +76893,7 @@ default: error_illegal_ident(); }
 	case 2964:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED51); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -76902,7 +76902,7 @@ default: error_illegal_ident(); }
 	case 2965:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_in_parens) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED5B), expr); } while(0); } else {
@@ -76949,7 +76949,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x5E); } while(0);
 	case 2973:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD5E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD5E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76958,7 +76958,7 @@ default: error_illegal_ident(); }
 	case 2974:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD5E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD5E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76967,7 +76967,7 @@ default: error_illegal_ident(); }
 	case 2975:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD5E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD5E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -76976,7 +76976,7 @@ default: error_illegal_ident(); }
 	case 2976:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD5E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD5E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77032,7 +77032,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x1E)
 	case 2983:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5F); } while(0);
 break;
@@ -77042,7 +77042,7 @@ default: error_illegal_ident(); }
 	case 2984:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x58); } while(0);
 break;
@@ -77052,7 +77052,7 @@ default: error_illegal_ident(); }
 	case 2985:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x59); } while(0);
 break;
@@ -77062,7 +77062,7 @@ default: error_illegal_ident(); }
 	case 2986:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5A); } while(0);
 break;
@@ -77072,7 +77072,7 @@ default: error_illegal_ident(); }
 	case 2987:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5B); } while(0);
 break;
@@ -77082,7 +77082,7 @@ default: error_illegal_ident(); }
 	case 2988:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5C); } while(0);
 break;
@@ -77092,7 +77092,7 @@ default: error_illegal_ident(); }
 	case 2989:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5E); } while(0);
 break;
@@ -77102,7 +77102,7 @@ default: error_illegal_ident(); }
 	case 2990:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD5E00); } while(0); } else {
@@ -77114,7 +77114,7 @@ default: error_illegal_ident(); }
 	case 2991:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD5E), expr); } while(0); } else {
@@ -77126,7 +77126,7 @@ default: error_illegal_ident(); }
 	case 2992:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD5E00); } while(0); } else {
@@ -77138,7 +77138,7 @@ default: error_illegal_ident(); }
 	case 2993:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD5E), expr); } while(0); } else {
@@ -77150,7 +77150,7 @@ default: error_illegal_ident(); }
 	case 2994:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5D); } while(0);
 break;
@@ -77160,7 +77160,7 @@ default: error_illegal_ident(); }
 	case 2995:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x1E), expr); } while(0);
@@ -77171,7 +77171,7 @@ default: error_illegal_ident(); }
 	case 2996:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED47); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -77215,7 +77215,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x66); } while(0);
 	case 3004:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77224,7 +77224,7 @@ default: error_illegal_ident(); }
 	case 3005:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD66), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD66), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77233,7 +77233,7 @@ default: error_illegal_ident(); }
 	case 3006:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77242,7 +77242,7 @@ default: error_illegal_ident(); }
 	case 3007:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD66), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD66), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77262,7 +77262,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x26)
 	case 3010:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x67); } while(0);
 break;
@@ -77272,7 +77272,7 @@ default: error_illegal_ident(); }
 	case 3011:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x60); } while(0);
 break;
@@ -77282,7 +77282,7 @@ default: error_illegal_ident(); }
 	case 3012:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x61); } while(0);
 break;
@@ -77292,7 +77292,7 @@ default: error_illegal_ident(); }
 	case 3013:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x62); } while(0);
 break;
@@ -77302,7 +77302,7 @@ default: error_illegal_ident(); }
 	case 3014:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x63); } while(0);
 break;
@@ -77312,7 +77312,7 @@ default: error_illegal_ident(); }
 	case 3015:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x64); } while(0);
 break;
@@ -77322,7 +77322,7 @@ default: error_illegal_ident(); }
 	case 3016:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x66); } while(0);
 break;
@@ -77332,7 +77332,7 @@ default: error_illegal_ident(); }
 	case 3017:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6600); } while(0); } else {
@@ -77344,7 +77344,7 @@ default: error_illegal_ident(); }
 	case 3018:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD66), expr); } while(0); } else {
@@ -77356,7 +77356,7 @@ default: error_illegal_ident(); }
 	case 3019:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6600); } while(0); } else {
@@ -77368,7 +77368,7 @@ default: error_illegal_ident(); }
 	case 3020:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD66), expr); } while(0); } else {
@@ -77380,7 +77380,7 @@ default: error_illegal_ident(); }
 	case 3021:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x65); } while(0);
 break;
@@ -77390,7 +77390,7 @@ default: error_illegal_ident(); }
 	case 3022:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x26), expr); } while(0);
@@ -77422,7 +77422,7 @@ default: error_illegal_ident(); }
 	case 3026:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE400); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -77431,7 +77431,7 @@ default: error_illegal_ident(); }
 	case 3027:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDE4), expr); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -77440,7 +77440,7 @@ default: error_illegal_ident(); }
 	case 3028:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xE400); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE400); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77449,7 +77449,7 @@ default: error_illegal_ident(); }
 	case 3029:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xE4), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDE4), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77458,7 +77458,7 @@ default: error_illegal_ident(); }
 	case 3030:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE400); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xE400); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77467,7 +77467,7 @@ default: error_illegal_ident(); }
 	case 3031:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDE4), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xE4), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77476,7 +77476,7 @@ default: error_illegal_ident(); }
 	case 3032:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xC400); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -77485,7 +77485,7 @@ default: error_illegal_ident(); }
 	case 3033:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xC4), expr); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -77494,7 +77494,7 @@ default: error_illegal_ident(); }
 	case 3034:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7C); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7C); } while(0); }
 break;
 case CPU_Z80: case CPU_Z80N:
@@ -77506,7 +77506,7 @@ default: error_illegal_ident(); }
 	case 3035:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7C); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7C); } while(0); }
 break;
 case CPU_Z80: case CPU_Z80N:
@@ -77518,7 +77518,7 @@ default: error_illegal_ident(); }
 	case 3036:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x210000); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x39); } while(0);
 break;
@@ -77545,7 +77545,7 @@ case CPU_GBZ80:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_d((0xF8), expr); } while(0);
 break;
-case CPU_8080: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_s_0((0x21), expr); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x39); } while(0);
@@ -77560,7 +77560,7 @@ case CPU_GBZ80:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x21), expr); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x2A), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x21), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77569,7 +77569,7 @@ default: error_illegal_ident(); }
 	case 3039:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED69); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -77578,7 +77578,7 @@ default: error_illegal_ident(); }
 	case 3040:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED61); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -77587,7 +77587,7 @@ default: error_illegal_ident(); }
 	case 3041:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE400); } while(0);
 break;
@@ -77597,7 +77597,7 @@ default: error_illegal_ident(); }
 	case 3042:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDE4), expr); } while(0);
 break;
@@ -77607,7 +77607,7 @@ default: error_illegal_ident(); }
 	case 3043:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE400); } while(0); } else {
@@ -77619,7 +77619,7 @@ default: error_illegal_ident(); }
 	case 3044:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xE4), expr); } while(0); } else {
@@ -77631,7 +77631,7 @@ default: error_illegal_ident(); }
 	case 3045:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE400); } while(0); } else {
@@ -77643,7 +77643,7 @@ default: error_illegal_ident(); }
 	case 3046:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDE4), expr); } while(0); } else {
@@ -77655,7 +77655,7 @@ default: error_illegal_ident(); }
 	case 3047:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xC400); } while(0);
 break;
@@ -77665,7 +77665,7 @@ default: error_illegal_ident(); }
 	case 3048:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xC4), expr); } while(0);
 break;
@@ -77675,7 +77675,7 @@ default: error_illegal_ident(); }
 	case 3049:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7C); } while(0); } else {
@@ -77687,7 +77687,7 @@ default: error_illegal_ident(); }
 	case 3050:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7C); } while(0); } else {
@@ -77699,7 +77699,7 @@ default: error_illegal_ident(); }
 	case 3051:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_in_parens) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x2A), expr); } while(0); } else {
@@ -77720,7 +77720,7 @@ default: error_illegal_ident(); }
 	case 3053:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED4F); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -77780,7 +77780,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x32); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
 break;
@@ -77793,7 +77793,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x22); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
 break;
@@ -77833,7 +77833,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x74); } while(0);
 	case 3070:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDF400); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -77853,7 +77853,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x36)
 	case 3073:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDF4), expr); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -77865,7 +77865,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x32); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
 break;
@@ -77878,7 +77878,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x22); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
 break;
@@ -77888,7 +77888,7 @@ default: error_illegal_ident(); }
 	case 3076:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7700); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7700); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77897,7 +77897,7 @@ default: error_illegal_ident(); }
 	case 3077:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7000); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7000); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77906,7 +77906,7 @@ default: error_illegal_ident(); }
 	case 3078:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7100); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7100); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77915,7 +77915,7 @@ default: error_illegal_ident(); }
 	case 3079:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7200); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7200); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77924,7 +77924,7 @@ default: error_illegal_ident(); }
 	case 3080:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7300); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7300); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77933,7 +77933,7 @@ default: error_illegal_ident(); }
 	case 3081:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7400); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7400); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77942,7 +77942,7 @@ default: error_illegal_ident(); }
 	case 3082:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xF400); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDF400); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77951,7 +77951,7 @@ default: error_illegal_ident(); }
 	case 3083:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7500); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7500); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77960,7 +77960,7 @@ default: error_illegal_ident(); }
 	case 3084:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xDD3600), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xFD3600), expr); } while(0); }
 break;
@@ -77970,7 +77970,7 @@ default: error_illegal_ident(); }
 	case 3085:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD77), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD77), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77979,7 +77979,7 @@ default: error_illegal_ident(); }
 	case 3086:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD70), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD70), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77988,7 +77988,7 @@ default: error_illegal_ident(); }
 	case 3087:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD71), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD71), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -77997,7 +77997,7 @@ default: error_illegal_ident(); }
 	case 3088:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD72), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD72), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78006,7 +78006,7 @@ default: error_illegal_ident(); }
 	case 3089:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD73), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD73), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78015,7 +78015,7 @@ default: error_illegal_ident(); }
 	case 3090:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD74), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD74), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78024,7 +78024,7 @@ default: error_illegal_ident(); }
 	case 3091:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xF4), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDF4), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78033,7 +78033,7 @@ default: error_illegal_ident(); }
 	case 3092:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD75), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD75), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78042,7 +78042,7 @@ default: error_illegal_ident(); }
 	case 3093:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (!opts.swap_ix_iy) { do { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx_n((0xDD36), idx_expr, n_expr); } while(0); } else { do { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx_n((0xFD36), idx_expr, n_expr); } while(0); }
 break;
@@ -78052,7 +78052,7 @@ default: error_illegal_ident(); }
 	case 3094:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7700); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7700); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78061,7 +78061,7 @@ default: error_illegal_ident(); }
 	case 3095:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7000); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7000); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78070,7 +78070,7 @@ default: error_illegal_ident(); }
 	case 3096:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7100); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7100); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78079,7 +78079,7 @@ default: error_illegal_ident(); }
 	case 3097:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7200); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7200); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78088,7 +78088,7 @@ default: error_illegal_ident(); }
 	case 3098:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7300); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7300); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78097,7 +78097,7 @@ default: error_illegal_ident(); }
 	case 3099:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7400); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7400); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78106,7 +78106,7 @@ default: error_illegal_ident(); }
 	case 3100:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDF400); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xF400); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78115,7 +78115,7 @@ default: error_illegal_ident(); }
 	case 3101:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7500); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7500); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78124,7 +78124,7 @@ default: error_illegal_ident(); }
 	case 3102:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xFD3600), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xDD3600), expr); } while(0); }
 break;
@@ -78134,7 +78134,7 @@ default: error_illegal_ident(); }
 	case 3103:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD77), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD77), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78143,7 +78143,7 @@ default: error_illegal_ident(); }
 	case 3104:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD70), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD70), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78152,7 +78152,7 @@ default: error_illegal_ident(); }
 	case 3105:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD71), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD71), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78161,7 +78161,7 @@ default: error_illegal_ident(); }
 	case 3106:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD72), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD72), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78170,7 +78170,7 @@ default: error_illegal_ident(); }
 	case 3107:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD73), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD73), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78179,7 +78179,7 @@ default: error_illegal_ident(); }
 	case 3108:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD74), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD74), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78188,7 +78188,7 @@ default: error_illegal_ident(); }
 	case 3109:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDF4), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xF4), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78197,7 +78197,7 @@ default: error_illegal_ident(); }
 	case 3110:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD75), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD75), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78206,7 +78206,7 @@ default: error_illegal_ident(); }
 	case 3111:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (!opts.swap_ix_iy) { do { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx_n((0xFD36), idx_expr, n_expr); } while(0); } else { do { Expr *n_expr = pop_expr(ctx); Expr *idx_expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx_n((0xDD36), idx_expr, n_expr); } while(0); }
 break;
@@ -78216,7 +78216,7 @@ default: error_illegal_ident(); }
 	case 3112:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD400); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -78225,7 +78225,7 @@ default: error_illegal_ident(); }
 	case 3113:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDD400); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDD400); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78234,7 +78234,7 @@ default: error_illegal_ident(); }
 	case 3114:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDD400); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDD400); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78243,7 +78243,7 @@ default: error_illegal_ident(); }
 	case 3115:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xD4), expr); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -78252,7 +78252,7 @@ default: error_illegal_ident(); }
 	case 3116:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xDDD4), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xFDD4), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78261,7 +78261,7 @@ default: error_illegal_ident(); }
 	case 3117:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xFDD4), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xDDD4), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78294,7 +78294,7 @@ if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE1); } while(0); } else {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE1); } while(0); }
 break;
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7D); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7D); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78303,7 +78303,7 @@ default: error_illegal_ident(); }
 	case 3121:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDC400); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDC400); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78312,7 +78312,7 @@ default: error_illegal_ident(); }
 	case 3122:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xDDC4), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xFDC4), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78334,7 +78334,7 @@ case CPU_GBZ80:
 if (expr_in_parens) warn_expr_in_parens();
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xDD21), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFD21), expr); } while(0); }
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) { if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xDD2A), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFD2A), expr); } while(0); } } else { if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xDD21), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFD21), expr); } while(0); } }
 break;
 default: error_illegal_ident(); }
@@ -78513,7 +78513,7 @@ if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE1); } while(0); } else {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE1); } while(0); }
 break;
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD7D); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD7D); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78522,7 +78522,7 @@ default: error_illegal_ident(); }
 	case 3144:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDC400); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDC400); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78531,7 +78531,7 @@ default: error_illegal_ident(); }
 	case 3145:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xFDC4), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xDDC4), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78553,7 +78553,7 @@ case CPU_GBZ80:
 if (expr_in_parens) warn_expr_in_parens();
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFD21), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xDD21), expr); } while(0); }
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) { if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFD2A), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xDD2A), expr); } while(0); } } else { if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFD21), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xDD21), expr); } while(0); } }
 break;
 default: error_illegal_ident(); }
@@ -78743,7 +78743,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x6E); } while(0);
 	case 3171:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78752,7 +78752,7 @@ default: error_illegal_ident(); }
 	case 3172:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD6E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD6E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78761,7 +78761,7 @@ default: error_illegal_ident(); }
 	case 3173:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78770,7 +78770,7 @@ default: error_illegal_ident(); }
 	case 3174:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD6E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD6E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78790,7 +78790,7 @@ do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x2E)
 	case 3177:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6F); } while(0);
 break;
@@ -78800,7 +78800,7 @@ default: error_illegal_ident(); }
 	case 3178:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x68); } while(0);
 break;
@@ -78810,7 +78810,7 @@ default: error_illegal_ident(); }
 	case 3179:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x69); } while(0);
 break;
@@ -78820,7 +78820,7 @@ default: error_illegal_ident(); }
 	case 3180:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6A); } while(0);
 break;
@@ -78830,7 +78830,7 @@ default: error_illegal_ident(); }
 	case 3181:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6B); } while(0);
 break;
@@ -78840,7 +78840,7 @@ default: error_illegal_ident(); }
 	case 3182:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6C); } while(0);
 break;
@@ -78850,7 +78850,7 @@ default: error_illegal_ident(); }
 	case 3183:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6E); } while(0);
 break;
@@ -78860,7 +78860,7 @@ default: error_illegal_ident(); }
 	case 3184:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6E00); } while(0); } else {
@@ -78872,7 +78872,7 @@ default: error_illegal_ident(); }
 	case 3185:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD6E), expr); } while(0); } else {
@@ -78884,7 +78884,7 @@ default: error_illegal_ident(); }
 	case 3186:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6E00); } while(0); } else {
@@ -78896,7 +78896,7 @@ default: error_illegal_ident(); }
 	case 3187:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD6E), expr); } while(0); } else {
@@ -78908,7 +78908,7 @@ default: error_illegal_ident(); }
 	case 3188:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6D); } while(0);
 break;
@@ -78918,7 +78918,7 @@ default: error_illegal_ident(); }
 	case 3189:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0x2E), expr); } while(0);
@@ -78943,7 +78943,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xF9); } while(0);
 	case 3192:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDF9); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDF9); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78952,7 +78952,7 @@ default: error_illegal_ident(); }
 	case 3193:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDF9); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDF9); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78965,7 +78965,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x31), expr); } while(0);
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED7B), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x31), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -78974,7 +78974,7 @@ default: error_illegal_ident(); }
 	case 3195:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED67); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -78983,7 +78983,7 @@ default: error_illegal_ident(); }
 	case 3196:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!expr_in_parens) return false;
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x32), expr); } while(0);
 break;
@@ -78997,7 +78997,7 @@ default: error_illegal_ident(); }
 	case 3197:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!expr_in_parens) return false;
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED43), expr); } while(0);
 break;
@@ -79007,7 +79007,7 @@ default: error_illegal_ident(); }
 	case 3198:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!expr_in_parens) return false;
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED53), expr); } while(0);
 break;
@@ -79017,7 +79017,7 @@ default: error_illegal_ident(); }
 	case 3199:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!expr_in_parens) return false;
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x22), expr); } while(0);
 break;
@@ -79027,7 +79027,7 @@ default: error_illegal_ident(); }
 	case 3200:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!expr_in_parens) return false;
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xDD22), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFD22), expr); } while(0); }
 break;
@@ -79037,7 +79037,7 @@ default: error_illegal_ident(); }
 	case 3201:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!expr_in_parens) return false;
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFD22), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xDD22), expr); } while(0); }
 break;
@@ -79051,7 +79051,7 @@ case CPU_GBZ80:
 if (!expr_in_parens) return false;
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x08), expr); } while(0);
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!expr_in_parens) return false;
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED73), expr); } while(0);
 break;
@@ -79061,7 +79061,7 @@ default: error_illegal_ident(); }
 	case 3203:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x3A), expr); } while(0);
 break;
@@ -79108,7 +79108,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x3A); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
 break;
@@ -79131,7 +79131,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x32); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2B); } while(0);
 break;
@@ -79145,7 +79145,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__ldd");
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDA8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -79158,7 +79158,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__lddr");
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDB8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -79265,7 +79265,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2A); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x7E); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
 break;
@@ -79288,7 +79288,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x22); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x23); } while(0);
 break;
@@ -79302,7 +79302,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__ldi");
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDA0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -79315,7 +79315,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__ldir");
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEDB0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -79351,7 +79351,7 @@ default: error_illegal_ident(); }
 	case 3236:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED6C); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -79360,7 +79360,7 @@ default: error_illegal_ident(); }
 	case 3237:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6C); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6C); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -79369,7 +79369,7 @@ default: error_illegal_ident(); }
 	case 3238:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD6C); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD6C); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -79378,7 +79378,7 @@ default: error_illegal_ident(); }
 	case 3239:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED6D), expr); } while(0);
 break;
@@ -79388,7 +79388,7 @@ default: error_illegal_ident(); }
 	case 3240:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED64); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -79397,7 +79397,7 @@ default: error_illegal_ident(); }
 	case 3241:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD64); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD64); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -79406,7 +79406,7 @@ default: error_illegal_ident(); }
 	case 3242:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD64); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD64); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -79415,7 +79415,7 @@ default: error_illegal_ident(); }
 	case 3243:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xDD6D), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFD6D), expr); } while(0); }
 break;
@@ -79425,7 +79425,7 @@ default: error_illegal_ident(); }
 	case 3244:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFD6D), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xDD6D), expr); } while(0); }
 break;
@@ -79435,7 +79435,7 @@ default: error_illegal_ident(); }
 	case 3245:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xED65), expr); } while(0);
 break;
@@ -79445,7 +79445,7 @@ default: error_illegal_ident(); }
 	case 3246:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xDD65), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFD65), expr); } while(0); }
 break;
@@ -79455,7 +79455,7 @@ default: error_illegal_ident(); }
 	case 3247:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!expr_in_parens) return false;
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xFD65), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0xDD65), expr); } while(0); }
 break;
@@ -79493,7 +79493,7 @@ default: error_illegal_ident(); }
 	case 3251:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x2A), expr); } while(0);
 break;
@@ -80158,7 +80158,7 @@ default: error_illegal_ident(); }
 	case 3353:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF7); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -80218,7 +80218,7 @@ switch (opts.cpu) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2F3C); } while(0);
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED44); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -80227,7 +80227,7 @@ default: error_illegal_ident(); }
 	case 3363:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED44); } while(0);
 break;
@@ -80240,7 +80240,7 @@ switch (opts.cpu) {
 case CPU_8080: case CPU_8085: case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x2F3C); } while(0);
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED44); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -80309,7 +80309,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
 	case 3375:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDB600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDB600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -80318,7 +80318,7 @@ default: error_illegal_ident(); }
 	case 3376:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDB6), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDB6), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -80327,7 +80327,7 @@ default: error_illegal_ident(); }
 	case 3377:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDB600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDB600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -80336,7 +80336,7 @@ default: error_illegal_ident(); }
 	case 3378:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDB6), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDB6), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -80397,7 +80397,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xB7); } while(0);
 	case 3386:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB7); } while(0);
 break;
@@ -80407,7 +80407,7 @@ default: error_illegal_ident(); }
 	case 3387:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB0); } while(0);
 break;
@@ -80417,7 +80417,7 @@ default: error_illegal_ident(); }
 	case 3388:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB1); } while(0);
 break;
@@ -80427,7 +80427,7 @@ default: error_illegal_ident(); }
 	case 3389:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB2); } while(0);
 break;
@@ -80437,7 +80437,7 @@ default: error_illegal_ident(); }
 	case 3390:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB3); } while(0);
 break;
@@ -80447,7 +80447,7 @@ default: error_illegal_ident(); }
 	case 3391:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB4); } while(0);
 break;
@@ -80457,7 +80457,7 @@ default: error_illegal_ident(); }
 	case 3392:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
 break;
@@ -80467,7 +80467,7 @@ default: error_illegal_ident(); }
 	case 3393:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDB600); } while(0); } else {
@@ -80479,7 +80479,7 @@ default: error_illegal_ident(); }
 	case 3394:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDB6), expr); } while(0); } else {
@@ -80491,7 +80491,7 @@ default: error_illegal_ident(); }
 	case 3395:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDB600); } while(0); } else {
@@ -80503,7 +80503,7 @@ default: error_illegal_ident(); }
 	case 3396:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDB6), expr); } while(0); } else {
@@ -80515,7 +80515,7 @@ default: error_illegal_ident(); }
 	case 3397:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xB5); } while(0);
 break;
@@ -80525,7 +80525,7 @@ default: error_illegal_ident(); }
 	case 3398:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xF6), expr); } while(0);
@@ -80561,7 +80561,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xB4); } while(0);
 	case 3404:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEC); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -80570,7 +80570,7 @@ default: error_illegal_ident(); }
 	case 3405:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEC); } while(0);
 break;
@@ -80585,7 +80585,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xB6); } while(0);
 	case 3407:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDB600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDB600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -80594,7 +80594,7 @@ default: error_illegal_ident(); }
 	case 3408:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDB6), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDB6), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -80603,7 +80603,7 @@ default: error_illegal_ident(); }
 	case 3409:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDB600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDB600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -80612,7 +80612,7 @@ default: error_illegal_ident(); }
 	case 3410:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDB6), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDB6), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -80621,7 +80621,7 @@ default: error_illegal_ident(); }
 	case 3411:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDEC); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDEC); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -80648,7 +80648,7 @@ default: error_illegal_ident(); }
 	case 3414:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDEC); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDEC); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -81027,7 +81027,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xF1); } while(0);
 	case 3460:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF1); } while(0);
 break;
@@ -81042,7 +81042,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xC1); } while(0);
 	case 3462:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xC1); } while(0);
 break;
@@ -81057,7 +81057,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xC1); } while(0);
 	case 3464:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xC1); } while(0);
 break;
@@ -81072,7 +81072,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
 	case 3466:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
 break;
@@ -81087,7 +81087,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
 	case 3468:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
 break;
@@ -81102,7 +81102,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
 	case 3470:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
 break;
@@ -81117,7 +81117,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
 	case 3472:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
 break;
@@ -81127,7 +81127,7 @@ default: error_illegal_ident(); }
 	case 3473:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED7E); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -81136,7 +81136,7 @@ default: error_illegal_ident(); }
 	case 3474:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE1); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE1); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -81145,7 +81145,7 @@ default: error_illegal_ident(); }
 	case 3475:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE1); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE1); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -81203,7 +81203,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xE5); } while(0);
 	case 3485:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED76); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -81212,7 +81212,7 @@ default: error_illegal_ident(); }
 	case 3486:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE5); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE5); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -81221,7 +81221,7 @@ default: error_illegal_ident(); }
 	case 3487:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDE5); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDE5); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -81278,7 +81278,7 @@ break;
 case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB13CB12); } while(0);
 break;
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF3); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -81296,7 +81296,7 @@ default: error_illegal_ident(); }
 	case 3496:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81331,7 +81331,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+(((~(1<<expr_value))&0xFF))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x47); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81357,7 +81357,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+(((~(1<<expr_value))&0xFF))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4F); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81383,7 +81383,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+(((~(1<<expr_value))&0xFF))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x57); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81409,7 +81409,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+(((~(1<<expr_value))&0xFF))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5F); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81435,7 +81435,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+(((~(1<<expr_value))&0xFF))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x67); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81461,7 +81461,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+(((~(1<<expr_value))&0xFF))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81476,7 +81476,7 @@ default: error_illegal_ident(); }
 	case 3503:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81493,7 +81493,7 @@ default: error_illegal_ident(); }
 	case 3504:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81510,7 +81510,7 @@ default: error_illegal_ident(); }
 	case 3505:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81527,7 +81527,7 @@ default: error_illegal_ident(); }
 	case 3506:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81555,7 +81555,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE600+(((~(1<<expr_value))&0xFF))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6F); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81570,7 +81570,7 @@ default: error_illegal_ident(); }
 	case 3508:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81585,7 +81585,7 @@ default: error_illegal_ident(); }
 	case 3509:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -81601,7 +81601,7 @@ default: error_illegal_ident(); }
 	case 3510:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81616,7 +81616,7 @@ default: error_illegal_ident(); }
 	case 3511:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -81632,7 +81632,7 @@ default: error_illegal_ident(); }
 	case 3512:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81647,7 +81647,7 @@ default: error_illegal_ident(); }
 	case 3513:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -81663,7 +81663,7 @@ default: error_illegal_ident(); }
 	case 3514:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81678,7 +81678,7 @@ default: error_illegal_ident(); }
 	case 3515:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -81694,7 +81694,7 @@ default: error_illegal_ident(); }
 	case 3516:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81709,7 +81709,7 @@ default: error_illegal_ident(); }
 	case 3517:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -81725,7 +81725,7 @@ default: error_illegal_ident(); }
 	case 3518:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81740,7 +81740,7 @@ default: error_illegal_ident(); }
 	case 3519:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -81756,7 +81756,7 @@ default: error_illegal_ident(); }
 	case 3520:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -81890,7 +81890,7 @@ default: error_illegal_ident(); }
 	case 3528:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -82026,7 +82026,7 @@ default: error_illegal_ident(); }
 	case 3536:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -82162,7 +82162,7 @@ default: error_illegal_ident(); }
 	case 3544:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -82298,7 +82298,7 @@ default: error_illegal_ident(); }
 	case 3552:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -82315,7 +82315,7 @@ default: error_illegal_ident(); }
 	case 3553:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -82330,7 +82330,7 @@ default: error_illegal_ident(); }
 	case 3554:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -82351,7 +82351,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xD8); } while(0);
 	case 3556:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82360,7 +82360,7 @@ default: error_illegal_ident(); }
 	case 3557:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82369,7 +82369,7 @@ default: error_illegal_ident(); }
 	case 3558:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82388,7 +82388,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xC9); } while(0);
 	case 3561:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82402,7 +82402,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xC0); } while(0);
 	case 3563:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82411,7 +82411,7 @@ default: error_illegal_ident(); }
 	case 3564:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82420,7 +82420,7 @@ default: error_illegal_ident(); }
 	case 3565:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82429,7 +82429,7 @@ default: error_illegal_ident(); }
 	case 3566:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82446,7 +82446,7 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD9); } while(0);
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED4D); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82473,7 +82473,7 @@ default: error_illegal_ident(); }
 	case 3571:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB17); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82482,7 +82482,7 @@ default: error_illegal_ident(); }
 	case 3572:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB17); } while(0);
 break;
@@ -82492,7 +82492,7 @@ default: error_illegal_ident(); }
 	case 3573:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB10); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82501,7 +82501,7 @@ default: error_illegal_ident(); }
 	case 3574:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB10); } while(0);
 break;
@@ -82515,7 +82515,7 @@ case CPU_8080: case CPU_8085:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__rl_bc");
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB11CB10); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82524,7 +82524,7 @@ default: error_illegal_ident(); }
 	case 3576:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB11); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82533,7 +82533,7 @@ default: error_illegal_ident(); }
 	case 3577:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB11); } while(0);
 break;
@@ -82543,7 +82543,7 @@ default: error_illegal_ident(); }
 	case 3578:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB12); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82552,7 +82552,7 @@ default: error_illegal_ident(); }
 	case 3579:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB12); } while(0);
 break;
@@ -82572,7 +82572,7 @@ break;
 case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB13CB12); } while(0);
 break;
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF3); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82581,7 +82581,7 @@ default: error_illegal_ident(); }
 	case 3581:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF3); } while(0);
 break;
@@ -82591,7 +82591,7 @@ default: error_illegal_ident(); }
 	case 3582:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB13); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82600,7 +82600,7 @@ default: error_illegal_ident(); }
 	case 3583:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB13); } while(0);
 break;
@@ -82610,7 +82610,7 @@ default: error_illegal_ident(); }
 	case 3584:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB14); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82619,7 +82619,7 @@ default: error_illegal_ident(); }
 	case 3585:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB14); } while(0);
 break;
@@ -82633,7 +82633,7 @@ case CPU_8080: case CPU_8085:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__rl_hl");
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB15CB14); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82642,7 +82642,7 @@ default: error_illegal_ident(); }
 	case 3587:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB16); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82714,7 +82714,7 @@ default: error_illegal_ident(); }
 	case 3595:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0016); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0016); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -82786,7 +82786,7 @@ default: error_illegal_ident(); }
 	case 3603:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB16), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB16), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -82858,7 +82858,7 @@ default: error_illegal_ident(); }
 	case 3611:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0016); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0016); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -82930,7 +82930,7 @@ default: error_illegal_ident(); }
 	case 3619:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB16), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB16), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -82939,7 +82939,7 @@ default: error_illegal_ident(); }
 	case 3620:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB15); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82948,7 +82948,7 @@ default: error_illegal_ident(); }
 	case 3621:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB15); } while(0);
 break;
@@ -82963,7 +82963,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x17); } while(0);
 	case 3623:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x17); } while(0);
 break;
@@ -82973,7 +82973,7 @@ default: error_illegal_ident(); }
 	case 3624:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB07); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -82982,7 +82982,7 @@ default: error_illegal_ident(); }
 	case 3625:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB07); } while(0);
 break;
@@ -82992,7 +82992,7 @@ default: error_illegal_ident(); }
 	case 3626:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB00); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83001,7 +83001,7 @@ default: error_illegal_ident(); }
 	case 3627:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB00); } while(0);
 break;
@@ -83011,7 +83011,7 @@ default: error_illegal_ident(); }
 	case 3628:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB01); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83020,7 +83020,7 @@ default: error_illegal_ident(); }
 	case 3629:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB01); } while(0);
 break;
@@ -83030,7 +83030,7 @@ default: error_illegal_ident(); }
 	case 3630:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB02); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83039,7 +83039,7 @@ default: error_illegal_ident(); }
 	case 3631:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB02); } while(0);
 break;
@@ -83049,7 +83049,7 @@ default: error_illegal_ident(); }
 	case 3632:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB03); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83058,7 +83058,7 @@ default: error_illegal_ident(); }
 	case 3633:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB03); } while(0);
 break;
@@ -83068,7 +83068,7 @@ default: error_illegal_ident(); }
 	case 3634:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB04); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83077,7 +83077,7 @@ default: error_illegal_ident(); }
 	case 3635:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB04); } while(0);
 break;
@@ -83087,7 +83087,7 @@ default: error_illegal_ident(); }
 	case 3636:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB06); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83159,7 +83159,7 @@ default: error_illegal_ident(); }
 	case 3644:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0006); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0006); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -83231,7 +83231,7 @@ default: error_illegal_ident(); }
 	case 3652:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB06), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB06), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -83303,7 +83303,7 @@ default: error_illegal_ident(); }
 	case 3660:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0006); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0006); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -83375,7 +83375,7 @@ default: error_illegal_ident(); }
 	case 3668:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB06), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB06), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -83384,7 +83384,7 @@ default: error_illegal_ident(); }
 	case 3669:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB05); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83393,7 +83393,7 @@ default: error_illegal_ident(); }
 	case 3670:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB05); } while(0);
 break;
@@ -83413,7 +83413,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x07); } while(0);
 	case 3673:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x07); } while(0);
 break;
@@ -83423,7 +83423,7 @@ default: error_illegal_ident(); }
 	case 3674:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__rld");
 break;
@@ -83446,7 +83446,7 @@ break;
 case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB13CB12); } while(0);
 break;
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF3); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83455,7 +83455,7 @@ default: error_illegal_ident(); }
 	case 3676:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83464,7 +83464,7 @@ default: error_illegal_ident(); }
 	case 3677:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83473,7 +83473,7 @@ default: error_illegal_ident(); }
 	case 3678:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83487,7 +83487,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xD0); } while(0);
 	case 3680:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83501,7 +83501,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xC0); } while(0);
 	case 3682:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83510,7 +83510,7 @@ default: error_illegal_ident(); }
 	case 3683:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83519,7 +83519,7 @@ default: error_illegal_ident(); }
 	case 3684:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83528,7 +83528,7 @@ default: error_illegal_ident(); }
 	case 3685:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1F); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83537,7 +83537,7 @@ default: error_illegal_ident(); }
 	case 3686:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1F); } while(0);
 break;
@@ -83547,7 +83547,7 @@ default: error_illegal_ident(); }
 	case 3687:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB18); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83556,7 +83556,7 @@ default: error_illegal_ident(); }
 	case 3688:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB18); } while(0);
 break;
@@ -83570,7 +83570,7 @@ case CPU_8080: case CPU_8085:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__rr_bc");
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB18CB19); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83579,7 +83579,7 @@ default: error_illegal_ident(); }
 	case 3690:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB19); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83588,7 +83588,7 @@ default: error_illegal_ident(); }
 	case 3691:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB19); } while(0);
 break;
@@ -83598,7 +83598,7 @@ default: error_illegal_ident(); }
 	case 3692:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1A); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83607,7 +83607,7 @@ default: error_illegal_ident(); }
 	case 3693:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1A); } while(0);
 break;
@@ -83624,7 +83624,7 @@ break;
 case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1ACB1B); } while(0);
 break;
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFB); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83633,7 +83633,7 @@ default: error_illegal_ident(); }
 	case 3695:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFB); } while(0);
 break;
@@ -83643,7 +83643,7 @@ default: error_illegal_ident(); }
 	case 3696:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1B); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83652,7 +83652,7 @@ default: error_illegal_ident(); }
 	case 3697:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1B); } while(0);
 break;
@@ -83662,7 +83662,7 @@ default: error_illegal_ident(); }
 	case 3698:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1C); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83671,7 +83671,7 @@ default: error_illegal_ident(); }
 	case 3699:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1C); } while(0);
 break;
@@ -83688,7 +83688,7 @@ break;
 case CPU_GBZ80: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1CCB1D); } while(0);
 break;
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFC); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83697,7 +83697,7 @@ default: error_illegal_ident(); }
 	case 3701:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFC); } while(0);
 break;
@@ -83707,7 +83707,7 @@ default: error_illegal_ident(); }
 	case 3702:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1E); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -83779,7 +83779,7 @@ default: error_illegal_ident(); }
 	case 3710:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB001E); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB001E); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -83851,7 +83851,7 @@ default: error_illegal_ident(); }
 	case 3718:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB1E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB1E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -83923,7 +83923,7 @@ default: error_illegal_ident(); }
 	case 3726:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB001E); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB001E); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -83995,7 +83995,7 @@ default: error_illegal_ident(); }
 	case 3734:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB1E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB1E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -84004,7 +84004,7 @@ default: error_illegal_ident(); }
 	case 3735:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDFC); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDFC); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -84013,7 +84013,7 @@ default: error_illegal_ident(); }
 	case 3736:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDFC); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDFC); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -84022,7 +84022,7 @@ default: error_illegal_ident(); }
 	case 3737:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1D); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84031,7 +84031,7 @@ default: error_illegal_ident(); }
 	case 3738:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB1D); } while(0);
 break;
@@ -84046,7 +84046,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x1F); } while(0);
 	case 3740:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x1F); } while(0);
 break;
@@ -84056,7 +84056,7 @@ default: error_illegal_ident(); }
 	case 3741:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0F); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84065,7 +84065,7 @@ default: error_illegal_ident(); }
 	case 3742:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0F); } while(0);
 break;
@@ -84075,7 +84075,7 @@ default: error_illegal_ident(); }
 	case 3743:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB08); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84084,7 +84084,7 @@ default: error_illegal_ident(); }
 	case 3744:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB08); } while(0);
 break;
@@ -84094,7 +84094,7 @@ default: error_illegal_ident(); }
 	case 3745:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB09); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84103,7 +84103,7 @@ default: error_illegal_ident(); }
 	case 3746:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB09); } while(0);
 break;
@@ -84113,7 +84113,7 @@ default: error_illegal_ident(); }
 	case 3747:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0A); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84122,7 +84122,7 @@ default: error_illegal_ident(); }
 	case 3748:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0A); } while(0);
 break;
@@ -84132,7 +84132,7 @@ default: error_illegal_ident(); }
 	case 3749:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0B); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84141,7 +84141,7 @@ default: error_illegal_ident(); }
 	case 3750:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0B); } while(0);
 break;
@@ -84151,7 +84151,7 @@ default: error_illegal_ident(); }
 	case 3751:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0C); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84160,7 +84160,7 @@ default: error_illegal_ident(); }
 	case 3752:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0C); } while(0);
 break;
@@ -84170,7 +84170,7 @@ default: error_illegal_ident(); }
 	case 3753:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0E); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84242,7 +84242,7 @@ default: error_illegal_ident(); }
 	case 3761:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB000E); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB000E); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -84314,7 +84314,7 @@ default: error_illegal_ident(); }
 	case 3769:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB0E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB0E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -84386,7 +84386,7 @@ default: error_illegal_ident(); }
 	case 3777:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB000E); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB000E); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -84458,7 +84458,7 @@ default: error_illegal_ident(); }
 	case 3785:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB0E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB0E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -84467,7 +84467,7 @@ default: error_illegal_ident(); }
 	case 3786:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0D); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84476,7 +84476,7 @@ default: error_illegal_ident(); }
 	case 3787:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB0D); } while(0);
 break;
@@ -84496,7 +84496,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x0F); } while(0);
 	case 3790:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x0F); } while(0);
 break;
@@ -84506,7 +84506,7 @@ default: error_illegal_ident(); }
 	case 3791:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K:
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__rrd");
 break;
@@ -84526,7 +84526,7 @@ break;
 case CPU_8085:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x10); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2CCB1D); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84563,7 +84563,7 @@ default: error_illegal_ident(); }
 	case 3795:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84582,7 +84582,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xD8); } while(0);
 	case 3798:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84591,7 +84591,7 @@ default: error_illegal_ident(); }
 	case 3799:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84600,7 +84600,7 @@ default: error_illegal_ident(); }
 	case 3800:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84614,7 +84614,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xD0); } while(0);
 	case 3802:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84628,7 +84628,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xC0); } while(0);
 	case 3804:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84637,7 +84637,7 @@ default: error_illegal_ident(); }
 	case 3805:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84646,7 +84646,7 @@ default: error_illegal_ident(); }
 	case 3806:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE0); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84655,7 +84655,7 @@ default: error_illegal_ident(); }
 	case 3807:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE8); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -84744,7 +84744,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
 	case 3824:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -84753,7 +84753,7 @@ default: error_illegal_ident(); }
 	case 3825:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD9E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD9E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -84762,7 +84762,7 @@ default: error_illegal_ident(); }
 	case 3826:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -84771,7 +84771,7 @@ default: error_illegal_ident(); }
 	case 3827:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD9E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD9E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -84832,7 +84832,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x9F); } while(0);
 	case 3835:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9F); } while(0);
 break;
@@ -84842,7 +84842,7 @@ default: error_illegal_ident(); }
 	case 3836:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x98); } while(0);
 break;
@@ -84852,7 +84852,7 @@ default: error_illegal_ident(); }
 	case 3837:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x99); } while(0);
 break;
@@ -84862,7 +84862,7 @@ default: error_illegal_ident(); }
 	case 3838:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9A); } while(0);
 break;
@@ -84872,7 +84872,7 @@ default: error_illegal_ident(); }
 	case 3839:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9B); } while(0);
 break;
@@ -84882,7 +84882,7 @@ default: error_illegal_ident(); }
 	case 3840:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9C); } while(0);
 break;
@@ -84892,7 +84892,7 @@ default: error_illegal_ident(); }
 	case 3841:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
 break;
@@ -84902,7 +84902,7 @@ default: error_illegal_ident(); }
 	case 3842:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9E00); } while(0); } else {
@@ -84914,7 +84914,7 @@ default: error_illegal_ident(); }
 	case 3843:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD9E), expr); } while(0); } else {
@@ -84926,7 +84926,7 @@ default: error_illegal_ident(); }
 	case 3844:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9E00); } while(0); } else {
@@ -84938,7 +84938,7 @@ default: error_illegal_ident(); }
 	case 3845:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD9E), expr); } while(0); } else {
@@ -84950,7 +84950,7 @@ default: error_illegal_ident(); }
 	case 3846:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x9D); } while(0);
 break;
@@ -84960,7 +84960,7 @@ default: error_illegal_ident(); }
 	case 3847:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xDE), expr); } while(0);
@@ -85000,7 +85000,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__sbc_hl_bc");
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED42); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -85013,7 +85013,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__sbc_hl_de");
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED52); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -85026,7 +85026,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__sbc_hl_hl");
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED62); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -85039,7 +85039,7 @@ case CPU_8080: case CPU_8085: case CPU_GBZ80:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__sbc_hl_sp");
 break;
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED72); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -85048,7 +85048,7 @@ default: error_illegal_ident(); }
 	case 3857:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED42); } while(0);
 break;
@@ -85058,7 +85058,7 @@ default: error_illegal_ident(); }
 	case 3858:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED52); } while(0);
 break;
@@ -85068,7 +85068,7 @@ default: error_illegal_ident(); }
 	case 3859:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED62); } while(0);
 break;
@@ -85078,7 +85078,7 @@ default: error_illegal_ident(); }
 	case 3860:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xED72); } while(0);
 break;
@@ -85093,7 +85093,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x9E); } while(0);
 	case 3862:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -85102,7 +85102,7 @@ default: error_illegal_ident(); }
 	case 3863:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD9E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD9E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -85111,7 +85111,7 @@ default: error_illegal_ident(); }
 	case 3864:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9E00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9E00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -85120,7 +85120,7 @@ default: error_illegal_ident(); }
 	case 3865:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD9E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD9E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -85187,7 +85187,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x37); } while(0);
 	case 3874:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x37); } while(0);
 break;
@@ -85197,7 +85197,7 @@ default: error_illegal_ident(); }
 	case 3875:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85232,7 +85232,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF600+((1<<expr_value))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x47); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85258,7 +85258,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF600+((1<<expr_value))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x4F); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85284,7 +85284,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF600+((1<<expr_value))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x57); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85310,7 +85310,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF600+((1<<expr_value))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x5F); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85336,7 +85336,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF600+((1<<expr_value))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x67); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85362,7 +85362,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF600+((1<<expr_value))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x77); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85377,7 +85377,7 @@ default: error_illegal_ident(); }
 	case 3882:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85394,7 +85394,7 @@ default: error_illegal_ident(); }
 	case 3883:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85411,7 +85411,7 @@ default: error_illegal_ident(); }
 	case 3884:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85428,7 +85428,7 @@ default: error_illegal_ident(); }
 	case 3885:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85456,7 +85456,7 @@ default: error_int_range(expr_value);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xF600+((1<<expr_value))); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x6F); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85471,7 +85471,7 @@ default: error_illegal_ident(); }
 	case 3887:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85486,7 +85486,7 @@ default: error_illegal_ident(); }
 	case 3888:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -85502,7 +85502,7 @@ default: error_illegal_ident(); }
 	case 3889:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85517,7 +85517,7 @@ default: error_illegal_ident(); }
 	case 3890:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -85533,7 +85533,7 @@ default: error_illegal_ident(); }
 	case 3891:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85548,7 +85548,7 @@ default: error_illegal_ident(); }
 	case 3892:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -85564,7 +85564,7 @@ default: error_illegal_ident(); }
 	case 3893:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85579,7 +85579,7 @@ default: error_illegal_ident(); }
 	case 3894:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -85595,7 +85595,7 @@ default: error_illegal_ident(); }
 	case 3895:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85610,7 +85610,7 @@ default: error_illegal_ident(); }
 	case 3896:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -85626,7 +85626,7 @@ default: error_illegal_ident(); }
 	case 3897:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85641,7 +85641,7 @@ default: error_illegal_ident(); }
 	case 3898:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -85657,7 +85657,7 @@ default: error_illegal_ident(); }
 	case 3899:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85791,7 +85791,7 @@ default: error_illegal_ident(); }
 	case 3907:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -85927,7 +85927,7 @@ default: error_illegal_ident(); }
 	case 3915:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -86063,7 +86063,7 @@ default: error_illegal_ident(); }
 	case 3923:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -86199,7 +86199,7 @@ default: error_illegal_ident(); }
 	case 3931:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -86216,7 +86216,7 @@ default: error_illegal_ident(); }
 	case 3932:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 if (expr_error) { error_expected_const_expr(); } else {
 switch (expr_value) {
@@ -86231,7 +86231,7 @@ default: error_illegal_ident(); }
 	case 3933:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (expr_error) { error_expected_const_expr(); } else {
@@ -86265,7 +86265,7 @@ default: error_illegal_ident(); }
 	case 3936:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x22), expr); } while(0);
 break;
@@ -86302,7 +86302,7 @@ default: error_illegal_ident(); }
 	case 3940:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB27); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -86311,7 +86311,7 @@ default: error_illegal_ident(); }
 	case 3941:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB27); } while(0);
 break;
@@ -86321,7 +86321,7 @@ default: error_illegal_ident(); }
 	case 3942:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB20); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -86330,7 +86330,7 @@ default: error_illegal_ident(); }
 	case 3943:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB20); } while(0);
 break;
@@ -86340,7 +86340,7 @@ default: error_illegal_ident(); }
 	case 3944:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB21); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -86349,7 +86349,7 @@ default: error_illegal_ident(); }
 	case 3945:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB21); } while(0);
 break;
@@ -86359,7 +86359,7 @@ default: error_illegal_ident(); }
 	case 3946:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB22); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -86368,7 +86368,7 @@ default: error_illegal_ident(); }
 	case 3947:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB22); } while(0);
 break;
@@ -86378,7 +86378,7 @@ default: error_illegal_ident(); }
 	case 3948:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB23); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -86387,7 +86387,7 @@ default: error_illegal_ident(); }
 	case 3949:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB23); } while(0);
 break;
@@ -86397,7 +86397,7 @@ default: error_illegal_ident(); }
 	case 3950:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB24); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -86406,7 +86406,7 @@ default: error_illegal_ident(); }
 	case 3951:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB24); } while(0);
 break;
@@ -86416,7 +86416,7 @@ default: error_illegal_ident(); }
 	case 3952:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB26); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -86488,7 +86488,7 @@ default: error_illegal_ident(); }
 	case 3960:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0026); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0026); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -86560,7 +86560,7 @@ default: error_illegal_ident(); }
 	case 3968:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB26), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB26), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -86632,7 +86632,7 @@ default: error_illegal_ident(); }
 	case 3976:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB0026); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB0026); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -86704,7 +86704,7 @@ default: error_illegal_ident(); }
 	case 3984:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB26), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB26), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -86713,7 +86713,7 @@ default: error_illegal_ident(); }
 	case 3985:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB25); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -86722,7 +86722,7 @@ default: error_illegal_ident(); }
 	case 3986:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB25); } while(0);
 break;
@@ -87826,7 +87826,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xF9); } while(0);
 	case 4109:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2F); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -87835,7 +87835,7 @@ default: error_illegal_ident(); }
 	case 4110:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2F); } while(0);
 break;
@@ -87845,7 +87845,7 @@ default: error_illegal_ident(); }
 	case 4111:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB28); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -87854,7 +87854,7 @@ default: error_illegal_ident(); }
 	case 4112:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB28); } while(0);
 break;
@@ -87868,7 +87868,7 @@ case CPU_8080: case CPU_8085:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__sra_bc");
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB28CB19); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -87877,7 +87877,7 @@ default: error_illegal_ident(); }
 	case 4114:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB29); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -87886,7 +87886,7 @@ default: error_illegal_ident(); }
 	case 4115:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB29); } while(0);
 break;
@@ -87896,7 +87896,7 @@ default: error_illegal_ident(); }
 	case 4116:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2A); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -87905,7 +87905,7 @@ default: error_illegal_ident(); }
 	case 4117:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2A); } while(0);
 break;
@@ -87919,7 +87919,7 @@ case CPU_8080: case CPU_8085:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__sra_de");
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2ACB1B); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -87928,7 +87928,7 @@ default: error_illegal_ident(); }
 	case 4119:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2B); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -87937,7 +87937,7 @@ default: error_illegal_ident(); }
 	case 4120:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2B); } while(0);
 break;
@@ -87947,7 +87947,7 @@ default: error_illegal_ident(); }
 	case 4121:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2C); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -87956,7 +87956,7 @@ default: error_illegal_ident(); }
 	case 4122:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2C); } while(0);
 break;
@@ -87973,7 +87973,7 @@ break;
 case CPU_8085:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x10); } while(0);
 break;
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2CCB1D); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -87982,7 +87982,7 @@ default: error_illegal_ident(); }
 	case 4124:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2E); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -88054,7 +88054,7 @@ default: error_illegal_ident(); }
 	case 4132:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB002E); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB002E); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -88126,7 +88126,7 @@ default: error_illegal_ident(); }
 	case 4140:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB2E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB2E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -88198,7 +88198,7 @@ default: error_illegal_ident(); }
 	case 4148:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB002E); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB002E); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -88270,7 +88270,7 @@ default: error_illegal_ident(); }
 	case 4156:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB2E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB2E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -88279,7 +88279,7 @@ default: error_illegal_ident(); }
 	case 4157:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2D); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -88288,7 +88288,7 @@ default: error_illegal_ident(); }
 	case 4158:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB2D); } while(0);
 break;
@@ -88298,7 +88298,7 @@ default: error_illegal_ident(); }
 	case 4159:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3F); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -88307,7 +88307,7 @@ default: error_illegal_ident(); }
 	case 4160:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3F); } while(0);
 break;
@@ -88317,7 +88317,7 @@ default: error_illegal_ident(); }
 	case 4161:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB38); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -88326,7 +88326,7 @@ default: error_illegal_ident(); }
 	case 4162:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB38); } while(0);
 break;
@@ -88336,7 +88336,7 @@ default: error_illegal_ident(); }
 	case 4163:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB39); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -88345,7 +88345,7 @@ default: error_illegal_ident(); }
 	case 4164:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB39); } while(0);
 break;
@@ -88355,7 +88355,7 @@ default: error_illegal_ident(); }
 	case 4165:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3A); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -88364,7 +88364,7 @@ default: error_illegal_ident(); }
 	case 4166:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3A); } while(0);
 break;
@@ -88374,7 +88374,7 @@ default: error_illegal_ident(); }
 	case 4167:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3B); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -88383,7 +88383,7 @@ default: error_illegal_ident(); }
 	case 4168:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3B); } while(0);
 break;
@@ -88393,7 +88393,7 @@ default: error_illegal_ident(); }
 	case 4169:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3C); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -88402,7 +88402,7 @@ default: error_illegal_ident(); }
 	case 4170:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3C); } while(0);
 break;
@@ -88412,7 +88412,7 @@ default: error_illegal_ident(); }
 	case 4171:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3E); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -88484,7 +88484,7 @@ default: error_illegal_ident(); }
 	case 4179:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB003E); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB003E); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -88556,7 +88556,7 @@ default: error_illegal_ident(); }
 	case 4187:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB3E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB3E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -88628,7 +88628,7 @@ default: error_illegal_ident(); }
 	case 4195:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDCB003E); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDCB003E); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -88700,7 +88700,7 @@ default: error_illegal_ident(); }
 	case 4203:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDCB3E), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDCB3E), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -88709,7 +88709,7 @@ default: error_illegal_ident(); }
 	case 4204:
 	{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3D); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -88718,7 +88718,7 @@ default: error_illegal_ident(); }
 	case 4205:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB3D); } while(0);
 break;
@@ -88728,7 +88728,7 @@ default: error_illegal_ident(); }
 	case 4206:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (expr_in_parens) warn_expr_in_parens();
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_nn((0x32), expr); } while(0);
 break;
@@ -88811,7 +88811,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
 	case 4220:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -88820,7 +88820,7 @@ default: error_illegal_ident(); }
 	case 4221:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD96), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD96), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -88829,7 +88829,7 @@ default: error_illegal_ident(); }
 	case 4222:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -88838,7 +88838,7 @@ default: error_illegal_ident(); }
 	case 4223:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD96), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD96), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -88899,7 +88899,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x97); } while(0);
 	case 4231:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x97); } while(0);
 break;
@@ -88909,7 +88909,7 @@ default: error_illegal_ident(); }
 	case 4232:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x90); } while(0);
 break;
@@ -88919,7 +88919,7 @@ default: error_illegal_ident(); }
 	case 4233:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x91); } while(0);
 break;
@@ -88929,7 +88929,7 @@ default: error_illegal_ident(); }
 	case 4234:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x92); } while(0);
 break;
@@ -88939,7 +88939,7 @@ default: error_illegal_ident(); }
 	case 4235:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x93); } while(0);
 break;
@@ -88949,7 +88949,7 @@ default: error_illegal_ident(); }
 	case 4236:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x94); } while(0);
 break;
@@ -88959,7 +88959,7 @@ default: error_illegal_ident(); }
 	case 4237:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
 break;
@@ -88969,7 +88969,7 @@ default: error_illegal_ident(); }
 	case 4238:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9600); } while(0); } else {
@@ -88981,7 +88981,7 @@ default: error_illegal_ident(); }
 	case 4239:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD96), expr); } while(0); } else {
@@ -88993,7 +88993,7 @@ default: error_illegal_ident(); }
 	case 4240:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9600); } while(0); } else {
@@ -89005,7 +89005,7 @@ default: error_illegal_ident(); }
 	case 4241:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD96), expr); } while(0); } else {
@@ -89017,7 +89017,7 @@ default: error_illegal_ident(); }
 	case 4242:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0x95); } while(0);
 break;
@@ -89027,7 +89027,7 @@ default: error_illegal_ident(); }
 	case 4243:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xD6), expr); } while(0);
@@ -89063,7 +89063,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x94); } while(0);
 	case 4249:
 	{
 switch (opts.cpu) {
-case CPU_8080: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 asm_cond_LABEL(stmt_label);
 add_call_emul_func("__z80asm__sub_hl_bc");
 break;
@@ -89099,7 +89099,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0x96); } while(0);
 	case 4254:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -89108,7 +89108,7 @@ default: error_illegal_ident(); }
 	case 4255:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD96), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD96), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -89117,7 +89117,7 @@ default: error_illegal_ident(); }
 	case 4256:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFD9600); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDD9600); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -89126,7 +89126,7 @@ default: error_illegal_ident(); }
 	case 4257:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFD96), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDD96), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -89814,7 +89814,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xD5); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xE1); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xD1); } while(0);
 break;
-case CPU_8080: case CPU_8085: case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_8080: case CPU_8085: case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xEB); } while(0);
 break;
 default: error_illegal_ident(); }
@@ -89858,7 +89858,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
 	case 4340:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDAE00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDAE00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -89867,7 +89867,7 @@ default: error_illegal_ident(); }
 	case 4341:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDAE), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDAE), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -89876,7 +89876,7 @@ default: error_illegal_ident(); }
 	case 4342:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDAE00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDAE00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -89885,7 +89885,7 @@ default: error_illegal_ident(); }
 	case 4343:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDAE), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDAE), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -89946,7 +89946,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xAF); } while(0);
 	case 4351:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAF); } while(0);
 break;
@@ -89956,7 +89956,7 @@ default: error_illegal_ident(); }
 	case 4352:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA8); } while(0);
 break;
@@ -89966,7 +89966,7 @@ default: error_illegal_ident(); }
 	case 4353:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xA9); } while(0);
 break;
@@ -89976,7 +89976,7 @@ default: error_illegal_ident(); }
 	case 4354:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAA); } while(0);
 break;
@@ -89986,7 +89986,7 @@ default: error_illegal_ident(); }
 	case 4355:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAB); } while(0);
 break;
@@ -89996,7 +89996,7 @@ default: error_illegal_ident(); }
 	case 4356:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAC); } while(0);
 break;
@@ -90006,7 +90006,7 @@ default: error_illegal_ident(); }
 	case 4357:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
 break;
@@ -90016,7 +90016,7 @@ default: error_illegal_ident(); }
 	case 4358:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xDDAE00); } while(0); } else {
@@ -90028,7 +90028,7 @@ default: error_illegal_ident(); }
 	case 4359:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDAE), expr); } while(0); } else {
@@ -90040,7 +90040,7 @@ default: error_illegal_ident(); }
 	case 4360:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { asm_cond_LABEL(stmt_label); add_opcode(0xFDAE00); } while(0); } else {
@@ -90052,7 +90052,7 @@ default: error_illegal_ident(); }
 	case 4361:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 if (!opts.swap_ix_iy) {
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDAE), expr); } while(0); } else {
@@ -90064,7 +90064,7 @@ default: error_illegal_ident(); }
 	case 4362:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { asm_cond_LABEL(stmt_label); add_opcode(0xAD); } while(0);
 break;
@@ -90074,7 +90074,7 @@ default: error_illegal_ident(); }
 	case 4363:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K:
+case CPU_R2KA: case CPU_R3K:
 if (expr_in_parens) warn_expr_in_parens();
 do { asm_cond_LABEL(stmt_label); add_opcode(0x76); } while(0);
 do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_n((0xEE), expr); } while(0);
@@ -90115,7 +90115,7 @@ do { asm_cond_LABEL(stmt_label); add_opcode(0xAE); } while(0);
 	case 4370:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDAE00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDAE00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -90124,7 +90124,7 @@ default: error_illegal_ident(); }
 	case 4371:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDAE), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDAE), expr); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -90133,7 +90133,7 @@ default: error_illegal_ident(); }
 	case 4372:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { asm_cond_LABEL(stmt_label); add_opcode(0xFDAE00); } while(0); } else { do { asm_cond_LABEL(stmt_label); add_opcode(0xDDAE00); } while(0); }
 break;
 default: error_illegal_ident(); }
@@ -90142,7 +90142,7 @@ default: error_illegal_ident(); }
 	case 4373:
 	{
 switch (opts.cpu) {
-case CPU_R2K: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
+case CPU_R2KA: case CPU_R3K: case CPU_Z180: case CPU_Z80: case CPU_Z80N:
 if (!opts.swap_ix_iy) { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xFDAE), expr); } while(0); } else { do { Expr *expr = pop_expr(ctx); asm_cond_LABEL(stmt_label); add_opcode_idx((0xDDAE), expr); } while(0); }
 break;
 default: error_illegal_ident(); }

@@ -76,17 +76,17 @@ struct fcb {
 };
 
 struct sfcb {
-    uint8_t    drive;          /* drive code */
+    uint8_t    drive;       /* drive code */
     char    name[8];        /* file name */
     char    ext[3];         /* file type */
-    uint8_t    pwdmode;        /* Password mode (0=no pwd): bit 7-Read, bit 6-Write, bit 4-Delete */
-    char    filler[10];     /* not used */
-	int 	c_date;			/* Create or Access date/time (depends on settings) */
-	uint8_t	c_hours;
-	uint8_t	c_minutes;
-	int 	date;			/* Update date/time (days since January 1, 1978) */
-	uint8_t	hours;
-	uint8_t	minutes;
+    uint8_t    pwdmode;     /* Password mode (0=no pwd): bit 7-Read, bit 6-Write, bit 4-Delete */
+    char    filler[11];     /* not used */
+    int 	c_date;			/* Create or Access date/time (depends on settings) */
+    uint8_t	c_hours;        /* Hours and minutes are encoded as BCD */
+    uint8_t	c_minutes;
+    int 	date;			/* Update date/time (days since January 1, 1978) */
+    uint8_t	hours;
+    uint8_t	minutes;
 };
 
 

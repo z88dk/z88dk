@@ -39,7 +39,7 @@ my %Tests;
 #	%t	temp jump label
 #	@label	unsigned word with given global label address
 #------------------------------------------------------------------------------
-my @CPUS = qw( z80 z80n z180 r2k r3k 8080 8085 gbz80 );
+my @CPUS = qw( z80 z80n z180 r2ka r3k 8080 8085 gbz80 );
 
 my %INV_FLAG 	= qw( 	_nz	_z 
 						_z 	_nz

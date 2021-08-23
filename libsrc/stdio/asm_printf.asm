@@ -105,7 +105,7 @@ ELSE
 	; -10 = length of buffer
 	;
 	; -80->-11 = buffer (69 bytes)
-  IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__
 	add	sp,-80
 	ld	hl,(ix+2)
 	ex	de,hl
@@ -175,7 +175,7 @@ ELSE
 ENDIF
 	and	a
 	jr	nz,cont
-IF __CPU_R2K__ | __CPU_R3K__ | __CPU_GBZ80__
+IF __CPU_R2KA__ | __CPU_R3K__ | __CPU_GBZ80__
 	add	sp,78
 ELSE
 	ld	hl,78		;adjust the stack

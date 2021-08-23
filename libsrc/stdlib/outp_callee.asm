@@ -19,7 +19,7 @@ PUBLIC asm_outp
    ; bc = port
    ; e = byte
 
-IF __CPU_R2K__|__CPU_R3K__
+IF __CPU_R2KA__|__CPU_R3K__
 
    ld h,b
    ld l,c

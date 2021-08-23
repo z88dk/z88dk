@@ -24,7 +24,7 @@ asm_cpu_get_int_state:
    ;
    ; uses  : af, hl
 
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 
    push ip
    dec sp

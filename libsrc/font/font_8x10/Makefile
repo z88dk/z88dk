@@ -19,7 +19,7 @@ obj/newlib-z80:
 	$(Q)$(ASSEMBLER) -d -O=obj/z80/x -I$(NEWLIB_DIRECTORY) -I../.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/newlib-r2k:
-	$(Q)$(ASSEMBLER) -d -O=obj/r2k/x -I$(NEWLIB_DIRECTORY) -I../.. -mr2k -D__CLASSIC $(NEWLIBGLOBS)
+	$(Q)$(ASSEMBLER) -d -O=obj/r2k/x -I$(NEWLIB_DIRECTORY) -I../.. -mr2ka -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/newlib-z80n:
 	$(Q)$(ASSEMBLER) -d -O=obj/z80n/x -I$(NEWLIB_DIRECTORY) -I../.. -mz80n -D__CLASSIC $(NEWLIBGLOBS)

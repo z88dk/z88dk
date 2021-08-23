@@ -34,7 +34,7 @@ EXTERN _u_free
    
 .notzero
    push  ix				;save callers ix
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
    push  de
    pop   ix
 ELSE

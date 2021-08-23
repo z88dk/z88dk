@@ -38,7 +38,7 @@ obj/ez80:
 
 obj/r2k:
 	mkdir -p obj/r2k/r2k
-	$(ASSEMBLER) -Oobj/r2k/r2k -I.. -mr2k  @crt0_rcm.lst
+	$(ASSEMBLER) -Oobj/r2k/r2k -I.. -mr2ka  @crt0_rcm.lst
 
 # this one uses iy in place of ix
 obj/ixiy:

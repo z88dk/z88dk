@@ -11,7 +11,7 @@ use Test::More;
 use Path::Tiny;
 require '../../t/testlib.pl';
 
-my @CPUS = (qw( 8080 z80 r2k ));
+my @CPUS = (qw( 8080 z80 r2ka ));
 
 my $test_nr;
 
