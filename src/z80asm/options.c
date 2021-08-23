@@ -806,8 +806,8 @@ static void option_cpu_z180(void)
 
 static void option_cpu_r2ka(void)
 {
-	opts.cpu = CPU_R2K;
-	opts.cpu_name = CPU_R2K_NAME;
+	opts.cpu = CPU_R2KA;
+	opts.cpu_name = CPU_R2KA_NAME;
 }
 
 static void option_cpu_r3k(void)
@@ -843,8 +843,8 @@ static void define_assembly_defines()
 	    define_static_def_sym("__CPU_Z180__", 1);
 	    define_static_def_sym("__CPU_ZILOG__", 1);
 		break;
-	case CPU_R2K:
-	    define_static_def_sym("__CPU_R2K__", 1);
+	case CPU_R2KA:
+	    define_static_def_sym("__CPU_R2KA__", 1);
 	    define_static_def_sym("__CPU_RABBIT__", 1);
 		break;
 	case CPU_R3K:

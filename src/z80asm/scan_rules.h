@@ -13772,7 +13772,7 @@ static tokid_t _scan_get( void )
 									case 46:  {
 										p = ((te))-1;
 										{
-											if ((opts.cpu & CPU_R2K) || (opts.cpu & CPU_R3K)) {
+											if ((opts.cpu & CPU_R2KA) || (opts.cpu & CPU_R3K)) {
 												sym.tok = TK_LZ;
 											}
 											else {
@@ -13785,7 +13785,7 @@ static tokid_t _scan_get( void )
 									case 47:  {
 										p = ((te))-1;
 										{
-											if ((opts.cpu & CPU_R2K) || (opts.cpu & CPU_R3K)) {
+											if ((opts.cpu & CPU_R2KA) || (opts.cpu & CPU_R3K)) {
 												sym.tok = TK_LO;
 											}
 											else {

@@ -866,7 +866,7 @@ write_file("test.asm", <<END);
 	if __CPU_Z180__
 	defb 3
 	else
-	if __CPU_R2K__
+	if __CPU_R2KA__
 	defb 4
 	else
 	if __CPU_R3K__

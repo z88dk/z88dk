@@ -17,7 +17,7 @@
 int fflush(FILE *fp)
 {
 #asm
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(sp + 2)
 ELSE
 	pop	bc
@@ -37,7 +37,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !_CPU_GBZ80__
 	push	ix	;save callers ix
 	dec	hl
 	dec	hl	;hl = fp
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,ix
 	ld	hl,(ix+fp_extra)
 ELSE
@@ -49,7 +49,7 @@ ENDIF
 	ld	a,__STDIO_MSG_FLUSH
 	call	l_jphl
 	pop	ix	;restore callers
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 	bool	hl
 	rr	hl
 ELSE

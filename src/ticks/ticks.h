@@ -45,7 +45,7 @@ extern long long st;
 #define is808x() ( (c_cpu & (CPU_8080|CPU_8085)) )
 #define isgbz80() ( (c_cpu & CPU_GBZ80) == CPU_GBZ80 )
 #define isr800() ( (c_cpu & CPU_R800) == CPU_R800 )
-#define israbbit() ( c_cpu & (CPU_R2K|CPU_R3K))
+#define israbbit() ( c_cpu & (CPU_R2KA|CPU_R3K))
 #define israbbit3k() ( c_cpu & (CPU_R3K))
 #define isz180() ( c_cpu & (CPU_Z180))
 #define isez80() ( c_cpu & (CPU_EZ80))
@@ -78,7 +78,7 @@ extern int f_(void);
 
 #define CPU_Z80      1
 #define CPU_Z180     2
-#define CPU_R2K      4
+#define CPU_R2KA     4
 #define CPU_R3K      8
 #define CPU_Z80N     16
 #define CPU_R800     32

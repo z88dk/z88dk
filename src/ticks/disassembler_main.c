@@ -85,7 +85,7 @@ int main(int argc, char **argv)
                 } else if ( strcmp(&argv[0][1],"mz180") == 0 ) {
                     c_cpu = CPU_Z180;
                 } else if ( strcmp(&argv[0][1],"mr2ka") == 0 ) {
-                    c_cpu = CPU_R2K;
+                    c_cpu = CPU_R2KA;
                 } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
                     c_cpu = CPU_R3K;
                 } else if ( strcmp(&argv[0][1],"mr800") == 0 ) {

@@ -74,7 +74,7 @@ ELSE
     add     hl,sp
     ld      (exitsp),hl
 ENDIF
-IF !__CPU_R2K__
+IF !__CPU_R2KA__
     ei
 ENDIF
 ; Optional definition for auto MALLOC init

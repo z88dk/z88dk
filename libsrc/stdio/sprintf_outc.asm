@@ -49,7 +49,7 @@ sprintf_outc:
 	pop	de	;charcter
 	push	bc
 	push	ix	;save ix
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 	ld	ix,hl
 ELSE
 	push	hl	;get fp into ix
@@ -64,7 +64,7 @@ ENDIF
 	dec	bc		;reduce space
 	ld	(ix+2),c
 	ld	(ix+3),b
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(ix+0)
 ELSE
 	ld	l,(ix+0)
@@ -77,7 +77,7 @@ ENDIF
 	inc	hl
 just_terminate:
 	ld	(hl),0
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 	ld	(ix+0),hl
 ELSE
 	ld	(ix+0),l
