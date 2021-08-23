@@ -52,7 +52,7 @@ Code Generation Options:
   -m8080                 Assemble for the 8080 (with Zilog or Intel mnemonics)
   -m8085                 Assemble for the 8085 (with Zilog or Intel mnemonics)
   -mz180                 Assemble for the Z180
-  -mr2k                  Assemble for the Rabbit 2000
+  -mr2ka                 Assemble for the Rabbit 2000
   -mr3k                  Assemble for the Rabbit 3000
   -mti83plus             Assemble for the TI83Plus
   -mti83                 Assemble for the TI83

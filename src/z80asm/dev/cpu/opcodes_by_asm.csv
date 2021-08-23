@@ -1,4 +1,4 @@
-; Assembly             |8080         |8085       |gbz80        |r2k        |r3k     |z180       |z80        |z80n       
+; Assembly             |8080         |8085       |gbz80        |r2ka       |r3k     |z180       |z80        |z80n       
 aci %n                 |CE %n        |~          |~            |~          |~       |~          |~          |~          
                        |             |           |             |           |        |           |           |           
 adc %n                 |CE %n        |~          |~            |~          |~       |~          |~          |~          

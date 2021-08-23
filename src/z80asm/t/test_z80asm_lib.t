@@ -127,8 +127,8 @@ run("./z88dk-z80asm -b -v -mz80n    -IXIY test.asm", 0, exp_output("z80n",   	1,
 run("./z88dk-z80asm -b -v -mz180          test.asm", 0, exp_output("z180",	0, "z88dk-z80asm-z180-.lib"), "");
 run("./z88dk-z80asm -b -v -mz180    -IXIY test.asm", 0, exp_output("z180",	1, "z88dk-z80asm-z180-ixiy.lib"), "");
 
-run("./z88dk-z80asm -b -v -mr2k           test.asm", 0, exp_output("r2k",		0, "z88dk-z80asm-r2k-.lib"), "");
-run("./z88dk-z80asm -b -v -mr2k     -IXIY test.asm", 0, exp_output("r2k",		1, "z88dk-z80asm-r2k-ixiy.lib"), "");
+run("./z88dk-z80asm -b -v -mr2ka          test.asm", 0, exp_output("r2ka",		0, "z88dk-z80asm-r2ka-.lib"), "");
+run("./z88dk-z80asm -b -v -mr2ka    -IXIY test.asm", 0, exp_output("r2ka",		1, "z88dk-z80asm-r2ka-ixiy.lib"), "");
 
 run("./z88dk-z80asm -b -v -mr3k           test.asm", 0, exp_output("r3k",		0, "z88dk-z80asm-r3k-.lib"), "");
 run("./z88dk-z80asm -b -v -mr3k     -IXIY test.asm", 0, exp_output("r3k",		1, "z88dk-z80asm-r3k-ixiy.lib"), "");

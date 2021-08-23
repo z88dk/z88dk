@@ -1456,7 +1456,7 @@ rcmx000_clib.lib:
 	@echo '--- Building RCM2/3000 Library ---'
 	@echo ''
 	$(call buildgeneric,rcmx000)
-	TARGET=rcmx000 TYPE=r2k $(LIBLINKER) -mr2k -DSTANDARDESCAPECHARS -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
+	TARGET=rcmx000 TYPE=r2k $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -DFORrcmx000 -x$(OUTPUT_DIRECTORY)/rcmx000_clib @$(LISTFILE_DIRECTORY)/rcmx000.lst
 
 # embedded target - contributed by Daniel Wallner
 embedded_clib.lib:
@@ -1886,7 +1886,7 @@ r2k_crt0.lib:
 	@echo '--- Building r2k crt Library ---'
 	@echo ''
 	$(call buildcrt)
-	TYPE=r2k $(LIBLINKER) -mr2k -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/r2k_crt0 @$(LISTFILE_DIRECTORY)/rabbit.lst
+	TYPE=r2k $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/r2k_crt0 @$(LISTFILE_DIRECTORY)/rabbit.lst
 
 
 clean: classic-clean new-clean

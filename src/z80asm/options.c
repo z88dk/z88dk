@@ -62,7 +62,7 @@ static void option_cpu_z180(void);
 static void option_cpu_gbz80(void);
 static void option_cpu_8080(void);
 static void option_cpu_8085(void);
-static void option_cpu_r2k(void);
+static void option_cpu_r2ka(void);
 static void option_cpu_r3k(void);
 static void option_cpu_ti83(void);
 static void option_cpu_ti83plus(void);
@@ -237,8 +237,8 @@ static void process_opt( int *parg, int argc, char *argv[] )
 		option_cpu_z180();
 		return;
 	}
-	else if(strcmp(argv[II], "-mr2k") == 0 || strcmp(argv[II], "-m=r2k") == 0) {
-		option_cpu_r2k();
+	else if(strcmp(argv[II], "-mr2ka") == 0 || strcmp(argv[II], "-m=r2ka") == 0) {
+		option_cpu_r2ka();
 		return;
 	}
 	else if(strcmp(argv[II], "-mr3k") == 0 || strcmp(argv[II], "-m=r3k") == 0) {
@@ -804,7 +804,7 @@ static void option_cpu_z180(void)
 	opts.cpu_name = CPU_Z180_NAME;
 }
 
-static void option_cpu_r2k(void)
+static void option_cpu_r2ka(void)
 {
 	opts.cpu = CPU_R2K;
 	opts.cpu_name = CPU_R2K_NAME;

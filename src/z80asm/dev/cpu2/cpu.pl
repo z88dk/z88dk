@@ -29,7 +29,7 @@ $ENV{PATH} = join($Config{path_sep}, ".", "../ticks", $ENV{PATH});
 #------------------------------------------------------------------------------
 # Globals
 #------------------------------------------------------------------------------
-our @CPUS = sort qw( 8080 8085 gbz80 r2k r3k z180 z80 z80n );
+our @CPUS = sort qw( 8080 8085 gbz80 r2ka r3k z180 z80 z80n );
 our %CPU_I; for (0 .. $#CPUS) { $CPU_I{$CPUS[$_]} = $_; }
 our $cpu = 'z80';
 our $ixiy;
@@ -86,17 +86,17 @@ our $table_separator = "|";
 #------------------------------------------------------------------------------
 # Predicates
 #------------------------------------------------------------------------------
-sub is8080() 		{ return $cpu eq '8080'; }
-sub is8085() 		{ return $cpu eq '8085'; }
-sub isintel() 		{ return is8080() || is8085(); }
+sub is8080()		{ return $cpu eq '8080'; }
+sub is8085()		{ return $cpu eq '8085'; }
+sub isintel()		{ return is8080() || is8085(); }
 sub isgbz80()		{ return $cpu eq 'gbz80'; }
 sub isz80()			{ return $cpu eq 'z80'; }
-sub isz80n() 		{ return $cpu eq 'z80n'; }
-sub isz180() 		{ return $cpu eq 'z180'; }
-sub iszilog() 		{ return isz80() || isz80n() || isz180(); }
-sub isr2k()			{ return $cpu eq 'r2k'; }
+sub isz80n()		{ return $cpu eq 'z80n'; }
+sub isz180()		{ return $cpu eq 'z180'; }
+sub iszilog()		{ return isz80() || isz80n() || isz180(); }
+sub isr2ka()		{ return $cpu eq 'r2ka'; }
 sub isr3k()			{ return $cpu eq 'r3k'; }
-sub israbbit()		{ return isr2k() || isr3k(); }
+sub israbbit()		{ return isr2ka() || isr3k(); }
 
 sub ixiy_asm_flag()	{ return $ixiy ? "-IXIY " : ""; }
 sub restarts()		{ return israbbit ? (          0x10,0x18,0x20,0x28,     0x38) :
@@ -2517,7 +2517,7 @@ sub assemble_and_run {
 	$ok &&= check_bin($got_bytes, $bytes);
 	
 	# run
-	my $ticks_cpu = ($cpu eq 'r3k') ? 'r2k' : $cpu;	# ticks does not support r3k
+	my $ticks_cpu = ($cpu eq 'r3k') ? 'r2ka' : $cpu;	# ticks does not support r3k
 	my $ticks_end = sprintf("%04X", defined($end) ? $end : $size);
 	$ok &&= run("z88dk-ticks test.bin -m$ticks_cpu -rom $linked_size_hex -end $ticks_end >test.out");
 

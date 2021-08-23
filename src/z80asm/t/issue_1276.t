@@ -44,7 +44,7 @@ for my $n (-4, 0, 4) {
 	z80asm("ld hl, (ix$offset) \n".
 		   "ld (ix$offset), hl \n".
 		   "ld hl, (sp$offset) \n".
-		   "ld (sp$offset), hl \n",		'-b -mr2k'); 	
+		   "ld (sp$offset), hl \n",		'-b -mr2ka'); 	
 	check_bin_file("test.bin", pack("C*", 
 			0xE4, $n & 0xFF,
 			0xF4, $n & 0xFF,
@@ -70,11 +70,11 @@ for my $n (-129, -128, 0, 255, 256) {
 	check_bin_file("test.bin", pack("C*", 0x38, $n & 0xFF));
 
 	unlink_testfiles();
-	z80asm("ld hl, (sp$offset)",		'-b -mr2k', 0, "", $warning); 	
+	z80asm("ld hl, (sp$offset)",		'-b -mr2ka', 0, "", $warning); 	
 	check_bin_file("test.bin", pack("C*", 0xC4, $n & 0xFF));
 
 	unlink_testfiles();
-	z80asm("ld (sp$offset), hl",		'-b -mr2k', 0, "", $warning); 	
+	z80asm("ld (sp$offset), hl",		'-b -mr2ka', 0, "", $warning); 	
 	check_bin_file("test.bin", pack("C*", 0xD4, $n & 0xFF));
 }
 
@@ -85,11 +85,11 @@ for my $n (-129, -128, 0, 127, 128) {
 	ok 1, "n=$n";
 
  	unlink_testfiles();
-	z80asm("ld hl, (ix$offset)",		'-b -mr2k', 0, "", $warning); 	
+	z80asm("ld hl, (ix$offset)",		'-b -mr2ka', 0, "", $warning); 	
 	check_bin_file("test.bin", pack("C*", 0xE4, $n & 0xFF));
 
 	unlink_testfiles();
-	z80asm("ld (ix$offset), hl",		'-b -mr2k', 0, "", $warning); 	
+	z80asm("ld (ix$offset), hl",		'-b -mr2ka', 0, "", $warning); 	
 	check_bin_file("test.bin", pack("C*", 0xF4, $n & 0xFF));
 }
 

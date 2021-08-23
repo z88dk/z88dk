@@ -32,8 +32,8 @@ endef
 #------------------------------------------------------------------------------
 # Call for all variants
 #------------------------------------------------------------------------------
-$(foreach cpu,8080 8085 gbz80 r2k r3k z180 z80 z80n,$(eval $(call MAKE_LIB,$(cpu)-,-m$(cpu))))
-$(foreach cpu,8080 8085 gbz80 r2k r3k z180 z80 z80n,$(eval $(call MAKE_LIB,$(cpu)-ixiy,-m$(cpu) -IXIY)))
+$(foreach cpu,8080 8085 gbz80 r2ka r3k z180 z80 z80n,$(eval $(call MAKE_LIB,$(cpu)-,-m$(cpu))))
+$(foreach cpu,8080 8085 gbz80 r2ka r3k z180 z80 z80n,$(eval $(call MAKE_LIB,$(cpu)-ixiy,-m$(cpu) -IXIY)))
 
 $(PROJ)_lib.lst: $(SRC)
 	$(RM) $(PROJ)_lib.lst

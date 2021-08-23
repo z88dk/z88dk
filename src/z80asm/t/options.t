@@ -394,11 +394,11 @@ t_z80asm_ok(0, "swapnib", "\xED\x23", "-mz80n");
 t_z80asm_ok(0, "slp", "\xED\x76", "-mz180");
 
 #------------------------------------------------------------------------------
-# -mr2k
+# -mr2ka
 #------------------------------------------------------------------------------
 
 t_z80asm_ok(0, "ex (sp),hl", "\xE3");
-t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "-mr2k");
+t_z80asm_ok(0, "ex (sp),hl", "\xED\x54", "-mr2ka");
 
 #------------------------------------------------------------------------------
 # -mr3k
@@ -841,7 +841,7 @@ t_z80asm_error("tstio 23	", "Error at file 'test.asm' line 1: illegal identifier
 t_z80asm_error("tst b		", "Error at file 'test.asm' line 1: illegal identifier");
 
 #------------------------------------------------------------------------------
-# -mr2k
+# -mr2ka
 t_z80asm_ok(0, "
 	altd ld a,31
 	ioi ld a,(0xFE)
@@ -852,7 +852,7 @@ t_z80asm_ok(0, "
 	0xD3, 0x3A, 0xFE, 0x00,
 	0xDB, 0x3A, 0xFE, 0x00,
 	
-), "-mr2k");
+), "-mr2ka");
 	
 # __CPU_xxx_contants___
 #------------------------------------------------------------------------------
@@ -897,7 +897,7 @@ t_z80asm_capture('-mz180 -b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\3");
 
 unlink "test.bin";
-t_z80asm_capture('-mr2k -b test.asm', "", "", 0);
+t_z80asm_capture('-mr2ka -b test.asm', "", "", 0);
 t_binary(read_binfile("test.bin"), "\4");
 
 unlink "test.bin";
