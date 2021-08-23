@@ -26,7 +26,7 @@
 #define CPU_Z80_NAME		"z80"
 #define CPU_Z80N_NAME		"z80n"
 #define CPU_Z180_NAME		"z180"
-#define CPU_R2K_NAME		"r2k"
+#define CPU_R2K_NAME		"r2ka"
 #define CPU_R3K_NAME		"r3k"
 #define CPU_8080_NAME		"8080"
 #define CPU_8085_NAME		"8085"
