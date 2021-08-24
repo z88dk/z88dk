@@ -112,6 +112,12 @@ Symbol *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t s
     }
     else											/* already defined */
     {
+        if (strncmp(name, "__CDBINFO__",11) == 0)
+        {
+            /* ignore duplicates of those */
+            return sym;
+        }
+
         if ( sym->module && sym->module != module && sym->module->modname )
             error_symbol_redefined_module( name, sym->module->modname );
         else
