@@ -4,6 +4,9 @@
 #include <string.h>
 
 #include "ticks.h"
+#include "cpu.h"
+#include "debugger.h"
+#include "backend.h"
 
 #if defined(_WIN32) || defined(WIN32)
 #ifndef strcasecmp
@@ -574,7 +577,6 @@ char   cmd_arguments[255];
 int    cmd_arguments_len = 0;
 
 int    ioport = -1;
-int    c_cpu = CPU_Z80;
 int    rom_size = 0;
 int    rc2014_mode = 0;
 
@@ -662,7 +664,7 @@ void setf(int a){
   fa= 255 & (fb= a & -129 | (a&4)<<5);
 }
 
-
+extern backend_t ticks_debugger_backend;
 
 int main (int argc, char **argv){
   int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0;
@@ -671,6 +673,7 @@ int main (int argc, char **argv){
   FILE * fh;
 
   hook_init();
+  set_backend(ticks_debugger_backend);
   debugger_init();
   apu_reset();
 

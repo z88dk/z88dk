@@ -3,6 +3,8 @@
  */
 
 #include "ticks.h"
+#include "backend.h"
+#include "debugger.h"
 #include <stdio.h>
 
 
@@ -50,15 +52,15 @@ void memory_init(char *model) {
     }
 }
 
-uint8_t get_memory(int pc)
+uint8_t get_memory(uint16_t pc)
 {
-  debugger_read_memory(pc);
+  bk.debugger_read_memory(pc);
   return  *get_memory_addr(pc);
 }
 
-uint8_t put_memory(int pc, uint8_t b)
+uint8_t put_memory(uint16_t pc, uint8_t b)
 {
-  debugger_write_memory(pc, b);
+  bk.debugger_write_memory(pc, b);
   if (pc < rom_size)
     return *get_memory_addr(pc);
   else

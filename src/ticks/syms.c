@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "ticks.h"
+#include "debug.h"
 
 static symbol  *symbols[65536] = {0};
 static symbol  *symbols_byname = NULL;
@@ -131,16 +132,14 @@ int symbol_resolve(char *name)
 
 
 // Find a symbol lower than where we were
-int symbol_find_lower(int addr, symboltype preferred_type, char *buf, size_t buflen)
+symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
 {
     symbol *sym;
     int     original_address = addr;
 
-    buf[0] = 0;
-
     while ( 1 ) {
         if ( addr < 0 ) {
-            return -1;
+            return NULL;
         }
     
         while ( (sym = symbols[addr % 65536]) == NULL && addr > 0 ) {
@@ -159,11 +158,13 @@ int symbol_find_lower(int addr, symboltype preferred_type, char *buf, size_t buf
         }
 
         if ( sym != NULL ) {
-            snprintf(buf,buflen,"%s+%d", sym->name, original_address-addr);
-            return 0;
+            *offset = original_address - addr;
+            return sym;
         } 
         addr--;
     }
+
+    return NULL;
 }
 
 const char *find_symbol(int addr, symboltype preferred_type)

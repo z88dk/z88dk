@@ -5,33 +5,13 @@
 
 
 #include "cmds.h"
+#include "syms.h"
+#include "cpu.h"
 #include <sys/types.h>
 #include <inttypes.h>
 
 #include "uthash.h"
 #include "utlist.h"
-
-typedef enum {
-    SYM_ANY = 0,
-    SYM_CONST = 1,
-    SYM_ADDRESS = 2,
-} symboltype;
-
-typedef struct symbol_s symbol;
-
-struct symbol_s {
-    const char    *name;
-    const char    *file;
-    const char    *module;
-    int            address;
-    symboltype     symtype;
-    char           islocal;
-    const char    *section;
-    symbol        *next;
-    UT_hash_handle hh;
-};
-
-
 
 extern unsigned char a,b,c,d,e,h,l;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_;
@@ -40,25 +20,7 @@ extern unsigned short ff, pc, sp;
 extern long long st;
 
 
-#define is8080() ( (c_cpu & CPU_8080) )
-#define is8085() ( (c_cpu & CPU_8085) )
-#define is808x() ( (c_cpu & (CPU_8080|CPU_8085)) )
-#define isgbz80() ( (c_cpu & CPU_GBZ80) == CPU_GBZ80 )
-#define isr800() ( (c_cpu & CPU_R800) == CPU_R800 )
-#define israbbit() ( c_cpu & (CPU_R2KA|CPU_R3K))
-#define israbbit3k() ( c_cpu & (CPU_R3K))
-#define isz180() ( c_cpu & (CPU_Z180))
-#define isez80() ( c_cpu & (CPU_EZ80))
-#define canaltreg() ( ( c_cpu & (CPU_8080|CPU_8085|CPU_GBZ80)) == 0 )
-#define canindex() ( ( c_cpu & (CPU_8080|CPU_8085|CPU_GBZ80)) == 0 )
-#define canixh() ( c_cpu & (CPU_Z80|CPU_Z80N|CPU_R800|CPU_EZ80))
-#define cansll() ( c_cpu & (CPU_Z80|CPU_Z80N))
-#define canz180() ( c_cpu & (CPU_Z180|CPU_EZ80))
-#define cancbundoc() ( c_cpu & (CPU_Z80|CPU_Z80N))
-
-extern int c_cpu;
 extern int trace;
-extern int debugger_active;
 extern int rom_size;		/* amount of memory in low addresses that is read-only */
 extern int ioport;
 extern int rc2014_mode;
@@ -75,17 +37,6 @@ extern int f_(void);
             a = (error);                          \
         }                                         \
     } while (0)
-
-#define CPU_Z80      1
-#define CPU_Z180     2
-#define CPU_R2KA     4
-#define CPU_R3K      8
-#define CPU_Z80N     16
-#define CPU_R800     32
-#define CPU_GBZ80    64
-#define CPU_8080     128
-#define CPU_8085     256
-#define CPU_EZ80     512
 
 #define Z88DK_O_RDONLY 0
 #define Z88DK_O_WRONLY 1
@@ -117,17 +68,6 @@ extern void      hook_misc_init(hook_command *cmds);
 extern void      hook_cpm(void);
 extern void      hook_rc2014(void);
 extern void      hook_console_init(hook_command *cmds);
-extern void      debugger_init();
-extern void      debugger();
-extern void      debugger_write_memory(int addr, uint8_t val);
-extern void      debugger_read_memory(int addr);
-extern int       disassemble2(int pc, char *buf, size_t buflen, int compact);
-extern void      read_symbol_file(char *filename);
-extern const char     *find_symbol(int addr, symboltype preferred_symtype);
-extern symbol   *find_symbol_byname(const char *name);
-extern int symbol_resolve(char *name);
-extern char **parse_words(char *line, int *argc);
-extern int symbol_find_lower(int addr, symboltype preferred_type, char *buf, size_t buflen);
 
 extern void memory_init(char *model);
 extern void memory_handle_paging(int port, int value);
@@ -139,8 +79,8 @@ extern void        out(int port, int value);
 
 extern uint8_t    *get_memory_addr(int pc);
 
-extern uint8_t     get_memory(int pc);
-extern uint8_t     put_memory(int pc, uint8_t b);
+extern uint8_t     get_memory(uint16_t pc);
+extern uint8_t     put_memory(uint16_t pc, uint8_t b);
 
 // acia
 extern int acia_out(int port, int value);
@@ -157,16 +97,6 @@ extern void apu_write_command(uint8_t cmd);
 
 extern int hook_console_out(int port, int value);
 extern int hook_console_in(int port);
-
-// srcfile
-extern void srcfile_display(const char *filename, int start_line, int count, int highlight);
-
-
-// debug
-extern void debug_add_info_encoded(char *encoded);
-extern int debug_find_source_location(int address, const char **filename, int *lineno);
-extern void debug_add_cline(const char *filename, int lineno, int level, int scope, const char *address);
-extern int debug_resolve_source(char *name);
 
 #ifndef WIN32
 extern int kbhit();
