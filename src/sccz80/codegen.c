@@ -5084,7 +5084,7 @@ void gen_intrinsic_in(SYMBOL *sym)
     if ( c_cpu & CPU_RABBIT ) {
         ol("ioi");
         outstr("\tld\thl,("); outname(sym->name, 1); outstr(")"); nl();
-        if ( c_cpu == CPU_R2K ) {
+        if ( c_cpu == CPU_R2KA ) {
             ol("nop"); // Rabbit bug workaround
         }
         return;
@@ -5116,7 +5116,7 @@ void gen_intrinsic_out(SYMBOL *sym)
         ol("ld\ta,l");
         ol("ioi");
         outstr("\tld\t("); outname(sym->name, 1); outstr("),a"); nl();
-        if ( c_cpu == CPU_R2K ) {
+        if ( c_cpu == CPU_R2KA ) {
             ol("nop"); // Rabbit bug workaround
         }
         return;

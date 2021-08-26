@@ -2,7 +2,9 @@
 // In this case it's adb information as per sdcc
 
 
-#include "ticks.h"
+#include "debug.h"
+#include "uthash.h"
+#include "utlist.h"
 #include <ctype.h>
 #include <stdio.h>
 

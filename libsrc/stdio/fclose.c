@@ -21,7 +21,7 @@
 int fclose(FILE *fp)
 {
 #asm
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(sp + 2)
 ELSE
 	pop	de
@@ -54,7 +54,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__ && !__CPU_GBZ80__
 	push	ix	;Save callers ix
 	push	hl
 	pop	ix	;ix = fp
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(ix+fp_extra)
 ELSE
 	ld	l,(ix+fp_extra)

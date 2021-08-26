@@ -1,0 +1,6 @@
+../_DEVELOPMENT/l/sccz80/crt0_8085/**.asm
+../_DEVELOPMENT/l/sccz80/crt0_long_8085/**.asm
+
+@8080.lst
+@newlib-8080.lst
+

@@ -26,7 +26,7 @@ obj/newlib-z80: $(NEWLIBASM)
 	@touch $@
 
 obj/newlib-r2k: $(NEWLIBASM)
-	@$(ASSEMBLER) -O=obj/r2k/x -I.. -mr2k -D__CLASSIC $^
+	@$(ASSEMBLER) -O=obj/r2k/x -I.. -mr2ka -D__CLASSIC $^
 	@touch $@
 
 obj/newlib-z80n: $(NEWLIBASM)
@@ -47,7 +47,7 @@ obj/ixiy/%.o: %.asm
 	@mv $(^:.asm=.o) $@
 
 obj/r2k/%.o: %.asm
-	@$(ASSEMBLER) -I../ -mr2k -D__CLASSIC $^
+	@$(ASSEMBLER) -I../ -mr2ka -D__CLASSIC $^
 	@mv $(^:.asm=.o) $@
 
 obj/z80n/%.o: %.asm

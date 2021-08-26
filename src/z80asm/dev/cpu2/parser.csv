@@ -3113,8 +3113,8 @@ LD BC COMMA expr                  |8085 |expr  |-    |ld bc, %m     |01 %m %m   
 LD BC COMMA expr                  |8085 |expr  |IXIY |ld bc, %m     |01 %m %m                                    |     10 T
 LD BC COMMA expr                  |gbz80|expr  |-    |ld bc, %m     |01 %m %m                                    |     12 T
 LD BC COMMA expr                  |gbz80|expr  |IXIY |ld bc, %m     |01 %m %m                                    |     12 T
-LD BC COMMA expr                  |r2k  |expr  |-    |ld bc, %m     |01 %m %m                                    |      6 T
-LD BC COMMA expr                  |r2k  |expr  |IXIY |ld bc, %m     |01 %m %m                                    |      6 T
+LD BC COMMA expr                  |r2ka |expr  |-    |ld bc, %m     |01 %m %m                                    |      6 T
+LD BC COMMA expr                  |r2ka |expr  |IXIY |ld bc, %m     |01 %m %m                                    |      6 T
 LD BC COMMA expr                  |r3k  |expr  |-    |ld bc, %m     |01 %m %m                                    |      6 T
 LD BC COMMA expr                  |r3k  |expr  |IXIY |ld bc, %m     |01 %m %m                                    |      6 T
 LD BC COMMA expr                  |z180 |expr  |-    |ld bc, %m     |01 %m %m                                    |      9 T
@@ -3425,8 +3425,8 @@ LD DE COMMA expr                  |8085 |expr  |-    |ld de, %m     |11 %m %m   
 LD DE COMMA expr                  |8085 |expr  |IXIY |ld de, %m     |11 %m %m                                    |     10 T
 LD DE COMMA expr                  |gbz80|expr  |-    |ld de, %m     |11 %m %m                                    |     12 T
 LD DE COMMA expr                  |gbz80|expr  |IXIY |ld de, %m     |11 %m %m                                    |     12 T
-LD DE COMMA expr                  |r2k  |expr  |-    |ld de, %m     |11 %m %m                                    |      6 T
-LD DE COMMA expr                  |r2k  |expr  |IXIY |ld de, %m     |11 %m %m                                    |      6 T
+LD DE COMMA expr                  |r2ka |expr  |-    |ld de, %m     |11 %m %m                                    |      6 T
+LD DE COMMA expr                  |r2ka |expr  |IXIY |ld de, %m     |11 %m %m                                    |      6 T
 LD DE COMMA expr                  |r3k  |expr  |-    |ld de, %m     |11 %m %m                                    |      6 T
 LD DE COMMA expr                  |r3k  |expr  |IXIY |ld de, %m     |11 %m %m                                    |      6 T
 LD DE COMMA expr                  |z180 |expr  |-    |ld de, %m     |11 %m %m                                    |      9 T
@@ -3727,8 +3727,8 @@ LD HL COMMA expr                  |8085 |expr  |-    |ld hl, %m     |21 %m %m   
 LD HL COMMA expr                  |8085 |expr  |IXIY |ld hl, %m     |21 %m %m                                    |     10 T
 LD HL COMMA expr                  |gbz80|expr  |-    |ld hl, %m     |21 %m %m                                    |     12 T
 LD HL COMMA expr                  |gbz80|expr  |IXIY |ld hl, %m     |21 %m %m                                    |     12 T
-LD HL COMMA expr                  |r2k  |expr  |-    |ld hl, %m     |21 %m %m                                    |      6 T
-LD HL COMMA expr                  |r2k  |expr  |IXIY |ld hl, %m     |21 %m %m                                    |      6 T
+LD HL COMMA expr                  |r2ka |expr  |-    |ld hl, %m     |21 %m %m                                    |      6 T
+LD HL COMMA expr                  |r2ka |expr  |IXIY |ld hl, %m     |21 %m %m                                    |      6 T
 LD HL COMMA expr                  |r3k  |expr  |-    |ld hl, %m     |21 %m %m                                    |      6 T
 LD HL COMMA expr                  |r3k  |expr  |IXIY |ld hl, %m     |21 %m %m                                    |      6 T
 LD HL COMMA expr                  |z180 |expr  |-    |ld hl, %m     |21 %m %m                                    |      9 T
@@ -4295,8 +4295,8 @@ LD SP COMMA expr                  |8085 |expr  |-    |ld sp, %m     |31 %m %m   
 LD SP COMMA expr                  |8085 |expr  |IXIY |ld sp, %m     |31 %m %m                                    |     10 T
 LD SP COMMA expr                  |gbz80|expr  |-    |ld sp, %m     |31 %m %m                                    |     12 T
 LD SP COMMA expr                  |gbz80|expr  |IXIY |ld sp, %m     |31 %m %m                                    |     12 T
-LD SP COMMA expr                  |r2k  |expr  |-    |ld sp, %m     |31 %m %m                                    |      6 T
-LD SP COMMA expr                  |r2k  |expr  |IXIY |ld sp, %m     |31 %m %m                                    |      6 T
+LD SP COMMA expr                  |r2ka |expr  |-    |ld sp, %m     |31 %m %m                                    |      6 T
+LD SP COMMA expr                  |r2ka |expr  |IXIY |ld sp, %m     |31 %m %m                                    |      6 T
 LD SP COMMA expr                  |r3k  |expr  |-    |ld sp, %m     |31 %m %m                                    |      6 T
 LD SP COMMA expr                  |r3k  |expr  |IXIY |ld sp, %m     |31 %m %m                                    |      6 T
 LD SP COMMA expr                  |z180 |expr  |-    |ld sp, %m     |31 %m %m                                    |      9 T

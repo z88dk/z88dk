@@ -29,7 +29,7 @@ PUBLIC asm_cpu_pop_ei_jp
 asm_z80_pop_ei:
 asm_cpu_pop_ei:
 
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 
    defc asm0_z80_pop_ei = asm_cpu_pop_ei
    defc asm0_cpu_pop_ei = asm_cpu_pop_ei

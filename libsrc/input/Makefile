@@ -17,7 +17,7 @@ obj/gbz80/%.o: %.asm
 	$(ZCC) +test -mgbz80 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
 obj/r2k/%.o: %.asm
-	$(ZCC) +test -mr2k $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
+	$(ZCC) +test -mr2ka $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^
 
 obj/z80/%.o: %.asm
 	$(ZCC) +test -mz80 $(CFLAGS) -Ca-DSTANDARDESCAPECHARS -Cc-standard-escape-chars -Ca-I../ -c -o $@ $^

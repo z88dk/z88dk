@@ -82,7 +82,7 @@ void add_copper_unit_nop();
 #define _Z180_ONLY(x)		(!(opts.cpu & CPU_Z180) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _RCM2000_ONLY(x)	(!(opts.cpu & CPU_R2K) ? \
+#define _RCM2000_ONLY(x)	(!(opts.cpu & CPU_R2KA) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
 #define _RCM3000_ONLY(x)	(!(opts.cpu & CPU_R3K) ? \

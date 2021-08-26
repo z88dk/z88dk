@@ -33,7 +33,7 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
 	ret
 ELSE
 	push	ix	;save callers
-  IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(sp + 8)	; size
 	ld	c,l
 	ld	b,h
@@ -81,7 +81,7 @@ fwrite_done:
 	; hl = bytes read
 	; divide and return
 	ex	de,hl
-  IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__
 	ld	hl,(sp + 8)	;size
   ELSE
 	ld	ix,0
@@ -103,7 +103,7 @@ _fwrite1:
         bit	5,(ix+fp_flags)		;_IOEXTRA
         jr      z,fwrite_direct
         ; Calling via the extra hook
-  IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__
         ld      hl,(ix+fp_extra)
   ELSE
         ld      l,(ix+fp_extra)
@@ -112,7 +112,7 @@ _fwrite1:
         ld      a,__STDIO_MSG_WRITE
         jp      l_jphl
 fwrite_direct:
-  IF __CPU_R2K__ | __CPU_R3K__
+  IF __CPU_R2KA__ | __CPU_R3K__
         ld      hl,(ix+fp_desc)
   ELSE
         ld      l,(ix+fp_desc)

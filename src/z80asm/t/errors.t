@@ -146,7 +146,6 @@ t_binary(read_binfile(bin_file()), pack("C*",
 ));
 
 # defvar out of range - tested in directives.t
-# defs out of range - tested in opcodes.t
 # org out of range - tested in directives.t
 
 # JR / DJNZ

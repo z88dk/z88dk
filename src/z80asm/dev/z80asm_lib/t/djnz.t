@@ -10,7 +10,7 @@ use Modern::Perl;
 use Test::More;
 require '../../t/testlib.pl';
 
-my @CPUS = (qw( 8080 z80 gbz80 r2k ));
+my @CPUS = (qw( 8080 z80 gbz80 r2ka ));
 
 my $test_nr;
 

@@ -78,6 +78,7 @@ extern void asm_DC(const char* name, struct Expr* expr);
 
 /* create a block of empty bytes, called by the DEFS directive */
 extern void asm_DEFS(int count, int fill);
+extern void asm_DEFS_str(int count, const char* str, int len);
 
 /* DEFB - add an expression or a string */
 extern void asm_DEFB_str(const char* str, int length);

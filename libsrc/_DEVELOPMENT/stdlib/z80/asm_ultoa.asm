@@ -37,7 +37,7 @@ asm_ultoa:
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
-IF __CPU_Z180__ || __CPU_R2K__ || __CPU_R3K__
+IF __CPU_Z180__ || __CPU_R2KA__ || __CPU_R3K__
 
    push ix
    ex (sp),hl

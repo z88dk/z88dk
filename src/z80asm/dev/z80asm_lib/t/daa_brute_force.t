@@ -13,7 +13,7 @@ use Path::Tiny;
 require '../../t/testlib.pl';
 
 # CPUs not supported by ticks: z80n z180 r3k
-my @CPUS = (qw( z80 r2k ));
+my @CPUS = (qw( z80 r2ka ));
 my $test_nr;
 
 for my $cpu (@CPUS) {
@@ -85,13 +85,13 @@ for my $cpu (@CPUS) {
 		elsif (!$nflag && !$carry && $ah <= 8 && !$hcarry && $al >= 10) {
 			is $got_a, ($a + 6) & 0xFF;
 			is $got_carry, 0;
-			# Fails test 775: cpu:r2k, nflag:0, carry:0, hcarry:0, a:10
+			# Fails test 775: cpu:r2ka, nflag:0, carry:0, hcarry:0, a:10
 			# is $got_hcarry, 1;
 		}
 		elsif (!$nflag && !$carry && $ah <= 9 && $hcarry && $al <= 3) {
 			is $got_a, ($a + 6) & 0xFF;
 			is $got_carry, 0;
-			# Fails test 1021: cpu:r2k, nflag:0, carry:0, hcarry:1, a:0
+			# Fails test 1021: cpu:r2ka, nflag:0, carry:0, hcarry:1, a:0
 			# is $got_hcarry, 0;
 		}
 		elsif (!$nflag && !$carry && $ah >= 10 && !$hcarry && $al <= 9) {
@@ -102,13 +102,13 @@ for my $cpu (@CPUS) {
 		elsif (!$nflag && !$carry && $ah >= 9 && !$hcarry && $al >= 10) {
 			is $got_a, ($a + 0x66) & 0xFF;
 			is $got_carry, 1;
-			# Fails test 919: cpu:r2k, nflag:0, carry:0, hcarry:0, a:154
+			# Fails test 919: cpu:r2ka, nflag:0, carry:0, hcarry:0, a:154
 			# is $got_hcarry, 1;
 		}
 		elsif (!$nflag && !$carry && $ah >= 10 && $hcarry && $al <= 3) {
 			is $got_a, ($a + 0x66) & 0xFF;
 			is $got_carry, 1;
-			# Fails test 1061: cpu:r2k, nflag:0, carry:0, hcarry:1, a:160
+			# Fails test 1061: cpu:r2ka, nflag:0, carry:0, hcarry:1, a:160
 			# is $got_hcarry, 0;
 		}
 		elsif (!$nflag && $carry && $ah <= 2 && !$hcarry && $al <= 9) {
@@ -119,13 +119,13 @@ for my $cpu (@CPUS) {
 		elsif (!$nflag && $carry && $ah <= 2 && !$hcarry && $al >= 10) {
 			is $got_a, ($a + 0x66) & 0xFF;
 			is $got_carry, 1;
-			# Fails test 1095: cpu:r2k, nflag:0, carry:1, hcarry:0, a:10
+			# Fails test 1095: cpu:r2ka, nflag:0, carry:1, hcarry:0, a:10
 			# is $got_hcarry, 1;
 		}
 		elsif (!$nflag && $carry && $ah <= 3 && $hcarry && $al <= 3) {
 			is $got_a, ($a + 0x66) & 0xFF;
 			is $got_carry, 1;
-			# Fails test 1133: cpu:r2k, nflag:0, carry:1, hcarry:1, a:0
+			# Fails test 1133: cpu:r2ka, nflag:0, carry:1, hcarry:1, a:0
 			# is $got_hcarry, 0;
 		}
 		elsif ($nflag && !$carry && $ah <= 9 && !$hcarry && $al <= 9) {

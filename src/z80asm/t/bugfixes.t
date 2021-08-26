@@ -96,61 +96,11 @@ ASM
 );
 
 #------------------------------------------------------------------------------
-# BUG_0008 : code block of 64K is read as zero
-note "BUG_0008";
-z80asm(
-	asm		=> "defs 65536, 0xAA",
-	options	=> " ",
-	ok		=> 1,
-);
-
-# use .o, dont assemble
-z80asm(
-	options	=> "-d -b test.o",
-	bin		=> "\xAA" x 65536,
-	ok		=> 1,
-);
-
-#------------------------------------------------------------------------------
-# BUG_0010 : heap corruption when reaching MAXCODESIZE
-# raise HEAP CORRUPTION DETECTED in MSVC
-note "BUG_0010";
-z80asm(
-	asm		=> "defs 65534,0xAA \n ld a, 0xAA",
-	bin		=> "\xAA" x 65534 . "\x3E\xAA",
-);
-z80asm(
-	asm		=> "defs 65535,0xAA \n ld a, 0xAA ;; error: max. code size of 65536 bytes reached",
-);
-z80asm(
-	asm		=> "defs 65533,0xAA \n ld bc, 0xAAAA",
-	bin		=> "\xAA" x 65533 . "\x01\xAA\xAA",
-);
-z80asm(
-	asm		=> "defs 65534,0xAA \n ld bc, 0xAAAA ;; error: max. code size of 65536 bytes reached",
-);
-z80asm(
-	asm		=> "defs 65532,0xAA \n defq 0xAAAAAAAA",
-	bin		=> "\xAA" x 65536,
-);
-z80asm(
-	asm		=> "defs 65533,0xAA \n defq 0xAAAAAAAA ;; error: max. code size of 65536 bytes reached",
-);
-
-#------------------------------------------------------------------------------
 # BUG_0012: binfilename[] array is too short, should be FILENAME_MAX
 note "BUG_0012";
 z80asm(
 	asm		=> "nop ;; 00",
 	options	=> "-b -o".("./" x 64)."test.bin",
-);
-
-#------------------------------------------------------------------------------
-# BUG_0013: defm check for MAX_CODESIZE incorrect
-note "BUG_0013";
-z80asm(
-	asm		=> "defs 65535, 'a' \n defm \"a\"",
-	bin		=> "a" x 65536,
 );
 
 #------------------------------------------------------------------------------
@@ -246,7 +196,7 @@ z80asm(
 							;; 78 B1 20 02 CB 95 ED 54 F1 C9 BE 23 
 							;; 0B F5 ED 54 CB C5 18 EA
 ASM
-	options	=> "$list -b -mr2k",
+	options	=> "$list -b -mr2ka",
 );
 }
 
@@ -401,20 +351,6 @@ z80asm(
 				jp		ASMPC				;; C3 06 01
 ASM
 	options	=> "-r0x100 -b",
-);
-
-#------------------------------------------------------------------------------
-# BUG_0050: Making a library with more than 64K and -d option fails - max. code size reached
-note "BUG_0050";
-z80asm(
-	asm1 =>	"defs 65000",
-	asm2 =>	"defs 65000",
-	options => "-Dxxx",		# no -b
-	ok => 1,
-);
-z80asm(
-	options => "-d -xtest.lib test1 test2",
-	ok => 1,
 );
 
 #------------------------------------------------------------------------------

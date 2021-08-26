@@ -4,6 +4,9 @@
 #include <string.h>
 
 #include "ticks.h"
+#include "cpu.h"
+#include "debugger.h"
+#include "backend.h"
 
 #if defined(_WIN32) || defined(WIN32)
 #ifndef strcasecmp
@@ -574,7 +577,6 @@ char   cmd_arguments[255];
 int    cmd_arguments_len = 0;
 
 int    ioport = -1;
-int    c_cpu = CPU_Z80;
 int    rom_size = 0;
 int    rc2014_mode = 0;
 
@@ -662,7 +664,7 @@ void setf(int a){
   fa= 255 & (fb= a & -129 | (a&4)<<5);
 }
 
-
+extern backend_t ticks_debugger_backend;
 
 int main (int argc, char **argv){
   int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0;
@@ -671,6 +673,7 @@ int main (int argc, char **argv){
   FILE * fh;
 
   hook_init();
+  set_backend(ticks_debugger_backend);
   debugger_init();
   apu_reset();
 
@@ -695,7 +698,7 @@ int main (int argc, char **argv){
     printf("  -mgbz80        Emulate a gbz80 (mostly)\n"),
     printf("  -mz80          Emulate a z80\n"),
     printf("  -mz180         Emulate a z180\n"),
-    printf("  -mr2k          Emulate a Rabbit 2000\n"),
+    printf("  -mr2ka         Emulate a Rabbit 2000\n"),
     printf("  -mr3k          Emulate a Rabbit 3000\n"),
     printf("  -mz80n         Emulate a Spectrum Next z80n\n"),
     printf("  -mez80         Emulate an ez80 (z80 mode)\n"),
@@ -768,10 +771,10 @@ int main (int argc, char **argv){
           } else if ( strcmp(&argv[0][1],"mz80n") == 0 ) {
             c_cpu = CPU_Z80N;
             memory_model = "zxn";
-          } else if ( strcmp(&argv[0][1],"mr2k") == 0 ) {
-            c_cpu = CPU_R2K;
+          } else if ( strcmp(&argv[0][1],"mr2ka") == 0 ) {
+            c_cpu = CPU_R2KA;
           } else if ( strcmp(&argv[0][1],"mr3k") == 0 ) {
-            c_cpu = CPU_R2K;
+            c_cpu = CPU_R3K;
           } else if ( strcmp(&argv[0][1],"mez80") == 0 ) {
             c_cpu = CPU_EZ80;
           } else if ( strcmp(&argv[0][1],"mgbz80") == 0 ) {

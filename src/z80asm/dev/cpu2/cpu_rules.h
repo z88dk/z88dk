@@ -3345,7 +3345,7 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_BC _TK_COMMA expr _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0x01);
 break;
@@ -3737,7 +3737,7 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_DE _TK_COMMA expr _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0x11);
 break;
@@ -4067,7 +4067,7 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_HL _TK_COMMA expr _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: 
+case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0x21);
 break;
@@ -4987,7 +4987,7 @@ default: error_illegal_ident(); }
 
 | label? _TK_LD _TK_SP _TK_COMMA expr _TK_NEWLINE @{
 switch (opts.cpu) {
-case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2K: case CPU_R3K: case CPU_Z180: 
+case CPU_8080: case CPU_8085: case CPU_GBZ80: case CPU_R2KA: case CPU_R3K: case CPU_Z180: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_stmt_nn(0x31);
 break;

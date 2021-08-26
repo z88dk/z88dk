@@ -23,7 +23,7 @@ run("./z88dk-z80asm -mz80 -b test.asm");
 my $bin1 = hexdump(slurp("test.bin"));
 note $bin1;
 
-run("./z88dk-z80asm -mr2k -b test.asm");
+run("./z88dk-z80asm -mr2ka -b test.asm");
 my $bin2 = hexdump(slurp("test.bin"));
 note $bin2;
 

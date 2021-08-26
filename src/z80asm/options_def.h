@@ -75,7 +75,7 @@ OPT(OptCall, option_cpu_gbz80, "-mgbz80", "", "Assemble for the GameBoy Z80", ""
 OPT(OptCall, option_cpu_8080, "-m8080", "", "Assemble for the 8080 (with Zilog or Intel mnemonics)", "")
 OPT(OptCall, option_cpu_8085, "-m8085", "", "Assemble for the 8085 (with Zilog or Intel mnemonics)", "")
 OPT(OptCall, option_cpu_z180, "-mz180", "", "Assemble for the Z180", "")
-OPT(OptCall, option_cpu_r2k, "-mr2k", "", "Assemble for the Rabbit 2000", "")
+OPT(OptCall, option_cpu_r2ka, "-mr2ka", "", "Assemble for the Rabbit 2000A", "")
 OPT(OptCall, option_cpu_r3k, "-mr3k", "", "Assemble for the Rabbit 3000", "")
 OPT(OptCall, option_cpu_ti83plus, "-mti83plus", "", "Assemble for the TI83Plus", "")
 OPT(OptCall, option_cpu_ti83, "-mti83", "", "Assemble for the TI83", "")

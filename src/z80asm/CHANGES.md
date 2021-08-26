@@ -4,6 +4,8 @@ Z88DK Z80 Module Assembler Change Log
 2021
 ----
 - 2021-01-18 Fix #1671: Define INCBIN as alias to BINARY
+- 2021-08-16 Add DEFS len,"string" for fixed-len-filled strings (thanks @o-marshmallow)
+- 2021-08-23 replace --cpu=r2k with --cpu=r2ka
 
 2020
 ----

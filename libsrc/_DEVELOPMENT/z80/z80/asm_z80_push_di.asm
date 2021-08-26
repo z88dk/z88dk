@@ -21,7 +21,7 @@ PUBLIC asm_cpu_push_di
 asm_z80_push_di:
 asm_cpu_push_di:
 
-IF __CPU_R2K__ | __CPU_R3K__
+IF __CPU_R2KA__ | __CPU_R3K__
 
    ipset 3
 
