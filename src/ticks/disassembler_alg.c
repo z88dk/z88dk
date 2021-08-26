@@ -1,8 +1,10 @@
 
 #include <stdio.h>
-#include "ticks.h"
-
-
+#include <inttypes.h>
+#include "cpu.h"
+#include "syms.h"
+#include "backend.h"
+#include "debugger.h"
 
 
 static char *rp2_table[] = { "bc", "de", "hl", "af"};
@@ -24,7 +26,7 @@ typedef struct {
 
 
 #define READ_BYTE(state,val) do { \
-    val = get_memory(state->pc++); \
+    val = bk.get_memory(state->pc++); \
     state->instr_bytes[state->len++] = val; \
 } while (0)
 

@@ -3,9 +3,11 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <stdint.h>
+#include "disassembler.h"
+#include "syms.h"
+#include "cpu.h"
+#include "backend.h"
 #include "ticks.h"
-
-
 
 static void disassemble_loop(int start, int end);
 
@@ -36,6 +38,10 @@ static void usage(char *program)
     exit(1);
 }
 
+static backend_t disassembler_backend = {
+    .get_memory = get_memory
+};
+
 int main(int argc, char **argv)
 {
     char  *program = argv[0];
@@ -51,6 +57,8 @@ int main(int argc, char **argv)
     if ( argc == 1 ) {
         usage(program);
     }
+
+    set_backend(disassembler_backend);
 
     while ( argc > 1  ) {
         if( argv[1][0] == '-' && argv[2] ) {
@@ -141,7 +149,7 @@ static void disassemble_loop(int start, int end)
 }
 
 
-uint8_t get_memory(int pc)
+uint8_t get_memory(uint16_t pc)
 {
     return mem[pc % 65536] ^ inverted;
 }
