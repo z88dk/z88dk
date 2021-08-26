@@ -32,11 +32,7 @@
         out (__IO_ACIA_CONTROL_REGISTER),a    ; set the ACIA CTRL register
 
     getc_clean_up_rx:
-        ld hl,aciaRxCount
-        di      
-        dec (hl)                    ; atomically decrement Rx count
         ld hl,(aciaRxOut)           ; get the pointer to place where we pop the Rx byte
-        ei
         ld a,(hl)                   ; get the Rx byte
 
         inc l                       ; move the Rx pointer low byte along
@@ -49,6 +45,9 @@ IF __IO_ACIA_RX_SIZE != 0x100
         pop af
 ENDIF
         ld (aciaRxOut),hl           ; write where the next byte should be popped
+
+        ld hl,aciaRxCount
+        dec (hl)                    ; atomically decrement Rx count
 
         ld l,a                      ; and put it in hl
         scf                         ; indicate char received

@@ -25,8 +25,6 @@
         jr NC,tx_check              ; buffer full, check if we can send something
 
         ld a,l                      ; get Rx byte from l
-        ld hl,aciaRxCount
-        inc (hl)                    ; atomically increment Rx buffer count
         ld hl,(aciaRxIn)            ; get the pointer to where we poke
         ld (hl),a                   ; write the Rx byte to the aciaRxIn address
 
@@ -38,6 +36,9 @@ IF __IO_ACIA_RX_SIZE != 0x100
         ld l,a                      ; return the low byte to l
 ENDIF
         ld (aciaRxIn),hl            ; write where the next byte should be poked
+
+        ld hl,aciaRxCount
+        inc (hl)                    ; atomically increment Rx buffer count
 
         ld a,(aciaRxCount)          ; get the current Rx count
         cp __IO_ACIA_RX_FULLISH     ; compare the count with the preferred full size
@@ -73,6 +74,7 @@ IF __IO_ACIA_TX_SIZE != 0x100
         ld l,a                      ; return the low byte to l
 ENDIF
         ld (aciaTxOut),hl           ; write where the next byte should be popped
+
         ld hl,aciaTxCount
         dec (hl)                    ; atomically decrement current Tx count
 

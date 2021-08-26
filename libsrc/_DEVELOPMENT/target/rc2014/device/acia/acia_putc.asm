@@ -34,11 +34,7 @@
         jr NC,putc_buffer_tx_overflow   ; buffer full, so drop the Tx byte and return
 
         ld a,l                      ; Tx byte
-        ld hl,aciaTxCount
-        di
-        inc (hl)                    ; atomic increment of Tx count
         ld hl,(aciaTxIn)            ; get the pointer to where we poke
-        ei
         ld (hl),a                   ; write the Tx byte to the aciaTxIn
 
         inc l                       ; move the Tx pointer, just low byte along
@@ -49,6 +45,10 @@ IF __IO_ACIA_TX_SIZE != 0x100
         ld l,a                      ; return the low byte to l
 ENDIF
         ld (aciaTxIn),hl            ; write where the next byte should be poked
+
+        ld hl,aciaTxCount
+        inc (hl)                    ; atomic increment of Tx count
+
         ld l,0                      ; indicate Tx buffer was not full
 
     putc_buffer_tx_exit:
