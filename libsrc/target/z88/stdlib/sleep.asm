@@ -23,15 +23,12 @@
 		EXTERN	l_div_u
 		PUBLIC asm_sleep
 
-;sleep(int time);
+;sleep(int time) __z88dk_fastcall;
 
 
 .sleep
 ._sleep
-        pop     hl
-        pop     de      ;number of seconds..
-        push    de
-        push    hl
+	ex	de,hl
         
 .asm_sleep
                 
