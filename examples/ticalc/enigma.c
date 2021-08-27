@@ -72,7 +72,7 @@ void main()
                flag=0;
           }
 
-/* Step up seconond rotor if first rotor reached notch */
+/* Step up second rotor if first rotor reached notch */
           if (pos[0]==notch[order[0]-1])
           {
                pos[1]++;

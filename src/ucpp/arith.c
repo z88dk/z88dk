@@ -378,7 +378,7 @@ ARITH_DECL_MONO_S_I(lval) { return x != 0; }
  *          with a non-zero result
  *       ++ if SIGNED_IS_BIGGER == 0, no overflow happens in the unsigned
  *          world; we use the fact that -NATIVE_SIGNED_MIN is then
- *          exaxctly 1 more than NATIVE_SIGNED_MAX
+ *          exactly 1 more than NATIVE_SIGNED_MAX
  *    ** if NEGATIVE_IS_BIGGER == 0, underflow check is identical to
  *       overflow check on (signed) -x and -y.
  */

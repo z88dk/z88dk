@@ -730,14 +730,14 @@ static void fat_write_file(disc_handle* h, char *filename, void* data, size_t le
 // FATFs interface
 
 DSTATUS disk_status (
-	BYTE pdrv		/* Physical drive nmuber to identify the drive */
+	BYTE pdrv		/* Physical drive number to identify the drive */
 )
 {
     return RES_OK;
 }
 
 DSTATUS disk_initialize (
-	BYTE pdrv				/* Physical drive nmuber to identify the drive */
+	BYTE pdrv				/* Physical drive number to identify the drive */
 )
 {
     return RES_OK;
@@ -745,7 +745,7 @@ DSTATUS disk_initialize (
 
 
 DRESULT disk_read (
-	BYTE pdrv,		/* Physical drive nmuber to identify the drive */
+	BYTE pdrv,		/* Physical drive number to identify the drive */
 	BYTE *buff,		/* Data buffer to store read data */
 	DWORD sector,	/* Start sector in LBA */
 	UINT count		/* Number of sectors to read */
@@ -758,7 +758,7 @@ DRESULT disk_read (
 
 
 DRESULT disk_write (
-	BYTE pdrv,			/* Physical drive nmuber to identify the drive */
+	BYTE pdrv,			/* Physical drive number to identify the drive */
 	const BYTE *buff,	/* Data to be written */
 	DWORD sector,		/* Start sector in LBA */
 	UINT count			/* Number of sectors to write */
@@ -770,7 +770,7 @@ DRESULT disk_write (
 }
 
 DRESULT disk_ioctl (
-	BYTE pdrv,		/* Physical drive nmuber (0..) */
+	BYTE pdrv,		/* Physical drive number (0..) */
 	BYTE cmd,		/* Control code */
 	void *buff		/* Buffer to send/receive control data */
 )
