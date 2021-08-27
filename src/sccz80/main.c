@@ -488,15 +488,16 @@ static void dumpfns()
             if (ptr->ctype->kind == KIND_PORT8 || ptr->ctype->kind == KIND_PORT16 ) {
                 outfmt("\tdefc\t_%s =\t%d\n", ptr->name, ptr->ctype->value);
             } else {
-                if ( storage == EXTERNP ) {
-                    outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("\t= %d\n", ptr->ctype->value);
-                } else if ( storage != LSTATIC && storage != TYPDEF ) {
+                if ( storage != LSTATIC && storage != TYPDEF ) {
                     GlobalPrefix();                    
                     outname(ptr->name, dopref(ptr)); nl();
                     if ( storage != STATIK ) {
                         debug_write_symbol(ptr);
                     }
                 }
+                if ( ptr->flags & ASSIGNED_ADDR ) {
+                    outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("\t= %d\n", ptr->ctype->value);
+                } 
             }
         }
     }

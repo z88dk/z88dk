@@ -45,9 +45,13 @@
 
 
 
+	GLOBAL	_c
 	defc	_c	= 16384
+	GLOBAL	_b
 	defc	_b	= 28672
+	GLOBAL	_d
 	defc	_d	= 32768
+	GLOBAL	_e
 	defc	_e	= 12288
 	defc	_buf	= 1280
 

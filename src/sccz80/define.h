@@ -154,7 +154,6 @@ enum storage_type {
     STATIK,        /* Implemented in this file, export */
     STKLOC,        /* On the stack */
     EXTERNAL,      /* External to this file */
-    EXTERNP,       /* Extern @ */
     LSTATIC,       /* Static to this file */
     TYPDEF
 };
@@ -179,7 +178,8 @@ enum symbol_flags {
         SHORTCALL_HL = 0x8000,   /* Use ld HL,$addr style of shortcall */
         BANKED = 0x10000,      /* Call via the banked_call function */
         HL_CALL = 0x20000,    /* Call via ld hl, (module) call (addr) */
-        INTERRUPT = 0x40000   /* Function is used for interrupts */
+        INTERRUPT = 0x40000,   /* Function is used for interrupts */
+        ASSIGNED_ADDR = 0x80000, /* Symbol has been assigned an address */
 };
 
 

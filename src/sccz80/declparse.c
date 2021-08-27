@@ -1143,14 +1143,16 @@ Type *dodeclare(enum storage_type storage)
             // If initialised, the drop name should be something different
             snprintf(drop_name, sizeof(drop_name), "__extern_%s", type->name);            
             type->value = val;
-            sym->storage = EXTERNP;
+            sym->storage = storage;
             sym->initialised = 1;
+            sym->flags |= ASSIGNED_ADDR;
         }
 
         // Handle the sdcc way of declaring variables at address
         if ( ataddress != -1 ) {
             type->value = ataddress;
-            sym->storage = EXTERNP;
+            sym->storage = storage;
+            sym->flags |= ASSIGNED_ADDR;
             sym->initialised = 1;
             // If initialised, the drop name should be something different
             snprintf(drop_name, sizeof(drop_name), "__extern_%s", type->name);                        
@@ -1176,7 +1178,7 @@ Type *dodeclare(enum storage_type storage)
         sym->initialised = 1;
         alloc_size = initials(drop_name, type);
 
-        if ( sym->storage == EXTERNP ) {
+        if ( sym->flags & ASSIGNED_ADDR ) {
             // Copy from local to the supplied address
             gen_switch_section(c_init_section);
             copy_to_extern(drop_name, type->name, alloc_size);
