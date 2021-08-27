@@ -96,7 +96,7 @@ void dodefine()
 	parlist[0] = parmp = parm;		/* Setup parm buffer	*/
 	if ((c = get()) == '(') {		/* With arguments?	*/
 	    nargs = 0;				/* Init formals counter	*/
-	    do {				/* Collect formal params	*/
+	    do {				/* Collect formal parms	*/
 		if (nargs >= LASTPARM)
 		    cfatal("Too many arguments for macro", NULLST);
 		else if ((c = skipws()) == ')')
