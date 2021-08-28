@@ -125,6 +125,7 @@ void debugger_read_memory(int addr)
 void invalidate() {}
 void break_() {}
 void resume() {}
+void detach() {}
 void add_breakpoint(uint8_t type, uint16_t at, uint8_t sz) {}
 void remove_breakpoint(uint8_t type, uint16_t at, uint8_t sz) {}
 void disable_breakpoint(uint8_t type, uint16_t at, uint8_t sz) {}
@@ -191,6 +192,7 @@ backend_t ticks_debugger_backend = {
     .resume = &resume,
     .next = &next,
     .step = &step,
+    .detach = &detach,
     .add_breakpoint = &add_breakpoint,
     .remove_breakpoint = &remove_breakpoint,
     .disable_breakpoint = &disable_breakpoint,

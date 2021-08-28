@@ -45,6 +45,7 @@ typedef struct {
     void_cb resume;
     void_cb next;
     void_cb step;
+    void_cb detach;
     breakpoint_cb add_breakpoint;
     breakpoint_cb remove_breakpoint;
     breakpoint_cb disable_breakpoint;
