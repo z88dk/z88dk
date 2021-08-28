@@ -30,6 +30,7 @@ static uint8_t registers_invalidated = 1;
 static sem_t* req_response_mutex = NULL;
 static sem_t* response_mutex = NULL;
 static sem_t* trap_mutex = NULL;
+static pthread_cond_t network_op_cond;
 static pthread_mutex_t network_op_mutex;
 static pthread_mutex_t trap_process_mutex;
 static trapped_action_t scheduled_action = NULL;
@@ -90,6 +91,7 @@ void post_network_op(network_op_cb calllack, void* arg)
     new_op->arg = arg;
     new_op->prev = last_network_op;
     last_network_op = new_op;
+    pthread_cond_signal(&network_op_cond);
     pthread_mutex_unlock(&network_op_mutex);
 }
 
@@ -157,7 +159,7 @@ int hex(char ch)
     return (-1);
 }
 
-char *mem2hex(char *mem, char *buf, uint32_t count)
+char *mem2hex(const char *mem, char *buf, uint32_t count)
 {
     unsigned char ch;
     for (int i = 0; i < count; i++)
@@ -307,7 +309,7 @@ uint8_t get_memory(uint16_t at)
     mem_requested_at = at;
     if (mem_requested_at > 4)
     {
-        // request a bir early in case prior memory is needed
+        // request a bit early in case prior memory is needed
         mem_requested_at -= 4;
     }
     else
@@ -422,7 +424,7 @@ void set_regs(struct debugger_regs_t* regs)
         rr[i] = value;
     }
 
-    char req[128] = {};
+    char req[128] = {0};
     req[0] = 'G';
     mem2hex((void*)rr, &req[1], register_mappings_count * 4);
 
@@ -707,8 +709,9 @@ static void* network_write_thread(void* arg)
 
     while (1)
     {
-        // execute network operations from main thread
         pthread_mutex_lock(&network_op_mutex);
+        pthread_cond_wait(&network_op_cond, &network_op_mutex);
+        // execute network operations from main thread
         while (last_network_op) {
             struct network_op* prev = last_network_op->prev;
             last_network_op->callback(last_network_op->arg);
@@ -717,11 +720,6 @@ static void* network_write_thread(void* arg)
         }
         pthread_mutex_unlock(&network_op_mutex);
         write_flush(socket);
-#ifdef __MACH__
-        pthread_yield_np();
-#else
-        pthread_yield();
-#endif
     }
 
     return NULL;
@@ -782,6 +780,7 @@ int main(int argc, char **argv) {
     sem_unlink("trap_mutex");
     trap_mutex = sem_open("trap_mutex", O_CREAT|O_EXCL, 0600, 0);
 
+    pthread_cond_init(&network_op_cond, NULL);
     pthread_mutex_init(&network_op_mutex, NULL);
     pthread_mutex_init(&trap_process_mutex, NULL);
 
