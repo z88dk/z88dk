@@ -65,7 +65,7 @@ void inbuf_erase_head(ssize_t end)
     pktbuf_erase_head(&in, end);
 }
 
-int read_data_once(int sockfd)
+int read_data_once(sock_t sockfd)
 {
     ssize_t nread;
     uint8_t buf[4096];
@@ -80,7 +80,7 @@ int read_data_once(int sockfd)
     return 0;
 }
 
-void write_flush(int sockfd)
+void write_flush(sock_t sockfd)
 {
     size_t write_index = 0;
     while (write_index < out.end)
@@ -196,7 +196,7 @@ bool skip_to_packet_start()
     return true;
 }
 
-int read_packet(int sockfd)
+int read_packet(sock_t sockfd)
 {
     while (!skip_to_packet_start())
     {

@@ -682,7 +682,7 @@ static uint8_t process_packet()
 
 static void* network_read_thread(void* arg)
 {
-    int socket = *(int*)arg;
+    sock_t socket = *(sock_t*)arg;
 
     while (1)
     {
@@ -705,7 +705,7 @@ static void* network_read_thread(void* arg)
 
 static void* network_write_thread(void* arg)
 {
-    int socket = *(int*)arg;
+    sock_t socket = *(sock_t*)arg;
 
     while (1)
     {
