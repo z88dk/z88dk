@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <signal.h>
 #ifdef WIN32
 #include <io.h>
 #else
@@ -18,6 +19,7 @@
 #include "syms.h"
 #include "linenoise.h"
 #include "srcfile.h"
+
 
 #define HISTORY_FILE ".ticks_history.txt"
 
@@ -151,6 +153,7 @@ breakpoint *breakpoints;
 breakpoint *watchpoints;
 
        int debugger_active = 0;
+       int break_required = 0;
        int next_address = -1;
        int trace = 0;
 static int hotspot = 0;
@@ -162,9 +165,13 @@ static int hotspots_t[65536];
 
 static int interact_with_tty = 0;
 
+void ctrl_c_handler(int dummy) {
+    break_required = 1;
+}
 
 void debugger_init()
 {
+    signal(SIGINT, ctrl_c_handler);
     linenoiseSetCompletionCallback(completion, NULL);
     linenoiseHistoryLoad(HISTORY_FILE); /* Load the history at startup */
     atexit(print_hotspots);
@@ -205,6 +212,17 @@ static void completion(const char *buf, linenoiseCompletions *lc, void *ctx)
             linenoiseAddCompletion(lc, cmd->cmd);
         }
         cmd++;
+    }
+}
+
+void debugger_process_signals()
+{
+    if (break_required)
+    {
+        printf("Requesting a break...\n");
+        bk.break_();
+        break_required = 0;
+        return;
     }
 }
 
@@ -398,7 +416,7 @@ void debugger()
         } else {
             /* Empty line is step */
             if ( freeline ) free(line);
-            debugger_active = 1;
+            bk.break_();
             break;
         }
     }
@@ -1015,6 +1033,7 @@ static int cmd_help(int argc, char **argv)
 
 static int cmd_quit(int argc, char **argv)
 {
+    bk.detach();
     exit(0);
 }
 

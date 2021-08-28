@@ -995,7 +995,10 @@ int main (int argc, char **argv){
 
   do{
     char buf[256];
-    if ( ih ) debugger();
+    if ( ih ) {
+        debugger_process_signals();
+        debugger();
+    }
     if( pc==start )
       st= 0,
       stint= intr,
