@@ -22,7 +22,7 @@ obj/8080:
 
 obj/8085:
 	mkdir -p obj/8085/8085
-	$(ASSEMBLER) -Oobj/8085/8085 -I..  -DCPU_8085 -m8085 @crt0_8080.lst
+	$(ASSEMBLER) -Oobj/8085/8085 -I..  -DCPU_8085 -m8085 @crt0_8085.lst
 
 obj/gbz80:
 	mkdir -p obj/gbz80/gbz80
