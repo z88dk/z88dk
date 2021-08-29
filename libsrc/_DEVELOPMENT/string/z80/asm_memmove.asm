@@ -32,7 +32,7 @@ asm_memmove:
 
    ld a,b
    or c
-   jp z, asm1_memcpy
+   jp Z, asm1_memcpy
    
    ; Because of the possibility of overlap between
    ; dst and src, we have two scenarios:
@@ -44,14 +44,14 @@ asm_memmove:
    
    ld a,d
    cp h
-   jp c, asm0_memcpy
-   jr nz, use_lddr
+   jp C, asm0_memcpy
+   jp NZ, use_lddr
    
    ld a,e
    cp l
-   jp c, asm0_memcpy
+   jp C, asm0_memcpy
    
-   jp z, asm1_memcpy           ; if dst == src, do nothing
+   jp Z, asm1_memcpy           ; if dst == src, do nothing
 
 use_lddr:
 
@@ -64,8 +64,11 @@ use_lddr:
    ex de,hl
    
    push de
-   
+
+IF !__CPU_8085__
    inc bc
+ENDIF
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
 loop:
  IF __CPU_GBZ80__
@@ -77,9 +80,16 @@ loop:
    ld (de),a
    dec de
    dec bc
+
+IF __CPU_8085__
+   jp NK,loop
+   inc bc
+ELSE
    ld a,b
    or c
-   jr nz,loop
+   jp NZ,loop
+ENDIF
+
 ELSE
    lddr
 ENDIF

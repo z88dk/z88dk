@@ -50,23 +50,34 @@ IF __CPU_GBZ80__
    ld (__memccpy_value),a
 ENDIF
 
+IF __CPU_8085__
+   dec bc
+ENDIF
+
 loop:
 IF __CPU_GBZ80__
    ld a,(__memccpy_value)
 ENDIF
    cp (hl)
-IF __CPU_GBZ80__ || __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    inc hl
    inc de
    dec bc
-   jr z,match
+   jp Z,match
+
+IF __CPU_8085__
+   jp NK,loop
+   inc bc
+ELSE
    ld a,b
    or c
-   jr nz,loop
+   jp NZ,loop
+ENDIF
+
 ELSE
    ldi
-   jr z, match
-   jp pe, loop
+   jr Z, match
+   jp PE, loop
 ENDIF
 
 nomatch:

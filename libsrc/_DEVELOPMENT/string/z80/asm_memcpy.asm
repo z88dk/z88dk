@@ -77,11 +77,16 @@ ELSE
 
    ld a,b
    or c
-   jr z, zero_n
+   jr Z, zero_n
 
 asm0_memcpy:
 
    push de
+
+IF __CPU_8085__
+   dec bc
+ENDIF
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
 loop:
  IF __CPU_GBZ80__
@@ -93,9 +98,16 @@ loop:
    ld (de),a
    inc de
    dec bc
+
+IF __CPU_8085__
+   jp NK,loop
+   inc bc
+ELSE
    ld a,b
    or c
-   jr nz,loop
+   jp NZ,loop
+ENDIF
+
 ELSE
    ldir
 ENDIF

@@ -36,22 +36,32 @@ asm_memset_wr:
    or c
 
    ld a,e
-   ld e,l
-   ld d,h
+   ld de,hl
 
-   ret z
+   ret Z
 
    push hl
    ld   e,a
+
+IF __CPU_8085__
+   dec bc
+ENDIF
+
 loop:
    ld (hl),e
    inc hl
    dec bc
-   ld  a,b
-   or  c
-   jr  nz,loop
+
+IF __CPU_8085__
+   jp NK,loop
+   inc bc
+ELSE
+   ld a,b
+   or c
+   jp NZ,loop
+ENDIF
+
    ex  de,hl
    pop hl
    ret
-
 

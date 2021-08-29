@@ -36,7 +36,7 @@ asm_memset:
    ld e,l
    ld d,h
 
-   ret z
+   ret Z
 
    ld (hl),a
    inc de
@@ -50,7 +50,7 @@ IF (__CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_MEMSET)
    jr nz, big
    
    or c
-   ret z
+   ret Z
    
    push hl
    
@@ -75,10 +75,15 @@ ELSE
    ld a,b
    or c
    
-   ret z
+   ret Z
 
    push hl
-IF __CPU_GBZ80__ || __CPU_INTEL__
+
+IF __CPU_8085__
+   dec bc
+ENDIF
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
 loop:
  IF __CPU_GBZ80__
    ld a,(hl+)
@@ -89,10 +94,17 @@ loop:
    ld (de),a
    inc de
    dec bc
+
+IF __CPU_8085__
+   jp NK,loop
+   inc bc
+ELSE
    ld a,b
    or c
-   jr nz,loop
-ELSE 
+   jp NZ,loop
+ENDIF
+
+ELSE
    ldir
 ENDIF
    

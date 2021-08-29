@@ -54,7 +54,7 @@ ELSE
    cpdr   
 ENDIF
    inc hl
-   ret z                       ; char found
+   ret Z                       ; char found
 
 notfound:
 

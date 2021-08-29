@@ -28,22 +28,33 @@ asm__memupr:
 
    ld a,b
    or c
-   ret z
-   
+   ret Z
+
    push hl
+
+IF __CPU_8085__
+   dec bc
+ENDIF
 
 loop:
 
    ld a,(hl)
    call asm_toupper
    ld (hl),a
-   
-IF __CPU_GBZ80__
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
    inc hl
    dec bc
+
+IF __CPU_8085__
+   jp NK,loop
+   inc bc
+ELSE
    ld a,b
    or c
-   jp nz,loop
+   jp NZ,loop
+ENDIF
+
 ELSE
    cpi                         ; hl++, bc--
    jp pe, loop
