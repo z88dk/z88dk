@@ -119,6 +119,13 @@ void debug_add_cline(const char *filename, int lineno, int level, int scope_bloc
     cl->level = level;
     cl->scope_block = scope_block;
     HASH_ADD_INT(cf->lines, line, cl);
+    if (clines[cl->address]) {
+        if (clines[cl->address]->line < lineno) {
+            return;
+        } else {
+            free(clines[cl->address]);
+        }
+    }
     clines[cl->address] = cl;  // TODO Banking
 }
 
