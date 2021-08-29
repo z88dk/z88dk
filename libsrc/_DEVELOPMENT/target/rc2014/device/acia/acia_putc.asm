@@ -7,7 +7,6 @@
     PUBLIC _acia_putc
 
     EXTERN aciaTxCount, aciaTxIn, aciaTxBuffer, aciaControl
-    EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 
     _acia_putc:
         ; enter    : l = char to output
@@ -17,11 +16,11 @@
 
         ld a,(aciaTxCount)          ; get the number of bytes in the Tx buffer
         or a                        ; check whether the buffer is empty
-        jr NZ,putc_buffer_tx        ; buffer not empty, so abandon immediate Tx
+        jp NZ,putc_buffer_tx        ; buffer not empty, so abandon immediate Tx
 
         in a,(__IO_ACIA_STATUS_REGISTER)    ; get the status of the ACIA
         and __IO_ACIA_SR_TDRE       ; check whether a byte can be transmitted
-        jr Z,putc_buffer_tx         ; if not, so abandon immediate Tx
+        jp Z,putc_buffer_tx         ; if not, so abandon immediate Tx
 
         ld a,l                      ; retrieve Tx character
         out (__IO_ACIA_DATA_REGISTER),a     ; immediately output the Tx byte to the ACIA
@@ -31,7 +30,7 @@
     putc_buffer_tx:
         ld a,(aciaTxCount)          ; Get the number of bytes in the Tx buffer
         cp __IO_ACIA_TX_SIZE-1      ; check whether there is space in the buffer
-        jr NC,putc_buffer_tx_overflow   ; buffer full, so drop the Tx byte and return
+        jp NC,putc_buffer_tx_overflow   ; buffer full, so drop the Tx byte and return
 
         ld a,l                      ; Tx byte
         ld hl,(aciaTxIn)            ; get the pointer to where we poke
@@ -67,7 +66,7 @@ ENDIF
 
     putc_buffer_tx_overflow:
         ld l,1                      ; indicate Tx buffer was full
-        jr putc_buffer_tx_exit
+        jp putc_buffer_tx_exit
 
     EXTERN _acia_need
     defc NEED = _acia_need
