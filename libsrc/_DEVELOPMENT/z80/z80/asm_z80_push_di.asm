@@ -36,7 +36,7 @@ ELSE
    push hl
 
 
-IF __8085
+IF __CPU_8085__
 
    rim
 

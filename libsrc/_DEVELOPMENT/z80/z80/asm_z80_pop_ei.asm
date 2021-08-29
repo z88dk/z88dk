@@ -63,7 +63,7 @@ asm_cpu_pop_ei_jp:
 
    pop af                      ; af = ei_di_status
 
-IF __8085
+IF __CPU_8085__
 
    and $08                     ; isolate IE bit
    jp Z,di_state               ; or fall through to ei_state

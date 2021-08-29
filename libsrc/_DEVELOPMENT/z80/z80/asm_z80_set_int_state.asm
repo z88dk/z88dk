@@ -33,7 +33,7 @@ IF __CPU_R2KA__ | __CPU_R3K__
 
 ELSE
 
-IF __8085
+IF __CPU_8085__
 
    and $80                     ; isolate IE bit
 
