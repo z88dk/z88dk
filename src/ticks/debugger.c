@@ -142,7 +142,7 @@ static command commands[] = {
     { "out",    cmd_out,           "<address> <value>", "Send to IO bus"},
     { "trace",  cmd_trace,         "<on/off>", "Disassemble every instruction"},
     { "hotspot",cmd_hotspot,       "<on/off>", "Track address counts and write to hotspots file"},
-    { "list",   cmd_list,          "<address>",   "List the source code at the given address"},
+    { "list",   cmd_list,          "[<address>]",   "List the source code at location given or pc"},
     { "help",   cmd_help,          "",   "Display this help text" },
     { "quit",   cmd_quit,          "",   "Quit ticks"},
     { NULL, NULL, NULL }
@@ -471,9 +471,10 @@ static int cmd_backtrace(int argc, char **argv)
         int   lineno;
 
         if ( debug_find_source_location(at, &filename, &lineno) < 0 ) {
-            printf("    %s+%d (unknown location)\n", sym->name, offset);
+            printf("  %s+%d (unknown location)\n", sym->name, offset);
         } else {
-            printf("    %s+%d at %s:%d\n", sym->name, offset, filename, lineno);
+            printf("  %s+%d at %s:%d\n", sym->name, offset, filename, lineno);
+            srcfile_display(filename, lineno, 1, lineno);
         }
 
         if (offset <= 6) {
@@ -1047,12 +1048,20 @@ static int cmd_list(int argc, char **argv)
     const char *filename;
     int   lineno;
 
-    if ( debug_find_source_location(addr, &filename, &lineno) < 0 ) {
-        printf("No mapping found for $%04x\n",pc);
-    } else {
-        srcfile_display(filename, lineno - 5, 10, lineno);
+    if ( argc == 2 ) {
+        int a2 = parse_address(argv[1]);
+
+        if ( a2 != -1 ) {
+            addr = a2;
+        }
     }
 
+    if ( debug_find_source_location(addr, &filename, &lineno) < 0 ) {
+        printf("No mapping found for $%04x\n",pc);
+        return 0;
+    }
+    srcfile_display(filename, lineno - 5, 10, lineno);
+    
     return 0;
 }
 
