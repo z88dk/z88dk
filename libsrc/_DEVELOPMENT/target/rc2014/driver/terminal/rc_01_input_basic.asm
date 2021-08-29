@@ -118,15 +118,15 @@ EXTERN rc_01_input_basic_stdio_msg_flsh
 rc_01_input_basic:
 
    cp ITERM_MSG_GETC
-   jp z, rc_01_input_basic_iterm_msg_getc
+   jp Z, rc_01_input_basic_iterm_msg_getc
    
    cp ITERM_MSG_INTERRUPT
-   jp z, rc_01_input_basic_iterm_msg_interrupt
+   jp Z, rc_01_input_basic_iterm_msg_interrupt
 
    cp ITERM_MSG_REJECT
-   jp z, rc_01_input_basic_iterm_msg_reject
+   jp Z, rc_01_input_basic_iterm_msg_reject
    
    cp STDIO_MSG_FLSH
-   jp z, rc_01_input_basic_stdio_msg_flsh
+   jp Z, rc_01_input_basic_stdio_msg_flsh
    
    jp console_01_input_terminal    ; forward to library

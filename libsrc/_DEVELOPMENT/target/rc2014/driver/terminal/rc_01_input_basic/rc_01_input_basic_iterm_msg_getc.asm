@@ -19,13 +19,13 @@ rc_01_input_basic_iterm_msg_getc:
    ; a = ascii code
 
    cp 32
-   ret nc
+   ret NC
    
    cp 10
-   jr z, key_cr
+   jp Z, key_cr
    
    cp 13
-   jr z, key_lf
+   jp Z, key_lf
 
    or a                        ; reset carry to indicate success
    ret

@@ -20,7 +20,7 @@ rc_01_input_basic_iterm_msg_interrupt:
    cp CHAR_CTRL_C
    
    scf
-   ret nz                      ; continue editing if not ctrl-c
+   ret NZ                      ; continue editing if not ctrl-c
    
    ; users expect ctrl-c to terminate the program
    ; terminating the edit would return with carry reset

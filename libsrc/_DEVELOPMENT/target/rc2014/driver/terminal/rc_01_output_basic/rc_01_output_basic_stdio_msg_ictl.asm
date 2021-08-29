@@ -25,10 +25,10 @@ rc_01_output_basic_stdio_msg_ictl:
    ; uses  : af, bc, de, hl
    
    ; flag bits managed by stdio?
-   
+
    ld a,h
    or l
-   jr nz, ioctl_message
+   jp NZ, ioctl_message
 
    call qualify
    jp asm_vioctl_driver
@@ -41,15 +41,15 @@ qualify:
 
    ld a,e
    or a
-   jr nz, part_2
+   jp NZ, part_2
 
 part_1:
 
    dec d
-   ret z
-   
+   ret Z
+
    dec d
-   ret z
+   ret Z
 
 reject:
 
@@ -60,37 +60,37 @@ part_2:
 
    inc d
    dec d
-   jr nz, reject
-   
+   jp NZ, reject
+
    cp $10
-   ret z
+   ret Z
    
    cp $20
-   ret z
-   
+   ret Z
+
    jr reject
 
 ioctl_message:
 
    ; check that message is specifically for an output terminal
-   
+
    ld a,e
    cp $02                      ; output terminal messages are type $02
-   jp nz, error_einval_zc
+   jp NZ, error_einval_zc
 
    ld a,d
    cp $06
-   jp nz, error_einval_zc
+   jp NZ, error_einval_zc
 
 _ioctl_get_oterm:
 
    ; return the address of this oterm's FDSTRUCT
-   
+
    push ix
    pop hl
-   
+
    dec hl
    dec hl
    dec hl
-   
+
    ret

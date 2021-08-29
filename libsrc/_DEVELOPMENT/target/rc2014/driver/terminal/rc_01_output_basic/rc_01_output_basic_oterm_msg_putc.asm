@@ -16,19 +16,19 @@ rc_01_output_basic_oterm_msg_putc:
    ; char to print is coming from stdio
    
    bit 5,(ix+6)
-   jr z, cooked                ; if cook is disabled
+   jr Z, cooked                ; if cook is disabled
 
    ; tty emulation is enabled
    
    ld a,OTERM_MSG_TTY
    
    call l_jpix                 ; carry reset if tty absorbed char
-   ret nc                      ; if tty absorbed char
+   ret NC                      ; if tty absorbed char
    
    ld a,c
    
    cp CHAR_BELL
-   jr nz, cooked
+   jp NZ, cooked
 
 putchar_bell:
 
@@ -43,13 +43,13 @@ rc_01_output_basic_oterm_msg_putc_raw:
    ld a,c
 
    bit 4,(ix+6)
-   jp z, 0x08                  ; if not processing crlf
+   jp Z, 0x08                  ; if not processing crlf
 
    cp CHAR_CR
-   ret z                       ; ignore cr
+   ret Z                       ; ignore cr
 
    cp CHAR_LF
-   jp nz, 0x08
+   jp NZ, 0x08
 
    ; send cr+lf
    

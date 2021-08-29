@@ -19,10 +19,10 @@ rc_01_output_basic_iterm_msg_putc:
    
    ld a,c
    cp 32
-   jp nc, rc_01_output_basic_oterm_msg_putc_raw
+   jp NC, rc_01_output_basic_oterm_msg_putc_raw
 
    cp CHAR_LF
-   jp z, rc_01_output_basic_oterm_msg_putc_raw
+   jp Z, rc_01_output_basic_oterm_msg_putc_raw
 
    ld c,'?'
    jp rc_01_output_basic_oterm_msg_putc_raw
