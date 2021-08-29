@@ -531,6 +531,7 @@ ENDIF
       
    ENDIF
    
+   
    IFDEF CRT_ENABLE_TRAP
    
       defc __crt_enable_trap = CRT_ENABLE_TRAP
@@ -548,6 +549,85 @@ ENDIF
       ENDIF
       
    ENDIF
+
+IF __8085
+
+   IFDEF CRT_ENABLE_INT55
+   
+      defc __crt_enable_int55 = CRT_ENABLE_INT55
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_int55
+      
+         defc __crt_enable_int55 = TAR__crt_enable_int55
+      
+      ELSE
+      
+         defc __crt_enable_int55 = DEF__crt_enable_int55
+      
+      ENDIF
+      
+   ENDIF
+   
+   
+   IFDEF CRT_ENABLE_INT65
+   
+      defc __crt_enable_int65 = CRT_ENABLE_INT65
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_int65
+      
+         defc __crt_enable_int65 = TAR__crt_enable_int65
+      
+      ELSE
+      
+         defc __crt_enable_int65 = DEF__crt_enable_int65
+      
+      ENDIF
+      
+   ENDIF
+   
+   
+   IFDEF CRT_ENABLE_INT65
+   
+      defc __crt_enable_int75 = CRT_ENABLE_INT65
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_int75
+      
+         defc __crt_enable_int75 = TAR__crt_enable_int75
+      
+      ELSE
+      
+         defc __crt_enable_int75 = DEF__crt_enable_int75
+      
+      ENDIF
+      
+   ENDIF
+   
+   
+   IFDEF CRT_ENABLE_RST40H
+   
+      defc __crt_enable_rst40h = CRT_ENABLE_RST40H
+   
+   ELSE
+   
+      IFDEF TAR__crt_enable_rst40h
+      
+         defc __crt_enable_rst40h = TAR__crt_enable_rst40h
+      
+      ELSE
+      
+         defc __crt_enable_rst40h = DEF__crt_enable_rst40h
+      
+      ENDIF
+      
+   ENDIF
+
+ENDIF
 
    ;; rules that must be processed by m4
    
