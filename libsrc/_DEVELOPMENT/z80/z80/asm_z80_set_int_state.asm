@@ -64,5 +64,3 @@ di_state:
    ret
 
 ENDIF
-
-ENDIF
