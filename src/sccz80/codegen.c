@@ -1420,6 +1420,11 @@ void gen_leave_function(Kind vartype, char type, int incritical)
             callrts("l_i64_copy");
         }
 
+        if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
+            gen_pop_frame();
+            Zsp += 2;
+        }
+
         if ( c_notaltreg && ( vartype != KIND_NONE && vartype != KIND_DOUBLE && vartype != KIND_LONGLONG) && abs(Zsp) >= 11 ) {
             // 8080, save hl, pop return int hl
             ol("ld\t(saved_hl),hl");
@@ -1442,9 +1447,9 @@ void gen_leave_function(Kind vartype, char type, int incritical)
             ol("ld\thl,(saved_hl)");
          }
          Zsp = savesp;
+    } else {
+        gen_pop_frame(); /* Restore previous frame pointer */
     }
-    gen_pop_frame(); /* Restore previous frame pointer */
-
 
     if ( (currfn->flags & INTERRUPT) == INTERRUPT ) {
         gen_interrupt_leave(currfn);
