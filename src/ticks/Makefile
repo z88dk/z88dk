@@ -20,6 +20,11 @@ GDBLDFLAGS = -lpthread
 CFLAGS += -I../../ext/uthash/src/ -g -MMD $(UNIXem_CFLAGS)
 LDFLAGS = -lm
 
+
+ifeq ($(EXESUFFIX),.exe)
+  GDBLDFLAGS += -lws2_32
+endif
+
 all: z88dk-ticks$(EXESUFFIX) z88dk-dis$(EXESUFFIX) z88dk-gdb$(EXESUFFIX)
 
 z88dk-ticks$(EXESUFFIX):	$(OBJS)

@@ -9,6 +9,9 @@
 #include <winsock2.h>
 typedef SOCKET sock_t;
 #else
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 typedef int sock_t;
 #endif
 

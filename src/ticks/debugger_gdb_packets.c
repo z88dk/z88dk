@@ -7,11 +7,6 @@
 #include <assert.h>
 #include <unistd.h>
 #include <stdbool.h>
-#include <sys/poll.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
 #include "debugger_gdb_packets.h"
 
 struct packet_buf
