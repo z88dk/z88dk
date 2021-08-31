@@ -118,6 +118,7 @@ static int cmd_out(int argc, char **argv);
 static int cmd_trace(int argc, char **argv);
 static int cmd_hotspot(int argc, char **argv);
 static int cmd_list(int argc, char **argv);
+static int cmd_restore(int argc, char **argv);
 static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
 static void print_hotspots();
@@ -144,6 +145,7 @@ static command commands[] = {
     { "hotspot",cmd_hotspot,       "<on/off>", "Track address counts and write to hotspots file"},
     { "list",   cmd_list,          "[<address>]",   "List the source code at location given or pc"},
     { "help",   cmd_help,          "",   "Display this help text" },
+    { "restore",cmd_restore,       "<path> [<address>]",   "Upload binary into machine memory"},
     { "quit",   cmd_quit,          "",   "Quit ticks"},
     { NULL, NULL, NULL }
 };
@@ -948,7 +950,7 @@ static int cmd_set(int argc, char **argv)
     } else {
         printf("Incorrect number of arguments\n");
     }
-    return 0;
+    return 1;
 }
 
 
@@ -1038,7 +1040,26 @@ static int cmd_quit(int argc, char **argv)
     exit(0);
 }
 
+static int cmd_restore(int argc, char **argv)
+{
+    int address;
+    if ( argc == 3 ) {
+        address = parse_address(argv[2]);
+    } else {
+        address = symbol_resolve("__head");
+        if (address == -1) {
+            printf("Warning: could not resolve starting address and no address is provided.\n");
+            return 0;
+        }
+    }
 
+    if (bk.restore(argv[1], address))
+    {
+        return 0;
+    }
+
+    return 1;
+}
 
 static int cmd_list(int argc, char **argv)
 {
