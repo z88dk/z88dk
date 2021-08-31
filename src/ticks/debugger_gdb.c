@@ -157,7 +157,7 @@ int hex(char ch)
     return (-1);
 }
 
-char *mem2hex(const char *mem, char *buf, uint32_t count)
+char *mem2hex(const uint8_t *mem, char *buf, uint32_t count)
 {
     unsigned char ch;
     for (int i = 0; i < count; i++)
@@ -170,7 +170,7 @@ char *mem2hex(const char *mem, char *buf, uint32_t count)
     return (buf);
 }
 
-char *hex2mem(const char *buf, char *mem, uint32_t count)
+uint8_t *hex2mem(const char *buf, uint8_t *mem, uint32_t count)
 {
     unsigned char ch;
     for (int i = 0; i < count; i++)
@@ -424,13 +424,18 @@ void set_regs(struct debugger_regs_t* regs)
 
     char req[128] = {0};
     req[0] = 'G';
-    mem2hex((void*)rr, &req[1], register_mappings_count * 4);
+    mem2hex((void*)rr, &req[1], register_mappings_count * 2);
 
     const char* resp = send_request(req);
 
     if (strcmp(resp, "OK") != 0)
     {
         printf("Warning: could not set the registers: %s\n", resp);
+    }
+    else
+    {
+        registers_invalidated = 1;
+        fetch_registers();
     }
 }
 
@@ -539,6 +544,47 @@ void debugger_step()
     debugger_active = 0;
 }
 
+uint8_t debugger_restore(const char* file_path, uint16_t at)
+{
+    FILE *f = fopen(file_path, "rb");
+    if (f == NULL)
+    {
+        printf("Could not open file.\n");
+        return 1;
+    }
+
+    size_t addr = at;
+
+    uint8_t buff[256];
+    size_t read_;
+    while ((read_ = fread(buff, 1, 256, f)))
+    {
+        char s[1024];
+        int offset;
+        sprintf(s, "M%zx,%zx:%n", addr, read_, &offset);
+        mem2hex(buff, &s[offset], read_);
+        const char* response = send_request(s);
+        if (strcmp(response, "OK") != 0)
+        {
+            printf("Warning: Cannot restore file at addr %zx: %s\n", addr, response);
+            return 1;
+        }
+
+        addr += read_;
+    }
+
+    fclose(f);
+
+    mem_requested_amount = 0;
+
+    // zero out all registers except for pc
+    struct debugger_regs_t regs;
+    memset(&regs, 0, sizeof(regs));
+    regs.pc = at;
+    set_regs(&regs);
+    return 0;
+}
+
 static backend_t gdb_backend = {
     .st = &get_st,
     .ff = &get_ff,
@@ -559,6 +605,7 @@ static backend_t gdb_backend = {
     .next = &debugger_next,
     .step = &debugger_step,
     .detach = &debugger_detach,
+    .restore = &debugger_restore,
     .add_breakpoint = &add_breakpoint,
     .remove_breakpoint = &remove_breakpoint,
     .disable_breakpoint = &disable_breakpoint,

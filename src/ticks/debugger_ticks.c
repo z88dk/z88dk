@@ -126,6 +126,10 @@ void invalidate() {}
 void break_() {}
 void resume() {}
 void detach() {}
+uint8_t restore(const char* file_path, uint16_t at) {
+    printf("Not supported.\n");
+    return 1;
+}
 void add_breakpoint(uint8_t type, uint16_t at, uint8_t sz) {}
 void remove_breakpoint(uint8_t type, uint16_t at, uint8_t sz) {}
 void disable_breakpoint(uint8_t type, uint16_t at, uint8_t sz) {}
@@ -193,6 +197,7 @@ backend_t ticks_debugger_backend = {
     .next = &next,
     .step = &step,
     .detach = &detach,
+    .restore = &restore,
     .add_breakpoint = &add_breakpoint,
     .remove_breakpoint = &remove_breakpoint,
     .disable_breakpoint = &disable_breakpoint,
