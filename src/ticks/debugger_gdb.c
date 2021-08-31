@@ -458,6 +458,7 @@ void debugger_break()
 void debugger_detach()
 {
     send_request("D");
+    shutdown(connection_socket, 0);
 }
 
 void debugger_resume()
@@ -708,7 +709,9 @@ static void* network_write_thread(void* arg)
     while (1)
     {
         pthread_mutex_lock(&network_op_mutex);
-        pthread_cond_wait(&network_op_cond, &network_op_mutex);
+        while (last_network_op == NULL) {
+            pthread_cond_wait(&network_op_cond, &network_op_mutex);
+        }
         // execute network operations from main thread
         while (last_network_op) {
             struct network_op* prev = last_network_op->prev;
@@ -716,8 +719,8 @@ static void* network_write_thread(void* arg)
             free(last_network_op);
             last_network_op = prev;
         }
-        pthread_mutex_unlock(&network_op_mutex);
         write_flush(socket);
+        pthread_mutex_unlock(&network_op_mutex);
     }
 
     return NULL;
