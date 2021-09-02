@@ -56,7 +56,7 @@ asm_strxfrm:
    
 IF __CPU_8085__
    dec bc
-ELSE
+ENDIF
 
 loop:
 

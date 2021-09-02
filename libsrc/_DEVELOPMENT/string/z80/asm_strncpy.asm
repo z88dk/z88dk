@@ -34,7 +34,7 @@ asm_strncpy:
 
    ld a,b
    or c
-   jr z, done
+   jp Z, done
       
    ; first copy src to dst
 
@@ -48,11 +48,11 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    inc de
    dec bc
    and a
-   jr z,copied
+   jp Z,copied
    ld a,c
    or c
-   jr z,done	;max characters
-   jr loop
+   jp Z,done                   ;max characters
+   jp loop
 copied:
    ; Now pad it out with zero
 zeroloop:
@@ -62,7 +62,7 @@ zeroloop:
    dec bc
    ld a,b
    or c
-   jr nz,zeroloop
+   jp NZ,zeroloop
 ELSE
    cp (hl)
    ldi
