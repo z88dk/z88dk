@@ -33,7 +33,7 @@ void debug_write_symbol(SYMBOL *sym)
 
     utstring_new(temp);
 
-    if ( sym->storage == LSTATIC) {
+    if ( sym->storage == LSTATIC ) {
         if ( sym->ctype->kind != KIND_FUNC ) {
             utstring_printf(temp,"S:F%.*s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,sym->name,sym->level);
         } else {
@@ -77,6 +77,7 @@ void debug_write_symbol(SYMBOL *sym)
         return;
     }
     // Encode the cdbstring and output it as a defc
+    utstring_printf(debug2_utstr, "; %s\n", utstring_body(temp));
     utstring_printf(debug2_utstr,"\tPUBLIC\t__CDBINFO__");
     encode_cdbstring(debug2_utstr, utstring_body(temp));
     utstring_printf(debug2_utstr,"\n");

@@ -1794,6 +1794,9 @@ static void declfunc(Type *functype, enum storage_type storage)
             functype->funcattrs.params_offset = currfn->ctype->funcattrs.params_offset;
         functype->funcattrs.shortcall_rst = currfn->ctype->funcattrs.shortcall_rst;
         functype->funcattrs.shortcall_value = currfn->ctype->funcattrs.shortcall_value;
+        if (currfn->storage == EXTERNAL)
+            currfn->storage = STATIK;
+        debug_write_symbol(currfn);
     } else {
         currfn = addglb(functype->name, functype, ID_VARIABLE, functype->kind, 0, storage);
         currfn->flags = functype->flags;
