@@ -14,6 +14,7 @@
 ;
 ; ===============================================================
 
+IF !__CPU_GBZ80__
 
 SECTION code_clib
 SECTION code_string
@@ -39,7 +40,7 @@ asm_strlcat:
    jp Z, szexceeded0
 
    xor a                       ; find end of string s1
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_INTEL__
    EXTERN __z80asm__cpir
    call __z80asm__cpir
 ELSE
@@ -60,18 +61,13 @@ ENDIF
 
 cpyloop:
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_INTEL__
    xor a
    cp (hl)                     ; end of src ?
-   jr Z, success
+   jp Z, success
 
-IF __CPU_GBZ80__
-   ld a,(hl+)
-ELSE
    ld a,(hl)
    inc hl
-ENDIF
-
    ld (de),a
    inc de
    dec bc
@@ -112,7 +108,7 @@ szexceeded1:
    dec hl                      ; hl = end of char *s2 (pointing at NUL)
    
    pop bc
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_INTEL__
 IF __CPU_8085__
    sub hl,bc
 ELSE
@@ -129,7 +125,7 @@ ENDIF
    ex de,hl                    ; de = strlen(s2 remnant)
 
    pop bc
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_INTEL__
 IF __CPU_8085__
    sub hl,bc                   ; hl = strlen(result s1)
 ELSE
@@ -143,7 +139,7 @@ ENDIF
 ELSE
    sbc hl,bc                   ; hl = strlen(result s1)
 ENDIF
-   
+
    add hl,de                   ; return strlen(s1)+strlen(s2)
    scf                         ; not enough space
 
@@ -158,7 +154,7 @@ szexceeded0:
    ; carry reset
    ; stack = char *s1
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_INTEL__
    EXTERN __z80asm__cpir
    call __z80asm__cpir
 ELSE
@@ -181,7 +177,7 @@ success:
    ; stack = char *s1
 
    pop bc
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_INTEL__
 IF __CPU_8085__
    sub hl,bc                   ; hl = strlen(s2)
 ELSE
@@ -197,3 +193,4 @@ ELSE
 ENDIF
    ret
 
+ENDIF
