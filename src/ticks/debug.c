@@ -3,45 +3,15 @@
 
 
 #include "debug.h"
-#include "uthash.h"
-#include "utlist.h"
+#include "backend.h"
 #include <ctype.h>
 #include <stdio.h>
+#include <stdbool.h>
 
-
-typedef struct cfile_s cfile;
-
-typedef struct {
-    int             line;
-    int             address;
-    cfile          *file;
-    int             level;
-    int             scope_block;
-    UT_hash_handle  hh;
-} cline;
-
-struct cfile_s {
-    char          *file;
-    cline         *lines;
-    UT_hash_handle hh;
-};
-
-
-
-// F:G$main$0_0$0({2}DF,SI:S),C,0,0,0,0,0
-typedef struct {
-    char   *name;
-    int     scope;
-    int     level;
-    size_t  size;
-    char   *proto; // String in 
-} FunctionRecord;
-
-
-
-static cfile   *cfiles = NULL;
-
-static cline    *clines[65536] = {0};
+static cfile *cfiles = NULL;
+static debug_sym_function *cfunctions = NULL;
+static debug_sym_symbol *csymbols = NULL;
+static cline *clines[65536] = {0};
 
 
 // Crude dehexer....
@@ -51,6 +21,488 @@ static int dehex(char c)
         return c - '0';
     } 
     return toupper(c) - 'A' + 10;
+}
+
+enum record_partning_mode {
+    RECORD_PARSING_MODE_BEGIN = 0,
+    RECORD_PARSING_MODE_D,
+    RECORD_PARSING_MODE_S,
+    RECORD_PARSING_MODE_STRUCTURE,
+    RECORD_PARSING_MODE_MAYBE_NEXT,
+    RECORD_PARSING_MODE_SIGN,
+    RECORD_PARSING_MODE_DONE,
+};
+
+static uint8_t parse_address_space(const char *encoded, address_space *address_space)
+{
+    address_space->address_space = *encoded++;
+
+    switch (address_space->address_space) {
+        case 'C':
+        case 'B':
+        case 'E': {
+            if (sscanf(encoded, ",%d,%d", &address_space->a, &address_space->b) != 2) {
+                return 1;
+            }
+            break;
+        }
+        default: {
+            printf("Warning: unsupported address space: %s\n", encoded);
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+static uint8_t parse_record_type(const char* rt, type_record* record)
+{
+    int end;
+    int size;
+    if (sscanf(rt, "{%d}%n", &size, &end) != 1)
+    {
+        return 1;
+    }
+
+    record->size = size;
+    record->first = NULL;
+    rt += end;
+
+    enum record_partning_mode mode = RECORD_PARSING_MODE_BEGIN;
+    char structure[128];
+    uint8_t structure_size = 0;
+
+    type_chain* last = NULL;
+
+    char c;
+    while ((c = *rt++)) {
+
+        switch (mode) {
+            case RECORD_PARSING_MODE_BEGIN: {
+                // new chain entry
+
+                {
+                    type_chain* next = malloc(sizeof(type_chain));
+                    if (last != NULL) {
+                        last->next = next;
+                    } else {
+                        record->first = next;
+                    }
+                    next->type_ = TYPE_UNKNOWN;
+                    next->data = NULL;
+                    next->next = NULL;
+                    last = next;
+                }
+
+                switch (c) {
+                    case 'D': {
+                        mode = RECORD_PARSING_MODE_D;
+                        break;
+                    }
+                    case 'S': {
+                        mode = RECORD_PARSING_MODE_S;
+                        break;
+                    }
+                    default: {
+                        printf("Warning: unkown type starting with %c.\n", c);
+                        goto err;
+                    }
+                }
+
+                break;
+            }
+            case RECORD_PARSING_MODE_D: {
+                /*
+                    DF	Function
+                    DG	Generic pointer
+                    DC	Code pointer
+                    DX	External ram pointer
+                    DD	Internal ram pointer
+                    DP	Paged pointer
+                    DI	Upper 128 byte pointer
+                 */
+
+                mode = RECORD_PARSING_MODE_MAYBE_NEXT;
+
+                switch (c) {
+                    case 'F': {
+                        last->type_ = TYPE_FUNCTION;
+                        break;
+                    }
+                    case 'G': {
+                        last->type_ = TYPE_GENERIC_POINTER;
+                        break;
+                    }
+                    case 'C': {
+                        last->type_ = TYPE_CODE_POINTER;
+                        break;
+                    }
+                    case 'X': {
+                        last->type_ = TYPE_EXTERNAL_RAM_POINTER;
+                        break;
+                    }
+                    case 'D': {
+                        last->type_ = TYPE_INTERNAL_RAM_POINTER;
+                        break;
+                    }
+                    case 'P': {
+                        last->type_ = TYPE_PAGED_POINTER;
+                        break;
+                    }
+                    case 'V': {
+                        last->type_ = TYPE_VOID;
+                        break;
+                    }
+                    case 'I': {
+                        last->type_ = TYPE_UPPER_128B_POINTER;
+                        break;
+                    }
+                    default: {
+                        printf("Warning: unkown type D%c.\n", c);
+                        goto err;
+                    }
+                }
+
+                break;
+            }
+            case RECORD_PARSING_MODE_S: {
+                /*
+                    SL	long
+                    SI	int
+                    SC	char
+                    SS	short
+                    SV	void
+                    SF	float
+                    ST<name> Structure of name <name>
+                 */
+
+                mode = RECORD_PARSING_MODE_MAYBE_NEXT;
+
+                switch (c) {
+                    case 'L': {
+                        last->type_ = TYPE_LONG;
+                        break;
+                    }
+                    case 'I': {
+                        last->type_ = TYPE_INT;
+                        break;
+                    }
+                    case 'C': {
+                        last->type_ = TYPE_CHAR;
+                        break;
+                    }
+                    case 'S': {
+                        last->type_ = TYPE_SHORT;
+                        break;
+                    }
+                    case 'V': {
+                        last->type_ = TYPE_VOID;
+                        break;
+                    }
+                    case 'F': {
+                        last->type_ = TYPE_FLOAT;
+                        break;
+                    }
+                    case 'T': {
+                        last->type_ = TYPE_STRUCTURE;
+                        mode = RECORD_PARSING_MODE_STRUCTURE;
+                        break;
+                    }
+                    default: {
+                        printf("Warning: unkown type F%c.\n", c);
+                        goto err;
+                    }
+                }
+
+                break;
+            }
+            case RECORD_PARSING_MODE_MAYBE_NEXT: {
+                switch (c) {
+                    case ',': {
+                        mode = RECORD_PARSING_MODE_BEGIN;
+                        break;
+                    }
+                    case ':': {
+                        mode = RECORD_PARSING_MODE_SIGN;
+                        break;
+                    }
+                    default: {
+                        goto err;
+                    }
+                }
+                break;
+            }
+            case RECORD_PARSING_MODE_STRUCTURE: {
+                switch (c) {
+                    case ',': {
+                        structure[structure_size] = 0;
+                        last->data = strdup(structure);
+                        mode = RECORD_PARSING_MODE_BEGIN;
+                        break;
+                    }
+                    case ':': {
+                        structure[structure_size] = 0;
+                        last->data = strdup(structure);
+                        structure[structure_size] = 0;
+                        mode = RECORD_PARSING_MODE_SIGN;
+                        break;
+                    }
+                    default: {
+                        structure[structure_size++] = c;
+                    }
+                }
+                break;
+            }
+            case RECORD_PARSING_MODE_SIGN: {
+                if (c == 'S') {
+                    record->signed_ = 1;
+                }
+                mode = RECORD_PARSING_MODE_DONE;
+                break;
+            }
+            case RECORD_PARSING_MODE_DONE: {
+                printf("Warning: data after sign.\n");
+                goto err;
+            }
+        }
+    }
+
+    return 0;
+
+err:
+    {
+        type_chain* c = record->first;
+
+        while (c)
+        {
+            type_chain* next = c->next;
+            free(c);
+            c = next;
+        }
+
+        record->first = NULL;
+    };
+
+    return 1;
+}
+
+static void debug_add_function_info(const char* encoded)
+{
+    // F:G$main$0_0$0({0}DF,SI:S),C,0,0,0,0,0
+    // F:Fother.c$haha2$0_0$0({0}DF,DV),C,0,0
+
+    debug_sym_function* f = malloc(sizeof(debug_sym_function));
+
+    char function_scope = *encoded++;
+    switch (function_scope)
+    {
+        case 'F':
+        {
+            // file scope
+            char file_name[FILENAME_MAX];
+            if (sscanf(encoded, "%[^$]$", file_name) != 1) {
+                goto err;
+            }
+            encoded += strlen(file_name) + 1;
+            f->scope = FUNCTION_SCOPE_FILE;
+            f->scope_value = strdup(file_name);
+            break;
+        }
+        case 'G':
+        {
+            // global scope
+            f->scope = FUNCTION_SCOPE_GLOBAL;
+            f->scope_value = NULL;
+
+            if (*encoded != '$') {
+                goto err;
+            }
+            encoded++;
+            break;
+        }
+        case 'L':
+        {
+            // function scope
+            char function_name[255];
+            if (sscanf(encoded, "%[^$]$", function_name) != 1) {
+                goto err;
+            }
+            encoded += strlen(function_name) + 1;
+            f->scope = FUNCTION_SCOPE_FUNCTION;
+            f->scope_value = strdup(function_name);
+            break;
+        }
+        default:
+        {
+            printf("Warning: unknown function scope: %c\n", function_scope);
+            return;
+        }
+    }
+
+    char function_name[255];
+    char level[32];
+    char block[32];
+    char type_record[128];
+    int end;
+
+    if (sscanf(encoded, "%[^$]$%[^$]$%[^(](%[^)]),%n", function_name, level, block, type_record, &end) != 4) {
+        goto err;
+    }
+    f->function_name = strdup(function_name);
+    f->arguments = NULL;
+    encoded += end;
+
+    if (f->scope == FUNCTION_SCOPE_GLOBAL) {
+        strcpy(f->name, f->function_name);
+    } else {
+        sprintf(f->name, "%s.%s", f->scope_value, f->function_name);
+    }
+
+    if (parse_record_type(type_record, &f->type_record)) {
+        printf("Warning cannot parse type record.\n");
+        goto err;
+    }
+
+    if (parse_address_space(encoded, &f->address_space)) {
+        printf("Warning cannot parse address space.\n");
+        goto err;
+    }
+
+    HASH_ADD_STR(cfunctions, name, f);
+
+    return;
+
+err:
+    free(f);
+    printf("Warning: could not add debug info on function.\n");
+}
+
+static void debug_add_symbol_info(const char* encoded)
+{
+    // S:G$VALUE_0$0_0$0({0}),E,0,0
+    // S:Lother.c.haha2$c$0_0$0({2}SI:S),B,1,4
+
+    debug_sym_symbol* s = malloc(sizeof(debug_sym_symbol));
+
+    char symbol_scope = *encoded++;
+    switch (symbol_scope)
+    {
+        case 'F':
+        {
+            // file scope
+            char file_name[FILENAME_MAX];
+            if (sscanf(encoded, "%[^$]$", file_name) != 1) {
+                goto err;
+            }
+            encoded += strlen(file_name) + 1;
+            s->scope = SYMBOL_SCOPE_FILE;
+            s->scope_value = strdup(file_name);
+            break;
+        }
+        case 'G':
+        {
+            // global scope
+            s->scope = SYMBOL_SCOPE_GLOBAL;
+            s->scope_value = NULL;
+
+            if (*encoded != '$') {
+                goto err;
+            }
+            encoded++;
+            break;
+        }
+        case 'L':
+        {
+            // file scope
+            char localiry_name[FILENAME_MAX];
+            if (sscanf(encoded, "%[^$]$", localiry_name) != 1) {
+                goto err;
+            }
+            encoded += strlen(localiry_name) + 1;
+            s->scope = SYMBOL_SCOPE_LOCAL;
+            s->scope_value = strdup(localiry_name);
+            break;
+        }
+        default:
+        {
+            printf("Warning: unknown symbol scope: %c\n", symbol_scope);
+            return;
+        }
+    }
+
+    char symbol_name[255];
+    char level[32];
+    char block[32];
+    char type_record[128];
+    int end;
+
+    if (sscanf(encoded, "%[^$]$%[^$]$%[^(](%[^)]),%n", symbol_name, level, block, type_record, &end) != 4) {
+        goto err;
+    }
+    s->symbol_name = strdup(symbol_name);
+    encoded += end;
+
+    if (s->scope == SYMBOL_SCOPE_GLOBAL) {
+        strcpy(s->name, s->symbol_name);
+    } else {
+        if (s->scope == SYMBOL_SCOPE_LOCAL) {
+            const char* dot = strrchr(s->scope_value, '.');
+            if (dot != NULL) {
+                size_t l = dot - s->scope_value;
+                char file_name[FILENAME_MAX] = {0};
+                char function_name[128] = {0};
+                memcpy(file_name, s->scope_value, l);
+                strcpy(function_name, dot + 1);
+
+                s->belongs_to_function = debug_find_function(function_name, file_name);
+                if (s->belongs_to_function) {
+                    debug_sym_function_argument* arg = malloc(sizeof(debug_sym_function_argument));
+                    arg->symbol = s;
+                    arg->next = NULL;
+
+                    debug_sym_function_argument* last = s->belongs_to_function->arguments;
+                    while (last && last->next) {
+                        last = last->next;
+                    }
+
+                    if (last) {
+                        last->next = arg;
+                    } else {
+                        s->belongs_to_function->arguments = arg;
+                    }
+                } else {
+                    printf("Warning: could not find function %s.%s for argument %s.\n",
+                        file_name, function_name, s->symbol_name);
+                }
+
+            }
+        }
+
+        sprintf(s->name, "%s.%s", s->scope_value, s->symbol_name);
+    }
+
+    if (parse_record_type(type_record, &s->type_record)) {
+        printf("Warning cannot parse type record.\n");
+        goto err;
+    }
+
+    if (parse_address_space(encoded, &s->address_space)) {
+        printf("Warning cannot parse address space.\n");
+        goto err;
+    }
+
+    HASH_ADD_STR(csymbols, name, s);
+
+    return;
+
+err:
+    free(s);
+    printf("Warning: could not add debug info on symbol.\n");
+}
+
+static void debug_add_module_info(const char* encoded)
+{
+
 }
 
 /* Add debug information, in this case it's encoded */
@@ -74,29 +526,35 @@ void debug_add_info_encoded(char *encoded)
     *drop = 0;
     if ( encoded[1] != ':')
         return;
-    switch ( encoded[0] ) {
-    case 'F': // Function
-        // F:G$main$0_0$0({2}DF,SI:S),C,0,0,0,0,0
-        break;
-    case 'M': // Module
-        // M:world
-        break;
-    case 'S': // Symbol
-        if ( encoded[2] == 'G') {
-            // Global symbol
-            // S:G$yy$0_0$0({2}SI:S),E,0,0
-            //     ^^          ^^ 
-        } else if ( encoded[2] == 'L') {
-            // File local symbol
-            // S:Lworld.main$x$1_0$3({2}SI:S),B,1,4
-            //               ^          ^^        ^
+
+    uint8_t record_type = encoded[0];
+    const char* subtype = &encoded[2];
+
+    switch (record_type)
+    {
+        case 'F':
+        {
+            debug_add_function_info(subtype);
+            break;
         }
-        break;
-
-
+        case 'M':
+        {
+            debug_add_module_info(subtype);
+            break;
+        }
+        case 'S':
+        {
+            debug_add_symbol_info(subtype);
+            break;
+        }
+        default:
+        {
+            printf("Warning: unknown record type: %c\n", record_type);
+            break;
+        }
     }
-  //  printf("Decoded cdb: <%s>\n",encoded);
 
+    //printf("Decoded cdb: <%s>\n",encoded);
 }
 
 
@@ -166,4 +624,47 @@ int debug_resolve_source(char *name)
         }
     }
     return -1;
+}
+
+debug_sym_function* debug_find_function(const char* function_name, const char* file_name) {
+    debug_sym_function* f = NULL;
+
+    if (file_name != NULL)
+    {
+        char name[FILENAME_MAX];
+        sprintf(name, "%s.%s", file_name, function_name);
+        HASH_FIND_STR(cfunctions, name, f);
+    }
+
+    if (f == NULL)
+    {
+        // we cannot find it by "file.c.function", now let's look by "function"
+        HASH_FIND_STR(cfunctions, function_name, f);
+    }
+
+    return f;
+}
+
+static uint8_t debug_resolve_chain_value(type_chain* chain, uint16_t frame_pointer, char* target) {
+    switch (chain->type_) {
+        case TYPE_INT: {
+            uint16_t v = (bk.get_memory(frame_pointer + 1) << 8) + bk.get_memory(frame_pointer);
+            sprintf(target, "%d", v);
+            return 0;
+        }
+        default: {
+            return 1;
+        }
+    }
+}
+
+uint8_t debug_get_symbol_value(debug_sym_symbol* sym, uint16_t frame_pointer, char* target) {
+    if (sym->address_space.address_space == 'B') {
+        return debug_resolve_chain_value(sym->type_record.first,
+            frame_pointer + sym->address_space.b, target);
+    } else {
+        return 1;
+    }
+
+    return 0;
 }

@@ -475,16 +475,65 @@ static int cmd_backtrace(int argc, char **argv)
         if ( debug_find_source_location(at, &filename, &lineno) < 0 ) {
             printf("  %s+%d (unknown location)\n", sym->name, offset);
         } else {
-            printf("  %s+%d at %s:%d\n", sym->name, offset, filename, lineno);
+
+            const char *nm;
+            if (*sym->name == '_') {
+                nm = sym->name + 1;
+            } else {
+                nm = sym->name;
+            }
+
+            uint16_t frame_pointer;
+            if (offset == 0) {
+                frame_pointer = stack - 2;
+            } else if (offset < 8) {
+                // we've pushed old ix but haven't inited old one
+                frame_pointer = stack;
+            } else {
+                frame_pointer = ix;
+            }
+
+            debug_sym_function* fn = debug_find_function(nm, filename);
+            if (fn != NULL) {
+                char function_args[255] = {0};
+                debug_sym_function_argument* arg = fn->arguments;
+                uint8_t first_arg = 1;
+                while (arg) {
+                    debug_sym_symbol* s = arg->symbol;
+                    if (!first_arg) {
+                        strcat(function_args, ", ");
+                    }
+                    char arg_text[128];
+                    char arg_value[128];
+                    if (debug_get_symbol_value(s, frame_pointer, arg_value)) {
+                        strcpy(arg_value, "unknown");
+                    }
+                    sprintf(arg_text, "%s=%s", s->symbol_name, arg_value);
+                    strcat(function_args, arg_text);
+                    first_arg = 0;
+                    arg = arg->next;
+                }
+                printf("  function %s+%d (%s) at %s:%d\n", fn->function_name, offset, function_args, filename, lineno);
+            } else {
+                printf("  %s+%d at %s:%d\n", sym->name, offset, filename, lineno);
+            }
+
+
             srcfile_display(filename, lineno, 1, lineno);
         }
 
-        if (offset <= 6) {
+        if (offset == 0) {
             // we're exactly at beginning of the function
             uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
             at = caller;
             // unwind ret
             stack += 2;
+        } else if (offset < 8) {
+            // we've pushed old ix but haven't inited old one
+            uint16_t caller = wrap_reg(bk.get_memory(stack + 3), bk.get_memory(stack + 2));
+            at = caller;
+            // unwind ret and ix
+            stack += 4;
         } else {
             // ix should point to sp at beginning of the function
             stack = ix;
