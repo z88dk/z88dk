@@ -27,10 +27,10 @@ asm_strerror:
    
    ld a,h
    or a
-   jr nz, use_default
+   jp NZ, use_default
    
    or l
-   jr z, use_ok
+   jp Z, use_ok
    
    ld e,l
    ld hl,__rodata_error_strings_head
@@ -42,14 +42,14 @@ search_loop:
    cp e
    inc hl
    
-   ret z                       ; if found string
+   ret Z                       ; if found string
    
    call __str_locate_nul
    inc hl
    
    ld a,(hl)
    or a
-   jr nz, search_loop          ; if end of strings not met
+   jp NZ, search_loop          ; if end of strings not met
 
 use_default:
 

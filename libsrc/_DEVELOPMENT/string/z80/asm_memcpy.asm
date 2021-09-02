@@ -35,10 +35,10 @@ IF (__CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_MEMCPY)
    ld a,b
    or a
    
-   jr nz, big
+   jr NZ, big
    
    or c
-   jr z, zero_n
+   jr Z, zero_n
    
    push de
 
@@ -77,15 +77,15 @@ ELSE
 
    ld a,b
    or c
-   jr Z, zero_n
+   jp Z, zero_n
 
 asm0_memcpy:
-
-   push de
 
 IF __CPU_8085__
    dec bc
 ENDIF
+
+   push de
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
 loop:

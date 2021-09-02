@@ -35,11 +35,12 @@ asm_memcmp:
    or c
    jp Z, equal
 
+asm0_memcmp:
+
 IF __CPU_8085__
    dec bc
 ENDIF
 
-asm0_memcmp:
 loop:
 
    ld a,(de)                   ; a = *s1
@@ -58,9 +59,10 @@ ENDIF
 IF __CPU_8085__
    jp NK,loop
    inc bc
+   xor a
 ELSE
 
-IF __CPU_GBZ80__ || __CPU_INTEL__
+IF  __CPU_8080__ || __CPU_GBZ80__
    ld a,b
    or c
    jp NZ,loop
@@ -69,6 +71,7 @@ ELSE
 ENDIF
 
 ENDIF
+
 equal:
 
    ld l,c
@@ -76,7 +79,9 @@ equal:
    ret
 
 different:
-
+IF __CPU_8085__
+   inc bc
+ENDIF
    dec hl
    sub (hl)
    ld h,a

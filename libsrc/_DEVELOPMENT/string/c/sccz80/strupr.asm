@@ -10,17 +10,21 @@ EXTERN asm_strupr
 
 defc strupr = asm_strupr
 
-IF __CLASSIC && __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
 PUBLIC _strupr
 
 _strupr:
    ld hl,sp+2
+IF __CPU_GBZ80__
    ld a,(hl+)
+ELSE
+   ld a,(hl)
+   inc hl
+ENDIF
    ld h,(hl)
    ld l,a
    call asm_strupr
-   ld   d,h
-   ld   e,l
+   ld de,hl
    ret
 ENDIF
 

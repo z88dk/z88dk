@@ -53,7 +53,7 @@ asm_strsep:
    ld h,a                      ; hl = char *s
    
    or l                        ; s == NULL?
-   jr z, notoken
+   jp Z, notoken
    
 have_string:
 
@@ -67,7 +67,7 @@ have_string:
    push bc                     ; save char **string_ptr + 1b
    
    call asm_strpbrk            ; hl = ptr to delim char
-   jr c, token_toend           ; if token extends to end of string (hl=0)
+   jp C, token_toend           ; if token extends to end of string (hl=0)
    
    ld (hl),0                   ; terminate token by overwriting delim char
    inc hl                      ; tokenize from here next time

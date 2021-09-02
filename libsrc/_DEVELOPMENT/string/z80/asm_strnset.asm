@@ -27,28 +27,28 @@ asm_strnset:
    
    ld a,b
    or c
-   ret z
-   
+   ret Z
+
    push hl
    xor a
-   
+
 loop:
 
    cp (hl)
-   jr z, exit
-   
+   jp Z, exit
+
    ld (hl),e
 
-IF __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    EXTERN __z80asm__cpi
    call __z80asm__cpi
    ld a,b
    or c 
    ld a,0
-   jr nz,loop
+   jp NZ,loop
 ELSE
    cpi                         ; hl++, bc--
-   jp pe, loop
+   jp PE, loop
 ENDIF
 
 exit:

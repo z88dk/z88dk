@@ -9,7 +9,7 @@ PUBLIC memcmp
 EXTERN asm_memcmp
 
 memcmp:
-IF __CPU_GBZ80__ | __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    ld hl,sp+2
    ld c,(hl)
    inc hl
@@ -19,7 +19,12 @@ IF __CPU_GBZ80__ | __CPU_INTEL__
    inc hl
    ld d,(hl)
    inc hl
+IF __CPU_GBZ80__
    ld a,(hl+)
+ELSE
+   ld a,(hl)
+   inc hl
+ENDIF
    ld h,(hl)
    ld l,e
    ld e,a
@@ -41,8 +46,7 @@ ENDIF
   
 IF __CLASSIC && __CPU_GBZ80__
    call asm_memcmp
-   ld d,h
-   ld e,l
+   ld de,hl
    ret
 ELSE 
    jp asm_memcmp

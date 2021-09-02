@@ -28,11 +28,15 @@ asm_ffs:
    
    ld a,l
    or a
-   jr nz, bits_1_8
+IF __CPU_INTEL__
+   jp NZ, bits_1_8
+ELSE
+   jr NZ, bits_1_8
+ENDIF
    
    ld a,h
    or a
-   ret z
+   ret Z
 
 asm1_ffs:
 bits_9_16:
@@ -43,13 +47,20 @@ asm2_ffs:
 loop:
 
    rra
-   ret c
+   ret C
    
    inc l
+IF __CPU_INTEL__
+   jp loop
+ELSE
    jr loop
-
+ENDIF
 asm0_ffs:
 bits_1_8:
 
    ld hl,1
+IF __CPU_INTEL__
+   jp loop
+ELSE
    jr loop
+ENDIF

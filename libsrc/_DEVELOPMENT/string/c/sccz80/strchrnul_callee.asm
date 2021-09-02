@@ -16,8 +16,7 @@ IF __CPU_GBZ80__
    pop hl
    push de
    call asm_strchrnul
-   ld d,h
-   ld e,l
+   ld de,hl
    ret
 ELSE
    pop hl

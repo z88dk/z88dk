@@ -9,7 +9,7 @@ PUBLIC memccpy_callee
 EXTERN asm_memccpy
 
 memccpy_callee:
-IF __CPU_INTEL__ | __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    ld hl,sp+2
    ld  c,(hl)
    inc hl
@@ -30,8 +30,7 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
    pop hl
    call asm_memccpy
  IF __CPU_GBZ80__
-   ld d,h
-   ld e,l
+   ld de,hl
  ENDIF
    pop bc ; return value
    pop af ;dump arg

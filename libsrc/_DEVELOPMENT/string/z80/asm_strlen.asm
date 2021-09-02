@@ -36,21 +36,29 @@ loop:
    inc hl
    dec bc
    and a
-   jr z,matched
+   jp Z,matched
+
    ld a,b
    or c
-   jr nz,loop
+   jp NZ,loop
+
 matched:
    push af
+IF __CPU_8085__
+   ld hl,$ffff
+   sub hl,bc
+ELSE
    ld a,$ff
    sub c
    ld  l,a
    ld  a,$ff
    sbc b
    ld  h,a
+ENDIF
    pop af
    ld  a,0
 ELSE
+
    cpir
    ld hl,$ffff
    sbc hl,bc

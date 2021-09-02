@@ -38,7 +38,7 @@ asm_strnchr:
 
    ld a,b                      ; if n == 0 not found
    or c
-   jp z, error_zc
+   jp Z, error_zc
 
 
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
@@ -56,27 +56,27 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
  ENDIF
    ld e,a
    dec bc
-   cp d 
-   jr z,match
-   and a		;Isn't current char NUL?
+   cp d                        ; FIXME why compare with D, that is never set?
+   jp Z,match
+   and a                       ; Isn't current char NUL?
    jp z,error_zc
    ld a,b
    or c
-   jr nz,loop
+   jp NZ,loop
    jp error_zc
+
 ELSE
-   
    ld e,(hl)                   ; current char in s
    cpi
-   jr z, match                 ; found char
-   jp po, error_zc             ; n exceeded
+   jr Z, match                 ; found char
+   jp PO, error_zc             ; n exceeded
    
    inc e                       ; is current char NUL?
    dec e
-   jr nz, loop
-
+   jr NZ, loop
    jp error_zc
 ENDIF
+
 match:
 
    dec hl

@@ -30,13 +30,13 @@ loop:
 
    ld a,(hl)
    or a
-   jr z, exit
+   jp Z, exit
 
    call asm_tolower
    ld (hl),a
-   
+
    inc hl
-   jr loop
+   jp loop
 
 exit:
 

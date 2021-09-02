@@ -39,7 +39,7 @@ loop:
 
    ld a,b
    or c
-   jr z, equal
+   jp Z, equal
 
    ld a,(hl)
    call asm_tolower
@@ -54,7 +54,7 @@ IF __CPU_Z180__ | __CPU_R2KA__ | __CPU_R3K__ | __CPU_INTEL__ | __CPU_GBZ80__ | _
    call asm_tolower
    
    cp l
-   jr nz, different
+   jp NZ, different
    
    pop hl
 
@@ -75,7 +75,7 @@ ENDIF
    dec bc
    
    or a                      ; end of string?         
-   jr nz, loop
+   jp NZ, loop
    
    dec de
 

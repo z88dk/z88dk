@@ -19,8 +19,7 @@ strnlen:
    push de
 IF __CLASSIC && __CPU_GBZ80__
    call asm_strnlen
-   ld d,h
-   ld e,l
+   ld de,hl
    ret
 ELSE   
    jp asm_strnlen

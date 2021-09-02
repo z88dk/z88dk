@@ -19,10 +19,9 @@ strcoll:
    push bc
 IF __CLASSIC && __CPU_GBZ80__
    call asm_strcoll
-   ld d,h
-   ld e,l
+   ld de,hl
    ret
-ELSE   
+ELSE
    jp asm_strcoll
 ENDIF
 

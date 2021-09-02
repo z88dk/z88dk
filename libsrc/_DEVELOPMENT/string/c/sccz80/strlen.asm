@@ -19,8 +19,7 @@ _strlen:
    ld h,(hl)
    ld l,a
    call asm_strlen
-   ld   d,h
-   ld   e,l
+   ld de,hl
    ret
 ENDIF
 

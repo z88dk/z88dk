@@ -36,38 +36,41 @@ loop:
 
    ld a,(hl)
    or a
-   jr z, end_string
+   jp Z, end_string
    
    ; see if this char from string is in prefix
    
    push hl                     ; save current string
    
    ld c,a                      ; c = char
-   ld l,e
-   ld h,d                      ; hl = prefix
+   ld hl,de                    ; hl = prefix
    call asm_strchr             ; is c in prefix?
    
    pop hl                      ; current string
 
-   jr nc, done                 ; char found
+   jp NC, done                 ; char found
    
    inc hl
-   jr loop
+   jp loop
 
 end_string:
 
    pop bc
 IF __CPU_INTEL__ || __CPU_GBZ80__
-   ld a,l
+IF __CPU_8085__
+   sub hl,bc
+ELSE
+   ld  a,l
    sub c
-   ld l,a
-   ld a,h
+   ld  l,a
+   ld  a,h
    sbc b
-   ld h,a
+   ld  h,a
+ENDIF
 ELSE
    sbc hl,bc
 ENDIF
-   
+
    scf
    ret
 
@@ -75,12 +78,16 @@ done:
 
    pop bc
 IF __CPU_INTEL__ || __CPU_GBZ80__
-   ld a,l
+IF __CPU_8085__
+   sub hl,bc
+ELSE
+   ld  a,l
    sub c
-   ld l,a
-   ld a,h
+   ld  l,a
+   ld  a,h
    sbc b
-   ld h,a
+   ld  h,a
+ENDIF
 ELSE
    sbc hl,bc
 ENDIF

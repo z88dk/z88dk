@@ -40,11 +40,11 @@ loop:
 
    ld a,(hl)
    cp c
-   ret z
-   
+   ret Z
+
    inc hl
-   
+
    or a
-   jr nz, loop
+   jp NZ, loop
    
    jp error_zc

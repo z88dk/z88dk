@@ -40,7 +40,7 @@ asm_strrstr:
    xor a
    ld c,a
    ld b,a
-IF __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    EXTERN __z80asm__cpir
    call __z80asm__cpir
 ELSE
@@ -56,7 +56,7 @@ ENDIF
    
    ld a,(de)
    or a
-   ret z
+   ret Z
    
 loop1:
 
@@ -66,37 +66,37 @@ loop1:
    ld a,b
    or c
    
-   jp z, error_zc              ; if no match
+   jp Z, error_zc              ; if no match
    
    ld a,(de)
    cp (hl)
-   
-   jr nz, loop1
+
+   jp NZ, loop1
    
    push hl                     ; save s
    push de                     ; save w
-   
+
 loop2:
 
    inc de
-   
+
    ld a,(de)
    or a
-   
-   jr z, match
+
+   jp Z, match
    inc hl
    
    cp (hl)
-   jr z, loop2
-   
+   jp Z, loop2
+
    pop de
    pop hl
-   
-   jr loop1
+
+   jp loop1
 
 match:
 
    pop de
    pop hl
-   
+
    ret

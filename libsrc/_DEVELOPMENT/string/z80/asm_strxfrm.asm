@@ -44,43 +44,52 @@ asm_strxfrm:
 
    ld a,d
    or e
-   jp z, asm_strlen            ; if dst == 0, return strlen(src)
-   
+   jp Z, asm_strlen            ; if dst == 0, return strlen(src)
+
    ld a,b
    or c
-   jp z, error_zc              ; if n == 0, return 0 with carry set
-   
+   jp Z, error_zc              ; if n == 0, return 0 with carry set
+
    ; copy src to dst
-   
+
    push hl                     ; save src
    
+IF __CPU_8085__
+   dec bc
+ELSE
+
 loop:
 
    ld a,(hl)
    or a
-   jr z, end_s2
-   
+   jp Z, end_s2
+
    dec bc
+
+IF __CPU_8085__
+   jp K,end_n
+ELSE
    ld a,b
    or c
-   jr z, end_n
-   
+   jp Z, end_n
+ENDIF
+
    push bc
    push hl
    push de
-   
+
    ld a,(hl)
    call __lc_char_ordinal      ; assign ordinal to char
-   
+
    pop de
    pop hl
    pop bc
-   
+
    ld (de),a
 
    inc hl
-   inc de   
-   jr loop
+   inc de
+   jp loop
 
 end_n:
 
@@ -93,17 +102,21 @@ end_s2:
 
    ld (de),a                   ; terminate dst
    
-   pop de                      ; de = src
+   pop bc                      ; bc = src
 IF __CPU_INTEL__ | __CPU_GBZ80__
+IF __CPU_8085__
+   sub hl,bc
+ELSE
    ld  a,l
-   sub e
+   sub c
    ld  l,a
    ld  a,h
-   sbc d
+   sbc b
    ld  h,a
-ELSE
-   sbc hl,de                   ; hl = num chars written to s1
 ENDIF
-   
+ELSE
+   sbc hl,bc                   ; hl = num chars written to s1
+ENDIF
+
    or a
    ret

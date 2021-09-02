@@ -41,18 +41,18 @@ asm_memchr:
 
    inc c
    dec c
-   jr z, test0
+   jp Z, test0
 
 asm0_memchr:
 loop:
-IF __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    EXTERN __z80asm__cpir
    call __z80asm__cpir
 ELSE
    cpir
 ENDIF
    dec hl
-   ret z                       ; char found
+   ret Z                       ; char found
 
 notfound:
 
@@ -61,6 +61,11 @@ notfound:
 test0:
 
    inc b
+IF __CPU__8085__
+   dec b
+   jp NZ,loop
+   jp error_zc
+ELSE
    djnz loop
-
    jr notfound
+ENDIF

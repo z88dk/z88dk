@@ -53,7 +53,7 @@ asm_strrspn:
    
    ld a,(de)
    or a
-   jr z, empty_cset
+   jp Z, empty_cset
 
 loop:
 
@@ -61,7 +61,7 @@ loop:
    
    ld a,b
    or c
-   jr z, all_in_cset
+   jp Z, all_in_cset
 
    dec hl                      ; & next char in str to check
 
@@ -80,7 +80,7 @@ loop:
    pop hl
    pop bc
    
-   jr nc, loop                 ; loop if char in cset
+   jp NC, loop                 ; loop if char in cset
 
 not_in_cset:
 

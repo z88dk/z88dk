@@ -19,10 +19,9 @@ strchrnul:
    push de
 IF __CLASSIC && __CPU_GBZ80__
    call asm_strchrnul
-   ld d,h
-   ld e,l
+   ld de,hl
    ret
-ELSE   
+ELSE
    jp asm_strchrnul
 ENDIF
 

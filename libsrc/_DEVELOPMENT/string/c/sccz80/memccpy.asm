@@ -9,8 +9,7 @@ PUBLIC memccpy
 EXTERN asm_memccpy
 
 memccpy:
-
-IF __CPU_INTEL__ | __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    ld hl,sp+2
    ld  c,(hl)
    inc hl
@@ -45,8 +44,7 @@ ENDIF
 
 IF __CLASSIC && __CPU_GBZ80__
    call asm_memccpy
-   ld d,h
-   ld e,l
+   ld de,hl
    ret
 ELSE
    jp asm_memccpy

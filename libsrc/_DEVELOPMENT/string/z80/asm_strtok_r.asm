@@ -42,7 +42,7 @@ asm_strtok_r:
 
    ld a,h                      ; s == NULL?
    or l
-   jr nz, have_string
+   jp NZ, have_string
    
    ld a,(bc)
    ld l,a
@@ -52,7 +52,7 @@ asm_strtok_r:
    ld h,a                      ; hl = saved position
       
    or l                        ; is last position NULL?
-   ret z
+   ret Z
 
 have_string:
 
@@ -65,7 +65,7 @@ have_string:
    ; stack = state
 
    call asm_strspn             ; hl = number of leading delim chars, bc = char *s1 = string
-   jr c, no_token              ; if string only contains delim chars
+   jp C, no_token              ; if string only contains delim chars
    
    add hl,bc                   ; hl = start of token after delim chars
    
@@ -80,7 +80,7 @@ have_string:
    push bc                     ; save state
    
    call asm_strpbrk            ; hl = ptr to delim char in string
-   jr c, token_toend           ; if token extends to end of string (hl=0)
+   jp C, token_toend           ; if token extends to end of string (hl=0)
    
    ld (hl),0                   ; terminate token with NUL
    inc hl                      ; start point for next token

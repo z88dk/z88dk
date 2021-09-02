@@ -36,7 +36,7 @@ loop:
 
    ld a,(hl)
    or a
-   jr z, end_string
+   jp Z, end_string
      
    ; see if this char from string is in prefix
    
@@ -49,21 +49,26 @@ loop:
    
    pop hl                      ; current string
 
-   jr c, done                  ; char not found
+   jp C, done                  ; char not found
    
    inc hl
-   jr loop
+   jp loop
 
 end_string:
 
-   pop bc
+   pop bc                     ; restore string
+
 IF __CPU_INTEL__ | __CPU_GBZ80__
+IF __CPU_8085__
+   sub hl,bc
+ELSE
    ld  a,l
    sub c
    ld  l,a
    ld  a,h
    sbc b
    ld  h,a
+ENDIF
 ELSE
    sbc hl,bc
 ENDIF
@@ -73,15 +78,19 @@ ENDIF
 
 done:
    
-   pop bc
+   pop bc                     ; restore string
    
 IF __CPU_INTEL__ | __CPU_GBZ80__
+IF __CPU_8085__
+   sub hl,bc
+ELSE
    ld  a,l
    sub c
    ld  l,a
    ld  a,h
    sbc b
    ld  h,a
+ENDIF
 ELSE
    or  a
    sbc hl,bc

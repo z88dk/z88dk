@@ -39,7 +39,7 @@ loop:
 
    ld a,(hl)
    or a
-   jp z, error_zc
+   jp Z, error_zc
    
    ; see if this char from string is in needles
    
@@ -51,7 +51,7 @@ loop:
    call asm_strchr             ; is c in needles?
    
    pop hl                      ; current s1
-   ret nc                      ; char found in needles
+   ret NC                      ; char found in needles
 
    inc hl
-   jr loop
+   jp loop

@@ -18,16 +18,23 @@ __str_locate_nul:
    xor a
    ld c,a
    ld b,a
-IF __CPU_GBZ80__
-loop:
+IF __CPU_INTEL__ || __CPU_GBZ80__
    dec bc
+loop:
    ld a,(hl)
    and a
-   ret z
+   ret Z
    inc hl
+   dec bc
+
+IF __CPU_8085__
+   jp NK,loop
+ELSE
    ld a,b
    or c
-   jr nz,loop
+   jp NZ,loop
+ENDIF
+
    and a
 ELSE
    cpir

@@ -69,7 +69,9 @@ ELSE
 ENDIF
 
 exit:
+IF __CPU_8085__
    inc bc
+ENDIF
    or a
    ret
 

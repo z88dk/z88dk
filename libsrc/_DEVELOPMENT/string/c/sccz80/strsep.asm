@@ -19,8 +19,7 @@ strsep:
    push hl
 IF __CLASSIC && __CPU_GBZ80__
    call asm_strsep
-   ld d,h
-   ld e,l
+   ld de,hl
    ret
 ELSE
    jp asm_strsep

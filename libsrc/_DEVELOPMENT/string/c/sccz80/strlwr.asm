@@ -9,6 +9,7 @@ PUBLIC strlwr
 EXTERN asm_strlwr
 
 defc strlwr = asm_strlwr
+
 IF __CLASSIC && __CPU_GBZ80__
 PUBLIC _strlwr
 
@@ -18,8 +19,7 @@ _strlwr:
    ld h,(hl)
    ld l,a
    call asm_strlwr
-   ld   d,h
-   ld   e,l
+   ld de,hl
    ret
 ENDIF
 

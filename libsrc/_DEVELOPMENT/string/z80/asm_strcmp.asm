@@ -35,14 +35,15 @@ loop:
 IF __CPU_INTEL || __CPU_GBZ80__
    cp (hl)
    inc hl
+   jp NZ, different
 ELSE
    cpi                         ; *s1 - *s2
+   jr NZ, different
 ENDIF
-   jr nz, different
    inc de
-   
+
    or a                        ; end of string?
-   jr nz, loop
+   jp NZ, loop
    
 equal:                         ; both strings ended same time
 

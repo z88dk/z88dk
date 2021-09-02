@@ -19,8 +19,7 @@ _strrstrip:
    ld h,(hl)
    ld l,a
    call asm_strrstrip
-   ld   d,h
-   ld   e,l
+   ld de,hl
    ret
 ENDIF
 

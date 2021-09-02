@@ -16,8 +16,7 @@ IF __CPU_GBZ80__
    pop hl
    push bc
    call asm_strpbrk
-   ld d,h
-   ld e,l
+   ld de,hl
    ret
 ELSE
    pop hl

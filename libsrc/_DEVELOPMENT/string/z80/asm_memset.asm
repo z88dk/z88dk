@@ -33,8 +33,7 @@ asm_memset:
    or c
 
    ld a,e
-   ld e,l
-   ld d,h
+   ld de,hl
 
    ret Z
 
@@ -46,17 +45,17 @@ IF (__CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_MEMSET)
 
    ld a,b
    or a
-   
-   jr nz, big
-   
+
+   jr NZ, big
+
    or c
    ret Z
-   
+
    push hl
-   
+
    EXTERN l_ldi_loop_small
    call   l_ldi_loop_small
-   
+
    pop hl
    ret
 
@@ -74,7 +73,7 @@ ELSE
 
    ld a,b
    or c
-   
+
    ret Z
 
    push hl
@@ -107,7 +106,7 @@ ENDIF
 ELSE
    ldir
 ENDIF
-   
+
    pop hl
    ret
 

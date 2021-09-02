@@ -47,7 +47,7 @@ loop:
 
    add hl,bc
    dec hl                      ; hl = last byte of block
-IF __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    EXTERN __z80asm_cpdr
    call __z80asm_cpdr
 ELSE   
@@ -63,6 +63,11 @@ notfound:
 test0:
 
    inc b
+IF __CPU__8085__
+   dec b
+   jp NZ,loop
+   jp error_zc
+ELSE
    djnz loop
-   
    jr notfound
+ENDIF

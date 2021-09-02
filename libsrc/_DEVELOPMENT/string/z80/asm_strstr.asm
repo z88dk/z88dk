@@ -38,7 +38,7 @@ asm_strstr:
 
    ld a,(hl)
    or a
-   jr z, empty_substring
+   jp Z, empty_substring
       
 match_1:
 
@@ -46,12 +46,12 @@ match_1:
 
    ld a,(de)                   ; a = *string
    cp (hl)
-   jr z, match_rest            ; string char matches first substring char
+   jp Z, match_rest            ; string char matches first substring char
    
    inc de
    
    or a                        ; end of string reached?
-   jr nz, match_1
+   jp NZ, match_1
 
 not_found:
 
@@ -74,10 +74,10 @@ loop:
    
    ld a,(de)                   ; a = *substring
    or a
-   jr z, match_found
+   jp Z, match_found
    
    cp (hl)
-   jr z, loop                  ; char matches so still hope
+   jp Z, loop                  ; char matches so still hope
 
 no_match:
 
@@ -88,9 +88,9 @@ no_match:
    inc de
    
    or a                        ; if first mismatch occurred at end of string,
-   jr nz, match_1              ; substring cannot fit so abandon early
+   jp NZ, match_1              ; substring cannot fit so abandon early
 
-   jr not_found
+   jp not_found
 
 match_found:
 

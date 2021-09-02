@@ -40,8 +40,8 @@ ELSE
    cp (hl)
    ldi
 ENDIF
-   jr nz, loop
-   
+   jp NZ, loop
+
    pop hl
    dec de
    ret

@@ -19,8 +19,7 @@ _strerror:
    ld h,(hl)
    ld l,a
    call asm_strerror
-   ld   d,h
-   ld   e,l
+   ld de,hl
    ret
 ENDIF
 

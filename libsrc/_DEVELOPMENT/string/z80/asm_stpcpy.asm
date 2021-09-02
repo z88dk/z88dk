@@ -25,7 +25,7 @@ asm_stpcpy:
    ; uses  : af, bc, de, hl
 
    xor a
-   
+
 loop:
 IF __CPU_INTEL__ || __CPU_GBZ80__
  IF __CPU_GBZ80__
@@ -37,15 +37,15 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    ld (de),a
    inc de
    and a
-   jr nz,loop
+   jp NZ,loop
 ELSE
    cp (hl)
    ldi
-   jr nz, loop
+   jp NZ, loop
 ENDIF
-   
+
    dec de
    dec hl
-   
+
    ex de,hl
    ret

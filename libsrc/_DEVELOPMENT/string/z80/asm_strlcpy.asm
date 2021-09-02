@@ -14,7 +14,6 @@
 ;
 ; ===============================================================
 
-IF !__CPU_GBZ80__
 SECTION code_clib
 SECTION code_string
 
@@ -37,17 +36,47 @@ asm_strlcpy:
    
    ld a,b
    or c
-   jr z, szexceeded1
-   
+   jp Z, szexceeded1
+
    xor a
-   
+
+IF __CPU_8085__
+   dec bc
+ENDIF
+
 cpyloop:
 
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   xor a
    cp (hl)                     ; end of src ?
-   jr z, done
-   
+   jr Z, done
+
+IF __CPU_GBZ80__
+   ld a,(hl+)
+ELSE
+   ld a,(hl)
+   inc hl
+ENDIF
+
+   ld (de),a
+   inc de
+   dec bc
+
+IF __CPU_8085__
+   jp NK,cpyloop
+ELSE
+   ld a,b
+   or c
+   jp NZ,cpyloop
+ENDIF
+
+ELSE 
+   cp (hl)                     ; end of src ?
+   jr Z, done
+
    ldi                         ; copy src byte to dst
-   jp pe, cpyloop
+   jp PE, cpyloop
+ENDIF
 
 szexceeded0:
 
@@ -65,22 +94,31 @@ szexceeded1:
    ; de = ptr to NUL in dst
    ; carry reset
    ; stack = char *src
-   
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   EXTERN __z80asm__cpir
+   call __z80asm__cpir
+ELSE
    cpir                        ; find end of src
+ENDIF
    dec hl
-   
-   pop bc
-IF __CPU_INTEL__
+
+   pop bc                      ; bc = char *src
+IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_8085__
+   sub hl,bc                   ; hl = strlen(s2)
+ELSE
    ld  a,l
    sub c
    ld  l,a
    ld  a,h
    sbc b
    ld  h,a
-ELSE
-   sbc hl,bc
 ENDIF
-   
+ELSE
+   sbc hl,bc                   ; hl = strlen(s2)
+ENDIF
+
    scf
    ret
 
@@ -92,19 +130,21 @@ done:
    ; de = ptr to NUL in dst
    ; carry reset
    ; stack = char *src
-   
+
    pop bc                      ; bc = char *src
-IF __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_8085__
+   sub hl,bc                   ; hl = strlen(s2)
+ELSE
    ld  a,l
    sub c
    ld  l,a
    ld  a,h
    sbc b
    ld  h,a
+ENDIF
 ELSE
    sbc hl,bc                   ; hl = strlen(s2)
 ENDIF
    ret
-
-ENDIF
 

@@ -19,8 +19,7 @@ _strrev:
    ld h,(hl)
    ld l,a
    call asm_strrev
-   ld   d,h
-   ld   e,l
+   ld de,hl
    ret
 ENDIF
 

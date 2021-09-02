@@ -19,8 +19,7 @@ _strdup:
    ld h,(hl)
    ld l,a
    call strdup
-   ld   d,h
-   ld   e,l
+   ld de,hl
    ret
 ENDIF
 

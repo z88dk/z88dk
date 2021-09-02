@@ -19,8 +19,7 @@ strspn:
    push bc
 IF __CLASSIC && __CPU_GBZ80__
    call asm_strspn
-   ld d,h
-   ld e,l
+   ld de,hl
 ELSE
    jp asm_strspn
 ENDIF

@@ -52,22 +52,43 @@ asm0_strdup:
    pop bc                      ; bc = length
    
    pop de                      ; de = char *s
-   ret c                       ; malloc error
+   ret C                       ; malloc error
    
    push hl                     ; save char *str (dup)
 
-IF __CPU_GBZ80__
+IF __CPU_8085__
+   dec bc
+ENDIF
+
 loop:
+IF __CPU_INTEL__ || __CPU_GBZ80__
    ld a,(de)
+IF __CPU_GBZ80__
    ld (hl+),a
+ELSE
+   ld (hl),a
+   inc hl
+ENDIF
    inc de
    dec bc
+IF __CPU_8085__
+   jp NK,loop
+   inc bc
+   xor a
+ELSE
    ld a,b
    or c
-   jr nz,loop
+   jp NZ,loop
+ENDIF
+
+IF __CPU_GBZ80__
    ld (hl+),a	;write terminating zero
 ELSE
+   ld (hl),a
+   inc hl
+ENDIF
 
+ELSE
    ex de,hl
    ldir
    
@@ -77,6 +98,6 @@ ELSE
    xor a
    ld (de),a
 ENDIF
-   
+
    pop hl
    ret

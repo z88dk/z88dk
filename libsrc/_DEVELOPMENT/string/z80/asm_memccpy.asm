@@ -45,8 +45,9 @@ asm_memccpy:
    
    inc c
    dec c
-   jr z, test0
-IF __CPU_GBZ80__
+   jp Z, test0
+
+IF __CPU_8080__ || __CPU_GBZ80__
    ld (__memccpy_value),a
 ENDIF
 
@@ -55,10 +56,12 @@ IF __CPU_8085__
 ENDIF
 
 loop:
-IF __CPU_GBZ80__
+IF __CPU_8080__ || __CPU_GBZ80__
    ld a,(__memccpy_value)
 ENDIF
+
    cp (hl)
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
    inc hl
    inc de
@@ -85,7 +88,9 @@ nomatch:
    jp error_zc
 
 match:
-
+IF __CPU__8085__
+   inc bc
+ENDIF
    ld l,e
    ld h,d                      ; hl = ptr in dst to char following char c
    ret                         ; z flag set
@@ -93,11 +98,16 @@ match:
 test0:
 
    inc b
+IF __CPU__8085__
+   dec b
+   jp NZ,loop
+   jp error_zc
+ELSE
    djnz loop
-   
    jr nomatch
+ENDIF
 
-IF __CPU_GBZ80__
+IF __CPU_8080__ || __CPU_GBZ80__
 SECTION bss_clib
 SECTION bss_string
 __memccpy_value:	defb	0

@@ -29,7 +29,7 @@ asm_ffsl:
 
    ld a,l
    or a
-   jp nz, asm0_ffs
+   jp NZ, asm0_ffs
    
    ld a,h
    or a
@@ -37,8 +37,11 @@ asm_ffsl:
    
    ld a,e
    or a
-   jr nz, bits_17_24
-   
+IF __CPU_INTEL__
+   jp NZ, bits_17_24
+ELSE
+   jr NZ, bits_17_24
+ENDIF
    ld a,d
    or a
    ret z

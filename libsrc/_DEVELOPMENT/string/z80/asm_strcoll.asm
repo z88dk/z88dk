@@ -46,14 +46,14 @@ loop:
    pop hl
    pop de
    
-   jr nz, different
+   jp NZ, different
    
    ld a,(de)
    inc de
    inc hl
    
    or a
-   jr nz, loop                 ; end of string?
+   jp NZ, loop                 ; end of string?
    
 equal:                         ; both strings ended same time
 
