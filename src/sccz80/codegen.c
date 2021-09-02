@@ -4886,7 +4886,8 @@ void OutIndex(int val)
 
 void gen_push_frame(void)
 {
-    if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
+    if ( (c_framepointer_is_ix != -1 && (currfn->ctype->flags & NAKED) == 0 )
+        || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
         if ( !IS_808x() && !IS_GBZ80() ) {
             ot("push\t");
             outstr(FRAME_REGISTER);
@@ -4907,7 +4908,8 @@ void gen_push_frame(void)
 
 void gen_pop_frame(void)
 {
-    if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
+    if ( (c_framepointer_is_ix != -1 && (currfn->ctype->flags & NAKED) == 0 )
+        || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {  
         if ( !IS_808x() && !IS_GBZ80() ) {
             ot("pop\t");
             outstr(FRAME_REGISTER);
