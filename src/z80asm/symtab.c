@@ -345,7 +345,8 @@ Symbol *define_symbol(const char *name, long value, sym_type_t type)
 	}
 	else if (sym->is_defined)				/* global symbol already defined */
 	{
-		error_symbol_redefined(name);
+		if ( strncmp(name,"__CDBINFO__", 11) ) 
+			error_symbol_redefined(name);
 	}
 	else
 	{
