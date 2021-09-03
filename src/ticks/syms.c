@@ -15,6 +15,7 @@ static int demangle_filename(const char *input, char *filename, char *funcname, 
     *lineno = -1;
     *level = -1;
     *scope = -1;
+    *funcname = 0;
 
     // Full packed format
     if ( sscanf(input,"%[^:]::%[^:]::%d::%d:%d",filename,funcname, level, scope, lineno) == 5 ) {
@@ -101,7 +102,7 @@ void read_symbol_file(char *filename)
                 char  *ptr;
 
                 demangle_filename(argv[9], filename, funcname, &lineno,&level, &scope_block);;
-                debug_add_cline(filename, lineno, level, scope_block, argv[2]);
+                debug_add_cline(filename, funcname, lineno, level, scope_block, argv[2]);
             }
             free(argv);
         }

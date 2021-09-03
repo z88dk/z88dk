@@ -558,10 +558,9 @@ void debug_add_info_encoded(char *encoded)
 }
 
 
-void debug_add_cline(const char *filename, int lineno, int level, int scope_block, const char *address)
-{                  
+void debug_add_cline(const char *filename, const char *function, int lineno, int level, int scope_block, const char *address)
+{
     cfile *cf;
-    cline *cl;
     HASH_FIND_STR(cfiles, filename, cf);
     if ( cf == NULL ) {
         cf = calloc(1,sizeof(*cf));
@@ -570,20 +569,25 @@ void debug_add_cline(const char *filename, int lineno, int level, int scope_bloc
         HASH_ADD_KEYPTR(hh, cfiles, cf->file, strlen(cf->file), cf);
     }
 
-    cl = calloc(1,sizeof(*cl));
+    int maddress = strtol(address + 1, NULL, 16);
+
+    cline *cl = calloc(1,sizeof(*cl));
     cl->line = lineno;
     cl->file = cf;
-    cl->address = strtol(address + 1, NULL, 16);
+    cl->function_name = strdup(function);
+    cl->address = maddress;
     cl->level = level;
     cl->scope_block = scope_block;
     HASH_ADD_INT(cf->lines, line, cl);
-    if (clines[cl->address]) {
-        if (clines[cl->address]->line < lineno) {
+
+    if (clines[maddress]) {
+        cline *old_cl = clines[maddress];
+        if (old_cl->line < lineno && (strcmp(old_cl->function_name, function) == 0) &&
+            (old_cl->scope_block == scope_block)) {
             return;
-        } else {
-            free(clines[cl->address]);
         }
     }
+
     clines[cl->address] = cl;  // TODO Banking
 }
 
@@ -647,8 +651,20 @@ debug_sym_function* debug_find_function(const char* function_name, const char* f
 
 static uint8_t debug_resolve_chain_value(type_chain* chain, uint16_t frame_pointer, char* target) {
     switch (chain->type_) {
-        case TYPE_INT: {
+        case TYPE_INT:
+        case TYPE_SHORT: {
             uint16_t v = (bk.get_memory(frame_pointer + 1) << 8) + bk.get_memory(frame_pointer);
+            sprintf(target, "%d", v);
+            return 0;
+        }
+        case TYPE_GENERIC_POINTER:
+        case TYPE_CODE_POINTER: {
+            uint16_t v = (bk.get_memory(frame_pointer + 1) << 8) + bk.get_memory(frame_pointer);
+            sprintf(target, "%#04x", v);
+            return 0;
+        }
+        case TYPE_CHAR: {
+            uint8_t v = bk.get_memory(frame_pointer);
             sprintf(target, "%d", v);
             return 0;
         }
@@ -658,13 +674,157 @@ static uint8_t debug_resolve_chain_value(type_chain* chain, uint16_t frame_point
     }
 }
 
-uint8_t debug_get_symbol_value(debug_sym_symbol* sym, uint16_t frame_pointer, char* target) {
+uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char* target) {
     if (sym->address_space.address_space == 'B') {
         return debug_resolve_chain_value(sym->type_record.first,
-            frame_pointer + sym->address_space.b, target);
+            frame_pointer->frame_pointer + sym->address_space.b, target);
     } else {
         return 1;
     }
 
     return 0;
+}
+
+uint8_t debug_symbol_valid(debug_sym_symbol* sym, uint16_t stack, debug_frame_pointer* frame_pointer)
+{
+    if (sym->address_space.address_space == 'B') {
+        return frame_pointer->frame_pointer + sym->address_space.b >= stack;
+    }
+
+    return 1;
+}
+
+static uint16_t wrap_reg(uint8_t h, uint8_t l)
+{
+    uint16_t data;
+#ifdef __BIG_ENDIAN__
+    *(((uint8_t *)&data) + 1) = l;
+    *((uint8_t *)&data) = h;
+#else
+    *(((uint8_t *)&data) + 1) = h;
+    *((uint8_t *)&data) = l;
+#endif
+    return data;
+}
+
+debug_frame_pointer* debug_stack_frames_at(debug_frame_pointer* first, size_t frame)
+{
+    while (frame && first) {
+        frame--;
+        first = first->next;
+    }
+    return first;
+}
+
+size_t debug_stack_frames_count(debug_frame_pointer* first)
+{
+    size_t count = 0;
+    while (first) {
+        count++;
+        first = first->next;
+    }
+    return count;
+}
+
+debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint16_t ix)
+{
+    debug_frame_pointer* first = NULL;
+    debug_frame_pointer* last = NULL;
+
+    uint16_t stack = sp;
+    uint16_t at = pc;
+
+    do {
+        uint16_t offset;
+        symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
+
+        if (sym == NULL) {
+            break;
+        }
+
+        debug_frame_pointer* new_frame = malloc(sizeof(debug_frame_pointer));
+
+        if (last) {
+            last->next = new_frame;
+        } else {
+            first = new_frame;
+        }
+        last = new_frame;
+
+        const char *nm;
+        if (*sym->name == '_') {
+            nm = sym->name + 1;
+        } else {
+            nm = sym->name;
+        }
+
+        uint16_t frame_pointer;
+        if (offset == 0) {
+            frame_pointer = stack - 2;
+        } else if (offset < 8) {
+            // we've pushed old ix but haven't inited old one
+            frame_pointer = stack;
+        } else {
+            frame_pointer = ix;
+        }
+
+        const char *filename;
+        int   lineno;
+
+        new_frame->next = NULL;
+        new_frame->frame_pointer = frame_pointer;
+        new_frame->offset = offset;
+        new_frame->address = at;
+        new_frame->symbol = sym;
+
+        if (debug_find_source_location(at, &filename, &lineno) < 0) {
+            new_frame->filename = NULL;
+            new_frame->lineno = 0;
+            new_frame->function = NULL;
+        } else {
+            new_frame->filename = filename;
+            new_frame->lineno = lineno;
+            new_frame->function = debug_find_function(nm, filename);
+        }
+
+        if (offset == 0) {
+            // we're exactly at beginning of the function
+            uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
+            at = caller;
+            // unwind ret
+            stack += 2;
+        } else if (offset < 8) {
+            // we've pushed old ix but haven't inited old one
+            uint16_t caller = wrap_reg(bk.get_memory(stack + 3), bk.get_memory(stack + 2));
+            at = caller;
+            // unwind ret and ix
+            stack += 4;
+        } else {
+            // ix should point to sp at beginning of the function
+            stack = ix;
+            // last thing pushed is frame pointer of the caller (its ix)
+            ix = wrap_reg(bk.get_memory(ix + 1), bk.get_memory(ix));
+            // then goes ret
+            stack += 2;
+            uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
+            at = caller;
+        }
+
+        if (strcmp(sym->name, "main") == 0 || strcmp(sym->name, "_main") == 0) {
+            break;
+        }
+
+    } while (1);
+
+    return first;
+}
+
+void debug_stack_frames_free(debug_frame_pointer* stack_frames)
+{
+    while (stack_frames)
+    {
+        debug_frame_pointer* next = stack_frames->next;
+        free (stack_frames);
+        stack_frames = next;
+    }
 }
