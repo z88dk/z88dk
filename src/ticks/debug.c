@@ -104,7 +104,7 @@ static uint8_t parse_record_type(const char* rt, type_record* record)
                         break;
                     }
                     default: {
-                        printf("Warning: unkown type starting with %c.\n", c);
+                        printf("Warning: unknown type starting with %c.\n", c);
                         goto err;
                     }
                 }
@@ -158,7 +158,7 @@ static uint8_t parse_record_type(const char* rt, type_record* record)
                         break;
                     }
                     default: {
-                        printf("Warning: unkown type D%c.\n", c);
+                        printf("Warning: unknown type D%c.\n", c);
                         goto err;
                     }
                 }
@@ -209,7 +209,7 @@ static uint8_t parse_record_type(const char* rt, type_record* record)
                         break;
                     }
                     default: {
-                        printf("Warning: unkown type F%c.\n", c);
+                        printf("Warning: unknown type F%c.\n", c);
                         goto err;
                     }
                 }
@@ -461,15 +461,9 @@ static void debug_add_symbol_info(const char* encoded)
                     arg->next = NULL;
 
                     debug_sym_function_argument* last = s->belongs_to_function->arguments;
-                    while (last && last->next) {
-                        last = last->next;
-                    }
 
-                    if (last) {
-                        last->next = arg;
-                    } else {
-                        s->belongs_to_function->arguments = arg;
-                    }
+                    arg->next = last;
+                    s->belongs_to_function->arguments = arg;
                 } else {
                     printf("Warning: could not find function %s.%s for argument %s.\n",
                         file_name, function_name, s->symbol_name);
