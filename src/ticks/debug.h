@@ -3,6 +3,7 @@
 
 #include "uthash.h"
 #include "utlist.h"
+#include "syms.h"
 
 
 typedef struct cfile_s cfile;
@@ -12,10 +13,12 @@ typedef struct address_space_s address_space;
 typedef struct debug_sym_function_s debug_sym_function;
 typedef struct debug_sym_symbol_s debug_sym_symbol;
 typedef struct debug_sym_function_argument_s debug_sym_function_argument;
+typedef struct debug_frame_pointer_s debug_frame_pointer;
 
 typedef struct {
     int             line;
     int             address;
+    const char     *function_name;
     cfile          *file;
     int             level;
     int             scope_block;
@@ -103,14 +106,30 @@ struct debug_sym_symbol_s {
     UT_hash_handle          hh;
 };
 
+struct debug_frame_pointer_s {
+    symbol*                 symbol;
+    debug_sym_function*     function;
+    uint16_t                offset;
+    uint16_t                address;
+    uint16_t                frame_pointer;
+    const char*             filename;
+    int                     lineno;
+    debug_frame_pointer*    next;
+};
 
 // debug
 extern void debug_add_info_encoded(char *encoded);
 extern int debug_find_source_location(int address, const char **filename, int *lineno);
-extern void debug_add_cline(const char *filename, int lineno, int level, int scope, const char *address);
+extern void debug_add_cline(const char *filename, const char *function, int lineno, int level, int scope, const char *address);
 extern int debug_resolve_source(char *name);
 
 extern debug_sym_function* debug_find_function(const char* function_name, const char* file_name);
-extern uint8_t debug_get_symbol_value(debug_sym_symbol* sym, uint16_t stack, char* target);
+extern uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char* target);
+extern uint8_t debug_symbol_valid(debug_sym_symbol* sym, uint16_t stack, debug_frame_pointer* frame_pointer);
+
+extern debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint16_t ix);
+extern debug_frame_pointer* debug_stack_frames_at(debug_frame_pointer* first, size_t frame);
+extern size_t debug_stack_frames_count(debug_frame_pointer* first);
+extern void debug_stack_frames_free(debug_frame_pointer* stack_frames);
 
 #endif

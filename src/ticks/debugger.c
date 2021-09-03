@@ -107,6 +107,11 @@ static void completion(const char *buf, linenoiseCompletions *lc, void *ctx);
 static int cmd_next(int argc, char **argv);
 static int cmd_step(int argc, char **argv);
 static int cmd_continue(int argc, char **argv);
+static int cmd_frame(int argc, char **argv);
+static int cmd_up(int argc, char **argv);
+static int cmd_down(int argc, char **argv);
+static int cmd_print(int argc, char **argv);
+static int cmd_info(int argc, char **argv);
 static int cmd_backtrace(int argc, char **argv);
 static int cmd_disassemble(int argc, char **argv);
 static int cmd_registers(int argc, char **argv);
@@ -127,16 +132,22 @@ static const char *resolve_to_label(int addr);
 
 
 static command commands[] = {
+    { "s",      cmd_step,          "",  NULL },
+    { "bt",     cmd_backtrace,     "",  NULL },
+    { "p",      cmd_print,         "",  NULL },
+    { "b",      cmd_break,         "",  NULL },
     { "next",   cmd_next,          "",  "Step the instruction (over calls)" },
     { "step",   cmd_step,          "",  "Step the instruction (including into calls)" },
-    { "s",      cmd_step,          "",  NULL },
     { "cont",   cmd_continue,      "",  "Continue execution" },
     { "backtrace",cmd_backtrace,   "",  "Show the execution stack" },
-    { "bt",     cmd_backtrace,     "", NULL },
+    { "frame",  cmd_frame,         "[<num>]",  "Set or see current frame" },
+    { "up",     cmd_up,            "",  "Go one frame up" },
+    { "down",   cmd_down,          "",  "Go one frame down" },
+    { "print",  cmd_print,         "<expression>",  "Print an expression" },
+    { "info",   cmd_info,         "locals,...",  "Get info request" },
     { "dis",    cmd_disassemble,   "[<address>]",  "Disassemble from pc/<address>" },
     { "reg",    cmd_registers,     "",  "Display the registers" },
     { "break",  cmd_break,         "<address/label>",  "Handle breakpoints" },
-    { "b",      cmd_break,         "", NULL },
     { "watch",  cmd_watch,         "<address/label>",  "Handle watchpoints" },
     { "x",      cmd_examine,       "<address>",   "Examine memory" },
     { "set",    cmd_set,           "<hl/h/l/...> <value>",  "Set registers" },
@@ -164,6 +175,8 @@ static int last_hotspot_addr;
 static int last_hotspot_st;
 static int hotspots[65536];
 static int hotspots_t[65536];
+static size_t current_frame = 0;
+static int last_stacktrace_at = 0;
 
 static int interact_with_tty = 0;
 
@@ -361,6 +374,11 @@ void debugger()
     else                                                                                // Original output for non-active tty
         snprintf(prompt,sizeof(prompt), " %04x (%s)>", bk.pc(), buf);
 
+    if (last_stacktrace_at != bk.pc()) {
+        last_stacktrace_at = bk.pc();
+        current_frame = 0;
+    }
+
     while ( (line = linenoise(prompt) ) != NULL ) {
         int argc;
         char freeline = 0;
@@ -449,108 +467,171 @@ static int cmd_continue(int argc, char **argv)
     return 1;
 }
 
+static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, uint16_t initial_stack)
+{
+    symbol* sym = fp->symbol;
+
+    const char* frame_marker = fp == current ? " * " : "   ";
+
+    if (fp->filename && fp->function) {
+        debug_sym_function* fn = fp->function;
+        if (fn != NULL) {
+            char function_args[255] = {0};
+            debug_sym_function_argument* arg = fn->arguments;
+            uint8_t first_arg = 1;
+            while (arg) {
+                debug_sym_symbol* s = arg->symbol;
+
+                if (!debug_symbol_valid(s, initial_stack, fp)) {
+                    arg = arg->next;
+                    // those vars do not exist yet
+                    continue;
+                }
+
+                if (!first_arg) {
+                    strcat(function_args, ", ");
+                }
+                char arg_text[128];
+                char arg_value[128];
+                if (debug_get_symbol_value(s, fp, arg_value)) {
+                    strcpy(arg_value, "unknown");
+                }
+                sprintf(arg_text, "%s=%s", s->symbol_name, arg_value);
+                strcat(function_args, arg_text);
+                first_arg = 0;
+                arg = arg->next;
+            }
+
+
+            printf("%sfunction %s+%d (%s)\n       at %s:%d\n", frame_marker,
+                fn->function_name, fp->offset, function_args,
+                fp->filename, fp->lineno);
+        } else {
+            printf("%s%s+%d at %s:%d\n", frame_marker, sym->name, fp->offset, fp->filename, fp->lineno);
+        }
+
+    } else {
+        printf("%s%s+%d (unknown location)\n", frame_marker, sym->name, fp->offset);
+    }
+}
+
+static int cmd_frame(int argc, char **argv)
+{
+    struct debugger_regs_t regs;
+    bk.get_regs(&regs);
+    uint16_t stack = regs.sp;
+    uint16_t ix = wrap_reg(regs.xh, regs.xl);
+    uint16_t at = bk.pc();
+
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix);
+    size_t frames_count = debug_stack_frames_count(first_frame_pointer);
+
+    if (argc > 1)
+    {
+        current_frame = strtol(argv[1], NULL, 10);
+    }
+
+    if (current_frame >= frames_count)
+    {
+        current_frame = frames_count - 1;
+    }
+
+    debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);
+    if (frame_at != NULL) {
+        printf("frame %zu\n", current_frame);
+        print_frame(frame_at, frame_at, stack);
+    } else {
+        printf("frame unknown.\n");
+    }
+
+    debug_stack_frames_free(first_frame_pointer);
+    return 0;
+}
+
+static int cmd_up(int argc, char **argv)
+{
+    if (current_frame > 0)
+    {
+        current_frame--;
+    }
+    return cmd_frame(0, NULL);
+}
+
+static int cmd_down(int argc, char **argv)
+{
+    current_frame++;
+    return cmd_frame(0, NULL);
+}
+
+static int cmd_print(int argc, char **argv)
+{
+    return 0;
+}
+
+static int cmd_info(int argc, char **argv)
+{
+    if (argc < 2) {
+        return 0;
+    }
+
+    if (strcmp(argv[1], "locals") == 0) {
+        struct debugger_regs_t regs;
+        bk.get_regs(&regs);
+
+        uint16_t stack = regs.sp;
+        uint16_t initial_stack = stack;
+        uint16_t ix = wrap_reg(regs.xh, regs.xl);
+        uint16_t at = bk.pc();
+
+        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix);
+        debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
+
+        debug_sym_function* fn = fp->function;
+        if (fn != NULL) {
+            char function_args[255] = {0};
+            debug_sym_function_argument* arg = fn->arguments;
+            while (arg) {
+                debug_sym_symbol* s = arg->symbol;
+
+                char arg_text[128];
+                char arg_value[128];
+
+                if (!debug_symbol_valid(s, initial_stack, fp)) {
+                    strcpy(arg_value, "<invalid>");
+                } else if (debug_get_symbol_value(s, fp, arg_value)) {
+                    strcpy(arg_value, "<unknown>");
+                }
+                printf("  %s=%s\n", s->symbol_name, arg_value);
+                arg = arg->next;
+            }
+        }
+
+        debug_stack_frames_free(first_frame_pointer);
+    }
+
+    return 0;
+}
+
 static int cmd_backtrace(int argc, char **argv)
 {
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
 
     uint16_t stack = regs.sp;
+    uint16_t initial_stack = stack;
     uint16_t ix = wrap_reg(regs.xh, regs.xl);
-
     uint16_t at = bk.pc();
 
-    do
-    {
-        uint16_t offset;
-        symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix);
+    debug_frame_pointer* fp = first_frame_pointer;
+    debug_frame_pointer* current = debug_stack_frames_at(first_frame_pointer, current_frame);
 
-        if (sym == NULL) {
-            printf("    Unknown.\n");
-            break;
-        }
+    while (fp) {
+        print_frame(fp, current, initial_stack);
+        fp = fp->next;
+    }
 
-        const char *filename;
-        int   lineno;
-
-        if ( debug_find_source_location(at, &filename, &lineno) < 0 ) {
-            printf("  %s+%d (unknown location)\n", sym->name, offset);
-        } else {
-
-            const char *nm;
-            if (*sym->name == '_') {
-                nm = sym->name + 1;
-            } else {
-                nm = sym->name;
-            }
-
-            uint16_t frame_pointer;
-            if (offset == 0) {
-                frame_pointer = stack - 2;
-            } else if (offset < 8) {
-                // we've pushed old ix but haven't inited old one
-                frame_pointer = stack;
-            } else {
-                frame_pointer = ix;
-            }
-
-            debug_sym_function* fn = debug_find_function(nm, filename);
-            if (fn != NULL) {
-                char function_args[255] = {0};
-                debug_sym_function_argument* arg = fn->arguments;
-                uint8_t first_arg = 1;
-                while (arg) {
-                    debug_sym_symbol* s = arg->symbol;
-                    if (!first_arg) {
-                        strcat(function_args, ", ");
-                    }
-                    char arg_text[128];
-                    char arg_value[128];
-                    if (debug_get_symbol_value(s, frame_pointer, arg_value)) {
-                        strcpy(arg_value, "unknown");
-                    }
-                    sprintf(arg_text, "%s=%s", s->symbol_name, arg_value);
-                    strcat(function_args, arg_text);
-                    first_arg = 0;
-                    arg = arg->next;
-                }
-                printf("  function %s+%d (%s) at %s:%d\n", fn->function_name, offset, function_args, filename, lineno);
-            } else {
-                printf("  %s+%d at %s:%d\n", sym->name, offset, filename, lineno);
-            }
-
-
-            srcfile_display(filename, lineno, 1, lineno);
-        }
-
-        if (offset == 0) {
-            // we're exactly at beginning of the function
-            uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
-            at = caller;
-            // unwind ret
-            stack += 2;
-        } else if (offset < 8) {
-            // we've pushed old ix but haven't inited old one
-            uint16_t caller = wrap_reg(bk.get_memory(stack + 3), bk.get_memory(stack + 2));
-            at = caller;
-            // unwind ret and ix
-            stack += 4;
-        } else {
-            // ix should point to sp at beginning of the function
-            stack = ix;
-            // last thing pushed is frame pointer of the caller (its ix)
-            ix = wrap_reg(bk.get_memory(ix + 1), bk.get_memory(ix));
-            // then goes ret
-            stack += 2;
-            uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
-            at = caller;
-        }
-
-        if (strcmp(sym->name, "main") == 0 || strcmp(sym->name, "_main") == 0) {
-            break;
-        }
-
-    } while (1);
-
+    debug_stack_frames_free(first_frame_pointer);
     return 0;
 }
 
@@ -1112,9 +1193,29 @@ static int cmd_restore(int argc, char **argv)
 
 static int cmd_list(int argc, char **argv)
 {
-    const unsigned short pc = bk.pc();
+    int addr;
 
-    int addr = pc;
+    {
+        struct debugger_regs_t regs;
+        bk.get_regs(&regs);
+        uint16_t stack = regs.sp;
+        uint16_t ix = wrap_reg(regs.xh, regs.xl);
+        uint16_t at = bk.pc();
+
+        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix);
+        debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);
+        if (frame_at)
+        {
+            addr = frame_at->address;
+        }
+        else
+        {
+            addr = at;
+        }
+
+        debug_stack_frames_free(first_frame_pointer);
+    }
+
     const char *filename;
     int   lineno;
 
@@ -1127,7 +1228,7 @@ static int cmd_list(int argc, char **argv)
     }
 
     if ( debug_find_source_location(addr, &filename, &lineno) < 0 ) {
-        printf("No mapping found for $%04x\n",pc);
+        printf("No mapping found for $%04x\n", addr);
         return 0;
     }
     srcfile_display(filename, lineno - 5, 10, lineno);
