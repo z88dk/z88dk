@@ -1719,7 +1719,7 @@ static int handle_cpp(struct lexer_state *ls, int sharp_type)
 				   some source files, and they are legal */
 				warning(l, "null cpp directive");
 			}
-			if (!(ls->flags & LEXER)) put_char(ls, '\n');
+			//if (!(ls->flags & LEXER)) put_char(ls, '\n');
 			goto handle_exit2;
 		case NAME:
 			break;
