@@ -6,6 +6,7 @@
 #include "backend.h"
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 static cfile *cfiles = NULL;
@@ -55,7 +56,7 @@ static uint8_t parse_address_space(const char *encoded, address_space *address_s
     return 0;
 }
 
-static uint8_t parse_record_type(const char* rt, type_record* record)
+static uint8_t parse_record_type(const char *rt, type_record *record)
 {
     int end;
     int size;
@@ -82,13 +83,14 @@ static uint8_t parse_record_type(const char* rt, type_record* record)
                 // new chain entry
 
                 {
-                    type_chain* next = malloc(sizeof(type_chain));
+                    type_chain* next = malloc(sizeof(*next));
                     if (last != NULL) {
                         last->next = next;
                     } else {
                         record->first = next;
                     }
                     next->type_ = TYPE_UNKNOWN;
+                    next->size = 1;
                     next->data = NULL;
                     next->next = NULL;
                     last = next;
@@ -113,6 +115,7 @@ static uint8_t parse_record_type(const char* rt, type_record* record)
             }
             case RECORD_PARSING_MODE_D: {
                 /*
+                    DA<n> - Array
                     DF	Function
                     DG	Generic pointer
                     DC	Code pointer
@@ -125,6 +128,13 @@ static uint8_t parse_record_type(const char* rt, type_record* record)
                 mode = RECORD_PARSING_MODE_MAYBE_NEXT;
 
                 switch (c) {
+                    case 'A': {
+                        char *end;
+                        last->type_ = TYPE_ARRAY;
+                        last->size = strtol(rt, &end, 0);
+                        rt = end;
+                        break;
+                    }
                     case 'F': {
                         last->type_ = TYPE_FUNCTION;
                         break;
@@ -286,7 +296,7 @@ err:
     return 1;
 }
 
-static void debug_add_function_info(const char* encoded)
+static void debug_add_function_info(const char *encoded)
 {
     // F:G$main$0_0$0({0}DF,SI:S),C,0,0,0,0,0
     // F:Fother.c$haha2$0_0$0({0}DF,DV),C,0,0
@@ -548,7 +558,7 @@ void debug_add_info_encoded(char *encoded)
         }
     }
 
-    //printf("Decoded cdb: <%s>\n",encoded);
+    printf("Decoded cdb: <%s>\n",encoded);
 }
 
 
@@ -643,23 +653,60 @@ debug_sym_function* debug_find_function(const char* function_name, const char* f
     return f;
 }
 
-static uint8_t debug_resolve_chain_value(type_chain* chain, uint16_t frame_pointer, char* target) {
+static uint8_t debug_resolve_chain_value(debug_sym_symbol *sym, uint16_t frame_pointer, char *target, size_t targetlen) {
+    type_chain *chain = sym->type_record.first;
     switch (chain->type_) {
+        case TYPE_ARRAY:
+            sprintf(target,"An array len %d", chain->size);
+            return 0;
         case TYPE_INT:
         case TYPE_SHORT: {
-            uint16_t v = (bk.get_memory(frame_pointer + 1) << 8) + bk.get_memory(frame_pointer);
-            sprintf(target, "%d", v);
+            if ( sym->type_record.signed_) {
+                int16_t v = (bk.get_memory(frame_pointer + 1) << 8) + bk.get_memory(frame_pointer);
+                snprintf(target, targetlen, "%d", v);
+            } else {
+                uint16_t v = (bk.get_memory(frame_pointer + 1) << 8) + bk.get_memory(frame_pointer);
+                snprintf(target, targetlen, "%u", v);
+            }
+            return 0;
+        }
+        case TYPE_LONG: {
+             if ( sym->type_record.signed_) {
+                int32_t v = (bk.get_memory(frame_pointer + 3) << 24) + (bk.get_memory(frame_pointer + 2) << 16) + (bk.get_memory(frame_pointer + 1) << 8) + bk.get_memory(frame_pointer);
+                snprintf(target, targetlen, "%d", v);
+            } else {
+                uint32_t v = (bk.get_memory(frame_pointer + 3) << 24) + (bk.get_memory(frame_pointer + 2) << 16) + (bk.get_memory(frame_pointer + 1) << 8) + bk.get_memory(frame_pointer);
+                snprintf(target, targetlen, "%u", v);
+            }
             return 0;
         }
         case TYPE_GENERIC_POINTER:
         case TYPE_CODE_POINTER: {
             uint16_t v = (bk.get_memory(frame_pointer + 1) << 8) + bk.get_memory(frame_pointer);
-            sprintf(target, "%#04x", v);
+            if ( chain->next->type_ == TYPE_CHAR ) {
+                int maxlen = targetlen - 2;
+                int offs = 0;
+
+                offs = snprintf(target + offs, targetlen - offs,"%#04x \"", v);
+
+                while ( offs < maxlen ) {
+                    char ch = bk.get_memory(v++);
+                    if ( ch == 0 ) break;
+                    if ( isprint(ch)) {
+                        offs += snprintf(target+offs, targetlen - offs, "%c", ch);
+                    } else {
+                        offs += snprintf(target+offs, targetlen - offs, "\\%02x", ch);
+                    }
+                }
+                snprintf(target+offs, targetlen - offs, "\"");
+                return 0;
+            }
+            snprintf(target, targetlen, "%#04x", v);
             return 0;
         }
         case TYPE_CHAR: {
             uint8_t v = bk.get_memory(frame_pointer);
-            sprintf(target, "%d", v);
+            snprintf(target, targetlen,"'%c' (%d)", v, v);
             return 0;
         }
         default: {
@@ -668,10 +715,9 @@ static uint8_t debug_resolve_chain_value(type_chain* chain, uint16_t frame_point
     }
 }
 
-uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char* target) {
+uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char *target, size_t targetlen) {
     if (sym->address_space.address_space == 'B') {
-        return debug_resolve_chain_value(sym->type_record.first,
-            frame_pointer->frame_pointer + sym->address_space.b, target);
+        return debug_resolve_chain_value(sym, frame_pointer->frame_pointer + sym->address_space.b, target, targetlen);
     } else {
         return 1;
     }
@@ -679,7 +725,7 @@ uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame
     return 0;
 }
 
-uint8_t debug_symbol_valid(debug_sym_symbol* sym, uint16_t stack, debug_frame_pointer* frame_pointer)
+uint8_t debug_symbol_valid(debug_sym_symbol *sym, uint16_t stack, debug_frame_pointer *frame_pointer)
 {
     if (sym->address_space.address_space == 'B') {
         return frame_pointer->frame_pointer + sym->address_space.b >= stack;
@@ -701,7 +747,7 @@ static uint16_t wrap_reg(uint8_t h, uint8_t l)
     return data;
 }
 
-debug_frame_pointer* debug_stack_frames_at(debug_frame_pointer* first, size_t frame)
+debug_frame_pointer* debug_stack_frames_at(debug_frame_pointer *first, size_t frame)
 {
     while (frame && first) {
         frame--;
@@ -710,7 +756,7 @@ debug_frame_pointer* debug_stack_frames_at(debug_frame_pointer* first, size_t fr
     return first;
 }
 
-size_t debug_stack_frames_count(debug_frame_pointer* first)
+size_t debug_stack_frames_count(debug_frame_pointer *first)
 {
     size_t count = 0;
     while (first) {

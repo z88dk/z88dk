@@ -116,7 +116,7 @@ void write_cdb_type(UT_string *output, Type *type,int comma)
 {
     if ( type->ptr ) {
         if ( type->kind == KIND_ARRAY ) {
-            utstring_printf(output,"%sDA%dd", comma ? "," : "",type->len);
+            utstring_printf(output,"%sDA%d", comma ? "," : "",type->len);
         } else {
             utstring_printf(output,"%sDG", comma ? "," : "");
         }

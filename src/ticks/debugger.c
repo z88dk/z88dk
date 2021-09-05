@@ -493,7 +493,7 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
                 }
                 char arg_text[128];
                 char arg_value[128];
-                if (debug_get_symbol_value(s, fp, arg_value)) {
+                if (debug_get_symbol_value(s, fp, arg_value, sizeof(arg_value))) {
                     strcpy(arg_value, "unknown");
                 }
                 sprintf(arg_text, "%s=%s", s->symbol_name, arg_value);
@@ -598,7 +598,7 @@ static int cmd_info(int argc, char **argv)
 
                 if (!debug_symbol_valid(s, initial_stack, fp)) {
                     strcpy(arg_value, "<invalid>");
-                } else if (debug_get_symbol_value(s, fp, arg_value)) {
+                } else if (debug_get_symbol_value(s, fp, arg_value, sizeof(arg_value))) {
                     strcpy(arg_value, "<unknown>");
                 }
                 printf("  %s=%s\n", s->symbol_name, arg_value);

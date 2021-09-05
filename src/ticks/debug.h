@@ -45,6 +45,7 @@ enum symbol_scope_t {
 
 enum type_record_type {
     TYPE_UNKNOWN = 0,
+    TYPE_ARRAY,
     TYPE_FUNCTION,
     TYPE_GENERIC_POINTER,
     TYPE_CODE_POINTER,
@@ -63,6 +64,7 @@ enum type_record_type {
 
 struct type_chain_s {
     enum type_record_type type_;
+    int   size;
     char* data;
     type_chain* next;
 };
@@ -124,7 +126,7 @@ extern void debug_add_cline(const char *filename, const char *function, int line
 extern int debug_resolve_source(char *name);
 
 extern debug_sym_function* debug_find_function(const char* function_name, const char* file_name);
-extern uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char* target);
+extern uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char *target, size_t targetlen);
 extern uint8_t debug_symbol_valid(debug_sym_symbol* sym, uint16_t stack, debug_frame_pointer* frame_pointer);
 
 extern debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint16_t ix);
