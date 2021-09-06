@@ -393,3 +393,7 @@
 
 	EXTERN	l_push_di
 	EXTERN	l_pop_ei
+
+        EXTERN  l_debug_push_frame
+        EXTERN  l_debug_pop_frame
+
