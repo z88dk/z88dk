@@ -105,6 +105,7 @@ typedef struct {
 
 static void completion(const char *buf, linenoiseCompletions *lc, void *ctx);
 static int cmd_next(int argc, char **argv);
+static int cmd_next_source(int argc, char **argv);
 static int cmd_step(int argc, char **argv);
 static int cmd_continue(int argc, char **argv);
 static int cmd_frame(int argc, char **argv);
@@ -114,6 +115,7 @@ static int cmd_print(int argc, char **argv);
 static int cmd_info(int argc, char **argv);
 static int cmd_backtrace(int argc, char **argv);
 static int cmd_disassemble(int argc, char **argv);
+static int cmd_fin(int argc, char **argv);
 static int cmd_registers(int argc, char **argv);
 static int cmd_break(int argc, char **argv);
 static int cmd_watch(int argc, char **argv);
@@ -133,10 +135,13 @@ static const char *resolve_to_label(int addr);
 
 static command commands[] = {
     { "s",      cmd_step,          "",  NULL },
+    { "ni",     cmd_next,          "",  NULL },
+    { "n",      cmd_next_source,   "",  NULL },
     { "bt",     cmd_backtrace,     "",  NULL },
     { "p",      cmd_print,         "",  NULL },
     { "b",      cmd_break,         "",  NULL },
-    { "next",   cmd_next,          "",  "Step the instruction (over calls)" },
+    { "nexti",  cmd_next,          "",  "Step the instruction (over calls)" },
+    { "next",   cmd_next_source,   "",  "Step one source line" },
     { "step",   cmd_step,          "",  "Step the instruction (including into calls)" },
     { "cont",   cmd_continue,      "",  "Continue execution" },
     { "backtrace",cmd_backtrace,   "",  "Show the execution stack" },
@@ -146,6 +151,7 @@ static command commands[] = {
     { "print",  cmd_print,         "<expression>",  "Print an expression" },
     { "info",   cmd_info,         "locals,...",  "Get info request" },
     { "dis",    cmd_disassemble,   "[<address>]",  "Disassemble from pc/<address>" },
+    { "fin",    cmd_fin,           "",  "Exit current function (and print result if any)" },
     { "reg",    cmd_registers,     "",  "Display the registers" },
     { "break",  cmd_break,         "<address/label>",  "Handle breakpoints" },
     { "watch",  cmd_watch,         "<address/label>",  "Handle watchpoints" },
@@ -177,6 +183,22 @@ static int hotspots[65536];
 static int hotspots_t[65536];
 static size_t current_frame = 0;
 static int last_stacktrace_at = 0;
+
+typedef enum {
+    TMP_REASON_UNKNOWN = 0,
+    TMP_REASON_FIN,
+    TMP_REASON_STEP_SOURCE_LINE,
+} temporary_breakpoint_reason_t;
+
+typedef struct temporary_breakpoint_t {
+    temporary_breakpoint_reason_t   reason;
+    uint32_t                        at;
+    debug_sym_function*             callee;
+    struct temporary_breakpoint_t*  next;
+} temporary_breakpoint_t;
+
+// temporary breakpoints live to the point one of them is hit. in that case all of them has to be removed
+static temporary_breakpoint_t* temporary_breakpoints = NULL;
 
 static int interact_with_tty = 0;
 
@@ -278,9 +300,66 @@ void debugger()
     }
 
     if ( bk.breakpoints_check() ) {
-        breakpoint *elem;
         int         i = 1;
         int         dodebug = 0;
+
+        temporary_breakpoint_t *temp_br;
+        LL_FOREACH(temporary_breakpoints, temp_br) {
+            if (bk.pc() == temp_br->at) {
+                dodebug = 1;
+                switch (temp_br->reason) {
+                    case TMP_REASON_FIN: {
+                        struct debugger_regs_t regs;
+                        bk.get_regs(&regs);
+                        uint16_t hl = wrap_reg(regs.h, regs.l);
+                        uint16_t de = wrap_reg(regs.d, regs.e);
+                        uint32_t return_value = ((uint32_t)de << 16) | hl;
+                        if (temp_br->callee) {
+                            type_chain *ttt = temp_br->callee->type_record.first;
+                            if (ttt->type_ == TYPE_FUNCTION) {
+                                // skip DF
+                                ttt = ttt->next;
+                            }
+                            if (ttt == NULL) {
+                                printf("Warning: unknown callee return type, DEHL returned %08x.\n", return_value);
+                            } else {
+                                if (ttt->type_ != TYPE_VOID) {
+                                    char resolved_result[128];
+                                    debug_print_element(ttt, temp_br->callee->type_record.signed_,
+                                        RESOLVE_BY_VALUE, return_value, resolved_result, 128);
+                                    printf("function %s returned: %s\n", temp_br->callee->function_name,
+                                        resolved_result);
+                                }
+                            }
+                        } else {
+                            printf("Warning: unknown callee, DEHL returned %08x.\n", return_value);
+                        }
+                        cmd_list(0, NULL);
+                        break;
+                    }
+                    case TMP_REASON_STEP_SOURCE_LINE: {
+                        cmd_list(0, NULL);
+                        break;
+                    }
+                    default: {
+                        printf("Warning: unknown reason why we stopped on temporary breakpoint.\n");
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (dodebug) {
+            // regardless of the reason we've stopped, all temp breakpoints have to be removed
+            while (temporary_breakpoints) {
+                bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, temporary_breakpoints->at, 1);
+                temporary_breakpoint_t* next = temporary_breakpoints->next;
+                free(temporary_breakpoints);
+                temporary_breakpoints = next;
+            }
+        }
+
+        breakpoint *elem;
         LL_FOREACH(breakpoints, elem) {
             if ( elem->enabled == 0 ) {
                 continue;
@@ -451,6 +530,59 @@ static int cmd_next(int argc, char **argv)
 }
 
 
+static int cmd_next_source(int argc, char **argv)
+{
+    struct debugger_regs_t regs;
+    bk.get_regs(&regs);
+
+    uint16_t stack = regs.sp;
+    uint16_t initial_stack = stack;
+    uint16_t ix = wrap_reg(regs.xh, regs.xl);
+    uint16_t at = bk.pc();
+
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix, 1);
+
+    if (first_frame_pointer == NULL || first_frame_pointer->function == NULL ||
+            first_frame_pointer->return_address == 0 ||
+            first_frame_pointer->filename == NULL) {
+        debug_stack_frames_free(first_frame_pointer);
+        printf("Warning: return address or source line is unknown, cannot next. Use nexti instead.\n");
+        return 0;
+    }
+
+    int next_address = debug_resolve_source_forward(first_frame_pointer->filename,
+        first_frame_pointer->function->function_name, first_frame_pointer->lineno + 1);
+    if (next_address < 0) {
+        debug_stack_frames_free(first_frame_pointer);
+        printf("Warning: return address or source line is unknown, cannot next. Use nexti instead.\n");
+        return 0;
+    }
+
+    {
+        temporary_breakpoint_t* tmp_next = malloc(sizeof(temporary_breakpoint_t));
+        tmp_next->at = next_address;
+        tmp_next->callee = first_frame_pointer->function;
+        tmp_next->reason = TMP_REASON_STEP_SOURCE_LINE;
+        LL_APPEND(temporary_breakpoints, tmp_next);
+        bk.add_breakpoint(BK_BREAKPOINT_SOFTWARE, tmp_next->at, 1);
+    }
+
+    {
+        temporary_breakpoint_t* tmp_fin = malloc(sizeof(temporary_breakpoint_t));
+        tmp_fin->at = first_frame_pointer->return_address;
+        tmp_fin->callee = first_frame_pointer->function;
+        tmp_fin->reason = TMP_REASON_FIN;
+        LL_APPEND(temporary_breakpoints, tmp_fin);
+        bk.add_breakpoint(BK_BREAKPOINT_SOFTWARE, tmp_fin->at, 1);
+    }
+
+    debug_stack_frames_free(first_frame_pointer);
+    debugger_active = 0;
+    bk.resume();
+    return 1;
+}
+
+
 
 static int cmd_step(int argc, char **argv)
 {
@@ -491,8 +623,8 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
                 if (!first_arg) {
                     strcat(function_args, ", ");
                 }
-                char arg_text[128];
-                char arg_value[128];
+                char arg_text[64];
+                char arg_value[20];
                 if (debug_get_symbol_value(s, fp, arg_value, sizeof(arg_value))) {
                     strcpy(arg_value, "unknown");
                 }
@@ -523,7 +655,7 @@ static int cmd_frame(int argc, char **argv)
     uint16_t ix = wrap_reg(regs.xh, regs.xl);
     uint16_t at = bk.pc();
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix, 0);
     size_t frames_count = debug_stack_frames_count(first_frame_pointer);
 
     if (argc > 1)
@@ -583,7 +715,7 @@ static int cmd_info(int argc, char **argv)
         uint16_t ix = wrap_reg(regs.xh, regs.xl);
         uint16_t at = bk.pc();
 
-        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix);
+        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix, 0);
         debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
 
         debug_sym_function* fn = fp->function;
@@ -622,7 +754,18 @@ static int cmd_backtrace(int argc, char **argv)
     uint16_t ix = wrap_reg(regs.xh, regs.xl);
     uint16_t at = bk.pc();
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix, 0);
+    if (first_frame_pointer == NULL) {
+        uint16_t offset;
+        symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
+        if (sym != NULL) {
+            printf("Warning: no backtrace is available for symbol '%s'.\n", sym->name);
+        } else {
+            printf("Warning: current location is unknown.\n");
+            return 0;
+        }
+    }
+
     debug_frame_pointer* fp = first_frame_pointer;
     debug_frame_pointer* current = debug_stack_frames_at(first_frame_pointer, current_frame);
 
@@ -701,16 +844,39 @@ static const char *resolve_to_label(int addr)
 
 static int cmd_disassemble(int argc, char **argv)
 {
-    char  buf[256];
-    int   i = 0;
-    static int  where = -1;
+    char buf[256];
+    int i = 0;
+    int where = -1;
     const unsigned short pc = bk.pc();
 
     if ( argc == 2 ) {
         where = parse_address(argv[1]);
     }
 
-    if ( where == -1 ) where = pc;
+    if ( where == -1 )
+    {
+        struct debugger_regs_t regs;
+        bk.get_regs(&regs);
+        uint16_t stack = regs.sp;
+        uint16_t ix = wrap_reg(regs.xh, regs.xl);
+
+        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(pc, stack, ix, 0);
+        debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);
+        if (frame_at)
+        {
+            if (current_frame) {
+                printf("Showing disassembly at frame %zu ($%04x), current pc is at $%04x\n",
+                    current_frame, frame_at->address, pc);
+            }
+            where = frame_at->address;
+        }
+        else
+        {
+            where = pc;
+        }
+
+        debug_stack_frames_free(first_frame_pointer);
+    }
 
     while ( i < 10 ) {
        where += disassemble2(where, buf, sizeof(buf), 0);
@@ -845,6 +1011,39 @@ static int cmd_watch(int argc, char **argv)
             }
         }
     } 
+    return 0;
+}
+
+static int cmd_fin(int argc, char **argv)
+{
+    struct debugger_regs_t regs;
+    bk.get_regs(&regs);
+
+    uint16_t stack = regs.sp;
+    uint16_t initial_stack = stack;
+    uint16_t ix = wrap_reg(regs.xh, regs.xl);
+    uint16_t at = bk.pc();
+
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix, 1);
+
+    if (first_frame_pointer && first_frame_pointer->return_address) {
+
+        temporary_breakpoint_t* tmp = malloc(sizeof(temporary_breakpoint_t));
+        tmp->at = first_frame_pointer->return_address;
+        tmp->callee = first_frame_pointer->function;
+        tmp->reason = TMP_REASON_FIN;
+        LL_APPEND(temporary_breakpoints, tmp);
+
+        bk.add_breakpoint(BK_BREAKPOINT_SOFTWARE, first_frame_pointer->return_address, 1);
+        debug_stack_frames_free(first_frame_pointer);
+        debugger_active = 0;
+        bk.resume();
+        return 1;
+    } else {
+        debug_stack_frames_free(first_frame_pointer);
+        printf("Warning: return address is unknown, cannot fin.\n");
+    }
+
     return 0;
 }
 
@@ -1202,7 +1401,7 @@ static int cmd_list(int argc, char **argv)
         uint16_t ix = wrap_reg(regs.xh, regs.xl);
         uint16_t at = bk.pc();
 
-        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix);
+        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix, 0);
         debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);
         if (frame_at)
         {

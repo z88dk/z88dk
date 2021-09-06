@@ -68,7 +68,7 @@ void srcfile_display(const char *filename, int start_line, int count, int highli
     if ( end_line > file->num_lines) end_line = file->num_lines;
 
 
-    for ( i = start_line; i < end_line; i++ ) {
+    for ( i = start_line; i <= end_line; i++ ) {
         if ( count > 1 ) {
             printf("%s% 5d: %s\n", i == highlight ? ">" : " ", i, file->lines[i-1]);
         } else {

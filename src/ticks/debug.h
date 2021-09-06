@@ -113,10 +113,16 @@ struct debug_frame_pointer_s {
     debug_sym_function*     function;
     uint16_t                offset;
     uint16_t                address;
+    uint16_t                return_address;
     uint16_t                frame_pointer;
     const char*             filename;
     int                     lineno;
     debug_frame_pointer*    next;
+};
+
+enum resolve_chain_value_kind {
+    RESOLVE_BY_POINTER,
+    RESOLVE_BY_VALUE
 };
 
 // debug
@@ -124,12 +130,14 @@ extern void debug_add_info_encoded(char *encoded);
 extern int debug_find_source_location(int address, const char **filename, int *lineno);
 extern void debug_add_cline(const char *filename, const char *function, int lineno, int level, int scope, const char *address);
 extern int debug_resolve_source(char *name);
+extern int debug_resolve_source_forward(const char *filename, const char* within_function, int lineno);
 
 extern debug_sym_function* debug_find_function(const char* function_name, const char* file_name);
+extern int debug_print_element(type_chain* chain, char issigned, enum resolve_chain_value_kind resolve_by, uint32_t data, char *target, size_t targetlen);
 extern uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char *target, size_t targetlen);
 extern uint8_t debug_symbol_valid(debug_sym_symbol* sym, uint16_t stack, debug_frame_pointer* frame_pointer);
 
-extern debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint16_t ix);
+extern debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint16_t ix, uint16_t limit);
 extern debug_frame_pointer* debug_stack_frames_at(debug_frame_pointer* first, size_t frame);
 extern size_t debug_stack_frames_count(debug_frame_pointer* first);
 extern void debug_stack_frames_free(debug_frame_pointer* stack_frames);
