@@ -1420,7 +1420,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
             callrts("l_i64_copy");
         }
 
-        if (c_framepointer_is_ix != -1 || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
+        if (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
             gen_pop_frame();
             Zsp += 2;
         }
@@ -4903,6 +4903,8 @@ void gen_push_frame(void)
         } else {
             ol("push\taf");
         }
+    } else if (c_debug_entry_points) {
+        callrts("l_debug_push_frame");
     }
 }
 
@@ -4917,6 +4919,8 @@ void gen_pop_frame(void)
         } else {
             ol("pop\taf");
         }
+    } else if (c_debug_entry_points) {
+        callrts("l_debug_pop_frame");
     }
 }
 

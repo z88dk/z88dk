@@ -107,3 +107,6 @@
 ../_DEVELOPMENT/l/z80/logical/l_cpl_hl
 ../_DEVELOPMENT/z80/z80/asm_z80_delay_ms
 ../_DEVELOPMENT/z80/z80/asm_z80_delay_tstate.asm
+../_DEVELOPMENT/l/z80/__debug_framepointer
+../_DEVELOPMENT/l/z80/l_debug_pop_frame
+../_DEVELOPMENT/l/z80/l_debug_push_frame

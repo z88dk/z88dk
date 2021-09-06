@@ -448,5 +448,7 @@ enum maths_mode {
 extern UT_string *debug_utstr;
 extern UT_string *debug2_utstr;
 extern int        scope_block;
+extern char       c_debug_entry_points;
+
 
 #endif

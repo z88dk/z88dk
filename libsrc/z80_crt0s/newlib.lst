@@ -5,6 +5,9 @@
 ../_DEVELOPMENT/l/z80/l_command_line_parse
 ../_DEVELOPMENT/l/z80/l_command_line_parse_in_place
 ../_DEVELOPMENT/l/z80/l_compare_de_hl
+../_DEVELOPMENT/l/z80/__debug_framepointer
+../_DEVELOPMENT/l/z80/l_debug_pop_frame
+../_DEVELOPMENT/l/z80/l_debug_push_frame
 ../_DEVELOPMENT/l/z80/l_dec_bc
 ../_DEVELOPMENT/l/z80/l_dec_de
 #../_DEVELOPMENT/l/z80/l_ei_reti

@@ -692,10 +692,10 @@ int debug_print_element(type_chain* chain, char issigned, enum resolve_chain_val
             if ( isprint(ch)) {
                 offs = snprintf(target, targetlen, "\'%c\'", ch);
             } else {
-                offs = snprintf(target, targetlen, "x%02x", ch);
+                offs = snprintf(target, targetlen, "x%02x", (unsigned char)ch);
             }
         } else {
-            offs = snprintf(target, targetlen, "x%02x", ch);
+            offs = snprintf(target, targetlen, "x%02x", (unsigned char)ch);
         }
         break;
     }
@@ -788,7 +788,7 @@ int debug_print_element(type_chain* chain, char issigned, enum resolve_chain_val
                 if ( isprint(ch)) {
                     offs += snprintf(target+offs, targetlen - offs, "%c", ch);
                 } else {
-                    offs += snprintf(target+offs, targetlen - offs, "\\%02x", ch);
+                    offs += snprintf(target+offs, targetlen - offs, "\\%02x", (unsigned char)ch);
                 }
             }
             snprintf(target+offs, targetlen - offs, "\"");

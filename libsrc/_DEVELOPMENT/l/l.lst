@@ -182,3 +182,6 @@ l/z80/longlong/fast/l_fast_lsr_dehldehl
 l/z80/longlong/small/l_small_asr_dehldehl
 l/z80/longlong/small/l_small_lsl_dehldehl
 l/z80/longlong/small/l_small_lsr_dehldehl
+l/z80/__debug_framepointer
+l/z80/l_debug_pop_frame
+l/z80/l_debug_push_frame

@@ -17,6 +17,7 @@ static char   *c_output_extension = "asm";
 static char   *c_output_file = NULL;
 static char    c_debug_adb_file = 0;
 static char    c_debug_adb_defc = 0;
+       char    c_debug_entry_points = 0;
 
 static int      gargc; /* global copies of command line args */
 static char   **gargv;
@@ -265,9 +266,8 @@ int main(int argc, char** argv)
 
     if ( c_debug_adb_file || c_debug_adb_defc ) {
         c_cline_directive = 1;
-        // Turn on the framepointer entry so we can get local variables
-        if ( !IS_808x() && !IS_GBZ80() && c_framepointer_is_ix == -1 ) {
-            c_framepointer_is_ix = 1;
+        if ( c_framepointer_is_ix == -1 ) {
+            c_debug_entry_points = 1;
         }
     }
 

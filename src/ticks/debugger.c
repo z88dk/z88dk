@@ -130,7 +130,7 @@ static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
 static void print_hotspots();
 static const char *resolve_to_label(int addr);
-
+static uint16_t get_current_framepointer(struct debugger_regs_t *regs);
 
 
 static command commands[] = {
@@ -537,7 +537,7 @@ static int cmd_next_source(int argc, char **argv)
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t ix = wrap_reg(regs.xh, regs.xl);
+    uint16_t ix = get_current_framepointer(&regs);
     uint16_t at = bk.pc();
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix, 1);
@@ -712,7 +712,7 @@ static int cmd_info(int argc, char **argv)
 
         uint16_t stack = regs.sp;
         uint16_t initial_stack = stack;
-        uint16_t ix = wrap_reg(regs.xh, regs.xl);
+        uint16_t ix = get_current_framepointer(&regs);
         uint16_t at = bk.pc();
 
         debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix, 0);
@@ -858,7 +858,7 @@ static int cmd_disassemble(int argc, char **argv)
         struct debugger_regs_t regs;
         bk.get_regs(&regs);
         uint16_t stack = regs.sp;
-        uint16_t ix = wrap_reg(regs.xh, regs.xl);
+        uint16_t ix = get_current_framepointer(&regs);
 
         debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(pc, stack, ix, 0);
         debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);
@@ -1398,7 +1398,7 @@ static int cmd_list(int argc, char **argv)
         struct debugger_regs_t regs;
         bk.get_regs(&regs);
         uint16_t stack = regs.sp;
-        uint16_t ix = wrap_reg(regs.xh, regs.xl);
+        uint16_t ix = get_current_framepointer(&regs);
         uint16_t at = bk.pc();
 
         debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, ix, 0);
@@ -1453,4 +1453,19 @@ static void print_hotspots()
         }
         fclose(fp);
     }
+}
+
+
+static uint16_t get_current_framepointer(struct debugger_regs_t *regs)
+{
+    // If the symbol __debug_framepointer is defined, then extract the value from there
+    // The rest of the stack can be walked as normal since the value is pushed onto
+    // the stack as usual
+    int where = symbol_resolve("__debug_framepointer");
+
+    if ( where != -1 ) {
+        uint16_t ret = bk.get_memory(where) + (bk.get_memory(where+1)*256);
+        return ret;
+    } 
+    return wrap_reg(regs->xh, regs->xl);
 }
