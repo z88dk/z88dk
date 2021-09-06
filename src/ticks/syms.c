@@ -56,7 +56,7 @@ void read_symbol_file(char *filename)
             char **argv = parse_words(buf,&argc);
 
             // Ignore
-            if ( argc < 9 ) {
+            if ( argc < 10 ) {
                 if ( argc >= 3 ) {
                     // We've got at least 3, do something (it's an old format)
                     symbol *sym = calloc(1,sizeof(*sym));
@@ -77,7 +77,16 @@ void read_symbol_file(char *filename)
                 symbol *sym = calloc(1,sizeof(*sym));
 
                 sym->name = strdup(argv[0]);
-                sym->file = strdup(argv[8]);
+
+                {
+                    char fname[FILENAME_MAX];
+                    if (sscanf(argv[9], "%[^:]", fname) == 1) {
+                        sym->file = strdup(fname);
+                    } else {
+                        sym->file = NULL;
+                    }
+                }
+
                 sym->section = strdup(argv[8]); // TODO, comma
                 sym->islocal = 0;
                 if ( strcmp(argv[5], "local,")) {

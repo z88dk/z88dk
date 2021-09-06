@@ -584,14 +584,6 @@ void debug_add_cline(const char *filename, const char *function, int lineno, int
     cl->scope_block = scope_block;
     HASH_ADD_INT(cf->lines, line, cl);
 
-    if (clines[maddress]) {
-        cline *old_cl = clines[maddress];
-        if (old_cl->line < lineno && (strcmp(old_cl->function_name, function) == 0) &&
-            (old_cl->scope_block == scope_block)) {
-            return;
-        }
-    }
-
     clines[cl->address] = cl;  // TODO Banking
 }
 
@@ -634,6 +626,28 @@ int debug_resolve_source(char *name)
     return -1;
 }
 
+int debug_resolve_source_forward(const char *filename, const char* within_function, int lineno)
+{
+    cfile *cf;
+    HASH_FIND_STR(cfiles, filename, cf);
+
+    if ( cf != NULL ) {
+        cline *cl;
+
+        // look a bit forward if we need to
+        for (int forward = 0; forward < 64; forward++) {
+            int f = lineno + forward;
+            HASH_FIND_INT(cf->lines, &f, cl);
+            if ( cl != NULL && (strcmp(cl->function_name, within_function) == 0) ) {
+                return cl->address;
+            }
+        }
+
+    }
+
+    return -1;
+}
+
 debug_sym_function* debug_find_function(const char* function_name, const char* file_name) {
     debug_sym_function* f = NULL;
 
@@ -657,42 +671,132 @@ static int min(int a, int b) { if (a < b ) return a; else return b;}
 static int max(int a, int b) { if (a > b ) return a; else return b;}
 
 
-static int print_element(enum type_record_type type, char issigned, uint16_t addr, char *target, size_t targetlen) {
+int debug_print_element(type_chain* chain, char issigned, enum resolve_chain_value_kind resolve_by, uint32_t data, char *target, size_t targetlen) {
     int offs = 0;
 
-    switch ( type ) {
-    case TYPE_CHAR:
+    switch ( chain->type_ ) {
+    case TYPE_CHAR: {
+        char ch;
+        switch (resolve_by) {
+            case RESOLVE_BY_POINTER: {
+                ch = bk.get_memory((uint16_t)data);
+                break;
+            }
+            case RESOLVE_BY_VALUE:
+            default: {
+                ch = (uint8_t)data;
+                break;
+            }
+        }
         if ( issigned ) {
-            char ch = bk.get_memory(addr);
             if ( isprint(ch)) {
                 offs = snprintf(target, targetlen, "\'%c\'", ch);
             } else {
                 offs = snprintf(target, targetlen, "x%02x", ch);
             }
         } else {
-            char ch = bk.get_memory(addr);
             offs = snprintf(target, targetlen, "x%02x", ch);
         }
         break;
+    }
     case TYPE_INT:
     case TYPE_SHORT:
         if ( issigned ) {
-            int16_t v = (bk.get_memory(addr + 1) << 8) + bk.get_memory(addr);
+            int16_t v;
+            switch (resolve_by) {
+                case RESOLVE_BY_POINTER: {
+                    v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                    break;
+                }
+                case RESOLVE_BY_VALUE:
+                default: {
+                    v = (int16_t)data;
+                    break;
+                }
+            }
             offs += snprintf(target, targetlen, "%d", v);
         } else {
-            uint16_t v = (bk.get_memory(addr + 1) << 8) + bk.get_memory(addr);
+            uint16_t v;
+            switch (resolve_by) {
+                case RESOLVE_BY_POINTER: {
+                    v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                    break;
+                }
+                case RESOLVE_BY_VALUE:
+                default: {
+                    v = (uint16_t)data;
+                    break;
+                }
+            }
             offs += snprintf(target, targetlen, "%u", v);
         }
         break;
     case TYPE_LONG:
         if ( issigned ) {
-            int32_t v = (bk.get_memory(addr + 3) << 24) + (bk.get_memory(addr + 2) << 16) + (bk.get_memory(addr + 1) << 8) + bk.get_memory(addr);
+            int32_t v;
+            switch (resolve_by) {
+                case RESOLVE_BY_POINTER: {
+                    v = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
+                    break;
+                }
+                case RESOLVE_BY_VALUE:
+                default: {
+                    v = (int32_t)data;
+                    break;
+                }
+            }
             offs = snprintf(target, targetlen, "%d", v);
         } else {
-            uint32_t v = (bk.get_memory(addr + 3) << 24) + (bk.get_memory(addr + 2) << 16) + (bk.get_memory(addr + 1) << 8) + bk.get_memory(addr);
+            uint32_t v;
+            switch (resolve_by) {
+                case RESOLVE_BY_POINTER: {
+                    v = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
+                    break;
+                }
+                case RESOLVE_BY_VALUE:
+                default: {
+                    v = (uint32_t)data;
+                    break;
+                }
+            }
             offs = snprintf(target, targetlen, "%u", v);
         }
         break;
+
+    case TYPE_GENERIC_POINTER:
+    case TYPE_CODE_POINTER: {
+        uint16_t v;
+        switch (resolve_by) {
+            case RESOLVE_BY_POINTER: {
+                v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                break;
+            }
+            case RESOLVE_BY_VALUE:
+                default: {
+                    v = (uint16_t)data;
+                    break;
+                }
+        }
+        if ( chain->next && chain->next->type_ == TYPE_CHAR ) {
+            int maxlen = targetlen - 2;
+
+            offs = snprintf(target + offs, targetlen - offs,"%#04x \"", v);
+
+            while ( offs < maxlen ) {
+                char ch = bk.get_memory(v++);
+                if ( ch == 0 ) break;
+                if ( isprint(ch)) {
+                    offs += snprintf(target+offs, targetlen - offs, "%c", ch);
+                } else {
+                    offs += snprintf(target+offs, targetlen - offs, "\\%02x", ch);
+                }
+            }
+            snprintf(target+offs, targetlen - offs, "\"");
+            return 0;
+        }
+        snprintf(target, targetlen, "%#04x", v);
+        return 0;
+    }
     default:
         break;
     }
@@ -712,16 +816,16 @@ static uint8_t debug_resolve_chain_value(debug_sym_symbol *sym, uint16_t frame_p
                 offs += snprintf(target + offs, targetlen - offs, "%s[%d] = ", i != 0 ? ", " : "", i);
                 switch ( chain->next->type_) {
                 case TYPE_CHAR:
-                    offs += print_element(chain->next->type_, sym->type_record.signed_, frame_pointer, target + offs, targetlen - offs);
+                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
                     frame_pointer++;
                     break;
                 case TYPE_INT:
                 case TYPE_SHORT:
-                    offs += print_element(chain->next->type_, sym->type_record.signed_, frame_pointer, target + offs, targetlen - offs);
+                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
                     frame_pointer += 2;
                     break;
                 case TYPE_LONG:
-                    offs += print_element(chain->next->type_, sym->type_record.signed_, frame_pointer, target + offs, targetlen - offs);
+                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
                     frame_pointer += 4;
                     break;
                 default:
@@ -735,31 +839,10 @@ static uint8_t debug_resolve_chain_value(debug_sym_symbol *sym, uint16_t frame_p
         case TYPE_INT:
         case TYPE_SHORT: 
         case TYPE_LONG:
-            print_element(chain->type_, sym->type_record.signed_, frame_pointer, target + offs, targetlen - offs);
-            return 0;
         case TYPE_GENERIC_POINTER:
-        case TYPE_CODE_POINTER: {
-            uint16_t v = (bk.get_memory(frame_pointer + 1) << 8) + bk.get_memory(frame_pointer);
-            if ( chain->next->type_ == TYPE_CHAR ) {
-                int maxlen = targetlen - 2;
-
-                offs = snprintf(target + offs, targetlen - offs,"%#04x \"", v);
-
-                while ( offs < maxlen ) {
-                    char ch = bk.get_memory(v++);
-                    if ( ch == 0 ) break;
-                    if ( isprint(ch)) {
-                        offs += snprintf(target+offs, targetlen - offs, "%c", ch);
-                    } else {
-                        offs += snprintf(target+offs, targetlen - offs, "\\%02x", ch);
-                    }
-                }
-                snprintf(target+offs, targetlen - offs, "\"");
-                return 0;
-            }
-            snprintf(target, targetlen, "%#04x", v);
+        case TYPE_CODE_POINTER:
+            debug_print_element(chain, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
             return 0;
-        }
 
         default: {
             return 1;
@@ -818,7 +901,7 @@ size_t debug_stack_frames_count(debug_frame_pointer *first)
     return count;
 }
 
-debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint16_t ix)
+debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint16_t ix, uint16_t limit)
 {
     debug_frame_pointer* first = NULL;
     debug_frame_pointer* last = NULL;
@@ -830,7 +913,19 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint
         uint16_t offset;
         symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
 
-        if (sym == NULL) {
+        if (sym == NULL || sym->file == NULL) {
+            break;
+        }
+
+        const char *nm;
+        if (*sym->name == '_') {
+            nm = sym->name + 1;
+        } else {
+            nm = sym->name;
+        }
+
+        debug_sym_function* fn = debug_find_function(nm, sym->file);
+        if (fn == NULL) {
             break;
         }
 
@@ -842,13 +937,6 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint
             first = new_frame;
         }
         last = new_frame;
-
-        const char *nm;
-        if (*sym->name == '_') {
-            nm = sym->name + 1;
-        } else {
-            nm = sym->name;
-        }
 
         uint16_t frame_pointer;
         if (offset == 0) {
@@ -867,16 +955,15 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint
         new_frame->frame_pointer = frame_pointer;
         new_frame->offset = offset;
         new_frame->address = at;
+        new_frame->function = fn;
         new_frame->symbol = sym;
 
         if (debug_find_source_location(at, &filename, &lineno) < 0) {
             new_frame->filename = NULL;
             new_frame->lineno = 0;
-            new_frame->function = NULL;
         } else {
             new_frame->filename = filename;
             new_frame->lineno = lineno;
-            new_frame->function = debug_find_function(nm, filename);
         }
 
         if (offset == 0) {
@@ -902,7 +989,13 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint
             at = caller;
         }
 
+        new_frame->return_address = at;
+
         if (strcmp(sym->name, "main") == 0 || strcmp(sym->name, "_main") == 0) {
+            break;
+        }
+
+        if (limit && (--limit == 0)) {
             break;
         }
 
