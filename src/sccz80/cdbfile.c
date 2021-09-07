@@ -47,7 +47,7 @@ void debug_write_symbol(SYMBOL *sym)
         if ( sym->ctype->kind != KIND_FUNC ) {
             utstring_printf(temp,",E,0,0");
         } else {
-            utstring_printf(temp,",C,0,0");
+            utstring_printf(temp,",C,0,%d",sym->ctype->funcattrs.params_offset);
         }
     } else if ( sym->storage == STATIK ) {
         if ( sym->ctype->kind != KIND_FUNC ) {
@@ -63,7 +63,7 @@ void debug_write_symbol(SYMBOL *sym)
         if ( sym->ctype->kind != KIND_FUNC ) {
             utstring_printf(temp,",E,0,0");
         } else {
-            utstring_printf(temp,",C,0,0,0,0,0");
+            utstring_printf(temp,",C,0,%d,0,0,0",sym->ctype->funcattrs.params_offset);
         }
     } else if ( sym->storage == STKLOC ) {
         utstring_printf(temp,"S:L%.*s.%s$%s$%d_0$",(int)strlen(Filename)-2,Filename+1,currfn->name,sym->name,sym->level);
@@ -116,7 +116,7 @@ void write_cdb_type(UT_string *output, Type *type,int comma)
 {
     if ( type->ptr ) {
         if ( type->kind == KIND_ARRAY ) {
-            utstring_printf(output,"%sDA%d", comma ? "," : "",type->len);
+            utstring_printf(output,"%sDA%dx", comma ? "," : "",type->len);
         } else {
             utstring_printf(output,"%sDG", comma ? "," : "");
         }
