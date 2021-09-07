@@ -1420,7 +1420,8 @@ void gen_leave_function(Kind vartype, char type, int incritical)
             callrts("l_i64_copy");
         }
 
-        if (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
+        if ( (c_framepointer_is_ix != -1 || c_debug_entry_points || (currfn->ctype->flags & SAVEFRAME )) &&
+            (currfn->ctype->flags & NAKED) == 0) {
             gen_pop_frame();
             Zsp += 2;
         }
@@ -1448,7 +1449,7 @@ void gen_leave_function(Kind vartype, char type, int incritical)
          }
          Zsp = savesp;
     } else {
-        gen_pop_frame(); /* Restore previous frame pointer */
+        gen_pop_frame(); /* Restore previous frame pointer if needed */
     }
 
     if ( (currfn->flags & INTERRUPT) == INTERRUPT ) {
@@ -4886,41 +4887,43 @@ void OutIndex(int val)
 
 void gen_push_frame(void)
 {
-    if ( (c_framepointer_is_ix != -1 && (currfn->ctype->flags & NAKED) == 0 )
-        || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {
-        if ( !IS_808x() && !IS_GBZ80() ) {
-            ot("push\t");
-            outstr(FRAME_REGISTER);
-            nl();
-            if ( c_framepointer_is_ix != -1) {
-                ot("ld\t");
+    if ( (currfn->ctype->flags & NAKED) == 0) {
+        if ( (currfn->ctype->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {  
+            if ( !IS_808x() && !IS_GBZ80() ) {
+                ot("push\t");
                 outstr(FRAME_REGISTER);
-                outstr(",0\n");
-                ot("add\t");
-                outstr(FRAME_REGISTER);
-                outstr(",sp\n");
+                nl();
+                if ( c_framepointer_is_ix != -1) {
+                    ot("ld\t");
+                    outstr(FRAME_REGISTER);
+                    outstr(",0\n");
+                    ot("add\t");
+                    outstr(FRAME_REGISTER);
+                    outstr(",sp\n");
+                }
+            } else {
+                ol("push\taf");
             }
-        } else {
-            ol("push\taf");
+        } else if (c_debug_entry_points) {
+            callrts("l_debug_push_frame");
         }
-    } else if (c_debug_entry_points) {
-        callrts("l_debug_push_frame");
     }
 }
 
 void gen_pop_frame(void)
 {
-    if ( (c_framepointer_is_ix != -1 && (currfn->ctype->flags & NAKED) == 0 )
-        || (currfn->ctype->flags & (SAVEFRAME|NAKED)) == SAVEFRAME ) {  
-        if ( !IS_808x() && !IS_GBZ80() ) {
-            ot("pop\t");
-            outstr(FRAME_REGISTER);
-            nl();
-        } else {
-            ol("pop\taf");
+    if ( (currfn->ctype->flags & NAKED) == 0) {
+        if ( (currfn->ctype->flags & SAVEFRAME) || c_framepointer_is_ix != -1 ) {  
+            if ( !IS_808x() && !IS_GBZ80() ) {
+                ot("pop\t");
+                outstr(FRAME_REGISTER);
+                nl();
+            } else {
+                ol("pop\taf");
+            }
+        } else if (c_debug_entry_points) {
+            callrts("l_debug_pop_frame");
         }
-    } else if (c_debug_entry_points) {
-        callrts("l_debug_pop_frame");
     }
 }
 
