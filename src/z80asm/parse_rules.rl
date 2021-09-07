@@ -125,6 +125,25 @@ Define rules for a ragel-based parser.
 			  expr %{ pop_eval_expr(ctx, &expr_value, &expr_error); };
 
 	/*---------------------------------------------------------------------
+	*   C_LINE
+	*--------------------------------------------------------------------*/
+	asm_C_LINE =
+		  _TK_C_LINE const_expr _TK_NEWLINE @{
+			if (expr_error)
+				error_expected_const_expr();
+			else
+				asm_C_LINE(expr_value, get_error_file());
+		}
+
+		| _TK_C_LINE const_expr _TK_COMMA string _TK_NEWLINE @{
+			if (expr_error)
+				error_expected_const_expr();
+			else
+				asm_C_LINE(expr_value, Str_data(name));
+		}
+		;
+	
+	/*---------------------------------------------------------------------
 	*   IF, IFDEF, IFNDEF, ELSE, ENDIF
 	*--------------------------------------------------------------------*/
 	asm_IF 		= _TK_IF       expr _TK_NEWLINE @{ asm_IF(ctx, pop_expr(ctx) ); };
@@ -165,7 +184,7 @@ Define rules for a ragel-based parser.
 		  %{ asm_DEFGROUP_define_const(Str_data(name)); }
 		;
 
-	defgroup_var = defgroup_var_value | defgroup_var_next ;
+	defgroup_var = defgroup_var_value | defgroup_var_next | asm_C_LINE;
 
 	defgroup_vars = defgroup_var (_TK_COMMA defgroup_var)* _TK_COMMA? ;
 
@@ -233,6 +252,7 @@ Define rules for a ragel-based parser.
 												ctx->current_sm = SM_MAIN;
 											}
 #endfor  <S>
+		| 	asm_C_LINE
 		;
 
 	asm_DEFVARS =
@@ -470,6 +490,7 @@ Define rules for a ragel-based parser.
 		| asm_DEFVARS
 		| asm_conditional
 		| asm_DMA
+		| asm_C_LINE
 		/*---------------------------------------------------------------------
 		*   Directives
 		*--------------------------------------------------------------------*/
@@ -513,20 +534,6 @@ Define rules for a ragel-based parser.
 				error_expected_const_expr();
 			else
 				asm_LINE(expr_value, Str_data(name));
-		}
-
-		| _TK_C_LINE const_expr _TK_NEWLINE @{
-			if (expr_error)
-				error_expected_const_expr();
-			else
-				asm_C_LINE(expr_value, get_error_file());
-		}
-
-		| _TK_C_LINE const_expr _TK_COMMA string _TK_NEWLINE @{
-			if (expr_error)
-				error_expected_const_expr();
-			else
-				asm_C_LINE(expr_value, Str_data(name));
 		}
 
 		| label? _TK_INCLUDE string _TK_NEWLINE @{

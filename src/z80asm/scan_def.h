@@ -209,11 +209,13 @@ TOKEN_RE(TK_IND_C,   "(C",   "(" hspace "C"i   index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_HLI, "(HLI", "(" hspace "HLI"i index_reg_suffix, p--; te--)
 TOKEN_RE(TK_IND_HLD, "(HLD", "(" hspace "HLD"i index_reg_suffix, p--; te--)
 
+/* so that C_LINE can appear in DEFVARS and DEFGROUP (#1852) */
+TOKEN_KW(C_LINE, )
+
 /* assembly directives */
 TOKEN_OPCODE(ALIGN      )
 TOKEN_OPCODE(BINARY     )
 TOKEN_OPCODE(BYTE       )
-TOKEN_OPCODE(C_LINE     )
 TOKEN_OPCODE(DB         )
 TOKEN_OPCODE(DC         )
 TOKEN_OPCODE(DDB        )
