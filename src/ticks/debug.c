@@ -929,10 +929,12 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
     debug_frame_pointer* first = NULL;
     debug_frame_pointer* last = NULL;
 
+    uint8_t entry_num = 0;
     uint16_t stack = sp;
     uint16_t at = pc;
 
     do {
+        entry_num++;
         uint16_t offset;
         symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
 
@@ -949,6 +951,44 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
 
         debug_sym_function* fn = debug_find_function(nm, sym->file);
         if (fn == NULL) {
+            if (offset == 0 && entry_num == 1) {
+                // we might save the situation here
+                debug_frame_pointer* unknown_entry = malloc(sizeof(debug_frame_pointer));
+
+                uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
+
+                uint16_t unknown_offset;
+                symbol* s = symbol_find_lower(at, SYM_ADDRESS, &unknown_offset);
+
+                unknown_entry->next = NULL;
+                unknown_entry->frame_pointer = 0xFFFFFFFF;
+                unknown_entry->symbol = s;
+                unknown_entry->offset = unknown_offset;
+                unknown_entry->address = at;
+                unknown_entry->return_address = caller;
+                unknown_entry->function = NULL;
+
+                const char *filename;
+                int   lineno;
+                if (debug_find_source_location(at, &filename, &lineno) < 0) {
+                    unknown_entry->filename = NULL;
+                    unknown_entry->lineno = 0;
+                } else {
+                    unknown_entry->filename = filename;
+                    unknown_entry->lineno = lineno;
+                }
+
+                at = caller;
+                stack += 2;
+
+                if (last) {
+                    last->next = unknown_entry;
+                } else {
+                    first = unknown_entry;
+                }
+                last = unknown_entry;
+                continue;
+            }
             break;
         }
 

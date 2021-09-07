@@ -330,7 +330,7 @@ void debugger()
                                 }
                             }
                         } else {
-                            printf("Warning: unknown callee, DEHL returned %08x.\n", return_value);
+                            printf("Warning: returned from a function without frame pointer.\n");
                         }
                         cmd_list(0, NULL);
                         break;
