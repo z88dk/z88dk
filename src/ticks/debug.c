@@ -804,29 +804,29 @@ int debug_print_element(type_chain* chain, char issigned, enum resolve_chain_val
     return offs;
 }
 
-static uint8_t debug_resolve_chain_value(debug_sym_symbol *sym, uint16_t frame_pointer, char *target, size_t targetlen) {
+static uint8_t debug_resolve_chain_value(debug_sym_symbol *sym, uint16_t addr, char *target, size_t targetlen) {
     type_chain *chain = sym->type_record.first;
     int         offs = 0;
 
     switch (chain->type_) {
         case TYPE_ARRAY: {
             int maxlen = max(10,min(10, chain->size));
-            offs += snprintf(target + offs, targetlen - offs, "%#04x [%d] = { ", frame_pointer, chain->size);
+            offs += snprintf(target + offs, targetlen - offs, "%#04x [%d] = { ", addr, chain->size);
             for ( int i = 0; i < maxlen; i++ ) {
                 offs += snprintf(target + offs, targetlen - offs, "%s[%d] = ", i != 0 ? ", " : "", i);
                 switch ( chain->next->type_) {
                 case TYPE_CHAR:
-                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
-                    frame_pointer++;
+                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, addr, target + offs, targetlen - offs);
+                    addr++;
                     break;
                 case TYPE_INT:
                 case TYPE_SHORT:
-                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
-                    frame_pointer += 2;
+                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, addr, target + offs, targetlen - offs);
+                    addr += 2;
                     break;
                 case TYPE_LONG:
-                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
-                    frame_pointer += 4;
+                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, addr, target + offs, targetlen - offs);
+                    addr += 4;
                     break;
                 default:
                     break;
@@ -841,7 +841,7 @@ static uint8_t debug_resolve_chain_value(debug_sym_symbol *sym, uint16_t frame_p
         case TYPE_LONG:
         case TYPE_GENERIC_POINTER:
         case TYPE_CODE_POINTER:
-            debug_print_element(chain, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
+            debug_print_element(chain, sym->type_record.signed_, RESOLVE_BY_POINTER, addr, target + offs, targetlen - offs);
             return 0;
 
         default: {
@@ -901,7 +901,7 @@ size_t debug_stack_frames_count(debug_frame_pointer *first)
     return count;
 }
 
-debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint16_t ix, uint16_t limit)
+debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint16_t fp, uint16_t limit)
 {
     debug_frame_pointer* first = NULL;
     debug_frame_pointer* last = NULL;
@@ -942,10 +942,10 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint
         if (offset == 0) {
             frame_pointer = stack - 2;
         } else if (offset < 8) {
-            // we've pushed old ix but haven't inited old one
+            // we've pushed old fp but haven't inited old one
             frame_pointer = stack;
         } else {
-            frame_pointer = ix;
+            frame_pointer = fp;
         }
 
         const char *filename;
@@ -973,16 +973,16 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint
             // unwind ret
             stack += 2;
         } else if (offset < 8) {
-            // we've pushed old ix but haven't inited old one
+            // we've pushed old fp but haven't inited old one
             uint16_t caller = wrap_reg(bk.get_memory(stack + 3), bk.get_memory(stack + 2));
             at = caller;
-            // unwind ret and ix
+            // unwind ret and fp
             stack += 4;
         } else {
-            // ix should point to sp at beginning of the function
-            stack = ix;
-            // last thing pushed is frame pointer of the caller (its ix)
-            ix = wrap_reg(bk.get_memory(ix + 1), bk.get_memory(ix));
+            // fp should point to sp at beginning of the function
+            stack = fp;
+            // last thing pushed is frame pointer of the caller (its fp)
+            fp = wrap_reg(bk.get_memory(fp + 1), bk.get_memory(fp));
             // then goes ret
             stack += 2;
             uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
