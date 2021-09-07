@@ -1,5 +1,6 @@
 #include "debugger.h"
 #include "backend.h"
+#include "debug.h"
 #include "disassembler.h"
 #include "syms.h"
 #include <string.h>

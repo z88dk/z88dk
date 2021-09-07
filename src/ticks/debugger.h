@@ -24,14 +24,6 @@ typedef struct breakpoint {
     struct breakpoint  *next;
 } breakpoint;
 
-struct debugger_regs_t {
-    uint16_t pc, sp;
-    unsigned char a,b,c,d,e,h,l;
-    unsigned char a_,b_,c_,d_,e_,h_,l_;
-    unsigned char f, f_;
-    unsigned char xh, xl, yh, yl;
-};
-
 extern int debugger_active;
 extern void      debugger_init();
 extern void      debugger();

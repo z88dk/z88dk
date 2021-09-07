@@ -130,8 +130,6 @@ static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
 static void print_hotspots();
 static const char *resolve_to_label(int addr);
-static uint16_t get_current_framepointer(struct debugger_regs_t *regs);
-
 
 static command commands[] = {
     { "s",      cmd_step,          "",  NULL },
@@ -537,10 +535,9 @@ static int cmd_next_source(int argc, char **argv)
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t fpaddr = get_current_framepointer(&regs);
     uint16_t at = bk.pc();
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, fpaddr, 1);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 1);
 
     if (first_frame_pointer == NULL || first_frame_pointer->function == NULL ||
             first_frame_pointer->return_address == 0 ||
@@ -605,7 +602,7 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
 
     const char* frame_marker = fp == current ? " * " : "   ";
 
-    if (fp->filename && fp->function) {
+    if (sym && fp->filename && fp->function) {
         debug_sym_function* fn = fp->function;
         if (fn != NULL) {
             char function_args[255] = {0};
@@ -643,7 +640,11 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
         }
 
     } else {
-        printf("%s%s+%d (unknown location)\n", frame_marker, sym->name, fp->offset);
+        if (sym) {
+            printf("%s%s+%d\n       at unknown location\n", frame_marker, sym->name, fp->offset);
+        } else {
+            printf("%s$%04x\n       at unknown location\n", frame_marker, fp->address);
+        }
     }
 }
 
@@ -652,10 +653,9 @@ static int cmd_frame(int argc, char **argv)
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
     uint16_t stack = regs.sp;
-    uint16_t fpaddr = wrap_reg(regs.xh, regs.xl);
     uint16_t at = bk.pc();
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, fpaddr, 0);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     size_t frames_count = debug_stack_frames_count(first_frame_pointer);
 
     if (argc > 1)
@@ -682,16 +682,16 @@ static int cmd_frame(int argc, char **argv)
 
 static int cmd_up(int argc, char **argv)
 {
-    if (current_frame > 0)
-    {
-        current_frame--;
-    }
+    current_frame++;
     return cmd_frame(0, NULL);
 }
 
 static int cmd_down(int argc, char **argv)
 {
-    current_frame++;
+    if (current_frame > 0)
+    {
+        current_frame--;
+    }
     return cmd_frame(0, NULL);
 }
 
@@ -712,10 +712,9 @@ static int cmd_info(int argc, char **argv)
 
         uint16_t stack = regs.sp;
         uint16_t initial_stack = stack;
-        uint16_t fpaddr = get_current_framepointer(&regs);
         uint16_t at = bk.pc();
 
-        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, fpaddr, 0);
+        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
         debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
 
         debug_sym_function* fn = fp->function;
@@ -751,10 +750,9 @@ static int cmd_backtrace(int argc, char **argv)
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t fpaddr = wrap_reg(regs.xh, regs.xl);
     uint16_t at = bk.pc();
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, fpaddr, 0);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     if (first_frame_pointer == NULL) {
         uint16_t offset;
         symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
@@ -858,9 +856,8 @@ static int cmd_disassemble(int argc, char **argv)
         struct debugger_regs_t regs;
         bk.get_regs(&regs);
         uint16_t stack = regs.sp;
-        uint16_t fpaddr = get_current_framepointer(&regs);
 
-        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(pc, stack, fpaddr, 0);
+        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(pc, stack, &regs, 0);
         debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);
         if (frame_at)
         {
@@ -1021,10 +1018,9 @@ static int cmd_fin(int argc, char **argv)
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t fpaddr = wrap_reg(regs.xh, regs.xl);
     uint16_t at = bk.pc();
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, fpaddr, 1);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 1);
 
     if (first_frame_pointer && first_frame_pointer->return_address) {
 
@@ -1398,10 +1394,9 @@ static int cmd_list(int argc, char **argv)
         struct debugger_regs_t regs;
         bk.get_regs(&regs);
         uint16_t stack = regs.sp;
-        uint16_t fpaddr = get_current_framepointer(&regs);
         uint16_t at = bk.pc();
 
-        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, fpaddr, 0);
+        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
         debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);
         if (frame_at)
         {
@@ -1453,19 +1448,4 @@ static void print_hotspots()
         }
         fclose(fp);
     }
-}
-
-
-static uint16_t get_current_framepointer(struct debugger_regs_t *regs)
-{
-    // If the symbol __debug_framepointer is defined, then extract the value from there
-    // The rest of the stack can be walked as normal since the value is pushed onto
-    // the stack as usual
-    int where = symbol_resolve("__debug_framepointer");
-
-    if ( where != -1 ) {
-        uint16_t ret = bk.get_memory(where) + (bk.get_memory(where+1)*256);
-        return ret;
-    } 
-    return wrap_reg(regs->xh, regs->xl);
 }
