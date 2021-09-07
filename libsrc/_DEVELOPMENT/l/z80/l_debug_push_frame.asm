@@ -12,7 +12,7 @@ l_debug_push_frame:
     ld      hl,(__debug_framepointer)
     ex      (sp),hl ;hl = entry value
     push    hl
-    ld      hl,4
+    ld      hl,2
     add     hl,sp
     ld      (__debug_framepointer),hl
     pop     hl
