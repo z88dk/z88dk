@@ -14,7 +14,7 @@ use Cwd qw( cwd abs_path );
 use File::Basename;
 use File::Path 'remove_tree';
 
-my @TEST_EXT = qw( asm bin c d dat def err inc lis lst map o P out sym tap );
+my @TEST_EXT = qw( asm bin c h d dat def err inc lis lst map o P out sym tap );
 
 # run z80asm from .
 $ENV{PATH} = ".".$Config{path_sep}.$ENV{PATH};
