@@ -589,7 +589,18 @@ void debug_add_cline(const char *filename, const char *function, int lineno, int
 
 int debug_find_source_location(int address, const char **filename, int *lineno)
 {
+    uint16_t offset;
+    symbol *original_sym = symbol_find_lower(address, SYM_ADDRESS, &offset);
+    if (original_sym == NULL) {
+        // no symbol - no address!
+        return -1;
+    }
+    int topmost_address = original_sym->address;
+
     while ( clines[address] == NULL && address > 0 ) {
+        if (address < topmost_address) {
+            return -1;
+        }
         address--;
     }
     if ( clines[address] == NULL) return -1;
