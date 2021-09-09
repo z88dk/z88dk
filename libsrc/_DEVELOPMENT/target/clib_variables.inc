@@ -39,44 +39,39 @@ IF __clib_malloc_heap_size = -1
    ld hl,-1                    ; ensure sp == 0 is accepted
    add hl,sp                   ; hl = top of the stack
 
+IF __CPU_INTEL__ || __CPU_GBZ80__
 IF __CPU_8085__
    ld bc,__BSS_END_tail
    sub hl,bc                   ; hl = space between top of stack and end of bss - 1
-
 ELSE
-
    ld de,__BSS_END_tail
-
-IF __CPU_8080__ || __CPU_GBZ80__
    ld a,l
    sub e
    ld a,h
-   sbc d
-
+   sbc d                       ; hl = space between top of stack and end of bss - 1
+ENDIF
 ELSE
+   ld de,__BSS_END_tail
    xor a
    sbc hl,de                   ; hl = space between top of stack and end of bss - 1
-ENDIF
-
 ENDIF
 
    jp C, __Exit                ; if stack overlaps bss, this is a fatal error
 
    ld bc,__crt_stack_size + 14 ; amount of space reserved by stack + minimum heap size - 1
 
+IF __CPU_INTEL__ || __CPU_GBZ80__
 IF __CPU_8085__
    sub hl,bc                   ; hl = max heap size - 15
-
 ELSE
-IF __CPU_8080__ || __CPU_GBZ80__
    ld a,l
    sub c
    ld a,h
-   sbc b
+   sbc b                       ; hl = max heap size - 15
+ENDIF
 
 ELSE
    sbc hl,bc                   ; hl = max heap size - 15
-ENDIF
 ENDIF
 
    jp C, __Exit                ; if no room for heap, this is a fatal error
@@ -86,7 +81,7 @@ ENDIF
 
    ld bc,hl                    ; bc = available heap size
 
-IF __CPU_8085__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    ld hl,__BSS_END_tail        ; hl = __BSS_END_tail = start of heap
 ELSE
    ex de,hl                    ; hl = __BSS_END_tail = start of heap
@@ -114,22 +109,22 @@ IF __clib_malloc_heap_size < -1
 
    ld hl,-__clib_malloc_heap_size - 13
 
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
 IF __CPU_8085__
    ld bc,__BSS_END_tail
    sub hl,bc                   ; hl = space between top of stack and end of bss - 1
 ELSE
    ld de,__BSS_END_tail
-
-IF __CPU_8080__ || __CPU_GBZ80__
    ld a,l
    sub e
    ld a,h
    sbc d
+ENDIF
 ELSE
+   ld de,__BSS_END_tail
    xor a
    sbc hl,de                   ; hl = space between top of stack and end of bss - 1
-ENDIF
-
 ENDIF
 
    jp C, __Exit                ; if no room for minimum size heap, fatal error
