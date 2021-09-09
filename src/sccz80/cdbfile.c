@@ -76,6 +76,7 @@ void debug_write_symbol(SYMBOL *sym)
     } else {
         return;
     }
+
     // Encode the cdbstring and output it as a defc
     utstring_printf(debug2_utstr, "; %s\n", utstring_body(temp));
     utstring_printf(debug2_utstr,"\tPUBLIC\t__CDBINFO__");
@@ -93,23 +94,37 @@ void debug_write_symbol(SYMBOL *sym)
 void debug_write_type(Type *type)
 {
     int i;
+    UT_string *temp;
 
-    utstring_printf(debug_utstr,"T:F%.*s$%s",(int)strlen(Filename)-2,Filename+1,type->name);
-    write_cdb_type(debug_utstr, type, 0);
+
+    utstring_new(temp);
 
     if ( type->kind == KIND_STRUCT) {
-        utstring_printf(debug_utstr,"[");
+        utstring_printf(temp,"T:F%.*s$%s",(int)strlen(Filename)-2,Filename+1,type->name);
+        utstring_printf(temp,"[");
         for ( i = 0; i < array_len(type->fields); i++) {
             Type *f = array_get_byindex(type->fields, i);
-            utstring_printf(debug_utstr,"({%d}S:S$%s$0_0$0(",(int)f->offset,f->name);
-            write_cdb_type(debug_utstr, f,0);
-            utstring_printf(debug_utstr,"),Z,0,0)");
+            utstring_printf(temp,"({%d}S:S$%s$0_0$0({%d}",(int)f->offset,f->name,f->size);
+            write_cdb_type(temp, f,0);
+            utstring_printf(temp,"),Z,0,0)");
         }
-        utstring_printf(debug_utstr,"]");
+        utstring_printf(temp,"]");
     }
 
+    if ( utstring_len(temp) > 0) {
+        // Encode the cdbstring and output it as a defc
+        utstring_printf(debug2_utstr, "; %s\n", utstring_body(temp));
+        utstring_printf(debug2_utstr,"\tPUBLIC\t__CDBINFO__");
+        encode_cdbstring(debug2_utstr, utstring_body(temp));
+        utstring_printf(debug2_utstr,"\n");
+        utstring_printf(debug2_utstr,"\tdefc\t__CDBINFO__");
+        encode_cdbstring(debug2_utstr, utstring_body(temp));
+        utstring_printf(debug2_utstr," = 1\n");
 
-    utstring_printf(debug_utstr,"\n");
+        utstring_concat(debug_utstr, temp);
+        utstring_free(temp);
+        utstring_printf(debug_utstr,"\n");
+    }
 } 
 
 void write_cdb_type(UT_string *output, Type *type,int comma)
@@ -162,7 +177,7 @@ void write_cdb_type(UT_string *output, Type *type,int comma)
        // utstring_printf(output,"*__far ");
         break;
     case KIND_STRUCT:
-        utstring_printf(output,"%sST_%s", comma ? "," : "", type->name);
+        utstring_printf(output,"%sST%s:S", comma ? "," : "", type->tag ? type->tag->name : type->name);
         break;
     case KIND_FUNC:
         utstring_printf(output,"%sDF", comma ? "," : "");
