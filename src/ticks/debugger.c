@@ -690,10 +690,16 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
         }
 
     } else {
-        if (sym) {
-            printf("%s%s+%d\n       at unknown location\n", frame_marker, sym->name, fp->offset);
+        char location[FILENAME_MAX + 4];
+        if (fp->filename) {
+            sprintf(location, "%s:%d", fp->filename, fp->lineno);
         } else {
-            printf("%s$%04x\n       at unknown location\n", frame_marker, fp->address);
+            sprintf(location, "%s", "unknown location");
+        }
+        if (sym) {
+            printf("%s%s+%d\n       at %s\n", frame_marker, sym->name, fp->offset, location);
+        } else {
+            printf("%s$%04x\n       at %s\n", frame_marker, fp->address, location);
         }
     }
 }
