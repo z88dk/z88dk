@@ -718,7 +718,6 @@ int main (int argc, char **argv){
 
   hook_init();
   set_backend(ticks_debugger_backend);
-  debugger_init();
   apu_reset();
 
   tapbuf= (unsigned char *) malloc (0x20000);
@@ -797,6 +796,7 @@ int main (int argc, char **argv){
           break;
         case 'd':
           debugger_active = 1;
+          debugger_init();
           argv--;
           argc++;
           break;

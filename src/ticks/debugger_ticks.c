@@ -124,7 +124,7 @@ void debugger_read_memory(int addr)
 }
 
 void invalidate() {}
-void break_() {}
+void break_() {debugger_active=1; }
 void resume() {}
 void detach() {}
 uint8_t restore(const char* file_path, uint16_t at) {
