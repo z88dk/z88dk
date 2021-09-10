@@ -106,7 +106,11 @@ void vinline()
                 gen_comment(line);
             }
             if (c_cline_directive || c_intermix_ccode) {
-                gen_emit_line(lineno);
+                while ( lptr-- ) {
+                    if ( !isspace(lptr)) break;
+                }
+                if ( lptr ) 
+                    gen_emit_line(lineno);
             }
             lptr = 0;
             return;

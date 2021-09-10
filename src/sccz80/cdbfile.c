@@ -111,7 +111,7 @@ void debug_write_type(Type *type)
         utstring_printf(temp,"]");
     }
 
-    if ( utstring_len(temp) > 0) {
+    if ( utstring_len(temp) > 0 && utstring_len(temp)< 200) {
         // Encode the cdbstring and output it as a defc
         utstring_printf(debug2_utstr, "; %s\n", utstring_body(temp));
         utstring_printf(debug2_utstr,"\tPUBLIC\t__CDBINFO__");
