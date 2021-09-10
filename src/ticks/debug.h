@@ -114,7 +114,7 @@ struct debug_frame_pointer_s {
     uint16_t                offset;
     uint16_t                address;
     uint16_t                return_address;
-    uint16_t                frame_pointer;
+    uint32_t                frame_pointer;
     const char*             filename;
     int                     lineno;
     debug_frame_pointer*    next;
@@ -123,6 +123,14 @@ struct debug_frame_pointer_s {
 enum resolve_chain_value_kind {
     RESOLVE_BY_POINTER,
     RESOLVE_BY_VALUE
+};
+
+struct debugger_regs_t {
+    uint16_t pc, sp;
+    unsigned char a,b,c,d,e,h,l;
+    unsigned char a_,b_,c_,d_,e_,h_,l_;
+    unsigned char f, f_;
+    unsigned char xh, xl, yh, yl;
 };
 
 // debug
@@ -137,7 +145,7 @@ extern int debug_print_element(type_chain* chain, char issigned, enum resolve_ch
 extern uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char *target, size_t targetlen);
 extern uint8_t debug_symbol_valid(debug_sym_symbol* sym, uint16_t stack, debug_frame_pointer* frame_pointer);
 
-extern debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint16_t ix, uint16_t limit);
+extern debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit);
 extern debug_frame_pointer* debug_stack_frames_at(debug_frame_pointer* first, size_t frame);
 extern size_t debug_stack_frames_count(debug_frame_pointer* first);
 extern void debug_stack_frames_free(debug_frame_pointer* stack_frames);

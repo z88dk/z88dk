@@ -102,11 +102,11 @@ typedef struct {
 } command;
 
 
-
 static void completion(const char *buf, linenoiseCompletions *lc, void *ctx);
 static int cmd_next(int argc, char **argv);
 static int cmd_next_source(int argc, char **argv);
 static int cmd_step(int argc, char **argv);
+static int cmd_step_source(int argc, char **argv);
 static int cmd_continue(int argc, char **argv);
 static int cmd_frame(int argc, char **argv);
 static int cmd_up(int argc, char **argv);
@@ -115,7 +115,7 @@ static int cmd_print(int argc, char **argv);
 static int cmd_info(int argc, char **argv);
 static int cmd_backtrace(int argc, char **argv);
 static int cmd_disassemble(int argc, char **argv);
-static int cmd_fin(int argc, char **argv);
+static int cmd_finish(int argc, char **argv);
 static int cmd_registers(int argc, char **argv);
 static int cmd_break(int argc, char **argv);
 static int cmd_watch(int argc, char **argv);
@@ -130,40 +130,40 @@ static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
 static void print_hotspots();
 static const char *resolve_to_label(int addr);
-static uint16_t get_current_framepointer(struct debugger_regs_t *regs);
-
 
 static command commands[] = {
-    { "s",      cmd_step,          "",  NULL },
-    { "ni",     cmd_next,          "",  NULL },
-    { "n",      cmd_next_source,   "",  NULL },
-    { "bt",     cmd_backtrace,     "",  NULL },
-    { "p",      cmd_print,         "",  NULL },
-    { "b",      cmd_break,         "",  NULL },
-    { "nexti",  cmd_next,          "",  "Step the instruction (over calls)" },
-    { "next",   cmd_next_source,   "",  "Step one source line" },
-    { "step",   cmd_step,          "",  "Step the instruction (including into calls)" },
-    { "cont",   cmd_continue,      "",  "Continue execution" },
-    { "backtrace",cmd_backtrace,   "",  "Show the execution stack" },
-    { "frame",  cmd_frame,         "[<num>]",  "Set or see current frame" },
-    { "up",     cmd_up,            "",  "Go one frame up" },
-    { "down",   cmd_down,          "",  "Go one frame down" },
-    { "print",  cmd_print,         "<expression>",  "Print an expression" },
-    { "info",   cmd_info,         "locals,...",  "Get info request" },
-    { "dis",    cmd_disassemble,   "[<address>]",  "Disassemble from pc/<address>" },
-    { "fin",    cmd_fin,           "",  "Exit current function (and print result if any)" },
-    { "reg",    cmd_registers,     "",  "Display the registers" },
-    { "break",  cmd_break,         "<address/label>",  "Handle breakpoints" },
-    { "watch",  cmd_watch,         "<address/label>",  "Handle watchpoints" },
-    { "x",      cmd_examine,       "<address>",   "Examine memory" },
-    { "set",    cmd_set,           "<hl/h/l/...> <value>",  "Set registers" },
-    { "out",    cmd_out,           "<address> <value>", "Send to IO bus"},
-    { "trace",  cmd_trace,         "<on/off>", "Disassemble every instruction"},
-    { "hotspot",cmd_hotspot,       "<on/off>", "Track address counts and write to hotspots file"},
-    { "list",   cmd_list,          "[<address>]",   "List the source code at location given or pc"},
-    { "help",   cmd_help,          "",   "Display this help text" },
-    { "restore",cmd_restore,       "<path> [<address>]",   "Upload binary into machine memory"},
-    { "quit",   cmd_quit,          "",   "Quit ticks"},
+    { "si",        cmd_step,        "",  NULL },
+    { "s",         cmd_step_source, "",  NULL },
+    { "ni",        cmd_next,        "",  NULL },
+    { "n",         cmd_next_source, "",  NULL },
+    { "bt",        cmd_backtrace,   "",  NULL },
+    { "p",         cmd_print,       "",  NULL },
+    { "b",         cmd_break,       "",  NULL },
+    { "nexti",     cmd_next,        "",  "Step the instruction (over calls)" },
+    { "next",      cmd_next_source, "",                     "Step one source line" },
+    { "stepi",     cmd_step,        "",                     "Step the instruction (including into calls)" },
+    { "step",      cmd_step_source, "",                     "Step one source line (including into calls)" },
+    { "cont",      cmd_continue,    "",                     "Continue execution" },
+    { "backtrace", cmd_backtrace,   "",                     "Show the execution stack" },
+    { "frame",     cmd_frame,       "[<num>]",              "Set or see current frame" },
+    { "up",        cmd_up,          "",                     "Go one frame up" },
+    { "down",      cmd_down,        "",                     "Go one frame down" },
+    { "print",     cmd_print,       "<expression>",         "Print an expression" },
+    { "info",      cmd_info,        "locals,...",           "Get info request" },
+    { "dis",       cmd_disassemble, "[<address>]",          "Disassemble from pc/<address>" },
+    { "finish",    cmd_finish,      "",                     "Exit current function (and print result if any)" },
+    { "reg",       cmd_registers,   "",                     "Display the registers" },
+    { "break",     cmd_break,       "<address/label>",      "Handle breakpoints" },
+    { "watch",     cmd_watch,       "<address/label>",      "Handle watchpoints" },
+    { "x",         cmd_examine,     "<address>",            "Examine memory" },
+    { "set",       cmd_set,         "<hl/h/l/...> <value>", "Set registers" },
+    { "out",       cmd_out,         "<address> <value>",    "Send to IO bus"},
+    { "trace",     cmd_trace,       "<on/off>",             "Disassemble every instruction"},
+    { "hotspot",   cmd_hotspot,     "<on/off>",             "Track address counts and write to hotspots file"},
+    { "list",      cmd_list,        "[<address>]",          "List the source code at location given or pc"},
+    { "help",      cmd_help,        "",                     "Display this help text" },
+    { "restore",   cmd_restore,     "<path> [<address>]",   "Upload binary into machine memory"},
+    { "quit",      cmd_quit,        "",   "Quit ticks"},
     { NULL, NULL, NULL }
 };
 
@@ -175,6 +175,7 @@ breakpoint *watchpoints;
        int break_required = 0;
        int next_address = -1;
        int trace = 0;
+       int trace_source = 0;
 static int hotspot = 0;
 static int max_hotspot_addr = 0;
 static int last_hotspot_addr;
@@ -188,12 +189,16 @@ typedef enum {
     TMP_REASON_UNKNOWN = 0,
     TMP_REASON_FIN,
     TMP_REASON_STEP_SOURCE_LINE,
+    TMP_REASON_NEXT_SOURCE_LINE,
 } temporary_breakpoint_reason_t;
 
 typedef struct temporary_breakpoint_t {
     temporary_breakpoint_reason_t   reason;
     uint32_t                        at;
     debug_sym_function*             callee;
+    const char*                     source_file;
+    int                             source_line;
+    uint8_t                         external;
     struct temporary_breakpoint_t*  next;
 } temporary_breakpoint_t;
 
@@ -263,6 +268,34 @@ void debugger_process_signals()
     }
 }
 
+static void add_temporary_internal_breakpoint(uint32_t address, temporary_breakpoint_reason_t reason,
+    const char *source_filename, int source_lineno)
+{
+    temporary_breakpoint_t* tmp_step = malloc(sizeof(temporary_breakpoint_t));
+    tmp_step->at = address;
+    tmp_step->callee = NULL;
+    tmp_step->external = 0;
+    tmp_step->source_file = source_filename;
+    tmp_step->source_line = source_lineno;
+    tmp_step->reason = reason;
+    LL_APPEND(temporary_breakpoints, tmp_step);
+}
+
+static void remove_temp_breakpoints()
+{
+    next_address = -1;
+
+    // regardless of the reason we've stopped, all temp breakpoints have to be removed
+    while (temporary_breakpoints) {
+        if (temporary_breakpoints->external) {
+            bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, temporary_breakpoints->at, 1);
+        }
+        temporary_breakpoint_t* next = temporary_breakpoints->next;
+        free(temporary_breakpoints);
+        temporary_breakpoints = next;
+    }
+}
+
 void debugger()
 {
     static char *last_line = NULL;
@@ -299,15 +332,15 @@ void debugger()
         last_hotspot_st = st;
     }
 
-    if ( bk.breakpoints_check() ) {
-        int         i = 1;
-        int         dodebug = 0;
+    int dodebug = 0;
 
+    {
         temporary_breakpoint_t *temp_br;
         LL_FOREACH(temporary_breakpoints, temp_br) {
-            if (bk.pc() == temp_br->at) {
+            if ((temp_br->at == 0xFFFFFFFF) || (bk.pc() == temp_br->at)) {
                 dodebug = 1;
-                switch (temp_br->reason) {
+                temporary_breakpoint_reason_t reason = temp_br->reason;
+                switch (reason) {
                     case TMP_REASON_FIN: {
                         struct debugger_regs_t regs;
                         bk.get_regs(&regs);
@@ -332,13 +365,40 @@ void debugger()
                                 }
                             }
                         } else {
-                            printf("Warning: unknown callee, DEHL returned %08x.\n", return_value);
+                            printf("Warning: returned from a function without frame pointer.\n");
                         }
-                        cmd_list(0, NULL);
                         break;
                     }
-                    case TMP_REASON_STEP_SOURCE_LINE: {
-                        cmd_list(0, NULL);
+                    case TMP_REASON_STEP_SOURCE_LINE:
+                    case TMP_REASON_NEXT_SOURCE_LINE: {
+                        const char *filename;
+                        int   lineno;
+                        const unsigned short pc = bk.pc();
+                        if (debug_find_source_location(pc, &filename, &lineno) < 0) {
+                            // don't know where we are, keep going
+                            if (reason == TMP_REASON_STEP_SOURCE_LINE) {
+                                bk.step();
+                            } else {
+                                bk.next();
+                            }
+                            return;
+                        }
+                        // we're still on the same source line
+                        if ((strcmp(filename, temp_br->source_file) == 0) && (lineno == temp_br->source_line)) {
+                            remove_temp_breakpoints();
+                            if (reason == TMP_REASON_STEP_SOURCE_LINE) {
+                                add_temporary_internal_breakpoint(0xFFFFFFFF, reason, filename, lineno);
+                                bk.step();
+                            } else {
+                                char  b[100];
+                                int len = disassemble2(pc, b, sizeof(b), 0);
+                                add_temporary_internal_breakpoint(pc + len, reason, filename, lineno);
+                                bk.next();
+                            }
+                            return;
+                        } else {
+                            trace_source = 1;
+                        }
                         break;
                     }
                     default: {
@@ -350,15 +410,12 @@ void debugger()
         }
 
         if (dodebug) {
-            // regardless of the reason we've stopped, all temp breakpoints have to be removed
-            while (temporary_breakpoints) {
-                bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, temporary_breakpoints->at, 1);
-                temporary_breakpoint_t* next = temporary_breakpoints->next;
-                free(temporary_breakpoints);
-                temporary_breakpoints = next;
-            }
+            remove_temp_breakpoints();
         }
+    }
 
+    if ( bk.breakpoints_check() ) {
+        int         i = 1;
         breakpoint *elem;
         LL_FOREACH(breakpoints, elem) {
             if ( elem->enabled == 0 ) {
@@ -421,19 +478,30 @@ void debugger()
             }
             i++;
         }
-        if (debugger_active == 0)
-        {
-            if ( bk.pc() == next_address ) {
-                next_address = -1;
-                dodebug = 1;
-            }
-            /* Check breakpoints */
-            if ( dodebug == 0 ) return;
-        }
     }
 
+    if (debugger_active == 0)
+    {
+        if ( bk.pc() == next_address ) {
+            next_address = -1;
+            dodebug = 1;
+        }
+        /* Check breakpoints */
+        if ( dodebug == 0 ) return;
+    }
 
-    if (trace ==0) { // Prevent two lines with the same information
+    if (trace_source) {
+        trace_source = 0;
+        const char *filename;
+        int   lineno;
+        if ( debug_find_source_location(bk.pc(), &filename, &lineno) < 0 ) {
+            disassemble2(bk.pc(), buf, sizeof(buf), 0);
+            printf("%s\n",buf);
+        } else {
+            printf("%s:\n", filename);
+            srcfile_display(filename, lineno - 1, 2, lineno);
+        }
+    } else if (trace == 0) { // Prevent two lines with the same information
         disassemble2(bk.pc(), buf, sizeof(buf), 0);
         printf("%s\n",buf);
     }
@@ -532,57 +600,23 @@ static int cmd_next(int argc, char **argv)
 
 static int cmd_next_source(int argc, char **argv)
 {
-    struct debugger_regs_t regs;
-    bk.get_regs(&regs);
-
-    uint16_t stack = regs.sp;
-    uint16_t initial_stack = stack;
-    uint16_t fpaddr = get_current_framepointer(&regs);
-    uint16_t at = bk.pc();
-
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, fpaddr, 1);
-
-    if (first_frame_pointer == NULL || first_frame_pointer->function == NULL ||
-            first_frame_pointer->return_address == 0 ||
-            first_frame_pointer->filename == NULL) {
-        debug_stack_frames_free(first_frame_pointer);
-        printf("Warning: return address or source line is unknown, cannot next. Use nexti instead.\n");
+    const char *filename;
+    int   lineno;
+    const unsigned short pc = bk.pc();
+    if (debug_find_source_location(pc, &filename, &lineno) < 0) {
+        printf("Warning: cannot obtain current source line.\n");
         return 0;
     }
-
-    int next_address = debug_resolve_source_forward(first_frame_pointer->filename,
-        first_frame_pointer->function->function_name, first_frame_pointer->lineno + 1);
-    if (next_address < 0) {
-        debug_stack_frames_free(first_frame_pointer);
-        printf("Warning: return address or source line is unknown, cannot next. Use nexti instead.\n");
-        return 0;
-    }
-
+    uint16_t break_at;
     {
-        temporary_breakpoint_t* tmp_next = malloc(sizeof(temporary_breakpoint_t));
-        tmp_next->at = next_address;
-        tmp_next->callee = first_frame_pointer->function;
-        tmp_next->reason = TMP_REASON_STEP_SOURCE_LINE;
-        LL_APPEND(temporary_breakpoints, tmp_next);
-        bk.add_breakpoint(BK_BREAKPOINT_SOFTWARE, tmp_next->at, 1);
+        char  buf[100];
+        int len = disassemble2(pc, buf, sizeof(buf), 0);
+        break_at = pc + len;
     }
-
-    {
-        temporary_breakpoint_t* tmp_fin = malloc(sizeof(temporary_breakpoint_t));
-        tmp_fin->at = first_frame_pointer->return_address;
-        tmp_fin->callee = first_frame_pointer->function;
-        tmp_fin->reason = TMP_REASON_FIN;
-        LL_APPEND(temporary_breakpoints, tmp_fin);
-        bk.add_breakpoint(BK_BREAKPOINT_SOFTWARE, tmp_fin->at, 1);
-    }
-
-    debug_stack_frames_free(first_frame_pointer);
-    debugger_active = 0;
-    bk.resume();
+    add_temporary_internal_breakpoint(break_at, TMP_REASON_NEXT_SOURCE_LINE, filename, lineno);
+    bk.next();
     return 1;
 }
-
-
 
 static int cmd_step(int argc, char **argv)
 {
@@ -590,7 +624,20 @@ static int cmd_step(int argc, char **argv)
     return 1;  /* We should exit the loop */
 }
 
+static int cmd_step_source(int argc, char **argv)
+{
+    const char *filename;
+    int   lineno;
+    const unsigned short pc = bk.pc();
+    if (debug_find_source_location(pc, &filename, &lineno) < 0) {
+        printf("Warning: cannot obtain current source line.\n");
+        return 0;
+    }
 
+    add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_STEP_SOURCE_LINE, filename, lineno);
+    bk.step();
+    return 1;
+}
 
 static int cmd_continue(int argc, char **argv)
 {
@@ -605,7 +652,7 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
 
     const char* frame_marker = fp == current ? " * " : "   ";
 
-    if (fp->filename && fp->function) {
+    if (sym && fp->filename && fp->function) {
         debug_sym_function* fn = fp->function;
         if (fn != NULL) {
             char function_args[255] = {0};
@@ -643,7 +690,17 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
         }
 
     } else {
-        printf("%s%s+%d (unknown location)\n", frame_marker, sym->name, fp->offset);
+        char location[FILENAME_MAX + 4];
+        if (fp->filename) {
+            sprintf(location, "%s:%d", fp->filename, fp->lineno);
+        } else {
+            sprintf(location, "%s", "unknown location");
+        }
+        if (sym) {
+            printf("%s%s+%d\n       at %s\n", frame_marker, sym->name, fp->offset, location);
+        } else {
+            printf("%s$%04x\n       at %s\n", frame_marker, fp->address, location);
+        }
     }
 }
 
@@ -652,10 +709,9 @@ static int cmd_frame(int argc, char **argv)
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
     uint16_t stack = regs.sp;
-    uint16_t fpaddr = wrap_reg(regs.xh, regs.xl);
     uint16_t at = bk.pc();
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, fpaddr, 0);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     size_t frames_count = debug_stack_frames_count(first_frame_pointer);
 
     if (argc > 1)
@@ -682,16 +738,16 @@ static int cmd_frame(int argc, char **argv)
 
 static int cmd_up(int argc, char **argv)
 {
-    if (current_frame > 0)
-    {
-        current_frame--;
-    }
+    current_frame++;
     return cmd_frame(0, NULL);
 }
 
 static int cmd_down(int argc, char **argv)
 {
-    current_frame++;
+    if (current_frame > 0)
+    {
+        current_frame--;
+    }
     return cmd_frame(0, NULL);
 }
 
@@ -712,10 +768,9 @@ static int cmd_info(int argc, char **argv)
 
         uint16_t stack = regs.sp;
         uint16_t initial_stack = stack;
-        uint16_t fpaddr = get_current_framepointer(&regs);
         uint16_t at = bk.pc();
 
-        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, fpaddr, 0);
+        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
         debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
 
         debug_sym_function* fn = fp->function;
@@ -751,10 +806,9 @@ static int cmd_backtrace(int argc, char **argv)
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t fpaddr = wrap_reg(regs.xh, regs.xl);
     uint16_t at = bk.pc();
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, fpaddr, 0);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     if (first_frame_pointer == NULL) {
         uint16_t offset;
         symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
@@ -858,9 +912,8 @@ static int cmd_disassemble(int argc, char **argv)
         struct debugger_regs_t regs;
         bk.get_regs(&regs);
         uint16_t stack = regs.sp;
-        uint16_t fpaddr = get_current_framepointer(&regs);
 
-        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(pc, stack, fpaddr, 0);
+        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(pc, stack, &regs, 0);
         debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);
         if (frame_at)
         {
@@ -1014,29 +1067,30 @@ static int cmd_watch(int argc, char **argv)
     return 0;
 }
 
-static int cmd_fin(int argc, char **argv)
+static int cmd_finish(int argc, char **argv)
 {
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
 
     uint16_t stack = regs.sp;
     uint16_t initial_stack = stack;
-    uint16_t fpaddr = wrap_reg(regs.xh, regs.xl);
     uint16_t at = bk.pc();
 
-    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, fpaddr, 1);
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 1);
 
     if (first_frame_pointer && first_frame_pointer->return_address) {
 
         temporary_breakpoint_t* tmp = malloc(sizeof(temporary_breakpoint_t));
         tmp->at = first_frame_pointer->return_address;
         tmp->callee = first_frame_pointer->function;
+        tmp->external = 1;
         tmp->reason = TMP_REASON_FIN;
         LL_APPEND(temporary_breakpoints, tmp);
 
         bk.add_breakpoint(BK_BREAKPOINT_SOFTWARE, first_frame_pointer->return_address, 1);
         debug_stack_frames_free(first_frame_pointer);
         debugger_active = 0;
+        trace_source = 1;
         bk.resume();
         return 1;
     } else {
@@ -1398,10 +1452,9 @@ static int cmd_list(int argc, char **argv)
         struct debugger_regs_t regs;
         bk.get_regs(&regs);
         uint16_t stack = regs.sp;
-        uint16_t fpaddr = get_current_framepointer(&regs);
         uint16_t at = bk.pc();
 
-        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, fpaddr, 0);
+        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
         debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);
         if (frame_at)
         {
@@ -1453,19 +1506,4 @@ static void print_hotspots()
         }
         fclose(fp);
     }
-}
-
-
-static uint16_t get_current_framepointer(struct debugger_regs_t *regs)
-{
-    // If the symbol __debug_framepointer is defined, then extract the value from there
-    // The rest of the stack can be walked as normal since the value is pushed onto
-    // the stack as usual
-    int where = symbol_resolve("__debug_framepointer");
-
-    if ( where != -1 ) {
-        uint16_t ret = bk.get_memory(where) + (bk.get_memory(where+1)*256);
-        return ret;
-    } 
-    return wrap_reg(regs->xh, regs->xl);
 }

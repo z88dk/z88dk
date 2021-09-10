@@ -2,6 +2,7 @@
 
 #include "debugger.h"
 #include "ticks.h"
+#include "debug.h"
 #include "backend.h"
 #include "disassembler.h"
 

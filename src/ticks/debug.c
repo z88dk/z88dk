@@ -589,7 +589,18 @@ void debug_add_cline(const char *filename, const char *function, int lineno, int
 
 int debug_find_source_location(int address, const char **filename, int *lineno)
 {
+    uint16_t offset;
+    symbol *original_sym = symbol_find_lower(address, SYM_ADDRESS, &offset);
+    if (original_sym == NULL) {
+        // no symbol - no address!
+        return -1;
+    }
+    int topmost_address = original_sym->address;
+
     while ( clines[address] == NULL && address > 0 ) {
+        if (address < topmost_address) {
+            return -1;
+        }
         address--;
     }
     if ( clines[address] == NULL) return -1;
@@ -804,29 +815,29 @@ int debug_print_element(type_chain* chain, char issigned, enum resolve_chain_val
     return offs;
 }
 
-static uint8_t debug_resolve_chain_value(debug_sym_symbol *sym, uint16_t addr, char *target, size_t targetlen) {
+static uint8_t debug_resolve_chain_value(debug_sym_symbol *sym, uint16_t frame_pointer, char *target, size_t targetlen) {
     type_chain *chain = sym->type_record.first;
     int         offs = 0;
 
     switch (chain->type_) {
         case TYPE_ARRAY: {
             int maxlen = max(10,min(10, chain->size));
-            offs += snprintf(target + offs, targetlen - offs, "%#04x [%d] = { ", addr, chain->size);
+            offs += snprintf(target + offs, targetlen - offs, "%#04x [%d] = { ", frame_pointer, chain->size);
             for ( int i = 0; i < maxlen; i++ ) {
                 offs += snprintf(target + offs, targetlen - offs, "%s[%d] = ", i != 0 ? ", " : "", i);
                 switch ( chain->next->type_) {
                 case TYPE_CHAR:
-                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, addr, target + offs, targetlen - offs);
-                    addr++;
+                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
+                    frame_pointer++;
                     break;
                 case TYPE_INT:
                 case TYPE_SHORT:
-                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, addr, target + offs, targetlen - offs);
-                    addr += 2;
+                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
+                    frame_pointer += 2;
                     break;
                 case TYPE_LONG:
-                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, addr, target + offs, targetlen - offs);
-                    addr += 4;
+                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
+                    frame_pointer += 4;
                     break;
                 default:
                     break;
@@ -841,7 +852,7 @@ static uint8_t debug_resolve_chain_value(debug_sym_symbol *sym, uint16_t addr, c
         case TYPE_LONG:
         case TYPE_GENERIC_POINTER:
         case TYPE_CODE_POINTER:
-            debug_print_element(chain, sym->type_record.signed_, RESOLVE_BY_POINTER, addr, target + offs, targetlen - offs);
+            debug_print_element(chain, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
             return 0;
 
         default: {
@@ -901,15 +912,40 @@ size_t debug_stack_frames_count(debug_frame_pointer *first)
     return count;
 }
 
-debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint16_t fp, uint16_t limit)
+static uint16_t get_current_framepointer(struct debugger_regs_t *regs, size_t* invalidate_stack_offset)
 {
+    // If the symbol __debug_framepointer is defined, then extract the value from there
+    // The rest of the stack can be walked as normal since the value is pushed onto
+    // the stack as usual
+    int where = symbol_resolve("__debug_framepointer");
+
+    if ( where != -1 ) {
+        // call l_debug_push_frame
+        *invalidate_stack_offset = 3;
+        uint16_t ret = bk.get_memory(where) + (bk.get_memory(where+1)*256);
+        return ret;
+    }
+
+    // push	ix; ld ix,0; add ix,sp
+    *invalidate_stack_offset = 8;
+    return wrap_reg(regs->xh, regs->xl);
+}
+
+
+debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit)
+{
+    size_t invalidate_stack_after;
+    uint16_t frame_pointer = get_current_framepointer(regs, &invalidate_stack_after);
+
     debug_frame_pointer* first = NULL;
     debug_frame_pointer* last = NULL;
 
+    uint8_t entry_num = 0;
     uint16_t stack = sp;
     uint16_t at = pc;
 
     do {
+        entry_num++;
         uint16_t offset;
         symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
 
@@ -926,6 +962,44 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint
 
         debug_sym_function* fn = debug_find_function(nm, sym->file);
         if (fn == NULL) {
+            if (offset == 0 && entry_num == 1) {
+                // we might save the situation here
+                debug_frame_pointer* unknown_entry = malloc(sizeof(debug_frame_pointer));
+
+                uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
+
+                uint16_t unknown_offset;
+                symbol* s = symbol_find_lower(at, SYM_ADDRESS, &unknown_offset);
+
+                unknown_entry->next = NULL;
+                unknown_entry->frame_pointer = 0xFFFFFFFF;
+                unknown_entry->symbol = s;
+                unknown_entry->offset = unknown_offset;
+                unknown_entry->address = at;
+                unknown_entry->return_address = caller;
+                unknown_entry->function = NULL;
+
+                const char *filename;
+                int   lineno;
+                if (debug_find_source_location(at, &filename, &lineno) < 0) {
+                    unknown_entry->filename = NULL;
+                    unknown_entry->lineno = 0;
+                } else {
+                    unknown_entry->filename = filename;
+                    unknown_entry->lineno = lineno;
+                }
+
+                at = caller;
+                stack += 2;
+
+                if (last) {
+                    last->next = unknown_entry;
+                } else {
+                    first = unknown_entry;
+                }
+                last = unknown_entry;
+                continue;
+            }
             break;
         }
 
@@ -938,21 +1012,23 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint
         }
         last = new_frame;
 
-        uint16_t frame_pointer;
+        uint16_t new_frame_pointer;
         if (offset == 0) {
-            frame_pointer = stack - 2;
-        } else if (offset < 8) {
-            // we've pushed old fp but haven't inited old one
-            frame_pointer = stack;
+            // fp of this function hasn't been pushed yet, so we pretend it did,
+            // cause variables offset off frame pointer, even if it doesn't exist yet
+            new_frame_pointer = stack - 2;
+        } else if (offset < invalidate_stack_after) {
+            // we've pushed old ix but haven't inited old one
+            new_frame_pointer = stack;
         } else {
-            frame_pointer = fp;
+            new_frame_pointer = frame_pointer;
         }
 
         const char *filename;
         int   lineno;
 
         new_frame->next = NULL;
-        new_frame->frame_pointer = frame_pointer;
+        new_frame->frame_pointer = new_frame_pointer;
         new_frame->offset = offset;
         new_frame->address = at;
         new_frame->function = fn;
@@ -966,23 +1042,58 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, uint
             new_frame->lineno = lineno;
         }
 
+        if (fn->address_space.b) {
+            debug_frame_pointer* unknown_entry = malloc(sizeof(debug_frame_pointer));
+            new_frame->next = unknown_entry;
+
+            uint16_t caller = wrap_reg(bk.get_memory(new_frame_pointer + 3), bk.get_memory(new_frame_pointer + 2));
+            uint16_t unknown_offset;
+            symbol* s = symbol_find_lower(caller, SYM_ADDRESS, &unknown_offset);
+
+            unknown_entry->next = NULL;
+            unknown_entry->frame_pointer = 0xFFFFFFFF;
+            unknown_entry->symbol = s;
+            unknown_entry->offset = unknown_offset;
+            unknown_entry->address = caller;
+            unknown_entry->function = NULL;
+
+            if (debug_find_source_location(caller, &filename, &lineno) < 0) {
+                unknown_entry->filename = NULL;
+                unknown_entry->lineno = 0;
+            } else {
+                unknown_entry->filename = filename;
+                unknown_entry->lineno = lineno;
+            }
+
+            last = unknown_entry;
+        }
+
         if (offset == 0) {
+            if (fn->address_space.b) {
+                stack += fn->address_space.b;
+            }
             // we're exactly at beginning of the function
             uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
             at = caller;
             // unwind ret
             stack += 2;
-        } else if (offset < 8) {
-            // we've pushed old fp but haven't inited old one
+        } else if (offset < invalidate_stack_after) {
+            if (fn->address_space.b) {
+                stack += fn->address_space.b;
+            }
+            // we've pushed old ix but haven't inited old one
             uint16_t caller = wrap_reg(bk.get_memory(stack + 3), bk.get_memory(stack + 2));
             at = caller;
-            // unwind ret and fp
+            // unwind ret and ix
             stack += 4;
         } else {
             // fp should point to sp at beginning of the function
-            stack = fp;
+            stack = frame_pointer;
+            if (fn->address_space.b) {
+                stack += fn->address_space.b;
+            }
             // last thing pushed is frame pointer of the caller (its fp)
-            fp = wrap_reg(bk.get_memory(fp + 1), bk.get_memory(fp));
+            frame_pointer = wrap_reg(bk.get_memory(frame_pointer + 1), bk.get_memory(frame_pointer));
             // then goes ret
             stack += 2;
             uint16_t caller = wrap_reg(bk.get_memory(stack + 1), bk.get_memory(stack));
