@@ -102,7 +102,7 @@ struct debug_sym_symbol_s {
     const char*             symbol_name;
     enum symbol_scope_t     scope;
     const char*             scope_value;
-    type_record             type_record;;
+    type_record             type_record;
     address_space           address_space;
     debug_sym_function*     belongs_to_function;
     UT_hash_handle          hh;

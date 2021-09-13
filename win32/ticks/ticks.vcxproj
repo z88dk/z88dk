@@ -168,8 +168,11 @@
     <ClCompile Include="..\..\ext\UNIXem\src\time.c" />
     <ClCompile Include="..\..\src\ticks\acia.c" />
     <ClCompile Include="..\..\src\ticks\am9511.c" />
+    <ClCompile Include="..\..\src\ticks\backend.c" />
+    <ClCompile Include="..\..\src\ticks\cpu.c" />
     <ClCompile Include="..\..\src\ticks\debug.c" />
     <ClCompile Include="..\..\src\ticks\debugger.c" />
+    <ClCompile Include="..\..\src\ticks\debugger_ticks.c" />
     <ClCompile Include="..\..\src\ticks\disassembler_alg.c" />
     <ClCompile Include="..\..\src\ticks\hook.c" />
     <ClCompile Include="..\..\src\ticks\hook_console.c" />

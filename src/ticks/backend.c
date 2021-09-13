@@ -1,6 +1,6 @@
 #include "backend.h"
 
-backend_t bk = {};
+backend_t bk = {0};
 
 void set_backend(backend_t backend)
 {
