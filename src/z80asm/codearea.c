@@ -558,7 +558,7 @@ bool fwrite_module_code(FILE *file, int* p_code_size)
 		    section->origin >= 0 || section->align > 1)
 		{
 			xfwrite_dword(size, file);
-			xfwrite_bcount_cstr(section->name, file);
+			xfwrite_wcount_cstr(section->name, file);
 			write_origin(file, section);
 			xfwrite_dword(section->align, file);
 

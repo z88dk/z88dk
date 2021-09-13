@@ -250,7 +250,7 @@ void object_module_append(obj_file_t* obj, Module* module) {
 
 	// reserve space for the module's sections
 	xassert(goto_modname(obj));
-	const char* modname = parse_bcount_str(obj);
+	const char* modname = parse_wcount_str(obj);
 	CURRENTMODULE->modname = modname;
 
 	if (goto_code(obj)) {
@@ -260,7 +260,7 @@ void object_module_append(obj_file_t* obj, Module* module) {
 				break;
 
 			// reserve space in section
-			const char* section_name = parse_bcount_str(obj);
+			const char* section_name = parse_wcount_str(obj);
 			Section* section = new_section(section_name);
 			int origin = parse_int(obj);
 			set_origin(origin, section);
@@ -339,11 +339,11 @@ static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
 		int line_nr = parse_int(obj);
 
 		// patch location
-		const char* section_name = parse_bcount_str(obj);
+		const char* section_name = parse_wcount_str(obj);
 		int asmpc = parse_word(obj);
 		int code_pos = parse_word(obj);
 
-		const char* target_name = parse_bcount_str(obj);
+		const char* target_name = parse_wcount_str(obj);
 		const char* expr_text_1 = parse_wcount_str(obj);
 
 		// call parser to interpret expression followed by newline
@@ -754,7 +754,7 @@ static bool linked_module(obj_file_t* obj, StrHash* extern_syms) {
 
 	// get module name
 	xassert(goto_modname(obj));
-	const char* modname = parse_bcount_str(obj);
+	const char* modname = parse_wcount_str(obj);
 
 	// get defined names
 	if (goto_defined_names(obj)) {
@@ -763,10 +763,10 @@ static bool linked_module(obj_file_t* obj, StrHash* extern_syms) {
 			if (scope == 0)	
 				break;					// end of list
 			obj->i++;					// skip type
-			parse_bcount_str(obj);		// skip section name
+			parse_wcount_str(obj);		// skip section name
 			obj->i += 4;				// skip value
-			const char* symbol_name = parse_bcount_str(obj);
-			parse_bcount_str(obj);		// skip defined file name
+			const char* symbol_name = parse_wcount_str(obj);
+			parse_wcount_str(obj);		// skip defined file name
 			obj->i += 4;				// skip line number
 
 			// link module if one defined symbol matches pending externals
@@ -834,7 +834,7 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 				break;
 
 			// next section
-			const char* section_name = parse_bcount_str(obj);
+			const char* section_name = parse_wcount_str(obj);
 			Section* section = new_section(section_name);
 			int origin = parse_int(obj);
 			set_origin(origin, section);
@@ -861,10 +861,10 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 				break;
 
 			int symbol_type = parse_byte(obj);						// type of symbol
-			const char* section_name = parse_bcount_str(obj);		// section
+			const char* section_name = parse_wcount_str(obj);		// section
 			int value = parse_int(obj);								// value
-			const char* name = parse_bcount_str(obj);				// symbol name
-			const char* def_filename = parse_bcount_str(obj);		// where defined
+			const char* name = parse_wcount_str(obj);				// symbol name
+			const char* def_filename = parse_wcount_str(obj);		// where defined
 			int line_nr = parse_int(obj);							// where defined
 
 			new_section(section_name);								// define CURRENTSECTION
@@ -903,7 +903,7 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 	int end_external_names = obj->i;
 	if (goto_external_names(obj)) {
 		while (obj->i < end_external_names) {
-			const char* name = parse_bcount_str(obj);
+			const char* name = parse_wcount_str(obj);
 			StrHash_set(&extern_syms, name, (void*)name);	// remember all extern references
 		}
 	}

@@ -90,11 +90,11 @@ static long write_expr(FILE* fp)
 
 		xfwrite_dword(expr->line_nr, fp);				/* source line number */
 
-		xfwrite_bcount_cstr(expr->section->name, fp);	/* section name */
+		xfwrite_wcount_cstr(expr->section->name, fp);	/* section name */
 
 		xfwrite_word(expr->asmpc, fp);					/* ASMPC */
 		xfwrite_word(expr->code_pos, fp);				/* patchptr */
-		xfwrite_bcount_cstr(target_name, fp);			/* target symbol for expression */
+		xfwrite_wcount_cstr(target_name, fp);			/* target symbol for expression */
 		xfwrite_wcount_cstr(Str_data(expr->text), fp);	/* expression */
 	}
 
@@ -136,12 +136,12 @@ static int write_symbols_symtab(FILE* fp, SymbolHash* symtab)
 			xfwrite_byte(scope, fp);
 			xfwrite_byte(type, fp);
 
-			xfwrite_bcount_cstr(sym->section->name, fp);
+			xfwrite_wcount_cstr(sym->section->name, fp);
 			xfwrite_dword(sym->value, fp);
-			xfwrite_bcount_cstr(sym->name, fp);
+			xfwrite_wcount_cstr(sym->name, fp);
 
 			// write symbol definition location
-			xfwrite_bcount_cstr(sym->filename ? sym->filename : "", fp);
+			xfwrite_wcount_cstr(sym->filename ? sym->filename : "", fp);
 			xfwrite_dword(sym->line_nr, fp);
 
 			written++;
@@ -185,7 +185,7 @@ static long write_externsym(FILE* fp)
 		if (sym->is_touched &&
 			(sym->scope == SCOPE_EXTERN || (!sym->is_defined && sym->scope == SCOPE_GLOBAL)))
 		{
-			xfwrite_bcount_cstr(sym->name, fp);
+			xfwrite_wcount_cstr(sym->name, fp);
 			written++;
 		}
 	}
@@ -199,7 +199,7 @@ static long write_externsym(FILE* fp)
 static long write_modname(FILE* fp)
 {
 	long modname_ptr = ftell(fp);
-	xfwrite_bcount_cstr(CURRENTMODULE->modname, fp);		/* write module name */
+	xfwrite_wcount_cstr(CURRENTMODULE->modname, fp);		/* write module name */
 	return modname_ptr;
 }
 
@@ -344,7 +344,7 @@ OFile* OFile_read_header(FILE* file, size_t start_ptr)
 
 	/* read module name */
 	fseek(file, start_ptr + self->modname_ptr, SEEK_SET);
-	xfread_bcount_str(modname, file);
+	xfread_wcount_str(modname, file);
 	self->modname = spool_add(utstr_body(modname));
 
 	utstr_free(modname);
@@ -474,7 +474,7 @@ static bool objmodule_loaded_1(const char* obj_filename, UT_string* section_name
 					break;
 
 				/* reserve space in section */
-				xfread_bcount_str(section_name, ofile->file);
+				xfread_wcount_str(section_name, ofile->file);
 				section = new_section(utstr_body(section_name));
 				read_origin(ofile->file, section);
 				section->align = xfread_dword(ofile->file);
