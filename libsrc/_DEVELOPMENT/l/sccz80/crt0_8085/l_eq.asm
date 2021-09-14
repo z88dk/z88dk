@@ -3,15 +3,13 @@
 ;       To make startup code smaller and neater!
 ;
 ;       6/9/98  djm
-;       13/5/99 djm Added carry conditions...
+;       13/5/99 djm Added carry conditions
+;       August 2021 feilipu aligned boolean conditions
 
 SECTION code_crt0_sccz80
 
 PUBLIC  l_eq
-EXTERN  l_cmp
 
-;
-;
 ; DE == HL
 ; carry set if true
 
@@ -19,15 +17,14 @@ EXTERN  l_cmp
     ld a,l
     sub e
     ld l,a
-    ld  a,h
+    ld a,h
     sbc a,d
-    ld h,a
     or l
-    inc hl
+
+    ld hl,1
     scf
-    ret z
+    ret Z
 
     xor a
-    ld l,a
-    ld h,a
+    dec l
     ret

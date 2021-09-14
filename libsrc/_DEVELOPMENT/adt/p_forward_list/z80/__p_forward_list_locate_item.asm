@@ -54,12 +54,12 @@ loop:
    cp c
    
    inc hl
-   jr z, match_possible
+   jp Z, match_possible
 
    or (hl)
    dec hl
    
-   jr z, list_end
+   jp Z, list_end
 
 try_next:
 
@@ -71,7 +71,7 @@ try_next:
    ld h,(hl)
    ld l,a
    
-   jr loop
+   jp loop
 
 match_possible:
 
@@ -79,16 +79,16 @@ match_possible:
    cp b
    
    dec hl
-   ret z                       ; item found
+   ret Z                       ; item found
 
    or (hl)
-   jr nz, try_next             ; if not at end of list
+   jp  NZ, try_next             ; if not at end of list
 
 list_end:
    
    ld a,b
    or c
-   ret z                       ; do not indicate error if searching for end
+   ret Z                       ; do not indicate error if searching for end
    
    ; de = void *lagger
    ; hl = void *item_back

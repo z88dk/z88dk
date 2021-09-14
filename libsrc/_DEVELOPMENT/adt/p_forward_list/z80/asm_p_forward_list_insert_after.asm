@@ -24,9 +24,16 @@ asm_p_forward_list_insert_after:
    ;         z flag set if item is the last item in the list
    ;
    ; uses  : af, de, hl
-   
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,(hl)
+   inc hl
+   ld (de),a
+   inc de
+ELSE
    ldi
    inc bc                      ; undo changes to bc
+ENDIF
    ld a,(hl)
    ld (de),a                   ; item->next = list_item->next
 

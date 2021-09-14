@@ -26,8 +26,7 @@ asm_p_forward_list_init:
    ;
    ; uses  : af, de, hl
 
-   ld e,l
-   ld d,h
+   ld de,hl
    
    xor a
    jp l_setmem_hl - 4          ; p_forward_list->next = 0

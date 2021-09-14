@@ -44,10 +44,9 @@ asm_heap_alloc_unlocked:
    
    ld bc,6                     ; sizeof(heap header)
    add hl,bc                   ; add space for header to request
-   jp c, error_enomem_zc
+   jp C, error_enomem_zc
    
-   ld c,l
-   ld b,h                      ; bc = gross request size
+   ld bc,hl                    ; bc = gross request size
    
    ld hl,6                     ; hl = sizeof(mutex)
    add hl,de
@@ -66,7 +65,7 @@ block_loop:
    
    ld a,d
    or e
-   jp z, error_enomem_zc - 2   ; if reached end of heap
+   jp Z, error_enomem_zc - 2   ; if reached end of heap
    
    inc hl
    ld c,(hl)
@@ -88,14 +87,37 @@ block_loop:
    
    push hl                     ; save block->next
    
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,l
+   sub e
+   ld l,a
+   ld a,h
+   sub d
+   ld h,a                      ; hl = free bytes in block
+IF __CPU_8085__
+   sub hl,bc
+ELSE
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sub b
+   ld h,a
+ENDIF
+ELSE
    sbc hl,de                   ; hl = free bytes in block
    sbc hl,bc
+ENDIF
    
    pop hl                      ; hl = block->next
-   jr nc, found_memory         ; free bytes >= gross request size
+IF __CPU_INTEL__
+   jp NC, found_memory         ; free bytes >= gross request size
+ELSE
+   jr NC, found_memory         ; free bytes >= gross request size
+ENDIF
    
    pop af                      ; junk stack item
-   jr block_loop
+   jp block_loop
 
 found_memory:
 

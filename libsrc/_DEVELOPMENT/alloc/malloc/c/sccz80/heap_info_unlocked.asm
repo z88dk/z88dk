@@ -1,6 +1,8 @@
 
 ; void heap_info_unlocked(void *heap, void *callback)
 
+IF !__CPU_INTEL__
+
 SECTION code_clib
 SECTION code_alloc_malloc
 
@@ -19,3 +21,5 @@ heap_info_unlocked:
    push af
    
    jp asm_heap_info_unlocked
+
+ENDIF

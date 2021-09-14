@@ -53,16 +53,16 @@ asm_heap_alloc_aligned_unlocked:
 
    ld a,h
    or l
-   ret z                       ; if size == 0
+   ret Z                       ; if size == 0
 
    call l_power_2_bc           ; bc = power of two >= bc
-   jp c, error_einval_zc       ; if alignment == 2^16
+   jp C, error_einval_zc       ; if alignment == 2^16
 
    dec bc                      ; bc = alignment - 1
    
    ld a,b
    or c
-   jp z, asm_heap_alloc_unlocked  ; if no alignment (alignment == 1)
+   jp Z, asm_heap_alloc_unlocked  ; if no alignment (alignment == 1)
 
    ; de = void *heap
    ; hl = size
@@ -72,7 +72,7 @@ asm_heap_alloc_aligned_unlocked:
    
    ld bc,6                     ; sizeof(heap header)
    add hl,bc
-   jp c, error_enomem_zc
+   jp C, error_enomem_zc
    
    ex de,hl                    ; de = gross request size
    
@@ -93,8 +93,7 @@ block_loop:
    ; hl = & block
    ; stack = gross request size, alignment - 1
 
-   ld e,l
-   ld d,h                      ; de = & block
+   ld de,hl                    ; de = & block 
 
    ; check if end of heap reached
    
@@ -102,7 +101,7 @@ block_loop:
    inc hl
    or (hl)
    
-   jp z, error_enomem_zc - 2   ; if end of heap reached
+   jp Z, error_enomem_zc - 2   ; if end of heap reached
 
    inc hl                      ; hl = & block.committed
 
@@ -114,7 +113,11 @@ block_loop:
    
    ld a,b
    or c
-   jr nz, committed_nonzero
+IF __CPU_INTEL__
+   jp NZ, committed_nonzero
+ELSE
+   jr NZ, committed_nonzero
+ENDIF
    
    ; block->committed == 0
    ; this means the request can be overlayed on top
@@ -136,26 +139,33 @@ block_loop:
    
    ld a,l
    and c
-   jr nz, overlay_unaligned
+IF __CPU_INTEL__
+   jp NZ, overlay_unaligned
+ELSE
+   jr NZ, overlay_unaligned
+ENDIF
    
    ld a,h
    and b
-   jr nz, overlay_unaligned
+IF __CPU_INTEL__
+   jp NZ, overlay_unaligned
+ELSE
+   jr NZ, overlay_unaligned
+ENDIF
 
    ; overlay aligns
 
    ; de = & block
    ; stack = gross request size, alignment - 1
 
-   ld l,e
-   ld h,d
+   ld hl,de
    
    pop af
    pop bc
    push bc
    push af
    
-   jr test_fit
+   jp test_fit
 
 overlay_unaligned:
 
@@ -173,14 +183,14 @@ committed_nonzero:
    ld hl,6                     ; sizeof(heap header)
    add hl,bc
    add hl,de                   ; first free address after another header added
-   jp c, error_enomem_zc - 2
+   jp C, error_enomem_zc - 2
    
    ; compute next aligned address
    
    pop bc                      ; bc = alignment - 1
 
    add hl,bc
-   jp c, error_enomem_zc - 1
+   jp C, error_enomem_zc - 1
    call l_andc_hl_bc           ; hl = hl & ~bc
 
    ; de = & block
@@ -211,7 +221,11 @@ test_fit:
    ; see if proposed block fits
    
    call __heap_place_block
-   jr nc, success              ; if block fits
+IF __CPU_INTEL__
+   jp NC, success              ; if block fits
+ELSE
+   jr NC, success              ; if block fits
+ENDIF
    
    ; try next block
    
@@ -223,7 +237,7 @@ test_fit:
    ld h,(hl)
    ld l,a
    
-   jr block_loop
+   jp block_loop
 
 success:
 

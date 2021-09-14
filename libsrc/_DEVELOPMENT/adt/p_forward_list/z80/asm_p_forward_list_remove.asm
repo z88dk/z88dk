@@ -39,6 +39,6 @@ asm_p_forward_list_remove:
    ; uses  : af, de, hl
    
    call __p_forward_list_locate_item
-   jp nc, asm_p_forward_list_remove_after
+   jp NC, asm_p_forward_list_remove_after
 
    jp error_zc

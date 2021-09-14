@@ -1,4 +1,4 @@
-; sccz80 crt0 library - 8080 version
+; sccz80 crt0 library - 8085 version
 
 SECTION code_crt0_sccz80
 
@@ -8,10 +8,10 @@ PUBLIC  l_asr_u_hl_by_e
 .l_asr_u
     ex de,hl
 .l_asr_u_hl_by_e
-.l_asr_u_1
     dec e
-    ret m
+    ret M
 
+.l_asr_u_1
     ld a,h
     and a
     rra
@@ -19,4 +19,6 @@ PUBLIC  l_asr_u_hl_by_e
     ld a,l
     rra
     ld l,a
-    jp l_asr_u_1
+    dec e
+    jp P,l_asr_u_1
+    ret

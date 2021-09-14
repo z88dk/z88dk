@@ -40,8 +40,7 @@ asm_heap_init:
    ;
    ; uses  : af, bc, de, hl
 
-   ld e,l
-   ld d,h                      ; de = void *heap
+   ld de,hl                    ; de = void *heap
    
    push hl                     ; save void *heap
    push bc                     ; save num bytes
@@ -49,7 +48,7 @@ asm_heap_init:
    ld c,mtx_plain
    call asm_mtx_init
    
-   jp c, error_enolck_zc - 2   ; if mutex init failed
+   jp C, error_enolck_zc - 2   ; if mutex init failed
 
    ld hl,6                     ; sizeof(mutex)
    add hl,de

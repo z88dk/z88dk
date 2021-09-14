@@ -51,7 +51,13 @@ asm_posix_memalign_unlocked:
 
    push de                     ; save memptr
    
+   IF __CPU_INTEL__ || __CPU_GBZ80__
+   ex de,hl
+   ld hl,(__malloc_heap)
+   ex de,hl
+   ELSE
    ld de,(__malloc_heap)
+   ENDIF
    call asm_heap_alloc_aligned_unlocked
    
 asm0_posix_memalign_unlocked:
@@ -63,7 +69,7 @@ asm0_posix_memalign_unlocked:
    inc hl
    ld (hl),d                   ; *memptr = allocation address
    
-   jp nc, error_znc            ; if no error
+   jp NZ, error_znc            ; if no error
    
    ld hl,(_errno)              ; otherwise error is stored in errno
    ret                         ; (this is safe in z88dk)

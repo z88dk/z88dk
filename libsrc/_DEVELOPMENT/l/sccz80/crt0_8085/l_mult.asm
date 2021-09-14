@@ -27,5 +27,5 @@ ccmul2: XOR     a
         RL      de
         LD      a,d
         OR      e
-        RET     Z
-        JP      ccmul1
+        JP      NZ,ccmul1
+        RET

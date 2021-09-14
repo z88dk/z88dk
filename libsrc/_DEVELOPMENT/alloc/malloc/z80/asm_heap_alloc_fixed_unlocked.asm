@@ -63,8 +63,7 @@ locate_loop:
 
    ; locate block that block_p belongs to
 
-   ld c,l
-   ld b,h
+   ld bc,hl
 
    ; bc = & block_belong
    ; de = & block_p
@@ -77,11 +76,17 @@ locate_loop:
    ld l,a                      ; hl = block->next
    
    or h
-   jr z, end_loop              ; if end of heap reached
-
+IF __CPU_INTEL__
+   jp Z, end_loop              ; if end of heap reached
+ELSE
+   jr Z, end_loop              ; if end of heap reached
+ENDIF
    call l_ltu_de_hl
-   jr nc, locate_loop          ; if block_p >= block
-
+IF __CPU_INTEL__
+   jp NC, locate_loop          ; if block_p >= block
+ELSE
+   jr NC, locate_loop          ; if block_p >= block
+ENDIF
 end_loop:
 
    ; bc = & block
@@ -93,10 +98,9 @@ end_loop:
    
    ld bc,6                     ; sizeof(heap header)
    add hl,bc
-   jp c, error_enomem_zc - 1   ; if request size too big
+   jp C, error_enomem_zc - 1   ; if request size too big
 
-   ld c,l
-   ld b,h                      ; bc = gross request size
+   ld bc,hl                    ; bc = gross request size
 
    pop hl
    
@@ -107,6 +111,6 @@ end_loop:
    ; determine if block_p will fit into block's space
    
    call __heap_place_block
-   jp nc, __heap_allocate_block  ; if allocation will be successful
+   jp NC, __heap_allocate_block  ; if allocation will be successful
 
    jp error_enomem_zc

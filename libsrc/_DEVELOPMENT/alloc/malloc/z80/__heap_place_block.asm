@@ -29,7 +29,7 @@ __heap_place_block:
    ; uses  : af
 
    call l_ltu_de_hl
-   ret c                       ; if block_new < block
+   ret C                       ; if block_new < block
 
    push hl                     ; save & block
    
@@ -39,18 +39,46 @@ __heap_place_block:
    ld l,a                      ; hl = block->next = & block_next
    
    or h
-   jr z, fail                  ; if block is end of heap marker
+IF __CPU_INTEL__
+   jp Z, fail                  ; if block is end of heap marker
+ELSE
+   jr Z, fail                  ; if block is end of heap marker
+ENDIF
 
    ; bc = gross request size
    ; de = & block_new
    ; hl = & block_next
    ; stack = & block
    
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,l
+   sub e
+   ld l,a
+   ld a,h
+   sub d
+   ld h,a                      ; hl = avail bytes to next block
+   jp C, fail                  ; if block_next < block_new
+ELSE
    sbc hl,de                   ; hl = avail bytes to next block
-   jr c, fail                  ; if block_next < block_new
+   jr C, fail                  ; if block_next < block_new
+ENDIF
 
+IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_8085__
+   sub hl,bc
+ELSE
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sub b
+   ld h,a
+ENDIF
+   jp C, fail                  ; if avail bytes < gross request size
+ELSE
    sbc hl,bc
-   jr c, fail                  ; if avail bytes < gross request size
+   jr C, fail                  ; if avail bytes < gross request size
+ENDIF
 
    ; block_new will fit before block_next
 
@@ -59,8 +87,7 @@ __heap_place_block:
    push hl                     ; save & block
    push bc                     ; save gross request size
    
-   ld c,l
-   ld b,h                      ; bc = & block
+   ld bc,hl                    ; bc = & block
    
    inc hl
    inc hl
@@ -72,7 +99,11 @@ __heap_place_block:
    
    ld a,h
    or l
-   jr nz, committed_nonzero    ; if committed != 0
+IF __CPU_INTEL__
+   jp NZ, committed_nonzero    ; if committed != 0
+ELSE
+   jr NZ, committed_nonzero    ; if committed != 0
+ENDIF
    
    ; committed == 0 so either block_new sits exactly on
    ; top of this header or it is at least six bytes ahead
@@ -80,7 +111,7 @@ __heap_place_block:
    ld hl,6
    
    call committed_nonzero
-   ret nc
+   ret NC
 
    ; bc = gross request size
    ; de = & block_new
@@ -90,12 +121,12 @@ __heap_place_block:
    cp l
    
    scf
-   ret nz
+   ret NZ
    
    ld a,d
    cp h
    
-   ret z                       ; if block == block_new
+   ret Z                       ; if block == block_new
    
    scf
    ret

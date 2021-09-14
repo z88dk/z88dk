@@ -4,6 +4,8 @@
 SECTION code_clib
 SECTION code_alloc_balloc
 
+IF !__CPU_GBZ80__
+
 PUBLIC balloc_addmem_callee
 
 EXTERN asm_balloc_addmem
@@ -27,3 +29,4 @@ PUBLIC _balloc_addmem_callee
 defc _balloc_addmem_callee = balloc_addmem_callee
 ENDIF
 
+ENDIF

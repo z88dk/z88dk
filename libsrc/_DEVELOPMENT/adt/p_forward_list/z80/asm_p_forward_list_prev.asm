@@ -34,12 +34,21 @@ asm_p_forward_list_prev:
    ; uses  : af, de, hl
 
    call __p_forward_list_locate_item
-   jp c, error_zc
+   jp C, error_zc
    
    ex de,hl                    ; de = void *item_prev
-   
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,l
+   sub e
+   ld l,a
+   ld a,h
+   sbc d
+   ld d,a
+ELSE
    sbc hl,de
-   jp z, error_zc              ; if item was last in list
+ENDIF
+   jp Z, error_zc              ; if item was last in list
    
    ex de,hl                    ; hl = void *item_prev
    

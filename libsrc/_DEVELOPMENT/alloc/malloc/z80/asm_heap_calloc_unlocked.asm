@@ -48,11 +48,10 @@ asm_heap_calloc_unlocked:
 
    push de                     ; save heap
    
-   ld e,c
-   ld d,b
+   ld de,bc
    
    call l_mulu_16_16x16        ; hl = nmemb * size = request size
-   jp c, error_enomem_zc - 1
+   jp C, error_enomem_zc - 1
 
    pop de                      ; de = void *heap
    push hl                     ; save request size
@@ -60,7 +59,7 @@ asm_heap_calloc_unlocked:
    call asm_heap_alloc_unlocked
 
    pop bc                      ; bc = request size
-   ret c                       ; if allocation failed
+   ret C                       ; if allocation failed
    
    ; hl = void *p
    ; bc = request size

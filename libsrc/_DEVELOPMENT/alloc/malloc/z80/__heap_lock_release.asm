@@ -3,7 +3,6 @@ SECTION code_clib
 SECTION code_alloc_malloc
 
 PUBLIC __heap_lock_release
-PUBLIC __heap_lock_release_0
 
 EXTERN asm_mtx_unlock
 
@@ -29,6 +28,9 @@ __heap_lock_release:
    
    ret
 
+IF !__CPU_GBZ80__
+
+PUBLIC __heap_lock_release_0
 
 __heap_lock_release_0:
 
@@ -45,3 +47,5 @@ __heap_lock_release_0:
    
    pop hl
    ret
+
+ENDIF

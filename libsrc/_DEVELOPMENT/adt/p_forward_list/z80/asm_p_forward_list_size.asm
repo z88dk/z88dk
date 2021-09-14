@@ -34,7 +34,7 @@ loop:
    ld l,a
    
    or h
-   jr nz, loop
+   jp NZ, loop
 
    ex de,hl
    ret

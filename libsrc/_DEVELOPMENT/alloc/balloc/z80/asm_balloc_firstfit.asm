@@ -37,11 +37,17 @@ asm_balloc_firstfit:
    ld a,h
 
    or a
-   jp z, error_zc              ; zero queues to search
+   jp Z, error_zc              ; zero queues to search
 
    ld h,0
    add hl,hl
+   IF __CPU_INTEL__ || __CPU_GBZ80__
+   ex de,hl
+   ld hl,(__balloc_array)
+   ex de,hl
+   ELSE
    ld de,(__balloc_array)
+   ENDIF
    add hl,de                   ; forward_list *q
    
    ld b,a
@@ -55,9 +61,18 @@ loop:
    
    ld a,d
    or e
-   jr nz, found_block
+IF __CPU_8085__
+   jp NZ, found_block
+ELSE
+   jr NZ, found_block
+ENDIF
    
+   IF __CPU_INTEL__ || __CPU_GBZ80__
+   dec b
+   jp NZ,loop
+   ELSE
    djnz loop
+   ENDIF
    jp error_zc
 
 found_block:

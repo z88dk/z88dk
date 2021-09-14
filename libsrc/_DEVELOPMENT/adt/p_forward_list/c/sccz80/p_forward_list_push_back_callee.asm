@@ -4,6 +4,8 @@
 SECTION code_clib
 SECTION code_adt_p_forward_list
 
+IF !__CPU_GBZ80__
+
 PUBLIC p_forward_list_push_back_callee
 
 EXTERN asm_p_forward_list_push_back
@@ -22,3 +24,4 @@ PUBLIC _p_forward_list_push_back_callee
 defc _p_forward_list_push_back_callee = p_forward_list_push_back_callee
 ENDIF
 
+ENDIF

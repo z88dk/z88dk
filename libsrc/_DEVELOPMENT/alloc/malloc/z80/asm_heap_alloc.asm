@@ -51,7 +51,7 @@ asm_heap_alloc:
    ; uses  : af, bc, de, hl
    
    call __heap_lock_acquire
-   jp c, error_enolck_zc
+   jp C, error_enolck_zc
    
    push de                       ; save void *heap
    call asm_heap_alloc_unlocked

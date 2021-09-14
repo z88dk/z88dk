@@ -26,6 +26,8 @@
 SECTION code_clib
 SECTION code_alloc_malloc
 
+IF !__CPU_GBZ80__               ; ex (sp),hl instruction used
+
 PUBLIC asm_heap_realloc_unlocked
 
 EXTERN error_enomem_zc, __heap_allocate_block, asm_memmove, asm_heap_free_unlocked, l_ltu_bc_hl
@@ -57,14 +59,17 @@ asm_heap_realloc_unlocked:
    add hl,bc                   ; add space for header to request size
    jp c, error_enomem_zc - 2
    
-   ld c,l
-   ld b,h                      ; bc = gross request size
+   ld bc,hl                    ; bc = gross request size
    
    pop hl                      ; hl = void *p
    
    ld a,h
    or l
-   jr z, allocating            ; if p == 0, we are allocating
+IF __CPU_INTEL__
+   jp Z, allocating            ; if p == 0, we are allocating
+ELSE
+   jr Z, allocating            ; if p == 0, we are allocating
+ENDIF
 
 resize:
 
@@ -82,11 +87,34 @@ resize:
    ex de,hl
    
    or a
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,l
+   sub e
+   ld l,a
+   ld a,h
+   sub d
+   ld h,a
+IF __CPU_8085__
+   sub hl,bc                   ; hl = block_next - block_p - gross_request
+ELSE
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sub b
+   ld h,a                      ; hl = block_next - block_p - gross_request
+ENDIF
+ELSE
    sbc hl,de
    sbc hl,bc                   ; hl = block_next - block_p - gross_request
-
+ENDIF
+   
    ex de,hl
-   jr c, resize_fail           ; if cannot resize in place
+IF __CPU_INTEL__
+   jp C, resize_fail           ; if cannot resize in place
+ELSE
+   jr C, resize_fail           ; if cannot resize in place
+ENDIF
 
    ; resize will be successful
 
@@ -119,13 +147,12 @@ allocating:
    ; bc = gross request size
 
    call largest_fit
-   jp c, error_enomem_zc
+   jp C, error_enomem_zc
    
    ; de = & block_largest
    ; bc = gross request size
 
-   ld l,e
-   ld h,d
+   ld hl,de
    
    inc hl
    inc hl
@@ -183,7 +210,11 @@ resize_fail:
    ; stack = void *p_old, p_old->committed
    
    call largest_fit
-   jr c, alloc_fail
+IF __CPU_INTEL__
+   jp C, alloc_fail
+ELSE
+   jr C, alloc_fail
+ENDIF
 
    ; allocate memory out of the largest block
 
@@ -191,8 +222,7 @@ resize_fail:
    ; bc = gross request size
    ; stack = void *p_old, p_old->committed
 
-   ld l,e
-   ld h,d
+   ld hl,de
    
    inc hl
    inc hl
@@ -223,8 +253,7 @@ resize_fail:
    ld hl,-6                    ; sizeof(heap header)
    add hl,bc
    
-   ld c,l
-   ld b,h                      ; bc = num bytes in p
+   ld bc,hl                    ; bc = num bytes in p
    
    pop hl                      ; hl = void *p_old
    jp asm_memmove
@@ -258,12 +287,15 @@ alloc_fail:
    
    ld a,h
    or l
-   jr nz, prev_present
+IF __CPU_INTEL__
+   jp NZ, prev_present
+ELSE
+   jr NZ, prev_present
+ENDIF
    
    ; block_p is the first block in the heap
    
-   ld l,e
-   ld h,d
+   ld hl,de
 
 prev_present:
 
@@ -309,7 +341,11 @@ block_loop:
    
    ld a,d
    or e
-   jr z, end_loop              ; if end of heap reached
+IF __CPU_INTEL__
+   jp Z, end_loop              ; if end of heap reached
+ELSE
+   jr Z, end_loop              ; if end of heap reached
+ENDIF
 
    inc hl
    
@@ -332,14 +368,37 @@ block_loop:
    
    push hl                     ; save & block_next
    
+IF __CPU_INTEL__
+   ld a,l
+   sub e
+   ld l,a
+   ld a,h
+   sub d
+   ld h,a
+IF __CPU_8085__
+   sub hl,bc                   ; hl = free bytes in this block
+ELSE
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sub b
+   ld h,a                      ; hl = free bytes in this block
+ENDIF
+ELSE
    sbc hl,de
    sbc hl,bc                   ; hl = free bytes in this block
+ENDIF
    
    pop de                      ; de = & block_next
    pop bc                      ; bc = largest block size
 
    call l_ltu_bc_hl
-   jr nc, block_loop           ; if bc >= hl
+IF __CPU_INTEL__
+   jp NC, block_loop           ; if bc >= hl
+ELSE
+   jr NC, block_loop           ; if bc >= hl
+ENDIF
 
 block_bigger:
 
@@ -347,14 +406,13 @@ block_bigger:
    ; de = & block_next
    ; stack = gross request size, & block_largest, & block
 
-   ld c,l
-   ld b,h                      ; bc = new largest block size
+   ld bc,hl                    ; bc = new largest block size
    
    pop hl
    ex (sp),hl                  ; replace & block_largest with & block
    push hl
    
-   jr block_loop
+   jp block_loop
 
 end_loop:
 
@@ -366,10 +424,23 @@ end_loop:
    pop de
    pop de                      ; de = & block_largest
 
-   ld l,c
-   ld h,b                      ; hl = largest block size
+   ld hl,bc                    ; hl = largest block size
    
    pop bc                      ; bc = gross request size
-
+IF __CPU_INTEL__
+IF __CPU_8085__
+   sub hl,bc
+ELSE
+   ld a,l
+   sub c
+   ld l,a
+   ld a,h
+   sub b
+   ld h,a
+ENDIF
+ELSE
    sbc hl,bc
+ENDIF
    ret                         ; carry set if block not large enough
+
+ENDIF

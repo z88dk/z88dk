@@ -30,6 +30,8 @@ INCLUDE "config_private.inc"
 SECTION code_clib
 SECTION code_alloc_malloc
 
+IF !__CPU_GBZ80__
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 IF __CLIB_OPT_MULTITHREAD & $01
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -64,7 +66,13 @@ asm_realloc:
    ;
    ; uses  : af, bc, de, hl
 
+   IF __CPU_INTEL__ || __CPU_GBZ80__
+   ex de,hl
+   ld hl,(__malloc_heap)
+   ex de,hl
+   ELSE
    ld de,(__malloc_heap)
+   ENDIF
    jp asm_heap_realloc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -80,3 +88,5 @@ defc asm_realloc = asm_realloc_unlocked
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ENDIF

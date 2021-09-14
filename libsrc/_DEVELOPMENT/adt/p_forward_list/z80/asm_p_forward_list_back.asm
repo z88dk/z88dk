@@ -37,7 +37,7 @@ asm_p_forward_list_back:
    inc hl
    or (hl)
    
-   jp z, error_zc
+   jp Z, error_zc
 
    dec hl
    ld bc,0                     ; locate end of list

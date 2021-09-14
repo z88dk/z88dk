@@ -28,19 +28,16 @@ ccdiv:  LD      b,h
         EX      DE,HL
         LD     DE,0
 ccdiv1: ADD     HL,HL
-        call    l_rlde
+        RL      DE
         JP      Z,ccdiv2
         call    l_cmpbcde
         JP      M,ccdiv2
         LD      a,l
         OR     1
         LD      l,a
-        LD      a,e
-        sub     c
-        LD      e,a
-        LD      a,d
-        SBC     b
-        LD      d,a
+        EX      de,hl
+        SUB     hl,bc
+        EX      de,hl
 ccdiv2: POP     AF
         DEC     a
         JP      Z,ccdiv3

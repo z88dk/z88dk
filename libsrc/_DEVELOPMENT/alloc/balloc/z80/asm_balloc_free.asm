@@ -28,10 +28,9 @@ asm_balloc_free:
    
    ld a,h
    or l
-   ret z                       ; if address == 0
+   ret Z                       ; if address == 0
 
-   ld e,l
-   ld d,h                      ; de = void *item to free
+   ld de,hl                    ; de = void *item to free
    
    dec hl
    ld l,(hl)

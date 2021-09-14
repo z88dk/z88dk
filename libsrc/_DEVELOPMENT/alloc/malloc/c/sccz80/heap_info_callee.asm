@@ -1,6 +1,8 @@
 
 ; void heap_info(void *heap, void *callback)
 
+IF !__CPU_INTEL__
+
 INCLUDE "config_private.inc"
 
 SECTION code_clib
@@ -36,3 +38,5 @@ defc heap_info_callee = heap_info_unlocked_callee
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ENDIF

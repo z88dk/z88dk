@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+IF !__CPU_INTEL__
+
 INCLUDE "config_private.inc"
 
 SECTION code_clib
@@ -54,3 +56,5 @@ defc asm_heap_info = asm_heap_info_unlocked
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ENDIF

@@ -44,10 +44,17 @@ asm_p_forward_list_remove_after:
    
    ld a,h
    or l
-   jp z, error_zc              ; if there is no following item
-   
+   jp Z, error_zc              ; if there is no following item
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   ld a,(hl)
+   inc hl
+   ld (de),a
+   inc de
+ELSE
    ldi
    inc bc                      ; undo changes to bc
+ENDIF
    ld a,(hl)
    ld (de),a                   ; list_item->next = item->next
    

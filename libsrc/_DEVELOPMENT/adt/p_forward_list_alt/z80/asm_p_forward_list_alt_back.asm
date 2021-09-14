@@ -37,6 +37,6 @@ asm_p_forward_list_alt_back:
    or (hl)
    inc hl
    
-   jp nz, l_readword_hl
+   jp NZ, l_readword_hl
    
    jp error_zc  

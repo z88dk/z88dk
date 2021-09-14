@@ -50,7 +50,13 @@ asm_malloc:
    ;
    ; uses  : af, bc, de, hl
    
+   IF __CPU_INTEL__ || __CPU_GBZ80__
+   ex de,hl
+   ld hl,(__malloc_heap)
+   ex de,hl
+   ELSE
    ld de,(__malloc_heap)
+   ENDIF
    jp asm_heap_alloc
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

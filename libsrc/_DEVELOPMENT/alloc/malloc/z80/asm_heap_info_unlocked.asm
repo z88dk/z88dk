@@ -10,6 +10,8 @@
 ;
 ; ===============================================================
 
+IF !__CPU_INTEL__
+
 SECTION code_clib
 SECTION code_alloc_malloc
 
@@ -180,3 +182,5 @@ free:
    push bc                     ; type
    
    jr invoke
+
+ENDIF

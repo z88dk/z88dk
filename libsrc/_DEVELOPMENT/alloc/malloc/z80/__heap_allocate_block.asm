@@ -23,11 +23,19 @@ __heap_allocate_block:
    
    ld a,e
    cp l
-   jr nz, insert_block
+IF __CPU_INTEL__
+   jp NZ, insert_block
+ELSE
+   jr NZ, insert_block
+ENDIF
    
    ld a,d
    cp h
-   jr z, overlay_block
+IF __CPU_INTEL__
+   jp Z, overlay_block
+ELSE
+   jr Z, overlay_block
+ENDIF
 
 insert_block:
 
@@ -58,12 +66,20 @@ insert_block:
    inc bc
    
    or a
-   jr nz, block_next_present
+IF __CPU_INTEL__
+   jp NZ, block_next_present
+ELSE
+   jr NZ, block_next_present
+ENDIF
    
    ld a,(bc)
    
    or a
-   jr z, block_next_absent
+IF __CPU_INTEL__
+   jp Z, block_next_absent
+ELSE
+   jr Z, block_next_absent
+ENDIF
 
 block_next_present:
 
