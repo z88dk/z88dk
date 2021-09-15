@@ -34,5 +34,5 @@ END
 	check_bin_file("$test.bin", words($len, $len));
 }
 
-#unlink_testfiles;
+unlink_testfiles;
 done_testing;
