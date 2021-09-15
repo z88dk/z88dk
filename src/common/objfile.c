@@ -86,7 +86,10 @@ static section_t* read_section(objfile_t* obj, FILE* fp)
 	UT_string* name = utstr_new();
 
 	// read section name from file
-	xfread_bcount_str(name, fp);
+	if (obj->version >= 16)
+		xfread_wcount_str(name, fp);
+	else
+		xfread_bcount_str(name, fp);
 
 	// search in existing sections
 	section_t* section = NULL;
@@ -317,7 +320,10 @@ static void objfile_read_sections(objfile_t* obj, FILE* fp, long fpos_start)
 				break;
 
 			UT_string* name = utstr_new();
-			xfread_bcount_str(name, fp);
+			if (obj->version >= 16)
+				xfread_wcount_str(name, fp);
+			else
+				xfread_bcount_str(name, fp);
 
 			// create new section object or use first if empty section
 			section_t* section;
@@ -418,10 +424,18 @@ static void objfile_read_symbols(objfile_t* obj, FILE* fp, long fpos_start, long
 			symbol->section = obj->sections;			// the first section
 
 		symbol->value = xfread_dword(fp);
-		xfread_bcount_str(symbol->name, fp);
+		if (obj->version >= 16)
+			xfread_wcount_str(symbol->name, fp);
+		else
+			xfread_bcount_str(symbol->name, fp);
+
 
 		if (obj->version >= 9) {			// add definition location
-			xfread_bcount_str(symbol->filename, fp);
+			if (obj->version >= 16)
+				xfread_wcount_str(symbol->filename, fp);
+			else
+				xfread_bcount_str(symbol->filename, fp);
+
 			symbol->line_nr = xfread_dword(fp);
 		}
 
@@ -454,7 +468,11 @@ static void objfile_read_externs(objfile_t* obj, FILE* fp, long fpos_start, long
 
 	xfseek(fp, fpos_start, SEEK_SET);
 	while (ftell(fp) < fpos_end) {
-		xfread_bcount_str(name, fp);
+		if (obj->version >= 16)
+			xfread_wcount_str(name, fp);
+		else
+			xfread_bcount_str(name, fp);
+
 		argv_push(obj->externs, utstr_body(name));
 
 		if (opt_obj_list)
@@ -523,7 +541,10 @@ static void objfile_read_exprs(objfile_t* obj, FILE* fp, long fpos_start, long f
 			printf(" $%04X: ", expr->patch_ptr);
 
 		if (obj->version >= 6) {
-			xfread_bcount_str(expr->target_name, fp);
+			if (obj->version >= 16)
+				xfread_wcount_str(expr->target_name, fp);
+			else
+				xfread_bcount_str(expr->target_name, fp);
 
 			if (show_expr && utstr_len(expr->target_name) > 0)
 				printf("%s := ", utstr_body(expr->target_name));
@@ -578,7 +599,11 @@ void objfile_read(objfile_t* obj, FILE* fp)
 
 	// module name
 	xfseek(fp, fpos0 + fpos_modname, SEEK_SET);
-	xfread_bcount_str(obj->modname, fp);
+	if (obj->version >= 16)
+		xfread_wcount_str(obj->modname, fp);
+	else
+		xfread_bcount_str(obj->modname, fp);
+
 	if (opt_obj_list)
 		printf("  Name: %s\n", utstr_body(obj->modname));
 
@@ -638,11 +663,11 @@ static long objfile_write_exprs1(objfile_t* obj, FILE* fp, UT_string* last_filen
 			}
 
 			xfwrite_dword(expr->line_nr, fp);				// source line number
-			xfwrite_bcount_str(expr->section->name, fp);	// section name
+			xfwrite_wcount_str(expr->section->name, fp);	// section name
 
 			xfwrite_word(expr->asmpc, fp);					// ASMPC
 			xfwrite_word(expr->patch_ptr, fp);				// patchptr
-			xfwrite_bcount_str(expr->target_name, fp);		// target symbol for expression
+			xfwrite_wcount_str(expr->target_name, fp);		// target symbol for expression
 			xfwrite_wcount_str(expr->text, fp);				// expression
 		}
 	}
@@ -680,10 +705,10 @@ static long objfile_write_symbols(objfile_t* obj, FILE* fp)
 
 			xfwrite_byte(symbol->scope, fp);		// scope
 			xfwrite_byte(symbol->type, fp);			// type
-			xfwrite_bcount_str(symbol->section->name, fp);// section
+			xfwrite_wcount_str(symbol->section->name, fp);// section
 			xfwrite_dword(symbol->value, fp);		// value
-			xfwrite_bcount_str(symbol->name, fp);	// name
-			xfwrite_bcount_str(symbol->filename, fp);// filename
+			xfwrite_wcount_str(symbol->name, fp);	// name
+			xfwrite_wcount_str(symbol->filename, fp);// filename
 			xfwrite_dword(symbol->line_nr, fp);		// definition line
 		}
 	}
@@ -704,7 +729,7 @@ static long objfile_write_externs1(objfile_t* obj, FILE* fp, UT_string* name)
 
 	for (char** pname = argv_front(obj->externs); *pname; pname++) {
 		utstr_set_fmt(name, "%s", *pname);
-		xfwrite_bcount_str(name, fp);
+		xfwrite_wcount_str(name, fp);
 	}
 
 	return fpos0;
@@ -723,7 +748,7 @@ static long objfile_write_externs(objfile_t* obj, FILE* fp)
 static long objfile_write_modname(objfile_t* obj, FILE* fp)
 {
 	long fpos0 = ftell(fp);
-	xfwrite_bcount_str(obj->modname, fp);
+	xfwrite_wcount_str(obj->modname, fp);
 	return fpos0;
 }
 
@@ -736,7 +761,7 @@ static long objfile_write_sections(objfile_t* obj, FILE* fp)
 	section_t* section;
 	DL_FOREACH(obj->sections, section) {
 		xfwrite_dword(utarray_len(section->data), fp);
-		xfwrite_bcount_str(section->name, fp);
+		xfwrite_wcount_str(section->name, fp);
 		xfwrite_dword(section->org, fp);
 		xfwrite_dword(section->align, fp);
 		xfwrite_bytes(utarray_front(section->data), utarray_len(section->data), fp);

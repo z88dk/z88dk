@@ -18,7 +18,7 @@ use Test::Differences;
 use List::Uniq 'uniq';
 use Data::HexDump;
 
-my $OBJ_FILE_VERSION = "14";
+my $OBJ_FILE_VERSION = "16";
 my $STOP_ON_ERR = grep {/-stop/} @ARGV;
 my $KEEP_FILES	= grep {/-keep/} @ARGV;
 my $test	 = "test";
@@ -379,8 +379,8 @@ sub objfile {
 			@$_ == 8 or die;
 			my($type, $filename, $line_nr, $section, $asmptr, $ptr, $target_name, $text) = @$_;
 			$o .= $type . pack_lstring($filename) . pack("V", $line_nr) .
-			        pack_string($section) . pack("vv", $asmptr, $ptr) .
-					pack_string($target_name) . pack_lstring($text);
+			        pack_lstring($section) . pack("vv", $asmptr, $ptr) .
+					pack_lstring($target_name) . pack_lstring($text);
 		}
 		$o .= "\0";
 	}
@@ -391,9 +391,9 @@ sub objfile {
 		for (@{$args{SYMBOLS}}) {
 			@$_ == 7 or die;
 			my($scope, $type, $section, $value, $name, $def_filename, $line_nr) = @$_;
-			$o .= $scope . $type . pack_string($section) .
-					pack("V", $value) . pack_string($name) .
-					pack_string($def_filename) . pack("V", $line_nr);
+			$o .= $scope . $type . pack_lstring($section) .
+					pack("V", $value) . pack_lstring($name) .
+					pack_lstring($def_filename) . pack("V", $line_nr);
 		}
 		$o .= "\0";
 	}
@@ -402,13 +402,13 @@ sub objfile {
 	if ($args{LIBS}) {
 		store_ptr(\$o, $lib_addr);
 		for my $name (@{$args{LIBS}}) {
-			$o .= pack_string($name);
+			$o .= pack_lstring($name);
 		}
 	}
 
 	# store name
 	store_ptr(\$o, $name_addr);
-	$o .= pack_string($args{NAME});
+	$o .= pack_lstring($args{NAME});
 
 	# store code
 	if ( $args{CODE} ) {
@@ -418,7 +418,7 @@ sub objfile {
 			@$_ == 4 or die;
 			my($section, $org, $align, $code) = @$_;
 			$o .= pack("V", length($code)) .
-			        pack_string($section) .
+			        pack_lstring($section) .
 					pack("VV", $org, $align) .
 					$code;
 		}
