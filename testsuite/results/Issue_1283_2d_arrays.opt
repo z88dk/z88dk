@@ -40,7 +40,6 @@
 	defb	255
 	defb	255
 	defb	128
-	defs	16
 	SECTION	code_compiler
 
 ._test1

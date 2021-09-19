@@ -88,7 +88,6 @@ int str_init(Type *tag)
         }
         if ( i != 0 ) needchar(',');
 
-
         if ( ptr->offset == last_offset ) {
             add_bitfield(ptr, &bitfield_value);
             had_bitfield += ptr->bit_size;
@@ -161,6 +160,9 @@ int agg_init(Type *type, int isflexible)
     int size = 0;
 
     while (dim) {
+        if ( rcmatch('}')) {
+            break;
+        }
         if ( type->kind == KIND_ARRAY && type->ptr->kind == KIND_STRUCT ) {
             /* array of struct */
             if  ( done == 0 ) {
@@ -186,6 +188,7 @@ int agg_init(Type *type, int isflexible)
                    size += agg_init(type->ptr, isflexible);
                if ( needbrace ) needchar('}');
             }
+            dim--;
         } else {
             char needbrace = 0;
             if ( cmatch('{') ) 
@@ -196,6 +199,7 @@ int agg_init(Type *type, int isflexible)
                 size += init(type->ptr,1);
             }
             if ( needbrace ) needchar('}');
+            dim--;
         }
         done++;
         if (cmatch(',') == 0)
