@@ -54,9 +54,8 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    ld a,(hl)
    inc hl
  ENDIF
-   ld e,a
    dec bc
-   cp d 
+   cp e 
    jr z,match
    and a		;Isn't current char NUL?
    jp z,error_zc
