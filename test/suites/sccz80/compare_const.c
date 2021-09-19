@@ -102,6 +102,7 @@ void test_compare1_long()
 {
     long a = 0;
     long b = 1;
+    long c = -1000;
 
     if ( a == 1 ) { Assert(1, "a == 1"); }
     if ( b == 1 ) { } else { Assert(1, "b == 1"); } 
@@ -120,6 +121,10 @@ void test_compare1_long()
     if ( b > 1 ) { Assert(1, "b > 1"); } 
     if ( a >= 1 ) { Assert(1, "a >= 1"); }
     if ( b >= 1 ) {} else{ Assert(1, "b >= 1"); } 
+
+    if (c < -1000 ) { Assert(1,"c < -1000"); }
+    if (c < -500 )  {} else { Assert(1,"c < -500"); }
+    if (c < 1000 )  {} else { Assert(1,"c < 1000"); }
 }
 
 void test_compare1_ulong()
