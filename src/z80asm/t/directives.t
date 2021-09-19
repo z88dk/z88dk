@@ -80,7 +80,7 @@ z80asm(
 END
 );
 z80nm("test.o", <<'END');
-Object  file test.o at $0000: Z80RMF14
+Object  file test.o at $0000: Z80RMF16
   Name: test
   Section "": 1 bytes
     C $0000: C9
@@ -96,7 +96,7 @@ z80asm(
 END
 );
 z80nm("test.o", <<'END');
-Object  file test.o at $0000: Z80RMF14
+Object  file test.o at $0000: Z80RMF16
   Name: lib
   Section "": 1 bytes
     C $0000: C9
@@ -113,7 +113,7 @@ z80asm(
 END
 );
 z80nm("test.o", <<'END');
-Object  file test.o at $0000: Z80RMF14
+Object  file test.o at $0000: Z80RMF16
   Name: lib2
   Section "": 1 bytes
     C $0000: C9

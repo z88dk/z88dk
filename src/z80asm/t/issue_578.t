@@ -27,7 +27,7 @@ END
 
 check_bin_file("test.bin", pack("C*", 0, 1));
 z80nm("test.o", <<'END');
-Object  file test.o at $0000: Z80RMF14
+Object  file test.o at $0000: Z80RMF16
   Name: test
   Section "": 2 bytes
     C $0000: 00 01

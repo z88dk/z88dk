@@ -549,7 +549,7 @@ void debugger()
 
             if ( argc > 0 ) {
                 command *cmd = &commands[0];
-                command* ambiguous_commands[16] = {};
+                command* ambiguous_commands[16] = {0};
                 int ambigious_commands_num = 0;
                 while ( cmd->cmd ) {
                     if ( strcmp(argv[0], cmd->cmd) == 0 ) {

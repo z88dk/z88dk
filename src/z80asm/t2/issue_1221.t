@@ -36,7 +36,7 @@ z80asm_ok("", "", "",
           'dc       c2 = 5'     => "");
 
 capture_ok("z88dk-z80nm -a ${test}.o", <<END);
-Object  file ${test}.o at \$0000: Z80RMF14
+Object  file ${test}.o at \$0000: Z80RMF16
   Name: ${test}
   Section "": 50 bytes
     C \$0000: 01 02 03 04 05 68 65 6C 6C 6F 77 6F 72 6C 64 34

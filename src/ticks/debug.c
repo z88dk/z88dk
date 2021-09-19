@@ -678,8 +678,8 @@ debug_sym_function* debug_find_function(const char* function_name, const char* f
     return f;
 }
 
-static int min(int a, int b) { if (a < b ) return a; else return b;}
-static int max(int a, int b) { if (a > b ) return a; else return b;}
+static int Min(int a, int b) { if (a < b ) return a; else return b;}
+static int Max(int a, int b) { if (a > b ) return a; else return b;}
 
 
 int debug_print_element(type_chain* chain, char issigned, enum resolve_chain_value_kind resolve_by, uint32_t data, char *target, size_t targetlen) {
@@ -821,7 +821,7 @@ static uint8_t debug_resolve_chain_value(debug_sym_symbol *sym, uint16_t frame_p
 
     switch (chain->type_) {
         case TYPE_ARRAY: {
-            int maxlen = max(10,min(10, chain->size));
+            int maxlen = Max(10,Min(10, chain->size));
             offs += snprintf(target + offs, targetlen - offs, "%#04x [%d] = { ", frame_pointer, chain->size);
             for ( int i = 0; i < maxlen; i++ ) {
                 offs += snprintf(target + offs, targetlen - offs, "%s[%d] = ", i != 0 ? ", " : "", i);
