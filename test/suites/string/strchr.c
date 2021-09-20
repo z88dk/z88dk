@@ -16,7 +16,6 @@ void strnchr_tests()
 {
    char *haystack = "needle";
 
-	printf("%p -> %p\n",haystack,strnchr(haystack,5,'e'));
    Assert(haystack + 1 == strnchr(haystack,5,'e'), "Should find at position 1");
    Assert(NULL == strnchr(haystack,1,'e'), "Should not find in range");
    Assert(NULL == strnchr(haystack,5,'a'), "Should not find");
