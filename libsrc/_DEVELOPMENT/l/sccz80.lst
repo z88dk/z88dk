@@ -96,7 +96,6 @@ l/sccz80/crt0_long_z80/l_long_ugt
 l/sccz80/crt0_long_z80/l_long_ule
 l/sccz80/crt0_long_z80/l_long_ult
 l/sccz80/crt0_long_z80/l_long_xor
-l/sccz80/crt0_long_z80/lpush2
 l/sccz80/crt0_longlong_z80/__i64_acc
 l/sccz80/crt0_longlong_z80/l_i64_add
 l/sccz80/crt0_longlong_z80/l_i64_and
