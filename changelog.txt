@@ -31,8 +31,7 @@ Detailed but incomplete changelist:
 - [sccz80] Bug fixes + optimisations
 - [z80asm] Now supports assembling undocumented 8085 instructions
 - [z80asm] Replace --cpu=r2k with --cpu=r2ka
-- [zsdcc] Upgraded to SDCC 4.1.6 r12419 (bugfixes)
-
+- [zsdcc] Upgraded to SDCC 4.1.6 r12555 (bugfixes)
 
 z88dk v2.1 - 07.02.2021
 
