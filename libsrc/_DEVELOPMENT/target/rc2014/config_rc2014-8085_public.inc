@@ -94,7 +94,7 @@ PUBLIC __CPU_INFO_ENABLE_UNDOCUMENTED
 
 
 
-defc __Z80 = 0x01
+defc __8085 = 0x01
 
 
 defc __CPU_INFO = 0x00
