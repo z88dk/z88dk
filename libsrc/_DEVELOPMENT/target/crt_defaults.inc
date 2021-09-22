@@ -33,8 +33,8 @@
    defc DEF__crt_on_exit               = 0x10001 ;; halt on exit (see documentation for other exit behaviours)
 
    defc DEF__crt_enable_rst            = 0       ;; if non-zero and in some crts with code org = 0, set bits indicate which rst locations are implemented with user code
+   defc DEF__crt_enable_nmi            = 0       ;; if non-zero and in some crts with code org = 0, a jump to user code to service the nmi is inserted
    defc DEF__crt_enable_trap           = 0       ;; if non-zero and in some crts with code org = 0 and 8085 or Z180 target, a jump to user code to service traps is inserted
-   defc DEF__crt_enable_nmi            = 0       ;; if non-zero and in some crts with code org = 0 and Z80/Z180, a jump to user code to service the nmi is inserted
 
    ; clib defaults
    
