@@ -33,6 +33,12 @@ IF __CPU_R2KA__ | __CPU_R3K__
 
 ELSE
 
+IF __CPU_8085__
+
+   and $80                     ; isolate IE bit
+
+ELSE
+
    IF __Z80 & __Z80_NMOS
    
       bit 0,l                  ; check carry flag
@@ -42,9 +48,11 @@ ELSE
       bit 2,l                  ; check p/v flag
    
    ENDIF
-   
-   jr z, di_state
-   
+
+ENDIF
+
+   jp Z, di_state
+
 ei_state:
 
    ei

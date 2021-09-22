@@ -34,6 +34,12 @@ IF __CPU_R2KA__ | __CPU_R3K__
 
 ELSE
 
+IF __CPU_8085__
+
+   rim
+
+ELSE
+
    IF __Z80 & __Z80_NMOS
    
       ; nmos z80 bug prevents use of "ld a,i" to gather IFF2 into p/v flag
@@ -68,6 +74,8 @@ ELSE
       ld a,i
 
    ENDIF
+
+ENDIF
 
 continue:
    
