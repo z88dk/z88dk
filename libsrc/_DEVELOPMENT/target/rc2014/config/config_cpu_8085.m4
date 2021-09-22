@@ -38,7 +38,7 @@ dnl#
 
 ifdef(`CFG_ASM_DEF',
 `
-defc `__Z80' = __8085
+defc `__8085' = __8085
 
 
 defc `__CPU_INFO' = __CPU_INFO

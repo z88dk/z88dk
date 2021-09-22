@@ -65,7 +65,7 @@ defc __IO_SIO_PORT_OFFSET_D = 0x01
 
 
 
-defc __Z80 = 0x01
+defc __8085 = 0x01
 
 
 defc __CPU_INFO = 0x00
