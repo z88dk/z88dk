@@ -62,17 +62,26 @@ asm_cpu_pop_ei_jp:
    ; uses  : af
 
    pop af                      ; af = ei_di_status
-   
+
+IF __CPU_8085__
+
+   and $08                     ; isolate IE bit
+   jp Z,di_state               ; or fall through to ei_state
+
+ELSE
+
    IF __Z80 & __Z80_NMOS
    
-      jr nc, di_state
+      jr NZ, di_state
    
    ELSE
    
-      jp po, di_state
+      jp PO, di_state
 
    ENDIF
-   
+
+ENDIF
+
 ei_state:
 
    ei

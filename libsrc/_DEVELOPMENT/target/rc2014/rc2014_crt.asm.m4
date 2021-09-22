@@ -60,6 +60,28 @@ ifelse(__STARTUP, 0,
 
    include(`startup/rc2014_crt_0.asm.m4')
 ')
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 8085 acia driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ifelse(__STARTUP, 2,
+`
+   ; acia drivers installed on stdin, stdout, stderr
+
+   IFNDEF __CRTCFG
+
+      defc __CRTCFG = 1
+
+   ENDIF
+
+   IFNDEF __MMAP
+
+      defc __MMAP = 0
+
+   ENDIF
+
+   include(`startup/rc2014_crt_2.asm.m4')
+')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; sio driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -72,7 +94,7 @@ ifelse(__STARTUP, 4,
 
    IFNDEF __CRTCFG
 
-      defc __CRTCFG = 1
+      defc __CRTCFG = 2
 
    ENDIF
 
@@ -96,7 +118,7 @@ ifelse(__STARTUP, 8,
 
    IFNDEF __CRTCFG
 
-      defc __CRTCFG = 2
+      defc __CRTCFG = 3
 
    ENDIF
 
@@ -119,7 +141,7 @@ ifelse(__STARTUP, 16,
 
    IFNDEF __CRTCFG
 
-      defc __CRTCFG = 3
+      defc __CRTCFG = 4
 
    ENDIF
 
@@ -130,6 +152,29 @@ ifelse(__STARTUP, 16,
    ENDIF
 
    include(`startup/rc2014_crt_16.asm.m4')
+')
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; 8085 basic driver ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+ifelse(__STARTUP, 32,
+`
+   ; basic drivers installed on stdin, stdout, stderr
+
+   IFNDEF __CRTCFG
+
+      defc __CRTCFG = 5
+
+   ENDIF
+
+   IFNDEF __MMAP
+
+      defc __MMAP = 0
+
+   ENDIF
+
+   include(`startup/rc2014_crt_32.asm.m4')
 ')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -148,7 +193,7 @@ ifelse(__STARTUP, 64,
 
    IFNDEF __CRTCFG
 
-      defc __CRTCFG = 4
+      defc __CRTCFG = 6
 
    ENDIF
 
@@ -171,7 +216,7 @@ ifelse(__STARTUP, 256,
 
    IFNDEF __CRTCFG
 
-      defc __CRTCFG = 5
+      defc __CRTCFG = 7
 
    ENDIF
 
