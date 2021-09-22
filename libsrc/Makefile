@@ -98,6 +98,7 @@ TOCREATE += $(call check_target,px4,px4.lib $(CPMLIBS))
 TOCREATE += $(call check_target,px8,px8.lib $(CPMLIBS))
 TOCREATE += $(call check_target,radio86,radio86_clib.lib)
 TOCREATE += $(call check_target,rcmx000,rcmx000_clib.lib)
+TOCREATE += $(call check_target,rc2014,rc2014-8085_clib.lib)
 TOCREATE += $(call check_target,rc700,rc700.lib $(CPMLIBS))
 TOCREATE += $(call check_target,rex,rex_clib.lib)
 TOCREATE += $(call check_target,rx78,rx78_clib.lib)
@@ -1311,10 +1312,6 @@ gl6000_clib.lib:
 	TARGET=gl6000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl6000 -x$(OUTPUT_DIRECTORY)/gl6000_clib @$(LISTFILE_DIRECTORY)/gl6000.lst
 
 
-
-
-
-
 # Untested C lib for NC100 machines - dom
 nc_clib.lib:
 	@echo ''
@@ -1682,7 +1679,6 @@ mikro80_clib.lib:
 	$(MAKE) -C games TARGET=mikro80
 	TARGET=mikro80 TYPE=8080 $(LIBLINKER) -m8080 -DFORmikro80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mikro80_clib @$(LISTFILE_DIRECTORY)/mikro80.lst
 
-
 special_clib.lib:
 	@echo ''
 	@echo '--- Building Specialist Library ---'
@@ -1730,7 +1726,6 @@ altair8800_clib.lib:
 	@echo ''
 	$(call buildgeneric,altair8800,portable)
 	TARGET=altair8800 TYPE=8080 $(LIBLINKER) -m8080 -DFORaltair8800 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/altair8800_clib @$(LISTFILE_DIRECTORY)/altair8800.lst
-
 
 dai_clib.lib:
 	@echo ''
@@ -1780,6 +1775,13 @@ radio86_clib.lib:
 	$(call buildgeneric,radio86,"gencon portable")
 	TARGET=radio86 TYPE=8080 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8080 -DFORradio86 -x$(OUTPUT_DIRECTORY)/radio86_clib @$(LISTFILE_DIRECTORY)/radio86.lst
 
+# RC2014 (newlib target) using 8085 CPU Module - feilipu
+rc2014-8085_clib.lib:
+	@echo ''
+	@echo '--- Building RC2014-8085 Library ---'
+	@echo ''
+	$(call buildgeneric,rc2014,portable)
+	TARGET=rc2014 TYPE=8085 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8085 -DFORrc2014 -x$(OUTPUT_DIRECTORY)/rc2014-8085_clib @$(LISTFILE_DIRECTORY)/rc2014-8085.lst
 
 gfxvti.lib:
 	@echo ''
@@ -1879,7 +1881,6 @@ gbz80_crt0.lib:
 	@echo ''
 	$(call buildcrt)
 	TYPE=gbz80 $(LIBLINKER) -mgbz80 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gbz80_crt0 @$(LISTFILE_DIRECTORY)/gbz80.lst
-
 
 r2k_crt0.lib:
 	@echo ''

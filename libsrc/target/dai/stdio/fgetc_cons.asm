@@ -4,7 +4,7 @@
 	PUBLIC	fgetc_cons
 	PUBLIC	_fgetc_cons
 
-	INCLUDe	"target/dai/def/dai.def"
+	INCLUDE	"target/dai/def/dai.def"
 
 .fgetc_cons
 ._fgetc_cons
