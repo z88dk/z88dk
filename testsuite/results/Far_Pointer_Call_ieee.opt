@@ -20,7 +20,7 @@
 	push	hl
 	ld	hl,2	;const
 	push	hl
-	ld	hl,6	;const
+	ld	l,6	
 	add	hl,sp
 	ld	e,(hl)
 	inc	hl
@@ -52,7 +52,7 @@
 	push	hl
 	ld	hl,2	;const
 	push	hl
-	ld	hl,6	;const
+	ld	l,6	
 	add	hl,sp
 	ld	e,(hl)
 	inc	hl

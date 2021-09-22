@@ -16,7 +16,7 @@
 ._main
 	ld	hl,9	;const
 	push	hl
-	ld	hl,20	;const
+	ld	l,20	
 	push	hl
 	call	_do_something
 	pop	bc

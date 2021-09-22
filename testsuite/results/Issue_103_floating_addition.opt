@@ -383,9 +383,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+12
-	push	hl
+	ex	(sp),hl
 	call	_add_int_longform
 	call	dpush
 	ld	a,4
@@ -393,9 +392,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+33
-	push	hl
+	ex	(sp),hl
 	call	_add_int_longform2
 	call	dpush
 	ld	a,4
@@ -403,9 +401,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+55
-	push	hl
+	ex	(sp),hl
 	call	_add_double
 	call	dpush
 	ld	a,4
@@ -413,9 +410,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+70
-	push	hl
+	ex	(sp),hl
 	call	_sub_int
 	call	dpush
 	ld	a,4
@@ -423,9 +419,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+82
-	push	hl
+	ex	(sp),hl
 	call	_sub_int_longform
 	call	dpush
 	ld	a,4
@@ -433,9 +428,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+103
-	push	hl
+	ex	(sp),hl
 	call	_sub_double
 	call	dpush
 	ld	a,4
@@ -443,9 +437,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+118
-	push	hl
+	ex	(sp),hl
 	call	_sub_int_longform2
 	call	dpush
 	ld	a,4
@@ -453,9 +446,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+140
-	push	hl
+	ex	(sp),hl
 	call	_mult_int
 	call	dpush
 	ld	a,4
@@ -463,9 +455,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+153
-	push	hl
+	ex	(sp),hl
 	call	_mult_double
 	call	dpush
 	ld	a,4
@@ -473,9 +464,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+169
-	push	hl
+	ex	(sp),hl
 	call	_mult_double_longform
 	call	dpush
 	ld	a,4
@@ -483,9 +473,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+194
-	push	hl
+	ex	(sp),hl
 	call	_mult_double_longform2
 	call	dpush
 	ld	a,4
@@ -493,9 +482,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+220
-	push	hl
+	ex	(sp),hl
 	call	_div_int
 	call	dpush
 	ld	a,4
@@ -503,9 +491,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+232
-	push	hl
+	ex	(sp),hl
 	call	_div_double
 	call	dpush
 	ld	a,4
@@ -513,9 +500,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+247
-	push	hl
+	ex	(sp),hl
 	call	_div_double_longform
 	call	dpush
 	ld	a,4
@@ -523,9 +509,8 @@
 	pop	bc
 	pop	bc
 	pop	bc
-	pop	bc
 	ld	hl,i_1+271
-	push	hl
+	ex	(sp),hl
 	call	_div_double_longform2
 	call	dpush
 	ld	a,4

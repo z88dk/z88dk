@@ -46,9 +46,8 @@
 	ld	hl,_selected_data
 	push	hl
 	call	_func
-	pop	bc
 	ld	hl,_selected_data+16
-	push	hl
+	ex	(sp),hl
 	call	_func
 	pop	bc
 	ld	hl,(_selected_data+2)

@@ -6257,3 +6257,292 @@
 =
 	ld	hl,(_%1)
 	ld	h,0
+
+%title Increment memory not via hl
+	ld	hl,(_%1)
+	ld	h,0
+	%2c	hl
+	ld	a,l
+	ld	(_%1),a
+.i_%3
+	ld	hl,%4
+=
+	ld	hl,_%1
+	%2c	(hl)
+.i_%3
+	ld	hl,%4
+
+%title Redundant sign extnsion
+	ld	l,(hl)
+	ld	h,0
+	call	l_%"xor|and|or"2
+	ld	a,l
+	call	l_sxt
+	pop	de
+	ld	a,l
+	ld	(de),a
+=
+	ld	a,(hl)
+	%2	e
+	pop	de
+	ld	(de),a
+
+	ld	hl,(_%1)
+	ld	h,0
+	ex	de,hl
+	ld	hl,(_%2)
+	ld	h,0
+	ex	de,hl
+	and	a
+	sbc	hl,de
+	jp	%3c,%4	;
+	ld	hl,%5
+=
+	ld	hl,(_%2)
+	ld	a,(_%1)
+	sub	l
+	jp	%3c,%4	;
+	ld	hl,%5
+
+%notcpu gbz80
+	pop	bc
+	ld	hl,%1
+	push	hl
+	call	_%2
+=
+	ld	hl,%1
+	ex	(sp),hl
+	call	_%2
+
+	ld	l,(hl)
+	ld	h,0
+	ld	bc,%1
+	add	hl,bc
+	ld	a,l
+	pop	de
+	ld	(de),a
+	ld	hl,%2
+=
+	ld	a,(hl)
+	add	%eval(%1 256 %%)
+	pop	de
+	ld	(de),a
+	ld	hl,%2
+
+%eval 1 = %3 %1 -
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	(hl),%2
+	ld	hl,%3	;const
+	add	hl,sp
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	(hl),%2
+	inc	hl
+
+%eval 2 = %3 %1 -
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	(hl),%2
+	ld	hl,%3	;const
+	add	hl,sp
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	(hl),%2
+	inc	hl
+	inc	hl
+
+	ld	hl,(_%1)
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	%2,%3	;EOS
+=
+	ld	a,(_%1)
+	and	a
+	jp	%2,%3	;EOS
+
+
+%check 0 <= %1 <= 255
+%check 0 <= %2 <= 255
+	ld	hl,%1	;const
+	push	hl
+	ld	hl,%2	;const
+=
+	ld	hl,%1	;const
+	push	hl
+	ld	l,%2	
+
+	push	hl
+	ld	hl,(_%1)
+	ld	h,0
+	add	hl,hl
+	pop	de
+	add	hl,de
+=
+	ex	de,hl
+	ld	hl,(_%1)
+	ld	h,0
+	add	hl,hl
+	add	hl,de
+
+	call	l_gchar
+	pop	de
+	ld	a,l
+	ld	(de),a
+.%1
+	ld	hl,%2
+=
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+.%1
+	ld	hl,%2
+
+%notcpu gbz80
+	ld	hl,_%1
+	inc	(hl)
+	ld	a,(hl)
+	inc	hl
+	jr	nz,ASMPC+3
+	inc	(hl)
+	jp	%2	;EOS
+=
+	ld	hl,(_%1)
+	inc	hl
+	ld	(_%1),hl
+	jp	%2	;EOS
+
+%notcpu gbz80
+	ld	hl,_%1
+	inc	(hl)
+	ld	a,(hl)
+	inc	hl
+	jr	nz,ASMPC+3
+	inc	(hl)
+	ld	hl,%2
+=
+	ld	hl,(_%1)
+	inc	hl
+	ld	(_%1),hl
+	ld	hl,%2
+
+%notcpu gbz80
+	ld	hl,_%1
+	dec	(hl)
+	ld	a,(hl)
+	inc	hl
+	cp	255
+	jr	nz,ASMPC+3
+	dec	(hl)
+	ld	hl,%2
+=
+	ld	hl,(_%1)
+	dec	hl
+	ld	(_%1),hl
+	ld	hl,%2
+
+%notcpu gbz80
+	ld	hl,_%1
+	dec	(hl)
+	ld	a,(hl)
+	inc	hl
+	cp	255
+	jr	nz,ASMPC+3
+	dec	(hl)
+	ld	h,(hl)
+	ld	l,a
+=
+	ld	hl,(_%1)
+	dec	hl
+	ld	(_%1),hl
+
+%check 0 <= %2 <= 65535
+%check 0 <= %3 <= 65535
+	add	hl,%2
+	add	hl,%3
+=
+	add	hl,%eval(%2 %3 +)
+
+%check 0 <= %2 <= 65535
+	ld	hl,_%1
+	add	hl,%2
+=
+	ld	hl,_%1+%2
+
+%check 0 <= %1 <= 255
+	ld	l,(hl)
+	ld	h,0
+	ld	de,%1
+	and	a
+	sbc	hl,de
+	jp	nz,%3	;
+	ld	hl,%4
+=
+	ld	a,(hl)
+	cp	%1
+	jp	nz,%3	;
+	ld	hl,%4
+
+%check 0 <= %1 <= 255
+	pop	hl
+	push	hl
+	ld	l,h
+	ld	h,0
+	ld	de,%1
+	and	a
+	sbc	hl,de
+	jp	nz,%3	;
+	add	hl,sp
+=
+	ld	hl,1	;const
+	add	hl,sp
+	ld	a,(hl)
+	cp	%1
+	jp	nz,%3	;
+	ld	hl,0	;const
+	add	hl,sp
+
+	pop	hl
+	push	hl
+	ld	l,h
+	ld	h,0
+	ld	a,h
+	or	l
+	jp	%2,%3	;
+	ld	hl,%4
+=
+	ld	hl,1	;const
+	add	hl,sp
+	ld	a,(hl)
+	and	a
+	jp	%2,%3	;
+	ld	hl,%4
+
+%check 0 <= %2 <= 255
+	ld	hl,(_%1)
+	ld	h,0
+	ld	de,%2
+	and	a
+	sbc	hl,de
+	jp	z,%3	;
+=
+	ld	a,(_%1)
+	cp	%2
+	jp	z,%3	;
+
+%title Kill redundant upper 8 cleaning (14b -> 12b)
+	ld	hl,%1
+	ld	h,0
+	ld	a,%2
+	sub	l
+	jp	%3c,%4
+	ld	hl,%5
+=
+	ld	hl,%1
+	ld	a,%2
+	sub	l
+	jp	%3c,%4
+	ld	hl,%5

@@ -11,11 +11,11 @@
 ._main
 	ld	hl,14	;const
 	push	hl
-	ld	hl,8	;const
+	ld	l,8	
 	push	hl
 	ld	hl,7	;const
 	push	hl
-	ld	hl,0	;const
+	ld	l,0	
 	pop	bc
 	pop	bc
 	pop	bc

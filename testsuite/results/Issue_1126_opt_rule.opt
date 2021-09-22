@@ -23,9 +23,8 @@
 	ld	hl,0	;const
 	push	hl
 	call	_zx_border
-	pop	bc
 	ld	hl,2	;const
-	push	hl
+	ex	(sp),hl
 	call	_sendMsg
 	pop	bc
 	ret
