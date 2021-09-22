@@ -50,4 +50,4 @@ test_gbz80_%.bin: $(SOURCES) %.c
 	$(runtest_gbz80)
 
 clean:
-	rm -f *.bin *.map $(OBJECTS) zcc_opt.def *~ *.lis 
+	rm -f *.bin *.map $(OBJECTS) zcc_opt.def *~ *.lis
