@@ -27,10 +27,44 @@ include(`../crt_rules.inc')
 include(`rc2014_rules.inc')
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CLASSIC CRT AND CLIB CONFIGURATION ;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; By default we want to have stdio working for us
+IFNDEF CRT_ENABLE_STDIO
+    defc CRT_ENABLE_STDIO = 1
+ENDIF
+
+; Maximum number of FILEs available
+IF !DEFINED_CLIB_FOPEN_MAX
+    defc    CLIB_FOPEN_MAX = 4
+ENDIF
+
+PUBLIC  __FOPEN_MAX
+defc    __FOPEN_MAX = CLIB_FOPEN_MAX
+
+; Maximum number of fds available
+IF !DEFINED_CLIB_OPEN_MAX
+    defc    CLIB_OPEN_MAX = CLIB_FOPEN_MAX
+ENDIF
+
+PUBLIC  __CLIB_OPEN_MAX
+defc    __CLIB_OPEN_MAX = CLIB_OPEN_MAX
+
+; By default allow the command line options
+IF !DEFINED_CRT_ENABLE_COMMANDLINE
+  IFDEF TAR__CRT_ENABLE_COMMANDLINE
+      defc CRT_ENABLE_COMMANDLINE = TAR__CRT_ENABLE_COMMANDLINE
+  ELSE
+      defc CRT_ENABLE_COMMANDLINE = 1
+  ENDIF
+ENDIF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SET UP MEMORY MAP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include(`crt_memory_map.inc')
+include "../../../../../lib/crt/classic/crt_section.asm"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; STARTUP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -93,31 +127,7 @@ IF __crt_enable_commandline >= 1
 
 ENDIF
 
-   ; initialize data section
-
-   include "../clib_init_data.inc"
-
-   ; initialize data section to be identical in
-   ; both banks of RAM (where 128kB RAM is provided)
-   ; this is to support shadowwrite() and shadowread() functions
-   ; the asm_shadowcopy function must be available in both RAM
-   ; banks at the same address
-   ; asm_shadowcopy can then be further relocated as needed
-   ; the asm_shadowcopy RAM copy function is disabled by default
-
-   ; ld a,$01
-   ; out (__IO_RAM_TOGGLE),a
-
-   ; include "../clib_init_data.inc"
-
-   ; xor a
-   ; out (__IO_RAM_TOGGLE),a
-
-   ; initialize bss section
-
-   include "../clib_init_bss.inc"
-
-   ; interrupt mode
+   ; copy interrupt vector table to final location
 
    include "../crt_set_interrupt_mode.inc"
 
@@ -183,7 +193,10 @@ ENDIF
 include "../clib_variables.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CLIB STUBS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; NEWLIB CLIB FUNCTIONS;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-include "../clib_stubs.inc"
+SECTION code_clib
+
+INCLUDE "../../alloc/malloc/z80/asm_heap_init.asm"
+
