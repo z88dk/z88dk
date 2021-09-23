@@ -1,6 +1,6 @@
 IF __register_sp < -1
 
-   IF __CPU_8085__
+   IF __CPU_INTEL__
      ld hl,(-__register_sp)      ; stack location is stored at memory address
      ld sp,hl
    ELSE
