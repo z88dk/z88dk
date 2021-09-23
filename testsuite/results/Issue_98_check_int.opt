@@ -177,6 +177,7 @@
 
 
 
+
 	SECTION	bss_compiler
 ._g	defs	2
 	SECTION	code_compiler

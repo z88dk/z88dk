@@ -39,6 +39,8 @@
 	ld	bc,12
 	ldir
 
+	SECTION	code_compiler
+
 
 	SECTION	bss_compiler
 	SECTION	code_compiler

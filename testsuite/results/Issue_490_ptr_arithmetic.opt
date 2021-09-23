@@ -130,6 +130,7 @@
 
 
 
+
 	SECTION	bss_compiler
 ._st_func_double_static_arr	defs	30
 	SECTION	code_compiler

@@ -81,6 +81,7 @@
 
 
 
+
 	SECTION	bss_compiler
 ._fnptr	defs	2
 	SECTION	code_compiler

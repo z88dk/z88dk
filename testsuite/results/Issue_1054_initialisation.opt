@@ -22,6 +22,7 @@
 	defw	i_1+0
 	defw	i_1+2
 	SECTION	code_compiler
+
 	SECTION	rodata_compiler
 .i_1
 	defm	"a"

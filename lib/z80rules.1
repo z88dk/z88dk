@@ -1289,7 +1289,7 @@
 	or	l
 	jp	z,%3	;%4
 =
-	jr	%1_%2
+	jp	%1_%2
 .%2
 	jp	%3	;%4
 .%1_%2
@@ -1723,7 +1723,7 @@
 =
 	jp	c,%3	;%8
 .%1
-	jr	%1_%2
+	jp	%1_%2
 .%2
 	ld	a,h
 	or	l
@@ -4868,7 +4868,18 @@
 .%2
 	jp	i_%3	;%6
 =
+%activate
 	jp	i_%1	;%5
+.%2
+	jp	i_%3	;%6
+=
+%once
+	jp	i_%1	;%5
+%activate
+; --- Start of Optimiser additions ---
+=
+%once
+; --- Start of Optimiser additions ---
 	defc	%2 = i_%3
 
 	jr	c,%1
@@ -4876,9 +4887,21 @@
 	jp	i_%3	;%5
 .%1
 =
-	jp	nc,i_%3	;%5
-	defc	%2 = i_%3
+%activate
+	jr	c,%1
+.%2
+	jp	i_%3	;%5
 .%1
+=
+%once
+	jp	nc,i_%3	;%5
+.%1
+%activate
+; --- Start of Optimiser additions ---
+=
+%once
+; --- Start of Optimiser additions ---
+	defc	%2 = i_%3
 
 	push	hl
 	ld	hl,%2	;const
@@ -4895,7 +4918,17 @@
 .i_%1
 	jp	i_%2	;%5
 =
+%activate
+.i_%1
 	jp	i_%2	;%5
+=
+%once
+	jp	i_%2	;%5
+%activate
+; --- Start of Optimiser additions ---
+=
+%once
+; --- Start of Optimiser additions ---
 	defc	i_%1 = i_%2
 
 	jr	i_%2
@@ -4903,16 +4936,14 @@
 =
 	jr	i_%2
 
-	jp	i_%2	;%4
-	jp	i_%3	;%5
+	jp	i_%2
+	jp	i_%3
 =
-	jp	i_%2	;%4
+	jp	i_%2
 
-	jr	i_%1
-	defc	%2
+	j%"r|p"0	i_%1
 .i_%1
 =
-	defc	%2
 .i_%1
 
 %notcpu 8080
@@ -4964,13 +4995,9 @@
 	pop	hl
 
 	jp	i_%1	;%4
-	defc	%2
 	jp	i_%3	;%5
-	defc	%6
 =
 	jp	i_%1	;%4
-	defc	%2
-	defc	%6
 
 	ld	hl,%1	;const
 	call	l_gintspsp	;%2
@@ -6572,3 +6599,20 @@
 	and	a
 	jp	%2z,%3
 	ld	hl,%4
+
+%title De-dupe labels
+.i_%1
+.i_%2
+=
+%activate
+.i_%1
+.i_%2
+=
+%once
+.i_%1
+%activate
+; --- Start of Optimiser additions ---
+=
+%once
+; --- Start of Optimiser additions ---
+	defc	i_%2 = i_%1
