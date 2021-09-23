@@ -8,17 +8,27 @@
          IF (__crt_enable_commandline < 2)
          
             IF (__register_sp = -1)
-         
-               ld sp,(__sp_or_ret)
             
+              IF __CPU_INTEL__
+                ld hl,(__sp_or_ret)
+                ld sp,hl
+              ELSE
+                ld sp,(__sp_or_ret)
+              ENDIF
+              
             ENDIF
          
          ELSE
          
             IF (__register_sp = -1)
             
-               ld sp,(__sp_or_ret)
-            
+              IF __CPU_INTEL__
+                ld hl,(__sp_or_ret)
+                ld sp,hl
+              ELSE
+                ld sp,(__sp_or_ret)
+              ENDIF
+              
             ENDIF
             
          ENDIF
@@ -31,8 +41,13 @@
          
             ; program returns to caller
 
-            ld sp,(__sp_or_ret)
-         
+           IF __CPU_INTEL__
+             ld hl,(__sp_or_ret)
+             ld sp,hl
+           ELSE
+             ld sp,(__sp_or_ret)
+           ENDIF
+           
          ENDIF
          
       ENDIF

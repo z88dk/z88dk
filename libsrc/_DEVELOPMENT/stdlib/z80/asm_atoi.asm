@@ -32,12 +32,12 @@ asm_atoi:
 asm0_atoi:
 
    call l_eat_sign             ; consume any leading sign
-   jr nc, not_negative         ; if there was no minus sign
+   jr NC, not_negative         ; if there was no minus sign
    
    ; negative sign found
    
    call not_negative           ; convert numerical part
-   jp nc, l_neg_hl             ; if no overflow, negate result
+   jp NC, l_neg_hl             ; if no overflow, negate result
    
    inc hl                      ; hl = $8000 = INT_MIN
    ret
@@ -46,11 +46,17 @@ not_negative:
 
    ex de,hl
    call l_atou                 ; unsigned int conversion
-   jr c, overflow              ; unsigned overflow
-   
+   jr C, overflow              ; unsigned overflow
+
+IF __CPU_INTEL__
+   ld a,h
+   rla                         ; check for signed overflow
+   ret NC
+ELSE
    bit 7,h                     ; check for signed overflow
-   ret z
-   
+   ret Z
+ENDIF
+
    scf                         ; indicate signed overflow
 
 overflow:

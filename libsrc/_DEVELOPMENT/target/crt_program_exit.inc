@@ -37,10 +37,17 @@
             
                ; program jumps to caller
 
+              IF __CPU_INTEL__
+               ex de,hl
+               ld hl,(__sp_or_ret)
+               ex de,hl
+              ELSE
                ld de,(__sp_or_ret)
-               push de
-               ret
-               
+              ENDIF
+              
+              push de
+              ret
+              
             ELSE
             
                ; program halts

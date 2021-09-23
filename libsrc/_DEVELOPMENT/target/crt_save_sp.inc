@@ -11,8 +11,13 @@
 
          IF (__register_sp = -1)
          
-            ld (__sp_or_ret),sp
-            
+           IF __CPU_8085__
+             ld hl,sp
+             ld (__sp_or_ret),hl
+           ELSE
+             ld (__sp_or_ret),sp
+           ENDIF
+           
          ENDIF
          
       ELSE
@@ -21,24 +26,33 @@
          
             ; program returns to caller on exit
 
-            ld (__sp_or_ret),sp
+            IF __CPU_8085__
+              ld hl,sp
+              ld (__sp_or_ret),hl
+            ELSE
+              ld (__sp_or_ret),sp
+            ENDIF
          
          ELSE
          
             IF (__crt_on_exit & 0x4)
             
                ; program jumps to caller on exit
-            
+
                IF (__crt_enable_commandline != 2)
-               
-                  pop hl
-                  ld (__sp_or_ret),hl
-               
+                 pop hl
+                 ld (__sp_or_ret),hl
                ELSE
-               
-                  pop de
-                  ld (__sp_or_ret),de
-                  
+                 IF __CPU_INTEL__
+                   ex de,hl
+                   pop hl
+                   ld (__sp_or_ret),hl
+                   ex de,hl
+                 ELSE
+                   pop de
+                   ld (__sp_or_ret),de
+                 ENDIF
+                 
                ENDIF
                
             ENDIF

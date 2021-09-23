@@ -77,7 +77,8 @@ IF ( __crt_model = 1 )
     ld	hl,__ROMABLE_END_tail
     ld	de,__DATA_head
     ld	bc,__DATA_END_tail - __DATA_head
-	ldir
+    EXTERN  asm_memcpy
+    call    asm_memcpy
 ELIF ( __crt_model >= 2 )
     EXTERN	__ROMABLE_END_tail
     EXTERN	__DATA_head
