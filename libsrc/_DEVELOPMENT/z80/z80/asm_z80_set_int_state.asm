@@ -51,7 +51,7 @@ ELSE
 
 ENDIF
 
-   jp Z, di_state
+   jr Z, di_state
 
 ei_state:
 
