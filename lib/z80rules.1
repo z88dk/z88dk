@@ -6546,3 +6546,17 @@
 	sub	l
 	jp	%3c,%4
 	ld	hl,%5
+
+%title Inline sint8 -> sint16 can be extended to sint32
+	ld	a,l
+	rla
+	sbc	a
+	ld	h,a
+	call	l_int2long_s
+=
+	ld	a,l
+	rla
+	sbc	a
+	ld	h,a
+	ld	d,a
+	ld	e,a
