@@ -6560,3 +6560,15 @@
 	ld	h,a
 	ld	d,a
 	ld	e,a
+
+%title Redundant h,0 removed
+	ld	h,0
+	ld	a,l
+	and	a
+	jp	%2z,%3
+	ld	hl,%4
+=
+	ld	a,l
+	and	a
+	jp	%2z,%3
+	ld	hl,%4

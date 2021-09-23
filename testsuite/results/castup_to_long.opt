@@ -10,7 +10,6 @@
 
 ._branch
 	push	hl
-	ld	h,0
 	ld	a,l
 	and	a
 	jp	nz,i_2	;
