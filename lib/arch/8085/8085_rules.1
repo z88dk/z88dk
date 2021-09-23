@@ -83,13 +83,6 @@
 	push	hl
 	ld	de,%2
 
-	pop	de
-	call	l_sub
-=
-	pop	bc
-	sub	hl,bc
-
-
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
 	add	hl,sp
@@ -104,12 +97,6 @@
 	inc	hl
 	ld	d,(hl)
 	inc	hl
-
-	call	l_sub
-=
-	ld	c,e
-	ld	b,d
-	sub	hl,bc
 
 	ld	de,sp+%1
 	ld	hl,(de)
