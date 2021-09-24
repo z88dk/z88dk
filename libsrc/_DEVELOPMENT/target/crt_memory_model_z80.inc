@@ -17,8 +17,10 @@ section code_crt_start
 ENDIF
 
 section code_crt_init
+section code_crt_init_exit
 section code_crt_main
 section code_crt_exit
+section code_crt_exit_exit
 section code_crt_return
 section code_crt_common
 
@@ -180,6 +182,7 @@ align 4
 section bss_align_2
 align 2
 
+section bss_crt
 section bss_driver
 section bss_font
 section bss_clib

@@ -9,6 +9,10 @@ section bss_error
 section bss_env
 section bss_esxdos
 section bss_fcntl
+section bss_fp_am9511
+section bss_fp_math48
+section bss_fp_math32
+section bss_fp_math16
 section bss_input
 section bss_PSGlib
 section bss_SMSlib
