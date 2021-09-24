@@ -74,6 +74,7 @@
 
 
 
+
 	SECTION	bss_compiler
 ._funcptr	defs	3
 ._funcptr2	defs	3
