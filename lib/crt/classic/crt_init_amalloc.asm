@@ -39,10 +39,23 @@ ENDIF
     ld      (hl),a
 
     pop     hl	; sp
-    sbc     hl,bc	; hl = total free memory
-    ld      d,h
-    ld      e,l
-IF __CPU_INTEL__
+
+IF __CPU_8085__
+    sub     hl,bc   ; hl = total free memory
+ELIF __CPU_8080__ || __CPU_GBZ80
+    ld      a,l
+    sub     c
+    ld      l,a
+    ld      a,h
+    sbc     b
+    ld      h,a
+ELSE
+    sbc     hl,bc   ; hl = total free memory
+ENDIF
+
+    ld      de,hl
+
+IF __CPU_INTEL__ || __CPU_GBZ80
     and     a
     ld      a,d
     rra
@@ -63,13 +76,44 @@ ELSE
     srl     d
     rr      e
 ENDIF
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+
 IF DEFINED_USING_amalloc_2
-    sbc     hl,de	;  leave 2/4 of the free memory for the stack
+    ld      a,l     ;  leave 2/4 of the free memory for the stack
+    sub     e
+    ld      l,a
+    ld      a,h
+    sbc     d
+    ld      h,a
 IF DEFINED_USING_amalloc_1
-    sbc     hl,de	;  leave 3/4 of the free memory for the stack
+    ld      a,l     ;  leave 3/4 of the free memory for the stack
+    sub     e
+    ld      l,a
+    ld      a,h
+    sbc     d
+    ld      h,a
 ENDIF
 ENDIF
-    sbc     hl,de	;  leave 1/4 of the free memory for the stack
+    ld      a,l     ;  leave 1/4 of the free memory for the stack
+    sub     e
+    ld      l,a
+    ld      a,h
+    sbc     d
+    ld      h,a
+
+ELSE
+
+IF DEFINED_USING_amalloc_2
+    sbc     hl,de   ;  leave 2/4 of the free memory for the stack
+IF DEFINED_USING_amalloc_1
+    sbc     hl,de   ;  leave 3/4 of the free memory for the stack
+ENDIF
+ENDIF
+
+    sbc     hl,de   ;  leave 1/4 of the free memory for the stack
+ENDIF
+
     push    bc ; main address for malloc area
     push    hl	; area size
     EXTERN  sbrk_callee

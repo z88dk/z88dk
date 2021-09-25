@@ -100,6 +100,14 @@ ENDIF
 
     include "../crt_init_sp.inc"
 
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of
+; the compiled program and the stack pointer
+
+IF DEFINED_USING_amalloc
+    include "../../../../../lib/crt/classic/crt_init_amalloc.asm"
+ENDIF
+
    ; command line
 
 IF (__crt_enable_commandline = 1) || (__crt_enable_commandline >= 3)
@@ -187,6 +195,8 @@ IF CRT_ENABLE_STDIO = 1
 ENDIF
 
 IF DEFINED_USING_amalloc
+    EXTERN  __BSS_END_tail
+
     ld hl,__BSS_END_tail
     ld (_heap),hl
 ENDIF
@@ -292,6 +302,7 @@ IF DEFINED_USING_amalloc
 ._heap
     defw 0                      ; initialised by code_crt_init - location of the last program byte
     defw 0
+
 ENDIF
 
 IF CLIB_BALLOC_TABLE_SIZE > 0

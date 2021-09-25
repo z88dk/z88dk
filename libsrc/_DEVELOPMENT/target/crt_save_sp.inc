@@ -11,7 +11,7 @@
 
          IF (__register_sp = -1)
          
-           IF __CPU_8085__
+            IF __CPU_INTEL__ || __CPU_GBZ80__
              ld hl,sp
              ld (__sp_or_ret),hl
            ELSE
@@ -26,7 +26,7 @@
          
             ; program returns to caller on exit
 
-            IF __CPU_8085__
+            IF __CPU_INTEL__ || __CPU_GBZ80__
               ld hl,sp
               ld (__sp_or_ret),hl
             ELSE
@@ -43,13 +43,12 @@
                  pop hl
                  ld (__sp_or_ret),hl
                ELSE
-                 IF __CPU_INTEL__
+                 pop de
+                 IF __CPU_INTEL__ || __CPU_GBZ80__
                    ex de,hl
-                   pop hl
                    ld (__sp_or_ret),hl
                    ex de,hl
                  ELSE
-                   pop de
                    ld (__sp_or_ret),de
                  ENDIF
                  

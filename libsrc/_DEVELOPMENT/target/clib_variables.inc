@@ -39,17 +39,15 @@ IF __clib_malloc_heap_size = -1
    ld hl,-1                    ; ensure sp == 0 is accepted
    add hl,sp                   ; hl = top of the stack
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
 IF __CPU_8085__
    ld bc,__BSS_END_tail
    sub hl,bc                   ; hl = space between top of stack and end of bss - 1
-ELSE
+ELIF __CPU_8080__ || __CPU_GBZ80__
    ld de,__BSS_END_tail
    ld a,l
    sub e
    ld a,h
    sbc d                       ; hl = space between top of stack and end of bss - 1
-ENDIF
 ELSE
    ld de,__BSS_END_tail
    xor a
@@ -60,16 +58,13 @@ ENDIF
 
    ld bc,__crt_stack_size + 14 ; amount of space reserved by stack + minimum heap size - 1
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
 IF __CPU_8085__
    sub hl,bc                   ; hl = max heap size - 15
-ELSE
+ELIF __CPU_8080__ || __CPU_GBZ80__
    ld a,l
    sub c
    ld a,h
    sbc b                       ; hl = max heap size - 15
-ENDIF
-
 ELSE
    sbc hl,bc                   ; hl = max heap size - 15
 ENDIF
@@ -109,18 +104,15 @@ IF __clib_malloc_heap_size < -1
 
    ld hl,-__clib_malloc_heap_size - 13
 
-
-IF __CPU_INTEL__ || __CPU_GBZ80__
 IF __CPU_8085__
    ld bc,__BSS_END_tail
    sub hl,bc                   ; hl = space between top of stack and end of bss - 1
-ELSE
+ELIF __CPU_8080__ || __CPU_GBZ80__
    ld de,__BSS_END_tail
    ld a,l
    sub e
    ld a,h
    sbc d
-ENDIF
 ELSE
    ld de,__BSS_END_tail
    xor a
