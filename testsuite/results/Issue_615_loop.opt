@@ -181,6 +181,7 @@
 
 
 
+
 	SECTION	bss_compiler
 ._var	defs	2
 	SECTION	code_compiler

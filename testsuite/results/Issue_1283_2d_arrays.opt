@@ -40,16 +40,14 @@
 	defb	255
 	defb	255
 	defb	128
-	defs	16
 	SECTION	code_compiler
 
 ._test1
 	ld	hl,_selected_data
 	push	hl
 	call	_func
-	pop	bc
 	ld	hl,_selected_data+16
-	push	hl
+	ex	(sp),hl
 	call	_func
 	pop	bc
 	ld	hl,(_selected_data+2)
@@ -73,6 +71,7 @@
 	call	_ifunc
 	pop	bc
 	ret
+
 
 
 

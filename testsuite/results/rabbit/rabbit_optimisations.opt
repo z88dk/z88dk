@@ -176,13 +176,14 @@
 ._pushinstr
 	ld	hl,1	;const
 	push	hl
-	ld	hl,2	;const
+	ld	l,2	
 	push	hl
 	ld	hl,3	;const
 	push	hl
 	call	_anotherfunc
 	add	sp,6
 	ret
+
 
 
 

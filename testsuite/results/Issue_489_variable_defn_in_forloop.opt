@@ -35,9 +35,8 @@
 	pop	bc
 	jp	i_2	;EOS
 .i_3
-	pop	bc
 	ld	hl,100	;const
-	push	hl
+	ex	(sp),hl
 	call	_func2
 	pop	bc
 	pop	bc
@@ -86,13 +85,13 @@
 	jp	i_5	;EOS
 .i_6
 	pop	bc
-	pop	bc
 	ld	hl,100	;const
-	push	hl
+	ex	(sp),hl
 	call	_func2
 	pop	bc
 	pop	hl
 	ret
+
 
 
 

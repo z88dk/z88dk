@@ -66,7 +66,7 @@ IF ((__crt_enable_rst & $0404) != $0404)
       
 ENDIF
 
-   defm "2.00"
+   defm "2.10"
 
 ; address = 0x0018
 

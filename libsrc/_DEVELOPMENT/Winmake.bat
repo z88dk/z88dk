@@ -5,7 +5,7 @@ setlocal ENABLEDELAYEDEXPANSION
 
 @rem must have leading and trailing space
 
-set alltargets= z80 am9511 cpm hbios m math16 math32 rc2014 scz180 sms vgl yaz180 z180 zx zxn 
+set alltargets= z80 am9511 cpm hbios m math16 math32 rc2014 scz180 sms yaz180 z180 zx zxn 
 set z88dklib=../../lib
 
 if "%1" == "" (

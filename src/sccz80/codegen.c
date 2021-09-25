@@ -4071,7 +4071,7 @@ void zne(LVALUE* lval)
 
 void zlt_const(LVALUE *lval, int64_t value64)
 {
-    int32_t value = (int32_t)value64;
+    uint32_t value = (uint32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 ) {
             if ( ulvalue(lval) ) {
@@ -4121,7 +4121,7 @@ void zlt_const(LVALUE *lval, int64_t value64)
         } else {
             ol("ld\ta,l");
             ol("xor\t128");
-            outfmt("\tsub\t%d\n", 128 | (value % 256));
+            outfmt("\tsub\t%d\n", (0x80 + (value % 256)) % 256);
         }
         set_carry(lval);
     } else if ( lval->val_type == KIND_INT || lval->val_type == KIND_PTR ) {
@@ -4246,7 +4246,7 @@ void zlt(LVALUE* lval)
 
 void zle_const(LVALUE *lval, int64_t value64)
 {
-    int32_t value = (int32_t)value64;
+    uint32_t value = (uint32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
        if ( value ==  0 && !IS_808x() ) {
             if ( lval->val_type == KIND_CPTR) {
@@ -4376,7 +4376,7 @@ void zle(LVALUE* lval)
 
 void zgt_const(LVALUE *lval, int64_t value64)
 {
-    int32_t value = (int32_t)value64;
+    uint32_t value = (uint32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 && ulvalue(lval) ) {
             if ( lval->val_type == KIND_CPTR ) {
@@ -4498,7 +4498,7 @@ void zgt(LVALUE* lval)
 
 void zge_const(LVALUE *lval, int64_t value64)
 {
-    int32_t value = (int32_t)value64;
+    uint32_t value = (uint32_t)value64;
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
         if ( value == 0 ) {
             if ( ulvalue(lval) ) {
@@ -4523,7 +4523,7 @@ void zge_const(LVALUE *lval, int64_t value64)
         } else {
             ol("ld\ta,l");
             ol("xor\t128");
-            outfmt("\tsub\t%d\n", 0x80 + ( value % 256));
+            outfmt("\tsub\t%d\n", 128 | ( value % 256));
             ol("ccf");
         }
     } else if ( lval->val_type == KIND_LONGLONG) {
@@ -5375,7 +5375,7 @@ void zconvert_to_double(Kind from, Kind to, unsigned char isunsigned)
 }
 
 void zconvert_to_llong(unsigned char tounsigned, Kind from, unsigned char fromunsigned) {
-    if (tounsigned == NO && fromunsigned == NO) {
+    if (fromunsigned == NO) {
         if (from == KIND_LONG) callrts("l_i64_slong2i64");
         else callrts("l_i64_sint2i64");
     } else {
@@ -5406,10 +5406,10 @@ void zwiden_stack_to_llong(LVALUE *lval)
 }
 
 void zconvert_to_long(unsigned char tounsigned, Kind from, unsigned char fromunsigned) {
-    if (tounsigned == NO && fromunsigned == NO) {
-        gen_conv_sint2long();
-    } else {
+    if (fromunsigned) {
         gen_conv_uint2long();
+    } else {
+        gen_conv_sint2long();
     }
 }
 

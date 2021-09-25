@@ -18,6 +18,7 @@
 
 
 
+
 	SECTION	bss_compiler
 ._foo	defs	10
 ._bar	defs	6

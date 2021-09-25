@@ -194,6 +194,7 @@
 	ret
 
 
+
 	SECTION	rodata_compiler
 .i_1
 	defm	"hello"

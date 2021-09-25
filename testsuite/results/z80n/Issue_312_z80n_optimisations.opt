@@ -138,8 +138,10 @@
 
 
 ._pushinstr
-	push	1	;const
-	push	2	;const
+	ld	hl,1	;const
+	push	hl
+	ld	l,2	
+	push	hl
 	ld	hl,3	;const
 	push	hl
 	call	_anotherfunc
@@ -147,6 +149,7 @@
 	pop	bc
 	pop	bc
 	ret
+
 
 
 

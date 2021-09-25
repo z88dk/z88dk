@@ -20,7 +20,6 @@
 	ld	de,1
 	call	l_long_eq
 	jp	nc,i_3	;
-	defc	i_3 = i_2
 .i_4_i_3
 	ld	hl,2	;const
 	add	hl,sp
@@ -94,7 +93,6 @@
 	or	d
 	or	e
 	jp	z,i_12	;
-	defc	i_12 = i_11
 .i_13_i_12
 	ld	hl,2	;const
 	add	hl,sp
@@ -106,6 +104,9 @@
 .i_11
 	ret
 
+
+	defc	i_3 = i_2
+	defc	i_12 = i_11
 
 
 
