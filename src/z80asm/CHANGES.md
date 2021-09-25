@@ -4,8 +4,17 @@ Z88DK Z80 Module Assembler Change Log
 2021
 ----
 - 2021-01-18 Fix #1671: Define INCBIN as alias to BINARY
+- 2021-07-22 Fix #1821 - create a new record type in the object file to handle gbz80 offsets to 0xff00
+- 2021-08-03 Fix #1823 - add jp k et all to 8085
+- 2021-08-03 Fix #1104 Rename z80asm to z88dk-z80asm
+- 2021-08-05 Fix #1823 ld de,hl
+- 2021-08-15 Fix #1823 - 8085 implementation of ld hl,sp+N
 - 2021-08-16 Add DEFS len,"string" for fixed-len-filled strings (thanks @o-marshmallow)
 - 2021-08-23 replace --cpu=r2k with --cpu=r2ka
+- 2021-08-24 Ignore duplicate __CDBINFO__, __C_LINE_ / __ASM_LINE_ fixes
+- 2021-09-08 Fix #1852: accept C_LINE inside DEFVARS and DEFGROUP
+- 2021-09-15 Fix #1856 - store strings in object file as word-counted strings
+- 2021-09-25 Fix #1865 - emulate de-indirect loads
 
 2020
 ----
@@ -17,8 +26,10 @@ Z88DK Z80 Module Assembler Change Log
   defp, ptr, dp (24-bit pointer)
   defq, dword, dq (32-bit word)
   defs, ds (define shift)
-- 2020-08-02 Add -Dvar=nn to define a numeric variable in the command line
 - 2020-05-14 Fix #1451: link very slow on Windows
+- 2020-08-02 Add -Dvar=nn to define a numeric variable in the command line
+- 2020-08-10 Fix #1549 - Replace -i with -l
+- 2020-09-24 Fix #1572 output_dir added twice to reloc file
 
 2019
 ----
@@ -26,7 +37,10 @@ Z88DK Z80 Module Assembler Change Log
 - 2019-07-14 Convert Spectrum Next CPU to (--cpu=z80n) (thank you Phillip Stevens)
 - 2019-07-20 Support Intel 8080 with Zilog syntax (--cpu=8080) (thank you @suborb)
 - 2019-07-22 Support Intel 8080/8085 with Intel syntax, except Jump Positive (jp conflicts with Zilog jump) and Call Positive (cp conflicts with Zilog compare). Support alternative j_p and c_p for Jump Positive and Call Positive.
+- 2019-12-03 Implement rld and rrd emulation for 8080/8085
 - 2019-12-17 Add linker support for sign-extended 8-bit values
+- 2019-12-24 Fix #1364 Fix barrel rotate instruction (brlc)
+- 2019-12-24 Fix #1364 implement missing z80n instructions, fix timings
 
 2018
 ----

@@ -8591,9 +8591,117 @@ EB 21 %u 00 39 EB                  |ld de, sp+%u |            |             |ld 
                                    |             |            |             |                       |         |               |                 |              
 EB 21 00 00 39 EB                  |ld de, sp    |            |             |ld de, sp              |~        |~              |~                |~             
                                    |             |            |             |                       |         |               |                 |              
+EB 22 %m %m EB                     |ld (%m), de  |~           |             |                       |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 2A %m %m EB                     |ld de, (%m)  |~           |             |                       |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 36 %n EB                        |ld (de), %n  |~           |             |ld (de), %n            |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 36 %n EB 13                     |ld (de+), %n |~           |             |ld (de+), %n           |~        |~              |~                |~             
+                                   |ldi (de), %n |            |             |ldi (de), %n           |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 36 %n EB 1B                     |ld (de-), %n |~           |             |ld (de-), %n           |~        |~              |~                |~             
+                                   |ldd (de), %n |            |             |ldd (de), %n           |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
 EB 38 %u EB                        |             |ld hl, sp+%u|             |                       |         |               |                 |              
                                    |             |            |             |                       |         |               |                 |              
 EB 38 00 EB                        |             |ld hl, sp   |             |                       |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 46 EB                           |ld b, (de)   |~           |             |ld b, (de)             |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 46 EB 13                        |ld b, (de+)  |~           |             |ld b, (de+)            |~        |~              |~                |~             
+                                   |ldi b, (de)  |            |             |ldi b, (de)            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 46 EB 1B                        |ld b, (de-)  |~           |             |ld b, (de-)            |~        |~              |~                |~             
+                                   |ldd b, (de)  |            |             |ldd b, (de)            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 4E EB                           |ld c, (de)   |~           |             |ld c, (de)             |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 4E EB 13                        |ld c, (de+)  |~           |             |ld c, (de+)            |~        |~              |~                |~             
+                                   |ldi c, (de)  |            |             |ldi c, (de)            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 4E EB 1B                        |ld c, (de-)  |~           |             |ld c, (de-)            |~        |~              |~                |~             
+                                   |ldd c, (de)  |            |             |ldd c, (de)            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 56 EB                           |ld h, (de)   |~           |             |ld h, (de)             |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 56 EB 13                        |ld h, (de+)  |~           |             |ld h, (de+)            |~        |~              |~                |~             
+                                   |ldi h, (de)  |            |             |ldi h, (de)            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 56 EB 1B                        |ld h, (de-)  |~           |             |ld h, (de-)            |~        |~              |~                |~             
+                                   |ldd h, (de)  |            |             |ldd h, (de)            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 5E EB                           |ld l, (de)   |~           |             |ld l, (de)             |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 5E EB 13                        |ld l, (de+)  |~           |             |ld l, (de+)            |~        |~              |~                |~             
+                                   |ldi l, (de)  |            |             |ldi l, (de)            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 5E EB 1B                        |ld l, (de-)  |~           |             |ld l, (de-)            |~        |~              |~                |~             
+                                   |ldd l, (de)  |            |             |ldd l, (de)            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 66 EB                           |ld d, (de)   |~           |             |ld d, (de)             |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 66 EB 13                        |ld d, (de+)  |~           |             |ld d, (de+)            |~        |~              |~                |~             
+                                   |ldi d, (de)  |            |             |ldi d, (de)            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 66 EB 1B                        |ld d, (de-)  |~           |             |ld d, (de-)            |~        |~              |~                |~             
+                                   |ldd d, (de)  |            |             |ldd d, (de)            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 6E EB                           |ld e, (de)   |~           |             |ld e, (de)             |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 6E EB 13                        |ld e, (de+)  |~           |             |ld e, (de+)            |~        |~              |~                |~             
+                                   |ldi e, (de)  |            |             |ldi e, (de)            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 6E EB 1B                        |ld e, (de-)  |~           |             |ld e, (de-)            |~        |~              |~                |~             
+                                   |ldd e, (de)  |            |             |ldd e, (de)            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 70 EB                           |ld (de), b   |~           |             |ld (de), b             |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 70 EB 13                        |ld (de+), b  |~           |             |ld (de+), b            |~        |~              |~                |~             
+                                   |ldi (de), b  |            |             |ldi (de), b            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 70 EB 1B                        |ld (de-), b  |~           |             |ld (de-), b            |~        |~              |~                |~             
+                                   |ldd (de), b  |            |             |ldd (de), b            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 71 EB                           |ld (de), c   |~           |             |ld (de), c             |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 71 EB 13                        |ld (de+), c  |~           |             |ld (de+), c            |~        |~              |~                |~             
+                                   |ldi (de), c  |            |             |ldi (de), c            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 71 EB 1B                        |ld (de-), c  |~           |             |ld (de-), c            |~        |~              |~                |~             
+                                   |ldd (de), c  |            |             |ldd (de), c            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 72 EB                           |ld (de), h   |~           |             |ld (de), h             |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 72 EB 13                        |ld (de+), h  |~           |             |ld (de+), h            |~        |~              |~                |~             
+                                   |ldi (de), h  |            |             |ldi (de), h            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 72 EB 1B                        |ld (de-), h  |~           |             |ld (de-), h            |~        |~              |~                |~             
+                                   |ldd (de), h  |            |             |ldd (de), h            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 73 EB                           |ld (de), l   |~           |             |ld (de), l             |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 73 EB 13                        |ld (de+), l  |~           |             |ld (de+), l            |~        |~              |~                |~             
+                                   |ldi (de), l  |            |             |ldi (de), l            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 73 EB 1B                        |ld (de-), l  |~           |             |ld (de-), l            |~        |~              |~                |~             
+                                   |ldd (de), l  |            |             |ldd (de), l            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 74 EB                           |ld (de), d   |~           |             |ld (de), d             |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 74 EB 13                        |ld (de+), d  |~           |             |ld (de+), d            |~        |~              |~                |~             
+                                   |ldi (de), d  |            |             |ldi (de), d            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 74 EB 1B                        |ld (de-), d  |~           |             |ld (de-), d            |~        |~              |~                |~             
+                                   |ldd (de), d  |            |             |ldd (de), d            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 75 EB                           |ld (de), e   |~           |             |ld (de), e             |~        |~              |~                |~             
+                                   |             |            |             |                       |         |               |                 |              
+EB 75 EB 13                        |ld (de+), e  |~           |             |ld (de+), e            |~        |~              |~                |~             
+                                   |ldi (de), e  |            |             |ldi (de), e            |         |               |                 |              
+                                   |             |            |             |                       |         |               |                 |              
+EB 75 EB 1B                        |ld (de-), e  |~           |             |ld (de-), e            |~        |~              |~                |~             
+                                   |ldd (de), e  |            |             |ldd (de), e            |         |               |                 |              
                                    |             |            |             |                       |         |               |                 |              
 EC                                 |             |            |             |or hl, de              |~        |               |                 |              
                                    |             |            |             |                       |         |               |                 |              
