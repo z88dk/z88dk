@@ -134,6 +134,7 @@ section data_clib
   ;;section data_fcntl_stdio_heap_body
   ;;section data_fcntl_stdio_heap_tail
   ;;section data_fcntl_fdtable_body
+section data_crt
 section data_lib
 section data_compiler
 section data_user

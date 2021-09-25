@@ -64,17 +64,17 @@ include(`../clib_instantiate_begin.m4')
 
 ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
 `
-   include(`driver/terminal/rc_01_input_basic.m4')
-   m4_rc_01_input_basic(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
+    include(`driver/terminal/rc_01_input_basic.m4')
+    m4_rc_01_input_basic(_stdin, __i_fcntl_fdstruct_1, CRT_ITERM_TERMINAL_FLAGS, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
 
-   include(`driver/terminal/rc_01_output_basic.m4')
-   m4_rc_01_output_basic(_stdout, CRT_OTERM_TERMINAL_FLAGS)
+    include(`driver/terminal/rc_01_output_basic.m4')
+    m4_rc_01_output_basic(_stdout, CRT_OTERM_TERMINAL_FLAGS)
 
-   include(`../m4_file_dup.m4')
-   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
+    include(`../m4_file_dup.m4')
+    m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
 ',
 `
-   include(`crt_driver_instantiation.asm.m4')
+    include(`crt_driver_instantiation.asm.m4')
 ')
 
 include(`../clib_instantiate_end.m4')
@@ -95,8 +95,8 @@ EXTERN _main
 
 IF __crt_include_preamble
 
-   include "crt_preamble.asm"
-   SECTION CODE
+    include "crt_preamble.asm"
+    SECTION CODE
 
 ENDIF
 
@@ -104,45 +104,45 @@ ENDIF
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-__Start:
+.__Start
 
-   include "../crt_start_di.inc"
-   include "../crt_save_sp.inc"
+    include "../crt_start_di.inc"
+    include "../crt_save_sp.inc"
 
-__Restart:
+.__Restart
 
-   include "../crt_init_sp.inc"
+    include "../crt_init_sp.inc"
 
    ; command line
 
 IF (__crt_enable_commandline = 1) || (__crt_enable_commandline >= 3)
 
-   include "../crt_cmdline_empty.inc"
+    include "../crt_cmdline_empty.inc"
 
 ENDIF
 
-__Restart_2:
+.__Restart_2
 
 IF __crt_enable_commandline >= 1
 
-   push hl                     ; argv
-   push bc                     ; argc
+    push hl                     ; argv
+    push bc                     ; argc
 
 ENDIF
 
-   ; initialize data section
+    ; initialize data section
 
-   include "../clib_init_data.inc"
+    include "../clib_init_data.inc"
 
-   ; initialize bss section
+    ; initialize bss section
 
-   include "../clib_init_bss.inc"
+    include "../clib_init_bss.inc"
 
-   ; interrupt mode
+    ; interrupt mode
 
-   include "../crt_set_interrupt_mode.inc"
+    include "../crt_set_interrupt_mode.inc"
 
-SECTION code_crt_init          ; user and library initialization
+SECTION code_crt_init           ; user and library initialization
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MAIN ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -150,70 +150,70 @@ SECTION code_crt_init          ; user and library initialization
 
 SECTION code_crt_main
 
-   include "../crt_start_ei.inc"
+    include "../crt_start_ei.inc"
 
-   ; call user program
+    ; call user program
 
-   call _main                  ; hl = return status
+    call _main                  ; hl = return status
 
-   ; run exit stack
+    ; run exit stack
 
 IF __clib_exit_stack_size > 0
 
-   EXTERN asm_exit
-   jp asm_exit                 ; exit function jumps to __Exit
+    EXTERN asm_exit
+    jp asm_exit                 ; exit function jumps to __Exit
 
 ENDIF
 
-__Exit:
+.__Exit
 
 IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
 
-   ; not restarting
+    ; not restarting
 
-   push hl                     ; save return status
+    push hl                     ; save return status
 
 ENDIF
 
-SECTION code_crt_exit          ; user and library cleanup
+SECTION code_crt_exit           ; user and library cleanup
 SECTION code_crt_return
 
-   ; close files
+    ; close files
 
-   include "../clib_close.inc"
+    include "../clib_close.inc"
 
-   ; terminate
+    ; terminate
 
 IF (__crt_on_exit = 0x10002)
 
-   ; returning to basic
+    ; returning to basic
 
-   pop hl
+    pop hl
+
+    ld sp,(__sp_or_ret)
 
    IF CRT_ABPASS > 0
 
-      ld a,h
-      ld b,l
-      call CRT_ABPASS
+        ld a,h
+        ld b,l
+        jp CRT_ABPASS
 
-   ENDIF
+    ENDIF
 
-   ld sp,(__sp_or_ret)
+    IF (__crt_interrupt_mode_exit >= 0) && (__crt_interrupt_mode_exit <= 2)
 
-   IF (__crt_interrupt_mode_exit >= 0) && (__crt_interrupt_mode_exit <= 2)
+        im __crt_interrupt_mode_exit
 
-      im __crt_interrupt_mode_exit
+    ENDIF
 
-   ENDIF
-
-   ei
-   ret
+    ei
+    ret
 
 ELSE
 
-   include "../crt_exit_eidi.inc"
-   include "../crt_restore_sp.inc"
-   include "../crt_program_exit.inc"
+    include "../crt_exit_eidi.inc"
+    include "../crt_restore_sp.inc"
+    include "../crt_program_exit.inc"
 
 ENDIF
 
@@ -225,8 +225,8 @@ include "../crt_jump_vectors_z80.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
-   SECTION BSS_UNINITIALIZED
-   __sp_or_ret:  defw 0
+    SECTION BSS_UNINITIALIZED
+    __sp_or_ret:  defw 0
 
 ENDIF
 
