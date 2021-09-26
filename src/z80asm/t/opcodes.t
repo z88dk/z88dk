@@ -2253,17 +2253,11 @@ IF      !RABBIT
 ELSE    
 ENDIF   
         ld   (bc),b                     ;; error: syntax error
-        ld   (de),b                     ;; error: syntax error
         ld   (bc),c                     ;; error: syntax error
-        ld   (de),c                     ;; error: syntax error
         ld   (bc),d                     ;; error: syntax error
-        ld   (de),d                     ;; error: syntax error
         ld   (bc),e                     ;; error: syntax error
-        ld   (de),e                     ;; error: syntax error
         ld   (bc),h                     ;; error: syntax error
-        ld   (de),h                     ;; error: syntax error
         ld   (bc),l                     ;; error: syntax error
-        ld   (de),l                     ;; error: syntax error
         ld   (bc),(hl)                  ;; error: syntax error
         ld   (de),(hl)                  ;; error: syntax error
         ld   (bc),(ix+DIS)              ;; error: syntax error
@@ -2271,7 +2265,6 @@ ENDIF
         ld   (bc),(iy+DIS)              ;; error: syntax error
         ld   (de),(iy+DIS)              ;; error: syntax error
         ld   (bc),N                     ;; error: syntax error
-        ld   (de),N                     ;; error: syntax error
 IF      !RABBIT
 ELSE    
 ENDIF   
@@ -4472,17 +4465,11 @@ ELSE
         ld   iyl,1                      ;; error: illegal identifier
 ENDIF   
         ld   (bc),b                     ;; error: syntax error
-        ld   (de),b                     ;; error: syntax error
         ld   (bc),c                     ;; error: syntax error
-        ld   (de),c                     ;; error: syntax error
         ld   (bc),d                     ;; error: syntax error
-        ld   (de),d                     ;; error: syntax error
         ld   (bc),e                     ;; error: syntax error
-        ld   (de),e                     ;; error: syntax error
         ld   (bc),h                     ;; error: syntax error
-        ld   (de),h                     ;; error: syntax error
         ld   (bc),l                     ;; error: syntax error
-        ld   (de),l                     ;; error: syntax error
         ld   (bc),(hl)                  ;; error: syntax error
         ld   (de),(hl)                  ;; error: syntax error
         ld   (bc),(ix+DIS)              ;; error: syntax error
@@ -4490,7 +4477,6 @@ ENDIF
         ld   (bc),(iy+DIS)              ;; error: syntax error
         ld   (de),(iy+DIS)              ;; error: syntax error
         ld   (bc),N                     ;; error: syntax error
-        ld   (de),N                     ;; error: syntax error
 IF      !RABBIT
 ELSE    
 ENDIF   

@@ -168,6 +168,16 @@ for my $cpu (@CPUS) {
     if ($cpu eq '8085') {
         $DECODE{$cpu}[0x38] = 2;
     }
+	
+	if ($cpu ne 'gbz80') {
+		$DECODE{$cpu}[0x22] = 3;
+		$DECODE{$cpu}[0x2A] = 3;
+	}
+	
+	for my $n (0..3) {
+		$DECODE{$cpu}[0x03+16*$n] = 1;		# inc rr
+		$DECODE{$cpu}[0x0B+16*$n] = 1;		# dec rr
+	}
 }
 
 #------------------------------------------------------------------------------
@@ -211,7 +221,91 @@ for my $cpu (@CPUS) {
 	for my $r (qw( b c d e h l m a )) {
 		add_opc($cpu, "mvi $r, %n", ld_r_n($r), '%n');
 	}
+	
+	if (!$gameboy) {
+		# gbz80 lacks ex de,hl, therefore ld r,(de) / ld (de),r / ld (de),N 
+		# only implemented for the other CPUs
+		
+		# LD r, (de) ; r!=a
+		add_opc_final($cpu, "ld b, (de)", 0xEB, ld_r_r('b', '(hl)'), 0xEB);
+		add_opc_final($cpu, "ld c, (de)", 0xEB, ld_r_r('c', '(hl)'), 0xEB);
+		add_opc_final($cpu, "ld d, (de)", 0xEB, ld_r_r('h', '(hl)'), 0xEB);
+		add_opc_final($cpu, "ld e, (de)", 0xEB, ld_r_r('l', '(hl)'), 0xEB);
+		add_opc_final($cpu, "ld h, (de)", 0xEB, ld_r_r('d', '(hl)'), 0xEB);
+		add_opc_final($cpu, "ld l, (de)", 0xEB, ld_r_r('e', '(hl)'), 0xEB);
+		
+		add_opc_final($cpu, "ld b, (de+)", 0xEB, ld_r_r('b', '(hl)'), 0xEB, 0x13);
+		add_opc_final($cpu, "ld c, (de+)", 0xEB, ld_r_r('c', '(hl)'), 0xEB, 0x13);
+		add_opc_final($cpu, "ld d, (de+)", 0xEB, ld_r_r('h', '(hl)'), 0xEB, 0x13);
+		add_opc_final($cpu, "ld e, (de+)", 0xEB, ld_r_r('l', '(hl)'), 0xEB, 0x13);
+		add_opc_final($cpu, "ld h, (de+)", 0xEB, ld_r_r('d', '(hl)'), 0xEB, 0x13);
+		add_opc_final($cpu, "ld l, (de+)", 0xEB, ld_r_r('e', '(hl)'), 0xEB, 0x13);
+		
+		add_opc_final($cpu, "ldi b, (de)", 0xEB, ld_r_r('b', '(hl)'), 0xEB, 0x13);
+		add_opc_final($cpu, "ldi c, (de)", 0xEB, ld_r_r('c', '(hl)'), 0xEB, 0x13);
+		add_opc_final($cpu, "ldi d, (de)", 0xEB, ld_r_r('h', '(hl)'), 0xEB, 0x13);
+		add_opc_final($cpu, "ldi e, (de)", 0xEB, ld_r_r('l', '(hl)'), 0xEB, 0x13);
+		add_opc_final($cpu, "ldi h, (de)", 0xEB, ld_r_r('d', '(hl)'), 0xEB, 0x13);
+		add_opc_final($cpu, "ldi l, (de)", 0xEB, ld_r_r('e', '(hl)'), 0xEB, 0x13);
+		
+		add_opc_final($cpu, "ld b, (de-)", 0xEB, ld_r_r('b', '(hl)'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ld c, (de-)", 0xEB, ld_r_r('c', '(hl)'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ld d, (de-)", 0xEB, ld_r_r('h', '(hl)'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ld e, (de-)", 0xEB, ld_r_r('l', '(hl)'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ld h, (de-)", 0xEB, ld_r_r('d', '(hl)'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ld l, (de-)", 0xEB, ld_r_r('e', '(hl)'), 0xEB, 0x1B);
+		
+		add_opc_final($cpu, "ldd b, (de)", 0xEB, ld_r_r('b', '(hl)'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ldd c, (de)", 0xEB, ld_r_r('c', '(hl)'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ldd d, (de)", 0xEB, ld_r_r('h', '(hl)'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ldd e, (de)", 0xEB, ld_r_r('l', '(hl)'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ldd h, (de)", 0xEB, ld_r_r('d', '(hl)'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ldd l, (de)", 0xEB, ld_r_r('e', '(hl)'), 0xEB, 0x1B);
+		
+		# LD (de), r ; r!=a
+		add_opc_final($cpu, "ld (de), b", 0xEB, ld_r_r('(hl)', 'b'), 0xEB);
+		add_opc_final($cpu, "ld (de), c", 0xEB, ld_r_r('(hl)', 'c'), 0xEB);
+		add_opc_final($cpu, "ld (de), d", 0xEB, ld_r_r('(hl)', 'h'), 0xEB);
+		add_opc_final($cpu, "ld (de), e", 0xEB, ld_r_r('(hl)', 'l'), 0xEB);
+		add_opc_final($cpu, "ld (de), h", 0xEB, ld_r_r('(hl)', 'd'), 0xEB);
+		add_opc_final($cpu, "ld (de), l", 0xEB, ld_r_r('(hl)', 'e'), 0xEB);
+		
+		add_opc_final($cpu, "ld (de+), b", 0xEB, ld_r_r('(hl)', 'b'), 0xEB, 0x13);
+		add_opc_final($cpu, "ld (de+), c", 0xEB, ld_r_r('(hl)', 'c'), 0xEB, 0x13);
+		add_opc_final($cpu, "ld (de+), d", 0xEB, ld_r_r('(hl)', 'h'), 0xEB, 0x13);
+		add_opc_final($cpu, "ld (de+), e", 0xEB, ld_r_r('(hl)', 'l'), 0xEB, 0x13);
+		add_opc_final($cpu, "ld (de+), h", 0xEB, ld_r_r('(hl)', 'd'), 0xEB, 0x13);
+		add_opc_final($cpu, "ld (de+), l", 0xEB, ld_r_r('(hl)', 'e'), 0xEB, 0x13);
+		
+		add_opc_final($cpu, "ldi (de), b", 0xEB, ld_r_r('(hl)', 'b'), 0xEB, 0x13);
+		add_opc_final($cpu, "ldi (de), c", 0xEB, ld_r_r('(hl)', 'c'), 0xEB, 0x13);
+		add_opc_final($cpu, "ldi (de), d", 0xEB, ld_r_r('(hl)', 'h'), 0xEB, 0x13);
+		add_opc_final($cpu, "ldi (de), e", 0xEB, ld_r_r('(hl)', 'l'), 0xEB, 0x13);
+		add_opc_final($cpu, "ldi (de), h", 0xEB, ld_r_r('(hl)', 'd'), 0xEB, 0x13);
+		add_opc_final($cpu, "ldi (de), l", 0xEB, ld_r_r('(hl)', 'e'), 0xEB, 0x13);
+		
+		add_opc_final($cpu, "ld (de-), b", 0xEB, ld_r_r('(hl)', 'b'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ld (de-), c", 0xEB, ld_r_r('(hl)', 'c'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ld (de-), d", 0xEB, ld_r_r('(hl)', 'h'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ld (de-), e", 0xEB, ld_r_r('(hl)', 'l'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ld (de-), h", 0xEB, ld_r_r('(hl)', 'd'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ld (de-), l", 0xEB, ld_r_r('(hl)', 'e'), 0xEB, 0x1B);
+		
+		add_opc_final($cpu, "ldd (de), b", 0xEB, ld_r_r('(hl)', 'b'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ldd (de), c", 0xEB, ld_r_r('(hl)', 'c'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ldd (de), d", 0xEB, ld_r_r('(hl)', 'h'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ldd (de), e", 0xEB, ld_r_r('(hl)', 'l'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ldd (de), h", 0xEB, ld_r_r('(hl)', 'd'), 0xEB, 0x1B);
+		add_opc_final($cpu, "ldd (de), l", 0xEB, ld_r_r('(hl)', 'e'), 0xEB, 0x1B);
 
+		# LD (de), N
+		add_opc_final($cpu, "ld (de), %n", 	0xEB, ld_r_n('(hl)'), '%n', 0xEB);
+		add_opc_final($cpu, "ld (de+), %n", 0xEB, ld_r_n('(hl)'), '%n', 0xEB, 0x13);
+		add_opc_final($cpu, "ldi (de), %n", 0xEB, ld_r_n('(hl)'), '%n', 0xEB, 0x13);
+		add_opc_final($cpu, "ld (de-), %n", 0xEB, ld_r_n('(hl)'), '%n', 0xEB, 0x1B);
+		add_opc_final($cpu, "ldd (de), %n", 0xEB, ld_r_n('(hl)'), '%n', 0xEB, 0x1B);
+	}
+	
 	# LD r, (NN) / ld (NN), r
 	if ($gameboy) {
 		add_opc($cpu, "ld (%m), a", 0xEA, '%m', '%m');
@@ -340,7 +434,14 @@ for my $cpu (@CPUS) {
 				}
 			}
 			else {
-				if (!$intel) {
+				if ($intel) {
+					if ($r eq 'de') {
+						# gbz80 lacks the ld hl,(**) and ld (**),hl
+						add_opc($cpu, "ld $r, (%m)", 0xEB, 0x2A, '%m', '%m', 0xEB);
+						add_opc($cpu, "ld (%m), $r", 0xEB, 0x22, '%m', '%m', 0xEB);
+					}
+				}
+				else {
 					add_opc($cpu, "ld $r, (%m)", 0xED, 0x4B + $V{$r}*16, '%m', '%m');
 					add_opc($cpu, "ld (%m), $r", 0xED, 0x43 + $V{$r}*16, '%m', '%m');
 				}

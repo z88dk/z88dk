@@ -4712,9 +4712,36 @@
  ld (bc), a                     ; 02
  ld (bc+), a                    ; 02 03
  ld (bc-), a                    ; 02 0B
+ ld (de), -128                  ; EB 36 80 EB
+ ld (de), 127                   ; EB 36 7F EB
+ ld (de), 255                   ; EB 36 FF EB
  ld (de), a                     ; 12
+ ld (de), b                     ; EB 70 EB
+ ld (de), c                     ; EB 71 EB
+ ld (de), d                     ; EB 74 EB
+ ld (de), e                     ; EB 75 EB
+ ld (de), h                     ; EB 72 EB
+ ld (de), l                     ; EB 73 EB
+ ld (de+), -128                 ; EB 36 80 EB 13
+ ld (de+), 127                  ; EB 36 7F EB 13
+ ld (de+), 255                  ; EB 36 FF EB 13
  ld (de+), a                    ; 12 13
+ ld (de+), b                    ; EB 70 EB 13
+ ld (de+), c                    ; EB 71 EB 13
+ ld (de+), d                    ; EB 74 EB 13
+ ld (de+), e                    ; EB 75 EB 13
+ ld (de+), h                    ; EB 72 EB 13
+ ld (de+), l                    ; EB 73 EB 13
+ ld (de-), -128                 ; EB 36 80 EB 1B
+ ld (de-), 127                  ; EB 36 7F EB 1B
+ ld (de-), 255                  ; EB 36 FF EB 1B
  ld (de-), a                    ; 12 1B
+ ld (de-), b                    ; EB 70 EB 1B
+ ld (de-), c                    ; EB 71 EB 1B
+ ld (de-), d                    ; EB 74 EB 1B
+ ld (de-), e                    ; EB 75 EB 1B
+ ld (de-), h                    ; EB 72 EB 1B
+ ld (de-), l                    ; EB 73 EB 1B
  ld (hl), -128                  ; 36 80
  ld (hl), 127                   ; 36 7F
  ld (hl), 255                   ; 36 FF
@@ -4890,6 +4917,9 @@
  ld b', e                       ; 76 43
  ld b', h                       ; 76 44
  ld b', l                       ; 76 45
+ ld b, (de)                     ; EB 46 EB
+ ld b, (de+)                    ; EB 46 EB 13
+ ld b, (de-)                    ; EB 46 EB 1B
  ld b, (hl)                     ; 46
  ld b, (ix)                     ; FD 46 00
  ld b, (ix+127)                 ; FD 46 7F
@@ -4940,6 +4970,9 @@
  ld c', e                       ; 76 4B
  ld c', h                       ; 76 4C
  ld c', l                       ; 76 4D
+ ld c, (de)                     ; EB 4E EB
+ ld c, (de+)                    ; EB 4E EB 13
+ ld c, (de-)                    ; EB 4E EB 1B
  ld c, (hl)                     ; 4E
  ld c, (ix)                     ; FD 4E 00
  ld c, (ix+127)                 ; FD 4E 7F
@@ -4974,6 +5007,9 @@
  ld d', e                       ; 76 53
  ld d', h                       ; 76 54
  ld d', l                       ; 76 55
+ ld d, (de)                     ; EB 66 EB
+ ld d, (de+)                    ; EB 66 EB 13
+ ld d, (de-)                    ; EB 66 EB 1B
  ld d, (hl)                     ; 56
  ld d, (ix)                     ; FD 56 00
  ld d, (ix+127)                 ; FD 56 7F
@@ -5027,6 +5063,9 @@
  ld e', e                       ; 76 5B
  ld e', h                       ; 76 5C
  ld e', l                       ; 76 5D
+ ld e, (de)                     ; EB 6E EB
+ ld e, (de+)                    ; EB 6E EB 13
+ ld e, (de-)                    ; EB 6E EB 1B
  ld e, (hl)                     ; 5E
  ld e, (ix)                     ; FD 5E 00
  ld e, (ix+127)                 ; FD 5E 7F
@@ -5062,6 +5101,9 @@
  ld h', e                       ; 76 63
  ld h', h                       ; 76 64
  ld h', l                       ; 76 65
+ ld h, (de)                     ; EB 56 EB
+ ld h, (de+)                    ; EB 56 EB 13
+ ld h, (de-)                    ; EB 56 EB 1B
  ld h, (hl)                     ; 66
  ld h, (ix)                     ; FD 66 00
  ld h, (ix+127)                 ; FD 66 7F
@@ -5164,6 +5206,9 @@
  ld l', e                       ; 76 6B
  ld l', h                       ; 76 6C
  ld l', l                       ; 76 6D
+ ld l, (de)                     ; EB 5E EB
+ ld l, (de+)                    ; EB 5E EB 13
+ ld l, (de-)                    ; EB 5E EB 1B
  ld l, (hl)                     ; 6E
  ld l, (ix)                     ; FD 6E 00
  ld l, (ix+127)                 ; FD 6E 7F
@@ -5200,20 +5245,50 @@
  ldax de                        ; 1A
  ldd                            ; ED A8
  ldd (bc), a                    ; 02 0B
+ ldd (de), -128                 ; EB 36 80 EB 1B
+ ldd (de), 127                  ; EB 36 7F EB 1B
+ ldd (de), 255                  ; EB 36 FF EB 1B
  ldd (de), a                    ; 12 1B
+ ldd (de), b                    ; EB 70 EB 1B
+ ldd (de), c                    ; EB 71 EB 1B
+ ldd (de), d                    ; EB 74 EB 1B
+ ldd (de), e                    ; EB 75 EB 1B
+ ldd (de), h                    ; EB 72 EB 1B
+ ldd (de), l                    ; EB 73 EB 1B
  ldd (hl), a                    ; 77 2B
  ldd a, (bc)                    ; 0A 0B
  ldd a, (de)                    ; 1A 1B
  ldd a, (hl)                    ; 7E 2B
+ ldd b, (de)                    ; EB 46 EB 1B
+ ldd c, (de)                    ; EB 4E EB 1B
+ ldd d, (de)                    ; EB 66 EB 1B
+ ldd e, (de)                    ; EB 6E EB 1B
+ ldd h, (de)                    ; EB 56 EB 1B
+ ldd l, (de)                    ; EB 5E EB 1B
  lddr                           ; ED B8
  lddsr                          ; ED 98
  ldi                            ; ED A0
  ldi (bc), a                    ; 02 03
+ ldi (de), -128                 ; EB 36 80 EB 13
+ ldi (de), 127                  ; EB 36 7F EB 13
+ ldi (de), 255                  ; EB 36 FF EB 13
  ldi (de), a                    ; 12 13
+ ldi (de), b                    ; EB 70 EB 13
+ ldi (de), c                    ; EB 71 EB 13
+ ldi (de), d                    ; EB 74 EB 13
+ ldi (de), e                    ; EB 75 EB 13
+ ldi (de), h                    ; EB 72 EB 13
+ ldi (de), l                    ; EB 73 EB 13
  ldi (hl), a                    ; 77 23
  ldi a, (bc)                    ; 0A 03
  ldi a, (de)                    ; 1A 13
  ldi a, (hl)                    ; 7E 23
+ ldi b, (de)                    ; EB 46 EB 13
+ ldi c, (de)                    ; EB 4E EB 13
+ ldi d, (de)                    ; EB 66 EB 13
+ ldi e, (de)                    ; EB 6E EB 13
+ ldi h, (de)                    ; EB 56 EB 13
+ ldi l, (de)                    ; EB 5E EB 13
  ldir                           ; ED B0
  ldisr                          ; ED 90
  ldp (-32768), hl               ; ED 65 00 80

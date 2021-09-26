@@ -5006,17 +5006,14 @@
  jp lz, 32767                   ; Error
  jp lz, 65535                   ; Error
  ld (-32768), bc                ; Error
- ld (-32768), de                ; Error
  ld (-32768), ix                ; Error
  ld (-32768), iy                ; Error
  ld (-32768), sp                ; Error
  ld (32767), bc                 ; Error
- ld (32767), de                 ; Error
  ld (32767), ix                 ; Error
  ld (32767), iy                 ; Error
  ld (32767), sp                 ; Error
  ld (65535), bc                 ; Error
- ld (65535), de                 ; Error
  ld (65535), ix                 ; Error
  ld (65535), iy                 ; Error
  ld (65535), sp                 ; Error
@@ -5250,9 +5247,6 @@
  ld de', 65535                  ; Error
  ld de', bc                     ; Error
  ld de', de                     ; Error
- ld de, (-32768)                ; Error
- ld de, (32767)                 ; Error
- ld de, (65535)                 ; Error
  ld de, ix                      ; Error
  ld de, iy                      ; Error
  ld e', (hl)                    ; Error
