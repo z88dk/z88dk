@@ -67,26 +67,26 @@ include(`../clib_instantiate_begin.m4')
 
 ifelse(eval(M4__CRT_INCLUDE_DRIVER_INSTANTIATION == 0), 1,
 `
-   include(`../cpm/driver/terminal/cpm_00_input_cons.m4')
-   m4_cpm_00_input_cons(_stdin, 0x0100, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
+    include(`../cpm/driver/terminal/cpm_00_input_cons.m4')
+    m4_cpm_00_input_cons(_stdin, 0x0100, M4__CRT_ITERM_EDIT_BUFFER_SIZE)
 
-   include(`../cpm/driver/terminal/cpm_00_output_cons.m4')
-   m4_cpm_00_output_cons(_stdout, 0x0010)
+    include(`../cpm/driver/terminal/cpm_00_output_cons.m4')
+    m4_cpm_00_output_cons(_stdout, 0x0010)
 
-   include(`../m4_file_dup.m4')
-   m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
+    include(`../m4_file_dup.m4')
+    m4_file_dup(_stderr, 0x80, __i_fcntl_fdstruct_1)
 
-   include(`../cpm/driver/character/cpm_00_input_reader.m4')
-   m4_cpm_00_input_reader(_stdrdr, 0x0100)
+    include(`../cpm/driver/character/cpm_00_input_reader.m4')
+    m4_cpm_00_input_reader(_stdrdr, 0x0100)
 
-   include(`../cpm/driver/character/cpm_00_output_punch.m4')
-   m4_cpm_00_output_punch(_stdpun, 0x0010)
+    include(`../cpm/driver/character/cpm_00_output_punch.m4')
+    m4_cpm_00_output_punch(_stdpun, 0x0010)
 
-   include(`../cpm/driver/character/cpm_00_output_list.m4')
-   m4_cpm_00_output_list(_stdlst, 0x0010)
+    include(`../cpm/driver/character/cpm_00_output_list.m4')
+    m4_cpm_00_output_list(_stdlst, 0x0010)
 ',
 `
-   include(`crt_driver_instantiation.asm.m4')
+    include(`crt_driver_instantiation.asm.m4')
 ')
 
 include(`../clib_instantiate_end.m4')
@@ -101,25 +101,25 @@ PUBLIC __Start, __Exit
 
 EXTERN _main, asm_cpm_bdos
 
-Qualify:
+.__Qualify
 
-   ; disqualify 8080
-   
-   sub a
-   jp po, __Continue
+    ; disqualify 8080
 
-   ld c,__CPM_PRST
-   ld de,disqualify_s
+    sub a
+    jp PO, __Continue
+
+    ld c,__CPM_PRST
+    ld de,disqualify_s
    
-   call asm_cpm_bdos
-   rst 0
+    call asm_cpm_bdos
+    rst 0
 
 disqualify_s:
 
-   defm "z80 only"
-   defb 13,10,'$'
+    defm "z80 only"
+    defb 13,10,'$'
 
-__Continue:
+.__Continue
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; USER PREAMBLE ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -127,8 +127,8 @@ __Continue:
 
 IF __crt_include_preamble
 
-   include "crt_preamble.asm"
-   SECTION CODE
+    include "crt_preamble.asm"
+    SECTION CODE
 
 ENDIF
 
@@ -136,80 +136,80 @@ ENDIF
 ;; CRT INIT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-__Start:
+.__Start
 
-   include "../crt_start_di.inc"
-   include "../crt_save_sp.inc"
+    include "../crt_start_di.inc"
+    include "../crt_save_sp.inc"
 
-__Restart:
+.__Restart
 
-   include "../crt_init_sp.inc"
+    include "../crt_init_sp.inc"
 
    ; command line
 
 IF __crt_enable_commandline = 1
 
-   include "../crt_cmdline_empty.inc"
+    include "../crt_cmdline_empty.inc"
 
 ENDIF
 
 IF __crt_enable_commandline >= 3
 
-   ; copy command line words from default dma buffer to stack
-   ; must do this as the default dma buffer may be used by the cpm program
+    ; copy command line words from default dma buffer to stack
+    ; must do this as the default dma buffer may be used by the cpm program
 
-   EXTERN l_command_line_parse
+    EXTERN l_command_line_parse
 
-   ld hl,0x0080                ; default dma buffer
+    ld hl,0x0080                ; default dma buffer
 
-   ld c,(hl)
-   ld b,h                      ; bc = length of command line
+    ld c,(hl)
+    ld b,h                      ; bc = length of command line
 
-   inc l
-   ex de,hl
+    inc l
+    ex de,hl
 
-   call l_command_line_parse
+    call l_command_line_parse
 
-   ; cpm does not supply program name in command line
-   ; so place empty string in argv[0] instead
+    ; cpm does not supply program name in command line
+    ; so place empty string in argv[0] instead
 
-   ; bc = int argc
-   ; hl = char *argv[]
-   ; de = & empty string
-   ; bc'= num chars in redirector
-   ; hl'= char *redirector
+    ; bc = int argc
+    ; hl = char *argv[]
+    ; de = & empty string
+    ; bc'= num chars in redirector
+    ; hl'= char *redirector
 
-   push de                     ; empty string added to front of argv[]
+    push de                     ; empty string added to front of argv[]
 
-   dec hl
-   dec hl                      ; char *argv[] adjusted to include empty string at index 0
+    dec hl
+    dec hl                      ; char *argv[] adjusted to include empty string at index 0
 
-   inc c                       ; argc++
+    inc c                       ; argc++
 
 ENDIF
 
-__Restart_2:
+.__Restart_2
 
 IF __crt_enable_commandline >= 1
 
-   push hl                     ; argv
-   push bc                     ; argc
+    push hl                     ; argv
+    push bc                     ; argc
 
 ENDIF
 
-   ; initialize data section
+    ; initialize data section
 
-   include "../clib_init_data.inc"
+    include "../clib_init_data.inc"
 
-   ; initialize bss section
+    ; initialize bss section
 
-   include "../clib_init_bss.inc"
+    include "../clib_init_bss.inc"
 
-   ; interrupt mode
+    ; interrupt mode
 
-   include "../crt_set_interrupt_mode.inc"
+    include "../crt_set_interrupt_mode.inc"
 
-SECTION code_crt_init          ; user and library initialization
+SECTION code_crt_init           ; user and library initialization
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; MAIN ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -217,43 +217,43 @@ SECTION code_crt_init          ; user and library initialization
 
 SECTION code_crt_main
 
-   include "../crt_start_ei.inc"
+    include "../crt_start_ei.inc"
 
-   ; call user program
+    ; call user program
 
-   call _main                  ; hl = return status
+    call _main                  ; hl = return status
 
-   ; run exit stack
+    ; run exit stack
 
 IF __clib_exit_stack_size > 0
 
-   EXTERN asm_exit
-   jp asm_exit                 ; exit function jumps to __Exit
+    EXTERN asm_exit
+    jp asm_exit                 ; exit function jumps to __Exit
 
 ENDIF
 
-__Exit:
+.__Exit
 
 IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
 
-   ; not restarting
+    ; not restarting
 
-   push hl                     ; save return status
+    push hl                     ; save return status
 
 ENDIF
 
-SECTION code_crt_exit          ; user and library cleanup
+SECTION code_crt_exit           ; user and library cleanup
 SECTION code_crt_return
 
-   ; close files
+    ; close files
 
-   include "../clib_close.inc"
+    include "../clib_close.inc"
 
-   ; terminate
+    ; terminate
 
-   include "../crt_exit_eidi.inc"
-   include "../crt_restore_sp.inc"
-   include "../crt_program_exit.inc"
+    include "../crt_exit_eidi.inc"
+    include "../crt_restore_sp.inc"
+    include "../crt_program_exit.inc"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -263,8 +263,8 @@ include "../crt_jump_vectors_z80.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
-   SECTION BSS_UNINITIALIZED
-   __sp_or_ret:  defw 0
+    SECTION BSS_UNINITIALIZED
+    __sp_or_ret:  defw 0
 
 ENDIF
 

@@ -1,0 +1,4 @@
+target/rc2014/stdio/fputc_cons_native
+target/rc2014/stdio/fgetc_cons
+@stdio/stdio_8080.lst
+

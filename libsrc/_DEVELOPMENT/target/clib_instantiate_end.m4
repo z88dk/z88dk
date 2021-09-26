@@ -56,10 +56,10 @@ dnl############################################################
    
       IF __clib_fopen_max > __I_STDIO_NUM_FILE
 
-		   defc __MAX_FOPEN = __clib_fopen_max
-		
+         defc __MAX_FOPEN = __clib_fopen_max
+
          ; create extra FILE structures
-     
+
          SECTION bss_clib
          SECTION bss_stdio
       
@@ -86,11 +86,11 @@ dnl############################################################
          
             dec l
             jr nz, loop
-				
+
       ELSE
 
          defc __MAX_FOPEN = __I_STDIO_NUM_FILE
-				
+
       ENDIF   
 
    ENDIF
@@ -98,7 +98,7 @@ dnl############################################################
    IF (__clib_fopen_max = 0) && (__I_STDIO_NUM_FILE = 0)
    
       defc __MAX_FOPEN = 0
-	
+
       ; create empty file lists
       
       SECTION bss_clib

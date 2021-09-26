@@ -1,6 +1,11 @@
 IF __register_sp < -1
 
-   ld sp,(-__register_sp)      ; stack location is stored at memory address
+   IF __CPU_INTEL__
+     ld hl,(-__register_sp)      ; stack location is stored at memory address
+     ld sp,hl
+   ELSE
+     ld sp,(-__register_sp)      ; stack location is stored at memory address
+   ENDIF
 
 ELSE
 

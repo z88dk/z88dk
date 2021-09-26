@@ -17,8 +17,10 @@ ENDIF
 
 section code_crt_start
 section code_crt_init
+section code_crt_init_exit
 section code_crt_main
 section code_crt_exit
+section code_crt_exit_exit
 section code_crt_return
 section code_crt_common
 
@@ -137,6 +139,7 @@ section data_clib
   ;;section data_fcntl_stdio_heap_body
   ;;section data_fcntl_stdio_heap_tail
   ;;section data_fcntl_fdtable_body
+section data_crt
 section data_lib
 section data_compiler
 section data_user
@@ -185,6 +188,7 @@ align 4
 section bss_align_2
 align 2
 
+section bss_crt
 section bss_driver
 section bss_font
 section bss_clib

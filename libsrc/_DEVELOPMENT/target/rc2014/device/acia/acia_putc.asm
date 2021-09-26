@@ -34,6 +34,7 @@
         jr NC,putc_buffer_tx_overflow   ; buffer full, so drop the Tx byte and return
 
         ld a,l                      ; Tx byte
+
         ld hl,(aciaTxIn)            ; get the pointer to where we poke
         ld (hl),a                   ; write the Tx byte to the aciaTxIn
 

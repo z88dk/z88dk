@@ -15,9 +15,7 @@ SECTION code_alloc_malloc
 
 PUBLIC asm_heap_init
 
-EXTERN mtx_plain
-
-EXTERN asm_mtx_init, error_enolck_zc, l_setmem_hl
+EXTERN l_setmem_hl
 
 asm_heap_init:
 
@@ -46,10 +44,13 @@ asm_heap_init:
    push hl                     ; save void *heap
    push bc                     ; save num bytes
    
+IF !__CPU_INTEL__
+   EXTERN mtx_plain, asm_mtx_init, error_enolck_zc
+
    ld c,mtx_plain
    call asm_mtx_init
-   
-   jp c, error_enolck_zc - 2   ; if mutex init failed
+   jp C, error_enolck_zc - 2   ; if mutex init failed
+ENDIF
 
    ld hl,6                     ; sizeof(mutex)
    add hl,de

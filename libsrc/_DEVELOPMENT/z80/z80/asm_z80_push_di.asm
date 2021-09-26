@@ -25,6 +25,7 @@ IF __CPU_R2KA__ | __CPU_R3K__
 
    ipset 3
 
+
 ELSE
 
    ; exit  : stack = ei_di_status
@@ -33,6 +34,13 @@ ELSE
 
    ex (sp),hl
    push hl
+
+
+IF __CPU_8085__
+
+   rim
+
+ELSE
 
    IF __Z80 & __Z80_NMOS
    
@@ -49,7 +57,7 @@ ELSE
       scf
       
       ld a,i
-      jp pe, continue          ; carry set if ints enabled
+      jp PE, continue          ; carry set if ints enabled
       
       dec sp
       dec sp
@@ -57,7 +65,7 @@ ELSE
       
       ld a,h
       or l
-      jr z, continue           ; int did not occur, ints are disabled, carry reset
+      jr Z, continue           ; int did not occur, ints are disabled, carry reset
       
       scf                      ; int occurred, set carry
 
@@ -68,6 +76,8 @@ ELSE
       ld a,i
 
    ENDIF
+
+ENDIF
 
 continue:
    

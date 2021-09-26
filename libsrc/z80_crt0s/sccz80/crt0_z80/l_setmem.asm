@@ -1,7 +1,7 @@
 ; 01.2007 aralbrec
 
                 SECTION   code_crt0_sccz80
-PUBLIC l_setmem
+PUBLIC l_setmem, l_setmem_hl
 
 ; Many places in the library have functions
 ; that initialize structures to 0.  This
@@ -48,5 +48,6 @@ PUBLIC l_setmem
    ld (hl),a
 
 .l_setmem
-   
+.l_setmem_hl
+
    ret

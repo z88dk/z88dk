@@ -56,6 +56,12 @@ target/$(1)/obj/config_private.inc: target/$(1)/config.m4
 	m4 -DCFG_ASM_PUB target/$(1)/config.m4 > target/$(1)/config_$(1)_public.inc
 	m4 -DCFG_C_DEF target/$(1)/config.m4 > target/$(1)/config_$(1).h
 	cp target/$(1)/config_$(1)_private.inc target/$(1)/obj/config_private.inc
+	@if [ "$(1)" = "rc2014" ]; then \
+		m4 -DCFG_ASM_DEF target/$(1)/config_8085.m4 > target/$(1)/config_$(1)-8085_private.inc; \
+		m4 -DCFG_ASM_PUB target/$(1)/config_8085.m4 > target/$(1)/config_$(1)-8085_public.inc; \
+		m4 -DCFG_C_DEF target/$(1)/config_8085.m4 > target/$(1)/config_$(1)-8085.h; \
+		cp target/$(1)/config_$(1)-8085_private.inc target/$(1)/obj/config_8085_private.inc; \
+	fi;
 	@if [ "$(1)" = "zx" ]; then \
 		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm.m4 > arch/zx/bifrost2/z80/BIFROST2_ENGINE.asm; \
 		m4 -I../../src/m4 -Itarget/zx/obj arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm.m4 > arch/zx/bifrost2/z80/BIFROST2_INSTALL.asm; \

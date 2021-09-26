@@ -37,10 +37,10 @@
             
                ; program jumps to caller
 
-               ld de,(__sp_or_ret)
-               push de
-               ret
-               
+              ld de,(__sp_or_ret)
+              push de
+              ret
+              
             ELSE
             
                ; program halts
