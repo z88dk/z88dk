@@ -44,14 +44,7 @@
                  ld (__sp_or_ret),hl
                ELSE
                  pop de
-                 IF __CPU_INTEL__ || __CPU_GBZ80__
-                   ex de,hl
-                   ld (__sp_or_ret),hl
-                   ex de,hl
-                 ELSE
-                   ld (__sp_or_ret),de
-                 ENDIF
-                 
+                 ld (__sp_or_ret),de
                ENDIF
                
             ENDIF
