@@ -3,11 +3,11 @@ stdio/inkey/getk
 target/m5/stdio/fgetc_cons_rom
 target/m5/stdio/getk_rom
 target/m5/stdio/fputc_cons_rom
+@video/tms9918/video_tms9918.lst
 @stdio/ansicore.lst
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
-@video/tms9918/video_tms9918.lst
 @gfx/narrow/gfx_narrow.lst
 target/m5/games/joystick
 target/m5/games/keys_joystick

@@ -2,9 +2,9 @@
 stdio/inkey/fgetc_cons
 stdio/inkey/getk
 target/pencil2/stdio/CRT_FONT
-@stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @video/tms9918/video_tms9918_nmi.lst
+@stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
 @psg/sn76489/sn76489.lst
 target/pencil2/games/joystick

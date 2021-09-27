@@ -4,10 +4,10 @@ target/msx/stdio/fputc_cons
 target/svi/stdio/generic_console
 @font/font_8x8/font_8x8.lst
 @stdio/ansicore.lst
-@stdio/stdio.lst
 @input/input_keyboard.lst
 target/msx/time/clock
 @video/tms9918/video_tms9918.lst
+@stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
 target/svi/games/joystick
 target/svi/games/keys_joystick

@@ -1,10 +1,10 @@
 @stdio/ansicore.lst
 stdio/inkey/fgetc_cons
 stdio/inkey/getk
-@stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
 @video/tms9918/video_tms9918_nmi.lst
+@stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
 @psg/sn76489/sn76489.lst
 @games/games.lst
