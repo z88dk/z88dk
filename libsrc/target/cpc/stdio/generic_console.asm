@@ -57,11 +57,21 @@ generic_console_cls:
 	and	a
 	jr	nz,cls_mode1
 	ld	a,(__cpc_paper0)
+	ld	b,a
+	rrca
+	or	b
 	jr	docls
 cls_mode1:
 	cp	1
 	jr	nz,cls_mode2
 	ld	a,(__cpc_paper1)
+	ld	b,a
+	rrca
+	or	b
+	rrca
+	or	b
+	rrca
+	or	b
 	jr	docls
 cls_mode2:
 	xor	a
