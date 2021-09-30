@@ -483,6 +483,22 @@ static int compute_equ_exprs_once(ExprList* exprs, bool show_error, bool module_
 		return 0;
 }
 
+/* check if we have expressions still with target, i.e. circular definitions (see #1869) */
+static void check_equ_exprs_solved(ExprList* exprs, bool module_relative_addr) {
+	if (module_relative_addr)			/* not linking */
+		return;
+
+	ExprListElem* iter = ExprList_first(exprs);
+	while (iter != NULL) {
+		Expr* expr = iter->obj;
+		if (expr->target_name) {
+			set_expr_env(expr, module_relative_addr);
+			error_not_defined(expr->target_name);
+		}
+		iter = ExprList_next(iter);
+	}
+}
+
 /* compute all equ expressions, removing them from the list */
 void compute_equ_exprs(ExprList* exprs, bool show_error, bool module_relative_addr)
 {
@@ -496,6 +512,9 @@ void compute_equ_exprs(ExprList* exprs, bool show_error, bool module_relative_ad
 	/* if some unresolved, give up and show error */
 	if (show_error && compute_result < 0)
 		compute_equ_exprs_once(exprs, true, module_relative_addr);
+
+	/* if linking, check that we solved all EQU expressions */
+	check_equ_exprs_solved(exprs, module_relative_addr);
 }
 
 /* compute and patch expressions */
