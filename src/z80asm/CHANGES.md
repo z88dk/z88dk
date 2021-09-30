@@ -15,6 +15,7 @@ Z88DK Z80 Module Assembler Change Log
 - 2021-09-08 Fix #1852: accept C_LINE inside DEFVARS and DEFGROUP
 - 2021-09-15 Fix #1856 - store strings in object file as word-counted strings
 - 2021-09-25 Fix #1865 - emulate de-indirect loads
+- 2021-09-30 Fix #1869: detect and report symbols not defined because of circular dependencies
 
 2020
 ----
