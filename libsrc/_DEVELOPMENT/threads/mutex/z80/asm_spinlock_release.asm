@@ -12,7 +12,7 @@ PUBLIC asm_spinlock_release
    ;
    ; uses  : none
 
-IF __CPU_8080__ || __CPU_8085__
+IF __CPU_INTEL__
    dec (hl)                    ; atomic operation
    ret
 

@@ -13,19 +13,21 @@ PUBLIC asm_spinlock_tryacquire
    ;
    ; uses  : f
 
-IF __CPU_8080__ || __CPU_8085__
+IF __CPU_INTEL__
+
+   scf
    inc (hl)                     ; atomic operation
    jp NZ,acquisition_failed
 
-   or a                         ; if acquisition succeeded
+   ccf                          ; if acquisition succeeded
    ret
 
 .acquisition_failed
    dec (hl)
-   scf
    ret
 
 ELSE
+
    scf
    rr (hl)                      ; atomic operation
 

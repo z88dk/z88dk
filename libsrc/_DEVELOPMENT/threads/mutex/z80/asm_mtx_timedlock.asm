@@ -17,7 +17,7 @@ PUBLIC asm_mtx_timedlock
 EXTERN __thrd_id, thrd_success, thrd_error
 EXTERN asm_spinlock_acquire, __thread_block_timeout, error_einval_mc
 
-asm_mtx_timedlock:
+.asm_mtx_timedlock
 
    ; enter : hl = mtx_t *m
    ;         bc = struct timespec *ts (0 means no timeout)
@@ -44,14 +44,14 @@ asm_mtx_timedlock:
    dec hl
    
    or a
-   jp z, error_einval_mc       ; if mutex invalid
+   jp Z, error_einval_mc       ; if mutex invalid
 
    ld a,(__thrd_id)            ; thread id
    
    cp (hl)                     ; compare against current mutex owner
    inc hl                      ; hl = & mutex_type
    
-   jr z, mutex_owned           ; if thread owns mutex already
+   jr Z, mutex_owned           ; if thread owns mutex already
    
    inc hl
    inc hl                      ; hl = & m->spinlock
@@ -64,9 +64,9 @@ asm_mtx_timedlock:
    
    ld a,(hl)
    or a
-   jr z, mutex_acquired        ; if mutex not currently owned
+   jr Z, mutex_acquired        ; if mutex not currently owned
    
-failed_acquire:
+.failed_acquire
 
    inc hl
    inc hl
@@ -85,7 +85,7 @@ failed_acquire:
    
    ld a,h
    or l
-   jr nz, lock_failed          ; if hl = thrd_error
+   jr NZ, lock_failed          ; if hl = thrd_error
    
    ; this thread now owns the mutex and spinlock is acquired
    
@@ -95,7 +95,7 @@ failed_acquire:
    dec hl
    dec hl                      ; hl = mtx_t *m
 
-mutex_acquired:
+.mutex_acquired
 
    ld a,(__thrd_id)
    
@@ -107,38 +107,45 @@ mutex_acquired:
    ld (hl),1                   ; m->lock_count = 1
    
    inc hl
-IF __CPU_8080__ || __CPU_8085__
+IF __CPU_INTEL__
    dec (hl)                    ; unlock(m->spinlock)
 ELSE
    ld (hl),$fe                 ; unlock(m->spinlock)
 ENDIF
    
-lock_success:
+.lock_success
 
    ld hl,thrd_success
    ret
 
-lock_failed:
+.lock_failed
 
    pop bc                      ; junk item
    
    scf
    ret
 
-mutex_owned:
+.mutex_owned
 
    ; hl = & m->mutex_type
    ; carry reset
-
+   
+IF __CPU_INTEL__
+   ld a,(hl)                  ; test recursive bit on type
+   rrca
+   rrca
+   jr NC, lock_success
+ELSE
    bit 1,(hl)                  ; test recursive bit on type
-   jr z, lock_success
+   jr Z, lock_success
+ENDIF
 
-recursive:
+.recursive
 
    inc hl                      ; hl = & m->lock_count
    
    inc (hl)                    ; m->lock_count++
-   jr nz, lock_success
+   jr NZ, lock_success
    
    ; lock count limit exceeded
    

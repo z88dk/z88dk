@@ -25,7 +25,7 @@ PUBLIC asm_call_once
 
 EXTERN asm_spinlock_tryacquire, __thread_context_switch, l_jphl
 
-asm_call_once:
+.asm_call_once
 
    ; enter : hl = once_flag *flag
    ;         de = void (*func)(void)
@@ -46,7 +46,7 @@ asm_call_once:
    call __thread_context_switch
    jr asm_call_once
 
-run_function:
+.run_function
 
    push hl                     ; save once_flag
 

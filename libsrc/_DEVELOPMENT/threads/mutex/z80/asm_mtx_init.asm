@@ -16,7 +16,7 @@ PUBLIC asm_mtx_init
 
 EXTERN thrd_error, thrd_success, l_setmem_hl
 
-asm_mtx_init:
+.asm_mtx_init
 
    ; enter : hl = mtx_t *m
    ;          c = mutex_type
@@ -37,11 +37,11 @@ asm_mtx_init:
       
    ld a,c
    and $f8
-   jr nz, unknown_type
+   jr NZ, unknown_type
    
    ld a,c
    and $07
-   jr z, unknown_type
+   jr Z, unknown_type
 
    xor a
    call l_setmem_hl - 12       ; zero structure
@@ -49,11 +49,13 @@ asm_mtx_init:
    dec hl
    dec hl
    dec hl
-IF __CPU_8080__ || __CPU_8085__
-   ld (hl),$ff                 ; unlock(m->spinlock)
+
+IF __CPU_INTEL__
+   ld (hl),$ff                 ; initialise(m->spinlock)
 ELSE
-   ld (hl),$fe                 ; unlock(m->spinlock)
+   ld (hl),$fe                 ; initialise(m->spinlock)
 ENDIF
+
    dec hl
    dec hl
    ld (hl),c                   ; m->mutex_type = c

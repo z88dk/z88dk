@@ -17,7 +17,7 @@ PUBLIC asm_mtx_unlock
 EXTERN __thrd_id, thrd_success, thrd_error
 EXTERN asm_spinlock_acquire, __thread_unblock, error_einval_mc
 
-asm_mtx_unlock:
+.asm_mtx_unlock
 
    ; enter : hl = mtx_t *m
    ;
@@ -43,22 +43,22 @@ asm_mtx_unlock:
    dec hl
    
    or a
-   jp z, error_einval_mc       ; if mutex invalid
+   jp Z, error_einval_mc       ; if mutex invalid
 
    ld a,(__thrd_id)            ; thread id
    
    cp (hl)                     ; compare against current mutex owner
-   jr nz, fail_not_owner
+   jr NZ, fail_not_owner
 
-reduce_lock_count:
+.reduce_lock_count
 
    inc hl
    inc hl
    
    dec (hl)                    ; m->lock_count--
-   jr nz, success              ; if lock_count remains > 0
+   jr NZ, success              ; if lock_count remains > 0
 
-relinquish_ownership:
+.relinquish_ownership
 
    inc hl                      ; hl = & m->spinlock
    
@@ -79,19 +79,19 @@ relinquish_ownership:
    
    ; no waiting threads
 
-IF __CPU_8080__ || __CPU_8085__
+IF __CPU_INTEL__
    dec (hl)                    ; unlock(m->spinlock)
 ELSE
    ld (hl),$fe                 ; unlock(m->spinlock)
 ENDIF
 
-success:
+.success
 
    or a
    ld hl,thrd_success
    ret
 
-fail_not_owner:
+.fail_not_owner
 
    ld hl,thrd_error
    scf
