@@ -204,13 +204,6 @@
 	call	l_eq
 	jr	c,%1
 
-	call	l_pint
-	ld	de,%1	;const
-	ex	de,hl
-=
-	call	l_pint_ex
-	ld	hl,%1	;const
-
 	pop	de
 	call	l_pint
 =

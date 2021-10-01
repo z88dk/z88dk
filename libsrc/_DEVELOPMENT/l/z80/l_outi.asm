@@ -1,5 +1,7 @@
 INCLUDE "config_private.inc"
 
+IF !__CPU_RABBIT__
+
 IF (__CLIB_OPT_UNROLL & 0xc0)
    SECTION smc_clib
    SECTION smc_l
@@ -166,4 +168,5 @@ l_outi:
 
    ret
 
+ENDIF
 ENDIF
