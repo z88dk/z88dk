@@ -1,2 +1,1 @@
-@newlib-z80n.lst
-@crt0_z80.lst
+@../_DEVELOPMENT/l/l_z80n.lst

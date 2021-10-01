@@ -11,6 +11,8 @@ TARGET = am9511 cpm hbios m math16 math32 rc2014 scz180 sms yaz180 z180 z80 zx z
 
 Z88DK_LIB := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../../lib/
 
+NEWLIB_ROOT = ./
+
 
 .PHONY: all clean install-clean
 all: $(TARGET)

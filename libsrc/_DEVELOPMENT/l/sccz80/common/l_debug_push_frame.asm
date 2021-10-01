@@ -1,4 +1,5 @@
 
+IF !__CPU_GBZ80__
 
 SECTION code_clib
 SECTION code_l_sccz80
@@ -18,3 +19,4 @@ l_debug_push_frame:
     pop     hl
     push    bc
     ret
+ENDIF

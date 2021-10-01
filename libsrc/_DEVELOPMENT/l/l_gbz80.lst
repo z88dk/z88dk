@@ -61,10 +61,6 @@ ${NEWLIB_ROOT}l/z80/logical/l_andc_hl_bc
 ${NEWLIB_ROOT}l/z80/logical/l_andc_hl_de
 ${NEWLIB_ROOT}l/z80/logical/l_cpl_dehl
 ${NEWLIB_ROOT}l/z80/logical/l_cpl_hl
-${NEWLIB_ROOT}
-${NEWLIB_ROOT}
-${NEWLIB_ROOT}
-${NEWLIB_ROOT}
 ${NEWLIB_ROOT}l/sdcc/___sdcc_call_hl
 ${NEWLIB_ROOT}l/sdcc/gbz80/__divschar
 ${NEWLIB_ROOT}l/sdcc/gbz80/__divsint

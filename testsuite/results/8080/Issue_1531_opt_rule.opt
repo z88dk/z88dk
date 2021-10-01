@@ -46,7 +46,7 @@
 	push	hl
 	call	_func
 	pop	bc
-	jp	i_6	;EOS
+	ret
 .i_5
 	ld	hl,i_1+12
 	push	hl

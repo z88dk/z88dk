@@ -44,7 +44,7 @@
 	ld	hl,0	;const
 	ld	de,1
 	call	l_long_eq
-	jp	nc,i_5	;
+	ret	nc
 .i_6
 	ld	hl,2	;const
 	add	hl,sp
@@ -68,7 +68,7 @@
 	or	l
 	or	d
 	or	e
-	jp	z,i_8	;
+	ret	z
 .i_9
 	ld	hl,2	;const
 	add	hl,sp
