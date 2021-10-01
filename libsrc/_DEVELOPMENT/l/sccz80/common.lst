@@ -8,6 +8,7 @@ ${NEWLIB_ROOT}l/sccz80/common/l_compare_result
 ${NEWLIB_ROOT}l/sccz80/common/l_ghtonsint
 ${NEWLIB_ROOT}l/sccz80/common/l_debug_push_frame
 ${NEWLIB_ROOT}l/sccz80/common/l_cmp
+${NEWLIB_ROOT}l/sccz80/common/l_ne
 ${NEWLIB_ROOT}l/sccz80/common/l_pint_pop
 ${NEWLIB_ROOT}l/sccz80/common/l_debug_pop_frame
 ${NEWLIB_ROOT}l/sccz80/common/l_gintsp

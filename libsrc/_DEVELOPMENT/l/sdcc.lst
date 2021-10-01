@@ -1,3 +1,4 @@
+${NEWLIB_ROOT}l/sdcc/__convert_sdccf2reg
 ${NEWLIB_ROOT}l/sdcc/____sdcc_2_copy_src_mhl_dst_bcix
 ${NEWLIB_ROOT}l/sdcc/____sdcc_2_copy_src_mhl_dst_deix
 ${NEWLIB_ROOT}l/sdcc/____sdcc_4_copy_src_mhl_dst_bcix

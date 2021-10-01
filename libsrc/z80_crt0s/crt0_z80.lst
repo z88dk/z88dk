@@ -1,4 +1,5 @@
 @../_DEVELOPMENT/l/l_z80.lst
 ../_DEVELOPMENT/z80/z80/asm_z80_push_di
 ../_DEVELOPMENT/z80/z80/asm_z80_pop_ei
+@newlib-z80.lst
 

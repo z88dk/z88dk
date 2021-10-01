@@ -5,7 +5,6 @@ ${NEWLIB_ROOT}l/sccz80/8080/l_div_u
 ${NEWLIB_ROOT}l/sccz80/8080/l_mult
 ${NEWLIB_ROOT}l/sccz80/8080/l_gcharspsp
 ${NEWLIB_ROOT}l/sccz80/8080/l_g2charspsp
-${NEWLIB_ROOT}l/sccz80/8080/l_ne
 ${NEWLIB_ROOT}l/sccz80/8080/l_asr
 ${NEWLIB_ROOT}l/sccz80/8080/l_g2intspsp
 ${NEWLIB_ROOT}l/sccz80/8080/l_cmpbcde
@@ -34,6 +33,7 @@ ${NEWLIB_ROOT}l/sccz80/8080/i32/l_long_mod_u
 ${NEWLIB_ROOT}l/sccz80/8080/i32/l_long_asr
 ${NEWLIB_ROOT}l/sccz80/8080/l_getptr
 ${NEWLIB_ROOT}l/sccz80/8080/l_glong
+${NEWLIB_ROOT}l/sccz80/8080/l_asl
 ${NEWLIB_ROOT}l/sccz80/8080/l_asr_u
 ${NEWLIB_ROOT}l/sccz80/8080/l_div
 @${NEWLIB_ROOT}l/sccz80/common.lst

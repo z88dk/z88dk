@@ -1,3 +1,5 @@
+${NEWLIB_ROOT}l/sccz80/gbz80/crt0_variables
+${NEWLIB_ROOT}l/sccz80/gbz80/crt_variables_math
 ${NEWLIB_ROOT}l/sccz80/gbz80/l_mod
 ${NEWLIB_ROOT}l/sccz80/gbz80/l_cm_bc
 ${NEWLIB_ROOT}l/sccz80/gbz80/int2long_s
