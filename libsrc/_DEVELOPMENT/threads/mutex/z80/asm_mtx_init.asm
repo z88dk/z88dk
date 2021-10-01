@@ -49,7 +49,11 @@ asm_mtx_init:
    dec hl
    dec hl
    dec hl
+IF __CPU_8080__ || __CPU_8085__
+   ld (hl),$ff                 ; unlock(m->spinlock)
+ELSE
    ld (hl),$fe                 ; unlock(m->spinlock)
+ENDIF
    dec hl
    dec hl
    ld (hl),c                   ; m->mutex_type = c

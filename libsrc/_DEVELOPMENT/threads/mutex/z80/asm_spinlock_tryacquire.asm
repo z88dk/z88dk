@@ -4,7 +4,7 @@ SECTION code_threads_mutex
 
 PUBLIC asm_spinlock_tryacquire
 
-asm_spinlock_tryacquire:
+.asm_spinlock_tryacquire
 
    ; enter : hl = & spinlock
    ;
@@ -13,7 +13,21 @@ asm_spinlock_tryacquire:
    ;
    ; uses  : f
 
-   scf
-   rr (hl)                     ; atomic operation
-   
+IF __CPU_8080__ || __CPU_8085__
+   inc (hl)                     ; atomic operation
+   jp NZ,acquisition_failed
+
+   or a                         ; if acquisition succeeded
    ret
+
+.acquisition_failed
+   dec (hl)
+   scf
+   ret
+
+ELSE
+   scf
+   rr (hl)                      ; atomic operation
+
+   ret
+ENDIF
