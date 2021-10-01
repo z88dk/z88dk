@@ -96,16 +96,6 @@ IF ((__crt_enable_rst & $0808) != $0808)
 
 ENDIF
 
-   PUBLIC l_dec_de
-
-   dec de
-   dec de
-   dec de
-   
-l_dec_de:
-
-   ret
-
 ; address = 0x0020
 
    ALIGN 0x0020
@@ -135,16 +125,6 @@ IF ((__crt_enable_rst & $1010) != $1010)
    defc   _8085_rst_20h_vector = $21
 
 ENDIF
-
-   PUBLIC l_dec_bc
-
-   dec bc
-   dec bc
-   dec bc
-
-l_dec_bc:
-
-   ret
 
 ; address = 0x0024
 
@@ -206,16 +186,6 @@ IF ((__crt_enable_rst & $2020) != $2020)
    defc   _8085_rst_28h_vector = $29
       
 ENDIF
-
-   PUBLIC l_ret
-   
-   pop hl
-   pop hl
-   pop hl
-   
-l_ret:
-   
-   ret
 
 ; address = 0x002C
 
@@ -406,9 +376,29 @@ ENDIF
    PUBLIC l_ei_ret
    PUBLIC l_ret
 
-l_ei_ret:
+.l_ei_ret
    ei
-l_ret:
+.l_ret
+   ret
+
+   PUBLIC l_dec_de
+
+   dec de
+   dec de
+   dec de
+   
+.l_dec_de
+
+   ret
+
+   PUBLIC l_dec_bc
+
+   dec bc
+   dec bc
+   dec bc
+
+.l_dec_bc
+
    ret
 
    PUBLIC l_setmem_hl
@@ -449,7 +439,7 @@ l_ret:
    ld (hl),a
    inc hl
 
-l_setmem_hl:
+.l_setmem_hl
 
    ret
 
@@ -460,14 +450,14 @@ l_setmem_hl:
 
    inc hl
    inc hl
-   
-   inc hl
-   inc hl
-   
+
    inc hl
    inc hl
 
-l_inc_hl:
+   inc hl
+   inc hl
+
+.l_inc_hl
 
    ret
 
@@ -484,8 +474,8 @@ PUBLIC error_mc
    pop hl
    pop hl
 
-error_mc:
-   
+.error_mc
+
    ld hl,-1
    scf
    ret
@@ -497,8 +487,8 @@ PUBLIC error_zc
    pop hl
    pop hl
 
-error_zc:
-   
+.error_zc
+
    ld hl,0
    scf
    ret
@@ -519,20 +509,20 @@ IF (__crt_org_vector_table = -0x0100)
 ; that is 151 bytes to pad, make it count!
 
 PUBLIC l_inc_sp
-   
-   inc sp
-   inc sp
-   
-   inc sp
-   inc sp
-   
-   inc sp
-   inc sp
-   
+
    inc sp
    inc sp
 
-l_inc_sp:
+   inc sp
+   inc sp
+
+   inc sp
+   inc sp
+
+   inc sp
+   inc sp
+
+.l_inc_sp
 
    ret
 
@@ -556,52 +546,52 @@ PUBLIC l_setmem_de
    ld (de),a
    inc de
 
-l_setmem_de:
+.l_setmem_de
 
    ret
 
 PUBLIC l_neg_hl
 
-l_neg_hl:
+.l_neg_hl
 
    ld a,l
    cpl
    ld l,a
-   
+
    ld a,h
    cpl
    ld h,a
-   
+
    inc hl
    ret
 
 PUBLIC l_neg_de
 
-l_neg_de:
+.l_neg_de
 
    ld a,e
    cpl 
    ld e,a
-   
+
    ld a,d
    cpl
    ld d,a
-   
+
    inc de
    ret
 
 PUBLIC l_neg_bc
 
-l_neg_bc:
-   
+.l_neg_bc
+
    ld a,c
    cpl
    ld c,a
-   
+
    ld a,b
    cpl
    ld b,a
-   
+
    inc bc
    ret
 
@@ -611,8 +601,8 @@ PUBLIC error_mc
    pop hl
    pop hl
 
-error_mc:
-   
+.error_mc
+
    ld hl,-1
    scf
    ret
@@ -623,13 +613,11 @@ PUBLIC error_mnc
    pop hl
    pop hl
 
-error_mnc:
-   
+.error_mnc
+
    ld hl,-1
-   
    scf
    ccf
-   
    ret
 
 PUBLIC error_zc
@@ -639,8 +627,8 @@ PUBLIC error_zc
    pop hl
    pop hl
 
-error_zc:
-   
+.error_zc
+
    ld hl,0
    scf
    ret
@@ -650,22 +638,20 @@ PUBLIC error_znc
    pop hl
    pop hl
    pop hl
-   
-error_znc:
-   
+
+.error_znc
+
    ld hl,0
-   
    scf
    ccf
-   
    ret
 
 PUBLIC error_lzc
 
    pop hl
 
-error_lzc:
-   
+.error_lzc
+
    ld de,0
    jp error_zc
 
@@ -673,8 +659,8 @@ PUBLIC error_lznc
 
    pop hl
 
-error_lznc:
-   
+.error_lznc
+
    ld de,0
    jp error_znc
 
@@ -682,7 +668,7 @@ PUBLIC error_lmc
 
    pop hl
 
-error_lmc:
+.error_lmc
    
    ld de,-1
    jp error_mc
@@ -691,8 +677,8 @@ PUBLIC error_lmnc
 
    pop hl
 
-error_lmnc:
-   
+.error_lmnc
+
    ld de,-1
    jp error_mnc
 
@@ -700,11 +686,10 @@ PUBLIC error_oc
 
    pop hl
 
-error_oc:
-   
+.error_oc
+
    ld hl,1
    scf
-   
    ret
 
 PUBLIC error_onc
@@ -713,13 +698,11 @@ PUBLIC error_onc
    pop hl
    pop hl
 
-error_onc:
-   
+.error_onc
+
    ld hl,1
-   
    scf
    ccf
-   
    ret
 
 PUBLIC l_readword_hl
@@ -736,13 +719,13 @@ PUBLIC l_readword_hl
    inc hl
    inc hl
 
-l_readword_hl:
-   
+.l_readword_hl
+
    ld a,(hl)
    inc hl
    ld h,(hl)
    ld l,a
-   
+
    ret
 
 ; address = 0x100

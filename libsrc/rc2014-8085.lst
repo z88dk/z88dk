@@ -1,4 +1,7 @@
-target/rc2014/stdio/fputc_cons_native
-target/rc2014/stdio/fgetc_cons
+target/rc2014/stdio/fputc_cons_basic
+target/rc2014/stdio/fgetc_cons_basic
+target/rc2014/stdio/fputc_cons_acia
+target/rc2014/stdio/fgetc_cons_acia
+target/rc2014/stdio/interrupt_cons_acia
 @stdio/stdio_8080.lst
 

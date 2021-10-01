@@ -95,9 +95,9 @@ IF __CRTCFG = 1
    defc TAR__crt_enable_rst40h         = 0
 
    defc TAR__crt_enable_trap           = 0
-   defc TAR__crt_enable_rst55          = 0
-   defc TAR__crt_enable_rst65          = 1
-   defc TAR__crt_enable_rst75          = 0
+   defc TAR__crt_enable_int55          = 0
+   defc TAR__crt_enable_int65          = 1
+   defc TAR__crt_enable_int75          = 0
 
    ; clib defaults
 

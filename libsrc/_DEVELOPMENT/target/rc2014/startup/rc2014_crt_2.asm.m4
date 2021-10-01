@@ -110,6 +110,14 @@ ENDIF
 
     include "../crt_init_sp.inc"
 
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of
+; the compiled program and the stack pointer
+
+IF DEFINED_USING_amalloc
+    include "../../../../../lib/crt/classic/crt_init_amalloc.asm"
+ENDIF
+
    ; command line
 
 IF (__crt_enable_commandline = 1) || (__crt_enable_commandline >= 3)
@@ -197,13 +205,53 @@ IF CRT_ENABLE_STDIO = 1
 ENDIF
 
 IF DEFINED_USING_amalloc
+    EXTERN  __BSS_END_tail
+
     ld hl,__BSS_END_tail
     ld (_heap),hl
 ENDIF
 
-   ; copy interrupt vector table to final location
+    ; copy interrupt vector table to final location
 
-   include "../crt_set_interrupt_mode.inc"
+    include "../crt_set_interrupt_mode.inc"
+
+    ; initialise the ACIA
+
+    EXTERN  aciaControl
+
+    EXTERN  aciaRxCount
+    EXTERN  aciaRxIn
+    EXTERN  aciaRxOut
+
+    EXTERN  aciaTxCount
+    EXTERN  aciaTxIn
+    EXTERN  aciaTxOut
+
+    EXTERN  aciaRxBuffer
+    EXTERN  aciaTxBuffer
+
+    ld a,__IO_ACIA_CR_RESET     ; Master Reset the ACIA
+    out (__IO_ACIA_CONTROL_REGISTER),a
+
+    ld a,__IO_ACIA_CR_REI|__IO_ACIA_CR_TDI_RTS0|__IO_ACIA_CR_8N1|__IO_ACIA_CR_CLK_DIV_64
+                                ; load the default ACIA configuration
+                                ; 8n1 at 115200 baud
+                                ; receive interrupt enabled
+                                ; transmit interrupt disabled
+    ld (aciaControl),a          ; write the ACIA control byte echo
+    out (__IO_ACIA_CONTROL_REGISTER),a  ; output to the ACIA control
+
+    ld hl,aciaRxBuffer          ; load Rx buffer pointer home
+    ld (aciaRxIn),hl
+    ld (aciaRxOut),hl
+
+    ld hl,aciaTxBuffer          ; load Tx buffer pointer home
+    ld (aciaTxIn),hl
+    ld (aciaTxOut),hl
+
+    xor a                       ; reset empties the Tx & Rx buffers
+    ld (aciaRxCount),a          ; reset the Rx counter (set 0)
+    ld (aciaTxCount),a          ; reset the Tx counter (set 0)
 
 SECTION code_crt_init           ; user and library initialization
 
@@ -276,6 +324,7 @@ IF DEFINED_USING_amalloc
 ._heap
     defw 0                      ; initialised by code_crt_init - location of the last program byte
     defw 0
+
 ENDIF
 
 IF CLIB_BALLOC_TABLE_SIZE > 0
@@ -295,7 +344,24 @@ ENDIF
 
 SECTION data_crt
 
+PUBLIC  fgetc_cons
+EXTERN  fgetc_cons_acia
+
+    defc DEFINED_fgetc_cons = 1
+    defc fgetc_cons = fgetc_cons_acia
+
+PUBLIC  fputc_cons
+EXTERN  fputc_cons_acia
+
+    defc DEFINED_fputc_cons = 1
+    defc fputc_cons = fputc_cons_acia
+
 include "../../../../../lib/crt/classic/crt_runtime_selection.asm" 
+
+PUBLIC _8085_int65
+EXTERN  acia_interrupt
+
+defc _8085_int65 = acia_interrupt
 
 include "../crt_jump_vectors_8085.inc"
 
