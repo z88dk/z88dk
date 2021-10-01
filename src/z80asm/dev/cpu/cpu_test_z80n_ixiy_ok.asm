@@ -3442,6 +3442,7 @@
  sui -128                       ; D6 80
  sui 127                        ; D6 7F
  sui 255                        ; D6 FF
+ swap a                         ; ED 23
  swapnib                        ; ED 23
  test -128                      ; ED 27 80
  test 127                       ; ED 27 7F
