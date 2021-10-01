@@ -13,7 +13,7 @@ PUBLIC asm_spinlock_release
    ; uses  : none
 
 IF __CPU_8080__ || __CPU_8085__
-   dec (hl)
+   dec (hl)                    ; atomic operation
    ret
 
 ELSE

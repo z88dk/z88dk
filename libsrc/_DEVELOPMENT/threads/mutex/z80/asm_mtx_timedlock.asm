@@ -107,7 +107,11 @@ mutex_acquired:
    ld (hl),1                   ; m->lock_count = 1
    
    inc hl
+IF __CPU_8080__ || __CPU_8085__
+   dec (hl)                    ; unlock(m->spinlock)
+ELSE
    ld (hl),$fe                 ; unlock(m->spinlock)
+ENDIF
    
 lock_success:
 

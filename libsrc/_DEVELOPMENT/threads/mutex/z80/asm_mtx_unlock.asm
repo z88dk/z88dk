@@ -78,8 +78,12 @@ relinquish_ownership:
    jr c, success               ; another thread was unblocked
    
    ; no waiting threads
-   
+
+IF __CPU_8080__ || __CPU_8085__
+   dec (hl)                    ; unlock(m->spinlock)
+ELSE
    ld (hl),$fe                 ; unlock(m->spinlock)
+ENDIF
 
 success:
 
