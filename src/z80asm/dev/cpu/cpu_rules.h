@@ -40186,6 +40186,9 @@ switch (opts.cpu) {
 case CPU_GBZ80: 
 DO_stmt(0xCB37);
 break;
+case CPU_Z80N: 
+DO_stmt(0xED23);
+break;
 default: error_illegal_ident(); }
 }
 
