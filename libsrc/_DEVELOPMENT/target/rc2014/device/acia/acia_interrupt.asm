@@ -42,7 +42,7 @@ ENDIF
 
         ld a,(aciaRxCount)          ; get the current Rx count
         cp __IO_ACIA_RX_FULLISH     ; compare the count with the preferred full size
-        jr C,tx_check               ; leave the RTS low, and check for Rx/Tx possibility
+        jr NZ,tx_check              ; leave the RTS low, and check for Rx/Tx possibility
 
         ld a,(aciaControl)          ; get the ACIA control echo byte
         and ~__IO_ACIA_CR_TEI_MASK  ; mask out the Tx interrupt bits
