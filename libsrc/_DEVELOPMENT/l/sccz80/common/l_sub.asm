@@ -4,11 +4,17 @@
 ;
 ;       6/9/98  djm
 
-SECTION code_clib
-SECTION code_l_sccz80
+SECTION   code_crt0_sccz80
 
-PUBLIC l_gint
+PUBLIC    l_sub
 
-EXTERN l_gintsp_gint
+; HL = DE - HL
 
-defc l_gint = l_gintsp_gint
+.l_sub
+    ld a,e
+    sub l
+    ld l,a
+    ld a,d
+    sbc a,h
+    ld h,a
+    ret

@@ -7,15 +7,22 @@
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC l_cm_bc
+PUBLIC l_gchar, l_gchar_sxt
 
-EXTERN l_neg_bc
+l_gchar:
 
-l_cm_bc:
+   ; fetch char from (HL) and sign extend into HL
 
-    ; bc = abs(bc)
-    
-    bit 7,b
-    ret z
-    
-    jp l_neg_bc
+   ld a,(hl)
+
+l_gchar_sxt:
+
+   ; sign extend a into hl
+   
+   ld l,a
+   
+   rlca
+   sbc a,a
+   ld h,a
+   
+   ret

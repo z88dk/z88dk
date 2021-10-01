@@ -7,15 +7,8 @@
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC l_cm_de
+PUBLIC l_sxt
 
-EXTERN l_neg_de
+EXTERN l_gchar_sxt
 
-l_cm_de:
-
-   ; de = abs(de)
-   
-   bit 7,d
-   ret z
-   
-   jp l_neg_de
+defc l_sxt = l_gchar_sxt
