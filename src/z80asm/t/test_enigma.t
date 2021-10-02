@@ -66,22 +66,19 @@ if (Test::More->builder->is_passing) {
 	spew("enigma.exp", "Enter text to be (de)coded, finish with a .\n".
 					   "HREXLSLEOC .\n");
 
-	diag "test is failing, issue #1561";
-	if (0) {
-		$cmd = path($TICKS)->canonpath." enigma.bin < enigma.in > enigma.out 2> $NUL";
-		ok 0==system($cmd), $cmd;
+	$cmd = path($TICKS)->canonpath." enigma.bin < enigma.in > enigma.out 2> $NUL";
+	ok 0==system($cmd), $cmd;
 
-		# cleanup output
-		my $output = path('enigma.out')->slurp_raw;
-		for ($output) {
-			s/^Ticks:\s*\d+\s*//m;
-			s/\r\n/\n/g;
-		}
-		spew('enigma.out', $output);
-
-		ok path('enigma.exp')->slurp_raw eq path('enigma.out')->slurp_raw ,
-				"enigma.out and enigma.exp equal";
+	# cleanup output
+	my $output = path('enigma.out')->slurp_raw;
+	for ($output) {
+		s/^Ticks:\s*\d+\s*//m;
+		s/\r\n/\n/g;
 	}
+	spew('enigma.out', $output);
+
+	ok path('enigma.exp')->slurp_raw eq path('enigma.out')->slurp_raw ,
+			"enigma.out and enigma.exp equal";
 	
     unlink qw( enigma.bin enigma.com enigma.in enigma.out enigma.exp );
 }

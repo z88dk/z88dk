@@ -90394,6 +90394,9 @@ switch (opts.cpu) {
 case CPU_GBZ80:
 do { asm_cond_LABEL(stmt_label); add_opcode(0xCB37); } while(0);
 break;
+case CPU_Z80N:
+do { asm_cond_LABEL(stmt_label); add_opcode(0xED23); } while(0);
+break;
 default: error_illegal_ident(); }
 }
 	break;

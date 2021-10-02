@@ -8756,7 +8756,8 @@ ED 20 %n                           |             |            |             |   
                                    |             |            |             |                       |         |               |                 |              
 ED 21 %n                           |             |            |             |                       |         |out0 (%n), h   |                 |              
                                    |             |            |             |                       |         |               |                 |              
-ED 23                              |             |            |             |                       |         |               |                 |swapnib       
+ED 23                              |             |            |             |                       |         |               |                 |swap a        
+                                   |             |            |             |                       |         |               |                 |swapnib       
                                    |             |            |             |                       |         |               |                 |              
 ED 24                              |             |            |             |                       |         |test a, h      |                 |mirror a      
                                    |             |            |             |                       |         |test h         |                 |              

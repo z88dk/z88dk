@@ -1402,6 +1402,8 @@ for my $cpu (@CPUS) {
 	# Z80N opcodes for ZX Next
 	if ($z80n) {
 		add_opc($cpu, "swapnib", 		0xED, 0x23);
+		add_opc($cpu, "swap a", 		0xED, 0x23);
+		
 		add_opc($cpu, "mirror a", 		0xED, 0x24);
 		add_opc($cpu, "bsla de,b",		0xED, 0x28);
 		add_opc($cpu, "bsra de,b",		0xED, 0x29);

@@ -6023,7 +6023,6 @@
  sub a', l                      ; Error
  sures                          ; Error
  swap (hl)                      ; Error
- swap a                         ; Error
  swap b                         ; Error
  swap c                         ; Error
  swap d                         ; Error
