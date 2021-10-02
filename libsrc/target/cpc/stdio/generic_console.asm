@@ -18,7 +18,6 @@
 
 	EXTERN	generic_console_flags
 	EXTERN	CRT_FONT
-	EXTERN	conio_map_colour
 
 	defc	SCREEN = 0xc000
 
@@ -26,7 +25,6 @@ generic_console_set_attribute:
 	ret
 
 generic_console_set_ink:
-	call	conio_map_colour
 	ld	d,a
 	and	15		;Maximum
 	call	convert_to_mode0
@@ -39,7 +37,6 @@ generic_console_set_ink:
 	ret
 
 generic_console_set_paper:
-	call	conio_map_colour
 	ld	d,a
 	and	15		;Maximum
 	call	convert_to_mode0

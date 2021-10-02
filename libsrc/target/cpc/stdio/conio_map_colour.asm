@@ -2,7 +2,6 @@
 ;
 
 	SECTION		code_clib
-	PUBLIC		conio_map_colour
 	PUBLIC		conio_map_colour_firmware
 	PUBLIC		cpc_set_ansi_palette
 
@@ -13,10 +12,6 @@
 ; Map ANSI colours to firmware colours
 conio_map_colour_firmware:
 	ld	hl,ansipalette
-	jr	do_mapping
-
-conio_map_colour:
-        ld      hl,table
 do_mapping:
         ld      c,__CLIB_CONIO_NATIVE_COLOUR
         rr      c
@@ -51,11 +46,8 @@ loop:
 	ret
 
 
-	SECTION rodata_clib
 
-; Mapping betwen ANSI colours and hardware colour
-table:	defb	0,15,2,3,4,5,6,7,8
-	defb	9,10,11,12,13,14,1
+	SECTION rodata_clib
 
 ; Mapping to firmware colours from ANSI colours
 
