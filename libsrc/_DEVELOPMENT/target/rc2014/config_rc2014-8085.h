@@ -62,7 +62,6 @@
 #define __8085  0x01
 
 #define __CPU_INFO  0x00
-#define __CPU_INFO_ENABLE_UNDOCUMENTED  0x01
 
 
 

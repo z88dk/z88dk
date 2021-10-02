@@ -12,10 +12,7 @@ EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 .fputc_cons_acia
     ; enter    : a = char to output
     ;
-    ; modifies : af
-    push hl                     ; store HL so we don't clobber it
-    ld l,a                      ; preserve Tx character
-
+    ; modifies : af, de, hl
     ld a,(aciaTxCount)          ; get the number of bytes in the Tx buffer
     or a                        ; check whether the buffer is empty
     jp NZ,fputc_cons_tx         ; buffer not empty, so abandon immediate Tx
@@ -24,10 +21,10 @@ EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
     and __IO_ACIA_SR_TDRE       ; check whether a byte can be transmitted
     jp Z,fputc_cons_tx          ; if not, so abandon immediate Tx
 
-    ld a,l                      ; retrieve Tx character
-    out (__IO_ACIA_DATA_REGISTER),a     ; immediately output the Tx byte to the ACIA
+    ld de,sp+2                  ; retrieve Tx character
+    ld a,(de)
+    out (__IO_ACIA_DATA_REGISTER),a ; immediately output the Tx byte to the ACIA
 
-    pop hl                      ; recover HL
     ret                         ; and just complete
 
 .fputc_cons_tx
@@ -35,7 +32,8 @@ EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
     cp __IO_ACIA_TX_SIZE-1      ; check whether there is space in the buffer
     jp NC,fputc_cons_tx         ; buffer full, so wait till it has space
 
-    ld a,l                      ; retrieve Tx character
+    ld de,sp+2                  ; retrieve Tx character
+    ld a,(de)
 
     ld hl,(aciaTxIn)            ; get the pointer to where we poke
     ld (hl),a                   ; write the Tx byte to the aciaTxIn
@@ -51,8 +49,6 @@ ENDIF
 
     ld hl,aciaTxCount
     inc (hl)                    ; atomic increment of Tx count
-
-    pop hl                      ; recover HL
 
     ld a,(aciaControl)          ; get the ACIA control echo byte
     and __IO_ACIA_CR_TEI_RTS0   ; test whether ACIA interrupt is set

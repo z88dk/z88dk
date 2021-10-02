@@ -9,9 +9,9 @@ EXTERN aciaRxCount, aciaRxOut, aciaRxBuffer, aciaControl
 EXTERN asm_z80_push_di, asm_z80_pop_ei
 
 .fgetc_cons_acia
-    ; exit     : a = char received
+    ; exit     : hl = char received
     ;
-    ; modifies : af
+    ; modifies : af, hl
 
     ld a,(aciaRxCount)          ; get the number of bytes in the Rx buffer
     or a                        ; see if there are zero bytes available
@@ -29,8 +29,6 @@ EXTERN asm_z80_push_di, asm_z80_pop_ei
     out (__IO_ACIA_CONTROL_REGISTER),a    ; set the ACIA CTRL register
 
 .fgetc_cons_rx
-    push hl                     ; store HL so we don't clobber it
-
     ld hl,(aciaRxOut)           ; get the pointer to place where we pop the Rx byte
     ld a,(hl)                   ; get the Rx byte
 
@@ -50,6 +48,6 @@ ENDIF
     ld hl,aciaRxCount
     dec (hl)                    ; atomically decrement Rx count
 
-    pop hl                      ; recover HL
+    ld l,a
+    ld h,0
     ret
-

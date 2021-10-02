@@ -69,7 +69,6 @@ defc __8085 = 0x01
 
 
 defc __CPU_INFO = 0x00
-defc __CPU_INFO_ENABLE_UNDOCUMENTED = 0x01
 
 
 
