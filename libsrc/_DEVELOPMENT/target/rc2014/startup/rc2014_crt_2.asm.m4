@@ -230,14 +230,18 @@ ENDIF
     EXTERN  aciaRxBuffer
     EXTERN  aciaTxBuffer
 
+    ld a,$1D
+    sim                         ; reset R7.5,
+                                ; set MSE to mask R7.5 & R5.5
+
     ld a,__IO_ACIA_CR_RESET     ; Master Reset the ACIA
     out (__IO_ACIA_CONTROL_REGISTER),a
 
     ld a,__IO_ACIA_CR_REI|__IO_ACIA_CR_TDI_RTS0|__IO_ACIA_CR_8N2|__IO_ACIA_CR_CLK_DIV_64
                                 ; load the default ACIA configuration
                                 ; 8n2 at 115200 baud
-                                ; receive interrupt enabled
-                                ; transmit interrupt disabled
+                                ; receive interrupt on R6.5 enabled
+                                ; transmit interrupt on R6.5 disabled
     ld (aciaControl),a          ; write the ACIA control byte echo
     out (__IO_ACIA_CONTROL_REGISTER),a  ; output to the ACIA control
 
