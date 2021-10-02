@@ -145,7 +145,8 @@ ENDIF
 
 PUBLIC aciaRxBuffer
 
-aciaRxBuffer:   defs    __IO_ACIA_RX_SIZE  ; Space for the Rx Buffer
+.aciaRxBuffer
+    defs    __IO_ACIA_RX_SIZE  ; Space for the Rx Buffer
 
 ; pad to next boundary
 
@@ -198,7 +199,8 @@ ENDIF
 
 PUBLIC aciaTxBuffer
 
-aciaTxBuffer:   defs    __IO_ACIA_TX_SIZE  ; Space for the Tx Buffer
+.aciaTxBuffer
+    defs    __IO_ACIA_TX_SIZE  ; Space for the Tx Buffer
 
 ; pad to next boundary
 

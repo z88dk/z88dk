@@ -33,7 +33,6 @@ EXTERN asm_z80_push_di, asm_z80_pop_ei
     ld a,(hl)                   ; get the Rx byte
 
     inc l                       ; move the Rx pointer low byte along
-
 IF __IO_ACIA_RX_SIZE != 0x100
     push af
     ld a,__IO_ACIA_RX_SIZE-1    ; load the buffer size, (n^2)-1
@@ -42,7 +41,6 @@ IF __IO_ACIA_RX_SIZE != 0x100
     ld l,a                      ; return the low byte to l
     pop af
 ENDIF
-
     ld (aciaRxOut),hl           ; write where the next byte should be popped
 
     ld hl,aciaRxCount
