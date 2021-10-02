@@ -390,7 +390,7 @@ IF (__crt_enable_nmi <= 1)
       
 ENDIF
 
-IF __crt_org_vector_table = -0x0080
+IF (__crt_org_vector_table = -0x0080)
 
 ; place vector table at address 0x0080
 
@@ -428,9 +428,7 @@ error_zc:
 
 section code_crt_start
 
-ENDIF
-
-IF (__crt_org_vector_table = -0x0100)
+ELIF (__crt_org_vector_table = -0x0100)
 
 ; place vector table at address 0x0100
 

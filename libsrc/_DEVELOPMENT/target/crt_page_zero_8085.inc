@@ -461,7 +461,7 @@ ENDIF
 
    ret
 
-IF __crt_org_vector_table = -0x0080
+IF (__crt_org_vector_table = -0x0080)
 
 ; place vector table at address 0x0080
 
@@ -499,9 +499,7 @@ PUBLIC error_zc
 
 section code_crt_start
 
-ENDIF
-
-IF (__crt_org_vector_table = -0x0100)
+ELIF (__crt_org_vector_table = -0x0100)
 
 ; place vector table at address 0x0100
 
@@ -733,6 +731,14 @@ PUBLIC l_readword_hl
    ALIGN 0x0100
 
 section code_crt_start
+
+ELSE
+
+; address = 0x080
+
+   ALIGN 0x0080
+
+section code_crt_init
 
 ENDIF
 
