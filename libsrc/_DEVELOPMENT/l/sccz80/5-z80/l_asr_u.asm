@@ -6,18 +6,16 @@
 ;
 ;       22/3/99 djm Rewritten to be shorter.. unsigned version
 
-SECTION code_clib
-SECTION code_l_sccz80
+                SECTION   code_crt0_sccz80
+                PUBLIC    l_asr_u
+		PUBLIC    l_asr_u_hl_by_e
 
-PUBLIC l_asr_u
-PUBLIC l_asr_u_hl_by_e
-
-EXTERN l_lsr_hl
-
-l_asr_u:
-
-   ex de,hl
-l_asr_u_hl_by_e:
-   ld a,e
-   
-   jp l_lsr_hl
+.l_asr_u
+        ex      de,hl
+.l_asr_u_hl_by_e
+.l_asr_u_1
+        dec     e
+        ret     m
+	srl	h
+        rr      l
+        jp      l_asr_u_1
