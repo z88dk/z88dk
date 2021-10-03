@@ -42,7 +42,7 @@ ENDIF
 
         ld a,(aciaRxCount)          ; get the current Rx count
         cp __IO_ACIA_RX_FULLISH     ; compare the count with the preferred full size
-        jr NZ,tx_check              ; leave the RTS low, and check for Rx/Tx possibility
+        jp NZ,tx_check              ; leave the RTS low, and check for Rx/Tx possibility
 
         ld a,(aciaControl)          ; get the ACIA control echo byte
         and ~__IO_ACIA_CR_TEI_MASK  ; mask out the Tx interrupt bits
@@ -61,7 +61,7 @@ ENDIF
 
         ld a,(aciaTxCount)          ; get the number of bytes in the Tx buffer
         or a                        ; check whether it is zero
-        jr Z,tx_tei_clear           ; if the count is zero, then disable the Tx Interrupt
+        jp Z,tx_tei_clear           ; if the count is zero, then disable the Tx Interrupt
 
         ld hl,(aciaTxOut)           ; get the pointer to place where we pop the Tx byte
         ld a,(hl)                   ; get the Tx byte

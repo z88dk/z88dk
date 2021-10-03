@@ -230,10 +230,6 @@ ENDIF
     EXTERN  aciaRxBuffer
     EXTERN  aciaTxBuffer
 
-    ld a,$1D
-    sim                         ; reset R7.5,
-                                ; set MSE to mask R7.5 & R5.5
-
     ld a,__IO_ACIA_CR_RESET     ; Master Reset the ACIA
     out (__IO_ACIA_CONTROL_REGISTER),a
 
@@ -256,6 +252,9 @@ ENDIF
     xor a                       ; reset empties the Tx & Rx buffers
     ld (aciaRxCount),a          ; reset the Rx counter (set 0)
     ld (aciaTxCount),a          ; reset the Tx counter (set 0)
+
+    ld a,$1D
+    sim                         ; reset R7.5, set MSE and unmask R6.5
 
 SECTION code_crt_init           ; user and library initialization
 

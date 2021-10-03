@@ -14,7 +14,7 @@ EXTERN aciaTxCount, aciaTxOut, aciaTxBuffer, aciaControl
 
     in a,(__IO_ACIA_STATUS_REGISTER)  ; get the status of the ACIA
     rrca                        ; check whether a byte has been received, via __IO_ACIA_SR_RDRF
-    jp NC,tx_send               ; if not, go check for bytes to transmit 
+    jr NC,tx_send               ; if not, go check for bytes to transmit 
 
 .rx_get
     in a,(__IO_ACIA_DATA_REGISTER)    ; Get the received byte from the ACIA 
@@ -22,7 +22,7 @@ EXTERN aciaTxCount, aciaTxOut, aciaTxBuffer, aciaControl
 
     ld a,(aciaRxCount)          ; Get the number of bytes in the Rx buffer
     cp __IO_ACIA_RX_SIZE-1      ; check whether there is space in the buffer
-    jp NC,tx_check              ; buffer full, check if we can send something
+    jr NC,tx_check              ; buffer full, check if we can send something
 
     ld a,l                      ; get Rx byte from l
     ld hl,(aciaRxIn)            ; get the pointer to where we poke
@@ -53,11 +53,11 @@ ENDIF
 .tx_check
     in a,(__IO_ACIA_STATUS_REGISTER)  ; get the status of the ACIA
     rrca                        ; check whether a byte has been received, via __IO_ACIA_SR_RDRF
-    jp C,rx_get                 ; another byte received, go get it
+    jr C,rx_get                 ; another byte received, go get it
 
 .tx_send
     rrca                        ; check whether a byte can be transmitted, via __IO_ACIA_SR_TDRE
-    jp NC,tx_end                ; if not, we're done for now
+    jr NC,tx_end                ; if not, we're done for now
 
     ld a,(aciaTxCount)          ; get the number of bytes in the Tx buffer
     or a                        ; check whether it is zero
@@ -78,7 +78,7 @@ ENDIF
     ld hl,aciaTxCount
     dec (hl)                    ; atomically decrement current Tx count
 
-    jp NZ,tx_end                ; if we've more Tx bytes to send, we're done for now
+    jr NZ,tx_end                ; if we've more Tx bytes to send, we're done for now
 
 .tx_tei_clear
     ld a,(aciaControl)          ; get the ACIA control echo byte

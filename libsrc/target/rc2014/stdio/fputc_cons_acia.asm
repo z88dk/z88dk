@@ -10,16 +10,16 @@ EXTERN aciaTxCount, aciaTxIn, aciaTxBuffer, aciaControl
 EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 
 .fputc_cons_acia
-    ; enter    : a = char to output
+    ; enter    : (sp+2) = char to output
     ;
     ; modifies : af, de, hl
     ld a,(aciaTxCount)          ; get the number of bytes in the Tx buffer
     or a                        ; check whether the buffer is empty
-    jp NZ,fputc_cons_tx         ; buffer not empty, so abandon immediate Tx
+    jr NZ,fputc_cons_tx         ; buffer not empty, so abandon immediate Tx
 
     in a,(__IO_ACIA_STATUS_REGISTER)    ; get the status of the ACIA
     and __IO_ACIA_SR_TDRE       ; check whether a byte can be transmitted
-    jp Z,fputc_cons_tx          ; if not, so abandon immediate Tx
+    jr Z,fputc_cons_tx          ; if not, so abandon immediate Tx
 
     ld de,sp+2                  ; retrieve Tx character
     ld a,(de)
@@ -30,7 +30,7 @@ EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
 .fputc_cons_tx
     ld a,(aciaTxCount)          ; Get the number of bytes in the Tx buffer
     cp __IO_ACIA_TX_SIZE-1      ; check whether there is space in the buffer
-    jp NC,fputc_cons_tx         ; buffer full, so wait till it has space
+    jr NC,fputc_cons_tx         ; buffer full, so wait till it has space
 
     ld de,sp+2                  ; retrieve Tx character
     ld a,(de)

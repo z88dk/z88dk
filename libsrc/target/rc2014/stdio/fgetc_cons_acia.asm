@@ -9,7 +9,7 @@ EXTERN aciaRxCount, aciaRxOut, aciaRxBuffer, aciaControl
 EXTERN asm_z80_push_di, asm_z80_pop_ei
 
 .fgetc_cons_acia
-    ; exit     : hl = char received
+    ; exit     : l = char received
     ;
     ; modifies : af, hl
 
@@ -46,6 +46,5 @@ ENDIF
     ld hl,aciaRxCount
     dec (hl)                    ; atomically decrement Rx count
 
-    ld l,a
-    ld h,0
+    ld l,a                      ; and put it in hl
     ret
