@@ -63,3 +63,11 @@ ${NEWLIB_ROOT}l/sccz80/9-common/l_gint
 ${NEWLIB_ROOT}l/sccz80/9-common/l_bool
 ${NEWLIB_ROOT}l/sccz80/9-common/l_le
 ${NEWLIB_ROOT}l/sccz80/9-common/l_case
+${NEWLIB_ROOT}l/sccz80/9-common/f48/__convert_sdccf2reg
+${NEWLIB_ROOT}l/sccz80/9-common/f48/extra
+${NEWLIB_ROOT}l/sccz80/9-common/f48/fa
+${NEWLIB_ROOT}l/sccz80/9-common/f48/__atof2
+${NEWLIB_ROOT}l/sccz80/9-common/f48/fasign
+${NEWLIB_ROOT}l/sccz80/9-common/f48/fp_seed
+${NEWLIB_ROOT}l/sccz80/9-common/f48/int2long_u_float
+${NEWLIB_ROOT}l/sccz80/9-common/f48/int2long_s_float

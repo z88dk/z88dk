@@ -36,5 +36,9 @@ ${NEWLIB_ROOT}l/sccz80/8-8080/l_glong
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_asl
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_asr_u
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_div
+${NEWLIB_ROOT}l/sccz80/8-8080/f48/dstore
+${NEWLIB_ROOT}l/sccz80/8-8080/f48/dpush2
+${NEWLIB_ROOT}l/sccz80/8-8080/f48/dldpsh
+${NEWLIB_ROOT}l/sccz80/8-8080/f48/dload
 @${NEWLIB_ROOT}l/sccz80/common.lst
 
