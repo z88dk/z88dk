@@ -276,7 +276,7 @@ void outstr(const char *ptr)
 
 void outfmt(const char* fmt, ...)
 {
-    char buf[1024];
+    char buf[32768];
     va_list ap;
 
     va_start(ap, fmt);
