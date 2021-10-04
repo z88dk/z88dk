@@ -21,7 +21,7 @@
         ret Z                       ; if the count is zero, then return
 
         cp __IO_ACIA_RX_EMPTYISH    ; compare the count with the preferred empty size
-        jr NC,getc_clean_up_rx      ; if the buffer not emptyish, don't change the RTS
+        jp NZ,getc_clean_up_rx      ; if the buffer is too full, don't change the RTS
 
         di                          ; critical section begin
         ld a,(aciaControl)          ; get the ACIA control echo byte

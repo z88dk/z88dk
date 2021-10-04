@@ -277,6 +277,11 @@ int main(int argc, char** argv)
         WriteDefined("CPU_8080", 1);
     }
 
+    if ( c_cpu == CPU_8085 ) {
+        c_notaltreg = 1;
+        WriteDefined("CPU_8085", 1);
+    }
+
     if ( c_cpu == CPU_GBZ80 ) {
         c_notaltreg = 1;
         WriteDefined("CPU_GBZ80", 1);

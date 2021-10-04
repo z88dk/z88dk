@@ -17,12 +17,11 @@
         ; modifies : af, hl
 
         ld a,(siobRxCount)          ; get the number of bytes in the Rx buffer
-        ld l,a                      ; and put it in hl
         or a                        ; see if there are zero bytes available
         ret Z                       ; if the count is zero, then return
 
-;       cp __IO_SIO_RX_EMPTYISH     ; compare the count with the preferred empty size
-;       jr NC,getc_clean_up         ; if the buffer NOT emptyish, don't change the RTS
+        cp __IO_SIO_RX_EMPTYISH     ; compare the count with the preferred empty size
+        jp NZ,getc_clean_up         ; if the buffer NOT emptyish, don't change the RTS
                                     ; this means retrieving characters will be slower
                                     ; when the buffer is emptyish.
                                     ; Better than the reverse case.
@@ -33,11 +32,7 @@
         out (__IO_SIOB_CONTROL_REGISTER),a  ; write the SIOB R5 register
 
     getc_clean_up:
-        ld hl,siobRxCount
-        di
-        dec (hl)                    ; atomically decrement Rx count
         ld hl,(siobRxOut)           ; get the pointer to place where we pop the Rx byte
-        ei
         ld a,(hl)                   ; get the Rx byte
 
         inc l                       ; move the Rx pointer low byte along
@@ -50,6 +45,9 @@ IF __IO_SIO_RX_SIZE != 0x100
         pop af
 ENDIF
         ld (siobRxOut),hl           ; write where the next byte should be popped
+
+        ld hl,siobRxCount
+        dec (hl)                    ; atomically decrement Rx count
 
         ld l,a                      ; put the byte in hl
         scf                         ; indicate char received

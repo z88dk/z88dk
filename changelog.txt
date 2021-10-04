@@ -25,7 +25,8 @@ Detailed but incomplete changelist:
 - [classic] +zx: Improved Interface 1/Microdrive support
 - [classic] +zx: esxdos and plus3 fcntl enhancements
 - [newlib] ZX0 decompression functions added
-- [newlib] +rc2014: Support for shadow RAM copying
+- [newlib] +rc2014: Support for shadow RAM copying (disabled by default)
+- [newlib] +rc2014: 8085 CPU support through hybrid classic library
 - [newlib] +zxn: dot files are now created correctly
 - [sccz80] Temporary files now removed on windows
 - [sccz80] Bug fixes + optimisations

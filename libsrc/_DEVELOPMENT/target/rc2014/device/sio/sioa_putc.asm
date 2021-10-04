@@ -37,6 +37,7 @@
         jr NC,putc_buffer_tx_overflow   ; buffer full, so drop the Tx byte and return
 
         ld a,l                      ; Tx byte
+
         ld hl,sioaTxCount
         inc (hl)                    ; atomic increment of Tx count
         ld hl,(sioaTxIn)            ; get the pointer to where we poke

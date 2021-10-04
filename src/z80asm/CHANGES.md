@@ -3,18 +3,20 @@ Z88DK Z80 Module Assembler Change Log
 
 2021
 ----
-- 2021-01-18 Fix #1671: Define INCBIN as alias to BINARY
-- 2021-07-22 Fix #1821 - create a new record type in the object file to handle gbz80 offsets to 0xff00
-- 2021-08-03 Fix #1823 - add jp k et all to 8085
+- 2021-01-18 Fix #1671 Define INCBIN as alias to BINARY
+- 2021-07-22 Fix #1821 create a new record type in the object file to handle gbz80 offsets to 0xff00
+- 2021-08-03 Fix #1823 add jp k et all to 8085
 - 2021-08-03 Fix #1104 Rename z80asm to z88dk-z80asm
 - 2021-08-05 Fix #1823 ld de,hl
-- 2021-08-15 Fix #1823 - 8085 implementation of ld hl,sp+N
+- 2021-08-15 Fix #1823 8085 implementation of ld hl,sp+N
 - 2021-08-16 Add DEFS len,"string" for fixed-len-filled strings (thanks @o-marshmallow)
 - 2021-08-23 replace --cpu=r2k with --cpu=r2ka
 - 2021-08-24 Ignore duplicate __CDBINFO__, __C_LINE_ / __ASM_LINE_ fixes
-- 2021-09-08 Fix #1852: accept C_LINE inside DEFVARS and DEFGROUP
-- 2021-09-15 Fix #1856 - store strings in object file as word-counted strings
-- 2021-09-25 Fix #1865 - emulate de-indirect loads
+- 2021-09-08 Fix #1852 accept C_LINE inside DEFVARS and DEFGROUP
+- 2021-09-15 Fix #1856 store strings in object file as word-counted strings
+- 2021-09-25 Fix #1865 emulate de-indirect loads
+- 2021-09-30 Fix #1869 detect and report symbols not defined because of circular dependencies
+- 2021-10-01 Fix #1874 illegal identifier swap a 
 
 2020
 ----

@@ -12,7 +12,6 @@ define(`__8085', 0x01)
 # CPU info
 
 define(`__CPU_INFO', 0x00)
-define(`__CPU_INFO_ENABLE_UNDOCUMENTED', 0x01)
 
 #
 # END OF USER CONFIGURATION
@@ -29,7 +28,6 @@ ifdef(`CFG_ASM_PUB',
 PUBLIC `__8085'
 
 PUBLIC `__CPU_INFO'
-PUBLIC `__CPU_INFO_ENABLE_UNDOCUMENTED'
 ')
 
 dnl#
@@ -42,7 +40,6 @@ defc `__8085' = __8085
 
 
 defc `__CPU_INFO' = __CPU_INFO
-defc `__CPU_INFO_ENABLE_UNDOCUMENTED' = __CPU_INFO_ENABLE_UNDOCUMENTED
 ')
 
 dnl#
@@ -55,5 +52,4 @@ ifdef(`CFG_C_DEF',
 `#define' `__8085'  __8085
 
 `#define' `__CPU_INFO'  __CPU_INFO
-`#define' `__CPU_INFO_ENABLE_UNDOCUMENTED'  __CPU_INFO_ENABLE_UNDOCUMENTED
 ')

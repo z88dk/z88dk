@@ -201,9 +201,9 @@ IF DEFINED_USING_amalloc
     ld (_heap),hl
 ENDIF
 
-   ; copy interrupt vector table to final location
+    ; copy interrupt vector table to final location
 
-   include "../crt_set_interrupt_mode.inc"
+    include "../crt_set_interrupt_mode.inc"
 
 SECTION code_crt_init           ; user and library initialization
 
@@ -321,6 +321,18 @@ IF CLIB_BALLOC_TABLE_SIZE > 0
 ENDIF
 
 SECTION data_crt
+
+PUBLIC  fgetc_cons
+EXTERN  fgetc_cons_basic
+
+    defc DEFINED_fgetc_cons = 1
+    defc fgetc_cons = fgetc_cons_basic
+
+PUBLIC  fputc_cons
+EXTERN  fputc_cons_basic
+
+    defc DEFINED_fputc_cons = 1
+    defc fputc_cons = fputc_cons_basic
 
 include "../../../../../lib/crt/classic/crt_runtime_selection.asm" 
 
