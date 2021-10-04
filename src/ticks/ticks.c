@@ -4688,6 +4688,7 @@ int main (int argc, char **argv){
     }
   } while ( pc != end && st < counter  );
   if ( alarmtime != 0 ) {
+     if ( rc2014_mode ) exit(l);
       /* We running as a test, we should never reach the end, so exit with error */
       exit(1);
   }
