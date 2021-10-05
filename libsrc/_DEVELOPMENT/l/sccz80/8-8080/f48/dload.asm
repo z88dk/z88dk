@@ -1,7 +1,8 @@
         
-	SECTION	  code_crt0_sccz80
-        PUBLIC    dload
-	EXTERN	  fa
+SECTION code_clib
+SECTION code_l_sccz80
+PUBLIC    dload
+EXTERN	  fa
 
 ;----------------
 ; Load FA from hl

@@ -2,9 +2,10 @@
 ;       Long functions
 ;
 
-                SECTION   code_crt0_sccz80
-		PUBLIC    l_glong
-		PUBLIC    l_glonghlp
+SECTION code_clib
+SECTION code_l_sccz80
+PUBLIC    l_glong
+PUBLIC    l_glonghlp
 
 
 ;Fetch long dehl from (hl)

@@ -1,7 +1,7 @@
 ; sccz80 crt0 library - 8085 version
 
-SECTION code_crt0_sccz80
-
+SECTION code_clib
+SECTION code_l_sccz80
 PUBLIC l_rlde
 
 ; {DE <r<r 1}

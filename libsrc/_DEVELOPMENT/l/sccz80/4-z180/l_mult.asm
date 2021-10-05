@@ -1,7 +1,8 @@
 
 
-	SECTION   code_crt0_sccz80
-	PUBLIC		l_mult
+SECTION code_clib
+SECTION code_l_sccz80
+PUBLIC	l_mult
 
 ; Entry: hl = value1
 ;        de = value2

@@ -28,9 +28,10 @@
 
 
 
-	SECTION	code_crt0_sccz80
-	PUBLIC	___div16_bcde
-	PUBLIC	___divu16_bcde
+SECTION code_clib
+SECTION code_l_sccz80
+PUBLIC	___div16_bcde
+PUBLIC	___divu16_bcde
 
         ;; 16-bit division
         ;;

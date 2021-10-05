@@ -5,8 +5,9 @@
 ;       6/9/98  djm
 
 
-                SECTION   code_crt0_sccz80
-                PUBLIC    l_asl
+SECTION code_clib
+SECTION code_l_sccz80
+PUBLIC    l_asl
 
 
 ; shift DE left arithmetically by HL, move to HL

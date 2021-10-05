@@ -10,7 +10,7 @@
 
 
 IF  __CPU_RABBIT__
-        SECTION code_crt0_sccz80
+        SECTION code_l_sccz80
         PUBLIC  __z80asm__daa
 
 __z80asm__daa:

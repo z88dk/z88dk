@@ -190,7 +190,9 @@ stacktop:
     ; As a result, we need to ensure that compiler support routines,
     ; screen routines are in low memory and can't be
     ; paged out
-    SECTION code_crt0_sccz80
+    SECTION code_l
+    SECTION code_l_sdcc
+    SECTION code_l_sccz80
     SECTION code_graphics
     SECTION code_driver
     SECTION data_graphics

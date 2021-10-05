@@ -2,7 +2,7 @@
 ; aralbrec 02.2008
 ; flag-perfect emulation of cpir
 
-        SECTION code_crt0_sccz80
+        SECTION code_l_sccz80
         PUBLIC  __z80asm__cpir
 
 IF  __CPU_GBZ80__

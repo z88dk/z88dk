@@ -1,8 +1,9 @@
 
 
-        SECTION	code_crt0_sccz80
-	PUBLIC	dstore
-	EXTERN  fa
+SECTION code_clib
+SECTION code_l_sccz80
+PUBLIC	dstore
+EXTERN  fa
 
 
 ;--------------

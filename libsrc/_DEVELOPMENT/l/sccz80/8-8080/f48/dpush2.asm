@@ -1,7 +1,8 @@
         
-	SECTION	  code_crt0_sccz80
-        PUBLIC    dpush2
-	EXTERN	  fa
+SECTION code_clib
+SECTION code_l_sccz80
+PUBLIC    dpush2
+EXTERN	  fa
 
 ;------------------------------------------------------
 ; Push FA onto stack under ret address and stacked word

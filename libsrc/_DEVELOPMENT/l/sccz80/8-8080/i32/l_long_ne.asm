@@ -1,7 +1,7 @@
 ; sccz80 crt0 library - 8080 version
 
-SECTION code_crt0_sccz80
-
+SECTION code_clib
+SECTION code_l_sccz80
 PUBLIC l_long_ne
 
 EXTERN l_long_ucmp

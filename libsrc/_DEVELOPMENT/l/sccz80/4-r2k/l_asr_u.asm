@@ -3,8 +3,10 @@
 ; Shift de right by hl bits
 ;
 ;
-                SECTION   code_crt0_sccz80
-                PUBLIC    l_asr_u
+SECTION code_clib
+SECTION code_l_sccz80
+
+PUBLIC l_asr_u
 
 ; Entry: hl = bit shift counter
 ;        de = value to shift

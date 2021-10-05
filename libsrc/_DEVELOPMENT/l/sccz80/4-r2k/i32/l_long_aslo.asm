@@ -11,7 +11,8 @@
 ;       aralbrec 01/2007
 ;       switched to shifts from slower doubling using de/hl
 
-                SECTION   code_crt0_sccz80
+SECTION code_clib
+SECTION code_l_sccz80
 PUBLIC l_long_aslo
 
 ; Shift primary left by secondary

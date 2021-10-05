@@ -2,7 +2,8 @@
 ;       l_glong variant to be used sometimes by the peephole optimizer
 
 
-                SECTION   code_crt0_sccz80
+SECTION code_clib
+SECTION code_l_sccz80
 PUBLIC    l_glongsp
 
 

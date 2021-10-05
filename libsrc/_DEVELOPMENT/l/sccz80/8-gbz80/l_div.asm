@@ -1,8 +1,9 @@
 
 
-	SECTION	code_crt0_sccz80
-	PUBLIC	l_div
-	EXTERN	___div16_bcde
+SECTION code_clib
+SECTION code_l_sccz80
+PUBLIC	l_div
+EXTERN	___div16_bcde
 
 ; signed division
 ; hl = de/hl, de = de%hl

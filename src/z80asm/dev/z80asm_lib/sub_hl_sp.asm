@@ -8,7 +8,7 @@
 ; z80   151   151
 ; z80n  151   151
 
-        SECTION code_crt0_sccz80
+        SECTION code_l_sccz80
         PUBLIC  __z80asm__sub_hl_sp
 
 __z80asm__sub_hl_sp:

@@ -8,10 +8,10 @@
 ;       shifts are faster than doubling and ex with de/hl
 
 
-    SECTION code_crt0_sccz80
-
-    PUBLIC l_long_asl
-    PUBLIC l_long_aslo
+SECTION code_clib
+SECTION code_l_sccz80
+PUBLIC l_long_asl
+PUBLIC l_long_aslo
 
 
 ; Shift primary left by secondary

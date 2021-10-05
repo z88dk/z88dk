@@ -11,7 +11,8 @@
 ;
 ;       djm 22/3/99 Unsigned version
 
-                SECTION   code_crt0_sccz80
+SECTION code_clib
+SECTION code_l_sccz80
 PUBLIC    l_long_asr_u
 
 ; Shift primary (on stack) right by secondary, 

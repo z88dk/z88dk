@@ -4,7 +4,8 @@
 ;       Stefano - 30/4/2002
 ;
 
-SECTION   code_crt0_sccz80
+SECTION code_clib
+SECTION code_l_sccz80
 
 PUBLIC l_long_ucmp
 EXTERN __retloc
