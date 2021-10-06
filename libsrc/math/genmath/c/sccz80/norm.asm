@@ -37,7 +37,7 @@
         SUB     8       ;adjust exponent
         CP      $D0
         JR      NZ,NORM2
-	jp	norm4
+        jp      norm4
 ;
 .NORM8  DEC     B
 ;                       shift  c ix d hl  left one bit...
@@ -63,4 +63,4 @@
         LD      (HL),A
         JP      NC,norm4        ;nc => underflow (set to 0)
         RET     Z               ;z => underflow (leave as 0)
-	jp	pack
+        jp      pack

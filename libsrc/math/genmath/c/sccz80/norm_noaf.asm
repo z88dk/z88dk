@@ -13,7 +13,6 @@
 
 	EXTERN	pack
 	EXTERN	norm4
-	EXTERN	afswap
 
 	EXTERN	fa
 
@@ -39,21 +38,18 @@
         CP      $D0
         JR      NZ,NORM2
         jp      norm4
-
 ;
 .NORM8  DEC     B
 ;                       shift  c ix d hl  left one bit...
         ADD     HL,HL
         RL      D
-        ;EX      AF,AF'
-		call	afswap
+        call    afswap  ;EX      AF,AF'
         ADD     IX,IX
-        ;EX      AF,AF'
-		call	afswap
+        call	afswap  ;EX      AF,AF'
         JR      NC,NORM10
         INC     IX
-.NORM10 ;EX      AF,AF'
-		call	afswap
+.NORM10 
+        call    afswap  ;EX      AF,AF'
         RL      C       ;...end of shifting
 ;
 .NORM12 JP      P,NORM8 ;p => high order bit still zero
@@ -71,8 +67,7 @@
         jp      pack
 
 
-.afswap
-        ;EX      AF,AF'
+.afswap                 ;EX      AF,AF'
         push    hl
         push    af
         ld      hl,(af1)
@@ -85,4 +80,4 @@
 
 	SECTION	bss_crt
 
-af1:	defw	0
+af1:    defw    0
