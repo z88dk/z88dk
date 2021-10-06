@@ -69,3 +69,20 @@
         JP      NC,norm4        ;nc => underflow (set to 0)
         RET     Z               ;z => underflow (leave as 0)
         jp      pack
+
+
+.afswap
+        ;EX      AF,AF'
+        push    hl
+        push    af
+        ld      hl,(af1)
+        ex      (sp),hl
+        ld      (af1),hl
+        pop     af
+        pop     hl
+        ret
+
+
+	SECTION	bss_crt
+
+af1:	defw	0
