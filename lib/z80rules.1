@@ -6600,6 +6600,25 @@
 	jp	%2z,%3
 	ld	hl,%4
 
+%title Redundant swap
+	ld	l,h
+	ld	a,l
+	and	a
+	jp	%1,%2	;
+	ld	hl,%3
+=
+	ld	a,h
+	and	a
+	jp	%1,%2	;
+	ld	hl,%3
+
+	ld	a,l
+	ld	(%1),a
+	ld	a,l
+=
+	ld	a,l
+	ld	(%1),a
+
 %title De-dupe labels
 .i_%1
 .i_%2
@@ -6616,3 +6635,16 @@
 %once
 ; --- Start of Optimiser additions ---
 	defc	i_%1 = i_%2
+
+%title Jump to ret
+.i_%1
+	ret
+=
+%activate
+	j%"p|r"	i_%1	;%%2
+=
+	ret
+%activate
+	j%"p|r"	%%2,i_%1	;%%3
+=
+	ret	%%2

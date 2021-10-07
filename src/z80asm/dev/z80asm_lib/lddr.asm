@@ -2,7 +2,7 @@
 ; Doesn't emulate the flags correctly
 
 
-        SECTION code_crt0_sccz80
+        SECTION code_l_sccz80
         PUBLIC  __z80asm__lddr
 
 __z80asm__lddr:

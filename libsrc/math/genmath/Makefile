@@ -19,11 +19,19 @@ $(OUTPUT_DIRECTORY)/genmath.lib: $(addprefix obj/z80/, $(OBJECTS))
 $(OUTPUT_DIRECTORY)/genmath_iy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/genmath_iy @genmath.lst
 
-$(OUTPUT_DIRECTORY)/genmath_zx81.lib: $(addprefix obj/ixiy/, $(OBJECTS))
-	TYPE=ixiy $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/genmath_zx81 @genmathzx81.lst
+$(OUTPUT_DIRECTORY)/genmath_zx81.lib: $(addprefix obj/ixiy_zx81/, $(OBJECTS))
+	TYPE=ixiy_zx81 $(LIBLINKER) -IXIY -x$(OUTPUT_DIRECTORY)/genmath_zx81 @genmathzx81.lst
+
+obj/ixiy_zx81/%.o: %.asm
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -I$(Z88DK_LIBSRC) -IXIY -mz80 -D__CLASSIC $(AFLAGS) $^
+	@mv $(^:.asm=.o) $@
+
+obj/ixiy_zx81/%.o: %.c
+	$(ZCC) +test -mz80 -Ca-IXIY -Cl-IXIY $(CFLAGS) -o $@  $^
+
 
 dirs:
-	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80
+	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80 obj/ixiy_zx81/c/sccz80
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt

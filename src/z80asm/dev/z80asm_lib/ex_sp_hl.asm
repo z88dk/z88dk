@@ -9,7 +9,7 @@
 ; z80n   19    19
 
 IF  __CPU_GBZ80__
-        SECTION code_crt0_sccz80
+        SECTION code_l_sccz80
         PUBLIC  __z80asm__ex_sp_hl
 
 __z80asm__ex_sp_hl:

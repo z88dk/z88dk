@@ -13,8 +13,7 @@
 @im2/im2_sdcc.lst
 @input/cpm/input_sdcc_iy.lst
 @inttypes/inttypes_sdcc_iy.lst
-@l/l.lst
-@l/sdcc.lst
+@l/l_z180.lst
 @libgen/libgen_sdcc.lst
 @locale/locale.lst
 @math/math_integer.lst

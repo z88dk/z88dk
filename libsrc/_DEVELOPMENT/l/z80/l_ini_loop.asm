@@ -1,5 +1,7 @@
 INCLUDE "config_private.inc"
 
+IF !__CPU_RABBIT__
+
 SECTION code_clib
 SECTION code_l
 
@@ -48,4 +50,5 @@ sub_16:
    inir
    ret
 
+ENDIF
 ENDIF

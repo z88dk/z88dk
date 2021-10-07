@@ -1,4 +1,6 @@
 
+IF !__CPU_RABBIT__
+
 SECTION code_clib
 SECTION code_l
 
@@ -8,3 +10,4 @@ l_ei_reti:
 
    ei
    reti
+ENDIF

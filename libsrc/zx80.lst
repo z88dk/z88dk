@@ -33,7 +33,6 @@ target/zx81/games/bit_fx4
 target/zx81/games/beeper
 target/zx81/games/bit_synth
 @games/games.lst
-z80_crt0s/z80_emu/afswap
 @target/zx81/arch_zx81.lst
 target/zx81/psg/set_psg
 target/zx81/psg/set_psg_callee

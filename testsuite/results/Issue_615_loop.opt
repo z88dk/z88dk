@@ -97,7 +97,7 @@
 	ld	hl,(_var)
 	ld	a,h
 	or	l
-	jp	z,i_21	;
+	ret	z
 	call	_whilefunc
 	jp	i_20	;EOS
 .i_21

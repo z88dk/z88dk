@@ -9,7 +9,6 @@
     SECTION rodata_driver       ;Keep it in low memoey
     SECTION code_compiler
     SECTION code_clib
-    SECTION code_crt0_sccz80
     SECTION code_l
     SECTION code_l_sdcc
     SECTION code_l_sccz80

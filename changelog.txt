@@ -5,23 +5,27 @@ z88dk v2.2 - xx.xx.xxx
 
 Detailed but incomplete changelist:
 
+- [all] Compressed data can now use ZX0 compression tools
+- [all] math32 optimisations
+- [appmake] Compressed ROM data sections can now use zx0
+- [classic] features.h added for improved portability
+- [classic] ZX0,1,2 decompression functions added
+- [classic] +cpc: Screen driver fixes
 - [classic] +cpm: Amstrad, Televideo, Bondwell disc creation
 - [classic] +cpm: support for Bondwell 2 console and graphics
 - [classic] +cpm: Amstrad PCW Graphics library
-- [appmake] Compressed ROM data sections can now use zx0
-- [all] Compressed data can now use ZX0 compression tools
-- [all] math32 optimisations
-- [classic] ZX0 decompression functions added
-- [classic] +radio86: New target for the Radio86 family
 - [classic] +cpm: New subtypes for Bondwell 12/14 and 2
 - [classic] +cpm: Removal of code that made it incompatible with the z180
 - [classic] +cpm: GSX graphics library
 - [classic] +cpm/msxdos1: fcntl speedup via caching
-- [classic] +msx: (msxdos) Time functions now available
 - [classic] +gl: GL6000 support improved
+- [classic] +msx: (msxdos) Time functions now available
 - [classic] +pc88: Graphics reworked and optimised
+- [classic] +radio86: New target for the Radio86 family
 - [classic] +sam: Extensively reworked and improved
 - [classic] +vg5k: 8x10 fonts and UDGs now usable
+- [classic] +ts2068/zxn: "fatpix" available in hires mode
+- [classic] +z88: Support for the OZ5 apps and shell
 - [classic] +zx: Improved Interface 1/Microdrive support
 - [classic] +zx: esxdos and plus3 fcntl enhancements
 - [newlib] ZX0 decompression functions added
@@ -30,6 +34,8 @@ Detailed but incomplete changelist:
 - [newlib] +zxn: dot files are now created correctly
 - [sccz80] Temporary files now removed on windows
 - [sccz80] Bug fixes + optimisations
+- [sccz80] Debug information using -debug
+- [ticks] Start of symbolic debugging
 - [z80asm] Now supports assembling undocumented 8085 instructions
 - [z80asm] Replace --cpu=r2k with --cpu=r2ka
 - [zsdcc] Upgraded to SDCC 4.1.6 r12555 (bugfixes)

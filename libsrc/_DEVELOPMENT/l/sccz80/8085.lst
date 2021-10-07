@@ -1,0 +1,4 @@
+${NEWLIB_ROOT}l/sccz80/7-8085/l_mult
+${NEWLIB_ROOT}l/sccz80/7-8085/l_asr
+${NEWLIB_ROOT}l/sccz80/7-8085/l_rlde
+@${NEWLIB_ROOT}l/sccz80/8080.lst

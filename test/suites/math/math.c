@@ -29,6 +29,9 @@
    #define TINY_POSITIVE TINY_POS_AM9511
 #else
    #define EPSILON (0.000000001)
+#ifndef FLT_MIN
+#define FLT_MIN      1.0e-38
+#endif
    #define TINY_POSITIVE FLT_MIN
 #endif
 

@@ -1,7 +1,7 @@
 ; Substitute for z80 cpd instruction
 ; aralbrec 06.2007
 
-        SECTION code_crt0_sccz80
+        SECTION code_l_sccz80
         PUBLIC  __z80asm__cpd
 
 IF  __CPU_GBZ80__

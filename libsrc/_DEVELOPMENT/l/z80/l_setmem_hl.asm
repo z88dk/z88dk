@@ -3,6 +3,7 @@ SECTION code_clib
 SECTION code_l
 
 PUBLIC l_setmem_hl
+PUBLIC l_setmem
 
    ; write byte to buffer pointed at by hl
    ; invoke with "call l_setmem_hl - (n*2)" to write n bytes to memory
@@ -51,5 +52,6 @@ PUBLIC l_setmem_hl
    inc hl
 
 l_setmem_hl:
+l_setmem:
 
    ret
