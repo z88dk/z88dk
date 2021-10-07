@@ -1,6 +1,6 @@
 SECTION code_driver
 
-PUBLIC _disk_status_fastcall
+PUBLIC disk_status_fastcall
 
 EXTERN asm_disk_status
 
@@ -11,4 +11,4 @@ EXTERN asm_disk_status
 
 ; get the ide drive status
 
-defc _disk_status_fastcall = asm_disk_status
+defc disk_status_fastcall = asm_disk_status

@@ -1,6 +1,6 @@
 SECTION code_driver
 
-PUBLIC _disk_initialize
+PUBLIC disk_initialize
 
 EXTERN asm_disk_initialize
 
@@ -11,7 +11,7 @@ EXTERN asm_disk_initialize
 
 ; initialize the ide drive
 
-_disk_initialize:
+disk_initialize:
 
     pop af
     pop hl
