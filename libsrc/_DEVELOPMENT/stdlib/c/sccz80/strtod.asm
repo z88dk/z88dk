@@ -1,9 +1,9 @@
 
-; double strtod(const char *nptr, char **endptr)
+; double strtod(const char *nptr, char **endptr) __smallc
 
 PUBLIC strtod
 
-EXTERN asm_strtod
+EXTERN mlib2d, asm_strtod
 
 strtod:
 
@@ -15,7 +15,9 @@ strtod:
    push de
    push af
    
-   jp asm_strtod
+   call asm_strtod
+
+   jp mlib2d                   ; to sccz80_float
 
 ; SDCC bridge for Classic
 IF __CLASSIC
