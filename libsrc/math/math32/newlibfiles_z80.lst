@@ -98,6 +98,7 @@
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/mul2_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/mul10u.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/mul10u_fastcall.asm
+../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/mlib2d.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/round_fastcall.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/cos.asm
 ../../_DEVELOPMENT/math/float/math32/lm32/c/sccz80/l_f32_f2long.asm

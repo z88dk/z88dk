@@ -13,6 +13,9 @@ SECTION code_clib
 PUBLIC zx81toasc
 EXTERN zx81_cnvtab
 
+EXTERN __CLIB_ZX_CAPITAL_TRANSFORM
+EXTERN __CLIB_ZX_INVERSE_TRANSFORM
+
 .zx81toasc
 	ld	a,(hl)
 	push	hl
@@ -32,14 +35,14 @@ EXTERN zx81_cnvtab
 	jr	c,isntchar
 	cp	64
 	jr	nc,isntchar
-	add	59	; Ok, lowercase
+	sub	__CLIB_ZX_CAPITAL_TRANSFORM
 	jr	setout	; .. and put it out
 .isntchar
 	cp	166	; Between A and Z ?
 	jr	c,isntchar1
 	cp	192
 	jr	nc,isntchar1
-	sub 101	; Uppercase
+	sub	__CLIB_ZX_INVERSE_TRANSFORM
 	jr	setout	; .. and put it out
 .isntchar1
 	ld	hl,zx81_cnvtab

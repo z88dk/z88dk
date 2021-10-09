@@ -17,7 +17,7 @@
 
 // Make intellisense run easier..
 #ifdef __clang__
-#define __smallc 
+#define __smallc
 #define __z88dk_callee
 #define __z88dk_fastcall
 #endif
@@ -28,11 +28,15 @@
 #endif
 
 #ifdef __8080__
-#define __DISABLE_BUILTIN 
+#define __DISABLE_BUILTIN
+#endif
+
+#ifdef __8085__
+#define __DISABLE_BUILTIN
 #endif
 
 #if __SDCC && __GBZ80__
-#define __DISABLE_BUILTIN 
+#define __DISABLE_BUILTIN
 #define __z88dk_fastcall
 #endif
 

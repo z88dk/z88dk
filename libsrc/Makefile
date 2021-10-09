@@ -689,8 +689,8 @@ cpm_clib.lib:
 	@echo ''
 	@echo '--- Building GSX based Z88DK GFX Library ---'
 	@echo ''
-	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide
-	TARGET=cpm TYPE=z80 $(LIBLINKER) -DFORcpm -x$(OUTPUT_DIRECTORY)/gfxgsx @$(LISTFILE_DIRECTORY)/target/cpm/gfxgsx.lst
+	$(MAKE) -C gfx TARGET=cpm SUBTYPE=gsx FLAVOUR=wide
+	TARGET=gsx TYPE=z80 $(LIBLINKER) -DFORcpm -DFORgsx -x$(OUTPUT_DIRECTORY)/gfxgsx @$(LISTFILE_DIRECTORY)/target/cpm/gfxgsx.lst
 
 cpm8080_clib.lib:
 	@echo ''

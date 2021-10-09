@@ -74,6 +74,7 @@ math/float/am9511/lam32/c/sccz80/log2_fastcall
 math/float/am9511/lam32/c/sccz80/log10
 math/float/am9511/lam32/c/sccz80/log10_fastcall
 math/float/am9511/lam32/c/sccz80/log_fastcall
+math/float/am9511/lam32/c/sccz80/mlib2d
 math/float/am9511/lam32/c/sccz80/modf
 math/float/am9511/lam32/c/sccz80/modf_callee
 math/float/am9511/lam32/c/sccz80/mul2

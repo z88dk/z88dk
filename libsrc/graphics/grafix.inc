@@ -761,9 +761,11 @@ ENDIF
 ; HiRez display should stay between 512..800 px.
 ; We keep an average value
 IF FORcpm
+  IF FORgsx
     DEFINE gotgfx
     defc maxx    = 1920        ; foo value hopefully larger than the max X resolution
     defc maxy    = 768        ; we keep unbalanced proportions, assuming non-square pixels
+  ENDIF
 ENDIF
 
 ; =============================================

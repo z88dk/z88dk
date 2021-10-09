@@ -85,6 +85,7 @@ math/float/math48/c/sccz80/cm48_sccz80_log2
 math/float/math48/c/sccz80/cm48_sccz80_logb
 math/float/math48/c/sccz80/cm48_sccz80_lrint
 math/float/math48/c/sccz80/cm48_sccz80_lround
+math/float/math48/c/sccz80/cm48_sccz80_m482d
 math/float/math48/c/sccz80/cm48_sccz80_modf
 math/float/math48/c/sccz80/cm48_sccz80_modf_callee
 math/float/math48/c/sccz80/cm48_sccz80_nan

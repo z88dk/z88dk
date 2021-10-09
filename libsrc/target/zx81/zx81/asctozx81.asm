@@ -14,6 +14,9 @@ PUBLIC asctozx81
 PUBLIC asctozx81_entry_reg
 EXTERN zx81_cnvtab
 
+EXTERN __CLIB_ZX_LOWER_CASE_TRANSFORM
+EXTERN __CLIB_ZX_UPPER_CASE_TRANSFORM
+
 .asctozx81
 	ld	a,(hl)
 .asctozx81_entry_reg
@@ -29,14 +32,14 @@ EXTERN zx81_cnvtab
 	jr	c,isntlower
 	cp	123
 	jr	nc,isntlower
-	sub	59	; Recode to upper
+	add	+(__CLIB_ZX_LOWER_CASE_TRANSFORM % 256)
 	jr	setout
 .isntlower
 	cp	65	; Between A and Z ?
 	jr	c,isntchar
 	cp	91
 	jr	nc,isntchar
-	add 101	; Ok, re-code to the ZX81 charset (upper and inverted)
+	add	+(__CLIB_ZX_UPPER_CASE_TRANSFORM % 256)
 	jr	setout	; .. and put it out
 .isntchar
 	ld	hl,zx81_cnvtab
