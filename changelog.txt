@@ -193,7 +193,7 @@ A more detailed (incomplete) changelist follows:
 - [classiclib] +c128 improvements
 - [classiclib] [math48] #108: Single parameter library math functions now work correctly
 - [classiclib] +rcmx000 support has been restored and optimisations applied
-- [classiclib] builtin functions are enabled for both sccz80 and zsdcc, disable thema ll
+- [classiclib] builtin functions are enabled for both sccz80 and zsdcc, disable them all
   with -D__DISABLE_BUILTIN or individually with __DISABLE_BUILTIN_[function]
 - [classiclib] +sms fixed an issue with tile corruption due to sdcc compatiblity
   code being inserted in the wrong place
