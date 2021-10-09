@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------------------
 // die - check results and die on error
-// Copyright (C) Paulo Custodio, 2011-2020
+// Copyright (C) Paulo Custodio, 2011-2021
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #include "unity.h"

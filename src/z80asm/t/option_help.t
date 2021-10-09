@@ -18,7 +18,7 @@ ok $version, "version $version";
 
 run("./z88dk-z80asm -h", 0, <<"END", "");
 Z80 Module Assembler $version
-(c) InterLogic 1993-2009, Paulo Custodio 2011-2020
+(c) InterLogic 1993-2009, Paulo Custodio 2011-2021
 
 Usage:
   z80asm [options] { \@<modulefile> | <filename> }
