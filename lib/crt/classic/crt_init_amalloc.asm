@@ -11,8 +11,8 @@
 ;EXTERN ASMTAIL
 ;PUBLIC _heap
 ;._heap
-;	defw ASMTAIL	; Location of the last program byte
-;	defw 0
+;   defw ASMTAIL    ; Location of the last program byte
+;   defw 0
 ;ENDIF
 
 
@@ -21,12 +21,7 @@
 IF CRT_MAX_HEAP_ADDRESS
     ld      hl,CRT_MAX_HEAP_ADDRESS
 ELSE
-IF __CPU_8080__ || __CPU_GBZ80__
-    ld      hl,0
-    add     hl,sp
-ELSE
     ld      hl,sp
-ENDIF
 ENDIF
     ; HL must hold SP or the end of free memory
     push    hl
@@ -42,7 +37,7 @@ ENDIF
     dec     hl
     ld      (hl),a
 
-    pop     hl	; sp
+    pop     hl      ; sp
 
 IF __CPU_8085__
     sub     hl,bc   ; hl = total free memory
@@ -125,7 +120,7 @@ ENDIF
     sbc     hl,de   ;  leave 1/4 of the free memory for the stack
 ENDIF
 
-    push    bc ; main address for malloc area
-    push    hl	; area size
+    push    bc      ; main address for malloc area
+    push    hl      ; area size
     EXTERN  sbrk_callee
     call    sbrk_callee
