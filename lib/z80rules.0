@@ -23,17 +23,6 @@
 	dec	hl
 	ld	(%1),hl
 
-	ld	hl,(%1)
-	ld	h,0
-	%2c	hl
-	ld	a,l
-	ld	(%1),a
-=
-	ld	hl,%1
-	%2c	(hl)
-	ld	l,(hl)
-	ld	h,0
-
 	call	l_pint
 	ld	a,h
 	or	l
@@ -133,58 +122,6 @@
 	inc	hl
 	inc	hl
 	push	hl
-
-	pop	hl
-	push	hl
-	ld	bc,%1
-	add	hl,bc
-	ld	(hl),%2
-	inc	hl
-	ld	(hl),%3
-	pop	hl
-	push	hl
-	ld	bc,%4
-	add	hl,bc
-=
-	pop	hl
-	push	hl
-	ld	bc,%1
-	add	hl,bc
-	ld	(hl),%2
-	inc	hl
-	ld	(hl),%3
-	ld	bc,%eval( %4 %1 - 1 -)
-	add	hl,bc
-
-	pop	hl
-	push	hl
-	ld	bc,%1
-	add	hl,bc
-	ld	(hl),%2
-	pop	hl
-	push	hl
-	ld	bc,%3
-	add	hl,bc
-=
-	pop	hl
-	push	hl
-	ld	bc,%1
-	add	hl,bc
-	ld	(hl),%2
-	ld	bc,%eval(%3 %1 -)
-	add	hl,bc
-
-%notcpu gbz80
-	ld	hl,%1	;const
-	push	hl
-	call	l_gint	;%3
-	%2c	hl
-	pop	de
-	call	l_pint
-=
-	ld	hl,(%1)
-	%2c	hl
-	ld	(%1),hl
 
 	call	l_eq
 	ld	de,0	;const
@@ -630,6 +567,7 @@
 	ld	(%1),hl
 	ld	hl,%3
 
+%notcpu gbz80
 	ld	hl,%1
 	ld	(hl),+(%2 %% 256)
 	inc	hl
@@ -640,6 +578,7 @@
 	ld	(%1),hl
 	ld	hl,%3
 
+%notcpu gbz80
 	ld	hl,%1
 	ld	(%2),hl
 	ld	hl,%1	;const
