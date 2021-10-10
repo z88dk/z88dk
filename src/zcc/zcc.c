@@ -1416,8 +1416,10 @@ int main(int argc, char **argv)
                 else
                     q = original_filenames[i];
 
-                snprintf(tmp, sizeof(tmp) - 3, "MODULE %s\n"
-                         "LINE 0, \"%s\"\n\n", q, original_filenames[i]);
+                snprintf(tmp, sizeof(tmp) - 3, 
+						 "MODULE %s%s\n"
+                         "LINE 0, \"%s\"\n\n", 
+						isdigit(*q) ? "_" : "", q, original_filenames[i]);
 
                 /* change non-alnum chars in module name to underscore */
 

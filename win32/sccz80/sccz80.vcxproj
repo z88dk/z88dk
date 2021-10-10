@@ -127,7 +127,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <CustomBuildStep>
-      <Command>copy /y $(OutDir)$(TargetName)$(TargetExt) ..\..\bin\$(TargetName)$(TargetExt)</Command>
+      <Command>copy /y $(OutDir)$(TargetName)$(TargetExt) ..\..\bin\z88dk-$(TargetName)$(TargetExt)</Command>
     </CustomBuildStep>
     <CustomBuildStep>
       <Outputs>..\..\bin\$(TargetName)$(TargetExt)</Outputs>
