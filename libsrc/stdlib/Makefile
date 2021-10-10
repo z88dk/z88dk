@@ -17,7 +17,8 @@ ASMFILES_GBZ80 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extrac
 NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm"
 
 NEWLIBGLOBS_8080 := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*rand*.asm" \
-	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*abs.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/abs.asm" \
+	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/labs.asm" \
 	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atoi.asm" \
 	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/atol.asm" \
 	"$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/itoa*.asm" \
