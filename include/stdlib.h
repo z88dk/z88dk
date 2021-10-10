@@ -74,12 +74,12 @@ extern long long strtoll_callee(char *nptr,char **endptr,int base) __z88dk_calle
 
 
 extern unsigned long long strtoull(char *nptr,char **endptr,int base) __smallc;
-extern unsigned long long strtoull_callee(char *nptr,char **endptr,int base) __z88dk_callee __smallc;;
+extern unsigned long long strtoull_callee(char *nptr,char **endptr,int base) __z88dk_callee __smallc;
 #define strtoull(a,b,c) strtoull_callee(a,b,c)
 
 
-extern char *ulltoa(unsigned long long num,char *buf,int radix) __smallc;;
-extern char *ulltoa_callee(unsigned long long num,char *buf,int radix) __z88dk_callee __smallc;;
+extern char *ulltoa(unsigned long long num,char *buf,int radix) __smallc;
+extern char *ulltoa_callee(unsigned long long num,char *buf,int radix) __z88dk_callee __smallc;
 #define ulltoa(a,b,c) ulltoa_callee(a,b,c)
 #endif
 
