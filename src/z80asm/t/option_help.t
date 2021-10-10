@@ -77,7 +77,7 @@ Binary Output:
   -d                     Assemble only updated files
   -rADDR                 Relocate binary file to given address (decimal or hex)
   -R                     Create relocatable code
-  -reloc-info            Geneate binary file relocation information
+  -reloc-info            Generate binary file relocation information
   -fBYTE                 Default value to fill in DEFS (decimal or hex)
 
 Output File Options:
