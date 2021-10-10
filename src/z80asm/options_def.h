@@ -100,7 +100,7 @@ OPT(OptSet, &opts.split_bin, "-split-bin", "", "Create one binary file per secti
 OPT(OptSet, &opts.date_stamp, "-d", "", "Assemble only updated files", "")
 OPT(OptCallArg, option_origin, "-r", "", "Relocate binary file to given address (decimal or hex)", "ADDR")
 OPT(OptSet, &opts.relocatable, "-R", "", "Create relocatable code", "")
-OPT(OptSet, &opts.reloc_info, "-reloc-info", "", "Geneate binary file relocation information", "")
+OPT(OptSet, &opts.reloc_info, "-reloc-info", "", "Generate binary file relocation information", "")
 OPT(OptCallArg, option_filler, "-f", "", "Default value to fill in DEFS (decimal or hex)", "BYTE")
 
 OPT_TITLE("Output File Options:")
