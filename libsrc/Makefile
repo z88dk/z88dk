@@ -1914,8 +1914,6 @@ classic-clean:
 	$(MAKE) -C debug clean
 	$(MAKE) -C lib3d clean
 	$(MAKE) -C input clean	
-	$(RM) abc80/*.o
-	$(RM) abc800/*.o
 	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
@@ -1928,6 +1926,7 @@ classic-clean:
 	$(MAKE) -C target clean
 	$(MAKE) -C video clean
 	$(MAKE) -C gfx clean
+	$(RM) graphics/retrofit/*.o
 	$(RM) *.lib
 
 new-clean:
