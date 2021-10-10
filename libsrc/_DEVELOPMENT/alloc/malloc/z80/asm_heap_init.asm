@@ -40,8 +40,7 @@ asm_heap_init:
    ;
    ; uses  : af, bc, de, hl
 
-   ld e,l
-   ld d,h                      ; de = void *heap
+   ld de,hl                    ; de = void *heap
    
    push hl                     ; save void *heap
    push bc                     ; save num bytes

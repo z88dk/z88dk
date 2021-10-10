@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2020
+Copyright (C) Paulo Custodio, 2011-2021
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -107,17 +107,17 @@ extern int range_size(range_t range);
 *----------------------------------------------------------------------------*/
 CLASS(Expr)
 ExprOpArray* rpn_ops;			/* list of operands / operators in reverse polish notation */
-Str* text;				/* expression in infix text */
+Str*		text;				/* expression in infix text */
 
 /* flags set during eval */
 struct {
 	bool not_evaluable : 1;		/* true if expression did not retunr a value */
 	bool undefined_symbol : 1;	/* true if expression contains one undefined symbol */
 	bool extern_symbol : 1;		/* true if expression contains one EXTERN symbol */
-	bool cross_section_addr : 1;	/* true if expression referred to symbol on another section */
+	bool cross_section_addr : 1;/* true if expression referred to symbol on another section */
 } result;
 
-range_t		 range;			/* range of expression result */
+range_t		 range;				/* range of expression result */
 
 sym_type_t	 type;				/* highest type of symbols used in expression */
 bool		 is_computed : 1;	/* true if all values in expression have been computed */
@@ -128,8 +128,8 @@ const char* target_name;		/* name of the symbol, stored in strpool,
 
 struct Module* module;			/* module where expression is patched (weak ref) */
 struct Section* section;		/* section where expression is patched (weak ref) */
-int		 asmpc;				/* ASMPC value during linking */
-int		 code_pos;			/* Address to patch expression value */
+int			asmpc;				/* ASMPC value during linking */
+int			code_pos;			/* Address to patch expression value */
 
 const char* filename;			/* file and line where expression defined, string in strpool */
 int			 line_nr;			/* source line */

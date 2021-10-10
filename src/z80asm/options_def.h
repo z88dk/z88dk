@@ -2,7 +2,7 @@
 Z88DK Z80 Macro Assembler
 
 Copyright (C) Gunther Strube, InterLogic 1993-99
-Copyright (C) Paulo Custodio, 2011-2020
+Copyright (C) Paulo Custodio, 2011-2021
 License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 Repository: https://github.com/z88dk/z88dk
 
@@ -100,7 +100,7 @@ OPT(OptSet, &opts.split_bin, "-split-bin", "", "Create one binary file per secti
 OPT(OptSet, &opts.date_stamp, "-d", "", "Assemble only updated files", "")
 OPT(OptCallArg, option_origin, "-r", "", "Relocate binary file to given address (decimal or hex)", "ADDR")
 OPT(OptSet, &opts.relocatable, "-R", "", "Create relocatable code", "")
-OPT(OptSet, &opts.reloc_info, "-reloc-info", "", "Geneate binary file relocation information", "")
+OPT(OptSet, &opts.reloc_info, "-reloc-info", "", "Generate binary file relocation information", "")
 OPT(OptCallArg, option_filler, "-f", "", "Default value to fill in DEFS (decimal or hex)", "BYTE")
 
 OPT_TITLE("Output File Options:")

@@ -18,7 +18,7 @@ ok $version, "version $version";
 
 run("./z88dk-z80asm -h", 0, <<"END", "");
 Z80 Module Assembler $version
-(c) InterLogic 1993-2009, Paulo Custodio 2011-2020
+(c) InterLogic 1993-2009, Paulo Custodio 2011-2021
 
 Usage:
   z80asm [options] { \@<modulefile> | <filename> }
@@ -77,7 +77,7 @@ Binary Output:
   -d                     Assemble only updated files
   -rADDR                 Relocate binary file to given address (decimal or hex)
   -R                     Create relocatable code
-  -reloc-info            Geneate binary file relocation information
+  -reloc-info            Generate binary file relocation information
   -fBYTE                 Default value to fill in DEFS (decimal or hex)
 
 Output File Options:
