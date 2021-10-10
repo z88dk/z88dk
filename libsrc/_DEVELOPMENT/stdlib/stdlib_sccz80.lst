@@ -4,6 +4,8 @@ stdlib/c/sccz80/atexit
 stdlib/c/sccz80/atof
 stdlib/c/sccz80/atoi
 stdlib/c/sccz80/atol
+stdlib/c/sccz80/atoll
+stdlib/c/sccz80/atoll_callee
 stdlib/c/sccz80/at_quick_exit
 stdlib/c/sccz80/bsearch
 stdlib/c/sccz80/bsearch_callee
@@ -27,8 +29,12 @@ stdlib/c/sccz80/ftoh_callee
 stdlib/c/sccz80/itoa
 stdlib/c/sccz80/itoa_callee
 stdlib/c/sccz80/labs
+stdlib/c/sccz80/llabs
+stdlib/c/sccz80/llabs_callee
 stdlib/c/sccz80/ltoa
 stdlib/c/sccz80/ltoa_callee
+stdlib/c/sccz80/lltoa
+stdlib/c/sccz80/lltoa_callee
 stdlib/c/sccz80/qsort
 stdlib/c/sccz80/qsort_callee
 stdlib/c/sccz80/quick_exit
@@ -40,9 +46,15 @@ stdlib/c/sccz80/strtof
 stdlib/c/sccz80/strtof_callee
 stdlib/c/sccz80/strtol
 stdlib/c/sccz80/strtol_callee
+stdlib/c/sccz80/strtoll
+stdlib/c/sccz80/strtoll_callee
 stdlib/c/sccz80/strtoul
 stdlib/c/sccz80/strtoul_callee
+stdlib/c/sccz80/strtoull
+stdlib/c/sccz80/strtoull_callee
 stdlib/c/sccz80/system
+stdlib/c/sccz80/ulltoa
+stdlib/c/sccz80/ulltoa_callee
 stdlib/c/sccz80/ultoa
 stdlib/c/sccz80/ultoa_callee
 stdlib/c/sccz80/utoa

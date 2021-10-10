@@ -246,6 +246,23 @@ __DPROTO(,,char,*,ulltoa,unsigned long long num,char *buf,int radix)
 
 #endif
 
+#ifdef __SCCZ80
+
+extern long long atoll(char *buf);
+extern long long atoll_callee(char *buf) __z88dk_callee;
+#define atoll(a) atoll_callee(a)
+
+extern long long llabs(long long i);
+extern long long llabs_callee(long long i) __z88dk_callee;
+#define llabs(a) llabs_callee(a)
+   
+__DPROTO(,,char,*,lltoa,long long num,char *buf,int radix)
+__DPROTO(,,long long,,strtoll,char *nptr,char **endptr,int base)
+__DPROTO(,,unsigned long long,,strtoull,char *nptr,char **endptr,int base)
+__DPROTO(,,char,*,ulltoa,unsigned long long num,char *buf,int radix)
+
+#endif
+
 #ifdef __ZXNEXT
 
 __DPROTO(,,unsigned char,,mkstemp_ex,char *template)
