@@ -35,6 +35,58 @@ IFNDEF CRT_ENABLE_STDIO
     defc CRT_ENABLE_STDIO = 1
 ENDIF
 
+PUBLIC __CRT_KEY_DEL
+IFDEF CRT_KEY_DEL
+    defc __CRT_KEY_DEL = CRT_KEY_DEL
+ELSE
+    defc __CRT_KEY_DEL = 8
+ENDIF
+
+PUBLIC __CRT_KEY_CAPS_LOCK
+IFDEF CRT_KEY_CAPS_LOCK
+    defc __CRT_KEY_CAPS_LOCK  = CRT_KEY_CAPS_LOCK
+ELSE
+    defc __CRT_KEY_CAPS_LOCK = 6
+ENDIF
+
+; When using the firmware printer we may need to disable the soft
+; cursor created by fgets_cons()
+PUBLIC __CLIB_DISABLE_FGETS_CURSOR
+IFDEF CLIB_DISABLE_FGETS_CURSOR
+    defc __CLIB_DISABLE_FGETS_CURSOR = CLIB_DISABLE_FGETS_CURSOR
+ELSE
+    defc __CLIB_DISABLE_FGETS_CURSOR = 0
+ENDIF
+
+; Delay when entering fgetc_cons()
+; 50ms stops rogue repeats nicely, but may need tuning
+PUBLIC __CLIB_FGETC_CONS_DELAY
+IFDEF CLIB_FGETC_CONS_DELAY
+    defc __CLIB_FGETC_CONS_DELAY = CLIB_FGETC_CONS_DELAY
+ELSE
+    defc __CLIB_FGETC_CONS_DELAY = 50
+ENDIF
+
+; Delay when kbhit/getch() returns a cached key press
+; Delaying slightly means that typing is possible
+PUBLIC __CLIB_KBHIT_DELAY
+IFDEF CLIB_KBHIT_DELAY
+    defc __CLIB_KBHIT_DELAY = CLIB_KBHIT_DELAY
+ELSE
+    defc __CLIB_KBHIT_DELAY = 0
+ENDIF
+
+; If 32 bit floats are defined, then we need to indicate to the library
+; that they are in use (mainly for printf/scanf)
+PUBLIC CLIB_32BIT_FLOATS
+IF !DEFINED_CLIB_32BIT_FLOATS
+    defc CLIB_32BIT_FLOATS = 0
+ENDIF
+PUBLIC CLIB_64BIT_FLOATS
+IF !DEFINED_CLIB_64BIT_FLOATS
+    defc CLIB_64BIT_FLOATS = 0
+ENDIF
+   
 ; Maximum number of FILEs available
 IF !DEFINED_CLIB_FOPEN_MAX
     defc    CLIB_FOPEN_MAX = 4
@@ -73,6 +125,7 @@ include(`crt_memory_map.inc')
 SECTION CODE
 
 PUBLIC __Start, __Exit
+PUBLIC  cleanup                 ; jp'd to by exit()
 
 EXTERN _main
 
@@ -279,6 +332,7 @@ IF __clib_exit_stack_size > 0
 
 ENDIF
 
+.cleanup
 .__Exit
 
 IF !((__crt_on_exit & 0x10000) && (__crt_on_exit & 0x8))
@@ -302,6 +356,9 @@ SECTION code_crt_return
     include "../crt_restore_sp.inc"
     include "../crt_program_exit.inc"
 
+.l_dcal
+    jp (hl)                     ; used for function pointer calls
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -310,13 +367,18 @@ SECTION code_crt_return
 
 IF CRT_ENABLE_STDIO = 1
 
-    PUBLIC    __sgoioblk
-    PUBLIC    __sgoioblk_end
+    PUBLIC  __sgoioblk
+    PUBLIC  __sgoioblk_end
 .__sgoioblk
     defs    CLIB_FOPEN_MAX * 10 ; stdio control block
 .__sgoioblk_end                 ; end of stdio control block
 
 ENDIF
+
+    PUBLIC  exitsp
+    PUBLIC  exitcount
+.exitsp     defw    0           ; atexit() stack
+.exitcount  defb    0           ; number of atexit() routines
 
 IF DEFINED_USING_amalloc
 
