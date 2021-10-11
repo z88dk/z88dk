@@ -1,6 +1,3 @@
-target/excali64/stdio/fgetc_cons
-target/excali64/stdio/getk
-target/excali64/stdio/fputc_cons_native
 target/excali64/stdio/generic_console
 target/excali64/stdio/generic_console_ioctl
 target/excali64/stdio/conio_vars
@@ -12,4 +9,3 @@ target/excali64/stdio/loadudg6
 @input/input_keyboard.lst
 @gfx/gencon/gfx_gencon6.lst
 @video/mc6845/mc6845.lst
-@stdio/stdio.lst

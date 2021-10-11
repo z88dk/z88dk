@@ -1,6 +1,0 @@
-target/excali64/stdio/fgetc_cons
-target/excali64/stdio/getk
-target/excali64/stdio/fputc_cons_native
-@target/excali64/excali64.lst
-@stdio/stdio.lst
-

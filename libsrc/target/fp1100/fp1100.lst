@@ -1,11 +1,12 @@
-target/fp1100/gencon/generic_console
-target/fp1100/gencon/generic_console_ioctl
-target/fp1100/gencon/conio_vars
-target/fp1100/gencon/CRT_FONT
-target/fp1100/gencon/conio_map_colour
+target/fp1100/stdio/generic_console
+target/fp1100/stdio/generic_console_ioctl
+target/fp1100/stdio/conio_vars
+target/fp1100/stdio/CRT_FONT
+target/fp1100/stdio/conio_map_colour
 target/fp1100/stdio/fputc_cons_native
 target/fp1100/stdio/fgetc_cons
 target/fp1100/stdio/getk
+@stdio/stdio.lst
 target/fp1100/graphics/clg
 target/fp1100/graphics/textpixl
 target/fp1100/graphics/getmaxx
@@ -17,5 +18,4 @@ target/fp1100/graphics/w_xorpixl
 target/fp1100/graphics/w_pointxy
 @gfx/wide/gfx_wide.lst
 @font/font_8x8/font_8x8.lst
-target/fp1100/fp1100/subcpu_cpm
-target/fp1100/fp1100/display_cpm
+
