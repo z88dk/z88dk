@@ -20,13 +20,14 @@
                                     ; receive interrupt enabled
                                     ; transmit interrupt disabled
 
-        ld      a,CNTLA1_RE|CNTLA1_TE|CNTLA1_MODE_8N1
+        ld      a,CNTLA1_RE|CNTLA1_TE|CNTLA1_MODE_8N2
         out0    (CNTLA1),a          ; output to the ASCI1 control A reg
 
                                     ; PHI / PS / SS / DR = BAUD Rate
                                     ; PHI = 36.864MHz
                                     ; BAUD = 9600 = 36864000 / 30 / 2 / 64
                                     ; PS 1, SS_DIV_2, DR 1
+                                    ; 9600 baud 8n2
         ld a,CNTLB1_PS|CNTLB1_DR|CNTLB1_SS_DIV_2
         out0    (CNTLB1),a          ; output to the ASCI1 control B reg
 
