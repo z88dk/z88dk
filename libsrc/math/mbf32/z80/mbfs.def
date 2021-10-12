@@ -5,21 +5,21 @@
         GLOBAL  UNITY
 
 
-        GLOBAL  FPREG   ;4 bytes
-        GLOBAL  FPEXP   ;FPREG + 3 ?
-	GLOBAL	SEED	;Random seed
-	GLOBAL	LSTRND	;Last random number
+        GLOBAL  FPREG           ;4 bytes
+        GLOBAL  FPEXP           ;FPREG + 3 ?
+        GLOBAL  SEED            ;Random seed
+        GLOBAL  LSTRND          ;Last random number
 
-        GLOBAL  MULVAL  ;3 bytes
-        GLOBAL  DIVSUP  ;defb
-        GLOBAL  DIV1    ;defl
-        GLOBAL  DIV2    ;defl
-        GLOBAL  DIV3    ;3 bytes
-        GLOBAL  DIV4    ;2 bytes
-	GLOBAL	SGNRES	;1 byte
+        GLOBAL  MULVAL          ;3 bytes
+        GLOBAL  DIVSUP          ;defb
+        GLOBAL  DIV1            ;defl
+        GLOBAL  DIV2            ;defl
+        GLOBAL  DIV3            ;3 bytes
+        GLOBAL  DIV4            ;2 bytes
+        GLOBAL  SGNRES          ;1 byte
 
 
-	GLOBAL  INVSGN
+        GLOBAL  INVSGN
         GLOBAL  ADDPHL
         GLOBAL  STAKFP
         GLOBAL  FPBCDE
@@ -49,7 +49,7 @@
         GLOBAL  DCBCDE
         GLOBAL  SCALE
 
-	GLOBAL	DIV
+        GLOBAL  DIV
         GLOBAL  NEGAFT
         GLOBAL  MULT
         GLOBAL  BCDEFP
@@ -87,6 +87,6 @@
         GLOBAL  LOG
         GLOBAL  SIN
         GLOBAL  COS
-	GLOBAL	TAN
+        GLOBAL  TAN
         GLOBAL  ATN
         GLOBAL  EXP

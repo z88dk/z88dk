@@ -1,4 +1,4 @@
 
-		PUBLIC	BSERR
+        PUBLIC  BSERR
 
-BSERR:	ret
+BSERR:  ret

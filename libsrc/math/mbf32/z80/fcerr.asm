@@ -1,4 +1,4 @@
 
-		PUBLIC	FCERR
+        PUBLIC  FCERR
 
-FCERR:	ret
+FCERR:  ret

@@ -1,7 +1,7 @@
 
-	SECTION bss_fp_mbf32
+    SECTION bss_fp_mbf32
 
-	PUBLIC	MULVAL
+    PUBLIC  MULVAL
 
 
-MULVAL:	defb	0,0,0
+MULVAL: defb    0,0,0
