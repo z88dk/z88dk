@@ -35,6 +35,18 @@ IFNDEF CRT_ENABLE_STDIO
     defc CRT_ENABLE_STDIO = 1
 ENDIF
 
+PUBLIC  fgetc_cons
+EXTERN  fgetc_cons_basic
+
+    defc DEFINED_fgetc_cons = 1
+    defc fgetc_cons = fgetc_cons_basic
+
+PUBLIC  fputc_cons
+EXTERN  fputc_cons_basic
+
+    defc DEFINED_fputc_cons = 1
+    defc fputc_cons = fputc_cons_basic
+
 PUBLIC __CRT_KEY_DEL
 IFDEF CRT_KEY_DEL
     defc __CRT_KEY_DEL = CRT_KEY_DEL
@@ -89,7 +101,7 @@ ENDIF
    
 ; Maximum number of FILEs available
 IF !DEFINED_CLIB_FOPEN_MAX
-    defc    CLIB_FOPEN_MAX = 4
+    defc    CLIB_FOPEN_MAX = 10
 ENDIF
 
 PUBLIC  __FOPEN_MAX
@@ -102,15 +114,6 @@ ENDIF
 
 PUBLIC  __CLIB_OPEN_MAX
 defc    __CLIB_OPEN_MAX = CLIB_OPEN_MAX
-
-; By default allow the command line options
-IF !DEFINED_CRT_ENABLE_COMMANDLINE
-  IFDEF TAR__CRT_ENABLE_COMMANDLINE
-      defc CRT_ENABLE_COMMANDLINE = TAR__CRT_ENABLE_COMMANDLINE
-  ELSE
-      defc CRT_ENABLE_COMMANDLINE = 1
-  ENDIF
-ENDIF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; SET UP MEMORY MAP ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -125,7 +128,7 @@ include(`crt_memory_map.inc')
 SECTION CODE
 
 PUBLIC __Start, __Exit
-PUBLIC  cleanup                 ; jp'd to by exit()
+PUBLIC  cleanup                 ; jumped to by exit()
 
 EXTERN _main
 
@@ -338,6 +341,10 @@ ENDIF
 ;; RUNTIME VARS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+    SECTION data_crt
+
+include "../../../../../lib/crt/classic/crt_runtime_selection.asm" 
+
     SECTION bss_crt
 
 IF CRT_ENABLE_STDIO = 1
@@ -381,24 +388,6 @@ IF CLIB_BALLOC_TABLE_SIZE > 0
     defs CLIB_BALLOC_TABLE_SIZE * 2
 
 ENDIF
-
-SECTION data_crt
-
-PUBLIC  fgetc_cons
-EXTERN  fgetc_cons_basic
-
-    defc DEFINED_fgetc_cons = 1
-    defc fgetc_cons = fgetc_cons_basic
-
-PUBLIC  fputc_cons
-EXTERN  fputc_cons_basic
-
-    defc DEFINED_fputc_cons = 1
-    defc fputc_cons = fputc_cons_basic
-
-include "../../../../../lib/crt/classic/crt_runtime_selection.asm" 
-
-include "../crt_jump_vectors_8085.inc"
 
 IF (__crt_on_exit & 0x10000) && ((__crt_on_exit & 0x6) || ((__crt_on_exit & 0x8) && (__register_sp = -1)))
 
