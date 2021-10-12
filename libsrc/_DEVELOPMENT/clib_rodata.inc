@@ -22,6 +22,7 @@ section rodata_fp_am9511
 section rodata_fp_math48
 section rodata_fp_math32
 section rodata_fp_math16
+section rodata_fp_mbf32
 section rodata_input
 section rodata_SMSlib
 section rodata_sound_ay
