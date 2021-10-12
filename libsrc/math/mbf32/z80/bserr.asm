@@ -1,4 +1,7 @@
 
-        PUBLIC  BSERR
+    SECTION code_fp_mbf32
 
-BSERR:  ret
+    PUBLIC  BSERR
+
+BSERR:
+    ret

@@ -3,5 +3,5 @@
 
     PUBLIC  MULVAL
 
-
-MULVAL: defb    0,0,0
+MULVAL:
+    defb    0,0,0

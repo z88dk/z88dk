@@ -1,4 +1,7 @@
 
-        PUBLIC  FCERR
+    SECTION code_fp_mbf32
 
-FCERR:  ret
+    PUBLIC  FCERR
+
+FCERR:
+    ret
