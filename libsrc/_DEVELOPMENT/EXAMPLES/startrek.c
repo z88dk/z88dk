@@ -29,20 +29,25 @@
 
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
 // zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
+// zcc +rc2014 -SO2 -subtype=basic85 startrek.c -o startrek --math-mbf32_8080 -create-app
 
-#pragma printf = "%s %d %f"
+#pragma printf = "%s %3.3d %f"
 
-#pragma output CLIB_MALLOC_HEAP_SIZE   = 0            // do not create malloc heap
-#pragma output CLIB_STDIO_HEAP_SIZE    = 0            // do not create stdio heap (cannot open files)
-#pragma output CLIB_EXIT_STACK_SIZE    = 0            // do not reserve space for registering atexit() functions
-#pragma output CRT_ENABLE_COMMANDLINE  = 3            // create command line
+#pragma output CLIB_MALLOC_HEAP_SIZE    = 0             // do not create malloc heap
+#pragma output CLIB_STDIO_HEAP_SIZE     = 0             // do not create stdio heap (cannot open files)
+#pragma output CLIB_EXIT_STACK_SIZE     = 0             // do not reserve space for registering atexit() functions
+#pragma output CRT_ENABLE_COMMANDLINE   = 3             // create command line
 
 #ifdef __SPECTRUM
+#pragma output CRT_ORG_CODE             = 30000         // move ORG to 30000
+#pragma output REGISTER_SP              = -1            // indicate crt should not modify stack location
+#pragma output CRT_ENABLE_EIDI          = 0x01          // disable interrupts at start
+#endif
 
-#pragma output CRT_ORG_CODE            = 30000        // move ORG to 30000
-#pragma output REGISTER_SP             = -1           // indicate crt should not modify stack location
-#pragma output CRT_ENABLE_EIDI         = 0x01         // disable interrupts at start
-
+#ifdef __RC2014
+#pragma output CRT_ORG_CODE                 = 0x8400    // move ORG to 0x8400 for -subtype=basic85
+                                                        // also all the instruction text is omitted
+#pragma output CLIB_DISABLE_FGETS_CURSOR    = 1         // do not print a cursor
 #endif
 
 /*
@@ -1999,6 +2004,15 @@ getline_l(char *s)
 
 **********/
 
+
+#ifdef __RC2014
+
+const unsigned char *instr[] = {
+"\nThere are no instructions. You are on your own!\n",
+0 };
+
+#else
+
 const unsigned char *instr[] = {
 "\n\n",
 "1. When you see _Command?_ printed, enter one of the legal",
@@ -2109,6 +2123,8 @@ const unsigned char *instr[] = {
 "   regions referred to in the game.",
 "\n",
 0 };
+
+#endif
 
 void
 showfile(char *filename)
