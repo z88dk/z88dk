@@ -31,7 +31,7 @@
 // zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
 // zcc +rc2014 -SO2 -subtype=basic85 startrek.c -o startrek --math-mbf32_8080 -create-app
 
-#pragma printf = "%s %3.3d %f"
+#pragma printf = "%s %d %4.2f"
 
 #pragma output CLIB_MALLOC_HEAP_SIZE    = 0             // do not create malloc heap
 #pragma output CLIB_STDIO_HEAP_SIZE     = 0             // do not create stdio heap (cannot open files)
@@ -945,7 +945,7 @@ long_range_scan(void)
         if (i > 0 && i <= 8 && j > 0 && j <= 8)
           {
             z[i][j] = g[i][j];
-            printf(" %3.3d :", z[i][j]);
+            printf(" %03d :", z[i][j]);
           }
         else
           printf(" *** :");
@@ -1373,7 +1373,7 @@ galactic_record(void)
       if (z[i][j] == 0)
         printf("***");
       else
-        printf("%3.3d", z[i][j]);
+        printf("%03d", z[i][j]);
     }
 
     printf("\n");
