@@ -7,12 +7,15 @@
 ; (C) 1978 Microsoft
 ;
 ; Original source: https://github.com/feilipu/NASCOM_BASIC_4.7
+;
+; Base target CPU is 8080, exception code paths for 8085, GBZ80, & Z80.
+;
 
-	MODULE 	mbf32
+    MODULE     mbf32
 
-	SECTION	code_fp_mbf32
+    SECTION    code_fp_mbf32
 
-	INCLUDE	"mbfs.def"
+    INCLUDE    "mbfs.def"
 
 
 ROUND:  LD      HL,HALF         ; Add 0.5 to FPREG
@@ -27,7 +30,7 @@ SUBCDE: CALL    INVSGN          ; Negate FPREG
 FPADD:  LD      A,B             ; Get FP exponent
         OR      A               ; Is number zero?
         RET     Z               ; Yes - Nothing to add
-        LD      A,(FPEXP)       ; Get FPREG exponent
+        LD      A,(FPEXP)       ; Get exponent of FPREG
         OR      A               ; Is this number zero?
         JP      Z,FPBCDE        ; Yes - Move BCDE to FPREG
         SUB     B               ; BCDE number larger?
@@ -212,7 +215,6 @@ SHRT1:  RRA                     ; Shift it right
         LD      B,A             ; Re-save underflow
         JP      SHRLP           ; More bits to do
 
-
 UNITY:  DEFB     000H,000H,000H,081H    ; 1.00000
 
 LOGTAB: DEFB    3                       ; Table used by LOG
@@ -224,7 +226,7 @@ LOGTAB: DEFB    3                       ; Table used by LOG
 LOG:    CALL    TSTSGN          ; Test sign of value
 IF __CPU_GBZ80__
         bit     7,a
-        jp      nz,FCERR	; if < 0 error
+        jp      nz,FCERR    ; if < 0 error
 ELSE
         OR      A
         JP      PE,FCERR        ; ?FC Error if <= zero
@@ -274,8 +276,7 @@ ELSE
         LD      (MULVAL+1),HL   ; Save rest of multiplier
 ENDIF
         LD      BC,0            ; Partial product (BCDE) = zero
-        LD      D,B
-        LD      E,B
+        LD      DE,BC
         LD      HL,BNORM        ; Address of normalise
         PUSH    HL              ; Save for return
         LD      HL,MULT8        ; Address of 8 bit multiply
@@ -544,8 +545,7 @@ IF __CPU_GBZ80__
 ELSE
         EX      DE,HL           ; Save code string address
         LD      (FPREG),HL      ; Save LSB,NLSB of number
-        LD      H,B             ; Exponent of number
-        LD      L,C             ; MSB of number
+        LD      HL,BC           ; Exponent, MSB of number
         LD      (FPREG+2),HL    ; Save MSB and exponent
         EX      DE,HL           ; Restore code string address
 ENDIF
@@ -582,7 +582,7 @@ SIGNS:  LD      HL,FPREG+2      ; Point to MSB of FPREG
         RRA                     ; Old sign to carry
         INC     HL
         INC     HL
-        LD      (HL),A          ; Set sign of result
+        LD      (HL),A          ; Set sign of result SGNRES
         LD      A,C             ; Get MSB
         RLCA                    ; Old sign to carry
         SCF                     ; Set MSBit
@@ -688,12 +688,13 @@ INT:    LD      HL,FPEXP        ; Point to exponent
         POP     AF              ; Restore LSB of number
         RET
 
-MLDEBC: LD      HL,0            ; Clear partial product
+MLDEBC:                         ; Multiply DE by BC to HL
+        LD      HL,0            ; Clear partial product
         LD      A,B             ; Test multiplier
         OR      C
         RET     Z               ; Return zero if zero
         LD      A,16            ; 16 bits
-MLDBLP: ADD     HL,HL           ; Shift P.P left
+MLDBLP: ADD     HL,HL           ; Shift partial product left
         JP      C,BSERR         ; ?BS Error if overflow
         EX      DE,HL
         ADD     HL,HL           ; Shift multiplier left
@@ -1139,7 +1140,7 @@ ENDIF
         LD      C,A             ; BC = Offset into table
         ADD     HL,BC           ; Point to coefficient
         CALL    LOADFP          ; Coefficient to BCDE
-        CALL    FPMULT  ;       ; Multiply FPREG by coefficient
+        CALL    FPMULT          ; Multiply FPREG by coefficient
         LD      A,(SEED+1)      ; Get (SEED+1)
         INC     A               ; Add 1
         AND     00000011B       ; 0 to 3
@@ -1158,10 +1159,10 @@ RND1:   CALL    BCDEFP          ; Move FPREG to BCDE
         LD      E,C             ; LSB = MSB
         XOR     01001111B       ; Fiddle around
         LD      C,A             ; New MSB
-        LD      (HL),80H        ; Set exponent
-        DEC     HL              ; Point to MSB
-        LD      B,(HL)          ; Get MSB
-        LD      (HL),80H        ; Make value -0.5
+        LD      (HL),80H        ; Set saved signed bit to positive
+        DEC     HL              ; Point to Exponent
+        LD      B,(HL)          ; Get Exponent to BCDE
+        LD      (HL),80H        ; Makes Exponent 1
         LD      HL,SEED         ; Random number seed
         INC     (HL)            ; Count seed
         LD      A,(HL)          ; Get seed
@@ -1187,7 +1188,7 @@ RNDTAB: DEFB    068H,0B1H,046H,068H     ; Table used by RND
         DEFB    010H,0D1H,075H,068H
 
 COS:    LD      HL,HALFPI       ; Point to PI/2
-        CALL    ADDPHL          ; Add it to PPREG
+        CALL    ADDPHL          ; Add it to FPREG
 SIN:    CALL    STAKFP          ; Put angle on stack
         LD      BC,8349H        ; BCDE = 2 PI
         LD      DE,0FDBH

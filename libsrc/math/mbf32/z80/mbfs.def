@@ -1,92 +1,92 @@
 
 
-        GLOBAL  HALFPI
-        GLOBAL  HALF
-        GLOBAL  UNITY
+    GLOBAL  HALFPI
+    GLOBAL  HALF
+    GLOBAL  UNITY
 
 
-        GLOBAL  FPREG           ;4 bytes
-        GLOBAL  FPEXP           ;FPREG + 3 ?
-        GLOBAL  SEED            ;Random seed
-        GLOBAL  LSTRND          ;Last random number
+    GLOBAL  FPREG   ;4 bytes
+    GLOBAL  FPEXP   ;FPREG + 3 ?
+    GLOBAL  SEED    ;Random seed
+    GLOBAL  LSTRND  ;Last random number
 
-        GLOBAL  MULVAL          ;3 bytes
-        GLOBAL  DIVSUP          ;defb
-        GLOBAL  DIV1            ;defl
-        GLOBAL  DIV2            ;defl
-        GLOBAL  DIV3            ;3 bytes
-        GLOBAL  DIV4            ;2 bytes
-        GLOBAL  SGNRES          ;1 byte
-
-
-        GLOBAL  INVSGN
-        GLOBAL  ADDPHL
-        GLOBAL  STAKFP
-        GLOBAL  FPBCDE
-        GLOBAL  DVBCDE
-        GLOBAL  SUBPHL
-        GLOBAL  PNORM
-        GLOBAL  FLGREL
-
-        GLOBAL  TSTSGN
-        GLOBAL  RETREL
-
-        GLOBAL  ROUND
-        GLOBAL  RONDB
-        GLOBAL  INVSGN
-        GLOBAL  ADDEXP
-        GLOBAL  BNORM
-        GLOBAL  FPROND
-        GLOBAL  PLUCDE
-        GLOBAL  RESZER
-        GLOBAL  RONDUP
-        GLOBAL  SHRT1
+    GLOBAL  MULVAL  ;3 bytes
+    GLOBAL  DIVSUP  ;defb
+    GLOBAL  DIV1    ;defl
+    GLOBAL  DIV2    ;defl
+    GLOBAL  DIV3    ;3 bytes
+    GLOBAL  DIV4    ;2 bytes
+    GLOBAL  SGNRES  ;1 byte
 
 
-        GLOBAL  SUMSER
-        GLOBAL  SMSER1
+    GLOBAL  INVSGN
+    GLOBAL  ADDPHL
+    GLOBAL  STAKFP
+    GLOBAL  FPBCDE
+    GLOBAL  DVBCDE
+    GLOBAL  SUBPHL
+    GLOBAL  PNORM
+    GLOBAL  FLGREL
 
-        GLOBAL  DCBCDE
-        GLOBAL  SCALE
+    GLOBAL  TSTSGN
+    GLOBAL  RETREL
 
-        GLOBAL  DIV
-        GLOBAL  NEGAFT
-        GLOBAL  MULT
-        GLOBAL  BCDEFP
-        GLOBAL  FPMULT
-        GLOBAL  LOADFP
-        GLOBAL  FPADD
-        GLOBAL  PHLTFP
-        GLOBAL  SUBCDE
-        GLOBAL  INT
-        GLOBAL  SAVEXP
-        GLOBAL  CMPNUM
-        GLOBAL  OVTST1
-        GLOBAL  OVTST2
-        GLOBAL  OVTST3
-        GLOBAL  POPHRT
-        GLOBAL  SIGNS
-        GLOBAL  COMPL
-        GLOBAL  SGNRES
-        GLOBAL  FPINT
-        GLOBAL  CONPOS
-        GLOBAL  DIV10
+    GLOBAL  ROUND
+    GLOBAL  RONDB
+    GLOBAL  INVSGN
+    GLOBAL  ADDEXP
+    GLOBAL  BNORM
+    GLOBAL  FPROND
+    GLOBAL  PLUCDE
+    GLOBAL  RESZER
+    GLOBAL  RONDUP
+    GLOBAL  SHRT1
 
-        GLOBAL  MULLN2          ; * ln(2)
 
-        GLOBAL  RSCALE
+    GLOBAL  SUMSER
+    GLOBAL  SMSER1
 
-        GLOBAL   DZERR
-        GLOBAL   FCERR
-        GLOBAL   BSERR
-        GLOBAL   OVERR
+    GLOBAL  DCBCDE
+    GLOBAL  SCALE
 
-        GLOBAL  SQR
-        GLOBAL  POWER
-        GLOBAL  EXP
-        GLOBAL  LOG
-        GLOBAL  SIN
-        GLOBAL  COS
-        GLOBAL  TAN
-        GLOBAL  ATN
-        GLOBAL  EXP
+    GLOBAL  DIV
+    GLOBAL  NEGAFT
+    GLOBAL  MULT
+    GLOBAL  BCDEFP
+    GLOBAL  FPMULT
+    GLOBAL  LOADFP
+    GLOBAL  FPADD
+    GLOBAL  PHLTFP
+    GLOBAL  SUBCDE
+    GLOBAL  INT
+    GLOBAL  SAVEXP
+    GLOBAL  CMPNUM
+    GLOBAL  OVTST1
+    GLOBAL  OVTST2
+    GLOBAL  OVTST3
+    GLOBAL  POPHRT
+    GLOBAL  SIGNS
+    GLOBAL  COMPL
+    GLOBAL  SGNRES
+    GLOBAL  FPINT
+    GLOBAL  CONPOS
+    GLOBAL  DIV10
+
+    GLOBAL  MULLN2  ; * ln(2)
+
+    GLOBAL  RSCALE
+
+    GLOBAL   DZERR
+    GLOBAL   FCERR
+    GLOBAL   BSERR
+    GLOBAL   OVERR
+
+    GLOBAL  SQR
+    GLOBAL  POWER
+    GLOBAL  EXP
+    GLOBAL  LOG
+    GLOBAL  SIN
+    GLOBAL  COS
+    GLOBAL  TAN
+    GLOBAL  ATN
+    GLOBAL  EXP

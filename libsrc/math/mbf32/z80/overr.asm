@@ -1,7 +1,7 @@
 
-    SECTION code_fp_mbf32
+SECTION code_fp_mbf32
 
-    PUBLIC  OVERR
+PUBLIC  OVERR
 
 OVERR:
     ret
