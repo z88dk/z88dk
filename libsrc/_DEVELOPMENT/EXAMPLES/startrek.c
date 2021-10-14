@@ -29,7 +29,7 @@
 
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
 // zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
-// zcc +rc2014 -SO2 -subtype=basic85 startrek.c -o startrek --math-mbf32_8080 -create-app
+// zcc +rc2014 -SO2 -subtype=basic85 startrek.c -o startrek --math-mbf32_8085 -create-app
 
 #pragma printf = "%s %d %4.2f"
 

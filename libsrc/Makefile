@@ -226,6 +226,7 @@ daimath32.lib:
 	@echo ''
 	$(MAKE) -C math/daimath32
 
+# am9511 build - @feilipu
 am9511.lib:
 	@echo ''
 	@echo '--- Building Am9511 APU Maths Library ---'
