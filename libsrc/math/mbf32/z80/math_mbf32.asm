@@ -11,12 +11,13 @@
 ; Base target CPU is 8080, exception code paths for 8085, GBZ80, & Z80.
 ;
 
-    MODULE     mbf32
+MODULE  mbf32
 
-    SECTION    code_fp_mbf32
+SECTION code_fp_mbf32
 
-    INCLUDE    "mbfs.def"
+INCLUDE "mbfs.def"
 
+PUBLIC  ARET                    ; A ret instruction
 
 ROUND:  LD      HL,HALF         ; Add 0.5 to FPREG
 ADDPHL: CALL    LOADFP          ; Load FP at (HL) to BCDE
@@ -37,9 +38,16 @@ FPADD:  LD      A,B             ; Get FP exponent
         JP      NC,NOSWAP       ; No - Don't swap them
         CPL                     ; Two's complement
         INC     A               ;  FP exponent
+IF __CPU_GBZ80__
         EX      DE,HL
         CALL    STAKFP          ; Put FPREG on stack
         EX      DE,HL
+ELSE
+        LD      HL,(FPREG)      ; LSB,NLSB of FPREG
+        PUSH    HL              ; Stack them
+        LD      HL,(FPREG+2)    ; MSB and exponent of FPREG
+        PUSH    HL              ; Stack them
+ENDIF
         CALL    FPBCDE          ; Move BCDE to FPREG
         POP     BC              ; Restore number from stack
         POP     DE
@@ -53,8 +61,8 @@ NOSWAP: CP      24+1            ; Second number insignificant?
         OR      H               ; Result to be positive?
         LD      HL,FPREG        ; Point to FPREG
 IF __CPU_GBZ80__
-        bit     7,a
-        jp      z,MINCDE
+        BIT     7,A
+        JP      Z,MINCDE        ; No - Subtract FPREG from CDE
 ELSE
         JP      P,MINCDE        ; No - Subtract FPREG from CDE
 ENDIF
@@ -112,8 +120,8 @@ NORMAL: DEC     B               ; Count bits
         LD      C,A             ; Save MSB
 PNORM:  
 IF __CPU_GBZ80__
-        bit     7,a
-        jp      z,NORMAL
+        BIT     7,A
+        JP      Z,NORMAL        ; Not done - Keep going
 ELSE
         JP      P,NORMAL        ; Not done - Keep going
 ENDIF
@@ -131,8 +139,8 @@ RONDUP: LD      A,B             ; Get VLSB of number
 RONDB:  LD      HL,FPEXP        ; Point to exponent
         OR      A               ; Any rounding?
 IF __CPU_GBZ80__
-        bit     7,a
-        call    nz,FPROND
+        BIT     7,A
+        CALL    NZ,FPROND       ; Yes - Round number up
 ELSE
         CALL    M,FPROND        ; Yes - Round number up
 ENDIF
@@ -225,8 +233,8 @@ LOGTAB: DEFB    3                       ; Table used by LOG
 
 LOG:    CALL    TSTSGN          ; Test sign of value
 IF __CPU_GBZ80__
-        bit     7,a
-        jp      nz,FCERR    ; if < 0 error
+        BIT     7,A
+        JP      NZ,FCERR        ; ?FC Error if < zero
 ELSE
         OR      A
         JP      PE,FCERR        ; ?FC Error if <= zero
@@ -267,10 +275,10 @@ FPMULT: CALL    TSTSGN          ; Test sign of FPREG
         LD      A,C             ; Get MSB of multiplier
         LD      (MULVAL),A      ; Save MSB of multiplier
 IF __CPU_GBZ80__
-        ld      hl,MULVAL+1
-        ld      (hl),e
-        inc     hl
-        ld      (hl),d
+        LD      HL,MULVAL+1
+        LD      (HL),E          ; Save rest of multiplier
+        INC     HL
+        LD      (HL),D
 ELSE
         EX      DE,HL
         LD      (MULVAL+1),HL   ; Save rest of multiplier
@@ -295,10 +303,10 @@ MUL8LP: RRA                     ; Shift LSB right
         JP      NC,NOMADD       ; Bit was zero - Don't add
         PUSH    HL              ; Save LSB and count
 IF __CPU_GBZ80__
-        ld      hl,MULVAL+1
-        ld      a,(hl+)
-        ld      h,(hl)
-        ld      l,a
+        LD      HL,MULVAL+1
+        LD      A,(HL+)         ; Get LSB and NMSB
+        LD      H,(HL)
+        LD      L,A
 ELSE
         LD      HL,(MULVAL+1)   ; Get LSB and NMSB
 ENDIF
@@ -330,7 +338,15 @@ BYTSFT: LD      B,E             ; Shift partial product left
         LD      C,A
         RET
 
-DIV10:  CALL    STAKFP          ; Save FPREG on stack
+DIV10:
+IF __CPU_GBZ80__
+        CALL    STAKFP          ; Save FPREG on stack
+ELSE
+        LD      HL,(FPREG)      ; LSB,NLSB of FPREG
+        PUSH    HL              ; Stack them
+        LD      HL,(FPREG+2)    ; MSB and exponent of FPREG
+        PUSH    HL              ; Stack them
+ENDIF
         LD      BC,8420H        ; BCDE = 10.
         LD      DE,0000H
         CALL    FPBCDE          ; Move 10 to FPREG
@@ -379,8 +395,8 @@ RESDIV: POP     BC              ; Restore divisor
         DEC     A
         RRA                     ; Bit 0 to bit 7
 IF __CPU_GBZ80__
-        bit     6,a             ;Need to get the result of the inc/dec
-        jp      nz,RONDB
+        BIT     6,A             ; Need to get the result of the inc/dec
+        JP      NZ,RONDB        ; Done - Normalise result
 ELSE
         JP      M,RONDB         ; Done - Normalise result
 ENDIF
@@ -423,11 +439,11 @@ ADDEXP: LD      A,B             ; Get exponent of dividend
         RRA                     ; Test exponent for overflow
         XOR     B
 IF __CPU_GBZ80__
-        bit     7,a
+        BIT     7,A
 ENDIF
         LD      A,B             ; Get exponent
 IF __CPU_GBZ80__
-        jp      z,OVTST2
+        JP      Z,OVTST2        ; Positive - Test for overflow
 ELSE
         JP      P,OVTST2        ; Positive - Test for overflow
 ENDIF
@@ -445,8 +461,8 @@ OVTST1: CALL    TSTSGN          ; Test sign of FPREG
 OVTST2: OR      A               ; Test if new exponent zero
 OVTST3: POP     HL              ; Clear off return address
 IF __CPU_GBZ80__
-        bit     7,a
-        jp      z,RESZER
+        BIT     7,A
+        JP      Z,RESZER        ; Result zero
 ELSE
         JP      P,RESZER        ; Result zero
 ENDIF
@@ -491,8 +507,8 @@ RETINT: LD      HL,FPEXP        ; Point to exponent
 
 ABS:    CALL    TSTSGN          ; Test sign of FPREG
 IF __CPU_GBZ80__
-        bit     7,a
-        ret     z
+        BIT     7,A
+        RET     Z               ; Return if positive
 ELSE
         RET     P               ; Return if positive
 ENDIF
@@ -505,22 +521,22 @@ INVSGN: LD      HL,FPREG+2      ; Point to MSB
 STAKFP: EX      DE,HL           ; Save code string address
 IF __CPU_GBZ80__
         GLOBAL  ___mbf32_savea
-        ld      (___mbf32_savea),a
-        ld      hl,FPREG
-        ld      a,(hl+)
-        ld      h,(hl)
-        ld      l,a
+        LD      (___mbf32_savea),A
+        LD      HL,FPREG        ; LSB and NLSB of FPREG
+        LD      A,(HL+)
+        LD      H,(HL)
+        LD      L,A
 ELSE
-        LD      HL,(FPREG)      ; LSB,NLSB of FPREG
+        LD      HL,(FPREG)      ; LSB and NLSB of FPREG
 ENDIF
         EX      (SP),HL         ; Stack them,get return
         PUSH    HL              ; Re-save return
 IF __CPU_GBZ80__
-        ld      hl,FPREG+2
-        ld      a,(hl+)
-        ld      h,(hl)
-        ld      l,a
-        ld      a,(___mbf32_savea)
+        LD      HL,FPREG+2      ; MSB and exponent of FPREG
+        LD      A,(HL+)
+        LD      H,(HL)
+        LD      L,A
+        LD      A,(___mbf32_savea)
 ELSE
         LD      HL,(FPREG+2)    ; MSB and exponent of FPREG
 ENDIF
@@ -532,20 +548,20 @@ ENDIF
 PHLTFP: CALL    LOADFP          ; Number at HL to BCDE
 FPBCDE: 
 IF __CPU_GBZ80__
-        push    hl
-        ld      hl,FPREG
-        ld      (hl),e
-        inc     hl
-        ld      (hl),d
-        inc     hl
-        ld      (hl),c
-        inc     hl
-        ld      (hl),b
-        pop     hl
+        PUSH    HL              ; Save code string address
+        LD      HL,FPREG
+        LD      (HL),E          ; Save LSB and NLSB of number
+        INC     HL
+        LD      (HL),D
+        INC     HL
+        LD      (HL),C          ; Save MSB and exponent
+        INC     HL
+        LD      (hl),B
+        POP     HL              ; Restore code string address
 ELSE
         EX      DE,HL           ; Save code string address
-        LD      (FPREG),HL      ; Save LSB,NLSB of number
-        LD      HL,BC           ; Exponent, MSB of number
+        LD      (FPREG),HL      ; Save LSB and NLSB of number
+        LD      HL,BC           ; Exponent and MSB of number
         LD      (FPREG+2),HL    ; Save MSB and exponent
         EX      DE,HL           ; Restore code string address
 ENDIF
@@ -563,13 +579,22 @@ INCHL:  INC     HL              ; Used for conditional "INC HL"
         RET
 
 FPTHL:  LD      DE,FPREG        ; Point to FPREG
-DETHL4: LD      B,4             ; 4 bytes to move
-DETHLB: LD      A,(DE)          ; Get source
+DETHL4: LD      A,(DE)          ; Get source
         LD      (HL),A          ; Save destination
         INC     DE              ; Next source
         INC     HL              ; Next destination
-        DEC     B               ; Count bytes
-        JP      NZ,DETHLB       ; Loop if more
+        LD      A,(DE)          ; Get source
+        LD      (HL),A          ; Save destination
+        INC     DE              ; Next source
+        INC     HL              ; Next destination
+        LD      A,(DE)          ; Get source
+        LD      (HL),A          ; Save destination
+        INC     DE              ; Next source
+        INC     HL              ; Next destination
+        LD      A,(DE)          ; Get source
+        LD      (HL),A          ; Save destination
+        INC     DE              ; Next source
+        INC     HL              ; Next destination
         RET
 
 SIGNS:  LD      HL,FPREG+2      ; Point to MSB of FPREG
@@ -603,11 +628,11 @@ CMPNUM: LD      A,B             ; Get exponent of number
         LD      HL,FPREG+2      ; MSB of FPREG
         XOR     (HL)            ; Combine signs
 IF __CPU_GBZ80__
-        bit     7,a
+        BIT     7,A             ; Get MSB of number
 ENDIF
         LD      A,C             ; Get MSB of number
 IF __CPU_GBZ80__
-        ret     nz
+        RET     NZ              ; Exit if signs different
 ELSE
         RET     M               ; Exit if signs different
 ENDIF
@@ -648,8 +673,8 @@ FPINT:  LD      B,A             ; <- Move
         XOR     (HL)            ; Combine with sign of FPREG
         LD      H,A             ; Save combined signs
 IF __CPU_GBZ80__
-        bit     7,a
-        call    nz,DCBCDE
+        BIT     7,A
+        CALL    NZ,DCBCDE       ; Negative - Decrement BCDE
 ELSE
         CALL    M,DCBCDE        ; Negative - Decrement BCDE
 ENDIF
@@ -665,10 +690,14 @@ ENDIF
         RET
 
 DCBCDE: DEC     DE              ; Decrement BCDE
+IF __CPU_8085__
+        JP      NK,$+4          ; Exit if LSBs not FFFF
+ELSE
         LD      A,D             ; Test LSBs
         AND     E
         INC     A
         RET     NZ              ; Exit if LSBs not FFFF
+ENDIF
         DEC     BC              ; Decrement MSBs
         RET
 
@@ -693,12 +722,16 @@ MLDEBC:                         ; Multiply DE by BC to HL
         LD      A,B             ; Test multiplier
         OR      C
         RET     Z               ; Return zero if zero
-        LD      A,16            ; 16 bits
+        LD      A,16            ; 16 bits (iterations)
 MLDBLP: ADD     HL,HL           ; Shift partial product left
         JP      C,BSERR         ; ?BS Error if overflow
+IF __CPU_8085__
+        RL      DE              ; Shift (rotate) multiplier left
+ELSE
         EX      DE,HL
         ADD     HL,HL           ; Shift multiplier left
         EX      DE,HL
+ENDIF
         JP      NC,NOMLAD       ; Bit was zero - No add
         ADD     HL,BC           ; Add multiplicand
         JP      C,BSERR         ; ?BS Error if overflow
@@ -742,10 +775,10 @@ CONEXP: PUSH    HL              ; Save code string address
         SUB     B               ; Subtract digits after point
 SCALMI: 
 IF __CPU_GBZ80__
-        bit     7,a
-        call    z,SCALPL
-        bit     7,a
-        jp      z,ENDCON
+        BIT     7,A
+        CALL    Z,SCALPL        ; Positive - Multiply number
+        BIT     7,A
+        JP      Z,ENDCON        ; Positive - All done
 ELSE
         CALL    P,SCALPL        ; Positive - Multiply number
         JP      P,ENDCON        ; Positive - All done
@@ -787,7 +820,15 @@ ADDIG:  PUSH    DE              ; Save sign of exponent
         JP      MANLP           ; Get another digit
 ENDIF
 
-RSCALE: CALL    STAKFP          ; Put number on stack
+RSCALE:
+IF __CPU_GBZ80__
+        CALL    STAKFP          ; Put number on stack
+ELSE
+        LD      HL,(FPREG)      ; LSB and NLSB of FPREG
+        PUSH    HL              ; Stack them
+        LD      HL,(FPREG+2)    ; MSB and exponent of FPREG
+        PUSH    HL              ; Stack them
+ENDIF
         CALL    FLGREL          ; Digit to add to FPREG
 PADD:   POP     BC              ; Restore number
         POP     DE
@@ -819,8 +860,8 @@ NUMASC: LD      HL,PBUFF        ; Convert number to ASCII
         CALL    TSTSGN          ; Test sign of FPREG
         LD      (HL),' '        ; Space at start
 IF __CPU_GBZ80__
-        bit     7,a
-        jp      z,SPCFST
+        BIT     7,A
+        JP      Z,SPCFST        ; Positive - Space to start
 ELSE
         JP      P,SPCFST        ; Positive - Space to start
 ENDIF
@@ -830,8 +871,8 @@ SPCFST: INC     HL              ; First byte of number
         JP      Z,JSTZER        ; Return "0" if zero
         PUSH    HL              ; Save buffer address
 IF __CPU_GBZ80__
-        bit     7,a
-        call    nz,INVSGN
+        BIT     7,A
+        CALL    NZ,INVSGN       ; Negate FPREG if negative
 ELSE
         CALL    M,INVSGN        ; Negate FPREG if negative
 ENDIF
@@ -862,8 +903,8 @@ INRNG:  CALL    ROUND           ; Add 0.5 to FPREG
         ADD     A,C             ; 6 digits before point
         INC     A               ; Add one
 IF __CPU_GBZ80__
-        bit     7,a
-        jp      nz,MAKNUM
+        BIT     7,A
+        JP      NZ,MAKNUM       ; Do it in "E" form if < 1E-02
 ELSE
         JP      M,MAKNUM        ; Do it in "E" form if < 1E-02
 ENDIF
@@ -892,7 +933,7 @@ DIGTXT: DEC     B               ; Count digits before point
         PUSH    DE              ; Save powers of ten
         CALL    BCDEFP          ; Move FPREG to BCDE
         POP     HL              ; Powers of ten table
-        LD      B, '0'-1        ; ASCII "0" - 1
+        LD      B,'0'-1         ; ASCII "0" - 1
 TRYAGN: INC     B               ; Count subtractions
         LD      A,E             ; Get LSB
         SUB     (HL)            ; Subtract LSB
@@ -933,8 +974,8 @@ DOEBIT: POP     AF              ; Get "E" flag
         INC     HL              ; And move on
         LD      (HL),'+'        ; Put '+' in buffer
 IF __CPU_GBZ80__
-        bit     7,a
-        jp      z,OUTEXP
+        BIT     7,A
+        JP      Z,OUTEXP
 ELSE
         JP      P,OUTEXP        ; Positive - Output exponent
 ENDIF
@@ -973,7 +1014,7 @@ POWERS: DEFB    0A0H,086H,001H  ; 100000
         DEFB    00AH,000H,000H  ;     10
         DEFB    001H,000H,000H  ;      1
 
-NEGAFT: LD  HL,INVSGN           ; Negate result
+NEGAFT: LD      HL,INVSGN       ; Negate result
         EX      (SP),HL         ; To be done after caller
         JP      (HL)            ; Return to caller
 
@@ -981,19 +1022,19 @@ SQR:    CALL    STAKFP          ; Put value on stack
         LD      HL,HALF         ; Set power to 1/2
         CALL    PHLTFP          ; Move 1/2 to FPREG
 
-POWER:  POP     BC              ; Get base
+POWER:  POP     BC              ; Get base from stack
         POP     DE
         CALL    TSTSGN          ; Test sign of power
 IF __CPU_GBZ80__
-        jp      nz,POWER_SKIP1
+        JP      NZ,POWER_SKIP1
 ENDIF
         LD      A,B             ; Get exponent of base
         JP      Z,EXP           ; Make result 1 if zero
 IF __CPU_GBZ80__
 POWER_SKIP1:
-        bit     7,a
-        ld      A,B             ; Get exponent of base
-        JP      z,POWER1
+        BIT     7,A
+        LD      A,B             ; Get exponent of base
+        JP      Z,POWER1        ; Positive base - Ok
 ELSE
         JP      P,POWER1        ; Positive base - Ok
 ENDIF
@@ -1007,8 +1048,8 @@ POWER1: OR      A               ; Base zero?
         OR      01111111B       ; Get sign status
         CALL    BCDEFP          ; Move power to BCDE
 IF __CPU_GBZ80__
-        bit     7,a
-        jp      z,POWER2
+        BIT     7,A
+        JP      Z,POWER2        ; Positive base - Ok
 ELSE
         JP      P,POWER2        ; Positive base - Ok
 ENDIF
@@ -1025,18 +1066,18 @@ ENDIF
 POWER2: 
         POP     HL              ; Restore MSB and exponent
 IF __CPU_GBZ80__
-        or      $7f             ; Restore sign back
-        ld      (___mbf32_savea),a
-        ld      a,l
-        ld      (FPREG+2),a
-        ld      a,h
-        ld      (FPREG+3),a
-        pop     hl
-        ld      a,l
-        ld      (FPREG),a
-        ld      a,h
-        ld      (FPREG+1),a
-        ld      a,(___mbf32_savea)
+        OR      $7f             ; Restore sign back
+        LD      (___mbf32_savea),a
+        LD      A,L
+        LD      (FPREG+2),A
+        LD      A,H
+        LD      (FPREG+3),A
+        POP     HL
+        LD      A,L
+        LD      (FPREG),A
+        LD      A,H
+        LD      (FPREG+1),A
+        LD      A,(___mbf32_savea)
 ELSE
         LD      (FPREG+2),HL    ; Save base in FPREG
         POP     HL              ; LSBs of base
@@ -1121,8 +1162,8 @@ SUMLP:  POP     AF              ; Restore count
 RND:    CALL    TSTSGN          ; Test sign of FPREG
         LD      HL,SEED+2       ; Random number seed
 IF __CPU_GBZ80__
-        bit     7,a
-        jp      nz,RESEED
+        BIT     7,A
+        JP      NZ,RESEED       ; Negative - Re-seed
 ELSE
         JP      M,RESEED        ; Negative - Re-seed
 ENDIF
@@ -1159,6 +1200,7 @@ RND1:   CALL    BCDEFP          ; Move FPREG to BCDE
         LD      E,C             ; LSB = MSB
         XOR     01001111B       ; Fiddle around
         LD      C,A             ; New MSB
+                                ; HL is pointing to SGNRES
         LD      (HL),80H        ; Set saved signed bit to positive
         DEC     HL              ; Point to Exponent
         LD      B,(HL)          ; Get Exponent to BCDE
@@ -1206,8 +1248,8 @@ SIN:    CALL    STAKFP          ; Put angle on stack
         CALL    TSTSGN          ; Test sign of value
         SCF                     ; Flag positive
 IF __CPU_GBZ80__
-        bit     7,a
-        jp      z,SIN1
+        BIT     7,A
+        JP      Z,SIN1          ; Positive - Ok
 ELSE
         JP      P,SIN1          ; Positive - Ok
 ENDIF
@@ -1216,8 +1258,8 @@ ENDIF
         OR      A               ; Flag negative
 SIN1:   PUSH    AF              ; Save sign
 IF __CPU_GBZ80__
-        bit     7,a
-        call    z,INVSGN
+        BIT     7,A
+        CALL    Z,INVSGN        ; Negate value if positive
 ELSE
         CALL    P,INVSGN        ; Negate value if positive
 ENDIF
@@ -1251,10 +1293,10 @@ TAN:    CALL    STAKFP          ; Put angle on stack
 
 ATN:    CALL    TSTSGN          ; Test sign of value
 IF __CPU_GBZ80__
-        bit     7,a
-        call    nz,NEGAFT
-        bit     7,a
-        call    nz,INVSGN
+        BIT     7,A
+        CALL    NZ,NEGAFT       ; Negate result after if -ve
+        BIT     7,A
+        CALL    NZ,INVSGN       ; Negate value if -ve
 ELSE
         CALL    M,NEGAFT        ; Negate result after if -ve
         CALL    M,INVSGN        ; Negate value if -ve
@@ -1271,6 +1313,7 @@ ENDIF
 ATN1:   LD      HL,ATNTAB       ; Coefficient table
         CALL    SUMSER          ; Evaluate sum of series
         LD      HL,HALFPI       ; PI/2 - angle in case > 1
+ARET:
         RET                     ; Number > 1 - Sub from PI/2
 
 ATNTAB: DEFB    9                       ; Table used by ATN
