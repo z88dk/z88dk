@@ -37,7 +37,7 @@ FPADD:  LD      A,B             ; Get FP exponent
         SUB     B               ; BCDE number larger?
         JP      NC,NOSWAP       ; No - Don't swap them
         CPL                     ; Two's complement
-        INC     A               ;  FP exponent
+        INC     A               ; FP exponent
 IF __CPU_GBZ80__
         EX      DE,HL
         CALL    STAKFP          ; Put FPREG on stack

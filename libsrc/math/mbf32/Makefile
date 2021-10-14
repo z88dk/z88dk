@@ -10,7 +10,7 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += -fp-mode=mbf32 -D__MATH_MBF32
 
-all: dirs $(OUTPUT_DIRECTORY)/mbf32.lib $(OUTPUT_DIRECTORY)/mbf32_iy.lib $(OUTPUT_DIRECTORY)/mbf32_8080.lib $(OUTPUT_DIRECTORY)/mbf32_8085.lib $(OUTPUT_DIRECTORY)/mbf32_gbz80.lib
+all: dirs $(OUTPUT_DIRECTORY)/mbf32.lib $(OUTPUT_DIRECTORY)/mbf32_8080.lib $(OUTPUT_DIRECTORY)/mbf32_8085.lib $(OUTPUT_DIRECTORY)/mbf32_iy.lib $(OUTPUT_DIRECTORY)/mbf32_gbz80.lib
 
 $(OUTPUT_DIRECTORY)/mbf32.lib: $(addprefix obj/z80/, $(OBJECTS))
 	TYPE=z80 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/mbf32 @mbf32.lst
@@ -28,7 +28,10 @@ $(OUTPUT_DIRECTORY)/mbf32_gbz80.lib: $(addprefix obj/gbz80/, $(OBJECTS))
 	TYPE=gbz80 $(LIBLINKER) -mgbz80 -x$(OUTPUT_DIRECTORY)/mbf32_gbz80 @mbf32.lst
 
 dirs:
-	@mkdir -p obj/z80/c/sccz80 obj/ixiy/c/sccz80 obj/z80/c/asm obj/ixiy/c/asm obj/8080/c/sccz80 obj/8080/c/asm obj/z80/z80 obj/8080/z80 obj/ixiy/z80
+	@mkdir -p obj/z80/c/sccz80 obj/z80/c/asm obj/z80/z80
+	@mkdir -p obj/8080/c/sccz80 obj/8080/c/asm obj/8080/z80
+	@mkdir -p obj/8085/c/sccz80 obj/8085/c/asm obj/8085/z80
+	@mkdir -p obj/ixiy/c/sccz80 obj/ixiy/c/asm obj/ixiy/z80
 	@mkdir -p obj/gbz80/c/sccz80 obj/gbz80/c/asm obj/gbz80/z80
 
 clean:
