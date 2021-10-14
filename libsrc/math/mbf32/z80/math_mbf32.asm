@@ -48,7 +48,12 @@ ELSE
         LD      HL,(FPREG+2)    ; MSB and exponent of FPREG
         PUSH    HL              ; Stack them
 ENDIF
+IF __CPU_Z80__
+        LD      (FPREG),DE      ; Move BCDE to FPREG
+        LD      (FPREG+2),BC
+ELSE
         CALL    FPBCDE          ; Move BCDE to FPREG
+ENDIF
         POP     BC              ; Restore number from stack
         POP     DE
 NOSWAP: CP      24+1            ; Second number insignificant?
@@ -150,7 +155,13 @@ ENDIF
         AND     10000000B       ; Only bit 7 needed
         XOR     C               ; Set correct sign
         LD      C,A             ; Save correct sign in number
+IF __CPU_Z80__
+FPBCDE: LD      (FPREG),DE      ; Move BCDE to FPREG
+        LD      (FPREG+2),BC
+        RET
+ELSE
         JP      FPBCDE          ; Move BCDE to FPREG
+ENDIF
 
 FPROND: INC     E               ; Round LSB
         RET     NZ              ; Return if ok
@@ -223,13 +234,12 @@ SHRT1:  RRA                     ; Shift it right
         LD      B,A             ; Re-save underflow
         JP      SHRLP           ; More bits to do
 
-UNITY:  DEFB     000H,000H,000H,081H    ; 1.00000
+UNITY:  DEFB    000H,000H,000H,081H     ; 1.00000
 
 LOGTAB: DEFB    3                       ; Table used by LOG
         DEFB    0AAH,056H,019H,080H     ; 0.59898
         DEFB    0F1H,022H,076H,080H     ; 0.96147
         DEFB    045H,0AAH,038H,082H     ; 2.88539
-
 
 LOG:    CALL    TSTSGN          ; Test sign of value
 IF __CPU_GBZ80__
@@ -349,7 +359,12 @@ ELSE
 ENDIF
         LD      BC,8420H        ; BCDE = 10.
         LD      DE,0000H
+IF __CPU_Z80__
+        LD      (FPREG),DE      ; Move 10 to FPREG
+        LD      (FPREG+2),BC
+ELSE
         CALL    FPBCDE          ; Move 10 to FPREG
+ENDIF
 
 DIV:    POP     BC              ; Get number from stack
         POP     DE
@@ -468,7 +483,13 @@ ELSE
 ENDIF
         JP      OVERR           ; Overflow error
 
-MLSP10: CALL    BCDEFP          ; Move FPREG to BCDE
+MLSP10:
+IF __CPU_Z80__
+        LD      DE,(FPREG)      ; Move FPREG to BCDE
+        LD      BC,(FPREG+2)
+ELSE
+        CALL    BCDEFP          ; Move FPREG to BCDE
+ENDIF
         LD      A,B             ; Get exponent
         OR      A               ; Is it zero?
         RET     Z               ; Yes - Result is zero
@@ -545,6 +566,13 @@ ENDIF
         EX      DE,HL           ; Restore code string address
         RET
 
+IF __CPU_Z80__
+PHLTFP: LD      DE,FPREG        ; Number at HL to FPREG
+        LDI                     ; 4 bytes to move (HL++)->(DE++)
+        LDI
+        LDI
+        LDI
+ELSE
 PHLTFP: CALL    LOADFP          ; Number at HL to BCDE
 FPBCDE: 
 IF __CPU_GBZ80__
@@ -564,6 +592,7 @@ ELSE
         LD      HL,BC           ; Exponent and MSB of number
         LD      (FPREG+2),HL    ; Save MSB and exponent
         EX      DE,HL           ; Restore code string address
+ENDIF
 ENDIF
         RET
 
@@ -668,7 +697,12 @@ FPINT:  LD      B,A             ; <- Move
         OR      A               ; Test exponent
         RET     Z               ; Zero - Return zero
         PUSH    HL              ; Save pointer to number
+IF __CPU_Z80__
+        LD      DE,(FPREG)      ; Move FPREG to BCDE
+        LD      BC,(FPREG+2)
+ELSE
         CALL    BCDEFP          ; Move FPREG to BCDE
+ENDIF
         CALL    SIGNS           ; Set MSBs & sign of result
         XOR     (HL)            ; Combine with sign of FPREG
         LD      H,A             ; Save combined signs
@@ -722,10 +756,18 @@ MLDEBC:                         ; Multiply DE by BC to HL
         LD      A,B             ; Test multiplier
         OR      C
         RET     Z               ; Return zero if zero
+IF __CPU_Z80__
+        LD      A,B
+        LD      B,16            ; 16 bits (iterations)
+ELSE
         LD      A,16            ; 16 bits (iterations)
+ENDIF
 MLDBLP: ADD     HL,HL           ; Shift partial product left
         JP      C,BSERR         ; ?BS Error if overflow
-IF __CPU_8085__
+IF __CPU_Z80__
+        SLA     C               ; Shift multiplier left
+        RLA
+ELIF __CPU_8085__
         RL      DE              ; Shift (rotate) multiplier left
 ELSE
         EX      DE,HL
@@ -733,10 +775,16 @@ ELSE
         EX      DE,HL
 ENDIF
         JP      NC,NOMLAD       ; Bit was zero - No add
+IF __CPU_Z80__
+        ADD     HL,DE
+        JP      C,BSERR         ; ?BS Error if overflow
+NOMLAD: DJNZ    MLDBLP
+ELSE
         ADD     HL,BC           ; Add multiplicand
         JP      C,BSERR         ; ?BS Error if overflow
 NOMLAD: DEC     A               ; Count bits
         JP      NZ,MLDBLP       ; More
+ENDIF
         RET
 
 IF NOT_NEEDED
@@ -897,7 +945,12 @@ GTSIXD: CALL    DIV10           ; Divide by 10
 INRNG:  CALL    ROUND           ; Add 0.5 to FPREG
         INC     A
         CALL    FPINT           ; F.P to integer
+IF _CPU_Z80__
+        LD      (FPREG),DE      ; Move BCDE to FPREG
+        LD      (FPREG+2),BC
+ELSE
         CALL    FPBCDE          ; Move BCDE to FPREG
+ENDIF
         LD      BC,0306H        ; 1E+06 to 1E-03 range
         POP     AF              ; Restore count
         ADD     A,C             ; 6 digits before point
@@ -930,9 +983,15 @@ DIGTXT: DEC     B               ; Count digits before point
         CALL    Z,INCHL         ; Last digit - move on
         PUSH    BC              ; Save digits before point
         PUSH    HL              ; Save buffer address
+IF __CPU_Z80__
+        EX      DE,HL           ; Save powers of ten table
+        LD      DE,(FPREG)      ; Move FPREG to BCDE
+        LD      BC,(FPREG+2)
+ELSE
         PUSH    DE              ; Save powers of ten
         CALL    BCDEFP          ; Move FPREG to BCDE
         POP     HL              ; Powers of ten table
+ENDIF
         LD      B,'0'-1         ; ASCII "0" - 1
 TRYAGN: INC     B               ; Count subtractions
         LD      A,E             ; Get LSB
@@ -951,7 +1010,12 @@ TRYAGN: INC     B               ; Count subtractions
         JP      NC,TRYAGN       ; No overflow - Try again
         CALL    PLUCDE          ; Restore number
         INC     HL              ; Start of next number
+IF __CPU_Z80__
+        LD      (FPREG),DE      ; Angle to FPREG
+        LD      (FPREG+2),BC
+ELSE
         CALL    FPBCDE          ; Move BCDE to FPREG
+ENDIF
         EX      DE,HL           ; Save point in table
         POP     HL              ; Restore buffer address
         LD      (HL),B          ; Save digit in buffer
@@ -1020,7 +1084,15 @@ NEGAFT: LD      HL,INVSGN       ; Negate result
 
 SQR:    CALL    STAKFP          ; Put value on stack
         LD      HL,HALF         ; Set power to 1/2
+IF __CPU_Z80__
+        LD      DE,FPREG        ; Move 1/2 to FPREG
+        LDI                     ; 4 bytes to move (HL++)->(DE++)
+        LDI
+        LDI
+        LDI
+ELSE
         CALL    PHLTFP          ; Move 1/2 to FPREG
+ENDIF
 
 POWER:  POP     BC              ; Get base from stack
         POP     DE
@@ -1046,7 +1118,12 @@ POWER1: OR      A               ; Base zero?
         PUSH    BC
         LD      A,C             ; Get MSB of base
         OR      01111111B       ; Get sign status
+IF __CPU_Z80__
+        LD      DE,(FPREG)      ; Move power to BCDE
+        LD      BC,(FPREG+2)
+ELSE
         CALL    BCDEFP          ; Move power to BCDE
+ENDIF
 IF __CPU_GBZ80__
         BIT     7,A
         JP      Z,POWER2        ; Positive base - Ok
@@ -1134,13 +1211,26 @@ SUMSER: CALL    STAKFP          ; Put FPREG on stack
         LD      DE,MULT         ; Multiply by "X"
         PUSH    DE              ; To be done after
         PUSH    HL              ; Save address of table
+IF __CPU_Z80__
+        LD      DE,(FPREG)      ; Move FPREG to BCDE
+        LD      BC,(FPREG+2)
+ELSE
         CALL    BCDEFP          ; Move FPREG to BCDE
+ENDIF
         CALL    FPMULT          ; Square the value
         POP     HL              ; Restore address of table
 SMSER1: CALL    STAKFP          ; Put value on stack
         LD      A,(HL)          ; Get number of coefficients
         INC     HL              ; Point to start of table
+IF __CPU_Z80_
+        LD      DE,FPREG        ; Move coefficient to FPREG
+        LDI                     ; 4 bytes to move (HL++)->(DE++)
+        LDI
+        LDI
+        LDI
+ELSE
         CALL    PHLTFP          ; Move coefficient to FPREG
+ENDIF
         DEFB    06H             ; Skip "POP AF"
 SUMLP:  POP     AF              ; Restore count
         POP     BC              ; Restore number
@@ -1168,7 +1258,15 @@ ELSE
         JP      M,RESEED        ; Negative - Re-seed
 ENDIF
         LD      HL,LSTRND       ; Last random number
+IF __CPU_Z80__
+        LD      DE,FPREG        ; Move last RND to FPREG
+        LDI                     ; 4 bytes to move (HL++)->(DE++)
+        LDI
+        LDI
+        LDI
+ELSE
         CALL    PHLTFP          ; Move last RND to FPREG
+ENDIF
         LD      HL,SEED+2       ; Random number seed
         RET     Z               ; Return if RND(0)
         ADD     A,(HL)          ; Add (SEED)+2)
@@ -1195,12 +1293,20 @@ ENDIF
         LD      C,A             ; BC = Offset into table
         ADD     HL,BC           ; Point to value
         CALL    ADDPHL          ; Add value to FPREG
-RND1:   CALL    BCDEFP          ; Move FPREG to BCDE
+RND1:
+IF __CPU_Z80__
+        LD      DE,(FPREG)      ; Move FPREG to BCDE
+        LD      BC,(FPREG+2)
+ELSE
+        CALL    BCDEFP          ; Move FPREG to BCDE
+ENDIF
         LD      A,E             ; Get LSB
         LD      E,C             ; LSB = MSB
         XOR     01001111B       ; Fiddle around
         LD      C,A             ; New MSB
-                                ; HL is pointing to SGNRES
+IF __CPU_Z80__
+        LD      HL,SGNRES       ; HL is pointing to SGNRES
+ENDIF
         LD      (HL),80H        ; Set saved signed bit to positive
         DEC     HL              ; Point to Exponent
         LD      B,(HL)          ; Get Exponent to BCDE
@@ -1215,8 +1321,18 @@ RND1:   CALL    BCDEFP          ; Move FPREG to BCDE
         DEC     D               ; with the
         INC     E               ; number
 RND2:   CALL    BNORM           ; Normalise number
+IF __CPU_Z80__
+        LD      DE,LSTRND       ; Save random number
+        LD      HL,FPREG        ; Move FPREG to last and return
+        LDI                     ; 4 bytes to move (HL++)->(DE++)
+        LDI
+        LDI
+        LDI
+        RET
+ELSE
         LD      HL,LSTRND       ; Save random number
         JP      FPTHL           ; Move FPREG to last and return
+ENDIF
 
 RESEED: LD      (HL),A          ; Re-seed random numbers
         DEC     HL
@@ -1225,7 +1341,7 @@ RESEED: LD      (HL),A          ; Re-seed random numbers
         LD      (HL),A
         JP      RND1            ; Return RND seed
 
-RNDTAB: DEFB    068H,0B1H,046H,068H     ; Table used by RND
+RNDTAB: DEFB    068H,0B1H,046H,068H ; Table used by RND
         DEFB    099H,0E9H,092H,069H
         DEFB    010H,0D1H,075H,068H
 
@@ -1234,7 +1350,12 @@ COS:    LD      HL,HALFPI       ; Point to PI/2
 SIN:    CALL    STAKFP          ; Put angle on stack
         LD      BC,8349H        ; BCDE = 2 PI
         LD      DE,0FDBH
+IF __CPU_Z80__
+        LD      (FPREG),DE      ; Move 2 PI to FPREG
+        LD      (FPREG+2),BC
+ELSE
         CALL    FPBCDE          ; Move 2 PI to FPREG
+ENDIF
         POP     BC              ; Restore angle
         POP     DE
         CALL    DVBCDE          ; Divide angle by 2 PI
@@ -1287,7 +1408,12 @@ TAN:    CALL    STAKFP          ; Put angle on stack
         POP     HL
         CALL    STAKFP          ; Save SIN of angle
         EX      DE,HL           ; BCDE = Angle
+IF __CPU_Z80__
+        LD      (FPREG),DE      ; Angle to FPREG
+        LD      (FPREG+2),BC
+ELSE
         CALL    FPBCDE          ; Angle to FPREG
+ENDIF
         CALL    COS             ; Get COS of angle
         JP      DIV             ; TAN = SIN / COS
 
