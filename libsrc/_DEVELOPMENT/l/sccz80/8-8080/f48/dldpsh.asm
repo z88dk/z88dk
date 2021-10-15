@@ -12,6 +12,7 @@ EXTERN      fa
 dldpsh:
     ld      de,fa
 IF __CPU_INTEL__
+    ld      c,a
     ld      b,6
 loop:
     ld      a,(hl)
@@ -20,6 +21,7 @@ loop:
     inc     de
     dec     b
     jp      NZ,loop
+    ld      a,c
 ELSE
     ld      bc,6
     ldir

@@ -11,6 +11,7 @@ EXTERN      fa
 dstore:
     ld      de,fa
 IF __CPU_INTEL__
+    ld      c,a
     ld      b,6
 loop:
     ld      a,(de)
@@ -19,6 +20,7 @@ loop:
     inc     hl
     dec     b
     jp      NZ,loop
+    ld      a,c
 ELSE
     ex      de,hl
     ld      bc,6
