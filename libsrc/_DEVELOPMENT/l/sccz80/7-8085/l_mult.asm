@@ -33,5 +33,4 @@ PUBLIC l_mult
 .mul5
     dec     a
     jp      NZ,mul1
-.mul6
     ret

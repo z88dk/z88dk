@@ -9,8 +9,8 @@ PUBLIC  l_div_u
 l_div_u:
     ld      bc,hl           ; store divisor to bc
     ld      hl,0            ; clear remainder
-    xor     a               ; clear carry
     ld      a,17            ; load loop counter
+    or      a               ; clear carry
 ccduv1:
     rl      de              ; left shift dividend into carry
     dec     a               ; decrement loop counter

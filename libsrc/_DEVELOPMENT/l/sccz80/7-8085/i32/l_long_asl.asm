@@ -6,7 +6,10 @@
 ;
 ;       aralbrec 01/2007
 ;       shifts are faster than doubling and ex with de/hl
-
+;
+;       feilipu 10/2021
+;       8085 optimisation
+;
 
 SECTION code_clib
 SECTION code_l_sccz80
