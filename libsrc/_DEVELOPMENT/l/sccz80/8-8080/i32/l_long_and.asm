@@ -45,6 +45,5 @@ EXTERN    __retloc
     ld      hl,(__retloc)
     push    hl
 
-    ld      l,c         ;get the lower 16 back into hl
-    ld      h,b
+    ld      hl,bc       ;get the lower 16 back into hl
     ret

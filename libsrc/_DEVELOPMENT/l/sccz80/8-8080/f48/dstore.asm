@@ -10,13 +10,19 @@ EXTERN      fa
 ;--------------
 dstore:
     ld      de,fa
+IF __CPU_INTEL__
     ld      b,6
 loop:
     ld      a,(de)
     ld      (hl),a
-    inc     hl
     inc     de
+    inc     hl
     dec     b
     jp      NZ,loop
-
+ELSE
+    ex      de,hl
+    ld      bc,6
+    ldir
+    ex      de,hl    ; returns de=fa+6, hl=hl+6
+ENDIF
     ret

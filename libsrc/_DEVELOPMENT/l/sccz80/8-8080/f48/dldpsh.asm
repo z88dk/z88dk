@@ -11,15 +11,19 @@ EXTERN      fa
 ;-----------------------------------------
 dldpsh:
     ld      de,fa
+IF __CPU_INTEL__
     ld      b,6
 loop:
     ld      a,(hl)
     ld      (de),a
-    inc     de
     inc     hl
+    inc     de
     dec     b
     jp      NZ,loop
-
+ELSE
+    ld      bc,6
+    ldir
+ENDIF
 ;------------------------------------------
 ; Push FA onto stack (under return address)
 ;------------------------------------------
