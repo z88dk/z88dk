@@ -11,7 +11,7 @@ PUBLIC  l_asr_u_hl_by_e
 .l_asr_u_hl_by_e
 .l_asr_u_1
     dec e
-    ret m
+    ret M
 
     ld a,h
     and a

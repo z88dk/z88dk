@@ -2,6 +2,7 @@
 
 SECTION code_clib
 SECTION code_l_sccz80
+
 PUBLIC  l_asr
 PUBLIC  l_asr_hl_by_e
 
@@ -10,7 +11,7 @@ PUBLIC  l_asr_hl_by_e
 .l_asr_hl_by_e
 .l_asr1
     dec e
-    ret m
+    ret M
 
     ld a,h
     rla

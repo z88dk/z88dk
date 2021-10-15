@@ -15,50 +15,35 @@ PUBLIC    l_long_asr_uo
     ld a,c
     jp entry
 
-
 ; Shift primary (on stack) right by secondary,
 .l_long_asr_u
-    pop    bc
+    pop     bc
     ld      a,l     ;temporary store for counter
     pop     hl
     pop     de
     push    bc
 
 .entry 
-    and    31
-    ret    z
+    and     31
+    ret     Z
 
-    ld    b,a
-IF __CPU_GBZ80__
-    ld    a,e    ;Primary = dahl
-ENDIF
+    ld      b,a
 
 .loop
-IF __CPU_GBZ80__
-    srl    d
+    and     a
+    ld      a,d
     rra
-    rr    h
-    rr    l
-ELSE
-    and    a
-    ld    a,d
+    ld      d,a
+    ld      a,e
     rra
-    ld    d,a
-    ld    a,e
+    ld      e,a
+    ld      a,h
     rra
-    ld    e,a
-    ld    a,h
+    ld      h,a
+    ld      a,l
     rra
-    ld    h,a
-    ld    a,l
-    rra
-    ld    l,a
-ENDIF
+    ld      l,a
 
-    dec    b
-    jp    nz,loop
-IF __CPU_GBZ80__
-    ld    e,a
-ENDIF
-
+    dec     b
+    jp      NZ,loop
     ret

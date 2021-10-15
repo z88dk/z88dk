@@ -45,68 +45,70 @@ EXTERN __retloc, __math_rhs, __math_lhs, __math_result
 ; Liberated from ack
 
 l_long_mult:
+    LD      (__math_rhs),HL    ; store multiplier
+    ex      de,hl
+    LD      (__math_rhs+2),HL
 
-	LD (__math_rhs),HL	; store multiplier
-	ex	de,hl
-	LD (__math_rhs+2),HL
+    POP     HL
+    LD      (__retloc),HL
 
-	POP HL
-	LD (__retloc),HL
+    POP     HL            ; store multiplicand
+    LD      (__math_lhs),HL
+    POP     HL
+    LD      (__math_lhs+2),HL
+    LD      HL,0
+    LD      (__math_result),HL
+    LD      (__math_result+2),HL
 
-	POP HL			; store multiplicand
-	LD (__math_lhs),HL
-	POP HL
-	LD (__math_lhs+2),HL
-	LD HL,0
-	LD (__math_result),HL
-	LD (__math_result+2),HL
-
-	ld hl,__math_rhs
-	ld c,4
-lp1:	
-	push hl
-	LD  a,(HL)			; get next byte of multiplier
-	LD  b,8
-lp2:	RRA
-	JP	NC,dont_add
-	LD HL,(__math_lhs)		; add multiplicand to product
-	EX	DE,HL
-	LD HL,(__math_result)
-	ADD	HL,DE
-	LD (__math_result),HL
-	LD HL,(__math_lhs+2)
-	JP	NC,noinc
-	INC HL
-noinc:	EX	DE,HL
-	LD HL,(__math_result+2)
-	ADD	HL,DE
-	LD (__math_result+2),HL
+    ld      hl,__math_rhs
+    ld      c,4
+lp1:    
+    push    hl
+    LD      a,(HL)            ; get next byte of multiplier
+    LD      b,8
+lp2:
+    RRA
+    JP      NC,dont_add
+    LD      HL,(__math_lhs)        ; add multiplicand to product
+    EX      DE,HL
+    LD      HL,(__math_result)
+    ADD     HL,DE
+    LD      (__math_result),HL
+    LD      HL,(__math_lhs+2)
+    JP      NC,noinc
+    INC     HL
+noinc:
+    EX      DE,HL
+    LD      HL,(__math_result+2)
+    ADD     HL,DE
+    LD      (__math_result+2),HL
 
 dont_add:
-	LD HL,(__math_lhs)		; shift multiplicand left
-	ADD	HL,HL
-	LD (__math_lhs),HL
-	LD HL,(__math_lhs+2)
-	JP	NC,noshift
-	ADD	HL,HL
-	INC HL
-	JP store
+    LD      HL,(__math_lhs)        ; shift multiplicand left
+    ADD     HL,HL
+    LD      (__math_lhs),HL
+    LD      HL,(__math_lhs+2)
+    JP      NC,noshift
+    ADD     HL,HL
+    INC     HL
+    JP      store
+
 noshift:
-	ADD	HL,HL
-store:	LD (__math_lhs+2),HL
+    ADD     HL,HL
+store:
+    LD      (__math_lhs+2),HL
+    DEC     b
+    JP      NZ,lp2
 
-	DEC b
-	JP	NZ,lp2
+    pop     hl
+    inc     hl
+    dec     c
+    JP      NZ,lp1
 
-        pop hl
-        inc hl
-        dec c
-	JP	NZ,lp1
+    LD      HL,(__retloc)
+    push    hl
 
-	LD HL,(__retloc)
-	push hl
-
-	LD HL,(__math_result+2)
-	ex de,hl
-	LD HL,(__math_result)
-	ret
+    LD      HL,(__math_result+2)
+    ex      de,hl
+    LD      HL,(__math_result)
+    ret

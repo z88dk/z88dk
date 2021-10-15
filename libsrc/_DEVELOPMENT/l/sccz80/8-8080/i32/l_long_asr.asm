@@ -5,6 +5,7 @@
 
 SECTION code_clib
 SECTION code_l_sccz80
+
 PUBLIC    l_long_asr
 PUBLIC    l_long_asro
 
@@ -18,48 +19,34 @@ PUBLIC    l_long_asro
 ;        sp + 2 = long to shift
 
 .l_long_asr
-    pop    bc
+    pop     bc
     ld      a,l     ;temporary store for counter
     pop     hl
     pop     de
     push    bc
 
 .entry 
-    and    31
-    ret    z
+    and     31
+    ret     Z
 
-    ld    b,a
-IF __CPU_GBZ80__
-    ld    a,e    ; primary = dahl
-ENDIF
+    ld      b,a
 
 .loop
-IF __CPU_GBZ80__
-    sra    d
-    rra
-    rr    h
-    rr    l
-ELSE
-    ld    a,d
+    ld      a,d
     rla
-    ld    a,d
+    ld      a,d
     rra
-    ld    d,a
-    ld    a,e
+    ld      d,a
+    ld      a,e
     rra
-    ld    e,a
-    ld    a,h
+    ld      e,a
+    ld      a,h
     rra
-    ld    h,a
-    ld    a,l
+    ld      h,a
+    ld      a,l
     rra
-    ld    l,a
-ENDIF
+    ld      l,a
 
-    dec    b
-    jp    nz,loop
-IF __CPU_GBZ80__
-    ld    e,a
-ENDIF
-
+    dec     b
+    jp      NZ,loop
     ret

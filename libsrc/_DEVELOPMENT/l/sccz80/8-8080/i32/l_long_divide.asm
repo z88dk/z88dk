@@ -33,6 +33,7 @@
 
 SECTION code_clib
 SECTION code_l_sccz80
+
 PUBLIC l_long_divide
 EXTERN    error_divide_by_zero_mc
 EXTERN __retloc, __math_block1, __math_block3, __math_block2
@@ -49,300 +50,193 @@ EXTERN __retloc, __math_block1, __math_block3, __math_block2
 ; Returns: dehl = result (modulus or quotient)
 
 divide_zero:
-IF __CPU_GBZ80__
-        ld    hl,__retloc
-        ld    a,(hl+)
-        ld    h,(hl)
-        ld    l,a
-ELSE
-        ld    hl,(__retloc)
-ENDIF
-    push  hl
-    ld    hl,0
-    ld    de,0
-    jp    error_divide_by_zero_mc
+    ld      hl,(__retloc)
+    push    hl
+    ld      hl,0
+    ld      de,hl
+    jp      error_divide_by_zero_mc
 
 l_long_divide:
-    ld    (__div32_mode),A
-IF __CPU_GBZ80__
-        ld    b,h
-        ld    a,l
-        ld    hl,__math_block3
-        ld    (hl+),a
-        ld    a,b
-        ld    (hl+),a
-        ld    a,e
-        ld    (hl+),a
-        ld    a,d
-        ld    (hl+),a
-ELSE
-        ld    (__math_block3),hl
-	ld    a,h	;0 divisor check
-        or    l
-        ex    de,hl
-        ld    (__math_block3+2),hl
-        or    h
-        or    l
-ENDIF
-IF __CPU_GBZ80__
-        pop    de
-        ld    hl,__retloc
-        ld    a,e
-        ld    (hl+),a
-        ld    a,d
-        ld    (hl+),a
-        pop    de        ;store dividend
-        ld    hl,__math_block1
-        ld    a,e
-        ld    (hl+),a
-        ld    a,d
-        ld    (hl+),a
-        pop    de
-        ld    a,e
-        ld    (hl+),a
-        ld    a,d
-        ld    (hl+),a
-ELSE
-        pop   hl        ;return address
-        ld    (__retloc),hl
-        pop   hl            ; store dividend
-        ld    (__math_block1),HL
-	pop   hl
-        ld    (__math_block1+2),HL
-	jp    z,divide_zero
-ENDIF
+    ld      (__div32_mode),A
+    ld      (__math_block3),hl
+    ld      a,h    ;0 divisor check
+    or      l
+    ex      de,hl
+    ld      (__math_block3+2),hl
+    or      h
+    or      l
 
-IF __CPU_GBZ80__
-    ld    hl,__math_block3
-    ld    a,(hl+)
-    or    (hl)
-    inc   hl
-    or    (hl)
-    inc   hl
-    or    (hl)
-    jp    z,divide_zero
-ENDIF
+    pop     hl        ;return address
+    ld      (__retloc),hl
+    pop     hl            ; store dividend
+    ld      (__math_block1),HL
+    pop     hl
+    ld      (__math_block1+2),HL
+    jp      Z,divide_zero
 
-IF __CPU_GBZ80__
-    ld    hl,__math_block2
-    xor   a
-    ld    (hl+),a
-    ld    (hl+),a
-    ld    (hl+),a
-    ld    (hl+),a
-ELSE
-    ld    hl, 0            ; store initial value of remainder
-    ld    (__math_block2),hl
-    ld    (__math_block2+2),hl
-ENDIF
+    ld      hl, 0            ; store initial value of remainder
+    ld      (__math_block2),hl
+    ld      (__math_block2+2),hl
 
-    ld    b,0
-    ld    a,(__div32_mode)
+
+    ld      b,0
+    ld      a,(__div32_mode)
     rla
-    jp    nc,do_unsigned            ; jump if unsigned
+    jp      NC,do_unsigned            ; jump if unsigned
 
     ; Considering signed values here
-    ld    a,(__math_block1+3)        ;Check sign of dividend
+    ld      a,(__math_block1+3)        ;Check sign of dividend
     rla
-    jp    nc,dividend_not_signed
-    ld    b,129
-    ld    hl, __math_block1
-    call  compl        ; dividend is positive now
+    jp      NC,dividend_not_signed
+    ld      b,129
+    ld      hl, __math_block1
+    call    compl        ; dividend is positive now
 
 dividend_not_signed:
-    ld    a,(__math_block3+3)
+    ld      a,(__math_block3+3)
     rla
-    jp    nc,do_unsigned    ;Just carry on
-    inc   b
-    ld    hl, __math_block3
-    call  compl        ; divisor is positive now
+    jp      NC,do_unsigned    ;Just carry on
+    inc     b
+    ld      hl, __math_block3
+    call    compl        ; divisor is positive now
 
 do_unsigned:    
-    push  bc            ; save b-reg
-    ld    b,32
+    push    bc            ; save b-reg
+    ld      b,32
 
 dv0:    
-    ld    hl,__math_block1        ; left shift: __math_block2 <- __math_block1 <- 0
-    xor   a
+    ld      hl,__math_block1        ; left shift: __math_block2 <- __math_block1 <- 0
+    xor     a
 shift:
-IF __CPU_GBZ80__
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-ELSE
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-ENDIF
+    ld      a,(hl)
+    rla
+    ld      (hl),a
+    inc     hl
+    ld      a,(hl)
+    rla
+    ld      (hl),a
+    inc     hl
+    ld      a,(hl)
+    rla
+    ld      (hl),a
+    inc     hl
+    ld      a,(hl)
+    rla
+    ld      (hl),a
+    inc     hl
+    ld      a,(hl)
+    rla
+    ld      (hl),a
+    inc     hl
+    ld      a,(hl)
+    rla
+    ld      (hl),a
+    inc     hl
+    ld      a,(hl)
+    rla
+    ld      (hl),a
+    inc     hl
+    ld      a,(hl)
+    rla
+    ld      (hl),a
 
 
-    ld    hl,__math_block2+3        ; which is larger: divisor or remainder?
-    ld    de,__math_block3+3
-    ld    c,4
+    ld      hl,__math_block2+3        ; which is larger: divisor or remainder?
+    ld      de,__math_block3+3
+    ld      c,4
 loop:
-    ld    a,(de)
-    cp    (hl)
-    jp    z,again
-    jp    nc,continue
-    jp    do_subtract
-again:    
-    dec   de
-    dec   hl
-    dec   c
-    jp    nz,loop
+    ld      a,(de)
+    cp      (hl)
+    jp      Z,again
+    jp      NC,continue
+    jp      do_subtract
+
+again:
+    dec     de
+    dec     hl
+    dec     c
+    jp      NZ,loop
 
 do_subtract:
-    ld    de,__math_block2        ; remainder is larger or equal: subtract divisor
-    ld    hl,__math_block3
-    xor   a
-    ld    a,(de)
-    sbc   (hl)
-    ld    (de),a
-    inc   de
-    inc   hl
-    ld    a,(de)
-    sbc   (hl)
-    ld    (de),a
-    inc   de
-    inc   hl
-    ld    a,(de)
-    sbc   (hl)
-    ld    (de),a
-    inc   de
-    inc   hl
-    ld    a,(de)
-    sbc   (hl)
-    ld    (de),a
-    ld    hl,__math_block1
-    inc   (hl)
+    ld      de,__math_block2        ; remainder is larger or equal: subtract divisor
+    ld      hl,__math_block3
+    xor     a
+    ld      a,(de)
+    sbc     (hl)
+    ld      (de),a
+    inc     de
+    inc     hl
+    ld      a,(de)
+    sbc     (hl)
+    ld      (de),a
+    inc     de
+    inc     hl
+    ld      a,(de)
+    sbc     (hl)
+    ld      (de),a
+    inc     de
+    inc     hl
+    ld      a,(de)
+    sbc     (hl)
+    ld      (de),a
+    ld      hl,__math_block1
+    inc     (hl)
 
 continue:
-    dec   b
-    jp    nz,dv0            ; keep looping
+    dec     b
+    jp      NZ,dv0            ; keep looping
 
-    pop   bc
-    ld    a,(__div32_mode)        ; quotient or remainder?
+    pop     bc
+    ld      a,(__div32_mode)        ; quotient or remainder?
     rra
-    jp    nc,return_modulus
+    jp      NC,return_modulus
 
 ; for dvi 4 and dvu 4 only:
-    ld    a,b
+    ld      a,b
     rra
-    ld    hl, __math_block1        ; complement quotient if divisor
-    call  c,compl        ; and dividend have different signs
-    ld    a,b
+    ld      hl, __math_block1        ; complement quotient if divisor
+    call    C,compl        ; and dividend have different signs
+    ld      a,b
     rla
-    ld    hl, __math_block2
-    call  C,compl        ; negate remainder if dividend was negative
-IF __CPU_GBZ80__
-    ld    hl,__retloc
-    ld    a,(hl+)
-    ld    h,(hl)
-    ld    l,a
-    push  hl
-    ld    hl,__math_block1+3
-    ld    a,(hl-)
-    ld    d,a
-    ld    a,(hl-)
-    ld    e,a
-    ld    a,(hl-)
-    ld    l,(hl)
-    ld    h,a
-ELSE
-    ld    hl,(__retloc)
-    push  hl
-    ld    hl, (__math_block1+2)        ; push quotient
-    ex    de,hl
-    ld    hl, (__math_block1)
-ENDIF
+    ld      hl, __math_block2
+    call    C,compl        ; negate remainder if dividend was negative
+    ld      hl,(__retloc)
+    push    hl
+    ld      hl, (__math_block1+2)        ; push quotient
+    ex      de,hl
+    ld      hl, (__math_block1)
     ret
 
 ; for rmi 4 and rmu 4 only:
 return_modulus:
-    ld    a,b
+    ld      a,b
     rra
-    ld    hl, __math_block1        ; complement quotient if divisor
-    call  c,compl        ; and dividend have different signs
-    ld    a,b
+    ld      hl, __math_block1        ; complement quotient if divisor
+    call    C,compl        ; and dividend have different signs
+    ld      a,b
     rla
-    ld    hl, __math_block2
-    call  c,compl        ; negate remainder if dividend was negative
-IF __CPU_GBZ80__
-    ld    hl,__retloc
-    ld    a,(hl+)
-    ld    h,(hl)
-    ld    l,a
-    push  hl
-    ld    hl,__math_block2+3
-    ld    a,(hl-)
-    ld    d,a
-    ld    a,(hl-)
-    ld    e,a
-    ld    a,(hl-)
-    ld    l,(hl)
-    ld    h,a
-ELSE
-    ld    hl,(__retloc)
-    push  hl
-    ld    hl, (__math_block2+2)
-    ex    de,hl
-    ld    hl, (__math_block2)
-ENDIF
+    ld      hl, __math_block2
+    call    C,compl        ; negate remainder if dividend was negative
+    ld      hl,(__retloc)
+    push    hl
+    ld      hl, (__math_block2+2)
+    ex      de,hl
+    ld      hl, (__math_block2)
     ret
 
 ; make 2's complement of 4 bytes pointed to by hl.
 compl:    
-    push  bc
-    ld    c,4
-    xor	  a
+    push    bc
+    ld      c,4
+    xor     a
 compl1:    
-    ld    a,0
-    sbc   (HL)
-    ld    (HL),a
-    inc   HL
-    dec   c
-    jp    nz,compl1
-    pop   bc
+    ld      a,0
+    sbc     (hl)
+    ld      (hl),a
+    inc     hl
+    dec     c
+    jp      NZ,compl1
+    pop     bc
     ret
 
     SECTION     bss_crt

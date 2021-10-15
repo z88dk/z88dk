@@ -7,15 +7,16 @@
 
 SECTION code_clib
 SECTION code_l_sccz80
+
 PUBLIC    l_asl
 
 
 ; shift DE left arithmetically by HL, move to HL
 
 .l_asl
-        ex de,hl
+    ex de,hl
 .l_asl1
-        dec   e
-        ret   m
-        add   hl,hl
-        jp    l_asl1
+    dec   e
+    ret   M
+    add   hl,hl
+    jp    l_asl1

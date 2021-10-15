@@ -10,6 +10,7 @@
 
 SECTION code_clib
 SECTION code_l_sccz80
+
 PUBLIC l_long_asl
 PUBLIC l_long_aslo
 
@@ -20,40 +21,29 @@ PUBLIC l_long_aslo
 ; concern ourselves with l (secondary) as our counter
 
 .l_long_asl
-
-   pop bc 
-   ld a,l         ; counter
-   pop hl
-   pop de
-   push bc
+   pop      bc
+   ld       a,l         ; counter
+   pop      hl
+   pop      de
+   push     bc
 
 ; Optimised version enters with dehl=long, count = a
 .l_long_aslo
-   and 31
-   ret z
+   and      31
+   ret      Z
 
-   ld b,a
-IF __CPU_GBZ80__
-   ld a,e    ;Primary = dahl
-ENDIF
+   ld       b,a
 
 .loop
-   add hl,hl
-IF __CPU_GBZ80__
+   add      hl,hl
+   ld       a,e
    rla
-   rl d
-ELSE
-   ld a,e
+   ld       e,a
+   ld       a,d 
    rla
-   ld e,a
-   ld a,d 
-   rla
-   ld d,a
-ENDIF
-   dec b
-   jp  nz,loop
-IF __CPU_GBZ80__
-   ld e,a
-ENDIF
+   ld       d,a
+
+   dec      b
+   jp       NZ,loop
    ret
 
