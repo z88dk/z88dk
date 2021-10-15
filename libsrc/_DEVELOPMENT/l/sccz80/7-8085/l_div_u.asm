@@ -12,36 +12,25 @@ l_div_u:
     ld      a,17            ; load loop counter
 ccduv1:
     rl      de              ; left shift dividend into carry
-    jp      C,ccduv2        ; we have to keep carry -> calling else branch
-
     dec     a               ; decrement loop counter
-    jp      Z,ccduv5
+    jp      Z,ccduv3
 
-    or     a                ; clear carry
-    jp      ccduv3
-
-ccduv2:
-    dec     a               ; decrement loop counter
-    JP      Z,ccduv5
-
-    scf                     ; set carry
-ccduv3:
     ex      de,hl
     rl      de              ; left shift carry into remainder
     ex      de,hl
 
     sub     hl,bc           ; substract divisor from remainder
-    jp      NC,ccduv4       ; if result negative, add back divisor, clear carry
+    jp      NC,ccduv2       ; if result negative, add back divisor, clear carry
 
     add     hl,bc           ; add back divisor
     or      a               ; clear carry
     jp      ccduv1
 
-ccduv4:
+ccduv2:
     scf                     ; set carry
     jp      ccduv1
         
-ccduv5:
+ccduv3:
     ex      de,hl
     ret
 
