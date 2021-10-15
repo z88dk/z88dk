@@ -1,18 +1,16 @@
+; sccz80 crt0 library - 8085 version
 
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC l_div
+PUBLIC  l_div
 
-EXTERN l_deneg
-EXTERN l_bcneg
-EXTERN l_rlde
-EXTERN l_cmpbcde
-
+EXTERN  l_deneg
+EXTERN  l_bcneg
+EXTERN  l_cmpbcde
 
 ; HL = DE / HL, DE = DE % HL
 l_div:
-ccdiv:
     ld      bc,hl
     ld      a,d
     xor     b

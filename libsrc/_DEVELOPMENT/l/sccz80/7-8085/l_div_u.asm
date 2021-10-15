@@ -1,8 +1,9 @@
+; sccz80 crt0 library - 8085 version
 
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC l_div_u
+PUBLIC  l_div_u
 
 ; HL = DE / HL, DE = DE % HL
 l_div_u:
