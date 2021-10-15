@@ -7,18 +7,18 @@ PUBLIC  l_asr
 PUBLIC  l_asr_hl_by_e
 
 .l_asr
-    ex de,hl
+    ex      de,hl
 .l_asr_hl_by_e
 .l_asr1
-    dec e
-    ret M
+    dec     e
+    ret     M
 
-    ld a,h
+    ld      a,h
     rla
-    ld a,h
+    ld      a,h
     rra
-    ld h,a
-    ld a,l
+    ld      h,a
+    ld      a,l
     rra
-    ld l,a
-    jp l_asr1
+    ld      l,a
+    jp      l_asr1

@@ -9,13 +9,13 @@ PUBLIC l_getptr
 
     ; fetch far ptr from address hl
 l_getptr:
-    ld e,(hl)
-    inc hl
-    ld d,(hl)
-    inc hl
-    ld l,(hl)
-    ld h,0
+    ld      e,(hl)
+    inc     hl
+    ld      d,(hl)
+    inc     hl
+    ld      l,(hl)
+    ld      h,0
 
-    ex de,hl
+    ex      de,hl
     ret
 

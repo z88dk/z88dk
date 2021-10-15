@@ -13,8 +13,7 @@ EXTERN l_cmpbcde
 ; HL = DE / HL, DE = DE % HL
 l_div:
 ccdiv:
-    LD      b,h
-    LD      c,l
+    LD      bc,hl
     LD      a,d
     XOR     b
     PUSH    AF
