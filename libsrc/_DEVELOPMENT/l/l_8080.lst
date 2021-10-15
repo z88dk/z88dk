@@ -1,4 +1,3 @@
-@${NEWLIB_ROOT}l/sccz80/8085.lst
 ${NEWLIB_ROOT}l/z80/ascii/num_to_txt/l_ultoa
 ${NEWLIB_ROOT}l/z80/ascii/num_to_txt/l_ultob
 ${NEWLIB_ROOT}l/z80/ascii/num_to_txt/l_ultoh
@@ -65,3 +64,4 @@ ${NEWLIB_ROOT}l/z80/long/l_dec_dehl
 ${NEWLIB_ROOT}l/z80/long/l_inc_dehl
 ${NEWLIB_ROOT}l/z80/long/l_neg_dehl
 ${NEWLIB_ROOT}l/z80/l_jphl
+@${NEWLIB_ROOT}l/sccz80/8080.lst
