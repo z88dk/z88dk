@@ -12,6 +12,15 @@
 #define DBL_MANT_DIG 23
 #define FLT_DIG      6
 #define DBL_DIG      6
+#define FLT_EPSILON  0.0000001
+#define DBL_EPSILON  0.0000001
+
+
+#define HUGE_POS_F32        (+8.507059e+37)
+#define TINY_POS_F32        (+1.175494e-38)
+#define HUGE_NEG_F32        (-8.507059e+37)
+#define TINY_NEG_F32        (-1.175494e-38)
+
 
 
 

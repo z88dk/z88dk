@@ -27,6 +27,9 @@
 #elif MATHDAI32
    #define EPSILON (0.000001)
    #define TINY_POSITIVE TINY_POS_AM9511
+#elif MBF32
+   #define EPSILON (0.000001)
+   #define TINY_POSITIVE TINY_POS_F32
 #else
    #define EPSILON (0.000000001)
 #ifndef FLT_MIN
@@ -158,7 +161,7 @@ void test_approx_equal()
 #ifdef MATH16
     //                   0.005
     Assert( approx_equal(1.24,1.22,EPSILON) == 0, " 1.24 != 1.22");
-#elif MATH32
+#elif MATH32 | MBF32
     //                   0.000001
     Assert( approx_equal(1.23456,1.23455,EPSILON) == 0, " 1.23456 != 1.23455");
 #else
