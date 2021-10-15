@@ -8,15 +8,8 @@ PUBLIC l_mult
 ; HL = DE * HL [signed]
 .l_mult
     ld      bc,hl
-    dec     de
-    ret     Z           ; de = 1 return hl
     ld      hl,0
-    jp      K,mul4      ; de = 0 return hl=0
-    inc     de
-    ld      a,b
-    or      c
-    ret     Z           ; zero multiplier
-    ld      a,8         ; 16 bits (8 iterations)
+    ld      a,4         ; 16 bits (4 iterations)
 .mul1
     add     hl,hl
     rl      de
@@ -28,7 +21,17 @@ PUBLIC l_mult
     jp      NC,mul3
     add     hl,bc
 .mul3
+    add     hl,hl
+    rl      de
+    jp      NC,mul4
+    add     hl,bc
+.mul4
+    add     hl,hl
+    rl      de
+    jp      NC,mul5
+    add     hl,bc
+.mul5
     dec     a
     jp      NZ,mul1
-.mul4
+.mul6
     ret
