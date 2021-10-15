@@ -50,14 +50,10 @@ EXTERN __retloc, __math_block1, __math_block3, __math_block2
 ; Returns: dehl = result (modulus or quotient)
 
 divide_zero:
-IF __CPU_GBZ80__
-        ld    hl,__retloc
-        ld    a,(hl+)
-        ld    h,(hl)
-        ld    l,a
-ELSE
-        ld    hl,(__retloc)
-ENDIF
+    ld    hl,__retloc
+    ld    a,(hl+)
+    ld    h,(hl)
+    ld    l,a
     push  hl
     ld    hl,0
     ld    de,0
@@ -65,55 +61,35 @@ ENDIF
 
 l_long_divide:
     ld    (__div32_mode),A
-IF __CPU_GBZ80__
-        ld    b,h
-        ld    a,l
-        ld    hl,__math_block3
-        ld    (hl+),a
-        ld    a,b
-        ld    (hl+),a
-        ld    a,e
-        ld    (hl+),a
-        ld    a,d
-        ld    (hl+),a
-ELSE
-        ld    (__math_block3),hl
-	ld    a,h	;0 divisor check
-        or    l
-        ex    de,hl
-        ld    (__math_block3+2),hl
-        or    h
-        or    l
-ENDIF
-IF __CPU_GBZ80__
-        pop    de
-        ld    hl,__retloc
-        ld    a,e
-        ld    (hl+),a
-        ld    a,d
-        ld    (hl+),a
-        pop    de        ;store dividend
-        ld    hl,__math_block1
-        ld    a,e
-        ld    (hl+),a
-        ld    a,d
-        ld    (hl+),a
-        pop    de
-        ld    a,e
-        ld    (hl+),a
-        ld    a,d
-        ld    (hl+),a
-ELSE
-        pop   hl        ;return address
-        ld    (__retloc),hl
-        pop   hl            ; store dividend
-        ld    (__math_block1),HL
-	pop   hl
-        ld    (__math_block1+2),HL
-	jp    z,divide_zero
-ENDIF
+    ld    b,h
+    ld    a,l
+    ld    hl,__math_block3
+    ld    (hl+),a
+    ld    a,b
+    ld    (hl+),a
+    ld    a,e
+    ld    (hl+),a
+    ld    a,d
+    ld    (hl+),a
 
-IF __CPU_GBZ80__
+    pop    de
+    ld    hl,__retloc
+    ld    a,e
+    ld    (hl+),a
+    ld    a,d
+    ld    (hl+),a
+    pop    de        ;store dividend
+    ld    hl,__math_block1
+    ld    a,e
+    ld    (hl+),a
+    ld    a,d
+    ld    (hl+),a
+    pop    de
+    ld    a,e
+    ld    (hl+),a
+    ld    a,d
+    ld    (hl+),a
+
     ld    hl,__math_block3
     ld    a,(hl+)
     or    (hl)
@@ -122,20 +98,13 @@ IF __CPU_GBZ80__
     inc   hl
     or    (hl)
     jp    z,divide_zero
-ENDIF
 
-IF __CPU_GBZ80__
     ld    hl,__math_block2
     xor   a
     ld    (hl+),a
     ld    (hl+),a
     ld    (hl+),a
     ld    (hl+),a
-ELSE
-    ld    hl, 0            ; store initial value of remainder
-    ld    (__math_block2),hl
-    ld    (__math_block2+2),hl
-ENDIF
 
     ld    b,0
     ld    a,(__div32_mode)
@@ -166,56 +135,21 @@ dv0:
     ld    hl,__math_block1        ; left shift: __math_block2 <- __math_block1 <- 0
     xor   a
 shift:
-IF __CPU_GBZ80__
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-        inc   hl
-        rl    (hl)
-ELSE
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-        inc   hl
-        ld    a,(hl)
-        rla
-        ld    (hl),a
-ENDIF
-
+    rl    (hl)
+    inc   hl
+    rl    (hl)
+    inc   hl
+    rl    (hl)
+    inc   hl
+    rl    (hl)
+    inc   hl
+    rl    (hl)
+    inc   hl
+    rl    (hl)
+    inc   hl
+    rl    (hl)
+    inc   hl
+    rl    (hl)
 
     ld    hl,__math_block2+3        ; which is larger: divisor or remainder?
     ld    de,__math_block3+3
@@ -275,7 +209,6 @@ continue:
     rla
     ld    hl, __math_block2
     call  C,compl        ; negate remainder if dividend was negative
-IF __CPU_GBZ80__
     ld    hl,__retloc
     ld    a,(hl+)
     ld    h,(hl)
@@ -289,13 +222,6 @@ IF __CPU_GBZ80__
     ld    a,(hl-)
     ld    l,(hl)
     ld    h,a
-ELSE
-    ld    hl,(__retloc)
-    push  hl
-    ld    hl, (__math_block1+2)        ; push quotient
-    ex    de,hl
-    ld    hl, (__math_block1)
-ENDIF
     ret
 
 ; for rmi 4 and rmu 4 only:
@@ -308,7 +234,6 @@ return_modulus:
     rla
     ld    hl, __math_block2
     call  c,compl        ; negate remainder if dividend was negative
-IF __CPU_GBZ80__
     ld    hl,__retloc
     ld    a,(hl+)
     ld    h,(hl)
@@ -322,13 +247,6 @@ IF __CPU_GBZ80__
     ld    a,(hl-)
     ld    l,(hl)
     ld    h,a
-ELSE
-    ld    hl,(__retloc)
-    push  hl
-    ld    hl, (__math_block2+2)
-    ex    de,hl
-    ld    hl, (__math_block2)
-ENDIF
     ret
 
 ; make 2's complement of 4 bytes pointed to by hl.

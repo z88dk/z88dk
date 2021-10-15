@@ -10,7 +10,7 @@ EXTERN l_long_ucmp
     call    l_long_ucmp
     ld    hl,1
     scf
-    ret    z
+    ret    Z
 
     dec    hl
     and    a

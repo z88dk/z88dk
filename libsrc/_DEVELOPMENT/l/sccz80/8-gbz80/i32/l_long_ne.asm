@@ -11,7 +11,7 @@ l_long_ne:
     call    l_long_ucmp
     ld    hl,1
     scf
-    ret    nz
+    ret    NZ
 
     dec    hl
     and    a

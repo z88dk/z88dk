@@ -13,28 +13,17 @@ EXTERN    __retloc
 ;Logical routines for long functions    dehl
 ;first opr on stack
 
-
 .l_long_and
-IF __CPU_GBZ80__
-    pop    bc       ;Return address
+    pop     bc      ;Return address
     push    hl      ;Low word
-    ld    hl,__retloc
-    ld    (hl),c
-    inc    hl
-    ld    (hl),b
-    pop    bc
-ELSE
-    ex    (sp),hl
-    ld    (__retloc),hl
-    pop    bc
-ENDIF
 
-IF __CPU_GBZ80__
-    ld    hl,sp+0
-ELSE
-    ld      hl,0
-    add     hl,sp   ;points to hl on stack
-ENDIF
+    ld      hl,__retloc
+    ld      (hl),c
+    inc     hl
+    ld      (hl),b
+    pop     bc
+
+    ld      hl,sp+0
 
     ld      a,c
     and     (hl)
@@ -53,21 +42,15 @@ ENDIF
 
     ld      a,d
     and     (hl)
-    inc    hl
+    inc     hl
     ld      d,a
 
-    ld    sp,hl
-IF __CPU_GBZ80__
-    ld    hl,__retloc
-    ld    a,(hl+)
-    ld    h,(hl)
-    ld    l,a
-    push    hl
-ELSE
-    ld    hl,(__retloc)
-    push    hl
-ENDIF
+    ld      sp,hl
 
-    ld      l,c     ;get the lower 16 back into hl
-    ld      h,b
+    ld      hl,__retloc
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
+    push    hl
+    ld      hl,bc     ;get the lower 16 back into hl
     ret

@@ -15,25 +15,16 @@ EXTERN  __retloc
 ;enter with secondary, primary on stack
 
 .l_long_sub
-IF __CPU_GBZ80__
-    pop    bc    ;Return address
+    pop     bc    ;Return address
     push    hl    ;Low word
-    ld    hl,__retloc
-    ld    (hl),c
-    inc    hl
-    ld    (hl),b
-ELSE
-    ex    (sp),hl
-    ld    (__retloc),hl
-ENDIF
-    pop    bc
+    ld      hl,__retloc
+    ld      (hl),c
+    inc     hl
+    ld      (hl),b
 
-IF __CPU_GBZ80__
-    ld    hl,sp+0
-ELSE
-    ld      hl,0
-    add     hl,sp   ;points to hl on stack
-ENDIF
+    pop     bc
+
+    ld      hl,sp+0
 
     ld      a,(hl)
     sub     c
@@ -52,21 +43,16 @@ ENDIF
 
     ld      a,(hl)
     sbc     a,d
-    inc    hl
+    inc     hl
     ld      d,a
 
-    ld    sp,hl
-IF __CPU_GBZ80__
-    ld    hl,__retloc
-    ld    a,(hl+)
-    ld    h,(hl)
-    ld    l,a
-    push    hl
-ELSE
-    ld    hl,(__retloc)
-    push    hl
-ENDIF
+    ld      sp,hl
 
-    ld      l,c     ;get the lower 16 back into hl
-    ld      h,b
+    ld      hl,__retloc
+    ld      a,(hl+)
+    ld      h,(hl)
+    ld      l,a
+    push    hl
+
+    ld      hl,bc   ;get the lower 16 back into hl
     ret
