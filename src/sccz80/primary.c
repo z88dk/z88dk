@@ -319,8 +319,15 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
         return;
     }
 
-
-
+    if ( t2 == KIND_LONGLONG ) {
+        if ( t2 != KIND_LONGLONG) {
+            // Just convert down to a 32 bit number regardless of destination type
+            // inefficient, but we have just been dealing with 64 bit numbers!
+            zconvert_to_long(isunsigned1, t2, isunsigned2);
+        }
+        return;
+    }
+    
 
     /* Converting between pointer types..far and near */
     if (t1 == KIND_CPTR && t2 == KIND_INT)

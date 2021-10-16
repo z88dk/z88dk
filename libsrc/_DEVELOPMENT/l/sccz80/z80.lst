@@ -42,6 +42,7 @@ ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_load
 ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_mod
 ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_ge
 ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_div_u
+${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_u64_toi32
 ${NEWLIB_ROOT}l/sccz80/5-z80/l_ne
 ${NEWLIB_ROOT}l/sccz80/5-z80/l_asr
 ${NEWLIB_ROOT}l/sccz80/5-z80/l_eq

@@ -5406,6 +5406,14 @@ void zwiden_stack_to_llong(LVALUE *lval)
 }
 
 void zconvert_to_long(unsigned char tounsigned, Kind from, unsigned char fromunsigned) {
+    if ( from == KIND_LONGLONG ) {
+        if (fromunsigned) {
+            callrts("l_i64_u64_toi32");
+        } else {
+            callrts("l_i64_s64_toi32");
+        }
+        return;
+    }
     if (fromunsigned) {
         gen_conv_uint2long();
     } else {

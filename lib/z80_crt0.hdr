@@ -344,6 +344,7 @@
 	EXTERN	l_i64_ulong2i64
 	EXTERN	l_i64_sint2i64
 	EXTERN	l_i64_uint2i64
+        EXTERN  l_i64_u64_toi32
 
 
 ;-------------------

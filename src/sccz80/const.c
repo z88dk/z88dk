@@ -223,7 +223,7 @@ typecheck:
     if ( lval->const_val >= 65536 || lval->const_val < -32767 ) {
         lval->val_type = KIND_LONG;
     }
-    if ( lval->const_val >= UINT32_MAX || lval->const_val < INT32_MIN ) {
+    if ( lval->const_val > UINT32_MAX || lval->const_val < INT32_MIN ) {
         lval->val_type = KIND_LONGLONG;
         if ( sizeof(long double) == sizeof(double)) {
             warningfmt("limited-range", "On this host, 64 bit constants may not be correct\n");
