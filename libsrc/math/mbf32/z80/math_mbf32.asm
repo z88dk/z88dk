@@ -7,6 +7,7 @@
 ; (C) 1978 Microsoft
 ;
 ; Original source: https://github.com/feilipu/NASCOM_BASIC_4.7
+; The 8085 and Z80 instruction tuning are copyright (C) 2021 Phillip Stevens
 ;
 ; Base target CPU is 8080, exception code paths for 8085, GBZ80, & Z80.
 ;
@@ -77,6 +78,7 @@ ENDIF
         INC     (HL)            ; Increment it
         JP      Z,OVERR         ; Number overflowed - Error
         LD      L,1             ; 1 bit to shift right
+        LD      C,A             ; Save MSB of BCDE
         CALL    SHRT1           ; Shift result right
         JP      RONDUP          ; Round it up
 
@@ -117,13 +119,18 @@ SAVEXP: LD      (FPEXP),A       ; Save result as zero
 
 NORMAL: DEC     B               ; Count bits
         ADD     HL,HL           ; Shift HL left
+IF __CPU_Z80__
+        RL      D               ; Get NMSB, shift left with last bit
+        RL      C               ; Get MSB, shift left with last bit
+ELSE
         LD      A,D             ; Get NMSB
         RLA                     ; Shift left with last bit
         LD      D,A             ; Save NMSB
         LD      A,C             ; Get MSB
         ADC     A,A             ; Shift left with last bit
         LD      C,A             ; Save MSB
-PNORM:  
+ENDIF
+PNORM:
 IF __CPU_GBZ80__
         BIT     7,A
         JP      Z,NORMAL        ; Not done - Keep going
@@ -220,8 +227,14 @@ SHRITE: ADD     A,8+1           ; Adjust count
 SHRLP:  XOR     A               ; Flag for all done
         DEC     L               ; All shifting done?
         RET     Z               ; Yes - Return
-        LD      A,C             ; Get MSB
-SHRT1:  RRA                     ; Shift it right
+IF _CPU_Z80__
+SHRT1:  RR      C               ; Get MSB, shift it right
+        RR      D               ; Get NMSB,shift right with last bit
+        RR      E               ; Get LSB, shift right with last bit
+        RR      B               ; Get underflow, shift right with last bit
+ELSE
+SHRT1:  LD      A,C             ; Get MSB
+        RRA                     ; Shift it right
         LD      C,A             ; Re-save
         LD      A,D             ; Get NMSB
         RRA                     ; Shift right with last bit
@@ -232,6 +245,7 @@ SHRT1:  RRA                     ; Shift it right
         LD      A,B             ; Get underflow
         RRA                     ; Shift right with last bit
         LD      B,A             ; Re-save underflow
+ENDIF
         JP      SHRLP           ; More bits to do
 
 UNITY:  DEFB    000H,000H,000H,081H     ; 1.00000
@@ -381,7 +395,7 @@ DVBCDE: CALL    TSTSGN          ; Test sign of FPREG
         LD      A,(HL)          ; Get NMSB of dividend
         LD      (DIV2),A        ; Save for subtraction
         DEC     HL
-        LD      A,(HL)          ; Get MSB of dividend
+        LD      A,(HL)          ; Get LSB of dividend
         LD      (DIV1),A        ; Save for subtraction
         LD      B,C             ; Get MSB
         EX      DE,HL           ; NMSB,LSB to HL
@@ -416,19 +430,34 @@ ELSE
         JP      M,RONDB         ; Done - Normalise result
 ENDIF
         RLA                     ; Restore carry
+IF __CPU_Z80__
+        RL      E               ; Get LSB of quotient, double it
+        RL      D               ; Get NMSB of quotient, double it
+ELIF __CPU_8085__
+        RL      DE              ; Get NMSB and LSB of quotient, double them
+ELSE
         LD      A,E             ; Get LSB of quotient
         RLA                     ; Double it
         LD      E,A             ; Put it back
         LD      A,D             ; Get NMSB of quotient
         RLA                     ; Double it
         LD      D,A             ; Put it back
+ENDIF
+IF __CPU_Z80__
+        RL      C               ; Get MSB of quotient, double it
+ELSE
         LD      A,C             ; Get MSB of quotient
         RLA                     ; Double it
         LD      C,A             ; Put it back
+ENDIF
         ADD     HL,HL           ; Double NMSB,LSB of divisor
+IF __CPU_Z80__
+        RL      B               ; Get MSB of divisor, double it
+ELSE
         LD      A,B             ; Get MSB of divisor
         RLA                     ; Double it
         LD      B,A             ; Put it back
+ENDIF
         LD      A,(DIV4)        ; Get VLSB of quotient
         RLA                     ; Double it
         LD      (DIV4),A        ; Put it back

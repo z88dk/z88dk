@@ -10,6 +10,7 @@ Detailed but incomplete changelist:
 - [appmake] Compressed ROM data sections can now use zx0
 - [classic] features.h added for improved portability
 - [classic] ZX0,1,2 decompression functions added
+- [classic] MBF32 8085 and Z80 instruction optimisation
 - [classic] +cpc: Screen driver fixes
 - [classic] +cpm: Amstrad, Televideo, Bondwell disc creation
 - [classic] +cpm: support for Bondwell 2 console and graphics
