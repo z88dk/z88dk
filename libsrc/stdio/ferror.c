@@ -17,7 +17,7 @@
 int wrapper2(FILE *fp) __naked
 {
 #asm
-
+PUBLIC _ferror
 ferror:
 _ferror:
 	inc	hl
