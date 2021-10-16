@@ -5,10 +5,8 @@ ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_cm_bc
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/int2long_s
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_div_u
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_mult
-${NEWLIB_ROOT}l/sccz80/8-gbz80/f48/dstore
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_asr
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_pint
-${NEWLIB_ROOT}l/sccz80/8-gbz80/f48/dpush2
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_glongsp
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_cm_de
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_asl
@@ -36,6 +34,9 @@ ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_glong
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/division16
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_asr_u
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/f48/dldpsh
+${NEWLIB_ROOT}l/sccz80/8-gbz80/f48/dload
+${NEWLIB_ROOT}l/sccz80/8-gbz80/f48/dpush2
+${NEWLIB_ROOT}l/sccz80/8-gbz80/f48/dstore
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_div
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_case
 @${NEWLIB_ROOT}l/sccz80/common.lst

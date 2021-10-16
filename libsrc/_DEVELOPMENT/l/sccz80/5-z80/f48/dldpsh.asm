@@ -2,25 +2,17 @@
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC      dldpsh
-PUBLIC      dpush
-EXTERN      fa
+PUBLIC  dldpsh
+PUBLIC  dpush
+EXTERN  fa
 
 ;-----------------------------------------
 ; Load FA from (hl) and push FA onto stack
 ;-----------------------------------------
 dldpsh:
     ld      de,fa
-    ld      c,a
-    ld      b,6
-loop:
-    ld      a,(hl)
-    ld      (de),a
-    inc     hl
-    inc     de
-    dec     b
-    jp      NZ,loop
-    ld      a,c
+    ld      bc,6
+    ldir
 
 ;------------------------------------------
 ; Push FA onto stack (under return address)

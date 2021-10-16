@@ -13,9 +13,8 @@ dload:
     ld      c,a
     ld      b,6
 loop:
-    ld      a,(hl)
+    ld      a,(hl+)
     ld      (de),a
-    inc     hl
     inc     de
     dec     b
     jp      NZ,loop
