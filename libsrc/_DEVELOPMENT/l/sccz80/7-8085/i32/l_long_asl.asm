@@ -1,4 +1,4 @@
-;       Z88 Small C+ Run Time Library 
+;       Z88 Small C+ Run Time Library
 ;       Long support functions
 ;
 ;       djm 25/2/99
@@ -9,13 +9,12 @@
 ;
 ;       feilipu 10/2021
 ;       8085 optimisation
-;
 
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC l_long_asl
-PUBLIC l_long_aslo
+PUBLIC  l_long_asl
+PUBLIC  l_long_aslo
 
 
 ; Shift primary left by secondary

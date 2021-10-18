@@ -36,12 +36,7 @@ PUBLIC l_long_aslo
 
 .loop
    add      hl,hl
-   ld       a,e
-   rla
-   ld       e,a
-   ld       a,d 
-   rla
-   ld       d,a
+   rl       de
 
    dec      b
    jp       NZ,loop
