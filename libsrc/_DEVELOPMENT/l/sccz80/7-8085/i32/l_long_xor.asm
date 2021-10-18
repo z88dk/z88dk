@@ -4,7 +4,7 @@
 ;       Stefano - 29/4/2002
 ;
 ;       feilipu 10/2021
-;       8085 optimisation stack 104 T -> 74 T
+;       8085 optimisation stack 104 T -> 66 T
 
 SECTION code_clib
 SECTION code_l_sccz80
@@ -12,42 +12,41 @@ SECTION code_l_sccz80
 PUBLIC  l_long_xor
 
 
-;Logical routines for long functions    dehl
-;first opr on stack
+;primary = secondary ^ primary
+;enter with secondary in dehl, primary on stack
 
-
-; "xor" dehl' and dehl into dehl'
 .l_long_xor
     ld      bc,de       ;get the upper 16 into bc
-    ld      de,sp+2
-    ex      de,hl       ;points to i32 on stack
+    ld      de,sp+2     ;points to i32 on stack
 
-    ld a,e
-    xor (hl)
-    inc hl
-    ld e,a
+    ld      a,(de)
+    xor     a,l
+    ld      l,a
 
-    ld a,d
-    xor (hl)
-    inc hl
-    ld d,a
+    inc     de
 
-    ld a,c
-    xor (hl)
-    inc hl
-    ld c,a
+    ld      a,(de)
+    xor     a,h
+    ld      h,a
 
-    ld a,b
-    xor (hl)
-    ld b,a
+    inc     de
 
-    pop     hl          ;get return
+    ld      a,(de)
+    xor     a,c
+    ld      c,a
+
+    inc     de
+
+    ld      a,(de)
+    xor     a,b
+    ld      b,a
+
+    pop     de          ;get return
     inc     sp
     inc     sp
     inc     sp
     inc     sp
-    push    hl          ;save return
+    push    de          ;save return
 
-    ex      de,hl       ;get the lower 16 back into hl
     ld      de,bc       ;get the upper 16 back into de
     ret

@@ -4,7 +4,7 @@
 ;       Stefano - 29/4/2002
 ;
 ;       feilipu 10/2021
-;       8085 optimisation stack 104 T -> 74 T
+;       8085 optimisation stack 104 T -> 66 T
 
 SECTION code_clib
 SECTION code_l_sccz80
@@ -12,41 +12,41 @@ SECTION code_l_sccz80
 PUBLIC  l_long_or
 
 
-;Logical routines for long functions    dehl
-;first opr on stack
+;primary = secondary | primary
+;enter with secondary in dehl, primary on stack
 
-; "or" deHL' and dehl into HLde'
 .l_long_or
     ld      bc,de       ;get the upper 16 into bc
-    ld      de,sp+2
-    ex      de,hl       ;points to i32 on stack
+    ld      de,sp+2     ;points to i32 on stack
 
-    ld      a,e
-    or      (hl)
-    inc     hl
-    ld      e,a
+    ld      a,(de)
+    or      a,l
+    ld      l,a
 
-    ld      a,d
-    or      (hl)
-    inc     hl
-    ld      d,a
+    inc     de
 
-    ld      a,c
-    or      (hl)
-    inc     hl
+    ld      a,(de)
+    or      a,h
+    ld      h,a
+
+    inc     de
+
+    ld      a,(de)
+    or      a,c
     ld      c,a
 
-    ld      a,b
-    or      (hl)
+    inc     de
+
+    ld      a,(de)
+    or      a,b
     ld      b,a
 
-    pop     hl          ;get return
+    pop     de          ;get return
     inc     sp
     inc     sp
     inc     sp
     inc     sp
-    push    hl          ;save return
+    push    de          ;save return
 
-    ex      de,hl       ;get the lower 16 back into hl
     ld      de,bc       ;get the upper 16 back into de
     ret
