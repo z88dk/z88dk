@@ -300,7 +300,7 @@ void debugger()
 {
     static char *last_line = NULL;
     char   buf[256];
-    char   prompt[100];
+    char   prompt[300];
     char  *line;
 
     if ( last_line == NULL ) {
