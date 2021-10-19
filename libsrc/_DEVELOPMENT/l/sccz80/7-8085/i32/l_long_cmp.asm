@@ -71,14 +71,12 @@ PUBLIC l_long_cmp
     or      b
     scf
 
-; We need to preserve flags
+; We need to preserve flags in af
 .l_long_cmp2
     pop     bc          ;get returns
     pop     de
-    inc     sp          ;i32
-    inc     sp
-    inc     sp
-    inc     sp
+    pop     hl          ;i32
+    pop     hl
     push    de          ;save returns
     push    bc
 
