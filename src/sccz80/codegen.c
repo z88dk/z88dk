@@ -457,7 +457,6 @@ void gen_store_to_tos(Kind typeobj)
     case KIND_DOUBLE:
         gen_push_float(typeobj);
         return;
-    /* KIND_CPTR..untested */
     case KIND_CPTR:
         ol("dec\tsp");
         ol("ld\ta,e");
@@ -2494,6 +2493,7 @@ void zmod(LVALUE* lval)
                 callrts("l_i64_mod_u");
             else
                 callrts("l_i64_mod");
+            Zsp += 8;
         } else if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
             if (ulvalue(lval))
                 callrts("l_long_mod_u");
