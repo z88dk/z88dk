@@ -41,12 +41,13 @@ PUBLIC  l_long_sub
     sbc     a,b
     ld      b,a
 
-    pop     de          ;get return
-    inc     sp
-    inc     sp
-    inc     sp
-    inc     sp
-    push    de          ;save return
-
     ld      de,bc       ;get the upper 16 back into de
+
+    pop     bc          ;get return
+    inc     sp
+    inc     sp
+    inc     sp
+    inc     sp
+    push    bc          ;save return
+
     ret

@@ -7,7 +7,9 @@ ${NEWLIB_ROOT}l/sccz80/7-8085/l_rlde
 ${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_add
 ${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_and
 ${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_asl
+${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_cmp
 ${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_or
 ${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_sub
+${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_ucmp
 ${NEWLIB_ROOT}l/sccz80/7-8085/i32/l_long_xor
 @${NEWLIB_ROOT}l/sccz80/8080.lst
