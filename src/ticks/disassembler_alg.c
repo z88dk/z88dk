@@ -330,7 +330,9 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                         BUF_PRINTF("%-8s%s", "dec", handle_register8(state, y,opbuf1,sizeof(opbuf1)));
                         break;
                     case 6:
-                        BUF_PRINTF("%-8s%s,%s", "ld", handle_register8(state, y,opbuf1,sizeof(opbuf1)), handle_immed8(state, opbuf2, sizeof(opbuf2)));
+                        handle_register8(state, y,opbuf1,sizeof(opbuf1));
+                        handle_immed8(state, opbuf2, sizeof(opbuf2));
+                        BUF_PRINTF("%-8s%s,%s", "ld", opbuf1, opbuf2);
                         break;
                     case 7:
                         if ( israbbit() && y == 4 ) BUF_PRINTF("%-8ssp,%s", "add",handle_displacement(state, opbuf1, sizeof(opbuf1)));
