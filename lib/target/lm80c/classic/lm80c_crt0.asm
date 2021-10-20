@@ -83,18 +83,18 @@ basicstart:
 
 
 start:
-	ld	(start1+1),sp
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-	ld	(exitsp),sp
+    ld      (start1+1),sp
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss
+    ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+    IF DEFINED_USING_amalloc
+        INCLUDE "crt/classic/crt_init_amalloc.asm"
+    ENDIF
 
 
 	; Setup NMI if required

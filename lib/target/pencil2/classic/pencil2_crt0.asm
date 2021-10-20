@@ -3,49 +3,45 @@
 ;
 ;	2k of memory 
 
-	module	pencil_crt0 
+    module  pencil_crt0 
 
 
-;--------
-; Include zcc_opt.def to find out some info
-;--------
 
-        defc    crt0 = 1
-        INCLUDE "zcc_opt.def"
 
-;--------
-; Some scope definitions
-;--------
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
-        EXTERN    _main           ;main() is always external to crt0 code
+    EXTERN  _main           ;main() is always external to crt0 code
 
-        PUBLIC    cleanup         ;jp'd to by exit()
-        PUBLIC    l_dcal          ;jp(hl)
-	PUBLIC	  msxbios
-	EXTERN	  msx_set_mode
-	EXTERN    asm_im1_handler
-	EXTERN    nmi_vectors
-        EXTERN    asm_interrupt_handler
-	EXTERN    __vdp_enable_status
-	EXTERN    VDP_STATUS
+    PUBLIC  cleanup         ;jp'd to by exit()
+    PUBLIC  l_dcal          ;jp(hl)
+    PUBLIC	msxbios
+    EXTERN	msx_set_mode
+    EXTERN  asm_im1_handler
+    EXTERN  nmi_vectors
+    EXTERN  asm_interrupt_handler
+    EXTERN  __vdp_enable_status
+    EXTERN  VDP_STATUS
+    EXTERN  __tms9918_status_register
 
-	defc	CONSOLE_COLUMNS = 32
-	defc	CONSOLE_ROWS = 24
+    defc    CONSOLE_COLUMNS = 32
+    defc    CONSOLE_ROWS = 24
 
-	defc	CRT_ORG_BSS = 0x7000	
-	defc	CRT_ORG_CODE = 0x8000
+    defc    CRT_ORG_BSS = 0x7000	
+    defc    CRT_ORG_CODE = 0x8000
 
-        defc    TAR__fputc_cons_generic = 1
-        defc    TAR__no_ansifont = 1
-        defc    TAR__clib_exit_stack_size = 0
-        defc    TAR__register_sp = 0x7800
-	defc	CRT_KEY_DEL = 127
-	defc	__CPU_CLOCK = 3579545
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc    TAR__fputc_cons_generic = 1
+    defc    TAR__no_ansifont = 1
+    defc    TAR__clib_exit_stack_size = 0
+    defc    TAR__register_sp = 0x7800
+    defc	CRT_KEY_DEL = 127
+    defc	__CPU_CLOCK = 3579545
+    INCLUDE "crt/classic/crt_rules.inc"
 
-	org	  CRT_ORG_CODE
-	defm	"COPYRIGHT SOUNDIC"
-	jp	program		;Where to start execution from
+    org     CRT_ORG_CODE
+
+    defm    "COPYRIGHT SOUNDIC"
+    jp      program             ;Where to start execution from
 IF (__crt_enable_nmi > 1)
         EXTERN  _z80_nmi
         jp      _z80_nmi
@@ -125,36 +121,37 @@ cleanup:
 
 IF (__crt_enable_nmi <= 1)
 nmi_int:
-	push	af
-	push	hl
-	ld	a,(__vdp_enable_status)
-	rlca
-	jr	c,no_vbl
-	in	a,(VDP_STATUS)
+    push    af
+    push    hl
+    ld      a,(__vdp_enable_status)
+    rlca
+    jr      c,no_vbl
+    in      a,(VDP_STATUS)
+    ld      (__tms9918_status_register),a
 no_vbl:
-	ld	hl,nmi_vectors
-	call	asm_interrupt_handler
-	pop	hl
-	pop	af
-	retn
+    ld      hl,nmi_vectors
+    call    asm_interrupt_handler
+    pop     hl
+    pop     af
+    retn
 ENDIF
 
 
 ; Safe BIOS call
 msxbios:
-        push    ix
-        ret
+    push    ix
+    ret
 
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
-	INCLUDE "crt/classic/crt_runtime_selection.asm" 
-	
-	defc	__crt_org_bss = CRT_ORG_BSS
-        IF DEFINED_CRT_MODEL
-            defc __crt_model = CRT_MODEL
-        ELSE
-            defc __crt_model = 1
-        ENDIF
-	INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.asm" 
+
+    defc	__crt_org_bss = CRT_ORG_BSS
+    IF DEFINED_CRT_MODEL
+        defc __crt_model = CRT_MODEL
+    ELSE
+        defc __crt_model = 1
+    ENDIF
+    INCLUDE	"crt/classic/crt_section.asm"
 

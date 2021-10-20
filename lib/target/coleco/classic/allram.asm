@@ -64,6 +64,7 @@ nmi_handler:
     rlca
     jr      c,no_vbl
     in      a,(VDP_STATUS)
+    ld      (__tms9918_status_register),a
 no_vbl:
     ld      hl,nmi_vectors
     call    asm_interrupt_handler

@@ -60,10 +60,13 @@
         defc CONSOLE_ROWS = 24
     endif
 
+    EXTERN  __tms9918_status_register
+
 
     defc    TAR__register_sp = Stack_Top
     defc    TAR__clib_exit_stack_size = 32
     defc    __CPU_CLOCK = 3580000
+
     INCLUDE "crt/classic/crt_rules.inc"
 
 
@@ -82,7 +85,8 @@ filler1:
 int_RASTER: 
     push    af 
 
-    in      a, ($BF) 
+    in      a, ($BF)
+    ld      (__tms9918_status_register),a
     or      a 
     jp      p, int_not_VBL  ; Bit 7 not set 
 
