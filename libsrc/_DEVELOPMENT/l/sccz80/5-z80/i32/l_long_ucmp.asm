@@ -66,7 +66,7 @@ l_long_ucmp:
    exx
 
    sbc a,d
-;  ld d,a
+   ld d,a
 
    ; dehl = result, a = d
 
@@ -74,7 +74,7 @@ l_long_ucmp:
 
 positive:
 
-;  ld a,d
+   ld a,d
    or e
    or h
    or l

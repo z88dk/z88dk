@@ -77,15 +77,15 @@ l_long_cmp:
    exx
 
    sbc a,d
-;  ld d,a
+   ld d,a
 
    ; dehl = result, a = d
-
-   jp M, negative
+   add a,a
+   jp C, negative
 
 positive:
 
-;  ld a,d
+   ld a,d
    or e
    or h
    or l
