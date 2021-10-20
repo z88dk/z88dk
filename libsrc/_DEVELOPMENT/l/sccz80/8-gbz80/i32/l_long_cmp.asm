@@ -41,15 +41,15 @@ PUBLIC l_long_cmp
 
     ld      a,(hl)
     sbc     a,d
-;   ld      d,a
+    ld      d,a
 
 ; ATP we have done the comparision and are left with debc = result of
 ; primary - secondary, if we have a negative sign then secondary > primary
-
-    jp      M,l_long_cmp1
+    add     a,a
+    jp      C,l_long_cmp1
 
 ; Primary was larger, return NC
-;   ld      a,d
+    ld      a,d
     or      e
     or      b
     or      c
@@ -59,7 +59,7 @@ PUBLIC l_long_cmp
 
 ; Secondary was larger, return C
 .l_long_cmp1
-;   ld      a,d
+    ld      a,d
     or      e
     or      b
     or      c
