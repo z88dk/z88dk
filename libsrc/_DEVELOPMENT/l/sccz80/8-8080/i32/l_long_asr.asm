@@ -12,8 +12,8 @@ PUBLIC    l_long_asro
 ; Entry:    dehl = long
 ;        c = shift couter
 .l_long_asro
-    ld    a,c
-    jp    entry
+    ld      a,c
+    jp      entry
 
 ; Entry:    l = counter
 ;        sp + 2 = long to shift
@@ -25,7 +25,7 @@ PUBLIC    l_long_asro
     pop     de
     push    bc
 
-.entry 
+.entry
     and     31
     ret     Z
 

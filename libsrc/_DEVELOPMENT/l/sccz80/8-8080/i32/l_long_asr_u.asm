@@ -12,8 +12,9 @@ PUBLIC    l_long_asr_uo
 ; Entry: dehl = long
 ;           c = shift
 .l_long_asr_uo
-    ld a,c
-    jp entry
+    ld      a,c
+    jp      entry
+
 
 ; Shift primary (on stack) right by secondary,
 .l_long_asr_u
