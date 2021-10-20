@@ -41,5 +41,6 @@ video/tms9918/obj/${TARGET}/msx_vmerge
 video/tms9918/obj/${TARGET}/msx_map_m2_pixel
 video/tms9918/obj/${TARGET}/vdpport
 video/tms9918/obj/${TARGET}/msx_set_sprite_16
+video/tms9918/obj/${TARGET}/__tms9918_status_register
 video/tms9918/stdio/**/obj/${TARGET}/*
 video/tms9918/graphics/obj/${TARGET}/*
