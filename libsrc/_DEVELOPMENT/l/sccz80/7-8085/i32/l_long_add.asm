@@ -4,7 +4,7 @@
 ;       Stefano - 29/4/2002
 ;
 ;       feilipu 10/2021
-;       8085 optimisation stack 104 T -> 66 T
+;       8085 optimisation
 
 SECTION code_clib
 SECTION code_l_sccz80

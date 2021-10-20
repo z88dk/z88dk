@@ -1,51 +1,53 @@
-;       Z88 Small C+ Run Time Library 
+;       Z88 Small C+ Run Time Library
 ;       Long functions
 ;       "8080" mode
 ;       Stefano - 29/4/2002
 ;
+;       feilipu 10/2021
+;       8080 optimisation
 
 SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC  l_long_sub
-EXTERN  __retloc
 
 
 ;primary = secondary - primary
-;enter with secondary, primary on stack
+;enter with secondary in dehl, primary on stack
 
 .l_long_sub
-    ex      (sp),hl
-    ld      (__retloc),hl
-    pop     bc
-
-    ld      hl,sp   ;points to hl on stack
+    ld      bc,hl       ;get the lower 16 into bc
+    ld      hl,sp+2     ;points to i32 on stack
 
     ld      a,(hl)
-    sub     c
-    inc     hl
+    sub     a,c
     ld      c,a
+
+    inc     hl
 
     ld      a,(hl)
     sbc     a,b
-    inc     hl
     ld      b,a
+
+    inc     hl
 
     ld      a,(hl)
     sbc     a,e
-    inc     hl
     ld      e,a
+
+    inc     hl
 
     ld      a,(hl)
     sbc     a,d
-    inc     hl
     ld      d,a
 
-    ld      sp,hl
+    ld      hl,bc       ;get the lower 16 back into hl
 
-    ld      hl,(__retloc)
-    push    hl
+    pop     bc          ;get return
+    inc     sp
+    inc     sp
+    inc     sp
+    inc     sp
+    push    bc          ;save return
 
-    ld      hl,bc     ;get the lower 16 back into hl
     ret
-

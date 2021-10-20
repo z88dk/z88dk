@@ -47,7 +47,7 @@ PUBLIC l_long_ucmp
 
     ld      a,(de)
     sbc     a,b
-    ld      b,a
+;   ld      b,a
 
 ; ATP we have done the comparision and are left with bchl = result of
 ; primary - secondary, if we have a carry then secondary > primary
@@ -55,30 +55,30 @@ PUBLIC l_long_ucmp
     jp      C,l_long_ucmp1
 
 ; Primary was larger, return NC
-    ld      a,l
-    or      h
+;   ld      a,b
     or      c
-    or      b
-    scf                 ; Replace with and a?
+    or      h
+    or      l
+    scf
     ccf
     jp      l_long_ucmp2
 
 ; Secondary was larger, return C
 .l_long_ucmp1
-    ld      a,l
-    or      h
+;   ld      a,b
     or      c
-    or      b
+    or      h
+    or      l
     scf
 
 ; We need to preserve flags in af
 .l_long_ucmp2
     pop     bc          ;get returns
     pop     de
-    pop     hl          ;u32
+    pop     hl          ;pop u32
     pop     hl
     push    de          ;save returns
     push    bc
 
-    ld      hl,1        ;saves some mem in comparision unfunctions
+    ld      hl,1        ;saves some mem in comparision functions
     ret

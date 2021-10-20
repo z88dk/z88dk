@@ -3,86 +3,82 @@
 ;       "8080" mode
 ;       Stefano - 30/4/2002
 ;
+;       feilipu 10/2021
+;       8080 optimisation
 
 SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_long_cmp
 
-EXTERN __retloc
-EXTERN __retloc2
-
-; Signed compare of dehl (stack) and dehl (registers)
+; Signed compare of primary dehl (stack) and secondary dehl (registers)
 ;
 ; Entry:    primary  = (under two return addresses on stack)
 ;           secondary= dehl
 ;
-; Exit:     z = numbers the same
-;           nz = numbers different
-;           c/nc = sign of difference [set if secondary > primary]
+; Exit:     Z = numbers the same
+;           NZ = numbers different
+;           C/NC = sign of difference [set if secondary > primary]
 ;           hl = 1
 ;
 ; Code takes secondary from primary
 
 .l_long_cmp
-    ex      (sp),hl
-    ld      (__retloc),hl    ;first return
-    pop     bc        ;low word
-    pop     hl        ;second return value
-    ld      (__retloc2),hl
-
-    ld      hl,0
-    add     hl,sp   ;points to hl on stack
+    ld      bc,hl       ;get the lower 16 into bc
+    ld      hl,sp+4     ;points to i32 on stack
 
     ld      a,(hl)
-    sub     c
+    sub     a,c
     ld      c,a
+
     inc     hl
 
     ld      a,(hl)
     sbc     a,b
     ld      b,a
+
     inc     hl
 
     ld      a,(hl)
     sbc     a,e
     ld      e,a
+
     inc     hl
 
     ld      a,(hl)
     sbc     a,d
-    ld      d,a
-    inc     hl
+;   ld      d,a
 
-    ld      sp,hl
+; ATP we have done the comparision and are left with debc = result of
+; primary - secondary, if we have a negative sign then secondary > primary
 
-; ATP we have done the comparision and are left with dehl = result of
-; primary - secondary, if we have a carry then secondary > primary
-    rla        ;Test sign
-    jp      NC,l_long_cmp1
+    jp      M,l_long_cmp1
 
-; Negative number
-    ld      a,c
-    or      b
-    or      d
+; Primary was larger, return NC
+;   ld      a,d
     or      e
-    scf
-    jp      retloc
-
-; Secondary was larger, return c
-.l_long_cmp1
-    ld      a,c
     or      b
-    or      d
-    or      e
+    or      c
     scf
     ccf
-.retloc
-    ; We need to preserve flags
-    ld      hl,(__retloc2)
-    push    hl
-    ld      hl,(__retloc)
-    push    hl
+    jp      l_long_cmp2
 
-    ld      hl,1    ; Saves some mem in comparision unfunctions
+; Secondary was larger, return C
+.l_long_cmp1
+;   ld      a,d
+    or      e
+    or      b
+    or      c
+    scf
+
+; We need to preserve flags in af
+.l_long_cmp2
+    pop     bc          ;get returns
+    pop     de
+    pop     hl          ;pop i32
+    pop     hl
+    push    de          ;save returns
+    push    bc
+
+    ld      hl,1        ;saves some mem in comparision functions
     ret

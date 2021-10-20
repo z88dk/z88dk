@@ -47,7 +47,7 @@ PUBLIC l_long_cmp
 
     ld      a,(de)
     sbc     a,b
-    ld      b,a
+;   ld      b,a
 
 ; ATP we have done the comparision and are left with bchl = result of
 ; primary - secondary, if we have a negative sign then secondary > primary
@@ -55,30 +55,30 @@ PUBLIC l_long_cmp
     jp      M,l_long_cmp1
 
 ; Primary was larger, return NC
-    ld      a,l
-    or      h
+;   ld      a,b
     or      c
-    or      b
+    or      h
+    or      l
     scf
     ccf
     jp      l_long_cmp2
 
 ; Secondary was larger, return C
 .l_long_cmp1
-    ld      a,l
-    or      h
+;   ld      a,b
     or      c
-    or      b
+    or      h
+    or      l
     scf
 
 ; We need to preserve flags in af
 .l_long_cmp2
     pop     bc          ;get returns
     pop     de
-    pop     hl          ;i32
+    pop     hl          ;pop i32
     pop     hl
     push    de          ;save returns
     push    bc
 
-    ld      hl,1        ;saves some mem in comparision unfunctions
+    ld      hl,1        ;saves some mem in comparision functions
     ret
