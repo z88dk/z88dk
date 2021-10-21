@@ -3,15 +3,15 @@
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC l_mult_long
-PUBLIC l_mult_long_0
+PUBLIC l_mult_ulong
+PUBLIC l_mult_ulong_0
 
-; DEHL = DE * HL [signed]
-.l_mult_long
+; DEHL = DE * HL [unsigned]
+.l_mult_ulong
     ld      bc,hl
 
-; DEHL = DE * BC [signed]
-.l_mult_long_0
+; DEHL = DE * BC [unsigned]
+.l_mult_ulong_0
     ld      hl,0
     ld      a,8         ; 16 bits (8 iterations)
 .mul1
