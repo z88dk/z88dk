@@ -34,6 +34,21 @@ void test_quickmult_long()
      Assert( val * 6  == 18, "3 * 6");
 }
 
+void test_mult_long()
+{
+     long val1 = 3;
+     long val2 = 5;
+
+     Assert(  val1 *  val2  ==  15, " 3 *  5");
+     Assert(  val1 * -val2  == -15, " 3 * -5");
+     Assert( -val1 *  val2  == -15, "-3 * -5");
+     Assert( -val1 * -val2  ==  15, "-3 * -5");
+     Assert(  val2 *  val1  ==  15, " 5 *  3");
+     Assert(  val2 * -val1  == -15, " 5 * -3");
+     Assert( -val2 *  val1  == -15, "-5 *  3");
+     Assert( -val2 * -val1  ==  15, "-5 * -3");
+}
+
 int suite_mult()
 {
     suite_setup("Multiplication Tests");
@@ -44,6 +59,7 @@ int suite_mult()
   #endif
 #endif
     suite_add_test(test_quickmult_long);
+    suite_add_test(test_mult_long);
 
     return suite_run();
 }
