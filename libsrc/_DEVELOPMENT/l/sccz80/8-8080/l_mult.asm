@@ -11,7 +11,7 @@ PUBLIC l_mult_0
     LD      bc,hl
 
 ; HL = DE * BC [signed]
-.lmult_0
+.l_mult_0
     LD      hl,0
 ccmul1:
     LD      a,c

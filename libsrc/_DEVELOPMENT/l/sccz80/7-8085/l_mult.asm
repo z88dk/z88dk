@@ -11,7 +11,7 @@ PUBLIC l_mult_0
     ld      bc,hl
 
 ; HL = DE * BC [signed]
-.lmult_0
+.l_mult_0
     ld      hl,0
     ld      a,4         ; 16 bits (4 iterations)
 .mul1
