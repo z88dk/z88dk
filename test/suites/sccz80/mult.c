@@ -9,8 +9,8 @@ void test_longlong_mult()
 {
      long long val = 3;
 
-     Assert( val * 655360 == 655360 * 3, "3  * 655360");
-     Assert( val * 256 == 768, "3  * 256");
+     Assert( val * 655360 == 655360 * 3, "3 * 655360");
+     Assert( val * 256 == 768, "3 * 256");
      Assert( val * 8  == 24, "3 * 8");
      Assert( val * 4  == 12, "3 * 4");
      Assert( val * 2  == 6, "3 * 2");
@@ -25,7 +25,7 @@ void test_quickmult_long()
 {
      long val = 3;
 
-     Assert( val * 256 == 768, "3  * 256");
+     Assert( val * 256 == 768, "3 * 256");
      Assert( val * 8  == 24, "3 * 8");
      Assert( val * 4  == 12, "3 * 4");
      Assert( val * 2  == 6, "3 * 2");
