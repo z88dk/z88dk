@@ -588,6 +588,8 @@ int cpc_exec(char* target)
         else
         {
             free(outFileBuff);
+            mb_cleanup_memory(&memory);
+            mb_cleanup_aligned(&aligned);
         }
     }
 
