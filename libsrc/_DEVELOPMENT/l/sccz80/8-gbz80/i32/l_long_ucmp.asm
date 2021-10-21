@@ -4,7 +4,7 @@
 ;       Stefano - 30/4/2002
 ;
 ;       feilipu 10/2021
-;       8080 optimisation
+;       gbz80 optimisation
 
 SECTION code_clib
 SECTION code_l_sccz80

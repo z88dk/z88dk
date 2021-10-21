@@ -4,11 +4,14 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_mult
+PUBLIC l_mult_0
 
 ; HL = DE * HL [signed]
 .l_mult
-ccmul:
     LD      bc,hl
+
+; HL = DE * BC [signed]
+.l_mult_0
     LD      hl,0
 ccmul1:
     LD      a,c
@@ -35,4 +38,5 @@ ccmul2:
     LD      d,a
     OR      e
     RET     Z
+
     JP      ccmul1
