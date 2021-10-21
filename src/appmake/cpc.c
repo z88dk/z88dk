@@ -422,7 +422,7 @@ int cpc_exec(char* target)
         mb_enumerate_banks(fmap, binname, &memory, &aligned);
         fclose(fmap);
 
-        dumpBankInfo(&memory);
+//        dumpBankInfo(&memory);
 
         // Check if banks exceed 16KB limits
         checkBankLimits(&memory);
@@ -580,6 +580,9 @@ int cpc_exec(char* target)
                 exit_log(1, "Can't write disc image");
             }
 
+            disc_free(h);
+            mb_cleanup_memory(&memory);
+            mb_cleanup_aligned(&aligned);
             return 0;
         }
         else
