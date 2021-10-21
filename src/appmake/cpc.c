@@ -255,7 +255,7 @@ int dumpBankInfo(struct banked_memory *memory)
     int bank, section;
     int banksFound = 0;
 
-    for(bsnum=0; bsnum<memory->num; bsnum++)
+    for (bsnum = 0; bsnum < memory->num; bsnum++)
     {
         for (bank = 0; bank < MAXBANKS; ++bank)
         {
@@ -267,8 +267,8 @@ int dumpBankInfo(struct banked_memory *memory)
                 banksFound++;
             }
         }
-    }    
-    return(banksFound);
+    }
+    return (banksFound);
 }
 
 void checkBankLimits(struct banked_memory *memory)
@@ -293,7 +293,7 @@ void checkBankLimits(struct banked_memory *memory)
 
                 if ((p + sb->size) > 0x4000)
                 {
-                    exit_log(1,  "Section %s exceeds 16k boundary by %d bytes\n", sb->section_name, p + sb->size - 0x4000);
+                    exit_log(1, "Section %s exceeds 16k boundary by %d bytes\n", sb->section_name, p + sb->size - 0x4000);
                 }
             }
         }
@@ -309,21 +309,21 @@ void checkBankLimits(struct banked_memory *memory)
 // \return Allocated buffer containing the whole file (should be freed)
 uint8_t *cpc_layout_file(uint8_t *inbuf, char *fileName, size_t filelen, int start_address, int file_type, size_t *total_len_ptr)
 {
-     uint8_t *buf = must_malloc(filelen + 128);
-     int      cksum, i;
-     size_t   total_len = 0;
+    uint8_t *buf = must_malloc(filelen + 128);
+    int cksum, i;
+    size_t total_len = 0;
 
     // Setup an AMSDOS header
     memset(buf, 0, 128);
 
     // Add file name. Should be in CPM format
-    for (i = 0; i<11; i++)
+    for (i = 0; i < 11; i++)
         buf[i + 1] = toupper(fileName[i]);
 
     // 0:BASIC 1:Protected 2:Binary
     // ASCII files don't have headers but a fake header is built in
     // memory with the file type #16, "Unprotected ASCII v1")
-    buf[0x12] = file_type; 
+    buf[0x12] = file_type;
     buf[0x15] = start_address % 256;
     buf[0x16] = start_address / 256;
 
@@ -341,12 +341,13 @@ uint8_t *cpc_layout_file(uint8_t *inbuf, char *fileName, size_t filelen, int sta
     buf[0x43] = cksum % 256;
     buf[0x44] = cksum / 256;
 
-    while ( total_len < filelen ) {
+    while (total_len < filelen)
+    {
         buf[128 + total_len] = inbuf[total_len];
         total_len++;
     }
 
-    // Add the length of the file header     
+    // Add the length of the file header
     total_len += 128;
 
     *total_len_ptr = total_len;
@@ -356,21 +357,19 @@ uint8_t *cpc_layout_file(uint8_t *inbuf, char *fileName, size_t filelen, int sta
 
 int cpc_exec(char* target)
 {
-    struct  banked_memory memory;
-    struct  aligned_data aligned;
-    FILE    *fmap;
-    char    crtname[FILENAME_MAX + 1];
-    int     numBanks = 0;
+    struct banked_memory memory;
+    struct aligned_data aligned;
+    FILE *fmap;
+    char crtname[FILENAME_MAX + 1];
     uint8_t *inFileBuff;
     uint8_t *outFileBuff;
-    char    cpm_filename[20];
-    size_t  file_len;
+    char cpm_filename[20];
+    size_t file_len;
     char filename[FILENAME_MAX + 1];
     char wavfile[FILENAME_MAX + 1];
     FILE *fpin, *fpout;
     long pos;
     int i;
-
     FILE *f, *source;
     unsigned char header[256];
     unsigned char srchead[128];
@@ -380,12 +379,13 @@ int cpc_exec(char* target)
     unsigned int blocks;
     unsigned int currentblock = 1;
     int j, ret;
-    size_t  binary_length;
+    size_t binary_length;
     int nchunks;
 
     ret = -1;
 
-    if (help) return ret;
+    if (help)
+        return ret;
 
     if (binname == NULL)
     {
@@ -401,7 +401,7 @@ int cpc_exec(char* target)
 
     memset(&aligned, 0, sizeof(aligned));
     memset(&memory, 0, sizeof(memory));
-    mb_create_bankspace(&memory, "BANK");   // bank space 0
+    mb_create_bankspace(&memory, "BANK"); // bank space 0
 
     if (banked_space != NULL)
     {
@@ -417,43 +417,48 @@ int cpc_exec(char* target)
     snprintf(filename, sizeof(filename) - 4, "%s", crtfile);
     suffix_change(filename, ".map");
 
-    if ((fmap = fopen(filename, "r")) != NULL) {        
-        printf("Enumerating memory banks...\n");
+    if ((fmap = fopen(filename, "r")) != NULL)
+    {
         mb_enumerate_banks(fmap, binname, &memory, &aligned);
         fclose(fmap);
-    
-        numBanks = dumpBankInfo(&memory);
 
-        if(numBanks == 0)
-        {
-            printf("No memory banks found. Assuming single binary application.\n");
-        } else {
-            // Check if banks exceed 16KB limits
-            checkBankLimits(&memory);
+        dumpBankInfo(&memory);
 
-            // sort the memory banks and look for section overlaps
-            if (mb_sort_banks(&memory))
-                exit_log(1, "Aborting... one or more binaries overlap\n");
-        }
-    } else {
+        // Check if banks exceed 16KB limits
+        checkBankLimits(&memory);
+
+        // sort the memory banks and look for section overlaps
+        if (mb_sort_banks(&memory))
+            exit_log(1, "Aborting... one or more binaries overlap\n");
+    }
+    else
+    {
         fprintf(stderr, "Failed to enumerate banks, could not open %s\n", filename);
     }
 
-    if (dumb) {
+    if (dumb)
+    {
         strcpy(filename, binname);
-    } else {
+    }
+    else
+    {
         // If the ORG address has been specified use it.
         // Otherwise, search the map file for it.
-        if (origin != -1) {
+        if (origin != -1)
+        {
             pos = origin;
-        } else {
-            if ((pos = get_org_addr(crtfile)) == -1) {
-                exit_log(1,"Could not find symbol CRT_ORG_CODE or __crt_org_code\n");
+        }
+        else
+        {
+            if ((pos = get_org_addr(crtfile)) == -1)
+            {
+                exit_log(1, "Could not find symbol CRT_ORG_CODE or __crt_org_code\n");
             }
         }
 
         // If the exec address was not specified, use the ORG address
-        if (exec == -1) {
+        if (exec == -1)
+        {
             exec = pos;
         }
 
@@ -461,144 +466,125 @@ int cpc_exec(char* target)
         if (blockname == NULL)
             blockname = zbasename(binname);
 
-        if(numBanks == 0) {
-            // If an output file was not specified, use the binary
-            // file name but change the extension
-            if (outfile == NULL) {
-                strcpy(filename, binname);
-                suffix_change(filename, ".cpc");
-            } else {
-                strcpy(filename, outfile);
-            }
+        // If an output file was not specified, use the binary
+        // file name but change the extension
+        if (outfile == NULL)
+        {
+            strcpy(filename, binname);
+            suffix_change(filename, ".cpc");
+        }
+        else
+        {
+            strcpy(filename, outfile);
+        }
 
-            if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-                exit_log(1,"Can't open input file %s\n", binname);
-            }
+        if ((fpin = fopen_bin(binname, crtfile)) == NULL)
+        {
+            exit_log(1, "Can't open input file %s\n", binname);
+        }
 
-            // Now we try to determine the size of the file to be
-            // converted
-            if (fseek(fpin, 0, SEEK_END)) {
-                fclose(fpin);
-                exit_log(1, "Couldn't determine size of file\n");
-            }
-
-            binary_length = ftell(fpin);
-            fseek(fpin, 0L, SEEK_SET);
-
-            inFileBuff = must_malloc(binary_length);
-            if (binary_length != fread(inFileBuff, 1, binary_length, fpin)) {
-                fclose(fpin);
-                exit_log(1, "Could not read required data from <%s>\n",binname);
-            }
+        // Now we try to determine the size of the file to be
+        // converted
+        if (fseek(fpin, 0, SEEK_END))
+        {
             fclose(fpin);
+            exit_log(1, "Couldn't determine size of file\n");
+        }
 
-            cpm_create_filename(filename, cpm_filename, 0, 0);
-            outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, binary_length, pos, 2, &file_len);
-            free(inFileBuff);
+        binary_length = ftell(fpin);
+        fseek(fpin, 0L, SEEK_SET);
 
-            if ((fpout = fopen(filename, "wb")) == NULL) {
-                exit_log(1,"Can't open output file\n");
-            }
+        inFileBuff = must_malloc(binary_length);
+        if (binary_length != fread(inFileBuff, 1, binary_length, fpin))
+        {
+            fclose(fpin);
+            exit_log(1, "Could not read required data from <%s>\n", binname);
+        }
+        fclose(fpin);
 
-            if ((fwrite(outFileBuff, 1, file_len, fpout)) != file_len) {
-                fclose(fpout);
-                free(outFileBuff);
-                exit_log(1, "Could not write required data to <%s>\n",filename);
-            }
+        cpm_create_filename(filename, cpm_filename, 0, 0);
+        outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, binary_length, pos, 2, &file_len);
+        free(inFileBuff);
+
+        if ((fpout = fopen(filename, "wb")) == NULL)
+        {
+            exit_log(1, "Can't open output file\n");
+        }
+
+        if ((fwrite(outFileBuff, 1, file_len, fpout)) != file_len)
+        {
             fclose(fpout);
             free(outFileBuff);
+            exit_log(1, "Could not write required data to <%s>\n", filename);
+        }
+        fclose(fpout);
 
-            if (disk) {
-                return cpm_write_file_to_image("cpcsystem", "dsk", NULL, filename, NULL, NULL);
-            }
-        } else {
-            char    disc_image_name[FILENAME_MAX+1];
+        if (disk)
+        {
+            char disc_image_name[FILENAME_MAX + 1];
+            int bsnum_bank;
             disc_handle *h;
-            char    basic_filename[20];
-            int     bsnum_bank;
 
-            // Multi-bank application
-            printf("\nMulti-bank application\n");
+            strcpy(disc_image_name, binname);
+            suffix_change(disc_image_name, ".dsk");
 
-            if (outfile == NULL) {
-                strcpy(disc_image_name, binname);
-                suffix_change(disc_image_name, ".dsk");
-            } else {
-                strcpy(disc_image_name, outfile);
+            if ((h = cpm_create_with_format("cpcsystem")) == NULL)
+            {
+                free(outFileBuff);
+                exit_log(1, "Cannot find disc specification\n");
             }
 
-            if (strcmp(binname, disc_image_name) == 0) {
-                exit_log(1, "Input and output file names must be different\n");
-            }
-
-            if ((fpin = fopen_bin(binname, crtfile)) == NULL) {
-                exit_log(1,"Can't open input file %s\n", binname);
-            }
-
-            if (fseek(fpin, 0, SEEK_END)) {
-                fclose(fpin);
-                exit_log(1,"Couldn't determine size of file\n");
-            }
-
-            binary_length = ftell(fpin);
-            fseek(fpin, 0L, SEEK_SET);
-
-            if ( (h = cpm_create_with_format("cpcsystem")) == NULL ) {
-                fclose(fpin);
-                exit_log(1,"Cannot find disc specification\n");
-            }
-
-            cpm_create_filename(blockname, basic_filename, 0, 1);
-
-            inFileBuff = must_malloc(binary_length);
-            if (binary_length != fread(inFileBuff, 1, binary_length, fpin)) {
-                fclose(fpin);
-                exit_log(1, "Could not read required data from <%s>\n",binname);
-            }
-            fclose(fpin);
-
-            suffix_change(basic_filename, ".CPC");
-            cpm_create_filename(basic_filename, cpm_filename, 0, 0);
-            outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, binary_length, pos, 2, &file_len);
             disc_write_file(h, cpm_filename, outFileBuff, file_len);
             free(outFileBuff);
-            free(inFileBuff);
 
             // Write the banks
             bsnum_bank = mb_find_bankspace(&memory, "BANK");
-            for ( i = 0; i < MAXBANKS; i++ ) {
-                struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
-                if (mb->num > 0) {
-                    char    numbuf[32];
+            if (bsnum_bank >= 0)
+            {
+                for (i = 0; i < MAXBANKS; i++)
+                {
+                    struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
+                    if (mb->num > 0)
+                    {
+                        char numbuf[32];
 
-                    if ( (fpin =fopen(mb->secbin->filename, "rb") ) == NULL ) {
-                        exit_log(1,"Cannot open BANK file %s\n", mb->secbin->filename);
-                    }
+                        if ((fpin = fopen(mb->secbin->filename, "rb")) == NULL)
+                        {
+                            exit_log(1, "Cannot open BANK file %s\n", mb->secbin->filename);
+                        }
 
-                    inFileBuff = must_malloc(mb->secbin->size);
+                        inFileBuff = must_malloc(mb->secbin->size);
 
-                    if ( mb->secbin->size != fread(inFileBuff, 1,  mb->secbin->size, fpin)) {
+                        if (mb->secbin->size != fread(inFileBuff, 1, mb->secbin->size, fpin))
+                        {
+                            fclose(fpin);
+                            exit_log(1, "Could not read required data from <%s>\n", mb->secbin->filename);
+                        }
                         fclose(fpin);
-                        exit_log(1, "Could not read required data from <%s>\n",mb->secbin->filename);
+
+                        snprintf(numbuf, sizeof(numbuf), ".B%d", i);
+                        suffix_change(filename, numbuf);
+
+                        cpm_create_filename(filename, cpm_filename, 0, 0);
+                        outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, mb->secbin->size, mb->secbin->org, 2, &file_len);
+                        disc_write_file(h, cpm_filename, outFileBuff, file_len);
+
+                        free(inFileBuff);
+                        free(outFileBuff);
                     }
-                    fclose(fpin);
-
-                    snprintf(numbuf,sizeof(numbuf),".B%d",i);
-                    suffix_change(basic_filename, numbuf);
-
-                    cpm_create_filename(basic_filename, cpm_filename, 0, 0);
-                    outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, mb->secbin->size, mb->secbin->org, 2, &file_len);
-                    disc_write_file(h, cpm_filename, outFileBuff, file_len);
-                    
-                    free(inFileBuff);
-                    free(outFileBuff);
                 }
             }
 
-            if ( disc_write_edsk(h, disc_image_name) < 0 ) {
-                exit_log(1,"Can't write disc image");
+            if (disc_write_edsk(h, disc_image_name) < 0)
+            {
+                exit_log(1, "Can't write disc image");
             }
+
             return 0;
+        }
+        else
+        {
+            free(outFileBuff);
         }
     }
 
