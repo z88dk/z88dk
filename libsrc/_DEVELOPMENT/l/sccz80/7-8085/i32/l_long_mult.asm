@@ -23,20 +23,22 @@ EXTERN  l_mult_ulong_0
 
     ld      bc,hl               ;secondary LSW
 
-    ld      de,sp+6             ;primary LSW addr
+    ld      de,sp+6             ;primary LSW offset
     ld      hl,(de)
     ex      de,hl
 
     call    l_mult_ulong_0      ;dehl = de * bc
 
+    pop     bc                  ;get return
     push    hl                  ;result LSW
+    push    bc                  ;push return
     push    de                  ;partial result MSW
 
-    ld      de,sp+6             ;secondary LSW addr
+    ld      de,sp+6             ;secondary LSW offset
     ld      hl,(de)
     ld      bc,hl
 
-    ld      de,sp+12            ;primary MSW addr
+    ld      de,sp+12            ;primary MSW offset
     ld      hl,(de)
     ex      de,hl
 
@@ -46,11 +48,11 @@ EXTERN  l_mult_ulong_0
     add     hl,bc
     push    hl
 
-    ld      de,sp+8             ;secondary MSW addr
+    ld      de,sp+8             ;secondary MSW offset
     ld      hl,(de)
     ld      bc,hl
 
-    ld      de,sp+10            ;primary LSW addr
+    ld      de,sp+10            ;primary LSW offset
     ld      hl,(de)
     ex      de,hl
 
@@ -59,14 +61,17 @@ EXTERN  l_mult_ulong_0
     pop     bc                  ;partial result MSW
     add     hl,bc               ;result MSW
 
-    pop     bc                  ;result LSW
-    pop     af                  ;return
+    ex      (sp),hl             ;result MSW <> return
 
-    ld      de,sp+8             ;remove secondary and primary from stack
-    ex      de,hl
-    ld      sp,hl
+    ld      de,sp+10            ;place return on stack
+    ld      (de),hl
+
+    pop     hl                  ;result MSW
+    pop     bc                  ;result LSW
+
+    ld      de,sp+6             ;point to return again
+    ex      de,hl               ;result MSW <> return sp
+    ld      sp,hl               ;remove stacked parameters
 
     ld      hl,bc               ;result LSW
-
-    push    af                  ;replace return
     ret
