@@ -29,11 +29,11 @@ static char     disk = 0;
 static int     origin = -1;
 static int     exec = -1;
 static char     help = 0;
-static int     LOW = 64;
-static int     HIGH = 192;
+static int     LOW = 0x20;
+static int     HIGH = 0xe0;
 /* Higher values can give better transfer speed */
 /* Too high values will give read errors */
-static int     rate = 0;     /* Sampling rate of the output file (Hz) */
+static int     rate = 8000;     /* Sampling rate of the output file (Hz) */
 
 
 /* Options that are available for this module */
@@ -44,9 +44,9 @@ option_t     cpc_options[] = {
      {'o', "output", "Name of output file", OPT_STR, &outfile},
      {0, "bankspace", "Create custom bank spaces", OPT_STR, &banked_space},
      {0, "disk", "Generate a .dsk image", OPT_BOOL, &disk},
-     {0, "audio", "Create also a WAV file", OPT_BOOL, &audio},
+     {0, "audio", "Generate an audio WAV file", OPT_BOOL, &audio},
      {0, "rate", "Rate/speed (8000, 11025..)", OPT_INT, &rate},
-     {0, "dumb", "Just convert to WAV a tape file", OPT_BOOL, &dumb},
+     {0, "dumb", "Convert a file with an AMSDOS header to a WAV file", OPT_BOOL, &dumb},
      {0, "loud", "Louder audio volume", OPT_BOOL, &loud},
      {0, "noext", "Remove the file extension", OPT_BOOL, &noext},
      {0, "exec", "Location to start execution", OPT_INT, &exec},
@@ -61,8 +61,8 @@ static int     cpc_checksum(unsigned char *buf, int len);
 void          putbit    (FILE * f, unsigned char b, unsigned long int *filesize);
 void          putbyte   (FILE * f, unsigned char b, unsigned long int *filesize);
 void          putblock  (FILE * f, unsigned char *block, unsigned int size, unsigned long int *filesize);
-void          putWavHeader(FILE * f);
-void          writesize (FILE * f, unsigned long int size);
+void          putWavHeader(FILE* f, unsigned long int* filesize);
+void          writesize(FILE* f, uint32_t size);
 void          putCRC    (FILE * f, unsigned int CRC, unsigned long int *filesize);
 void          writename (unsigned char *tape_hdr, unsigned char *disc_hdr);
 void          putsilence(FILE * f, int length, unsigned long int *filesize);
@@ -119,7 +119,7 @@ void putblock(FILE* f, unsigned char* block, unsigned int size, unsigned long in
 }
 
 /* Creates the header for the .wav file */
-void putWavHeader(FILE* f)
+void putWavHeader(FILE* f, unsigned long int* filesize)
 {
 
     /* Header for .wav files. Dumbly copied from an existent .wav file :) */
@@ -149,21 +149,30 @@ void putWavHeader(FILE* f)
     WavHeader[31] = (rate >> 24) & 0xff;
 
     fwrite(WavHeader, 1, 44, f);
+    *filesize += sizeof(WavHeader);
 }
 
-void writesize(FILE* f, unsigned long int size)
+/**
+ * Write the wav file size into the file header.
+ *
+ * @param f     File pointer
+ * @param size  Size in bytes of the wav file
+ **/
+void writesize(FILE *f, uint32_t size)
 {
-    /*
-      * This might cause problems on little-endian systems. If so, please
-      * let me know.
-      */
-
-    unsigned long int s2;
+    uint32_t sizeLE;
+    // Offset 4,  4-bytes - SubChunk2Size = NumSamples * NumChannels * BitsPerSample/8 (little endian)
+    // http://soundfile.sapp.org/doc/WaveFormat/
+    sizeLE = htole32(size);
     fseek(f, 40, SEEK_SET);
-    fwrite(&size, 4, 1, f);
+    fwrite(&sizeLE, 4, 1, f);
+
+    // Offset 4,  4-bytes - ChunkSize = 36 + SubChunk2Size (little endian)
+    // http://soundfile.sapp.org/doc/WaveFormat/
+    size = size + 36;
+    sizeLE = htole32(size);
     fseek(f, 4, SEEK_SET);
-    s2 = size + 36; /* I think this is right. Not sure at all. :) */
-    fwrite(&s2, 4, 1, f);
+    fwrite(&sizeLE, 4, 1, f);
 }
 
 /*
@@ -209,24 +218,36 @@ unsigned int calcCRC(unsigned char* buffer)
     return ((~CRC) & 0xffff);
 }
 
-void writename(unsigned char* tape_hdr, unsigned char* disc_hdr)
+/**
+ * Copy file name from a CPM disk header to a tape header.
+ * If the --noext option was specified the file name extension is omitted.
+ *
+ * @param tape_hdr  Pointer to the tape header
+ * @param disc_hdr  Pointer to the disk header
+ **/
+void writename(unsigned char *tape_hdr, unsigned char *disc_hdr)
 {
     /* Processes the CPC file name.          */
     /* Mainly, to manage file extensions ... */
     int i = 0, j = 0;
-    while ((disc_hdr[i + 1] != 32) && (i < 8)) {
+    while ((disc_hdr[i + 1] != ' ') && (i < 8))
+    {
         tape_hdr[i] = disc_hdr[i + 1];
         i++;
     }
-    if (noext) {
-        if (disc_hdr[9] != 32) {
+    if (!noext)
+    {
+        if (disc_hdr[9] != ' ')
+        {
+            /* File extension present */
             tape_hdr[i] = '.';
             i++;
-        } /* File extension present */
-        while ((disc_hdr[9 + j] != 32) && (j < 3)) {
-            tape_hdr[i] = disc_hdr[9 + j];
-            i++;
-            j++;
+            while ((disc_hdr[9 + j] != ' ') && (j < 3))
+            {
+                tape_hdr[i] = disc_hdr[9 + j];
+                i++;
+                j++;
+            }
         }
     }
 }
@@ -239,6 +260,11 @@ void putsilence(FILE* f, int length, unsigned long int* filesize)
         fputc(128, f);
 }
 
+/**
+ * Display the information from a memory section.
+ *
+ * @param sb    Pointer to the section binary.
+ **/
 void dumpSectionInfo(struct section_bin *sb)
 {
     printf("bankname : %s\n", sb->section_name);
@@ -249,6 +275,11 @@ void dumpSectionInfo(struct section_bin *sb)
     printf("================\n");
 }
 
+/**
+ * Display memory bank information.
+ *
+ * @param memory    Pointer to banked_memory structure
+ **/
 int dumpBankInfo(struct banked_memory *memory)
 {
     int bsnum;
@@ -271,6 +302,11 @@ int dumpBankInfo(struct banked_memory *memory)
     return (banksFound);
 }
 
+/**
+ * Check if any memory banks cross a 16KB boundary.
+ *
+ * @param memory    Pointer to banked_memory structure
+ **/
 void checkBankLimits(struct banked_memory *memory)
 {
     int bsnum;
@@ -300,13 +336,240 @@ void checkBankLimits(struct banked_memory *memory)
     }
 }
 
-// Layout a cpc file
-// \param inbuf The input buffer containing the file
-// \param fileName File name for CPM header
-// \param filelen Number of bytes to read
-// \param file_type Spectrum file type
-// \param total_len How long the returned block is
-// \return Allocated buffer containing the whole file (should be freed)
+/**
+ * Convert a binary file to wave format and append it to the specified wave file.
+ *
+ * @param fpWav File pointer to open wave file
+ * @param filename Binary file name
+ * @param filesize Pointer to file size. Will be incremented by the actual amount of data written to the wav file
+ *
+ * @returns
+ **/
+int bin2wav(FILE *fpWav, char *filename, unsigned long int *filesize)
+{
+    unsigned char srchead[0x80];
+    unsigned char srcdata[2048];
+    unsigned int currentblock = 1;
+    FILE *fpBin;
+    unsigned int blocks;
+    unsigned char header[0x100];
+    int nchunks;
+    int j, i;
+    int size;
+    int cksum;
+
+    printf("Adding %s to wav file\n", filename);
+
+    // Open the source binary file
+    if ((fpBin = fopen(filename, "rb")) == NULL)
+    {
+        exit_log(1, "Can't open file %s for wave conversion\n", filename);
+    }
+    // Read the AMSDOS header
+    if (1 != fread(srchead, 0x80, 1, fpBin))
+    {
+        fclose(fpBin);
+        exit_log(1, "Could not read AMSDOS header from %s\n", filename);
+    }
+
+    // Confirm this is an AMSDOS header
+    cksum = (srchead[0x44] << 8) | srchead[0x43];
+    if (cpc_checksum(srchead, 0x42) != cksum)
+    {
+        exit_log(1, "Checksum mismatch, invalid AMSDOS header!\n");
+    }
+
+    size = srchead[64] + srchead[65] * 0x100;
+    if (dumb)
+        printf("CPC file size (%s):%d bytes\n", filename, size);
+
+    blocks = size >> 11;
+
+    if (size & 0x7ff)
+        blocks++;
+    if (dumb)
+        printf("Need %d blocks.\n", blocks);
+
+    // Create tape header
+    memset(header, 0, 0x100);
+    header[24] = srchead[64];
+    header[25] = srchead[65];
+    header[17] = 0;
+    writename(header, srchead);
+    for (i = 18; i < 28; i++)
+        header[i] = srchead[i];
+    if (dumb)
+    {
+        printf("Total size : %4x\n", header[24] + header[25] * 256);
+        printf("Entry point: %4x\n", header[26] + header[27] * 256);
+        printf("Origin     : %4x\n", header[21] + header[22] * 256);
+    }
+
+    putsilence(fpWav, rate * 2, filesize);
+
+    for (currentblock = 1; currentblock <= blocks; currentblock++)
+    {
+        if (dumb)
+            printf("Processing file %s block %d ", header, currentblock);
+
+        /* Filling in the tape header ... */
+        header[16] = (unsigned char)currentblock;
+        header[19] = 0; /* Default block size: 2048 bytes */
+        header[20] = 8;
+
+        if (currentblock == blocks)
+        {
+            /* Last block */
+            header[17] = 0xff;
+            if (size % 2048)
+            {
+                header[20] = (size & 0x0700) >> 8;
+                header[19] = size & 0xff;
+            }
+        }
+        if (currentblock == 1)
+            header[23] = 0xff; /* First Block */
+        /*
+         * AMSDOS won't load the file if this is not set to
+         * 255 ! it will reply "Found FILE block n" ,
+         * whatever the block number
+         */
+        if (dumb)
+            printf("Size of block:%d\n", header[19] + header[20] * 256);
+        if (1 != fread(srcdata, header[19] + header[20] * 256, 1, fpBin))
+        {
+            fclose(fpBin);
+            exit_log(1, "Could not read required data from <%s>\n", filename);
+        }
+
+        if (feof(fpBin))
+        {
+            fprintf(stderr, "Fatal error: EOF met on input file.\nMaybe a non-CPC or ASCII file ?\n");
+            exit(2);
+        }
+        /* Actual header writing */
+        for (i = 0; i < 256; i++)
+            putbyte(fpWav, 0xff, filesize); /* leader */
+        putbit(fpWav, 0, filesize);         /* Sync bit & byte. For
+                                             * more details see */
+        putbyte(fpWav, 0x2c, filesize);     /* AIFFdec's refernce.txt
+                                             * !               */
+        putblock(fpWav, header, 256, filesize);
+        putCRC(fpWav, calcCRC(header), filesize);
+        for (i = 0; i < 4; i++)
+            putbyte(fpWav, 255, filesize); /* trailer */
+        /* putsilence(f,rate,&filesize); */
+        for (i = 0; i < 256; i++)
+            putbyte(fpWav, 255, filesize); /* leader */
+        putbit(fpWav, 0, filesize);
+        putbyte(fpWav, 0x16, filesize);
+
+        /* Block writing */
+
+        nchunks = header[20];
+        if (header[19] != 0)
+            nchunks++;
+
+        /*
+         * Number of chunks is block size/256, +1 if there is
+         * a remainder
+         */
+        for (j = 0; j < nchunks; j++)
+        {
+            putblock(fpWav, srcdata + (j * 256), 256, filesize);
+            putCRC(fpWav, calcCRC(srcdata + (j * 256)), filesize);
+        }
+        for (i = 0; i < 4; i++)
+            putbyte(fpWav, 255, filesize); /* trailer */
+        if (currentblock != blocks)
+            putsilence(fpWav, rate * 2, filesize);
+    }
+    fclose(fpBin);
+    return (size);
+}
+
+/**
+ * Read an entire binary file.
+ *
+ * @param binname   Binary file name
+ * @param crtfile   crt0 file name
+ * @param length    Pointer to receive the length of the data read
+ *
+ * @returns Pointer to buffer containing file data (must be freed).
+ */
+uint8_t *readFile(char *binname, char *crtfile, size_t *length)
+{
+    FILE *fpin;
+    uint8_t *inFileBuff;
+    size_t binary_length;
+
+    if ((fpin = fopen_bin(binname, crtfile)) == NULL)
+    {
+        exit_log(1, "Can't open input file %s\n", binname);
+    }
+
+    // Now we try to determine the size of the file to be
+    // converted
+    if (fseek(fpin, 0, SEEK_END))
+    {
+        fclose(fpin);
+        exit_log(1, "Couldn't determine size of file\n");
+    }
+
+    binary_length = ftell(fpin);
+    fseek(fpin, 0L, SEEK_SET);
+
+    inFileBuff = must_malloc(binary_length);
+    if (binary_length != fread(inFileBuff, 1, binary_length, fpin))
+    {
+        fclose(fpin);
+        exit_log(1, "Could not read required data from '%s'\n", binname);
+    }
+    fclose(fpin);
+
+    if (length != NULL)
+        *length = binary_length;
+
+    return (inFileBuff);
+}
+
+/**
+ * Write data to a binary file. The file is overwritten if it already exists.
+ *
+ * @param cpm_filename  CPM formatted file name
+ * @param outFileBuff   Pointer to buffer containing data to be written
+ * @param length        Length in bytes of data to be written
+ **/
+void writeFile(char *cpm_filename, uint8_t *outFileBuff, int file_len)
+{
+    FILE *fpout;
+
+    if ((fpout = fopen(cpm_filename, "wb")) == NULL)
+    {
+        exit_log(1, "Can't open output file '%s'\n", cpm_filename);
+    }
+
+    if ((fwrite(outFileBuff, 1, file_len, fpout)) != file_len)
+    {
+        fclose(fpout);
+        free(outFileBuff);
+        exit_log(1, "Can't write %d bytes to '%s'\n", file_len, cpm_filename);
+    }
+    fclose(fpout);
+}
+
+/**
+ * Prefix an input buffer, containing a binary file, with an AMSDOS header.
+ *
+ * @param inbuf     The input buffer containing the file
+ * @param fileName  CPM file name to be placed in the header
+ * @param filelen   Length of file data pointed to by inBuf
+ * @param start_address Load and execution address of the file
+ * @param file_type CPM file type. 0:BASIC 1:Protected 2:Binary
+ * @param total_len_ptr Length of the returned buffer
+ *
+ * @returns Allocated buffer containing an AMSDOS header and the binary file data (must be freed)
+ **/
 uint8_t *cpc_layout_file(uint8_t *inbuf, char *fileName, size_t filelen, int start_address, int file_type, size_t *total_len_ptr)
 {
     uint8_t *buf = must_malloc(filelen + 128);
@@ -367,25 +630,19 @@ int cpc_exec(char* target)
     size_t file_len;
     char filename[FILENAME_MAX + 1];
     char wavfile[FILENAME_MAX + 1];
-    FILE *fpin, *fpout;
     long pos;
     int i;
-    FILE *f, *source;
-    unsigned char header[256];
-    unsigned char srchead[128];
-    unsigned char srcdata[2048];
-    unsigned long int filesize = 0;
-    unsigned int size;
-    unsigned int blocks;
-    unsigned int currentblock = 1;
-    int j, ret;
+    int ret = -1;
     size_t binary_length;
-    int nchunks;
-
-    ret = -1;
+    int bsnum_bank;
+    unsigned long int wavSize = 0;
+    unsigned int totalSize = 0;
+    FILE *fpWav;
 
     if (help)
+    {
         return ret;
+    }
 
     if (binname == NULL)
     {
@@ -397,6 +654,54 @@ int cpc_exec(char* target)
         snprintf(crtname, sizeof(crtname) - 4, "%s", binname);
         suffix_change(crtname, "");
         crtfile = crtname;
+    }
+
+    /* low & high levels in the .wav file                               */
+    /* LOW must be under 128 and HIGH above this value                  */
+    /* The nearer 128, the less sound output is loud                    */
+    /* Typically LOW and HIGH are centered around 128 but I don't think */
+    /* this is requested.                                               */
+    /* Note : of course, output .wav file is 8bit.                      */
+
+    if (loud)
+    {
+        HIGH = 0xFd;
+        LOW = 2;
+    }
+
+    // --dumb does a direct conversion from a file with an AMSDOS header to a wav file.
+    if (dumb)
+    {
+        // If an output file was not specified, use the binary
+        // file name but change the extension
+        if (outfile == NULL)
+        {
+            strcpy(filename, binname);
+            suffix_change(filename, ".wav");
+        }
+        else
+        {
+            strcpy(filename, outfile);
+        }
+
+        // Open the wav file and write the header
+        if ((fpWav = fopen(filename, "wb")) == NULL)
+        {
+            exit_log(1, "Can't open output wav audio file %s\n", wavfile);
+        }
+
+        putWavHeader(fpWav, &wavSize);
+
+        totalSize += bin2wav(fpWav, binname, &wavSize);
+
+        writesize(fpWav, wavSize);
+        fclose(fpWav);
+
+        printf("Wav file size : %ld\n", wavSize);
+        printf("Actual rate   : %ld bits/sec\n",
+               (long int)(((long int)(totalSize * 8 * rate)) / wavSize));
+
+        return(0);
     }
 
     memset(&aligned, 0, sizeof(aligned));
@@ -431,324 +736,207 @@ int cpc_exec(char* target)
         if (mb_sort_banks(&memory))
             exit_log(1, "Aborting... one or more binaries overlap\n");
     }
+
+    // If the ORG address has been specified use it.
+    // Otherwise, search the map file for it.
+    if (origin != -1)
+    {
+        pos = origin;
+    }
     else
     {
-        fprintf(stderr, "Failed to enumerate banks, could not open %s\n", filename);
+        if ((pos = get_org_addr(crtfile)) == -1)
+        {
+            exit_log(1, "Could not find symbol CRT_ORG_CODE or __crt_org_code\n");
+        }
     }
 
-    if (dumb)
+    // If the exec address was not specified, use the ORG address
+    if (exec == -1)
+    {
+        exec = pos;
+    }
+
+    // If an output file was not specified, use the binary
+    // file name but change the extension
+    if (outfile == NULL)
     {
         strcpy(filename, binname);
+        suffix_change(filename, ".cpc");
     }
     else
     {
-        // If the ORG address has been specified use it.
-        // Otherwise, search the map file for it.
-        if (origin != -1)
-        {
-            pos = origin;
-        }
-        else
-        {
-            if ((pos = get_org_addr(crtfile)) == -1)
-            {
-                exit_log(1, "Could not find symbol CRT_ORG_CODE or __crt_org_code\n");
-            }
-        }
+        strcpy(filename, outfile);
+    }
 
-        // If the exec address was not specified, use the ORG address
-        if (exec == -1)
-        {
-            exec = pos;
-        }
+    inFileBuff = readFile(binname, crtfile, &binary_length);
 
-        // If the block name was not specified, use the binary file name
-        if (blockname == NULL)
-            blockname = zbasename(binname);
-
-        // If an output file was not specified, use the binary
-        // file name but change the extension
-        if (outfile == NULL)
-        {
-            strcpy(filename, binname);
-            suffix_change(filename, ".cpc");
-        }
-        else
-        {
-            strcpy(filename, outfile);
-        }
-
-        if ((fpin = fopen_bin(binname, crtfile)) == NULL)
-        {
-            exit_log(1, "Can't open input file %s\n", binname);
-        }
-
-        // Now we try to determine the size of the file to be
-        // converted
-        if (fseek(fpin, 0, SEEK_END))
-        {
-            fclose(fpin);
-            exit_log(1, "Couldn't determine size of file\n");
-        }
-
-        binary_length = ftell(fpin);
-        fseek(fpin, 0L, SEEK_SET);
-
-        inFileBuff = must_malloc(binary_length);
-        if (binary_length != fread(inFileBuff, 1, binary_length, fpin))
-        {
-            fclose(fpin);
-            exit_log(1, "Could not read required data from <%s>\n", binname);
-        }
-        fclose(fpin);
-
+    if (blockname == NULL)
         cpm_create_filename(filename, cpm_filename, 0, 0);
-        outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, binary_length, pos, 2, &file_len);
-        free(inFileBuff);
+    else
+        cpm_create_filename(blockname, cpm_filename, 0, 0);
 
-        if ((fpout = fopen(filename, "wb")) == NULL)
+    outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, binary_length, pos, 2, &file_len);
+    free(inFileBuff);
+
+    writeFile(filename, outFileBuff, file_len);
+
+    if (disk)
+    {
+        char disc_image_name[FILENAME_MAX + 1];
+        disc_handle *h;
+
+        strcpy(disc_image_name, binname);
+        suffix_change(disc_image_name, ".dsk");
+
+        if ((h = cpm_create_with_format("cpcsystem")) == NULL)
         {
-            exit_log(1, "Can't open output file\n");
+            free(outFileBuff);
+            exit_log(1, "Cannot find disc specification\n");
         }
 
-        if ((fwrite(outFileBuff, 1, file_len, fpout)) != file_len)
+        disc_write_file(h, cpm_filename, outFileBuff, file_len);
+        free(outFileBuff);
+
+        // Write the banks
+        bsnum_bank = mb_find_bankspace(&memory, "BANK");
+        if (bsnum_bank >= 0)
         {
-            fclose(fpout);
-            free(outFileBuff);
-            exit_log(1, "Could not write required data to <%s>\n", filename);
-        }
-        fclose(fpout);
-
-        if (disk)
-        {
-            char disc_image_name[FILENAME_MAX + 1];
-            int bsnum_bank;
-            disc_handle *h;
-
-            strcpy(disc_image_name, binname);
-            suffix_change(disc_image_name, ".dsk");
-
-            if ((h = cpm_create_with_format("cpcsystem")) == NULL)
+            for (i = 0; i < MAXBANKS; i++)
             {
-                free(outFileBuff);
-                exit_log(1, "Cannot find disc specification\n");
-            }
-
-            disc_write_file(h, cpm_filename, outFileBuff, file_len);
-            free(outFileBuff);
-
-            // Write the banks
-            bsnum_bank = mb_find_bankspace(&memory, "BANK");
-            if (bsnum_bank >= 0)
-            {
-                for (i = 0; i < MAXBANKS; i++)
+                struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
+                if (mb->num > 0)
                 {
-                    struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
-                    if (mb->num > 0)
+                    char numbuf[32];
+                    char tmpBlockName[FILENAME_MAX + 1];
+
+                    inFileBuff = readFile(mb->secbin->filename, NULL, &binary_length);
+
+                    snprintf(numbuf, sizeof(numbuf), ".b%d", i);
+                    if (blockname == NULL)
                     {
-                        char numbuf[32];
-
-                        if ((fpin = fopen(mb->secbin->filename, "rb")) == NULL)
-                        {
-                            exit_log(1, "Cannot open BANK file %s\n", mb->secbin->filename);
-                        }
-
-                        inFileBuff = must_malloc(mb->secbin->size);
-
-                        if (mb->secbin->size != fread(inFileBuff, 1, mb->secbin->size, fpin))
-                        {
-                            fclose(fpin);
-                            exit_log(1, "Could not read required data from <%s>\n", mb->secbin->filename);
-                        }
-                        fclose(fpin);
-
-                        snprintf(numbuf, sizeof(numbuf), ".B%d", i);
-                        suffix_change(filename, numbuf);
-
-                        cpm_create_filename(filename, cpm_filename, 0, 0);
-                        outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, mb->secbin->size, mb->secbin->org, 2, &file_len);
-                        disc_write_file(h, cpm_filename, outFileBuff, file_len);
-
-                        free(inFileBuff);
-                        free(outFileBuff);
+                        strcpy(tmpBlockName, filename);
                     }
+                    else
+                    {
+                        strcpy(tmpBlockName, blockname);
+                    }
+                    suffix_change(tmpBlockName, numbuf);
+                    suffix_change(filename, numbuf);
+
+                    cpm_create_filename(tmpBlockName, cpm_filename, 0, 0);
+                    outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, mb->secbin->size, mb->secbin->org, 2, &file_len);
+
+                    writeFile(filename, outFileBuff, file_len);
+
+                    disc_write_file(h, cpm_filename, outFileBuff, file_len);
+
+                    free(inFileBuff);
+                    free(outFileBuff);
                 }
             }
-
-            if (disc_write_edsk(h, disc_image_name) < 0)
-            {
-                exit_log(1, "Can't write disc image");
-            }
-
-            disc_free(h);
-            mb_cleanup_memory(&memory);
-            mb_cleanup_aligned(&aligned);
-            return 0;
         }
-        else
+
+        if (disc_write_edsk(h, disc_image_name) < 0)
         {
-            free(outFileBuff);
-            mb_cleanup_memory(&memory);
-            mb_cleanup_aligned(&aligned);
+            exit_log(1, "Can't write disc image");
         }
+
+        disc_free(h);
+        mb_cleanup_memory(&memory);
+        mb_cleanup_aligned(&aligned);
+        return 0;
     }
 
-    /* low & high levels in the .wav file                               */
-    /* LOW must be under 128 and HIGH above this value                  */
-    /* The nearer 128, the less sound output is loud                    */
-    /* Typically LOW and HIGH are centered around 128 but I don't think */
-    /* this is requested.                                               */
-    /* Note : of course, output .wav file is 8bit.                      */
-
-    if (loud) {
-        HIGH = 0xFd;
-        LOW = 2;
-    } else {
-        HIGH = 0xe0;
-        LOW = 0x20;
-    }
-
-    if (!rate)
-        rate = 8000;
+    free(outFileBuff);
 
     /* ***************************************** */
-    /* Now, if requested, create the audio file */
+    /* Now, if requested, create the audio file  */
     /* ***************************************** */
-    if ((audio) || (loud)) {
-        if ((source = fopen(filename, "rb")) == NULL) {
-            exit_log(1,"Can't open file %s for wave conversion\n", filename);
-        }
-        /*
-           * if (fseek(source,0,SEEK_END)) { fclose(source);
-           * exit_log(1,"Couldn't determine size of file\n"); }
-           * len=ftell(source); fseek(source,0,SEEK_SET);
-           */
-        if (1 != fread(srchead, 128, 1, source)) { fclose(source); exit_log(1, "Could not read required data from <%s>\n",filename); }
-        size = srchead[64] + srchead[65] * 256;
-        if (dumb)
-            printf("CPC file size (%s):%d bytes\n", filename, size);
-
-        blocks = size >> 11;
-
-        if (size & 2047)
-            blocks++;
-        if (dumb)
-            printf("Need %d blocks.\n", blocks);
-
+    if ((audio) || (loud))
+    {
+        // Open the wav file and write the header
         strcpy(wavfile, filename);
-
         suffix_change(wavfile, ".wav");
-
-        if ((f = fopen(wavfile, "wb")) == NULL) {
-            exit_log(1, "Can't open output waw audio file %s\n", wavfile);
+        if ((fpWav = fopen(wavfile, "wb")) == NULL)
+        {
+            exit_log(1, "Can't open output wav audio file %s\n", wavfile);
         }
-        putWavHeader(f);
+        putWavHeader(fpWav, &wavSize);
 
-        for (i = 0; i < 256; i++)
-            header[i] = 0;
-        header[24] = srchead[64];
-        header[25] = srchead[65];
-        header[17] = 0;
-        writename(header, srchead);
-        for (i = 18; i < 28; i++)
-            header[i] = srchead[i];
-        if (dumb)
-            printf("Total size : %4x\n", header[24] + header[25] * 256);
-        if (dumb)
-            printf("Entry point: %4x\n", header[26] + header[27] * 256);
-        if (dumb)
-            printf("Origin     : %4x\n", header[21] + header[22] * 256);
+        totalSize += bin2wav(fpWav, filename, &wavSize);
 
-        putsilence(f, rate, &filesize);
+        // Output any memory banks
+        // Write the banks
+        bsnum_bank = mb_find_bankspace(&memory, "BANK");
+        if (bsnum_bank >= 0)
+        {
+            for (i = 0; i < MAXBANKS; i++)
+            {
+                struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
+                if (mb->num > 0)
+                {
+                    char numbuf[32];
+                    char tmpBlockName[FILENAME_MAX + 1];
 
-        for (currentblock = 1; currentblock <= blocks; currentblock++) {
-            if (dumb)
-                printf("Processing file %s block %d ", header, currentblock);
+                    inFileBuff = readFile(mb->secbin->filename, NULL, &binary_length);
 
-            /* Filling in the tape header ... */
-            header[16] = (unsigned char)currentblock;
-            header[19] = 0; /* Default block size: 2048 bytes */
-            header[20] = 8;
+                    snprintf(numbuf, sizeof(numbuf), ".b%d", i);
+                    if (blockname == NULL)
+                    {
+                        strcpy(tmpBlockName, filename);
+                    }
+                    else
+                    {
+                        strcpy(tmpBlockName, blockname);
+                    }
+                    suffix_change(tmpBlockName, numbuf);
+                    suffix_change(filename, numbuf);
 
-            if (currentblock == blocks) { /* Last block */
-                header[17] = 0xff;
-                if (size % 2048) {
-                    header[20] = (size & 0x0700) >> 8;
-                    header[19] = size & 0xff;
+                    cpm_create_filename(tmpBlockName, cpm_filename, 0, 0);
+                    outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, mb->secbin->size, mb->secbin->org, 2, &file_len);
+
+                    writeFile(filename, outFileBuff, file_len);
+
+                    totalSize += bin2wav(fpWav, filename, &wavSize);
+
+                    free(inFileBuff);
+                    free(outFileBuff);
                 }
             }
-            if (currentblock == 1)
-                header[23] = 0xff; /* First Block */
-            /*
-                * AMSDOS won't load the file if this is not set to
-                * 255 ! it will reply "Found FILE block n" ,
-                * whatever the block number
-                */
-            if (dumb)
-                printf("Size of block:%d\n", header[19] + header[20] * 256);
-            if (1 != fread(srcdata, header[19] + header[20] * 256, 1, source)) { fclose(source); exit_log(1, "Could not read required data from <%s>\n",filename); }
-
-            if (feof(source)) {
-                fprintf(stderr, "Fatal error: EOF met on input file.\nMaybe a non-CPC or ASCII file ?\n");
-                exit(2);
-            }
-            /* Actual header writing */
-            for (i = 0; i < 256; i++)
-                putbyte(f, 0xff, &filesize); /* leader */
-            putbit(f, 0, &filesize); /* Sync bit & byte. For
-                                    * more details see */
-            putbyte(f, 0x2c, &filesize); /* AIFFdec's refrnce.txt
-                                    * !               */
-            putblock(f, header, 256, &filesize);
-            putCRC(f, calcCRC(header), &filesize);
-            for (i = 0; i < 4; i++)
-                putbyte(f, 255, &filesize); /* trailer */
-            /* putsilence(f,rate,&filesize); */
-            for (i = 0; i < 256; i++)
-                putbyte(f, 255, &filesize); /* leader */
-            putbit(f, 0, &filesize);
-            putbyte(f, 0x16, &filesize);
-
-            /* Block writing */
-
-            nchunks = header[20];
-            if (header[19] != 0)
-                nchunks++;
-
-            /*
-                * Number of chunks is block size/256, +1 if there is
-                * a remainder
-                */
-            for (j = 0; j < nchunks; j++) {
-                putblock(f, srcdata + (j * 256), 256, &filesize);
-                putCRC(f, calcCRC(srcdata + (j * 256)), &filesize);
-            }
-            for (i = 0; i < 4; i++)
-                putbyte(f, 255, &filesize); /* trailer */
-            if (currentblock != blocks)
-                putsilence(f, rate * 2, &filesize);
         }
 
-        if (dumb)
-            printf("Output file size:%ld\n", filesize);
-        printf("Actual rate:%ld bits/sec\n", (long int)(((long int)(size * 8 * rate)) / filesize));
-        writesize(f, filesize);
+        printf("Actual rate:%ld bits/sec\n",
+               (long int)(((long int)(totalSize * 8 * rate)) / wavSize));
+        writesize(fpWav, wavSize);
 
-        fclose(source);
-        fclose(f);
+        fclose(fpWav);
+    }
 
-    } /* END of WAV CONVERSION BLOCK */
+    // Free memory allocated for memory bank scanning
+    mb_cleanup_memory(&memory);
+    mb_cleanup_aligned(&aligned);
+
     return 0;
 }
 
+/**
+ * Calculate a checksum over the specified buffer.
+ *
+ * @param buf   Pointer to buffer
+ * @param len   Number of bytes to checksum
+ *
+ * @returns Calculated checksum.
+ **/
 static int cpc_checksum(unsigned char *buf, int len)
 {
-     int          i;
-     int          cksum = 0;
+    int i;
+    int cksum = 0;
 
-     for (i = 0; i < len; i++) {
-          cksum += buf[i];
-     }
+    for (i = 0; i < len; i++)
+    {
+        cksum += buf[i];
+    }
 
-     return cksum;
+    return cksum;
 }
