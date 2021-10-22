@@ -160,19 +160,16 @@ void putWavHeader(FILE* f, unsigned long int* filesize)
  **/
 void writesize(FILE *f, uint32_t size)
 {
-    uint32_t sizeLE;
     // Offset 4,  4-bytes - SubChunk2Size = NumSamples * NumChannels * BitsPerSample/8 (little endian)
     // http://soundfile.sapp.org/doc/WaveFormat/
-    sizeLE = htole32(size);
     fseek(f, 40, SEEK_SET);
-    fwrite(&sizeLE, 4, 1, f);
+    writelong(size, f);
 
     // Offset 4,  4-bytes - ChunkSize = 36 + SubChunk2Size (little endian)
     // http://soundfile.sapp.org/doc/WaveFormat/
     size = size + 36;
-    sizeLE = htole32(size);
     fseek(f, 4, SEEK_SET);
-    fwrite(&sizeLE, 4, 1, f);
+    writelong(size, f);
 }
 
 /*
