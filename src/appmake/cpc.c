@@ -868,9 +868,10 @@ int cpc_exec(char* target)
         bsnum_bank = mb_find_bankspace(&memory, "BANK");
         if (bsnum_bank >= 0)
         {
-            for (i = 0; i < MAXBANKS; i++)
+            for (i = 0; i < 8 /*MAXBANKS*/; i++)
             {
-                struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[i];
+                int bankOrder[8] = {3, 0, 1, 4, 5, 6, 7, 2};
+                struct memory_bank *mb = &memory.bankspace[bsnum_bank].membank[bankOrder[i]];
                 if (mb->num > 0)
                 {
                     char numbuf[32];
@@ -878,7 +879,7 @@ int cpc_exec(char* target)
 
                     inFileBuff = readFile(mb->secbin->filename, NULL, &binary_length);
 
-                    snprintf(numbuf, sizeof(numbuf), ".b%d", i);
+                    snprintf(numbuf, sizeof(numbuf), ".b%d", bankOrder[i]);
                     if (blockname == NULL)
                     {
                         strcpy(tmpBlockName, filename);
