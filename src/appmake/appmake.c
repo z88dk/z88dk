@@ -1911,6 +1911,7 @@ void mb_delete_source_binaries(struct banked_memory *memory)
 
 void mb_cleanup_memory(struct banked_memory *memory)
 {
+    struct memory_bank *mb;
     int i,j,k;
     // does not free "memory"
 
@@ -1920,7 +1921,7 @@ void mb_cleanup_memory(struct banked_memory *memory)
         
         for (j = 0; j < MAXBANKS; ++j)
         {
-            struct memory_bank *mb = &bs->membank[j];
+            mb = &bs->membank[j];
 
             for (k = 0; k < mb->num; ++k)
             {
@@ -1934,6 +1935,15 @@ void mb_cleanup_memory(struct banked_memory *memory)
         }
 
         free(bs->bank_id);
+    }
+
+    mb = &memory->mainbank;
+    for (k = 0; k < mb->num; ++k)
+    {
+        struct section_bin *sb = &mb->secbin[k];
+
+        free(sb->filename);
+        free(sb->section_name);
     }
 
     free(memory->bankspace);
