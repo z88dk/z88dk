@@ -1,4 +1,4 @@
-; sccz80 crt0 library - 8085 version
+; sccz80 crt0 library - 8080 version
 ;
 ; feilipu 10/2021
 
@@ -15,22 +15,22 @@ PUBLIC l_mult_ulong_0
 ; DEHL = DE * BC [unsigned]
 .l_mult_ulong_0
     ld      hl,0
-    ld      a,8         ; 16 bits (8 iterations)
+    ld      a,16         ; 16 iterations
 .mul1
+    push    af
     add     hl,hl
-    rl      de
+    ld      a,e
+    rla
+    ld      e,a
+    ld      a,d
+    rla
+    ld      d,a
     jp      NC,mul2
     add     hl,bc
     jp      NC,mul2
     inc     de
 .mul2
-    add     hl,hl
-    rl      de
-    jp      NC,mul3
-    add     hl,bc
-    jp      NC,mul3
-    inc     de
-.mul3
+    pop     af
     dec     a
     jp      NZ,mul1
     ret

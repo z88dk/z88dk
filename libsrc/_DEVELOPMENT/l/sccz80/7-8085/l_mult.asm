@@ -1,4 +1,6 @@
 ; sccz80 crt0 library - 8085 version
+;
+; feilipu 10/2021
 
 SECTION code_clib
 SECTION code_l_sccz80

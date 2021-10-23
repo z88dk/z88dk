@@ -5,6 +5,7 @@ ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_cm_bc
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/int2long_s
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_div_u
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_mult
+${NEWLIB_ROOT}l/sccz80/8-gbz80/l_mult_ulong
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_asr
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_pint
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_glongsp

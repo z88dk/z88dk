@@ -3,6 +3,7 @@ ${NEWLIB_ROOT}l/sccz80/8-8080/l_gintspsp
 ${NEWLIB_ROOT}l/sccz80/8-8080/int2long_s
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_div_u
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_mult
+${NEWLIB_ROOT}l/sccz80/8-8080/l_mult_ulong
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_gcharspsp
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_g2charspsp
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_asr
