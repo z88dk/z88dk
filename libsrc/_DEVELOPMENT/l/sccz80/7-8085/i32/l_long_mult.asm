@@ -16,10 +16,8 @@ EXTERN  l_mult_ulong_0
 ;enter with secondary in dehl, primary on stack
 ;exit with product in dehl
 .l_long_mult
-    pop     bc                  ;get return
     push    de                  ;put secondary on stack
     push    hl
-    push    bc                  ;replace return
 
     ld      bc,hl               ;secondary LSW
 
@@ -29,12 +27,10 @@ EXTERN  l_mult_ulong_0
 
     call    l_mult_ulong_0      ;dehl = de * bc
 
-    pop     bc                  ;get return
     push    hl                  ;result LSW
-    push    bc                  ;push return
     push    de                  ;partial result MSW
 
-    ld      de,sp+6             ;secondary LSW offset
+    ld      de,sp+4             ;secondary LSW offset
     ld      hl,(de)
     ld      bc,hl
 
@@ -48,7 +44,7 @@ EXTERN  l_mult_ulong_0
     add     hl,bc
     push    hl
 
-    ld      de,sp+8             ;secondary MSW offset
+    ld      de,sp+6             ;secondary MSW offset
     ld      hl,(de)
     ld      bc,hl
 
@@ -60,16 +56,17 @@ EXTERN  l_mult_ulong_0
 
     pop     bc                  ;partial result MSW
     add     hl,bc               ;result MSW
+    push    hl
 
-    ex      (sp),hl             ;result MSW <> return
-
-    ld      de,sp+10            ;place return on stack
+    ld      de,sp+8             ;get return from stack
+    ld      hl,(de)
+    ld      de,sp+12            ;place return on stack
     ld      (de),hl
 
     pop     hl                  ;result MSW
     pop     bc                  ;result LSW
 
-    ld      de,sp+6             ;point to return again
+    ld      de,sp+8             ;point to return again
     ex      de,hl               ;result MSW <> return sp
     ld      sp,hl               ;remove stacked parameters
 
