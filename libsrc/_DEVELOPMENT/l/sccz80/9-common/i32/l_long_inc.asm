@@ -1,7 +1,5 @@
 ;       Small C+ Z88 Support Library
-;
-;	Increment long on hl
-;	Kept little endian
+;       Long functions
 ;
 ;       djm 26/2/2000
 ;       aralbrec 01/2007
@@ -9,21 +7,22 @@
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC l_long_inc
+PUBLIC  l_long_inc
+PUBLIC  l_long_inc_mhl
 
-l_long_inc:
+.l_long_inc
+.l_long_inc_mhl
+    inc (hl)
+    ret NZ
 
-   inc (hl)
-   ret nz
-   
-   inc hl
-   inc (hl)
-   ret nz
-   
-   inc hl
-   inc (hl)
-   ret nz
-   
-   inc hl
-   inc (hl)
-   ret
+    inc hl
+    inc (hl)
+    ret NZ
+
+    inc hl
+    inc (hl)
+    ret NZ
+
+    inc hl
+    inc (hl)
+    ret
