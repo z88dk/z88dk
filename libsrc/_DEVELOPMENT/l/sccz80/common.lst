@@ -48,6 +48,7 @@ ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_inclong
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_neg
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_add_mhl
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_and_mhl
+${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_cp_mhl
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_cpl_mde
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_cpl_mhl
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_dec_mhl
