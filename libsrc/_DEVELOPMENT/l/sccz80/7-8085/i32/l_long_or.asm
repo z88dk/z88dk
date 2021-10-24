@@ -12,8 +12,9 @@ SECTION code_l_sccz80
 PUBLIC  l_long_or
 
 
-;primary = secondary | primary
+;result =  primary | secondary
 ;enter with secondary in dehl, primary on stack
+;exit with result in dehl
 
 .l_long_or
     ld      bc,de       ;get the upper 16 into bc

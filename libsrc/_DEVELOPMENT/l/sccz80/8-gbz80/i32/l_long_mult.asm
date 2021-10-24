@@ -12,9 +12,11 @@ PUBLIC  l_long_mult
 EXTERN  l_mult_0
 EXTERN  l_mult_ulong_0
 
-;primary = secondary * primary
+
+;result = primary * secondary
 ;enter with secondary in dehl, primary on stack
 ;exit with product in dehl
+
 .l_long_mult
     push    de                  ;put secondary on stack
     push    hl

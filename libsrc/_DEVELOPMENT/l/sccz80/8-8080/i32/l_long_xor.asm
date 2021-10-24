@@ -12,8 +12,9 @@ SECTION code_l_sccz80
 PUBLIC  l_long_xor
 
 
-;primary = secondary ^ primary
+;result = primary ^ secondary
 ;enter with secondary in dehl, primary on stack
+;exit with result in dehl
 
 .l_long_xor
     ld      bc,hl       ;get the lower 16 into bc

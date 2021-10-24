@@ -12,7 +12,7 @@ SECTION code_l_sccz80
 PUBLIC  l_long_xor
 
 
-;primary = secondary ^ primary
+;primary = primary ^ secondary
 ;enter with secondary in dehl, primary on stack
 
 .l_long_xor
