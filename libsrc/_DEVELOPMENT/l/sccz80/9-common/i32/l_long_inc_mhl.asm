@@ -10,6 +10,10 @@ SECTION code_l_sccz80
 PUBLIC  l_long_inc
 PUBLIC  l_long_inc_mhl
 
+
+;primary = primary + 1
+;enter with primary in (hl)
+
 .l_long_inc
 .l_long_inc_mhl
     inc (hl)
@@ -25,4 +29,5 @@ PUBLIC  l_long_inc_mhl
 
     inc hl
     inc (hl)
+
     ret

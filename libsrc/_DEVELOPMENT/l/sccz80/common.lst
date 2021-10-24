@@ -34,7 +34,6 @@ ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_lt
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_ule
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_le
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_ult
-${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_dec
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_ugt
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_ge
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_lneg
@@ -46,13 +45,15 @@ ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_com
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_declong
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/htonl
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_inclong
-${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_inc
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_neg
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_add_mhl
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_and_mhl
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_cpl_mhl
+${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_dec_mhl
+${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_inc_mhl
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_neg_mhl
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_or_mhl
+${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_rl_mhl
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_sub_mhl
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_xor_mhl
 ${NEWLIB_ROOT}l/sccz80/9-common/l_ule
