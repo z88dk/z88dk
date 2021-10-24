@@ -14,28 +14,28 @@ PUBLIC  l_long_sub_mhl
 
 .l_long_sub_mhl
     ld      a,(de)
-    sub     (hl)
+    sub     a,(hl)
     ld      (de),a
 
     inc     de
     inc     hl
 
     ld      a,(de)
-    sbc     (hl)
+    sbc     a,(hl)
     ld      (de),a
 
     inc     de
     inc     hl
 
     ld      a,(de)
-    sbc     (hl)
+    sbc     a,(hl)
     ld      (de),a
 
     inc     de
     inc     hl
 
     ld      a,(de)
-    sbc     (hl)
+    sbc     a,(hl)
     ld      (de),a
 
     ret

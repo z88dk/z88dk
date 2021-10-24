@@ -14,24 +14,24 @@ PUBLIC  l_long_cp_mhl
 
 .l_long_cp_mhl
     ld      a,(de)
-    sub     (hl)
+    sub     a,(hl)
 
     inc     de
     inc     hl
 
     ld      a,(de)
-    sbc     (hl)
+    sbc     a,(hl)
 
     inc     de
     inc     hl
 
     ld      a,(de)
-    sbc     (hl)
+    sbc     a,(hl)
 
     inc     de
     inc     hl
 
     ld      a,(de)
-    sbc     (hl)
+    sbc     a,(hl)
 
     ret

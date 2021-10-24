@@ -14,28 +14,28 @@ PUBLIC  l_long_add_mhl
 
 .l_long_add_mhl
     ld      a,(de)
-    add     (hl)
+    add     a,(hl)
     ld      (de),a
 
     inc     de
     inc     hl
 
     ld      a,(de)
-    adc     (hl)
+    adc     a,(hl)
     ld      (de),a
 
     inc     de
     inc     hl
 
     ld      a,(de)
-    adc     (hl)
+    adc     a,(hl)
     ld      (de),a
 
     inc     de
     inc     hl
 
     ld      a,(de)
-    adc     (hl)
+    adc     a,(hl)
     ld      (de),a
 
     ret
