@@ -20,7 +20,7 @@ EXTERN  l_long_rl_mde, l_long_cp_mhl, l_long_sub_mhl
     or e
     or h
     or l                        ;clear Carry to quotient
-    jr Z, divide_by_zero
+    jp Z, divide_by_zero
 
     push    de                  ;put secondary (divisor) on stack
     push    hl
@@ -64,6 +64,8 @@ EXTERN  l_long_rl_mde, l_long_cp_mhl, l_long_sub_mhl
     ld      b,32                ;set up div_loop counter
 
 .div_loop
+
+IF 1
     ld      de,sp+14            ;rotate left dividend + quotient Carry
     call    l_long_rl_mde
 
@@ -75,12 +77,94 @@ EXTERN  l_long_rl_mde, l_long_cp_mhl, l_long_sub_mhl
     ld      de,sp+4
     call    l_long_cp_mhl
 
-    jr      C,skip_subtract     ;skip if remainder < divisor
+    jp      C,skip_subtract     ;skip if remainder < divisor
 
     ld      de,sp+8             ;subtract (remainder - divisor)
     ex      de,hl
     ld      de,sp+4
     call    l_long_sub_mhl
+
+ELSE
+    ld      de,sp+14            ;rotate left dividend + quotient Carry
+
+    ld      a,(de)
+    rla
+    ld      (de),a
+    inc     de
+    ld      a,(de)
+    rla
+    ld      (de),a
+    inc     de
+    ld      a,(de)
+    rla
+    ld      (de),a
+    inc     de
+    ld      a,(de)
+    rla
+    ld      (de),a
+
+    ld      de,sp+4             ;rotate left remainder + dividend Carry
+
+    ld      a,(de)
+    rla
+    ld      (de),a
+    inc     de
+    ld      a,(de)
+    rla
+    ld      (de),a
+    inc     de
+    ld      a,(de)
+    rla
+    ld      (de),a
+    inc     de
+    ld      a,(de)
+    rla
+    ld      (de),a
+
+    ld      de,sp+8             ;compare (remainder - divisor)
+    ex      de,hl
+    ld      de,sp+4
+
+    ld      a,(de)
+    sub     a,(hl)
+    inc     de
+    inc     hl
+    ld      a,(de)
+    sbc     a,(hl)
+    inc     de
+    inc     hl
+    ld      a,(de)
+    sbc     a,(hl)
+    inc     de
+    inc     hl
+    ld      a,(de)
+    sbc     a,(hl)
+
+    jp      C,skip_subtract     ;skip if remainder < divisor
+
+    ld      de,sp+8             ;subtract (remainder - divisor)
+    ex      de,hl
+    ld      de,sp+4
+
+    ld      a,(de)
+    sub     a,(hl)
+    ld      (de),a
+    inc     de
+    inc     hl
+    ld      a,(de)
+    sbc     a,(hl)
+    ld      (de),a
+    inc     de
+    inc     hl
+    ld      a,(de)
+    sbc     a,(hl)
+    ld      (de),a
+    inc     de
+    inc     hl
+    ld      a,(de)
+    sbc     a,(hl)
+    ld      (de),a
+ENDIF
 
 .skip_subtract
     ccf                         ;prepare Carry for quotient
