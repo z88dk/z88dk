@@ -17,8 +17,6 @@
     EXTERN  __printf_check_long_flag
     EXTERN  __printf_context
 
-    EXTERN  __math_block2
-
     defc    handlelong = 1
 
 
@@ -191,8 +189,7 @@ IF handlelong
     call    __printf_get_base
     ld      d,h
     ld      e,h
-    call    l_long_div_u
-    ld      a,(__math_block2)   ;We know that's where the modulus is kept
+    call    l_long_div_u    ;returns modulus LSB in a
     cp      255
     push    af
   ELSE

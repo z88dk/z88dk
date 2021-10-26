@@ -7,15 +7,15 @@
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC  l_long_mod
+PUBLIC  l_long_div
 
 EXTERN  l_long_div_u_0, l_long_neg_mhl
 
-;remainder = primary % secondary
+;quotient = primary / secondary
 ;enter with secondary (divisor) in dehl, primary (dividend | quotient) on stack
-;exit with remainder in dehl
+;exit with quotient in dehl
 
-.l_long_mod
+.l_long_div
     ld a,d                      ;check for divide by zero
     or e
     or h
@@ -31,58 +31,57 @@ EXTERN  l_long_div_u_0, l_long_neg_mhl
 
     ld      c,d                 ;sign of divisor
 
-    ld      hl,sp+13            ;sign of dividend
-    ld      b,(hl)
+    ld      de,sp+13            ;sign of dividend
+    ld      a,(de)
+    ld      b,a
 
     push    bc                  ;save sign info
 
-    ld      hl,sp+12            ;dividend
-    ld      a,b                 ;sign of dividend
+    ld      de,sp+12            ;dividend
+    ex      de,hl
     or      a,a                 ;test sign of dividend
     call    M,l_long_neg_mhl    ;take absolute value of dividend
 
-    ld      hl,sp+6             ;divisor
+    ld      de,sp+6             ;divisor
+    ex      de,hl
     ld      a,c                 ;sign of divisor
     or      a,a                 ;test sign of divisor
     call    M,l_long_neg_mhl    ;take absolute value of divisor
 
     call    l_long_div_u_0      ;unsigned division
 
-    ;tidy up with remainder to dehl
+    ;tidy up with quotient to dehl
 
     ; C standard requires that the result of division satisfy
     ; a = (a/b)*b + a%b
     ; remainder takes sign of the dividend
 
-    pop     af                  ;restore sign info
+    pop     bc                  ;restore sign info
 
-    ld      hl,sp+0             ;remainder
-    or      a,a                 ;test sign of dividend
-    call    M,l_long_neg_mhl    ;negate remainder if dividend was negative
+    ld      de,sp+10            ;quotient
+    ex      de,hl
+    ld      a,b
+    xor     c                   ;test sign of dividend^divisor
+    call    M,l_long_neg_mhl    ;negate quotient if signs different
 
-    ld      hl,sp+8             ;get return from stack
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      hl,sp+12            ;place return on stack
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
+    ld      de,sp+12            ;get quotient MSW
+    ld      hl,(de)
+    ld      bc,hl               ;quotient MSW
 
-    ld      hl,sp+0             ;get remainder LSW
-    ld      c,(hl)
-    inc     hl
-    ld      b,(hl)
+    ld      de,sp+8             ;get return from stack
+    ld      hl,(de)
+    ld      de,sp+12            ;place return on stack
+    ld      (de),hl
 
-    ld      hl,sp+2             ;get remainder MSW
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
+    ld      de,sp+10            ;get quotient LSW
+    ld      hl,(de)
 
-    ld      hl,sp+12            ;point to return again
+    ld      de,sp+12            ;point to return again
+    ex      de,hl               ;quotient LSW <> return sp
     ld      sp,hl               ;remove stacked parameters
 
-    ld      hl,bc               ;remainder LSW
+    ex      de,hl               ;quotient LSW
+    ld      de,bc               ;quotient MSW
 
     ret
 
@@ -92,7 +91,14 @@ EXTERN  l_long_div_u_0, l_long_neg_mhl
     pop     de
     push    bc                  ;replace return
 
-    ld      de,0                ;return ZERO
-    ld      hl,de
+    ld      a,h
 
+    ld      de,$7fff            ;return dehl = LONG_MAX
+    ld      hl,$ffff
+
+    or      a
+    ret     P                   ;if dividend positive
+
+    inc     de                  ;return dehl = LONG_MIN
+    inc     hl
     ret

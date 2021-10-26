@@ -31,17 +31,19 @@ EXTERN  l_long_div_u_0, l_long_neg_mhl
 
     ld      c,d                 ;sign of divisor
 
-    ld      hl,sp+13            ;sign of dividend
-    ld      b,(hl)
+    ld      de,sp+13            ;sign of dividend
+    ld      a,(de)
+    ld      b,a
 
     push    bc                  ;save sign info
 
-    ld      hl,sp+12            ;dividend
-    ld      a,b                 ;sign of dividend
+    ld      de,sp+12            ;dividend
+    ex      de,hl
     or      a,a                 ;test sign of dividend
     call    M,l_long_neg_mhl    ;take absolute value of dividend
 
-    ld      hl,sp+6             ;divisor
+    ld      de,sp+6             ;divisor
+    ex      de,hl
     ld      a,c                 ;sign of divisor
     or      a,a                 ;test sign of divisor
     call    M,l_long_neg_mhl    ;take absolute value of divisor
@@ -56,30 +58,25 @@ EXTERN  l_long_div_u_0, l_long_neg_mhl
 
     pop     af                  ;restore sign info
 
-    ld      hl,sp+0             ;remainder
+    ld      de,sp+0             ;remainder
+    ex      de,hl
     or      a,a                 ;test sign of dividend
     call    M,l_long_neg_mhl    ;negate remainder if dividend was negative
 
-    ld      hl,sp+8             ;get return from stack
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      hl,sp+12            ;place return on stack
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
+    ld      de,sp+8             ;get return from stack
+    ld      hl,(de)
+    ld      de,sp+12            ;place return on stack
+    ld      (de),hl
 
-    ld      hl,sp+0             ;get remainder LSW
-    ld      c,(hl)
-    inc     hl
-    ld      b,(hl)
+    ld      de,sp+0             ;get remainder LSW
+    ld      hl,(de)
+    ld      bc,hl               ;remainder LSW
 
-    ld      hl,sp+2             ;get remainder MSW
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
+    ld      de,sp+2             ;get remainder MSW
+    ld      hl,(de)
 
-    ld      hl,sp+12            ;point to return again
+    ld      de,sp+12            ;point to return again
+    ex      de,hl               ;remainder MSW <> return sp
     ld      sp,hl               ;remove stacked parameters
 
     ld      hl,bc               ;remainder LSW

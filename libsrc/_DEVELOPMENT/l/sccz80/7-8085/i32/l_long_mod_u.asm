@@ -35,26 +35,20 @@ EXTERN l_long_div_u_0
 
     ;tidy up with remainder to dehl
 
-    ld      hl,sp+10            ;get return from stack
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
-    ld      hl,sp+14            ;place return on stack
-    ld      (hl),e
-    inc     hl
-    ld      (hl),d
+    ld      de,sp+10            ;get return from stack
+    ld      hl,(de)
+    ld      de,sp+14            ;place return on stack
+    ld      (de),hl
 
-    ld      hl,sp+2             ;get remainder LSW
-    ld      c,(hl)
-    inc     hl
-    ld      b,(hl)
+    ld      de,sp+2             ;get remainder LSW
+    ld      hl,(de)
+    ld      bc,hl               ;remainder LSW
 
-    ld      hl,sp+4             ;get remainder MSW
-    ld      e,(hl)
-    inc     hl
-    ld      d,(hl)
+    ld      de,sp+4             ;get remainder MSW
+    ld      hl,(de)
 
-    ld      hl,sp+14            ;point to return again
+    ld      de,sp+14            ;point to return again
+    ex      de,hl               ;remainder MSW <> return sp
     ld      sp,hl               ;remove stacked parameters
 
     ld      hl,bc               ;remainder LSW

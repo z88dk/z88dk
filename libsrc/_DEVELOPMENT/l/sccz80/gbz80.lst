@@ -1,5 +1,3 @@
-${NEWLIB_ROOT}l/sccz80/8-gbz80/crt0_variables
-${NEWLIB_ROOT}l/sccz80/8-gbz80/crt_variables_math
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_mod
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_cm_bc
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/int2long_s
@@ -24,7 +22,6 @@ ${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_cmp
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_mod
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_ucmp
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_or
-${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_divide
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_asr_u
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_ne
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_mod_u
