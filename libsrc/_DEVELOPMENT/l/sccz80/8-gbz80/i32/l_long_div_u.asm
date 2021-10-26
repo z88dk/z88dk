@@ -71,13 +71,13 @@ EXTERN  l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
 
 .div_loop
     rra                         ;save Carry
-    ld      hl,sp+14
+    ld      hl,sp+4             ;remainder (hl)
+    ex      de,hl
+    ld      hl,sp+14            ;dividend (hl)
     rla                         ;restore Carry
-    call    l_long_rl_mhl       ;rotate left dividend + quotient Carry
 
-    rra                         ;save Carry
-    ld      hl,sp+4
-    rla                         ;restore Carry
+    call    l_long_rl_mhl       ;rotate left dividend + quotient Carry
+    ex      de,hl
     call    l_long_rl_mhl       ;rotate left remainder + dividend Carry
 
     ld      hl,sp+4             ;compare (remainder - divisor)
