@@ -26,6 +26,9 @@ ${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_asr_u
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_ne
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_mod_u
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_asr
+${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_cpl_mhl
+${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_neg_mhl
+${NEWLIB_ROOT}l/sccz80/8-gbz80/i32/l_long_rl_mhl
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_mod_u
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_getptr
 ${NEWLIB_ROOT}l/sccz80/8-gbz80/l_glong
