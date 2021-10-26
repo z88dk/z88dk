@@ -9,7 +9,7 @@ SECTION code_l_sccz80
 
 PUBLIC  l_long_div_u, l_long_div_u_0
 
-EXTERN  l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
+EXTERN  l_long_rl_mde, l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
 
 ;quotient = primary / secondary
 ;enter with secondary (divisor) in dehl, primary (dividend | quotient) on stack
@@ -78,8 +78,7 @@ EXTERN  l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
 
 IF 1
     call    l_long_rl_mhl       ;rotate left dividend + quotient Carry
-    ex      de,hl
-    call    l_long_rl_mhl       ;rotate left remainder + dividend Carry
+    call    l_long_rl_mde       ;rotate left remainder + dividend Carry
 
     ld      hl,sp+4             ;compare (remainder - divisor)
     ex      de,hl
@@ -111,24 +110,22 @@ ELSE
     rla
     ld      (hl),a
 
-    ex      de,hl
-
     ;rotate left remainder + dividend Carry
-    ld      a,(hl)
+    ld      a,(de)
     rla
-    ld      (hl),a
-    inc     hl
-    ld      a,(hl)
+    ld      (de),a
+    inc     de
+    ld      a,(de)
     rla
-    ld      (hl),a
-    inc     hl
-    ld      a,(hl)
+    ld      (de),a
+    inc     de
+    ld      a,(de)
     rla
-    ld      (hl),a
-    inc     hl
-    ld      a,(hl)
+    ld      (de),a
+    inc     de
+    ld      a,(de)
     rla
-    ld      (hl),a
+    ld      (de),a
 
     ;compare (remainder - divisor)
     ld      hl,sp+4
