@@ -13,12 +13,20 @@ PUBLIC  l_long_rl_mhl
 ;enter with primary in (hl)
 
 .l_long_rl_mhl
-    rl    (hl)
-    inc   hl
-    rl    (hl)
-    inc   hl
-    rl    (hl)
-    inc   hl
-    rl    (hl)
+    ld      a,(hl)
+    rla
+    ld      (hl+),a
+
+    ld      a,(hl)
+    rla
+    ld      (hl+),a
+
+    ld      a,(hl)
+    rla
+    ld      (hl+),a
+
+    ld      a,(hl)
+    rla
+    ld      (hl),a
 
     ret

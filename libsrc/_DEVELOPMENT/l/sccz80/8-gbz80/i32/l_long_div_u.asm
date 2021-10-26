@@ -95,24 +95,34 @@ IF 1
 
 ELSE
     ;rotate left dividend + quotient Carry
-    rl    (hl)
-    inc   hl
-    rl    (hl)
-    inc   hl
-    rl    (hl)
-    inc   hl
-    rl    (hl)
+    ld      a,(hl)
+    rla
+    ld      (hl+),a
+    ld      a,(hl)
+    rla
+    ld      (hl+),a
+    ld      a,(hl)
+    rla
+    ld      (hl+),a
+    ld      a,(hl)
+    rla
+    ld      (hl),a
 
     ex      de,hl
 
     ;rotate left remainder + dividend Carry
-    rl    (hl)
-    inc   hl
-    rl    (hl)
-    inc   hl
-    rl    (hl)
-    inc   hl
-    rl    (hl)
+    ld      a,(hl)
+    rla
+    ld      (hl+),a
+    ld      a,(hl)
+    rla
+    ld      (hl+),a
+    ld      a,(hl)
+    rla
+    ld      (hl+),a
+    ld      a,(hl)
+    rla
+    ld      (hl),a
 
     ;compare (remainder - divisor)
     ld      hl,sp+4
