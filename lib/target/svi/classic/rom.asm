@@ -3,7 +3,9 @@
 ;
 
 
+  IF !DEFINED_CRT_ORG_BSS
     defc    CRT_ORG_BSS = 0x8000
+  ENDIF
     defc    CRT_ORG_CODE = 0x0000
 
     EXTERN  im1_vectors
