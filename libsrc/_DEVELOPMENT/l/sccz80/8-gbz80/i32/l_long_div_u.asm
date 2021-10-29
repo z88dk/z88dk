@@ -77,7 +77,7 @@ EXTERN  l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
     ld      hl,sp+14            ;dividend (hl)
     rla                         ;restore Carry
 
-IF 0
+IF 1
     call    l_long_rl_mhl       ;rotate left dividend + quotient Carry
     ex      de,hl
     call    l_long_rl_mhl       ;rotate left remainder + dividend Carry

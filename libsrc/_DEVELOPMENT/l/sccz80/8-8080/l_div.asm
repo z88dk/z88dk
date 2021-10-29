@@ -2,12 +2,13 @@
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC l_div
+EXTERN  l_hlneg
+EXTERN  l_deneg
+EXTERN  l_bcneg
+EXTERN  l_rlde
+EXTERN  l_cmpbcde
 
-EXTERN l_deneg
-EXTERN l_bcneg
-EXTERN l_rlde
-EXTERN l_cmpbcde
+PUBLIC  l_div
 
 
 ; HL = DE / HL, DE = DE % HL
@@ -55,8 +56,6 @@ ccdiv3:
     POP     AF
     RET     P
     call    l_deneg
-    EX      DE,HL
-    call    l_deneg
-    EX      DE,HL
+    call    l_hlneg
     ret
 

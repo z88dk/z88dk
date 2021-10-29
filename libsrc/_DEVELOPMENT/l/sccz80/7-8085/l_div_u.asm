@@ -1,4 +1,6 @@
-; sccz80 crt0 library - 8085 version
+;   sccz80 crt0 library - 8085 version
+;
+;   feilipu 10/2021
 
 SECTION code_clib
 SECTION code_l_sccz80
@@ -6,32 +8,43 @@ SECTION code_l_sccz80
 PUBLIC  l_div_u
 
 ; HL = DE / HL, DE = DE % HL
-l_div_u:
-    ld      bc,hl           ; store divisor to bc
-    ld      hl,0            ; clear remainder
-    ld      a,17            ; load loop counter
-    or      a               ; clear carry
-ccduv1:
-    rl      de              ; left shift dividend into carry
-    dec     a               ; decrement loop counter
-    jp      Z,ccduv3
-
+.l_div_u
+    ld      bc,hl           ;store divisor to bc
+    ld      hl,0            ;clear remainder
+    ld      a,8             ;16 bits (8 iterations)
+.div_loop
+    rl      de              ;left shift dividend + quotient carry
     ex      de,hl
-    rl      de              ; left shift carry into remainder
+    rl      de              ;left shift remainder + dividend carry
     ex      de,hl
 
-    sub     hl,bc           ; substract divisor from remainder
-    jp      NC,ccduv2       ; if result negative, add back divisor, clear carry
+    sub     hl,bc           ;substract divisor from remainder
+    jp      NK,skip_revert0 ;if remainder < divisor, add back divisor
 
-    add     hl,bc           ; add back divisor
-    or      a               ; clear carry
-    jp      ccduv1
+    add     hl,bc           ;revert subtraction of divisor
+    scf                     ;set carry to complement
 
-ccduv2:
-    scf                     ; set carry
-    jp      ccduv1
-        
-ccduv3:
+.skip_revert0
+    ccf                     ;complement carry
+
+    rl      de              ;left shift dividend + quotient carry
     ex      de,hl
+    rl      de              ;left shift remainder + dividend carry
+    ex      de,hl
+
+    sub     hl,bc           ;substract divisor from remainder
+    jp      NK,skip_revert1 ;if remainder < divisor, add back divisor
+
+    add     hl,bc           ;revert subtraction of divisor
+    scf                     ;set carry to complement
+
+.skip_revert1
+    ccf                     ;complement carry
+
+    dec     a               ;decrement loop counter
+    jp      NZ,div_loop
+
+    rl      de              ;left shift dividend + quotient carry
+    ex      de,hl           ;dividend<>remainder
     ret
 
