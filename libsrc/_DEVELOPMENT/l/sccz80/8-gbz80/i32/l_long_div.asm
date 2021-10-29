@@ -81,7 +81,8 @@ EXTERN  l_long_div_u_0, l_long_neg_mhl
     inc     hl
     ld      d,(hl)
 
-    ld      hl,sp+12            ;point to return again
+;   ld      hl,sp+12
+    inc     hl                  ;point to return again
     ld      sp,hl               ;remove stacked parameters
 
     ex      de,hl               ;quotient LSW

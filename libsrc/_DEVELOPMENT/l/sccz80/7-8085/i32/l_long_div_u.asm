@@ -65,7 +65,7 @@ EXTERN  l_long_rl_mde, l_long_cp_mhl, l_long_sub_mhl
 
 .div_loop
 
-IF 1
+IF 0
     ld      de,sp+14            ;rotate left dividend + quotient Carry
     call    l_long_rl_mde
 

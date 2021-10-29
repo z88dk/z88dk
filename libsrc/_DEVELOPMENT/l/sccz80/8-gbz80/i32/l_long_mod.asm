@@ -74,7 +74,8 @@ EXTERN  l_long_div_u_0, l_long_neg_mhl
     inc     hl
     ld      b,(hl)
 
-    ld      hl,sp+2             ;get remainder MSW
+;   ld      hl,sp+2
+    inc     hl                  ;get remainder MSW
     ld      e,(hl)
     inc     hl
     ld      d,(hl)

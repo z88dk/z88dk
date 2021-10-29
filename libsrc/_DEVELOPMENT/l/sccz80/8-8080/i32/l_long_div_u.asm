@@ -49,15 +49,16 @@ EXTERN  l_long_rl_mde, l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
     inc     hl
     ld      (hl),d
 
+    ld      hl,sp+2             ;get remainder LSB (for __printf_number)
+    ld      a,(hl)
+
     ld      hl,sp+12            ;get quotient LSW
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
 
-    ld      hl,sp+2             ;get remainder LSB (for __printf_number)
-    ld      a,(hl)
-
-    ld      hl,sp+14            ;point to return again
+;   ld      hl,sp+14
+    inc     hl                  ;point to return again
     ld      sp,hl               ;remove stacked parameters
 
     ex      de,hl               ;quotient LSW
@@ -76,7 +77,7 @@ EXTERN  l_long_rl_mde, l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
     ld      hl,sp+14            ;dividend (hl)
     rla                         ;restore Carry
 
-IF 1
+IF 0
     call    l_long_rl_mhl       ;rotate left dividend + quotient Carry
     call    l_long_rl_mde       ;rotate left remainder + dividend Carry
 
