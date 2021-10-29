@@ -17,6 +17,7 @@
     EXTERN   SETWRT
     EXTERN   FILVRM
     EXTERN   RG0SAV
+    EXTERN   CONSOLE_COLUMNS
     EXTERN   l_tms9918_disable_interrupts
     EXTERN   l_tms9918_enable_interrupts
     EXTERN   __tms9918_screen_mode
@@ -90,7 +91,7 @@ ENDIF
 
     ld    a,__tms9918_CAPS_MODE0
     ld    (generic_console_caps),a
-    ld    a,32
+    ld    a,CONSOLE_COLUMNS	;Needs to be overridden by ANSI
     ld    (__console_w),a 
     ld    hl,$1800
     ld    (__tms9918_pattern_name),hl
@@ -278,7 +279,7 @@ ENDIF
 
     ld    a,__tms9918_CAPS_MODE2
     ld    (generic_console_caps),a
-    ld    a,32
+    ld    a,CONSOLE_COLUMNS
     ld    (__console_w),a 
 	
     ld    bc,6144    ; set VRAM attribute area

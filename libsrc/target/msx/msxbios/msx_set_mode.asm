@@ -25,6 +25,7 @@
         EXTERN   __tms9918_CAPS_MODE0
         EXTERN   __tms9918_CAPS_MODE1
         EXTERN   __tms9918_CAPS_MODE2
+        EXTERN   CONSOLE_COLUMNS
 
 IF FORmsx
 	INCLUDE	"target/msx/def/msxbios.def"
@@ -53,7 +54,7 @@ _msx_set_mode:
         jr      z,set_mode
 	; Otherwise, it's a custom firmware call
 	ex	de,hl	;hl = mode
-	ld	de,0 + 32		;width
+	ld	de,0 + CONSOLE_COLUMNS	;width
 	ld	bc,0 + 4		;mode=4 (we don't handle that anywhere)
         xor     a
 set_mode:
@@ -76,7 +77,7 @@ set_mode:
 ; 32x24 graphics
 set_mode_2:
 	ld	hl,INIGRP
-	ld	de,$1800 + 32	;pattern name
+	ld	de,$1800 + CONSOLE_COLUMNS	;pattern name
 	ld	bc,$0000 + 2	;pattern generator
         ld      a,__tms9918_CAPS_MODE2
 	jr	set_mode
@@ -96,7 +97,7 @@ set_mode_0:
 ; 32x24 mode
 IF FORmsx
 set_mode_1:
-        ld      de,$1800 + 32   ; pattern name + width
+        ld      de,$1800 + CONSOLE_COLUMNS   ; pattern name + width
         ld      bc,$0000 + 0  ; pattern generator + mode
 	ld	hl,INIT32
         ld      a,__tms9918_CAPS_MODE1
@@ -110,7 +111,7 @@ set_mode_1:
         ld      bc,$0000  ; pattern generator + mode
         ld      a,0
         ld      (__tms9918_screen_mode),a
-	ld	a,32
+	ld	a,CONSOLE_COLUMNS
 	ld	(__console_w),a
         ld      (__tms9918_pattern_name),de
         ld      (__tms9918_pattern_generator),bc
