@@ -18,45 +18,28 @@ l_small_mul_32_16x16:
     ;
     ; uses  : af, bc, de, hl
 
-    ld c,l
-    ld b,h
+    ld bc,hl
 
     ld a,16
     ld hl,0
 
 loop_0:
-IF __CPU_INTEL__
-    push af
-ENDIF
-
     ; bc = 16-bit multiplicand
     ; de = 16-bit multiplicand
     ;  a = iterations
 
     add hl,hl
-IF __CPU_INTEL__
-    ld a,e
-    rla
-    ld e,a
-    ld a,d
-    rla
-    ld d,a
-ELSE
     rl e
     rl d
-ENDIF
 
-    jr NC,loop_1
+    jp NC,loop_1
     add hl,bc
-    jr NC,loop_1
+    jp NC,loop_1
     inc de
 
 loop_1:
-IF __CPU_INTEL__
-    pop af
-ENDIF
     dec a
-    jr NZ,loop_0
+    jp NZ,loop_0
 
     or a
     ret

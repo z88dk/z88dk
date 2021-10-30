@@ -41,7 +41,7 @@ void test_mult_long()
 
      Assert(  val1 *  val2  ==  15, " 3 *  5");
      Assert(  val1 * -val2  == -15, " 3 * -5");
-     Assert( -val1 *  val2  == -15, "-3 * -5");
+     Assert( -val1 *  val2  == -15, "-3 *  5");
      Assert( -val1 * -val2  ==  15, "-3 * -5");
      Assert(  val2 *  val1  ==  15, " 5 *  3");
      Assert(  val2 * -val1  == -15, " 5 * -3");

@@ -48,15 +48,15 @@ l_fast_mulu_32_32x32:
    
    inc d
    dec d
-   jr nz, _24b_x               ; 25 to 32 bits
+   jr NZ, _24b_x               ; 25 to 32 bits
 
    inc e
    dec e
-   jr nz, _16b_x               ; 17 to 24 bits
+   jr NZ, _16b_x               ; 17 to 24 bits
 
    inc h
    dec h
-   jr nz, _8b_x                ; 9 to 16 bits
+   jr NZ, _8b_x                ; 9 to 16 bits
 
 _8_32:
 
@@ -72,7 +72,7 @@ IF __CLIB_OPT_IMATH_FAST & $80
    call l_fast_mulu_40_32x8
    
    or a
-   ret z
+   ret Z
 
 overflow:
    
@@ -105,15 +105,15 @@ IF __CLIB_OPT_IMATH_FAST & $80
 
    inc d
    dec d
-   jr nz, overflow             ; 24b_24b = 48b
+   jr NZ, overflow             ; 24b_24b = 48b
 
    inc e
    dec e
-   jr nz, overflow             ; 24b_16b = 40b
+   jr NZ, overflow             ; 24b_16b = 40b
    
    inc h
    dec h
-   jr nz, overflow             ; 24b_8b = 32b
+   jr NZ, overflow             ; 24b_8b = 32b
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -121,15 +121,15 @@ ELSE
 
    inc d
    dec d
-   jr nz, _24b_24b
+   jr NZ, _24b_24b
    
    inc e
    dec e
-   jr nz, _24b_16b
+   jr NZ, _24b_16b
    
    inc h
    dec h
-   jr nz, _24b_8b
+   jr NZ, _24b_8b
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
@@ -148,7 +148,7 @@ IF __CLIB_OPT_IMATH_FAST & $80
    call l0_fast_mulu_40_32x8
    
    or a
-   ret z
+   ret Z
 
    jr overflow
 
@@ -171,11 +171,11 @@ IF __CLIB_OPT_IMATH_FAST & $80
    
    inc d
    dec d
-   jr nz, overflow             ; 16b_24b = 40b
+   jr NZ, overflow             ; 16b_24b = 40b
    
    inc e
    dec e
-   jr nz, overflow             ; 16b_16b = 32b
+   jr NZ, overflow             ; 16b_16b = 32b
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ELSE
@@ -183,11 +183,11 @@ ELSE
 
    inc d
    dec d
-   jr nz, _16b_24b
+   jr NZ, _16b_24b
    
    inc e
    dec e
-   jr nz, _16b_16b
+   jr NZ, _16b_16b
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ENDIF
@@ -195,7 +195,7 @@ ENDIF
 
    inc h
    dec h
-   jr nz, _24_16
+   jr NZ, _24_16
 
 _24_8:
 
@@ -217,20 +217,20 @@ IF __CLIB_OPT_IMATH_FAST & $80
 
    inc d
    dec d
-   jr nz, overflow             ; 8b_24b = 32b
+   jr NZ, overflow             ; 8b_24b = 32b
 
 ELSE
 
    inc d
    dec d
-   jr nz, _8b_24b
+   jr NZ, _8b_24b
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    
    inc e
    dec e
-   jr z, _16_16
+   jr Z, _16_16
    
    ; hl' * ehl
 
