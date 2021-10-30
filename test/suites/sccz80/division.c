@@ -87,7 +87,7 @@ void test_signed_mod()
 }
 
 
-int suite_mult()
+int suite_division()
 {
     suite_setup("Division Tests");
 
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 {
     int  res = 0;
 
-    res += suite_mult();
+    res += suite_division();
 
     exit(res);
 }

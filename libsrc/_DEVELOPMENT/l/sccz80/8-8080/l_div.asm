@@ -1,3 +1,6 @@
+;   sccz80 crt0 library - 8080 version
+;
+;   feilipu 10/2021
 
 SECTION code_clib
 SECTION code_l_sccz80
@@ -13,21 +16,25 @@ PUBLIC  l_div
 
 ; HL = DE / HL, DE = DE % HL
 l_div:
-ccdiv:
-    LD      bc,hl
-    LD      a,d
-    XOR     b
-    PUSH    AF
+    ld      c,d             ;sign of dividend
+    ld      b,h             ;sign of divisor
+    push    bc              ;save signs
+
+    ld      c,l             ;divisor to bc
+
     LD      a,d
     OR      a
     CALL    M,l_deneg
+
     LD      a,b
     OR      a
     CALL    M,l_bcneg
+
     LD      a,16
     PUSH    AF
     EX      DE,HL
     LD      DE,0
+
 ccdiv1:
     ADD     HL,HL
     call    l_rlde
@@ -53,9 +60,18 @@ ccdiv2:
     JP      ccdiv1
 
 ccdiv3:
-    POP     AF
-    RET     P
-    call    l_deneg
-    call    l_hlneg
-    ret
+    ; C standard requires that the result of division satisfy
+    ; a = (a/b)*b + a%b
+    ; remainder takes sign of the dividend
 
+    pop     bc                  ;restore sign info
+
+    ld      a,b
+    xor     c                   ;quotient, sign of dividend^divisor
+    call    M,l_hlneg
+
+    ld      a,c
+    or      a,a                 ;remainder, sign of dividend
+    call    M,l_deneg
+
+    ret

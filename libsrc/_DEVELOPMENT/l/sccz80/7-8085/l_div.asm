@@ -8,63 +8,40 @@ SECTION code_l_sccz80
 EXTERN  l_hlneg
 EXTERN  l_deneg
 EXTERN  l_bcneg
+EXTERN  l_div_u_0
 
 PUBLIC  l_div
 
 ; HL = DE / HL, DE = DE % HL
 .l_div
-    ld      bc,hl
-    ld      a,d
-    xor     b
-    push    af              ;save de^hl for sign
+    ld      c,d             ;sign of dividend
+    ld      b,h             ;sign of divisor
+    push    bc              ;save signs
+
+    ld      c,l             ;divisor to bc
+
     ld      a,d
     or      a
     call    M,l_deneg
+
     ld      a,b
     or      a
     call    M,l_bcneg
 
-    ld      bc,hl           ;store divisor to bc
-    ld      hl,0            ;clear remainder
-    ld      a,8             ;16 bits (8 iterations)
-.div_loop
-    rl      de              ;left shift dividend + quotient carry
-    ex      de,hl
-    rl      de              ;left shift remainder + dividend carry
-    ex      de,hl
+    call    l_div_u_0       ;unsigned HL = DE / BC, DE = DE % BC
 
-    sub     hl,bc           ;substract divisor from remainder
-    jp      NK,skip_revert0 ;if remainder < divisor, add back divisor
+    ; C standard requires that the result of division satisfy
+    ; a = (a/b)*b + a%b
+    ; remainder takes sign of the dividend
 
-    add     hl,bc           ;revert subtraction of divisor
-    scf                     ;set carry to complement
+    pop     bc                  ;restore sign info
 
-.skip_revert0
-    ccf                     ;complement carry
+    ld      a,b
+    xor     c                   ;quotient, sign of dividend^divisor
+    call    M,l_hlneg
 
-    rl      de              ;left shift dividend + quotient carry
-    ex      de,hl
-    rl      de              ;left shift remainder + dividend carry
-    ex      de,hl
+    ld      a,c
+    or      a,a                 ;remainder, sign of dividend
+    call    M,l_deneg
 
-    sub     hl,bc           ;substract divisor from remainder
-    jp      NK,skip_revert1 ;if remainder < divisor, add back divisor
-
-    add     hl,bc           ;revert subtraction of divisor
-    scf                     ;set carry to complement
-
-.skip_revert1
-    ccf                     ;complement carry
-
-    dec     a               ;decrement loop counter
-    jp      NZ,div_loop
-
-    rl      de              ;left shift dividend + quotient carry
-    ex      de,hl           ;dividend<>remainder
-
-    pop     af
-    ret     P
-    call    l_deneg
-    call    l_hlneg
     ret
-
