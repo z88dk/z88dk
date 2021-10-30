@@ -17,7 +17,7 @@ void test_ullong_division()
      Assert( val / 128         == 0x01000000, "val / 128");
      Assert( val / 256         == 0x00800000, "val / 256");
      Assert( val / 512         == 0x00400000, "val / 512");
-     Assert( 0x80000000UL/ 512 == 0x400000, "0x80000000/ 512");
+     Assert( 0x80000000UL / 512 == 0x400000, "0x80000000 / 512");
 }
   #endif
 #endif
@@ -35,22 +35,22 @@ void test_ulong_division()
      Assert( val / 128         == 0x01000000, "val / 128");
      Assert( val / 256         == 0x00800000, "val / 256");
      Assert( val / 512         == 0x00400000, "val / 512");
-     Assert( 0x80000000UL/ 512 == 0x400000, "0x80000000/ 512");
+     Assert( 0x80000000UL / 512 == 0x00400000, "0x80000000 / 512");
 }
 
 void test_long_division()
 {
-     int32_t val = -1;
-     Assert( val / 2           == 0, "val / 2");
-     Assert( val / 4           == 0, "val / 4");
-     Assert( val / 8           == 0, "val / 8");
-     Assert( val / 16          == 0, "val / 16");
-     Assert( val / 32          == 0, "val / 32");
-     Assert( val / 64          == 0, "val / 64");
-     Assert( val / 128         == 0, "val / 128");
-     Assert( val / 256         == 0, "val / 256");
-     Assert( val / 512         == 0, "val / 512");
-     Assert( 0x80000000/ 512 == 0x00400000, "0x80000000/ 512");
+     int32_t val = -256;
+     Assert( val / 2  == -128, "-256 / 2");
+     Assert( val / -4  ==  64, "-256 / -4");
+     Assert( val / 8  ==  -32, "-256 / 8");
+     Assert( val / -16  == 16, "-256 / -16");
+     Assert( -val / 32  ==  8, " 256 / 32");
+     Assert( -val / -64  == -4, " 256 / -64");
+     Assert( val / 128  == -2, "-256 / 128");
+     Assert( val / -256  == 1, "-256 / -256");
+     Assert( val / 512  == 0, " -256 / 512");
+     Assert( 0x80000000 / 512 == 0x00400000, "0x80000000 / 512");
 }
 
 void test_long_mod()
@@ -62,16 +62,15 @@ void test_long_mod()
 
 void test_signed_division()
 {
-    int16_t val = -1;
+    int16_t val = -64;
 
-    Assert( val / 2  == 0, "-1 / 2");
-    Assert( val / 4  == 0, "-1 / 4");
-    Assert( val / 8  == 0, "-1 / 8");
-    Assert( val / 16  == 0, "-1 / 16");
-    Assert( val / 32  == 0, "-1 / 32");
-    Assert( val / 64  == 0, "-1 / 64");
-    Assert( val / 128  == 0, "-1 / 128");
-    Assert( val / 256  == 0, "-1 / 256");
+    Assert( val / 2  == -32, "-64 / 2");
+    Assert( val / -4  ==  16, "-64 / -4");
+    Assert( val / 8  ==  -8, "-64 / 8");
+    Assert( val / -16  ==  4, "-64 / -16");
+    Assert( -val / -32  == -2, " 64 / -32");
+    Assert( -val / 64  == 1, " 64 / 64");
+    Assert( val / -128  == 0, "-64 / -128");
 }
 
 void test_signed_mod()
@@ -79,13 +78,12 @@ void test_signed_mod()
     int16_t val = -1;
 
     Assert( val % 2  == 1, "-1 % 2");
-    Assert( val % 4  == 1, "-1 % 4");
+    Assert( val % -4  == -1, "-1 % -4");
     Assert( val % 8  == 1, "-1 % 8");
-    Assert( val % 16  == 1, "-1 % 16");
-    Assert( val % 32  == 1, "-1 % 32");
-    Assert( val % 64  == 1, "-1 % 64");
-    Assert( val % 128  == 1, "-1 % 128");
-    Assert( val % 256  == 1, "-1 % 256");
+    Assert( val % -16  == -1, "-1 % -16");
+    Assert( -val % -32  == 1, " 1 % -32");
+    Assert( -val % 64  == 1, " 1 % 64");
+    Assert( -val % -128  == 1, " 1 % -128");
 }
 
 
