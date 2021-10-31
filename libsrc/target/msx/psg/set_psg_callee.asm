@@ -34,7 +34,14 @@ _set_psg_callee:
 .asm_set_psg
 
 	ld	a,l
-
+        cp      7
+        jr      nz,not_reg7
+        ld      a,e
+        and     @00111111
+        or      @10000000
+        ld      e,a
+        ld      a,l
+not_reg7:
 	di
 	out     (PSG_ADDR),a
 	push    af
