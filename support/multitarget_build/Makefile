@@ -35,6 +35,10 @@ all: $(foreach target, $(TARGETS),  build/$(target)/$(APPNAME) )
 endif
 
 # We have some ports with subtypes so create targets for them
+Z88DKTARGET_adam = coleco
+ZCFLAGS_adam = -subtype=adam
+ZLDFLAGS_adam =
+
 Z88DKTARGET_aquarius_rom = aquarius
 ZCFLAGS_aquarius_rom = -subtype=rom
 ZLDFLAGS_aquarius_rom = 
@@ -107,6 +111,10 @@ ZLDFLAGS_svi_disk =
 Z88DKTARGET_svi_rom = svi
 ZCFLAGS_svi_rom = -subtype=rom
 ZLDFLAGS_svi_rom = 
+
+Z88DKTARGET_svi_rom318 = svi
+ZCFLAGS_svi_rom318 = -subtype=rom318
+ZLDFLAGS_svi_rom318 = 
 
 Z88DKTARGET_z88_app = z88
 ZCFLAGS_z88_app = -subtype=app
