@@ -697,6 +697,8 @@ cpm8080_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Library (8080)---'
 	@echo ''
+	$(call buildgeneric,cpm,"portable")
+	$(MAKE) -C target/cpm
 	$(RM) target/cpm/stdio/*.o target/cpm/cpm/*.o
 	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(TARGET_DIRECTORY)/cpm/cpm_8080.lst
 

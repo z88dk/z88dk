@@ -139,6 +139,8 @@ IF VDP_CMD < 0
 	ld	a,h
 	and	@00111111
 	ld	(-VDP_CMD),a
+        push    bc
+        pop     bc
 	ld	a,(-VDP_DATAIN)
 ELSE
 	push	bc
@@ -147,6 +149,8 @@ ELSE
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
 	out	(c),a
+        push    bc
+        pop     bc
 	ld	bc,VDP_DATAIN
 	in	a,(c)
 	pop	bc
@@ -162,6 +166,8 @@ IF VDP_CMD < 0
 	ld	a,h
 	and	@00111111
 	ld	(-VDP_CMD),a
+        push    bc
+        pop     bc
 	ld	a,(-VDP_DATAIN)
 ELSE	
 	push	bc
@@ -170,6 +176,8 @@ ELSE
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
 	out	(c),a
+        push    bc
+        pop     bc
 	ld	bc,VDP_DATAIN
 	in	a,(c)
 	pop	bc
@@ -273,6 +281,8 @@ IF VDP_CMD < 0
 	and	@00111111
 	or	@01000000
 	ld	(-VDP_CMD),a
+        push    bc
+        pop     bc
 	ld	a,(chline_buffer)
 	ld	(-VDP_DATA),a
 ELSE
@@ -283,6 +293,8 @@ ELSE
          and      @00111111	; masked with "write command" bits
          or       @01000000
 	out	(c),a
+        push    bc
+        pop     bc
 	ld	bc,VDP_DATA
          ld       a,(chline_buffer)
 	out	(c),a
@@ -299,6 +311,8 @@ IF VDP_CMD < 0
 	and	@00111111
 	or	@01000000
 	ld	(-VDP_CMD),a
+        push    bc
+        pop     bc
 	ld	a,(chline_buffer+1)
 	ld	(-VDP_DATA),a
 ELSE
@@ -309,6 +323,8 @@ ELSE
          and      @00111111	; masked with "write command" bits
          or       @01000000
 	out	(c),a
+        push    bc
+        pop     bc
 	ld	bc,VDP_DATA
          ld       a,(chline_buffer+1)
 	out	(c),a
@@ -340,6 +356,8 @@ IF VDP_CMD < 0
 	ld	a,h
 	and	@00111111
 	ld	(-VDP_CMD),a
+        push    bc
+        pop     bc
 	ld	a,(-VDP_DATAIN)
 ELSE
 	push	bc
@@ -348,6 +366,8 @@ ELSE
 	ld	a,h		; MSB of video mem ptr
 	and	@00111111	; masked with "read command" bits
 	out	(c),a
+        push    bc
+        pop     bc
 	ld	bc,VDP_DATAIN
 	in	a,(c)
 	pop	bc
@@ -363,6 +383,8 @@ IF VDP_CMD < 0
 	ld	a,h
 	and	@00111111
 	ld	(-VDP_CMD),a
+        push    bc
+        pop     bc
 	ld	a,(-VDP_DATAIN)
 ELSE	
 	push	bc
@@ -372,6 +394,8 @@ ELSE
 	and	@00111111	; masked with "read command" bits
 	out	(c),a
 	ld	bc,VDP_DATAIN
+        push    bc
+        pop     bc
 	in	a,(c)
 	pop	bc
 ENDIF
