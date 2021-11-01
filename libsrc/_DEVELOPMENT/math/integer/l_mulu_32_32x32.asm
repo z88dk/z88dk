@@ -39,8 +39,8 @@ ENDIF
 
 IF __CLIB_OPT_IMATH > 50
 
-   EXTERN l_fast_mulu_32_32x32
-   defc l_mulu_32_32x32 = l_fast_mulu_32_32x32
+   EXTERN l_fast_muls_32_32x32
+   defc l_mulu_32_32x32 = l_fast_muls_32_32x32
 
 ENDIF
 
