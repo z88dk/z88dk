@@ -72,6 +72,6 @@ ccdiv3:
 
     ld      a,c
     or      a,a                 ;remainder, sign of dividend
-    call    M,l_deneg
+    ret     P
 
-    ret
+    jp      l_deneg

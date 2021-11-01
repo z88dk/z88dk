@@ -44,11 +44,11 @@ EXTERN  l_long_rl_mde, l_long_cp_mhl, l_long_sub_mhl
     ld      de,sp+14            ;place return on stack
     ld      (de),hl
 
-    ld      de,sp+12            ;get quotient LSW
-    ld      hl,(de)
-
     ld      de,sp+2             ;get remainder LSB (for __printf_number)
     ld      a,(de)
+
+    ld      de,sp+12            ;get quotient LSW
+    ld      hl,(de)
 
     ld      de,sp+14            ;point to return again
     ex      de,hl               ;quotient LSW <> return sp
