@@ -1,6 +1,6 @@
 
 
-#ifndef __SPECTRUM
+#if __MSX 
 #pragma bank 4
 
 // This function isn't used, and is just used to push the rom size

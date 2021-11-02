@@ -573,6 +573,7 @@ uint8_t *cpc_layout_file(uint8_t *inbuf, char *fileName, size_t filelen, int sta
     int cksum, i;
     size_t total_len = 0;
 
+
     // Setup an AMSDOS header
     memset(buf, 0, 128);
 
@@ -772,6 +773,22 @@ int cpc_exec(char* target)
         cpm_create_filename(filename, cpm_filename, 0, 0);
     else
         cpm_create_filename(blockname, cpm_filename, 0, 0);
+
+    int loader_filename = parameter_search(crtfile, ".map", "__crt_loader_filename");
+
+    if ( loader_filename != -1 ) {
+        char loader_name[20];
+
+        if (blockname == NULL)
+            cpm_create_filename(filename, loader_name, 0, 1);
+        else
+            cpm_create_filename(blockname, loader_name, 0, 1);
+
+        suffix_change(loader_name, ".B0");
+
+        memcpy(inFileBuff + loader_filename - pos, loader_name,16);
+    }
+    
 
     outFileBuff = cpc_layout_file(inFileBuff, cpm_filename, binary_length, pos, 2, &file_len);
     free(inFileBuff);

@@ -3,17 +3,16 @@
 
 #include "banking.h"
 
-#ifdef __SMS__
+#if __SMS__ || __CPC__
+#define BANK 5
 #pragma bank 5
 #else
+#define BANK 1
 #pragma bank 1
 #endif
 
+
 int func_bank1() {
-#ifdef __SMS__
-    printf("Printing from bank5\n");
-#else
-    printf("Printing from bank1\n");
-#endif
+    printf("Printing from bank%d\n",BANK);
     return func_bank2();
 }
