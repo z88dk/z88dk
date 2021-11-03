@@ -16,7 +16,7 @@ IF __CLIB_OPT_IMATH_FAST & $80
 ELSE
 
    EXTERN l_fast_mulu_32_24x16
-   
+
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -59,7 +59,7 @@ ELSE
 
 ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-   
+
    inc h
    dec h
 
@@ -76,7 +76,7 @@ ENDIF
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
    ex de,hl
-   
+
 reduce_0:
 
    ;  e = 8-bit multiplicand
@@ -86,7 +86,7 @@ reduce_0:
 IF __CLIB_OPT_IMATH_FAST & $80
 
    call l_fast_mulu_24_16x8
-   
+
    or a
    ret z                       ; if result confined to hl
 
@@ -115,9 +115,9 @@ mulu_32_16x16:
    ELSE
 
       push ix
-     
+  
       call l_fast_mulu_32_24x16
-     
+  
       pop ix
       ret
 

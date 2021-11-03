@@ -43,7 +43,7 @@ l0_fast_mulu_64_32x32:
 
    ld a,b
    ld b,33
-   
+
    jr start
 
 loop_0:
@@ -72,7 +72,7 @@ start:
    exx
    rra
    rr c
-   
+
    djnz loop_0
 
    ; result = hl' hl bc' ac
@@ -85,5 +85,5 @@ start:
    ld d,b
    exx
    pop de
-   
+
    ret
