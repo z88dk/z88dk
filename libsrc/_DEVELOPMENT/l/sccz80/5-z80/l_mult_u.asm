@@ -11,7 +11,7 @@ PUBLIC l_mult_u_0
 
 EXTERN l_mulu_16_16x16
 
-defc l_mult = l_mulu_16_16x16
+defc l_mult_u = l_mulu_16_16x16
 
 ; Multiply two 16 bit numbers hl=bc*de (unsigned)
 .l_mult_u_0
