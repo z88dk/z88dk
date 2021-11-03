@@ -34,5 +34,5 @@ l_z80n_muls_16_16x16:
     pop bc                      ; recover sign info from multiplicand and multiplier
     ld a,b
     xor c
-    jp M,l_neg_hl               ; negate product if needed, and return
-    ret
+    ret P
+    jp l_neg_hl               ; negate product if needed, and return

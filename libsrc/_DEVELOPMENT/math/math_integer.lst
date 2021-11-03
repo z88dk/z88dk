@@ -37,6 +37,8 @@ math/integer/small/l_small_divu_16_16x16
 math/integer/small/l_small_divu_32_32x32
 math/integer/small/l_small_divu_64_64x8
 math/integer/small/l_small_divu_64_64x64
+math/integer/small/l_small_muls_16_16x16
+math/integer/small/l_small_muls_32_32x32
 math/integer/small/l_small_mulu_de
 math/integer/small/l_small_mul_16_16x16
 math/integer/small/l_small_mul_32_16x16

@@ -11,15 +11,15 @@ PUBLIC l_muls_32_32x32
 
 IF __CPU_Z180__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
-   EXTERN l_z180_mulu_32_32x32
-   defc l_muls_32_32x32 = l_z180_mulu_32_32x32
+   EXTERN l_z180_muls_32_32x32
+   defc l_muls_32_32x32 = l_z180_muls_32_32x32
 
 ELSE
 
 IF __CPU_Z80N__ && ((__CLIB_OPT_IMATH = 0) || (__CLIB_OPT_IMATH = 100))
 
-   EXTERN l_z80n_mulu_32_32x32
-   defc l_muls_32_32x32 = l_z80n_mulu_32_32x32
+   EXTERN l_z80n_muls_32_32x32
+   defc l_muls_32_32x32 = l_z80n_muls_32_32x32
 
 ELSE
 

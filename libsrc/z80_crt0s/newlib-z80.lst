@@ -87,6 +87,8 @@
 ../_DEVELOPMENT/math/integer/small/l_small_divu_32_32x32
 ../_DEVELOPMENT/math/integer/small/l_small_divu_64_64x8
 ../_DEVELOPMENT/math/integer/small/l_small_divu_64_64x64
+../_DEVELOPMENT/math/integer/small/l_small_muls_16_16x16
+../_DEVELOPMENT/math/integer/small/l_small_muls_32_32x32
 ../_DEVELOPMENT/math/integer/small/l_small_mulu_de
 ../_DEVELOPMENT/math/integer/small/l_small_mul_16_16x16
 ../_DEVELOPMENT/math/integer/small/l_small_mul_32_16x16
