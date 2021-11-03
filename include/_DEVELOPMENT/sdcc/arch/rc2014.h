@@ -39,6 +39,12 @@ extern unsigned char io_pio_ide_config;
 extern unsigned char io_ram_toggle;
 extern unsigned char io_rom_toggle;
 
+extern unsigned int  io_shadow_base;
+
+extern unsigned char io_lut_operand_latch;
+extern unsigned char io_lut_result_msb;
+extern unsigned char io_lut_result_lsb;
+
 #else
 
 __sfr __at __IO_DIO_PORT       io_dio;
@@ -65,6 +71,8 @@ __sfr __at __IO_PIO_IDE_CONFIG  io_pio_ide_config;
 __sfr __at __IO_RAM_TOGGLE      io_ram_toggle;
 __sfr __at __IO_ROM_TOGGLE      io_rom_toggle;
 
+__sfr __banked __at __IO_RAM_SHADOW_BASE    io_shadow_base;
+
 __sfr __at __IO_LUT_OPERAND_LATCH   io_lut_operand_latch;
 __sfr __at __IO_LUT_RESULT_MSB      io_lut_result_msb;
 __sfr __at __IO_LUT_RESULT_LSB      io_lut_result_lsb;
@@ -75,14 +83,19 @@ __sfr __at __IO_LUT_RESULT_LSB      io_lut_result_lsb;
 
 // provide shadow RAM copy function for SC114, Wesley, and feilipu Memory Modules
 
-extern void *shadowwrite(void *dst,const void *src,size_t n) __preserves_regs(iyh,iyl);
-extern void *shadowwrite_callee(void *dst,const void *src,size_t n) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define shadowwrite(a,b,c) shadowwrite_callee(a,b,c)
+extern void *shadow_write(void *dst,const void *src,size_t n) __preserves_regs(iyh,iyl);
+extern void *shadow_write_callee(void *dst,const void *src,size_t n) __preserves_regs(iyh,iyl) __z88dk_callee;
+#define shadow_write(a,b,c) shadow_write_callee(a,b,c)
 
 
-extern void *shadowread(void *dst,const void *src,size_t n) __preserves_regs(iyh,iyl);
-extern void *shadowread_callee(void *dst,const void *src,size_t n) __preserves_regs(iyh,iyl) __z88dk_callee;
-#define shadowread(a,b,c) shadowread_callee(a,b,c)
+extern void *shadow_read(void *dst,const void *src,size_t n) __preserves_regs(iyh,iyl);
+extern void *shadow_read_callee(void *dst,const void *src,size_t n) __preserves_regs(iyh,iyl) __z88dk_callee;
+#define shadow_read(a,b,c) shadow_read_callee(a,b,c)
+
+
+extern void shadow_relocate(void *dst) __preserves_regs(iyh,iyl);
+extern void shadow_relocate_fastcall(void *dst) __preserves_regs(iyh,iyl) __z88dk_fastcall;
+#define shadow_relocate(a) shadow_relocate_fastcall(a)
 
 
 

@@ -39,8 +39,6 @@ defc __CPU_CLOCK = 7372800
 defc __IO_DIO_PORT = 0x00
 defc __IO_CF_PORT = 0x10
 defc __IO_PIO_PORT_BASE = 0x20
-defc __IO_RAM_TOGGLE = 0x30
-defc __IO_ROM_TOGGLE = 0x38
 defc __IO_LUT_PORT_BASE = 0x40
 defc __IO_APU_PORT_BASE = 0x42
 defc __IO_APU0_PORT_BASE = 0x42
@@ -723,6 +721,23 @@ defc __IO_LUT_RESULT_MSB  = 0x41
 defc __IO_LUT_RESULT_LSB  = 0x40
 
 defc __IO_LUT_MODULE_AVAILABLE  = 0x00
+
+
+
+
+
+
+
+
+
+
+
+
+defc __IO_RAM_TOGGLE = 0x30
+defc __IO_ROM_TOGGLE = 0x38
+defc __IO_RAM_SHADOW_BASE  = 0x58
+
+defc __IO_RAM_SHADOW_AVAILABLE  = 0x00
 
 
 

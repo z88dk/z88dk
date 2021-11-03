@@ -47,6 +47,7 @@ include(`target/rc2014/config/config_sio.m4')
 include(`target/rc2014/config/config_82c55.m4')
 include(`target/rc2014/config/config_ide.m4')
 include(`target/rc2014/config/config_lut.m4')
+include(`target/rc2014/config/config_ram.m4')
 
 include(`target/am9511/config/config_am9511a.m4')
 include(`target/am9511/config/config_am9511a_multi.m4')

@@ -1,17 +1,16 @@
 
-; void *shadowread_callee(void * restrict s1, const void * restrict s2, size_t n)
+; void *shadow_read_callee(void * restrict s1, const void * restrict s2, size_t n) __z88dk_callee
 
 SECTION smc_lib
 
-PUBLIC _shadowread_callee
+PUBLIC _shadow_read_callee
 
 EXTERN asm_push_di
 EXTERN asm_pop_ei_jp
 
-EXTERN asm_shadowcopy
+EXTERN asm_shadow_copy
 
-._shadowread_callee
-
+._shadow_read_callee
    pop af
    pop de
    pop hl
@@ -25,5 +24,5 @@ EXTERN asm_shadowcopy
 
    scf          ; set up read from shadow ram
 
-   call NZ,asm_shadowcopy
+   call NZ,asm_shadow_copy
    jp asm_pop_ei_jp

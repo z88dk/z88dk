@@ -155,6 +155,8 @@ ENDIF
 
     include "../clib_init_data.inc"
 
+IF __IO_RAM_SHADOW_AVAILABLE = 0x01
+
     ; initialize data section to be identical in
     ; both banks of RAM (where 128kB RAM is provided)
     ; this is to support shadowwrite() and shadowread() functions
@@ -163,13 +165,21 @@ ENDIF
     ; asm_shadowcopy can then be further relocated as needed
     ; the asm_shadowcopy RAM copy function is disabled by default
 
-    ; ld a,$01
-    ; out (__IO_RAM_TOGGLE),a
+    ld a,$01
+    out (__IO_RAM_TOGGLE),a
 
-    ; include "../clib_init_data.inc"
+    include "../clib_init_data.inc"
 
-    ; xor a
-    ; out (__IO_RAM_TOGGLE),a
+    xor a
+    out (__IO_RAM_TOGGLE),a
+
+    ; REMEMBER to initialise the location of the asm_shadowcopy
+    ; stub when initialising low RAM
+
+    ; ld hl,asm_shadowcopy
+    ; ld (__IO_RAM_SHADOW_BASE),hl
+
+ENDIF
 
     ; initialize bss section
 

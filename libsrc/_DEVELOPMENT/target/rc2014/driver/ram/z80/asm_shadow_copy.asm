@@ -3,8 +3,8 @@ INCLUDE "config_private.inc"
 
 SECTION smc_driver
 
-PUBLIC asm_shadowcopy
-PUBLIC asm_shadowcopy_end
+PUBLIC asm_shadow_copy
+PUBLIC asm_shadow_copy_end
 
 ;   @feilipu February 2021
 ;
@@ -13,7 +13,12 @@ PUBLIC asm_shadowcopy_end
 ;   This code is located in the DATA section and, for ROM builds,
 ;   is copied to both main and shadow RAM banks during initialisation.
 ;
+;   The current location of this stub is maintained at base 0x0058.
+;   The C interfaces use this address to find the location this code.
+;
 ;   If desired, this code can be relocated wherever it suits the user.
+;   This can be done with the C shadowrelocate(void * addr) function,
+;   which will also update the base address.
 ;
 ;   On entry: Interrupts disabled unless you know better
 ;             HL = Source start address (in RAM)
@@ -25,7 +30,7 @@ PUBLIC asm_shadowcopy_end
 ;             IX IY AF' BC' DE' HL' preserved
 ;             carry reset
 
-.asm_shadowcopy
+.asm_shadow_copy
     rla                     ; get source bank number into A
     out (__IO_RAM_TOGGLE),a ; now in initial bank
     rra                     ; move current bank number into carry
@@ -62,4 +67,4 @@ PUBLIC asm_shadowcopy_end
     out (__IO_RAM_TOGGLE),a ; now in front bank
     ret
 
-.asm_shadowcopy_end
+.asm_shadow_copy_end

@@ -1,21 +1,24 @@
 
-; void *shadowread(void * restrict s1, const void * restrict s2, size_t n)
+; void *shadow_read(void * restrict s1, const void * restrict s2, size_t n) __smallc
 
 SECTION smc_lib
 
-PUBLIC shadowread_callee
+PUBLIC shadow_read
 
 EXTERN asm_push_di
 EXTERN asm_pop_ei_jp
 
-EXTERN asm_shadowcopy
+EXTERN asm_shadow_copy
 
-.shadowread_callee
-
+.shadow_read
    pop af
    pop bc
    pop hl
    pop de
+
+   push de
+   push hl
+   push bc
    push af
 
    call asm_push_di
@@ -25,12 +28,12 @@ EXTERN asm_shadowcopy
 
    scf          ; set up read from shadow ram
 
-   call NZ,asm_shadowcopy
+   call NZ,asm_shadow_copy
    jp asm_pop_ei_jp
 
 ; SDCC bridge for Classic
 IF __CLASSIC
-PUBLIC _shadowread_callee
-defc _shadowread_callee = shadowread_callee
+PUBLIC _shadow_read
+defc _shadow_read = shadow_read
 ENDIF
 

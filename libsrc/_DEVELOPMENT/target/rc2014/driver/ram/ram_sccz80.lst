@@ -1,6 +1,8 @@
-target/rc2014/driver/ram/c/sccz80/shadowread
-target/rc2014/driver/ram/c/sccz80/shadowread_callee
-target/rc2014/driver/ram/c/sccz80/shadowwrite
-target/rc2014/driver/ram/c/sccz80/shadowwrite_callee
+target/rc2014/driver/ram/c/sccz80/shadow_read
+target/rc2014/driver/ram/c/sccz80/shadow_read_callee
+target/rc2014/driver/ram/c/sccz80/shadow_write
+target/rc2014/driver/ram/c/sccz80/shadow_write_callee
+target/rc2014/driver/ram/c/sccz80/shadow_relocate
+target/rc2014/driver/ram/c/sccz80/shadow_relocate_fastcall
 
 @target/rc2014/driver/ram/ram_asm.lst
