@@ -55,6 +55,9 @@ math/integer/l_divu_32_32x16
 math/integer/l_divu_32_32x32
 math/integer/l_divu_64_64x8
 math/integer/l_divu_64_64x64
+math/integer/l_muls_16_16x16
+math/integer/l_muls_32_32x32
+math/integer/l_muls_64_64x64
 math/integer/l_mulu_de
 math/integer/l_mulu_16_8x8
 math/integer/l_mulu_16_16x8

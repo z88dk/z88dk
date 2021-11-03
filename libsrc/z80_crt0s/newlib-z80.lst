@@ -67,6 +67,7 @@
 ../_DEVELOPMENT/math/integer/fast/l_fast_muls_8_8x8
 ../_DEVELOPMENT/math/integer/fast/l_fast_muls_16_16x16
 ../_DEVELOPMENT/math/integer/fast/l_fast_muls_32_32x32
+../_DEVELOPMENT/math/integer/fast/l_fast_mulu_de
 ../_DEVELOPMENT/math/integer/fast/l_fast_mulu_8_8x8
 ../_DEVELOPMENT/math/integer/fast/l_fast_mulu_16_8x8
 ../_DEVELOPMENT/math/integer/fast/l_fast_mulu_16_16x16
@@ -86,6 +87,7 @@
 ../_DEVELOPMENT/math/integer/small/l_small_divu_32_32x32
 ../_DEVELOPMENT/math/integer/small/l_small_divu_64_64x8
 ../_DEVELOPMENT/math/integer/small/l_small_divu_64_64x64
+../_DEVELOPMENT/math/integer/small/l_small_mulu_de
 ../_DEVELOPMENT/math/integer/small/l_small_mul_16_16x16
 ../_DEVELOPMENT/math/integer/small/l_small_mul_32_16x16
 ../_DEVELOPMENT/math/integer/small/l_small_mul_32_32x32
@@ -103,6 +105,10 @@
 ../_DEVELOPMENT/math/integer/l_divu_32_32x32
 ../_DEVELOPMENT/math/integer/l_divu_64_64x8
 ../_DEVELOPMENT/math/integer/l_divu_64_64x64
+../_DEVELOPMENT/math/integer/l_muls_16_16x16
+../_DEVELOPMENT/math/integer/l_muls_32_32x32
+../_DEVELOPMENT/math/integer/l_muls_64_64x64
+../_DEVELOPMENT/math/integer/l_mulu_de
 ../_DEVELOPMENT/math/integer/l_mulu_16_8x8
 ../_DEVELOPMENT/math/integer/l_mulu_16_16x8
 ../_DEVELOPMENT/math/integer/l_mulu_16_16x16
