@@ -23,7 +23,18 @@
     PUBLIC  cleanup         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
 
+
+IF DEFINED_CLIB_DEFAULT_SCREEN_MODE
+    IF CLIB_DEFAULT_SCREEN_MODE = 0
+        defc    CONSOLE_COLUMNS = 20
+    ELIF CLIB_DEFAULT_SCREEN_MODE = 1
+        defc    CONSOLE_COLUMNS = 40
+    ELIF CLIB_DEFAULT_SCREEN_MODE = 2
+        defc    CONSOLE_COLUMNS = 80
+    ENDIF
+ELSE
     defc    CONSOLE_COLUMNS = 40
+ENDIF
     defc    CONSOLE_ROWS = 25
 
     PUBLIC  cpc_enable_fw_exx_set       ;needed by firmware interposer
@@ -34,6 +45,7 @@
     defc    TAR__no_ansifont = 1
     defc    TAR__register_sp = -1
     defc    TAR__clib_exit_stack_size = 8
+    defc    TAR__clib_banking_stack_size = 16
     defc    CRT_KEY_DEL = 12
     defc    __CPU_CLOCK = 4000000
     INCLUDE "crt/classic/crt_rules.inc"
@@ -105,6 +117,10 @@ IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
+IF DEFINED_CLIB_DEFAULT_SCREEN_MODE
+    ld      a,CLIB_DEFAULT_SCREEN_MODE
+    call    cpc_setmode
+ENDIF
 
     call    _main
 
