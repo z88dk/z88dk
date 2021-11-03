@@ -17,7 +17,7 @@ PUBLIC asm_shadow_copy_end
 ;   The C interfaces use this address to find the location this code.
 ;
 ;   If desired, this code can be relocated wherever it suits the user.
-;   This can be done with the C shadowrelocate(void * addr) function,
+;   This can be done with the C shadow_relocate(void * addr) function,
 ;   which will also update the base address.
 ;
 ;   On entry: Interrupts disabled unless you know better
