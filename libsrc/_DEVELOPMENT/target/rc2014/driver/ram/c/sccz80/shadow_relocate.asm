@@ -1,5 +1,5 @@
 
-; void shadow_relocate(void * address) __smallc
+; void shadow_relocate(void * address) __smallc __z88dk_fastcall
 
 SECTION smc_lib
 
@@ -11,12 +11,6 @@ EXTERN asm_pop_ei_jp
 EXTERN asm_shadow_relocate
 
 .shadow_relocate
-   pop bc
-   pop hl
-
-   push hl
-   push bc
-
    call asm_push_di
 
    call asm_shadow_relocate
