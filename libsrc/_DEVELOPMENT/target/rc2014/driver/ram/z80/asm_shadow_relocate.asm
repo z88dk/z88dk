@@ -34,9 +34,9 @@ PUBLIC asm_shadow_relocate
 
     ld hl,(__IO_RAM_SHADOW_BASE)    ; location of stub
     ld bc,asm_shadow_copy_end-asm_shadow_copy   ; size of stub
-    or a                    ; write to shadow RAM
 
-    call asm_shadow_copy     ; copy it
+    or a                    ; write to shadow RAM
+    call asm_shadow_copy    ; copy it
 
     pop de                  ; recover destination
 

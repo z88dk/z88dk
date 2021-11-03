@@ -8,7 +8,7 @@ PUBLIC _shadow_read
 EXTERN asm_push_di
 EXTERN asm_pop_ei_jp
 
-EXTERN asm_shadow_copy
+EXTERN __IO_RAM_SHADOW_BASE
 
 ._shadow_read
    pop af
@@ -21,12 +21,19 @@ EXTERN asm_shadow_copy
    push de
    push af
 
-   call asm_push_di
-   
    ld a,b
    or c
+   ret Z
+
+   call asm_push_di
+
+   push hl
+   ld hl,asm_pop_ei_jp
+   ex (sp),hl
+
+   push hl
+   ld hl,(__IO_RAM_SHADOW_BASE)
+   ex (sp),hl
 
    scf          ; set up read from shadow ram
-
-   call NZ,asm_shadow_copy
-   jp asm_pop_ei_jp
+   ret          ; jp (__IO_RAM_SHADOW_BASE)

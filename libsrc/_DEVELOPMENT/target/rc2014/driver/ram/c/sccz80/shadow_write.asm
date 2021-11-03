@@ -8,7 +8,7 @@ PUBLIC shadow_write
 EXTERN asm_push_di
 EXTERN asm_pop_ei_jp
 
-EXTERN asm_shadow_copy
+EXTERN __IO_RAM_SHADOW_BASE
 
 .shadow_write
    pop af
@@ -21,13 +21,22 @@ EXTERN asm_shadow_copy
    push bc
    push af
 
+   ld a,b
+   or c
+   ret Z
+
    call asm_push_di
 
-   ld a,b
-   or c         ; also set up write to shadow ram
+   push hl
+   ld hl,asm_pop_ei_jp
+   ex (sp),hl
 
-   call NZ,asm_shadow_copy
-   jp asm_pop_ei_jp
+   push hl
+   ld hl,(__IO_RAM_SHADOW_BASE)
+   ex (sp),hl
+
+   or a         ; set up write to shadow ram
+   ret          ; jp (__IO_RAM_SHADOW_BASE)
 
 ; SDCC bridge for Classic
 IF __CLASSIC
