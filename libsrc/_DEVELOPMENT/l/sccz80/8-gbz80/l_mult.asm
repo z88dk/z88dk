@@ -3,13 +3,16 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC  l_mult
+PUBLIC  l_mult_u
 PUBLIC  l_mult_0
 
 ; Multiply two 16 bit numbers hl=bc*de ((un)signed)
 .l_mult_0
         ld      hl,bc
-; Multiply two 16 bit numbers hl=hl*de ((un)signed)
+; Multiply two 16 bit numbers hl=hl*de (signed)
 .l_mult
+; Multiply two 16 bit numbers hl=hl*de (unsigned)
+.l_mult_u
         ld      a,h
         ld      c,l
         ld      b,16

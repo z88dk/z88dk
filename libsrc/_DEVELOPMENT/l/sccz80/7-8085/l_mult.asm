@@ -6,10 +6,13 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC l_mult
+PUBLIC l_mult_u
 PUBLIC l_mult_0
 
 ; HL = DE * HL [signed]
 .l_mult
+; HL = DE * HL [unsigned]
+.l_mult_u
     ld      bc,hl
 
 ; HL = DE * BC [signed]

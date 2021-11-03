@@ -8,6 +8,7 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC  l_long_mult
+PUBLIC  l_long_mult_u
 
 EXTERN  l_mult_0
 EXTERN  l_mult_ulong_0
@@ -17,6 +18,7 @@ EXTERN  l_mult_ulong_0
 ;exit with product in dehl
 
 .l_long_mult
+.l_long_mult_u
     push    de                  ;put secondary on stack
     push    hl
 

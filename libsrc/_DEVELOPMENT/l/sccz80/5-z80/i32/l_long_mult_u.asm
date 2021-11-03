@@ -18,11 +18,11 @@
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC l_long_mult
+PUBLIC l_long_mult_u
 
-EXTERN l_muls_32_32x32
+EXTERN l_mulu_32_32x32
 
-l_long_mult:
+l_long_mult_u:
 
    ; dehl = arg1
    ; stack = arg2, ret
@@ -34,4 +34,4 @@ l_long_mult:
    pop de
    
    push bc
-   jp l_muls_32_32x32
+   jp l_mulu_32_32x32
