@@ -32,8 +32,8 @@ ELSE
 
 IF __CLIB_OPT_IMATH <= 50
 
-   EXTERN l_small_mul_32_32x32
-   defc l_muls_32_32x32 = l_small_mul_32_32x32
+   EXTERN l_small_muls_32_32x32
+   defc l_muls_32_32x32 = l_small_muls_32_32x32
 
 ENDIF
 
