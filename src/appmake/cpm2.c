@@ -515,6 +515,23 @@ static disc_spec z80pack_spec = {
     .skew_tab = { 0x00, 0x06, 0x0C, 0x12, 0x18, 0x04, 0x0A, 0x10, 0x16, 0x02, 0x08, 0x0E, 0x14, 0x01, 0x07, 0x0d, 0x13, 0x19, 0x05, 0x0b, 0x11, 0x17, 0x03, 0x09, 0x0f, 0x15 }
 };
 
+// CAOS, NANOS, Z1013 CP/M
+static disc_spec caos_spec = {
+    .name = "CAOS",
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 1024,
+    .gap3_length = 0x52,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .alternate_sides = 1,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 0,
+    .first_sector_offset = 1,
+};
+
 
 
 
@@ -531,6 +548,7 @@ static struct formats {
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bw12",      "Bondwell 12/14",        &bondwell12_spec, 0, NULL, 1 },
     { "bw2",       "Bondwell Model 2",      &bondwell2_spec, 0, NULL, 1 },
+    { "caos",      "CAOS/NANOS/z1013 CP/M", &caos_spec, 0, NULL, 1 },
     { "cpcsystem", "CPC System Disc",       &cpcsystem_spec, 0, NULL, 0 },
     { "col1",      "Coleco ADAM 40T SSDD",  &col1_spec, 0, NULL, 1 },
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
