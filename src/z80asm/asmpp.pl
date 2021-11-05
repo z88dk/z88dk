@@ -338,7 +338,7 @@ sub parse_include_it {
 			defined(my $line = <$in>) or return;
 			if ( $line->{text} =~ 
 				/^ [\#\*]? \s* INCLUDE \s+ $QFILE_RE /ix ) {
-				return read_file_it($1);
+				return parse_include_it(read_file_it($1));
 			}
 			return $line;
 		};
