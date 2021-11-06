@@ -12,7 +12,7 @@ License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_licens
 Repository: https://github.com/z88dk/z88dk
 */
 
-#include "../errors.h"
+#include "errors.h"
 #include "alloc.h"
 #include "die.h"
 #include "fileutil.h"

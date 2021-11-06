@@ -28,27 +28,27 @@ ASTYLE = astyle \
 # force generation of version with make dev
 #------------------------------------------------------------------------------
 all::
-	touch hist.c
+	touch src/c/hist.c
 
 #------------------------------------------------------------------------------
 # ragel parser generator
 #------------------------------------------------------------------------------
-all:: scan_rules.h
+all:: src/c/scan_rules.h
 
-scan_rules.h : scan_rules.rl tokens.h scan_def.h \
+src/c/scan_rules.h : src/c/scan_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl dev/Makefile 
-	perl parse_ragel.pl scan_rules.rl
+	perl parse_ragel.pl src/c/scan_rules.rl
 #	$(ASTYLE) scan_rules.h -- formatted file too big for debugger (> 65536 lines)
 	
-all:: parse_rules.h
+all:: src/c/parse_rules.h
 
 dev/cpu/cpu_rules.h : dev/cpu/cpu.pl dev/Makefile
 	perl dev/cpu/cpu.pl
 
-parse_rules.h : parse_rules.rl tokens.h scan_def.h \
+src/c/parse_rules.h : src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl dev/Makefile \
 				dev/cpu/cpu_rules.h
-	perl parse_ragel.pl parse_rules.rl
+	perl parse_ragel.pl src/c/parse_rules.rl
 	
 #------------------------------------------------------------------------------
 # Generate test scripts using  Udo Munk's z80asm as a reference implementation

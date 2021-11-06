@@ -19,7 +19,7 @@ SRC		:= $(filter-out test.asm,$(wildcard *.asm))
 define MAKE_LIB
 all: $(PROJ)-$(strip $(1)).lib
 
-$(PROJ)-$(strip $(1)).lib: $(PROJ)_lib.lst $(SRC) Makefile ../../zobjfile.h
+$(PROJ)-$(strip $(1)).lib: $(PROJ)_lib.lst $(SRC) Makefile ../../src/c/zobjfile.h
 	$(Z80ASM_EXE) -l -x$(PROJ)-$(strip $(1)).lib $(2) @$(PROJ)_lib.lst
 
 clean::

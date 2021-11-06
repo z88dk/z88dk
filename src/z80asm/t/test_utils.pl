@@ -485,7 +485,7 @@ sub t_compile_module {
 	my($init_code, $main_code, $compile_args) = @_;
 
 	# modules to include always
-	$compile_args .= " lib/alloc.o ";
+	$compile_args .= " src/c/alloc.o ";
 
 	# wait for previous run to finish
 	while (-f 'test'.$Config{_exe} && ! unlink('test'.$Config{_exe})) {
@@ -660,7 +660,7 @@ sub normalize {
 #------------------------------------------------------------------------------
 # get version and date from hist.c
 sub get_copyright {
-	my $hist = read_file("hist.c");
+	my $hist = read_file("src/c/hist.c");
 	my($copyright) = $hist =~ /\#define \s+ COPYRIGHT \s+ \" (.*?) \"/x or die;
 
 	my $config = read_file("../config.h");

@@ -105,11 +105,6 @@ static const char* parse_str(obj_file_t* obj, int len) {
 	return ret;
 }
 
-static const char* parse_bcount_str(obj_file_t* obj) {
-	int len = parse_byte(obj);
-	return parse_str(obj, len);
-}
-
 static const char* parse_wcount_str(obj_file_t* obj) {
 	int len = parse_word(obj);
 	return parse_str(obj, len);

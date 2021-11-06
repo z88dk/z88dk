@@ -4517,7 +4517,7 @@ t_binary(read_binfile(bin_file()), "\xC3\x00\x00");
 #------------------------------------------------------------------------------
 unlink_testfiles();
 
-my $objs = "zobjfile.o lib/class.o lib/array.o errors.o error_func.o lib/str.o lib/strhash.o lib/list.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o scan.o options.o model.o module.o sym.o symtab.o lib/srcfile.o macros.o hist.o expr.o listfile.o codearea.o lib/dbg.o ../common/zutils.o modlink.o libfile.o z80asm.o z80pass.o directives.o parse.o opcodes.o ";
+my $objs = "src/c/zobjfile.o src/c/class.o src/c/array.o src/c/errors.o src/c/error_func.o src/c/str.o src/c/strhash.o src/c/list.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o src/c/scan.o src/c/options.o src/c/model.o src/c/module.o src/c/sym.o src/c/symtab.o src/c/srcfile.o src/c/macros.o src/c/hist.o src/c/expr.o src/c/listfile.o src/c/codearea.o src/c/dbg.o ../common/zutils.o src/c/modlink.o src/c/libfile.o src/c/z80asm.o src/c/z80pass.o src/c/directives.o src/c/parse.o src/c/opcodes.o ";
 if ($^O eq 'MSWin32' || $^O eq 'msys') {
 	  $objs .= "../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o ";
 }

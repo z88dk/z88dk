@@ -161,7 +161,7 @@ static void process_env_options()
 
 void parse_argv( int argc, char *argv[] )
 {
-    int arg;
+	int arg = 0;
 
     init_module();
 

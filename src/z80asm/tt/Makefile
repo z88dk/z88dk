@@ -9,14 +9,14 @@
 
 TPAGE = perl -S tpage --include_path=. 
 
-all : $(patsubst %.tt, ../%, $(wildcard *.tt))
+all : $(patsubst %.tt, ../src/c/%, $(wildcard *.tt))
 
-../%.c : %.c.tt %.yaml
+../src/c/%.c : %.c.tt %.yaml Makefile
 	$(TPAGE) $< > $@~
 	mv $@~ $@
 	dos2unix $@
 
-../%.h : %.h.tt %.yaml
+../src/c/%.h : %.h.tt %.yaml Makefile
 	$(TPAGE) $< > $@~
 	mv $@~ $@
 	dos2unix $@

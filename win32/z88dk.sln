@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-z80nm", "z80nm\z80nm.vcxproj", "{E3CAFDD4-FBE2-4E7E-AB20-816C8B257F6B}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -101,8 +101,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm-common", "z80asm-common\z80asm-common.vcxproj", "{00BCE225-FE40-4C33-B15E-C8FB6ADA74EB}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "regex", "regex\regex.vcxproj", "{BD9576EB-A8C0-4E05-ACE3-563277AB90BC}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z80asm2", "z80asm2\z80asm2.vcxproj", "{2D3EF459-1199-423F-A1D2-7EDFFB563075}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common", "common\common.vcxproj", "{D7BC7A18-5BC5-4543-9F93-87A055319826}"
 EndProject
@@ -306,14 +304,6 @@ Global
 		{BD9576EB-A8C0-4E05-ACE3-563277AB90BC}.Release|Win32.Build.0 = Release|Win32
 		{BD9576EB-A8C0-4E05-ACE3-563277AB90BC}.Release|x64.ActiveCfg = Release|x64
 		{BD9576EB-A8C0-4E05-ACE3-563277AB90BC}.Release|x64.Build.0 = Release|x64
-		{2D3EF459-1199-423F-A1D2-7EDFFB563075}.Debug|Win32.ActiveCfg = Debug|Win32
-		{2D3EF459-1199-423F-A1D2-7EDFFB563075}.Debug|Win32.Build.0 = Debug|Win32
-		{2D3EF459-1199-423F-A1D2-7EDFFB563075}.Debug|x64.ActiveCfg = Debug|x64
-		{2D3EF459-1199-423F-A1D2-7EDFFB563075}.Debug|x64.Build.0 = Debug|x64
-		{2D3EF459-1199-423F-A1D2-7EDFFB563075}.Release|Win32.ActiveCfg = Release|Win32
-		{2D3EF459-1199-423F-A1D2-7EDFFB563075}.Release|Win32.Build.0 = Release|Win32
-		{2D3EF459-1199-423F-A1D2-7EDFFB563075}.Release|x64.ActiveCfg = Release|x64
-		{2D3EF459-1199-423F-A1D2-7EDFFB563075}.Release|x64.Build.0 = Release|x64
 		{D7BC7A18-5BC5-4543-9F93-87A055319826}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D7BC7A18-5BC5-4543-9F93-87A055319826}.Debug|Win32.Build.0 = Debug|Win32
 		{D7BC7A18-5BC5-4543-9F93-87A055319826}.Debug|x64.ActiveCfg = Debug|x64

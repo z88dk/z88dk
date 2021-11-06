@@ -22,17 +22,18 @@ ifeq ($(EXESUFFIX),.exe)
 				   ../../ext/UNIXem/src/dirent.o
 endif
 
-CC 		?= gcc
+CC 			?= gcc
+CXX			?= g++
 INSTALL 	?= install
 CROSS		?= 0
 
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
-SRCS		:= $(filter-out test.c,$(wildcard *.c lib/*.c ../common/*.c ../../ext/regex/reg*.c))
-OBJS 		:= $(SRCS:.c=.o) \
-		   $(UNIXem_OBJS)
-DEPENDS		:= $(SRCS:.c=.d)
+C_SRCS		:= $(filter-out src/c/test.c, $(wildcard src/c/*.c ../common/*.c ../../ext/regex/reg*.c))
+CXX_SRCS	:= $(wildcard src/cpp/*.cpp)	
+OBJS 		:= $(C_SRCS:.c=.o) $(CXX_SRCS:.cpp=.o) $(UNIXem_OBJS)
+DEPENDS		:= $(C_SRCS:.c=.d) $(CXX_SRCS:.cpp=.d)
 TEST_SRC_MAIN	:= $(wildcard t/test_*.c)
 TEST_SRC_LIB	:= t/testlib.c
 
@@ -40,15 +41,21 @@ TEST_SRC_LIB	:= t/testlib.c
 # variables
 #------------------------------------------------------------------------------
 OPT 		= -O3
+#OPT		= -g -Wextra 
 
-STD 		= -std=gnu11
-LOCAL_LIB	:= lib
-LOCAL_CFLAGS 	+= -MMD -I. -I$(LOCAL_LIB) -It -g -Wall $(STD) $(OPT) \
-		   -I../common \
-		   -I../../ext/optparse \
-		   -I../../ext/regex \
-		   -I../../ext/uthash/src \
-		   $(UNIXem_CFLAGS)
+COMMON_FLAGS = -MMD -Wall $(OPT) \
+			-Isrc
+
+LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
+			-Isrc/c \
+			-It \
+			-I../common \
+			-I../../ext/optparse \
+			-I../../ext/regex \
+			-I../../ext/uthash/src \
+			$(UNIXem_CFLAGS)
+CXX_FLAGS	+= -std=c++17 $(COMMON_FLAGS) \
+			-Isrc/cpp
 
 #------------------------------------------------------------------------------
 # main
@@ -58,7 +65,7 @@ LOCAL_CFLAGS 	+= -MMD -I. -I$(LOCAL_LIB) -It -g -Wall $(STD) $(OPT) \
 all: $(PROJ)$(EXESUFFIX)
 
 $(PROJ)$(EXESUFFIX): ../config.h $(OBJS)
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -o $(PROJ)$(EXESUFFIX) $(OBJS) $(LDFLAGS)
+	$(CXX) -o $(PROJ)$(EXESUFFIX) $(OBJS) $(LDFLAGS)
 
 ../config.h:
 	@echo \#define PREFIX \"/usr/local/share/z88dk\" 				 > $@
@@ -69,8 +76,11 @@ $(PROJ)$(EXESUFFIX): ../config.h $(OBJS)
 %.o: %.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -c -o $@ $<
 
+%.o: %.cpp
+	$(CXX) $(CXX_FLAGS) -c -o $@ $<
+
 # parser is too big to optimize with -O3
-parse.o: parse.c
+src/c/parse.o: src/c/parse.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -O0 -c -o $@ $<
 
 #------------------------------------------------------------------------------
@@ -110,7 +120,6 @@ clean::
 dev:
 	perl asmstyle.pl dev/z80asm_lib/*.asm
 	$(MAKE) -C tt
-	$(MAKE) -C lib
 	$(MAKE) -f dev/Makefile
 	$(MAKE) all
 
@@ -131,15 +140,7 @@ install: $(PROJ)$(EXESUFFIX) z80asm_lib
 # clean
 #------------------------------------------------------------------------------
 clean::
-	$(RM) *.core $(LOCAL_LIB)/*.core $(LOCAL_LIB)/t/*.core $(LOCAL_LIB)/t/uthash/*.core
-	$(RM) *.o    $(LOCAL_LIB)/*.o    $(LOCAL_LIB)/t/*.o    $(LOCAL_LIB)/t/uthash/*.o
-	$(RM) *.out  $(LOCAL_LIB)/*.out  $(LOCAL_LIB)/t/*.out  $(LOCAL_LIB)/t/uthash/*.out
-	$(RM) *.orig $(LOCAL_LIB)/*.orig $(LOCAL_LIB)/t/*.orig $(LOCAL_LIB)/t/uthash/*.orig
-	$(RM) *.exe  $(LOCAL_LIB)/*.exe  $(LOCAL_LIB)/t/*.exe  $(LOCAL_LIB)/t/uthash/*.exe
-	$(RM) *.tmp  $(LOCAL_LIB)/*.tmp  $(LOCAL_LIB)/t/*.tmp  $(LOCAL_LIB)/t/uthash/*.tmp
-	$(RM) *.bak  $(LOCAL_LIB)/*.bak  $(LOCAL_LIB)/t/*.bak  $(LOCAL_LIB)/t/uthash/*.bak
-	$(RM) *.log  $(LOCAL_LIB)/*.log  $(LOCAL_LIB)/t/*.log  $(LOCAL_LIB)/t/uthash/*.log
-	$(RM) *~     $(LOCAL_LIB)/*~     $(LOCAL_LIB)/t/*~     $(LOCAL_LIB)/t/uthash/*~
+	$(RM) *.core *.o  *.out *.orig *.exe *.tmp *.bak *.log *~
 	$(RM) -rf Debug Release x1 x2 x3
 	$(RM) $(OBJS) $(TEST_SRC_LIB:.c=.o)
 
@@ -149,7 +150,7 @@ clean::
 all: t/libtestlib.a
 
 t/libtestlib.a : $(OBJS) $(TEST_SRC_LIB:.c=.o)
-	ar rcs t/libtestlib.a $(OBJS:main.o=) $(TEST_SRC_LIB:.c=.o)
+	ar rcs t/libtestlib.a $(OBJS:src/c/main.o=) $(TEST_SRC_LIB:.c=.o)
 
 $(TEST_SRC_MAIN:.c=.o) : t/libtestlib.a
 
@@ -200,8 +201,8 @@ clean::
 
 clean::
 	$(RM) -r *.dSYM
-	$(RM) $(PROJ)$(EXESUFFIX) $(LOCAL_LIB)/$(PROJ)$(EXESUFFIX) test* $(LOCAL_LIB)/test*
-	$(RM) t/*.tmp $(LOCAL_LIB)/t/*.tmp t/dev/*.tmp
+	$(RM) $(PROJ)$(EXESUFFIX) test*
+	$(RM) t/*.tmp t/dev/*.tmp
 
 #------------------------------------------------------------------------------
 # Dependencies

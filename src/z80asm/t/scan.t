@@ -15,11 +15,7 @@ use File::Slurp;
 use Test::Differences;
 require './t/test_utils.pl';
 
-my $objs = "scan.o errors.o error_func.o model.o module.o codearea.o listfile.o ".
-		   "options.o hist.o sym.o symtab.o expr.o ".
-		   "lib/str.o lib/strhash.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o modlink.o zobjfile.o libfile.o ".
-		   "lib/srcfile.o macros.o lib/class.o ".
-		   "lib/list.o lib/array.o lib/dbg.o ../common/zutils.o z80asm.o z80pass.o directives.o parse.o opcodes.o ";
+my $objs = "src/c/scan.o src/c/errors.o src/c/error_func.o src/c/model.o src/c/module.o src/c/codearea.o src/c/listfile.o src/c/options.o src/c/hist.o src/c/sym.o src/c/symtab.o src/c/expr.o src/c/str.o src/c/strhash.o  ../common/fileutil.o ../common/strutil.o ../common/die.o ../common/objfile.o ../../ext/regex/regcomp.o ../../ext/regex/regerror.o ../../ext/regex/regexec.o ../../ext/regex/regfree.o src/c/modlink.o src/c/zobjfile.o src/c/libfile.o src/c/srcfile.o src/c/macros.o src/c/class.o src/c/list.o src/c/array.o src/c/dbg.o ../common/zutils.o src/c/z80asm.o src/c/z80pass.o src/c/directives.o src/c/parse.o src/c/opcodes.o ";
 if ($^O eq 'MSWin32' || $^O eq 'msys') {
 	  $objs .= "../../ext/UNIXem/src/glob.o ../../ext/UNIXem/src/dirent.o ";
 }
