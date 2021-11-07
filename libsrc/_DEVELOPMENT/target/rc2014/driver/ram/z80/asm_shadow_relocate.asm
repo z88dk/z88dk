@@ -32,12 +32,18 @@ PUBLIC asm_shadow_relocate
     ex de,hl                ; destination to de
     push de                 ; save a copy of destination
 
+    ld hl,shadow_relocate_continue  ; save our return address after copy
+    push hl
+
     ld hl,(__IO_RAM_SHADOW_BASE)    ; location of stub
+    push hl                 ; save for jp (__IO_RAM_SHADOW_BASE)
+
     ld bc,asm_shadow_copy_end-asm_shadow_copy   ; size of stub
 
     or a                    ; write to shadow RAM
-    call asm_shadow_copy    ; copy it
+    ret                     ; copy it by jp (__IO_RAM_SHADOW_BASE)
 
+.shadow_relocate_continue
     pop de                  ; recover destination
 
     ld hl,(__IO_RAM_SHADOW_BASE)    ; location of stub
