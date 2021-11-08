@@ -79,7 +79,7 @@ loop_00:
 
    add a,a
    ccf
-   jr nz, loop_exit
+   jr nc, loop_exit
 
    xor a
    jp error_lznc
@@ -92,7 +92,7 @@ loop11:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop12
 
@@ -108,7 +108,7 @@ loop12:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop13
 
@@ -124,7 +124,7 @@ loop13:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop14
 
@@ -140,7 +140,7 @@ loop14:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop15
 
@@ -156,7 +156,7 @@ loop15:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop16
 
@@ -172,7 +172,7 @@ loop16:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop17
 
@@ -188,7 +188,7 @@ loop17:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop_exit
 
@@ -240,7 +240,7 @@ loop:
    exx
    adc hl,hl
    exx
-   adc a,a
+   rla
 
    jr nc, loop_end
 
