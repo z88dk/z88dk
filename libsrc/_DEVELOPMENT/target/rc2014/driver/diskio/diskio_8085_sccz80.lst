@@ -9,4 +9,4 @@ target/rc2014/driver/diskio/c/sccz80/disk_read_callee
 target/rc2014/driver/diskio/c/sccz80/disk_write
 target/rc2014/driver/diskio/c/sccz80/disk_write_callee
 
-@target/rc2014/driver/diskio/diskio_asm.lst
+@target/rc2014/driver/diskio/diskio_8085_asm.lst
