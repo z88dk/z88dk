@@ -159,11 +159,11 @@ IF __IO_RAM_SHADOW_AVAILABLE = 0x01
 
     ; initialize data section to be identical in
     ; both banks of RAM (where 128kB RAM is provided)
-    ; this is to support shadowwrite() and shadowread() functions
+    ; this is to support shadow_write() and shadow_read() functions
     ; the asm_shadowcopy function must be available in both RAM
     ; banks at the same address
-    ; asm_shadowcopy can then be further relocated as needed
-    ; the asm_shadowcopy RAM copy function is disabled by default
+    ; asm_shadow_copy can then be further relocated as needed
+    ; the asm_shadow_copy RAM copy function is disabled by default
 
     ld a,$01
     out (__IO_RAM_TOGGLE),a
@@ -173,10 +173,12 @@ IF __IO_RAM_SHADOW_AVAILABLE = 0x01
     xor a
     out (__IO_RAM_TOGGLE),a
 
-    ; REMEMBER to initialise the location of the asm_shadowcopy
+    ; REMEMBER to initialise the location of the asm_shadow_copy
     ; stub when initialising low RAM
 
-    ; ld hl,asm_shadowcopy
+    ; EXTERN asm_shadow_copy
+
+    ; ld hl,asm_shadow_copy
     ; ld (__IO_RAM_SHADOW_BASE),hl
 
 ENDIF
