@@ -7,7 +7,7 @@ SECTION code_driver_character_output
 PUBLIC fputc_cons_acia
 
 EXTERN aciaTxCount, aciaTxIn, aciaTxBuffer, aciaControl
-EXTERN asm_z80_push_di, asm_z80_pop_ei_jp
+
 
 .fputc_cons_acia
     ; enter    : (sp+2) = char to output

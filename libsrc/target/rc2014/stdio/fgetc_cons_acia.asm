@@ -6,7 +6,7 @@ SECTION code_driver
 PUBLIC fgetc_cons_acia
 
 EXTERN aciaRxCount, aciaRxOut, aciaRxBuffer, aciaControl
-EXTERN asm_z80_push_di, asm_z80_pop_ei
+
 
 .fgetc_cons_acia
     ; exit     : l = char received
