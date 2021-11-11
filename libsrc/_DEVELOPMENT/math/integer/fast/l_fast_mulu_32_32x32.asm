@@ -318,16 +318,14 @@ _16b_24b:
    ld h,l
    ld l,0
 
-   exx
-
    pop af
-
-   call l0_fast_mulu_40_32x8
 
    push de
    push hl
 
    exx
+
+   call l0_fast_mulu_40_32x8
 
    pop bc
    add hl,bc

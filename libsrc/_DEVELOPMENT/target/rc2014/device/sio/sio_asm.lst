@@ -1,29 +1,29 @@
 
-target/rc2014/device/sio/__sioa_data_Rx
-target/rc2014/device/sio/__siob_data_Rx
+target/rc2014/device/sio/z80/__sioa_data_Rx
+target/rc2014/device/sio/z80/__siob_data_Rx
 
-target/rc2014/device/sio/__sioa_data_Tx
-target/rc2014/device/sio/__siob_data_Tx
+target/rc2014/device/sio/z80/__sioa_data_Tx
+target/rc2014/device/sio/z80/__siob_data_Tx
 
-target/rc2014/device/sio/sioa_flush_Rx
-target/rc2014/device/sio/sioa_flush_Tx
-target/rc2014/device/sio/sioa_reset
-target/rc2014/device/sio/sioa_getc
-target/rc2014/device/sio/sioa_peekc
-target/rc2014/device/sio/sioa_pollc
-target/rc2014/device/sio/sioa_putc
+target/rc2014/device/sio/z80/sioa_flush_Rx
+target/rc2014/device/sio/z80/sioa_flush_Tx
+target/rc2014/device/sio/z80/sioa_reset
+target/rc2014/device/sio/z80/sioa_getc
+target/rc2014/device/sio/z80/sioa_peekc
+target/rc2014/device/sio/z80/sioa_pollc
+target/rc2014/device/sio/z80/sioa_putc
 
-target/rc2014/device/sio/siob_flush_Rx
-target/rc2014/device/sio/siob_flush_Tx
-target/rc2014/device/sio/siob_reset
-target/rc2014/device/sio/siob_getc
-target/rc2014/device/sio/siob_peekc
-target/rc2014/device/sio/siob_pollc
-target/rc2014/device/sio/siob_putc
+target/rc2014/device/sio/z80/siob_flush_Rx
+target/rc2014/device/sio/z80/siob_flush_Tx
+target/rc2014/device/sio/z80/siob_reset
+target/rc2014/device/sio/z80/siob_getc
+target/rc2014/device/sio/z80/siob_peekc
+target/rc2014/device/sio/z80/siob_pollc
+target/rc2014/device/sio/z80/siob_putc
 
-target/rc2014/device/sio/sio_init
-target/rc2014/device/sio/sio_interrupt
+target/rc2014/device/sio/z80/sio_init
+target/rc2014/device/sio/z80/sio_interrupt
 
-target/rc2014/device/sio/__sio_init_async_rodata
+target/rc2014/device/sio/z80/__sio_init_async_rodata
 
-target/rc2014/device/sio/__sio_need
+target/rc2014/device/sio/z80/__sio_need
