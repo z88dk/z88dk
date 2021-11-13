@@ -13,7 +13,7 @@
 
 
 
-int __FASTCALL__ readbyte(int fd)
+int __FASTCALL__ readbyte(int fd) __naked
 {
 #asm
 	push	ix	;save callers
@@ -31,6 +31,7 @@ int __FASTCALL__ readbyte(int fd)
 	ret	c	;error, return EOF
 	ld	l,e
 	ld	h,0
+        ret
 #endasm
 }
 
