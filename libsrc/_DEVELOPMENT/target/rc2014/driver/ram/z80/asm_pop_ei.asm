@@ -15,7 +15,7 @@
 
 INCLUDE "config_private.inc"
 
-SECTION smc_clib
+SECTION code_clib
 
 PUBLIC asm_pop_ei_jp
 
