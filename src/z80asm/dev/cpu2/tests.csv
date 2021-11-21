@@ -5777,8 +5777,8 @@ ld hl, iy         |z80n |-    |FD E5; E1                                   |    
 ld hl, iy         |z80n |IXIY |DD E5; E1                                   |     25 T
 ld hl, sp         |8080 |-    |21 00 00; 39                                |     20 T
 ld hl, sp         |8080 |IXIY |21 00 00; 39                                |     20 T
-ld hl, sp         |8085 |-    |21 00 00; 39                                |     20 T
-ld hl, sp         |8085 |IXIY |21 00 00; 39                                |     20 T
+ld hl, sp         |8085 |-    |EB; 38 00; EB                               |     18 T
+ld hl, sp         |8085 |IXIY |EB; 38 00; EB                               |     18 T
 ld hl, sp         |gbz80|-    |F8 00                                       |     12 T
 ld hl, sp         |gbz80|IXIY |F8 00                                       |     12 T
 ld hl, sp         |z80  |-    |21 00 00; 39                                |     21 T
@@ -5787,8 +5787,8 @@ ld hl, sp         |z80n |-    |21 00 00; 39                                |    
 ld hl, sp         |z80n |IXIY |21 00 00; 39                                |     21 T
 ld hl, sp+-128    |8080 |-    |21 80 00; 39                                |     20 T
 ld hl, sp+-128    |8080 |IXIY |21 80 00; 39                                |     20 T
-ld hl, sp+-128    |8085 |-    |21 80 00; 39                                |     20 T
-ld hl, sp+-128    |8085 |IXIY |21 80 00; 39                                |     20 T
+ld hl, sp+-128    |8085 |-    |EB; 38 80; EB                               |     18 T
+ld hl, sp+-128    |8085 |IXIY |EB; 38 80; EB                               |     18 T
 ld hl, sp+-128    |gbz80|-    |F8 80                                       |     12 T
 ld hl, sp+-128    |gbz80|IXIY |F8 80                                       |     12 T
 ld hl, sp+-128    |z80  |-    |21 80 00; 39                                |     21 T
@@ -5797,14 +5797,16 @@ ld hl, sp+-128    |z80n |-    |21 80 00; 39                                |    
 ld hl, sp+-128    |z80n |IXIY |21 80 00; 39                                |     21 T
 ld hl, sp+127     |8080 |-    |21 7F 00; 39                                |     20 T
 ld hl, sp+127     |8080 |IXIY |21 7F 00; 39                                |     20 T
-ld hl, sp+127     |8085 |-    |21 7F 00; 39                                |     20 T
-ld hl, sp+127     |8085 |IXIY |21 7F 00; 39                                |     20 T
+ld hl, sp+127     |8085 |-    |EB; 38 7F; EB                               |     18 T
+ld hl, sp+127     |8085 |IXIY |EB; 38 7F; EB                               |     18 T
 ld hl, sp+127     |gbz80|-    |F8 7F                                       |     12 T
 ld hl, sp+127     |gbz80|IXIY |F8 7F                                       |     12 T
 ld hl, sp+127     |z80  |-    |21 7F 00; 39                                |     21 T
 ld hl, sp+127     |z80  |IXIY |21 7F 00; 39                                |     21 T
 ld hl, sp+127     |z80n |-    |21 7F 00; 39                                |     21 T
 ld hl, sp+127     |z80n |IXIY |21 7F 00; 39                                |     21 T
+ld hl, sp+255     |8085 |-    |EB; 38 FF; EB                               |     18 T
+ld hl, sp+255     |8085 |IXIY |EB; 38 FF; EB                               |     18 T
 ld i, a           |z80  |-    |ED 47                                       |      9 T
 ld i, a           |z80  |IXIY |ED 47                                       |      9 T
 ld i, a           |z80n |-    |ED 47                                       |      9 T

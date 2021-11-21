@@ -3,8 +3,7 @@
 ;
 ; Input data for tests, to be parsed by build_opcodes.pl
 ;
-; Copyright (C) Gunther Strube, InterLogic 1993-99
-; Copyright (C) Paulo Custodio, 2011-2017
+; Copyright (C) Paulo Custodio, 2011-2021
 ; License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 ; Repository: https://github.com/pauloscustodio/z88dk-z80asm
 ;------------------------------------------------------------------------------
@@ -38,7 +37,6 @@
 
 ; Word
 	ld bc,{-32768 -1 0 1 32767 65535}
-	ld bc,{-32769 65536}				;; warn 2: integer '{1}' out of range
 
 ; 32-bit arithmetic, long range is not tested on a 32bit long
 	defq 0xFFFFFFFF						;; defw 0FFFFh, 0FFFFh
@@ -46,7 +44,6 @@
 
 ; call out of range
 	call {-32768 -1 0 1 65535}
-	call {-32769 65536}					;; warn 2: integer '{1}' out of range
 
 ;------------------------------------------------------------------------------
 ; Expressions
@@ -64,8 +61,8 @@ label_2: ld a,3							;;label_2 ld a,3
 
 	defw label_1, label_2
 	defw ZERO+label_1
-	defb #label_2-label_1				;; defb 2
-	defb #ZERO+label_2-label_1			;; defb 2
+	defb label_2-label_1				;; defb 2
+	defb ZERO+label_2-label_1			;; defb 2
 	
 	defb 255,128,0,-128
 	defb ZERO+255,ZERO-128
@@ -319,7 +316,7 @@ ENDIF
 	ld	a,(NN)
 	ld	(NN),a
 
-	ld ({bc de}),{b c d e h l (hl) (ix+DIS) (iy+DIS) N}	;; error: syntax error
+	ld (bc),{b c d e h l (hl) (ix+DIS) (iy+DIS) N}	;; error: syntax error
 
 IF !RABBIT
 	ld	{i r},a
@@ -759,15 +756,15 @@ ENDIF
 ;------------------------------------------------------------------------------
 	call_oz {1 255}						;; 	rst 20h ;; defb {1}
 	call_oz {256 65535}					;; 	rst 20h ;; defw {1}
-	call_oz {0 65536}					;; error: integer '{1}' out of range
+	call_oz 0							;; error: integer '0' out of range
 
 IF !RABBIT
 	call_pkg {0 1 65535}				;; 	rst 08h ;; defw {1}
-	call_pkg {-1 65536} 				;; error: integer '{1}' out of range
+	call_pkg -1			 				;; error: integer '-1' out of range
 ENDIF
 	
 	fpp {1 254}							;; 	rst 18h ;; defb {1}
 	fpp {0 255 256}				 		;; error: integer '{1}' out of range
 
 	invoke {0 1 65535}					;;	call {1}
-	invoke {-1 65536}			 		;; error: integer '{1}' out of range
+	invoke -1					 		;; error: integer '-1' out of range

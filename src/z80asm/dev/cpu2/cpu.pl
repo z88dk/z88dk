@@ -703,6 +703,14 @@ sub init_opcodes {
 			add("ld hl, sp+%s", B(0xf8, '%s'), T(12));
 			add("ld hl, sp",    B(0xf8, 0),    T(12));
 		}
+		elsif (is8085) {
+            add_compound("ld hl, sp+%n" =>  "ex de, hl",
+                                            "ld de, sp+%n",
+											"ex de, hl");
+            add_compound("ld hl, sp" =>     "ex de, hl",
+                                            "ld de, sp",
+											"ex de, hl");
+		}
         else {
             add_compound("ld hl, sp+%s" =>  "ld hl, %s",
                                             "add hl, sp");
@@ -2317,6 +2325,14 @@ sub run_tests {
 								[" and a",		$Opcodes{"and a"}{$cpu}->clone()],
 								[$test_asm, 	$prog_instance]);
 					}
+					elsif ($asm =~ /^(jx5|j_x5|jp x5|jk|j_k|jp k|jnx5|j_nx5|jp nx5|jnk|j_nk|jp nk)/) {
+						$prog_instance = $prog->clone(
+							n => 0x12, s => 0x12, d => 0x12, m => 3);
+						$asm_instance = replace($asm, 
+							'%n', 0x12, '%s', 0x12, '%d' => 0x12, '%m', 3);
+						$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
+						run_test($ixiy, 3, [$test_asm, $prog_instance]);
+					}
 					elsif ($asm =~ /rst %c/) {
 						for my $target (restarts()) {
 							$prog_instance = $prog->clone(c => $target);
@@ -2503,16 +2519,7 @@ sub assemble_and_run {
 	
 	my @ticks = @{$prog->ticks};
 	
-	# use z80asm2 if building for z80 and no library calls
 	my $got_bytes = path('test.bin')->slurp_raw;
-	if (length($got_bytes) == $size+1 && !$ixiy && isz80()) {	# final nop is not counted in $size
-		$ok &&= run("z80asm2 test.asm");
-		$ok or return;
-
-		my $got_bytes2 = path('test.bin')->slurp_raw;
-		$got_bytes2 = substr($got_bytes2, 0, $size);
-		$ok &&= check_bin($got_bytes2, $bytes);
-	}
 	$got_bytes = substr($got_bytes, 0, $size);		# ignore code after bytes - library
 	$ok &&= check_bin($got_bytes, $bytes);
 	
