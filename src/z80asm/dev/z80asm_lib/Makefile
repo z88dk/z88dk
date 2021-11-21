@@ -7,7 +7,13 @@
 # Copyright (C) Paulo Custodio, 2011-2019
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
-PROJ		:= z88dk-z80asm
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 	:= .exe
+else
+  EXESUFFIX 	?=
+endif
+
+PROJ		:= z88dk-z80asm$(EXESUFFIX)
 
 INSTALL 	?= install
 Z80ASM_EXE	?= ../../$(PROJ)
@@ -40,7 +46,8 @@ $(PROJ)_lib.lst: $(SRC)
 	$(foreach file, $(sort $(SRC)), echo $(file) >> $(PROJ)_lib.lst; )
 
 clean::
-	$(RM) $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin
+	$(RM) $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin $(PROJ)
 
 test: all
+	cp $(Z80ASM_EXE) $(PROJ)
 	perl -S prove t/*.t
