@@ -10,24 +10,24 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 */
 
 #include "alloc.h"
+#include "die.h"
 #include "errors.h"
 #include "init.h"
 #include "list.h"
+#include "macros.h"
 #include "model.h"
 #include "options.h"
 #include "scan.h"
 #include "str.h"
 #include "utarray.h"
-#include "die.h"
 #include "zutils.h"
-
 #include <ctype.h>
 
 /*-----------------------------------------------------------------------------
 * 	Globals
 *----------------------------------------------------------------------------*/
 Sym  sym;
-bool EOL;
+bool found_EOL;
 
 /*-----------------------------------------------------------------------------
 * 	Static - current scan context
@@ -51,7 +51,7 @@ typedef struct scan_state_t
 	Sym		 sym;
 	char	*input_buf;
 	bool	 at_bol;
-	bool	 EOL;
+	bool	 found_EOL;
 	int		 cs, act;
 	int		 p, pe, eof_, ts, te;
 //	char	*sym_string;
@@ -79,7 +79,7 @@ static void init_sym(void)
 	sym.text = "";
 	sym.string = NULL;
 	sym.filename = NULL;
-	sym.line_nr = 0;
+	sym.line_num = 0;
 #endif
 	sym.number = 0;
 }
@@ -118,7 +118,7 @@ void save_scan_state(void)
 	save.sym = sym;
 	save.input_buf = m_strdup(Str_data(input_buf));
 	save.at_bol = at_bol;
-	save.EOL = EOL;
+	save.found_EOL = found_EOL;
 	save.cs = cs;
 	save.act = act;
 	save.p   = p   ? p   - Str_data(input_buf) : -1;
@@ -142,7 +142,7 @@ void restore_scan_state(void)
 	sym = save->sym;
 	Str_set(input_buf, save->input_buf);
 	at_bol = save->at_bol;
-	EOL = save->EOL;
+	found_EOL = save->found_EOL;
 	cs = save->cs;
 	act = save->act;
 	p   = save->p   >= 0 ? Str_data(input_buf) + save->p   : NULL;
@@ -275,13 +275,13 @@ static void skip_to_newline( void )
 }
 
 /*-----------------------------------------------------------------------------
-*   Skip line past the newline, set EOL
+*   Skip line past the newline, set found_EOL
 *----------------------------------------------------------------------------*/
 void Skipline( void )
 {
 	init_module();
 
-	if ( ! EOL )
+	if ( ! found_EOL )
 	{
 		char *newline = strchr( p, '\n' );
 		if ( newline == NULL )
@@ -289,7 +289,7 @@ void Skipline( void )
 		else 
 			p = newline + 1;
 		
-		EOL = true;
+		found_EOL = true;
 	}
 }
 
@@ -304,12 +304,10 @@ void Skipline( void )
 *----------------------------------------------------------------------------*/
 static bool fill_buffer( void )
 {
-	char *line;
-
 	while ( *p == '\0' )
 	{
 		/* get last buffer from stack, if any */
-		line = List_pop( input_stack );
+		char* line = List_pop( input_stack );
 		if ( line != NULL )
 		{
 			set_scan_buf( line, false );	/* read from stack - assume not at BOL */
@@ -318,7 +316,7 @@ static bool fill_buffer( void )
 		else 
 		{
 			/* get next line from input source file */
-			line = src_getline();
+			const char* line = macros_getline(sfile_getline);
 			if ( line == NULL )
 				return false;
 
@@ -339,9 +337,9 @@ tokid_t GetSym( void )
 
 	init_sym();
 
-	/* keep returning TK_NEWLINE until EOL is cleared 
+	/* keep returning TK_NEWLINE until found_EOL is cleared 
 	*  NOTE: HACK for inconsistent parser in handling newlines, should be removed */
-	if ( EOL )
+	if ( found_EOL )
 	{
 		at_bol = true;
 		sym.tstart = "\n"; sym.tlen = 1;
@@ -366,7 +364,7 @@ tokid_t GetSym( void )
 
 	sym.tstart = ts; sym.tlen = te - ts;			/* remember token position */
 
-	at_bol = EOL = (sym.tok == TK_NEWLINE) ? true : false;
+	at_bol = found_EOL = (sym.tok == TK_NEWLINE) ? true : false;
 	return sym.tok;
 }
 

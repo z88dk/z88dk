@@ -44,8 +44,8 @@ extern void asm_DEFGROUP_define_const(const char* name);
 extern void asm_LSTON(void);
 extern void asm_LSTOFF(void);
 
-extern void asm_LINE(int line_nr, const char* filename);
-extern void asm_C_LINE(int line_nr, const char* filename);
+extern void asm_LINE(int line_num, const char* filename);
+extern void asm_C_LINE(int line_num, const char* filename);
 extern void asm_ORG(int address);
 extern void asm_PHASE(int address);
 extern void asm_DEPHASE();

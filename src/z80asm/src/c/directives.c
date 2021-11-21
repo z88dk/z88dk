@@ -180,26 +180,28 @@ void asm_LSTOFF(void)
 /*-----------------------------------------------------------------------------
 *   directives with number argument
 *----------------------------------------------------------------------------*/
-void asm_LINE(int line_nr, const char* filename)
+void asm_LINE(int line_num, const char* filename)
 {
 	STR_DEFINE(name, STR_SIZE);
 
-	src_set_filename(filename);
-	src_set_line_nr(line_nr, 1);
+	sfile_set_filename(filename);
+	sfile_set_line_num(line_num, 1);
+	sfile_set_c_source(false);
+
 	set_error_file(filename);
-	set_error_line(line_nr);
+	set_error_line(line_num);
 
 	STR_DELETE(name);
 }
 
-void asm_C_LINE(int line_nr, const char* filename)
+void asm_C_LINE(int line_num, const char* filename)
 {
-	src_set_filename(filename);
-	src_set_line_nr(line_nr, 0);		// do not increment line numbers
-	src_set_c_source();
+	sfile_set_filename(filename);
+	sfile_set_line_num(line_num, 0);		// do not increment line numbers
+	sfile_set_c_source(true);
 
 	set_error_file(filename);
-	set_error_line(line_nr);
+	set_error_line(line_num);
 
 	if (opts.debug_info) {
 		STR_DEFINE(name, STR_SIZE);
@@ -207,7 +209,7 @@ void asm_C_LINE(int line_nr, const char* filename)
 		char fname_encoded[FILENAME_MAX * 2];
 		url_encode(filename, fname_encoded);
 
-		Str_sprintf(name, "__C_LINE_%ld_%s", line_nr, fname_encoded);
+		Str_sprintf(name, "__C_LINE_%ld_%s", line_num, fname_encoded);
 		if (!find_local_symbol(Str_data(name)))
 			asm_LABEL(Str_data(name));
 

@@ -60,7 +60,7 @@ Symbol *Symbol_create(const char *name, long value, sym_type_t type, sym_scope_t
 	self->module = module;
 	self->section = section;
 	self->filename = get_error_file();
-	self->line_nr = get_error_line();
+	self->line_num = get_error_line();
 
     return self;              						/* pointer to new symbol */
 }

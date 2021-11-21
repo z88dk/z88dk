@@ -177,11 +177,11 @@ void error_missing_close_block(void)
 	
 	STR_DELETE(msg);
 }
-void error_unbalanced_struct_at(const char *filename, int line_nr)
+void error_unbalanced_struct_at(const char *filename, int line_num)
 {
 	STR_DEFINE(msg, STR_SIZE);
 
-	Str_append_sprintf( msg, "unbalanced control structure started at file '%s' line %d", filename, line_nr );
+	Str_append_sprintf( msg, "unbalanced control structure started at file '%s' line %d", filename, line_num );
 	do_error( ErrError, Str_data(msg) );
 	
 	STR_DELETE(msg);

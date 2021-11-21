@@ -38,7 +38,7 @@ Z80pass2(void)
 		/* set error location */
 		set_error_null();
 		set_error_file(expr->filename);
-		set_error_line(expr->line_nr);
+		set_error_line(expr->line_num);
 
 		/* Define code location; BUG_0048 */
 		set_cur_section(expr->section);

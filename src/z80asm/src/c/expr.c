@@ -17,6 +17,7 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "expr.h"
 #include "init.h"
 #include "model.h"
+#include "module.h"
 #include "strhash.h"
 #include "strutil.h"
 #include "sym.h"
@@ -387,8 +388,8 @@ void Expr_init(Expr* self)
 	self->asmpc = get_phased_PC() >= 0 ? get_phased_PC() : get_PC();	/* BUG_0048 */
 	self->code_pos = get_cur_module_size();	/* BUG_0015 */
 
-	self->filename = src_filename();
-	self->line_nr = src_line_nr();
+	self->filename = spool_add(sfile_filename());
+	self->line_num = sfile_line_num();
 	self->listpos = -1;
 }
 

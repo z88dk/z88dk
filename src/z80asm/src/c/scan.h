@@ -30,7 +30,7 @@ typedef struct sym_t
 	char	*string;		/* identifier to return with TK_NAME and TK_LABEL, or
 							*  double-quoted string without quotes to return with a TK_STRING */
 	char	*filename;		/* filename where token found, in strpool */
-	int 	 line_nr;		/* line number where token found */
+	int 	 line_num;		/* line number where token found */
 #endif
 	int		 number;		/* number to return with TK_NUMBER */
 } Sym;
@@ -39,7 +39,7 @@ typedef struct sym_t
 * 	Globals
 *----------------------------------------------------------------------------*/
 extern Sym  sym;			/* last token retrieved */
-extern bool EOL;			/* scanner EOL state */
+extern bool found_EOL;			/* scanner found_EOL state */
 
 /*-----------------------------------------------------------------------------
 *	Scan API
@@ -62,9 +62,9 @@ extern void GetSymExpect(tokid_t expected_tok);
 /* insert the given text at the current scan position */
 extern void SetTemporaryLine(const char *line );
 
-/* skip line past the newline, set EOL */
+/* skip line past the newline, set found_EOL */
 extern void  Skipline( void );
-extern bool EOL;
+extern bool found_EOL;
 
 /* return static string with current token text
 *  non-reentrant, string needs to be saved by caller */

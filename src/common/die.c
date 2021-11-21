@@ -24,14 +24,14 @@ void die(char *msg, ...)
     exit(EXIT_FAILURE);
 }
 
-void *check_alloc(void *p, const char *file, int line_nr)
+void *check_alloc(void *p, const char *file, int line_num)
 {
 	if (!p)
-		die("memory allocation error at %s:%d\n", file, line_nr);
+		die("memory allocation error at %s:%d\n", file, line_num);
 	return p;
 }
 
-int check_retval(int retval, const char *file, const char *source_file, int line_nr)
+int check_retval(int retval, const char *file, const char *source_file, int line_num)
 {
 	if (retval) {
 		perror(file);

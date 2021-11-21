@@ -132,7 +132,7 @@ int			asmpc;				/* ASMPC value during linking */
 int			code_pos;			/* Address to patch expression value */
 
 const char* filename;			/* file and line where expression defined, string in strpool */
-int			 line_nr;			/* source line */
+int			 line_num;			/* source line */
 long		 listpos;			/* position in listing file to patch (in pass 2), -1 if not listing */
 END_CLASS;
 

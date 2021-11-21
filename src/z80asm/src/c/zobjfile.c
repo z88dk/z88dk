@@ -88,7 +88,7 @@ static long write_expr(FILE* fp)
 		else
 			xfwrite_wcount_cstr("", fp);
 
-		xfwrite_dword(expr->line_nr, fp);				/* source line number */
+		xfwrite_dword(expr->line_num, fp);				/* source line number */
 
 		xfwrite_wcount_cstr(expr->section->name, fp);	/* section name */
 
@@ -142,7 +142,7 @@ static int write_symbols_symtab(FILE* fp, SymbolHash* symtab)
 
 			// write symbol definition location
 			xfwrite_wcount_cstr(sym->filename ? sym->filename : "", fp);
-			xfwrite_dword(sym->line_nr, fp);
+			xfwrite_dword(sym->line_num, fp);
 
 			written++;
 		}

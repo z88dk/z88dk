@@ -41,7 +41,7 @@ typedef struct OpenStruct
 {
 	tokid_t	open_tok;			// open token - TK_IF, TK_ELSE, ...
 	const char *filename;		// file and line where token found
-	int		line_nr;
+	int		line_num;
 	bool	active : 1;			// in true branch of conditional compilation
 	bool	parent_active : 1;	// in true branch of parent's conditional compilation
 	bool	elif_was_true : 1;	// true if any of the IF/ELIF branches returned true

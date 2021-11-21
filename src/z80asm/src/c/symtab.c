@@ -108,7 +108,7 @@ Symbol *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t s
         sym->module = module;
 		sym->section = section;
 		sym->filename = get_error_file();
-		sym->line_nr = get_error_line();
+		sym->line_num = get_error_line();
     }
     else											/* already defined */
     {
@@ -320,7 +320,7 @@ static Symbol *define_local_symbol(const char *name, long value, sym_type_t type
         sym->module  = CURRENTMODULE;						/* owner of symbol is always creator */
 		sym->section = CURRENTSECTION;
 		sym->filename = get_error_file();
-		sym->line_nr = get_error_line();
+		sym->line_num = get_error_line();
     }
 
 	return sym;
@@ -357,7 +357,7 @@ Symbol *define_symbol(const char *name, long value, sym_type_t type)
 		sym->module = CURRENTMODULE;		/* owner of symbol is always creator */
 		sym->section = CURRENTSECTION;
 		sym->filename = get_error_file();
-		sym->line_nr = get_error_line();
+		sym->line_num = get_error_line();
 	}
 
 	return sym;
@@ -613,7 +613,7 @@ static void _write_symbol_file(const char *filename, Module *module, bool(*cond)
 			Str_append_sprintf(line, ", %s", sym->section->name);
 			Str_append_sprintf(line, ", ");
 			if (sym->filename && sym->filename[0]) {
-				Str_append_sprintf(line, "%s:%d", sym->filename, sym->line_nr);
+				Str_append_sprintf(line, "%s:%d", sym->filename, sym->line_num);
 			}
 		}
 		strstrip(Str_data(line));
@@ -679,7 +679,7 @@ void check_undefined_symbols(SymbolHash *symtab)
 		if (sym->scope == SCOPE_PUBLIC && !sym->is_defined) {
 			set_error_null();
 			set_error_file(sym->filename);
-			set_error_line(sym->line_nr);
+			set_error_line(sym->line_num);
 			error_not_defined(sym->name);
 		}
 	}

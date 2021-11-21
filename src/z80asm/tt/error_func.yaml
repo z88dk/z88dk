@@ -111,8 +111,8 @@ errors:
 	
   - type	: ErrError
     func	: error_unbalanced_struct_at
-    args	: 'const char *filename, int line_nr'
-    message	: "\"unbalanced control structure started at file '%s' line %d\", filename, line_nr"
+    args	: 'const char *filename, int line_num'
+    message	: "\"unbalanced control structure started at file '%s' line %d\", filename, line_num"
 	
   - type	: ErrError
     func	: error_unbalanced_struct

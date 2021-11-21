@@ -69,7 +69,7 @@ CLASS( Symbol )
 	struct Module  *module;				/* module which owns symbol (weak ref) */
 	struct Section *section;			/* section where expression is defined (weak ref) */
 	const char	   *filename;			/* file where defined */
-	int				line_nr;			/* line where defined */
+	int				line_num;			/* line where defined */
 END_CLASS;
 
 /*-----------------------------------------------------------------------------

@@ -21,7 +21,7 @@ extern void error_string_too_long(void);
 extern void error_divide_by_zero(void);
 extern void error_missing_block(void);
 extern void error_missing_close_block(void);
-extern void error_unbalanced_struct_at(const char *filename, int line_nr);
+extern void error_unbalanced_struct_at(const char *filename, int line_num);
 extern void error_unbalanced_struct(void);
 extern void error_not_defined(const char *name);
 extern void error_illegal_ident(void);

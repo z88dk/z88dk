@@ -280,7 +280,7 @@ void object_module_append(obj_file_t* obj, Module* module) {
 
 /* set environment to compute expression */
 static void set_asmpc_env(Module* module, const char* section_name,
-	const char* filename, int line_nr,
+	const char* filename, int line_num,
 	int asmpc,
 	bool module_relative_addr)
 {
@@ -291,7 +291,7 @@ static void set_asmpc_env(Module* module, const char* section_name,
 
 	/* source file and line number */
 	set_error_file(filename);
-	set_error_line(line_nr);
+	set_error_line(line_num);
 
 	/* assembler PC as absolute address */
 	new_section(section_name);
@@ -310,7 +310,7 @@ static void set_asmpc_env(Module* module, const char* section_name,
 static void set_expr_env(Expr* expr, bool module_relative_addr)
 {
 	set_asmpc_env(expr->module, expr->section->name,
-		expr->filename, expr->line_nr,
+		expr->filename, expr->line_num,
 		expr->asmpc,
 		module_relative_addr);
 }
@@ -331,7 +331,7 @@ static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
 			last_filename = source_filename;
 		else
 			source_filename = last_filename;
-		int line_nr = parse_int(obj);
+		int line_num = parse_int(obj);
 
 		// patch location
 		const char* section_name = parse_wcount_str(obj);
@@ -346,12 +346,12 @@ static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
 		utstring_printf(expr_text_2, "%s\n", expr_text_1);
 
 		SetTemporaryLine(utstring_body(expr_text_2));
-		EOL = false;                // reset end of line parsing flag - a line is to be parsed...
+		found_EOL = false;                // reset end of line parsing flag - a line is to be parsed...
 		scan_expect_operands();
 		GetSym();
 
 		// parse expression and store in the list
-		set_asmpc_env(CURRENTMODULE, section_name, source_filename, line_nr, asmpc, false);
+		set_asmpc_env(CURRENTMODULE, section_name, source_filename, line_num, asmpc, false);
 		Expr* expr = expr_parse();
 		if (expr) {
 			expr->range = 0;
@@ -379,7 +379,7 @@ static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
 			expr->asmpc = asmpc;
 			expr->code_pos = code_pos;
 			expr->filename = spool_add(source_filename);
-			expr->line_nr = line_nr;
+			expr->line_num = line_num;
 			expr->listpos = -1;
 
 			ExprList_push(&exprs, expr);
@@ -879,7 +879,7 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 			int value = parse_int(obj);								// value
 			const char* name = parse_wcount_str(obj);				// symbol name
 			const char* def_filename = parse_wcount_str(obj);		// where defined
-			int line_nr = parse_int(obj);							// where defined
+			int line_num = parse_int(obj);							// where defined
 
 			new_section(section_name);								// define CURRENTSECTION
 
@@ -907,7 +907,7 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 			// set definition location
 			if (sym) {
 				sym->filename = spool_add(def_filename);
-				sym->line_nr = line_nr;
+				sym->line_num = line_num;
 			}
 		}
 	}
