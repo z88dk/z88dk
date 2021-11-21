@@ -225,7 +225,7 @@ static void do_assemble(const char *src_filename )
  ***************************************************************************************************/
 int z80asm_main( int argc, char *argv[] )
 {
-	model_init();						/* init global data */
+	errors_init();
 	init_macros();
 
 	/* parse command line and call-back via assemble_file() */

@@ -118,7 +118,7 @@ void free_macros()
 static void fill_input(getline_t getline_func)
 {
 	if (argv_len(in_lines) == 0) {
-		char *line = getline_func();
+		const char *line = getline_func();
 		if (line)
 			argv_push(in_lines, line);
 	}

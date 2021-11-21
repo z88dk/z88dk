@@ -10,7 +10,6 @@ Repository: https://github.com/z88dk/z88dk
 #pragma once
 
 #include "expr.h"
-#include "model.h"
 #include "zobjfile.h"
 #include "symtab.h"
 #include "types.h"

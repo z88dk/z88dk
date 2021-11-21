@@ -10,7 +10,7 @@ Assembly macros.
 
 #pragma once
 
-typedef char *(*getline_t)();
+typedef const char *(*getline_t)();
 
 extern void init_macros();
 extern void clear_macros();

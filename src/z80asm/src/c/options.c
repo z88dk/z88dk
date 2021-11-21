@@ -12,10 +12,8 @@
 #include "fileutil.h"
 #include "hist.h"
 #include "init.h"
-#include "model.h"
 #include "modlink.h"        /* Prevent warning: implicit declaration of function ‘library_file_append’ */
 #include "options.h"
-#include "srcfile.h"
 #include "str.h"
 #include "strutil.h"
 #include "symtab.h"
@@ -397,27 +395,32 @@ static const char *search_source(const char *filename)
 	return filename;
 }
 
-static void process_file(char *filename )
+static void process_file(const char *filename_ )
 {
-	strstrip(filename);
-	switch (filename[0])
+	char* filename_copy = xstrdup(filename_);
+	char* filename = filename_copy;
 	{
-	case '\0':		/* no file */
-		break;
-
-	case '@':		/* file list */
-		filename++;						/* point to after '@' */
 		strstrip(filename);
-		filename = (char *)expand_environment_variables(filename);
-		expand_list_glob(filename);
-		break;
-	case ';':     /* comment */
-	case '#':
-		break;
-	default:
-		filename = (char *)expand_environment_variables(filename);
-		expand_source_glob(filename);
+		switch (filename[0])
+		{
+		case '\0':		/* no file */
+			break;
+
+		case '@':		/* file list */
+			filename++;						/* point to after '@' */
+			strstrip(filename);
+			filename = (char*)expand_environment_variables(filename);
+			expand_list_glob(filename);
+			break;
+		case ';':     /* comment */
+		case '#':
+			break;
+		default:
+			filename = (char*)expand_environment_variables(filename);
+			expand_source_glob(filename);
+		}
 	}
+	xfree(filename_copy);
 }
 
 void expand_source_glob(const char *pattern)
@@ -439,52 +442,44 @@ void expand_source_glob(const char *pattern)
 	}
 }
 
-void expand_list_glob(const char *filename)
+void expand_list_glob(const char* filename)
 {
 	if (strpbrk(filename, "*?") != NULL) {		// is a pattern
-		argv_t *files = path_find_glob(filename);
+		argv_t* files = path_find_glob(filename);
 
 		if (argv_len(files) == 0)
 			error_glob_no_files(filename);		// error if pattern matched no file
 
-		for (char **p = argv_front(files); *p; p++) {
-			char *filename = *p;
-			src_push();
-			{
-				char *line;
-
-				// append the directoy of the list file to the include path	and remove it at the end
-				argv_push(opts.inc_path, path_dir(filename));
-
-				if (src_open(filename, NULL)) {
-					while ((line = src_getline()) != NULL)
-						process_file(line);
-				}
-
-				// finished assembly, remove dirname from include path
-				argv_pop(opts.inc_path);
-			}
-			src_pop();
-		}
-		argv_free(files);
-	}
-	else {
-		src_push();
-		{
-			char *line;
+		for (char** p = argv_front(files); *p; p++) {
+			char* filename = *p;
 
 			// append the directoy of the list file to the include path	and remove it at the end
 			argv_push(opts.inc_path, path_dir(filename));
 
-			if (src_open(filename, NULL)) {
-				while ((line = src_getline()) != NULL)
+			if (sfile_open(filename, false)) {
+				const char* line;
+				while ((line = sfile_getline()) != NULL)
 					process_file(line);
 			}
 
 			// finished assembly, remove dirname from include path
 			argv_pop(opts.inc_path);
 		}
-		src_pop();
+		argv_free(files);
+	}
+	else {
+
+		// append the directoy of the list file to the include path	and remove it at the end
+		argv_push(opts.inc_path, path_dir(filename));
+
+		if (sfile_open(filename, false)) {
+			const char* line;
+			while ((line = sfile_getline()) != NULL)
+				process_file(line);
+		}
+
+		// finished assembly, remove dirname from include path
+		argv_pop(opts.inc_path);
 	}
 }
 
@@ -1080,4 +1075,14 @@ static void make_output_dir()
 		opts.output_directory = path_canon(opts.output_directory);
 		path_mkdir(opts.output_directory);
 	}
+}
+
+
+bool option_ucase() {
+	return opts.ucase;
+}
+
+const char* search_includes(const char* filename) {
+	const char* filename_path = path_search(filename, opts.inc_path);
+	return filename_path;
 }

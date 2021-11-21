@@ -95,6 +95,11 @@ errors:
     message	: '"string longer than reserved space"'
 	
   - type	: ErrError
+    func	: error_invalid_char
+    args	: void
+    message	: '"invalid character"'
+	
+  - type	: ErrError
     func	: error_divide_by_zero
     args	: void
     message	: '"division by zero"'

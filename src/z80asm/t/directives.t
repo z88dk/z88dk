@@ -217,7 +217,7 @@ END
 
 write_file("test.inc", "IF 1\n");
 z80asm(asm => 'INCLUDE "test.inc"',
-	   error => "Error at file 'test.inc' line 2: unbalanced control structure started at file 'test.inc' line 1");
+	   error => "Error at file 'test.asm' line 2: unbalanced control structure started at file 'test.inc' line 1");
 
 z80asm(asm => "IFDEF	;; error: syntax error");
 z80asm(asm => "IFDEF 1	;; error: syntax error");
@@ -234,7 +234,7 @@ END
 
 write_file("test.inc", "IFDEF hello\n");
 z80asm(asm => 'INCLUDE "test.inc"',
-	   error => "Error at file 'test.inc' line 2: unbalanced control structure started at file 'test.inc' line 1");
+	   error => "Error at file 'test.asm' line 2: unbalanced control structure started at file 'test.inc' line 1");
 
 z80asm(asm => "IFNDEF	;; error: syntax error");
 z80asm(asm => "IFNDEF 1	;; error: syntax error");
@@ -251,4 +251,4 @@ END
 
 write_file("test.inc", "IFNDEF hello\n");
 z80asm(asm => 'INCLUDE "test.inc"',
-	   error => "Error at file 'test.inc' line 2: unbalanced control structure started at file 'test.inc' line 1");
+	   error => "Error at file 'test.asm' line 2: unbalanced control structure started at file 'test.inc' line 1");

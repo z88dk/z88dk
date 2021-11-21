@@ -13,6 +13,7 @@ Handle assembly listing and symbol table listing.
 #include "errors.h"
 #include "fileutil.h"
 #include "hist.h"
+#include "if.h"
 #include "listfile.h"
 #include "options.h"
 #include "strutil.h"
@@ -20,7 +21,6 @@ Handle assembly listing and symbol table listing.
 #include "utstring.h"
 #include "z80asm.h"
 #include "zutils.h"
-
 #include <stdio.h>
 #include <time.h>
 
@@ -184,6 +184,21 @@ void list_start_line( int address,
         ListFile_start_line( the_list, address,
                              source_file, source_line_nr, line );
     }
+}
+
+void got_source_line(const char* filename, int line_num, const char* text) {
+	set_error_file(filename);			// file for error messages
+	if (filename) {
+		set_error_line(line_num);		// line number for error messages
+
+		// send line to list file
+		if (opts.cur_list)
+			list_start_line(get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
+				filename, line_num, text);
+	}
+#ifdef LOG_INPUT
+	printf("%s:%d:%s", filename, line_num, text);
+#endif
 }
 
 /*-----------------------------------------------------------------------------

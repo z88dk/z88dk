@@ -6,6 +6,7 @@
 //-----------------------------------------------------------------------------
 #pragma once
 
+#include "if.h"
 #include "strutil.h"
 #include "types.h"
 #include "utarray.h"
@@ -98,3 +99,8 @@ extern void checkrun_appmake(void);
 #define ZX81_ORIGIN_MIN	 16514
 #define ZX81_ORIGIN_MAX  16514
 #define ZX81_APP_EXT	".P"		/* ZX81 .P file */
+
+/*-----------------------------------------------------------------------------
+*   options function interface
+*----------------------------------------------------------------------------*/
+bool option_ucase();

@@ -31,6 +31,7 @@ OPT_VAR( bool,		date_stamp,	false	)
 OPT_VAR( bool,		relocatable, false	)
 OPT_VAR( bool,      reloc_info, false   )	/* generate .reloc file */
 OPT_VAR( bool,		opt_speed,	false   )
+OPT_VAR( bool,      ucase,      false   )	/* convert identifies to upper case */
 
 OPT_VAR(appmake_t, appmake, APPMAKE_NONE)
 OPT_VAR(const char *, appmake_opts, "")
@@ -68,6 +69,12 @@ OPT_TITLE("Help Options:")
 OPT(OptCall, exit_help, "-h", "", "Show help options", "")
 OPT(OptSet, &opts.verbose, "-v", "", "Be verbose", "")
 
+OPT_TITLE("Preprocessor Options:")
+OPT(OptSet, &opts.swap_ix_iy, "-IXIY", "", "Swap IX and IY registers", "")
+OPT(OptStringList, &opts.inc_path, "-I", "", "Add directory to include search path", "PATH")
+OPT(OptCallArg, option_define, "-D", "", "Define a static symbol", "SYMBOL[=VALUE]")
+OPT(OptSet, &opts.ucase, "-ucase", "", "Convert identifiers to upper case", "")
+
 OPT_TITLE("Code Generation Options:")
 OPT(OptCall, option_cpu_z80n, "-mz80n", "", "Assemble for the Z80 variant of ZX Next", "")
 OPT(OptCall, option_cpu_z80, "-mz80", "", "Assemble for the Z80", "")
@@ -79,16 +86,11 @@ OPT(OptCall, option_cpu_r2ka, "-mr2ka", "", "Assemble for the Rabbit 2000A", "")
 OPT(OptCall, option_cpu_r3k, "-mr3k", "", "Assemble for the Rabbit 3000", "")
 OPT(OptCall, option_cpu_ti83plus, "-mti83plus", "", "Assemble for the TI83Plus", "")
 OPT(OptCall, option_cpu_ti83, "-mti83", "", "Assemble for the TI83", "")
-OPT(OptSet, &opts.swap_ix_iy, "-IXIY", "", "Swap IX and IY registers", "")
 OPT(OptSet, &opts.opt_speed, "-opt-speed", "", "Optimize for speed", "")
 OPT(OptCall, option_debug_info, "-debug", "", "Add debug info to map file", "")
 
-OPT_TITLE("Environment:")
-OPT(OptStringList, &opts.inc_path, "-I", "", "Add directory to include search path", "PATH")
-OPT(OptStringList, &opts.lib_path, "-L", "", "Add directory to library search path", "PATH")
-OPT(OptCallArg, option_define, "-D", "", "Define a static symbol", "SYMBOL[=VALUE]")
-
 OPT_TITLE("Libraries:")
+OPT(OptStringList, &opts.lib_path, "-L", "", "Add directory to library search path", "PATH")
 OPT(OptCallArg, option_make_lib, "-x", "", "Create a library file" FILEEXT_LIB, "FILE")
 OPT(OptCallArg, option_use_lib, "-l", "", "Use library file" FILEEXT_LIB, "FILE")
 

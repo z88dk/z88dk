@@ -37,7 +37,7 @@ typedef struct ParseCtx
 
 	UT_array *token_strings;		/* strings saved from the current statement */
 	UT_array *exprs;				/* array of expressions computed during parse */
-	UT_array *open_structs;			/* nested array of structures being parsed (IF/ENDIF,...) */
+
 	int dma_cmd;					/* current DMA command */
 } ParseCtx;
 
@@ -48,7 +48,8 @@ extern ParseCtx *ParseCtx_new(void);
 extern void ParseCtx_delete(ParseCtx *ctx);
 
 /* parse the given assembly file, return false if failed */
-extern bool parse_file(const char *filename);
+extern void parse_file(const char *filename);
+extern void parse_include_file(const char* filename);
 
 /* try to parse the current statement, return false if failed */
 extern bool parse_statement(ParseCtx *ctx);

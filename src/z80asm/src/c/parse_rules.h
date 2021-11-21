@@ -45125,11 +45125,12 @@ static const int parser_en_main_directives_DEFx_asm_PTR_asm_PTR_iter_asm_PTR_nex
 static const int parser_en_main_directives_DEFx_asm_DP_asm_DP_iter_asm_DP_next = 47;
 static int get_start_state(ParseCtx *ctx)
 {
+ init_module();
  OpenStruct *open_struct;
  switch (ctx->current_sm)
  {
  case SM_MAIN:
-  open_struct = (OpenStruct *)utarray_back(ctx->open_structs);
+  open_struct = (OpenStruct *)utarray_back(open_structs);
   if (open_struct == NULL || (open_struct->active && open_struct->parent_active))
    return parser_en_main;
   else
@@ -45156,6 +45157,7 @@ static int get_start_state(ParseCtx *ctx)
 }
 static bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 {
+ init_module();
  int value1 = 0;
  int start_num_errors = get_num_errors();
  int expr_value = 0;
@@ -45310,28 +45312,28 @@ _match:
   }
 	break;
 	case 10:
-	{ asm_IF(ctx, pop_expr(ctx) ); }
+	{ asm_IF(pop_expr(ctx) ); }
 	break;
 	case 11:
-	{ asm_IFDEF(ctx, Str_data(name) ); }
+	{ asm_IFDEF(Str_data(name) ); }
 	break;
 	case 12:
-	{ asm_IFNDEF(ctx, Str_data(name) ); }
+	{ asm_IFNDEF(Str_data(name) ); }
 	break;
 	case 13:
-	{ asm_ELSE(ctx); }
+	{ asm_ELSE(); }
 	break;
 	case 14:
-	{ asm_ELIF(ctx, pop_expr(ctx) ); }
+	{ asm_ELIF(pop_expr(ctx) ); }
 	break;
 	case 15:
-	{ asm_ELIFDEF(ctx, Str_data(name) ); }
+	{ asm_ELIFDEF(Str_data(name) ); }
 	break;
 	case 16:
-	{ asm_ELIFNDEF(ctx, Str_data(name) ); }
+	{ asm_ELIFNDEF(Str_data(name) ); }
 	break;
 	case 17:
-	{ asm_ENDIF(ctx); }
+	{ asm_ENDIF(); }
 	break;
 	case 18:
 	{ if (expr_error)
@@ -91491,6 +91493,7 @@ _again:
 }
 static bool _parse_statement(ParseCtx *ctx)
 {
+ init_module();
  STR_DEFINE(name, STR_SIZE);
  STR_DEFINE(stmt_label, STR_SIZE);
  bool ret = _parse_statement_1(ctx, name, stmt_label);

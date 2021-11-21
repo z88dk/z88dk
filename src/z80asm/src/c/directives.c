@@ -14,7 +14,7 @@ Assembly directives.
 #include "directives.h"
 #include "errors.h"
 #include "fileutil.h"
-#include "model.h"
+#include "if.h"
 #include "module.h"
 #include "parse.h"
 #include "strutil.h"
@@ -76,11 +76,11 @@ void asm_cond_LABEL(Str* label)
 		Str_len(label) = 0;
 	}
 
-	if (opts.debug_info && !scr_is_c_source()) {
+	if (opts.debug_info && !sfile_is_c_source()) {
 		STR_DEFINE(name, STR_SIZE);
 
 		char fname_encoded[FILENAME_MAX * 2];
-		url_encode(src_filename(), fname_encoded);
+		url_encode(sfile_filename(), fname_encoded);
 
 		Str_sprintf(name, "__ASM_LINE_%ld_%s", get_error_line(), fname_encoded);
 		if (!find_local_symbol(Str_data(name)))
@@ -238,7 +238,7 @@ void asm_DEPHASE()
 *----------------------------------------------------------------------------*/
 void asm_INCLUDE(const char* filename)
 {
-	parse_file(filename);
+	parse_include_file(filename);
 }
 
 void asm_BINARY(const char* filename)

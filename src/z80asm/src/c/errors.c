@@ -13,7 +13,6 @@ Error handling.
 #include "fileutil.h"
 #include "init.h"
 #include "options.h"
-#include "srcfile.h"
 #include "str.h"
 #include "strhash.h"
 #include "strutil.h"
@@ -51,9 +50,6 @@ DEFINE_init_module()
     /* init Errors */
     reset_error_count();			/* clear error count */
     set_error_null();               /* clear location of error messages */
-
-	/* init file error handling */
-	set_incl_recursion_err_cb( error_include_recursion );
 }
 
 DEFINE_dtor_module()
