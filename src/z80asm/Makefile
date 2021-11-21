@@ -153,6 +153,7 @@ dev: $(1).o
 
 $(1).cpp: $(1).re Makefile
 	$(RE2C) -o $(1).cpp $(1).re
+	dos2unix $(1).cpp
 endef
 
 $(eval $(call MAKE_RE2C,src/cpp/lex))
