@@ -91,11 +91,11 @@ __tms9918_scrollup:
         push    de
         push    bc
         ld      a,(__tms9918_screen_mode)
-        ld      b,3
+        ld      b,4
         ld      hl,40
         and     a
         jr      z,scroll_text
-        ld      b,4
+        ld      b,3
         ld      hl,32
         cp      1
         jr      z,scroll_text
@@ -106,12 +106,12 @@ scroll_rejoin:
         ret
 
 
-; Entry: bc = width
+; Entry: hl = width
 scroll_text:
         push    ix
 	ld	de,(__tms9918_pattern_name)
-	add	hl,de
         push    hl      ;Save width for later
+	add	hl,de
 scroll_text_1:
         push    bc
         push    hl      ;Source
