@@ -27,8 +27,6 @@ EXTERN asm_f24_sqrt
     pop bc                      ; pop return address
     pop de                      ; get left operand off of the stack
     pop hl                      ; get right operand off the stack
-    push hl                     ; right operand on of the stack
-    push de                     ; left operand on the stack
     push bc                     ; push return
     push de                     ; left operand on the stack
 

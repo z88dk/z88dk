@@ -15,7 +15,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _invf16
-EXTERN cm16_sdcc_inv
-defc _invf16 = cm16_sdcc_inv
+defc _invf16 = invf16
 ENDIF
 

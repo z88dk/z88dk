@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _hypotf16
-EXTERN cm16_sdcc_hypot
-defc _hypotf16 = cm16_sdcc_hypot
+defc _hypotf16 = hypotf16
 ENDIF
 

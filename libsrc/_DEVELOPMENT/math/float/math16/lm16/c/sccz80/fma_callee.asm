@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _fmaf16_callee
-EXTERN cm16_sdcc_fma_callee
-defc _fmaf16_callee = cm16_sdcc_fma_callee
+defc _fmaf16_callee = fmaf16_callee
 ENDIF
 

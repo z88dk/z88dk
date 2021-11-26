@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _ceilf16
-EXTERN cm16_sdcc_ceil
-defc _ceilf16 = cm16_sdcc_ceil
+defc _ceilf16 = ceilf16
 ENDIF
 
