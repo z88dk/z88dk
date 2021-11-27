@@ -540,7 +540,6 @@ static void parseline(ParseCtx *ctx)
 
 		Skipline();
 	}
-	list_end_line();				/* Write current source line to list file */
 }
 
 static void check_open_structs(void) {

@@ -15,6 +15,7 @@ Assembly directives.
 #include "errors.h"
 #include "fileutil.h"
 #include "if.h"
+#include "listfile.h"
 #include "module.h"
 #include "parse.h"
 #include "strutil.h"
@@ -169,12 +170,14 @@ void asm_LSTON(void)
 {
 	if (opts.list)
 		opts.cur_list = true;
+	list_end_line();
 }
 
 void asm_LSTOFF(void)
 {
 	if (opts.list)
 		opts.cur_list = false;
+	list_end_line();
 }
 
 /*-----------------------------------------------------------------------------

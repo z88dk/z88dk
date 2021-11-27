@@ -66,17 +66,26 @@ const char* SourceFile::get_input_line() {
 			if (!m_ifs.is_open() || m_ifs.eof())
 				return nullptr;
 
-			safe_getline(m_ifs, m_line);
+			// read line and continuation lines
+			m_line.clear();
+			string this_line;
+			while (true) {
+				safe_getline(m_ifs, this_line);
+				m_line_num += m_line_inc;
+				got_source_line(m_filename.c_str(), m_line_num, this_line.c_str());
+				m_line += this_line;
+
+				if (!m_line.empty() && m_line.back() == '\\')
+					m_line.back() = ' ';
+				else
+					break;
+			}
 			m_line += "\n";				// parser expects a newline after line
-			m_line_num += m_line_inc;
-			got_source_line(m_filename.c_str(), m_line_num, m_line.c_str());
+
+
 			split_line();				// split on '\\'
 		}
 	}
-}
-
-void SourceFile::split_line() {
-	m_in_lines.push_back(m_line);
 }
 
 bool SourceFile::recursive_include(const string& filename) {

@@ -236,7 +236,7 @@ void ListFile_append_long( ListFile *self, long dword )
 
 void list_append( long value, int num_bytes )
 {
-    if ( the_list != NULL )
+	if ( the_list != NULL )
     {
         ListFile_append( the_list, value, num_bytes );
     }
