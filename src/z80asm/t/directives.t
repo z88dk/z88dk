@@ -252,3 +252,12 @@ END
 write_file("test.inc", "IFNDEF hello\n");
 z80asm(asm => 'INCLUDE "test.inc"',
 	   error => "Error at file 'test.asm' line 2: unbalanced control structure started at file 'test.inc' line 1");
+
+#------------------------------------------------------------------------------
+# unbalanced control structure is first file, second file ok
+#------------------------------------------------------------------------------
+z80asm(
+	asm1 => "IF 1",
+	asm2 => "nop",
+	options => "",
+	error => "Error at file 'test1.asm' line 2: unbalanced control structure started at file 'test1.asm' line 1");

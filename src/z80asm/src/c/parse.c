@@ -548,6 +548,9 @@ static void check_open_structs(void) {
 	OpenStruct* os = (OpenStruct*)utarray_back(open_structs);
 	if (os != NULL)
 		error_unbalanced_struct_at(os->filename, os->line_num);
+
+	// clear stack to prepare for next file
+	utarray_clear(open_structs);
 }
 
 void parse_include_file(const char* filename)
