@@ -87,9 +87,6 @@
     <ClInclude Include="..\..\src\z80asm\src\c\listfile.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\c\macros.h">
-      <Filter>Header Files\c</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\minunit.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
@@ -209,9 +206,6 @@
     <ClCompile Include="..\..\src\z80asm\src\c\listfile.c">
       <Filter>Source Files\c</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\c\macros.c">
-      <Filter>Source Files\c</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\c\minunit.c">
       <Filter>Source Files\c</Filter>
     </ClCompile>
@@ -269,9 +263,6 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\defines.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\cpp\preproc_re.cpp">
-      <Filter>Source Files\cpp</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\src\c\scan_rules.rl">
@@ -291,9 +282,6 @@
     </None>
     <None Include="..\..\src\z80asm\tt\tokens.yaml">
       <Filter>Resource Files\c</Filter>
-    </None>
-    <None Include="..\..\src\z80asm\src\cpp\preproc_re.re">
-      <Filter>Resource Files\cpp</Filter>
     </None>
   </ItemGroup>
 </Project>

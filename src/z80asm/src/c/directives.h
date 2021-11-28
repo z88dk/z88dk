@@ -74,7 +74,6 @@ extern void asm_UNDEFINE(const char* name);
 
 /* define a constant or expression */
 extern void asm_DEFC(const char* name, struct Expr* expr);
-extern void asm_DC(const char* name, struct Expr* expr);
 
 /* create a block of empty bytes, called by the DEFS directive */
 extern void asm_DEFS(int count, int fill);

@@ -7,6 +7,7 @@
 
 #include "if.h"
 #include "lex.h"
+#include "preproc.h"
 #include "utils.h"
 #include <cctype>
 #include <unordered_map>
@@ -19,31 +20,18 @@ using namespace std;
 	re2c:indent:top = 2;
 
 	end 	= "\000";
-	ws		=  [ \t\v\f\r];
-
+	ws		=  [ \t\v\f];
+	nl		= "\r\n"|"\r"|"\n";
+	_ 		= ws*;
+	__ 		= ws+;
+	_b		= [^_a-zA-Z0-9\000];
 	ident 	= [_a-zA-Z][_a-zA-Z0-9]*;
+	ident_prefix = [.#$%@];
 	operand	= ident |
-			  'b\'' |
-			  'c\'' |
-			  'd\'' |
-			  'e\'' |
-			  'h\'' |
-			  'l\'' |
-			  'a\'' |
-			  'af\'' |
-			  'bc\'' |
-			  'de\'' |
-			  'hl\'' |
-			  'ccf\'' |
-			  'scf\'' |
-			  'rra\'' |
-			  'rrca\'' |
-			  'rla\'' |
-			  'rlca\'' |
-			  'ds.b' |
-			  'ds.w' |
-			  'ds.p' |
-			  'ds.q';
+			  'b\''   | 'c\''   | 'd\''   | 'e\''    | 'h\''   | 'l\''    | 'a\'' |
+			  'af\''  | 'bc\''  | 'de\''  | 'hl\''   |
+			  'ccf\'' | 'scf\'' | 'rra\'' | 'rrca\'' | 'rla\'' | 'rlca\'' |
+			  'ds.b'  | 'ds.w'  | 'ds.p'  | 'ds.q';
 	bin		= [0-1];
 	oct		= [0-7];
 	dec		= [0-9];
@@ -57,6 +45,8 @@ using namespace std;
 	qchar	= qchar_ | [^\r\n\000'];
 	qqchar	= qchar_ | [^\r\n\000"];
 */
+
+//-----------------------------------------------------------------------------
 
 static unordered_map<string, Keyword> keyword_table = {
 #	define X(id, text)		{ text, Keyword::id },
@@ -81,6 +71,17 @@ static string ident_change_case(const string& ident) {
 	else
 		return ident;
 }
+
+static bool starts_with_hash(const string& line) {
+	const char* p = line.c_str();
+	const char* YYMARKER;
+	/*!re2c
+		_ '#'				{ return true; }
+		*					{ return false; }
+	*/
+}
+
+//-----------------------------------------------------------------------------
 
 Token& Lexer::operator[](int offset) {
 	return peek(offset);
@@ -113,7 +114,7 @@ void Lexer::set(const string& text) {
 			ws+				{ continue; }
 			end				{ return; }
 			";"				{ return; }
-			"\n"			{ m_tokens.emplace_back(TType::Newline);
+			"\n"				{ m_tokens.emplace_back(TType::Newline);
 							  m_tokens.back().col = col;
 							  continue; }
 			dec+ 'd'?		{ m_tokens.emplace_back(TType::Integer, a2i(p0, 10));
@@ -122,16 +123,16 @@ void Lexer::set(const string& text) {
 			mantissa exp? 	{ m_tokens.emplace_back(TType::Floating, atof(p0));
 							  m_tokens.back().col = col;
 							  continue; }
-			dec hex* 'h'	{ m_tokens.emplace_back(TType::Integer, a2i(p0, 16));
+			dec hex* 'h'		{ m_tokens.emplace_back(TType::Integer, a2i(p0, 16));
 							  m_tokens.back().col = col;
 							  continue; }
-			"$" hex+		{ m_tokens.emplace_back(TType::Integer, a2i(p0+1, 16));
+			"$" hex+			{ m_tokens.emplace_back(TType::Integer, a2i(p0+1, 16));
 							  m_tokens.back().col = col;
 							  continue; }
 			'0x' hex+		{ m_tokens.emplace_back(TType::Integer, a2i(p0+2, 16));
 							  m_tokens.back().col = col;
 							  continue; }
-			bin+ 'b'		{ m_tokens.emplace_back(TType::Integer, a2i(p0, 2));
+			bin+ 'b'			{ m_tokens.emplace_back(TType::Integer, a2i(p0, 2));
 							  m_tokens.back().col = col;
 							  continue; }
 			[%@] bin+		{ m_tokens.emplace_back(TType::Integer, a2i(p0+1, 2));
@@ -173,7 +174,7 @@ void Lexer::set(const string& text) {
 			'#'				{ m_tokens.emplace_back(TType::Hash);
 							  m_tokens.back().col = col;
 							  continue; }
-			'##'			{ m_tokens.emplace_back(TType::DblHash);
+			'##'				{ m_tokens.emplace_back(TType::DblHash);
 							  m_tokens.back().col = col;
 							  continue; }
 			'$'				{ m_tokens.emplace_back(TType::ASMPC);
@@ -185,7 +186,7 @@ void Lexer::set(const string& text) {
 			'&'				{ m_tokens.emplace_back(TType::BinAnd);
 							  m_tokens.back().col = col;
 							  continue; }
-			'&&'			{ m_tokens.emplace_back(TType::LogAnd);
+			'&&'				{ m_tokens.emplace_back(TType::LogAnd);
 							  m_tokens.back().col = col;
 							  continue; }
 			'('				{ m_tokens.emplace_back(TType::Lparen);
@@ -197,7 +198,7 @@ void Lexer::set(const string& text) {
 			'*'				{ m_tokens.emplace_back(TType::Mul);
 							  m_tokens.back().col = col;
 							  continue; }
-			'**'			{ m_tokens.emplace_back(TType::Pow);
+			'**'				{ m_tokens.emplace_back(TType::Pow);
 							  m_tokens.back().col = col;
 							  continue; }
 			'+'				{ m_tokens.emplace_back(TType::Plus);
@@ -221,10 +222,10 @@ void Lexer::set(const string& text) {
 			'<'				{ m_tokens.emplace_back(TType::Lt);
 							  m_tokens.back().col = col;
 							  continue; }
-			'<='			{ m_tokens.emplace_back(TType::Le);
+			'<='				{ m_tokens.emplace_back(TType::Le);
 							  m_tokens.back().col = col;
 							  continue; }
-			'<<'			{ m_tokens.emplace_back(TType::Shl);
+			'<<'				{ m_tokens.emplace_back(TType::Shl);
 							  m_tokens.back().col = col;
 							  continue; }
 			'='  | '=='		{ m_tokens.emplace_back(TType::Eq);
@@ -236,10 +237,10 @@ void Lexer::set(const string& text) {
 			'>'				{ m_tokens.emplace_back(TType::Gt);
 							  m_tokens.back().col = col;
 							  continue; }
-			'>='			{ m_tokens.emplace_back(TType::Ge);
+			'>='				{ m_tokens.emplace_back(TType::Ge);
 							  m_tokens.back().col = col;
 							  continue; }
-			'>>'			{ m_tokens.emplace_back(TType::Shr);
+			'>>'				{ m_tokens.emplace_back(TType::Shr);
 							  m_tokens.back().col = col;
 							  continue; }
 			'?'				{ m_tokens.emplace_back(TType::Quest);
@@ -248,7 +249,7 @@ void Lexer::set(const string& text) {
 			'['				{ m_tokens.emplace_back(TType::Lsquare);
 							  m_tokens.back().col = col;
 							  continue; }
-			'\\'			{ m_tokens.emplace_back(TType::Backslash);
+			'\\'				{ m_tokens.emplace_back(TType::Backslash);
 							  m_tokens.back().col = col;
 							  continue; }
 			']'				{ m_tokens.emplace_back(TType::Rsquare);
@@ -257,7 +258,7 @@ void Lexer::set(const string& text) {
 			'^'				{ m_tokens.emplace_back(TType::BinXor);
 							  m_tokens.back().col = col;
 							  continue; }
-			'^^'			{ m_tokens.emplace_back(TType::LogXor);
+			'^^'				{ m_tokens.emplace_back(TType::LogXor);
 							  m_tokens.back().col = col;
 							  continue; }
 			'{'				{ m_tokens.emplace_back(TType::Lbrace);
@@ -266,7 +267,7 @@ void Lexer::set(const string& text) {
 			'|'				{ m_tokens.emplace_back(TType::BinOr);
 							  m_tokens.back().col = col;
 							  continue; }
-			'||'			{ m_tokens.emplace_back(TType::LogOr);
+			'||'				{ m_tokens.emplace_back(TType::LogOr);
 							  m_tokens.back().col = col;
 							  continue; }
 			'}'				{ m_tokens.emplace_back(TType::Rbrace);
@@ -315,3 +316,159 @@ void Lexer::set(const string& text) {
 		*/
 	}
 }
+
+//-----------------------------------------------------------------------------
+
+// split lines on '\\'
+void LineSplitFilter::split_line(const string& line) {
+	if (starts_with_hash(line))
+		m_lines.push_back(line);		// don't split # lines
+	else {
+		string output;
+		const char* YYMARKER;
+		const char* p = line.c_str();
+
+		while (true) {
+			const char* p0 = p;
+			/*!re2c
+				__				{ output += " "; continue; }
+				';' [^\r\n\000]*{ continue; }
+				end             { if (!output.empty()) {
+								      output += "\n"; m_lines.push_back(output); }
+								  return; }
+				nl | '\\'		{ output += "\n"; m_lines.push_back(output);
+								  output.clear(); continue; }
+				"'"  qchar* "'" |
+				'"' qqchar* '"' |
+				operand         { output += string(p0, p); continue; }
+				*               { output += string(p0, p); continue; }
+			*/
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void MacroExpander::do_expand() {
+	const char* YYMARKER;
+	p = m_text.c_str();
+
+	while (true) {
+		const char* p0 = p;
+		/*!re2c
+			end             { return; }
+			ident_prefix? ident {
+							  check_macro_call(string(p0, p)); continue; }
+			"'"  qchar* "'" |
+			'"' qqchar* '"' |
+			operand         { m_output += string(p0, p); continue; }
+			*               { m_output += string(p0, p); continue; }
+		*/
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void MacroExpandFilter::parse_line(const string& line) {
+	const char* YYMARKER, * yyt1, * yyt2, * p1, * p2;
+	p = line.c_str();
+
+	/*!re2c
+		_ '#' _ 'define' _ @p1 ident_prefix ident @p2 {
+							  parse_define(string(p1, p2));
+							  return; }
+		_ '#' _ 'define' __ @p1 ident @p2 {
+							  parse_define(string(p1, p2));
+							  return; }
+		_ '#' _ 'define' _b	{ error_syntax(); return; }
+
+		_ '#' _ 'undef' _ @p1 ident_prefix ident @p2 _ [;\r\n] {
+							  m_defines.remove(string(p1, p2));
+							  return; }
+		_ '#' _ 'undef' __ @p1 ident @p2 _ [;\r\n] {
+							  m_defines.remove(string(p1, p2));
+							  return; }
+		_ '#' _ 'undef' _b	{ error_syntax(); return; }
+
+		_ '#'				{ return; }
+		*					{ MacroExpander expander{ line, &m_defines };
+							  string expanded = expander.expand();
+							  m_lines.push_back(expanded);
+							  return; }
+	*/
+}
+
+void MacroExpandFilter::parse_params(shared_ptr<Macro> macro) {
+	while (true) {
+		const char* p0 = p;
+		/*!re2c
+			_				{ continue; }
+			ident_prefix? ident {
+							  string name = string(p0, p);
+							  macro->push_arg(name);
+							  p = skip_spaces(p);
+							  if (*p == ',') {
+							      p++; continue;
+							  }
+							  else
+							      return; }
+			*				{ error_syntax(); return; }
+		*/
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+#if 0
+
+void SourceFileStack::parse_line(const string& line) {
+	// init global parse pointers
+	m_line = line;
+	p = m_line.c_str();
+
+	// parse
+
+	/*!re2c
+
+		*					{ 	m_out_lines.push_back(m_line); return; }
+	*/
+}
+
+p = m_line.c_str();
+const char* YYMARKER, * yyt1, * yyt2, * p1, * p2;
+
+/*
+!re2c
+	_ '.' _ @p1 ident @p2 __ 'if' _b { p--;
+						  do_label(string(p1, p2));
+						  do_if(); return; }
+	_ @p1 ident @p2 ':' _ 'if' _b { p--;
+						  do_label(string(p1, p2));
+						  do_if(); return; }
+	_ 'if' _b			{ p--;
+						  do_if(); return; }
+
+	_ '.' _ @p1 ident @p2 __ 'else' _b { p--;
+						  do_label(string(p1, p2));
+						  do_else(); return; }
+	_ @p1 ident @p2 ':' _ 'else' _b { p--;
+						  do_label(string(p1, p2));
+						  do_else(); return; }
+	_ 'else' _b			{ p--;
+						  do_else(); return; }
+
+	_ '.' _ @p1 ident @p2 __ 'endif' _b { p--;
+						  do_label(string(p1, p2));
+						  do_endif(); return; }
+	_ @p1 ident @p2 ':' _ 'endif' _b { p--;
+						  do_label(string(p1, p2));
+						  do_endif(); return; }
+	_ 'endif' _b		{ p--;
+						  do_endif(); return; }
+
+
+_ '#@#' _ 'include' _ '"' @p1[^ "\r\n\000]+ @p2 '"' _ nl {
+do_include(string(p1, p2)); return; }
+	*/
+#endif
+

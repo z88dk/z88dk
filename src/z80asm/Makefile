@@ -157,8 +157,6 @@ $(1).cpp: $(1).re Makefile
 endef
 
 $(eval $(call MAKE_RE2C,src/cpp/lex))
-$(eval $(call MAKE_RE2C,src/cpp/preproc_re))
-
 
 clean::
 	$(MAKE) -C lib clean

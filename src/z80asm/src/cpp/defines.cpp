@@ -26,6 +26,8 @@ void Macro::push_body(const string& text) {
 	m_body += text;
 }
 
+//-----------------------------------------------------------------------------
+
 Macros::Macros(Macros* parent)
 	: m_parent(parent) {}
 
@@ -39,6 +41,10 @@ void Macros::add(shared_ptr<Macro> macro) {
 
 void Macros::remove(const string& name) {
 	m_table.erase(name);
+}
+
+void Macros::clear() {
+	m_table.clear();
 }
 
 shared_ptr<Macro> Macros::find(const string& name) const {

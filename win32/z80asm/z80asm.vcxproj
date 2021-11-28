@@ -218,7 +218,6 @@
     <ClInclude Include="..\..\src\z80asm\src\c\libfile.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\list.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\listfile.h" />
-    <ClInclude Include="..\..\src\z80asm\src\c\macros.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\minunit.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\modlink.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\module.h" />
@@ -246,7 +245,6 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\lex.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\main.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\preproc.cpp" />
-    <ClCompile Include="..\..\src\z80asm\src\cpp\preproc_re.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\utils.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\c\alloc.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\array.c" />
@@ -262,7 +260,6 @@
     <ClCompile Include="..\..\src\z80asm\src\c\libfile.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\list.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\listfile.c" />
-    <ClCompile Include="..\..\src\z80asm\src\c\macros.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\minunit.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\modlink.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\module.c" />
@@ -281,7 +278,6 @@
   <ItemGroup>
     <None Include="..\..\src\z80asm\src\cpp\keyword.def" />
     <None Include="..\..\src\z80asm\src\cpp\lex.re" />
-    <None Include="..\..\src\z80asm\src\cpp\preproc_re.re" />
     <None Include="..\..\src\z80asm\src\c\parse_rules.rl" />
     <None Include="..\..\src\z80asm\src\c\scan_rules.rl" />
     <None Include="..\..\src\z80asm\tt\error_func.yaml" />

@@ -356,11 +356,6 @@ void asm_DEFC(const char* name, Expr* expr)
 	}
 }
 
-void asm_DC(const char* name, Expr* expr)
-{
-	asm_DEFC(name, expr);
-}
-
 /*-----------------------------------------------------------------------------
 *   DEFS - create a block of empty bytes, called by the DEFS directive
 *----------------------------------------------------------------------------*/

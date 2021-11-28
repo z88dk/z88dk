@@ -21,5 +21,8 @@ string str_toupper(string str);
 // convert C-escape sequences
 string str_compress_escapes(const string& in);
 
+// check string ending
+bool str_ends_with(const string& str, const string& ending);
+
 // read lines with any EOL terminator
 istream& safe_getline(istream& is, string& t);

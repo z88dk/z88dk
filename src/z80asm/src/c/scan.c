@@ -14,7 +14,6 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 #include "errors.h"
 #include "init.h"
 #include "list.h"
-#include "macros.h"
 #include "options.h"
 #include "scan.h"
 #include "str.h"
@@ -315,7 +314,7 @@ static bool fill_buffer( void )
 		else 
 		{
 			/* get next line from input source file */
-			const char* line = macros_getline(sfile_getline);
+			const char* line = sfile_get_source_line();
 			if ( line == NULL )
 				return false;
 

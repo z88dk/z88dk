@@ -39,6 +39,7 @@ public:
 
 	void add(shared_ptr<Macro> macro);
 	void remove(const string& name);
+	void clear();
 
 	shared_ptr<Macro> find(const string& name) const;
 	shared_ptr<Macro> find_all(const string& name) const;

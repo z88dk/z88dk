@@ -244,5 +244,71 @@ END_ERR
 	z80asm_ok("", "", "", "xx: $defq xx,xx+1020304h"=> bytes(0,0,0,0, 4,3,2,1));
 }
 
+#-------------------------------------------------------------------------------
+# test DEFC
+#-------------------------------------------------------------------------------
+
+for my $defc (qw(defc dc)) {
+	ok 1, "Test with $defc";
+
+	z80asm_nok("", "", "xx: $defc", <<END_ERR);
+Error at file '$test.asm' line 1: syntax error
+END_ERR
+
+	z80asm_nok("", "", "xx: $defc aa", <<END_ERR);
+Error at file '$test.asm' line 1: syntax error
+END_ERR
+
+	z80asm_nok("", "", "xx: $defc aa=", <<END_ERR);
+Error at file '$test.asm' line 1: syntax error
+END_ERR
+
+	z80asm_nok("", "", "xx: $defc aa=1+1,", <<END_ERR);
+Error at file '$test.asm' line 1: syntax error
+END_ERR
+
+	z80asm_ok("", "", "", 
+		"xx: $defc aa=1+1"				=> "",
+		"    $defc bb=2+2,cc=3+3"		=> "",
+		"    defb xx,aa,bb,cc"			=> bytes(0, 2, 4, 6));
+}
+
+#-------------------------------------------------------------------------------
+# test EQU
+#-------------------------------------------------------------------------------
+
+for my $equ ('equ', '=') {
+	ok 1, "Test with $equ";
+
+	z80asm_nok("", "", "aa $equ", <<END_ERR);
+Error at file '$test.asm' line 1: syntax error
+END_ERR
+
+	z80asm_nok("", "", "aa $equ 1,", <<END_ERR);
+Error at file '$test.asm' line 1: syntax error
+END_ERR
+
+	z80asm_nok("", "", ".aa: $equ 1,", <<END_ERR);
+Error at file '$test.asm' line 1: syntax error
+END_ERR
+
+	z80asm_ok("", "", "", 
+		"aa $equ 1+1"					=> "",
+		"   defb aa"					=> bytes(2));
+		
+	z80asm_ok("", "", "", 
+		"#define set equ"				=> "",
+		"one=1"							=> "",
+		" two    =    2"				=> "",
+		" .three equ  3"				=> "",
+		" four:  Equ  4"				=> "",
+		"five    EQU  5"				=> "",
+		" six    set  6"				=> "",
+		" .seven equ  7"				=> "",
+		" eight: equ  8"				=> "",
+		"defb one,two,three,four,five,six,seven,eight" 
+										=> bytes(1..8));
+}
+
 unlink_testfiles;
 done_testing;

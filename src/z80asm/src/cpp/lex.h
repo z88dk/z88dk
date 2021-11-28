@@ -16,6 +16,12 @@ inline bool isident(char c) {
 	return c == '_' || isalnum(c);
 }
 
+inline const char* skip_spaces(const char* p) {
+	while (isspace(*p) && *p != '\r' && *p != '\n')
+		p++;
+	return p;
+}
+
 enum class TType {
 	End, Newline,
 	Ident, Label, Integer, Floating, String, ASMPC,
@@ -24,7 +30,7 @@ enum class TType {
 	Eq, Ne, Lt, Le, Gt, Ge, Shl, Shr,
 	Quest, Colon, Dot, Comma, Hash, DblHash,
 	Lparen, Rparen, Lsquare, Rsquare, Lbrace, Rbrace,
-	Backslash,
+	Backslash, 
 };
 
 enum class Keyword {

@@ -416,19 +416,27 @@ Define rules for a ragel-based parser.
 					   asm_XDEF | asm_XLIB | asm_XREF | asm_LIB;
 
 	/*---------------------------------------------------------------------
-	*   directives with list of assignments
+	*   DEFC, DC, EQU, =
 	*--------------------------------------------------------------------*/
 #foreach <OP> in DEFC, DC
 	asm_<OP>_iter =
 			asm_<OP>_next:
 				name _TK_EQUAL expr (_TK_COMMA | _TK_NEWLINE)
-				@{	asm_<OP>(Str_data(name), pop_expr(ctx));
+				@{	DO_STMT_LABEL();
+					asm_DEFC(Str_data(name), pop_expr(ctx));
 					if ( ctx->p->tok == TK_COMMA )
 						fgoto asm_<OP>_next;
 				};
-	asm_<OP> = _TK_<OP> asm_<OP>_iter ;
+	asm_<OP> = label? _TK_<OP> asm_<OP>_iter ;
 #endfor  <OP>
-	directives_assign = asm_DEFC | asm_DC;
+
+	asm_EQU = name (_TK_EQU | _TK_EQUAL) expr _TK_NEWLINE
+				@{	asm_DEFC(Str_data(name), pop_expr(ctx)); }
+			| label (_TK_EQU | _TK_EQUAL) expr _TK_NEWLINE
+				@{	asm_DEFC(Str_data(stmt_label), pop_expr(ctx)); }
+			;
+	
+	directives_assign = asm_DEFC | asm_DC | asm_EQU;
 
 	/*---------------------------------------------------------------------
 	*   Z88DK specific opcodes

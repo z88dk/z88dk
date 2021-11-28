@@ -12,7 +12,6 @@ Repository: https://github.com/z88dk/z88dk
 #include "fileutil.h"
 #include "libfile.h"
 #include "listfile.h"
-#include "macros.h"
 #include "modlink.h"
 #include "module.h"
 #include "parse.h"
@@ -170,8 +169,6 @@ static void do_assemble(const char *src_filename )
     int start_errors = get_num_errors();     /* count errors in this source file */
 	const char *obj_filename = get_obj_filename(src_filename);
 
-	clear_macros();
-
 	/* create list file */
 	if (opts.list)
 		list_open(get_list_filename(src_filename));
@@ -226,7 +223,6 @@ static void do_assemble(const char *src_filename )
 int z80asm_main( int argc, char *argv[] )
 {
 	errors_init();
-	init_macros();
 
 	/* parse command line and call-back via assemble_file() */
 	/* If filename starts with '@', reads the file as a list of filenames
@@ -283,9 +279,7 @@ int z80asm_main( int argc, char *argv[] )
 			m_free(reloctable);
 	}
 
-	free_macros();
-
-    if ( get_num_errors() )
+	if ( get_num_errors() )
     {
         return 1;	/* signal error */
     }

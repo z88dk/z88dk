@@ -288,6 +288,7 @@ tokens:
   - name    : ELIFNDEF
   - name    : ELSE
   - name    : ENDIF
+  - name    : EQU
   - name    : EXTERN
   - name    : GLOBAL
   - name    : IF

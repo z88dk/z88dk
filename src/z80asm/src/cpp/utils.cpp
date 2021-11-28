@@ -76,6 +76,14 @@ string str_compress_escapes(const string& in) {
 	return out;
 }
 
+// https://stackoverflow.com/questions/874134/find-out-if-string-ends-with-another-string-in-c
+bool str_ends_with(const string& str, const string& ending) {
+	if (str.length() >= ending.length())
+		return (0 == str.compare(str.length() - ending.length(), ending.length(), ending));
+	else
+		return false;
+}
+
 // https://stackoverflow.com/questions/6089231/getting-std-ifstream-to-handle-lf-cr-and-crlf
 istream& safe_getline(istream& is, string& t) {
 	t.clear();

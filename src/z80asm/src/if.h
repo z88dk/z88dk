@@ -14,13 +14,18 @@ extern "C" {
 // main routine
 int z80asm_main(int argc, char *argv[]);
 
+// string pool
+const char* spool_add(const char* str);
+
 // errors
+void error_include_recursion(const char* filename);
 void error_invalid_char();
 void error_invalid_squoted_string();
-void error_symbol_redefined(const char* name);
-void error_unclosed_string();
-void error_include_recursion(const char* filename);
 void error_read_file(const char* filename);
+void error_symbol_redefined(const char* name);
+void error_syntax();
+void error_unbalanced_struct_at(const char* filename, int line_num);
+void error_unclosed_string();
 
 // options
 bool option_ucase();
@@ -31,6 +36,7 @@ void sfile_hold_input();
 void sfile_unhold_input();
 bool sfile_open(const char* filename, bool search_include_path);
 const char* sfile_getline();
+const char* sfile_get_source_line();
 const char* sfile_filename();
 int sfile_line_num();
 bool sfile_is_c_source();

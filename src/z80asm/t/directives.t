@@ -32,16 +32,6 @@ z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa,bb 	\n DEFB aa 	;; error: symbol 'aa'
 z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa,bb 	\n DEFB bb 	;; error: symbol 'bb' not defined");
 
 #------------------------------------------------------------------------------
-# DEFC
-#------------------------------------------------------------------------------
-z80asm(asm => "DEFC 			;; error: syntax error");
-z80asm(asm => "DEFC aa			;; error: syntax error");
-z80asm(asm => "DEFC aa=			;; error: syntax error");
-z80asm(asm => "DEFC aa=1+1,		;; error: syntax error");
-
-z80asm(asm => "DEFC aa=1+1,bb=2+2	\n DEFB aa,bb	;; 02 04");
-
-#------------------------------------------------------------------------------
 # MODULE
 #------------------------------------------------------------------------------
 
