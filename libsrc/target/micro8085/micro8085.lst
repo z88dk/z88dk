@@ -1,0 +1,6 @@
+target/micro8085/stdio/fgetc_cons
+target/micro8085/stdio/fputc_cons_native
+target/micro8085/stdio/getk
+@stdio/stdio_8080.lst
+
+

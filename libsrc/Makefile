@@ -67,6 +67,7 @@ TOCREATE += $(call check_target,lynx,lynx_clib.lib)
 TOCREATE += $(call check_target,m100,m100_clib.lib)
 TOCREATE += $(call check_target,m5,m5_clib.lib)
 TOCREATE += $(call check_target,mc1000,mc1000_clib.lib)
+TOCREATE += $(call check_target,micro8085,micro8085_clib.lib)
 TOCREATE += $(call check_target,mikro80,mikro80_clib.lib)
 TOCREATE += $(call check_target,msx,msx_clib.lib)
 TOCREATE += $(call check_target,mtx,mtx_clib.lib)
@@ -265,6 +266,14 @@ ndos.lib:
 
 gendos.lib:
 	$(MAKE) -C fcntl/gen_rnd
+
+# micro8085 library - ahjelm
+micro8085_clib.lib:
+	@echo ''
+	@echo '--- Building micro8085 Library ---'
+	@echo ''
+	$(call buildgeneric,micro8085)
+	TARGET=micro8085 TYPE=8085 $(LIBLINKER) -m8085 -DFORmicro8085 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/micro8085_clib @$(TARGET_DIRECTORY)/micro8085/micro8085.lst
 
 # z88 library - dom
 z88_clib.lib:
@@ -697,8 +706,6 @@ cpm8080_clib.lib:
 	@echo ''
 	@echo '--- Building CP/M Library (8080)---'
 	@echo ''
-	$(call buildgeneric,cpm,"portable")
-	$(MAKE) -C target/cpm
 	$(RM) target/cpm/stdio/*.o target/cpm/cpm/*.o
 	TARGET=cpm TYPE=8080 DEVICE=nodevice $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/cpm8080_clib @$(TARGET_DIRECTORY)/cpm/cpm_8080.lst
 
