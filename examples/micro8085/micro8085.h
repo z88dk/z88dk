@@ -145,4 +145,25 @@ extern void beep_dis(void);
 extern uint8_t adc1_in(void);
 extern uint8_t adc2_in(void);
 
+/*********************************************************************
+* void fputc_cons_native(char data)
+* \\ this is stdio/printf output function including <cr><lf> conversion
+* \\ can also be used as a general output function writing data to uart
+**********************************************************************/
+extern void fputc_cons_native(char);
+
+/*********************************************************************
+* char fgetc_cons(void)
+* \\ this is stdio input function which can also be used as a general
+* \\ input function reading data from uart (it will wait for rcvd char)
+**********************************************************************/
+extern char fgetc_cons(void);
+
+/*********************************************************************
+* char getk(void)
+* \\ this is stdio input function which can also be used as a general
+* \\ input function reading data from uart (returns zero if no char)
+**********************************************************************/
+extern char getk(void);
+
 #endif /* _MICRO8085_H_ */
