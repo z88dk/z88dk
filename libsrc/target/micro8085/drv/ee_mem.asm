@@ -176,14 +176,17 @@ pollw1: call    ee_cs_en        ;SELECT EEPROM
         ld      a,eerdsr        ;OPCODE READ STATUS
         call    spitx           ;TRANSMIT OPCODE
         call    spirx           ;READ STATUS
+        ld      c,a             ;TMP SAVE STATUS
         call    ee_cs_dis       ;DESELECT
+        ld      a,c             ;RESTORE TMP SAVED
         ld      hl,1            ;IF OK RETURN TRUE
         and     eewipb          ;MASK THE BIT
         ret     z               ;ZERO MEANS READY
         call    delay140        ;ELSE ADD SOME DELAY
         dec     b               ;AND COUNT LOOPS
         jp      nz,pollw1       ;MORE LOOPS TRY AGAIN
-        ret                     ;ELSE RETURN HL=0 FALSE
+        ld      hl,0            ;ELSE RETURN HL=0 FALSE
+        ret
 
 ;-------------------------------------------------------------------------
 ee_cs_en:
