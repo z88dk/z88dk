@@ -1,6 +1,7 @@
 ;-------------------------------------------------------------------------
 ; Embedded target Micro8085 by Anders Hjelm
 ; https://hackaday.io/project/176653-micro8085
+; for target clib support see /z88dk/examples/micro8085/micro8085.h
 ;-------------------------------------------------------------------------
         module micro8085_crt0
 
@@ -214,16 +215,6 @@ target_init:
         sim                     ;SET THE NEW MASK
         ei                      ;ENABLE INTERRUPT
         ret
-
-;-------------------------------------------------------------------------
-; These modules are included in micro8085_clib.lib supporting target hw
-;        INCLUDE "../libsrc/target/micro8085/drv/ee_mem.asm"
-;        INCLUDE "../libsrc/target/micro8085/drv/io_port.asm"
-;        INCLUDE "../libsrc/target/micro8085/drv/spi_bus.asm"
-;        INCLUDE "../libsrc/target/micro8085/drv/uart_putc.asm"
-;        INCLUDE "../libsrc/target/micro8085/drv/uart_puts.asm"
-;        INCLUDE "../libsrc/target/micro8085/drv/uart_rxbuf.asm"
-;        INCLUDE "../libsrc/target/micro8085/drv/uart_txbuf.asm"
 
 ;-------------------------------------------------------------------------
         defc    __crt_org_bss = CRT_ORG_BSS
