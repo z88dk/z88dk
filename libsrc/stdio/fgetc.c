@@ -135,7 +135,7 @@ fgetc_assign_ret:
 #endif
 not_text_fp:
     ld      a,h
-    inc     h
+    inc     a
     ret     nz
   ENDIF
 .seteof

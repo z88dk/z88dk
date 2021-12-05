@@ -23,6 +23,7 @@
 
 
 /* Conversion functions */
+#ifdef __SCCZ80
 extern half_t __LIB__ f16_f48(float x) __z88dk_fastcall;
 extern half_t __LIB__ f16_f32(float x) __z88dk_fastcall;
 
@@ -40,6 +41,79 @@ extern half_t __LIB__ f16_i32(int32_t x) __z88dk_fastcall;
 extern half_t __LIB__ f16_u8(uint8_t x) __z88dk_fastcall;
 extern half_t __LIB__ f16_u16(uint16_t x) __z88dk_fastcall;
 extern half_t __LIB__ f16_u32(uint32_t x) __z88dk_fastcall;
+#else
+extern half_t f16_f48(double_t x);
+extern half_t f16_f48_fastcall(double_t x) __z88dk_fastcall;
+#define f16_f48(a) f16_f48_fastcall(a)
+
+
+extern double_t f48_f16(half_t x);
+extern double_t f48_f16_fastcall(half_t x) __z88dk_fastcall;
+#define f48_f16(a) f48_f16_fastcall(a)
+
+
+
+extern half_t f16_f32(float_t x);
+extern half_t f16_f32_fastcall(float_t x) __z88dk_fastcall;
+#define f16_f32(a) f16_f32_fastcall(a)
+
+
+extern float_t f32_f16(half_t x);
+extern float_t f32_f16_fastcall(half_t x) __z88dk_fastcall;
+#define f32_f16(a) f32_f16_fastcall(a)
+
+extern int16_t i16_f16(half_t x);
+extern int16_t i16_f16_fastcall(half_t x) __z88dk_fastcall;
+#define i16_f16(a) i16_f16_fastcall(a)
+
+
+extern uint16_t u16_f16(half_t x);
+extern uint16_t u16_f16_fastcall(half_t x) __z88dk_fastcall;
+#define u16_f16(a) u16_f16_fastcall(a)
+
+
+extern int32_t i32_f16(half_t x);
+extern int32_t i32_f16_fastcall(half_t x) __z88dk_fastcall;
+#define i32_f16(a) i32_f16_fastcall(a)
+
+
+extern uint32_t u32_f16(half_t x);
+extern uint32_t u32_f16_fastcall(half_t x) __z88dk_fastcall;
+#define u32_f16(a) u32_f16_fastcall(a)
+
+
+
+extern half_t f16_i8(int8_t x);
+extern half_t f16_i8_fastcall(int8_t x) __z88dk_fastcall;
+#define f16_i8(a) f16_i8_fastcall(a)
+
+extern half_t f16_i16(int16_t x);
+extern half_t f16_i16_fastcall(int16_t x) __z88dk_fastcall;
+#define f16_i16(a) f16_i16_fastcall(a)
+
+
+extern half_t f16_i32(int32_t x);
+extern half_t f16_i32_fastcall(int32_t x) __z88dk_fastcall;
+#define f16_i32(a) f16_i32_fastcall(a)
+
+
+extern half_t f16_u8(uint8_t x);
+extern half_t f16_u8_fastcall(uint8_t x) __z88dk_fastcall;
+#define f16_u8(a) f16_u8_fastcall(a)
+
+
+extern half_t f16_u16(uint16_t x);
+extern half_t f16_u16_fastcall(uint16_t x) __z88dk_fastcall;
+#define f16_u16(a) f16_u16_fastcall(a)
+
+
+extern half_t f16_u32(uint32_t x);
+extern half_t f16_u32_fastcall(uint32_t x) __z88dk_fastcall;
+#define f16_u32(a) f16_u32_fastcall(a)
+
+
+
+#endif
 
 /* Arithmetic functions */
 extern half_t __LIB__ addf16(half_t x,half_t y) __smallc;

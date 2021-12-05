@@ -58,7 +58,20 @@
     ; We default to the 64 column terminal driver
     ; Check whether to default to 32 column display
     defc    CONSOLE_ROWS = 24
-    IF !DEFINED_CLIB_ZX_CONIO32
+    IF DEFINED_CLIB_DEFAULT_SCREEN_MODE && __TS2068__
+        IF DEFINED_CLIB_ZX_CONIO32
+           defc BASE_COLS = 32
+        ELSE
+           defc CLIB_ZX_CONIO32 = 0
+           defc BASE_COLS = 64
+        ENDIF
+        IF CLIB_DEFAULT_SCREEN_MODE < 6
+           defc CONSOLE_COLUMNS = BASE_COLS
+        ELSE
+           ; Hires mode
+           defc CONSOLE_COLUMNS = BASE_COLS * 2
+        ENDIF
+    ELIF !DEFINED_CLIB_ZX_CONIO32
         defc CLIB_ZX_CONIO32 = 0
         defc CONSOLE_COLUMNS = 64
     ELSE
@@ -127,6 +140,11 @@ init:
 ELSE
 
         ; --- startup=[default] ---
+  IF DEFINED_CLIB_DEFAULT_SCREEN_MODE && __TS2068__
+    EXTERN ts_vmod
+    ld      l,CLIB_DEFAULT_SCREEN_MODE
+    call    ts_vmod 
+  ENDIF
   IF !DEFINED_CRT_DISABLELOADER
         call   loadbanks
   ENDIF

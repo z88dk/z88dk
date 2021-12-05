@@ -15,11 +15,15 @@ static char             *c_output_file      = NULL;
 static char             *c_boot_filename     = NULL;
 static char             *c_disc_container    = "dsk";
 static char             *c_extension         = NULL;
+static char            **c_additional_files  = NULL;
+static int               c_additional_files_num = 0;
 
 static char              c_force_com_extension   = 0;
 static char              c_disable_com_file_creation = 0;
 static char              help         = 0;
 
+
+static void c_add_file(char *option);
 
 /* Options that are available for this module */
 option_t cpm2_options[] = {
@@ -33,6 +37,7 @@ option_t cpm2_options[] = {
     {  0,  "extension", "Extension for the output file", OPT_STR, &c_extension},
     {  0,  "force-com-ext", "Always force COM extension", OPT_BOOL, &c_force_com_extension},
     {  0,  "no-com-file", "Don't create a separate .com file", OPT_BOOL, &c_disable_com_file_creation },
+    { 'a', "add-file", "Add additional files [hostfile:cpmfile] or [hostfile]", OPT_FUNCTION, (void *)c_add_file },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -593,6 +598,33 @@ static void dump_formats()
     exit(1);
 }
 
+// Called for each additional file
+static void c_add_file(char *param)
+{
+    char *colon = strchr(param, ':');
+    char  cpm_filename[20];
+    char  filename[FILENAME_MAX+1];
+    int   i;
+
+    if ( colon == NULL ) {
+        // We need to create a CP/M filename from the argument given
+        char *basename;
+
+        basename = zbasename(param);
+        cpm_create_filename(basename, cpm_filename, 0, 0);
+        strcpy(filename, param);
+    } else {
+        snprintf(filename, sizeof(filename),"%.*s", (int)(colon - param), filename);
+        snprintf(cpm_filename, sizeof(cpm_filename),"%s",colon+1);
+    }
+
+    i = c_additional_files_num;
+    c_additional_files_num += 2;
+    c_additional_files = realloc(c_additional_files, sizeof(c_additional_files[0]) * c_additional_files_num);
+    c_additional_files[i] = strdup(filename);
+    c_additional_files[i+1] = strdup(cpm_filename);
+}
+
 int cpm2_exec(char* target)
 {
 
@@ -607,8 +639,10 @@ int cpm2_exec(char* target)
         dump_formats();
         return -1;
     }
+
     return cpm_write_file_to_image(c_disc_format, c_disc_container, c_output_file, c_binary_name, c_crt_filename, c_boot_filename);
 }
+
 
 // TODO: Needs bootsector handling
 disc_handle *cpm_create_with_format(const char *disc_format) 
@@ -627,6 +661,34 @@ disc_handle *cpm_create_with_format(const char *disc_format)
         return NULL;
     }
     return cpm_create(spec);
+}
+
+static void write_extra_files(disc_handle *h)
+{
+    int     i;
+    void   *filebuf;
+    FILE   *binary_fp;
+    size_t  binlen;
+
+    for ( i = 0; i < c_additional_files_num; i+= 2) {
+        // Open the binary file
+        if ((binary_fp = fopen(c_additional_files[i], "rb")) == NULL) {
+            exit_log(1, "Can't open input file %s\n", c_additional_files[i]);
+        }
+        if (fseek(binary_fp, 0, SEEK_END)) {
+            fclose(binary_fp);
+            exit_log(1, "Couldn't determine size of file: %s\n",c_additional_files[i]);
+        }
+        binlen = ftell(binary_fp);
+        fseek(binary_fp, 0L, SEEK_SET);
+        filebuf = malloc(binlen);
+        if (1 != fread(filebuf, binlen, 1, binary_fp))  { fclose(binary_fp); exit_log(1, "Could not read required data from <%s>\n",c_additional_files[i]); }
+        fclose(binary_fp);
+
+        disc_write_file(h, c_additional_files[i+1], filebuf, binlen);
+        free(filebuf);
+    }
+
 }
 
 
@@ -713,6 +775,8 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
     if ( f->extra_hook ) {
         f->extra_hook(h);
     }
+
+    write_extra_files(h);
     
     if (writer(h, disc_name) < 0) {
         exit_log(1, "Can't write disc image\n");

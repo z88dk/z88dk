@@ -22,7 +22,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <math.h>
-#include <libxml2/libxml/parser.h>
+#include <libxml/parser.h>
 
 #include "../../include/gfxprofile.h"
 //#include "gfxprofile.h"

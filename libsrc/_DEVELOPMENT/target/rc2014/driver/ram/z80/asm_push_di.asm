@@ -11,7 +11,7 @@
 
 INCLUDE "config_private.inc"
 
-SECTION smc_clib
+SECTION code_clib
 
 PUBLIC asm_push_di
 

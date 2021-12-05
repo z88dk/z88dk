@@ -130,7 +130,7 @@ ENDIF
 loop_11:
 
    add hl,hl
-   rla 
+   rla
    rl c
 
    jr nc, loop_12
@@ -144,7 +144,7 @@ loop_11:
 loop_12:
 
    add hl,hl
-   rla 
+   rla
    rl c
 
    jr nc, loop_13
@@ -158,7 +158,7 @@ loop_12:
 loop_13:
 
    add hl,hl
-   rla 
+   rla
    rl c
 
    jr nc, loop_14
@@ -172,7 +172,7 @@ loop_13:
 loop_14:
 
    add hl,hl
-   rla 
+   rla
    rl c
 
    jr nc, loop_15
@@ -186,7 +186,7 @@ loop_14:
 loop_15:
 
    add hl,hl
-   rla 
+   rla
    rl c
 
    jr nc, loop_16
@@ -200,7 +200,7 @@ loop_15:
 loop_16:
 
    add hl,hl
-   rla 
+   rla
    rl c
 
    jr nc, loop_17
@@ -214,7 +214,7 @@ loop_16:
 loop_17:
 
    add hl,hl
-   rla 
+   rla
    rl c
 
    jr nc, exit_18
@@ -228,10 +228,9 @@ loop_17:
 exit_18:
 
    ; product in cahl
-  
+
    ld e,a
    ld d,c
-  
    xor a
    ret
 
@@ -273,7 +272,7 @@ ENDIF
 loop_11:
 
    add hl,hl
-   rla 
+   rla
    rl c
 
    jr nc, loop_01
@@ -290,10 +289,10 @@ loop_01:
    jp nz, loop_11
 
    ; product in cahl
-  
+
    ld e,a
    ld d,c
-  
+
    xor a
    ret
 
