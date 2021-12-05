@@ -34,11 +34,15 @@ eewipb  equ  1H
 ; extern bool ee_mem_rd(uint8 *pData, uint16 Address, uint16 Length);
 ;-------------------------------------------------------------------------
 _ee_mem_rd:
+        call    pollwip         ;wait for write in progress to
+        ld      a,h             ;finish before next access
+        or      l               ;test for ok
+        ret     z               ;otherwise return false
         ld      de,sp+2         ;get arguments from stack
         ld      hl,(de)         ;last pushed is length
         ld      a,h             ;test for
         or      l               ;zero length
-        ret     z               ;if so skip and return
+        jp      z,eerd1         ;if so skip and return
         push    hl              ;save length
         inc     de              ;move to next
         inc     de              ;argument position
@@ -48,12 +52,8 @@ _ee_mem_rd:
         inc     de              ;argument position
         ld      hl,(de)         ;which is dataptr
         ex      (sp),hl         ;dptr to stack addr to hl
-        push    hl              ;save addr
-        call    pollwip         ;wait for write in progress to
-        ld      a,h             ;finish before next access
-        or      l               ;test for ok
-        ret     z               ;otherwise skip and return
-        pop     bc              ;pop back address
+        ld      b,h             ;save addr
+        ld      c,l             ;to bc
         call    ee_cs_en        ;SELECT EEPROM
         ld      a,eerdda        ;OPCODE READ DATA
         call    spitx           ;TRANSMIT OPCODE
@@ -65,6 +65,7 @@ _ee_mem_rd:
         pop     bc              ;get back length
         call    sprxbf          ;let spi in function finish
         call    ee_cs_dis       ;deselect eeprom chip
+eerd1:  ld      hl,1            ;return true
         ret
 
 ;-------------------------------------------------------------------------
