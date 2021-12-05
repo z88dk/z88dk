@@ -106,5 +106,9 @@ END
 run_ok("./z88dk-z80asm -b $test.1.asm $test.2.asm");
 check_bin_file("$test.1.bin", bytes(0xc9));
 
+z80asm_ok("", "", "",
+		'#define cat(#a, #b) #a#b'		=> "",
+		'cat(aa,bb): jp aabb'			=> bytes(0xc3, 0, 0));
+
 unlink_testfiles();
 done_testing();
