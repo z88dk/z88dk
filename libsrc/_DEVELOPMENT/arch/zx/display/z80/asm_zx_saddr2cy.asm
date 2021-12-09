@@ -20,13 +20,10 @@ asm_zx_saddr2cy:
    rlca
    rlca
    rlca
+   xor h
    and $07
-   ld l,a
-   
-   ld a,h
-   and $18
-   or l
-   
+   xor h
+   and $1f
    ld l,a
 
 IF __SCCZ80
