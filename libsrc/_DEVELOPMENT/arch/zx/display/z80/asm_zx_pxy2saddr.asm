@@ -28,40 +28,37 @@ asm_zx_pxy2saddr:
    ;
    ; uses  : af, de, hl
    
-   ld a,h
-   and $07
-
-IF __USE_SPECTRUM_128_SECOND_DFILE
-   or $c0
-ELSE
-   or $40
-ENDIF
+   or a
 
 asm0_zx_pxy2saddr:
 
-   ld d,a
-   
    ld a,h
    rra
+   scf
    rra
+IF __USE_SPECTRUM_128_SECOND_DFILE
+   ; target $c0 or $e0 (CF 0/1 at asm0_zx_pxy2saddr)
+   scf
+ELSE
+   ; target $40 or $60 (CF 0/1 at asm0_zx_pxy2saddr)
+   or a
+ENDIF
    rra
-   and $18
-   or d
-   ld d,a
-   
-   ld a,l
-   rra
-   rra
-   rra
-   and $1f
    ld e,a
-   
-   ld a,h
-   add a,a
-   add a,a
-   and $e0
 
-   or e
+   xor h
+   and %11111000
+   xor h
+   ld d,a
+
+   ld a,l
+   xor e
+   and %11111000
+   xor e
+
+   rrca
+   rrca
+   rrca
    ld e,a
 
    ex de,hl
