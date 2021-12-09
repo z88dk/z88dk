@@ -33,7 +33,5 @@ asm_zx_saddrcdown:
    ld h,a
 
    and $18
-   cp $18
-
-   ccf
+   add a,$e8
    ret
