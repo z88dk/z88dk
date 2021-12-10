@@ -1,6 +1,7 @@
 target/px8/subcpu_call
 target/px8/subcpu_command
 target/px8/subcpu_function
+target/px8/adcvrt
 target/px8/esc_sequence
 target/px8/lcd_set_udg
 target/px8/px8_break
