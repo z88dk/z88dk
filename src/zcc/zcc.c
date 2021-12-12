@@ -2616,8 +2616,7 @@ static void configure_compiler()
         compiler_style = filter_outspecified_flag;
         BuildOptions(&asmargs, "-D__SDCC");
         BuildOptions(&linkargs, "-D__SDCC");
-    }
-    else {
+    } else if (strcmp(c_compiler_type,"sccz80") == 0 ) {
         preprocarg = " -DSCCZ80 -DSMALL_C -D__SCCZ80";
         BuildOptions(&cpparg, preprocarg);
                 BuildOptions(&asmargs, "-D__SCCZ80");
@@ -2642,6 +2641,9 @@ static void configure_compiler()
         }
         c_compiler = c_sccz80_exe;
         compiler_style = outspecified_flag;
+    } else {
+        printf("Unknown compiler type: %s\n",c_compiler_type);
+        exit(1);
     }
 }
 
