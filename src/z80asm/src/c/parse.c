@@ -34,44 +34,10 @@ Define ragel-based parser.
 static UT_icd ut_Sym_icd = { sizeof(Sym), NULL, NULL, NULL };
 
 /*-----------------------------------------------------------------------------
-* 	Current open struct
-*----------------------------------------------------------------------------*/
-typedef struct OpenStruct
-{
-	tokid_t	open_tok;			// open token - TK_IF, TK_ELSE, ...
-	const char *filename;		// file and line where token found
-	int		line_num;
-	bool	active : 1;			// in true branch of conditional compilation
-	bool	parent_active : 1;	// in true branch of parent's conditional compilation
-	bool	elif_was_true : 1;	// true if any of the IF/ELIF branches returned true
-} OpenStruct;
-
-static UT_icd ut_OpenStruct_icd = { sizeof(OpenStruct), NULL, NULL, NULL };
-static UT_array* open_structs;
-
-/*-----------------------------------------------------------------------------
-* 	init module
-*----------------------------------------------------------------------------*/
-static void deinit_module(void) {
-	utarray_free(open_structs);
-}
-
-static void init_module(void) {
-	static bool inited = false;
-	if (!inited) {
-		utarray_new(open_structs, &ut_OpenStruct_icd);
-		atexit(deinit_module);
-		inited = true;
-	}
-}
-
-/*-----------------------------------------------------------------------------
 * 	Current parse context
 *----------------------------------------------------------------------------*/
 ParseCtx *ParseCtx_new(void)
 {
-	init_module();
-
 	ParseCtx *ctx = m_new(ParseCtx);
 
 	utarray_new(ctx->tokens, &ut_Sym_icd);
@@ -85,8 +51,6 @@ ParseCtx *ParseCtx_new(void)
 
 void ParseCtx_delete(ParseCtx *ctx)
 {
-	init_module();
-
 	utarray_free(ctx->exprs);
 	utarray_free(ctx->token_strings);
 	utarray_free(ctx->tokens);
@@ -100,8 +64,6 @@ void ParseCtx_delete(ParseCtx *ctx)
 /* save the current scanner context and parse the given expression */
 struct Expr *parse_expr(const char *expr_text)
 {
-	init_module();
-
 	Expr *expr;
 	int num_errors;
 
@@ -115,8 +77,12 @@ struct Expr *parse_expr(const char *expr_text)
 			scan_expect_operands();
 			GetSym();
 			expr = expr_parse();		/* may output error */
-			if (sym.tok != TK_END && num_errors == get_num_errors())
+			if (sym.tok != TK_END && sym.tok != TK_NEWLINE &&
+				num_errors == get_num_errors()) {
 				error_syntax();
+				OBJ_DELETE(expr);
+				expr = NULL;
+			}
 		}
 		sfile_unhold_input();
 	}
@@ -128,8 +94,6 @@ struct Expr *parse_expr(const char *expr_text)
 /* push current expression */
 static void push_expr(ParseCtx *ctx)
 {
-	init_module();
-
 	STR_DEFINE(expr_text, STR_SIZE);
 	Expr *expr;
 	Sym  *expr_p;
@@ -178,8 +142,6 @@ static void push_expr(ParseCtx *ctx)
 *----------------------------------------------------------------------------*/
 static Expr *pop_expr(ParseCtx *ctx)
 {
-	init_module();
-
 	Expr *expr;
 
 	expr = *((Expr **)utarray_back(ctx->exprs));
@@ -195,8 +157,6 @@ static Expr *pop_expr(ParseCtx *ctx)
 *----------------------------------------------------------------------------*/
 static void pop_eval_expr(ParseCtx *ctx, int *pvalue, bool *perror)
 {
-	init_module();
-
 	Expr *expr;
 
 	*pvalue = 0;
@@ -220,8 +180,6 @@ static void pop_eval_expr(ParseCtx *ctx, int *pvalue, bool *perror)
 *----------------------------------------------------------------------------*/
 const char *autolabel(void)
 {
-	init_module();
-
 	STR_DEFINE(label, STR_SIZE);
 	static int n;
 	const char *ret;
@@ -238,8 +196,6 @@ const char *autolabel(void)
 *----------------------------------------------------------------------------*/
 static char *token_strings_add(ParseCtx *ctx, char *str)
 {
-	init_module();
-
 	if (!str)		/* NULL string */
 		return NULL;
 
@@ -253,8 +209,6 @@ static char *token_strings_add(ParseCtx *ctx, char *str)
 *----------------------------------------------------------------------------*/
 static void read_token(ParseCtx *ctx)
 {
-	init_module();
-
 	STR_DEFINE(buffer, STR_SIZE);
 	Sym sym_copy;
 	int p_index;
@@ -312,8 +266,6 @@ static void read_token(ParseCtx *ctx)
 
 static void free_tokens(ParseCtx *ctx)
 {
-	init_module();
-
 	utarray_clear(ctx->tokens);
 	utarray_clear(ctx->token_strings);
 	if (ctx->current_sm != SM_DMA_PARAMS) {		// DMA_PARAMS needs to preserve exprs between lines
@@ -324,50 +276,7 @@ static void free_tokens(ParseCtx *ctx)
 /*-----------------------------------------------------------------------------
 *   IF, IFDEF, IFNDEF, ELSE, ELIF, ELIFDEF, ELIFNDEF, ENDIF
 *----------------------------------------------------------------------------*/
-static void start_struct(tokid_t open_tok, bool condition)
-{
-	init_module();
-
-	OpenStruct *parent_os, os;
-
-	// init to zeros
-	memset(&os, 0, sizeof(OpenStruct));
-
-	os.open_tok = open_tok;
-	os.filename = get_error_file();
-	os.line_num = get_error_line();
-	os.active = condition;
-	if (os.active)
-		os.elif_was_true = true;
-
-	parent_os = (OpenStruct *)utarray_back(open_structs);
-	if (parent_os)
-		os.parent_active = parent_os->active && parent_os->parent_active;
-	else
-		os.parent_active = true;
-
-	utarray_push_back(open_structs, &os);
-}
-
-static void continue_struct(tokid_t open_tok, bool condition)
-{
-	init_module();
-
-	OpenStruct *os = (OpenStruct *)utarray_back(open_structs);
-	if (!os)
-		error_unbalanced_struct();
-	else {
-		os->open_tok = open_tok;
-		os->active = condition && !os->elif_was_true;
-		if (os->active)
-			os->elif_was_true = true;
-	}
-}
-
-static bool check_if_condition(Expr *expr)
-{
-	init_module();
-
+bool check_if_condition(Expr *expr) {
 	int value;
 	bool condition;
 
@@ -383,10 +292,16 @@ static bool check_if_condition(Expr *expr)
 	return condition;
 }
 
-static bool check_ifdef_condition(char *name)
-{
-	init_module();
+void parse_expr_eval_if_condition(const char* expr_text, bool* condition, bool* error) {
+	*condition = *error = false;
+	struct Expr *expr = parse_expr(expr_text);
+	if (expr)
+		*condition = check_if_condition(expr);
+	else
+		*error = true;
+}
 
+bool check_ifdef_condition(const char *name) {
 	Symbol *symbol;
 
 	symbol = find_symbol(name, CURRENTMODULE->local_symtab);
@@ -400,113 +315,6 @@ static bool check_ifdef_condition(char *name)
 	return false;
 }
 
-static void asm_IF(Expr *expr)
-{
-	init_module();
-
-	bool condition = check_if_condition(expr);
-	start_struct(TK_IF, condition);
-}
-
-static void asm_IFDEF(char *name)
-{
-	init_module();
-
-	bool condition;
-
-	condition = check_ifdef_condition(name);
-	start_struct(TK_IFDEF, condition);
-}
-
-static void asm_IFNDEF(char *name)
-{
-	init_module();
-
-	bool condition;
-
-	condition = ! check_ifdef_condition(name);
-	start_struct(TK_IFNDEF, condition);
-}
-
-static void asm_ELSE(void)
-{
-	init_module();
-
-	OpenStruct *os;
-
-	os = (OpenStruct *)utarray_back(open_structs);
-	if (!os)
-		error_unbalanced_struct();
-	else
-	{
-		switch (os->open_tok)
-		{
-		case TK_IF:
-		case TK_IFDEF:
-		case TK_IFNDEF:
-			os->active = !os->active && !os->elif_was_true;
-			os->open_tok = TK_ELSE;
-			break;
-
-		default:
-			error_unbalanced_struct_at(os->filename, os->line_num);
-		}
-	}
-}
-
-static void asm_ELIF(Expr *expr)
-{
-	init_module();
-
-	asm_ELSE();
-	bool condition = check_if_condition(expr);
-	continue_struct(_TK_IF, condition);
-}
-
-static void asm_ELIFDEF(char *name)
-{
-	init_module();
-
-	asm_ELSE();
-	bool condition = check_ifdef_condition(name);
-	continue_struct(_TK_IFDEF, condition);
-}
-
-static void asm_ELIFNDEF(char *name)
-{
-	init_module();
-
-	asm_ELSE();
-	bool condition = !check_ifdef_condition(name);
-	continue_struct(_TK_IFDEF, condition);
-}
-
-static void asm_ENDIF(void)
-{
-	init_module();
-
-	OpenStruct *os;
-
-	os = (OpenStruct *)utarray_back(open_structs);
-	if (!os)
-		error_unbalanced_struct();
-	else
-	{
-		switch (os->open_tok)
-		{
-		case TK_IF:
-		case TK_IFDEF:
-		case TK_IFNDEF:
-		case TK_ELSE:
-			utarray_pop_back(open_structs);
-			break;
-
-		default:
-			error_unbalanced_struct_at(os->filename, os->line_num);
-		}
-	}
-}
-
 /*-----------------------------------------------------------------------------
 *   Import parser generated by ragel
 *----------------------------------------------------------------------------*/
@@ -517,8 +325,6 @@ static void asm_ENDIF(void)
 *----------------------------------------------------------------------------*/
 static void parseline(ParseCtx *ctx)
 {
-	init_module();
-
 	int start_num_errors;
 
 	next_PC();				/* update assembler program counter */
@@ -542,20 +348,8 @@ static void parseline(ParseCtx *ctx)
 	}
 }
 
-static void check_open_structs(void) {
-	init_module();
-	OpenStruct* os = (OpenStruct*)utarray_back(open_structs);
-	if (os != NULL)
-		error_unbalanced_struct_at(os->filename, os->line_num);
-
-	// clear stack to prepare for next file
-	utarray_clear(open_structs);
-}
-
-void parse_include_file(const char* filename)
+void parse_file(const char* filename)
 {
-	init_module();
-
 	ParseCtx* ctx = ParseCtx_new();
 	{
 		if (sfile_open(filename, true)) {
@@ -573,19 +367,11 @@ void parse_include_file(const char* filename)
 	ParseCtx_delete(ctx);
 }
 
-void parse_file(const char* filename) {
-	init_module();
-	parse_include_file(filename);
-	check_open_structs();
-}
-
 /*-----------------------------------------------------------------------------
 *   Parse one statement, if possible
 *----------------------------------------------------------------------------*/
 bool parse_statement(ParseCtx *ctx)
 {
-	init_module();
-
 	bool parse_ok;
 
 	save_scan_state();

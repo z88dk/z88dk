@@ -144,29 +144,6 @@ Define rules for a ragel-based parser.
 		;
 	
 	/*---------------------------------------------------------------------
-	*   IF, IFDEF, IFNDEF, ELSE, ENDIF
-	*--------------------------------------------------------------------*/
-	asm_IF 		= _TK_IF       expr _TK_NEWLINE @{ asm_IF(pop_expr(ctx) ); };
-	asm_IFDEF 	= _TK_IFDEF    name _TK_NEWLINE @{ asm_IFDEF(Str_data(name) ); };
-	asm_IFNDEF 	= _TK_IFNDEF   name _TK_NEWLINE @{ asm_IFNDEF(Str_data(name) ); };
-	asm_ELSE 	= _TK_ELSE          _TK_NEWLINE @{ asm_ELSE(); };
-	asm_ELIF 	= _TK_ELIF     expr _TK_NEWLINE @{ asm_ELIF(pop_expr(ctx) ); };
-	asm_ELIFDEF	= _TK_ELIFDEF  name _TK_NEWLINE @{ asm_ELIFDEF(Str_data(name) ); };
-	asm_ELIFNDEF= _TK_ELIFNDEF name _TK_NEWLINE @{ asm_ELIFNDEF(Str_data(name) ); };
-	asm_ENDIF 	= _TK_ENDIF         _TK_NEWLINE @{ asm_ENDIF(); };
-
-	asm_conditional = asm_IF | asm_IFDEF | asm_IFNDEF |
-					  asm_ELSE |
-					  asm_ELIF | asm_ELIFDEF | asm_ELIFNDEF |
-					  asm_ENDIF;
-
-	skip :=
-		  _TK_END
-		| _TK_NEWLINE
-		| asm_conditional
-		| (any - _TK_NEWLINE - asm_conditional)* _TK_NEWLINE;
-
-	/*---------------------------------------------------------------------
 	*   DEFGROUP
 	*--------------------------------------------------------------------*/
 	defgroup_var_value =
@@ -496,7 +473,6 @@ Define rules for a ragel-based parser.
 		| asm_Z88DK
 		| asm_DEFGROUP
 		| asm_DEFVARS
-		| asm_conditional
 		| asm_DMA
 		| asm_C_LINE
 		/*---------------------------------------------------------------------
@@ -607,18 +583,10 @@ Define rules for a ragel-based parser.
 
 static int get_start_state(ParseCtx *ctx)
 {
-	init_module();
-
-	OpenStruct *open_struct;
-
 	switch (ctx->current_sm)
 	{
 	case SM_MAIN:
-		open_struct = (OpenStruct *)utarray_back(open_structs);
-		if (open_struct == NULL || (open_struct->active && open_struct->parent_active))
-			return parser_en_main;
-		else
-			return parser_en_skip;
+		return parser_en_main;
 
 	case SM_DEFVARS_OPEN:
 		scan_expect_operands();
@@ -649,8 +617,6 @@ static int get_start_state(ParseCtx *ctx)
 
 static bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 {
-	init_module();
-
 	int  value1 = 0;
 	int  start_num_errors = get_num_errors();
 	int  expr_value = 0;			/* last computed expression value */
@@ -686,8 +652,6 @@ static bool _parse_statement_1(ParseCtx *ctx, Str *name, Str *stmt_label)
 
 static bool _parse_statement(ParseCtx *ctx)
 {
-	init_module();
-
 	STR_DEFINE(name, STR_SIZE);			/* identifier name */
 	STR_DEFINE(stmt_label, STR_SIZE);	/* statement label, NULL if none */
 

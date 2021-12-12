@@ -49,13 +49,17 @@ extern void ParseCtx_delete(ParseCtx *ctx);
 
 /* parse the given assembly file, return false if failed */
 extern void parse_file(const char *filename);
-extern void parse_include_file(const char* filename);
 
 /* try to parse the current statement, return false if failed */
 extern bool parse_statement(ParseCtx *ctx);
 
 /* save the current scanner context and parse the given expression */
 extern struct Expr *parse_expr(const char *expr_text);
+extern void parse_expr_eval_if_condition(const char *expr_text, bool* condition, bool* error);
+
+/* check IF conditions */
+extern bool check_if_condition(Expr *expr);
+extern bool check_ifdef_condition(const char *name);
 
 /* return new auto-label in strpool */
 extern const char *autolabel(void);

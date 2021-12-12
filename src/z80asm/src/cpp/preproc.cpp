@@ -11,8 +11,8 @@
 
 SourceFileStack g_source_file_stack;
 static LineSplitFilter splitter1{ &g_source_file_stack };
-MacroExpandFilter g_macro_expand_filter{ &splitter1 };
-LineSplitFilter g_preproc{ &g_macro_expand_filter };
+PreprocFilter g_preproc_filter{ &splitter1 };
+LineSplitFilter g_preproc{ &g_preproc_filter };
 
 //-----------------------------------------------------------------------------
 
@@ -118,14 +118,6 @@ bool SourceFileStack::getline(string& line) {
 	line.clear();
 	while (true) {
 		if (m_files.empty()) {		// end of input
-#if 0
-			if (!m_if_stack.empty()) {
-				error_unbalanced_struct_at(
-					m_if_stack.back().filename.c_str(),
-					m_if_stack.back().line_num);
-				m_if_stack.clear();
-			}
-#endif
 			return false;
 		}
 		else if (m_files.back().hold())
@@ -213,67 +205,18 @@ bool LineSplitFilter::get_source_line(string& line) {
 	return true;
 }
 
+// split lines on '\\'
 void LineSplitFilter::parse_line(const string& line) {
-	split_line(line);
+	if (starts_with_hash(line))
+		m_lines.push_back(line);		// don't split # lines
+	else
+		split_lines(m_lines, line);
 }
+
 
 //-----------------------------------------------------------------------------
 
-MacroExpander::MacroExpander(const string& text, Macros* defines)
-	: m_text(text), m_defines(defines) {}
-
-string MacroExpander::expand() {
-	m_output.clear();
-	m_recursive_error = false;
-	do_expand();
-	if (m_recursive_error)
-		return m_text;
-	else
-		return m_output;
-}
-
-void MacroExpander::check_macro_call(const string& name) {
-	shared_ptr<Macro> macro;
-
-	// try full name
-	if ((macro = m_defines->find_all(name)) != nullptr)
-		expand_macro(macro);
-	// try name without prefix
-	else if (!isident(name[0]) && (macro = m_defines->find_all(name.substr(1))) != nullptr) {
-		m_output += name.front();
-		expand_macro(macro);
-	}
-	else
-		m_output += name;
-}
-
-void MacroExpander::expand_macro(shared_ptr<Macro> macro) {
-	if (macro->is_expanding()) {
-		m_recursive_error = true;
-	}
-	else {
-		// create a scope for the recursive evaluation
-		Macros sub_defines{ m_defines };
-
-		// collect parameters
-		if (macro->args().size()) {
-			vector<string> params = collect_params();
-			for (size_t i = 0; i < macro->args().size(); i++) {
-				shared_ptr<Macro> param = make_shared<Macro>(
-					macro->args()[i],
-					i < params.size() ? params[i] : "");
-				sub_defines.add(param);
-			}
-		}
-
-		macro->set_expanding(true);
-		MacroExpander expander{ macro->body(), &sub_defines };
-		m_output += expander.expand();
-		macro->set_expanding(false);
-	}
-}
-
-vector<string> MacroExpander::collect_params() {
+vector<string> ParamScanner::collect_params() {
 	bool in_parens = false;
 	if (*p == '(') {				// '(' after name without spaces
 		in_parens = true;
@@ -300,7 +243,7 @@ vector<string> MacroExpander::collect_params() {
 	return params;
 }
 
-bool MacroExpander::collect_param(string& param) {
+bool ParamScanner::collect_param(string& param) {
 	param.clear();
 	if (next_char() == ')' || *p == '\r' || *p == '\n' || *p == '\0')
 		return false;
@@ -356,24 +299,171 @@ bool MacroExpander::collect_param(string& param) {
 	return true;
 }
 
-char MacroExpander::next_char() {
+char ParamScanner::next_char() {
 	p = skip_spaces(p);
 	return *p;
 }
 
-//-----------------------------------------------------------------------------
-
-MacroExpandFilter::MacroExpandFilter(LineSource* source)
-	: LineFilter(source) {}
-
-void MacroExpandFilter::got_eof() {
-	m_defines.clear();
+bool ParamScanner::expect_eol() {
+	if (next_char() != ';' && *p != '\r' && *p != '\n') {
+		error_syntax();
+		return false;
+	}
+	else
+		return true;
 }
 
-void MacroExpandFilter::parse_define(const string& name) {
+//-----------------------------------------------------------------------------
+
+MacroExpander::MacroExpander(const string& text, Macros* defines)
+	: ParamScanner(text), m_defines(defines) {}
+
+string MacroExpander::expand() {
+	m_output.clear();
+	m_recursive_error = false;
+	do_expand();
+	if (m_recursive_error)
+		return m_text;
+	else
+		return m_output;
+}
+
+void MacroExpander::check_macro_call(const string& name) {
+	shared_ptr<Macro> macro;
+
+	// try full name
+	if ((macro = m_defines->find_all(name)) != nullptr)
+		expand_macro(macro);
+	// try name without prefix
+	else if (!isident(name[0]) && (macro = m_defines->find_all(name.substr(1))) != nullptr) {
+		m_output += name.front();
+		expand_macro(macro);
+	}
+	else
+		m_output += name;
+}
+
+void MacroExpander::expand_macro(shared_ptr<Macro> macro) {
+	if (macro->is_expanding()) {
+		m_recursive_error = true;
+	}
+	else {
+		// create a scope for the recursive evaluation
+		Macros sub_defines{ m_defines };
+
+		// collect parameters
+		if (macro->args().size()) {
+			vector<string> params = collect_params();
+			for (size_t i = 0; i < macro->args().size(); i++) {
+				shared_ptr<Macro> param = make_shared<Macro>(
+					macro->args()[i],
+					i < params.size() ? params[i] : "");
+				sub_defines.add(param);
+			}
+		}
+
+		macro->set_expanding(true);
+		MacroExpander expander{ macro->body(), &sub_defines };
+		m_output += expander.expand();
+		macro->set_expanding(false);
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+PreprocLevel::PreprocLevel(Macros* parent)
+	: defines(parent) {
+	init();
+}
+
+void PreprocLevel::init(const string& line) {
+	split_lines(m_lines, line);
+}
+
+bool PreprocLevel::getline(string& line) {
+	line.clear();
+	if (!m_lines.empty()) {			// have lines in queue
+		line = m_lines.front();
+		m_lines.pop_front();
+		return true;
+	}
+	else
+		return false;
+}
+
+//-----------------------------------------------------------------------------
+
+IfNest::IfNest(Keyword keyword, bool flag, const string& filename, int line_num)
+	: keyword(keyword), flag(flag), done_if(false)
+	, filename(filename), line_num(line_num) {}
+
+//-----------------------------------------------------------------------------
+
+PreprocFilter::PreprocFilter(LineSource* source)
+	: LineFilter(source) {
+	m_levels.emplace_back();
+}
+
+void PreprocFilter::got_eof() {
+	m_levels.clear();
+	m_levels.emplace_back();
+	m_macros.clear();
+	if (!m_if_stack.empty()) {
+		error_unbalanced_struct_at(
+			m_if_stack.back().filename.c_str(),
+			m_if_stack.back().line_num);
+		m_if_stack.clear();
+	}
+}
+
+bool PreprocFilter::getline(string& line) {
+	while (true) {
+		if (m_source->hold())
+			return false;
+		else if (!m_lines.empty()) {
+			line = m_lines.front();
+			m_lines.pop_front();
+			return true;
+		}
+		else if (m_levels.back().getline(line))
+			return true;
+		else if (m_levels.size() > 1)
+			m_levels.pop_back();		// drop one level and continue
+		else if (get_source_line(line))
+			parse_line(line);
+		else {
+			got_eof();
+			return false;
+		}
+	}
+}
+
+void PreprocFilter::parse_line(const string& line) {
+	// do these irrespective of ifs_active()
+	if (check_ifs(line))
+		return;
+
+	if (!ifs_active())
+		return;
+
+	// do these only if ifs_active()
+	if (check_defines(line))
+		return;
+
+	// last check
+	if (check_macro_call(line))
+		return;
+
+	// expand macros in text
+	MacroExpander expander{ line, &m_levels.back().defines };
+	string expanded = expander.expand();
+	m_lines.push_back(expanded);
+}
+
+void PreprocFilter::parse_define(const string& name) {
 	// create macro, check for duplicate names
 	shared_ptr<Macro> macro = make_shared<Macro>(name);
-	m_defines.add(macro);
+	m_levels.front().defines.add(macro);
 
 	// check for parameters
 	if (*p == '(') {
@@ -394,41 +484,187 @@ void MacroExpandFilter::parse_define(const string& name) {
 	macro->push_body(string(p0, p));
 }
 
-//-----------------------------------------------------------------------------
-
-#if 0
-PreprocLevel::PreprocLevel(Macros* parent)
-	: defines(parent) {
-	init();
+void PreprocFilter::do_label(const string& name) {
+	m_lines.push_back(name + ":\n");
 }
 
-void PreprocLevel::init(const string& line) {
-	this->line = line;
-	if (starts_with_hash())		// if line starts with '#' dont split on '\\'
-		m_lines.push_back(line);
-	else 						// split line by '\\' and '\n'
-		split_line();
-}
-
-bool PreprocLevel::getline() {
-	line.clear();
-	if (!m_lines.empty()) {			// have lines in queue
-		line = m_lines.front();
-		m_lines.pop_front();
-		return true;
+void PreprocFilter::do_if() {
+	bool flag, error;
+	parse_expr_eval_if_condition(p, &flag, &error);
+	if (!error) {
+		m_if_stack.emplace_back(Keyword::IF, flag,
+			g_source_file_stack.filename(), g_source_file_stack.line_num());
+		m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
 	}
-	else
-		return false;
 }
-#endif
 
-//-----------------------------------------------------------------------------
+void PreprocFilter::do_ifdef() {
+	string name = collect_name();
+	if (!name.empty()) {
+		if (expect_eol()) {
+			bool defined = check_ifdef_condition(name.c_str());
+			m_if_stack.emplace_back(Keyword::IF, defined,
+				g_source_file_stack.filename(), g_source_file_stack.line_num());
+			m_if_stack.back().done_if = m_if_stack.back().done_if || defined;
+		}
+	}
+}
 
-#if 0
-IfNest::IfNest(Keyword keyword, bool flag, const string& filename, int line_num)
-	: keyword(keyword), flag(flag), done_if(false)
-	, filename(filename), line_num(line_num) {}
-#endif
+void PreprocFilter::do_ifndef() {
+	string name = collect_name();
+	if (!name.empty()) {
+		if (expect_eol()) {
+			bool not_defined = !check_ifdef_condition(name.c_str());
+			m_if_stack.emplace_back(Keyword::IF, not_defined,
+				g_source_file_stack.filename(), g_source_file_stack.line_num());
+			m_if_stack.back().done_if = m_if_stack.back().done_if || not_defined;
+		}
+	}
+}
+
+void PreprocFilter::do_elif() {
+	if (m_if_stack.empty())
+		error_unbalanced_struct();
+	else {
+		Keyword last = m_if_stack.back().keyword;
+		if (last != Keyword::IF && last != Keyword::ELIF)
+			error_unbalanced_struct_at(
+				m_if_stack.back().filename.c_str(),
+				m_if_stack.back().line_num);
+		else {
+			bool flag, error;
+			parse_expr_eval_if_condition(p, &flag, &error);
+			if (!error) {
+				if (m_if_stack.back().done_if)
+					flag = false;
+				m_if_stack.back().keyword = Keyword::ELIF;
+				m_if_stack.back().flag = flag;
+				m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
+			}
+		}
+	}
+}
+
+void PreprocFilter::do_elifdef() {
+	if (m_if_stack.empty())
+		error_unbalanced_struct();
+	else {
+		Keyword last = m_if_stack.back().keyword;
+		if (last != Keyword::IF && last != Keyword::ELIF)
+			error_unbalanced_struct_at(
+				m_if_stack.back().filename.c_str(),
+				m_if_stack.back().line_num);
+		else {
+			string name = collect_name();
+			if (!name.empty()) {
+				if (expect_eol()) {
+					bool defined = check_ifdef_condition(name.c_str());
+					if (m_if_stack.back().done_if)
+						defined = false;
+					m_if_stack.back().keyword = Keyword::ELIF;
+					m_if_stack.back().flag = defined;
+					m_if_stack.back().done_if = m_if_stack.back().done_if || defined;
+				}
+			}
+		}
+	}
+}
+
+void PreprocFilter::do_elifndef() {
+	if (m_if_stack.empty())
+		error_unbalanced_struct();
+	else {
+		Keyword last = m_if_stack.back().keyword;
+		if (last != Keyword::IF && last != Keyword::ELIF)
+			error_unbalanced_struct_at(
+				m_if_stack.back().filename.c_str(),
+				m_if_stack.back().line_num);
+		else {
+			string name = collect_name();
+			if (!name.empty()) {
+				if (expect_eol()) {
+					bool not_defined = !check_ifdef_condition(name.c_str());
+					if (m_if_stack.back().done_if)
+						not_defined = false;
+					m_if_stack.back().keyword = Keyword::ELIF;
+					m_if_stack.back().flag = not_defined;
+					m_if_stack.back().done_if = m_if_stack.back().done_if || not_defined;
+				}
+			}
+		}
+	}
+}
+
+void PreprocFilter::do_else() {
+	if (expect_eol()) {
+		if (m_if_stack.empty())
+			error_unbalanced_struct();
+		else {
+			Keyword last = m_if_stack.back().keyword;
+			if (last != Keyword::IF && last != Keyword::ELIF)
+				error_unbalanced_struct_at(
+					m_if_stack.back().filename.c_str(),
+					m_if_stack.back().line_num);
+			else {
+				bool flag = !m_if_stack.back().done_if;
+				m_if_stack.back().keyword = Keyword::ELSE;
+				m_if_stack.back().flag = flag;
+				m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
+			}
+		}
+	}
+}
+
+void PreprocFilter::do_endif() {
+	if (expect_eol()) {
+		if (m_if_stack.empty())
+			error_unbalanced_struct();
+		else {
+			Keyword last = m_if_stack.back().keyword;
+			if (last != Keyword::IF && last != Keyword::ELIF && last != Keyword::ELSE)
+				error_unbalanced_struct_at(
+					m_if_stack.back().filename.c_str(),
+					m_if_stack.back().line_num);
+			else 
+				m_if_stack.pop_back();
+		}
+	}
+}
+
+void PreprocFilter::do_macro_call(shared_ptr<Macro> macro) {
+	// collect arguments
+	vector<string> params;
+	if (macro->args().size() != 0) {
+		params = collect_params();
+		if (macro->args().size() != params.size())
+			error_wrong_number_macro_args(macro->name().c_str());
+	}
+	expect_eol();
+
+	// create new level of macro expansion
+	m_levels.emplace_back(&m_levels.back().defines);
+
+	// create macros for each argument
+	for (size_t i = 0; i < macro->args().size(); i++) {
+		string arg = macro->args()[i];
+		string param = i < params.size() ? params[i] : "";
+		shared_ptr<Macro> param_macro = make_shared<Macro>(arg, param);
+		m_levels.back().defines.add(param_macro);
+	}
+
+	// create lines from body
+	m_levels.back().init(macro->body());
+}
+
+bool PreprocFilter::ifs_active() const {
+	if (m_levels.back().exitm_called)
+		return false;
+	for (auto& f : m_if_stack) {
+		if (!f.flag)
+			return false;
+	}
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 
@@ -484,14 +720,3 @@ void sfile_set_line_num(int line_num, int line_inc) {
 void sfile_set_c_source(bool f) {
 	g_source_file_stack.set_c_source(f);
 }
-
-
-#if 0
-Location g_location;
-
-
-void preproc_open(const char* filename) { (void)filename; }
-void preproc_close() {}
-const char* preproc_getline() { return nullptr; }
-#endif
-

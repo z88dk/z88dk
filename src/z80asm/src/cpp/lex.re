@@ -19,9 +19,10 @@ using namespace std;
 	re2c:yyfill:enable = 0;
 	re2c:indent:top = 2;
 
-	end 	= "\000";
+	end 		= "\000";
 	ws		=  [ \t\v\f];
 	nl		= "\r\n"|"\r"|"\n";
+	eos		= [;\r\n];
 	_ 		= ws*;
 	__ 		= ws+;
 	_b		= [^_a-zA-Z0-9\000];
@@ -72,13 +73,36 @@ static string ident_change_case(const string& ident) {
 		return ident;
 }
 
-static bool starts_with_hash(const string& line) {
+bool starts_with_hash(const string& line) {
 	const char* p = line.c_str();
-	const char* YYMARKER;
+	const char* YYMARKER{ nullptr };
 	/*!re2c
 		_ '#'				{ return true; }
 		*					{ return false; }
 	*/
+}
+
+void split_lines(deque<string>& lines, const string& line) {
+	string output;
+	const char* YYMARKER{ nullptr };
+	const char* p = line.c_str();
+
+	while (true) {
+		const char* p0 = p;
+		/*!re2c
+			__				{ output += " "; continue; }
+			';' [^\r\n\000]*{ continue; }
+			end             { if (!output.empty()) {
+								  output += "\n"; lines.push_back(output); }
+							  return; }
+			nl | '\\'		{ output += "\n"; lines.push_back(output);
+							  output.clear(); continue; }
+			"'"  qchar* "'" |
+			'"' qqchar* '"' |
+			operand         { output += string(p0, p); continue; }
+			*               { output += string(p0, p); continue; }
+		*/
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -319,38 +343,19 @@ void Lexer::set(const string& text) {
 
 //-----------------------------------------------------------------------------
 
-// split lines on '\\'
-void LineSplitFilter::split_line(const string& line) {
-	if (starts_with_hash(line))
-		m_lines.push_back(line);		// don't split # lines
-	else {
-		string output;
-		const char* YYMARKER;
-		const char* p = line.c_str();
+string ParamScanner::collect_name() {
+	const char* YYMARKER{ nullptr }, * yyt1{ nullptr }, * p1{ nullptr };
 
-		while (true) {
-			const char* p0 = p;
-			/*!re2c
-				__				{ output += " "; continue; }
-				';' [^\r\n\000]*{ continue; }
-				end             { if (!output.empty()) {
-								      output += "\n"; m_lines.push_back(output); }
-								  return; }
-				nl | '\\'		{ output += "\n"; m_lines.push_back(output);
-								  output.clear(); continue; }
-				"'"  qchar* "'" |
-				'"' qqchar* '"' |
-				operand         { output += string(p0, p); continue; }
-				*               { output += string(p0, p); continue; }
-			*/
-		}
-	}
+	/*!re2c
+		_ @p1 ident		{ return string(p1, p); }
+		*               { error_syntax(); return ""; }
+	*/
 }
 
 //-----------------------------------------------------------------------------
 
 void MacroExpander::do_expand() {
-	const char* YYMARKER;
+	const char* YYMARKER{ nullptr };
 	p = m_text.c_str();
 
 	while (true) {
@@ -369,36 +374,208 @@ void MacroExpander::do_expand() {
 
 //-----------------------------------------------------------------------------
 
-void MacroExpandFilter::parse_line(const string& line) {
-	const char* YYMARKER, * yyt1, * yyt2, * p1, * p2;
+bool PreprocFilter::check_ifs(const string& line) {
+	const char* YYMARKER{ nullptr }, * yyt1{ nullptr }, * yyt2{ nullptr }, * yyt3{ nullptr };
+	const char *p1{ nullptr }, * p2{ nullptr };
+	p = line.c_str();
+
+	/*!re2c
+		_ '.' _ @p1 ident @p2 __ 'if' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_if();
+							  return true; }
+		_ @p1 ident @p2 _ ':' _ 'if' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_if();
+							  return true; }
+		_ 'if' _ ':'			{ return false; }
+		_ 'if' _b			{ p--;
+							  do_if(); 
+							  return true; }
+
+		_ '.' _ @p1 ident @p2 __ 'ifdef' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_ifdef();
+							  return true; }
+		_ @p1 ident @p2 _ ':' _ 'ifdef' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_ifdef();
+							  return true; }
+		_ 'ifdef' _ ':'		{ return false; }
+		_ 'ifdef' _b			{ p--;
+							  do_ifdef();
+							  return true; }
+
+		_ '.' _ @p1 ident @p2 __ 'ifndef' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_ifndef();
+							  return true; }
+		_ @p1 ident @p2 _ ':' _ 'ifndef' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_ifndef();
+							  return true; }
+		_ 'ifndef' _ ':'		{ return false; }
+		_ 'ifndef' _b			{ p--;
+							  do_ifndef();
+							  return true; }
+
+		_ '.' _ @p1 ident @p2 __ 'elif' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_elif();
+							  return true; }
+		_ @p1 ident @p2 _ ':' _ 'elif' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_elif();
+							  return true; }
+		_ 'elif' _ ':'		{ return false; }
+		_ 'elif' _b			{ p--;
+							  do_elif();
+							  return true; }
+
+		_ '.' _ @p1 ident @p2 __ 'elifdef' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_elifdef();
+							  return true; }
+		_ @p1 ident @p2 _ ':' _ 'elifdef' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_elifdef();
+							  return true; }
+		_ 'elifdef' _ ':'	{ return false; }
+		_ 'elifdef' _b		{ p--;
+							  do_elifdef();
+							  return true; }
+
+		_ '.' _ @p1 ident @p2 __ 'elifndef' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_elifndef();
+							  return true; }
+		_ @p1 ident @p2 _ ':' _ 'elifndef' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_elifndef();
+							  return true; }
+		_ 'elifndef' _ ':'	{ return false; }
+		_ 'elifndef' _b		{ p--;
+							  do_elifndef();
+							  return true; }
+
+		_ '.' _ @p1 ident @p2 __ 'else' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_else();
+							  return true; }
+		_ @p1 ident @p2 _ ':' _ 'else' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_else();
+							  return true; }
+		_ 'else' _ ':'		{ return false; }
+		_ 'else' _b			{ p--;
+							  do_else();
+							  return true; }
+
+		_ '.' _ @p1 ident @p2 __ 'endif' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_endif();
+							  return true; }
+		_ @p1 ident @p2 _ ':' _ 'endif' _b {
+							  p--;
+							  if (ifs_active()) do_label(string(p1, p2));
+							  do_endif();
+							  return true; }
+		_ 'endif' _ ':'		{ return false; }
+		_ 'endif' _b			{ p--;
+							  do_endif();
+							  return true; }
+
+
+		*					{ return false; }
+	*/
+}
+
+bool PreprocFilter::check_defines(const string& line) {
+	const char* YYMARKER{ nullptr }, * yyt1{ nullptr }, * yyt2{ nullptr };
+	const char* p1{ nullptr }, * p2{ nullptr };
 	p = line.c_str();
 
 	/*!re2c
 		_ '#' _ 'define' _ @p1 ident_prefix ident @p2 {
 							  parse_define(string(p1, p2));
-							  return; }
+							  return true; }
 		_ '#' _ 'define' __ @p1 ident @p2 {
 							  parse_define(string(p1, p2));
-							  return; }
-		_ '#' _ 'define' _b	{ error_syntax(); return; }
+							  return true; }
+		_ '#' _ 'define' _b	{ error_syntax(); return true; }
 
-		_ '#' _ 'undef' _ @p1 ident_prefix ident @p2 _ [;\r\n] {
-							  m_defines.remove(string(p1, p2));
-							  return; }
-		_ '#' _ 'undef' __ @p1 ident @p2 _ [;\r\n] {
-							  m_defines.remove(string(p1, p2));
-							  return; }
-		_ '#' _ 'undef' _b	{ error_syntax(); return; }
+		_ '#' _ 'undef' _ @p1 ident_prefix ident @p2 _ eos {
+							  m_levels.front().defines.remove(string(p1, p2));
+							  return true; }
+		_ '#' _ 'undef' __ @p1 ident @p2 _ eos {
+							  m_levels.front().defines.remove(string(p1, p2));
+							  return true; }
+		_ '#' _ 'undef' _b	{ error_syntax(); return true; }
 
-		_ '#'				{ return; }
-		*					{ MacroExpander expander{ line, &m_defines };
-							  string expanded = expander.expand();
-							  m_lines.push_back(expanded);
-							  return; }
+		_ '#'				{ return true; }
+
+
+		*					{ return false; }
 	*/
 }
 
-void MacroExpandFilter::parse_params(shared_ptr<Macro> macro) {
+bool PreprocFilter::check_macro_call(const string& line) {
+	const char* YYMARKER{ nullptr }, * yyt1{ nullptr }, * yyt2{ nullptr }, * yyt3{ nullptr };
+	const char* p1{ nullptr }, * p2{ nullptr }, * p3{ nullptr }, * p4{ nullptr };
+	shared_ptr<Macro> macro;
+	p = line.c_str();
+
+	/*!re2c
+		_ '.' _ @p1 ident @p2 __ @p3 ident @p4 {
+							  macro = m_macros.find_all(string(p3, p4));
+							  if (macro) {
+							      do_label(string(p1, p2));
+								  do_macro_call(macro);
+								  return true;
+							  }
+							  else
+							      return false;
+							}
+		_ @p1 ident @p2 _ ':' _ @p3 ident @p4 {
+							  macro = m_macros.find_all(string(p3, p4));
+							  if (macro) {
+								  do_label(string(p1, p2));
+								  do_macro_call(macro);
+								  return true;
+							  }
+							  else
+								  return false;
+							}
+		_ @p3 ident @p4		{
+							  macro = m_macros.find_all(string(p3, p4));
+							  if (macro) {
+								  do_macro_call(macro);
+								  return true;
+							  }
+							  else
+								  return false;
+							}
+
+		*					{ return false; }
+	*/
+}
+
+void PreprocFilter::parse_params(shared_ptr<Macro> macro) {
 	while (true) {
 		const char* p0 = p;
 		/*!re2c
@@ -420,53 +597,8 @@ void MacroExpandFilter::parse_params(shared_ptr<Macro> macro) {
 //-----------------------------------------------------------------------------
 
 #if 0
-
-void SourceFileStack::parse_line(const string& line) {
-	// init global parse pointers
-	m_line = line;
-	p = m_line.c_str();
-
-	// parse
-
-	/*!re2c
-
-		*					{ 	m_out_lines.push_back(m_line); return; }
-	*/
-}
-
-p = m_line.c_str();
-const char* YYMARKER, * yyt1, * yyt2, * p1, * p2;
-
 /*
 !re2c
-	_ '.' _ @p1 ident @p2 __ 'if' _b { p--;
-						  do_label(string(p1, p2));
-						  do_if(); return; }
-	_ @p1 ident @p2 ':' _ 'if' _b { p--;
-						  do_label(string(p1, p2));
-						  do_if(); return; }
-	_ 'if' _b			{ p--;
-						  do_if(); return; }
-
-	_ '.' _ @p1 ident @p2 __ 'else' _b { p--;
-						  do_label(string(p1, p2));
-						  do_else(); return; }
-	_ @p1 ident @p2 ':' _ 'else' _b { p--;
-						  do_label(string(p1, p2));
-						  do_else(); return; }
-	_ 'else' _b			{ p--;
-						  do_else(); return; }
-
-	_ '.' _ @p1 ident @p2 __ 'endif' _b { p--;
-						  do_label(string(p1, p2));
-						  do_endif(); return; }
-	_ @p1 ident @p2 ':' _ 'endif' _b { p--;
-						  do_label(string(p1, p2));
-						  do_endif(); return; }
-	_ 'endif' _b		{ p--;
-						  do_endif(); return; }
-
-
 _ '#@#' _ 'include' _ '"' @p1[^ "\r\n\000]+ @p2 '"' _ nl {
 do_include(string(p1, p2)); return; }
 	*/

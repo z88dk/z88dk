@@ -17,6 +17,9 @@
 #include <string>
 using namespace std;
 
+bool starts_with_hash(const string& line);
+void split_lines(deque<string>& lines, const string& line);
+
 class LineSource {
 public:
 	virtual bool getline(string& line) = 0;
@@ -80,29 +83,8 @@ public:
 
 private:
 	list<SourceFile>		m_files;			// source files stack
-#if 0
-	deque<string>		m_out_lines;		// lines to return
-	string				m_line;			// last read line
-	const char*			p{ nullptr };	// scan pointer in line
-
-	vector<IfNest>		m_if_stack;		// state of nested IFs
-#endif
 
 	bool recursive_include(const string& filename);
-#if 0
-	void parse_line(const string& line);// parse line, send output to queue
-
-	void do_if();
-	void do_else();
-	void do_endif();
-
-	void do_label(const string& label);	
-	void do_if();						
-	void do_else();						
-	void do_endif();						
-
-	void do_include(const string& filename);	// push new SourceFile to g_source_file_stack
-#endif
 };
 
 // joins continuation lines, splits lines by '\\'
@@ -113,111 +95,95 @@ public:
 private:
 	bool get_source_line(string& line);
 	void parse_line(const string& line) override;
-	void split_line(const string& line);
+};
+
+// scanner for macro parameters
+class ParamScanner {
+public:
+	ParamScanner(const string& text = "") { init_text(text); }
+	void init_text(const string& text) { m_text = text; p = m_text.c_str(); }
+	vector<string> collect_params();
+	bool collect_param(string& param);
+	string collect_name();
+	char next_char();
+	bool expect_eol();
+
+protected:
+	string		m_text;
+	const char* p{ nullptr };
 };
 
 // expands macros
-class MacroExpander {
+class MacroExpander : public ParamScanner {
 public:
 	MacroExpander(const string& text, Macros* defines);
 	string expand();
 
 private:
-	string		m_text;
 	Macros*		m_defines;
-	const char* p{ nullptr };
 	string		m_output;
 	bool			m_recursive_error{ false };
 
 	void do_expand();
 	void check_macro_call(const string& name);
 	void expand_macro(shared_ptr<Macro> macro);
-	vector<string> collect_params();
-	bool collect_param(string& param);
-	char next_char();
 };
 
-class MacroExpandFilter : public LineFilter {
-public:
-	MacroExpandFilter(LineSource* source);
-	void got_eof() override;
-
-private:
-	Macros		m_defines;
-	const char* p{ nullptr };
-
-	virtual void parse_line(const string& line) override;
-	void parse_define(const string& name);
-	void parse_params(shared_ptr<Macro> macro);
-};
-
-extern SourceFileStack g_source_file_stack;
-extern MacroExpandFilter g_macro_expand_filter;
-extern LineSplitFilter g_preproc;
-
-#if 0
 struct PreprocLevel {
-	string		line;
 	Macros		defines;					// #defines, macro args
 	bool			exitm_called{ false };
 
 	PreprocLevel(Macros* parent = nullptr);
 	void init(const string& line = "");
-	bool getline();
+	bool getline(string& line);
 
 private:
 	deque<string>	m_lines;
-
-	bool starts_with_hash();
-	void split_line();
 };
 
 struct IfNest {
 	Keyword keyword;
-	bool	flag;
-	bool	done_if;
+	bool		flag;
+	bool		done_if;
 	string	filename;
 	int		line_num;
 
 	IfNest(Keyword keyword, bool flag, const string& filename, int line_num);
 };
 
-struct Location {
-	string  filename;
-	int     line_num{ 0 };
-
-	Location(const string& filename = "", int line_num = 0)
-		: filename(filename), line_num(line_num) {}
-	void clear() { filename.clear(); line_num = 0; }
-};
-
-extern Location g_location;
-
-struct Line {
-	Location    location;
-	string      text;
-
-	Line(const Location& location = g_location, const string& text = "")
-		: location(location), text(text) {}
-	void clear() { location.clear(); text.clear(); }
-};
-
-struct PreprocLevel {
-	Line		line;
-	Lexer		lexer;
-	Macros		defines;					// #defines, -D, macro args
-	bool		exitm_called{ false };
-
-	PreprocLevel(Macros* parent = nullptr);
-	void init(const Line& line);
-	bool getline();
+class PreprocFilter : public LineFilter, public ParamScanner {
+public:
+	PreprocFilter(LineSource* source);
+	void got_eof() override;
+	bool getline(string& line) override;
 
 private:
-	list<Line>	m_lines;
+	list<PreprocLevel>	m_levels;		// levels of macro expansion
+	Macros				m_macros;		// opcode-like macros
+	vector<IfNest>		m_if_stack;		// stack of active IFs
+
+	void parse_line(const string& line) override;
+	void parse_define(const string& name);
+	void parse_params(shared_ptr<Macro> macro);
+
+	bool check_ifs(const string& line);
+	bool check_defines(const string& line);
+	bool check_macro_call(const string& line);
+
+	void do_label(const string& name);
+	void do_if();
+	void do_ifdef();
+	void do_ifndef();
+	void do_elif();
+	void do_elifdef();
+	void do_elifndef();
+	void do_else();
+	void do_endif();
+	void do_macro_call(shared_ptr<Macro> macro);
+
+	bool ifs_active() const;
 };
 
-
-class SourceFileStack {
-
-};
-#endif
+extern SourceFileStack g_source_file_stack;
+extern PreprocFilter g_preproc_filter;
+extern LineSplitFilter g_preproc;

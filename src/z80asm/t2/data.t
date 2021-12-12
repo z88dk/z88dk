@@ -34,12 +34,6 @@ for my $filler (0, 1, 0xff) {
     '   DEFB    123             ' => bytes(123),
     '   DS      5,"hello"       ' => 'hello',
     '   DEFB    123             ' => bytes(123),
-    
-    '   IF 0                    ' => '',       
-    '     DS 4                  ' => '',       
-    '   ELSE                    ' => '',       
-    '     DS 4                  ' => bytes(($filler) x 4),
-    '   ENDIF                   ' => '',       
     );
 }
 

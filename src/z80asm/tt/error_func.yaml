@@ -317,3 +317,8 @@ errors:
     func	: error_cmd_failed
     args	: const char *cmd
     message	: "\"command '%s' failed\", cmd"
+
+  - type	: ErrError
+    func	: error_wrong_number_macro_args
+    args	: const char *macro
+    message	: "\"macro '%s': wrong number of arguments\", macro"

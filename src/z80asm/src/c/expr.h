@@ -145,15 +145,6 @@ extern void ExprOp_compute(ExprOp* self, Expr* expr, bool not_defined_error);
    return NULL and issue syntax error on error */
 extern Expr* expr_parse(void);
 
-/* parse and eval an expression,
-   return false and issue syntax error on parse error
-   return false and issue symbol not defined error on result.not_evaluable */
-extern bool expr_parse_eval(long* presult);
-
-/* parse and eval an expression as argument to IF,
-   return expression value, ignoring symbol-not-defined errors  */
-extern long expr_parse_eval_if(void);
-
 /* evaluate expression if possible, set result.not_evaluable if failed
    e.g. symbol not defined; show error messages if not_defined_error */
 extern long Expr_eval(Expr* self, bool not_defined_error);

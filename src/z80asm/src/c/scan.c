@@ -73,12 +73,6 @@ static void init_sym(void)
 	sym.tok = sym.tok_opcode = TK_END;
 	sym.tstart = ""; 
 	sym.tlen = 0;
-#if 0
-	sym.text = "";
-	sym.string = NULL;
-	sym.filename = NULL;
-	sym.line_num = 0;
-#endif
 	sym.number = 0;
 }
 
@@ -393,11 +387,6 @@ void CurSymExpect(tokid_t expected_tok)
 void SetTemporaryLine(const char *line )
 {
 	init_module();
-
-#if 0
-	if (*p != '\0')
-		List_push(&input_stack, m_strdup(p));		/* save current input */
-#endif
 	set_scan_buf( line, false );					/* assume not at BOL */
 }
 

@@ -62,3 +62,4 @@ extern void warn_dma_unsupported_command(void);
 extern void warn_dma_half_cycle_timing(void);
 extern void warn_dma_ready_signal_unsupported(void);
 extern void error_cmd_failed(const char *cmd);
+extern void error_wrong_number_macro_args(const char *macro);

@@ -15,6 +15,7 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "die.h"
 #include "errors.h"
 #include "expr.h"
+#include "if.h"
 #include "init.h"
 #include "module.h"
 #include "strhash.h"
@@ -461,13 +462,6 @@ static bool Expr_parse_factor(Expr* self)
 
 		/* copy type */
 		self->type = MAX(self->type, symptr->type);
-#if 0
-		if (!symptr->is_defined)
-		{
-			self->result.not_evaluable = true;
-	}
-#endif
-
 		Str_append_n(self->text, sym.tstart, sym.tlen);		/* add identifier to infix expr */
 
 		GetSym();
@@ -643,17 +637,6 @@ Expr* expr_parse(void)
 	Expr* self = OBJ_NEW(Expr);
 	bool is_const_expr = false;
 
-#if 0
-	// remove Constant Expression operator
-	if (sym.tok == TK_CONST_EXPR)		/* leading '#' : ignore relocatable address expression */
-	{
-		Str_append_n(self->text, sym.tstart, sym.tlen);
-
-		GetSym();
-		is_const_expr = true;
-}
-#endif
-
 	if (Expr_parse_ternary_cond(self))
 	{
 		/* convert to constant expression */
@@ -718,44 +701,6 @@ long Expr_eval(Expr* self, bool not_defined_error)
 	}
 
 	return Calc_pop();
-}
-
-/*-----------------------------------------------------------------------------
-*	parse and eval an expression, return false on result.not_evaluable
-*----------------------------------------------------------------------------*/
-static bool _expr_parse_eval(long* presult, bool not_defined_error)
-{
-	Expr* expr;
-	bool  failed;
-
-	*presult = 0;
-
-	expr = expr_parse();
-	if (expr == NULL)
-		return false;				/* error output by expr_parse() */
-
-	/* eval and discard expression */
-	*presult = Expr_eval(expr, not_defined_error);
-	failed = (expr->result.not_evaluable);
-	OBJ_DELETE(expr);
-
-	/* check errors */
-	if (failed)
-		return false;
-	else
-		return true;
-}
-
-bool expr_parse_eval(long* presult)
-{
-	return _expr_parse_eval(presult, true);
-}
-
-long expr_parse_eval_if(void)
-{
-	long result = 0;
-	_expr_parse_eval(&result, false);
-	return result;
 }
 
 /* check if all variables used in an expression are local to the same module
@@ -860,4 +805,3 @@ bool Expr_is_recusive(Expr* self, const char* name)
 	}
 	return false;
 }
-

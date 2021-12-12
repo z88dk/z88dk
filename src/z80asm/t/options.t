@@ -854,56 +854,6 @@ t_z80asm_ok(0, "
 	
 ), "-mr2ka");
 	
-# __CPU_xxx_contants___
-#------------------------------------------------------------------------------
-write_file("test.asm", <<END);
-	if __CPU_Z80__
-	defb 1
-	else 
-	if __CPU_Z80N__
-	defb 2
-	else
-	if __CPU_Z180__
-	defb 3
-	else
-	if __CPU_R2KA__
-	defb 4
-	else
-	if __CPU_R3K__
-	defb 5
-	else
-	defb 6
-	endif
-	endif
-	endif
-	endif
-	endif
-END
-
-unlink "test.bin";
-t_z80asm_capture('-b test.asm', "", "", 0);
-t_binary(read_binfile("test.bin"), "\1");
-
-unlink "test.bin";
-t_z80asm_capture('-mz80 -b test.asm', "", "", 0);
-t_binary(read_binfile("test.bin"), "\1");
-
-unlink "test.bin";
-t_z80asm_capture('-mz80n -b test.asm', "", "", 0);
-t_binary(read_binfile("test.bin"), "\2");
-
-unlink "test.bin";
-t_z80asm_capture('-mz180 -b test.asm', "", "", 0);
-t_binary(read_binfile("test.bin"), "\3");
-
-unlink "test.bin";
-t_z80asm_capture('-mr2ka -b test.asm', "", "", 0);
-t_binary(read_binfile("test.bin"), "\4");
-
-unlink "test.bin";
-t_z80asm_capture('-mr3k -b test.asm', "", "", 0);
-t_binary(read_binfile("test.bin"), "\5");
-
 #------------------------------------------------------------------------------
 # --
 #------------------------------------------------------------------------------

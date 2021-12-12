@@ -16,6 +16,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "listfile.h"
 #include "modlink.h"
 #include "options.h"
+#include "parse.h"
 #include "scan.h"
 #include "str.h"
 #include "strutil.h"
@@ -24,7 +25,6 @@ Repository: https://github.com/z88dk/z88dk
 #include "utstring.h"
 #include "z80asm.h"
 #include "zutils.h"
-
 #include <ctype.h>
 #include <limits.h>
 #include <stdio.h>
@@ -316,8 +316,6 @@ static void set_expr_env(Expr* expr, bool module_relative_addr)
 }
 
 static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
-	UT_string* expr_text_2;
-	utstring_new(expr_text_2);
 	const char* last_filename = spool_add(obj->filename);
 
 	while (true) {
@@ -339,20 +337,11 @@ static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
 		int code_pos = parse_word(obj);
 
 		const char* target_name = parse_wcount_str(obj);
-		const char* expr_text_1 = parse_wcount_str(obj);
+		const char* expr_text = parse_wcount_str(obj);
 
-		// call parser to interpret expression followed by newline
-		utstring_clear(expr_text_2);
-		utstring_printf(expr_text_2, "%s\n", expr_text_1);
-
-		SetTemporaryLine(utstring_body(expr_text_2));
-		found_EOL = false;                // reset end of line parsing flag - a line is to be parsed...
-		scan_expect_operands();
-		GetSym();
-
-		// parse expression and store in the list
+		// call parser to interpret expression
 		set_asmpc_env(CURRENTMODULE, section_name, source_filename, line_num, asmpc, false);
-		Expr* expr = expr_parse();
+		Expr* expr = parse_expr(expr_text);
 		if (expr) {
 			expr->range = 0;
 			switch (type) {
@@ -385,8 +374,6 @@ static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
 			ExprList_push(&exprs, expr);
 		}
 	}
-
-	utstring_free(expr_text_2);
 }
 
 // read all the modules' expressions to the given list, or to the module's if NULL

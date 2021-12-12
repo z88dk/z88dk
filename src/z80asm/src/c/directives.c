@@ -241,7 +241,7 @@ void asm_DEPHASE()
 *----------------------------------------------------------------------------*/
 void asm_INCLUDE(const char* filename)
 {
-	parse_include_file(filename);
+	parse_file(filename);
 }
 
 void asm_BINARY(const char* filename)
