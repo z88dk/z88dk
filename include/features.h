@@ -3707,7 +3707,7 @@
 #define HAVE_FGETC_CONS 1
 #define __HAVE_GETK 1
 // #define __HAVE_INKEY 0
-// #define __HAVE_ONEBITSOUND 0
+#define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
 // #define __HAVE_PSG_AY_WYZ 0
 // #define __HAVE_PSG_AY_VT2 0
@@ -3815,7 +3815,7 @@
 // #define HAVE_FGETC_CONS 0
 // #define __HAVE_GETK 0
 // #define __HAVE_INKEY 0
-// #define __HAVE_ONEBITSOUND 0
+#define __HAVE_ONEBITSOUND 1
 // #define __HAVE_PSG_AY 0
 // #define __HAVE_PSG_AY_WYZ 0
 // #define __HAVE_PSG_AY_VT2 0
