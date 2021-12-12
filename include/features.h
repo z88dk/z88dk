@@ -1678,8 +1678,8 @@
 // #define __HAVE_GFX_XORPLOT 0
 
 #elif defined(__KROKHA__)
-#define __HAVE_KEYBOARD 1
-#define HAVE_FGETC_CONS 1
+// #define __HAVE_KEYBOARD 0
+// #define HAVE_FGETC_CONS 0
 // #define __HAVE_GETK 0
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
