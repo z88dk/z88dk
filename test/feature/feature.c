@@ -12,7 +12,7 @@ int main()
    int  c;
 
    printf("x\n");
-#ifdef __HAVE_KEYBOARD
+#ifdef __HAVE_FGETC_CONS
    c = fgetc_cons();
  #ifdef __HAVE_GETK
    c = getk();
@@ -43,6 +43,9 @@ int main()
    fopen("asfsf","r");
    c = read(0, buf, 0);
    fclose(NULL);
+#endif
+#ifdef __HAVE_JOYSTICK
+   c = joystick(1);
 #endif
 }
 
