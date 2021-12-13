@@ -213,6 +213,12 @@ IF FORbondwell
         defc sndbit_mask   = $80
 ENDIF
 
+IF FORbondwell2
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
 IF FORpasopia7
     defc sndbit_port	= $30
     defc sndbit_bit    = 7

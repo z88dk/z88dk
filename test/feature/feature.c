@@ -46,6 +46,9 @@ int main()
 #endif
 #ifdef __HAVE_JOYSTICK
    c = joystick(1);
+   {
+     char *d = joystick_type[0];
+   }
 #endif
 }
 
