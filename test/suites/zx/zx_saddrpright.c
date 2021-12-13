@@ -18,14 +18,17 @@ static void dummy()
 }
 
 
-static void evaluate(int y) __z88dk_fastcall __naked
+static void evaluate(int a, int m)  __naked
 {
 #asm
-    push   hl    ; Save for later
-    ld     de,0
-    push   de
-    push   de
-    pop    bc
+    ld     ix,2
+    add    ix,sp
+    ld     e,(ix+0)
+    ld     d,0
+    ld     l,(ix+2)
+    ld     h,(ix+3)
+    ld     bc,0
+    push   bc
     pop    af
     call   old_zx_saddrpright
     ld     (_old_regs+0),bc
@@ -34,11 +37,14 @@ static void evaluate(int y) __z88dk_fastcall __naked
     push   af
     pop    hl
     ld     (_old_regs+6),hl
-    pop    hl   ;Get argument back again
-    ld     de,0
-    push   de
-    push   de
-    pop    bc
+    ld     ix,2
+    add    ix,sp
+    ld     e,(ix+0)
+    ld     d,0
+    ld     l,(ix+2)
+    ld     h,(ix+3)
+    ld     bc,0
+    push   bc
     pop    af
     call   asm_zx_saddrpright
     ld     (_new_regs+0),bc
@@ -53,12 +59,20 @@ static void evaluate(int y) __z88dk_fastcall __naked
 
 void test_func()
 {
-    int a;
-    for ( a = 16384; a < 22528; a++ ) {
-       evaluate(a);
+    int a = 16384;
+    int e;
+    
+    for ( e = 1; e < 256; e <<= 1 ) {
+       evaluate(a,e);
        compare(a);
     }
-
+    e = 1;
+    for ( a = 16385; a < 22528; a++ ) {
+       evaluate(a,e);
+       compare(a);
+       e <<= 1;
+       if ( e == 256 ) e = 1;
+    }
 }
 
 int suite_pix()
