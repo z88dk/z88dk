@@ -19,13 +19,6 @@ EXTERN asm0_zx_pxy2saddr
 
 asm_tshc_pxy2aaddr:
 
-   ld a,h
-   and $07
-
-IF __USE_SPECTRUM_128_SECOND_DFILE
-   or $e0
-ELSE
-   or $60
-ENDIF
+   scf
 
    jp asm0_zx_pxy2saddr
