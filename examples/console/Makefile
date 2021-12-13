@@ -7,7 +7,7 @@ include ../../support/multitarget_build/Makefile
 # Hello world 
 WORLD_TARGETS = abc80 abc800 ace adam alphatro altair8800 aquarius bee c128 c7420 coleco bit90 cpc cpm dai \
 	eg2000 enterprise fp1100 g800 gal gamegear gl  gl4000 gl6000  \
-	hemc hgmc homelab homelab2 kc kramermc lambda laser500 lviv lynx m5 m100 mc1000 mikro80 \
+	hemc hgmc homelab homelab2 kc kramermc lambda laser500 lviv lynx m5 m100 mc1000 micro8085 mikro80 \
 	msx mtx multi8 myvision mz mz2500 nascom nc newbrain ondra osca oz p2000 pacman pasopia7 pc6001 \
 	pencil2 pps primo pv1000  \
 	pv2000 rcmx000 rx78 sam sc3000 smc777 sms sos spc1000 special srr super80 super80_vduem svi svi_rom svi_rom318 test ti82 ti83 ti85 ti86 ti8x \
