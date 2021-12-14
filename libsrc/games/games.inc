@@ -69,9 +69,10 @@ IF FORz88
 ENDIF
 
 IF FORace
+        defc SOUND_INOUT = 1
         defc sndbit_port   = 254
-        defc sndbit_bit    = 3
-        defc sndbit_mask   = 8         ; (2^sndbit_bit)
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 1         ; (2^sndbit_bit)
 ENDIF
 
 IF FORaquarius

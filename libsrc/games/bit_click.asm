@@ -22,12 +22,11 @@ IF !__CPU_GBZ80__
     xor     sndbit_mask
     ld      (__snd_tick),a
 
-IF SOUND_INOUT
-    and     sndbit_mask
-    jr      z,set_out
-    in      a,(sndbit_port)
-    ret
-    out     (sndbit_port),a
+IF SOUND_INOUT = 1
+    jr nz,ASMPC+6
+    in  a,(sndbit_port)
+    jr  ASMPC+4
+    out  (sndbit_port),a
     ret
 ELIF sndbit_port > 255
   IF !__CPU_INTEL__	

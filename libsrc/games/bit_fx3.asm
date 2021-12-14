@@ -61,7 +61,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           pop     af
           xor     l
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
@@ -85,7 +92,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           pop     af
           xor     l
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
@@ -124,7 +138,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           pop     af
           xor     l
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
@@ -146,7 +167,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
           xor     sndbit_mask
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
@@ -180,7 +208,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           pop     af
           xor     b
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
@@ -215,7 +250,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           pop     af
           xor     l
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
@@ -249,12 +291,19 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr      nc,desc3
           xor     sndbit_mask
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
         ELIF sndbit_port < 0
-          ld  (-sndbit_port),a                   ;9 T slower
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -290,12 +339,19 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr      nc,hdesc3
           xor     sndbit_mask
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
         ELIF sndbit_port < 0
-          ld  (-sndbit_port),a                   ;9 T slower
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -328,12 +384,19 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr      c,asc3
           xor     sndbit_mask
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
         ELIF sndbit_port < 0
-          ld  (-sndbit_port),a                   ;9 T slower
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -366,12 +429,19 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           pop     af
           xor     l
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
         ELIF sndbit_port < 0
-          ld  (-sndbit_port),a                   ;9 T slower
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF

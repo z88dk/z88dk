@@ -82,7 +82,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           ld   a,(__snd_tick)
           xor  c
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx

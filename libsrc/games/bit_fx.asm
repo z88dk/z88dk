@@ -91,12 +91,20 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 .fx2      call  bit_open_di
           ld    e,150  
 .fx2_1
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          and  a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
         ELIF sndbit_port < 0
-          ld  (-sndbit_port),a                   ;9 T slower
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -138,7 +146,15 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           dec   hl  
 .zap0_2   djnz  zap0_2  
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          and  a
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
@@ -172,7 +188,15 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr      nz,clackson_jump
           xor     sndbit_mask
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          and  a
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;8 T slower
           exx
@@ -209,12 +233,19 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 .zap3_1   push  bc
           xor   sndbit_mask
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
         ELIF sndbit_port < 0
-          ld  (sndbit_port),a                   ;9 T slower
+          ld  (sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -228,7 +259,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           djnz  zap3_2
           xor   sndbit_mask
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
@@ -291,7 +329,15 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 .zap1_1   push  bc  
           xor   sndbit_mask  ;oscillate between high and low bits...
 
-        IF sndbit_port >= 256
+        IF SOUND_INOUT = 1
+          and  a
+          ld   c,a
+          jr nz,ASMPC+6
+          in  a,(sndbit_port)
+          jr  ASMPC+4
+          out  (sndbit_port),a
+          ld   a,c
+        ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
