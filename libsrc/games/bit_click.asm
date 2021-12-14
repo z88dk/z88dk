@@ -18,20 +18,27 @@ IF !__CPU_GBZ80__
 
 .bit_click
 ._bit_click
+    ld      a,(__snd_tick)
+    xor     sndbit_mask
+    ld      (__snd_tick),a
 
-          ld   a,(__snd_tick)
-          xor  sndbit_mask
-
-   IF sndbit_port > 255
-      IF !__CPU_INTEL__	
-          ld   bc,sndbit_port
-          out  (c),a
-      ENDIF
-   ELSE
-          out  (sndbit_port),a
-   ENDIF
-
-          ld   (__snd_tick),a
-          ret
+IF SOUND_INOUT
+    and     sndbit_mask
+    jr      z,set_out
+    in      a,(sndbit_port)
+    ret
+    out     (sndbit_port),a
+    ret
+ELIF sndbit_port > 255
+  IF !__CPU_INTEL__	
+    ld      bc,sndbit_port
+    out     (c),a
+  ENDIF
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
+    ret
 
 ENDIF

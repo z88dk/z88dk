@@ -95,6 +95,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a                   ;9 T slower
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -140,6 +142,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -160,7 +164,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           call  bit_open_di
 .clackson_LENGHT
           ld      b,90
-        IF sndbit_port <= 255
+        IF sndbit_port > 0 && sndbit_port <= 255
           ld      c,sndbit_port
         ENDIF
 .clackson_loop
@@ -172,6 +176,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;8 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a
         ELSE
           out  (c),a
         ENDIF
@@ -207,6 +213,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (sndbit_port),a                   ;9 T slower
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -224,6 +232,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -285,6 +295,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF

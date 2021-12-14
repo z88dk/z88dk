@@ -65,6 +65,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -87,6 +89,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -124,6 +128,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -144,6 +150,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -176,6 +184,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -209,6 +219,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -241,6 +253,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a                   ;9 T slower
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -280,6 +294,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a                   ;9 T slower
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -316,6 +332,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a                   ;9 T slower
         ELSE
           out  (sndbit_port),a
         ENDIF
@@ -352,6 +370,8 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           exx
           out  (c),a                   ;9 T slower
           exx
+        ELIF sndbit_port < 0
+          ld  (-sndbit_port),a                   ;9 T slower
         ELSE
           out  (sndbit_port),a
         ENDIF
