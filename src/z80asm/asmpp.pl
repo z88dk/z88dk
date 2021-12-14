@@ -452,7 +452,7 @@ sub convert_expr_it {
 							  split(//, $+{str} ) ) )
 			  }egxi;
 			s/\\(
-				(?:[arnt'"\\]) |               # Single char escapes
+				(?:[abenrt'"\\]) |             # Single char escapes
 				(?:[ul].) |                    # uc or lc next char
 				(?:x[0-9a-fA-F]{2}) |          # 2 digit hex escape
 				(?:x\{[0-9a-fA-F]+\}) |        # more than 2 digit hex
