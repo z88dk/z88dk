@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _ldexpf16
-EXTERN cm16_sdcc_ldexp
-defc _ldexpf16 = cm16_sdcc_ldexp
+defc _ldexpf16 = ldexpf16
 ENDIF
 

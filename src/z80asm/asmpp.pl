@@ -451,6 +451,14 @@ sub convert_expr_it {
 							  map {$_ eq '#' ? '1' : '0'}
 							  split(//, $+{str} ) ) )
 			  }egxi;
+			s/\\(
+				(?:[abenrt'"\\]) |             # Single char escapes
+				(?:[ul].) |                    # uc or lc next char
+				(?:x[0-9a-fA-F]{2}) |          # 2 digit hex escape
+				(?:x\{[0-9a-fA-F]+\}) |        # more than 2 digit hex
+				(?:\d{2,3}) |                  # octal
+				(?:N\{U\+[0-9a-fA-F]{2,4}\})   # unicode by hex
+				)/"qq|\\$1|"/geex;
 			s{ $QSTR_RE }{ join(",", map {ord} split(//, $+{str})) }egxi;
 			s/ (?| \b   ( \d [0-9A-F]* ) h \b 
 				 | \$   (    [0-9A-F]+ ) \b

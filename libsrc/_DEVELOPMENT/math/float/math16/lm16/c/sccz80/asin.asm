@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _asinf16
-EXTERN cm16_sdcc_asin
-defc _asinf16 = cm16_sdcc_asin
+defc _asinf16 = asinf16
 ENDIF
 

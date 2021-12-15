@@ -44,7 +44,7 @@ target/vz/games/bit_open_di
 target/vz/games/bit_close
 target/vz/games/bit_close_ei
 target/vz/games/joystick
-@games/games_mwr.lst
+@games/games.lst
 @input/input_keyboard.lst
 target/vz/vz_bgrd
 target/vz/vz_brick

@@ -21,24 +21,21 @@ asm_zx_saddr2py:
    ; exit  :  l = pixel y coordinate
    ;
    ; uses  : af, l
-   
-   ld a,l
-   rra
-   rra
-   and $38
-   ld l,a
-   
+
+   rr l
+   rr l ; L = XX'rrr'XXX (char *R*ow)
+
    ld a,h
    add a,a
    add a,a
    add a,a
+   xor h
    and $c0
-   or l
-   ld l,a
-   
-   ld a,h
-   and $07
-   or l
+   xor h ; A = tt'XXX'lll (*T*hird, *L*ine)
+
+   xor l
+   and $c7
+   xor l ; A = tt'rrr'lll
    ld l,a
 
 IF __SCCZ80

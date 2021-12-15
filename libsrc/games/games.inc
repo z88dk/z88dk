@@ -4,6 +4,11 @@
 ;       Written by Stefano Bodrato  1/10/2001
 ;       based on the Dominic's sound routines
 ;
+;       sndbit_port < 0 = memory based
+;       sndbit_port >= 256 = 16 bit io
+;       else 8 bit io
+;
+;       However.... SOUND_INOUT = toggle speaker with in/out (+ace only)
 ;
 ;       $Id: games.inc $
 ;
@@ -64,9 +69,10 @@ IF FORz88
 ENDIF
 
 IF FORace
+        defc SOUND_INOUT = 1
         defc sndbit_port   = 254
-        defc sndbit_bit    = 3
-        defc sndbit_mask   = 8         ; (2^sndbit_bit)
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 1         ; (2^sndbit_bit)
 ENDIF
 
 IF FORaquarius
@@ -153,19 +159,19 @@ IF FORvg5k
 ENDIF
 
 IF FORvz
-        defc sndbit_port   = 26624      ; this is a memory address, not a port !
+        defc sndbit_port   = -26624      ; this is a memory address, not a port !
         defc sndbit_bit    = 0
         defc sndbit_mask   = 33         ; bit 0 (Speaker A) and 5 (Speaker B)
 ENDIF
 
 IF FORlaser500
-        defc sndbit_port   = $6800 	; this is a memory address, not a port !
+        defc sndbit_port   = -$6800 	; this is a memory address, not a port !
         defc sndbit_bit    = 0
         defc sndbit_mask   = 1         ; bit 0 (Speaker A) and 5 (Speaker B)
 ENDIF
 
 IF FORgal
-        defc sndbit_port   = 8248       ; this is a memory address, not a port !
+        defc sndbit_port   = -8248       ; this is a memory address, not a port !
         defc sndbit_bit    = 2
         defc sndbit_mask   = @01000100
         ;defc sndbit_mask   = 4
@@ -213,6 +219,12 @@ IF FORbondwell
         defc sndbit_mask   = $80
 ENDIF
 
+IF FORbondwell2
+        defc sndbit_port   = 0
+        defc sndbit_bit    = 0
+        defc sndbit_mask   = 0
+ENDIF
+
 IF FORpasopia7
     defc sndbit_port	= $30
     defc sndbit_bit    = 7
@@ -239,7 +251,7 @@ IF FORgl
 ENDIF
 
 IF FORkrokha
-	defc	sndbit_port = 0xf7ff
+	defc	sndbit_port = -0xf7ff
 	defc	sndbit_bit = 1
 	defc	sndbit_mask = 2
 ENDIF

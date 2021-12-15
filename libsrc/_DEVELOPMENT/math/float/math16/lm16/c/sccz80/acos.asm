@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _acosf16
-EXTERN cm16_sdcc_acos
-defc _acosf16 = cm16_sdcc_acos
+defc _acosf16 = acosf16
 ENDIF
 

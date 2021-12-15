@@ -571,6 +571,13 @@ static int option_set(int pos, int max, char *argv[], option_t *option)
                 *(char **)(option->dest) = strdup(param);
             break;
 
+        case OPT_FUNCTION:
+            if (param) {
+                option_cb func = (option_cb)option->dest;
+                func(param);
+            }
+            break;
+
         case OPT_NONE:
             ret = pos;
             break;
@@ -611,6 +618,9 @@ static void option_print(char *execname, char *ident, char *copyright, char *des
             break;
         case OPT_STR:
             fprintf(stderr,"%s   --%-15s (string)  %s\n",optstr,opt->lopt,opt->desc);
+            break;
+        case OPT_FUNCTION:
+            fprintf(stderr,"%s   --%-15s (complex) %s\n",optstr,opt->lopt,opt->desc);
             break;
         case OPT_NONE:
             break;
