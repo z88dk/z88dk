@@ -16,28 +16,22 @@ EXTERN ide_read_byte
 
 ; load the IDE status register and if there is an error noted,
 ; then load the IDE error register to provide details.
-
+; Uses AF, DE
 ; Carry is set on no error.
 
-ide_test_error:
-    push af
-    ld a, __IO_IDE_ALT_STATUS    ;select status register
-    call ide_read_byte      ;get status in A
-    bit 0, a                ;test ERR bit
-    jr z, ide_test_success
-    bit 5, a
-    jr nz, ide_test2        ;test write error bit
-    
-    ld a, __IO_IDE_ERROR    ;select error register
-    call ide_read_byte      ;get error register in a
-ide_test2:
-    inc sp                  ;pop old af
-    inc sp
-    or a                    ;make carry flag zero = error!
-    ret                     ;if a = 0, ide write busy timed out
+.ide_test_error
+    ld a,__IO_IDE_ALT_STATUS    ;select status register
+    call ide_read_byte          ;get status in A
+    and 00000001b               ;test ERR bit
+    scf                         ;set carry flag on success
+    ret Z                       ;return with carry set
 
-ide_test_success:
-    pop af
-    scf                     ;set carry flag on success
-    ret
+    ld a,e                      ;get byte from alternate ide_read_byte return
+    and 00100000b               ;test write error bit
+    ret Z                       ;return carry clear, a = 0, ide write busy timed out
+
+    ld a,__IO_IDE_ERROR         ;select error register
+    call ide_read_byte          ;get error register in a
+    or a                        ;make carry flag zero = error!
+    ret                         ;if a = 0, ide write busy timed out
 

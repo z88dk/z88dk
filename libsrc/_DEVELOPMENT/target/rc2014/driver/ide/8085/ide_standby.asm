@@ -15,26 +15,14 @@ EXTERN ide_write_byte
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called by
 ; the main program.
-
+; Uses AF, DE
 ; tell the drive to spin down though standby command
 
-ide_standby:
-    push af
-    push de
+.ide_standby
     call ide_wait_ready
-    jr nc, error
-    ld e, __IDE_CMD_STANDBY
-    ld a, __IO_IDE_COMMAND
+    jp NC,ide_test_error        ;carry = 0 on return = operation failed
+
+    ld e,__IDE_CMD_STANDBY
+    ld a,__IO_IDE_COMMAND
     call ide_write_byte
-    call ide_wait_ready
-    jr nc, error
-    pop de 
-    pop af
-    scf                     ;carry = 1 on return = operation ok
-    ret
-
-error:
-    pop de 
-    pop af
-    jp ide_test_error       ;carry = 0 on return = operation failed
-
+    jp ide_wait_ready           ;carry set on return = operation ok

@@ -1,7 +1,7 @@
-target/rc2014/driver/ram/c/sccz80/shadow_read
-target/rc2014/driver/ram/c/sccz80/shadow_read_callee
-target/rc2014/driver/ram/c/sccz80/shadow_write
-target/rc2014/driver/ram/c/sccz80/shadow_write_callee
-target/rc2014/driver/ram/c/sccz80/shadow_relocate
+_DEVELOPMENT/target/rc2014/driver/ram/c/sccz80/shadow_read
+_DEVELOPMENT/target/rc2014/driver/ram/c/sccz80/shadow_read_callee
+_DEVELOPMENT/target/rc2014/driver/ram/c/sccz80/shadow_write
+_DEVELOPMENT/target/rc2014/driver/ram/c/sccz80/shadow_write_callee
+_DEVELOPMENT/target/rc2014/driver/ram/c/sccz80/shadow_relocate
 
-@target/rc2014/driver/ram/ram_8085_asm.lst
+@_DEVELOPMENT/target/rc2014/driver/ram/ram_8085_asm.lst

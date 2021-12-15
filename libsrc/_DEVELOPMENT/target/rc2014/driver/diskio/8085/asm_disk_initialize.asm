@@ -20,38 +20,29 @@ EXTERN ide_init
 
 ; initialize the ide drive
 
-asm_disk_initialize:
-    push af
-    xor a       ; clear a
-    or l        ; check that that it is drive 0
-    jr nz, sta_nodisk
+.asm_disk_initialize
+    xor a                       ; clear a
+    or l                        ; check that that it is drive 0
+    jr NZ,sta_nodisk
 
-    ; hard reset the drive
-    call ide_hard_reset
-    jr nc, sta_noinit
+    call ide_hard_reset         ; hard reset the drive
+    jr NC,sta_noinit
 
-    ; soft reset the drive
-    call ide_soft_reset
-    jr nc, sta_noinit
+    call ide_soft_reset         ; soft reset the drive
+    jr NC,sta_noinit
 
-    ;initialize the drive. If there is no drive, this may hang
-    call ide_init
-    jr nc, sta_noinit
+    call ide_init               ; initialize the drive. If there is no drive, this may hang
+    jr NC,sta_noinit
 
-    ld hl, 0            ; set DSTATUS OK
-    pop af
-    scf                 
+    ld hl,0                     ; set DSTATUS OK
+    scf
     ret
 
-sta_noinit:
-    ld hl, 1            ; set DSTATUS STA_NOINIT
-    pop af
-    or a
+.sta_noinit
+    ld hl,1                     ; set DSTATUS STA_NOINIT
     ret
 
-sta_nodisk:
-    ld hl, 2            ; set DSTATUS STA_NODISK
-    pop af
-    or a
+.sta_nodisk
+    ld hl,2                     ; set DSTATUS STA_NODISK
     ret
 

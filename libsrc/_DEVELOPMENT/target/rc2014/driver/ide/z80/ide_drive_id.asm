@@ -15,8 +15,6 @@ EXTERN ide_test_error
 EXTERN ide_write_byte
 EXTERN ide_read_block
 
-EXTERN ideBuffer
-
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called by
 ; the main program.

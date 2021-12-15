@@ -1,8 +1,6 @@
-target/rc2014/driver/diskio/c/sccz80/disk_initialize
 target/rc2014/driver/diskio/c/sccz80/disk_initialize_fastcall
 target/rc2014/driver/diskio/c/sccz80/disk_ioctl
 target/rc2014/driver/diskio/c/sccz80/disk_ioctl_callee
-target/rc2014/driver/diskio/c/sccz80/disk_status
 target/rc2014/driver/diskio/c/sccz80/disk_status_fastcall
 target/rc2014/driver/diskio/c/sccz80/disk_read
 target/rc2014/driver/diskio/c/sccz80/disk_read_callee

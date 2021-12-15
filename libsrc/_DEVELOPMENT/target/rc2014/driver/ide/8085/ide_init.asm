@@ -12,22 +12,14 @@ EXTERN ide_test_error
 
 EXTERN ide_write_byte
 
-EXTERN ideStatus
-
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called by
 ; the main program.
-
+; Uses AF, DE
 ; initialize the ide drive
 
-ide_init:
-    push af
-    push de
-    xor a
-    ld (ideStatus), a       ;set master device
-    ld e, 11100000b
-    ld a, __IO_IDE_HEAD
-    call ide_write_byte     ;select the master device, LBA mode
-    pop de 
-    pop af
-    jp ide_wait_ready
+.ide_init
+    ld e,11100000b
+    ld a,__IO_IDE_HEAD
+    call ide_write_byte         ;select the master device, LBA mode
+    jp ide_wait_ready           ;carry set on return = operation ok

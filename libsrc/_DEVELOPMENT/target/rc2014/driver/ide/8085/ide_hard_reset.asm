@@ -17,26 +17,26 @@ EXTERN ide_wait_ready
 ; do a hard reset on the drive, by pulsing its reset pin.
 ; do this first, and if a soft reset doesn't work.
 ; this should be followed with a call to "ide_init".
+; uses AF, DE
 
-ide_hard_reset:
-    push af
-    push bc
-    ld bc, __IO_PIO_IDE_CONFIG
-    ld a, __IO_PIO_IDE_RD
-    out (c), a          ;config 8255 chip, read mode
-    ld bc, __IO_PIO_IDE_CTL
-    ld a, __IO_IDE_RST_LINE
-    out (c),a           ;hard reset the disk drive
-    ld b, $0
-ide_rst_dly:
-    djnz ide_rst_dly    ;delay 256 nop 150us (reset minimum 25us)
-    ld bc, __IO_PIO_IDE_CTL
-    xor a
-    out (c),a           ;no ide control lines asserted
-    ld b, $0
-ide_rst_dly2:
-    djnz ide_rst_dly2   ;delay 256 nop 150us
-    pop bc
-    pop af
-    jp ide_wait_ready
+.ide_hard_reset
+    ld a,__IO_PIO_IDE_RD
+    out (__IO_PIO_IDE_CONFIG),a ;config 8255 chip, read mode
+
+    ld a,__IO_IDE_RST_LINE
+    out (__IO_PIO_IDE_CTL),a    ;hard reset the disk drive
+
+    xor a                       ;keep iterative count in A
+.ide_rst_dly
+    dec a
+    jp NZ,ide_rst_dly           ;delay 256 nop 150us (reset minimum 25us)
+
+;   xor a
+    out (__IO_PIO_IDE_CTL),a    ;no ide control lines asserted
+
+.ide_rst_dly2
+    dec a
+    jp NZ,ide_rst_dly2          ;delay 256 nop 150us
+
+    jp ide_wait_ready           ;carry set on return = operation ok
 
