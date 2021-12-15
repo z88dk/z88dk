@@ -82,6 +82,25 @@ bool starts_with_hash(const string& line) {
 	*/
 }
 
+bool remove_final_backslash(string& line) {
+	const char* p = line.c_str();
+	const char* YYMARKER{ nullptr };
+	while (true) {
+		size_t parsed_len = p - line.c_str();
+		/*!re2c
+			end					{ return false; }
+			';' [^\r\n\000]*	{ return false; }
+			"'"  qchar* "'" |
+			'"' qqchar* '"' |
+			operand         	{ continue; }
+			'\\' nl? end		{ line.erase(parsed_len);
+								  line.push_back(' ');
+								  return true; }
+			*					{ continue; }
+		*/
+	}
+}
+
 void split_lines(deque<string>& lines, const string& line) {
 	string output;
 	const char* YYMARKER{ nullptr };
@@ -579,7 +598,7 @@ void PreprocFilter::parse_params(shared_ptr<Macro> macro) {
 	while (true) {
 		const char* p0 = p;
 		/*!re2c
-			_				{ continue; }
+			__				{ continue; }
 			ident_prefix? ident {
 							  string name = string(p0, p);
 							  macro->push_arg(name);

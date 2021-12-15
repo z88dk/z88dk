@@ -10,9 +10,14 @@
 #include <string>
 using namespace std;
 
-// std::filesystem from C++17
-#include <filesystem>
-namespace fs = std::filesystem;
+#if __has_include(<filesystem>)
+	// std::filesystem from C++17
+	#include <filesystem>
+	namespace fs = std::filesystem;
+#else
+	#include <experimental/filesystem>
+	namespace fs = std::experimental::filesystem;
+#endif
 
 // change case
 string str_tolower(string str);
