@@ -34,6 +34,6 @@ target/laser500/games/bit_open
 target/laser500/games/bit_close
 target/laser500/games/joystick
 target/laser500/games/keys_joystick
-@games/games_mwr.lst
+@games/games.lst
 games/obj/laser500/joystick_type
 

@@ -47,7 +47,7 @@ target/gal/games/bit_open_di
 target/gal/games/bit_close
 target/gal/games/bit_close_ei
 target/gal/games/joystick
-@games/games_mwr.lst
+@games/games.lst
 target/gal/psg/set_psg
 target/gal/psg/set_psg_callee
 target/gal/psg/get_psg
