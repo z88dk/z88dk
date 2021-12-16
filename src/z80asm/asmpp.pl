@@ -44,6 +44,7 @@ our %MACRO;			# macros { args, local, lines }
 our %DEFL;			# variable-value macros
 our $DEFL_RE;		# match any DEFL name
 our $UCASE;			# if true all text is capitalized on reading from file
+our $VERBOSE;		# output additional information
 
 our $NAME_RE = 
 	qr/ [_a-z]  \w* /ix;
@@ -337,7 +338,7 @@ sub parse_include_it {
 		sub {
 			defined(my $line = <$in>) or return;
 			if ( $line->{text} =~ 
-				/^ [\#\*]? \s* INCLUDE \s+ $QFILE_RE /ix ) {
+				/^ \s* [\#\*]? \s* INCLUDE \s+ $QFILE_RE /ix ) {
 				return parse_include_it(read_file_it($1));
 			}
 			return $line;
@@ -618,7 +619,9 @@ sub assemble_file {
 	
 	# assemble, translate error messages
 	my @cmd = ('z88dk-z80asm', @OPTIONS, $i_file);
-	print "@cmd\n";
+	if ($VERBOSE) {
+		print "@cmd\n";
+	}
 	$cmd[0] = $FindBin::Bin.'/z88dk-z80asm';
 	my ($stdout, $stderr, $exit) = capture {
 		system @cmd;
@@ -638,9 +641,12 @@ while (@ARGV && $ARGV[0] =~ /^-/) {
 	if    (/^-I(.*)/ ) {					add_path($1); }
 	elsif (/^-D($NAME_RE)(?:=(.*))?/ ) {	define_defl(uc($1), $2 || 1); }
 	elsif (/^--ucase$/ ) {					$UCASE = 1; }
+	elsif (/^-c$/ ) {						; } # ignore -c (for cmake)
+	elsif (/^-o$/ ) { $_ = shift;			push @OPTIONS, "-o$_"; } # remove <space> between -o and file name
+	elsif (/^-v$/ ) {						$VERBOSE = 1; } # only be noisy if asked
 	else {									push @OPTIONS, $_; }
 }
 
-@ARGV or die "Usage: ", basename($0), " [-Ipath][-Dvar[=value]] FILE...\n";
+@ARGV or die "Usage: ", basename($0), " [-Ipath][-Dvar[=value]][-v][--ucase] FILE...\n";
 assemble_file($_) for @ARGV;
 exit 0;
