@@ -1,4 +1,4 @@
-INCLUDE "config_private.inc"
+INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
 
 SECTION data_driver
 

@@ -1,7 +1,6 @@
 
-    INCLUDE "config_private.inc"
+    INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
 
-    SECTION code_driver
 
     PUBLIC _acia_interrupt
     
@@ -91,7 +90,7 @@ ENDIF
         pop af
 
         ei
-        reti
+        ret
 
     EXTERN _acia_need
     defc NEED = _acia_need
