@@ -179,7 +179,7 @@ EXTERN ideBuffer
     jr dresult_ok
 
 .dresult_par_error
-    ld hl, 4                    ; set DRESULT RES_PARERR
+    ld hl,4                     ; set DRESULT RES_PARERR
     pop de
     or a
     ret

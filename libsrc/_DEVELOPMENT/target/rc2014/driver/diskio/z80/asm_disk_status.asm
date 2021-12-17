@@ -16,20 +16,16 @@ PUBLIC asm_disk_status
 
 ; get the ide drive status
 
-asm_disk_status:
-    push af
-    xor a           ; clear a
-    or l            ; check that that it is drive 0
-    jr nz, sta_nodisk
+.asm_disk_status
+    xor a                       ; clear a
+    or l                        ; check that that it is drive 0
+    jr NZ,sta_nodisk
 
-    ld hl, 0        ; set DSTATUS OK
-    pop af
+    ld hl,0                     ; set DSTATUS OK
     scf
     ret
 
-sta_nodisk:
-    ld hl, 2        ; set DSTATUS STA_NODISK
-    pop af
-    or a
+.sta_nodisk
+    ld hl,2                     ; set DSTATUS STA_NODISK
     ret
 

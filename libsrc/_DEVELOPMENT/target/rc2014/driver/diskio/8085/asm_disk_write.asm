@@ -42,6 +42,7 @@ EXTERN ide_write_sector
 
     inc de                      ; increment the LBA lower word
     jp NK,loop                  ; lower de word no overflow, therefore no carry to bc
+
     inc bc                      ; otherwise increment LBA upper word
     jp loop
 
