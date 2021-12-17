@@ -1,0 +1,15 @@
+_DEVELOPMENT/target/rc2014/driver/ide/8080/__ide_data
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_wait_ready
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_wait_drq
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_test_error
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_setup_lba
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_hard_reset
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_soft_reset
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_init
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_drive_id
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_idle
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_standby
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_sleep
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_cache_flush
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_read_sector
+_DEVELOPMENT/target/rc2014/driver/ide/8080/ide_write_sector

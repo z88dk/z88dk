@@ -21,13 +21,14 @@ EXTERN asm_disk_ioctl
 
 disk_ioctl_callee:
 
-    pop af
-    pop hl
-    pop de
-    pop bc
+    pop de                      ; pop return
 
-    push af
+    pop hl                      ; pop buffer
+    pop bc                      ; pop cmd
+    ld a,c
+    pop bc                      ; pop pdrv
+    ld b,a
 
-    ld b, e
+    push de                     ; push return
 
     jp asm_disk_ioctl

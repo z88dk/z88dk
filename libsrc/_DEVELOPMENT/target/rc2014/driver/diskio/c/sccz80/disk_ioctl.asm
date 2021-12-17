@@ -21,15 +21,17 @@ EXTERN asm_disk_ioctl
 
 disk_ioctl:
 
-    pop af
+    inc sp
+    inc sp
     pop hl
     pop de
     pop bc
     push bc
     push de
     push hl
-    push af
+    dec sp
+    dec sp
 
-    ld b, e
+    ld b,e
 
     jp asm_disk_ioctl

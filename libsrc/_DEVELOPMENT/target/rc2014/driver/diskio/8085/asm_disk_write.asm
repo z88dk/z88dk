@@ -26,8 +26,8 @@ EXTERN ide_write_sector
     or a                        ; check sectors != 0
     jr Z,dresult_error
 
-    push af                     ; save number of sectors
 .loop
+    push af                     ; save number of sectors
     push bc                     ; save LBA
     push de
     call ide_write_sector       ; with the logical block address in bcde, write one sector
@@ -40,11 +40,8 @@ EXTERN ide_write_sector
     dec a
     jr Z,dresult_ok
 
-    push af                     ; save number of sectors, free a for LBA increment testing
     inc de                      ; increment the LBA lower word
-    ld a,e
-    or a,d                      ; lower de word non-zero, therefore no carry to bc
-    jp NZ,loop
+    jp NK,loop                  ; lower de word no overflow, therefore no carry to bc
 
     inc bc                      ; otherwise increment LBA upper word
     jp loop
