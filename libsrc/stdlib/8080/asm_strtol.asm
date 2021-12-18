@@ -7,7 +7,7 @@
 ; long result in dehl
 
 	SECTION	code_clib
-	PUBLIC	asm_strtol
+	PUBLIC	asm_strtol, asm_strtoul
 	EXTERN	l_long_neg, l_long_mult, asm_isspace
 
 
