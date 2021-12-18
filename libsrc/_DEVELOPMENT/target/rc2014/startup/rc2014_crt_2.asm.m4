@@ -171,7 +171,14 @@ ENDIF
 ; the compiled program and the stack pointer
 
 IF DEFINED_USING_amalloc
+
+    EXTERN  __BSS_END_tail
+
+    ld hl,__BSS_END_tail
+    ld (_heap),hl
+
     include "../../../../../lib/crt/classic/crt_init_amalloc.asm"
+
 ENDIF
 
    ; command line
@@ -258,13 +265,6 @@ IF CRT_ENABLE_STDIO = 1
     ld (hl),21                  ; stdout
     ld hl,__sgoioblk+22
     ld (hl),21                  ; stderr
-ENDIF
-
-IF DEFINED_USING_amalloc
-    EXTERN  __BSS_END_tail
-
-    ld hl,__BSS_END_tail
-    ld (_heap),hl
 ENDIF
 
     ; copy interrupt vector table to final location

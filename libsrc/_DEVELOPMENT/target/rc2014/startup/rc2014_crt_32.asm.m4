@@ -161,7 +161,14 @@ ENDIF
 ; the compiled program and the stack pointer
 
 IF DEFINED_USING_amalloc
+
+    EXTERN  __BSS_END_tail
+
+    ld hl,__BSS_END_tail
+    ld (_heap),hl
+
     include "../../../../../lib/crt/classic/crt_init_amalloc.asm"
+
 ENDIF
 
    ; command line
