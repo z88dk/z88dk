@@ -195,11 +195,7 @@ bool LineSplitFilter::get_source_line(string& line) {
 		line += this_line;
 		first_line = false;
 
-		if (str_ends_with(line, "\\\n")) {
-			line.erase(line.length() - 2);
-			line.push_back(' ');
-		}
-		else
+		if (!remove_final_backslash(line)) 
 			break;
 	}
 	return true;
