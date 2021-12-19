@@ -245,9 +245,11 @@ IF __crt_initialize_bss = 1
     inc hl
     dec bc
     jp NK,init_bss_8085
+
 ENDIF
 
 IF CRT_ENABLE_STDIO = 1
+
     ; Setup std* streams
     ld hl,__sgoioblk+2
     ld (hl),19                  ; stdin
@@ -255,13 +257,7 @@ IF CRT_ENABLE_STDIO = 1
     ld (hl),21                  ; stdout
     ld hl,__sgoioblk+22
     ld (hl),21                  ; stderr
-ENDIF
 
-IF DEFINED_USING_amalloc
-    EXTERN  __BSS_END_tail
-
-    ld hl,__BSS_END_tail
-    ld (_heap),hl
 ENDIF
 
     ; copy interrupt vector table to final location
