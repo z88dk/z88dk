@@ -35,7 +35,7 @@ char *fgets_cons(char *str, size_t max)
     int c;
     int ptr;
 
-    ptr=0;
+    ptr = 0;
 
     docursor();
     while (ptr < max - 1) {
@@ -44,34 +44,40 @@ char *fgets_cons(char *str, size_t max)
         if (c == KEY_CAPS_LOCK)
         {
             _cons_state ^= 1; // Toggle caps lock
-        }
-        else if ( c == KEY_DEL)
+
+        } else if ( c == KEY_DEL)
         {
             if ( ptr > 0 )
             {
                 if ( CLIB_DISABLE_FGETS_CURSOR == 0 ) {
-                    fgets_cons_erase_character('_');
+                    fgets_cons_erase_character(' ');
                 }
-                fgets_cons_erase_character(str[--ptr]);
-                str[ptr] = 0;
+
+                fgets_cons_erase_character(' ');
+                str[--ptr] = 0;
+
                 docursor();
             }
         } else if (c == 4 || c == -1)
         {
-            break;
+            return ptr ? str : NULL;
         } else
         {
             if (_cons_state)
                 c = toupper(c);
 
-            str[ptr++] = c;
-            str[ptr] = 0;
+            str[ptr] = c;
+            str[++ptr] = 0;
+
             if ( CLIB_DISABLE_FGETS_CURSOR == 0 ) {
-                fgets_cons_erase_character('_');
+                fgets_cons_erase_character(' ');
             }
+
             fputc_cons(c);
+
             if (c == '\n' || c == '\r')
-                break;
+                return ptr ? str : NULL;
+
             docursor();
         }
     }
