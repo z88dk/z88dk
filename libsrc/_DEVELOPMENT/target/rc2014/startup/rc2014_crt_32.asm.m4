@@ -156,21 +156,6 @@ ENDIF
 
     include "../crt_init_sp.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-
-IF DEFINED_USING_amalloc
-
-    EXTERN  __BSS_END_tail
-
-    ld hl,__BSS_END_tail
-    ld (_heap),hl
-
-    include "../../../../../lib/crt/classic/crt_init_amalloc.asm"
-
-ENDIF
-
    ; command line
 
 IF (__crt_enable_commandline = 1) || (__crt_enable_commandline >= 3)
@@ -263,6 +248,21 @@ ENDIF
     ; copy interrupt vector table to final location
 
     include "../crt_set_interrupt_mode.inc"
+
+IF DEFINED_USING_amalloc
+    
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of
+; the compiled program and the stack pointer
+
+    EXTERN  __BSS_END_tail
+
+    ld hl,__BSS_END_tail
+    ld (_heap),hl
+
+    include "../../../../../lib/crt/classic/crt_init_amalloc.asm"
+
+ENDIF
 
 SECTION code_crt_init           ; user and library initialization
 
