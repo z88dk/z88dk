@@ -50,17 +50,17 @@ char *fgets_cons(char *str, size_t max)
             if ( ptr > 0 )
             {
                 if ( CLIB_DISABLE_FGETS_CURSOR == 0 ) {
-                    fgets_cons_erase_character(' ');
+                    fgets_cons_erase_character('_');
                 }
-
-                fgets_cons_erase_character(' ');
-                str[--ptr] = 0;
-
+                fgets_cons_erase_character(str[--ptr]);
+                str[ptr] = 0;
                 docursor();
             }
+
         } else if (c == 4 || c == -1)
         {
-            return ptr ? str : NULL;
+            break;
+
         } else
         {
             if (_cons_state)
@@ -68,16 +68,12 @@ char *fgets_cons(char *str, size_t max)
 
             str[ptr] = c;
             str[++ptr] = 0;
-
             if ( CLIB_DISABLE_FGETS_CURSOR == 0 ) {
-                fgets_cons_erase_character(' ');
+                fgets_cons_erase_character('_');
             }
-
             fputc_cons(c);
-
             if (c == '\n' || c == '\r')
-                return ptr ? str : NULL;
-
+                break;
             docursor();
         }
     }
