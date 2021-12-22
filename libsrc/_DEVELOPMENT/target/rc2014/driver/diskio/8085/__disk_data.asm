@@ -1,5 +1,5 @@
 
-SECTION data_driver
+SECTION bss_driver
 
 PUBLIC ideBuffer
 
