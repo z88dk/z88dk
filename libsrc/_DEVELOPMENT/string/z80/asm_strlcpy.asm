@@ -66,6 +66,7 @@ ELSE
    xor a
 
 cpyloop:
+   cp (hl)                     ; end of src ?
    ldi                         ; copy src byte to dst
    jp PE,cpyloop
 
