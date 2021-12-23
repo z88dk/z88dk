@@ -105,7 +105,7 @@ IF __CPU_8080__
    ld  a,h
    sbc b
    ld  h,a
-IF __CPU_8085__
+ELIF __CPU_8085__
    sub hl,bc
 ELSE
    sbc hl,bc
@@ -131,7 +131,7 @@ IF __CPU_8080__
    ld  a,h
    sbc b
    ld  h,a
-IF __CPU_8085__
+ELIF __CPU_8085__
    sub hl,bc
 ELSE
    sbc hl,bc                   ; hl = strlen(s2)

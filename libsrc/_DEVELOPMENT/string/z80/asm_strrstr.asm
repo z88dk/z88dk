@@ -36,59 +36,57 @@ asm_strrstr:
    ; uses  : af, bc, de, hl
    
    ; first find end of s and len(s)
-   
+
    xor a
    ld c,a
    ld b,a
-IF __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    EXTERN __z80asm__cpir
    call __z80asm__cpir
 ELSE
    cpir
 ENDIF
    dec hl
-   
+
    ; de = char *w
    ; hl = & terminating 0 in s
    ; bc = -(length of s) - 1
-   
+
    ; degenerate case
-   
+
    ld a,(de)
    or a
-   ret z
-   
-loop1:
+   ret Z
 
+loop1:
    dec hl
    inc bc
-   
+
    ld a,b
    or c
-   
-   jp z, error_zc              ; if no match
-   
+
+   jp Z,error_zc               ; if no match
+
    ld a,(de)
    cp (hl)
-   
-   jr nz, loop1
-   
+
+   jr NZ,loop1
+
    push hl                     ; save s
    push de                     ; save w
-   
-loop2:
 
+loop2:
    inc de
-   
+
    ld a,(de)
    or a
-   
-   jr z, match
+
+   jr Z,match
    inc hl
-   
+
    cp (hl)
-   jr z, loop2
-   
+   jr Z,loop2
+
    pop de
    pop hl
    

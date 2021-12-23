@@ -32,12 +32,12 @@ loop:
 
    ld a,(hl)
    or a                        ; reached end of s?
-   ret z
-   
+   ret Z
+
    inc hl
-   
+
    call asm_isspace
-   jr nc, loop
+   jr NC,loop
 
    dec hl
    ret

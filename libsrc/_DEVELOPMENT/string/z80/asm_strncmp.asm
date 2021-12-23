@@ -41,22 +41,22 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    cp (hl)
    inc hl
    dec bc
-   jr  nz,different
+   jr  NZ,different
    and a
-   jr z,equal
+   jr Z,equal
    ld a,b
    or c
-   jr z,equal
+   jr Z,equal
    inc de
    jr loop
 ELSE
    cpi                         ; *s1 - *s2
-   jr nz, different
-   jp po, equal
+   jr NZ,different
+   jp PO,equal
    inc de
 
    or a
-   jr nz, loop
+   jr NZ,loop
 
    dec de
 

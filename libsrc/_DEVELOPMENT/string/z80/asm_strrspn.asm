@@ -50,36 +50,36 @@ asm_strrspn:
 
    call __str_locate_nul       ; hl points at terminating 0 in str
    call l_neg_bc               ; bc = strlen(str) + 1
-   
+
    ld a,(de)
    or a
-   jr z, empty_cset
+   jr Z,empty_cset
 
 loop:
 
    dec bc                      ; position of next char in str
-   
+
    ld a,b
    or c
-   jr z, all_in_cset
+   jr Z,all_in_cset
 
    dec hl                      ; & next char in str to check
 
    push bc
    push hl
-   
+
    ; see if current char from string is in cset
-   
+
    ld c,(hl)
-   
+
    ld hl,de                    ; hl = cset
-   
+
    call asm_strchr             ; carry reset if in cset
-   
+
    pop hl
    pop bc
-   
-   jr nc, loop                 ; loop if char in cset
+
+   jr NC,loop                  ; loop if char in cset
 
 not_in_cset:
 

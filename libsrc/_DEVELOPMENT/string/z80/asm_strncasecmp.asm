@@ -47,44 +47,44 @@ loop:
 IF __CPU_Z180__ | __CPU_R2KA__ | __CPU_R3K__ | __CPU_INTEL__ | __CPU_GBZ80__ | __CLASSIC
 
    push hl
-   
+
    ld l,a
-   
+
    ld a,(de)
    call asm_tolower
-   
+
    cp l
-   jr nz, different
-   
+   jr NZ,different
+
    pop hl
 
 ELSE
 
    ld ixl,a                  ; ixl = *s2
-   
+
    ld a,(de)
    call asm_tolower
-   
+
    cp ixl                    ; *s1 - *s2
-   jr nz, different
+   jr NZ,different
 
 ENDIF
 
    inc de
    inc hl
    dec bc
-   
+
    or a                      ; end of string?         
    jr nz, loop
-   
+
    dec de
 
 equal:                       ; both strings ended same time
 
    ld l,a
    ld h,a
-   ret 
-   
+   ret
+
 different:
 
 IF __CPU_Z180__ | __CPU_R2KA__ | __CPU_R3K__ | __CPU_INTEL__ | __CPU_GBZ80__ | __CLASSIC

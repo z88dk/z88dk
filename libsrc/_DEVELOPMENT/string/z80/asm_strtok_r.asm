@@ -78,13 +78,13 @@ have_string:
    pop bc
    push hl                     ; save start of token
    push bc                     ; save state
-   
+
    call asm_strpbrk            ; hl = ptr to delim char in string
    jr C,token_toend            ; if token extends to end of string (hl=0)
 
    ld (hl),0                   ; terminate token with NUL
    inc hl                      ; start point for next token
-   
+
 token_toend:
 
    pop bc                      ; bc = state = char **lasts

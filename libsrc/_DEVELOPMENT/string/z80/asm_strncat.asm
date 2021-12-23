@@ -50,20 +50,22 @@ loop:                          ; append src to dst
 IF __CPU_INTEL__ || __CPU_GBZ80__
    ld a,(hl)
    and a
-   jr z,done
+   jr Z,done
    ld (de),a
    inc hl
    inc de
+
    dec bc
    ld a,b
    or c
    jr nz,loop
+
 ELSE
    cp (hl)
-   jr z, done
-      
+   jr Z,done
+
    ldi
-   jp pe, loop
+   jp PE,loop
 ENDIF
 
    scf

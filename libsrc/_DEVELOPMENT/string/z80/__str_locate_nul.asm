@@ -28,7 +28,7 @@ loop:
    ld a,b
    or c
    jr NZ,loop
-   and a
+
 ELSE
    cpir
 ENDIF

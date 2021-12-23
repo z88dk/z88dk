@@ -54,8 +54,8 @@ loop:
    jr loop
 
 end_string:
-
    pop bc
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
    ld  a,l
    sub c
@@ -71,7 +71,6 @@ ENDIF
    ret
 
 done:
-
    pop bc
 
 IF __CPU_INTEL__ || __CPU_GBZ80__

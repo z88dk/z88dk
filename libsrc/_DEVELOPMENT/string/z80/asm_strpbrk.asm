@@ -39,7 +39,7 @@ loop:
 
    ld a,(hl)
    or a
-   jp z, error_zc
+   jp Z,error_zc
    
    ; see if this char from string is in needles
    
