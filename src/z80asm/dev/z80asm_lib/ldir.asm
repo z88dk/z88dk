@@ -7,6 +7,9 @@
 
 __z80asm__ldir:
         push    af
+        dec     bc
+        inc     b
+        inc     c
 loop:
 IF  __CPU_GBZ80__
         ld      a, (hl+)
@@ -16,9 +19,9 @@ ELSE
 ENDIF
         ld      (de), a
         inc     de
-        dec     bc
-        ld      a, b
-        or      c
-        jr      nz, loop
+        dec     c
+        jp      nz, loop
+        dec     b
+        jp      nz, loop
         pop     af
         ret
