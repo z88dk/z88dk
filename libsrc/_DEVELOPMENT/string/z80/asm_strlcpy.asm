@@ -67,6 +67,7 @@ ELSE
 
 cpyloop:
    cp (hl)                     ; end of src ?
+   jr Z,done
    ldi                         ; copy src byte to dst
    jp PE,cpyloop
 
