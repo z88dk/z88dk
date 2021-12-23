@@ -29,27 +29,26 @@ asm_strnlen:
    ;
    ; uses : af, bc, de, hl
 
-   ld e,l
-   ld d,h                      ; de = char *s
+   ld de,hl                    ; de = char *s
 
    ld a,b
    or c
-   jp z, error_znc
-   
+   jp Z,error_znc
+
    xor a
-IF __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    EXTERN __z80asm_cpir
    call __z80asm_cpir
 ELSE
    cpir                        ; find end of s, maxlen chars examined
 ENDIF
 
-   jr nz, notend               ; if end of s not reached, skip scf
+   jr NZ,notend                ; if end of s not reached, skip scf
    scf                         ; end of s reached, need to sub 1 extra
 
 notend:
 
-IF __CPU_INTEL__ | __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    ld  a,l
    sub e
    ld  l,a

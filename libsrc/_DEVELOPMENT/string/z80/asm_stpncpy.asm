@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; char *stpncpy(char * restrict s1, const char * restrict s2, size_t n)
@@ -35,36 +35,44 @@ asm_stpncpy:
 
    ld a,b
    or c
-   jr z, exit
+   jr Z,exit
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+
+   dec bc
+   inc b
+   inc c
 
    ; copy src to dst
-
-   xor a
-
 loop:
-IF __CPU_INTEL__ || __CPU_GBZ80__
+   xor a
+   cp (hl)
+   jr Z,copied
+
    ld a,(hl)
    inc hl
    ld (de),a
    inc de
-   dec bc
-   and a
-   jr Z,copied
-   ld a,b
-   or c
+
+   dec c
    jr NZ,loop
+   dec b
+   jr NZ,loop
+
 copied:
-   push hl
-zeroloop:
+   ld hl,de                     ; save addr of first NUL in s1
    xor a
+zeroloop:
    ld (de),a
    inc de
-   dec bc
-   ld a,b
-   or c
+   dec c
    jr NZ,zeroloop
-   pop hl
+   dec b
+   jr NZ,zeroloop
+
 ELSE
+   xor a
+loop:
    cp (hl)
    ldi
    jp PO,done                  ; reached max number of chars
@@ -72,13 +80,13 @@ ELSE
 
    ; now pad with zeroes
 
-   ld l,e
-   ld h,d
+   ld hl,de
    dec hl
 
    push hl                    ; save addr of first NUL in s1
    ldir
    pop hl
+
 ENDIF
 
    ret

@@ -31,8 +31,7 @@ asm__strrstrip:
    ;
    ; uses  : af, bc, de, hl
 
-   ld e,l
-   ld d,h                      ; de = char *s
+   ld de,hl                    ; de = char *s
 
    ; find strlen(s) and terminating NUL
 
@@ -49,7 +48,7 @@ loop:
    ld a,(hl)
    call asm_isspace
    jr c, not_ws
-  
+
 IF __CPU_GBZ80__ || __CPU_INTEL__
    dec hl
    dec bc
@@ -60,7 +59,7 @@ ELSE
    cpd                         ; hl--, bc--
    jp pe, loop
 ENDIF
-   
+
 all_ws:
 exit:
 
