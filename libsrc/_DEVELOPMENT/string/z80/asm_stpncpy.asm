@@ -36,11 +36,11 @@ asm_stpncpy:
    ld a,b
    or c
    jr z, exit
-      
+
    ; copy src to dst
-   
+
    xor a
-   
+
 loop:
 IF __CPU_INTEL__ || __CPU_GBZ80__
    ld a,(hl)
@@ -49,10 +49,10 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    inc de
    dec bc
    and a
-   jr z,copied
+   jr Z,copied
    ld a,b
    or c
-   jr nz,loop
+   jr NZ,loop
 copied:
    push hl
 zeroloop:
@@ -62,16 +62,16 @@ zeroloop:
    dec bc
    ld a,b
    or c
-   jr nz,zeroloop
+   jr NZ,zeroloop
    pop hl
 ELSE
    cp (hl)
    ldi
-   jp po, done                 ; reached max number of chars
-   jr nz, loop
-   
+   jp PO,done                  ; reached max number of chars
+   jr NZ,loop
+
    ; now pad with zeroes
-   
+
    ld l,e
    ld h,d
    dec hl
@@ -80,15 +80,13 @@ ELSE
    ldir
    pop hl
 ENDIF
-   
+
    ret
 
 done:
-
-   jr nz, exit                ; if last char was not NUL
+   jr NZ,exit                 ; if last char was not NUL
    dec de                     ; move back to NUL
 
 exit:
-
    ex de,hl
    ret

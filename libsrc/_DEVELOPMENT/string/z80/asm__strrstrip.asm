@@ -39,9 +39,8 @@ asm__strrstrip:
    call asm_strlen
    jr z, exit                  ; if strlen(s) == 0
    
-   ld c,l
-   ld b,h                      ; bc = strlen(s)
-     
+   ld bc,hl                    ; bc = strlen(s)
+
    add hl,de                   ; hl = s + strlen(s)
    dec hl                      ; hl points at last char in s
    
@@ -65,8 +64,7 @@ ENDIF
 all_ws:
 exit:
 
-   ld l,e
-   ld h,d
+   ld hl,de
    ret
 
 not_ws:

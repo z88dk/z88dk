@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; void *memset(void *s, int c, size_t n)
@@ -33,69 +33,77 @@ asm_memset:
    or c
 
    ld a,e
-   ld e,l
-   ld d,h
+   ld de,hl
 
-   ret z
+   ret Z
 
+IF (__CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_MEMSET)
    ld (hl),a
    inc de
    dec bc
 
-IF (__CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_MEMSET)
-
    ld a,b
    or a
-   
-   jr nz, big
-   
+
+   jr NZ,big
+
    or c
-   ret z
-   
+   ret Z
+
    push hl
-   
+
    EXTERN l_ldi_loop_small
    call   l_ldi_loop_small
-   
+
    pop hl
    ret
 
 big:
-
    push hl
-   
+
    EXTERN l_ldi_loop_0
    call   l_ldi_loop_0
-   
+
    pop hl
    ret
 
 ELSE
 
-   ld a,b
-   or c
-   
-   ret z
-
+IF __CPU_INTEL__ || __CPU_GBZ80__
    push hl
-IF __CPU_GBZ80__ || __CPU_INTEL__
+
+   dec bc
+   inc b
+   inc c
+
 loop:
  IF __CPU_GBZ80__
-   ld a,(hl+)
+   ld (hl+),a
  ELSE
-   ld a,(hl)
+   ld (hl),a
    inc hl
  ENDIF
-   ld (de),a
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
+   ex de,hl
+
+ELSE
+   ld (hl),a
    inc de
    dec bc
+
    ld a,b
    or c
-   jr nz,loop
-ELSE 
+   ret Z
+
+   push hl
    ldir
+
 ENDIF
-   
+
    pop hl
    ret
 

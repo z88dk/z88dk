@@ -46,8 +46,7 @@ loop:
    push hl                     ; save current string
    
    ld c,a                      ; c = char
-   ld l,e
-   ld h,d                      ; hl = needles
+   ld hl,de                    ; hl = needles
    call asm_strchr             ; is c in needles?
    
    pop hl                      ; current s1

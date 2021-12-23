@@ -72,8 +72,7 @@ loop:
    
    ld c,(hl)
    
-   ld l,e
-   ld h,d                      ; hl = cset
+   ld hl,de                    ; hl = cset
    
    call asm_strchr             ; carry reset if in cset
    
@@ -84,8 +83,7 @@ loop:
 
 not_in_cset:
 
-   ld l,c
-   ld h,b                      ; hl = char position
+   ld hl,bc                    ; hl = char position
 
    pop bc                      ; bc = char *str
    ret
@@ -97,8 +95,7 @@ all_in_cset:
 
 empty_cset:
 
-   ld l,c
-   ld h,b
+   ld hl,bc
    dec hl                      ; hl = strlen(str)
    
    pop bc                      ; bc = char *str

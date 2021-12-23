@@ -79,7 +79,7 @@ loop:
    ld (de),a
 
    inc hl
-   inc de   
+   inc de
    jr loop
 
 end_n:

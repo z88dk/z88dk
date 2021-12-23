@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; void *memswap(void *s1, void *s2, size_t n)
@@ -30,17 +30,20 @@ asm_memswap:
 
    ld a,b
    or c
-   ret z
+   ret Z
 
 asm0_memswap:
-
    push hl
 
-loop:
-   
-   ld a,(de)
 IF __CPU_GBZ80__ || __CPU_INTEL__
+
+   dec bc
+   inc b
+   inc c
+
+loop:
    push bc
+   ld a,(de)
    ld c,a
    ld a,(hl)
    ld (de),a
@@ -53,15 +56,20 @@ IF __CPU_GBZ80__ || __CPU_INTEL__
    inc hl
  ENDIF
    pop bc
-   ld a,b
-   or c
-   jr nz,loop
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
 ELSE
+loop:
+   ld a,(de)
    ldi
    dec hl
    ld (hl),a
    inc hl
-   jp pe, loop
+   jp PE,loop
+
 ENDIF
 
    pop hl

@@ -77,8 +77,7 @@ done:                          ; terminate dst
 
 zero_n:
 
-   ld l,e
-   ld h,d
-   
+   ld hl,de
+
    scf
    ret

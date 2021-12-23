@@ -30,28 +30,37 @@ asm__memstrcpy:
    
    ld a,b
    or c
-   ret z                       ; if n == 0
-   
+   ret Z                       ; if n == 0
+
    xor a
 
 loop:
-IF __CPU_GBZ80__
+IF __CPU_GBZ80__ || __CPU_INTEL__
    xor a
 ENDIF
+
    cp (hl)
-   ret z                       ; if '\0' met
-  
+   ret Z                       ; if '\0' met
+
+IF __CPU_GBZ80__ || __CPU_INTEL__
+
 IF __CPU_GBZ80__
    ld a,(hl+)
+ELSE
+   ld a,(hl)
+   inc hl
+ENDIF
    ld (de),a
    inc de
    dec bc
    ld a,b
    or c
-   jr nz,loop
+   jr NZ,loop
+
 ELSE 
    ldi
-   jp pe, loop
+   jp PE,loop
+
 ENDIF
 
    or a
