@@ -98,7 +98,7 @@ ENDIF
    dec hl
    pop bc                      ; bc = char *src
 
-IF __CPU_8080__
+IF __CPU_8080__ || __CPU_GBZ80__
    ld  a,l
    sub c
    ld  l,a
@@ -124,7 +124,7 @@ done:
 
    pop bc                      ; bc = char *src
 
-IF __CPU_8080__
+IF __CPU_8080__ || __CPU_GBZ80__
    ld  a,l
    sub c
    ld  l,a
