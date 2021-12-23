@@ -37,8 +37,8 @@ asm_strnlen:
 
    xor a
 IF __CPU_INTEL__ || __CPU_GBZ80__
-   EXTERN __z80asm_cpir
-   call __z80asm_cpir
+   EXTERN __z80asm__cpir
+   call __z80asm__cpir
 ELSE
    cpir                        ; find end of s, maxlen chars examined
 ENDIF
