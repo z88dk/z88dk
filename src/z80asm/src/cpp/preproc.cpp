@@ -6,8 +6,703 @@
 //-----------------------------------------------------------------------------
 
 #include "if.h"
+#include "lex.h"
 #include "preproc.h"
 #include "utils.h"
+#include <cassert>
+using namespace std;
+
+//-----------------------------------------------------------------------------
+// global state
+static bool g_hold_getline;
+static bool g_do_preproc_line;
+static Preproc g_preproc;
+
+//-----------------------------------------------------------------------------
+
+static string concat(const string& s1, const string& s2) {
+	if (s1.empty() || s2.empty())
+		return s1 + s2;
+	else if (str_ends_with(s1, "##"))   // cpp-style concatenation
+		return s1.substr(0, s1.length() - 2) + s2;
+	else if (isspace(s1.back()) || isspace(s2.front()))
+		return s1 + s2;
+	else if (isident(s1.back()) && isident(s2.front()))
+		return s1 + " " + s2;
+	else if (s1.back() == '$' && isxdigit(s2.front()))
+		return s1 + " " + s2;
+	else if ((s1.back() == '%' || s1.back() == '@') &&
+		(isdigit(s2.front()) || s2.front() == '"'))
+		return s1 + " " + s2;
+	else if ((s1.back() == '&' && s2.front() == '&') ||
+		(s1.back() == '|' && s2.front() == '|') ||
+		(s1.back() == '^' && s2.front() == '^') ||
+		(s1.back() == '*' && s2.front() == '*') ||
+		(s1.back() == '<' && (s2.front() == '=' || s2.front() == '<' || s2.front() == '>')) ||
+		(s1.back() == '>' && (s2.front() == '=' || s2.front() == '>')) ||
+		(s1.back() == '=' && s2.front() == '=') ||
+		(s1.back() == '!' && s2.front() == '=') ||
+		(s1.back() == '#' && s2.front() == '#'))
+		return s1 + " " + s2;
+	else
+		return s1 + s2;
+}
+
+//-----------------------------------------------------------------------------
+
+Location::Location(const string& filename, int line_num)
+	: filename(filename), line_num(line_num) {}
+
+//-----------------------------------------------------------------------------
+
+PreprocLevel::PreprocLevel(Macros* parent)
+	: defines(parent) {
+	init();
+}
+
+void PreprocLevel::init(const string& text) {
+	if (g_do_preproc_line) 
+		split_lines(m_lines, text);
+	else 
+		m_lines.push_back(text);
+}
+
+bool PreprocLevel::getline(string& line) {
+	line.clear();
+	if (m_lines.empty())
+		return false;
+
+	line = m_lines.front();
+	m_lines.pop_front();
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+
+PreprocFile::PreprocFile(const string& filename, ifstream& ifs)
+	: filename(filename)
+	, ifs(move(ifs))
+	, location(filename, 0) {}
+
+bool PreprocFile::getline(string& line) {
+	while (true) {
+		if (m_queue.getline(line))
+			return true;
+		else if (get_cont_lines(line))
+			m_queue.init(line);
+		else
+			return false;
+	}
+}
+
+bool PreprocFile::get_cont_lines(string& line) {
+	if (!get_source_line(line))
+		return false;
+
+	// if line ends with backslash, concatenate with next line
+	while (remove_final_backslash(line)) {
+		string this_line;
+		if (get_source_line(this_line)) {
+			line += this_line;
+		}
+		else {
+			line += "\n";			// eof, put back newline
+			break;
+		}
+	}
+	return true;
+}
+
+bool PreprocFile::get_source_line(string& line) {
+	line.clear();
+
+	if (!ifs.is_open() || ifs.eof())
+		return false;
+
+	// read line
+	if (!safe_getline(ifs, line))
+		return false;
+
+	line.push_back('\n');
+	location.inc_line();
+	got_source_line(location.filename.c_str(), location.line_num, line.c_str());
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+
+void ExpandedText::append(const string& str) {
+	m_text = concat(m_text, str);
+}
+
+//-----------------------------------------------------------------------------
+
+IfNest::IfNest(Keyword keyword, Location location, bool flag)
+	: keyword(keyword), location(location), flag(flag), done_if(false) {}
+
+//-----------------------------------------------------------------------------
+
+Preproc::Preproc() {
+	m_levels.emplace_back();
+}
+
+bool Preproc::open(const string& filename, bool search_include_path) {
+	// search file in path
+	string found_filename = filename;
+	if (search_include_path)
+		found_filename = search_includes(filename.c_str());
+
+	// check for recursive includes
+	if (recursive_include(found_filename)) {
+		error_include_recursion(filename.c_str());
+		return false;
+	}
+
+	// open file
+	ifstream ifs(found_filename, ios::binary);
+	if (!ifs.is_open()) {
+		error_read_file(found_filename.c_str());
+		return false;
+	}
+	else {
+		m_files.emplace_back(found_filename, ifs);
+		return true;
+	}
+}
+
+void Preproc::close() {
+	m_files.clear();
+	m_levels.clear();
+	m_output.clear();
+	m_if_stack.clear();
+
+	m_levels.emplace_back();
+}
+
+bool Preproc::getline(string& line) {
+	line.clear();
+	while (true) {
+		if (!m_output.empty()) {
+			line = m_output.front();
+			m_output.pop_front();
+			return true;
+		}
+		else if (m_levels.size() > 1)
+			m_levels.pop_back();		// drop one level and continue
+		else if (m_files.empty()) {
+			got_eof();
+			return false;
+		}
+		else if (m_files.back().getline(line)) {
+			if (g_do_preproc_line)
+				parse_line(line);
+			else
+				m_output.push_back(line);
+		}
+		else
+			m_files.pop_back();
+	}
+}
+
+string Preproc::filename() const {
+	if (!m_files.empty())
+		return m_files.back().location.filename;
+	else
+		return "";
+}
+
+int Preproc::line_num() const {
+	if (!m_files.empty())
+		return m_files.back().location.line_num;
+	else
+		return 0;
+}
+
+bool Preproc::is_c_source() const {
+	if (m_files.empty())
+		return false;
+	else
+		return m_files.back().is_c_source;
+}
+
+void Preproc::set_filename(const string& filename) {
+	if (!m_files.empty())
+		m_files.back().location.filename = filename;
+}
+
+void Preproc::set_line_num(int line_num, int line_inc) {
+	if (!m_files.empty()) {
+		m_files.back().location.line_num = line_num - line_inc;
+		m_files.back().location.line_inc = line_inc;
+	}
+}
+
+void Preproc::set_c_source(bool f) {
+	if (!m_files.empty())
+		m_files.back().is_c_source = f;
+}
+
+bool Preproc::recursive_include(const string& filename) {
+	for (auto& elem : m_files) {
+		if (elem.filename == filename)
+			return true;
+	}
+	return false;
+}
+
+void Preproc::got_eof() {
+	if (!m_if_stack.empty()) {
+		error_unbalanced_struct_at(
+			m_if_stack.back().location.filename.c_str(),
+			m_if_stack.back().location.line_num);
+		m_if_stack.clear();
+	}
+	close();
+}
+
+void Preproc::parse_line(const string& line) {
+	m_lexer.set(line);
+
+	// do these irrespective of ifs_active()
+	if (check_keyword(Keyword::IF, &Preproc::do_if)) return;
+	if (check_keyword(Keyword::ELSE, &Preproc::do_else)) return;
+	if (check_keyword(Keyword::ENDIF, &Preproc::do_endif)) return;
+	if (check_keyword(Keyword::IFDEF, &Preproc::do_ifdef)) return;
+	if (check_keyword(Keyword::IFNDEF, &Preproc::do_ifndef)) return;
+	if (check_keyword(Keyword::ELIF, &Preproc::do_elif)) return;
+	if (check_keyword(Keyword::ELIFDEF, &Preproc::do_elifdef)) return;
+	if (check_keyword(Keyword::ELIFNDEF, &Preproc::do_elifndef)) return;
+
+	if (!ifs_active()) return;
+
+	// do these only if ifs_active()
+
+	// last check - macro call
+
+	// expand macros in text
+	m_lexer.rewind();
+	ExpandedText expanded = expand(m_lexer, defines());
+	if (expanded.got_error())
+		m_output.push_back(line);
+	else
+		m_output.push_back(expanded.text());
+}
+
+void Preproc::do_label() {
+	string line = m_lexer.peek().svalue + ":\n";
+	m_output.push_back(line);
+	m_lexer.next();
+}
+
+bool Preproc::ifs_active() {
+	if (m_levels.back().exitm_called)
+		return false;
+	for (auto& f : m_if_stack) {
+		if (!f.flag)
+			return false;
+	}
+	return true;
+}
+
+bool Preproc::check_keyword(Keyword keyword, void(Preproc::* do_action)()) {
+	if (m_lexer[0].is(TType::Label) && m_lexer[1].is(keyword)) {
+		if (ifs_active())
+			do_label();
+		else
+			m_lexer.next();
+		m_lexer.next();
+		((*this).*(do_action))();
+		return true;
+	}
+	else if (m_lexer[0].is(keyword)) {
+		m_lexer.next();
+		((*this).*(do_action))();
+		return true;
+	}
+	else
+		return false;
+}
+
+void Preproc::do_if() {
+	bool flag, error;
+	parse_expr_eval_if_condition(m_lexer.text_ptr(), &flag, &error);
+	if (!error) {
+		m_if_stack.emplace_back(Keyword::IF, m_files.back().location, flag);
+		m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
+	}
+}
+
+void Preproc::do_else() {
+	if (!m_lexer.peek().is(TType::Newline))
+		error_syntax();
+	else if (m_if_stack.empty())
+		error_unbalanced_struct();
+	else {
+		Keyword last = m_if_stack.back().keyword;
+		if (last != Keyword::IF && last != Keyword::ELIF)
+			error_unbalanced_struct_at(
+				m_if_stack.back().location.filename.c_str(),
+				m_if_stack.back().location.line_num);
+		else {
+			bool flag = !m_if_stack.back().done_if;
+			m_if_stack.back().keyword = Keyword::ELSE;
+			m_if_stack.back().flag = flag;
+			m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
+		}
+	}
+}
+
+void Preproc::do_endif() {
+	if (!m_lexer.peek().is(TType::Newline))
+		error_syntax();
+	else if (m_if_stack.empty())
+		error_unbalanced_struct();
+	else {
+		Keyword last = m_if_stack.back().keyword;
+		if (last != Keyword::IF && last != Keyword::ELIF && last != Keyword::ELSE)
+			error_unbalanced_struct_at(
+				m_if_stack.back().location.filename.c_str(),
+				m_if_stack.back().location.line_num);
+		else
+			m_if_stack.pop_back();
+	}
+}
+
+void Preproc::do_ifdef_ifndef(bool invert) {
+	if (!m_lexer.peek().is(TType::Ident))
+		error_syntax();
+	else {
+		string name = m_lexer.peek().svalue;
+		m_lexer.next();
+		if (!m_lexer.peek().is(TType::Newline))
+			error_syntax();
+		else {
+			bool f = check_ifdef_condition(name.c_str());
+			if (invert)
+				f = !f;
+			m_if_stack.emplace_back(Keyword::IF, m_files.back().location, f);
+			m_if_stack.back().done_if = m_if_stack.back().done_if || f;
+		}
+	}
+}
+
+void Preproc::do_ifdef() {
+	do_ifdef_ifndef(false);
+}
+
+void Preproc::do_ifndef() {
+	do_ifdef_ifndef(true);
+}
+
+void Preproc::do_elif() {
+	if (m_if_stack.empty())
+		error_unbalanced_struct();
+	else {
+		Keyword last = m_if_stack.back().keyword;
+		if (last != Keyword::IF && last != Keyword::ELIF)
+			error_unbalanced_struct_at(
+				m_if_stack.back().location.filename.c_str(),
+				m_if_stack.back().location.line_num);
+		else {
+			bool flag, error;
+			parse_expr_eval_if_condition(m_lexer.text_ptr(), &flag, &error);
+			if (!error) {
+				if (m_if_stack.back().done_if)
+					flag = false;
+				m_if_stack.back().keyword = Keyword::ELIF;
+				m_if_stack.back().flag = flag;
+				m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
+			}
+		}
+	}
+}
+
+void Preproc::do_elifdef_elifndef(bool invert) {
+	if (m_if_stack.empty())
+		error_unbalanced_struct();
+	else {
+		Keyword last = m_if_stack.back().keyword;
+		if (last != Keyword::IF && last != Keyword::ELIF)
+			error_unbalanced_struct_at(
+				m_if_stack.back().location.filename.c_str(),
+				m_if_stack.back().location.line_num);
+		else {
+			if (!m_lexer.peek().is(TType::Ident))
+				error_syntax();
+			else {
+				string name = m_lexer.peek().svalue;
+				m_lexer.next();
+				if (!m_lexer.peek().is(TType::Newline))
+					error_syntax();
+				else {
+					bool f = check_ifdef_condition(name.c_str());
+					if (invert)
+						f = !f;
+					if (m_if_stack.back().done_if)
+						f = false;
+					m_if_stack.back().keyword = Keyword::ELIF;
+					m_if_stack.back().flag = f;
+					m_if_stack.back().done_if = m_if_stack.back().done_if || f;
+				}
+			}
+		}
+	}
+}
+
+void Preproc::do_elifdef() {
+	do_elifdef_elifndef(false);
+}
+
+void Preproc::do_elifndef() {
+	do_elifdef_elifndef(true);
+}
+
+ExpandedText Preproc::expand(Lexer& lexer, Macros& defines) {
+	ExpandedText out;
+
+	while (!lexer.at_end()) {
+		Token token = lexer[0];
+		lexer.next();
+
+		switch (token.ttype) {
+		case TType::End:
+			break;
+		case TType::Newline: out.append("\n"); break;
+		case TType::Ident:
+			expand_ident(out, token.svalue, lexer, defines);
+			break;
+		case TType::Label:
+			expand_ident(out, token.svalue, lexer, defines);
+			out.append(":");
+			break;
+		case TType::Integer: out.append(to_string(token.ivalue)); break;
+		case TType::String: out.append("\"" + str_expand_escapes(token.svalue) + "\""); break;
+		case TType::ASMPC: out.append("$"); break;
+		case TType::BinNot: out.append("~"); break;
+		case TType::LogNot: out.append("!"); break;
+		case TType::BinAnd: out.append("&"); break;
+		case TType::LogAnd: out.append("&&"); break;
+		case TType::BinOr: out.append("|"); break;
+		case TType::LogOr: out.append("||"); break;
+		case TType::BinXor: out.append("^"); break;
+		case TType::LogXor: out.append("^^"); break;
+		case TType::Plus: out.append("+"); break;
+		case TType::Minus: out.append("-"); break;
+		case TType::Mul: out.append("*"); break;
+		case TType::Pow: out.append("**"); break;
+		case TType::Div: out.append("/"); break;
+		case TType::Mod: out.append("%"); break;
+		case TType::Eq: out.append("=="); break;
+		case TType::Ne: out.append("!="); break;
+		case TType::Lt: out.append("<"); break;
+		case TType::Le: out.append("<="); break;
+		case TType::Gt: out.append(">"); break;
+		case TType::Ge: out.append(">="); break;
+		case TType::Shl: out.append("<<"); break;
+		case TType::Shr: out.append(">>"); break;
+		case TType::Quest: out.append("?"); break;
+		case TType::Colon: out.append(":"); break;
+		case TType::Dot: out.append("."); break;
+		case TType::Comma: out.append(","); break;
+		case TType::Hash: out.append("#"); break;
+		case TType::DblHash: out.append("##"); break;
+		case TType::Lparen: out.append("("); break;
+		case TType::Rparen: out.append(")"); break;
+		case TType::Lsquare: out.append("["); break;
+		case TType::Rsquare: out.append("]"); break;
+		case TType::Lbrace: out.append("{"); break;
+		case TType::Rbrace: out.append("}"); break;
+		case TType::Backslash: out.append("\n"); break;
+		default: assert(0);
+		}
+	}
+	return out;
+}
+
+void Preproc::expand_ident(ExpandedText& out, const string& ident, Lexer& lexer, Macros& defines) {
+	size_t pos = lexer.pos();
+	ExpandedText expanded = expand_define_call(ident, lexer, defines);
+	if (expanded.got_error()) {
+		lexer.set_pos(pos);
+		out.append(ident);
+	}
+	else
+		out.append(expanded.text());
+}
+
+ExpandedText Preproc::expand_define_call(const string& name, Lexer& lexer, Macros& defines) {
+	ExpandedText out;
+
+	shared_ptr<Macro> macro = defines.find_all(name);
+	if (!macro) {							// macro does not exists - insert name
+		out.append(name);
+		return out;
+	}
+
+	// macro exists
+	if (macro->is_expanding()) {				// recursive invocation
+		out.append(macro->body());
+		out.set_error(true);
+		return out;
+	}
+
+	// collect arguments
+	vector<string> params;
+	if (macro->args().size() != 0) {
+		params = collect_macro_params(lexer);
+		if (macro->args().size() != params.size()) {
+			error_wrong_number_macro_args(macro->name().c_str());
+			return out;
+		}
+	}
+
+	// create macros for each argument
+	Macros sub_defines{ defines };				// create scope for arguments
+	for (size_t i = 0; i < macro->args().size(); i++) {
+		string arg = macro->args()[i];
+		string param = i < params.size() ? params[i] : "";
+		shared_ptr<Macro> param_macro = make_shared<Macro>(arg, param);
+		sub_defines.add(param_macro);
+	}
+
+	// expand macro
+	macro->set_expanding(true);
+	Lexer sub_lexer{ macro->body() };
+	out = expand(sub_lexer, sub_defines);
+	macro->set_expanding(false);
+	return out;
+}
+
+string Preproc::collect_param(Lexer& lexer) {
+	const char* p0 = lexer.text_ptr();
+	int open_parens = 0;
+	while (true) {
+		const char* p1 = lexer.text_ptr();
+		switch (lexer.peek().ttype) {
+		case TType::End:
+			return string(p0, p1);
+		case TType::Lparen:
+			open_parens++;
+			lexer.next();
+			break;
+		case TType::Rparen:
+			open_parens--;
+			if (open_parens < 0)
+				return string(p0, p1);
+			else
+				lexer.next();
+			break;
+		case TType::Comma:
+			if (open_parens == 0)
+				return string(p0, p1);
+			else
+				lexer.next();
+			break;
+		default:
+			lexer.next();
+		}
+	}
+}
+
+vector<string> Preproc::collect_macro_params(Lexer& lexer) {
+	vector<string> params;
+
+	bool in_parens = (lexer.peek().ttype == TType::Lparen);
+	if (in_parens)
+		lexer.next();
+
+	// collect up to close parens or end of line
+	while (true) {
+		params.push_back(collect_param(lexer));
+		switch (lexer.peek().ttype) {
+		case TType::Comma:
+			lexer.next();
+			continue;
+		case TType::Rparen:
+			if (in_parens)
+				lexer.next();
+			return params;
+		case TType::End:
+			return params;
+		default:
+			error_syntax();
+			return params;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void sfile_hold_input() {
+	g_hold_getline = true;
+}
+
+void sfile_unhold_input() {
+	g_hold_getline = false;
+}
+
+bool sfile_open(const char* filename, bool search_include_path) {
+	return g_preproc.open(filename, search_include_path);
+}
+
+const char* sfile_getline() {
+	static string line;				// to return line.c_str() - NOT REENTRANT
+	if (g_hold_getline)
+		return nullptr;
+	g_do_preproc_line = false;		// no preprocessing on input line
+	if (g_preproc.getline(line))
+		return line.c_str();
+	else
+		return nullptr;
+}
+
+const char* sfile_get_source_line() {
+	static string line;				// to return line.c_str() - NOT REENTRANT
+	if (g_hold_getline)
+		return nullptr;
+	g_do_preproc_line = true;		// preprocessing on input line
+	if (g_preproc.getline(line))
+		return line.c_str();
+	else
+		return nullptr;
+}
+
+const char* sfile_filename() {
+	if (g_preproc.filename().empty())
+		return nullptr;
+	else
+		return spool_add(g_preproc.filename().c_str());
+}
+
+int sfile_line_num() {
+	return g_preproc.line_num();
+}
+
+bool sfile_is_c_source() {
+	return g_preproc.is_c_source();
+}
+
+void sfile_set_filename(const char* filename) {
+	g_preproc.set_filename(filename);
+}
+
+void sfile_set_line_num(int line_num, int line_inc) {
+	g_preproc.set_line_num(line_num, line_inc);
+}
+
+void sfile_set_c_source(bool f) {
+	g_preproc.set_c_source(f);
+}
+
+
+
+
+
+
+#if 0
+
 
 SourceFileStack g_source_file_stack;
 static LineSplitFilter splitter1{ &g_source_file_stack };
@@ -484,88 +1179,6 @@ void PreprocFilter::do_label(const string& name) {
 	m_lines.push_back(name + ":\n");
 }
 
-void PreprocFilter::do_if() {
-	bool flag, error;
-	parse_expr_eval_if_condition(p, &flag, &error);
-	if (!error) {
-		m_if_stack.emplace_back(Keyword::IF, flag,
-			g_source_file_stack.filename(), g_source_file_stack.line_num());
-		m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
-	}
-}
-
-void PreprocFilter::do_ifdef() {
-	string name = collect_name();
-	if (!name.empty()) {
-		if (expect_eol()) {
-			bool defined = check_ifdef_condition(name.c_str());
-			m_if_stack.emplace_back(Keyword::IF, defined,
-				g_source_file_stack.filename(), g_source_file_stack.line_num());
-			m_if_stack.back().done_if = m_if_stack.back().done_if || defined;
-		}
-	}
-}
-
-void PreprocFilter::do_ifndef() {
-	string name = collect_name();
-	if (!name.empty()) {
-		if (expect_eol()) {
-			bool not_defined = !check_ifdef_condition(name.c_str());
-			m_if_stack.emplace_back(Keyword::IF, not_defined,
-				g_source_file_stack.filename(), g_source_file_stack.line_num());
-			m_if_stack.back().done_if = m_if_stack.back().done_if || not_defined;
-		}
-	}
-}
-
-void PreprocFilter::do_elif() {
-	if (m_if_stack.empty())
-		error_unbalanced_struct();
-	else {
-		Keyword last = m_if_stack.back().keyword;
-		if (last != Keyword::IF && last != Keyword::ELIF)
-			error_unbalanced_struct_at(
-				m_if_stack.back().filename.c_str(),
-				m_if_stack.back().line_num);
-		else {
-			bool flag, error;
-			parse_expr_eval_if_condition(p, &flag, &error);
-			if (!error) {
-				if (m_if_stack.back().done_if)
-					flag = false;
-				m_if_stack.back().keyword = Keyword::ELIF;
-				m_if_stack.back().flag = flag;
-				m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
-			}
-		}
-	}
-}
-
-void PreprocFilter::do_elifdef() {
-	if (m_if_stack.empty())
-		error_unbalanced_struct();
-	else {
-		Keyword last = m_if_stack.back().keyword;
-		if (last != Keyword::IF && last != Keyword::ELIF)
-			error_unbalanced_struct_at(
-				m_if_stack.back().filename.c_str(),
-				m_if_stack.back().line_num);
-		else {
-			string name = collect_name();
-			if (!name.empty()) {
-				if (expect_eol()) {
-					bool defined = check_ifdef_condition(name.c_str());
-					if (m_if_stack.back().done_if)
-						defined = false;
-					m_if_stack.back().keyword = Keyword::ELIF;
-					m_if_stack.back().flag = defined;
-					m_if_stack.back().done_if = m_if_stack.back().done_if || defined;
-				}
-			}
-		}
-	}
-}
-
 void PreprocFilter::do_elifndef() {
 	if (m_if_stack.empty())
 		error_unbalanced_struct();
@@ -587,42 +1200,6 @@ void PreprocFilter::do_elifndef() {
 					m_if_stack.back().done_if = m_if_stack.back().done_if || not_defined;
 				}
 			}
-		}
-	}
-}
-
-void PreprocFilter::do_else() {
-	if (expect_eol()) {
-		if (m_if_stack.empty())
-			error_unbalanced_struct();
-		else {
-			Keyword last = m_if_stack.back().keyword;
-			if (last != Keyword::IF && last != Keyword::ELIF)
-				error_unbalanced_struct_at(
-					m_if_stack.back().filename.c_str(),
-					m_if_stack.back().line_num);
-			else {
-				bool flag = !m_if_stack.back().done_if;
-				m_if_stack.back().keyword = Keyword::ELSE;
-				m_if_stack.back().flag = flag;
-				m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
-			}
-		}
-	}
-}
-
-void PreprocFilter::do_endif() {
-	if (expect_eol()) {
-		if (m_if_stack.empty())
-			error_unbalanced_struct();
-		else {
-			Keyword last = m_if_stack.back().keyword;
-			if (last != Keyword::IF && last != Keyword::ELIF && last != Keyword::ELSE)
-				error_unbalanced_struct_at(
-					m_if_stack.back().filename.c_str(),
-					m_if_stack.back().line_num);
-			else 
-				m_if_stack.pop_back();
 		}
 	}
 }
@@ -664,55 +1241,7 @@ bool PreprocFilter::ifs_active() const {
 
 //-----------------------------------------------------------------------------
 
-void sfile_hold_input() {
-	g_source_file_stack.hold_input();
-}
 
-void sfile_unhold_input() {
-	g_source_file_stack.unhold_input();
-}
 
-bool sfile_open(const char* filename, bool search_include_path) {
-	return g_source_file_stack.open(filename, search_include_path);
-}
+#endif
 
-const char* sfile_getline() {
-	static string line;				// so that we can return line.c_str() - NOT REENTRANT
-	if (g_source_file_stack.getline(line))
-		return line.c_str();
-	else
-		return nullptr;
-}
-
-const char* sfile_get_source_line() {
-	static string line;				// so that we can return line.c_str() - NOT REENTRANT
-	if (g_preproc.getline(line))
-		return line.c_str();
-	else
-		return nullptr;
-}
-
-const char* sfile_filename() {
-	string filename = g_source_file_stack.filename();
-	return filename.empty() ? nullptr : spool_add(filename.c_str());
-}
-
-int sfile_line_num() {
-	return g_source_file_stack.line_num();
-}
-
-bool sfile_is_c_source() {
-	return g_source_file_stack.is_c_source();
-}
-
-void sfile_set_filename(const char* filename) {
-	g_source_file_stack.set_filename(filename);
-}
-
-void sfile_set_line_num(int line_num, int line_inc) {
-	g_source_file_stack.set_line_num(line_num, line_inc);
-}
-
-void sfile_set_c_source(bool f) {
-	g_source_file_stack.set_c_source(f);
-}

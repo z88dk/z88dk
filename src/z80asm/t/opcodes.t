@@ -2111,9 +2111,9 @@ z80asm(
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
         ld   a,1+                       ;; error: syntax error
-        ld   a,'                        ;; error: invalid single quoted character
+        ld   a,'                        ;; error: unclosed quoted string
         ld   a,''                       ;; error: invalid single quoted character
-        ld   a,'a                       ;; error: invalid single quoted character
+        ld   a,'a                       ;; error: unclosed quoted string
         ld   a,'he'                     ;; error: invalid single quoted character
         ld   a,"a"                      ;; error: syntax error
         defb 1/0                        ;; error 2: division by zero
@@ -4137,9 +4137,9 @@ z80asm(
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
         ld   a,1+                       ;; error: syntax error
-        ld   a,'                        ;; error: invalid single quoted character
+        ld   a,'                        ;; error: unclosed quoted string
         ld   a,''                       ;; error: invalid single quoted character
-        ld   a,'a                       ;; error: invalid single quoted character
+        ld   a,'a                       ;; error: unclosed quoted string
         ld   a,'he'                     ;; error: invalid single quoted character
         ld   a,"a"                      ;; error: syntax error
         defb 1/0                        ;; error 2: division by zero

@@ -81,7 +81,7 @@ Object  file test.o at $0000: Z80RMF16
     G = $0000 asm_BIFROST2_stop (section "") (file test.asm:10)
     G C $C9C2 asm_BIFROST2_showNext2Tiles (section "") (file test.asm:11)
   Expressions:
-    E =  $0000 $0000: asm_BIFROST2_start := 51625+ASMPC-ASMPC (section "") (file test.asm:9)
+    E =  $0000 $0000: asm_BIFROST2_start := 51625+$-$ (section "") (file test.asm:9)
     E =  $0000 $0000: asm_BIFROST2_stop := 51634+here-there (section "") (file test.asm:10)
 END
 

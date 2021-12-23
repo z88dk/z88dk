@@ -40,5 +40,74 @@ one   equ 1 ;\ret
 defb zero,one,two
 END
 
+# test ## concatenation
+z80asm_ok("", "", "", <<'END', bytes(0));
+zero equ 0
+     defb ze \
+	      ## \
+		  ro
+END
+
+# continuation line without next line
+z80asm_ok("", "", "", <<'END', bytes(0,1,2));
+     defb 0 \ defb 1 \ defb 2 \
+END
+
+# IF label
+z80asm_ok("", "", "", <<'END', bytes(0xc3, 0, 0));
+if: if 1
+jp if
+endif
+END
+
+# quoted strings
+z80asm_ok("", "", "", <<'END', bytes(7, 8, 27, 12, 10, 13, 9, 11, 0x5c, 0x27, 0x22));
+defb '\a','\b','\e','\f','\n','\r','\t','\v','\\','\'','\"'
+END
+
+z80asm_ok("", "", "", <<'END', bytes(0, 1, 7, 8, 15, 16, 255));
+defb '\0','\1','\7','\10','\17','\20','\377'
+END
+
+z80asm_ok("", "", "", <<'END', bytes(0, 1, 7, 8, 15, 16, 255));
+defb '\x0','\x1','\x7','\x8','\xf','\x10','\xff'
+END
+
+z80asm_ok("", "", "", <<'END', bytes(7, 8, 27, 12, 10, 13, 9, 11, 0x5c, 0x27, 0x22));
+defb "\a\b\e\f\n\r\t\v\\\'\""
+END
+
+z80asm_ok("", "", "", <<'END', bytes(0, 1, 7, 8, 15, 16, 255));
+defb "\0\1\7\10\17\20\377"
+END
+
+z80asm_ok("", "", "", <<'END', bytes(0, 1, 7, 8, 15, 16, 255));
+defb "\x0\x1\x7\x8\xf\x10\xff"
+END
+
+z80asm_nok("", "", <<'END_ASM', <<END_ERR);
+defb 'a
+END_ASM
+Error at file '$test.asm' line 1: unclosed quoted string
+END_ERR
+
+z80asm_nok("", "", <<'END_ASM', <<END_ERR);
+defb ''
+END_ASM
+Error at file '$test.asm' line 1: invalid single quoted character
+END_ERR
+
+z80asm_nok("", "", <<'END_ASM', <<END_ERR);
+defb 'ab'
+END_ASM
+Error at file '$test.asm' line 1: invalid single quoted character
+END_ERR
+
+z80asm_nok("", "", <<'END_ASM', <<END_ERR);
+defb "a
+END_ASM
+Error at file '$test.asm' line 1: unclosed quoted string
+END_ERR
+
 unlink_testfiles;
 done_testing;

@@ -37,14 +37,11 @@ using namespace std;
 	oct		= [0-7];
 	dec		= [0-9];
 	hex		= [0-9a-fA-F];
-	mantissa= [-+]? dec+ '.' dec* | dec* '.' dec+;
-	exp		= [eE][-+]?[0-9]+;
-	qchar_	= '\\' ['"\\abefnrtv] |
-			  '\\' [0-7]{1,3} |
+	qchar_	= '\\' [0-7]{1,3} |
 			  '\\x' [0-9a-fA-F]{1,2} |
 			  '\\' [^\r\n\000];
-	qchar	= qchar_ | [^\r\n\000'];
-	qqchar	= qchar_ | [^\r\n\000"];
+	qchar	= qchar_ | [^\r\n\000\\'];
+	qqchar	= qchar_ | [^\r\n\000\\"];
 */
 
 //-----------------------------------------------------------------------------
@@ -73,6 +70,7 @@ static string ident_change_case(const string& ident) {
 		return ident;
 }
 
+#if 0
 bool starts_with_hash(const string& line) {
 	const char* p = line.c_str();
 	const char* YYMARKER{ nullptr };
@@ -81,6 +79,7 @@ bool starts_with_hash(const string& line) {
 		*					{ return false; }
 	*/
 }
+#endif
 
 bool remove_final_backslash(string& line) {
 	const char* p = line.c_str();
@@ -89,7 +88,7 @@ bool remove_final_backslash(string& line) {
 		size_t parsed_len = p - line.c_str();
 		/*!re2c
 			end					{ return false; }
-			';' [^\r\n\000]*	{ return false; }
+			';'					{ return false; }
 			"'"  qchar* "'" |
 			'"' qqchar* '"' |
 			operand         	{ continue; }
@@ -109,7 +108,6 @@ void split_lines(deque<string>& lines, const string& line) {
 	while (true) {
 		const char* p0 = p;
 		/*!re2c
-			__				{ output += " "; continue; }
 			';' [^\r\n\000]*{ continue; }
 			end             { if (!output.empty()) {
 								  output += "\n"; lines.push_back(output); }
@@ -156,14 +154,11 @@ void Lexer::set(const string& text) {
 		/*!re2c
 			ws+				{ continue; }
 			end				{ return; }
-			";"				{ return; }
+			";"	[^\r\n\000]*{ continue; }
 			"\n"				{ m_tokens.emplace_back(TType::Newline);
 							  m_tokens.back().col = col;
 							  continue; }
 			dec+ 'd'?		{ m_tokens.emplace_back(TType::Integer, a2i(p0, 10));
-							  m_tokens.back().col = col;
-							  continue; }
-			mantissa exp? 	{ m_tokens.emplace_back(TType::Floating, atof(p0));
 							  m_tokens.back().col = col;
 							  continue; }
 			dec hex* 'h'		{ m_tokens.emplace_back(TType::Integer, a2i(p0, 16));
@@ -198,16 +193,14 @@ void Lexer::set(const string& text) {
 			"'" @p1 qchar* @p2 "'"	{
 							  string str = str_compress_escapes(string(p1, p2));
 							  if (str.length() != 1) {
-								  error_invalid_squoted_string();
-								  return;
+								  error_invalid_squoted_string(); clear();
 							  }
 							  m_tokens.emplace_back(TType::Integer, str[0]);
 							  m_tokens.back().col = col;
 							  continue; }
 
 			'"' @p1 qqchar* @p2 '"'	{
-							  string str = str_compress_escapes(string(p1, p2));
-							  m_tokens.emplace_back(TType::String, str);
+							  m_tokens.emplace_back(TType::String, string(p1, p2));
 							  m_tokens.back().col = col;
 							  continue; }
 
@@ -223,13 +216,17 @@ void Lexer::set(const string& text) {
 			'$'				{ m_tokens.emplace_back(TType::ASMPC);
 							  m_tokens.back().col = col;
 							  continue; }
+			'asmpc' _b		{ p--;
+							  m_tokens.emplace_back(TType::ASMPC);
+							  m_tokens.back().col = col;
+							  continue; }
 			'%'				{ m_tokens.emplace_back(TType::Mod);
 							  m_tokens.back().col = col;
 							  continue; }
 			'&'				{ m_tokens.emplace_back(TType::BinAnd);
 							  m_tokens.back().col = col;
 							  continue; }
-			'&&'				{ m_tokens.emplace_back(TType::LogAnd);
+			'&&'			{ m_tokens.emplace_back(TType::LogAnd);
 							  m_tokens.back().col = col;
 							  continue; }
 			'('				{ m_tokens.emplace_back(TType::Lparen);
@@ -241,7 +238,7 @@ void Lexer::set(const string& text) {
 			'*'				{ m_tokens.emplace_back(TType::Mul);
 							  m_tokens.back().col = col;
 							  continue; }
-			'**'				{ m_tokens.emplace_back(TType::Pow);
+			'**'			{ m_tokens.emplace_back(TType::Pow);
 							  m_tokens.back().col = col;
 							  continue; }
 			'+'				{ m_tokens.emplace_back(TType::Plus);
@@ -352,13 +349,17 @@ void Lexer::set(const string& text) {
 							  continue; }
 
 			"'" |
-			'"'				{ error_unclosed_string(); return; }
+			'"'				{ error_unclosed_string(); clear(); return; }
 
-			*				{ error_invalid_char(); return; }
+			*				{ error_invalid_char(); clear(); return; }
 
 		*/
 	}
 }
+
+
+
+#if 0
 
 //-----------------------------------------------------------------------------
 
@@ -392,137 +393,6 @@ void MacroExpander::do_expand() {
 }
 
 //-----------------------------------------------------------------------------
-
-bool PreprocFilter::check_ifs(const string& line) {
-	const char* YYMARKER{ nullptr }, * yyt1{ nullptr }, * yyt2{ nullptr }, * yyt3{ nullptr };
-	const char *p1{ nullptr }, * p2{ nullptr };
-	p = line.c_str();
-
-	/*!re2c
-		_ '.' _ @p1 ident @p2 __ 'if' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_if();
-							  return true; }
-		_ @p1 ident @p2 _ ':' _ 'if' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_if();
-							  return true; }
-		_ 'if' _ ':'			{ return false; }
-		_ 'if' _b			{ p--;
-							  do_if(); 
-							  return true; }
-
-		_ '.' _ @p1 ident @p2 __ 'ifdef' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_ifdef();
-							  return true; }
-		_ @p1 ident @p2 _ ':' _ 'ifdef' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_ifdef();
-							  return true; }
-		_ 'ifdef' _ ':'		{ return false; }
-		_ 'ifdef' _b			{ p--;
-							  do_ifdef();
-							  return true; }
-
-		_ '.' _ @p1 ident @p2 __ 'ifndef' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_ifndef();
-							  return true; }
-		_ @p1 ident @p2 _ ':' _ 'ifndef' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_ifndef();
-							  return true; }
-		_ 'ifndef' _ ':'		{ return false; }
-		_ 'ifndef' _b			{ p--;
-							  do_ifndef();
-							  return true; }
-
-		_ '.' _ @p1 ident @p2 __ 'elif' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_elif();
-							  return true; }
-		_ @p1 ident @p2 _ ':' _ 'elif' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_elif();
-							  return true; }
-		_ 'elif' _ ':'		{ return false; }
-		_ 'elif' _b			{ p--;
-							  do_elif();
-							  return true; }
-
-		_ '.' _ @p1 ident @p2 __ 'elifdef' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_elifdef();
-							  return true; }
-		_ @p1 ident @p2 _ ':' _ 'elifdef' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_elifdef();
-							  return true; }
-		_ 'elifdef' _ ':'	{ return false; }
-		_ 'elifdef' _b		{ p--;
-							  do_elifdef();
-							  return true; }
-
-		_ '.' _ @p1 ident @p2 __ 'elifndef' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_elifndef();
-							  return true; }
-		_ @p1 ident @p2 _ ':' _ 'elifndef' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_elifndef();
-							  return true; }
-		_ 'elifndef' _ ':'	{ return false; }
-		_ 'elifndef' _b		{ p--;
-							  do_elifndef();
-							  return true; }
-
-		_ '.' _ @p1 ident @p2 __ 'else' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_else();
-							  return true; }
-		_ @p1 ident @p2 _ ':' _ 'else' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_else();
-							  return true; }
-		_ 'else' _ ':'		{ return false; }
-		_ 'else' _b			{ p--;
-							  do_else();
-							  return true; }
-
-		_ '.' _ @p1 ident @p2 __ 'endif' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_endif();
-							  return true; }
-		_ @p1 ident @p2 _ ':' _ 'endif' _b {
-							  p--;
-							  if (ifs_active()) do_label(string(p1, p2));
-							  do_endif();
-							  return true; }
-		_ 'endif' _ ':'		{ return false; }
-		_ 'endif' _b			{ p--;
-							  do_endif();
-							  return true; }
-
-
-		*					{ return false; }
-	*/
-}
 
 bool PreprocFilter::check_defines(const string& line) {
 	const char* YYMARKER{ nullptr }, * yyt1{ nullptr }, * yyt2{ nullptr };
@@ -623,3 +493,4 @@ do_include(string(p1, p2)); return; }
 	*/
 #endif
 
+#endif

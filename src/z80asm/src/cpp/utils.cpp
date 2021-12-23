@@ -25,6 +25,7 @@ static int char_digit(char c) {
 	return -1;
 }
 
+// convert "\xnn" et all to characters
 string str_compress_escapes(const string& in) {
 	string out;
 	int base = 0, max_digits = 0, digit = 0;
@@ -72,6 +73,33 @@ string str_compress_escapes(const string& in) {
 		}
 		else
 			out.push_back(*p);
+	}
+	return out;
+}
+
+// expand non-ascii chars to "\xnn" et all
+string str_expand_escapes(const string& in) {
+	string out;
+	for (auto c : in) {
+		switch (c) {
+		case '\a':	out += "\\a"; break;
+		case '\b':	out += "\\b"; break;
+		case '\f':	out += "\\f"; break;
+		case '\n':	out += "\\n"; break;
+		case '\r':	out += "\\r"; break;
+		case '\t':	out += "\\t"; break;
+		case '\v':	out += "\\v"; break;
+		default:
+			if (c >= 0x20 && c < 0x7f)
+				out.push_back(c);
+			else if (c < 8)
+				out += "\\" + to_string(c);			// \o
+			else {
+				string c_hex = int_to_hex(c);		// 0xhh
+				c_hex[0] = '\\';					// \xhh
+				out += c_hex;
+			}
+		}
 	}
 	return out;
 }

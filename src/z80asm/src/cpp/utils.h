@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <iostream>
+#include <sstream>
 #include <string>
 using namespace std;
 
@@ -25,9 +27,25 @@ string str_toupper(string str);
 
 // convert C-escape sequences
 string str_compress_escapes(const string& in);
+string str_expand_escapes(const string& in);
 
 // check string ending
 bool str_ends_with(const string& str, const string& ending);
 
 // read lines with any EOL terminator
 istream& safe_getline(istream& is, string& t);
+
+// convert int to hex
+// https://stackoverflow.com/questions/5100718/integer-to-hex-string-in-c
+template< typename T >
+std::string int_to_hex(T i)
+{
+	std::ostringstream ss;
+	if (i < 10)
+		ss << i;
+	else
+		ss << "0x"
+		<< std::setfill('0') << std::setw(2)
+		<< std::hex << i << std::dec;
+	return ss.str();
+}

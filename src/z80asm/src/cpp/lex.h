@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstring>
+#include <deque>
 #include <string>
 #include <vector>
 using namespace std;
@@ -22,9 +23,12 @@ inline const char* skip_spaces(const char* p) {
 	return p;
 }
 
+bool remove_final_backslash(string& line);
+void split_lines(deque<string>& lines, const string& line);
+
 enum class TType {
 	End, Newline,
-	Ident, Label, Integer, Floating, String, ASMPC,
+	Ident, Label, Integer, String, ASMPC,
 	BinNot, LogNot, BinAnd, LogAnd, BinOr, LogOr, BinXor, LogXor,
 	Plus, Minus, Mul, Pow, Div, Mod,
 	Eq, Ne, Lt, Le, Gt, Ge, Shl, Shr,
@@ -41,15 +45,12 @@ enum class Keyword {
 struct Token {
 	TType   ttype{ TType::End };
 	int     ivalue{ 0 };
-	double	fvalue{ 0.0 };
 	string  svalue;
 	Keyword	keyword{ Keyword::None };
 	size_t	col{ 0 };
 
 	Token(TType ttype = TType::End, int ivalue = 0)
 		: ttype(ttype), ivalue(ivalue) {}
-	Token(TType ttype, double fvalue)
-		: ttype(ttype), fvalue(fvalue) {}
 	Token(TType ttype, const string& svalue, Keyword keyword = Keyword::None)
 		: ttype(ttype), svalue(svalue), keyword(keyword) {}
 

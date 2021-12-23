@@ -2,6 +2,8 @@
 
 BEGIN { use lib 't2'; require 'testlib.pl'; }
 
+use Test::More skip_all => "NOT IMPLEMENTED";
+
 z80asm_ok("", "", "",
 		'nop'					=> bytes(0));
 

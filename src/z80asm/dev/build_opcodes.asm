@@ -49,9 +49,9 @@
 ; Expressions
 ;------------------------------------------------------------------------------
 	ld a,1
-	ld a,'								;; error: invalid single quoted character
+	ld a,'								;; error: unclosed quoted string
 	ld a,''								;; error: invalid single quoted character
-	ld a,'a								;; error: invalid single quoted character
+	ld a,'a								;; error: unclosed quoted string
 	ld a,'a'
 	ld a,'he'							;; error: invalid single quoted character
 	ld a,"a"							;; error: syntax error

@@ -106,6 +106,15 @@ void error_redefined_macro(const char *name)
 	
 	STR_DELETE(msg);
 }
+void error_wrong_number_macro_args(const char *name)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	Str_append_sprintf( msg, "wrong number of macro '%s' arguments", name );
+	do_error( ErrError, Str_data(msg) );
+	
+	STR_DELETE(msg);
+}
 void error_syntax(void)
 {
 	STR_DEFINE(msg, STR_SIZE);
@@ -543,15 +552,6 @@ void error_cmd_failed(const char *cmd)
 	STR_DEFINE(msg, STR_SIZE);
 
 	Str_append_sprintf( msg, "command '%s' failed", cmd );
-	do_error( ErrError, Str_data(msg) );
-	
-	STR_DELETE(msg);
-}
-void error_wrong_number_macro_args(const char *macro)
-{
-	STR_DEFINE(msg, STR_SIZE);
-
-	Str_append_sprintf( msg, "macro '%s': wrong number of arguments", macro );
 	do_error( ErrError, Str_data(msg) );
 	
 	STR_DELETE(msg);
