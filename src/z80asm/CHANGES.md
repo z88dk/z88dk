@@ -17,6 +17,9 @@ Z88DK Z80 Module Assembler Change Log
 - 2021-09-25 Fix #1865 emulate de-indirect loads
 - 2021-09-30 Fix #1869 detect and report symbols not defined because of circular dependencies
 - 2021-10-01 Fix #1874 illegal identifier swap a 
+- 2021-10-10 Fix #1883 zcc accepts file names starting with digits
+- 2021-12-25 Fix #1911 use faster loops in ldir and lddr emulation
+- 2021-12-25 Fix #1898 add ASSERT directive
 
 2020
 ----

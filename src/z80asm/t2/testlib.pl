@@ -60,6 +60,7 @@ sub z80asm_ok {
 
 sub z80asm_nok {
     my($options, $files, $asm, $exp_err) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     
     # save asm file
     my $asm_file = "${test}.asm";
