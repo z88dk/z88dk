@@ -51,7 +51,6 @@ extern void asm_PHASE(int address);
 extern void asm_DEPHASE();
 
 /* directives with string argument */
-extern void asm_INCLUDE(const char* filename);
 extern void asm_BINARY(const char* filename);
 
 /* directives with name argument */

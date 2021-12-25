@@ -278,6 +278,7 @@ void Preproc::parse_line(const string& line) {
 	if (!ifs_active()) return;
 
 	// do these only if ifs_active()
+	if (check_include()) return;
 
 	// last check - macro call
 
@@ -319,6 +320,19 @@ bool Preproc::check_keyword(Keyword keyword, void(Preproc::* do_action)()) {
 	else if (m_lexer[0].is(keyword)) {
 		m_lexer.next();
 		((*this).*(do_action))();
+		return true;
+	}
+	else
+		return false;
+}
+
+bool Preproc::check_include() {
+	if (check_keyword(Keyword::INCLUDE, &Preproc::do_include))
+		return true;
+	else if (m_lexer[0].is(TType::Hash) && m_lexer[1].is(Keyword::INCLUDE)) {
+		m_lexer.next();
+		m_lexer.next();
+		do_include();
 		return true;
 	}
 	else
@@ -457,6 +471,20 @@ void Preproc::do_elifdef() {
 
 void Preproc::do_elifndef() {
 	do_elifdef_elifndef(true);
+}
+
+void Preproc::do_include() {
+	if (!m_lexer.peek().is(TType::String))
+		error_syntax();
+	else {
+		string filename = m_lexer.peek().svalue;
+		m_lexer.next();
+		if (!m_lexer.peek().is(TType::Newline))
+			error_syntax();
+		else {
+			open(filename, true);
+		}
+	}
 }
 
 ExpandedText Preproc::expand(Lexer& lexer, Macros& defines) {

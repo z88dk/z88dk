@@ -239,11 +239,6 @@ void asm_DEPHASE()
 /*-----------------------------------------------------------------------------
 *   directives with string argument
 *----------------------------------------------------------------------------*/
-void asm_INCLUDE(const char* filename)
-{
-	parse_file(filename);
-}
-
 void asm_BINARY(const char* filename)
 {
 	filename = path_search(filename, opts.inc_path);

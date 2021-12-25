@@ -119,6 +119,7 @@ private:
 	bool ifs_active();
 
 	bool check_keyword(Keyword keyword, void (Preproc::* do_action)());
+	bool check_include();
 
 	void do_if();
 	void do_else();
@@ -130,6 +131,7 @@ private:
 	void do_elifdef_elifndef(bool invert);
 	void do_elifdef();
 	void do_elifndef();
+	void do_include();
 
 	ExpandedText expand(Lexer& lexer, Macros& defines);
 	void expand_ident(ExpandedText& out, const string& ident, Lexer& lexer, Macros& defines);

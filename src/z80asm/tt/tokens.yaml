@@ -259,6 +259,7 @@ tokens:
 
   # Assembly directives
   - name    : ALIGN
+  - name    : ASSERT
   - name    : BINARY
   - name    : BYTE
   - name    : C_LINE
@@ -283,19 +284,10 @@ tokens:
   - name    : DS
   - name    : DW
   - name    : DWORD
-  - name    : ELIF
-  - name    : ELIFDEF
-  - name    : ELIFNDEF
-  - name    : ELSE
-  - name    : ENDIF
   - name    : EQU
   - name    : EXTERN
   - name    : GLOBAL
-  - name    : IF
-  - name    : IFDEF
-  - name    : IFNDEF
   - name    : INCBIN
-  - name    : INCLUDE
   - name    : LIB
   - name    : LINE
   - name    : LSTOFF

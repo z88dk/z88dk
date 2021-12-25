@@ -322,3 +322,8 @@ errors:
     func	: error_cmd_failed
     args	: const char *cmd
     message	: "\"command '%s' failed\", cmd"
+
+  - type	: ErrError
+    func	: error_assertion_failed
+    args	: void
+    message	: "\"assertion failed\""

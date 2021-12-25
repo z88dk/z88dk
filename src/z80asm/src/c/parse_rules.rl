@@ -478,6 +478,15 @@ Define rules for a ragel-based parser.
 		/*---------------------------------------------------------------------
 		*   Directives
 		*--------------------------------------------------------------------*/
+		| label? _TK_ASSERT const_expr _TK_NEWLINE @{
+			DO_STMT_LABEL();
+			if (expr_error)
+				error_expected_const_expr();
+			else if (expr_value == 0)
+				error_assertion_failed();
+			else 
+				; 
+		}
 		| label? _TK_ALIGN const_expr _TK_NEWLINE @{
 		    DO_STMT_LABEL();
 			if (expr_error)
@@ -518,11 +527,6 @@ Define rules for a ragel-based parser.
 				error_expected_const_expr();
 			else
 				asm_LINE(expr_value, Str_data(name));
-		}
-
-		| label? _TK_INCLUDE string _TK_NEWLINE @{
-			DO_STMT_LABEL();
-			asm_INCLUDE(Str_data(name));
 		}
 
 		| label? ( _TK_BINARY | _TK_INCBIN ) string _TK_NEWLINE @{
