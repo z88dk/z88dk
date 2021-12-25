@@ -1,0 +1,6 @@
+_DEVELOPMENT/target/rc2014/driver/diskio/8085/__disk_data
+_DEVELOPMENT/target/rc2014/driver/diskio/8085/asm_disk_initialize
+_DEVELOPMENT/target/rc2014/driver/diskio/8085/asm_disk_ioctl
+_DEVELOPMENT/target/rc2014/driver/diskio/8085/asm_disk_status
+_DEVELOPMENT/target/rc2014/driver/diskio/8085/asm_disk_read
+_DEVELOPMENT/target/rc2014/driver/diskio/8085/asm_disk_write

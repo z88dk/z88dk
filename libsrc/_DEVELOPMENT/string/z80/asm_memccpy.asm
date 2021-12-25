@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; void *memccpy(void * restrict s1, const void * restrict s2, int c, size_t n)
@@ -42,52 +42,57 @@ asm_memccpy:
    ;            bc = 0
    ;
    ; uses  : f, bc, de, hl
-   
+
    inc c
    dec c
-   jr z, test0
-IF __CPU_GBZ80__
+   jr Z,test0
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+
    ld (__memccpy_value),a
-ENDIF
+   dec bc
+   inc b
+   inc c
 
 loop:
-IF __CPU_GBZ80__
    ld a,(__memccpy_value)
-ENDIF
    cp (hl)
-IF __CPU_GBZ80__ || __CPU_INTEL__
+   ld a,(hl)
    inc hl
+   ld (de),a
    inc de
-   dec bc
-   jr z,match
-   ld a,b
-   or c
-   jr nz,loop
+   jr Z,match
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
 ELSE
+
+loop:
+   cp (hl)
    ldi
-   jr z, match
-   jp pe, loop
+   jr Z,match
+   jp PE,loop
+
 ENDIF
 
 nomatch:
-
    jp error_zc
 
 match:
-
-   ld l,e
-   ld h,d                      ; hl = ptr in dst to char following char c
+   ld hl,de                    ; hl = ptr in dst to char following char c
    ret                         ; z flag set
 
 test0:
-
    inc b
-   djnz loop
-   
+   dec b
+   jr NZ,loop
+
    jr nomatch
 
-IF __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
 SECTION bss_clib
 SECTION bss_string
-__memccpy_value:	defb	0
+__memccpy_value:    defb 0
 ENDIF

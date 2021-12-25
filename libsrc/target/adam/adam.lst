@@ -6,3 +6,7 @@ games/obj/coleco/joystick_type
 @video/tms9918/video_tms9918.lst
 @gfx/narrow/gfx_narrow.lst
 target/adam/cpm_platform_init
+target/coleco/games/joystick
+target/coleco/games/coleco_joypad
+games/obj/coleco/joystick_type
+@games/games.lst

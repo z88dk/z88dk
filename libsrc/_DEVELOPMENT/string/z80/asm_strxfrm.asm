@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; size_t strxfrm(char * restrict s1, const char * restrict s2, size_t n)
@@ -44,66 +44,67 @@ asm_strxfrm:
 
    ld a,d
    or e
-   jp z, asm_strlen            ; if dst == 0, return strlen(src)
+   jp Z,asm_strlen             ; if dst == 0, return strlen(src)
    
    ld a,b
    or c
-   jp z, error_zc              ; if n == 0, return 0 with carry set
-   
-   ; copy src to dst
-   
-   push hl                     ; save src
-   
-loop:
+   jp Z,error_zc               ; if n == 0, return 0 with carry set
 
+   ; copy src to dst
+
+   push hl                     ; save src
+
+   dec bc
+   inc b
+   inc c
+
+loop:
    ld a,(hl)
    or a
-   jr z, end_s2
-   
-   dec bc
-   ld a,b
-   or c
-   jr z, end_n
-   
+   jr Z,end_s2
+
    push bc
    push hl
    push de
-   
-   ld a,(hl)
+
    call __lc_char_ordinal      ; assign ordinal to char
-   
+
    pop de
    pop hl
    pop bc
-   
+
    ld (de),a
 
    inc hl
-   inc de   
-   jr loop
+   inc de
+
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
 
 end_n:
-
    call end_s2
-
    scf
    ret
 
 end_s2:
-
    ld (de),a                   ; terminate dst
-   
-   pop de                      ; de = src
-IF __CPU_INTEL__ | __CPU_GBZ80__
+
+   pop bc                      ; bc = src
+
+IF __CPU_8080__ | __CPU_GBZ80__
    ld  a,l
-   sub e
+   sub c
    ld  l,a
    ld  a,h
-   sbc d
+   sbc b
    ld  h,a
+ELIF __CPU_8085__
+   sub hl,bc
 ELSE
-   sbc hl,de                   ; hl = num chars written to s1
+   sbc hl,bc                   ; hl = num chars written to s1
 ENDIF
-   
+
    or a
    ret

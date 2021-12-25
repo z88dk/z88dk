@@ -28,54 +28,59 @@ extern void *_CLIB_DISABLE_FGETS_CURSOR;
 
 extern void fgets_cons_erase_character(unsigned char toerase) __z88dk_fastcall;
 
-static void docursor();
+static void docursor(void);
 
 char *fgets_cons(char *str, size_t max)
-{   
-   int c;
-   int ptr;
-   ptr=0;
+{
+    int c;
+    int ptr;
 
-   docursor();
-   while (ptr < max - 1) {
-      c = fgetc_cons();
+    ptr = 0;
 
+    docursor();
+    while (ptr < max - 1) {
+        c = fgetc_cons();
 
-      if (c == KEY_CAPS_LOCK)
-      {
-         _cons_state ^= 1; // Toggle caps lock
-      }
-      else if ( c == KEY_DEL)
-      {
-	if ( ptr > 0 )
-	{
-           if ( CLIB_DISABLE_FGETS_CURSOR == 0 ) {
-               fgets_cons_erase_character('_');
-           }
-           fgets_cons_erase_character(str[--ptr]);
-           str[ptr] = 0;
-           docursor();
+        if (c == KEY_CAPS_LOCK)
+        {
+            _cons_state ^= 1; // Toggle caps lock
+
+        } else if ( c == KEY_DEL)
+        {
+            if ( ptr > 0 )
+            {
+                if ( CLIB_DISABLE_FGETS_CURSOR == 0 ) {
+                    fgets_cons_erase_character('_');
+                }
+                fgets_cons_erase_character(str[--ptr]);
+                str[ptr] = 0;
+                docursor();
+            }
+
+        } else if (c == 4 || c == -1)
+        {
+            break;
+
+        } else
+        {
+            if (_cons_state)
+                c = toupper(c);
+
+            str[ptr] = c;
+            str[++ptr] = 0;
+            if ( CLIB_DISABLE_FGETS_CURSOR == 0 ) {
+                fgets_cons_erase_character('_');
+            }
+            fputc_cons(c);
+            if (c == '\n' || c == '\r')
+                break;
+            docursor();
         }
-      } else if ( c == 4||c==-1) {
-        break;
-      } else {
-         if (_cons_state)
-            c = toupper(c);
-            
-         str[ptr++] = c;
-         str[ptr] = 0;
-         if ( CLIB_DISABLE_FGETS_CURSOR == 0 ) {
-             fgets_cons_erase_character('_');
-         }
-	 fputc_cons(c);
-         if (c == '\n' || c == '\r') break;
-         docursor();
-      }
-   }
-   return ptr ? str : NULL;
+    }
+    return ptr ? str : NULL;
 }
 
-static void docursor() {
+static void docursor(void) {
     if ( CLIB_DISABLE_FGETS_CURSOR == 0 ) {
         fputc_cons('_');
     }

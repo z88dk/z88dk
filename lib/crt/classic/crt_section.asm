@@ -122,9 +122,9 @@ exitsp:          defw    0       ;atexit() stack
 exitcount:       defb    0       ;Number of atexit() routines
 IF DEFINED_USING_amalloc
     PUBLIC _heap
-    ; The heap pointer will be wiped at startup,
-    ; but first its value (based on __tail)
-    ; will be kept for sbrk() to setup the malloc area
+    ; The heap pointer will be wiped at bss initialisation.
+    ; Its value (based on __tail) will be set later if set
+    ; by sbrk() during AMALLOC initialisation.
 _heap:
     defw 0          ; Initialised by code_crt_init - location of the last program byte
     defw 0

@@ -14,7 +14,7 @@ __str_locate_nul:
    ;         carry reset
    ;
    ; uses  : af, bc, hl
-   
+
    xor a
    ld c,a
    ld b,a
@@ -23,12 +23,12 @@ loop:
    dec bc
    ld a,(hl)
    and a
-   ret z
+   ret Z
    inc hl
    ld a,b
    or c
-   jr nz,loop
-   and a
+   jr NZ,loop
+
 ELSE
    cpir
 ENDIF

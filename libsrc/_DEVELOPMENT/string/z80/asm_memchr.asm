@@ -41,7 +41,7 @@ asm_memchr:
 
    inc c
    dec c
-   jr z, test0
+   jr Z,test0
 
 asm0_memchr:
 loop:
@@ -52,15 +52,14 @@ ELSE
    cpir
 ENDIF
    dec hl
-   ret z                       ; char found
+   ret Z                       ; char found
 
 notfound:
-
    jp error_zc
 
 test0:
-
    inc b
-   djnz loop
+   dec b
+   jr NZ,loop
 
    jr notfound

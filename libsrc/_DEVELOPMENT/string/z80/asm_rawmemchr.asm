@@ -1,6 +1,14 @@
 
+; ===============================================================
+; Dec 2021 feilipu
+; ===============================================================
+; 
 ; BSD
 ; void *rawmemchr(const void *mem, int c)
+;
+; Matches a character pointed to by mem.
+;
+; ===============================================================
 
 SECTION code_clib
 SECTION code_string
@@ -14,24 +22,25 @@ asm_rawmemchr:
    ;
    ; exit  : hl = pointer to char c
    ;
-   ; uses  : af, bc, hl + de (gbz80/8080)
+   ; uses  : af, bc, hl
    
    ld bc,0
-IF __CPU_GBZ80__
-   push de
-   ld e,a
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
 loop:
    cp (hl)
-   jr z,matched
+   jr Z,matched
    inc hl
-   dec bc
-   ld a,b
-   or c
-   jr nz,loop
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
 matched:
-   pop de
+
 ELSE
    cpir
    dec hl
+
 ENDIF
    ret

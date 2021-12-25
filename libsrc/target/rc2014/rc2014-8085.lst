@@ -3,5 +3,9 @@ target/rc2014/stdio/fgetc_cons_basic
 target/rc2014/stdio/fputc_cons_acia
 target/rc2014/stdio/fgetc_cons_acia
 target/rc2014/stdio/interrupt_cons_acia
+
+@_DEVELOPMENT/target/rc2014/device/device_8085_sccz80.lst
+@_DEVELOPMENT/target/rc2014/driver/driver_8085_sccz80.lst
+
 @stdio/stdio_8080.lst
 

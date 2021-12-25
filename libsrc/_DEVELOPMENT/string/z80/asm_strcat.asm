@@ -31,7 +31,7 @@ asm_strcat:
    ex de,hl
    call __str_locate_nul       ; a = 0
    ex de,hl
-      
+
 loop:                          ; append s2 to s1
 IF __CPU_INTEL__ || __CPU_GBZ80__
   IF __CPU_GBZ80__
@@ -43,14 +43,14 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    ld (de),a
    inc de
    and a
-   jr nz,loop
+   jr NZ,loop
 ELSE
    cp (hl)
    ldi
-   jr nz, loop
+   jr NZ,loop
 ENDIF
-   
+
    pop hl                      ; hl = dst
-   
+
    dec de
    ret

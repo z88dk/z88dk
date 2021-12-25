@@ -24,6 +24,7 @@ target/cpc/graphics/w_clga
 @gfx/wide/gfx_wide.lst
 target/cpc/time/clock
 target/cpc/games/joystick
+games/obj/${TARGET}/joystick_type
 target/cpc/cpcrslib/firmware
 target/cpc/cpcrslib/bios_msg
 target/cpc/cpcrslib/cpc_fdc

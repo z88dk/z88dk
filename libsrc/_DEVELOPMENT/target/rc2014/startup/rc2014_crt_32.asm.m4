@@ -156,14 +156,6 @@ ENDIF
 
     include "../crt_init_sp.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-
-IF DEFINED_USING_amalloc
-    include "../../../../../lib/crt/classic/crt_init_amalloc.asm"
-ENDIF
-
    ; command line
 
 IF (__crt_enable_commandline = 1) || (__crt_enable_commandline >= 3)
@@ -238,9 +230,11 @@ IF __crt_initialize_bss = 1
     inc hl
     dec bc
     jp NK,init_bss_8085
+
 ENDIF
 
 IF CRT_ENABLE_STDIO = 1
+
     ; Setup std* streams
     ld hl,__sgoioblk+2
     ld (hl),19                  ; stdin
@@ -248,18 +242,27 @@ IF CRT_ENABLE_STDIO = 1
     ld (hl),21                  ; stdout
     ld hl,__sgoioblk+22
     ld (hl),21                  ; stderr
-ENDIF
 
-IF DEFINED_USING_amalloc
-    EXTERN  __BSS_END_tail
-
-    ld hl,__BSS_END_tail
-    ld (_heap),hl
 ENDIF
 
     ; copy interrupt vector table to final location
 
     include "../crt_set_interrupt_mode.inc"
+
+IF DEFINED_USING_amalloc
+    
+; Optional definition for auto MALLOC init
+; it assumes we have free space between the end of
+; the compiled program and the stack pointer
+
+    EXTERN  __BSS_END_tail
+
+    ld hl,__BSS_END_tail
+    ld (_heap),hl
+
+    include "../../../../../lib/crt/classic/crt_init_amalloc.asm"
+
+ENDIF
 
 SECTION code_crt_init           ; user and library initialization
 
@@ -365,9 +368,9 @@ ENDIF
 IF DEFINED_USING_amalloc
 
     PUBLIC _heap
-    ; The heap pointer will be wiped at startup,
-    ; but first its value (based on __tail)
-    ; will be kept for sbrk() to setup the malloc area
+    ; The heap pointer will be wiped at bss initialisation.
+    ; Its value (based on __tail) will be set later if set
+    ; by sbrk() during AMALLOC initialisation.
 ._heap
     defw 0                      ; initialised by code_crt_init - location of the last program byte
     defw 0

@@ -116,8 +116,8 @@ IF DEFINED_USING_amalloc_1
     sbc     hl,de   ;  leave 3/4 of the free memory for the stack
 ENDIF
 ENDIF
-
     sbc     hl,de   ;  leave 1/4 of the free memory for the stack
+
 ENDIF
 
     push    bc      ; main address for malloc area

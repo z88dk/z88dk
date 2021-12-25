@@ -33,41 +33,40 @@ asm_strncmp:
    ld a,b
    or c
    jr z, equal
-      
-loop:
 
+loop:
    ld a,(de)                   ; a = *s1
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
    cp (hl)
    inc hl
    dec bc
-   jr  nz,different
+   jr  NZ,different
    and a
-   jr z,equal
+   jr Z,equal
    ld a,b
    or c
-   jr z,equal
+   jr Z,equal
    inc de
    jr loop
 ELSE
    cpi                         ; *s1 - *s2
-   jr nz, different
-   jp po, equal
+   jr NZ,different
+   jp PO,equal
    inc de
-   
-   or a
-   jr nz, loop
-   
-   dec de
-ENDIF
-   
-equal:
 
+   or a
+   jr NZ,loop
+
+   dec de
+
+ENDIF
+
+equal:
    ld hl,0
    ret
 
 different:
-
    dec hl
    sub (hl)
    ld h,a

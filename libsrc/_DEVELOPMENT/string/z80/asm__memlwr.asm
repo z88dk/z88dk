@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Jan 2014
+; Jan 2014 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; char *_memlwr(void *p, size_t n)
@@ -28,25 +28,41 @@ asm__memlwr:
 
    ld a,b
    or c
-   ret z
-   
+   ret Z
+
    push hl
 
-loop:
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   dec bc
+   inc b
+   inc c
 
+loop:
+   ld a,(hl)
+   call asm_tolower
+
+IF __CPU_GBZ80__
+   ld (hl+),a
+ELSE
+   ld (hl),a
+   inc hl
+ENDIF
+
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
+ELSE
+
+loop:
    ld a,(hl)
    call asm_tolower
    ld (hl),a
-   
-IF __CPU_GBZ80__
-   inc hl
-   dec bc
-   ld a,b
-   or c
-   jp nz,loop
-ELSE
+
    cpi                         ; hl++, bc--
-   jp pe, loop
+   jp pe,loop
+
 ENDIF
 
    pop hl

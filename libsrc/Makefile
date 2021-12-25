@@ -371,6 +371,7 @@ pacman_clib.lib:
 	@echo '--- Building PacMan HW Library ---'
 	@echo ''
 	$(call buildgeneric,pacman,"text6 narrow")
+	$(MAKE) -C games TARGET=pacman SUBSET=joystick.asm
 	TARGET=pacman TYPE=z80 $(LIBLINKER) -DFORpacman -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pacman_clib @$(TARGET_DIRECTORY)/pacman/pacman.lst
 
 # Philips P2000 lib - Stefano
@@ -665,6 +666,7 @@ bondwell2.lib:
 	@echo ''
 	@$(RM) -f video/msm6255/*.o
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=bondwell2
+	$(MAKE) -C games TARGET=cpm SUBTYPE=bondwell2
 	TARGET=bondwell2 TYPE=z80 $(LIBLINKER) -DFORbondwell2 -x$(OUTPUT_DIRECTORY)/bondwell2 @$(TARGET_DIRECTORY)/bondwell2/bw2.lst
 
 gfxosborne1.lib:
@@ -1361,6 +1363,7 @@ cpc_clib.lib:
 	@echo ''
 	$(call buildgeneric,cpc,wide)
 	$(MAKE) -C target/cpc
+	$(MAKE) -C games TARGET=cpc SUBSET=joystick.asm
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcpc -x$(OUTPUT_DIRECTORY)/cpc_clib @$(TARGET_DIRECTORY)/cpc/cpc.lst
 	TARGET=cpc TYPE=z80 $(LIBLINKER) -DFORcpc -x$(OUTPUT_DIRECTORY)/cpccpm @$(TARGET_DIRECTORY)/cpc/cpc_cpm.lst
 
