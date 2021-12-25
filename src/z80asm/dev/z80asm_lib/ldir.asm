@@ -7,11 +7,11 @@
 
 __z80asm__ldir:
         push    af
-		
-		    ; setup loop
-		    dec 	bc			
-		    inc 	b 
-		    inc 	c 
+
+		; setup loop
+        dec     bc
+        inc     b
+        inc     c
 loop:
 IF  __CPU_GBZ80__
         ld      a, (hl+)
