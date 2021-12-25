@@ -36,24 +36,24 @@ loop:
    ld a,(hl)
    call asm_tolower
    ld c,a                    ; c = *s2
-   
+
    ld a,(de)
    call asm_tolower
-   
+
    cp c                      ; *s1 - *s2
-   jr nz, different
+   jr NZ,different
 
    inc de
    inc hl
-   
+
    or a                      ; end of string?      
-   jr nz, loop
+   jr NZ,loop
 
 equal:                       ; both strings ended same time
 
    dec de
-   
-   ld l,a	
+
+   ld l,a
    ld h,a
    ret 
    

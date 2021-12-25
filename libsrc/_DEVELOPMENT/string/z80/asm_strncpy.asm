@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; char *strncpy(char * restrict s1, const char * restrict s2, size_t n)
@@ -34,50 +34,64 @@ asm_strncpy:
 
    ld a,b
    or c
-   jr z, done
+   jr Z,done
       
    ; first copy src to dst
+IF __CPU_INTEL__ || __CPU_GBZ80__
 
+   dec bc
+   inc b
+   inc c
+
+loop:
+IF __CPU_GBZ80__
+   ld a,(hl+)
+ELSE
+   ld a,(hl)
+   inc hl
+ENDIF
+   ld (de),a
+   and a
+   jr Z,copied
+
+   inc de
+
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
+   jr done                      ; reached max number of chars
+
+copied:
+   ; now pad with zeroes
+
+zeroloop:
+   ld (de),a
+   inc de
+
+   dec c
+   jr NZ,zeroloop
+   dec b
+   jr NZ,zeroloop
+
+ELSE
    xor a
 
 loop:
-IF __CPU_GBZ80__ || __CPU_INTEL__
-   ld a,(hl)
-   ld (de),a
-   inc hl
-   inc de
-   dec bc
-   and a
-   jr z,copied
-   ld a,c
-   or c
-   jr z,done	;max characters
-   jr loop
-copied:
-   ; Now pad it out with zero
-zeroloop:
-   xor a
-   ld (de),a
-   inc de
-   dec bc
-   ld a,b
-   or c
-   jr nz,zeroloop
-ELSE
    cp (hl)
    ldi
-   jp po, done                 ; reached max number of chars
-   jr nz, loop
-   
+   jp PO,done                  ; reached max number of chars
+   jr NZ,loop
+
    ; now pad with zeroes
-   
-   ld l,e
-   ld h,d
+
+   ld hl,de
    dec hl
    ldir
+
 ENDIF
 
 done:
-
    pop hl
    ret

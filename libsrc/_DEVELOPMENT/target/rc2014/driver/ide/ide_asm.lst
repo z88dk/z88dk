@@ -1,4 +1,3 @@
-target/rc2014/driver/ide/8080/__ide_data
 target/rc2014/driver/ide/8080/ide_wait_ready
 target/rc2014/driver/ide/8080/ide_wait_drq
 target/rc2014/driver/ide/8080/ide_test_error

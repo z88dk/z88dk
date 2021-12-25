@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; void *memcpy(void * restrict s1, const void * restrict s2, size_t n)
@@ -34,42 +34,40 @@ IF (__CLIB_OPT_UNROLL & __CLIB_OPT_UNROLL_MEMCPY)
 
    ld a,b
    or a
-   
-   jr nz, big
-   
+
+   jr NZ,big
+
    or c
-   jr z, zero_n
-   
+   jr Z,zero_n
+
    push de
 
    EXTERN l_ldi_loop_small
    call   l_ldi_loop_small
 
    pop hl
-   
+
    or a
    ret
 
 big:
-
    push de
-   
+
    EXTERN l_ldi_loop_0
    call   l_ldi_loop_0
-   
+
    pop hl
-   
+
    or a
    ret
 
 asm0_memcpy:
-
    push de
-   
+
    call l_ldi_loop
-   
+
    pop hl
-   
+
    or a
    ret
 
@@ -77,12 +75,16 @@ ELSE
 
    ld a,b
    or c
-   jr z, zero_n
+   jr Z,zero_n
 
 asm0_memcpy:
-
    push de
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
+   dec bc
+   inc b
+   inc c
+
 loop:
  IF __CPU_GBZ80__
    ld a,(hl+)
@@ -92,16 +94,17 @@ loop:
  ENDIF
    ld (de),a
    inc de
-   dec bc
-   ld a,b
-   or c
-   jr nz,loop
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
 ELSE
    ldir
+
 ENDIF
 
    pop hl
-   
    or a
    ret
 
@@ -109,8 +112,5 @@ ENDIF
 
 asm1_memcpy:
 zero_n:
-
-   ld l,e
-   ld h,d
-   
+   ld hl,de
    ret

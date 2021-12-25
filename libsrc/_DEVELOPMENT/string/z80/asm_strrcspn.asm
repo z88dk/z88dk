@@ -54,7 +54,7 @@ asm_strrcspn:
    
    ld a,(de)
    or a
-   jr z, empty_cset
+   jr Z,empty_cset
 
 loop:
 IF __CPU_GBZ80__
@@ -62,10 +62,10 @@ IF __CPU_GBZ80__
    call __z80asm__cpd
    ld a,b
    or c
-   jr z,none_in_cset
+   jr Z,none_in_cset
 ELSE
    cpd                         ; hl--, bc--
-   jp po, none_in_cset
+   jp PO,none_in_cset
 ENDIF
 
    ; hl = & current char in str to check
@@ -77,21 +77,19 @@ ENDIF
    ; see if current char from string is in cset
    
    ld c,(hl)
-   
-   ld l,e
-   ld h,d
-   
+
+   ld hl,de
+
    call asm_strchr             ; carry reset if in cset
-   
+
    pop hl
    pop bc
-   
-   jr c, loop                  ; loop if char not in cset
+
+   jr C,loop                   ; loop if char not in cset
 
 in_cset:
 
-   ld l,c
-   ld h,b                      ; hl = char position
+   ld hl,bc                    ; hl = char position
 
    pop bc                      ; bc = char *str
    ret
@@ -103,8 +101,7 @@ none_in_cset:
 
 empty_cset:
 
-   ld l,c
-   ld h,b
+   ld hl,bc
    dec hl                      ; hl = strlen(str)
    
    pop bc                      ; bc = char *str

@@ -31,45 +31,39 @@ asm__strrstrip:
    ;
    ; uses  : af, bc, de, hl
 
-   ld e,l
-   ld d,h                      ; de = char *s
+   ld de,hl                    ; de = char *s
 
    ; find strlen(s) and terminating NUL
 
    call asm_strlen
-   jr z, exit                  ; if strlen(s) == 0
-   
-   ld c,l
-   ld b,h                      ; bc = strlen(s)
-     
+   jr Z,exit                   ; if strlen(s) == 0
+
+   ld bc,hl                    ; bc = strlen(s)
+
    add hl,de                   ; hl = s + strlen(s)
    dec hl                      ; hl points at last char in s
-   
-loop:
 
+loop:
    ld a,(hl)
    call asm_isspace
-   jr c, not_ws
-  
+   jr C,not_ws
+
 IF __CPU_GBZ80__ || __CPU_INTEL__
    dec hl
    dec bc
    ld a,b
    or c
-   jr nz,loop
+   jr NZ,loop
 ELSE 
    cpd                         ; hl--, bc--
-   jp pe, loop
+   jp PE,loop
 ENDIF
-   
+
 all_ws:
 exit:
-
-   ld l,e
-   ld h,d
+   ld hl,de
    ret
 
 not_ws:
-
    inc hl                      ; past non-ws char
    ret

@@ -38,11 +38,11 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
 ELSE
    cpi                         ; *s1 - *s2
 ENDIF
-   jr nz, different
+   jr NZ,different
    inc de
-   
+
    or a                        ; end of string?
-   jr nz, loop
+   jr NZ,loop
    
 equal:                         ; both strings ended same time
 

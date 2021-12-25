@@ -8,10 +8,10 @@
 __z80asm__ldir:
         push    af
 		
-		; setup loop
-		dec 	bc			
-		inc 	b 
-		inc 	c 
+		    ; setup loop
+		    dec 	bc			
+		    inc 	b 
+		    inc 	c 
 loop:
 IF  __CPU_GBZ80__
         ld      a, (hl+)
@@ -21,11 +21,12 @@ ELSE
 ENDIF
         ld      (de), a
         inc     de
-		
+
         ; iterate
-		dec 	c       
-		jr 		nz,loop 
-		djnz    loop 
+        dec     c
+        jp      nz, loop
+        dec     b
+        jp      nz, loop
 
         pop     af
         ret

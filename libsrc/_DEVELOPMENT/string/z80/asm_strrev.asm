@@ -27,12 +27,11 @@ asm_strrev:
 
    ; find end of string and string length
    
-   ld e,l
-   ld d,h                      ; de = char *s
-   
+   ld de,hl                    ; de = char *s
+
    call __str_locate_nul       ; bc = -strlen(s) - 1
    dec hl                      ; hl = ptr to char prior to terminating 0
-      
+
    push de                     ; save char *s
 
 IF __CPU_INTEL__
@@ -59,30 +58,33 @@ ENDIF
 
    or b
    jr z, exit                  ; if numswaps == 0, exit
-   
-loop:
 
+loop:
    ld a,(de)                   ; char at front of s
-IF __CPU_GBZ80__
+IF __CPU_INTEL__ || __CPU_GBZ80__
    push af
    ld  a,(hl)
    ld (de),a
    inc de
    dec bc
    pop af
+IF __CPU_GBZ80__
    ld (hl-),a
+ELSE
+   ld (hl),a
+   dec hl
+ENDIF
    ld  a,b
    or  c
-   jp  nz,loop
+   jp  NZ,loop
 ELSE
    ldi                         ; char at rear written to front of s
    dec hl
    ld (hl),a                   ; char from front written to rear of s 
    dec hl
-   jp pe, loop
+   jp PE,loop
 ENDIF
-   
-exit:
 
+exit:
    pop hl                      ; hl = char *s
    ret

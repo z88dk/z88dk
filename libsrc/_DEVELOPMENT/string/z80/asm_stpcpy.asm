@@ -37,15 +37,15 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    ld (de),a
    inc de
    and a
-   jr nz,loop
+   jr NZ,loop
 ELSE
    cp (hl)
    ldi
-   jr nz, loop
+   jr NZ,loop
 ENDIF
    
    dec de
    dec hl
-   
+
    ex de,hl
    ret

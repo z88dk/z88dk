@@ -31,33 +31,32 @@ asm_strspn:
    ; uses  : af, bc, hl
 
    push hl                     ; save string
-   
+
 loop:
 
    ld a,(hl)
    or a
-   jr z, end_string
-     
+   jr Z,end_string
+
    ; see if this char from string is in prefix
-   
+
    push hl                     ; save current string
-   
+
    ld c,a                      ; c = char
-   ld l,e
-   ld h,d                      ; hl = prefix
+   ld hl,de                    ; hl = prefix
    call asm_strchr             ; is c in prefix?
-   
+
    pop hl                      ; current string
 
-   jr c, done                  ; char not found
-   
+   jr C,done                   ; char not found
+
    inc hl
    jr loop
 
 end_string:
-
    pop bc
-IF __CPU_INTEL__ | __CPU_GBZ80__
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
    ld  a,l
    sub c
    ld  l,a
@@ -67,15 +66,14 @@ IF __CPU_INTEL__ | __CPU_GBZ80__
 ELSE
    sbc hl,bc
 ENDIF
-   
+
    scf
    ret
 
 done:
-   
    pop bc
-   
-IF __CPU_INTEL__ | __CPU_GBZ80__
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
    ld  a,l
    sub c
    ld  l,a
