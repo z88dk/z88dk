@@ -259,6 +259,7 @@ tokens:
 
   # Assembly directives
   - name    : ALIGN
+  - name    : ASSERT
   - name    : BINARY
   - name    : BYTE
   - name    : C_LINE

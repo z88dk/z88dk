@@ -537,3 +537,12 @@ void error_cmd_failed(const char *cmd)
 	
 	STR_DELETE(msg);
 }
+void error_assertion_failed(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	Str_append_sprintf( msg, "assertion failed" );
+	do_error( ErrError, Str_data(msg) );
+	
+	STR_DELETE(msg);
+}

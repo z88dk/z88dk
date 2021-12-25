@@ -214,6 +214,7 @@ TOKEN_KW(C_LINE, )
 
 /* assembly directives */
 TOKEN_OPCODE(ALIGN      )
+TOKEN_OPCODE(ASSERT     )
 TOKEN_OPCODE(BINARY     )
 TOKEN_OPCODE(BYTE       )
 TOKEN_OPCODE(DB         )
