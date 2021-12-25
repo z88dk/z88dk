@@ -41,6 +41,8 @@ $(PROJ)_lib.lst: $(SRC)
 
 clean::
 	$(RM) $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin
+	$(RM) $(PROJ)
 
 test: all
+	cp $(Z80ASM_EXE) $(PROJ)
 	perl -S prove t/*.t

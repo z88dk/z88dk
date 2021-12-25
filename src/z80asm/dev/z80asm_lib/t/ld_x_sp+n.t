@@ -53,8 +53,14 @@ for my $cpu (@CPUS) {
                     ld      hl, sp $add_text
                     rst     0
 END
-            my $sum = $base + $add;
-            
+            my $sum;
+			if ($cpu eq '8085') {
+				$sum = $base + ($add & 0xff);		# unsigned
+			}
+			else {
+				$sum = $base + $add;				# signed
+			}
+			
             is $r->{HL}, $sum, "result";
                     
             (Test::More->builder->is_passing) or die;

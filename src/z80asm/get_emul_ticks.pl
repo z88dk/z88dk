@@ -20,7 +20,7 @@ for my $cpu (qw( 8080 8085 gbz80 r2ka z180 z80 z80n )) {
 			($carry ? "scf\n" : "and a\n"),
 			$asm,
 			"nop ; END\n");
-		run("z80asm -b -l -m$cpu test.asm");
+		run("z88dk-z80asm -b -l -m$cpu test.asm");
 		# get end address
 		my $end;
 		for (path("test.lis")->lines) {
