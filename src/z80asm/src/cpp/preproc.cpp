@@ -61,7 +61,7 @@ PreprocLevel::PreprocLevel(Macros* parent)
 }
 
 void PreprocLevel::init(const string& text) {
-	if (g_do_preproc_line) 
+	if (g_do_preproc_line && !starts_with_hash(text))
 		split_lines(m_lines, text);
 	else 
 		m_lines.push_back(text);
@@ -266,21 +266,26 @@ void Preproc::parse_line(const string& line) {
 	m_lexer.set(line);
 
 	// do these irrespective of ifs_active()
-	if (check_keyword(Keyword::IF, &Preproc::do_if)) return;
-	if (check_keyword(Keyword::ELSE, &Preproc::do_else)) return;
-	if (check_keyword(Keyword::ENDIF, &Preproc::do_endif)) return;
-	if (check_keyword(Keyword::IFDEF, &Preproc::do_ifdef)) return;
-	if (check_keyword(Keyword::IFNDEF, &Preproc::do_ifndef)) return;
-	if (check_keyword(Keyword::ELIF, &Preproc::do_elif)) return;
-	if (check_keyword(Keyword::ELIFDEF, &Preproc::do_elifdef)) return;
-	if (check_keyword(Keyword::ELIFNDEF, &Preproc::do_elifndef)) return;
+	if (check_opcode(Keyword::IF, &Preproc::do_if)) return;
+	if (check_opcode(Keyword::ELSE, &Preproc::do_else)) return;
+	if (check_opcode(Keyword::ENDIF, &Preproc::do_endif)) return;
+	if (check_opcode(Keyword::IFDEF, &Preproc::do_ifdef)) return;
+	if (check_opcode(Keyword::IFNDEF, &Preproc::do_ifndef)) return;
+	if (check_opcode(Keyword::ELIF, &Preproc::do_elif)) return;
+	if (check_opcode(Keyword::ELIFDEF, &Preproc::do_elifdef)) return;
+	if (check_opcode(Keyword::ELIFNDEF, &Preproc::do_elifndef)) return;
 
 	if (!ifs_active()) return;
 
 	// do these only if ifs_active()
-	if (check_include()) return;
-	if (check_keyword(Keyword::BINARY, &Preproc::do_binary)) return;
-	if (check_keyword(Keyword::INCBIN, &Preproc::do_binary)) return;
+	if (check_opcode(Keyword::INCLUDE, &Preproc::do_include)) return;
+	if (check_hash_directive(Keyword::INCLUDE, &Preproc::do_include)) return;
+	if (check_opcode(Keyword::BINARY, &Preproc::do_binary)) return;
+	if (check_opcode(Keyword::INCBIN, &Preproc::do_binary)) return;
+	if (check_hash_directive(Keyword::DEFINE, &Preproc::do_define)) return;
+	if (check_hash_directive(Keyword::UNDEF, &Preproc::do_undef)) return;
+
+	if (check_hash()) return;
 
 	// last check - macro call
 
@@ -309,7 +314,7 @@ bool Preproc::ifs_active() {
 	return true;
 }
 
-bool Preproc::check_keyword(Keyword keyword, void(Preproc::* do_action)()) {
+bool Preproc::check_opcode(Keyword keyword, void(Preproc::* do_action)()) {
 	if (m_lexer[0].is(TType::Label) && m_lexer[1].is(keyword)) {
 		if (ifs_active())
 			do_label();
@@ -328,15 +333,20 @@ bool Preproc::check_keyword(Keyword keyword, void(Preproc::* do_action)()) {
 		return false;
 }
 
-bool Preproc::check_include() {
-	if (check_keyword(Keyword::INCLUDE, &Preproc::do_include))
-		return true;
-	else if (m_lexer[0].is(TType::Hash) && m_lexer[1].is(Keyword::INCLUDE)) {
+bool Preproc::check_hash_directive(Keyword keyword, void(Preproc::* do_action)()) {
+	if (m_lexer[0].is(TType::Hash) && m_lexer[1].is(keyword)) {
 		m_lexer.next();
 		m_lexer.next();
-		do_include();
+		((*this).*(do_action))();
 		return true;
 	}
+	else
+		return false;
+}
+
+bool Preproc::check_hash() {
+	if (m_lexer[0].is(TType::Hash))
+		return true;
 	else
 		return false;
 }
@@ -526,6 +536,74 @@ void Preproc::do_binary() {
 				}
 			}
 		}
+	}
+}
+
+void Preproc::do_define() {
+	if (!m_lexer.peek().is(TType::Ident))
+		error_syntax();
+	else {
+		// get name
+		size_t name_col = m_lexer.peek().col;
+		string name = m_lexer.peek().svalue;
+		m_lexer.next();
+
+		// check if name is followed by '(' without spaces
+		size_t this_col = m_lexer.peek().col;
+		bool has_space = (this_col > name_col + name.length());
+		bool has_args = (!has_space && m_lexer.peek().is(TType::Lparen));
+
+		// create macro
+		auto macro = make_shared<Macro>(name);
+		defines_base().add(macro);				// create macro
+
+		// collect args
+		if (has_args) {
+			m_lexer.next();						// skip '('
+			while (true) {
+				if (!m_lexer.peek().is(TType::Ident)) {
+					error_syntax();
+					return;
+				}
+				string arg = m_lexer.peek().svalue;
+				macro->push_arg(arg);
+				m_lexer.next();					// skip name
+
+				if (m_lexer.peek().is(TType::Comma)) {
+					m_lexer.next();				// skip ','
+					continue;
+				}
+				else if (m_lexer.peek().is(TType::Rparen)) {
+					m_lexer.next();				// skip ')'
+					break;
+				}
+				else {
+					error_syntax();
+					return;
+				}
+			}
+		}
+
+		// collect body
+		string body = str_chomp(m_lexer.text_ptr());
+		macro->push_body(body);
+
+		while (!m_lexer.peek().is(TType::Newline))
+			m_lexer.next();
+	}
+}
+
+void Preproc::do_undef() {
+	if (!m_lexer.peek().is(TType::Ident))
+		error_syntax();
+	else {
+		// get name
+		string name = m_lexer.peek().svalue;
+		m_lexer.next();
+		if (!m_lexer.peek().is(TType::Newline))
+			error_syntax();
+		else
+			defines_base().remove(name);
 	}
 }
 

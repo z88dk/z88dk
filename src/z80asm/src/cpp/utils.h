@@ -31,6 +31,7 @@ string str_expand_escapes(const string& in);
 
 // check string ending
 bool str_ends_with(const string& str, const string& ending);
+string str_chomp(const string& str);
 
 // read lines with any EOL terminator
 istream& safe_getline(istream& is, string& t);

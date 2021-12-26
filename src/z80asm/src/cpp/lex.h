@@ -23,6 +23,7 @@ inline const char* skip_spaces(const char* p) {
 	return p;
 }
 
+bool starts_with_hash(const string& line);
 bool remove_final_backslash(string& line);
 void split_lines(deque<string>& lines, const string& line);
 

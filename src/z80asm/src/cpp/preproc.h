@@ -118,8 +118,9 @@ private:
 	void do_label();
 	bool ifs_active();
 
-	bool check_keyword(Keyword keyword, void (Preproc::* do_action)());
-	bool check_include();
+	bool check_opcode(Keyword keyword, void (Preproc::* do_action)());
+	bool check_hash_directive(Keyword keyword, void (Preproc::* do_action)());
+	bool check_hash();
 
 	void do_if();
 	void do_else();
@@ -133,6 +134,8 @@ private:
 	void do_elifndef();
 	void do_include();
 	void do_binary();
+	void do_define();
+	void do_undef();
 
 	ExpandedText expand(Lexer& lexer, Macros& defines);
 	void expand_ident(ExpandedText& out, const string& ident, Lexer& lexer, Macros& defines);

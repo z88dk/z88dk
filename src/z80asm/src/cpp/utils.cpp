@@ -112,6 +112,13 @@ bool str_ends_with(const string& str, const string& ending) {
 		return false;
 }
 
+string str_chomp(const string& str_) {
+	string str = str_;
+	while (!str.empty() && isspace(str.back()))
+		str.pop_back();
+	return str;
+}
+
 // https://stackoverflow.com/questions/6089231/getting-std-ifstream-to-handle-lf-cr-and-crlf
 istream& safe_getline(istream& is, string& t) {
 	t.clear();

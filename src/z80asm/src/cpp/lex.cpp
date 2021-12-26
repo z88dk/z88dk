@@ -42,7 +42,6 @@ static string ident_change_case(const string& ident) {
 		return ident;
 }
 
-#if 0
 bool starts_with_hash(const string& line) {
 	const char* p = line.c_str();
 	const char* YYMARKER{ nullptr };
@@ -91,7 +90,6 @@ yy9:
 		}
 
 }
-#endif
 
 bool remove_final_backslash(string& line) {
 	const char* p = line.c_str();

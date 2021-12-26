@@ -2,8 +2,6 @@
 
 BEGIN { use lib 't2'; require 'testlib.pl'; }
 
-use Test::More skip_all => "NOT IMPLEMENTED";
-
 z80asm_ok("", "", "",
 		'nop'					=> bytes(0));
 
@@ -47,18 +45,6 @@ END_ASM
 Error at file '$test.asm' line 1: syntax error
 Error at file '$test.asm' line 2: syntax error
 END_ERR
-
-z80asm_ok("", "", "",
-		'#DEFINE .one 	1'		=> "",
-		'#Define @two 	2'		=> "",
-		'#define #three	3'		=> "",
-		'#define $four 	4'		=> "",
-		'#define %five	5'		=> "",
-		'#define ._ 	6'		=> "",
-		'#define _ 		7'		=> "",
-		'defb .one,@two,#three'	=> bytes(1..3),
-		'defb $four,%five,._,_'	=> bytes(4..7),
-		'defb ".one"'			=> ".one");
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 #define abc(a,b,a) a+b+a
@@ -109,7 +95,7 @@ run_ok("./z88dk-z80asm -b $test.1.asm $test.2.asm");
 check_bin_file("$test.1.bin", bytes(0xc9));
 
 z80asm_ok("", "", "",
-		'#define cat(#a, #b) #a#b'		=> "",
+		'#define cat(a, b) a ## b'		=> "",
 		'cat(aa,bb): jp aabb'			=> bytes(0xc3, 0, 0));
 
 unlink_testfiles();
