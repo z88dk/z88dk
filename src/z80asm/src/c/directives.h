@@ -50,9 +50,6 @@ extern void asm_ORG(int address);
 extern void asm_PHASE(int address);
 extern void asm_DEPHASE();
 
-/* directives with string argument */
-extern void asm_BINARY(const char* filename);
-
 /* directives with name argument */
 extern void asm_MODULE(const char* name);
 extern void asm_SECTION(const char* name);

@@ -279,6 +279,8 @@ void Preproc::parse_line(const string& line) {
 
 	// do these only if ifs_active()
 	if (check_include()) return;
+	if (check_keyword(Keyword::BINARY, &Preproc::do_binary)) return;
+	if (check_keyword(Keyword::INCBIN, &Preproc::do_binary)) return;
 
 	// last check - macro call
 
@@ -483,6 +485,46 @@ void Preproc::do_include() {
 			error_syntax();
 		else {
 			open(filename, true);
+		}
+	}
+}
+
+void Preproc::do_binary() {
+	if (!m_lexer.peek().is(TType::String))
+		error_syntax();
+	else {
+		string filename = m_lexer.peek().svalue;
+		m_lexer.next();
+		if (!m_lexer.peek().is(TType::Newline))
+			error_syntax();
+		else {
+			// search file in path
+			string found_filename = search_includes(filename.c_str());
+
+			// open file
+			ifstream ifs(found_filename, ios::binary);
+			if (!ifs.is_open()) 
+				error_read_file(found_filename.c_str());
+			else {
+				// output DEFB lines
+				const int line_len = 32;
+				unsigned char bytes[line_len];
+
+				while (!ifs.eof()) {
+					ifs.read(reinterpret_cast<char*>(bytes), line_len);
+					size_t num_read = static_cast<size_t>(ifs.gcount());
+					if (num_read > 0) {
+						string line = "defb ";
+						string separator = "";
+						for (size_t i = 0; i < num_read; i++) {
+							line += separator + std::to_string(bytes[i]);
+							separator = ",";
+						}
+						line += "\n";
+						m_output.push_back(line);
+					}
+				}
+			}
 		}
 	}
 }

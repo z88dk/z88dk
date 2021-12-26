@@ -260,7 +260,6 @@ tokens:
   # Assembly directives
   - name    : ALIGN
   - name    : ASSERT
-  - name    : BINARY
   - name    : BYTE
   - name    : C_LINE
   - name    : DB
@@ -287,7 +286,6 @@ tokens:
   - name    : EQU
   - name    : EXTERN
   - name    : GLOBAL
-  - name    : INCBIN
   - name    : LIB
   - name    : LINE
   - name    : LSTOFF

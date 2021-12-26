@@ -529,11 +529,6 @@ Define rules for a ragel-based parser.
 				asm_LINE(expr_value, Str_data(name));
 		}
 
-		| label? ( _TK_BINARY | _TK_INCBIN ) string _TK_NEWLINE @{
-			DO_STMT_LABEL();
-			asm_BINARY(Str_data(name));
-		}
-
 		| _TK_PHASE const_expr _TK_NEWLINE @{
 			if (expr_error)
 				error_expected_const_expr();

@@ -148,10 +148,6 @@ extern void append_defs(int num_bytes, byte_t fill);
 /* advance code pointer reserving space, return address of start of buffer */
 extern byte_t *append_reserve( int num_bytes );	
 
-/* patch/append binary contents of file, whole file if num_bytes < 0 */
-extern void  patch_file_contents( FILE *file, int addr, long num_bytes );	
-extern void append_file_contents( FILE *file,            long num_bytes );	
-
 extern void patch_from_memory(byte_t* data, int addr, long num_bytes);
 
 /*-----------------------------------------------------------------------------

@@ -237,22 +237,6 @@ void asm_DEPHASE()
 }
 
 /*-----------------------------------------------------------------------------
-*   directives with string argument
-*----------------------------------------------------------------------------*/
-void asm_BINARY(const char* filename)
-{
-	filename = path_search(filename, opts.inc_path);
-	FILE* binfile = fopen(filename, "rb");
-	if (!binfile) {
-		error_read_file(filename);
-	}
-	else {
-		append_file_contents(binfile, -1);		/* read binary code */
-		xfclose(binfile);
-	}
-}
-
-/*-----------------------------------------------------------------------------
 *   directives with name argument
 *----------------------------------------------------------------------------*/
 void asm_MODULE(const char* name)

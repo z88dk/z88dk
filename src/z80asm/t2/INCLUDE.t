@@ -131,7 +131,5 @@ END_ASM
 Error at file '$test.inc' line 1: cannot include file '$test.asm' recursively
 END_ERR
 
-
-
 unlink_testfiles;
 done_testing;

@@ -132,6 +132,7 @@ private:
 	void do_elifdef();
 	void do_elifndef();
 	void do_include();
+	void do_binary();
 
 	ExpandedText expand(Lexer& lexer, Macros& defines);
 	void expand_ident(ExpandedText& out, const string& ident, Lexer& lexer, Macros& defines);

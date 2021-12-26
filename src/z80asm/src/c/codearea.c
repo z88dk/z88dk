@@ -493,31 +493,6 @@ byte_t *append_reserve( int num_bytes )
 	return alloc_space( get_cur_module_size(), num_bytes );
 }
 
-/* append binary contents of file, whole file if num_bytes < 0 */
-void patch_file_contents( FILE *file, int addr, long num_bytes ) {
-	long start_ptr;
-	byte_t *buffer;
-
-	init_module();
-
-	/* get bin file size */
-	if ( num_bytes < 0 )
-	{
-		start_ptr = ftell( file );
-		
-		fseek( file, 0, SEEK_END );				/* file pointer to end of file */
-		num_bytes = ftell( file ) - start_ptr;
-		
-		fseek( file, start_ptr, SEEK_SET );		/* file pointer to original position */
-	}
-
-	if ( num_bytes > 0 )
-	{
-		buffer = alloc_space( addr, num_bytes );
-		xfread_bytes(buffer, num_bytes, file);
-	}
-}
-
 void patch_from_memory(byte_t* data, int addr, long num_bytes) {
 	init_module();
 
@@ -525,12 +500,6 @@ void patch_from_memory(byte_t* data, int addr, long num_bytes) {
 		byte_t *buffer = alloc_space(addr, num_bytes);
 		memcpy(buffer, data, num_bytes);
 	}
-}
-
-void append_file_contents(FILE *file, long num_bytes)
-{
-	init_module();
-	patch_file_contents(file, get_cur_module_size(), num_bytes);
 }
 
 /*-----------------------------------------------------------------------------
