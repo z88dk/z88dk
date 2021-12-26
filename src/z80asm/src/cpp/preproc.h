@@ -121,6 +121,7 @@ private:
 	bool check_opcode(Keyword keyword, void (Preproc::* do_action)());
 	bool check_hash_directive(Keyword keyword, void (Preproc::* do_action)());
 	bool check_hash();
+	bool check_defl();
 
 	void do_if();
 	void do_else();
@@ -136,6 +137,7 @@ private:
 	void do_binary();
 	void do_define();
 	void do_undef();
+	void do_defl(const string& name);
 
 	ExpandedText expand(Lexer& lexer, Macros& defines);
 	void expand_ident(ExpandedText& out, const string& ident, Lexer& lexer, Macros& defines);

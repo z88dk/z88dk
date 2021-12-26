@@ -284,7 +284,7 @@ void Preproc::parse_line(const string& line) {
 	if (check_opcode(Keyword::INCBIN, &Preproc::do_binary)) return;
 	if (check_hash_directive(Keyword::DEFINE, &Preproc::do_define)) return;
 	if (check_hash_directive(Keyword::UNDEF, &Preproc::do_undef)) return;
-
+	if (check_defl()) return;
 	if (check_hash()) return;
 
 	// last check - macro call
@@ -347,6 +347,29 @@ bool Preproc::check_hash_directive(Keyword keyword, void(Preproc::* do_action)()
 bool Preproc::check_hash() {
 	if (m_lexer[0].is(TType::Hash))
 		return true;
+	else
+		return false;
+}
+
+bool Preproc::check_defl() {
+	if (m_lexer[0].is(TType::Label, TType::Ident) &&
+		m_lexer[1].is(Keyword::DEFL)) {
+		string name = m_lexer[0].svalue;
+		m_lexer.next();				// skip name
+		m_lexer.next();				// skip DEFC
+		do_defl(name);
+		return true;
+	}
+	else if (m_lexer[0].is(Keyword::DEFL) &&
+		m_lexer[1].is(TType::Ident) &&
+		m_lexer[2].is(TType::Eq)) { 
+		string name = m_lexer[1].svalue;
+		m_lexer.next();				// skip DEFL
+		m_lexer.next();				// skip name
+		m_lexer.next();				// skip '='
+		do_defl(name);
+		return true;
+	}
 	else
 		return false;
 }
@@ -604,6 +627,30 @@ void Preproc::do_undef() {
 			error_syntax();
 		else
 			defines_base().remove(name);
+	}
+}
+
+void Preproc::do_defl(const string& name) {
+	if (m_lexer.peek().is(TType::Newline))
+		error_syntax();
+	else {
+		// if name is not defined, create an empty one
+		if (!defines_base().find(name)) {
+			auto macro = make_shared<Macro>(name);
+			defines_base().add(macro);
+		}
+
+		// expand macros in expression, may refer to name
+		string text = str_chomp(m_lexer.text_ptr());
+		ExpandedText expanded = expand(m_lexer, defines());
+		if (!expanded.got_error())
+			text = str_chomp(expanded.text());
+
+		// redefine name
+		defines_base().remove(name);
+		auto macro = make_shared<Macro>(name);
+		macro->push_body(text);
+		defines_base().add(macro);
 	}
 }
 
