@@ -9,6 +9,7 @@ PUBLIC strlwr
 EXTERN asm_strlwr
 
 defc strlwr = asm_strlwr
+
 IF __CLASSIC && __CPU_GBZ80__
 PUBLIC _strlwr
 

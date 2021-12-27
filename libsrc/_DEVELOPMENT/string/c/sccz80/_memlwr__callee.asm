@@ -9,6 +9,7 @@ PUBLIC _memlwr__callee
 EXTERN asm__memlwr
 
 _memlwr__callee:
+
 IF __CPU_GBZ80__
    pop de	;ret
    pop bc	;n
@@ -19,7 +20,7 @@ ELSE
    pop bc
    ex (sp),hl
 ENDIF
-   
+
    jp asm__memlwr
 
 ; SDCC bridge for Classic

@@ -10,19 +10,12 @@ PUBLIC bcopy_callee
 EXTERN asm_bcopy
 
 bcopy_callee:
-IF __CPU_GBZ80__
-   pop af	;ret
-   pop bc	;len
-   pop de	;dst
-   pop hl	;src
-   push af
-ELSE
-   pop hl
-   pop bc
-   pop de
-   ex (sp),hl
-ENDIF
-   
+
+   pop hl       ;ret
+   pop bc       ;len
+   pop de       ;dst
+   ex (sp),hl   ;src
+
    jp asm_bcopy
 
 ; SDCC bridge for Classic

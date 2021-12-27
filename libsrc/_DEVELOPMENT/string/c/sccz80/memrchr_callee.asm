@@ -9,15 +9,15 @@ PUBLIC memrchr_callee, l0_memrchr_callee
 EXTERN asm_memrchr
 
 memrchr_callee:
+
    pop hl
    pop bc
    pop de
    ex (sp),hl
 
 l0_memrchr_callee:
-
    ld a,e
-   
+
    jp asm_memrchr
 
 ; SDCC bridge for Classic
