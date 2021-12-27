@@ -48,7 +48,7 @@ loop:
 
    pop hl                      ; current string
 
-   jr NZ,done                  ; char found
+   jr NC,done                  ; char found
 
    inc hl
    jr loop
