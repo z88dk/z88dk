@@ -48,6 +48,15 @@ static string concat(const string& s1, const string& s2) {
 		return s1 + s2;
 }
 
+static int next_id() {
+	static int id = 0;
+	return ++id;
+}
+
+static string unique_name(const string& name) {
+	return name + "__" + std::to_string(next_id());
+}
+
 //-----------------------------------------------------------------------------
 
 Location::Location(const string& filename, int line_num)
@@ -61,10 +70,12 @@ PreprocLevel::PreprocLevel(Macros* parent)
 }
 
 void PreprocLevel::init(const string& text) {
-	if (g_do_preproc_line && !starts_with_hash(text))
-		split_lines(m_lines, text);
-	else 
-		m_lines.push_back(text);
+	if (!text.empty()) {
+		if (g_do_preproc_line && !starts_with_hash(text))
+			split_lines(m_lines, text);
+		else
+			m_lines.push_back(text);
+	}
 }
 
 bool PreprocLevel::getline(string& line) {
@@ -177,6 +188,7 @@ void Preproc::close() {
 	m_levels.clear();
 	m_output.clear();
 	m_if_stack.clear();
+	m_macros.clear();
 
 	m_levels.emplace_back();
 }
@@ -188,6 +200,12 @@ bool Preproc::getline(string& line) {
 			line = m_output.front();
 			m_output.pop_front();
 			return true;
+		}
+		else if (m_levels.back().getline(line)) {
+			if (g_do_preproc_line)
+				parse_line(line);
+			else
+				m_output.push_back(line);
 		}
 		else if (m_levels.size() > 1)
 			m_levels.pop_back();		// drop one level and continue
@@ -204,6 +222,14 @@ bool Preproc::getline(string& line) {
 		else
 			m_files.pop_back();
 	}
+}
+
+bool Preproc::get_unpreproc_line(string& line) {
+	bool save_do_preproc_line = g_do_preproc_line;
+	g_do_preproc_line = false;
+	bool ret = getline(line);
+	g_do_preproc_line = save_do_preproc_line;
+	return ret;
 }
 
 string Preproc::filename() const {
@@ -278,16 +304,19 @@ void Preproc::parse_line(const string& line) {
 	if (!ifs_active()) return;
 
 	// do these only if ifs_active()
-	if (check_opcode(Keyword::INCLUDE, &Preproc::do_include)) return;
+	if (check_hash_directive(Keyword::DEFINE, &Preproc::do_define)) return;
 	if (check_hash_directive(Keyword::INCLUDE, &Preproc::do_include)) return;
+	if (check_hash_directive(Keyword::UNDEF, &Preproc::do_undef)) return;
 	if (check_opcode(Keyword::BINARY, &Preproc::do_binary)) return;
 	if (check_opcode(Keyword::INCBIN, &Preproc::do_binary)) return;
-	if (check_hash_directive(Keyword::DEFINE, &Preproc::do_define)) return;
-	if (check_hash_directive(Keyword::UNDEF, &Preproc::do_undef)) return;
+	if (check_opcode(Keyword::INCLUDE, &Preproc::do_include)) return;
+	if (check_opcode(Keyword::LOCAL, &Preproc::do_local)) return;
 	if (check_defl()) return;
+	if (check_macro()) return;
 	if (check_hash()) return;
 
 	// last check - macro call
+	if (check_macro_call()) return;
 
 	// expand macros in text
 	m_lexer.rewind();
@@ -299,9 +328,17 @@ void Preproc::parse_line(const string& line) {
 }
 
 void Preproc::do_label() {
+	// extract label
 	string line = m_lexer.peek().svalue + ":\n";
-	m_output.push_back(line);
 	m_lexer.next();
+
+	// expand macros in label
+	Lexer sublexer{ line };
+	ExpandedText expanded = expand(sublexer, defines());
+	if (expanded.got_error())
+		m_output.push_back(line);
+	else
+		m_output.push_back(expanded.text());
 }
 
 bool Preproc::ifs_active() {
@@ -372,6 +409,52 @@ bool Preproc::check_defl() {
 	}
 	else
 		return false;
+}
+
+bool Preproc::check_macro() {
+	if (m_lexer[0].is(TType::Label, TType::Ident) &&
+		m_lexer[1].is(Keyword::MACRO)) {
+		string name = m_lexer[0].svalue;
+		m_lexer.next();				// skip name
+		m_lexer.next();				// skip MACRO
+		do_macro(name);
+		return true;
+	}
+	else if (m_lexer[0].is(Keyword::MACRO) &&
+		m_lexer[1].is(TType::Ident)) {
+		string name = m_lexer[1].svalue;
+		m_lexer.next();				// skip MACRO
+		m_lexer.next();				// skip name
+		do_macro(name);
+		return true;
+	}
+	else
+		return false;
+}
+
+bool Preproc::check_macro_call() {
+	if (m_lexer[0].is(TType::Label) && m_lexer[1].is(TType::Ident)) {
+		string name = m_lexer[1].svalue;
+		shared_ptr<Macro> macro = m_macros.find_all(name);
+		if (macro) {
+			do_label();
+			m_lexer.next();
+			do_macro_call(macro);
+			return true;
+		}
+	}
+
+	if (m_lexer[0].is(TType::Ident)) {
+		string name = m_lexer[0].svalue;
+		shared_ptr<Macro> macro = m_macros.find_all(name);
+		if (macro) {
+			m_lexer.next();
+			do_macro_call(macro);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void Preproc::do_if() {
@@ -654,6 +737,65 @@ void Preproc::do_defl(const string& name) {
 	}
 }
 
+void Preproc::do_macro(const string& name) {
+	// create macro
+	auto macro = make_shared<Macro>(name);
+	m_macros.add(macro);								// create macro
+
+	// collect args
+	if (!m_lexer.peek().is(TType::Newline)) {
+		vector<string> args = collect_name_list(m_lexer);
+		for (auto& arg : args)
+			macro->push_arg(arg);
+	}
+
+	// collect body
+	string body = collect_macro_body(Keyword::MACRO, Keyword::ENDM);
+	macro->push_body(body);
+}
+
+void Preproc::do_macro_call(shared_ptr<Macro> macro) {
+	// collect arguments
+	vector<string> params;
+	if (macro->args().size() != 0) {
+		params = collect_macro_params(m_lexer);
+		if (macro->args().size() != params.size()) {
+			error_wrong_number_macro_args(macro->name().c_str());
+			return;
+		}
+	}
+	if (!m_lexer.peek().is(TType::Newline)) {
+		error_syntax();
+		return;
+	}
+
+	// create new level of macro expansion
+	m_levels.emplace_back(&defines());
+
+	// create macros in the new level for each argument
+	for (size_t i = 0; i < macro->args().size(); i++) {
+		string arg = macro->args()[i];
+		string param = i < params.size() ? params[i] : "";
+		shared_ptr<Macro> param_macro = make_shared<Macro>(arg, param);
+		defines().add(param_macro);
+	}
+
+	// create lines from body
+	m_levels.back().init(macro->body());
+}
+
+void Preproc::do_local() {
+	// collect symbols
+	vector<string> names = collect_name_list(m_lexer);
+	for (auto& name : names) {
+		// define new name
+		string def_name = unique_name(name);
+		auto macro = make_shared<Macro>(name);
+		macro->push_body(def_name);
+		defines().add(macro);			// add to top layer
+	}
+}
+
 ExpandedText Preproc::expand(Lexer& lexer, Macros& defines) {
 	ExpandedText out;
 
@@ -776,7 +918,7 @@ string Preproc::collect_param(Lexer& lexer) {
 	while (true) {
 		const char* p1 = lexer.text_ptr();
 		switch (lexer.peek().ttype) {
-		case TType::End:
+		case TType::Newline:
 			return string(p0, p1);
 		case TType::Lparen:
 			open_parens++;
@@ -819,13 +961,70 @@ vector<string> Preproc::collect_macro_params(Lexer& lexer) {
 			if (in_parens)
 				lexer.next();
 			return params;
-		case TType::End:
+		case TType::Newline:
 			return params;
 		default:
 			error_syntax();
 			return params;
 		}
 	}
+}
+
+vector<string> Preproc::collect_name_list(Lexer& lexer) {
+	vector<string> names;
+	while (true) {
+		if (!lexer.peek().is(TType::Ident)) {
+			error_syntax();
+			break;
+		}
+		string name = lexer.peek().svalue;
+		names.push_back(name);
+		lexer.next();
+
+		if (lexer.peek().is(TType::Comma)) 
+			lexer.next();
+		else if (lexer.peek().is(TType::Newline))
+			break;
+		else {
+			error_syntax();
+			break;
+		}
+	}
+	return names;
+}
+
+string Preproc::collect_macro_body(Keyword start_keyword, Keyword end_keyword) {
+	Location start_location = m_files.back().location;
+
+	// collect body
+	string body, line;
+	while (get_unpreproc_line(line)) {
+		m_lexer.set(line);
+
+		if ((m_lexer[0].is(TType::Label, TType::Ident) && m_lexer[1].is(start_keyword)) ||
+			(m_lexer[0].is(start_keyword))) {
+			error_unbalanced_struct_at(
+				start_location.filename.c_str(),
+				start_location.line_num);
+			return "";
+		}
+		else if (m_lexer[0].is(end_keyword)) {
+			m_lexer.next();
+			if (!m_lexer[0].is(TType::Newline)) {
+				error_syntax();
+				return "";
+			}
+			else {
+				return body;
+			}
+		}
+		else
+			body += line;
+	}
+	error_unbalanced_struct_at(
+		start_location.filename.c_str(),
+		start_location.line_num);
+	return "";
 }
 
 //-----------------------------------------------------------------------------
@@ -858,8 +1057,10 @@ const char* sfile_get_source_line() {
 	if (g_hold_getline)
 		return nullptr;
 	g_do_preproc_line = true;		// preprocessing on input line
-	if (g_preproc.getline(line))
+	if (g_preproc.getline(line)) {
+		got_expanded_line(sfile_filename(), sfile_line_num(), line.c_str());
 		return line.c_str();
+	}
 	else
 		return nullptr;
 }

@@ -93,6 +93,7 @@ public:
 	bool open(const string& filename, bool search_include_path);
 	void close();
 	bool getline(string& line);
+	bool get_unpreproc_line(string& line);
 	string filename() const;
 	int line_num() const;
 	bool is_c_source() const;
@@ -106,9 +107,9 @@ private:
 	deque<string>		m_output;       // parsed output
 	vector<IfNest>		m_if_stack;		// state of nested IFs
 	Lexer				m_lexer;		// line being parsed
+	Macros				m_macros;		// MACRO..ENDM macros
 
 	bool recursive_include(const string& filename);
-	bool getline_(string& lime);
 
 	Macros& defines() { return m_levels.back().defines; }
 	Macros& defines_base() { return m_levels.front().defines; }
@@ -122,6 +123,8 @@ private:
 	bool check_hash_directive(Keyword keyword, void (Preproc::* do_action)());
 	bool check_hash();
 	bool check_defl();
+	bool check_macro();
+	bool check_macro_call();
 
 	void do_if();
 	void do_else();
@@ -138,12 +141,17 @@ private:
 	void do_define();
 	void do_undef();
 	void do_defl(const string& name);
+	void do_macro(const string& name);
+	void do_macro_call(shared_ptr<Macro> macro);
+	void do_local();
 
 	ExpandedText expand(Lexer& lexer, Macros& defines);
 	void expand_ident(ExpandedText& out, const string& ident, Lexer& lexer, Macros& defines);
 	ExpandedText expand_define_call(const string& name, Lexer& lexer, Macros& defines);
 	string collect_param(Lexer& lexer);
 	vector<string> collect_macro_params(Lexer& lexer);
+	vector<string> collect_name_list(Lexer& lexer);
+	string collect_macro_body(Keyword start_keyword, Keyword end_keyword);
 };
 
 #if 0

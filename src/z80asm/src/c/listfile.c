@@ -201,6 +201,16 @@ void got_source_line(const char* filename, int line_num, const char* text) {
 #endif
 }
 
+void got_expanded_line(const char* filename, int line_num, const char* text) {
+	if (opts.verbose) {
+		UT_string* line;
+		utstring_new(line);
+		utstring_printf(line, "+ %s", text);
+		got_source_line(filename, line_num, utstring_body(line));
+		utstring_free(line);
+	}
+}
+
 /*-----------------------------------------------------------------------------
 *	append one byte / word / long to list line
 *----------------------------------------------------------------------------*/

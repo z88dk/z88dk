@@ -50,6 +50,7 @@ void sfile_set_filename(const char* filename);
 void sfile_set_line_num(int line_num, int line_inc);
 void sfile_set_c_source(bool f);
 void got_source_line(const char* filename, int line_num, const char* text);
+void got_expanded_line(const char* filename, int line_num, const char* text);
 
 #ifdef __cplusplus
 }
