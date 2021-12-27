@@ -108,6 +108,7 @@ TOCREATE += $(call check_target,sam,sam_clib.lib)
 TOCREATE += $(call check_target,sc3000,sc3000_clib.lib)
 TOCREATE += $(call check_target,smc777,smc777_clib.lib smc777_cpm.lib $(CPMLIBS))
 TOCREATE += $(call check_target,sms,sms_clib.lib)
+TOCREATE := $(call check_target,sol20,sol20_clib.lib)
 TOCREATE += $(call check_target,spc1000,spc1000_clib.lib)
 TOCREATE += $(call check_target,srr,srr_clib.lib)
 TOCREATE += $(call check_target,sos,sos_clib.lib)
@@ -1739,6 +1740,14 @@ altair8800_clib.lib:
 	@echo ''
 	$(call buildgeneric,altair8800,portable)
 	TARGET=altair8800 TYPE=8080 $(LIBLINKER) -m8080 -DFORaltair8800 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/altair8800_clib @$(TARGET_DIRECTORY)/altair8800/altair8800.lst
+
+sol20_clib.lib:
+	@echo ''
+	@echo '--- Building SOL20 Library ---'
+	@echo ''
+	$(call buildgeneric,sol20,"portable gencon")
+	TARGET=sol20 TYPE=8080 $(LIBLINKER) -m8080 -DFORsol20 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sol20_clib @$(TARGET_DIRECTORY)/sol20/sol20.lst
+
 
 dai_clib.lib:
 	@echo ''

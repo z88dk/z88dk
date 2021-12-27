@@ -225,6 +225,9 @@ extern option_t  sc3000_options;
 extern int       sms_exec(char *target);
 extern option_t  sms_options;
 
+extern int       sol20_exec(char *target);
+extern option_t  sol20_options;
+
 extern int       spc1000_exec(char *target);
 extern option_t  spc1000_options;
 
@@ -502,6 +505,10 @@ struct {
       "Create a SMC-777 bootable d88 disc",
       NULL,
       smc777_exec,    &smc777_options },
+    { "bin2ent",  "sol20",   "(C) 2021 z88dk",
+      "Create a Sol20 ENT file",
+      NULL,
+      sol20_exec,    &sol20_options },
     { "sentinel",  "sos",       "(C) 2013 Stefano Bodrato",
       "Add a header for S-OS (The Sentinel)",
       NULL,
