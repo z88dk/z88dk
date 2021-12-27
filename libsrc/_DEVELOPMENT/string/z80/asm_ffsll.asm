@@ -11,7 +11,7 @@
 ;
 ; ===============================================================
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
 SECTION code_clib
 SECTION code_string
 
@@ -32,23 +32,23 @@ asm_ffsll:
    or e
    or h
    or l
-   
-   jp nz, asm_ffsl
-   
-   exx
-   
-   call asm_ffsl
-   ld a,l
-   
+
+   jp NZ,asm_ffsl
+
    exx
 
-   jp nc, error_znc
-   
+   call asm_ffsl
+   ld a,l
+
+   exx
+
+   jp NC,error_znc
+
    add a,32
-   
+
    ld l,a
    ld h,0
-   
+
    scf
    ret
 ENDIF

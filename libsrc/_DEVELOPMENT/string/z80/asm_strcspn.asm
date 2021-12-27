@@ -48,13 +48,12 @@ loop:
 
    pop hl                      ; current string
 
-   jr nc, done                 ; char found
+   jr NZ,done                  ; char found
 
    inc hl
    jr loop
 
 end_string:
-
    pop bc
 IF __CPU_8080__ || __CPU_GBZ80__
    ld a,l
@@ -68,12 +67,11 @@ ELIF __CPU_8085__
 ELSE
    sbc hl,bc
 ENDIF
-   
+
    scf
    ret
 
 done:
-
    pop bc
 IF __CPU_8080__ || __CPU_GBZ80__
    ld a,l

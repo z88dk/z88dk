@@ -32,6 +32,7 @@ asm_strcmp:
 loop:
 
    ld a,(de)                   ; a = *s1
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
    cp (hl)
    inc hl
@@ -45,14 +46,12 @@ ENDIF
    jr NZ,loop
    
 equal:                         ; both strings ended same time
-
    dec de
    ld l,a
    ld h,a
    ret
 
 different:
-
    dec hl
    sub (hl)
    ld h,a

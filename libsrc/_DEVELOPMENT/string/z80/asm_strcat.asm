@@ -42,14 +42,15 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
   ENDIF
    ld (de),a
    inc de
-   and a
+   or a                        ; end of string?
    jr NZ,loop
+
 ELSE
    cp (hl)
    ldi
    jr NZ,loop
-ENDIF
 
+ENDIF
    pop hl                      ; hl = dst
 
    dec de

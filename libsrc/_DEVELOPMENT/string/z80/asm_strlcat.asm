@@ -36,11 +36,17 @@ asm_strlcat:
    
    ld a,b                      ; catch degenerate case where n == 0
    or c
-   jr z, szexceeded0
+   jr Z,szexceeded0
 
    xor a                       ; find end of string s1
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   EXTERN __z80asm__cpir
+   call __z80asm__cpir
+ELSE
    cpir
-   
+ENDIF
+
    dec hl                      ; hl parked on NUL and bc decr by one extra for the NUL
    jp po, szexceeded0          ; oops, size exceeded within string s1
    
@@ -49,15 +55,14 @@ asm_strlcat:
    ex de,hl                    ; de = s1, hl = s2
 
 cpyloop:
-
    cp (hl)
-   jr z, success
+   jr Z,success
    
    ldi
    jp pe, cpyloop
-   
+
    ; incomplete appending of string src
-   
+
    xor a
    ld (de),a                   ; terminate string s1
 
@@ -72,34 +77,45 @@ szexceeded1:
 
    push hl                     ; save current position in s2 to compute strlens later   
 
-   cpir
-   dec hl                      ; hl = end of char *s2 (pointing at NUL)
-   
-   pop bc
 IF __CPU_INTEL__ || __CPU_GBZ80__
+   EXTERN __z80asm__cpir
+   call __z80asm__cpir
+ELSE
+   cpir
+ENDIF
+
+   dec hl                      ; hl = end of char *s2 (pointing at NUL)
+   pop bc
+
+IF __CPU_8080__ || __CPU_GBZ80__
    ld  a,l
    sub c
    ld  l,a
    ld  a,h
    sbc b
    ld  h,a
+ELIF __CPU_8085__
+   sub hl,bc
 ELSE
    sbc hl,bc
 ENDIF
    ex de,hl                    ; de = strlen(s2 remnant)
-   
+
    pop bc
-IF __CPU_INTEL__ || __CPU_GBZ80__
+
+IF __CPU_8080__ || __CPU_GBZ80__
    ld  a,l
    sub c
    ld  l,a
    ld  a,h
    sbc b
    ld  h,a
+ELIF __CPU_8085__
+   sub hl,bc
 ELSE
    sbc hl,bc                   ; hl = strlen(result s1)
 ENDIF
-   
+
    add hl,de                   ; return strlen(s1)+strlen(s2)
    scf                         ; not enough space
    
@@ -114,7 +130,13 @@ szexceeded0:
    ; carry reset
    ; stack = char *s1
 
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   EXTERN __z80asm__cpir
+   call __z80asm__cpir
+ELSE
    cpir
+ENDIF
+
    dec hl                      ; hl = end of char *s1 (pointing at NUL)
    
    ld c,a
@@ -132,13 +154,15 @@ success:
    ; stack = char *s1
 
    pop bc
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_8080__ || __CPU_GBZ80__
    ld  a,l
    sub c
    ld  l,a
    ld  a,h
    sbc b
    ld  h,a
+ELIF __CPU_8085__
+   sub hl,bc
 ELSE
    sbc hl,bc                   ; hl = strlen(final s1)
 ENDIF

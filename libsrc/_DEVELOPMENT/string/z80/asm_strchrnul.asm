@@ -38,13 +38,13 @@ loop:
    ld a,(hl)
    cp c
    ret Z
-   
+
    inc hl
-   
-   or a
+
+   or a                        ; end of string?
    jr NZ,loop
-   
+
    dec hl
-      
+
    scf
    ret

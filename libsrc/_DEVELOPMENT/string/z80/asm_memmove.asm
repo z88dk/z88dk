@@ -78,6 +78,7 @@ loop:
  ENDIF
    ld (de),a
    dec de
+
    dec c
    jr NZ,loop
    dec b

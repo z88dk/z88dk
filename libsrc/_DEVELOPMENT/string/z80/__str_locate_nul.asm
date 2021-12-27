@@ -18,12 +18,14 @@ __str_locate_nul:
    xor a
    ld c,a
    ld b,a
-IF __CPU_GBZ80__
+
+IF __CPU_INTEL || __CPU_GBZ80__
 loop:
    dec bc
    ld a,(hl)
    and a
    ret Z
+
    inc hl
    ld a,b
    or c
@@ -31,6 +33,7 @@ loop:
 
 ELSE
    cpir
+
 ENDIF
    dec hl
    ret

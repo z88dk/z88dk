@@ -93,7 +93,7 @@ end_s2:
 
    pop bc                      ; bc = src
 
-IF __CPU_8080__ | __CPU_GBZ80__
+IF __CPU_8080__ || __CPU_GBZ80__
    ld  a,l
    sub c
    ld  l,a

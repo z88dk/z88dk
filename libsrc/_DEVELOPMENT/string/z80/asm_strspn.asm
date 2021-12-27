@@ -56,13 +56,15 @@ loop:
 end_string:
    pop bc
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_8080__ || __CPU_GBZ80__
    ld  a,l
    sub c
    ld  l,a
    ld  a,h
    sbc b
    ld  h,a
+ELIF __CPU_8085__
+   sub hl,bc
 ELSE
    sbc hl,bc
 ENDIF
@@ -73,13 +75,15 @@ ENDIF
 done:
    pop bc
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_8080__ || __CPU_GBZ80__
    ld  a,l
    sub c
    ld  l,a
    ld  a,h
    sbc b
    ld  h,a
+ELIF __CPU_8085__
+   sub hl,bc
 ELSE
    or  a
    sbc hl,bc

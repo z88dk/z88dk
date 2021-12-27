@@ -38,16 +38,11 @@ asm_strnchr:
 
    ld a,b                      ; if n == 0 not found
    or c
-   jp z, error_zc
-
-
-IF !__CPU_INTEL__ && !__CPU_GBZ80__
-   ld a,e
-ENDIF
-
-loop:
+   jp Z, error_zc
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
+
+loop:
  IF __CPU_GBZ80__
    ld a,(hl+)
  ELSE
@@ -55,8 +50,9 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    inc hl
  ENDIF
    dec bc
-   cp e 
+   cp e
    jr Z,match
+
    and a                        ;Isn't current char NUL?
    jp Z,error_zc
 
@@ -66,10 +62,12 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    jp error_zc
 
 ELSE
+   ld a,e
 
+loop:
    ld e,(hl)                   ; current char in s
    cpi
-   jr z, match                 ; found char
+   jr Z, match                 ; found char
    jp po, error_zc             ; n exceeded
 
    inc e                       ; is current char NUL?
@@ -79,7 +77,7 @@ ELSE
    jp error_zc
 
 ENDIF
-match:
 
+match:
    dec hl
    ret

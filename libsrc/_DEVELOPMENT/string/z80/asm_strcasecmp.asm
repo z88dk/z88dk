@@ -46,7 +46,7 @@ loop:
    inc de
    inc hl
 
-   or a                      ; end of string?      
+   or a                      ; end of string?
    jr NZ,loop
 
 equal:                       ; both strings ended same time
