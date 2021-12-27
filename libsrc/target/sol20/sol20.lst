@@ -1,3 +1,5 @@
+target/sol20/stdio/getk
+target/sol20/stdio/fgetc_cons
 @video/vdm/video_vdm.lst
 @stdio/stdio_8080.lst
 
