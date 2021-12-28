@@ -845,21 +845,25 @@ void Preproc::do_exitm() {
 }
 
 void Preproc::do_rept() {
-	int count = 0;
-	bool error = false;
+	if (m_lexer.peek().is(TType::Newline))
+		error_syntax();
+	else {
+		int count = 0;
+		bool error = false;
 
-	string count_text = expand(m_lexer.text_ptr());
-	parse_const_expr_eval(count_text.c_str(), &count, &error);
-	if (!error) {
-		string body = collect_macro_body(Keyword::REPT, Keyword::ENDR);
+		string count_text = expand(m_lexer.text_ptr());
+		parse_const_expr_eval(count_text.c_str(), &count, &error);
+		if (!error) {
+			string body = collect_macro_body(Keyword::REPT, Keyword::ENDR);
 
-		// create new level for expansion
-		m_levels.emplace_back(&defines());
-		string block;
-		for (int i = 0; i < count; i++)
-			block += body;
+			// create new level for expansion
+			m_levels.emplace_back(&defines());
+			string block;
+			for (int i = 0; i < count; i++)
+				block += body;
 
-		m_levels.back().init(block);
+			m_levels.back().init(block);
+		}
 	}
 }
 

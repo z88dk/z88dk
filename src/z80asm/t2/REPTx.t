@@ -10,7 +10,21 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 		rept
 END_ASM
-Error at file '$test.asm' line 1: syntax error in expression
+Error at file '$test.asm' line 1: syntax error
+END_ERR
+
+z80asm_nok("", "", <<'END_ASM', <<END_ERR);
+		rept xx
+END_ASM
+Error at file '$test.asm' line 1: symbol 'xx' not defined
+Error at file '$test.asm' line 1: expected constant expression
+END_ERR
+
+z80asm_nok("", "", <<'END_ASM', <<END_ERR);
+		extern xx
+		rept xx
+END_ASM
+Error at file '$test.asm' line 2: expected constant expression
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);

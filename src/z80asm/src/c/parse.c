@@ -286,7 +286,10 @@ void parse_const_expr_eval(const char* expr_text, int* result, bool* error) {
 	else {
 		// eval and discard expression
 		*result = Expr_eval(expr, true);
-		*error = (expr->result.not_evaluable);
+		if (expr->result.not_evaluable) {
+			error_expected_const_expr();
+			*error = true;
+		}
 		OBJ_DELETE(expr);
 	}
 }
