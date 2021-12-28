@@ -196,24 +196,25 @@ void Preproc::close() {
 bool Preproc::getline(string& line) {
 	line.clear();
 	while (true) {
-		if (!m_output.empty()) {
+		if (!m_output.empty()) {		// output queue
 			line = m_output.front();
 			m_output.pop_front();
-			return true;
+			if (!line.empty())
+				return true;
 		}
-		else if (m_levels.back().getline(line)) {
+		else if (m_levels.back().getline(line)) {	// read from macro expansion
 			if (g_do_preproc_line)
 				parse_line(line);
 			else
 				m_output.push_back(line);
 		}
-		else if (m_levels.size() > 1)
+		else if (m_levels.size() > 1)	// end of macro expansion
 			m_levels.pop_back();		// drop one level and continue
-		else if (m_files.empty()) {
+		else if (m_files.empty()) {		// end of input
 			got_eof();
 			return false;
 		}
-		else if (m_files.back().getline(line)) {
+		else if (m_files.back().getline(line)) {	// read from file
 			if (g_do_preproc_line)
 				parse_line(line);
 			else
@@ -308,6 +309,7 @@ void Preproc::parse_line(const string& line) {
 	if (check_hash_directive(Keyword::INCLUDE, &Preproc::do_include)) return;
 	if (check_hash_directive(Keyword::UNDEF, &Preproc::do_undef)) return;
 	if (check_opcode(Keyword::BINARY, &Preproc::do_binary)) return;
+	if (check_opcode(Keyword::EXITM, &Preproc::do_exitm)) return;
 	if (check_opcode(Keyword::INCBIN, &Preproc::do_binary)) return;
 	if (check_opcode(Keyword::INCLUDE, &Preproc::do_include)) return;
 	if (check_opcode(Keyword::LOCAL, &Preproc::do_local)) return;
@@ -333,12 +335,7 @@ void Preproc::do_label() {
 	m_lexer.next();
 
 	// expand macros in label
-	Lexer sublexer{ line };
-	ExpandedText expanded = expand(sublexer, defines());
-	if (expanded.got_error())
-		m_output.push_back(line);
-	else
-		m_output.push_back(expanded.text());
+	m_output.push_back(expand(line));
 }
 
 bool Preproc::ifs_active() {
@@ -428,6 +425,10 @@ bool Preproc::check_macro() {
 		do_macro(name);
 		return true;
 	}
+	else if (m_lexer[0].is(Keyword::ENDM)) {
+		error_unbalanced_struct();
+		return true;
+	}
 	else
 		return false;
 }
@@ -458,8 +459,12 @@ bool Preproc::check_macro_call() {
 }
 
 void Preproc::do_if() {
+	// expand macros in condition
+	string cond_text = expand(m_lexer.text_ptr());
+
+	// check condition
 	bool flag, error;
-	parse_expr_eval_if_condition(m_lexer.text_ptr(), &flag, &error);
+	parse_expr_eval_if_condition(cond_text.c_str(), &flag, &error);
 	if (!error) {
 		m_if_stack.emplace_back(Keyword::IF, m_files.back().location, flag);
 		m_if_stack.back().done_if = m_if_stack.back().done_if || flag;
@@ -511,7 +516,11 @@ void Preproc::do_ifdef_ifndef(bool invert) {
 		if (!m_lexer.peek().is(TType::Newline))
 			error_syntax();
 		else {
-			bool f = check_ifdef_condition(name.c_str());
+			// expand macros in condition
+			string cond_text = expand(name);
+
+			// check condition
+			bool f = check_ifdef_condition(cond_text.c_str());
 			if (invert)
 				f = !f;
 			m_if_stack.emplace_back(Keyword::IF, m_files.back().location, f);
@@ -538,8 +547,12 @@ void Preproc::do_elif() {
 				m_if_stack.back().location.filename.c_str(),
 				m_if_stack.back().location.line_num);
 		else {
+			// expand macros in condition
+			string cond_text = expand(m_lexer.text_ptr());
+
+			// check condition
 			bool flag, error;
-			parse_expr_eval_if_condition(m_lexer.text_ptr(), &flag, &error);
+			parse_expr_eval_if_condition(cond_text.c_str(), &flag, &error);
 			if (!error) {
 				if (m_if_stack.back().done_if)
 					flag = false;
@@ -569,7 +582,11 @@ void Preproc::do_elifdef_elifndef(bool invert) {
 				if (!m_lexer.peek().is(TType::Newline))
 					error_syntax();
 				else {
-					bool f = check_ifdef_condition(name.c_str());
+					// expand macros in condition
+					string cond_text = expand(name);
+
+					// check condition
+					bool f = check_ifdef_condition(cond_text.c_str());
 					if (invert)
 						f = !f;
 					if (m_if_stack.back().done_if)
@@ -724,10 +741,7 @@ void Preproc::do_defl(const string& name) {
 		}
 
 		// expand macros in expression, may refer to name
-		string text = str_chomp(m_lexer.text_ptr());
-		ExpandedText expanded = expand(m_lexer, defines());
-		if (!expanded.got_error())
-			text = str_chomp(expanded.text());
+		string text = str_chomp(expand(m_lexer.text_ptr()));
 
 		// redefine name
 		defines_base().remove(name);
@@ -796,6 +810,15 @@ void Preproc::do_local() {
 	}
 }
 
+void Preproc::do_exitm() {
+	if (!m_lexer.peek().is(TType::Newline))
+		error_syntax();
+	else if (m_levels.size() == 1)
+		error_unbalanced_struct();
+	else
+		m_levels.back().exitm_called = true;
+}
+
 ExpandedText Preproc::expand(Lexer& lexer, Macros& defines) {
 	ExpandedText out;
 
@@ -856,6 +879,15 @@ ExpandedText Preproc::expand(Lexer& lexer, Macros& defines) {
 		}
 	}
 	return out;
+}
+
+string Preproc::expand(const string& text) {
+	Lexer sublexer{ text };
+	ExpandedText expanded = expand(sublexer, defines());
+	if (expanded.got_error())
+		return text;
+	else
+		return expanded.text();
 }
 
 void Preproc::expand_ident(ExpandedText& out, const string& ident, Lexer& lexer, Macros& defines) {

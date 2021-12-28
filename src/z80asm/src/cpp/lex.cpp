@@ -1646,10 +1646,13 @@ yy196:
 			{
 							  string str = str_compress_escapes(string(p1, p2));
 							  if (str.length() != 1) {
-								  error_invalid_squoted_string(); clear();
+								  error_invalid_squoted_string();
+								  clear();
 							  }
-							  m_tokens.emplace_back(TType::Integer, str[0]);
-							  m_tokens.back().col = col;
+							  else {
+								  m_tokens.emplace_back(TType::Integer, str[0]);
+								  m_tokens.back().col = col;
+							  }
 							  continue; }
 yy198:
 			yych = *++p;

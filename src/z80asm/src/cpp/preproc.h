@@ -144,8 +144,10 @@ private:
 	void do_macro(const string& name);
 	void do_macro_call(shared_ptr<Macro> macro);
 	void do_local();
+	void do_exitm();
 
 	ExpandedText expand(Lexer& lexer, Macros& defines);
+	string expand(const string& text);
 	void expand_ident(ExpandedText& out, const string& ident, Lexer& lexer, Macros& defines);
 	ExpandedText expand_define_call(const string& name, Lexer& lexer, Macros& defines);
 	string collect_param(Lexer& lexer);

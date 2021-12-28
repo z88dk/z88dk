@@ -92,6 +92,12 @@ Error at file '$test.asm' line 1: unclosed quoted string
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
+ld a, "a"
+END_ASM
+Error at file '$test.asm' line 1: syntax error
+END_ERR
+
+z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 defb ''
 END_ASM
 Error at file '$test.asm' line 1: invalid single quoted character
@@ -107,6 +113,15 @@ z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 defb "a
 END_ASM
 Error at file '$test.asm' line 1: unclosed quoted string
+END_ERR
+
+# invalid single quoted character was overflowing to next line
+z80asm_nok("", "", <<'END_ASM', <<END_ERR);
+ld a,'he'
+ld a,"a"
+END_ASM
+Error at file '$test.asm' line 1: invalid single quoted character
+Error at file '$test.asm' line 2: syntax error
 END_ERR
 
 unlink_testfiles;

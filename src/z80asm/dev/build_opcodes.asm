@@ -48,14 +48,6 @@
 ;------------------------------------------------------------------------------
 ; Expressions
 ;------------------------------------------------------------------------------
-	ld a,1
-	ld a,'								;; error: unclosed quoted string
-	ld a,''								;; error: invalid single quoted character
-	ld a,'a								;; error: unclosed quoted string
-	ld a,'a'
-	ld a,'he'							;; error: invalid single quoted character
-	ld a,"a"							;; error: syntax error
-
 .label_1 ld a,2							;;label_1 ld a,2
 label_2: ld a,3							;;label_2 ld a,3
 

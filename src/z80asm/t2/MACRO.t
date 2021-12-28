@@ -12,7 +12,7 @@ END_ERR
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 		endm
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+Error at file '$test.asm' line 1: unbalanced control structure
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);

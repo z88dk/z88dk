@@ -91,14 +91,11 @@ END_ASM
 ;------------------------------------------------------------------------------
 ; Expressions
 ;------------------------------------------------------------------------------
-        ld   a,1                        ;; 3E 01
-        ld   a,'a'                      ;; 3E 61
-
 .label_1 ld   a,2                       ;; 3E 02
 label_2: ld   a,3                       ;; 3E 03
 
-        defw label_1, label_2           ;; 61 01 63 01
-        defw ZERO+label_1               ;; 61 01
+        defw label_1, label_2           ;; 5D 01 5F 01
+        defw ZERO+label_1               ;; 5D 01
         defb label_2-label_1            ;; 02
         defb ZERO+label_2-label_1       ;; 02
 
@@ -2111,11 +2108,6 @@ z80asm(
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
         ld   a,1+                       ;; error: syntax error
-        ld   a,'                        ;; error: unclosed quoted string
-        ld   a,''                       ;; error: invalid single quoted character
-        ld   a,'a                       ;; error: unclosed quoted string
-        ld   a,'he'                     ;; error: invalid single quoted character
-        ld   a,"a"                      ;; error: syntax error
         defb 1/0                        ;; error 2: division by zero
         defb 1% 0                       ;; error 2: division by zero
         defb 1?                         ;; error: syntax error
@@ -2276,14 +2268,11 @@ END_ASM
 ;------------------------------------------------------------------------------
 ; Expressions
 ;------------------------------------------------------------------------------
-        ld   a,1                        ;; 3E 01
-        ld   a,'a'                      ;; 3E 61
-
 .label_1 ld   a,2                       ;; 3E 02
 label_2: ld   a,3                       ;; 3E 03
 
-        defw label_1, label_2           ;; 61 01 63 01
-        defw ZERO+label_1               ;; 61 01
+        defw label_1, label_2           ;; 5D 01 5F 01
+        defw ZERO+label_1               ;; 5D 01
         defb label_2-label_1            ;; 02
         defb ZERO+label_2-label_1       ;; 02
 
@@ -4034,10 +4023,10 @@ ELSE
         call z,NN                       ;; 20 03 CD 30 00
         call nc,NN                      ;; 38 03 CD 30 00
         call c,NN                       ;; 30 03 CD 30 00
-        call po,NN                      ;; EA 90 09 CD 30 00
-        call pe,NN                      ;; E2 96 09 CD 30 00
-        call p,NN                       ;; FA 9C 09 CD 30 00
-        call m,NN                       ;; F2 A2 09 CD 30 00
+        call po,NN                      ;; EA 8C 09 CD 30 00
+        call pe,NN                      ;; E2 92 09 CD 30 00
+        call p,NN                       ;; FA 98 09 CD 30 00
+        call m,NN                       ;; F2 9E 09 CD 30 00
 
 
 ENDIF   
@@ -4137,11 +4126,6 @@ z80asm(
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
         ld   a,1+                       ;; error: syntax error
-        ld   a,'                        ;; error: unclosed quoted string
-        ld   a,''                       ;; error: invalid single quoted character
-        ld   a,'a                       ;; error: unclosed quoted string
-        ld   a,'he'                     ;; error: invalid single quoted character
-        ld   a,"a"                      ;; error: syntax error
         defb 1/0                        ;; error 2: division by zero
         defb 1% 0                       ;; error 2: division by zero
         defb 1?                         ;; error: syntax error
