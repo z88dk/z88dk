@@ -72,6 +72,15 @@ z80asm_ok("", "", "", <<'END', bytes(1,1));
 		endr
 END
 
+# test the manual examples
+z80asm_ok("", "", "", <<'END', bytes((0x3e, 0x20, 0xd7) x 10));
+		; output 10 spaces on a ZX Spectrum
+		REPT 10
+		ld  a, ' '
+		rst 10h
+		ENDR
+END
+
 #-------------------------------------------------------------------------------
 # REPC
 #-------------------------------------------------------------------------------
@@ -154,6 +163,27 @@ z80asm_ok("", "", "", <<'END', "hello");
 		endr
 END
 
+# test the manual examples
+my $expected = ""; 
+for (split //, "hello world") { 
+	$expected .= bytes(0x3e, ord($_), 0xd7);
+}
+z80asm_ok("", "", "", <<'END', $expected);
+		; output "hello" on a ZX Spectrum
+		REPTC var, "hello world"
+		ld  a, var
+		rst 10h
+		ENDR
+END
+
+z80asm_ok("", "", "", <<'END', "23");
+		; store the digits of the version
+		DEFL version=23
+		REPTC var, version
+		defb var
+		ENDR
+END
+
 #-------------------------------------------------------------------------------
 # REPI
 #-------------------------------------------------------------------------------
@@ -202,6 +232,14 @@ z80asm_ok("", "", "", <<'END', "hello".bytes(13,10, 0, 123, 0));
 		defb var
 		defb 0
 		endr
+END
+
+# test the manual examples
+z80asm_ok("", "", "", <<'END', bytes(0xc5, 0xd5, 0xe5, 0xf5));
+		; push all registers
+		REPTI reg, bc, de, hl, af
+		push reg
+		ENDR
 END
 
 unlink_testfiles;
