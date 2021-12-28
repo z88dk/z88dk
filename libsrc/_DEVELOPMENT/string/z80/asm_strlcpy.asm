@@ -91,13 +91,25 @@ szexceeded1:
    ; stack = char *src
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
-   EXTERN __z80asm__cpir
-   call __z80asm__cpir
+loop:
+   cp (hl)
+   jr Z,found                  ; find end of src
+
+   inc hl
+
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
+found:
+
 ELSE
    cpir                        ; find end of src
+   dec hl
+
 ENDIF
 
-   dec hl
    pop bc                      ; bc = char *src
 
 IF __CPU_8080__ || __CPU_GBZ80__

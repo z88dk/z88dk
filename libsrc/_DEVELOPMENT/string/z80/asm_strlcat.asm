@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; size_t strlcat(char * restrict s1, const char * restrict s2, size_t n)
@@ -14,7 +14,6 @@
 ;
 ; ===============================================================
 
-IF !__CPU_GBZ80__
 SECTION code_clib
 SECTION code_string
 
@@ -41,25 +40,63 @@ asm_strlcat:
    xor a                       ; find end of string s1
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
-   EXTERN __z80asm__cpir
-   call __z80asm__cpir
+
+   dec bc                      ; bc decr by one extra allowing for the dst NUL
+
+   dec bc
+   inc b
+   inc c
+
+srchloop:
+   cp (hl)
+   jr Z,found_dst              ; hl parked on NUL
+
+   inc hl
+
+   dec c
+   jr NZ,srchloop
+   dec b
+   jr NZ,srchloop
+
+   jr szexceeded0              ; oops, size exceeded within string s1
+
+found_dst:
+
 ELSE
    cpir
+
+   dec hl                      ; hl parked on NUL and bc decr by one extra for the dst NUL
+   jp PO,szexceeded0           ; oops, size exceeded within string s1
 ENDIF
 
-   dec hl                      ; hl parked on NUL and bc decr by one extra for the NUL
-   jp po, szexceeded0          ; oops, size exceeded within string s1
-   
    ; append to string s1 with chars from string s2
    
    ex de,hl                    ; de = s1, hl = s2
 
+IF __CPU_INTEL__ || __CPU_GBZ80__
+
+cpyloop:
+   xor a
+   cp (hl)
+   jr Z,success
+
+   ld a,(hl)
+   inc hl
+   ld (de),a
+   inc de
+
+   dec c
+   jr NZ,cpyloop
+   dec b
+   jr NZ,cpyloop
+
+ELSE
 cpyloop:
    cp (hl)
    jr Z,success
-   
    ldi
-   jp pe, cpyloop
+   jp pe,cpyloop
+ENDIF
 
    ; incomplete appending of string src
 
@@ -75,16 +112,27 @@ szexceeded1:
    ; carry reset
    ; stack = char *s1
 
-   push hl                     ; save current position in s2 to compute strlens later   
+   push hl                     ; save current position in s2 to compute strlens later
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
-   EXTERN __z80asm__cpir
-   call __z80asm__cpir
+endloop:
+   cp (hl)
+   jr Z,found_src              ; find end of src
+
+   inc hl
+
+   dec c
+   jr NZ,endloop
+   dec b
+   jr NZ,endloop
+
+found_src:
+
 ELSE
    cpir
+   dec hl                      ; hl = end of char *s2 (pointing at NUL)
 ENDIF
 
-   dec hl                      ; hl = end of char *s2 (pointing at NUL)
    pop bc
 
 IF __CPU_8080__ || __CPU_GBZ80__
@@ -99,6 +147,7 @@ ELIF __CPU_8085__
 ELSE
    sbc hl,bc
 ENDIF
+
    ex de,hl                    ; de = strlen(s2 remnant)
 
    pop bc
@@ -118,7 +167,7 @@ ENDIF
 
    add hl,de                   ; return strlen(s1)+strlen(s2)
    scf                         ; not enough space
-   
+
    ret
 
 szexceeded0:
@@ -131,14 +180,24 @@ szexceeded0:
    ; stack = char *s1
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
-   EXTERN __z80asm__cpir
-   call __z80asm__cpir
+loop0:
+   cp (hl)
+   jr Z,found_dst_end           ; find end of dst
+
+   inc hl
+
+   dec c
+   jr NZ,loop0
+   dec b
+   jr NZ,loop0
+
+found_dst_end:
+
 ELSE
    cpir
+   dec hl                      ; hl = end of char *s1 (pointing at NUL)
 ENDIF
 
-   dec hl                      ; hl = end of char *s1 (pointing at NUL)
-   
    ld c,a
    ld b,a
    ex de,hl
@@ -168,4 +227,3 @@ ELSE
 ENDIF
    ret
 
-ENDIF

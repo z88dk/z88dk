@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; char *strnchr(const char *s, size_t n, int c)
@@ -38,9 +38,13 @@ asm_strnchr:
 
    ld a,b                      ; if n == 0 not found
    or c
-   jp Z, error_zc
+   jp Z,error_zc
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
+
+   dec bc
+   inc b
+   inc c
 
 loop:
  IF __CPU_GBZ80__
@@ -49,16 +53,17 @@ loop:
    ld a,(hl)
    inc hl
  ENDIF
-   dec bc
    cp e
    jr Z,match
 
    and a                        ;Isn't current char NUL?
    jp Z,error_zc
 
-   ld a,b
-   or c
+   dec c
    jr NZ,loop
+   dec b
+   jr NZ,loop
+
    jp error_zc
 
 ELSE
@@ -67,8 +72,8 @@ ELSE
 loop:
    ld e,(hl)                   ; current char in s
    cpi
-   jr Z, match                 ; found char
-   jp po, error_zc             ; n exceeded
+   jr Z,match                  ; found char
+   jp po,error_zc              ; n exceeded
 
    inc e                       ; is current char NUL?
    dec e

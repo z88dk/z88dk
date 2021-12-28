@@ -57,7 +57,7 @@ ELSE
 ENDIF
 
    or b
-   jr z, exit                  ; if numswaps == 0, exit
+   jr Z,exit                   ; if numswaps == 0, exit
 
 loop:
    ld a,(de)                   ; char at front of s
@@ -75,9 +75,9 @@ ELSE
    ld (hl),a
    dec hl
 ENDIF
-   ld  a,b
-   or  c
-   jp  NZ,loop
+   ld a,b
+   or c
+   jp NZ,loop
 
 ELSE
    ldi                         ; char at rear written to front of s

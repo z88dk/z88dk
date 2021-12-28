@@ -34,7 +34,7 @@ asm_strncat:
 
    ld a,b
    or c
-   jr z, zero_n
+   jr Z,zero_n
 
 asm0_strncat:
    push de                     ; save dst
@@ -51,6 +51,7 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    ld a,(hl)
    and a
    jr Z,done
+
    ld (de),a
    inc hl
    inc de
@@ -66,12 +67,13 @@ ELSE
 
    ldi
    jp PE,loop
+
 ENDIF
 
    scf
 
-done:                          ; terminate dst
-   ld (de),a
+done:
+   ld (de),a                   ; terminate dst
 
    pop hl
    ret

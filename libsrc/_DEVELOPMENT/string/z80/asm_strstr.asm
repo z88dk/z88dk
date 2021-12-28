@@ -77,7 +77,7 @@ loop:
    jr z, match_found
 
    cp (hl)
-   jr z, loop                  ; char matches so still hope
+   jr Z,loop                   ; char matches so still hope
 
 no_match:
 

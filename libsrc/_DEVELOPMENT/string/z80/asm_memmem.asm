@@ -15,7 +15,8 @@
 ; 
 ; ===============================================================
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+
 SECTION code_clib
 SECTION code_string
 
@@ -72,13 +73,7 @@ search_loop:
    ; ix = little_len - 1
 
    ld a,(de)                   ; a = first little char
-
-IF __CPU_INTEL__ || __CPU_GBZ80__
-   EXTERN __z80asm__cpir
-   call __z80asm__cpir
-ELSE
    cpir                        ; look for little char in big
-ENDIF
 
    jp nz, error_zc             ; not found
 
@@ -135,4 +130,5 @@ no_match:
 not_found:
 
    jp error_zc
+
 ENDIF
