@@ -55,6 +55,7 @@ extern bool parse_statement(ParseCtx *ctx);
 
 /* save the current scanner context and parse the given expression */
 extern struct Expr *parse_expr(const char *expr_text);
+extern void parse_const_expr_eval(const char* expr_text, int* result, bool* error);
 extern void parse_expr_eval_if_condition(const char *expr_text, bool* condition, bool* error);
 
 /* check IF conditions */

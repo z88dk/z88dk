@@ -14,6 +14,7 @@ Define ragel-based parser.
 #include "die.h"
 #include "directives.h"
 #include "expr.h"
+#include "if.h"
 #include "listfile.h"
 #include "module.h"
 #include "opcodes.h"
@@ -276,6 +277,29 @@ static void free_tokens(ParseCtx *ctx)
 /*-----------------------------------------------------------------------------
 *   IF, IFDEF, IFNDEF, ELSE, ELIF, ELIFDEF, ELIFNDEF, ENDIF
 *----------------------------------------------------------------------------*/
+void parse_const_expr_eval(const char* expr_text, int* result, bool* error) {
+	*result = 0;
+	*error = false;
+	struct Expr* expr = parse_expr(expr_text);
+	if (!expr)
+		*error = true;
+	else {
+		// eval and discard expression
+		*result = Expr_eval(expr, true);
+		*error = (expr->result.not_evaluable);
+		OBJ_DELETE(expr);
+	}
+}
+
+void parse_expr_eval_if_condition(const char* expr_text, bool* condition, bool* error) {
+	*condition = *error = false;
+	struct Expr *expr = parse_expr(expr_text);
+	if (expr)
+		*condition = check_if_condition(expr);
+	else
+		*error = true;
+}
+
 bool check_if_condition(Expr *expr) {
 	int value;
 	bool condition;
@@ -290,15 +314,6 @@ bool check_if_condition(Expr *expr) {
 	OBJ_DELETE(expr);
 
 	return condition;
-}
-
-void parse_expr_eval_if_condition(const char* expr_text, bool* condition, bool* error) {
-	*condition = *error = false;
-	struct Expr *expr = parse_expr(expr_text);
-	if (expr)
-		*condition = check_if_condition(expr);
-	else
-		*error = true;
 }
 
 bool check_ifdef_condition(const char *name) {

@@ -34,6 +34,7 @@ bool option_ucase();
 const char* search_includes(const char* filename);
 
 // expressions
+void parse_const_expr_eval(const char* expr_text, int* result, bool* error);
 void parse_expr_eval_if_condition(const char *expr_text, bool* condition, bool* error);
 bool check_ifdef_condition(const char* name);
 
