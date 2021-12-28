@@ -20,10 +20,9 @@ END_ASM
 ;
 ; Input data for tests, to be parsed by build_opcodes.pl
 ;
-; Copyright (C) Gunther Strube, InterLogic 1993-99
-; Copyright (C) Paulo Custodio, 2011-2020
+; Copyright (C) Paulo Custodio, 2011-2021
 ; License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-; Repository: https://github.com/z88dk/z88dk
+; Repository: https://github.com/pauloscustodio/z88dk-z80asm
 ;------------------------------------------------------------------------------
 
         org  0100h
@@ -77,8 +76,6 @@ END_ASM
         ld   bc,1                       ;; 01 01 00
         ld   bc,32767                   ;; 01 FF 7F
         ld   bc,65535                   ;; 01 FF FF
-        ld   bc,-32769                  ;; 01 FF 7F
-        ld   bc,65536                   ;; 01 00 00
 
 ; 32-bit arithmetic, long range is not tested on a 32bit long
         defq 0xFFFFFFFF                 ;; FF FF FF FF
@@ -90,22 +87,17 @@ END_ASM
         call 0                          ;; CD 00 00
         call 1                          ;; CD 01 00
         call 65535                      ;; CD FF FF
-        call -32769                     ;; CD FF 7F
-        call 65536                      ;; CD 00 00
 
 ;------------------------------------------------------------------------------
 ; Expressions
 ;------------------------------------------------------------------------------
-        ld   a,1                        ;; 3E 01
-        ld   a,'a'                      ;; 3E 61
-
 .label_1 ld   a,2                       ;; 3E 02
 label_2: ld   a,3                       ;; 3E 03
 
-        defw label_1, label_2           ;; 6D 01 6F 01
-        defw ZERO+label_1               ;; 6D 01
-        defb +label_2-label_1           ;; 02
-        defb +ZERO+label_2-label_1      ;; 02
+        defw label_1, label_2           ;; 5D 01 5F 01
+        defw ZERO+label_1               ;; 5D 01
+        defb label_2-label_1            ;; 02
+        defb ZERO+label_2-label_1       ;; 02
 
         defb 255,128,0,-128             ;; FF 80 00 80
         defb ZERO+255,ZERO-128          ;; FF 80
@@ -2061,123 +2053,6 @@ ELSE
 ENDIF   
 
 ;------------------------------------------------------------------------------
-; IF ELSE ENDIF
-;------------------------------------------------------------------------------
-        if   1
-          defb 1                        ;; 01
-          if   1
-            defb 2                      ;; 02
-          else
-            defb 3
-          endif
-        else
-          defb 4
-          if   1
-            defb 5
-          else
-            defb 6
-          endif
-        endif
-
-        if   0
-          defb 7
-        endif
-
-        if   1
-          defb 8                        ;; 08
-        endif
-
-        if   0
-          defb 9
-        else
-          defb 10                       ;; 0A
-        endif
-
-        if   undefined
-          defb 11
-        else
-          defb 12                       ;; 0C
-        endif
-
-        if   undefined | 1
-          defb 13                       ;; 0D
-        else
-          defb 14
-        endif
-
-;------------------------------------------------------------------------------
-; IFDEF ELSE ENDIF
-;------------------------------------------------------------------------------
-        defc ifdef_1 = 0
-        define ifdef_2
-
-        ifdef ZERO
-          defb 1                        ;; 01
-        else
-          defb 2
-        endif
-
-        ifdef undefined
-          defb 3
-        else
-          defb 4                        ;; 04
-        endif
-
-        ifdef ifdef_1
-          defb 5                        ;; 05
-        else
-          defb 6
-        endif
-
-        ifdef ifdef_2
-          defb 7                        ;; 07
-        else
-          defb 8
-        endif
-
-        ifdef ifdef_3
-          defb 9
-        else
-          defb 10                       ;; 0A
-        endif
-
-;------------------------------------------------------------------------------
-; IFNDEF ELSE ENDIF
-;------------------------------------------------------------------------------
-        defc ifndef_1 = 0
-        define ifndef_2
-
-        ifndef ZERO
-          defb 1
-        else
-          defb 2                        ;; 02
-        endif
-
-        ifndef undefined
-          defb 3                        ;; 03
-        else
-          defb 4
-        endif
-
-        ifndef ifndef_1
-          defb 5
-        else
-          defb 6                        ;; 06
-        endif
-
-        ifndef ifndef_2
-          defb 7
-        else
-          defb 8                        ;; 08
-        endif
-
-        ifndef ifndef_3
-          defb 9                        ;; 09
-        else
-          defb 10
-        endif
-
-;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
 ;------------------------------------------------------------------------------
 
@@ -2233,11 +2108,6 @@ z80asm(
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
         ld   a,1+                       ;; error: syntax error
-        ld   a,'                        ;; error: invalid single quoted character
-        ld   a,''                       ;; error: invalid single quoted character
-        ld   a,'a                       ;; error: invalid single quoted character
-        ld   a,'he'                     ;; error: invalid single quoted character
-        ld   a,"a"                      ;; error: syntax error
         defb 1/0                        ;; error 2: division by zero
         defb 1% 0                       ;; error 2: division by zero
         defb 1?                         ;; error: syntax error
@@ -2259,11 +2129,8 @@ ENDIF
         ld   (bc),h                     ;; error: syntax error
         ld   (bc),l                     ;; error: syntax error
         ld   (bc),(hl)                  ;; error: syntax error
-        ld   (de),(hl)                  ;; error: syntax error
         ld   (bc),(ix+DIS)              ;; error: syntax error
-        ld   (de),(ix+DIS)              ;; error: syntax error
         ld   (bc),(iy+DIS)              ;; error: syntax error
-        ld   (de),(iy+DIS)              ;; error: syntax error
         ld   (bc),N                     ;; error: syntax error
 IF      !RABBIT
 ELSE    
@@ -2330,10 +2197,9 @@ END_ASM
 ;
 ; Input data for tests, to be parsed by build_opcodes.pl
 ;
-; Copyright (C) Gunther Strube, InterLogic 1993-99
-; Copyright (C) Paulo Custodio, 2011-2020
+; Copyright (C) Paulo Custodio, 2011-2021
 ; License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-; Repository: https://github.com/z88dk/z88dk
+; Repository: https://github.com/pauloscustodio/z88dk-z80asm
 ;------------------------------------------------------------------------------
 
         org  0100h
@@ -2387,8 +2253,6 @@ END_ASM
         ld   bc,1                       ;; 01 01 00
         ld   bc,32767                   ;; 01 FF 7F
         ld   bc,65535                   ;; 01 FF FF
-        ld   bc,-32769                  ;; 01 FF 7F
-        ld   bc,65536                   ;; 01 00 00
 
 ; 32-bit arithmetic, long range is not tested on a 32bit long
         defq 0xFFFFFFFF                 ;; FF FF FF FF
@@ -2400,22 +2264,17 @@ END_ASM
         call 0                          ;; CD 00 00
         call 1                          ;; CD 01 00
         call 65535                      ;; CD FF FF
-        call -32769                     ;; CD FF 7F
-        call 65536                      ;; CD 00 00
 
 ;------------------------------------------------------------------------------
 ; Expressions
 ;------------------------------------------------------------------------------
-        ld   a,1                        ;; 3E 01
-        ld   a,'a'                      ;; 3E 61
-
 .label_1 ld   a,2                       ;; 3E 02
 label_2: ld   a,3                       ;; 3E 03
 
-        defw label_1, label_2           ;; 6D 01 6F 01
-        defw ZERO+label_1               ;; 6D 01
-        defb +label_2-label_1           ;; 02
-        defb +ZERO+label_2-label_1      ;; 02
+        defw label_1, label_2           ;; 5D 01 5F 01
+        defw ZERO+label_1               ;; 5D 01
+        defb label_2-label_1            ;; 02
+        defb ZERO+label_2-label_1       ;; 02
 
         defb 255,128,0,-128             ;; FF 80 00 80
         defb ZERO+255,ZERO-128          ;; FF 80
@@ -4164,10 +4023,10 @@ ELSE
         call z,NN                       ;; 20 03 CD 30 00
         call nc,NN                      ;; 38 03 CD 30 00
         call c,NN                       ;; 30 03 CD 30 00
-        call po,NN                      ;; EA 9C 09 CD 30 00
-        call pe,NN                      ;; E2 A2 09 CD 30 00
-        call p,NN                       ;; FA A8 09 CD 30 00
-        call m,NN                       ;; F2 AE 09 CD 30 00
+        call po,NN                      ;; EA 8C 09 CD 30 00
+        call pe,NN                      ;; E2 92 09 CD 30 00
+        call p,NN                       ;; FA 98 09 CD 30 00
+        call m,NN                       ;; F2 9E 09 CD 30 00
 
 
 ENDIF   
@@ -4208,123 +4067,6 @@ IF      !RABBIT
         otdr
 ELSE    
 ENDIF   
-
-;------------------------------------------------------------------------------
-; IF ELSE ENDIF
-;------------------------------------------------------------------------------
-        if   1
-          defb 1                        ;; 01
-          if   1
-            defb 2                      ;; 02
-          else
-            defb 3
-          endif
-        else
-          defb 4
-          if   1
-            defb 5
-          else
-            defb 6
-          endif
-        endif
-
-        if   0
-          defb 7
-        endif
-
-        if   1
-          defb 8                        ;; 08
-        endif
-
-        if   0
-          defb 9
-        else
-          defb 10                       ;; 0A
-        endif
-
-        if   undefined
-          defb 11
-        else
-          defb 12                       ;; 0C
-        endif
-
-        if   undefined | 1
-          defb 13                       ;; 0D
-        else
-          defb 14
-        endif
-
-;------------------------------------------------------------------------------
-; IFDEF ELSE ENDIF
-;------------------------------------------------------------------------------
-        defc ifdef_1 = 0
-        define ifdef_2
-
-        ifdef ZERO
-          defb 1                        ;; 01
-        else
-          defb 2
-        endif
-
-        ifdef undefined
-          defb 3
-        else
-          defb 4                        ;; 04
-        endif
-
-        ifdef ifdef_1
-          defb 5                        ;; 05
-        else
-          defb 6
-        endif
-
-        ifdef ifdef_2
-          defb 7                        ;; 07
-        else
-          defb 8
-        endif
-
-        ifdef ifdef_3
-          defb 9
-        else
-          defb 10                       ;; 0A
-        endif
-
-;------------------------------------------------------------------------------
-; IFNDEF ELSE ENDIF
-;------------------------------------------------------------------------------
-        defc ifndef_1 = 0
-        define ifndef_2
-
-        ifndef ZERO
-          defb 1
-        else
-          defb 2                        ;; 02
-        endif
-
-        ifndef undefined
-          defb 3                        ;; 03
-        else
-          defb 4
-        endif
-
-        ifndef ifndef_1
-          defb 5
-        else
-          defb 6                        ;; 06
-        endif
-
-        ifndef ifndef_2
-          defb 7
-        else
-          defb 8                        ;; 08
-        endif
-
-        ifndef ifndef_3
-          defb 9                        ;; 09
-        else
-          defb 10
-        endif
 
 ;------------------------------------------------------------------------------
 ; Allow labels with names of opcodes
@@ -4368,7 +4110,6 @@ IF      !RABBIT
         call_pkg 1
         call_pkg 65535
         call_pkg -1
-        call_pkg 65536
 ENDIF   
 
         fpp  1                          ;; DF 01
@@ -4385,11 +4126,6 @@ z80asm(
         ldx                             ;; error: syntax error
         ld                              ;; error: syntax error
         ld   a,1+                       ;; error: syntax error
-        ld   a,'                        ;; error: invalid single quoted character
-        ld   a,''                       ;; error: invalid single quoted character
-        ld   a,'a                       ;; error: invalid single quoted character
-        ld   a,'he'                     ;; error: invalid single quoted character
-        ld   a,"a"                      ;; error: syntax error
         defb 1/0                        ;; error 2: division by zero
         defb 1% 0                       ;; error 2: division by zero
         defb 1?                         ;; error: syntax error
@@ -4471,11 +4207,8 @@ ENDIF
         ld   (bc),h                     ;; error: syntax error
         ld   (bc),l                     ;; error: syntax error
         ld   (bc),(hl)                  ;; error: syntax error
-        ld   (de),(hl)                  ;; error: syntax error
         ld   (bc),(ix+DIS)              ;; error: syntax error
-        ld   (de),(ix+DIS)              ;; error: syntax error
         ld   (bc),(iy+DIS)              ;; error: syntax error
-        ld   (de),(iy+DIS)              ;; error: syntax error
         ld   (bc),N                     ;; error: syntax error
 IF      !RABBIT
 ELSE    

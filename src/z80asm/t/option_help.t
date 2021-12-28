@@ -45,6 +45,12 @@ Help Options:
   -h                     Show help options
   -v                     Be verbose
 
+Preprocessor Options:
+  -IXIY                  Swap IX and IY registers
+  -IPATH                 Add directory to include search path
+  -DSYMBOL[=VALUE]       Define a static symbol
+  -ucase                 Convert identifiers to upper case
+
 Code Generation Options:
   -mz80n                 Assemble for the Z80 variant of ZX Next
   -mz80                  Assemble for the Z80
@@ -56,16 +62,11 @@ Code Generation Options:
   -mr3k                  Assemble for the Rabbit 3000
   -mti83plus             Assemble for the TI83Plus
   -mti83                 Assemble for the TI83
-  -IXIY                  Swap IX and IY registers
   -opt-speed             Optimize for speed
   -debug                 Add debug info to map file
 
-Environment:
-  -IPATH                 Add directory to include search path
-  -LPATH                 Add directory to library search path
-  -DSYMBOL[=VALUE]       Define a static symbol
-
 Libraries:
+  -LPATH                 Add directory to library search path
   -xFILE                 Create a library file.lib
   -lFILE                 Use library file.lib
 

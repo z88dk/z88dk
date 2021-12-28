@@ -1,0 +1,45 @@
+//-----------------------------------------------------------------------------
+// z80asm
+// keywords recognized by the lexer
+// Copyright (C) Paulo Custodio, 2011-2021
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+X(None, "")
+
+X(ASMPC, "asmpc")
+X(BINARY, "binary")
+X(CLINE, "c_line")
+X(DEFC, "defc")
+X(DEFCONT, "defcont")
+X(DEFGROUP, "defgroup")
+X(DEFINE, "define")
+X(DEFL, "defl")
+X(DEFVARS, "defvars")
+X(DS_B, "ds.b")
+X(DS_P, "ds.p")
+X(DS_Q, "ds.q")
+X(DS_W, "ds.w")
+X(ELIF, "elif")
+X(ELIFDEF, "elifdef")
+X(ELIFNDEF, "elifndef")
+X(ELSE, "else")
+X(ENDIF, "endif")
+X(ENDM, "endm")
+X(ENDR, "endr")
+X(EQU, "equ")
+X(EXITM, "exitm")
+X(IF, "if")
+X(IFDEF, "ifdef")
+X(IFNDEF, "ifndef")
+X(INCBIN, "incbin")
+X(INCLUDE, "include")
+X(LINE, "line")
+X(LOCAL, "local")
+X(MACRO, "macro")
+X(REPT, "rept")
+X(REPTC, "reptc")
+X(REPTI, "repti")
+X(UNDEF, "undef")
+
+#undef X

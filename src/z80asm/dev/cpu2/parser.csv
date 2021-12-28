@@ -3699,18 +3699,18 @@ LD HL COMMA IY                    |z80n |-     |-    |ld hl, iy     |FD E5; E1  
 LD HL COMMA IY                    |z80n |-     |IXIY |ld hl, iy     |DD E5; E1                                   |     25 T
 LD HL COMMA SP                    |8080 |-     |-    |ld hl, sp     |21 00 00; 39                                |     20 T
 LD HL COMMA SP                    |8080 |-     |IXIY |ld hl, sp     |21 00 00; 39                                |     20 T
-LD HL COMMA SP                    |8085 |-     |-    |ld hl, sp     |21 00 00; 39                                |     20 T
-LD HL COMMA SP                    |8085 |-     |IXIY |ld hl, sp     |21 00 00; 39                                |     20 T
+LD HL COMMA SP                    |8085 |-     |-    |ld hl, sp     |EB; 38 00; EB                               |     18 T
+LD HL COMMA SP                    |8085 |-     |IXIY |ld hl, sp     |EB; 38 00; EB                               |     18 T
 LD HL COMMA SP                    |gbz80|-     |-    |ld hl, sp     |F8 00                                       |     12 T
 LD HL COMMA SP                    |gbz80|-     |IXIY |ld hl, sp     |F8 00                                       |     12 T
 LD HL COMMA SP                    |z80  |-     |-    |ld hl, sp     |21 00 00; 39                                |     21 T
 LD HL COMMA SP                    |z80  |-     |IXIY |ld hl, sp     |21 00 00; 39                                |     21 T
 LD HL COMMA SP                    |z80n |-     |-    |ld hl, sp     |21 00 00; 39                                |     21 T
 LD HL COMMA SP                    |z80n |-     |IXIY |ld hl, sp     |21 00 00; 39                                |     21 T
+LD HL COMMA SP PLUS expr          |8085 |expr  |-    |ld hl, sp+%n  |EB; 38 %n; EB                               |     18 T
+LD HL COMMA SP PLUS expr          |8085 |expr  |IXIY |ld hl, sp+%n  |EB; 38 %n; EB                               |     18 T
 LD HL COMMA SP expr               |8080 |expr  |-    |ld hl, sp+%s  |21 %s 00; 39                                |     20 T
 LD HL COMMA SP expr               |8080 |expr  |IXIY |ld hl, sp+%s  |21 %s 00; 39                                |     20 T
-LD HL COMMA SP expr               |8085 |expr  |-    |ld hl, sp+%s  |21 %s 00; 39                                |     20 T
-LD HL COMMA SP expr               |8085 |expr  |IXIY |ld hl, sp+%s  |21 %s 00; 39                                |     20 T
 LD HL COMMA SP expr               |gbz80|expr  |-    |ld hl, sp+%s  |F8 %s                                       |     12 T
 LD HL COMMA SP expr               |gbz80|expr  |IXIY |ld hl, sp+%s  |F8 %s                                       |     12 T
 LD HL COMMA SP expr               |z80  |expr  |-    |ld hl, sp+%s  |21 %s 00; 39                                |     21 T

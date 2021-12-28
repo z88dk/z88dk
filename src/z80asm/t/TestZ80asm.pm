@@ -63,6 +63,7 @@ END {
 #------------------------------------------------------------------------------
 sub z80asm {
 	my(%args) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	note "Test at ",join(" ", caller);
 	
@@ -175,6 +176,8 @@ sub z80asm {
 #------------------------------------------------------------------------------
 sub unlink_temp {
 	my(@temp) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
 	push @temp, 
 		grep { -f $_ }
 		grep {/^ test .* \. (?: asm |
@@ -224,6 +227,7 @@ sub write_binfile {
 # check binary file
 sub test_binfile {
 	my($file, $expected) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
 	note "Test at ",join(" ", caller);
 
@@ -246,6 +250,7 @@ sub test_binfile {
 #------------------------------------------------------------------------------
 sub z80nm {
 	my($o_file, $expected_out) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	system("make -C $AR") and die;
 
@@ -273,6 +278,7 @@ sub z80nm {
 #------------------------------------------------------------------------------
 sub is_text {
 	my($got, $expected, $name) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
 	# normalize white space
 	for ($got, $expected) {

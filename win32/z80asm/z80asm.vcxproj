@@ -22,33 +22,33 @@
     <ProjectGuid>{48CCD8D5-4049-4C31-8C9E-80CEACAD7FE6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>z88dk-z80asm</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>z88dk-z80asm</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -89,9 +89,10 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\src\z80asm;..\..\src\common;..\..\src\z80asm\lib;..\..\ext\UNIXem\include;..\..\ext\uthash\src;..\..\ext\regex</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LOG_INPUT;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\..\src\common;..\..\src\z80asm\src;..\..\ext\UNIXem\include;..\..\ext\uthash\src;..\..\ext\regex</AdditionalIncludeDirectories>
       <SDLCheck>true</SDLCheck>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,8 +132,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..\src\common;..\..\src\z80asm\lib;..\..\ext\UNIXem\include;..\..\ext\uthash\src;..\..\ext\regex</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\src\common;..\..\src\z80asm\src;..\..\ext\UNIXem\include;..\..\ext\uthash\src;..\..\ext\regex</AdditionalIncludeDirectories>
       <SDLCheck>true</SDLCheck>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -186,102 +188,100 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\common\zutils.c" />
-    <ClCompile Include="..\..\src\z80asm\codearea.c" />
-    <ClCompile Include="..\..\src\z80asm\common.c" />
-    <ClCompile Include="..\..\src\z80asm\directives.c" />
-    <ClCompile Include="..\..\src\z80asm\errors.c" />
-    <ClCompile Include="..\..\src\z80asm\error_func.c" />
-    <ClCompile Include="..\..\src\z80asm\expr.c" />
-    <ClCompile Include="..\..\src\z80asm\hist.c" />
-    <ClCompile Include="..\..\src\z80asm\libfile.c" />
-    <ClCompile Include="..\..\src\z80asm\lib\alloc.c" />
-    <ClCompile Include="..\..\src\z80asm\lib\array.c" />
-    <ClCompile Include="..\..\src\z80asm\lib\class.c" />
-    <ClCompile Include="..\..\src\z80asm\lib\dbg.c" />
-    <ClCompile Include="..\..\src\z80asm\lib\list.c" />
-    <ClCompile Include="..\..\src\z80asm\lib\minunit.c" />
-    <ClCompile Include="..\..\src\z80asm\lib\srcfile.c" />
-    <ClCompile Include="..\..\src\z80asm\lib\str.c" />
-    <ClCompile Include="..\..\src\z80asm\lib\strhash.c" />
-    <ClCompile Include="..\..\src\z80asm\listfile.c" />
-    <ClCompile Include="..\..\src\z80asm\macros.c" />
-    <ClCompile Include="..\..\src\z80asm\main.c" />
-    <ClCompile Include="..\..\src\z80asm\model.c" />
-    <ClCompile Include="..\..\src\z80asm\modlink.c" />
-    <ClCompile Include="..\..\src\z80asm\module.c" />
-    <ClCompile Include="..\..\src\z80asm\zobjfile.c" />
-    <ClCompile Include="..\..\src\z80asm\opcodes.c" />
-    <ClCompile Include="..\..\src\z80asm\options.c" />
-    <ClCompile Include="..\..\src\z80asm\parse.c" />
-    <ClCompile Include="..\..\src\z80asm\scan.c" />
-    <ClCompile Include="..\..\src\z80asm\sym.c" />
-    <ClCompile Include="..\..\src\z80asm\symtab.c" />
-    <ClCompile Include="..\..\src\z80asm\z80asm.c" />
-    <ClCompile Include="..\..\src\z80asm\z80pass.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\src\common\zutils.h" />
-    <ClInclude Include="..\..\src\config.h" />
-    <ClInclude Include="..\..\src\portability.h" />
-    <ClInclude Include="..\..\src\z80asm\codearea.h" />
-    <ClInclude Include="..\..\src\z80asm\common.h" />
-    <ClInclude Include="..\..\src\z80asm\directives.h" />
-    <ClInclude Include="..\..\src\z80asm\errors.h" />
-    <ClInclude Include="..\..\src\z80asm\error_func.h" />
-    <ClInclude Include="..\..\src\z80asm\expr.h" />
-    <ClInclude Include="..\..\src\z80asm\expr_def.h" />
-    <ClInclude Include="..\..\src\z80asm\hist.h" />
-    <ClInclude Include="..\..\src\z80asm\libfile.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\alloc.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\array.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\class.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\classhash.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\classlist.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\dbg.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\init.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\list.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\minunit.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\queue.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\srcfile.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\str.h" />
-    <ClInclude Include="..\..\src\z80asm\lib\strhash.h" />
-    <ClInclude Include="..\..\src\z80asm\listfile.h" />
-    <ClInclude Include="..\..\src\z80asm\macros.h" />
-    <ClInclude Include="..\..\src\z80asm\model.h" />
-    <ClInclude Include="..\..\src\z80asm\modlink.h" />
-    <ClInclude Include="..\..\src\z80asm\module.h" />
-    <ClInclude Include="..\..\src\z80asm\zobjfile.h" />
-    <ClInclude Include="..\..\src\z80asm\opcodes.h" />
-    <ClInclude Include="..\..\src\z80asm\options.h" />
-    <ClInclude Include="..\..\src\z80asm\options_def.h" />
-    <ClInclude Include="..\..\src\z80asm\parse.h" />
-    <ClInclude Include="..\..\src\z80asm\parse_rules.h" />
-    <ClInclude Include="..\..\src\z80asm\scan.h" />
-    <ClInclude Include="..\..\src\z80asm\scan_def.h" />
-    <ClInclude Include="..\..\src\z80asm\scan_rules.h" />
-    <ClInclude Include="..\..\src\z80asm\sym.h" />
-    <ClInclude Include="..\..\src\z80asm\symbol.h" />
-    <ClInclude Include="..\..\src\z80asm\symtab.h" />
-    <ClInclude Include="..\..\src\z80asm\tokens.h" />
-    <ClInclude Include="..\..\src\z80asm\z80asm.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\..\src\z80asm\parse_rules.rl" />
-    <None Include="..\..\src\z80asm\scan_rules.rl" />
-    <None Include="..\..\src\z80asm\tt\error_func.c.tt" />
-    <None Include="..\..\src\z80asm\tt\error_func.h.tt" />
-    <None Include="..\..\src\z80asm\tt\error_func.yaml" />
-    <None Include="..\..\src\z80asm\tt\tokens.h.tt" />
-    <None Include="..\..\src\z80asm\tt\tokens.yaml" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\UNIXem\UNIXem.vcxproj">
       <Project>{7d0213a3-87fa-4f56-a5d6-cc23682acad8}</Project>
     </ProjectReference>
     <ProjectReference Include="..\z80asm-common\z80asm-common.vcxproj">
       <Project>{00bce225-fe40-4c33-b15e-c8fb6ada74eb}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\defines.h" />
+    <ClInclude Include="..\..\src\z80asm\src\cpp\lex.h" />
+    <ClInclude Include="..\..\src\z80asm\src\cpp\preproc.h" />
+    <ClInclude Include="..\..\src\z80asm\src\cpp\utils.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\alloc.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\array.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\class.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\classhash.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\classlist.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\codearea.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\common.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\dbg.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\directives.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\errors.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\error_func.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\expr.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\expr_def.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\hist.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\init.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\libfile.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\list.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\listfile.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\minunit.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\modlink.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\module.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\opcodes.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\options.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\options_def.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\parse.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\parse_rules.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\queue.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\scan.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\scan_def.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\scan_rules.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\str.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\strhash.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\sym.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\symbol.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\symtab.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\tokens.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\z80asm.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\zobjfile.h" />
+    <ClInclude Include="..\..\src\z80asm\src\if.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\defines.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\cpp\lex.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\cpp\main.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\cpp\preproc.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\cpp\utils.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\c\alloc.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\array.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\class.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\codearea.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\common.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\dbg.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\directives.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\errors.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\error_func.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\expr.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\hist.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\libfile.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\list.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\listfile.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\minunit.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\modlink.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\module.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\opcodes.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\options.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\parse.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\scan.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\str.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\strhash.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\sym.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\symtab.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\z80asm.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\z80pass.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\zobjfile.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\z80asm\src\cpp\keyword.def" />
+    <None Include="..\..\src\z80asm\src\cpp\lex.re" />
+    <None Include="..\..\src\z80asm\src\c\parse_rules.rl" />
+    <None Include="..\..\src\z80asm\src\c\scan_rules.rl" />
+    <None Include="..\..\src\z80asm\tt\error_func.yaml" />
+    <None Include="..\..\src\z80asm\tt\tokens.yaml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

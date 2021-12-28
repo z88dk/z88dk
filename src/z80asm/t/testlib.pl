@@ -75,6 +75,7 @@ sub build_z80nm {	_build_tool('z80nm');	}
 
 sub run {
 	my($cmd, $return, $out, $err) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 	$return //= 0;
 	$out //= '';
 	$err //= '';
@@ -108,6 +109,7 @@ sub run {
 
 sub z80asm {
 	my($source, $options, $return, $out, $err) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 	$options //= "-b";
 	
 	spew("test.asm", $source);
@@ -116,13 +118,15 @@ sub z80asm {
 
 sub appmake {
 	my($args) = @_;
-	
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
 	build_appmake();
 	run("z88dk-appmake $args", 0, 'IGNORE');
 }
 
 sub ticks {
 	my($source, $options) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	build_ticks();
 	z80asm($source, $options." -b");
@@ -199,6 +203,7 @@ sub parity {
 
 sub z80nm {
 	my($file, $out) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
 	build_z80nm();
 	run("z88dk-z80nm -a $file", 0, $out);
@@ -210,6 +215,7 @@ sub z80nm {
 
 sub slurp {
 	my($file) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 	ok -f $file, $file;
 	local $/;
 	open(my $fh, "<:raw", $file) or die "$file: $!";
@@ -218,11 +224,13 @@ sub slurp {
 
 sub spew {
 	my($file, @text) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 	open(my $fh, ">:raw", $file) or die "$file: $!";
 	print $fh @text;
 }
 
 sub unlink_testfiles {
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 	if ($ENV{KEEP}) {
 		note "kept test files";
 	}
@@ -272,6 +280,7 @@ sub hexdump {
 
 sub check_text_file {
 	my($file, $exp, $title) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 	$title //= $file." contents";
 	my $loc = " at file ".((caller)[1])." line ".((caller)[2]);
 	
@@ -286,6 +295,7 @@ sub check_text_file {
 
 sub check_bin_file {
 	my($file, $exp, $title) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 	$title //= $file." contents";
 	my $loc = " at file ".((caller)[1])." line ".((caller)[2]);
 	
@@ -301,6 +311,7 @@ sub check_bin_file {
 
 sub check_text {
 	my($out, $exp, $title) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	my $out_t = trim($out);
 	my $exp_t = trim($exp);

@@ -5319,7 +5319,7 @@ ld hl, iy     |z80  |FD E5; E1                                   |     25 T
 ld hl, iy     |z80n |FD E5; E1                                   |     25 T
               |     |                                            |         
 ld hl, sp     |8080 |21 00 00; 39                                |     20 T
-ld hl, sp     |8085 |21 00 00; 39                                |     20 T
+ld hl, sp     |8085 |EB; 38 00; EB                               |     18 T
 ld hl, sp     |gbz80|F8 00                                       |     12 T
 ld hl, sp     |r2ka |   **                                       |   **    
 ld hl, sp     |r3k  |   **                                       |   **    
@@ -5327,8 +5327,17 @@ ld hl, sp     |z180 |   **                                       |   **
 ld hl, sp     |z80  |21 00 00; 39                                |     21 T
 ld hl, sp     |z80n |21 00 00; 39                                |     21 T
               |     |                                            |         
+ld hl, sp+%n  |8080 |   **                                       |   **    
+ld hl, sp+%n  |8085 |EB; 38 %n; EB                               |     18 T
+ld hl, sp+%n  |gbz80|   **                                       |   **    
+ld hl, sp+%n  |r2ka |   **                                       |   **    
+ld hl, sp+%n  |r3k  |   **                                       |   **    
+ld hl, sp+%n  |z180 |   **                                       |   **    
+ld hl, sp+%n  |z80  |   **                                       |   **    
+ld hl, sp+%n  |z80n |   **                                       |   **    
+              |     |                                            |         
 ld hl, sp+%s  |8080 |21 %s 00; 39                                |     20 T
-ld hl, sp+%s  |8085 |21 %s 00; 39                                |     20 T
+ld hl, sp+%s  |8085 |   **                                       |   **    
 ld hl, sp+%s  |gbz80|F8 %s                                       |     12 T
 ld hl, sp+%s  |r2ka |   **                                       |   **    
 ld hl, sp+%s  |r3k  |   **                                       |   **    

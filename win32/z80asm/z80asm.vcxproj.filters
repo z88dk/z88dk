@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
@@ -13,263 +13,275 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\c">
+      <UniqueIdentifier>{590f7c70-88ed-44ee-881e-2461059db0e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\c">
+      <UniqueIdentifier>{67794170-ad0c-400b-864c-8d5f00dc6575}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\cpp">
+      <UniqueIdentifier>{dd4ac2a3-c89b-4d16-a6ad-fc7d0bcebebb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\cpp">
+      <UniqueIdentifier>{72a93d8e-93a7-4fa1-ac38-5d4791cecf0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\c">
+      <UniqueIdentifier>{c2ece489-ab61-4165-95f9-81889c619df5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\cpp">
+      <UniqueIdentifier>{e0f09aaa-6a40-43ee-b07d-fc8fc6be6c95}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\z80asm\codearea.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\directives.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\error_func.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\errors.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\expr.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\hist.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\libfile.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\listfile.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\model.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\modlink.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\module.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\opcodes.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\options.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\parse.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\scan.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\sym.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\symtab.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80asm.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\z80pass.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\lib\alloc.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\lib\array.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\lib\class.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\lib\dbg.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\lib\list.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\lib\minunit.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\lib\srcfile.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\lib\str.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\lib\strhash.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\main.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\macros.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\zobjfile.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\common.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\common\zutils.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\src\z80asm\lib\alloc.h">
+    <ClInclude Include="..\..\src\z80asm\src\c\alloc.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\array.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\class.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\classhash.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\classlist.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\codearea.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\common.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\dbg.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\directives.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\error_func.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\errors.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\expr.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\expr_def.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\hist.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\init.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\libfile.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\list.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\listfile.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\minunit.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\modlink.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\module.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\opcodes.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\options.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\options_def.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\parse.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\parse_rules.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\queue.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\scan.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\scan_def.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\scan_rules.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\str.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\strhash.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\sym.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\symbol.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\symtab.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\tokens.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\z80asm.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\zobjfile.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\if.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\array.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\preproc.h">
+      <Filter>Header Files\cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\class.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\lex.h">
+      <Filter>Header Files\cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\classhash.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\utils.h">
+      <Filter>Header Files\cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\classlist.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\dbg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\init.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\list.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\minunit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\queue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\srcfile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\str.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\lib\strhash.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\codearea.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\directives.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\error_func.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\errors.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\expr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\expr_def.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\hist.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\libfile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\listfile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\modlink.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\module.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\opcodes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\options.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\options_def.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\parse.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\parse_rules.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\scan.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\scan_def.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\scan_rules.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\sym.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\symbol.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\symtab.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\tokens.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\z80asm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\portability.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\macros.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\zobjfile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\common\zutils.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\defines.h">
+      <Filter>Header Files\cpp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\z80asm\parse_rules.rl">
-      <Filter>Resource Files</Filter>
+    <ClCompile Include="..\..\src\z80asm\src\c\alloc.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\array.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\class.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\codearea.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\common.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\dbg.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\directives.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\error_func.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\errors.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\expr.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\hist.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\libfile.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\list.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\listfile.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\minunit.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\modlink.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\module.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\opcodes.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\options.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\parse.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\scan.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\str.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\strhash.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\sym.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\symtab.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\z80asm.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\z80pass.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\zobjfile.c">
+      <Filter>Source Files\c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\main.cpp">
+      <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\preproc.cpp">
+      <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\lex.cpp">
+      <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\utils.cpp">
+      <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\defines.cpp">
+      <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\z80asm\src\c\scan_rules.rl">
+      <Filter>Resource Files\c</Filter>
     </None>
-    <None Include="..\..\src\z80asm\scan_rules.rl">
-      <Filter>Resource Files</Filter>
+    <None Include="..\..\src\z80asm\src\c\parse_rules.rl">
+      <Filter>Resource Files\c</Filter>
     </None>
-    <None Include="..\..\src\z80asm\tt\error_func.c.tt">
-      <Filter>Resource Files</Filter>
+    <None Include="..\..\src\z80asm\src\cpp\lex.re">
+      <Filter>Resource Files\cpp</Filter>
     </None>
-    <None Include="..\..\src\z80asm\tt\error_func.h.tt">
-      <Filter>Resource Files</Filter>
+    <None Include="..\..\src\z80asm\src\cpp\keyword.def">
+      <Filter>Resource Files\cpp</Filter>
     </None>
     <None Include="..\..\src\z80asm\tt\error_func.yaml">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\src\z80asm\tt\tokens.h.tt">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\c</Filter>
     </None>
     <None Include="..\..\src\z80asm\tt\tokens.yaml">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\c</Filter>
     </None>
   </ItemGroup>
 </Project>

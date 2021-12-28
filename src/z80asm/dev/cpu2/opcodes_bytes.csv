@@ -441,12 +441,10 @@
 21 %m %m                                    |z80n |lxi hl, %m    |     10 T
                                             |     |              |         
 21 %s 00; 39                                |8080 |ld hl, sp+%s  |     20 T
-21 %s 00; 39                                |8085 |ld hl, sp+%s  |     20 T
 21 %s 00; 39                                |z80  |ld hl, sp+%s  |     21 T
 21 %s 00; 39                                |z80n |ld hl, sp+%s  |     21 T
                                             |     |              |         
 21 00 00; 39                                |8080 |ld hl, sp     |     20 T
-21 00 00; 39                                |8085 |ld hl, sp     |     20 T
 21 00 00; 39                                |z80  |ld hl, sp     |     21 T
 21 00 00; 39                                |z80n |ld hl, sp     |     21 T
                                             |     |              |         
@@ -4652,6 +4650,10 @@ EB; 21 %n 00; 39; EB                        |z80n |ld de, sp+%n  |     29 T
 EB; 21 00 00; 39; EB                        |8080 |ld de, sp     |     28 T
 EB; 21 00 00; 39; EB                        |z80  |ld de, sp     |     29 T
 EB; 21 00 00; 39; EB                        |z80n |ld de, sp     |     29 T
+                                            |     |              |         
+EB; 38 %n; EB                               |8085 |ld hl, sp+%n  |     18 T
+                                            |     |              |         
+EB; 38 00; EB                               |8085 |ld hl, sp     |     18 T
                                             |     |              |         
 EC %m %m                                    |8080 |call pe, %m   |  11/17 T
 EC %m %m                                    |8085 |call pe, %m   |   9/18 T

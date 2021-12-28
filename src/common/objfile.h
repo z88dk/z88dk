@@ -52,7 +52,7 @@ typedef struct symbol_s
 	struct section_s* section;		// weak
 
 	UT_string* filename;
-	int		 line_nr;
+	int		 line_num;
 
 	struct symbol_s* next, * prev;
 } symbol_t;
@@ -75,7 +75,7 @@ typedef struct expr_s
 	UT_string* target_name;
 
 	UT_string* filename;
-	int		 line_nr;
+	int		 line_num;
 
 	struct expr_s* next, * prev;
 } expr_t;

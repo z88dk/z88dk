@@ -22,7 +22,7 @@ my $RAGEL = "ragel -T0";
 
 my @TEMP;
 @ARGV == 1 or die "Usage: ",basename($0)," INPUT.rl";
-my $FILE = basename(shift, ".rl");
+my $FILE = dirname($ARGV[0])."/".basename($ARGV[0], ".rl");
 
 # parse loops to .rl -> .rl1
 preprocess("$FILE.rl", "$FILE.rl1");

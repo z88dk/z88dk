@@ -7,7 +7,13 @@
 # Copyright (C) Paulo Custodio, 2011-2019
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
-PROJ		:= z88dk-z80asm
+ifeq ($(OS),Windows_NT)
+  EXESUFFIX 	:= .exe
+else
+  EXESUFFIX 	?=
+endif
+
+PROJ		:= z88dk-z80asm$(EXESUFFIX)
 
 INSTALL 	?= install
 Z80ASM_EXE	?= ../../$(PROJ)
@@ -19,7 +25,7 @@ SRC		:= $(filter-out test.asm,$(wildcard *.asm))
 define MAKE_LIB
 all: $(PROJ)-$(strip $(1)).lib
 
-$(PROJ)-$(strip $(1)).lib: $(PROJ)_lib.lst $(SRC) Makefile ../../zobjfile.h
+$(PROJ)-$(strip $(1)).lib: $(PROJ)_lib.lst $(SRC) Makefile ../../src/c/zobjfile.h
 	$(Z80ASM_EXE) -l -x$(PROJ)-$(strip $(1)).lib $(2) @$(PROJ)_lib.lst
 
 clean::
@@ -40,8 +46,7 @@ $(PROJ)_lib.lst: $(SRC)
 	$(foreach file, $(sort $(SRC)), echo $(file) >> $(PROJ)_lib.lst; )
 
 clean::
-	$(RM) $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin
-	$(RM) $(PROJ)
+	$(RM) $(SRC:.asm=.o) $(SRC:.asm=.lis) test.asm test.o test.bin $(PROJ)
 
 test: all
 	cp $(Z80ASM_EXE) $(PROJ)

@@ -367,6 +367,7 @@
  ld hl, (de)                    ; Error
  ld hl, ix                      ; Error
  ld hl, iy                      ; Error
+ ld hl, sp+255                  ; Error
  ld i, a                        ; Error
  ld ix, (-32768)                ; Error
  ld ix, (32767)                 ; Error

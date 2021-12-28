@@ -79,13 +79,13 @@ Object  file test.o at $0000: Z80RMF16
     U         __tail
     U         __size
   Expressions:
-    E Ub $0000 $0001: ASMPC-4608 (section "") (file test.asm:6)
-    E Cw $0002 $0003: ASMPC (section "") (file test.asm:7)
+    E Ub $0000 $0001: $-4608 (section "") (file test.asm:6)
+    E Cw $0002 $0003: $ (section "") (file test.asm:7)
     E Ub $0005 $0006: a1-4608 (section "") (file test.asm:8)
     E Cw $0007 $0008: a1 (section "") (file test.asm:9)
     E Cw $000A $000B: a2-a1 (section "") (file test.asm:10)
-    E Cw $000D $000E: a1-ASMPC (section "") (file test.asm:11)
-    E Cw $0010 $0011: a2-ASMPC (section "") (file test.asm:12)
+    E Cw $000D $000E: a1-$ (section "") (file test.asm:11)
+    E Cw $0010 $0011: a2-$ (section "") (file test.asm:12)
     E Cw $0013 $0014: __head (section "") (file test.asm:14)
     E Cw $0016 $0017: __tail (section "") (file test.asm:15)
     E Cw $0019 $001A: __size (section "") (file test.asm:16)
@@ -102,13 +102,13 @@ Object  file test1.o at $0000: Z80RMF16
     U         __tail
     U         __size
   Expressions:
-    E Ub $0000 $0001: ASMPC-4608 (section "") (file test1.asm:4)
-    E Cw $0002 $0003: ASMPC (section "") (file test1.asm:5)
+    E Ub $0000 $0001: $-4608 (section "") (file test1.asm:4)
+    E Cw $0002 $0003: $ (section "") (file test1.asm:5)
     E Ub $0005 $0006: a2-4608 (section "") (file test1.asm:6)
     E Cw $0007 $0008: a2 (section "") (file test1.asm:7)
     E Cw $000A $000B: a2-a1 (section "") (file test1.asm:8)
-    E Cw $000D $000E: ASMPC-a1 (section "") (file test1.asm:9)
-    E Cw $0010 $0011: a2-ASMPC (section "") (file test1.asm:10)
+    E Cw $000D $000E: $-a1 (section "") (file test1.asm:9)
+    E Cw $0010 $0011: a2-$ (section "") (file test1.asm:10)
     E Cw $0013 $0014: __head (section "") (file test1.asm:12)
     E Cw $0016 $0017: __tail (section "") (file test1.asm:13)
     E Cw $0019 $001A: __size (section "") (file test1.asm:14)
@@ -908,7 +908,7 @@ Object  file test.o at $0000: Z80RMF16
     E Cw $0012 $0013: test2__delay (section code) (file test2.asm:13)
     E =  $0000 $0000: test2_printa1 := printa (section "") (file test2.asm:4)
     E =  $0000 $0000: print := print1 (section "") (file test2.asm:3)
-    E Cw $000D $000D: ASMPC (section data) (file test3.asm:12)
+    E Cw $000D $000D: $ (section data) (file test3.asm:12)
     E Cw $0020 $0021: printa (section code) (file test3.asm:6)
 END
 

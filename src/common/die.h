@@ -31,7 +31,7 @@ extern void die(char *msg, ...);
 							} while(0)
 
 // check alloc result, die if error
-extern void *check_alloc(void *p, const char *file, int line_nr);
+extern void *check_alloc(void *p, const char *file, int line_num);
 #define Check_alloc(type, p)	((type)(check_alloc((p), __FILE__, __LINE__)))
 
 #define xmalloc(size)		Check_alloc(void*, malloc(size))
@@ -43,7 +43,7 @@ extern void *check_alloc(void *p, const char *file, int line_nr);
 #define xnew(type)			Check_alloc(type*, calloc(1, sizeof(type)))
 
 // check OS retval
-extern int check_retval(int retval, const char *file, const char *source_file, int line_nr);
+extern int check_retval(int retval, const char *file, const char *source_file, int line_num);
 #define Check_retval(rv, file)	check_retval((rv), (file), __FILE__, __LINE__)
 
 #define xremove(file)		Check_retval(remove(file), (file))

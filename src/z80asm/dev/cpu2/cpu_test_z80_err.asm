@@ -54,6 +54,7 @@
  ld de, hl+127                  ; Error
  ld de, hl+255                  ; Error
  ld hl, (de)                    ; Error
+ ld hl, sp+255                  ; Error
  ldd (hl), a                    ; Error
  ldd a, (hl)                    ; Error
  ldh (-128), a                  ; Error

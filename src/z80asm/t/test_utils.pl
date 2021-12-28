@@ -78,6 +78,7 @@ sub unlink_testfiles {
 
 sub t_z80asm {
 	my(%args) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	my $line = "[line ".((caller)[2])."]";
 
@@ -195,14 +196,14 @@ sub t_z80asm {
 	}
 
 	# list file or symbol table
-	if (defined($args{bin})) {
-		if ($cmd =~ / (-l) /) {
-			ok   -f $_, "$line $_" for (@lst);
-		}
-		else {
-			ok ! -f $_, "$line no $_" for (@lst);
-		}
+	if ($cmd =~ / (-l) /) {
+		ok   -f $_, "$line $_" for (@lst);
+	}
+	else {
+		ok ! -f $_, "$line no $_" for (@lst);
+	}
 
+	if (defined($args{bin})) {
 		if ($cmd =~ / (-s) /) {
 			ok   -f $_, "$line $_" for (@sym);
 		}
@@ -211,8 +212,6 @@ sub t_z80asm {
 		}
 	}
 	elsif ($args{linkerr}) {	# asm OK but link failed
-		ok -f $_, "$line $_" for (@lst);
-
 		if ($cmd =~ / (-s) /) {
 			ok   -f $_, "$line $_" for (@sym);
 		}
@@ -221,7 +220,6 @@ sub t_z80asm {
 		}
 	}
 	else {
-		ok ! -f $_, "$line no $_" for (@lst);
 		ok ! -f $_, "$line no $_" for (@sym);
 	}
 
@@ -485,7 +483,7 @@ sub t_compile_module {
 	my($init_code, $main_code, $compile_args) = @_;
 
 	# modules to include always
-	$compile_args .= " lib/alloc.o ";
+	$compile_args .= " src/c/alloc.o ";
 
 	# wait for previous run to finish
 	while (-f 'test'.$Config{_exe} && ! unlink('test'.$Config{_exe})) {
@@ -660,7 +658,7 @@ sub normalize {
 #------------------------------------------------------------------------------
 # get version and date from hist.c
 sub get_copyright {
-	my $hist = read_file("hist.c");
+	my $hist = read_file("src/c/hist.c");
 	my($copyright) = $hist =~ /\#define \s+ COPYRIGHT \s+ \" (.*?) \"/x or die;
 
 	my $config = read_file("../config.h");

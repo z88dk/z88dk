@@ -6,17 +6,19 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 # https://github.com/z88dk/z88dk/issues/1898
 
 z80asm_ok("", "", "", <<'END_ASM', bytes(0, 1, 3));
-L1:		assert 1
+L1:		assert 1			; constant
 		defb L1
 L2:
-		assert 2
+		assert 2			; constant !=0
 		defb L2
 		
-		assert L2-L1==1
+		assert L2-L1==1		; expression containing already defined labels
 		
 		defc X1 = 3
-		assert X1
+		assert X1			; expression containing defc constants
 		defb X1
+		
+		assert $==3			; expression containing ASMPC
 END_ASM
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);

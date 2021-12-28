@@ -32,44 +32,6 @@ z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa,bb 	\n DEFB aa 	;; error: symbol 'aa'
 z80asm(asm => "DEFINE aa,bb \n UNDEFINE aa,bb 	\n DEFB bb 	;; error: symbol 'bb' not defined");
 
 #------------------------------------------------------------------------------
-# DEFC
-#------------------------------------------------------------------------------
-z80asm(asm => "DEFC 			;; error: syntax error");
-z80asm(asm => "DEFC aa			;; error: syntax error");
-z80asm(asm => "DEFC aa=			;; error: syntax error");
-z80asm(asm => "DEFC aa=1+1,		;; error: syntax error");
-
-z80asm(asm => "DEFC aa=1+1,bb=2+2	\n DEFB aa,bb	;; 02 04");
-
-#------------------------------------------------------------------------------
-# DEFW, DEFQ - simple use tested in opcodes.t
-# test error messages here
-#------------------------------------------------------------------------------
-z80asm(asm => "xx: DEFW 							;; error: syntax error");
-z80asm(asm => "xx: DEFW xx, 						;; error: syntax error");
-z80asm(asm => "xx: DEFW xx,xx+102h					;; 00 00 02 01");
-
-z80asm(asm => "x1: DEFS 65534,0xAA \n x2: DEFW 0xAAAA",
-	   bin => "\xAA" x 65536);
-z80asm(asm => "x1: DEFS 65532,0xAA \n x2: DEFW 0xAAAA, 0xAAAA",
-	   bin => "\xAA" x 65536);
-z80asm(asm => "x1: DEFS 65535,0xAA \n x2: DEFW 0xAAAA ;; error: max. code size of 65536 bytes reached");
-z80asm(asm => "x1: DEFS 65533,0xAA \n x2: DEFW 0xAAAA, 0xAAAA ;; error: max. code size of 65536 bytes reached");
-
-
-z80asm(asm => "xx: DEFQ 							;; error: syntax error");
-z80asm(asm => "xx: DEFQ xx, 						;; error: syntax error");
-z80asm(asm => "xx: DEFQ xx,xx+1020304h				;; 00 00 00 00 04 03 02 01");
-
-z80asm(asm => "x1: DEFS 65532,0xAA \n x2: DEFQ 0xAAAAAAAA",
-	   bin => "\xAA" x 65536);
-z80asm(asm => "x1: DEFS 65528,0xAA \n x2: DEFQ 0xAAAAAAAA, 0xAAAAAAAA",
-	   bin => "\xAA" x 65536);
-z80asm(asm => "x1: DEFS 65533,0xAA \n x2: DEFQ 0xAAAAAAAA ;; error: max. code size of 65536 bytes reached");
-z80asm(asm => "x1: DEFS 65529,0xAA \n x2: DEFQ 0xAAAAAAAA, 0xAAAAAAAA ;; error: max. code size of 65536 bytes reached");
-
-
-#------------------------------------------------------------------------------
 # MODULE
 #------------------------------------------------------------------------------
 
@@ -200,55 +162,5 @@ ok ! -f "test.lis", "test.lis does not exist";
 # IF ELSE ENDIF - simple use tested in opcodes.t
 # test error messages here
 #------------------------------------------------------------------------------
-z80asm(asm => "IF 		;; error: syntax error");
-z80asm(asm => "IF 1+	;; error: syntax error");
-z80asm(asm => "IF 1",
-	   error => "Error at file 'test.asm' line 2: unbalanced control structure started at file 'test.asm' line 1");
-z80asm(asm => "ELSE 	;; error: unbalanced control structure");
-z80asm(asm => "ENDIF 	;; error: unbalanced control structure");
 
-z80asm(asm => <<'END',
-	IF 1
-	ELSE
-	ELSE 	;; error: unbalanced control structure started at file 'test.asm' line 1
-	ENDIF
-END
-);
 
-write_file("test.inc", "IF 1\n");
-z80asm(asm => 'INCLUDE "test.inc"',
-	   error => "Error at file 'test.inc' line 2: unbalanced control structure started at file 'test.inc' line 1");
-
-z80asm(asm => "IFDEF	;; error: syntax error");
-z80asm(asm => "IFDEF 1	;; error: syntax error");
-z80asm(asm => "IFDEF hello",
-	   error => "Error at file 'test.asm' line 2: unbalanced control structure started at file 'test.asm' line 1");
-
-z80asm(asm => <<'END',
-	IFDEF hello
-	ELSE
-	ELSE 	;; error: unbalanced control structure started at file 'test.asm' line 1
-	ENDIF
-END
-);
-
-write_file("test.inc", "IFDEF hello\n");
-z80asm(asm => 'INCLUDE "test.inc"',
-	   error => "Error at file 'test.inc' line 2: unbalanced control structure started at file 'test.inc' line 1");
-
-z80asm(asm => "IFNDEF	;; error: syntax error");
-z80asm(asm => "IFNDEF 1	;; error: syntax error");
-z80asm(asm => "IFNDEF hello",
-	   error => "Error at file 'test.asm' line 2: unbalanced control structure started at file 'test.asm' line 1");
-
-z80asm(asm => <<'END',
-	IFNDEF hello
-	ELSE
-	ELSE 	;; error: unbalanced control structure started at file 'test.asm' line 1
-	ENDIF
-END
-);
-
-write_file("test.inc", "IFNDEF hello\n");
-z80asm(asm => 'INCLUDE "test.inc"',
-	   error => "Error at file 'test.inc' line 2: unbalanced control structure started at file 'test.inc' line 1");

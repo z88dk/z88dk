@@ -24,7 +24,7 @@ jobs:
     - name: Update apt 
       run: sudo apt update
     - name: Install apt dependencies
-      run: sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl ragel libyaml-perl liblocal-lib-perl
+      run: sudo apt install -y dos2unix libboost-all-dev texinfo texi2html gdb curl cpanminus ccache libmodern-perl-perl libtemplate-perl ragel re2c libyaml-perl liblocal-lib-perl
     - name: Install perl prerequisites
       run: cpanm --local-lib=~/perl5 App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
     - name: Build binaries

@@ -68,6 +68,11 @@ errors:
     args	: 'const char *name'
     message	: "\"macro '%s' redefined\", name"
 	
+  - type	: ErrError
+    func	: error_wrong_number_macro_args
+    args	: 'const char *name'
+    message	: "\"wrong number of macro '%s' arguments\", name"
+
   # Assembly errors
   - type	: ErrError
     func	: error_syntax
@@ -95,6 +100,11 @@ errors:
     message	: '"string longer than reserved space"'
 	
   - type	: ErrError
+    func	: error_invalid_char
+    args	: void
+    message	: '"invalid character"'
+	
+  - type	: ErrError
     func	: error_divide_by_zero
     args	: void
     message	: '"division by zero"'
@@ -111,8 +121,8 @@ errors:
 	
   - type	: ErrError
     func	: error_unbalanced_struct_at
-    args	: 'const char *filename, int line_nr'
-    message	: "\"unbalanced control structure started at file '%s' line %d\", filename, line_nr"
+    args	: 'const char *filename, int line_num'
+    message	: "\"unbalanced control structure started at file '%s' line %d\", filename, line_num"
 	
   - type	: ErrError
     func	: error_unbalanced_struct
