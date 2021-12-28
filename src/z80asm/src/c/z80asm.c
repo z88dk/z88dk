@@ -200,8 +200,8 @@ static void do_assemble(const char *src_filename )
 
 	set_error_null();
 
-	/* remove list file if more errors now than before */
-	list_close(start_errors == get_num_errors());
+	/* keep list files even if errors */
+	list_close(true);
 
 	/* remove incomplete object file */
 	if (start_errors != get_num_errors())
