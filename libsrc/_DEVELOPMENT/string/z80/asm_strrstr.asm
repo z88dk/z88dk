@@ -89,7 +89,7 @@ loop2:
 
    pop de
    pop hl
-   
+
    jr loop1
 
 match:

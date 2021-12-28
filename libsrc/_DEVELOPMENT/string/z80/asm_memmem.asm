@@ -15,7 +15,8 @@
 ; 
 ; ===============================================================
 
-IF !__CPU_INTEL__ & !__CPU_GBZ80__
+IF !__CPU_INTEL__ && !__CPU_GBZ80__
+
 SECTION code_clib
 SECTION code_string
 
@@ -73,6 +74,7 @@ search_loop:
 
    ld a,(de)                   ; a = first little char
    cpir                        ; look for little char in big
+
    jp nz, error_zc             ; not found
 
    push hl
@@ -128,4 +130,5 @@ no_match:
 not_found:
 
    jp error_zc
+
 ENDIF

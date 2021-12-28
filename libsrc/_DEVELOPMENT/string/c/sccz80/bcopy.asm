@@ -10,7 +10,8 @@ PUBLIC bcopy
 EXTERN asm_bcopy
 
 bcopy:
-IF __CPU_GBZ80__ | __CPU_INTEL__
+
+IF __CPU_GBZ80__ || __CPU_INTEL__
    ld hl,sp+2
    ld c,(hl)
    inc hl
@@ -23,18 +24,19 @@ IF __CPU_GBZ80__ | __CPU_INTEL__
    ld a,(hl+)
    ld h,(hl)
    ld l,a
+
 ELSE
    pop af
    pop bc
    pop de
    pop hl
-   
+
    push hl
    push de
    push bc
    push af
 ENDIF
-   
+
    jp asm_bcopy
 
 ; SDCC bridge for Classic

@@ -94,6 +94,7 @@ loop:
  ENDIF
    ld (de),a
    inc de
+
    dec c
    jr NZ,loop
    dec b

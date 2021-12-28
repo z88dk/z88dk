@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; char *strrchr(const char *s, int c)
@@ -35,20 +35,38 @@ asm_strrchr:
    ;
    ; uses  : af, bc, e, hl
    
-   ld e,c
-   
+   ld e,c                      ; e = char
+
    call __str_locate_nul       ; hl points at terminating 0
    call l_neg_bc               ; bc = strlen + 1
-   
+
    ld a,e                      ; a = char
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
-   EXTERN __z80asm__cpdr
-   call __z80asm__cpdr
+
+   dec bc
+   inc b
+   inc c
+
+loop:
+   cp (hl)
+   ret Z                       ; found character
+
+   dec hl                      ; search backwards
+
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
+
+   inc hl
+   cp (hl)
+
 ELSE
    cpdr                        ; search backwards
 ENDIF
+
    jp NZ,error_zc
 
-found_char:
-   inc hl
+   inc hl                      ; found character
    ret

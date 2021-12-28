@@ -57,7 +57,7 @@ asm_strrcspn:
    jr Z,empty_cset
 
 loop:
-IF __CPU_GBZ80__
+IF __CPU_INTEL || __CPU_GBZ80__
    EXTERN __z80asm__cpd
    call __z80asm__cpd
    ld a,b

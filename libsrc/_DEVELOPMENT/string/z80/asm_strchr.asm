@@ -43,7 +43,7 @@ loop:
 
    inc hl
 
-   or a
+   or a                        ; end of string?
    jr NZ,loop
 
    jp error_zc

@@ -13,11 +13,11 @@ _memlwr_:
    pop de
    pop bc
    pop hl
-   
+
    push hl
    push bc
    push de
-   
+
    jp asm__memlwr
 
 ; SDCC bridge for Classic

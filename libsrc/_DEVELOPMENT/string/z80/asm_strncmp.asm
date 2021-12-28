@@ -32,7 +32,7 @@ asm_strncmp:
 
    ld a,b
    or c
-   jr z, equal
+   jr Z,equal
 
 loop:
    ld a,(de)                   ; a = *s1
@@ -41,7 +41,7 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    cp (hl)
    inc hl
    dec bc
-   jr  NZ,different
+   jr NZ,different
    and a
    jr Z,equal
    ld a,b

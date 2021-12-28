@@ -49,7 +49,6 @@ IF __CPU_Z180__ | __CPU_R2KA__ | __CPU_R3K__ | __CPU_INTEL__ | __CPU_GBZ80__ | _
    push hl
 
    ld l,a
-
    ld a,(de)
    call asm_tolower
 

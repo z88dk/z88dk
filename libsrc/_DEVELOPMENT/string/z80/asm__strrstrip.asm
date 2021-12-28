@@ -1,6 +1,6 @@
 
 ; ===============================================================
-; Dec 2013
+; Dec 2013 / Dec 2021 feilipu
 ; ===============================================================
 ; 
 ; char *_strrstrip(const char *s)
@@ -43,18 +43,30 @@ asm__strrstrip:
    add hl,de                   ; hl = s + strlen(s)
    dec hl                      ; hl points at last char in s
 
+IF __CPU_GBZ80__ || __CPU_INTEL__
+
+   dec bc
+   inc b
+   inc c
+
 loop:
    ld a,(hl)
    call asm_isspace
    jr C,not_ws
 
-IF __CPU_GBZ80__ || __CPU_INTEL__
    dec hl
-   dec bc
-   ld a,b
-   or c
+
+   dec c
    jr NZ,loop
-ELSE 
+   dec b
+   jr NZ,loop
+
+ELSE
+loop:
+   ld a,(hl)
+   call asm_isspace
+   jr C,not_ws
+
    cpd                         ; hl--, bc--
    jp PE,loop
 ENDIF

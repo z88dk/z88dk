@@ -73,9 +73,9 @@ extern const unsigned char *joystick_type[];
 
 #ifdef __CPC__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1", "QAOP-MN"};
+	const unsigned char *joystick_type[] = { "Joystick 0", "Joystick 1"};
 #endif
-	#define GAME_DEVICES 3
+	#define GAME_DEVICES 2
 #endif
 
 #ifdef __ENTERPRISE__

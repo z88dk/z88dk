@@ -34,12 +34,11 @@ asm_strncat:
 
    ld a,b
    or c
-   jr z, zero_n
+   jr Z,zero_n
 
 asm0_strncat:
-
    push de                     ; save dst
-   
+
    push bc
    ex de,hl
    call __str_locate_nul       ; a = 0
@@ -47,10 +46,12 @@ asm0_strncat:
    pop bc
 
 loop:                          ; append src to dst
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
    ld a,(hl)
    and a
    jr Z,done
+
    ld (de),a
    inc hl
    inc de
@@ -58,7 +59,7 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    dec bc
    ld a,b
    or c
-   jr nz,loop
+   jr NZ,loop
 
 ELSE
    cp (hl)
@@ -66,19 +67,18 @@ ELSE
 
    ldi
    jp PE,loop
+
 ENDIF
 
    scf
 
-done:                          ; terminate dst
-
-   ld (de),a
+done:
+   ld (de),a                   ; terminate dst
 
    pop hl
    ret
 
 zero_n:
-
    ld hl,de
 
    scf

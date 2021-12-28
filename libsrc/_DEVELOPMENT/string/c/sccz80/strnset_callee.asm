@@ -14,7 +14,7 @@ strnset_callee:
    pop bc
    pop de
    ex (sp),hl
-   
+
    jp asm_strnset
 
 ; SDCC bridge for Classic

@@ -10,12 +10,12 @@ EXTERN asm__memstrcpy
 
 _memstrcpy__callee:
 
-   pop af
-   pop bc
    pop hl
+   pop bc
    pop de
-   push af
-   
+   ex (sp),hl
+   ex de,hl
+
    jp asm__memstrcpy
 
 ; SDCC bridge for Classic

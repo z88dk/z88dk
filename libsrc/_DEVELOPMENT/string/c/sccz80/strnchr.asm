@@ -32,14 +32,14 @@ ELSE
    pop de
    pop bc
    pop hl
-   
+
    push hl
    push bc
    push de
    push af
    jp asm_strnchr
 ENDIF
-   
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC

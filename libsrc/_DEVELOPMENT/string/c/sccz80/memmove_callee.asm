@@ -10,12 +10,12 @@ EXTERN asm_memmove
 
 memmove_callee:
 
-   pop af
-   pop bc
    pop hl
+   pop bc
    pop de
-   push af
-   
+   ex (sp),hl
+   ex de,hl
+
    jp asm_memmove
 
 ; SDCC bridge for Classic
