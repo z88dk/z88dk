@@ -31,7 +31,7 @@
 
       IF __SDCC_IY && (__NEXTOS_DOT_COMMAND = 0) && (NEXTOS_VERSION = 0)
       
-         ld iy,__SYS_IY
+         ld iy,23610		;__SYS_IY
          ei
       
       ENDIF
