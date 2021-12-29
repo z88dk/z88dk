@@ -503,6 +503,5 @@ check_bin_file("$test.bin", bytes(8));
 capture_ok("./z88dk-z80asm -b -mgbz80 -IXIY $test.asm", "");
 check_bin_file("$test.bin", bytes(8, 12));
 
-
 unlink_testfiles;
 done_testing;
