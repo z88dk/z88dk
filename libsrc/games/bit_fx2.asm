@@ -19,25 +19,25 @@ IF !__CPU_GBZ80__
 .bit_fx2
 ._bit_fx2
 
-        IF sndbit_port >= 256
-          exx
-          ld   bc,sndbit_port
-          exx
-        ENDIF
+IF sndbit_port >= 256
+    exx
+    ld   bc,sndbit_port
+    exx
+ENDIF
 
-          ld    a,l
-          cp    8  
-          ret   nc  
-          add   a,a  
-          ld    e,a  
-          ld    d,0  
-          ld    hl,table  
-          add   hl,de  
-          ld    a,(hl)  
-          inc   hl  
-          ld    h,(hl)  
-          ld    l,a  
-          jp    (hl)  
+    ld    a,l
+    cp    8  
+    ret   nc  
+    add   a,a  
+    ld    e,a  
+    ld    d,0  
+    ld    hl,table  
+    add   hl,de  
+    ld    a,(hl)  
+    inc   hl  
+    ld    h,(hl)  
+    ld    l,a  
+    jp    (hl)  
           
 .table    
     defw    DeepSpace	; effect #0
@@ -56,862 +56,839 @@ ENDIF
 ;Space sound
           
 .DeepSpace
-          call  bit_open_di
+    call  bit_open_di
 .DS_LENGHT
-          ld      b,100
-        IF sndbit_port > 0 && sndbit_port <= 255
-          ld      c,sndbit_port
-        ENDIF
+    ld      b,100
 .ds_loop
-          dec     h
-          jr      nz,ds_jump
-          xor     sndbit_mask
+    dec     h
+    jr      nz,ds_jump
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld   c,a
+    jr nz,ASMPC+6
+    in  a,(sndbit_port)
+    jr  ASMPC+4
+    out  (sndbit_port),a
+    ld   a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out  (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld  (-sndbit_port),a
+ELSE
+    out  (sndbit_port),a
+ENDIF
 
-          push    bc
-          ld      b,250
+    push    bc
+    ld      b,250
 .loosetime1
-          djnz    loosetime1
-          pop     bc
-          xor     sndbit_mask
+    djnz    loosetime1
+    pop     bc
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld   c,a
+    jr nz,ASMPC+6
+    in  a,(sndbit_port)
+    jr  ASMPC+4
+    out  (sndbit_port),a
+    ld   a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out  (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld  (-sndbit_port),a
+ELSE
+    out  (sndbit_port),a
+ENDIF
 
 .ds_FR_1
           ;ld      h,230
-          ld      h,254
+    ld      h,254
 .ds_jump
-          dec     l
-          jr      nz,ds_loop
-          xor     sndbit_mask
+    dec     l
+    jr      nz,ds_loop
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
-          push    bc
-          ld      b,200
+    push    bc
+    ld      b,200
 .loosetime2
-          djnz    loosetime2
-          pop     bc
-          xor     sndbit_mask
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+    djnz    loosetime2
+    pop     bc
+    xor     sndbit_mask
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .ds_FR_2
-          ld      l,255
-          djnz    ds_loop
-          call	bit_close_ei
-          ret
+    ld      l,255
+    djnz    ds_loop
+    call	bit_close_ei
+    ret
 
 
 ;Dual note with fuzzy addedd
           
 .SSpace2
-          call  bit_open_di
+    call  bit_open_di
 .SS_LENGHT
-          ld      b,100
-        IF sndbit_port > 0 && sndbit_port <= 255
-          ld      c,sndbit_port
-        ENDIF
+    ld      b,100
 .ss_loop
-          dec     h
-          jr      nz,ss_jump
-          push    hl
-          push    af
-          ld      a,sndbit_mask
-          ld      h,0
-          and     (hl)
-          ld      l,a
-          pop     af
-          xor     l
+    dec     h
+    jr      nz,ss_jump
+    push    hl
+    push    af
+    ld      a,sndbit_mask
+    ld      h,0
+    and     (hl)
+    ld      l,a
+    pop     af
+    xor     l
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
-          pop     hl
-          xor     sndbit_mask
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+    pop     hl
+    xor     sndbit_mask
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .ss_FR_1
-          ld      h,230
+    ld      h,230
 .ss_jump
-          dec     l
-          jr      nz,ss_loop
-          xor     sndbit_mask
+    dec     l
+    jr      nz,ss_loop
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out  (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .ss_FR_2
-          ld      l,255
-          djnz    ss_loop
-          call	bit_close_ei
-          ret
+    ld      l,255
+    djnz    ss_loop
+    call	bit_close_ei
+    ret
 
 
 ;Dual note with LOT of fuzzy addedd
-          
+    
 .TSpace
-          call  bit_open_di
+    call  bit_open_di
 .TS_LENGHT
-          ld      b,100
-        IF sndbit_port > 0 && sndbit_port <= 255
-          ld      c,sndbit_port
-        ENDIF
+    ld      b,100
 .ts_loop
-          dec     h
-          jr      nz,ts_jump
-          push    hl
-          push    af
-          ld      a,sndbit_mask
-          ld      h,0
-          and     (hl)
-          ld      l,a
-          pop     af
-          xor     l
+    dec     h
+    jr      nz,ts_jump
+    push    hl
+    push    af
+    ld      a,sndbit_mask
+    ld      h,0
+    and     (hl)
+    ld      l,a
+    pop     af
+    xor     l
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
-          pop     hl
-          xor     sndbit_mask
+    pop     hl
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .ts_FR_1
-          ld      h,130
+    ld      h,130
 .ts_jump
-          dec     l
-          jr      nz,ts_loop
-          push    hl
-          push    af
-          ld      a,sndbit_mask
-          ld      l,h
-          ld      h,0
-          and     (hl)
-          ld      l,a
-          pop     af
-          xor     l
+    dec     l
+    jr      nz,ts_loop
+    push    hl
+    push    af
+    ld      a,sndbit_mask
+    ld      l,h
+    ld      h,0
+    and     (hl)
+    ld      l,a
+    pop     af
+    xor     l
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out  (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
-          pop     hl
-          xor     sndbit_mask
+    pop     hl
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .ts_FR_2
-          ld      l,155
-          djnz    ts_loop
-          call	bit_close_ei
-          ret
-
+    ld      l,155
+    djnz    ts_loop
+    call	bit_close_ei
+    ret
 
 
 .Clackson2
-          call  bit_open_di
+    call    bit_open_di
 .CS_LENGHT
-          ld      b,200
-        IF sndbit_port > 0 && sndbit_port <= 255
-          ld      c,sndbit_port
-        ENDIF
+    ld      b,200
 .cs_loop
-          dec     h
-          jr      nz,cs_jump
-          xor     sndbit_mask
+    dec     h
+    jr      nz,cs_jump
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
-          push    bc
-          ld      b,250
+    push    bc
+    ld      b,250
 .cswait1
-          djnz    cswait1
-          pop     bc
-          xor     sndbit_mask
+    djnz    cswait1
+    pop     bc
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .cs_FR_1
-          ld      h,230
+    ld      h,230
 .cs_jump
-          inc     l
-          jr      nz,cs_loop
-          xor     sndbit_mask
+    inc     l
+    jr      nz,cs_loop
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
-
-          push    bc
-          ld      b,200
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
+    push    bc
+    ld      b,200
 .cswait2
-          djnz    cswait2
-          pop     bc
-          xor     sndbit_mask
-
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+    djnz    cswait2
+    pop     bc
+    xor     sndbit_mask
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .cs_FR_2
-          ld      l,0
-          djnz    cs_loop
-          call	bit_close_ei
-          ret
+    ld      l,0
+    djnz    cs_loop
+    call	bit_close_ei
+    ret
 
 
 .TSpace2
-          ld      a,230
-          ld      (t2_FR_1+1),a
-          xor     a
-          ld      (t2_FR_2+1),a
+    ld      a,230
+    ld      (t2_FR_1+1),a
+    xor     a
+    ld      (t2_FR_2+1),a
 
-          call  bit_open_di
+    call  bit_open_di
 .T2_LENGHT
-          ld      b,200
-        IF sndbit_port > 0 && sndbit_port <= 255
-          ld      c,sndbit_port
-        ENDIF
+    ld      b,200
 .t2_loop
-          dec     h
-          jr      nz,t2_jump
-          xor     sndbit_mask
+    dec     h
+    jr      nz,t2_jump
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
-          push    bc
-          ld      b,250
+    push    bc
+    ld      b,250
 .wait1
-          djnz    wait1
-          pop     bc
-          xor     sndbit_mask
+    djnz    wait1
+    pop     bc
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .t2_FR_1
-          ld      h,230
+    ld      h,230
 .t2_jump
-          inc     l
-          jr      nz,t2_loop
-          push    af
-          ld      a,(t2_FR_2+1)
-          inc     a
-          ld      (t2_FR_2+1),a
-          pop     af
-          xor     sndbit_mask
+    inc     l
+    jr      nz,t2_loop
+    push    af
+    ld      a,(t2_FR_2+1)
+    inc     a
+    ld      (t2_FR_2+1),a
+    pop     af
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
-          push    bc
-          ld      b,200
+    push    bc
+    ld      b,200
 .wait2
-          djnz    wait2
-          pop     bc
-          xor     sndbit_mask
+    djnz    wait2
+    pop     bc
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out  (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .t2_FR_2
-          ld      l,0
-          djnz    t2_loop
-          call	bit_close_ei
-          ret
+    ld      l,0
+    djnz    t2_loop
+    call    bit_close_ei
+    ret
 
 
 .TSpace3
-          ld      a,230
-          ld      (u2_FR_1+1),a
-          xor     a
-          ld      (u2_FR_2+1),a
+    ld      a,230
+    ld      (u2_FR_1+1),a
+    xor     a
+    ld      (u2_FR_2+1),a
 
-          call  bit_open_di
+    call    bit_open_di
 .U2_LENGHT
-          ld      b,200
-        IF sndbit_port > 0 && sndbit_port <= 255
-          ld      c,sndbit_port
-        ENDIF
+    ld      b,200
 .u2_loop
-          dec     h
-          jr      nz,u2_jump
-          push    af
-          ld      a,(u2_FR_1+1)
-          inc     a
-          ld      (u2_FR_1+1),a
-          pop     af
-          xor     sndbit_mask
+    dec     h
+    jr      nz,u2_jump
+    push    af
+    ld      a,(u2_FR_1+1)
+    inc     a
+    ld      (u2_FR_1+1),a
+    pop     af
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .u2_FR_1
-          ld      h,50
+    ld      h,50
 .u2_jump
-          inc     l
-          jr      nz,u2_loop
-          push    af
-          ld      a,(u2_FR_2+1)
-          inc     a
-          ld      (u2_FR_2+1),a
-          pop     af
-          xor     sndbit_mask
+    inc     l
+    jr      nz,u2_loop
+    push    af
+    ld      a,(u2_FR_2+1)
+    inc     a
+    ld      (u2_FR_2+1),a
+    pop     af
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out  (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .u2_FR_2
-          ld      l,0
-          djnz    u2_loop
-          call	bit_close_ei
-          ret
+    ld      l,0
+    djnz    u2_loop
+    call    bit_close_ei
+    ret
 
 
 .Squoink
-          ld      a,230
-          ld      (qi_FR_1+1),a
-          xor     a
-          ld      (qi_FR_2+1),a
+    ld      a,230
+    ld      (qi_FR_1+1),a
+    xor     a
+    ld      (qi_FR_2+1),a
 
-          call  bit_open_di
+    call    bit_open_di
 .qi_LENGHT
-          ld      b,200
-        IF sndbit_port > 0 && sndbit_port <= 255
-          ld      c,sndbit_port
-        ENDIF
+    ld      b,200
 .qi_loop
-          dec     h
-          jr      nz,qi_jump
-          push    af
-          ld      a,(qi_FR_1+1)
-          dec     a
-          ld      (qi_FR_1+1),a
-          pop     af
-          xor     sndbit_mask
+    dec     h
+    jr      nz,qi_jump
+    push    af
+    ld      a,(qi_FR_1+1)
+    dec     a
+    ld      (qi_FR_1+1),a
+    pop     af
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .qi_FR_1
-          ld      h,50
+    ld      h,50
 .qi_jump
-          inc     l
-          jr      nz,qi_loop
-          push    af
-          ld      a,(qi_FR_2+1)
-          inc     a
-          ld      (qi_FR_2+1),a
-          pop     af
-          xor     sndbit_mask
+    inc     l
+    jr      nz,qi_loop
+    push    af
+    ld      a,(qi_FR_2+1)
+    inc     a
+    ld      (qi_FR_2+1),a
+    pop     af
+    xor     sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;8 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (c),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;8 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
 .qi_FR_2
-          ld      l,0
-          djnz    qi_loop
-          call	bit_close_ei
-          ret
+    ld      l,0
+    djnz    qi_loop
+    call    bit_close_ei
+    ret
 
 IF !__CPU_INTEL__
 .explosion
-          call  bit_open_di
-          ld	hl,1
+    call  bit_open_di
+    ld	hl,1
 .expl
-          push    hl
-          push    af
-          ld      a,sndbit_mask
-          ld      h,0
-          and     (hl)
-          ld      l,a
-          pop     af
-          xor     l
+    push    hl
+    push    af
+    ld      a,sndbit_mask
+    ld      h,0
+    and     (hl)
+    ld      l,a
+    pop     af
+    xor     l
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF SOUND_IFF = 1
-          jp      nz,ASMPC+4
-          di
-          jp      ASMPC+4
-          ei
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld      c,a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ld      a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a                   ;9 T slower
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a
+ENDIF
 
-          pop     hl
+    pop     hl
 
-          push    af
-          ld      b,h
-          ld      c,l
-.dly      dec     bc
-          ld      a,b
-          or      c
-          jr      nz,dly
-          pop     af
-          
-          inc     hl
-          bit     1,h
-          jr      z,expl
-          
-          call	bit_close_ei
-          ret
+    push    af
+    ld      b,h
+    ld      c,l
+.dly
+    dec     bc
+    ld      a,b
+    or      c
+    jr      nz,dly
+    pop     af
+    
+    inc     hl
+    bit     1,h
+    jr      z,expl
+    
+    call	bit_close_ei
+    ret
 ELSE
 aret:   ret
 ENDIF

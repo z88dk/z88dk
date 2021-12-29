@@ -205,9 +205,6 @@ ENDIF
     call  bit_open_di
 .clackson_LENGHT
     ld      b,90
-IF sndbit_port > 0 && sndbit_port <= 255
-    ld      c,sndbit_port
-ENDIF
 .clackson_loop
     dec     h
     jr      nz,clackson_jump
@@ -229,12 +226,12 @@ ELIF SOUND_IFF = 1
     ei
 ELIF sndbit_port >= 256
     exx
-    out  (c),a                   ;8 T slower
+    out  (c),a
     exx
 ELIF sndbit_port < 0
     ld  (-sndbit_port),a
 ELSE
-    out  (c),a
+    out  (sndbit_port),a
 ENDIF
 
 .clackson_FR_1
@@ -262,8 +259,10 @@ ELIF sndbit_port >= 256
     exx
     out  (c),a                   ;8 T slower
     exx
+ELIF sndbit_port < 0
+    ld  (-sndbit_port),a
 ELSE
-    out  (c),a
+    out  (sndbit_port),a
 ENDIF
 
 .clackson_FR_2
