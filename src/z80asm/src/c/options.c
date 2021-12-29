@@ -50,6 +50,7 @@ enum OptType
 /* declare functions */
 static void exit_help( void );
 static void exit_copyright( void );
+static void option_dummy(void);
 static void option_origin(const char *origin );
 static void option_define(const char *symbol );
 static void option_make_lib(const char *library );
@@ -262,6 +263,12 @@ static void process_opt( int *parg, int argc, char *argv[] )
 	else if (strcmp(argv[II], "-reloc-info") == 0) {
 		opts.reloc_info = true;
 		return;
+	}
+	else if (strncmp(argv[II], "-float", 6) == 0) {
+		const char* format = &argv[II][6];
+		if (*format == '=') format++;
+		if (!set_float_format(format))
+			error_invalid_float_format();
 	}
 	else {
 		/* search opts_lu[] */
@@ -698,6 +705,8 @@ int number_arg(const char *arg)
 		return (int)lval;
 }
 
+static void option_dummy(void) {}
+
 static void option_origin(const char *origin )
 {
 	int value = number_arg(origin);
@@ -864,6 +873,9 @@ static void define_assembly_defines()
 	if (opts.swap_ix_iy) {
 		define_static_def_sym("__SWAP_IX_IY__", 1);
 	}
+
+	// __FLOAT__xxx__
+	define_static_def_sym(get_float_format_define(), 1);
 }
 
 /*-----------------------------------------------------------------------------

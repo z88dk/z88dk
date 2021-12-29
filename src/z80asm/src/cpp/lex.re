@@ -19,15 +19,10 @@ using namespace std;
 	re2c:yyfill:enable = 0;
 	re2c:indent:top = 2;
 
-	end 		= "\000";
+	end 	= "\000";
 	ws		=  [ \t\v\f];
 	nl		= "\r\n"|"\r"|"\n";
-	eos		= [;\r\n];
-	_ 		= ws*;
-	__ 		= ws+;
-	_b		= [^_a-zA-Z0-9\000];
 	ident 	= [_a-zA-Z][_a-zA-Z0-9]*;
-	ident_prefix = [.#$%@];
 	operand	= ident |
 			  'b\''   | 'c\''   | 'd\''   | 'e\''    | 'h\''   | 'l\''    | 'a\'' |
 			  'af\''  | 'bc\''  | 'de\''  | 'hl\''   |
@@ -36,6 +31,8 @@ using namespace std;
 	bin		= [0-1];
 	oct		= [0-7];
 	dec		= [0-9];
+	mantissa= dec+ '.' dec* | dec* '.' dec+;
+	exp		= 'e' [-+]? dec+;
 	hex		= [0-9a-fA-F];
 	qchar_	= '\\' [0-7]{1,3} |
 			  '\\x' [0-9a-fA-F]{1,2} |
@@ -74,7 +71,7 @@ bool starts_with_hash(const string& line) {
 	const char* p = line.c_str();
 	const char* YYMARKER{ nullptr };
 	/*!re2c
-		_ '#'				{ return true; }
+		ws* '#'				{ return true; }
 		*					{ return false; }
 	*/
 }
@@ -153,22 +150,25 @@ void Lexer::set(const string& text) {
 			ws+				{ continue; }
 			end				{ return; }
 			";"	[^\r\n\000]*{ continue; }
-			"\n"				{ m_tokens.emplace_back(TType::Newline);
+			"\n"			{ m_tokens.emplace_back(TType::Newline);
+							  m_tokens.back().col = col;
+							  continue; }
+			mantissa exp? 	{ m_tokens.emplace_back(TType::Floating, atof(p0));
 							  m_tokens.back().col = col;
 							  continue; }
 			dec+ 'd'?		{ m_tokens.emplace_back(TType::Integer, a2i(p0, 10));
 							  m_tokens.back().col = col;
 							  continue; }
-			dec hex* 'h'		{ m_tokens.emplace_back(TType::Integer, a2i(p0, 16));
+			dec hex* 'h'	{ m_tokens.emplace_back(TType::Integer, a2i(p0, 16));
 							  m_tokens.back().col = col;
 							  continue; }
-			"$" hex+			{ m_tokens.emplace_back(TType::Integer, a2i(p0+1, 16));
+			"$" hex+		{ m_tokens.emplace_back(TType::Integer, a2i(p0+1, 16));
 							  m_tokens.back().col = col;
 							  continue; }
 			'0x' hex+		{ m_tokens.emplace_back(TType::Integer, a2i(p0+2, 16));
 							  m_tokens.back().col = col;
 							  continue; }
-			bin+ 'b'			{ m_tokens.emplace_back(TType::Integer, a2i(p0, 2));
+			bin+ 'b'		{ m_tokens.emplace_back(TType::Integer, a2i(p0, 2));
 							  m_tokens.back().col = col;
 							  continue; }
 			[%@] bin+		{ m_tokens.emplace_back(TType::Integer, a2i(p0+1, 2));
@@ -211,14 +211,10 @@ void Lexer::set(const string& text) {
 			'#'				{ m_tokens.emplace_back(TType::Hash);
 							  m_tokens.back().col = col;
 							  continue; }
-			'##'				{ m_tokens.emplace_back(TType::DblHash);
+			'##'			{ m_tokens.emplace_back(TType::DblHash);
 							  m_tokens.back().col = col;
 							  continue; }
 			'$'				{ m_tokens.emplace_back(TType::ASMPC);
-							  m_tokens.back().col = col;
-							  continue; }
-			'asmpc' _b		{ p--;
-							  m_tokens.emplace_back(TType::ASMPC);
 							  m_tokens.back().col = col;
 							  continue; }
 			'%'				{ m_tokens.emplace_back(TType::Mod);
@@ -263,10 +259,10 @@ void Lexer::set(const string& text) {
 			'<'				{ m_tokens.emplace_back(TType::Lt);
 							  m_tokens.back().col = col;
 							  continue; }
-			'<='				{ m_tokens.emplace_back(TType::Le);
+			'<='			{ m_tokens.emplace_back(TType::Le);
 							  m_tokens.back().col = col;
 							  continue; }
-			'<<'				{ m_tokens.emplace_back(TType::Shl);
+			'<<'			{ m_tokens.emplace_back(TType::Shl);
 							  m_tokens.back().col = col;
 							  continue; }
 			'='  | '=='		{ m_tokens.emplace_back(TType::Eq);
@@ -278,10 +274,10 @@ void Lexer::set(const string& text) {
 			'>'				{ m_tokens.emplace_back(TType::Gt);
 							  m_tokens.back().col = col;
 							  continue; }
-			'>='				{ m_tokens.emplace_back(TType::Ge);
+			'>='			{ m_tokens.emplace_back(TType::Ge);
 							  m_tokens.back().col = col;
 							  continue; }
-			'>>'				{ m_tokens.emplace_back(TType::Shr);
+			'>>'			{ m_tokens.emplace_back(TType::Shr);
 							  m_tokens.back().col = col;
 							  continue; }
 			'?'				{ m_tokens.emplace_back(TType::Quest);
@@ -290,7 +286,7 @@ void Lexer::set(const string& text) {
 			'['				{ m_tokens.emplace_back(TType::Lsquare);
 							  m_tokens.back().col = col;
 							  continue; }
-			'\\'				{ m_tokens.emplace_back(TType::Backslash);
+			'\\'			{ m_tokens.emplace_back(TType::Backslash);
 							  m_tokens.back().col = col;
 							  continue; }
 			']'				{ m_tokens.emplace_back(TType::Rsquare);
@@ -299,7 +295,7 @@ void Lexer::set(const string& text) {
 			'^'				{ m_tokens.emplace_back(TType::BinXor);
 							  m_tokens.back().col = col;
 							  continue; }
-			'^^'				{ m_tokens.emplace_back(TType::LogXor);
+			'^^'			{ m_tokens.emplace_back(TType::LogXor);
 							  m_tokens.back().col = col;
 							  continue; }
 			'{'				{ m_tokens.emplace_back(TType::Lbrace);
@@ -308,7 +304,7 @@ void Lexer::set(const string& text) {
 			'|'				{ m_tokens.emplace_back(TType::BinOr);
 							  m_tokens.back().col = col;
 							  continue; }
-			'||'				{ m_tokens.emplace_back(TType::LogOr);
+			'||'			{ m_tokens.emplace_back(TType::LogOr);
 							  m_tokens.back().col = col;
 							  continue; }
 			'}'				{ m_tokens.emplace_back(TType::Rbrace);
@@ -345,7 +341,10 @@ void Lexer::set(const string& text) {
 
 			operand @p1		{ string str = ident_change_case(string(p0, p1));
 							  Keyword keyword = lu_keyword(str);
-							  m_tokens.emplace_back(TType::Ident, str, keyword);
+							  if (keyword == Keyword::ASMPC) 
+							      m_tokens.emplace_back(TType::ASMPC);
+							  else
+							      m_tokens.emplace_back(TType::Ident, str, keyword);
 							  m_tokens.back().col = col;
 							  continue; }
 
@@ -357,141 +356,3 @@ void Lexer::set(const string& text) {
 		*/
 	}
 }
-
-
-
-#if 0
-
-//-----------------------------------------------------------------------------
-
-string ParamScanner::collect_name() {
-	const char* YYMARKER{ nullptr }, * yyt1{ nullptr }, * p1{ nullptr };
-
-	/*!re2c
-		_ @p1 ident		{ return string(p1, p); }
-		*               { error_syntax(); return ""; }
-	*/
-}
-
-//-----------------------------------------------------------------------------
-
-void MacroExpander::do_expand() {
-	const char* YYMARKER{ nullptr };
-	p = m_text.c_str();
-
-	while (true) {
-		const char* p0 = p;
-		/*!re2c
-			end             { return; }
-			ident_prefix? ident {
-							  check_macro_call(string(p0, p)); continue; }
-			"'"  qchar* "'" |
-			'"' qqchar* '"' |
-			operand         { m_output += string(p0, p); continue; }
-			*               { m_output += string(p0, p); continue; }
-		*/
-	}
-}
-
-//-----------------------------------------------------------------------------
-
-bool PreprocFilter::check_defines(const string& line) {
-	const char* YYMARKER{ nullptr }, * yyt1{ nullptr }, * yyt2{ nullptr };
-	const char* p1{ nullptr }, * p2{ nullptr };
-	p = line.c_str();
-
-	/*!re2c
-		_ '#' _ 'define' _ @p1 ident_prefix ident @p2 {
-							  parse_define(string(p1, p2));
-							  return true; }
-		_ '#' _ 'define' __ @p1 ident @p2 {
-							  parse_define(string(p1, p2));
-							  return true; }
-		_ '#' _ 'define' _b	{ error_syntax(); return true; }
-
-		_ '#' _ 'undef' _ @p1 ident_prefix ident @p2 _ eos {
-							  m_levels.front().defines.remove(string(p1, p2));
-							  return true; }
-		_ '#' _ 'undef' __ @p1 ident @p2 _ eos {
-							  m_levels.front().defines.remove(string(p1, p2));
-							  return true; }
-		_ '#' _ 'undef' _b	{ error_syntax(); return true; }
-
-		_ '#'				{ return true; }
-
-
-		*					{ return false; }
-	*/
-}
-
-bool PreprocFilter::check_macro_call(const string& line) {
-	const char* YYMARKER{ nullptr }, * yyt1{ nullptr }, * yyt2{ nullptr }, * yyt3{ nullptr };
-	const char* p1{ nullptr }, * p2{ nullptr }, * p3{ nullptr }, * p4{ nullptr };
-	shared_ptr<Macro> macro;
-	p = line.c_str();
-
-	/*!re2c
-		_ '.' _ @p1 ident @p2 __ @p3 ident @p4 {
-							  macro = m_macros.find_all(string(p3, p4));
-							  if (macro) {
-							      do_label(string(p1, p2));
-								  do_macro_call(macro);
-								  return true;
-							  }
-							  else
-							      return false;
-							}
-		_ @p1 ident @p2 _ ':' _ @p3 ident @p4 {
-							  macro = m_macros.find_all(string(p3, p4));
-							  if (macro) {
-								  do_label(string(p1, p2));
-								  do_macro_call(macro);
-								  return true;
-							  }
-							  else
-								  return false;
-							}
-		_ @p3 ident @p4		{
-							  macro = m_macros.find_all(string(p3, p4));
-							  if (macro) {
-								  do_macro_call(macro);
-								  return true;
-							  }
-							  else
-								  return false;
-							}
-
-		*					{ return false; }
-	*/
-}
-
-void PreprocFilter::parse_params(shared_ptr<Macro> macro) {
-	while (true) {
-		const char* p0 = p;
-		/*!re2c
-			__				{ continue; }
-			ident_prefix? ident {
-							  string name = string(p0, p);
-							  macro->push_arg(name);
-							  p = skip_spaces(p);
-							  if (*p == ',') {
-							      p++; continue;
-							  }
-							  else
-							      return; }
-			*				{ error_syntax(); return; }
-		*/
-	}
-}
-
-//-----------------------------------------------------------------------------
-
-#if 0
-/*
-!re2c
-_ '#@#' _ 'include' _ '"' @p1[^ "\r\n\000]+ @p2 '"' _ nl {
-do_include(string(p1, p2)); return; }
-	*/
-#endif
-
-#endif

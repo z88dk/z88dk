@@ -29,7 +29,7 @@ void split_lines(deque<string>& lines, const string& line);
 
 enum class TType {
 	End, Newline,
-	Ident, Label, Integer, String, ASMPC,
+	Ident, Label, Integer, Floating, String, ASMPC,
 	BinNot, LogNot, BinAnd, LogAnd, BinOr, LogOr, BinXor, LogXor,
 	Plus, Minus, Mul, Pow, Div, Mod,
 	Eq, Ne, Lt, Le, Gt, Ge, Shl, Shr,
@@ -47,6 +47,7 @@ struct Token {
 	TType   ttype{ TType::End };
 	int     ivalue{ 0 };
 	string  svalue;
+	double	fvalue{ 0.0 };
 	Keyword	keyword{ Keyword::None };
 	size_t	col{ 0 };
 
@@ -54,6 +55,8 @@ struct Token {
 		: ttype(ttype), ivalue(ivalue) {}
 	Token(TType ttype, const string& svalue, Keyword keyword = Keyword::None)
 		: ttype(ttype), svalue(svalue), keyword(keyword) {}
+	Token(TType ttype, double fvalue)
+		: ttype(ttype), fvalue(fvalue) {}
 
 	void clear() { *this = Token(); }
 

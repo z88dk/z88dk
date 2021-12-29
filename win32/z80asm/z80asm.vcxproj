@@ -197,6 +197,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\src\cpp\defines.h" />
+    <ClInclude Include="..\..\src\z80asm\src\cpp\float.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\lex.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\preproc.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\utils.h" />
@@ -242,6 +243,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\src\cpp\defines.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\cpp\float.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\lex.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\main.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\preproc.cpp" />
