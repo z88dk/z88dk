@@ -253,5 +253,8 @@
     <ClCompile Include="..\..\src\appmake\mgt.c" />
     <ClCompile Include="..\..\src\appmake\smc777.c" />
     <ClCompile Include="..\..\src\appmake\z88elf.c" />
+    <ClCompile Include="..\..\src\appmake\sol20.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
