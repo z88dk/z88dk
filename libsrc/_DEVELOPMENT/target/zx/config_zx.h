@@ -1030,6 +1030,172 @@
 
 
 
+#define __SYS_IY  SYS_IY
+#define __SYS_HLP  SYS_HLP
+
+#define __SYSVAR_SWAP  0x5b00
+#define __SYSVAR_STOO  0x5b10
+#define __SYSVAR_YOUNGER  0x5b21
+#define __SYSVAR_REGNUOY  0x5b2a
+#define __SYSVAR_ONERR  0x5b3a
+#define __SYSVAR_OLDHL  0x5b52
+#define __SYSVAR_OLDBC  0x5b54
+#define __SYSVAR_OLDAF  0x5b56
+#define __SYSVAR_TARGET  0x5b58
+#define __SYSVAR_RETADDR  0x5b5a
+#define __SYSVAR_BANKM  0x5b5c
+#define __SYSVAR_RAMRST  0x5b5d
+#define __SYSVAR_RAMERR  0x5b5e
+#define __SYSVAR_BAUD  0x5b5f
+#define __SYSVAR_SERFL  0x5b61
+#define __SYSVAR_COL  0x5b63
+#define __SYSVAR_WIDTH  0x5b64
+#define __SYSVAR_TVPARS  0x5b65
+#define __SYSVAR_FLAGS3  0x5b66
+#define __SYSVAR_BANK678  0x5b67
+#define __SYSVAR_FLAGN  0x5b68
+#define __SYSVAR_MAXBNK  0x5b69
+#define __SYSVAR_OLDSP  0x5b6a
+#define __SYSVAR_SYNRET  0x5b6c
+#define __SYSVAR_LASTV  0x5b6e
+#define __SYSVAR_TILEBNKL  0x5b73
+#define __SYSVAR_TILEML  0x5b74
+#define __SYSVAR_TILEBNK2  0x5b75
+#define __SYSVAR_TILEM2  0x5b76
+#define __SYSVAR_NXTBNK  0x5b77
+#define __SYSVAR_DATABNK  0x5b78
+#define __SYSVAR_LODDRV  0x5b79
+#define __SYSVAR_SAVDRV  0x5b7a
+#define __SYSVAR_L2SOFT  0x5b7b
+#define __SYSVAR_TILEWL  0x5b7c
+#define __SYSVAR_TILEW2  0x5b7e
+#define __SYSVAR_TILEOFFL  0x5b80
+#define __SYSVAR_TILEOFF2  0x5b82
+#define __SYSVAR_COORDSL  0x5b84
+#define __SYSVAR_COORDS2  0x5b86
+#define __SYSVAR_COORDSULA  0x5b88
+#define __SYSVAR_COORDSHR  0x5b8a
+#define __SYSVAR_COORDSHC  0x5b8c
+#define __SYSVAR_INKL  0x5b8e
+#define __SYSVAR_INK2  0x5b8f
+#define __SYSVAR_ATTRULA  0x5b90
+#define __SYSVAR_ATTRHR  0x5b91
+#define __SYSVAR_ATTRHC  0x5b92
+#define __SYSVAR_INKMASK  0x5b93
+#define __SYSVAR_TMPVARS  0x5b94
+
+#define __SYSVAR_TSTACK  0x5bff
+
+#define __SYSVAR_KSTATE  0x5c00
+#define __SYSVAR_LASTK  0x5c08
+#define __SYSVAR_REPDEL  0x5c09
+#define __SYSVAR_REPPER  0x5c0a
+#define __SYSVAR_DEFADD  0x5c0b
+#define __SYSVAR_KDATA  0x5c0d
+#define __SYSVAR_TVDATA  0x5c0e
+#define __SYSVAR_STRMS  0x5c10
+#define __SYSVAR_CHARS  0x5c36
+#define __SYSVAR_RASP  0x5c38
+#define __SYSVAR_PIP  0x5c39
+#define __SYSVAR_ERRNR  0x5c3a
+#define __SYSVAR_FLAGS  0x5c3b
+#define __SYSVAR_TVFLAG  0x5c3c
+#define __SYSVAR_ERRSP  0x5c3d
+#define __SYSVAR_LISTSP  0x5c3f
+#define __SYSVAR_MODE  0x5c41
+#define __SYSVAR_NEWPPC  0x5c42
+#define __SYSVAR_NSPPC  0x5c44
+#define __SYSVAR_PPC  0x5c45
+#define __SYSVAR_SUBPPC  0x5c47
+#define __SYSVAR_BORDCR  0x5c48
+#define __SYSVAR_EPPC  0x5c49
+#define __SYSVAR_VARS  0x5c4b
+#define __SYSVAR_DEST  0x5c4d
+#define __SYSVAR_CHANS  0x5c4f
+#define __SYSVAR_CURCHL  0x5c51
+#define __SYSVAR_PROG  0x5c53
+#define __SYSVAR_NXTLIN  0x5c55
+#define __SYSVAR_DATADD  0x5c57
+#define __SYSVAR_ELINE  0x5c59
+#define __SYSVAR_KCUR  0x5c5b
+#define __SYSVAR_CHADD  0x5c5d
+#define __SYSVAR_XPTR  0x5c5f
+#define __SYSVAR_WORKSP  0x5c61
+#define __SYSVAR_STKBOT  0x5c63
+#define __SYSVAR_STKEND  0x5c65
+#define __SYSVAR_BREG  0x5c67
+#define __SYSVAR_MEM  0x5c68
+#define __SYSVAR_FLAGS2  0x5c6a
+#define __SYSVAR_DFSZ  0x5c6b
+#define __SYSVAR_STOP  0x5c6c
+#define __SYSVAR_OLDPPC  0x5c6e
+#define __SYSVAR_OSPPC  0x5c70
+#define __SYSVAR_FLAGX  0x5c71
+#define __SYSVAR_STRLEN  0x5c72
+#define __SYSVAR_TADDR  0x5c74
+#define __SYSVAR_SEED  0x5c76
+#define __SYSVAR_FRAMES  0x5c78
+#define __SYSVAR_UDG  0x5c7b
+#define __SYSVAR_COORDS  0x5c7d
+#define __SYSVAR_GMODE  0x5c7f
+#define __SYSVAR_PRCC  0x5c80
+#define __SYSVAR_ECHOE  0x5c82
+#define __SYSVAR_DFCC  0x5c84
+#define __SYSVAR_DFCCL  0x5c86
+#define __SYSVAR_SPOSN  0x5c88
+#define __SYSVAR_SPOSNL  0x5c8a
+#define __SYSVAR_SCRCT  0x5c8c
+#define __SYSVAR_ATTRP  0x5c8d
+#define __SYSVAR_MASKP  0x5c8e
+#define __SYSVAR_ATTRT  0x5c8f
+#define __SYSVAR_MASKT  0x5c90
+#define __SYSVAR_PFLAG  0x5c91
+#define __SYSVAR_MEMBOT  0x5c92
+#define __SYSVAR_NMIADD  0x5cb0
+#define __SYSVAR_RAMTOP  0x5cb2
+#define __SYSVAR_PRAMT  0x5cb4
+
+#define __ERRB_0_OK  0
+#define __ERRB_1_NEXT_WITHOUT_FOR  1
+#define __ERRB_2_VARIABLE_NOT_FOUND  2
+#define __ERRB_3_SUBSCRIPT_WRONG  3
+#define __ERRB_4_OUT_OF_MEMORY  4
+#define __ERRB_5_OUT_OF_SCREEN  5
+#define __ERRB_6_NUMBER_TOO_BIG  6
+#define __ERRB_7_RETURN_WITHOUT_GOSUB  7
+#define __ERRB_8_END_OF_FILE  8
+#define __ERRB_9_STOP_STATEMENT  9
+#define __ERRB_A_INVALID_ARGUMENT  10
+#define __ERRB_B_INTEGER_OUT_OF_RANGE  11
+#define __ERRB_C_NONSENSE_IN_BASIC  12
+#define __ERRB_D_BREAK_CONT_REPEATS  13
+#define __ERRB_E_OUT_OF_DATA  14
+#define __ERRB_F_INVALID_FILENAME  15
+#define __ERRB_G_NO_ROOM_FOR_LINE  16
+#define __ERRB_H_STOP_IN_INPUT  17
+#define __ERRB_I_FOR_WITHOUT_NEXT  18
+#define __ERRB_J_INVALID_IO_DEVICE  19
+#define __ERRB_K_INVALID_COLOUR  20
+#define __ERRB_K_INVALID_COLOR  20
+#define __ERRB_L_BREAK_INTO_PROGRAM  21
+#define __ERRB_M_RAMTOP_NO_GOOD  22
+#define __ERRB_N_STATEMENT_LOST  23
+#define __ERRB_O_INVALID_STREAM  24
+#define __ERRB_P_FN_WITHOUT_DEF  25
+#define __ERRB_Q_PARAMETER_ERROR  26
+#define __ERRB_R_TAPE_LOADING_ERROR  27
+
+
+
+
+
+
+
+
+
+
+
+
 #define __NEXTOS_IDE_MODE  0x01d5
 
 #define __ESX_RST_SYS  0x08

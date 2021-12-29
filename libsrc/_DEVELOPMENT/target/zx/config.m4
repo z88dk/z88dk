@@ -50,6 +50,7 @@ include(`target/zx/config/config_nirvanap.m4')
 include(`target/zx/config/config_sound_bit.m4')
 include(`target/zx/config/config_sp1.m4')
 include(`target/zx/config/config_ulaplus.m4')
+include(`target/zx/config/config_zx_sysvar.m4')
 include(`target/zx/config/config_zxn_nextos.m4')
 
 dnl############################################################
