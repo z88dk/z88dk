@@ -1,5 +1,5 @@
 name: z88dk
-base: core18
+base: core20
 summary: Development kit for Z80 machiens
 adopt-info: part-z88dk
 
@@ -30,7 +30,7 @@ parts:
       - BUILD_SDCC: "1"
       - BUILD_SDCC_HTTP: "1"
     override-build: |
-      cpanm -n -L $SNAPCRAFT_PART_INSTALL App::Prove Capture::Tiny::Extended File::Path  CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Object::Tiny::RW List::Uniq Data::HexDump
+      cpanm -n -L $SNAPCRAFT_PART_INSTALL App::Prove Capture::Tiny::Extended File::Path  CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Object::Tiny::RW List::Uniq 
       ./build.sh -i $SNAP
       make DESTDIR=$SNAPCRAFT_PART_INSTALL install
     build-packages:
@@ -58,6 +58,7 @@ parts:
       - libpath-tiny-perl 
       - libtest-differences-perl 
       - libtext-table-perl 
+      - libdata-hexdump-perl
       - libregexp-common-perl 
       - libclone-perl
     stage-packages:
