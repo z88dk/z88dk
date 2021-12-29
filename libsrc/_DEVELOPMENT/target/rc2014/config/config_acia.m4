@@ -47,7 +47,7 @@ define(`__IO_ACIA_RX_SIZE', 0x100)         # Size of the Rx Buffer
 define(`__IO_ACIA_RX_FULLISH', 0x`'eval(__IO_ACIA_RX_SIZE-16,16))
                                            # Fullness of the Rx Buffer, when NOT_RTS is signalled
 define(`__IO_ACIA_RX_EMPTYISH', 0x08)      # Fullness of the Rx Buffer, when RTS is signalled
-define(`__IO_ACIA_TX_SIZE', 0x10)          # Size of the Tx Buffer   
+define(`__IO_ACIA_TX_SIZE', 0x10)          # Size of the Tx Buffer
 
 #
 # END OF USER CONFIGURATION

@@ -7,13 +7,7 @@
 # Copyright (C) Paulo Custodio, 2011-2019
 # License: http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
-ifeq ($(OS),Windows_NT)
-  EXESUFFIX 	:= .exe
-else
-  EXESUFFIX 	?=
-endif
-
-PROJ		:= z88dk-z80asm$(EXESUFFIX)
+PROJ		:= z88dk-z80asm
 
 INSTALL 	?= install
 Z80ASM_EXE	?= ../../$(PROJ)

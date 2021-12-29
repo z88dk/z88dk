@@ -40,7 +40,7 @@ define(`__IO_APU1_PORT_BASE', 0x62) # Base Address for Am9511A Module #1
 define(`__IO_APU2_PORT_BASE', 0xC2) # Base Address for Am9511A Module #2
 define(`__IO_APU3_PORT_BASE', 0xE2) # Base Address for Am9511A Module #3
 
-# MC68C60 ACIA Port Definition
+# MC68B50 ACIA Port Definition
 
 define(`__IO_ACIA_PORT_BASE', 0x80) # Port Address for 68C50 Module
 
@@ -48,13 +48,15 @@ define(`__IO_ACIA_PORT_BASE', 0x80) # Port Address for 68C50 Module
 
 define(`__IO_SIO_PORT_BASE', 0x80)  # Port Address for SIO/0-2 Module
 
-# Spencer's build
+# Spencer's SIO2 Configuration
+
 define(`__IO_SIO_PORT_OFFSET_A', 0x00)  # Port Offset for A Channel (A1)
 define(`__IO_SIO_PORT_OFFSET_B', 0x02)  # Port Offset for B Channel (A1)
 define(`__IO_SIO_PORT_OFFSET_C', 0x00)  # Port Offset for Command (!A0)
 define(`__IO_SIO_PORT_OFFSET_D', 0x01)  # Port Offset for Data (!A0)
 
-# Standard (including Dr Baker)
+# Standard SIO2 Configuration (including Dr Baker)
+
 # define(`__IO_SIO_PORT_OFFSET_A', 0x00)  # Port Offset for A Channel (A0)
 # define(`__IO_SIO_PORT_OFFSET_B', 0x01)  # Port Offset for B Channel (A0)
 # define(`__IO_SIO_PORT_OFFSET_C', 0x02)  # Port Offset for Command (A1)
