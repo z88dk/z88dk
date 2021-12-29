@@ -18,6 +18,8 @@
 		defc VDM_ROWS = 16
 		
 		EXTERN		VDM_DISPLAY
+                EXTERN          VDM_CAPS
+                EXTERN          VDM_CAPS_MASK
 
 		PUBLIC		GRAPHICS_CHAR_SET
 		PUBLIC		GRAPHICS_CHAR_UNSET
@@ -28,7 +30,7 @@
 
 		INCLUDE	"ioctl.def"
 	        PUBLIC  CLIB_GENCON_CAPS
-		defc	CLIB_GENCON_CAPS = CAP_GENCON_UNDERLINE
+		defc	CLIB_GENCON_CAPS = VDM_CAPS
 
 generic_console_ioctl:
 	scf
@@ -58,11 +60,12 @@ generic_console_plotc:
 generic_console_printc:
 	call	xypos
 	ld	a,(generic_console_flags)
-	rrca
-	rrca
-	rrca
-	rrca
-	and	@10000000
+        and     VDM_CAPS_MASK
+        jp      z,add_bit
+        scf
+add_bit:
+        ld      a,0
+        rra
 	or	d
 	ld	(hl),a
 	ret

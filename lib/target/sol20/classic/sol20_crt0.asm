@@ -26,6 +26,12 @@
                 defc CLIB_FGETC_CONS_DELAY = 150
         ENDIF
 
+        PUBLIC VDM_CAPS
+        PUBLIC VDM_CAPS_MASK
+        INCLUDE "ioctl.def"
+        defc VDM_CAPS = CAP_GENCON_INVERSE
+        defc VDM_CAPS_MASK = @10000000
+
 	defc    TAR__fputc_cons_generic = 1
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = 0xbfff

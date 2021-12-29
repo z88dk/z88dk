@@ -1,3 +1,4 @@
 video/vdm/stdio/generic_console
 video/vdm/stdio/VDM_DISPLAY
+video/vdm/stdio/VDM_CAPS
 @gfx/gencon/gfx_gencon1_portable.lst
