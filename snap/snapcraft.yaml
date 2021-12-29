@@ -63,8 +63,8 @@ parts:
       - libclone-perl
     stage-packages:
       - libicu60
-      - perl-modules-5.26
-      - libperl5.26
+      - perl-modules
+      - libperl
       - libxml2
       - m4
 
