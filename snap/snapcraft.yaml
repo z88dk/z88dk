@@ -62,9 +62,9 @@ parts:
       - libregexp-common-perl 
       - libclone-perl
     stage-packages:
-      - libicu60
-      - perl-modules
-      - libperl
+      - libicu66
+      - perl-modules-5.30
+      - libperl5.30
       - libxml2
       - m4
 
