@@ -490,6 +490,35 @@ IF FORpencil2
 ENDIF
 
 
+MACRO ONEBITOUT
+LOCAL l1, l2, l3, l4
+IF SOUND_INOUT = 1
+    ld      c,a
+    and     sndbit_mask
+    jr      nz,l1
+    in      a,(sndbit_port) 
+    jr      l2
+l1: out     (sndbit_port),a 
+l2: ld      a,c
+ELIF SOUND_IFF = 1
+    ld      c,a
+    and     sndbit_mask
+    jp      nz,l3
+    di 
+l3: jp      l4
+    ei
+l4: ld      a,c
+ELIF sndbit_port >= 256
+    exx
+    out     (c),a
+    exx
+ELIF sndbit_port < 0
+    ld      (-sndbit_port),a
+ELSE
+    out     (sndbit_port),a 
+ENDIF
+ENDM
+
 
 
 ; ********************************************************

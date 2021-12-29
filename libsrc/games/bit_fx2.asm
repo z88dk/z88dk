@@ -64,27 +64,8 @@ ENDIF
     jr      nz,ds_jump
     xor     sndbit_mask
 
-IF SOUND_INOUT = 1
-    ld   c,a
-    jr nz,ASMPC+6
-    in  a,(sndbit_port)
-    jr  ASMPC+4
-    out  (sndbit_port),a
-    ld   a,c
-ELIF SOUND_IFF = 1
-    jp      nz,ASMPC+4
-    di
-    jp      ASMPC+4
-    ei
-ELIF sndbit_port >= 256
-    exx
-    out  (c),a                   ;8 T slower
-    exx
-ELIF sndbit_port < 0
-    ld  (-sndbit_port),a
-ELSE
-    out  (sndbit_port),a
-ENDIF
+    ONEBITOUT
+
 
     push    bc
     ld      b,250
@@ -93,27 +74,8 @@ ENDIF
     pop     bc
     xor     sndbit_mask
 
-IF SOUND_INOUT = 1
-    ld   c,a
-    jr nz,ASMPC+6
-    in  a,(sndbit_port)
-    jr  ASMPC+4
-    out  (sndbit_port),a
-    ld   a,c
-ELIF SOUND_IFF = 1
-    jp      nz,ASMPC+4
-    di
-    jp      ASMPC+4
-    ei
-ELIF sndbit_port >= 256
-    exx
-    out  (c),a                   ;8 T slower
-    exx
-ELIF sndbit_port < 0
-    ld  (-sndbit_port),a
-ELSE
-    out  (sndbit_port),a
-ENDIF
+    ONEBITOUT
+
 
 .ds_FR_1
           ;ld      h,230
