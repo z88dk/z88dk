@@ -83,6 +83,7 @@
     <ClCompile Include="..\..\src\appmake\sc3000.c" />
     <ClCompile Include="..\..\src\appmake\smc777.c" />
     <ClCompile Include="..\..\src\appmake\sms.c" />
+    <ClCompile Include="..\..\src\appmake\sol20.c" />
     <ClCompile Include="..\..\src\appmake\sorcerer.c" />
     <ClCompile Include="..\..\src\appmake\sos.c" />
     <ClCompile Include="..\..\src\appmake\spc1000.c" />
