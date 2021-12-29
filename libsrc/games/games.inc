@@ -9,6 +9,7 @@
 ;       else 8 bit io
 ;
 ;       However.... SOUND_INOUT = toggle speaker with in/out (+ace only)
+;                   SOUND_IFF = toggle speaker with ei/di cycle (+sol20 only)
 ;
 ;       $Id: games.inc $
 ;
@@ -260,6 +261,14 @@ IF FORlviv
         defc sndbit_port   = $c2
         defc sndbit_bit    = 0
         defc sndbit_mask   = 1
+ENDIF
+
+
+IF FORsol20
+    defc sndbit_port   = 0
+    defc sndbit_bit    = 0
+    defc sndbit_mask   = 0
+    defc SOUND_IFF     = 1
 ENDIF
 
 ; Compatibility ones only, the following ports don't have a beeper

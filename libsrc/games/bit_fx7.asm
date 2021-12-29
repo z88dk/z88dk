@@ -8,7 +8,7 @@
 ; Library #4 by Stefano Bodrato
 ;
 
-IF !__CPU_GBZ80__ && !__CPU_INTEL__
+IF !__CPU_GBZ80__ 
           SECTION    code_clib
           PUBLIC     bit_fx7
           PUBLIC     _bit_fx7

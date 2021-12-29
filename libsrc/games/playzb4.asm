@@ -13,7 +13,7 @@
 ; play 4 bit pulse wave encoded data using sid master volume
 
 
-IF !__CPU_GBZ80__ && !__CPU_INTEL__
+IF !__CPU_GBZ80__
 
 	SECTION code_clib
 	
@@ -98,6 +98,11 @@ IF SOUND_INOUT = 1
     jr  ASMPC+4
     out  (sndbit_port),a
     ld   a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
 ELIF sndbit_port >= 256
 	  exx
 	  out  (c),a                   ;9 T slower

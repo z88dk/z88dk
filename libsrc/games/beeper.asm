@@ -3,15 +3,18 @@
 ; Generic 1 bit sound functions
 ;
 
-IF !__CPU_GBZ80__ && !__CPU_INTEL__
     SECTION    code_clib
     PUBLIC     beeper
     PUBLIC     _beeper
     INCLUDE  "games/games.inc"
 
+IF __CPU_GBZ80__ || __CPU_INTEL__
+beeper:
+_beeper:
+    ret
+ELSE
     ;EXTERN      bit_open_di
-    ;EXTERN      bit_close_ei
-	
+    ;EXTERN      bit_close_ei	
     EXTERN      __snd_tick
 
 ;
@@ -26,72 +29,77 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
 .beeper
 ._beeper
-          push	ix
-        IF sndbit_port >= 256
-          exx
-          ld   bc,sndbit_port
-          exx
-        ENDIF
-          ld   a,l
-          srl  l
-          srl  l
-          cpl
-          and  3
-          ld   c,a
-          ld   b,0
-          ld   ix,beixp3
-          add  ix,bc
-          ;call bit_open_di
-          ld	a,(__snd_tick)
+    push	ix
+IF sndbit_port >= 256
+    exx
+    ld   bc,sndbit_port
+    exx
+ENDIF
+    ld   a,l
+    srl  l
+    srl  l
+    cpl
+    and  3
+    ld   c,a
+    ld   b,0
+    ld   ix,beixp3
+    add  ix,bc
+    ;call bit_open_di
+    ld	a,(__snd_tick)
 
 .beixp3
-          nop
-          nop
-          nop
-          inc  b
-          inc  c
+    nop
+    nop
+    nop
+    inc  b
+    inc  c
 .behllp   dec  c
-          jr   nz,behllp
-          ld   c,$3F
-          dec  b
-          jp   nz,behllp
-          xor  sndbit_mask
+    jr   nz,behllp
+    ld   c,$3F
+    dec  b
+    jp   nz,behllp
+    xor  sndbit_mask
 
-        IF SOUND_INOUT = 1
-          ld   c,a
-          jr nz,ASMPC+6
-          in  a,(sndbit_port)
-          jr  ASMPC+4
-          out  (sndbit_port),a
-          ld   a,c
-        ELIF sndbit_port >= 256
-          exx
-          out  (c),a                   ;9 T slower
-          exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
-        ELSE
-          out  (sndbit_port),a
-        ENDIF
+IF SOUND_INOUT = 1
+    ld   c,a
+    jr nz,ASMPC+6
+    in  a,(sndbit_port)
+    jr  ASMPC+4
+    out  (sndbit_port),a
+    ld   a,c
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
+ELIF sndbit_port >= 256
+    exx
+    out  (c),a                   ;9 T slower
+    exx
+ELIF sndbit_port < 0
+    ld  (-sndbit_port),a
+ELSE
+    out  (sndbit_port),a
+ENDIF
 
-          ld   b,h
-          ld   c,a
-          bit  sndbit_bit,a            ;if o/p go again!
-          jr   nz,be_again
-          ld   a,d
-          or   e
-          jr   z,be_end
-          ld   a,c
-          ld   c,l
-          dec  de
-          jp   (ix)
+    ld   b,h
+    ld   c,a
+    bit  sndbit_bit,a            ;if o/p go again!
+    jr   nz,be_again
+    ld   a,d
+    or   e
+    jr   z,be_end
+    ld   a,c
+    ld   c,l
+    dec  de
+    jp   (ix)
 .be_again
-          ld   c,l
-          inc  c
-          jp   (ix)
+    ld   c,l
+    inc  c
+    jp   (ix)
 .be_end
-          pop	ix
-          ;call   bit_close_ei
-          ret
+    pop	ix
+    ;call   bit_close_ei
+    ret
 
 ENDIF

@@ -4,7 +4,7 @@
 ; Alternate sound library by Stefano Bodrato
 ;
 
-IF !__CPU_GBZ80__ && !__CPU_INTEL__
+IF !__CPU_GBZ80__  && !__CPU_INTEL__
           SECTION    code_clib
           PUBLIC     bit_fx3
           PUBLIC     _bit_fx3
@@ -68,6 +68,11 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr  ASMPC+4
           out  (sndbit_port),a
           ld   a,c
+        ELIF SOUND_IFF = 1
+          jp      nz,ASMPC+4
+          di
+          jp      ASMPC+4
+          ei
         ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
@@ -99,6 +104,11 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr  ASMPC+4
           out  (sndbit_port),a
           ld   a,c
+        ELIF SOUND_IFF = 1
+          jp      nz,ASMPC+4
+          di
+          jp      ASMPC+4
+          ei
         ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
@@ -145,6 +155,11 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr  ASMPC+4
           out  (sndbit_port),a
           ld   a,c
+        ELIF SOUND_IFF = 1
+          jp      nz,ASMPC+4
+          di
+          jp      ASMPC+4
+          ei
         ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
@@ -174,6 +189,11 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr  ASMPC+4
           out  (sndbit_port),a
           ld   a,c
+        ELIF SOUND_IFF = 1
+          jp      nz,ASMPC+4
+          di
+          jp      ASMPC+4
+          ei
         ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
@@ -215,6 +235,11 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr  ASMPC+4
           out  (sndbit_port),a
           ld   a,c
+        ELIF SOUND_IFF = 1
+          jp      nz,ASMPC+4
+          di
+          jp      ASMPC+4
+          ei
         ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
@@ -257,6 +282,11 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr  ASMPC+4
           out  (sndbit_port),a
           ld   a,c
+        ELIF SOUND_IFF = 1
+          jp      nz,ASMPC+4
+          di
+          jp      ASMPC+4
+          ei
         ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
@@ -298,6 +328,11 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr  ASMPC+4
           out  (sndbit_port),a
           ld   a,c
+        ELIF SOUND_IFF = 1
+          jp      nz,ASMPC+4
+          di
+          jp      ASMPC+4
+          ei
         ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
@@ -346,6 +381,11 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr  ASMPC+4
           out  (sndbit_port),a
           ld   a,c
+        ELIF SOUND_IFF = 1
+          jp      nz,ASMPC+4
+          di
+          jp      ASMPC+4
+          ei
         ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
@@ -391,6 +431,11 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr  ASMPC+4
           out  (sndbit_port),a
           ld   a,c
+        ELIF SOUND_IFF = 1
+          jp      nz,ASMPC+4
+          di
+          jp      ASMPC+4
+          ei
         ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
@@ -436,6 +481,11 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           jr  ASMPC+4
           out  (sndbit_port),a
           ld   a,c
+        ELIF SOUND_IFF = 1
+          jp      nz,ASMPC+4
+          di
+          jp      ASMPC+4
+          ei
         ELIF sndbit_port >= 256
           exx
           out  (c),a                   ;9 T slower
