@@ -6,7 +6,8 @@ SECTION code_driver_character_output
 
 PUBLIC fputc_cons_acia
 
-EXTERN aciaTxCount, aciaTxIn, aciaTxBuffer, aciaControl
+EXTERN aciaTxCount, aciaTxIn, aciaTxBuffer
+EXTERN aciaControl
 
 
 .fputc_cons_acia
