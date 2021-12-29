@@ -762,8 +762,6 @@ IF FORsol20
     defc maxx    = 64
     defc maxy    = 16
     defc USEplotc = 1
-ELSE
-	kkkk
 ENDIF
 
 ; GSX virtual window is (32768 x 32768)
