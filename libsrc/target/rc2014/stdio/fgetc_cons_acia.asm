@@ -5,7 +5,8 @@ SECTION code_driver
 
 PUBLIC fgetc_cons_acia
 
-EXTERN aciaRxCount, aciaRxOut, aciaRxBuffer, aciaControl
+EXTERN aciaRxCount, aciaRxOut, aciaRxBuffer
+EXTERN aciaControl
 
 
 .fgetc_cons_acia

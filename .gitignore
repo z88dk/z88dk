@@ -112,6 +112,7 @@ src/cpp/z88dk-zcpp
 src/lstmanip/z88dk-lstmanip
 src/scanner/z88dk-zpragma
 src/sccz80/sccz80
+src/sdcc-build
 src/ticks/ticks
 src/ticks/z88dk-dis
 src/ticks/z88dk-gdb
@@ -126,6 +127,7 @@ src/z80asm/dev/cpu2/cpu_test_r3k_ok.asm
 src/z80asm/dev/cpu2/cpu_test_z180_err.asm
 src/z80asm/dev/cpu2/cpu_test_z180_ixiy_ok.asm
 src/z80asm/dev/cpu2/cpu_test_z180_ok.asm
+src/z80asm/dev/z80pack-1.21/z80asm/z80asm
 src/z80asm/t/libtestlib.a
 src/z80asm/t/test_codearea
 src/z80asm/t/test_codearea.out
