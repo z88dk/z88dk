@@ -32,12 +32,12 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     
     
 .asm_uncircle
-    push    af
 IF NEED_swapgfxbk = 1
+    push    af
     call    swapgfxbk
-ENDIF
     pop     af
-    ld      ix,respixel
+ENDIF
+    ld      hl,respixel
     call    draw_circle
 IF NEED_swapgfxbk
     jp      __graphics_end
