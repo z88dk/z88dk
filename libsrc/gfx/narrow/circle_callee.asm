@@ -29,10 +29,10 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     push    af
 .asm_circle
     push    ix
-    ld      ix,plotpixel
 IF NEED_swapgfxbk = 1
     call    swapgfxbk
 ENDIF
+    ld      hl,plotpixel
     call    draw_circle
 IF NEED_swapgfxbk
     jp      __graphics_end
