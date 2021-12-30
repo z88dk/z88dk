@@ -289,5 +289,8 @@
     <None Include="..\..\src\z80asm\tt\tokens.yaml">
       <Filter>Resource Files\c</Filter>
     </None>
+    <None Include="..\..\src\z80asm\src\cpp\float.def">
+      <Filter>Resource Files\cpp</Filter>
+    </None>
   </ItemGroup>
 </Project>

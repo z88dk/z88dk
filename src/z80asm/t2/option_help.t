@@ -40,9 +40,7 @@ Preprocessor Options:
   -IPATH                 Add directory to include search path
   -DSYMBOL[=VALUE]       Define a static symbol
   -ucase                 Convert identifiers to upper case
-  -float=format          Set float format to one of:
-                         genmath|math48|z80|sdcc|am9511|ieee754|ieee754double|
-                         zx|zx81
+  -float=FORMAT          Set default float format
 
 Code Generation Options:
   -mz80n                 Assemble for the Z80 variant of ZX Next

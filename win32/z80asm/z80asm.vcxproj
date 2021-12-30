@@ -278,6 +278,7 @@
     <ClCompile Include="..\..\src\z80asm\src\c\zobjfile.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src\z80asm\src\cpp\float.def" />
     <None Include="..\..\src\z80asm\src\cpp\keyword.def" />
     <None Include="..\..\src\z80asm\src\cpp\lex.re" />
     <None Include="..\..\src\z80asm\src\c\parse_rules.rl" />

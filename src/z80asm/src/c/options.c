@@ -267,8 +267,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 	else if (strncmp(argv[II], "-float", 6) == 0) {
 		const char* format = &argv[II][6];
 		if (*format == '=') format++;
-		if (!set_float_format(format))
-			error_invalid_float_format();
+		set_float_format(format);		// shows error message if not valid
 	}
 	else {
 		/* search opts_lu[] */

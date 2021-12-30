@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // preprocessor
-// // Copyright (C) Paulo Custodio, 2011-2021
+// Copyright (C) Paulo Custodio, 2011-2021
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -971,7 +971,7 @@ void Preproc::do_float() {
 			}
 			else {
 				FloatRepr float_repr{ expr.value() };
-				string line = "defb " + float_repr.get_int_list() + "\n";
+				string line = "defb " + float_repr.convert_int_list() + "\n";
 				m_output.push_back(line);
 			}
 

@@ -1,7 +1,6 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// preprocessor
-// // Copyright (C) Paulo Custodio, 2011-2021
+// Copyright (C) Paulo Custodio, 2011-2021
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
@@ -37,7 +36,10 @@ private:
 
 class FloatRepr {
 public:
-	enum class Format { genmath, math48, z80, sdcc, am9511, ieee754, ieee754double, zx, zx81 };
+	enum class Format {
+		#define X(type)		type,
+		#include "float.def"
+	};
 
 	FloatRepr(double value = 0.0);
 
@@ -49,12 +51,35 @@ public:
 	static bool set_format(const string& text);
 	static string format_define();
 
-	vector<uint8_t> get_bytes();
-	string get_int_list();
+	vector<uint8_t> convert();
+	string convert_int_list();
 
 private:
-	double m_value;
+	// from sccz80
+	static inline const int MAX_MANTISSA_SIZE = 7;
+
+	struct fp_decomposed {
+		uint8_t   exponent{ 0 };
+		uint8_t   sign{ 0 };
+		uint8_t   mantissa[MAX_MANTISSA_SIZE + 1]{ 0 };
+	};
+
+	// data
+	double	m_value{ 0.0 };
+	uint8_t m_fa[MAX_MANTISSA_SIZE + 1]{ 0 };
+	int	c_fp_size{ 6 };
+	int c_fp_mantissa_bytes{ 5 };
+	int c_fp_exponent_bias{ 128 };
+	int c_fp_fudge_offset{ 0 };
 	static inline Format m_format{ Format::genmath };		// TODO: define appropriate default
+
+	// converters for each type
+	#define X(type)		void convert__##type();
+	#include "float.def"
+
+	// from sccz80
+	void pack32bit_float(uint32_t val);
+	void decompose_float(double raw, struct fp_decomposed* fs);
 };
 
 bool set_float_format(const char* format);

@@ -74,10 +74,7 @@ OPT(OptSet, &opts.swap_ix_iy, "-IXIY", "", "Swap IX and IY registers", "")
 OPT(OptStringList, &opts.inc_path, "-I", "", "Add directory to include search path", "PATH")
 OPT(OptCallArg, option_define, "-D", "", "Define a static symbol", "SYMBOL[=VALUE]")
 OPT(OptSet, &opts.ucase, "-ucase", "", "Convert identifiers to upper case", "")
-OPT(OptCall, option_dummy, "-float=format", "",
-	"Set float format to one of:\n"
-	"                         genmath|math48|z80|sdcc|am9511|ieee754|ieee754double|\n"
-	"                         zx|zx81", "")
+OPT(OptCall, option_dummy, "-float=FORMAT", "", "Set default float format", "")
 
 OPT_TITLE("Code Generation Options:")
 OPT(OptCall, option_cpu_z80n, "-mz80n", "", "Assemble for the Z80 variant of ZX Next", "")
