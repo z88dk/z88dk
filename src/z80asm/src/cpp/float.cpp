@@ -211,19 +211,40 @@ double FloatExpr::parse_func2(double(*f)(double, double)) {
 FloatRepr::FloatRepr(double value)
 	: m_value(value) {}
 
+void FloatRepr::set_format(Format format) {
+	// ser current format
+	c_format = format;
+
+	// set format characterisitics
+	switch (format) {
+#define X(type, fp_size, fp_exponent_bias, fp_mantissa_bytes, fp_fudge_offset) \
+	case Format::type: \
+		c_fp_size = fp_size; \
+		c_fp_exponent_bias = fp_exponent_bias; \
+		c_fp_mantissa_bytes = fp_mantissa_bytes; \
+		c_fp_fudge_offset = fp_fudge_offset; \
+		break;
+#include "float.def"
+	default:
+		assert(0);
+	}
+}
+
 bool FloatRepr::set_format(const string& text) {
 	// map "genmath" -> Format::genmath, ...
 	static unordered_map<string, Format> map = {
-		#define X(type)		{ #type, Format::type },
-		#include "float.def"
+#define X(type, fp_size, fp_exponent_bias, fp_mantissa_bytes, fp_fudge_offset)	\
+		{ #type, Format::type },
+#include "float.def"
 	};
 
 	auto found = map.find(text);
 	if (found == map.end()) {	// not found
 		error_invalid_float_format();
 		cerr << "Available float formats:";
-		#define X(type)		cerr << " " #type;
-		#include "float.def"
+#define X(type, fp_size, fp_exponent_bias, fp_mantissa_bytes, fp_fudge_offset)	\
+		cerr << " " #type;
+#include "float.def"
 		cerr << endl;
 		return false;
 	}
@@ -236,12 +257,13 @@ bool FloatRepr::set_format(const string& text) {
 string FloatRepr::format_define() {
 	// map Format::genmath -> "genmath", ...
 	static unordered_map<Format, string> map = {
-		#define X(type)		{ Format::type, #type },
-		#include "float.def"
+#define X(type, fp_size, fp_exponent_bias, fp_mantissa_bytes, fp_fudge_offset)	\
+		{ Format::type, #type },
+#include "float.def"
 	};
 
 	// build "__FLOAT_<TYPE>__"
-	auto found = map.find(m_format);
+	auto found = map.find(c_format);
 	assert(found != map.end());
 
 	string define_name = str_toupper("__FLOAT_" + found->second + "__");
@@ -250,9 +272,10 @@ string FloatRepr::format_define() {
 
 vector<uint8_t> FloatRepr::convert() {
 	// convert into c_fp_size, m_fa
-	switch (m_format) {
-	#define X(type)		case Format::type: convert__##type(); break;
-	#include "float.def"
+	switch (c_format) {
+#define X(type, fp_size, fp_exponent_bias, fp_mantissa_bytes, fp_fudge_offset)	\
+	case Format::type: convert__##type(); break;
+#include "float.def"
 	default:
 		assert(0); 
 	}
@@ -265,10 +288,30 @@ vector<uint8_t> FloatRepr::convert() {
 	return bytes;
 }
 
-void FloatRepr::convert__z80() {
+// code from sccz80
+void FloatRepr::convert__genmath() {
+	struct fp_decomposed fs = { 0 };
+	int offs = MAX_MANTISSA_SIZE - c_fp_mantissa_bytes;
+	int i;
+
+	decompose_float(m_value, &fs);
+
+	for (i = offs; i < MAX_MANTISSA_SIZE; i++) 
+		m_fa[i - offs + c_fp_fudge_offset] = fs.mantissa[i];
+	
+	m_fa[i - offs - 1 + c_fp_fudge_offset] |= fs.sign ? 0x80 : 0;
+	m_fa[i - offs + c_fp_fudge_offset] = fs.exponent;
 }
 
-// code from sccz80
+void FloatRepr::convert__math48() {
+	convert__genmath();		// TODO: remove?
+}
+
+#if 0
+void FloatRepr::convert__z88() {
+	convert__genmath();
+}
+
 void FloatRepr::convert__ieee() {
 	c_fp_size = 4;
 	c_fp_mantissa_bytes = 5;
@@ -358,25 +401,6 @@ void FloatRepr::convert__mbf64() {
 	m_fa[7] = fs.exponent;
 }
 
-void FloatRepr::convert__z88() {
-	c_fp_size = 4;
-	c_fp_mantissa_bytes = 5;
-	c_fp_exponent_bias = 128;
-
-	struct fp_decomposed fs;
-	int      offs = MAX_MANTISSA_SIZE - c_fp_mantissa_bytes;
-	int      i;
-
-	decompose_float(m_value, &fs);
-
-
-	for (i = offs; i < MAX_MANTISSA_SIZE; i++) {
-		m_fa[i - offs + c_fp_fudge_offset] = fs.mantissa[i];
-	}
-	m_fa[i - offs - 1 + c_fp_fudge_offset] |= fs.sign ? 0x80 : 0;
-	m_fa[i - offs + c_fp_fudge_offset] = fs.exponent;
-}
-
 void FloatRepr::convert__ieee16() {
 	c_fp_size = 2;
 	c_fp_mantissa_bytes = 2;
@@ -442,17 +466,12 @@ void FloatRepr::convert__am9511() {
 	pack32bit_float(fp_value);
 }
 
-void FloatRepr::convert__math48() {
-}
-
-void FloatRepr::convert__genmath() {
-}
-
 void FloatRepr::convert__zx() {
 }
 
 void FloatRepr::convert__zx81() {
 }
+#endif
 
 string FloatRepr::convert_int_list() {
 	vector<uint8_t> bytes = convert();

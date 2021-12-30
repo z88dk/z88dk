@@ -951,9 +951,8 @@ void Preproc::do_float() {
 		m_lexer.next();
 		if (!m_lexer.peek().is(TType::Newline))
 			error_syntax();
-		else if (!FloatRepr::set_format(format))
-			error_invalid_float_format();
-		else {}			// OK
+		else
+			FloatRepr::set_format(format);		// set format issues error if illegal format
 	}
 	// else parse list of float expressions
 	else {

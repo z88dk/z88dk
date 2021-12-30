@@ -37,8 +37,9 @@ private:
 class FloatRepr {
 public:
 	enum class Format {
-		#define X(type)		type,
-		#include "float.def"
+#define X(type, fp_size, fp_exponent_bias, fp_mantissa_bytes, fp_fudge_offset)	\
+		type,
+#include "float.def"
 	};
 
 	FloatRepr(double value = 0.0);
@@ -46,8 +47,8 @@ public:
 	double value() const { return m_value; };
 	void set_value(double value) { m_value = value; }
 
-	static Format format() { return m_format; }
-	static void set_format(Format format) { m_format = format; }
+	static Format format() { return c_format; }
+	static void set_format(Format format);
 	static bool set_format(const string& text);
 	static string format_define();
 
@@ -67,15 +68,17 @@ private:
 	// data
 	double	m_value{ 0.0 };
 	uint8_t m_fa[MAX_MANTISSA_SIZE + 1]{ 0 };
-	int	c_fp_size{ 6 };
-	int c_fp_mantissa_bytes{ 5 };
-	int c_fp_exponent_bias{ 128 };
-	int c_fp_fudge_offset{ 0 };
-	static inline Format m_format{ Format::genmath };		// TODO: define appropriate default
+
+	static inline Format c_format{ Format::genmath };		// TODO: define appropriate default
+	static inline int c_fp_size{ 6 };
+	static inline int c_fp_exponent_bias{ 128 };
+	static inline int c_fp_mantissa_bytes{ 5 };
+	static inline int c_fp_fudge_offset{ 0 };
 
 	// converters for each type
-	#define X(type)		void convert__##type();
-	#include "float.def"
+#define X(type, fp_size, fp_exponent_bias, fp_mantissa_bytes, fp_fudge_offset)	\
+	void convert__##type();
+#include "float.def"
 
 	// from sccz80
 	void pack32bit_float(uint32_t val);
