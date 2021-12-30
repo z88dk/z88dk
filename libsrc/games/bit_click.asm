@@ -9,12 +9,12 @@
 
 IF !__CPU_GBZ80__
 
-    SECTION    code_clib
-    PUBLIC     bit_click
-    PUBLIC     _bit_click
-    INCLUDE  "games/games.inc"
+    SECTION code_clib
+    PUBLIC  bit_click
+    PUBLIC  _bit_click
+    INCLUDE "games/games.inc"
 
-    EXTERN     __snd_tick
+    EXTERN  __snd_tick
 
 .bit_click
 ._bit_click
@@ -23,10 +23,16 @@ IF !__CPU_GBZ80__
     ld      (__snd_tick),a
 
 IF SOUND_INOUT = 1
-    jr nz,ASMPC+6
-    in  a,(sndbit_port)
-    jr  ASMPC+4
-    out  (sndbit_port),a
+    jr      nz,ASMPC+6
+    in      a,(sndbit_port)
+    jr      ASMPC+4
+    out     (sndbit_port),a
+    ret
+ELIF SOUND_IFF = 1
+    jp      nz,ASMPC+4
+    di
+    jp      ASMPC+4
+    ei
     ret
 ELIF sndbit_port > 255
   IF !__CPU_INTEL__	

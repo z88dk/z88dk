@@ -757,6 +757,13 @@ IF FORgl6000
     defc    WANT_swapgfxbk = 0
 ENDIF
 
+IF FORsol20
+    DEFINE gotgfx
+    defc maxx    = 64
+    defc maxy    = 16
+    defc USEplotc = 1
+ENDIF
+
 ; GSX virtual window is (32768 x 32768)
 ; HiRez display should stay between 512..800 px.
 ; We keep an average value

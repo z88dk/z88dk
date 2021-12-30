@@ -1,5 +1,5 @@
 name: z88dk
-base: core18
+base: core20
 summary: Development kit for Z80 machiens
 adopt-info: part-z88dk
 
@@ -30,7 +30,7 @@ parts:
       - BUILD_SDCC: "1"
       - BUILD_SDCC_HTTP: "1"
     override-build: |
-      cpanm -n -L $SNAPCRAFT_PART_INSTALL App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences CPU::Z80::Assembler Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Text::Table
+      cpanm -n -L $SNAPCRAFT_PART_INSTALL App::Prove Capture::Tiny::Extended File::Path  CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Object::Tiny::RW List::Uniq 
       ./build.sh -i $SNAP
       make DESTDIR=$SNAPCRAFT_PART_INSTALL install
     build-packages:
@@ -47,10 +47,25 @@ parts:
       - zlib1g-dev
       - m4
       - curl
+      - ragel
+      - re2c
+      - libmodern-perl-perl
+      - libtemplate-perl
+      - libtemplate-plugin-yaml-perl
+      - libyaml-perl 
+      - liblocal-lib-perl 
+      - libcapture-tiny-perl 
+      - libpath-tiny-perl 
+      - libtest-differences-perl 
+      - libtext-table-perl 
+      - libdata-hexdump-perl
+      - libregexp-common-perl 
+      - libclone-perl
+      - libfile-slurp-perl
     stage-packages:
-      - libicu60
-      - perl-modules-5.26
-      - libperl5.26
+      - libicu66
+      - perl-modules-5.30
+      - libperl5.30
       - libxml2
       - m4
 

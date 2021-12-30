@@ -8,7 +8,7 @@
 ; Library #6 by Stefano Bodrato
 ;
 
-IF !__CPU_GBZ80__ && !__CPU_INTEL__
+IF !__CPU_GBZ80__ 
           SECTION    code_clib
           PUBLIC     bit_fx6
           PUBLIC     _bit_fx6
@@ -116,8 +116,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
 		  ld    (FR_4+1),a
 
 		  ld    a,b
+IF __CPU_INTEL__
+    rrca
+    rrca
+    and     @00111111
+ELSE
 		  srl   a
 		  srl   a
+ENDIF
 		  inc   a
   		  ld    (bit_synth_len+1),a
 

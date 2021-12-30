@@ -24,10 +24,12 @@ Detailed but incomplete changelist:
 - [classic] +cpm: GSX graphics library
 - [classic] +cpm/msxdos1: fcntl speedup via caching
 - [classic] +gl: GL6000 support improved
+- [classic] +micro85: Support for the homebrew Micro85 added
 - [classic] +msx: (msxdos) Time functions now available
 - [classic] +pc88: Graphics reworked and optimised
 - [classic] +radio86: New target for the Radio86 family
 - [classic] +sam: Extensively reworked and improved
+- [classic] +sol20: Support for the PTC Sol 20 added
 - [classic] +vg5k: 8x10 fonts and UDGs now usable
 - [classic] +ts2068/zxn: "fatpix" available in hires mode
 - [classic] +z88: Support for the OZ5 apps and shell
@@ -43,6 +45,7 @@ Detailed but incomplete changelist:
 - [ticks] Start of symbolic debugging
 - [z80asm] Now supports assembling undocumented 8085 instructions
 - [z80asm] Replace --cpu=r2k with --cpu=r2ka
+- [z80asm] Macros are now supported
 - [zsdcc] Upgraded to SDCC 4.1.6 r12555 (bugfixes)
 
 z88dk v2.1 - 07.02.2021

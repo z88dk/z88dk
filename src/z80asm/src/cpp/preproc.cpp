@@ -439,7 +439,9 @@ bool Preproc::check_macro() {
 bool Preproc::check_macro_call() {
 	if (m_lexer[0].is(TType::Label) && m_lexer[1].is(TType::Ident)) {
 		string name = m_lexer[1].svalue;
+		// find in MACRO macros OR in #define macros
 		shared_ptr<Macro> macro = m_macros.find_all(name);
+		if (!macro)       macro = defines().find_all(name);
 		if (macro) {
 			do_label();
 			m_lexer.next();
@@ -450,7 +452,9 @@ bool Preproc::check_macro_call() {
 
 	if (m_lexer[0].is(TType::Ident)) {
 		string name = m_lexer[0].svalue;
+		// find in MACRO macros OR in #define macros
 		shared_ptr<Macro> macro = m_macros.find_all(name);
+		if (!macro)       macro = defines().find_all(name);
 		if (macro) {
 			m_lexer.next();
 			do_macro_call(macro);
@@ -805,10 +809,6 @@ void Preproc::do_macro_call(shared_ptr<Macro> macro) {
 			return;
 		}
 	}
-	if (!m_lexer.peek().is(TType::Newline)) {
-		error_syntax();
-		return;
-	}
 
 	// create new level of macro expansion
 	m_levels.emplace_back(&defines());
@@ -821,8 +821,9 @@ void Preproc::do_macro_call(shared_ptr<Macro> macro) {
 		defines().add(param_macro);
 	}
 
-	// create lines from body
-	m_levels.back().init(macro->body());
+	// create lines from body; append rest of the macro call line
+	string body = macro->body() + " " + string(m_lexer.text_ptr());
+	m_levels.back().init(body);
 }
 
 void Preproc::do_local() {

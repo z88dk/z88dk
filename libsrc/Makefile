@@ -1746,6 +1746,7 @@ sol20_clib.lib:
 	@echo '--- Building SOL20 Library ---'
 	@echo ''
 	$(call buildgeneric,sol20,"portable gencon")
+	$(MAKE) -C games TARGET=sol20
 	TARGET=sol20 TYPE=8080 $(LIBLINKER) -m8080 -DFORsol20 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/sol20_clib @$(TARGET_DIRECTORY)/sol20/sol20.lst
 
 
