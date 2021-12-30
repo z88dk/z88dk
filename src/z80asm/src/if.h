@@ -21,7 +21,7 @@ const char* spool_add(const char* str);
 void error_float_eval_error();
 void error_include_recursion(const char* filename);
 void error_invalid_char();
-void error_invalid_float_format();
+void error_invalid_float_format(const char* formats);
 void error_invalid_squoted_string();
 void error_read_file(const char* filename);
 void error_symbol_redefined(const char* name);
@@ -59,6 +59,7 @@ void got_expanded_line(const char* filename, int line_num, const char* text);
 // floats
 bool set_float_format(const char* format);
 const char* get_float_format_define(void);
+const char* get_float_formats(void);
 
 #ifdef __cplusplus
 }

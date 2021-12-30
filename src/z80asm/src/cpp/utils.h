@@ -10,6 +10,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 using namespace std;
 
 #if __has_include(<filesystem>)
@@ -38,8 +39,8 @@ istream& safe_getline(istream& is, string& t);
 
 // convert int to hex
 // https://stackoverflow.com/questions/5100718/integer-to-hex-string-in-c
-template< typename T >
-std::string int_to_hex(T i)
+template<typename T>
+string int_to_hex(T i)
 {
 	std::ostringstream ss;
 	if (i < 10)
@@ -49,4 +50,15 @@ std::string int_to_hex(T i)
 		<< std::setfill('0') << std::setw(2)
 		<< std::hex << i << std::dec;
 	return ss.str();
+}
+
+// convert vector of integers to string of comma-separated values
+template<typename T>
+string vector_to_csv(vector<T> items) {
+	string out;
+	for (auto item : items)
+		out += std::to_string(item) + ",";
+	if (!out.empty())
+		out.pop_back();		// remove end comma
+	return out;
 }

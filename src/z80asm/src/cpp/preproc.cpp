@@ -951,8 +951,9 @@ void Preproc::do_float() {
 		m_lexer.next();
 		if (!m_lexer.peek().is(TType::Newline))
 			error_syntax();
-		else
-			FloatRepr::set_format(format);		// set format issues error if illegal format
+		else if (!set_float_format(format.c_str()))
+			error_invalid_float_format(get_float_formats());
+		else {}
 	}
 	// else parse list of float expressions
 	else {
@@ -970,8 +971,8 @@ void Preproc::do_float() {
 				return;
 			}
 			else {
-				FloatRepr float_repr{ expr.value() };
-				string line = "defb " + float_repr.convert_int_list() + "\n";
+				string bytes_csv = vector_to_csv(g_float_format.float_to_bytes(expr.value()));
+				string line = "defb " + bytes_csv + "\n";
 				m_output.push_back(line);
 			}
 

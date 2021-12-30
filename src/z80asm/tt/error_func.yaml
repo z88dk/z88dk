@@ -330,8 +330,8 @@ errors:
 
   - type	: ErrError
     func	: error_invalid_float_format
-    args	: void
-    message	: "\"invalid float format\""
+    args	: const char* formats
+    message	: "\"invalid float format, expected one of: %s\", formats"
 
   - type	: ErrError
     func	: error_float_eval_error
