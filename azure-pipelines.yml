@@ -15,7 +15,7 @@ pr:
   - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'ubuntu-20.04'
 
 steps:
 - checkout: self
@@ -32,9 +32,9 @@ steps:
   displayName: ccache
 - bash: |
     sudo apt-get update
-    sudo apt-get install -y ccache libboost-all-dev texinfo texi2html gdb curl dos2unix ragel liblocal-lib-perl cpanminus
+    sudo apt-get install -y ragel re2c dos2unix texinfo texi2html gdb curl cpanminus ccache libboost-all-dev libmodern-perl-perl libtemplate-perl libtemplate-plugin-yaml-perl libyaml-perl liblocal-lib-perl libcapture-tiny-perl libpath-tiny-perl libtest-differences-perl libtext-table-perl libdata-hexdump-perl libregexp-common-perl libclone-perl
     eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
-    cpanm App::Prove Modern::Perl Capture::Tiny Capture::Tiny::Extended Path::Tiny File::Path Template Template::Plugin::YAML Test::Differences Text::Table CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Data::HexDump Object::Tiny::RW Regexp::Common List::Uniq Clone
+    cpanm  App::Prove Capture::Tiny::Extended File::Path  CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Object::Tiny::RW List::Uniq
   displayName: "Install prerequisites"
 - bash: |
     eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
