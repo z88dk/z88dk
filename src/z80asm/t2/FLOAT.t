@@ -6,8 +6,8 @@ use Math::Trig;
 #-------------------------------------------------------------------------------
 # errors
 #-------------------------------------------------------------------------------
-my $invalid_format_error = 
-"invalid float format, expected one of: genmath,math48,ieee16,ieee32,ieee64,zx81,zx,z88";
+my $invalid_format_error = "invalid float format, expected one of: ".
+	"genmath,math48,ieee16,ieee32,ieee64,z80,zx81,zx,z88,mbfs,mbf40,mbf64,am9511";
 
 capture_nok("./z88dk-z80asm -float", <<END);
 Error: $invalid_format_error
@@ -66,7 +66,7 @@ my @fdata = (1., -1., 255., -255., 256., -256.,
 			 65535., -65535., 65536., -65536.,
 			 5.5, -5.5, 5.5e1, 5.e-1);
 
-for my $ftype ("", "genmath", "math48") {
+for my $ftype ("", "genmath", "math48", "z80") {
 	check_asm($ftype, \@fdata,
 		[0,0,0,0,0,129,
 		 0,0,0,0,128,129,
@@ -171,7 +171,7 @@ check_asm("zx", \@fdata,
 );
 
 SKIP: {
-	skip "-math=z88 output should be 40-bit, getting 48-bits";
+	skip "-math=z88 output should be 40-bit, getting 48-bits, see #305";
 	check_asm("z88", \@fdata,
 		[228,0,0,0,0,128,
 		 228,0,0,0,128,128,
@@ -190,20 +190,102 @@ SKIP: {
 	);
 }
 
+check_asm("mbfs", \@fdata,
+	[0,0,0,129,
+	 0,0,128,129,
+	 0,0,127,136,
+	 0,0,255,136,
+	 0,0,0,137,
+	 0,0,128,137,
+	 0,255,127,144,
+	 0,255,255,144,
+	 0,0,0,145,
+	 0,0,128,145,
+	 0,0,48,131,
+	 0,0,176,131,
+	 0,0,92,134,
+	 0,0,0,128]	 
+);
+
+SKIP: {
+	skip "-fp-mode=mbf40 output should be 40-bit, getting 48-bits, see #305";
+	check_asm("mbf40", \@fdata,
+		[0,0,0,0,129,127,
+		 0,0,0,128,129,127,
+		 0,0,0,127,136,127,
+		 0,0,0,255,136,127,
+		 0,0,0,0,137,127,
+		 0,0,0,128,137,127,
+		 0,0,255,127,144,127,
+		 0,0,255,255,144,127,
+		 0,0,0,0,145,127,
+		 0,0,0,128,145,127,
+		 0,0,0,48,131,127,
+		 0,0,0,176,131,127,
+		 0,0,0,92,134,127,
+		 0,0,0,0,128,127]	 
+	);
+}
+
+check_asm("mbf64", \@fdata,
+	[0,0,0,0,0,0,0,129,
+	 0,0,0,0,0,0,128,129,
+	 0,0,0,0,0,0,127,136,
+	 0,0,0,0,0,0,255,136,
+	 0,0,0,0,0,0,0,137,
+	 0,0,0,0,0,0,128,137,
+	 0,0,0,0,0,255,127,144,
+	 0,0,0,0,0,255,255,144,
+	 0,0,0,0,0,0,0,145,
+	 0,0,0,0,0,0,128,145,
+	 0,0,0,0,0,0,48,131,
+	 0,0,0,0,0,0,176,131,
+	 0,0,0,0,0,0,92,134,
+	 0,0,0,0,0,0,0,128]	 
+);
+
+check_asm("am9511", \@fdata,
+	[0,0,128,1,
+	 0,0,128,129,
+	 0,0,255,8,
+	 0,0,255,136,
+	 0,0,128,9,
+	 0,0,128,137,
+	 0,255,255,16,
+	 0,255,255,144,
+	 0,0,128,17,
+	 0,0,128,145,
+	 0,0,176,3,
+	 0,0,176,131,
+	 0,0,220,6,
+	 0,0,128,0]	 
+);
+
 #-------------------------------------------------------------------------------
 # compare C and ASM representations
 #-------------------------------------------------------------------------------
-check_c("-lm", 			"",					"float",	\@fdata);
-check_c("-lm", 			"-float=genmath",	"float",	\@fdata);
-check_c("-lmath48", 	"",					"float",	\@fdata);
-check_c("-lmath48", 	"-float=genmath",	"float",	\@fdata);
-check_c("--math32",		"-float=ieee32",	"float",	\@fdata);
-check_c("--math16",		"-float=ieee16",	"_Float16",	\@fdata);
+check_c("-lm", 				"",					"float",	\@fdata);
+check_c("-lm", 				"-float=genmath",	"float",	\@fdata);
+check_c("-lmath48", 		"",					"float",	\@fdata);
+check_c("-fp-mode=z80", 	"",					"float",	\@fdata);
+
+check_c("--math32",			"-float=ieee32",	"float",	\@fdata);
+check_c("--math16",			"-float=ieee16",	"_Float16",	\@fdata);
 
 SKIP: {
-	skip "-math=z88 output should be 40-bit, getting 48-bits";
-	check_c("--math-z88",	"-float=z88",		"float",	\@fdata);
+	skip "-math=z88 output should be 40-bit, getting 48-bits, see #305";
+	check_c("--math-z88",		"-float=z88",		"float",	\@fdata);
 }
+
+check_c("-fp-mode=mbf32",	"-float=mbfs",		"float",	\@fdata);
+
+SKIP: {
+	skip "-fp-mode=mbf40 output should be 40-bit, getting 48-bits, see #305";
+	check_c("-fp-mode=mbf40",	"-float=mbf40",		"float",	\@fdata);
+}
+
+check_c("-fp-mode=mbf64",	"-float=mbf64",		"float",	\@fdata);
+check_c("-fp-mode=am9511",	"-float=am9511",	"float",	\@fdata);
 
 #-------------------------------------------------------------------------------
 # check float expressions

@@ -126,6 +126,18 @@ static void decompose_float(double raw, fp_decomposed* fs, int mant_bytes, int e
 		fs->sign = 1;
 }
 
+static vector<uint8_t> pack32bit_float(uint32_t val) {
+	vector<uint8_t> fa;
+	fa.resize(4);
+
+	fa[0] = val & 0xff;
+	fa[1] = (val >> 8) & 0xff;
+	fa[2] = (val >> 16) & 0xff;
+	fa[3] = (val >> 24) & 0xff;
+
+	return fa;
+}
+
 static vector<uint8_t> dofloat_z80(double value,
 	int fp_size = 6, int mant_bytes = 5, int exp_bias = 128, int fudge_offset = 0) {
 
@@ -152,6 +164,10 @@ vector<uint8_t> float_to_genmath(double value) {
 }
 
 vector<uint8_t> float_to_math48(double value) {
+	return float_to_genmath(value);		// same format as genmath
+}
+
+vector<uint8_t> float_to_z80(double value) {
 	return float_to_genmath(value);		// same format as genmath
 }
 
@@ -262,6 +278,91 @@ vector<uint8_t> float_to_zx81(double value) {
 
 vector<uint8_t> float_to_z88(double value) {
 	return dofloat_z80(value, 5, 4, 127, 1);
+}
+
+vector<uint8_t> float_to_mbfs(double value) {
+	int fp_size = 4;
+
+	vector<uint8_t> fa;
+	fa.resize(fp_size);
+
+	struct fp_decomposed fs = { 0 };
+	uint32_t fp_value = 0;
+
+	decompose_float(value, &fs, 3, 128);
+
+	// Bundle up mantissa
+	fp_value = (((uint32_t)fs.mantissa[4]) |
+		(((uint32_t)fs.mantissa[5]) << 8) |
+		(((uint32_t)fs.mantissa[6]) << 16)) & 0x007fffff;
+
+	// And now the exponent
+	fp_value |= (((uint32_t)fs.exponent) << 24);
+
+	// And the sign bit
+	fp_value |= fs.sign ? 0x00800000 : 0x00000000;
+	return pack32bit_float(fp_value);
+}
+
+vector<uint8_t> float_to_mbf40(double value) {
+	int fp_size = 5;
+
+	vector<uint8_t> fa;
+	fa.resize(fp_size);
+
+	struct fp_decomposed fs = { 0 };
+
+	decompose_float(value, &fs, 4, 128);
+
+	memcpy(&fa[0], fs.mantissa + 3, 4);
+	fa[3] |= fs.sign ? 0x80 : 00;
+	fa[4] = fs.exponent;
+
+	return fa;
+}
+
+vector<uint8_t> float_to_mbf64(double value) {
+	int fp_size = 8;
+
+	vector<uint8_t> fa;
+	fa.resize(fp_size);
+
+	struct fp_decomposed fs = { 0 };
+
+	decompose_float(value, &fs, 7, 128);
+
+	memcpy(&fa[0], fs.mantissa, 7);
+	fa[6] |= fs.sign ? 0x80 : 00;
+	fa[7] = fs.exponent;
+
+	return fa;
+}
+
+vector<uint8_t> float_to_am9511(double value) {
+	int fp_size = 4;
+
+	vector<uint8_t> fa;
+	fa.resize(fp_size);
+
+	struct fp_decomposed fs = { 0 };
+	uint32_t fp_value = 0;
+
+	if (value != 0.0) {
+		decompose_float(value, &fs, 3, 0);
+
+		// Bundle up mantissa
+		fp_value = (((uint32_t)fs.mantissa[4]) |
+			(((uint32_t)fs.mantissa[5]) << 8) |
+			(((uint32_t)fs.mantissa[6]) << 16)) | 0x00800000;
+
+		// And now the exponent
+		fp_value |= ((((uint32_t)fs.exponent) << 24) & 0x7f000000);
+
+		// And the sign bit
+		fp_value |= fs.sign ? 0x80000000 : 0x00000000;
+	}
+
+	return pack32bit_float(fp_value);
 }
 
 //-----------------------------------------------------------------------------

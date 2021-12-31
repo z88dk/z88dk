@@ -61,12 +61,17 @@ extern FloatFormat g_float_format;
 
 vector<uint8_t> float_to_genmath(double value);
 vector<uint8_t> float_to_math48(double value);
+vector<uint8_t> float_to_z80(double value);
 vector<uint8_t> float_to_ieee16(double value);
 vector<uint8_t> float_to_ieee32(double value);
 vector<uint8_t> float_to_ieee64(double value);
 vector<uint8_t> float_to_zx(double value);
 vector<uint8_t> float_to_zx81(double value);
 vector<uint8_t> float_to_z88(double value);
+vector<uint8_t> float_to_mbfs(double value);
+vector<uint8_t> float_to_mbf40(double value);
+vector<uint8_t> float_to_mbf64(double value);
+vector<uint8_t> float_to_am9511(double value);
 
 #if 0
 class FloatRepr {
