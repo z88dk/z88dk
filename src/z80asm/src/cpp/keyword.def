@@ -32,6 +32,7 @@ X(MACRO, "macro")
 X(REPT, "rept")
 X(REPTC, "reptc")
 X(REPTI, "repti")
+X(SETFLOAT, "setfloat")
 X(UNDEF, "undef")
 
 // functions for floats
@@ -63,5 +64,7 @@ X(ROUND, "round")
 X(ABS, "abs")
 X(HYPOT, "hypot")
 X(FMOD, "fmod")
+X(PI, "pi")
+X(E, "e")
 
 #undef X

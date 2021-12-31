@@ -44,6 +44,7 @@ public:
 	};
 
 	Format get() const { return m_format; }
+	string get_type() const;
 	string get_define() const;
 	void set(Format format) { m_format = format; }
 	bool set_text(const string& text);
@@ -63,7 +64,9 @@ vector<uint8_t> float_to_math48(double value);
 vector<uint8_t> float_to_ieee16(double value);
 vector<uint8_t> float_to_ieee32(double value);
 vector<uint8_t> float_to_ieee64(double value);
+vector<uint8_t> float_to_zx(double value);
 vector<uint8_t> float_to_zx81(double value);
+vector<uint8_t> float_to_z88(double value);
 
 #if 0
 class FloatRepr {

@@ -11,9 +11,11 @@ X(ieee32)		// zcc --math32, 32 bit ieee-754
 X(ieee64)		// 64 bit ieee-754
 X(zx81)			// ZX-81 40 bit format
 X(zx)			// ZX-Spectrum 40 bit format
-
+X(z88)			// zcc -math-z88, 40 bit format for Z88
 
 #if 0
+//X(mbfs, 4, 128, 3, 0)		// 32 bit Microsoft single precision
+
 // floating point formats - copied from sccz80
 // X(type, fp_size, fp_exponent_bias, fp_mantissa_bytes, fp_fudge_offset)
 

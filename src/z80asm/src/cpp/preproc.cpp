@@ -192,6 +192,7 @@ void Preproc::close() {
 	m_macros.clear();
 
 	m_levels.emplace_back();
+	g_float_format.set(FloatFormat::Format::genmath);
 }
 
 bool Preproc::getline(string& line) {
@@ -315,6 +316,7 @@ void Preproc::parse_line(const string& line) {
 	if (check_opcode(Keyword::INCBIN, &Preproc::do_binary)) return;
 	if (check_opcode(Keyword::INCLUDE, &Preproc::do_include)) return;
 	if (check_opcode(Keyword::LOCAL, &Preproc::do_local)) return;
+	if (check_opcode(Keyword::SETFLOAT, &Preproc::do_setfloat)) return;
 	if (check_defl()) return;
 	if (check_macro()) return;
 	if (check_reptx()) return;
@@ -943,22 +945,12 @@ void Preproc::do_repti() {
 }
 
 void Preproc::do_float() {
-	if (m_lexer.peek().is(TType::Newline))
+	string expanded = expand(m_lexer.text_ptr());	// expand macros in line
+	Lexer sublexer{ expanded };
+
+	if (sublexer.peek().is(TType::Newline))
 		error_syntax();
-	// check for float type change
-	else if (m_lexer.peek().is(TType::Ident)) {
-		string format = m_lexer.peek().svalue;
-		m_lexer.next();
-		if (!m_lexer.peek().is(TType::Newline))
-			error_syntax();
-		else if (!set_float_format(format.c_str()))
-			error_invalid_float_format(get_float_formats());
-		else {}
-	}
-	// else parse list of float expressions
 	else {
-		string expanded = expand(m_lexer.text_ptr());	// expand macros in line
-		Lexer sublexer{ expanded };
 		while (true) {
 			// parse expression
 			FloatExpr expr{ sublexer };
@@ -971,8 +963,11 @@ void Preproc::do_float() {
 				return;
 			}
 			else {
-				string bytes_csv = vector_to_csv(g_float_format.float_to_bytes(expr.value()));
-				string line = "defb " + bytes_csv + "\n";
+				double value = expr.value();
+				vector<uint8_t> bytes = g_float_format.float_to_bytes(value);
+				string bytes_csv = vector_to_csv(bytes);
+				string line = "defb " + bytes_csv +
+					";float." + g_float_format.get_type() + "(" + std::to_string(value) + ")\n";
 				m_output.push_back(line);
 			}
 
@@ -988,6 +983,23 @@ void Preproc::do_float() {
 				return;
 			}
 		}
+	}
+}
+
+void Preproc::do_setfloat() {
+	string expanded = expand(m_lexer.text_ptr());	// expand macros in line
+	Lexer sublexer{ expanded };
+
+	if (sublexer.peek().is(TType::Newline))
+		error_syntax();
+	else if (sublexer.peek().is(TType::Ident)) {
+		string format = sublexer.peek().svalue;
+		sublexer.next();
+		if (!sublexer.peek().is(TType::Newline))
+			error_syntax();
+		else if (!set_float_format(format.c_str()))
+			error_invalid_float_format(get_float_formats());
+		else {}
 	}
 }
 

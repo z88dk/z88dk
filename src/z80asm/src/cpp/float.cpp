@@ -126,11 +126,8 @@ static void decompose_float(double raw, fp_decomposed* fs, int mant_bytes, int e
 		fs->sign = 1;
 }
 
-vector<uint8_t> float_to_genmath(double value) {
-	int fp_size = 6;
-	int mant_bytes = 5;
-	int exp_bias = 128;
-	int fudge_offset = 0;
+static vector<uint8_t> dofloat_z80(double value,
+	int fp_size = 6, int mant_bytes = 5, int exp_bias = 128, int fudge_offset = 0) {
 
 	vector<uint8_t> fa;
 	fa.resize(fp_size);
@@ -148,6 +145,10 @@ vector<uint8_t> float_to_genmath(double value) {
 	fa[i - offs + fudge_offset] = fs.exponent;
 
 	return fa;
+}
+
+vector<uint8_t> float_to_genmath(double value) {
+	return dofloat_z80(value, 6, 5, 128, 0);
 }
 
 vector<uint8_t> float_to_math48(double value) {
@@ -213,6 +214,28 @@ vector<uint8_t> float_to_ieee64(double value) {
 	return get_bytes(f.bytes, static_cast<int>(sizeof(f)));
 }
 
+// if integer: 0, 0, low, high, 0 (positive) | 0, 255, low, high, 0 (negative)
+// else: same as zx81
+vector<uint8_t> float_to_zx(double value) {
+	if (floor(value) == value && fabs(value) <= 65535.0) {
+		int ivalue = static_cast<int>(floor(value));
+		vector<uint8_t>	out;
+
+		out.push_back(0);
+		if (value >= 0.0)
+			out.push_back(0);
+		else
+			out.push_back(255);
+		out.push_back(ivalue & 0xff);
+		out.push_back((ivalue >> 8) & 0xff);
+		out.push_back(0);
+
+		return out;
+	}
+	else
+		return float_to_zx81(value);
+}
+
 // 1 byte exponent
 // 4 bytes mantissa, with first bit replaced by sign bit
 vector<uint8_t> float_to_zx81(double value) {
@@ -237,26 +260,8 @@ vector<uint8_t> float_to_zx81(double value) {
 	return out;
 }
 
-// if integer: 0, 0, low, high, 0 (positive) | 0, 255, low, high, 0 (negative)
-// else: same as zx81
-static vector<uint8_t> float_to_zx(double value) {
-	if (floor(value) == value && fabs(value) <= 65535.0) {
-		int ivalue = static_cast<int>(floor(value));
-		vector<uint8_t>	out;
-
-		out.push_back(0);
-		if (value >= 0.0)
-			out.push_back(0);
-		else
-			out.push_back(255);
-		out.push_back(ivalue & 0xff);
-		out.push_back((ivalue >> 8) & 0xff);
-		out.push_back(0);
-
-		return out;
-	}
-	else
-		return float_to_zx81(value);
+vector<uint8_t> float_to_z88(double value) {
+	return dofloat_z80(value, 5, 4, 127, 1);
 }
 
 //-----------------------------------------------------------------------------
@@ -355,8 +360,10 @@ double FloatExpr::parse_unary() {
 			m_parse_error = true;
 			return 0.0;
 		}
-		else
+		else {
+			m_lexer.next();
 			return a;
+		}
 	default:
 		a = parse_primary();
 		if (m_parse_error) return 0.0;
@@ -404,6 +411,8 @@ double FloatExpr::parse_primary() {
         case Keyword::ABS: m_lexer.next(); return parse_func(abs);
         case Keyword::HYPOT: m_lexer.next(); return parse_func2(hypot);
         case Keyword::FMOD: m_lexer.next(); return parse_func2(fmod);
+		case Keyword::PI: m_lexer.next(); return atan(1)*4;
+		case Keyword::E: m_lexer.next(); return exp(1);
 		default:
 			m_parse_error = true;
 			return 0.0;
@@ -459,18 +468,20 @@ double FloatExpr::parse_func2(double(*f)(double, double)) {
 
 //-----------------------------------------------------------------------------
 
-string FloatFormat::get_define() const {
+string FloatFormat::get_type() const {
 	// map Format::ieee32 -> "ieee32", ...
 	static unordered_map<Format, string> map = {
 #		define X(type)	{ Format::type, #type },
 #		include "float.def"
 	};
 
-	// build "__FLOAT_<TYPE>__"
 	auto found = map.find(m_format);
 	assert(found != map.end());
+	return found->second;
+}
 
-	string define_name = str_toupper("__FLOAT_" + found->second + "__");
+string FloatFormat::get_define() const {
+	string define_name = str_toupper("__FLOAT_" + get_type() + "__");
 	return define_name;
 }
 
