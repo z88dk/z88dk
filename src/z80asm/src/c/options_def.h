@@ -16,43 +16,43 @@ Define command line options
 #define OPT_VAR(type, name, default)
 #endif
 
-OPT_VAR( bool,		verbose,	false	)
-OPT_VAR( bool,		symtable,	false	)
-OPT_VAR( bool,		list,		false	)	/* -l flag */
-OPT_VAR( bool,		cur_list,	false	)	/* current LSTON/LSTOFF status */
-OPT_VAR( bool,		map,		false	)
-OPT_VAR( bool,		ti83plus,	false	)
-OPT_VAR( bool,		swap_ix_iy,	false	)
-OPT_VAR( bool,      debug_info, false   )	/* add debug info to map file */
-OPT_VAR( bool,		globaldef,	false	)
-OPT_VAR( bool,		make_bin,	false	)
-OPT_VAR( bool,		split_bin,	false   )	/* true to split binary file per section */
-OPT_VAR( bool,		date_stamp,	false	)
-OPT_VAR( bool,		relocatable, false	)
-OPT_VAR( bool,      reloc_info, false   )	/* generate .reloc file */
-OPT_VAR( bool,		opt_speed,	false   )
-OPT_VAR( bool,      ucase,      false   )	/* convert identifies to upper case */
+OPT_VAR(bool, verbose, false)
+OPT_VAR(bool, symtable, false)
+OPT_VAR(bool, list, false)	/* -l flag */
+OPT_VAR(bool, cur_list, false)	/* current LSTON/LSTOFF status */
+OPT_VAR(bool, map, false)
+OPT_VAR(bool, ti83plus, false)
+OPT_VAR(bool, swap_ix_iy, false)
+OPT_VAR(bool, debug_info, false)	/* add debug info to map file */
+OPT_VAR(bool, globaldef, false)
+OPT_VAR(bool, make_bin, false)
+OPT_VAR(bool, split_bin, false)	/* true to split binary file per section */
+OPT_VAR(bool, date_stamp, false)
+OPT_VAR(bool, relocatable, false)
+OPT_VAR(bool, reloc_info, false)	/* generate .reloc file */
+OPT_VAR(bool, opt_speed, false)
+OPT_VAR(bool, ucase, false)	/* convert identifies to upper case */
 
 OPT_VAR(appmake_t, appmake, APPMAKE_NONE)
-OPT_VAR(const char *, appmake_opts, "")
-OPT_VAR(const char *, appmake_ext, "")
+OPT_VAR(const char*, appmake_opts, "")
+OPT_VAR(const char*, appmake_ext, "")
 OPT_VAR(int, appmake_origin_min, -1)
 OPT_VAR(int, appmake_origin_max, -1)
 
 OPT_VAR(int, cpu, CPU_Z80)
-OPT_VAR(const char *, cpu_name, CPU_Z80_NAME)
+OPT_VAR(const char*, cpu_name, CPU_Z80_NAME)
 
-OPT_VAR(const char *,	bin_file,	NULL	)	/* set by -o */
-OPT_VAR(const char *,	lib_file,	NULL	)	/* set by -x */
-OPT_VAR(const char *,    consol_obj_file, NULL)	/* set by -o and no -b */
-OPT_VAR(const char *,    output_directory, NULL)	/* set by -O */
+OPT_VAR(const char*, bin_file, NULL)	/* set by -o */
+OPT_VAR(const char*, lib_file, NULL)	/* set by -x */
+OPT_VAR(const char*, consol_obj_file, NULL)	/* set by -o and no -b */
+OPT_VAR(const char*, output_directory, NULL)	/* set by -O */
 
-OPT_VAR(argv_t *,	inc_path, NULL)			/* path for include files */
-OPT_VAR(argv_t *,	lib_path, NULL)			/* path for library files */
+OPT_VAR(argv_t*, inc_path, NULL)			/* path for include files */
+OPT_VAR(argv_t*, lib_path, NULL)			/* path for library files */
 
-OPT_VAR(argv_t *,	files,	  NULL)			/* list of input files */
+OPT_VAR(argv_t*, files, NULL)			/* list of input files */
 
-OPT_VAR(int,		filler,		0)			/* filler byte for defs */
+OPT_VAR(int, filler, 0)			/* filler byte for defs */
 
 /*-----------------------------------------------------------------------------
 *   define options
@@ -74,6 +74,7 @@ OPT(OptSet, &opts.swap_ix_iy, "-IXIY", "", "Swap IX and IY registers", "")
 OPT(OptStringList, &opts.inc_path, "-I", "", "Add directory to include search path", "PATH")
 OPT(OptCallArg, option_define, "-D", "", "Define a static symbol", "SYMBOL[=VALUE]")
 OPT(OptSet, &opts.ucase, "-ucase", "", "Convert identifiers to upper case", "")
+OPT(OptCall, option_dummy, "-float=FORMAT", "", "Set default float format", "")
 
 OPT_TITLE("Code Generation Options:")
 OPT(OptCall, option_cpu_z80n, "-mz80n", "", "Assemble for the Z80 variant of ZX Next", "")

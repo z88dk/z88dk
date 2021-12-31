@@ -1,10 +1,11 @@
 //-----------------------------------------------------------------------------
 // z80asm
 // preprocessor
-// // Copyright (C) Paulo Custodio, 2011-2021
+// Copyright (C) Paulo Custodio, 2011-2021
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "float.h"
 #include "if.h"
 #include "lex.h"
 #include "preproc.h"
@@ -191,6 +192,7 @@ void Preproc::close() {
 	m_macros.clear();
 
 	m_levels.emplace_back();
+	g_float_format.set(FloatFormat::Format::genmath);
 }
 
 bool Preproc::getline(string& line) {
@@ -310,9 +312,11 @@ void Preproc::parse_line(const string& line) {
 	if (check_hash_directive(Keyword::UNDEF, &Preproc::do_undef)) return;
 	if (check_opcode(Keyword::BINARY, &Preproc::do_binary)) return;
 	if (check_opcode(Keyword::EXITM, &Preproc::do_exitm)) return;
+	if (check_opcode(Keyword::FLOAT, &Preproc::do_float)) return;
 	if (check_opcode(Keyword::INCBIN, &Preproc::do_binary)) return;
 	if (check_opcode(Keyword::INCLUDE, &Preproc::do_include)) return;
 	if (check_opcode(Keyword::LOCAL, &Preproc::do_local)) return;
+	if (check_opcode(Keyword::SETFLOAT, &Preproc::do_setfloat)) return;
 	if (check_defl()) return;
 	if (check_macro()) return;
 	if (check_reptx()) return;
@@ -940,6 +944,65 @@ void Preproc::do_repti() {
 	}
 }
 
+void Preproc::do_float() {
+	string expanded = expand(m_lexer.text_ptr());	// expand macros in line
+	Lexer sublexer{ expanded };
+
+	if (sublexer.peek().is(TType::Newline))
+		error_syntax();
+	else {
+		while (true) {
+			// parse expression
+			FloatExpr expr{ sublexer };
+			if (!expr.parse()) {
+				error_syntax_expr();
+				return;
+			}
+			else if (expr.eval_error()) {
+				error_float_eval_error();
+				return;
+			}
+			else {
+				double value = expr.value();
+				vector<uint8_t> bytes = g_float_format.float_to_bytes(value);
+				string bytes_csv = vector_to_csv(bytes);
+				string line = "defb " + bytes_csv +
+					";float." + g_float_format.get_type() + "(" + std::to_string(value) + ")\n";
+				m_output.push_back(line);
+			}
+
+			// check for next
+			if (sublexer.peek().is(TType::Comma)) {
+				sublexer.next();
+				continue;
+			}
+			else if (sublexer.peek().is(TType::Newline))
+				break;
+			else {
+				error_syntax();
+				return;
+			}
+		}
+	}
+}
+
+void Preproc::do_setfloat() {
+	string expanded = expand(m_lexer.text_ptr());	// expand macros in line
+	Lexer sublexer{ expanded };
+
+	if (sublexer.peek().is(TType::Newline))
+		error_syntax();
+	else if (sublexer.peek().is(TType::Ident)) {
+		string format = sublexer.peek().svalue;
+		sublexer.next();
+		if (!sublexer.peek().is(TType::Newline))
+			error_syntax();
+		else if (!set_float_format(format.c_str()))
+			error_invalid_float_format(get_float_formats());
+		else {}
+	}
+}
+
 ExpandedText Preproc::expand(Lexer& lexer, Macros& defines) {
 	ExpandedText out;
 
@@ -959,6 +1022,7 @@ ExpandedText Preproc::expand(Lexer& lexer, Macros& defines) {
 			out.append(":");
 			break;
 		case TType::Integer: out.append(to_string(token.ivalue)); break;
+		case TType::Floating: out.append(to_string(token.fvalue)); break;
 		case TType::String: out.append("\"" + str_expand_escapes(token.svalue) + "\""); break;
 		case TType::ASMPC: out.append("$"); break;
 		case TType::BinNot: out.append("~"); break;

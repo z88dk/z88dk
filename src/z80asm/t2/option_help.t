@@ -1,22 +1,12 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-# Z88DK Z80 Macro Assembler
-#
-# Copyright (C) Paulo Custodio, 2011-2020
-# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/z88dk/z88dk/
-#
-# Test -h
+BEGIN { use lib 't2'; require 'testlib.pl'; }
 
-use Modern::Perl;
-use Test::More;
-require './t/testlib.pl';
-
-my $config = slurp("../config.h");
+my $config = path("../config.h")->slurp;
 my($version) = $config =~ /Z88DK_VERSION\s*"(.*)"/;
 ok $version, "version $version";
 
-run("./z88dk-z80asm -h", 0, <<"END", "");
+capture_ok("./z88dk-z80asm -h", <<"END");
 Z80 Module Assembler $version
 (c) InterLogic 1993-2009, Paulo Custodio 2011-2021
 
@@ -50,6 +40,7 @@ Preprocessor Options:
   -IPATH                 Add directory to include search path
   -DSYMBOL[=VALUE]       Define a static symbol
   -ucase                 Convert identifiers to upper case
+  -float=FORMAT          Set default float format
 
 Code Generation Options:
   -mz80n                 Assemble for the Z80 variant of ZX Next
@@ -94,19 +85,19 @@ Appmake Options:
                          for above RAMTOP
 END
 
-run("./z88dk-z80asm -h=x", 1, "", <<END);
+capture_nok("./z88dk-z80asm -h=x", <<END);
 Error: illegal option: -h=x
 END
 
 # make sure help fist in 80 columns
 ok open(my $fh, "<", __FILE__), "open ".__FILE__;
 while (<$fh>) {
-	next if /^\s*\#/;
-	chomp;
-	if (length($_) > 80) {
-		ok 0, "line $. longer than 80 chars";
-	}
+    next if /^\s*\#/;
+    chomp;
+    if (length($_) > 80) {
+        ok 0, "line $. longer than 80 chars";
+    }
 }
 
-unlink_testfiles();
-done_testing();
+unlink_testfiles;
+done_testing;

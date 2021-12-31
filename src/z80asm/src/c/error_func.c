@@ -565,3 +565,21 @@ void error_assertion_failed(void)
 	
 	STR_DELETE(msg);
 }
+void error_invalid_float_format(const char* formats)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	Str_append_sprintf( msg, "invalid float format, expected one of: %s", formats );
+	do_error( ErrError, Str_data(msg) );
+	
+	STR_DELETE(msg);
+}
+void error_float_eval_error(void)
+{
+	STR_DEFINE(msg, STR_SIZE);
+
+	Str_append_sprintf( msg, "float expression cannot be evaluated" );
+	do_error( ErrError, Str_data(msg) );
+	
+	STR_DELETE(msg);
+}

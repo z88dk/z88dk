@@ -64,3 +64,5 @@ extern void warn_dma_half_cycle_timing(void);
 extern void warn_dma_ready_signal_unsupported(void);
 extern void error_cmd_failed(const char *cmd);
 extern void error_assertion_failed(void);
+extern void error_invalid_float_format(const char* formats);
+extern void error_float_eval_error(void);

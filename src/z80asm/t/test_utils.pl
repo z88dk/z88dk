@@ -229,6 +229,7 @@ sub t_z80asm {
 #------------------------------------------------------------------------------
 sub t_z80asm_error {
 	my($code, $expected_err, $options) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	my $line = "[line ".((caller)[2])."]";
 	(my $test_name = $code) =~ s/\n.*/.../s;
@@ -264,6 +265,7 @@ sub t_z80asm_error {
 #------------------------------------------------------------------------------
 sub t_z80asm_ok {
 	my($address_hex, $code, $expected_binary, $options, $expected_warnings) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	$expected_warnings ||= "";
 	chomp_eol($expected_warnings);
@@ -300,6 +302,7 @@ sub t_z80asm_ok {
 #------------------------------------------------------------------------------
 sub t_binary {
 	my($binary, $expected_binary, $test_name) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	$test_name //= "[line ".((caller)[2])."]";
 	$binary //= "";
@@ -331,6 +334,7 @@ sub t_binary {
 #------------------------------------------------------------------------------
 sub t_z80asm_capture {
 	my($args, $expected_out, $expected_err, $expected_retval) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	my $line = "[line ".((caller)[2])."]";
 	ok 1, $line." t_z80asm_capture - ".z80asm()." ".$args;
@@ -481,6 +485,7 @@ sub libfile {
 #------------------------------------------------------------------------------
 sub t_compile_module {
 	my($init_code, $main_code, $compile_args) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	# modules to include always
 	$compile_args .= " src/c/alloc.o ";
@@ -581,6 +586,7 @@ int main (int argc, char **argv)
 #------------------------------------------------------------------------------
 sub t_run_module {
 	my($args, $expected_out, $expected_err, $expected_exit) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	note "line ", (caller)[2], ": test$Config{_exe} @$args";
 	my($out, $err, $exit) = capture { system("./test$Config{_exe}", @$args) };
@@ -710,6 +716,7 @@ sub get_gcc_options {
 #------------------------------------------------------------------------------
 sub is_text {
 	my($got, $expected, $name) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	# normalize white space
 	for ($got, $expected) {

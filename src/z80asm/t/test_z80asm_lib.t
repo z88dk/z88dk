@@ -37,6 +37,7 @@ run("./z88dk-z80asm -b -v test.asm", 0, <<'END', "");
 Reading library 'z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
 Predefined constant: __CPU_ZILOG__ = $0001
+Predefined constant: __FLOAT_GENMATH__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -49,8 +50,7 @@ Creating binary 'test.bin'
 END
 t_binary(path("test.bin")->slurp_raw, pack("C*", 0xCD, 0x04, 0x00, 0xC9, @RLD_AT_0004));
 
-
-# run with lib pointed bt ZCCCFG
+# run with lib pointed by ZCCCFG
 $ENV{ZCCCFG} = 'testdir/root/lib/config';
 move('z88dk-z80asm-z80-.lib', $ENV{ZCCCFG}.'/../z88dk-z80asm-z80-.lib');
 run("./z88dk-z80asm -b -v test.asm", 0, <<'END', "");
@@ -59,6 +59,7 @@ Library '/usr/local/share/z88dk/lib/z88dk-z80asm-z80-.lib' not found
 Reading library 'testdir/root/lib/z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
 Predefined constant: __CPU_ZILOG__ = $0001
+Predefined constant: __FLOAT_GENMATH__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -79,6 +80,7 @@ Library '/usr/local/share/z88dk/lib/z88dk-z80asm-z80-.lib' not found
 Reading library 'testdir/root/lib/z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
 Predefined constant: __CPU_ZILOG__ = $0001
+Predefined constant: __FLOAT_GENMATH__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -99,6 +101,7 @@ Library '/usr/local/share/z88dk/lib/z88dk-z80asm-z80-.lib' not found
 Library '/../z88dk-z80asm-z80-.lib' not found
 Predefined constant: __CPU_Z80__ = $0001
 Predefined constant: __CPU_ZILOG__ = $0001
+Predefined constant: __FLOAT_GENMATH__ = $0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
@@ -139,6 +142,8 @@ done_testing;
 
 sub run {
 	my($cmd, $ret, $out, $err) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
 	ok 1, $cmd;
 	my($stdout, $stderr, $return) = capture { system $cmd; };
 	is_text( $stdout, ($out // ""), "stdout" );
@@ -162,6 +167,7 @@ sub exp_output {
 Reading library '$library'
 Predefined constant: __CPU_${cpu}__ = \$0001
 Predefined constant: __CPU_${family}__ = \$0001$swap_ixiy
+Predefined constant: __FLOAT_GENMATH__ = \$0001
 Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'

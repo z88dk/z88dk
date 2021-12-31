@@ -410,98 +410,129 @@ END_ERR
 # test CPU-defining constants
 #-------------------------------------------------------------------------------
 
-path("$test.asm")->spew(<<END_ASM);
-		if __CPU_Z80__
-			defb 1
-		endif
-		if __CPU_Z80N__
-			defb 2
-		endif
-		if __CPU_Z180__
-			defb 3
-		endif
-		if __CPU_R2KA__
-			defb 4
-		endif
-		if __CPU_R3K__
-			defb 5
-		endif
-		if __CPU_8080__
-			defb 6
-		endif
-		if __CPU_8085__
-			defb 7
-		endif
-		if __CPU_GBZ80__
-			defb 8
-		endif
-		if __CPU_ZILOG__
-			defb 9
-		endif
-		if __CPU_RABBIT__
-			defb 10
-		endif
-		if __CPU_INTEL__
-			defb 11
-		endif
-		if __SWAP_IX_IY__
-			defb 12
-		endif
+path("$test.asm")->spew(<<'END_ASM');
+		if __CPU_Z80__				\ defb  1 \ endif
+		if __CPU_Z80N__				\ defb  2 \ endif
+		if __CPU_Z180__				\ defb  3 \ endif
+		if __CPU_R2KA__				\ defb  4 \ endif
+		if __CPU_R3K__				\ defb  5 \ endif
+		if __CPU_8080__				\ defb  6 \ endif
+		if __CPU_8085__				\ defb  7 \ endif
+		if __CPU_GBZ80__			\ defb  8 \ endif
+		if __CPU_ZILOG__			\ defb  9 \ endif
+		if __CPU_RABBIT__			\ defb 10 \ endif
+		if __CPU_INTEL__			\ defb 11 \ endif
+		if __SWAP_IX_IY__			\ defb 12 \ endif
+		
+		if __FLOAT_GENMATH__		\ defb 30 \ endif
+		if __FLOAT_MATH48__			\ defb 31 \ endif
+		if __FLOAT_IEEE16__			\ defb 32 \ endif
+		if __FLOAT_IEEE32__			\ defb 33 \ endif
+		if __FLOAT_IEEE64__			\ defb 34 \ endif
+		if __FLOAT_ZX__				\ defb 35 \ endif
+		if __FLOAT_ZX81__			\ defb 36 \ endif
+		
+;		if __FLOAT_Z80__			\ defb 21 \ endif
+;		if __FLOAT_IEEE__			\ defb 22 \ endif
+;		if __FLOAT_MBFS__			\ defb 23 \ endif
+;		if __FLOAT_MBF40__			\ defb 24 \ endif
+;		if __FLOAT_MBF64__			\ defb 25 \ endif
+;		if __FLOAT_Z88__			\ defb 26 \ endif
+;		if __FLOAT_AM9511__			\ defb 28 \ endif
 END_ASM
 
 capture_ok("./z88dk-z80asm -b $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9));
+check_bin_file("$test.bin", bytes(1, 9, 30));
 
 capture_ok("./z88dk-z80asm -b -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 12));
+check_bin_file("$test.bin", bytes(1, 9, 12, 30));
 
 capture_ok("./z88dk-z80asm -b -mz80 $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9));
+check_bin_file("$test.bin", bytes(1, 9, 30));
 
 capture_ok("./z88dk-z80asm -b -mz80 -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 12));
+check_bin_file("$test.bin", bytes(1, 9, 12, 30));
 
 capture_ok("./z88dk-z80asm -b -mz80n $test.asm", "");
-check_bin_file("$test.bin", bytes(2, 9));
+check_bin_file("$test.bin", bytes(2, 9, 30));
 
 capture_ok("./z88dk-z80asm -b -mz80n -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(2, 9, 12));
+check_bin_file("$test.bin", bytes(2, 9, 12, 30));
 
 capture_ok("./z88dk-z80asm -b -mz180 $test.asm", "");
-check_bin_file("$test.bin", bytes(3, 9));
+check_bin_file("$test.bin", bytes(3, 9, 30));
 
 capture_ok("./z88dk-z80asm -b -mz180 -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(3, 9, 12));
+check_bin_file("$test.bin", bytes(3, 9, 12, 30));
 
 capture_ok("./z88dk-z80asm -b -mr2ka $test.asm", "");
-check_bin_file("$test.bin", bytes(4, 10));
+check_bin_file("$test.bin", bytes(4, 10, 30));
 
 capture_ok("./z88dk-z80asm -b -mr2ka -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(4, 10, 12));
+check_bin_file("$test.bin", bytes(4, 10, 12, 30));
 
 capture_ok("./z88dk-z80asm -b -mr3k $test.asm", "");
-check_bin_file("$test.bin", bytes(5, 10));
+check_bin_file("$test.bin", bytes(5, 10, 30));
 
 capture_ok("./z88dk-z80asm -b -mr3k -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(5, 10, 12));
+check_bin_file("$test.bin", bytes(5, 10, 12, 30));
 
 capture_ok("./z88dk-z80asm -b -m8080 $test.asm", "");
-check_bin_file("$test.bin", bytes(6, 11));
+check_bin_file("$test.bin", bytes(6, 11, 30));
 
 capture_ok("./z88dk-z80asm -b -m8080 -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(6, 11, 12));
+check_bin_file("$test.bin", bytes(6, 11, 12, 30));
 
 capture_ok("./z88dk-z80asm -b -m8085 $test.asm", "");
-check_bin_file("$test.bin", bytes(7, 11));
+check_bin_file("$test.bin", bytes(7, 11, 30));
 
 capture_ok("./z88dk-z80asm -b -m8085 -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(7, 11, 12));
+check_bin_file("$test.bin", bytes(7, 11, 12, 30));
 
 capture_ok("./z88dk-z80asm -b -mgbz80 $test.asm", "");
-check_bin_file("$test.bin", bytes(8));
+check_bin_file("$test.bin", bytes(8, 30));
 
 capture_ok("./z88dk-z80asm -b -mgbz80 -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(8, 12));
+check_bin_file("$test.bin", bytes(8, 12, 30));
+
+capture_ok("./z88dk-z80asm -b -float=genmath $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 30));
+
+capture_ok("./z88dk-z80asm -b -float=math48 $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 31));
+
+capture_ok("./z88dk-z80asm -b -float=ieee16 $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 32));
+
+capture_ok("./z88dk-z80asm -b -float=ieee32 $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 33));
+
+capture_ok("./z88dk-z80asm -b -float=ieee64 $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 34));
+
+capture_ok("./z88dk-z80asm -b -float=zx $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 35));
+
+capture_ok("./z88dk-z80asm -b -float=zx81 $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 36));
+
+# capture_ok("./z88dk-z80asm -b -float=ieee $test.asm", "");
+# check_bin_file("$test.bin", bytes(1, 9, 22));
+# 
+# capture_ok("./z88dk-z80asm -b -float=mbfs $test.asm", "");
+# check_bin_file("$test.bin", bytes(1, 9, 23));
+# 
+# capture_ok("./z88dk-z80asm -b -float=mbf40 $test.asm", "");
+# check_bin_file("$test.bin", bytes(1, 9, 24));
+# 
+# capture_ok("./z88dk-z80asm -b -float=mbf64 $test.asm", "");
+# check_bin_file("$test.bin", bytes(1, 9, 25));
+# 
+# capture_ok("./z88dk-z80asm -b -float=z88 $test.asm", "");
+# check_bin_file("$test.bin", bytes(1, 9, 26));
+# 
+# capture_ok("./z88dk-z80asm -b -float=am9511 $test.asm", "");
+# check_bin_file("$test.bin", bytes(1, 9, 28));
 
 unlink_testfiles;
 done_testing;

@@ -149,6 +149,8 @@ private:
 	void do_rept();
 	void do_reptc();
 	void do_repti();
+	void do_float();
+	void do_setfloat();
 
 	ExpandedText expand(Lexer& lexer, Macros& defines);
 	string expand(const string& text);

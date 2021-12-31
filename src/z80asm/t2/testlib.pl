@@ -53,9 +53,9 @@ sub z80asm_ok {
     $options ||= "-b";
     $files ||= $asm_file;
 
-    run_ok("./z88dk-z80asm $options $files 2> ${test}.err");
+    run_ok("./z88dk-z80asm $options $files 2> ${test}.stderr");
     check_bin_file($bin_file, $bin);
-    check_txt_file("${test}.err", $exp_warn) if $exp_warn;
+    check_txt_file("${test}.stderr", $exp_warn) if $exp_warn;
 }
 
 sub z80asm_nok {
@@ -77,16 +77,16 @@ sub capture_ok {
     my($cmd, $exp_out) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
-    run_ok($cmd." > ${test}.out");
-    check_txt_file("${test}.out", $exp_out);
+    run_ok($cmd." > ${test}.stdout");
+    check_txt_file("${test}.stdout", $exp_out);
 }
 
 sub capture_nok {
     my($cmd, $exp_err) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    run_nok($cmd." 2> ${test}.err");
-    check_txt_file("${test}.err", $exp_err);
+    run_nok($cmd." 2> ${test}.stderr");
+    check_txt_file("${test}.stderr", $exp_err);
 }
 
 sub run_ok {

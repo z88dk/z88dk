@@ -327,3 +327,13 @@ errors:
     func	: error_assertion_failed
     args	: void
     message	: "\"assertion failed\""
+
+  - type	: ErrError
+    func	: error_invalid_float_format
+    args	: const char* formats
+    message	: "\"invalid float format, expected one of: %s\", formats"
+
+  - type	: ErrError
+    func	: error_float_eval_error
+    args	: void
+    message	: "\"float expression cannot be evaluated\""
