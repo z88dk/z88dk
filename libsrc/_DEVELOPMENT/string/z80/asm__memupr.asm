@@ -33,6 +33,7 @@ asm__memupr:
    push hl
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
+
    dec bc
    inc b
    inc c
@@ -40,13 +41,7 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
 loop:
    ld a,(hl)
    call asm_toupper
-
-IF __CPU_GBZ80__
    ld (hl+),a
-ELSE
-   ld (hl),a
-   inc hl
-ENDIF
 
    dec c
    jr NZ,loop

@@ -33,25 +33,23 @@ asm_strcat:
    ex de,hl
 
 loop:                          ; append s2 to s1
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
-  IF __CPU_GBZ80__
+
    ld a,(hl+)
-  ELSE
-   ld a,(hl)
-   inc hl
-  ENDIF
-   ld (de),a
-   inc de
+   ld (de+),a
+
    or a                        ; end of string?
    jr NZ,loop
 
 ELSE
+
    cp (hl)
    ldi
    jr NZ,loop
 
 ENDIF
-   pop hl                      ; hl = dst
 
+   pop hl                      ; hl = dst
    dec de
    ret

@@ -53,7 +53,6 @@ asm_memmove:
 
    jp Z,asm1_memcpy           ; if dst == src, do nothing
 
-
 use_lddr:
    push de
    dec bc
@@ -66,18 +65,13 @@ use_lddr:
    push de
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
+
    inc b
    inc c
 
 loop:
- IF __CPU_GBZ80__
    ld a,(hl-)
- ELSE
-   ld a,(hl)
-   dec hl
- ENDIF
-   ld (de),a
-   dec de
+   ld (de-),a
 
    dec c
    jr NZ,loop
@@ -85,6 +79,7 @@ loop:
    jr NZ,loop
 
 ELSE
+
    inc bc
    lddr
 
@@ -95,3 +90,4 @@ ENDIF
 
    pop hl
    ret
+

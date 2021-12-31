@@ -81,19 +81,14 @@ asm0_memcpy:
    push de
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
+
    dec bc
    inc b
    inc c
 
 loop:
- IF __CPU_GBZ80__
    ld a,(hl+)
- ELSE
-   ld a,(hl)
-   inc hl
- ENDIF
-   ld (de),a
-   inc de
+   ld (de+),a
 
    dec c
    jr NZ,loop
@@ -101,6 +96,7 @@ loop:
    jr NZ,loop
 
 ELSE
+
    ldir
 
 ENDIF

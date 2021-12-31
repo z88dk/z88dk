@@ -62,6 +62,7 @@ loop:
    ld (de),a
    inc de
    jr Z,match
+
    dec c
    jr NZ,loop
    dec b

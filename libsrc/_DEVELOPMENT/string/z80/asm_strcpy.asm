@@ -29,19 +29,14 @@ asm_strcpy:
 IF __CPU_INTEL__ || __CPU_GBZ80__
 
 loop:
-IF __CPU_GBZ80__
    ld a,(hl+)
-ELSE
-   ld a,(hl)
-   inc hl
-ENDIF
+   ld (de+),a
 
-   ld (de),a
-   inc de
    or a
    jr NZ,loop
 
 ELSE
+
    xor a
 loop:
    cp (hl)

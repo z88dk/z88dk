@@ -35,7 +35,7 @@ asm_memswap:
 asm0_memswap:
    push hl
 
-IF __CPU_GBZ80__ || __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
 
    dec bc
    inc b
@@ -43,18 +43,16 @@ IF __CPU_GBZ80__ || __CPU_INTEL__
 
 loop:
    push bc
+
    ld a,(de)
    ld c,a
+
    ld a,(hl)
-   ld (de),a
-   inc de
+   ld (de+),a
+
    ld a,c
- IF __CPU_GBZ80__
    ld (hl+),a
- ELSE
-   ld (hl),a
-   inc hl
- ENDIF
+
    pop bc
    dec c
    jr NZ,loop
@@ -62,6 +60,7 @@ loop:
    jr NZ,loop
 
 ELSE
+
 loop:
    ld a,(de)
    ldi

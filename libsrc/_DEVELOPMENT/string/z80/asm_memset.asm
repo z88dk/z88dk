@@ -70,6 +70,7 @@ big:
 ELSE
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
+
    push hl
 
    dec bc
@@ -77,12 +78,8 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    inc c
 
 loop:
- IF __CPU_GBZ80__
    ld (hl+),a
- ELSE
-   ld (hl),a
-   inc hl
- ENDIF
+
    dec c
    jr NZ,loop
    dec b
@@ -91,6 +88,7 @@ loop:
    ex de,hl
 
 ELSE
+
    ld (hl),a
    inc de
    dec bc

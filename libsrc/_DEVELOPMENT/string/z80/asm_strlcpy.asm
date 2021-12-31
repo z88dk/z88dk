@@ -39,6 +39,7 @@ asm_strlcpy:
    jr Z,szexceeded1
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
+
    dec bc
    inc b
    inc c
@@ -48,14 +49,8 @@ cpyloop:
    cp (hl)                     ; end of src ?
    jr Z,done
 
-IF __CPU_GBZ80__
    ld a,(hl+)
-ELSE
-   ld a,(hl)
-   inc hl
-ENDIF
-   ld (de),a
-   inc de
+   ld (de+),a
 
    dec c
    jr NZ,cpyloop
@@ -63,6 +58,7 @@ ENDIF
    jr NZ,cpyloop
 
 ELSE
+
    xor a
 
 cpyloop:
@@ -91,6 +87,7 @@ szexceeded1:
    ; stack = char *src
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
+
 loop:
    cp (hl)
    jr Z,found                  ; find end of src
@@ -105,6 +102,7 @@ loop:
 found:
 
 ELSE
+
    cpir                        ; find end of src
    dec hl
 

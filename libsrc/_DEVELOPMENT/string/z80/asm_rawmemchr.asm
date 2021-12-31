@@ -31,6 +31,7 @@ loop:
    cp (hl)
    jr Z,matched
    inc hl
+
    dec c
    jr NZ,loop
    dec b

@@ -27,23 +27,23 @@ asm_stpcpy:
    xor a
    
 loop:
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
- IF __CPU_GBZ80__
+
    ld a,(hl+)
- ELSE
-   ld a,(hl)
-   inc hl
- ENDIF
-   ld (de),a
-   inc de
+   ld (de+),a
+
    and a
    jr NZ,loop
+
 ELSE
+
    cp (hl)
    ldi
    jr NZ,loop
+
 ENDIF
-   
+
    dec de
    dec hl
 

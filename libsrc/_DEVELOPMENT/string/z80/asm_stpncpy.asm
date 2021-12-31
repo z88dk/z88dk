@@ -49,10 +49,8 @@ loop:
    cp (hl)
    jr Z,copied
 
-   ld a,(hl)
-   inc hl
-   ld (de),a
-   inc de
+   ld a,(hl+)
+   ld (de+),a
 
    dec c
    jr NZ,loop
@@ -63,8 +61,8 @@ copied:
    ld hl,de                     ; save addr of first NUL in s1
    xor a
 zeroloop:
-   ld (de),a
-   inc de
+   ld (de+),a
+
    dec c
    jr NZ,zeroloop
    dec b

@@ -80,10 +80,8 @@ cpyloop:
    cp (hl)
    jr Z,success
 
-   ld a,(hl)
-   inc hl
-   ld (de),a
-   inc de
+   ld a,(hl+)
+   ld (de+),a
 
    dec c
    jr NZ,cpyloop

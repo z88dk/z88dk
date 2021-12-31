@@ -43,7 +43,7 @@ asm__strrstrip:
    add hl,de                   ; hl = s + strlen(s)
    dec hl                      ; hl points at last char in s
 
-IF __CPU_GBZ80__ || __CPU_INTEL__
+IF __CPU_INTEL__ || __CPU_GBZ80__
 
    dec bc
    inc b
@@ -62,6 +62,7 @@ loop:
    jr NZ,loop
 
 ELSE
+
 loop:
    ld a,(hl)
    call asm_isspace
@@ -69,6 +70,7 @@ loop:
 
    cpd                         ; hl--, bc--
    jp PE,loop
+
 ENDIF
 
 all_ws:

@@ -47,12 +47,7 @@ asm_memset_wr:
    inc c
 
 loop:
- IF __CPU_GBZ80__
    ld (hl+),a
- ELSE
-   ld (hl),a
-   inc hl
- ENDIF
 
    dec c
    jr NZ,loop

@@ -35,8 +35,9 @@ asm_strncpy:
    ld a,b
    or c
    jr Z,done
-      
+
    ; first copy src to dst
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
 
    dec bc
@@ -44,12 +45,7 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    inc c
 
 loop:
-IF __CPU_GBZ80__
    ld a,(hl+)
-ELSE
-   ld a,(hl)
-   inc hl
-ENDIF
    ld (de),a
    and a
    jr Z,copied
@@ -67,8 +63,7 @@ copied:
    ; now pad with zeroes
 
 zeroloop:
-   ld (de),a
-   inc de
+   ld (de+),a
 
    dec c
    jr NZ,zeroloop
@@ -76,6 +71,7 @@ zeroloop:
    jr NZ,zeroloop
 
 ELSE
+
    xor a
 
 loop:

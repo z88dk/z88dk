@@ -55,44 +55,34 @@ asm0_strdup:
 
    push hl                     ; save char *str (dup)
 
+   ex de,hl
+
 IF __CPU_INTEL || __CPU_GBZ80__
+
    dec bc
    inc b
    inc c
+
 loop:
-   ld a,(de)
-   inc de
-IF __CPU_GBZ80__
-   ld (hl+),a
-ELSE
-   ld (hl),a
-   inc hl
-ENDIF
+   ld a,(hl+)
+   ld (de+),a
 
    dec c
    jr NZ,loop
    dec b
    jr NZ,loop
 
-   ; ensure terminating NUL written, strndup requires it
-
-IF __CPU_GBZ80__
-   ld (hl+),a
 ELSE
-   ld (hl),a
-   inc hl
-ENDIF
 
-ELSE
-   ex de,hl
    ldir
+
+ENDIF
 
    ; ensure terminating NUL written, strndup requires it
 
    dec de
    xor a
    ld (de),a
-ENDIF
 
    pop hl
    ret

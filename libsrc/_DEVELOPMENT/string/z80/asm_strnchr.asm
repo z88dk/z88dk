@@ -47,12 +47,7 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    inc c
 
 loop:
- IF __CPU_GBZ80__
    ld a,(hl+)
- ELSE
-   ld a,(hl)
-   inc hl
- ENDIF
    cp e
    jr Z,match
 
@@ -67,6 +62,7 @@ loop:
    jp error_zc
 
 ELSE
+
    ld a,e
 
 loop:
