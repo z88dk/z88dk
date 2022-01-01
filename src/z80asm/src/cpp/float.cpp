@@ -277,7 +277,7 @@ vector<uint8_t> float_to_zx81(double value) {
 }
 
 vector<uint8_t> float_to_z88(double value) {
-	return dofloat_z80(value, 5, 4, 127, 1);
+	return dofloat_z80(value, 6, 4, 127, 1);	// leading zero + 5 bytes
 }
 
 vector<uint8_t> float_to_mbfs(double value) {
@@ -305,7 +305,7 @@ vector<uint8_t> float_to_mbfs(double value) {
 }
 
 vector<uint8_t> float_to_mbf40(double value) {
-	int fp_size = 5;
+	int fp_size = 6;			// 5 bytes + trailing zero
 
 	vector<uint8_t> fa;
 	fa.resize(fp_size);
