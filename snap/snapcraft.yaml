@@ -30,7 +30,7 @@ parts:
       - BUILD_SDCC: "1"
       - BUILD_SDCC_HTTP: "1"
     override-build: |
-      cpanm -n -L $SNAPCRAFT_PART_INSTALL App::Prove Capture::Tiny::Extended File::Path  CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Object::Tiny::RW List::Uniq Regexp::Common
+      cpanm -n -L $SNAPCRAFT_PART_INSTALL App::Prove Capture::Tiny::Extended File::Path  CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Object::Tiny::RW List::Uniq Regexp::Common Modern::Perl Path::Tiny
       ./build.sh -i $SNAP
       make DESTDIR=$SNAPCRAFT_PART_INSTALL install
     build-packages:
