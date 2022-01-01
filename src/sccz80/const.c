@@ -19,7 +19,7 @@ typedef struct elem_s {
     int            written;
     int            litlab;
     zdouble        value;
-    unsigned char  fa[MAX_MANTISSA_SIZE+1];      /* The parsed representation */
+    unsigned char  fa[MAX_MANTISSA_SIZE + 1];      /* The parsed representation */
     char           str[60];    /* A raw string version */
 } elem_t;
 
