@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.4
+ * FreeRTOS Kernel V10.4.6
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -47,13 +47,21 @@ include(__link__.m4)
 
 /*-----------------------------------------------------------*/
 
+/*
+ * portSTACK_LIMIT_PADDING is a number of extra words to consider to be in
+ * use on the stack.
+ */
+#ifndef portSTACK_LIMIT_PADDING
+    #define portSTACK_LIMIT_PADDING    0
+#endif
+
 #if ( ( configCHECK_FOR_STACK_OVERFLOW == 1 ) && ( portSTACK_GROWTH < 0 ) )
 
 /* Only the current stack state is to be checked. */
     #define taskCHECK_FOR_STACK_OVERFLOW()                                                            \
     {                                                                                                 \
         /* Is the currently saved stack pointer within the stack limit? */                            \
-        if( pxCurrentTCB->pxTopOfStack <= pxCurrentTCB->pxStack )                                     \
+        if( pxCurrentTCB->pxTopOfStack <= pxCurrentTCB->pxStack + portSTACK_LIMIT_PADDING )           \
         {                                                                                             \
             vApplicationStackOverflowHook( ( TaskHandle_t ) pxCurrentTCB, pxCurrentTCB->pcTaskName ); \
         }                                                                                             \
@@ -69,7 +77,7 @@ include(__link__.m4)
     {                                                                                                 \
                                                                                                       \
         /* Is the currently saved stack pointer within the stack limit? */                            \
-        if( pxCurrentTCB->pxTopOfStack >= pxCurrentTCB->pxEndOfStack )                                \
+        if( pxCurrentTCB->pxTopOfStack >= pxCurrentTCB->pxEndOfStack - portSTACK_LIMIT_PADDING )      \
         {                                                                                             \
             vApplicationStackOverflowHook( ( TaskHandle_t ) pxCurrentTCB, pxCurrentTCB->pcTaskName ); \
         }                                                                                             \
