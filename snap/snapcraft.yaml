@@ -30,7 +30,7 @@ parts:
       - BUILD_SDCC: "1"
       - BUILD_SDCC_HTTP: "1"
     override-build: |
-      cpanm -n -L $SNAPCRAFT_PART_INSTALL App::Prove Capture::Tiny::Extended File::Path  CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Object::Tiny::RW List::Uniq 
+      cpanm -n -L $SNAPCRAFT_PART_INSTALL App::Prove Capture::Tiny::Extended File::Path  CPU::Z80::Assembler Test::Cmd::Common Test::HexDifferences Object::Tiny::RW List::Uniq Regexp::Common Modern::Perl Path::Tiny
       ./build.sh -i $SNAP
       make DESTDIR=$SNAPCRAFT_PART_INSTALL install
     build-packages:
@@ -119,12 +119,12 @@ apps:
     plugs: [home, removable-media]
   z88dk-asmpp:
     environment:
-      PERL5LIB: "$SNAP/lib/perl5:$SNAP/usr/share/perl/5.26.1:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.26.1"
+      PERL5LIB: "$SNAP/lib/perl5:$SNAP/usr/share/perl/5.30:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.30"
     command: bin/z88dk-asmpp
     plugs: [home, removable-media]
   z88dk-asmstyle:
     environment:
-      PERL5LIB: "$SNAP/lib/perl5:$SNAP/usr/share/perl/5.26.1:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.26.1"
+      PERL5LIB: "$SNAP/lib/perl5:$SNAP/usr/share/perl/5.30:$SNAP/usr/lib/x86_64-linux-gnu/perl/5.30"
     command: bin/z88dk-asmstyle
     plugs: [home, removable-media]
 
