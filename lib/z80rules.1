@@ -445,8 +445,9 @@
 =
 	ld	hl,(_%1)
 
-%notcpu gbz80
 %notcpu 8080
+%notcpu 8085
+%notcpu gbz80
 	ld	hl,_%1
 	call	l_glong
 =
@@ -1409,6 +1410,7 @@
 	call	l_gint	;%9
 
 %notcpu 8080
+%notcpu 8085
 %notcpu gbz80
 	ld	hl,%1
 	ex	de,hl
@@ -1806,6 +1808,7 @@
 	add	hl,de
 
 %notcpu 8080
+%notcpu 8085
 	ld	hl,%1
 	push	hl
 	pop	bc
@@ -2214,6 +2217,7 @@
 	ld	e,l
 
 %notcpu 8080
+%notcpu 8085
 	push	hl
 	call	l_gint	;
 	inc	hl
@@ -2229,6 +2233,7 @@
 	ld	l,a
 
 %notcpu 8080
+%notcpu 8085
 	push	hl
 	call	l_gint	;
 	dec	hl
@@ -2343,6 +2348,7 @@
 	ld	hl,%2
 
 %notcpu 8080
+%notcpu 8085
 	ld	hl,%1
 	push	hl
 	ld	hl,%2
@@ -2425,7 +2431,6 @@
 =
 	ld	sp,hl
 
-%notcpu 8080
 %notcpu gbz80
 	call	memset
 	pop	bc
@@ -2434,7 +2439,6 @@
 =
 	call	memset_callee
 
-%notcpu 8080
 %notcpu gbz80
 	call	memcpy
 	pop	bc
@@ -2541,6 +2545,7 @@
 	push	hl
 
 %notcpu 8080
+%notcpu 8085
 	ld	hl,(%1)
 	pop	de
 	push	de
@@ -2906,6 +2911,7 @@
 	ld	hl,%2
 
 %notcpu 8080
+%notcpu 8085
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
@@ -2921,6 +2927,7 @@
 	ld	l,0
 
 %notcpu 8080
+%notcpu 8085
 	ld	h,0
 	srl	l
 	add	hl,hl
@@ -2930,6 +2937,7 @@
 	add	hl,hl
 
 %notcpu 8080
+%notcpu 8085
 	ld	h,0
 	srl	h
 	rr	l
@@ -2938,6 +2946,7 @@
 	srl	l
 
 %notcpu 8080
+%notcpu 8085
 	ld	h,0
 	srl	l
 	srl	h
@@ -2975,6 +2984,7 @@
 	ld	h,0
 
 %notcpu 8080
+%notcpu 8085
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,2
@@ -3023,6 +3033,7 @@
 	ld	l,a
 
 %notcpu 8080
+%notcpu 8085
 	ld	l,0
 	ld	a,1
 	call	l_long_aslo
@@ -3591,6 +3602,7 @@
 	ex	de,hl
 
 %notcpu 8080
+%notcpu 8085
 	push	hl
 	ld	l,(hl)
 	ld	h,0
@@ -3708,6 +3720,7 @@
 
 %check 0 <= %1 <= 7
 %notcpu 8080
+%notcpu 8085
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -3944,6 +3957,7 @@
 	jp	%2z,%1	;%5
 
 %notcpu 8080
+%notcpu 8085
 	push	hl
 	call	l_gint	;
 	res	%1,l
@@ -4521,6 +4535,7 @@
 =
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	or	128
 	ld	(hl),a
@@ -4586,7 +4601,6 @@
 	jp	%1z,%2	;%3
 	ld	hl,%4
 
-
 %check 0 <= %1 <= 255
 	ld	a,l
 	and	%1
@@ -4640,6 +4654,15 @@
 	ld	hl,%2	;const
 =
 	ld	hl,%2	;const
+
+%check 0 <= %1 <= 255
+%cpu 8085
+	ld	hl,%1	;const
+	add	hl,sp
+=
+	ex	de,hl
+	ld	de,sp+%1	;const
+	ex	de,hl
 
 	ld	a,(hl)
 	and	0
@@ -4766,6 +4789,7 @@
 	push	hl
 
 %notcpu 8080
+%notcpu 8085
 %notcpu gbz80
 	ld	hl,(%1)
 	ld	de,(%1+2)
@@ -4786,6 +4810,7 @@
 	ex	de,hl
 
 %notcpu 8080
+%notcpu 8085
 %notcpu gbz80
 	ld	hl,(%1)
 	ld	de,(%1+2)
@@ -4947,6 +4972,7 @@
 .i_%1
 
 %notcpu 8080
+%notcpu 8085
 %notcpu gbz80
 	call	l_gint	;%1
 	call	l_pint
@@ -5125,6 +5151,7 @@
 	ld	(hl),a
 
 %notcpu 8080
+%notcpu 8085
 	rlca
 	and	1
 	jp	%5,%1	;%4
@@ -5133,6 +5160,7 @@
 	jp	%5,%1	;%4
 
 %notcpu 8080
+%notcpu 8085
 	rlca
 	bit	%2,a
 	jp	%5,%1	;%4
@@ -5159,6 +5187,7 @@
 	ld	hl,%6
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	1
 	jp	%2z,%3
@@ -5169,6 +5198,7 @@
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	2
 	jp	%2z,%3
@@ -5179,6 +5209,7 @@
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	4
 	jp	%2z,%3
@@ -5189,6 +5220,7 @@
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	8
 	jp	%2z,%3
@@ -5199,6 +5231,7 @@
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	16
 	jp	%2z,%3
@@ -5209,6 +5242,7 @@
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	32
 	jp	%2z,%3
@@ -5219,6 +5253,7 @@
 	ld	hl,%4
  
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	64
 	jp	%2z,%3
@@ -5229,6 +5264,7 @@
 	ld	hl,%4
 
 %notcpu 8080
+%notcpu 8085
 	ld	a,(hl)
 	and	128
 	jp	%2z,%3
