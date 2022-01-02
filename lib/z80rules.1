@@ -4655,15 +4655,6 @@
 =
 	ld	hl,%2	;const
 
-%check 0 <= %1 <= 255
-%cpu 8085
-	ld	hl,%1	;const
-	add	hl,sp
-=
-	ex	de,hl
-	ld	de,sp+%1	;const
-	ex	de,hl
-
 	ld	a,(hl)
 	and	0
 	ld	l,a
