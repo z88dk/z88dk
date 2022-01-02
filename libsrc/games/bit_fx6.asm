@@ -23,7 +23,7 @@ IF !__CPU_GBZ80__
           EXTERN     bit_synth_sub    ; entry
           EXTERN     bit_synth_len    ; sound duration
 		  ; FR*_tick should hold the XOR instruction.
-		  ; FR*_tick+1 should be set to 0 or to sndbit_mask
+		  ; FR*_tick+1 should be set to 0 or to SOUND_ONEBIT_mask
           EXTERN     FR1_tick
           EXTERN     FR2_tick
           EXTERN     FR3_tick
@@ -41,7 +41,7 @@ IF !__CPU_GBZ80__
 ._bit_fx6
 		
 		; Initialize the synthetizer
-		ld	a,sndbit_mask
+		ld	a,SOUND_ONEBIT_mask
 		ld	(FR_1+1),a
 		ld	(FR_2+1),a
 		ld	(FR_3+1),a

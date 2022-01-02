@@ -30,9 +30,9 @@ ELSE
 .beeper
 ._beeper
     push	ix
-IF sndbit_port >= 256
+IF SOUND_ONEBIT_port >= 256
     exx
-    ld   bc,sndbit_port
+    ld   bc,SOUND_ONEBIT_port
     exx
 ENDIF
     ld   a,l
@@ -58,14 +58,14 @@ ENDIF
     ld   c,$3F
     dec  b
     jp   nz,behllp
-    xor  sndbit_mask
+    xor  SOUND_ONEBIT_mask
 
     ONEBITOUT
 
 
     ld   b,h
     ld   c,a
-    bit  sndbit_bit,a            ;if o/p go again!
+    bit  SOUND_ONEBIT_bit,a            ;if o/p go again!
     jr   nz,be_again
     ld   a,d
     or   e

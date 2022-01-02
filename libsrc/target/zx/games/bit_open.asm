@@ -26,7 +26,7 @@
         push de
         ld	e,a
         ld  a,(__snd_tick)
-        and sndbit_mask
+        and SOUND_ONEBIT_mask
         or e
         pop de
         ld	(__snd_tick),a

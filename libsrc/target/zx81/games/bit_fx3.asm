@@ -48,7 +48,7 @@
           ld	b,255
 .expl
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           ld      l,b
           and     (hl)
@@ -72,7 +72,7 @@
           pop     bc
 
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           ld      l,b
           and     (hl)
@@ -111,7 +111,7 @@
           ld	b,100
 .blrp
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           ld      l,b
           and     (hl)
@@ -139,7 +139,7 @@
           djnz    dlyb
           pop     bc
 
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -169,7 +169,7 @@
           ld	hl,0
 .coff2
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           and     (hl)
           ld      b,a
           pop     af
@@ -202,7 +202,7 @@
           ld	b,255
 .blurp2
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           ld      l,b
           and     (hl)
@@ -242,7 +242,7 @@
 .desc2    rl      l
           rl      h
           jr      nc,desc3
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -283,7 +283,7 @@
 .hdesc2   rl      l
           rl      h
           jr      nc,hdesc3
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -321,7 +321,7 @@
 .asc2     rl      l
           rl      h
           jr      c,asc3
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -355,7 +355,7 @@
           
 .fx71     push    hl
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           and     l
           ld      l,a
           pop     af

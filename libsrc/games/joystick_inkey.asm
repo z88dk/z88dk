@@ -1,10 +1,10 @@
 ; Keyboard joysticks based on inkey
 
-	MODULE	joystick_inkey
+	MODULE	INPUT_JOY_useinkey
 	SECTION	code_clib
 
 
-	PUBLIC	joystick_inkey
+	PUBLIC	INPUT_JOY_useinkey
 
         EXTERN  joystick_sc
         EXTERN  keys_qaop
@@ -12,7 +12,7 @@
         EXTERN  keys_vi
         EXTERN  keys_cursor
 
-joystick_inkey:
+INPUT_JOY_useinkey:
         ld      hl,keys_qaop
         cp      1
         jp      z,joystick_sc

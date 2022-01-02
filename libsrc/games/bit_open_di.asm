@@ -19,15 +19,12 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
     
 .bit_open_di
 ._bit_open_di
-        
-        ld a,i		; get the current status of the irq line
-        di
-        push af
-        
-        ex (sp),hl
-        ld (__bit_irqstatus),hl
-        pop hl
-        
-        ld  a,(__snd_tick)
-        ret
+    ld      a,i		; get the current status of the irq line
+    di
+    push    af
+    ex      (sp),hl
+    ld      (__bit_irqstatus),hl
+    pop     hl
+    ld      a,(__snd_tick)
+    ret
 ENDIF

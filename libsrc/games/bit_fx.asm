@@ -32,9 +32,9 @@ IF !__CPU_GBZ80__
 .bit_fx
 ._bit_fx
 
-IF sndbit_port >= 256
+IF SOUND_ONEBIT_port >= 256
     exx
-    ld   bc,sndbit_port
+    ld   bc,SOUND_ONEBIT_port
     exx
 ENDIF
     ld    a,l
@@ -97,7 +97,7 @@ ENDIF
     ld    e,150  
 .fx2_1
     ONEBITOUT
-    xor   sndbit_mask  
+    xor   SOUND_ONEBIT_mask  
     ld    b,e  
 .fx2_2    
     djnz  fx2_2  
@@ -142,7 +142,7 @@ IF !__CPU_INTEL__
 
     ONEBITOUT
 
-    xor   sndbit_mask
+    xor   SOUND_ONEBIT_mask
     ex    af,af
     ld    a,h  
     or    l
@@ -165,7 +165,7 @@ ENDIF
 .clackson_loop
     dec     h
     jr      nz,clackson_jump
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -174,7 +174,7 @@ ENDIF
 .clackson_jump
     dec     l
     jr      nz,clackson_loop
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -190,7 +190,7 @@ ENDIF
     call  bit_open_di
 .zap3_1   
     push  bc
-    xor   sndbit_mask
+    xor   SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -203,7 +203,7 @@ ENDIF
 .zap3_2   
     nop
     djnz  zap3_2
-    xor   sndbit_mask
+    xor   SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -265,7 +265,7 @@ ENDIF
     ld    b,0  
 .zap1_1   
     push  bc  
-    xor   sndbit_mask  ;oscillate between high and low bits...
+    xor   SOUND_ONEBIT_mask  ;oscillate between high and low bits...
 
     ONEBITOUT
 

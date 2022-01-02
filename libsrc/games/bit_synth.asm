@@ -24,7 +24,7 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           PUBLIC     bit_synth_sub    ; entry
           PUBLIC     bit_synth_len    ; duration
           ; FR*_tick should hold the XOR instruction.
-          ; FR*_tick+1 should be set to 0 or to sndbit_mask
+          ; FR*_tick+1 should be set to 0 or to SOUND_ONEBIT_mask
           PUBLIC     FR1_tick
           PUBLIC     FR2_tick
           PUBLIC     FR3_tick
@@ -68,28 +68,28 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           and     a
           jr      z,FR1_blank
           ld      (FR_1+1),a
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
 .FR1_blank
           ld      (FR1_tick+1),a
           ld      a,(ix+4)
           and     a
           jr      z,FR2_blank
           ld      (FR_2+1),a
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
 .FR2_blank
           ld      (FR2_tick+1),a
           ld      a,(ix+2)
           and     a
           jr      z,FR3_blank
           ld      (FR_3+1),a
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
 .FR3_blank
           ld      (FR1_tick+1),a
           ld      a,(ix+0)
           and     a
           jr      z,FR4_blank
           ld      (FR_4+1),a
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
 .FR4_blank
           ld      (FR1_tick+1),a
 
@@ -108,9 +108,9 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           push    de
           push    bc
 
-        IF sndbit_port >= 256
+        IF SOUND_ONEBIT_port >= 256
           exx
-          ld   bc,sndbit_port
+          ld   bc,SOUND_ONEBIT_port
           exx
         ENDIF
 
@@ -126,15 +126,15 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           dec     h
           jr      nz,jump
 .FR1_tick
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
         IF SOUND_INOUT = 1
           exx
           ld   c,a
           jr nz,ASMPC+6
-          in  a,(sndbit_port)
+          in  a,(SOUND_ONEBIT_port)
           jr  ASMPC+4
-          out  (sndbit_port),a
+          out  (SOUND_ONEBIT_port),a
           ld   a,c
           exx
         ELIF SOUND_IFF = 1
@@ -142,14 +142,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           di
           jp      ASMPC+4
           ei
-        ELIF sndbit_port >= 256
+        ELIF SOUND_ONEBIT_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
+        ELIF SOUND_ONEBIT_port < 0
+          ld  (-SOUND_ONEBIT_port),a
         ELSE
-          out  (sndbit_port),a
+          out  (SOUND_ONEBIT_port),a
         ENDIF
 
 .FR_1
@@ -158,15 +158,15 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           dec     l
           jr      nz,jump2
 .FR2_tick
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
         IF SOUND_INOUT = 1
           exx
           ld   c,a
           jr nz,ASMPC+6
-          in  a,(sndbit_port)
+          in  a,(SOUND_ONEBIT_port)
           jr  ASMPC+4
-          out  (sndbit_port),a
+          out  (SOUND_ONEBIT_port),a
           ld   a,c
           exx
         ELIF SOUND_IFF = 1
@@ -174,14 +174,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           di
           jp      ASMPC+4
           ei
-        ELIF sndbit_port >= 256
+        ELIF SOUND_ONEBIT_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
+        ELIF SOUND_ONEBIT_port < 0
+          ld  (-SOUND_ONEBIT_port),a
         ELSE
-          out  (sndbit_port),a
+          out  (SOUND_ONEBIT_port),a
         ENDIF
 
 .FR_2
@@ -190,15 +190,15 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           dec     d
           jr      nz,jump3
 .FR3_tick
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
         IF SOUND_INOUT = 1
           exx
           ld   c,a
           jr nz,ASMPC+6
-          in  a,(sndbit_port)
+          in  a,(SOUND_ONEBIT_port)
           jr  ASMPC+4
-          out  (sndbit_port),a
+          out  (SOUND_ONEBIT_port),a
           ld   a,c
           exx
         ELIF SOUND_IFF = 1
@@ -206,14 +206,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           di
           jp      ASMPC+4
           ei
-        ELIF sndbit_port >= 256
+        ELIF SOUND_ONEBIT_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
+        ELIF SOUND_ONEBIT_port < 0
+          ld  (-SOUND_ONEBIT_port),a
         ELSE
-          out  (sndbit_port),a
+          out  (SOUND_ONEBIT_port),a
         ENDIF
 
 .FR_3
@@ -222,15 +222,15 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           dec     e
           jr      nz,loop2
 .FR4_tick
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
         IF SOUND_INOUT = 1
           exx
           ld   c,a
           jr nz,ASMPC+6
-          in  a,(sndbit_port)
+          in  a,(SOUND_ONEBIT_port)
           jr  ASMPC+4
-          out  (sndbit_port),a
+          out  (SOUND_ONEBIT_port),a
           ld   a,c
           exx
         ELIF SOUND_IFF = 1
@@ -238,14 +238,14 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
           di
           jp      ASMPC+4
           ei
-        ELIF sndbit_port >= 256
+        ELIF SOUND_ONEBIT_port >= 256
           exx
           out  (c),a                   ;9 T slower
           exx
-        ELIF sndbit_port < 0
-          ld  (-sndbit_port),a
+        ELIF SOUND_ONEBIT_port < 0
+          ld  (-SOUND_ONEBIT_port),a
         ELSE
-          out  (sndbit_port),a
+          out  (SOUND_ONEBIT_port),a
         ENDIF
 
 .FR_4

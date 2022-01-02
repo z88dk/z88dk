@@ -32,9 +32,9 @@ IF !__CPU_GBZ80__ && !__CPU_INTEL__
     ;push	ix
     ld	bc,noise  ; point to myself to garble the bit patterns
     push  bc
-IF sndbit_port >= 256
+IF SOUND_ONEBIT_port >= 256
     exx
-    ld   bc,sndbit_port
+    ld   bc,SOUND_ONEBIT_port
     exx
 ENDIF
 ;          ld   a,l
@@ -67,7 +67,7 @@ ENDIF
 		  ;ld   a,r		; more randomness
 		  ;xor  (hl)
 		  ;xor  l
-          ;and  sndbit_mask
+          ;and  SOUND_ONEBIT_mask
 		  ;xor  b
           ;ex  (sp),hl
 		  
@@ -80,7 +80,7 @@ ENDIF
 		  ;ld  a,h
 		  ;xor l
 		  ld  a,l
-		  and  sndbit_mask
+		  and  SOUND_ONEBIT_mask
 		  ld  l,a		  
 		  pop af
 
@@ -94,7 +94,7 @@ ENDIF
 
           ld   b,h
           ld   c,a
-          bit  sndbit_bit,a            ;if o/p go again!
+          bit  SOUND_ONEBIT_bit,a            ;if o/p go again!
           jr   nz,noise_again
 		  
           ld   a,d

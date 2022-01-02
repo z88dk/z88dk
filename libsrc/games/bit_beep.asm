@@ -19,13 +19,13 @@
 
 .bit_beep
 ._bit_beep
-    call bit_open_di
-    pop bc
-    pop hl
-    pop de
-    push de
-    push hl
-    push bc
+    call    bit_open_di
+    pop     bc
+    pop     hl
+    pop     de
+    push    de
+    push    hl
+    push    bc
     
-    call beeper
-    jp bit_close_ei
+    call    beeper
+    jp      bit_close_ei

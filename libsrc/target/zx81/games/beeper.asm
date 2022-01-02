@@ -81,7 +81,7 @@
           dec  b
           jp   nz,behllp
 
-          xor  sndbit_mask
+          xor  SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -95,7 +95,7 @@
 
           ld   b,h
           ld   c,a
-          bit  sndbit_bit,a            ;if o/p go again!
+          bit  SOUND_ONEBIT_bit,a            ;if o/p go again!
           jr   nz,be_again
 
           ld   a,d

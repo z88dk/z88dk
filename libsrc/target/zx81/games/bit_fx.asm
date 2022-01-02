@@ -84,7 +84,7 @@
 .fx2      call  bit_open_di
           ld    e,150  
 .fx2_1
-          xor   sndbit_mask  
+          xor   SOUND_ONEBIT_mask  
 ;-----
           out  (255),a
           jp   nz,isz
@@ -127,7 +127,7 @@
 .zap0_1   ld    b,(hl)  
           dec   hl  
 .zap0_2   djnz  zap0_2  
-          xor   sndbit_mask
+          xor   SOUND_ONEBIT_mask
 ;-----
           out  (255),a
           jp   z,isz2
@@ -155,7 +155,7 @@
 .clackson_loop
           dec     h
           jr      nz,clackson_jump
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -172,7 +172,7 @@
 .clackson_jump
           dec     l
           jr      nz,clackson_loop
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -195,7 +195,7 @@
           
 .zap3     call  bit_open_di
 .zap3_1   push  bc
-          xor   sndbit_mask
+          xor   SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -214,7 +214,7 @@
           pop   af
 .zap3_2   nop
           djnz  zap3_2
-          xor   sndbit_mask
+          xor   SOUND_ONEBIT_mask
 
 ;-----
           out  (255),a
@@ -274,7 +274,7 @@
 .zap1     call  bit_open_di
           ld    b,0  
 .zap1_1   push  bc  
-          xor   sndbit_mask  ;oscillate between high and low bits...
+          xor   SOUND_ONEBIT_mask  ;oscillate between high and low bits...
 
 ;-----
           out  (255),a

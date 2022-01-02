@@ -39,9 +39,9 @@ _playzb4:
 	push	de
 	push	bc
 
-	IF sndbit_port >= 256
+	IF SOUND_ONEBIT_port >= 256
 	  exx
-	  ld   bc,sndbit_port
+	  ld   bc,SOUND_ONEBIT_port
 	  exx
 	ENDIF
 
@@ -86,7 +86,7 @@ byte1:
 	  rlca
 	  ld   l,a
 	  sbc  a,a	; 0 or FF
-	  and  sndbit_mask
+	  and  SOUND_ONEBIT_mask
 	  ld   c,a
 	  ld   a,(__snd_tick)
 	  xor  c

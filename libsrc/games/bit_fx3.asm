@@ -19,9 +19,9 @@ IF !__CPU_GBZ80__  && !__CPU_INTEL__
 .bit_fx3
 ._bit_fx3
 
-        IF sndbit_port >= 256
+        IF SOUND_ONEBIT_port >= 256
           exx
-          ld   bc,sndbit_port
+          ld   bc,SOUND_ONEBIT_port
           exx
         ENDIF
 
@@ -53,7 +53,7 @@ IF !__CPU_GBZ80__  && !__CPU_INTEL__
           ld	b,255
 .expl
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           ld      l,b
           and     (hl)
@@ -69,7 +69,7 @@ IF !__CPU_GBZ80__  && !__CPU_INTEL__
           pop     bc
 
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           ld      l,b
           and     (hl)
@@ -101,7 +101,7 @@ IF !__CPU_GBZ80__  && !__CPU_INTEL__
           ld	b,100
 .blrp
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           ld      l,b
           and     (hl)
@@ -121,7 +121,7 @@ IF !__CPU_GBZ80__  && !__CPU_INTEL__
           djnz    dlyb
           pop     bc
 
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -144,7 +144,7 @@ IF !__CPU_GBZ80__  && !__CPU_INTEL__
           ld	hl,0
 .coff2
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           and     (hl)
           ld      b,a
           pop     af
@@ -170,7 +170,7 @@ IF !__CPU_GBZ80__  && !__CPU_INTEL__
           ld	b,255
 .blurp2
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           ld      h,0
           ld      l,b
           and     (hl)
@@ -203,7 +203,7 @@ IF !__CPU_GBZ80__  && !__CPU_INTEL__
 .desc2    rl      l
           rl      h
           jr      nc,desc3
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -237,7 +237,7 @@ IF !__CPU_GBZ80__  && !__CPU_INTEL__
 .hdesc2   rl      l
           rl      h
           jr      nc,hdesc3
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -268,7 +268,7 @@ IF !__CPU_GBZ80__  && !__CPU_INTEL__
 .asc2     rl      l
           rl      h
           jr      c,asc3
-          xor     sndbit_mask
+          xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -295,7 +295,7 @@ IF !__CPU_GBZ80__  && !__CPU_INTEL__
           
 .fx71     push    hl
           push    af
-          ld      a,sndbit_mask
+          ld      a,SOUND_ONEBIT_mask
           and     l
           ld      l,a
           pop     af

@@ -15,5 +15,5 @@
 
 .bit_open
 ._bit_open
-	  ld a,(__snd_tick)
-	  ret
+    ld      a,(__snd_tick)
+    ret

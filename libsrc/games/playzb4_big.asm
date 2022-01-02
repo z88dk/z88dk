@@ -46,7 +46,7 @@ _playzb4:
 	ld	b,dithpat_end-dithpat
 rep:
 	  ld	a,(hl)
-	  and  sndbit_mask      ; check the bit status
+	  and  SOUND_ONEBIT_mask      ; check the bit status
 	  ld   a,0
 	  jr   z,noz
 	  dec  a
@@ -98,7 +98,7 @@ do_sound:
 	adc 0
 	ld  h,a
 
-	ld   bc,sndbit_port
+	ld   bc,SOUND_ONEBIT_port
 	
 	; 15 times
 	outi

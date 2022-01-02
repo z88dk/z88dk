@@ -19,9 +19,9 @@ IF !__CPU_GBZ80__
 .bit_fx2
 ._bit_fx2
 
-IF sndbit_port >= 256
+IF SOUND_ONEBIT_port >= 256
     exx
-    ld   bc,sndbit_port
+    ld   bc,SOUND_ONEBIT_port
     exx
 ENDIF
 
@@ -62,7 +62,7 @@ ENDIF
 .ds_loop
     dec     h
     jr      nz,ds_jump
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -72,7 +72,7 @@ ENDIF
 .loosetime1
     djnz    loosetime1
     pop     bc
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -83,7 +83,7 @@ ENDIF
 .ds_jump
     dec     l
     jr      nz,ds_loop
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -93,7 +93,7 @@ ENDIF
 .loosetime2
     djnz    loosetime2
     pop     bc
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
     ONEBITOUT
 
 
@@ -115,7 +115,7 @@ ENDIF
     jr      nz,ss_jump
     push    hl
     push    af
-    ld      a,sndbit_mask
+    ld      a,SOUND_ONEBIT_mask
     ld      h,0
     and     (hl)
     ld      l,a
@@ -125,7 +125,7 @@ ENDIF
     ONEBITOUT
 
     pop     hl
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
     ONEBITOUT
 
 
@@ -134,7 +134,7 @@ ENDIF
 .ss_jump
     dec     l
     jr      nz,ss_loop
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -157,7 +157,7 @@ ENDIF
     jr      nz,ts_jump
     push    hl
     push    af
-    ld      a,sndbit_mask
+    ld      a,SOUND_ONEBIT_mask
     ld      h,0
     and     (hl)
     ld      l,a
@@ -167,7 +167,7 @@ ENDIF
     ONEBITOUT
 
     pop     hl
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -179,7 +179,7 @@ ENDIF
     jr      nz,ts_loop
     push    hl
     push    af
-    ld      a,sndbit_mask
+    ld      a,SOUND_ONEBIT_mask
     ld      l,h
     ld      h,0
     and     (hl)
@@ -191,7 +191,7 @@ ENDIF
 
 
     pop     hl
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -210,7 +210,7 @@ ENDIF
 .cs_loop
     dec     h
     jr      nz,cs_jump
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
     ONEBITOUT
 
 
@@ -219,7 +219,7 @@ ENDIF
 .cswait1
     djnz    cswait1
     pop     bc
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -229,7 +229,7 @@ ENDIF
 .cs_jump
     inc     l
     jr      nz,cs_loop
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -238,7 +238,7 @@ ENDIF
 .cswait2
     djnz    cswait2
     pop     bc
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
     ONEBITOUT
 
 
@@ -261,7 +261,7 @@ ENDIF
 .t2_loop
     dec     h
     jr      nz,t2_jump
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -271,7 +271,7 @@ ENDIF
 .wait1
     djnz    wait1
     pop     bc
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -286,7 +286,7 @@ ENDIF
     inc     a
     ld      (t2_FR_2+1),a
     pop     af
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -296,7 +296,7 @@ ENDIF
 .wait2
     djnz    wait2
     pop     bc
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -325,7 +325,7 @@ ENDIF
     inc     a
     ld      (u2_FR_1+1),a
     pop     af
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -340,7 +340,7 @@ ENDIF
     inc     a
     ld      (u2_FR_2+1),a
     pop     af
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -369,7 +369,7 @@ ENDIF
     dec     a
     ld      (qi_FR_1+1),a
     pop     af
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
     ONEBITOUT
 
 
@@ -383,7 +383,7 @@ ENDIF
     inc     a
     ld      (qi_FR_2+1),a
     pop     af
-    xor     sndbit_mask
+    xor     SOUND_ONEBIT_mask
 
     ONEBITOUT
 
@@ -401,7 +401,7 @@ IF !__CPU_INTEL__
 .expl
     push    hl
     push    af
-    ld      a,sndbit_mask
+    ld      a,SOUND_ONEBIT_mask
     ld      h,0
     and     (hl)
     ld      l,a
