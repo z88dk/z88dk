@@ -8,7 +8,7 @@
     SECTION code_clib
     PUBLIC  joystick
     PUBLIC  _joystick
-    EXTERN  INPUT_JOY_useinkey
+    EXTERN  joystick_inkey
     EXTERN  getk
 
     INCLUDE "games/games.inc"
@@ -30,6 +30,6 @@ IF INPUT_JOY_useinkey = 0
     ld	    hl,0
     ret
 ELSE
-    jp      INPUT_JOY_useinkey
+    jp      joystick_inkey
 ENDIF
 
