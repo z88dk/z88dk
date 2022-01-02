@@ -78,7 +78,7 @@ loop:
    dec c
    jr NZ,loop
    dec b
-   jp NZ,loop
+   jr NZ,loop
 
 ELSE
 
