@@ -330,7 +330,7 @@ constdecl:
             if (dump) {
                 /* struct member or array of pointer to char */
                 if ( type->kind == KIND_DOUBLE ) {
-                    unsigned char  fa[MAX_MANTISSA_SIZE+1];
+					unsigned char  fa[MAX_MANTISSA_SIZE + 1] = { 0 };
                     int      i;
                     /* It was a float, lets parse the float and then dump it */
                     if ( c_double_strings ) { 
@@ -344,7 +344,7 @@ constdecl:
                         }
                     }
                 } else if (type->kind == KIND_FLOAT16) {
-                    unsigned char  fa[MAX_MANTISSA_SIZE+1];
+					unsigned char  fa[MAX_MANTISSA_SIZE + 1] = { 0 };
                     dofloat(MATHS_IEEE16, value, fa);
                     defword();
                     outdec(fa[1] << 8 | fa[0]);

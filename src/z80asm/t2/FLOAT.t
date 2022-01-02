@@ -170,25 +170,22 @@ check_asm("zx", \@fdata,
 	 128,0,0,0,0]	 
 );
 
-SKIP: {
-	skip "-math=z88 output should be 40-bit, getting 48-bits, see #305";
-	check_asm("z88", \@fdata,
-		[228,0,0,0,0,128,
-		 228,0,0,0,128,128,
-		 228,0,0,0,127,135,
-		 228,0,0,0,255,135,
-		 228,0,0,0,0,136,
-		 228,0,0,0,128,136,
-		 228,0,0,255,127,143,
-		 228,0,0,255,255,143,
-		 228,0,0,0,0,144,
-		 228,0,0,0,128,144,
-		 228,0,0,0,48,130,
-		 228,0,0,0,176,130,
-		 228,0,0,0,92,133,
-		 228,0,0,0,0,127]
-	);
-}
+check_asm("z88", \@fdata,
+	[0,0,0,0,0,128,
+	 0,0,0,0,128,128,
+	 0,0,0,0,127,135,
+	 0,0,0,0,255,135,
+	 0,0,0,0,0,136,
+	 0,0,0,0,128,136,
+	 0,0,0,255,127,143,
+	 0,0,0,255,255,143,
+	 0,0,0,0,0,144,
+	 0,0,0,0,128,144,
+	 0,0,0,0,48,130,
+	 0,0,0,0,176,130,
+	 0,0,0,0,92,133,
+	 0,0,0,0,0,127]
+);
 
 check_asm("mbfs", \@fdata,
 	[0,0,0,129,
@@ -207,25 +204,22 @@ check_asm("mbfs", \@fdata,
 	 0,0,0,128]	 
 );
 
-SKIP: {
-	skip "-fp-mode=mbf40 output should be 40-bit, getting 48-bits, see #305";
-	check_asm("mbf40", \@fdata,
-		[0,0,0,0,129,127,
-		 0,0,0,128,129,127,
-		 0,0,0,127,136,127,
-		 0,0,0,255,136,127,
-		 0,0,0,0,137,127,
-		 0,0,0,128,137,127,
-		 0,0,255,127,144,127,
-		 0,0,255,255,144,127,
-		 0,0,0,0,145,127,
-		 0,0,0,128,145,127,
-		 0,0,0,48,131,127,
-		 0,0,0,176,131,127,
-		 0,0,0,92,134,127,
-		 0,0,0,0,128,127]	 
-	);
-}
+check_asm("mbf40", \@fdata,
+	[0,0,0,0,129,0,
+	 0,0,0,128,129,0,
+	 0,0,0,127,136,0,
+	 0,0,0,255,136,0,
+	 0,0,0,0,137,0,
+	 0,0,0,128,137,0,
+	 0,0,255,127,144,0,
+	 0,0,255,255,144,0,
+	 0,0,0,0,145,0,
+	 0,0,0,128,145,0,
+	 0,0,0,48,131,0,
+	 0,0,0,176,131,0,
+	 0,0,0,92,134,0,
+	 0,0,0,0,128,0]	 
+);
 
 check_asm("mbf64", \@fdata,
 	[0,0,0,0,0,0,0,129,
@@ -268,22 +262,13 @@ check_c("-lm", 				"",					"float",	\@fdata);
 check_c("-lm", 				"-float=genmath",	"float",	\@fdata);
 check_c("-lmath48", 		"",					"float",	\@fdata);
 check_c("-fp-mode=z80", 	"",					"float",	\@fdata);
-
 check_c("--math32",			"-float=ieee32",	"float",	\@fdata);
+check_c("-fp-mode=ieee",	"-float=ieee32",	"float",	\@fdata);
 check_c("--math16",			"-float=ieee16",	"_Float16",	\@fdata);
-
-SKIP: {
-	skip "-math=z88 output should be 40-bit, getting 48-bits, see #305";
-	check_c("--math-z88",		"-float=z88",		"float",	\@fdata);
-}
-
+check_c("-math-z88",		"-float=z88",		"float",	\@fdata);
+check_c("-fp-mode=z88",		"-float=z88",		"float",	\@fdata);
 check_c("-fp-mode=mbf32",	"-float=mbfs",		"float",	\@fdata);
-
-SKIP: {
-	skip "-fp-mode=mbf40 output should be 40-bit, getting 48-bits, see #305";
-	check_c("-fp-mode=mbf40",	"-float=mbf40",		"float",	\@fdata);
-}
-
+check_c("-fp-mode=mbf40",	"-float=mbf40",		"float",	\@fdata);
 check_c("-fp-mode=mbf64",	"-float=mbf64",		"float",	\@fdata);
 check_c("-fp-mode=am9511",	"-float=am9511",	"float",	\@fdata);
 

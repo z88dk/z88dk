@@ -59,26 +59,31 @@ ENDIF
    or b
    jr Z,exit                   ; if numswaps == 0, exit
 
-loop:
-   ld a,(de)                   ; char at front of s
 
 IF __CPU_INTEL__ || __CPU_GBZ80__
+   dec bc
+   inc b
+   inc c
 
+loop:
+   ld a,(de)                   ; char at front of s
    push af
 
    ld  a,(hl)
    ld (de+),a
-   dec bc
-   pop af
 
+   pop af
    ld (hl-),a
 
-   ld a,b
-   or c
-   jp NZ,loop
+   dec c
+   jr NZ,loop
+   dec b
+   jr NZ,loop
 
 ELSE
 
+loop:
+   ld a,(de)                   ; char at front of s
    ldi                         ; char at rear written to front of s
    dec hl
    ld (hl),a                   ; char from front written to rear of s 
