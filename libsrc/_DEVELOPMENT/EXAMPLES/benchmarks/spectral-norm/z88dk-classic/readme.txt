@@ -9,6 +9,9 @@ VERIFY CORRECT RESULT
 To verify the correct result compile for the zx spectrum target
 and run in an emulator.
 
+classic/sccz80/8085/MBF32
+zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 spectral-norm.c -o spectral-norm --math-mbf32_8085 -lndos -create-app
+
 sccz80/classic
 zcc +zx -vn -DSTATIC -DPRINTF -O2 spectral-norm.c -o spectral-norm -lm -lndos -create-app
 zcc +zx -vn -DSTATIC -DPRINTF -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm --math32 -lndos -create-app
