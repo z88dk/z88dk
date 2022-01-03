@@ -167,15 +167,15 @@ KWIPS        = 100*10*1 / 228.6031 = 4.3743
 MWIPS        = 4.3743 / 1000 = 0.0043743
 
 4.
-Z88DK April 28, 2021
+Z88DK January 3, 2022
 classic/zsdcc #12070/math48
 24 bit mantissa + 8 bit exponent (internally 40+8)
-7588 bytes less page zero
+7064 bytes less page zero
 
-cycle count  = 920781972
-time @ 4MHz  = 920781972 / 4x10^6 = 230.1954 seconds
-KWIPS        = 100*10*1 / 230.1954 = 4.3441
-MWIPS        = 4.3441 / 1000 = 0.0043441
+cycle count  = 917739704
+time @ 4MHz  = 917739704 / 4x10^6 = 229.4349 seconds
+KWIPS        = 100*10*1 / 230.1954 = 4.3585
+MWIPS        = 4.3585 / 1000 = 0.0043585
 
 5.
 Z88DK April 28, 2021
@@ -189,15 +189,15 @@ KWIPS        = 100*10*1 / 243.2248 = 4.1114
 MWIPS        = 4.1114 / 1000 = 0.0041114
 
 6.
-Z88DK April 28, 2021
+Z88DK January 3, 2022
 sccz80 / classic c library / genmath float package
 40 bit mantissa + 8 bit exponent
-6359 bytes less page zero
+6411 bytes less page zero
 
-cycle count  = 1283271893
-time @ 4MHz  = 1283271893 / 4x10^6 = 320.8179 seconds
-KWIPS        = 100*10*1 / 320.8179 = 3.1170
-MWIPS        = 3.1170 / 1000 = 0.0031170
+cycle count  = 1284172870
+time @ 4MHz  = 1284172870 / 4x10^6 = 321.0432 seconds
+KWIPS        = 100*10*1 / 320.8179 = 3.1148
+MWIPS        = 3.1148 / 1000 = 0.0031148
 
 7.
 SDCC 3.6.5 #9842 (MINGW64)
@@ -223,15 +223,26 @@ KWIPS        = 100*10*1 / 144.0468 = 6.9421
 MWIPS        = 6.9421 / 1000 = 0.0069421
 
 9.
-Z88DK April 30, 2021
+Z88DK January 3, 2022
 sccz80 / new c library / math32
 24 bit mantissa + 8 bit exponent
-8921 bytes less page zero
+8861 bytes less page zero
 
-cycle count  = 567396426
-time @ 4MHz  = 567396426 / 4x10^6 = 141.8491 seconds
-KWIPS        = 100*10*1 / 141.8491 = 7.0497
-MWIPS        = 7.0497 / 1000 = 0.0070497
+cycle count  = 568209557
+time @ 4MHz  = 568209557 / 4x10^6 = 142.0524 seconds
+KWIPS        = 100*10*1 / 142.0524 = 7.0396
+MWIPS        = 7.0396 / 1000 = 0.0070396
+
+10.
+Z88DK January 3, 2022
+sccz80 / classic c library / MBF32
+Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
+6237 bytes less page zero
+
+cycle count  = 547041311
+time @ 4MHz  = 547041311 / 4x10^6 = 136.7603 seconds
+KWIPS        = 100*10*1 / 136.7603 = 7.3121
+MWIPS        = 7.3121 / 1000 = 0.0073121
 
 DQ.
 HITECH C MSDOS V750
