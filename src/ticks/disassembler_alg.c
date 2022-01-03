@@ -618,9 +618,9 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
                                     else if ( b == 0x90 ) BUF_PRINTF("outinb  ");
                                     else if ( b == 0x91 ) {
                                         // Ensure nextreg regNum,value immediates are processed in the correct order
-                                        char *regNum = handle_immed8(state, opbuf1, sizeof(opbuf1));
-                                        char *value = handle_immed8(state, opbuf2, sizeof(opbuf2));
-                                        BUF_PRINTF("nextreg %s,%s",regNum, value);
+                                        handle_immed8(state, opbuf1, sizeof(opbuf1));
+                                        handle_immed8(state, opbuf2, sizeof(opbuf2));
+                                        BUF_PRINTF("nextreg %s,%s",opbuf1, opbuf2);
                                     } else if ( b == 0x92 ) BUF_PRINTF("nextreg %s,a",handle_immed8(state, opbuf1, sizeof(opbuf1)));
                                     else if ( b == 0x93 ) BUF_PRINTF("pixeldn");
                                     else if ( b == 0x94 ) BUF_PRINTF("pixelad");
