@@ -27,9 +27,13 @@
  * - Instructions stored as text rather than loaded from disk.
  */
 
+// classic
+// zcc +cpm -clib=8085 -O2 startrek.c -o startrek --math-mbf32_8085 -create-app
+// zcc +rc2014 -SO2 -subtype=basic85 startrek.c -o startrek --math-mbf32_8085 -create-app
+
+// newlib
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
 // zcc +zx -vn -SO3 -startup=4 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
-// zcc +rc2014 -SO2 -subtype=basic85 startrek.c -o startrek --math-mbf32_8085 -create-app
 
 #pragma printf = "%s %d %4.2f"
 
@@ -47,7 +51,6 @@
 #ifdef __RC2014
 #pragma output CRT_ORG_CODE                 = 0x8400    // move ORG to 0x8400 for -subtype=basic85
                                                         // also all the instruction text is omitted
-#pragma output CLIB_DISABLE_FGETS_CURSOR    = 1         // do not print a cursor
 #endif
 
 /*
