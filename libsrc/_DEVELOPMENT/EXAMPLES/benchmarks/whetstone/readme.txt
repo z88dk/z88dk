@@ -244,7 +244,18 @@ time @ 4MHz  = 547041311 / 4x10^6 = 136.7603 seconds
 KWIPS        = 100*10*1 / 136.7603 = 7.3121
 MWIPS        = 7.3121 / 1000 = 0.0073121
 
-DQ.
+11.
+Z88DK January 3, 2022
+sccz80 / classic c library / 8085 CPU / MBF32
+Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
+6133 bytes less page zero
+
+cycle count  = 549592505
+time @ 4MHz  = 549592505 / 4x10^6 = 137.3981 seconds
+KWIPS        = 100*10*1 / 137.3981 = 7.2781
+MWIPS        = 7.2781 / 1000 = 0.0072781
+
+DISQ.
 HITECH C MSDOS V750
 24 bit mantissa + 8 bit exponent
 7002 bytes exact

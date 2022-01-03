@@ -29,8 +29,12 @@ a binary ORGed at address 0 was produced.
 
 This simplifies the use of TICKS for timing.
 
+sccz80/classic/8085
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 spectral-norm.c -o spectral-norm.bin  --math-mbf32_8085 -lndos -m
+
 sccz80/classic
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 spectral-norm.c -o spectral-norm.bin -lm -lndos -m
+zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 spectral-norm.c -o spectral-norm.bin  --math-mbf32_8085 -lndos -m
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints spectral-norm.c -o spectral-norm.bin --math32 -lndos -m
 
 zsdcc/classic
@@ -63,14 +67,16 @@ error: 2 * 10^(-9)
 cycle count  = 8617785182
 time @ 4MHz  = 8617785182 / 4*10^6 = 35 min 54 sec
 
-Z88DK July 4, 2021
-zsdcc #12419 / classic c library / math32
-6049 bytes less page zero
+
+Z88DK January 3, 2022
+zsdcc #12555 / classic c library / math32
+5910 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 10003973822
-time @ 4MHz  = 10003973822 / 4*10^6 = 41 min 41 sec
+cycle count  = 9756176827
+time @ 4MHz  = 9756176827 / 4*10^6 = 40 min 39 sec
+
 
 Z88DK April 20, 2020
 sccz80 / classic c library / genmath
@@ -81,6 +87,7 @@ error: 2 * 10^(-9)
 cycle count  = 14688455657
 time @ 4MHz  = 14688455657 / 4*10^6 = 61 min 12 sec
 
+
 Z88DK July 4, 2021
 sccz80 / classic c library / math32
 5875 bytes less page zero
@@ -89,3 +96,24 @@ error: 2 * 10^(-7)
 
 cycle count  = 9718997187
 time @ 4MHz  = 9718997187 / 4*10^6 = 40 min 29 sec
+
+
+Z88DK January 3, 2022
+sccz80 / classic c library / MBF32
+4703 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 6306469660
+time @ 4MHz  = 6306469660 / 4*10^6 = 26 min 16 sec
+
+
+Z88DK January 3, 2022
+sccz80 / classic c library / 8085 / MBF32
+4620 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 6279854918
+time @ 4MHz  = 6279854918 / 4*10^6 = 26 min 10 sec
+

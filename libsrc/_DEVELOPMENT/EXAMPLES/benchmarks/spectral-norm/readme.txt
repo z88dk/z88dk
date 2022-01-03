@@ -115,14 +115,14 @@ time @ 4MHz  = 14688455657 / 4*10^6 = 61 min 12 sec
 [Issue #124](https://github.com/z88dk/z88dk/issues/124) Normalization is slow.
 
 7.
-Z88DK July 4, 2021
-sccz80 / classic c library / math32
-5875 bytes less page zero
+Z88DK January 3, 2022
+zsdcc #12555 / classic c library / math32
+5910 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 9718997187
-time @ 4MHz  = 9718997187 / 4*10^6 = 40 min 29 sec
+cycle count  = 9756176827
+time @ 4MHz  = 9756176827 / 4*10^6 = 40 min 39 sec
 
 8.
 Z88DK July 4, 2021
@@ -145,7 +145,27 @@ time @ 4MHz  = 20543308237 / 4*10^6 = 85 min 36 sec
 
 Slow speed & large size due to float implementation in C.
 
-DQ.
+10.
+Z88DK January 3, 2022
+sccz80 / classic c library / MBF32
+4703 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 6306469660
+time @ 4MHz  = 6306469660 / 4*10^6 = 26 min 16 sec
+
+11.
+Z88DK January 3, 2022
+sccz80 / classic c library / 8085 / MBF32
+4620 bytes less page zero
+
+error: 2 * 10^(-7)
+
+cycle count  = 6279854918
+time @ 4MHz  = 6279854918 / 4*10^6 = 26 min 10 sec
+
+DISQ.
 HITECH C MSDOS V750
 ? bytes exact
 

@@ -27,7 +27,7 @@ a binary ORGed at address 0 was produced.
 This simplifies the use of TICKS for timing.
 
 classic/sccz80/8085
-zcc +test -m8085 -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
+zcc +test -clib=8085 -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
 
 sccz80/classic
 zcc +test -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
@@ -58,10 +58,10 @@ PI.C
 
 Z88DK January 3, 2022
 sccz80 / classic c library / 8085 CPU
-7187 bytes less page zero
+7298 bytes less page zero
 
-cycle count  = 4073389905 unreliable
-time @ 4MHz  = 4073389905 / 4*10^6 = 16 min 58 sec
+cycle count  = 10209121152
+time @ 4MHz  = 10209121152 / 4*10^6 = 42 min 32 sec
 
 
 Z88DK January 3, 2022
