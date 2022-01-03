@@ -100,12 +100,12 @@ cycle count  = 4169137078
 time @ 4MHz  = 4169137078 / 4*10^6 = 17 min 22 sec
 
 6.
-Z88DK April 20, 2020
+Z88DK January 3, 2022
 sccz80 / classic c library
-6508 bytes less page zero
+7146 bytes less page zero
 
-cycle count  = 4012440830
-time @ 4MHz  = 4012440830 / 4*10^6 = 16 min 43 sec
+cycle count  = 4056462302
+time @ 4MHz  = 4056462302 / 4*10^6 = 16 min 54 sec
 
 7.
 HITECH C MSDOS V750

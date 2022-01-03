@@ -9,6 +9,9 @@ VERIFY CORRECT RESULT
 To verify correct result, compile for the zx spectrum target
 and run in an emulator.
 
+classic/sccz80/8085
+zcc +cpm -clib=8085 -vn -O2 -DSTATIC -DPRINTF pi.c -o pi -lndos -create-app
+
 sccz80/classic
 zcc +zx -vn -O2 -DSTATIC -DPRINTF pi.c -o pi -lndos -create-app
 
@@ -22,6 +25,9 @@ To time, the program was compiled for the generic z80 target so that
 a binary ORGed at address 0 was produced.
 
 This simplifies the use of TICKS for timing.
+
+classic/sccz80/8085
+zcc +test -m8085 -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
 
 sccz80/classic
 zcc +test -vn -O2 -DSTATIC -DTIMER -D__Z88DK pi.c -o pi.bin -lndos -m
@@ -50,12 +56,20 @@ RESULT
 PI.C
 
 
-Z88DK April 20, 2020
-sccz80 / classic c library
-6508 bytes less page zero
+Z88DK January 3, 2022
+sccz80 / classic c library / 8085 CPU
+7187 bytes less page zero
 
-cycle count  = 4012440830
-time @ 4MHz  = 4012440830 / 4*10^6 = 16 min 43 sec
+cycle count  = 4073389905 unreliable
+time @ 4MHz  = 4073389905 / 4*10^6 = 16 min 58 sec
+
+
+Z88DK January 3, 2022
+sccz80 / classic c library
+7146 bytes less page zero
+
+cycle count  = 4056462302
+time @ 4MHz  = 4056462302 / 4*10^6 = 16 min 54 sec
 
 
 Z88DK April 20, 2020

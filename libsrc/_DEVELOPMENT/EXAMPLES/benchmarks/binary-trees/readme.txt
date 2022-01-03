@@ -83,12 +83,12 @@ cycle count  = 150508687
 time @ 4MHz  = 150508687 / 4*10^6 = 37.63 sec
 
 2.
-Z88DK April 20, 2020
+Z88DK January 3, 2022
 sccz80 / classic c library
-2924 bytes less page zero
+3800 bytes less page zero
 
-cycle count  = 153408086
-time @ 4MHz  = 153408086 / 4*10^6 = 38.52 sec
+cycle count  = 145559470
+time @ 4MHz  = 145559470 / 4*10^6 = 36.39 sec
 
 3.
 SDCC 3.6.5 #9852 (MINGW64)
@@ -140,7 +140,15 @@ time @ 4MHz  = 7358336547 / 4x10^6 = 30 min 40 sec
 IAR is likely implementing a heap similar to z88dk's new c library
 where an emphasis is placed on the speed of realloc().
 
-DQ.
+8.
+Z88DK January 3, 2022
+sccz80 / classic c library / 8085 CPU
+3831 bytes less page zero
+
+cycle count  = 156017339
+time @ 4MHz  = 156017339 / 4*10^6 = 39.00 sec
+
+DISQ.
 HITECH C CPM V309
 4165 bytes less cpm overhead
 

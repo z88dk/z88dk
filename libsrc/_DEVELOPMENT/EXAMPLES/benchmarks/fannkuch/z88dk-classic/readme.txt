@@ -9,6 +9,9 @@ VERIFY CORRECT RESULT
 To verify the correct result, compile for the zx spectrum target and
 run in a spectrum emulator.
 
+classic/sccz80/8085
+zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 fannkuch.c -o fannkuch -lndos -create-app
+
 classic/sccz80
 zcc +zx -vn -DSTATIC -DPRINTF -O2 fannkuch.c -o fannkuch -lndos -create-app
 
@@ -22,6 +25,9 @@ To time, the program was compiled for the generic z80 target so that
 a binary ORGed at address 0 was produced.
 
 This simplifies the use of TICKS for timing.
+
+classic/sccz80/8085
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 fannkuch.c -o fannkuch.bin -lndos -m
 
 classic/sccz80
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 fannkuch.c -o fannkuch.bin -lndos -m
@@ -46,12 +52,20 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK April 20, 2020
-classic/sccz80
-1178 bytes less page zero
+Z88DK January 3, 2022
+classic/sccz80/8085
+1821 bytes less page zero
 
-cycle count  = 77386481
-time @ 4MHz  = 77386481 / 4*10^6 = 19.34 sec
+cycle count  = 75221898
+time @ 4MHz  = 75221898 / 4*10^6 = 18.81 sec
+
+
+Z88DK January 3, 2022
+classic/sccz80
+1763 bytes less page zero
+
+cycle count  = 75381296
+time @ 4MHz  = 75381296 / 4*10^6 = 18.84 sec
 
 
 Z88DK April 20, 2020

@@ -100,15 +100,15 @@ time @ 4MHz  = 5306393684 / 4*10^6 = 22 min 07 sec
 Slow speed & large size due to float implementation in C.
 
 5.
-Z88DK April 28, 2021
+Z88DK January 3, 2022
 sccz80 / classic
-4493 bytes less page zero
+4527 bytes less page zero
 
 first number error : 5 * 10^(-8)
 second number error: 1 * 10^(-8)
 
-cycle count  = 3658052111
-time @ 4MHz  = 3658052111 / 4*10^6 = 15 min 14 sec
+cycle count  = 3659884553
+time @ 4MHz  = 3659884553 / 4*10^6 = 15 min 15 sec
 
 Internal 48-bit float implementation causes relative slowdown.
 
@@ -137,15 +137,15 @@ cycle count  = 2253709929
 time @ 4MHz  = 2253709929 / 4*10^6 = 9 min 23 sec
 
 8.
-Z88DK April 30, 2021
+Z88DK January 3, 2022
 sccz80 / classic / math32
-6018 bytes less page zero
+6052 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 993265277
-time @ 4MHz  = 993265277 / 4*10^6 =  4 min 8 sec
+cycle count  = 995097719
+time @ 4MHz  = 995097719 / 4*10^6 =  4 min 9 sec
 
 IEEE 32-bit float implementation, accurate to 7 significant digits.
 
@@ -174,6 +174,19 @@ cycle count  = 357718801
 time @ 4MHz  = 357718801 / 4*10^6 = 1 min 29 sec
 
 IEEE 16-bit float implementation, accurate to 3 significant digits.
+
+11.
+Z88DK January 3, 2022
+sccz80 / classic / MBF32
+4989 bytes less page zero
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1848679330
+time @ 4MHz  = 1848679330 / 4*10^6 =  7 min 42 sec
+
+Microsoft 32-bit float implementation, accurate to 7 significant digits.
 
 DQ.
 HITECH C CPM V309

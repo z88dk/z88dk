@@ -92,14 +92,14 @@ Large size & slow speed largely due to float implementation in C.
 Bugged -DSTATIC prevents potentially faster version from compiling.
 
 6.
-Z88DK April 20, 2020
-sccz80 / classic c library
-3291 bytes less page zero
+Z88DK January 3, 2022
+sccz80 / classic c library / MBF32
+4823 bytes less page zero
 
-cycle count  = 243021012
-time @ 4MHz  = 243021012 / 4*10^6 = 60.76 sec
+cycle count  = 165102454
+time @ 4MHz  = 165102454 / 4*10^6 = 41.27 sec
 
-Internal 48-bit float implementation causes relative slowdown.
+Microsoft 32-bit float implementation.
 
 7.
 Z88DK April 20, 2020
@@ -118,6 +118,8 @@ sccz80 / new c library
 
 cycle count  = 204281085
 time @ 4MHz  = 204281085 / 4*10^6 = 51.07 sec
+
+Internal 48-bit float implementation causes relative slowdown.
 
 9.
 Z88DK April 20, 2020
