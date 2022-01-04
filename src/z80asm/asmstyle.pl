@@ -81,7 +81,7 @@ sub parse_line {
 	    }
         }
         # opcode
-        elsif (s/^\s*(\w+)\s*//) {
+        elsif (s/^\s*(#?\w+)\s*//) {
             $ret{opcode} = $1;
             $ret{args} = '';
             while (/\S/) {
