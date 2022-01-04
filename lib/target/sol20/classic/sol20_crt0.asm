@@ -41,7 +41,7 @@
 	defc	CONSOLE_COLUMNS = 64
         INCLUDE "crt/classic/crt_rules.inc"
 
-     IFNDEF CRT_ORG_CODE
+     IF !DEFINED_CRT_ORG_CODE
         defc CRT_ORG_CODE = 0x0000
      ENDIF
 
