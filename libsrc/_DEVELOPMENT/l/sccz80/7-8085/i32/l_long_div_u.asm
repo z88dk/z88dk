@@ -9,8 +9,6 @@ SECTION code_l_sccz80
 
 PUBLIC  l_long_div_u, l_long_div_u_0
 
-EXTERN  l_long_rl_mde, l_long_cp_mhl, l_long_sub_mhl
-
 ;quotient = primary / secondary
 ;enter with secondary (divisor) in dehl, primary (dividend | quotient) on stack
 ;exit with quotient in dehl
@@ -65,26 +63,6 @@ EXTERN  l_long_rl_mde, l_long_cp_mhl, l_long_sub_mhl
 
 .div_loop
 
-IF 1
-    ld      de,sp+14            ;rotate left dividend + quotient Carry
-    call    l_long_rl_mde
-
-    ld      de,sp+4             ;rotate left remainder + dividend Carry
-    call    l_long_rl_mde
-
-    ld      de,sp+8             ;compare (remainder - divisor)
-    ex      de,hl
-    ld      de,sp+4
-    call    l_long_cp_mhl
-
-    jp      C,skip_subtract     ;skip if remainder < divisor
-
-    ld      de,sp+8             ;subtract (remainder - divisor)
-    ex      de,hl
-    ld      de,sp+4
-    call    l_long_sub_mhl
-
-ELSE
     ld      de,sp+14            ;rotate left dividend + quotient Carry
 
     ld      a,(de)
@@ -164,7 +142,6 @@ ELSE
     ld      a,(de)
     sbc     a,(hl)
     ld      (de),a
-ENDIF
 
 .skip_subtract
     ccf                         ;prepare Carry for quotient
@@ -173,7 +150,22 @@ ENDIF
     jp      NZ,div_loop
 
     ld      de,sp+14            ;rotate left quotient Carry
-    call    l_long_rl_mde
+
+    ld      a,(de)
+    rla
+    ld      (de),a
+    inc     de
+    ld      a,(de)
+    rla
+    ld      (de),a
+    inc     de
+    ld      a,(de)
+    rla
+    ld      (de),a
+    inc     de
+    ld      a,(de)
+    rla
+    ld      (de),a
 
     ret
 
