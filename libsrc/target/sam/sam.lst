@@ -77,11 +77,11 @@ target/sam/sam/sam_load_palette
 target/sam/sam/sam_set_palette
 
 ; Lets pull in etracker + ay emulator for the sound chip
-@psg/saa1099/saa1099.lst
+@sound/saa1099/saa1099.lst
 
 ; Pull in WYZ player
 target/sam/psg/asm_wyz_hardware_out
-@psg/ay/wyz/psg_wyz.lst
+@sound/ay/wyz/psg_wyz.lst
 
 ; What are these used for?
 target/sam/variables

@@ -3,5 +3,5 @@ target/x1/stdio/getk
 target/x1/stdio/fgetc_cons
 @stdio/stdio.lst
 
-@psg/ay/psg.lst
+@sound/ay/psg.lst
 

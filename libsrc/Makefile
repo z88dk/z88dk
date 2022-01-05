@@ -157,10 +157,9 @@ define buildgeneric
 	$(MAKE) -C font
 	$(MAKE) -C input
 	$(MAKE) -C stdlib 
-	$(MAKE) -C gfx TARGET=$(1) FLAVOUR=$(if $(2),$(2),narrow)
-	$(MAKE) -C psg TARGET=$(1)
-	$(MAKE) -C games TARGET=$(1) SUBTYPE=$(3) TARGET_CFLAGS=$(4)
-	$(MAKE) -C sound TARGET=$(1) SUBTYPE=$(3) TARGET_CFLAGS=$(4)
+	$(MAKE) -C gfx TARGET=$(1) $(if $(3),SUBTYPE=$(3),) FLAVOUR=$(if $(2),$(2),narrow)
+	$(MAKE) -C games TARGET=$(1) $(if $(3),SUBTYPE=$(3),) $(if $(4),TARGET_CFLAGS=$(4),)
+	$(MAKE) -C sound TARGET=$(1) $(if $(3),SUBTYPE=$(3),) $(if $(4),TARGET_CFLAGS=$(4),)
 endef
 
 define buildcrt
@@ -395,7 +394,6 @@ pc88_clib.lib:
 	@echo ''
 	@echo '--- Building PC8801 Library ---'
 	@echo ''
-	$(MAKE) -C psg TARGET=pc88
 	$(call buildgeneric,pc88,"wide")
 	TARGET=pc88 TYPE=z80 $(LIBLINKER) -DFORpc88 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pc88_clib @$(TARGET_DIRECTORY)/pc88/pc88.lst
 
@@ -628,7 +626,7 @@ attache.lib:
 	@echo ''
 	@echo '--- Building Otrona Attache Library ---'
 	@echo ''
-	$(MAKE) -C psg TARGET=cpm SUBTYPE=attache
+	$(MAKE) -C sound TARGET=cpm SUBTYPE=attache
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=attache
 	TARGET=attache TYPE=z80 $(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/attache @$(TARGET_DIRECTORY)/attache/attache.lst
 
@@ -858,7 +856,6 @@ svi_clib.lib:
 	$(MAKE) -C target/msx/msxbios
 	$(MAKE) -C target/svi TARGET=svi
 	$(MAKE) -C video/tms9918 TARGET=svi
-	$(MAKE) -C psg TARGET=svi
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsvi -x$(OUTPUT_DIRECTORY)/svi_clib @$(TARGET_DIRECTORY)/svi/svi.lst
 	TARGET=svi TYPE=z80 $(LIBLINKER) -DFORsvi -x$(OUTPUT_DIRECTORY)/svibios @$(TARGET_DIRECTORY)/svi/arch_svibios.lst
 
@@ -872,7 +869,6 @@ msx_clib.lib:
 	$(MAKE) -C target/cpm/fcntl
 	$(MAKE) -C target/msx 
 	$(MAKE) -C video/tms9918 TARGET=msx
-	$(MAKE) -C psg TARGET=msx
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(TARGET_DIRECTORY)/msx/msx.lst
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msxbios @$(TARGET_DIRECTORY)/msx/arch_msxbios.lst
 
@@ -936,7 +932,7 @@ einstein.lib:
 	$(MAKE) -C sound TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=narrow SUBTYPE=einstein
-	$(MAKE) -C psg TARGET=cpm SUBTYPE=einstein
+	$(MAKE) -C sound TARGET=cpm SUBTYPE=einstein
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(TARGET_DIRECTORY)/einstein/einstein.lst
 
 excali64_clib.lib:
@@ -955,7 +951,6 @@ smc777_clib.lib:
 	@echo ''
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C gfx TARGET=smc777 FLAVOUR=wide
-	$(MAKE) -C psg TARGET=smc777
 	$(MAKE) -C games TARGET=smc777 
 	$(MAKE) -C sound TARGET=smc777 
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_clib @$(TARGET_DIRECTORY)/smc777/smc777.lst
@@ -966,7 +961,6 @@ smc777_cpm.lib:
 	@echo ''
 	@$(RM) -f video/mc6845/*.o
 	$(MAKE) -C gfx TARGET=cpm SUBTYPE=smc777 FLAVOUR=wide
-	$(MAKE) -C psg TARGET=cpm SUBTYPE=smc777
 	$(MAKE) -C games TARGET=cpm SUBTYPE=smc777 TARGET_CFLAGS=-subtype=smc777
 	$(MAKE) -C sound TARGET=cpm SUBTYPE=smc777 TARGET_CFLAGS=-subtype=smc777
 	TARGET=smc777 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsmc777 -x$(OUTPUT_DIRECTORY)/smc777_cpm @$(TARGET_DIRECTORY)/smc777/smc777_cpm.lst
@@ -999,7 +993,6 @@ adam.lib:
 	$(MAKE) -C sound TARGET=cpm SUBTYPE=coleco
 	$(MAKE) -C video/tms9918 TARGET=coleco
 	$(MAKE) -C gfx TARGET=coleco FLAVOUR=narrow
-	$(MAKE) -C psg TARGET=coleco
 	TARGET=coleco TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORcoleco -DFORadam -x$(OUTPUT_DIRECTORY)/adam @$(TARGET_DIRECTORY)/adam/adam.lst
 
 # SORD M5 library - Stefano
@@ -1276,7 +1269,6 @@ gl6000_clib.lib:
 	@echo '--- Building Genius Leader 6000 Library ---'
 	@echo ''
 	$(call buildgeneric,gl,narrow,gl6000,-clib=gl6000sl)
-	$(MAKE) -C gfx TARGET=gl SUBTYPE=gl6000 FLAVOUR=narrow
 	TARGET=gl6000 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORgl6000 -x$(OUTPUT_DIRECTORY)/gl6000_clib @$(TARGET_DIRECTORY)/gl6000/gl6000.lst
 
 
@@ -1409,9 +1401,7 @@ tiki100.lib:
 	@echo ''
 	@echo '--- Building TIKI-100 Library ---'
 	@echo ''
-	$(call buildgeneric,cpm)
-	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=tiki100
-	$(MAKE) -C psg TARGET=cpm SUBTYPE=tiki100
+	$(call buildgeneric,cpm,"wide",tiki100)
 	TARGET=tiki100 TYPE=z80 $(LIBLINKER) -DFORtiki100 -x$(OUTPUT_DIRECTORY)/tiki100 @$(TARGET_DIRECTORY)/tiki100/tiki100.lst
 	
 # RCM2/3000 lib
@@ -1653,16 +1643,14 @@ vector06c_clib.lib:
 	@echo ''
 	@echo '--- Building Vector06c Library ---'
 	@echo ''
-	$(call buildgeneric,vector06c,portable)
-	$(MAKE) -C gfx TARGET=vector06c FLAVOUR=wide
+	$(call buildgeneric,vector06c,"wide portable")
 	TARGET=vector06c TYPE=8080 $(LIBLINKER) -m8080 -DFORvector06c -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/vector06c_clib @$(TARGET_DIRECTORY)/vector06c/vector06c.lst
 
 pk8000_clib.lib:
 	@echo ''
 	@echo '--- Building PK8000 Library ---'
 	@echo ''
-	$(call buildgeneric,pk8000,portable)
-	#$(MAKE) -C gfx TARGET=vector06c FLAVOUR=wide
+	$(call buildgeneric,pk8000,"wide portable")
 	TARGET=pk8000 TYPE=8080 $(LIBLINKER) -m8080 -DFORpk8000 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/pk8000_clib @$(TARGET_DIRECTORY)/pk8000/pk8000.lst
 
 lviv_clib.lib:
@@ -1870,7 +1858,6 @@ classic-clean:
 	$(MAKE) -C debug clean
 	$(MAKE) -C lib3d clean
 	$(MAKE) -C input clean	
-	$(MAKE) -C psg clean
 	$(MAKE) -C threading/preempt clean
 	$(MAKE) -C sprites/software/sp1 clean
 	$(MAKE) -C sdcard clean

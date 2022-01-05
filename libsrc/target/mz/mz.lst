@@ -11,7 +11,7 @@ target/mz/stdio/ansi/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 target/mz/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
-@psg/sn76489/sn76489.lst
+@sound/sn76489/sn76489.lst
 target/mz/graphics/clsgraph
 target/mz/graphics/plotpixl
 target/mz/graphics/respixl

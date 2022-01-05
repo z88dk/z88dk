@@ -47,6 +47,6 @@ target/spc1000/psg/set_psg
 target/spc1000/psg/set_psg_callee
 target/spc1000/psg/get_psg
 target/spc1000/psg/psg_init
-@psg/ay/psg.lst
+@sound/ay/psg.lst
 @video/mc6847/mc6847.lst
 

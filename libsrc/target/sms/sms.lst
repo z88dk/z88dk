@@ -20,7 +20,7 @@ target/sms/read_joypad2
 target/sms/gotoxy
 target/sms/add_raster_int
 target/sms/add_pause_int
-@psg/sn76489/sn76489.lst
+@sound/sn76489/sn76489.lst
 @sound/onebit/onebit.lst
 @games/games.lst
 @video/tms9918/video_tms9918.lst

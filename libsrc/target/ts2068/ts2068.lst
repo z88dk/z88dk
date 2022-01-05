@@ -26,7 +26,7 @@ target/ts2068/psg/get_psg
 target/ts2068/psg/psg_init
 target/ts2068/psg/asm_wyz_hardware_out
 target/ts2068/psg/asm_vt2_hardware_out
-@psg/ay/wyz/psg_wyz.lst
-@psg/ay/vt2/psg_vt2.lst
+@sound/ay/wyz/psg_wyz.lst
+@sound/ay/vt2/psg_vt2.lst
 @target/ts2068/newlib/newlib.lst
-@psg/ay/psg.lst
+@sound/ay/psg.lst

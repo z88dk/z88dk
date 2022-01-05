@@ -50,7 +50,7 @@ target/pc6001/psg/set_psg_callee
 target/pc6001/psg/get_psg
 target/pc6001/psg/psg_init
 target/pc6001/psg/asm_wyz_hardware_out
-@psg/ay/psg.lst
-@psg/ay/wyz/psg_wyz.lst
+@sound/ay/psg.lst
+@sound/ay/wyz/psg_wyz.lst
 @video/mc6847/mc6847.lst
 

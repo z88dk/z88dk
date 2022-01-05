@@ -114,6 +114,6 @@ target/cpc/psg/get_psg
 target/cpc/psg/psg_init
 target/cpc/psg/asm_wyz_hardware_out
 target/cpc/banked_call
-@psg/ay/psg.lst
-@psg/ay/wyz/psg_wyz.lst
+@sound/ay/psg.lst
+@sound/ay/wyz/psg_wyz.lst
 

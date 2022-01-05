@@ -6,7 +6,7 @@ stdio/inkey/getk
 @video/tms9918/video_tms9918_nmi.lst
 @stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
-@psg/sn76489/sn76489.lst
+@sound/sn76489/sn76489.lst
 @sound/onebit/onebit.lst
 @games/games.lst
 

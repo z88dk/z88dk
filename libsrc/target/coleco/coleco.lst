@@ -6,7 +6,7 @@ target/coleco/stdio/getk
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @gfx/narrow/gfx_narrow.lst
-@psg/sn76489/sn76489.lst
+@sound/sn76489/sn76489.lst
 target/coleco/games/joystick
 target/coleco/games/coleco_joypad
 games/obj/coleco/joystick_type

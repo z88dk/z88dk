@@ -25,7 +25,7 @@ target/smc777/graphics/w_xorpixl_MODE8
 @gfx/wide/gfx_wide.lst
 target/smc777/games/joystick
 @font/font_8x8/font_8x8.lst
-@psg/sn76489/sn76489.lst
+@sound/sn76489/sn76489.lst
 @sound/onebit/onebit.lst
 @games/games.lst
 @video/mc6845/mc6845.lst

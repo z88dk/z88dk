@@ -1,7 +1,7 @@
 include ../Make.config
 
 
-SUBDIRS = onebit
+SUBDIRS = onebit ay sn76489 saa1099
 
 CLEANDIRS = $(SUBDIRS:%=clean-%)
 

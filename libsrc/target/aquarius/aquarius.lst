@@ -27,5 +27,5 @@ target/aquarius/psg/set_psg
 target/aquarius/psg/set_psg_callee
 target/aquarius/psg/get_psg
 target/aquarius/psg/psg_init
-@psg/ay/psg.lst
+@sound/ay/psg.lst
 

@@ -10,7 +10,7 @@ target/rx78/stdio/conio_vars
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 @input/input_keyboard.lst
-@psg/sn76489/sn76489.lst
+@sound/sn76489/sn76489.lst
 target/rx78/load_palette
 target/rx78/graphics/clg
 target/rx78/graphics/pixladdr

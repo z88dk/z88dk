@@ -9,4 +9,4 @@ target/attache/graphics/w_pointxy
 target/attache/psg/set_psg
 target/attache/psg/set_psg_callee
 target/attache/psg/psg_init
-@psg/ay/psg.lst
+@sound/ay/psg.lst

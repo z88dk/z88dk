@@ -99,4 +99,4 @@ target/cpc/psg/set_psg
 target/cpc/psg/set_psg_callee
 target/cpc/psg/get_psg
 target/cpc/psg/psg_init
-@psg/ay/psg.lst
+@sound/ay/psg.lst

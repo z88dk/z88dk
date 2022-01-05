@@ -9,7 +9,7 @@ target/pasopia7/stdio/generic_console_ioctl
 @stdio/stdio.lst
 @input/input_keyboard.lst
 target/pasopia7/games/joystick
-@psg/sn76489/sn76489.lst
+@sound/sn76489/sn76489.lst
 @sound/onebit/onebit.lst
 @games/games.lst
 @gfx/gencon/gfx_gencon1.lst

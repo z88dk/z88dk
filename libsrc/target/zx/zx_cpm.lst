@@ -62,4 +62,4 @@ target/zx/psg/set_psg
 target/zx/psg/set_psg_callee
 target/zx/psg/get_psg
 target/zx/psg/psg_init
-@psg/ay/psg.lst
+@sound/ay/psg.lst
