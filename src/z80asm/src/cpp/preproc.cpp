@@ -10,6 +10,7 @@
 #include "lex.h"
 #include "preproc.h"
 #include "utils.h"
+#include "asmerrors.h"
 #include <cassert>
 using namespace std;
 
@@ -168,14 +169,14 @@ bool Preproc::open(const string& filename, bool search_include_path) {
 
 	// check for recursive includes
 	if (recursive_include(found_filename)) {
-		error_include_recursion(filename.c_str());
+		g_errors.error(ErrCode::IncludeRecursion, filename);
 		return false;
 	}
 
 	// open file
 	ifstream ifs(found_filename, ios::binary);
 	if (!ifs.is_open()) {
-		error_read_file(found_filename.c_str());
+		g_errors.error(ErrCode::FileOpen, found_filename);
 		return false;
 	}
 	else {
@@ -283,9 +284,9 @@ bool Preproc::recursive_include(const string& filename) {
 
 void Preproc::got_eof() {
 	if (!m_if_stack.empty()) {
-		error_unbalanced_struct_at(
-			m_if_stack.back().location.filename.c_str(),
-			m_if_stack.back().location.line_num);
+		g_errors.error(ErrCode::UnbalancedStructStartedAt,
+			m_if_stack.back().location.filename + ":" +
+			std::to_string(m_if_stack.back().location.line_num));
 		m_if_stack.clear();
 	}
 	close();
@@ -431,7 +432,7 @@ bool Preproc::check_macro() {
 		return true;
 	}
 	else if (m_lexer[0].is(Keyword::ENDM)) {
-		error_unbalanced_struct();
+		g_errors.error(ErrCode::UnbalancedStruct);
 		return true;
 	}
 	else
@@ -484,7 +485,7 @@ bool Preproc::check_reptx() {
 		return true;
 	}
 	else if (m_lexer[0].is(Keyword::ENDR)) {
-		error_unbalanced_struct();
+		g_errors.error(ErrCode::UnbalancedStruct);
 		return true;
 	}
 	else
@@ -506,15 +507,15 @@ void Preproc::do_if() {
 
 void Preproc::do_else() {
 	if (!m_lexer.peek().is(TType::Newline))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else if (m_if_stack.empty())
-		error_unbalanced_struct();
+		g_errors.error(ErrCode::UnbalancedStruct);
 	else {
 		Keyword last = m_if_stack.back().keyword;
 		if (last != Keyword::IF && last != Keyword::ELIF)
-			error_unbalanced_struct_at(
-				m_if_stack.back().location.filename.c_str(),
-				m_if_stack.back().location.line_num);
+			g_errors.error(ErrCode::UnbalancedStructStartedAt,
+				m_if_stack.back().location.filename + ":" +
+				std::to_string(m_if_stack.back().location.line_num));
 		else {
 			bool flag = !m_if_stack.back().done_if;
 			m_if_stack.back().keyword = Keyword::ELSE;
@@ -526,15 +527,15 @@ void Preproc::do_else() {
 
 void Preproc::do_endif() {
 	if (!m_lexer.peek().is(TType::Newline))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else if (m_if_stack.empty())
-		error_unbalanced_struct();
+		g_errors.error(ErrCode::UnbalancedStruct);
 	else {
 		Keyword last = m_if_stack.back().keyword;
 		if (last != Keyword::IF && last != Keyword::ELIF && last != Keyword::ELSE)
-			error_unbalanced_struct_at(
-				m_if_stack.back().location.filename.c_str(),
-				m_if_stack.back().location.line_num);
+			g_errors.error(ErrCode::UnbalancedStructStartedAt,
+				m_if_stack.back().location.filename + ":" +
+				std::to_string(m_if_stack.back().location.line_num));
 		else
 			m_if_stack.pop_back();
 	}
@@ -542,12 +543,12 @@ void Preproc::do_endif() {
 
 void Preproc::do_ifdef_ifndef(bool invert) {
 	if (!m_lexer.peek().is(TType::Ident))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else {
 		string name = m_lexer.peek().svalue;
 		m_lexer.next();
 		if (!m_lexer.peek().is(TType::Newline))
-			error_syntax();
+			g_errors.error(ErrCode::Syntax);
 		else {
 			// expand macros in condition
 			string cond_text = expand(name);
@@ -572,13 +573,13 @@ void Preproc::do_ifndef() {
 
 void Preproc::do_elif() {
 	if (m_if_stack.empty())
-		error_unbalanced_struct();
+		g_errors.error(ErrCode::UnbalancedStruct);
 	else {
 		Keyword last = m_if_stack.back().keyword;
 		if (last != Keyword::IF && last != Keyword::ELIF)
-			error_unbalanced_struct_at(
-				m_if_stack.back().location.filename.c_str(),
-				m_if_stack.back().location.line_num);
+			g_errors.error(ErrCode::UnbalancedStructStartedAt,
+				m_if_stack.back().location.filename + ":" +
+				std::to_string(m_if_stack.back().location.line_num));
 		else {
 			// expand macros in condition
 			string cond_text = expand(m_lexer.text_ptr());
@@ -599,21 +600,21 @@ void Preproc::do_elif() {
 
 void Preproc::do_elifdef_elifndef(bool invert) {
 	if (m_if_stack.empty())
-		error_unbalanced_struct();
+		g_errors.error(ErrCode::UnbalancedStruct);
 	else {
 		Keyword last = m_if_stack.back().keyword;
 		if (last != Keyword::IF && last != Keyword::ELIF)
-			error_unbalanced_struct_at(
-				m_if_stack.back().location.filename.c_str(),
-				m_if_stack.back().location.line_num);
+			g_errors.error(ErrCode::UnbalancedStructStartedAt,
+				m_if_stack.back().location.filename + ":" +
+				std::to_string(m_if_stack.back().location.line_num));
 		else {
 			if (!m_lexer.peek().is(TType::Ident))
-				error_syntax();
+				g_errors.error(ErrCode::Syntax);
 			else {
 				string name = m_lexer.peek().svalue;
 				m_lexer.next();
 				if (!m_lexer.peek().is(TType::Newline))
-					error_syntax();
+					g_errors.error(ErrCode::Syntax);
 				else {
 					// expand macros in condition
 					string cond_text = expand(name);
@@ -643,12 +644,12 @@ void Preproc::do_elifndef() {
 
 void Preproc::do_include() {
 	if (!m_lexer.peek().is(TType::String))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else {
 		string filename = m_lexer.peek().svalue;
 		m_lexer.next();
 		if (!m_lexer.peek().is(TType::Newline))
-			error_syntax();
+			g_errors.error(ErrCode::Syntax);
 		else {
 			open(filename, true);
 		}
@@ -657,23 +658,23 @@ void Preproc::do_include() {
 
 void Preproc::do_binary() {
 	if (!m_lexer.peek().is(TType::String))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else {
 		string filename = m_lexer.peek().svalue;
 		m_lexer.next();
 		if (!m_lexer.peek().is(TType::Newline))
-			error_syntax();
+			g_errors.error(ErrCode::Syntax);
 		else {
 			// search file in path
 			string found_filename = search_includes(filename.c_str());
 
 			// open file
 			ifstream ifs(found_filename, ios::binary);
-			if (!ifs.is_open()) 
-				error_read_file(found_filename.c_str());
+			if (!ifs.is_open())
+				g_errors.error(ErrCode::FileOpen, found_filename);
 			else {
 				// output DEFB lines
-				const int line_len = 32;
+				const int line_len = 16;
 				unsigned char bytes[line_len];
 
 				while (!ifs.eof()) {
@@ -697,7 +698,7 @@ void Preproc::do_binary() {
 
 void Preproc::do_define() {
 	if (!m_lexer.peek().is(TType::Ident))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else {
 		// get name
 		size_t name_col = m_lexer.peek().col;
@@ -718,7 +719,7 @@ void Preproc::do_define() {
 			m_lexer.next();						// skip '('
 			while (true) {
 				if (!m_lexer.peek().is(TType::Ident)) {
-					error_syntax();
+					g_errors.error(ErrCode::Syntax);
 					return;
 				}
 				string arg = m_lexer.peek().svalue;
@@ -734,7 +735,7 @@ void Preproc::do_define() {
 					break;
 				}
 				else {
-					error_syntax();
+					g_errors.error(ErrCode::Syntax);
 					return;
 				}
 			}
@@ -751,13 +752,13 @@ void Preproc::do_define() {
 
 void Preproc::do_undef() {
 	if (!m_lexer.peek().is(TType::Ident))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else {
 		// get name
 		string name = m_lexer.peek().svalue;
 		m_lexer.next();
 		if (!m_lexer.peek().is(TType::Newline))
-			error_syntax();
+			g_errors.error(ErrCode::Syntax);
 		else
 			defines_base().remove(name);
 	}
@@ -765,7 +766,7 @@ void Preproc::do_undef() {
 
 void Preproc::do_defl(const string& name) {
 	if (m_lexer.peek().is(TType::Newline))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else {
 		// if name is not defined, create an empty one
 		if (!defines_base().find(name)) {
@@ -807,7 +808,7 @@ void Preproc::do_macro_call(shared_ptr<Macro> macro) {
 	if (macro->args().size() != 0) {
 		params = collect_macro_params(m_lexer);
 		if (macro->args().size() != params.size()) {
-			error_wrong_number_macro_args(macro->name().c_str());
+			g_errors.error(ErrCode::MacroArgsNumber, macro->name());
 			return;
 		}
 	}
@@ -842,16 +843,16 @@ void Preproc::do_local() {
 
 void Preproc::do_exitm() {
 	if (!m_lexer.peek().is(TType::Newline))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else if (m_levels.size() == 1)
-		error_unbalanced_struct();
+		g_errors.error(ErrCode::UnbalancedStruct);
 	else
 		m_levels.back().exitm_called = true;
 }
 
 void Preproc::do_rept() {
 	if (m_lexer.peek().is(TType::Newline))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else {
 		int count = 0;
 		bool error = false;
@@ -874,13 +875,13 @@ void Preproc::do_rept() {
 
 void Preproc::do_reptc() {
 	if (!m_lexer.peek().is(TType::Ident))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else {
 		// get variable to iterate
 		string var = m_lexer.peek().svalue;
 		m_lexer.next();
 		if (!m_lexer.peek().is(TType::Comma))
-			error_syntax();
+			g_errors.error(ErrCode::Syntax);
 		else {
 			m_lexer.next();
 			// build string to iterate
@@ -904,22 +905,22 @@ void Preproc::do_reptc() {
 
 void Preproc::do_repti() {
 	if (!m_lexer.peek().is(TType::Ident))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else {
 		// get variable to iterate
 		string var = m_lexer.peek().svalue;
 		m_lexer.next();
 		if (!m_lexer.peek().is(TType::Comma))
-			error_syntax();
+			g_errors.error(ErrCode::Syntax);
 		else {
 			m_lexer.next();
 			if (m_lexer.peek().is(TType::Newline))
-				error_syntax();
+				g_errors.error(ErrCode::Syntax);
 			else {
 				// collect params to iterate
 				vector<string> params = collect_macro_params(m_lexer);
 				if (!m_lexer.peek().is(TType::Newline))
-					error_syntax();
+					g_errors.error(ErrCode::Syntax);
 				else {
 					string body = collect_macro_body(Keyword::REPTI, Keyword::ENDR);
 
@@ -949,17 +950,17 @@ void Preproc::do_float() {
 	Lexer sublexer{ expanded };
 
 	if (sublexer.peek().is(TType::Newline))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else {
 		while (true) {
 			// parse expression
 			FloatExpr expr{ sublexer };
 			if (!expr.parse()) {
-				error_syntax_expr();
+				g_errors.error(ErrCode::Syntax, expanded);
 				return;
 			}
 			else if (expr.eval_error()) {
-				error_float_eval_error();
+				g_errors.error(ErrCode::ExprEval, expanded);
 				return;
 			}
 			else {
@@ -979,7 +980,7 @@ void Preproc::do_float() {
 			else if (sublexer.peek().is(TType::Newline))
 				break;
 			else {
-				error_syntax();
+				g_errors.error(ErrCode::Syntax);
 				return;
 			}
 		}
@@ -991,14 +992,14 @@ void Preproc::do_setfloat() {
 	Lexer sublexer{ expanded };
 
 	if (sublexer.peek().is(TType::Newline))
-		error_syntax();
+		g_errors.error(ErrCode::Syntax);
 	else if (sublexer.peek().is(TType::Ident)) {
 		string format = sublexer.peek().svalue;
 		sublexer.next();
 		if (!sublexer.peek().is(TType::Newline))
-			error_syntax();
+			g_errors.error(ErrCode::Syntax);
 		else if (!set_float_format(format.c_str()))
-			error_invalid_float_format(get_float_formats());
+			g_errors.error(ErrCode::InvalidFloatFormat, FloatFormat::get_formats());
 		else {}
 	}
 }
@@ -1039,7 +1040,7 @@ ExpandedText Preproc::expand(Lexer& lexer, Macros& defines) {
 		case TType::Pow: out.append("**"); break;
 		case TType::Div: out.append("/"); break;
 		case TType::Mod: out.append("%"); break;
-		case TType::Eq: out.append("=="); break;
+		case TType::Eq: out.append("="); break;
 		case TType::Ne: out.append("!="); break;
 		case TType::Lt: out.append("<"); break;
 		case TType::Le: out.append("<="); break;
@@ -1107,7 +1108,7 @@ ExpandedText Preproc::expand_define_call(const string& name, Lexer& lexer, Macro
 	if (macro->args().size() != 0) {
 		params = collect_macro_params(lexer);
 		if (macro->args().size() != params.size()) {
-			error_wrong_number_macro_args(macro->name().c_str());
+			g_errors.error(ErrCode::MacroArgsNumber, macro->name());
 			return out;
 		}
 	}
@@ -1181,7 +1182,7 @@ vector<string> Preproc::collect_macro_params(Lexer& lexer) {
 		case TType::Newline:
 			return params;
 		default:
-			error_syntax();
+			g_errors.error(ErrCode::Syntax);
 			return params;
 		}
 	}
@@ -1191,7 +1192,7 @@ vector<string> Preproc::collect_name_list(Lexer& lexer) {
 	vector<string> names;
 	while (true) {
 		if (!lexer.peek().is(TType::Ident)) {
-			error_syntax();
+			g_errors.error(ErrCode::Syntax);
 			break;
 		}
 		string name = lexer.peek().svalue;
@@ -1203,7 +1204,7 @@ vector<string> Preproc::collect_name_list(Lexer& lexer) {
 		else if (lexer.peek().is(TType::Newline))
 			break;
 		else {
-			error_syntax();
+			g_errors.error(ErrCode::Syntax);
 			break;
 		}
 	}
@@ -1220,15 +1221,15 @@ string Preproc::collect_macro_body(Keyword start_keyword, Keyword end_keyword) {
 
 		if ((m_lexer[0].is(TType::Label, TType::Ident) && m_lexer[1].is(start_keyword)) ||
 			(m_lexer[0].is(start_keyword))) {
-			error_unbalanced_struct_at(
-				start_location.filename.c_str(),
-				start_location.line_num);
+			g_errors.error(ErrCode::UnbalancedStructStartedAt,
+				start_location.filename + ":" +
+				std::to_string(start_location.line_num));
 			return "";
 		}
 		else if (m_lexer[0].is(end_keyword)) {
 			m_lexer.next();
 			if (!m_lexer[0].is(TType::Newline)) {
-				error_syntax();
+				g_errors.error(ErrCode::Syntax);
 				return "";
 			}
 			else {
@@ -1238,9 +1239,9 @@ string Preproc::collect_macro_body(Keyword start_keyword, Keyword end_keyword) {
 		else
 			body += line;
 	}
-	error_unbalanced_struct_at(
-		start_location.filename.c_str(),
-		start_location.line_num);
+	g_errors.error(ErrCode::UnbalancedStruct,
+		start_location.filename + ":" +
+		std::to_string(start_location.line_num));
 	return "";
 }
 
@@ -1254,7 +1255,7 @@ string Preproc::collect_reptc_arg(Lexer& lexer) {
 		case TType::String:
 			lexer.next();
 			if (!lexer.peek().is(TType::End, TType::Newline)) {
-				error_syntax();
+				g_errors.error(ErrCode::Syntax);
 				return "";
 			}
 			else
@@ -1262,7 +1263,7 @@ string Preproc::collect_reptc_arg(Lexer& lexer) {
 		case TType::Integer:
 			lexer.next();
 			if (!lexer.peek().is(TType::End, TType::Newline)) {
-				error_syntax();
+				g_errors.error(ErrCode::Syntax);
 				return "";
 			}
 			else
@@ -1271,7 +1272,7 @@ string Preproc::collect_reptc_arg(Lexer& lexer) {
 			ExpandedText expanded = expand(lexer, defines());
 			string expanded_text = str_chomp(expanded.text());
 			if (!lexer.peek().is(TType::End, TType::Newline)) {
-				error_syntax();
+				g_errors.error(ErrCode::Syntax);
 				return "";
 			}
 			else if (expanded_text == prev_expanded) {		// detect loop
@@ -1285,7 +1286,7 @@ string Preproc::collect_reptc_arg(Lexer& lexer) {
 			}
 		}
 		default:
-			error_syntax();
+			g_errors.error(ErrCode::Syntax);
 			return "";
 		}
 	}

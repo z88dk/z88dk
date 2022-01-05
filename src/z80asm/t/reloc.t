@@ -122,8 +122,8 @@ my $reloc_header = reloc_header(@reloc);
 
 t_z80asm_capture("-b -m -R test.asm", 
 				 "Relocation header is ".length($reloc_header)." bytes.\n", <<'ERR', 0);
-Warning at module 'test': ORG ignored at file 'test.o', section 'code'
-Warning at module 'test': ORG ignored at file 'test.o', section 'data'
+test.asm: warning: ORG ignored: file test.o, section code
+test.asm: warning: ORG ignored: file test.o, section data
 ERR
 
 t_binary(read_binfile("test.bin"), $reloc_header.CPU::Z80::Assembler::z80asm("org 0\n".$asm));
@@ -240,12 +240,12 @@ $reloc_header = reloc_header(@reloc);
 
 t_z80asm_capture("-b -m -R test.asm test1.asm test2.asm", 
 				 "Relocation header is ".length($reloc_header)." bytes.\n", <<'ERR', 0);
-Warning at module 'test': ORG ignored at file 'test.o', section 'code'
-Warning at module 'test': ORG ignored at file 'test.o', section 'data'
-Warning at module 'test1': ORG ignored at file 'test1.o', section 'code'
-Warning at module 'test1': ORG ignored at file 'test1.o', section 'data'
-Warning at module 'test2': ORG ignored at file 'test2.o', section 'code'
-Warning at module 'test2': ORG ignored at file 'test2.o', section 'data'
+test.asm: warning: ORG ignored: file test.o, section code
+test.asm: warning: ORG ignored: file test.o, section data
+test1.asm: warning: ORG ignored: file test1.o, section code
+test1.asm: warning: ORG ignored: file test1.o, section data
+test2.asm: warning: ORG ignored: file test2.o, section code
+test2.asm: warning: ORG ignored: file test2.o, section data
 ERR
 
 t_binary(read_binfile("test.bin"), $reloc_header.CPU::Z80::Assembler::z80asm("org 0\n".$asm));

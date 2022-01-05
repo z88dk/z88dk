@@ -24,20 +24,23 @@ END_ASM
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 		assert
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- assert
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 		extern xxx
 		assert xxx
 END_ASM
-Error at file '$test.asm' line 2: expected constant expression
+$test.asm:2: error: constant expression expected
+  ^---- assert xxx
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 		assert 0
 END_ASM
-Error at file '$test.asm' line 1: assertion failed
+$test.asm:1: error: assertion failed
+  ^---- assert 0
 END_ERR
 
 unlink_testfiles;

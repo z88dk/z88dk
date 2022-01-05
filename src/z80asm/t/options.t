@@ -62,11 +62,11 @@ is read_file(bin_file(), binmode => ':raw'), "\0\0\0";
 
 # check no arguments
 t_z80asm_capture("-v=x", 	"", 	<<'ERR', 1);
-Error: illegal option: -v=x
+error: illegal option: -v=x
 ERR
 
 t_z80asm_capture("--verbose=x", 	"", 	<<'ERR', 1);
-Error: illegal option: --verbose=x
+error: illegal option: --verbose=x
 ERR
 
 # not verbose
@@ -77,11 +77,11 @@ is read_file(bin_file(), binmode => ':raw'), "\0";
 
 # check no arguments
 t_z80asm_capture("-nv=x", 	"", 	<<'ERR', 1);
-Error: illegal option: -nv=x
+error: illegal option: -nv=x
 ERR
 
 t_z80asm_capture("--not-verbose=x", 	"", 	<<'ERR', 1);
-Error: illegal option: --not-verbose=x
+error: illegal option: --not-verbose=x
 ERR
 
 #------------------------------------------------------------------------------
@@ -341,37 +341,6 @@ t_z80asm_capture("-d $base", "", "", 0);
 is substr(read_file(o_file(), binmode => ':raw'), -5, 5), "\0\xFF\xFF\xFF\xFF";
 is -M o_file(), $date_obj;	# new object
 
-
-#------------------------------------------------------------------------------
-# -r
-#------------------------------------------------------------------------------
-
-# -r
-for my $origin (0, 0x1234) {
-	my $origin_hex = sprintf("%x", $origin);
-	for my $origin_text ($origin, "0x${origin_hex}", "0X${origin_hex}", "0${origin_hex}h", "0${origin_hex}H", "\$${origin_hex}") {
-		z80asm(
-			options	=> "-b -r".$origin_text,
-			asm		=> "start: jp start",
-			bin		=> "\xC3" . pack("v", $origin),
-		);
-	}
-}
-
-# option out of range
-for my $origin (-1, 0x10000) {
-	z80asm(
-		options	=> "-b -r$origin",
-		asm		=> "start: jp start",
-		error	=> "Error: integer '$origin' out of range",
-	);
-}
-z80asm(
-	options	=> "-b -r123Z",
-	asm		=> "start: jp start",
-	error	=> "Error: invalid origin (-r) option '123Z'",
-);
-
 #------------------------------------------------------------------------------
 # -R - tested in reloc.t
 
@@ -458,7 +427,7 @@ t_z80asm_ok(0, $asm, $bin, "-l".$lib);
 # no -L, only file name : error
 write_file(asm_file(), $asm);
 t_z80asm_capture("-l".$lib_base." ".asm_file(), "", 
-		"Error: cannot read file 'test.lib'\n", 1);
+		"error: file open: test.lib\n", 1);
 
 # -L : OK
 t_z80asm_ok(0, $asm, $bin, "-L$lib_dir -l$lib_base");
@@ -479,19 +448,22 @@ unlink_testfiles($lib);
 $asm = "ld a,_value23";		# BUG_0045
 
 # no -D
-t_z80asm_error($asm, "Error at file 'test.asm' line 1: symbol '_value23' not defined");
+t_z80asm_error($asm, <<END);
+test.asm:1: error: undefined symbol: _value23
+  ^---- _value23
+END
 
 # invalid -D
 for my $options ('-D23', quote_os('-Da*')) {		# quote because of '*'
 	write_file(asm_file(), "");
 	t_z80asm_capture("$options ".asm_file(), "", 
-					"Error: illegal identifier\n", 1);
+					"error: illegal identifier\n", 1);
 }
 
 for my $options ('aaa=', 'aaa=a', 'aaa=!', 'aaa=1x') {
 	write_file(asm_file(), "");
 	t_z80asm_capture("-D${options} ".asm_file(), "", 
-					"Error: invalid -DVAR=VAL option '${options}'\n", 1);
+					"error: invalid define (-Dvar=value) option: ${options}\n", 1);
 }
 
 # -D
@@ -830,16 +802,16 @@ t_z80asm_ok(0, "
 	
 ), "-mz180");
 
-t_z80asm_error("slp			", "Error at file 'test.asm' line 1: illegal identifier");
-t_z80asm_error("mlt bc		", "Error at file 'test.asm' line 1: illegal identifier");
-t_z80asm_error("in0 b,(10)	", "Error at file 'test.asm' line 1: illegal identifier");
-t_z80asm_error("out0 (10),b	", "Error at file 'test.asm' line 1: illegal identifier");
-t_z80asm_error("otim		", "Error at file 'test.asm' line 1: illegal identifier");
-t_z80asm_error("otimr		", "Error at file 'test.asm' line 1: illegal identifier");
-t_z80asm_error("otdm		", "Error at file 'test.asm' line 1: illegal identifier");
-t_z80asm_error("otdmr		", "Error at file 'test.asm' line 1: illegal identifier");
-t_z80asm_error("tstio 23	", "Error at file 'test.asm' line 1: illegal identifier");
-t_z80asm_error("tst b		", "Error at file 'test.asm' line 1: illegal identifier");
+t_z80asm_error("slp			", "test.asm:1: error: illegal identifier\n  ^---- slp");
+t_z80asm_error("mlt bc		", "test.asm:1: error: illegal identifier\n  ^---- mlt bc");
+t_z80asm_error("in0 b,(10)	", "test.asm:1: error: illegal identifier\n  ^---- in0 b,(10)");
+t_z80asm_error("out0 (10),b	", "test.asm:1: error: illegal identifier\n  ^---- out0 (10),b");
+t_z80asm_error("otim		", "test.asm:1: error: illegal identifier\n  ^---- otim");
+t_z80asm_error("otimr		", "test.asm:1: error: illegal identifier\n  ^---- otimr");
+t_z80asm_error("otdm		", "test.asm:1: error: illegal identifier\n  ^---- otdm");
+t_z80asm_error("otdmr		", "test.asm:1: error: illegal identifier\n  ^---- otdmr");
+t_z80asm_error("tstio 23	", "test.asm:1: error: illegal identifier\n  ^---- tstio 23");
+t_z80asm_error("tst b		", "test.asm:1: error: illegal identifier\n  ^---- tst b");
 
 #------------------------------------------------------------------------------
 # -mr2ka
@@ -860,7 +832,7 @@ t_z80asm_ok(0, "
 #------------------------------------------------------------------------------
 write_file("-test.asm", "nop");
 t_z80asm_capture("-b -test.asm", "", <<END, 1);
-Error: illegal option: -test.asm
+error: illegal option: -test.asm
 END
 t_z80asm_capture("-b -- -test.asm", "", "", 0);
 t_binary(read_binfile("-test.bin"), "\x00");

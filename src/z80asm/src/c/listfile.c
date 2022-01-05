@@ -10,7 +10,6 @@ Handle assembly listing and symbol table listing.
 */
 
 #include "codearea.h"
-#include "errors.h"
 #include "fileutil.h"
 #include "hist.h"
 #include "if.h"
@@ -177,8 +176,7 @@ void ListFile_start_line( ListFile *self, int address,
 }
 
 void list_start_line( int address,
-	const char *source_file, int source_line_nr, const char *line )
-{
+	const char *source_file, int source_line_nr, const char *line ) {
     if ( the_list != NULL )
     {
         ListFile_start_line( the_list, address,
@@ -187,14 +185,13 @@ void list_start_line( int address,
 }
 
 void got_source_line(const char* filename, int line_num, const char* text) {
-	set_error_file(filename);			// file for error messages
-	if (filename) {
-		set_error_line(line_num);		// line number for error messages
+	set_error_location(filename, line_num);
+	set_error_source_line(text);
 
-		// send line to list file
-		if (opts.cur_list)
-			list_start_line(get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
-				filename, line_num, text);
+	// send line to list file
+	if (filename && opts.cur_list) {
+		list_start_line(get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
+			filename, line_num, text);
 	}
 #ifdef LOG_INPUT
 	printf("%s:%d:%s", filename, line_num, text);
@@ -202,13 +199,22 @@ void got_source_line(const char* filename, int line_num, const char* text) {
 }
 
 void got_expanded_line(const char* filename, int line_num, const char* text) {
-	if (opts.verbose) {
+	set_error_expanded_line(text);
+
+	// send line to list file
+	if (filename && opts.cur_list && opts.verbose) {
 		UT_string* line;
 		utstring_new(line);
-		utstring_printf(line, "+ %s", text);
-		got_source_line(filename, line_num, utstring_body(line));
+		utstring_printf(line, "      + %s", text);
+
+		list_start_line(get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
+			filename, line_num, utstring_body(line));
+
 		utstring_free(line);
 	}
+#ifdef LOG_INPUT
+	printf("%s:%d:      + %s", filename, line_num, text);
+#endif
 }
 
 /*-----------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "asmerrors.h"
 #include "defines.h"
 #include "if.h"
 #include <algorithm>
@@ -15,7 +16,7 @@ Macro::Macro(const string& name, const string& body)
 
 void Macro::push_arg(const string& arg) {
 	if (find(m_args.begin(), m_args.end(), arg) != m_args.end())
-		error_symbol_redefined(arg.c_str());
+		g_errors.error(ErrCode::DuplicateDefinition, arg);
 	else
 		m_args.push_back(arg);
 }
@@ -34,7 +35,7 @@ Macros::Macros(Macros* parent)
 void Macros::add(shared_ptr<Macro> macro) {
 	const string& name = macro->name();
 	if (m_table.find(name) != m_table.end())
-		error_symbol_redefined(name.c_str());
+		g_errors.error(ErrCode::DuplicateDefinition, name);
 	else
 		m_table[name] = macro;
 }

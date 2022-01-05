@@ -196,6 +196,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\asmerrors.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\defines.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\float.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\lex.h" />
@@ -210,8 +211,6 @@
     <ClInclude Include="..\..\src\z80asm\src\c\common.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\dbg.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\directives.h" />
-    <ClInclude Include="..\..\src\z80asm\src\c\errors.h" />
-    <ClInclude Include="..\..\src\z80asm\src\c\error_func.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\expr.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\expr_def.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\hist.h" />
@@ -242,6 +241,7 @@
     <ClInclude Include="..\..\src\z80asm\src\if.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\asmerrors.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\defines.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\float.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\lex.cpp" />
@@ -255,8 +255,6 @@
     <ClCompile Include="..\..\src\z80asm\src\c\common.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\dbg.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\directives.c" />
-    <ClCompile Include="..\..\src\z80asm\src\c\errors.c" />
-    <ClCompile Include="..\..\src\z80asm\src\c\error_func.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\expr.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\hist.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\libfile.c" />
@@ -278,12 +276,12 @@
     <ClCompile Include="..\..\src\z80asm\src\c\zobjfile.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src\z80asm\src\cpp\asmerrors.def" />
     <None Include="..\..\src\z80asm\src\cpp\float.def" />
     <None Include="..\..\src\z80asm\src\cpp\keyword.def" />
     <None Include="..\..\src\z80asm\src\cpp\lex.re" />
     <None Include="..\..\src\z80asm\src\c\parse_rules.rl" />
     <None Include="..\..\src\z80asm\src\c\scan_rules.rl" />
-    <None Include="..\..\src\z80asm\tt\error_func.yaml" />
     <None Include="..\..\src\z80asm\tt\tokens.yaml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

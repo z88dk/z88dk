@@ -20,7 +20,8 @@ unlink_testfiles();
 z80asm(<<'...', "", 1, "", <<'...');
 	defc aaa = aaa
 ...
-Error at file 'test.asm' line 1: expression for 'aaa' depends on itself
+test.asm:1: error: recursive expression
+  ^---- defc aaa = aaa
 ...
 
 unlink_testfiles();

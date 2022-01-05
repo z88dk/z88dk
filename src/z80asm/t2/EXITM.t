@@ -6,13 +6,15 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 		exitm hello
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- exitm hello
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 		exitm
 END_ASM
-Error at file '$test.asm' line 1: unbalanced control structure
+$test.asm:1: error: unbalanced control structure
+  ^---- exitm
 END_ERR
 
 # function

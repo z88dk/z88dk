@@ -8,19 +8,22 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		include 
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- include
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		include 'a'
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- include 'a'
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		include "$test.inc" extra
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- include "test_t2_INCLUDE.inc" extra
 END_ERR
 
 path("$test.inc")->spew(<<END);
@@ -70,7 +73,8 @@ END
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		include "test.inc"
 END_ASM
-Error at file '$test.asm' line 1: cannot read file 'test.inc'
+$test.asm:1: error: file open: test.inc
+  ^---- include "test.inc"
 END_ERR
 
 # -I : OK
@@ -115,7 +119,8 @@ unlink "$test.inc";
 z80asm_nok("-x$test.lib", "", <<END_ASM, <<END_ERR);
 		include "$test.inc"
 END_ASM
-Error at file '$test.asm' line 1: cannot read file '$test.inc'
+$test.asm:1: error: file open: $test.inc
+  ^---- include "$test.inc"
 END_ERR
 ok ! -f "$test.lib", "$test.lib does not exist";
 
@@ -128,7 +133,8 @@ END
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		include "$test.inc"
 END_ASM
-Error at file '$test.inc' line 1: cannot include file '$test.asm' recursively
+$test.inc:1: error: include recursion: $test.asm
+  ^---- include "$test.asm"
 END_ERR
 
 unlink_testfiles;

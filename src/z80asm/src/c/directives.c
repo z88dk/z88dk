@@ -12,7 +12,6 @@ Assembly directives.
 #include "codearea.h"
 #include "die.h"
 #include "directives.h"
-#include "errors.h"
 #include "fileutil.h"
 #include "if.h"
 #include "listfile.h"
@@ -83,7 +82,7 @@ void asm_cond_LABEL(Str* label)
 		char fname_encoded[FILENAME_MAX * 2];
 		url_encode(sfile_filename(), fname_encoded);
 
-		Str_sprintf(name, "__ASM_LINE_%ld_%s", get_error_line(), fname_encoded);
+		Str_sprintf(name, "__ASM_LINE_%ld_%s", get_error_line_num(), fname_encoded);
 		if (!find_local_symbol(Str_data(name)))
 			asm_LABEL(Str_data(name));
 
@@ -183,28 +182,20 @@ void asm_LSTOFF(void)
 /*-----------------------------------------------------------------------------
 *   directives with number argument
 *----------------------------------------------------------------------------*/
-void asm_LINE(int line_num, const char* filename)
-{
-	STR_DEFINE(name, STR_SIZE);
-
+void asm_LINE(int line_num, const char* filename) {
 	sfile_set_filename(filename);
 	sfile_set_line_num(line_num, 1);
 	sfile_set_c_source(false);
 
-	set_error_file(filename);
-	set_error_line(line_num);
-
-	STR_DELETE(name);
+	set_error_location(filename, line_num);
 }
 
-void asm_C_LINE(int line_num, const char* filename)
-{
+void asm_C_LINE(int line_num, const char* filename) {
 	sfile_set_filename(filename);
 	sfile_set_line_num(line_num, 0);		// do not increment line numbers
 	sfile_set_c_source(true);
 
-	set_error_file(filename);
-	set_error_line(line_num);
+	set_error_location(filename, line_num);
 
 	if (opts.debug_info) {
 		STR_DEFINE(name, STR_SIZE);
@@ -315,7 +306,7 @@ void asm_DEFC(const char* name, Expr* expr)
 	{
 		/* check if expression depends on itself */
 		if (Expr_is_recusive(expr, name)) {
-			error_expression_recursion(name);
+			error_expr_recursion(name);
 		}
 		else {
 			/* store in object file to be computed at link time */
@@ -530,7 +521,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 		If bit 6 of n is set then accept one following byte/ set together, expect word instead
 		*/
 		if ((N & 0x83) != 0x01) {
-			error_base_register_illegal(N);
+			error_dma_base_register_illegal(N);
 			return;
 		}
 
@@ -539,7 +530,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 		// parse wr0 parameters: check bits 3,4
 		if ((N & 0x18) != 0 && utarray_len(exprs) == 0) {
-			error_missing_arguments();
+			error_dma_missing_args();
 			return;
 		}
 		switch (N & 0x18) {
@@ -552,7 +543,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 		// parse wr0 parameters: check bits 5,6
 		if ((N & 0x60) != 0 && utarray_len(exprs) == 0) {
-			error_missing_arguments();
+			error_dma_missing_args();
 			return;
 		}
 		switch (N & 0x60) {
@@ -576,7 +567,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 		In w if any of bits 7,6,3,2 are set warning "dma does not support half cycle timing"
 		*/
 		if (((N & 0x87) | 0x04) != 0x04) {
-			error_base_register_illegal(N);
+			error_dma_base_register_illegal(N);
 			return;
 		}
 		N |= 0x04;
@@ -586,7 +577,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 		if (N & 0x40) {
 			if (utarray_len(exprs) == 0) {
-				error_missing_arguments();
+				error_dma_missing_args();
 				return;
 			}
 			if (!asm_DMA_shift_byte(exprs, &W))
@@ -594,7 +585,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 			add_opcode(W & 0xFF);
 			if ((W & 0x30) != 0 || (W & 0x03) == 0x03) {
-				error_port_A_timing();
+				error_dma_illegal_port_A_timing();
 				return;
 			}
 			if (W & 0xCC)
@@ -613,7 +604,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 		If bit 5 of w is set then accept one following byte x that can be anything.
 		*/
 		if ((N & 0x87) != 0x00) {
-			error_base_register_illegal(N);
+			error_dma_base_register_illegal(N);
 			return;
 		}
 
@@ -622,7 +613,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 		if (N & 0x40) {
 			if (utarray_len(exprs) == 0) {
-				error_missing_arguments();
+				error_dma_missing_args();
 				return;
 			}
 			if (!asm_DMA_shift_byte(exprs, &W))
@@ -630,7 +621,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 			add_opcode(W & 0xFF);
 			if ((W & 0x10) != 0 || (W & 0x03) == 0x03) {
-				error_port_B_timing();
+				error_dma_illegal_port_B_timing();
 				return;
 			}
 			if (W & 0xCC)
@@ -638,7 +629,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 			if (W & 0x20) {
 				if (utarray_len(exprs) == 0) {
-					error_missing_arguments();
+					error_dma_missing_args();
 					return;
 				}
 				asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
@@ -657,7 +648,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 		If bit 4 of n is set then accept one following byte that can be anything.
 		*/
 		if (((N & 0x83) | 0x80) != 0x80) {
-			error_base_register_illegal(N);
+			error_dma_base_register_illegal(N);
 			return;
 		}
 		N |= 0x80;
@@ -670,7 +661,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 		if (N & 0x08) {
 			if (utarray_len(exprs) == 0) {
-				error_missing_arguments();
+				error_dma_missing_args();
 				return;
 			}
 			asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
@@ -678,7 +669,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 		if (N & 0x10) {
 			if (utarray_len(exprs) == 0) {
-				error_missing_arguments();
+				error_dma_missing_args();
 				return;
 			}
 			asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
@@ -698,7 +689,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 		Again if both bits 2 & 3 are set, w,x must be combined into a single word parameter.
 		*/
 		if (((N & 0x83) | 0x81) != 0x81) {
-			error_base_register_illegal(N);
+			error_dma_base_register_illegal(N);
 			return;
 		}
 		if (N & 0x10) {
@@ -716,7 +707,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 		if ((N & 0x0C) == 0x0C) {
 			if (utarray_len(exprs) == 0) {
-				error_missing_arguments();
+				error_dma_missing_args();
 				return;
 			}
 			asm_DEFW(asm_DMA_shift_exprs(exprs));
@@ -724,14 +715,14 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 		else {
 			if (N & 0x04) {
 				if (utarray_len(exprs) == 0) {
-					error_missing_arguments();
+					error_dma_missing_args();
 					return;
 				}
 				asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
 			}
 			if (N & 0x08) {
 				if (utarray_len(exprs) == 0) {
-					error_missing_arguments();
+					error_dma_missing_args();
 					return;
 				}
 				asm_DEFB_expr(asm_DMA_shift_exprs(exprs));
@@ -747,7 +738,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 		If bit 3 of n is set then warning "dma does not support ready signals"
 		*/
 		if (((N & 0xC7) | 0x82) != 0x82) {
-			error_base_register_illegal(N);
+			error_dma_base_register_illegal(N);
 			return;
 		}
 		N |= 0x82;
@@ -808,7 +799,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 		if (N == 0xBB) {
 			if (utarray_len(exprs) == 0) {
-				error_missing_arguments();
+				error_dma_missing_args();
 				return;
 			}
 			if (!asm_DMA_shift_byte(exprs, &W))
@@ -829,7 +820,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 	// check for extra arguments
 	if (utarray_len(exprs) > 0)
-		error_extra_arguments();
+		error_dma_extra_args();
 }
 
 void asm_DMA_command(int cmd, UT_array* exprs)

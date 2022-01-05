@@ -17,7 +17,6 @@ require './t/testlib.pl';
 unlink_testfiles();
 spew("test.asm", 	"nop");
 spew("test.o", 		"dummy");
-spew("test.err",	"dummy");
 spew("test.lis",	"test");
 spew("test.bin",	"test");
 spew("test.sym",	"test");
@@ -33,8 +32,6 @@ Object  file test.o at $0000: Z80RMF16
   Section "": 1 bytes
     C $0000: 00
 END
-
-ok ! -f "test.err";
 
 check_text_file("test.lis",		"test");
 check_text_file("test.bin",		"test");

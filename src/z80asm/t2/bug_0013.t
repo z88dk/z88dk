@@ -13,7 +13,8 @@ z80asm_nok("", "", <<END, <<END);
         defs 65535, 'a'
         defm "aa"
 END
-Error at file '${test}.asm' line 2: max. code size of 65536 bytes reached
+$test.asm:2: error: segment overflow
+  ^---- defm "aa"
 END
 
 unlink_testfiles;

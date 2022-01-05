@@ -8,11 +8,11 @@
 #include "../config.h"
 #include "../portability.h"
 #include "die.h"
-#include "errors.h"
 #include "fileutil.h"
 #include "hist.h"
+#include "if.h"
 #include "init.h"
-#include "modlink.h"        /* Prevent warning: implicit declaration of function ‘library_file_append’ */
+#include "modlink.h"
 #include "options.h"
 #include "str.h"
 #include "strutil.h"
@@ -21,7 +21,6 @@
 #include "utstring.h"
 #include "z80asm.h"
 #include "zutils.h"
-
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
@@ -32,7 +31,6 @@
 #define FILEEXT_LIST    ".lis"    
 #define FILEEXT_OBJ     ".o"	  
 #define FILEEXT_DEF     ".def"    
-#define FILEEXT_ERR     ".err"    
 #define FILEEXT_BIN     ".bin"    
 #define FILEEXT_LIB     ".lib"    
 #define FILEEXT_SYM     ".sym"    
@@ -268,7 +266,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 		const char* format = &argv[II][6];
 		if (*format == '=') format++;
 		if (!set_float_format(format))
-			error_invalid_float_format(get_float_formats());
+			error_invalid_float_format();
 	}
 	else {
 		/* search opts_lu[] */
@@ -398,7 +396,7 @@ static const char *search_source(const char *filename)
 		return f;
 
 	// not found
-	error_read_file(filename);
+	error_file_open(filename);
 	return filename;
 }
 
@@ -655,7 +653,6 @@ static void exit_help( void )
     printf( "    %-6s = map file\n", FILEEXT_MAP );
 	printf( "    %-6s = reloc file\n", FILEEXT_RELOC);
 	printf( "    %-6s = global address definition file\n", FILEEXT_DEF);
-    printf( "    %-6s = error file\n", FILEEXT_ERR );
 
 #include "options_def.h"
 
@@ -707,11 +704,11 @@ int number_arg(const char *arg)
 
 static void option_dummy(void) {}
 
-static void option_origin(const char *origin )
+static void option_origin(const char * origin_text)
 {
-	int value = number_arg(origin);
-	if (value < 0 || value > 0xFFFF)
-		error_invalid_org_option(origin);
+	int value = number_arg(origin_text);
+	if (value < 0)		// value can be >0xffff for banked address
+		error_invalid_org_option(origin_text);
 	else
 		set_origin_option(value);
 }
@@ -910,12 +907,6 @@ const char *get_def_filename(const char *filename )
 {
     init_module();
 	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_DEF));
-}
-
-const char *get_err_filename(const char *filename )
-{
-    init_module();
-	return path_prepend_output_dir(path_replace_ext(filename, FILEEXT_ERR));
 }
 
 const char *get_bin_filename(const char *filename )

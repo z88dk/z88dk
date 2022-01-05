@@ -73,7 +73,6 @@ sub z80asm {
 	my $bin = $args{bin} || "";
 	my $err_text = "";
 	my @err_text;	# error text for each pass
-	my %err_file;
 	my %o_file;
 	my $num_errors;
 	for (sort keys %args) {
@@ -103,8 +102,9 @@ sub z80asm {
 				if (my($type, $dummy, $pass, $message) = 
 					/;;\s+(error|warn)(\s*(\d+))?:\s+(.*)/) {
 					$pass ||= 0;
-					my $err = ($type eq 'error' ? "Error" : "Warning").
-							" at file 'test$id.asm' line $line_nr: $message\n";
+					my $err = "test$id.asm:$line_nr: ".					
+						($type eq 'error' ? "error" : "warning").
+						": $message\n";
 					$num_errors++ if $type eq 'error';
 					$err_text[$pass] ||= "";
 					$err_text[$pass] .= $err;
@@ -121,10 +121,6 @@ sub z80asm {
 				defined $_ and $text .= $_;
 			}
 			$err_text .= $text;
-			if ($text) {
-				$err_file{"test$id.err"} ||= "";
-				$err_file{"test$id.err"} .= $text;		
-			}
 			@err_text = ();
 		}
 	}
@@ -148,12 +144,6 @@ sub z80asm {
 	is_text( $stderr, $err_text, "stderr" );
 	my $expected_ok = ($bin ne "") || $args{ok};
 	is !$return, !!$expected_ok, "exit";
-	
-	# check error file
-	for (sort keys %err_file) {
-		ok -f $_, "$_ exists";
-		is_text( scalar(read_file($_)), $err_file{$_}, "$_ contents" );
-	}
 	
 	# check object file
 	for (sort keys %o_file) {

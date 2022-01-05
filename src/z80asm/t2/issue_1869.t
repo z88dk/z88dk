@@ -9,8 +9,10 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
         defc    i_64 = i_61
         defc    i_61 = i_64
 END_ASM
-Error at file '$test.asm' line 1: symbol 'i_64' not defined
-Error at file '$test.asm' line 2: symbol 'i_61' not defined
+$test.asm:1: error: undefined symbol: i_64
+  ^---- i_61
+$test.asm:2: error: undefined symbol: i_61
+  ^---- i_64
 END_ERR
 
 path("$test.1.asm")->spew(<<END_ASM);
@@ -26,8 +28,10 @@ path("$test.2.asm")->spew(<<END_ASM);
 END_ASM
 
 capture_nok("./z88dk-z80asm -b $test.1.asm $test.2.asm", <<END_ERR);
-Error at file '$test.1.asm' line 3: symbol 'i_64' not defined
-Error at file '$test.2.asm' line 3: symbol 'i_61' not defined
+$test.1.asm:3: error: undefined symbol: i_64
+  ^---- i_61
+$test.2.asm:3: error: undefined symbol: i_61
+  ^---- i_64
 END_ERR
 
 unlink_testfiles;

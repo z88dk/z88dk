@@ -33,14 +33,14 @@ m1	macro
 	nop
 	endm
 ...
-Error at file test.asm line 4: macro multiply defined
+test.asm:4: error: macro multiply defined
 ...
 
 t_asmpp_error(<<'...', "", <<'...');
 m1	macro
 	nop
 ...
-Error at file test.asm line 1: missing ENDM
+test.asm:1: error: missing ENDM
 ...
 
 for my $sep ("\t", ":", " :", ": ", " : ") {
@@ -54,7 +54,7 @@ m1	macro
 	
 	m1 a
 ...
-Error at file test.asm line 5: extra macro arguments
+test.asm:5: error: extra macro arguments
 ...
 
 t_asmpp_ok(<<'...', "", "\xC5\xD5\xE5\xF5" x 5);
@@ -108,7 +108,8 @@ next:
 		m1
 		m1
 ...
-Error at file 'test.asm' line 7: symbol 'next' already defined
+test.asm:7: error: duplicate definition: next
+  ^---- next:
 ...
 
 t_asmpp_ok(<<'...', "", "\xC3\x03\x00\xC3\x06\x00");
@@ -448,6 +449,8 @@ exit 0;
 #------------------------------------------------------------------------------
 sub t_asmpp_ok {
 	my($in, $args, $bin) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
 	ok 1,"[line ".((caller)[2])."]"." t_asmpp_ok";
 	write_file("test.asm", $in);
 	unlink("test.bin");
@@ -459,6 +462,8 @@ sub t_asmpp_ok {
 #------------------------------------------------------------------------------
 sub t_asmpp_error {
 	my($in, $args, $error) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
 	ok 1,"[line ".((caller)[2])."]"." t_asmpp_error";
 	write_file("test.asm", $in);
 	my $cmd = "perl asmpp.pl -b $args test.asm";

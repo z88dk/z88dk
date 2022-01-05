@@ -4,34 +4,33 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 
 # CH_0012 : wrappers on OS calls to raise fatal error
 
-unlink "${test}.asm";
-capture_nok("./z88dk-z80asm ${test}.asm", <<END);
-Error: cannot read file '${test}.asm'
+unlink "$test.asm";
+capture_nok("./z88dk-z80asm $test.asm", <<END);
+error: file open: $test.asm
 END
 
-unlink "${test}.inc";
-z80asm_nok("", "", <<END,
-    INCLUDE "${test}.inc"
-END
-           <<END);
-Error at file '${test}.asm' line 1: cannot read file '${test}.inc'
-END
+unlink "$test.inc";
+z80asm_nok("", "", <<END_ASM, <<END_ERR);
+    INCLUDE "$test.inc"
+END_ASM
+$test.asm:1: error: file open: $test.inc
+  ^---- INCLUDE "$test.inc"
+END_ERR
 
-unlink "${test}.bin";
-z80asm_nok("", "", <<END,
-    BINARY "${test}.bin"
-END
-           <<END);
-Error at file '${test}.asm' line 1: cannot read file '${test}.bin'
-END
+unlink "$test.bin";
+z80asm_nok("", "", <<END_ASM, <<END_ERR);
+    BINARY "$test.bin"
+END_ASM
+$test.asm:1: error: file open: $test.bin
+  ^---- BINARY "$test.bin"
+END_ERR
 
-unlink "${test}.lib";
-z80asm_nok("-b -l${test}", "", <<END,
+unlink "$test.lib";
+z80asm_nok("-b -l$test", "", <<END_ASM, <<END_ERR);
     NOP
-END
-           <<END);
-Error: cannot read file '${test}.lib'
-END
+END_ASM
+error: file open: $test.lib
+END_ERR
 
 unlink_testfiles;
 done_testing;

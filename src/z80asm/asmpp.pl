@@ -136,8 +136,7 @@ sub add_define {
 #------------------------------------------------------------------------------
 sub error {
 	my($line, $message) = @_;
-	die "Error at file ", $line->{file}, " line ", $line->{line_nr},
-		": ", $message, "\n";
+	die $line->{file},":",$line->{line_nr},": error: ",$message,"\n";
 }		
 
 #------------------------------------------------------------------------------
@@ -627,8 +626,8 @@ sub assemble_file {
 		system @cmd;
 	};
 	
-	$stderr =~ s/(at file ')([^']+)(' line )(\d+)/
-				 $1 . $line_map[$4]{file} . $3 . $line_map[$4]{line_nr} /ge;
+	$stderr =~ s/^([^:]+):(\d+): (error|warning): /
+				 $line_map[$2]{file}.":".$line_map[$2]{line_nr}.": ".$3.": "/ge;
 	print $stdout;
 	print STDERR $stderr;
 	

@@ -5,13 +5,13 @@
 // Repository: https://github.com/z88dk/z88dk
 //-----------------------------------------------------------------------------
 
-#include "errors.h"
 #include "fileutil.h"
+#include "if.h"
 #include "libfile.h"
 #include "modlink.h"
+#include "options.h"
 #include "utlist.h"
 #include "zobjfile.h"
-#include "options.h"
 
 char Z80libhdr[] = "Z80LMF" OBJ_VERSION;
 

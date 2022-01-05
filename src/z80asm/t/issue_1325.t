@@ -19,8 +19,10 @@ unlink_testfiles();
 my $bit = 0;
 for my $op (qw( bit res set )) {
 	for my $r (qw( ixh ixl iyh iyl )) {
-		z80asm("$op $bit, $r",	'-b', 1, "", 
-				"Error at file 'test.asm' line 1: syntax error\n");
+		z80asm("$op $bit, $r",	'-b', 1, "", <<END);
+test.asm:1: error: syntax error
+  ^---- $op $bit, $r
+END
 		$bit++;
 		$bit &= 0x07;
 	}

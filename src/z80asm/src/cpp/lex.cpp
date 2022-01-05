@@ -6,6 +6,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "asmerrors.h"
 #include "if.h"
 #include "lex.h"
 #include "preproc.h"
@@ -942,7 +943,7 @@ yy89:
 yy91:
 			++p;
 yy92:
-			{ error_invalid_char(); clear(); return; }
+			{ g_errors.error(ErrCode::InvalidChar); clear(); return; }
 yy93:
 			yych = *++p;
 			switch (yych) {
@@ -987,7 +988,7 @@ yy100:
 				goto yy176;
 			}
 yy101:
-			{ error_unclosed_string(); clear(); return; }
+			{ g_errors.error(ErrCode::MissingQuote); clear(); return; }
 yy102:
 			yych = *++p;
 			switch (yych) {
@@ -1659,7 +1660,7 @@ yy196:
 			{
 							  string str = str_compress_escapes(string(p1, p2));
 							  if (str.length() != 1) {
-								  error_invalid_squoted_string();
+								  g_errors.error(ErrCode::InvalidCharConst);
 								  clear();
 							  }
 							  else {

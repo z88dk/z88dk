@@ -60,12 +60,6 @@
     <ClInclude Include="..\..\src\z80asm\src\c\directives.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\c\error_func.h">
-      <Filter>Header Files\c</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\c\errors.h">
-      <Filter>Header Files\c</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\expr.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
@@ -165,6 +159,9 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\float.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\asmerrors.h">
+      <Filter>Header Files\cpp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\src\c\alloc.c">
@@ -186,12 +183,6 @@
       <Filter>Source Files\c</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\c\directives.c">
-      <Filter>Source Files\c</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\c\error_func.c">
-      <Filter>Source Files\c</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\c\errors.c">
       <Filter>Source Files\c</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\c\expr.c">
@@ -269,6 +260,9 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\float.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\asmerrors.cpp">
+      <Filter>Source Files\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\src\c\scan_rules.rl">
@@ -283,13 +277,13 @@
     <None Include="..\..\src\z80asm\src\cpp\keyword.def">
       <Filter>Resource Files\cpp</Filter>
     </None>
-    <None Include="..\..\src\z80asm\tt\error_func.yaml">
-      <Filter>Resource Files\c</Filter>
-    </None>
     <None Include="..\..\src\z80asm\tt\tokens.yaml">
       <Filter>Resource Files\c</Filter>
     </None>
     <None Include="..\..\src\z80asm\src\cpp\float.def">
+      <Filter>Resource Files\cpp</Filter>
+    </None>
+    <None Include="..\..\src\z80asm\src\cpp\asmerrors.def">
       <Filter>Resource Files\cpp</Filter>
     </None>
   </ItemGroup>

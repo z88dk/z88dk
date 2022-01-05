@@ -6,33 +6,36 @@ use Math::Trig;
 #-------------------------------------------------------------------------------
 # errors
 #-------------------------------------------------------------------------------
-my $invalid_format_error = "invalid float format, expected one of: ".
+my $invalid_format_error = "invalid float format, expected: ".
 	"genmath,math48,ieee16,ieee32,ieee64,z80,zx81,zx,z88,mbfs,mbf40,mbf64,am9511";
 
 capture_nok("./z88dk-z80asm -float", <<END);
-Error: $invalid_format_error
+error: $invalid_format_error
 END
 
 capture_nok("./z88dk-z80asm -float=xx", <<END);
-Error: $invalid_format_error
+error: $invalid_format_error
 END
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		float 
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- float
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		setfloat 
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- setfloat
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		setfloat xx
 END_ASM
-Error at file '$test.asm' line 1: $invalid_format_error
+$test.asm:1: error: $invalid_format_error
+  ^---- setfloat xx
 END_ERR
 
 #-------------------------------------------------------------------------------

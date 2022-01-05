@@ -5,19 +5,22 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 defl
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- defl
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 defl a
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- defl a
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 defl a b
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- defl a b
 END_ERR
 
 z80asm_ok("", "", "", <<'END', bytes(1,2,3,3,5,7));

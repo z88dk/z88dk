@@ -582,13 +582,14 @@ write_file("test.asm", <<'END');
 				EXTERN	ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
 
 			sd_write_sector:
-				jp sd_write_block_2gb + ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE ;; error: symbol 'sd_write_block_2gb' not defined
+				jp sd_write_block_2gb + ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE ;; error: undefined symbol: sd_write_block_2gb
 END
 my($stdout, $stderr, $return, @dummy) = capture { system "./z88dk-z80asm test.asm"; };
 is_text( $stdout, "" );
 is_text( $stderr, <<'END' );
-Error at file 'test.asm' line 5: symbol 'sd_write_block_2gb' not defined
-Error at file 'test.asm' line 1: symbol 'sd_write_block_2gb' not defined
+test.asm:5: error: undefined symbol: sd_write_block_2gb
+  ^---- sd_write_block_2gb+ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE
+test.asm:1: error: undefined symbol: sd_write_block_2gb
 END
 is !!$return, !!1;
 

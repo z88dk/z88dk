@@ -6,11 +6,13 @@ z80asm_ok("", "", "",
 		'nop'					=> bytes(0));
 
 z80asm_nok("", "", "#define", <<END_ERR);
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- #define
 END_ERR
 
 z80asm_nok("", "", "#undef", <<END_ERR);
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- #undef
 END_ERR
 
 z80asm_ok("", "", "",
@@ -35,27 +37,32 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 #define nil nop
 #define nil nop
 END_ASM
-Error at file '$test.asm' line 2: symbol 'nil' already defined
+$test.asm:2: error: duplicate definition: nil
+  ^---- #define nil nop
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 #define .3 nop
 #define 3 nop
 END_ASM
-Error at file '$test.asm' line 1: syntax error
-Error at file '$test.asm' line 2: syntax error
+$test.asm:1: error: syntax error
+  ^---- #define .3 nop
+$test.asm:2: error: syntax error
+  ^---- #define 3 nop
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 #define abc(a,b,a) a+b+a
 END_ASM
-Error at file '$test.asm' line 1: symbol 'a' already defined
+$test.asm:1: error: duplicate definition: a
+  ^---- #define abc(a,b,a) a+b+a
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 #define abc(a,b a+b
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- #define abc(a,b a+b
 END_ERR
 
 z80asm_ok("", "", "",
