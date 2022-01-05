@@ -14,7 +14,7 @@ OBJSUBDIR = $(SUBTYPE)
 endif
 
 GENOBJECTS = 
-CUSTOBJECTS = bit_frequency.o bit_play.o buzzer_play.o synth_play.o psg_play.o joystick_type.o
+CUSTOBJECTS = joystick_type.o
 
 ifeq ($(SUBSET),)
 ASMFILES = $(wildcard *.asm)

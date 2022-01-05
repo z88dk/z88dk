@@ -18,6 +18,7 @@ target/trs80/games/bit_open_di
 target/trs80/games/bit_close
 target/trs80/games/bit_close_ei
 target/trs80/games/keys_joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 @video/mc6845/mc6845.lst
 

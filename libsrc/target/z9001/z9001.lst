@@ -13,6 +13,7 @@ stdio/ansi/generic/f_ansi_dline
 target/z9001/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
 target/z9001/games/joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 target/z9001/graphics/textpixl
 @gfx/text/gfx_text.lst

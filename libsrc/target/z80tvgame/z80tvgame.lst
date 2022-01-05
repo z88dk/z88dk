@@ -7,6 +7,7 @@ target/z80tvgame/stdio/fgetc_cons
 @stdio/stdio.lst
 @font/font_8x8/font_8x8.lst
 target/z80tvgame/games/joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 target/z80tvgame/graphics/pixladdr
 target/z80tvgame/graphics/clsgraph

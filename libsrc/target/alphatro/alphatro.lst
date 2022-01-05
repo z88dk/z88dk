@@ -12,5 +12,6 @@ target/alphatro/graphics/cleargraphics
 @gfx/gencon/gfx_gencon6.lst
 @video/mc6845/mc6845.lst
 target/alphatro/games/keys_joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 

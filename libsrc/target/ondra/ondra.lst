@@ -12,5 +12,6 @@ stdio/inkey/fgetc_cons
 @stdio/stdio.lst
 target/ondra/games/joystick
 target/ondra/games/keys_joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 

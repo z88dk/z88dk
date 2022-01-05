@@ -15,6 +15,7 @@ target/lm80c/psg/get_psg
 target/lm80c/psg/psg_init
 target/lm80c/psg/asm_wyz_hardware_out
 target/lm80c/psg/asm_vt2_hardware_out
+@sound/onebit/onebit.lst
 @games/games.lst
 @target/lm80c/rs232/rs232.lst
 

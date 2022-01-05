@@ -13,7 +13,7 @@
 ; This routine shouldn't stay in contended memory locations !!
 ;
 
-IF !__CPU_GBZ80__ && !__CPU_INTEL__
+IF !__CPU_GBZ80__ && !__CPU_INTEL__ && !__CPU_RABBIT__
           SECTION    smc_clib
           PUBLIC     bit_synth
           PUBLIC     _bit_synth

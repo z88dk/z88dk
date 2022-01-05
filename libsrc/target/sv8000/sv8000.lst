@@ -35,5 +35,6 @@ target/sv8000/psg/asm_wyz_hardware_out
 @psg/ay/wyz/psg_wyz.lst
 target/sv8000/games/joystick
 games/obj/sv8000/joystick_type
+@sound/onebit/onebit.lst
 @games/games.lst
 

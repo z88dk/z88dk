@@ -8,6 +8,7 @@ target/enterprise/games/bit_open
 target/enterprise/games/bit_open_di
 target/enterprise/games/bit_close
 target/enterprise/games/bit_close_ei
+@sound/onebit/onebit.lst
 @games/games.lst
 target/enterprise/enterprise/exos_capture_channel
 target/enterprise/enterprise/exos_capture_channel_callee

@@ -13,7 +13,7 @@
 ; play 4 bit pulse wave encoded data using sid master volume
 
 
-IF !__CPU_GBZ80__ && !__CPU_INTEL__
+IF !__CPU_GBZ80__ && !__CPU_INTEL__ && !__CPU_RABBIT__
 
 	SECTION code_clib
 	

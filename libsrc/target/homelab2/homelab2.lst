@@ -7,5 +7,6 @@ target/homelab2/graphics/textpixl
 @input/input_keyboard.lst
 target/homelab2/games/joystick.asm
 target/homelab2/games/keys_joystick.asm
+@sound/onebit/onebit.lst
 @games/games.lst
 

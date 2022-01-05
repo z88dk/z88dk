@@ -16,6 +16,7 @@ target/spc1000/stdio/CRT_FONT
 target/spc1000/tms9918
 target/spc1000/games/joystick
 target/spc1000/games/keys_joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 target/spc1000/graphics/cleargraphics
 target/spc1000/graphics/getmaxx

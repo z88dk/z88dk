@@ -21,5 +21,6 @@ target/rx78/graphics/pointxy
 @gfx/narrow/gfx_narrow.lst
 target/rx78/games/joystick
 target/rx78/games/keys_joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 

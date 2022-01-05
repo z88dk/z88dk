@@ -18,5 +18,6 @@ target/primo/games/bit_close
 target/primo/games/bit_close_ei
 target/primo/games/keys_joystick
 target/primo/games/joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 

@@ -15,6 +15,7 @@ stdio/inkey/fgetc_cons
 @input/input_keyboard.lst
 
 @font/font_8x8/font_8x8.lst
+@sound/onebit/onebit.lst
 @games/games.lst
 target/vector06c/graphics/clg
 target/vector06c/graphics/w_pixladdr

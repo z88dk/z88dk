@@ -18,5 +18,6 @@ target/mz/graphics/respixl
 target/mz/graphics/xorpixl
 target/mz/graphics/pointxy
 @gfx/narrow/gfx_narrow.lst
+@sound/onebit/onebit.lst
 @games/games.lst
 

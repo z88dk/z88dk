@@ -21,6 +21,7 @@ target/aquarius/games/bit_open_di
 target/aquarius/games/bit_close
 target/aquarius/games/bit_close_ei
 target/aquarius/games/keys_joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 target/aquarius/psg/set_psg
 target/aquarius/psg/set_psg_callee

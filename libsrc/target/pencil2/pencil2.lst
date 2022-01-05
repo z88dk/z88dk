@@ -10,6 +10,7 @@ target/pencil2/stdio/CRT_FONT
 target/pencil2/games/joystick
 target/pencil2/games/keys_joystick
 games/obj/pencil2/joystick_type
+@sound/onebit/onebit.lst
 @games/games.lst
 @input/input_keyboard.lst
 

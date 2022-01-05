@@ -7,5 +7,6 @@ target/gl/games/bit_open
 target/gl/games/bit_open_di
 target/gl/games/bit_close
 target/gl/games/bit_close_ei
+@sound/onebit/onebit.lst
 @games/games.lst
 

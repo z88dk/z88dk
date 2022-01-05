@@ -7,5 +7,6 @@ stdio/inkey/getk
 @stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
 @psg/sn76489/sn76489.lst
+@sound/onebit/onebit.lst
 @games/games.lst
 

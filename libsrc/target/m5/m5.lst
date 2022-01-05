@@ -12,5 +12,6 @@ target/m5/stdio/fputc_cons_rom
 target/m5/games/joystick
 target/m5/games/keys_joystick
 @psg/sn76489/sn76489.lst
+@sound/onebit/onebit.lst
 @games/games.lst
 

@@ -10,5 +10,6 @@ target/sc3000/time/clock
 @psg/sn76489/sn76489.lst
 target/sc3000/games/joystick
 target/sc3000/games/keys_joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 

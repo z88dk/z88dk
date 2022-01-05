@@ -8,7 +8,7 @@
 ; Stefano Bodrato - 2001..2013
 ;
 
-IF !__CPU_GBZ80__ && !__CPU_INTEL__
+IF !__CPU_GBZ80__ && !__CPU_INTEL__ && !__CPU_RABBIT__
     SECTION    code_clib
     PUBLIC     bit_open_di
     PUBLIC     _bit_open_di

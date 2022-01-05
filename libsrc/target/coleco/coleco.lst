@@ -10,5 +10,6 @@ target/coleco/stdio/getk
 target/coleco/games/joystick
 target/coleco/games/coleco_joypad
 games/obj/coleco/joystick_type
+@sound/onebit/onebit.lst
 @games/games.lst
 

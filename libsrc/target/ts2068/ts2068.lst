@@ -15,6 +15,7 @@ target/ts2068/graphics_hr/zx_hardcopy
 @gfx/wide/gfx_wide.lst
 target/shared/clock
 target/zx/games/obj/${TARGET}/joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 @target/zx/spectrum.lst
 @font/font_4x8/font_4x8.lst

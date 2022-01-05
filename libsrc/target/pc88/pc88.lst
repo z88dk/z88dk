@@ -42,6 +42,7 @@ target/pc88/games/bit_close
 target/pc88/games/bit_close_ei
 games/joystick
 target/pc88/time/clock
+@sound/onebit/onebit.lst
 @games/games.lst
 target/pc88/psg/set_psg
 target/pc88/psg/set_psg_callee

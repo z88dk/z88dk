@@ -12,6 +12,7 @@ stdio/inkey/fgetc_cons
 @font/font_8x8/font_8x8.lst
 target/pmd85/games/joystick
 target/pmd85/games/keys_joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 target/pmd85/graphics/clg
 target/pmd85/graphics/w_pixladdr

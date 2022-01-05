@@ -20,5 +20,6 @@ target/p2000/games/bit_open
 target/p2000/games/bit_open_di
 target/p2000/games/bit_close
 target/p2000/games/bit_close_ei
+@sound/onebit/onebit.lst
 @games/games.lst
 

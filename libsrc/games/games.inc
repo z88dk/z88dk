@@ -490,8 +490,10 @@ IF FORpencil2
 ENDIF
 
 
+
 MACRO ONEBITOUT
 LOCAL l1, l2, l3, l4
+IF !__CPU_RABBIT__
 IF SOUND_INOUT = 1
     ld      c,a
     and     SOUND_ONEBIT_mask
@@ -517,6 +519,7 @@ ELIF SOUND_ONEBIT_port < 0
 ELSE
     out     (SOUND_ONEBIT_port),a 
 ENDIF
+ENDIF
 ENDM
 
 
@@ -527,6 +530,11 @@ ENDM
 
 
 
+IFNDEF SOUND_ONEBIT_port
+    defc SOUND_ONEBIT_port   = 0
+    defc SOUND_ONEBIT_bit    = 0
+    defc SOUND_ONEBIT_mask   = 0
+ENDIF
 
 
 IF !INPUT_JOY_useinkey

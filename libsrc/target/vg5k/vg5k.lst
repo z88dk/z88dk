@@ -26,5 +26,6 @@ target/vg5k/games/bit_open
 target/vg5k/games/bit_open_di
 target/vg5k/games/bit_close
 target/vg5k/games/bit_close_ei
+@sound/onebit/onebit.lst
 @games/games.lst
 

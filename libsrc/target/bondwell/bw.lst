@@ -6,5 +6,6 @@ target/bondwell/ioctl/generic_console_xypos
 target/bondwell/ioctl/generic_console_ioctl
 target/bondwell/playzb4
 @gfx/gencon/gfx_gencon6.lst
+@sound/onebit/onebit.lst
 @games/games.lst
 @video/mc6845/mc6845.lst

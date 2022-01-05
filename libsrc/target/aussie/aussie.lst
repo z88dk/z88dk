@@ -10,4 +10,5 @@ target/aussie/games/bit_open
 target/aussie/games/bit_open_di
 target/aussie/games/bit_close
 target/aussie/games/bit_close_ei
+@sound/onebit/onebit.lst
 @games/games.lst

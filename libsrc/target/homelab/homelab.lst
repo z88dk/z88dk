@@ -7,6 +7,7 @@ stdio/inkey/fgetc_cons
 @input/input_keyboard.lst
 target/homelab/games/joystick.asm
 target/homelab/games/keys_joystick.asm
+@sound/onebit/onebit.lst
 @games/games.lst
 target/homelab/graphics/textpixl
 @gfx/gencon/gfx_gencon.lst

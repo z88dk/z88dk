@@ -3,6 +3,7 @@ target/sol20/stdio/fgetc_cons
 target/sol20/games/bit_open_close
 @video/vdm/video_vdm.lst
 @stdio/stdio_8080.lst
+@sound/onebit/onebit.lst
 @games/games.lst
 
 

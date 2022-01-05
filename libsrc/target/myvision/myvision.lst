@@ -7,6 +7,7 @@ stdio/inkey/getk
 @stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
 target/myvision/games/joystick.asm
+@sound/onebit/onebit.lst
 @games/games.lst
 target/myvision/psg/set_psg
 target/myvision/psg/set_psg_callee

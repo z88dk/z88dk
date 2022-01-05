@@ -46,6 +46,7 @@ target/z88/games/bit_open_di
 target/z88/games/bit_close
 target/z88/games/bit_close_ei
 target/z88/games/beeper
+@sound/onebit/onebit.lst
 @games/games.lst
 target/z88/rs232/rs232_close
 target/z88/rs232/rs232_get

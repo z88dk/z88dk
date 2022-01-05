@@ -3,6 +3,7 @@ target/tvc/stdio/fgetc_cons
 target/tvc/stdio/getk
 @stdio/stdio.lst
 target/tvc/games/joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 target/tvc/time/clock
 target/tvc/tvc_cls

@@ -13,4 +13,5 @@ gfx/narrow/obj/gl6000/stencil_render
 @input/input_keyboard.lst
 target/gl6000/games/joystick
 target/gl6000/games/keys_joystick
+@sound/onebit/onebit.lst
 @games/games.lst

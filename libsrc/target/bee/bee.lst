@@ -17,6 +17,7 @@ target/shared/copy_font
 @font/font_8x8/font_8x8.lst
 @stdio/stdio.lst
 target/bee/games/joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 target/bee/graphics/textpixl
 @gfx/gencon/gfx_gencon.lst

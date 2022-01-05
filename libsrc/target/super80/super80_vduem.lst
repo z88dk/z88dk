@@ -13,6 +13,7 @@ target/super80/graphics/textpixl
 target/super80/games/bit_open
 target/super80/games/bit_close
 target/super80/games/keys_joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 @video/mc6845/mc6845.lst
 

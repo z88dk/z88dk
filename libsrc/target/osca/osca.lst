@@ -26,6 +26,7 @@ target/osca/graphics/cplot_callee
 target/osca/graphics/cplotpixel
 @gfx/wide/gfx_wide.lst
 target/osca/games/joystick
+@sound/onebit/onebit.lst
 @games/games.lst
 target/osca/time/clock
 target/osca/osca/flos_paper

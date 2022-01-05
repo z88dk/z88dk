@@ -5,4 +5,5 @@ target/c128/games/bit_open
 target/c128/games/bit_open_di
 target/c128/games/bit_close
 target/c128/games/bit_close_ei
+@sound/onebit/onebit.lst
 @games/games.lst

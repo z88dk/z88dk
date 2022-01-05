@@ -13,4 +13,5 @@ target/bondwell2/stdio/CRT_FONT
 @font/font_8x8/font_8x8.lst
 @gfx/wide/gfx_wide.lst
 @video/msm6255/msm6255.lst
+@sound/onebit/onebit.lst
 @games/games.lst
