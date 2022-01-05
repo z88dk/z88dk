@@ -168,7 +168,15 @@ time @ 4MHz  =  915024561 / 4*10^6 =  3 min 48 sec
 
 IEEE 16-bit float implementation.
 
-DQ.
+12.
+Z88DK January 5, 2022
+sccz80 / classic c library / 8085 / MBF32
+3457 bytes less page zero
+
+cycle count  = 1806589346
+time @ 4MHz  = 1806589346 / 4*10^6 =  7 min 32 sec
+
+DISQ.
 HITECH C MSDOS V750
 1526 bytes exact
 

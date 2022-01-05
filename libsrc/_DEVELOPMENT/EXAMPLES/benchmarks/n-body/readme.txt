@@ -188,7 +188,20 @@ time @ 4MHz  = 1848679330 / 4*10^6 =  7 min 42 sec
 
 Microsoft 32-bit float implementation, accurate to 7 significant digits.
 
-DQ.
+12.
+Z88DK January 5, 2022
+sccz80 / classic / 8085 / MBF32
+4889 bytes less page zero
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1852019035
+time @ 4MHz  = 1852019035 / 4*10^6 =  7 min 43 sec
+
+Microsoft 32-bit float implementation, accurate to 7 significant digits.
+
+DISQ.
 HITECH C CPM V309
 ???? bytes less cpm overhead
 

@@ -28,6 +28,9 @@ This simplifies the use of TICKS for timing.
 sccz80/classic
 zcc +test -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
 
+sccz80/classic/8085
+zcc +test -clib=8085 -vn -O2 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
+
 zsdcc/classic
 zcc +test -vn -compiler=sdcc -SO3 --max-allocs-per-node200000 -DSTATIC -DTIMER -D__Z88DK sieve.c -o sieve.bin -lndos -m
 
@@ -48,17 +51,25 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK April 20, 2020
+Z88DK January 5, 2022
 sccz80 / classic c library
-8589 bytes less page zero
+9185 bytes less page zero
 
-cycle count  = 4957733
-time @ 4MHz  = 4957733 / 4*10^6 = 1.2394 sec
+cycle count  = 4769143
+time @ 4MHz  = 4769143 / 4*10^6 = 1.1923 sec
 
 
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-8558 bytes less page zero
+Z88DK January 5, 2022
+sccz80 / classic c library / 8085
+9278 bytes less page zero
 
-cycle count  = 4510806
-time @ 4MHZ  = 4510806 / 4*10^6 = 1.1277 sec
+cycle count  = 5129695
+time @ 4MHz  = 5129695 / 4*10^6 = 1.2824 sec
+
+
+Z88DK January 5, 2022
+zsdcc #12555 / classic c library
+9177 bytes less page zero
+
+cycle count  = 4110873
+time @ 4MHZ  = 4110873 / 4*10^6 = 1.0277 sec

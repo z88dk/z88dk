@@ -89,12 +89,12 @@ cycle count  = 3714152
 time @ 4MHz  = 3714152 / 4*10^6 = 0.9285 sec
 
 4.
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-8558 bytes less page zero
+Z88DK January 5, 2022
+zsdcc #12555 / classic c library
+9177 bytes less page zero
 
-cycle count  = 4510806
-time @ 4MHZ  = 4510806 / 4*10^6 = 1.1277 sec
+cycle count  = 4110873
+time @ 4MHZ  = 4110873 / 4*10^6 = 1.0277 sec
 
 5.
 HITECH C CPM V309
@@ -119,9 +119,18 @@ cycle count  = 4957733
 time @ 4MHz  = 4957733 / 4*10^6 = 1.2394 sec
 
 7.
-Z88DK April 20, 2020
+Z88DK January 5, 2022
 sccz80 / classic c library
-8589 bytes less page zero
+9185 bytes less page zero
 
-cycle count  = 4957733
-time @ 4MHz  = 4957733 / 4*10^6 = 1.2394 sec
+cycle count  = 4769143
+time @ 4MHz  = 4769143 / 4*10^6 = 1.1923 sec
+
+8.
+Z88DK January 5, 2022
+sccz80 / classic c library / 8085
+9278 bytes less page zero
+
+cycle count  = 5129695
+time @ 4MHz  = 5129695 / 4*10^6 = 1.2824 sec
+

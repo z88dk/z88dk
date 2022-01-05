@@ -37,6 +37,9 @@ zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin -lm -m -lndo
 classic/sccz80/MBF32
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math-mbf32 -m -lndos
 
+classic/sccz80/8085/MBF32
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math-mbf32_8085 -m -lndos
+
 classic/sccz80/math32
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 n-body.c -o n-body.bin --math32 -m -lndos
 
@@ -80,6 +83,17 @@ second number error: 1 * 10^(-8)
 
 cycle count  = 3659884553
 time @ 4MHz  = 3659884553 / 4*10^6 = 15 min 15 sec
+
+
+Z88DK January 5, 2022
+sccz80 / classic / 8085 / MBF32
+4889 bytes less page zero
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1852019035
+time @ 4MHz  = 1852019035 / 4*10^6 =  7 min 43 sec
 
 
 Z88DK January 3, 2022
