@@ -25,7 +25,7 @@ my $test	 = "test";
 
 sub z80asm	 { $ENV{Z80ASM_EXE} || "./z88dk-z80asm" }
 
-my @TEST_EXT = (qw( asm lis inc bin map o lib sym def err
+my @TEST_EXT = (qw( asm lis inc bin map o lib sym def 
 					exe c cpp lst prj i reloc tap P ));
 my @MAIN_TEST_FILES;
 my @TEST_FILES;
@@ -49,7 +49,6 @@ sub _unlink_files {
 	my($line, @files) = @_;
 	@files = grep {-f} uniq(@files);
 	is unlink(@files), scalar(@files), "$line unlink @files";
-	while (grep {-f} @files) { sleep 1 };	# z80asm sometimes cannot create errfile
 }
 
 #------------------------------------------------------------------------------
@@ -132,23 +131,14 @@ sub t_z80asm {
 	# check stderr
 	$args{err} ||= ""; $args{linkerr} ||= "";
 	chomp_eol($args{err}); chomp_eol($args{linkerr}); chomp_eol($stderr);
-	my $exp_err_screen = my $exp_err_file = $args{err}.$args{linkerr};
+	my $exp_err_screen = $args{err}.$args{linkerr};
 	my $ok_err_screen = is_text($stderr, $exp_err_screen, "$line err");
 	$errors++ unless $ok_err_screen;
-	if ($stderr && $stderr !~ /option.*deprecated/) {	# option deprecated: before error file is created
-		ok -f err_file(), "$line ".err_file();
-		my $got_err_file = read_file(err_file(), err_mode => 'quiet') // "";
-		chomp_eol($got_err_file);
-		is_text($exp_err_file, $got_err_file, "$line err file");
-	}
 
 	# check retval
 	if (defined($args{bin})) {	# asm success
 		$errors++ unless $return == 0;
 		ok $return == 0, "$line exit value";
-
-		# warning -> got_err_file
-		# ok ! -f err_file(), "$line no ".err_file();
 
 		ok -f $_, "$line $_" for (@o, bin_file());
 
@@ -167,8 +157,6 @@ sub t_z80asm {
 		$errors++ unless $return != 0;
 		ok $return != 0, "$line exit value";
 
-		ok -f err_file(), "$line ".err_file();
-
 		ok -f $_, "$line $_" for (@o);
 		ok ! -f $_, "$line no $_" for (bin_file(), map_file());
 
@@ -182,8 +170,6 @@ sub t_z80asm {
 	else {				# asm failed
 		$errors++ unless $return != 0;
 		ok $return != 0, "$line exit value";
-
-		ok -f err_file(), "$line ".err_file();
 
 		ok ! -f $_, "$line no $_" for (@o, bin_file(), map_file());
 
@@ -233,7 +219,8 @@ sub t_z80asm_error {
 
 	my $line = "[line ".((caller)[2])."]";
 	(my $test_name = $code) =~ s/\n.*/.../s;
-	ok 1, "$line t_z80asm_error $test_name - $expected_err";
+	(my $show_err = $expected_err) =~ s/\n.*//s;
+	ok 1, "$line t_z80asm_error $test_name - $show_err";
 
 	_unlink_files($line, @MAIN_TEST_FILES);
 	write_file(asm_file(), "$code\n");
@@ -246,7 +233,6 @@ sub t_z80asm_error {
 	is $stdout, "", "$line stdout";
 	is_text( $stderr, $expected_err, "$line stderr" );
 	ok $return != 0, "$line exit value";
-	ok -f err_file(), "$line error file found";
 	ok ! -f o_file(), "$line object file deleted";
 	ok ! -f bin_file(), "$line binary file deleted";
 	if (defined($options) && $options =~ /-x(\S+)/) {
@@ -255,9 +241,6 @@ sub t_z80asm_error {
 
 		ok ! -f $1, "$line library file deleted";
 	}
-
-	is_text( read_file(err_file(), err_mode => 'quiet'),
-				$expected_err, "$line error in error file" );
 
 	exit 1 if $return == 0 && $STOP_ON_ERR;
 }
@@ -290,7 +273,6 @@ sub t_z80asm_ok {
 	is_text( $stderr, $expected_warnings, "$line stderr" );
 
 	ok $return == 0, "$line exit value";
-	ok ! -f err_file(), "$line no error file";
 	ok -f bin_file(), "$line bin file found";
 
 	my $binary = read_file(bin_file(), binmode => ':raw', err_mode => 'quiet');

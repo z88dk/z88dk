@@ -37,8 +37,11 @@ z80asm(<<END1, "-mgbz80 -l", 1, "", <<END2);
     ldh a,(0xfe01)
     ldh a,0xff01
 END1
-Error at file 'test.asm' line 2: syntax error
-Warning at file 'test.asm' line 1: integer '65025' out of range
+test.asm:2: error: syntax error
+  ^---- ldh a,0xff01
+      ^---- ldh a,65281
+test.asm:1: warning: integer range: 0xfe01
+  ^---- (65025)
 END2
 
 unlink_testfiles();

@@ -220,13 +220,13 @@ main := |*
 			if (Str_len(string) == 1)
 				sym.number = Str_data(string)[0];
 			else
-				error_invalid_squoted_string(); 
+				error_invalid_char_const(); 
 				
 			STR_DELETE(string);
 		}
 		else
 		{
-			error_invalid_squoted_string(); 
+			error_invalid_char_const(); 
 		}
 		ts = te = p;
 		fbreak;
@@ -237,7 +237,7 @@ main := |*
 	{ 
 		sym.tok = TK_STRING;
 		if ( ! get_sym_string() )	/* consumes input up to end quote or \n */
-			error_unclosed_string(); 
+			error_missing_quote(); 
 		fbreak;
 	};
 	

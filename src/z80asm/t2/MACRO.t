@@ -6,20 +6,23 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 		macro
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- macro
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 		endm
 END_ASM
-Error at file '$test.asm' line 1: unbalanced control structure
+$test.asm:1: error: unbalanced control structure
+  ^---- endm
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 		macro name
 		macro name
 END_ASM
-Error at file '$test.asm' line 2: unbalanced control structure started at file '$test.asm' line 1
+$test.asm:2: error: unbalanced control structure started at: $test.asm:1
+  ^---- macro name
 END_ERR
 
 # simple macro

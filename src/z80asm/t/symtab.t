@@ -14,7 +14,7 @@ require './t/test_utils.pl';
 # -DVAR
 t_z80asm(
 	asm		=> "define VAR",
-	err		=> "Error at file 'test.asm' line 1: symbol 'VAR' already defined",
+	err		=> "test.asm:1: error: duplicate definition: VAR\n  ^---- define VAR",
 	options	=> "-DVAR"
 );
 
@@ -26,13 +26,13 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "defc VAR=2",
-	err		=> "Error at file 'test.asm' line 1: symbol 'VAR' already defined",
+	err		=> "test.asm:1: error: duplicate definition: VAR\n  ^---- defc VAR=2",
 	options	=> "-DVAR"
 );
 
 t_z80asm(
 	asm		=> "VAR: nop",
-	err		=> "Error at file 'test.asm' line 1: symbol 'VAR' already defined",
+	err		=> "test.asm:1: error: duplicate definition: VAR\n  ^---- VAR: nop",
 	options	=> "-DVAR"
 );
 
@@ -44,7 +44,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "EXTERN VAR",
-	err		=> "Error at file 'test.asm' line 1: symbol 'VAR' already declared local",
+	err		=> "test.asm:1: error: symbol redeclaration: VAR\n  ^---- EXTERN VAR",
 	options	=> "-DVAR"
 );
 
@@ -56,7 +56,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "undefine VAR : defb VAR",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' not defined",
+	err		=> "test.asm:2: error: undefined symbol: VAR\n  ^---- VAR",
 );
 
 t_z80asm(
@@ -66,12 +66,12 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "define VAR : defc VAR=2",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
+	err		=> "test.asm:2: error: duplicate definition: VAR\n  ^---- defc VAR=2",
 );
 
 t_z80asm(
 	asm		=> "define VAR : VAR: nop",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
+	err		=> "test.asm:2: error: duplicate definition: VAR\n  ^---- VAR: nop",
 );
 
 t_z80asm(
@@ -81,7 +81,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "define VAR : EXTERN VAR",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
+	err		=> "test.asm:2: error: symbol redeclaration: VAR\n  ^---- EXTERN VAR",
 );
 
 # defc VAR
@@ -92,17 +92,17 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "defc VAR=1 : define VAR",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
+	err		=> "test.asm:2: error: duplicate definition: VAR\n  ^---- define VAR",
 );
 
 t_z80asm(
 	asm		=> "defc VAR=1 : defc VAR=1",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
+	err		=> "test.asm:2: error: duplicate definition: VAR\n  ^---- defc VAR=1",
 );
 
 t_z80asm(
 	asm		=> "defc VAR=1 : VAR: nop",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
+	err		=> "test.asm:2: error: duplicate definition: VAR\n  ^---- VAR: nop",
 );
 
 t_z80asm(
@@ -112,7 +112,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "defc VAR=1 : EXTERN VAR",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
+	err		=> "test.asm:2: error: symbol redeclaration: VAR\n  ^---- EXTERN VAR",
 );
 
 t_z80asm(
@@ -134,17 +134,17 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "VAR: : define VAR",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
+	err		=> "test.asm:2: error: duplicate definition: VAR\n  ^---- define VAR",
 );
 
 t_z80asm(
 	asm		=> "VAR: : defc VAR=1",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
+	err		=> "test.asm:2: error: duplicate definition: VAR\n  ^---- defc VAR=1",
 );
 
 t_z80asm(
 	asm		=> "VAR: : VAR: nop",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already defined",
+	err		=> "test.asm:2: error: duplicate definition: VAR\n  ^---- VAR: nop",
 );
 
 t_z80asm(
@@ -159,7 +159,7 @@ t_z80asm(
 
 t_z80asm(
 	asm		=> "VAR: : EXTERN VAR",
-	err		=> "Error at file 'test.asm' line 2: symbol 'VAR' already declared local",
+	err		=> "test.asm:2: error: symbol redeclaration: VAR\n  ^---- EXTERN VAR",
 );
 
 # PUBLIC
@@ -222,14 +222,14 @@ t_z80asm(
 t_z80asm(
 	asm		=> "PUBLIC VAR : defc VAR=3 : defb VAR",
 	asm1	=> "PUBLIC VAR : defc VAR=3 : defb VAR",
-	linkerr	=> "Error at module 'test1': symbol 'VAR' already defined in module 'test'",
+	linkerr	=> "test1.asm: error: duplicate definition: test::VAR",
 );
 
 # Symbol declared global in another module
 t_z80asm(
 	asm		=> "PUBLIC VAR : defc VAR=2",
 	asm1	=> "PUBLIC VAR : defc VAR=3",
-	linkerr	=> "Error at module 'test1': symbol 'VAR' already defined in module 'test'",
+	linkerr	=> "test1.asm: error: duplicate definition: test::VAR",
 );
 
 # Case-sensitive symbols

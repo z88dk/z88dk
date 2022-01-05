@@ -162,7 +162,6 @@ static void            apply_copt_rules(int filenumber, int num, char **rules, c
 static void            zsdcc_asm_filter_comments(int filenumber, char *ext);
 static void            remove_temporary_files(void);
 static void            remove_file_with_extension(char *file, char *suffix);
-static void            ShowErrors(char *, char *);
 static int             copyprepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
 static int             copy_file(char *src, char *src_extension, char *dest, char *dest_extension);
 static int             prepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
@@ -2829,12 +2828,6 @@ void remove_temporary_files(void)
 {
     int             j;
 
-    /* Show all error files */
-
-    for (j = 0; j < nfiles; j++) {
-        ShowErrors(filelist[j], original_filenames[j]);
-    }
-
     if (cleanup) {    /* Default is yes */
         for (j = 0; j < nfiles; j++) {
             remove_file_with_extension(temporary_filenames[j], "");
@@ -2868,62 +2861,6 @@ void remove_file_with_extension(char *file, char *ext)
     temp = changesuffix(file, ext);
     remove(temp);
     free(temp);
-}
-
-
-void
-ShowErrors(char *filen, char *orig)
-{
-    char           *temp;
-    char            buffer[LINEMAX + 1];
-    char            buffer2[LINEMAX + 1];
-    char            filenamebuf[LINEMAX + 1];
-    char           *ptr_char;
-    int             j, linepos;
-    FILE           *fp, *fp2;
-
-    temp = changesuffix(filen, ".err");
-    if ((fp = fopen(temp, "r")) != NULL) {
-        if (orig) {
-            fprintf(stderr, "Errors in source file %s:\n", orig);
-        } else {
-            /* We're printing linking errors, better print a key! */
-            fprintf(stderr, "Key to filenames:\n");
-            for (j = 0; j < nfiles; j++) {
-                fprintf(stderr, "%s = %s\n", filelist[j], original_filenames[j]);
-            }
-        }
-
-        while (fgets(buffer, LINEMAX, fp) != NULL) {
-            fprintf(stderr, "%s", buffer);
-
-            /* Dig into asm source file and show the corresponding line.. */
-            if (strstr(buffer, " line ") != NULL ) {    /* ..only if a line number is given */
-                linepos = atoi(strstr(buffer, " line ") + strlen(" line "));
-                strcpy(filenamebuf, strstr(buffer, "'") + strlen("'"));
-                ptr_char = strstr(filenamebuf,"::");
-                if (ptr_char) *ptr_char = 0;
-                ptr_char = strstr(filenamebuf, "'");        /* Find second ' */
-                if (ptr_char) *ptr_char = 0;                /* End filenamebuf at second ' or at end of string */
-
-                if ((linepos > 1) && ((fp2 = fopen(filenamebuf, "r")) != NULL)) {
-                    for (j = 1; j < linepos; j++) {
-                        if (NULL == fgets(buffer2, LINEMAX, fp2)) {
-                            fprintf(stderr, "Error while reading string from %s\n", temp);
-                            exit(1);
-                        }
-                    }
-                    fprintf(stderr, "                   ^ ---- %s", fgets(buffer2, LINEMAX, fp2));
-                    fclose(fp2);
-                }
-            }
-
-        }
-        fclose(fp);
-
-    }
-    free(temp);        /* Free temp buffer */
-
 }
 
 

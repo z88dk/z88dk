@@ -12,8 +12,8 @@ Handle object file contruction, reading and writing
 #include "class.h"
 #include "codearea.h"
 #include "die.h"
-#include "errors.h"
 #include "fileutil.h"
+#include "if.h"
 #include "libfile.h"
 #include "options.h"
 #include "str.h"
@@ -366,7 +366,7 @@ static OFile* _OFile_open_read(const char* filename, bool test_mode)
 	file = fopen(filename, "rb");
 	if (!file) {
 		if (!test_mode)
-			error_read_file(filename);
+			error_file_open(filename);
 		return NULL;
 	}
 
@@ -531,7 +531,7 @@ bool check_obj_lib_file(const char* filename,
 	// can read file?
 	fp = fopen(filename, "rb");
 	if (fp == NULL) {
-		error_read_file(filename);
+		error_file_open(filename);
 		goto error;
 	}
 

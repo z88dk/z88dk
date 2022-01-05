@@ -129,7 +129,7 @@ check_bin_file("test.tap", $rem_tap);
 # error for -r below 23760
 unlink_testfiles();
 z80asm($asm, "+zx -m -r23759", 1, "", <<'END');
-	Error: invalid origin: 23759
+error: invalid ORG: 0x5ccf
 END
 check_bin_file("test.bin", $bin);
 ok ! -f "test.tap", "no test.tap";
@@ -146,8 +146,8 @@ z80asm(<<'END', "+zx -m", 0, "", <<'END');
 	org 50000
 	ret
 END
-	Warning: ORG ignored at file 'test.o', section 'code1'
-	Warning: ORG ignored at file 'test.o', section 'code2'
+warning: ORG ignored: file test.o, section code1
+warning: ORG ignored: file test.o, section code2
 END
 check_bin_file("test.bin", $bin);
 check_bin_file("test.tap", $rem_tap);

@@ -19,7 +19,9 @@ z80asm_nok("", "", <<END, <<END);
         defs 65535, 0xaa
         ld a, 0xaa
 END
-Error at file '${test}.asm' line 2: max. code size of 65536 bytes reached
+${test}.asm:2: error: segment overflow
+  ^---- ld a, 0xaa
+      ^---- ld a,170
 END
 
 
@@ -32,7 +34,9 @@ z80asm_nok("", "", <<END, <<END);
         defs 65534, 0xaa
         ld bc, 0xaaaa
 END
-Error at file '${test}.asm' line 2: max. code size of 65536 bytes reached
+${test}.asm:2: error: segment overflow
+  ^---- ld bc, 0xaaaa
+      ^---- ld bc,43690
 END
 
 
@@ -45,7 +49,9 @@ z80asm_nok("", "", <<END, <<END);
         defs 65533, 0xaa
         defq 0xaaaaaaaa
 END
-Error at file '${test}.asm' line 2: max. code size of 65536 bytes reached
+${test}.asm:2: error: segment overflow
+  ^---- defq 0xaaaaaaaa
+      ^---- defq-1431655766
 END
 
 unlink_testfiles;

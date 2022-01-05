@@ -9,43 +9,49 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		if
 END_ASM
-Error at file '$test.asm' line 1: syntax error in expression
+$test.asm:1: error: syntax error in expression
+  ^---- if
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		if 1+
 END_ASM
-Error at file '$test.asm' line 1: syntax error in expression
+$test.asm:1: error: syntax error in expression
+  ^---- if 1+
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		if 1,
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- if 1,
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		if 1
 END_ASM
-Error at file '$test.asm' line 2: unbalanced control structure started at file '$test.asm' line 1
+$test.asm:2: error: unbalanced control structure started at: $test.asm:1
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		else
 END_ASM
-Error at file '$test.asm' line 1: unbalanced control structure
+$test.asm:1: error: unbalanced control structure
+  ^---- else
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		elif 1
 END_ASM
-Error at file '$test.asm' line 1: unbalanced control structure
+$test.asm:1: error: unbalanced control structure
+  ^---- elif 1
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		endif
 END_ASM
-Error at file '$test.asm' line 1: unbalanced control structure
+$test.asm:1: error: unbalanced control structure
+  ^---- endif
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
@@ -54,7 +60,8 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		else
 		endif
 END_ASM
-Error at file '$test.asm' line 3: unbalanced control structure started at file '$test.asm' line 1
+$test.asm:3: error: unbalanced control structure started at: $test.asm:1
+  ^---- else
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
@@ -63,7 +70,8 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		elif 2
 		endif
 END_ASM
-Error at file '$test.asm' line 3: unbalanced control structure started at file '$test.asm' line 1
+$test.asm:3: error: unbalanced control structure started at: $test.asm:1
+  ^---- elif 2
 END_ERR
 
 path("$test.inc")->spew(<<END_ASM);
@@ -72,7 +80,7 @@ END_ASM
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		include "$test.inc"
 END_ASM
-Error at file '$test.asm' line 2: unbalanced control structure started at file '$test.inc' line 1
+$test.asm:2: error: unbalanced control structure started at: $test.inc:1
 END_ERR
 
 path("$test.asm")->spew(<<END_ASM);
@@ -182,37 +190,42 @@ for my $ifdef (qw(ifdef ifndef)) {
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		$ifdef
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- $ifdef
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		el$ifdef
 END_ASM
-Error at file '$test.asm' line 1: unbalanced control structure
+$test.asm:1: error: unbalanced control structure
+  ^---- el$ifdef
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		$ifdef 1
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- $ifdef 1
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		$ifdef hello,
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- $ifdef hello,
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		$ifdef hello
 END_ASM
-Error at file '$test.asm' line 2: unbalanced control structure started at file '$test.asm' line 1
+$test.asm:2: error: unbalanced control structure started at: $test.asm:1
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		el$ifdef hello
 END_ASM
-Error at file '$test.asm' line 1: unbalanced control structure
+$test.asm:1: error: unbalanced control structure
+  ^---- el$ifdef hello
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
@@ -221,7 +234,8 @@ END_ERR
 		else
 		endif
 END_ASM
-Error at file '$test.asm' line 3: unbalanced control structure started at file '$test.asm' line 1
+$test.asm:3: error: unbalanced control structure started at: $test.asm:1
+  ^---- else
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
@@ -230,7 +244,8 @@ END_ERR
 		el$ifdef hello
 		endif
 END_ASM
-Error at file '$test.asm' line 3: unbalanced control structure started at file '$test.asm' line 1
+$test.asm:3: error: unbalanced control structure started at: $test.asm:1
+  ^---- el$ifdef hello
 END_ERR
 
 	path("$test.inc")->spew(<<END_ASM);
@@ -239,7 +254,7 @@ END_ASM
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		include "$test.inc"
 END_ASM
-Error at file '$test.asm' line 2: unbalanced control structure started at file '$test.inc' line 1
+$test.asm:2: error: unbalanced control structure started at: $test.inc:1
 END_ERR
 
 }
@@ -403,7 +418,7 @@ path("$test.2.asm")->spew(<<END_ASM);
 		nop
 END_ASM
 capture_nok("./z88dk-z80asm -b $test.1.asm $test.2.asm", <<END_ERR);
-Error at file '$test.1.asm' line 2: unbalanced control structure started at file '$test.1.asm' line 1
+$test.1.asm:2: error: unbalanced control structure started at: $test.1.asm:1
 END_ERR
 
 #-------------------------------------------------------------------------------
@@ -424,115 +439,113 @@ path("$test.asm")->spew(<<'END_ASM');
 		if __CPU_INTEL__			\ defb 11 \ endif
 		if __SWAP_IX_IY__			\ defb 12 \ endif
 		
-		if __FLOAT_GENMATH__		\ defb 30 \ endif
-		if __FLOAT_MATH48__			\ defb 31 \ endif
-		if __FLOAT_IEEE16__			\ defb 32 \ endif
-		if __FLOAT_IEEE32__			\ defb 33 \ endif
-		if __FLOAT_IEEE64__			\ defb 34 \ endif
-		if __FLOAT_ZX__				\ defb 35 \ endif
-		if __FLOAT_ZX81__			\ defb 36 \ endif
-		
-;		if __FLOAT_Z80__			\ defb 21 \ endif
-;		if __FLOAT_IEEE__			\ defb 22 \ endif
-;		if __FLOAT_MBFS__			\ defb 23 \ endif
-;		if __FLOAT_MBF40__			\ defb 24 \ endif
-;		if __FLOAT_MBF64__			\ defb 25 \ endif
-;		if __FLOAT_Z88__			\ defb 26 \ endif
-;		if __FLOAT_AM9511__			\ defb 28 \ endif
+		if __FLOAT_GENMATH__		\ defb 20 \ endif
+		if __FLOAT_MATH48__			\ defb 21 \ endif
+		if __FLOAT_IEEE16__			\ defb 22 \ endif
+		if __FLOAT_IEEE32__			\ defb 23 \ endif
+		if __FLOAT_IEEE64__			\ defb 24 \ endif
+		if __FLOAT_Z80__			\ defb 25 \ endif
+		if __FLOAT_ZX81__			\ defb 26 \ endif
+		if __FLOAT_ZX__				\ defb 27 \ endif
+		if __FLOAT_Z88__			\ defb 28 \ endif
+		if __FLOAT_MBFS__			\ defb 29 \ endif
+		if __FLOAT_MBF40__			\ defb 30 \ endif
+		if __FLOAT_MBF64__			\ defb 31 \ endif
+		if __FLOAT_AM9511__			\ defb 32 \ endif
 END_ASM
 
 capture_ok("./z88dk-z80asm -b $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 30));
+check_bin_file("$test.bin", bytes(1, 9, 20));
 
 capture_ok("./z88dk-z80asm -b -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 12, 30));
+check_bin_file("$test.bin", bytes(1, 9, 12, 20));
 
 capture_ok("./z88dk-z80asm -b -mz80 $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 30));
+check_bin_file("$test.bin", bytes(1, 9, 20));
 
 capture_ok("./z88dk-z80asm -b -mz80 -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 12, 30));
+check_bin_file("$test.bin", bytes(1, 9, 12, 20));
 
 capture_ok("./z88dk-z80asm -b -mz80n $test.asm", "");
-check_bin_file("$test.bin", bytes(2, 9, 30));
+check_bin_file("$test.bin", bytes(2, 9, 20));
 
 capture_ok("./z88dk-z80asm -b -mz80n -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(2, 9, 12, 30));
+check_bin_file("$test.bin", bytes(2, 9, 12, 20));
 
 capture_ok("./z88dk-z80asm -b -mz180 $test.asm", "");
-check_bin_file("$test.bin", bytes(3, 9, 30));
+check_bin_file("$test.bin", bytes(3, 9, 20));
 
 capture_ok("./z88dk-z80asm -b -mz180 -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(3, 9, 12, 30));
+check_bin_file("$test.bin", bytes(3, 9, 12, 20));
 
 capture_ok("./z88dk-z80asm -b -mr2ka $test.asm", "");
-check_bin_file("$test.bin", bytes(4, 10, 30));
+check_bin_file("$test.bin", bytes(4, 10, 20));
 
 capture_ok("./z88dk-z80asm -b -mr2ka -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(4, 10, 12, 30));
+check_bin_file("$test.bin", bytes(4, 10, 12, 20));
 
 capture_ok("./z88dk-z80asm -b -mr3k $test.asm", "");
-check_bin_file("$test.bin", bytes(5, 10, 30));
+check_bin_file("$test.bin", bytes(5, 10, 20));
 
 capture_ok("./z88dk-z80asm -b -mr3k -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(5, 10, 12, 30));
+check_bin_file("$test.bin", bytes(5, 10, 12, 20));
 
 capture_ok("./z88dk-z80asm -b -m8080 $test.asm", "");
-check_bin_file("$test.bin", bytes(6, 11, 30));
+check_bin_file("$test.bin", bytes(6, 11, 20));
 
 capture_ok("./z88dk-z80asm -b -m8080 -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(6, 11, 12, 30));
+check_bin_file("$test.bin", bytes(6, 11, 12, 20));
 
 capture_ok("./z88dk-z80asm -b -m8085 $test.asm", "");
-check_bin_file("$test.bin", bytes(7, 11, 30));
+check_bin_file("$test.bin", bytes(7, 11, 20));
 
 capture_ok("./z88dk-z80asm -b -m8085 -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(7, 11, 12, 30));
+check_bin_file("$test.bin", bytes(7, 11, 12, 20));
 
 capture_ok("./z88dk-z80asm -b -mgbz80 $test.asm", "");
-check_bin_file("$test.bin", bytes(8, 30));
+check_bin_file("$test.bin", bytes(8, 20));
 
 capture_ok("./z88dk-z80asm -b -mgbz80 -IXIY $test.asm", "");
-check_bin_file("$test.bin", bytes(8, 12, 30));
+check_bin_file("$test.bin", bytes(8, 12, 20));
 
 capture_ok("./z88dk-z80asm -b -float=genmath $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 30));
+check_bin_file("$test.bin", bytes(1, 9, 20));
 
 capture_ok("./z88dk-z80asm -b -float=math48 $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 31));
+check_bin_file("$test.bin", bytes(1, 9, 21));
 
 capture_ok("./z88dk-z80asm -b -float=ieee16 $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 32));
+check_bin_file("$test.bin", bytes(1, 9, 22));
 
 capture_ok("./z88dk-z80asm -b -float=ieee32 $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 33));
+check_bin_file("$test.bin", bytes(1, 9, 23));
 
 capture_ok("./z88dk-z80asm -b -float=ieee64 $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 34));
+check_bin_file("$test.bin", bytes(1, 9, 24));
 
-capture_ok("./z88dk-z80asm -b -float=zx $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 35));
+capture_ok("./z88dk-z80asm -b -float=z80 $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 25));
 
 capture_ok("./z88dk-z80asm -b -float=zx81 $test.asm", "");
-check_bin_file("$test.bin", bytes(1, 9, 36));
+check_bin_file("$test.bin", bytes(1, 9, 26));
 
-# capture_ok("./z88dk-z80asm -b -float=ieee $test.asm", "");
-# check_bin_file("$test.bin", bytes(1, 9, 22));
-# 
-# capture_ok("./z88dk-z80asm -b -float=mbfs $test.asm", "");
-# check_bin_file("$test.bin", bytes(1, 9, 23));
-# 
-# capture_ok("./z88dk-z80asm -b -float=mbf40 $test.asm", "");
-# check_bin_file("$test.bin", bytes(1, 9, 24));
-# 
-# capture_ok("./z88dk-z80asm -b -float=mbf64 $test.asm", "");
-# check_bin_file("$test.bin", bytes(1, 9, 25));
-# 
-# capture_ok("./z88dk-z80asm -b -float=z88 $test.asm", "");
-# check_bin_file("$test.bin", bytes(1, 9, 26));
-# 
-# capture_ok("./z88dk-z80asm -b -float=am9511 $test.asm", "");
-# check_bin_file("$test.bin", bytes(1, 9, 28));
+capture_ok("./z88dk-z80asm -b -float=zx $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 27));
+
+capture_ok("./z88dk-z80asm -b -float=z88 $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 28));
+
+capture_ok("./z88dk-z80asm -b -float=mbfs $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 29));
+
+capture_ok("./z88dk-z80asm -b -float=mbf40 $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 30));
+
+capture_ok("./z88dk-z80asm -b -float=mbf64 $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 31));
+
+capture_ok("./z88dk-z80asm -b -float=am9511 $test.asm", "");
+check_bin_file("$test.bin", bytes(1, 9, 32));
 
 unlink_testfiles;
 done_testing;

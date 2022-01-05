@@ -55,8 +55,11 @@ for my $n (-4, 0, 4) {
 # check warnings
 for my $n (-129, -128, 0, 255, 256) {
 	my $offset = $n > 0 ? "+$n" : $n < 0 ? "$n" : "";
-	my $warning = ($n >= -128 && $n < 256) ? "" : "Warning at file 'test.asm' line 1: integer '$n' out of range\n";
-
+	my $n_report = $n<10 ? $n : sprintf("0x%02x", $n);
+	my $warning = ($n >= -128 && $n < 256) ? "" : <<END;
+test.asm:1: warning: integer range: $n_report
+  ^---- $n
+END
 	ok 1, "n=$n";
 	
     if ($n != 0) {
@@ -80,7 +83,11 @@ for my $n (-129, -128, 0, 255, 256) {
 
 for my $n (-129, -128, 0, 127, 128) {
 	my $offset = $n > 0 ? "+$n" : $n < 0 ? "$n" : "";
-	my $warning = ($n >= -128 && $n < 128) ? "" : "Warning at file 'test.asm' line 1: integer '$n' out of range\n";
+	my $n_report = $n<10 ? $n : sprintf("0x%02x", $n);
+	my $warning = ($n >= -128 && $n < 128) ? "" : <<END;
+test.asm:1: warning: integer range: $n_report
+  ^---- $n
+END
 
 	ok 1, "n=$n";
 

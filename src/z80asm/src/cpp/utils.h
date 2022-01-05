@@ -32,7 +32,10 @@ string str_expand_escapes(const string& in);
 
 // check string ending
 bool str_ends_with(const string& str, const string& ending);
-string str_chomp(const string& str);
+string str_chomp(const string& str);				// remove end blanks
+string str_strip(const string& str);				// remove start and end blanks
+string str_remove_all_blanks(const string& str);	// remove all blanks
+string str_remove_extra_blanks(const string& str);	// replace sequences of blanks with one space
 
 // read lines with any EOL terminator
 istream& safe_getline(istream& is, string& t);

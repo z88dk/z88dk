@@ -24,14 +24,16 @@ END
 		line 1, "$test.dir${slash}test.inc"
 		ld
 END_ASM
-Error at file '$test.dir${slash}test.inc' line 1: syntax error
+$test.dir${slash}test.inc:1: error: syntax error
+  ^---- ld
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		c_line 1, "$test.dir${slash}test.c"
 		ld
 END_ASM
-Error at file '$test.dir${slash}test.c' line 1: syntax error
+$test.dir${slash}test.c:1: error: syntax error
+  ^---- ld
 END_ERR
 
 	path("$test.dir")->remove_tree if Test::More->builder->is_passing;

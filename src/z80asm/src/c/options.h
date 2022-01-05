@@ -76,7 +76,6 @@ extern const char *get_asm_filename(const char *filename );
 extern const char *get_list_filename(const char *filename );
 extern const char *get_obj_filename(const char *filename );
 extern const char *get_def_filename(const char *filename );
-extern const char *get_err_filename(const char *filename );
 extern const char *get_bin_filename(const char *filename );
 extern const char *get_lib_filename(const char *filename );
 extern const char *get_sym_filename(const char *filename );

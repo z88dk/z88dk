@@ -9,9 +9,9 @@ Repository: https://github.com/z88dk/z88dk
 
 #include "alloc.h"
 #include "codearea.h"
-#include "errors.h"
 #include "expr.h"
 #include "fileutil.h"
+#include "if.h"
 #include "libfile.h"
 #include "listfile.h"
 #include "modlink.h"
@@ -156,14 +156,14 @@ static bool obj_files_read_data(obj_file_t** plist) {
 	for (obj_file_t* obj = *plist; obj; obj = obj->next) {
 		obj->size = file_size(obj->filename);
 		if (obj->size < 0) {
-			error_read_file(obj->filename);
+			error_file_open(obj->filename);
 			return false;
 		}
 
 		obj->data = xmalloc(obj->size);
 		FILE* fp = fopen(obj->filename, "rb");
 		if (!fp){
-			error_read_file(obj->filename);
+			error_file_open(obj->filename);
 			return false;
 		}
 		xfread(obj->data, 1, obj->size, fp);
@@ -280,18 +280,16 @@ void object_module_append(obj_file_t* obj, Module* module) {
 
 /* set environment to compute expression */
 static void set_asmpc_env(Module* module, const char* section_name,
-	const char* filename, int line_num,
-	int asmpc,
-	bool module_relative_addr)
-{
+	const char* expr_text, const char* filename, int line_num, 
+	int asmpc, bool module_relative_addr) {
 	int base_addr, offset;
 
 	/* point to current module */
 	set_cur_module(module);
 
 	/* source file and line number */
-	set_error_file(filename);
-	set_error_line(line_num);
+	set_error_location(filename, line_num);
+	set_error_source_line(expr_text);		// to show expression in case of error
 
 	/* assembler PC as absolute address */
 	new_section(section_name);
@@ -310,7 +308,7 @@ static void set_asmpc_env(Module* module, const char* section_name,
 static void set_expr_env(Expr* expr, bool module_relative_addr)
 {
 	set_asmpc_env(expr->module, expr->section->name,
-		expr->filename, expr->line_num,
+		expr->text->data, expr->filename, expr->line_num,
 		expr->asmpc,
 		module_relative_addr);
 }
@@ -340,7 +338,8 @@ static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
 		const char* expr_text = parse_wcount_str(obj);
 
 		// call parser to interpret expression
-		set_asmpc_env(CURRENTMODULE, section_name, source_filename, line_num, asmpc, false);
+		set_asmpc_env(CURRENTMODULE, section_name, expr_text, source_filename, line_num,
+			asmpc, false);
 		Expr* expr = parse_expr(expr_text);
 		if (expr) {
 			expr->range = 0;
@@ -381,7 +380,7 @@ static void read_module_exprs(ExprList* exprs) {
 	for (obj_file_t* obj = g_objects; obj; obj = obj->next) {
 		xassert(obj->module);
 		set_cur_module(obj->module);
-		set_error_null();
+		clear_error_location();
 
 		if (goto_exprs(obj)) {
 			if (exprs != NULL)
@@ -390,7 +389,7 @@ static void read_module_exprs(ExprList* exprs) {
 				read_cur_module_exprs(obj->module->exprs, obj);
 		}
 	}
-	set_error_null();
+	clear_error_location();
 }
 
 /* compute equ expressions and remove them from the list
@@ -475,7 +474,7 @@ static void check_equ_exprs_solved(ExprList* exprs, bool module_relative_addr) {
 		Expr* expr = iter->obj;
 		if (expr->target_name) {
 			set_expr_env(expr, module_relative_addr);
-			error_not_defined(expr->target_name);
+			error_undefined_symbol(expr->target_name);
 		}
 		iter = ExprList_next(iter);
 	}
@@ -843,7 +842,8 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 
 			// if creating relocatable code, ignore origin 
 			if (opts.relocatable && section->origin >= 0) {
-				warn_org_ignored(obj->filename, section_name);
+				warn_org_ignored(obj->filename, section->name);
+
 				section->origin = -1;
 				section->section_split = false;
 			}
@@ -968,11 +968,7 @@ void link_modules(void)
 	for (obj_file_t* obj = g_objects; !get_num_errors() && obj != NULL; obj = obj->next) {
 		set_cur_module(obj->module);
 
-		// open error file on first module
-		if (obj == g_objects)
-			open_error_file(CURRENTMODULE->filename);
-		set_error_null();
-		set_error_module(CURRENTMODULE->modname);
+		set_error_location(CURRENTMODULE->filename, 0);
 
 		// link code and read definitions
 		link_module(obj, extern_syms);
@@ -982,7 +978,7 @@ void link_modules(void)
 	if (!get_num_errors() && !opts.consol_obj_file && g_libraries != NULL)
 		link_libraries(extern_syms);
 
-	set_error_null();
+	clear_error_location();
 
 	/* allocate segment addresses and compute absolute addresses of symbols */
 	/* in consol_obj_file sections are zero-based */
@@ -1018,9 +1014,7 @@ void link_modules(void)
 		OBJ_DELETE(exprs);
 	}
 
-	set_error_null();
-
-	close_error_file();
+	clear_error_location();
 
 	if (!get_num_errors()) {
 		if (opts.map)

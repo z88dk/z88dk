@@ -9,19 +9,22 @@ for my $binary ("binary", "incbin") {
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		$binary 
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- $binary
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		$binary 'a'
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- $binary 'a'
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		$binary "$test.dat" extra
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- $binary "$test.dat" extra
 END_ERR
 
 	path("$test.dat")->spew_raw(bytes(0, 0x0a, 0x0d, 0xff));
@@ -51,14 +54,18 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		nop
 		binary "$test.dat"
 END_ASM
-Error at file '$test.asm' line 2: max. code size of 65536 bytes reached
+$test.asm:2: error: segment overflow
+  ^---- binary "test_t2_BINARY.dat"
+      ^---- defb 240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255
 END_ERR
 
 path("$test.dat")->spew_raw($blob."x");		# 64k+1
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		binary "$test.dat"
 END_ASM
-Error at file '$test.asm' line 1: max. code size of 65536 bytes reached
+$test.asm:1: error: segment overflow
+  ^---- binary "test_t2_BINARY.dat"
+      ^---- defb 120
 END_ERR
 
 #-------------------------------------------------------------------------------
@@ -77,7 +84,8 @@ END
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		binary "test.dat"
 END_ASM
-Error at file '$test.asm' line 1: cannot read file 'test.dat'
+$test.asm:1: error: file open: test.dat
+  ^---- binary "test.dat"
 END_ERR
 
 # -I : OK

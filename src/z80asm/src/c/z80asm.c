@@ -10,6 +10,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "die.h"
 #include "directives.h"
 #include "fileutil.h"
+#include "if.h"
 #include "libfile.h"
 #include "listfile.h"
 #include "modlink.h"
@@ -65,6 +66,8 @@ void assemble_file( const char *filename )
 	obj_filename = path_canon(get_obj_filename(filename));
 	path_mkdir(path_dir(obj_filename));
 
+	set_error_location(obj_filename, 0);
+
 	/* try to load object file */
 	if (strcmp(filename, obj_filename) == 0 &&			/* input is object file */
 		file_exists(filename)							/* .o file exists */
@@ -89,7 +92,7 @@ void assemble_file( const char *filename )
 				src_filename = obj_filename;
 			}
 			else {				
-				error_read_file(filename);
+				error_file_open(filename);
 				return;
 			}
 		}
@@ -112,20 +115,18 @@ void assemble_file( const char *filename )
 	module = set_cur_module( new_module() );
 	module->filename = spool_add( src_filename );
 
-	/* Create error file */
-	remove(get_err_filename(src_filename));
-	open_error_file(src_filename);
-
 	if (load_obj_only)
 		object_file_append(obj_filename, CURRENTMODULE, true, false);
 	else
 		query_assemble(src_filename);			/* try to assemble, check -d */
 
-    set_error_null();							/* no more module in error messages */
+    clear_error_location();							/* no more module in error messages */
 	opts.cur_list = false;
 
 	/* finished assembly, remove dirname from include path */
 	argv_pop(opts.inc_path);
+
+	clear_error_location();
 }
 
 /*-----------------------------------------------------------------------------
@@ -188,8 +189,7 @@ static void do_assemble(const char *src_filename )
 
 	asm_MODULE_default();			/* Module name must be defined */
 
-	set_error_null();
-	//set_error_module( CURRENTMODULE->modname );
+	clear_error_location();
 
 	Z80pass2();						/* call pass 2 even if errors found, to issue pass2 errors */
 	
@@ -198,7 +198,7 @@ static void do_assemble(const char *src_filename )
 	* processing).
 	*/
 
-	set_error_null();
+	clear_error_location();
 
 	/* keep list files even if errors */
 	list_close(true);
@@ -206,8 +206,6 @@ static void do_assemble(const char *src_filename )
 	/* remove incomplete object file */
 	if (start_errors != get_num_errors())
 		remove(get_obj_filename(src_filename));
-
-	close_error_file();
 
 	remove_all_local_syms();
 	remove_all_global_syms();
@@ -220,16 +218,13 @@ static void do_assemble(const char *src_filename )
 /***************************************************************************************************
  * Main entry of Z80asm
  ***************************************************************************************************/
-int z80asm_main( int argc, char *argv[] )
-{
-	errors_init();
-
+int z80asm_main(int argc, char* argv[]) {
 	/* parse command line and call-back via assemble_file() */
 	/* If filename starts with '@', reads the file as a list of filenames
 	*	and assembles each one in turn */
 	parse_argv(argc, argv);
 	if (!get_num_errors()) {
-		for (char **pfile = argv_front(opts.files); *pfile; pfile++)
+		for (char** pfile = argv_front(opts.files); *pfile; pfile++)
 			assemble_file(*pfile);
 	}
 
@@ -240,7 +235,7 @@ int z80asm_main( int argc, char *argv[] )
 		}
 		else if (opts.make_bin) {
 			xassert(opts.consol_obj_file == NULL);
-			link_modules();			
+			link_modules();
 
 			if (!get_num_errors())
 				CreateBinFile();
@@ -256,7 +251,7 @@ int z80asm_main( int argc, char *argv[] )
 			link_modules();
 
 			set_cur_module(get_first_module(NULL));
-			
+
 			CURRENTMODULE->filename = get_asm_filename(opts.consol_obj_file);
 			CURRENTMODULE->modname = path_remove_ext(path_file(CURRENTMODULE->filename));
 
@@ -268,23 +263,16 @@ int z80asm_main( int argc, char *argv[] )
 		}
 	}
 
-	set_error_null();
-	close_error_file();
-
+	clear_error_location();
 	delete_modules();		/* Release module information (symbols, etc.) */
 
-	if (opts.relocatable)
-	{
+	if (opts.relocatable) {
 		if (reloctable != NULL)
 			m_free(reloctable);
 	}
 
-	if ( get_num_errors() )
-    {
-        return 1;	/* signal error */
-    }
-    else
-    {
-        return 0;    /* assembler successfully ended */
-    }
+	if (get_num_errors())
+		return EXIT_FAILURE;
+	else
+		return EXIT_SUCCESS;
 }

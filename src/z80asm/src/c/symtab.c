@@ -14,13 +14,13 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 */
 
 #include "die.h"
-#include "errors.h"
-#include "listfile.h"
 #include "fileutil.h"
+#include "if.h"
+#include "listfile.h"
 #include "options.h"
+#include "str.h"
 #include "symbol.h"
 #include "symtab.h"
-#include "str.h"
 #include "z80asm.h"
 #include "zutils.h"
 
@@ -56,19 +56,11 @@ void SymbolHash_cat( SymbolHash **ptarget, SymbolHash *source )
 *   return pointer to found symbol in a symbol tree, otherwise NULL if not found
 *	marks looked-up symbol as is_touched
 *----------------------------------------------------------------------------*/
-Symbol *find_symbol(const char *name, SymbolHash *symtab )
-{
-    Symbol *sym;
-
-    sym = SymbolHash_get( symtab, name );
-	if ( sym != NULL )
-	{
+Symbol* find_symbol(const char* name, SymbolHash* symtab) {
+	Symbol* sym = SymbolHash_get(symtab, name);
+	if (sym != NULL)
 		sym->is_touched = true;
-		if ( strcmp( sym->name, name ) != 0 )
-			warn_symbol_different( sym->name, name );
-	}
-
-    return sym;
+	return sym;
 }
 
 Symbol *find_local_symbol(const char *name )
@@ -106,8 +98,8 @@ Symbol *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t s
 		sym->is_defined = true;
         sym->module = module;
 		sym->section = section;
-		sym->filename = get_error_file();
-		sym->line_num = get_error_line();
+		sym->filename = get_error_filename();
+		sym->line_num = get_error_line_num();
     }
     else											/* already defined */
     {
@@ -117,10 +109,10 @@ Symbol *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t s
             return sym;
         }
 
-        if ( sym->module && sym->module != module && sym->module->modname )
-            error_symbol_redefined_module( name, sym->module->modname );
-        else
-            error_symbol_redefined( name );
+		if (sym->module && sym->module != module && sym->module->modname)
+			error_duplicate_definition_module(sym->module->modname, name);
+		else
+			error_duplicate_definition(name);
     }
 
     return sym;
@@ -293,34 +285,32 @@ void remove_all_global_syms( void )
 *   b) if in the local table but not yet defined, create now (was a reference)
 *   c) else error REDEFINED
 *----------------------------------------------------------------------------*/
-static Symbol *define_local_symbol(const char *name, long value, sym_type_t type)
+static Symbol* define_local_symbol(const char* name, long value, sym_type_t type)
 {
-    Symbol *sym;
+	Symbol* sym;
 
-    sym = find_symbol( name, CURRENTMODULE->local_symtab );
+	sym = find_symbol(name, CURRENTMODULE->local_symtab);
 
-    if ( sym == NULL )					/* Symbol not declared as local */
-    {
-        /* create symbol */
+	if (sym == NULL)					/* Symbol not declared as local */
+	{
+		/* create symbol */
 		sym = Symbol_create(name, value, type, SCOPE_LOCAL, CURRENTMODULE, CURRENTSECTION);
 		sym->is_defined = true;
 		SymbolHash_set(&CURRENTMODULE->local_symtab, name, sym);
-    }
-    else if ( sym->is_defined )			/* local symbol already defined */
-    {
-        error_symbol_redefined( name );
-    }
-    else								/* symbol declared local, but not yet defined */
-    {
-        sym->value = value;
-		sym->type = MAX( sym->type, type );
+	}
+	else if (sym->is_defined)			/* local symbol already defined */
+		error_duplicate_definition(name);
+	else								/* symbol declared local, but not yet defined */
+	{
+		sym->value = value;
+		sym->type = MAX(sym->type, type);
 		sym->scope = SCOPE_LOCAL;
 		sym->is_defined = true;
-        sym->module  = CURRENTMODULE;						/* owner of symbol is always creator */
+		sym->module = CURRENTMODULE;						/* owner of symbol is always creator */
 		sym->section = CURRENTSECTION;
-		sym->filename = get_error_file();
-		sym->line_num = get_error_line();
-    }
+		sym->filename = get_error_filename();
+		sym->line_num = get_error_line_num();
+	}
 
 	return sym;
 }
@@ -332,11 +322,11 @@ static Symbol *define_local_symbol(const char *name, long value, sym_type_t type
 *   c) if declared global/extern and defined -> error REDEFINED
 *   d) if in global table and not global/extern -> define a new local symbol
 *----------------------------------------------------------------------------*/
-Symbol *define_symbol(const char *name, long value, sym_type_t type)
+Symbol* define_symbol(const char* name, long value, sym_type_t type)
 {
-    Symbol     *sym;
+	Symbol* sym;
 
-    sym = find_symbol( name, global_symtab );
+	sym = find_symbol(name, global_symtab);
 
 	if (sym == NULL)						/* Symbol not declared as global/extern */
 	{
@@ -344,8 +334,8 @@ Symbol *define_symbol(const char *name, long value, sym_type_t type)
 	}
 	else if (sym->is_defined)				/* global symbol already defined */
 	{
-		if ( strncmp(name,"__CDBINFO__", 11) ) 
-			error_symbol_redefined(name);
+		if (strncmp(name, "__CDBINFO__", 11))
+			error_duplicate_definition(name);
 	}
 	else
 	{
@@ -355,8 +345,8 @@ Symbol *define_symbol(const char *name, long value, sym_type_t type)
 		sym->is_defined = true;
 		sym->module = CURRENTMODULE;		/* owner of symbol is always creator */
 		sym->section = CURRENTSECTION;
-		sym->filename = get_error_file();
-		sym->line_num = get_error_line();
+		sym->filename = get_error_filename();
+		sym->line_num = get_error_line_num();
 	}
 
 	return sym;
@@ -375,7 +365,7 @@ void update_symbol(const char *name, long value, sym_type_t type )
 		sym = find_symbol( name, global_symtab );
 
     if ( sym == NULL )
-		error_not_defined(name);
+		error_undefined_symbol(name);
 	else
 	{
 		sym->value = value;
@@ -562,7 +552,7 @@ void declare_extern_symbol(const char *name)
             else
             {
                 /* already declared local */
-                error_symbol_decl_local( name );
+                error_symbol_redecl( name );
             }
         }
         else 
@@ -676,11 +666,9 @@ void check_undefined_symbols(SymbolHash *symtab)
 		sym = (Symbol *)iter->value;
 
 		if (sym->scope == SCOPE_PUBLIC && !sym->is_defined) {
-			set_error_null();
-			set_error_file(sym->filename);
-			set_error_line(sym->line_num);
-			error_not_defined(sym->name);
+			set_error_location(sym->filename, sym->line_num);
+			error_undefined_symbol(sym->name);
 		}
 	}
-	set_error_null();
+	clear_error_location();
 }

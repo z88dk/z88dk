@@ -132,7 +132,7 @@ Define rules for a ragel-based parser.
 			if (expr_error)
 				error_expected_const_expr();
 			else
-				asm_C_LINE(expr_value, get_error_file());
+				asm_C_LINE(expr_value, get_error_filename());
 		}
 
 		| _TK_C_LINE const_expr _TK_COMMA string _TK_NEWLINE @{
@@ -483,7 +483,7 @@ Define rules for a ragel-based parser.
 			if (expr_error)
 				error_expected_const_expr();
 			else if (expr_value == 0)
-				error_assertion_failed();
+				error_assert_failed();
 			else 
 				; 
 		}
@@ -519,7 +519,7 @@ Define rules for a ragel-based parser.
 			if (expr_error)
 				error_expected_const_expr();
 			else
-				asm_LINE(expr_value, get_error_file());
+				asm_LINE(expr_value, get_error_filename());
 		}
 
 		| _TK_LINE const_expr _TK_COMMA string _TK_NEWLINE @{

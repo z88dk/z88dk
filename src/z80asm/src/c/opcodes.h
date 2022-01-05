@@ -11,7 +11,6 @@ Define CPU opcodes
 
 #pragma once
 
-#include "errors.h"
 #include "options.h"
 
 /* forward declaration without include cycle */

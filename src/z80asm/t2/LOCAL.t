@@ -6,13 +6,15 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 		local
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- local
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 		local a a
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- local a a
 END_ERR
 
 # labels

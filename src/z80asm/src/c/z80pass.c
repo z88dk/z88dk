@@ -7,11 +7,12 @@ License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_licens
 Repository: https://github.com/z88dk/z88dk
 */
 
+#include "die.h"
+#include "if.h"
 #include "limits.h"
 #include "listfile.h"
 #include "modlink.h"
 #include "symbol.h"
-#include "die.h"
 
 /* external functions */
 
@@ -36,9 +37,8 @@ Z80pass2(void)
 		expr = iter->obj;
 
 		/* set error location */
-		set_error_null();
-		set_error_file(expr->filename);
-		set_error_line(expr->line_num);
+		set_error_location(expr->filename, expr->line_num);
+		set_error_source_line(expr->text->data);	// show expression in case of error
 
 		/* Define code location; BUG_0048 */
 		set_cur_section(expr->section);
@@ -184,8 +184,7 @@ Z80pass2(void)
 	check_undefined_symbols(global_symtab);
 
 	/* clean error location */
-	set_error_null();
-	//set_error_module( CURRENTMODULE->modname );
+	clear_error_location();
 
 	/* create object file */
 	if (!get_num_errors())

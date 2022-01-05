@@ -1,0 +1,84 @@
+//-----------------------------------------------------------------------------
+// z80asm
+// Copyright (C) Paulo Custodio, 2011-2021
+// License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
+//-----------------------------------------------------------------------------
+
+// X(code, message)
+X(Ok, "ok")
+
+// files
+X(FileOpen, "file open")
+X(IncludeRecursion, "include recursion")
+X(NotLibFile, "not a library file")
+X(NotObjFile, "not an object file")
+X(ObjFileVersion, "invalid object file version")
+X(LibFileVersion, "invalid library file version")
+
+// options
+X(NoSrcFile, "source file expected")
+X(IllegalOption, "illegal option")
+X(GlobNoFiles, "pattern returned no files")
+X(InvalidOrgOption, "invalid origin (-r) option")
+X(InvalidDefineOption, "invalid define (-Dvar=value) option")
+X(InvalidFillerOption, "invalid filler (-f) option")
+X(CmdFailed, "command failed")
+
+// lexer
+X(InvalidChar, "invalid character")
+X(MissingQuote, "missing quote")
+X(InvalidCharConst, "invalid character constant")
+
+// symbols
+X(DuplicateDefinition, "duplicate definition")
+X(UndefinedSymbol, "undefined symbol")
+X(SymbolRedecl, "symbol redeclaration")
+
+// expressions
+X(ConstExprExpected, "constant expression expected")
+X(DivisionByZero, "division by zero")
+X(ExprRecursion, "recursive expression")
+
+// preprocessor
+X(MacroArgsNumber, "number of macro arguments")
+X(ExprEval, "expression evaluation")
+X(InvalidFloatFormat, "invalid float format, expected")
+
+// assembler
+X(ExprInParens, "interpreting indirect value as immediate")
+X(IllegalIdent, "illegal identifier")
+X(IntRange, "integer range")
+X(JrNoLocal, "relative jump address not local")
+X(MissingBlock, "missing {} block")
+X(MissingCloseBlock, "{} block not closed")
+X(StrTooLong, "string longer than reserved space")
+X(Syntax, "syntax error")
+X(SyntaxExpr, "syntax error in expression")
+X(UnbalancedStruct, "unbalanced control structure")
+X(UnbalancedStructStartedAt, "unbalanced control structure started at")
+X(AssertFailed, "assertion failed")
+
+// DMA
+X(DMABaseRegisterIllegal, "DMA base register byte illegal")
+X(DMAMissingArgs, "DMA missing register group member(s)")
+X(DMAExtraArgs, "DMA too many arguments")
+X(DMAIllegalPortATiming, "DMA illegal port A timing")
+X(DMAIllegalPortBTiming, "DMA illegal port B timing")
+X(DMAUnsupportedInterrupts, "DMA does not support interrupts")
+X(DMAUnsupportedFeatures, "DMA does not support some features")
+X(DMAUnsupportedCommand, "DMA does not implement this command")
+X(DMAIllegalMode, "DMA illegal mode")
+X(DMAIllegalCommand, "DMA illegal command")
+X(DMAIllegalReadMask, "DMA illegal read mask")
+X(DMAHalfCycleTiming, "DMA does not support half cycle timing")
+X(DMAUnsupportedReadySignal, "DMA does not support ready signals")
+
+// linker
+X(AlignRedefined, "ALIGN redefined")
+X(OrgIgnored, "ORG ignored")
+X(OrgRedefined, "ORG redefined")
+X(SegmentOverflow, "segment overflow")
+X(OrgNotAligned, "ORG not aligned")
+X(InvalidOrg, "invalid ORG")
+
+#undef X

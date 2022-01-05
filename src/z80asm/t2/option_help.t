@@ -29,7 +29,6 @@ Usage:
     .map   = map file
     .reloc = reloc file
     .def   = global address definition file
-    .err   = error file
 
 Help Options:
   -h                     Show help options
@@ -86,7 +85,7 @@ Appmake Options:
 END
 
 capture_nok("./z88dk-z80asm -h=x", <<END);
-Error: illegal option: -h=x
+error: illegal option: -h=x
 END
 
 # make sure help fist in 80 columns

@@ -88,31 +88,36 @@ END
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 defb 'a
 END_ASM
-Error at file '$test.asm' line 1: unclosed quoted string
+$test.asm:1: error: missing quote
+  ^---- defb 'a
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 ld a, "a"
 END_ASM
-Error at file '$test.asm' line 1: syntax error
+$test.asm:1: error: syntax error
+  ^---- ld a, "a"
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 defb ''
 END_ASM
-Error at file '$test.asm' line 1: invalid single quoted character
+$test.asm:1: error: invalid character constant
+  ^---- defb ''
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 defb 'ab'
 END_ASM
-Error at file '$test.asm' line 1: invalid single quoted character
+$test.asm:1: error: invalid character constant
+  ^---- defb 'ab'
 END_ERR
 
 z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 defb "a
 END_ASM
-Error at file '$test.asm' line 1: unclosed quoted string
+$test.asm:1: error: missing quote
+  ^---- defb "a
 END_ERR
 
 # invalid single quoted character was overflowing to next line
@@ -120,9 +125,24 @@ z80asm_nok("", "", <<'END_ASM', <<END_ERR);
 ld a,'he'
 ld a,"a"
 END_ASM
-Error at file '$test.asm' line 1: invalid single quoted character
-Error at file '$test.asm' line 2: syntax error
+$test.asm:1: error: invalid character constant
+  ^---- ld a,'he'
+$test.asm:2: error: syntax error
+  ^---- ld a,"a"
 END_ERR
+
+# backslash inside include filename not converted to escape sequence 
+# backslash inside defb converted to escape sequence
+z80asm_nok("", "", <<'END_ASM', <<END_ERR);
+		include "a\run\new\folder"
+END_ASM
+$test.asm:1: error: file open: a/run/new/folder
+  ^---- include "a\\run\\new\\folder"
+END_ERR
+
+z80asm_ok("", "", "", <<'END_ASM', "a\run\new\folder");
+		defb "a\run\new\folder"
+END_ASM
 
 unlink_testfiles;
 done_testing;

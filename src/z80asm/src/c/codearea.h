@@ -45,7 +45,7 @@ CLASS( Section )
 	bool		 section_split : 1;	// ORG -1 was given, signal that this section
 									// should be output to a new binary file
 	bool		 max_codesize_issued : 1;
-									// error_max_codesize issued, ignore next calls
+									// error_segment_overflow issued, ignore next calls
 	bool		 align_found : 1;	// ALIGN already found in this section
 	int			 asmpc;				// address of current opcode relative to start
 									// of the current module, reset to 0 at start

@@ -10,8 +10,8 @@ Manage the code area in memory
 
 #include "codearea.h"
 #include "die.h"
-#include "errors.h"
 #include "fileutil.h"
+#include "if.h"
 #include "init.h"
 #include "listfile.h"
 #include "options.h"
@@ -393,9 +393,8 @@ static void inc_PC( int num_bytes )
 static void check_space( int addr, int num_bytes )
 {
 	init_module();
-	if (addr + num_bytes > MAXCODESIZE && !g_cur_section->max_codesize_issued)
-	{
-		error_max_codesize((long)MAXCODESIZE);
+	if (addr + num_bytes > MAXCODESIZE && !g_cur_section->max_codesize_issued) {
+		error_segment_overflow();
 		g_cur_section->max_codesize_issued = true;
 	}
 }
@@ -658,7 +657,7 @@ void set_origin_option(int origin)
 {
 	Section *default_section;
 
-	if (origin < 0 || origin > 0xFFFF)
+	if (origin < 0)		// value can be >0xffff for banked address
 		error_int_range((long)origin);
 	else
 	{

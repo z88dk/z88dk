@@ -127,13 +127,6 @@ src/c/parse_rules.h : src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				dev/cpu/cpu_rules.h
 	perl parse_ragel.pl src/c/parse_rules.rl
 
-# Generate test scripts using  Udo Munk's z80asm as a reference implementation
-dev: t/opcodes.t
-
-t/opcodes.t: dev/build_opcodes.pl dev/build_opcodes.asm Makefile
-	$(MAKE) -C dev/z80pack-1.21/z80asm
-	perl dev/build_opcodes.pl
-
 # Template
 dev: $(patsubst tt/%.tt, src/c/%, $(wildcard tt/*.tt))
 
@@ -179,8 +172,8 @@ clean::
 	$(RM) -rf Debug Release x1 x2 x3
 	$(RM) $(OBJS) $(TEST_SRC_LIB:.c=.o)
 
-all:
-	perl dev/cpu2/cpu.pl
+#all:
+#	perl dev/cpu2/cpu.pl
 
 test: $(PROJ)$(EXESUFFIX) z80asm_lib
 	$(MAKE) dev
