@@ -871,6 +871,10 @@ static void define_assembly_defines()
 		define_static_def_sym("__SWAP_IX_IY__", 1);
 	}
 
+	if (opts.ti83plus) {
+		define_static_def_sym("__CPU_TI83PLUS__", 1);
+	}
+
 	// __FLOAT__xxx__
 	define_static_def_sym(get_float_format_define(), 1);
 }
