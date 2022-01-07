@@ -24,6 +24,8 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 #include "z80asm.h"
 #include "zutils.h"
 
+#define COLUMN_WIDTH	32
+
 /*-----------------------------------------------------------------------------
 *   Global Symbol Tables
 *----------------------------------------------------------------------------*/

@@ -1084,9 +1084,16 @@ static void make_output_dir()
 	}
 }
 
-
 bool option_ucase() {
 	return opts.ucase;
+}
+
+bool option_list_file() {
+	return opts.list;
+}
+
+bool option_cur_list() {
+	return opts.cur_list;
 }
 
 const char* search_includes(const char* filename) {
