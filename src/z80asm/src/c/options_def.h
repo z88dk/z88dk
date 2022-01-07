@@ -21,6 +21,7 @@ OPT_VAR(bool, symtable, false)
 OPT_VAR(bool, list, false)	/* -l flag */
 OPT_VAR(bool, cur_list, false)	/* current LSTON/LSTOFF status */
 OPT_VAR(bool, map, false)
+OPT_VAR(bool, ti83, false)
 OPT_VAR(bool, ti83plus, false)
 OPT_VAR(bool, swap_ix_iy, false)
 OPT_VAR(bool, debug_info, false)	/* add debug info to map file */

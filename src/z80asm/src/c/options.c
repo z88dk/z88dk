@@ -820,12 +820,14 @@ static void option_cpu_r3k(void)
 static void option_cpu_ti83(void)
 {
 	option_cpu_z80();
+	opts.ti83 = true;
 	opts.ti83plus = false;
 }
 
 static void option_cpu_ti83plus(void)
 {
 	option_cpu_z80();
+	opts.ti83 = false;
 	opts.ti83plus = true;
 }
 
@@ -871,7 +873,10 @@ static void define_assembly_defines()
 		define_static_def_sym("__SWAP_IX_IY__", 1);
 	}
 
-	if (opts.ti83plus) {
+	if (opts.ti83) {
+		define_static_def_sym("__CPU_TI83__", 1);
+	}
+	else if (opts.ti83plus) {
 		define_static_def_sym("__CPU_TI83PLUS__", 1);
 	}
 
