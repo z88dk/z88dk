@@ -10,7 +10,6 @@ Repository: https://github.com/z88dk/z88dk
 #include "die.h"
 #include "if.h"
 #include "limits.h"
-#include "listfile.h"
 #include "modlink.h"
 #include "symbol.h"
 

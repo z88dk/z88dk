@@ -1323,7 +1323,7 @@ const char* sfile_get_source_line() {
 		return nullptr;
 	g_do_preproc_line = true;		// preprocessing on input line
 	if (g_preproc.getline(line)) {
-		got_expanded_line(sfile_filename(), sfile_line_num(), line.c_str());
+		got_expanded_line(line.c_str());
 		return line.c_str();
 	}
 	else

@@ -218,7 +218,6 @@
     <ClInclude Include="..\..\src\z80asm\src\c\init.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\libfile.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\list.h" />
-    <ClInclude Include="..\..\src\z80asm\src\c\listfile.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\minunit.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\modlink.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\module.h" />
@@ -261,7 +260,6 @@
     <ClCompile Include="..\..\src\z80asm\src\c\hist.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\libfile.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\list.c" />
-    <ClCompile Include="..\..\src\z80asm\src\c\listfile.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\minunit.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\modlink.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\module.c" />

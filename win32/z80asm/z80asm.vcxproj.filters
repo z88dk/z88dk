@@ -78,9 +78,6 @@
     <ClInclude Include="..\..\src\z80asm\src\c\list.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\c\listfile.h">
-      <Filter>Header Files\c</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\minunit.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
@@ -198,9 +195,6 @@
       <Filter>Source Files\c</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\c\list.c">
-      <Filter>Source Files\c</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\c\listfile.c">
       <Filter>Source Files\c</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\c\minunit.c">

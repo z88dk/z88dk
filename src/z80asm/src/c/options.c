@@ -1101,6 +1101,10 @@ bool option_cur_list() {
 	return opts.cur_list;
 }
 
+bool option_verbose() {
+	return opts.verbose;
+}
+
 const char* search_includes(const char* filename) {
 	const char* filename_path = path_search(filename, opts.inc_path);
 	return filename_path;

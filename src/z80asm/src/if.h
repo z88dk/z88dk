@@ -85,6 +85,7 @@ void error_assert_failed();
 bool option_ucase();
 bool option_list_file();
 bool option_cur_list();
+bool option_verbose();
 const char* search_includes(const char* filename);
 
 // expressions
@@ -104,8 +105,10 @@ bool sfile_is_c_source();
 void sfile_set_filename(const char* filename);
 void sfile_set_line_num(int line_num, int line_inc);
 void sfile_set_c_source(bool f);
-void got_source_line(const char* filename, int line_num, const char* text);
-void got_expanded_line(const char* filename, int line_num, const char* text);
+
+// code area
+int get_PC();
+int get_phased_PC();
 
 // list file
 void list_open(const char* list_file);
@@ -115,6 +118,8 @@ void list_expanded_line(int asmpc, int phased_pc, const char* text);
 void list_append_bytes(int value, int num_bytes);
 void list_patch_bytes(int asmpc, int value, int num_bytes);
 void list_end_line();
+void got_source_line(const char* filename, int line_num, const char* text);
+void got_expanded_line(const char* text);
 
 // floats
 bool set_float_format(const char* format);

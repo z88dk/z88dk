@@ -235,3 +235,27 @@ void list_patch_bytes(int asmpc, int value, int num_bytes) {
 void list_end_line() {
 	g_list_file.end_line();
 }
+
+void got_source_line(const char* filename, int line_num, const char* text) {
+	set_error_location(filename, line_num);
+	set_error_source_line(text);
+
+	// send line to list file
+	if (filename && option_cur_list()) {
+		list_source_line(filename, line_num,
+			get_PC(), get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
+			text);
+	}
+}
+
+void got_expanded_line(const char* text) {
+	set_error_expanded_line(text);
+
+	// send line to list file
+	if (option_cur_list() && option_verbose()) {
+		string line = string("      + ") + text;
+		list_expanded_line(
+			get_PC(), get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
+			line.c_str());
+	}
+}
