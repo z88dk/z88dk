@@ -10,7 +10,7 @@ and then to C68 on QDOS.
 It has been maintained since 2011 by Paulo Custodio.
 
 Copyright (C) Gunther Strube, InterLogic 1993-99  
-Copyright (C) Paulo Custodio, 2011-2017
+Copyright (C) Paulo Custodio, 2011-2022
 
 Repository
 ----------
