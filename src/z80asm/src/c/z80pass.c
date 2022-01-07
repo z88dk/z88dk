@@ -159,10 +159,10 @@ Z80pass2(void)
 		if (opts.list) {
 			if (expr->range == RANGE_WORD_BE) {
 				int swapped = ((value & 0xFF00) >> 8) | ((value & 0x00FF) << 8);
-				list_patch_data(expr->listpos, swapped, range_size(expr->range));
+				list_patch_bytes(expr->listpos, swapped, range_size(expr->range));
 			}
 			else {
-				list_patch_data(expr->listpos, value, range_size(expr->range));
+				list_patch_bytes(expr->listpos, value, range_size(expr->range));
 			}
 		}
 
@@ -201,16 +201,13 @@ Z80pass2(void)
 
 bool Pass2infoExpr(range_t range, Expr* expr)
 {
-	int list_offset;
-
 	if (expr != NULL)
 	{
 		expr->range = range;
 		expr->code_pos = get_cur_module_size();			/* update expression location */
-		list_offset = expr->code_pos - get_PC();
 
 		if (opts.cur_list)
-			expr->listpos = list_patch_pos(list_offset);	/* now calculated as absolute file pointer */
+			expr->listpos = expr->code_pos;
 		else
 			expr->listpos = -1;
 

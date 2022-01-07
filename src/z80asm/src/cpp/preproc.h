@@ -25,6 +25,7 @@ struct Location {
 	int line_inc{ 1 };
 
 	Location(const string& filename = "", int line_num = 0);
+	void clear() { filename.clear(); line_num = 0; line_inc = 1; }
 	void inc_line() { line_num += line_inc; }
 };
 

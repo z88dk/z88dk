@@ -14,7 +14,6 @@ Assembly directives.
 #include "directives.h"
 #include "fileutil.h"
 #include "if.h"
-#include "listfile.h"
 #include "module.h"
 #include "parse.h"
 #include "strutil.h"

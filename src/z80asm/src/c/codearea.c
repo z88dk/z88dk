@@ -13,7 +13,6 @@ Manage the code area in memory
 #include "fileutil.h"
 #include "if.h"
 #include "init.h"
-#include "listfile.h"
 #include "options.h"
 #include "strutil.h"
 #include "utstring.h"
@@ -457,8 +456,8 @@ void append_value( int value, int num_bytes )
     init_module();
 	patch_value(get_cur_module_size(), value, num_bytes);
 
-	if ( opts.list )
-		list_append( value, num_bytes );
+	if (opts.cur_list)
+		list_append_bytes(value, num_bytes);
 }
 
 void patch_byte( int addr, byte_t byte1 ) { patch_value( addr, byte1, 1 ); }

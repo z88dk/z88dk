@@ -170,10 +170,6 @@ static void do_assemble(const char *src_filename )
     int start_errors = get_num_errors();     /* count errors in this source file */
 	const char *obj_filename = get_obj_filename(src_filename);
 
-	/* create list file */
-	if (opts.list)
-		list_open(get_list_filename(src_filename));
-
 	/* initialize local symtab with copy of static one (-D defines) */
 	copy_static_syms();
 
@@ -183,25 +179,13 @@ static void do_assemble(const char *src_filename )
 	if (opts.verbose)
 		printf("Assembling '%s' to '%s'\n", path_canon(src_filename), path_canon(obj_filename));
 
+	list_open(get_list_filename(src_filename));
 	parse_file(src_filename);
-
-	list_end();						/* get_used_symbol will only generate page references until list_end() */
-
 	asm_MODULE_default();			/* Module name must be defined */
-
 	clear_error_location();
-
 	Z80pass2();						/* call pass 2 even if errors found, to issue pass2 errors */
-	
-	/*
-	* Source file no longer needed (file could already have been closed, if error occurred during INCLUDE
-	* processing).
-	*/
-
 	clear_error_location();
-
-	/* keep list files even if errors */
-	list_close(true);
+	list_close();
 
 	/* remove incomplete object file */
 	if (start_errors != get_num_errors())

@@ -871,6 +871,10 @@ static void define_assembly_defines()
 		define_static_def_sym("__SWAP_IX_IY__", 1);
 	}
 
+	if (opts.ti83plus) {
+		define_static_def_sym("__CPU_TI83PLUS__", 1);
+	}
+
 	// __FLOAT__xxx__
 	define_static_def_sym(get_float_format_define(), 1);
 }
@@ -1080,9 +1084,16 @@ static void make_output_dir()
 	}
 }
 
-
 bool option_ucase() {
 	return opts.ucase;
+}
+
+bool option_list_file() {
+	return opts.list;
+}
+
+bool option_cur_list() {
+	return opts.cur_list;
 }
 
 const char* search_includes(const char* filename) {

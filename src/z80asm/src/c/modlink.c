@@ -13,7 +13,6 @@ Repository: https://github.com/z88dk/z88dk
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
-#include "listfile.h"
 #include "modlink.h"
 #include "options.h"
 #include "parse.h"

@@ -103,3 +103,5 @@ extern void checkrun_appmake(void);
 *   options function interface
 *----------------------------------------------------------------------------*/
 bool option_ucase();
+bool option_list_file();
+bool option_cur_list();

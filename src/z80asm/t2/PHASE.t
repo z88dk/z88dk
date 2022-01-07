@@ -76,33 +76,34 @@ END
 ));
 
 check_txt_file("$test.lis", <<'END');
-1     0000              	section PART_1
-2     0000              	part1:
-3     0000  21 12 00    		ld hl, start
-4     0003  11 00 80    		ld de, 0x8000
-5     0006  01 08 00    		ld bc, end-start
-6     0009  ED B0       		ldir
-7     000B  18 00       		jr l1
-8     000D              	l1:
-9     000D  C3 00 80    		jp 0x8000
-10    0010  10 00       		defw asmpc
-11    0012              	start:
-12    0012              		PHASE 0x8000
-13    8000  CD 03 80    	f1: call f2
-14    8003  18 00       	f2: jr l2
-15    8005              
-16    8005              		section PART_2
-17    0000              	part2:
-18    0000  01 02 03 04 		defb 1,2,3,4
-19    0004              
-20    0004              		section PART_1
-21    8005  C9          	l2:	ret
-22    8006  06 80       		defw asmpc
-23    8008              		DEPHASE
-24    001A              	end:
-25    001A  1A 00       		defw asmpc
-26    001C              
-27    001C              
+test_t2_PHASE.asm:
+     1                          	section PART_1
+     2                          	part1:
+     3   000000 210000          		ld hl, start
+     4   000003 110080          		ld de, 0x8000
+     5   000006 010800          		ld bc, end-start
+     6   000009 edb0            		ldir
+     7   00000b 1800            		jr l1
+     8                          	l1:
+     9   00000d c30080          		jp 0x8000
+    10   000010 1000            		defw asmpc
+    11                          	start:
+    12                          		PHASE 0x8000
+    13   008000 cd0380          	f1: call f2
+    14   008003 1800            	f2: jr l2
+    15                          
+    16                          		section PART_2
+    17                          	part2:
+    18   000000 01020304        		defb 1,2,3,4
+    19                          
+    20                          		section PART_1
+    21   008005 c9              	l2:	ret
+    22   008006 0680            		defw asmpc
+    23                          		DEPHASE
+    24                          	end:
+    25   00001a 1a00            		defw asmpc
+    26                          
+    27                          
 END
 
 check_txt_file("$test.map", <<END);
