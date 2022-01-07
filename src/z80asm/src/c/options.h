@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------------------
-// Z88DK Z80 Module Assembler
+// Z88DK Z80 Macro Assembler
 // Parse command line options
-// Copyright (C) Paulo Custodio, 2011-2021
+// Copyright (C) Paulo Custodio, 2011-2022
 // License: http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 #pragma once

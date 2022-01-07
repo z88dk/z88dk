@@ -652,7 +652,7 @@ sub get_copyright {
 	my $config = read_file("../config.h");
 	my($version) = $config =~ /\#define \s+ Z88DK_VERSION \s+ \" (.*?) \" /x or die;
 
-	my $copyrightmsg = "Z80 Module Assembler ".$version."\n(c) ".$copyright;
+	my $copyrightmsg = "Z80 Macro Assembler ".$version."\n(c) ".$copyright;
 
 	return $copyrightmsg;
 }

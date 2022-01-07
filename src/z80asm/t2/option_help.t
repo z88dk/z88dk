@@ -7,8 +7,8 @@ my($version) = $config =~ /Z88DK_VERSION\s*"(.*)"/;
 ok $version, "version $version";
 
 capture_ok("./z88dk-z80asm -h", <<"END");
-Z80 Module Assembler $version
-(c) InterLogic 1993-2009, Paulo Custodio 2011-2021
+Z80 Macro Assembler $version
+(c) InterLogic 1993-2009, Paulo Custodio 2011-2022
 
 Usage:
   z80asm [options] { \@<modulefile> | <filename> }
