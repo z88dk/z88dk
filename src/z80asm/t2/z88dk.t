@@ -48,18 +48,5 @@ $test.asm:3: error: integer range: 0x100
 END
 
 
-z80asm_ok("", "", "", 
-'		invoke 0		', bytes(0xcd).words(0),
-'		invoke 1		', bytes(0xcd).words(1),
-'		invoke 65535	', bytes(0xcd).words(65535));
-
-z80asm_nok("", "", <<END, <<END);
-		invoke -1
-END
-$test.asm:1: error: integer range: -1
-  ^---- invoke -1
-END
-
-
 unlink_testfiles;
 done_testing;

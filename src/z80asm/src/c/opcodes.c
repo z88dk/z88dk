@@ -210,20 +210,24 @@ void add_Z88_FPP(int argument)
 
 void add_Z88_INVOKE(int argument)
 {
-	int opcode;
+	if (opts.ti83 || opts.ti83plus) {
+		int opcode;
 
-	if (opts.ti83plus)
-		opcode = Z80_RST(0x28);		/* Ti83Plus: RST 28H instruction */
-	else
-		opcode = Z80_CALL;			/* Ti83: CALL */
+		if (opts.ti83plus)
+			opcode = Z80_RST(0x28);		/* Ti83Plus: RST 28H instruction */
+		else
+			opcode = Z80_CALL;			/* Ti83: CALL */
 
-	if (argument >= 0)
-	{
-		append_byte(opcode);
-		append_word(argument);
+		if (argument >= 0)
+		{
+			append_byte(opcode);
+			append_word(argument);
+		}
+		else
+			error_int_range(argument);
 	}
 	else
-		error_int_range(argument);
+		error_illegal_ident();
 }
 
 // cu.wait VER, HOR   ->  16 - bit encoding 0x8000 + (HOR << 9) + VER
