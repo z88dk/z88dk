@@ -34,7 +34,7 @@ ENDIF
      ; a = byte holding pixel mask
      ; hl = address
 rotated:
-IF NEEDplot|NEEDunplot
+IF NEEDplot|NEEDunplot|NEEDxor
     ld      e,a     ;Pixel to set
     cpl
     ld      d,a     ;Mask
@@ -42,7 +42,7 @@ ELSE
     ld      e,a     ;Pixel to set
 ENDIF
 
-IF NEEDplot
+IF NEEDplot|NEEDxor
     ld      a,(__rx78_ink)
     ld      c,a
 ELIF NEEDunplot
@@ -88,7 +88,6 @@ noset_red:
     ld      (hl),a
 ELIF NEEDxor
     ld      a,(hl)
-    and     d
     rrc     c
     jr      nc,noset_blue
     xor     e
@@ -100,7 +99,6 @@ noset_blue:
     ld      a,@00000010
     out     ($f2),a
     ld      a,(hl)
-    and     d
     rrc     c
     jr      nc,noset_green
     xor     e
@@ -108,10 +106,9 @@ noset_green:
     ld      (hl),a
     ld      a,3
     out     ($f1),a
-    ld      a,@00000010
+    ld      a,@00000100
     out     ($f2),a
     ld      a,(hl)
-    and     d
     rrc     c
     jr      nc,noset_red
     xor     e
