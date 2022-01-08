@@ -10,7 +10,6 @@
 IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  drawbox
-    EXTERN  l_jpix
 
 ; IN:  HL,DE = (x,y).  HL' = width, DE' = height
 
@@ -95,10 +94,12 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     push    bc
     push    hl
     push    de
-    call    l_jpix
+    call    jpix
     pop     de
     pop     hl
     pop     bc
     ret
+jpix:
+    jp      (ix)
 
 ENDIF

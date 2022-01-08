@@ -2,7 +2,6 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  draw_circle
 
-    EXTERN  l_jpix
 
 DEFVARS 0
 {
@@ -144,8 +143,10 @@ DEFVARS 0
     push    de
     pop     ix
     ; h, l = coordinates
-    call    l_jpix
+    call    jpix
     pop     ix
     ret
+jpix:
+    jp      (ix)
 
 ENDIF
