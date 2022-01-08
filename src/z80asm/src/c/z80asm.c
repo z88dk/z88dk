@@ -227,7 +227,7 @@ int z80asm_main(int argc, char* argv[]) {
 				checkrun_appmake();		/* call appmake if requested in the options */
 		}
 		else if (opts.bin_file) {	// -o consolidated obj
-			opts.consol_obj_file = get_obj_filename(opts.bin_file);
+			opts.consol_obj_file = opts.bin_file;
 			opts.bin_file = NULL;
 
 			xassert(opts.consol_obj_file != NULL);
