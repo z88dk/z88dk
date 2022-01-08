@@ -118,21 +118,21 @@ ENDIF
 IF NEEDxor
 	out	($5c),a		;Switch to blue plane
 	ld	a,(hl)
-	rlc	c
+	rrc	c
 	jr	nc,noset_blue
 	xor	d
 noset_blue:
 	ld	(hl),a
 	out	($5e),a		;Switch to green plane
 	ld	a,(hl)
-	rlc	c
+	rrc	c
 	jr	nc,noset_green
 	xor	d
 noset_green:
 	ld	(hl),a
 	out	($5d),a		;Switch to red plane
 	ld	a,(hl)
-	rlc	c
+	rrc	c
 	jr	nc,noset_red
 	xor	d
 noset_red:
