@@ -107,7 +107,7 @@ Define rules for a ragel-based parser.
 			  ( _TK_ASMPC | _TK_NAME | _TK_NUMBER )
 			  ( rparen )*;
 
-	expr1 	= _TK_CONST_EXPR ? term ( binary term )**;
+	expr1 	= term ( binary term )**;
 
 	action expr_start_action {
 		ctx->expr_start = ctx->p;

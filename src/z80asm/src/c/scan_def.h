@@ -58,7 +58,7 @@ TOKEN(TK_LOG_NOT, "!", )
 
 /* no token for "\"" */
 
-TOKEN(TK_CONST_EXPR, "#", )
+/* no token for "#" */
 
 /* no token for "$" */
 

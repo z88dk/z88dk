@@ -49,7 +49,6 @@ UT_icd ut_exprs_icd = { sizeof(Expr*), ut_exprs_init, NULL, ut_exprs_dtor };
 static void ExprOp_init_asmpc(ExprOp* self);
 static void ExprOp_init_number(ExprOp* self, long value);
 static void ExprOp_init_symbol(ExprOp* self, Symbol* symbol);
-static void ExprOp_init_const_expr(ExprOp* self);
 static void ExprOp_init_operator(ExprOp* self, tokid_t tok, op_type_t op_type);
 
 /*-----------------------------------------------------------------------------
@@ -254,11 +253,6 @@ void ExprOp_init_symbol(ExprOp* self, Symbol* symbol)
 {
 	self->op_type = SYMBOL_OP;
 	self->d.symbol = symbol;
-}
-
-void ExprOp_init_const_expr(ExprOp* self)
-{
-	self->op_type = CONST_EXPR_OP;
 }
 
 void ExprOp_init_operator(ExprOp* self, tokid_t tok, op_type_t op_type)
@@ -631,18 +625,9 @@ DEFINE_PARSER(Expr_parse_multiplication, Expr_parse_power,
 
 /* parse expression at current input, return new Expr object;
    return NULL and issue syntax error on error */
-Expr* expr_parse(void)
-{
+Expr* expr_parse(void) {
 	Expr* self = OBJ_NEW(Expr);
-	bool is_const_expr = false;
-
-	if (Expr_parse_ternary_cond(self))
-	{
-		/* convert to constant expression */
-		if (is_const_expr)
-			ExprOp_init_const_expr(ExprOpArray_push(self->rpn_ops));
-	}
-	else
+	if (!Expr_parse_ternary_cond(self))
 	{
 		/* syntax error in expression */
 		error_syntax_expr();
@@ -650,7 +635,6 @@ Expr* expr_parse(void)
 		OBJ_DELETE(self);
 		self = NULL;
 	}
-
 	return self;
 }
 
