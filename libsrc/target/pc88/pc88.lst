@@ -29,7 +29,7 @@ target/pc88/graphics/w_stencil_render
 target/pc88/graphics/lores_data
 target/pc88/graphics/getmaxy
 target/pc88/graphics/getmaxx
-target/pc88/graphics/w_putsprite
+;target/pc88/graphics/w_putsprite
 target/pc88/graphics/w_plotpixl
 target/pc88/graphics/clsgraph
 @gfx/wide/gfx_wide.lst
