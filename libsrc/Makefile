@@ -666,9 +666,9 @@ bondwell2.lib:
 	@echo '--- Building Bondwell 2 Library ---'
 	@echo ''
 	@$(RM) -f video/msm6255/*.o
-	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=bondwell2
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=bondwell2 TARGET_CFLAGS="-Ca-IXIY -Cl-IXIY"
 	$(MAKE) -C games TARGET=cpm SUBTYPE=bondwell2
-	TARGET=bondwell2 TYPE=z80 $(LIBLINKER) -DFORbondwell2 -x$(OUTPUT_DIRECTORY)/bondwell2 @$(TARGET_DIRECTORY)/bondwell2/bw2.lst
+	TARGET=bondwell2 TYPE=ixiy $(LIBLINKER) -IXIY -DFORbondwell2 -x$(OUTPUT_DIRECTORY)/bondwell2 @$(TARGET_DIRECTORY)/bondwell2/bw2.lst
 
 gfxosborne1.lib:
 	@echo ''
