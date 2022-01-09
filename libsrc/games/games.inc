@@ -317,6 +317,7 @@ IF FORlynx
         defc SOUND_ONEBIT_port   = 0
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 0
+	defc INPUT_JOY_useinkey = 1
 ENDIF
 
 IF FORosca
@@ -488,6 +489,7 @@ IF FORpencil2
     defc SOUND_ONEBIT_port	= $ff		; also valid for Coleco Adam and Pencil II
     defc SOUND_ONEBIT_bit    = 3
     defc SOUND_ONEBIT_mask   = $0F			; $0F for full volume output
+    defc INPUT_JOY_useinkey = 1
 ENDIF
 
 
