@@ -1530,20 +1530,26 @@ int main(int argc, char **argv)
 
         int status = 0;
 
+		// z80asm now generates map file with same basename as output binary, i.e. a.map
+		/*
         if (mapon && copy_file(c_crt0, ".map", filenamebuf, ".map")) {
             fprintf(stderr, "Cannot copy map file\n");
             status = 1;
         }
+		*/
 
         if (symbolson && copy_file(c_crt0, ".sym", filenamebuf, ".sym")) {
             fprintf(stderr, "Cannot copy symbols file\n");
             status = 1;
         }
 
-        if (globaldefon && copy_defc_file(c_crt0, ".def", filenamebuf, ".def")) {
+		// z80asm now generates def file with same basename as output binary, i.e. a.def
+		/*
+		if (globaldefon && copy_defc_file(c_crt0, ".def", filenamebuf, ".def")) {
             fprintf(stderr, "Cannot create global defc file\n");
             status = 1;
         }
+		*/
 
         if (lston && copy_file(c_crt0, ".lis", filenamebuf, ".lis")) {
             fprintf(stderr, "Cannot copy crt0 list file\n");
@@ -1556,7 +1562,8 @@ int main(int argc, char **argv)
 
         if (createapp) {
             /* Building an application - run the appmake command on it */
-            snprintf(buffer, sizeof(buffer), "%s %s -b \"%s\" -c \"%s\"", c_appmake_exe, appmakeargs ? appmakeargs : "", outputfile, c_crt0);
+			/* z80asm now generates map file with same basename as output binary, i.e. a.map */
+            snprintf(buffer, sizeof(buffer), "%s %s -b \"%s\" -c \"%s\"", c_appmake_exe, appmakeargs ? appmakeargs : "", outputfile, filenamebuf);
             if (verbose) {
                 printf("%s\n", buffer);
                 fflush(stdout);

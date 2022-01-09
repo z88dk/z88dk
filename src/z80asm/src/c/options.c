@@ -889,7 +889,7 @@ static void define_assembly_defines()
 *	strpool
 *	Extensions may be changed by options.
 *----------------------------------------------------------------------------*/
-static const char *path_prepend_output_dir(const char *filename)
+const char *path_prepend_output_dir(const char *filename)
 {
 	char path[FILENAME_MAX];
 	if (opts.output_directory) {

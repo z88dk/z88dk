@@ -71,7 +71,7 @@ for my $one_step (0, 1) {
 	check_bin_file("test_CODE.bin",	pack("C*", 1, 2, 3, 4, 5));
 	check_bin_file("test_DATA.bin",	pack("C*", 10, 11, 12, 13));
 	check_bin_file("test_BSS.bin", 	pack("C*", 0, 0, 0));
-	check_text_file("test1.map", $exp_map);
+	check_text_file("test.map", $exp_map);
 }
 
 
