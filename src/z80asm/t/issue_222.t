@@ -112,6 +112,7 @@ z80asm($asm, "+zx -m -v", 0, <<'END');
 	Module 'test' size: 4 bytes
 
 	Code size: 4 bytes ($5CD0 to $5CD3)
+	Creating file 'test.map'
 	Creating binary 'test.bin'
 	z88dk-appmake +zx -b "test.bin" -o "test.tap" --org 23760
 END
