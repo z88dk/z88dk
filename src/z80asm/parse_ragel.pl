@@ -12,11 +12,11 @@
 # Converts special tokens <NL> to "\n", <TAB> to "\t"; <CAT> concatenates.
 # Expands <MAP>(aa=>AA,bb=>BB,) .. using <A> and <B>
 
-use strict;
+use 5.020;
 use warnings;
+use autodie;
 use File::Basename;
 use File::Copy;
-use File::Slurp;
 
 my $RAGEL = "ragel -T0";
 
@@ -190,4 +190,19 @@ sub expand_one_func {
 	}
 	
 	return $func->(@args);
+}
+
+# File::Slurp replacement - to be able to run this script with plain Perl without
+# additional modules
+sub read_file {
+	my($filename) = @_;
+	open(my $fh, "<", $filename);
+	local $/;
+	return <$fh>;
+}
+
+sub write_file {
+	my($filename, $text) = @_;
+	open(my $fh, ">", $filename);
+	print $fh $text;
 }
