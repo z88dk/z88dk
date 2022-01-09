@@ -13,12 +13,15 @@
 	PUBLIC	fgetc_cons
 	PUBLIC	_fgetc_cons
         EXTERN	msxbios
+        EXTERN  __CLIB_FIRMWARE_KEYBOARD_CLICK
 
 
 IF FORmsx
         INCLUDE "target/msx/def/msxbios.def"
+        INCLUDE "target/msx/def/msxbasic.def"
 ELSE
         INCLUDE "target/svi/def/svibios.def"
+        INCLUDE "target/svi/def/svibasic.def"
 ENDIF
 
 
@@ -39,3 +42,14 @@ ENDIF
 	ld	l,a
 	ld	h,0
 	ret
+
+
+        SECTION code_crt_init
+
+        ld      a,__CLIB_FIRMWARE_KEYBOARD_CLICK
+        cp      -1
+        jr      z,no_set_click
+        ld      (CLIKSW),a
+no_set_click:
+
+
