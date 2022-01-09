@@ -4,8 +4,10 @@
 	EXTERN	joystick_sc
 
 	PUBLIC	joystick
+	PUBLIC	_joystick
 
 joystick:
+_joystick:
 	ld	a,l
         ld      hl,keys_cursors
         cp      1

@@ -76,6 +76,15 @@ start:
     ld      hl,2
     call    msx_set_mode
     im      1
+ 
+    ; Configure the AY to enable reading the keys
+    ld      a,$07
+    out     ($00),a
+    in      a,($02)
+    set     7,a
+    res     6,a
+    out     ($01),a
+
     ei
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
