@@ -7,7 +7,6 @@ target/pencil2/stdio/CRT_FONT
 @stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
 @psg/sn76489/sn76489.lst
-target/pencil2/games/joystick
 target/pencil2/games/keys_joystick
 games/obj/pencil2/joystick_type
 @games/games.lst
