@@ -1,9 +1,8 @@
 #------------------------------------------------------------------------------
-# Z88DK Z80 Module Assembler
+# Z88DK Z80 Macro Assembler
 #
 # Copyright (C) Paulo Custodio, 2011-2022
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 BARE_PROJ	:= z80asm
 PROJ		:= z88dk-$(BARE_PROJ)
@@ -27,7 +26,6 @@ CXX			?= g++
 INSTALL 	?= install
 CROSS		?= 0
 RE2C		= re2c -W --tags --no-debug-info --no-generation-date 
-TPAGE 		= perl -S tpage
 
 OPT 		= -O3
 #OPT		= -g -Wextra 
@@ -127,18 +125,9 @@ src/c/parse_rules.h : src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				dev/cpu/cpu_rules.h
 	perl parse_ragel.pl src/c/parse_rules.rl
 
-# Template
-dev: $(patsubst tt/%.tt, src/c/%, $(wildcard tt/*.tt))
-
-src/c/%.c : tt/%.c.tt tt/%.yaml Makefile
-	$(TPAGE) $< > $@~
-	mv $@~ $@
-	dos2unix $@
-
-src/c/%.h : tt/%.h.tt tt/%.yaml Makefile
-	$(TPAGE) $< > $@~
-	mv $@~ $@
-	dos2unix $@
+src/c/tokens.h : make_tokens.pl Makefile
+	perl make_tokens.pl > $@
+	dos2unix -q $@
 
 # re2c
 define MAKE_RE2C
@@ -146,7 +135,7 @@ dev: $(1).o
 
 $(1).cpp: $(1).re Makefile
 	$(RE2C) -o $(1).cpp $(1).re
-	dos2unix $(1).cpp
+	dos2unix -q $(1).cpp
 endef
 
 $(eval $(call MAKE_RE2C,src/cpp/lex))
