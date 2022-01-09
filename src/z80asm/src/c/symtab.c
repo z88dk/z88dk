@@ -582,6 +582,9 @@ static void _write_symbol_file(const char *filename, Module *module, bool(*cond)
 	else
 		reloc_offset = 0;
 
+	if (opts.verbose)
+		printf("Creating file '%s'\n", path_canon(filename));
+
 	file = xfopen(filename, "w");
 
 	symbols = select_module_symbols(module, cond);
@@ -621,11 +624,14 @@ static void _write_symbol_file(const char *filename, Module *module, bool(*cond)
 *----------------------------------------------------------------------------*/
 static bool cond_all_symbols(Symbol *sym) { return true; }
 
-void write_map_file(void)
-{
-	_write_symbol_file(
-		get_map_filename(get_first_module(NULL)->filename),
-		NULL, cond_all_symbols, "", true);
+void write_map_file(void) {
+	const char* filename;
+	if (opts.bin_file)
+		filename = get_map_filename(opts.bin_file);
+	else
+		filename = get_map_filename(get_first_module(NULL)->filename);
+
+	_write_symbol_file(filename, NULL, cond_all_symbols, "", true);
 }
 
 static bool cond_global_symbols(Symbol *sym)
@@ -633,11 +639,14 @@ static bool cond_global_symbols(Symbol *sym)
 	return !(sym->is_global_def) && (sym->scope == SCOPE_PUBLIC || sym->scope == SCOPE_GLOBAL);
 }
 
-void write_def_file(void)
-{
-	_write_symbol_file(
-		get_def_filename(get_first_module(NULL)->filename),
-		NULL, cond_global_symbols, "DEFC ", false);
+void write_def_file(void) {
+	const char* filename;
+	if (opts.bin_file)
+		filename = get_def_filename(opts.bin_file);
+	else
+		filename = get_def_filename(get_first_module(NULL)->filename);
+
+	_write_symbol_file(filename, NULL, cond_global_symbols, "DEFC ", false);
 }
 
 static bool cond_module_symbols(Symbol *sym) 

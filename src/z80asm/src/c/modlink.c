@@ -1027,15 +1027,14 @@ void link_modules(void)
 }
 
 void
-CreateBinFile(void)
-{
+CreateBinFile(void) {
 	FILE* binaryfile, * inital_binaryfile;
 	FILE* relocfile, * initial_relocfile;
 	const char* filename;
 	bool is_relocatable = (opts.relocatable && totaladdr != 0);
 
 	if (opts.bin_file)        /* use predined output filename from command line */
-		filename = opts.bin_file;
+		filename = path_prepend_output_dir(opts.bin_file);
 	else						/* create output filename, based on project filename */
 		filename = get_bin_filename(get_first_module(NULL)->filename);		/* add '.bin' extension */
 

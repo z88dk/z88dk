@@ -106,9 +106,10 @@ for my $one_step (0, 1) {
 	check_bin_file("test_s0.bin", pack("C*", 0, 1, 2, 3));
 	check_bin_file("test_a0.bin", pack("C*", 10, 11));
 	check_bin_file("test_b0.bin", pack("C*", 20, 21));
-	check_text_file("test_map.map", $exp_map);
+	check_text_file("test.map", $exp_map);
 
-	appmake("+glue -b test -c test_map --clean");
+	appmake("+glue -b test -c test --clean");
+	
 	check_bin_file("test__.bin", $exp_bin);
 }
 

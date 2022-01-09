@@ -39,8 +39,10 @@ Assembling 'test.asm' to 'test.o'
 Reading 'test.asm' = 'test.asm'
 Writing object file 'test.o'
 Module 'test' size: 3 bytes
+Creating file 'test.sym'
 
 Code size: 3 bytes ($0000 to $0002)
+Creating file 'test.def'
 Creating binary 'test.bin'
 END
 

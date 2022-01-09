@@ -81,6 +81,7 @@ extern const char *get_lib_filename(const char *filename );
 extern const char *get_sym_filename(const char *filename );
 extern const char *get_map_filename(const char *filename);
 extern const char *get_reloc_filename(const char *filename);
+extern const char* path_prepend_output_dir(const char* filename);
 
 /*-----------------------------------------------------------------------------
 *   Call appmake if requested in options
