@@ -374,6 +374,7 @@ IF FORgl6000
     defc SOUND_ONEBIT_port	= 0
     defc SOUND_ONEBIT_bit    = 0
     defc SOUND_ONEBIT_mask   = 0
+    defc INPUT_JOY_useinkey = 1
 ENDIF
 
 IF FORmyvision
