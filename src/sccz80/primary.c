@@ -197,8 +197,8 @@ zdouble calc(
             right = 0;
         }
         if ( is16bit ) return ((int16_t)left) >> (int16_t)right;
-        else if (left_kind == KIND_LONG) return ((int32_t)left) >> (int)right;
-        else return ((int64_t)left) >> (int)right;
+        else if (left_kind == KIND_LONG) return ((int32_t)(int64_t)left) >> (int)right;
+        else return (int64_t)((int64_t)left) >> (int)right;
     } else
         return (CalcStand(left_kind, left, oper, right));
 }
