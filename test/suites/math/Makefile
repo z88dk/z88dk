@@ -7,7 +7,8 @@ OBJECTS := $(SOURCES:.c=.o)
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED 
 
 
-all:	test_genmath.bin test_math48.bin test_math32.bin test_math16.bin test_daimath32.bin test_math48_rc2014_CODE.bin \
+all:	test_genmath.bin test_math48.bin test_math32.bin test_math16.bin test_daimath32.bin \
+	test_math48_rc2014_CODE.bin test_9511_rc2014_CODE.bin \
 	test_mbf32.bin test_mbf32_8080.bin test_mbf32_8085.bin test_mbf32_gbz80.bin
 
 
@@ -35,13 +36,17 @@ test_math48.bin: $(SOURCES)
 	$(call compile, -DMATH48 -DMATH_LIBRARY="\"\\\"Math48\\\"\"", -lmath48)
 	$(runtest)
 
+test_math32.bin: $(SOURCES)
+	$(call compile, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32)
+	$(runtest)
+
 test_math48_rc2014_CODE.bin: $(SOURCES)
 	$(call compile_rc2014, -DMATH48 -DMATH_LIBRARY="\"\\\"Math48\\\"\"", -lm)
 	$(runtest_rc2014)
 
-test_math32.bin: $(SOURCES)
-	$(call compile, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32)
-	$(runtest)
+test_9511_rc2014_CODE.bin: $(SOURCES)
+	$(call compile_rc2014, -DAM9511 -D__MATH_AM9511 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"AM9511\\\"\"", -lam9511)
+	$(runtest_rc2014)
 
 test_math32_rc2014_CODE.bin: $(SOURCES)
 	$(call compile_rc2014, -DMATH32 -D__MATH_MATH32 -fp-mode=ieee -DMATH_LIBRARY="\"\\\"Math32\\\"\"", -lmath32)
