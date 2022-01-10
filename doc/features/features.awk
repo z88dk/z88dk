@@ -14,7 +14,7 @@ END {
 }
 {
    if ( FNR == 1 ) {
-      for ( i = 5 ;i < NF; i++ ) {
+      for ( i = 7 ;i < NF; i++ ) {
           headers[i] = $i;
       }
    } else {
@@ -28,7 +28,7 @@ END {
            printf("  && defined(%s)",$4);
       }
       printf("\n");
-      for ( i = 5; i < NF; i++ ) {
+      for ( i = 7; i < NF; i++ ) {
          if ( $i == "0" && headers[i] ~ /HAVE/ ) {
              printf("// #define %s %s\n",headers[i],$i);
          } else {
