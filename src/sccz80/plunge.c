@@ -406,14 +406,13 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         // Handle constant on RHS
         if ( lval2->is_const && kind_is_integer(lval->val_type) ) {
             doconstoper = 1;
-	    if ( lval2->ltype->isunsigned )
-              const_val = (uint64_t)lval2->const_val;
-	    else {
-              if (lval2->const_val > (long double)LLONG_MAX ) {
-                  const_val = (int64_t)(uint64_t)lval2->const_val;
-	      } else
-                  const_val = (int64_t)lval2->const_val;
-	    }
+	    if ( lval2->ltype->isunsigned ) {
+                const_val = (uint64_t)lval2->const_val;
+	    } else if (lval2->const_val > (long double)LLONG_MAX ) {
+                const_val = (int64_t)(uint64_t)lval2->const_val;
+	    } else {
+                const_val = (int64_t)lval2->const_val;
+            }
             clearstage(before, 0);
             // Promote lhs if it's a smaller integer type than the constant
             if ( lhs_val_type < rhs_val_type) {
@@ -422,10 +421,13 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         } else if ( lval1_wasconst && kind_is_integer(lval2->val_type) ) {
             /* Handle the case that the constant was on the left */
             doconstoper = 1;
-	    if ( lval->ltype->isunsigned )
+	    if ( lval->ltype->isunsigned ) {
                 const_val = (uint64_t)lval->const_val;
-	    else 
+	    } else if (lval->const_val > (long double)LLONG_MAX ) {
+                const_val = (int64_t)(uint64_t)lval->const_val;
+	    } else {
                 const_val = (int64_t)lval->const_val;
+            }
             clearstage(before_constlval, 0);
             force(lhs_val_type, rhs_val_type, lval2->ltype->isunsigned, lval->ltype->isunsigned,1);
         }
