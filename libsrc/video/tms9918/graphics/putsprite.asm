@@ -165,7 +165,7 @@
          djnz     woloop
 	 jr       putsprite_exit
 
-
+	SECTION  code_graphics
 ; Edge of byte reached, save its content,
 ; increment video ptr, and get new byte.
 ._edge
