@@ -31,7 +31,7 @@ EXTERN __IO_APU_OP_FADD
 EXTERN __IO_APU_OP_FMUL
 EXTERN __IO_APU_OP_SQRT
 
-EXTERN asm_am9511_pushf_hl
+EXTERN asm_am9511_pushf
 EXTERN asm_am9511_pushf_fastcall
 EXTERN asm_am9511_popf
 
@@ -58,9 +58,7 @@ PUBLIC asm_am9511_hypot, asm_am9511_hypot_callee
     ld a,__IO_APU_OP_FMUL
     out (__IO_APU_CONTROL),a        ; y * y
 
-    ld hl,2
-    add hl,sp
-    call asm_am9511_pushf_hl        ; x
+    call asm_am9511_pushf           ; x
 
     ld a,__IO_APU_OP_PTOF
     out (__IO_APU_CONTROL),a        ; x

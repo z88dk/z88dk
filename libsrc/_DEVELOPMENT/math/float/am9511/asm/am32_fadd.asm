@@ -17,7 +17,7 @@ SECTION code_fp_am9511
 EXTERN __IO_APU_CONTROL
 EXTERN __IO_APU_OP_FADD
 
-EXTERN asm_am9511_pushf_hl
+EXTERN asm_am9511_pushf
 EXTERN asm_am9511_pushf_fastcall
 EXTERN asm_am9511_popf
 
@@ -27,9 +27,7 @@ PUBLIC asm_am9511_fadd, asm_am9511_fadd_callee
 ; enter here for floating add, x+y, x on stack, y in dehl, result in dehl
 .asm_am9511_fadd
     exx
-    ld hl,2
-    add hl,sp
-    call asm_am9511_pushf_hl        ; x
+    call asm_am9511_pushf           ; x
 
     exx
     call asm_am9511_pushf_fastcall  ; y

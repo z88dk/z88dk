@@ -17,7 +17,7 @@ SECTION code_fp_am9511
 EXTERN __IO_APU_CONTROL
 EXTERN __IO_APU_OP_DADD
 
-EXTERN asm_am9511_pushl_hl
+EXTERN asm_am9511_pushl
 EXTERN asm_am9511_pushl_fastcall
 EXTERN asm_am9511_popl
 
@@ -27,9 +27,7 @@ PUBLIC asm_am9511_ladd, asm_am9511_ladd_callee
 ; enter here for long add, x+y, x on stack, y in dehl, result in dehl
 .asm_am9511_ladd
     exx
-    ld hl,2
-    add hl,sp
-    call asm_am9511_pushl_hl        ; x
+    call asm_am9511_pushl           ; x
 
     exx
     call asm_am9511_pushl_fastcall  ; y

@@ -19,11 +19,11 @@ SECTION code_fp_am9511
 
 EXTERN __IO_APU_STATUS, __IO_APU_DATA
 
-PUBLIC asm_am9511_pushf_hl
+PUBLIC asm_am9511_pushf
 PUBLIC asm_am9511_pushf_fastcall
 
 
-.asm_am9511_pushf_hl
+.asm_am9511_pushf
 
     ; float primitive
     ; push a IEEE-754 floating point into Am9511 stack.
@@ -31,7 +31,6 @@ PUBLIC asm_am9511_pushf_fastcall
     ; Convert from IEEE_float to am9511_float.
     ;
     ; enter : stack = IEEE_float, ret1, ret0
-    ;       :    hl = pointer to IEEE_float
     ;
     ; exit  : stack = IEEE_float, ret1
     ; 
@@ -40,6 +39,9 @@ PUBLIC asm_am9511_pushf_fastcall
 ;   in a,(__IO_APU_STATUS)      ; read the APU status register
 ;   rlca                        ; busy? and __IO_APU_STATUS_BUSY
 ;   jr C,asm_am9511_pushf
+
+    ld hl,4
+    add hl,sp
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     outi                        ; load LSW into APU

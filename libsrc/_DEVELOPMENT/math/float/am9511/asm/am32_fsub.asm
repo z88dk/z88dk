@@ -17,7 +17,7 @@ SECTION code_fp_am9511
 EXTERN __IO_APU_CONTROL
 EXTERN __IO_APU_OP_FSUB
 
-EXTERN asm_am9511_pushf_hl
+EXTERN asm_am9511_pushf
 EXTERN asm_am9511_pushf_fastcall
 EXTERN asm_am9511_popf
 
@@ -27,9 +27,7 @@ PUBLIC asm_am9511_fsub, asm_am9511_fsub_callee
 ; enter here for floating subtract, x-y x on stack, y in dehl, result in dehl
 .asm_am9511_fsub
     exx
-    ld hl,2
-    add hl,sp
-    call asm_am9511_pushf_hl        ; x
+    call asm_am9511_pushf           ; x
 
     exx
     call asm_am9511_pushf_fastcall  ; y

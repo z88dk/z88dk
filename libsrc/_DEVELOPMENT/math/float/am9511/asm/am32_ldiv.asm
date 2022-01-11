@@ -17,7 +17,7 @@ SECTION code_fp_am9511
 EXTERN __IO_APU_CONTROL
 EXTERN __IO_APU_OP_DDIV
 
-EXTERN asm_am9511_pushl_hl
+EXTERN asm_am9511_pushl
 EXTERN asm_am9511_pushl_fastcall
 EXTERN asm_am9511_popl
 
@@ -27,9 +27,7 @@ PUBLIC asm_am9511_ldiv, asm_am9511_ldiv_callee
 ; enter here for long divide, x/y, x on stack, y in dehl
 .asm_am9511_ldiv
     exx
-    ld hl,2
-    add hl,sp
-    call asm_am9511_pushl_hl        ; x
+    call asm_am9511_pushl           ; x
 
     exx
     call asm_am9511_pushl_fastcall  ; y

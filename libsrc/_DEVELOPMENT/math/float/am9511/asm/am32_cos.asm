@@ -17,7 +17,7 @@ SECTION code_fp_am9511
 EXTERN __IO_APU_CONTROL
 EXTERN __IO_APU_OP_COS
 
-EXTERN asm_am9511_pushf_hl
+EXTERN asm_am9511_pushf
 EXTERN asm_am9511_pushf_fastcall
 EXTERN asm_am9511_popf
 
@@ -25,9 +25,7 @@ PUBLIC asm_am9511_cos, asm_am9511_cos_fastcall
 
 
 .asm_am9511_cos
-    ld hl,2
-    add hl,sp
-    call asm_am9511_pushf_hl        ; x
+    call asm_am9511_pushf           ; x
 
     ld a,__IO_APU_OP_COS
     out (__IO_APU_CONTROL),a        ; cos(x)
