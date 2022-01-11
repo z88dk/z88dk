@@ -22,6 +22,10 @@ EXTERN __IO_APU_STATUS, __IO_APU_DATA
 PUBLIC asm_am9511_popi
 
 
+.am9511_popi_wait
+    ex (sp),hl
+    ex (sp),hl
+
 .asm_am9511_popi
 
     ; float primitive
