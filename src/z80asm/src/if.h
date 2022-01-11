@@ -118,8 +118,8 @@ void list_expanded_line(int asmpc, int phased_pc, const char* text);
 void list_append_bytes(int value, int num_bytes);
 void list_patch_bytes(int asmpc, int value, int num_bytes);
 void list_end_line();
-void got_source_line(const char* filename, int line_num, const char* text);
-void got_expanded_line(const char* text);
+void list_got_source_line(const char* filename, int line_num, const char* text);
+void list_got_expanded_line(const char* text);
 
 // floats
 bool set_float_format(const char* format);

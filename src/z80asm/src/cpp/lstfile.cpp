@@ -236,11 +236,8 @@ void list_end_line() {
 	g_list_file.end_line();
 }
 
-void got_source_line(const char* filename, int line_num, const char* text) {
-	set_error_location(filename, line_num);
-	set_error_source_line(text);
-
-	// send line to list file
+// send line to list file
+void list_got_source_line(const char* filename, int line_num, const char* text) {
 	if (filename && option_cur_list()) {
 		list_source_line(filename, line_num,
 			get_PC(), get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
@@ -248,10 +245,8 @@ void got_source_line(const char* filename, int line_num, const char* text) {
 	}
 }
 
-void got_expanded_line(const char* text) {
-	set_error_expanded_line(text);
-
-	// send line to list file
+// send line to list file
+void list_got_expanded_line(const char* text) {
 	if (option_cur_list() && option_verbose()) {
 		string line = string("      + ") + text;
 		list_expanded_line(
