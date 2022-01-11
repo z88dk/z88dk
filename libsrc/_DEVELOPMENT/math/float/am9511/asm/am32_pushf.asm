@@ -34,11 +34,13 @@ PUBLIC asm_am9511_pushf_fastcall
     ;
     ; exit  : stack = IEEE_float, ret1
     ; 
-    ; uses  : af, bc, hl
+    ; uses  : af, bc', hl'
 
 ;   in a,(__IO_APU_STATUS)      ; read the APU status register
 ;   rlca                        ; busy? and __IO_APU_STATUS_BUSY
 ;   jr C,asm_am9511_pushf
+
+    exx                         ; preserve dehl
 
     ld hl,4
     add hl,sp
@@ -70,6 +72,8 @@ PUBLIC asm_am9511_pushf_fastcall
     rl (hl)                     ; get sign
     rra
     out (c),a                   ; load exponent into APU
+
+    exx
     ret
 
 .asm_am9511_max
@@ -82,6 +86,8 @@ PUBLIC asm_am9511_pushf_fastcall
     rl (hl)                     ; get sign
     rra
     out (c),a                   ; load maximum exponent into APU
+
+    exx
     ret
 
 .asm_am9511_zero
@@ -92,6 +98,8 @@ PUBLIC asm_am9511_pushf_fastcall
     out (c),a
     out (c),a
     out (c),a                   ; load zero exponent into APU
+
+    exx
     ret
 
 

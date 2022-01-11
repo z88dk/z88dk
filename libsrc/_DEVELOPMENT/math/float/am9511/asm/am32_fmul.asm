@@ -26,10 +26,8 @@ PUBLIC asm_am9511_fmul, asm_am9511_fmul_callee
 
 ; enter here for floating multiply, x+y, x on stack, y in dehl, result in dehl
 .asm_am9511_fmul
-    exx
     call asm_am9511_pushf           ; x
 
-    exx
     call asm_am9511_pushf_fastcall  ; y
 
     ld a,__IO_APU_OP_FMUL
@@ -40,18 +38,16 @@ PUBLIC asm_am9511_fmul, asm_am9511_fmul_callee
 
 ; enter here for floating multiply callee, x+y, x on stack, y in dehl
 .asm_am9511_fmul_callee
-    exx
-    pop hl                          ; ret
-    pop de
-    ex (sp),hl                      ; ret back on stack
-    ex de,hl
-    call asm_am9511_pushf_fastcall  ; x
+    call asm_am9511_pushf           ; x
 
-    exx
     call asm_am9511_pushf_fastcall  ; y
 
     ld a,__IO_APU_OP_FMUL
     out (__IO_APU_CONTROL),a        ; x * y
+
+    pop hl                          ; ret
+    pop de
+    ex (sp),hl                      ; ret back on stack
 
     jp asm_am9511_popf
 

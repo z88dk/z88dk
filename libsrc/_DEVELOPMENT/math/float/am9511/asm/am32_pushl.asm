@@ -32,11 +32,13 @@ PUBLIC asm_am9511_pushl_fastcall
     ;
     ; exit  : stack = long, ret1
     ; 
-    ; uses  : af, bc, hl
+    ; uses  : af, bc', hl'
 
 ;   in a,(__IO_APU_STATUS)      ; read the APU status register
 ;   rlca                        ; busy? __IO_APU_STATUS_BUSY
 ;   jr C,asm_am9511_pushl_hl
+
+    exx                         ; preserve dehl
 
     ld hl,4
     add hl,sp
@@ -49,6 +51,8 @@ PUBLIC asm_am9511_pushl_fastcall
     outi                        ; load MSW into APU
     inc b
     outi
+
+    exx
     ret
 
 

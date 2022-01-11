@@ -26,10 +26,8 @@ PUBLIC asm_am9511_lmul, asm_am9511_lmul_callee
 
 ; enter here for long multiply, x*y x on stack, y in dehl
 .asm_am9511_lmul
-    exx
     call asm_am9511_pushl           ; x
 
-    exx
     call asm_am9511_pushl_fastcall  ; y
 
     ld a,__IO_APU_OP_DMUL
@@ -40,17 +38,15 @@ PUBLIC asm_am9511_lmul, asm_am9511_lmul_callee
 
 ; enter here for long multiply callee, x*y x on stack, y in dehl
 .asm_am9511_lmul_callee
-    exx
-    pop hl                          ; ret
-    pop de
-    ex (sp),hl                      ; ret back on stack
-    ex de,hl
-    call asm_am9511_pushl_fastcall  ; x
+    call asm_am9511_pushl           ; x
 
-    exx
     call asm_am9511_pushl_fastcall  ; y
 
     ld a,__IO_APU_OP_DMUL
     out (__IO_APU_CONTROL),a        ; x * y
+
+    pop hl                          ; ret
+    pop de
+    ex (sp),hl                      ; ret back on stack
 
     jp asm_am9511_popl              ; product in dehl

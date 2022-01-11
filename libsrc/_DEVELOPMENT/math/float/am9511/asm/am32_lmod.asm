@@ -29,13 +29,11 @@ PUBLIC asm_am9511_lmod, asm_am9511_lmod_callee
 
 ; enter here for long modulus, x%y, x on stack, y in dehl
 .asm_am9511_lmod
-    exx
     call asm_am9511_pushl           ; x
 
     ld a,__IO_APU_OP_PTOD
     out (__IO_APU_CONTROL),a        ; push x
 
-    exx
     call asm_am9511_pushl_fastcall  ; y
 
     ld a,__IO_APU_OP_DDIV
@@ -54,17 +52,11 @@ PUBLIC asm_am9511_lmod, asm_am9511_lmod_callee
 
 ; enter here for long modulus callee, x%y, x on stack, y in dehl
 .asm_am9511_lmod_callee
-    exx
-    pop hl                          ; ret
-    pop de
-    ex (sp),hl                      ; ret back on stack
-    ex de,hl
-    call asm_am9511_pushl_fastcall  ; x
+    call asm_am9511_pushl           ; x
 
     ld a,__IO_APU_OP_PTOD
     out (__IO_APU_CONTROL),a        ; push x
 
-    exx
     call asm_am9511_pushl_fastcall  ; y
 
     ld a,__IO_APU_OP_DDIV
@@ -77,5 +69,9 @@ PUBLIC asm_am9511_lmod, asm_am9511_lmod_callee
 
     ld a,__IO_APU_OP_DSUB
     out (__IO_APU_CONTROL),a        ; x%y
+
+    pop hl                          ; ret
+    pop de
+    ex (sp),hl                      ; ret back on stack
 
     jp asm_am9511_popl              ; remainder in dehl

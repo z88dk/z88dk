@@ -26,10 +26,8 @@ PUBLIC asm_am9511_lsub, asm_am9511_lsub_callee
 
 ; enter here for long subtract, x-y x on stack, y in dehl
 .asm_am9511_lsub
-    exx
     call asm_am9511_pushl           ; x
 
-    exx
     call asm_am9511_pushl_fastcall  ; y
 
     ld a,__IO_APU_OP_DSUB
@@ -40,17 +38,15 @@ PUBLIC asm_am9511_lsub, asm_am9511_lsub_callee
 
 ; enter here for long subtract callee, x-y x on stack, y in dehl
 .asm_am9511_lsub_callee
-    exx
-    pop hl                          ; ret
-    pop de
-    ex (sp),hl                      ; ret back on stack
-    ex de,hl
-    call asm_am9511_pushl_fastcall  ; x
+    call asm_am9511_pushl           ; x
 
-    exx
     call asm_am9511_pushl_fastcall  ; y
 
     ld a,__IO_APU_OP_DSUB
     out (__IO_APU_CONTROL),a        ; x - y
 
-    jp asm_am9511_popl
+    pop hl                          ; ret
+    pop de
+    ex (sp),hl                      ; ret back on stack
+
+    jp asm_am9511_popl              ; result in dehl
