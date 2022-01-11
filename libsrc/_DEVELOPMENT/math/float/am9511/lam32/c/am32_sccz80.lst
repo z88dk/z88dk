@@ -54,7 +54,6 @@ math/float/am9511/lam32/c/sccz80/l_f32_f2int
 math/float/am9511/lam32/c/sccz80/l_f32_f2long
 math/float/am9511/lam32/c/sccz80/l_f32_ge
 math/float/am9511/lam32/c/sccz80/l_f32_gt
-math/float/am9511/lam32/c/sccz80/l_f32_invf
 math/float/am9511/lam32/c/sccz80/l_f32_ldexp
 math/float/am9511/lam32/c/sccz80/l_f32_le
 math/float/am9511/lam32/c/sccz80/l_f32_lt
