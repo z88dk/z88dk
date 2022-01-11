@@ -45,7 +45,6 @@ PUBLIC asm_am9511_pushi_fastcall
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     outi                        ; load LSW into APU
-    inc b
     outi
 
     exx

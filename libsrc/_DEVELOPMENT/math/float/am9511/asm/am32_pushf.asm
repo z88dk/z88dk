@@ -47,9 +47,7 @@ PUBLIC asm_am9511_pushf_fastcall
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     outi                        ; load LSW into APU
-    inc b
     outi
-    inc b
 
     ld a,(hl)                   ; get mantissa MSB
     rla                         ; get exponent least significant bit to carry
@@ -66,8 +64,7 @@ PUBLIC asm_am9511_pushf_fastcall
     dec hl
     set 7,(hl)                  ; set mantissa MSB
     outi                        ; load mantissa MSB into APU
-    inc b
-    
+
     rla                         ; position exponent for sign
     rl (hl)                     ; get sign
     rra
@@ -80,8 +77,7 @@ PUBLIC asm_am9511_pushf_fastcall
     dec hl
     bit 7,(hl)                  ; set mantissa MSB
     outi                        ; load mantissa MSB into APU
-    inc b
-    
+
     ld a,0FEh                   ; position exponent for sign
     rl (hl)                     ; get sign
     rra
