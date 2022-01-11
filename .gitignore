@@ -8,8 +8,11 @@
 **/*.lib
 **/*.lis
 **/*.map
+**/*.tab.*
 **/*.o
 **/*.orig
+**/*.yy.c
+**/*.output
 **/*.vcxproj.user
 **/.prove*
 **/.vscode/

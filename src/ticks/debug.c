@@ -4,6 +4,7 @@
 
 #include "debug.h"
 #include "backend.h"
+#include "exp_engine.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +12,7 @@
 
 static cfile *cfiles = NULL;
 static debug_sym_function *cfunctions = NULL;
-static debug_sym_symbol *csymbols = NULL;
+static debug_sym_symbol *cdb_csymbols = NULL;
 static cline *clines[65536] = {0};
 
 
@@ -495,7 +496,7 @@ static void debug_add_symbol_info(const char* encoded)
         goto err;
     }
 
-    HASH_ADD_STR(csymbols, name, s);
+    HASH_ADD_STR(cdb_csymbols, symbol_name, s);
 
     return;
 
@@ -681,189 +682,204 @@ debug_sym_function* debug_find_function(const char* function_name, const char* f
 static int Min(int a, int b) { if (a < b ) return a; else return b;}
 static int Max(int a, int b) { if (a > b ) return a; else return b;}
 
-
-int debug_print_element(type_chain* chain, char issigned, enum resolve_chain_value_kind resolve_by, uint32_t data, char *target, size_t targetlen) {
-    int offs = 0;
-
-    switch ( chain->type_ ) {
-    case TYPE_CHAR: {
-        char ch;
-        switch (resolve_by) {
-            case RESOLVE_BY_POINTER: {
-                ch = bk.get_memory((uint16_t)data);
-                break;
-            }
-            case RESOLVE_BY_VALUE:
-            default: {
-                ch = (uint8_t)data;
-                break;
-            }
-        }
-        if ( issigned ) {
-            if ( isprint(ch)) {
-                offs = snprintf(target, targetlen, "\'%c\'", ch);
-            } else {
-                offs = snprintf(target, targetlen, "x%02x", (unsigned char)ch);
-            }
-        } else {
-            offs = snprintf(target, targetlen, "x%02x", (unsigned char)ch);
-        }
-        break;
+type_chain* copy_type_chain(type_chain* from) {
+    if (from == NULL) {
+        return NULL;
     }
-    case TYPE_INT:
-    case TYPE_SHORT:
-        if ( issigned ) {
-            int16_t v;
+    type_chain* result = malloc(sizeof(type_chain));
+    *result = *from;
+    result->next = NULL;
+    type_chain* ptr = result;
+    from = from->next;
+    while (from) {
+        type_chain* copy_ptr = malloc(sizeof(type_chain));
+        *copy_ptr = *from;
+        ptr->next = copy_ptr;
+        copy_ptr->next = NULL;
+        from = from->next;
+    }
+    return result;
+}
+
+static int get_type_memory_size(type_chain* chain) {
+    if (chain == NULL) {
+        return 1;
+    }
+    switch (chain->type_)
+    {
+        case TYPE_CHAR: {
+            return 1;
+        }
+        case TYPE_INT:
+        case TYPE_GENERIC_POINTER:
+        case TYPE_CODE_POINTER:
+        case TYPE_SHORT: {
+            return 2;
+        }
+        case TYPE_FLOAT:
+        case TYPE_LONG: {
+            return 4;
+        }
+        default: {
+            return 0;
+        }
+    }
+}
+
+void debug_resolve_expression_element(type_chain* chain, char issigned, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into) {
+    int offs = 0;
+    if (issigned) {
+        into->flags |= EXPRESSION_TYPE_SIGNED;
+    }
+    into->type = *chain;
+    if (chain->next) {
+        into->type.next = copy_type_chain(chain->next);
+    }
+    into->memory_size = get_type_memory_size(chain);
+    switch ( chain->type_ ) {
+        case TYPE_CHAR: {
+            char ch;
             switch (resolve_by) {
                 case RESOLVE_BY_POINTER: {
-                    v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                    ch = bk.get_memory((uint16_t)data);
+                    into->memory_location = data;
                     break;
                 }
                 case RESOLVE_BY_VALUE:
                 default: {
-                    v = (int16_t)data;
+                    ch = (uint8_t)data;
+                    into->memory_location = 0;
                     break;
                 }
             }
-            offs += snprintf(target, targetlen, "%d", v);
-        } else {
+            into->as_int = ch;
+        }
+        case TYPE_INT:
+        case TYPE_SHORT:
+            if ( issigned ) {
+                int16_t v;
+                switch (resolve_by) {
+                    case RESOLVE_BY_POINTER: {
+                        v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                        into->memory_location = data;
+                        break;
+                    }
+                    case RESOLVE_BY_VALUE:
+                    default: {;
+                        v = (int16_t)data;
+                        into->memory_location = 0;
+                        break;
+                    }
+                }
+                into->as_int = v;
+            } else {
+                uint16_t v;
+                switch (resolve_by) {
+                    case RESOLVE_BY_POINTER: {
+                        v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                        into->memory_location = data;
+                        break;
+                    }
+                    case RESOLVE_BY_VALUE:
+                    default: {
+                        v = (uint16_t)data;
+                        into->memory_location = 0;
+                        break;
+                    }
+                }
+                into->as_uint = v;
+            }
+            break;
+        case TYPE_LONG:
+            if ( issigned ) {
+                int32_t v;
+                switch (resolve_by) {
+                    case RESOLVE_BY_POINTER: {
+                        v = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
+                        into->memory_location = data;
+                        break;
+                    }
+                    case RESOLVE_BY_VALUE:
+                    default: {
+                        v = (int32_t)data;
+                        into->memory_location = 0;
+                        break;
+                    }
+                }
+                into->as_int = v;
+            } else {
+                uint32_t v;
+                switch (resolve_by) {
+                    case RESOLVE_BY_POINTER: {
+                        v = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
+                        into->memory_location = data;
+                        break;
+                    }
+                    case RESOLVE_BY_VALUE:
+                    default: {
+                        v = (uint32_t)data;
+                        into->memory_location = 0;
+                        break;
+                    }
+                }
+                into->as_uint = v;
+            }
+            break;
+
+        case TYPE_STRUCTURE: {
+            into->memory_size = 0;
+            into->as_pointer.ptr = data;
+            break;
+        }
+        case TYPE_ARRAY: {
+            into->as_pointer.ptr = data;
+            into->as_pointer.element_size = get_type_memory_size(chain->next);
+            into->memory_size = into->as_pointer.element_size * chain->size;
+            break;
+        }
+        case TYPE_GENERIC_POINTER:
+        case TYPE_CODE_POINTER: {
+            into->memory_size = 2;
             uint16_t v;
             switch (resolve_by) {
                 case RESOLVE_BY_POINTER: {
                     v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                    into->memory_location = data;
                     break;
                 }
                 case RESOLVE_BY_VALUE:
                 default: {
                     v = (uint16_t)data;
+                    into->memory_location = 0;
                     break;
                 }
             }
-            offs += snprintf(target, targetlen, "%u", v);
+
+            into->as_pointer.ptr = v;
+            break;
         }
-        break;
-    case TYPE_LONG:
-        if ( issigned ) {
-            int32_t v;
-            switch (resolve_by) {
-                case RESOLVE_BY_POINTER: {
-                    v = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
-                    break;
-                }
-                case RESOLVE_BY_VALUE:
-                default: {
-                    v = (int32_t)data;
-                    break;
-                }
-            }
-            offs = snprintf(target, targetlen, "%d", v);
-        } else {
-            uint32_t v;
-            switch (resolve_by) {
-                case RESOLVE_BY_POINTER: {
-                    v = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
-                    break;
-                }
-                case RESOLVE_BY_VALUE:
-                default: {
-                    v = (uint32_t)data;
-                    break;
-                }
-            }
-            offs = snprintf(target, targetlen, "%u", v);
-        }
-        break;
-
-    case TYPE_GENERIC_POINTER:
-    case TYPE_CODE_POINTER: {
-        uint16_t v;
-        switch (resolve_by) {
-            case RESOLVE_BY_POINTER: {
-                v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
-                break;
-            }
-            case RESOLVE_BY_VALUE:
-                default: {
-                    v = (uint16_t)data;
-                    break;
-                }
-        }
-        if ( chain->next && chain->next->type_ == TYPE_CHAR ) {
-            int maxlen = targetlen - 2;
-
-            offs = snprintf(target + offs, targetlen - offs,"%#04x \"", v);
-
-            while ( offs < maxlen ) {
-                char ch = bk.get_memory(v++);
-                if ( ch == 0 ) break;
-                if ( isprint(ch)) {
-                    offs += snprintf(target+offs, targetlen - offs, "%c", ch);
-                } else {
-                    offs += snprintf(target+offs, targetlen - offs, "\\%02x", (unsigned char)ch);
-                }
-            }
-            snprintf(target+offs, targetlen - offs, "\"");
-            return 0;
-        }
-        snprintf(target, targetlen, "%#04x", v);
-        return 0;
-    }
-    default:
-        break;
-    }
-
-    return offs;
-}
-
-static uint8_t debug_resolve_chain_value(debug_sym_symbol *sym, uint16_t frame_pointer, char *target, size_t targetlen) {
-    type_chain *chain = sym->type_record.first;
-    int         offs = 0;
-
-    switch (chain->type_) {
-        case TYPE_ARRAY: {
-            int maxlen = Max(10,Min(10, chain->size));
-            offs += snprintf(target + offs, targetlen - offs, "%#04x [%d] = { ", frame_pointer, chain->size);
-            for ( int i = 0; i < maxlen; i++ ) {
-                offs += snprintf(target + offs, targetlen - offs, "%s[%d] = ", i != 0 ? ", " : "", i);
-                switch ( chain->next->type_) {
-                case TYPE_CHAR:
-                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
-                    frame_pointer++;
-                    break;
-                case TYPE_INT:
-                case TYPE_SHORT:
-                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
-                    frame_pointer += 2;
-                    break;
-                case TYPE_LONG:
-                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
-                    frame_pointer += 4;
-                    break;
-                default:
-                    break;
-                }
-            }
-            offs += snprintf(target+offs, targetlen - offs,"%s }", maxlen != chain->size ? " ..." : "");
-            return 0;
-        }
-        case TYPE_CHAR:
-        case TYPE_INT:
-        case TYPE_SHORT: 
-        case TYPE_LONG:
-        case TYPE_GENERIC_POINTER:
-        case TYPE_CODE_POINTER:
-            debug_print_element(chain, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
-            return 0;
 
         default: {
-            return 1;
+            break;
         }
     }
 }
 
-uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char *target, size_t targetlen) {
+static uint8_t debug_resolve_chain_value_as_string(debug_sym_symbol *sym, uint16_t frame_pointer, char *target, size_t targetlen) {
+    type_chain *chain = sym->type_record.first;
+    struct expression_result_t result = {};
+    debug_resolve_expression_element(chain, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, &result);
+    if (is_expression_result_error(&result)) {
+        return snprintf(target, targetlen, "<error:%s>", result.as_error);
+    } else {
+        return expression_result_value_to_string(&result, target, targetlen);
+    }
+}
+
+uint8_t debug_get_symbol_value_as_string(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char *target, size_t targetlen) {
     if (sym->address_space.address_space == 'B') {
-        return debug_resolve_chain_value(sym, frame_pointer->frame_pointer + sym->address_space.b, target, targetlen);
+        return debug_resolve_chain_value_as_string(sym, frame_pointer->frame_pointer + sym->address_space.b, target,
+            targetlen);
     } else {
         return 1;
     }
@@ -871,13 +887,61 @@ uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame
     return 0;
 }
 
-uint8_t debug_symbol_valid(debug_sym_symbol *sym, uint16_t stack, debug_frame_pointer *frame_pointer)
-{
-    if (sym->address_space.address_space == 'B') {
-        return frame_pointer->frame_pointer + sym->address_space.b >= stack;
+static int debug_get_symbol_address(debug_sym_symbol *s) {
+    int address = symbol_resolve(s->symbol_name);
+    if (address >= 0) {
+        return address;
     }
 
+    char underscored_name[255];
+    sprintf(underscored_name, "_%s", s->symbol_name);
+
+    address = symbol_resolve(underscored_name);
+    if (address >= 0) {
+        return address;
+    }
+
+    return -1;
+}
+
+void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, struct expression_result_t* into) {
+    switch (sym->address_space.address_space) {
+        case 'B': {
+            return debug_resolve_expression_element(sym->type_record.first, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer->frame_pointer + sym->address_space.b, into);
+        }
+        case 'E': {
+            int addr = debug_get_symbol_address(sym);
+            if (addr < 0) {
+                into->type.type_ = TYPE_UNKNOWN;
+                return;
+            }
+            return debug_resolve_expression_element(sym->type_record.first, sym->type_record.signed_, RESOLVE_BY_POINTER, addr, into);
+        }
+        default: {
+            sprintf(into->as_error, "Incorrect address space (not implemented)");
+            into->flags |= EXPRESSION_ERROR;
+        }
+    }
+}
+
+uint8_t debug_symbol_valid(debug_sym_symbol *sym, uint16_t stack, debug_frame_pointer *frame_pointer) {
+    if (sym->address_space.address_space == 'B') {
+        if (frame_pointer->frame_pointer + sym->address_space.b >= stack) {
+            return 1;
+        }
+        return 0;
+    }
     return 1;
+}
+
+debug_sym_symbol* cdb_find_symbol(const char* cname) {
+    debug_sym_symbol* result;
+    HASH_FIND_STR(cdb_csymbols, cname, result);
+    return result;
+}
+
+debug_sym_symbol* cdb_get_first_symbol() {
+    return cdb_csymbols;
 }
 
 static uint16_t wrap_reg(uint8_t h, uint8_t l)
