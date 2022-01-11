@@ -8,10 +8,10 @@
 ;  feilipu, August 2020
 ;
 ;-------------------------------------------------------------------------
-;  asm_am9511_pushl - am9511 APU push long
+;  asm_am9511_pushi - am9511 APU push integer
 ;-------------------------------------------------------------------------
 ; 
-;  Load long into Am9511 APU stack
+;  Load integer into Am9511 APU stack
 ;
 ;-------------------------------------------------------------------------
 
@@ -19,24 +19,24 @@ SECTION code_fp_am9511
 
 EXTERN __IO_APU_STATUS, __IO_APU_DATA
 
-PUBLIC asm_am9511_pushl
-PUBLIC asm_am9511_pushl_fastcall
+PUBLIC asm_am9511_pushi
+PUBLIC asm_am9511_pushi_fastcall
 
 
-.asm_am9511_pushl
+.asm_am9511_pushi
 
     ; float primitive
-    ; push a long into Am9511 stack.
+    ; push an integer into Am9511 stack.
     ;
-    ; enter : stack = long, ret1, ret0
+    ; enter : stack = integer, ret1, ret0
     ;
-    ; exit  : stack = long, ret1
+    ; exit  : stack = integer, ret1
     ; 
     ; uses  : af, bc, hl
 
 ;   in a,(__IO_APU_STATUS)      ; read the APU status register
 ;   rlca                        ; busy? __IO_APU_STATUS_BUSY
-;   jr C,asm_am9511_pushl_hl
+;   jr C,asm_am9511_pushi_hl
 
     ld hl,4
     add hl,sp
@@ -45,33 +45,27 @@ PUBLIC asm_am9511_pushl_fastcall
     outi                        ; load LSW into APU
     inc b
     outi
-    inc b
-    outi                        ; load MSW into APU
-    inc b
-    outi
     ret
 
 
-.asm_am9511_pushl_fastcall
+.asm_am9511_pushi_fastcall
 
     ; float primitive
-    ; push a long into Am9511 stack.
+    ; push an integer into Am9511 stack.
     ;
     ; enter : stack = ret1, ret0
-    ;       :  dehl = long
+    ;       :    hl = integer
     ;
     ; exit  : stack = ret1
     ; 
-    ; uses  : af, bc, de, hl
+    ; uses  : af, bc, hl
 
 ;   in a,(__IO_APU_STATUS)      ; read the APU status register
 ;   rlca                        ; busy? __IO_APU_STATUS_BUSY
-;   jr C,asm_am9511_pushl_fastcall
+;   jr C,asm_am9511_pushi_fastcall
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
     out (c),l                   ; load LSW into APU
     out (c),h
-    out (c),e                   ; load MSW into APU
-    out (c),d
     ret
 

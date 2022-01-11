@@ -38,9 +38,11 @@ math/float/am9511/asm/am32_log10
 math/float/am9511/asm/am32_lsub
 math/float/am9511/asm/am32_nan_b
 math/float/am9511/asm/am32_popf
+math/float/am9511/asm/am32_popi
 math/float/am9511/asm/am32_popl
 math/float/am9511/asm/am32_pow
 math/float/am9511/asm/am32_pushf
+math/float/am9511/asm/am32_pushi
 math/float/am9511/asm/am32_pushl
 math/float/am9511/asm/am32_sigdig
 math/float/am9511/asm/am32_sin

@@ -237,9 +237,11 @@
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_lsub.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_nan_b.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_popf.asm
+../../_DEVELOPMENT/math/float/am9511/asm/am32_popi.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_popl.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_pow.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_pushf.asm
+../../_DEVELOPMENT/math/float/am9511/asm/am32_pushi.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_pushl.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_sigdig.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_sin.asm

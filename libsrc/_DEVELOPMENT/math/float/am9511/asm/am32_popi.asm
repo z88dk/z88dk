@@ -8,10 +8,10 @@
 ;  feilipu, August 2020
 ;
 ;-------------------------------------------------------------------------
-;  asm_am9511_popl - am9511 APU pop long
+;  asm_am9511_popi - am9511 APU pop integer
 ;-------------------------------------------------------------------------
 ; 
-;  Load long from Am9511 APU stack
+;  Load integer from Am9511 APU stack
 ;
 ;-------------------------------------------------------------------------
 
@@ -19,31 +19,25 @@ SECTION code_fp_am9511
 
 EXTERN __IO_APU_STATUS, __IO_APU_DATA
 
-PUBLIC asm_am9511_popl
+PUBLIC asm_am9511_popi
 
 
-.am9511_popl_wait
-    ex (sp),hl
-    ex (sp),hl
-
-.asm_am9511_popl
+.asm_am9511_popi
 
     ; float primitive
-    ; pop a long from the Am9511 stack.
+    ; pop an integer from the Am9511 stack.
     ;
     ; enter : stack = ret0
     ;
-    ; exit  :  dehl = long
+    ; exit  :  dehl = integer
     ; 
-    ; uses  : af, bc, de, hl
+    ; uses  : af, bc, hl
 
     in a,(__IO_APU_STATUS)      ; read the APU status register
     rlca                        ; busy? and __IO_APU_STATUS_BUSY
-    jr C,am9511_popl_wait
+    jr C,am9511_popi_wait
 
     ld bc,__IO_APU_DATA         ; the address of the APU data port in bc
-    in d,(c)                    ; load MSW from APU
-    in e,(c)
     in h,(c)                    ; load LSW from APU
     in l,(c)
     ret
