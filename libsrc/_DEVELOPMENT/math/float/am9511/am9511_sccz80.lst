@@ -46,7 +46,6 @@ math/float/am9511/c/sccz80/cam32_sccz80_ldiv_u_callee
 math/float/am9511/c/sccz80/cam32_sccz80_lmod_callee
 math/float/am9511/c/sccz80/cam32_sccz80_lmod_u_callee
 math/float/am9511/c/sccz80/cam32_sccz80_lmul_callee
-math/float/am9511/c/sccz80/cam32_sccz80_load
 math/float/am9511/c/sccz80/cam32_sccz80_log
 math/float/am9511/c/sccz80/cam32_sccz80_log2
 math/float/am9511/c/sccz80/cam32_sccz80_log10
@@ -55,14 +54,11 @@ math/float/am9511/c/sccz80/cam32_sccz80_modf_callee
 math/float/am9511/c/sccz80/cam32_sccz80_neg
 math/float/am9511/c/sccz80/cam32_sccz80_pow
 math/float/am9511/c/sccz80/cam32_sccz80_pow_callee
-math/float/am9511/c/sccz80/cam32_sccz80_read
-math/float/am9511/c/sccz80/cam32_sccz80_read_callee
 math/float/am9511/c/sccz80/cam32_sccz80_round
 math/float/am9511/c/sccz80/cam32_sccz80_sin
 math/float/am9511/c/sccz80/cam32_sccz80_sinh
 math/float/am9511/c/sccz80/cam32_sccz80_sqr
 math/float/am9511/c/sccz80/cam32_sccz80_sqrt
-math/float/am9511/c/sccz80/cam32_sccz80_switch_arg
 math/float/am9511/c/sccz80/cam32_sccz80_tan
 math/float/am9511/c/sccz80/cam32_sccz80_tanh
 math/float/am9511/c/sccz80/cam32_sccz80_zero

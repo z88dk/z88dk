@@ -4,9 +4,9 @@ PUBLIC cam32_sdcc___fs2uint_callee
 PUBLIC cam32_sdcc___fs2uchar_callee
 
 EXTERN asm_am9511_f2uint
-EXTERN cam32_sdcc_read1_callee
+EXTERN asm_sdcc_read1_callee
 
 .cam32_sdcc___fs2uint_callee
 .cam32_sdcc___fs2uchar_callee
-    call cam32_sdcc_read1_callee
+    call asm_sdcc_read1_callee
     jp asm_am9511_f2uint

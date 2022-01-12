@@ -51,6 +51,11 @@ math/float/am9511/asm/am32_sqrt
 math/float/am9511/asm/am32_tan
 math/float/am9511/asm/am32_util
 
+math/float/am9511/asm/am32_load
+math/float/am9511/asm/am32_read
+math/float/am9511/asm/am32_read_callee
+math/float/am9511/asm/am32_switch_arg
+
 @math/float/am9511/asm/am32_stack/am32_stack.lst
 
 @math/float/am9511/am9511_c_asm.lst

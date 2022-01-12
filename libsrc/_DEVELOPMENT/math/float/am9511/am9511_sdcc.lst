@@ -51,12 +51,6 @@ math/float/am9511/c/sdcc/cam32_sdcc_fsub
 math/float/am9511/c/sdcc/cam32_sdcc_fsub_callee
 math/float/am9511/c/sdcc/cam32_sdcc_hypot
 math/float/am9511/c/sdcc/cam32_sdcc_hypot_callee
-math/float/am9511/c/sdcc/cam32_sdcc_idiv
-math/float/am9511/c/sdcc/cam32_sdcc_idiv_callee
-math/float/am9511/c/sdcc/cam32_sdcc_imod
-math/float/am9511/c/sdcc/cam32_sdcc_imod_callee
-math/float/am9511/c/sdcc/cam32_sdcc_imul
-math/float/am9511/c/sdcc/cam32_sdcc_imul_callee
 math/float/am9511/c/sdcc/cam32_sdcc_ladd
 math/float/am9511/c/sdcc/cam32_sdcc_ladd_callee
 math/float/am9511/c/sdcc/cam32_sdcc_ldexp
@@ -67,7 +61,6 @@ math/float/am9511/c/sdcc/cam32_sdcc_lmod
 math/float/am9511/c/sdcc/cam32_sdcc_lmod_callee
 math/float/am9511/c/sdcc/cam32_sdcc_lmul
 math/float/am9511/c/sdcc/cam32_sdcc_lmul_callee
-math/float/am9511/c/sdcc/cam32_sdcc_load
 math/float/am9511/c/sdcc/cam32_sdcc_log
 math/float/am9511/c/sdcc/cam32_sdcc_log2
 math/float/am9511/c/sdcc/cam32_sdcc_log10
@@ -76,8 +69,6 @@ math/float/am9511/c/sdcc/cam32_sdcc_lsub_callee
 math/float/am9511/c/sdcc/cam32_sdcc_neg
 math/float/am9511/c/sdcc/cam32_sdcc_pow
 math/float/am9511/c/sdcc/cam32_sdcc_pow_callee
-math/float/am9511/c/sdcc/cam32_sdcc_read
-math/float/am9511/c/sdcc/cam32_sdcc_read_callee
 math/float/am9511/c/sdcc/cam32_sdcc_round
 math/float/am9511/c/sdcc/cam32_sdcc___schar2fs
 math/float/am9511/c/sdcc/cam32_sdcc___schar2fs_callee

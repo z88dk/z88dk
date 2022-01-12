@@ -2,9 +2,9 @@
 
 SECTION code_fp_am9511
 
-PUBLIC cam32_sccz80_load
+PUBLIC asm_sccz80_load
 
-.cam32_sccz80_load
+.asm_sccz80_load
 
     ; sccz80 float primitive
     ; Load float pointed to by HL into DEHL
@@ -23,8 +23,7 @@ PUBLIC cam32_sccz80_load
     inc hl
     ld d,(hl)                   ; DEBC = sccz80_float
 
-    ld l,c
-    ld h,b
+    ld hl,bc
 
     ret                         ; DEHL = sccz80_float
 
