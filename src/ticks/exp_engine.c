@@ -39,56 +39,42 @@ uint8_t is_expression_result_error(struct expression_result_t* result) {
 void set_expression_result_error(struct expression_result_t* result, const char* error) {
     result->flags |= EXPRESSION_ERROR;
     strcpy(result->as_error, error);
+    expression_result_free(result);
 }
 
 void reset_expression_result(struct expression_result_t* result) {
     result->flags = EXPRESSION_UNKNOWN;
+    expression_result_free(result);
 }
 
-void expression_result_free_typechain(struct expression_result_t* result)
+void expression_result_free(struct expression_result_t* result)
 {
-    type_chain* next = result->type.next;
-    while (next) {
-        type_chain* next_next = next->next;
-        free(next);
-        next = next_next;
+    if (result->type.first) {
+        free_type(result->type.first);
+        result->type.first = NULL;
     }
 }
 
-static uint8_t is_expression_a_pointer(struct expression_result_t *exp) {
-    return exp->type.type_ == TYPE_GENERIC_POINTER ||  exp->type.type_ == TYPE_CODE_POINTER;
-}
-
-uint8_t is_expression_signed(struct expression_result_t *exp) {
-    return exp->flags & EXPRESSION_TYPE_SIGNED;
-}
-
-void set_expression_signed(struct expression_result_t *exp, uint8_t is_signed) {
-    if (is_signed) {
-        exp->flags |= EXPRESSION_TYPE_SIGNED;
-    } else {
-        exp->flags &= ~EXPRESSION_TYPE_SIGNED;
-    }
-}
-
-void expression_value_to_pointer(struct expression_result_t *from, struct expression_result_t *to, type_chain* pointer_type, uint8_t is_signed) {
-    if (is_expression_a_pointer(from)) {
+void expression_value_to_pointer(struct expression_result_t *from, struct expression_result_t *to, type_record* pointer_type) {
+    if (is_type_a_pointer(from->type.first)) {
         *to = *from;
-        to->type.type_ = TYPE_GENERIC_POINTER;
-        to->type.next = copy_type_chain(pointer_type);
-        set_expression_signed(to, is_signed);
+        to->type.first = malloc_type(TYPE_GENERIC_POINTER);
+        to->type.first->next = copy_type_chain(pointer_type->first);
+        to->type.signed_ = pointer_type->signed_;
         return;
     }
 
-    type_chain* type_of = copy_type_chain(pointer_type);
-    set_expression_signed(to, is_signed);
-    to->type.type_ = TYPE_GENERIC_POINTER;
-    to->type.next = type_of;
+    to->type.signed_ = pointer_type->signed_;
+    to->type.first = malloc_type(TYPE_GENERIC_POINTER);
+    to->type.first->next = copy_type_chain(pointer_type->first);
 
-    switch (from->type.type_) {
+    if (pointer_type->first == NULL) {
+        return;
+    }
+
+    switch (pointer_type->first->type_) {
         case TYPE_FLOAT: {
             to->as_pointer.ptr = (uint16_t)from->as_float;
-            to->as_pointer.element_size = from->memory_size;
             return;
         }
         case TYPE_SHORT:
@@ -96,13 +82,12 @@ void expression_value_to_pointer(struct expression_result_t *from, struct expres
         case TYPE_INT:
         case TYPE_LONG: {
             to->as_pointer.ptr = (uint16_t)from->as_int;
-            to->as_pointer.element_size = from->memory_size;
             return;
         }
         default: {
             to->flags |= EXPRESSION_ERROR;
             char tp[128];
-            expression_result_type_to_string(&from->type, is_expression_signed(from), tp);
+            expression_result_type_to_string(&from->type, from->type.first, tp);
             sprintf(to->as_error, "Cannot convert type %s to a pointer", tp);
             return;
         }
@@ -111,28 +96,27 @@ void expression_value_to_pointer(struct expression_result_t *from, struct expres
 
 void expression_dereference_pointer(struct expression_result_t *from, struct expression_result_t *to) {
     extern backend_t bk;
-    if (!(is_expression_a_pointer(from))) {
+    if (!(is_type_a_pointer(from->type.first))) {
         to->flags = EXPRESSION_ERROR;
         char tp[128];
-        expression_result_type_to_string(&from->type, is_expression_signed(from), tp);
+        expression_result_type_to_string(&from->type, from->type.first, tp);
         sprintf(to->as_error, "Cannot dereference type: %s", tp);
         return;
     }
 
-    if (from->type.next == NULL) {
+    if (from->type.first == NULL || from->type.first->next == NULL) {
         to->flags |= EXPRESSION_ERROR;
         sprintf(to->as_error, "Cannot dereference void");
         return;
     }
 
-    to->type = *from->type.next;
-    to->type.next = copy_type_chain(to->type.next);
+    to->type = from->type;
+    to->type.first = copy_type_chain(to->type.first->next);
     to->memory_location = from->as_pointer.ptr;
-    to->memory_size = from->as_pointer.element_size;
 
     int16_t data = from->as_pointer.ptr;
 
-    switch (to->type.type_) {
+    switch (from->type.first->next->type_) {
         case TYPE_VOID: {
             to->flags |= EXPRESSION_ERROR;
             sprintf(to->as_error, "Cannot dereference void");
@@ -158,30 +142,34 @@ void expression_dereference_pointer(struct expression_result_t *from, struct exp
         default: {
             to->flags |= EXPRESSION_ERROR;
             char tp[128];
-            expression_result_type_to_string(&from->type, is_expression_signed(from), tp);
+            expression_result_type_to_string(&from->type, from->type.first->next, tp);
             sprintf(to->as_error, "Cannot dereference type (not implemented): %s", tp);
             break;
         }
     }
 }
 
-type_chain expression_string_get_type(const char* str, uint8_t* is_signed) {
-    type_chain result = {};
+void expression_string_get_type(const char* str, type_record* type) {
     for (int i = 0; primitive_types[i].type_name; i++) {
         if (strcmp(str, primitive_types[i].type_name) == 0) {
-            *is_signed = primitive_types[i].is_signed;
-            result.type_ = primitive_types[i].type_of;
-            return result;
+            type->signed_ = primitive_types[i].is_signed;
+            type->first = malloc_type(primitive_types[i].type_of);
+            type->size = get_type_memory_size(type->first);
+            return;
         }
     }
-    *is_signed = 0;
-    result.type_ = TYPE_UNKNOWN;
-    return result;
+    type->signed_ = 0;
+    type->first = malloc_type(TYPE_UNKNOWN);
 }
 
-void expression_result_type_to_string(type_chain* type, uint8_t is_signed, char* buffer) {
+void expression_result_type_to_string(type_record* root, type_chain* type, char* buffer) {
+    if (type == NULL) {
+        sprintf(buffer, "void");
+        return;
+    }
+
     for (int i = 0; primitive_types[i].type_name; i++) {
-        if (primitive_types[i].is_signed == is_signed && primitive_types[i].type_of == type->type_) {
+        if (primitive_types[i].is_signed == root->signed_ && primitive_types[i].type_of == type->type_) {
             strcpy(buffer, primitive_types[i].type_name);
             return;
         }
@@ -193,7 +181,7 @@ void expression_result_type_to_string(type_chain* type, uint8_t is_signed, char*
                 sprintf(buffer, "void*");
             } else {
                 char pointer_type[128];
-                expression_result_type_to_string(type->next, is_signed, pointer_type);
+                expression_result_type_to_string(root, type->next, pointer_type);
                 sprintf(buffer, "%s*", pointer_type);
             }
             break;
@@ -208,51 +196,38 @@ void expression_result_type_to_string(type_chain* type, uint8_t is_signed, char*
     }
 }
 
-static uint8_t are_exp_same_type(struct expression_result_t* a, type_chain* ta,
-    struct expression_result_t* b, type_chain* tb)
-{
-    if (is_expression_signed(a) != is_expression_signed(b)) {
-        return 0;
-    }
-    if (ta->type_ != tb->type_) {
-        return 0;
-    }
-    if (is_expression_a_pointer(a)) {
-        if (ta->next == NULL || tb->next == NULL) {
-            return 0;
-        }
-        return are_exp_same_type(a, ta->next, b, tb->next);
-    }
-    return 1;
-}
-
 void expression_math_add(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
-    if (!(are_exp_same_type(a, &a->type, b, &b->type))) {
+    if (!(are_type_records_same(&a->type, &b->type))) {
         struct expression_result_t local_3 = {};
-        convert_expression(b, &local_3, a->type.type_, is_expression_signed(b));
+        convert_expression(b, &local_3, &a->type);
         expression_math_add(a, &local_3, result);
+        expression_result_free(&local_3);
         return;
     }
-
-    switch (a->type.type_) {
+    if (a->type.first == NULL) {
+        return;
+    }
+    result->type = a->type;
+    result->type.first = copy_type_chain(a->type.first);
+    switch (a->type.first->type_) {
         case TYPE_FLOAT: {
             result->as_float = a->as_float + b->as_float;
-            return;
+            break;
         }
         case TYPE_CHAR:
         case TYPE_INT:
         case TYPE_LONG: {
-            if (is_expression_signed(a)) {
+            if (a->type.signed_) {
                 result->as_int = a->as_int + b->as_int;
             } else {
                 result->as_uint = (uint32_t)((uint32_t)a->as_int + (uint32_t)b->as_int);
             }
-            return;
+            break;
         }
         default: {
             result->flags |= EXPRESSION_ERROR;
             char tp[128];
-            expression_result_type_to_string(&a->type, is_expression_signed(a), tp);
+            expression_result_type_to_string(&a->type, a->type.first, tp);
             sprintf(result->as_error, "Cannot perform math '+' on type %s", tp);
             break;
         }
@@ -260,32 +235,37 @@ void expression_math_add(struct expression_result_t* a, struct expression_result
 }
 
 void expression_math_sub(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
-    if (!(are_exp_same_type(a, &a->type, b, &b->type))) {
+    if (!(are_type_records_same(&a->type, &b->type))) {
         struct expression_result_t local_3 = {};
-        convert_expression(b, &local_3, a->type.type_, is_expression_signed(b));
+        convert_expression(b, &local_3, &a->type);
         expression_math_sub(a, &local_3, result);
+        expression_result_free(&local_3);
         return;
     }
-
-    switch (a->type.type_) {
+    if (a->type.first == NULL) {
+        return;
+    }
+    result->type = a->type;
+    result->type.first = copy_type_chain(a->type.first);
+    switch (a->type.first->type_) {
         case TYPE_FLOAT: {
             result->as_float = a->as_float - b->as_float;
-            return;
+            break;
         }
         case TYPE_CHAR:
         case TYPE_INT:
         case TYPE_LONG: {
-            if (is_expression_signed(a)) {
+            if (a->type.signed_) {
                 result->as_int = a->as_int - b->as_int;
             } else {
                 result->as_uint = (uint32_t)((uint32_t)a->as_int - (uint32_t)b->as_int);
             }
-            return;
+            break;
         }
         default: {
             result->flags |= EXPRESSION_ERROR;
             char tp[128];
-            expression_result_type_to_string(&a->type, is_expression_signed(a), tp);
+            expression_result_type_to_string(&a->type, a->type.first, tp);
             sprintf(result->as_error, "Cannot perform math '+' on type %s", tp);
             break;
         }
@@ -293,32 +273,37 @@ void expression_math_sub(struct expression_result_t* a, struct expression_result
 }
 
 void expression_math_mul(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
-    if (!(are_exp_same_type(a, &a->type, b, &b->type))) {
+    if (!(are_type_records_same(&a->type, &b->type))) {
         struct expression_result_t local_3 = {};
-        convert_expression(b, &local_3, a->type.type_, is_expression_signed(b));
+        convert_expression(b, &local_3, &a->type);
         expression_math_mul(a, &local_3, result);
+        expression_result_free(&local_3);
         return;
     }
-
-    switch (a->type.type_) {
+    if (a->type.first == NULL) {
+        return;
+    }
+    result->type = a->type;
+    result->type.first = copy_type_chain(a->type.first);
+    switch (a->type.first->type_) {
         case TYPE_FLOAT: {
             result->as_float = a->as_float * b->as_float;
-            return;
+            break;
         }
         case TYPE_CHAR:
         case TYPE_INT:
         case TYPE_LONG: {
-            if (is_expression_signed(a)) {
+            if (a->type.signed_) {
                 result->as_int = a->as_int * b->as_int;
             } else {
                 result->as_uint = (uint32_t)((uint32_t)a->as_int * (uint32_t)b->as_int);
             }
-            return;
+            break;
         }
         default: {
             result->flags |= EXPRESSION_ERROR;
             char tp[128];
-            expression_result_type_to_string(&a->type, is_expression_signed(a), tp);
+            expression_result_type_to_string(&a->type, a->type.first, tp);
             sprintf(result->as_error, "Cannot perform math '+' on type %s", tp);
             break;
         }
@@ -326,47 +311,39 @@ void expression_math_mul(struct expression_result_t* a, struct expression_result
 }
 
 void expression_math_div(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
-    if (!(are_exp_same_type(a, &a->type, b, &b->type))) {
+    if (!(are_type_records_same(&a->type, &b->type))) {
         struct expression_result_t local_3 = {};
-        convert_expression(b, &local_3, a->type.type_, is_expression_signed(b));
+        convert_expression(b, &local_3, &a->type);
         expression_math_div(a, &local_3, result);
+        expression_result_free(&local_3);
         return;
     }
-
-    switch (a->type.type_) {
+    if (a->type.first == NULL) {
+        return;
+    }
+    result->type = a->type;
+    result->type.first = copy_type_chain(a->type.first);
+    switch (a->type.first->type_) {
         case TYPE_FLOAT: {
             result->as_float = a->as_float / b->as_float;
-            return;
+            break;
         }
         case TYPE_CHAR:
         case TYPE_INT:
         case TYPE_LONG: {
-            if (is_expression_signed(a)) {
+            if (a->type.signed_) {
                 result->as_int = a->as_int / b->as_int;
             } else {
                 result->as_uint = (uint32_t)((uint32_t)a->as_int / (uint32_t)b->as_int);
             }
-            return;
+            break;
         }
         default: {
             result->flags |= EXPRESSION_ERROR;
             char tp[128];
-            expression_result_type_to_string(&a->type, is_expression_signed(a), tp);
+            expression_result_type_to_string(&a->type, a->type.first, tp);
             sprintf(result->as_error, "Cannot perform math '+' on type %s", tp);
             break;
-        }
-    }
-}
-
-uint8_t is_primitive_integer_type(struct expression_result_t* exp) {
-    switch (exp->type.type_) {
-        case TYPE_CHAR:
-        case TYPE_INT:
-        case TYPE_LONG: {
-            return 1;
-        }
-        default: {
-            return 0;
         }
     }
 }
@@ -375,7 +352,10 @@ static int Min(int a, int b) { if (a < b ) return a; else return b;}
 static int Max(int a, int b) { if (a > b ) return a; else return b;}
 
 int expression_result_value_to_string(struct expression_result_t* result, char* buffer, int buffer_len) {
-    switch (result->type.type_) {
+    if (result->type.first == NULL) {
+        return snprintf(buffer, buffer_len, "<none>");
+    }
+    switch (result->type.first->type_) {
         case TYPE_UNKNOWN: {
             return snprintf(buffer, buffer_len, "<unknown>");
         }
@@ -386,14 +366,15 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
             for ( int i = 0; i < maxlen; i++ ) {
                 offs += snprintf(buffer + offs, buffer_len - offs, "%s[%d] = ", i != 0 ? ", " : "", i);
                 struct expression_result_t elr = {};
-                debug_resolve_expression_element(result->type.next, is_expression_signed(result), RESOLVE_BY_POINTER, ptr, &elr);
+                debug_resolve_expression_element(&result->type, RESOLVE_BY_POINTER, ptr, &elr);
                 if (is_expression_result_error(&elr)) {
                     offs += snprintf(buffer + offs, buffer_len - offs, "<error:%s>", elr.as_error);
                     break;
                 } else {
                     offs += expression_result_value_to_string(&elr, buffer + offs, buffer_len - offs);
-                    ptr += elr.memory_size;
+                    ptr += get_type_memory_size(result->type.first->next);
                 }
+                expression_result_free(&elr);
             }
             offs += snprintf(buffer + offs, buffer_len - offs,"%s }", maxlen != result->type.size ? " ..." : "");
             return offs;
@@ -401,7 +382,7 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
         case TYPE_CHAR:
         case TYPE_INT:
         case TYPE_LONG: {
-            if (is_expression_signed(result)) {
+            if (result->type.signed_) {
                 return snprintf(buffer, buffer_len, "%i", result->as_int);
             } else {
                 return snprintf(buffer, buffer_len, "%u", result->as_uint);
@@ -415,18 +396,25 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
         }
         case TYPE_GENERIC_POINTER:
         case TYPE_CODE_POINTER: {
-            if (result->type.next == NULL) {
+            if (result->type.first->next == NULL) {
                 return snprintf(buffer, buffer_len, "%#04x", result->as_pointer.ptr);
             }
-            switch (result->type.next->type_) {
+            switch (result->type.first->next->type_) {
                 case TYPE_INT:
                 case TYPE_LONG:
                 {
                     struct expression_result_t local = {};
                     expression_dereference_pointer(result, &local);
-                    char buff[128];
-                    expression_result_value_to_string(&local, buff, 128);
-                    return snprintf(buffer, buffer_len, "%#04x(%s)", result->as_pointer.ptr, buff);
+                    int offs;
+                    if (local.flags & EXPRESSION_ERROR) {
+                        offs = snprintf(buffer, buffer_len, "%#04x(error:%s)", result->as_pointer.ptr, local.as_error);
+                    } else {
+                        char buff[128];
+                        expression_result_value_to_string(&local, buff, 128);
+                        offs = snprintf(buffer, buffer_len, "%#04x(%s)", result->as_pointer.ptr, buff);
+                    }
+                    expression_result_free(&local);
+                    return offs;
                 }
                 case TYPE_CHAR: {
                     char buff [128];
@@ -457,16 +445,16 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
     return 0;
 }
 
-void convert_expression(struct expression_result_t* from, struct expression_result_t* to,
-    enum type_record_type type, uint8_t is_signed
-) {
-    to->type.type_ = type;
-    to->type.next = NULL;
-    set_expression_signed(to, is_signed);
+void convert_expression(struct expression_result_t* from, struct expression_result_t* to, type_record* type) {
+    to->type = *type;
+    to->type.first = copy_type_chain(type->first);
     to->memory_location = from->memory_location;
-    switch (from->type.type_) {
+    if (type->first == NULL) {
+        return;
+    }
+    switch (from->type.first->type_) {
         case TYPE_FLOAT: {
-            switch (type) {
+            switch (type->first->type_) {
                 case TYPE_FLOAT: {
                     to->as_float = from->as_float;
                     break;
@@ -487,7 +475,7 @@ void convert_expression(struct expression_result_t* from, struct expression_resu
         case TYPE_CHAR:
         case TYPE_INT:
         case TYPE_LONG: {
-            switch (type) {
+            switch (type->first->type_) {
                 case TYPE_FLOAT: {
                     to->as_float = (int32_t)from->as_int;
                     break;
@@ -501,8 +489,6 @@ void convert_expression(struct expression_result_t* from, struct expression_resu
                 case TYPE_GENERIC_POINTER:
                 case TYPE_CODE_POINTER: {
                     to->as_pointer.ptr = (uint16_t)from->as_int;
-                    to->as_pointer.element_size = from->memory_size;
-                    to->type.next = NULL;
                 }
                 default: {
                     break;
@@ -513,7 +499,7 @@ void convert_expression(struct expression_result_t* from, struct expression_resu
 
         case TYPE_GENERIC_POINTER:
         case TYPE_CODE_POINTER: {
-            switch (type) {
+            switch (type->first->type_) {
                 case TYPE_FLOAT: {
                     to->as_float = (float)from->as_pointer.ptr;
                     break;

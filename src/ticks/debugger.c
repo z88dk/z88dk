@@ -373,7 +373,7 @@ void debugger()
                             } else {
                                 if (ttt->type_ != TYPE_VOID) {
                                     struct expression_result_t result = {};
-                                    debug_resolve_expression_element(ttt, temp_br->callee->type_record.signed_,
+                                    debug_resolve_expression_element(&temp_br->callee->type_record,
                                         RESOLVE_BY_VALUE, return_value, &result);
                                     if (is_expression_result_error(&result)) {
                                         printf("function %s errored: %s\n", temp_br->callee->function_name, result.as_error);
@@ -382,6 +382,7 @@ void debugger()
                                         expression_result_value_to_string(&result, resolved_result, 128);
                                         printf("function %s returned: %s\n", temp_br->callee->function_name, resolved_result);
                                     }
+                                    expression_result_free(&result);
                                 }
                             }
                         } else {
@@ -702,12 +703,14 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
                     char exp_type[128] = "unknown";
                     char exp_value[128] = "???";
 
-                    expression_result_type_to_string(&exp.type, is_expression_signed(&exp), exp_type);
+                    expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
                     expression_result_value_to_string(&exp, exp_value, sizeof(exp_value));
 
                     snprintf(arg_text, sizeof(arg_text), "<%s>%s = %s", exp_type, s->symbol_name, exp_value);
                     strcat(function_args, arg_text);
                 }
+
+                expression_result_free(&exp);
 
                 first_arg = 0;
                 arg = arg->next;
@@ -853,6 +856,13 @@ static int cmd_print(int argc, char **argv)
         strcat(call, argv[i]);
     }
 
+    if (getenv("YYDEBUG") != NULL) {
+        extern int yydebug;
+        yydebug = 1;
+    }
+
+    int types = count_allocated_types();
+
     evaluate_expression_string(call);
     free(call);
 
@@ -865,10 +875,16 @@ static int cmd_print(int argc, char **argv)
 
     char type[128] = "unknown";
     char value[128] = "???";
-    expression_result_type_to_string(&result->type, is_expression_signed(result), type);
+    expression_result_type_to_string(&result->type, result->type.first, type);
     expression_result_value_to_string(result, value, sizeof(value));
 
     printf("Result: <%s> %s\n", type, value);
+
+    expression_result_free(result);
+    int new_types = count_allocated_types();
+    if (new_types > types) {
+        printf("Warning: %d type info object(s) leaked\n", new_types - types);
+    }
 
     return 0;
 }
@@ -921,10 +937,11 @@ static void info_section_locals() {
                 } else {
                     char exp_type[128] = "unknown";
                     char exp_value[128] = "???";
-                    expression_result_type_to_string(&exp.type, is_expression_signed(&exp), exp_type);
+                    expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
                     expression_result_value_to_string(&exp, exp_value, sizeof(exp_value));
                     printf("  <%s>%s = %s\n", exp_type, s->symbol_name, exp_value);
                 }
+                expression_result_free(&exp);
             } else {
                 printf("  %s = <invalid>\n", s->symbol_name);
             }
@@ -964,9 +981,10 @@ static void info_section_globals() {
 
         char exp_type[128] = "unknown";
         char exp_value[128] = "???";
-        expression_result_type_to_string(&exp.type, is_expression_signed(&exp), exp_type);
+        expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
         expression_result_value_to_string(&exp, exp_value, sizeof(exp_value));
         printf("  <%s>%s = %s\n", exp_type, s->symbol_name, exp_value);
+        expression_result_free(&exp);
     }
 
     debug_stack_frames_free(first_frame_pointer);

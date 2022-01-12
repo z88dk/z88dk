@@ -16,10 +16,7 @@ void yyerror(const char* s);
 
 %union {
     struct expression_result_t val;
-    struct {
-    	type_chain type;
-    	uint8_t is_signed;
-    } type;
+    type_record type;
     char cval[128];
     char errval[128];
 }
@@ -41,9 +38,10 @@ void yyerror(const char* s);
 %type<val> pointer_expression
 %type<errval> error_expression
 
-%destructor {
-	expression_result_free_typechain(&$$);
-} value_expression pointer_expression
+%destructor { expression_result_free(&$$); } T_PRIMITIVE_VALUE
+%destructor { expression_result_free(&$$); } value_expression
+%destructor { expression_result_free(&$$); } pointer_expression
+%destructor { free_type($$.first); } type_expression
 
 %start calculation
 
@@ -57,32 +55,39 @@ calculation:
 
 pointer_expression: T_POINTER
 	| T_AMPERSAND value_expression						{
-		$$.type.type_ = TYPE_GENERIC_POINTER;
+		$$.type = $2.type;
+		$$.type.first = malloc_type(TYPE_GENERIC_POINTER);
+		$$.type.first->next = copy_type_chain($2.type.first);
 		$$.as_pointer.ptr = $2.memory_location;
-		$$.as_pointer.element_size = $2.memory_size;
-		$$.type.next = copy_type_chain(&$2.type);
-		set_expression_signed(&$$, is_expression_signed(&$2));
+		expression_result_free(&$2);
 	 }
-	| T_LEFT type_expression T_STAR T_RIGHT pointer_expression		{ expression_value_to_pointer(&$5, &$$, &$2.type, $2.is_signed); }
-	| T_LEFT type_expression T_STAR T_RIGHT value_expression		{ expression_value_to_pointer(&$5, &$$, &$2.type, $2.is_signed); }
+	| T_AMPERSAND pointer_expression					{
+		$$.type = $2.type;
+		$$.type.first = malloc_type(TYPE_GENERIC_POINTER);
+		$$.type.first->next = copy_type_chain($2.type.first);
+		$$.as_pointer.ptr = $2.memory_location;
+		expression_result_free(&$2);
+	 }
+	| T_LEFT type_expression T_STAR T_RIGHT pointer_expression		{ expression_value_to_pointer(&$5, &$$, &$2); free_type($2.first); expression_result_free(&$5); }
+	| T_LEFT type_expression T_STAR T_RIGHT value_expression		{ expression_value_to_pointer(&$5, &$$, &$2); free_type($2.first); expression_result_free(&$5); }
 	| T_LEFT pointer_expression T_RIGHT					{ $$ = $2; }
 	| pointer_expression T_PLUS value_expression				{
 		$$ = $1;
-		if (is_primitive_integer_type(&$3)) {
-			$$.as_pointer.ptr += $3.as_int * $$.as_pointer.element_size;
-		} else {
+		if ($3.type.first == NULL) {
 			$$.flags |= EXPRESSION_ERROR;
-			sprintf($$.as_error, "Cannot do math with non-integer");
+			sprintf($$.as_error, "Cannot do math with void");
 		}
+		$$.as_pointer.ptr += $3.as_int * $1.type.first->next->size;
+		expression_result_free(&$3);
 	 }
 	 | pointer_expression T_MINUS value_expression				{
 		$$ = $1;
-		if (is_primitive_integer_type(&$3)) {
-			$$.as_pointer.ptr -= $3.as_int * $$.as_pointer.element_size;
-		} else {
+		if ($3.type.first == NULL) {
 			$$.flags |= EXPRESSION_ERROR;
-			sprintf($$.as_error, "Cannot do math with non-integer");
+			sprintf($$.as_error, "Cannot do math with void");
 		}
+		$$.as_pointer.ptr -= $3.as_int * $1.type.first->next->size;
+		expression_result_free(&$3);
 	 }
 ;
 
@@ -90,13 +95,13 @@ type_expression: T_PRIMITIVE_TYPE
 ;
 
 value_expression: T_PRIMITIVE_VALUE
-	| T_STAR pointer_expression						{ expression_dereference_pointer(&$2, &$$); }
-	| T_LEFT type_expression T_RIGHT value_expression			{ convert_expression(&$4, &$$, $2.type.type_, $2.is_signed); }
+	| T_STAR pointer_expression						{ expression_dereference_pointer(&$2, &$$); expression_result_free(&$2); }
+	| T_LEFT type_expression T_RIGHT value_expression			{ convert_expression(&$4, &$$, &$2); free_type($2.first); expression_result_free(&$4); }
 	| T_LEFT value_expression T_RIGHT					{ $$ = $2; }
-	| value_expression T_PLUS value_expression				{ expression_math_add(&$1, &$3, &$$); }
-	| value_expression T_MINUS value_expression				{ expression_math_sub(&$1, &$3, &$$); }
-	| value_expression T_SLASH value_expression				{ expression_math_div(&$1, &$3, &$$); }
-	| value_expression T_STAR value_expression				{ expression_math_mul(&$1, &$3, &$$); }
+	| value_expression T_PLUS value_expression				{ expression_math_add(&$1, &$3, &$$); expression_result_free(&$1); expression_result_free(&$3); }
+	| value_expression T_MINUS value_expression				{ expression_math_sub(&$1, &$3, &$$); expression_result_free(&$1); expression_result_free(&$3); }
+	| value_expression T_SLASH value_expression				{ expression_math_div(&$1, &$3, &$$); expression_result_free(&$1); expression_result_free(&$3); }
+	| value_expression T_STAR value_expression				{ expression_math_mul(&$1, &$3, &$$); expression_result_free(&$1); expression_result_free(&$3); }
 
 error_expression: T_ERROR							{ strcpy($$, $1); }
 ;

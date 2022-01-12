@@ -18,58 +18,73 @@ multiple_words "unsigned char"|"unsigned short"|"unsigned int"|"unsigned long"
 %%
 
 [ \t]	; // ignore all whitespace
--?[0-9]+\.[0-9]+ 	{ yylval.val.type.type_ = TYPE_FLOAT; yylval.val.as_float = atof(yytext); return T_PRIMITIVE_VALUE; }
--?[0-9]+		    { yylval.val.type.type_ = TYPE_LONG; yylval.val.flags |= EXPRESSION_TYPE_SIGNED; yylval.val.as_int = atoi(yytext); return T_PRIMITIVE_VALUE; }
-0x[0-9a-fA-F]+		{ yylval.val.type.type_ = TYPE_LONG; yylval.val.flags |= EXPRESSION_TYPE_SIGNED; sscanf(yytext + 2, "%x", &yylval.val.as_int); return T_PRIMITIVE_VALUE; }
+-?[0-9]+\.[0-9]+ 	{
+    memset(&yylval.val.type, 0, sizeof(yylval.val.type));
+    yylval.val.type.first = malloc_type(TYPE_FLOAT);
+    yylval.val.as_float = atof(yytext);
+    return T_PRIMITIVE_VALUE;
+}
+-?[0-9]+		    {
+    memset(&yylval.val.type, 0, sizeof(yylval.val.type));
+    yylval.val.type.first = malloc_type(TYPE_LONG);
+    yylval.val.type.signed_ = 1;
+    yylval.val.as_int = atoi(yytext);
+    return T_PRIMITIVE_VALUE;
+}
+0x[0-9a-fA-F]+		{
+    memset(&yylval.val.type, 0, sizeof(yylval.val.type));
+    yylval.val.type.first = malloc_type(TYPE_LONG);
+    yylval.val.type.signed_ = 1;
+    sscanf(yytext + 2, "%x", &yylval.val.as_int);
+    return T_PRIMITIVE_VALUE;
+}
 "&"		            { return T_AMPERSAND; }
 {multiple_words}	{ return lookup_word(); }
 {word}		        { return lookup_word(); }
-"+"		            {return T_PLUS;}
-"-"		            {return T_MINUS;}
-"*"		            {return T_STAR;}
-"/"		            {return T_SLASH;}
-"("		            {return T_LEFT;}
-")"		            {return T_RIGHT;}
+"+"		            { return T_PLUS; }
+"-"		            { return T_MINUS; }
+"*"		            { return T_STAR; }
+"/"		            { return T_SLASH; }
+"("		            { return T_LEFT; }
+")"		            { return T_RIGHT; }
 
 %%
 
 int lookup_word() {
     // it it a type?
     {
-        uint8_t is_signed = 0;
-        type_chain type = expression_string_get_type(yytext, &is_signed);
-        if (type.type_ != TYPE_UNKNOWN) {
-            yylval.type.type = type;
-            yylval.type.is_signed = is_signed;
+        type_record type = {};
+        expression_string_get_type(yytext, &type);
+        if (type.first->type_ != TYPE_UNKNOWN) {
+            yylval.type = type;
             return T_PRIMITIVE_TYPE;
         }
+        free_type(type.first);
     }
 
     struct expression_result_t result = {};
     struct lookup_t lookup;
     lookup.symbol_name = yytext;
     debug_lookup_symbol(&lookup, &result);
-
     if (is_expression_result_error(&result)) {
         strcpy(yylval.errval, result.as_error);
         return T_ERROR;
     }
-
-    switch (result.type.type_)
-    {
-        case TYPE_UNKNOWN:
-        {
+    if (result.type.first == NULL) {
+        yylval.val = result;
+        return T_PRIMITIVE_VALUE;
+    }
+    switch (result.type.first->type_) {
+        case TYPE_UNKNOWN: {
             strcpy(yylval.errval, "<unknown>");
             return T_ERROR;
         }
         case TYPE_GENERIC_POINTER:
-        case TYPE_CODE_POINTER:
-        {
+        case TYPE_CODE_POINTER: {
             yylval.val = result;
             return T_POINTER;
         }
-        default:
-        {
+        default: {
             yylval.val = result;
             return T_PRIMITIVE_VALUE;
         }

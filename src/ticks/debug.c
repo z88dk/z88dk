@@ -686,22 +686,110 @@ type_chain* copy_type_chain(type_chain* from) {
     if (from == NULL) {
         return NULL;
     }
-    type_chain* result = malloc(sizeof(type_chain));
-    *result = *from;
-    result->next = NULL;
-    type_chain* ptr = result;
-    from = from->next;
+    type_chain* result = NULL;
+    type_chain* ptr = NULL;
     while (from) {
-        type_chain* copy_ptr = malloc(sizeof(type_chain));
+        type_chain* copy_ptr = malloc_type(from->type_);
+        if (ptr == NULL) {
+            result = copy_ptr;
+        } else {
+            ptr->next = copy_ptr;
+        }
         *copy_ptr = *from;
-        ptr->next = copy_ptr;
-        copy_ptr->next = NULL;
+        ptr = copy_ptr;
+        ptr->next = NULL;
         from = from->next;
     }
     return result;
 }
 
-static int get_type_memory_size(type_chain* chain) {
+static int s_allocated_types = 0;
+
+int count_allocated_types()
+{
+    return s_allocated_types;
+}
+
+type_chain* malloc_type(enum type_record_type type) {
+    type_chain* result = malloc(sizeof(type_chain));
+    result->next = NULL;
+    result->data = NULL;
+    result->type_ = type;
+    result->size = get_type_memory_size(result);
+    s_allocated_types++;
+    return result;
+}
+
+void free_type(type_chain* type) {
+    while (type) {
+        type_chain* next_next = type->next;
+        free(type);
+        s_allocated_types--;
+        type = next_next;
+    }
+}
+
+uint8_t is_type_a_pointer(type_chain* type) {
+    if (type == NULL) {
+        return 0;
+    }
+    return type->type_ == TYPE_GENERIC_POINTER || type->type_ == TYPE_CODE_POINTER;
+}
+
+uint8_t are_type_chains_same(type_chain* a, type_chain* b)
+{
+    if (a->type_ != b->type_) {
+        return 0;
+    }
+    if (is_type_a_pointer(a)) {
+        if (a == NULL || b == NULL) {
+            return 0;
+        }
+        return are_type_chains_same(a->next, b->next);
+    }
+    return 1;
+}
+
+uint8_t is_primitive_integer_type(type_chain* type) {
+    if (type == NULL) {
+        return 0;
+    }
+    switch (type->type_) {
+        case TYPE_CHAR:
+        case TYPE_INT:
+        case TYPE_LONG: {
+            return 1;
+        }
+        default: {
+            return 0;
+        }
+    }
+}
+
+uint8_t are_type_records_same(type_record* a, type_record* b)
+{
+    if (a->signed_ != b->signed_) {
+        return 0;
+    }
+    if ((a->first == NULL) != (b->first == NULL)) {
+        return 0;
+    }
+    if ((a->first == NULL) && (b->first == NULL)) {
+        return 1;
+    }
+    if (a->first->type_ != b->first->type_) {
+        return 0;
+    }
+    if (is_type_a_pointer(a->first)) {
+        if (a->first->next == NULL || a->first->next == NULL) {
+            return 0;
+        }
+        return are_type_chains_same(a->first, b->first);
+    }
+    return 1;
+}
+
+int get_type_memory_size(type_chain* chain) {
     if (chain == NULL) {
         return 1;
     }
@@ -726,17 +814,17 @@ static int get_type_memory_size(type_chain* chain) {
     }
 }
 
-void debug_resolve_expression_element(type_chain* chain, char issigned, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into) {
+void debug_resolve_expression_element(type_record* record, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into) {
     int offs = 0;
-    if (issigned) {
-        into->flags |= EXPRESSION_TYPE_SIGNED;
+    if (record == NULL) {
+        return;
     }
-    into->type = *chain;
-    if (chain->next) {
-        into->type.next = copy_type_chain(chain->next);
+    into->type = *record;
+    into->type.first = copy_type_chain(record->first);
+    if (record->first == NULL) {
+        return;
     }
-    into->memory_size = get_type_memory_size(chain);
-    switch ( chain->type_ ) {
+    switch ( record->first->type_ ) {
         case TYPE_CHAR: {
             char ch;
             switch (resolve_by) {
@@ -756,7 +844,7 @@ void debug_resolve_expression_element(type_chain* chain, char issigned, enum res
         }
         case TYPE_INT:
         case TYPE_SHORT:
-            if ( issigned ) {
+            if ( record->signed_ ) {
                 int16_t v;
                 switch (resolve_by) {
                     case RESOLVE_BY_POINTER: {
@@ -791,7 +879,7 @@ void debug_resolve_expression_element(type_chain* chain, char issigned, enum res
             }
             break;
         case TYPE_LONG:
-            if ( issigned ) {
+            if ( record->signed_ ) {
                 int32_t v;
                 switch (resolve_by) {
                     case RESOLVE_BY_POINTER: {
@@ -827,19 +915,15 @@ void debug_resolve_expression_element(type_chain* chain, char issigned, enum res
             break;
 
         case TYPE_STRUCTURE: {
-            into->memory_size = 0;
             into->as_pointer.ptr = data;
             break;
         }
         case TYPE_ARRAY: {
             into->as_pointer.ptr = data;
-            into->as_pointer.element_size = get_type_memory_size(chain->next);
-            into->memory_size = into->as_pointer.element_size * chain->size;
             break;
         }
         case TYPE_GENERIC_POINTER:
         case TYPE_CODE_POINTER: {
-            into->memory_size = 2;
             uint16_t v;
             switch (resolve_by) {
                 case RESOLVE_BY_POINTER: {
@@ -865,15 +949,17 @@ void debug_resolve_expression_element(type_chain* chain, char issigned, enum res
     }
 }
 
-static uint8_t debug_resolve_chain_value_as_string(debug_sym_symbol *sym, uint16_t frame_pointer, char *target, size_t targetlen) {
-    type_chain *chain = sym->type_record.first;
+static int debug_resolve_chain_value_as_string(debug_sym_symbol *sym, uint16_t frame_pointer, char *target, size_t targetlen) {
     struct expression_result_t result = {};
-    debug_resolve_expression_element(chain, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, &result);
+    debug_resolve_expression_element(&sym->type_record, RESOLVE_BY_POINTER, frame_pointer, &result);
+    int offs;
     if (is_expression_result_error(&result)) {
-        return snprintf(target, targetlen, "<error:%s>", result.as_error);
+        offs = snprintf(target, targetlen, "<error:%s>", result.as_error);
     } else {
-        return expression_result_value_to_string(&result, target, targetlen);
+        offs = expression_result_value_to_string(&result, target, targetlen);
     }
+    expression_result_free(&result);
+    return offs;
 }
 
 uint8_t debug_get_symbol_value_as_string(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char *target, size_t targetlen) {
@@ -907,15 +993,15 @@ static int debug_get_symbol_address(debug_sym_symbol *s) {
 void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, struct expression_result_t* into) {
     switch (sym->address_space.address_space) {
         case 'B': {
-            return debug_resolve_expression_element(sym->type_record.first, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer->frame_pointer + sym->address_space.b, into);
+            return debug_resolve_expression_element(&sym->type_record, RESOLVE_BY_POINTER, frame_pointer->frame_pointer + sym->address_space.b, into);
         }
         case 'E': {
             int addr = debug_get_symbol_address(sym);
             if (addr < 0) {
-                into->type.type_ = TYPE_UNKNOWN;
+                into->type.first = malloc_type(TYPE_UNKNOWN);
                 return;
             }
-            return debug_resolve_expression_element(sym->type_record.first, sym->type_record.signed_, RESOLVE_BY_POINTER, addr, into);
+            return debug_resolve_expression_element(&sym->type_record, RESOLVE_BY_POINTER, addr, into);
         }
         default: {
             sprintf(into->as_error, "Incorrect address space (not implemented)");
