@@ -24,8 +24,9 @@ PUBLIC asm_am9511_ceil_fastcall
 ; Entry: dehl = floating point number
 .asm_am9511_ceil_fastcall
     call asm_am9511_discardfraction
-    bit 7,d
-    ret NZ
+    ld a,d
+    rla
+    ret C
 
 .was_positive
     ; Add 1

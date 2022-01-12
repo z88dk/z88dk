@@ -29,7 +29,7 @@ loop:
     ld a,(hl)
     or a
     jp Z, asm_am9511_derror_einval_zc
-    
+
     inc hl
     cp ')'
     jp Z, asm_am9511_derror_einval_zc

@@ -16,7 +16,7 @@ PUBLIC asm_am9511_dhexpop
 
 EXTERN asm_am9511_min
 
-asm_am9511_dhexpop:
+.asm_am9511_dhexpop
 
    ; strtod helper
    ;

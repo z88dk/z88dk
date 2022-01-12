@@ -30,12 +30,26 @@ PUBLIC asm_am9511_float32u
 
 EXTERN asm_am9511_normalize
 
+; convert unsigned char in l to float in dehl
+.asm_am9511_float8u
+    ld h,0
+    jr asm_am9511_float16
+
 ; convert signed char in l to float in dehl
 .asm_am9511_float8
     ld a,l
     rla                         ; sign bit of a into C
     sbc a,a
     ld h,a                      ; now hl is sign extended
+
+; convert unsigned in hl to float in dehl
+.asm_am9511_float16u
+    ld a,h
+    rlca
+    or a                        ; ensure unsigned int's "sign" bit is reset
+    rra
+    ld h,a
+                                ; continue, with unsigned int number in hl
 
 ; convert integer in hl to float in dehl
 .asm_am9511_float16
@@ -46,40 +60,22 @@ EXTERN asm_am9511_normalize
 
     jp asm_am9511_popf
 
-; now convert long in dehl to float in dehl
+
+; convert unsigned long in dehl to float in dehl
+.asm_am9511_float32u
+    ld a,d
+    rlca
+    or a                        ; ensure unsigned long's "sign" bit is reset
+    rra
+    ld d,a
+                                ; continue, with unsigned long number in dehl
+
+; convert long in dehl to float in dehl
 .asm_am9511_float32
     call asm_am9511_pushl_fastcall
 
     ld a,__IO_APU_OP_FLTD
-    out (__IO_APU_CONTROL),a    ; convert to float 
-
-    jp asm_am9511_popf
-
-
-; convert character in l to float in dehl
-.asm_am9511_float8u
-    ld h,0
-
-; convert unsigned in hl to float in dehl
-.asm_am9511_float16u                  
-    res 7,h                     ; ensure unsigned int's "sign" bit is reset
-                                ; continue, with unsigned int number in hl
-    call asm_am9511_pushi_fastcall
-
-    ld a,__IO_APU_OP_FLTS
-    out (__IO_APU_CONTROL),a    ; convert to float 
-
-    jp asm_am9511_popf
-
-; convert unsigned long in dehl to float in dehl
-.asm_am9511_float32u                  
-    res 7,d                     ; ensure unsigned long's "sign" bit is reset
-                                ; continue, with unsigned long number in dehl
-
-    call asm_am9511_pushl_fastcall
-
-    ld a,__IO_APU_OP_FLTD
-    out (__IO_APU_CONTROL),a    ; convert to float 
+    out (__IO_APU_CONTROL),a    ; convert to float
 
     jp asm_am9511_popf
 

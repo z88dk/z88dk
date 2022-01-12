@@ -24,8 +24,9 @@ PUBLIC asm_am9511_floor_fastcall
 ; Entry: dehl = floating point number
 .asm_am9511_floor_fastcall
     call asm_am9511_discardfraction
-    bit 7,d
-    ret Z
+    ld a,d
+    rla
+    ret NC
 
 .was_negative
     ; And subtract 1

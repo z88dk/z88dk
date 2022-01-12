@@ -9,15 +9,16 @@
 ;
 ;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_am9511
 
-PUBLIC asm_am9511_eexit
 PUBLIC asm_am9511_neg
 PUBLIC asm_am9511_zero
 PUBLIC asm_am9511_zero_hlde
 PUBLIC asm_am9511_min
 PUBLIC asm_am9511_max
 PUBLIC asm_am9511_nan
+PUBLIC asm_am9511_eexit
 
 ; here to negate a number in dehl
 .asm_am9511_neg
