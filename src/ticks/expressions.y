@@ -27,7 +27,7 @@ void yyerror(const char* s);
 
 %token<errval> T_ERROR
 %token T_PRIMITIVE_TYPE
-%token T_PLUS T_MINUS T_STAR T_DIVIDE T_LEFT T_RIGHT
+%token T_PLUS T_MINUS T_STAR T_DIVIDE T_LEFT T_RIGHT T_LEFT_BRACKET T_RIGHT_BRACKET
 %token T_AMPERSAND
 %left T_PLUS T_MINUS
 %left T_STAR T_SLASH
@@ -75,19 +75,31 @@ pointer_expression: T_POINTER
 		$$ = $1;
 		if ($3.type.first == NULL) {
 			$$.flags |= EXPRESSION_ERROR;
-			sprintf($$.as_error, "Cannot do math with void");
+			sprintf($$.as_error, "Cannot do void pointer math");
+		} else {
+			if (is_primitive_integer_type($3.type.first)) {
+				$$.as_pointer.ptr += $3.as_int * get_type_memory_size($1.type.first->next);
+				expression_result_free(&$3);
+			} else {
+				$$.flags |= EXPRESSION_ERROR;
+				sprintf($$.as_error, "Cannot do pointer math with non-integers");
+			}
 		}
-		$$.as_pointer.ptr += $3.as_int * $1.type.first->next->size;
-		expression_result_free(&$3);
 	 }
 	 | pointer_expression T_MINUS value_expression				{
 		$$ = $1;
 		if ($3.type.first == NULL) {
 			$$.flags |= EXPRESSION_ERROR;
-			sprintf($$.as_error, "Cannot do math with void");
+			sprintf($$.as_error, "Cannot do void pointer math");
+		} else {
+			if (is_primitive_integer_type($3.type.first)) {
+				$$.as_pointer.ptr -= $3.as_int * get_type_memory_size($1.type.first->next);
+				expression_result_free(&$3);
+			} else {
+				$$.flags |= EXPRESSION_ERROR;
+				sprintf($$.as_error, "Cannot do pointer math with non-integers");
+			}
 		}
-		$$.as_pointer.ptr -= $3.as_int * $1.type.first->next->size;
-		expression_result_free(&$3);
 	 }
 ;
 
@@ -102,6 +114,22 @@ value_expression: T_PRIMITIVE_VALUE
 	| value_expression T_MINUS value_expression				{ expression_math_sub(&$1, &$3, &$$); expression_result_free(&$1); expression_result_free(&$3); }
 	| value_expression T_SLASH value_expression				{ expression_math_div(&$1, &$3, &$$); expression_result_free(&$1); expression_result_free(&$3); }
 	| value_expression T_STAR value_expression				{ expression_math_mul(&$1, &$3, &$$); expression_result_free(&$1); expression_result_free(&$3); }
+	| pointer_expression T_LEFT_BRACKET value_expression T_RIGHT_BRACKET    {
+		if ($3.type.first == NULL) {
+			$$.flags |= EXPRESSION_ERROR;
+			sprintf($$.as_error, "Cannot do math with void");
+		} else {
+			if (is_primitive_integer_type($3.type.first)) {
+				$1.as_pointer.ptr += $3.as_int * get_type_memory_size($1.type.first->next);
+				expression_dereference_pointer(&$1, &$$);
+				expression_result_free(&$1);
+				expression_result_free(&$3);
+			} else {
+				$$.flags |= EXPRESSION_ERROR;
+				sprintf($$.as_error, "Cannot index pointer by non-integer");
+			}
+		}
+	}
 
 error_expression: T_ERROR							{ strcpy($$, $1); }
 ;

@@ -949,30 +949,6 @@ void debug_resolve_expression_element(type_record* record, enum resolve_chain_va
     }
 }
 
-static int debug_resolve_chain_value_as_string(debug_sym_symbol *sym, uint16_t frame_pointer, char *target, size_t targetlen) {
-    struct expression_result_t result = {};
-    debug_resolve_expression_element(&sym->type_record, RESOLVE_BY_POINTER, frame_pointer, &result);
-    int offs;
-    if (is_expression_result_error(&result)) {
-        offs = snprintf(target, targetlen, "<error:%s>", result.as_error);
-    } else {
-        offs = expression_result_value_to_string(&result, target, targetlen);
-    }
-    expression_result_free(&result);
-    return offs;
-}
-
-uint8_t debug_get_symbol_value_as_string(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char *target, size_t targetlen) {
-    if (sym->address_space.address_space == 'B') {
-        return debug_resolve_chain_value_as_string(sym, frame_pointer->frame_pointer + sym->address_space.b, target,
-            targetlen);
-    } else {
-        return 1;
-    }
-
-    return 0;
-}
-
 static int debug_get_symbol_address(debug_sym_symbol *s) {
     int address = symbol_resolve(s->symbol_name);
     if (address >= 0) {

@@ -47,6 +47,8 @@ multiple_words "unsigned char"|"unsigned short"|"unsigned int"|"unsigned long"
 "/"		            { return T_SLASH; }
 "("		            { return T_LEFT; }
 ")"		            { return T_RIGHT; }
+"["		            { return T_LEFT_BRACKET; }
+"]"		            { return T_RIGHT_BRACKET; }
 
 %%
 
