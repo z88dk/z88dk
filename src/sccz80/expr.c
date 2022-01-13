@@ -507,7 +507,11 @@ int heira(LVALUE *lval)
             rvalue(lval);
         intcheck(lval, lval);
         com(lval);
+#if defined(HAVE_ARM64)
+        lval->const_val = ~(uint64_t)lval->const_val;
+#else
         lval->const_val = (int64_t)~(uint64_t)lval->const_val;
+#endif
         lval->stage_add = NULL;
         return 0;
     } else if (cmatch('!')) {

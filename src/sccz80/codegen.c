@@ -4756,7 +4756,7 @@ void const2(int32_t val)
     if (val < 0)
         val += 65536;
     immed2();
-    outdec(val);
+    outdec(val & 0xffff);
     nl();
 }
 

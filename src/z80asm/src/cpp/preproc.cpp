@@ -139,7 +139,10 @@ bool PreprocFile::get_source_line(string& line) {
 
 	line.push_back('\n');
 	location.inc_line();
-	got_source_line(location.filename.c_str(), location.line_num, line.c_str());
+
+	list_got_source_line(location.filename.c_str(), location.line_num, line.c_str());
+	set_error_location(location.filename.c_str(), location.line_num);
+	set_error_source_line(line.c_str());
 
 	return true;
 }
@@ -1323,7 +1326,8 @@ const char* sfile_get_source_line() {
 		return nullptr;
 	g_do_preproc_line = true;		// preprocessing on input line
 	if (g_preproc.getline(line)) {
-		got_expanded_line(line.c_str());
+		list_got_expanded_line(line.c_str());
+		set_error_expanded_line(line.c_str());
 		return line.c_str();
 	}
 	else

@@ -10,6 +10,10 @@
  #include "uthash.h"
  #include "utstring.h"
  
+// Detect arm64 - horrible bit masking issues hide behind
+#if defined(_M_ARM64) || defined(__aarch64__)
+#define HAVE_ARM64 1
+#endif
 
 
 #define MALLOC(x)   malloc(x)

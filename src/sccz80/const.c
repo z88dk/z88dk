@@ -1056,7 +1056,8 @@ void load_llong_into_acc(zdouble val)
     char    buf[8];
     elem_t *elem;
 
-    v = val;
+    if ( val < 0 ) v = (uint64_t)(int64_t)val;
+    else v = val;
 
 
     l = v & 0xffffffff;
