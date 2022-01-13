@@ -255,19 +255,19 @@
 ../../_DEVELOPMENT/math/float/am9511/asm/z80/am32_read_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/z80/am32_switch_arg.asm
 
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_acosh.asm
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_asinh.asm
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_atan2.asm
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_atanh.asm
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_cosh.asm
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_exp2.asm
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_exp10.asm
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_fmod.asm
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_log2.asm
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_modf.asm
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_round.asm
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_sinh.asm
-../../_DEVELOPMENT/math/float/am9511/c/asm/am9511_tanh.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_acosh.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_asinh.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_atan2.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_atanh.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_cosh.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_exp2.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_exp10.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_fmod.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_log2.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_modf.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_round.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_sinh.asm
+../../_DEVELOPMENT/math/float/am9511/c/z80/am9511_tanh.asm
 
 ../../_DEVELOPMENT/math/float/am9511/c/sdcc/cam32_sdcc_acos.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sdcc/cam32_sdcc_acosh.asm

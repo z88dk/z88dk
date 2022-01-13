@@ -4,10 +4,10 @@ CFILES = $(wildcard *.c)
 AFILES = $(CFILES:.c=.asm)
 CFLAGS += -I. 
 
-all: $(addprefix asm/,$(AFILES))
+all: $(addprefix z80/,$(AFILES))
 
-asm/%.asm: %.c
+z80/%.asm: %.c
 	zcc +z80 -clib=sdcc_ix --reserve-regs-iy --allow-unsafe-read --max-allocs-per-node400000 -D__MATH_AM9511 -SO3 $(CFLAGS) -a $^ -o $@
 
 clean:
-	$(RM) asm/*.asm asm/*.err zcc_opt.def
+	$(RM) z80/*.asm z80/*.err zcc_opt.def
