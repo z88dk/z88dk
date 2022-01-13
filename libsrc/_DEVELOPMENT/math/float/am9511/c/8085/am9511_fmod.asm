@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jan 13 18:21:08 2022
+;	Module compile time: Thu Jan 13 18:36:46 2022
 
 
 	C_LINE	0,"am9511_fmod.c"
@@ -185,27 +185,27 @@
 
 ; Function am9511_fmod flags 0x00000200 __smallc 
 ; double am9511_fmod(double x, double y)
-; parameter 'double y' at sp+2 size(6)
-; parameter 'double x' at sp+8 size(6)
+; parameter 'double y' at sp+2 size(4)
+; parameter 'double x' at sp+6 size(4)
 	C_LINE	12,"am9511_fmod.c::am9511_fmod::0::0"
 ._am9511_fmod
 	push	bc
 	push	bc
 	push	bc
 	push	bc
-	push	bc
-	ld	hl,12	;const
+	ld	hl,10	;const
 	add	hl,sp
-	call	dldpsh
+	call	l_glong2sp
 	ld	hl,0	;const
-	call	l_int2long_u_float
-	call	deq
+	ld	d,h
+	ld	e,l
+	call	l_f32_eq
 	ld	a,h
 	or	l
 	jp	z,i_2	;
 	ld	hl,0	;const
-	call	l_int2long_u_float
-	pop	bc
+	ld	d,h
+	ld	e,l
 	pop	bc
 	pop	bc
 	pop	bc
@@ -214,61 +214,61 @@
 
 
 .i_2
-	ld	hl,6	;const
+	ld	hl,4	;const
 	add	hl,sp
 	push	hl
-	ld	hl,20	;const
+	ld	hl,16	;const
 	add	hl,sp
-	call	dldpsh
-	ld	hl,20	;const
+	call	l_glong2sp
+	ld	hl,16	;const
 	add	hl,sp
-	call	dload
-	call	ddiv
-	call	ifix
+	call	l_glong
+	call	l_f32_div
+	call	l_f32_f2slong
 	pop	bc
 	call	l_plong
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
+	ld	hl,16	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,10	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_slong2f
+	push	de
+	push	hl
 	ld	hl,20	;const
 	add	hl,sp
-	call	dldpsh
+	call	l_glong
+	call	l_f32_mul
+	call	l_f32_sub
+	pop	bc
+	call	l_plong
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong2sp
 	ld	hl,14	;const
 	add	hl,sp
 	call	l_glong
-	call	float
-	call	dpush
-	ld	hl,26	;const
-	add	hl,sp
-	call	dload
-	call	dmul
-	call	dsub
-	pop	hl
-	call	dstore
-	ld	hl,0	;const
-	add	hl,sp
-	call	dldpsh
-	ld	hl,18	;const
-	add	hl,sp
-	call	dload
-	call	dge
+	call	l_f32_ge
 	ld	a,h
 	or	l
 	jp	z,i_3	;
 	ld	hl,0	;const
 	add	hl,sp
-	call	dldpsh
-	ld	hl,18	;const
+	call	l_glong2sp
+	ld	hl,14	;const
 	add	hl,sp
-	call	dload
-	call	dsub
+	call	l_glong
+	call	l_f32_sub
 	jp	i_4	;
 .i_3
 	ld	hl,0	;const
 	add	hl,sp
-	call	dload
+	call	l_glong
 .i_4
-	pop	bc
 	pop	bc
 	pop	bc
 	pop	bc

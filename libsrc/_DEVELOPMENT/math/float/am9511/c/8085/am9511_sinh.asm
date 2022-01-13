@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jan 13 18:21:09 2022
+;	Module compile time: Thu Jan 13 18:36:46 2022
 
 
 	C_LINE	0,"am9511_sinh.c"
@@ -185,37 +185,35 @@
 
 ; Function am9511_sinhf flags 0x00000208 __smallc __z88dk_fastcall 
 ; double am9511_sinhf(double x)
-; parameter 'double x' at sp+2 size(6)
+; parameter 'double x' at sp+2 size(4)
 	C_LINE	5,"am9511_sinh.c::am9511_sinhf::0::0"
 ._am9511_sinhf
-	call	dpush
-	push	bc
+	push	de
+	push	hl
 	push	bc
 	push	bc
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	ld	hl,8	;const
-	add	hl,sp
-	call	dload
-	call	_exp
-	pop	hl
-	call	dstore
-	ld	hl,0	;const
-	add	hl,sp
-	call	dldpsh
 	ld	hl,6	;const
 	add	hl,sp
-	call	dldpsh
-	ld	hl,1	;const
-	call	l_int2long_u_float
-	call	dswap
-	call	ddiv
-	call	dsub
-	call	_div2
-	ld	hl,12	;const
+	call	l_glong
+	call	_exp
+	pop	bc
+	call	l_plong
+	ld	hl,0	;const
 	add	hl,sp
-	ld	sp,hl
+	call	l_glong2sp
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_invf
+	call	l_f32_sub
+	call	_div2
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
 	ret
 
 

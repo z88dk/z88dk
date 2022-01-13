@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jan 13 18:21:08 2022
+;	Module compile time: Thu Jan 13 18:36:46 2022
 
 
 	C_LINE	0,"am9511_acosh.c"
@@ -185,36 +185,31 @@
 
 ; Function am9511_acosh flags 0x00000208 __smallc __z88dk_fastcall 
 ; double am9511_acosh(double x)
-; parameter 'double x' at sp+2 size(6)
+; parameter 'double x' at sp+2 size(4)
 	C_LINE	8,"am9511_acosh.c::am9511_acosh::0::0"
 ._am9511_acosh
-	call	dpush
-	ld	hl,0	;const
-	add	hl,sp
-	call	dload
+	push	de
+	push	hl
 	call	_mul2
-	call	dpush
-	ld	hl,6	;const
+	push	de
+	push	hl
+	ld	hl,4	;const
 	add	hl,sp
-	call	dldpsh
-	ld	hl,12	;const
+	call	l_glong2sp
+	ld	hl,8	;const
 	add	hl,sp
-	call	dload
+	call	l_glong
 	call	_sqr
-	call	dpush
-	ld	hl,1	;const
-	call	l_int2long_u_float
-	call	dsub
+	push	de
+	push	hl
+	ld	hl,0	;const
+	ld	de,16256
+	call	l_f32_sub
 	call	_sqrt
-	call	dadd
-	call	dpush
-	ld	hl,1	;const
-	call	l_int2long_u_float
-	call	dswap
-	call	ddiv
-	call	dsub
+	call	l_f32_add
+	call	l_f32_invf
+	call	l_f32_sub
 	call	_log
-	pop	bc
 	pop	bc
 	pop	bc
 	ret

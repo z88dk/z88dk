@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jan 13 18:21:09 2022
+;	Module compile time: Thu Jan 13 18:36:46 2022
 
 
 	C_LINE	0,"am9511_modf.c"
@@ -186,15 +186,16 @@
 ; Function am9511_modf flags 0x00000200 __smallc 
 ; double am9511_modf(double x, double * y)
 ; parameter 'double * y' at sp+2 size(2)
-; parameter 'double x' at sp+4 size(6)
+; parameter 'double x' at sp+4 size(4)
 	C_LINE	34,"am9511_modf.c::am9511_modf::0::0"
 ._am9511_modf
 	ld	hl,4	;const
 	add	hl,sp
-	call	dldpsh
+	call	l_glong2sp
 	ld	hl,0	;const
-	call	l_int2long_u_float
-	call	dlt
+	ld	d,h
+	ld	e,l
+	call	l_f32_lt
 	ld	a,h
 	or	l
 	jp	z,i_2	;
@@ -202,29 +203,28 @@
 	call	l_gintspsp	;
 	ld	hl,6	;const
 	add	hl,sp
-	call	dload
+	call	l_glong
 	call	_ceil
-	pop	hl
-	call	dstore
+	pop	bc
+	call	l_plong
 	jp	i_3	;EOS
 .i_2
 	ld	hl,2	;const
 	call	l_gintspsp	;
 	ld	hl,6	;const
 	add	hl,sp
-	call	dload
+	call	l_glong
 	call	_floor
-	pop	hl
-	call	dstore
+	pop	bc
+	call	l_plong
 .i_3
 	ld	hl,4	;const
 	add	hl,sp
-	call	dldpsh
-	ld	hl,8	;const
+	call	l_glong2sp
+	ld	hl,6	;const
 	add	hl,sp
-	call	l_gint	;
-	call	dload
-	call	dsub
+	call	l_glonghlp
+	call	l_f32_sub
 	ret
 
 

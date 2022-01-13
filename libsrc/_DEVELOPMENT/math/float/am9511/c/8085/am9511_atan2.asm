@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jan 13 18:21:09 2022
+;	Module compile time: Thu Jan 13 18:36:46 2022
 
 
 	C_LINE	0,"am9511_atan2.c"
@@ -185,203 +185,198 @@
 
 ; Function am9511_atan2 flags 0x00000200 __smallc 
 ; double am9511_atan2(double y, double x)
-; parameter 'double x' at sp+2 size(6)
-; parameter 'double y' at sp+8 size(6)
+; parameter 'double x' at sp+2 size(4)
+; parameter 'double y' at sp+6 size(4)
 	C_LINE	5,"am9511_atan2.c::am9511_atan2::0::0"
 ._am9511_atan2
 	push	bc
 	push	bc
-	push	bc
-	ld	hl,8	;const
+	ld	hl,6	;const
 	add	hl,sp
-	call	dldpsh
+	call	l_glong2sp
 	ld	hl,0	;const
-	call	l_int2long_u_float
-	call	dne
+	ld	d,h
+	ld	e,l
+	call	l_f32_ne
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	ld	hl,8	;const
+	ld	hl,6	;const
 	add	hl,sp
-	call	dload
+	call	l_glong
 	call	_fabs
-	call	dpush
-	ld	hl,20	;const
+	push	de
+	push	hl
+	ld	hl,14	;const
 	add	hl,sp
-	call	dload
+	call	l_glong
 	call	_fabs
-	call	dge
+	call	l_f32_ge
 	ld	a,h
 	or	l
 	jp	z,i_3	;
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	ld	hl,16	;const
+	ld	hl,12	;const
 	add	hl,sp
-	call	dldpsh
-	ld	hl,16	;const
+	call	l_glong2sp
+	ld	hl,12	;const
 	add	hl,sp
-	call	dload
-	call	ddiv
+	call	l_glong
+	call	l_f32_div
 	call	_atan
-	pop	hl
-	call	dstore
-	ld	hl,8	;const
+	pop	bc
+	call	l_plong
+	ld	hl,6	;const
 	add	hl,sp
-	call	dldpsh
+	call	l_glong2sp
 	ld	hl,0	;const
-	call	l_int2long_u_float
-	call	dlt
+	ld	d,h
+	ld	e,l
+	call	l_f32_lt
 	ld	a,h
 	or	l
 	jp	z,i_4	;
-	ld	hl,14	;const
+	ld	hl,10	;const
 	add	hl,sp
-	call	dldpsh
+	call	l_glong2sp
 	ld	hl,0	;const
-	call	l_int2long_u_float
-	call	dge
+	ld	d,h
+	ld	e,l
+	call	l_f32_ge
 	ld	a,h
 	or	l
 	jp	z,i_5	;
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,i_6+0
-	call	dload
-	call	dadd
-	pop	hl
-	call	dstore
-	jp	i_7	;EOS
+	call	l_glong2sp
+	ld	hl,4059	;const
+	ld	de,16457
+	call	l_f32_add
+	pop	bc
+	call	l_plong
+	jp	i_6	;EOS
 .i_5
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,i_6+0
-	call	dload
-	call	dsub
-	pop	hl
-	call	dstore
-	jp	i_8	;EOS
+	call	l_glong2sp
+	ld	hl,4059	;const
+	ld	de,16457
+	call	l_f32_sub
+	pop	bc
+	call	l_plong
+	jp	i_7	;EOS
 .i_3
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
+	ld	hl,8	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,16	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_div
+	call	_atan
+	ld	a,d
+	xor	128
+	ld	d,a
+	pop	bc
+	call	l_plong
 	ld	hl,10	;const
 	add	hl,sp
-	call	dldpsh
-	ld	hl,22	;const
-	add	hl,sp
-	call	dload
-	call	ddiv
-	call	_atan
-	call	minusfa
-	pop	hl
-	call	dstore
-	ld	hl,14	;const
-	add	hl,sp
-	call	dldpsh
+	call	l_glong2sp
 	ld	hl,0	;const
-	call	l_int2long_u_float
-	call	dlt
+	ld	d,h
+	ld	e,l
+	call	l_f32_lt
 	ld	a,h
 	or	l
-	jp	z,i_9	;
+	jp	z,i_8	;
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	call	dldpsh
-	ld	hl,i_10+0
-	call	dload
-	call	dsub
-	pop	hl
-	call	dstore
-	jp	i_11	;EOS
-.i_9
-	ld	hl,0	;const
-	add	hl,sp
-	push	hl
-	call	dldpsh
-	ld	hl,i_10+0
-	call	dload
-	call	dadd
-	pop	hl
-	call	dstore
+	call	l_glong2sp
+	ld	hl,4059	;const
+	ld	de,16329
+	call	l_f32_sub
+	pop	bc
+	call	l_plong
+	jp	i_9	;EOS
 .i_8
 	ld	hl,0	;const
 	add	hl,sp
-	call	dload
+	push	hl
+	call	l_glong2sp
+	ld	hl,4059	;const
+	ld	de,16329
+	call	l_f32_add
 	pop	bc
+	call	l_plong
+.i_7
+	ld	hl,0	;const
+	add	hl,sp
+	call	l_glong
 	pop	bc
 	pop	bc
 	ret
 
 
 .i_2
-	ld	hl,14	;const
+	ld	hl,10	;const
 	add	hl,sp
-	call	dldpsh
+	call	l_glong2sp
 	ld	hl,0	;const
-	call	l_int2long_u_float
-	call	dgt
+	ld	d,h
+	ld	e,l
+	call	l_f32_gt
+	ld	a,h
+	or	l
+	jp	z,i_11	;
+	ld	hl,4059	;const
+	ld	de,16329
+	pop	bc
+	pop	bc
+	ret
+
+
+.i_11
+	ld	hl,10	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,0	;const
+	ld	d,h
+	ld	e,l
+	call	l_f32_lt
 	ld	a,h
 	or	l
 	jp	z,i_13	;
-	ld	hl,i_10+0
-	call	dload
-	pop	bc
-	pop	bc
-	pop	bc
-	ret
-
-
-.i_13
-	ld	hl,14	;const
-	add	hl,sp
-	call	dldpsh
-	ld	hl,0	;const
-	call	l_int2long_u_float
-	call	dlt
-	ld	a,h
-	or	l
-	jp	z,i_15	;
-	ld	hl,i_16+0
-	call	dload
-	pop	bc
+	ld	hl,4059	;const
+	ld	de,49097
 	pop	bc
 	pop	bc
 	ret
 
 
-.i_12
+.i_10
 	ld	hl,0	;const
-	call	l_int2long_u_float
-	pop	bc
+	ld	d,h
+	ld	e,l
 	pop	bc
 	pop	bc
 	ret
 
 
 ; --- Start of Optimiser additions ---
-	defc	i_7 = i_4
-	defc	i_11 = i_8
-	defc	i_15 = i_14
-	defc	i_14 = i_12
-	defc	i_4 = i_8
+	defc	i_6 = i_4
+	defc	i_9 = i_7
+	defc	i_13 = i_12
+	defc	i_12 = i_10
+	defc	i_4 = i_7
 
-	SECTION	rodata_compiler
-.i_6
-	;3.141593
-	defb	0x21,0xa2,0xda,0x0f,0x49,0x82
-.i_10
-	;1.570796
-	defb	0x21,0xa2,0xda,0x0f,0x49,0x81
-.i_16
-	;-1.570796
-	defb	0x21,0xa2,0xda,0x0f,0xc9,0x81
 
 ; --- Start of Static Variables ---
 

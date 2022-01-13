@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jan 13 18:21:09 2022
+;	Module compile time: Thu Jan 13 18:36:46 2022
 
 
 	C_LINE	0,"am9511_exp10.c"
@@ -185,22 +185,22 @@
 
 ; Function am9511_exp10 flags 0x00000208 __smallc __z88dk_fastcall 
 ; double am9511_exp10(double x)
-; parameter 'double x' at sp+2 size(6)
+; parameter 'double x' at sp+2 size(4)
 	C_LINE	21,"am9511_exp10.c::am9511_exp10::0::0"
 ._am9511_exp10
-	call	dpush
+	push	de
+	push	hl
+	push	de
+	push	hl
 	ld	hl,0	;const
-	add	hl,sp
-	call	dldpsh
-	ld	hl,0	;const
-	call	l_int2long_u_float
-	call	deq
+	ld	d,h
+	ld	e,l
+	call	l_f32_eq
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	ld	hl,1	;const
-	call	l_int2long_u_float
-	pop	bc
+	ld	hl,0	;const
+	ld	de,16256
 	pop	bc
 	pop	bc
 	ret
@@ -209,12 +209,11 @@
 .i_2
 	ld	hl,0	;const
 	add	hl,sp
-	call	dldpsh
-	ld	hl,i_3+0
-	call	dload
-	call	dmul
+	call	l_glong2sp
+	ld	hl,23950	;const
+	ld	de,16403
+	call	l_f32_mul
 	call	_exp
-	pop	bc
 	pop	bc
 	pop	bc
 	ret
@@ -222,10 +221,6 @@
 
 ; --- Start of Optimiser additions ---
 
-	SECTION	rodata_compiler
-.i_3
-	;2.302585
-	defb	0xab,0xdd,0x8d,0x5d,0x13,0x82
 
 ; --- Start of Static Variables ---
 

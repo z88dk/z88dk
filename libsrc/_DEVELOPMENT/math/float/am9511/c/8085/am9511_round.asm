@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jan 13 18:21:08 2022
+;	Module compile time: Thu Jan 13 18:36:46 2022
 
 
 	C_LINE	0,"am9511_round.c"
@@ -185,21 +185,22 @@
 
 ; Function am9511_round flags 0x00000208 __smallc __z88dk_fastcall 
 ; double am9511_round(double x)
-; parameter 'double x' at sp+2 size(6)
+; parameter 'double x' at sp+2 size(4)
 	C_LINE	16,"am9511_round.c::am9511_round::0::0"
 ._am9511_round
-	call	dpush
-	ld	hl,65522	;const
+	push	de
+	push	hl
+	ld	hl,65524	;const
 	add	hl,sp
 	ld	sp,hl
 	ld	hl,6	;const
 	add	hl,sp
 	push	hl
-	ld	hl,16	;const
+	ld	hl,14	;const
 	add	hl,sp
-	call	dload
-	pop	hl
-	call	dstore
+	call	l_glong
+	pop	bc
+	call	l_plong
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
@@ -208,7 +209,7 @@
 	call	l_glong
 	pop	bc
 	call	l_plong
-	ld	hl,12	;const
+	ld	hl,10	;const
 	add	hl,sp
 	push	hl
 	ld	hl,4	;const
@@ -294,12 +295,16 @@
 	jp	nz,ASMPC+4
 	scf
 	jp	nc,i_6	;
-	ld	hl,16	;const
+	ld	hl,14	;const
 	add	hl,sp
-	call	dload
-	ld	hl,22	;const
+	call	l_glong
+	ld	c,l
+	ld	b,h
+	ld	hl,18	;const
 	add	hl,sp
 	ld	sp,hl
+	ld	l,c
+	ld	h,b
 	ret
 
 
@@ -340,26 +345,34 @@
 	ld	de,128
 	call	l_eq
 	jp	nc,i_8	;
-	ld	hl,14	;const
+	ld	hl,12	;const
 	add	hl,sp
-	call	dldpsh
-	ld	hl,20	;const
+	call	l_glong2sp
+	ld	hl,16	;const
 	add	hl,sp
-	call	dload
-	call	dadd
-	ld	hl,20	;const
+	call	l_glong
+	call	l_f32_add
+	ld	c,l
+	ld	b,h
+	ld	hl,16	;const
 	add	hl,sp
 	ld	sp,hl
+	ld	l,c
+	ld	h,b
 	ret
 
 
 .i_8
-	ld	hl,14	;const
+	ld	hl,12	;const
 	add	hl,sp
-	call	dload
-	ld	hl,20	;const
+	call	l_glong
+	ld	c,l
+	ld	b,h
+	ld	hl,16	;const
 	add	hl,sp
 	ld	sp,hl
+	ld	l,c
+	ld	h,b
 	ret
 
 
@@ -374,10 +387,14 @@
 	call	l_plong
 	ld	hl,6	;const
 	add	hl,sp
-	call	dload
-	ld	hl,20	;const
+	call	l_glong
+	ld	c,l
+	ld	b,h
+	ld	hl,16	;const
 	add	hl,sp
 	ld	sp,hl
+	ld	l,c
+	ld	h,b
 	ret
 
 

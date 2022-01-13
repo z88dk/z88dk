@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jan 13 18:21:08 2022
+;	Module compile time: Thu Jan 13 18:36:46 2022
 
 
 	C_LINE	0,"am9511_atanh.c"
@@ -185,28 +185,29 @@
 
 ; Function am9511_atanh flags 0x00000208 __smallc __z88dk_fastcall 
 ; double am9511_atanh(double x)
-; parameter 'double x' at sp+2 size(6)
+; parameter 'double x' at sp+2 size(4)
 	C_LINE	8,"am9511_atanh.c::am9511_atanh::0::0"
 ._am9511_atanh
-	call	dpush
+	push	de
+	push	hl
+	push	de
+	push	hl
 	ld	hl,0	;const
+	ld	de,16256
+	call	l_f32_add
+	push	de
+	push	hl
+	ld	hl,4	;const
 	add	hl,sp
-	call	dldpsh
-	ld	hl,1	;const
-	call	l_int2long_u_float
-	call	dadd
-	call	dpush
-	ld	hl,6	;const
-	add	hl,sp
-	call	dldpsh
-	ld	hl,1	;const
-	call	l_int2long_u_float
-	call	dswap
-	call	dsub
-	call	ddiv
+	call	l_glong
+	ld	bc,16256
+	push	bc
+	ld	bc,0
+	push	bc
+	call	l_f32_sub
+	call	l_f32_div
 	call	_div2
 	call	_log
-	pop	bc
 	pop	bc
 	pop	bc
 	ret

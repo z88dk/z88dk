@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jan 13 18:21:09 2022
+;	Module compile time: Thu Jan 13 18:36:46 2022
 
 
 	C_LINE	0,"am9511_tanh.c"
@@ -185,53 +185,57 @@
 
 ; Function am9511_tanh flags 0x00000208 __smallc __z88dk_fastcall 
 ; double am9511_tanh(double x)
-; parameter 'double x' at sp+2 size(6)
+; parameter 'double x' at sp+2 size(4)
 	C_LINE	5,"am9511_tanh.c::am9511_tanh::0::0"
 ._am9511_tanh
-	call	dpush
-	ld	hl,65524	;const
-	add	hl,sp
-	ld	sp,hl
-	ld	hl,6	;const
+	push	de
+	push	hl
+	push	bc
+	push	bc
+	push	bc
+	push	bc
+	ld	hl,4	;const
 	add	hl,sp
 	push	hl
-	ld	hl,14	;const
+	ld	hl,10	;const
 	add	hl,sp
-	call	dload
+	call	l_glong
 	call	_exp
-	pop	hl
-	call	dstore
+	pop	bc
+	call	l_plong
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
+	ld	hl,6	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_invf
+	pop	bc
+	call	l_plong
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong2sp
+	ld	hl,4	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_sub
+	push	de
+	push	hl
 	ld	hl,8	;const
 	add	hl,sp
-	call	dldpsh
-	ld	hl,1	;const
-	call	l_int2long_u_float
-	call	dswap
-	call	ddiv
-	pop	hl
-	call	dstore
-	ld	hl,6	;const
+	call	l_glong2sp
+	ld	hl,8	;const
 	add	hl,sp
-	call	dldpsh
-	ld	hl,6	;const
-	add	hl,sp
-	call	dload
-	call	dsub
-	call	dpush
+	call	l_glong
+	call	l_f32_add
+	call	l_f32_div
+	ld	c,l
+	ld	b,h
 	ld	hl,12	;const
-	add	hl,sp
-	call	dldpsh
-	ld	hl,12	;const
-	add	hl,sp
-	call	dload
-	call	dadd
-	call	ddiv
-	ld	hl,18	;const
 	add	hl,sp
 	ld	sp,hl
+	ld	l,c
+	ld	h,b
 	ret
 
 
