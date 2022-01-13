@@ -1,7 +1,7 @@
 
 #include "m32_math.h"
 
-float m32_coshf (const float x) __z88dk_fastcall
+float m32_coshf (float x) __z88dk_fastcall
 {
     float y;
 
