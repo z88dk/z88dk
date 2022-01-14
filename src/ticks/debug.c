@@ -814,17 +814,17 @@ int get_type_memory_size(type_chain* chain) {
     }
 }
 
-void debug_resolve_expression_element(type_record* record, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into) {
+void debug_resolve_expression_element(type_record* record, type_chain* chain, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into) {
     int offs = 0;
     if (record == NULL) {
         return;
     }
     into->type = *record;
-    into->type.first = copy_type_chain(record->first);
-    if (record->first == NULL) {
+    into->type.first = copy_type_chain(chain);
+    if (chain == NULL) {
         return;
     }
-    switch ( record->first->type_ ) {
+    switch ( chain->type_ ) {
         case TYPE_CHAR: {
             char ch;
             switch (resolve_by) {
@@ -969,7 +969,7 @@ static int debug_get_symbol_address(debug_sym_symbol *s) {
 void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, struct expression_result_t* into) {
     switch (sym->address_space.address_space) {
         case 'B': {
-            return debug_resolve_expression_element(&sym->type_record, RESOLVE_BY_POINTER, frame_pointer->frame_pointer + sym->address_space.b, into);
+            return debug_resolve_expression_element(&sym->type_record, sym->type_record.first, RESOLVE_BY_POINTER, frame_pointer->frame_pointer + sym->address_space.b, into);
         }
         case 'E': {
             int addr = debug_get_symbol_address(sym);
@@ -977,7 +977,7 @@ void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointe
                 into->type.first = malloc_type(TYPE_UNKNOWN);
                 return;
             }
-            return debug_resolve_expression_element(&sym->type_record, RESOLVE_BY_POINTER, addr, into);
+            return debug_resolve_expression_element(&sym->type_record, sym->type_record.first, RESOLVE_BY_POINTER, addr, into);
         }
         default: {
             sprintf(into->as_error, "Incorrect address space (not implemented)");

@@ -359,6 +359,9 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
         case TYPE_UNKNOWN: {
             return snprintf(buffer, buffer_len, "<unknown>");
         }
+        case TYPE_FUNCTION: {
+            return snprintf(buffer, buffer_len, "<function>");
+        }
         case TYPE_ARRAY: {
             int maxlen = Max(10,Min(10, result->type.size));
             int offs = snprintf(buffer, buffer_len, "%#04x [%d] = { ", result->as_pointer.ptr, result->type.size);
@@ -366,7 +369,7 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
             for ( int i = 0; i < maxlen; i++ ) {
                 offs += snprintf(buffer + offs, buffer_len - offs, "%s[%d] = ", i != 0 ? ", " : "", i);
                 struct expression_result_t elr = {};
-                debug_resolve_expression_element(&result->type, RESOLVE_BY_POINTER, ptr, &elr);
+                debug_resolve_expression_element(&result->type, result->type.first, RESOLVE_BY_POINTER, ptr, &elr);
                 if (is_expression_result_error(&elr)) {
                     offs += snprintf(buffer + offs, buffer_len - offs, "<error:%s>", elr.as_error);
                     break;
@@ -439,7 +442,7 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
             }
         }
         default: {
-            return 0;
+            return snprintf(buffer, buffer_len, "<unknown:%d>", result->type.first->type_);
         }
     }
     return 0;

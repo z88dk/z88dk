@@ -373,12 +373,12 @@ void debugger()
                             } else {
                                 if (ttt->type_ != TYPE_VOID) {
                                     struct expression_result_t result = {};
-                                    debug_resolve_expression_element(&temp_br->callee->type_record,
+                                    debug_resolve_expression_element(&temp_br->callee->type_record, ttt,
                                         RESOLVE_BY_VALUE, return_value, &result);
                                     if (is_expression_result_error(&result)) {
                                         printf("function %s errored: %s\n", temp_br->callee->function_name, result.as_error);
                                     } else {
-                                        char resolved_result[128];
+                                        char resolved_result[128] = "<unknown>";
                                         expression_result_value_to_string(&result, resolved_result, 128);
                                         printf("function %s returned: %s\n", temp_br->callee->function_name, resolved_result);
                                     }

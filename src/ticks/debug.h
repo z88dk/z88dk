@@ -152,7 +152,7 @@ extern int get_type_memory_size(type_chain* chain);
 struct expression_result_t;
 
 extern debug_sym_function* debug_find_function(const char* function_name, const char* file_name);
-extern void debug_resolve_expression_element(type_record* record, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into);
+extern void debug_resolve_expression_element(type_record* record, type_chain* chain, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into);
 extern void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, struct expression_result_t* into);
 extern uint8_t debug_symbol_valid(debug_sym_symbol* sym, uint16_t stack, debug_frame_pointer* frame_pointer);
 extern debug_sym_symbol* cdb_get_first_symbol();
