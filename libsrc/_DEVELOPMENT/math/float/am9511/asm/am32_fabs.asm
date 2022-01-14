@@ -9,10 +9,15 @@
 ;
 ;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_am9511
 
 PUBLIC  asm_am9511_fabs_fastcall
 
 .asm_am9511_fabs_fastcall
-    res	7,d
+    ld a,d
+    rlca
+    or a        ;reset Carry
+    rra
+    ld d,a
     ret
