@@ -51,7 +51,7 @@ float m32_tanf (float x) __z88dk_fastcall;
 float m32_asinf (float x) __z88dk_fastcall;
 float m32_acosf (float x) __z88dk_fastcall;
 float m32_atanf (float x) __z88dk_fastcall;
-float m32_atan2f (float x, float y);
+float m32_atan2f (float y, float x);
 
 /* Hyperbolic functions */
 float m32_sinhf (float x) __z88dk_fastcall;
