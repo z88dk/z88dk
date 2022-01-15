@@ -65,7 +65,7 @@ int rom_exec(char* target)
     if ((binname == NULL) && (romsize == 0))
         return -1;
 
-    crt_model = (crtfile == NULL) ? (-1) : parameter_search(crtfile, ".sym", "__crt_model");
+    crt_model = (crtfile == NULL) ? (-1) : parameter_search(crtfile, ".map", "__crt_model");
 
     if ((binorg == -1) && ((crtfile == NULL) || ((binorg = get_org_addr(crtfile)) == -1))) {
         fprintf(stderr, "Warning: could not get the code ORG, binary ORG defaults to rombase = %d\n", rombase);
@@ -79,7 +79,8 @@ int rom_exec(char* target)
             strcpy(outname, binname);
             // choose bin suffix if new c lib compile and ram model chosen or romsize is set to zero
             // not safe to use bin suffix in classic compile since the linker's output filename ends in .bin
-            suffix_change(outname, ((crt_model == 0) || ((crt_model != -1) && (romsize == 0))) ? ".bin" : ".rom");
+            int change = ((crt_model == 0) || ((crt_model != -1) && (romsize == 0)));
+            suffix_change(outname, change ? ".bin" : ".rom");
             if (!strcmp(outname, binname))
                 suffix_change(outname, ".rom");
         }
