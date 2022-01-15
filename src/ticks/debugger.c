@@ -681,20 +681,36 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
                 arg = arg->next;
             }
 
-
-            printf("%sfunction %s+%d (%s)\n       at %s:%d\n", frame_marker,
-                fn->function_name, fp->offset, function_args,
-                fp->filename, fp->lineno);
+            if (fp->offset == 0xFFFF) {
+                printf("%sfunction %s+??? (unreliable offset, %s)\n       at %s\n", frame_marker,
+                    fn->function_name, function_args, fp->filename);
+            } else {
+                printf("%sfunction %s+%d (%s)\n       at %s:%d\n", frame_marker,
+                    fn->function_name, fp->offset, function_args,
+                    fp->filename, fp->lineno);
+            }
         } else {
-            printf("%s%s+%d at %s:%d\n", frame_marker, sym->name, fp->offset, fp->filename, fp->lineno);
+            if (fp->offset == 0xFFFF) {
+                printf("%s%s+??? (unreliable offset) at %s\n", frame_marker, sym->name, fp->filename);
+            } else {
+                printf("%s%s+%d at %s:%d\n", frame_marker, sym->name, fp->offset, fp->filename, fp->lineno);
+            }
         }
 
     } else {
         char location[FILENAME_MAX + 4];
         if (fp->filename) {
-            sprintf(location, "%s:%d", fp->filename, fp->lineno);
+            if (fp->lineno) {
+                sprintf(location, "%s:%d", fp->filename, fp->lineno);
+            } else {
+                sprintf(location, "%s", fp->filename);
+            }
         } else {
-            sprintf(location, "%s", "unknown location");
+            if (fp->symbol && fp->symbol->file) {
+                sprintf(location, "%s", fp->symbol->file);
+            } else {
+                sprintf(location, "%s", "unknown location");
+            }
         }
         if (sym) {
             printf("%s%s+%d\n       at %s\n", frame_marker, sym->name, fp->offset, location);
@@ -1447,6 +1463,7 @@ static int cmd_restore(int argc, char **argv)
 static int cmd_list(int argc, char **argv)
 {
     int addr;
+    int offset;
 
     {
         struct debugger_regs_t regs;
@@ -1459,10 +1476,12 @@ static int cmd_list(int argc, char **argv)
         if (frame_at)
         {
             addr = frame_at->address;
+            offset = frame_at->offset;
         }
         else
         {
             addr = at;
+            offset = 0;
         }
 
         debug_stack_frames_free(first_frame_pointer);
@@ -1477,6 +1496,10 @@ static int cmd_list(int argc, char **argv)
         if ( a2 != -1 ) {
             addr = a2;
         }
+    }
+
+    if (offset == 0xFFFF) {
+        printf("Warning: offset is unreliable, call could have happened from anywhere of this function.\n");
     }
 
     if ( debug_find_source_location(addr, &filename, &lineno) < 0 ) {
