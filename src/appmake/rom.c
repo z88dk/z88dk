@@ -67,6 +67,7 @@ int rom_exec(char* target)
 
     crt_model = (crtfile == NULL) ? (-1) : parameter_search(crtfile, ".map", "__crt_model");
 
+
     if ((binorg == -1) && ((crtfile == NULL) || ((binorg = get_org_addr(crtfile)) == -1))) {
         fprintf(stderr, "Warning: could not get the code ORG, binary ORG defaults to rombase = %d\n", rombase);
         binorg = rombase;
