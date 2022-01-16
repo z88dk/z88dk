@@ -1,11 +1,11 @@
 ;
-;  Copyright (c) 2020 Phillip Stevens
+;  Copyright (c) 2022 Phillip Stevens
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, August 2020
+;  feilipu, January 2022
 ;
 ;-------------------------------------------------------------------------
 ; asm_am9511_ldexp - z80, z180, z80n load exponent
@@ -30,38 +30,10 @@
 SECTION code_clib
 SECTION code_fp_am9511
 
-EXTERN asm_am9511_min
-
-PUBLIC asm_am9511_dmulpow2
-
-   ; multiply DEHL' by a power of two
-   ; DEHL' *= 2^(HL)
-   ;
-   ; enter : DEHL'= float x
-   ;         HL = signed integer
-   ;
-   ; exit  : success
-   ;
-   ;            DEHL'= x * 2^(HL)
-   ;            carry reset
-   ;
-   ;         fail if overflow
-   ;
-   ;            AC'= +-inf
-   ;            carry set, errno set
-   ;
-   ; uses  : af, bc', de', hl'
-   
-.asm_am9511_dmulpow2
-    push hl                     ; power 2 on stack
-    exx
-    pop bc                      ; power 2 in bc
-    call pow2
-    exx
-    ret
-
+EXTERN asm_am9511_zero, asm_am9511_max
 
 PUBLIC asm_am9511_ldexp_callee
+
 
 ; float ldexpf (float x, int16_t pw2);
 .asm_am9511_ldexp_callee
@@ -74,33 +46,53 @@ PUBLIC asm_am9511_ldexp_callee
     ;
     ; uses  : af, bc, de, hl
 
-    pop af                      ; return
-    pop hl                      ; (float)x in dehl
-    pop de
-    pop bc                      ; pw2 maximum int8_t actually
-    push af                     ; return on stack
+    ld de,sp+4                  ; point to mantissa and exponent
+    ld hl,(de)
 
-.pow2
-    sla e                       ; get the exponent
-    rl d
-    jr Z,zero_legal             ; return IEEE signed zero
-    rr e                        ; save the sign in e[7]
+    add hl,hl                   ; get the exponent and mantissa
+    inc h
+    dec h
+    jp Z,zero                   ; return IEEE signed zero
 
-    ld a,d
-    add c                       ; pw2
-    ld d,a                      ; exponent returned
+    ld de,sp+6
+    ld a,(de)                   ; pw2
+    add h
+    ld h,a                      ; exponent returned
 
-    sla e                       ; restore sign to C
-    rr d
-    rr e
+    jp C,max                    ; exponent is overflowed
+    jp Z,zero                   ; return IEEE underflow zero
 
-    and a                       ; check for zero exponent
-    ret NZ                      ; return IEEE DEHL
-    jp asm_am9511_min           ; otherwise return IEEE underflow zero
+    dec de
+    ld a,(de)                   ; get original sign and exponent
+    rla                         ; capture sign
+    ld a,h
+    rra                         ; new sign and exponent
+    ld d,a
 
-.zero_legal
-    ld e,d                      ; use 0
-    ld h,d
-    ld l,d
-    rr d                        ; restore the sign
-    ret                         ; return IEEE signed ZERO in DEHL
+    ld a,l                      ; new exponent and mantissa
+    rra
+    ld e,a
+
+    pop bc                      ; pop return
+    pop hl                      ; valid mantissa
+    pop af                      ; discard old mantissa and exponent
+    pop af                      ; discard old pw2
+    push bc                     ; replace return
+
+    ret
+
+.zero
+    pop bc                      ; pop return
+    pop hl                      ; valid mantissa
+    pop de                      ; old mantissa and exponent
+    pop af                      ; discard pw2
+    push bc                     ; replace return
+    jp asm_am9511_zero          ; return IEEE signed ZERO in DEHL
+
+.max
+    pop bc                      ; pop return
+    pop hl                      ; valid mantissa
+    pop de                      ; old mantissa and exponent
+    pop af                      ; discard pw2
+    push bc                     ; replace return
+    jp asm_am9511_max           ; return IEEE signed infinity in DEHL

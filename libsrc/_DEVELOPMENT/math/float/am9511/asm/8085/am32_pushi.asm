@@ -1,11 +1,11 @@
 ;
-;  Copyright (c) 2020 Phillip Stevens
+;  Copyright (c) 2022 Phillip Stevens
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, August 2020
+;  feilipu, January 2022
 ;
 ;-------------------------------------------------------------------------
 ;  asm_am9511_pushi - am9511 APU push integer
@@ -15,9 +15,14 @@
 ;
 ;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_am9511
 
-EXTERN __IO_APU_STATUS, __IO_APU_DATA
+IFDEF __CLASSIC
+INCLUDE "../../_DEVELOPMENT/target/am9511/config_am9511_private.inc"
+ELSE
+INCLUDE "target/am9511/config_am9511_private.inc"
+ENDIF
 
 PUBLIC asm_am9511_pushi
 PUBLIC asm_am9511_pushi_fastcall
@@ -32,7 +37,7 @@ PUBLIC asm_am9511_pushi_fastcall
     ;
     ; exit  : stack = integer, ret1
     ; 
-    ; uses  : af, bc', hl'
+    ; uses  : af, bc
 
 ;   in a,(__IO_APU_STATUS)      ; read the APU status register
 ;   rlca                        ; busy? __IO_APU_STATUS_BUSY
@@ -48,7 +53,7 @@ PUBLIC asm_am9511_pushi_fastcall
     ld a,(de)
     out (__IO_APU_DATA),a
 
-    ld de,bc                     ; recover dehl
+    ld de,bc                    ; recover dehl
     ret
 
 
@@ -62,7 +67,7 @@ PUBLIC asm_am9511_pushi_fastcall
     ;
     ; exit  : stack = ret1
     ; 
-    ; uses  : af, bc, hl
+    ; uses  : af, hl
 
 ;   in a,(__IO_APU_STATUS)      ; read the APU status register
 ;   rlca                        ; busy? __IO_APU_STATUS_BUSY

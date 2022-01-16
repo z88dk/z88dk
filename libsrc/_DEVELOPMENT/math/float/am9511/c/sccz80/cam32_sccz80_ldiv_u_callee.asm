@@ -18,7 +18,11 @@ EXTERN asm_am9511_ldiv_callee
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
 .cam32_sccz80_ldiv_u_callee
-    res 7,d                 ; unsigned divisor
+    ld a,d
+    rla
+    or a                    ; unsigned divisor
+    rra
+    ld d,a
     jp asm_am9511_ldiv_callee
                             ; enter stack = sccz80_long left, ret
                             ;        DEHL = sccz80_long right

@@ -1,7 +1,18 @@
+;
+;  Copyright (c) 2022 Phillip Stevens
+;
+;  This Source Code Form is subject to the terms of the Mozilla Public
+;  License, v. 2.0. If a copy of the MPL was not distributed with this
+;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+;
+;  feilipu, January 2022
+;
+;-------------------------------------------------------------------------
+
 SECTION code_clib
 SECTION code_fp_am9511
 
-PUBLIC  asm_am9511_compare, asm_am9511_compare_callee
+PUBLIC  asm_am9511_compare_sccz80
 
 ; Compare two IEEE floats.
 ;
@@ -12,137 +23,138 @@ PUBLIC  asm_am9511_compare, asm_am9511_compare_callee
 ;       - Always flip the sign bit.
 ;       - If the sign bit was set (negative), flip the other bits too.
 ;       http://stereopsis.com/radix.html, et al.
-;
-;
-;       Entry: stack = right, left, ret, ret
-;
-;       Exit:      Z = number is zero
-;               (NZ) = number is non-zero
-;                  C = number is negative 
-;                 NC = number is positive
-;              stack = right, left, ret
-;
-;       Uses: af, bc, de, hl, bc', de', hl'
-.asm_am9511_compare
-    pop af              ;return address from this function
-    pop bc              ;return address to real program
-    pop hl              ;the left (primary) off the stack
-    pop de
-    exx                 ;right
-    pop hl              ;and the right (secondary) off the stack
-    pop de
-    push de
-    push hl
-    exx                 ;left
-    push de
-    push hl
-    push bc
-    push af
-    jr continue
 
-;       Entry: dehl  = right
-;              stack = left, ret, ret
+;       Entry: stack = left, right, ret, ret
 ;
 ;       Exit:      Z = number is zero
 ;               (NZ) = number is non-zero
 ;                  C = number is negative 
 ;                 NC = number is positive
 ;
-;       Uses: af, bc, de, hl, bc', de', hl'
-.asm_am9511_compare_callee
-    exx                 ;left
-    pop af              ;return address from this function
-    pop bc              ;return address to real program
-    pop hl              ;and the left (primary) off the stack
-    pop de
-    push bc
-    push af
+;       Uses: af, bc, de, hl
+.asm_am9511_compare_sccz80
+    ld de,sp+4          ;right
+    ex de,hl
+    ld de,sp+8          ;left
 
-.continue
-    exx                 ;right
-    sla e
-    rl d
-    jr Z,zero_right     ;right is zero (exponent is zero)
+;       We subtract the right from the left.
+;                       l-r -> result
+;                       (hl) right
+;                       (de) left
+
+    push hl             ;(hl) right
+    push de             ;(de) left
+    push de             ;(de) left
+    ld bc,hl            ;(bc) right
+
+    ld de,hl+2          ;(de) right MSW
+    ld hl,(de)          ;right MSW
+    add hl,hl
+    inc h
+    dec h
+    jp Z,zero_right     ;right is zero (exponent is zero)
+
     ccf
-    jr C,positive_right
-    ld a,l
+    jp C,positive_right
+
+    ld a,(bc)
     cpl
-    ld l,a
-    ld a,h
+    ld (bc),a
+    inc bc
+    ld a,(bc)
     cpl
-    ld h,a
-    ld a,e
+    ld (bc),a
+    inc bc
+    ld a,(bc)
     cpl
-    ld e,a
-    ld a,d
+    ld (bc),a
+    inc bc
+    ld a,(bc)
     cpl
-    ld d,a
+    ld (bc),a
+
 .positive_right
-    rr d
-    rr e
 
-    res 0,l             ;remove least significant bit
+    pop hl              ;(hl) left
+    ld bc,hl            ;(bc) left
 
-    exx                 ;left
-    sla e
-    rl d
-    jr Z,zero_left      ;left is zero (exponent is zero)
+    ld de,hl+2          ;(de) left MSW
+    ld hl,(de)          ;left MSW
+    add hl,hl
+    inc h
+    dec h
+    jp Z,zero_left      ;left is zero (exponent is zero)
+
     ccf
-    jr C,positive_left
-    ld a,l
+    jp C,positive_left
+
+    ld a,(bc)
     cpl
-    ld l,a
-    ld a,h
+    ld (bc),a
+    inc bc
+    ld a,(bc)
     cpl
-    ld h,a
-    ld a,e
+    ld (bc),a
+    inc bc
+    ld a,(bc)
     cpl
-    ld e,a
-    ld a,d
+    ld (bc),a
+    inc bc
+    ld a,(bc)
     cpl
-    ld d,a
+    ld (bc),a
+
 .positive_left
-    rr d
-    rr e
 
-    res 0,l             ;remove least significant bit
+    pop bc              ;(bc) left
+    pop hl              ;(hl) right
 
-    ld a,l
+    push de             ;make working variable
+    push de
+    ld de,sp+0          ;(de) pointer to variable
 
-    exx                 ;right
-    sub l
-    ld c,a
+    ld a,(bc)           ;left
+    sub (hl)            ;right
+    ld (de),a           ;result
 
-    exx                 ;left
-    ld a,h
+    inc bc
+    inc de
+    inc hl
 
-    exx                 ;right
-    sbc a,h
-    ld b,a
+    ld a,(bc)           ;left
+    sbc (hl)            ;right + C
+    ld (de),a           ;result
 
-    exx                 ;left
-    ld a,e
+    inc bc
+    inc de
+    inc hl
 
-    exx                 ;right
-    sbc a,e
+    ld a,(bc)           ;left
+    sbc (hl)            ;right + C
+    ld (de),a           ;result
 
-    exx                 ;left
-    ld c,a
-    ld a,d
+    inc bc
+    inc de
+    inc hl
 
-    exx                 ;right
-    sbc a,d
+    ld a,(bc)           ;left
+    sbc (hl)            ;right + C
 
-    ; dehl  = right float, bc   =  low word of result
-    ; dehl' =  left float, a,c' = high word of result
-    jr C,consider_negative
+    jp C,consider_negative
 
 .consider_positive
     ; Calculate whether result is zero (equal)
-    or c
-    or b
-    exx                 ;left
-    or c
+    ex de,hl
+    dec hl
+    or (hl)
+    dec hl
+    or (hl)
+    dec hl
+    or (hl)
+
+    pop bc              ;remove working variable
+    pop bc
+
 .return_positive
     ld hl,1
     scf
@@ -151,31 +163,44 @@ PUBLIC  asm_am9511_compare, asm_am9511_compare_callee
 
 .consider_negative
     ; Calculate whether result is zero (equal)
-    or c
-    or b
-    exx                 ;left
-    or c
+    ex de,hl
+    dec hl
+    or (hl)
+    dec hl
+    or (hl)
+    dec hl
+    or (hl)
+
+    pop bc              ;remove working variable
+    pop bc
+
 .return_negative
     ld hl,1
     scf
     ret
 
 .zero_right
-    ;   right dehl = 0    
-    ;   left dehl' = float
-    exx                 ;left
-    sla e
-    rl d
-    jr NC,return_positive
-    jr Z,return_positive    ;both left and right are zero
-    jr return_negative
+    pop hl              ;(hl) left
+    pop hl              ;(hl) left
+    pop bc              ;(bc) right
+
+    ld de,hl+2          ;(de) left MSW
+    ld hl,(de)          ;left MSW
+    add hl,hl
+    inc h
+    dec h
+
+    jp NC,return_positive
+    jp Z,return_positive    ;both left and right are zero
+    jp return_negative
 
 .zero_left
-    ;   left dehl = 0
-    ;   right dehl' = (cpl if negative)float non-zero
-    exx                 ;right
-    sla e
-    rl d
-    jr NC,return_positive
-    jr return_negative
+    pop bc              ;(bc) left
+    pop hl              ;(hl) right
+
+    ld de,hl+2          ;(de) right MSW
+    ld hl,(de)          ;right MSW
+    add hl,hl
+    jp NC,return_positive
+    jp return_negative
 

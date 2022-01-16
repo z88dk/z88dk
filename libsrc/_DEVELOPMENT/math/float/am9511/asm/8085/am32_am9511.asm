@@ -1,11 +1,11 @@
 ;
-;  Copyright (c) 2020 Phillip Stevens
+;  Copyright (c) 2022 Phillip Stevens
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, July 2020
+;  feilipu, January 2022
 ;
 ;-------------------------------------------------------------------------
 ;  asm_f32_am9511 - z80 format conversion code
@@ -21,6 +21,7 @@
 ;
 ;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_am9511
 
 EXTERN asm_am9511_zero          ; return a legal zero of sign d in dehl
@@ -29,18 +30,24 @@ PUBLIC asm_f32_am9511
 PUBLIC asm_am9511_f32
 
 .asm_f32_am9511
-    sla e                       ; remove leading 1 from mantissa
-    jp NC,asm_am9511_zero       ; if it was zero, then return zero
+    ld a,e
+    rla                         ; check leading 1 from mantissa
+    jp NC,asm_am9511_zero       ; if it was zero, then return ieee zero
 
-    ld a,d                      ; capture exponent
-    rla                         ; adjust twos complement exponent
-    sra a                       ; with sign extention
+    ld a,d                      ; get sign and exponent
+    rla                         ; remove sign
+    rlca                        ; adjust twos complement exponent
+    rra                         ; with sign extention
+    rra
     add 127-1                   ; bias including shift binary point
 
-    rl d                        ; get sign
-    rra                         ; position sign and exponent
-    rr e                        ; resposition exponent and mantissa
-    ld d,a                      ; restore exponent
+    rl de                       ; get sign to carry, remove 1 leading mantissa
+    rra                         ; reposition sign and exponent
+    ld d,a                      ; restore exponent and carry
+    ld a,e
+    rra                         ; resposition exponent and mantissa
+    ld e,a
+
     ret
 
 ;-------------------------------------------------------------------------
@@ -58,38 +65,45 @@ PUBLIC asm_am9511_f32
 ;-------------------------------------------------------------------------
 
 .asm_am9511_f32
-    ld a,d                      ; capture exponent
-    sla e
-    rl a                        ; position exponent in a
-    jr Z,am9511_zero            ; check for zero
+    rl de                       ; get sign to carry, shift exponent to d
+    push af                     ; save sign in carry
+
+    ld a,d                      ; get exponent
+    or a                        ; check for zero
+    jr Z,am9511_zero
     cp 127+63                   ; check for overflow
     jr NC,am9511_max
     cp 127-64                   ; check for underflow
     jr C,am9511_zero
     sub 127-1                   ; bias including shift binary point
+    rla                         ; position exponent for sign
+    ld d,a
 
-    rla                         ; position sign
-    rl d                        ; get sign
-    rra
-    ld d,a                      ; restore exponent
+    pop af                      ; recover sign
 
+    ld a,d
+    rra                         ; position sign and exponent
+    ld d,a                      ; restore sign and exponent
+
+    ld a,e
     scf                         ; set mantissa leading 1
-    rr e                        ; restore mantissa
+    rra                         ; restore 1 & mantissa
+    ld e,a
     ret
 
 .am9511_zero
+    pop af                      ; recover sign
     ld de,0                     ; no signed zero available
-    ld h,d
-    ld l,e
+    ld hl,de
     ret
 
 .am9511_max                     ; floating max value of sign d in dehl
-    ld a,d
-    and 080h                    ; isolate sign
-    or 03fh                     ; max exponent
+    pop af                      ; recover sign
+    ld a,07eh                   ; max exponent << 1
+    rra                         ; relocate sign and exponent
     ld d,a
 
-    ld e, 0ffh                  ; max mantissa
+    ld e, 0ffh                  ; max exponent and mantissa
     ld h,e
     ld l,e
     ret

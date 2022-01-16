@@ -9,6 +9,7 @@ math/float/am9511/asm/am32_exp
 math/float/am9511/asm/am32_fabs
 math/float/am9511/asm/am32_fadd
 math/float/am9511/asm/am32_fdiv
+math/float/am9511/asm/am32_finv
 math/float/am9511/asm/am32_floor
 math/float/am9511/asm/am32_fmul
 math/float/am9511/asm/am32_fsub

@@ -74,11 +74,14 @@ PUBLIC asm_am9511_pushf_fastcall
     ret
 
 .asm_am9511_max
-    dec hl
-    bit 7,(hl)                  ; set mantissa MSB
-    outi                        ; load mantissa MSB into APU
+    in a,(c)
+    in a,(c)
+    ld a,0ffh                    ; confirm we have maximum
+    out (c),a                    ; load mantissa into APU
+    out (c),a
+    out (c),a
 
-    ld a,0FEh                   ; position exponent for sign
+    ld a,0feh                   ; position exponent for sign
     rl (hl)                     ; get sign
     rra
     out (c),a                   ; load maximum exponent into APU

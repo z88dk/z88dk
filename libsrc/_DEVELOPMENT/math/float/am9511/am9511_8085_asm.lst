@@ -16,7 +16,6 @@ math/float/am9511/asm/8085/am32_pushf
 math/float/am9511/asm/8085/am32_pushi
 math/float/am9511/asm/8085/am32_pushl
 math/float/am9511/asm/8085/am32_read
-math/float/am9511/asm/8085/am32_read_callee
 math/float/am9511/asm/8085/am32_switch_arg
 
 @math/float/am9511/am9511_c_asm.lst

@@ -11,6 +11,51 @@
 ;
 ; Exit:  dehl = adjusted float
 
+IFDEF __CPU_8085__
+
+.l_f32_ldexp
+        push af                     ; save power
+
+        rl de                       ; get the exponent
+
+        inc d
+        dec d
+        jp Z,zero_legal
+
+        ld a,e
+        rra                         ; capture sign
+        ld e,a
+
+        pop af                      ; restore power
+        add d
+        ld d,a
+
+        ld a,e
+        rla                         ; recover sign
+        ld e,a
+
+        ld a,d
+        rra                         ; new sign and exponent
+        ld d,a
+        ld a,e                      ; new exponent and mantissa
+        rra
+        ld e,a
+
+        ret
+
+
+.zero_legal
+        ld e,d                      ; use 0
+        ld hl,de
+
+        ld a,d
+        rra                         ; return sign and exponent
+        ld d,a
+
+        ret                         ; return IEEE signed ZERO in DEHL
+
+ELSE
+
 .l_f32_ldexp
         sla e                       ; get the exponent
         rl d
@@ -35,7 +80,9 @@
 
 .zero_legal
         ld e,d                      ; use 0
-        ld h,d
-        ld l,d
-        rr d                        ; restore the sign
+        ld hl,de
+
+        rr d                        ; restore the sign and exponent
         ret                         ; return IEEE signed ZERO in DEHL
+
+ENDIF

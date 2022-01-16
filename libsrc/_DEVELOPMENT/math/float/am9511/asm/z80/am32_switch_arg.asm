@@ -16,10 +16,10 @@ PUBLIC asm_switch_arg
     ;
     ; Uses a, bc, de, hl
 
-    ld hl,8         ;Left
+    ld hl,8         ; left
     add hl,sp
     ex de,hl
-    ld hl,4         ;Right
+    ld hl,4         ; right
     add hl,sp
     ld b,4
 .loop

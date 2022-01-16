@@ -1,11 +1,11 @@
 ;
-;  Copyright (c) 2020 Phillip Stevens
+;  Copyright (c) 2022 Phillip Stevens
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, August 2020
+;  feilipu, January 2022
 ;
 ;-------------------------------------------------------------------------
 ;  asm_am9511_pushf - am9511 APU push float
@@ -15,9 +15,14 @@
 ;
 ;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_am9511
 
-EXTERN __IO_APU_STATUS, __IO_APU_DATA
+IFDEF __CLASSIC
+INCLUDE "../../_DEVELOPMENT/target/am9511/config_am9511_private.inc"
+ELSE
+INCLUDE "target/am9511/config_am9511_private.inc"
+ENDIF
 
 PUBLIC asm_am9511_pushf
 PUBLIC asm_am9511_pushf_fastcall
@@ -34,15 +39,16 @@ PUBLIC asm_am9511_pushf_fastcall
     ;
     ; exit  : stack = IEEE_float, ret1
     ; 
-    ; uses  : af, bc', hl'
+    ; uses  : af, bc
 
 ;   in a,(__IO_APU_STATUS)      ; read the APU status register
 ;   rlca                        ; busy? and __IO_APU_STATUS_BUSY
 ;   jp C,asm_am9511_pushf
 
-    ld bc,de                    ; preserve dehl
+    push de                     ; preserve dehl
+    ld bc,hl
 
-    ld de,sp+4
+    ld de,sp+6
 
     ld a,(de)                   ; load LSW into APU
     out (__IO_APU_DATA),a
@@ -52,42 +58,55 @@ PUBLIC asm_am9511_pushf_fastcall
     out (__IO_APU_DATA),a
 
     inc de
+    ld hl,(de)                  ; get exponent and mantissa MSB
 
-    ld a,(de)                   ; get mantissa MSB
-    rla                         ; get exponent least significant bit to carry
-    inc de
-    ld a,(de)                   ; get exponent to a
-    rl a                        ; get all exponent to a, set flags
+    add hl,hl                   ; shift exponent to h
+
+    ld a,h                      ; get exponent to a
+    or a                        ; set exponent flags
     jr Z,asm_am9511_zero        ; check for zero
     cp 127+63                   ; check for overflow
     jr NC,asm_am9511_max
     cp 127-64                   ; check for underflow
     jr C,asm_am9511_zero
     sub 127-1                   ; bias including shift binary point
-
-    dec hl
-    set 7,(hl)                  ; set mantissa MSB
-    outi                        ; load mantissa MSB into APU
-
     rla                         ; position exponent for sign
-    rl (hl)                     ; get sign
-    rra
-    out (c),a                   ; load exponent into APU
+    ld h,a
 
-    ld de,bc                     ; recover dehl
+    ld a,l                      ; get mantissa to a
+    scf                         ; set mantissa MSB to 1
+    rra
+    out (__IO_APU_DATA),a       ; load mantissa MSB into APU
+
+    inc de
+    ld a,(de)                   ; get sign
+    rla
+
+    ld a,h
+    rra
+    out (__IO_APU_DATA),a       ; load exponent into APU
+
+    ld hl,bc
+    pop de                      ; recover dehl
     ret
 
 .asm_am9511_max
-    dec hl
-    bit 7,(hl)                  ; set mantissa MSB
-    outi                        ; load mantissa MSB into APU
+    in a,(__IO_APU_DATA)
+    in a,(__IO_APU_DATA)
+    ld a,0ffh                   ; confirm we have maximum
+    out (__IO_APU_DATA),a       ; load mantissa into APU
+    out (__IO_APU_DATA),a
+    out (__IO_APU_DATA),a
 
-    ld a,0FEh                   ; position exponent for sign
-    rl (hl)                     ; get sign
+    inc de
+    ld a,(de)                   ; get sign
+    rla
+    ld a,07eh                   ; max exponent << 1
     rra
-    out (c),a                   ; load maximum exponent into APU
+    out (__IO_APU_DATA),a       ; load maximum exponent into APU
 
-    ld de,bc                     ; recover dehl
+    ld hl,bc
+    pop de                      ; recover dehl
     ret
 
 .asm_am9511_zero
@@ -99,7 +118,8 @@ PUBLIC asm_am9511_pushf_fastcall
     out (__IO_APU_DATA),a
     out (__IO_APU_DATA),a       ; load zero exponent into APU
 
-    ld de,bc                     ; recover dehl
+    ld hl,bc
+    pop de                      ; recover dehl
     ret
 
 
@@ -115,25 +135,32 @@ PUBLIC asm_am9511_pushf_fastcall
     ;
     ; exit  : stack = ret1
     ; 
-    ; uses  : af, bc, hl
+    ; uses  : af, de, hl
 
-    ld a,d                      ; capture exponent
-    sla e                       ; position exponent in a
-    rl a                        ; check for zero
+    rl de                       ; get sign to carry, move exponent to d
+    push af                     ; save sign in carry
+
+    ld a,d                      ; get exponent
+    or a                        ; check for zero
     jr Z,asm_am9511_zero_fastcall
     cp 127+63                   ; check for overflow
     jr NC,asm_am9511_max_fastcall
     cp 127-64                   ; check for underflow
     jr C,asm_am9511_zero_fastcall
     sub 127-1                   ; bias including shift binary point
-
     rla                         ; position exponent for sign
-    rl d                        ; get sign
-    rra
-    ld d,a                      ; restore exponent
+    ld d,a
 
+    pop af                      ; recover sign
+
+    ld a,d
+    rra                         ; position sign and exponent
+    ld d,a                      ; restore sign and exponent
+
+    ld a,e
     scf                         ; set mantissa leading 1
-    rr e                        ; restore mantissa
+    rra                         ; restore 1 & mantissa
+    ld e,a
 
 .pushf_fastcall
 ;   in a,(__IO_APU_STATUS)      ; read the APU status register
@@ -151,15 +178,16 @@ PUBLIC asm_am9511_pushf_fastcall
     out (__IO_APU_DATA),a
 
 .asm_am9511_zero_fastcall
+    pop af                      ; recover sign
     ld de,0                     ; no signed zero available
     ld h,d
     ld l,e
     jr pushf_fastcall
 
 .asm_am9511_max_fastcall        ; floating max value of sign d in dehl
-    ld a,d
-    and 080h                    ; isolate sign
-    or 03fh                     ; max exponent
+    pop af                      ; recover sign
+    ld a,07eh                   ; max exponent << 1
+    rra                         ; relocate sign and exponent
     ld d,a
 
     ld e, 0ffh                  ; max mantissa

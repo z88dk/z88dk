@@ -6,7 +6,7 @@ SECTION code_fp_am9511
 
 PUBLIC cam32_sccz80_fmin_callee
 
-EXTERN  asm_am9511_compare
+EXTERN  asm_am9511_compare_sccz80
 
     ; minimum of two sccz80 floats
     ;
@@ -17,21 +17,21 @@ EXTERN  asm_am9511_compare
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
 .cam32_sccz80_fmin_callee 
-    call asm_am9511_compare ; compare two floats on the stack
-    jr NC,left
-    pop af                  ; ret
+    call asm_am9511_compare_sccz80  ; compare two floats on the stack
+    jp C,left
+    pop bc                  ; ret
     pop hl                  ; pop right
     pop de
-    pop bc                  ; pop left
-    pop bc
-    push af
+    pop af                  ; pop left
+    pop af
+    push bc
     ret                     ; return DEHL = sccz80_float min
 
 .left
-    pop af                  ; ret
-    pop bc                  ; pop right
-    pop bc
+    pop bc                  ; ret
+    pop af                  ; pop right
+    pop af
     pop hl                  ; pop left
     pop de
-    push af
+    push bc
     ret                     ; return DEHL = sccz80_float min

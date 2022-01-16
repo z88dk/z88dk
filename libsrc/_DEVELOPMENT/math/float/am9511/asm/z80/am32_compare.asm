@@ -2,6 +2,7 @@ SECTION code_clib
 SECTION code_fp_am9511
 
 PUBLIC  asm_am9511_compare, asm_am9511_compare_callee
+PUBLIC  asm_am9511_compare_sccz80
 
 ; Compare two IEEE floats.
 ;
@@ -38,7 +39,8 @@ PUBLIC  asm_am9511_compare, asm_am9511_compare_callee
     push hl
     push bc
     push af
-    jr continue
+    exx                 ;right
+    jp continue
 
 ;       Entry: dehl  = right
 ;              stack = left, ret, ret
@@ -57,9 +59,36 @@ PUBLIC  asm_am9511_compare, asm_am9511_compare_callee
     pop de
     push bc
     push af
+    exx                 ;right
+    jp continue
+
+;       Entry: stack = left, right, ret, ret
+;
+;       Exit:      Z = number is zero
+;               (NZ) = number is non-zero
+;                  C = number is negative 
+;                 NC = number is positive
+;              stack = left, right, ret
+;
+;       Uses: af, bc, de, hl, bc', de', hl'
+.asm_am9511_compare_sccz80
+    pop af              ;return address from this function
+    pop bc              ;return address to real program
+    pop hl              ;the right (secondary) off the stack
+    pop de
+    exx                 ;left
+    pop hl              ;and the left (primary) off the stack
+    pop de
+    push de
+    push hl
+    exx                 ;right
+    push de
+    push hl
+    push bc
+    push af
+
 
 .continue
-    exx                 ;right
     sla e
     rl d
     jr Z,zero_right     ;right is zero (exponent is zero)
@@ -161,7 +190,7 @@ PUBLIC  asm_am9511_compare, asm_am9511_compare_callee
     ret
 
 .zero_right
-    ;   right dehl = 0    
+    ;   right dehl = 0
     ;   left dehl' = float
     exx                 ;left
     sla e

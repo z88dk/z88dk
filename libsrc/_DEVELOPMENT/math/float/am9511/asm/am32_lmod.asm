@@ -14,11 +14,11 @@
 SECTION code_clib
 SECTION code_fp_am9511
 
-EXTERN __IO_APU_CONTROL
-EXTERN __IO_APU_OP_DDIV
-EXTERN __IO_APU_OP_DMUL
-EXTERN __IO_APU_OP_DSUB
-EXTERN __IO_APU_OP_PTOD
+IFDEF __CLASSIC
+INCLUDE "../../_DEVELOPMENT/target/am9511/config_am9511_private.inc"
+ELSE
+INCLUDE "target/am9511/config_am9511_private.inc"
+ENDIF
 
 EXTERN asm_am9511_pushl
 EXTERN asm_am9511_pushl_fastcall

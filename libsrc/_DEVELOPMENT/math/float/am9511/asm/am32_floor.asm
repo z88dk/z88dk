@@ -11,8 +11,11 @@
 
 SECTION code_fp_am9511
 
-EXTERN __IO_APU_CONTROL
-EXTERN __IO_APU_OP_FSUB
+IFDEF __CLASSIC
+INCLUDE "../../_DEVELOPMENT/target/am9511/config_am9511_private.inc"
+ELSE
+INCLUDE "target/am9511/config_am9511_private.inc"
+ENDIF
 
 EXTERN asm_am9511_discardfraction
 

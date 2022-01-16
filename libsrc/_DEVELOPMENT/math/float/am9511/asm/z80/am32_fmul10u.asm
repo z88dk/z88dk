@@ -20,7 +20,7 @@ PUBLIC asm_am9511_fmul10u_fastcall
     sla e                       ; get exponent into d
     rl d
     jr Z,zero_legal             ; return IEEE zero
-    
+
     scf                         ; set hidden bit
     rr e                        ; return mantissa to ehl
 
@@ -47,7 +47,7 @@ PUBLIC asm_am9511_fmul10u_fastcall
 
     ld a,3                      ; exponent increase
     jr NC,no_carry
-    
+
     rr e                        ; shift if a carry
     rr h
     rr l
@@ -65,17 +65,20 @@ PUBLIC asm_am9511_fmul10u_fastcall
 
 .zero_legal
     ld e,d                      ; use 0
-    ld h,d
-    ld l,d        
-    rr d                        ; restore the sign
+    ld hl,de
+
+    ld a,d
+    rra                         ; restore the sign and exponent
+    ld d,a
+
     ret                         ; return IEEE signed ZERO in DEHL
 
 .infinity
     ld de,0
-    ld h,d
-    ld l,d
+    ld hl,de
+
     dec d                       ; 0xff
-    rr d                        ; restore the sign
+    rr d                        ; restore the sign and exponent
     rr e
     scf
     ret                         ; return IEEE signed INFINITY in DEHL

@@ -12,8 +12,7 @@ OBJECTS = $(CFILES:.c=.o)
 
 CFLAGS += -fp-mode=ieee  -DMUST_ROUND
 
-all: dirs $(OUTPUT_DIRECTORY)/am9511.lib $(OUTPUT_DIRECTORY)/am9511_ixiy.lib
-# $(OUTPUT_DIRECTORY)/am9511_8085.lib
+all: dirs $(OUTPUT_DIRECTORY)/am9511.lib $(OUTPUT_DIRECTORY)/am9511_ixiy.lib $(OUTPUT_DIRECTORY)/am9511_8085.lib
 
 $(OUTPUT_DIRECTORY)/am9511.lib: $(addprefix obj/z80/, $(OBJECTS))
 	$(Q)$(ASSEMBLER) -d -I$(Z88DK_LIB) -O=obj/z80/x/x  -I.. -mz80 -D__CLASSIC @newlibfiles_z80.lst

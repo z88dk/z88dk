@@ -30,7 +30,7 @@ PUBLIC asm_am9511_f32
 
 .asm_f32_am9511
     sla e                       ; remove leading 1 from mantissa
-    jp NC,asm_am9511_zero       ; if it was zero, then return zero
+    jp NC,asm_am9511_zero       ; if it was zero, then return ieee zero
 
     ld a,d                      ; capture exponent
     rla                         ; adjust twos complement exponent
@@ -79,8 +79,7 @@ PUBLIC asm_am9511_f32
 
 .am9511_zero
     ld de,0                     ; no signed zero available
-    ld h,d
-    ld l,e
+    ld hl,de
     ret
 
 .am9511_max                     ; floating max value of sign d in dehl

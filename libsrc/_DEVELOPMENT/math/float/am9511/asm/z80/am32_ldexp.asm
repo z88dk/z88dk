@@ -84,6 +84,7 @@ PUBLIC asm_am9511_ldexp_callee
     sla e                       ; get the exponent
     rl d
     jr Z,zero_legal             ; return IEEE signed zero
+
     rr e                        ; save the sign in e[7]
 
     ld a,d
@@ -96,6 +97,7 @@ PUBLIC asm_am9511_ldexp_callee
 
     and a                       ; check for zero exponent
     ret NZ                      ; return IEEE DEHL
+
     jp asm_am9511_min           ; otherwise return IEEE underflow zero
 
 .zero_legal

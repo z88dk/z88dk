@@ -1,11 +1,11 @@
 ;
-;  Copyright (c) 2020 Phillip Stevens
+;  Copyright (c) 2022 Phillip Stevens
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, August 2020
+;  feilipu, January 2022
 ;
 ;-------------------------------------------------------------------------
 ; asm_am9511_frexp - z80, z180, z80n fraction and exponent
@@ -45,31 +45,48 @@ PUBLIC asm_am9511_frexp_callee
     ;
     ; uses  : af, bc, de, hl
 
-    pop af                      ; return
-    pop hl                      ; (float)x in dehl
-    pop de
-    pop bc                      ; (int8_t*)pw2
-    push af                     ; return on stack
 
-    sla e                       ; get the exponent
-    rl d
-    rr e                        ; save the sign in e[7]
+    ld de,sp+4                  ; point to mantissa and exponent
+    ld hl,(de)
 
-    ld a,d
-    ld d,0
-    and a
-    jr Z,zero
-    ld d,$7e                    ; remove exponent excess (bias-1)
-    sub d                       ; mantissa between 0.5 and 1
+    add hl,hl                   ; get the exponent and mantissa
+
+    ld a,h
+    or a
+    jp Z,zero
+
+    ld h,$7e                    ; remove exponent excess (bias-1)
+    sub h                       ; mantissa between 0.5 and 1
 
 .zero
+    ld de,sp+6                  ; point to (int8_t*)pw2
+    ex de,hl
+    ld c,(hl)                   ; get pw2
+    inc hl
+    ld b,(hl)
+    ex de,hl
+
     ld (bc),a                   ; and store in pw2
     inc bc
     rlca
-    sbc  a
-    ld  (bc),a
+    sbc a
+    ld (bc),a
 
-    rl e                        ; get sign back
-    rr d
-    rr e
+    ld de,sp+4                  ; point to mantissa and exponent
+    ld a,(de)                   ; get original sign and exponent
+    rla                         ; capture sign
+    ld a,h
+    rra                         ; new sign and exponent
+    ld d,a
+
+    ld a,l                      ; new exponent and mantissa
+    rra
+    ld e,a
+
+    pop bc                      ; pop return
+    pop hl                      ; valid mantissa
+    pop af                      ; discard old mantissa and exponent
+    pop af                      ; discard (int8_t*)pw2
+    push bc                     ; replace return
+
     ret                         ; return IEEE DEHL fraction

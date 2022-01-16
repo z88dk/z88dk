@@ -56,9 +56,9 @@ PUBLIC asm_am9511_frexp_callee
     rr e                        ; save the sign in e[7]
 
     ld a,d
-    ld d,0
-    and a
+    or a
     jr Z,zero
+
     ld d,$7e                    ; remove exponent excess (bias-1)
     sub d                       ; mantissa between 0.5 and 1
 
@@ -66,8 +66,8 @@ PUBLIC asm_am9511_frexp_callee
     ld (bc),a                   ; and store in pw2
     inc bc
     rlca
-    sbc  a
-    ld  (bc),a
+    sbc a
+    ld (bc),a
 
     rl e                        ; get sign back
     rr d

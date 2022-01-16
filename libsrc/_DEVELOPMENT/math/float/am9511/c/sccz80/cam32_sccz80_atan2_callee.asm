@@ -1,22 +1,14 @@
 
+SECTION code_clib
 SECTION code_fp_am9511
+
 PUBLIC cam32_sccz80_atan2_callee
 
-EXTERN _am9511_atan2f
+EXTERN _am9511_atan2f, asm_switch_arg
 
 
 .cam32_sccz80_atan2_callee
-    pop hl      ; return
-    pop bc      ; RHS
-    pop de
-    pop af      ; LHS
-    ex (sp),hl  ; return to stack
-
-    push de     ; RHS
-    push bc    
-    push hl     ; LHS
-    push af
-
+    call asm_switch_arg
     call _am9511_atan2f
     pop af
     pop af

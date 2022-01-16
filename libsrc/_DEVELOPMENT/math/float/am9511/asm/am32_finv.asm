@@ -1,14 +1,14 @@
 ;
-;  Copyright (c) 2020 Phillip Stevens
+;  Copyright (c) 2022 Phillip Stevens
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, August 2020
+;  feilipu, January 2022
 ;
 ;-------------------------------------------------------------------------
-; asm_am9511_fdiv - am9511 floating point divide
+; asm_am9511_finv - am9511 floating point inverse
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
@@ -24,32 +24,40 @@ EXTERN asm_am9511_pushf
 EXTERN asm_am9511_pushf_fastcall
 EXTERN asm_am9511_popf
 
-PUBLIC asm_am9511_fdiv, asm_am9511_fdiv_callee
+PUBLIC asm_am9511_finv, asm_am9511_finv_fastcall
 
 
-; enter here for floating divide, x/y, x on stack, y in dehl, result in dehl
-.asm_am9511_fdiv
+; enter here for floating inverse, 1/x, x on stack, result in dehl
+.asm_am9511_finv
     call asm_am9511_pushf           ; x
 
-    call asm_am9511_pushf_fastcall  ; y
+    ld de,03f80h
+    ld hl,0
+
+    call asm_am9511_pushf_fastcall  ; 1
+
+    ld a,__IO_APU_OP_XCHF
+    out (__IO_APU_CONTROL),a        ; swap
 
     ld a,__IO_APU_OP_FDIV
-    out (__IO_APU_CONTROL),a        ; x / y
+    out (__IO_APU_CONTROL),a        ; 1 / x
 
     jp asm_am9511_popf
 
 
-; enter here for floating divide callee, x/y, x on stack, y in dehl
-.asm_am9511_fdiv_callee
-    call asm_am9511_pushf           ; x
+; enter here for floating inverse fastcall, 1/x, x in dehl, result in dehl
+.asm_am9511_finv_fastcall
+    call asm_am9511_pushf_fastcall  ; x
 
-    call asm_am9511_pushf_fastcall  ; y
+    ld de,03f80h
+    ld hl,0h
+
+    call asm_am9511_pushf_fastcall  ; 1
+
+    ld a,__IO_APU_OP_XCHF
+    out (__IO_APU_CONTROL),a        ; swap
 
     ld a,__IO_APU_OP_FDIV
-    out (__IO_APU_CONTROL),a        ; x / y
-
-    pop hl                          ; ret
-    pop de
-    ex (sp),hl                      ; ret back on stack
+    out (__IO_APU_CONTROL),a        ; 1 / x
 
     jp asm_am9511_popf

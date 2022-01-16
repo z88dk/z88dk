@@ -20,35 +20,35 @@ PUBLIC asm_am9511_discardfraction
     rl d
     jr Z,zero_legal             ; return IEEE signed zero
 
-    ld a,d                      ; Exponent
-    rr d                        ; Keep sign and exponent safe
+    ld a,d                      ; exponent
+    rr d                        ; keep sign and exponent safe
     rr e
-    sub $7f                     ; Exponent value of 127 is 1.xx
+    sub $7f                     ; exponent value of 127 is 1.xx
     jr C,return_zero
 
     inc a
     cp 24
-    ret NC                      ; No shift needed, all integer
+    ret NC                      ; no shift needed, all integer
 
-                                ; Build mask of integer bits
+                                ; build mask of integer bits
                                 ; a = number of bits to keep
     exx
     ld hl,0
     ld e,h
 
 .shift_right                    ; shift mantissa mask right
-    scf
+    scf                         ; setting 1s as we go
     rr e
     rr h
     rr l
     dec a
     jr NZ,shift_right
 
-    ld  a,e                     ; mask out fractional bits
+    ld a,e                      ; mask out fractional bits
     exx
     and e
-    ld  e,a
-    ld  a,h
+    ld e,a
+    ld a,h
     exx
     and h
     exx
@@ -62,7 +62,7 @@ PUBLIC asm_am9511_discardfraction
 
 
 .return_zero
-    rl d                        ; Get the sign bit
+    rl d                        ; get the sign bit
     ld d,0
 
 .zero_legal

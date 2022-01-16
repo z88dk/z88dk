@@ -154,6 +154,7 @@
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_f2long.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_ge.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_gt.asm
+../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_invf.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_ldexp.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_le.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_lt.asm
@@ -208,6 +209,7 @@
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_fabs.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_fadd.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_fdiv.asm
+../../_DEVELOPMENT/math/float/am9511/asm/am32_finv.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_floor.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_fmul.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_fsub.asm

@@ -75,6 +75,7 @@
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_f2long.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_ge.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_gt.asm
+../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_invf.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_ldexp.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_le.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/l_f32_lt.asm
@@ -100,7 +101,6 @@
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/mul2_fastcall.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/mul10u.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/mul10u_fastcall.asm
-../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/mlib2d.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/pow.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/pow_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/lam32/c/sccz80/round.asm
@@ -129,6 +129,7 @@
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_fabs.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_fadd.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_fdiv.asm
+../../_DEVELOPMENT/math/float/am9511/asm/am32_finv.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_floor.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_fmul.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_fsub.asm
@@ -167,7 +168,6 @@
 ../../_DEVELOPMENT/math/float/am9511/asm/8085/am32_pushi.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/8085/am32_pushl.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/8085/am32_read.asm
-../../_DEVELOPMENT/math/float/am9511/asm/8085/am32_read_callee.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/8085/am32_switch_arg.asm
 
 ../../_DEVELOPMENT/math/float/am9511/c/8085/am9511_acosh.asm
@@ -183,6 +183,10 @@
 ../../_DEVELOPMENT/math/float/am9511/c/8085/am9511_round.asm
 ../../_DEVELOPMENT/math/float/am9511/c/8085/am9511_sinh.asm
 ../../_DEVELOPMENT/math/float/am9511/c/8085/am9511_tanh.asm
+
+../../_DEVELOPMENT/math/float/am9511/c/sdcc/cam32_sdcc_fabs.asm
+../../_DEVELOPMENT/math/float/am9511/c/sdcc/cam32_sdcc_floor.asm
+../../_DEVELOPMENT/math/float/am9511/c/sdcc/cam32_sdcc_sqrt.asm
 
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_acos.asm
 ../../_DEVELOPMENT/math/float/am9511/c/sccz80/cam32_sccz80_acosh.asm

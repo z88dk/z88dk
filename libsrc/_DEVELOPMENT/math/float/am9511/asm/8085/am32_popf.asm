@@ -1,11 +1,11 @@
 ;
-;  Copyright (c) 2020 Phillip Stevens
+;  Copyright (c) 2022 Phillip Stevens
 ;
 ;  This Source Code Form is subject to the terms of the Mozilla Public
 ;  License, v. 2.0. If a copy of the MPL was not distributed with this
 ;  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ;
-;  feilipu, August 2020
+;  feilipu, January 2022
 ;
 ;-------------------------------------------------------------------------
 ;  asm_am9511_popf - am9511 APU pop float
@@ -15,12 +15,16 @@
 ;
 ;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_am9511
 
-EXTERN __IO_APU_STATUS, __IO_APU_DATA
+IFDEF __CLASSIC
+INCLUDE "../../_DEVELOPMENT/target/am9511/config_am9511_private.inc"
+ELSE
+INCLUDE "target/am9511/config_am9511_private.inc"
+ENDIF
 
 PUBLIC asm_am9511_popf
-
 
 .am9511_popf_wait
     ex (sp),hl
@@ -53,49 +57,57 @@ PUBLIC asm_am9511_popf
     in a,(__IO_APU_DATA)
     ld l,a
 
-    and 07ch                    ; errors from status register
+    in a,(__IO_APU_STATUS)      ; read the APU status register
+    and 03eh                    ; errors from status register
     jr NZ,errors
 
-    sla e                       ; remove leading 1 from mantissa
-
-    ld a,d                      ; capture exponent
-    rla                         ; adjust twos complement exponent
-    sra a                       ; with sign extention
+    ld a,d                      ; get sign and exponent
+    rla                         ; remove sign
+    rlca                        ; adjust twos complement exponent
+    rra                         ; with sign extention
+    rra
     add 127-1                   ; bias including shift binary point
 
-    rl d                        ; get sign
-    rra                         ; position sign and exponent
-    rr e                        ; resposition exponent and mantissa
-    ld d,a                      ; restore exponent
+    rl de                       ; get sign to carry, remove 1 leading mantissa
+    rra                         ; reposition sign and exponent
+    ld d,a                      ; restore exponent and carry
+    ld a,e
+    rra                         ; resposition exponent and mantissa
+    ld e,a
+
     ret
 
 .errors
-    rrca                        ; relocate status bits (just for convenience)
-    bit 5,a                     ; zero
-    jr NZ,zero
-    bit 1,a
-    jr NZ,infinity              ; overflow
-    bit 2,a
-    jr NZ,zero                  ; underflow
-
-.nan
-    rl d                        ; get sign
-    ld de,0feffh
-    rr d                        ; nan exponent
-    ld h,e                      ; nan mantissa
-    ld l,e
-    ret
-
-.infinity
-    rl d                        ; get sign
-    ld de,0fe80h
-    rr d                        ; nan exponent
-    ld hl,0                     ; nan mantissa
-    ret
+    rrca                        ; relocate status bits
+    rrca
+    jp C,infinity               ; overflow
+    rrca
+    rrca
+    jp C,nan                    ; negative sqr or log
+    rrca
+    jp C,nan                    ; division by zero
 
 .zero
     ld de,0
-    ld h,d
-    ld l,e
+    ld hl,de
     ret
+
+.nan
+    ld a,d                      ; get sign
+    or 07fh
+    ld d,a                      ; nan exponent
+
+    ld hl,0ffffh                ; nan mantissa
+    ld e,h
+    ret
+
+.infinity
+    ld a,d                      ; get sign
+    or 07fh
+    ld d,a                      ; nan exponent
+
+    ld hl,0                     ; nan mantissa
+    ld e,080h
+    ret
+
 
