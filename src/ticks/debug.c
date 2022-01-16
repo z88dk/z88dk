@@ -940,6 +940,7 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
     debug_frame_pointer* first = NULL;
     debug_frame_pointer* last = NULL;
 
+    uint8_t unreliable_offset = 0;
     uint8_t entry_num = 0;
     uint16_t stack = sp;
     uint16_t at = pc;
@@ -948,8 +949,36 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
         entry_num++;
         uint16_t offset;
         symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
+        if (entry_num == 1 && frame_pointer && (sym == NULL || sym->file == NULL)) {
+            // we have no idea where we are but, but somebody called us, and it's return address
+            // should be right before frame pointer
+            uint16_t caller = wrap_reg(bk.get_memory(frame_pointer - 1), bk.get_memory(frame_pointer - 2));
+            sym = symbol_find_lower(caller, SYM_ADDRESS, &offset);
+            if (sym != NULL && sym->file != NULL) {
+                // report <system call>
+                debug_frame_pointer* system_call = malloc(sizeof(debug_frame_pointer));
+                system_call->next = NULL;
+                system_call->frame_pointer = 0xFFFFFFFF;
+                system_call->symbol = NULL;
+                system_call->offset = 0;
+                system_call->address = at;
+                system_call->return_address = caller;
+                system_call->function = NULL;
+                system_call->filename = "<system call>";
+                system_call->lineno = 0;
 
-        if (sym == NULL || sym->file == NULL) {
+                // because the original PC is unreliable, but we're restoring from frame_pointer
+                // we cannot assume the offset is reliable, so let's report is as beginning of system caller
+                unreliable_offset = 1;
+                at = caller - offset;
+                stack = frame_pointer;
+
+                first = system_call;
+                last = system_call;
+
+                // keep the loop going from the probable caller
+                continue;
+            }
             break;
         }
 
@@ -1001,6 +1030,11 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
                 continue;
             }
             break;
+        }
+
+        if (unreliable_offset) {
+            unreliable_offset = 0;
+            offset = 0xFFFF;
         }
 
         debug_frame_pointer* new_frame = malloc(sizeof(debug_frame_pointer));
