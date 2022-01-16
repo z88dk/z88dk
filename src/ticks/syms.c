@@ -47,7 +47,7 @@ static int symbol_compare(const void *p1, const void *p2)
 
 void read_symbol_file(char *filename)
 {
-    char  buf[256];
+    char  buf[512];
     FILE *fp = fopen(filename,"r");
 
     if ( fp != NULL ) {

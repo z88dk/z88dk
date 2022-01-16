@@ -19,6 +19,7 @@
 #include "syms.h"
 #include "linenoise.h"
 #include "srcfile.h"
+#include "exp_engine.h"
 
 
 #define HISTORY_FILE ".ticks_history.txt"
@@ -167,6 +168,20 @@ static command commands[] = {
     { NULL, NULL, NULL }
 };
 
+static void print_breakpoints();
+static void info_section_locals();
+static void info_section_globals();
+
+static struct {
+    const char* name;
+    const char* help;
+    void (*cb)();
+} cmd_info_sections[] = {
+    {"breakpoints",     "show breakpoints",                     print_breakpoints},
+    {"locals",          "show local variables",                 info_section_locals},
+    {"variables",       "show static/global variables",         info_section_globals},
+    {NULL, NULL}
+};
 
 breakpoint *breakpoints;
 breakpoint *watchpoints;
@@ -357,11 +372,17 @@ void debugger()
                                 printf("Warning: unknown callee return type, DEHL returned %08x.\n", return_value);
                             } else {
                                 if (ttt->type_ != TYPE_VOID) {
-                                    char resolved_result[128];
-                                    debug_print_element(ttt, temp_br->callee->type_record.signed_,
-                                        RESOLVE_BY_VALUE, return_value, resolved_result, 128);
-                                    printf("function %s returned: %s\n", temp_br->callee->function_name,
-                                        resolved_result);
+                                    struct expression_result_t result = {};
+                                    debug_resolve_expression_element(&temp_br->callee->type_record, ttt,
+                                        RESOLVE_BY_VALUE, return_value, &result);
+                                    if (is_expression_result_error(&result)) {
+                                        printf("function %s errored: %s\n", temp_br->callee->function_name, result.as_error);
+                                    } else {
+                                        char resolved_result[128] = "<unknown>";
+                                        expression_result_value_to_string(&result, resolved_result, 128);
+                                        printf("function %s returned: %s\n", temp_br->callee->function_name, resolved_result);
+                                    }
+                                    expression_result_free(&result);
                                 }
                             }
                         } else {
@@ -670,13 +691,27 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
                 if (!first_arg) {
                     strcat(function_args, ", ");
                 }
-                char arg_text[64];
-                char arg_value[20];
-                if (debug_get_symbol_value(s, fp, arg_value, sizeof(arg_value))) {
-                    strcpy(arg_value, "unknown");
+                char arg_text[255];
+
+                struct expression_result_t exp = {};
+                debug_get_symbol_value_expression(s, fp, &exp);
+
+                if (is_expression_result_error(&exp)) {
+                    sprintf(arg_text, "<error>%s", s->symbol_name);
+                    strcat(function_args, arg_text);
+                } else {
+                    char exp_type[128] = "unknown";
+                    char exp_value[128] = "???";
+
+                    expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
+                    expression_result_value_to_string(&exp, exp_value, sizeof(exp_value));
+
+                    snprintf(arg_text, sizeof(arg_text), "<%s>%s = %s", exp_type, s->symbol_name, exp_value);
+                    strcat(function_args, arg_text);
                 }
-                sprintf(arg_text, "%s=%s", s->symbol_name, arg_value);
-                strcat(function_args, arg_text);
+
+                expression_result_free(&exp);
+
                 first_arg = 0;
                 arg = arg->next;
             }
@@ -767,49 +802,238 @@ static int cmd_down(int argc, char **argv)
     return cmd_frame(0, NULL);
 }
 
+void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* result) {
+    struct debugger_regs_t regs;
+    bk.get_regs(&regs);
+
+    uint16_t stack = regs.sp;
+    uint16_t initial_stack = stack;
+    uint16_t at = bk.pc();
+
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
+    debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
+
+    debug_sym_function* fn = fp->function;
+    if (fn != NULL) {
+        char function_args[255] = {0};
+        debug_sym_function_argument* arg = fn->arguments;
+        while (arg) {
+            debug_sym_symbol* s = arg->symbol;
+            if (strcmp(s->symbol_name, lookup->symbol_name) == 0) {
+                if (!debug_symbol_valid(s, initial_stack, fp)) {
+                    arg = arg->next;
+                    continue;
+                }
+                debug_get_symbol_value_expression(s, fp, result);
+                debug_stack_frames_free(first_frame_pointer);
+                return;
+            }
+            arg = arg->next;
+        }
+
+        // try static locals
+        char sname[128];
+        sprintf(sname, "st_%s_%s", fn->function_name, lookup->symbol_name);
+        debug_sym_symbol *s = cdb_find_symbol(sname);
+        if (s != NULL && s->address_space.address_space == 'E') {
+            debug_get_symbol_value_expression(s, fp, result);
+            debug_stack_frames_free(first_frame_pointer);
+            return;
+        }
+    }
+
+    // try globals
+    debug_sym_symbol *s = cdb_find_symbol(lookup->symbol_name);
+    if (s != NULL && s->address_space.address_space == 'E') {
+        debug_get_symbol_value_expression(s, fp, result);
+        debug_stack_frames_free(first_frame_pointer);
+        return;
+    }
+
+    debug_stack_frames_free(first_frame_pointer);
+
+    sprintf(result->as_error, "Cannot resolve symbol: %s", lookup->symbol_name);
+    result->flags |= EXPRESSION_ERROR;
+}
+
 static int cmd_print(int argc, char **argv)
 {
+    if (argc < 2)
+    {
+        return 0;
+    }
+
+    char* call = malloc(255);
+    strcpy(call, argv[1]);
+
+    for (int i = 2; i < argc; i++)
+    {
+        strcat(call, " ");
+        strcat(call, argv[i]);
+    }
+
+    if (getenv("YYDEBUG") != NULL) {
+        extern int yydebug;
+        yydebug = 1;
+    }
+
+    int types = count_allocated_types();
+
+    evaluate_expression_string(call);
+    free(call);
+
+    struct expression_result_t* result = get_expression_result();
+    if (is_expression_result_error(result))
+    {
+        printf("Error: %s\n", result->as_error);
+        return 0;
+    }
+
+    char type[128] = "unknown";
+    char value[128] = "???";
+    expression_result_type_to_string(&result->type, result->type.first, type);
+    expression_result_value_to_string(result, value, sizeof(value));
+
+    printf("Result: <%s> %s\n", type, value);
+
+    expression_result_free(result);
+    int new_types = count_allocated_types();
+    if (new_types > types) {
+        printf("Warning: %d type info object(s) leaked\n", new_types - types);
+    }
+
     return 0;
+}
+
+static void print_breakpoints() {
+    breakpoint *elem;
+    int         i = 1;
+    LL_FOREACH(breakpoints, elem) {
+        if ( elem->type == BREAK_PC) {
+            const char *sym = find_symbol(elem->value, SYM_ADDRESS);
+            printf("%d:\tPC = $%04x (%s) %s\n",i, elem->value,sym ? sym : "<unknown>", elem->enabled ? "" : " (disabled)");
+        } else if ( elem->type == BREAK_CHECK8 ) {
+            printf("%d\t%s = $%02x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
+        } else if ( elem->type == BREAK_CHECK16 ) {
+            printf("%d\t%s = $%04x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
+        }  else if ( elem->type == BREAK_REGISTER ) {
+            struct reg* r = &registers[elem->lcheck_arg];
+            if (r->high == NULL && r->word == NULL) {
+                printf("%d\t%s = $%02x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
+            } else {
+                printf("%d\t%s = $%04x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
+            }
+        }
+        i++;
+    }
+}
+
+static void info_section_locals() {
+    struct debugger_regs_t regs;
+    bk.get_regs(&regs);
+
+    uint16_t stack = regs.sp;
+    uint16_t initial_stack = stack;
+    uint16_t at = bk.pc();
+
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
+    debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
+
+    debug_sym_function* fn = fp->function;
+    if (fn != NULL) {
+        char function_args[255] = {0};
+        debug_sym_function_argument* arg = fn->arguments;
+        while (arg) {
+            debug_sym_symbol* s = arg->symbol;
+            if (debug_symbol_valid(s, initial_stack, fp)) {
+                struct expression_result_t exp = {};
+                debug_get_symbol_value_expression(s, fp, &exp);
+                if (is_expression_result_error(&exp)) {
+                    printf("  %s = <error>\n", s->symbol_name);
+                } else {
+                    char exp_type[128] = "unknown";
+                    char exp_value[128] = "???";
+                    expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
+                    expression_result_value_to_string(&exp, exp_value, sizeof(exp_value));
+                    printf("  <%s>%s = %s\n", exp_type, s->symbol_name, exp_value);
+                }
+                expression_result_free(&exp);
+            } else {
+                printf("  %s = <invalid>\n", s->symbol_name);
+            }
+            arg = arg->next;
+        }
+    }
+
+    debug_stack_frames_free(first_frame_pointer);
+}
+
+static void info_section_globals() {
+    struct debugger_regs_t regs;
+    bk.get_regs(&regs);
+
+    uint16_t stack = regs.sp;
+    uint16_t initial_stack = stack;
+    uint16_t at = bk.pc();
+
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
+    debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
+
+    for (debug_sym_symbol *s = cdb_get_first_symbol(); s != NULL; s = s->hh.next) {
+        // globals only
+        if (s->address_space.address_space != 'E') {
+            continue;
+        }
+        if (s->type_record.first == NULL || (s->type_record.first->type_ == TYPE_FUNCTION)) {
+            continue;
+        }
+
+        struct expression_result_t exp = {};
+        debug_get_symbol_value_expression(s, fp, &exp);
+
+        if (is_expression_result_error(&exp)) {
+            continue;
+        }
+
+        char exp_type[128] = "unknown";
+        char exp_value[128] = "???";
+        expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
+        expression_result_value_to_string(&exp, exp_value, sizeof(exp_value));
+        printf("  <%s>%s = %s\n", exp_type, s->symbol_name, exp_value);
+        expression_result_free(&exp);
+    }
+
+    debug_stack_frames_free(first_frame_pointer);
 }
 
 static int cmd_info(int argc, char **argv)
 {
-    if (argc < 2) {
-        return 0;
-    }
+    int matches_total = 0;
+    int matched_section = -1;
 
-    if (strcmp(argv[1], "locals") == 0) {
-        struct debugger_regs_t regs;
-        bk.get_regs(&regs);
-
-        uint16_t stack = regs.sp;
-        uint16_t initial_stack = stack;
-        uint16_t at = bk.pc();
-
-        debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
-        debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
-
-        debug_sym_function* fn = fp->function;
-        if (fn != NULL) {
-            char function_args[255] = {0};
-            debug_sym_function_argument* arg = fn->arguments;
-            while (arg) {
-                debug_sym_symbol* s = arg->symbol;
-
-                char arg_text[128];
-                char arg_value[128];
-
-                if (!debug_symbol_valid(s, initial_stack, fp)) {
-                    strcpy(arg_value, "<invalid>");
-                } else if (debug_get_symbol_value(s, fp, arg_value, sizeof(arg_value))) {
-                    strcpy(arg_value, "<unknown>");
-                }
-                printf("  %s=%s\n", s->symbol_name, arg_value);
-                arg = arg->next;
+    if (argc >= 2) {
+        for (int i = 0; cmd_info_sections[i].cb; i++) {
+            if (strstr(cmd_info_sections[i].name, argv[1]) == cmd_info_sections[i].name) {
+                matches_total++;
+                matched_section = i;
             }
         }
 
-        debug_stack_frames_free(first_frame_pointer);
+        if (matches_total == 1) {
+            cmd_info_sections[matched_section].cb();
+            return 0;
+        }
+
+        if (matches_total > 1) {
+            printf("Warning: ambiguous information section, please elaborate.\n");
+            return 0;
+        }
+    }
+
+    printf("Warning: cannot identify information section. Available sections are:\n");
+
+    for (int i = 0; cmd_info_sections[i].cb; i++) {
+        printf("  %s - %s\n", cmd_info_sections[i].name, cmd_info_sections[i].help);
     }
 
     return 0;
@@ -1122,28 +1346,8 @@ static int cmd_break(int argc, char **argv)
     const unsigned short pc = bk.pc();
 
     if ( argc == 1 ) {
-        breakpoint *elem;
-        int         i = 1;
-
         /* Just show the breakpoints */
-        LL_FOREACH(breakpoints, elem) {
-            if ( elem->type == BREAK_PC) {
-                const char *sym = find_symbol(elem->value, SYM_ADDRESS);
-                printf("%d:\tPC = $%04x (%s) %s\n",i, elem->value,sym ? sym : "<unknown>", elem->enabled ? "" : " (disabled)");
-            } else if ( elem->type == BREAK_CHECK8 ) {
-                printf("%d\t%s = $%02x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
-            } else if ( elem->type == BREAK_CHECK16 ) {
-                printf("%d\t%s = $%04x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
-            }  else if ( elem->type == BREAK_REGISTER ) {
-                struct reg* r = &registers[elem->lcheck_arg];
-                if (r->high == NULL && r->word == NULL) {
-                    printf("%d\t%s = $%02x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
-                } else {
-                    printf("%d\t%s = $%04x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
-                }
-            }
-            i++;
-        }
+        print_breakpoints();
     } else if ( argc == 2 ) {
         char *end;
         const char *sym;

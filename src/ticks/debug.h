@@ -140,10 +140,23 @@ extern void debug_add_cline(const char *filename, const char *function, int line
 extern int debug_resolve_source(char *name);
 extern int debug_resolve_source_forward(const char *filename, const char* within_function, int lineno);
 
+extern type_chain* copy_type_chain(type_chain* from);
+extern int count_allocated_types();
+extern type_chain* malloc_type(enum type_record_type type);
+extern void free_type(type_chain* type);
+extern uint8_t is_primitive_integer_type(type_chain* type);
+extern uint8_t is_type_a_pointer(type_chain* type);
+extern uint8_t are_type_chains_same(type_chain* a, type_chain* b);
+extern uint8_t are_type_records_same(type_record* a, type_record* b);
+extern int get_type_memory_size(type_chain* chain);
+struct expression_result_t;
+
 extern debug_sym_function* debug_find_function(const char* function_name, const char* file_name);
-extern int debug_print_element(type_chain* chain, char issigned, enum resolve_chain_value_kind resolve_by, uint32_t data, char *target, size_t targetlen);
-extern uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char *target, size_t targetlen);
+extern void debug_resolve_expression_element(type_record* record, type_chain* chain, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into);
+extern void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, struct expression_result_t* into);
 extern uint8_t debug_symbol_valid(debug_sym_symbol* sym, uint16_t stack, debug_frame_pointer* frame_pointer);
+extern debug_sym_symbol* cdb_get_first_symbol();
+extern debug_sym_symbol* cdb_find_symbol(const char* cname);
 
 extern debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit);
 extern debug_frame_pointer* debug_stack_frames_at(debug_frame_pointer* first, size_t frame);
