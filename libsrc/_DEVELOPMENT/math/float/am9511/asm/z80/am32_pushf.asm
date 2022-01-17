@@ -34,7 +34,8 @@ PUBLIC asm_am9511_pushf_fastcall
     ;
     ; exit  : stack = IEEE_float, ret1
     ; 
-    ; uses  : af, bc', hl'
+    ; uses      : af, bc', hl'
+    ; preserves : de, hl
 
 ;   in a,(__IO_APU_STATUS)      ; read the APU status register
 ;   rlca                        ; busy? and __IO_APU_STATUS_BUSY
@@ -59,13 +60,13 @@ PUBLIC asm_am9511_pushf_fastcall
     jr NC,asm_am9511_max
     cp 127-64                   ; check for underflow
     jr C,asm_am9511_zero
-    sub 127-1                   ; bias including shift binary point
+    sub 127-1                   ; remove bias including shift binary point
 
     dec hl
     set 7,(hl)                  ; set mantissa MSB
     outi                        ; load mantissa MSB into APU
 
-    rla                         ; position exponent for sign
+    rla                         ; position 7-bit exponent for sign
     rl (hl)                     ; get sign
     rra
     out (c),a                   ; load exponent into APU
@@ -126,7 +127,7 @@ PUBLIC asm_am9511_pushf_fastcall
     jr C,asm_am9511_zero_fastcall
     sub 127-1                   ; bias including shift binary point
 
-    rla                         ; position exponent for sign
+    rla                         ; position 7-bit exponent for sign
     rl d                        ; get sign
     rra
     ld d,a                      ; restore exponent

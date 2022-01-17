@@ -39,7 +39,8 @@ PUBLIC asm_am9511_pushf_fastcall
     ;
     ; exit  : stack = IEEE_float, ret1
     ; 
-    ; uses  : af, bc
+    ; uses      : af, bc
+    ; preserves : de, hl
 
 ;   in a,(__IO_APU_STATUS)      ; read the APU status register
 ;   rlca                        ; busy? and __IO_APU_STATUS_BUSY
@@ -58,19 +59,19 @@ PUBLIC asm_am9511_pushf_fastcall
     out (__IO_APU_DATA),a
 
     inc de
-    ld hl,(de)                  ; get exponent and mantissa MSB
+    ld hl,(de)                  ; get exponent and mantissa MSW
 
     add hl,hl                   ; shift exponent to h
 
     ld a,h                      ; get exponent to a
     or a                        ; set exponent flags
-    jr Z,asm_am9511_zero        ; check for zero
+    jp Z,asm_am9511_zero        ; check for zero
     cp 127+63                   ; check for overflow
-    jr NC,asm_am9511_max
+    jp NC,asm_am9511_max
     cp 127-64                   ; check for underflow
-    jr C,asm_am9511_zero
-    sub 127-1                   ; bias including shift binary point
-    rla                         ; position exponent for sign
+    jp C,asm_am9511_zero
+    sub 127-1                   ; remove bias including shift binary point
+    rla                         ; position 7-bit exponent for sign
     ld h,a
 
     ld a,l                      ; get mantissa to a
@@ -142,13 +143,13 @@ PUBLIC asm_am9511_pushf_fastcall
 
     ld a,d                      ; get exponent
     or a                        ; check for zero
-    jr Z,asm_am9511_zero_fastcall
+    jp Z,asm_am9511_zero_fastcall
     cp 127+63                   ; check for overflow
-    jr NC,asm_am9511_max_fastcall
+    jp NC,asm_am9511_max_fastcall
     cp 127-64                   ; check for underflow
-    jr C,asm_am9511_zero_fastcall
+    jp C,asm_am9511_zero_fastcall
     sub 127-1                   ; bias including shift binary point
-    rla                         ; position exponent for sign
+    rla                         ; position 7-bit exponent for sign
     ld d,a
 
     pop af                      ; recover sign
@@ -177,12 +178,14 @@ PUBLIC asm_am9511_pushf_fastcall
     ld a,d
     out (__IO_APU_DATA),a
 
+    ret
+
 .asm_am9511_zero_fastcall
     pop af                      ; recover sign
     ld de,0                     ; no signed zero available
     ld h,d
     ld l,e
-    jr pushf_fastcall
+    jp pushf_fastcall
 
 .asm_am9511_max_fastcall        ; floating max value of sign d in dehl
     pop af                      ; recover sign
@@ -193,5 +196,5 @@ PUBLIC asm_am9511_pushf_fastcall
     ld e, 0ffh                  ; max mantissa
     ld h,e
     ld l,e
-    jr pushf_fastcall
+    jp pushf_fastcall
 
