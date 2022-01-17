@@ -1057,6 +1057,43 @@ static uint16_t get_current_framepointer(struct debugger_regs_t *regs, size_t* i
     return wrap_reg(regs->xh, regs->xl);
 }
 
+static uint8_t recover_from_frame_pointer(symbol* sym, uint16_t frame_pointer,
+                                          uint8_t* unreliable_offset, uint16_t* at, uint16_t* stack,
+                                          debug_frame_pointer** first, debug_frame_pointer** last)
+{
+    // we have no idea where we are but, but somebody called us, and it's return address
+    // should be right before frame pointer
+    uint16_t caller = wrap_reg(bk.get_memory(frame_pointer - 1), bk.get_memory(frame_pointer - 2));
+    uint16_t offset;
+    sym = symbol_find_lower(caller, SYM_ADDRESS, &offset);
+    if (sym != NULL && sym->file != NULL) {
+        // report <system call>
+        debug_frame_pointer* system_call = malloc(sizeof(debug_frame_pointer));
+        system_call->next = NULL;
+        system_call->frame_pointer = 0xFFFFFFFF;
+        system_call->symbol = NULL;
+        system_call->offset = 0;
+        system_call->address = *at;
+        system_call->return_address = caller;
+        system_call->function = NULL;
+        system_call->filename = "<system call>";
+        system_call->lineno = 0;
+
+        // because the original PC is unreliable, but we're restoring from frame_pointer
+        // we cannot assume the offset is reliable, so let's report is as beginning of system caller
+        *unreliable_offset = 1;
+        *at = caller - offset;
+        *stack = frame_pointer;
+
+        *first = system_call;
+        *last = system_call;
+
+        // keep the loop going from the probable caller
+        return 1;
+    }
+
+    return 0;
+}
 
 debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit)
 {
@@ -1075,34 +1112,10 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
         entry_num++;
         uint16_t offset;
         symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
-        if (entry_num == 1 && frame_pointer && (sym == NULL || sym->file == NULL)) {
-            // we have no idea where we are but, but somebody called us, and it's return address
-            // should be right before frame pointer
-            uint16_t caller = wrap_reg(bk.get_memory(frame_pointer - 1), bk.get_memory(frame_pointer - 2));
-            sym = symbol_find_lower(caller, SYM_ADDRESS, &offset);
-            if (sym != NULL && sym->file != NULL) {
-                // report <system call>
-                debug_frame_pointer* system_call = malloc(sizeof(debug_frame_pointer));
-                system_call->next = NULL;
-                system_call->frame_pointer = 0xFFFFFFFF;
-                system_call->symbol = NULL;
-                system_call->offset = 0;
-                system_call->address = at;
-                system_call->return_address = caller;
-                system_call->function = NULL;
-                system_call->filename = "<system call>";
-                system_call->lineno = 0;
-
-                // because the original PC is unreliable, but we're restoring from frame_pointer
-                // we cannot assume the offset is reliable, so let's report is as beginning of system caller
-                unreliable_offset = 1;
-                at = caller - offset;
-                stack = frame_pointer;
-
-                first = system_call;
-                last = system_call;
-
-                // keep the loop going from the probable caller
+        if (sym == NULL || sym->file == NULL) {
+            if (entry_num == 1 && frame_pointer &&
+                recover_from_frame_pointer(sym, frame_pointer,
+                    &unreliable_offset, &at, &stack, &first, &last)) {
                 continue;
             }
             break;
@@ -1154,6 +1167,11 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
                 }
                 last = unknown_entry;
                 continue;
+            } else if (entry_num == 1 && frame_pointer) {
+                if (recover_from_frame_pointer(sym, frame_pointer,
+                    &unreliable_offset, &at, &stack, &first, &last)) {
+                    continue;
+                }
             }
             break;
         }
