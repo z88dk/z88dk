@@ -25,6 +25,5 @@ EXTERN asm_am9511_ldexp_callee
     push af
     push af
     push af
-    push af
     push bc
     ret

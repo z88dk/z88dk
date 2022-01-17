@@ -56,7 +56,7 @@ PUBLIC  asm_am9511_compare_sccz80
 
     jp NC,positive_right
 
-    ld a,(bc)
+    ld a,(bc)           ;flip all right bits
     cpl
     ld (bc),a
     inc bc
@@ -74,10 +74,10 @@ PUBLIC  asm_am9511_compare_sccz80
     jp continue_left
 
 .positive_right
-    ld a,080h
-    xor h               ;flip right sign bit
-    ld h,a
-    ld (de),hl
+    inc de
+    ld a,(de)
+    xor 080h             ;flip right sign bit
+    ld (de),a
 
 .continue_left
     pop hl              ;(hl) left
@@ -92,7 +92,7 @@ PUBLIC  asm_am9511_compare_sccz80
 
     jp NC,positive_left
 
-    ld a,(bc)
+    ld a,(bc)           ;flip all left bits
     cpl
     ld (bc),a
     inc bc
@@ -110,10 +110,10 @@ PUBLIC  asm_am9511_compare_sccz80
     jp continue
 
 .positive_left
-    ld a,080h
-    xor h               ;flip left sign bit
-    ld h,a
-    ld (de),hl
+    inc de
+    ld a,(de)
+    xor 080h           ;flip left sign bit
+    ld (de),a
 
 .continue
     pop bc              ;(bc) left
@@ -144,19 +144,19 @@ PUBLIC  asm_am9511_compare_sccz80
     ld (de),a           ;result
 
     inc bc
-    inc de
+;   inc de
     inc hl
 
     ld a,(bc)           ;left
     sbc (hl)            ;right + C
-                        ;leave MSB in a
+;   ld (de),a           ;leave MSB in a
 
     jp C,consider_negative
 
 .consider_positive
     ; Calculate whether result is zero (equal)
     ex de,hl
-    dec hl
+;   dec hl
     or (hl)
     dec hl
     or (hl)
@@ -175,7 +175,7 @@ PUBLIC  asm_am9511_compare_sccz80
 .consider_negative
     ; Calculate whether result is zero (equal)
     ex de,hl
-    dec hl
+;   dec hl
     or (hl)
     dec hl
     or (hl)

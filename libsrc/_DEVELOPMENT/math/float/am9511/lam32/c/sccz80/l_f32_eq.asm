@@ -22,6 +22,7 @@ IFDEF __CPU_8085__
     ld de,sp+8
     ex de,hl
     ld sp,hl
+    ex de,hl
     push bc
 
     scf
@@ -32,14 +33,14 @@ IFDEF __CPU_8085__
 
 ELSE
 
-    EXTERN	asm_am9511_compare_callee
+    EXTERN  asm_am9511_compare_callee
 
 .l_f32_eq
-	call asm_am9511_compare_callee
-	scf
-	ret	Z
-	ccf
-	dec	hl
-	ret
+    call asm_am9511_compare_callee
+    scf
+    ret Z
+    ccf
+    dec hl
+    ret
 
 ENDIF

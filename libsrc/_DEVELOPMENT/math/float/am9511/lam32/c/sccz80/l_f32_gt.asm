@@ -22,6 +22,7 @@ IFDEF __CPU_8085__
     ld de,sp+8
     ex de,hl
     ld sp,hl
+    ex de,hl
     push bc
 
     jp Z,gt1
