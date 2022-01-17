@@ -126,6 +126,7 @@ static int cmd_out(int argc, char **argv);
 static int cmd_trace(int argc, char **argv);
 static int cmd_hotspot(int argc, char **argv);
 static int cmd_list(int argc, char **argv);
+static int cmd_del_break(int argc, char **argv);
 static int cmd_restore(int argc, char **argv);
 static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
@@ -140,6 +141,7 @@ static command commands[] = {
     { "bt",        cmd_backtrace,   "",  NULL },
     { "p",         cmd_print,       "",  NULL },
     { "b",         cmd_break,       "",  NULL },
+    { "d",         cmd_del_break,   "",  NULL },
     { "nexti",     cmd_next,        "",  "Step the instruction (over calls)" },
     { "next",      cmd_next_source, "",                     "Step one source line" },
     { "stepi",     cmd_step,        "",                     "Step the instruction (including into calls)" },
@@ -155,6 +157,7 @@ static command commands[] = {
     { "finish",    cmd_finish,      "",                     "Exit current function (and print result if any)" },
     { "reg",       cmd_registers,   "",                     "Display the registers" },
     { "break",     cmd_break,       "<address/label>",      "Handle breakpoints" },
+    { "delete",    cmd_del_break,   "<breakpoint id>",      "Delete breakpoint(s)" },
     { "watch",     cmd_watch,       "<address/label>",      "Handle watchpoints" },
     { "x",         cmd_examine,     "<address>",            "Examine memory" },
     { "set",       cmd_set,         "<hl/h/l/...> <value>", "Set registers" },
@@ -1341,6 +1344,68 @@ static int cmd_finish(int argc, char **argv)
     return 0;
 }
 
+static void free_breakpoint(breakpoint* elem)
+{
+    if (elem->text) {
+        free(elem->text);
+    }
+    free(elem);
+}
+
+static uint8_t confirm(const char* message) {
+    while (1) {
+        printf("%s (y/n)", message);
+        fflush(stdout);
+        char c;
+        do {
+            scanf("%c", &c);
+        } while (!isalpha(c));
+        if (c == 'y' || c == 'Y') {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static void delete_all_breakpoints()
+{
+    printf("Deleting all breakpoints.\n");
+    breakpoint *elem, *tmp;
+    LL_FOREACH_SAFE(breakpoints, elem, tmp) {
+        bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, elem->value, 1);
+        LL_DELETE(breakpoints, elem);
+        free_breakpoint(elem);
+    }
+}
+
+static void delete_breakpoint(int b)
+{
+    int num = b;
+    breakpoint *elem;
+    LL_FOREACH(breakpoints, elem) {
+        num--;
+        if ( num == 0 ) {
+            printf("Deleting breakpoint %d\n", b);
+            bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, elem->value, 1);
+            LL_DELETE(breakpoints, elem);
+            free_breakpoint(elem);
+            break;
+        }
+    }
+}
+
+static int cmd_del_break(int argc, char **argv) {
+    if (argc == 1) {
+        if (confirm("Are you sure you want delete all breakpoints?")) {
+            delete_all_breakpoints();
+        }
+    }
+    if (argc == 2) {
+        delete_breakpoint(atoi(argv[1]));
+    }
+    return 0;
+}
+
 static int cmd_break(int argc, char **argv)
 {
     const unsigned short pc = bk.pc();
@@ -1359,6 +1424,7 @@ static int cmd_break(int argc, char **argv)
             elem->type = BREAK_PC;
             elem->value = value;
             elem->enabled = 1;
+            elem->text = NULL;
             bk.add_breakpoint(BK_BREAKPOINT_SOFTWARE, value, 1);
             LL_APPEND(breakpoints, elem);
             printf("Adding breakpoint at '%s' $%04x (%s)\n",argv[1], value,  resolve_to_label(value));
@@ -1366,17 +1432,7 @@ static int cmd_break(int argc, char **argv)
             printf("Cannot break on '%s'\n",argv[1]);
         }
     } else if ( argc == 3 && strcmp(argv[1],"delete") == 0 ) {
-        int num = atoi(argv[2]);
-        breakpoint *elem;
-        LL_FOREACH(breakpoints, elem) {
-            num--;
-            if ( num == 0 ) {
-                printf("Deleting breakpoint %d\n",atoi(argv[2]));
-                bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, elem->value, 1);
-                LL_DELETE(breakpoints,elem); // TODO: Freeing
-                break;
-            }
-        }
+        delete_breakpoint(atoi(argv[2]));
     } else if ( argc == 3 && strcmp(argv[1],"disable") == 0 ) {
         int num = atoi(argv[2]);
         breakpoint *elem;
@@ -1635,10 +1691,16 @@ static int cmd_help(int argc, char **argv)
      return 0;
 }
 
-
-
 static int cmd_quit(int argc, char **argv)
 {
+    breakpoint* elem;
+    int count;
+    LL_COUNT(breakpoints, elem, count);
+    if (count > 0) {
+        if (confirm("You have breakpoint(s) set. Would you like to remove them before you detach?")) {
+            delete_all_breakpoints();
+        }
+    }
     bk.detach();
     exit(0);
 }
