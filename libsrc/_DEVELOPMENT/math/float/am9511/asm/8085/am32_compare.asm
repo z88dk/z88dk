@@ -54,8 +54,7 @@ PUBLIC  asm_am9511_compare_sccz80
     dec h
     jp Z,zero_right     ;right is zero (exponent is zero)
 
-    ccf
-    jp C,positive_right
+    jp NC,positive_right
 
     ld a,(bc)
     cpl
@@ -72,9 +71,15 @@ PUBLIC  asm_am9511_compare_sccz80
     ld a,(bc)
     cpl
     ld (bc),a
+    jp continue_left
 
 .positive_right
+    ld a,080h
+    xor h               ;flip right sign bit
+    ld h,a
+    ld (de),hl
 
+.continue_left
     pop hl              ;(hl) left
     ld bc,hl            ;(bc) left
 
@@ -85,8 +90,7 @@ PUBLIC  asm_am9511_compare_sccz80
     dec h
     jp Z,zero_left      ;left is zero (exponent is zero)
 
-    ccf
-    jp C,positive_left
+    jp NC,positive_left
 
     ld a,(bc)
     cpl
@@ -103,9 +107,15 @@ PUBLIC  asm_am9511_compare_sccz80
     ld a,(bc)
     cpl
     ld (bc),a
+    jp continue
 
 .positive_left
+    ld a,080h
+    xor h               ;flip left sign bit
+    ld h,a
+    ld (de),hl
 
+.continue
     pop bc              ;(bc) left
     pop hl              ;(hl) right
 
@@ -139,6 +149,7 @@ PUBLIC  asm_am9511_compare_sccz80
 
     ld a,(bc)           ;left
     sbc (hl)            ;right + C
+                        ;leave MSB in a
 
     jp C,consider_negative
 

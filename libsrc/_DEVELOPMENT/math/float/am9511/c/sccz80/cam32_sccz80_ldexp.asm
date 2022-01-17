@@ -10,20 +10,21 @@ EXTERN asm_am9511_ldexp_callee
 .cam32_sccz80_ldexp
     ; Entry:
     ; Stack: float left, int right, ret
-    ; Reverse the stack
-    pop af                      ;my return
+    ; Reverse the stack, return on top
+
+    pop hl                      ;my return
     pop bc                      ;int
-    pop hl                      ;float
-    pop de
-    push af                     ;my return
+    pop de                      ;float LSW
+    ex (sp),hl                  ;float MSW <-> my return
     push bc                     ;int
-    push de                     ;float
-    push hl
+    push hl                     ;float MSW
+    push de                     ;float LSW
     call asm_am9511_ldexp_callee
 
-    pop af                      ;my return
+    pop bc                      ;my return
     push af
     push af
     push af
     push af
+    push bc
     ret

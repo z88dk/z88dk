@@ -25,7 +25,7 @@ EXTERN  asm_am9511_compare_sccz80
     pop af                  ; pop left
     pop af
     push bc
-    ret                     ; return DEHL = sccz80_float min
+    ret                     ; return DEHL = sccz80_float max
 
 .left
     pop bc                  ; ret

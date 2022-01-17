@@ -45,12 +45,10 @@ PUBLIC asm_am9511_frexp_callee
     ;
     ; uses  : af, bc, de, hl
 
-
     ld de,sp+4                  ; point to mantissa and exponent
     ld hl,(de)
 
     add hl,hl                   ; get the exponent and mantissa
-
     ld a,h
     or a
     jp Z,zero
