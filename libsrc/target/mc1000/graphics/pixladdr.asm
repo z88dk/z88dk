@@ -12,6 +12,8 @@
 
 	PUBLIC	gfxbyte_get
 	PUBLIC	pix_return
+
+        EXTERN  __mc1000_modeval
 	
 .pixeladdress
 
@@ -54,7 +56,7 @@
 	ld	hl,pixelbyte
 	ld	(hl),a
 
-	ld	a,$9f
+	ld	a,(__mc1000_modeval)
 	out	($80),a
 
 	ld	a,b
@@ -67,13 +69,14 @@
 .pix_return
 
 	ex	af,af	; dcircle uses the flags in af'.. watch out !
-	ld	a,$9e
+	ld	a,(__mc1000_modeval)
 	out	($80),a
 
 	ex	af,af	; dcircle uses the flags in af'.. watch out !
 	ld	(de),a	; pixel address
 
-	ld	a,$9f
+	ld	a,(__mc1000_modeval)
+        set     0,a
 	out	($80),a
 	ret
 

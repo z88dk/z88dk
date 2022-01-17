@@ -15,6 +15,9 @@
 	PUBLIC	_ansi_cls
 
 	EXTERN	generic_console_ioctl
+	EXTERN	generic_console_cls
+
+        EXTERN  __mc1000_modeval
 	INCLUDE	"ioctl.def"
 	
 
@@ -22,6 +25,10 @@
 ._clg
 .ansi_cls
 ._ansi_cls
+        ld      a,(__mc1000_modeval)
+        and     @00011100
+        cp      @00011100
+        jp      z,generic_console_cls
         ld      hl,1
         push    hl
         ld      hl,0

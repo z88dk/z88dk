@@ -4,6 +4,7 @@
 
 #include "debug.h"
 #include "backend.h"
+#include "exp_engine.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +12,7 @@
 
 static cfile *cfiles = NULL;
 static debug_sym_function *cfunctions = NULL;
-static debug_sym_symbol *csymbols = NULL;
+static debug_sym_symbol *cdb_csymbols = NULL;
 static cline *clines[65536] = {0};
 
 
@@ -495,7 +496,7 @@ static void debug_add_symbol_info(const char* encoded)
         goto err;
     }
 
-    HASH_ADD_STR(csymbols, name, s);
+    HASH_ADD_STR(cdb_csymbols, symbol_name, s);
 
     return;
 
@@ -681,203 +682,328 @@ debug_sym_function* debug_find_function(const char* function_name, const char* f
 static int Min(int a, int b) { if (a < b ) return a; else return b;}
 static int Max(int a, int b) { if (a > b ) return a; else return b;}
 
-
-int debug_print_element(type_chain* chain, char issigned, enum resolve_chain_value_kind resolve_by, uint32_t data, char *target, size_t targetlen) {
-    int offs = 0;
-
-    switch ( chain->type_ ) {
-    case TYPE_CHAR: {
-        char ch;
-        switch (resolve_by) {
-            case RESOLVE_BY_POINTER: {
-                ch = bk.get_memory((uint16_t)data);
-                break;
-            }
-            case RESOLVE_BY_VALUE:
-            default: {
-                ch = (uint8_t)data;
-                break;
-            }
-        }
-        if ( issigned ) {
-            if ( isprint(ch)) {
-                offs = snprintf(target, targetlen, "\'%c\'", ch);
-            } else {
-                offs = snprintf(target, targetlen, "x%02x", (unsigned char)ch);
-            }
-        } else {
-            offs = snprintf(target, targetlen, "x%02x", (unsigned char)ch);
-        }
-        break;
+type_chain* copy_type_chain(type_chain* from) {
+    if (from == NULL) {
+        return NULL;
     }
-    case TYPE_INT:
-    case TYPE_SHORT:
-        if ( issigned ) {
-            int16_t v;
+    type_chain* result = NULL;
+    type_chain* ptr = NULL;
+    while (from) {
+        type_chain* copy_ptr = malloc_type(from->type_);
+        if (ptr == NULL) {
+            result = copy_ptr;
+        } else {
+            ptr->next = copy_ptr;
+        }
+        *copy_ptr = *from;
+        ptr = copy_ptr;
+        ptr->next = NULL;
+        from = from->next;
+    }
+    return result;
+}
+
+static int s_allocated_types = 0;
+
+int count_allocated_types()
+{
+    return s_allocated_types;
+}
+
+type_chain* malloc_type(enum type_record_type type) {
+    type_chain* result = malloc(sizeof(type_chain));
+    result->next = NULL;
+    result->data = NULL;
+    result->type_ = type;
+    result->size = get_type_memory_size(result);
+    s_allocated_types++;
+    return result;
+}
+
+void free_type(type_chain* type) {
+    while (type) {
+        type_chain* next_next = type->next;
+        free(type);
+        s_allocated_types--;
+        type = next_next;
+    }
+}
+
+uint8_t is_type_a_pointer(type_chain* type) {
+    if (type == NULL) {
+        return 0;
+    }
+    return type->type_ == TYPE_GENERIC_POINTER || type->type_ == TYPE_CODE_POINTER;
+}
+
+uint8_t are_type_chains_same(type_chain* a, type_chain* b)
+{
+    if (a->type_ != b->type_) {
+        return 0;
+    }
+    if (is_type_a_pointer(a)) {
+        if (a == NULL || b == NULL) {
+            return 0;
+        }
+        return are_type_chains_same(a->next, b->next);
+    }
+    return 1;
+}
+
+uint8_t is_primitive_integer_type(type_chain* type) {
+    if (type == NULL) {
+        return 0;
+    }
+    switch (type->type_) {
+        case TYPE_CHAR:
+        case TYPE_INT:
+        case TYPE_LONG: {
+            return 1;
+        }
+        default: {
+            return 0;
+        }
+    }
+}
+
+uint8_t are_type_records_same(type_record* a, type_record* b)
+{
+    if (a->signed_ != b->signed_) {
+        return 0;
+    }
+    if ((a->first == NULL) != (b->first == NULL)) {
+        return 0;
+    }
+    if ((a->first == NULL) && (b->first == NULL)) {
+        return 1;
+    }
+    if (a->first->type_ != b->first->type_) {
+        return 0;
+    }
+    if (is_type_a_pointer(a->first)) {
+        if (a->first->next == NULL || a->first->next == NULL) {
+            return 0;
+        }
+        return are_type_chains_same(a->first, b->first);
+    }
+    return 1;
+}
+
+int get_type_memory_size(type_chain* chain) {
+    if (chain == NULL) {
+        return 1;
+    }
+    switch (chain->type_)
+    {
+        case TYPE_CHAR: {
+            return 1;
+        }
+        case TYPE_INT:
+        case TYPE_GENERIC_POINTER:
+        case TYPE_CODE_POINTER:
+        case TYPE_SHORT: {
+            return 2;
+        }
+        case TYPE_FLOAT:
+        case TYPE_LONG: {
+            return 4;
+        }
+        default: {
+            return 0;
+        }
+    }
+}
+
+void debug_resolve_expression_element(type_record* record, type_chain* chain, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into) {
+    int offs = 0;
+    if (record == NULL) {
+        return;
+    }
+    into->type = *record;
+    into->type.first = copy_type_chain(chain);
+    if (chain == NULL) {
+        return;
+    }
+    switch ( chain->type_ ) {
+        case TYPE_CHAR: {
+            char ch;
             switch (resolve_by) {
                 case RESOLVE_BY_POINTER: {
-                    v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                    ch = bk.get_memory((uint16_t)data);
+                    into->memory_location = data;
                     break;
                 }
                 case RESOLVE_BY_VALUE:
                 default: {
-                    v = (int16_t)data;
+                    ch = (uint8_t)data;
+                    into->memory_location = 0;
                     break;
                 }
             }
-            offs += snprintf(target, targetlen, "%d", v);
-        } else {
+            into->as_int = ch;
+        }
+        case TYPE_INT:
+        case TYPE_SHORT:
+            if ( record->signed_ ) {
+                int16_t v;
+                switch (resolve_by) {
+                    case RESOLVE_BY_POINTER: {
+                        v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                        into->memory_location = data;
+                        break;
+                    }
+                    case RESOLVE_BY_VALUE:
+                    default: {;
+                        v = (int16_t)data;
+                        into->memory_location = 0;
+                        break;
+                    }
+                }
+                into->as_int = v;
+            } else {
+                uint16_t v;
+                switch (resolve_by) {
+                    case RESOLVE_BY_POINTER: {
+                        v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                        into->memory_location = data;
+                        break;
+                    }
+                    case RESOLVE_BY_VALUE:
+                    default: {
+                        v = (uint16_t)data;
+                        into->memory_location = 0;
+                        break;
+                    }
+                }
+                into->as_uint = v;
+            }
+            break;
+        case TYPE_LONG:
+            if ( record->signed_ ) {
+                int32_t v;
+                switch (resolve_by) {
+                    case RESOLVE_BY_POINTER: {
+                        v = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
+                        into->memory_location = data;
+                        break;
+                    }
+                    case RESOLVE_BY_VALUE:
+                    default: {
+                        v = (int32_t)data;
+                        into->memory_location = 0;
+                        break;
+                    }
+                }
+                into->as_int = v;
+            } else {
+                uint32_t v;
+                switch (resolve_by) {
+                    case RESOLVE_BY_POINTER: {
+                        v = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
+                        into->memory_location = data;
+                        break;
+                    }
+                    case RESOLVE_BY_VALUE:
+                    default: {
+                        v = (uint32_t)data;
+                        into->memory_location = 0;
+                        break;
+                    }
+                }
+                into->as_uint = v;
+            }
+            break;
+
+        case TYPE_STRUCTURE: {
+            into->as_pointer.ptr = data;
+            break;
+        }
+        case TYPE_ARRAY: {
+            into->as_pointer.ptr = data;
+            break;
+        }
+        case TYPE_GENERIC_POINTER:
+        case TYPE_CODE_POINTER: {
             uint16_t v;
             switch (resolve_by) {
                 case RESOLVE_BY_POINTER: {
                     v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
+                    into->memory_location = data;
                     break;
                 }
                 case RESOLVE_BY_VALUE:
                 default: {
                     v = (uint16_t)data;
+                    into->memory_location = 0;
                     break;
                 }
             }
-            offs += snprintf(target, targetlen, "%u", v);
+
+            into->as_pointer.ptr = v;
+            break;
         }
-        break;
-    case TYPE_LONG:
-        if ( issigned ) {
-            int32_t v;
-            switch (resolve_by) {
-                case RESOLVE_BY_POINTER: {
-                    v = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
-                    break;
-                }
-                case RESOLVE_BY_VALUE:
-                default: {
-                    v = (int32_t)data;
-                    break;
-                }
-            }
-            offs = snprintf(target, targetlen, "%d", v);
-        } else {
-            uint32_t v;
-            switch (resolve_by) {
-                case RESOLVE_BY_POINTER: {
-                    v = (bk.get_memory(data + 3) << 24) + (bk.get_memory(data + 2) << 16) + (bk.get_memory(data + 1) << 8) + bk.get_memory(data);
-                    break;
-                }
-                case RESOLVE_BY_VALUE:
-                default: {
-                    v = (uint32_t)data;
-                    break;
-                }
-            }
-            offs = snprintf(target, targetlen, "%u", v);
-        }
-        break;
-
-    case TYPE_GENERIC_POINTER:
-    case TYPE_CODE_POINTER: {
-        uint16_t v;
-        switch (resolve_by) {
-            case RESOLVE_BY_POINTER: {
-                v = (bk.get_memory((uint16_t)data + 1) << 8) + bk.get_memory((uint16_t)data);
-                break;
-            }
-            case RESOLVE_BY_VALUE:
-                default: {
-                    v = (uint16_t)data;
-                    break;
-                }
-        }
-        if ( chain->next && chain->next->type_ == TYPE_CHAR ) {
-            int maxlen = targetlen - 2;
-
-            offs = snprintf(target + offs, targetlen - offs,"%#04x \"", v);
-
-            while ( offs < maxlen ) {
-                char ch = bk.get_memory(v++);
-                if ( ch == 0 ) break;
-                if ( isprint(ch)) {
-                    offs += snprintf(target+offs, targetlen - offs, "%c", ch);
-                } else {
-                    offs += snprintf(target+offs, targetlen - offs, "\\%02x", (unsigned char)ch);
-                }
-            }
-            snprintf(target+offs, targetlen - offs, "\"");
-            return 0;
-        }
-        snprintf(target, targetlen, "%#04x", v);
-        return 0;
-    }
-    default:
-        break;
-    }
-
-    return offs;
-}
-
-static uint8_t debug_resolve_chain_value(debug_sym_symbol *sym, uint16_t frame_pointer, char *target, size_t targetlen) {
-    type_chain *chain = sym->type_record.first;
-    int         offs = 0;
-
-    switch (chain->type_) {
-        case TYPE_ARRAY: {
-            int maxlen = Max(10,Min(10, chain->size));
-            offs += snprintf(target + offs, targetlen - offs, "%#04x [%d] = { ", frame_pointer, chain->size);
-            for ( int i = 0; i < maxlen; i++ ) {
-                offs += snprintf(target + offs, targetlen - offs, "%s[%d] = ", i != 0 ? ", " : "", i);
-                switch ( chain->next->type_) {
-                case TYPE_CHAR:
-                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
-                    frame_pointer++;
-                    break;
-                case TYPE_INT:
-                case TYPE_SHORT:
-                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
-                    frame_pointer += 2;
-                    break;
-                case TYPE_LONG:
-                    offs += debug_print_element(chain->next, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
-                    frame_pointer += 4;
-                    break;
-                default:
-                    break;
-                }
-            }
-            offs += snprintf(target+offs, targetlen - offs,"%s }", maxlen != chain->size ? " ..." : "");
-            return 0;
-        }
-        case TYPE_CHAR:
-        case TYPE_INT:
-        case TYPE_SHORT: 
-        case TYPE_LONG:
-        case TYPE_GENERIC_POINTER:
-        case TYPE_CODE_POINTER:
-            debug_print_element(chain, sym->type_record.signed_, RESOLVE_BY_POINTER, frame_pointer, target + offs, targetlen - offs);
-            return 0;
 
         default: {
-            return 1;
+            break;
         }
     }
 }
 
-uint8_t debug_get_symbol_value(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, char *target, size_t targetlen) {
-    if (sym->address_space.address_space == 'B') {
-        return debug_resolve_chain_value(sym, frame_pointer->frame_pointer + sym->address_space.b, target, targetlen);
-    } else {
-        return 1;
+static int debug_get_symbol_address(debug_sym_symbol *s) {
+    int address = symbol_resolve(s->symbol_name);
+    if (address >= 0) {
+        return address;
     }
 
-    return 0;
+    char underscored_name[255];
+    sprintf(underscored_name, "_%s", s->symbol_name);
+
+    address = symbol_resolve(underscored_name);
+    if (address >= 0) {
+        return address;
+    }
+
+    return -1;
 }
 
-uint8_t debug_symbol_valid(debug_sym_symbol *sym, uint16_t stack, debug_frame_pointer *frame_pointer)
-{
-    if (sym->address_space.address_space == 'B') {
-        return frame_pointer->frame_pointer + sym->address_space.b >= stack;
+void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, struct expression_result_t* into) {
+    switch (sym->address_space.address_space) {
+        case 'B': {
+            return debug_resolve_expression_element(&sym->type_record, sym->type_record.first, RESOLVE_BY_POINTER, frame_pointer->frame_pointer + sym->address_space.b, into);
+        }
+        case 'E': {
+            int addr = debug_get_symbol_address(sym);
+            if (addr < 0) {
+                into->type.first = malloc_type(TYPE_UNKNOWN);
+                return;
+            }
+            return debug_resolve_expression_element(&sym->type_record, sym->type_record.first, RESOLVE_BY_POINTER, addr, into);
+        }
+        default: {
+            sprintf(into->as_error, "Incorrect address space (not implemented)");
+            into->flags |= EXPRESSION_ERROR;
+        }
     }
+}
 
+uint8_t debug_symbol_valid(debug_sym_symbol *sym, uint16_t stack, debug_frame_pointer *frame_pointer) {
+    if (sym->address_space.address_space == 'B') {
+        if (frame_pointer->frame_pointer + sym->address_space.b >= stack) {
+            return 1;
+        }
+        return 0;
+    }
     return 1;
+}
+
+debug_sym_symbol* cdb_find_symbol(const char* cname) {
+    debug_sym_symbol* result;
+    HASH_FIND_STR(cdb_csymbols, cname, result);
+    return result;
+}
+
+debug_sym_symbol* cdb_get_first_symbol() {
+    return cdb_csymbols;
 }
 
 static uint16_t wrap_reg(uint8_t h, uint8_t l)
@@ -940,6 +1066,7 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
     debug_frame_pointer* first = NULL;
     debug_frame_pointer* last = NULL;
 
+    uint8_t unreliable_offset = 0;
     uint8_t entry_num = 0;
     uint16_t stack = sp;
     uint16_t at = pc;
@@ -948,8 +1075,36 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
         entry_num++;
         uint16_t offset;
         symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
+        if (entry_num == 1 && frame_pointer && (sym == NULL || sym->file == NULL)) {
+            // we have no idea where we are but, but somebody called us, and it's return address
+            // should be right before frame pointer
+            uint16_t caller = wrap_reg(bk.get_memory(frame_pointer - 1), bk.get_memory(frame_pointer - 2));
+            sym = symbol_find_lower(caller, SYM_ADDRESS, &offset);
+            if (sym != NULL && sym->file != NULL) {
+                // report <system call>
+                debug_frame_pointer* system_call = malloc(sizeof(debug_frame_pointer));
+                system_call->next = NULL;
+                system_call->frame_pointer = 0xFFFFFFFF;
+                system_call->symbol = NULL;
+                system_call->offset = 0;
+                system_call->address = at;
+                system_call->return_address = caller;
+                system_call->function = NULL;
+                system_call->filename = "<system call>";
+                system_call->lineno = 0;
 
-        if (sym == NULL || sym->file == NULL) {
+                // because the original PC is unreliable, but we're restoring from frame_pointer
+                // we cannot assume the offset is reliable, so let's report is as beginning of system caller
+                unreliable_offset = 1;
+                at = caller - offset;
+                stack = frame_pointer;
+
+                first = system_call;
+                last = system_call;
+
+                // keep the loop going from the probable caller
+                continue;
+            }
             break;
         }
 
@@ -1001,6 +1156,11 @@ debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, stru
                 continue;
             }
             break;
+        }
+
+        if (unreliable_offset) {
+            unreliable_offset = 0;
+            offset = 0xFFFF;
         }
 
         debug_frame_pointer* new_frame = malloc(sizeof(debug_frame_pointer));
