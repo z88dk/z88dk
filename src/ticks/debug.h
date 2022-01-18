@@ -12,6 +12,8 @@ typedef struct type_chain_s type_chain;
 typedef struct address_space_s address_space;
 typedef struct debug_sym_function_s debug_sym_function;
 typedef struct debug_sym_symbol_s debug_sym_symbol;
+typedef struct debug_sym_type_s debug_sym_type;
+typedef struct debug_sym_type_member_s debug_sym_type_member;
 typedef struct debug_sym_function_argument_s debug_sym_function_argument;
 typedef struct debug_frame_pointer_s debug_frame_pointer;
 
@@ -40,7 +42,8 @@ enum function_scope_t {
 enum symbol_scope_t {
     SYMBOL_SCOPE_GLOBAL = 0,
     SYMBOL_SCOPE_FILE,
-    SYMBOL_SCOPE_LOCAL
+    SYMBOL_SCOPE_LOCAL,
+    SYMBOL_SCOPE_SYMBOL
 };
 
 enum type_record_type {
@@ -108,6 +111,20 @@ struct debug_sym_symbol_s {
     UT_hash_handle          hh;
 };
 
+struct debug_sym_type_member_s {
+    uint16_t                    offset;
+    debug_sym_symbol*           symbol;
+    debug_sym_type_member*      next;
+};
+
+struct debug_sym_type_s {
+    char                        name[128];
+    enum symbol_scope_t         scope;
+    const char*                 scope_value;
+    debug_sym_type_member*      first_child;
+    UT_hash_handle              hh;
+};
+
 struct debug_frame_pointer_s {
     symbol*                 symbol;
     debug_sym_function*     function;
@@ -157,6 +174,7 @@ extern void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame
 extern uint8_t debug_symbol_valid(debug_sym_symbol* sym, uint16_t stack, debug_frame_pointer* frame_pointer);
 extern debug_sym_symbol* cdb_get_first_symbol();
 extern debug_sym_symbol* cdb_find_symbol(const char* cname);
+extern debug_sym_type* cdb_find_type(const char* tname);
 
 extern debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit);
 extern debug_frame_pointer* debug_stack_frames_at(debug_frame_pointer* first, size_t frame);

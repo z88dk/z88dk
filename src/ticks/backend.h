@@ -47,6 +47,7 @@ typedef struct {
     void_cb next;
     void_cb step;
     void_cb detach;
+    uint8_t confirm_detach_w_breakpoints;
     restore_cb restore;
     breakpoint_cb add_breakpoint;
     breakpoint_cb remove_breakpoint;

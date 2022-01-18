@@ -607,6 +607,7 @@ static backend_t gdb_backend = {
     .resume = &debugger_resume,
     .next = &debugger_next,
     .step = &debugger_step,
+    .confirm_detach_w_breakpoints = 1,
     .detach = &debugger_detach,
     .restore = &debugger_restore,
     .add_breakpoint = &add_breakpoint,

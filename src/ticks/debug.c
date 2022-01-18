@@ -13,6 +13,7 @@
 static cfile *cfiles = NULL;
 static debug_sym_function *cfunctions = NULL;
 static debug_sym_symbol *cdb_csymbols = NULL;
+static debug_sym_type *cdb_ctypes = NULL;
 static cline *clines[65536] = {0};
 
 
@@ -35,25 +36,31 @@ enum record_partning_mode {
     RECORD_PARSING_MODE_DONE,
 };
 
-static uint8_t parse_address_space(const char *encoded, address_space *address_space)
+static uint8_t parse_address_space(const char* encoded, const char** result, address_space *address_space)
 {
     address_space->address_space = *encoded++;
 
     switch (address_space->address_space) {
         case 'C':
         case 'B':
+        case 'Z':
         case 'E': {
-            if (sscanf(encoded, ",%d,%d", &address_space->a, &address_space->b) != 2) {
+            int end;
+            if (sscanf(encoded, ",%d,%d%n", &address_space->a, &address_space->b, &end) != 2) {
+                *result = NULL;
                 return 1;
             }
+            encoded += end;
             break;
         }
         default: {
             printf("Warning: unsupported address space: %s\n", encoded);
+            *result = NULL;
             return 1;
         }
     }
 
+    *result = encoded;
     return 0;
 }
 
@@ -374,7 +381,7 @@ static void debug_add_function_info(const char *encoded)
         goto err;
     }
 
-    if (parse_address_space(encoded, &f->address_space)) {
+    if (parse_address_space(encoded, &encoded, &f->address_space)) {
         printf("Warning cannot parse address space.\n");
         goto err;
     }
@@ -388,7 +395,7 @@ err:
     printf("Warning: could not add debug info on function.\n");
 }
 
-static void debug_add_symbol_info(const char* encoded)
+static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char** result)
 {
     // S:G$VALUE_0$0_0$0({0}),E,0,0
     // S:Lother.c.haha2$c$0_0$0({2}SI:S),B,1,4
@@ -422,6 +429,18 @@ static void debug_add_symbol_info(const char* encoded)
             encoded++;
             break;
         }
+        case 'S':
+        {
+            // symbol scope
+            s->scope = SYMBOL_SCOPE_SYMBOL;
+            s->scope_value = NULL;
+
+            if (*encoded != '$') {
+                goto err;
+            }
+            encoded++;
+            break;
+        }
         case 'L':
         {
             // file scope
@@ -437,7 +456,6 @@ static void debug_add_symbol_info(const char* encoded)
         default:
         {
             printf("Warning: unknown symbol scope: %c\n", symbol_scope);
-            return;
         }
     }
 
@@ -453,7 +471,7 @@ static void debug_add_symbol_info(const char* encoded)
     s->symbol_name = strdup(symbol_name);
     encoded += end;
 
-    if (s->scope == SYMBOL_SCOPE_GLOBAL) {
+    if ((s->scope == SYMBOL_SCOPE_GLOBAL) || (s->scope == SYMBOL_SCOPE_SYMBOL)) {
         strcpy(s->name, s->symbol_name);
     } else {
         if (s->scope == SYMBOL_SCOPE_LOCAL) {
@@ -491,18 +509,116 @@ static void debug_add_symbol_info(const char* encoded)
         goto err;
     }
 
-    if (parse_address_space(encoded, &s->address_space)) {
+    if (parse_address_space(encoded, &encoded, &s->address_space)) {
         printf("Warning cannot parse address space.\n");
         goto err;
     }
 
-    HASH_ADD_STR(cdb_csymbols, symbol_name, s);
-
-    return;
+    *result = encoded;
+    return s;
 
 err:
+    *result = NULL;
     free(s);
     printf("Warning: could not add debug info on symbol.\n");
+    return NULL;
+}
+
+static debug_sym_type* debug_parse_type_info(const char* encoded)
+{
+    // T:Fsrc/server.c$test_t[({0}S:S$a$0_0$0({2}SI:S),Z,0,0)({2}S:S$b$0_0$0({2}SI:S),Z,0,0)]
+
+    debug_sym_type* t = malloc(sizeof(debug_sym_type));
+
+    char symbol_scope = *encoded++;
+    switch (symbol_scope)
+    {
+        case 'F':
+        {
+            // file scope
+            char file_name[FILENAME_MAX];
+            if (sscanf(encoded, "%[^$]$", file_name) != 1) {
+                goto err;
+            }
+            encoded += strlen(file_name) + 1;
+            t->scope = SYMBOL_SCOPE_FILE;
+            t->scope_value = strdup(file_name);
+            break;
+        }
+        case 'G':
+        {
+            // global scope
+            t->scope = SYMBOL_SCOPE_GLOBAL;
+            t->scope_value = NULL;
+
+            if (*encoded != '$') {
+                goto err;
+            }
+            encoded++;
+            break;
+        }
+        case 'L':
+        {
+            // file scope
+            char localiry_name[FILENAME_MAX];
+            if (sscanf(encoded, "%[^$]$", localiry_name) != 1) {
+                goto err;
+            }
+            encoded += strlen(localiry_name) + 1;
+            t->scope = SYMBOL_SCOPE_LOCAL;
+            t->scope_value = strdup(localiry_name);
+            break;
+        }
+        default:
+        {
+            printf("Warning: unknown symbol scope: %c\n", symbol_scope);
+            break;
+        }
+    }
+
+    char type_info[512];
+
+    if (sscanf(encoded, "%[^[][%[^]]]", t->name, type_info) != 2) {
+        goto err;
+    }
+
+    const char* encoded_type_info = type_info;
+    struct debug_sym_type_member_s* last = NULL;
+
+    while (*encoded_type_info) {
+        int offset;
+        int end;
+        if (sscanf(encoded_type_info, "({%d}S:%n", &offset, &end) != 1) {
+            goto err;
+        }
+        encoded_type_info += end;
+
+        struct debug_sym_type_member_s* new_member = calloc(1, sizeof(struct debug_sym_type_member_s));
+        new_member->offset = offset;
+        if (last == NULL) {
+            t->first_child = new_member;
+        } else {
+            last->next = new_member;
+        }
+
+        debug_sym_symbol* s = debug_parse_symbol_info(encoded_type_info, &encoded_type_info);
+        if (s) {
+            new_member->symbol = s;
+        } else {
+            goto err;
+        }
+        if (*encoded_type_info == ')') {
+            encoded_type_info++;
+        }
+
+        last = new_member;
+    }
+
+    return t;
+
+err:
+    free(t);
+    printf("Warning: could not add debug info on type.\n");
 }
 
 static void debug_add_module_info(const char* encoded)
@@ -549,7 +665,19 @@ void debug_add_info_encoded(char *encoded)
         }
         case 'S':
         {
-            debug_add_symbol_info(subtype);
+            const char* res;
+            debug_sym_symbol* s = debug_parse_symbol_info(subtype, &res);
+            if (s) {
+                HASH_ADD_STR(cdb_csymbols, symbol_name, s);
+            }
+            break;
+        }
+        case 'T':
+        {
+            debug_sym_type* t = debug_parse_type_info(subtype);
+            if (t) {
+                HASH_ADD_STR(cdb_ctypes, name, t);
+            }
             break;
         }
         default:
@@ -793,8 +921,27 @@ int get_type_memory_size(type_chain* chain) {
     if (chain == NULL) {
         return 1;
     }
-    switch (chain->type_)
-    {
+    switch (chain->type_) {
+        case TYPE_STRUCTURE: {
+            debug_sym_type* t = cdb_find_type(chain->data);
+            if (t == NULL) {
+                return 0;
+            }
+            debug_sym_type_member* child = t->first_child;
+            int max_offset = 0;
+            debug_sym_type_member* max_child = NULL;
+            while (child) {
+                if (child->offset >= max_offset) {
+                    max_offset = child->offset;
+                    max_child = child;
+                }
+                child = child->next;
+            }
+            if (max_child) {
+                return max_child->offset + max_child->symbol->type_record.size;
+            }
+            return 0;
+        }
         case TYPE_CHAR: {
             return 1;
         }
@@ -915,10 +1062,12 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
             break;
 
         case TYPE_STRUCTURE: {
+            into->memory_location = data;
             into->as_pointer.ptr = data;
             break;
         }
         case TYPE_ARRAY: {
+            into->memory_location = data;
             into->as_pointer.ptr = data;
             break;
         }
@@ -981,7 +1130,7 @@ void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointe
         }
         default: {
             sprintf(into->as_error, "Incorrect address space (not implemented)");
-            into->flags |= EXPRESSION_ERROR;
+            set_expression_result_error(into);
         }
     }
 }
@@ -999,6 +1148,15 @@ uint8_t debug_symbol_valid(debug_sym_symbol *sym, uint16_t stack, debug_frame_po
 debug_sym_symbol* cdb_find_symbol(const char* cname) {
     debug_sym_symbol* result;
     HASH_FIND_STR(cdb_csymbols, cname, result);
+    return result;
+}
+
+debug_sym_type* cdb_find_type(const char* tname) {
+    if (tname == NULL) {
+        return NULL;
+    }
+    debug_sym_type* result;
+    HASH_FIND_STR(cdb_ctypes, tname, result);
     return result;
 }
 

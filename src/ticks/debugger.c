@@ -806,6 +806,7 @@ static int cmd_down(int argc, char **argv)
 }
 
 void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* result) {
+    zero_expression_result(result);
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
 
@@ -856,7 +857,7 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
     debug_stack_frames_free(first_frame_pointer);
 
     sprintf(result->as_error, "Cannot resolve symbol: %s", lookup->symbol_name);
-    result->flags |= EXPRESSION_ERROR;
+    set_expression_result_error(result);
 }
 
 static int cmd_print(int argc, char **argv)
@@ -1693,12 +1694,14 @@ static int cmd_help(int argc, char **argv)
 
 static int cmd_quit(int argc, char **argv)
 {
-    breakpoint* elem;
-    int count;
-    LL_COUNT(breakpoints, elem, count);
-    if (count > 0) {
-        if (confirm("You have breakpoint(s) set. Would you like to remove them before you detach?")) {
-            delete_all_breakpoints();
+    if (bk.confirm_detach_w_breakpoints) {
+        breakpoint* elem;
+        int count;
+        LL_COUNT(breakpoints, elem, count);
+        if (count > 0) {
+            if (confirm("You have breakpoint(s) set. Would you like to remove them before you detach?")) {
+                delete_all_breakpoints();
+            }
         }
     }
     bk.detach();

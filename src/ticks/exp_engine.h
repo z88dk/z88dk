@@ -28,12 +28,15 @@ struct expression_result_t {
 
 extern void evaluate_expression_string(const char* expr);
 extern uint8_t is_expression_result_error(struct expression_result_t* result);
-extern void set_expression_result_error(struct expression_result_t* result, const char* error);
+extern void set_expression_result_error(struct expression_result_t* result);
+extern void set_expression_result_error_str(struct expression_result_t* result, const char* error);
 
 extern void expression_result_free(struct expression_result_t* result);
 extern void convert_expression(struct expression_result_t* from, struct expression_result_t* to, type_record* type);
 extern void expression_result_type_to_string(type_record* root, type_chain* type, char* buffer);
 extern void expression_dereference_pointer(struct expression_result_t *from, struct expression_result_t *to);
+extern void expression_resolve_struct_member(struct expression_result_t *struct_, const char *member, struct expression_result_t* result);
+extern void expression_resolve_struct_member_ptr(struct expression_result_t *struct_ptr, const char *member, struct expression_result_t* result);
 extern void expression_value_to_pointer(struct expression_result_t *from, struct expression_result_t *to, type_record* pointer_type);
 extern void expression_math_add(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result);
 extern void expression_math_sub(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result);
@@ -42,9 +45,10 @@ extern void expression_math_div(struct expression_result_t* a, struct expression
 extern void expression_string_get_type(const char* str, type_record* type);
 extern int expression_result_value_to_string(struct expression_result_t* result, char* buffer, int buffer_len);
 extern void reset_expression_result(struct expression_result_t* result);
+extern void zero_expression_result(struct expression_result_t* result);
 extern struct expression_result_t* get_expression_result();
 
-    struct lookup_t {
+struct lookup_t {
     const char* symbol_name;
 };
 
