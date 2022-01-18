@@ -18,8 +18,8 @@ int f;          /* number of digits to follow decimal point */
 char *str;      /* output string */
 {
         double scale;           /* scale factor */
-        int i,                          /* copy of f, and # digits before decimal point */
-                d;                              /* a digit */
+        int i,                  /* copy of f, and # digits before decimal point */
+            d;                  /* a digit */
 
         if( x < 0.0 ) {
                 *str++ = '-' ;

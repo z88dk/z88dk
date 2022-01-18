@@ -20,11 +20,11 @@ int prec ;              /* # digits after decimal place */
 char *str ;             /* output string */
 {
         double scale;   /* scale factor */
-        int i,                  /* counter */
-                d,                      /* a digit */
-                expon;          /* exponent */
+        int i,          /* counter */
+            d,          /* a digit */
+            expon;      /* exponent */
 
-        scale = 1.0 ;           /* scale = 10 ** prec */
+        scale = 1.0 ;   /* scale = 10 ** prec */
         i = prec ;
         while ( i-- )
         scale *= 10.0 ;

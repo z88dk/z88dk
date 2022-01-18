@@ -23,7 +23,7 @@ PUBLIC asm_am9511_eexit
 ; here to negate a number in dehl
 .asm_am9511_neg
     ld a,d
-    xor 080h
+    xor $80
     ld d,a
     ret
 

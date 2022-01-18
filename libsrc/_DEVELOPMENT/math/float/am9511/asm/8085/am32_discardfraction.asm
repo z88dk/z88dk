@@ -25,20 +25,20 @@ PUBLIC asm_am9511_discardfraction
 
     inc d
     dec d
-    jp Z,zero_legal             ; return IEEE zero
+    jp Z,return_zero            ; return IEEE zero
 
     ld a,d                      ; exponent
     sub $7f                     ; exponent value of 127 is 1.xx
-    jr C,return_zero
+    jp C,return_zero
 
     inc a
     cp 24
-    ret NC                      ; no shift needed, all integer
+    jp NC,shift_none            ; no shift needed, all integer
 
                                 ; build mask of integer bits
                                 ; a = number of bits to keep
     ld hl,0
-    ld e,h
+    ld e,l
 
 .shift_right                    ; shift mantissa mask right
     scf                         ; by setting 1s as we go
@@ -55,12 +55,12 @@ PUBLIC asm_am9511_discardfraction
     jp NZ,shift_right
 
     pop bc                      ; return mantissa bits
-    ld a,b
-    and h
-    ld h,a
     ld a,c
     and l
     ld l,a
+    ld a,b
+    and h
+    ld h,a
 
     pop bc                      ; return exponent and mantissa bits
     ld a,c                      ; first bit of e is exponent
@@ -70,19 +70,24 @@ PUBLIC asm_am9511_discardfraction
     ld d,b                      ; get original sign and exponent
     ret
 
+.shift_none
+    pop hl                      ; return mantissa
+    pop de                      ; return sign and exponent
+    ret
+
 .return_zero
+    pop hl                      ; balance stack
+    pop de
+
     ld a,d                      ; get the sign bit
     rla
-    ld d,0
 
-.zero_legal
-    ld e,d                      ; use 0
+    ld de,0
     ld hl,de
 
     ld a,d
     rra                         ; return sign and exponent
     ld d,a
 
-    pop af
     ret                         ; return IEEE signed ZERO in DEHL
 

@@ -35,7 +35,7 @@ EXTERN asm_am9511_normalize
 ; convert unsigned char in l to float in dehl
 .asm_am9511_float8u
     ld h,0
-    jr asm_am9511_float16
+    jp asm_am9511_float16
 
 ; convert signed char in l to float in dehl
 .asm_am9511_float8
@@ -43,13 +43,12 @@ EXTERN asm_am9511_normalize
     rla                         ; sign bit of a into C
     sbc a,a
     ld h,a                      ; now hl is sign extended
+    jp asm_am9511_float16
 
 ; convert unsigned in hl to float in dehl
 .asm_am9511_float16u
     ld a,h
-    rlca
-    or a                        ; ensure unsigned int's "sign" bit is reset
-    rra
+    and $7f                     ; ensure unsigned int's "sign" bit is reset
     ld h,a
                                 ; continue, with unsigned int number in hl
 
@@ -66,9 +65,7 @@ EXTERN asm_am9511_normalize
 ; convert unsigned long in dehl to float in dehl
 .asm_am9511_float32u
     ld a,d
-    rlca
-    or a                        ; ensure unsigned long's "sign" bit is reset
-    rra
+    and $7f                     ; ensure unsigned long's "sign" bit is reset
     ld d,a
                                 ; continue, with unsigned long number in dehl
 

@@ -9,6 +9,7 @@
 ;
 ;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_am9511
 
 EXTERN asm_am9511_zero, asm_am9511_max

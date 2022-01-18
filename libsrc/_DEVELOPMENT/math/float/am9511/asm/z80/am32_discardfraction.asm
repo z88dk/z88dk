@@ -9,7 +9,9 @@
 ;
 ;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_am9511
+
 PUBLIC asm_am9511_discardfraction
 
 ; Entry: dehl = 32 bit float
@@ -34,7 +36,7 @@ PUBLIC asm_am9511_discardfraction
                                 ; a = number of bits to keep
     exx
     ld hl,0
-    ld e,h
+    ld e,l
 
 .shift_right                    ; shift mantissa mask right
     scf                         ; setting 1s as we go

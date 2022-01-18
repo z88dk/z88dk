@@ -102,9 +102,9 @@ extern double_t __LIB__ hypot_callee(double_t x,double_t y) __smallc __z88dk_cal
 #define hypot(a,b) hypot_callee(a,b)
 
 /* Helper functions */
-extern double_t __LIB__ atof(char *) __smallc;
-extern void __LIB__ ftoa(double_t, int, char *) __smallc;
-extern void __LIB__ ftoe(double_t, int, char *) __smallc;
+extern double_t __LIB__ atof(char *) __smallc __z88dk_fastcall;
+extern void __LIB__ ftoa(double_t, int, char *) __smallc __z88dk_callee;
+extern void __LIB__ ftoe(double_t, int, char *) __smallc __z88dk_callee;
 
 extern double_t __LIB__ f32_fam9511(double_t x) __smallc __z88dk_callee;
 extern double_t __LIB__ fam9511_f32(double_t x) __smallc __z88dk_callee;
@@ -186,8 +186,8 @@ extern double_t hypot_callee(double_t x,double_t y) __z88dk_callee;
 
 /* Helper functions */
 extern double_t atof(char *);
-extern void ftoa(double_t, int, char *);
-extern void ftoe(double_t, int, char *);
+extern void ftoa(double_t, int, char *) __z88dk_callee;
+extern void ftoe(double_t, int, char *) __z88dk_callee;
 
 extern double_t f32_fam9511(double_t x) __z88dk_callee;
 extern double_t fam9511_f32(double_t x) __z88dk_callee;

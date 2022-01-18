@@ -16,8 +16,6 @@ PUBLIC  asm_am9511_fabs_fastcall
 
 .asm_am9511_fabs_fastcall
     ld a,d
-    rlca
-    or a        ;reset Carry
-    rra
+    and $7f         ;reset sign bit
     ld d,a
     ret
