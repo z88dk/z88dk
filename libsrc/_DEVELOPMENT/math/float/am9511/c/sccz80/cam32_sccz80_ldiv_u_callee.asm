@@ -19,9 +19,7 @@ EXTERN asm_am9511_ldiv_callee
 
 .cam32_sccz80_ldiv_u_callee
     ld a,d
-    rla
-    or a                    ; unsigned divisor
-    rra
+    and $7f                 ; unsigned divisor
     ld d,a
     jp asm_am9511_ldiv_callee
                             ; enter stack = sccz80_long left, ret

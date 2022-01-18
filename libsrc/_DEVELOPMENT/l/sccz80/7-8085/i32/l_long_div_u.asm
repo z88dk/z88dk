@@ -9,11 +9,16 @@ SECTION code_l_sccz80
 
 PUBLIC  l_long_div_u, l_long_div_u_0
 
+;for __printf_number where LSB of modulus is required in a
+;where the math library provides a l_long_div_u without this feature
+PUBLIC  l_long_div_m
+
 ;quotient = primary / secondary
 ;enter with secondary (divisor) in dehl, primary (dividend | quotient) on stack
 ;exit with quotient in dehl
 
 .l_long_div_u
+.l_long_div_m
     ld a,d                      ;check for divide by zero
     or e
     or h

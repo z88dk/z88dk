@@ -184,12 +184,13 @@ miniprintn_start_process:
 .divloop
 IF handlelong
   IF __CPU_INTEL__ | __CPU_GBZ80__
+    EXTERN  l_long_div_m
     push    de      ; number MSW
     push    hl      ; number LSW
     call    __printf_get_base
     ld      d,h
     ld      e,h
-    call    l_long_div_u    ;returns modulus LSB in a
+    call    l_long_div_m    ;returns modulus LSB in a
     cp      255
     push    af
   ELSE

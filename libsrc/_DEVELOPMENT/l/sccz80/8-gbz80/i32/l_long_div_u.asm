@@ -9,13 +9,16 @@ SECTION code_l_sccz80
 
 PUBLIC  l_long_div_u, l_long_div_u_0
 
-EXTERN  l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
+;for __printf_number where LSB of modulus is required in a
+;where the math library provides a l_long_div_u without this feature
+PUBLIC  l_long_div_m
 
 ;quotient = primary / secondary
 ;enter with secondary (divisor) in dehl, primary (dividend | quotient) on stack
 ;exit with quotient in dehl
 
 .l_long_div_u
+.l_long_div_m
     ld a,d                      ;check for divide by zero
     or e
     or h
@@ -77,24 +80,6 @@ EXTERN  l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
     ld      hl,sp+14            ;dividend (hl)
     rla                         ;restore Carry
 
-IF 1
-    call    l_long_rl_mhl       ;rotate left dividend + quotient Carry
-    ex      de,hl
-    call    l_long_rl_mhl       ;rotate left remainder + dividend Carry
-
-    ld      hl,sp+4             ;compare (remainder - divisor)
-    ex      de,hl
-    ld      hl,sp+8
-    call    l_long_cp_mhl
-
-    jp      C,skip_subtract     ;skip if remainder < divisor
-
-    ld      hl,sp+4             ;subtract (remainder - divisor)
-    ex      de,hl
-    ld      hl,sp+8
-    call    l_long_sub_mhl
-
-ELSE
     ;rotate left dividend + quotient Carry
     ld      a,(hl)
     rla
@@ -170,7 +155,6 @@ ELSE
     ld      a,(de)
     sbc     a,(hl)
     ld      (de),a
-ENDIF
 
 .skip_subtract
     ccf                         ;prepare Carry for quotient
@@ -181,7 +165,19 @@ ENDIF
     rra                         ;save Carry
     ld      hl,sp+14
     rla                         ;restore Carry
-    call    l_long_rl_mhl       ;rotate left quotient Carry
+
+    ld      a,(hl)              ;rotate left quotient Carry
+    rla
+    ld      (hl+),a
+    ld      a,(hl)
+    rla
+    ld      (hl+),a
+    ld      a,(hl)
+    rla
+    ld      (hl+),a
+    ld      a,(hl)
+    rla
+    ld      (hl),a
 
     ret
 
