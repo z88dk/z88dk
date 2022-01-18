@@ -55,7 +55,7 @@ PUBLIC asm_am9511_ldexp_callee
     jp Z,zero                   ; return IEEE signed zero
 
     ld de,sp+6
-    ld a,(de)                   ; pw2
+    ld a,(de)                   ; (int8_t)pw2
     add h
     ld h,a                      ; exponent returned
 
@@ -74,7 +74,7 @@ PUBLIC asm_am9511_ldexp_callee
     ld e,a
 
     pop bc                      ; pop return
-    pop hl                      ; valid mantissa
+    pop hl                      ; valid old mantissa
     pop af                      ; discard old mantissa and exponent
     pop af                      ; discard old pw2
     push bc                     ; replace return

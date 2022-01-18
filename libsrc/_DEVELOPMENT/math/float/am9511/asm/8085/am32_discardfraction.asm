@@ -23,11 +23,10 @@ PUBLIC asm_am9511_discardfraction
 
     rl de                       ; get exponent in d
 
-    inc d
-    dec d
+    ld a,d                      ; exponent
+    or a
     jp Z,return_zero            ; return IEEE zero
 
-    ld a,d                      ; exponent
     sub $7f                     ; exponent value of 127 is 1.xx
     jp C,return_zero
 
@@ -40,6 +39,8 @@ PUBLIC asm_am9511_discardfraction
     ld hl,0
     ld e,l
 
+    ld d,a                      ; use d for loop counter
+
 .shift_right                    ; shift mantissa mask right
     scf                         ; by setting 1s as we go
     ld a,e
@@ -51,7 +52,7 @@ PUBLIC asm_am9511_discardfraction
     ld a,l
     rra
     ld l,a
-    dec a
+    dec d
     jp NZ,shift_right
 
     pop bc                      ; return mantissa bits

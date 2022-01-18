@@ -70,8 +70,8 @@ PUBLIC asm_am9511_frexp_callee
     sbc a
     ld (bc),a
 
-    ld de,sp+4                  ; point to mantissa and exponent
-    ld a,(de)                   ; get original sign and exponent
+    ld de,sp+5                  ; point to original sign and exponent
+    ld a,(de)                   ; get sign and exponent
     rla                         ; capture sign
     ld a,h
     rra                         ; new sign and exponent
