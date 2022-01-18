@@ -148,7 +148,7 @@ ENDIF
 
 ; Get the file handle
 ;
-; Exit: hl = calling cuntion
+; Exit: hl = calling function
 ; Uses: f
 __printf_get_print_function:
 	push	de

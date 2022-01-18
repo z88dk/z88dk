@@ -30,12 +30,14 @@ IFDEF __CPU_8085__
         add d
         ld d,a
 
+        jp Z,zero_legal             ; check for zero exponent result
+
         ld a,e
         rla                         ; recover sign
         ld e,a
 
         ld a,d
-        rra                         ; new sign and exponent
+        rra                         ; sign and new exponent
         ld d,a
         ld a,e                      ; new exponent and mantissa
         rra
