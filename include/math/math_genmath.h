@@ -1,5 +1,5 @@
-#ifndef __MATH_GENMATH_H__
-#define __MATH_GENMATH_H__
+#ifndef __MATH_GENMATH_H
+#define __MATH_GENMATH_H
 
 #include <sys/compiler.h>
 #include <sys/types.h>
@@ -131,4 +131,4 @@ extern int __LIB__ fpclassify(double_t );
 #define fma(x,y,z) (x*y+z)
 
 
-#endif /* _MATH_GENMATH_H */
+#endif /* __MATH_GENMATH_H */
