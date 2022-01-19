@@ -42,18 +42,16 @@ static int symbol_compare(const void *p1, const void *p2)
     return s2->address - s1->address;
 }
 
-
-
+static char read_symbol_buf[2048];
 
 void read_symbol_file(char *filename)
 {
-    char  buf[512];
     FILE *fp = fopen(filename,"r");
 
     if ( fp != NULL ) {
-        while ( fgets(buf, sizeof(buf), fp) != NULL ) {
+        while ( fgets(read_symbol_buf, sizeof(read_symbol_buf), fp) != NULL ) {
             int argc;
-            char **argv = parse_words(buf,&argc);
+            char **argv = parse_words(read_symbol_buf,&argc);
 
             // Ignore
             if ( argc < 10 ) {

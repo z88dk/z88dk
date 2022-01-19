@@ -141,6 +141,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                         last->type_ = TYPE_ARRAY;
                         last->size = strtol(rt, &end, 0);
                         rt = end;
+                        if (*rt == 'x') rt++;
                         break;
                     }
                     case 'F': {
@@ -576,10 +577,9 @@ static debug_sym_type* debug_parse_type_info(const char* encoded)
         }
     }
 
-    char type_info[512];
-
+    char* type_info = malloc(strlen(encoded));
     if (sscanf(encoded, "%[^[][%[^]]]", t->name, type_info) != 2) {
-        goto err;
+        goto err_type_info;
     }
 
     const char* encoded_type_info = type_info;
@@ -589,7 +589,7 @@ static debug_sym_type* debug_parse_type_info(const char* encoded)
         int offset;
         int end;
         if (sscanf(encoded_type_info, "({%d}S:%n", &offset, &end) != 1) {
-            goto err;
+            goto err_type_info;
         }
         encoded_type_info += end;
 
@@ -601,11 +601,13 @@ static debug_sym_type* debug_parse_type_info(const char* encoded)
             last->next = new_member;
         }
 
-        debug_sym_symbol* s = debug_parse_symbol_info(encoded_type_info, &encoded_type_info);
+        const char* updated_encoded_type_info;
+        debug_sym_symbol* s = debug_parse_symbol_info(encoded_type_info, &updated_encoded_type_info);
         if (s) {
+            encoded_type_info = updated_encoded_type_info;
             new_member->symbol = s;
         } else {
-            goto err;
+            goto err_type_info;
         }
         if (*encoded_type_info == ')') {
             encoded_type_info++;
@@ -614,11 +616,16 @@ static debug_sym_type* debug_parse_type_info(const char* encoded)
         last = new_member;
     }
 
+    free(type_info);
+
     return t;
 
+err_type_info:
+    free(type_info);
 err:
     free(t);
     printf("Warning: could not add debug info on type.\n");
+    return NULL;
 }
 
 static void debug_add_module_info(const char* encoded)
@@ -861,7 +868,7 @@ uint8_t is_type_a_pointer(type_chain* type) {
     if (type == NULL) {
         return 0;
     }
-    return type->type_ == TYPE_GENERIC_POINTER || type->type_ == TYPE_CODE_POINTER;
+    return type->type_ == TYPE_GENERIC_POINTER || type->type_ == TYPE_CODE_POINTER || type->type_ == TYPE_ARRAY;
 }
 
 uint8_t are_type_chains_same(type_chain* a, type_chain* b)
@@ -988,6 +995,7 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
                 }
             }
             into->as_int = ch;
+            break;
         }
         case TYPE_INT:
         case TYPE_SHORT:

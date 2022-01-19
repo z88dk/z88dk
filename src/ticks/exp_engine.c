@@ -264,6 +264,16 @@ void expression_result_type_to_string(type_record* root, type_chain* type, char*
             }
             break;
         }
+        case TYPE_ARRAY: {
+            if (type->next == NULL) {
+                sprintf(buffer, "void*");
+            } else {
+                char array_type[128];
+                expression_result_type_to_string(root, type->next, array_type);
+                sprintf(buffer, "%s[]", array_type);
+            }
+            break;
+        }
         case TYPE_STRUCTURE: {
             sprintf(buffer, "struct %s", type->data);
             break;
@@ -488,7 +498,7 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
             for ( int i = 0; i < maxlen; i++ ) {
                 offs += snprintf(buffer + offs, buffer_len - offs, "%s[%d] = ", i != 0 ? ", " : "", i);
                 struct expression_result_t elr = {};
-                debug_resolve_expression_element(&result->type, result->type.first, RESOLVE_BY_POINTER, ptr, &elr);
+                debug_resolve_expression_element(&result->type, result->type.first->next, RESOLVE_BY_POINTER, ptr, &elr);
                 if (is_expression_result_error(&elr)) {
                     offs += snprintf(buffer + offs, buffer_len - offs, "<error:%s>", elr.as_error);
                     break;

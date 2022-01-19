@@ -704,12 +704,14 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
                     strcat(function_args, arg_text);
                 } else {
                     char exp_type[128] = "unknown";
-                    char exp_value[128] = "???";
+                    char* exp_value = malloc(2048);
+                    strcpy(exp_value, "???");
 
                     expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
-                    expression_result_value_to_string(&exp, exp_value, sizeof(exp_value));
+                    expression_result_value_to_string(&exp, exp_value, 2048);
 
                     snprintf(arg_text, sizeof(arg_text), "<%s>%s = %s", exp_type, s->symbol_name, exp_value);
+                    free(exp_value);
                     strcat(function_args, arg_text);
                 }
 
@@ -894,11 +896,13 @@ static int cmd_print(int argc, char **argv)
     }
 
     char type[128] = "unknown";
-    char value[128] = "???";
+    char* value = malloc(2048);
+    strcpy(value, "???");
     expression_result_type_to_string(&result->type, result->type.first, type);
-    expression_result_value_to_string(result, value, sizeof(value));
+    expression_result_value_to_string(result, value, 2048);
 
     printf("Result: <%s> %s\n", type, value);
+    free(value);
 
     expression_result_free(result);
     int new_types = count_allocated_types();
@@ -956,10 +960,12 @@ static void info_section_locals() {
                     printf("  %s = <error>\n", s->symbol_name);
                 } else {
                     char exp_type[128] = "unknown";
-                    char exp_value[128] = "???";
+                    char* exp_value = malloc(2048);
+                    strcpy(exp_value, "???");
                     expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
-                    expression_result_value_to_string(&exp, exp_value, sizeof(exp_value));
+                    expression_result_value_to_string(&exp, exp_value, 2048);
                     printf("  <%s>%s = %s\n", exp_type, s->symbol_name, exp_value);
+                    free(exp_value);
                 }
                 expression_result_free(&exp);
             } else {
@@ -1000,10 +1006,12 @@ static void info_section_globals() {
         }
 
         char exp_type[128] = "unknown";
-        char exp_value[128] = "???";
+        char* exp_value = malloc(2048);
+        strcpy(exp_value, "???");
         expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
-        expression_result_value_to_string(&exp, exp_value, sizeof(exp_value));
+        expression_result_value_to_string(&exp, exp_value, 2048);
         printf("  <%s>%s = %s\n", exp_type, s->symbol_name, exp_value);
+        free(exp_value);
         expression_result_free(&exp);
     }
 
