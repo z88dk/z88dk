@@ -7,15 +7,17 @@
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC  l_long_div_u
+PUBLIC  l_long_div_m
 
 EXTERN  l_long_div_0
+
+;for __printf_number where LSB of modulus is required in a
 
 ;quotient = primary / secondary
 ;enter with secondary (divisor) in dehl, primary (dividend | quotient) on stack
 ;exit with quotient in dehl
 
-.l_long_div_u
+.l_long_div_m
     ld      a,d                 ;check for divide by zero
     or      e
     or      h
@@ -43,6 +45,9 @@ EXTERN  l_long_div_0
     ld      hl,(de)
     ld      de,sp+14            ;place return on stack
     ld      (de),hl
+
+    ld      de,sp+2             ;get remainder LSB (for __printf_number)
+    ld      a,(de)
 
     ld      de,sp+12            ;get quotient LSW
     ld      hl,(de)

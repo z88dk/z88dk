@@ -9,18 +9,18 @@ SECTION code_l_sccz80
 
 PUBLIC  l_long_div
 
-EXTERN  l_long_div_u_0, l_long_neg_mhl
+EXTERN  l_long_div_0, l_long_neg_mhl
 
 ;quotient = primary / secondary
 ;enter with secondary (divisor) in dehl, primary (dividend | quotient) on stack
 ;exit with quotient in dehl
 
 .l_long_div
-    ld a,d                      ;check for divide by zero
-    or e
-    or h
-    or l                        ;clear Carry to quotient
-    jr Z, divide_by_zero
+    ld      a,d                 ;check for divide by zero
+    or      e
+    or      h
+    or      l                   ;clear Carry to quotient
+    jr      Z, divide_by_zero
 
     push    de                  ;put secondary (divisor) on stack
     push    hl
@@ -46,7 +46,7 @@ EXTERN  l_long_div_u_0, l_long_neg_mhl
     add     a,a                 ;test sign of divisor
     call    C,l_long_neg_mhl    ;take absolute value of divisor
 
-    call    l_long_div_u_0      ;unsigned division
+    call    l_long_div_0        ;division loop
 
     ;tidy up with quotient to dehl
 
