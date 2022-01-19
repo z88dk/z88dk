@@ -16,24 +16,22 @@ IFDEF __CPU_8085__
 .l_f32_ldexp
         push af                     ; save power
 
-        rl de                       ; get the exponent
+        rl de                       ; get the sign and exponent
 
         inc d
         dec d
         jp Z,zero_legal
 
         ld a,e
-        rra                         ; capture sign
+        rra                         ; save sign in e[7]
         ld e,a
 
         pop af                      ; restore power
         add d
         ld d,a
 
-        jp Z,zero_legal             ; check for zero exponent result
-
         ld a,e
-        rla                         ; recover sign
+        rla                         ; restore sign to C
         ld e,a
 
         ld a,d
@@ -45,7 +43,6 @@ IFDEF __CPU_8085__
 
         ret
 
-
 .zero_legal
         ld e,d                      ; use 0
         ld hl,de
@@ -54,6 +51,7 @@ IFDEF __CPU_8085__
         rra                         ; return sign and exponent
         ld d,a
 
+        pop af                      ; balance stack
         ret                         ; return IEEE signed ZERO in DEHL
 
 ELSE
