@@ -722,23 +722,22 @@
 	ld	sp,hl
 	ld	hl,%1
 
+%provide safe hl return
 %cpu 8085
 %check 0 <= %1 <= 255
-	ex	de,hl
 	ld	hl,%1	;const
 	add	hl,sp
-	ld	sp,hl
-	ex	de,hl
 =
+	ex	de,hl
 	ld	de,sp+%1	;const <= 255
 	ex	de,hl
-	ld	sp,hl
-	ex	de,hl
 
+%optimise the standard load
 %cpu 8085
 %check 0 <= %1 <= 255
-	ld	hl,%1	;const
-	add	hl,sp
+	ex	de,hl
+	ld	de,sp+%1	;const <= 255
+	ex	de,hl
 =
 	ld	de,sp+%1	;const <= 255
 	ex	de,hl
