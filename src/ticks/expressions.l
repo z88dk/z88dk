@@ -13,6 +13,7 @@ int lookup_word();
 %}
 
 word [a-zA-Z_][a-zA-Z0-9_]*
+struct_word "struct "[a-zA-Z_][a-zA-Z0-9_]*
 multiple_words "unsigned char"|"unsigned short"|"unsigned int"|"unsigned long"
 
 %%
@@ -43,6 +44,7 @@ multiple_words "unsigned char"|"unsigned short"|"unsigned int"|"unsigned long"
 "->"		        { return T_ARROW; }
 {multiple_words}	{ return lookup_word(); }
 {word}		        { return lookup_word(); }
+{struct_word}       { return lookup_word(); }
 "+"		            { return T_PLUS; }
 "-"		            { return T_MINUS; }
 "*"		            { return T_STAR; }

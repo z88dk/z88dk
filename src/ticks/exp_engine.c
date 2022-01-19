@@ -228,6 +228,16 @@ void expression_resolve_struct_member(struct expression_result_t *struct_, const
 }
 
 void expression_string_get_type(const char* str, type_record* type) {
+    if (strstr(str, "struct ") == str) {
+        str += 7;
+        debug_sym_type* t = cdb_find_type(str);
+        if (t != NULL) {
+            type->signed_ = 0;
+            type->first = malloc_type(TYPE_STRUCTURE);
+            type->first->data = t->name;
+            return;
+        }
+    }
     for (int i = 0; primitive_types[i].type_name; i++) {
         if (strcmp(str, primitive_types[i].type_name) == 0) {
             type->signed_ = primitive_types[i].is_signed;
