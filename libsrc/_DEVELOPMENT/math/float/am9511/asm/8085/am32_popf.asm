@@ -59,7 +59,7 @@ PUBLIC asm_am9511_popf
 
     in a,(__IO_APU_STATUS)      ; read the APU status register
     and 03eh                    ; errors from status register
-    jr NZ,errors
+    jp NZ,errors
 
     ld a,d                      ; get sign and exponent
     rla                         ; remove sign

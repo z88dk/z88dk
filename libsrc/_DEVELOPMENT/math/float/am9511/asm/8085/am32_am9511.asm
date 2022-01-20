@@ -70,11 +70,11 @@ PUBLIC asm_am9511_f32
 
     ld a,d                      ; get exponent
     or a                        ; check for zero
-    jr Z,am9511_zero
+    jp Z,am9511_zero
     cp 127+63                   ; check for overflow
-    jr NC,am9511_max
+    jp NC,am9511_max
     cp 127-64                   ; check for underflow
-    jr C,am9511_zero
+    jp C,am9511_zero
     sub 127-1                   ; bias including shift binary point
     rla                         ; position exponent for sign
     ld d,a
