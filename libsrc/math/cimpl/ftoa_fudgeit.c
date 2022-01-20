@@ -6,8 +6,8 @@ int ftoa_fudgeit(float x, float scale)
     float c;
     int   b;
 
-    b = z;
-    c = z - (double)b;
+    b = (int)z;
+    c = z - (float)b;
     if  ( c > 0.999999 ) return b + 1;
 
     return b;

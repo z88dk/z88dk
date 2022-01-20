@@ -7,10 +7,10 @@ vpath %.c ../cimpl
 
 
 CFILES  = $(notdir $(wildcard ../../_DEVELOPMENT/math/float/am9511/c/*.c)) atof.c ftoa.c ftoe.c
-CFILES  = atof.c ftoa.c ftoe.c ftoa_fudgeit.c
+CFILES  = atof.c ftoa.c ftoe.c
 OBJECTS = $(CFILES:.c=.o)
 
-CFLAGS += -fp-mode=ieee  -DMUST_ROUND
+CFLAGS += -fp-mode=ieee
 
 all: dirs $(OUTPUT_DIRECTORY)/am9511.lib $(OUTPUT_DIRECTORY)/am9511_ixiy.lib $(OUTPUT_DIRECTORY)/am9511_8085.lib
 
