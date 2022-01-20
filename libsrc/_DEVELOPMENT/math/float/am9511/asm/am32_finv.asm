@@ -29,15 +29,13 @@ PUBLIC asm_am9511_finv, asm_am9511_finv_fastcall
 
 ; enter here for floating inverse, 1/x, x on stack, result in dehl
 .asm_am9511_finv
-    call asm_am9511_pushf           ; x
 
     ld de,03f80h
     ld hl,0
 
     call asm_am9511_pushf_fastcall  ; 1
 
-    ld a,__IO_APU_OP_XCHF
-    out (__IO_APU_CONTROL),a        ; swap
+    call asm_am9511_pushf           ; x
 
     ld a,__IO_APU_OP_FDIV
     out (__IO_APU_CONTROL),a        ; 1 / x

@@ -50,7 +50,7 @@ char *str;      /* output string */
                 d = x / scale ;
 #endif
                 *str++ = d + '0' ;
-                x = x - ((double)d *scale) ;
+                x = x - ((double)d * scale) ;
         }
         if ( f <= 0 ) {
                 *str = 0;
