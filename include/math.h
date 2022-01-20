@@ -50,4 +50,4 @@
 #endif
 
 
-#endif /* _MATH_H */
+#endif /* __MATH_H__ */

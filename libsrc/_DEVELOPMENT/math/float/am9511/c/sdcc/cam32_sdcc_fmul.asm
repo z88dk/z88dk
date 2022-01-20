@@ -6,7 +6,7 @@ SECTION code_fp_am9511
 
 PUBLIC cam32_sdcc_fmul
 
-EXTERN cam32_sdcc_readr, asm_am9511_fmul
+EXTERN asm_sdcc_readr, asm_am9511_fmul
 
 .cam32_sdcc_fmul
 
@@ -18,7 +18,7 @@ EXTERN cam32_sdcc_readr, asm_am9511_fmul
     ;
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
-    call cam32_sdcc_readr
+    call asm_sdcc_readr
     jp asm_am9511_fmul      ; enter stack = sdcc_float right, sdcc_float left, ret
                             ;        DEHL = sdcc_float right
                             ; return DEHL = sdcc_float

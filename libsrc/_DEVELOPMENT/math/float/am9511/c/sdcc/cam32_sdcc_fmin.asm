@@ -6,7 +6,7 @@ SECTION code_fp_am9511
 
 PUBLIC cam32_sdcc_fmin
 
-EXTERN cam32_sdcc_read1, cam32_sdcc_readr, asm_am9511_compare
+EXTERN asm_sdcc_read1, asm_sdcc_readr, asm_am9511_compare
 
     ; minimum of two sdcc floats
     ;
@@ -19,7 +19,7 @@ EXTERN cam32_sdcc_read1, cam32_sdcc_readr, asm_am9511_compare
     
 .cam32_sdcc_fmin
     call asm_am9511_compare ; compare two floats on the stack
-    jp NC,cam32_sdcc_readr
-    jp cam32_sdcc_read1     ; enter  stack = sdcc_float right, sdcc_float left, ret
+    jp NC,asm_sdcc_readr
+    jp asm_sdcc_read1       ; enter  stack = sdcc_float right, sdcc_float left, ret
                             ; return stack = sdcc_float right, sdcc_float left
                             ;         DEHL = sdcc_float min

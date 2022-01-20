@@ -10,7 +10,7 @@ CFILES  = $(notdir $(wildcard ../../_DEVELOPMENT/math/float/math32/c/*.c)) atof.
 CFILES  = atof.c ftoa.c ftoe.c ftoa_fudgeit.c
 OBJECTS = $(CFILES:.c=.o)
 
-CFLAGS += -fp-mode=ieee  -DMUST_ROUND
+CFLAGS += -fp-mode=ieee -DMUST_ROUND
 
 all: dirs $(OUTPUT_DIRECTORY)/math32.lib $(OUTPUT_DIRECTORY)/math32_ixiy.lib
 

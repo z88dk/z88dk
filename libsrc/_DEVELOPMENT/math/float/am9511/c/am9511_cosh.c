@@ -1,7 +1,7 @@
 
 #include "am9511_math.h"
 
-float am9511_cosh (const float x) __z88dk_fastcall
+float am9511_cosh (float x) __z88dk_fastcall
 {
     float y;
 

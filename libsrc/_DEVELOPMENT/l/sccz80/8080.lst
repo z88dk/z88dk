@@ -13,10 +13,12 @@ ${NEWLIB_ROOT}l/sccz80/8-8080/l_rlde
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_glong2sp
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_cm_de
 ${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_sub
+${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_div
+${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_div_0
+${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_div_m
 ${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_div_u
 ${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_add
 ${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_asl
-${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_div
 ${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_xor
 ${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_mult
 ${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_and

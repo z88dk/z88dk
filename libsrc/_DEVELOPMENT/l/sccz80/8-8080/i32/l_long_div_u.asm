@@ -7,9 +7,9 @@
 SECTION code_clib
 SECTION code_l_sccz80
 
-PUBLIC  l_long_div_u, l_long_div_u_0
+PUBLIC  l_long_div_u
 
-EXTERN  l_long_rl_mde, l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
+EXTERN  l_long_div_0
 
 ;quotient = primary / secondary
 ;enter with secondary (divisor) in dehl, primary (dividend | quotient) on stack
@@ -31,7 +31,7 @@ EXTERN  l_long_rl_mde, l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
 
     push    bc                  ;save null sign info
 
-    call    l_long_div_u_0      ;unsigned division
+    call    l_long_div_0        ;division loop
 
     ;tidy up with quotient to dehl
 
@@ -49,9 +49,6 @@ EXTERN  l_long_rl_mde, l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
     inc     hl
     ld      (hl),d
 
-    ld      hl,sp+2             ;get remainder LSB (for __printf_number)
-    ld      a,(hl)
-
     ld      hl,sp+12            ;get quotient LSW
     ld      e,(hl)
     inc     hl
@@ -65,129 +62,6 @@ EXTERN  l_long_rl_mde, l_long_rl_mhl, l_long_cp_mhl, l_long_sub_mhl
     ld      de,bc               ;quotient MSW
 
     ret
-
-
-.l_long_div_u_0
-    ld      b,32                ;set up div_loop counter
-
-.div_loop
-    rra                         ;save Carry
-    ld      hl,sp+4             ;remainder (hl)
-    ex      de,hl
-    ld      hl,sp+14            ;dividend (hl)
-    rla                         ;restore Carry
-
-IF 1
-    call    l_long_rl_mhl       ;rotate left dividend + quotient Carry
-    call    l_long_rl_mde       ;rotate left remainder + dividend Carry
-
-    ld      hl,sp+4             ;compare (remainder - divisor)
-    ex      de,hl
-    ld      hl,sp+8
-    call    l_long_cp_mhl
-
-    jp      C,skip_subtract     ;skip if remainder < divisor
-
-    ld      hl,sp+4             ;subtract (remainder - divisor)
-    ex      de,hl
-    ld      hl,sp+8
-    call    l_long_sub_mhl
-
-ELSE
-    ;rotate left dividend + quotient Carry
-    ld      a,(hl)
-    rla
-    ld      (hl),a
-    inc     hl
-    ld      a,(hl)
-    rla
-    ld      (hl),a
-    inc     hl
-    ld      a,(hl)
-    rla
-    ld      (hl),a
-    inc     hl
-    ld      a,(hl)
-    rla
-    ld      (hl),a
-
-    ;rotate left remainder + dividend Carry
-    ld      a,(de)
-    rla
-    ld      (de),a
-    inc     de
-    ld      a,(de)
-    rla
-    ld      (de),a
-    inc     de
-    ld      a,(de)
-    rla
-    ld      (de),a
-    inc     de
-    ld      a,(de)
-    rla
-    ld      (de),a
-
-    ;compare (remainder - divisor)
-    ld      hl,sp+4
-    ex      de,hl
-    ld      hl,sp+8
-
-    ld      a,(de)
-    sub     a,(hl)
-    inc     de
-    inc     hl
-    ld      a,(de)
-    sbc     a,(hl)
-    inc     de
-    inc     hl
-    ld      a,(de)
-    sbc     a,(hl)
-    inc     de
-    inc     hl
-    ld      a,(de)
-    sbc     a,(hl)
-
-    jp      C,skip_subtract     ;skip if remainder < divisor
-    
-    ;subtract (remainder - divisor)
-    ld      hl,sp+4 
-    ex      de,hl
-    ld      hl,sp+8
-
-    ld      a,(de)
-    sub     a,(hl)
-    ld      (de),a
-    inc     de
-    inc     hl
-    ld      a,(de)
-    sbc     a,(hl)
-    ld      (de),a
-    inc     de
-    inc     hl
-    ld      a,(de)
-    sbc     a,(hl)
-    ld      (de),a
-    inc     de
-    inc     hl
-    ld      a,(de)
-    sbc     a,(hl)
-    ld      (de),a
-ENDIF
-
-.skip_subtract
-    ccf                         ;prepare Carry for quotient
-
-    dec     b
-    jp      NZ,div_loop
-
-    rra                         ;save Carry
-    ld      hl,sp+14
-    rla                         ;restore Carry
-    call    l_long_rl_mhl       ;rotate left quotient Carry
-
-    ret
-
 
 .divide_by_zero
     pop     bc                  ;pop return

@@ -6,7 +6,7 @@ SECTION code_fp_am9511
 
 PUBLIC cam32_sccz80_fdiv
 
-EXTERN cam32_sccz80_switch_arg, cam32_sccz80_readl
+EXTERN asm_switch_arg, asm_sccz80_readl
 EXTERN asm_am9511_fdiv
 
     ; divide sccz80 float by sccz80 float
@@ -18,8 +18,8 @@ EXTERN asm_am9511_fdiv
     ; uses  : af, bc, de, hl, af', bc', de', hl'
 
 .cam32_sccz80_fdiv
-    call cam32_sccz80_switch_arg
-    call cam32_sccz80_readl
+    call asm_switch_arg
+    call asm_sccz80_readl
     jp asm_am9511_fdiv      ; enter stack = sccz80_float right, sccz80_float left, ret
                             ;        DEHL = sccz80_float right
                             ; return DEHL = sccz80_float

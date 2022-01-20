@@ -7,9 +7,10 @@ OBJECTS := $(SOURCES:.c=.o)
 CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED 
 
 
-all:	test_genmath.bin test_math48.bin test_math32.bin test_math16.bin test_daimath32.bin \
+all: test_genmath.bin test_math48.bin test_math32.bin test_math16.bin test_daimath32.bin \
 	test_math48_rc2014_CODE.bin test_9511_rc2014_CODE.bin \
-	test_mbf32.bin test_mbf32_8080.bin test_mbf32_8085.bin test_mbf32_gbz80.bin
+	test_mbf32.bin test_mbf32_8080.bin test_mbf32_8085.bin test_mbf32_gbz80.bin \
+	test_9511_8085.bin
 
 
 test_genmath.bin: $(SOURCES)
@@ -26,6 +27,10 @@ test_mbf32_8080.bin: $(SOURCES)
 
 test_mbf32_8085.bin: $(SOURCES)
 	$(call compile_8085, -DMBF32 --math-mbf32_8085 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
+	$(runtest_8085)
+
+test_9511_8085.bin: $(SOURCES)
+	$(call compile_8085, -DAM9511 --math-am9511_8085 -DMATH_LIBRARY="\"\\\"AM9511\\\"\"")
 	$(runtest_8085)
 
 test_mbf32_gbz80.bin: $(SOURCES)

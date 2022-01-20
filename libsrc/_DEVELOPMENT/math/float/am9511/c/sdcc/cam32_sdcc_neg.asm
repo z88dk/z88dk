@@ -6,7 +6,7 @@ SECTION code_fp_am9511
 
 PUBLIC cam32_sdcc_neg
 
-EXTERN cam32_sdcc_read1, asm_am9511_neg
+EXTERN asm_sdcc_read1, asm_am9511_neg
 
 .cam32_sdcc_neg
 
@@ -18,7 +18,7 @@ EXTERN cam32_sdcc_read1, asm_am9511_neg
     ;
     ; uses  : af, bc, de, hl
 
-    call cam32_sdcc_read1
+    call asm_sdcc_read1
 
     jp asm_am9511_neg       ; enter stack = sdcc_float, ret
                             ;        DEHL = sdcc_float

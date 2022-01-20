@@ -1,5 +1,5 @@
-#ifndef __MATH_ZXMATH_H__
-#define __MATH_ZXMATH_H__
+#ifndef __MATH_ZXMATH_H
+#define __MATH_ZXMATH_H
 
 #include <sys/compiler.h>
 #include <sys/types.h>
@@ -128,4 +128,4 @@ extern int __LIB__ fpclassify(double_t );
 #define fma(x,y,z) (x*y+z)
 
 
-#endif /* _MATH_ZXMATH_H */
+#endif /* __MATH_ZXMATH_H */

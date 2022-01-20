@@ -1,9 +1,10 @@
 
+SECTION code_clib
 SECTION code_fp_am9511
 
 PUBLIC cam32_sccz80_modf_callee
 
-EXTERN _am9511_modf
+EXTERN _am9511_modf, asm_switch_arg
 
 ; float modff(float x, float * y)
 .cam32_sccz80_modf_callee
@@ -11,14 +12,7 @@ EXTERN _am9511_modf
     ; Stack: float left, ptr right, ret
 
     ; Reverse the stack
-    pop af      ;ret
-    pop bc      ;ptr
-    pop hl      ;float
-    pop de
-    push af     ;ret
-    push bc     ;ptr
-    push de     ;float
-    push hl
+    call asm_switch_arg
     call _am9511_modf
     pop af
     pop af

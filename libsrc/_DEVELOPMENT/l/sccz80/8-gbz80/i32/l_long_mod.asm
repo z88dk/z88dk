@@ -9,7 +9,7 @@ SECTION code_l_sccz80
 
 PUBLIC  l_long_mod
 
-EXTERN  l_long_div_u_0, l_long_neg_mhl
+EXTERN  l_long_div_0, l_long_neg_mhl
 
 ;remainder = primary % secondary
 ;enter with secondary (divisor) in dehl, primary (dividend | quotient) on stack
@@ -46,7 +46,7 @@ EXTERN  l_long_div_u_0, l_long_neg_mhl
     add     a,a                 ;test sign of divisor
     call    C,l_long_neg_mhl    ;take absolute value of divisor
 
-    call    l_long_div_u_0      ;unsigned division
+    call    l_long_div_0        ;division loop
 
     ;tidy up with remainder to dehl
 
