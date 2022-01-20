@@ -9,7 +9,7 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _cos
-EXTERN cam32_sdcc_dcc_cos
-defc _cos = cam32_sdcc_dcc_cos
+EXTERN cam32_sdcc_cos
+defc _cos = cam32_sdcc_cos
 ENDIF
 
