@@ -99,9 +99,9 @@ The intrinsic functions, written in assembly, assume the sccz80 calling conventi
 
 The library is laid out in these directories.
 
-### z80
+### asm z80 / 8085
 
-Contains the assembly language implementation of the maths library.  This includes the maths functions expected by the C11 standard and various low level functions necessary to implement a complete float package accessible from assembly language.  These functions are the intrinsic `am9511` functions.
+Contains the assembly language implementation of the maths library. This includes the maths functions expected by the C11 standard and various low level functions necessary to implement a complete float package accessible from assembly language. These functions are the intrinsic `am9511` functions. Where no differentiation between z80 and 8085 implementation (i.e. 8080 compatible) is required the functions are in the base library. Otherwise the functions are provide in either z80 or 8085 specific directory, and are compiled according to the library requirements.
 
 ### c
 
@@ -116,6 +116,8 @@ Contains the zsdcc and the sccz80 C compiler interface and is implemented using 
 Glue that connects the compilers and standard assembly interface to the `am9511` library.  The purpose is to define aliases that connect the standard names to the am9511 specific names.  These functions make up the complete z88dk `am9511` maths library that is linked against on the compile line as `-lam9511`.
 
 An alias is provided to simplify usage of the library. `--am9511` provides all the required linkages and definitions, as a simple alternative to `-Cc-fp-mode=ieee -Cc-D__MATH_AM9511 -D__MATH_AM9511 -lam9511 -pragma-define:CLIB_32BIT_FLOATS=1`.
+
+For 8085 support using the classic library an alternative alias is provided to simplify usage of the library. `--math-am9511_8085` provides all the required linkages and definitions. This format aligns with common practice for classic maths library aliases.
 
 ## Function Discussion
 
@@ -212,7 +214,6 @@ To compare to the [standardised benchmark results](https://github.com/z88dk/z88d
 
 #### whetstone
 
-Z88DK August 16, 2020<br>
 zsdcc #11722 / new c library
 
 zsdcc / newlib / **math48 - 126 seconds**
@@ -226,6 +227,10 @@ zsdcc / newlib / **math32 - 92 seconds**
 zsdcc / newlib / **am9511 - 28 seconds**
 
 `zcc +rc2014 -subtype=cpm -SO3 --max-allocs-per-node400000 -DPRINTOUT whetstone.c -o whetstone --am9511 -m -create-app`
+
+zsccz80 / classic / **am9511 - 30 seconds**
+
+`zcc +cpm -clib=8085 -O2 -DSTATIC -DPRINTOUT whetstone.c -o whetstone --math-am9511_8085 -lndos -create-app`
 
 
 #### spectral-norm
@@ -254,6 +259,14 @@ sccz80 / newlib / **am9511 - 5 min 28 seconds** - `--opt-code-speed=inlineints`<
 1.2742140
 
 `zcc +rc2014 -subtype=cpm -clib=new --opt-code-speed=inlineints -DPRINTF spectral-norm.c -o spectral-norm --am9511 -create-app`
+
+Z88DK January 21, 2022<br>
+sccz80 / classic c library
+
+sccz80 / classic / **am9511 - 5 min 48 seconds**<br>
+1.2742147
+
+`zcc +cpm -clib=8085 -DSTATIC -DPRINTF -O2 spectral-norm.c -o spectral-norm --math-am9511_8085 -lndos -create-app`
 
 
 #### fasta
@@ -308,6 +321,15 @@ zsdcc / newlib / **am9511 - 77 seconds**<br>
 -0.169080500
 
 `zcc +rc2014 -subtype=cpm -clib=new --opt-code-speed=inlineints -DPRINTF n-body.c -o n-body --am9511 -m -pragma-include:zpragma.inc -create-app`
+
+Z88DK January 21, 2022<br>
+sccz80 / classic c library
+
+ sccz80 / classic / **am9511 - 69 seconds**<br>
+-0.169075155<br>
+-0.169080514
+
+`zcc +cpm -clib=8085 -DSTATIC -DPRINTF -O2 n-body.c -o n-body --math-am9511_8085 -lndos -create-app`
 
 
 #### mandelbrot

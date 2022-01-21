@@ -14,6 +14,7 @@ Detailed but incomplete changelist:
 - [classic] sccz80 8080, 8085, gbz80 l_ primitive reentrancy
 - [classic] string function loop overhead optimisation
 - [classic] string callee functions 8080, 8085 safe
+- [classic] AM9511 math library support for 8085
 - [classic] +cpc: Screen driver fixes
 - [classic] +cpc: Banking support
 - [classic] +cpm: Amstrad, Televideo, Bondwell disc creation
