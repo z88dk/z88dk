@@ -3,7 +3,7 @@
 
 This is the z88dk 32-bit IEEE-754 (mostly) standard Am9511A floating point maths package, designed to work with the SCCZ80 and ZSDCC compiler IEEE-754 (mostly) standard 32-bit floating point interfaces.
 
-This library is designed solely and expressly to support the AMD Am9511A Arithmetic Processor Unit. The initial implementation is for the Am9511 APU Module, designed for the RC2014. Later expansion will support the DAI, and the YAZ180, and other classic machines with the Am9511A APU.
+This library is designed solely and expressly to support the AMD Am9511A (Intel 8231A) Arithmetic Processor Unit. The initial implementation is for the Am9511 APU Module, designed for the RC2014 with either z80 or 8085 CPU. Later expansion will support the DAI, and the YAZ180, and other classic z80 and 8085 machines with the Am9511A APU.
 
 *@feilipu, August 2020*
 
