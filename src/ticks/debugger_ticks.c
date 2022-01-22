@@ -197,6 +197,7 @@ backend_t ticks_debugger_backend = {
     .resume = &resume,
     .next = &next,
     .step = &step,
+    .confirm_detach_w_breakpoints = 0,
     .detach = &detach,
     .restore = &restore,
     .add_breakpoint = &add_breakpoint,
