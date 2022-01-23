@@ -373,11 +373,14 @@ IF (__crt_enable_rst40h <= 1)
 
 ENDIF
 
-   PUBLIC l_ei_ret
-
-.l_ei_ret
-   ei
+   PUBLIC l_ret
+   
+   pop hl
+   pop hl
+   pop hl
+   
 .l_ret
+   
    ret
 
    PUBLIC l_dec_de
