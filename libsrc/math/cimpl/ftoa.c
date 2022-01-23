@@ -44,11 +44,7 @@ char *str;      /* output string */
                 /* output digits before decimal */
                 x = fabs(x);
                 scale = floor(0.5 + scale * 0.1 ) ;
-#ifdef MUST_ROUND
-                d = ftoa_fudgeit(x, scale) ;
-#else
                 d = x / scale ;
-#endif
                 *str++ = d + '0' ;
                 x = x - ((double)d * scale) ;
         }
