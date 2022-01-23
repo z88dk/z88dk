@@ -28,6 +28,7 @@ ${NEWLIB_ROOT}l/sccz80/9-common/l_ult
 ${NEWLIB_ROOT}l/sccz80/9-common/l_bcneg
 ${NEWLIB_ROOT}l/sccz80/9-common/l_gt
 ${NEWLIB_ROOT}l/sccz80/9-common/l_sub
+${NEWLIB_ROOT}l/sccz80/9-common/l_ret
 ${NEWLIB_ROOT}l/sccz80/9-common/l_pop_ei
 ${NEWLIB_ROOT}l/sccz80/9-common/l_ucmp
 ${NEWLIB_ROOT}l/sccz80/9-common/i32/l_long_lt

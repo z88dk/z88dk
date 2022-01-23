@@ -374,7 +374,6 @@ IF (__crt_enable_rst40h <= 1)
 ENDIF
 
    PUBLIC l_ei_ret
-   PUBLIC l_ret
 
 .l_ei_ret
    ei
