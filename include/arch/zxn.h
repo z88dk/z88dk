@@ -815,7 +815,7 @@ extern unsigned char ZXN_READ_MMU3(void) __preserves_regs(d,e,h,iyl,iyh);
 extern unsigned char ZXN_READ_MMU4(void) __preserves_regs(d,e,h,iyl,iyh);
 extern unsigned char ZXN_READ_MMU5(void) __preserves_regs(d,e,h,iyl,iyh);
 extern unsigned char ZXN_READ_MMU6(void) __preserves_regs(d,e,h,iyl,iyh);
-extern unsigned char ZXN_READ_MMU7(void) __preserves_regs(d,e,h,iyl,iyh)
+extern unsigned char ZXN_READ_MMU7(void) __preserves_regs(d,e,h,iyl,iyh);
 
 #ifndef __SDCC
 extern void __LIB__ ZXN_WRITE_MMU0(unsigned char page) __smallc __z88dk_fastcall;
