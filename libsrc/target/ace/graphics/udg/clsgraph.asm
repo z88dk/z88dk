@@ -24,8 +24,4 @@
 	ld   b,32	; number of characters to load
 	ld   hl,$2c00	; UDG area
 	call loadudg6
-        ld   c,32
-        ld   b,32
-        ld   hl,$2c00 + 768 ;Overwrite lower case
-	call loadudg6
         jp   generic_console_cls

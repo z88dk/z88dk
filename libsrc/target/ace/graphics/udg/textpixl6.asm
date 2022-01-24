@@ -3,7 +3,7 @@
 
 	PUBLIC	textpixl
 
-	defc	BASE = 96
+	defc	INV = 128
 
 ;        2  1
 ;        8  4
@@ -37,22 +37,22 @@ textpixl:
 ;	.. X. .X XX
 ;	.. .. .. ..
 ;	X. X. X. X.
-	defb	BASE + 0,BASE + 2,BASE + 1, BASE + 3
+	defb	INV + 31,INV + 29,INV + 30, INV + 28
 
 ;	.. X. .X XX
 ;	X. X. X. X.
 ;	X. X. X. X.
-	defb	BASE + 8, BASE + 10, BASE + 9, BASE + 11
+	defb	INV + 23, INV + 21, INV + 22, INV + 20
 
 ;	.. X. .X XX
 ;       .X .X .X .X
-;       X. X. X  X.
-	defb	BASE + 4, BASE + 6, BASE + 5, BASE  + 7
+;       X. X. X. X.
+	defb	INV + 27, INV + 25, INV + 26, INV + 24
 
 ;	.. X. .X XX
 ;	XX XX XX XX
 ;	X. X. X. X.
-	defb    BASE + 12, BASE + 14, BASE + 13, BASE + 15
+	defb    INV + 19, INV + 17, INV + 18, INV + 16
 
 ;	.. X. .X XX
 ;	.. .. .. ..
@@ -78,20 +78,20 @@ textpixl:
 ;	.. X. .X XX
 ;       .. .. .. ..
 ;       XX XX XX XX
-	defb	BASE + 16, BASE + 18, BASE + 17, BASE + 19
+	defb	INV + 15, INV + 13, INV + 14, INV + 12
 
 ;	.. X. .X XX
 ;       X. X. X. X.
 ; 	XX XX XX XX
-	defb	BASE + 24, BASE + 26, BASE + 25, BASE + 27
+	defb	INV + 7, INV + 5, INV + 6, INV + 4
 
 ;	.. X. .X XX
 ;	.X .X .X .X
 ;	XX XX XX XX
-	defb	BASE + 20, BASE + 22, BASE + 21, BASE + 23
+	defb	INV + 11, INV + 9, INV + 10, INV + 8
 
 
 ;	.. X. .X XX
 ;	XX XX XX XX
 ;	XX XX XX XX
-	defb	BASE + 28, BASE + 30, BASE + 29, BASE + 31
+	defb	INV + 3, INV + 1, INV + 2, INV + 0
