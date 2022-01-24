@@ -6,7 +6,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-struct expression_result_t expression_result;
+struct expression_result_t expression_result = {};
+struct history_expression_t* history_expressions = NULL;
 
 struct {
     const char* type_name;
@@ -44,11 +45,6 @@ void set_expression_result_error(struct expression_result_t* result) {
 void set_expression_result_error_str(struct expression_result_t* result, const char* error) {
     result->flags |= EXPRESSION_ERROR;
     strcpy(result->as_error, error);
-    expression_result_free(result);
-}
-
-void reset_expression_result(struct expression_result_t* result) {
-    result->flags = EXPRESSION_UNKNOWN;
     expression_result_free(result);
 }
 

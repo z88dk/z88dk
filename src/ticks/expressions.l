@@ -12,6 +12,7 @@ int lookup_word();
 
 %}
 
+history_expr $[0-9]+
 word [a-zA-Z_][a-zA-Z0-9_]*
 struct_word "struct "[a-zA-Z_][a-zA-Z0-9_]*
 multiple_words "unsigned char"|"unsigned short"|"unsigned int"|"unsigned long"
@@ -42,6 +43,7 @@ multiple_words "unsigned char"|"unsigned short"|"unsigned int"|"unsigned long"
 "&"		            { return T_AMPERSAND; }
 "."		            { return T_DOT; }
 "->"		        { return T_ARROW; }
+{history_expr}		{ strcpy(yylval.cval, yytext); return T_HISTORY_STRING; }
 {multiple_words}	{ return lookup_word(); }
 {word}		        { return lookup_word(); }
 {struct_word}       { return lookup_word(); }
