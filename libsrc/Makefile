@@ -792,7 +792,7 @@ gfxaceudg.lib:
 	@echo ''
 	@echo '--- Building Jupiter Ace UDG based Graphics Library ---'
 	@echo ''
-	$(MAKE) -C gfx TARGET=ace SUBTYPE=aceudg FLAVOUR="text6 narrow"
+	$(MAKE) -C gfx TARGET=ace SUBTYPE=aceudg FLAVOUR="gencon text6 narrow"
 	TARGET=aceudg TYPE=z80 $(LIBLINKER) -DFORaceudg -x$(OUTPUT_DIRECTORY)/gfxaceudg @$(TARGET_DIRECTORY)/ace/gfxaceudg.lst
 
 # Mattel Aquarius library - Stefano

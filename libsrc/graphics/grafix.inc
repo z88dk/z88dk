@@ -182,8 +182,9 @@ ENDIF
 IF FORaceudg
     DEFINE gotgfx
     defc maxx    = 64
-    defc maxy    = 71
-    defc blankch    = 128
+    defc maxy    = 72
+    defc blankch    = 32
+    defc    WANT_swapgfxbk = 0
 ENDIF
 
 IF FORace
