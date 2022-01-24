@@ -283,7 +283,7 @@ void mgt_writefile(disc_handle *h, char mgt_filename[11], mgt_filetype filetype,
         ------------------
         211      Always 3 (this is the id used in tape header)
         212-213  Length
-        214-315  Start address
+        214-215  Start address
         216-217  Not used
         218-219  Autorun address (0 if there is no autorun address)
 
