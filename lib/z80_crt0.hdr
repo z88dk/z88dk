@@ -97,6 +97,7 @@
 	EXTERN    l_bcneg
 	EXTERN    l_case	;Integer case
 	EXTERN    l_mult	;Integer hl = hl * de
+	EXTERN    l_mult_u	;Integer unsigned *
 	EXTERN    l_div		;Integer signed / hl=de/hl, de=de%hl
 	EXTERN    l_div_u	;Integer unsigned /
 	EXTERN    l_mod		;Integer % (for gbz80) hl=de%hl
@@ -148,6 +149,7 @@
 	EXTERN	l_long_mod
 	EXTERN	l_long_mod_u
 	EXTERN	l_long_mult
+	EXTERN	l_long_mult_u
 	EXTERN	l_long_asr_u	;Long unsigned >>
 	EXTERN	l_long_asr_uo	;Long unsigned >> shift in c
 	EXTERN	l_long_case
@@ -307,6 +309,7 @@
 	EXTERN	l_i64_add
 	EXTERN	l_i64_sub
 	EXTERN	l_i64_mult
+	EXTERN	l_i64_mult_u
 	EXTERN	l_i64_mod
 	EXTERN	l_i64_mod_u
 	EXTERN	l_i64_div

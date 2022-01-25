@@ -1,22 +1,22 @@
 
     SECTION code_l_sccz80
-    PUBLIC  l_i64_mult
+    PUBLIC  l_i64_mult_u
     EXTERN  __i64_acc
     EXTERN  __i64_extra
-    EXTERN  l_muls_64_64x64
+    EXTERN  l_mulu_64_64x64
     EXTERN  l_store_64_dehldehl_mbc
 
 ; Entry: acc = RHS (divisor)
 ;        sp+2 = LHS (dividend)
 ; Exit:  acc = LHS * RHS
-l_i64_mult:
+l_i64_mult_u:
 	ld	hl,2
 	add	hl,sp
 	ld	de,__i64_extra
 	ld	bc,8
 	ldir
 	ld	ix,__i64_extra
-	call	l_muls_64_64x64
+	call	l_mulu_64_64x64
 	;dehl'dehl = remainder, copy it into fac
 	ld	bc,__i64_acc
 	call	l_store_64_dehldehl_mbc

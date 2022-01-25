@@ -51,7 +51,7 @@
 	ld	d,0
 	pop	hl
 	push	hl
-	call	l_mult
+	call	l_mult_u
 	inc	sp
 	pop	bc
 	ret
@@ -67,7 +67,7 @@
 	add	hl,sp
 	ld	l,(hl)
 	ld	h,0
-	call	l_mult
+	call	l_mult_u
 	inc	sp
 	pop	bc
 	ret

@@ -14,6 +14,7 @@ ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_eq
 ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_lneg
 ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_and
 ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_mult
+${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_mult_u
 ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_push_under_int
 ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_uge
 ${NEWLIB_ROOT}l/sccz80/5-z80/i64/l_i64_ule
