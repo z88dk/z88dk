@@ -5,7 +5,6 @@
 # Generate test code and parsing tables for the cpus supported by z80asm
 # Copyright (C) Paulo Custodio, 2011-2022
 # License: http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 
 use Modern::Perl;
@@ -222,6 +221,14 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "mvi $r, %n", ld_r_n($r), '%n');
 	}
 	
+	# LD (hl), N
+	add_opc_final($cpu, "ld (hl+), %n", ld_r_n('(hl)'), '%n', 0x23);
+	add_opc_final($cpu, "ldi (hl), %n", ld_r_n('(hl)'), '%n', 0x23);
+
+	add_opc_final($cpu, "ld (hl-), %n", ld_r_n('(hl)'), '%n', 0x2B);
+	add_opc_final($cpu, "ldd (hl), %n", ld_r_n('(hl)'), '%n', 0x2B);
+
+	
 	if (!$gameboy) {
 		# gbz80 lacks ex de,hl, therefore ld r,(de) / ld (de),r / ld (de),N 
 		# only implemented for the other CPUs
@@ -399,6 +406,15 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "ldd a, (hl)", 0x7E, 0x2B);
 	}
 	
+	# LD (hl), bc/de
+	add_opc_final($cpu, "ld (hl), bc",  0x71, 0x23, 0x70, 0x2B);
+	add_opc_final($cpu, "ld (hl+), bc", 0x71, 0x23, 0x70, 0x23);
+	add_opc_final($cpu, "ldi (hl), bc", 0x71, 0x23, 0x70, 0x23);
+	
+	add_opc_final($cpu, "ld (hl), de",  0x73, 0x23, 0x72, 0x2B);
+	add_opc_final($cpu, "ld (hl+), de", 0x73, 0x23, 0x72, 0x23);
+	add_opc_final($cpu, "ldi (hl), de", 0x73, 0x23, 0x72, 0x23);
+	
 	# LD dd, NN
 	for my $r (qw( bc de hl sp )) {
 		my $alt_r = ($r eq 'sp') ? $r : substr($r,0,1);		# B, D, H
@@ -526,6 +542,11 @@ for my $cpu (@CPUS) {
 		for my $a ('a, ', '') {
 			add_opc($cpu, "$op $a%n", alu_n($op), '%n'); #1318 do not define jp as jump-positive ( unless $intel && $op eq 'cp'; )
 		}
+		
+		add_opc($cpu, "$op (hl+)", 		alu_r($op, '(hl)'), 0x23);
+		add_opc($cpu, "$op a, (hl+)", 	alu_r($op, '(hl)'), 0x23);
+		add_opc($cpu, "$op (hl-)", 		alu_r($op, '(hl)'), 0x2b);
+		add_opc($cpu, "$op a, (hl-)", 	alu_r($op, '(hl)'), 0x2b);
 	}
 
 	for my $r (qw( b c d e h l m a )) {
@@ -558,6 +579,12 @@ for my $cpu (@CPUS) {
 		add_opc($cpu, "inr $r",		inc_r($r));
 		add_opc($cpu, "dcr $r",		dec_r($r));
 	}
+	
+	add_opc($cpu, "inc (hl+)", 	inc_r('(hl)'), 0x23);
+	add_opc($cpu, "dec (hl+)", 	dec_r('(hl)'), 0x23);
+	
+	add_opc($cpu, "inc (hl-)", 	inc_r('(hl)'), 0x2b);
+	add_opc($cpu, "dec (hl-)", 	dec_r('(hl)'), 0x2b);
 	
 	for my $r (qw( b c d e h l (hl) a )) { 
 		for my $op (qw( tst test )) {
@@ -798,22 +825,9 @@ for my $cpu (@CPUS) {
 
 	if ($rabbit) {
 		add_opc($cpu, "add sp, %s", 		0x27, '%s');
-		add_opc($cpu, "add.a sp, %s", 		0x27, '%s');
 	}
 	elsif ($gameboy) {
 		add_opc($cpu, "add sp, %s", 		0xE8, '%s');
-		add_opc($cpu, "add.a sp, %s", 		0xE8, '%s');
-	}
-	else {
-		add_opc($cpu, "add.a sp, %s",		push_d('hl'),				# push hl
-											ld_r_n('a'), '%s',			# ld a, %s
-											ld_r_r('l', 'a'),			# ld l, a	 											
-											rot_a('rla'),				# rla
-											alu_r('sbc', 'a'),			# sbc a, a
-											ld_r_r('h', 'a'),			# ld h, a	; sign extend										
-											add_hl_d('sp'),				# add hl, sp
-											ld_sp_hl(),					# ld sp, hl
-											pop_d('hl'));				# pop hl
 	}
 	
 	# ADC
@@ -835,23 +849,8 @@ for my $cpu (@CPUS) {
 		for ([hl => ()], [ix => 0xDD], [iy => 0xFD]) {
 			my($r, @pfx) = @$_;
 			add_opc($cpu, "and $r, de", 	@pfx, 0xDC);
-			add_opc($cpu, "and.a $r, de", 	@pfx, 0xDC);
 		}
 	}
-	else {
-		add_opc($cpu, "and.a hl, de", 		ld_r_r('a', 'h'),		# ld a,h
-											alu_r('and', 'd'),		# and d
-											ld_r_r('h', 'a'),		# ld h,a
-											ld_r_r('a', 'l'),		# ld a,l
-											alu_r('and', 'e'),		# and e
-											ld_r_r('l', 'a'));		# ld l,a
-	}
-	add_opc($cpu, "and.a hl, bc", 			ld_r_r('a', 'h'),		# ld a,h
-											alu_r('and', 'b'),		# and b
-											ld_r_r('h', 'a'),		# ld h,a
-											ld_r_r('a', 'l'),		# ld a,l
-											alu_r('and', 'c'),		# and c
-											ld_r_r('l', 'a'));		# ld l,a
 	
 	# XOR
 	
@@ -1072,31 +1071,9 @@ for my $cpu (@CPUS) {
 
 	# bit set, reset and test group
 	for my $r (qw( b c d e h l (hl) a )) {
-		if ($intel) {
-			if ($r eq 'a') {
-				add_opc($cpu, "bit.a %c, $r", 	alu_n('and'), '1<<%c(0..7)');	# and 1|2|4|...
-
-				add_opc($cpu, "res.a %c, $r", 	alu_n('and'), '(~(1<<%c(0..7)))&0xFF');	# and ~(1|2|4|...)
-				
-				add_opc($cpu, "set.a %c, $r", 	alu_n('or'), '1<<%c(0..7)');	# or 1|2|4|...
-			}
-			else {
-				add_opc($cpu, "bit.a %c, $r", 	ld_r_r('a', $r),		# ld a, reg
-												alu_n('and'), '1<<%c(0..7)');	# and 1|2|4|...
-
-				add_opc($cpu, "res.a %c, $r", 	ld_r_r('a', $r),		# ld a, reg
-												alu_n('and'), '(~(1<<%c(0..7)))&0xFF',	# and ~(1|2|4|...)
-												ld_r_r($r, 'a'));		# ld reg, a
-												
-				add_opc($cpu, "set.a %c, $r", 	ld_r_r('a', $r),		# ld a, reg
-												alu_n('or'), '1<<%c(0..7)',		# or 1|2|4|...
-												ld_r_r($r, 'a'));		# ld reg, a
-			}
-		}
-		else {
+		if (!$intel) {
 			for my $op (qw( bit res set )) {
 				add_opc($cpu, "$op %c, $r", 	0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
-				add_opc($cpu, "$op.a %c, $r", 	0xCB, ($V{$op}*0x40 + $V{$r})."+8*%c(0..7)");
 			}
 		}
 	}
@@ -1222,7 +1199,6 @@ for my $cpu (@CPUS) {
 		
 		# TODO: Rabbit LJP not supported
 		add_opc($cpu, "jp $f, %m", 		jp_f($_f), '%m', '%m');
-		add_opc($cpu, "j$_f %m", 		jp_f($_f), '%m', '%m');
 		add_opc($cpu, "j$f %m", 		jp_f($_f), '%m', '%m') 
 			unless $f eq 'p'; #1318 do not define jp as jump-positive ( && !$intel; )
 	}
@@ -1274,7 +1250,6 @@ for my $cpu (@CPUS) {
 		}
 		else {
 			add_opc($cpu, "call $f, %m",call_f($_f), '%m', '%m');
-			add_opc($cpu, "c$_f %m", 	call_f($_f), '%m', '%m');
 			add_opc($cpu, "c$f %m", 	call_f($_f), '%m', '%m') 
 				unless $f eq 'p'; #1318 do not define cp as call-positive ( && !$intel; )
 		}
@@ -1293,7 +1268,6 @@ for my $cpu (@CPUS) {
 		next if $f !~ /^(nz|z|nc|c)$/ && $gameboy;
 		
 		add_opc($cpu, "ret $f",			ret_f($_f));
-		add_opc($cpu, "r$_f",			ret_f($_f));
 		add_opc($cpu, "r$f",			ret_f($_f));
 	}	
 
@@ -1490,17 +1464,13 @@ for my $cpu (@CPUS) {
 
 		# Jump on flag X5/K is set
 		add_opc($cpu, "jx5 %m",			0xFD, '%m', '%m');
-		add_opc($cpu, "j_x5 %m",		0xFD, '%m', '%m');
 		add_opc($cpu, "jp x5,%m",		0xFD, '%m', '%m');
 		add_opc($cpu, "jk %m",			0xFD, '%m', '%m');
-		add_opc($cpu, "j_k %m",			0xFD, '%m', '%m');
 		add_opc($cpu, "jp k,%m",		0xFD, '%m', '%m');
 
 		add_opc($cpu, "jnx5 %m",		0xDD, '%m', '%m');
-		add_opc($cpu, "j_nx5 %m",		0xDD, '%m', '%m');
 		add_opc($cpu, "jp nx5,%m",		0xDD, '%m', '%m');
 		add_opc($cpu, "jnk %m",			0xDD, '%m', '%m');
-		add_opc($cpu, "j_nk %m",		0xDD, '%m', '%m');
 		add_opc($cpu, "jp nk,%m",		0xDD, '%m', '%m');
 	}
 }

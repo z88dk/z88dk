@@ -50,9 +50,9 @@
  ld a, (hl-)                    ; Error
  ld a, (hld)                    ; Error
  ld a, (hli)                    ; Error
- ld de, hl+-128                 ; Error
  ld de, hl+127                  ; Error
  ld de, hl+255                  ; Error
+ ld de, hl-128                  ; Error
  ld hl, (de)                    ; Error
  ld hl, sp+255                  ; Error
  ldd (hl), a                    ; Error
