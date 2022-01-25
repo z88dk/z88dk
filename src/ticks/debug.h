@@ -158,7 +158,6 @@ extern int debug_resolve_source(char *name);
 extern int debug_resolve_source_forward(const char *filename, const char* within_function, int lineno);
 
 extern type_chain* copy_type_chain(type_chain* from);
-extern int count_allocated_types();
 extern type_chain* malloc_type(enum type_record_type type);
 extern void free_type(type_chain* type);
 extern uint8_t is_primitive_integer_type(type_chain* type);

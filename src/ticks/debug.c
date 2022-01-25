@@ -838,20 +838,12 @@ type_chain* copy_type_chain(type_chain* from) {
     return result;
 }
 
-static int s_allocated_types = 0;
-
-int count_allocated_types()
-{
-    return s_allocated_types;
-}
-
 type_chain* malloc_type(enum type_record_type type) {
     type_chain* result = malloc(sizeof(type_chain));
     result->next = NULL;
     result->data = NULL;
     result->type_ = type;
     result->size = get_type_memory_size(result);
-    s_allocated_types++;
     return result;
 }
 
@@ -859,7 +851,6 @@ void free_type(type_chain* type) {
     while (type) {
         type_chain* next_next = type->next;
         free(type);
-        s_allocated_types--;
         type = next_next;
     }
 }

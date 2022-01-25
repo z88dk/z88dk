@@ -23,6 +23,7 @@ void yyerror(const char* s);
 
 %token<val> T_PRIMITIVE_VALUE
 %token<cval> T_STRING
+%token<cval> T_HISTORY_STRING
 
 %token<errval> T_ERROR
 %token T_PRIMITIVE_TYPE
@@ -58,6 +59,10 @@ value_expression: T_PRIMITIVE_VALUE
     		struct lookup_t lookup = {};
     		lookup.symbol_name = $1;
     		debug_lookup_symbol(&lookup, &$$);
+	}
+	| T_HISTORY_STRING							{
+    		zero_expression_result(&$$);
+    		debug_lookup_history($1, &$$);
 	}
 	| value_expression T_DOT T_STRING					{ expression_resolve_struct_member(&$1, $3, &$$); expression_result_free(&$1); }
 	| value_expression T_ARROW T_STRING					{ expression_resolve_struct_member_ptr(&$1, $3, &$$); expression_result_free(&$1); }
@@ -105,7 +110,6 @@ error_expression: T_ERROR							{ strcpy($$, $1); }
 
 void evaluate_expression_string(const char* expr)
 {
-    reset_expression_result(get_expression_result());
     YY_BUFFER_STATE st = yy_scan_string (expr);
     yyparse();
     yy_delete_buffer(st);

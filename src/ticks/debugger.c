@@ -102,6 +102,7 @@ typedef struct {
     char   *help;
 } command;
 
+static int last_evaluation_id = 0;
 
 static void completion(const char *buf, linenoiseCompletions *lc, void *ctx);
 static int cmd_next(int argc, char **argv);
@@ -807,6 +808,19 @@ static int cmd_down(int argc, char **argv)
     return cmd_frame(0, NULL);
 }
 
+void debug_lookup_history(const char* history, struct expression_result_t* result) {
+    zero_expression_result(result);
+    struct history_expression_t *he;
+    HASH_FIND_STR(history_expressions, history, he);
+    if (he != NULL) {
+        *result = he->result;
+        result->type.first = copy_type_chain(he->result.type.first);
+        return;
+    }
+    sprintf(result->as_error, "Cannot find item <%s> in history", history);
+    set_expression_result_error(result);
+}
+
 void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* result) {
     zero_expression_result(result);
     struct debugger_regs_t regs;
@@ -883,8 +897,6 @@ static int cmd_print(int argc, char **argv)
         yydebug = 1;
     }
 
-    int types = count_allocated_types();
-
     evaluate_expression_string(call);
     free(call);
 
@@ -901,14 +913,15 @@ static int cmd_print(int argc, char **argv)
     expression_result_type_to_string(&result->type, result->type.first, type);
     expression_result_value_to_string(result, value, 2048);
 
-    printf("Result: <%s> %s\n", type, value);
+    char result_id[32];
+    sprintf(result_id, "$%d", ++last_evaluation_id);
+    printf("%s = <%s> %s\n", result_id, type, value);
     free(value);
 
-    expression_result_free(result);
-    int new_types = count_allocated_types();
-    if (new_types > types) {
-        printf("Warning: %d type info object(s) leaked\n", new_types - types);
-    }
+    struct history_expression_t* he = calloc(1, sizeof(struct history_expression_t));
+    strcpy(he->name, result_id);
+    he->result = *get_expression_result();
+    HASH_ADD_STR(history_expressions, name, he);
 
     return 0;
 }
