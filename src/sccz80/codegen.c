@@ -4254,7 +4254,7 @@ void zle_const(LVALUE *lval, int64_t value64)
             } else {
                 ol("ld\ta,d");
                 if ( !ulvalue(lval)) {
-                    ol("rla");
+                    ol("rlca");
                     ol("jr\tc,ASMPC+8");
                 }
                 ol("or\te"); // We know MSBit was 0, so no point shifting it back in
@@ -4281,7 +4281,7 @@ void zle_const(LVALUE *lval, int64_t value64)
     } else {
         if ( value ==  0 && !IS_808x() ) {
             ol("ld\ta,h"); // 8 bytes
-            ol("rla");
+            ol("rlca");
             ol("jr\tc,ASMPC+6");
             ol("or\tl"); // We know MSBit was 0, so no point shifting it back in
             ol("jr\tnz,ASMPC+3");
