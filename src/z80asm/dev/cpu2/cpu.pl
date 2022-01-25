@@ -5,7 +5,6 @@
 # Generate test code and parsing tables for the cpus supported by z80asm
 # Copyright (C) Paulo Custodio, 2011-2022
 # License: http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/z88dk/z88dk
 #------------------------------------------------------------------------------
 
 use Modern::Perl;
@@ -132,10 +131,10 @@ sub B::to_string {
 	my($self) = @_;
 	my @bytes = @$self;
 	for (@bytes) {
-		if (/\@(?:__z80asm__)?(\w+)&0xff/) {
+		if (/\@(__z80asm__\w+)&0xff/) {
 			$_ = "\@$1";
 		}
-		elsif (/\@(?:__z80asm__)?(\w+)>>8/) {
+		elsif (/\@(__z80asm__\w+)>>8/) {
 			$_ = undef;
 		}
 		else {
@@ -395,7 +394,7 @@ sub T::to_string {
 		for my $instr (@{$self->prog}) {
 			push @bytes, $instr->format_bytes;
 		}
-		return join('; ', @bytes);
+		return join('  ', @bytes);
 	}
 }
 
@@ -1414,7 +1413,8 @@ next;
 		add_compound("dec (hl+)"		=> "dec (hl)", "inc hl");
 		add_compound("dec (hl-)"		=> "dec (hl)", "dec hl");
 		
-		for my $op (qw( add adc sub sbc and xor or  cp  )) {
+		for my $op (qw( add adc sub sbc and xor or  cp  
+		                                            cmp )) {
 			next if $op eq 'cp' && isintel;	# CP is Call Positive in Intel
 			add_compound("$op a, (hl+)"	=> "$op a, (hl)", "inc hl");
 			add_compound("$op    (hl+)"	=> "$op a, (hl)", "inc hl");
@@ -1568,7 +1568,7 @@ sub do_compound {
         my $prog = try_add_compound($asm, @prog);
         if (!$prog) {
             $tried{$asm}++;
-            die "not found: $asm: ",join(" \\ ",@prog),"\n" if $tried{$asm} > 2;
+            die "not found: $cpu $asm: ",join(" \\ ",@prog),"\n" if $tried{$asm} > 10;
             push @compound_queue, [$cpu_, $ixiy_, $asm, @prog];
         }
     }
@@ -2019,22 +2019,29 @@ sub init_tests {
 sub add_tests {
 	my($asm, $prog) = @_;
 
-	if ($asm =~ /%([dsunmbr])/) {
+	if ($asm =~ /%([dsunmc])/) {
 		my $k = $1;
 		my @range = ($k eq 'd') ? (127, -128) :
 					($k eq 's') ? (127, -128) :
 					($k eq 'u') ? (0, -255) : 
 					($k eq 'n') ? (255, 127, -128) : 
 					($k eq 'm') ? (65535, 32767, -32768) : 
-					($asm =~ /^(bit|res|set) /) ? (0 .. 7) :
+					($k eq 'c') ? 
+						(($asm =~ /^(bit|res|set) /)	? (0 .. 7) :
 					($asm =~ /^rst /) ? (restarts()) :
-					die;
+						 ($asm =~ /^im /) 				? (0..2) :
+						 ($asm =~ /^out /)				? (0) :
+						 die $asm) : 
+					die $asm;
 		for my $v (@range) {
 			add_tests(replace($asm, "%$k", $v), $prog->clone($k => 0+$v));	# recurse
 			if ($asm =~ /^rst/ && $v != 0) {
 				add_tests(replace($asm, "%$k", $v/8), $prog->clone($k => 0+$v));	# recurse for rst 1..7
 			}
 		}
+	}
+	elsif ($asm =~ /%j/) {		# djnz %j/jr %j
+		add_tests(replace($asm, "%j", "ASMPC"), $prog->clone(j => 0xfe));	# recurse
 	}
 	else {
 		$Tests{$asm}{$cpu} = $prog->clone();
@@ -2370,8 +2377,8 @@ sub run_tests {
 					}
 					elsif ($asm =~ /^(bit|set|res) /) {
 						for my $c (0..7) {
-							$prog_instance = $prog->clone(c => $c);
-							$asm_instance = replace($asm, '%c', $c);
+							$prog_instance = $prog->clone(c => $c, d => 127);
+							$asm_instance = replace($asm, '%c', $c, '%d', 127);
 							$test_asm = sprintf(" %-31s; %s", $asm_instance, $prog_instance->format_bytes);
 							push @test, [$test_asm, $prog_instance];	
 						}
@@ -2494,7 +2501,7 @@ sub assemble_and_run {
 
 	# assemble
 	path('test.asm')->spew($asm);
-	$ok &&= run("z80asm -m$cpu $ixiy -l -b -m test.asm");
+	$ok &&= run("z88dk-z80asm -m$cpu $ixiy -l -b -m test.asm");
 	$ok or return;
 	
 	# linked object size in hex
@@ -2589,6 +2596,7 @@ sub replace {
 	while (my($find, $replace) = splice(@pairs, 0, 2)) {
 		$text =~ s/$find/$replace/g;
 	}
+	$text =~ s/\+-/-/g;
 	return $text;
 }
 

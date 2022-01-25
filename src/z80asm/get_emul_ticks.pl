@@ -24,7 +24,7 @@ for my $cpu (qw( 8080 8085 gbz80 r2ka z180 z80 z80n )) {
 		# get end address
 		my $end;
 		for (path("test.lis")->lines) {
-			if (/^\d+\s+([0-9A-F]{4})\s+00\s+nop ; END/) { $end = $1; last; }
+			if (/^\s*\d+\s+([0-9A-F]{6})\s+00\s+nop ; END/) { $end = $1; last; }
 		}
 		defined($end) or die "end address not found\n";
 		# end=1: skip and a/scf in ticks count

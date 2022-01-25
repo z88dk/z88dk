@@ -175,42 +175,42 @@ ADC H                             |z80  |-     |-    |adc h         |8C         
 ADC H                             |z80  |-     |IXIY |adc h         |8C                                          |      4 T
 ADC H                             |z80n |-     |-    |adc h         |8C                                          |      4 T
 ADC H                             |z80n |-     |IXIY |adc h         |8C                                          |      4 T
-ADC HL COMMA BC                   |8080 |-     |-    |adc hl, bc    |CD @adc_hl_bc                               |  47/52 T
-ADC HL COMMA BC                   |8080 |-     |IXIY |adc hl, bc    |CD @adc_hl_bc                               |  47/52 T
-ADC HL COMMA BC                   |8085 |-     |-    |adc hl, bc    |CD @adc_hl_bc                               |  48/51 T
-ADC HL COMMA BC                   |8085 |-     |IXIY |adc hl, bc    |CD @adc_hl_bc                               |  48/51 T
-ADC HL COMMA BC                   |gbz80|-     |-    |adc hl, bc    |CD @adc_hl_bc                               |  36/44 T
-ADC HL COMMA BC                   |gbz80|-     |IXIY |adc hl, bc    |CD @adc_hl_bc                               |  36/44 T
+ADC HL COMMA BC                   |8080 |-     |-    |adc hl, bc    |CD @__z80asm__adc_hl_bc                     |  47/52 T
+ADC HL COMMA BC                   |8080 |-     |IXIY |adc hl, bc    |CD @__z80asm__adc_hl_bc                     |  47/52 T
+ADC HL COMMA BC                   |8085 |-     |-    |adc hl, bc    |CD @__z80asm__adc_hl_bc                     |  48/51 T
+ADC HL COMMA BC                   |8085 |-     |IXIY |adc hl, bc    |CD @__z80asm__adc_hl_bc                     |  48/51 T
+ADC HL COMMA BC                   |gbz80|-     |-    |adc hl, bc    |CD @__z80asm__adc_hl_bc                     |  36/44 T
+ADC HL COMMA BC                   |gbz80|-     |IXIY |adc hl, bc    |CD @__z80asm__adc_hl_bc                     |  36/44 T
 ADC HL COMMA BC                   |z80  |-     |-    |adc hl, bc    |ED 4A                                       |     15 T
 ADC HL COMMA BC                   |z80  |-     |IXIY |adc hl, bc    |ED 4A                                       |     15 T
 ADC HL COMMA BC                   |z80n |-     |-    |adc hl, bc    |ED 4A                                       |     15 T
 ADC HL COMMA BC                   |z80n |-     |IXIY |adc hl, bc    |ED 4A                                       |     15 T
-ADC HL COMMA DE                   |8080 |-     |-    |adc hl, de    |CD @adc_hl_de                               |  47/52 T
-ADC HL COMMA DE                   |8080 |-     |IXIY |adc hl, de    |CD @adc_hl_de                               |  47/52 T
-ADC HL COMMA DE                   |8085 |-     |-    |adc hl, de    |CD @adc_hl_de                               |  48/51 T
-ADC HL COMMA DE                   |8085 |-     |IXIY |adc hl, de    |CD @adc_hl_de                               |  48/51 T
-ADC HL COMMA DE                   |gbz80|-     |-    |adc hl, de    |CD @adc_hl_de                               |  36/44 T
-ADC HL COMMA DE                   |gbz80|-     |IXIY |adc hl, de    |CD @adc_hl_de                               |  36/44 T
+ADC HL COMMA DE                   |8080 |-     |-    |adc hl, de    |CD @__z80asm__adc_hl_de                     |  47/52 T
+ADC HL COMMA DE                   |8080 |-     |IXIY |adc hl, de    |CD @__z80asm__adc_hl_de                     |  47/52 T
+ADC HL COMMA DE                   |8085 |-     |-    |adc hl, de    |CD @__z80asm__adc_hl_de                     |  48/51 T
+ADC HL COMMA DE                   |8085 |-     |IXIY |adc hl, de    |CD @__z80asm__adc_hl_de                     |  48/51 T
+ADC HL COMMA DE                   |gbz80|-     |-    |adc hl, de    |CD @__z80asm__adc_hl_de                     |  36/44 T
+ADC HL COMMA DE                   |gbz80|-     |IXIY |adc hl, de    |CD @__z80asm__adc_hl_de                     |  36/44 T
 ADC HL COMMA DE                   |z80  |-     |-    |adc hl, de    |ED 5A                                       |     15 T
 ADC HL COMMA DE                   |z80  |-     |IXIY |adc hl, de    |ED 5A                                       |     15 T
 ADC HL COMMA DE                   |z80n |-     |-    |adc hl, de    |ED 5A                                       |     15 T
 ADC HL COMMA DE                   |z80n |-     |IXIY |adc hl, de    |ED 5A                                       |     15 T
-ADC HL COMMA HL                   |8080 |-     |-    |adc hl, hl    |CD @adc_hl_hl                               |    110 T
-ADC HL COMMA HL                   |8080 |-     |IXIY |adc hl, hl    |CD @adc_hl_hl                               |    110 T
-ADC HL COMMA HL                   |8085 |-     |-    |adc hl, hl    |CD @adc_hl_hl                               |    111 T
-ADC HL COMMA HL                   |8085 |-     |IXIY |adc hl, hl    |CD @adc_hl_hl                               |    111 T
-ADC HL COMMA HL                   |gbz80|-     |-    |adc hl, hl    |CD @adc_hl_hl                               |     84 T
-ADC HL COMMA HL                   |gbz80|-     |IXIY |adc hl, hl    |CD @adc_hl_hl                               |     84 T
+ADC HL COMMA HL                   |8080 |-     |-    |adc hl, hl    |CD @__z80asm__adc_hl_hl                     |    110 T
+ADC HL COMMA HL                   |8080 |-     |IXIY |adc hl, hl    |CD @__z80asm__adc_hl_hl                     |    110 T
+ADC HL COMMA HL                   |8085 |-     |-    |adc hl, hl    |CD @__z80asm__adc_hl_hl                     |    111 T
+ADC HL COMMA HL                   |8085 |-     |IXIY |adc hl, hl    |CD @__z80asm__adc_hl_hl                     |    111 T
+ADC HL COMMA HL                   |gbz80|-     |-    |adc hl, hl    |CD @__z80asm__adc_hl_hl                     |     84 T
+ADC HL COMMA HL                   |gbz80|-     |IXIY |adc hl, hl    |CD @__z80asm__adc_hl_hl                     |     84 T
 ADC HL COMMA HL                   |z80  |-     |-    |adc hl, hl    |ED 6A                                       |     15 T
 ADC HL COMMA HL                   |z80  |-     |IXIY |adc hl, hl    |ED 6A                                       |     15 T
 ADC HL COMMA HL                   |z80n |-     |-    |adc hl, hl    |ED 6A                                       |     15 T
 ADC HL COMMA HL                   |z80n |-     |IXIY |adc hl, hl    |ED 6A                                       |     15 T
-ADC HL COMMA SP                   |8080 |-     |-    |adc hl, sp    |CD @adc_hl_sp                               |  57/62 T
-ADC HL COMMA SP                   |8080 |-     |IXIY |adc hl, sp    |CD @adc_hl_sp                               |  57/62 T
-ADC HL COMMA SP                   |8085 |-     |-    |adc hl, sp    |CD @adc_hl_sp                               |  60/63 T
-ADC HL COMMA SP                   |8085 |-     |IXIY |adc hl, sp    |CD @adc_hl_sp                               |  60/63 T
-ADC HL COMMA SP                   |gbz80|-     |-    |adc hl, sp    |CD @adc_hl_sp                               |  52/60 T
-ADC HL COMMA SP                   |gbz80|-     |IXIY |adc hl, sp    |CD @adc_hl_sp                               |  52/60 T
+ADC HL COMMA SP                   |8080 |-     |-    |adc hl, sp    |CD @__z80asm__adc_hl_sp                     |  57/62 T
+ADC HL COMMA SP                   |8080 |-     |IXIY |adc hl, sp    |CD @__z80asm__adc_hl_sp                     |  57/62 T
+ADC HL COMMA SP                   |8085 |-     |-    |adc hl, sp    |CD @__z80asm__adc_hl_sp                     |  60/63 T
+ADC HL COMMA SP                   |8085 |-     |IXIY |adc hl, sp    |CD @__z80asm__adc_hl_sp                     |  60/63 T
+ADC HL COMMA SP                   |gbz80|-     |-    |adc hl, sp    |CD @__z80asm__adc_hl_sp                     |  52/60 T
+ADC HL COMMA SP                   |gbz80|-     |IXIY |adc hl, sp    |CD @__z80asm__adc_hl_sp                     |  52/60 T
 ADC HL COMMA SP                   |z80  |-     |-    |adc hl, sp    |ED 7A                                       |     15 T
 ADC HL COMMA SP                   |z80  |-     |IXIY |adc hl, sp    |ED 7A                                       |     15 T
 ADC HL COMMA SP                   |z80n |-     |-    |adc hl, sp    |ED 7A                                       |     15 T
@@ -883,16 +883,16 @@ ANI expr                          |z80  |expr  |-    |ani %n        |E6 %n      
 ANI expr                          |z80  |expr  |IXIY |ani %n        |E6 %n                                       |      7 T
 ANI expr                          |z80n |expr  |-    |ani %n        |E6 %n                                       |      7 T
 ANI expr                          |z80n |expr  |IXIY |ani %n        |E6 %n                                       |      7 T
-ARHL                              |8080 |-     |-    |arhl          |CD @sra_hl                                  |     99 T
-ARHL                              |8080 |-     |IXIY |arhl          |CD @sra_hl                                  |     99 T
+ARHL                              |8080 |-     |-    |arhl          |CD @__z80asm__sra_hl                        |     99 T
+ARHL                              |8080 |-     |IXIY |arhl          |CD @__z80asm__sra_hl                        |     99 T
 ARHL                              |8085 |-     |-    |arhl          |10                                          |      7 T
 ARHL                              |8085 |-     |IXIY |arhl          |10                                          |      7 T
-ARHL                              |gbz80|-     |-    |arhl          |CB 2C; CB 1D                                |     16 T
-ARHL                              |gbz80|-     |IXIY |arhl          |CB 2C; CB 1D                                |     16 T
-ARHL                              |z80  |-     |-    |arhl          |CB 2C; CB 1D                                |     16 T
-ARHL                              |z80  |-     |IXIY |arhl          |CB 2C; CB 1D                                |     16 T
-ARHL                              |z80n |-     |-    |arhl          |CB 2C; CB 1D                                |     16 T
-ARHL                              |z80n |-     |IXIY |arhl          |CB 2C; CB 1D                                |     16 T
+ARHL                              |gbz80|-     |-    |arhl          |CB 2C  CB 1D                                |     16 T
+ARHL                              |gbz80|-     |IXIY |arhl          |CB 2C  CB 1D                                |     16 T
+ARHL                              |z80  |-     |-    |arhl          |CB 2C  CB 1D                                |     16 T
+ARHL                              |z80  |-     |IXIY |arhl          |CB 2C  CB 1D                                |     16 T
+ARHL                              |z80n |-     |-    |arhl          |CB 2C  CB 1D                                |     16 T
+ARHL                              |z80n |-     |IXIY |arhl          |CB 2C  CB 1D                                |     16 T
 BIT const_expr COMMA A            |gbz80|expr  |-    |bit %c, a     |CB 47+%c*08                                 |      8 T
 BIT const_expr COMMA A            |gbz80|expr  |IXIY |bit %c, a     |CB 47+%c*08                                 |      8 T
 BIT const_expr COMMA A            |z80  |expr  |-    |bit %c, a     |CB 47+%c*08                                 |      8 T
@@ -1549,22 +1549,22 @@ CP expr                           |z80  |expr  |-    |cp %n         |FE %n      
 CP expr                           |z80  |expr  |IXIY |cp %n         |FE %n                                       |      7 T
 CP expr                           |z80n |expr  |-    |cp %n         |FE %n                                       |      7 T
 CP expr                           |z80n |expr  |IXIY |cp %n         |FE %n                                       |      7 T
-CPD                               |8080 |-     |-    |cpd           |CD @cpd                                     |164/191 T
-CPD                               |8080 |-     |IXIY |cpd           |CD @cpd                                     |164/191 T
-CPD                               |8085 |-     |-    |cpd           |CD @cpd                                     |156/181 T
-CPD                               |8085 |-     |IXIY |cpd           |CD @cpd                                     |156/181 T
-CPD                               |gbz80|-     |-    |cpd           |CD @cpd                                     |408/424 T
-CPD                               |gbz80|-     |IXIY |cpd           |CD @cpd                                     |408/424 T
+CPD                               |8080 |-     |-    |cpd           |CD @__z80asm__cpd                           |164/191 T
+CPD                               |8080 |-     |IXIY |cpd           |CD @__z80asm__cpd                           |164/191 T
+CPD                               |8085 |-     |-    |cpd           |CD @__z80asm__cpd                           |156/181 T
+CPD                               |8085 |-     |IXIY |cpd           |CD @__z80asm__cpd                           |156/181 T
+CPD                               |gbz80|-     |-    |cpd           |CD @__z80asm__cpd                           |408/424 T
+CPD                               |gbz80|-     |IXIY |cpd           |CD @__z80asm__cpd                           |408/424 T
 CPD                               |z80  |-     |-    |cpd           |ED A9                                       |     16 T
 CPD                               |z80  |-     |IXIY |cpd           |ED A9                                       |     16 T
 CPD                               |z80n |-     |-    |cpd           |ED A9                                       |     16 T
 CPD                               |z80n |-     |IXIY |cpd           |ED A9                                       |     16 T
-CPDR                              |8080 |-     |-    |cpdr          |CD @cpdr                                    |195/353 T
-CPDR                              |8080 |-     |IXIY |cpdr          |CD @cpdr                                    |195/353 T
-CPDR                              |8085 |-     |-    |cpdr          |CD @cpdr                                    |180/328 T
-CPDR                              |8085 |-     |IXIY |cpdr          |CD @cpdr                                    |180/328 T
-CPDR                              |gbz80|-     |-    |cpdr          |CD @cpdr                                    |448/856 T
-CPDR                              |gbz80|-     |IXIY |cpdr          |CD @cpdr                                    |448/856 T
+CPDR                              |8080 |-     |-    |cpdr          |CD @__z80asm__cpdr                          |195/353 T
+CPDR                              |8080 |-     |IXIY |cpdr          |CD @__z80asm__cpdr                          |195/353 T
+CPDR                              |8085 |-     |-    |cpdr          |CD @__z80asm__cpdr                          |180/328 T
+CPDR                              |8085 |-     |IXIY |cpdr          |CD @__z80asm__cpdr                          |180/328 T
+CPDR                              |gbz80|-     |-    |cpdr          |CD @__z80asm__cpdr                          |448/856 T
+CPDR                              |gbz80|-     |IXIY |cpdr          |CD @__z80asm__cpdr                          |448/856 T
 CPDR                              |z80  |-     |-    |cpdr          |ED B9                                       |  16/37 T
 CPDR                              |z80  |-     |IXIY |cpdr          |ED B9                                       |  16/37 T
 CPDR                              |z80n |-     |-    |cpdr          |ED B9                                       |  16/37 T
@@ -1577,12 +1577,12 @@ CPE expr                          |z80  |expr  |-    |cpe %m        |EC %m %m   
 CPE expr                          |z80  |expr  |IXIY |cpe %m        |EC %m %m                                    |  10/17 T
 CPE expr                          |z80n |expr  |-    |cpe %m        |EC %m %m                                    |  10/17 T
 CPE expr                          |z80n |expr  |IXIY |cpe %m        |EC %m %m                                    |  10/17 T
-CPI                               |8080 |-     |-    |cpi           |CD @cpi                                     |164/191 T
-CPI                               |8080 |-     |IXIY |cpi           |CD @cpi                                     |164/191 T
-CPI                               |8085 |-     |-    |cpi           |CD @cpi                                     |156/181 T
-CPI                               |8085 |-     |IXIY |cpi           |CD @cpi                                     |156/181 T
-CPI                               |gbz80|-     |-    |cpi           |CD @cpi                                     |408/424 T
-CPI                               |gbz80|-     |IXIY |cpi           |CD @cpi                                     |408/424 T
+CPI                               |8080 |-     |-    |cpi           |CD @__z80asm__cpi                           |164/191 T
+CPI                               |8080 |-     |IXIY |cpi           |CD @__z80asm__cpi                           |164/191 T
+CPI                               |8085 |-     |-    |cpi           |CD @__z80asm__cpi                           |156/181 T
+CPI                               |8085 |-     |IXIY |cpi           |CD @__z80asm__cpi                           |156/181 T
+CPI                               |gbz80|-     |-    |cpi           |CD @__z80asm__cpi                           |408/424 T
+CPI                               |gbz80|-     |IXIY |cpi           |CD @__z80asm__cpi                           |408/424 T
 CPI                               |z80  |-     |-    |cpi           |ED A1                                       |     16 T
 CPI                               |z80  |-     |IXIY |cpi           |ED A1                                       |     16 T
 CPI                               |z80n |-     |-    |cpi           |ED A1                                       |     16 T
@@ -1597,12 +1597,12 @@ CPI expr                          |z80  |expr  |-    |cpi %n        |FE %n      
 CPI expr                          |z80  |expr  |IXIY |cpi %n        |FE %n                                       |      7 T
 CPI expr                          |z80n |expr  |-    |cpi %n        |FE %n                                       |      7 T
 CPI expr                          |z80n |expr  |IXIY |cpi %n        |FE %n                                       |      7 T
-CPIR                              |8080 |-     |-    |cpir          |CD @cpir                                    |195/353 T
-CPIR                              |8080 |-     |IXIY |cpir          |CD @cpir                                    |195/353 T
-CPIR                              |8085 |-     |-    |cpir          |CD @cpir                                    |180/328 T
-CPIR                              |8085 |-     |IXIY |cpir          |CD @cpir                                    |180/328 T
-CPIR                              |gbz80|-     |-    |cpir          |CD @cpir                                    |448/856 T
-CPIR                              |gbz80|-     |IXIY |cpir          |CD @cpir                                    |448/856 T
+CPIR                              |8080 |-     |-    |cpir          |CD @__z80asm__cpir                          |195/353 T
+CPIR                              |8080 |-     |IXIY |cpir          |CD @__z80asm__cpir                          |195/353 T
+CPIR                              |8085 |-     |-    |cpir          |CD @__z80asm__cpir                          |180/328 T
+CPIR                              |8085 |-     |IXIY |cpir          |CD @__z80asm__cpir                          |180/328 T
+CPIR                              |gbz80|-     |-    |cpir          |CD @__z80asm__cpir                          |448/856 T
+CPIR                              |gbz80|-     |IXIY |cpir          |CD @__z80asm__cpir                          |448/856 T
 CPIR                              |z80  |-     |-    |cpir          |ED B1                                       |  16/37 T
 CPIR                              |z80  |-     |IXIY |cpir          |ED B1                                       |  16/37 T
 CPIR                              |z80n |-     |-    |cpir          |ED B1                                       |  16/37 T
@@ -2037,36 +2037,36 @@ DI                                |z80  |-     |-    |di            |F3         
 DI                                |z80  |-     |IXIY |di            |F3                                          |      4 T
 DI                                |z80n |-     |-    |di            |F3                                          |      4 T
 DI                                |z80n |-     |IXIY |di            |F3                                          |      4 T
-DJNZ B COMMA expr                 |8080 |expr  |-    |djnz b, %m    |05; C2 %m %m                                |     15 T
-DJNZ B COMMA expr                 |8080 |expr  |IXIY |djnz b, %m    |05; C2 %m %m                                |     15 T
-DJNZ B COMMA expr                 |8085 |expr  |-    |djnz b, %m    |05; C2 %m %m                                |  11/14 T
-DJNZ B COMMA expr                 |8085 |expr  |IXIY |djnz b, %m    |05; C2 %m %m                                |  11/14 T
-DJNZ B COMMA expr                 |gbz80|expr  |-    |djnz b, %j    |05; 20 %j                                   |     12 T
-DJNZ B COMMA expr                 |gbz80|expr  |IXIY |djnz b, %j    |05; 20 %j                                   |     12 T
+DJNZ B COMMA expr                 |8080 |expr  |-    |djnz b, %m    |05  C2 %m %m                                |     15 T
+DJNZ B COMMA expr                 |8080 |expr  |IXIY |djnz b, %m    |05  C2 %m %m                                |     15 T
+DJNZ B COMMA expr                 |8085 |expr  |-    |djnz b, %m    |05  C2 %m %m                                |  11/14 T
+DJNZ B COMMA expr                 |8085 |expr  |IXIY |djnz b, %m    |05  C2 %m %m                                |  11/14 T
+DJNZ B COMMA expr                 |gbz80|expr  |-    |djnz b, %j    |05  20 %j                                   |     12 T
+DJNZ B COMMA expr                 |gbz80|expr  |IXIY |djnz b, %j    |05  20 %j                                   |     12 T
 DJNZ B COMMA expr                 |z80  |expr  |-    |djnz b, %j    |10 %j                                       |   8/13 T
 DJNZ B COMMA expr                 |z80  |expr  |IXIY |djnz b, %j    |10 %j                                       |   8/13 T
 DJNZ B COMMA expr                 |z80n |expr  |-    |djnz b, %j    |10 %j                                       |   8/13 T
 DJNZ B COMMA expr                 |z80n |expr  |IXIY |djnz b, %j    |10 %j                                       |   8/13 T
-DJNZ expr                         |8080 |expr  |-    |djnz %m       |05; C2 %m %m                                |     15 T
-DJNZ expr                         |8080 |expr  |IXIY |djnz %m       |05; C2 %m %m                                |     15 T
-DJNZ expr                         |8085 |expr  |-    |djnz %m       |05; C2 %m %m                                |  11/14 T
-DJNZ expr                         |8085 |expr  |IXIY |djnz %m       |05; C2 %m %m                                |  11/14 T
-DJNZ expr                         |gbz80|expr  |-    |djnz %j       |05; 20 %j                                   |     12 T
-DJNZ expr                         |gbz80|expr  |IXIY |djnz %j       |05; 20 %j                                   |     12 T
+DJNZ expr                         |8080 |expr  |-    |djnz %m       |05  C2 %m %m                                |     15 T
+DJNZ expr                         |8080 |expr  |IXIY |djnz %m       |05  C2 %m %m                                |     15 T
+DJNZ expr                         |8085 |expr  |-    |djnz %m       |05  C2 %m %m                                |  11/14 T
+DJNZ expr                         |8085 |expr  |IXIY |djnz %m       |05  C2 %m %m                                |  11/14 T
+DJNZ expr                         |gbz80|expr  |-    |djnz %j       |05  20 %j                                   |     12 T
+DJNZ expr                         |gbz80|expr  |IXIY |djnz %j       |05  20 %j                                   |     12 T
 DJNZ expr                         |z80  |expr  |-    |djnz %j       |10 %j                                       |   8/13 T
 DJNZ expr                         |z80  |expr  |IXIY |djnz %j       |10 %j                                       |   8/13 T
 DJNZ expr                         |z80n |expr  |-    |djnz %j       |10 %j                                       |   8/13 T
 DJNZ expr                         |z80n |expr  |IXIY |djnz %j       |10 %j                                       |   8/13 T
-DSUB                              |8080 |-     |-    |dsub          |CD @sub_hl_bc                               |     86 T
-DSUB                              |8080 |-     |IXIY |dsub          |CD @sub_hl_bc                               |     86 T
+DSUB                              |8080 |-     |-    |dsub          |CD @__z80asm__sub_hl_bc                     |     86 T
+DSUB                              |8080 |-     |IXIY |dsub          |CD @__z80asm__sub_hl_bc                     |     86 T
 DSUB                              |8085 |-     |-    |dsub          |08                                          |     10 T
 DSUB                              |8085 |-     |IXIY |dsub          |08                                          |     10 T
-DSUB                              |gbz80|-     |-    |dsub          |CD @sub_hl_bc                               |     80 T
-DSUB                              |gbz80|-     |IXIY |dsub          |CD @sub_hl_bc                               |     80 T
-DSUB                              |z80  |-     |-    |dsub          |CD @sub_hl_bc                               |     80 T
-DSUB                              |z80  |-     |IXIY |dsub          |CD @sub_hl_bc                               |     80 T
-DSUB                              |z80n |-     |-    |dsub          |CD @sub_hl_bc                               |     80 T
-DSUB                              |z80n |-     |IXIY |dsub          |CD @sub_hl_bc                               |     80 T
+DSUB                              |gbz80|-     |-    |dsub          |CD @__z80asm__sub_hl_bc                     |     80 T
+DSUB                              |gbz80|-     |IXIY |dsub          |CD @__z80asm__sub_hl_bc                     |     80 T
+DSUB                              |z80  |-     |-    |dsub          |CD @__z80asm__sub_hl_bc                     |     80 T
+DSUB                              |z80  |-     |IXIY |dsub          |CD @__z80asm__sub_hl_bc                     |     80 T
+DSUB                              |z80n |-     |-    |dsub          |CD @__z80asm__sub_hl_bc                     |     80 T
+DSUB                              |z80n |-     |IXIY |dsub          |CD @__z80asm__sub_hl_bc                     |     80 T
 EI                                |8080 |-     |-    |ei            |FB                                          |      4 T
 EI                                |8080 |-     |IXIY |ei            |FB                                          |      4 T
 EI                                |8085 |-     |-    |ei            |FB                                          |      4 T
@@ -2089,8 +2089,8 @@ EX DE COMMA HL                    |8080 |-     |-    |ex de, hl     |EB         
 EX DE COMMA HL                    |8080 |-     |IXIY |ex de, hl     |EB                                          |      4 T
 EX DE COMMA HL                    |8085 |-     |-    |ex de, hl     |EB                                          |      4 T
 EX DE COMMA HL                    |8085 |-     |IXIY |ex de, hl     |EB                                          |      4 T
-EX DE COMMA HL                    |gbz80|-     |-    |ex de, hl     |E5; D5; E1; D1                              |     56 T
-EX DE COMMA HL                    |gbz80|-     |IXIY |ex de, hl     |E5; D5; E1; D1                              |     56 T
+EX DE COMMA HL                    |gbz80|-     |-    |ex de, hl     |E5  D5  E1  D1                              |     56 T
+EX DE COMMA HL                    |gbz80|-     |IXIY |ex de, hl     |E5  D5  E1  D1                              |     56 T
 EX DE COMMA HL                    |z80  |-     |-    |ex de, hl     |EB                                          |      4 T
 EX DE COMMA HL                    |z80  |-     |IXIY |ex de, hl     |EB                                          |      4 T
 EX DE COMMA HL                    |z80n |-     |-    |ex de, hl     |EB                                          |      4 T
@@ -2099,8 +2099,8 @@ EX IND_SP RPAREN COMMA HL         |8080 |-     |-    |ex (sp), hl   |E3         
 EX IND_SP RPAREN COMMA HL         |8080 |-     |IXIY |ex (sp), hl   |E3                                          |     18 T
 EX IND_SP RPAREN COMMA HL         |8085 |-     |-    |ex (sp), hl   |E3                                          |     16 T
 EX IND_SP RPAREN COMMA HL         |8085 |-     |IXIY |ex (sp), hl   |E3                                          |     16 T
-EX IND_SP RPAREN COMMA HL         |gbz80|-     |-    |ex (sp), hl   |CD @ex_sp_hl                                |    148 T
-EX IND_SP RPAREN COMMA HL         |gbz80|-     |IXIY |ex (sp), hl   |CD @ex_sp_hl                                |    148 T
+EX IND_SP RPAREN COMMA HL         |gbz80|-     |-    |ex (sp), hl   |CD @__z80asm__ex_sp_hl                      |    148 T
+EX IND_SP RPAREN COMMA HL         |gbz80|-     |IXIY |ex (sp), hl   |CD @__z80asm__ex_sp_hl                      |    148 T
 EX IND_SP RPAREN COMMA HL         |z80  |-     |-    |ex (sp), hl   |E3                                          |     19 T
 EX IND_SP RPAREN COMMA HL         |z80  |-     |IXIY |ex (sp), hl   |E3                                          |     19 T
 EX IND_SP RPAREN COMMA HL         |z80n |-     |-    |ex (sp), hl   |E3                                          |     19 T
@@ -2575,26 +2575,26 @@ JP C COMMA expr                   |z80  |expr  |-    |jp c, %m      |DA %m %m   
 JP C COMMA expr                   |z80  |expr  |IXIY |jp c, %m      |DA %m %m                                    |     10 T
 JP C COMMA expr                   |z80n |expr  |-    |jp c, %m      |DA %m %m                                    |     10 T
 JP C COMMA expr                   |z80n |expr  |IXIY |jp c, %m      |DA %m %m                                    |     10 T
-JP IND_BC RPAREN                  |8080 |-     |-    |jp (bc)       |C5; C9                                      |     21 T
-JP IND_BC RPAREN                  |8080 |-     |IXIY |jp (bc)       |C5; C9                                      |     21 T
-JP IND_BC RPAREN                  |8085 |-     |-    |jp (bc)       |C5; C9                                      |     22 T
-JP IND_BC RPAREN                  |8085 |-     |IXIY |jp (bc)       |C5; C9                                      |     22 T
-JP IND_BC RPAREN                  |gbz80|-     |-    |jp (bc)       |C5; C9                                      |     24 T
-JP IND_BC RPAREN                  |gbz80|-     |IXIY |jp (bc)       |C5; C9                                      |     24 T
-JP IND_BC RPAREN                  |z80  |-     |-    |jp (bc)       |C5; C9                                      |     21 T
-JP IND_BC RPAREN                  |z80  |-     |IXIY |jp (bc)       |C5; C9                                      |     21 T
-JP IND_BC RPAREN                  |z80n |-     |-    |jp (bc)       |C5; C9                                      |     21 T
-JP IND_BC RPAREN                  |z80n |-     |IXIY |jp (bc)       |C5; C9                                      |     21 T
-JP IND_DE RPAREN                  |8080 |-     |-    |jp (de)       |D5; C9                                      |     21 T
-JP IND_DE RPAREN                  |8080 |-     |IXIY |jp (de)       |D5; C9                                      |     21 T
-JP IND_DE RPAREN                  |8085 |-     |-    |jp (de)       |D5; C9                                      |     22 T
-JP IND_DE RPAREN                  |8085 |-     |IXIY |jp (de)       |D5; C9                                      |     22 T
-JP IND_DE RPAREN                  |gbz80|-     |-    |jp (de)       |D5; C9                                      |     24 T
-JP IND_DE RPAREN                  |gbz80|-     |IXIY |jp (de)       |D5; C9                                      |     24 T
-JP IND_DE RPAREN                  |z80  |-     |-    |jp (de)       |D5; C9                                      |     21 T
-JP IND_DE RPAREN                  |z80  |-     |IXIY |jp (de)       |D5; C9                                      |     21 T
-JP IND_DE RPAREN                  |z80n |-     |-    |jp (de)       |D5; C9                                      |     21 T
-JP IND_DE RPAREN                  |z80n |-     |IXIY |jp (de)       |D5; C9                                      |     21 T
+JP IND_BC RPAREN                  |8080 |-     |-    |jp (bc)       |C5  C9                                      |     21 T
+JP IND_BC RPAREN                  |8080 |-     |IXIY |jp (bc)       |C5  C9                                      |     21 T
+JP IND_BC RPAREN                  |8085 |-     |-    |jp (bc)       |C5  C9                                      |     22 T
+JP IND_BC RPAREN                  |8085 |-     |IXIY |jp (bc)       |C5  C9                                      |     22 T
+JP IND_BC RPAREN                  |gbz80|-     |-    |jp (bc)       |C5  C9                                      |     24 T
+JP IND_BC RPAREN                  |gbz80|-     |IXIY |jp (bc)       |C5  C9                                      |     24 T
+JP IND_BC RPAREN                  |z80  |-     |-    |jp (bc)       |C5  C9                                      |     21 T
+JP IND_BC RPAREN                  |z80  |-     |IXIY |jp (bc)       |C5  C9                                      |     21 T
+JP IND_BC RPAREN                  |z80n |-     |-    |jp (bc)       |C5  C9                                      |     21 T
+JP IND_BC RPAREN                  |z80n |-     |IXIY |jp (bc)       |C5  C9                                      |     21 T
+JP IND_DE RPAREN                  |8080 |-     |-    |jp (de)       |D5  C9                                      |     21 T
+JP IND_DE RPAREN                  |8080 |-     |IXIY |jp (de)       |D5  C9                                      |     21 T
+JP IND_DE RPAREN                  |8085 |-     |-    |jp (de)       |D5  C9                                      |     22 T
+JP IND_DE RPAREN                  |8085 |-     |IXIY |jp (de)       |D5  C9                                      |     22 T
+JP IND_DE RPAREN                  |gbz80|-     |-    |jp (de)       |D5  C9                                      |     24 T
+JP IND_DE RPAREN                  |gbz80|-     |IXIY |jp (de)       |D5  C9                                      |     24 T
+JP IND_DE RPAREN                  |z80  |-     |-    |jp (de)       |D5  C9                                      |     21 T
+JP IND_DE RPAREN                  |z80  |-     |IXIY |jp (de)       |D5  C9                                      |     21 T
+JP IND_DE RPAREN                  |z80n |-     |-    |jp (de)       |D5  C9                                      |     21 T
+JP IND_DE RPAREN                  |z80n |-     |IXIY |jp (de)       |D5  C9                                      |     21 T
 JP IND_HL RPAREN                  |8080 |-     |-    |jp (hl)       |E9                                          |      5 T
 JP IND_HL RPAREN                  |8080 |-     |IXIY |jp (hl)       |E9                                          |      5 T
 JP IND_HL RPAREN                  |8085 |-     |-    |jp (hl)       |E9                                          |      6 T
@@ -3079,34 +3079,34 @@ LD B COMMA expr                   |z80  |expr  |-    |ld b, %n      |06 %n      
 LD B COMMA expr                   |z80  |expr  |IXIY |ld b, %n      |06 %n                                       |      7 T
 LD B COMMA expr                   |z80n |expr  |-    |ld b, %n      |06 %n                                       |      7 T
 LD B COMMA expr                   |z80n |expr  |IXIY |ld b, %n      |06 %n                                       |      7 T
-LD BC COMMA DE                    |8080 |-     |-    |ld bc, de     |42; 4B                                      |     10 T
-LD BC COMMA DE                    |8080 |-     |IXIY |ld bc, de     |42; 4B                                      |     10 T
-LD BC COMMA DE                    |8085 |-     |-    |ld bc, de     |42; 4B                                      |      8 T
-LD BC COMMA DE                    |8085 |-     |IXIY |ld bc, de     |42; 4B                                      |      8 T
-LD BC COMMA DE                    |gbz80|-     |-    |ld bc, de     |42; 4B                                      |      8 T
-LD BC COMMA DE                    |gbz80|-     |IXIY |ld bc, de     |42; 4B                                      |      8 T
-LD BC COMMA DE                    |z80  |-     |-    |ld bc, de     |42; 4B                                      |      8 T
-LD BC COMMA DE                    |z80  |-     |IXIY |ld bc, de     |42; 4B                                      |      8 T
-LD BC COMMA DE                    |z80n |-     |-    |ld bc, de     |42; 4B                                      |      8 T
-LD BC COMMA DE                    |z80n |-     |IXIY |ld bc, de     |42; 4B                                      |      8 T
-LD BC COMMA HL                    |8080 |-     |-    |ld bc, hl     |44; 4D                                      |     10 T
-LD BC COMMA HL                    |8080 |-     |IXIY |ld bc, hl     |44; 4D                                      |     10 T
-LD BC COMMA HL                    |8085 |-     |-    |ld bc, hl     |44; 4D                                      |      8 T
-LD BC COMMA HL                    |8085 |-     |IXIY |ld bc, hl     |44; 4D                                      |      8 T
-LD BC COMMA HL                    |gbz80|-     |-    |ld bc, hl     |44; 4D                                      |      8 T
-LD BC COMMA HL                    |gbz80|-     |IXIY |ld bc, hl     |44; 4D                                      |      8 T
-LD BC COMMA HL                    |z80  |-     |-    |ld bc, hl     |44; 4D                                      |      8 T
-LD BC COMMA HL                    |z80  |-     |IXIY |ld bc, hl     |44; 4D                                      |      8 T
-LD BC COMMA HL                    |z80n |-     |-    |ld bc, hl     |44; 4D                                      |      8 T
-LD BC COMMA HL                    |z80n |-     |IXIY |ld bc, hl     |44; 4D                                      |      8 T
-LD BC COMMA IX                    |z80  |-     |-    |ld bc, ix     |DD 44; DD 4D                                |     16 T
-LD BC COMMA IX                    |z80  |-     |IXIY |ld bc, ix     |FD 44; FD 4D                                |     16 T
-LD BC COMMA IX                    |z80n |-     |-    |ld bc, ix     |DD 44; DD 4D                                |     16 T
-LD BC COMMA IX                    |z80n |-     |IXIY |ld bc, ix     |FD 44; FD 4D                                |     16 T
-LD BC COMMA IY                    |z80  |-     |-    |ld bc, iy     |FD 44; FD 4D                                |     16 T
-LD BC COMMA IY                    |z80  |-     |IXIY |ld bc, iy     |DD 44; DD 4D                                |     16 T
-LD BC COMMA IY                    |z80n |-     |-    |ld bc, iy     |FD 44; FD 4D                                |     16 T
-LD BC COMMA IY                    |z80n |-     |IXIY |ld bc, iy     |DD 44; DD 4D                                |     16 T
+LD BC COMMA DE                    |8080 |-     |-    |ld bc, de     |42  4B                                      |     10 T
+LD BC COMMA DE                    |8080 |-     |IXIY |ld bc, de     |42  4B                                      |     10 T
+LD BC COMMA DE                    |8085 |-     |-    |ld bc, de     |42  4B                                      |      8 T
+LD BC COMMA DE                    |8085 |-     |IXIY |ld bc, de     |42  4B                                      |      8 T
+LD BC COMMA DE                    |gbz80|-     |-    |ld bc, de     |42  4B                                      |      8 T
+LD BC COMMA DE                    |gbz80|-     |IXIY |ld bc, de     |42  4B                                      |      8 T
+LD BC COMMA DE                    |z80  |-     |-    |ld bc, de     |42  4B                                      |      8 T
+LD BC COMMA DE                    |z80  |-     |IXIY |ld bc, de     |42  4B                                      |      8 T
+LD BC COMMA DE                    |z80n |-     |-    |ld bc, de     |42  4B                                      |      8 T
+LD BC COMMA DE                    |z80n |-     |IXIY |ld bc, de     |42  4B                                      |      8 T
+LD BC COMMA HL                    |8080 |-     |-    |ld bc, hl     |44  4D                                      |     10 T
+LD BC COMMA HL                    |8080 |-     |IXIY |ld bc, hl     |44  4D                                      |     10 T
+LD BC COMMA HL                    |8085 |-     |-    |ld bc, hl     |44  4D                                      |      8 T
+LD BC COMMA HL                    |8085 |-     |IXIY |ld bc, hl     |44  4D                                      |      8 T
+LD BC COMMA HL                    |gbz80|-     |-    |ld bc, hl     |44  4D                                      |      8 T
+LD BC COMMA HL                    |gbz80|-     |IXIY |ld bc, hl     |44  4D                                      |      8 T
+LD BC COMMA HL                    |z80  |-     |-    |ld bc, hl     |44  4D                                      |      8 T
+LD BC COMMA HL                    |z80  |-     |IXIY |ld bc, hl     |44  4D                                      |      8 T
+LD BC COMMA HL                    |z80n |-     |-    |ld bc, hl     |44  4D                                      |      8 T
+LD BC COMMA HL                    |z80n |-     |IXIY |ld bc, hl     |44  4D                                      |      8 T
+LD BC COMMA IX                    |z80  |-     |-    |ld bc, ix     |DD 44  DD 4D                                |     16 T
+LD BC COMMA IX                    |z80  |-     |IXIY |ld bc, ix     |FD 44  FD 4D                                |     16 T
+LD BC COMMA IX                    |z80n |-     |-    |ld bc, ix     |DD 44  DD 4D                                |     16 T
+LD BC COMMA IX                    |z80n |-     |IXIY |ld bc, ix     |FD 44  FD 4D                                |     16 T
+LD BC COMMA IY                    |z80  |-     |-    |ld bc, iy     |FD 44  FD 4D                                |     16 T
+LD BC COMMA IY                    |z80  |-     |IXIY |ld bc, iy     |DD 44  DD 4D                                |     16 T
+LD BC COMMA IY                    |z80n |-     |-    |ld bc, iy     |FD 44  FD 4D                                |     16 T
+LD BC COMMA IY                    |z80n |-     |IXIY |ld bc, iy     |DD 44  DD 4D                                |     16 T
 LD BC COMMA expr                  |8080 |expr  |-    |ld bc, %m     |01 %m %m                                    |     10 T
 LD BC COMMA expr                  |8080 |expr  |IXIY |ld bc, %m     |01 %m %m                                    |     10 T
 LD BC COMMA expr                  |8085 |expr  |-    |ld bc, %m     |01 %m %m                                    |     10 T
@@ -3371,54 +3371,54 @@ LD D COMMA expr                   |z80  |expr  |-    |ld d, %n      |16 %n      
 LD D COMMA expr                   |z80  |expr  |IXIY |ld d, %n      |16 %n                                       |      7 T
 LD D COMMA expr                   |z80n |expr  |-    |ld d, %n      |16 %n                                       |      7 T
 LD D COMMA expr                   |z80n |expr  |IXIY |ld d, %n      |16 %n                                       |      7 T
-LD DE COMMA BC                    |8080 |-     |-    |ld de, bc     |50; 59                                      |     10 T
-LD DE COMMA BC                    |8080 |-     |IXIY |ld de, bc     |50; 59                                      |     10 T
-LD DE COMMA BC                    |8085 |-     |-    |ld de, bc     |50; 59                                      |      8 T
-LD DE COMMA BC                    |8085 |-     |IXIY |ld de, bc     |50; 59                                      |      8 T
-LD DE COMMA BC                    |gbz80|-     |-    |ld de, bc     |50; 59                                      |      8 T
-LD DE COMMA BC                    |gbz80|-     |IXIY |ld de, bc     |50; 59                                      |      8 T
-LD DE COMMA BC                    |z80  |-     |-    |ld de, bc     |50; 59                                      |      8 T
-LD DE COMMA BC                    |z80  |-     |IXIY |ld de, bc     |50; 59                                      |      8 T
-LD DE COMMA BC                    |z80n |-     |-    |ld de, bc     |50; 59                                      |      8 T
-LD DE COMMA BC                    |z80n |-     |IXIY |ld de, bc     |50; 59                                      |      8 T
-LD DE COMMA HL                    |8080 |-     |-    |ld de, hl     |54; 5D                                      |     10 T
-LD DE COMMA HL                    |8080 |-     |IXIY |ld de, hl     |54; 5D                                      |     10 T
-LD DE COMMA HL                    |gbz80|-     |-    |ld de, hl     |54; 5D                                      |      8 T
-LD DE COMMA HL                    |gbz80|-     |IXIY |ld de, hl     |54; 5D                                      |      8 T
-LD DE COMMA HL                    |z80  |-     |-    |ld de, hl     |54; 5D                                      |      8 T
-LD DE COMMA HL                    |z80  |-     |IXIY |ld de, hl     |54; 5D                                      |      8 T
-LD DE COMMA HL                    |z80n |-     |-    |ld de, hl     |54; 5D                                      |      8 T
-LD DE COMMA HL                    |z80n |-     |IXIY |ld de, hl     |54; 5D                                      |      8 T
+LD DE COMMA BC                    |8080 |-     |-    |ld de, bc     |50  59                                      |     10 T
+LD DE COMMA BC                    |8080 |-     |IXIY |ld de, bc     |50  59                                      |     10 T
+LD DE COMMA BC                    |8085 |-     |-    |ld de, bc     |50  59                                      |      8 T
+LD DE COMMA BC                    |8085 |-     |IXIY |ld de, bc     |50  59                                      |      8 T
+LD DE COMMA BC                    |gbz80|-     |-    |ld de, bc     |50  59                                      |      8 T
+LD DE COMMA BC                    |gbz80|-     |IXIY |ld de, bc     |50  59                                      |      8 T
+LD DE COMMA BC                    |z80  |-     |-    |ld de, bc     |50  59                                      |      8 T
+LD DE COMMA BC                    |z80  |-     |IXIY |ld de, bc     |50  59                                      |      8 T
+LD DE COMMA BC                    |z80n |-     |-    |ld de, bc     |50  59                                      |      8 T
+LD DE COMMA BC                    |z80n |-     |IXIY |ld de, bc     |50  59                                      |      8 T
+LD DE COMMA HL                    |8080 |-     |-    |ld de, hl     |54  5D                                      |     10 T
+LD DE COMMA HL                    |8080 |-     |IXIY |ld de, hl     |54  5D                                      |     10 T
+LD DE COMMA HL                    |gbz80|-     |-    |ld de, hl     |54  5D                                      |      8 T
+LD DE COMMA HL                    |gbz80|-     |IXIY |ld de, hl     |54  5D                                      |      8 T
+LD DE COMMA HL                    |z80  |-     |-    |ld de, hl     |54  5D                                      |      8 T
+LD DE COMMA HL                    |z80  |-     |IXIY |ld de, hl     |54  5D                                      |      8 T
+LD DE COMMA HL                    |z80n |-     |-    |ld de, hl     |54  5D                                      |      8 T
+LD DE COMMA HL                    |z80n |-     |IXIY |ld de, hl     |54  5D                                      |      8 T
 LD DE COMMA HL PLUS expr          |8085 |expr  |-    |ld de, hl+%n  |28 %n                                       |     10 T
 LD DE COMMA HL PLUS expr          |8085 |expr  |IXIY |ld de, hl+%n  |28 %n                                       |     10 T
-LD DE COMMA IX                    |z80  |-     |-    |ld de, ix     |DD 54; DD 5D                                |     16 T
-LD DE COMMA IX                    |z80  |-     |IXIY |ld de, ix     |FD 54; FD 5D                                |     16 T
-LD DE COMMA IX                    |z80n |-     |-    |ld de, ix     |DD 54; DD 5D                                |     16 T
-LD DE COMMA IX                    |z80n |-     |IXIY |ld de, ix     |FD 54; FD 5D                                |     16 T
-LD DE COMMA IY                    |z80  |-     |-    |ld de, iy     |FD 54; FD 5D                                |     16 T
-LD DE COMMA IY                    |z80  |-     |IXIY |ld de, iy     |DD 54; DD 5D                                |     16 T
-LD DE COMMA IY                    |z80n |-     |-    |ld de, iy     |FD 54; FD 5D                                |     16 T
-LD DE COMMA IY                    |z80n |-     |IXIY |ld de, iy     |DD 54; DD 5D                                |     16 T
-LD DE COMMA SP                    |8080 |-     |-    |ld de, sp     |EB; 21 00 00; 39; EB                        |     28 T
-LD DE COMMA SP                    |8080 |-     |IXIY |ld de, sp     |EB; 21 00 00; 39; EB                        |     28 T
+LD DE COMMA IX                    |z80  |-     |-    |ld de, ix     |DD 54  DD 5D                                |     16 T
+LD DE COMMA IX                    |z80  |-     |IXIY |ld de, ix     |FD 54  FD 5D                                |     16 T
+LD DE COMMA IX                    |z80n |-     |-    |ld de, ix     |DD 54  DD 5D                                |     16 T
+LD DE COMMA IX                    |z80n |-     |IXIY |ld de, ix     |FD 54  FD 5D                                |     16 T
+LD DE COMMA IY                    |z80  |-     |-    |ld de, iy     |FD 54  FD 5D                                |     16 T
+LD DE COMMA IY                    |z80  |-     |IXIY |ld de, iy     |DD 54  DD 5D                                |     16 T
+LD DE COMMA IY                    |z80n |-     |-    |ld de, iy     |FD 54  FD 5D                                |     16 T
+LD DE COMMA IY                    |z80n |-     |IXIY |ld de, iy     |DD 54  DD 5D                                |     16 T
+LD DE COMMA SP                    |8080 |-     |-    |ld de, sp     |EB  21 00 00  39  EB                        |     28 T
+LD DE COMMA SP                    |8080 |-     |IXIY |ld de, sp     |EB  21 00 00  39  EB                        |     28 T
 LD DE COMMA SP                    |8085 |-     |-    |ld de, sp     |38 00                                       |     10 T
 LD DE COMMA SP                    |8085 |-     |IXIY |ld de, sp     |38 00                                       |     10 T
-LD DE COMMA SP                    |gbz80|-     |-    |ld de, sp     |E5; D5; E1; D1; 21 00 00; 39; E5; D5; E1; D1|    132 T
-LD DE COMMA SP                    |gbz80|-     |IXIY |ld de, sp     |E5; D5; E1; D1; 21 00 00; 39; E5; D5; E1; D1|    132 T
-LD DE COMMA SP                    |z80  |-     |-    |ld de, sp     |EB; 21 00 00; 39; EB                        |     29 T
-LD DE COMMA SP                    |z80  |-     |IXIY |ld de, sp     |EB; 21 00 00; 39; EB                        |     29 T
-LD DE COMMA SP                    |z80n |-     |-    |ld de, sp     |EB; 21 00 00; 39; EB                        |     29 T
-LD DE COMMA SP                    |z80n |-     |IXIY |ld de, sp     |EB; 21 00 00; 39; EB                        |     29 T
-LD DE COMMA SP PLUS expr          |8080 |expr  |-    |ld de, sp+%n  |EB; 21 %n 00; 39; EB                        |     28 T
-LD DE COMMA SP PLUS expr          |8080 |expr  |IXIY |ld de, sp+%n  |EB; 21 %n 00; 39; EB                        |     28 T
+LD DE COMMA SP                    |gbz80|-     |-    |ld de, sp     |E5  D5  E1  D1  21 00 00  39  E5  D5  E1  D1|    132 T
+LD DE COMMA SP                    |gbz80|-     |IXIY |ld de, sp     |E5  D5  E1  D1  21 00 00  39  E5  D5  E1  D1|    132 T
+LD DE COMMA SP                    |z80  |-     |-    |ld de, sp     |EB  21 00 00  39  EB                        |     29 T
+LD DE COMMA SP                    |z80  |-     |IXIY |ld de, sp     |EB  21 00 00  39  EB                        |     29 T
+LD DE COMMA SP                    |z80n |-     |-    |ld de, sp     |EB  21 00 00  39  EB                        |     29 T
+LD DE COMMA SP                    |z80n |-     |IXIY |ld de, sp     |EB  21 00 00  39  EB                        |     29 T
+LD DE COMMA SP PLUS expr          |8080 |expr  |-    |ld de, sp+%n  |EB  21 %n 00  39  EB                        |     28 T
+LD DE COMMA SP PLUS expr          |8080 |expr  |IXIY |ld de, sp+%n  |EB  21 %n 00  39  EB                        |     28 T
 LD DE COMMA SP PLUS expr          |8085 |expr  |-    |ld de, sp+%n  |38 %n                                       |     10 T
 LD DE COMMA SP PLUS expr          |8085 |expr  |IXIY |ld de, sp+%n  |38 %n                                       |     10 T
-LD DE COMMA SP PLUS expr          |gbz80|expr  |-    |ld de, sp+%n  |E5; D5; E1; D1; 21 %n 00; 39; E5; D5; E1; D1|    132 T
-LD DE COMMA SP PLUS expr          |gbz80|expr  |IXIY |ld de, sp+%n  |E5; D5; E1; D1; 21 %n 00; 39; E5; D5; E1; D1|    132 T
-LD DE COMMA SP PLUS expr          |z80  |expr  |-    |ld de, sp+%n  |EB; 21 %n 00; 39; EB                        |     29 T
-LD DE COMMA SP PLUS expr          |z80  |expr  |IXIY |ld de, sp+%n  |EB; 21 %n 00; 39; EB                        |     29 T
-LD DE COMMA SP PLUS expr          |z80n |expr  |-    |ld de, sp+%n  |EB; 21 %n 00; 39; EB                        |     29 T
-LD DE COMMA SP PLUS expr          |z80n |expr  |IXIY |ld de, sp+%n  |EB; 21 %n 00; 39; EB                        |     29 T
+LD DE COMMA SP PLUS expr          |gbz80|expr  |-    |ld de, sp+%n  |E5  D5  E1  D1  21 %n 00  39  E5  D5  E1  D1|    132 T
+LD DE COMMA SP PLUS expr          |gbz80|expr  |IXIY |ld de, sp+%n  |E5  D5  E1  D1  21 %n 00  39  E5  D5  E1  D1|    132 T
+LD DE COMMA SP PLUS expr          |z80  |expr  |-    |ld de, sp+%n  |EB  21 %n 00  39  EB                        |     29 T
+LD DE COMMA SP PLUS expr          |z80  |expr  |IXIY |ld de, sp+%n  |EB  21 %n 00  39  EB                        |     29 T
+LD DE COMMA SP PLUS expr          |z80n |expr  |-    |ld de, sp+%n  |EB  21 %n 00  39  EB                        |     29 T
+LD DE COMMA SP PLUS expr          |z80n |expr  |IXIY |ld de, sp+%n  |EB  21 %n 00  39  EB                        |     29 T
 LD DE COMMA expr                  |8080 |expr  |-    |ld de, %m     |11 %m %m                                    |     10 T
 LD DE COMMA expr                  |8080 |expr  |IXIY |ld de, %m     |11 %m %m                                    |     10 T
 LD DE COMMA expr                  |8085 |expr  |-    |ld de, %m     |11 %m %m                                    |     10 T
@@ -3667,56 +3667,56 @@ LD H COMMA expr                   |z80  |expr  |-    |ld h, %n      |26 %n      
 LD H COMMA expr                   |z80  |expr  |IXIY |ld h, %n      |26 %n                                       |      7 T
 LD H COMMA expr                   |z80n |expr  |-    |ld h, %n      |26 %n                                       |      7 T
 LD H COMMA expr                   |z80n |expr  |IXIY |ld h, %n      |26 %n                                       |      7 T
-LD HL COMMA BC                    |8080 |-     |-    |ld hl, bc     |60; 69                                      |     10 T
-LD HL COMMA BC                    |8080 |-     |IXIY |ld hl, bc     |60; 69                                      |     10 T
-LD HL COMMA BC                    |8085 |-     |-    |ld hl, bc     |60; 69                                      |      8 T
-LD HL COMMA BC                    |8085 |-     |IXIY |ld hl, bc     |60; 69                                      |      8 T
-LD HL COMMA BC                    |gbz80|-     |-    |ld hl, bc     |60; 69                                      |      8 T
-LD HL COMMA BC                    |gbz80|-     |IXIY |ld hl, bc     |60; 69                                      |      8 T
-LD HL COMMA BC                    |z80  |-     |-    |ld hl, bc     |60; 69                                      |      8 T
-LD HL COMMA BC                    |z80  |-     |IXIY |ld hl, bc     |60; 69                                      |      8 T
-LD HL COMMA BC                    |z80n |-     |-    |ld hl, bc     |60; 69                                      |      8 T
-LD HL COMMA BC                    |z80n |-     |IXIY |ld hl, bc     |60; 69                                      |      8 T
-LD HL COMMA DE                    |8080 |-     |-    |ld hl, de     |62; 6B                                      |     10 T
-LD HL COMMA DE                    |8080 |-     |IXIY |ld hl, de     |62; 6B                                      |     10 T
-LD HL COMMA DE                    |8085 |-     |-    |ld hl, de     |62; 6B                                      |      8 T
-LD HL COMMA DE                    |8085 |-     |IXIY |ld hl, de     |62; 6B                                      |      8 T
-LD HL COMMA DE                    |gbz80|-     |-    |ld hl, de     |62; 6B                                      |      8 T
-LD HL COMMA DE                    |gbz80|-     |IXIY |ld hl, de     |62; 6B                                      |      8 T
-LD HL COMMA DE                    |z80  |-     |-    |ld hl, de     |62; 6B                                      |      8 T
-LD HL COMMA DE                    |z80  |-     |IXIY |ld hl, de     |62; 6B                                      |      8 T
-LD HL COMMA DE                    |z80n |-     |-    |ld hl, de     |62; 6B                                      |      8 T
-LD HL COMMA DE                    |z80n |-     |IXIY |ld hl, de     |62; 6B                                      |      8 T
+LD HL COMMA BC                    |8080 |-     |-    |ld hl, bc     |60  69                                      |     10 T
+LD HL COMMA BC                    |8080 |-     |IXIY |ld hl, bc     |60  69                                      |     10 T
+LD HL COMMA BC                    |8085 |-     |-    |ld hl, bc     |60  69                                      |      8 T
+LD HL COMMA BC                    |8085 |-     |IXIY |ld hl, bc     |60  69                                      |      8 T
+LD HL COMMA BC                    |gbz80|-     |-    |ld hl, bc     |60  69                                      |      8 T
+LD HL COMMA BC                    |gbz80|-     |IXIY |ld hl, bc     |60  69                                      |      8 T
+LD HL COMMA BC                    |z80  |-     |-    |ld hl, bc     |60  69                                      |      8 T
+LD HL COMMA BC                    |z80  |-     |IXIY |ld hl, bc     |60  69                                      |      8 T
+LD HL COMMA BC                    |z80n |-     |-    |ld hl, bc     |60  69                                      |      8 T
+LD HL COMMA BC                    |z80n |-     |IXIY |ld hl, bc     |60  69                                      |      8 T
+LD HL COMMA DE                    |8080 |-     |-    |ld hl, de     |62  6B                                      |     10 T
+LD HL COMMA DE                    |8080 |-     |IXIY |ld hl, de     |62  6B                                      |     10 T
+LD HL COMMA DE                    |8085 |-     |-    |ld hl, de     |62  6B                                      |      8 T
+LD HL COMMA DE                    |8085 |-     |IXIY |ld hl, de     |62  6B                                      |      8 T
+LD HL COMMA DE                    |gbz80|-     |-    |ld hl, de     |62  6B                                      |      8 T
+LD HL COMMA DE                    |gbz80|-     |IXIY |ld hl, de     |62  6B                                      |      8 T
+LD HL COMMA DE                    |z80  |-     |-    |ld hl, de     |62  6B                                      |      8 T
+LD HL COMMA DE                    |z80  |-     |IXIY |ld hl, de     |62  6B                                      |      8 T
+LD HL COMMA DE                    |z80n |-     |-    |ld hl, de     |62  6B                                      |      8 T
+LD HL COMMA DE                    |z80n |-     |IXIY |ld hl, de     |62  6B                                      |      8 T
 LD HL COMMA IND_DE RPAREN         |8085 |-     |-    |ld hl, (de)   |ED                                          |     10 T
 LD HL COMMA IND_DE RPAREN         |8085 |-     |IXIY |ld hl, (de)   |ED                                          |     10 T
-LD HL COMMA IX                    |z80  |-     |-    |ld hl, ix     |DD E5; E1                                   |     25 T
-LD HL COMMA IX                    |z80  |-     |IXIY |ld hl, ix     |FD E5; E1                                   |     25 T
-LD HL COMMA IX                    |z80n |-     |-    |ld hl, ix     |DD E5; E1                                   |     25 T
-LD HL COMMA IX                    |z80n |-     |IXIY |ld hl, ix     |FD E5; E1                                   |     25 T
-LD HL COMMA IY                    |z80  |-     |-    |ld hl, iy     |FD E5; E1                                   |     25 T
-LD HL COMMA IY                    |z80  |-     |IXIY |ld hl, iy     |DD E5; E1                                   |     25 T
-LD HL COMMA IY                    |z80n |-     |-    |ld hl, iy     |FD E5; E1                                   |     25 T
-LD HL COMMA IY                    |z80n |-     |IXIY |ld hl, iy     |DD E5; E1                                   |     25 T
-LD HL COMMA SP                    |8080 |-     |-    |ld hl, sp     |21 00 00; 39                                |     20 T
-LD HL COMMA SP                    |8080 |-     |IXIY |ld hl, sp     |21 00 00; 39                                |     20 T
-LD HL COMMA SP                    |8085 |-     |-    |ld hl, sp     |EB; 38 00; EB                               |     18 T
-LD HL COMMA SP                    |8085 |-     |IXIY |ld hl, sp     |EB; 38 00; EB                               |     18 T
+LD HL COMMA IX                    |z80  |-     |-    |ld hl, ix     |DD E5  E1                                   |     25 T
+LD HL COMMA IX                    |z80  |-     |IXIY |ld hl, ix     |FD E5  E1                                   |     25 T
+LD HL COMMA IX                    |z80n |-     |-    |ld hl, ix     |DD E5  E1                                   |     25 T
+LD HL COMMA IX                    |z80n |-     |IXIY |ld hl, ix     |FD E5  E1                                   |     25 T
+LD HL COMMA IY                    |z80  |-     |-    |ld hl, iy     |FD E5  E1                                   |     25 T
+LD HL COMMA IY                    |z80  |-     |IXIY |ld hl, iy     |DD E5  E1                                   |     25 T
+LD HL COMMA IY                    |z80n |-     |-    |ld hl, iy     |FD E5  E1                                   |     25 T
+LD HL COMMA IY                    |z80n |-     |IXIY |ld hl, iy     |DD E5  E1                                   |     25 T
+LD HL COMMA SP                    |8080 |-     |-    |ld hl, sp     |21 00 00  39                                |     20 T
+LD HL COMMA SP                    |8080 |-     |IXIY |ld hl, sp     |21 00 00  39                                |     20 T
+LD HL COMMA SP                    |8085 |-     |-    |ld hl, sp     |EB  38 00  EB                               |     18 T
+LD HL COMMA SP                    |8085 |-     |IXIY |ld hl, sp     |EB  38 00  EB                               |     18 T
 LD HL COMMA SP                    |gbz80|-     |-    |ld hl, sp     |F8 00                                       |     12 T
 LD HL COMMA SP                    |gbz80|-     |IXIY |ld hl, sp     |F8 00                                       |     12 T
-LD HL COMMA SP                    |z80  |-     |-    |ld hl, sp     |21 00 00; 39                                |     21 T
-LD HL COMMA SP                    |z80  |-     |IXIY |ld hl, sp     |21 00 00; 39                                |     21 T
-LD HL COMMA SP                    |z80n |-     |-    |ld hl, sp     |21 00 00; 39                                |     21 T
-LD HL COMMA SP                    |z80n |-     |IXIY |ld hl, sp     |21 00 00; 39                                |     21 T
-LD HL COMMA SP PLUS expr          |8085 |expr  |-    |ld hl, sp+%n  |EB; 38 %n; EB                               |     18 T
-LD HL COMMA SP PLUS expr          |8085 |expr  |IXIY |ld hl, sp+%n  |EB; 38 %n; EB                               |     18 T
-LD HL COMMA SP expr               |8080 |expr  |-    |ld hl, sp+%s  |21 %s 00; 39                                |     20 T
-LD HL COMMA SP expr               |8080 |expr  |IXIY |ld hl, sp+%s  |21 %s 00; 39                                |     20 T
+LD HL COMMA SP                    |z80  |-     |-    |ld hl, sp     |21 00 00  39                                |     21 T
+LD HL COMMA SP                    |z80  |-     |IXIY |ld hl, sp     |21 00 00  39                                |     21 T
+LD HL COMMA SP                    |z80n |-     |-    |ld hl, sp     |21 00 00  39                                |     21 T
+LD HL COMMA SP                    |z80n |-     |IXIY |ld hl, sp     |21 00 00  39                                |     21 T
+LD HL COMMA SP PLUS expr          |8085 |expr  |-    |ld hl, sp+%n  |EB  38 %n  EB                               |     18 T
+LD HL COMMA SP PLUS expr          |8085 |expr  |IXIY |ld hl, sp+%n  |EB  38 %n  EB                               |     18 T
+LD HL COMMA SP expr               |8080 |expr  |-    |ld hl, sp+%s  |21 %s 00  39                                |     20 T
+LD HL COMMA SP expr               |8080 |expr  |IXIY |ld hl, sp+%s  |21 %s 00  39                                |     20 T
 LD HL COMMA SP expr               |gbz80|expr  |-    |ld hl, sp+%s  |F8 %s                                       |     12 T
 LD HL COMMA SP expr               |gbz80|expr  |IXIY |ld hl, sp+%s  |F8 %s                                       |     12 T
-LD HL COMMA SP expr               |z80  |expr  |-    |ld hl, sp+%s  |21 %s 00; 39                                |     21 T
-LD HL COMMA SP expr               |z80  |expr  |IXIY |ld hl, sp+%s  |21 %s 00; 39                                |     21 T
-LD HL COMMA SP expr               |z80n |expr  |-    |ld hl, sp+%s  |21 %s 00; 39                                |     21 T
-LD HL COMMA SP expr               |z80n |expr  |IXIY |ld hl, sp+%s  |21 %s 00; 39                                |     21 T
+LD HL COMMA SP expr               |z80  |expr  |-    |ld hl, sp+%s  |21 %s 00  39                                |     21 T
+LD HL COMMA SP expr               |z80  |expr  |IXIY |ld hl, sp+%s  |21 %s 00  39                                |     21 T
+LD HL COMMA SP expr               |z80n |expr  |-    |ld hl, sp+%s  |21 %s 00  39                                |     21 T
+LD HL COMMA SP expr               |z80n |expr  |IXIY |ld hl, sp+%s  |21 %s 00  39                                |     21 T
 LD HL COMMA expr                  |8080 |(expr)|-    |ld hl, (%m)   |2A %m %m                                    |     16 T
 LD HL COMMA expr                  |8080 |(expr)|IXIY |ld hl, (%m)   |2A %m %m                                    |     16 T
 LD HL COMMA expr                  |8080 |expr  |-    |ld hl, %m     |21 %m %m                                    |     10 T
@@ -3985,22 +3985,22 @@ LD IND_IY expr RPAREN COMMA expr  |z80  |expr  |-    |ld (iy+%d), %n|FD 36 %d %n
 LD IND_IY expr RPAREN COMMA expr  |z80  |expr  |IXIY |ld (iy+%d), %n|DD 36 %d %n                                 |     19 T
 LD IND_IY expr RPAREN COMMA expr  |z80n |expr  |-    |ld (iy+%d), %n|FD 36 %d %n                                 |     19 T
 LD IND_IY expr RPAREN COMMA expr  |z80n |expr  |IXIY |ld (iy+%d), %n|DD 36 %d %n                                 |     19 T
-LD IX COMMA BC                    |z80  |-     |-    |ld ix, bc     |DD 60; DD 69                                |     16 T
-LD IX COMMA BC                    |z80  |-     |IXIY |ld ix, bc     |FD 60; FD 69                                |     16 T
-LD IX COMMA BC                    |z80n |-     |-    |ld ix, bc     |DD 60; DD 69                                |     16 T
-LD IX COMMA BC                    |z80n |-     |IXIY |ld ix, bc     |FD 60; FD 69                                |     16 T
-LD IX COMMA DE                    |z80  |-     |-    |ld ix, de     |DD 62; DD 6B                                |     16 T
-LD IX COMMA DE                    |z80  |-     |IXIY |ld ix, de     |FD 62; FD 6B                                |     16 T
-LD IX COMMA DE                    |z80n |-     |-    |ld ix, de     |DD 62; DD 6B                                |     16 T
-LD IX COMMA DE                    |z80n |-     |IXIY |ld ix, de     |FD 62; FD 6B                                |     16 T
-LD IX COMMA HL                    |z80  |-     |-    |ld ix, hl     |E5; DD E1                                   |     25 T
-LD IX COMMA HL                    |z80  |-     |IXIY |ld ix, hl     |E5; FD E1                                   |     25 T
-LD IX COMMA HL                    |z80n |-     |-    |ld ix, hl     |E5; DD E1                                   |     25 T
-LD IX COMMA HL                    |z80n |-     |IXIY |ld ix, hl     |E5; FD E1                                   |     25 T
-LD IX COMMA IY                    |z80  |-     |-    |ld ix, iy     |FD E5; DD E1                                |     29 T
-LD IX COMMA IY                    |z80  |-     |IXIY |ld ix, iy     |DD E5; FD E1                                |     29 T
-LD IX COMMA IY                    |z80n |-     |-    |ld ix, iy     |FD E5; DD E1                                |     29 T
-LD IX COMMA IY                    |z80n |-     |IXIY |ld ix, iy     |DD E5; FD E1                                |     29 T
+LD IX COMMA BC                    |z80  |-     |-    |ld ix, bc     |DD 60  DD 69                                |     16 T
+LD IX COMMA BC                    |z80  |-     |IXIY |ld ix, bc     |FD 60  FD 69                                |     16 T
+LD IX COMMA BC                    |z80n |-     |-    |ld ix, bc     |DD 60  DD 69                                |     16 T
+LD IX COMMA BC                    |z80n |-     |IXIY |ld ix, bc     |FD 60  FD 69                                |     16 T
+LD IX COMMA DE                    |z80  |-     |-    |ld ix, de     |DD 62  DD 6B                                |     16 T
+LD IX COMMA DE                    |z80  |-     |IXIY |ld ix, de     |FD 62  FD 6B                                |     16 T
+LD IX COMMA DE                    |z80n |-     |-    |ld ix, de     |DD 62  DD 6B                                |     16 T
+LD IX COMMA DE                    |z80n |-     |IXIY |ld ix, de     |FD 62  FD 6B                                |     16 T
+LD IX COMMA HL                    |z80  |-     |-    |ld ix, hl     |E5  DD E1                                   |     25 T
+LD IX COMMA HL                    |z80  |-     |IXIY |ld ix, hl     |E5  FD E1                                   |     25 T
+LD IX COMMA HL                    |z80n |-     |-    |ld ix, hl     |E5  DD E1                                   |     25 T
+LD IX COMMA HL                    |z80n |-     |IXIY |ld ix, hl     |E5  FD E1                                   |     25 T
+LD IX COMMA IY                    |z80  |-     |-    |ld ix, iy     |FD E5  DD E1                                |     29 T
+LD IX COMMA IY                    |z80  |-     |IXIY |ld ix, iy     |DD E5  FD E1                                |     29 T
+LD IX COMMA IY                    |z80n |-     |-    |ld ix, iy     |FD E5  DD E1                                |     29 T
+LD IX COMMA IY                    |z80n |-     |IXIY |ld ix, iy     |DD E5  FD E1                                |     29 T
 LD IX COMMA expr                  |z80  |(expr)|-    |ld ix, (%m)   |DD 2A %m %m                                 |     20 T
 LD IX COMMA expr                  |z80  |(expr)|IXIY |ld ix, (%m)   |FD 2A %m %m                                 |     20 T
 LD IX COMMA expr                  |z80  |expr  |-    |ld ix, %m     |DD 21 %m %m                                 |     14 T
@@ -4073,22 +4073,22 @@ LD IXL COMMA expr                 |z80  |expr  |-    |ld ixl, %n    |DD 2E %n   
 LD IXL COMMA expr                 |z80  |expr  |IXIY |ld ixl, %n    |FD 2E %n                                    |     11 T
 LD IXL COMMA expr                 |z80n |expr  |-    |ld ixl, %n    |DD 2E %n                                    |     11 T
 LD IXL COMMA expr                 |z80n |expr  |IXIY |ld ixl, %n    |FD 2E %n                                    |     11 T
-LD IY COMMA BC                    |z80  |-     |-    |ld iy, bc     |FD 60; FD 69                                |     16 T
-LD IY COMMA BC                    |z80  |-     |IXIY |ld iy, bc     |DD 60; DD 69                                |     16 T
-LD IY COMMA BC                    |z80n |-     |-    |ld iy, bc     |FD 60; FD 69                                |     16 T
-LD IY COMMA BC                    |z80n |-     |IXIY |ld iy, bc     |DD 60; DD 69                                |     16 T
-LD IY COMMA DE                    |z80  |-     |-    |ld iy, de     |FD 62; FD 6B                                |     16 T
-LD IY COMMA DE                    |z80  |-     |IXIY |ld iy, de     |DD 62; DD 6B                                |     16 T
-LD IY COMMA DE                    |z80n |-     |-    |ld iy, de     |FD 62; FD 6B                                |     16 T
-LD IY COMMA DE                    |z80n |-     |IXIY |ld iy, de     |DD 62; DD 6B                                |     16 T
-LD IY COMMA HL                    |z80  |-     |-    |ld iy, hl     |E5; FD E1                                   |     25 T
-LD IY COMMA HL                    |z80  |-     |IXIY |ld iy, hl     |E5; DD E1                                   |     25 T
-LD IY COMMA HL                    |z80n |-     |-    |ld iy, hl     |E5; FD E1                                   |     25 T
-LD IY COMMA HL                    |z80n |-     |IXIY |ld iy, hl     |E5; DD E1                                   |     25 T
-LD IY COMMA IX                    |z80  |-     |-    |ld iy, ix     |DD E5; FD E1                                |     29 T
-LD IY COMMA IX                    |z80  |-     |IXIY |ld iy, ix     |FD E5; DD E1                                |     29 T
-LD IY COMMA IX                    |z80n |-     |-    |ld iy, ix     |DD E5; FD E1                                |     29 T
-LD IY COMMA IX                    |z80n |-     |IXIY |ld iy, ix     |FD E5; DD E1                                |     29 T
+LD IY COMMA BC                    |z80  |-     |-    |ld iy, bc     |FD 60  FD 69                                |     16 T
+LD IY COMMA BC                    |z80  |-     |IXIY |ld iy, bc     |DD 60  DD 69                                |     16 T
+LD IY COMMA BC                    |z80n |-     |-    |ld iy, bc     |FD 60  FD 69                                |     16 T
+LD IY COMMA BC                    |z80n |-     |IXIY |ld iy, bc     |DD 60  DD 69                                |     16 T
+LD IY COMMA DE                    |z80  |-     |-    |ld iy, de     |FD 62  FD 6B                                |     16 T
+LD IY COMMA DE                    |z80  |-     |IXIY |ld iy, de     |DD 62  DD 6B                                |     16 T
+LD IY COMMA DE                    |z80n |-     |-    |ld iy, de     |FD 62  FD 6B                                |     16 T
+LD IY COMMA DE                    |z80n |-     |IXIY |ld iy, de     |DD 62  DD 6B                                |     16 T
+LD IY COMMA HL                    |z80  |-     |-    |ld iy, hl     |E5  FD E1                                   |     25 T
+LD IY COMMA HL                    |z80  |-     |IXIY |ld iy, hl     |E5  DD E1                                   |     25 T
+LD IY COMMA HL                    |z80n |-     |-    |ld iy, hl     |E5  FD E1                                   |     25 T
+LD IY COMMA HL                    |z80n |-     |IXIY |ld iy, hl     |E5  DD E1                                   |     25 T
+LD IY COMMA IX                    |z80  |-     |-    |ld iy, ix     |DD E5  FD E1                                |     29 T
+LD IY COMMA IX                    |z80  |-     |IXIY |ld iy, ix     |FD E5  DD E1                                |     29 T
+LD IY COMMA IX                    |z80n |-     |-    |ld iy, ix     |DD E5  FD E1                                |     29 T
+LD IY COMMA IX                    |z80n |-     |IXIY |ld iy, ix     |FD E5  DD E1                                |     29 T
 LD IY COMMA expr                  |z80  |(expr)|-    |ld iy, (%m)   |FD 2A %m %m                                 |     20 T
 LD IY COMMA expr                  |z80  |(expr)|IXIY |ld iy, (%m)   |DD 2A %m %m                                 |     20 T
 LD IY COMMA expr                  |z80  |expr  |-    |ld iy, %m     |FD 21 %m %m                                 |     14 T
@@ -4403,22 +4403,22 @@ LDD A COMMA IND_HL RPAREN         |gbz80|-     |-    |ldd a, (hl)   |3A         
 LDD A COMMA IND_HL RPAREN         |gbz80|-     |IXIY |ldd a, (hl)   |3A                                          |      8 T
 LDD IND_HL RPAREN COMMA A         |gbz80|-     |-    |ldd (hl), a   |32                                          |      8 T
 LDD IND_HL RPAREN COMMA A         |gbz80|-     |IXIY |ldd (hl), a   |32                                          |      8 T
-LDD                               |8080 |-     |-    |ldd           |CD @ldd                                     |181/188 T
-LDD                               |8080 |-     |IXIY |ldd           |CD @ldd                                     |181/188 T
-LDD                               |8085 |-     |-    |ldd           |CD @ldd                                     |180/184 T
-LDD                               |8085 |-     |IXIY |ldd           |CD @ldd                                     |180/184 T
-LDD                               |gbz80|-     |-    |ldd           |CD @ldd                                     |     80 T
-LDD                               |gbz80|-     |IXIY |ldd           |CD @ldd                                     |     80 T
+LDD                               |8080 |-     |-    |ldd           |CD @__z80asm__ldd                           |181/188 T
+LDD                               |8080 |-     |IXIY |ldd           |CD @__z80asm__ldd                           |181/188 T
+LDD                               |8085 |-     |-    |ldd           |CD @__z80asm__ldd                           |180/184 T
+LDD                               |8085 |-     |IXIY |ldd           |CD @__z80asm__ldd                           |180/184 T
+LDD                               |gbz80|-     |-    |ldd           |CD @__z80asm__ldd                           |     80 T
+LDD                               |gbz80|-     |IXIY |ldd           |CD @__z80asm__ldd                           |     80 T
 LDD                               |z80  |-     |-    |ldd           |ED A8                                       |     16 T
 LDD                               |z80  |-     |IXIY |ldd           |ED A8                                       |     16 T
 LDD                               |z80n |-     |-    |ldd           |ED A8                                       |     16 T
 LDD                               |z80n |-     |IXIY |ldd           |ED A8                                       |     16 T
-LDDR                              |8080 |-     |-    |lddr          |CD @lddr                                    | 96/144 T
-LDDR                              |8080 |-     |IXIY |lddr          |CD @lddr                                    | 96/144 T
-LDDR                              |8085 |-     |-    |lddr          |CD @lddr                                    | 97/147 T
-LDDR                              |8085 |-     |IXIY |lddr          |CD @lddr                                    | 97/147 T
-LDDR                              |gbz80|-     |-    |lddr          |CD @lddr                                    |100/152 T
-LDDR                              |gbz80|-     |IXIY |lddr          |CD @lddr                                    |100/152 T
+LDDR                              |8080 |-     |-    |lddr          |CD @__z80asm__lddr                          | 96/144 T
+LDDR                              |8080 |-     |IXIY |lddr          |CD @__z80asm__lddr                          | 96/144 T
+LDDR                              |8085 |-     |-    |lddr          |CD @__z80asm__lddr                          | 97/147 T
+LDDR                              |8085 |-     |IXIY |lddr          |CD @__z80asm__lddr                          | 97/147 T
+LDDR                              |gbz80|-     |-    |lddr          |CD @__z80asm__lddr                          |100/152 T
+LDDR                              |gbz80|-     |IXIY |lddr          |CD @__z80asm__lddr                          |100/152 T
 LDDR                              |z80  |-     |-    |lddr          |ED B8                                       |  16/47 T
 LDDR                              |z80  |-     |IXIY |lddr          |ED B8                                       |  16/47 T
 LDDR                              |z80n |-     |-    |lddr          |ED B8                                       |  16/47 T
@@ -4439,22 +4439,22 @@ LDI A COMMA IND_HL RPAREN         |gbz80|-     |-    |ldi a, (hl)   |2A         
 LDI A COMMA IND_HL RPAREN         |gbz80|-     |IXIY |ldi a, (hl)   |2A                                          |      8 T
 LDI IND_HL RPAREN COMMA A         |gbz80|-     |-    |ldi (hl), a   |22                                          |      8 T
 LDI IND_HL RPAREN COMMA A         |gbz80|-     |IXIY |ldi (hl), a   |22                                          |      8 T
-LDI                               |8080 |-     |-    |ldi           |CD @ldi                                     |181/188 T
-LDI                               |8080 |-     |IXIY |ldi           |CD @ldi                                     |181/188 T
-LDI                               |8085 |-     |-    |ldi           |CD @ldi                                     |180/184 T
-LDI                               |8085 |-     |IXIY |ldi           |CD @ldi                                     |180/184 T
-LDI                               |gbz80|-     |-    |ldi           |CD @ldi                                     |     80 T
-LDI                               |gbz80|-     |IXIY |ldi           |CD @ldi                                     |     80 T
+LDI                               |8080 |-     |-    |ldi           |CD @__z80asm__ldi                           |181/188 T
+LDI                               |8080 |-     |IXIY |ldi           |CD @__z80asm__ldi                           |181/188 T
+LDI                               |8085 |-     |-    |ldi           |CD @__z80asm__ldi                           |180/184 T
+LDI                               |8085 |-     |IXIY |ldi           |CD @__z80asm__ldi                           |180/184 T
+LDI                               |gbz80|-     |-    |ldi           |CD @__z80asm__ldi                           |     80 T
+LDI                               |gbz80|-     |IXIY |ldi           |CD @__z80asm__ldi                           |     80 T
 LDI                               |z80  |-     |-    |ldi           |ED A0                                       |     16 T
 LDI                               |z80  |-     |IXIY |ldi           |ED A0                                       |     16 T
 LDI                               |z80n |-     |-    |ldi           |ED A0                                       |     16 T
 LDI                               |z80n |-     |IXIY |ldi           |ED A0                                       |     16 T
-LDIR                              |8080 |-     |-    |ldir          |CD @ldir                                    | 96/144 T
-LDIR                              |8080 |-     |IXIY |ldir          |CD @ldir                                    | 96/144 T
-LDIR                              |8085 |-     |-    |ldir          |CD @ldir                                    | 97/147 T
-LDIR                              |8085 |-     |IXIY |ldir          |CD @ldir                                    | 97/147 T
-LDIR                              |gbz80|-     |-    |ldir          |CD @ldir                                    | 96/144 T
-LDIR                              |gbz80|-     |IXIY |ldir          |CD @ldir                                    | 96/144 T
+LDIR                              |8080 |-     |-    |ldir          |CD @__z80asm__ldir                          | 96/144 T
+LDIR                              |8080 |-     |IXIY |ldir          |CD @__z80asm__ldir                          | 96/144 T
+LDIR                              |8085 |-     |-    |ldir          |CD @__z80asm__ldir                          | 97/147 T
+LDIR                              |8085 |-     |IXIY |ldir          |CD @__z80asm__ldir                          | 97/147 T
+LDIR                              |gbz80|-     |-    |ldir          |CD @__z80asm__ldir                          | 96/144 T
+LDIR                              |gbz80|-     |IXIY |ldir          |CD @__z80asm__ldir                          | 96/144 T
 LDIR                              |z80  |-     |-    |ldir          |ED B0                                       |  16/47 T
 LDIR                              |z80  |-     |IXIY |ldir          |ED B0                                       |  16/47 T
 LDIR                              |z80n |-     |-    |ldir          |ED B0                                       |  16/47 T
@@ -5253,22 +5253,22 @@ MVI M COMMA expr                  |z80  |expr  |-    |mvi m, %n     |36 %n      
 MVI M COMMA expr                  |z80  |expr  |IXIY |mvi m, %n     |36 %n                                       |     10 T
 MVI M COMMA expr                  |z80n |expr  |-    |mvi m, %n     |36 %n                                       |     10 T
 MVI M COMMA expr                  |z80n |expr  |IXIY |mvi m, %n     |36 %n                                       |     10 T
-NEG A                             |8080 |-     |-    |neg a         |2F; 3C                                      |      9 T
-NEG A                             |8080 |-     |IXIY |neg a         |2F; 3C                                      |      9 T
-NEG A                             |8085 |-     |-    |neg a         |2F; 3C                                      |      8 T
-NEG A                             |8085 |-     |IXIY |neg a         |2F; 3C                                      |      8 T
-NEG A                             |gbz80|-     |-    |neg a         |2F; 3C                                      |      8 T
-NEG A                             |gbz80|-     |IXIY |neg a         |2F; 3C                                      |      8 T
+NEG A                             |8080 |-     |-    |neg a         |2F  3C                                      |      9 T
+NEG A                             |8080 |-     |IXIY |neg a         |2F  3C                                      |      9 T
+NEG A                             |8085 |-     |-    |neg a         |2F  3C                                      |      8 T
+NEG A                             |8085 |-     |IXIY |neg a         |2F  3C                                      |      8 T
+NEG A                             |gbz80|-     |-    |neg a         |2F  3C                                      |      8 T
+NEG A                             |gbz80|-     |IXIY |neg a         |2F  3C                                      |      8 T
 NEG A                             |z80  |-     |-    |neg a         |ED 44                                       |      8 T
 NEG A                             |z80  |-     |IXIY |neg a         |ED 44                                       |      8 T
 NEG A                             |z80n |-     |-    |neg a         |ED 44                                       |      8 T
 NEG A                             |z80n |-     |IXIY |neg a         |ED 44                                       |      8 T
-NEG                               |8080 |-     |-    |neg           |2F; 3C                                      |      9 T
-NEG                               |8080 |-     |IXIY |neg           |2F; 3C                                      |      9 T
-NEG                               |8085 |-     |-    |neg           |2F; 3C                                      |      8 T
-NEG                               |8085 |-     |IXIY |neg           |2F; 3C                                      |      8 T
-NEG                               |gbz80|-     |-    |neg           |2F; 3C                                      |      8 T
-NEG                               |gbz80|-     |IXIY |neg           |2F; 3C                                      |      8 T
+NEG                               |8080 |-     |-    |neg           |2F  3C                                      |      9 T
+NEG                               |8080 |-     |IXIY |neg           |2F  3C                                      |      9 T
+NEG                               |8085 |-     |-    |neg           |2F  3C                                      |      8 T
+NEG                               |8085 |-     |IXIY |neg           |2F  3C                                      |      8 T
+NEG                               |gbz80|-     |-    |neg           |2F  3C                                      |      8 T
+NEG                               |gbz80|-     |IXIY |neg           |2F  3C                                      |      8 T
 NEG                               |z80  |-     |-    |neg           |ED 44                                       |      8 T
 NEG                               |z80  |-     |IXIY |neg           |ED 44                                       |      8 T
 NEG                               |z80n |-     |-    |neg           |ED 44                                       |      8 T
@@ -5867,16 +5867,16 @@ RC                                |z80  |-     |-    |rc            |D8         
 RC                                |z80  |-     |IXIY |rc            |D8                                          |   5/11 T
 RC                                |z80n |-     |-    |rc            |D8                                          |   5/11 T
 RC                                |z80n |-     |IXIY |rc            |D8                                          |   5/11 T
-RDEL                              |8080 |-     |-    |rdel          |CD @rl_de                                   |     90 T
-RDEL                              |8080 |-     |IXIY |rdel          |CD @rl_de                                   |     90 T
+RDEL                              |8080 |-     |-    |rdel          |CD @__z80asm__rl_de                         |     90 T
+RDEL                              |8080 |-     |IXIY |rdel          |CD @__z80asm__rl_de                         |     90 T
 RDEL                              |8085 |-     |-    |rdel          |18                                          |     10 T
 RDEL                              |8085 |-     |IXIY |rdel          |18                                          |     10 T
-RDEL                              |gbz80|-     |-    |rdel          |CB 13; CB 12                                |     16 T
-RDEL                              |gbz80|-     |IXIY |rdel          |CB 13; CB 12                                |     16 T
-RDEL                              |z80  |-     |-    |rdel          |CB 13; CB 12                                |     16 T
-RDEL                              |z80  |-     |IXIY |rdel          |CB 13; CB 12                                |     16 T
-RDEL                              |z80n |-     |-    |rdel          |CB 13; CB 12                                |     16 T
-RDEL                              |z80n |-     |IXIY |rdel          |CB 13; CB 12                                |     16 T
+RDEL                              |gbz80|-     |-    |rdel          |CB 13  CB 12                                |     16 T
+RDEL                              |gbz80|-     |IXIY |rdel          |CB 13  CB 12                                |     16 T
+RDEL                              |z80  |-     |-    |rdel          |CB 13  CB 12                                |     16 T
+RDEL                              |z80  |-     |IXIY |rdel          |CB 13  CB 12                                |     16 T
+RDEL                              |z80n |-     |-    |rdel          |CB 13  CB 12                                |     16 T
+RDEL                              |z80n |-     |IXIY |rdel          |CB 13  CB 12                                |     16 T
 RES const_expr COMMA A            |gbz80|expr  |-    |res %c, a     |CB 87+%c*08                                 |      8 T
 RES const_expr COMMA A            |gbz80|expr  |IXIY |res %c, a     |CB 87+%c*08                                 |      8 T
 RES const_expr COMMA A            |z80  |expr  |-    |res %c, a     |CB 87+%c*08                                 |      8 T
@@ -6047,16 +6047,16 @@ RL B                              |z80  |-     |-    |rl b          |CB 10      
 RL B                              |z80  |-     |IXIY |rl b          |CB 10                                       |      8 T
 RL B                              |z80n |-     |-    |rl b          |CB 10                                       |      8 T
 RL B                              |z80n |-     |IXIY |rl b          |CB 10                                       |      8 T
-RL BC                             |8080 |-     |-    |rl bc         |CD @rl_bc                                   |     90 T
-RL BC                             |8080 |-     |IXIY |rl bc         |CD @rl_bc                                   |     90 T
-RL BC                             |8085 |-     |-    |rl bc         |CD @rl_bc                                   |     88 T
-RL BC                             |8085 |-     |IXIY |rl bc         |CD @rl_bc                                   |     88 T
-RL BC                             |gbz80|-     |-    |rl bc         |CB 11; CB 10                                |     16 T
-RL BC                             |gbz80|-     |IXIY |rl bc         |CB 11; CB 10                                |     16 T
-RL BC                             |z80  |-     |-    |rl bc         |CB 11; CB 10                                |     16 T
-RL BC                             |z80  |-     |IXIY |rl bc         |CB 11; CB 10                                |     16 T
-RL BC                             |z80n |-     |-    |rl bc         |CB 11; CB 10                                |     16 T
-RL BC                             |z80n |-     |IXIY |rl bc         |CB 11; CB 10                                |     16 T
+RL BC                             |8080 |-     |-    |rl bc         |CD @__z80asm__rl_bc                         |     90 T
+RL BC                             |8080 |-     |IXIY |rl bc         |CD @__z80asm__rl_bc                         |     90 T
+RL BC                             |8085 |-     |-    |rl bc         |CD @__z80asm__rl_bc                         |     88 T
+RL BC                             |8085 |-     |IXIY |rl bc         |CD @__z80asm__rl_bc                         |     88 T
+RL BC                             |gbz80|-     |-    |rl bc         |CB 11  CB 10                                |     16 T
+RL BC                             |gbz80|-     |IXIY |rl bc         |CB 11  CB 10                                |     16 T
+RL BC                             |z80  |-     |-    |rl bc         |CB 11  CB 10                                |     16 T
+RL BC                             |z80  |-     |IXIY |rl bc         |CB 11  CB 10                                |     16 T
+RL BC                             |z80n |-     |-    |rl bc         |CB 11  CB 10                                |     16 T
+RL BC                             |z80n |-     |IXIY |rl bc         |CB 11  CB 10                                |     16 T
 RL C                              |gbz80|-     |-    |rl c          |CB 11                                       |      8 T
 RL C                              |gbz80|-     |IXIY |rl c          |CB 11                                       |      8 T
 RL C                              |z80  |-     |-    |rl c          |CB 11                                       |      8 T
@@ -6069,16 +6069,16 @@ RL D                              |z80  |-     |-    |rl d          |CB 12      
 RL D                              |z80  |-     |IXIY |rl d          |CB 12                                       |      8 T
 RL D                              |z80n |-     |-    |rl d          |CB 12                                       |      8 T
 RL D                              |z80n |-     |IXIY |rl d          |CB 12                                       |      8 T
-RL DE                             |8080 |-     |-    |rl de         |CD @rl_de                                   |     90 T
-RL DE                             |8080 |-     |IXIY |rl de         |CD @rl_de                                   |     90 T
+RL DE                             |8080 |-     |-    |rl de         |CD @__z80asm__rl_de                         |     90 T
+RL DE                             |8080 |-     |IXIY |rl de         |CD @__z80asm__rl_de                         |     90 T
 RL DE                             |8085 |-     |-    |rl de         |18                                          |     10 T
 RL DE                             |8085 |-     |IXIY |rl de         |18                                          |     10 T
-RL DE                             |gbz80|-     |-    |rl de         |CB 13; CB 12                                |     16 T
-RL DE                             |gbz80|-     |IXIY |rl de         |CB 13; CB 12                                |     16 T
-RL DE                             |z80  |-     |-    |rl de         |CB 13; CB 12                                |     16 T
-RL DE                             |z80  |-     |IXIY |rl de         |CB 13; CB 12                                |     16 T
-RL DE                             |z80n |-     |-    |rl de         |CB 13; CB 12                                |     16 T
-RL DE                             |z80n |-     |IXIY |rl de         |CB 13; CB 12                                |     16 T
+RL DE                             |gbz80|-     |-    |rl de         |CB 13  CB 12                                |     16 T
+RL DE                             |gbz80|-     |IXIY |rl de         |CB 13  CB 12                                |     16 T
+RL DE                             |z80  |-     |-    |rl de         |CB 13  CB 12                                |     16 T
+RL DE                             |z80  |-     |IXIY |rl de         |CB 13  CB 12                                |     16 T
+RL DE                             |z80n |-     |-    |rl de         |CB 13  CB 12                                |     16 T
+RL DE                             |z80n |-     |IXIY |rl de         |CB 13  CB 12                                |     16 T
 RL E                              |gbz80|-     |-    |rl e          |CB 13                                       |      8 T
 RL E                              |gbz80|-     |IXIY |rl e          |CB 13                                       |      8 T
 RL E                              |z80  |-     |-    |rl e          |CB 13                                       |      8 T
@@ -6091,16 +6091,16 @@ RL H                              |z80  |-     |-    |rl h          |CB 14      
 RL H                              |z80  |-     |IXIY |rl h          |CB 14                                       |      8 T
 RL H                              |z80n |-     |-    |rl h          |CB 14                                       |      8 T
 RL H                              |z80n |-     |IXIY |rl h          |CB 14                                       |      8 T
-RL HL                             |8080 |-     |-    |rl hl         |CD @rl_hl                                   |     90 T
-RL HL                             |8080 |-     |IXIY |rl hl         |CD @rl_hl                                   |     90 T
-RL HL                             |8085 |-     |-    |rl hl         |CD @rl_hl                                   |     88 T
-RL HL                             |8085 |-     |IXIY |rl hl         |CD @rl_hl                                   |     88 T
-RL HL                             |gbz80|-     |-    |rl hl         |CB 15; CB 14                                |     16 T
-RL HL                             |gbz80|-     |IXIY |rl hl         |CB 15; CB 14                                |     16 T
-RL HL                             |z80  |-     |-    |rl hl         |CB 15; CB 14                                |     16 T
-RL HL                             |z80  |-     |IXIY |rl hl         |CB 15; CB 14                                |     16 T
-RL HL                             |z80n |-     |-    |rl hl         |CB 15; CB 14                                |     16 T
-RL HL                             |z80n |-     |IXIY |rl hl         |CB 15; CB 14                                |     16 T
+RL HL                             |8080 |-     |-    |rl hl         |CD @__z80asm__rl_hl                         |     90 T
+RL HL                             |8080 |-     |IXIY |rl hl         |CD @__z80asm__rl_hl                         |     90 T
+RL HL                             |8085 |-     |-    |rl hl         |CD @__z80asm__rl_hl                         |     88 T
+RL HL                             |8085 |-     |IXIY |rl hl         |CD @__z80asm__rl_hl                         |     88 T
+RL HL                             |gbz80|-     |-    |rl hl         |CB 15  CB 14                                |     16 T
+RL HL                             |gbz80|-     |IXIY |rl hl         |CB 15  CB 14                                |     16 T
+RL HL                             |z80  |-     |-    |rl hl         |CB 15  CB 14                                |     16 T
+RL HL                             |z80  |-     |IXIY |rl hl         |CB 15  CB 14                                |     16 T
+RL HL                             |z80n |-     |-    |rl hl         |CB 15  CB 14                                |     16 T
+RL HL                             |z80n |-     |IXIY |rl hl         |CB 15  CB 14                                |     16 T
 RL IND_HL RPAREN                  |gbz80|-     |-    |rl (hl)       |CB 16                                       |     16 T
 RL IND_HL RPAREN                  |gbz80|-     |IXIY |rl (hl)       |CB 16                                       |     16 T
 RL IND_HL RPAREN                  |z80  |-     |-    |rl (hl)       |CB 16                                       |     15 T
@@ -6223,26 +6223,26 @@ RLCA                              |z80  |-     |-    |rlca          |07         
 RLCA                              |z80  |-     |IXIY |rlca          |07                                          |      4 T
 RLCA                              |z80n |-     |-    |rlca          |07                                          |      4 T
 RLCA                              |z80n |-     |IXIY |rlca          |07                                          |      4 T
-RLD                               |8080 |-     |-    |rld           |CD @rld                                     |201/232 T
-RLD                               |8080 |-     |IXIY |rld           |CD @rld                                     |201/232 T
-RLD                               |8085 |-     |-    |rld           |CD @rld                                     |197/226 T
-RLD                               |8085 |-     |IXIY |rld           |CD @rld                                     |197/226 T
-RLD                               |gbz80|-     |-    |rld           |CD @rld                                     |164/188 T
-RLD                               |gbz80|-     |IXIY |rld           |CD @rld                                     |164/188 T
+RLD                               |8080 |-     |-    |rld           |CD @__z80asm__rld                           |201/232 T
+RLD                               |8080 |-     |IXIY |rld           |CD @__z80asm__rld                           |201/232 T
+RLD                               |8085 |-     |-    |rld           |CD @__z80asm__rld                           |197/226 T
+RLD                               |8085 |-     |IXIY |rld           |CD @__z80asm__rld                           |197/226 T
+RLD                               |gbz80|-     |-    |rld           |CD @__z80asm__rld                           |164/188 T
+RLD                               |gbz80|-     |IXIY |rld           |CD @__z80asm__rld                           |164/188 T
 RLD                               |z80  |-     |-    |rld           |ED 6F                                       |     18 T
 RLD                               |z80  |-     |IXIY |rld           |ED 6F                                       |     18 T
 RLD                               |z80n |-     |-    |rld           |ED 6F                                       |     18 T
 RLD                               |z80n |-     |IXIY |rld           |ED 6F                                       |     18 T
-RLDE                              |8080 |-     |-    |rlde          |CD @rl_de                                   |     90 T
-RLDE                              |8080 |-     |IXIY |rlde          |CD @rl_de                                   |     90 T
+RLDE                              |8080 |-     |-    |rlde          |CD @__z80asm__rl_de                         |     90 T
+RLDE                              |8080 |-     |IXIY |rlde          |CD @__z80asm__rl_de                         |     90 T
 RLDE                              |8085 |-     |-    |rlde          |18                                          |     10 T
 RLDE                              |8085 |-     |IXIY |rlde          |18                                          |     10 T
-RLDE                              |gbz80|-     |-    |rlde          |CB 13; CB 12                                |     16 T
-RLDE                              |gbz80|-     |IXIY |rlde          |CB 13; CB 12                                |     16 T
-RLDE                              |z80  |-     |-    |rlde          |CB 13; CB 12                                |     16 T
-RLDE                              |z80  |-     |IXIY |rlde          |CB 13; CB 12                                |     16 T
-RLDE                              |z80n |-     |-    |rlde          |CB 13; CB 12                                |     16 T
-RLDE                              |z80n |-     |IXIY |rlde          |CB 13; CB 12                                |     16 T
+RLDE                              |gbz80|-     |-    |rlde          |CB 13  CB 12                                |     16 T
+RLDE                              |gbz80|-     |IXIY |rlde          |CB 13  CB 12                                |     16 T
+RLDE                              |z80  |-     |-    |rlde          |CB 13  CB 12                                |     16 T
+RLDE                              |z80  |-     |IXIY |rlde          |CB 13  CB 12                                |     16 T
+RLDE                              |z80n |-     |-    |rlde          |CB 13  CB 12                                |     16 T
+RLDE                              |z80n |-     |IXIY |rlde          |CB 13  CB 12                                |     16 T
 RM                                |8080 |-     |-    |rm            |F8                                          |   5/11 T
 RM                                |8080 |-     |IXIY |rm            |F8                                          |   5/11 T
 RM                                |8085 |-     |-    |rm            |F8                                          |   6/12 T
@@ -6315,16 +6315,16 @@ RR B                              |z80  |-     |-    |rr b          |CB 18      
 RR B                              |z80  |-     |IXIY |rr b          |CB 18                                       |      8 T
 RR B                              |z80n |-     |-    |rr b          |CB 18                                       |      8 T
 RR B                              |z80n |-     |IXIY |rr b          |CB 18                                       |      8 T
-RR BC                             |8080 |-     |-    |rr bc         |CD @rr_bc                                   |     90 T
-RR BC                             |8080 |-     |IXIY |rr bc         |CD @rr_bc                                   |     90 T
-RR BC                             |8085 |-     |-    |rr bc         |CD @rr_bc                                   |     88 T
-RR BC                             |8085 |-     |IXIY |rr bc         |CD @rr_bc                                   |     88 T
-RR BC                             |gbz80|-     |-    |rr bc         |CB 18; CB 19                                |     16 T
-RR BC                             |gbz80|-     |IXIY |rr bc         |CB 18; CB 19                                |     16 T
-RR BC                             |z80  |-     |-    |rr bc         |CB 18; CB 19                                |     16 T
-RR BC                             |z80  |-     |IXIY |rr bc         |CB 18; CB 19                                |     16 T
-RR BC                             |z80n |-     |-    |rr bc         |CB 18; CB 19                                |     16 T
-RR BC                             |z80n |-     |IXIY |rr bc         |CB 18; CB 19                                |     16 T
+RR BC                             |8080 |-     |-    |rr bc         |CD @__z80asm__rr_bc                         |     90 T
+RR BC                             |8080 |-     |IXIY |rr bc         |CD @__z80asm__rr_bc                         |     90 T
+RR BC                             |8085 |-     |-    |rr bc         |CD @__z80asm__rr_bc                         |     88 T
+RR BC                             |8085 |-     |IXIY |rr bc         |CD @__z80asm__rr_bc                         |     88 T
+RR BC                             |gbz80|-     |-    |rr bc         |CB 18  CB 19                                |     16 T
+RR BC                             |gbz80|-     |IXIY |rr bc         |CB 18  CB 19                                |     16 T
+RR BC                             |z80  |-     |-    |rr bc         |CB 18  CB 19                                |     16 T
+RR BC                             |z80  |-     |IXIY |rr bc         |CB 18  CB 19                                |     16 T
+RR BC                             |z80n |-     |-    |rr bc         |CB 18  CB 19                                |     16 T
+RR BC                             |z80n |-     |IXIY |rr bc         |CB 18  CB 19                                |     16 T
 RR C                              |gbz80|-     |-    |rr c          |CB 19                                       |      8 T
 RR C                              |gbz80|-     |IXIY |rr c          |CB 19                                       |      8 T
 RR C                              |z80  |-     |-    |rr c          |CB 19                                       |      8 T
@@ -6337,16 +6337,16 @@ RR D                              |z80  |-     |-    |rr d          |CB 1A      
 RR D                              |z80  |-     |IXIY |rr d          |CB 1A                                       |      8 T
 RR D                              |z80n |-     |-    |rr d          |CB 1A                                       |      8 T
 RR D                              |z80n |-     |IXIY |rr d          |CB 1A                                       |      8 T
-RR DE                             |8080 |-     |-    |rr de         |CD @rr_de                                   |     90 T
-RR DE                             |8080 |-     |IXIY |rr de         |CD @rr_de                                   |     90 T
-RR DE                             |8085 |-     |-    |rr de         |CD @rr_de                                   |     88 T
-RR DE                             |8085 |-     |IXIY |rr de         |CD @rr_de                                   |     88 T
-RR DE                             |gbz80|-     |-    |rr de         |CB 1A; CB 1B                                |     16 T
-RR DE                             |gbz80|-     |IXIY |rr de         |CB 1A; CB 1B                                |     16 T
-RR DE                             |z80  |-     |-    |rr de         |CB 1A; CB 1B                                |     16 T
-RR DE                             |z80  |-     |IXIY |rr de         |CB 1A; CB 1B                                |     16 T
-RR DE                             |z80n |-     |-    |rr de         |CB 1A; CB 1B                                |     16 T
-RR DE                             |z80n |-     |IXIY |rr de         |CB 1A; CB 1B                                |     16 T
+RR DE                             |8080 |-     |-    |rr de         |CD @__z80asm__rr_de                         |     90 T
+RR DE                             |8080 |-     |IXIY |rr de         |CD @__z80asm__rr_de                         |     90 T
+RR DE                             |8085 |-     |-    |rr de         |CD @__z80asm__rr_de                         |     88 T
+RR DE                             |8085 |-     |IXIY |rr de         |CD @__z80asm__rr_de                         |     88 T
+RR DE                             |gbz80|-     |-    |rr de         |CB 1A  CB 1B                                |     16 T
+RR DE                             |gbz80|-     |IXIY |rr de         |CB 1A  CB 1B                                |     16 T
+RR DE                             |z80  |-     |-    |rr de         |CB 1A  CB 1B                                |     16 T
+RR DE                             |z80  |-     |IXIY |rr de         |CB 1A  CB 1B                                |     16 T
+RR DE                             |z80n |-     |-    |rr de         |CB 1A  CB 1B                                |     16 T
+RR DE                             |z80n |-     |IXIY |rr de         |CB 1A  CB 1B                                |     16 T
 RR E                              |gbz80|-     |-    |rr e          |CB 1B                                       |      8 T
 RR E                              |gbz80|-     |IXIY |rr e          |CB 1B                                       |      8 T
 RR E                              |z80  |-     |-    |rr e          |CB 1B                                       |      8 T
@@ -6359,16 +6359,16 @@ RR H                              |z80  |-     |-    |rr h          |CB 1C      
 RR H                              |z80  |-     |IXIY |rr h          |CB 1C                                       |      8 T
 RR H                              |z80n |-     |-    |rr h          |CB 1C                                       |      8 T
 RR H                              |z80n |-     |IXIY |rr h          |CB 1C                                       |      8 T
-RR HL                             |8080 |-     |-    |rr hl         |CD @rr_hl                                   |     90 T
-RR HL                             |8080 |-     |IXIY |rr hl         |CD @rr_hl                                   |     90 T
-RR HL                             |8085 |-     |-    |rr hl         |CD @rr_hl                                   |     88 T
-RR HL                             |8085 |-     |IXIY |rr hl         |CD @rr_hl                                   |     88 T
-RR HL                             |gbz80|-     |-    |rr hl         |CB 1C; CB 1D                                |     16 T
-RR HL                             |gbz80|-     |IXIY |rr hl         |CB 1C; CB 1D                                |     16 T
-RR HL                             |z80  |-     |-    |rr hl         |CB 1C; CB 1D                                |     16 T
-RR HL                             |z80  |-     |IXIY |rr hl         |CB 1C; CB 1D                                |     16 T
-RR HL                             |z80n |-     |-    |rr hl         |CB 1C; CB 1D                                |     16 T
-RR HL                             |z80n |-     |IXIY |rr hl         |CB 1C; CB 1D                                |     16 T
+RR HL                             |8080 |-     |-    |rr hl         |CD @__z80asm__rr_hl                         |     90 T
+RR HL                             |8080 |-     |IXIY |rr hl         |CD @__z80asm__rr_hl                         |     90 T
+RR HL                             |8085 |-     |-    |rr hl         |CD @__z80asm__rr_hl                         |     88 T
+RR HL                             |8085 |-     |IXIY |rr hl         |CD @__z80asm__rr_hl                         |     88 T
+RR HL                             |gbz80|-     |-    |rr hl         |CB 1C  CB 1D                                |     16 T
+RR HL                             |gbz80|-     |IXIY |rr hl         |CB 1C  CB 1D                                |     16 T
+RR HL                             |z80  |-     |-    |rr hl         |CB 1C  CB 1D                                |     16 T
+RR HL                             |z80  |-     |IXIY |rr hl         |CB 1C  CB 1D                                |     16 T
+RR HL                             |z80n |-     |-    |rr hl         |CB 1C  CB 1D                                |     16 T
+RR HL                             |z80n |-     |IXIY |rr hl         |CB 1C  CB 1D                                |     16 T
 RR IND_HL RPAREN                  |gbz80|-     |-    |rr (hl)       |CB 1E                                       |     16 T
 RR IND_HL RPAREN                  |gbz80|-     |IXIY |rr (hl)       |CB 1E                                       |     16 T
 RR IND_HL RPAREN                  |z80  |-     |-    |rr (hl)       |CB 1E                                       |     15 T
@@ -6491,26 +6491,26 @@ RRCA                              |z80  |-     |-    |rrca          |0F         
 RRCA                              |z80  |-     |IXIY |rrca          |0F                                          |      4 T
 RRCA                              |z80n |-     |-    |rrca          |0F                                          |      4 T
 RRCA                              |z80n |-     |IXIY |rrca          |0F                                          |      4 T
-RRD                               |8080 |-     |-    |rrd           |CD @rrd                                     |229/260 T
-RRD                               |8080 |-     |IXIY |rrd           |CD @rrd                                     |229/260 T
-RRD                               |8085 |-     |-    |rrd           |CD @rrd                                     |224/253 T
-RRD                               |8085 |-     |IXIY |rrd           |CD @rrd                                     |224/253 T
-RRD                               |gbz80|-     |-    |rrd           |CD @rrd                                     |136/160 T
-RRD                               |gbz80|-     |IXIY |rrd           |CD @rrd                                     |136/160 T
+RRD                               |8080 |-     |-    |rrd           |CD @__z80asm__rrd                           |229/260 T
+RRD                               |8080 |-     |IXIY |rrd           |CD @__z80asm__rrd                           |229/260 T
+RRD                               |8085 |-     |-    |rrd           |CD @__z80asm__rrd                           |224/253 T
+RRD                               |8085 |-     |IXIY |rrd           |CD @__z80asm__rrd                           |224/253 T
+RRD                               |gbz80|-     |-    |rrd           |CD @__z80asm__rrd                           |136/160 T
+RRD                               |gbz80|-     |IXIY |rrd           |CD @__z80asm__rrd                           |136/160 T
 RRD                               |z80  |-     |-    |rrd           |ED 67                                       |     18 T
 RRD                               |z80  |-     |IXIY |rrd           |ED 67                                       |     18 T
 RRD                               |z80n |-     |-    |rrd           |ED 67                                       |     18 T
 RRD                               |z80n |-     |IXIY |rrd           |ED 67                                       |     18 T
-RRHL                              |8080 |-     |-    |rrhl          |CD @sra_hl                                  |     99 T
-RRHL                              |8080 |-     |IXIY |rrhl          |CD @sra_hl                                  |     99 T
+RRHL                              |8080 |-     |-    |rrhl          |CD @__z80asm__sra_hl                        |     99 T
+RRHL                              |8080 |-     |IXIY |rrhl          |CD @__z80asm__sra_hl                        |     99 T
 RRHL                              |8085 |-     |-    |rrhl          |10                                          |      7 T
 RRHL                              |8085 |-     |IXIY |rrhl          |10                                          |      7 T
-RRHL                              |gbz80|-     |-    |rrhl          |CB 2C; CB 1D                                |     16 T
-RRHL                              |gbz80|-     |IXIY |rrhl          |CB 2C; CB 1D                                |     16 T
-RRHL                              |z80  |-     |-    |rrhl          |CB 2C; CB 1D                                |     16 T
-RRHL                              |z80  |-     |IXIY |rrhl          |CB 2C; CB 1D                                |     16 T
-RRHL                              |z80n |-     |-    |rrhl          |CB 2C; CB 1D                                |     16 T
-RRHL                              |z80n |-     |IXIY |rrhl          |CB 2C; CB 1D                                |     16 T
+RRHL                              |gbz80|-     |-    |rrhl          |CB 2C  CB 1D                                |     16 T
+RRHL                              |gbz80|-     |IXIY |rrhl          |CB 2C  CB 1D                                |     16 T
+RRHL                              |z80  |-     |-    |rrhl          |CB 2C  CB 1D                                |     16 T
+RRHL                              |z80  |-     |IXIY |rrhl          |CB 2C  CB 1D                                |     16 T
+RRHL                              |z80n |-     |-    |rrhl          |CB 2C  CB 1D                                |     16 T
+RRHL                              |z80n |-     |IXIY |rrhl          |CB 2C  CB 1D                                |     16 T
 RST const_expr                    |8080 |expr  |-    |rst %c        |C7+%c                                       |     11 T
 RST const_expr                    |8080 |expr  |IXIY |rst %c        |C7+%c                                       |     11 T
 RST const_expr                    |8085 |expr  |-    |rst %c        |C7+%c                                       |     12 T
@@ -6787,42 +6787,42 @@ SBC H                             |z80  |-     |-    |sbc h         |9C         
 SBC H                             |z80  |-     |IXIY |sbc h         |9C                                          |      4 T
 SBC H                             |z80n |-     |-    |sbc h         |9C                                          |      4 T
 SBC H                             |z80n |-     |IXIY |sbc h         |9C                                          |      4 T
-SBC HL COMMA BC                   |8080 |-     |-    |sbc hl, bc    |CD @sbc_hl_bc                               |     86 T
-SBC HL COMMA BC                   |8080 |-     |IXIY |sbc hl, bc    |CD @sbc_hl_bc                               |     86 T
-SBC HL COMMA BC                   |8085 |-     |-    |sbc hl, bc    |CD @sbc_hl_bc                               |     82 T
-SBC HL COMMA BC                   |8085 |-     |IXIY |sbc hl, bc    |CD @sbc_hl_bc                               |     82 T
-SBC HL COMMA BC                   |gbz80|-     |-    |sbc hl, bc    |CD @sbc_hl_bc                               |     80 T
-SBC HL COMMA BC                   |gbz80|-     |IXIY |sbc hl, bc    |CD @sbc_hl_bc                               |     80 T
+SBC HL COMMA BC                   |8080 |-     |-    |sbc hl, bc    |CD @__z80asm__sbc_hl_bc                     |     86 T
+SBC HL COMMA BC                   |8080 |-     |IXIY |sbc hl, bc    |CD @__z80asm__sbc_hl_bc                     |     86 T
+SBC HL COMMA BC                   |8085 |-     |-    |sbc hl, bc    |CD @__z80asm__sbc_hl_bc                     |     82 T
+SBC HL COMMA BC                   |8085 |-     |IXIY |sbc hl, bc    |CD @__z80asm__sbc_hl_bc                     |     82 T
+SBC HL COMMA BC                   |gbz80|-     |-    |sbc hl, bc    |CD @__z80asm__sbc_hl_bc                     |     80 T
+SBC HL COMMA BC                   |gbz80|-     |IXIY |sbc hl, bc    |CD @__z80asm__sbc_hl_bc                     |     80 T
 SBC HL COMMA BC                   |z80  |-     |-    |sbc hl, bc    |ED 42                                       |     15 T
 SBC HL COMMA BC                   |z80  |-     |IXIY |sbc hl, bc    |ED 42                                       |     15 T
 SBC HL COMMA BC                   |z80n |-     |-    |sbc hl, bc    |ED 42                                       |     15 T
 SBC HL COMMA BC                   |z80n |-     |IXIY |sbc hl, bc    |ED 42                                       |     15 T
-SBC HL COMMA DE                   |8080 |-     |-    |sbc hl, de    |CD @sbc_hl_de                               |     86 T
-SBC HL COMMA DE                   |8080 |-     |IXIY |sbc hl, de    |CD @sbc_hl_de                               |     86 T
-SBC HL COMMA DE                   |8085 |-     |-    |sbc hl, de    |CD @sbc_hl_de                               |     82 T
-SBC HL COMMA DE                   |8085 |-     |IXIY |sbc hl, de    |CD @sbc_hl_de                               |     82 T
-SBC HL COMMA DE                   |gbz80|-     |-    |sbc hl, de    |CD @sbc_hl_de                               |     80 T
-SBC HL COMMA DE                   |gbz80|-     |IXIY |sbc hl, de    |CD @sbc_hl_de                               |     80 T
+SBC HL COMMA DE                   |8080 |-     |-    |sbc hl, de    |CD @__z80asm__sbc_hl_de                     |     86 T
+SBC HL COMMA DE                   |8080 |-     |IXIY |sbc hl, de    |CD @__z80asm__sbc_hl_de                     |     86 T
+SBC HL COMMA DE                   |8085 |-     |-    |sbc hl, de    |CD @__z80asm__sbc_hl_de                     |     82 T
+SBC HL COMMA DE                   |8085 |-     |IXIY |sbc hl, de    |CD @__z80asm__sbc_hl_de                     |     82 T
+SBC HL COMMA DE                   |gbz80|-     |-    |sbc hl, de    |CD @__z80asm__sbc_hl_de                     |     80 T
+SBC HL COMMA DE                   |gbz80|-     |IXIY |sbc hl, de    |CD @__z80asm__sbc_hl_de                     |     80 T
 SBC HL COMMA DE                   |z80  |-     |-    |sbc hl, de    |ED 52                                       |     15 T
 SBC HL COMMA DE                   |z80  |-     |IXIY |sbc hl, de    |ED 52                                       |     15 T
 SBC HL COMMA DE                   |z80n |-     |-    |sbc hl, de    |ED 52                                       |     15 T
 SBC HL COMMA DE                   |z80n |-     |IXIY |sbc hl, de    |ED 52                                       |     15 T
-SBC HL COMMA HL                   |8080 |-     |-    |sbc hl, hl    |CD @sbc_hl_hl                               |  38/47 T
-SBC HL COMMA HL                   |8080 |-     |IXIY |sbc hl, hl    |CD @sbc_hl_hl                               |  38/47 T
-SBC HL COMMA HL                   |8085 |-     |-    |sbc hl, hl    |CD @sbc_hl_hl                               |  40/50 T
-SBC HL COMMA HL                   |8085 |-     |IXIY |sbc hl, hl    |CD @sbc_hl_hl                               |  40/50 T
-SBC HL COMMA HL                   |gbz80|-     |-    |sbc hl, hl    |CD @sbc_hl_hl                               |  32/48 T
-SBC HL COMMA HL                   |gbz80|-     |IXIY |sbc hl, hl    |CD @sbc_hl_hl                               |  32/48 T
+SBC HL COMMA HL                   |8080 |-     |-    |sbc hl, hl    |CD @__z80asm__sbc_hl_hl                     |  38/47 T
+SBC HL COMMA HL                   |8080 |-     |IXIY |sbc hl, hl    |CD @__z80asm__sbc_hl_hl                     |  38/47 T
+SBC HL COMMA HL                   |8085 |-     |-    |sbc hl, hl    |CD @__z80asm__sbc_hl_hl                     |  40/50 T
+SBC HL COMMA HL                   |8085 |-     |IXIY |sbc hl, hl    |CD @__z80asm__sbc_hl_hl                     |  40/50 T
+SBC HL COMMA HL                   |gbz80|-     |-    |sbc hl, hl    |CD @__z80asm__sbc_hl_hl                     |  32/48 T
+SBC HL COMMA HL                   |gbz80|-     |IXIY |sbc hl, hl    |CD @__z80asm__sbc_hl_hl                     |  32/48 T
 SBC HL COMMA HL                   |z80  |-     |-    |sbc hl, hl    |ED 62                                       |     15 T
 SBC HL COMMA HL                   |z80  |-     |IXIY |sbc hl, hl    |ED 62                                       |     15 T
 SBC HL COMMA HL                   |z80n |-     |-    |sbc hl, hl    |ED 62                                       |     15 T
 SBC HL COMMA HL                   |z80n |-     |IXIY |sbc hl, hl    |ED 62                                       |     15 T
-SBC HL COMMA SP                   |8080 |-     |-    |sbc hl, sp    |CD @sbc_hl_sp                               |    156 T
-SBC HL COMMA SP                   |8080 |-     |IXIY |sbc hl, sp    |CD @sbc_hl_sp                               |    156 T
-SBC HL COMMA SP                   |8085 |-     |-    |sbc hl, sp    |CD @sbc_hl_sp                               |    152 T
-SBC HL COMMA SP                   |8085 |-     |IXIY |sbc hl, sp    |CD @sbc_hl_sp                               |    152 T
-SBC HL COMMA SP                   |gbz80|-     |-    |sbc hl, sp    |CD @sbc_hl_sp                               |    232 T
-SBC HL COMMA SP                   |gbz80|-     |IXIY |sbc hl, sp    |CD @sbc_hl_sp                               |    232 T
+SBC HL COMMA SP                   |8080 |-     |-    |sbc hl, sp    |CD @__z80asm__sbc_hl_sp                     |    156 T
+SBC HL COMMA SP                   |8080 |-     |IXIY |sbc hl, sp    |CD @__z80asm__sbc_hl_sp                     |    156 T
+SBC HL COMMA SP                   |8085 |-     |-    |sbc hl, sp    |CD @__z80asm__sbc_hl_sp                     |    152 T
+SBC HL COMMA SP                   |8085 |-     |IXIY |sbc hl, sp    |CD @__z80asm__sbc_hl_sp                     |    152 T
+SBC HL COMMA SP                   |gbz80|-     |-    |sbc hl, sp    |CD @__z80asm__sbc_hl_sp                     |    232 T
+SBC HL COMMA SP                   |gbz80|-     |IXIY |sbc hl, sp    |CD @__z80asm__sbc_hl_sp                     |    232 T
 SBC HL COMMA SP                   |z80  |-     |-    |sbc hl, sp    |ED 72                                       |     15 T
 SBC HL COMMA SP                   |z80  |-     |IXIY |sbc hl, sp    |ED 72                                       |     15 T
 SBC HL COMMA SP                   |z80n |-     |-    |sbc hl, sp    |ED 72                                       |     15 T
@@ -7137,16 +7137,16 @@ SRA B                             |z80  |-     |-    |sra b         |CB 28      
 SRA B                             |z80  |-     |IXIY |sra b         |CB 28                                       |      8 T
 SRA B                             |z80n |-     |-    |sra b         |CB 28                                       |      8 T
 SRA B                             |z80n |-     |IXIY |sra b         |CB 28                                       |      8 T
-SRA BC                            |8080 |-     |-    |sra bc        |CD @sra_bc                                  |     99 T
-SRA BC                            |8080 |-     |IXIY |sra bc        |CD @sra_bc                                  |     99 T
-SRA BC                            |8085 |-     |-    |sra bc        |CD @sra_bc                                  |     96 T
-SRA BC                            |8085 |-     |IXIY |sra bc        |CD @sra_bc                                  |     96 T
-SRA BC                            |gbz80|-     |-    |sra bc        |CB 28; CB 19                                |     16 T
-SRA BC                            |gbz80|-     |IXIY |sra bc        |CB 28; CB 19                                |     16 T
-SRA BC                            |z80  |-     |-    |sra bc        |CB 28; CB 19                                |     16 T
-SRA BC                            |z80  |-     |IXIY |sra bc        |CB 28; CB 19                                |     16 T
-SRA BC                            |z80n |-     |-    |sra bc        |CB 28; CB 19                                |     16 T
-SRA BC                            |z80n |-     |IXIY |sra bc        |CB 28; CB 19                                |     16 T
+SRA BC                            |8080 |-     |-    |sra bc        |CD @__z80asm__sra_bc                        |     99 T
+SRA BC                            |8080 |-     |IXIY |sra bc        |CD @__z80asm__sra_bc                        |     99 T
+SRA BC                            |8085 |-     |-    |sra bc        |CD @__z80asm__sra_bc                        |     96 T
+SRA BC                            |8085 |-     |IXIY |sra bc        |CD @__z80asm__sra_bc                        |     96 T
+SRA BC                            |gbz80|-     |-    |sra bc        |CB 28  CB 19                                |     16 T
+SRA BC                            |gbz80|-     |IXIY |sra bc        |CB 28  CB 19                                |     16 T
+SRA BC                            |z80  |-     |-    |sra bc        |CB 28  CB 19                                |     16 T
+SRA BC                            |z80  |-     |IXIY |sra bc        |CB 28  CB 19                                |     16 T
+SRA BC                            |z80n |-     |-    |sra bc        |CB 28  CB 19                                |     16 T
+SRA BC                            |z80n |-     |IXIY |sra bc        |CB 28  CB 19                                |     16 T
 SRA C                             |gbz80|-     |-    |sra c         |CB 29                                       |      8 T
 SRA C                             |gbz80|-     |IXIY |sra c         |CB 29                                       |      8 T
 SRA C                             |z80  |-     |-    |sra c         |CB 29                                       |      8 T
@@ -7159,16 +7159,16 @@ SRA D                             |z80  |-     |-    |sra d         |CB 2A      
 SRA D                             |z80  |-     |IXIY |sra d         |CB 2A                                       |      8 T
 SRA D                             |z80n |-     |-    |sra d         |CB 2A                                       |      8 T
 SRA D                             |z80n |-     |IXIY |sra d         |CB 2A                                       |      8 T
-SRA DE                            |8080 |-     |-    |sra de        |CD @sra_de                                  |     99 T
-SRA DE                            |8080 |-     |IXIY |sra de        |CD @sra_de                                  |     99 T
-SRA DE                            |8085 |-     |-    |sra de        |CD @sra_de                                  |     96 T
-SRA DE                            |8085 |-     |IXIY |sra de        |CD @sra_de                                  |     96 T
-SRA DE                            |gbz80|-     |-    |sra de        |CB 2A; CB 1B                                |     16 T
-SRA DE                            |gbz80|-     |IXIY |sra de        |CB 2A; CB 1B                                |     16 T
-SRA DE                            |z80  |-     |-    |sra de        |CB 2A; CB 1B                                |     16 T
-SRA DE                            |z80  |-     |IXIY |sra de        |CB 2A; CB 1B                                |     16 T
-SRA DE                            |z80n |-     |-    |sra de        |CB 2A; CB 1B                                |     16 T
-SRA DE                            |z80n |-     |IXIY |sra de        |CB 2A; CB 1B                                |     16 T
+SRA DE                            |8080 |-     |-    |sra de        |CD @__z80asm__sra_de                        |     99 T
+SRA DE                            |8080 |-     |IXIY |sra de        |CD @__z80asm__sra_de                        |     99 T
+SRA DE                            |8085 |-     |-    |sra de        |CD @__z80asm__sra_de                        |     96 T
+SRA DE                            |8085 |-     |IXIY |sra de        |CD @__z80asm__sra_de                        |     96 T
+SRA DE                            |gbz80|-     |-    |sra de        |CB 2A  CB 1B                                |     16 T
+SRA DE                            |gbz80|-     |IXIY |sra de        |CB 2A  CB 1B                                |     16 T
+SRA DE                            |z80  |-     |-    |sra de        |CB 2A  CB 1B                                |     16 T
+SRA DE                            |z80  |-     |IXIY |sra de        |CB 2A  CB 1B                                |     16 T
+SRA DE                            |z80n |-     |-    |sra de        |CB 2A  CB 1B                                |     16 T
+SRA DE                            |z80n |-     |IXIY |sra de        |CB 2A  CB 1B                                |     16 T
 SRA E                             |gbz80|-     |-    |sra e         |CB 2B                                       |      8 T
 SRA E                             |gbz80|-     |IXIY |sra e         |CB 2B                                       |      8 T
 SRA E                             |z80  |-     |-    |sra e         |CB 2B                                       |      8 T
@@ -7181,16 +7181,16 @@ SRA H                             |z80  |-     |-    |sra h         |CB 2C      
 SRA H                             |z80  |-     |IXIY |sra h         |CB 2C                                       |      8 T
 SRA H                             |z80n |-     |-    |sra h         |CB 2C                                       |      8 T
 SRA H                             |z80n |-     |IXIY |sra h         |CB 2C                                       |      8 T
-SRA HL                            |8080 |-     |-    |sra hl        |CD @sra_hl                                  |     99 T
-SRA HL                            |8080 |-     |IXIY |sra hl        |CD @sra_hl                                  |     99 T
+SRA HL                            |8080 |-     |-    |sra hl        |CD @__z80asm__sra_hl                        |     99 T
+SRA HL                            |8080 |-     |IXIY |sra hl        |CD @__z80asm__sra_hl                        |     99 T
 SRA HL                            |8085 |-     |-    |sra hl        |10                                          |      7 T
 SRA HL                            |8085 |-     |IXIY |sra hl        |10                                          |      7 T
-SRA HL                            |gbz80|-     |-    |sra hl        |CB 2C; CB 1D                                |     16 T
-SRA HL                            |gbz80|-     |IXIY |sra hl        |CB 2C; CB 1D                                |     16 T
-SRA HL                            |z80  |-     |-    |sra hl        |CB 2C; CB 1D                                |     16 T
-SRA HL                            |z80  |-     |IXIY |sra hl        |CB 2C; CB 1D                                |     16 T
-SRA HL                            |z80n |-     |-    |sra hl        |CB 2C; CB 1D                                |     16 T
-SRA HL                            |z80n |-     |IXIY |sra hl        |CB 2C; CB 1D                                |     16 T
+SRA HL                            |gbz80|-     |-    |sra hl        |CB 2C  CB 1D                                |     16 T
+SRA HL                            |gbz80|-     |IXIY |sra hl        |CB 2C  CB 1D                                |     16 T
+SRA HL                            |z80  |-     |-    |sra hl        |CB 2C  CB 1D                                |     16 T
+SRA HL                            |z80  |-     |IXIY |sra hl        |CB 2C  CB 1D                                |     16 T
+SRA HL                            |z80n |-     |-    |sra hl        |CB 2C  CB 1D                                |     16 T
+SRA HL                            |z80n |-     |IXIY |sra hl        |CB 2C  CB 1D                                |     16 T
 SRA IND_HL RPAREN                 |gbz80|-     |-    |sra (hl)      |CB 2E                                       |     16 T
 SRA IND_HL RPAREN                 |gbz80|-     |IXIY |sra (hl)      |CB 2E                                       |     16 T
 SRA IND_HL RPAREN                 |z80  |-     |-    |sra (hl)      |CB 2E                                       |     15 T
@@ -7511,46 +7511,46 @@ SUB H                             |z80  |-     |-    |sub h         |94         
 SUB H                             |z80  |-     |IXIY |sub h         |94                                          |      4 T
 SUB H                             |z80n |-     |-    |sub h         |94                                          |      4 T
 SUB H                             |z80n |-     |IXIY |sub h         |94                                          |      4 T
-SUB HL COMMA BC                   |8080 |-     |-    |sub hl, bc    |CD @sub_hl_bc                               |     86 T
-SUB HL COMMA BC                   |8080 |-     |IXIY |sub hl, bc    |CD @sub_hl_bc                               |     86 T
+SUB HL COMMA BC                   |8080 |-     |-    |sub hl, bc    |CD @__z80asm__sub_hl_bc                     |     86 T
+SUB HL COMMA BC                   |8080 |-     |IXIY |sub hl, bc    |CD @__z80asm__sub_hl_bc                     |     86 T
 SUB HL COMMA BC                   |8085 |-     |-    |sub hl, bc    |08                                          |     10 T
 SUB HL COMMA BC                   |8085 |-     |IXIY |sub hl, bc    |08                                          |     10 T
-SUB HL COMMA BC                   |gbz80|-     |-    |sub hl, bc    |CD @sub_hl_bc                               |     80 T
-SUB HL COMMA BC                   |gbz80|-     |IXIY |sub hl, bc    |CD @sub_hl_bc                               |     80 T
-SUB HL COMMA BC                   |z80  |-     |-    |sub hl, bc    |CD @sub_hl_bc                               |     80 T
-SUB HL COMMA BC                   |z80  |-     |IXIY |sub hl, bc    |CD @sub_hl_bc                               |     80 T
-SUB HL COMMA BC                   |z80n |-     |-    |sub hl, bc    |CD @sub_hl_bc                               |     80 T
-SUB HL COMMA BC                   |z80n |-     |IXIY |sub hl, bc    |CD @sub_hl_bc                               |     80 T
-SUB HL COMMA DE                   |8080 |-     |-    |sub hl, de    |CD @sub_hl_de                               |     86 T
-SUB HL COMMA DE                   |8080 |-     |IXIY |sub hl, de    |CD @sub_hl_de                               |     86 T
-SUB HL COMMA DE                   |8085 |-     |-    |sub hl, de    |CD @sub_hl_de                               |     82 T
-SUB HL COMMA DE                   |8085 |-     |IXIY |sub hl, de    |CD @sub_hl_de                               |     82 T
-SUB HL COMMA DE                   |gbz80|-     |-    |sub hl, de    |CD @sub_hl_de                               |     80 T
-SUB HL COMMA DE                   |gbz80|-     |IXIY |sub hl, de    |CD @sub_hl_de                               |     80 T
-SUB HL COMMA DE                   |z80  |-     |-    |sub hl, de    |CD @sub_hl_de                               |     80 T
-SUB HL COMMA DE                   |z80  |-     |IXIY |sub hl, de    |CD @sub_hl_de                               |     80 T
-SUB HL COMMA DE                   |z80n |-     |-    |sub hl, de    |CD @sub_hl_de                               |     80 T
-SUB HL COMMA DE                   |z80n |-     |IXIY |sub hl, de    |CD @sub_hl_de                               |     80 T
-SUB HL COMMA HL                   |8080 |-     |-    |sub hl, hl    |CD @sub_hl_hl                               |     86 T
-SUB HL COMMA HL                   |8080 |-     |IXIY |sub hl, hl    |CD @sub_hl_hl                               |     86 T
-SUB HL COMMA HL                   |8085 |-     |-    |sub hl, hl    |CD @sub_hl_hl                               |     82 T
-SUB HL COMMA HL                   |8085 |-     |IXIY |sub hl, hl    |CD @sub_hl_hl                               |     82 T
-SUB HL COMMA HL                   |gbz80|-     |-    |sub hl, hl    |CD @sub_hl_hl                               |     80 T
-SUB HL COMMA HL                   |gbz80|-     |IXIY |sub hl, hl    |CD @sub_hl_hl                               |     80 T
-SUB HL COMMA HL                   |z80  |-     |-    |sub hl, hl    |CD @sub_hl_hl                               |     80 T
-SUB HL COMMA HL                   |z80  |-     |IXIY |sub hl, hl    |CD @sub_hl_hl                               |     80 T
-SUB HL COMMA HL                   |z80n |-     |-    |sub hl, hl    |CD @sub_hl_hl                               |     80 T
-SUB HL COMMA HL                   |z80n |-     |IXIY |sub hl, hl    |CD @sub_hl_hl                               |     80 T
-SUB HL COMMA SP                   |8080 |-     |-    |sub hl, sp    |CD @sub_hl_sp                               |    156 T
-SUB HL COMMA SP                   |8080 |-     |IXIY |sub hl, sp    |CD @sub_hl_sp                               |    156 T
-SUB HL COMMA SP                   |8085 |-     |-    |sub hl, sp    |CD @sub_hl_sp                               |    152 T
-SUB HL COMMA SP                   |8085 |-     |IXIY |sub hl, sp    |CD @sub_hl_sp                               |    152 T
-SUB HL COMMA SP                   |gbz80|-     |-    |sub hl, sp    |CD @sub_hl_sp                               |    232 T
-SUB HL COMMA SP                   |gbz80|-     |IXIY |sub hl, sp    |CD @sub_hl_sp                               |    232 T
-SUB HL COMMA SP                   |z80  |-     |-    |sub hl, sp    |CD @sub_hl_sp                               |    151 T
-SUB HL COMMA SP                   |z80  |-     |IXIY |sub hl, sp    |CD @sub_hl_sp                               |    151 T
-SUB HL COMMA SP                   |z80n |-     |-    |sub hl, sp    |CD @sub_hl_sp                               |    151 T
-SUB HL COMMA SP                   |z80n |-     |IXIY |sub hl, sp    |CD @sub_hl_sp                               |    151 T
+SUB HL COMMA BC                   |gbz80|-     |-    |sub hl, bc    |CD @__z80asm__sub_hl_bc                     |     80 T
+SUB HL COMMA BC                   |gbz80|-     |IXIY |sub hl, bc    |CD @__z80asm__sub_hl_bc                     |     80 T
+SUB HL COMMA BC                   |z80  |-     |-    |sub hl, bc    |CD @__z80asm__sub_hl_bc                     |     80 T
+SUB HL COMMA BC                   |z80  |-     |IXIY |sub hl, bc    |CD @__z80asm__sub_hl_bc                     |     80 T
+SUB HL COMMA BC                   |z80n |-     |-    |sub hl, bc    |CD @__z80asm__sub_hl_bc                     |     80 T
+SUB HL COMMA BC                   |z80n |-     |IXIY |sub hl, bc    |CD @__z80asm__sub_hl_bc                     |     80 T
+SUB HL COMMA DE                   |8080 |-     |-    |sub hl, de    |CD @__z80asm__sub_hl_de                     |     86 T
+SUB HL COMMA DE                   |8080 |-     |IXIY |sub hl, de    |CD @__z80asm__sub_hl_de                     |     86 T
+SUB HL COMMA DE                   |8085 |-     |-    |sub hl, de    |CD @__z80asm__sub_hl_de                     |     82 T
+SUB HL COMMA DE                   |8085 |-     |IXIY |sub hl, de    |CD @__z80asm__sub_hl_de                     |     82 T
+SUB HL COMMA DE                   |gbz80|-     |-    |sub hl, de    |CD @__z80asm__sub_hl_de                     |     80 T
+SUB HL COMMA DE                   |gbz80|-     |IXIY |sub hl, de    |CD @__z80asm__sub_hl_de                     |     80 T
+SUB HL COMMA DE                   |z80  |-     |-    |sub hl, de    |CD @__z80asm__sub_hl_de                     |     80 T
+SUB HL COMMA DE                   |z80  |-     |IXIY |sub hl, de    |CD @__z80asm__sub_hl_de                     |     80 T
+SUB HL COMMA DE                   |z80n |-     |-    |sub hl, de    |CD @__z80asm__sub_hl_de                     |     80 T
+SUB HL COMMA DE                   |z80n |-     |IXIY |sub hl, de    |CD @__z80asm__sub_hl_de                     |     80 T
+SUB HL COMMA HL                   |8080 |-     |-    |sub hl, hl    |CD @__z80asm__sub_hl_hl                     |     86 T
+SUB HL COMMA HL                   |8080 |-     |IXIY |sub hl, hl    |CD @__z80asm__sub_hl_hl                     |     86 T
+SUB HL COMMA HL                   |8085 |-     |-    |sub hl, hl    |CD @__z80asm__sub_hl_hl                     |     82 T
+SUB HL COMMA HL                   |8085 |-     |IXIY |sub hl, hl    |CD @__z80asm__sub_hl_hl                     |     82 T
+SUB HL COMMA HL                   |gbz80|-     |-    |sub hl, hl    |CD @__z80asm__sub_hl_hl                     |     80 T
+SUB HL COMMA HL                   |gbz80|-     |IXIY |sub hl, hl    |CD @__z80asm__sub_hl_hl                     |     80 T
+SUB HL COMMA HL                   |z80  |-     |-    |sub hl, hl    |CD @__z80asm__sub_hl_hl                     |     80 T
+SUB HL COMMA HL                   |z80  |-     |IXIY |sub hl, hl    |CD @__z80asm__sub_hl_hl                     |     80 T
+SUB HL COMMA HL                   |z80n |-     |-    |sub hl, hl    |CD @__z80asm__sub_hl_hl                     |     80 T
+SUB HL COMMA HL                   |z80n |-     |IXIY |sub hl, hl    |CD @__z80asm__sub_hl_hl                     |     80 T
+SUB HL COMMA SP                   |8080 |-     |-    |sub hl, sp    |CD @__z80asm__sub_hl_sp                     |    156 T
+SUB HL COMMA SP                   |8080 |-     |IXIY |sub hl, sp    |CD @__z80asm__sub_hl_sp                     |    156 T
+SUB HL COMMA SP                   |8085 |-     |-    |sub hl, sp    |CD @__z80asm__sub_hl_sp                     |    152 T
+SUB HL COMMA SP                   |8085 |-     |IXIY |sub hl, sp    |CD @__z80asm__sub_hl_sp                     |    152 T
+SUB HL COMMA SP                   |gbz80|-     |-    |sub hl, sp    |CD @__z80asm__sub_hl_sp                     |    232 T
+SUB HL COMMA SP                   |gbz80|-     |IXIY |sub hl, sp    |CD @__z80asm__sub_hl_sp                     |    232 T
+SUB HL COMMA SP                   |z80  |-     |-    |sub hl, sp    |CD @__z80asm__sub_hl_sp                     |    151 T
+SUB HL COMMA SP                   |z80  |-     |IXIY |sub hl, sp    |CD @__z80asm__sub_hl_sp                     |    151 T
+SUB HL COMMA SP                   |z80n |-     |-    |sub hl, sp    |CD @__z80asm__sub_hl_sp                     |    151 T
+SUB HL COMMA SP                   |z80n |-     |IXIY |sub hl, sp    |CD @__z80asm__sub_hl_sp                     |    151 T
 SUB IND_HL RPAREN                 |8080 |-     |-    |sub (hl)      |96                                          |      7 T
 SUB IND_HL RPAREN                 |8080 |-     |IXIY |sub (hl)      |96                                          |      7 T
 SUB IND_HL RPAREN                 |8085 |-     |-    |sub (hl)      |96                                          |      7 T
@@ -7637,8 +7637,8 @@ XCHG                              |8080 |-     |-    |xchg          |EB         
 XCHG                              |8080 |-     |IXIY |xchg          |EB                                          |      4 T
 XCHG                              |8085 |-     |-    |xchg          |EB                                          |      4 T
 XCHG                              |8085 |-     |IXIY |xchg          |EB                                          |      4 T
-XCHG                              |gbz80|-     |-    |xchg          |E5; D5; E1; D1                              |     56 T
-XCHG                              |gbz80|-     |IXIY |xchg          |E5; D5; E1; D1                              |     56 T
+XCHG                              |gbz80|-     |-    |xchg          |E5  D5  E1  D1                              |     56 T
+XCHG                              |gbz80|-     |IXIY |xchg          |E5  D5  E1  D1                              |     56 T
 XCHG                              |z80  |-     |-    |xchg          |EB                                          |      4 T
 XCHG                              |z80  |-     |IXIY |xchg          |EB                                          |      4 T
 XCHG                              |z80n |-     |-    |xchg          |EB                                          |      4 T
