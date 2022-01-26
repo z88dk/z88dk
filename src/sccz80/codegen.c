@@ -2216,12 +2216,18 @@ void mult(LVALUE* lval)
 {
     switch (lval->val_type) {
     case KIND_LONGLONG:
-        callrts("l_i64_mult");
+        if (ulvalue(lval))
+            callrts("l_i64_mult_u");
+        else
+            callrts("l_i64_mult");
         Zsp += 8;
         break;
     case KIND_LONG:
     case KIND_CPTR:
-        callrts("l_long_mult");
+        if (ulvalue(lval))
+            callrts("l_long_mult_u");
+        else
+            callrts("l_long_mult");
         Zsp += 4;
         break;
     case KIND_FLOAT16:
@@ -2256,7 +2262,10 @@ void mult(LVALUE* lval)
             }
         }
     default:
-        callrts("l_mult"); 
+        if (ulvalue(lval))
+            callrts("l_mult_u");
+        else
+            callrts("l_mult");
     }
 }
 

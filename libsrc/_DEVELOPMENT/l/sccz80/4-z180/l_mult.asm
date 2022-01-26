@@ -3,6 +3,7 @@
 SECTION code_clib
 SECTION code_l_sccz80
 PUBLIC  l_mult
+PUBLIC  l_mult_u
 
 PUBLIC  l_mult_0
 
@@ -17,6 +18,7 @@ PUBLIC  l_mult_0
 ; Exit:  hl = value1 * value2
 
 .l_mult
+.l_mult_u
     ld  a,d     ; a = xh
     ld  d,h     ; d = yh
     ld  h,a     ; h = xh

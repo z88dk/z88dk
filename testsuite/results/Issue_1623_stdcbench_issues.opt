@@ -91,7 +91,7 @@
 	ld	bc,20480
 	push	bc
 	call	l_long_div_u
-	call	l_long_mult
+	call	l_long_mult_u
 	push	de
 	push	hl
 	ld	hl,100	;const
