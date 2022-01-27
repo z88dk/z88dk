@@ -680,7 +680,10 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
     if (sym && fp->filename && fp->function) {
         debug_sym_function* fn = fp->function;
         if (fn != NULL) {
-            char function_args[255] = {0};
+            static char function_args[2048];
+            strcpy(function_args, "");
+            int buffer_offset = 0;
+            int buffer_length = 255;
             debug_sym_function_argument* arg = fn->arguments;
             uint8_t first_arg = 1;
             while (arg) {
@@ -695,7 +698,8 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
                 if (!first_arg) {
                     strcat(function_args, ", ");
                 }
-                char arg_text[255];
+                static char arg_text[2048];
+                strcpy(arg_text, "");
 
                 struct expression_result_t exp = {};
                 debug_get_symbol_value_expression(s, fp, &exp);
@@ -705,14 +709,13 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
                     strcat(function_args, arg_text);
                 } else {
                     char exp_type[128] = "unknown";
-                    char* exp_value = malloc(2048);
+                    static char exp_value[2048];
                     strcpy(exp_value, "???");
 
                     expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
                     expression_result_value_to_string(&exp, exp_value, 2048);
 
                     snprintf(arg_text, sizeof(arg_text), "<%s>%s = %s", exp_type, s->symbol_name, exp_value);
-                    free(exp_value);
                     strcat(function_args, arg_text);
                 }
 
