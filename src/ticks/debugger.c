@@ -1385,6 +1385,9 @@ static uint8_t confirm(const char* message) {
         if (c == 'y' || c == 'Y') {
             return 1;
         }
+        if (c == 'n' || c == 'N') {
+            return 0;
+        }
     }
     return 0;
 }
