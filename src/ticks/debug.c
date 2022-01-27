@@ -985,7 +985,11 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
                     break;
                 }
             }
-            into->as_int = ch;
+            if ( record->signed_ ) {
+                into->as_int = (char)ch;
+            } else {
+                into->as_uint = (unsigned char)ch;
+            }
             break;
         }
         case TYPE_INT:
