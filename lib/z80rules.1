@@ -2021,6 +2021,32 @@
 	jp	z,%3	;%5
 	ld	hl,%4
 
+%title Optimise int <= 0
+	jr	c,ASMPC+6
+	or	l
+	jr	nz,ASMPC+3
+	scf
+	jp	c,%1	;%2
+=
+	jp	c,%1
+	or	l
+	jp	z,%1
+
+%title Optimise long <= 0
+	jr	c,ASMPC+8
+	or	e
+	or	h
+	or	l
+	jr	nz,ASMPC+3
+	scf
+	jp	c,%1	;%2
+=
+	jp	c,%1
+	or	e
+	or	h
+	or	l
+	jp	z,%1
+
 	jr	z,ASMPC+3
 	scf
 	call	c,%2
