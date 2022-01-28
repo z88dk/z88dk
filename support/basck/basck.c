@@ -428,6 +428,9 @@ int dbldiv_skel[]={16, 0xB7, 0xC8, 0xFC, SKIP, SKIP, 0xFE, 0x41, 0xDA, SKIP, SKI
 int exp_skel[]={9, ADDR, SKIP_CALL, 1, 0x38, 0x81, 17, 0X3B, 0xAA, SKIP_CALL};
 int fpmult_skel[]={7, 1, 0x38, 0x81, 17, 0X3B, 0xAA, CATCH_CALL};
 
+int fpdiv_skel[]={9, ADDR, SKIP_CALL, 0xCA, SKIP, SKIP, 0x2e, 0xff, SKIP_CALL, 0x34};
+int fpdiv_skel2[]={14, ADDR, 0x2A, SKIP, SKIP, 0xEB, 0x22, SKIP, SKIP, 0xC5, 0x2A, SKIP, SKIP, 0xE3, 0x22};
+
 int abs_skel[]={10, ADDR, SKIP_CALL, 0xF0, 33, SKIP, SKIP, 0x7E, 0xEE, 0x80, 0x77};
 int abs_skel2[]={10, ADDR, SKIP, 0xF0, 33, SKIP, SKIP, 0x7E, 0xEE, 0x80, 0x77};
 int abs_skel3[]={14, ADDR, SKIP_CALL, 0xF0, SKIP, 0xFA, SKIP, SKIP, 0xCA, SKIP, SKIP, 33, SKIP, SKIP, 0x7E};
@@ -529,18 +532,9 @@ int compl_skel[]={12, ADDR, 33, SKIP, SKIP, 0x7E, 0x2F, 0x77, 0xAF, 0x6F, 0x90, 
 int sgnres_skel[]={11, 33, CATCH, CATCH, 0x7E, 0x2F, 0x77, 0xAF, 0x6F, 0x90, 0x47, 0x7D};
 int shrite_skel[]={13, 6, 0, 0xD6, 8, 0xDA, CATCH, CATCH, 0x43, 0x5A, 0x51, 0x0E, 0, 0xC3};
 int shrite_skel2[]={9, ADDR, 0xC6, 9, 0x6F, 0xAF, 0x2D, 0xC8, 0x79, 0x1F};
-int scale_skel[]={11, ADDR, 6, 0, 0xD6, 8, 0x38, SKIP, 0x43, 0x5A, 0x51, 0x0E, 0, 0xC3};
-int scale_skel2[]={14, ADDR, 6, 0, 0xD6, 8, 0xDA, CATCH, CATCH, 0x43, 0x5A, 0x51, 0x0E, 0, 0xC3};
-/*
-SHRITE: ADD     A,8+1           ; Adjust count
-        LD      L,A             ; Save bits to shift
-SHRLP:  XOR     A               ; Flag for all done
-        DEC     L               ; All shifting done?
-        RET     Z               ; Yes - Return
-        LD      A,C             ; Get MSB
-SHRT1:  RRA                     ; Shift it right
+//int scale_skel[]={11, ADDR, 6, 0, 0xD6, 8, 0x38, SKIP, 0x43, 0x5A, 0x51, 0x0E, 0, 0xC3};
+//int scale_skel2[]={14, ADDR, 6, 0, 0xD6, 8, 0xDA, CATCH, CATCH, 0x43, 0x5A, 0x51, 0x0E, 0, 0xC3};
 
-*/
 int fpthl_skel[]={10, ADDR, 17, SKIP, SKIP, 6, 4, 0x1A, 0x77, 0x13, 0x23};
 
 /* connected to 'ASCTFP' */
@@ -577,7 +571,12 @@ int dblsub_skel2[]={15, ADDR, 33, SKIP, SKIP, SKIP_CALL, 33, SKIP, SKIP, 0x7E, 0
 
 int dbladd_skel[]={13, 33, SKIP, SKIP, 0x7E, 0xEE, 0x80, ADDR,  33, SKIP, SKIP, 0x7E, 0xB7, 0xC8};
 int dblmul_skel[]={9, ADDR, SKIP_CALL, 0xC8, SKIP_CALL, SKIP_CALL, 0x71, 0x13, 6, 7};
+int dblmul_skel2[]={13, ADDR, SKIP_CALL, 0xC8, 0x3A, SKIP, SKIP, 0xB7, SKIP, SKIP, SKIP, SKIP_CALL, SKIP_CALL, 0x71};
+int dblmul_skel3[]={12, ADDR, SKIP_CALL, 0xC8, 0x3A, SKIP, SKIP, 0xB7, SKIP, SKIP, SKIP_CALL, SKIP_CALL, 0x71};
+
 int dbldiv_skel2[]={13, ADDR, 0x3A, SKIP, SKIP, 0xB7, 0xCA, SKIP, SKIP, SKIP_CALL, 0x34, 0x34, SKIP_CALL, 33};
+int dbldiv_skel3[]={13, ADDR, 0x3A, SKIP, SKIP, 0xB7, 0xCA, SKIP, SKIP, 0x3A, SKIP, SKIP, 0xB7, 0xCA, SKIP, SKIP, SKIP_CALL, 0x34};
+
 
 int int_skel[]={11, ADDR, 33, SKIP, SKIP, 0x7E, 0xFE, 0x98, 0x3A, SKIP, SKIP, 0xD0};
 
@@ -587,6 +586,8 @@ int mldebc_skel2[]={10, 0xC1, 3, 0x71, 0x23, 0x70, 0x23, 0xF5, CATCH_CALL, 0xF1,
 int mldebc_skel3[]={9, ADDR, 33, 0, 0, 0x78, 0xB1, 0xC8, 0x3E, 0x10};
 
 int intmul_skel[]={17, ADDR, 0x7C, 0xB5, 0xCA, SKIP, SKIP, 0xE5, 0xD5, SKIP_CALL, 0xC5, 0x44, 0x4D, 33, 0, 0, 0x3E, 0x10};
+
+int dandor_skel[]={17, ADDR, 0x78,  0xF5, SKIP_CALL, 0xF1, 0xD1, 0xFE, SKIP, 0XCA, SKIP, SKIP, 0xFE, SKIP, 0XCA, SKIP, SKIP, 1};
 
 int asctfp_skel[]={10, ADDR, 0xFE, '-', 0xF5, 0xCA, SKIP, SKIP, 0xFE, '+', 0xCA};
 int asctfp_skel2[]={9, ADDR, 0xFE, '-', 0xF5, 0x28, SKIP, 0xFE, '+', 0x28};
@@ -1864,13 +1865,13 @@ int main(int argc, char *argv[])
 			res=find_skel(bnorm_skel2);
 		if (res>0)
 			clbl("BNORM", res+pos+1, "Normalise number");
-
-		res=find_skel(scale_skel);
+/*
+		res=find_skel(scale_skel2);
 		if (res<0)
-			res=find_skel(scale_skel2);
+			res=find_skel(scale_skel);
 		if (res>0)
-			clbl("SCALE", res+pos+1, "Scale number in BCDE for A exponent (bits)");
-
+			clbl("SCALE", res+pos+1, "a.k.a. SHIFTR, Scale number in BCDE for A exponent (bits)");
+*/
 		res=find_skel(plucde_skel);
 		if (res>0)
 			clbl("PLUCDE", res+pos+1, "Add number pointed by HL to CDE");
@@ -1892,7 +1893,7 @@ int main(int argc, char *argv[])
 
 		res=find_skel(fpbcde_skel);
 		if (res>0) {
-			clbl("PHLTFP", res+pos+1, "Number at HL to BCDE");
+			clbl("MOVFM", res+pos+1, "a.k.a. PHLTFP, Number at HL to BCDE");
 			clbl("FPBCDE", res+pos+4, "Move BCDE to FPREG");
 		} else {
 			res=find_skel(fpbcde_skel2);
@@ -1938,7 +1939,13 @@ int main(int argc, char *argv[])
 
 		res=find_skel(fpmult_skel);
 		if (res>0)
-			clbl("FPMULT", res, "Multiply BCDE to FP reg");
+			clbl("FMULT", res, "MULTIPLICATION, FAC:=ARG*FAC");
+
+		res=find_skel(fpdiv_skel2);
+		if (res<0)
+			res=find_skel(fpdiv_skel);
+		if (res>0)
+			clbl("FDIV", res+pos+1, "DIVISION, FAC:=ARG/FAC");
 
 		res=find_skel(div10_skel);
 		if (res<0)
@@ -1994,15 +2001,15 @@ int main(int argc, char *argv[])
 
 		res=find_skel(cmpnum_skel);
 		if (res>0)
-			clbl("CMPNUM", res, "Compare FP reg to BCDE");
+			clbl("FCOMP", res, "Compare FP reg to BCDE");
 
 		res=find_skel(fpint_skel);
 		if (res>0)
-			clbl("FPINT", res, "Floating Point to Integer");
+			clbl("QINT", res, "a.k.a. FPINT, Floating Point to Integer");
 
 		res=find_skel(flgrel_skel);
 		if (res>0)
-			clbl("FLGREL", res+pos+1, "CY and A to FP, & normalise");
+			clbl("FLOAT", res+pos+1, "a.k.a. FLGREL, Float the signed integer in A (CY and A to FP, & normalise)");
 
 		res=find_skel(sumser_skel);
 		if (res>0)
@@ -2016,42 +2023,60 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(dblint_skel2);
 		if (res>0)
-			clbl("DBL_INT", res+pos+1, "INT (double precision BASIC variant)");
+			clbl("__INT", res+pos+1, "INT (double precision BASIC variant)");
 
 		res=find_skel(dblsub_skel);
 		if (res>0)
-			clbl("DBL_SUB", res+pos+1, "aka DECSUB, Double precision SUB (formerly SUBCDE)");
+			clbl("DSUB", res+pos+1, "aka DECSUB, Double precision SUB (formerly SUBCDE)");
 
 		res=find_skel(dbladd_skel);
 		if (res>0)
-			clbl("DBL_ADD", res+pos+1, "aka DECADD, Double precision ADD (formerly FPADD)");
+			clbl("DADD", res+pos+1, "aka DECADD, Double precision ADD (formerly FPADD)");
 
 		res=find_skel(dblsub_skel2);
 		if (res>0) {
-			clbl("DBL_SUB", res+pos+1, "aka DECSUB, Double precision SUB (formerly SUBCDE)");
-			clbl("DBL_ADD", res+pos+7, "aka DECADD, Double precision ADD (formerly FPADD)");
+			clbl("DSUB", res+pos+1, "aka DECSUB, Double precision SUB (formerly SUBCDE)");
+			clbl("DADD", res+pos+7, "aka DECADD, Double precision ADD (formerly FPADD)");
 		}
 
-		res=find_skel(dblmul_skel);
+		res=find_skel(dblmul_skel2);
+		if (res<0)
+			res=find_skel(dblmul_skel3);
+		if (res<0)
+			res=find_skel(dblmul_skel);
 		if (res>0)
-			clbl("DBL_MUL", res+pos+1, "aka DECMUL, Double precision MULTIPLY");
+			clbl("DMUL", res+pos+1, "aka DECMUL, Double precision MULTIPLY");
 
 		res=find_skel(dbldiv_skel);
 		if (res>0)
-			clbl("DBL_DIV", res, "aka DECDIV, Double precision DIVIDE");
+			clbl("DDIV", res, "aka DECDIV, Double precision DIVIDE");
 		else {
-			res=find_skel(dbldiv_skel2);
+			res=find_skel(dbldiv_skel3);
+			if (res<0)
+				res=find_skel(dbldiv_skel2);
 			if (res>0)
-				clbl("DBL_DIV", res+pos+1, "aka DECDIV, Double precision DIVIDE");
+				clbl("DDIV", res+pos+1, "aka DECDIV, Double precision DIVIDE");
 		}
 
 		res=find_skel(fix_skel);
 		if (res>0)
 			clbl("FIX", res+pos+1, "Double Precision to Integer conversion");
 
+
+		res=find_skel(dandor_skel);
+		if (res>0)
+		{
+			clbl("DANDOR", res+pos+1, "Apply AND and OR operators");
+			clbl("__CINT", img[res+4] + 256*img[res+5], "'CINT' BASIC function");
+			clbl("IMOD", img[res+11] + 256*img[res+12], "Integer MOD operator");
+			clbl("INT_DIV", img[res+16] + 256*img[res+17], "Divide the signed integer in DE by the signed integer in HL.");
+			clbl("GIVINT", img[res+19] + 256*img[res+20], "Return integer in [A][L] as function end.");
+		}
+
+
 		res=find_skel(intmul_skel);
 		if (res>0)
-			clbl("INT_MUL", res+pos+1, "Integer MULTIPLY");
+			clbl("IMULT", res+pos+1, "Integer MULTIPLY");
 
 		res=find_skel(mldebc_skel);
 		if (res<0)
