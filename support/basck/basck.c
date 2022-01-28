@@ -440,13 +440,14 @@ int ms_rnd_skel2[]={16, ADDR, SKIP_CALL, 33, SKIP, SKIP, 0xFA, SKIP, SKIP, 33, S
 
 int ms_rnd_seed[]={15, SKIP_CALL, 33, CATCH, CATCH, 0xFA, SKIP, SKIP, 33, SKIP, SKIP, SKIP_CALL, 33, SKIP, SKIP, 0xC8};
 int ms_lstrnd[]={15, SKIP_CALL, 33, SKIP, SKIP, 0xFA, SKIP, SKIP, 33, CATCH, CATCH, SKIP_CALL, 33, SKIP, SKIP, 0xC8};
-int ms_lstrnd2[]={10, SKIP_CALL, 0xFA, SKIP, SKIP, 33, CATCH, CATCH, SKIP_CALL, 0xC8, 1};
 
 int last_fpreg_skel2[]={13, SKIP_CALL, 0xF0, SKIP, 0xFA, SKIP, SKIP, 0xCA, SKIP, SKIP, 33, CATCH, CATCH, 0x7E};
-int dblabs_skel[]={13, SKIP_CALL, 0xF0, SKIP, 0xFA, CATCH, CATCH, 0xCA, SKIP, SKIP, 33, SKIP, SKIP, 0x7E};
+int ineg_skel[]={13, SKIP_CALL, 0xF0, SKIP, 0xFA, CATCH, CATCH, 0xCA, SKIP, SKIP, 33, SKIP, SKIP, 0x7E};
 
-int dblabs_skel2[]={10, ADDR, 0x2A, SKIP, SKIP, SKIP_CALL, 0x7C, 0xEE, 0x80, 0xB5, 0xC0};
-int dblfpreg_skel[]={9, 0x2A, CATCH, CATCH, SKIP_CALL, 0x7C, 0xEE, 0x80, 0xB5, 0xC0};
+int ineg_skel2[]={10, ADDR, 0x2A, SKIP, SKIP, SKIP_CALL, 0x7C, 0xEE, 0x80, 0xB5, 0xC0};
+//int dblfpreg_skel[]={9, 0x2A, CATCH, CATCH, SKIP_CALL, 0x7C, 0xEE, 0x80, 0xB5, 0xC0};
+//int dbllast_fpreg_skel[]={13, 33, CATCH, CATCH, 0x7E, 0xEE, 0x80, 0x77, 33, SKIP, SKIP, 0x7E, 0xB7, 0xC8};
+
 int dbl_tstsgn_skel3[]={6, CATCH_CALL, 0x6F, 0x17, 0x9F, 0x67, 0xC3};
 
 int dbl_tstsgn_skel[]={13, CATCH_CALL, 0xF0, SKIP, 0xFA, SKIP, SKIP  ,0xCA, SKIP, SKIP, 33, SKIP, SKIP, 0x7E};
@@ -574,8 +575,6 @@ int fix_skel[]={10, ADDR, SKIP_CALL, 0xF8, SKIP_CALL, 0xF2, SKIP, SKIP, SKIP_CAL
 int dblsub_skel[]={14, ADDR, 33, SKIP, SKIP, 0x7E, 0xEE, 0x80, 0x77, 33, SKIP, SKIP, 0x7E, 0xB7, 0xC8};
 int dblsub_skel2[]={15, ADDR, 33, SKIP, SKIP, SKIP_CALL, 33, SKIP, SKIP, 0x7E, 0xB7, 0xC8, 0x47, 0x2B, 0x4E, 17};
 
-int dbllast_fpreg_skel[]={13, 33, CATCH, CATCH, 0x7E, 0xEE, 0x80, 0x77, 33, SKIP, SKIP, 0x7E, 0xB7, 0xC8};
-
 int dbladd_skel[]={13, 33, SKIP, SKIP, 0x7E, 0xEE, 0x80, ADDR,  33, SKIP, SKIP, 0x7E, 0xB7, 0xC8};
 int dblmul_skel[]={9, ADDR, SKIP_CALL, 0xC8, SKIP_CALL, SKIP_CALL, 0x71, 0x13, 6, 7};
 int dbldiv_skel2[]={13, ADDR, 0x3A, SKIP, SKIP, 0xB7, 0xCA, SKIP, SKIP, SKIP_CALL, 0x34, 0x34, SKIP_CALL, 33};
@@ -612,8 +611,10 @@ int str_skel2[]={14, ADDR, SKIP_CALL, SKIP_CALL, SKIP_CALL, 1, SKIP, SKIP,  0xC5
 
 int tstopl_skel[]={15, ADDR, 17, SKIP, SKIP, 0x2A, SKIP, SKIP, 0x22, SKIP, SKIP, 0x3E, 1, 0x32, SKIP_CALL, SKIP_CALL};
 int tstopl_skel2[]={14, ADDR, 17, SKIP, SKIP, 0x3E, 0xD5, 0x2A, SKIP, SKIP, 0x22, SKIP, SKIP, 0x3E, 3};
+
 int tmstpt_skel[]={14, 17, SKIP, SKIP, 0x2A, CATCH, CATCH, 0x22, SKIP, SKIP, 0x3E, 1, 0x32, SKIP_CALL, SKIP_CALL};
 int tmstpt_skel2[]={13, 17, SKIP, SKIP, 0x3E, 0xD5, 0x2A, CATCH, CATCH, 0x22, SKIP, SKIP, 0x3E, 3};
+
 int tmpstr_skel[]={14, 17, CATCH, CATCH, 0x2A, SKIP, SKIP, 0x22, SKIP, SKIP, 0x3E, 1, 0x32, SKIP_CALL, SKIP_CALL};
 int tmpstr_skel2[]={13, 17, CATCH, CATCH, 0x3E, 0xD5, 0x2A, SKIP, SKIP, 0x22, SKIP, SKIP, 0x3E, 3};
 int tmpstr_skel3[]={13, SKIP_CALL, 33, CATCH, CATCH, 0xE5, 0x77, 0x23, 0x23, 0x73, 0x23, 0x72, 0xE1, 0xC9};
@@ -743,6 +744,7 @@ int tststr_skel2[]={10, CATCH_CALL, 0x2A, SKIP, SKIP, 0xEB, SKIP_CALL, 0xEB, 0xC
 
 int baktmp_skel[]={12, ADDR,  0x2A, SKIP, SKIP, 0x2B, 0x46, 0x2B, 0x4E, 0x2B, 0x2B, SKIP_CALL, 0xC0};
 int baktmp_skel2[]={13, ADDR,  0x2A, SKIP, SKIP, 0x2B, 0x46, 0x2B, 0x4E, 0x2B, 0x2B, 0x7C, 0x92, 0xC0};
+
 int tmstpt_skel3[]={11, 0x2A, CATCH, CATCH, 0x2B, 0x46, 0x2B, 0x4E, 0x2B, 0x2B, SKIP_CALL, 0xC0};
 int tmstpt_skel4[]={12, 0x2A, CATCH, CATCH, 0x2B, 0x46, 0x2B, 0x4E, 0x2B, 0x2B, 0x7C, 0x92, 0xC0};
 
@@ -807,6 +809,9 @@ int lnum_range_skel[]={9, 0x73, 0x23, 0x72, 0x18, ADDR, 17, 0, 0, 0xD5};
 int ex_warm_skel[]={17, ADDR, 0xF9, 33, SKIP, SKIP, 0x22, SKIP, SKIP, SKIP_CALL, SKIP_CALL, 0xAF, 0x67, 0x6F, 0x22, SKIP, SKIP, 0x32};
 int ex_warm_skel2[]={18, ADDR, 0xF9, 33, SKIP, SKIP, 0x22, SKIP, SKIP, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xAF, 0x67, 0x6F, 0x22, SKIP, SKIP, 0x32};
 int ex_end1_skel[]={14, ADDR, 0x22, SKIP, SKIP, 33, SKIP, SKIP, 0x22, SKIP, SKIP, 33, 0xF6, 0xFF, 0xC1};
+
+int ex_end1_skel1[]={9, ADDR, 0xE5, 0xF5, 0x7D, 0xA4, 0x3C,  0xCA, SKIP, SKIP,  0x22, SKIP, SKIP,   0x21, SKIP, SKIP, 0x22};
+int ex_end1_skel2[]={9, ADDR, 0xE5, 0xF5, 0x7D, 0xA4, 0x3C,  0x28, SKIP,  0x22, SKIP, SKIP,   0x21, SKIP, SKIP, 0x22};
 
 int tkmsbasic_code_skel[]={12, 0xD5, 17, SKIP, SKIP, 0xC5, 1, SKIP, SKIP, 0xC5, 0x06, CATCH, 0x7E};
 int jptab_msbasic_skel[]={10, 0x07, 0x4F, 6, 0, 0xEB, 33, CATCH, CATCH, 9, 0x4E};
@@ -1168,7 +1173,7 @@ int main(int argc, char *argv[])
 
 		pos=find_skel(cpdehl_skel);
 		if (pos>0) {
-			printf ("\n#    CPDEHL (compare DE and HL), code found at $%04X", (unsigned int) pos);
+			printf ("\n#    DCOMPR/CPDEHL (compare DE and HL), code found at $%04X", (unsigned int) pos);
 			/* Canon X-07 hack */
 			if (pos==0x3E44) {
 				pos=0xB000;
@@ -1221,11 +1226,11 @@ int main(int argc, char *argv[])
 		printf("\n\n");
 
 
-		res=find_skel(inport_skel);
+		res=find_skel(inport_skel3);
 		if (res<0)
 			res=find_skel(inport_skel2);
 		if (res<0)
-			res=find_skel(inport_skel3);
+			res=find_skel(inport_skel);
 		if (res>0)
 			dlbl("INPORT", res, "Current port for 'INP' function");
 
@@ -1239,11 +1244,9 @@ int main(int argc, char *argv[])
 
 		res=find_skel(ms_rnd_seed);
 		if (res>0)
-			dlbl("SEED", res+2, "Seed for RND numbers");
+			dlbl("SEED", res-2, "Seed for RND numbers");
 
 		res=find_skel(ms_lstrnd);
-		if (res<0)
-			res=find_skel(ms_lstrnd2);
 		if (res>0)
 			dlbl("LSTRND2", res+2, "Last RND number");
 
@@ -1259,6 +1262,7 @@ int main(int argc, char *argv[])
 		if (res>0)
 			dlbl("BUFFER", res, "Start of input buffer");
 
+/*
 		res=find_skel(tmstpt_skel);
 		if (res<0)
 			res=find_skel(tmstpt_skel2);
@@ -1268,20 +1272,15 @@ int main(int argc, char *argv[])
 			res=find_skel(tmstpt_skel4);
 		if (res>0)
 			dlbl("TMSTPT", res, "Temporary string pool pointer");
+*/
 
-		res=find_skel(tmpstr_skel);
+		res=find_skel(tmpstr_skel3);
 		if (res<0)
 			res=find_skel(tmpstr_skel2);
 		if (res<0)
-			res=find_skel(tmpstr_skel3);
+			res=find_skel(tmpstr_skel);
 		if (res>0)
 			dlbl("TMPSTR", res, "Temporary string");
-
-		res=find_skel(nxtopr_skel);
-		if (res<0)
-			res=find_skel(nxtopr_skel2);
-		if (res>0)
-			dlbl("NXTOPR", res, "Address ptr to next operator");
 
 		res=find_skel(curpos_skel);
 		if (res<0)
@@ -1303,13 +1302,13 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(prognd_skel2);
 		if (res>0)
-			dlbl("PROGND", res, "; BASIC program end ptr (a.k.a. VARTAB, Simple Variables)");
+			dlbl("VARTAB", res, "; BASIC program end ptr (a.k.a. PROGND, Simple Variables)");
 
 		res=find_skel(varend_skel);
 		if (res<0)
 			res=find_skel(varend_skel2);
 		if (res>0)
-			dlbl("VAREND", res, "End of variables, begin of array aariables");
+			dlbl("ARYTAB", res, "End of variables, begin of array aariables (a.k.a. VAREND)");
 
 		res=find_skel(arrend_skel);
 		if (res<0)
@@ -1317,7 +1316,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(arrend_skel3);
 		if (res>0)
-			dlbl("ARREND", res, "End of arrays (lowest free mem)");
+			dlbl("STREND", res, "End of arrays (a.k.a. ARREND, lowest free mem)");
 
 		res=find_skel(sgnres_skel);
 		if (res>0)
@@ -1371,21 +1370,49 @@ int main(int argc, char *argv[])
 
 		res=find_skel(eval3_ex_skel);
 		if (res>0) {
-			dlbl("TEMP2", img[res+2] + 256*img[res+3], "(word) temp. storage used by EVAL, also used in place of NXTOPR");
+			dlbl("NXTOPR", img[res+2] + 256*img[res+3], "(word) temp. storage used by EVAL, a.k.a. TEMP2");
 			dlbl("TEMP3", img[res+7] + 256*img[res+8], "(word) used for garbage collection or by USR function");
+		} else {
+			res=find_skel(nxtopr_skel);
+			if (res<0)
+				res=find_skel(nxtopr_skel2);
+			if (res>0)
+				dlbl("NXTOPR", res, "(word) temp. storage used by EVAL, a.k.a. TEMP2");
 		}
+		
 
-		res=find_skel(ex_end1_skel);
-		if (res>0) {
-			//dlbl("SAVTXT", img[res+2] + 256*img[res+3], "(word), prg pointer for resume");
-			//dlbl("TEMPST", img[res+5] + 256*img[res+6], "(word), temporary descriptors");
-			//dlbl("TEMPPT", img[res+8] + 256*img[res+9], "(word), start of free area of temporary descriptor");
-			//
-			dlbl("CURLIN", img[res+15] + 256*img[res+16], "(word), line number being interpreted");
-			//
-			dlbl("OLDLIN", img[res+25] + 256*img[res+26], "(word), old line number set up ^C ...");
-			dlbl("SAVTXT", img[res+28] + 256*img[res+29], "(word), prg pointer for resume");
-			dlbl("OLDTXT", img[res+31] + 256*img[res+32], "(word), prg pointer for CONT");
+
+		res=find_skel(ex_end1_skel1);
+		if (res>0)   {
+				clbl("ENDCON", res+pos-2, "BASIC jumps here on a STOP program condition");
+				dlbl("CURLIN", img[res-1] + 256*img[res], "(word), line number being interpreted");
+				//
+				dlbl("OLDLIN", img[res+10] + 256*img[res+11], "(word), old line number set up ^C ...");
+				dlbl("SAVTXT", img[res+13] + 256*img[res+14], "(word), prg pointer for resume");
+				dlbl("OLDTXT", img[res+16] + 256*img[res+17], "(word), prg pointer for CONT");
+		} else {
+			res=find_skel(ex_end1_skel2);
+			if (res>0)   {
+					clbl("ENDCON", res+pos-2, "BASIC jumps here on a STOP program condition");
+					dlbl("CURLIN", img[res-1] + 256*img[res], "(word), line number being interpreted");
+					//
+					dlbl("OLDLIN", img[res+9] + 256*img[res+10], "(word), old line number set up ^C ...");
+					dlbl("SAVTXT", img[res+12] + 256*img[res+13], "(word), prg pointer for resume");
+					dlbl("OLDTXT", img[res+15] + 256*img[res+16], "(word), prg pointer for CONT");
+			} else {
+				res=find_skel(ex_end1_skel);
+				if (res>0) {
+					//dlbl("SAVTXT", img[res+2] + 256*img[res+3], "(word), prg pointer for resume");
+					//dlbl("TEMPST", img[res+5] + 256*img[res+6], "(word), temporary descriptors");
+					//dlbl("TEMPPT", img[res+8] + 256*img[res+9], "(word), start of free area of temporary descriptor");
+					//
+					dlbl("CURLIN", img[res+15] + 256*img[res+16], "(word), line number being interpreted");
+					//
+					dlbl("OLDLIN", img[res+25] + 256*img[res+26], "(word), old line number set up ^C ...");
+					dlbl("SAVTXT", img[res+28] + 256*img[res+29], "(word), prg pointer for resume");
+					dlbl("OLDTXT", img[res+31] + 256*img[res+32], "(word), prg pointer for CONT");
+				}
+			}
 		}
 
 
@@ -1500,7 +1527,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(fpreg_skel4);
 		if (res>0)
-			dlbl("FPREG", res, "Floating Point Register (FACCU, FACLOW on Ext. BASIC)");
+			dlbl("FACCU", res, "Floating Point Register (FPREG, FACLOW on Ext. BASIC)");
 
 		res=find_skel(last_fpreg_skel);
 		if (res<0)
@@ -1513,7 +1540,7 @@ int main(int argc, char *argv[])
 			res=find_skel(fpexp_skel2);
 		if (res>0)
 			dlbl("FPEXP", res, "Floating Point Exponent");
-
+/*
 		res=find_skel(dblfpreg_skel);
 		if (res>0)
 			dlbl("DBL_FPREG", res, "Double Precision Floating Point Register (aka FACLOW)");
@@ -1521,13 +1548,14 @@ int main(int argc, char *argv[])
 		res=find_skel(dbllast_fpreg_skel);
 		if (res>0)
 			dlbl("DBL_LAST_FPREG", res, "Last byte in Double Precision FP register (+sign bit)");
+*/
 
 
 		printf("\n");
 
 		res=find_skel(cpdehl_skel);
 		if (res>0)
-			clbl("CPDEHL", res+pos+1, "compare DE and HL (aka DCOMPR)");
+			clbl("DCOMPR", res+pos+1, "compare DE and HL (aka CPDEHL)");
 
 		res=find_skel(fndnum_skel);
 		if (res<0)
@@ -1629,11 +1657,11 @@ int main(int argc, char *argv[])
 			if (res<0)
 				res=find_skel(rinput_skel3);
 			if (res>0)
-				clbl("RINPUT", res, "Line input");
+				clbl("PINLIN", res, "a.k.a. RINPUT, Line input");
 			else {
 				res=find_skel(rinput_skel4);
 				if (res>0)
-					clbl("RINPUT", res+pos, "Line input");
+					clbl("PINLIN", res+pos, "a.k.a. RINPUT, Line input");
 			}
 		}
 
@@ -1673,13 +1701,13 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(int_hl_skel2);
 		if (res>0)
-			clbl("INT_RESULT_HL", res, "Get back from function, result in HL");
+			clbl("MAKINT", res, "Get back from function, result in HL");
 
 		res=find_skel(unsigned_a_skel);
 		if (res<0)
 			res=find_skel(unsigned_a_skel2);
 		if (res>0)
-			clbl("UNSIGNED_RES_A", res+pos, "Get back from function, result in A");
+			clbl("PASSA", res+pos, "Get back from function, result in A");
 
 		printf("\n");
 
@@ -1693,7 +1721,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(tstsgn_skel3);
 		if (res>0)
-			clbl("TSTSGN", res+pos+1, "Test sign of FPREG");
+			clbl("SIGN", res+pos+1, "Test sign of FPREG");
 
 		res=find_skel(dbl_tstsgn_skel);
 		if (res<0)
@@ -1701,18 +1729,18 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(dbl_tstsgn_skel3);
 		if (res>0)
-			clbl("_TSTSGN", res, "Test sign in number");
+			clbl("VSIGN", res, "Test sign in number");
 
 
 		res=find_skel(invsgn_skel);
 		if (res<0)
 			res=find_skel(invsgn_skel2);
 		if (res>0)
-			clbl("INVSGN", res, "Invert number sign");
+			clbl("NEG", res, "Invert number sign");
 
 		res=find_skel(stakfp_skel);
 		if (res>0) {
-			clbl("STAKFP", res+pos+1, "Put FP value on stack");
+			clbl("PUSHF", res+pos+1, "a.k.a. STAKFP, Put FP value on stack");
 		}
 
 		res=find_skel(negaft_skel);
@@ -1799,13 +1827,13 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("ABS", res+pos+1, "ABS");
 
-		res=find_skel(dblabs_skel);
+		res=find_skel(ineg_skel);
 		if (res>0)
-			clbl("DBL_ABS", res, "ABS (double precision BASIC variant)");
+			clbl("INEG", res, "Integer negation");
 		else {
-			res=find_skel(dblabs_skel2);
+			res=find_skel(ineg_skel2);
 			if (res>0)
-				clbl("DBL_ABS", res+pos+1, "ABS (double precision BASIC variant)");
+				clbl("INEG", res+pos+1, "Integer negation");
 		}
 
 		res=find_skel(ms_rnd_skel);
@@ -1818,16 +1846,16 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(fpadd_skel2);
 		if (res>0) {
-			clbl("SUBCDE",res+pos+1-3, "Subtract BCDE from FP reg");
-			clbl("FPADD", res+pos+1, "Add BCDE to FP reg");
+			clbl("FSUB",res+pos+1-3, "Formerly SUBCDE, Subtract BCDE from FP reg");
+			clbl("FADD", res+pos+1, "a.k.a. FPADD, Add BCDE to FP reg");
 		}
 		else {
 			res=find_skel(fpadd_skel3);
 			if (res<0)
 				res=find_skel(fpadd_skel4);
 			if (res>0) {
-				clbl("SUBCDE",res-3, "Subtract BCDE from FP reg");
-				clbl("FPADD", res, "Add BCDE to FP reg");
+				clbl("FSUB",res-3, "Formerly SUBCDE, Subtract BCDE from FP reg");
+				clbl("FADD", res, "a.k.a. FPADD, Add BCDE to FP reg");
 			}
 		}
 
