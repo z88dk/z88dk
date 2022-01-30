@@ -28,6 +28,7 @@
         EXTERN  LDIRMV
 	EXTERN	CONSOLE_XOFFSET
 	EXTERN	CONSOLE_YOFFSET
+	EXTERN	CONSOLE_ROWS
 
         INCLUDE "video/tms9918/vdp.inc"
 
@@ -91,12 +92,10 @@ __tms9918_scrollup:
         push    de
         push    bc
         ld      a,(__tms9918_screen_mode)
-        ld      b,4
-        ld      hl,40
+        ld      bc,40
         and     a
         jr      z,scroll_text
-        ld      b,3
-        ld      hl,32
+        ld      bc,32
         cp      1
         jr      z,scroll_text
         call    ansi_SCROLLUP
@@ -109,30 +108,37 @@ scroll_rejoin:
 ; Entry: hl = width
 scroll_text:
         push    ix
-	ld	de,(__tms9918_pattern_name)
-        push    hl      ;Save width for later
-	add	hl,de
+	ld	hl,(__tms9918_pattern_name)
+	ld	d,h
+	ld	e,l
+	add	hl,bc
+	ld	a,CONSOLE_ROWS-1
 scroll_text_1:
-        push    bc
+        push    af
         push    hl      ;Source
         push    de      ;Destination
-
+        push	bc	;width
         ld      de,__tms9918_scroll_buffer
-        ld      bc,256
         call    LDIRMV
+	pop	bc
         pop     de
         push    de
+	push	bc
         ld      hl,__tms9918_scroll_buffer
-        ld      bc,256
         call    LDIRVM
+	pop	bc	;width
         pop     de      ;Destination
         pop     hl
-        inc     d
-        inc     h
-        pop     bc
-        djnz    scroll_text_1
+	add	hl,bc
+	ex	de,hl
+	add	hl,bc
+	ex	de,hl
+        pop     af
+	dec	a
+	jr	nz,scroll_text_1
         ; And blank characters out
-        ld      b,23
+	push	bc		;width
+        ld      b,CONSOLE_ROWS - 1
         ld      c,0
         call    __tms9918_text_xypos
         pop     bc

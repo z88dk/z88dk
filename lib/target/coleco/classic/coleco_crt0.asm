@@ -12,7 +12,9 @@
     PUBLIC  l_dcal
     PUBLIC  cleanup
     defc    CONSOLE_COLUMNS = 32
+IF !DEFINED_CONSOLE_ROWS
     defc    CONSOLE_ROWS = 24
+ENDIF
 
     EXTERN    __vdp_enable_status
     EXTERN    VDP_STATUS

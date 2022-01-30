@@ -22,7 +22,9 @@
         PUBLIC    l_dcal          ;jp(hl)
 
 	defc	CONSOLE_COLUMNS = 32
+IF !DEFINED_CONSOLE_ROWS
 	defc	CONSOLE_ROWS = 24
+ENDIF
 
 
         defc    TAR__no_ansifont = 1

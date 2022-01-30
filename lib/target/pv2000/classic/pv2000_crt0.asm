@@ -29,7 +29,9 @@
 
     defc    CRT_ORG_CODE = 0xc000
     defc    CRT_ORG_BSS = 0x7565
+IF !DEFINED_CONSOLE_ROWS
     defc    CONSOLE_ROWS = 24
+ENDIF
     defc    CONSOLE_COLUMNS = 32
 
     defc    TAR__fputc_cons_generic = 1

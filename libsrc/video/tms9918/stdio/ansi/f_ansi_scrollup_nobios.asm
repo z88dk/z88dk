@@ -15,13 +15,14 @@
         PUBLIC  __tms9918_scroll_buffer
         EXTERN  __tms9918_attribute
         
+        EXTERN  CONSOLE_ROWS
         EXTERN  LDIRVM
         EXTERN  LDIRMV
         EXTERN  FILVRM
         
 .ansi_SCROLLUP
         push    ix
-        ld      b,23
+        ld      b,CONSOLE_ROWS-1
         ld      hl,256
 .scloop
         push    bc

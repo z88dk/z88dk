@@ -1,7 +1,7 @@
 ;
 ;	Startup for the Pencil II
 ;
-;	2k of memory 
+;	2k of memory, basically a Colecovision with a keyboard
 
     module  pencil_crt0 
 
@@ -25,7 +25,9 @@
     EXTERN  __tms9918_status_register
 
     defc    CONSOLE_COLUMNS = 32
+IF !DEFINED_CONSOLE_ROWS
     defc    CONSOLE_ROWS = 24
+ENDIF
 
     defc    CRT_ORG_BSS = 0x7000	
     defc    CRT_ORG_CODE = 0x8000
@@ -91,7 +93,7 @@ ELSE
         jp      asm_im1_handler ;Maskable interrupt
 ENDIF
 	defs	$8034 - $802c
-	defm "Z88DK!** **!2019"
+	defm "Z88DK!** **!2022"
 
 
 ; Restart routines, nothing sorted yet

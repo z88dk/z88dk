@@ -57,7 +57,9 @@
     else
         defc __GAMEGEAR_ENABLED = 0
         defc CONSOLE_COLUMNS = 32
+IF !DEFINED_CONSOLE_ROWS
         defc CONSOLE_ROWS = 24
+ENDIF
     endif
 
     EXTERN  __tms9918_status_register

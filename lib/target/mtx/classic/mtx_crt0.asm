@@ -40,7 +40,9 @@
             ENDIF
         ENDIF
 
+IF !DEFINED_CONSOLE_ROWS
 	defc	CONSOLE_ROWS = 24
+ENDIF
 	defc	CONSOLE_COLUMNS = 80
         defc    TAR__clib_exit_stack_size = 32
         defc    TAR__register_sp = -0xfa96

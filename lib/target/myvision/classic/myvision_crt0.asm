@@ -25,7 +25,9 @@
     EXTERN  VDP_STATUS
 
     defc    CONSOLE_COLUMNS = 32
+IF !DEFINED_CONSOLE_ROWS
     defc    CONSOLE_ROWS = 24
+ENDIF
 
     defc    CRT_ORG_BSS = 0xa000
     defc    CRT_ORG_CODE = 0x0000

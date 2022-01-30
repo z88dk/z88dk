@@ -12,7 +12,9 @@
     PUBLIC  msxbios
 
     defc    CONSOLE_COLUMNS = 32
+IF !DEFINED_CONSOLE_ROWS
     defc    CONSOLE_ROWS = 24
+ENDIF
     defc    __CPU_CLOCK = 3580000
 
 IF (!DEFINED_startup || (startup=1))

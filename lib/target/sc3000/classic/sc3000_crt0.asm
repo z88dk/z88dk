@@ -16,7 +16,9 @@
 	; Always use the generic console unless overridden
         defc    TAR__fputc_cons_generic = 1
         defc    CONSOLE_COLUMNS = 32
+IF !DEFINED_CONSOLE_ROWS
         defc    CONSOLE_ROWS = 24
+ENDIF
         defc    CRT_KEY_DEL = 12
 
 IF startup = 2
