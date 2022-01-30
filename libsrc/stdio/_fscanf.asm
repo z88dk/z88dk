@@ -16,7 +16,9 @@
 _fscanf:
 	ld	hl,2
 	add	hl,sp		;points to buf
+IF !__CPU_INTEL__
 	push	ix		;save callers
+ENDIF
 	ld	c,(hl)		;fp
 	inc	hl
 	ld	b,(hl)
@@ -35,7 +37,9 @@ _fscanf:
 	pop	bc
 	pop	bc
 	pop	bc
+IF !__CPU_INTEL__
 	pop	ix
+ENDIF
 	ret
 
 

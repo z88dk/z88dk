@@ -13,6 +13,10 @@
     EXTERN  asm_isxdigit
     EXTERN  __scanf_parse_number
 
+    EXTERN  __scanf_check_suppressed
+    EXTERN  __scanf_increment_conversions
+    EXTERN  __scanf_check_long
+
 __scanf_handle_x:
 __scanf_handle_p:
     call    __scanf_common_start    ;de=argument as necessary
@@ -32,14 +36,26 @@ __scanf_handle_p:
 __scanf_x_only_0_on_stream:
     ; There's only a zero on the stream, but we've read two characters from
     ; it and we can't push back two, so fudge it a little
+IF __CPU_INTEL__
+    call    __scanf_check_suppressed
+ELSE
     bit     3,(ix-3)
+ENDIF
     jp      nz,scanf_loop                   ;carry on
+IF __CPU_INTEL__
+    call    __scanf_increment_conversions
+ELSE
     inc     (ix-1)                  ;number of converted arguments
+ENDIF
     xor     a
     ld      (de),a
     inc     de
     ld      (de),a
+IF __CPU_INTEL__
+    call    __scanf_check_long
+ELSE
     bit     1,(ix-3)
+ENDIF
     jp      z,scanf_loop
     inc     de
     ld      (de),a

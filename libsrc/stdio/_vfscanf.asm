@@ -12,16 +12,23 @@
 ; sdcc version
 ;void vfscanf(FILE *fp, char *fmt,va_list ap)
 _vfscanf:
-	pop	af
-	pop	hl	;fp
-	pop	de	;fmt
-	pop	bc	;ap
-	push	bc
-	push	de
-	push	hl
-	push	af
-
+    ld      hl,7
+    add     hl,sp
+    ld      b,(hl)      ;fp
+    dec     hl
+    ld      c,(hl)
+    dec     hl
+    ld      d,(hl)      ;fmt
+    dec     hl
+    ld      e,(hl)
+    dec     hl
+    ld      a,(hl)      ;fp
+    dec     hl
+    ld      l,(hl)
+    ld      h,a
+IF !__CPU_INTEL__
 	push	ix	;save callers
+ENDIF
 	push	hl	;fp
 	ld	hl,0	;sdcc mode
 	push	hl
@@ -32,7 +39,9 @@ _vfscanf:
 	pop	bc
 	pop	bc
 	pop	bc
+IF !__CPU_INTEL__
 	pop	ix	;restore callers
+ENDIF
 	ret
 
 

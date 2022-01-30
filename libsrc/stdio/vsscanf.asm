@@ -19,7 +19,9 @@
 vsscanf:
 	ld	hl,7
 	add	hl,sp		;hl=&buf+1
+IF !__CPU_INTEL__
 	push	ix		;save callers
+ENDIF
 
 	ld	b,(hl)		;buf
 	dec	hl
@@ -51,7 +53,9 @@ vsscanf:
 	pop	bc
 	pop	bc
 	pop	bc
+IF !__CPU_INTEL__
 	pop	ix
+ENDIF
 	ret
 
 

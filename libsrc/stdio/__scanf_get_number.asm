@@ -6,9 +6,17 @@
     EXTERN  __scanf_ungetchar
     EXTERN  __scanf_getchar
 
+    EXTERN  __scanf_check_suppressed
+    EXTERN  __scanf_check_long
+    EXTERN  __scanf_check_sign
+    EXTERN  __scanf_increment_conversions
+
     EXTERN	l_long_neg
     EXTERN	l_long_mult
     EXTERN  asm_toupper
+
+
+
 
 ; hl = fmt
 ; de = destination
@@ -17,8 +25,12 @@ __scanf_get_number:
     push    hl              ;save fmt
     push    de              ;save destination
     call    scanf_atoul
+IF __CPU_INTEL__
+    call    __scanf_check_suppressed
+ELSE
     and     a               ;clear carry
     bit     3,(ix-3)        ;assignment suppressed?
+ENDIF
     jr      nz,scanf_getnumber_suppressed
     ex      de,hl           ;long is hlde (i.e. reversed)
     ex      (sp),hl         ;*sp =top16, hl=destination
@@ -26,16 +38,23 @@ __scanf_get_number:
     inc     hl
     ld      (hl),d
     pop     de              ;de= most sig word of long
-
+IF __CPU_INTEL__
+    call    __scanf_check_long
+ELSE
     bit     1,(ix-3)
+ENDIF
     jr      z,scanf_getnumber_notlong
     inc     hl
     ld      (hl),e
     inc     hl
     ld      (hl),d
 scanf_getnumber_notlong:
-    pop     hl              ;fmt
+IF __CPU_INTEL__
+    call    __scanf_increment_conversions
+ELSE
     inc     (ix-1)          ;number of conversions done
+ENDIF
+    pop     hl              ;fmt
     ret
 scanf_getnumber_suppressed:
     pop     hl              ;rubbish
@@ -84,7 +103,11 @@ scanf_atoul_exit:
     ld      a,c
     call    __scanf_ungetchar
 scanf_atoul_exit2:
+IF __CPU_INTEL__
+    call    __scanf_check_sign
+ELSE
     bit     0,(ix-3)        ;sign flag
+ENDIF
     call    nz,l_long_neg
     ret
 	

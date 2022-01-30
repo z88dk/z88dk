@@ -16,15 +16,23 @@
 ;        printf1(fp, ungetc, getc, sccz80_delta, *ct,ct-1);
 ;}
 vfscanf:
-	pop	af
-	pop	hl	;ap
-	pop	de	;fmt
-	pop	bc	;fp
-	push	bc
-	push	de
-	push	hl
-	push	af
+    ld      hl,7
+    add     hl,sp
+    ld      b,(hl)      ;fp
+    dec     hl
+    ld      c,(hl)
+    dec     hl
+    ld      d,(hl)      ;fmt
+    dec     hl
+    ld      e,(hl)
+    dec     hl
+    ld      a,(hl)
+    dec     hl
+    ld      l,(hl)
+    ld      h,a
+IF !__CPU_INTEL__
 	push	ix	;save callers
+ENDIF
 
 	push	bc	;fp
 	ld	bc,1		;sccz80
@@ -36,7 +44,9 @@ vfscanf:
 	pop	bc
 	pop	bc
 	pop	bc
+IF !__CPU_INTEL__
 	pop	ix
+ENDIF
 	ret
 
 

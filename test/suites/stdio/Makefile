@@ -3,7 +3,7 @@ include ../make.config
 
 
 
-all:	test_scanf.bin test_sprintf.bin  test_scanf_rcm.bin test_sprintf_rcm.bin test_sprintf_8080.bin test_sprintf_gbz80.bin
+all:	test_scanf.bin test_sprintf.bin  test_scanf_rcm.bin test_sprintf_rcm.bin test_sprintf_8080.bin test_sprintf_gbz80.bin test_scanf_8080.bin
 
 
 test_scanf.bin: scanf.c $(SOURCES)
@@ -13,6 +13,10 @@ test_scanf.bin: scanf.c $(SOURCES)
 test_scanf_rcm.bin: scanf.c $(SOURCES)
 	$(compile_rcm)
 	$(runtest_rcm)
+
+test_scanf_8080.bin: scanf.c $(SOURCES)
+	$(compile_8080)
+	$(runtest_8080)
 
 test_sprintf.bin: sprintf.c $(SOURCES)
 	$(call compile,-lm)

@@ -21,7 +21,9 @@ sscanf:
 	ld	h,0
         add     hl,hl
 	add	hl,sp		;&buf
+IF !__CPU_INTEL__
 	push	ix		;save callers
+ENDIF
 	ld	c,(hl)		;buf
 	inc	hl
 	ld	b,(hl)
@@ -55,7 +57,9 @@ sscanf:
 	pop	bc
 	pop	bc
 	pop	bc
+IF !__CPU_INTEL__
 	pop	ix
+ENDIF
 	ret
 
 

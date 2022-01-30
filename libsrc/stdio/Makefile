@@ -5,11 +5,12 @@ include ../Make.config
 CFILES = $(wildcard *.c)
 ZSFILES = $(wildcard zsock/*.c) 
 AFILES = $(wildcard *.asm) $(wildcard conio/*.asm)
-AFILES_8080 = $(filter-out $(wildcard *scanf*.asm), $(wildcard *.asm)) $(wildcard conio/*.asm)
+AFILES_8080 = $(wildcard *.asm) $(wildcard conio/*.asm)
+AFILES_GBZ80 = $(filter-out $(wildcard *scanf*.asm), $(wildcard *.asm)) $(wildcard conio/*.asm)
 OFILES = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 CFILES_8080= 
 OFILES_8080 = $(CFILES:.c=.o) $(CFILES_8080:.c=.o)  $(AFILES_8080:.asm=.o)
-OFILES_GBZ80 = $(CFILES:.c=.o) $(CFILES_8080:.c=.o)  $(AFILES_8080:.asm=.o)
+OFILES_GBZ80 = $(CFILES:.c=.o) $(CFILES_8080:.c=.o)  $(AFILES_GBZ80:.asm=.o)
 
 
 all: dirs $(addprefix  obj/,$(OFILES)) $(addprefix obj/ixiy/,$(OFILES)) $(addprefix obj/net/,$(ZSFILES:.c=.o)) $(addprefix obj/binary/,$(OFILES)) $(addprefix obj/stdesc/,$(OFILES)) $(addprefix obj/r2k/,$(OFILES)) $(addprefix obj/8080/,$(OFILES_8080)) $(addprefix obj/gbz80/,$(OFILES_GBZ80))
