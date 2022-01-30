@@ -498,7 +498,7 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
             return snprintf(buffer, buffer_len, "<function>");
         }
         case TYPE_ARRAY: {
-            int maxlen = Max(10,Min(10, result->type.size));
+            int maxlen = Max(0, Min(10, result->type.size));
             int offs = snprintf(buffer, buffer_len, "%#04x [%d] = { ", result->as_pointer.ptr, result->type.size);
             uint16_t ptr = result->as_pointer.ptr;
             for ( int i = 0; i < maxlen; i++ ) {
