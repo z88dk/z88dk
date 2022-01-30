@@ -745,7 +745,7 @@ struct aligned_data
 };
 
 extern void mb_create_bankspace(struct banked_memory *memory, char *bank_id);
-extern void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory, struct aligned_data *aligned);
+extern void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *memory, struct aligned_data *aligned);
 extern int  mb_find_bankspace(struct banked_memory *memory, char *bankspace_name);
 extern int  mb_remove_bankspace(struct banked_memory *memory, char *bankspace_name);
 extern int  mb_remove_bank(struct bank_space *bs, unsigned int index, int clean);
@@ -761,6 +761,7 @@ extern void mb_generate_output_binary_complete(char *binname, int ihex, int fill
 extern void mb_delete_source_binaries(struct banked_memory *memory);
 extern void mb_cleanup_memory(struct banked_memory *memory);
 extern void mb_cleanup_aligned(struct aligned_data *aligned);
+extern int mb_print_info(struct banked_memory *memory);
 
 
 /* mgt.c */

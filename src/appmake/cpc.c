@@ -262,42 +262,6 @@ void putsilence(FILE* f, int length, unsigned long int* filesize)
  *
  * @param sb    Pointer to the section binary.
  **/
-void dumpSectionInfo(struct section_bin *sb)
-{
-    printf("bankname : %s\n", sb->section_name);
-    printf("filename : %s\n", sb->filename);
-    printf("offset   : 0x%04x\n", sb->offset);
-    printf("org      : 0x%04x\n", sb->org);
-    printf("size     : 0x%04x\n", sb->size);
-    printf("================\n");
-}
-
-/**
- * Display memory bank information.
- *
- * @param memory    Pointer to banked_memory structure
- **/
-int dumpBankInfo(struct banked_memory *memory)
-{
-    int bsnum;
-    int bank, section;
-    int banksFound = 0;
-
-    for (bsnum = 0; bsnum < memory->num; bsnum++)
-    {
-        for (bank = 0; bank < MAXBANKS; ++bank)
-        {
-            struct memory_bank *mb = &memory->bankspace[bsnum].membank[bank];
-
-            for (section = 0; section < mb->num; ++section)
-            {
-                dumpSectionInfo(&mb->secbin[section]);
-                banksFound++;
-            }
-        }
-    }
-    return (banksFound);
-}
 
 /**
  * Check if any memory banks cross a 16KB boundary.
@@ -725,7 +689,7 @@ int cpc_exec(char* target)
         mb_enumerate_banks(fmap, binname, &memory, &aligned);
         fclose(fmap);
 
-//        dumpBankInfo(&memory);
+//        mb_print_info(&memory);
 
         // Check if banks exceed 16KB limits
         checkBankLimits(&memory);

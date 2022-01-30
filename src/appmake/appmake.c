@@ -1167,7 +1167,7 @@ enum
     TYPE_SIZE
 };
 
-void mb_enumerate_banks(FILE *fmap, char *binname, struct banked_memory *memory, struct aligned_data *aligned)
+void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *memory, struct aligned_data *aligned)
 {
     char buffer[MBLINEMAX-6];           // Prevent sscanf of buffer overflowing symbol_name
     char symbol_name[MBLINEMAX-5];      // Prevent 'snprintf(section_name,...' overflow warning
@@ -1984,6 +1984,47 @@ void mb_cleanup_aligned(struct aligned_data *aligned)
     aligned->num = 0;
     aligned->array = NULL;
 }
+
+
+/**
+ * Display the information from a memory section.
+ *
+ * @param sb    Pointer to the section binary.
+ **/
+static void _mb_print_section_info(struct section_bin *sb)
+{
+    printf("bankname : %s\n", sb->section_name);
+    printf("filename : %s\n", sb->filename);
+    printf("offset   : 0x%04x\n", sb->offset);
+    printf("org      : 0x%04x\n", sb->org);
+    printf("size     : 0x%04x\n", sb->size);
+    printf("================\n");
+}
+
+/**
+ * Display memory bank information.
+ *
+ * @param memory    Pointer to banked_memory structure
+ **/
+int mb_print_info(struct banked_memory *memory)
+{
+    int bsnum;
+    int bank, section;
+    int banksFound = 0;
+
+    for (bsnum = 0; bsnum < memory->num; bsnum++) {
+        for (bank = 0; bank < MAXBANKS; ++bank) {
+            struct memory_bank *mb = &memory->bankspace[bsnum].membank[bank];
+
+            for (section = 0; section < mb->num; ++section) {
+                _mb_print_section_info(&mb->secbin[section]);
+                banksFound++;
+            }
+        }
+    }
+    return (banksFound);
+}
+
 
 
 // This bit of code is used (rather than stat), because we create a temporary file
