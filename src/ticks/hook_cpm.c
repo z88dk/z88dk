@@ -51,18 +51,17 @@ void hook_cpm(void)
                 addr++;
             }
             fflush(stdout);
-            break;
         }
+        break;
     case 0x0b:  // C_STAT
         /* Entered with C=0Bh. Returns A=L=status.
            Returns A=0 if no characters are waiting, nonzero if a character is waiting. */
         {
             int val;
-            if ( val = getch() == EOF )
-                val = 0;
+            if ( val = kbhit() == EOF )
+                a = l = 0;
             else
-                ungetc(val, stdin);
-            a = l = val;
+                a = l = val;
         }
         break;
     case 0x0c:  // S_BDOSVER

@@ -26,7 +26,7 @@ TIMING
 Change options to produce a ROM binary file.
 Enable -DSTATIC and -DTIMER only for CPP pre-defined symbols.
 
-Rebuild to produce SPECTRAL.BIN.
+Rebuild to produce WHETSTONE.BIN.
 
 Program size from the IDE dialog is: 6750 (ROM) + 169 (RAM) = 6919 bytes.
 The two other sections correspond to page zero and initialization code.
