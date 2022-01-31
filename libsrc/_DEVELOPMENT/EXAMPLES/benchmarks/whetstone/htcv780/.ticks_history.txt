@@ -1,5 +1,0 @@
-trace on
-continue
-help
-cont
-quit
