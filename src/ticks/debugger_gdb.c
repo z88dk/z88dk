@@ -699,6 +699,9 @@ static uint8_t process_packet()
 
     if (checksum != (hex(inbuf[packetend + 1]) << 4 | hex(inbuf[packetend + 2])))
     {
+        if (verbose) {
+            printf("Warning: incorrect checksum, expected: %02x\n", checksum);
+        }
         inbuf_erase_head(packetend + 3);
         return 1;
     }
