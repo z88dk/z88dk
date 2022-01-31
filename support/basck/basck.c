@@ -1,5 +1,6 @@
 /*
  *   ROM Basic analyzer, by Stefano Bodrato, APR 2016
+ *   Jan, 2022 - general cleanup, few entry names are now different
  *
  *   This tool looks for known 'fingerprints' in the code and tries to identify
  *   function entry points and to provide a cross-reference for further ROM analysis.
@@ -586,8 +587,13 @@ int mldebc_skel2[]={10, 0xC1, 3, 0x71, 0x23, 0x70, 0x23, 0xF5, CATCH_CALL, 0xF1,
 int mldebc_skel3[]={9, ADDR, 33, 0, 0, 0x78, 0xB1, 0xC8, 0x3E, 0x10};
 
 int intmul_skel[]={17, ADDR, 0x7C, 0xB5, 0xCA, SKIP, SKIP, 0xE5, 0xD5, SKIP_CALL, 0xC5, 0x44, 0x4D, 33, 0, 0, 0x3E, 0x10};
+int isub_skel[]={8, ADDR, 0x7C, 0x17, 0x9F, 0x47, SKIP_CALL, 0x79, 0x98 };
+int ineghl_skel[]={7, 0x7C, 0x17, 0x9F, 0x47, CATCH_CALL, 0x79, 0x98 };
+int iadd_skel[]={9, ADDR, 0x7C, 0x17, 0x9F, 0x47, 0xE5, 0x7A, 0x17, 0x9F };
 
 int dandor_skel[]={17, ADDR, 0x78,  0xF5, SKIP_CALL, 0xF1, 0xD1, 0xFE, SKIP, 0XCA, SKIP, SKIP, 0xFE, SKIP, 0XCA, SKIP, SKIP, 1};
+int finrel_skel[]={8, ADDR, 0x78,  0xFE, 100, 0xD0, 0xC5, 0xD5, 17};
+
 
 int asctfp_skel[]={10, ADDR, 0xFE, '-', 0xF5, 0xCA, SKIP, SKIP, 0xFE, '+', 0xCA};
 int asctfp_skel2[]={9, ADDR, 0xFE, '-', 0xF5, 0x28, SKIP, 0xFE, '+', 0x28};
@@ -2059,10 +2065,29 @@ int main(int argc, char *argv[])
 			clbl("GIVINT", img[res+19] + 256*img[res+20], "Return integer in [A][L] as function end.");
 		}
 
+		res=find_skel(finrel_skel);
+		if (res>0)
+			clbl("FINREL", res+pos+1, "Build an entry for a relational operator");
 
 		res=find_skel(intmul_skel);
 		if (res>0)
-			clbl("IMULT", res+pos+1, "Integer MULTIPLY");
+			clbl("IMULT", res+pos+1, "Integer MULTIPLY, (HL):=(DE)*(HL)");
+
+		res=find_skel(iadd_skel);
+		if (res>0)
+			clbl("IADD", res+pos+1, "Integer ADDITION, (HL):=(DE)+(HL)");
+
+		res=find_skel(isub_skel);
+		if (res>0)
+			clbl("ISUB", res+pos+1, "Integer SUBTRTACTION, (HL):=(DE)-(HL)");
+
+		res=find_skel(ineghl_skel);
+		if (res>0) {
+			clbl("IMULDV", res-12, "GET READY TO MULTIPLY OR DIVIDE");
+			clbl("INEGH", res-5, "NEGATE H,L");
+			clbl("INEGA", res-4, "NEGATE A");
+			clbl("INEGHL", res, "Negate HL");
+		}
 
 		res=find_skel(mldebc_skel);
 		if (res<0)
