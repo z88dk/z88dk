@@ -3,6 +3,7 @@
 	PUBLIC	_load_palette_gamegear
 	PUBLIC	asm_load_palette_gamegear
 
+	include	"macros.inc"
 ;==============================================================
 ; void load_palette(int *data, int index, int count)
 ;==============================================================
@@ -35,10 +36,9 @@
 ; c  = palette index to start at (<64)
 ;==============================================================
 .asm_load_palette_gamegear
-	ld 	a,c
-	out 	($bf),a     ; Palette index
-	ld 	a,$c0
-	out 	($bf),a     ; Palette write identifier
+
+	setCRAM	c
+
 	inc	c
 	; GGGGRRRR
 	ld	e,(hl)		;7
@@ -48,12 +48,11 @@
 	
 	ld	a,e
 	out	($be),a
-	ld 	a,c
-	out 	($bf),a     ; Palette index
-	ld 	a,$c0
-	out 	($bf),a     ; Palette write identifier
+
+	setCRAM	c
+
 	inc	c
-        nop
+	 nop
         nop
 	ld	a,d
 	out	($be),a

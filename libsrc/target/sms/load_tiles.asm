@@ -2,6 +2,7 @@
 	PUBLIC	load_tiles
 	PUBLIC	_load_tiles
 
+    include "macros.inc"
 ;==============================================================
 ; load_tiles(unsigned char *data, int index, int count, int bpp)	
 ;==============================================================
@@ -60,11 +61,8 @@ LoadTiles:
         rl h
         sla l
         rl h
-        ld a,l
-        out ($bf),a
-        ld a,h
-        or $40
-        out ($bf),a
+
+        setVRAM l, h
 
         ; I need to output bc*8 bytes so I need to modify bc (<<3)
         sla c

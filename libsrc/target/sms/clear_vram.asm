@@ -2,8 +2,8 @@
 	SECTION code_clib
 	PUBLIC	clear_vram
 	PUBLIC	_clear_vram
-	EXTERN	VRAMToHL
 	
+	include	"macros.inc"
 ;==============================================================
 ; Clear VRAM
 ;==============================================================
@@ -11,8 +11,9 @@
 ;==============================================================
 .clear_vram
 ._clear_vram
-	ld	hl,$0000
-	call	VRAMToHL
+
+	setVRAM	0, 0
+
 	; Output 16KB of zeroes
 	ld 	hl, $4000    ; Counter for 16KB of VRAM
 	ld 	a, $00       ; Value to write

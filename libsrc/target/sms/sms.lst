@@ -6,7 +6,6 @@ target/shared/clock
 target/sms/clear_vram
 target/sms/load_palette
 target/sms/load_palette_gamegear
-target/sms/VRAMToHL
 target/sms/load_tiles
 target/sms/DrawOneLine
 target/sms/set_bkg_map

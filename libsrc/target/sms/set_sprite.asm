@@ -2,9 +2,10 @@
 	PUBLIC	set_sprite
 	PUBLIC	_set_sprite
 
-        EXTERN  CONSOLE_YOFFSET
-        EXTERN  CONSOLE_XOFFSET
+    EXTERN  CONSOLE_YOFFSET
+    EXTERN  CONSOLE_XOFFSET
 
+	include	"macros.inc"
 ;==============================================================
 ; set_sprite(int n, int x, int y, int tile)	
 ;==============================================================
@@ -30,10 +31,7 @@
 	ld	e, (hl)		; N
 	
 	;vdp set addr (Y table)
-	ld	a, e
-	out	($bf), a
-	ld	a, $7f
-	out	($bf), a
+	setVRAM	e, $3f
 	
 	ld	a, b
 	out	($be), a	; Set Y
@@ -42,9 +40,7 @@
 	ld	a, e
 	add	a, a
 	or	$80
-	out	($bf), a
-	ld	a, $7f
-	out	($bf), a
+	setVRAM	a, $3f
 
 	ld a, c
 	out ($be), a		; Set X

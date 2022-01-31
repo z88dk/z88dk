@@ -2,10 +2,10 @@
 	PUBLIC	fputc_cons_native
 	
 	INCLUDE "target/sms/sms.hdr"
+	INCLUDE "target/sms/macros.inc"
 
-	EXTERN	VRAMToHL
-        EXTERN  CONSOLE_YOFFSET
-        EXTERN  CONSOLE_XOFFSET
+    EXTERN  CONSOLE_YOFFSET
+    EXTERN  CONSOLE_XOFFSET
 	PUBLIC	fputc_vdp_offs
 	
 .fputc_cons_native
@@ -15,7 +15,7 @@
 	ld	h, a			; Loads char offset
 	ld	de, NameTableAddress
 	add	hl, de			; Calculates name table address
-	call	VRAMToHL
+	setVRAM	l, h
 	
 	ld      hl,2
 	add     hl,sp

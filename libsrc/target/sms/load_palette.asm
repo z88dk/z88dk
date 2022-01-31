@@ -6,6 +6,7 @@
 
 	EXTERN	__GAMEGEAR_ENABLED
 
+	include	"macros.inc"
 ;==============================================================
 ; void load_palette(unsigned char *data, int index, int count)
 ;==============================================================
@@ -41,10 +42,9 @@
 ; c  = palette index to start at (<32)
 ;==============================================================
 .LoadPalette
-	ld 	a,c
-	out 	($bf),a     ; Palette index
-	ld 	a,$c0
-	out 	($bf),a     ; Palette write identifier
+
+	setCRAM	c
+
 .LoadPalette1
 	ld	a,(hl)		;7
 	out	($be),a
@@ -64,9 +64,9 @@
 .LoadPalette_6bit_gg
 	ld 	a,c
 	add	a
-	out 	($bf),a     ; Palette index
-	ld 	a,$c0
-	out 	($bf),a     ; Palette write identifier
+
+	setCRAM	a
+
 .LoadPalette2
 	; --BBGGRR
 	ld	a,(hl)		;7

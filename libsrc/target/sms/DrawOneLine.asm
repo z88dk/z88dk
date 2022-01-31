@@ -4,8 +4,7 @@
 	
 	INCLUDE "target/sms/sms.hdr"
 
-	
-	EXTERN	VRAMToHL
+	include	"macros.inc"
 
 ;==============================================================
 ; DrawOneLine
@@ -16,12 +15,7 @@
 ; c  = Number of bkg tiles to write
 ;==============================================================
 .DrawOneLine
-	push	hl
-	ld	h, d
-	ld	l, e
-	call	VRAMToHL	; Set VRAM write address
-	pop	hl
-	
+	setVRAM	e, d	; Set VRAM write address
 	push	af
 .loop
 	ld	a, (hl)

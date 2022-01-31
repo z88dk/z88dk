@@ -2,6 +2,7 @@
 	PUBLIC  set_vdp_reg
 	PUBLIC  _set_vdp_reg
 
+	include	"macros.inc"
 ;==============================================================
 ; void set_vdp_reg(int reg, int value)
 ;==============================================================
@@ -15,9 +16,6 @@
 	ld	a, (hl)		; Value
 	inc	hl
 	inc	hl
-	di
-	out	($bf),a
-	ld	a, (hl)		; Register #
-	out	($bf),a
-	ei
+	ld	l, (hl)
+	setVDPReg	a, l
 	ret
