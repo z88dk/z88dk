@@ -580,6 +580,7 @@ uint8_t debugger_restore(const char* file_path, uint16_t at)
 
     // zero out all registers except for pc
     struct debugger_regs_t regs;
+    bk.get_regs(&regs);
     int sp = regs.sp;
     memset(&regs, 0, sizeof(regs));
     regs.pc = at;
