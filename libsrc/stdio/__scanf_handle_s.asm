@@ -63,7 +63,7 @@ ENDIF
 scanf_fmt_s_done:
 IF __CPU_INTEL__
     call    __scanf_check_suppressed
-    xor     a
+    ld      a,0
 ELSE
     xor     a
     bit     3,(ix-3)        ;suppress setting

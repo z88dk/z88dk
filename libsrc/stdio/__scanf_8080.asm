@@ -12,6 +12,7 @@ PUBLIC  __scanf_check_sign
 PUBLIC  __scanf_check_width
 PUBLIC  __scanf_check_long
 PUBLIC  __scanf_set_width
+PUBLIC  __scanf_get_width
 PUBLIC  __scanf_set_signflag
 PUBLIC  __scanf_set_longflag
 PUBLIC  __scanf_set_suppressed
@@ -42,11 +43,14 @@ __scanf_decrement_bytesread:
     ld      hl,(__scanf_context)
     ld      de,-6
     add     hl,de
-    and     a
-    dec     (hl)
-    ret     nc
+    ld      e,(hl)
     inc     hl
-    dec     (hl)
+    ld      d,(hl)
+    dec     de
+    ld      (hl),d
+    dec     hl
+    ld      (hl),e
+    and     a
     ret
 
 
@@ -102,12 +106,12 @@ __scanf_set_width:
     or      4           ;bit 2
     ld      (hl),a
     dec     hl          ;-4
-    ld      (hl),d
+    ld      (hl),e
     pop     hl
     ret
 
 ; Exit: b = width
-___scanf_get_width:
+__scanf_get_width:
     push    hl
     ld      hl,(__scanf_context)
     dec     hl

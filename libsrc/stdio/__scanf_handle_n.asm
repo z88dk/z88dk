@@ -21,14 +21,17 @@ ENDIF
     jp      nz,scanf_loop
     call    __scanf_nextarg
 IF __CPU_INTEL__
+    push    hl
     ld      hl,(__scanf_context)
-    ld      bc,5
+    ld      bc,-6
     add     hl,bc
     ld      a,(hl)
     ld      (de),a
     inc     de
+    inc     hl
     ld      a,(hl)
     ld      (de),a
+    pop     hl
 ELSE
     ld      a,(ix-6)
     ld      (de),a

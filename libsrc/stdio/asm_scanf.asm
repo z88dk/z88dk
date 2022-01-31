@@ -75,11 +75,14 @@ IF __CPU_INTEL__
     ld      (hl),a      ;-4
     dec     hl
     ld      (hl),a      ;-5
+    dec     hl
+    ld      (hl),a      ;-6
 ELSE
     ld      (ix-1),a
     ld      (ix-2),a
     ld      (ix-4),a
     ld      (ix-5),a
+    ld      (ix-6),a
 ENDIF
 
 IF __CPU_R2KA__ | __CPU_R3K__
@@ -105,6 +108,7 @@ IF __CPU_INTEL__
     call    __scanf_reset_flags
 ELSE
     ld      (ix-3),0    ;reset flags for each loop
+    ld      (ix-4),0    ;reset width
 ENDIF
     ld      a,(hl)
     and     a
@@ -134,7 +138,7 @@ IF __CPU_INTEL__
     ld      de,-5
     add     hl,de
     ld      a,(hl)
-    dec     hl
+    dec     hl	;-6
     or      (hl)
     ld      de,-1
     jr      z,scanf_exit2
@@ -143,10 +147,8 @@ IF __CPU_INTEL__
     ld      e,(hl)
     ld      d,0
 ELSE
-    ld      e,(ix-6)
-    ld      d,(ix-5)
-    ld      a,d
-    or      e
+    ld      a,(ix-6)
+    or      (ix-5)
     ld      de,-1
     jr      z,scanf_exit2
     ld      e,(ix-1)
@@ -324,10 +326,15 @@ ENDIF
     call    fgetc
     pop     bc
 __scanf_getchar_return:
+    inc     hl
     ld      a,h    
     or      l
+    scf
+    jr      z,__scanf_getchar_return1
+    dec     hl
     ;inc    a    ; if eof then 0
     ld      a,l    ; set the return value
+    and     a
     scf
     jr      z,__scanf_getchar_return1
 IF __CPU_INTEL__
@@ -354,9 +361,11 @@ __scanf_ungetchar:
 IF __CPU_INTEL__
     call    __scanf_decrement_bytesread
 ELSE
-    dec     (ix-6)
-    jr      nc,__scanf_ungetchar1
-    dec     (ix-5)
+    ld      e,(ix-6)
+    ld      d,(ix-5)
+    dec     de
+    ld      (ix-5),d
+    ld      (ix-6),e
 ENDIF
 __scanf_ungetchar1:
     ld      l,a        ;character to unget

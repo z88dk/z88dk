@@ -7,6 +7,8 @@
     EXTERN  scanf_exit
     EXTERN  __scanf_parse_number
 
+    EXTERN  asm_toupper
+
     EXTERN  __scanf_b_fmt_entry_from_i
     EXTERN  __scanf_d_fmt_entry_from_i
     EXTERN  __scanf_o_fmt_entry_from_i
@@ -25,9 +27,7 @@ __scanf_handle_i:
     jp      __scanf_d_fmt_entry_from_i
 handle_i_fmt_octalorhex:
     call    __scanf_getchar
-    jp      c,__scanf_x_only_0_on_stream
-    cp      'x'
-    jp      z,__scanf_x_fmt_leader_found
+    call    asm_toupper
     cp      'X'
     jp      z,__scanf_x_fmt_leader_found
     ; Must be octal then
