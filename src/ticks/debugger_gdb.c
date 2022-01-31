@@ -923,7 +923,6 @@ int main(int argc, char **argv) {
 
         XMLDoc_free(&xml);
 
-        uint8_t got_ix = 0;
         uint8_t got_sp = 0;
         uint8_t got_pc = 0;
         if (verbose) {
@@ -932,10 +931,6 @@ int main(int argc, char **argv) {
         for (int i = 0; i < register_mappings_count; i++) {
             if (verbose) {
                 printf(" %s", register_mapping_names[register_mappings[i]]);
-            }
-            if (register_mappings[i] == REGISTER_MAPPING_IX) {
-                got_ix = 1;
-                continue;
             }
             if (register_mappings[i] == REGISTER_MAPPING_SP) {
                 got_sp = 1;
@@ -949,7 +944,7 @@ int main(int argc, char **argv) {
         if (verbose) {
             printf("\n");
         }
-        if (got_ix == 0 || got_pc == 0 || got_sp == 0) {
+        if (got_pc == 0 || got_sp == 0) {
             printf("Insufficient register information.\n");
         }
     }
