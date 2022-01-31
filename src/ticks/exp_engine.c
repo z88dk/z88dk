@@ -602,6 +602,7 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
                             buff[i++] = '.';
                         }
                     }
+                    buff[i] = 0;
                     return snprintf(buffer, buffer_len, "%#04x(\"%s\")", result->as_pointer.ptr, buff);
                 }
                 default: {

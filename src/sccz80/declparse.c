@@ -278,7 +278,7 @@ static Type *parse_enum(Type *type)
     type->size = 2;
     type->isunsigned = c_default_unsigned;
     if ( symname(sname) == 0 )
-        snprintf(sname, sizeof(sname),"0__anonenum_%d", num_enums_defined++);
+        snprintf(sname, sizeof(sname),"0__anonenum_%d_%d", lineno, num_enums_defined++);
     
     if ( (ptr = find_enum(sname)) == NULL ) {
         ptr = make_enum(sname);
@@ -401,7 +401,7 @@ Type *parse_struct(Type *type, char isstruct)
     } else {
         // Anonymous struct
         str = CALLOC(1,sizeof(*str));
-        snprintf(str->name, sizeof(str->name), "0__anon%s_%d", isstruct ? "struct" : "union", num_structs++);
+        snprintf(str->name, sizeof(str->name), "0__anon%s_%d_%d", isstruct ? "struct" : "union", lineno, num_structs++);
         str->kind = KIND_STRUCT;
         str->fields = array_init(free_type); 
         str->weak = 1;
