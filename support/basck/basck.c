@@ -663,6 +663,8 @@ int eval_skel[]={13, ADDR, 0x2B, 0x16, 0, 0xD5, 0x0E, 1, SKIP_CALL, SKIP_CALL, 0
 int eval_skel2[]={14, ADDR, 0x2B, 0x16, 0, 0xD5, 0x0E, 1, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0x22, SKIP, SKIP, 0x2A};
 int eval_skel3[]={18, ADDR, 0x2B, 0x16, 0, 0xD5, 0x0E, 1, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0xAF, 0x32, SKIP, SKIP, 0x22, SKIP, SKIP, 0x2A};
 
+int maclng_skel[]={19, ADDR, 0xED, 0x53, SKIP, SKIP, SKIP_CALL, 0xE5, 17, 0, 0, 0xD5, 0xF5, SKIP_CALL, SKIP_CALL, 0x41, 0x4A, 0x53, 0x78, 0xB1};
+
 int chksyn_skel[]={11, CATCH_CALL, '(', 0x2B, 0x16, 0, 0xD5, 0x0E, 1, SKIP_CALL, SKIP_CALL, 0x22};
 int chkstk_skel[]={11, SKIP_CALL, '(', 0x2B, 0x16, 0, 0xD5, 0x0E, 1, CATCH_CALL, SKIP_CALL, 0x22};
 int oprnd_skel2[]={11, SKIP_CALL, '(', 0x2B, 0x16, 0, 0xD5, 0x0E, 1, SKIP_CALL, CATCH_CALL, 0x22};
@@ -688,18 +690,6 @@ int makint_skel4[]={12, SKIP_CALL, SKIP_CALL, ADDR, SKIP, SKIP, 0xC2, SKIP, SKIP
 
 int getword_skel[]={8, CATCH_CALL, 0xD5, SKIP_CALL, ',', SKIP_CALL, 0xD1, 0x12, 0xc9};
 
-/*
-__POKE:
-  CALL L542F   ; GETWORD <--
-  PUSH DE
-  RST SYNCHR        ; Check syntax: next byte holds the byte to be found
-  INC L
-  CALL GETINT
-  POP DE
-  LD (DE),A
-  RET
-  */
-
 int inport_skel[]={13, SKIP_CALL, 0x32, CATCH, CATCH, 0x32, SKIP, SKIP, SKIP_CALL, ',', 0xC3, SKIP, SKIP, SKIP_CALL};
 int otport_skel[]={13, SKIP_CALL, 0x32, SKIP, SKIP, 0x32, CATCH, CATCH, SKIP_CALL, ',', 0xC3, SKIP, SKIP, SKIP_CALL};
 int inport_skel2[]={12, SKIP_CALL, 0x32, CATCH, CATCH, 0x32, SKIP, SKIP, SKIP_CALL, ',', 0x18, SKIP, SKIP_CALL};
@@ -708,17 +698,17 @@ int inport_skel3[]={12, SKIP_CALL, 0x32, CATCH, CATCH, 0x32, SKIP, SKIP, SKIP_CA
 int otport_skel3[]={12, SKIP_CALL, 0x32, SKIP, SKIP, 0x32, CATCH, CATCH, SKIP_CALL, ',', 0x2B, 0x23, SKIP_CALL};
 
 
-int outc_skel[]={15, 0x3A, SKIP, SKIP, 0x86, 0x3D, 0xB8, 0xD4, CATCH, CATCH, SKIP_CALL, 0xAF, 0xC4, SKIP, SKIP, 0xE1};
+int outdo_skel[]={15, 0x3A, SKIP, SKIP, 0x86, 0x3D, 0xB8, 0xD4, CATCH, CATCH, SKIP_CALL, 0xAF, 0xC4, SKIP, SKIP, 0xE1};
 int prs_skel2[]={15, 0x3A, SKIP, SKIP, 0x86, 0x3D, 0xB8, 0xD4, SKIP, SKIP, CATCH_CALL, 0xAF, 0xC4, SKIP, SKIP, 0xE1};
-int outc_skel2[]={12, 0x3A, SKIP, SKIP, 0x86, 0xB8, 0xD4, SKIP, SKIP, SKIP_CALL, 0x3E, 0x20, CATCH_CALL};
+int outdo_skel2[]={12, 0x3A, SKIP, SKIP, 0x86, 0xB8, 0xD4, SKIP, SKIP, SKIP_CALL, 0x3E, 0x20, CATCH_CALL};
 
 int prnums_skel[]={12, ADDR, 0x23, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0x1C, 0x1D, 0xC8, 0x0A, SKIP_CALL, 0xFE, 13};
 int prnums_skel2[]={12, ADDR, 0x23, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0x14, 0x15, 0xC8, 0x0A, SKIP_CALL, 0xFE, 13};
 
-int outc_skel3[]={11, 0x23, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0x1C, 0x1D, 0xC8, 0x0A, CATCH_CALL, 0xFE, 13};
-int outc_skel4[]={11, 0x23, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0x14, 0x15, 0xC8, 0x0A, CATCH_CALL, 0xFE, 13};
-int outc_skel5[]={6 ,0x3E, '?', CATCH_CALL, 0x3E, ' ', 0xCD};
-int outc_skel6[]={11 ,0x4F, 0xF1, 0xB7, 0x28, SKIP, 0x79, 0xFE, ' ', 0xD4, CATCH, CATCH};
+int outdo_skel3[]={11, 0x23, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0x1C, 0x1D, 0xC8, 0x0A, CATCH_CALL, 0xFE, 13};
+int outdo_skel4[]={11, 0x23, SKIP_CALL, SKIP_CALL, SKIP_CALL, 0x14, 0x15, 0xC8, 0x0A, CATCH_CALL, 0xFE, 13};
+int outdo_skel5[]={6 ,0x3E, '?', CATCH_CALL, 0x3E, ' ', 0xCD};
+int outdo_skel6[]={11 ,0x4F, 0xF1, 0xB7, 0x28, SKIP, 0x79, 0xFE, ' ', 0xD4, CATCH, CATCH};
 
 int numasc_skel[]={15, SKIP_CALL, CATCH_CALL, SKIP_CALL, SKIP_CALL, 1, SKIP, SKIP,  0xC5, 0x7E, 0x23, 0x23, 0xE5, SKIP_CALL, 0xE1, 0x4E};
 
@@ -752,6 +742,8 @@ int tmstpt_skel4[]={12, 0x2A, CATCH, CATCH, 0x2B, 0x46, 0x2B, 0x4E, 0x2B, 0x2B, 
 int datsnr_skel[]={15, ADDR, 0x2A, SKIP, SKIP, 0x22, SKIP, SKIP, 0x1E, 2, 1, 0x1E, SKIP, 1, 0x1E, SKIP};
 
 int ucase_skel[]={9, ADDR, 0x7E, 0xFE, 0x61, 0xD8, 0xFE, 0x7B, 0xD0, 0xE6, 0x5F, 0xC9};
+int isletter_skel[]={8, ADDR, 0xFE, 'A', 0xD8, 0xFE, 0x5B, 0x3F, 0xC9};
+int tstnum_skel[]={15, ADDR, 0x7E, 0xFE, '.', 0xCA, SKIP, SKIP, 0xFE, '9'+1, 0xD2, SKIP, SKIP, 0xFE, '0', 0xDA};
 
 
 /* Later Extended BASIC versions (MSX BASIC, Otrona Attache', Triumph Adler.. */
@@ -1698,12 +1690,6 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("INT_RESULT_A", res+pos, "Get back from function, result in A (signed)");
 
-		res=find_skel(int_hl_skel);
-		if (res<0)
-			res=find_skel(int_hl_skel2);
-		if (res>0)
-			clbl("MAKINT", res, "Get back from function, result in HL");
-
 		res=find_skel(unsigned_a_skel);
 		if (res<0)
 			res=find_skel(unsigned_a_skel2);
@@ -2239,16 +2225,29 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("CHR", res+pos+1, "CHR$ BASIC function");
 
-		res=find_skel(makint_skel);
+
+		res=find_skel(int_hl_skel);
+		if (res<0)
+			res=find_skel(int_hl_skel2);
+
+		if (res<0)
+			res=find_skel(makint_skel);
 		if (res<0)
 			res=find_skel(makint_skel2);
 		if (res<0)
 			res=find_skel(makint_skel3);
 		if (res<0)
 			res=find_skel(makint_skel4);
+
 		if (res>0)
 			clbl("MAKINT", res, "Convert tmp string to int in A register");
-
+/*
+		res=find_skel(int_hl_skel);
+		if (res<0)
+			res=find_skel(int_hl_skel2);
+		if (res>0)
+			clbl("MAKINT", res, "Get back from function, result in HL");
+*/
 		res=find_skel(concat_skel);
 		if (res>0)
 			clbl("CONCAT", res+pos+1, "String concatenation");
@@ -2284,45 +2283,55 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("OPNPAR", res+pos+1, "Chk Syntax, make sure '(' follows");
 
-
-		res=find_skel(getnum_skel);
-		if (res<0)
-			res=find_skel(getnum_skel2);
-		if (res<0)
-			res=find_skel(getnum_skel3);
+		res2=0;
+		res=find_skel(eval_skel);
 		if (res>0) {
-			//clbl("GETNUM", res, "BASIC interpreter entry to get a number (EVAL on recent versions)");
-			clbl("EVAL", res+pos+1, "(a.k.a. GETNUM, evaluate expression (GETNUM)");
+			res2++;
+			clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
 			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
-		} else {
-			res=find_skel(eval_skel);
-			if (res>0) {
-				clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
-				clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
-				clbl("EVAL2", res+pos+1+12, "Evaluate expression until precedence break");
-				clbl("EVAL3", res+pos+1+15, "Evaluate expression until precedence break");
-			}
-
-			res=find_skel(eval_skel2);
-			if (res>0) {
-				clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
-				clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
-				clbl("EVAL2", res+pos+1+15, "Evaluate expression until precedence break");
-				clbl("EVAL3", res+pos+1+18, "Evaluate expression until precedence break");
-			}
-
-			res=find_skel(eval_skel3);
-			if (res>0) {
-				clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
-				clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
-				clbl("EVAL2", res+pos+1+19, "Evaluate expression until precedence break");
-				clbl("EVAL3", res+pos+1+22, "Evaluate expression until precedence break");
-			}
+			clbl("EVAL2", res+pos+1+12, "Evaluate expression until precedence break");
+			clbl("EVAL3", res+pos+1+15, "Evaluate expression until precedence break");
 		}
 
-		res=find_skel(eval3_ex_skel);
+		res=find_skel(eval_skel2);
 		if (res>0) {
-			clbl("EVAL3", res+pos+1+3, "Evaluate expression until precedence break");
+			res2++;
+			clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
+			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+			clbl("EVAL2", res+pos+1+15, "Evaluate expression until precedence break");
+			clbl("EVAL3", res+pos+1+18, "Evaluate expression until precedence break");
+		}
+
+		res=find_skel(eval_skel3);
+		if (res>0) {
+			res2++;
+			clbl("EVAL", res+pos+1, "a.k.a. GETNUM, evaluate expression");
+			clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+			clbl("EVAL2", res+pos+1+19, "Evaluate expression until precedence break");
+			clbl("EVAL3", res+pos+1+22, "Evaluate expression until precedence break");
+		}
+
+
+		res=find_skel(maclng_skel);
+		if (res>0)
+			clbl("MACLNG", res+pos+1, "MACRO LANGUAGE DRIVER");
+
+		if (res2==0) {
+			res=find_skel(getnum_skel);
+			if (res<0)
+				res=find_skel(getnum_skel2);
+			if (res<0)
+				res=find_skel(getnum_skel3);
+			if (res>0) {
+				//clbl("GETNUM", res, "BASIC interpreter entry to get a number (EVAL on recent versions)");
+				clbl("EVAL", res+pos+1, "(a.k.a. GETNUM, evaluate expression (GETNUM)");
+				clbl("EVAL1", res+pos+1+3, "Save precedence and eval until precedence break");
+
+				res=find_skel(eval3_ex_skel);
+				if (res>0) {
+					clbl("EVAL3", res+pos+1+3, "Evaluate expression until precedence break");
+				}
+			}
 		}
 
 
@@ -2398,8 +2407,18 @@ int main(int argc, char *argv[])
 
 		res=find_skel(ucase_skel);
 		if (res>0) {
-			clbl("UCASE_HL", res+pos+1, "Get char from (HL) and make upper case");
+			clbl("MAKUPL", res+pos+1, "Get char from (HL) and make upper case");
 			clbl("UCASE", res+pos+2, "Make char in 'A' upper case");
+		}
+
+		res=find_skel(isletter_skel);
+		if (res>0) {
+			clbl("ISLETTER_A", res+pos+1, "Check char in 'A' being in the 'A'..'Z' range");
+		}
+
+		res=find_skel(tstnum_skel);
+		if (res>0) {
+			clbl("TSTNUM", res+pos+1, "Check char in 'A' being part of a number");
 		}
 
 		res=find_skel(getk_skel);
@@ -2407,19 +2426,19 @@ int main(int argc, char *argv[])
 			clbl("GETK", res, "Get key in 'A'");
 
 
-		res=find_skel(outc_skel);
+		res=find_skel(outdo_skel6);
 		if (res<0)
-			res=find_skel(outc_skel2);
+			res=find_skel(outdo_skel2);
 		if (res<0)
-			res=find_skel(outc_skel3);
+			res=find_skel(outdo_skel3);
 		if (res<0)
-			res=find_skel(outc_skel4);
+			res=find_skel(outdo_skel4);
 		if (res<0)
-			res=find_skel(outc_skel5);
+			res=find_skel(outdo_skel5);
 		if (res<0)
-			res=find_skel(outc_skel6);
+			res=find_skel(outdo_skel);
 		if (res>0)
-			clbl("OUTC", res, "Output char in 'A' to console");
+			clbl("OUTDO", res, "Output char in 'A' to console");
 
 
 		/* MS BASIC errors */
@@ -2429,7 +2448,7 @@ int main(int argc, char *argv[])
 		res=find_skel(datsnr_skel);
 		if (res>0) {
 			clbl("DATSNR", res+pos+1, "'SN err' entry for Input STMT");
-			clbl("SNERR", res+pos+1+6, "entry for '?SN ERROR'");
+			clbl("SN_ERR", res+pos+1+6, "entry for '?SN ERROR'");
 		}
 		res=find_skel(fcerr_skel);
 		if (res<0)
@@ -2439,11 +2458,11 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(fcerr_skel4);
 		if (res>0)
-			clbl("FCERR", res, "entry for '?FC ERROR'");
+			clbl("FC_ERR", res, "entry for '?FC ERROR'");
 
 		res=find_skel(ulerr_skel);
 		if (res>0)
-			clbl("ULERR", res, "entry for '?UL ERROR'");
+			clbl("UL_ERR", res, "entry for '?UL ERROR'");
 
 		res=find_skel(tty_ctlcodes_skel);
 		if (res>0) {
