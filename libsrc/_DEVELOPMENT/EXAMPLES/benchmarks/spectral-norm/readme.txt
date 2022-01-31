@@ -165,12 +165,14 @@ error: 2 * 10^(-7)
 cycle count  = 6279854918
 time @ 4MHz  = 6279854918 / 4*10^6 = 26 min 10 sec
 
-DISQ.
-HITECH C MSDOS V750
-? bytes exact
+12.
+HITECH C MSDOS V780pl2
+3780 bytes exact
 
-Disqualified due to incorrect results.
-HTC V750 does not have a functioning float library.
+error: 2 * 10^(-7)
+
+cycle count  = 6780314927
+time @ 4MHz  = 6780314927 / 4*10^6 = 28 min 15 sec
 
 
 BENCHMARKS GAME COMMENTS

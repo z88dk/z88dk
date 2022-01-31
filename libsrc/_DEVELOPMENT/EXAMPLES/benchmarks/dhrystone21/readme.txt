@@ -110,13 +110,13 @@ dhrystones/s = 20000 / 62.2107 = 311.1626
 DMIPS        = 311.1626 / 1757 = 0.1771
 
 3.
-HITECH C MSDOS V750
-7002 bytes exact
+HITECH C MSDOS V780pl2
+1895 bytes exact
 
-cycle count  = 288200126
-time @ 4MHz  = 288200126 / 4x10^6 = 72.0500 seconds
-dhrystones/s = 20000 / 72.0500 = 277.5849
-DMIPS        = 277.5849 / 1757 = 0.15799
+cycle count  = 280100135
+time @ 4MHz  = 280100135 / 4x10^6 = 70.0250 seconds
+dhrystones/s = 20000 / 70.0250 = 285.6121
+DMIPS        = 285.6121 / 1757 = 0.1625
 
 4.
 SDCC 3.6.5 #9842 (MINGW64)

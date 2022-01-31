@@ -100,11 +100,11 @@ time @ 4MHz  = 203788182 / 4*10^6 = 50.95 sec
 Large size caused by float package implemented in C.
 
 4.
-HITECH C MSDOS V750
-4121 bytes exact
+HITECH C MSDOS V780pl2
+4247 bytes exact
 
-cycle count  = 243708728
-time @ 4MHz  = 243708728 / 4x10^6 = 60.93 seconds
+cycle count  = 240336355
+time @ 4MHz  = 240336355 / 4x10^6 = 60.09 seconds
 
 5.
 Z88DK April 20, 2020

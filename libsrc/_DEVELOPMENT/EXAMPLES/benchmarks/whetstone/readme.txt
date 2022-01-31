@@ -255,10 +255,13 @@ time @ 4MHz  = 549592505 / 4x10^6 = 137.3981 seconds
 KWIPS        = 100*10*1 / 137.3981 = 7.2781
 MWIPS        = 7.2781 / 1000 = 0.0072781
 
-DISQ.
-HITECH C MSDOS V750
+12.
+HITECH C MSDOS V780pl2
 24 bit mantissa + 8 bit exponent
-7002 bytes exact
+6919 bytes exact
 
-Incorrect results.
-HTC V750 does not have a functioning float library.
+cycle count  = 614748605
+time @ 4MHz  = 614748605 / 4x10^6 = 153.6871 seconds
+KWIPS        = 100*10*1 / 153.6871 = 6.5067
+MWIPS        = 6.5067 / 1000 = 0.0065067
+

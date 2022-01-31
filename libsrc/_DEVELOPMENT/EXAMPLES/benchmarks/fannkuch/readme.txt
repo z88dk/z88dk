@@ -55,11 +55,11 @@ RESULTS
 =======
 
 1.
-HITECH C MSDOS V750
-716 bytes exact
+HITECH C MSDOS V780pl2
+868 bytes exact
 
-cycle count  = 49858382
-time @ 4MHz  = 49858382 / 4x10^6 = 12.46 sec
+cycle count  = 51982515
+time @ 4MHz  = 51982515 / 4x10^6 = 12.99 seconds
 
 2.
 Z88DK April 20, 2020

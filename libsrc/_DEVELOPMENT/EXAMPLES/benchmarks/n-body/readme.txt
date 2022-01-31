@@ -201,18 +201,21 @@ time @ 4MHz  = 1852019035 / 4*10^6 =  7 min 43 sec
 
 Microsoft 32-bit float implementation, accurate to 7 significant digits.
 
+13.
+HITECH C MSDOS V780pl2
+3736 bytes exact
+
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1600543903
+time @ 4MHz  = 1600543903 / 4*10^6 = 6 min 40 sec
+
 DISQ.
 HITECH C CPM V309
 ???? bytes less cpm overhead
 
 Unable to compile.
-
-DQ.
-HITECH C MSDOS V750
-? bytes exact
-
-Disqualified due to incorrect results.
-HTC v750 does not have a functioning float library.
 
 
 BENCHMARKS GAME COMMENTS

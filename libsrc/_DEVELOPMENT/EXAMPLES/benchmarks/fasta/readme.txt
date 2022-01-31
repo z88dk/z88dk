@@ -142,11 +142,10 @@ time @ 4MHz  = 215257269 / 4*10^6 = 53.81 sec
 Microsoft 32-bit float implementation.
 
 DISQ.
-HITECH C MSDOS V750
+HITECH C MSDOS V780pl2
 4121 bytes exact
 
 Disqualified due to incorrect results.
-HTC V750 does not have a functioning float library.
 
 
 BENCHMARKS GAME COMMENTS

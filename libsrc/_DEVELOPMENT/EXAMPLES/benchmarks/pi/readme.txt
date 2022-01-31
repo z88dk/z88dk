@@ -108,11 +108,11 @@ cycle count  = 4056462302
 time @ 4MHz  = 4056462302 / 4*10^6 = 16 min 54 sec
 
 7.
-HITECH C MSDOS V750
-6337 bytes exact
+HITECH C MSDOS V780pl2
+6593 bytes exact
 
-cycle count  = 5520768427
-time @ 4MHz  = 5520768427 / 4x10^6 = 23 min 00 sec
+cycle count  = 5528979464
+time @ 4MHz  = 5528979464 / 4x10^6 = 23 min 02 sec
 
 8.
 HITECH C CPM V309
@@ -183,11 +183,11 @@ cycle count  = 2609489119
 time @ 4MHz  = 2609489119 / 4*10^6 = 10 min 52 sec
 
 5.
-HITECH C MSDOS V750
-6486 bytes exact
+HITECH C MSDOS V780pl2
+6728 bytes exact
 
-cycle count  = 5884356227
-time @ 4MHz  = 5884356227 / 4x10^6 = 24 min 31 sec
+cycle count  = 5892567264
+time @ 4MHz  = 5892567264 / 4x10^6 = 24 min 33 sec
 
 It looks like HTC implements ldiv() as two separate divisions.
 

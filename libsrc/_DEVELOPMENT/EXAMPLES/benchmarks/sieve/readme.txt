@@ -75,11 +75,11 @@ cycle count  = 3665494
 time @ 4MHZ  = 3665494 / 4*10^6 = 0.9163 sec
 
 2.
-HITECH C MSDOS V750
-8243 bytes exact
+HITECH C MSDOS V780pl2
+8472 bytes exact
 
-cycle count  = 3672107
-time @ 4MHz  = 3672107 / 4x10^6 = 0.9180 sec
+cycle count  = 3885436
+time @ 4MHz  = 3885436 / 4x10^6 = 0.9713 seconds
 
 3.
 IAR Z80 V4.06A

@@ -177,11 +177,10 @@ cycle count  = 1806589346
 time @ 4MHz  = 1806589346 / 4*10^6 =  7 min 32 sec
 
 DISQ.
-HITECH C MSDOS V750
-1526 bytes exact
+HITECH C MSDOS V780pl2
+1679 bytes exact
 
 Disqualified due to incorrect results.
-HTCv750 does not have a functioning float library.
 
 
 BENCHMARKS GAME COMMENTS

@@ -1,0 +1,3 @@
+trace on
+cont
+quit
