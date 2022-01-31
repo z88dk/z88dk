@@ -32,6 +32,7 @@ static sem_t* trap_mutex = NULL;
 static pthread_cond_t network_op_cond;
 static pthread_mutex_t network_op_mutex;
 static pthread_mutex_t trap_process_mutex;
+static int supported_packet_size = 1024;
 static trapped_action_t scheduled_action = NULL;
 static const void* scheduled_action_data = NULL;
 static void* scheduled_action_response = NULL;
@@ -554,11 +555,19 @@ uint8_t debugger_restore(const char* file_path, uint16_t at)
         return 1;
     }
 
+    printf("Restoring... ");
+    fflush(stdout);
+
     size_t addr = at;
 
-    uint8_t buff[256];
+    int post_at_once = (supported_packet_size - 16) / 2;
+    if (post_at_once > 256) {
+        post_at_once = 256;
+    }
+
+    uint8_t buff[post_at_once];
     size_t read_;
-    while ((read_ = fread(buff, 1, 256, f)))
+    while ((read_ = fread(buff, 1, post_at_once, f)))
     {
         char s[1024];
         int offset;
@@ -577,6 +586,8 @@ uint8_t debugger_restore(const char* file_path, uint16_t at)
     fclose(f);
 
     mem_requested_amount = 0;
+
+    printf("OK\n");
 
     // zero out all registers except for pc
     struct debugger_regs_t regs;
@@ -864,6 +875,21 @@ int main(int argc, char **argv) {
         if (strstr(supported, "NonBreakable")) {
             printf("Warning: remote is not breakable; cannot request execution to stop from here\n");
             bk.breakable = 0;
+        }
+
+        int pkt_size;
+        const char* pkt_size_str = strstr(supported, "PacketSize");
+        if (pkt_size_str == NULL) {
+            printf("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
+        } else {
+            if (sscanf(pkt_size_str, "PacketSize=%d", &pkt_size) != 1) {
+                printf("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
+            } else {
+                supported_packet_size = pkt_size;
+                if (verbose) {
+                    printf("Synced on packet size: %d\n", supported_packet_size);
+                }
+            }
         }
     }
 
