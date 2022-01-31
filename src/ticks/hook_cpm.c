@@ -78,7 +78,7 @@ void hook_cpm(void)
             a = l = 0xff; // Selecting an unavailable drive.
         break;
     case 0x19:  // DRV_GET
-        /* Entered with C=0Eh, E=drive number. Returns L=A=0 or 0FFh. */
+        /* Entered with C=19h, E=drive number. Returns L=A=0 or 0FFh. */
         if ( e == 0 )
             a = l = 0;  // Current drive is a
         else
