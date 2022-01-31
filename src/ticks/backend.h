@@ -42,6 +42,7 @@ typedef struct {
     debugger_write_memory_cb debugger_write_memory;
     debugger_read_memory_cb debugger_read_memory;
     void_cb invalidate;
+    uint8_t breakable;
     void_cb break_;
     void_cb resume;
     void_cb next;

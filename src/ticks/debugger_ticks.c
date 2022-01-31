@@ -193,6 +193,7 @@ backend_t ticks_debugger_backend = {
     .debugger_write_memory = &debugger_write_memory,
     .debugger_read_memory = &debugger_read_memory,
     .invalidate = &invalidate,
+    .breakable = 1,
     .break_ = &break_,
     .resume = &resume,
     .next = &next,

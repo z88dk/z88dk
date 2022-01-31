@@ -280,8 +280,12 @@ void debugger_process_signals()
 {
     if (break_required)
     {
-        printf("Requesting a break...\n");
-        bk.break_();
+        if (bk.breakable) {
+            printf("Requesting a break...\n");
+            bk.break_();
+        } else {
+            printf("Warning: cannot request a break, use other means\n");
+        }
         break_required = 0;
         return;
     }

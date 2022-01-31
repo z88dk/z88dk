@@ -603,6 +603,7 @@ static backend_t gdb_backend = {
     .debugger_write_memory = &debugger_write_memory,
     .debugger_read_memory = &debugger_read_memory,
     .invalidate = &invalidate,
+    .breakable = 1,
     .break_ = &debugger_break,
     .resume = &debugger_resume,
     .next = &debugger_next,
@@ -854,6 +855,11 @@ int main(int argc, char **argv) {
         {
             printf("Remote target does not support qXfer:features:read+\n");
             goto shutdown;
+        }
+
+        if (strstr(supported, "NonBreakable")) {
+            printf("Warning: remote is not breakable; cannot request execution to stop from here\n");
+            bk.breakable = 0;
         }
     }
 
