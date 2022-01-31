@@ -35,7 +35,7 @@
     PUBLIC    raster_procs    ;Raster interrupt handlers
     PUBLIC    pause_procs    ;Pause interrupt handlers
     
-    PUBLIC    timer        ;This is incremented every time a VBL/HBL interrupt happens
+    PUBLIC    _timer         ;This is incremented every time a VBL/HBL interrupt happens
     PUBLIC    _pause_flag    ;This alternates between 0 and 1 every time pause is pressed
     
 
@@ -94,14 +94,9 @@ int_RASTER:
 
 ;int_VBL: 
     push    hl 
-    ld      hl, timer 
-    ld      a, (hl) 
-    inc     a 
-    ld      (hl), a 
-    inc     hl 
-    ld      a, (hl) 
-    adc     a, 1 
-    ld      (hl), a     ;Increments the timer 
+    ld      hl, (_timer)
+    inc     hl
+    ld      (_timer), hl
     ld      hl, raster_procs 
     call    int_handler 
     pop     hl 
@@ -325,7 +320,7 @@ ENDIF
         SECTION bss_crt
 raster_procs:       defs    16    ;Raster interrupt handlers
 pause_procs:        defs    16    ;Pause interrupt handlers
-timer:              defw    0    ;This is incremented every time a VBL/HBL interrupt happens
+_timer:             defw    0    ;This is incremented every time a VBL interrupt happens
 _pause_flag:        defb    0    ;This alternates between 0 and 1 every time pause is pressed
 __gamegear_flag:    defb    0    ;Non zero if running on a gamegear
 
