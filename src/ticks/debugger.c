@@ -276,6 +276,8 @@ static void completion(const char *buf, linenoiseCompletions *lc, void *ctx)
     }
 }
 
+static uint8_t confirm(const char* message);
+
 void debugger_process_signals()
 {
     if (break_required)
@@ -284,7 +286,10 @@ void debugger_process_signals()
             printf("Requesting a break...\n");
             bk.break_();
         } else {
-            printf("Warning: cannot request a break, use other means\n");
+            if (confirm("Cannot request a break, would you like to quit instead?"))
+            {
+                exit(1);
+            }
         }
         break_required = 0;
         return;
