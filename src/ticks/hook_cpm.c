@@ -59,9 +59,8 @@ void hook_cpm(void)
         {
             int val;
             if ( val = kbhit() == EOF )
-                a = l = 0;
-            else
-                a = l = val;
+                val = 0;
+            a = l = val;
         }
         break;
     case 0x0c:  // S_BDOSVER
@@ -88,7 +87,8 @@ void hook_cpm(void)
         if ( e == 0xff )
             a = l = user_num;
         else
-            if ( e >= 0 && e < 16 ) user_num = e;
+            if ( e >= 0 && e < 16 )
+                user_num = e;
         break;
     default:
         fprintf(stderr,"Unsupported BDOS call %d\n",c);
