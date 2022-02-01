@@ -198,6 +198,7 @@ IF __GAMEGEAR__
 ENDIF
     ret
 
+IF __GAMEGEAR__
 gg_palette:
     defw 0x0000             ;transparent
     defw 0x0000             ;00 00 00
@@ -215,6 +216,7 @@ gg_palette:
     defw 0x0f0f             ;ff 00 ff
     defw 0x0555             ;55 55 55
     defw 0x0fff             ;ff ff ff
+ENDIF
 
     DEFC SpriteSet          = 0       ; 0 for sprites to use tiles 0-255, 1 for 256+
     DEFC NameTableAddress   = $3800   ; must be a multiple of $800; usually $3800; fills $700 bytes (unstretched)
