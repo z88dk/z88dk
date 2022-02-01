@@ -221,7 +221,7 @@ gg_palette:
     DEFC SpriteTableAddress = $3f00   ; must be a multiple of $100; usually $3f00; fills $100 bytes
 
 _Data: 
-    defb @00000100,$80 
+    defb @00000110,$80
     ;     |||||||`- Disable synch 
     ;     ||||||`-- Enable extra height modes 
     ;     |||||`--- SMS mode instead of SG 
@@ -241,7 +241,7 @@ _Data:
     defb $FF,$83 
     defb $FF,$84 
     defb (SpriteTableAddress/128)|@10000001,$85 
-    defb (SpriteSet/2^2)         |@11111011,$86 
+    defb (SpriteSet<<2)          |@00000011,$86
     defb $f|$f0,$87 
     ;     `-------- Border palette colour (sprite palette) 
     defb $00,$88 
