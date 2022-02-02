@@ -129,6 +129,7 @@ static int cmd_hotspot(int argc, char **argv);
 static int cmd_list(int argc, char **argv);
 static int cmd_del_break(int argc, char **argv);
 static int cmd_restore(int argc, char **argv);
+static int cmd_restore_pc(int argc, char **argv);
 static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
 static void print_hotspots();
@@ -167,7 +168,8 @@ static command commands[] = {
     { "hotspot",   cmd_hotspot,     "<on/off>",             "Track address counts and write to hotspots file"},
     { "list",      cmd_list,        "[<address>]",          "List the source code at location given or pc"},
     { "help",      cmd_help,        "",                     "Display this help text" },
-    { "restore",   cmd_restore,     "<path> [<address>]",   "Upload binary into machine memory"},
+    { "restore",   cmd_restore,     "<path> [<address>]",   "Upload binary into machine memory, keep PC intact"},
+    { "restore_pc",cmd_restore_pc,  "<path> [<address>]",   "Upload binary into machine memory and set PC to that address"},
     { "quit",      cmd_quit,        "",   "Quit ticks"},
     { NULL, NULL, NULL }
 };
@@ -1744,20 +1746,42 @@ static int cmd_quit(int argc, char **argv)
     exit(0);
 }
 
-static int cmd_restore(int argc, char **argv)
+static int get_restore_address(int argc, char **argv)
 {
-    int address;
     if ( argc == 3 ) {
-        address = parse_address(argv[2]);
+        return parse_address(argv[2]);
     } else {
-        address = symbol_resolve("__head");
+        int address = symbol_resolve("__head");
         if (address == -1) {
             printf("Warning: could not resolve starting address and no address is provided.\n");
             return 0;
         }
+        return address;
+    }
+}
+
+static int cmd_restore(int argc, char **argv)
+{
+    int address = get_restore_address(argc, argv);
+    if (address == 0) {
+        return 0;
     }
 
-    if (bk.restore(argv[1], address))
+    if (bk.restore(argv[1], address, 0)) {
+        return 0;
+    }
+
+    return 1;
+}
+
+static int cmd_restore_pc(int argc, char **argv)
+{
+    int address = get_restore_address(argc, argv);
+    if (address == 0) {
+        return 0;
+    }
+
+    if (bk.restore(argv[1], address, 0))
     {
         return 0;
     }

@@ -546,7 +546,7 @@ void debugger_step()
     debugger_active = 0;
 }
 
-uint8_t debugger_restore(const char* file_path, uint16_t at)
+uint8_t debugger_restore(const char* file_path, uint16_t at, uint8_t set_pc)
 {
     FILE *f = fopen(file_path, "rb");
     if (f == NULL)
@@ -589,14 +589,16 @@ uint8_t debugger_restore(const char* file_path, uint16_t at)
 
     printf("OK\n");
 
-    // zero out all registers except for pc
-    struct debugger_regs_t regs;
-    bk.get_regs(&regs);
-    int sp = regs.sp;
-    memset(&regs, 0, sizeof(regs));
-    regs.pc = at;
-    regs.sp = sp;
-    set_regs(&regs);
+    if (set_pc) {
+        // zero out all registers except for pc
+        struct debugger_regs_t regs;
+        bk.get_regs(&regs);
+        int sp = regs.sp;
+        memset(&regs, 0, sizeof(regs));
+        regs.pc = at;
+        regs.sp = sp;
+        set_regs(&regs);
+    }
     return 0;
 }
 

@@ -127,7 +127,7 @@ void invalidate() {}
 void break_() {debugger_active=1; }
 void resume() {}
 void detach() {}
-uint8_t restore(const char* file_path, uint16_t at) {
+uint8_t restore(const char* file_path, uint16_t at, uint8_t set_pc) {
     printf("Not supported.\n");
     return 1;
 }
