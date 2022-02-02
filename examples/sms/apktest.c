@@ -12,7 +12,7 @@ extern char testtxt_apk[];
 void main() {
 	char buf[100];
 
-	aplib_depack(testtxt_apk, buf);
+	aplib_depack(buf, testtxt_apk);
 
         clear_vram();
 	set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_SCREEN);
