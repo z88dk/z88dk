@@ -21,6 +21,10 @@
     IF !DEFINED_MSXDOS
         defc MSXDOS = 5
     ENDIF
+
+    IF !DEFINED_CRT_DISABLELOADER
+        defc CRT_DISABLELOADER = 1
+    ENDIF
     PUBLIC MSXDOS
     
     INCLUDE "crt/classic/crt_rules.inc"
@@ -55,6 +59,12 @@ ENDIF
     INCLUDE	"crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
     ld      (exitsp),sp
+
+IF CLIB_MSXDOS = 2
+  IF CRT_DISABLELOADER != 1
+    call    loadbanks
+  ENDIF
+ENDIF
 
 IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
@@ -94,6 +104,183 @@ l_dcal:
     jp      (hl)
 
 
+IF CLIB_MSXDOS = 2
+  IF CRT_DISABLELOADER != 1
+
+  PUBLIC banked_call
+banked_call:
+    pop     hl              ; Get the return address
+    ld      (mainsp),sp
+    ld      sp,(tempsp)
+    call    GET_P2
+    push    af              ; Push the current bank onto the stack
+    ld      e,(hl)          ; Fetch the call address
+    inc     hl
+    ld      d,(hl)
+    inc     hl
+    ld      a,(hl)          ; ...and page
+    inc     hl
+    inc     hl              ; Yes this should be here
+    push    hl              ; Push the real return address
+    ld      hl,bank_mappings ; Mapping 0-255 to actual segment ids
+    add     l
+    ld      l,a
+    ld      a,0
+    adc     h
+    ld      h,a
+    ld      a,(hl)          ;Get the real bank
+    ld      (tempsp),sp
+    ld      sp,(mainsp)
+    call    PUT_P2
+    ld      l,e
+    ld      h,d
+    call    l_dcal          ; jp(hl)
+    ld      (mainsp),sp
+    ld      sp,(tempsp)
+    pop     bc              ; Get the return address
+    pop     af              ; Pop the old bank
+    ld      (tempsp),sp
+    ld      sp,(mainsp)
+    call    PUT_P2
+    push    bc
+    ret
+
+
+hexit:
+    ld      c,a
+    rrca
+    rrca
+    rrca
+    rrca
+    call    dohex
+    ld      a,c
+dohex:
+    and     15
+    ld      b,'0'
+    cp      10
+    jr      c,not_alpha
+    ld      b,'A' - 10
+not_alpha:
+    add     b
+    ld      (hl),a
+    inc     hl
+    ret
+
+
+loadbanks:
+    ; Setup mapper, extract info etc
+    ld      a,($FB20)   ;HOKVLD
+    rrca
+    ret     nc          ;No extended bios, can't do memory mapping
+    xor     a
+    ld      de,$0401
+    call    $FFCA   ;EXTBIO
+    xor     a
+    ld      de,$0402
+    call    $FFCA   ;EXTBIO
+    and     a
+    ret     z
+    ld      de,dos2_jump
+    ld      bc,dos2_end - dos2_jump
+    ldir
+
+    ld      hl,__crt_loader_filename
+find_ext:
+    ld      a,(hl)
+    cp      '.'
+    inc     hl
+    jr      nz,find_ext
+    ld      (extension),hl
+
+    ld      a,0     ;Bank number to start loading from
+load_loop:
+    push    af      ;Bank number
+    ld      hl,(extension)
+    call    hexit
+    inc     hl
+    ld      (hl),'$'
+    ld      de,__crt_loader_filename
+    ld      a,1             ;READ only
+    ld      c,$43           ;OPEN
+    call    5
+    and     a
+    jp      nz,next_file
+    push    bc              ;b=fd
+    ; Allocate a bank
+    ld      b,0             ;Primary mapper
+    ld      a,0             ;Allocate user segment
+    call    ALL_SEG
+    pop     bc
+    jr      c,close_file
+    ld      c,a             ;Save allocated segment
+    pop     af
+    push    af
+    ld      e,a
+    ld      hl,bank_mappings
+    ld      d,0
+    add     hl,de
+    ld      (hl),c         ;Save mapping
+    ld      a,c
+    call    PUT_P2
+    ; b = file handler
+    ld      de,32768       ;Just read a banks worth, don't care how much really
+    ld      hl,16384
+    ld      c,$48          ;Read
+    push    bc
+    call    5
+    pop     bc
+close_file:
+    ld      c,$45           ;Close
+    call    5
+next_file:
+    pop     af
+    inc     a
+    cp      4
+    jr      nz,load_loop
+    ret
+
+
+; Populated by appmake
+    PUBLIC  __crt_loader_filename
+extension:
+    defw    0
+__crt_loader_filename:
+    defm    "BANK.00"
+    defs    12
+
+
+bank_mappings:
+    defs        256	    ;This is far too many
+
+; Jump table (copied from on high)
+dos2_jump:
+ALL_SEG:    defs    3   ;Allocate a 16k segment.
+FRE_SEG:    defs    3   ;Free a 16k segment.
+RD_SEG:     defs    3   ;Read byte from address A:HL to A
+WR_SEG:     defs    3   ;Write byte from E to address A:HL.
+CAL_SEG:    defs    3   ;Inter-segment call.  Address in IYh:IX
+CALLS:      defs    3   ;Inter-segment call.  Address in line after the call instruction.
+PUT_PH:     defs    3   ;Put segment into page (HL).
+GET_PH:     defs    3   ;Get current segment for page (HL)
+PUT_P0:     defs    3   ;Put segment into page 0.
+GET_P0:     defs    3   ;Get current segment for page 0.
+PUT_P1:	    defs    3   ;Put segment into page 1.
+GET_P1:     defs    3   ;Get current segment for page 1.
+PUT_P2:     defs    3   ;Put segment into page 2.
+GET_P2:     defs    3   ;Get current segment for page 2.
+PUT_P3:     defs    3   ;Not supported since page-3 must never be changed.  Acts like a "NOP" if called.
+GET_P3:     defs    3   ;Get current segment for page 3.
+dos2_end:
+
+mainsp: defw    0
+
+tempstack:      defs    CLIB_BANKING_STACK_SIZE
+
+tempsp: defw    tempstack + CLIB_BANKING_STACK_SIZE
+
+  ENDIF
+ENDIF
+
     INCLUDE "crt/classic/crt_runtime_selection.asm"
     INCLUDE "crt/classic/crt_section.asm"
 IF CLIB_MSXDOS = 1
@@ -104,4 +291,11 @@ ENDIF
 
     PUBLIC  brksave
 brksave:    defb    1
+
+IF CLIB_MSXDOS = 2
+  IF CRT_DISABLELOADER != 1
+    ; Include a lot of banks (org to 0x8000)
+    INCLUDE "target/msx/classic/megarom.asm"
+  ENDIF
+ENDIF
 
