@@ -427,41 +427,11 @@ _m32_tanhf:
 	push	af
 	push	af
 	call	_m32_expf
-	ex	(sp), hl
-	ld	(ix-6),e
-	ld	(ix-5),d
-	pop	hl
-	push	hl
-	ld	e,(ix-6)
-	ld	d,(ix-5)
-	call	_m32_invf
-	push	de
-	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	call	___fssub_callee
 	ld	(ix-4),l
 	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
-	pop	hl
-	push	hl
-	ld	e,(ix-6)
-	ld	d,(ix-5)
 	call	_m32_invf
-	push	de
-	push	hl
-	ld	l,(ix-6)
-	ld	h,(ix-5)
-	push	hl
-	ld	l,(ix-8)
-	ld	h,(ix-7)
-	push	hl
-	call	___fsadd_callee
 	push	de
 	push	hl
 	ld	l,(ix-2)
@@ -469,6 +439,32 @@ _m32_tanhf:
 	push	hl
 	ld	l,(ix-4)
 	ld	h,(ix-3)
+	push	hl
+	call	___fssub_callee
+	ex	(sp), hl
+	ld	(ix-6),e
+	ld	(ix-5),d
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	ld	e,(ix-2)
+	ld	d,(ix-1)
+	call	_m32_invf
+	push	de
+	push	hl
+	ld	l,(ix-2)
+	ld	h,(ix-1)
+	push	hl
+	ld	l,(ix-4)
+	ld	h,(ix-3)
+	push	hl
+	call	___fsadd_callee
+	push	de
+	push	hl
+	ld	l,(ix-6)
+	ld	h,(ix-5)
+	push	hl
+	ld	l,(ix-8)
+	ld	h,(ix-7)
 	push	hl
 	call	___fsdiv
 	ld	sp,ix
