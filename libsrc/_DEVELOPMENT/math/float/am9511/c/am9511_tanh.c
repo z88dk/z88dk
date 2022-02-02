@@ -3,11 +3,10 @@
 
 float am9511_tanh (float x) __z88dk_fastcall
 {
-    float y,z;
+    float y;
 
     y = exp(x);
-    z = 1/y;
-    
-    return (y - z)/(y + z);
+    x = 1.0/y;
+    return (y - x)/(y + x);
 }
 

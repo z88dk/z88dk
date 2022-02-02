@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Jan 19 19:21:58 2022
+;	Module compile time: Wed Feb  2 15:03:02 2022
 
 
 	C_LINE	0,"am9511_cosh.c"
@@ -223,13 +223,9 @@
 ._am9511_cosh
 	push	de
 	push	hl
-	push	bc
-	push	bc
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	ld	hl,6	;const
-	add	hl,sp
 	call	l_glong
 	call	_exp
 	pop	bc
@@ -243,8 +239,6 @@
 	call	l_f32_invf
 	call	l_f32_add
 	call	_div2
-	pop	bc
-	pop	bc
 	pop	bc
 	pop	bc
 	ret

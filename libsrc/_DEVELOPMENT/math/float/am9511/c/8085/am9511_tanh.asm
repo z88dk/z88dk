@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Jan 19 19:21:58 2022
+;	Module compile time: Wed Feb  2 15:03:02 2022
 
 
 	C_LINE	0,"am9511_tanh.c"
@@ -225,50 +225,45 @@
 	push	hl
 	push	bc
 	push	bc
-	push	bc
-	push	bc
-	ld	hl,4	;const
-	add	hl,sp
-	push	hl
-	ld	hl,10	;const
-	add	hl,sp
-	call	l_glong
-	call	_exp
-	pop	bc
-	call	l_plong
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	call	l_f32_invf
+	call	_exp
 	pop	bc
 	call	l_plong
 	ld	hl,4	;const
 	add	hl,sp
+	push	hl
+	ld	hl,2	;const
+	add	hl,sp
+	call	l_glong
+	call	l_f32_invf
+	pop	bc
+	call	l_plong
+	ld	hl,0	;const
+	add	hl,sp
 	call	l_glong2sp
-	ld	hl,4	;const
+	ld	hl,8	;const
 	add	hl,sp
 	call	l_glong
 	call	l_f32_sub
 	push	de
 	push	hl
-	ld	hl,8	;const
+	ld	hl,4	;const
 	add	hl,sp
 	call	l_glong2sp
-	ld	hl,8	;const
+	ld	hl,12	;const
 	add	hl,sp
 	call	l_glong
 	call	l_f32_add
 	call	l_f32_div
-	ld	c,l
-	ld	b,h
-	ld	hl,12	;const
-	add	hl,sp
-	ld	sp,hl
-	ld	l,c
-	ld	h,b
+	pop	bc
+	pop	bc
+	pop	bc
+	pop	bc
 	ret
 
 
