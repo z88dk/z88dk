@@ -3,7 +3,10 @@
 
 float m32_tanhf (float x) __z88dk_fastcall
 {
-    x = m32_expf(x);
-    return (x - m32_invf(x))/(x + m32_invf(x));
+    float y;
+
+    y = m32_expf(x);
+    x = m32_invf(y);
+    return  (y - x)/(y + x);
 }
 
