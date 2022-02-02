@@ -2,11 +2,12 @@ lstoff
 
 ; Spectravideo SVI hook entry definition
 ;
-; May 2016
-; $Id: svihook.def,v 1.1 2016-06-06 15:40:54 stefano Exp $
+; May 2016 - Jan 2022
+; $Id: svihook.def$
 ;
 
-defc HKEYI = $FE79		; Interrupt handler
+defc HKEYI = $FE7B		; Interrupt handler
+
 defc HTIMI = $FF5A		; Hook 2 for Interrupt handler
 defc HCHPU = $FFAE	;  CHPUT(A-character;SAVE ALL)
 ;; defc HDSPC = MISSING 	;  Display cursor    (no param.)
@@ -46,55 +47,55 @@ defc HGETP = $FEDF		;  Locate FCB
 defc HSETF = $FEE8      ;  Locate FCB
 defc HNOFO = $FED0		;  "OPEN": not found
 defc HNULO = $FEEB		;  "OPEN"
-defc HNTFL = $FEA9		;  Close I/O buffer 0
+defc HNTFL = $FEAB		;  Close I/O buffer 0
 defc HMERG = $FEC7		;  "MERGE/LOAD"
-defc HSAVE = $FEB5		;  "SAVE"
+defc HSAVE = $FEB7		;  "SAVE"
 defc HBINS = $FEF1		;  "SAVE"
 defc HBINL = $FF33		;  "MERGE/LOAD"  (slighlty different on MSX)
 defc HFILE = $FEB8		;  "FILES"
-defc HDGET = $FEF1		;  "GET/PUT"
-defc HFILO = $FE7F		;  Sequential output
-defc HINDS = $FE82		;  Sequential input
-defc HRSLF = $FE97		;  "INPUT$
-defc HSAVD = $FEB2		;"LOC",6D14"LOF",6D25"EOF",6D39"FPOS"
-defc HLOC  = $FE9A		;  "LOC"
+defc HDGET = $FE81		;  "GET/PUT"
+defc HFILO = $FF12		;  Sequential output
+defc HINDS = $FE84		;  Sequential input
+defc HRSLF = $FE99		;  "INPUT$
+defc HSAVD = $FEB4		;  "LOC",6D14"LOF",6D25"EOF",6D39"FPOS"
+defc HLOC  = $FE9C		;  "LOC"
 defc HLOF  = $FEBB		;  "LOF"
 defc HEOF  = $FECA		;  "EOF"
-defc HFPOS = $FE8B		;  "FPOS"
-defc HBAKU = $FE9D		;  "LINE INPUT#"
-defc HPARD = $FEA3		;  Parse device name
+defc HFPOS = $FE8D		;  "FPOS"
+defc HBAKU = $FE9F		;  "LINE INPUT#"
+defc HPARD = $FEA5		;  Parse device name
 defc HNODE = $FEC1		;  Parse device name
 defc HPOSD = $FEE5		;  Parse device name (slighlty different on MSX)
-;;  (HDEVN)
+;;  (HDEVN)                ; This hook not used (at least on MSX)
 defc HGEND = $FF0F		;  I/O function dispatcher
 defc HRUNC = $FEF7		;  Run-clear
-defc HCLEA = $FEAF		;  Run-clear
+defc HCLEA = $FEB1		;  Run-clear
 defc HLOPD = $F7F6		;  Run-clear
-defc HSTKE = $FEA0		;  Reset stack
+defc HSTKE = $FEA2		;  Reset stack
 defc HISFL = $FF15		;  ISFLIO std routine
 defc HOUTD = $FF09		;  OUTDO std routine (AFTER a call to ISFLIO, on MSX it happens BEFORE)
-;; defc HCRDO = MISSING		;  CR,LF to OUTDO
+defc HCRDO = $FED9		;  CR,LF to OUTDO
 defc HDSKC = $FF4B		;  Mainloop line input
 defc HDOGR = $FEC4		;  Line draw
-;; defc HPRGE = MISSING ?		;  Program end
+defc HPRGE = $FED3		;  Program end
 defc HERRP = $FF18		;  Error handler
 defc HERRF = $FF1B		;  Error handler
-defc HREAD = $FE8E		;  Mainloop "OK"
-defc HMAIN = $FE94		;  Mainloop
+defc HREAD = $FE90		;  Mainloop "OK"
+defc HMAIN = $FE96		;  Hook 2 for Mainloop
 defc HDIRD = $FF06		;  Mainloop direct statement
 defc HFINI = $FF30		;  Mainloop finished
 defc HFINE = $FF36		;  Mainloop finished
 defc HCRUN = $FF24		;  Tokenise
 defc HCRUS = $FF21		;  Tokenise
-defc HISRE = $FE91		;  Tokenise
-defc HNTFN = $FEAC		;  Tokenise
+defc HISRE = $FE93		;  Tokenise
+defc HNTFN = $FEAE		;  Tokenise
 defc HNOTR = $FF0C		;  Tokenise
-defc HSNGF = $FE88		;  "FOR"
+defc HSNGF = $FE8A		;  "FOR"
 defc HNEWS = $FF54		;  Runloop new statement
 defc HGONE = $FF57		;  Runloop execute
 ;; defc HCNRG = MISSING		;  CHRGTR std routine
 defc HRETU = $FEEE		;  "RETURN"
-defc HPRTF = $FE7C		;  "PRINT"
+defc HPRTF = $FE7E		;  "PRINT"
 defc HCOMP = $FF00		;  "PRINT"
 defc HFINP = $FF27		;  "PRINT"
 defc HTRMN = $FF1E		;  "READ/INPUT" error
@@ -108,8 +109,8 @@ defc HWIDT = $FF3F		;  "WIDTH"
 defc HLIST = $FEF4		;  "LIST"
 defc HBUFL = $FED6		;  Detokenise
 defc HFRQI = $FF03		;  Convert to integer
-defc HSCNE = $FE85		;  Line number to pointer
-defc HFRET = $FEA6		;  Free descriptor
+defc HSCNE = $FE87		;  Line number to pointer
+defc HFRET = $FEA8		;  Free descriptor
 defc HPTRG = $FECD		;  Variable search
 ;;defc HPHYD = $		;  PHYDIO std routine
 ;;defc HFORM = $		;  FORMAT std routine
