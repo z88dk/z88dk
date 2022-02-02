@@ -13,14 +13,13 @@
 ;==============================================================
 scroll_bkg:
 _scroll_bkg:
-
-        call    l_tms9918_disable_interrupts
-
         ld      hl, 2
         add     hl, sp
         ld      a, (hl)                 ; Y
         inc     hl
         inc     hl
+
+        call    l_tms9918_disable_interrupts
 
         out     (__IO_VDP_COMMAND), a   ; Output value
         ld      a, VDP_SET_REG|$09      ; Output to VDP register 9 (Y Scroll)

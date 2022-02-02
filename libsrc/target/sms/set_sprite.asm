@@ -48,7 +48,7 @@ asm_set_sprite:
 	;vdp set addr (Y table)
         ld      a, e
         out     (__IO_VDP_COMMAND), a
-        ld      a, $40|(SpriteTableAddress>>8)
+        ld      a, VDP_SET_VRAM|(SpriteTableAddress>>8)
         out     (__IO_VDP_COMMAND), a
 
         ld      a, b
