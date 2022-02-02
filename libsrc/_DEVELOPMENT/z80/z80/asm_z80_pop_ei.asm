@@ -72,7 +72,7 @@ ELSE
 
    IF __Z80 & __Z80_NMOS
    
-      jr NZ, di_state
+      jr NC, di_state
    
    ELSE
    
