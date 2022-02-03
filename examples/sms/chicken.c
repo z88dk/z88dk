@@ -94,12 +94,15 @@ void main() {
 		while (y < 176) {
 			while (get_vcount() < y) {
 			}
+#if 0
+			// load_palette() is too slow for this to work
 			if (j & 0x01) {
-				load_palette(pal1, 0, 16);
+				load_palette(&pal1[6], 6, 1);
 			} else {
-				load_palette(pal2, 0, 16);
+				load_palette(&pal2[6], 6, 1);
 			}
-			scroll_bkg(x, y);
+#endif
+			scroll_bkg(x, 0);
 			(*p) += (*p2);
 			p++;
 			p2++;
@@ -112,7 +115,9 @@ void main() {
 			scroll_bkg(0, 0);
 			y += 2;
 		}
-		load_palette(pal1, 0, 16);
+#if 0
+		load_palette(&pal1[6], 6, 1);
+#endif
 		scroll_bkg(0, 0);
 
 		wait_vblank_noint();
