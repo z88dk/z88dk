@@ -52,4 +52,4 @@ libpsgtest.sms: libpsgtest.c
 	zcc +sms $(CFLAGS) $< -o $@ -create-app
 
 clean:
-	$(RM) *.bin *.i *.lib *.op* *.o *~ zcc_opt.def *.sms *.map
+	$(RM) *.bin *.i *.lib *.op* *.o *~ zcc_opt.def *.sms *.map *.ram
