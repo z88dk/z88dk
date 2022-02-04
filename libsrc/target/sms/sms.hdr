@@ -2,3 +2,13 @@
 	DEFC	SpriteSet          = 0       ; 0 for sprites to use tiles 0-255, 1 for 256+
 	DEFC	NameTableAddress   = $3800   ; must be a multiple of $800; usually $3800; fills $700 bytes (unstretched)
 	DEFC	SpriteTableAddress = $3f00   ; must be a multiple of $100; usually $3f00; fills $100 bytes
+
+
+	DEFC	__IO_VDP_DATA      = 0xbe
+	DEFC	__IO_VDP_COMMAND   = 0xbf
+	DEFC	__IO_VDP_STATUS    = 0xbf
+
+	DEFC	VDP_SET_VRAM	   = $40
+	DEFC	VDP_SET_CRAM	   = $c0
+	DEFC	VDP_SET_REG 	   = $80
+

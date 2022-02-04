@@ -35,7 +35,7 @@
     PUBLIC    raster_procs    ;Raster interrupt handlers
     PUBLIC    pause_procs    ;Pause interrupt handlers
     
-    PUBLIC    timer        ;This is incremented every time a VBL/HBL interrupt happens
+    PUBLIC    _timer         ;This is incremented every time a VBL/HBL interrupt happens
     PUBLIC    _pause_flag    ;This alternates between 0 and 1 every time pause is pressed
     
 
@@ -94,14 +94,9 @@ int_RASTER:
 
 ;int_VBL: 
     push    hl 
-    ld      hl, timer 
-    ld      a, (hl) 
-    inc     a 
-    ld      (hl), a 
-    inc     hl 
-    ld      a, (hl) 
-    adc     a, 1 
-    ld      (hl), a     ;Increments the timer 
+    ld      hl, (_timer)
+    inc     hl
+    ld      (_timer), hl
     ld      hl, raster_procs 
     call    int_handler 
     pop     hl 
@@ -203,6 +198,7 @@ IF __GAMEGEAR__
 ENDIF
     ret
 
+IF __GAMEGEAR__
 gg_palette:
     defw 0x0000             ;transparent
     defw 0x0000             ;00 00 00
@@ -220,13 +216,14 @@ gg_palette:
     defw 0x0f0f             ;ff 00 ff
     defw 0x0555             ;55 55 55
     defw 0x0fff             ;ff ff ff
+ENDIF
 
     DEFC SpriteSet          = 0       ; 0 for sprites to use tiles 0-255, 1 for 256+
     DEFC NameTableAddress   = $3800   ; must be a multiple of $800; usually $3800; fills $700 bytes (unstretched)
     DEFC SpriteTableAddress = $3f00   ; must be a multiple of $100; usually $3f00; fills $100 bytes
 
 _Data: 
-    defb @00000100,$80 
+    defb @00000110,$80
     ;     |||||||`- Disable synch 
     ;     ||||||`-- Enable extra height modes 
     ;     |||||`--- SMS mode instead of SG 
@@ -246,7 +243,7 @@ _Data:
     defb $FF,$83 
     defb $FF,$84 
     defb (SpriteTableAddress/128)|@10000001,$85 
-    defb (SpriteSet/2^2)         |@11111011,$86 
+    defb (SpriteSet/2^2)         |@11111011,$86
     defb $f|$f0,$87 
     ;     `-------- Border palette colour (sprite palette) 
     defb $00,$88 
@@ -325,7 +322,7 @@ ENDIF
         SECTION bss_crt
 raster_procs:       defs    16    ;Raster interrupt handlers
 pause_procs:        defs    16    ;Pause interrupt handlers
-timer:              defw    0    ;This is incremented every time a VBL/HBL interrupt happens
+_timer:             defw    0    ;This is incremented every time a VBL interrupt happens
 _pause_flag:        defb    0    ;This alternates between 0 and 1 every time pause is pressed
 __gamegear_flag:    defb    0    ;Non zero if running on a gamegear
 

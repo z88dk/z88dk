@@ -1,12 +1,11 @@
 
-	SECTION code_clib
-	PUBLIC	DrawOneLine
-	
-	INCLUDE "target/sms/sms.hdr"
+        SECTION code_clib
+        PUBLIC  DrawOneLine
 
-	
-	EXTERN	VRAMToHL
+        EXTERN  l_tms9918_disable_interrupts
+        EXTERN  l_tms9918_enable_interrupts_jp
 
+        INCLUDE "target/sms/sms.hdr"
 ;==============================================================
 ; DrawOneLine
 ;==============================================================
@@ -15,28 +14,32 @@
 ; de = Destination VRAM address
 ; c  = Number of bkg tiles to write
 ;==============================================================
-.DrawOneLine
-	push	hl
-	ld	h, d
-	ld	l, e
-	call	VRAMToHL	; Set VRAM write address
-	pop	hl
-	
-	push	af
-.loop
-	ld	a, (hl)
-	out	($be), a	; Character number
-	inc	hl		;6
-	ld	a, (hl)		;7
-	nop			;4
-	nop			;4
-	nop			;4
-	nop			;4
-	out	($be), a	; Attribute number
-	inc	hl
+DrawOneLine:
 
-	dec	c
-	jp	nz, loop	; Repeat until c is zero
-	pop	af
-	
-	ret
+        call    l_tms9918_disable_interrupts
+
+        ld      a, e
+        out     (__IO_VDP_COMMAND), a
+        ld      a, d
+        or      VDP_SET_VRAM
+        out     (__IO_VDP_COMMAND), a
+
+        push    af
+loop:
+        ld      a, (hl)
+        out     (__IO_VDP_DATA), a      ; Character number
+        inc     hl                      ;6
+        ld      a, (hl)                 ;7
+        nop                             ;4
+        nop                             ;4
+        nop                             ;4
+        nop                             ;4
+        out     (__IO_VDP_DATA), a      ; Attribute number
+        inc     hl
+
+        dec     c
+        jp      nz, loop                ; Repeat until c is zero
+        pop     af
+
+        ; exit through l_tms9918_enable_interrupts_jp
+        jp      l_tms9918_enable_interrupts_jp
