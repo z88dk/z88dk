@@ -60,9 +60,6 @@
     <ClCompile Include="..\..\src\ticks\hook_rc2014.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ext\UNIXem\src\time.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\ticks\debug.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -76,6 +73,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\ticks\debugger_ticks.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ticks\exp_engine.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ticks\expressions.tab.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ticks\lex.yy.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,5 +104,49 @@
     <ClInclude Include="..\..\ext\uthash\src\uthash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\ticks\backend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ticks\cpu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ticks\debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ticks\debugger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ticks\debugger_gdb_packets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ticks\disassembler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ticks\exp_engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ticks\expressions.tab.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ticks\srcfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ticks\sxmlc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ticks\sxmlsearch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ticks\syms.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\ticks\expressions.y">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\src\ticks\expressions.l">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

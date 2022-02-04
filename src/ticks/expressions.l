@@ -1,5 +1,9 @@
 %option noyywrap
 
+%top{
+#include <stdint.h>
+}
+
 %{
 #include <stdio.h>
 
@@ -61,7 +65,7 @@ multiple_words "unsigned char"|"unsigned short"|"unsigned int"|"unsigned long"
 int lookup_word() {
     // it it a type?
     {
-        type_record type = {};
+        type_record type = {0};
         expression_string_get_type(yytext, &type);
         if (type.first->type_ != TYPE_UNKNOWN) {
             yylval.type = type;

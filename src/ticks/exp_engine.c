@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-struct expression_result_t expression_result = {};
+struct expression_result_t expression_result = {0};
 struct history_expression_t* history_expressions = NULL;
 
 struct {
@@ -173,7 +173,7 @@ void expression_resolve_struct_member_ptr(struct expression_result_t *struct_ptr
         sprintf(result->as_error, "Cannot do arrow (->) on a non-pointer type <%s>", tp);
         return;
     }
-    struct expression_result_t dereferenced = {};
+    struct expression_result_t dereferenced = {0};
     expression_dereference_pointer(struct_ptr, &dereferenced);
     if (is_expression_result_error(&dereferenced)) {
         *result = dereferenced;
@@ -296,7 +296,7 @@ void expression_math_add(struct expression_result_t* a, struct expression_result
         return;
     }
     if (!is_type_a_pointer(a->type.first) && !(are_type_records_same(&a->type, &b->type))) {
-        struct expression_result_t local_3 = {};
+        struct expression_result_t local_3 = {0};
         convert_expression(b, &local_3, &a->type);
         expression_math_add(a, &local_3, result);
         expression_result_free(&local_3);
@@ -352,7 +352,7 @@ void expression_math_sub(struct expression_result_t* a, struct expression_result
         return;
     }
     if (!is_type_a_pointer(a->type.first) && !(are_type_records_same(&a->type, &b->type))) {
-        struct expression_result_t local_3 = {};
+        struct expression_result_t local_3 = {0};
         convert_expression(b, &local_3, &a->type);
         expression_math_sub(a, &local_3, result);
         expression_result_free(&local_3);
@@ -408,7 +408,7 @@ void expression_math_sub(struct expression_result_t* a, struct expression_result
 void expression_math_mul(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
     zero_expression_result(result);
     if (!(are_type_records_same(&a->type, &b->type))) {
-        struct expression_result_t local_3 = {};
+        struct expression_result_t local_3 = {0};
         convert_expression(b, &local_3, &a->type);
         expression_math_mul(a, &local_3, result);
         expression_result_free(&local_3);
@@ -447,7 +447,7 @@ void expression_math_mul(struct expression_result_t* a, struct expression_result
 void expression_math_div(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
     zero_expression_result(result);
     if (!(are_type_records_same(&a->type, &b->type))) {
-        struct expression_result_t local_3 = {};
+        struct expression_result_t local_3 = {0};
         convert_expression(b, &local_3, &a->type);
         expression_math_div(a, &local_3, result);
         expression_result_free(&local_3);
@@ -499,11 +499,11 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
         }
         case TYPE_ARRAY: {
             int maxlen = Max(0, Min(10, result->type.size));
-            int offs = snprintf(buffer, buffer_len, "%#04x [%d] = { ", result->as_pointer.ptr, result->type.size);
+            int offs = snprintf(buffer, buffer_len, "%#04x [%d] = { ", result->as_pointer.ptr, (int)result->type.size);
             uint16_t ptr = result->as_pointer.ptr;
             for ( int i = 0; i < maxlen; i++ ) {
                 offs += snprintf(buffer + offs, buffer_len - offs, "%s[%d] = ", i != 0 ? ", " : "", i);
-                struct expression_result_t elr = {};
+                struct expression_result_t elr = {0};
                 debug_resolve_expression_element(&result->type, result->type.first->next, RESOLVE_BY_POINTER, ptr, &elr);
                 if (is_expression_result_error(&elr)) {
                     offs += snprintf(buffer + offs, buffer_len - offs, "<error:%s>", elr.as_error);
@@ -549,7 +549,7 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
                 } else {
                     offs += snprintf(buffer + offs, buffer_len - offs, ", %s=", child->symbol->symbol_name);
                 }
-                struct expression_result_t child_result = {};
+                struct expression_result_t child_result = {0};
                 debug_resolve_expression_element(&child->symbol->type_record, child->symbol->type_record.first,
                     RESOLVE_BY_POINTER, ptr + child->offset, &child_result);
                 if (is_expression_result_error(&child_result)) {
@@ -574,7 +574,7 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
                 case TYPE_INT:
                 case TYPE_LONG:
                 {
-                    struct expression_result_t local = {};
+                    struct expression_result_t local = {0};
                     expression_dereference_pointer(result, &local);
                     int offs;
                     if (local.flags & EXPRESSION_ERROR) {

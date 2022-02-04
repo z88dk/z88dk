@@ -1102,7 +1102,7 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
 }
 
 static int debug_get_symbol_address(debug_sym_symbol *s) {
-    int address = symbol_resolve(s->symbol_name);
+    int address = symbol_resolve((char*)s->symbol_name);
     if (address >= 0) {
         return address;
     }

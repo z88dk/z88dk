@@ -56,7 +56,7 @@ type_expression: T_PRIMITIVE_TYPE
 value_expression: T_PRIMITIVE_VALUE
 	| T_STRING								{
     		zero_expression_result(&$$);
-    		struct lookup_t lookup = {};
+    		struct lookup_t lookup = {0};
     		lookup.symbol_name = $1;
     		debug_lookup_symbol(&lookup, &$$);
 	}

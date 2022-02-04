@@ -376,7 +376,7 @@ void debugger()
                                 printf("Warning: unknown callee return type, DEHL returned %08x.\n", return_value);
                             } else {
                                 if (ttt->type_ != TYPE_VOID) {
-                                    struct expression_result_t result = {};
+                                    struct expression_result_t result = {0};
                                     debug_resolve_expression_element(&temp_br->callee->type_record, ttt,
                                         RESOLVE_BY_VALUE, return_value, &result);
                                     if (is_expression_result_error(&result)) {
@@ -701,7 +701,7 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
                 static char arg_text[2048];
                 strcpy(arg_text, "");
 
-                struct expression_result_t exp = {};
+                struct expression_result_t exp = {0};
                 debug_get_symbol_value_expression(s, fp, &exp);
 
                 if (is_expression_result_error(&exp)) {
@@ -970,7 +970,7 @@ static void info_section_locals() {
         while (arg) {
             debug_sym_symbol* s = arg->symbol;
             if (debug_symbol_valid(s, initial_stack, fp)) {
-                struct expression_result_t exp = {};
+                struct expression_result_t exp = {0};
                 debug_get_symbol_value_expression(s, fp, &exp);
                 if (is_expression_result_error(&exp)) {
                     printf("  %s = <error>\n", s->symbol_name);
@@ -1014,7 +1014,7 @@ static void info_section_globals() {
             continue;
         }
 
-        struct expression_result_t exp = {};
+        struct expression_result_t exp = {0};
         debug_get_symbol_value_expression(s, fp, &exp);
 
         if (is_expression_result_error(&exp)) {
