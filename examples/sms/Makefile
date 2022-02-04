@@ -48,7 +48,7 @@ testsnd.sms: testsnd.c
 	zcc +sms $(CFLAGS) testsnd.c -o testsnd.bin  -create-app
 	echo testsnd.map testsnd.sym
 
-libpsgtest.sms: libpsgtest.c my_mission.psg
+libpsgtest.sms: libpsgtest.c music.asm my_mission.psg
 	zcc +sms $(CFLAGS) libpsgtest.c music.asm -o $@ -create-app
 
 clean:
