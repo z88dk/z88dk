@@ -80,6 +80,15 @@ sub parse_line {
                 else { die; }
 	    }
         }
+        # #define
+        elsif (s/^\s*(#DEFINE)\b//i) {
+            $ret{opcode} = $1;
+            $ret{args} = '';
+            while (/\S/) {
+                if (s/^\s*(\w+)//)                 { $ret{args} .= " " . $1; }
+                else { die; }
+	    }
+        }
         # opcode
         elsif (s/^\s*(#?\w+)\s*//) {
             $ret{opcode} = $1;
@@ -114,6 +123,14 @@ sub format_line {
             $out = tab_to($out, $OPCODE);
             $out .= $line->{opcode};
             $out = tab_to($out, $ARGS);
+            $out .= $line->{args};
+        }
+        elsif (($line->{opcode}//'') =~ /^#define$/i) {
+            $out = tab_to($out, $OPCODE);
+            $out .= $line->{opcode};
+            $out .= "  ";
+            $out = tab_to($out, $ARGS);
+            $line->{args} =~ s/^\s+|\s+$//g;
             $out .= $line->{args};
         }
         elsif (($line->{opcode}//'') =~ /^(if|ifdef|ifndef|else|elif|elifdef|efifndef|endif)$/i) {
