@@ -4,7 +4,7 @@
         PUBLIC  asm_load_palette_gamegear
 
         EXTERN  l_tms9918_disable_interrupts
-        EXTERN  l_tms9918_enable_interrupts
+        EXTERN  l_tms9918_enable_interrupts_jp
 
         include "sms.hdr"
 ;==============================================================
@@ -73,6 +73,5 @@ asm_load_palette_gamegear:
         djnz    asm_load_palette_gamegear
                                         ;13
 
-        call    l_tms9918_enable_interrupts
-
-        ret
+        ; exit through l_tms9918_enable_interrupts_jp
+        jp      l_tms9918_enable_interrupts_jp

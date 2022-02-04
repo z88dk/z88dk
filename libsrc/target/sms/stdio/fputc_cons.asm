@@ -2,7 +2,7 @@
 	PUBLIC	fputc_cons_native
 	
     EXTERN  l_tms9918_disable_interrupts
-    EXTERN  l_tms9918_enable_interrupts
+    EXTERN  l_tms9918_enable_interrupts_jp
 	INCLUDE "target/sms/sms.hdr"
 
     EXTERN  CONSOLE_YOFFSET
@@ -52,8 +52,8 @@ ENDIF
 	ld	a, h
 	ld	(fputc_vdp_offs+1), a	; Saves char offset
 	
-	call	l_tms9918_enable_interrupts
-	ret				; Nothing more to do
+    ; exit through l_tms9918_enable_interrupts_jp
+    jp      l_tms9918_enable_interrupts_jp
 
 .nocrlf
 	cp	12		; CLS ?
@@ -63,8 +63,8 @@ ENDIF
     ld      hl,+(CONSOLE_YOFFSET * 64 + CONSOLE_XOFFSET * 2)
     ld      (fputc_vdp_offs),hl
 
-	call	l_tms9918_enable_interrupts
-    ret
+    ; exit through l_tms9918_enable_interrupts_jp
+    jp      l_tms9918_enable_interrupts_jp
 
 .nocls
 	out	(__IO_VDP_DATA), a	; Outputs character
@@ -83,8 +83,8 @@ ENDIF
 	cp	64 - (CONSOLE_XOFFSET * 2)
 	jr	z,linebreak
 
-	call	l_tms9918_enable_interrupts
-	ret
+    ; exit through l_tms9918_enable_interrupts_jp
+    jp      l_tms9918_enable_interrupts_jp
 
 	SECTION	data_clib
 

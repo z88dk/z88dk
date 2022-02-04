@@ -3,7 +3,7 @@
         PUBLIC  _scroll_bkg
 
         EXTERN  l_tms9918_disable_interrupts
-        EXTERN  l_tms9918_enable_interrupts
+        EXTERN  l_tms9918_enable_interrupts_jp
 
         include "sms.hdr"
 ;==============================================================
@@ -13,10 +13,11 @@
 ;==============================================================
 scroll_bkg:
 _scroll_bkg:
+        ld      hl, 2
+        add     hl, sp
+
         call    l_tms9918_disable_interrupts
 
-        ld      hl, 4
-        add     hl, sp
         ld      a, (hl)                 ; Y
         inc     hl
         inc     hl
@@ -31,6 +32,5 @@ _scroll_bkg:
         ld      a, VDP_SET_REG|$08      ; Output to VDP register 8 (X Scroll)
         out     (__IO_VDP_COMMAND), a
 
-        call    l_tms9918_enable_interrupts
-
-        ret
+        ; exit through l_tms9918_enable_interrupts_jp
+        jp      l_tms9918_enable_interrupts_jp

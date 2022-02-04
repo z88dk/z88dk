@@ -4,7 +4,7 @@
         PUBLIC  _clear_vram
 
         EXTERN  l_tms9918_disable_interrupts
-        EXTERN  l_tms9918_enable_interrupts
+        EXTERN  l_tms9918_enable_interrupts_jp
 
         include "sms.hdr"
 ;==============================================================
@@ -36,6 +36,5 @@ clearVRAM1:
         dec     l
         jp      nz, clearVRAM1
 
-        call    l_tms9918_enable_interrupts
-
-        ret
+        ; exit through l_tms9918_enable_interrupts_jp
+        jp      l_tms9918_enable_interrupts_jp

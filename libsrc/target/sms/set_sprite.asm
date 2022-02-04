@@ -6,7 +6,7 @@
         EXTERN  CONSOLE_YOFFSET
         EXTERN  CONSOLE_XOFFSET
         EXTERN  l_tms9918_disable_interrupts
-        EXTERN  l_tms9918_enable_interrupts
+        EXTERN  l_tms9918_enable_interrupts_jp
 
         include "sms.hdr"
 ;==============================================================
@@ -74,6 +74,5 @@ asm_set_sprite:
         ld      a, d                    ;4
         out     (__IO_VDP_DATA), a      ; Set Tile
 
-        call    l_tms9918_enable_interrupts
-
-        ret
+        ; exit through l_tms9918_enable_interrupts_jp
+        jp      l_tms9918_enable_interrupts_jp

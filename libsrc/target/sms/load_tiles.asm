@@ -4,7 +4,7 @@
         PUBLIC  asm_load_tiles
 
         EXTERN  l_tms9918_disable_interrupts
-        EXTERN  l_tms9918_enable_interrupts
+        EXTERN  l_tms9918_enable_interrupts_jp
 
         include "sms.hdr"
 ;==============================================================
@@ -53,13 +53,13 @@ _load_tiles:
 ; d  = bits per pixel
 ;==============================================================
 asm_load_tiles:
+        call    l_tms9918_disable_interrupts
+
         push    af
         push    bc
         push    de
         push    hl
         push    ix
-
-        call    l_tms9918_disable_interrupts
 
         ; Tell VDP where I want to write (hl<<5)
         sla     l
@@ -121,11 +121,11 @@ _NoMoreBlanks:
         or      c
         jp      nz, _Loop
 
-        call    l_tms9918_enable_interrupts
-
         pop     ix
         pop     hl
         pop     de
         pop     bc
         pop     af
-        ret
+
+        ; exit through l_tms9918_enable_interrupts_jp
+        jp      l_tms9918_enable_interrupts_jp

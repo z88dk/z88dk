@@ -3,7 +3,7 @@
         PUBLIC  DrawOneLine
 
         EXTERN  l_tms9918_disable_interrupts
-        EXTERN  l_tms9918_enable_interrupts
+        EXTERN  l_tms9918_enable_interrupts_jp
 
         INCLUDE "target/sms/sms.hdr"
 ;==============================================================
@@ -41,6 +41,5 @@ loop:
         jp      nz, loop                ; Repeat until c is zero
         pop     af
 
-        call    l_tms9918_enable_interrupts
-
-        ret
+        ; exit through l_tms9918_enable_interrupts_jp
+        jp      l_tms9918_enable_interrupts_jp

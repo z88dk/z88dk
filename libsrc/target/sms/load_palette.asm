@@ -5,7 +5,7 @@
 
         EXTERN  __GAMEGEAR_ENABLED
         EXTERN  l_tms9918_disable_interrupts
-        EXTERN  l_tms9918_enable_interrupts
+        EXTERN  l_tms9918_enable_interrupts_jp
 
         include "sms.hdr"
 ;==============================================================
@@ -58,9 +58,8 @@ LoadPalette1:
         nop                             ;4
         djnz    LoadPalette1            ;13
 
-        call    l_tms9918_enable_interrupts
-
-        ret
+        ; exit through l_tms9918_enable_interrupts_jp
+        jp      l_tms9918_enable_interrupts_jp
 
 ;==============================================================
 ; Load palette
@@ -113,6 +112,5 @@ LoadPalette2:
         nop                             ;4
         djnz    LoadPalette2            ;13
 
-        call    l_tms9918_enable_interrupts
-
-        ret
+        ; exit through l_tms9918_enable_interrupts_jp
+        jp      l_tms9918_enable_interrupts_jp
