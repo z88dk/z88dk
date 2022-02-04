@@ -10,7 +10,7 @@ typedef uint16_t (*get_uint16_cb)();
 typedef long long (*get_longlong_cb)();
 typedef int (*get_int_cb)();
 typedef void (*reset_paging_cb)();
-typedef uint8_t (*restore_cb)(const char* file_path, uint16_t at);
+typedef uint8_t (*restore_cb)(const char* file_path, uint16_t at, uint8_t set_pc);
 typedef void (*out_cb)(int port, int value);
 typedef void (*debugger_write_memory_cb)(int addr, uint8_t val);
 typedef void (*debugger_read_memory_cb)(int addr);
@@ -42,6 +42,7 @@ typedef struct {
     debugger_write_memory_cb debugger_write_memory;
     debugger_read_memory_cb debugger_read_memory;
     void_cb invalidate;
+    uint8_t breakable;
     void_cb break_;
     void_cb resume;
     void_cb next;

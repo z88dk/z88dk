@@ -127,7 +127,7 @@ void invalidate() {}
 void break_() {debugger_active=1; }
 void resume() {}
 void detach() {}
-uint8_t restore(const char* file_path, uint16_t at) {
+uint8_t restore(const char* file_path, uint16_t at, uint8_t set_pc) {
     printf("Not supported.\n");
     return 1;
 }
@@ -193,6 +193,7 @@ backend_t ticks_debugger_backend = {
     .debugger_write_memory = &debugger_write_memory,
     .debugger_read_memory = &debugger_read_memory,
     .invalidate = &invalidate,
+    .breakable = 1,
     .break_ = &break_,
     .resume = &resume,
     .next = &next,

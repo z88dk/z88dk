@@ -32,6 +32,7 @@ static sem_t* trap_mutex = NULL;
 static pthread_cond_t network_op_cond;
 static pthread_mutex_t network_op_mutex;
 static pthread_mutex_t trap_process_mutex;
+static int supported_packet_size = 1024;
 static trapped_action_t scheduled_action = NULL;
 static const void* scheduled_action_data = NULL;
 static void* scheduled_action_response = NULL;
@@ -545,7 +546,7 @@ void debugger_step()
     debugger_active = 0;
 }
 
-uint8_t debugger_restore(const char* file_path, uint16_t at)
+uint8_t debugger_restore(const char* file_path, uint16_t at, uint8_t set_pc)
 {
     FILE *f = fopen(file_path, "rb");
     if (f == NULL)
@@ -554,11 +555,19 @@ uint8_t debugger_restore(const char* file_path, uint16_t at)
         return 1;
     }
 
+    printf("Restoring... ");
+    fflush(stdout);
+
     size_t addr = at;
 
-    uint8_t buff[256];
+    int post_at_once = (supported_packet_size - 16) / 2;
+    if (post_at_once > 256) {
+        post_at_once = 256;
+    }
+
+    uint8_t buff[post_at_once];
     size_t read_;
-    while ((read_ = fread(buff, 1, 256, f)))
+    while ((read_ = fread(buff, 1, post_at_once, f)))
     {
         char s[1024];
         int offset;
@@ -578,13 +587,18 @@ uint8_t debugger_restore(const char* file_path, uint16_t at)
 
     mem_requested_amount = 0;
 
-    // zero out all registers except for pc
-    struct debugger_regs_t regs;
-    int sp = regs.sp;
-    memset(&regs, 0, sizeof(regs));
-    regs.pc = at;
-    regs.sp = sp;
-    set_regs(&regs);
+    printf("OK\n");
+
+    if (set_pc) {
+        // zero out all registers except for pc
+        struct debugger_regs_t regs;
+        bk.get_regs(&regs);
+        int sp = regs.sp;
+        memset(&regs, 0, sizeof(regs));
+        regs.pc = at;
+        regs.sp = sp;
+        set_regs(&regs);
+    }
     return 0;
 }
 
@@ -603,6 +617,7 @@ static backend_t gdb_backend = {
     .debugger_write_memory = &debugger_write_memory,
     .debugger_read_memory = &debugger_read_memory,
     .invalidate = &invalidate,
+    .breakable = 1,
     .break_ = &debugger_break,
     .resume = &debugger_resume,
     .next = &debugger_next,
@@ -697,6 +712,9 @@ static uint8_t process_packet()
 
     if (checksum != (hex(inbuf[packetend + 1]) << 4 | hex(inbuf[packetend + 2])))
     {
+        if (verbose) {
+            printf("Warning: incorrect checksum, expected: %02x\n", checksum);
+        }
         inbuf_erase_head(packetend + 3);
         return 1;
     }
@@ -855,6 +873,26 @@ int main(int argc, char **argv) {
             printf("Remote target does not support qXfer:features:read+\n");
             goto shutdown;
         }
+
+        if (strstr(supported, "NonBreakable")) {
+            printf("Warning: remote is not breakable; cannot request execution to stop from here\n");
+            bk.breakable = 0;
+        }
+
+        int pkt_size;
+        const char* pkt_size_str = strstr(supported, "PacketSize");
+        if (pkt_size_str == NULL) {
+            printf("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
+        } else {
+            if (sscanf(pkt_size_str, "PacketSize=%d", &pkt_size) != 1) {
+                printf("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
+            } else {
+                supported_packet_size = pkt_size;
+                if (verbose) {
+                    printf("Synced on packet size: %d\n", supported_packet_size);
+                }
+            }
+        }
     }
 
     {
@@ -913,7 +951,6 @@ int main(int argc, char **argv) {
 
         XMLDoc_free(&xml);
 
-        uint8_t got_ix = 0;
         uint8_t got_sp = 0;
         uint8_t got_pc = 0;
         if (verbose) {
@@ -922,10 +959,6 @@ int main(int argc, char **argv) {
         for (int i = 0; i < register_mappings_count; i++) {
             if (verbose) {
                 printf(" %s", register_mapping_names[register_mappings[i]]);
-            }
-            if (register_mappings[i] == REGISTER_MAPPING_IX) {
-                got_ix = 1;
-                continue;
             }
             if (register_mappings[i] == REGISTER_MAPPING_SP) {
                 got_sp = 1;
@@ -939,7 +972,7 @@ int main(int argc, char **argv) {
         if (verbose) {
             printf("\n");
         }
-        if (got_ix == 0 || got_pc == 0 || got_sp == 0) {
+        if (got_pc == 0 || got_sp == 0) {
             printf("Insufficient register information.\n");
         }
     }
