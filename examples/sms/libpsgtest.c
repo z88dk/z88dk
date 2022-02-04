@@ -8,15 +8,32 @@ extern unsigned char music[];
 static const unsigned char pal0[] =
 { 0x00, 0x3f };
 
+static const unsigned char pal1[] =
+{ 0x00, 0x03 };
+
+static const unsigned char *pal[] =
+{&pal0[1], &pal1[1]};
+
 void isr(void)
 {
+    static unsigned char flashDelay = 0;
+    static unsigned char palette = 0;
+
+    // Flash the text by swapping palette index 1
+    if(flashDelay++ & 0x10)
+    {
+        flashDelay = 0;
+        palette ^= 1;
+        load_palette((unsigned char *) pal[palette], 1, 1);
+    }
+
     // Play the next frame of music
     PSGFrame();
 }
 
 void main(void)
 {
-    int x = 0;
+    unsigned char x = 0;
 
     // Clear the video RAM
     clear_vram();
