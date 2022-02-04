@@ -78,7 +78,7 @@ void main() {
     load_palette(pal1, 0, 16); 
     load_palette(pal2, 16, 16); 
 
-    set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_BIT7 | VDP_REG_FLAGS1_SCREEN); 
+    set_vdp_reg(VDP_REG_FLAGS1, VDP_REG_FLAGS1_BIT7 | VDP_REG_FLAGS1_SCREEN | VDP_REG_FLAGS1_VINT);
 
 //  add_pause_int(pause_handler); 
 
@@ -88,38 +88,34 @@ void main() {
 		j = 0;
 		x = 1;
 		y = 16;
+		// Wait for frame refresh
+		__asm__("halt");
 		while (get_vcount() != 0) {
 		}
 		x = (*p) >> 4;
 		while (y < 176) {
 			while (get_vcount() < y) {
 			}
-#if 0
 			// load_palette() is too slow for this to work
 			if (j & 0x01) {
-				load_palette(&pal1[6], 6, 1);
+				load_palette(&pal1[4], 4, 4);
 			} else {
-				load_palette(&pal2[6], 6, 1);
+				load_palette(&pal2[4], 4, 4);
 			}
-#endif
 			scroll_bkg(x, 0);
 			(*p) += (*p2);
 			p++;
 			p2++;
 			x = (*p) >> 4;
-			y += 14;
+			y += 13;
 			j++;
 
 			while (get_vcount() < y) {
 			}
 			scroll_bkg(0, 0);
-			y += 2;
+			y += 3;
 		}
-#if 0
-		load_palette(&pal1[6], 6, 1);
-#endif
+		load_palette(&pal1[4], 4, 4);
 		scroll_bkg(0, 0);
-
-		wait_vblank_noint();
 	}
 }

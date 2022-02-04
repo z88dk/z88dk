@@ -6,7 +6,7 @@ ifeq ($(COMPILER),sdcc)
    CFLAGS += -compiler=sdcc  -SO3 --max-allocs-per-node200000 --fsigned-char 
 all: test.sms libctest.sms  apktest.sms testsnd.sms
 else
-all: test.sms libctest.sms pongmstr.sms pngmstr2.sms apktest.sms chicken.sms testsnd.sms
+all: test.sms libctest.sms pongmstr.sms pngmstr2.sms apktest.sms chicken.sms testsnd.sms libpsgtest.sms
 endif
 
 
@@ -48,5 +48,8 @@ testsnd.sms: testsnd.c
 	zcc +sms $(CFLAGS) testsnd.c -o testsnd.bin  -create-app
 	echo testsnd.map testsnd.sym
 
+libpsgtest.sms: libpsgtest.c
+	zcc +sms $(CFLAGS) $< -o $@ -create-app
+
 clean:
-	$(RM) *.bin *.i *.lib *.op* *.o *~ zcc_opt.def *.sms
+	$(RM) *.bin *.i *.lib *.op* *.o *~ zcc_opt.def *.sms *.map
