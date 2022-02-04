@@ -44,7 +44,6 @@ void main() {
     int ply2_y = 100; 
     int ply2_tile = 'H'; 
     int raster[10], speeds[10], *p, *p2; 
-    char *c; 
 
     clear_vram(); 
 

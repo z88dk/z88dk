@@ -3,6 +3,8 @@
 #include <psg/PSGlib.h>
 #include <stdio.h>
 
+extern unsigned char music[];
+
 static const unsigned char pal0[] =
 { 0x00, 0x3f };
 
@@ -34,7 +36,7 @@ void main(void)
     // Setup our refresh ISR
     add_raster_int(isr);
     // Start the music
-    PSGPlay(&music);
+    PSGPlay(music);
 
     while (1)
     {
@@ -44,13 +46,4 @@ void main(void)
         scroll_bkg(x--, 0);
     }
 }
-
-#asm
-        section rodata_user
-
-        ; Music borrowed from http://shiru.untergrund.net/music.shtml
-        ; and converted to PSG with https://www.smspower.org/forums/16925-PSGToolAVGMToPSGConvertor
-_music:
-        binary "my_mission.psg"
-#endasm
 
