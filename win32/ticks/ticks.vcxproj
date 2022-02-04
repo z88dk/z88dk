@@ -165,7 +165,6 @@
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ext\UNIXem\src\time.c" />
     <ClCompile Include="..\..\src\ticks\acia.c" />
     <ClCompile Include="..\..\src\ticks\am9511.c" />
     <ClCompile Include="..\..\src\ticks\backend.c" />
@@ -174,12 +173,15 @@
     <ClCompile Include="..\..\src\ticks\debugger.c" />
     <ClCompile Include="..\..\src\ticks\debugger_ticks.c" />
     <ClCompile Include="..\..\src\ticks\disassembler_alg.c" />
+    <ClCompile Include="..\..\src\ticks\expressions.tab.c" />
+    <ClCompile Include="..\..\src\ticks\exp_engine.c" />
     <ClCompile Include="..\..\src\ticks\hook.c" />
     <ClCompile Include="..\..\src\ticks\hook_console.c" />
     <ClCompile Include="..\..\src\ticks\hook_cpm.c" />
     <ClCompile Include="..\..\src\ticks\hook_io.c" />
     <ClCompile Include="..\..\src\ticks\hook_misc.c" />
     <ClCompile Include="..\..\src\ticks\hook_rc2014.c" />
+    <ClCompile Include="..\..\src\ticks\lex.yy.c" />
     <ClCompile Include="..\..\src\ticks\linenoise.c" />
     <ClCompile Include="..\..\src\ticks\memory.c" />
     <ClCompile Include="..\..\src\ticks\srcfile.c" />
@@ -189,11 +191,32 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\ext\uthash\src\uthash.h" />
+    <ClInclude Include="..\..\src\ticks\backend.h" />
     <ClInclude Include="..\..\src\ticks\cmds.h" />
+    <ClInclude Include="..\..\src\ticks\cpu.h" />
+    <ClInclude Include="..\..\src\ticks\debug.h" />
+    <ClInclude Include="..\..\src\ticks\debugger.h" />
+    <ClInclude Include="..\..\src\ticks\debugger_gdb_packets.h" />
+    <ClInclude Include="..\..\src\ticks\disassembler.h" />
+    <ClInclude Include="..\..\src\ticks\expressions.tab.h" />
+    <ClInclude Include="..\..\src\ticks\exp_engine.h" />
     <ClInclude Include="..\..\src\ticks\linenoise.h" />
+    <ClInclude Include="..\..\src\ticks\srcfile.h" />
+    <ClInclude Include="..\..\src\ticks\sxmlc.h" />
+    <ClInclude Include="..\..\src\ticks\sxmlsearch.h" />
+    <ClInclude Include="..\..\src\ticks\syms.h" />
     <ClInclude Include="..\..\src\ticks\ticks.h" />
     <ClInclude Include="..\..\src\ticks\utf8.h" />
     <ClInclude Include="..\..\src\ticks\utlist.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\ticks\expressions.l" />
+    <None Include="..\..\src\ticks\expressions.y" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\UNIXem\UNIXem.vcxproj">
+      <Project>{7d0213a3-87fa-4f56-a5d6-cc23682acad8}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

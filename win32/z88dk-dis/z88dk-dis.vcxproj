@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\src\ticks\debug.c" />
     <ClCompile Include="..\..\src\ticks\disassembler_alg.c" />
     <ClCompile Include="..\..\src\ticks\disassembler_main.c" />
+    <ClCompile Include="..\..\src\ticks\exp_engine.c" />
     <ClCompile Include="..\..\src\ticks\syms.c" />
   </ItemGroup>
   <ItemGroup>

@@ -30,6 +30,9 @@
     <ClCompile Include="..\..\src\ticks\backend.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\ticks\exp_engine.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\ticks\cmds.h">
