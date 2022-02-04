@@ -11,6 +11,8 @@ unsigned char pal1[] = {0x2A, 0x3F, 0x0F, 0x00, 0x01, 0x02, 0x03, 0x17,
 unsigned char pal2[] = {0x2A, 0x3F, 0x0F, 0x00, 0x10, 0x20, 0x30, 0x35,
 				0x15, 0x35, 0x1D, 0x3D, 0x17, 0x10, 0x20, 0x03};
 
+unsigned char *pal[] = {&pal1[4], &pal2[4]};
+
 unsigned int road_pattern[] = {0x0001, 0x0002,
 							   0x0000, 0x0000};
 
@@ -34,9 +36,9 @@ int rand_speed() {
 }
 
 void main() { 
-    int x = 0; 
-    int y = 0; 
-    int  i, j; 
+    unsigned char x = 0; 
+    unsigned char y = 0; 
+    unsigned char  i, j; 
     int ply_x = 120; 
     int ply_y = 92; 
     int ply_tile = 'H'; 
@@ -95,26 +97,23 @@ void main() {
 		while (y < 176) {
 			while (get_vcount() < y) {
 			}
-			// load_palette() is too slow for this to work
-			if (j & 0x01) {
-				load_palette(&pal1[4], 4, 4);
-			} else {
-				load_palette(&pal2[4], 4, 4);
-			}
+
+			load_palette(pal[j], 4, 4);
+
 			scroll_bkg(x, 0);
 			(*p) += (*p2);
 			p++;
 			p2++;
 			x = (*p) >> 4;
-			y += 13;
-			j++;
+			y += 14;
+			j ^= 1;
 
 			while (get_vcount() < y) {
 			}
 			scroll_bkg(0, 0);
-			y += 3;
+			y += 2;
 		}
-		load_palette(&pal1[4], 4, 4);
+		load_palette(pal[0], 4, 4);
 		scroll_bkg(0, 0);
 	}
 }
