@@ -5873,9 +5873,16 @@ FRESULT f_mkfs (
 		} else {
 			st_dword(buf + BPB_TotSec32, sz_vol);		/* Volume size in 32-bit LBA */
 		}
-		buf[BPB_Media] = 0xF8;							/* Media descriptor byte */
-		st_word(buf + BPB_SecPerTrk, 63);				/* Number of sectors per track (for int13) */
-		st_word(buf + BPB_NumHeads, 255);				/* Number of heads (for int13) */
+        if ( fmt == FS_FAT12) {
+		    buf[BPB_Media] = 0xF9;							/* Media descriptor byte */
+		    st_word(buf + BPB_SecPerTrk, 0x09);				/* Number of sectors per track (for int13) */
+		    st_word(buf + BPB_NumHeads, 0x02);				/* Number of heads (for int13) */
+
+        } else {
+		    buf[BPB_Media] = 0xF8;							/* Media descriptor byte */
+		    st_word(buf + BPB_SecPerTrk, 63);				/* Number of sectors per track (for int13) */
+		    st_word(buf + BPB_NumHeads, 255);				/* Number of heads (for int13) */
+        }
 		st_dword(buf + BPB_HiddSec, b_vol);				/* Volume offset in the physical drive [sector] */
 		if (fmt == FS_FAT32) {
 			st_dword(buf + BS_VolID32, GET_FATTIME());	/* VSN */

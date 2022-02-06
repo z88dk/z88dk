@@ -63,6 +63,7 @@ ENDIF
 IF CLIB_MSXDOS = 2
   IF CRT_DISABLELOADER != 1
     call    loadbanks
+    jp      c,cleanup
   ENDIF
 ENDIF
 
@@ -166,12 +167,40 @@ not_alpha:
     inc     hl
     ret
 
+print_message_pop:
+    pop     af
+print_message:
+    ld      c,9
+    call    5
+    scf
+    ret
+
+msg_bankstart:
+    defm    "Starting to load banks\r\n$"
+
+msg_noextbios:
+    defm    "Cannot detect extended BIOS\r\n$"
+
+msg_nomapper:
+    defm    "Cannot locate mapper\r\n$"
+
+msg_cantallocate:
+    defm    "Cannot allocate segment\r\n$"
+
+msg_loading:
+    defm    "Loading....$"
+
+msg_lf:
+    defm    "\r\n$"
 
 loadbanks:
+    ld      de,msg_bankstart
+    call    print_message
     ; Setup mapper, extract info etc
     ld      a,($FB20)   ;HOKVLD
     rrca
-    ret     nc          ;No extended bios, can't do memory mapping
+    ld      de,msg_noextbios
+    jp      nc,print_message
     xor     a
     ld      de,$0401
     call    $FFCA   ;EXTBIO
@@ -179,7 +208,8 @@ loadbanks:
     ld      de,$0402
     call    $FFCA   ;EXTBIO
     and     a
-    ret     z
+    ld      de,msg_nomapper
+    jp      z,print_message
     ld      de,dos2_jump
     ld      bc,dos2_end - dos2_jump
     ldir
@@ -211,7 +241,8 @@ load_loop:
     ld      a,0             ;Allocate user segment
     call    ALL_SEG
     pop     bc
-    jr      c,close_file
+    ld      de,msg_cantallocate
+    jp      c,print_message_pop
     ld      c,a             ;Save allocated segment
     pop     af
     push    af
@@ -222,6 +253,14 @@ load_loop:
     ld      (hl),c         ;Save mapping
     ld      a,c
     call    PUT_P2
+    push    bc
+    ld      de,msg_loading
+    call    print_message
+    ld      de,__crt_loader_filename
+    call    print_message
+    ld      de,msg_lf
+    call    print_message
+    pop     bc
     ; b = file handler
     ld      de,32768       ;Just read a banks worth, don't care how much really
     ld      hl,16384
@@ -235,8 +274,8 @@ close_file:
 next_file:
     pop     af
     inc     a
-    cp      4
     jr      nz,load_loop
+    and     a
     ret
 
 
