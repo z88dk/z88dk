@@ -1813,7 +1813,7 @@ static void declfunc(Type *functype, enum storage_type storage)
 
     infunc = 1; /* In a function for sure! */
     
-    where = 2 + currfn->ctype->funcattrs.params_offset;
+    where = c_params_offset + currfn->ctype->funcattrs.params_offset;
 
     /* If we use frame pointer we preserve previous framepointer on entry
         * to each function

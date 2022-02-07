@@ -40,6 +40,7 @@ int c_standard_escapecodes = 0; /* \n = 10, \r = 13 */
 int c_disable_builtins = 0;
 int c_cline_directive = 0;
 int c_cpu = CPU_Z80;
+int c_params_offset = 2;
 int c_old_diagnostic_fmt = 0;
 char *c_zcc_opt = "zcc_opt.def";
 
@@ -98,6 +99,7 @@ static option  sccz80_opts[] = {
     { 0, "", OPT_HEADER, "Code generation options", NULL, NULL, 0 },
     { 0, "unsigned", OPT_BOOL, "Make all types unsigned", &c_default_unsigned, NULL, 0 },
     { 0, "disable-builtins", OPT_BOOL|OPT_DOUBLE_DASH, "Disable builtin functions",&c_disable_builtins, NULL, 0},
+    { 0, "params-offset", OPT_INT, "=<num> Base offset for the function parameters (default: 2)",&c_params_offset,NULL, 0},
     { 0, "doublestr", OPT_BOOL, "Store FP constants as strings", &c_double_strings, NULL, 0 },
     { 0, "math-z88", OPT_ASSIGN|OPT_INT, "(deprecated) Make FP constants match z88", &c_maths_mode, NULL, MATHS_Z88 },
 

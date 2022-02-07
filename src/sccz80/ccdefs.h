@@ -263,6 +263,7 @@ extern void     WriteDefined(char *sname, int value);
 extern int      c_notaltreg;
 extern int      c_cline_directive;
 extern int      c_cpu;
+extern int      c_params_offset;
 extern int      c_fp_mantissa_bytes;
 extern int      c_fp_exponent_bias;
 extern int      c_old_diagnostic_fmt;
