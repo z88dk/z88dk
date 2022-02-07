@@ -614,7 +614,7 @@ static void c_add_file(char *param)
         cpm_create_filename(basename, cpm_filename, 0, 0);
         strcpy(filename, param);
     } else {
-        snprintf(filename, sizeof(filename),"%.*s", (int)(colon - param), filename);
+        snprintf(filename, sizeof(filename),"%.*s", (int)(colon - param), param);
         snprintf(cpm_filename, sizeof(cpm_filename),"%s",colon+1);
     }
 

@@ -11,7 +11,12 @@ static char             *c_disc_format       = NULL;
 static char             *c_output_file      = NULL;
 static char             *c_boot_filename     = NULL;
 static char             *c_disc_container    = "raw";
+static char            **c_additional_files  = NULL;
+static int               c_additional_files_num = 0;
 static char              help         = 0;
+
+static void c_add_file(char *option);
+static void write_extra_files(disc_handle *h);
 
 static void checkBankLimits(struct banked_memory *memory);
 
@@ -24,6 +29,7 @@ option_t fat_options[] = {
     { 'o', "output",   "Name of output file",        OPT_STR|OPT_OUTPUT,   &c_output_file },
     { 's', "bootfile", "Name of the boot file",      OPT_STR,   &c_boot_filename },
     {  0,  "container", "Type of container (raw,dsk)", OPT_STR, &c_disc_container },
+    { 'a', "add-file", "Add additional files [hostfile:msxfile] or [hostfile]", OPT_FUNCTION, (void *)c_add_file },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 
@@ -95,6 +101,33 @@ static void dump_formats()
 }
 
 
+// Called for each additional file
+static void c_add_file(char *param)
+{
+    char *colon = strchr(param, ':');
+    char  cpm_filename[20];
+    char  filename[FILENAME_MAX+1];
+    int   i;
+
+    if ( colon == NULL ) {
+        // We need to create a CP/M filename from the argument given
+        char *basename;
+
+        basename = zbasename(param);
+        cpm_create_filename(basename, cpm_filename, 0, 1);
+        strcpy(filename, param);
+    } else {
+        snprintf(filename, sizeof(filename),"%.*s", (int)(colon - param), param);
+        snprintf(cpm_filename, sizeof(cpm_filename),"%s",colon+1);
+    }
+    i = c_additional_files_num;
+    c_additional_files_num += 2;
+    c_additional_files = realloc(c_additional_files, sizeof(c_additional_files[0]) * c_additional_files_num);
+    c_additional_files[i] = strdup(filename);
+    c_additional_files[i+1] = strdup(cpm_filename);
+}
+
+
 int fat_exec(char *target)
 {
     if (help)
@@ -150,7 +183,7 @@ int fat_write_file_to_image(const char *disc_format, const char *container, cons
 
     // Open the binary file
     if ((binary_fp = fopen_bin(binary_name, crt_filename)) == NULL) {
-        exit_log(1, "Can't open input file %s\n", binary_name);
+        exit_log(1, "Can't open extra input file <%s>\n", binary_name);
     }
     if (fseek(binary_fp, 0, SEEK_END)) {
         fclose(binary_fp);
@@ -205,7 +238,7 @@ int fat_write_file_to_image(const char *disc_format, const char *container, cons
                 char numbuf[32];
 
                 if ((binary_fp = fopen(mb->secbin->filename, "rb")) == NULL) {
-                    exit_log(1, "Can't open input file %s\n", binary_name);
+                    exit_log(1, "Can't open input bank file file <%s>\n", binary_name);
                 }
                 filebuf = realloc(filebuf, mb->secbin->size);
                 if (1 != fread(filebuf, mb->secbin->size, 1, binary_fp)) { 
@@ -221,6 +254,8 @@ int fat_write_file_to_image(const char *disc_format, const char *container, cons
             }
         }
     }
+
+    write_extra_files(h);
 
     if (writer(h, disc_name) < 0) {
         exit_log(1, "Can't write disc image");
@@ -254,4 +289,32 @@ static void checkBankLimits(struct banked_memory *memory)
             }
         }
     }
+}
+
+static void write_extra_files(disc_handle *h)
+{
+    int     i;
+    void   *filebuf;
+    FILE   *binary_fp;
+    size_t  binlen;
+
+    for ( i = 0; i < c_additional_files_num; i+= 2) {
+        // Open the binary file
+        if ((binary_fp = fopen(c_additional_files[i], "rb")) == NULL) {
+            exit_log(1, "Can't open input file <%s>\n", c_additional_files[i]);
+        }
+        if (fseek(binary_fp, 0, SEEK_END)) {
+            fclose(binary_fp);
+            exit_log(1, "Couldn't determine size of file: %s\n",c_additional_files[i]);
+        }
+        binlen = ftell(binary_fp);
+        fseek(binary_fp, 0L, SEEK_SET);
+        filebuf = malloc(binlen);
+        if (1 != fread(filebuf, binlen, 1, binary_fp))  { fclose(binary_fp); exit_log(1, "Could not read required data from <%s>\n",c_additional_files[i]); }
+        fclose(binary_fp);
+
+        disc_write_file(h, c_additional_files[i+1], filebuf, binlen);
+        free(filebuf);
+    }
+
 }
