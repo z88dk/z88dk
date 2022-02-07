@@ -89,6 +89,40 @@ int ldir_skel2[]={11, 17, CATCH, CATCH, 33, SKIP, SKIP, 1, SKIP, SKIP, 0xED, 0xB
 
 
 
+/*****************************/
+/* 2Z, 5Z, HuBasic variants */
+/*****************************/
+
+int mz800basic_skel[]={11, ADDR, 0xE3, 0xF5, 0x7E, 0x23, 0xE5, 33, SKIP, SKIP, 0x87, 0x85};
+
+int mz800_shift_adj[]={10, ADDR, 'G', 'O', 'T', 'O'+0x80, 'G', 'O', 'S', 'U', 'B'+0x80};
+
+int mz800_cmdtab_skel[]={15, 17, CATCH, CATCH, 0x87, 0xE5, 0xEB, 0x5F, 0x16, 0, 0x19, 0x7E, 0x23, 0x66, 0x6F, 0xE3};
+int mz800_tk_skel[]={16, 0xC5, 1, CATCH, CATCH, SKIP_CALL, 0x30, SKIP, 1, SKIP, SKIP, SKIP_CALL, 0x0E, 0xFE, 0x30, SKIP, 1};
+int mz800_tk2_skel[]={16, 0xC5, 1, SKIP, SKIP, SKIP_CALL, 0x30, SKIP, 1, CATCH, CATCH, SKIP_CALL, 0x0E, 0xFE, 0x30, SKIP, 1};
+int mz800_tk3_skel[]={18, 0xC5, 1, SKIP, SKIP, SKIP_CALL, 0x30, SKIP, 1, SKIP, SKIP, SKIP_CALL, 0x0E, 0xFE, 0x30, SKIP, 1, CATCH, CATCH};
+
+int mz800_prebyte2[]={14, 0xFE, 0xFF, 0xCA, SKIP, SKIP, 17, CATCH, CATCH, 0xFE, 0xFE, 0x20, SKIP, 0x7E, 0x23 };
+int mz800_prebyte3[]={14, 0xE5, 0x87, 0x6F, 0x26, 0, 1, CATCH, CATCH, 0x09, 0x7e, 0x23, 0x66, 0x6F, 0xE3 };
+
+
+/*
+
+PUSH    HL        
+ADD     A,A       
+LD      L,A       
+LD      H,0       
+LD      BC,W5D79  
+ADD     HL,BC     
+LD      A,(HL)    
+INC     HL        
+LD      H,(HL)    
+LD      L,A       
+EX      (SP),HL   
+RET
+
+*/
+
 /*************************************/
 /* Hudson Software HuBASIC detection */
 /*************************************/
@@ -1694,13 +1728,13 @@ int main(int argc, char *argv[])
 
 		res=find_skel(int_a_skel);
 		if (res>0)
-			clbl("INT_RESULT_A", res+pos, "Get back from function, result in A (signed)");
+			clbl("CONIA", res+pos, "Get back from function, result in A (signed)");
 
 		res=find_skel(unsigned_a_skel);
 		if (res<0)
 			res=find_skel(unsigned_a_skel2);
 		if (res>0)
-			clbl("PASSA", res+pos, "Get back from function, result in A");
+			clbl("PASSA", res+pos, "aka SNGFLT, Get back from function, result in A");
 
 		printf("\n");
 
@@ -3020,6 +3054,7 @@ int main(int argc, char *argv[])
 	}
 
 
+
    	/**************************/
 	/* Sinclair BASIC section */
 	/**************************/
@@ -3327,6 +3362,8 @@ int main(int argc, char *argv[])
 	}
 
 
+
+
    	/**************************/
 	/* Hudson HuBASIC section */
 	/**************************/
@@ -3334,6 +3371,8 @@ int main(int argc, char *argv[])
 	res=find_skel(hubas_ext_skel);
 	if (res<0)
 		res=find_skel(hubas_skel);
+	if (res<0)
+		res=find_skel(mz800basic_skel);
 
 	if (res>0) {
 		printf("\n# Hudson Software HuBASIC found\n");
@@ -3387,8 +3426,18 @@ int main(int argc, char *argv[])
 			if (pos >0) {
 				pos=pos-res;
 				if (pos >0)
-					printf("\n#    ORG shift detected, %d bytes", (unsigned int) pos);
+					printf("\n#    ORG shift detected, %d bytes\n\n", (unsigned int) pos);
 			}	else pos=0;
+		} else {
+			res=find_skel(mz800_tk_skel);  	// 2Z, 5Z
+			if (res>0) {
+				pos=find_skel(mz800_shift_adj);
+				if (pos >0) {
+					pos=pos-res+1;		/* Shift code alignment */
+					if (pos >0)
+						printf("\n#    ORG shift detected, %d bytes\n\n", (unsigned int) pos);
+				}	else pos=0;
+			}
 		}
 
 		res=find_skel(hu_ideexp);
@@ -3655,11 +3704,15 @@ int main(int argc, char *argv[])
 		res2=find_skel(hu_jptab);
 		if (res2<0)
 			res2=find_skel(hu_jptab_old);
+		if (res2<0)
+			res2=find_skel(mz800_cmdtab_skel);
 		if (res2>0)	dlbl("JPTAB", res2, "Jump table");
 
 		res=find_skel(tkhudson_skel);
 		if (res<0)
 			res=find_skel(tkhudson_skel_old);
+		if (res<0)
+			res=find_skel(mz800_tk_skel);
 		if (res>0) {
 			printf("\n# TOKEN table position = $%04X\n", (unsigned int) res);
 			if (brand == HUBASIC_OLD) {
@@ -3710,12 +3763,17 @@ int main(int argc, char *argv[])
 		res2=find_skel(hu_jptab_fn_old);
 		if (res2<0)
 			res2=find_skel(hu_jptab2);
+		if (res2<0)
+			res2=find_skel(mz800_prebyte2);
 		if (res2>0)
 			dlbl("JPTAB2", res2, "Jump table #2");
 
 		res=find_skel(tkhudson_skel2);
 		if (res<0)
 			res=find_skel(tkhudson_skel_fn_old);	// HUBASIC_OLD only
+		if (res<0)
+			res=find_skel(mz800_tk2_skel);	// 2Z, 5Z
+
 		if (res>0) {
 			printf("\n# TOKEN table position for prefix $FF = $%04X\n", (unsigned int) res);
 			clear_token();
@@ -3753,9 +3811,13 @@ int main(int argc, char *argv[])
 		printf("\n\n");
 
 		res2=find_skel(hu_jptab3);
-			if (res2>0)	dlbl("JPTAB3", res2, "Jump table #3");
+		if (res2<0)
+			res2=find_skel(mz800_prebyte3);
+		if (res2>0)	dlbl("JPTAB3", res2, "Jump table #3");
 
 		res=find_skel(tkhudson_skel3);
+		if (res<0)
+			res=find_skel(mz800_tk3_skel);		// 2Z, 5Z
 		if (res>0) {
 			printf("\n# TOKEN table position for prefix $FE = $%04X\n", (unsigned int) res);
 			clear_token();
@@ -3785,6 +3847,8 @@ int main(int argc, char *argv[])
 		}
 
 	}
+
+
 
 	printf("\n\n");
 
