@@ -89,6 +89,15 @@ int ldir_skel2[]={11, 17, CATCH, CATCH, 33, SKIP, SKIP, 1, SKIP, SKIP, 0xED, 0xB
 
 
 
+/***************************/
+/* 'OMEGASOFT' SHARP BASIC */
+/***************************/
+
+int om500_skel[]={12, 0xE5, 0x21, CATCH, CATCH, 6, 0x80, 0xD5, SKIP_CALL, 0xEB, SKIP_CALL, 0xEB, 0xBE};
+int spbas_skel[]={14, 0x2A, CATCH, CATCH, 17, SKIP, SKIP, 0x0E, 0x0B2, SKIP_CALL, 0x3E, 0x20, 0x12, 0x13, 0x21};
+
+
+
 /*****************************/
 /* 2Z, 5Z, HuBasic variants */
 /*****************************/
@@ -105,23 +114,6 @@ int mz800_tk3_skel[]={18, 0xC5, 1, SKIP, SKIP, SKIP_CALL, 0x30, SKIP, 1, SKIP, S
 int mz800_prebyte2[]={14, 0xFE, 0xFF, 0xCA, SKIP, SKIP, 17, CATCH, CATCH, 0xFE, 0xFE, 0x20, SKIP, 0x7E, 0x23 };
 int mz800_prebyte3[]={14, 0xE5, 0x87, 0x6F, 0x26, 0, 1, CATCH, CATCH, 0x09, 0x7e, 0x23, 0x66, 0x6F, 0xE3 };
 
-
-/*
-
-PUSH    HL        
-ADD     A,A       
-LD      L,A       
-LD      H,0       
-LD      BC,W5D79  
-ADD     HL,BC     
-LD      A,(HL)    
-INC     HL        
-LD      H,(HL)    
-LD      L,A       
-EX      (SP),HL   
-RET
-
-*/
 
 /*************************************/
 /* Hudson Software HuBASIC detection */
@@ -3846,6 +3838,30 @@ int main(int argc, char *argv[])
 			}
 		}
 
+	}
+
+
+
+	/*************************************************/
+	/* OMEGASOFT BASIC (standard on early MZ models) */
+	/*************************************************/
+
+	res=find_skel(spbas_skel);
+	if (res>0) {
+		printf("\n# OmegaSoft BASIC found\n");
+
+		res=find_skel(om500_skel);
+		if (res>0)
+			printf("\n# Interpreter type: OM-500\n");
+		else
+			printf("\n# Interpreter type: OM-1000 or later\n");
+
+
+		brand=find_skel(sharp_skel);
+		if (brand>0)
+			printf("#  'SHARP' signature found\n\n");
+		else
+			printf("#  'SHARP' signature not present\n\n");
 	}
 
 
