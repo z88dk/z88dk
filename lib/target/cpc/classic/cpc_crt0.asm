@@ -5,18 +5,11 @@
 ;       $Id: cpc_crt0.asm,v 1.37 2016-07-15 21:03:25 dom Exp $
 ;
 
-        MODULE  cpc_crt0
+    MODULE  cpc_crt0
 
 
-;--------
-; Include zcc_opt.def to find out some info
-;--------
-        defc    crt0 = 1
-        INCLUDE "zcc_opt.def"
-
-;--------
-; Some scope definitions
-;--------
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
     EXTERN  _main           ;main() is always external to crt0 code
 
