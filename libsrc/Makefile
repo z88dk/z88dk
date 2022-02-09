@@ -1060,7 +1060,8 @@ z1013_clib.lib:
 	@echo ''
 	@echo '--- Building Robotron Z1013 Library ---'
 	@echo ''
-	$(call buildgeneric,z1013,"text narrow")
+	$(call buildgeneric,z1013,"gencon narrow")
+	$(MAKE) -C video/krt TARGET=z1013
 	TARGET=z1013 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(TARGET_DIRECTORY)/z1013/z1013.lst
 
 # Robotron KC85/1, Z9001 library - Stefano
@@ -1068,8 +1069,9 @@ z9001_clib.lib:
 	@echo ''
 	@echo '--- Building Robotron KC85/1, KC/87, Z9001 Library ---'
 	@echo ''
-	$(call buildgeneric,z9001,"text narrow")
+	$(call buildgeneric,z9001,"text narrow wide")
 	$(MAKE) -C games TARGET=z9001
+	$(MAKE) -C video/krt TARGET=z9001
 	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(TARGET_DIRECTORY)/z9001/z9001.lst
 
 gfx9001krt.lib:

@@ -1,7 +1,7 @@
 include ../Make.config
 
 
-SUBDIRS = tms9918 upd7220
+SUBDIRS = tms9918 upd7220 krt
 # Directories that need a target passed down
 CLEANDIRS = $(SUBDIRS:%=clean-%) $(TARGETDIRS:%=clean-%)
 

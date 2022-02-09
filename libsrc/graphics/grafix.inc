@@ -359,7 +359,7 @@ IF FORz88
     defc    maxy     = 64
 ENDIF
 
-IF FORz9001krt
+IF FORz9001
     DEFINE gotgfx
     defc maxx    = 320
     defc maxy    = 192
@@ -393,9 +393,8 @@ ENDIF
 
 IF FORz1013
     DEFINE gotgfx
-    defc maxx    = 64
-    defc maxy    = 64
-    defc blankch    = 32
+    defc maxx    = 256
+    defc maxy    = 256
     defc    WANT_swapgfxbk = 0
 ENDIF
 
