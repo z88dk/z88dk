@@ -54,18 +54,16 @@ dosmessage:
 begin:
 ENDIF
 
-    ld      (start1+1),sp
+    ld      (__restore_sp_onexit+1),sp
     INCLUDE	"crt/classic/crt_init_sp.asm"
     INCLUDE	"crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
     ld      (exitsp),sp
 
-IF CLIB_MSXDOS = 2
   IF CRT_DISABLELOADER != 1
     call    loadbanks
     jp      c,cleanup
   ENDIF
-ENDIF
 
 IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
@@ -97,7 +95,7 @@ ENDIF
 
 cleanup:
     call    crt0_exit
-start1:
+__restore_sp_onexit:
     ld      sp,0
     jp      0
 
@@ -105,8 +103,7 @@ l_dcal:
     jp      (hl)
 
 
-IF CLIB_MSXDOS = 2
-  IF CRT_DISABLELOADER != 1
+IF CRT_DISABLELOADER != 1
 
   PUBLIC banked_call
 banked_call:
@@ -317,7 +314,6 @@ tempstack:      defs    CLIB_BANKING_STACK_SIZE
 
 tempsp: defw    tempstack + CLIB_BANKING_STACK_SIZE
 
-  ENDIF
 ENDIF
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"
@@ -331,10 +327,8 @@ ENDIF
     PUBLIC  brksave
 brksave:    defb    1
 
-IF CLIB_MSXDOS = 2
-  IF CRT_DISABLELOADER != 1
+IF CRT_DISABLELOADER != 1
     ; Include a lot of banks (org to 0x8000)
     INCLUDE "target/msx/classic/megarom.asm"
-  ENDIF
 ENDIF
 
