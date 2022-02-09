@@ -21,7 +21,7 @@ start:
 
     ld      iy,23610        ; restore the right iy value, 
                             ; fixing the self-relocating trick, if any
-    ld      (start1+1),sp
+    ld      (__restore_sp_onexit+1),sp
     INCLUDE	"crt/classic/crt_init_sp.asm"
     INCLUDE	"crt/classic/crt_init_atexit.asm"
     call	crt0_init_bss
@@ -42,7 +42,7 @@ cleanup_exit:
     ld      hl,10072        ;Restore hl' to what basic wants
     exx
     pop     bc
-start1: 
+__restore_sp_onexit:
     ld      sp,0            ;Restore stack to entry value
     ret
 

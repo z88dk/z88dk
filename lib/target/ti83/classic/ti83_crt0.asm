@@ -268,7 +268,7 @@ start:
 IF ZASMLOAD
 	call	_runIndicOff	; stop anoing run-indicator
 ENDIF
-	ld	(start1+1),sp
+	ld	(__restore_sp_onexit+1),sp
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
 	call	crt0_init_bss
@@ -302,7 +302,8 @@ ENDIF
 	im	2
 	call	_main
 cleanup:			; exit() jumps to this point
-start1:	ld	sp,0		; writeback
+__restore_sp_onexit:
+    ld	sp,0		; writeback
 	ld	iy,_IY_TABLE	; Restore flag-pointer
 IF !(Ion | SOS | Ti_Explorer | V_Explorer | Anova)
  IF NONANSI

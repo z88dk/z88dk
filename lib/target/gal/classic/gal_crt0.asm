@@ -28,29 +28,29 @@ IF      !DEFINED_CRT_ORG_CODE
 	defc	CRT_ORG_CODE = 0x2c3a
 ENDIF
 
-        defc    CONSOLE_COLUMNS = 32
-        defc    CONSOLE_ROWS = 16
+    defc    CONSOLE_COLUMNS = 32
+    defc    CONSOLE_ROWS = 16
 
-	defc	TAR__no_ansifont = 1
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
-	defc __CPU_CLOCK = 3072000
-	INCLUDE	"crt/classic/crt_rules.inc"
+    defc    TAR__no_ansifont = 1
+    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__register_sp = -1
+    defc __CPU_CLOCK = 3072000
+    INCLUDE	"crt/classic/crt_rules.inc"
 
-        org     CRT_ORG_CODE
+    org     CRT_ORG_CODE
 
 start:
-        ld      (start1+1),sp   ;Save entry stack
-	INCLUDE	"crt/classic/crt_init_sp.asm"
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    ld      (__restore_sp_onexit+1),sp   ;Save entry stack
+    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    call	crt0_init_bss
+    ld      (exitsp),sp
 
 IF DEFINED_USING_amalloc
 	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
-        call    _main           ;Call user program
+    call    _main           ;Call user program
 
 cleanup:
     call    crt0_exit
@@ -59,7 +59,7 @@ cleanup:
 cleanup_exit:
 	halt
 	im	1
-start1: ld      sp,0            ;Restore stack to entry value
+__restore_sp_onexit:ld      sp,0            ;Restore stack to entry value
 vpeek_noop:
 	scf
 noop:

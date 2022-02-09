@@ -45,11 +45,11 @@
         org     CRT_ORG_CODE
 
 start:
-        ld      (start1+1),sp	;Save entry stack
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    ld      (__restore_sp_onexit+1),sp	;Save entry stack
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
+    call	crt0_init_bss
+    ld      (exitsp),sp
 IF DEFINED_USING_amalloc
 	INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
@@ -61,7 +61,7 @@ cleanup:
     call    crt0_exit
 
 
-start1:
+__restore_sp_onexit:
         ld      sp,0
         jp	$AD	; Go back to monitor
 

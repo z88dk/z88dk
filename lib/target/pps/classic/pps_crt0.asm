@@ -54,7 +54,7 @@ ENDIF
 
 
 start:
-    ld      (start1+1),sp	;Save entry stack
+    ld      (__restore_sp_onexit+1),sp	;Save entry stack
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
@@ -98,7 +98,7 @@ cleanup:
     push    hl      ;save return code
     call    crt0_exit
     pop     bc
-start1:
+__restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value
     ld      bc,$41  ;exit with - error code
     rst     $10

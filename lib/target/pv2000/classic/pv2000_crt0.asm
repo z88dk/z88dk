@@ -59,7 +59,7 @@ start:
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
 
-    ld      (start1+1),sp   ; Save entry stack
+    ld      (__restore_sp_onexit+1),sp   ; Save entry stack
     call    crt0_init_bss
     ld      (exitsp),sp
     ld      hl,2
@@ -83,7 +83,7 @@ cleanup_exit:
 
     pop     hl      ; return code (still not sure it is teh right one !)
 
-start1: 
+__restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value
     ret
 

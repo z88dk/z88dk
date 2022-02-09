@@ -56,7 +56,7 @@ ace_ramtest:
     ld      h,a         ; use $fc to mask to the lower 1k boundary
     ld      sp,hl
 ELSE
-    ld      (start1+1),sp
+    ld      (__restore_sp_onexit+1),sp
     INCLUDE	"crt/classic/crt_init_sp.asm"
     INCLUDE	"crt/classic/crt_init_atexit.asm"
 ENDIF
@@ -130,7 +130,7 @@ cleanup:
     push    hl
     call    crt0_exit
     pop     bc
-start1:
+__restore_sp_onexit:
     ld      sp,0
 IF (startup=2)
     di

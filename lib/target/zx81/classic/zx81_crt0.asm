@@ -223,7 +223,7 @@ ENDIF
 	; the stack will be moved to make room
 	; for high-resolution graphics.
 	
-        ld      (start1+1),sp   ;Save entry stack
+        ld      (__restore_sp_onexit+1),sp   ;Save entry stack
 
 	INCLUDE	"crt/classic/crt_init_sp.asm"
 	INCLUDE	"crt/classic/crt_init_atexit.asm"
@@ -276,7 +276,7 @@ ENDIF
 ENDIF
 
         pop     bc		; return code (for BASIC)
-start1: ld      sp,0            ;Restore stack to entry value
+__restore_sp_onexit:ld      sp,0            ;Restore stack to entry value
         ret
 
 l_dcal: jp      (hl)            ;Used for function pointer calls

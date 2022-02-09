@@ -21,14 +21,12 @@ start:
 	ld	a,$FF				; back to main ROM
 	out	($71),a				; bank switching
 
-        ld      (start1+1),sp
-		
-		
-	INCLUDE	"crt/classic/crt_init_sp.asm"
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-	
-        ld      (exitsp),sp	
+    ld      (__restore_sp_onexit+1),sp
+    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    call	crt0_init_bss
+
+    ld      (exitsp),sp	
 		
 	IF DEFINED_USING_amalloc
 		INCLUDE "crt/classic/crt_init_amalloc.asm"
@@ -43,7 +41,7 @@ start:
 cleanup:
         call    crt0_exit
 
-start1:
+__restore_sp_onexit:
         ld      sp,0
 		
 	ld	a,$FF		; restore Main ROM

@@ -62,13 +62,13 @@ ENDIF
 
 start:
 
+    ld      (__restore_sp_onexit+1),sp   ; Save entry stack
 
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
 
-        ld      (start1+1),sp   ; Save entry stack
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    call    crt0_init_bss
+    ld      (exitsp),sp
 
 
 ; Optional definition for auto MALLOC init
@@ -91,7 +91,7 @@ cleanup_exit:
 
         pop     bc				; return code (still not sure it is teh right one !)
 
-start1: ld      sp,0            ;Restore stack to entry value
+__restore_sp_onexit:ld      sp,0            ;Restore stack to entry value
         ret
 
 

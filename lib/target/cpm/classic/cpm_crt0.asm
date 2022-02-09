@@ -99,7 +99,7 @@ ENDIF
 
     ld      hl,0
     add     hl,sp
-    ld      (start1+1),hl	;Save entry stack
+    ld      (__restore_sp_onexit+1),hl	;Save entry stack
 IF (startup=3)
     ; Increase to cover +3 MEM banking
     defc    __clib_exit_stack_size_t  = __clib_exit_stack_size + 18 + 18
@@ -175,7 +175,7 @@ cleanup:
     push    hl		;Save return value
     call    crt0_exit
     pop     bc		;Get exit() value into bc
-start1:	
+__restore_sp_onexit:
     ld      sp,0		;Pick up entry sp
     jp      0
 

@@ -19,9 +19,9 @@
 ; Execution starts here
 ;----------------------
 start:
-    ld      (start1+1),sp
-    INCLUDE	"crt/classic/crt_init_sp.asm"
-    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    ld      (__restore_sp_onexit+1),sp
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
     ld      (exitsp),sp
 
@@ -39,7 +39,7 @@ ENDIF
     call    msxbios
 cleanup:
     call    crt0_exit
-start1:
+__restore_sp_onexit:
     ld      sp,0
     ret
 

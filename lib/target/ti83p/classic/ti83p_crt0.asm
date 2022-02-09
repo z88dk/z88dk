@@ -159,7 +159,7 @@ IF DEFINED_GimmeSpeed
 	rst	28		; bcall(SetExSpeed)
 	defw	SetExSpeed	;
 ENDIF				;
-	ld	(start1+1),sp	;
+	ld	(__restore_sp_onexit+1),sp	;
         INCLUDE "crt/classic/crt_init_sp.asm"
         INCLUDE "crt/classic/crt_init_atexit.asm"
         call    crt0_init_bss
@@ -196,7 +196,8 @@ IF DEFINED_GimmeSpeed		;
 	rst	28		; bcall(SetExSpeed)
 	defw	SetExSpeed	;
 ENDIF				;
-start1:	ld	sp,0		; Restore SP
+__restore_sp_onexit:
+    ld	sp,0		; Restore SP
 IF TSE				; TSE Kernel
 	call	_tseForceYield	; Task-switch back to shell (can return...)
 	jp	start		; begin again if needed...

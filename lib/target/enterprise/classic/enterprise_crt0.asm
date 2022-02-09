@@ -117,7 +117,7 @@ ENDIF
 
 ; Inspired by the DizzyLord loader by ORKSOFT
         ;di
-        ld      (start1+1),sp
+        ld      (__restore_sp_onexit+1),sp
         ld    a, 004h
         out   (0bfh), a
 	INCLUDE "crt/classic/crt_init_sp.asm"
@@ -195,7 +195,7 @@ _basiccmd:
         defm    "BASIC"
 ENDIF
 
-start1:
+__restore_sp_onexit:
         ld      sp,0
         ret
 

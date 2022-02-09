@@ -63,11 +63,11 @@ ENDIF
 ; End of header, begin of startup part
 ;-------------------------------------
 start:
-	ld	(start1+1),sp
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-        call    crt0_init_bss
-	ld	(exitsp),sp
+    ld	(__restore_sp_onexit+1),sp
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss
+    ld	(exitsp),sp
 
 IF DEFINED_USING_amalloc
 	INCLUDE "crt/classic/crt_init_amalloc.asm"
@@ -90,7 +90,8 @@ ENDIF
 	im	2
 	call	_main
 cleanup:			; exit() jumps to this point
-start1:	ld	sp,0		; writeback
+__restore_sp_onexit:
+    ld	sp,0		; writeback
 	ld	iy,_IY_TABLE	; Restore flag-pointer
 	im	1
 tiei:	ei

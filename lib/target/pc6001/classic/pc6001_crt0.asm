@@ -105,11 +105,11 @@ start:
 ;ENDIF
 
 		
-        ld      (start1+1),sp   ;Save entry stack
-	INCLUDE	"crt/classic/crt_init_sp.asm"
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    ld      (__restore_sp_onexit+1),sp   ;Save entry stack
+    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    call	crt0_init_bss
+    ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -128,7 +128,7 @@ ENDIF
         call    _main
 cleanup:
         call    crt0_exit
-start1:
+__restore_sp_onexit:
         ld      sp,0
         ;ei
 noop:

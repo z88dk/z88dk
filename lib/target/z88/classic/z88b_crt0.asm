@@ -5,39 +5,39 @@
 ;	$Id: bas_crt0.asm,v 1.21 2016-06-21 20:49:06 dom Exp $
 
 
-        PUBLIC    cleanup               ;jp'd to by exit()
-        PUBLIC    l_dcal                ;jp(hl)
+    PUBLIC  cleanup               ;jp'd to by exit()
+    PUBLIC  l_dcal                ;jp(hl)
 
 
-        PUBLIC    processcmd    ;Processing <> commands
+    PUBLIC  processcmd    ;Processing <> commands
 
 
-        PUBLIC  _cpfar2near     ;Conversion of far to near data
+    PUBLIC  _cpfar2near     ;Conversion of far to near data
 
 ;-----------
 ; The .def files that we need here
 ;-----------
-	INCLUDE "bastoken.def"
-	INCLUDE "ctrlchar.def"
-	INCLUDE "error.def"
-	INCLUDE "stdio.def"
+    INCLUDE "bastoken.def"
+    INCLUDE "ctrlchar.def"
+    INCLUDE "error.def"
+    INCLUDE "stdio.def"
 
 ;--------
 ; Define the graphics map and segment for basic
 ;--------
-        EXTERN  z88_map_bank
-        EXTERN  z88_map_segment
-        defc    z88_map_bank = $4D3
-        defc    z88_map_segment = 192
+    EXTERN  z88_map_bank
+    EXTERN  z88_map_segment
+    defc    z88_map_bank = $4D3
+    defc    z88_map_segment = 192
 
 
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -0x1ffe	; oz safe place
-	defc	CRT_KEY_DEL = 127
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__register_sp = -0x1ffe	; oz safe place
+    defc    CRT_KEY_DEL = 127
+    INCLUDE "crt/classic/crt_rules.inc"
 
 
-        org $2300
+    org     $2300
 
 ;-----------
 ; Dennis Groning's BASIC file header
@@ -57,31 +57,28 @@ bas_last:
 ; Code starts executing from here
 ;-----------
 start:
-	ld	(start1+1),sp	;Save starting stack
-	INCLUDE	"crt/classic/crt_init_sp.asm"
-	INCLUDE	"crt/classic/crt_init_atexit.asm"
-        call    crt0_init_bss
-        ld      (exitsp),sp
+    ld      (__restore_sp_onexit+1),sp	;Save starting stack
+    INCLUDE	"crt/classic/crt_init_sp.asm"
+    INCLUDE	"crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss
+    ld      (exitsp),sp
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of 
-; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
-	ld	hl,(start1+1)
-	INCLUDE "crt/classic/crt_init_amalloc.asm"
+    ld      hl,(__restore_sp_onexit+1)
+    INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
 
-        call    doerrhan	;Initialise a laughable error handler
+    call    doerrhan    ;Initialise a laughable error handler
 
-        call    _main		;Run the program
-cleanup:			;Jump back here from exit() if needed
-        call    crt0_exit
+    call    _main       ;Run the program
+cleanup:                ;Jump back here from exit() if needed
+    call    crt0_exit
 
-        call_oz(gn_nln)		;Print a new line
-        call    resterrhan	;Restore the original error handler
-start1:	ld	sp,0		;Restore stack to entry value
-        ret			;Out we go
-
+    call_oz(gn_nln)     ;Print a new line
+    call    resterrhan  ;Restore the original error handler
+__restore_sp_onexit:
+    ld      sp,0        ;Restore stack to entry value
+    ret
 ;-----------
 ; Install the error handler
 ;-----------
@@ -137,15 +134,15 @@ errescpressed:
 ; the stack as required
 ;-----------
 _cpfar2near:
-	pop	bc
-	pop	hl
-	pop	de
-	push	bc
-	ret
+    pop     bc
+    pop     hl
+    pop     de
+    push    bc
+    ret
 
 
-        INCLUDE "crt/classic/crt_section.asm"
+    INCLUDE "crt/classic/crt_section.asm"
 
-        SECTION  bss_crt
+    SECTION  bss_crt
 l_erraddr:       defw    0       ;Not sure if these are used...
 l_errlevel:      defb    0

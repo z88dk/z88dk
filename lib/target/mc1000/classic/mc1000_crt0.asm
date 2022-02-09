@@ -266,18 +266,18 @@ start:
 	;LD ($106),a
 		;ld		hl,$106
 		;ld		(hl),255	; disable gaming mode (shouldn't this work by putting 255??)
-        ld      (start1+1),sp
+    ld      (__restore_sp_onexit+1),sp
 IF __register_sp == 0
-        ld      hl,$bfff	; 48K ?
-	ld	a,$55
-        ld      (hl),a
-	cp	(hl)
-        jr      z,has48k
-        ld      hl,$3fff	; 48K.
+    ld      hl,$bfff	; 48K ?
+    ld      a,$55
+    ld      (hl),a
+    cp      (hl)
+    jr      z,has48k
+    ld      hl,$3fff	; 48K.
 has48k:
-        ld      sp,hl
-	UNDEFINE  __register_sp
-	defc	__register_sp = -1
+    ld      sp,hl
+    UNDEFINE  __register_sp
+    defc    __register_sp = -1
 ENDIF
         
         ;ei
@@ -300,7 +300,7 @@ cleanup:
         call    crt0_exit
 
         pop     bc
-start1:
+__restore_sp_onexit:
         ld      sp,0
 
 IF (startup=2)

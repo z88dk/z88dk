@@ -34,7 +34,7 @@ ENDIF
     org     CRT_ORG_CODE
 
 start:
-    ld      (start1+1),sp	;Save entry stack
+    ld      (__restore_sp_onexit+1),sp	;Save entry stack
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     dec     sp
@@ -88,7 +88,7 @@ cleanup:
     push    hl
     call    crt0_exit
     pop     bc      ;Get exit() value into bc
-start1:
+__restore_sp_onexit:
     ld      sp,0		;Pick up entry sp
     jp      $1FFA	; HOT boot
 

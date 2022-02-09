@@ -44,17 +44,16 @@
 
 	INCLUDE "target/fp1100/def/fp1100.def"
 	
-        org     CRT_ORG_CODE
-	jp	start
+    org     CRT_ORG_CODE
 
+    jp      start
 start:
+    ld      (__restore_sp_onexit+1),sp   ; Save entry stack
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
 
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-
-        ld      (start1+1),sp   ; Save entry stack
-	call	crt0_init_bss
-        ld      (exitsp),sp
+    call    crt0_init_bss
+    ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
@@ -77,7 +76,7 @@ cleanup_exit:
 
         pop     bc				; return code (still not sure it is teh right one !)
 
-start1: ld      sp,0            ;Restore stack to entry value
+__restore_sp_onexit:ld      sp,0            ;Restore stack to entry value
 	ret
 
 

@@ -39,7 +39,7 @@
 start:
     ld      ix,4
     add     ix,sp
-    ld      (start1+1),sp	;Save starting stack
+    ld      (__restore_sp_onexit+1),sp	;Save starting stack
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
     ld      (exitsp),sp	
@@ -63,7 +63,7 @@ cleanup:			;Jump back here from exit() if needed
 
     call    resterrhan	;Restore the original error handler
 
-start1:	
+__restore_sp_onexit	
     ld      sp,0        ;Restore stack to entry value
     ret
 

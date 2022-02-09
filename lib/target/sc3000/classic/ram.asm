@@ -21,7 +21,7 @@
 start:
     ld      hl,0
     add     hl,sp
-    ld      (start1+1),sp
+    ld      (__restore_sp_onexit+1),sp
     INCLUDE	"crt/classic/crt_init_sp.asm"
     INCLUDE	"crt/classic/crt_init_atexit.asm"
 
@@ -44,6 +44,6 @@ cleanup:
     call    crt0_exit
 
 
-start1:
+__restore_sp_onexit:
     ld      sp,0
     ret

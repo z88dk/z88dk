@@ -49,7 +49,7 @@ ENDIF
     org     CRT_ORG_CODE
 
 start:
-    ld      (start1+1),sp
+    ld      (__restore_sp_onexit+1),sp
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
@@ -73,12 +73,11 @@ cleanup:
     call    crt0_exit
 
 
-start1:
-IF startup = 2
-    jr      start1
-ELSE
+__restore_sp_onexit:
     ld      sp,0
-
+IF startup = 2
+    jr      __restore_sp_onexit
+ELSE
     ld      ix,KILBUF	;Clear keyboard buffer
     call    msxbios
 

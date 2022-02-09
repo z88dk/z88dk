@@ -130,13 +130,13 @@ start:
 ;	ld	b,h
 ;	ld	c,l
 
-        ld      (start1+1),sp
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-;	push	bc		
-	call	crt0_init_bss
-;	pop	bc
-        ld      (exitsp),sp
+    ld      (__restore_sp_onexit+1),sp
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
+    ;	push	bc		
+    call	crt0_init_bss
+    ;	pop	bc
+    ld      (exitsp),sp
 ;       push	bc  ; keep ptr to arg list
 
 ; Optional definition for auto MALLOC init
@@ -221,7 +221,7 @@ IF (!DEFINED_osca_notimer)
         ei
 ENDIF
         pop	hl	; restore exit value
-start1:
+__restore_sp_onexit:
         ld	sp,0
         xor	a
         or	h	; ATM we are not mamaging the 'spawn' exception
