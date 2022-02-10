@@ -1,8 +1,8 @@
 
     SECTION code_clib
 
-    PUBLIC  xor_MODE1
+    PUBLIC  __krt_xor
 
-.xor_MODE1
+.__krt_xor
     defc    NEEDxor = 1
-    INCLUDE "target/gal/graphics/pixel_MODE1.inc"
+    INCLUDE "pixel_krt.inc"
