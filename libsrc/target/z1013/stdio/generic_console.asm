@@ -50,7 +50,7 @@ generic_console_printc:
     ld      a,(__z1013_mode)
     and     a
     ld      a,d
-    jp      nz,printc_MDOE1
+    jp      nz,printc_MODE1
     call    xypos
     ld      (hl),a
     ret
