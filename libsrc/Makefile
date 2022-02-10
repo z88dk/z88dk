@@ -134,7 +134,7 @@ TOCREATE += $(call check_target,x1,x1_clib.lib x1_cpm.lib $(CPMLIBS))
 TOCREATE += $(call check_target,z1013,z1013_clib.lib)
 TOCREATE += $(call check_target,z80tvgame,z80tvgame_clib.lib)
 TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
-TOCREATE += $(call check_target,z9001,z9001_clib.lib gfx9001krt.lib)
+TOCREATE += $(call check_target,z9001,z9001_clib.lib)
 TOCREATE += $(call check_target,zx, zx_clib.lib mzx.lib mzx_tiny.lib zxrom.lib)
 TOCREATE += $(call check_target,zxvgs, zxvgs.lib)
 TOCREATE += $(call check_target,zx80, zx80_clib.lib)
@@ -1073,13 +1073,6 @@ z9001_clib.lib:
 	$(MAKE) -C games TARGET=z9001
 	$(MAKE) -C video/krt TARGET=z9001
 	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(TARGET_DIRECTORY)/z9001/z9001.lst
-
-gfx9001krt.lib:
-	@echo ''
-	@echo '--- Building Z9001 KRT High Resolution Library ---'
-	@echo ''
-	$(MAKE) -C gfx TARGET=z9001 SUBTYPE=z9001krt FLAVOUR=wide
-	TARGET=z9001krt  TYPE=z80 $(LIBLINKER) -DFORz9001krt -x$(OUTPUT_DIRECTORY)/gfx9001krt @$(TARGET_DIRECTORY)/z9001/gfx9001krt.lst
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano
 kc_clib.lib:

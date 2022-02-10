@@ -29,6 +29,47 @@ ENDIF
     defc    CONSOLE_COLUMNS = 40
     defc    CONSOLE_ROWS = 24
 
+
+    defc    KRT_PORT = 0xb8
+    defc    KRT_ENABLE = 0x08
+    defc    KRT_DISABLE = 0x09
+    defc    KRT_ROWS = 24
+    defc    KRT_COLUMNS = 40
+    defc    KRT_ADDRESS = $ec00
+    defc    KRT_BANK_SELECTOR = 0x08
+
+    PUBLIC KRT_ENABLE
+    PUBLIC KRT_DISABLE
+    PUBLIC KRT_PORT
+    PUBLIC KRT_ROWS
+    PUBLIC KRT_COLUMNS
+    PUBLIC KRT_ADDRESS
+    PUBLIC KRT_BANK_SELECTOR
+
+IF CLIB_DISABLE_MODE1 = 1
+    PUBLIC  __krt_vpeek
+    PUBLIC  __krt_printc
+    PUBLIC  __krt_plot
+    PUBLIC  __krt_res
+    PUBLIC  __krt_xor
+    PUBLIC  __krt_pointxy
+    PUBLIC  __krt_pixeladdress
+    PUBLIC  __krt_scrollup
+    defc    __krt_vpeek = vpeek_noop
+    defc    __krt_printc = noop
+    defc    __krt_plot = noop
+    defc    __krt_res = noop
+    defc    __krt_xor = noop
+    defc    __krt_pointxy = noop
+    defc    __krt_pixeladdress = noop
+    defc    __krt_scrollup = noop
+    PUBLIC  __CLIB_DISABLE_MODE1
+    defc    __CLIB_DISABLE_MODE1 = 1
+ELSE
+    PUBLIC  __CLIB_DISABLE_MODE1
+    defc    __CLIB_DISABLE_MODE1 = 0
+ENDIF
+
     defc    TAR__no_ansifont = 1
     defc    TAR__register_sp = CRT_ORG_CODE - 2
     defc    TAR__clib_exit_stack_size = 32

@@ -15,8 +15,12 @@
     EXTERN  KRT_COLUMNS
     EXTERN  KRT_ROWS
     EXTERN  KRT_ENABLE
+    EXTERN  KRT_BANK_SELECTOR
 
     EXTERN  vpeek_screendollar
+    EXTERN  __krt_hook_set_colour
+    EXTERN  __krt_hook_cls_colour
+    EXTERN  __krt_hook_scrollup_colour
 
 
     EXTERN  generic_console_flags
@@ -31,6 +35,7 @@ cls1:
     push    bc
     ld      a,8
     sub     b
+    or      KRT_BANK_SELECTOR
     out     (KRT_PORT),a
     ld      hl,KRT_ADDRESS
     ld      de,KRT_ADDRESS + 1
@@ -39,6 +44,7 @@ cls1:
     ldir    
     pop     bc
     djnz    cls1
+    call    __krt_hook_cls_colour
     ret
 
 
@@ -69,6 +75,7 @@ loop:
     push    bc
     ld      a,8
     sub     b
+    or      KRT_BANK_SELECTOR
     out     (KRT_PORT),a
 
     ld      a,(generic_console_flags)
@@ -86,8 +93,9 @@ not_bold:
     djnz    loop
     ld      a,(generic_console_flags)
     bit     3,a
-    ret     z
+    jp      z,__krt_hook_set_colour
     ld      (hl),255
+    call    __krt_hook_set_colour
     ret
 
 
@@ -111,6 +119,7 @@ __krt_vpeek:
 vpeek_1:
     ld      a,8
     sub     b
+    or      KRT_BANK_SELECTOR
     out     (KRT_PORT),a
     ld      a,(hl)
     ld      (de),a
@@ -127,6 +136,7 @@ scroll1:
     push    bc
     ld      a,8
     sub     b
+    or      KRT_BANK_SELECTOR
     out     (KRT_PORT),a
 
     ld      hl,KRT_ADDRESS + KRT_COLUMNS
@@ -141,7 +151,7 @@ scroll2:
     djnz    scroll2
     pop     bc
     djnz    scroll1
-
+    call    __krt_hook_scrollup_colour
 
     pop     de
     pop     bc
