@@ -2,6 +2,10 @@ target/z1013/stdio/fgetc_cons
 target/z1013/stdio/getk
 target/z1013/stdio/fputc_cons
 target/z1013/stdio/generic_console
+target/z1013/stdio/conio_vars
+target/z1013/stdio/generic_console_ioctl
+target/z1013/stdio/generic_console_MODE1
+target/z1013/stdio/CRT_FONT
 @stdio/ansicore.lst
 target/z1013/stdio/ansi/f_ansi_attr
 target/z1013/stdio/ansi/f_ansi_bel
@@ -11,6 +15,24 @@ stdio/ansi/generic/f_ansi_dline
 target/z1013/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
 games/joystick
-target/z1013/graphics/textpixl
-@gfx/text/gfx_text.lst
+@font/font_8x8/font_8x8.lst
 
+@video/krt/video_krt.lst
+target/z1013/graphics/cleargraphics.asm
+target/z1013/graphics/getmaxx.asm
+target/z1013/graphics/getmaxy.asm
+target/z1013/graphics/pixladdr.asm
+target/z1013/graphics/plot_MODE0.asm
+target/z1013/graphics/plot_MODE1.asm
+target/z1013/graphics/plotpixl.asm
+target/z1013/graphics/pointxy.asm
+target/z1013/graphics/pointxy_MODE0.asm
+target/z1013/graphics/pointxy_MODE1.asm
+target/z1013/graphics/res_MODE0.asm
+target/z1013/graphics/res_MODE1.asm
+target/z1013/graphics/respixl.asm
+target/z1013/graphics/textpixl.asm
+target/z1013/graphics/xor_MODE0.asm
+target/z1013/graphics/xor_MODE1.asm
+target/z1013/graphics/xorpixl.asm
+@gfx/narrow/gfx_narrow.lst

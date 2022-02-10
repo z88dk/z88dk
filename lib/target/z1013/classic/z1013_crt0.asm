@@ -23,6 +23,46 @@
     defc    CONSOLE_ROWS = 32
     defc    CONSOLE_COLUMNS = 32
 
+    defc    KRT_PORT = 8
+    defc    KRT_ENABLE = 0x08
+    defc    KRT_DISABLE = 0x09
+    defc    KRT_ROWS = 32
+    defc    KRT_COLUMNS = 32
+    defc    KRT_ADDRESS = $ec00
+    defc    KRT_BANK_SELECTOR = 0
+
+    PUBLIC KRT_ENABLE
+    PUBLIC KRT_DISABLE
+    PUBLIC KRT_PORT
+    PUBLIC KRT_ROWS
+    PUBLIC KRT_COLUMNS
+    PUBLIC KRT_ADDRESS
+    PUBLIC KRT_BANK_SELECTOR
+
+IF CLIB_DISABLE_MODE1 = 1
+    PUBLIC  __krt_vpeek
+    PUBLIC  __krt_printc
+    PUBLIC  __krt_plot
+    PUBLIC  __krt_res
+    PUBLIC  __krt_xor
+    PUBLIC  __krt_pointxy
+    PUBLIC  __krt_pixeladdress
+    PUBLIC  __krt_scrollup
+    defc    __krt_vpeek = vpeek_noop
+    defc    __krt_printc = noop
+    defc    __krt_plot = noop
+    defc    __krt_res = noop
+    defc    __krt_xor = noop
+    defc    __krt_pointxy = noop
+    defc    __krt_pixeladdress = noop
+    defc    __krt_scrollup = noop
+    PUBLIC  __CLIB_DISABLE_MODE1
+    defc    __CLIB_DISABLE_MODE1 = 1
+ELSE
+    PUBLIC  __CLIB_DISABLE_MODE1
+    defc    __CLIB_DISABLE_MODE1 = 0
+ENDIF
+
 
 IF      !DEFINED_CRT_ORG_CODE
     defc    CRT_ORG_CODE  = 100h
@@ -38,7 +78,7 @@ ENDIF
     org     CRT_ORG_CODE
 
 start:
-    ld      (start1+1),sp	;Save entry stack
+    ld      (__restore_sp_onexit+1),sp	;Save entry stack
 
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
@@ -53,7 +93,7 @@ cleanup:
 	push    hl
     call    crt0_exit
     pop     bc
-start1:
+__restore_sp_onexit:
     ld      sp,0    ;Restore stack to entry value
     jp      $F000
 
