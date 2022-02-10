@@ -28,10 +28,10 @@
     ld      a,e
     and     7
     out     (KRT_PORT), a
-    ld      l,e		;Already *8
+    ld      l,e         ;Already *8
     ld      h,0
-    add     hl,hl		;*16
-    add     hl,hl		;*32
+    add     hl,hl       ;*16
+    add     hl,hl       ;*32
     ld      a,l
     and     @11100000
     ld      e,d

@@ -1069,7 +1069,7 @@ z9001_clib.lib:
 	@echo ''
 	@echo '--- Building Robotron KC85/1, KC/87, Z9001 Library ---'
 	@echo ''
-	$(call buildgeneric,z9001,"text narrow wide")
+	$(call buildgeneric,z9001,"gencon wide")
 	$(MAKE) -C games TARGET=z9001
 	$(MAKE) -C video/krt TARGET=z9001
 	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(TARGET_DIRECTORY)/z9001/z9001.lst

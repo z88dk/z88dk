@@ -15,10 +15,10 @@
 
     EXTERN  KRT_PORT
     EXTERN  KRT_DISABLE
-    EXTERN  __krt_cls
-    EXTERN  __krt_printc
-    EXTERN  __krt_vpeek
-    EXTERN  __krt_scrollup
+    EXTERN  cls_MODE1
+    EXTERN  printc_MODE1
+    EXTERN  vpeek_MODE1
+    EXTERN  scrollup_MODE1
     EXTERN  __z1013_mode
 
     defc    DISPLAY = 0xEC00
@@ -32,7 +32,7 @@ generic_console_set_attribute:
 generic_console_cls:
     ld      a,(__z1013_mode)
     and     a
-    jp      nz,__krt_cls
+    jp      nz,cls_MODE1
     ld      a,KRT_DISABLE
     out     (KRT_PORT),a
     ld      hl, DISPLAY
@@ -50,7 +50,7 @@ generic_console_printc:
     ld      a,(__z1013_mode)
     and     a
     ld      a,d
-    jp      nz,__krt_printc
+    jp      nz,printc_MDOE1
     call    xypos
     ld      (hl),a
     ret
@@ -64,7 +64,7 @@ generic_console_printc:
 generic_console_vpeek:
     ld      a,(__z1013_mode)
     and     a
-    jp      nz,__krt_vpeek
+    jp      nz,vpeek_MODE1
     call    xypos
     ld      a,(hl)
     and     a
@@ -86,7 +86,7 @@ generic_console_printc_3:
 generic_console_scrollup:
     ld      a,(__z1013_mode)
     and     a
-    jp      nz,__krt_scrollup
+    jp      nz,scrollup_MODE1
     push    de
     push    bc
     ld      hl, DISPLAY + CONSOLE_COLUMNS

@@ -14,3 +14,12 @@
     defc    printc_MODE1 = __krt_printc
     defc    vpeek_MODE1 = __krt_vpeek
     defc    scrollup_MODE1 = __krt_scrollup
+
+    PUBLIC  __krt_hook_set_colour
+    PUBLIC  __krt_hook_cls_colour
+    PUBLIC  __krt_hook_scrollup_colour
+
+__krt_hook_set_colour:
+__krt_hook_cls_colour:
+__krt_hook_scrollup_colour:
+    ret
