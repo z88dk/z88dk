@@ -706,23 +706,6 @@
 
 
 
-#define __IO_LUT_OPERAND_LATCH  0x40
-#define __IO_LUT_RESULT_MSB  0x41
-#define __IO_LUT_RESULT_LSB  0x40
-
-#define __IO_LUT_MODULE_AVAILABLE  0x00
-
-
-
-
-
-
-
-
-
-
-
-
 #define __IO_RAM_TOGGLE  0x30
 #define __IO_ROM_TOGGLE  0x38
 #define __IO_RAM_SHADOW_BASE  0x58

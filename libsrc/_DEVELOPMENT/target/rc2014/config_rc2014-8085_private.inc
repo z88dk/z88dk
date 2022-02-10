@@ -713,23 +713,6 @@ defc __IDE_CMD_ID = 0xEC
 
 
 
-defc __IO_LUT_OPERAND_LATCH  = 0x40
-defc __IO_LUT_RESULT_MSB  = 0x41
-defc __IO_LUT_RESULT_LSB  = 0x40
-
-defc __IO_LUT_MODULE_AVAILABLE  = 0x00
-
-
-
-
-
-
-
-
-
-
-
-
 defc __IO_RAM_TOGGLE = 0x30
 defc __IO_ROM_TOGGLE = 0x38
 defc __IO_RAM_SHADOW_BASE  = 0x58
