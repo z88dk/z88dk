@@ -39,10 +39,6 @@ extern unsigned char io_rom_toggle;
 
 extern unsigned int  io_shadow_base;
 
-extern unsigned char io_lut_operand_latch;
-extern unsigned char io_lut_result_msb;
-extern unsigned char io_lut_result_lsb;
-
 #else
 
 __sfr __at __IO_DIO_PORT       io_dio;
@@ -71,10 +67,6 @@ __sfr __at __IO_ROM_TOGGLE      io_rom_toggle;
 
 __sfr __banked __at __IO_RAM_SHADOW_BASE    io_shadow_base;
 
-__sfr __at __IO_LUT_OPERAND_LATCH   io_lut_operand_latch;
-__sfr __at __IO_LUT_RESULT_MSB      io_lut_result_msb;
-__sfr __at __IO_LUT_RESULT_LSB      io_lut_result_lsb;
-
 #endif
 
 // SYSTEM FUNCTIONS
@@ -85,19 +77,3 @@ __DPROTO(`iyh,iyl',`iyh,iyl',void,*,shadow_write,void *dst,const void *src,size_
 __DPROTO(`iyh,iyl',`iyh,iyl',void,*,shadow_read,void *dst,const void *src,size_t n)
 __DPROTO(`iyh,iyl',`iyh,iyl',void,,shadow_relocate,void *dst)
 
-// provide lut functions
-
-__DPROTO(`d,e,iyh,iyl',`d,e,iyh,iyl',uint16_t,,lut_read,uint16_t location)
-
-#ifdef __SCCZ80
-
-#define lut_mulu(a,b) lut_read((uint8_t)(a)<<8|(uint8_t)(b))
-
-#endif
-
-#ifdef __SDCC
-
-#define lut_mulu(a,b) lut_read_fastcall((uint8_t)(a)<<8|(uint8_t)(b))
-
-#endif
-#endif
