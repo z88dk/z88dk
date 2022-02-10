@@ -11,11 +11,11 @@ EXTERN asm_pop_ei_jp
 EXTERN __IO_RAM_SHADOW_BASE
 
 .shadow_read_callee
-   pop af
-   pop bc
    pop hl
+   pop bc
    pop de
-   push af
+   ex (sp),hl
+   ex de,hl
 
    ld a,b
    or c

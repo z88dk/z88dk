@@ -26,7 +26,7 @@ PUBLIC asm_pop_ei_jp
    ; uses  : af
 
    pop af                      ; af = ei_di_status
-   jp po, di_state
+   jp PO, di_state
 
 .ei_state
 

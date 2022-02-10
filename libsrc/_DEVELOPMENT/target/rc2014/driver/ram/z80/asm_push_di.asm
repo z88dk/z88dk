@@ -29,10 +29,10 @@ PUBLIC asm_push_di
    di
 
    push af
-   pop hl                      ; hl = ei_di status
+   pop hl                       ; hl = ei_di status
 
-   pop af                      ; af = ret
-   ex (sp),hl                  ; restore hl, push ei_di_status
+   pop af                       ; af = ret
+   ex (sp),hl                   ; restore hl, push ei_di_status
 
    push af
    ret
