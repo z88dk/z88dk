@@ -30,6 +30,7 @@ long  jptab;
 int  l;
 char token[1000];
 int address;
+int brand;
 
 /* For the SKOOL mode (disassembler), refer to:  http://skoolkit.ca/ */
 
@@ -276,13 +277,50 @@ int stkstr_skel[]={8, 0xF7, CATCH_CALL, 0xC1, 0xE1, 0x78, 0xB1, 0x28, SKIP};
 int stka_skel[]={15, 0xCD, SKIP, SKIP, 0x78, 0xB1, 0x28, SKIP, 0x1A, 0xC3, CATCH, CATCH, 0xCD, SKIP, SKIP, 0xC3};
 int decfp_skel[]={11, 0xCD, SKIP, SKIP, 0x20, SKIP, CATCH_CALL, SKIP, 1, 0, 6, 0xCD};
 
+int zx_prep_add[]={13, ADDR, 0x7E, 0x36, 0, SKIP, 0xC8, 0x23, 0xCB, 0x7E, 0xCB, 0xFE, 0x2B, 0xC8};
+int zx_prep_add2[]={13, ADDR, 0x7E, SKIP, 0xC8, 0x36, 0, 0x23, 0xCB, 0x7E, 0xCB, 0xFE, 0x2B, 0xC8};
+
+int zx_exchange[]={9, ADDR, 6, 5, 0x1A, 0x4E, 0xEB, 0x12, 0x71, 0x23};
+int zx_exchange2[]={10, ADDR, 6, 5, 0x4E, 0x1A, 0x77, 0x79, 0x12, 0x13, 0x23};
+
+
+int zx_class6[]={13, 0xFE, 0xA8, 0x20, SKIP, 0xE7, CATCH_CALL, SKIP_CALL, SKIP_CALL, 0xC2, SKIP, SKIP, 0xE6, 0x1F};
+int zx_syntax_on[]={13, 0xFE, 0xA8, 0x20, SKIP, 0xE7, SKIP_CALL, CATCH_CALL, SKIP_CALL, 0xC2, SKIP, SKIP, 0xE6, 0x1F};
+int zx_stk_to_a[]={13, 0xFE, 0xA8, 0x20, SKIP, 0xE7, SKIP_CALL, CATCH_CALL, SKIP_CALL, 0xC2, SKIP, SKIP, 0xE6, 0x1F};
+
+int zx_copybuff[]={10, 0xFD, 0x96, SKIP, 0xCB, 0xFF, 0xC6, 0x3C, 0xD4, CATCH, CATCH};
+int zx_copybuff2[]={11, 0xFD, 0xCB, SKIP, 0x4E, 0xC2, CATCH, CATCH, 0x0E, 0x21, SKIP_CALL, 0x05};
+
+int zx_poscr[]={11, 0xFD, 0xCB, SKIP, 0x4E, 0xC2, SKIP, SKIP, 0x0E, 0x21, CATCH_CALL, 0x05};
+
+int zx_syntax_z[]={7, CATCH_CALL, 0xC0, 0xD1, 0x3E, 0x76, 0xBE, 0xC8};
+int zx_syntax_z2[]={7, CATCH_CALL, 0xC0, 0xC1, 0x7E, 0xFE, 0x76, 0xC8};
+
+int check_end[]={8, ADDR, SKIP_CALL, 0xC0, 0xD1, 0x3E, 0x76, 0xBE, 0xC8};
+int check_end2[]={8, ADDR, SKIP_CALL, 0xC0, 0xC1, 0x7E, 0xFE, 0x76, 0xC8};
+int check_end_xzs[]={9, SKIP_CALL, CATCH_CALL, SKIP_CALL, 0x78, 0xE6, 0x3F, 0x67, 0x69, 0x22};
+
+int zx_fetch_num[]={9, CATCH_CALL, SKIP_CALL, SKIP_CALL, 0x78, 0xE6, 0x3F, 0x67, 0x69, 0x22};
+int zx_find_int2[]={9, SKIP_CALL, SKIP_CALL, CATCH_CALL, 0x78, 0xE6, 0x3F, 0x67, 0x69, 0x22};
+int zx_find_int2_2[]={10, CATCH_CALL, 0x78, 0xE6, 0x3F, 0x67, 0x69, 0x22, SKIP, SKIP, SKIP_CALL};
+int zx_find_int2_3[]={8, 0xFD, 0xCB, SKIP, 0xCE, CATCH_CALL, 0x78, 0xE6, 0x3F};
+
+
+
 
 /* Sinclair BASIC token extraction */
-int tklambda_skel[]={12, 0xB7, 0xF2, SKIP, SKIP, 0xE6, 0x3F, 0x21, CATCH, CATCH, 0xFE, 0x49, 0x30};
+int tkzx80_skel[]={13, 0xE5, 0x21, CATCH, CATCH, 0x96, 0x23, 0x38, SKIP, 0x3C,  0x47, 0xCB, 0x7E, 0x23};
 int tkzx81_skel[]={12, 0xE5, 0x21, CATCH, CATCH, 0xCB, 0x7F, 0x28, SKIP, 0xE6, 0x3F, 0xFE, 0x43};
+int tklambda_skel[]={12, 0xB7, 0xF2, SKIP, SKIP, 0xE6, 0x3F, 0x21, CATCH, CATCH, 0xFE, 0x49, 0x30};
 int tkspectrum_skel[]={13, 0x11, CATCH, CATCH, 0xF5, 0xCD, SKIP, SKIP, 0x38, SKIP, 0x3E, 0x20, 0xFD, 0xCB};
 int tk2068_skel[]={15, 0x11, CATCH, CATCH, 0xFE,0x5B, 0x38, SKIP, 0xD6, 0x1F, 0xF5, 0xCD, SKIP, SKIP, 0x38, SKIP};
 int tkzx128_skel[]={15, 0xD8, 0x06, 0xF9, 0x11, SKIP, SKIP , 0x21, CATCH, CATCH, 0xCD, SKIP, SKIP, 0xD0, 0xFE, 0xFF};
+
+
+int zx_classtbl[]={10, 33, CATCH, CATCH, 6, 0, 0x09, 0x4E, 0x09, 0xE5, 0xDF};
+int zx_jptab[]={13, 0xE7, 0x79, 0xD6, SKIP, 0xDA, SKIP, SKIP, 0x4F, 33, CATCH, CATCH, 0x09, 0x4E};
+int zx_jptab2[]={12, 0xE7, 0x79, 0xD6, SKIP, 0x38, SKIP, 0x4F, 33, CATCH, CATCH, 0x09, 0x4E};
+
 
 /* Sinclair BASIC error messages */
 int zxerr_skel[]={16, 0xFE, 0x0A, 0x38, 2, 0xC6, 7, 0xCD, SKIP, SKIP, 0X3E, 0x20, SKIP, 0x78, 0x11,  CATCH, CATCH};
@@ -1013,37 +1051,125 @@ int find_skel (int *skel) {
 
 int zx81char(int c) {
 	int a;
-	switch (c) {
-		case 11:
-			a='"';
-			break;
-		case 13:
-			a='$';
-			break;
-		case 15:
-			a='?';
-			break;
-		case 18:
-			a='>';
-			break;
-		case 19:
-			a='<';
-			break;
-		case 20:
-			a='=';
-			break;
-		case 23:
-			a='*';
-			break;
-		case 27:
-			a='.';
-			break;
-		default:
-			a=c+27;
-			break;
+	// ZX80
+	if (brand == 1) {
+		switch (c) {
+			case 0:
+				a='_';
+				break;
+			case 1:
+				a='"';
+				break;
+			case 13:
+				a='$';
+				break;
+			case 14:
+				a=':';
+				break;
+			case 15:
+				a='?';
+				break;
+			case 16:
+				a='(';
+				break;
+			case 17:
+				a=')';
+				break;
+			case 23:
+				a='>';
+				break;
+			case 24:
+				a='<';
+				break;
+			case 25:
+				a=';';
+				break;
+			case 26:
+				a=',';
+				break;
+			case 27:
+				a='.';
+				break;
+			case 22:
+				a='=';
+				break;
+			case 19:
+				a='+';
+				break;
+			case 20:
+				a='*';
+				break;
+			case 21:
+				a='/';
+				break;
+			default:
+				a=c+27;
+				break;
+		}
+	} else {
+	// ZX81
+		switch (c) {
+			case 0:
+				a='_';
+				break;
+			case 11:
+				a='"';
+				break;
+			case 13:
+				a='$';
+				break;
+			case 14:
+				a=':';
+				break;
+			case 15:
+				a='?';
+				break;
+			case 16:
+				a='(';
+				break;
+			case 17:
+				a=')';
+				break;
+			case 18:
+				a='>';
+				break;
+			case 19:
+				a='<';
+				break;
+			case 20:
+				a='=';
+				break;
+			case 21:
+				a='+';
+				break;
+			case 22:
+				a='-';
+				break;
+			case 23:
+				a='*';
+				break;
+			case 24:
+				a='/';
+				break;
+			case 25:
+				a=';';
+				break;
+			case 26:
+				a=',';
+				break;
+			case 27:
+				a='.';
+				break;
+			default:
+				a=c+27;
+				break;
+		}
 	}
 	return (a);
 }
+
+
+
 
 int main(int argc, char *argv[])
 {
@@ -1053,7 +1179,6 @@ int main(int argc, char *argv[])
 	int	i, flg;
 	long res, res2, res3;
 	int token_range;
-	int brand;
 	int new_tk_found;
 
 
@@ -3095,6 +3220,7 @@ int main(int argc, char *argv[])
 					printf ("Unknown System Variables mode\n");
 					break;
 			}
+		
 
 		printf("\n");
 
@@ -3123,10 +3249,43 @@ int main(int argc, char *argv[])
 				break;
 		}
 
+
 		printf("\n");
 
 		if (SKOOLMODE)
 			dlbl("PROG", res, "BASIC program start");
+
+		// This section is probably useless
+		// --------------------------------
+		if (!brand) {
+			res=find_skel(tkzx80_skel);
+			if (res> 0) {
+				brand=ZX80;
+				printf("\n#\t; Unknown ZX80 clone");
+			}
+
+			res=find_skel(tkzx81_skel);
+			if (res> 0) {
+				brand=ZX81;
+				printf("\n#\t; Unknown ZX81 clone");
+			}
+
+			res=find_skel(tkspectrum_skel);
+			if (res> 0) {
+				brand=SPECTRUM;
+				printf("\n#\t; Unknown Spectrum clone");
+			}
+
+			res=find_skel(tklambda_skel);
+			if (res> 0) {
+				brand=LAMBDA;
+				printf("\n#\t; Unknown ZX81 clone (Lambda style)");
+			}
+			
+			printf("\n");
+		}
+		// --------------------------------
+
 
 		res=find_skel(vars_skel);
 		if (res<0)
@@ -3206,6 +3365,71 @@ int main(int argc, char *argv[])
 		if (res>0)
 			clbl("ZXFP_DEC_TO_FP", res, "Decimal floating point");
 
+		res=find_skel(zx_prep_add);
+		if (res<0)
+			res=find_skel(zx_prep_add2);
+		if (res>0)
+			clbl("PREP_ADD", res+1, "Prepare FP value on Stack for addition");
+
+		res=find_skel(zx_exchange);
+		if (res<0)
+			res=find_skel(zx_exchange2);
+		if (res>0) {
+			clbl("EXCHANGE", res+1, "Swap first FP number with second number");
+			if (SKOOLMODE)	clbl("SWAP_BYTE", res+3, "Start of 'swap' loop.");
+		}
+
+
+		res=find_skel(zx_class6);
+		if (res>0)
+			clbl("CLASS_6", res, "Evaluate numeric expression and check for integer result");
+		res=find_skel(zx_syntax_on);
+		if (res>0)
+			clbl("SYNTAX_ON", res, "Internally used by PRINT on ZX81");
+		res=find_skel(zx_stk_to_a);
+		if (res>0)
+			clbl("STK_TO_A", res, "Put stack in A register");
+
+		res=find_skel(zx_copybuff);
+		if (res<0)
+			res=find_skel(zx_copybuff2);
+		if (res>0)
+			clbl("COPY_BUFF", res, "Send text line in buffer to the ZX Printer");
+
+		res=find_skel(zx_poscr);
+		if (res>0)
+			clbl("PO_SCR", res, "Test for scroll");
+
+		res=find_skel(zx_syntax_z);
+		if (res<0)
+			res=find_skel(zx_syntax_z2);
+		if (res>0)
+			clbl("SYNTAX_Z", res, "Set zero flag if checking syntax.");
+
+		res=find_skel(check_end);
+		if (res<0)
+			res=find_skel(check_end2);
+		if (res>0)
+			clbl("CHECK_END", res+1, "Check for end of statement and for no spurious characters.");
+		else {
+			res=find_skel(check_end_xzs);
+			if (res>0)
+				clbl("CHECK_END", res, "Check for end of statement and for no spurious characters.");
+		}
+
+		res=find_skel(zx_fetch_num);
+		if (res>0)
+			clbl("FETCH_NUM", res, "Fetch a number");
+
+		res=find_skel(zx_find_int2);
+		if (res<0)
+			res=find_skel(zx_find_int2_2);
+		if (res<0)
+			res=find_skel(zx_find_int2_3);
+		if (res>0)
+			clbl("FIND_INT", res, "Find integer (BC).  a.k.a. FIND_INT_2 on Spectrum");
+
+
 		printf("\n");
 
 		res=find_skel(zxfpmod_skel);
@@ -3253,8 +3477,23 @@ int main(int argc, char *argv[])
 				printf("\n#\tZXFP_STK_PI_D_2 = $%02X",img[res+13]);
 			}
 		}
+		
+		printf("\n\n");
+
+		res=find_skel(zx_classtbl);
+		if (res>0)
+			dlbl("CLASS_TBL", res, "Command class table");
 
 		printf("\n\n\n");
+		
+		
+		res=find_skel(zx_jptab);
+		if (res<0)
+			res=find_skel(zx_jptab2);
+		if (res>0)
+			dlbl("OFFSET_T", res, "Offset table (command JP table)");
+
+
 
 		/* Sinclair BASIC Commands */
 
@@ -3267,7 +3506,7 @@ int main(int argc, char *argv[])
 						printf("\n\n\n#TOKEN table position = $%04X\n", (unsigned int) res);
 						printf("\n#\t--- ");
 					chr=192;
-					for (i=res; (img[i]!=0xCD)!=0; i++) {
+					for (i=res; (img[i]!=0xCD); i++) {
 						c=img[i] & 0xBF;
 						if (chr==256)  chr=64;
 						if (c>=128) { c-=128; printf("%c \n#\t%d ",zx81char(c), chr++); }
@@ -3276,14 +3515,17 @@ int main(int argc, char *argv[])
 				}
 				break;
 
+			case ZX80:
 			case ZX81:
 				res=find_skel(tkzx81_skel);
+				if (res<0)
+					res=find_skel(tkzx80_skel);
 				if (res>0) {
 					if (SKOOLMODE)	dlbl("TKN_TABLE", res, "TOKEN table position");
 					printf("\n\n\n#TOKEN table position = $%04X\n", (unsigned int) res);
 					printf("\n#\t--- ");
 					chr=192;
-					for (i=res; (img[i]!=0x23)!=0; i++) {
+					for (i=res; ((brand==ZX81)&&(img[i]!=0x23)) || ((brand==ZX80)&&(img[i]!=205)); i++) {
 						c=img[i] & 0xBF;
 						if (chr==256) chr=64;
 						if (c>=128) { c-=128; printf("%c \n#\t%d ",zx81char(c), chr++); }
@@ -3299,7 +3541,7 @@ int main(int argc, char *argv[])
 					printf("\n\n\n#TOKEN table position = $%04X\n", (unsigned int) res);
 					printf("\n#\t--- ");
 					chr=165;
-					for (i=res; (chr<263)!=0; i++) {
+					for (i=res; (chr<263); i++) {
 						c=img[i];
 						if (c>=128) {
 							c-=128;
@@ -3323,7 +3565,7 @@ int main(int argc, char *argv[])
 					chr=165;
 					if (len>16384) res+=16384;
 					if (len>32768) res+=32768;
-					for (i=res; (chr<=256)!=0; i++) {
+					for (i=res; (chr<=256); i++) {
 						c=img[i];
 						if (c>=128) { c-=128; printf("%c \n#\t%d ",c, chr++); }
 						else printf("%c",c);
