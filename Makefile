@@ -34,7 +34,7 @@ endif
 
 Z88DK_PATH	= $(shell pwd)
 SDCC_PATH	= $(Z88DK_PATH)/src/sdcc-build
-SDCC_VERSION    = 12555
+SDCC_VERSION    = 13006
 
 ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
@@ -104,6 +104,8 @@ ifdef BUILD_SDCC
 		--disable-tlcs90-port --disable-xa51-port --disable-stm8-port \
 		--disable-pdk13-port --disable-pdk14-port \
 		--disable-pdk15-port --disable-pdk16-port \
+		--disable-mos6502-port --disable-mos65c02-port \
+		--disable-r2k-port \
 		--disable-ucsim --disable-device-lib --disable-packihx
 endif
 

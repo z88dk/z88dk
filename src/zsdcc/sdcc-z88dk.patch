@@ -1,6 +1,6 @@
 Index: src/SDCCasm.c
 ===================================================================
---- src/SDCCasm.c	(revision 12555)
+--- src/SDCCasm.c	(revision 13006)
 +++ src/SDCCasm.c	(working copy)
 @@ -403,8 +403,8 @@
  static const ASM_MAPPING _asxxxx_mapping[] = {
@@ -23,7 +23,7 @@ Index: src/SDCCasm.c
     "; ---------------------------------\n"
 Index: src/SDCCglue.c
 ===================================================================
---- src/SDCCglue.c	(revision 12555)
+--- src/SDCCglue.c	(revision 13006)
 +++ src/SDCCglue.c	(working copy)
 @@ -195,7 +195,7 @@
             (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
@@ -55,7 +55,7 @@ Index: src/SDCCglue.c
          }
  
        sym->ival = NULL;
-@@ -1899,9 +1903,12 @@
+@@ -1903,9 +1907,12 @@
    /* for all variables in this segment do */
    for (sym = setFirstItem (map->syms); sym; sym = setNextItem (map->syms))
      {
@@ -70,7 +70,7 @@ Index: src/SDCCglue.c
  
        /* eliminate redundant __str_%d (generated in stringToSymbol(), SDCCast.c) */
        if (!isinSet (tmpSet, sym))
-@@ -2079,7 +2086,11 @@
+@@ -2083,7 +2090,11 @@
  void
  flushStatics (void)
  {
@@ -84,9 +84,9 @@ Index: src/SDCCglue.c
  
 Index: src/SDCCmain.c
 ===================================================================
---- src/SDCCmain.c	(revision 12555)
+--- src/SDCCmain.c	(revision 13006)
 +++ src/SDCCmain.c	(working copy)
-@@ -514,16 +514,15 @@
+@@ -521,16 +521,15 @@
  {
    int i;
  
@@ -112,7 +112,7 @@ Index: src/SDCCmain.c
  static void
 Index: src/SDCCopt.c
 ===================================================================
---- src/SDCCopt.c	(revision 12555)
+--- src/SDCCopt.c	(revision 13006)
 +++ src/SDCCopt.c	(working copy)
 @@ -1016,7 +1016,7 @@
        /* TODO: Eliminate it, convert any SEND of volatile into DUMMY_READ_VOLATILE. */
@@ -132,7 +132,7 @@ Index: src/SDCCopt.c
        goto convert;
      }
  
-@@ -2148,10 +2148,11 @@
+@@ -2166,10 +2166,11 @@
    int i;
    int change = 0;
    iCode *ic, *newic;
@@ -145,7 +145,7 @@ Index: src/SDCCopt.c
  
    // Wide loop counter
    for (i = 0; i < count; i++)
-@@ -2348,8 +2349,8 @@
+@@ -2366,8 +2367,8 @@
                continue;
              }
  
@@ -156,7 +156,7 @@ Index: src/SDCCopt.c
  
            if (lic)
              {
-@@ -2356,7 +2357,7 @@
+@@ -2374,7 +2375,7 @@
                if (lic->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (lic)) && !IS_OP_LITERAL (IC_RIGHT (lic)))
                  continue;
  
@@ -165,7 +165,7 @@ Index: src/SDCCopt.c
  
                if (litval > 0x7f)
                  continue;
-@@ -2369,7 +2370,7 @@
+@@ -2387,7 +2388,7 @@
                if (ric->op != BITWISEAND || !IS_OP_LITERAL (IC_LEFT (ric)) && !IS_OP_LITERAL (IC_RIGHT (ric)))
                  continue;
  
@@ -174,9 +174,49 @@ Index: src/SDCCopt.c
  
                if (litval > 0x7f)
                  continue;
+Index: src/z80/main.c
+===================================================================
+--- src/z80/main.c	(revision 13006)
++++ src/z80/main.c	(working copy)
+@@ -1114,7 +1114,7 @@
+     1                           /* No fancy alignments supported. */
+   },
+   { NULL, NULL },
+-  1,                            /* ABI revision */
++  0,                            /* ABI revision */
+   { -1, 0, 0, 4, 0, 3, 0 },
+   { 
+     -1,                         /* shifts never use support routines */
+@@ -1246,7 +1246,7 @@
+     1                           /* No fancy alignments supported. */
+   },
+   { NULL, NULL },
+-  1,                            /* ABI revision */
++  0,                            /* ABI revision */
+   { -1, 0, 0, 4, 0, 3, 0 },
+   { -1, FALSE },
+   { z80_emitDebuggerSymbol },
+@@ -1763,7 +1763,7 @@
+     1                           /* No fancy alignments supported. */
+   },
+   { NULL, NULL },
+-  1,                            /* default ABI revision */
++  0,                            /* ABI revision */
+   { -1, 0, 0, 2, 0, 4, 0 },
+   { -1, FALSE },
+   { z80_emitDebuggerSymbol },
+@@ -2150,7 +2150,7 @@
+     1                           /* No fancy alignments supported. */
+   },
+   { NULL, NULL },
+-  1,                            /* ABI revision */
++  0,                            /* ABI revision */
+   { -1, 0, 0, 4, 0, 3, 0 },
+   { -1, FALSE },
+   { z80_emitDebuggerSymbol },
 Index: src/z80/peep.c
 ===================================================================
---- src/z80/peep.c	(revision 12555)
+--- src/z80/peep.c	(revision 13006)
 +++ src/z80/peep.c	(working copy)
 @@ -165,6 +165,88 @@
    return(found && found < end);
@@ -267,7 +307,7 @@ Index: src/z80/peep.c
  static bool
  z80MightBeParmInCallFromCurrentFunction(const char *what)
  {
-@@ -324,6 +406,8 @@
+@@ -332,6 +414,8 @@
  static bool
  z80MightRead(const lineNode *pl, const char *what)
  {
@@ -276,7 +316,7 @@ Index: src/z80/peep.c
    if(strcmp(what, "iyl") == 0 || strcmp(what, "iyh") == 0)
      what = "iy";
    if(strcmp(what, "ixl") == 0 || strcmp(what, "ixh") == 0)
-@@ -332,6 +416,16 @@
+@@ -340,6 +424,16 @@
    if(ISINST(pl->line, "call") && strcmp(what, "sp") == 0)
      return TRUE;
  
@@ -293,7 +333,7 @@ Index: src/z80/peep.c
    if(strcmp(pl->line, "call\t__initrleblock") == 0 && (strchr(what, 'd') != 0 || strchr(what, 'e') != 0))
      return TRUE;
  
-@@ -763,6 +857,7 @@
+@@ -785,6 +879,7 @@
      return(true);
    if(ISINST(pl->line, "call") && strchr(pl->line, ',') == 0)
      {
@@ -301,7 +341,7 @@ Index: src/z80/peep.c
        const symbol *f = findSym (SymbolTab, 0, pl->line + 6);
        const bool *preserved_regs;
  
-@@ -769,6 +864,16 @@
+@@ -791,6 +886,16 @@
        if(!strcmp(what, "ix"))
          return(false);
  
