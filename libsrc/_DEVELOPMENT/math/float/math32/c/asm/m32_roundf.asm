@@ -1,6 +1,6 @@
 ;--------------------------------------------------------
 ; File Created by SDCC : free open source ANSI-C Compiler
-; Version 4.1.6 #12555 (Linux)
+; Version 4.1.14 #13006 (Linux)
 ;--------------------------------------------------------
 ; Processed by Z88DK
 ;--------------------------------------------------------
@@ -424,35 +424,21 @@ _m32_roundf:
 	add	ix,sp
 	ld	c, l
 	ld	b, h
-	ld	hl, -20
+	ld	hl, -18
 	add	hl, sp
 	ld	sp, hl
-	ld	hl,0
-	add	hl, sp
-	ld	(ix-2),l
-	ld	(ix-1),h
-	ld	(hl), c
-	inc	hl
-	ld	(hl), b
-	inc	hl
-	ld	(hl), e
-	inc	hl
-	ld	(hl), d
-	ld	hl,0
-	add	hl, sp
-	ld	(ix-16),l
-	ld	(ix-15),h
-	push	de
+	pop	hl
 	push	bc
-	ld	e,(ix-16)
-	ld	d,(ix-15)
-	ld	hl,20
-	add	hl, sp
-	ex	de, hl
-	ld	bc,0x0004
-	ldir
-	pop	bc
-	pop	de
+	ld	(ix-16),e
+	ld	(ix-15),d
+	ld	a,(ix-18)
+	ld	(ix-4),a
+	ld	a,(ix-17)
+	ld	(ix-3),a
+	ld	a,(ix-16)
+	ld	(ix-2),a
+	ld	a,(ix-15)
+	ld	(ix-1),a
 	ld	a,(ix-4)
 	ld	(ix-14),a
 	ld	a,(ix-3)
@@ -618,26 +604,14 @@ l_m32_roundf_00109:
 	ld	h, b
 	jr	l_m32_roundf_00114
 l_m32_roundf_00113:
-	ld	l,(ix-16)
-	ld	h,(ix-15)
-	ld	(hl), c
-	inc	hl
-	ld	(hl), b
-	inc	hl
-	ld	(hl), e
-	inc	hl
-	ld	(hl), d
-	ld	hl,0
-	add	hl, sp
-	ld	c, (hl)
-	inc	hl
-	ld	b, (hl)
-	inc	hl
-	ld	e, (hl)
-	inc	hl
-	ld	d, (hl)
-	ld	l, c
-	ld	h, b
+	pop	hl
+	push	bc
+	ld	(ix-16),e
+	ld	(ix-15),d
+	pop	hl
+	push	hl
+	ld	e,(ix-16)
+	ld	d,(ix-15)
 l_m32_roundf_00114:
 	ld	sp, ix
 	pop	ix
