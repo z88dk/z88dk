@@ -77,3 +77,4 @@ __DPROTO(`iyh,iyl',`iyh,iyl',void,*,shadow_write,void *dst,const void *src,size_
 __DPROTO(`iyh,iyl',`iyh,iyl',void,*,shadow_read,void *dst,const void *src,size_t n)
 __DPROTO(`iyh,iyl',`iyh,iyl',void,,shadow_relocate,void *dst)
 
+#endif /* !__ARCH_RC2014_H__ */

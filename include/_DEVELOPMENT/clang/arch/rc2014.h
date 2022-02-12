@@ -85,3 +85,4 @@ extern void shadow_relocate(void *dst);
 
 
 
+#endif /* !__ARCH_RC2014_H__ */

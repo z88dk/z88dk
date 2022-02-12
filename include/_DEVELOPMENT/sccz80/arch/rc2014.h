@@ -89,3 +89,4 @@ extern void __LIB__ shadow_relocate(void *dst) __smallc __z88dk_fastcall;
 
 
 
+#endif /* !__ARCH_RC2014_H__ */
