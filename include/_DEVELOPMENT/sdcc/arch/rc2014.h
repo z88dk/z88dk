@@ -91,3 +91,4 @@ extern void shadow_relocate_fastcall(void *dst) __preserves_regs(iyh,iyl) __z88d
 
 
 
+#endif /* !__ARCH_RC2014_H__ */

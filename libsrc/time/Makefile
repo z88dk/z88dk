@@ -29,22 +29,22 @@ CLASSIC_OBJECTS = $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/,$(OBJEC
 
 all: dirs $(CLASSIC_OBJECTS) $(NEWLIB_TARGETS)
 
-obj/newlib-z80:  
+obj/newlib-z80:
 	@$(ASSEMBLER) -d -O=obj/z80/x -I.. -mz80 -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/newlib-r2k:  
+obj/newlib-r2k:
 	@$(ASSEMBLER) -d -O=obj/r2k/x -I.. -mr2ka -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/newlib-z80n:  
+obj/newlib-z80n:
 	@$(ASSEMBLER) -d -O=obj/z80n/x -I.. -mz80n -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/newlib-ixiy:  
+obj/newlib-ixiy:
 	@$(ASSEMBLER) -d -O=obj/ixiy/x -I.. -mz80 -IXIY -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/newlib-8080:  
+obj/newlib-8080:
 	@$(ASSEMBLER) -d -O=obj/8080/x -I.. -m8080 -D__CLASSIC $(NEWLIBGLOBS)
 
-obj/newlib-gbz80:  
+obj/newlib-gbz80:
 	@$(ASSEMBLER) -d -O=obj/gbz80/x -I.. -mgbz80 -D__CLASSIC $(NEWLIBGLOBS)
 
 obj/$(TARGET)/%.o: %.c
