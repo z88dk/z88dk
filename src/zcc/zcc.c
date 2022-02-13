@@ -1573,6 +1573,9 @@ int main(int argc, char **argv)
                 status = 1;
             }
         }
+        if ( !mapon ) {
+            remove_file_with_extension(outputfile, ".map");
+        }
 
         exit(status);
     }
