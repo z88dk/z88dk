@@ -285,7 +285,7 @@ extern char *utoa(uint16_t num,char *buf,int radix);
 
 
 
-#ifndef _ALLOC_MALLOC_H
+#ifndef __ALLOC_MALLOC_H__
 
 extern void *aligned_alloc(size_t alignment,size_t size);
 

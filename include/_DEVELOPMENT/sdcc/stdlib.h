@@ -365,7 +365,7 @@ extern char *utoa_callee(uint16_t num,char *buf,int radix) __z88dk_callee;
 
 
 
-#ifndef _ALLOC_MALLOC_H
+#ifndef __ALLOC_MALLOC_H__
 
 extern void *aligned_alloc(size_t alignment,size_t size);
 extern void *aligned_alloc_callee(size_t alignment,size_t size) __z88dk_callee;

@@ -43,7 +43,7 @@ __DPROTO(,,void,*,heap_realloc_unlocked,void *heap,void *p,size_t size)
 __DPROTO(,,void,*,memalign_unlocked,size_t alignment,size_t size)
 __DPROTO(,,int,,posix_memalign_unlocked,void **memptr,size_t alignment,size_t size)
 
-#ifndef _STDLIB_H
+#ifndef __STDLIB_H__
 
 __DPROTO(,,void,*,aligned_alloc,size_t alignment,size_t size)
 __DPROTO(,,void,*,calloc,size_t nmemb,size_t size)

@@ -197,7 +197,7 @@ __DPROTO(,,int,,system,char *s)
 __DPROTO(,,char,*,ultoa,uint32_t num,char *buf,int radix)
 __DPROTO(,,char,*,utoa,uint16_t num,char *buf,int radix)
 
-#ifndef _ALLOC_MALLOC_H
+#ifndef __ALLOC_MALLOC_H__
 
 __DPROTO(,,void,*,aligned_alloc,size_t alignment,size_t size)
 __DPROTO(,,void,*,calloc,size_t nmemb,size_t size)
