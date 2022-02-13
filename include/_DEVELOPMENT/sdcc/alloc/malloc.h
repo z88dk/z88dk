@@ -133,7 +133,7 @@ extern int posix_memalign_unlocked_callee(void **memptr,size_t alignment,size_t 
 
 
 
-#ifndef _STDLIB_H
+#ifndef __STDLIB_H__
 
 extern void *aligned_alloc(size_t alignment,size_t size);
 extern void *aligned_alloc_callee(size_t alignment,size_t size) __z88dk_callee;

@@ -339,7 +339,7 @@ extern char __LIB__ *utoa_callee(uint16_t num,char *buf,int radix) __smallc __z8
 
 
 
-#ifndef _ALLOC_MALLOC_H
+#ifndef __ALLOC_MALLOC_H__
 
 extern void __LIB__ *aligned_alloc(size_t alignment,size_t size) __smallc;
 extern void __LIB__ *aligned_alloc_callee(size_t alignment,size_t size) __smallc __z88dk_callee;
