@@ -58,7 +58,7 @@ void hook_cpm(void)
            Returns A=0 if no characters are waiting, nonzero if a character is waiting. */
         {
             int val;
-            if ( val = kbhit() == EOF )
+            if ( (val = kbhit()) == EOF )
                 val = 0;
             a = l = val;
         }
