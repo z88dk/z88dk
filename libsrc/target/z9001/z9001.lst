@@ -30,7 +30,6 @@ target/z9001/graphics/w_plotpixl
 target/z9001/graphics/w_pointxy
 target/z9001/graphics/pointxy_MODE0
 target/z9001/graphics/pointxy_MODE1
-target/z9001/graphics/putsprite
 target/z9001/graphics/res_MODE0
 target/z9001/graphics/res_MODE1
 target/z9001/graphics/w_respixl

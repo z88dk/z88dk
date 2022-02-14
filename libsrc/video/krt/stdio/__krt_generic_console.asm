@@ -16,6 +16,8 @@
     EXTERN  KRT_ROWS
     EXTERN  KRT_ENABLE
     EXTERN  KRT_BANK_SELECTOR
+    EXTERN  KRT_BANK_SELECTOR
+    EXTERN  KRT_CLS_FILL
 
     EXTERN  vpeek_screendollar
     EXTERN  __krt_hook_set_colour
@@ -40,7 +42,7 @@ cls1:
     ld      hl,KRT_ADDRESS
     ld      de,KRT_ADDRESS + 1
     ld      bc,+(KRT_COLUMNS * KRT_ROWS)
-    ld      (hl),0
+    ld      (hl),KRT_CLS_FILL
     ldir    
     pop     bc
     djnz    cls1
@@ -69,6 +71,7 @@ not_udg:
     ld      a,(generic_console_flags)
     rlca
     sbc     a
+    xor     KRT_CLS_FILL    ;take into account how we're filling initially
     ld      c,a             ;c = 0/c = 255 = inverse
     ld      b,8
 loop:

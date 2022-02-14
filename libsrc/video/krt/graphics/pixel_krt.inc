@@ -5,6 +5,7 @@
     EXTERN  getmaxx
     EXTERN  l_cmp
     EXTERN __gfx_coords
+    EXTERN  KRT_CLS_FILL
 
     INCLUDE "graphics/grafix.inc"
 
@@ -58,7 +59,10 @@ IF NEEDxor
     ld      (hl),a
 ENDIF
 IF NEEDpoint
-    and     (hl)
+    ld      c,a
+    ld      a,(hl)
+    xor     KRT_CLS_FILL
+    and     c
 ENDIF
     pop     bc  ;Restore callers
     ret
