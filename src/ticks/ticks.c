@@ -590,6 +590,7 @@ int    cmd_arguments_len = 0;
 int    ioport = -1;
 int    rom_size = 0;
 int    rc2014_mode = 0;
+int    c_autolabel = 0;
 
 static const uint8_t mirror_table[] = {
     0x0, 0x8, 0x4, 0xC,  /*  0-3  */

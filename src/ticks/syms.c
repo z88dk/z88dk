@@ -8,6 +8,18 @@
 static symbol  *symbols[65536] = {0};
 static symbol  *symbols_byname = NULL;
 
+typedef struct section_s section;
+
+struct section_s {
+    int      start;
+    int      end;
+    char    *name;
+    section *next;
+    UT_hash_handle hh;
+};
+
+static section *sections_byname = NULL;
+static section *sections;
 
 
 static int demangle_filename(const char *input, char *filename, char *funcname, int *lineno, int *level, int *scope)
@@ -55,6 +67,32 @@ void read_symbol_file(char *filename)
 
             // Ignore
             if ( argc < 10 ) {
+                if ( strncasecmp(argv[0], "__bss", 5) == 0 ||
+                     strncasecmp(argv[0], "__code", 6) == 0 ||
+                     strncasecmp(argv[0], "__smc", 5) == 0 ||
+                     strncasecmp(argv[0], "__data", 6) == 0 ||
+                     strncasecmp(argv[0], "__rodata", 8) == 0 ) {
+                    // It's something to do with a section 
+                    int len = strlen(argv[0]);
+
+                    // Rely on z80asm writing them out, __head, __tail, __size
+                    if ( strcmp(argv[0] + len - 5, "_size") == 0 ) {
+                        int size = strtol(!isxdigit(argv[2][0]) ? &argv[2][1] : argv[2], NULL, 16);
+                        if ( size != 0 ) {
+                            symbol *sym;
+                            int     start;
+                            strcpy(argv[0]+len - 5, "_head");
+                            if ((start = symbol_resolve(argv[0])) != -1 ) { // Looking for __head
+                                section *sect = calloc(1,sizeof(*sect));
+                                sect->start = start;
+                                sect->end = start + size;
+                                sect->name = strndup(argv[0] + 2, len - 5);
+                                LL_APPEND(sections, sect);
+                            }
+                        }
+                    }
+                }
+
                 if ( argc >= 3 ) {
                     // We've got at least 3, do something (it's an old format)
                     symbol *sym = calloc(1,sizeof(*sym));
@@ -282,4 +320,45 @@ char **parse_words(char *line, int *argc)
     *argc = n;
 
     return args;
+}
+
+void symbol_add_autolabel(int address, char *label)
+{
+    symbol *sym = calloc(1,sizeof(*sym));
+    sym->name = strdup(label);
+    sym->address = address;
+    sym->symtype = SYM_ADDRESS;
+    if ( sym->address >= 0 && sym->address <= 65535 ) {
+        LL_APPEND(symbols[sym->address], sym);
+    }
+    HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
+
+}
+
+
+int address_is_code(int addr)
+{
+    section *sect = sections;
+
+    while ( sect != NULL ) {
+        if ( addr >= sect->start && addr < sect->end) {
+            return (strncmp(sect->name, "code_",5) == 0 || strncmp(sect->name, "smc_",4) == 0 );
+        }
+        sect = sect->next;
+    }
+    
+    return 1; // We don't know, so lets assume it is code
+}
+
+void add_data_section(int addr, int end)
+{
+    section *sect = calloc(1,sizeof(*sect));
+    char     buf[128];
+
+    snprintf(buf,sizeof(buf),"data_auto_%p", sect);
+
+    sect->start = addr;
+    sect->end = end;
+    sect->name = strdup(buf);
+    LL_APPEND(sections, sect);
 }

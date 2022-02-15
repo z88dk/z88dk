@@ -8,7 +8,7 @@ typedef enum {
     SYM_ANY = 0,
     SYM_CONST = 1,
     SYM_ADDRESS = 2,
-    } symboltype;
+} symboltype;
 
 typedef struct symbol_s symbol;
 
@@ -30,5 +30,7 @@ extern const char     *find_symbol(int addr, symboltype preferred_symtype);
 extern symbol   *find_symbol_byname(const char *name);
 extern int symbol_resolve(char *name);
 extern char **parse_words(char *line, int *argc);
-
+extern void symbol_add_autolabel(int addr, char *label);
+extern int address_is_code(int addr);
+extern void add_data_section(int addr, int end);
 #endif
