@@ -2,4 +2,6 @@ target/pk8000/stdio/fputc_cons_native
 target/pk8000/stdio/generic_console
 @stdio/stdio_8080.lst
 @font/font_8x8/font_8x8.lst
-
+stdio/inkey/getk
+stdio/inkey/fgetc_cons
+@input/input_keyboard.lst
