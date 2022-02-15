@@ -49,6 +49,7 @@ gfx/wide/obj/${TARGET}/w_stencil_add_pixel
 gfx/wide/obj/${TARGET}/w_stencil_add_point
 gfx/wide/obj/${TARGET}/w_stencil_add_side
 gfx/wide/obj/${TARGET}/w_stencil_init
+gfx/wide/obj/${TARGET}/__generic_w_stencil_render
 gfx/wide/obj/${TARGET}/w_stencil_render2
 gfx/wide/obj/${TARGET}/w_uncircle
 gfx/wide/obj/${TARGET}/w_uncircle_callee

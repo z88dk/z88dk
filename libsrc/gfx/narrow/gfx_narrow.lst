@@ -53,6 +53,7 @@ gfx/narrow/obj/${TARGET}/stencil_add_pixel
 gfx/narrow/obj/${TARGET}/stencil_add_point
 gfx/narrow/obj/${TARGET}/stencil_add_side
 gfx/narrow/obj/${TARGET}/stencil_init
+gfx/narrow/obj/${TARGET}/__generic_stencil_render
 gfx/narrow/obj/${TARGET}/stencil_render2
 gfx/narrow/obj/${TARGET}/uncircle
 gfx/narrow/obj/${TARGET}/uncircle_callee
