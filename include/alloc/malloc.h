@@ -131,7 +131,7 @@ extern int __LIB__ posix_memalign_unlocked_callee(void **memptr,size_t alignment
 
 
 
-#ifndef __STDLIB_H__
+#ifndef _STDLIB_H
 
 extern void __LIB__ *aligned_alloc(size_t alignment,size_t size) __smallc;
 extern void __LIB__ *aligned_alloc_callee(size_t alignment,size_t size) __smallc __z88dk_callee;
