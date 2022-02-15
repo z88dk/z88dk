@@ -6,6 +6,8 @@
     EXTERN  l_cmp
     EXTERN __gfx_coords
     EXTERN  KRT_CLS_FILL
+    EXTERN  KRT_PORT
+    EXTERN  KRT_BANK_SELECTOR
 
     INCLUDE "graphics/grafix.inc"
 
@@ -64,5 +66,9 @@ IF NEEDpoint
     xor     KRT_CLS_FILL
     and     c
 ENDIF
+    push    af
+    ld      a,KRT_BANK_SELECTOR
+    out     (KRT_PORT),a
+    pop     af
     pop     bc  ;Restore callers
     ret

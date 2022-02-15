@@ -94,6 +94,8 @@ not_bold:
     inc     de
     pop     bc
     djnz    loop
+    ld      a,KRT_BANK_SELECTOR
+    out     (KRT_PORT),a
     ld      a,(generic_console_flags)
     bit     3,a
     jp      z,__krt_hook_set_colour
@@ -128,6 +130,8 @@ vpeek_1:
     ld      (de),a
     inc     de
     djnz    vpeek_1
+    ld      a,KRT_BANK_SELECTOR
+    out     (KRT_PORT),a
     jp      vpeek_screendollar
  
 
@@ -154,6 +158,8 @@ scroll2:
     djnz    scroll2
     pop     bc
     djnz    scroll1
+    ld      a,KRT_BANK_SELECTOR
+    out     (KRT_PORT),a
     call    __krt_hook_scrollup_colour
 
     pop     de
