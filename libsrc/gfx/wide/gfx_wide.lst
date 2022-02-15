@@ -36,6 +36,7 @@ gfx/wide/obj/${TARGET}/w_point
 gfx/wide/obj/${TARGET}/w_point_callee
 gfx/wide/obj/${TARGET}/w_pointxy
 gfx/wide/obj/${TARGET}/w_putc4x6
+gfx/wide/obj/${TARGET}/__generic_w_putsprite
 gfx/wide/obj/${TARGET}/w_putsprite2
 gfx/wide/obj/${TARGET}/w_respixl
 gfx/wide/obj/${TARGET}/w_setpos

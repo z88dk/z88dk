@@ -35,7 +35,7 @@ target/z9001/graphics/res_MODE1
 target/z9001/graphics/w_respixl
 target/z9001/graphics/textpixl
 target/z9001/graphics/w_pixladdr
-#target/z9001/graphics/w_putsprite
+target/z9001/graphics/w_putsprite
 #target/z9001/graphics/w_stencil_render
 target/z9001/graphics/xor_MODE0
 target/z9001/graphics/xor_MODE1

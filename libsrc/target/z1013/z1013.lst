@@ -28,6 +28,7 @@ target/z1013/graphics/plotpixl.asm
 target/z1013/graphics/pointxy.asm
 target/z1013/graphics/pointxy_MODE0.asm
 target/z1013/graphics/pointxy_MODE1.asm
+target/z1013/graphics/putsprite
 target/z1013/graphics/res_MODE0.asm
 target/z1013/graphics/res_MODE1.asm
 target/z1013/graphics/respixl.asm

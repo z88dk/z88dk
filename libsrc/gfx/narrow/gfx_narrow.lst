@@ -40,6 +40,7 @@ gfx/narrow/obj/${TARGET}/point
 gfx/narrow/obj/${TARGET}/point_callee
 gfx/narrow/obj/${TARGET}/pointxy
 gfx/narrow/obj/${TARGET}/putc4x6
+gfx/narrow/obj/${TARGET}/__generic_putsprite
 gfx/narrow/obj/${TARGET}/putsprite2
 gfx/narrow/obj/${TARGET}/respixl
 gfx/narrow/obj/${TARGET}/setpos
