@@ -1,6 +1,6 @@
 Index: src/SDCCasm.c
 ===================================================================
---- src/SDCCasm.c	(revision 13027)
+--- src/SDCCasm.c	(revision 13032)
 +++ src/SDCCasm.c	(working copy)
 @@ -403,8 +403,8 @@
  static const ASM_MAPPING _asxxxx_mapping[] = {
@@ -23,7 +23,7 @@ Index: src/SDCCasm.c
     "; ---------------------------------\n"
 Index: src/SDCCglue.c
 ===================================================================
---- src/SDCCglue.c	(revision 13027)
+--- src/SDCCglue.c	(revision 13032)
 +++ src/SDCCglue.c	(working copy)
 @@ -195,7 +195,7 @@
             (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
@@ -84,7 +84,7 @@ Index: src/SDCCglue.c
  
 Index: src/SDCCmain.c
 ===================================================================
---- src/SDCCmain.c	(revision 13027)
+--- src/SDCCmain.c	(revision 13032)
 +++ src/SDCCmain.c	(working copy)
 @@ -521,16 +521,15 @@
  {
@@ -112,7 +112,7 @@ Index: src/SDCCmain.c
  static void
 Index: src/SDCCopt.c
 ===================================================================
---- src/SDCCopt.c	(revision 13027)
+--- src/SDCCopt.c	(revision 13032)
 +++ src/SDCCopt.c	(working copy)
 @@ -1016,7 +1016,7 @@
        /* TODO: Eliminate it, convert any SEND of volatile into DUMMY_READ_VOLATILE. */
@@ -174,26 +174,9 @@ Index: src/SDCCopt.c
  
                if (litval > 0x7f)
                  continue;
-Index: src/z80/gen.c
-===================================================================
---- src/z80/gen.c	(revision 13027)
-+++ src/z80/gen.c	(working copy)
-@@ -4540,6 +4542,12 @@
-                   pushed_hl = true;
-                 }
-             }
-+          else if (result->type == AOP_IY && !iy_dead && !aopInReg (source, soffset + i, A_IDX))
-+            {
-+              via_a = true;
-+              if (!a_dead)
-+                _push (PAIR_AF);
-+            }
-           else if (!premoved_a && source->type == AOP_IY && result->type == AOP_REG && a_dead && i == 0 && i + 1 == size) // Using free a is cheaper than using iy.
-             via_a = true;
-           if (!premoved_a)
 Index: src/z80/main.c
 ===================================================================
---- src/z80/main.c	(revision 13027)
+--- src/z80/main.c	(revision 13032)
 +++ src/z80/main.c	(working copy)
 @@ -1114,7 +1114,7 @@
      1                           /* No fancy alignments supported. */
@@ -233,7 +216,7 @@ Index: src/z80/main.c
    { z80_emitDebuggerSymbol },
 Index: src/z80/peep.c
 ===================================================================
---- src/z80/peep.c	(revision 13027)
+--- src/z80/peep.c	(revision 13032)
 +++ src/z80/peep.c	(working copy)
 @@ -165,6 +165,88 @@
    return(found && found < end);
