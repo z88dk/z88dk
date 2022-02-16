@@ -22,6 +22,16 @@ static section *sections_byname = NULL;
 static section *sections;
 
 
+static char *duplen(const char *str, size_t len)
+{
+    char *ret = malloc(len + 1);
+
+    memcpy(ret, str, len);
+    ret[len] = 0;
+
+    return ret;
+}
+
 static int demangle_filename(const char *input, char *filename, char *funcname, int *lineno, int *level, int *scope)
 {
     *lineno = -1;
@@ -86,7 +96,7 @@ void read_symbol_file(char *filename)
                                 section *sect = calloc(1,sizeof(*sect));
                                 sect->start = start;
                                 sect->end = start + size;
-                                sect->name = strndup(argv[0] + 2, len - 5);
+                                sect->name = duplen(argv[0] + 2, len - 5);
                                 LL_APPEND(sections, sect);
                             }
                         }
