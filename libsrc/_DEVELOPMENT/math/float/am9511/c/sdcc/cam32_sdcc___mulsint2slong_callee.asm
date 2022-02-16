@@ -14,9 +14,8 @@ cam32_sdcc___mulsint2slong_callee:
    ;
    ; exit  : dehl = product
 
-   pop af
    pop hl
    pop de
-   push af
+   ex (sp),hl
 
    jp asm_am9511_imul       ; product in dehl
