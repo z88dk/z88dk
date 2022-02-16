@@ -25,6 +25,7 @@ struct network_op
 };
 
 uint8_t verbose = 0;
+int c_autolabel = 0;
 static uint8_t registers_invalidated = 1;
 static sem_t* req_response_mutex = NULL;
 static sem_t* response_mutex = NULL;

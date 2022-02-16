@@ -32,7 +32,7 @@ ENDIF
 
     defc    KRT_PORT = 0xb8
     defc    KRT_ENABLE = 0x08
-    defc    KRT_DISABLE = 0x09
+    defc    KRT_DISABLE = 0x00
     defc    KRT_ROWS = 24
     defc    KRT_COLUMNS = 40
     defc    KRT_ADDRESS = $ec00
@@ -92,6 +92,18 @@ start:
 IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
+    ; Copy variables from "text graphics mem" to "video graphics mem page 0"
+    ld      hl,$efc0
+    ld      b,64
+copy_loop:
+    ld      a,0
+    out     (KRT_PORT),a
+    ld      c,(hl)
+    ld      a,KRT_BANK_SELECTOR
+    out     (KRT_PORT),a
+    ld      (hl),c
+    inc     hl
+    djnz    copy_loop
 
     call    _main   ;Call user program
 

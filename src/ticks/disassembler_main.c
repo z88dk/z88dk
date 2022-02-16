@@ -14,6 +14,7 @@ static void disassemble_loop(int start, int end);
 unsigned char *mem;
 int  c_cpu = CPU_Z80;
 int  inverted = 0;
+int  c_autolabel = 0;
 
 
 static void usage(char *program)
@@ -81,6 +82,9 @@ int main(int argc, char **argv)
             case 'i':
                 inverted = 255;
                 break;
+            case 'a':
+                c_autolabel = 1;
+                break;
             case 'x':
                 read_symbol_file(argv[1]);
                 argc--; argv++;
@@ -141,10 +145,21 @@ int main(int argc, char **argv)
 static void disassemble_loop(int start, int end)
 {
     char   buf[256];
+    int    start2 = start;
 
-    while ( start < end ) {
-        start += disassemble2(start, buf, sizeof(buf), 0);
-        printf("%s\n",buf);
+    while ( start2 < end ) {
+        start2 += disassemble2(start2, buf, sizeof(buf), 0);
+        if (!c_autolabel) {
+            printf("%s\n",buf);
+        }
+    }
+
+    if ( c_autolabel ) {
+        start2 = start;
+        while ( start2 < end ) {
+            start2 += disassemble2(start2, buf, sizeof(buf), 0);
+            printf("%s\n",buf);
+        }
     }
 }
 
