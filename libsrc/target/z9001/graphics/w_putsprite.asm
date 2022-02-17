@@ -134,7 +134,6 @@
     pop     ix	;restore callers
     ld      a,KRT_BANK_SELECTOR
     out     (KRT_PORT),a
-    pop     ix
     ret
 
 

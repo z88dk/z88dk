@@ -7,6 +7,7 @@
     SECTION code_clib
     PUBLIC    joystick
     PUBLIC    _joystick
+    EXTERN    getk
 
 .joystick
 ._joystick
@@ -19,7 +20,9 @@
     cp    1
     jr    z,j_p1
     cp    2
-    jr    z,j_p2
+    jr    z,j_p2 
+    cp    3
+    jr    z,j_qaop
     jr    j_nop
 
 
@@ -55,3 +58,6 @@
     ld    l,a
     ld    h,0
     ret
+
+j_qaop:
+    INCLUDE "games/joystick_qaop.as1"

@@ -46,6 +46,8 @@ cls1:
     ldir    
     pop     bc
     djnz    cls1
+    ld      a,KRT_BANK_SELECTOR
+    out     (KRT_PORT),a
     call    __krt_hook_cls_colour
     ret
 
