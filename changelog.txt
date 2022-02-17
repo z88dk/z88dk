@@ -13,7 +13,7 @@ Detailed but incomplete changelist:
 - [classic] MBF32 8085 and Z80 instruction optimisation
 - [classic] sccz80 8080, 8085, gbz80 l_ primitive reentrancy
 - [classic] string function loop overhead optimisation
-- [classic] string callee functions 8080, 8085 safe
+- [classic] string callee functions made 8080, 8085 safe
 - [classic] AM9511 math library support for 8085
 - [classic] +cpc: Screen driver fixes
 - [classic] +cpc: Banking support
@@ -37,7 +37,7 @@ Detailed but incomplete changelist:
 - [classic] +zx: Improved Interface 1/Microdrive support
 - [classic] +zx: esxdos and plus3 fcntl enhancements
 - [newlib] ZX0 decompression functions added
-- [newlib] +rc2014: Support for shadow RAM copying (disabled by default)
+- [newlib] +rc2014: Support for shadow RAM access (disabled by default)
 - [newlib] +rc2014: 8085 CPU support through hybrid classic library
 - [newlib] +zxn: dot files are now created correctly
 - [sccz80] Temporary files now removed on windows
@@ -47,7 +47,7 @@ Detailed but incomplete changelist:
 - [z80asm] Now supports assembling undocumented 8085 instructions
 - [z80asm] Replace --cpu=r2k with --cpu=r2ka
 - [z80asm] Macros are now supported
-- [zsdcc] Upgraded to SDCC 4.2.0 r13032 (interim towards 4.2.0) (bugfixes)
+- [zsdcc] Upgraded to SDCC 4.2.0 r13032
 
 z88dk v2.1 - 07.02.2021
 
