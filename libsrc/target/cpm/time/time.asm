@@ -41,7 +41,7 @@ ELSE
     ld      c,12
     call    __bdos      ; check version
     cp      02Fh        ; MP/M II or later (cpm3..) ?
-    ret     NC          ; return if earlier than MP/M II (i.e. CP/M 2.2)
+    ret     C           ; return if earlier than MP/M II (i.e. CP/M 2.2)
 
     pop     de
     pop     hl
