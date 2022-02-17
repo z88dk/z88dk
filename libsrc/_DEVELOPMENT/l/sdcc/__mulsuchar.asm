@@ -6,7 +6,7 @@ SECTION code_l_sdcc
 
 PUBLIC __mulsuchar, __mulsuchar_0
 
-EXTERN l_muls_16_16x16
+EXTERN l_mulu_16_16x16
 
 __mulsuchar:
 
