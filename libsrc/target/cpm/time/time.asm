@@ -31,16 +31,17 @@ EXTERN  l_mult, l_long_mult, l_long_add, __bdos
 
 time:
 _time:
-    ld      hl,0        ; set zero, early return
+IF __CPU_INTEL__ || __CPU_GBZ80__
+    ld      hl,0        ; set zero for early return
     ld      de,hl
-
-IF __CPU_INTEL__
     ret
 
 ELSE
     ld      c,12
     call    __bdos      ; check version
     cp      02Fh        ; MP/M II or later (cpm3..) ?
+    ld      hl,0        ; set zero for early return
+    ld      de,hl
     ret     C           ; return if earlier than MP/M II (i.e. CP/M 2.2)
 
     pop     de
