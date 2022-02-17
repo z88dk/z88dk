@@ -6,6 +6,9 @@ target/cpm/cpm/cpm_platform_init
 target/cpm/cpm/__bdos
 @stdio/stdio_8080.lst
 
+target/cpm/time/obj/${TYPE}/clock
+target/cpm/time/obj/${TYPE}/time
+target/cpm/cpm/obj/${TYPE}/cpm_platform_init
 @target/cpm/fcntl/fcntl.lst
 @target/cpm/gsx.lst
 target/cpm/cpm/obj/${TYPE}/execl
