@@ -34,4 +34,4 @@ __mulsuchar_0:
    sbc a,a
    ld d,a
 
-   jp l_muls_16_16x16
+   jp l_mulu_16_16x16
