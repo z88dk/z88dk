@@ -363,6 +363,7 @@ IF FORvector06c
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 0
 ENDIF
+
   
 IF FORm100
         defc SOUND_ONEBIT_port   = 0
@@ -492,6 +493,11 @@ IF FORpencil2
     defc INPUT_JOY_useinkey = 1
 ENDIF
 
+IF !SOUND_ONEBIT_port
+        defc SOUND_ONEBIT_port   = 0
+        defc SOUND_ONEBIT_bit    = 0
+        defc SOUND_ONEBIT_mask   = 0
+ENDIF
 
 MACRO ONEBITOUT
 LOCAL l1, l2, l3, l4

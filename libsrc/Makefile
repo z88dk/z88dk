@@ -1151,6 +1151,7 @@ multi8_clib.lib:
 	@echo '--- Building Mitsubishi Multi8 Library ---'
 	@echo ''
 	$(call buildgeneric,multi8,wide)
+	$(MAKE) -C games TARGET=multi8
 	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(TARGET_DIRECTORY)/multi8/multi8.lst
 
 # Pasopia7 Multi8 - dom
