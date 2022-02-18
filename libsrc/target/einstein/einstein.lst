@@ -9,3 +9,4 @@ target/einstein/psg/set_psg
 target/einstein/psg/set_psg_callee
 @psg/ay/psg.lst
 @video/mc6845/mc6845.lst
+@games/games_joystick.lst
