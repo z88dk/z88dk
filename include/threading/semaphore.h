@@ -12,6 +12,7 @@ typedef struct {
     int             waiters[MAX_THREADS];  /**< Number of waiting threads */
 } sem_t;
 
+#ifdef __SCCZ80
 #asm
 DEFVARS 0
 {
@@ -20,6 +21,7 @@ DEFVARS 0
     semaphore_waiters       ds.w MAX_THREADS
 }
 #endasm
+#endif
 
 extern int __LIB__ sem_init(sem_t *sempahore, int shared, int value) __smallc;
 extern int __LIB__ sem_wait(sem_t *semaphore);

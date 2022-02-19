@@ -252,8 +252,8 @@ typedef struct {
 
 /// create / destroy lookup tables aren't necessary: 
 /// we use the existing sin/cos functions
-#define create_lookup_tables() asm("\n");
-#define destroy_lookup_tables() asm("\n");
+#define create_lookup_tables() 
+#define destroy_lookup_tables() 
 
 
 extern void __LIB__ msx_blit(surface_t *source, surface_t *dest, rect_t *from, rect_t *to) __smallc;

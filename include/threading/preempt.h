@@ -39,7 +39,7 @@ struct _thread {
     char      extra[4];                 /**< Extra storage for the scheduler */
 };
 
-
+#ifdef __SCCZ80
 #asm
 DEFVARS 0
 {
@@ -53,6 +53,7 @@ DEFVARS 0
     THREAD_SIZE         ds.b    1
 }
 #endasm
+#endif
 
 
 /* Schedulers can only be written in assembler due to parameters */
@@ -83,6 +84,7 @@ struct _threadbase {
     thread_t       threads[MAX_THREADS];   /**< Allocated with extra memory here */
 };
 
+#ifdef __SCZZ80
 #asm
 DEFVARS 0 {
     current             ds.w    1
@@ -96,6 +98,7 @@ DEFVARS 0 {
     threads             ds.b    1
 }
 #endasm
+#endif
 
 
 /** \brief Initialise the task manager

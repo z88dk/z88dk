@@ -44,7 +44,7 @@ extern unsigned char  SOS_MXLIN;
 // For positioning the text cursor.  The macros can be
 // used to inline code if the parameters resolve to constants.
 
-#define M_SOS_GOTOXY(xpos,ypos) asm("ld\tl,"#xpos"\nld\th,"#ypos"\ncall\t$201E\n");
+#define M_SOS_GOTOXY(xpos,ypos) __asm__("ld\tl,"#xpos"\nld\th,"#ypos"\ncall\t$201E\n");
 
 // Set console cursor position, top-left=(0;0)
 extern void  __LIB__              setcursorpos(int x, int y) __smallc;
