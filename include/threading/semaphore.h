@@ -12,7 +12,7 @@ typedef struct {
     int             waiters[MAX_THREADS];  /**< Number of waiting threads */
 } sem_t;
 
-#ifdef __SCCZ80
+#ifdef ASM_THREADING
 #asm
 DEFVARS 0
 {

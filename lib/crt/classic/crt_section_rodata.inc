@@ -26,6 +26,7 @@ ENDIF
     SECTION rodata_font_8x10
     SECTION rodata_font_ansi
     SECTION rodata_splib2
+    SECTION rodata_sound_bit
     ; Keep the following section last of all
     SECTION rodata_appdor
     SECTION RODATA_END
