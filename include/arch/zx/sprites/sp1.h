@@ -15,6 +15,8 @@
 
 #include <rect.h>
 #include <sys/types.h>
+#include <sys/compiler.h>
+#include <stdint.h>
 
 ///////////////////////////////////////////////////////////
 //                  DATA STRUCTURES                      //
@@ -22,10 +24,10 @@
 
 struct sp1_Rect {
 
-   uchar row;
-   uchar col;
-   uchar width;
-   uchar height;
+   uint8_t row;
+   uint8_t col;
+   uint8_t width;
+   uint8_t height;
 
 };
 
@@ -35,39 +37,39 @@ struct sp1_cs;
 
 struct sp1_update {                   // "update structs" - 10 bytes - Every tile in the display area managed by SP1 is described by one of these
 
-   uchar              nload;          // +0 bit 7 = 1 for invalidated, bit 6 = 1 for removed, bits 5:0 = number of occluding sprites present + 1
-   uchar              colour;         // +1 background tile attribute
-   uint               tile;           // +2 background 16-bit tile code (if MSB != 0 taken as address of graphic, else lookup in tile array)
+   uint8_t              nload;          // +0 bit 7 = 1 for invalidated, bit 6 = 1 for removed, bits 5:0 = number of occluding sprites present + 1
+   uint8_t              colour;         // +1 background tile attribute
+   uint16_t               tile;           // +2 background 16-bit tile code (if MSB != 0 taken as address of graphic, else lookup in tile array)
    struct sp1_cs     *slist;          // +4 BIG ENDIAN ; list of sprites occupying this tile (MSB = 0 if none) points at struct sp1_cs.attr_mask
    struct sp1_update *ulist;          // +6 BIG ENDIAN ; next update struct in list of update structs queued for draw (MSB = 0 if none)
-   uchar             *screen;         // +8 address in display file where this tile is drawn
+   uint8_t             *screen;         // +8 address in display file where this tile is drawn
 
 };
 
 struct sp1_ss {                       // "sprite structs" - 20 bytes - Every sprite is described by one of these
 
-   uchar              row;            // +0  current y tile-coordinate
-   uchar              col;            // +1  current x tile-coordinate
-   uchar              width;          // +2  width of sprite in tiles
-   uchar              height;         // +3  height of sprite in tiles
+   uint8_t            row;            // +0  current y tile-coordinate
+   uint8_t            col;            // +1  current x tile-coordinate
+   uint8_t            width;          // +2  width of sprite in tiles
+   uint8_t            height;         // +3  height of sprite in tiles
 
-   uchar              vrot;           // +4  bit 7 = 1 for 2-byte graphical definition else 1-byte, bits 2:0 = current vertical rotation (0..7)
-   uchar              hrot;           // +5  current horizontal rotation (0..7)
+   uint8_t            vrot;           // +4  bit 7 = 1 for 2-byte graphical definition else 1-byte, bits 2:0 = current vertical rotation (0..7)
+   uint8_t            hrot;           // +5  current horizontal rotation (0..7)
 
-   uchar             *frame;          // +6  current sprite frame address added to graphic pointers
+   uint8_t           *frame;          // +6  current sprite frame address added to graphic pointers
 
-   uchar              res0;           // +8  "LD A,n" opcode
-   uchar              e_hrot;         // +9  effective horizontal rotation = MSB of rotation table to use
-   uchar              res1;           // +10 "LD BC,nn" opcode
-   uint               e_offset;       // +11 effective offset to add to graphic pointers, equals result of vertical rotation + frame addr
-   uchar              res2;           // +13 "EX DE,HL" opcode
-   uchar              res3;           // +14 "JP (HL)" opcode
+   uint8_t            res0;           // +8  "LD A,n" opcode
+   uint8_t            e_hrot;         // +9  effective horizontal rotation = MSB of rotation table to use
+   uint8_t            res1;           // +10 "LD BC,nn" opcode
+   uint16_t           e_offset;       // +11 effective offset to add to graphic pointers, equals result of vertical rotation + frame addr
+   uint8_t            res2;           // +13 "EX DE,HL" opcode
+   uint8_t            res3;           // +14 "JP (HL)" opcode
 
    struct sp1_cs     *first;          // +15 BIG ENDIAN ; first struct sp1_cs of this sprite
 
-   uchar              xthresh;        // +17 hrot must be at least this number of pixels for last column of sprite to be drawn (1 default)
-   uchar              ythresh;        // +18 vrot must be at least this number of pixels for last row of sprite to be drawn (1 default)
-   uchar              nactive;        // +19 number of struct sp1_cs cells on display (written by sp1_MoveSpr*)
+   uint8_t            xthresh;        // +17 hrot must be at least this number of pixels for last column of sprite to be drawn (1 default)
+   uint8_t            ythresh;        // +18 vrot must be at least this number of pixels for last row of sprite to be drawn (1 default)
+   uint8_t            nactive;        // +19 number of struct sp1_cs cells on display (written by sp1_MoveSpr*)
 
 };
 
@@ -77,19 +79,19 @@ struct sp1_cs {                       // "char structs" - 24 bytes - Every sprit
 
    struct sp1_update *update;         // +2  BIG ENDIAN ; tile this sprite char currently occupies (MSB = 0 if none)
 
-   uchar              plane;          // +4  plane sprite occupies, 0 = closest to viewer
-   uchar              type;           // +5  bit 7 = 1 occluding, bit 6 = 1 last column, bit 5 = 1 last row, bit 4 = 1 clear pixelbuffer
-   uchar              attr_mask;      // +6  attribute mask logically ANDed with underlying attribute, default = 0xff for transparent
-   uchar              attr;           // +7  sprite colour, logically ORed to form final colour, default = 0 for transparent
+   uint8_t            plane;          // +4  plane sprite occupies, 0 = closest to viewer
+   uint8_t            type;           // +5  bit 7 = 1 occluding, bit 6 = 1 last column, bit 5 = 1 last row, bit 4 = 1 clear pixelbuffer
+   uint8_t            attr_mask;      // +6  attribute mask logically ANDed with underlying attribute, default = 0xff for transparent
+   uint8_t            attr;           // +7  sprite colour, logically ORed to form final colour, default = 0 for transparent
 
    void              *ss_draw;        // +8  struct sp1_ss + 8 bytes ; points at code embedded in sprite struct sp1_ss
 
-   uchar              res0;           // +10 typically "LD HL,nn" opcode
-   uchar             *def;            // +11 graphic definition pointer
-   uchar              res1;           // +13 typically "LD IX,nn" opcode
-   uchar              res2;           // +14
-   uchar             *l_def;          // +15 graphic definition pointer for sprite character to left of this one
-   uchar              res3;           // +17 typically "CALL nn" opcode
+   uint8_t            res0;           // +10 typically "LD HL,nn" opcode
+   uint8_t           *def;            // +11 graphic definition pointer
+   uint8_t            res1;           // +13 typically "LD IX,nn" opcode
+   uint8_t            res2;           // +14
+   uint8_t           *l_def;          // +15 graphic definition pointer for sprite character to left of this one
+   uint8_t            res3;           // +17 typically "CALL nn" opcode
    void              *draw;           // +18 & draw function for this sprite char
 
    struct sp1_cs     *next_in_upd;    // +20 BIG ENDIAN ; & sp1_cs.attr_mask of next sprite occupying the same tile (MSB = 0 if none)
@@ -99,26 +101,26 @@ struct sp1_cs {                       // "char structs" - 24 bytes - Every sprit
 
 struct sp1_ap {                       // "attribute pairs" - 2 bytes - A struct to hold sprite attribute and mask pairs
 
-   uchar              attr_mask;      // +0 attribute mask logically ANDed with underlying attribute = 0xff for transparent
-   uchar              attr;           // +1 sprite colour, logically ORed to form final colour = 0 for transparent
+   uint8_t            attr_mask;      // +0 attribute mask logically ANDed with underlying attribute = 0xff for transparent
+   uint8_t            attr;           // +1 sprite colour, logically ORed to form final colour = 0 for transparent
 
 };
 
 struct sp1_tp {                       // "tile pairs" - 3 bytes - A struct to hold background colour and tile pairs
 
-   uchar              attr;           // +0 colour
-   uint               tile;           // +1 tile code
+   uint8_t            attr;           // +0 colour
+   uint16_t           tile;           // +1 tile code
 
 };
 
 struct sp1_pss {                      // "print string struct" - 11 bytes - A struct holding print state information
 
    struct sp1_Rect   *bounds;         // +0 rectangular boundary within which printing will be allowed
-   uchar              flags;          // +2 bit 0=invalidate?, 1=xwrap?, 2=yinc?, 3=ywrap?
-   uchar              x;              // +3 current x coordinate of cursor with respect to top left corner of bounds
-   uchar              y;              // +4 current y coordinate of cursor with respect to top left corner of bounds
-   uchar              attr_mask;      // +5 current attribute mask
-   uchar              attr;           // +6 current attribute
+   uint8_t            flags;          // +2 bit 0=invalidate?, 1=xwrap?, 2=yinc?, 3=ywrap?
+   uint8_t            x;              // +3 current x coordinate of cursor with respect to top left corner of bounds
+   uint8_t            y;              // +4 current y coordinate of cursor with respect to top left corner of bounds
+   uint8_t            attr_mask;      // +5 current attribute mask
+   uint8_t            attr;           // +6 current attribute
    struct sp1_update *pos;            // +7 RESERVED struct sp1_update associated with current cursor coordinates
    void              *visit;          // +9 void (*visit)(struct sp1_update *) function, set to 0 for none
    
@@ -201,53 +203,53 @@ extern void  __LIB__  SP1_DRAW_LOAD1RBIM(void);    // load sprite 1-byte definit
 extern void  __LIB__  SP1_DRAW_ATTR(void);         // pixels are not drawn, only attributes
 
 
-// void *hook1  <->  void [ __FASTCALL__ ] (*hook1)(uint count, struct sp1_cs *c)      // if __FASTCALL__ only struct sp1_cs* passed
-// void *hook2  <->  void [ __FASTCALL__ ] (*hook2)(uint count, struct sp1_update *u)  // if __FASTCALL__ only struct sp1_update* passed
+// void *hook1  <->  void [ __FASTCALL__ ] (*hook1)(uint16_t count, struct sp1_cs *c)      // if __FASTCALL__ only struct sp1_cs* passed
+// void *hook2  <->  void [ __FASTCALL__ ] (*hook2)(uint16_t count, struct sp1_update *u)  // if __FASTCALL__ only struct sp1_update* passed
 //
 // void *drawf  <->  void (*drawf)(void)     // sprite draw function containing draw code and data for struct_sp1_cs
 
-extern struct sp1_ss      __LIB__  *sp1_CreateSpr(void *drawf, uchar type, uchar height, int graphic, uchar plane);
-extern uint               __LIB__   sp1_AddColSpr(struct sp1_ss *s, void *drawf, uchar type, int graphic, uchar plane);
+extern struct sp1_ss      __LIB__  *sp1_CreateSpr(void *drawf, uint8_t type, uint8_t height, int graphic, uint8_t plane);
+extern uint16_t           __LIB__   sp1_AddColSpr(struct sp1_ss *s, void *drawf, uint8_t type, int graphic, uint8_t plane);
 extern void               __LIB__   sp1_ChangeSprType(struct sp1_cs *c, void *drawf);
-extern void  __FASTCALL__ __LIB__   sp1_DeleteSpr(struct sp1_ss *s);   // only call after sprite is moved off screen
+extern void               __LIB__   sp1_DeleteSpr(struct sp1_ss *s) __z88dk_fastcall;   // only call after sprite is moved off screen
 
-extern void               __LIB__   sp1_MoveSprAbs(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uchar row, uchar col, uchar vrot, uchar hrot);
+extern void               __LIB__   sp1_MoveSprAbs(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint8_t row, uint8_t col, uint8_t vrot, uint8_t hrot);
 extern void               __LIB__   sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
-extern void               __LIB__   sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint x, uint y);
+extern void               __LIB__   sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint16_t x, uint16_t y);
 
 extern void               __LIB__   sp1_IterateSprChar(struct sp1_ss *s, void *hook1);
 extern void               __LIB__   sp1_IterateUpdateSpr(struct sp1_ss *s, void *hook2);
 
-extern void               __LIB__   sp1_GetSprClrAddr(struct sp1_ss *s, uchar **sprdest);
-extern void               __LIB__   sp1_PutSprClr(uchar **sprdest, struct sp1_ap *src, uchar n);
-extern void               __LIB__   sp1_GetSprClr(uchar **sprsrc, struct sp1_ap *dest, uchar n);
+extern void               __LIB__   sp1_GetSprClrAddr(struct sp1_ss *s, uint8_t **sprdest);
+extern void               __LIB__   sp1_PutSprClr(uint8_t **sprdest, struct sp1_ap *src, uint8_t n);
+extern void               __LIB__   sp1_GetSprClr(uint8_t **sprsrc, struct sp1_ap *dest, uint8_t n);
 
-extern void               __LIB__  *sp1_PreShiftSpr(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift);
+extern void               __LIB__  *sp1_PreShiftSpr(uint8_t flag, uint8_t height, uint8_t width, void *srcframe, void *destframe, uint8_t rshift);
 
 // some functions for displaying independent struct_sp1_cs not connected with any sprites; useful as foreground elements
 // if not using a no-rotate (NR) type sprite draw function, must manually init the sp1_cs.ldef member after calling sp1_InitCharStruct()
 
-extern void               __LIB__   sp1_InitCharStruct(struct sp1_cs *cs, void *drawf, uchar type, void *graphic, uchar plane);
+extern void               __LIB__   sp1_InitCharStruct(struct sp1_cs *cs, void *drawf, uint8_t type, void *graphic, uint8_t plane);
 extern void               __LIB__   sp1_InsertCharStruct(struct sp1_update *u, struct sp1_cs *cs);
-extern void  __FASTCALL__ __LIB__   sp1_RemoveCharStruct(struct sp1_cs *cs);
+extern void               __LIB__   sp1_RemoveCharStruct(struct sp1_cs *cs) __z88dk_fastcall;
 
 
 /* CALLEE LINKAGE */
 
-extern struct sp1_ss __CALLEE__ __LIB__ *sp1_CreateSpr_callee(void *drawf, uchar type, uchar height, int graphic, uchar plane);
-extern uint          __CALLEE__ __LIB__  sp1_AddColSpr_callee(struct sp1_ss *s, void *drawf, uchar type, int graphic, uchar plane);
-extern void          __CALLEE__ __LIB__  sp1_MoveSprAbs_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uchar row, uchar col, uchar vrot, uchar hrot);
-extern void          __CALLEE__ __LIB__  sp1_MoveSprRel_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
-extern void          __CALLEE__ __LIB__  sp1_MoveSprPix_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint x, uint y);
-extern void          __CALLEE__ __LIB__  sp1_IterateSprChar_callee(struct sp1_ss *s, void *hook1);
-extern void          __CALLEE__ __LIB__  sp1_IterateUpdateSpr_callee(struct sp1_ss *s, void *hook2);
-extern void          __CALLEE__ __LIB__  sp1_ChangeSprType_callee(struct sp1_cs *c, void *drawf);
-extern void          __CALLEE__ __LIB__  sp1_GetSprClrAddr_callee(struct sp1_ss *s, uchar **sprdest);
-extern void          __CALLEE__ __LIB__  sp1_PutSprClr_callee(uchar **sprdest, struct sp1_ap *src, uchar n);
-extern void          __CALLEE__ __LIB__  sp1_GetSprClr_callee(uchar **sprsrc, struct sp1_ap *dest, uchar n);
-extern void          __CALLEE__ __LIB__ *sp1_PreShiftSpr_callee(uchar flag, uchar height, uchar width, void *srcframe, void *destframe, uchar rshift);
-extern void          __CALLEE__ __LIB__  sp1_InitCharStruct_callee(struct sp1_cs *cs, void *drawf, uchar type, void *graphic, uchar plane);
-extern void          __CALLEE__ __LIB__  sp1_InsertCharStruct_callee(struct sp1_update *u, struct sp1_cs *cs);
+extern struct sp1_ss      __LIB__ *sp1_CreateSpr_callee(void *drawf, uint8_t type, uint8_t height, int graphic, uint8_t plane) __z88dk_callee;
+extern uint16_t           __LIB__  sp1_AddColSpr_callee(struct sp1_ss *s, void *drawf, uint8_t type, int graphic, uint8_t plane) __z88dk_callee;
+extern void               __LIB__  sp1_MoveSprAbs_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint8_t row, uint8_t col, uint8_t vrot, uint8_t hrot) __z88dk_callee;
+extern void               __LIB__  sp1_MoveSprRel_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot) __z88dk_callee;
+extern void               __LIB__  sp1_MoveSprPix_callee(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint16_t x, uint16_t y) __z88dk_callee;
+extern void               __LIB__  sp1_IterateSprChar_callee(struct sp1_ss *s, void *hook1) __z88dk_callee;
+extern void               __LIB__  sp1_IterateUpdateSpr_callee(struct sp1_ss *s, void *hook2) __z88dk_callee;
+extern void               __LIB__  sp1_ChangeSprType_callee(struct sp1_cs *c, void *drawf) __z88dk_callee;
+extern void               __LIB__  sp1_GetSprClrAddr_callee(struct sp1_ss *s, uint8_t **sprdest) __z88dk_callee;
+extern void               __LIB__  sp1_PutSprClr_callee(uint8_t **sprdest, struct sp1_ap *src, uint8_t n) __z88dk_callee;
+extern void               __LIB__  sp1_GetSprClr_callee(uint8_t **sprsrc, struct sp1_ap *dest, uint8_t n) __z88dk_callee;
+extern void               __LIB__ *sp1_PreShiftSpr_callee(uint8_t flag, uint8_t height, uint8_t width, void *srcframe, void *destframe, uint8_t rshift) __z88dk_callee;
+extern void               __LIB__  sp1_InitCharStruct_callee(struct sp1_cs *cs, void *drawf, uint8_t type, void *graphic, uint8_t plane) __z88dk_callee;
+extern void               __LIB__  sp1_InsertCharStruct_callee(struct sp1_update *u, struct sp1_cs *cs) __z88dk_callee;
 
 #define sp1_CreateSpr(a,b,c,d,e)       sp1_CreateSpr_callee(a,b,c,d,e)
 #define sp1_AddColSpr(a,b,c,d,e)       sp1_AddColSpr_callee(a,b,c,d,e)
@@ -282,8 +284,8 @@ extern void          __CALLEE__ __LIB__  sp1_InsertCharStruct_callee(struct sp1_
 // meaning a struct_sp1_ss can be used where struct_sp1_Rect
 // appears below.
 
-extern int  __LIB__ sp1_IsPtInRect(uchar x, uchar y, struct sp1_Rect *r);
-extern int  __LIB__ sp1_IsPt8InRect(uint x, uint y, struct sp1_Rect *r);   // point coords divided by 8
+extern int  __LIB__ sp1_IsPtInRect(uint8_t x, uint8_t y, struct sp1_Rect *r);
+extern int  __LIB__ sp1_IsPt8InRect(uint16_t x, uint16_t y, struct sp1_Rect *r);   // point coords divided by 8
 extern int  __LIB__ sp1_IsRectInRect(struct sp1_Rect *r1, struct sp1_Rect *r2);
 extern int  __LIB__ sp1_IntersectRect(struct sp1_Rect *r1, struct sp1_Rect *r2, struct sp1_Rect *result);
 
@@ -311,37 +313,37 @@ extern void __LIB__ sp1_MakeRect16Pix(struct sp1_ss *s, struct r_Rect16 *r);
 #define SP1_PSSFLAG_YINC        0x04
 #define SP1_PSSFLAG_YWRAP       0x08
 
-extern void  __LIB__  *sp1_TileEntry(uchar c, void *def);
+extern void  __LIB__  *sp1_TileEntry(uint8_t c, void *def);
 
-extern void  __LIB__   sp1_PrintAt(uchar row, uchar col, uchar colour, uint tile);
-extern void  __LIB__   sp1_PrintAtInv(uchar row, uchar col, uchar colour, uint tile);
-extern uint  __LIB__   sp1_ScreenStr(uchar row, uchar col);
-extern uchar __LIB__   sp1_ScreenAttr(uchar row, uchar col);
+extern void  __LIB__   sp1_PrintAt(uint8_t row, uint8_t col, uint8_t colour, uint16_t tile);
+extern void  __LIB__   sp1_PrintAtInv(uint8_t row, uint8_t col, uint8_t colour, uint16_t tile);
+extern uint16_t  __LIB__   sp1_ScreenStr(uint8_t row, uint8_t col);
+extern uint8_t __LIB__   sp1_ScreenAttr(uint8_t row, uint8_t col);
 
-extern void  __LIB__   sp1_PrintString(struct sp1_pss *ps, uchar *s);
-extern void  __LIB__   sp1_SetPrintPos(struct sp1_pss *ps, uchar row, uchar col);
+extern void  __LIB__   sp1_PrintString(struct sp1_pss *ps, uint8_t *s);
+extern void  __LIB__   sp1_SetPrintPos(struct sp1_pss *ps, uint8_t row, uint8_t col);
 
 extern void  __LIB__   sp1_GetTiles(struct sp1_Rect *r, struct sp1_tp *dest);
 extern void  __LIB__   sp1_PutTiles(struct sp1_Rect *r, struct sp1_tp *src);
 extern void  __LIB__   sp1_PutTilesInv(struct sp1_Rect *r, struct sp1_tp *src);
 
-extern void  __LIB__   sp1_ClearRect(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag);
-extern void  __LIB__   sp1_ClearRectInv(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag);
+extern void  __LIB__   sp1_ClearRect(struct sp1_Rect *r, uint8_t colour, uint8_t tile, uint8_t rflag);
+extern void  __LIB__   sp1_ClearRectInv(struct sp1_Rect *r, uint8_t colour, uint8_t tile, uint8_t rflag);
 
 /* CALLEE LINKAGE */
 
-extern void  __CALLEE__ __LIB__  *sp1_TileEntry_callee(uchar c, void *def);
-extern void  __CALLEE__ __LIB__   sp1_PrintAt_callee(uchar row, uchar col, uchar colour, uint tile);
-extern void  __CALLEE__ __LIB__   sp1_PrintAtInv_callee(uchar row, uchar col, uchar colour, uint tile);
-extern uint  __CALLEE__ __LIB__   sp1_ScreenStr_callee(uchar row, uchar col);
-extern uchar __CALLEE__ __LIB__   sp1_ScreenAttr_callee(uchar row, uchar col);
-extern void  __CALLEE__ __LIB__   sp1_PrintString_callee(struct sp1_pss *ps, uchar *s);
-extern void  __CALLEE__ __LIB__   sp1_SetPrintPos_callee(struct sp1_pss *ps, uchar row, uchar col);
-extern void  __CALLEE__ __LIB__   sp1_GetTiles_callee(struct sp1_Rect *r, struct sp1_tp *dest);
-extern void  __CALLEE__ __LIB__   sp1_PutTiles_callee(struct sp1_Rect *r, struct sp1_tp *src);
-extern void  __CALLEE__ __LIB__   sp1_PutTilesInv_callee(struct sp1_Rect *r, struct sp1_tp *src);
-extern void  __CALLEE__ __LIB__   sp1_ClearRect_callee(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag);
-extern void  __CALLEE__ __LIB__   sp1_ClearRectInv_callee(struct sp1_Rect *r, uchar colour, uchar tile, uchar rflag);
+extern void   __LIB__  *sp1_TileEntry_callee(uint8_t c, void *def) __z88dk_callee;
+extern void   __LIB__   sp1_PrintAt_callee(uint8_t row, uint8_t col, uint8_t colour, uint16_t tile) __z88dk_callee;
+extern void   __LIB__   sp1_PrintAtInv_callee(uint8_t row, uint8_t col, uint8_t colour, uint16_t tile) __z88dk_callee;
+extern uint16_t __LIB__   sp1_ScreenStr_callee(uint8_t row, uint8_t col) __z88dk_callee;
+extern uint8_t __LIB__   sp1_ScreenAttr_callee(uint8_t row, uint8_t col) __z88dk_callee;
+extern void   __LIB__   sp1_PrintString_callee(struct sp1_pss *ps, uint8_t *s) __z88dk_callee;
+extern void   __LIB__   sp1_SetPrintPos_callee(struct sp1_pss *ps, uint8_t row, uint8_t col) __z88dk_callee;
+extern void   __LIB__   sp1_GetTiles_callee(struct sp1_Rect *r, struct sp1_tp *dest) __z88dk_callee;
+extern void   __LIB__   sp1_PutTiles_callee(struct sp1_Rect *r, struct sp1_tp *src) __z88dk_callee;
+extern void   __LIB__   sp1_PutTilesInv_callee(struct sp1_Rect *r, struct sp1_tp *src) __z88dk_callee;
+extern void   __LIB__   sp1_ClearRect_callee(struct sp1_Rect *r, uint8_t colour, uint8_t tile, uint8_t rflag) __z88dk_callee;
+extern void   __LIB__   sp1_ClearRectInv_callee(struct sp1_Rect *r, uint8_t colour, uint8_t tile, uint8_t rflag) __z88dk_callee;
 
 #define sp1_TileEntry(a,b)         sp1_TileEntry_callee(a,b)
 #define sp1_PrintAt(a,b,c,d)       sp1_PrintAt_callee(a,b,c,d)
@@ -367,33 +369,33 @@ extern void  __CALLEE__ __LIB__   sp1_ClearRectInv_callee(struct sp1_Rect *r, uc
 
 // void *hook  <->  void [ __FASTCALL__ ] (*hook)(struct sp1_update *u)
 
-extern void               __LIB__   sp1_Initialize(uchar iflag, uchar colour, uchar tile);
+extern void               __LIB__   sp1_Initialize(uint8_t iflag, uint8_t colour, uint8_t tile);
 extern void               __LIB__   sp1_UpdateNow(void);
 
-extern struct sp1_update  __LIB__  *sp1_GetUpdateStruct(uchar row, uchar col);
+extern struct sp1_update  __LIB__  *sp1_GetUpdateStruct(uint8_t row, uint8_t col);
 extern void               __LIB__   sp1_IterateUpdateArr(struct sp1_update **ua, void *hook);  // zero terminated array
 extern void               __LIB__   sp1_IterateUpdateRect(struct sp1_Rect *r, void *hook);
 
-extern void __FASTCALL__  __LIB__   sp1_InvUpdateStruct(struct sp1_update *u);
-extern void __FASTCALL__  __LIB__   sp1_ValUpdateStruct(struct sp1_update *u);
+extern void               __LIB__   sp1_InvUpdateStruct(struct sp1_update *u) __z88dk_fastcall;
+extern void               __LIB__   sp1_ValUpdateStruct(struct sp1_update *u) __z88dk_fastcall;
 
-extern void __FASTCALL__  __LIB__   sp1_DrawUpdateStructIfInv(struct sp1_update *u);
-extern void __FASTCALL__  __LIB__   sp1_DrawUpdateStructIfVal(struct sp1_update *u);
-extern void __FASTCALL__  __LIB__   sp1_DrawUpdateStructIfNotRem(struct sp1_update *u);
-extern void __FASTCALL__  __LIB__   sp1_DrawUpdateStructAlways(struct sp1_update *u);
+extern void               __LIB__   sp1_DrawUpdateStructIfInv(struct sp1_update *u) __z88dk_fastcall;
+extern void               __LIB__   sp1_DrawUpdateStructIfVal(struct sp1_update *u) __z88dk_fastcall;
+extern void               __LIB__   sp1_DrawUpdateStructIfNotRem(struct sp1_update *u) __z88dk_fastcall;
+extern void               __LIB__   sp1_DrawUpdateStructAlways(struct sp1_update *u) __z88dk_fastcall;
 
-extern void __FASTCALL__  __LIB__   sp1_RemoveUpdateStruct(struct sp1_update *u);
-extern void __FASTCALL__  __LIB__   sp1_RestoreUpdateStruct(struct sp1_update *u);
+extern void               __LIB__   sp1_RemoveUpdateStruct(struct sp1_update *u) __z88dk_fastcall;
+extern void               __LIB__   sp1_RestoreUpdateStruct(struct sp1_update *u) __z88dk_fastcall;
 
-extern void __FASTCALL__  __LIB__   sp1_Invalidate(struct sp1_Rect *r);
-extern void __FASTCALL__  __LIB__   sp1_Validate(struct sp1_Rect *r);
+extern void              __LIB__   sp1_Invalidate(struct sp1_Rect *r) __z88dk_fastcall;
+extern void              __LIB__   sp1_Validate(struct sp1_Rect *r) __z88dk_fastcall;
 
 /* CALLEE LINKAGE */
 
-extern void              __CALLEE__ __LIB__   sp1_Initialize_callee(uchar iflag, uchar colour, uchar tile);
-extern struct sp1_update __CALLEE__ __LIB__  *sp1_GetUpdateStruct_callee(uchar row, uchar col);
-extern void              __CALLEE__ __LIB__   sp1_IterateUpdateArr_callee(struct sp1_update **ua, void *hook);
-extern void              __CALLEE__ __LIB__   sp1_IterateUpdateRect_callee(struct sp1_Rect *r, void *hook);
+extern void              __LIB__   sp1_Initialize_callee(uint8_t iflag, uint8_t colour, uint8_t tile) __z88dk_callee;
+extern struct sp1_update __LIB__  *sp1_GetUpdateStruct_callee(uint8_t row, uint8_t col) __z88dk_callee;
+extern void              __LIB__   sp1_IterateUpdateArr_callee(struct sp1_update **ua, void *hook) __z88dk_callee;
+extern void              __LIB__   sp1_IterateUpdateRect_callee(struct sp1_Rect *r, void *hook) __z88dk_callee;
 
 
 #define sp1_Initialize(a,b,c)       sp1_Initialize_callee(a,b,c)

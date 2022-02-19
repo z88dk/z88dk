@@ -9,7 +9,7 @@
 // this first test program.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex1.c -o ex1.bin -create-app -lsp1 -lmalloc -lndos
+// zcc +zx -vn ex1.c -o ex1.bin -create-app -lsp1  -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

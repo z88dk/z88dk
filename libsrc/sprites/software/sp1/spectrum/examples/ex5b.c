@@ -49,7 +49,7 @@
 // but only validate just before an sp1_UpdateNow() call.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex5b.c -o ex5b.bin -create-app -lsp1 -lmalloc -lndos
+// zcc +zx -vn ex5b.c -o ex5b.bin -create-app -lsp1  -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

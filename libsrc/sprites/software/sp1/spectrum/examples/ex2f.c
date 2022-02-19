@@ -21,7 +21,7 @@
 // of it all.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex2f.c -o ex2f.bin -create-app -lsp1 -lmalloc -lndos
+// zcc +zx -vn ex2f.c -o ex2f.bin -create-app -lsp1  -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

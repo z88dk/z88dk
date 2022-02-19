@@ -19,7 +19,7 @@
 // reflections using this feature.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex3c.c -o ex3c.bin -create-app -lsp1 -lmalloc -lndos
+// zcc +zx -vn ex3c.c -o ex3c.bin -create-app -lsp1  -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>
