@@ -1063,6 +1063,7 @@ z1013_clib.lib:
 	@echo ''
 	$(call buildgeneric,z1013,"gencon narrow")
 	$(MAKE) -C video/krt TARGET=z1013
+	$(MAKE) -C games TARGET=z1013
 	TARGET=z1013 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(TARGET_DIRECTORY)/z1013/z1013.lst
 
 # Robotron KC85/1, Z9001 library - Stefano
