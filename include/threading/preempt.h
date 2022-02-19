@@ -39,7 +39,7 @@ struct _thread {
     char      extra[4];                 /**< Extra storage for the scheduler */
 };
 
-#ifdef __SCCZ80
+#ifdef ASM_THREADING
 #asm
 DEFVARS 0
 {
@@ -84,7 +84,7 @@ struct _threadbase {
     thread_t       threads[MAX_THREADS];   /**< Allocated with extra memory here */
 };
 
-#ifdef __SCZZ80
+#ifdef ASM_THREADING
 #asm
 DEFVARS 0 {
     current             ds.w    1
