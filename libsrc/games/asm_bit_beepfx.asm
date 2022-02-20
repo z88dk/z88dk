@@ -61,7 +61,7 @@ read_data:
    jr z, sfx_routine_tone
    
    dec a
-   jr z, sfx_routine_noise
+   jp z, sfx_routine_noise
    
    dec a
    jr z, sfx_routine_sample
@@ -438,6 +438,6 @@ period_continue:
    jr nz, noise_loop_0
 
    ld bc,7
-   jr next_data
+   jp next_data
 
 ENDIF
