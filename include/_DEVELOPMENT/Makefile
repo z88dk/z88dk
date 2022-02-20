@@ -35,6 +35,7 @@ clang/%README: proto/%README
 classic:
 	cp -r sccz80/adt ../
 	cp -r sccz80/alloc ../
+	$(RM) -f ../alloc/malloc.h
 	cp -r sccz80/arch/zx/esxdos.h ../arch/zx/esxdos.h
 	cp -r sccz80/arch/zxn/esxdos.h ../arch/zxn/esxdos.h
 
