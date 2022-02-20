@@ -170,3 +170,5 @@ win32/Release/
 win32/ipch/
 win32/z88dk.VC.VC.opendb
 win32/z88dk.VC.db
+zsdcc_*_src.tar.gz
+include/alloc/malloc.h
