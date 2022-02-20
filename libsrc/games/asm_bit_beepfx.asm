@@ -71,7 +71,7 @@ read_data:
    ; leave 1-bit device in 0 position
    
    ld a,h
-   ONEBITOUT
+   ONEBITOUT2
    exx
    
    jp bit_close
@@ -144,7 +144,7 @@ sample_loop_2:
    and l                       ; confine to toggle bits
    or h                        ; mix with sound_bit_state
    
-   ONEBITOUT
+   ONEBITOUT2
    
    exx
    
@@ -243,7 +243,7 @@ tone_loop_1:
    and SOUND_ONEBIT_mask      ; set toggle bit if yes
    or h                        ; mix with bit_state
 
-   ONEBITOUT
+   ONEBITOUT2
       
    exx
 
@@ -361,7 +361,7 @@ noise_loop_1:
    and l                       ; toggle bits are random
    or h                        ; mix with bit_state
 
-   ONEBITOUT
+   ONEBITOUT2
    
    exx
    

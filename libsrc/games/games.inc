@@ -406,6 +406,34 @@ ENDIF
 ENDM
 
 
+MACRO ONEBITOUT2
+LOCAL l1, l2, l3, l4
+IF SOUND_INOUT = 1
+    ld      c,a
+    and     SOUND_ONEBIT_mask
+    jr      nz,l1
+    in      a,(SOUND_ONEBIT_port) 
+    jr      l2
+l1: out     (SOUND_ONEBIT_port),a 
+l2: ld      a,c
+ELIF SOUND_IFF = 1
+    ld      c,a
+    and     SOUND_ONEBIT_mask
+    jp      nz,l3
+    di 
+l3: jp      l4
+    ei
+l4: ld      a,c
+ELIF SOUND_ONEBIT_port >= 256
+    out     (c),a
+ELIF SOUND_ONEBIT_port < 0
+    ld      (-SOUND_ONEBIT_port),a
+ELSE
+    out     (SOUND_ONEBIT_port),a 
+ENDIF
+ENDM
+
+
 
 ; ********************************************************
 ;   This last part refers to NOT YET supported hardware
