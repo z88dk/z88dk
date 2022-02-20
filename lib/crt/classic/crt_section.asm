@@ -49,7 +49,7 @@ ENDIF
 
     ; a = 0 - reset exitcount
     ld      (exitcount),a
-IF CRT_ENABLE_STDIO = 1
+IF CRT_ENABLE_STDIO = 1 && CLIB_FOPEN_MAX > 0
 	; Setup std* streams
     ld      hl,__sgoioblk+2
     ld      (hl),19 ;stdin
@@ -103,7 +103,7 @@ crt0_exit:
     ret
 
     SECTION bss_crt
-IF CRT_ENABLE_STDIO = 1
+IF CRT_ENABLE_STDIO = 1 && CLIB_FOPEN_MAX > 0
     PUBLIC	__sgoioblk
     PUBLIC	__sgoioblk_end
 __sgoioblk:     defs    CLIB_FOPEN_MAX * 10      ;stdio control block
