@@ -41,7 +41,7 @@ asm_bit_beepfx:
 
    IF SOUND_ONEBIT_port >= 256
 
-      ld bc,__SOUND_BIT_PORT
+      ld bc,SOUND_ONEBIT_port
    
    ENDIF
 
