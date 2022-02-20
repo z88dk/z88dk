@@ -14,6 +14,7 @@ target/z1013/stdio/ansi/f_ansi_cls
 stdio/ansi/generic/f_ansi_dline
 target/z1013/stdio/ansi/f_ansi_scrollup
 @stdio/stdio.lst
+target/z1013/games/joystick.asm
 @games/games_joystick.lst
 @font/font_8x8/font_8x8.lst
 
