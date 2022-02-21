@@ -47,7 +47,6 @@ read_stick:
     ld      a,$1f
     out     ($01),a
     ld      a,c     ;c=$20/$40 for sticks
-    ld      a,$20
     out     ($00),a
     in      a,($00)
     and     31
