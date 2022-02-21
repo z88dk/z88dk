@@ -9,6 +9,7 @@
 
 #include <sys/compiler.h>
 #include <sys/types.h>
+#include <arch/zx/input.h>
 
 /////////////
 // CONSTANTS
@@ -267,50 +268,6 @@ extern int  __LIB__  tape_load_block_callee(void *addr, size_t len, unsigned cha
 #endif
 
 
-/////////////////////////////////////////////////////////////////
-// INPUT DEVICES: KEYBOARD, JOYSTICK AND MICE (SEE ALSO INPUT.H)
-/////////////////////////////////////////////////////////////////
-
-// Joystick Functions
-// These are actually in_*(void)
-extern unsigned int  __LIB__ in_JoyFuller();
-extern unsigned int  __LIB__ in_JoyKempston();
-extern unsigned int  __LIB__ in_JoySinclair1();
-extern unsigned int  __LIB__ in_JoySinclair2();
-extern unsigned int  __LIB__ in_JoyTimex1();
-extern unsigned int  __LIB__ in_JoyTimex2();
-
-// AMX Mouse
-//
-// To use you must declare the following global variables
-// uint in_AMXcoordX, in_AMXcoordY, in_AMXdeltaX, in_AMXdeltaY;
-
-extern void __LIB__             in_MouseAMXInit(uchar xvector, uchar yvector) __smallc;
-extern void __LIB__             in_MouseAMX(uchar *buttons, uint *xcoord, uint *ycoord) __smallc;
-extern void __LIB__             in_MouseAMXSetPos(uint xcoord, uint ycoord) __smallc;
-
-extern void __LIB__   in_MouseAMXInit_callee(uchar xvector, uchar yvector) __smallc __z88dk_callee;
-extern void __LIB__   in_MouseAMX_callee(uchar *buttons, uint *xcoord, uint *ycoord) __smallc __z88dk_callee;
-extern void __LIB__   in_MouseAMXSetPos_callee(uint xcoord, uint ycoord) __smallc __z88dk_callee;
-
-#define in_MouseAMXInit(a,b)    in_MouseAMXInit_callee(a,b)
-#define in_MouseAMX(a,b,c)      in_MouseAMX_callee(a,b,c)
-#define in_MouseAMXSetPos(a,b)  in_MouseAMXSetPos_callee(a,b)
-
-// Kempston Mouse
-//
-// To use you must declare the following global variables
-// uchar in_KempcoordX, in_KempcoordY, in_KemprawX, in_KemprawY;
-
-extern void __LIB__             in_MouseKempInit(void);
-extern void __LIB__             in_MouseKemp(uchar *buttons, uint *xcoord, uint *ycoord) __smallc;
-extern void __LIB__             in_MouseKempSetPos(uint xcoord, uint ycoord) __smallc;
-
-extern void __LIB__   in_MouseKemp_callee(uchar *buttons, uint *xcoord, uint *ycoord) __smallc __z88dk_callee;
-extern void __LIB__   in_MouseKempSetPos_callee(uint xcoord, uint ycoord) __smallc __z88dk_callee;
-
-#define in_MouseKemp(a,b,c)     in_MouseKemp_callee(a,b,c)
-#define in_MouseKempSetPos(a,b) in_MouseKempSetPos_callee(a,b)
 
 
 //////////////////////////

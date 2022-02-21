@@ -169,7 +169,7 @@ struct in_UDK {        /* user defined keys structure         */
 extern uint __LIB__  in_JoyKeyboard(struct in_UDK *u) __z88dk_fastcall;
 
 #ifdef SPECTRUM
-   #include <arch/zx/spectrum.h>
+   #include <arch/zx/input.h>
 /*
    Adds: 1 in_JoyKempston, 2 in_JoySinclair1, 3 in_JoySinclair2,
          4 in_JoyFuller,   5 in_JoyTimex1,    6 in_JoyTimex2
