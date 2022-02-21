@@ -1,6 +1,6 @@
 Index: src/SDCCasm.c
 ===================================================================
---- src/SDCCasm.c	(revision 13048)
+--- src/SDCCasm.c	(revision 13050)
 +++ src/SDCCasm.c	(working copy)
 @@ -403,8 +403,8 @@
  static const ASM_MAPPING _asxxxx_mapping[] = {
@@ -23,7 +23,7 @@ Index: src/SDCCasm.c
     "; ---------------------------------\n"
 Index: src/SDCCglue.c
 ===================================================================
---- src/SDCCglue.c	(revision 13048)
+--- src/SDCCglue.c	(revision 13050)
 +++ src/SDCCglue.c	(working copy)
 @@ -195,7 +195,7 @@
             (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
@@ -84,7 +84,7 @@ Index: src/SDCCglue.c
  
 Index: src/SDCCmain.c
 ===================================================================
---- src/SDCCmain.c	(revision 13048)
+--- src/SDCCmain.c	(revision 13050)
 +++ src/SDCCmain.c	(working copy)
 @@ -521,16 +521,15 @@
  {
@@ -112,7 +112,7 @@ Index: src/SDCCmain.c
  static void
 Index: src/SDCCopt.c
 ===================================================================
---- src/SDCCopt.c	(revision 13048)
+--- src/SDCCopt.c	(revision 13050)
 +++ src/SDCCopt.c	(working copy)
 @@ -1016,7 +1016,7 @@
        /* TODO: Eliminate it, convert any SEND of volatile into DUMMY_READ_VOLATILE. */
@@ -174,31 +174,9 @@ Index: src/SDCCopt.c
  
                if (litval > 0x7f)
                  continue;
-Index: src/z80/gen.c
-===================================================================
---- src/z80/gen.c	(revision 13048)
-+++ src/z80/gen.c	(working copy)
-@@ -2655,6 +2655,8 @@
-             }
-           else
-             {
-+              if (pairId == PAIR_HL && (aopInReg (aop, offset, IYL_IDX) || aopInReg (aop, offset, IYH_IDX)))
-+                UNIMPLEMENTED;
-               if (!aopInReg (aop, offset, _pairs[pairId].l_idx))
-                 {
-                    if (!regalloc_dry_run)
-@@ -2661,6 +2663,8 @@
-                      emit2 ("ld %s, %s", _pairs[pairId].l, aopGet (aop, offset, FALSE));
-                    regalloc_dry_run_cost += ld_cost (ASMOP_L, 0, aop, offset);
-                 }
-+              if (pairId == PAIR_HL && (aopInReg (aop, offset + 1, IYL_IDX) || aopInReg (aop, offset + 1, IYH_IDX)))
-+                UNIMPLEMENTED;
-               if (!aopInReg (aop, offset + 1, _pairs[pairId].h_idx))
-                 {
-                    if (!regalloc_dry_run)
 Index: src/z80/main.c
 ===================================================================
---- src/z80/main.c	(revision 13048)
+--- src/z80/main.c	(revision 13050)
 +++ src/z80/main.c	(working copy)
 @@ -1114,7 +1114,7 @@
      1                           /* No fancy alignments supported. */
@@ -238,7 +216,7 @@ Index: src/z80/main.c
    { z80_emitDebuggerSymbol },
 Index: src/z80/peep.c
 ===================================================================
---- src/z80/peep.c	(revision 13048)
+--- src/z80/peep.c	(revision 13050)
 +++ src/z80/peep.c	(working copy)
 @@ -165,6 +165,88 @@
    return(found && found < end);
