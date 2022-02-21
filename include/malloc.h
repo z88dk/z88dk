@@ -89,8 +89,8 @@ extern void __LIB__    mallinfo_callee(unsigned int *total, unsigned int *larges
 
 #define HEAPSIZE(bp)       unsigned char heap[bp+4];
 #define heapinit(a)        mallinit(); sbrk_callee(heap+4,a);
-#define getfree()          asm("EXTERN\tMAHeapInfo\nEXTERN\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nex\tde,hl\n")
-#define getlarge()         asm("EXTERN\tMAHeapInfo\nEXTERN\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nld\tl,c\nld\th,b\n")
+#define getfree()          __asm__("EXTERN\tMAHeapInfo\nEXTERN\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nex\tde,hl\n")
+#define getlarge()         __asm__("EXTERN\tMAHeapInfo\nEXTERN\t_heap\nld\thl,_heap\ncall\tMAHeapInfo\nld\tl,c\nld\th,b\n")
 #define realloc_down(a,b)  realloc_callee(a,b)
 
 

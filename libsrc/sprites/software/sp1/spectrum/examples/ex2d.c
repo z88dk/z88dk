@@ -11,7 +11,7 @@
 // is rotated horizontally.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex2d.c -o ex2d.bin -create-app -lsp1 -lmalloc -lndos
+// zcc +zx -vn ex2d.c -o ex2d.bin -create-app -lsp1  -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

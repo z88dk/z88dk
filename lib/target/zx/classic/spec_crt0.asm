@@ -398,10 +398,9 @@ romsvc:         defs    10  ; Pointer to the end of the sysdefvars
 ENDIF
 
 
-IF __MMAP != -1
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; Define Memory Banks
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Define Memory Banks
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
     IFNDEF CRT_ORG_BANK_0
         defc CRT_ORG_BANK_0 = 0xc000
@@ -499,4 +498,3 @@ IF __MMAP != -1
     SECTION DATA_7
     SECTION BSS_7
     SECTION BANK_7_END
-ENDIF

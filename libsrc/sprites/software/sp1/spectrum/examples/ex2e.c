@@ -16,7 +16,7 @@
 // a difference from ex2d here as well.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex2e.c -o ex2e.bin -create-app -lsp1 -lmalloc -lndos
+// zcc +zx -vn ex2e.c -o ex2e.bin -create-app -lsp1  -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

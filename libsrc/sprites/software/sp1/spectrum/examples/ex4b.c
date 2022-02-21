@@ -29,7 +29,7 @@
 // to do it outside the main game loop. 
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex4b.c -o ex4b.bin -create-app -lsp1 -lmalloc -lndos
+// zcc +zx -vn ex4b.c -o ex4b.bin -create-app -lsp1  -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

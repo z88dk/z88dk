@@ -10,7 +10,7 @@
 // which is why blank areas are seen. 
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex2c.c -o ex2c.bin -create-app -lsp1 -lmalloc -lndos
+// zcc +zx -vn ex2c.c -o ex2c.bin -create-app -lsp1  -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

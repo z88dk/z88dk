@@ -61,6 +61,7 @@
     SECTION code_sprite_sp1
     SECTION code_temp_sp1
     SECTION code_splib2
+    SECTION code_sound_bit
 IF !__crt_org_graphics
     SECTION code_graphics
 ENDIF

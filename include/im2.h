@@ -9,11 +9,11 @@
 #include <sys/compiler.h>
 #include <sys/types.h>
 
-#define M_BEGIN_ISR(name) void name(void) { asm("push\taf\npush\tbc\npush\tde\npush\thl\nex\taf,af\nexx\npush\taf\npush\tbc\npush\tde\npush\thl\npush\tix\npush\tiy\n");
-#define M_END_ISR asm("pop\tiy\npop\tix\npop\thl\npop\tde\npop\tbc\npop\taf\nexx\nex\taf,af\npop\thl\npop\tde\npop\tbc\npop\taf\nei\nreti\n"); }
+#define M_BEGIN_ISR(name) void name(void) { __asm__("push\taf\npush\tbc\npush\tde\npush\thl\nex\taf,af\nexx\npush\taf\npush\tbc\npush\tde\npush\thl\npush\tix\npush\tiy\n");
+#define M_END_ISR __asm__("pop\tiy\npop\tix\npop\thl\npop\tde\npop\tbc\npop\taf\nexx\nex\taf,af\npop\thl\npop\tde\npop\tbc\npop\taf\nei\nreti\n"); }
 
-#define M_BEGIN_ISR_LIGHT(name) void name(void) { asm("push\taf\npush\tbc\npush\tde\npush\thl\n");
-#define M_END_ISR_LIGHT asm("pop\thl\npop\tde\npop\tbc\npop\taf\nei\nreti\n"); }
+#define M_BEGIN_ISR_LIGHT(name) void name(void) { __asm__("push\taf\npush\tbc\npush\tde\npush\thl\n");
+#define M_END_ISR_LIGHT __asm__("pop\thl\npop\tde\npop\tbc\npop\taf\nei\nreti\n"); }
 
 /*
  * In the following:

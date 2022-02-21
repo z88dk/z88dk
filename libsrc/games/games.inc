@@ -84,9 +84,6 @@ IF FORaquarius
 ENDIF
 
 IF FORalphatro
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
 	defc INPUT_JOY_useinkey = 1
 ENDIF
 
@@ -220,11 +217,6 @@ IF FORbondwell
         defc SOUND_ONEBIT_mask   = $80
 ENDIF
 
-IF FORbondwell2
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
 
 IF FORpasopia7
     defc SOUND_ONEBIT_port	= $30
@@ -265,142 +257,28 @@ ENDIF
 
 
 IF FORsol20
-    defc SOUND_ONEBIT_port   = 0
-    defc SOUND_ONEBIT_bit    = 0
-    defc SOUND_ONEBIT_mask   = 0
     defc SOUND_IFF     = 1
 ENDIF
 
-; Compatibility ones only, the following ports don't have a beeper
-IF FORondra
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
-IF FORsv8000
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
-
-IF FORgb
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
-
-IF FOReinstein
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
-
-IF FORoz
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
-
-IF FORpps
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
-
-IF FORpv1000
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
 
 IF FORlynx
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
 	defc INPUT_JOY_useinkey = 1
 ENDIF
 
-IF FORosca
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
 
 IF FORsrr
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
 	defc INPUT_JOY_useinkey = 1
 ENDIF
 
 IF FORspc1000
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
 	defc INPUT_JOY_useinkey = 1
-ENDIF
-
-IF FORpc6001
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
-
-IF FORtvc
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
-
-IF FORpmd85
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
-
-IF FORvector06c
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
-ENDIF
-  
-IF FORm100
-        defc SOUND_ONEBIT_port   = 0
-        defc SOUND_ONEBIT_bit    = 0
-        defc SOUND_ONEBIT_mask   = 0
 ENDIF
 
 
 IF FORgl6000
-    defc SOUND_ONEBIT_port	= 0
-    defc SOUND_ONEBIT_bit    = 0
-    defc SOUND_ONEBIT_mask   = 0
     defc INPUT_JOY_useinkey = 1
 ENDIF
 
-IF FORmyvision
-    defc SOUND_ONEBIT_port	= 0
-    defc SOUND_ONEBIT_bit    = 0
-    defc SOUND_ONEBIT_mask   = 0
-ENDIF
-
-IF FORhomelab
-    defc SOUND_ONEBIT_port	= 0
-    defc SOUND_ONEBIT_bit    = 0
-    defc SOUND_ONEBIT_mask   = 0
-ENDIF
-
-IF FORhomelab2
-    defc SOUND_ONEBIT_port	= 0
-    defc SOUND_ONEBIT_bit    = 0
-    defc SOUND_ONEBIT_mask   = 0
-ENDIF
-
-IF FORlm80c
-    defc SOUND_ONEBIT_port	= 0
-    defc SOUND_ONEBIT_bit    = 0
-    defc SOUND_ONEBIT_mask   = 0
-ENDIF
 
 IF FORprimo
     defc SOUND_ONEBIT_port	= $00 ;
@@ -492,6 +370,11 @@ IF FORpencil2
     defc INPUT_JOY_useinkey = 1
 ENDIF
 
+IFNDEF SOUND_ONEBIT_port
+        defc SOUND_ONEBIT_port   = 0
+        defc SOUND_ONEBIT_bit    = 0
+        defc SOUND_ONEBIT_mask   = 0
+ENDIF
 
 MACRO ONEBITOUT
 LOCAL l1, l2, l3, l4
@@ -515,6 +398,34 @@ ELIF SOUND_ONEBIT_port >= 256
     exx
     out     (c),a
     exx
+ELIF SOUND_ONEBIT_port < 0
+    ld      (-SOUND_ONEBIT_port),a
+ELSE
+    out     (SOUND_ONEBIT_port),a 
+ENDIF
+ENDM
+
+
+MACRO ONEBITOUT2
+LOCAL l1, l2, l3, l4
+IF SOUND_INOUT = 1
+    ld      c,a
+    and     SOUND_ONEBIT_mask
+    jr      nz,l1
+    in      a,(SOUND_ONEBIT_port) 
+    jr      l2
+l1: out     (SOUND_ONEBIT_port),a 
+l2: ld      a,c
+ELIF SOUND_IFF = 1
+    ld      c,a
+    and     SOUND_ONEBIT_mask
+    jp      nz,l3
+    di 
+l3: jp      l4
+    ei
+l4: ld      a,c
+ELIF SOUND_ONEBIT_port >= 256
+    out     (c),a
 ELIF SOUND_ONEBIT_port < 0
     ld      (-SOUND_ONEBIT_port),a
 ELSE

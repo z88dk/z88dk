@@ -34,3 +34,6 @@ games/obj/${TARGET}/joystick_type
 games/obj/${TARGET}/joystick_sc
 games/obj/${TARGET}/kjoystick
 games/obj/${TARGET}/joystick_inkey
+games/obj/${TARGET}/asm_bit_beepfx
+games/obj/${TARGET}/bit_beepfx
+games/obj/${TYPE}/**/*.o

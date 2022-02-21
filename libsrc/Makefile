@@ -648,6 +648,7 @@ attache.lib:
 	@echo ''
 	@echo '--- Building Otrona Attache Library ---'
 	@echo ''
+	$(MAKE) -C games TARGET=cpm SUBTYPE=attache
 	$(MAKE) -C psg TARGET=cpm SUBTYPE=attache
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR=wide SUBTYPE=attache
 	TARGET=attache TYPE=z80 $(LIBLINKER) -DFORattache -x$(OUTPUT_DIRECTORY)/attache @$(TARGET_DIRECTORY)/attache/attache.lst
@@ -1062,6 +1063,7 @@ z1013_clib.lib:
 	@echo ''
 	$(call buildgeneric,z1013,"gencon narrow")
 	$(MAKE) -C video/krt TARGET=z1013
+	$(MAKE) -C games TARGET=z1013
 	TARGET=z1013 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz1013 -x$(OUTPUT_DIRECTORY)/z1013_clib @$(TARGET_DIRECTORY)/z1013/z1013.lst
 
 # Robotron KC85/1, Z9001 library - Stefano
@@ -1080,6 +1082,7 @@ kc_clib.lib:
 	@echo '--- Building VEB Mikroelektronik KC85/2..5 Library ---'
 	@echo ''
 	$(call buildgeneric,kc,wide)
+	$(MAKE) -C games TARGET=kc
 	TARGET=kc TYPE=ixiy $(LIBLINKER) -IXIY -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(TARGET_DIRECTORY)/kc/kc.lst
 
 # Hübler/Evert-MC - dom
@@ -1104,6 +1107,7 @@ hgmc_clib.lib:
 	@echo '--- Building Hübler Grafik MC Library ---'
 	@echo ''
 	$(call buildgeneric,hgmc)
+	$(MAKE) -C games TARGET=hgmc
 	TARGET=hgmc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORhgmc -x$(OUTPUT_DIRECTORY)/hgmc_clib @$(TARGET_DIRECTORY)/hgmc/hgmc.lst
 
 # Primo A-32/64 - dom
@@ -1151,6 +1155,7 @@ multi8_clib.lib:
 	@echo '--- Building Mitsubishi Multi8 Library ---'
 	@echo ''
 	$(call buildgeneric,multi8,wide)
+	$(MAKE) -C games TARGET=multi8
 	TARGET=multi8 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmulti8 -x$(OUTPUT_DIRECTORY)/multi8_clib @$(TARGET_DIRECTORY)/multi8/multi8.lst
 
 # Pasopia7 Multi8 - dom
@@ -1632,6 +1637,7 @@ x1_clib.lib:
 	@echo '--- Building Sharp X1 Library ---'
 	@echo ''
 	$(call buildgeneric,x1,wide)
+	$(MAKE) -C games TARGET=x1
 	$(MAKE) -C target/x1 
 	TARGET=x1 TYPE=z80 $(LIBLINKER) -DFORx1 -x$(OUTPUT_DIRECTORY)/x1_clib @$(TARGET_DIRECTORY)/x1/x1.lst
 

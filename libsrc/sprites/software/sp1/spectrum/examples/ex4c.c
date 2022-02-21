@@ -36,7 +36,7 @@
 // doorway.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex4c.c -o ex4c.bin -create-app -lsp1 -lmalloc -lndos
+// zcc +zx -vn ex4c.c -o ex4c.bin -create-app -lsp1  -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

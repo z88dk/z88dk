@@ -45,7 +45,7 @@
 // not attached to any sprite) in a future series of examples.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex5c.c -o ex5c.bin -create-app -lsp1 -lmalloc -lndos
+// zcc +zx -vn ex5c.c -o ex5c.bin -create-app -lsp1  -lndos
 
 #include <sprites/sp1.h>
 #include <malloc.h>

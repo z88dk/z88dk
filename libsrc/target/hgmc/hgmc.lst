@@ -12,4 +12,4 @@ target/hgmc/graphics/clg
 ; Take the optimised bitmapped stencil render
 gfx/narrow/obj/hgmc/stencil_render
 @gfx/narrow/gfx_narrow.lst
-
+@games/games_joystick.lst

@@ -57,3 +57,4 @@ target/x1/psg/get_psg
 target/x1/psg/psg_init
 target/x1/x1/asm_x1_keyboard_handler
 @psg/ay/psg.lst
+@games/games_joystick.lst
