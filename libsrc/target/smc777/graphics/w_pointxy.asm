@@ -9,6 +9,7 @@
     PUBLIC  w_pointxy
     EXTERN  __smc777_mode
     defc    NEEDpoint= 1
+    defc    WIDE_GFX = 1
     EXTERN  w_pointxy_MODE4
     EXTERN  w_pointxy_MODE8
 

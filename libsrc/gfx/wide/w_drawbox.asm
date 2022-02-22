@@ -14,6 +14,9 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
 ; IN:  HL,DE = (x,y).  HL' = width, DE' = height
 
 .drawbox
+    ; Decrement width/height by 1
+    dec     de
+    dec     hl
     push    hl
     push    de
     exx

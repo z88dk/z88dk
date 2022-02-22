@@ -28,6 +28,17 @@ IF __CPU_GBZ80__
 		ld	(__gfx_coords),a
 		ld	a,h
 		ld	(__gfx_coords+1),a
+ELIF WIDE_GFX
+		ex	de,hl
+		ld	hl,__gfx_coords
+		ld	(hl),d	;x
+		inc	hl
+		ld	(hl),0
+		inc	hl
+		ld	(hl),e	;y
+		inc	hl	
+		ld	(hl),0
+		ex	de,hl
 ELSE
 		ld	(__gfx_coords),hl
 ENDIF
