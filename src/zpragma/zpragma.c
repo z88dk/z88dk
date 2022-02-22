@@ -147,7 +147,11 @@ void write_defined(char *sname, int32_t value, int export)
     fprintf(fp,"\nIF !DEFINED_%s\n",sname);
     fprintf(fp,"\tdefc\tDEFINED_%s = 1\n",sname);
 	if (export) fprintf(fp, "\tPUBLIC\t%s\n", sname);
-    fprintf(fp,"\tdefc %s = %0#x\n",sname,value);
+    if ( value < 0 ) {
+        fprintf(fp,"\tdefc %s = %d\n",sname,value);
+    } else {
+        fprintf(fp,"\tdefc %s = %0#x\n",sname,value);
+    }
     fprintf(fp,"\tIFNDEF %s\n\tENDIF\n",sname);
     fprintf(fp,"ENDIF\n\n");
     fclose(fp);
