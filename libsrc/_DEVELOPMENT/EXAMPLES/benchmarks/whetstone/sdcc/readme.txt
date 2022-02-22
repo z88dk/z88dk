@@ -34,8 +34,11 @@ Change:
 VERIFY CORRECT RESULT
 =====================
 
-SDCC does not have any character i/o built into its libraries.
-We'll just have to trust that correct output is generated
+Verification is done by targeting CPM.  A very simple putchar + getchar
+calling into BDOS is provided in cpm.s.
+
+Change to the "verify" directory and compile by running "Winmake.bat".
+The resulting "whetston.com" file can be run in a cpm emulator to verify results.
 
 SDCC's float type has a 24 bit mantissa so it's expected that
 small errors will appear in the last decimal digit.

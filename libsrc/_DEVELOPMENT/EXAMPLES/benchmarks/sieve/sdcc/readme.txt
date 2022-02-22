@@ -37,29 +37,29 @@ TIMER_START = 0x217
    0x000 (_main in sieve.sym) +
    0x20a (_main in sieve.map)
 
-TIMER_STOP = 0x2b3
-   0x0a9 (TIMER_STOP in sieve.sym) -
+TIMER_STOP = 0x2ab
+   0x0a1 (TIMER_STOP in sieve.sym) -
    0x000 (_main in sieve.sym) +
    0x20a (_main in sieve.map)
 
-SIZE = 8263 bytes
-   0x00d2 (_CODE in sieve.map) +
-   0x0003 (_HEADER0 in sieve.map) +
-   0x0002 (_HEADER1 in sieve.map) +
-   0x0002 (_HEADER2 in sieve.map) +
-   0x0002 (_HEADER3 in sieve.map) +
-   0x0002 (_HEADER4 in sieve.map) +
-   0x0002 (_HEADER5 in sieve.map) +
-   0x0002 (_HEADER6 in sieve.map) +
-   0x0002 (_HEADER7 in sieve.map) +
-   0x000c (_HEADER8 in sieve.map) +
-   0x000f (_GSINIT in sieve.map) +
-   0x0001 (_GSFINAL in sieve.map) +
-   0x1f48 (_DATA in sieve.map)
+SIZE = 8278 bytes
+   196  (_CODE in sieve.map) +
+   3    (_HEADER0 in sieve.map) +
+   3    (_HEADER1 in sieve.map) +
+   3    (_HEADER2 in sieve.map) +
+   3    (_HEADER3 in sieve.map) +
+   3    (_HEADER4 in sieve.map) +
+   3    (_HEADER5 in sieve.map) +
+   3    (_HEADER6 in sieve.map) +
+   3    (_HEADER7 in sieve.map) +
+   12   (_HEADER8 in sieve.map) +
+   37   (_GSINIT in sieve.map) +
+   1    (_GSFINAL in sieve.map) +
+   8008 (_DATA in sieve.map)
 
 The invocation of TICKS looked like this:
 
-ticks sieve.bin -start 0217 -end 02b3 -counter 9999999999
+z88dk-ticks sieve.bin -start 0217 -end 02ab -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -71,8 +71,8 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-SDCC 3.6.5 #9842 (MINGW64)
-8263 bytes less page zero
+SDCC 4.2.0 #13050 Linux
+8278 bytes less page zero
 
-cycle count  = 4701570
-time @ 4MHz  = 4701570 / 4*10^6 = 1.1754 sec
+cycle count  = 4219481
+time @ 4MHz  = 4219481 / 4*10^6 = 1.0548 sec

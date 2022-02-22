@@ -28,17 +28,17 @@
 
 ; Just stubs - not copyrightable
 
-        ;; Stubs that hook the heap in
-        .globl  ___sdcc_heap_init
+    ;; Stubs that hook the heap in
+   .globl   ___sdcc_heap_init
 
-        .area   _GSINIT
-        call    ___sdcc_heap_init
+   .area    _GSINIT
+    call    ___sdcc_heap_init
 
-        .area   _HEAP
+    .area   _HEAP
 ___sdcc_heap::
-        ;; For now just allocate 1k of heap.
-        .ds     20000
+    ;; For now just allocate 1k of heap.
+    .ds     20000
 
-        .area   _HEAP_END
+    .area   _HEAP_END
 ___sdcc_heap_end::
-        .ds     1
+    .ds     1
