@@ -511,7 +511,7 @@ ENDIF
 IF FORvg5k
     DEFINE gotgfx
     defc maxx    = 80
-    defc maxy    = 72
+    defc maxy    = 75
     defc blankch    = 0
     defc    WANT_swapgfxbk = 0
 ENDIF
