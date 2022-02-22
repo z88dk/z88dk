@@ -67,7 +67,7 @@ SIZE = 7158 bytes
 
 The invocation of TICKS looked like this:
 
-z88dk-ticks bt.bin -start 0393 -end 04f4 -counter 9999999999
+z88dk-ticks binary-trees.bin -start 0393 -end 04f4 -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex

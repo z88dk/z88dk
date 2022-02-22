@@ -24,9 +24,6 @@ _getchar::
     ld      c,#1
     call    #0x0005
 
-    ld      l,a
-    ld      h,#0
-
     pop     iy
     pop     ix
 

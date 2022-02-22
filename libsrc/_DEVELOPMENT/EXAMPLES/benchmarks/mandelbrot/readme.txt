@@ -141,10 +141,10 @@ time @ 4MHz  = 3596657568 / 4*10^6 = 14 min 59 sec
 
 9.
 SDCC 4.2.0 #13050 Linux
-4333 bytes less page zero
+3962 bytes less page zero
 
-cycle count  = 5755539155
-time @ 4MHz  = 5755539155 / 4*10^6 = 23 min 59 sec
+cycle count  = 4991827956
+time @ 4MHz  = 4991827956 / 4*10^6 = 20 min 48 sec
 
 Slow speed largely due to float implementation in C.
 

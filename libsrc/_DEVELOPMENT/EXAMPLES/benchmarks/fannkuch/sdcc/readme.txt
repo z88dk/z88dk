@@ -29,21 +29,21 @@ TIMING
 
 Change back to the main directory.
 
-sdcc -mz80 -DSTATIC -DINLINE -DTIMER --max-allocs-per-node200000 fannkuch.c
+sdcc -mz80 -DINLINE -DTIMER --max-allocs-per-node200000 fannkuch.c
 hex2bin fannkuch.ihx
 
-TIMER_START = 0x563
-   0x359 (TIMER_START in fannkuch.sym) -
-   0x359 (_main in fannkuch.sym) +
-   0x563 (_main in fannkuch.map)
+TIMER_START = 0x492
+   0x288 (TIMER_START in fannkuch.sym) -
+   0x288 (_main in fannkuch.sym) +
+   0x492 (_main in fannkuch.map)
 
-TIMER_STOP = 0x569
-   0x35f (TIMER_STOP in fannkuch.sym) -
-   0x359 (_main in fannkuch.sym) +
-   0x563 (_main in fannkuch.map)
+TIMER_STOP = 0x498
+   0x28e (TIMER_STOP in fannkuch.sym) -
+   0x288 (_main in fannkuch.sym) +
+   0x492 (_main in fannkuch.map)
 
-SIZE = 1193 bytes
-   1001 (_CODE in fannkuch.map) +
+SIZE = 962 bytes
+   792  (_CODE in fannkuch.map) +
    3    (_HEADER0 in fannkuch.map) +
    3    (_HEADER1 in fannkuch.map) +
    3    (_HEADER2 in fannkuch.map) +
@@ -53,13 +53,13 @@ SIZE = 1193 bytes
    3    (_HEADER6 in fannkuch.map) +
    3    (_HEADER7 in fannkuch.map) +
    12   (_HEADER8 in fannkuch.map) +
-   49   (_GSINIT in fannkuch.map) +
+   37   (_GSINIT in fannkuch.map) +
    1    (_GSFINAL in fannkuch.map) +
-   106  (_DATA in fannkuch.map)
+   96   (_DATA in fannkuch.map)
 
 The invocation of TICKS looked like this:
 
-z88dk-ticks fannkuch.bin -start 0563 -end 0569 -counter 9999999999
+z88dk-ticks fannkuch.bin -start 0492 -end 0498 -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -72,7 +72,7 @@ RESULT
 ======
 
 SDCC 4.2.0 #13050 Linux
-1193 bytes less page zero
+962 bytes less page zero
 
-cycle count  = 70681811
-time @ 4MHz  = 70681811 / 4*10^6 = 17.67 sec
+cycle count  = 57325388
+time @ 4MHz  = 57325388 / 4*10^6 = 14.33 sec

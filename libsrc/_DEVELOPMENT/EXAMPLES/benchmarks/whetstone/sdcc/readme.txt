@@ -46,21 +46,21 @@ small errors will appear in the last decimal digit.
 TIMING
 ======
 
-sdcc -mz80 -DSTATIC -DTIMER --max-allocs-per-node200000 whetstone.c -o whetstone.ihx
+sdcc -mz80 -DTIMER --max-allocs-per-node200000 whetstone.c -o whetstone.ihx
 hex2bin whetstone.ihx
 
 TIMER_START = 0x0232
-   0x028 (TIMER_START in whetstone.sym) -
+   0x010 (TIMER_START in whetstone.sym) -
    0x000 (_main in whetstone.sym) +
    0x20a (_main in whetstone.map)
 
-TIMER_STOP = 0x0d7e
-   0xb74 (TIMER_STOP in whetstone.sym) -
+TIMER_STOP = 0x0bde
+   0x9d4 (TIMER_STOP in whetstone.sym) -
    0x000 (_main in whetstone.sym) +
    0x20a (_main in whetstone.map)
 
-SIZE = 11720 bytes
-   8341 (_CODE in whetstone.map) +
+SIZE = 10935 bytes
+   7897 (_CODE in whetstone.map) +
    3    (_HEADER0 in whetstone.map) +
    3    (_HEADER1 in whetstone.map) +
    3    (_HEADER2 in whetstone.map) +
@@ -70,14 +70,14 @@ SIZE = 11720 bytes
    3    (_HEADER6 in whetstone.map) +
    3    (_HEADER7 in whetstone.map) +
    12   (_HEADER8 in whetstone.map) +
-   3159 (_HOME in whetstone.map) +
+   2924 (_HOME in whetstone.map) +
    37   (_GSINIT in whetstone.map) +
    1    (_GSFINAL in whetstone.map) +
-   146  (_DATA in whetstone.map)
+   40   (_DATA in whetstone.map)
 
 The invocation of TICKS looked like this:
 
-z88dk-ticks whetstone.bin -start 0232 -end 0d73 -counter 9999999999
+z88dk-ticks whetstone.bin -start 021a -end 0bde -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -91,9 +91,9 @@ RESULT
 
 SDCC 4.2.0 #13050 Linux
 24 bit mantissa + 8 bit exponent
-11720 bytes less page zero
+10935 bytes less page zero
 
-cycle count  = 1493517892
-time @ 4MHz  = 1493517892 / 4x10^6 = 373.3795 seconds
-KWIPS        = 100*10*1 / 546.2030 = 2.6782
-MWIPS        = 2.6782 / 1000 = 0.0026782
+cycle count  = 1491668242
+time @ 4MHz  = 1491668242 / 4x10^6 = 372.9170 seconds
+KWIPS        = 100*10*1 / 372.9170 = 2.6816
+MWIPS        = 2.6816 / 1000 = 0.0026816
