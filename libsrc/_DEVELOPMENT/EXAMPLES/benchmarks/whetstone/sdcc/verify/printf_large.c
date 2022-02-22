@@ -215,7 +215,7 @@ calculate_digit (unsigned char radix)
    library yet (e.g. log()).
    It does most of the modifiers, but has some restrictions. E.g. the
    abs(float) shouldn't be bigger than an unsigned long (that's
-   about 4294967295), but still makes it usefull for most real-life
+   about 4294967295), but still makes it useful for most real-life
    applications.
 */
 
@@ -449,9 +449,9 @@ _print_format (pfn_outputchar pfn, void* pvoid, const char *format, va_list ap)
   bool   lsd;
 
   unsigned char radix;
-  unsigned char  width;
-  signed char decimals;
-  unsigned char  length;
+  size_t  width;
+  int decimals;
+  size_t  length;
   char           c;
 
 #ifdef __SDCC_STACK_AUTO
