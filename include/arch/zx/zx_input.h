@@ -1,6 +1,9 @@
 #ifndef __ARCH_ZX_INPUT_H__
 #define __ARCH_ZX_INPUT_H__
 
+#include <sys/compiler.h>
+#include <sys/types.h>
+
 ///////////
 // keyboard
 ///////////

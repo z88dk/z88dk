@@ -9,7 +9,7 @@
 
 #include <sys/compiler.h>
 #include <sys/types.h>
-#include <arch/zx/input.h>
+#include <arch/zx/zx_input.h>
 
 /////////////
 // CONSTANTS
