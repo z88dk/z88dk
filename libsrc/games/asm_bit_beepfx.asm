@@ -36,7 +36,7 @@ asm_bit_beepfx:
    
    call bit_open
    
-   and ~SOUND_ONEBIT_mask
+   and +(~SOUND_ONEBIT_mask) & 0xff
    ld h,a                      ; h'= sound_bit_state with output bit = 0
 
    IF SOUND_ONEBIT_port >= 256
