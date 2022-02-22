@@ -507,7 +507,7 @@ int heira(LVALUE *lval)
             rvalue(lval);
         intcheck(lval, lval);
         com(lval);
-#if defined(HAVE_ARM64)
+#if defined(NEED_BITMASK_KLUDGE)
         lval->const_val = ~(uint64_t)lval->const_val;
 #else
         lval->const_val = (int64_t)~(uint64_t)lval->const_val;

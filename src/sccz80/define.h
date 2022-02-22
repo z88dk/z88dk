@@ -10,9 +10,9 @@
  #include "uthash.h"
  #include "utstring.h"
  
-// Detect arm64 - horrible bit masking issues hide behind
-#if defined(_M_ARM64) || defined(__aarch64__)
-#define HAVE_ARM64 1
+// Detect various platforms - horrible bit masking issues hide behind
+#if defined(_M_ARM64) || defined(__aarch64__) ||defined(_M_ARM) || defined(__arm__) || defined(__s390__) || defined(__ppc64__)
+#define NEED_BITMASK_KLUDGE 1
 #endif
 
 
