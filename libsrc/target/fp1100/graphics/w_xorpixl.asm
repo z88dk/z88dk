@@ -17,6 +17,7 @@
     jr      z,hires
     ld      h,l
     ld      l,e
+    defc    WIDE_GFX = 1
     INCLUDE "gfx/gencon/pixel.inc"
 
 hires:	

@@ -6,6 +6,7 @@
     SECTION code_clib
     PUBLIC  w_plotpixel
     defc    NEEDplot = 1
+    defc    WIDE_GFX = 1
     EXTERN  __smc777_mode
     EXTERN  w_plotpixel_MODE4
     EXTERN  w_plotpixel_MODE8

@@ -21,12 +21,6 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;
 
 .drawbox
-    ld    a,2
-    cp b
-    ret nc
-    cp c
-    ret nc
-    
     push    bc
     push    hl
 
