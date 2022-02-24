@@ -74,7 +74,7 @@ prematurely terminated so rerun with a higher counter if that is the case.
 
 To verify, extract the 480 bytes at address 0xc000 from "verify.bin":
 
-appmake +extract -b verify.bin -s 0xc000 -l 480 -o image.bin
+z88dk-appmake +extract -b verify.bin -s 0xc000 -l 480 -o image.bin
 
 Compare the contents of "image.bin" to "image-golden.bin" in the same directory.
 The pixels around the edge of the mandelbrot set can vary somewhat depending
