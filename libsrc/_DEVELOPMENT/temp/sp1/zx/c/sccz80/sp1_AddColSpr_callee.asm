@@ -20,3 +20,10 @@ sp1_AddColSpr_callee:
    push af
 
    jp asm_sp1_AddColSpr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_AddColSpr_callee
+defc _sp1_AddColSpr_callee = sp1_AddColSpr_callee
+ENDIF
+

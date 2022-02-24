@@ -17,3 +17,10 @@ sp1_ScreenAttr_callee:
    ld d,l
 
    jp asm_sp1_ScreenAttr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_ScreenAttr_callee
+defc _sp1_ScreenAttr_callee = sp1_ScreenAttr_callee
+ENDIF
+

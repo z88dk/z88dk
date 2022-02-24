@@ -24,3 +24,10 @@ sp1_SetPrintPos:
    ld l,a
    
    jp asm_sp1_SetPrintPos
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_SetPrintPos
+defc _sp1_SetPrintPos = sp1_SetPrintPos
+ENDIF
+

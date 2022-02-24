@@ -21,3 +21,10 @@ sp1_PutSprClr:
    ld b,c
    
    jp asm_sp1_PutSprClr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PutSprClr
+defc _sp1_PutSprClr = sp1_PutSprClr
+ENDIF
+

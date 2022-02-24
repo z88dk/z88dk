@@ -32,3 +32,10 @@ sp1_CreateSpr:
    ex de,hl
    
    jp asm_sp1_CreateSpr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_CreateSpr
+defc _sp1_CreateSpr = sp1_CreateSpr
+ENDIF
+

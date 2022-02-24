@@ -16,3 +16,10 @@ sp1_PrintString_callee:
    ex (sp),hl
 
    jp asm_sp1_PrintString
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PrintString_callee
+defc _sp1_PrintString_callee = sp1_PrintString_callee
+ENDIF
+

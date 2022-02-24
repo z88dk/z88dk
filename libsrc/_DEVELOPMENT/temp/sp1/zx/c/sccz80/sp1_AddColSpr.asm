@@ -26,3 +26,10 @@ sp1_AddColSpr:
    push af
    
    jp asm_sp1_AddColSpr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_AddColSpr
+defc _sp1_AddColSpr = sp1_AddColSpr
+ENDIF
+

@@ -16,3 +16,10 @@ sp1_GetSprClr_callee:
    ex (sp),hl
 
    jp asm_sp1_GetSprClr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_GetSprClr_callee
+defc _sp1_GetSprClr_callee = sp1_GetSprClr_callee
+ENDIF
+

@@ -30,3 +30,10 @@ sp1_GetTiles:
    pop hl
    
    jp asm_sp1_GetTiles
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_GetTiles
+defc _sp1_GetTiles = sp1_GetTiles
+ENDIF
+

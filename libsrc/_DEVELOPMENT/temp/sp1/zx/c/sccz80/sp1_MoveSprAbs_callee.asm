@@ -24,3 +24,10 @@ sp1_MoveSprAbs_callee:
    push af
 
    jp asm_sp1_MoveSprAbs
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_MoveSprAbs_callee
+defc _sp1_MoveSprAbs_callee = sp1_MoveSprAbs_callee
+ENDIF
+

@@ -17,3 +17,10 @@ sp1_GetUpdateStruct:
    ld d,(hl)
    
    jp asm_sp1_GetUpdateStruct
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_GetUpdateStruct
+defc _sp1_GetUpdateStruct = sp1_GetUpdateStruct
+ENDIF
+

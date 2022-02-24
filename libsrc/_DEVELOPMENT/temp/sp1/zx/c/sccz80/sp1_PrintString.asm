@@ -23,3 +23,9 @@ sp1_PrintString:
 
    jp asm_sp1_PrintString
    
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PrintString
+defc _sp1_PrintString = sp1_PrintString
+ENDIF
+

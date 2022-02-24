@@ -20,3 +20,10 @@ sp1_Validate:
    ld c,(hl)
 
    jp asm_sp1_Validate
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_Validate
+defc _sp1_Validate = sp1_Validate
+ENDIF
+

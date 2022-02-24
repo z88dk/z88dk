@@ -27,3 +27,10 @@ sp1_InitCharStruct:
    push ix
    
    jp asm_sp1_InitCharStruct
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_InitCharStruct
+defc _sp1_InitCharStruct = sp1_InitCharStruct
+ENDIF
+

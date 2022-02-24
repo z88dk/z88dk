@@ -30,3 +30,10 @@ sp1_MoveSprRel:
    push af
    
    jp asm_sp1_MoveSprRel
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_MoveSprRel
+defc _sp1_MoveSprRel = sp1_MoveSprRel
+ENDIF
+

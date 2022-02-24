@@ -31,3 +31,10 @@ sp1_PutTilesInv:
    pop hl
    
    jp asm_sp1_PutTilesInv
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PutTilesInv
+defc _sp1_PutTilesInv = sp1_PutTilesInv
+ENDIF
+

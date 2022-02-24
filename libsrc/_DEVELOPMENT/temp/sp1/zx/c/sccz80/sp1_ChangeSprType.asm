@@ -17,3 +17,10 @@ sp1_ChangeSprType:
    push bc
    
    jp asm_sp1_ChangeSprType
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_ChangeSprType
+defc _sp1_ChangeSprType = sp1_ChangeSprType
+ENDIF
+

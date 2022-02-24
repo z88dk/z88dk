@@ -30,3 +30,10 @@ sp1_ClearRectInv_callee:
    pop hl   
 
    jp asm_sp1_ClearRectInv
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_ClearRectInv_callee
+defc _sp1_ClearRectInv_callee = sp1_ClearRectInv_callee
+ENDIF
+

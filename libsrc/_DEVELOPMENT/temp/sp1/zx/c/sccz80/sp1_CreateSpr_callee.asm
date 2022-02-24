@@ -22,3 +22,10 @@ sp1_CreateSpr_callee:
    push ix
 
    jp asm_sp1_CreateSpr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_CreateSpr_callee
+defc _sp1_CreateSpr_callee = sp1_CreateSpr_callee
+ENDIF
+

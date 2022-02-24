@@ -17,3 +17,10 @@ sp1_TileEntry_callee:
    push hl
 
    jp asm_sp1_TileEntry
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_TileEntry_callee
+defc _sp1_TileEntry_callee = sp1_TileEntry_callee
+ENDIF
+

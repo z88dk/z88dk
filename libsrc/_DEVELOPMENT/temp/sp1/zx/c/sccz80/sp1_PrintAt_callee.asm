@@ -22,3 +22,10 @@ sp1_PrintAt_callee:
    ld d,l
 
    jp asm_sp1_PrintAt
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PrintAt_callee
+defc _sp1_PrintAt_callee = sp1_PrintAt_callee
+ENDIF
+

@@ -36,3 +36,10 @@ sp1_ClearRect:
    pop hl
    
    jp asm_sp1_ClearRect
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_ClearRect
+defc _sp1_ClearRect = sp1_ClearRect
+ENDIF
+

@@ -23,3 +23,10 @@ sp1_GetTiles_callee:
    push af
 
    jp asm_sp1_GetTiles
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_GetTiles_callee
+defc _sp1_GetTiles_callee = sp1_GetTiles_callee
+ENDIF
+

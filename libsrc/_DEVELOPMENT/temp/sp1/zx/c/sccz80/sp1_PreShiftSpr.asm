@@ -36,3 +36,10 @@ sp1_PreShiftSpr:
    ld a,c
    
    jp asm_sp1_PreShiftSpr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PreShiftSpr
+defc _sp1_PreShiftSpr = sp1_PreShiftSpr
+ENDIF
+

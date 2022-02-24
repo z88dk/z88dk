@@ -18,3 +18,10 @@ sp1_ScreenAttr:
    ld d,(hl)
    
    jp asm_sp1_ScreenAttr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_ScreenAttr
+defc _sp1_ScreenAttr = sp1_ScreenAttr
+ENDIF
+

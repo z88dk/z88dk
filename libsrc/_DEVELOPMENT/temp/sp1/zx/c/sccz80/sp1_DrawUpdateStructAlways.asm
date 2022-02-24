@@ -9,3 +9,10 @@ PUBLIC sp1_DrawUpdateStructAlways
 EXTERN asm_sp1_DrawUpdateStructAlways
 
 defc sp1_DrawUpdateStructAlways = asm_sp1_DrawUpdateStructAlways
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_DrawUpdateStructAlways
+defc _sp1_DrawUpdateStructAlways = sp1_DrawUpdateStructAlways
+ENDIF
+

@@ -19,3 +19,10 @@ sp1_TileEntry:
    ld c,(hl)
    
    jp asm_sp1_TileEntry
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_TileEntry
+defc _sp1_TileEntry = sp1_TileEntry
+ENDIF
+

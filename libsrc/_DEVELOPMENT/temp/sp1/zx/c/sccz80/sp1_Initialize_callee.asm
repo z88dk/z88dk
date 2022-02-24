@@ -20,3 +20,10 @@ sp1_Initialize_callee:
    push bc
 
    jp asm_sp1_Initialize
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_Initialize_callee
+defc _sp1_Initialize_callee = sp1_Initialize_callee
+ENDIF
+

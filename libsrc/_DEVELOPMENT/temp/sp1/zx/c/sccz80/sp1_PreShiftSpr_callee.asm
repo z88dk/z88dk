@@ -25,3 +25,10 @@ sp1_PreShiftSpr_callee:
    ld a,c
 
    jp asm_sp1_PreShiftSpr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PreShiftSpr_callee
+defc _sp1_PreShiftSpr_callee = sp1_PreShiftSpr_callee
+ENDIF
+

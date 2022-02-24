@@ -19,3 +19,10 @@ sp1_SetPrintPos_callee:
    push af
 
    jp asm_sp1_SetPrintPos
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_SetPrintPos_callee
+defc _sp1_SetPrintPos_callee = sp1_SetPrintPos_callee
+ENDIF
+

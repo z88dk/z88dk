@@ -24,3 +24,10 @@ sp1_MoveSprPix:
    push af
 
    jp asm_sp1_MoveSprPix
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_MoveSprPix
+defc _sp1_MoveSprPix = sp1_MoveSprPix
+ENDIF
+

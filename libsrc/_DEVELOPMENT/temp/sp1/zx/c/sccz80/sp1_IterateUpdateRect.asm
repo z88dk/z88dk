@@ -18,3 +18,10 @@ sp1_IterateUpdateRect:
    push bc
    
    jp asm0_sp1_IterateUpdateRect
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_IterateUpdateRect
+defc _sp1_IterateUpdateRect = sp1_IterateUpdateRect
+ENDIF
+

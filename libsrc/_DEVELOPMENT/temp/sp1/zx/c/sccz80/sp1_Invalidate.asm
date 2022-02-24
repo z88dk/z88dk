@@ -20,3 +20,10 @@ sp1_Invalidate:
    ld c,(hl)
 
    jp asm_sp1_Invalidate
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_Invalidate
+defc _sp1_Invalidate = sp1_Invalidate
+ENDIF
+

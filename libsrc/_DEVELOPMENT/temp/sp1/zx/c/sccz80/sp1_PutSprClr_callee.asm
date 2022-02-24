@@ -18,3 +18,10 @@ sp1_PutSprClr_callee:
    ex (sp),hl
 
    jp asm_sp1_PutSprClr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PutSprClr_callee
+defc _sp1_PutSprClr_callee = sp1_PutSprClr_callee
+ENDIF
+

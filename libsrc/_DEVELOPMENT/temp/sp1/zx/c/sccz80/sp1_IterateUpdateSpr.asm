@@ -18,3 +18,10 @@ sp1_IterateUpdateSpr:
    push bc
    
    jp asm_sp1_IterateUpdateSpr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_IterateUpdateSpr
+defc _sp1_IterateUpdateSpr = sp1_IterateUpdateSpr
+ENDIF
+

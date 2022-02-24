@@ -18,3 +18,10 @@ sp1_IterateSprChar:
    push bc
    
    jp asm_sp1_IterateSprChar
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_IterateSprChar
+defc _sp1_IterateSprChar = sp1_IterateSprChar
+ENDIF
+

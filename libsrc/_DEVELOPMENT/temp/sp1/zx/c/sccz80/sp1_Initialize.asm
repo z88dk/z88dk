@@ -21,3 +21,10 @@ sp1_Initialize:
    ex de,hl
 
    jp asm_sp1_Initialize
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_Initialize
+defc _sp1_Initialize = sp1_Initialize
+ENDIF
+

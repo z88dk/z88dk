@@ -25,3 +25,10 @@ sp1_PrintAtInv:
    ld d,(hl)
    
    jp asm_sp1_PrintAtInv
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PrintAtInv
+defc _sp1_PrintAtInv = sp1_PrintAtInv
+ENDIF
+

@@ -11,3 +11,10 @@ PUBLIC sp1_InvUpdateStruct
 EXTERN asm_sp1_InvUpdateStruct
 
 defc sp1_InvUpdateStruct = asm_sp1_InvUpdateStruct
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_InvUpdateStruct
+defc _sp1_InvUpdateStruct = sp1_InvUpdateStruct
+ENDIF
+

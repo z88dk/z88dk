@@ -18,3 +18,10 @@ sp1_InsertCharStruct:
    push bc
    
    jp asm_sp1_InsertCharStruct
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_InsertCharStruct
+defc _sp1_InsertCharStruct = sp1_InsertCharStruct
+ENDIF
+

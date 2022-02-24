@@ -26,3 +26,10 @@ asm0_sp1_IterateUpdateRect:
    ld c,(hl)
 
    jp asm_sp1_IterateUpdateRect
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_IterateUpdateRect_callee
+defc _sp1_IterateUpdateRect_callee = sp1_IterateUpdateRect_callee
+ENDIF
+
