@@ -752,7 +752,7 @@ int main (int argc, char **argv){
     printf("  -iochar X      Set port X to be character input/output\n"),
     printf("  -output <file> dumps the RAM content to a 64K file\n"),
     printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n\n"),
-    printf("  Default values for -pc, -start and -end are 0000 if ommited. When the program "),
+    printf("  Default values for -pc, -start and -end are 0000 if omitted. When the program "),
     printf("exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
     exit(0);
   while (argc > 1){
