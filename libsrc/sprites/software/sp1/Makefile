@@ -11,7 +11,7 @@ sp1-all:
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1-zx81hr -IXIY @zx81hr.lst
 	# sdcc + classic library
 	make -C zx all
-	cp zx/sp1.lib $(OUTPUT_DIRECTORY)/sp1-zx.lib
+	cp zx/sp1-zx.lib $(OUTPUT_DIRECTORY)
 
 clean:
 	make -C zx clean
