@@ -8,7 +8,7 @@ For Linux users follow the instructions on the [installation page](https://githu
 
 `sdcc-z88dk.patch` is the current default standard patch.
 
-`sdcc-13067-z88dk.patch` is the current zsdcc patch, retained for comparison and building against sdcc r13067.
+`sdcc-13088-z88dk.patch` is the current zsdcc patch, retained for comparison and building against sdcc r13088.
 
 `sdcc-9958-z88dk.patch` is the previous z88dk v1.99c zsdcc standard patch, retained for comparison and building against sdcc r9958.
 
