@@ -8,7 +8,7 @@ SECTION code_temp_sp1
 
 PUBLIC asm_sp1_DeleteSpr
 
-EXTERN asm_free
+EXTERN asm_free, _u_free
 
 ; Delete the sprite, freeing any memory that was allocated in its
 ; creation.  Sprite must not be display on screen (move off-screen
@@ -31,7 +31,13 @@ loop:
    push bc
    ex de,hl
    push hl
+
+IF __CLASSIC
+   call _u_free
+ELSE
    call asm_free             ; free current struct sp1_cs
+ENDIF
+
    pop hl
    pop de
    ld l,e

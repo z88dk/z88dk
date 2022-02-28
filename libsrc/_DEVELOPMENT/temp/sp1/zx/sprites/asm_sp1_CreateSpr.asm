@@ -8,7 +8,7 @@ SECTION code_temp_sp1
 PUBLIC asm_sp1_CreateSpr
 
 EXTERN _sp1_struct_ss_prototype, _sp1_struct_cs_prototype
-EXTERN asm_malloc, asm_free
+EXTERN asm_malloc, asm_free, _u_malloc, _u_free
 
 asm_sp1_CreateSpr:
 
@@ -37,18 +37,37 @@ csalloc:
    push bc                    ; save height counter
    ld hl,24                   ; sizeof(struct sp1_cs)
    push hl
+
+; classic malloc exits with carry set if success, reset on failure
+; newlib asm_malloc exits with carry reset if success, set on failure
+IF __CLASSIC
+   call _u_malloc
+   pop bc
+   jp nc, fail
+ELSE
    call asm_malloc
    pop bc
    jp c, fail
+ENDIF
+
    pop bc
    push hl                    ; stack allocated block
    djnz csalloc
 
    ld hl,20                   ; sizeof(struct sp1_ss)
    push hl
+
+; again, see above...
+IF __CLASSIC
+   call _u_malloc
+   pop bc
+   jp nc, fail
+ELSE
    call asm_malloc
    pop bc
    jp c, fail
+ENDIF
+
    push hl
    
    exx
@@ -193,6 +212,12 @@ faillp:
    ret z                      ; if 0 done freeing, ret with nc for failure
    
    push hl
+
+IF __CLASSIC
+   call _u_free
+ELSE
    call asm_free              ; free the block
+ENDIF
+
    pop hl
    jp faillp
