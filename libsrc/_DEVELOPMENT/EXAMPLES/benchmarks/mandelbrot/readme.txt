@@ -140,7 +140,7 @@ time @ 4MHz  = 3596657568 / 4*10^6 = 14 min 59 sec
 48-bit float implementation causes relative slowdown.
 
 9.
-SDCC 4.2.0 #13050 Linux
+SDCC 4.2.0 Linux
 3962 bytes less page zero
 
 cycle count  = 4991827956

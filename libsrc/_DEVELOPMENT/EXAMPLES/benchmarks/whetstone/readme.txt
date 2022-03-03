@@ -200,7 +200,7 @@ KWIPS        = 100*10*1 / 320.8179 = 3.1148
 MWIPS        = 3.1148 / 1000 = 0.0031148
 
 7.
-SDCC 4.2.0 #13050 Linux
+SDCC 4.2.0 Linux
 24 bit mantissa + 8 bit exponent
 10935 bytes less page zero
 

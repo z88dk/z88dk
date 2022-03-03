@@ -79,7 +79,7 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-SDCC 4.2.0 #13050 Linux
+SDCC 4.2.0 Linux
 7141 bytes less page zero
 
 first number error : 1 * 10^(-7)

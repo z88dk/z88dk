@@ -119,7 +119,7 @@ dhrystones/s = 20000 / 70.0250 = 285.6121
 DMIPS        = 285.6121 / 1757 = 0.1625
 
 4.
-SDCC 4.2.0 #13050 Linux
+SDCC 4.2.0 Linux
 6825 bytes less page zero
 
 cycle count  = 225522684

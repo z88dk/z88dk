@@ -92,7 +92,7 @@ cycle count  = 59756269
 time @ 4MHz  = 59756269 / 4*10^6 = 14.94 sec
 
 6.
-SDCC 4.2.0 #13050 Linux
+SDCC 4.2.0 Linux
 962 bytes less page zero
 
 cycle count  = 57325388

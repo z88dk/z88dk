@@ -85,7 +85,7 @@ the images to address 16384 to see a visual representation.
 RESULT
 ======
 
-SDCC 4.2.0 #13050 Linux
+SDCC 4.2.0 Linux
 3962 bytes less page zero
 
 cycle count  = 4991827956
