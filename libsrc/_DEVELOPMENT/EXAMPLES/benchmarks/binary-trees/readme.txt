@@ -148,11 +148,12 @@ sccz80 / classic c library / 8085 CPU
 cycle count  = 156017339
 time @ 4MHz  = 156017339 / 4*10^6 = 39.00 sec
 
-DISQ.
-HITECH C CPM V309
-4165 bytes less cpm overhead
+9.
+HITECH C CPM V309-12
+16515 bytes less cpm overhead
 
-Disqualified for incorrect results.
+cycle count  = 298449848
+time @ 4MHz  = 298449848 / 4x10^6 = 74.61 seconds
 
 
 BENCHMARKS GAME COMMENTS
