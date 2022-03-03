@@ -30,7 +30,7 @@ The specialised nature of 16-bit floating point implies that this is an adjunct 
 
 ## IEEE-754 Half Precision Floating Point Format
 
-The z88dk half precision floating point format (compatible with Intel/ IEEE, etc.) is as follows:
+The z88dk half precision floating point format (compatible with Intel / IEEE, etc.) is as follows:
 
 ```
   hl = seeeeemm mmmmmmmm (s-sign, e-exponent, m-mantissa)
