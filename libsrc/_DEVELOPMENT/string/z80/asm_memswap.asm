@@ -41,23 +41,26 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
    inc b
    inc c
 
+   ld a,b
+loop_a:
+   push af
+
 loop:
-   push bc
-
    ld a,(de)
-   ld c,a
+   ld b,(hl)
 
-   ld a,(hl)
+   ld (hl+),a
+   ld a,b
    ld (de+),a
 
-   ld a,c
-   ld (hl+),a
-
-   pop bc
    dec c
    jr NZ,loop
-   dec b
-   jr NZ,loop
+
+   pop af
+   dec a
+   jr NZ,loop_a
+
+   ld b,a
 
 ELSE
 
