@@ -184,13 +184,11 @@ IF (__CLIB_OPT_SORT_QSORT & $03) = 0
    
       ; insertion sort small partitions
       
-      inc h
-      dec h
-      jr nz, partition_size_large
-      
-      ld a,l
-      cp 5                     ; chosen by trial and error
-      jr nc, partition_size_large
+      ld a,4                   ; chosen by trial and error
+      cp l
+      sbc a,a                  ; a = (4 < l) ? 0xFF : 0x00
+      or h
+      jr nz, partition_size_large ; 4 < ((j-i)/2)/size
       
    partition_size_small:
    
@@ -254,13 +252,11 @@ ELSE
       ; do not have number of items so using
       ; byte size of interval as poor substitute
       
-      inc h
-      dec h
-      jr nz, partition_size_large
-      
-      ld a,l
-      cp 10
-      jr nc, partition_size_large
+      ld a,9
+      cp l
+      sbc a,a                  ; a = (9 < l) ? 0xFF : 0x00
+      or h
+      jr nz, partition_size_large ; 9 < j-i
       
    partition_size_small:
 
