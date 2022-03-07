@@ -21,6 +21,30 @@ Index: src/SDCCasm.c
    {"fileprelude", ""},
    {"functionheader",
     "; ---------------------------------\n"
+Index: src/SDCCgen.c
+===================================================================
+--- src/SDCCgen.c	(revision 13088)
++++ src/SDCCgen.c	(working copy)
+@@ -230,13 +230,17 @@
+           break;
+ 
+         case ':':
+-          /* Add \n for labels, not dirs such as c:\mydir */
+-          if (!inComment && !inLiteral && !inLiteralString && (isspace ((unsigned char) bp[1])))
++          /* Add \n for labels, not dirs such as c:\mydir, not local direct assignment =: */
++          if (!inComment && !inLiteral && !inLiteralString && (isspace ((unsigned char) bp[1])) && (*(bp-1) != '='))
+             {
+               ++bp;
+               *bp = '\0';
+               ++bp;
++              /* Don't emit leading whitespaces */
++              while (isspace (*begin))
++                ++begin;
+               emitcode (begin, NULL);
++              genLine.lineCurr->isLabel = 1;
+               begin = bp;
+             }
+           else
 Index: src/SDCCglue.c
 ===================================================================
 --- src/SDCCglue.c	(revision 13088)
@@ -86,10 +110,12 @@ Index: src/SDCCmain.c
 ===================================================================
 --- src/SDCCmain.c	(revision 13088)
 +++ src/SDCCmain.c	(working copy)
-@@ -521,16 +521,15 @@
+@@ -519,18 +519,15 @@
+ void
+ printVersionInfo (FILE * stream)
  {
-   int i;
- 
+-  int i;
+-
 -  fprintf (stream, "SDCC : ");
 -  for (i = 0; i < NUM_PORTS; i++)
 -    fprintf (stream, "%s%s", i == 0 ? "" : "/", _ports[i]->target);
