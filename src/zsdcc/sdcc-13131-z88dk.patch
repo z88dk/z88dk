@@ -1,6 +1,6 @@
 Index: src/SDCCasm.c
 ===================================================================
---- src/SDCCasm.c	(revision 13088)
+--- src/SDCCasm.c	(revision 13131)
 +++ src/SDCCasm.c	(working copy)
 @@ -403,8 +403,8 @@
  static const ASM_MAPPING _asxxxx_mapping[] = {
@@ -23,7 +23,7 @@ Index: src/SDCCasm.c
     "; ---------------------------------\n"
 Index: src/SDCCgen.c
 ===================================================================
---- src/SDCCgen.c	(revision 13088)
+--- src/SDCCgen.c	(revision 13131)
 +++ src/SDCCgen.c	(working copy)
 @@ -230,13 +230,17 @@
            break;
@@ -47,7 +47,7 @@ Index: src/SDCCgen.c
            else
 Index: src/SDCCglue.c
 ===================================================================
---- src/SDCCglue.c	(revision 13088)
+--- src/SDCCglue.c	(revision 13131)
 +++ src/SDCCglue.c	(working copy)
 @@ -195,7 +195,7 @@
             (sym->_isparm && !IS_REGPARM (sym->etype) && !IS_STATIC (sym->localof->etype))) &&
@@ -108,7 +108,7 @@ Index: src/SDCCglue.c
  
 Index: src/SDCCmain.c
 ===================================================================
---- src/SDCCmain.c	(revision 13088)
+--- src/SDCCmain.c	(revision 13131)
 +++ src/SDCCmain.c	(working copy)
 @@ -519,18 +519,15 @@
  void
@@ -138,7 +138,7 @@ Index: src/SDCCmain.c
  static void
 Index: src/SDCCopt.c
 ===================================================================
---- src/SDCCopt.c	(revision 13088)
+--- src/SDCCopt.c	(revision 13131)
 +++ src/SDCCopt.c	(working copy)
 @@ -1016,7 +1016,7 @@
        /* TODO: Eliminate it, convert any SEND of volatile into DUMMY_READ_VOLATILE. */
@@ -202,7 +202,7 @@ Index: src/SDCCopt.c
                  continue;
 Index: src/z80/main.c
 ===================================================================
---- src/z80/main.c	(revision 13088)
+--- src/z80/main.c	(revision 13131)
 +++ src/z80/main.c	(working copy)
 @@ -1114,7 +1114,7 @@
      1                           /* No fancy alignments supported. */
@@ -242,7 +242,7 @@ Index: src/z80/main.c
    { z80_emitDebuggerSymbol },
 Index: src/z80/peep.c
 ===================================================================
---- src/z80/peep.c	(revision 13088)
+--- src/z80/peep.c	(revision 13131)
 +++ src/z80/peep.c	(working copy)
 @@ -165,6 +165,88 @@
    return(found && found < end);

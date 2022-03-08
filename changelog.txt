@@ -47,7 +47,7 @@ Detailed but incomplete changelist:
 - [z80asm] Now supports assembling undocumented 8085 instructions
 - [z80asm] Replace --cpu=r2k with --cpu=r2ka
 - [z80asm] Macros are now supported
-- [zsdcc] Upgraded to SDCC 4.2.0 RC2 r13088
+- [zsdcc] Upgraded to SDCC 4.2.0 r13131
 
 z88dk v2.1 - 07.02.2021
 
