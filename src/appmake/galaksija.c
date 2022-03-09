@@ -131,13 +131,15 @@ int gal_exec(char* target)
     char filename[FILENAME_MAX + 1];
     char wavfile[FILENAME_MAX + 1];
     int c, i;
-    int len;
+    int len, screenmode;
 
     unsigned long checksum;
     FILE *fpin, *fpout;
 
     char basicdef[] = "\001\000A=USR(&2C3A)\015";
+    char basicgraphdef[] = "\001\000GRAPH:A=USR(&2C3A)\015";
     int basicdeflen = 15;
+    int basicgraphlen = 21;
     int datalen;
 
     if (help)
@@ -190,10 +192,17 @@ int gal_exec(char* target)
         len = ftell(fpin);
         fseek(fpin, 0L, SEEK_SET);
 
-        datalen = 4 + len + basicdeflen;
+        datalen = 4 + len;
 
         if ((fpout = fopen(filename, "wb")) == NULL) {
             exit_log(1,"Can't open output file %s\n", filename);
+        }
+
+        screenmode = parameter_search(crtfile,".map","CLIB_DEFAULT_SCREEN_MODE");
+        if (screenmode == 1) {
+            datalen += basicgraphlen;
+        } else {
+            datalen += basicdeflen;
         }
 
         /* **** GTP Header **** */
@@ -232,9 +241,8 @@ int gal_exec(char* target)
         }
 
         /* basic */
-        for (i = 0; i < basicdeflen; i++) { /* block name string */
-            writebyte_cksum(basicdef[i], fpout, &checksum);
-            /*fputc(basicdef[i],fpout);*/
+        for (i = 0; i < (screenmode ? basicgraphlen : basicdeflen); i++) { /* block name string */
+            writebyte_cksum(screenmode ? basicgraphdef[i] : basicdef[i], fpout, &checksum);
         }
 
         writebyte(255 - (checksum % 256), fpout); /* data checksum */
