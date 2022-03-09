@@ -26,50 +26,49 @@
 ;   might be covered by the GNU General Public License.
 ;--------------------------------------------------------------------------
 
-	.module crt0
-	.globl	_main
+    .module crt0
+    .globl  _main
 
-	.area	_HEADER (ABS)
-	.org	0x100
+    .area   _HEADER (ABS)
+    .org    0x100
+
 init:
-	;; Set stack pointer below BDOS
-	ld	sp,(0x0006)
+    ;; Set stack pointer below BDOS
+    ld      sp,(0x0006)
 
-	;; Initialise global variables
-	call	gsinit
-	call	_main
-	jp	_exit
+    ;; Initialise global variables
+    call    gsinit
+    call    _main
+    jp      _exit
 
-	;; Ordering of segments for the linker.
-	.area	_HOME
-	.area	_CODE
-	.area	_INITIALIZER
-	.area   _GSINIT
-	.area   _GSFINAL
+    ;; Ordering of segments for the linker.
+    .area   _HOME
+    .area   _CODE
+    .area   _INITIALIZER
+    .area   _GSINIT
+    .area   _GSFINAL
 
-	.area	_DATA
-	.area	_INITIALIZED
-	.area	_BSEG
-	.area   _BSS
-	.area   _HEAP
+    .area   _DATA
+    .area   _INITIALIZED
+    .area   _BSEG
+    .area   _BSS
+    .area   _HEAP
 
-	.area   _CODE
+    .area   _CODE
 
 _exit::
-1$:
-	halt
-	jr	1$
+    jp      0x0000
 
-	.area   _GSINIT
+    .area   _GSINIT
 gsinit::
-	ld	bc, #l__INITIALIZER
-	ld	a, b
-	or	a, c
-	jr	Z, gsinit_next
-	ld	de, #s__INITIALIZED
-	ld	hl, #s__INITIALIZER
-	ldir
+    ld      bc, #l__INITIALIZER
+    ld      a, b
+    or      a, c
+    jr      Z, gsinit_next
+    ld      de, #s__INITIALIZED
+    ld      hl, #s__INITIALIZER
+    ldir
 gsinit_next:
 
-	.area   _GSFINAL
-	ret
+    .area   _GSFINAL
+    ret
