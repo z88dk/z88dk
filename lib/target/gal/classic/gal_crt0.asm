@@ -29,7 +29,9 @@ IF      !DEFINED_CRT_ORG_CODE
 ENDIF
 
     defc    CONSOLE_COLUMNS = 32
+IF !DEFINED_CONSOLE_ROWS
     defc    CONSOLE_ROWS = 16
+ENDIF
 
     defc    TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 32
