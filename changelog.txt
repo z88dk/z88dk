@@ -1,7 +1,7 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
-z88dk v2.2 - xx.xx.xxx
+z88dk v2.2 - xxx.xxx.2022
 
 Detailed but incomplete changelist:
 
