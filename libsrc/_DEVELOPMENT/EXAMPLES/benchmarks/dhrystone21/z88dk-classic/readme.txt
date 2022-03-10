@@ -33,7 +33,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks dhry.bin -start 011f -end 027f -counter 999999999
+z88dk-ticks dhry.bin -start 018a -end 02b5 -counter 999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -45,11 +45,11 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK April 20, 2020
-classic/zsdcc #11566
-7344 bytes less page zero
+Z88DK March 10, 2022
+classic/zsdcc #13131
+7882 bytes less page zero
 
-cycle count  = 248080263
-time @ 4MHz  = 248080263 / 4x10^6 = 62.0201 seconds
-dhrystones/s = 20000 / 62.0201 = 322.4763
-DMIPS        = 322.4763 / 1757 = 0.18354
+cycle count  = 251880052
+time @ 4MHz  = 251880052 / 4x10^6 = 62.97 seconds
+dhrystones/s = 20000 / 62.97 = 317.6115
+DMIPS        = 317.6115 / 1757 = 0.18077
