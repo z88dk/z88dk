@@ -1,7 +1,7 @@
 
 
-#ifndef STRING_TESTS_H
-#define STRING_TESTS_H
+#ifndef STDLIB_TESTS_H
+#define STDLIB_TESTS_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,6 +13,8 @@ extern int test_isqrt();
 extern int test_isqrt2();
 extern int test_strtol();
 extern int test_unbcd();
+extern int test_qsort();
+extern int test_qsort_newlib();
 
 
 #endif

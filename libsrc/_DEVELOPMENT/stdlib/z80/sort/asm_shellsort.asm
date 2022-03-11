@@ -50,7 +50,7 @@ asm_shellsort:
 	ld	(__stdlib_shellsort_t1),hl
 
 	; for (ngap = nel / 2; ngap > 0; ngap /= 2) {
-.i_3
+.shs_i3
 	pop de	; width
 	pop hl  ; ngap
 	srl h			; _ngap/2 ..bit rotation
@@ -85,9 +85,9 @@ asm_shellsort:
 	add	hl,de
 	ld	(__stdlib_shellsort_jd),hl
 	pop hl			; t2
-	jr	i_8
+	jr	shs_i8
 	
-.i_6
+.shs_i6
 	ld	de,(__stdlib_shellsort_i)
 	pop hl
 	push hl
@@ -96,7 +96,7 @@ asm_shellsort:
 	;ld	(__stdlib_shellsort_i),hl
 
 	; for (i = t2; i <= t1; i += width)
-.i_8
+.shs_i8
 	ld	(__stdlib_shellsort_i),hl
 	ld	de,(__stdlib_shellsort_t1)
 	
@@ -104,20 +104,20 @@ asm_shellsort:
 	
 	scf
 	sbc hl,de
-	jr nc, i_3    ; if i-t1-1 >= 0 (if i>t1)
+	jr nc, shs_i3    ; if i-t1-1 >= 0 (if i>t1)
 
 	; for (j =  i - t2..
 	ld	de,(__stdlib_shellsort_i)
 	ld	hl,(__stdlib_shellsort_t2)
 
-.i_11
+.shs_i11
 	ex	de,hl		; same subtraction is used twice in the for loop
 	and	a
 	sbc	hl,de
 	ld	(__stdlib_shellsort_j),hl
 
 	; for ..; j>0; ..
-	jp	m,i_6
+	jp	m,shs_i6
  
         ; hl = j
         
@@ -135,7 +135,7 @@ asm_shellsort:
         ; if ((*compar)(base+j, jd+j) <=0) break;
 
         call l_compare_de_hl   ; compare(de = jd+j, hl = base+j)
-        jp p, i_6              ; if *(jd+j) >= *(base+j)
+        jp p, shs_i6              ; if *(jd+j) >= *(base+j)
 
         ; de = jd + j (2nd arg)
         ; hl = base + j (1st arg)
@@ -149,7 +149,7 @@ asm_shellsort:
 	; for ... j -= gap)
 	ld	de,(__stdlib_shellsort_j)
 	ld	hl,(__stdlib_shellsort_gap)
-	jr	i_11
+	jr	shs_i11
 
 
 SECTION bss_clib
