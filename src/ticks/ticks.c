@@ -712,7 +712,7 @@ void setf(int a){
 extern backend_t ticks_debugger_backend;
 
 int main (int argc, char **argv){
-  int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0;
+  int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0, symbol_addr = -1;
   char * output= NULL;
   char  *memory_model = "standard";
   FILE * fh;
@@ -746,7 +746,7 @@ int main (int argc, char **argv){
     printf("  -mr3k          Emulate a Rabbit 3000\n"),
     printf("  -mz80n         Emulate a Spectrum Next z80n\n"),
     printf("  -mez80         Emulate an ez80 (z80 mode)\n"),
-    printf("  -x <file>      Symbol file to read\n"),
+    printf("  -x <file>      Symbol file to read (enables symbols for -pc,-start,-end)\n"),
     printf("  -ide0 <file>   Set file to be ide device 0\n"),
     printf("  -ide1 <file>   Set file to be ide device 1\n"),
     printf("  -iochar X      Set port X to be character input/output\n"),
@@ -766,13 +766,16 @@ int main (int argc, char **argv){
           memory_model = argv[1];
           break;
         case 'p':
-          pc= strtol(argv[1], NULL, 16);
+          symbol_addr= symbol_resolve(argv[1]);
+          pc= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 's':
-          start= strtol(argv[1], NULL, 16);
+          symbol_addr= symbol_resolve(argv[1]);
+          start= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 'e':
-          end= strtol(argv[1], NULL, 16);
+          symbol_addr= symbol_resolve(argv[1]);
+          end= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 'r':
           rom_size= strtol(argv[1], NULL, 16);
