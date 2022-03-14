@@ -10,7 +10,7 @@
 
 #include <graphics.h>
 #include <sys/ioctl.h>                // required for switching the screen mode
-#include <fratures.h>
+#include <features.h>
 
 
 /* Foo stuff, better to remove the unnecessary code while porting */
