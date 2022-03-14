@@ -108,8 +108,8 @@ int main(void)
       PRINTF2("%u, ", numbers[i]);
       if ((i > 0) && (numbers[i] < numbers[i-1]))
       {
-         PRINTF1("\n\nFAIL");
-         break;
+         PRINTF1("\n\nFAIL\n\n\n");
+         return 1;
       }
    }
    
