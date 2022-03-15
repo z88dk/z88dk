@@ -41,7 +41,6 @@ target/gal/graphics/res_MODE1
 target/gal/graphics/xor_MODE1
 target/gal/graphics/pointxy_MODE1
 target/gal/graphics/textpixl6
-target/gal/graphics/putsprite
 @gfx/narrow/gfx_narrow.lst
 target/gal/games/bit_open
 target/gal/games/bit_open_di
