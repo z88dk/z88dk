@@ -14,7 +14,7 @@ sp1-all:
 	cp zx/sp1-zx.lib $(OUTPUT_DIRECTORY)
 
 clean:
-	make -C zx clean
+	@make -s -C zx clean
 	$(RM) *.o
 	$(RM) spectrum/sprites/*.o
 	$(RM) spectrum/sprites/draw/*.o

@@ -28,4 +28,4 @@ dirs:
 
 
 clean:
-	$(RM) -fr obj 
+	$(RM) -fr obj sp1-zx.lib
