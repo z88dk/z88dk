@@ -24,6 +24,8 @@ sp1_Invalidate:
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _sp1_Invalidate
+PUBLIC _sp1_Invalidate_fastcall
 defc _sp1_Invalidate = sp1_Invalidate
+defc _sp1_Invalidate_fastcall = sp1_Invalidate
 ENDIF
 
