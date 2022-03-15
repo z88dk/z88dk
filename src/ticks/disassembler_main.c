@@ -21,9 +21,11 @@ static void usage(char *program)
 {
     printf("z88dk disassembler\n\n");
     printf("%s [options] [file]\n\n",program);
+    printf("  -x <file>      Symbol file to read\n");
+    printf("                 Use before -o,-s,-e to enable symbols\n");
     printf("  -o <addr>      Address to load code to\n");
     printf("  -s <addr>      Address to start disassembling from\n");
-    printf("  -e <addr>      Address to stop disassembling at\n");
+    printf("  -e <addr>      Address to stop disassembling at\n\n");
     printf("  -mz80          Disassemble z80 code\n");
     printf("  -mz180         Disassemble z180 code\n");
     printf("  -mez80         Disassemble ez80 code (short mode)\n");
@@ -34,7 +36,6 @@ static void usage(char *program)
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");
     printf("  -m8080         Disassemble 8080 code (with z80 mnenomics)\n");
     printf("  -m8085         Disassemble 8085 code (with z80 mnenomics)\n");
-    printf("  -x <file>      Symbol file to read (enables symbols for -o,-s,-e)\n");
 
     exit(1);
 }
@@ -51,7 +52,8 @@ int main(int argc, char **argv)
     uint16_t    org = 0;
     int         start = -1;
     uint16_t    end = 65535;
-    int    loaded = 0, symbol_addr = -1;
+    int    loaded = 0;
+    int    symbol_addr = -1;
 
     mem = calloc(1,65536);
 
