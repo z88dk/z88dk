@@ -9,11 +9,14 @@
 #ifdef __MSX__
 #include <msx.h>
 #endif
+#ifdef __GAL__
+#include <arch/gal.h>
+#endif
 #include <psg/vt2.h>
 #include <stdlib.h>
 
 
-#if __PC6001__ | __MULTI8__
+#if __PC6001__ | __MULTI8__ 
 #define NO_INTERRUPT 1
 #endif
 
@@ -55,7 +58,7 @@ void main()
 
    // Just loop
    while  ( 1 ) {
-      int k = getk();
+      int k = 0; // getk();
       switch ( k ) {
       case ' ':
           ay_vt2_stop();
@@ -66,7 +69,7 @@ void main()
       }
 #ifdef NO_INTERRUPT
        ay_vt2_play();
-       msleep(40);
+       msleep(10);
 #endif
    }
 }
