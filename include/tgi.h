@@ -9,6 +9,7 @@
 #define __TGI_H__
 
 #include <graphics.h>
+#include <lib3d.h>
 #include <sys/ioctl.h>                // required for switching the screen mode
 #include <features.h>
 
@@ -58,6 +59,7 @@ int TGI_MODE = MODE_SECONDSCREEN;
 #define tgi_lineto(a,b)             drawto(a,b)
 #define tgi_circle(a,b,c)           circle(a,b,c,1)
 #define tgi_bar(a,b,c,d)            fillb(a,b,c,d)
+#define tgi_arc(x,y,rx,ry,sa,ea)    ellipse(x,y,sa,ea,rx,ry)
 
 
 #endif
