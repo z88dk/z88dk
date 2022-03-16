@@ -66,6 +66,14 @@ TIMER_START();
 TIMER_STOP();
 }
 
+static void ticks_exit(int status) __z88dk_fastcall
+{
+   __asm
+      xor a
+      defb 0xed, 0xfe
+   __endasm;
+}
+
 int main(void)
 {
    PRINTF1("\nFilling the array with numbers.\n\n");
@@ -104,13 +112,15 @@ int main(void)
       PRINTF2("%u, ", numbers[i]);
       if ((i > 0) && (numbers[i] < numbers[i-1]))
       {
-         PRINTF1("\n\nFAIL");
-         break;
+         PRINTF1("\n\nFAIL\n\n\n");
+         ticks_exit(1);
+         return 1;
       }
    }
    
    PRINTF1("\n\n\n");
    
+   ticks_exit(0);
    return 0;
 }
 
