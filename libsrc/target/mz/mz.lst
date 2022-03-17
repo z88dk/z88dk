@@ -17,6 +17,7 @@ target/mz/graphics/plotpixl
 target/mz/graphics/respixl
 target/mz/graphics/xorpixl
 target/mz/graphics/pointxy
+target/mz/mz_border
 @gfx/narrow/gfx_narrow.lst
 @games/games.lst
 
