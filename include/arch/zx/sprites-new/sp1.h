@@ -391,8 +391,8 @@ extern void sp1_ClearRectInv_callee(struct sp1_Rect *r,uint16_t colour,uint16_t 
 
 // void *hook  <->  void [ __FASTCALL__ ] (*hook)(struct sp1_update *u)
 
-extern void sp1_Initialize(uint16_t iflag,uint16_t colour,uint16_t tile) __smallc __smallc;
-extern void sp1_Initialize_callee(uint16_t iflag,uint16_t colour,uint16_t tile) __smallc __z88dk_callee __smallc;
+extern void sp1_Initialize(uint16_t iflag,uint16_t colour,uint16_t tile) __smallc;
+extern void sp1_Initialize_callee(uint16_t iflag,uint16_t colour,uint16_t tile) __z88dk_callee __smallc;
 #define sp1_Initialize(a,b,c) sp1_Initialize_callee(a,b,c)
 
 
