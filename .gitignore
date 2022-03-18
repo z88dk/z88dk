@@ -1,6 +1,8 @@
 **/*.bak
 **/*.bin
 **/*.c.asm
+**/*.c.sym
+**/*.tap
 **/*.d
 **/*.dSYM/
 **/*.err
