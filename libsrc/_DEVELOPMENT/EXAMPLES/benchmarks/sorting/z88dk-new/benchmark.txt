@@ -1,0 +1,271 @@
+2022-03-19 12:54:33  Starting test
+
+----------------------------------------------------------------------
+new c library / sccz80
+Z88DK_VERSION 19388-38ebdf3b7-20220307
+
+defc __CLIB_OPT_SORT = 0
+defc __CLIB_OPT_SORT_QSORT = 0
+
+sort-sccz80-ran-20 91026
+sort-sccz80-ord-20 12904
+sort-sccz80-rev-20 143263
+sort-sccz80-equ-20 12904
+
+sort-sccz80-ran-5000 4620720172
+sort-sccz80-ord-5000 3155801
+sort-sccz80-rev-5000 9211268810
+sort-sccz80-equ-5000 3155801
+
+defc __CLIB_OPT_SORT = 1
+defc __CLIB_OPT_SORT_QSORT = 0
+
+sort-sccz80-ran-20 77971
+sort-sccz80-ord-20 49795
+sort-sccz80-rev-20 69289
+sort-sccz80-equ-20 49795
+
+sort-sccz80-ran-5000 90766660
+sort-sccz80-ord-5000 40823704
+sort-sccz80-rev-5000 61513903
+sort-sccz80-equ-5000 40823704
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0x0
+
+sort-sccz80-ran-20 65658
+sort-sccz80-ord-20 52667
+sort-sccz80-rev-20 61835
+sort-sccz80-equ-20 146923
+
+sort-sccz80-ran-5000 45968704
+sort-sccz80-ord-5000 35201614
+sort-sccz80-rev-5000 37739795
+sort-sccz80-equ-5000 7195803365
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0x1
+
+sort-sccz80-ran-20 90662
+sort-sccz80-ord-20 70053
+sort-sccz80-rev-20 81189
+sort-sccz80-equ-20 166972
+
+sort-sccz80-ran-5000 56678552
+sort-sccz80-ord-5000 49621048
+sort-sccz80-rev-5000 49621288
+sort-sccz80-equ-5000 7199716280
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0x4
+
+sort-sccz80-ran-20 74023
+sort-sccz80-ord-20 28240
+sort-sccz80-rev-20 41967
+sort-sccz80-equ-20 117319
+
+sort-sccz80-ran-5000 45228851
+sort-sccz80-ord-5000 30186144
+sort-sccz80-rev-5000 34161288
+sort-sccz80-equ-5000 7199025104
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0x5
+
+sort-sccz80-ran-20 59290
+sort-sccz80-ord-20 49480
+sort-sccz80-rev-20 59332
+sort-sccz80-equ-20 162226
+
+sort-sccz80-ran-5000 51835670
+sort-sccz80-ord-5000 43787154
+sort-sccz80-rev-5000 49965386
+sort-sccz80-equ-5000 7202957003
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0x8
+
+sort-sccz80-ran-20 66282
+sort-sccz80-ord-20 53339
+sort-sccz80-rev-20 62363
+sort-sccz80-equ-20 59613
+
+sort-sccz80-ran-5000  FAIL
+sort-sccz80-ord-5000  FAIL
+sort-sccz80-rev-5000  FAIL
+sort-sccz80-equ-5000 44535896
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0x9
+
+sort-sccz80-ran-20 83018
+sort-sccz80-ord-20 81882
+sort-sccz80-rev-20 87499
+sort-sccz80-equ-20 75193
+
+sort-sccz80-ran-5000  FAIL
+sort-sccz80-ord-5000  FAIL
+sort-sccz80-rev-5000  FAIL
+sort-sccz80-equ-5000 48048439
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0xc
+
+sort-sccz80-ran-20 74471
+sort-sccz80-ord-20 28528
+sort-sccz80-rev-20 41983
+sort-sccz80-equ-20 41698
+
+sort-sccz80-ran-5000 78830728
+sort-sccz80-ord-5000 55083569
+sort-sccz80-rev-5000 42342683
+sort-sccz80-equ-5000 39997378
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0xd
+
+sort-sccz80-ran-20 59912
+sort-sccz80-ord-20 51423
+sort-sccz80-rev-20 60248
+sort-sccz80-equ-20 54268
+
+sort-sccz80-ran-5000 89049741
+sort-sccz80-ord-5000 106561400
+sort-sccz80-rev-5000 73810651
+sort-sccz80-equ-5000 43791980
+
+----------------------------------------------------------------------
+new c library / zsdcc
+Build: 4.2.0 #13081 (Linux) Mar 10 2022
+
+defc __CLIB_OPT_SORT = 0
+defc __CLIB_OPT_SORT_QSORT = 0
+
+sort-zsdcc-ran-20 83401
+sort-zsdcc-ord-20 11745
+sort-zsdcc-rev-20 131673
+sort-zsdcc-equ-20 11745
+
+sort-zsdcc-ran-5000 4238228822
+sort-zsdcc-ord-5000 2850862
+sort-zsdcc-rev-5000 8448921310
+sort-zsdcc-equ-5000 2850862
+
+defc __CLIB_OPT_SORT = 1
+defc __CLIB_OPT_SORT_QSORT = 0
+
+sort-zsdcc-ran-20 72237
+sort-zsdcc-ord-20 46013
+sort-zsdcc-rev-20 64409
+sort-zsdcc-equ-20 46013
+
+sort-zsdcc-ran-5000 83717073
+sort-zsdcc-ord-5000 37468399
+sort-zsdcc-rev-5000 56707225
+sort-zsdcc-equ-5000 37468399
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0x0
+
+sort-zsdcc-ran-20 61327
+sort-zsdcc-ord-20 49373
+sort-zsdcc-rev-20 58175
+sort-zsdcc-equ-20 135333
+
+sort-zsdcc-ran-5000 41991138
+sort-zsdcc-ord-5000 32040472
+sort-zsdcc-rev-5000 34480199
+sort-zsdcc-equ-5000 6433455865
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0x1
+
+sort-zsdcc-ran-20 75239
+sort-zsdcc-ord-20 67715
+sort-zsdcc-rev-20 79142
+sort-zsdcc-equ-20 155298
+
+sort-zsdcc-ran-5000 47149856
+sort-zsdcc-ord-5000 45254014
+sort-zsdcc-rev-5000 44925497
+sort-zsdcc-equ-5000 6437369764
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0x4
+
+sort-zsdcc-ran-20 68106
+sort-zsdcc-ord-20 25922
+sort-zsdcc-rev-20 38673
+sort-zsdcc-equ-20 107315
+
+sort-zsdcc-ran-5000 41051388
+sort-zsdcc-ord-5000 27197998
+sort-zsdcc-rev-5000 30892542
+sort-zsdcc-equ-5000 6436375410
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0x5
+
+sort-zsdcc-ran-20 63106
+sort-zsdcc-ord-20 49968
+sort-zsdcc-rev-20 54499
+sort-zsdcc-equ-20 150084
+
+sort-zsdcc-ran-5000 44358513
+sort-zsdcc-ord-5000 42280667
+sort-zsdcc-rev-5000 42763731
+sort-zsdcc-equ-5000 6440305624
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0x8
+
+sort-zsdcc-ran-20 61951
+sort-zsdcc-ord-20 50045
+sort-zsdcc-rev-20 58703
+sort-zsdcc-equ-20 58441
+
+sort-zsdcc-ran-5000  FAIL
+sort-zsdcc-ord-5000  FAIL
+sort-zsdcc-rev-5000  FAIL
+sort-zsdcc-equ-5000 38053067
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0x9
+
+sort-zsdcc-ran-20 79987
+sort-zsdcc-ord-20 64336
+sort-zsdcc-rev-20 92555
+sort-zsdcc-equ-20 71798
+
+sort-zsdcc-ran-5000  FAIL
+sort-zsdcc-ord-5000  FAIL
+sort-zsdcc-rev-5000  FAIL
+sort-zsdcc-equ-5000 40748333
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0xc
+
+sort-zsdcc-ran-20 68554
+sort-zsdcc-ord-20 26210
+sort-zsdcc-rev-20 38689
+sort-zsdcc-equ-20 36372
+
+sort-zsdcc-ran-5000 63818273
+sort-zsdcc-ord-5000 53105886
+sort-zsdcc-rev-5000 37242403
+sort-zsdcc-equ-5000 32361491
+
+defc __CLIB_OPT_SORT = 2
+defc __CLIB_OPT_SORT_QSORT = 0xd
+
+sort-zsdcc-ran-20 68747
+sort-zsdcc-ord-20 65088
+sort-zsdcc-rev-20 61328
+sort-zsdcc-equ-20 43072
+
+sort-zsdcc-ran-5000 69909265
+sort-zsdcc-ord-5000 85979273
+sort-zsdcc-rev-5000 63200683
+sort-zsdcc-equ-5000 36277532
+
+2022-03-19 13:06:24  Test completed
