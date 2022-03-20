@@ -23,6 +23,9 @@ asm_sp1_CreateSpr:
 ; uses  : all
 ; exit  : no carry and hl=0 if memory allocation failed else hl = struct sp1_ss * and carry set
 
+   push ix
+   push iy
+
    push af
    ex af,af
    pop af                     ; a = a' = height  
@@ -197,7 +200,8 @@ done:
    ld a,ixh
    ld h,a
    scf                        ; indicate success
-   ret
+   jr all_return
+
 
 fail:
 
@@ -209,7 +213,7 @@ faillp:
    
    ld a,h
    or l
-   ret z                      ; if 0 done freeing, ret with nc for failure
+   jr z, all_return                      ; if 0 done freeing, ret with nc for failure
    
    push hl
 
@@ -221,3 +225,8 @@ ENDIF
 
    pop hl
    jp faillp
+
+all_return:
+   pop iy
+   pop ix
+   ret

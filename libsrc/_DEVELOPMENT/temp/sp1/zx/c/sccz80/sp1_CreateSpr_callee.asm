@@ -11,7 +11,11 @@ EXTERN asm_sp1_CreateSpr
 
 sp1_CreateSpr_callee:
 
-   pop ix
+;   pop ix	; save ret addr
+   exx
+   pop bc
+   exx
+
    pop bc
    pop hl
    pop de
@@ -19,9 +23,19 @@ sp1_CreateSpr_callee:
    pop de
    ld b,e
    pop de
-   push ix
 
-   jp asm_sp1_CreateSpr
+;   push ix	; restore ret addr
+   exx
+   push bc
+   exx
+
+;   jp asm_sp1_CreateSpr
+   push ix
+   push iy
+   call asm_sp1_CreateSpr
+   pop iy
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

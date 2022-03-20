@@ -23,6 +23,9 @@ asm_sp1_AddColSpr:
 ; uses  : af, bc, de, hl, bc', de', hl', iy
 ; exit  : carry flag for success and hl=1, else memory allocation failed and hl=0
 
+   push ix
+   push iy
+
    exx
    ld hl,0                    ; first try to get all the memory we need
    push hl                    ; push a 0 on stack to indicate end of allocated memory blocks
@@ -180,7 +183,7 @@ done:
    inc (ix+2)                 ; increase width of sprite
    inc l
    scf                        ; indicate success
-   ret
+   jr all_return
 
 fail:
 
@@ -192,7 +195,7 @@ faillp:
    
    ld a,h
    or l
-   ret z                      ; if 0 done freeing, ret with nc for failure
+   jr z, all_return                      ; if 0 done freeing, ret with nc for failure
    
    push hl
 
@@ -204,3 +207,8 @@ ENDIF
 
    pop hl
    jr faillp
+
+all_return:
+   pop iy
+   pop ix
+   ret

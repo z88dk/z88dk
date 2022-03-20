@@ -16,7 +16,13 @@ sp1_AddColSpr:
    pop de
    ld l,e
    pop de
-   pop ix
+
+   push ix	; save IX in BC'
+   exx
+   pop bc
+   exx
+
+   pop ix	; now get it, we need it
 
    push hl
    push hl
@@ -25,7 +31,15 @@ sp1_AddColSpr:
    push hl
    push af
    
-   jp asm_sp1_AddColSpr
+;   jp asm_sp1_AddColSpr
+   exx
+   push bc	; save old IX
+   exx
+
+   call asm_sp1_AddColSpr
+
+   pop ix	; restore it
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

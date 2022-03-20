@@ -19,11 +19,30 @@ sp1_MoveSprRel_callee:
    pop hl
    ld d,l
    pop hl
+
+   push ix	; save IX, IY to BC', DE'
+   push iy
+   exx
+   pop de
+   pop bc
+   exx
+
    pop iy
    pop ix
    push af
 
-   jp asm_sp1_MoveSprRel
+;   jp asm_sp1_MoveSprRel
+   exx
+   push bc	; save old IX, IY
+   push de
+   exx
+
+   call asm_sp1_MoveSprRel
+
+   pop iy	; restore them
+   pop ix
+   ret
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC
