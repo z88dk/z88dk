@@ -5,7 +5,7 @@ SOURCES += $(wildcard *.c)
 
 # the sort implementation is included directly during compilation to make it amendable by config_private.inc
 # overshadowing the pre-compiled newlib data (avoiding full rebuild of newlib for each test case)
-EXTRA_ASM_SOURCE = $(wildcard ../../../../stdlib/z80/sort/*.asm) ../../../../stdlib/z80/asm_qsort.asm
+EXTRA_ASM_SOURCE = $(wildcard ../../../../stdlib/z80/sort/*.asm) asm_handwritten.asm
 
 all:	benchmark.txt
 
@@ -19,7 +19,9 @@ NUM_OPTIONS=20 5000
 # quick common options
 SORT_OPTS=1+0 2+0xc
 # complete test (takes several minutes)
-# SORT_OPTS=0+0 1+0 2+0x0 2+0x1 2+0x4 2+0x5 2+0x8 2+0x9 2+0xc 2+0xd
+# SORT_OPTS=0+0 1+0 2+0x0 2+0x1 2+0x4 2+0x5 2+0x8 2+0x9 2+0xc 2+0xd 3+0
+### the option "3+0" is not part of the newlib, and selects hand-written hard-coded quick sort
+### for size=2 and uint16_t compare of elements in array (not using compare function)
 
 # CFLAGS +=
 

@@ -5,6 +5,13 @@ CHANGES TO SOURCE CODE
 status code in ticks. (the return from main in new-lib z80 target does
 end with `di : halt : jr $` infinite loop)
 
+And optimised the newlib implementation itself to avoid divu call for every
+new middle-pivot selection.
+
+And added (to satisfy my own curiosity) extra hard-coded hand-written assembly
+example using size=2 and inlined compare for uint16_t case (ignoring
+the compare function), it's hidden under invalid OPT_SORT=3 option.
+
 VERIFY CORRECT RESULT
 =====================
 
@@ -88,35 +95,35 @@ All programs are very close in size.
 RESULT
 ======
 
-Z88DK March 19, 2022
+Z88DK March 21, 2022
 new c library / sccz80 19388-38ebdf3b7-20220307 / __CLIB_OPT_SORT = 2, __CLIB_OPT_SORT_QSORT = 0xc
-1531 bytes less page zero
+1468 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20          74471     0.0186 sec
-sort-ord-20          28528     0.0071 sec
-sort-rev-20          41983     0.0105 sec
-sort-equ-20          41698     0.0104 sec
+sort-ran-20          69298     0.0173 sec
+sort-ord-20          25896     0.0065 sec
+sort-rev-20          39351     0.0098 sec
+sort-equ-20          27242     0.0068 sec
 
-sort-ran-5000     78830728    19.7077 sec
-sort-ord-5000     55083569    13.7709 sec
-sort-rev-5000     42342683    10.5857 sec
-sort-equ-5000     39997378     9.9993 sec
+sort-ran-5000     54966037    13.7415 sec
+sort-ord-5000     56231253    14.0578 sec
+sort-rev-5000     42450934    10.6127 sec
+sort-equ-5000     36069168     9.0173 sec
 
 
-Z88DK March 19, 2022
+Z88DK March 21, 2022
 new c library / zsdcc 4.2.0 #13081 / __CLIB_OPT_SORT = 2, __CLIB_OPT_SORT_QSORT = 0xc
-1458 bytes less page zero
+1395 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20          68554     0.0171 sec
-sort-ord-20          26210     0.0066 sec
-sort-rev-20          38689     0.0097 sec
-sort-equ-20          36372     0.0091 sec
+sort-ran-20          63442     0.0159 sec
+sort-ord-20          23578     0.0059 sec
+sort-rev-20          36057     0.0090 sec
+sort-equ-20          24948     0.0062 sec
 
-sort-ran-5000     63818273    15.9546 sec
-sort-ord-5000     53105886    13.2765 sec
-sort-rev-5000     37242403     9.3106 sec
-sort-equ-5000     32361491     8.0904 sec
+sort-ran-5000     51266468    12.8166 sec
+sort-ord-5000     47774963    11.9437 sec
+sort-rev-5000     39164351     9.7911 sec
+sort-equ-5000     28291376     7.0728 sec

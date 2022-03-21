@@ -1,4 +1,4 @@
-2022-03-20 18:37:44  Starting test
+2022-03-21 19:03:51  Starting test
 
 ----------------------------------------------------------------------
 new c library / sccz80
@@ -134,6 +134,19 @@ sort-sccz80-ord-5000 133000205
 sort-sccz80-rev-5000 80905257
 sort-sccz80-equ-5000 43862662
 
+defc __CLIB_OPT_SORT = 3
+defc __CLIB_OPT_SORT_QSORT = 0
+
+sort-sccz80-ran-20 14370
+sort-sccz80-ord-20 11730
+sort-sccz80-rev-20 13080
+sort-sccz80-equ-20 17550
+
+sort-sccz80-ran-5000 7366677
+sort-sccz80-ord-5000 4666984
+sort-sccz80-rev-5000 5020592
+sort-sccz80-equ-5000 8919440
+
 ----------------------------------------------------------------------
 new c library / zsdcc
 Build: 4.2.0 #13081 (Linux) Mar 10 2022
@@ -268,4 +281,17 @@ sort-zsdcc-ord-5000 123359223
 sort-zsdcc-rev-5000 81691589
 sort-zsdcc-equ-5000 36197091
 
-2022-03-20 18:49:27  Test completed
+defc __CLIB_OPT_SORT = 3
+defc __CLIB_OPT_SORT_QSORT = 0
+
+sort-zsdcc-ran-20 14370
+sort-zsdcc-ord-20 11730
+sort-zsdcc-rev-20 13080
+sort-zsdcc-equ-20 17550
+
+sort-zsdcc-ran-5000 7366677
+sort-zsdcc-ord-5000 4666984
+sort-zsdcc-rev-5000 5020592
+sort-zsdcc-equ-5000 8919440
+
+2022-03-21 19:16:03  Test completed
