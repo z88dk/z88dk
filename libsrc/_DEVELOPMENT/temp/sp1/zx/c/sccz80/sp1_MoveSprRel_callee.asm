@@ -20,10 +20,8 @@ sp1_MoveSprRel_callee:
    ld d,l
    pop hl
 
-   push ix	; save IX, IY to BC', DE'
-   push iy
+   push ix	; save IX to BC'
    exx
-   pop de
    pop bc
    exx
 
@@ -33,14 +31,12 @@ sp1_MoveSprRel_callee:
 
 ;   jp asm_sp1_MoveSprRel
    exx
-   push bc	; save old IX, IY
-   push de
+   push bc	; save old IX
    exx
 
    call asm_sp1_MoveSprRel
 
-   pop iy	; restore them
-   pop ix
+   pop ix	; restore it
    ret
 
 

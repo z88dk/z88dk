@@ -19,10 +19,8 @@ sp1_MoveSprAbs:
    ld d,l
    pop hl
 
-   push ix	; save IX, IY to BC', DE'
-   push iy
+   push ix	; save IX to BC'
    exx
-   pop de
    pop bc
    exx
 
@@ -39,14 +37,12 @@ sp1_MoveSprAbs:
 
 ;   jp asm_sp1_MoveSprAbs
    exx
-   push bc	; save old IX, IY
-   push de
+   push bc	; save old IX
    exx
 
    call asm_sp1_MoveSprAbs
 
-   pop iy	; restore them
-   pop ix
+   pop ix	; restore it
    ret
 
 ; SDCC bridge for Classic

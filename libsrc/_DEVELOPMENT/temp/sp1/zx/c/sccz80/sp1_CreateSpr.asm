@@ -31,7 +31,11 @@ sp1_CreateSpr:
    ld l,a
    ex de,hl
    
-   jp asm_sp1_CreateSpr
+   push ix
+;   jp asm_sp1_CreateSpr
+   call asm_sp1_CreateSpr
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC
