@@ -49,6 +49,18 @@
 
 INCLUDE "config_private.inc"
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF (__CLIB_OPT_SORT_QSORT & $03) = 0
+
+; pivot = middle item
+SECTION bss_clib
+SECTION bss_stdlib
+
+__stdlib_quicksort_size_lsb:   defw 0     ; ((size-1)&size)^size == lowest set bit in size
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 SECTION code_clib
 SECTION code_stdlib
 
@@ -107,6 +119,27 @@ ENDIF
 quicksort:
 
    push hl
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+IF (__CLIB_OPT_SORT_QSORT & $03) = 0
+
+   ; pivot = middle item ; calculate lowest set bit in size = ((size-1)&size)^size
+   ld l,c
+   ld h,b
+   dec hl
+   ld a,l
+   and c
+   xor c
+   ld l,a
+   ld a,h
+   and b
+   xor b
+   ld h,a
+   ld (__stdlib_quicksort_size_lsb),hl
+
+ENDIF
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
    ld hl,0
    ex (sp),hl                  ; mark end of stack with zero
 
@@ -161,62 +194,63 @@ IF (__CLIB_OPT_SORT_QSORT & $03) = 0
    ; k = (i+j)/2 - ((j-i)/2)%size
    ;   = i + (j-i)/2 - ((j-i)/2)%size  (-- Einar Saukas)
 
-   push hl                     ; save j
-   push de                     ; save i
-   push bc                     ; save size
-   push hl                     ; save j
-   push de                     ; save i
+   ; it is enough to adjust "i + (j-i)/2" by "-size/2" when "(j-i)/size" is odd
+   ; and odd-ness of (j-i)/size can be decided by lowest bit set in size without div:
 
-   sbc hl,de
+   ; 0 == i%size && 0 == j%size => 0 == (j-i)%size =>
+   ; 0 == ((j-i)/2)%size || size/2 == ((j-i)/2)%size
+   ; size/2 == ((j-i)/2)%size <=> 1 == ((j-i)/size)%2
+   ; 1 == ((j-i)/size)%2 <=> 0 != (((size-1)&size)^size)&(j-i)
+   ; proof on the reader - think about binary addition of size value to pointer (-- Peter Helcmanovsky)
+
+   push hl                     ; save j
+   sbc hl,de                   ; hl = j-i
+
+   ld a,(__stdlib_quicksort_size_lsb)
+   and l
+   jr nz,delta_j_i_is_size_odd
+   ld a,(__stdlib_quicksort_size_lsb+1)
+   and h
+   jr z,delta_j_i_is_size_even
+
+delta_j_i_is_size_odd:
+   sbc hl,bc                   ; hl = j-i-size ; forcing it to be "size even" => 0 == ((j-i)/2)%size
+
+delta_j_i_is_size_even:
    srl h
-   rr l                        ; hl = (j-i)/2
-   
-   ld e,c
-   ld d,b                      ; de = size
-   
-   push hl                     ; save (j-i)/2
-   
-   EXTERN l0_divu_16_16x16
-   call l0_divu_16_16x16       ; de = hl % de = [(j-i)/2] % size
+   rr l                        ; hl = (j-i)/2 or (j-i-size)/2, hl%size == 0 (is valid pointer to element)
 
    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
    IF __CLIB_OPT_SORT_QSORT & $04
-   
+
       ; insertion sort small partitions
-      
-      ld a,4                   ; chosen by trial and error
-      cp l
-      sbc a,a                  ; a = (4 < l) ? 0xFF : 0x00
-      or h
-      jr nz, partition_size_large ; 4 < ((j-i)/2)/size
-      
+      push hl                  ; save (j-i)/2
+
+      srl h
+      rr l
+      srl h
+      rr l
+      srl h
+      rr l
+      sbc hl,bc                ; (j-i)/2/8 - size - some_carry
+
+      pop hl
+
+      jr nc, partition_size_large ; roughly 8 < ((j-i)/2)/size
+
    partition_size_small:
-   
-      pop bc
-      pop bc
-      pop bc
-      pop bc                   ; bc = size
+
       pop af
-      pop af
-   
+
       jr interval_done
-   
-   ENDIF
-   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 partition_size_large:
 
-   pop hl                      ; hl = (j-i)/2
-   sbc hl,de
-   
-   pop de                      ; de = i
-   add hl,de                   ; hl = k = i + (j-i)/2 - ((j-i)/2)%size
-   
-   pop de                      ; de = j
-   pop bc                      ; bc = size
+   ENDIF
+   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+   add hl,de                   ; hl = k = i + (j-i)/2 - ((j-i)/2)%size
    ex de,hl
-   pop hl
 
    ; hl = i
    ; de = pivot
