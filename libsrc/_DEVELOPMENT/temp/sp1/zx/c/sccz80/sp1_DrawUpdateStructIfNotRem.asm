@@ -8,7 +8,12 @@ PUBLIC sp1_DrawUpdateStructIfNotRem
 
 EXTERN asm_sp1_DrawUpdateStructIfNotRem
 
-defc sp1_DrawUpdateStructIfNotRem = asm_sp1_DrawUpdateStructIfNotRem
+sp1_DrawUpdateStructIfNotRem:
+
+   push ix
+   call asm_sp1_DrawUpdateStructIfNotRem
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

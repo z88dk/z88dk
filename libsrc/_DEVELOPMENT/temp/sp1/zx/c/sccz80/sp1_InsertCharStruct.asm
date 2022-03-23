@@ -17,7 +17,11 @@ sp1_InsertCharStruct:
    push hl
    push bc
    
-   jp asm_sp1_InsertCharStruct
+;   jp asm_sp1_InsertCharStruct
+   push ix
+   call asm_sp1_InsertCharStruct
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

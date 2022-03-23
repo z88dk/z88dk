@@ -29,7 +29,11 @@ sp1_GetTiles:
    ld c,(hl)
    pop hl
    
-   jp asm_sp1_GetTiles
+;   jp asm_sp1_GetTiles
+   push ix
+   call asm_sp1_GetTiles
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

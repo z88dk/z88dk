@@ -10,7 +10,11 @@ EXTERN asm_sp1_InitCharStruct
 
 sp1_InitCharStruct:
 
-   pop ix
+;   pop ix
+   exx
+   pop bc
+   exx
+
    pop bc
    ld a,c
    ex af,af
@@ -24,9 +28,17 @@ sp1_InitCharStruct:
    push de
    push bc
    push bc
-   push ix
+
+;   push ix
+   exx
+   push bc
+   exx
    
-   jp asm_sp1_InitCharStruct
+;   jp asm_sp1_InitCharStruct
+   push ix
+   call asm_sp1_InitCharStruct
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

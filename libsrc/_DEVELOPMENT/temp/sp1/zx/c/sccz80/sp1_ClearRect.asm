@@ -35,7 +35,11 @@ sp1_ClearRect:
    ld c,(hl)
    pop hl
    
-   jp asm_sp1_ClearRect
+;   jp asm_sp1_ClearRect
+   push ix		; save/restore IX, garbled by asm function
+   call asm_sp1_ClearRect
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

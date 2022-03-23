@@ -8,7 +8,12 @@ PUBLIC sp1_DeleteSpr
 
 EXTERN asm_sp1_DeleteSpr
 
-defc sp1_DeleteSpr = asm_sp1_DeleteSpr
+sp1_DeleteSpr:
+
+   push ix
+   call asm_sp1_DeleteSpr
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

@@ -11,6 +11,12 @@ EXTERN asm0_sp1_IterateUpdateRect
 sp1_IterateUpdateRect:
 
    pop bc
+
+   push ix	; save IX to BC'
+   exx
+   pop bc
+   exx
+
    pop ix
    pop hl
    push hl
