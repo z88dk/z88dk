@@ -29,3 +29,4 @@ dirs:
 
 clean:
 	$(RM) -fr obj sp1-zx.lib
+	$(MAKE) -C examples clean

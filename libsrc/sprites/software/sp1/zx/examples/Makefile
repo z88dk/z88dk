@@ -28,5 +28,5 @@ all: ex0.tap ex1.tap ex5e.tap
 build: clean all
 
 clean:
-	@echo "Cleaning up..."
+	@echo "Cleaning up SP1 examples..."
 	@-rm -f *.o *.bin *.tap *.c.asm *.map *.lis *.sym

@@ -71,9 +71,15 @@
 // the rectangular area.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex5e.c -o ex5e.bin -create-app -lsp1  -lndos
+// A) zcc +zx -vn ex5e.c -o ex5e.bin --list --c-code-in-asm -create-app -lsp1  -lndos
+// B) zcc +zx -vn ex5e.c -o ex5e.bin --list --c-code-in-asm -create-app -lsp1-zx  -lndos
+// C) zcc +zx -vn -compiler=sdcc ex5e.c -o ex5e.bin --list --c-code-in-asm -create-app -lsp1-zx  -lndos
 
-#include <sprites/sp1.h>
+// use this include for A) classic-SP1 + classic libc  + sccz80
+//#include <arch/zx/sprites/sp1.h>
+
+// use this include for B) newlib-SP1 + classic libc + sccz80 and C) newlib-SP1 + classic libc + sdcc
+#include <arch/zx/sprites-new/sp1.h>
 #include <input.h>
 #include <malloc.h>
 #include <spectrum.h>
