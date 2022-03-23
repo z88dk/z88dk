@@ -1,4 +1,4 @@
-2022-03-21 19:03:51  Starting test
+2022-03-23 20:08:02  Starting test
 
 ----------------------------------------------------------------------
 new c library / sccz80
@@ -20,15 +20,15 @@ sort-sccz80-equ-5000 3155801
 defc __CLIB_OPT_SORT = 1
 defc __CLIB_OPT_SORT_QSORT = 0
 
-sort-sccz80-ran-20 77971
-sort-sccz80-ord-20 49795
-sort-sccz80-rev-20 69289
-sort-sccz80-equ-20 49795
+sort-sccz80-ran-20 76307
+sort-sccz80-ord-20 48291
+sort-sccz80-rev-20 67641
+sort-sccz80-equ-20 48291
 
-sort-sccz80-ran-5000 90766660
-sort-sccz80-ord-5000 40823704
-sort-sccz80-rev-5000 61513903
-sort-sccz80-equ-5000 40823704
+sort-sccz80-ran-5000 89193784
+sort-sccz80-ord-5000 39503536
+sort-sccz80-rev-5000 60078615
+sort-sccz80-equ-5000 39503536
 
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0x0
@@ -46,15 +46,15 @@ sort-sccz80-equ-5000 7190919971
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0x1
 
-sort-sccz80-ran-20 90662
-sort-sccz80-ord-20 70053
-sort-sccz80-rev-20 81189
-sort-sccz80-equ-20 166972
+sort-sccz80-ran-20 92432
+sort-sccz80-ord-20 69445
+sort-sccz80-rev-20 74452
+sort-sccz80-equ-20 167008
 
-sort-sccz80-ran-5000 56678552
-sort-sccz80-ord-5000 49621048
-sort-sccz80-rev-5000 49621288
-sort-sccz80-equ-5000 7199716280
+sort-sccz80-ran-5000 53959119
+sort-sccz80-ord-5000 46927635
+sort-sccz80-rev-5000 49921356
+sort-sccz80-equ-5000 7199717747
 
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0x4
@@ -72,15 +72,15 @@ sort-sccz80-equ-5000 7194371928
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0x5
 
-sort-sccz80-ran-20 62146
-sort-sccz80-ord-20 51547
-sort-sccz80-rev-20 60590
-sort-sccz80-equ-20 162081
+sort-sccz80-ran-20 86701
+sort-sccz80-ord-20 51755
+sort-sccz80-rev-20 71145
+sort-sccz80-equ-20 162063
 
-sort-sccz80-ran-5000 52091983
-sort-sccz80-ord-5000 44073485
-sort-sccz80-rev-5000 47428398
-sort-sccz80-equ-5000 7203010420
+sort-sccz80-ran-5000 50508046
+sort-sccz80-ord-5000 44903450
+sort-sccz80-rev-5000 47157605
+sort-sccz80-equ-5000 7203009169
 
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0x8
@@ -98,15 +98,15 @@ sort-sccz80-equ-5000 41972168
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0x9
 
-sort-sccz80-ran-20 83018
-sort-sccz80-ord-20 81882
-sort-sccz80-rev-20 87499
-sort-sccz80-equ-20 75193
+sort-sccz80-ran-20 76746
+sort-sccz80-ord-20 66362
+sort-sccz80-rev-20 73304
+sort-sccz80-equ-20 69255
 
 sort-sccz80-ran-5000  FAIL
 sort-sccz80-ord-5000  FAIL
 sort-sccz80-rev-5000  FAIL
-sort-sccz80-equ-5000 48048439
+sort-sccz80-equ-5000 48027515
 
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0xc
@@ -124,15 +124,15 @@ sort-sccz80-equ-5000 36069168
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0xd
 
-sort-sccz80-ran-20 70018
-sort-sccz80-ord-20 64520
-sort-sccz80-rev-20 58439
-sort-sccz80-equ-20 54228
+sort-sccz80-ran-20 61036
+sort-sccz80-ord-20 51761
+sort-sccz80-rev-20 59730
+sort-sccz80-equ-20 48368
 
-sort-sccz80-ran-5000 130562654
-sort-sccz80-ord-5000 133000205
-sort-sccz80-rev-5000 80905257
-sort-sccz80-equ-5000 43862662
+sort-sccz80-ran-5000 77031677
+sort-sccz80-ord-5000 112060164
+sort-sccz80-rev-5000 95419783
+sort-sccz80-equ-5000 43936982
 
 defc __CLIB_OPT_SORT = 3
 defc __CLIB_OPT_SORT_QSORT = 0
@@ -167,15 +167,15 @@ sort-zsdcc-equ-5000 2850862
 defc __CLIB_OPT_SORT = 1
 defc __CLIB_OPT_SORT_QSORT = 0
 
-sort-zsdcc-ran-20 72237
-sort-zsdcc-ord-20 46013
-sort-zsdcc-rev-20 64409
-sort-zsdcc-equ-20 46013
+sort-zsdcc-ran-20 70573
+sort-zsdcc-ord-20 44509
+sort-zsdcc-rev-20 62761
+sort-zsdcc-equ-20 44509
 
-sort-zsdcc-ran-5000 83717073
-sort-zsdcc-ord-5000 37468399
-sort-zsdcc-rev-5000 56707225
-sort-zsdcc-equ-5000 37468399
+sort-zsdcc-ran-5000 82144197
+sort-zsdcc-ord-5000 36148231
+sort-zsdcc-rev-5000 55271937
+sort-zsdcc-equ-5000 36148231
 
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0x0
@@ -193,15 +193,15 @@ sort-zsdcc-equ-5000 6428572471
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0x1
 
-sort-zsdcc-ran-20 75239
-sort-zsdcc-ord-20 67715
-sort-zsdcc-rev-20 79142
-sort-zsdcc-equ-20 155298
+sort-zsdcc-ran-20 73998
+sort-zsdcc-ord-20 63629
+sort-zsdcc-rev-20 79529
+sort-zsdcc-equ-20 155364
 
-sort-zsdcc-ran-5000 47149856
-sort-zsdcc-ord-5000 45254014
-sort-zsdcc-rev-5000 44925497
-sort-zsdcc-equ-5000 6437369764
+sort-zsdcc-ran-5000 48332199
+sort-zsdcc-ord-5000 42814712
+sort-zsdcc-rev-5000 45826191
+sort-zsdcc-equ-5000 6437369911
 
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0x4
@@ -219,15 +219,15 @@ sort-zsdcc-equ-5000 6431736325
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0x5
 
-sort-zsdcc-ran-20 63826
-sort-zsdcc-ord-20 42771
-sort-zsdcc-rev-20 60133
-sort-zsdcc-equ-20 149954
+sort-zsdcc-ran-20 70696
+sort-zsdcc-ord-20 45773
+sort-zsdcc-rev-20 48149
+sort-zsdcc-equ-20 149930
 
-sort-zsdcc-ran-5000 46754443
-sort-zsdcc-ord-5000 38878693
-sort-zsdcc-rev-5000 43497945
-sort-zsdcc-equ-5000 6440358471
+sort-zsdcc-ran-5000 45520020
+sort-zsdcc-ord-5000 40781765
+sort-zsdcc-rev-5000 43402964
+sort-zsdcc-equ-5000 6440356809
 
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0x8
@@ -245,15 +245,15 @@ sort-zsdcc-equ-5000 34447113
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0x9
 
-sort-zsdcc-ran-20 79987
-sort-zsdcc-ord-20 64336
-sort-zsdcc-rev-20 92555
-sort-zsdcc-equ-20 71798
+sort-zsdcc-ran-20 70976
+sort-zsdcc-ord-20 66118
+sort-zsdcc-rev-20 76643
+sort-zsdcc-equ-20 70785
 
 sort-zsdcc-ran-5000  FAIL
 sort-zsdcc-ord-5000  FAIL
 sort-zsdcc-rev-5000  FAIL
-sort-zsdcc-equ-5000 40748333
+sort-zsdcc-equ-5000 40875988
 
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0xc
@@ -271,15 +271,15 @@ sort-zsdcc-equ-5000 28291376
 defc __CLIB_OPT_SORT = 2
 defc __CLIB_OPT_SORT_QSORT = 0xd
 
-sort-zsdcc-ran-20 73576
-sort-zsdcc-ord-20 52376
-sort-zsdcc-rev-20 57923
-sort-zsdcc-equ-20 49182
+sort-zsdcc-ran-20 67605
+sort-zsdcc-ord-20 62947
+sort-zsdcc-rev-20 61391
+sort-zsdcc-equ-20 50037
 
-sort-zsdcc-ran-5000 70017281
-sort-zsdcc-ord-5000 123359223
-sort-zsdcc-rev-5000 81691589
-sort-zsdcc-equ-5000 36197091
+sort-zsdcc-ran-5000 63968607
+sort-zsdcc-ord-5000 86051871
+sort-zsdcc-rev-5000 80218092
+sort-zsdcc-equ-5000 36187578
 
 defc __CLIB_OPT_SORT = 3
 defc __CLIB_OPT_SORT_QSORT = 0
@@ -294,4 +294,4 @@ sort-zsdcc-ord-5000 4666984
 sort-zsdcc-rev-5000 5020592
 sort-zsdcc-equ-5000 8919440
 
-2022-03-21 19:16:03  Test completed
+2022-03-23 20:20:13  Test completed

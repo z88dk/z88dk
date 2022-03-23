@@ -98,22 +98,20 @@ asm_shellsort:
 	; for (i = t2; i <= t1; i += width)
 .shs_i8
 	ld	(__stdlib_shellsort_i),hl
-	ld	de,(__stdlib_shellsort_t1)
+	ex	de,hl
+	ld	hl,(__stdlib_shellsort_t1)
 	
-	; hl = i, de = t1
+	; de = i, hl = t1, carry=0 from "add hl,de" in both paths
 	
-	scf
 	sbc hl,de
-	jr nc, shs_i3    ; if i-t1-1 >= 0 (if i>t1)
+	jr c, shs_i3    ; if t1-i < 0 (if i>t1)
 
 	; for (j =  i - t2..
-	ld	de,(__stdlib_shellsort_i)
 	ld	hl,(__stdlib_shellsort_t2)
-
+	ex	de,hl
 .shs_i11
-	ex	de,hl		; same subtraction is used twice in the for loop
 	and	a
-	sbc	hl,de
+	sbc	hl,de		; same subtraction is used twice in the for loop
 	ld	(__stdlib_shellsort_j),hl
 
 	; for ..; j>0; ..
@@ -147,8 +145,8 @@ asm_shellsort:
 	call	asm0_memswap
 
 	; for ... j -= gap)
-	ld	de,(__stdlib_shellsort_j)
-	ld	hl,(__stdlib_shellsort_gap)
+	ld	hl,(__stdlib_shellsort_j)
+	ld	de,(__stdlib_shellsort_gap)
 	jr	shs_i11
 
 
