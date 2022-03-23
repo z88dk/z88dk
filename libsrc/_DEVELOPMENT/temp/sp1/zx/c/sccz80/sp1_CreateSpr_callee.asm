@@ -31,9 +31,7 @@ sp1_CreateSpr_callee:
 
 ;   jp asm_sp1_CreateSpr
    push ix
-   push iy
    call asm_sp1_CreateSpr
-   pop iy
    pop ix
    ret
 

@@ -31,8 +31,8 @@ sp1_CreateSpr:
    ld l,a
    ex de,hl
    
-   push ix
 ;   jp asm_sp1_CreateSpr
+   push ix
    call asm_sp1_CreateSpr
    pop ix
    ret
