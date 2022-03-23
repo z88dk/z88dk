@@ -16,7 +16,11 @@ sp1_GetUpdateStruct:
    inc hl
    ld d,(hl)
    
-   jp asm_sp1_GetUpdateStruct
+;   jp asm_sp1_GetUpdateStruct
+   push ix
+   call asm_sp1_GetUpdateStruct
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

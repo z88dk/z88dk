@@ -19,7 +19,11 @@ sp1_Invalidate:
    inc hl
    ld c,(hl)
 
-   jp asm_sp1_Invalidate
+;   jp asm_sp1_Invalidate
+   push ix
+   call asm_sp1_Invalidate
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

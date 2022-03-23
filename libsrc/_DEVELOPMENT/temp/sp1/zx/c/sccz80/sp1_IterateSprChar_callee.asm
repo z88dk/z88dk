@@ -15,7 +15,11 @@ sp1_IterateSprChar_callee:
    pop ix
    ex (sp),hl
 
-   jp asm_sp1_IterateSprChar
+;   jp asm_sp1_IterateSprChar
+   push ix
+   call asm_sp1_IterateSprChar
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

@@ -12,10 +12,22 @@ EXTERN asm_sp1_IterateUpdateArr
 sp1_IterateUpdateArr_callee:
 
    pop hl
+
+   push ix      ; save IX to BC'
+   exx
+   pop bc
+   exx
+
    pop ix
    ex (sp),hl
 
-   jp asm_sp1_IterateUpdateArr
+;   jp asm_sp1_IterateUpdateArr
+   exx
+   push bc      ; save old IX
+   exx
+   call asm_sp1_IterateUpdateArr
+   pop ix       ; restore it
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

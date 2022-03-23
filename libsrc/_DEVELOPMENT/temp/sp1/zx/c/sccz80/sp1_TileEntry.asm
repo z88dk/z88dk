@@ -18,7 +18,11 @@ sp1_TileEntry:
    inc hl
    ld c,(hl)
    
-   jp asm_sp1_TileEntry
+;   jp asm_sp1_TileEntry
+   push ix
+   call asm_sp1_TileEntry
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

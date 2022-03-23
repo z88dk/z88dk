@@ -32,8 +32,8 @@ asm0_sp1_IterateUpdateRect:
    ld c,(hl)
 
 ;   jp asm_sp1_IterateUpdateRect
-   exx		; save old IX
-   push bc
+   exx
+   push bc	; save old IX
    exx
    call asm_sp1_IterateUpdateRect
    pop ix	; restore it

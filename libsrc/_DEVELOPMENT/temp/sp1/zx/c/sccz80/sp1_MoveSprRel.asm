@@ -39,9 +39,7 @@ sp1_MoveSprRel:
    exx
    push bc	; save old IX
    exx
-
    call asm_sp1_MoveSprRel
-
    pop ix	; restore it
    ret
 

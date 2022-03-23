@@ -11,6 +11,11 @@ EXTERN asm_sp1_PreShiftSpr
 
 sp1_PreShiftSpr_callee:
 
+   push ix	; save IX to BC'
+   exx
+   pop bc
+   exx
+
    pop af
    pop bc
    pop iy
@@ -24,7 +29,14 @@ sp1_PreShiftSpr_callee:
    ld h,a
    ld a,c
 
-   jp asm_sp1_PreShiftSpr
+;   jp asm_sp1_PreShiftSpr
+   exx
+   push bc	; save old IX
+   exx
+   call asm_sp1_PreShiftSpr
+   pop ix	; restore it
+   ret
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC
