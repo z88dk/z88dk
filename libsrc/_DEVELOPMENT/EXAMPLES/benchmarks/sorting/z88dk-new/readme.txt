@@ -97,33 +97,33 @@ RESULT
 
 Z88DK March 21, 2022
 new c library / sccz80 19388-38ebdf3b7-20220307 / __CLIB_OPT_SORT = 2, __CLIB_OPT_SORT_QSORT = 0xc
-1468 bytes less page zero
+1464 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20          69298     0.0173 sec
+sort-ran-20          68544     0.0171 sec
 sort-ord-20          25896     0.0065 sec
-sort-rev-20          39351     0.0098 sec
+sort-rev-20          39139     0.0098 sec
 sort-equ-20          27242     0.0068 sec
 
-sort-ran-5000     54966037    13.7415 sec
-sort-ord-5000     56231253    14.0578 sec
-sort-rev-5000     42450934    10.6127 sec
+sort-ran-5000     54653916    13.6635 sec
+sort-ord-5000     55753490    13.9384 sec
+sort-rev-5000     42224444    10.5561 sec
 sort-equ-5000     36069168     9.0173 sec
 
 
 Z88DK March 21, 2022
 new c library / zsdcc 4.2.0 #13081 / __CLIB_OPT_SORT = 2, __CLIB_OPT_SORT_QSORT = 0xc
-1395 bytes less page zero
+1391 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20          63442     0.0159 sec
+sort-ran-20          62688     0.0157 sec
 sort-ord-20          23578     0.0059 sec
-sort-rev-20          36057     0.0090 sec
+sort-rev-20          35845     0.0090 sec
 sort-equ-20          24948     0.0062 sec
 
-sort-ran-5000     51266468    12.8166 sec
-sort-ord-5000     47774963    11.9437 sec
-sort-rev-5000     39164351     9.7911 sec
+sort-ran-5000     50916067    12.7290 sec
+sort-ord-5000     47359197    11.8398 sec
+sort-rev-5000     38926382     9.7316 sec
 sort-equ-5000     28291376     7.0728 sec
