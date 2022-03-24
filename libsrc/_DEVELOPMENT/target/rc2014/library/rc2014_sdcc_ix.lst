@@ -17,9 +17,7 @@
 @libgen/libgen_sdcc.lst
 @locale/locale.lst
 @math/math_integer.lst
-@math/float/math48/math48_sdcc_ix.lst
-@math/float/math32/math32_sdcc.lst
-@math/float/math32/math32_z80_common_asm.lst
+@math/math_float_sdcc_ix.lst
 @network/network_sdcc_ix.lst
 @setjmp/setjmp_sdcc_ix.lst
 @stdio/stdio_sdcc_ix.lst

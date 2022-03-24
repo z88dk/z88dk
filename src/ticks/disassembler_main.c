@@ -21,9 +21,11 @@ static void usage(char *program)
 {
     printf("z88dk disassembler\n\n");
     printf("%s [options] [file]\n\n",program);
+    printf("  -x <file>      Symbol file to read\n");
+    printf("                 Use before -o,-s,-e to enable symbols\n");
     printf("  -o <addr>      Address to load code to\n");
     printf("  -s <addr>      Address to start disassembling from\n");
-    printf("  -e <addr>      Address to stop disassembling at\n");
+    printf("  -e <addr>      Address to stop disassembling at\n\n");
     printf("  -mz80          Disassemble z80 code\n");
     printf("  -mz180         Disassemble z180 code\n");
     printf("  -mez80         Disassemble ez80 code (short mode)\n");
@@ -34,7 +36,6 @@ static void usage(char *program)
     printf("  -mgbz80        Disassemble Gameboy z80 code\n");
     printf("  -m8080         Disassemble 8080 code (with z80 mnenomics)\n");
     printf("  -m8085         Disassemble 8085 code (with z80 mnenomics)\n");
-    printf("  -x <file>      Symbol file to read\n");
 
     exit(1);
 }
@@ -52,6 +53,7 @@ int main(int argc, char **argv)
     int         start = -1;
     uint16_t    end = 65535;
     int    loaded = 0;
+    int    symbol_addr = -1;
 
     mem = calloc(1,65536);
 
@@ -65,18 +67,21 @@ int main(int argc, char **argv)
         if( argv[1][0] == '-' && argv[2] ) {
             switch (argc--, argv++[1][1]){
             case 'o':
-                org = strtol(argv[1], &endp, 0);
+                symbol_addr = symbol_resolve(argv[1]);
+                org = (-1 == symbol_addr) ? strtol(argv[1], &endp, 0) : symbol_addr;
                 if ( start == -1 ) {
                     start = org;
                 }
                 argc--; argv++;
                 break;
             case 's':
-                start = strtol(argv[1], &endp, 0);
+                symbol_addr = symbol_resolve(argv[1]);
+                start = (-1 == symbol_addr) ? strtol(argv[1], &endp, 0) : symbol_addr;
                 argc--; argv++;
                 break;
             case 'e':
-                end = strtol(argv[1], &endp, 0);
+                symbol_addr = symbol_resolve(argv[1]);
+                end = (-1 == symbol_addr) ? strtol(argv[1], &endp, 0) : symbol_addr;
                 argc--; argv++;
                 break;
             case 'i':

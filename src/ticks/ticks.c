@@ -712,7 +712,7 @@ void setf(int a){
 extern backend_t ticks_debugger_backend;
 
 int main (int argc, char **argv){
-  int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0;
+  int size= 0, start= 0, end= 0, intr= 0, tap= 0, alarmtime = 0, load_address = 0, symbol_addr = -1;
   char * output= NULL;
   char  *memory_model = "standard";
   FILE * fh;
@@ -723,8 +723,8 @@ int main (int argc, char **argv){
 
   tapbuf= (unsigned char *) malloc (0x20000);
   if( argc==1 )
-    printf("Ticks v0.14c beta, a silent Z80 emulator by Antonio Villena, 10 Jan 2013\n\n"),
-    printf("  ticks [-pc X] [-start X] [-end X] [-counter X] [-output <file>] <input_file>\n\n"),
+    printf("z88dk-ticks is derived from a silent Z80 emulator by Antonio Villena (v0.14c beta)\n\n"),
+    printf("  z88dk-ticks [-x <file>] [-pc X] [-start X] [-end X] [-counter X] [-output <file>] <input_file>\n\n"),
     printf("  <input_file>   File between 1 and 65536 bytes with Z80 machine code\n"),
     printf("  -tape <file>   emulates ZX tape in port $FE from a .WAV file\n"),
     printf("  -trace         outputs register values and disassembly while executing\n"),
@@ -733,7 +733,6 @@ int main (int argc, char **argv){
     printf("  -end X         X in hexadecimal is the PC condition to exit\n"),
     printf("  -counter X     X in decimal is another condition to exit\n"),
     printf("  -int X         X in decimal are number of cycles for periodic interrupts\n"),
-    printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
     printf("  -d             Enable debugger\n"),
     printf("  -l X           Load file to address\n"),
     printf("  -b <model>     Memory model (zxn/zx/z180)\n"),
@@ -746,14 +745,16 @@ int main (int argc, char **argv){
     printf("  -mr3k          Emulate a Rabbit 3000\n"),
     printf("  -mz80n         Emulate a Spectrum Next z80n\n"),
     printf("  -mez80         Emulate an ez80 (z80 mode)\n"),
-    printf("  -x <file>      Symbol file to read\n"),
     printf("  -ide0 <file>   Set file to be ide device 0\n"),
     printf("  -ide1 <file>   Set file to be ide device 1\n"),
     printf("  -iochar X      Set port X to be character input/output\n"),
     printf("  -output <file> dumps the RAM content to a 64K file\n"),
-    printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n\n"),
-    printf("  Default values for -pc, -start and -end are 0000 if ommited. When the program "),
-    printf("exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
+    printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n"),
+    printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
+    printf("  -x <file>      Symbol or map file to read\n"),
+    printf("                 Use before -pc,-start,-end to enable symbols\n\n"),
+    printf("  Default values for -pc, -start and -end are 0000 if omitted.\n"),
+    printf("  When the program exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
     exit(0);
   while (argc > 1){
     if( argv[1][0] == '-' && argv[2] )
@@ -766,13 +767,16 @@ int main (int argc, char **argv){
           memory_model = argv[1];
           break;
         case 'p':
-          pc= strtol(argv[1], NULL, 16);
+          symbol_addr= symbol_resolve(argv[1]);
+          pc= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 's':
-          start= strtol(argv[1], NULL, 16);
+          symbol_addr= symbol_resolve(argv[1]);
+          start= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 'e':
-          end= strtol(argv[1], NULL, 16);
+          symbol_addr= symbol_resolve(argv[1]);
+          end= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 'r':
           rom_size= strtol(argv[1], NULL, 16);

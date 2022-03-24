@@ -91,11 +91,11 @@ cycle count  = 145559470
 time @ 4MHz  = 145559470 / 4*10^6 = 36.39 sec
 
 3.
-SDCC 3.6.5 #9852 (MINGW64)
-8626 bytes less page zero
+SDCC 4.2.0 Linux
+7158 bytes less page zero
 
-cycle count  = 203788182
-time @ 4MHz  = 203788182 / 4*10^6 = 50.95 sec
+cycle count  = 188126191
+time @ 4MHz  = 188126191 / 4*10^6 = 47.03 sec
 
 Large size caused by float package implemented in C.
 
@@ -148,11 +148,12 @@ sccz80 / classic c library / 8085 CPU
 cycle count  = 156017339
 time @ 4MHz  = 156017339 / 4*10^6 = 39.00 sec
 
-DISQ.
-HITECH C CPM V309
-4165 bytes less cpm overhead
+9.
+HITECH C CPM V309-12
+16515 bytes less cpm overhead
 
-Disqualified for incorrect results.
+cycle count  = 298449848
+time @ 4MHz  = 298449848 / 4x10^6 = 74.61 seconds
 
 
 BENCHMARKS GAME COMMENTS
