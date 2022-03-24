@@ -23,7 +23,7 @@ LDFLAGS=-lsp1-zx -lndos -m
 ## target rules
 ##########################
 
-all: ex0.tap ex1.tap ex2a.tap ex5e.tap
+all: ex0.tap ex1.tap ex2a.tap ex2b.tap ex5e.tap
 
 build: clean all
 
