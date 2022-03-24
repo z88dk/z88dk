@@ -6,15 +6,15 @@ LDFLAGS=-lsp1-zx -lndos
 
 .PHONY: clean all
 
-##
-## TAP targets
-##
+##########################
+## sources and taps
+## just add standalone .c files
+## to this dir and they will be
+## compiled
+##########################
 
-TAP_TARGETS=ex0.tap \
-	ex1.tap \
-	ex2a.tap ex2b.tap ex2c.tap ex2d.tap ex2e.tap ex2f.tap ex2g.tap ex2h.tap \
-	ex3a.tap \
-	ex5e.tap
+SRCS=$(wildcard *.c)
+TAPS=$(SRCS:.c=.tap)
 
 ##########################
 ## implicit rules
@@ -35,7 +35,7 @@ TAP_TARGETS=ex0.tap \
 ## target rules
 ##########################
 
-all: $(TAP_TARGETS)
+all: $(TAPS)
 
 build: clean all
 	@-rm *.o *.bin
