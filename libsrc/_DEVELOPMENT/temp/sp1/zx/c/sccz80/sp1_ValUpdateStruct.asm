@@ -10,7 +10,12 @@ PUBLIC sp1_ValUpdateStruct
 
 EXTERN asm_sp1_ValUpdateStruct
 
-defc sp1_ValUpdateStruct = asm_sp1_ValUpdateStruct
+sp1_ValUpdateStruct:
+
+   push ix
+   call asm_sp1_ValUpdateStruct
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

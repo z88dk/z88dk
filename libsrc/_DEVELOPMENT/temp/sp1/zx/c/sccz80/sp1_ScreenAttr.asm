@@ -17,7 +17,11 @@ sp1_ScreenAttr:
    inc hl
    ld d,(hl)
    
-   jp asm_sp1_ScreenAttr
+;   jp asm_sp1_ScreenAttr
+   push ix
+   call asm_sp1_ScreenAttr
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

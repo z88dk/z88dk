@@ -15,7 +15,11 @@ sp1_PrintString_callee:
    pop de
    ex (sp),hl
 
-   jp asm_sp1_PrintString
+;   jp asm_sp1_PrintString
+   push ix
+   call asm_sp1_PrintString
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

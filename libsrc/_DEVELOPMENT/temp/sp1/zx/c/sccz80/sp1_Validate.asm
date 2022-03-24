@@ -19,7 +19,11 @@ sp1_Validate:
    inc hl
    ld c,(hl)
 
-   jp asm_sp1_Validate
+;   jp asm_sp1_Validate
+   push ix
+   call asm_sp1_Validate
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

@@ -10,7 +10,12 @@ PUBLIC sp1_RemoveCharStruct
 
 EXTERN asm_sp1_RemoveCharStruct
 
-defc sp1_RemoveCharStruct = asm_sp1_RemoveCharStruct
+sp1_RemoveCharStruct:
+
+   push ix
+   call asm_sp1_RemoveCharStruct
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

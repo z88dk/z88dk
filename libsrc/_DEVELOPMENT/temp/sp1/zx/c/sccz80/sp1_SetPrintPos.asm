@@ -23,7 +23,11 @@ sp1_SetPrintPos:
    ld h,(hl)
    ld l,a
    
-   jp asm_sp1_SetPrintPos
+;   jp asm_sp1_SetPrintPos
+   push ix
+   call asm_sp1_SetPrintPos
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC
