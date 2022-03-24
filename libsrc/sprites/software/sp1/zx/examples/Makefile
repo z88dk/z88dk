@@ -1,6 +1,8 @@
 ZCC=zcc +zx -vn -compiler=sdcc
-CFLAGS=-c --list -s --c-code-in-asm
-LDFLAGS=-lsp1-zx -lndos -m
+#CFLAGS=-c --list -s --c-code-in-asm
+#LDFLAGS=-lsp1-zx -lndos -m
+CFLAGS=-c
+LDFLAGS=-lsp1-zx -lndos
 
 .PHONY: clean all
 
@@ -26,6 +28,7 @@ LDFLAGS=-lsp1-zx -lndos -m
 all: ex0.tap ex1.tap ex2a.tap ex2b.tap ex2c.tap ex2d.tap ex2e.tap ex2f.tap ex2g.tap ex2h.tap ex5e.tap
 
 build: clean all
+	@-rm *.o *.bin
 
 clean:
 	@echo "Cleaning up SP1 examples..."
