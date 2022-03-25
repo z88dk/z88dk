@@ -19,9 +19,9 @@
 // reflections using this feature.
 /////////////////////////////////////////////////////////////
 
-// A) zcc +zx -vn ex2b.c -o ex2b.bin --list --c-code-in-asm -create-app -lsp1  -lndos
-// B) zcc +zx -vn ex2b.c -o ex2b.bin --list --c-code-in-asm -create-app -lsp1-zx  -lndos
-// C) zcc +zx -vn -compiler=sdcc ex2b.c -o ex2b.bin --list --c-code-in-asm -create-app -lsp1-zx  -lndos
+// A) zcc +zx -vn ex3c.c -o ex3c.bin --list --c-code-in-asm -create-app -lsp1  -lndos
+// B) zcc +zx -vn ex3c.c -o ex3c.bin --list --c-code-in-asm -create-app -lsp1-zx  -lndos
+// C) zcc +zx -vn -compiler=sdcc ex3c.c -o ex3c.bin --list --c-code-in-asm -create-app -lsp1-zx  -lndos
 
 // use this include for A) classic-SP1 + classic libc  + sccz80
 //#include <arch/zx/sprites/sp1.h>
