@@ -48,10 +48,17 @@
 // text is printed to see the effect.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex6a.c -o ex6a.bin -create-app -lsp1 -lndos
+// A) zcc +zx -vn ex6a.c -o ex6a.bin --list --c-code-in-asm -create-app -lsp1  -lndos
+// B) zcc +zx -vn ex6a.c -o ex6a.bin --list --c-code-in-asm -create-app -lsp1-zx  -lndos
+// C) zcc +zx -vn -compiler=sdcc ex6a.c -o ex6a.bin --list --c-code-in-asm -create-app -lsp1-zx  -lndos
 
-#include <sprites/sp1.h>
+// use this include for A) classic-SP1 + classic libc  + sccz80
+#include <arch/zx/sprites/sp1.h>
+
+// use this include for B) newlib-SP1 + classic libc + sccz80 and C) newlib-SP1 + classic libc + sdcc
+//#include <arch/zx/sprites-new/sp1.h>
 #include <spectrum.h>
+#include <intrinsic.h>
 
 #pragma output STACKPTR=53248                    // place stack at $d000 at startup
 
@@ -85,9 +92,7 @@ char text2[] = "  Until sometime in the =>";
 main()
 {
 
-   #asm
-   di
-   #endasm
+   intrinsic_di();
 
    // Initialize SP1.LIB
    

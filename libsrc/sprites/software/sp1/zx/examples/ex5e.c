@@ -140,25 +140,22 @@ uchar horline[] = {0,0,0xff,0,0,0xff,0,0};                      // horizontal li
 uchar verline[] = {0x24,0x24,0x24,0x24,0x24,0x24,0x24,0x24};    // vertical line
 uchar intline[] = {0x24,0x24,0xe7,0,0,0xe7,0x24,0x24};          // intersection of horizontal and vertical lines
 
-// Attach C Variable to Sprite Graphics Declared in ASM at End of File
-
-
 uchar window_data[] = {
-   0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00,
+    0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,
 	128,127,  0,192,  0,191, 30,161,
-	 30,161, 30,161, 30,161,  0,191,
-	 0,191, 30,161, 30,161, 30,161,
-	 30,161,  0,191,  0,192,128,127,
+	30,161, 30,161, 30,161,  0,191,
+	0,191, 30,161, 30,161, 30,161,
+	30,161,  0,191,  0,192,128,127,
 	255,  0,255,  0,255,  0,255,  0,
 	255,  0,255,  0,255,  0,255,  0,
-	  1,254,  0,  3,  0,253,120,133,
+
+	1,254,  0,  3,  0,253,120,133,
 	120,133,120,133,120,133,  0,253,
-	  0,253,120,133,120,133,120,133,
+	0,253,120,133,120,133,120,133,
 	120,133,  0,253,  0,  3,  1,254,
 	255,  0,255,  0,255,  0,255,  0,
 	255,  0,255,  0,255,  0,255,  0
 };
-
 uchar *gr_window = &window_data[16];      // gr_window will hold the address of the asm label _gr_window
 
 // Helper Function to Place Tile in a Specific Character Cell

@@ -45,11 +45,18 @@
 // not attached to any sprite) in a future series of examples.
 /////////////////////////////////////////////////////////////
 
-// zcc +zx -vn ex5c.c -o ex5c.bin -create-app -lsp1  -lndos
+// A) zcc +zx -vn ex5c.c -o ex5c.bin --list --c-code-in-asm -create-app -lsp1  -lndos
+// B) zcc +zx -vn ex5c.c -o ex5c.bin --list --c-code-in-asm -create-app -lsp1-zx  -lndos
+// C) zcc +zx -vn -compiler=sdcc ex5c.c -o ex5c.bin --list --c-code-in-asm -create-app -lsp1-zx  -lndos
 
-#include <sprites/sp1.h>
+// use this include for A) classic-SP1 + classic libc  + sccz80
+//#include <arch/zx/sprites/sp1.h>
+
+// use this include for B) newlib-SP1 + classic libc + sccz80 and C) newlib-SP1 + classic libc + sdcc
+#include <arch/zx/sprites-new/sp1.h>
 #include <malloc.h>
 #include <spectrum.h>
+#include <intrinsic.h>
 
 #pragma output STACKPTR=53248                    // place stack at $d000 at startup
 long heap;                                       // malloc's heap pointer
@@ -93,25 +100,36 @@ uchar horline[] = {0,0,0xff,0,0,0xff,0,0};                      // horizontal li
 uchar verline[] = {0x24,0x24,0x24,0x24,0x24,0x24,0x24,0x24};    // vertical line
 uchar intline[] = {0x24,0x24,0xe7,0,0,0xe7,0x24,0x24};          // intersection of horizontal and vertical lines
 
-// Attach C Variable to Sprite Graphics Declared in ASM at End of File
+uchar window_data[] = {
+    0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,0xff,0x00,
+	128,127,  0,192,  0,191, 30,161,
+	30,161, 30,161, 30,161,  0,191,
+	0,191, 30,161, 30,161, 30,161,
+	30,161,  0,191,  0,192,128,127,
+	255,  0,255,  0,255,  0,255,  0,
+	255,  0,255,  0,255,  0,255,  0,
 
-extern uchar gr_window[];      // gr_window will hold the address of the asm label _gr_window
+	1,254,  0,  3,  0,253,120,133,
+	120,133,120,133,120,133,  0,253,
+	0,253,120,133,120,133,120,133,
+	120,133,  0,253,  0,  3,  1,254,
+	255,  0,255,  0,255,  0,255,  0,
+	255,  0,255,  0,255,  0,255,  0
+};
+uchar *gr_window = &window_data[16];      // gr_window will hold the address of the asm label _gr_window
 
 main()
 {
    uchar i;
    struct sp1_ss *s;
    struct sprentry *se;
-   void *temp;
-   
-   #asm
-   di
-   #endasm
+
+   intrinsic_di();
 
    // Initialize MALLOC.LIB
    
    heap = 0L;                  // heap is empty
-   sbrk(40000, 10000);         // add 40000-49999 to malloc
+   sbrk( ( void * ) 40000, 10000);         // add 40000-49999 to malloc
 
    // Initialize SP1.LIB
    
@@ -191,42 +209,3 @@ main()
    }  // end main loop
 
 }
-
-#asm
-
-   defb @11111111, @00000000
-   defb @11111111, @00000000
-   defb @11111111, @00000000
-   defb @11111111, @00000000
-   defb @11111111, @00000000
-   defb @11111111, @00000000
-   defb @11111111, @00000000
-
-; ASM source file created by SevenuP v1.20
-; SevenuP (C) Copyright 2002-2006 by Jaime Tejedor Gomez, aka Metalbrain
-
-;GRAPHIC DATA:
-;Pixel Size:      ( 16,  24)
-;Char Size:       (  2,   3)
-;Sort Priorities: Mask, Char line, Y char, X char
-;Data Outputted:  Gfx
-;Interleave:      Sprite
-;Mask:            Yes, before graphic
-
-._gr_window
-
-	DEFB	128,127,  0,192,  0,191, 30,161
-	DEFB	 30,161, 30,161, 30,161,  0,191
-	DEFB	  0,191, 30,161, 30,161, 30,161
-	DEFB	 30,161,  0,191,  0,192,128,127
-	DEFB	255,  0,255,  0,255,  0,255,  0
-	DEFB	255,  0,255,  0,255,  0,255,  0
-	
-	DEFB	  1,254,  0,  3,  0,253,120,133
-	DEFB	120,133,120,133,120,133,  0,253
-	DEFB	  0,253,120,133,120,133,120,133
-	DEFB	120,133,  0,253,  0,  3,  1,254
-	DEFB	255,  0,255,  0,255,  0,255,  0
-	DEFB	255,  0,255,  0,255,  0,255,  0
-	
-#endasm
