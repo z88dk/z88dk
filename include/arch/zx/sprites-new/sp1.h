@@ -250,7 +250,7 @@ extern void sp1_MoveSprPix_callee(struct sp1_ss *s,struct sp1_Rect *clip,void *f
 #define sp1_MoveSprPix(a,b,c,d,e) sp1_MoveSprPix_callee(a,b,c,d,e)
 
 
-
+// hook1 and hook2 must have prototype: void userfunc( uint8_t count, struct sp1_cs *c ) __smallc;
 extern void sp1_IterateSprChar(struct sp1_ss *s,void *hook1) __smallc;
 extern void sp1_IterateSprChar_callee(struct sp1_ss *s,void *hook1) __z88dk_callee __smallc;
 #define sp1_IterateSprChar(a,b) sp1_IterateSprChar_callee(a,b)

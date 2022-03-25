@@ -217,6 +217,7 @@ extern void               __LIB__   sp1_MoveSprAbs(struct sp1_ss *s, struct sp1_
 extern void               __LIB__   sp1_MoveSprRel(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, char rel_row, char rel_col, char rel_vrot, char rel_hrot);
 extern void               __LIB__   sp1_MoveSprPix(struct sp1_ss *s, struct sp1_Rect *clip, void *frame, uint16_t x, uint16_t y);
 
+// hook1 and hook2 must have prototype: void userfunc( uint8_t count, struct sp1_cs *c ) __smallc;
 extern void               __LIB__   sp1_IterateSprChar(struct sp1_ss *s, void *hook1);
 extern void               __LIB__   sp1_IterateUpdateSpr(struct sp1_ss *s, void *hook2);
 
