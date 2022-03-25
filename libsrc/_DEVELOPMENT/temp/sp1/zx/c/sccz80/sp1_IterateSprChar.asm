@@ -10,6 +10,11 @@ EXTERN asm_sp1_IterateSprChar
 
 sp1_IterateSprChar:
 
+   push ix      ; save IX to BC'
+   exx
+   pop bc
+   exx
+
    pop bc
    pop ix
    pop hl
@@ -18,9 +23,11 @@ sp1_IterateSprChar:
    push bc
    
 ;   jp asm_sp1_IterateSprChar
-   push ix
+   exx
+   push bc	; save old IX
+   exx
    call asm_sp1_IterateSprChar
-   pop ix
+   pop ix	; restore it
    ret
 
 ; SDCC bridge for Classic
