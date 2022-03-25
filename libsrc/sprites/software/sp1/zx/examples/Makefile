@@ -35,7 +35,10 @@ TAPS=$(SRCS:.c=.tap)
 ## target rules
 ##########################
 
-all: $(TAPS)
+all: $(TAPS) ex6b.tap
+
+ex6b.tap:
+	$(ZCC) $(LDFLAGS) $(LIBS) -create-app ex6b/ex6b.c ex6b/ex6b_asm.asm -o ex6b.bin
 
 build: clean all
 	@-rm *.o *.bin
