@@ -28,6 +28,8 @@ sp1_Validate:
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _sp1_Validate
+PUBLIC _sp1_Validate_fastcall
 defc _sp1_Validate = sp1_Validate
+defc _sp1_Validate_fastcall = sp1_Validate
 ENDIF
 
