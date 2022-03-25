@@ -4,7 +4,7 @@ ZCC=zcc +zx -vn -compiler=sdcc
 CFLAGS=-c
 LDFLAGS=-lsp1-zx -lndos
 
-.PHONY: clean all
+.PHONY: clean all build
 
 ##########################
 ## sources and taps
@@ -14,13 +14,13 @@ LDFLAGS=-lsp1-zx -lndos
 ##########################
 
 SRCS=$(wildcard *.c)
-TAPS=$(SRCS:.c=.tap)
+TAPS=$(SRCS:.c=.tap) ex6b.tap
 
 ##########################
 ## implicit rules
 ##########################
 
-.PRECIOUS: %.o
+#.PRECIOUS: %.o
 
 %.o: %.c
 	$(ZCC) $(CFLAGS) $(INCLUDE) $< -o $@
@@ -30,18 +30,19 @@ TAPS=$(SRCS:.c=.tap)
 
 %.tap: %.o
 	$(ZCC) $(LDFLAGS) $(LIBS) -create-app $< -o $(shell basename $@ .tap).bin
+	@-rm $(shell basename $@ .tap)*.bin
 
 ##########################
 ## target rules
 ##########################
 
-all: $(TAPS) ex6b.tap
+all: $(TAPS)
 
 ex6b.tap:
 	$(ZCC) $(LDFLAGS) $(LIBS) -create-app ex6b/ex6b.c ex6b/ex6b_asm.asm -o ex6b.bin
+	@-rm ex6b*.bin
 
 build: clean all
-	@-rm *.o *.bin
 
 clean:
 	@echo "Cleaning up SP1 examples..."
