@@ -23,11 +23,11 @@ z80asm(<<END, "-Otest_dir -b -reloc-info -g -m -l test.asm", 0, "", "");
 			jp start
 END
 ok -f "test_dir/test.bin", "test_dir/test.bin created";
-ok -f "test_dir/test.lis", "test_dir/test.bin created";
-ok -f "test_dir/test.map", "test_dir/test.bin created";
-ok -f "test_dir/test.def", "test_dir/test.bin created";
-ok -f "test_dir/test.o", "test_dir/test.bin created";
-ok -f "test_dir/test.reloc", "test_dir/test.bin created";
+ok -f "test_dir/test.lis", "test_dir/test.lis created";
+ok -f "test_dir/test.map", "test_dir/test.map created";
+ok -f "test_dir/test.def", "test_dir/test.def created";
+ok -f "test_dir/test.o", "test_dir/test.o created";
+ok -f "test_dir/test.reloc", "test_dir/test.reloc created";
 
 path("test_dir")->remove_tree;
 unlink_testfiles();
