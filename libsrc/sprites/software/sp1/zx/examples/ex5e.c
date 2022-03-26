@@ -239,8 +239,8 @@ main()
    sp1_IterateUpdateRect(&sr2, Print);                 // draw bottom horizontal line
    
    tile = 'V';
-   sp1_IterateUpdateRect(&sr3, Print);                 // draw top horizontal line
-   sp1_IterateUpdateRect(&sr4, Print);                 // draw top horizontal line
+   sp1_IterateUpdateRect(&sr3, Print);                 // draw left vertical line
+   sp1_IterateUpdateRect(&sr4, Print);                 // draw right vertical line
    
    sp1_PrintAt( 7, 10, INK_RED | PAPER_GREEN, 'C');    // where the lines intersect
    sp1_PrintAt( 7, 21, INK_RED | PAPER_GREEN, 'C');    // print the intersection graphic
