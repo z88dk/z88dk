@@ -90,24 +90,24 @@ RESULTS
 =======
 
 1.
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-7344 bytes less page zero
+Z88DK March 10, 2022
+classic/zsdcc #13131
+7882 bytes less page zero
 
-cycle count  = 248080263
-time @ 4MHz  = 248080263 / 4x10^6 = 62.0201 seconds
-dhrystones/s = 20000 / 62.0201 = 322.4763
-DMIPS        = 322.4763 / 1757 = 0.18354
+cycle count  = 251880052
+time @ 4MHz  = 251880052 / 4x10^6 = 62.97 seconds
+dhrystones/s = 20000 / 62.97 = 317.6115
+DMIPS        = 317.6115 / 1757 = 0.18077
 
 2.
-Z88DK April 20, 2020
-zsdcc #11566 / new c library
-7163 bytes less page zero
+Z88DK March 10, 2022
+zsdcc #13131 / new c library
+7072 bytes less page zero
 
-cycle count  = 257100263
-time @ 4MHz  = 257100263 / 4x10^6 = 62.2751 seconds
-dhrystones/s = 20000 / 62.2107 = 311.1626
-DMIPS        = 311.1626 / 1757 = 0.1771
+cycle count  = 254720052
+time @ 4MHz  = 254720052 / 4x10^6 = 63.68 seconds
+dhrystones/s = 20000 / 63.68 = 314.0703
+DMIPS        = 314.0703 / 1757 = 0.1787
 
 3.
 HITECH C MSDOS V780pl2

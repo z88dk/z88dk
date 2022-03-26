@@ -17,7 +17,11 @@
 
 SECTION code_fp_am9511
 
-EXTERN __IO_APU_STATUS, __IO_APU_DATA
+IFDEF __CLASSIC
+INCLUDE "../../_DEVELOPMENT/target/am9511/config_am9511_private.inc"
+ELSE
+INCLUDE "target/am9511/config_am9511_private.inc"
+ENDIF
 
 PUBLIC asm_am9511_pushl
 PUBLIC asm_am9511_pushl_fastcall

@@ -211,11 +211,15 @@ second number error: 1 * 10^(-4)
 cycle count  = 1600543903
 time @ 4MHz  = 1600543903 / 4*10^6 = 6 min 40 sec
 
-DISQ.
-HITECH C CPM V309
-???? bytes less cpm overhead
+14.
+HITECH C CPM V309-12
+16492 bytes less cpm overhead
 
-Unable to compile.
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1593755080
+time @ 4MHz  = 1593755080 / 4*10^6 = 6 min 38 sec
 
 
 BENCHMARKS GAME COMMENTS

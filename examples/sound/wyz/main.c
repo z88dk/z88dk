@@ -12,11 +12,14 @@
 #ifdef __SAM__
 #include <arch/sam.h>
 #endif
+#ifdef __GAL__
+#include <arch/gal.h>
+#endif
 #include <psg/wyz.h>
 #include <stdlib.h>
 
 
-#if __PC6001__ | __MULTI8__ | __LM80C__ 
+#if __PC6001__ | __MULTI8__ | __LM80C__  
 #define NO_INTERRUPT 1
 #endif
 
