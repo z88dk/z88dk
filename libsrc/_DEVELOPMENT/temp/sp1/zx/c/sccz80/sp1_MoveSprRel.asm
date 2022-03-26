@@ -10,6 +10,11 @@ EXTERN asm_sp1_MoveSprRel
 
 sp1_MoveSprRel:
 
+   push ix	; save IX to BC'
+   exx
+   pop bc
+   exx
+
    pop af
    pop de
    pop bc
@@ -18,12 +23,6 @@ sp1_MoveSprRel:
    pop hl
    ld d,l
    pop hl
-
-   push ix	; save IX to BC'
-   exx
-   pop bc
-   exx
-
    pop iy
    pop ix
    push hl

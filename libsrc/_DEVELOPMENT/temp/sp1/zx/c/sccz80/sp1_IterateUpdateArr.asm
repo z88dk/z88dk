@@ -10,13 +10,12 @@ EXTERN asm_sp1_IterateUpdateArr
 
 sp1_IterateUpdateArr:
 
-   pop bc
-
    push ix	; save IX to BC'
    exx
    pop bc
    exx
 
+   pop bc
    pop ix
    pop hl
    push hl
