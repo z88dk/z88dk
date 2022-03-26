@@ -10,11 +10,12 @@ EXTERN asm_sp1_InitCharStruct
 
 sp1_InitCharStruct:
 
-;   pop ix
+   push ix
    exx
    pop bc
    exx
 
+   pop ix
    pop bc
    ld a,c
    ex af,af
@@ -28,14 +29,12 @@ sp1_InitCharStruct:
    push de
    push bc
    push bc
-
-;   push ix
+   push ix
+   
+;   jp asm_sp1_InitCharStruct
    exx
    push bc
    exx
-   
-;   jp asm_sp1_InitCharStruct
-   push ix
    call asm_sp1_InitCharStruct
    pop ix
    ret

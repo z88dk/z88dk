@@ -9,6 +9,11 @@ EXTERN asm_sp1_AddColSpr
 
 sp1_AddColSpr_callee:
 
+   push ix	; save IX in BC'
+   exx
+   pop bc
+   exx
+
    pop af
    pop hl
    ld h,l
@@ -16,12 +21,6 @@ sp1_AddColSpr_callee:
    pop de
    ld l,e
    pop de
-
-   push ix	; save IX in BC'
-   exx
-   pop bc
-   exx
-
    pop ix
    push af
 

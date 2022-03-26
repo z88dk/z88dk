@@ -11,11 +11,12 @@ EXTERN asm_sp1_CreateSpr
 
 sp1_CreateSpr_callee:
 
-;   pop ix	; save ret addr
+   push ix
    exx
    pop bc
    exx
 
+   pop ix
    pop bc
    pop hl
    pop de
@@ -23,14 +24,13 @@ sp1_CreateSpr_callee:
    pop de
    ld b,e
    pop de
+   push ix
 
-;   push ix	; restore ret addr
+
+;   jp asm_sp1_CreateSpr
    exx
    push bc
    exx
-
-;   jp asm_sp1_CreateSpr
-   push ix
    call asm_sp1_CreateSpr
    pop ix
    ret
