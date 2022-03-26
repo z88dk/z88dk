@@ -12,13 +12,9 @@
 SECTION code_clib
 SECTION code_fp_am9511
 
-EXTERN asm_am9511_zero, asm_am9511_max
-
-IFDEF __CPU_8085__
 INCLUDE "../../_DEVELOPMENT/target/am9511/config_am9511_private.inc"
-ELSE
-INCLUDE "config_am9511_private.inc"
-ENDIF
+
+EXTERN asm_am9511_zero, asm_am9511_max
 
 EXTERN asm_am9511_pushf_fastcall
 EXTERN asm_am9511_popl
