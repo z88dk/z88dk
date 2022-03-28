@@ -116,22 +116,14 @@ uchar credit[] = "\x04\x00\x14\x07graphics.by.redballoon";
 // addresses inside a string, which is needed here to print the fan
 // and tree "subroutine" strings
 
-//#define ADDR_BYTES(a)	( ( ( (uint16_t) a ) % 256 ), ( ( (uint16_t) a ) / 256 ) )
-
 extern uchar scene[];
-//uchar scene[] = {
-//   22, 0, 10,              // set coords to (0,10)
-//   7,                      // print credit
-//   ADDR_BYTES( credit ),
-//    
-//};
 
 // background UDG graphics
 
 uchar hash [] = {0x55,0xaa,0x55,0xaa,0x55,0xaa,0x55,0xaa};
 uchar grass[] = {251, 255, 191, 255, 255, 253, 223, 255};
 
-// attach C variable to tile graphics defined in asm at end of file
+// attach C variable to tile graphics defined in separate asm file
 
 extern uchar gr_tiles[];       // gr_tiles will hold the address of the asm label _gr_tiles
 
@@ -202,6 +194,3 @@ main()
       sp1_UpdateNow();
    }
 }
-
-__asm
-__end_asm;
