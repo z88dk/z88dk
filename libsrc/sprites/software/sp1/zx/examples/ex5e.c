@@ -213,7 +213,7 @@ main()
    // Initialize MALLOC.LIB
    
    heap = 0L;                  // heap is empty
-   sbrk( ( void * ) 40000, 10000);         // add 40000-49999 to malloc
+   sbrk( ( void * ) 42000, 8000);         // add 42000-49999 to malloc
 
    // Initialize SP1.LIB
    
