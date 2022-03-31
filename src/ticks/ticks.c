@@ -8,15 +8,6 @@
 #include "debugger.h"
 #include "backend.h"
 
-#if defined(_WIN32) || defined(WIN32)
-#ifndef strcasecmp
-#define strcasecmp(a,b) stricmp(a,b)
-#endif
-#endif
-
-
-
-
 // fr = zero, ff&256 = carry, ff&128 = s/p
 
 // TODO: Setting P flag

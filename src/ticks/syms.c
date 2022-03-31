@@ -5,12 +5,6 @@
 #include "ticks.h"
 #include "debug.h"
 
-#if defined(_WIN32) || defined(WIN32)
-#ifndef strncasecmp
-#define strncasecmp(a,b,c) strnicmp(a,b,c)
-#endif
-#endif
-
 static symbol  *symbols[65536] = {0};
 static symbol  *symbols_byname = NULL;
 
