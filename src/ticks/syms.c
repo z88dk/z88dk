@@ -96,7 +96,7 @@ void read_symbol_file(char *filename)
                                 section *sect = calloc(1,sizeof(*sect));
                                 sect->start = start;
                                 sect->end = start + size;
-                                sect->name = duplen(argv[0] + 2, len - 5);
+                                sect->name = duplen(argv[0] + 2, len - 5 - 2);
                                 LL_APPEND(sections, sect);
                             }
                         }
@@ -352,7 +352,7 @@ int address_is_code(int addr)
 
     while ( sect != NULL ) {
         if ( addr >= sect->start && addr < sect->end) {
-            return (strncmp(sect->name, "code_",5) == 0 || strncmp(sect->name, "smc_",4) == 0 );
+            return (strncasecmp(sect->name, "code_",5) == 0 || strncasecmp(sect->name, "smc_",4) == 0 );
         }
         sect = sect->next;
     }
