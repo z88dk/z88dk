@@ -48,16 +48,16 @@ asm0_insertion_sort:
    add hl,bc
    push hl                     ; save array_hi + 1
    
-   ld l,e
-   ld h,d
+   ex de,hl
    
    add hl,bc
-   ex de,hl                    ; hl = array_lo, de = array_lo + 1
+   ld e,l
+   ld d,h                      ; hl = array_lo + 1, de = array_lo + 1 = i
 
 array_loop:
 
    ; de = i
-   ; hl = array_lo
+   ; hl = array_lo + 1
    ; bc = size
    ; ix = compare
    ; stack = array_hi + 1
@@ -74,22 +74,22 @@ array_loop:
 
 begin_loop:
 
-   ex (sp),hl                  ; hl = array_lo
+   ex (sp),hl                  ; hl = array_lo + 1
    
    push de
    push hl   
+   or a                        ; carry=0 for insert_loop
 
 insert_loop:
 
    ; de = j
    ; bc = size
    ; ix = compare
-   ; stack = array_hi + 1, i, array_lo
+   ; stack = array_hi + 1, i, array_lo + 1
 
    ld l,e
    ld h,d
    
-   or a
    sbc hl,bc                   ; hl = j-1
 
    call l_compare_de_hl
@@ -99,24 +99,25 @@ insert_loop:
    call asm0_memswap           ; swap(j, j-1, size)
    pop bc
    
-   ld e,l
-   ld d,h                      ; de = j-1
+   ex de,hl                    ; de = j-1
    
-   pop hl                      ; hl = array_lo
+   pop hl                      ; hl = array_lo + 1
    push hl
 
-   or a
-   sbc hl,de
-   
-   jr nz, insert_loop          ; if more elements in array
+   ld a,e
+   sub l
+   ld a,d
+   sbc a,h
+
+   jp nc, insert_loop          ; if more elements in array (j-1 >= array_lo + 1)
 
 insert_exit:
 
    ; bc = size
    ; ix = compare
-   ; stack = array_hi + 1, i, array_lo
+   ; stack = array_hi + 1, i, array_lo + 1
 
-   pop de                      ; de = array_lo
+   pop de                      ; de = array_lo + 1
    pop hl                      ; hl = i
    
    add hl,bc
