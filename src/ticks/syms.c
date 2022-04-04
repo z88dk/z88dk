@@ -5,7 +5,7 @@
 #include "ticks.h"
 #include "debug.h"
 
-static symbol  *symbols[65536] = {0};
+static symbol  *symbols[MAX_ADDRESS] = {0};
 static symbol  *symbols_byname = NULL;
 
 typedef struct section_s section;
@@ -109,7 +109,7 @@ void read_symbol_file(char *filename)
                     sym->name = strdup(argv[0]);
                     sym->address = strtol(!isxdigit(argv[2][0]) ? &argv[2][1] : argv[2], NULL, 16);
                     sym->symtype = SYM_ADDRESS;
-                    if ( sym->address >= 0 && sym->address <= 65535 ) {
+                    if ( sym->address >= 0 && sym->address <= (MAX_ADDRESS-1) ) {
                         LL_APPEND(symbols[sym->address], sym);
                     }
                     HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
@@ -143,7 +143,7 @@ void read_symbol_file(char *filename)
                     sym->symtype = SYM_CONST;
                 }
                 sym->address = strtol(argv[2] + 1, NULL, 16);
-                if ( sym->address >= 0 && sym->address <= 65535 ) {
+                if ( sym->address >= 0 && sym->address <= (MAX_ADDRESS-1) ) {
                     LL_APPEND(symbols[sym->address], sym);
                 }
                 HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
@@ -198,7 +198,7 @@ symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
             return NULL;
         }
     
-        while ( (sym = symbols[addr % 65536]) == NULL && addr > 0 ) {
+        while ( (sym = symbols[addr % MAX_ADDRESS]) == NULL && addr > 0 ) {
             addr--;
         }
 
@@ -231,7 +231,7 @@ const char *find_symbol(int addr, symboltype preferred_type)
         return NULL;
     }
     
-    sym = symbols[addr % 65536];
+    sym = symbols[addr % MAX_ADDRESS];
 
     while ( sym != NULL ) {
         if ( preferred_type == SYM_ANY ) {
@@ -338,7 +338,7 @@ void symbol_add_autolabel(int address, char *label)
     sym->name = strdup(label);
     sym->address = address;
     sym->symtype = SYM_ADDRESS;
-    if ( sym->address >= 0 && sym->address <= 65535 ) {
+    if ( sym->address >= 0 && sym->address <= (MAX_ADDRESS-1) ) {
         LL_APPEND(symbols[sym->address], sym);
     }
     HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);

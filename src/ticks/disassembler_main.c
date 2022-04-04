@@ -49,9 +49,9 @@ int main(int argc, char **argv)
     char  *program = argv[0];
     char  *filename;
     char  *endp;
-    uint16_t    org = 0;
-    int         start = -1;
-    uint16_t    end = 65535;
+    int    org = 0;
+    int    start = -1;
+    int    end = MAX_ADDRESS-1;
     int    loaded = 0;
     int    symbol_addr = -1;
 
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
             FILE *fp = fopen(argv[1],"rb");
 
             if ( fp != NULL ) {
-                size_t r = fread(mem + org, sizeof(char), 65536 - start, fp);
+                size_t r = fread(mem + (org & 0xffff), sizeof(char), 0x10000 - (start & 0xffff), fp);
                 loaded = 1;
                 fclose(fp);
                 if ( r < end - org ) {
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
         start = 0;
     }
     if ( loaded ) {
-        disassemble_loop(start % 65536,end);
+        disassemble_loop((start % MAX_ADDRESS),end);
     } else {
         usage(program);
     }

@@ -13,6 +13,8 @@
 #include "uthash.h"
 #include "utlist.h"
 
+#define MAX_ADDRESS 0x100000
+
 #if defined(_WIN32) || defined(WIN32)
 
 #ifndef strcasecmp

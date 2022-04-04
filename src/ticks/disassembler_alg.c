@@ -16,7 +16,7 @@ static char *assorted_mainpage_opcodes[] = { "rlca", "rrca", "rla", "rra", "daa"
 
 typedef struct {
     int       index;
-    unsigned short     pc;
+    int       pc;
     int       len;
     int       skip;
     uint8_t   prefix;
@@ -27,7 +27,7 @@ typedef struct {
 
 
 #define READ_BYTE(state,val) do { \
-    val = bk.get_memory(state->pc++); \
+    val = bk.get_memory((state->pc++ & 0xffff)); \
     state->instr_bytes[state->len++] = val; \
 } while (0)
 
@@ -687,7 +687,7 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
         buf[offs++] = ' ';
         buf[offs] = 0;
     }
-    offs += snprintf(buf + offs, buflen - offs, ";[%04x] ", start_pc);
+    offs += snprintf(buf + offs, buflen - offs, ";[%04x] ", start_pc & 0xffff);
     for ( i = state->skip; i < state->len; i++ ) {
         offs += snprintf(buf + offs, buflen - offs,"%s%02x", i ? " " : "", state->instr_bytes[i]);
     }
