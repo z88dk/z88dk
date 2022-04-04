@@ -81,7 +81,7 @@ sccz80 / new c library / small int math
 6340 bytes less page zero
 
 cycle count  = 4028061102
-time @ 4MHz  = 4028061102 / 4*10^6 = 17 min 47 sec
+time @ 4MHz  = 4028061102 / 4*10^6 = 16 min 47 sec
 
 4.
 Z88DK April 4, 2022
