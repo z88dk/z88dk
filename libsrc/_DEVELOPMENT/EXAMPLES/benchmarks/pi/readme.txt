@@ -72,7 +72,7 @@ Z88DK April 4, 2022
 zsdcc #13081 / new c library / fast int math
 9049 bytes less page zero
 
-cycle count  = 1736106244 (April 4, 2022,  ZSDCC #13081)
+cycle count  = 1736106244
 time @ 4MHz  = 1736106244 / 4*10^6 =  7 min 14 sec
 
 3.
