@@ -3,7 +3,6 @@
  *
  *      Main() part
  *
- *      $Id: main.c,v 1.42 2016-09-01 04:08:32 aralbrec Exp $
  */
 
 #include "../config.h"
@@ -435,7 +434,7 @@ void info()
 {
     fputs(titlec, stderr);
     fputs(Version, stderr);
-    fputs("\n(C) 1980-2017 Cain, Van Zandt, Hendrix, Yorston, z88dk\n", stderr);
+    fputs("\n(C) 1980-2022 Cain, Van Zandt, Hendrix, Yorston, z88dk\n", stderr);
     fprintf(stderr, "Usage: %s [flags] [file]\n", gargv[0]);
 }
 
