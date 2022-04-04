@@ -22,7 +22,7 @@ IF FORmtx
 ENDIF
 
 IF FORsms
-	defc psgport	= $40
+	defc psgport	= $7f
 ENDIF
 
 IF FORpv2000
