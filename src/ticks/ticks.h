@@ -13,7 +13,8 @@
 #include "uthash.h"
 #include "utlist.h"
 
-#define MAX_ADDRESS 0x100000
+// ZX Spectrum Next can support upto 2MB of RAM
+#define MAX_ADDRESS 0x200000
 
 #if defined(_WIN32) || defined(WIN32)
 
