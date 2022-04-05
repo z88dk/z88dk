@@ -13,6 +13,9 @@
 #include "uthash.h"
 #include "utlist.h"
 
+#define SYM_TAB_SIZE    0x10000
+#define BUFF_SIZE       0x10000
+
 #if defined(_WIN32) || defined(WIN32)
 
 #ifndef strcasecmp

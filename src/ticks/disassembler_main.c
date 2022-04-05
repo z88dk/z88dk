@@ -49,13 +49,13 @@ int main(int argc, char **argv)
     char  *program = argv[0];
     char  *filename;
     char  *endp;
-    uint16_t    org = 0;
-    int         start = -1;
-    uint16_t    end = 65535;
+    int    org = 0;
+    int    start = -1;
+    int    end = -1;
     int    loaded = 0;
     int    symbol_addr = -1;
 
-    mem = calloc(1,65536);
+    mem = calloc(1,BUFF_SIZE);
 
     if ( argc == 1 ) {
         usage(program);
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
             FILE *fp = fopen(argv[1],"rb");
 
             if ( fp != NULL ) {
-                size_t r = fread(mem + org, sizeof(char), 65536 - start, fp);
+                size_t r = fread(mem + (org % BUFF_SIZE), sizeof(char), BUFF_SIZE - (start % BUFF_SIZE), fp);
                 loaded = 1;
                 fclose(fp);
                 if ( r < end - org ) {
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
         start = 0;
     }
     if ( loaded ) {
-        disassemble_loop(start % 65536,end);
+        disassemble_loop(start,end);
     } else {
         usage(program);
     }
@@ -171,5 +171,5 @@ static void disassemble_loop(int start, int end)
 
 uint8_t get_memory(uint16_t pc)
 {
-    return mem[pc % 65536] ^ inverted;
+    return mem[pc % BUFF_SIZE] ^ inverted;
 }
