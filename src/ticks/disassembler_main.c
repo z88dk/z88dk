@@ -49,9 +49,9 @@ int main(int argc, char **argv)
     char  *program = argv[0];
     char  *filename;
     char  *endp;
-    int    org = 0;
+    unsigned int    org = 0;
     int    start = -1;
-    int    end = -1;
+    unsigned int    end = -1;   // Max value (all f's)
     int    loaded = 0;
     int    symbol_addr = -1;
 

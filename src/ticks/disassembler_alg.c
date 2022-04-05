@@ -16,7 +16,7 @@ static char *assorted_mainpage_opcodes[] = { "rlca", "rrca", "rla", "rra", "daa"
 
 typedef struct {
     int       index;
-    int       pc;
+    unsigned int    pc;
     int       len;
     int       skip;
     uint8_t   prefix;
