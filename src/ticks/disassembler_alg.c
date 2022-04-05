@@ -27,7 +27,7 @@ typedef struct {
 
 
 #define READ_BYTE(state,val) do { \
-    val = bk.get_memory((state->pc++ & 0xffff)); \
+    val = bk.get_memory((state->pc++)); \
     state->instr_bytes[state->len++] = val; \
 } while (0)
 
