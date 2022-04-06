@@ -5,6 +5,9 @@
     Used in ftoa.c and ftoe.c
 
 #ifdef MUST_ROUND
+
+extern int ftoa_fudgeit(double x, double scale);
+
                 d = ftoa_fudgeit(x, scale) ;
 #else
                 d = x / scale ;
