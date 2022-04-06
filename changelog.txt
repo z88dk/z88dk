@@ -47,6 +47,7 @@ Detailed but incomplete changelist:
 - [newlib] +rc2014: Support for shadow RAM access (disabled by default)
 - [newlib] +rc2014: 8085 CPU support through new/classic hybrid library
 - [newlib] +zxn: dot files are now created correctly
+- [gdb] Debugger interface from ticks, connects to a gdbserver
 - [sccz80] Temporary files now removed on windows
 - [sccz80] Bug fixes + optimisations
 - [sccz80] Debug information using -debug
