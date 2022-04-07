@@ -144,8 +144,8 @@ Z88DK April 7, 2022
 sccz80 / classic c library / 8085 CPU
 7317 bytes less page zero
 
-cycle count  = 7829430543
-time @ 4MHz  = 7829430543 / 4*10^6 = 32 min 37 sec
+cycle count  = 7834839279
+time @ 4MHz  = 7834839279 / 4*10^6 = 32 min 38 sec
 
 RESULTS - PI_LDIV.C (LDIV USED)
 ===============================
