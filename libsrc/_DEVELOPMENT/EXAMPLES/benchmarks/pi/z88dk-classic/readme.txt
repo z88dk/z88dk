@@ -41,6 +41,7 @@ execution time.
 
 A typical invocation of TICKS looked like this:
 
+z88dk-ticks -m8085 pi.bin -x pi.map -start TIMER_START -end TIMER_STOP -counter 9999999999
 z88dk-ticks pi.bin -x pi.map -start TIMER_START -end TIMER_STOP -counter 9999999999
 
 counter = High value to ensure completion
@@ -54,12 +55,12 @@ RESULT
 PI.C
 
 
-Z88DK April 4, 2022
+Z88DK April 7, 2022
 sccz80 / classic c library / 8085 CPU
-7307 bytes less page zero
+7317 bytes less page zero
 
-cycle count  = 8560839680
-time @ 4MHz  = 8560839680 / 4*10^6 = 35 min 40 sec
+cycle count  = 7829430543
+time @ 4MHz  = 7829430543 / 4*10^6 = 32 min 37 sec
 
 
 Z88DK April 4, 2022

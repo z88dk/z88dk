@@ -140,12 +140,12 @@ time @ 4MHz  = 8762223085 / 4*10^6 = 36 min 31 sec
 It looks like IAR implements its 32-bit math in C.
 
 11.
-Z88DK April 4, 2022
+Z88DK April 7, 2022
 sccz80 / classic c library / 8085 CPU
-7307 bytes less page zero
+7317 bytes less page zero
 
-cycle count  = 8560839680
-time @ 4MHz  = 8560839680 / 4*10^6 = 35 min 40 sec
+cycle count  = 7829430543
+time @ 4MHz  = 7829430543 / 4*10^6 = 32 min 37 sec
 
 RESULTS - PI_LDIV.C (LDIV USED)
 ===============================
