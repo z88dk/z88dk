@@ -35,15 +35,25 @@ EXTERN  l_mult_ulong_0
     push    hl                  ;result LSW
     push    de                  ;partial result MSW
 
-    ld      hl,sp+4             ;secondary LSW offset
-    ld      c,(hl)
-    inc     hl
-    ld      b,(hl)
-
     ld      hl,sp+12            ;primary MSW offset
     ld      e,(hl)
     inc     hl
     ld      d,(hl)
+
+    ld      a,d                 ;check for primary MSW zero
+    or      e
+
+    ld      hl,sp+6             ;secondary MSW offset
+    or      (hl)                ;check for secondary MSW zero
+    inc     hl
+    or      (hl)
+
+    jp      Z,demoted_mult      ;both MSW are zero
+
+    ld      hl,sp+4             ;secondary LSW offset
+    ld      c,(hl)
+    inc     hl
+    ld      b,(hl)
 
     call    l_mult_0            ;hl = de * bc
 
@@ -67,6 +77,7 @@ EXTERN  l_mult_ulong_0
     add     hl,bc               ;result MSW
     push    hl
 
+.demoted_mult
     ld      hl,sp+8             ;get return from stack
     ld      e,(hl)
     inc     hl
