@@ -3,11 +3,14 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <stdint.h>
+#include <limits.h>
 #include "disassembler.h"
 #include "syms.h"
 #include "cpu.h"
 #include "backend.h"
 #include "ticks.h"
+
+#define BUFF_SIZE       0x10000
 
 static void disassemble_loop(int start, int end);
 
@@ -51,7 +54,7 @@ int main(int argc, char **argv)
     char  *endp;
     unsigned int    org = 0;
     int    start = -1;
-    unsigned int    end = -1;   // Max value (all f's)
+    int    end = INT_MAX;
     int    loaded = 0;
     int    symbol_addr = -1;
 
