@@ -1151,6 +1151,7 @@ static void  cleanup_temporary_files(void)
 /* memory banks */
 
 #define MBLINEMAX 1024
+#define MBBUFFERMAX 4096
 
 void mb_create_bankspace(struct banked_memory *memory, char *bank_id)
 {
@@ -1169,17 +1170,17 @@ enum
 
 void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *memory, struct aligned_data *aligned)
 {
-    char buffer[MBLINEMAX-6];           // Prevent sscanf of buffer overflowing symbol_name
-    char symbol_name[MBLINEMAX-5];      // Prevent 'snprintf(section_name,...' overflow warning
+    char* buffer = malloc(MBBUFFERMAX-6);           // Prevent sscanf of buffer overflowing symbol_name
+    char* symbol_name = malloc(MBBUFFERMAX-5);      // Prevent 'snprintf(section_name,...' overflow warning
     long symbol_value;
-    char section_name[MBLINEMAX-5];     // Prevent 'snprintf(bfilename,...' overflow warning
-    char bfilename[MBLINEMAX];
+    char section_name[MBLINEMAX-5];                 // Prevent 'snprintf(bfilename,...' overflow warning
+    char* bfilename = malloc(MBBUFFERMAX);
     int  c,i;
     struct stat st;
 
     // organize output binaries into banks
 
-    while (fgets(buffer, MBLINEMAX-7, fmap) != NULL)
+    while (fgets(buffer, MBBUFFERMAX-7, fmap) != NULL)
     {
         // have one line of the map file
         // make sure the entire line is consumed
@@ -1216,7 +1217,7 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
                         // classic can generate main bank binaries with empty section names
 
                         section_name[0] = 0;
-                        snprintf(bfilename, sizeof(bfilename), "%s.bin", binname);
+                        snprintf(bfilename, MBBUFFERMAX, "%s.bin", binname);
                         if ((stat(bfilename, &st) < 0) || (S_IFREG != (st.st_mode & S_IFMT)))
                             suffix_change(bfilename, "");
                     }
@@ -1226,14 +1227,14 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
 
                         snprintf(section_name, sizeof(section_name), "%s", &symbol_name[2]);
                         section_name[len - 7] = 0;
-                        snprintf(bfilename, sizeof(bfilename), "%s_%s.bin", binname, section_name);
+                        snprintf(bfilename, MBBUFFERMAX, "%s_%s.bin", binname, section_name);
                         if ( stat(bfilename, &st) < 0 ) {
                             char binname_buf[FILENAME_MAX+1];
 
                             snprintf(binname_buf,sizeof(binname_buf),"%s", binname);
                             suffix_change(binname_buf, "");
 
-                            snprintf(bfilename, sizeof(bfilename), "%s_%s.bin", binname_buf, section_name);
+                            snprintf(bfilename, MBBUFFERMAX, "%s_%s.bin", binname_buf, section_name);
                         }
                     }
 
@@ -1340,6 +1341,10 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
 
     if (mb_remove_section(memory, "UNASSIGNED", 0))
         printf("Warning: Non-empty UNASSIGNED section ignored -\n  this indicates that some code/data is not part of the memory map\n");
+
+    free(buffer);
+    free(symbol_name);
+    free(bfilename);
 }
 
 int mb_find_bankspace(struct banked_memory *memory, char *bankspace_name)

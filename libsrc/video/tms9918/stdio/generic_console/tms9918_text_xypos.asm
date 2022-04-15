@@ -19,6 +19,7 @@ __tms9918_text_xypos:
 	ld	a,b
 	add	CONSOLE_YOFFSET
 	ld	b,a
+        inc     b
 xypos_1:
         add     hl,de
         djnz    xypos_1
