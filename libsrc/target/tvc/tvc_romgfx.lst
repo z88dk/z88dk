@@ -1,0 +1,17 @@
+target/tvc/romgfx/getmaxx
+target/tvc/romgfx/getmaxy
+target/tvc/romgfx/pen_down
+target/tvc/romgfx/pen_up
+target/tvc/romgfx/move
+target/tvc/romgfx/setpos
+target/tvc/romgfx/plot
+target/tvc/romgfx/unplot
+target/tvc/romgfx/draw
+target/tvc/romgfx/drawr
+target/tvc/romgfx/drawto
+target/tvc/romgfx/undraw
+target/tvc/romgfx/undrawr
+target/tvc/romgfx/undrawto
+target/tvc/romgfx/circle
+target/tvc/romgfx/circle_callee
+target/tvc/romgfx/fill

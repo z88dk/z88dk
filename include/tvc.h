@@ -146,4 +146,32 @@ void tvc_set_ink(color_or_index c);
 void tvc_get_ink(color_or_index *retVal);
 
 
+/** Graphics related routines */
+
+enum line_mode {LM_NORM=0, LM_OR, LM_AND, LM_XOR};
+
+/**
+ * Sets the L_STYLE system variable. Valid values are 0-16.
+ * 
+ */
+void __LIB__ tvc_set_linestyle(char line_style) __z88dk_fastcall;
+
+/**
+ * Sets the L_MODE system variable. Valid values are 0-3.
+ * 
+ */
+void __LIB__ tvc_set_linemode(enum line_mode lm) __z88dk_fastcall;
+
+/**
+ * Gets the L_STYLE system variable.
+ * 
+ */
+char __LIB__ tvc_get_linestyle();
+
+/**
+ * Gets the L_MODE system variable.
+ * 
+ */
+char __LIB__ tvc_get_linemode();
+
 #endif
