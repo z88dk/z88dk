@@ -72,6 +72,8 @@ math/float/am9511/lam32/c/sdcc/___fsneq
 math/float/am9511/lam32/c/sdcc/___fsneq_callee
 math/float/am9511/lam32/c/sdcc/___fssub
 math/float/am9511/lam32/c/sdcc/___fssub_callee
+math/float/am9511/lam32/c/sdcc/___mulsint2slong
+math/float/am9511/lam32/c/sdcc/___mulsint2slong_callee
 math/float/am9511/lam32/c/sdcc/hypot
 math/float/am9511/lam32/c/sdcc/hypot_callee
 math/float/am9511/lam32/c/sdcc/ldexp

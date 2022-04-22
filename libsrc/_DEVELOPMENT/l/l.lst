@@ -21,6 +21,8 @@ ${NEWLIB_ROOT}l/z80/l_jpix
 ${NEWLIB_ROOT}l/z80/l_jpix_00
 ${NEWLIB_ROOT}l/z80/l_jpix_dd
 ${NEWLIB_ROOT}l/z80/l_jpiy
+${NEWLIB_ROOT}l/z80/l_jrbc
+${NEWLIB_ROOT}l/z80/l_jrde
 ${NEWLIB_ROOT}l/z80/l_ldd
 ${NEWLIB_ROOT}l/z80/l_ldd_loop
 ${NEWLIB_ROOT}l/z80/l_ldi

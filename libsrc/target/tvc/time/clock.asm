@@ -15,7 +15,5 @@
 .clock
 ._clock
 	ld hl,(INTINC) ; count of 20.096ms from start (can count up to almost 22mins)
-	ex de,hl
-    ld h,0
-    ld l,h
+    ld de,0
 	ret

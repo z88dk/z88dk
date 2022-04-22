@@ -129,6 +129,10 @@ ${NEWLIB_ROOT}l/sdcc/__rrslonglong
 ${NEWLIB_ROOT}l/sdcc/__rrslonglong_callee
 ${NEWLIB_ROOT}l/sdcc/__rrulonglong
 ${NEWLIB_ROOT}l/sdcc/__rrulonglong_callee
+${NEWLIB_ROOT}l/sdcc/___mulsint2slong
+${NEWLIB_ROOT}l/sdcc/___mulsint2slong_callee
+${NEWLIB_ROOT}l/sdcc/___muluint2ulong
+${NEWLIB_ROOT}l/sdcc/___muluint2ulong_callee
 ${NEWLIB_ROOT}l/sdcc/__sdcc_exit_div_64
 ${NEWLIB_ROOT}l/sdcc/__sdcc_exit_div_64_callee
 ${NEWLIB_ROOT}l/sdcc/__sdcc_exit_mod_64

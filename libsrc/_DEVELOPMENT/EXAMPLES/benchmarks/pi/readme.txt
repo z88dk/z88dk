@@ -122,11 +122,11 @@ cycle count  = 5531933581
 time @ 4MHz  = 5531933581 / 4*10^6 = 23 min 03 sec
 
 9.
-SDCC 3.6.5 #9842 (MINGW64)
-6844 bytes less page zero
+SDCC 4.2.0 Linux
+6591 bytes less page zero
 
-cycle count  = 8700157418
-time @ 4MHz  = 8700157418 / 4*10^6 = 36 min 15 sec
+cycle count  = 6649404381
+time @ 4MHz  = 6649404381 / 4*10^6 = 27 min 42 sec
 
 SDCC implements its 32-bit math in C.
 

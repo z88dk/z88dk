@@ -14,6 +14,7 @@ math/float/am9511/asm/am32_floor
 math/float/am9511/asm/am32_fmul
 math/float/am9511/asm/am32_fsub
 math/float/am9511/asm/am32_hypot
+math/float/am9511/asm/am32_imul
 math/float/am9511/asm/am32_ladd
 math/float/am9511/asm/am32_ldiv
 math/float/am9511/asm/am32_lmod

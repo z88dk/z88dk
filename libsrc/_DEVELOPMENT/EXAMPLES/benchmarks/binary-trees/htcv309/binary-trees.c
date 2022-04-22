@@ -43,8 +43,8 @@
 #endif
 
 #ifdef TIMER
-#define TIMER_START()     intrinsic_label(TIMER_START)
-#define TIMER_STOP()      intrinsic_label(TIMER_STOP)
+   #define TIMER_START()     asm("TIMER_START:")
+   #define TIMER_STOP()      asm("TIMER_STOP:")
 #else
 #define TIMER_START()
 #define TIMER_STOP()

@@ -88,14 +88,14 @@ cycle count  = 2331516019
 time @ 4MHz  = 2331516019 / 4*10^6 = 9 min 43 sec
 
 4.
-SDCC 3.6.5 #9852 (MINGW64)
-9233 bytes less page zero
+SDCC 4.2.0 Linux
+7141 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 5306393684
-time @ 4MHz  = 5306393684 / 4*10^6 = 22 min 07 sec
+cycle count  = 3163137393
+time @ 4MHz  = 3163137393 / 4*10^6 = 13 min 11 sec
 
 Slow speed & large size due to float implementation in C.
 
@@ -211,11 +211,15 @@ second number error: 1 * 10^(-4)
 cycle count  = 1600543903
 time @ 4MHz  = 1600543903 / 4*10^6 = 6 min 40 sec
 
-DISQ.
-HITECH C CPM V309
-???? bytes less cpm overhead
+14.
+HITECH C CPM V309-12
+16492 bytes less cpm overhead
 
-Unable to compile.
+first number error : 1 * 10^(-7)
+second number error: 1 * 10^(-4)
+
+cycle count  = 1593755080
+time @ 4MHz  = 1593755080 / 4*10^6 = 6 min 38 sec
 
 
 BENCHMARKS GAME COMMENTS

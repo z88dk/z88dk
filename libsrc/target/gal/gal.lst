@@ -48,9 +48,15 @@ target/gal/games/bit_close
 target/gal/games/bit_close_ei
 target/gal/games/joystick
 @games/games.lst
+target/gal/interrupt/im1_init
+target/gal/interrupt/add_raster_int
 target/gal/psg/set_psg
 target/gal/psg/set_psg_callee
 target/gal/psg/get_psg
 target/gal/psg/psg_init
+target/gal/psg/asm_wyz_hardware_out
+target/gal/psg/asm_vt2_hardware_out
 @psg/ay/psg.lst
+@psg/ay/wyz/psg_wyz.lst
+@psg/ay/vt2/psg_vt2.lst
 

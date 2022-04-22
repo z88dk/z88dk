@@ -8,8 +8,9 @@
 // labels that will be defined in the map file.  These are supplied to ticks so that
 // ticks can be used to exactly measure execution time.
 
-// zcc +rc2014 -subtype=rom -v -m -SO3 --max-allocs-per-node200000 --c-code-in-asm --list heapsort.c -o heapsort -create-app
-// zcc +zx -v -m -startup=4 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --c-code-in-asm --list heapsort.c -o heapsort -create-app
+// zcc +cpm -clib=sdcc_iy -v -m -SO3 --max-allocs-per-node200000 --list heapsort.c -o heapsort -create-app
+// zcc +rc2014 -subtype=cpm -v -m -SO3 --max-allocs-per-node200000 --list heapsort.c -o heapsort -create-app
+// zcc +zx -v -m -startup=4 -clib=sdcc_iy -SO3 --max-allocs-per-node200000 --list heapsort.c -o heapsort -create-app
 //
 // -subtype=rom    : make uncompressed rom mapped to address 0x0 (see z88dk/lib/config/rc2014.cfg for options this selects)
 // -v              : tell us what zcc is up to, -vn for quiet
