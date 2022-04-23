@@ -79,35 +79,35 @@ All programs are very close in size.
 RESULT
 ======
 
-Z88DK March 25, 2017
-classic / sccz80
-1029 bytes less page zero
+Z88DK March 14, 2022
+classic / sccz80 Version: 19388-38ebdf3b7-20220307
+1743 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20          81544     0.0204 sec
-sort-ord-20          53944     0.0135 sec
-sort-rev-20          75472     0.0189 sec
-sort-equ-20          53944     0.0135 sec
+sort-ran-20          82618     0.0207 sec
+sort-ord-20          52586     0.0131 sec
+sort-rev-20          74474     0.0186 sec
+sort-equ-20          52586     0.0131 sec
 
-sort-ran-5000     80957310    20.2393 sec
-sort-ord-5000     41381930    10.3455 sec
-sort-rev-5000     63068198    15.7670 sec
-sort-equ-5000     41381930    10.3455 sec
+sort-ran-5000     93581395    23.3953 sec
+sort-ord-5000     41378393    10.3446 sec
+sort-rev-5000     63352461    15.8381 sec
+sort-equ-5000     41378393    10.3446 sec
 
 
-Z88DK March 25, 2017
-classic / zsdcc #9852
-995 bytes less page zero
+Z88DK March 14, 2022
+classic / zsdcc Build: 4.2.0 #13081
+1711 bytes less page zero
 
                cycle count    time @ 4MHz
 
-sort-ran-20          77922     0.0195 sec
-sort-ord-20          50242     0.0126 sec
-sort-rev-20          70672     0.0177 sec
-sort-equ-20          50242     0.0126 sec
+sort-ran-20          76591     0.0191 sec
+sort-ord-20          48639     0.0122 sec
+sort-rev-20          69357     0.0173 sec
+sort-equ-20          48639     0.0122 sec
 
-sort-ran-5000     85903658    21.4759 sec
-sort-ord-5000     38026708     9.5067 sec
-sort-rev-5000     58261603    14.5654 sec
-sort-equ-5000     38026708     9.5067 sec
+sort-ran-5000     86069623    21.5174 sec
+sort-ord-5000     37803151     9.4508 sec
+sort-rev-5000     58230674    14.5577 sec
+sort-equ-5000     37803151     9.4508 sec

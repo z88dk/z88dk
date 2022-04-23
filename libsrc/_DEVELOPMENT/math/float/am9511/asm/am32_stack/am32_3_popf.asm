@@ -17,7 +17,11 @@
 
 SECTION code_fp_am9511
 
-EXTERN __IO_APU3_STATUS, __IO_APU3_DATA
+IFDEF __CLASSIC
+INCLUDE "../../_DEVELOPMENT/target/am9511/config_am9511_private.inc"
+ELSE
+INCLUDE "target/am9511/config_am9511_private.inc"
+ENDIF
 
 PUBLIC asm_am9511_3_popf
 
