@@ -15,3 +15,9 @@ target/tvc/romgfx/undrawto
 target/tvc/romgfx/circle
 target/tvc/romgfx/circle_callee
 target/tvc/romgfx/fill
+target/tvc/romgfx/drawb
+target/tvc/romgfx/undrawb
+target/tvc/romgfx/getx
+target/tvc/romgfx/gety
+target/tvc/romgfx/fillb
+target/tvc/romgfx/clg

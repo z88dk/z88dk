@@ -26,5 +26,8 @@ target/tvc/tvc_set_linestyle
 target/tvc/tvc_set_linemode
 target/tvc/tvc_get_linestyle
 target/tvc/tvc_get_linemode
+target/tvc/tvc_set_memorymap
+target/tvc/tvc_mapin_vram
+target/tvc/tvc_mapout_vram
 
 

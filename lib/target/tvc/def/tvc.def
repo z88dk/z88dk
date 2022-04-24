@@ -31,6 +31,7 @@ defc PAL            = $0C     ; Define a palette color
 
 ; Special ports
 defc PORT_BORDER    = $00     ; color of the border - output only
+defc PORT_MMAP      = $02     ; mapping of TVC memory
 
 ; Special addresses
 defc P_SAVE         = $0003   ; Save address of PORT 2, the memory mapping port
