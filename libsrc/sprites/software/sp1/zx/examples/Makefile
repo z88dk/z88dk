@@ -1,8 +1,12 @@
+# use this for SDCC + Classic
 ZCC=zcc +zx -vn -compiler=sdcc
-#CFLAGS=-c --list -s --c-code-in-asm
-#LDFLAGS=-lsp1-zx -lndos -m
-CFLAGS=-c
 LDFLAGS=-lsp1-zx -lndos
+
+# use this for SCCZ80 + Classic
+# ZCC=zcc +zx -vn
+# LDFLAGS=-lsp1-zx -lndos
+
+CFLAGS=-c
 
 .PHONY: clean all build
 
@@ -45,5 +49,4 @@ ex6b.tap:
 build: clean all
 
 clean:
-	@echo "Cleaning up SP1 examples..."
 	@-rm -f *.o *.bin *.tap *.c.asm *.map *.lis *.sym

@@ -29,15 +29,7 @@
 // to do it outside the main game loop. 
 /////////////////////////////////////////////////////////////
 
-// A) zcc +zx -vn ex4b.c -o ex4b.bin --list --c-code-in-asm -create-app -lsp1  -lndos
-// B) zcc +zx -vn ex4b.c -o ex4b.bin --list --c-code-in-asm -create-app -lsp1-zx  -lndos
-// C) zcc +zx -vn -compiler=sdcc ex4b.c -o ex4b.bin --list --c-code-in-asm -create-app -lsp1-zx  -lndos
-
-// use this include for A) classic-SP1 + classic libc  + sccz80
-//#include <arch/zx/sprites/sp1.h>
-
-// use this include for B) newlib-SP1 + classic libc + sccz80 and C) newlib-SP1 + classic libc + sdcc
-#include <arch/zx/sprites-new/sp1.h>
+#include <arch/zx/sprites/sp1.h>
 #include <malloc.h>
 #include <spectrum.h>
 #include <intrinsic.h>
