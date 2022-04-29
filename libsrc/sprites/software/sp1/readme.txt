@@ -20,9 +20,9 @@ directories.
 Several ports are underway.  As of now three versions
 of the library are available:
 
-1. spectrum  (256x192 pixel, 32x192 colour resolution)
-2. ts2068hr  (512x192 pixel monochrome)
-3. zx81hr    (256x192 pixel monochrome)
+1. zx        (ZX Spectrum, 256x192 pixel, 32x192 colour resolution)
+2. ts2068hr  (Timex, 512x192 pixel monochrome)
+3. zx81hr    (ZX81, 256x192 pixel monochrome)
 
 These ports can be used as the basis for other targets
 having similar screen resolutions.
@@ -30,7 +30,7 @@ having similar screen resolutions.
 ts2068hr is suitable for any black and white target with
 memory mapped display.
 
-spectrum is suitable for targets with pixel displays
+zx is suitable for targets with pixel displays
 having character-size colour overlays.
 
 If the new target's screen resolution matches one of the

@@ -6,7 +6,6 @@ sp1-all:
 	@echo
 	@echo --- SP1 Software Sprite Engine ---
 	# newlib and sccz80 + classic libraries
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1 @spectrum.lst
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1-ts2068 @ts2068hr.lst
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1-zx81hr -IXIY @zx81hr.lst
 	# sdcc + classic library
@@ -16,11 +15,6 @@ sp1-all:
 clean:
 	@make -s -C zx clean
 	$(RM) *.o
-	$(RM) spectrum/sprites/*.o
-	$(RM) spectrum/sprites/draw/*.o
-	$(RM) spectrum/tiles/*.o
-	$(RM) spectrum/updater/*.o
-	$(RM) spectrum/sp1.lib
 	$(RM) ts2068hr/sprites/*.o
 	$(RM) ts2068hr/sprites/draw/*.o
 	$(RM) ts2068hr/tiles/*.o
