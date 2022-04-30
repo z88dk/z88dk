@@ -1081,7 +1081,7 @@ kc_clib.lib:
 	@echo ''
 	@echo '--- Building VEB Mikroelektronik KC85/2..5 Library ---'
 	@echo ''
-	$(call buildgeneric,kc,wide)
+	$(call buildgeneric,kc,"wide portable")
 	$(MAKE) -C games TARGET=kc
 	TARGET=kc TYPE=ixiy $(LIBLINKER) -IXIY -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(TARGET_DIRECTORY)/kc/kc.lst
 
