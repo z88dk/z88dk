@@ -28,6 +28,19 @@ enum colors {black  = 0x00, blue    = 0x01, red     = 0x04, purple = 0x05,
              lblue  = 0x41, lred    = 0x44, lpurple = 0x45, lgreen = 0x50,
              lcyan  = 0x51, yellow  = 0x54, white   = 0x55};
 
+#define MMAP_P0_SYS   0x00
+#define MMAP_P0_U0    0x10
+#define MMAP_P0_CART  0x08
+#define MMAP_P0_U3    0x18  ; valid only in 64k+ or 32k machines with 32k mem expansion
+#define MMAP_P1_U1    0x00
+#define MMAP_P1_VID   0x04  ; valid only in 64k+ machines
+#define MMAP_P2_VID   0x00
+#define MMAP_P2_U2    0x20
+#define MMAP_P3_CART  0x00
+#define MMAP_P3_SYS   0x40
+#define MMAP_P3_U3    0x80
+#define MMAP_P3_IO_EXT  0xC0
+
 typedef union composite_color {
     enum colors color;
     int paletteIndex;
@@ -145,5 +158,50 @@ void tvc_set_ink(color_or_index c);
  */
 void tvc_get_ink(color_or_index *retVal);
 
+
+/** Graphics related routines */
+
+enum line_mode {LM_NORM=0, LM_OR, LM_AND, LM_XOR};
+
+/**
+ * Sets the L_STYLE system variable. Valid values are 0-16.
+ * 
+ */
+void __LIB__ tvc_set_linestyle(char line_style) __z88dk_fastcall;
+
+/**
+ * Sets the L_MODE system variable. Valid values are 0-3.
+ * 
+ */
+void __LIB__ tvc_set_linemode(enum line_mode lm) __z88dk_fastcall;
+
+/**
+ * Gets the L_STYLE system variable.
+ * 
+ */
+char __LIB__ tvc_get_linestyle();
+
+/**
+ * Gets the L_MODE system variable.
+ * 
+ */
+char __LIB__ tvc_get_linemode();
+
+/**
+ * Sets the memory mapping of TVC. Please make sure that U0 is mapped to PAGE0.
+ * One MMAP_P0_, one MMAP_P1_, one MMAP_P2_ and one MMAP_P3_ value must be selected
+ * and OR'ed (added) together!
+ */
+void __LIB__ tvc_set_memorymap(char map) __z88dk_fastcall;
+
+/**
+ *  Maps in the videoRAM to the addr 0x8000-0xbfff
+ */
+void __LIB__ tvc_mapin_vram() __z88dk_fastcall;
+
+/**
+ *  Maps out the videoRAM so U3 RAM to be used on addr 0x8000-0xbfff
+ */
+void __LIB__ tvc_mapout_vram() __z88dk_fastcall;
 
 #endif

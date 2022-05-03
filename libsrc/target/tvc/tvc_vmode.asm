@@ -18,8 +18,8 @@
     add     hl,sp
     ld      c,(hl)
 
-    rst     $30     ; C-row, B-column
-    defb    VMODE ; editor - character in
+    rst     $30     
+    defb    VMODE   ; Video mode. 0, 1, 2 -> 2color, 4color, 16 color mode
     ld      l,c
     ld      h,0
 	ret
