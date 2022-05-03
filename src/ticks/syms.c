@@ -230,11 +230,16 @@ const char *find_symbol(int addr, symboltype preferred_type)
     sym = symbols[addr % SYM_TAB_SIZE];
 
     while ( sym != NULL ) {
-        if ( preferred_type == SYM_ANY ) {
-            return sym->name;
-        }
-        if ( preferred_type == sym->symtype ) {
-            return sym->name;
+        if (sym->address == addr)
+        {
+            if (preferred_type == SYM_ANY)
+            {
+                return sym->name;
+            }
+            if (preferred_type == sym->symtype)
+            {
+                return sym->name;
+            }
         }
         sym = sym->next;
     }
