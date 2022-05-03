@@ -41,7 +41,6 @@ execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks -m8085 pi.bin -x pi.map -start TIMER_START -end TIMER_STOP -counter 9999999999
 z88dk-ticks pi.bin -x pi.map -start TIMER_START -end TIMER_STOP -counter 9999999999
 
 counter = High value to ensure completion
