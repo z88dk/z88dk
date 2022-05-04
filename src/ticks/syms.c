@@ -5,7 +5,7 @@
 #include "ticks.h"
 #include "debug.h"
 
-static symbol  *symbols[65536] = {0};
+static symbol  *symbols[SYM_TAB_SIZE] = {0};
 static symbol  *symbols_byname = NULL;
 
 typedef struct section_s section;
@@ -109,9 +109,7 @@ void read_symbol_file(char *filename)
                     sym->name = strdup(argv[0]);
                     sym->address = strtol(!isxdigit(argv[2][0]) ? &argv[2][1] : argv[2], NULL, 16);
                     sym->symtype = SYM_ADDRESS;
-                    if ( sym->address >= 0 && sym->address <= 65535 ) {
-                        LL_APPEND(symbols[sym->address], sym);
-                    }
+                    LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
                     HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
                 }
                 free(argv);
@@ -143,9 +141,7 @@ void read_symbol_file(char *filename)
                     sym->symtype = SYM_CONST;
                 }
                 sym->address = strtol(argv[2] + 1, NULL, 16);
-                if ( sym->address >= 0 && sym->address <= 65535 ) {
-                    LL_APPEND(symbols[sym->address], sym);
-                }
+                LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
                 HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
             } else if ( argc > 9 ) {
                 /* It's a cline/asmline symbol */
@@ -198,7 +194,7 @@ symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
             return NULL;
         }
     
-        while ( (sym = symbols[addr % 65536]) == NULL && addr > 0 ) {
+        while ( (sym = symbols[addr % SYM_TAB_SIZE]) == NULL && addr > 0 ) {
             addr--;
         }
 
@@ -231,14 +227,19 @@ const char *find_symbol(int addr, symboltype preferred_type)
         return NULL;
     }
     
-    sym = symbols[addr % 65536];
+    sym = symbols[addr % SYM_TAB_SIZE];
 
     while ( sym != NULL ) {
-        if ( preferred_type == SYM_ANY ) {
-            return sym->name;
-        }
-        if ( preferred_type == sym->symtype ) {
-            return sym->name;
+        if (sym->address == addr)
+        {
+            if (preferred_type == SYM_ANY)
+            {
+                return sym->name;
+            }
+            if (preferred_type == sym->symtype)
+            {
+                return sym->name;
+            }
         }
         sym = sym->next;
     }
@@ -338,9 +339,7 @@ void symbol_add_autolabel(int address, char *label)
     sym->name = strdup(label);
     sym->address = address;
     sym->symtype = SYM_ADDRESS;
-    if ( sym->address >= 0 && sym->address <= 65535 ) {
-        LL_APPEND(symbols[sym->address], sym);
-    }
+    LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
     HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
 
 }
