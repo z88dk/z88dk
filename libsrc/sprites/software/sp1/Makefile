@@ -15,13 +15,13 @@ sp1-all:
 clean:
 	@make -s -C zx clean
 	$(RM) *.o
-	$(RM) ts2068hr/sprites/*.o
-	$(RM) ts2068hr/sprites/draw/*.o
-	$(RM) ts2068hr/tiles/*.o
-	$(RM) ts2068hr/updater/*.o
-	$(RM) ts2068hr/sp1.lib
-	$(RM) zx81hr/sprites/*.o
-	$(RM) zx81hr/sprites/draw/*.o
-	$(RM) zx81hr/tiles/*.o
-	$(RM) zx81hr/updater/*.o
-	$(RM) zx81hr/sp1.lib
+	$(RM) deprecated/ts2068hr/sprites/*.o
+	$(RM) deprecated/ts2068hr/sprites/draw/*.o
+	$(RM) deprecated/ts2068hr/tiles/*.o
+	$(RM) deprecated/ts2068hr/updater/*.o
+	$(RM) deprecated/ts2068hr/sp1.lib
+	$(RM) deprecated/zx81hr/sprites/*.o
+	$(RM) deprecated/zx81hr/sprites/draw/*.o
+	$(RM) deprecated/zx81hr/tiles/*.o
+	$(RM) deprecated/zx81hr/updater/*.o
+	$(RM) deprecated/zx81hr/sp1.lib
