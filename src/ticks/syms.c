@@ -108,8 +108,20 @@ void read_symbol_file(char *filename)
                     symbol *sym = calloc(1,sizeof(*sym));
                     sym->name = strdup(argv[0]);
                     sym->address = strtol(!isxdigit(argv[2][0]) ? &argv[2][1] : argv[2], NULL, 16);
-                    sym->symtype = SYM_ADDRESS;
-                    LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
+                    if (argc >= 5) {
+                        if (strstr(argv[4], "const")) {
+                            sym->symtype = SYM_CONST;
+                        } else {
+                            sym->symtype = SYM_ADDRESS;
+                        }
+                    } else {
+                        sym->symtype = SYM_ADDRESS;
+                    }
+                    if (sym->symtype == SYM_ADDRESS) {
+                        if ( sym->address >= 0 && sym->address <= 65535 ) {
+                            LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
+                        }
+                    }
                     HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
                 }
                 free(argv);
