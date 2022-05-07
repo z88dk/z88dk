@@ -807,6 +807,14 @@ int main(int argc, char **argv) {
     char* connect_host = NULL;
     int connect_port = 0;
 
+    printf("----------------------------------\n"
+           "z88dk-gdb, a gdb client for z88dk.\n"
+           "----------------------------------\n"
+           "\n"
+           "See the following for a list of compatible gdb servers: "
+           "https://github.com/z88dk/z88dk/wiki/Tool-z88dk-gdb\n"
+           "\n");
+
     set_backend(gdb_backend);
 
     for (int i = 1; i < argc; i++) {
@@ -829,7 +837,6 @@ int main(int argc, char **argv) {
     }
 
     if (connect_port == 0 || connect_host == NULL) {
-        printf("z88dk-gdb, a gdb client.\n");
         printf("Usage: z88dk-gdb -h <connect host> -p <connect port> -x <debug symbols> [-x <debug symbols>] [-v]\n");
         return 1;
     }
