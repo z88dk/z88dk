@@ -6,6 +6,8 @@
 #include "backend.h"
 #include "disassembler.h"
 
+uint8_t verbose = 0;
+
 long long get_st()
 {
     return st;
@@ -29,6 +31,11 @@ uint16_t get_sp()
 uint8_t get_ticks_memory(uint16_t at)
 {
     return get_memory(at);
+}
+
+uint8_t is_verbose()
+{
+    return verbose;
 }
 
 void get_regs(struct debugger_regs_t* regs)
@@ -205,5 +212,6 @@ backend_t ticks_debugger_backend = {
     .remove_breakpoint = &remove_breakpoint,
     .disable_breakpoint = &disable_breakpoint,
     .enable_breakpoint = &enable_breakpoint,
-    .breakpoints_check = &breakpoints_check
+    .breakpoints_check = &breakpoints_check,
+    .is_verbose = is_verbose
 };
