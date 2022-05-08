@@ -82,6 +82,7 @@ int main(int argc, char *argv[])
         if ( ( ptr = strstr(argv[0],machines[i].execname )  ) &&
              ( *(ptr + strlen(machines[i].execname) ) == '.' || *(ptr + strlen(machines[i].execname) ) == '\0' ) ) {
             target = machines[i].ident;  
+            printf("Selected ident: %s", machines[i].ident);
             execute_command(target, argc, argv, 0);
             exit(0);
         }
