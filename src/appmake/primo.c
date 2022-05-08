@@ -261,7 +261,6 @@ void writePtpFile(FILE *fpin, FILE *fpout, int len) {
                 writeword(datablk->load_address, fpout);
                 writebyte(datablk->nb, fpout);
                 int l = datablk->nb==0 ? 256 : ((int)datablk->nb & 0xff);
-                printf("len of block: %d\n", l);
                 for(int i=0; i<l; i++) {
                     writebyte(datablk->data[i], fpout);
                 }
