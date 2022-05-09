@@ -39,6 +39,8 @@ extern int rom_size;		/* amount of memory in low addresses that is read-only */
 extern int ioport;
 extern int rc2014_mode;
 
+extern uint8_t verbose;
+
 /* Break down flags */
 extern int f(void);
 extern int f_(void);
