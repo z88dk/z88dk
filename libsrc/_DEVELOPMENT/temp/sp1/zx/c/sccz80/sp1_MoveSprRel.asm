@@ -10,6 +10,11 @@ EXTERN asm_sp1_MoveSprRel
 
 sp1_MoveSprRel:
 
+   push ix	; save IX to BC'
+   exx
+   pop bc
+   exx
+
    pop af
    pop de
    pop bc
@@ -29,7 +34,13 @@ sp1_MoveSprRel:
    push de
    push af
    
-   jp asm_sp1_MoveSprRel
+;   jp asm_sp1_MoveSprRel
+   exx
+   push bc	; save old IX
+   exx
+   call asm_sp1_MoveSprRel
+   pop ix	; restore it
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

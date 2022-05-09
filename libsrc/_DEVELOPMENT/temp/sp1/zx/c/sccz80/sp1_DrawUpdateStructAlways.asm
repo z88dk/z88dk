@@ -8,7 +8,12 @@ PUBLIC sp1_DrawUpdateStructAlways
 
 EXTERN asm_sp1_DrawUpdateStructAlways
 
-defc sp1_DrawUpdateStructAlways = asm_sp1_DrawUpdateStructAlways
+sp1_DrawUpdateStructAlways:
+
+   push ix
+   call asm_sp1_DrawUpdateStructAlways
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

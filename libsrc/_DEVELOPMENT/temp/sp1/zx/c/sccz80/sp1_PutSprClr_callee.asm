@@ -17,7 +17,11 @@ sp1_PutSprClr_callee:
    pop de
    ex (sp),hl
 
-   jp asm_sp1_PutSprClr
+;   jp asm_sp1_PutSprClr
+   push ix
+   call asm_sp1_PutSprClr
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

@@ -11,6 +11,11 @@ EXTERN asm_sp1_MoveSprAbs
 
 sp1_MoveSprAbs_callee:
 
+   push ix	; save IX to BC'
+   exx
+   pop bc
+   exx
+
    pop af
    pop de
    pop bc
@@ -23,7 +28,16 @@ sp1_MoveSprAbs_callee:
    pop ix
    push af
 
-   jp asm_sp1_MoveSprAbs
+;   jp asm_sp1_MoveSprAbs
+   exx
+   push bc	; save old IX
+   exx
+
+   call asm_sp1_MoveSprAbs
+
+   pop ix	; restore it
+   ret
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC

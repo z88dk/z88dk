@@ -30,7 +30,11 @@ sp1_PutTiles:
    ld c,(hl)
    pop hl
    
-   jp asm_sp1_PutTiles
+;   jp asm_sp1_PutTiles
+   push ix
+   call asm_sp1_PutTiles
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

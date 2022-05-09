@@ -21,7 +21,11 @@ sp1_PrintAt_callee:
    ld a,d
    ld d,l
 
-   jp asm_sp1_PrintAt
+;   jp asm_sp1_PrintAt
+   push ix
+   call asm_sp1_PrintAt
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

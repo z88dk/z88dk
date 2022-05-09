@@ -13,7 +13,12 @@ sp1_ChangeSprType_callee:
    pop de
    ex (sp),hl
 
-   jp asm_sp1_ChangeSprType
+;   jp asm_sp1_ChangeSprType
+   push ix
+   call asm_sp1_ChangeSprType
+   pop ix
+   ret
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC

@@ -20,7 +20,11 @@ sp1_Initialize:
    ld e,(hl)
    ex de,hl
 
-   jp asm_sp1_Initialize
+;   jp asm_sp1_Initialize
+   push ix
+   call asm_sp1_Initialize
+   pop ix
+   ret
 
 ; SDCC bridge for Classic
 IF __CLASSIC

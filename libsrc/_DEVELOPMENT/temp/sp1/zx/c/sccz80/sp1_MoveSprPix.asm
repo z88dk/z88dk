@@ -10,6 +10,11 @@ EXTERN asm_sp1_MoveSprPix
 
 sp1_MoveSprPix:
 
+   push ix	; save IX to BC'
+   exx
+   pop bc
+   exx
+
    pop af
    pop bc
    pop de
@@ -23,7 +28,14 @@ sp1_MoveSprPix:
    push bc
    push af
 
-   jp asm_sp1_MoveSprPix
+;   jp asm_sp1_MoveSprPix
+   exx
+   push bc	; save old IX
+   exx
+   call asm_sp1_MoveSprPix
+   pop ix	; restore it
+   ret
+
 
 ; SDCC bridge for Classic
 IF __CLASSIC
