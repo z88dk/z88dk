@@ -13,6 +13,8 @@
 #include "uthash.h"
 #include "utlist.h"
 
+#define SYM_TAB_SIZE    0x10000
+
 #if defined(_WIN32) || defined(WIN32)
 
 #ifndef strcasecmp
@@ -36,6 +38,8 @@ extern int trace;
 extern int rom_size;		/* amount of memory in low addresses that is read-only */
 extern int ioport;
 extern int rc2014_mode;
+
+extern uint8_t verbose;
 
 /* Break down flags */
 extern int f(void);

@@ -725,6 +725,7 @@ int main (int argc, char **argv){
     printf("  -counter X     X in decimal is another condition to exit\n"),
     printf("  -int X         X in decimal are number of cycles for periodic interrupts\n"),
     printf("  -d             Enable debugger\n"),
+    printf("  -v             Verbose logging\n"),
     printf("  -l X           Load file to address\n"),
     printf("  -b <model>     Memory model (zxn/zx/z180)\n"),
     printf("  -m8080         Emulate an 8080\n"),
@@ -793,6 +794,11 @@ int main (int argc, char **argv){
         case 'd':
           debugger_active = 1;
           debugger_init();
+          argv--;
+          argc++;
+          break;
+        case 'v':
+          verbose = 1;
           argv--;
           argc++;
           break;

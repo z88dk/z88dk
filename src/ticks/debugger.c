@@ -116,6 +116,7 @@ static int cmd_down(int argc, char **argv);
 static int cmd_print(int argc, char **argv);
 static int cmd_info(int argc, char **argv);
 static int cmd_backtrace(int argc, char **argv);
+static int cmd_stack(int argc, char **argv);
 static int cmd_disassemble(int argc, char **argv);
 static int cmd_finish(int argc, char **argv);
 static int cmd_registers(int argc, char **argv);
@@ -150,6 +151,7 @@ static command commands[] = {
     { "step",      cmd_step_source, "",                     "Step one source line (including into calls)" },
     { "cont",      cmd_continue,    "",                     "Continue execution" },
     { "backtrace", cmd_backtrace,   "",                     "Show the execution stack" },
+    { "stack",     cmd_stack,       "[<size>]",             "Examine stack" },
     { "frame",     cmd_frame,       "[<num>]",              "Set or see current frame" },
     { "up",        cmd_up,          "",                     "Go one frame up" },
     { "down",      cmd_down,        "",                     "Go one frame down" },
@@ -1124,6 +1126,49 @@ static int parse_number(char *str, char **end)
     } 
     return strtol(str, end, base);
 }
+
+static int cmd_stack(int argc, char **argv)
+{
+    int stack_size = 8;
+
+    if ( argc == 2 ) {
+        char *end;
+        stack_size = parse_number(argv[1], &end);
+    }
+
+    struct debugger_regs_t regs;
+    bk.get_regs(&regs);
+    uint16_t stack = regs.sp;
+
+    printf("Examining stack (%d values) starting from $%04x:\n", stack_size, stack);
+
+    printf("Values: ");
+    uint16_t stack_summary = stack;
+    for (int i = 0; i < stack_size; i++) {
+        uint16_t value_at = (bk.get_memory((uint16_t)stack_summary + 1) << 8) + bk.get_memory((uint16_t)stack_summary);
+        printf("%04x ", value_at);
+        stack_summary += 2;
+    }
+
+    printf("\nDetail:\n");
+    for (int i = 0; i < stack_size; i++) {
+        uint16_t value_at = (bk.get_memory((uint16_t)stack + 1) << 8) + bk.get_memory((uint16_t)stack);
+        printf("  $%04x (offset %d): %04x\n", stack, i * 2, value_at);
+
+        uint16_t offset;
+        symbol* sym = symbol_find_lower(value_at, SYM_ADDRESS, &offset);
+        if (sym) {
+            printf("    $%04x %s (+%d)\n", sym->address, sym->name, offset);
+        } else {
+            printf("    ?\n");
+        }
+
+        stack += 2;
+    }
+
+    return 0;
+}
+
 
 /* Parse an address operand. 
  *
