@@ -4956,6 +4956,23 @@
 	add	hl,sp
 	ld	a,(hl)
 
+%eval 0 = %2 %1 - !
+.i_%1
+	jp	i_%2	;%5
+=
+%activate
+.i_%1
+	jp	i_%2	;%5
+=
+%once
+	jp	i_%2	;%5
+%activate
+; --- Start of Optimiser additions ---
+=
+%once
+; --- Start of Optimiser additions ---
+	defc	i_%1 = i_%2
+
 	jr	i_%2
 	jp	i_%3	;%5
 =
