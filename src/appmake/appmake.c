@@ -845,15 +845,17 @@ void raw2wav(char *wavfile)
     */
 
     for (i=0; i<len;i++) {
+		// Small alteration of the square wave to make it look analogue
+		// It should be enough for all the emulators to accept it as a valid feed
+		// still permitting a good compression rate to the LZ algorithms
       c=getc(fpin);
-      fputc(c,fpout);
+      fputc(c-(i&1),fpout);
     }
 
     fclose(fpin);
     fclose(fpout);
     remove (rawfilename);
 }
-
 
 /* Convert a 44100 Khz RAW sound file to a 22050 Khz WAV file */
 void raw2wav_22k(char *wavfile, int mode)
