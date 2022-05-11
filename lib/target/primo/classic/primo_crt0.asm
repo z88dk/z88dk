@@ -32,8 +32,9 @@
         defc    TAR__register_sp = -1		; SP left untouched
 	defc	CRT_KEY_DEL = 12
 	defc	__CPU_CLOCK = 2500000
-        defc    CONSOLE_COLUMNS = 42		; Default primo uses 6x12 character glyph.
-        defc    CONSOLE_ROWS = 21
+        ; These CONSOLE_* are used by generic console code
+        defc    CONSOLE_COLUMNS = 32
+        defc    CONSOLE_ROWS = 24
         INCLUDE "crt/classic/crt_rules.inc"
 
         defc CRT_ORG_CODE = 0x4400 ; BASIC area starts at $43EA, 0000-3FFF is ROM, 4000-43E9 system variables/buffers etc...
