@@ -821,7 +821,7 @@ void raw2wav(char *wavfile)
 
     /* Now let's think at the WAV file */
     writestring("RIFF",fpout);
-    writelong(len+63,fpout);
+	writelong(len+36,fpout);
     writestring("WAVEfmt ",fpout);
     writelong(0x10,fpout);
     writeword(1,fpout);
@@ -833,9 +833,11 @@ void raw2wav(char *wavfile)
     writestring("data",fpout);
     writelong(len,fpout);
 
+/*
     for (i=0; i<63;i++) {
       fputc(0x20,fpout);
     }
+*/
 
     /*
     //writestring(wav_table,fpout);
@@ -887,7 +889,7 @@ void raw2wav_22k(char *wavfile, int mode)
 
     /* Now let's think at the WAV file */
     writestring("RIFF",fpout);
-    writelong(len+63,fpout);
+    writelong(len+36,fpout);
     writestring("WAVEfmt ",fpout);
     writelong(0x10,fpout);
     writeword(1,fpout);
@@ -899,9 +901,11 @@ void raw2wav_22k(char *wavfile, int mode)
     writestring("data",fpout);
     writelong(len,fpout);
 
+/*
     for (i=0; i<63;i++) {
       fputc(0x20,fpout);
     }
+*/
 
     /*
     //writestring(wav_table,fpout);
@@ -926,7 +930,10 @@ void raw2wav_22k(char *wavfile, int mode)
 			c=getc(fpin);
 			c=(c+getc(fpin))/2;
 	}
-      fputc(c,fpout);
+	// Small alteration of the square wave to make it look analogue
+	// It should be enough for all the emulators to accept it as a valid feed
+	// still permitting a good compression rate to the LZ algorithms
+      fputc(c-(i&1),fpout);
     }
 
     fclose(fpin);
