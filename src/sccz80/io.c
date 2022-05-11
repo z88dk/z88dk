@@ -114,15 +114,19 @@ t_buffer* currentbuffer = NULL;
 
 t_buffer* startbuffer(size_t blocks)
 {
-    t_buffer* buf = (t_buffer*)MALLOC(sizeof(t_buffer));
+    t_buffer* buf = MALLOC(sizeof(t_buffer));
     size_t  size = blocks * STAGESIZE;
     buf->size = size;
-    buf->start = (char*)MALLOC(size);
+    buf->start = MALLOC(size);
     buf->end = buf->start + blocks * size - 1;
     buf->next = buf->start;
     buf->before = currentbuffer; /* <-- DON'T USE NULL HERE TO SUPPRESS WARNING !!  */
     currentbuffer = buf;
     return buf;
+}
+
+int bufferlen(t_buffer *buf) {
+    return buf->next - buf->start;
 }
 
 void suspendbuffer(void)
