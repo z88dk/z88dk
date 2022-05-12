@@ -467,7 +467,13 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
     int end;
 
     if (sscanf(encoded, "%[^$]$%[^$]$%[^(](%[^)]),%n", symbol_name, level, block, type_record, &end) != 4) {
-        goto err;
+        if (sscanf(encoded, "$%[^$]$%[^(](%[^)]),%n", level, block, type_record, &end) == 3) {
+            static int anon_id = 1;
+            // we've got anonymous type, so come up with something
+            sprintf(symbol_name, "anon_%d", anon_id++);
+        } else {
+            goto err;
+        }
     }
     s->symbol_name = strdup(symbol_name);
     encoded += end;
