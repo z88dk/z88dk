@@ -154,7 +154,7 @@ struct debugger_regs_t {
 extern void debug_add_info_encoded(char *encoded);
 extern int debug_find_source_location(int address, const char **filename, int *lineno);
 extern void debug_add_cline(const char *filename, const char *function, int lineno, int level, int scope, const char *address);
-extern int debug_resolve_source(char *name);
+extern int debug_resolve_source(char *name, const char** corrected_name);
 extern int debug_resolve_source_forward(const char *filename, const char* within_function, int lineno);
 
 extern type_chain* copy_type_chain(type_chain* from);

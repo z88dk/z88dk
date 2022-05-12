@@ -947,8 +947,13 @@ static void print_breakpoints() {
     int         i = 1;
     LL_FOREACH(breakpoints, elem) {
         if ( elem->type == BREAK_PC) {
-            const char *sym = find_symbol(elem->value, SYM_ADDRESS);
-            printf("%d:\tPC = $%04x (%s) %s\n",i, elem->value,sym ? sym : "<unknown>", elem->enabled ? "" : " (disabled)");
+            uint16_t offset = 0;
+            symbol* sym = symbol_find_lower(elem->value, SYM_ADDRESS, &offset);
+            if (sym) {
+                printf("%d:\tPC = $%04x (%s+%d) %s\n",i, elem->value, sym->name, offset, elem->enabled ? "" : " (disabled)");
+            } else {
+                printf("%d:\tPC = $%04x (%s) %s\n",i, elem->value, "<unknown>", elem->enabled ? "" : " (disabled)");
+            }
         } else if ( elem->type == BREAK_CHECK8 ) {
             printf("%d\t%s = $%02x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
         } else if ( elem->type == BREAK_CHECK16 ) {
@@ -1177,7 +1182,7 @@ static int cmd_stack(int argc, char **argv)
  * 2. A symbol
  * 3. A line expression
  */
-static int parse_address(char *arg)
+static int parse_address(char *arg, const char** corrected_source)
 {
     char temp[1024];
     int  where;
@@ -1191,7 +1196,7 @@ static int parse_address(char *arg)
             where = symbol_resolve(temp);
             if ( where == -1 ) {
                 // And now try to resolve a line expression
-                where = debug_resolve_source(arg);
+                where = debug_resolve_source(arg, corrected_source);
             }
         }
     }
@@ -1228,7 +1233,7 @@ static int cmd_disassemble(int argc, char **argv)
     const unsigned short pc = bk.pc();
 
     if ( argc == 2 ) {
-        where = parse_address(argv[1]);
+        where = parse_address(argv[1], NULL);
     }
 
     if ( where == -1 )
@@ -1342,7 +1347,8 @@ static int cmd_watch(int argc, char **argv)
         char *end;
         const char *sym;
         breakpoint *elem;
-        int value = parse_address(argv[2]);
+        const char* corrected_source = argv[2];
+        int value = parse_address(argv[2], &corrected_source);
 
         if ( value != -1 ) {
             elem = malloc(sizeof(*elem));
@@ -1350,9 +1356,9 @@ static int cmd_watch(int argc, char **argv)
             elem->value = value;
             elem->enabled = 1;
             LL_APPEND(watchpoints, elem);
-            printf("Adding %s watchpoint at '%s' $%04x (%s)\n",breakwrite ? "write" : "read", argv[2], value,  resolve_to_label(value));
+            printf("Adding %s watchpoint at '%s' $%04x (%s)\n",breakwrite ? "write" : "read", corrected_source, value,  resolve_to_label(value));
         } else {
-            printf("Cannot set watchpoint on '%s'\n",argv[2]);
+            printf("Cannot set watchpoint on '%s'\n", corrected_source);
         }
     } else if ( argc == 3 && strcmp(argv[1],"delete") == 0 ) {
         int num = atoi(argv[2]);
@@ -1501,7 +1507,8 @@ static int cmd_break(int argc, char **argv)
         char *end;
         const char *sym;
         breakpoint *elem;
-        int value = parse_address(argv[1]);
+        const char* corrected_source = argv[1];
+        int value = parse_address(argv[1], &corrected_source);
 
         if ( value != -1 ) {
             elem = malloc(sizeof(*elem));
@@ -1511,9 +1518,9 @@ static int cmd_break(int argc, char **argv)
             elem->text = NULL;
             bk.add_breakpoint(BK_BREAKPOINT_SOFTWARE, value, 1);
             LL_APPEND(breakpoints, elem);
-            printf("Adding breakpoint at '%s' $%04x (%s)\n",argv[1], value,  resolve_to_label(value));
+            printf("Adding breakpoint at '%s' $%04x (%s)\n", corrected_source, value,  resolve_to_label(value));
         } else {
-            printf("Cannot break on '%s'\n",argv[1]);
+            printf("Cannot break on '%s'\n", corrected_source);
         }
     } else if ( argc == 3 && strcmp(argv[1],"delete") == 0 ) {
         delete_breakpoint(atoi(argv[2]));
@@ -1544,7 +1551,7 @@ static int cmd_break(int argc, char **argv)
     } else if ( argc == 5 && strcmp(argv[1], "memory8") == 0 ) {
         // break memory8 <addr> = <value>
         char  *end;
-        int value = parse_address(argv[2]);
+        int value = parse_address(argv[2], NULL);
 
         if ( value != -1 ) {
             breakpoint *elem = malloc(sizeof(*elem));
@@ -1560,7 +1567,7 @@ static int cmd_break(int argc, char **argv)
         }
     } else if ( argc == 5 && strcmp(argv[1], "memory16") == 0 ) {
         char *end;
-        int addr = parse_address(argv[2]);
+        int addr = parse_address(argv[2], NULL);
 
         if ( addr != -1 ) {
             int value = parse_number(argv[4],&end);
@@ -1626,7 +1633,7 @@ static int cmd_examine(int argc, char **argv)
     int    i;
 
     if ( argc == 2 ) {
-        addr = parse_address(argv[1]);
+        addr = parse_address(argv[1], NULL);
     }
 
     if ( addr == -1 ) addr = pc;
@@ -1794,7 +1801,7 @@ static int cmd_quit(int argc, char **argv)
 static int get_restore_address(int argc, char **argv)
 {
     if ( argc == 3 ) {
-        return parse_address(argv[2]);
+        return parse_address(argv[2], NULL);
     } else {
         int address = symbol_resolve("__head");
         if (address == -1) {
@@ -1865,7 +1872,7 @@ static int cmd_list(int argc, char **argv)
     int   lineno;
 
     if ( argc == 2 ) {
-        int a2 = parse_address(argv[1]);
+        int a2 = parse_address(argv[1], NULL);
 
         if ( a2 != -1 ) {
             addr = a2;
