@@ -800,7 +800,7 @@ void raw2wav(char *wavfile)
     int      c;
     long     i, len;
 
-    strcpy(rawfilename,wavfile);
+    strncpy(rawfilename,wavfile,FILENAME_MAX);
 
     if ( (fpin=fopen(wavfile,"rb") ) == NULL ) {
         exit_log(1,"Can't open file %s for wave conversion\n",wavfile);
@@ -833,19 +833,6 @@ void raw2wav(char *wavfile)
     writestring("data",fpout);
     writelong(len,fpout);
 
-/*
-    for (i=0; i<63;i++) {
-      fputc(0x20,fpout);
-    }
-*/
-
-    /*
-    //writestring(wav_table,fpout);
-    for (i=0; i<28;i++) {
-      fputc(0x20,fpout);
-    }
-    */
-
     for (i=0; i<len;i++) {
 		// Small alteration of the square wave to make it look analogue
 		// It should be enough for all the emulators to accept it as a valid feed
@@ -856,7 +843,9 @@ void raw2wav(char *wavfile)
 
     fclose(fpin);
     fclose(fpout);
-    remove (rawfilename);
+
+    if (unlink (rawfilename) != 0) fprintf(stderr, "Warning: Couldn't remove: %s\n",rawfilename);
+
 }
 
 
@@ -868,7 +857,7 @@ void raw2wav_22k(char *wavfile, int mode)
     int      c;
     long     i, len;
 
-    strcpy(rawfilename,wavfile);
+    strncpy(rawfilename,wavfile,FILENAME_MAX);
 
     if ( (fpin=fopen(wavfile,"rb") ) == NULL ) {
         exit_log(1,"Can't open file %s for wave conversion\n",wavfile);
@@ -901,19 +890,6 @@ void raw2wav_22k(char *wavfile, int mode)
     writestring("data",fpout);
     writelong(len,fpout);
 
-/*
-    for (i=0; i<63;i++) {
-      fputc(0x20,fpout);
-    }
-*/
-
-    /*
-    //writestring(wav_table,fpout);
-    for (i=0; i<28;i++) {
-      fputc(0x20,fpout);
-    }
-    */
-
     for (i=0; i<len;i++) {
 
     switch (mode)
@@ -938,7 +914,8 @@ void raw2wav_22k(char *wavfile, int mode)
 
     fclose(fpin);
     fclose(fpout);
-    remove (rawfilename);
+	
+    if (unlink (rawfilename) != 0) fprintf(stderr, "Warning: Couldn't remove: %s\n",rawfilename);
 }
 
 
