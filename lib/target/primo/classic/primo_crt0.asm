@@ -37,8 +37,9 @@
         defc    CONSOLE_ROWS = 24
         INCLUDE "crt/classic/crt_rules.inc"
 
+IF !DEFINED_CRT_ORG_CODE
         defc CRT_ORG_CODE = 0x4400 ; BASIC area starts at $43EA, 0000-3FFF is ROM, 4000-43E9 system variables/buffers etc...
-
+ENDIF
 	org	  CRT_ORG_CODE
 
 program:
