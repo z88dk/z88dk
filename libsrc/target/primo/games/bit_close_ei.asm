@@ -8,8 +8,7 @@
 
 .bit_close_ei
 ._bit_close_ei
-	ld	a,(__snd_tick)
-	or	$80
-	out	($0),a
+	ld	    a,(__bit_irqstatus)
+	out	    ($0),a
 	ret
 

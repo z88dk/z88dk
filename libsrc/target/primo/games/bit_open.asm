@@ -7,9 +7,7 @@
 
 .bit_open
 ._bit_open
-	in	a,($0)
-	and	@00101111	;Keep screen
-	or	@10001000	;Enable interrupts
-	or	$08		;original screen buffer
-    	ld      (__snd_tick),a
+	in	    a,($403B)
+	and	    @11101111	;Set piezzo to stand by, leave NMI interrupt
+    ld      (__snd_tick),a
 	ret
