@@ -7,7 +7,7 @@
 
 .bit_open
 ._bit_open
-	in	    a,($403B)
+	ld	    a,($403B)
 	and	    @11101111	;Set piezzo to stand by, leave NMI interrupt
     ld      (__snd_tick),a
 	ret
