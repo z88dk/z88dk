@@ -14,7 +14,7 @@
 .tvc_is_os_sound_playing
 ._tvc_is_os_sound_playing
     ld      h,0
-    ld      l,0
+    ld      l,h
     ld      a,(SND_ACTIVE)
     or      a
     ret     z

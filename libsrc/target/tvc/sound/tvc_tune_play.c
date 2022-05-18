@@ -30,6 +30,7 @@ void __LIB__ tvc_tune_play(char melody[])
     int duration = 2;
     char volume = 15;
     tvc_set_os_sound_interrupting(false);   // set to wait 
+	tvc_enable_sound(true);
     while ( *melody != 0 )
     {
         switch (*melody++) {

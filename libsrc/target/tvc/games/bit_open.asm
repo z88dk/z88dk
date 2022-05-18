@@ -10,12 +10,12 @@
     PUBLIC      bit_open
     PUBLIC      _bit_open
     EXTERN      __snd_tick
+    EXTERN      tvc_enable_sound
 
 .bit_open
 ._bit_open
-    ld      a,(PORT05)      ; shuts off tone oscillator
-    AND     @11101111
-    ld      (PORT05),a      ; and that will not be turned on again on bit_close()...
+    ld      l,0
+    call    tvc_enable_sound; stops the oscillator, so only the volume level affects the 'digit sound'
     ld      a,(PORT06)      ; gets the current value of port 6 - from its mirror register
     AND     @11000011       ; ... and leave out the 4 volume bits
    	ld      (__snd_tick),a
