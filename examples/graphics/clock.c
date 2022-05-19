@@ -9,10 +9,10 @@
  *  zcc +zx -oclock -lndos -create-app -lm -llib3d -DDETAILED clock.c
  *  zcc +zx81ansi -oclock -startup=3 -lgfx81hr192 -lndos -create-app -llib3d -DDETAILED clock.c
  *  zcc +zx81 -oclock -startup=2 -lgfx81 -lndos -create-app -llib3d clock.c
- *  zcc +ts2068 -create-app -lm -lgfx2068hr -lm -llib3d -DDETAILED -Dhires clock.c
+ *  zcc +ts2068 -pragma-define:CLIB_ZX_CONIO32=1 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -DDETAILED -create-app -llib3d -Dhires clock.c
  *  Add -DHAVE_TIME if the machine has a hardware clock that can be read
 
- $Id: clock.c,v 1.1 2012-11-07 15:10:06 stefano Exp $
+ $Id: clock.c$
 */
 
 #include <graphics.h>

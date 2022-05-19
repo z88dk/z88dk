@@ -14,4 +14,5 @@ target/zx81/stdio/ansi/f_ansi_dline
 target/zx81/stdio/ansi/f_ansi_scrollup
 target/zx81/graphics_gray/g_clg
 @gfx/gray/gfx_gray.lst
+gfx/narrow/obj/${TARGET}/clrarea2
 @gfx/narrow/gfx_narrow.lst

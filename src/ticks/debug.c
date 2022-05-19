@@ -694,7 +694,9 @@ void debug_add_info_encoded(char *encoded)
         }
     }
 
-    printf("Decoded cdb: <%s>\n",encoded);
+    if (bk.is_verbose()) {
+        printf("Decoded cdb: <%s>\n",encoded);
+    }
 }
 
 

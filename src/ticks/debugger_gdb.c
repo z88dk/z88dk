@@ -24,7 +24,7 @@ struct network_op
     struct network_op* prev;
 };
 
-uint8_t verbose = 0;
+static uint8_t verbose = 0;
 int c_autolabel = 0;
 static uint8_t registers_invalidated = 1;
 static sem_t* req_response_mutex = NULL;
@@ -290,6 +290,11 @@ uint16_t get_ff()
     return 0;
 }
 
+uint8_t is_verbose()
+{
+    return verbose;
+}
+
 uint16_t get_pc()
 {
     return fetch_registers()->pc;
@@ -323,7 +328,7 @@ uint8_t get_memory(uint16_t at)
         mem_requested_amount = (uint16_t)(0x10000 - (int)mem_requested_at);
     }
 
-    if (verbose)
+    if (bk.is_verbose())
     {
         printf("Fetching a chunk of %d bytes starting from address %d.\n", mem_requested_amount, mem_requested_at);
     }
@@ -630,7 +635,8 @@ static backend_t gdb_backend = {
     .remove_breakpoint = &remove_breakpoint,
     .disable_breakpoint = &disable_breakpoint,
     .enable_breakpoint = &enable_breakpoint,
-    .breakpoints_check = &breakpoints_check
+    .breakpoints_check = &breakpoints_check,
+    .is_verbose = is_verbose
 };
 
 static void execute_on_main_thread(trapped_action_t call, const void* data, void* response)
@@ -669,7 +675,7 @@ void remote_execution_stopped(const void* data, void* response)
         return;
     }
 
-    if (verbose)
+    if (bk.is_verbose())
     {
         printf("Execution stopped.\n");
     }
@@ -687,14 +693,14 @@ static uint8_t process_packet()
     }
 
     if (inbuf_size > 0 && *inbuf == '+') {
-        if (verbose) {
+        if (bk.is_verbose()) {
             printf("ack.\n");
         }
         inbuf_erase_head(1);
         return 1;
     }
 
-    if (verbose) {
+    if (bk.is_verbose()) {
         printf("r: %.*s\n", inbuf_size, inbuf);
     }
 
@@ -713,7 +719,7 @@ static uint8_t process_packet()
 
     if (checksum != (hex(inbuf[packetend + 1]) << 4 | hex(inbuf[packetend + 2])))
     {
-        if (verbose) {
+        if (bk.is_verbose()) {
             printf("Warning: incorrect checksum, expected: %02x\n", checksum);
         }
         inbuf_erase_head(packetend + 3);
@@ -801,6 +807,16 @@ int main(int argc, char **argv) {
     char* connect_host = NULL;
     int connect_port = 0;
 
+    printf("----------------------------------\n"
+           "z88dk-gdb, a gdb client for z88dk.\n"
+           "----------------------------------\n"
+           "\n"
+           "See the following for a list of compatible gdb servers: "
+           "https://github.com/z88dk/z88dk/wiki/Tool-z88dk-gdb\n"
+           "\n");
+
+    set_backend(gdb_backend);
+
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-p") == 0) {
             connect_port = atoi(argv[++i]);
@@ -808,22 +824,24 @@ int main(int argc, char **argv) {
             connect_host = argv[++i];
         } else if (strcmp(argv[i], "-x") == 0) {
             char* debug_symbols = argv[++i];
-            printf("Reading debug symbols...");
+            if (bk.is_verbose()) {
+                printf("Reading debug symbols...");
+            }
             read_symbol_file(debug_symbols);
-            printf("OK\n");
+            if (bk.is_verbose()) {
+                printf("OK\n");
+            }
         } else if (strcmp(argv[i], "-v") == 0) {
             verbose = 1;
         }
     }
 
     if (connect_port == 0 || connect_host == NULL) {
-        printf("z88dk-gdb, a gdb client.\n");
         printf("Usage: z88dk-gdb -h <connect host> -p <connect port> -x <debug symbols> [-x <debug symbols>] [-v]\n");
         return 1;
     }
 
     debugger_init();
-    set_backend(gdb_backend);
 
     connection_socket = socket(AF_INET, SOCK_STREAM, 0);
 

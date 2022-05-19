@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include "backend.h"
 #include "debugger_gdb_packets.h"
 
 struct packet_buf
@@ -121,12 +122,10 @@ void write_packet_bytes(const uint8_t *data, size_t num_bytes)
     write_hex(checksum);
 }
 
-extern uint8_t verbose;
-
 void write_packet(const char *data)
 {
     write_packet_bytes((const uint8_t *)data, strlen(data));
-    if (verbose)
+    if (bk.is_verbose())
     {
         printf("w: %s\n", data);
     }

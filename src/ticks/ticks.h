@@ -13,6 +13,20 @@
 #include "uthash.h"
 #include "utlist.h"
 
+#define SYM_TAB_SIZE    0x10000
+
+#if defined(_WIN32) || defined(WIN32)
+
+#ifndef strcasecmp
+#define strcasecmp(a,b) stricmp(a,b)
+#endif
+
+#ifndef strncasecmp
+#define strncasecmp(a,b,c) strnicmp(a,b,c)
+#endif
+
+#endif
+
 extern unsigned char a,b,c,d,e,h,l;
 extern unsigned char a_,b_,c_,d_,e_,h_,l_;
 extern unsigned char xh, xl, yh, yl;
@@ -24,6 +38,8 @@ extern int trace;
 extern int rom_size;		/* amount of memory in low addresses that is read-only */
 extern int ioport;
 extern int rc2014_mode;
+
+extern uint8_t verbose;
 
 /* Break down flags */
 extern int f(void);

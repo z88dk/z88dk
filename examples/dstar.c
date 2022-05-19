@@ -72,7 +72,7 @@
  *      zcc +zx -Dspritesize=16 -DSOUND -create-app -zorg=24300 dstar.c
  *
  *      To get a TS2068 HRG version of the game:
- *      zcc +ts2068 -startup=2 -Dspritesize=21 -DSOUND -create-app dstar.c
+ *      zcc +ts2068 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=0x3e -Dspritesize=21 -DSOUND -create-app dstar.c
  *   
  *      To get a VZ200 version:
  *      zcc +vz -Dspritesize=7 -DSOUND -odztar.vz dstar.c

@@ -22,7 +22,6 @@ Contact the author:
 =========================================================================*/
 
 #include <graphics.h>
-#include <spectrum.h>
 
 #pragma output nogfxglobals
 unsigned char stencil[256*4];

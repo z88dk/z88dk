@@ -3,11 +3,14 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <stdint.h>
+#include <limits.h>
 #include "disassembler.h"
 #include "syms.h"
 #include "cpu.h"
 #include "backend.h"
 #include "ticks.h"
+
+#define BUFF_SIZE       0x10000
 
 static void disassemble_loop(int start, int end);
 
@@ -49,13 +52,13 @@ int main(int argc, char **argv)
     char  *program = argv[0];
     char  *filename;
     char  *endp;
-    uint16_t    org = 0;
-    int         start = -1;
-    uint16_t    end = 65535;
+    unsigned int    org = 0;
+    int    start = -1;
+    int    end = INT_MAX;
     int    loaded = 0;
     int    symbol_addr = -1;
 
-    mem = calloc(1,65536);
+    mem = calloc(1,BUFF_SIZE);
 
     if ( argc == 1 ) {
         usage(program);
@@ -124,7 +127,7 @@ int main(int argc, char **argv)
             FILE *fp = fopen(argv[1],"rb");
 
             if ( fp != NULL ) {
-                size_t r = fread(mem + org, sizeof(char), 65536 - start, fp);
+                size_t r = fread(mem + (org % BUFF_SIZE), sizeof(char), BUFF_SIZE - (start % BUFF_SIZE), fp);
                 loaded = 1;
                 fclose(fp);
                 if ( r < end - org ) {
@@ -140,7 +143,7 @@ int main(int argc, char **argv)
         start = 0;
     }
     if ( loaded ) {
-        disassemble_loop(start % 65536,end);
+        disassemble_loop(start,end);
     } else {
         usage(program);
     }
@@ -171,5 +174,5 @@ static void disassemble_loop(int start, int end)
 
 uint8_t get_memory(uint16_t pc)
 {
-    return mem[pc % 65536] ^ inverted;
+    return mem[pc % BUFF_SIZE] ^ inverted;
 }

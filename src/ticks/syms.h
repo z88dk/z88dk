@@ -16,7 +16,7 @@ struct symbol_s {
     const char    *name;
     const char    *file;
     const char    *module;
-    int            address;
+    unsigned int   address;
     symboltype     symtype;
     char           islocal;
     const char    *section;

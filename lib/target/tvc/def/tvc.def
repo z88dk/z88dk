@@ -2,7 +2,7 @@ lstoff
 
 ; Videoton TV Computer related constants
 ;
-;  Sandor Vass - 2019
+;  Sandor Vass - 2019-2022
 ;
 
 ; Memory segments
@@ -16,18 +16,36 @@ defc ED_CFIX        = $A4     ; Editor set starting character position on input
 defc KBD_CHIN       = $91     ; Keyboard character in
 defc KBD_STATUS     = $93     ; Keyboard character in
 
+defc VID_CHOUT      = $01     ; char out on video
+defc VID_BKOUT      = $02     ; string out on video
+defc BTEXT          = $03     ; Pen position on text position (1,1 -> top left, [16,32,64],24 -> bottom right)
 defc VMODE          = $04     ; Video mode
 defc CLS            = $05     ; Clear screen
+defc BABS           = $06     ; Pen to absolute position (0,0 -> bottom left ; 1023,959 -> top right)
+defc BREL           = $07     ; Pen to relative position
+defc BON            = $08     ; Pen on paper
+defc BOFF           = $09     ; Pen off paper
+defc FILL           = $0A     ; Fill
+defc VID_DEFC       = $0B     ; Define a character
+defc PAL            = $0C     ; Define a palette color 
 
 ; Special ports
 defc PORT_BORDER    = $00     ; color of the border - output only
+defc PORT_MMAP      = $02     ; mapping of TVC memory
 
 ; Special addresses
 defc P_SAVE         = $0003   ; Save address of PORT 2, the memory mapping port
 defc PORT03         = $0B11   ; Save address of PORT 3, the keyboard row select and IO socket select port
 defc PORT06         = $0B13   ; Save address of PORT 6
 defc INTINC         = $0B1D   ; Address of the interrupt counter (happens once in each 20.096ms)
+defc L_MODE         = $0B4B   ; Mode of line draw: 0-overwrite, 1-OR, 2-AND, 3-XOR
+defc L_STYLE        = $0B4C   ; Line style (0-16)
 defc BORDER         = $0B4f   ; Save address of the color of the border
+
+; Graphics
+defc ROM_RESX       = 1024    ; X resolution using the ROM gfx functions
+defc ROM_RESY       = 960     ; Y resolution using the ROM gfx functions
+
 
 ; Warnings
 
