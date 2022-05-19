@@ -848,7 +848,6 @@ void raw2wav(char *wavfile)
 
 }
 
-
 /* Convert a 44100 Khz RAW sound file to a 22050 Khz WAV file */
 void raw2wav_22k(char *wavfile, int mode)
 {
