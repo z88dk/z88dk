@@ -10,6 +10,7 @@
 
 struct dpb *dp;
 int xltab;
+int blk_size, mask_count;
 
 
 
@@ -66,8 +67,26 @@ main()
 	if ( (xltab = get_xlt(get_current_volume())) == NULL)
 	{
 		printf("No software interleave\n\n");
-		exit(0);
+	} else {
+		printf("Interleave table is present\n\n");
 	}
+	
+	if (dp->DSM < 256)
+		blk_size=1024;
+	else
+		blk_size=2048;
+
+	for (mask_count = dp->EXM+1; mask_count /= 2; mask_count>=0) {
+		blk_size *= 2;
+	}
+	
+	if (blk_size != 128<<(dp->BSH))
+		printf("(warning: block size could be %u.\n)",128<<(dp->BSH));
+	
+	
+	printf("Disk size: %lu, block (extent) size: %u.\n", (long)blk_size*((long)dp->DSM+1),blk_size);
+	printf("MAX directory entries: %u, %u per block (%u blocks used).\n", dp->DRM+1, blk_size/32, (dp->DRM+1)/(blk_size/32));		
+
 
 
 }
