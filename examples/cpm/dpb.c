@@ -1,6 +1,9 @@
 /*
- *	Analyse the CP/M Disk Parameter Block and print its values
+ *  Analyse the CP/M Disk Parameter Block and print its values
  *  It will probably work on CP/M v2 only
+ *
+ *  By Stefano Bodrato, May 2022
+ *
  */
 
 
@@ -9,18 +12,18 @@
 #include <cpm.h>
 
 struct dpb *dp;
-int xltab;
 int blk_size, mask_count;
+int sec_count, cpm_ver;
+unsigned char *xltab;
 
 
-
-unsigned int get_xlt(int drive)
+unsigned char *get_xlt(int drive)
 {
 #asm
 	ld c,l		; (fastcall parm)
 	
 	ld hl,(1)   ; base+1 = addr of jump table + 3
-    ld l,27     ; point to seldisk
+	ld l,27     ; point to seldisk
 
 	ld e,0      ; If bit 0 of E is 0, then the disc is logged in as if new
 
@@ -46,6 +49,11 @@ retxlt:
 
 main()
 {
+	cpm_ver = bdos(CPM_VERS,0);
+
+	if ((cpm_ver == 0) || (cpm_ver > 0x2F))
+		printf("\nWARNING: unsupported CP/M version detected: %x.%x\n\n", cpm_ver >> 4, cpm_ver & 0xf);
+
 	printf("Parameters for current drive (%c:)\n\n",'A'+get_current_volume());
 	if ( (dp = get_dpb(get_current_volume())) == NULL)
 	{
@@ -53,7 +61,11 @@ main()
 		exit(0);
 	}
 
-	printf("Sectors per Track (SPT)..%u\n",dp->SPT);
+	printf("Sectors per Track (SPT)..%u",dp->SPT);
+	if (dp->SPT == 26)
+		printf(" 8\"\n");
+	else
+		printf("\n");
 	printf("Block Shift (BSH)........%u\n",dp->BSH);
 	printf("Block Mask (BLM).........%u\n",dp->BLM);
 	printf("Extent Mask (EXM)........%u\n",dp->EXM);
@@ -64,11 +76,21 @@ main()
 	printf("Dir chk vector sz (CKS)..%u\n",dp->CKS);
 	printf("Cylinder Offset (OFF)....%u\n",dp->OFF);
 
+	printf("-- Press 'Y' for more --\n",dp->OFF);
+	
+	while ((getk() != 'y') && (getk() != 'Y')) {};
+
+	printf("\n\nDetected CP/M version: %x.%x\n", cpm_ver >> 4, cpm_ver & 0xf);
+	
+
 	if ( (xltab = get_xlt(get_current_volume())) == NULL)
 	{
 		printf("No software interleave\n\n");
 	} else {
-		printf("Interleave table is present\n\n");
+		printf("Skew %u.\nInterleave table: ", xltab[1]-1);
+		for (sec_count = 0; sec_count < dp->SPT; sec_count++)
+		  printf("%u ",xltab[sec_count]-1);
+	  printf("\n\n");
 	}
 	
 	if (dp->DSM < 256)
@@ -81,13 +103,11 @@ main()
 	}
 	
 	if (blk_size != 128<<(dp->BSH))
-		printf("(warning: block size could be %u.\n)",128<<(dp->BSH));
+		printf("(warning: block size could also be %u).\n",128<<(dp->BSH));
 	
-	
-	printf("Disk size: %lu, block (extent) size: %u.\n", (long)blk_size*((long)dp->DSM+1),blk_size);
+	//printf("Formatted capacity: %lu, block (extent) size: %u.\n", (long)blk_size*((long)dp->DSM+1),blk_size);
+	printf("Block (extent) size: %u.\n", blk_size);
 	printf("MAX directory entries: %u, %u per block (%u blocks used).\n", dp->DRM+1, blk_size/32, (dp->DRM+1)/(blk_size/32));		
-
-
 
 }
 
