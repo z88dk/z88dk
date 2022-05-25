@@ -87,9 +87,9 @@ main()
 	{
 		printf("No software interleave\n\n");
 	} else {
-		printf("Skew %u.\nInterleave table: ", xltab[1]-1);
+		printf("Skew %u.\nInterleave table: ", xltab[1]-xltab[0]);
 		for (sec_count = 0; sec_count < dp->SPT; sec_count++)
-		  printf("%u ",xltab[sec_count]-1);
+		  printf("%u ",xltab[sec_count]);
 	  printf("\n\n");
 	}
 	
