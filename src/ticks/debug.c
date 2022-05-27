@@ -467,7 +467,13 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
     int end;
 
     if (sscanf(encoded, "%[^$]$%[^$]$%[^(](%[^)]),%n", symbol_name, level, block, type_record, &end) != 4) {
-        goto err;
+        if (sscanf(encoded, "$%[^$]$%[^(](%[^)]),%n", level, block, type_record, &end) == 3) {
+            static int anon_id = 1;
+            // we've got anonymous type, so come up with something
+            sprintf(symbol_name, "anon_%d", anon_id++);
+        } else {
+            goto err;
+        }
     }
     s->symbol_name = strdup(symbol_name);
     encoded += end;
@@ -748,7 +754,7 @@ int debug_find_source_location(int address, const char **filename, int *lineno)
     return 0;
 }
 
-int debug_resolve_source(char *name)
+int debug_resolve_source(char *name, const char** corrected_name)
 {
     char *ptr;
 
@@ -769,6 +775,31 @@ int debug_resolve_source(char *name)
 
             if ( cl != NULL ) {
                 return cl->address;
+            }
+        } else {
+            // try and do partial match
+            cfile *elem, *tmp;
+            uint32_t filename_len = strlen(filename);
+            HASH_ITER(hh, cfiles, elem, tmp) {
+                uint32_t elem_file_len = strlen(elem->file);
+
+                if (elem_file_len < filename_len)
+                    continue;
+
+                if (memcmp(filename, elem->file + elem_file_len - filename_len, filename_len) != 0)
+                    continue;
+
+                cline *cl;
+                HASH_FIND_INT(elem->lines, &line, cl);
+
+                if ( cl != NULL ) {
+                    if (corrected_name) {
+                        *corrected_name = elem->file;
+                    }
+                    return cl->address;
+                }
+
+                break;
             }
         }
     }
