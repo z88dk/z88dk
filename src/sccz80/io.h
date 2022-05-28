@@ -43,5 +43,6 @@ extern t_buffer * startbuffer(size_t blocks);
 extern void clearbuffer(t_buffer *buf);
 extern void suspendbuffer(void);
 extern int outbuffer(char c);
+extern int bufferlen(t_buffer *buf);
 extern t_buffer *currentbuffer;
 

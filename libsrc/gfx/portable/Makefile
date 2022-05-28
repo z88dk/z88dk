@@ -7,11 +7,11 @@ CFILES = $(wildcard *.c)
 OBJECTS = $(ASMFILES:.asm=.o)  $(CFILES:.c=.o)
 
 
-all: dirs $(addprefix obj/gbz80/,$(OBJECTS))  $(addprefix obj/8080/,$(OBJECTS))
+all: dirs $(addprefix obj/gbz80/,$(OBJECTS))  $(addprefix obj/8080/,$(OBJECTS)) $(addprefix obj/ixiy/,$(OBJECTS))
 
 
 dirs:
-	@mkdir -p obj/gbz80 obj/8080
+	@mkdir -p obj/gbz80 obj/8080 obj/ixiy
 
 clean: 
 	$(RM) -r obj

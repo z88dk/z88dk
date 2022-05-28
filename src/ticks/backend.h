@@ -16,6 +16,7 @@ typedef void (*debugger_write_memory_cb)(int addr, uint8_t val);
 typedef void (*debugger_read_memory_cb)(int addr);
 typedef void (*get_regs_cb)(struct debugger_regs_t* regs);
 typedef void (*void_cb)();
+typedef uint8_t (*uint8_t_cb)();
 typedef uint8_t (*breakpoints_check_cb)();
 typedef void (*breakpoint_cb)(uint8_t type, uint16_t at, uint8_t sz);
 
@@ -55,6 +56,7 @@ typedef struct {
     breakpoint_cb disable_breakpoint;
     breakpoint_cb enable_breakpoint;
     breakpoints_check_cb breakpoints_check;
+    uint8_t_cb is_verbose;
 } backend_t;
 
 extern backend_t bk;

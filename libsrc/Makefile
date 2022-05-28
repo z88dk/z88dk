@@ -125,7 +125,7 @@ TOCREATE += $(call check_target,ti86,ti86_clib.lib)
 TOCREATE += $(call check_target,tiki100,tiki100.lib $(CPMLIBS))
 TOCREATE += $(call check_target,trs80, trs80_clib.lib trsdos.lib gfxtrs80.lib gfxeg2000.lib grafyx4_3.lib grafyx4.lib gfxhrg1.lib)
 TOCREATE += $(call check_target,ts2068, ts2068_clib.lib m2068.lib)
-TOCREATE += $(call check_target,tvc, tvc_clib.lib)
+TOCREATE += $(call check_target,tvc,tvc_clib.lib tvc_romgfx.lib)
 TOCREATE += $(call check_target,vector06c,vector06c_clib.lib)
 TOCREATE += $(call check_target,vg5k,vg5k_clib.lib)
 TOCREATE += $(call check_target,vz,vz_clib.lib)
@@ -925,6 +925,13 @@ tvc_clib.lib:
 	$(MAKE) -C target/tvc
 	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_clib @$(TARGET_DIRECTORY)/tvc/tvc.lst
 
+# Videoton TV Computer ROM implemented graphics library - Sandor
+tvc_romgfx.lib:
+	@echo ''
+	@echo '--- Building Videoton TV Computer ROM based Gfx Library ---'
+	@echo ''
+	$(MAKE) -C target/tvc/romgfx TARGET=tvc
+	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_romgfx @$(TARGET_DIRECTORY)/tvc/tvc_romgfx.lst
 
 # Enterprise library - Stefano
 enterprise_clib.lib: 
@@ -1081,7 +1088,7 @@ kc_clib.lib:
 	@echo ''
 	@echo '--- Building VEB Mikroelektronik KC85/2..5 Library ---'
 	@echo ''
-	$(call buildgeneric,kc,wide)
+	$(call buildgeneric,kc,"wide portable")
 	$(MAKE) -C games TARGET=kc
 	TARGET=kc TYPE=ixiy $(LIBLINKER) -IXIY -DSTANDARDESCAPECHARS -DFORkc -x$(OUTPUT_DIRECTORY)/kc_clib @$(TARGET_DIRECTORY)/kc/kc.lst
 
