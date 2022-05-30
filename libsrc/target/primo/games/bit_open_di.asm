@@ -9,10 +9,11 @@
     
 .bit_open_di
 ._bit_open_di
-	in	a,($0)
-	and	@00101111	;Disable NMI (i.e. how interrupts are delivered)
-	or	@00001000
-	out	($0),a
-	ld	(__snd_tick),a
-        ret
+	ld	    a,($403B)
+    ld      (__bit_irqstatus),a
+	and	    @01111111	;Disable NMI (i.e. how interrupts are delivered), set 
+	out	    ($0),a
+    and     @01101111   ;Set piezzo to stand-by
+	ld	    (__snd_tick),a
+    ret
 
