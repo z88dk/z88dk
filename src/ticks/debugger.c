@@ -20,6 +20,7 @@
 #include "linenoise.h"
 #include "srcfile.h"
 #include "exp_engine.h"
+#include "breakpoints.h"
 
 
 #define HISTORY_FILE ".ticks_history.txt"
@@ -191,9 +192,6 @@ static struct {
     {NULL, NULL}
 };
 
-breakpoint *breakpoints;
-breakpoint *watchpoints;
-
        int debugger_active = 0;
        int break_required = 0;
        int next_address = -1;
@@ -207,26 +205,6 @@ static int hotspots[65536];
 static int hotspots_t[65536];
 static size_t current_frame = 0;
 static int last_stacktrace_at = 0;
-
-typedef enum {
-    TMP_REASON_UNKNOWN = 0,
-    TMP_REASON_FIN,
-    TMP_REASON_STEP_SOURCE_LINE,
-    TMP_REASON_NEXT_SOURCE_LINE,
-} temporary_breakpoint_reason_t;
-
-typedef struct temporary_breakpoint_t {
-    temporary_breakpoint_reason_t   reason;
-    uint32_t                        at;
-    debug_sym_function*             callee;
-    const char*                     source_file;
-    int                             source_line;
-    uint8_t                         external;
-    struct temporary_breakpoint_t*  next;
-} temporary_breakpoint_t;
-
-// temporary breakpoints live to the point one of them is hit. in that case all of them has to be removed
-static temporary_breakpoint_t* temporary_breakpoints = NULL;
 
 static int interact_with_tty = 0;
 
@@ -300,34 +278,6 @@ void debugger_process_signals()
     }
 }
 
-static void add_temporary_internal_breakpoint(uint32_t address, temporary_breakpoint_reason_t reason,
-    const char *source_filename, int source_lineno)
-{
-    temporary_breakpoint_t* tmp_step = malloc(sizeof(temporary_breakpoint_t));
-    tmp_step->at = address;
-    tmp_step->callee = NULL;
-    tmp_step->external = 0;
-    tmp_step->source_file = source_filename;
-    tmp_step->source_line = source_lineno;
-    tmp_step->reason = reason;
-    LL_APPEND(temporary_breakpoints, tmp_step);
-}
-
-static void remove_temp_breakpoints()
-{
-    next_address = -1;
-
-    // regardless of the reason we've stopped, all temp breakpoints have to be removed
-    while (temporary_breakpoints) {
-        if (temporary_breakpoints->external) {
-            bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, temporary_breakpoints->at, 1);
-        }
-        temporary_breakpoint_t* next = temporary_breakpoints->next;
-        free(temporary_breakpoints);
-        temporary_breakpoints = next;
-    }
-}
-
 void debugger()
 {
     static char *last_line = NULL;
@@ -364,88 +314,11 @@ void debugger()
         last_hotspot_st = st;
     }
 
-    int dodebug = 0;
+    int dodebug = process_temp_breakpoints();
 
-    {
-        temporary_breakpoint_t *temp_br;
-        LL_FOREACH(temporary_breakpoints, temp_br) {
-            if ((temp_br->at == 0xFFFFFFFF) || (bk.pc() == temp_br->at)) {
-                dodebug = 1;
-                temporary_breakpoint_reason_t reason = temp_br->reason;
-                switch (reason) {
-                    case TMP_REASON_FIN: {
-                        struct debugger_regs_t regs;
-                        bk.get_regs(&regs);
-                        uint16_t hl = wrap_reg(regs.h, regs.l);
-                        uint16_t de = wrap_reg(regs.d, regs.e);
-                        uint32_t return_value = ((uint32_t)de << 16) | hl;
-                        if (temp_br->callee) {
-                            type_chain *ttt = temp_br->callee->type_record.first;
-                            if (ttt->type_ == TYPE_FUNCTION) {
-                                // skip DF
-                                ttt = ttt->next;
-                            }
-                            if (ttt == NULL) {
-                                printf("Warning: unknown callee return type, DEHL returned %08x.\n", return_value);
-                            } else {
-                                if (ttt->type_ != TYPE_VOID) {
-                                    struct expression_result_t result = {0};
-                                    debug_resolve_expression_element(&temp_br->callee->type_record, ttt,
-                                        RESOLVE_BY_VALUE, return_value, &result);
-                                    if (is_expression_result_error(&result)) {
-                                        printf("function %s errored: %s\n", temp_br->callee->function_name, result.as_error);
-                                    } else {
-                                        char resolved_result[128] = "<unknown>";
-                                        expression_result_value_to_string(&result, resolved_result, 128);
-                                        printf("function %s returned: %s\n", temp_br->callee->function_name, resolved_result);
-                                    }
-                                    expression_result_free(&result);
-                                }
-                            }
-                        } else {
-                            printf("Warning: returned from a function without frame pointer.\n");
-                        }
-                        break;
-                    }
-                    case TMP_REASON_STEP_SOURCE_LINE:
-                    case TMP_REASON_NEXT_SOURCE_LINE: {
-                        const char *filename;
-                        int   lineno;
-                        const unsigned short pc = bk.pc();
-                        if (debug_find_source_location(pc, &filename, &lineno) < 0) {
-                            // don't know where we are, keep going
-                            if (reason == TMP_REASON_STEP_SOURCE_LINE) {
-                                bk.step();
-                            } else {
-                                bk.next();
-                            }
-                            return;
-                        }
-                        // we're still on the same source line
-                        if ((strcmp(filename, temp_br->source_file) == 0) && (lineno == temp_br->source_line)) {
-                            if (reason == TMP_REASON_STEP_SOURCE_LINE) {
-                                bk.step();
-                            } else {
-                                bk.next();
-                            }
-                            return;
-                        } else {
-                            remove_temp_breakpoints();
-                            trace_source = 1;
-                        }
-                        break;
-                    }
-                    default: {
-                        printf("Warning: unknown reason why we stopped on temporary breakpoint.\n");
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (dodebug) {
-            remove_temp_breakpoints();
-        }
+    if (dodebug) {
+        next_address = -1;
+        trace_source = 1;
     }
 
     if ( bk.breakpoints_check() ) {
@@ -1314,6 +1187,7 @@ static int cmd_registers(int argc, char **argv)
     return 0;
 }
 
+static void delete_breakpoint_by_number(int b);
 
 static int cmd_watch(int argc, char **argv)
 {
@@ -1357,7 +1231,7 @@ static int cmd_watch(int argc, char **argv)
             num--;
             if ( num == 0 ) {
                 printf("Deleting watchpoint %d\n",atoi(argv[2]));
-                LL_DELETE(breakpoints,elem); // TODO: Freeing
+                delete_breakpoint_by_number(elem);
                 break;
             }
         }
@@ -1400,14 +1274,12 @@ static int cmd_finish(int argc, char **argv)
 
     if (first_frame_pointer && first_frame_pointer->return_address) {
 
-        temporary_breakpoint_t* tmp = malloc(sizeof(temporary_breakpoint_t));
-        tmp->at = first_frame_pointer->return_address;
+        temporary_breakpoint_t* tmp = add_temporary_internal_breakpoint(first_frame_pointer->return_address,
+            TMP_REASON_FIN, NULL, 0);
         tmp->callee = first_frame_pointer->function;
         tmp->external = 1;
-        tmp->reason = TMP_REASON_FIN;
-        LL_APPEND(temporary_breakpoints, tmp);
-
         bk.add_breakpoint(BK_BREAKPOINT_SOFTWARE, first_frame_pointer->return_address, 1);
+
         debug_stack_frames_free(first_frame_pointer);
         debugger_active = 0;
         trace_source = 1;
@@ -1419,14 +1291,6 @@ static int cmd_finish(int argc, char **argv)
     }
 
     return 0;
-}
-
-static void free_breakpoint(breakpoint* elem)
-{
-    if (elem->text) {
-        free(elem->text);
-    }
-    free(elem);
 }
 
 static uint8_t confirm(const char* message) {
@@ -1447,28 +1311,22 @@ static uint8_t confirm(const char* message) {
     return 0;
 }
 
-static void delete_all_breakpoints()
-{
+static void delete_all_breakpoints() {
     printf("Deleting all breakpoints.\n");
     breakpoint *elem, *tmp;
     LL_FOREACH_SAFE(breakpoints, elem, tmp) {
-        bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, elem->value, 1);
-        LL_DELETE(breakpoints, elem);
-        free_breakpoint(elem);
+        delete_breakpoint(elem);
     }
 }
 
-static void delete_breakpoint(int b)
-{
+static void delete_breakpoint_by_number(int b) {
     int num = b;
     breakpoint *elem;
     LL_FOREACH(breakpoints, elem) {
         num--;
         if ( num == 0 ) {
             printf("Deleting breakpoint %d\n", b);
-            bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, elem->value, 1);
-            LL_DELETE(breakpoints, elem);
-            free_breakpoint(elem);
+            delete_breakpoint(elem);
             break;
         }
     }
@@ -1481,7 +1339,7 @@ static int cmd_del_break(int argc, char **argv) {
         }
     }
     if (argc == 2) {
-        delete_breakpoint(atoi(argv[1]));
+        delete_breakpoint_by_number(atoi(argv[1]));
     }
     return 0;
 }
@@ -1501,19 +1359,13 @@ static int cmd_break(int argc, char **argv)
         int value = parse_address(argv[1], &corrected_source);
 
         if ( value != -1 ) {
-            elem = malloc(sizeof(*elem));
-            elem->type = BREAK_PC;
-            elem->value = value;
-            elem->enabled = 1;
-            elem->text = NULL;
-            bk.add_breakpoint(BK_BREAKPOINT_SOFTWARE, value, 1);
-            LL_APPEND(breakpoints, elem);
+            elem = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, value, NULL);
             printf("Adding breakpoint at '%s' $%04x (%s)\n", corrected_source, value,  resolve_to_label(value));
         } else {
             printf("Cannot break on '%s'\n", corrected_source);
         }
     } else if ( argc == 3 && strcmp(argv[1],"delete") == 0 ) {
-        delete_breakpoint(atoi(argv[2]));
+        delete_breakpoint_by_number(atoi(argv[2]));
     } else if ( argc == 3 && strcmp(argv[1],"disable") == 0 ) {
         int num = atoi(argv[2]);
         breakpoint *elem;
@@ -1544,16 +1396,9 @@ static int cmd_break(int argc, char **argv)
         int value = parse_address(argv[2], NULL);
 
         if ( value != -1 ) {
-            breakpoint *elem = malloc(sizeof(*elem));
-            memset(elem, 0, sizeof(breakpoint));
-            elem->type = BREAK_CHECK8;
-            elem->lcheck_arg = value;
+            breakpoint *elem = add_breakpoint(BREAK_CHECK8, BK_BREAKPOINT_WATCHPOINT, 1, value, strdup(argv[2]));
             elem->lvalue = parse_number(argv[4], &end);
-            elem->enabled = 1;
-            elem->text = strdup(argv[2]);
-            LL_APPEND(breakpoints, elem);
             printf("Adding breakpoint for %s = $%02x\n", elem->text, elem->lvalue);
-            bk.add_breakpoint(BK_BREAKPOINT_WATCHPOINT, elem->value, 1);
         }
     } else if ( argc == 5 && strcmp(argv[1], "memory16") == 0 ) {
         char *end;
@@ -1561,18 +1406,12 @@ static int cmd_break(int argc, char **argv)
 
         if ( addr != -1 ) {
             int value = parse_number(argv[4],&end);
-            breakpoint *elem = malloc(sizeof(*elem));
-            memset(elem, 0, sizeof(breakpoint));
-            elem->type = BREAK_CHECK16;
+            breakpoint *elem = add_breakpoint(BREAK_CHECK16, BK_BREAKPOINT_WATCHPOINT, 2, 0, strdup(argv[2]));
             elem->lcheck_arg = addr;
             elem->lvalue = value % 256;
             elem->hcheck_arg = addr+1;
             elem->hvalue = (value % 65536 ) /    256;
-            elem->enabled = 1;
-            elem->text = strdup(argv[2]);
-            LL_APPEND(breakpoints, elem);
             printf("Adding breakpoint for %s = $%02x%02x\n", elem->text, elem->hvalue, elem->lvalue);
-            bk.add_breakpoint(BK_BREAKPOINT_WATCHPOINT, elem->value, 2);
         }
     } else if ( argc == 5 && strncmp(argv[1], "register",3) == 0 ) {
         struct reg *search = &registers[0];
@@ -1588,22 +1427,15 @@ static int cmd_break(int argc, char **argv)
 
         if ( search->name != NULL ) {
             int value = atoi(argv[4]);
-            breakpoint *elem = malloc(sizeof(*elem));
-            memset(elem, 0, sizeof(breakpoint));
-            elem->type = BREAK_REGISTER;
+            breakpoint *elem = add_breakpoint(BREAK_REGISTER, BK_BREAKPOINT_REGISTER, 1, search_idx, strdup(argv[2]));
             elem->lcheck_arg = search_idx;
             elem->lvalue = (value % 256);
             elem->hvalue = (value % 65536) / 256;
-            elem->enabled = 1;
-            elem->text = strdup(argv[2]);
-            LL_APPEND(breakpoints, elem);
             if ( elem->type == BREAK_CHECK8 ) {
                 printf("Adding breakpoint for %s = $%02x\n", elem->text, elem->lvalue);
             } else {
                 printf("Adding breakpoint for %s = $%02x%02x\n", elem->text, elem->hvalue, elem->lvalue);
             }
-            bk.add_breakpoint(BK_BREAKPOINT_REGISTER, search_idx, 1);
-
         } else {
             printf("No such register %s\n",argv[2]);
         }
