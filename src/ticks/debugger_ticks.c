@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 
 #include "debugger.h"
 #include "ticks.h"
@@ -129,7 +130,7 @@ void debugger_read_memory(int addr)
 }
 
 void invalidate() {}
-void break_() {debugger_active=1; }
+void break_(uint8_t temporary) {debugger_active=1; }
 void resume() {}
 void detach() {}
 uint8_t restore(const char* file_path, uint16_t at, uint8_t set_pc) {
@@ -137,7 +138,7 @@ uint8_t restore(const char* file_path, uint16_t at, uint8_t set_pc) {
     return 1;
 }
 
-static void do_nothing(uint8_t type, uint16_t at, uint8_t sz) {}
+static breakpoint_ret_t do_nothing(uint8_t type, uint16_t at, uint8_t sz) { return BREAKPOINT_ERROR_OK; }
 
 void next()
 {
@@ -176,6 +177,11 @@ void step()
     debugger_active = 1;
 }
 
+static void ctrl_c()
+{
+    break_required = 1;
+}
+
 uint8_t breakpoints_check()
 {
     return debugger_active == 0;
@@ -209,5 +215,10 @@ backend_t ticks_debugger_backend = {
     .disable_breakpoint = &do_nothing,
     .enable_breakpoint = &do_nothing,
     .breakpoints_check = &breakpoints_check,
-    .is_verbose = is_verbose
+    .is_verbose = is_verbose,
+    .remote_connect = NULL,
+    .console = stdout_log,
+    .debug = stdout_log,
+    .execution_stopped = NULL,
+    .ctrl_c = ctrl_c
 };

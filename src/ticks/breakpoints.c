@@ -13,29 +13,86 @@ breakpoint *watchpoints;
 
 // temporary breakpoints live to the point one of them is hit. in that case all of them has to be removed
 temporary_breakpoint_t* temporary_breakpoints = NULL;
+int next_breakpoint_number = 1;
+int break_required = 0;
 
 breakpoint* add_breakpoint(breakpoint_type type, enum bk_breakpoint_type bk_type, 
     int bk_size, int value, const char* text) {
     breakpoint* elem = calloc(1, sizeof(breakpoint));
-    
+
+    elem->number = next_breakpoint_number++;
     elem->type = type;
     elem->value = value;
     elem->enabled = 1;
     elem->text = NULL;
     LL_APPEND(breakpoints, elem);
-    
-    bk.add_breakpoint(bk_type, value, bk_size);
+
+    switch (bk.add_breakpoint(bk_type, value, bk_size)) {
+        case BREAKPOINT_ERROR_OK: {
+            break;
+        }
+        case BREAKPOINT_ERROR_RUNNING: {
+            bk.break_(1);
+            /* fallthrough */
+        }
+        case BREAKPOINT_ERROR_NOT_CONNECTED:
+        default: {
+            elem->pending_add = 1;
+            break;
+        }
+    }
+
     return elem;
 }
 
 void delete_breakpoint(breakpoint* b) {
-    bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, b->value, 1);
+    switch (bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, b->value, 1)) {
+        case BREAKPOINT_ERROR_OK: {
+            break;
+        }
+        case BREAKPOINT_ERROR_RUNNING: {
+            bk.break_(1);
+            /* fallthrough */
+        }
+        case BREAKPOINT_ERROR_NOT_CONNECTED:
+        default: {
+            b->pending_remove = 1;
+            return;
+        }
+    }
+
     LL_DELETE(breakpoints, b);
+
     if (b->text) {
         free(b->text);
         b->text = NULL;
     }
     free(b);
+}
+
+void delete_all_breakpoints() {
+    breakpoint *elem, *tmp;
+    LL_FOREACH_SAFE(breakpoints, elem, tmp) {
+        bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, elem->value, 1);
+
+        LL_DELETE(breakpoints, elem);
+
+        if (elem->text) {
+            free(elem->text);
+            elem->text = NULL;
+        }
+        free(elem);
+    }
+}
+
+breakpoint* find_breakpoint(int number) {
+    breakpoint *elem;
+    LL_FOREACH(breakpoints, elem) {
+        if (elem->number == number) {
+            return elem;
+        }
+    }
+    return NULL;
 }
 
 temporary_breakpoint_t* add_temporary_internal_breakpoint(uint32_t address, temporary_breakpoint_reason_t reason,
@@ -108,28 +165,33 @@ uint8_t process_temp_breakpoints() {
                 }
                 case TMP_REASON_STEP_SOURCE_LINE:
                 case TMP_REASON_NEXT_SOURCE_LINE: {
-                    const char *filename;
-                    int   lineno;
-                    const unsigned short pc = bk.pc();
-                    if (debug_find_source_location(pc, &filename, &lineno) < 0) {
-                        // don't know where we are, keep going
-                        if (reason == TMP_REASON_STEP_SOURCE_LINE) {
-                            bk.step();
-                        } else {
-                            bk.next();
-                        }
-                        return 0;
-                    }
-                    // we're still on the same source line
-                    if ((strcmp(filename, temp_br->source_file) == 0) && (lineno == temp_br->source_line)) {
-                        if (reason == TMP_REASON_STEP_SOURCE_LINE) {
-                            bk.step();
-                        } else {
-                            bk.next();
-                        }
-                        return 0;
-                    } else {
+                    if (temp_br->source_file == NULL) {
+                        // breakpoint was shady to begin with
                         dodebug = 1;
+                    } else {
+                        const char *filename;
+                        int   lineno;
+                        const unsigned short pc = bk.pc();
+                        if (debug_find_source_location(pc, &filename, &lineno) < 0) {
+                            // don't know where we are, keep going
+                            if (reason == TMP_REASON_STEP_SOURCE_LINE) {
+                                bk.step();
+                            } else {
+                                bk.next();
+                            }
+                            return 0;
+                        }
+                        // we're still on the same source line
+                        if ((strcmp(filename, temp_br->source_file) == 0) && (lineno == temp_br->source_line)) {
+                            if (reason == TMP_REASON_STEP_SOURCE_LINE) {
+                                bk.step();
+                            } else {
+                                bk.next();
+                            }
+                            return 0;
+                        } else {
+                            dodebug = 1;
+                        }
                     }
                     break;
                 }

@@ -223,6 +223,78 @@ void expression_resolve_struct_member(struct expression_result_t *struct_, const
     sprintf(result->as_error, "Cannot find child member '%s' on an type <%s>", member, tp);
 }
 
+void expression_get_struct_members(struct expression_result_t* result, int* count, char** members)
+{
+    *count = 0;
+
+    if (result->type.first->type_ == TYPE_GENERIC_POINTER ||
+        result->type.first->type_ == TYPE_CODE_POINTER) {
+
+        struct expression_result_t dereferenced = {};
+        expression_dereference_pointer(result, &dereferenced);
+        expression_get_struct_members(&dereferenced, count, members);
+        expression_result_free(&dereferenced);
+
+        return;
+    }
+
+    if (result->type.first->type_ != TYPE_STRUCTURE) {
+        return;
+    }
+
+    const char* struct_name = result->type.first->data;
+    if (struct_name == NULL) {
+        return;
+    }
+    debug_sym_type* t = cdb_find_type(struct_name);
+    if (t == NULL) {
+        bk.debug("No debug information on struct %s\n", struct_name);
+        return;
+    }
+    debug_sym_type_member* child = t->first_child;
+    while (child) {
+        if (members == NULL) {
+            (*count)++;
+        } else {
+            members[(*count)++] = (char*)child->symbol->symbol_name;
+        }
+        child = child->next;
+    }
+}
+
+int expression_count_members(struct expression_result_t* result)
+{
+    int num_child = 0;
+
+    if (result->type.first == NULL) {
+        return 0;
+    }
+
+    switch (result->type.first->type_)
+    {
+        case TYPE_CODE_POINTER:
+        case TYPE_GENERIC_POINTER:
+        {
+            struct expression_result_t dereferenced = {};
+            expression_dereference_pointer(result, &dereferenced);
+            num_child = expression_count_members(&dereferenced);
+            expression_result_free(&dereferenced);
+            break;
+        }
+        case TYPE_STRUCTURE:
+        {
+            expression_get_struct_members(result, &num_child, NULL);
+            break;
+        }
+        default:
+        {
+            return 0;
+        }
+    }
+
+    return num_child;
+}
+
 void expression_string_get_type(const char* str, type_record* type) {
     if (strstr(str, "struct ") == str) {
         str += 7;
@@ -264,7 +336,7 @@ void expression_result_type_to_string(type_record* root, type_chain* type, char*
             if (type->next == NULL) {
                 sprintf(buffer, "void*");
             } else {
-                char pointer_type[128];
+                char pointer_type[128] = {};
                 expression_result_type_to_string(root, type->next, pointer_type);
                 sprintf(buffer, "%s*", pointer_type);
             }
@@ -282,6 +354,10 @@ void expression_result_type_to_string(type_record* root, type_chain* type, char*
         }
         case TYPE_STRUCTURE: {
             sprintf(buffer, "struct %s", type->data);
+            break;
+        }
+        case TYPE_FUNCTION: {
+            sprintf(buffer, "function");
             break;
         }
         default: {
@@ -603,7 +679,7 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
                         }
                     }
                     buff[i] = 0;
-                    return snprintf(buffer, buffer_len, "%#04x(\"%s\")", result->as_pointer.ptr, buff);
+                    return snprintf(buffer, buffer_len, "%#04x('%s')", result->as_pointer.ptr, buff);
                 }
                 default: {
                     return snprintf(buffer, buffer_len, "%#04x", result->as_pointer.ptr);
@@ -697,4 +773,18 @@ void convert_expression(struct expression_result_t* from, struct expression_resu
 
 struct expression_result_t* get_expression_result() {
     return &expression_result;
+}
+
+void exp_engine_init()
+{
+    {
+        struct history_expression_t* he = calloc(1, sizeof(struct history_expression_t));
+        strcpy(he->name, "$fp");
+
+        he->result.type.first = malloc_type(TYPE_INT);
+        he->result.as_int = 0;
+
+        HASH_ADD_STR(history_expressions, name, he);
+    }
+
 }

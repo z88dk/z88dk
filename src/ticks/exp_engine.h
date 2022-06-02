@@ -34,6 +34,7 @@ struct history_expression_t {
 
 extern struct history_expression_t* history_expressions;
 
+extern void exp_engine_init();
 extern void evaluate_expression_string(const char* expr);
 extern uint8_t is_expression_result_error(struct expression_result_t* result);
 extern void set_expression_result_error(struct expression_result_t* result);
@@ -51,6 +52,8 @@ extern void expression_math_sub(struct expression_result_t* a, struct expression
 extern void expression_math_mul(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result);
 extern void expression_math_div(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result);
 extern void expression_string_get_type(const char* str, type_record* type);
+extern void expression_get_struct_members(struct expression_result_t* result, int* count, char** members);
+extern int expression_count_members(struct expression_result_t* result);
 extern int expression_result_value_to_string(struct expression_result_t* result, char* buffer, int buffer_len);
 extern void zero_expression_result(struct expression_result_t* result);
 extern struct expression_result_t* get_expression_result();

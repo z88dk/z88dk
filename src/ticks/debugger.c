@@ -8,6 +8,8 @@
 #include <io.h>
 #else
 #include <unistd.h>                         // For declarations of isatty()
+#include <stdarg.h>
+
 #endif
 
 #include "debugger.h"
@@ -132,10 +134,10 @@ static int cmd_list(int argc, char **argv);
 static int cmd_del_break(int argc, char **argv);
 static int cmd_restore(int argc, char **argv);
 static int cmd_restore_pc(int argc, char **argv);
+static int cmd_typeof(int argc, char **argv);
 static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
 static void print_hotspots();
-static const char *resolve_to_label(int addr);
 
 static command commands[] = {
     { "si",        cmd_step,        "",  NULL },
@@ -171,6 +173,7 @@ static command commands[] = {
     { "hotspot",   cmd_hotspot,     "<on/off>",             "Track address counts and write to hotspots file"},
     { "list",      cmd_list,        "[<address>]",          "List the source code at location given or pc"},
     { "help",      cmd_help,        "",                     "Display this help text" },
+    { "whatis/rmt",cmd_typeof,      "",                     NULL },
     { "restore",   cmd_restore,     "<path> [<address>]",   "Upload binary into machine memory, keep PC intact"},
     { "restore_pc",cmd_restore_pc,  "<path> [<address>]",   "Upload binary into machine memory and set PC to that address"},
     { "quit",      cmd_quit,        "",   "Quit ticks"},
@@ -193,7 +196,6 @@ static struct {
 };
 
        int debugger_active = 0;
-       int break_required = 0;
        int next_address = -1;
        int trace = 0;
        int trace_source = 0;
@@ -203,13 +205,13 @@ static int last_hotspot_addr;
 static int last_hotspot_st;
 static int hotspots[65536];
 static int hotspots_t[65536];
-static size_t current_frame = 0;
+size_t current_frame = 0;
 static int last_stacktrace_at = 0;
 
 static int interact_with_tty = 0;
 
 void ctrl_c_handler(int dummy) {
-    break_required = 1;
+    bk.ctrl_c();
 }
 
 void debugger_init()
@@ -220,6 +222,7 @@ void debugger_init()
     atexit(print_hotspots);
     memset(hotspots, 0, sizeof(hotspots));
     interact_with_tty = isatty(fileno(stdin)) && isatty(fileno(stdout)); // Only colors with active tty
+    exp_engine_init();
 }
 
 void unwrap_reg(uint16_t data, uint8_t* h, uint8_t* l)
@@ -265,8 +268,8 @@ void debugger_process_signals()
     if (break_required)
     {
         if (bk.breakable) {
-            printf("Requesting a break...\n");
-            bk.break_();
+            bk.console("Requesting a break...\n");
+            bk.break_(0);
         } else {
             if (confirm("Cannot request a break, would you like to quit instead?"))
             {
@@ -276,6 +279,44 @@ void debugger_process_signals()
         break_required = 0;
         return;
     }
+}
+
+int debugger_evaluate(char* line)
+{
+    int return_to_execution = 0;
+
+    int argc;
+    char** argv = parse_words(line, &argc);
+
+    if ( argc > 0 ) {
+        command *cmd = &commands[0];
+        command* ambiguous_commands[16] = {0};
+        int ambigious_commands_num = 0;
+        while ( cmd->cmd ) {
+            if ( strcmp(argv[0], cmd->cmd) == 0 ) {
+                return_to_execution = cmd->func(argc, argv);
+                ambigious_commands_num = 0;
+                break;
+            }
+            if ( strstr(cmd->cmd, argv[0]) == cmd->cmd) {
+                if (ambigious_commands_num < 16) {
+                    ambiguous_commands[ambigious_commands_num++] = cmd;
+                }
+            }
+            cmd++;
+        }
+        if (ambigious_commands_num == 1)
+        {
+            return_to_execution = ambiguous_commands[0]->func(argc, argv);
+        } else if (ambigious_commands_num > 1) {
+            bk.console("The following commands could match, which one is ambiguous:\n");
+            for (int i = 0; i < ambigious_commands_num; i++) {
+                bk.console("    %s\n", ambiguous_commands[i]->cmd);
+            }
+        }
+        free(argv);
+    }
+    return return_to_execution;
 }
 
 void debugger()
@@ -294,9 +335,9 @@ void debugger()
         disassemble2(bk.pc(), buf, sizeof(buf), 0);
 
         if (interact_with_tty)
-            printf( "\n%s\n\n",buf);    // In case of active tty, double LF to improve layout in case of 'cont'
+            bk.console( "\n%s\n\n",buf);    // In case of active tty, double LF to improve layout in case of 'cont'
         else
-            printf("%s\n",buf);         // Unchanged in case of non-active tty
+            bk.console("%s\n",buf);         // Unchanged in case of non-active tty
     }
 
     if ( hotspot ) {
@@ -330,18 +371,18 @@ void debugger()
             }
 
             if ( elem->type == BREAK_PC && elem->value == bk.pc() ) {
-                printf("Hit breakpoint %d: @%04x (%s)\n",i,bk.pc(),resolve_to_label(bk.pc()));
+                bk.console("Hit breakpoint %d: @%04x (%s)\n",i,bk.pc(),resolve_to_label(bk.pc()));
                 dodebug=1;
                 break;
             } else if ( elem->type == BREAK_CHECK8 && bk.get_memory(elem->lcheck_arg) == elem->lvalue ) {
-                printf("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
                 elem->enabled = 0;
                 dodebug=1;
                 break;
             } else if ( elem->type == BREAK_CHECK16 &&
                 bk.get_memory(elem->lcheck_arg) == elem->lvalue  &&
                 bk.get_memory(elem->hcheck_arg) == elem->hvalue  ) {
-                printf("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
                 elem->enabled = 0;
                 dodebug=1;
                 break;
@@ -361,14 +402,14 @@ void debugger()
                     lc = ((uint8_t *)r->word(&regs));
 #endif
                     if (*lc == elem->lvalue && *hc == elem->hvalue) {
-                        printf("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                        bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
                         elem->enabled = 0;
                         dodebug=1;
                         break;
                     }
                 } else if (r->high == NULL) {
                     if (*(r->low(&regs)) == elem->lvalue) {
-                        printf("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                        bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
                         elem->enabled = 0;
                         dodebug=1;
                         break;
@@ -376,7 +417,7 @@ void debugger()
                 } else {
                     if (*(r->low(&regs)) == elem->lvalue && *(r->high(&regs)) == elem->hvalue)
                     {
-                        printf("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                        bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
                         elem->enabled = 0;
                         dodebug=1;
                         break;
@@ -403,14 +444,14 @@ void debugger()
         int   lineno;
         if ( debug_find_source_location(bk.pc(), &filename, &lineno) < 0 ) {
             disassemble2(bk.pc(), buf, sizeof(buf), 0);
-            printf("%s\n",buf);
+            bk.console("%s\n",buf);
         } else {
-            printf("%s:\n", filename);
+            bk.console("%s:\n", filename);
             srcfile_display(filename, lineno - 1, 2, lineno);
         }
     } else if (trace == 0) { // Prevent two lines with the same information
         disassemble2(bk.pc(), buf, sizeof(buf), 0);
-        printf("%s\n",buf);
+        bk.console("%s\n",buf);
     }
 
     /* In the debugger, loop continuously for commands */
@@ -447,41 +488,9 @@ void debugger()
         }
 
         if (line[0] != '\0' && line[0] != '/') {
-            int return_to_execution = 0;
             linenoiseHistoryAdd(line); /* Add to the history. */
             linenoiseHistorySave(HISTORY_FILE); /* Save the history on disk. */
-
-            /* Lets chop the line up into words now */
-            argv = parse_words(line, &argc);
-
-            if ( argc > 0 ) {
-                command *cmd = &commands[0];
-                command* ambiguous_commands[16] = {0};
-                int ambigious_commands_num = 0;
-                while ( cmd->cmd ) {
-                    if ( strcmp(argv[0], cmd->cmd) == 0 ) {
-                        return_to_execution = cmd->func(argc, argv);
-                        ambigious_commands_num = 0;
-                        break;
-                    }
-                    if ( strstr(cmd->cmd, argv[0]) == cmd->cmd) {
-                        if (ambigious_commands_num < 16) {
-                            ambiguous_commands[ambigious_commands_num++] = cmd;
-                        }
-                    }
-                    cmd++;
-                }
-                if (ambigious_commands_num == 1)
-                {
-                    return_to_execution = ambiguous_commands[0]->func(argc, argv);
-                } else if (ambigious_commands_num > 1) {
-                    printf("The following commands could match, which one is ambiguous:\n");
-                    for (int i = 0; i < ambigious_commands_num; i++) {
-                        printf("    %s\n", ambiguous_commands[i]->cmd);
-                    }
-                }
-                free(argv);
-            }
+            int return_to_execution = debugger_evaluate(line);
             if ( freeline ) free(line);
             if ( return_to_execution ) {
                 /* Out of the linenoise loop */
@@ -490,7 +499,7 @@ void debugger()
         } else {
             /* Empty line is step */
             if ( freeline ) free(line);
-            bk.break_();
+            bk.break_(0);
             break;
         }
     }
@@ -511,7 +520,7 @@ static int cmd_next_source(int argc, char **argv)
     int   lineno;
     const unsigned short pc = bk.pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
-        printf("Warning: cannot obtain current source line.\n");
+        bk.console("Warning: cannot obtain current source line.\n");
         return 0;
     }
     add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_NEXT_SOURCE_LINE, filename, lineno);
@@ -531,7 +540,7 @@ static int cmd_step_source(int argc, char **argv)
     int   lineno;
     const unsigned short pc = bk.pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
-        printf("Warning: cannot obtain current source line.\n");
+        bk.console("Warning: cannot obtain current source line.\n");
         return 0;
     }
 
@@ -602,18 +611,18 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
             }
 
             if (fp->offset == 0xFFFF) {
-                printf("%sfunction %s+??? (unreliable offset, %s)\n       at %s\n", frame_marker,
+                bk.console("%sfunction %s+??? (unreliable offset, %s)\n       at %s\n", frame_marker,
                     fn->function_name, function_args, fp->filename);
             } else {
-                printf("%sfunction %s+%d (%s)\n       at %s:%d\n", frame_marker,
+                bk.console("%sfunction %s+%d (%s)\n       at %s:%d\n", frame_marker,
                     fn->function_name, fp->offset, function_args,
                     fp->filename, fp->lineno);
             }
         } else {
             if (fp->offset == 0xFFFF) {
-                printf("%s%s+??? (unreliable offset) at %s\n", frame_marker, sym->name, fp->filename);
+                bk.console("%s%s+??? (unreliable offset) at %s\n", frame_marker, sym->name, fp->filename);
             } else {
-                printf("%s%s+%d at %s:%d\n", frame_marker, sym->name, fp->offset, fp->filename, fp->lineno);
+                bk.console("%s%s+%d at %s:%d\n", frame_marker, sym->name, fp->offset, fp->filename, fp->lineno);
             }
         }
 
@@ -633,9 +642,9 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
             }
         }
         if (sym) {
-            printf("%s%s+%d\n       at %s\n", frame_marker, sym->name, fp->offset, location);
+            bk.console("%s%s+%d\n       at %s\n", frame_marker, sym->name, fp->offset, location);
         } else {
-            printf("%s$%04x\n       at %s\n", frame_marker, fp->address, location);
+            bk.console("%s$%04x\n       at %s\n", frame_marker, fp->address, location);
         }
     }
 }
@@ -662,10 +671,10 @@ static int cmd_frame(int argc, char **argv)
 
     debug_frame_pointer* frame_at = debug_stack_frames_at(first_frame_pointer, current_frame);
     if (frame_at != NULL) {
-        printf("frame %zu\n", current_frame);
+        bk.console("frame %zu\n", current_frame);
         print_frame(frame_at, frame_at, stack);
     } else {
-        printf("frame unknown.\n");
+        bk.console("frame unknown.\n");
     }
 
     debug_stack_frames_free(first_frame_pointer);
@@ -782,7 +791,7 @@ static int cmd_print(int argc, char **argv)
     struct expression_result_t* result = get_expression_result();
     if (is_expression_result_error(result))
     {
-        printf("Error: %s\n", result->as_error);
+        bk.console("Error: %s\n", result->as_error);
         return 0;
     }
 
@@ -794,7 +803,7 @@ static int cmd_print(int argc, char **argv)
 
     char result_id[32];
     sprintf(result_id, "$%d", ++last_evaluation_id);
-    printf("%s = <%s> %s\n", result_id, type, value);
+    bk.console("%s = <%s> %s\n", result_id, type, value);
     free(value);
 
     struct history_expression_t* he = calloc(1, sizeof(struct history_expression_t));
@@ -807,29 +816,27 @@ static int cmd_print(int argc, char **argv)
 
 static void print_breakpoints() {
     breakpoint *elem;
-    int         i = 1;
     LL_FOREACH(breakpoints, elem) {
         if ( elem->type == BREAK_PC) {
             uint16_t offset = 0;
             symbol* sym = symbol_find_lower(elem->value, SYM_ADDRESS, &offset);
             if (sym) {
-                printf("%d:\tPC = $%04x (%s+%d) %s\n",i, elem->value, sym->name, offset, elem->enabled ? "" : " (disabled)");
+                bk.console("%d:\tPC = $%04x (%s+%d) %s\n", elem->number, elem->value, sym->name, offset, elem->enabled ? "" : " (disabled)");
             } else {
-                printf("%d:\tPC = $%04x (%s) %s\n",i, elem->value, "<unknown>", elem->enabled ? "" : " (disabled)");
+                bk.console("%d:\tPC = $%04x (%s) %s\n",  elem->number, elem->value, "<unknown>", elem->enabled ? "" : " (disabled)");
             }
         } else if ( elem->type == BREAK_CHECK8 ) {
-            printf("%d\t%s = $%02x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
+            bk.console("%d\t%s = $%02x%s\n", elem->number, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
         } else if ( elem->type == BREAK_CHECK16 ) {
-            printf("%d\t%s = $%04x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
+            bk.console("%d\t%s = $%04x%s\n", elem->number, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
         }  else if ( elem->type == BREAK_REGISTER ) {
             struct reg* r = &registers[elem->lcheck_arg];
             if (r->high == NULL && r->word == NULL) {
-                printf("%d\t%s = $%02x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
+                bk.console("%d\t%s = $%02x%s\n", elem->number, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
             } else {
-                printf("%d\t%s = $%04x%s\n",i, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
+                bk.console("%d\t%s = $%04x%s\n", elem->number, elem->text, elem->value, elem->enabled ? "" : " (disabled)");
             }
         }
-        i++;
     }
 }
 
@@ -854,19 +861,19 @@ static void info_section_locals() {
                 struct expression_result_t exp = {0};
                 debug_get_symbol_value_expression(s, fp, &exp);
                 if (is_expression_result_error(&exp)) {
-                    printf("  %s = <error>\n", s->symbol_name);
+                    bk.console("  %s = <error>\n", s->symbol_name);
                 } else {
                     char exp_type[128] = "unknown";
                     char* exp_value = malloc(2048);
                     strcpy(exp_value, "???");
                     expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
                     expression_result_value_to_string(&exp, exp_value, 2048);
-                    printf("  <%s>%s = %s\n", exp_type, s->symbol_name, exp_value);
+                    bk.console("  <%s>%s = %s\n", exp_type, s->symbol_name, exp_value);
                     free(exp_value);
                 }
                 expression_result_free(&exp);
             } else {
-                printf("  %s = <invalid>\n", s->symbol_name);
+                bk.console("  %s = <invalid>\n", s->symbol_name);
             }
             arg = arg->next;
         }
@@ -907,7 +914,7 @@ static void info_section_globals() {
         strcpy(exp_value, "???");
         expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
         expression_result_value_to_string(&exp, exp_value, 2048);
-        printf("  <%s>%s = %s\n", exp_type, s->symbol_name, exp_value);
+        bk.console("  <%s>%s = %s\n", exp_type, s->symbol_name, exp_value);
         free(exp_value);
         expression_result_free(&exp);
     }
@@ -934,15 +941,15 @@ static int cmd_info(int argc, char **argv)
         }
 
         if (matches_total > 1) {
-            printf("Warning: ambiguous information section, please elaborate.\n");
+            bk.console("Warning: ambiguous information section, please elaborate.\n");
             return 0;
         }
     }
 
-    printf("Warning: cannot identify information section. Available sections are:\n");
+    bk.console("Warning: cannot identify information section. Available sections are:\n");
 
     for (int i = 0; cmd_info_sections[i].cb; i++) {
-        printf("  %s - %s\n", cmd_info_sections[i].name, cmd_info_sections[i].help);
+        bk.console("  %s - %s\n", cmd_info_sections[i].name, cmd_info_sections[i].help);
     }
 
     return 0;
@@ -962,9 +969,9 @@ static int cmd_backtrace(int argc, char **argv)
         uint16_t offset;
         symbol* sym = symbol_find_lower(at, SYM_ADDRESS, &offset);
         if (sym != NULL) {
-            printf("Warning: no backtrace is available for symbol '%s'.\n", sym->name);
+            bk.console("Warning: no backtrace is available for symbol '%s'.\n", sym->name);
         } else {
-            printf("Warning: current location is unknown.\n");
+            bk.console("Warning: current location is unknown.\n");
             return 0;
         }
     }
@@ -1008,27 +1015,27 @@ static int cmd_stack(int argc, char **argv)
     bk.get_regs(&regs);
     uint16_t stack = regs.sp;
 
-    printf("Examining stack (%d values) starting from $%04x:\n", stack_size, stack);
+    bk.console("Examining stack (%d values) starting from $%04x:\n", stack_size, stack);
 
-    printf("Values: ");
+    bk.console("Values: ");
     uint16_t stack_summary = stack;
     for (int i = 0; i < stack_size; i++) {
         uint16_t value_at = (bk.get_memory((uint16_t)stack_summary + 1) << 8) + bk.get_memory((uint16_t)stack_summary);
-        printf("%04x ", value_at);
+        bk.console("%04x ", value_at);
         stack_summary += 2;
     }
 
-    printf("\nDetail:\n");
+    bk.console("\nDetail:\n");
     for (int i = 0; i < stack_size; i++) {
         uint16_t value_at = (bk.get_memory((uint16_t)stack + 1) << 8) + bk.get_memory((uint16_t)stack);
-        printf("  $%04x (offset %d): %04x\n", stack, i * 2, value_at);
+        bk.console("  $%04x (offset %d): %04x\n", stack, i * 2, value_at);
 
         uint16_t offset;
         symbol* sym = symbol_find_lower(value_at, SYM_ADDRESS, &offset);
         if (sym) {
-            printf("    $%04x %s (+%d)\n", sym->address, sym->name, offset);
+            bk.console("    $%04x %s (+%d)\n", sym->address, sym->name, offset);
         } else {
-            printf("    ?\n");
+            bk.console("    ?\n");
         }
 
         stack += 2;
@@ -1045,7 +1052,7 @@ static int cmd_stack(int argc, char **argv)
  * 2. A symbol
  * 3. A line expression
  */
-static int parse_address(char *arg, const char** corrected_source)
+int parse_address(char *arg, const char** corrected_source)
 {
     char temp[1024];
     int  where;
@@ -1067,7 +1074,7 @@ static int parse_address(char *arg, const char** corrected_source)
 }
 
 /* Map an address into a convenient label */
-static const char *resolve_to_label(int addr)
+const char *resolve_to_label(int addr)
 {
     static char tbuf[1024];
     const char *sym;
@@ -1110,7 +1117,7 @@ static int cmd_disassemble(int argc, char **argv)
         if (frame_at)
         {
             if (current_frame) {
-                printf("Showing disassembly at frame %zu ($%04x), current pc is at $%04x\n",
+                bk.console("Showing disassembly at frame %zu ($%04x), current pc is at $%04x\n",
                     current_frame, frame_at->address, pc);
             }
             where = frame_at->address;
@@ -1125,7 +1132,7 @@ static int cmd_disassemble(int argc, char **argv)
 
     while ( i < 10 ) {
        where += disassemble2(where, buf, sizeof(buf), 0);
-       printf("%s\n",buf);
+       bk.console("%s\n",buf);
        i++;
     }
     return 0;
@@ -1143,7 +1150,7 @@ static int cmd_registers(int argc, char **argv)
     bk.get_regs(&regs);
 
     if (interact_with_tty) {
-        printf(
+        bk.console(
             FNT_CLR "af " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
             FNT_CLR "bc " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
             FNT_CLR "de " FNT_RST "$" FNT_BLD "%04X" FNT_RST "   "
@@ -1176,7 +1183,7 @@ static int cmd_registers(int argc, char **argv)
             pc, bk.get_memory(pc), sp, (bk.get_memory(sp+1) << 8 | bk.get_memory(sp))
             );
     } else {  // Original output for non-active tty
-        printf("pc=%04X, [pc]=%02X,    bc=%04X,  de=%04X,  hl=%04X,  af=%04X, ix=%04X, iy=%04X\n"
+        bk.console("pc=%04X, [pc]=%02X,    bc=%04X,  de=%04X,  hl=%04X,  af=%04X, ix=%04X, iy=%04X\n"
                "sp=%04X, [sp]=%04X, bc'=%04X, de'=%04X, hl'=%04X, af'=%04X\n"
                "f: S=%d Z=%d H=%d P/V=%d N=%d C=%d\n",
                pc, bk.get_memory(pc), regs.c | regs.b << 8, regs.e | regs.d << 8, regs.l | regs.h << 8, bk.f() | regs.a << 8, regs.xl | regs.xh << 8, regs.yl | regs.yh << 8,
@@ -1187,7 +1194,20 @@ static int cmd_registers(int argc, char **argv)
     return 0;
 }
 
-static void delete_breakpoint_by_number(int b);
+static void breakpoint_deleted(breakpoint* b) {
+    bk.console("Deleted breakpoint %d\n", b->number);
+}
+
+static void delete_breakpoint_by_number_and_log(int number){
+    breakpoint* b = find_breakpoint(number);
+    if (b == NULL)
+    {
+        bk.console("Warning: unknown breakpoint.\n");
+        return;
+    }
+
+    delete_breakpoint(b);
+}
 
 static int cmd_watch(int argc, char **argv)
 {
@@ -1200,9 +1220,9 @@ static int cmd_watch(int argc, char **argv)
         /* Just show the breakpoints */
         LL_FOREACH(watchpoints, elem) {
             if ( elem->type == BREAK_READ) {
-                printf("%d:\t(read) @$%04x (%s) %s\n",i, elem->value,resolve_to_label(elem->value), elem->enabled ? "" : " (disabled)");
+                bk.console("%d:\t(read) @$%04x (%s) %s\n",i, elem->value,resolve_to_label(elem->value), elem->enabled ? "" : " (disabled)");
             } else if ( elem->type == BREAK_WRITE) {
-                printf("%d:\t(write) @$%04x (%s) %s\n",i, elem->value,resolve_to_label(elem->value), elem->enabled ? "" : " (disabled)");
+                bk.console("%d:\t(write) @$%04x (%s) %s\n",i, elem->value,resolve_to_label(elem->value), elem->enabled ? "" : " (disabled)");
             } 
             i++;
         }
@@ -1215,33 +1235,26 @@ static int cmd_watch(int argc, char **argv)
         int value = parse_address(argv[2], &corrected_source);
 
         if ( value != -1 ) {
-            elem = malloc(sizeof(*elem));
+            elem = calloc(1, sizeof(*elem));
+            elem->number = next_breakpoint_number++;
             elem->type = breakwrite ? BREAK_WRITE : BREAK_READ;
             elem->value = value;
             elem->enabled = 1;
             LL_APPEND(watchpoints, elem);
-            printf("Adding %s watchpoint at '%s' $%04x (%s)\n",breakwrite ? "write" : "read", corrected_source, value,  resolve_to_label(value));
+            bk.console("Adding %s watchpoint at '%s' $%04x (%s)\n",breakwrite ? "write" : "read", corrected_source, value,  resolve_to_label(value));
         } else {
-            printf("Cannot set watchpoint on '%s'\n", corrected_source);
+            bk.console("Cannot set watchpoint on '%s'\n", corrected_source);
         }
     } else if ( argc == 3 && strcmp(argv[1],"delete") == 0 ) {
         int num = atoi(argv[2]);
-        breakpoint *elem;
-        LL_FOREACH(watchpoints, elem) {
-            num--;
-            if ( num == 0 ) {
-                printf("Deleting watchpoint %d\n",atoi(argv[2]));
-                delete_breakpoint_by_number(elem);
-                break;
-            }
-        }
+        delete_breakpoint_by_number_and_log(num);
     } else if ( argc == 3 && strcmp(argv[1],"disable") == 0 ) {
         int num = atoi(argv[2]);
         breakpoint *elem;
         LL_FOREACH(watchpoints, elem) {
             num--;
             if ( num == 0 ) {
-                printf("Disabling watchpoint %d\n",atoi(argv[2]));
+                bk.console("Disabling watchpoint %d\n",atoi(argv[2]));
                 elem->enabled = 0;
                 break;
             }
@@ -1252,7 +1265,7 @@ static int cmd_watch(int argc, char **argv)
         LL_FOREACH(watchpoints, elem) {
             num--;
             if ( num == 0 ) {
-                printf("Enabling watchpoint %d\n",atoi(argv[2]));
+                bk.console("Enabling watchpoint %d\n",atoi(argv[2]));
                 elem->enabled = 1;
                 break;
             }
@@ -1287,7 +1300,7 @@ static int cmd_finish(int argc, char **argv)
         return 1;
     } else {
         debug_stack_frames_free(first_frame_pointer);
-        printf("Warning: return address is unknown, cannot fin.\n");
+        bk.console("Warning: return address is unknown, cannot fin.\n");
     }
 
     return 0;
@@ -1295,7 +1308,7 @@ static int cmd_finish(int argc, char **argv)
 
 static uint8_t confirm(const char* message) {
     while (1) {
-        printf("%s (y/n)", message);
+        bk.console("%s (y/n)", message);
         fflush(stdout);
         char c;
         do {
@@ -1311,27 +1324,6 @@ static uint8_t confirm(const char* message) {
     return 0;
 }
 
-static void delete_all_breakpoints() {
-    printf("Deleting all breakpoints.\n");
-    breakpoint *elem, *tmp;
-    LL_FOREACH_SAFE(breakpoints, elem, tmp) {
-        delete_breakpoint(elem);
-    }
-}
-
-static void delete_breakpoint_by_number(int b) {
-    int num = b;
-    breakpoint *elem;
-    LL_FOREACH(breakpoints, elem) {
-        num--;
-        if ( num == 0 ) {
-            printf("Deleting breakpoint %d\n", b);
-            delete_breakpoint(elem);
-            break;
-        }
-    }
-}
-
 static int cmd_del_break(int argc, char **argv) {
     if (argc == 1) {
         if (confirm("Are you sure you want delete all breakpoints?")) {
@@ -1339,7 +1331,7 @@ static int cmd_del_break(int argc, char **argv) {
         }
     }
     if (argc == 2) {
-        delete_breakpoint_by_number(atoi(argv[1]));
+        delete_breakpoint_by_number_and_log(atoi(argv[1]));
     }
     return 0;
 }
@@ -1360,19 +1352,19 @@ static int cmd_break(int argc, char **argv)
 
         if ( value != -1 ) {
             elem = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, value, NULL);
-            printf("Adding breakpoint at '%s' $%04x (%s)\n", corrected_source, value,  resolve_to_label(value));
+            bk.console("Adding breakpoint at '%s' $%04x (%s)\n", corrected_source, value,  resolve_to_label(value));
         } else {
-            printf("Cannot break on '%s'\n", corrected_source);
+            bk.console("Cannot break on '%s'\n", corrected_source);
         }
     } else if ( argc == 3 && strcmp(argv[1],"delete") == 0 ) {
-        delete_breakpoint_by_number(atoi(argv[2]));
+        delete_breakpoint_by_number_and_log(atoi(argv[2]));
     } else if ( argc == 3 && strcmp(argv[1],"disable") == 0 ) {
         int num = atoi(argv[2]);
         breakpoint *elem;
         LL_FOREACH(breakpoints, elem) {
             num--;
             if ( num == 0 ) {
-                printf("Disabling breakpoint %d\n",atoi(argv[2]));
+                bk.console("Disabling breakpoint %d\n",atoi(argv[2]));
                 bk.disable_breakpoint(BK_BREAKPOINT_SOFTWARE, elem->value, 1);
                 elem->enabled = 0;
                 break;
@@ -1384,7 +1376,7 @@ static int cmd_break(int argc, char **argv)
         LL_FOREACH(breakpoints, elem) {
             num--;
             if ( num == 0 ) {
-                printf("Enabling breakpoint %d\n",atoi(argv[2]));
+                bk.console("Enabling breakpoint %d\n",atoi(argv[2]));
                 bk.enable_breakpoint(BK_BREAKPOINT_SOFTWARE, elem->value, 1);
                 elem->enabled = 1;
                 break;
@@ -1398,7 +1390,7 @@ static int cmd_break(int argc, char **argv)
         if ( value != -1 ) {
             breakpoint *elem = add_breakpoint(BREAK_CHECK8, BK_BREAKPOINT_WATCHPOINT, 1, value, strdup(argv[2]));
             elem->lvalue = parse_number(argv[4], &end);
-            printf("Adding breakpoint for %s = $%02x\n", elem->text, elem->lvalue);
+            bk.console("Adding breakpoint for %s = $%02x\n", elem->text, elem->lvalue);
         }
     } else if ( argc == 5 && strcmp(argv[1], "memory16") == 0 ) {
         char *end;
@@ -1411,7 +1403,7 @@ static int cmd_break(int argc, char **argv)
             elem->lvalue = value % 256;
             elem->hcheck_arg = addr+1;
             elem->hvalue = (value % 65536 ) /    256;
-            printf("Adding breakpoint for %s = $%02x%02x\n", elem->text, elem->hvalue, elem->lvalue);
+            bk.console("Adding breakpoint for %s = $%02x%02x\n", elem->text, elem->hvalue, elem->lvalue);
         }
     } else if ( argc == 5 && strncmp(argv[1], "register",3) == 0 ) {
         struct reg *search = &registers[0];
@@ -1432,12 +1424,12 @@ static int cmd_break(int argc, char **argv)
             elem->lvalue = (value % 256);
             elem->hvalue = (value % 65536) / 256;
             if ( elem->type == BREAK_CHECK8 ) {
-                printf("Adding breakpoint for %s = $%02x\n", elem->text, elem->lvalue);
+                bk.console("Adding breakpoint for %s = $%02x\n", elem->text, elem->lvalue);
             } else {
-                printf("Adding breakpoint for %s = $%02x%02x\n", elem->text, elem->hvalue, elem->lvalue);
+                bk.console("Adding breakpoint for %s = $%02x%02x\n", elem->text, elem->hvalue, elem->lvalue);
             }
         } else {
-            printf("No such register %s\n",argv[2]);
+            bk.console("No such register %s\n",argv[2]);
         }
 
     }
@@ -1470,22 +1462,44 @@ static int cmd_examine(int argc, char **argv)
 
         if ( i % 16 == 0 ) {                            // Handle line prefix 
             if (interact_with_tty) {
-                printf(FNT_CLR"%04X"FNT_RST":   ", addr);
+                bk.console(FNT_CLR"%04X"FNT_RST":   ", addr);
             } else {
-                printf("%04X:   ", addr);               // Non-color output for non-active tty
+                bk.console("%04X:   ", addr);               // Non-color output for non-active tty
             }
         }
 
-        printf("%02X ", b);                             // Hex dump of actual byte
+        bk.console("%02X ", b);                             // Hex dump of actual byte
 
-        if (i % 16 == 15) printf("   %s\n", abuf);      // Suffix line with ASCII dump
+        if (i % 16 == 15) bk.console("   %s\n", abuf);      // Suffix line with ASCII dump
 
         addr = (addr + 1) % 0x10000;                    // Next address with overflow correction
     }
     return 0;
 }
 
+static int cmd_typeof(int argc, char **argv)
+{
+    if (argc < 2)
+    {
+        bk.console("Warning: variable is not specified\n");
+        return 0;
+    }
 
+    evaluate_expression_string(argv[1]);
+
+    struct expression_result_t* result = get_expression_result();
+    if (is_expression_result_error(result))
+    {
+        bk.console("Error: %s\n", result->as_error);
+        return 0;
+    }
+
+    char type[128] = "unknown";
+    expression_result_type_to_string(&result->type, result->type.first, type);
+
+    bk.console("type = %s\n", type);
+    return 0;
+}
 
 static int cmd_set(int argc, char **argv)
 {
@@ -1520,7 +1534,7 @@ static int cmd_set(int argc, char **argv)
 
 
     } else {
-        printf("Incorrect number of arguments\n");
+        bk.console("Incorrect number of arguments\n");
     }
     return 1;
 }
@@ -1534,7 +1548,7 @@ static int cmd_out(int argc, char **argv)
         int port = parse_number(argv[1], &end);
         int value = parse_number(argv[2], &end);
 
-        printf("Writing IO: out(%d),%d\n",port,value);
+        bk.console("Writing IO: out(%d),%d\n",port,value);
         bk.out(port,value);
     }
     return 0;
@@ -1550,7 +1564,7 @@ static int cmd_trace(int argc, char **argv)
         } else if ( strcmp(argv[1],"off") == 0 ) {
             trace = 0;
         }
-        printf("Tracing is %s\n", trace ? "on" : "off");
+        bk.console("Tracing is %s\n", trace ? "on" : "off");
     }
     return 0;
 }
@@ -1565,7 +1579,7 @@ static int cmd_hotspot(int argc, char **argv)
         } else if ( strcmp(argv[1],"off") == 0 ) {
             hotspot = 0;
         }
-        printf("Hotspots are %s\n", hotspot ? "on" : "off");
+        bk.console("Hotspots are %s\n", hotspot ? "on" : "off");
     }
     return 0;
 }
@@ -1580,26 +1594,26 @@ static int cmd_help(int argc, char **argv)
         while ( cmd->cmd != NULL ) {
             if (cmd->help != NULL) {
                 if (interact_with_tty)
-                    printf(FNT_CLR"%-10s\t%-20s"FNT_RST"\t%s\n", cmd->cmd, cmd->options, cmd->help);
+                    bk.console(FNT_CLR"%-10s\t%-20s"FNT_RST"\t%s\n", cmd->cmd, cmd->options, cmd->help);
                 else // Original output for non-active tty
-                    printf("%-10s\t%-20s\t%s\n", cmd->cmd, cmd->options, cmd->help);
+                    bk.console("%-10s\t%-20s\t%s\n", cmd->cmd, cmd->options, cmd->help);
             }
             cmd++;
         }
     } else if ( strcmp(argv[1],"break") == 0 ) {
-        printf("break [address/label]             - Break at address\n");
-        printf("break delete [index]              - Delete breakpoint\n");
-        printf("break disable [index]             - Disable breakpoint\n");
-        printf("break enable [index]              - Enabled breakpoint\n");
-        printf("break memory8 [address] [value]   - Break when [address/label] is value\n");
-        printf("break memory16 [address] [value]  - Break when [address/label] is value\n");
-        printf("break register [register] [value] - Break when [register] is value\n");
+        bk.console("break [address/label]             - Break at address\n");
+        bk.console("break delete [index]              - Delete breakpoint\n");
+        bk.console("break disable [index]             - Disable breakpoint\n");
+        bk.console("break enable [index]              - Enabled breakpoint\n");
+        bk.console("break memory8 [address] [value]   - Break when [address/label] is value\n");
+        bk.console("break memory16 [address] [value]  - Break when [address/label] is value\n");
+        bk.console("break register [register] [value] - Break when [register] is value\n");
     } else if ( strcmp(argv[1],"watch") == 0 ) {
-        printf("watch delete [index]              - Delete breakpoint\n");
-        printf("watch disable [index]             - Disable breakpoint\n");
-        printf("watch enable [index]              - Enabled breakpoint\n");
-        printf("watch read [address]              - Break when [address] is read\n");
-        printf("watch write [address]             - Break when [address] is written\n");
+        bk.console("watch delete [index]              - Delete breakpoint\n");
+        bk.console("watch disable [index]             - Disable breakpoint\n");
+        bk.console("watch enable [index]              - Enabled breakpoint\n");
+        bk.console("watch read [address]              - Break when [address] is read\n");
+        bk.console("watch write [address]             - Break when [address] is written\n");
     }
      return 0;
 }
@@ -1627,7 +1641,7 @@ static int get_restore_address(int argc, char **argv)
     } else {
         int address = symbol_resolve("__head");
         if (address == -1) {
-            printf("Warning: could not resolve starting address and no address is provided.\n");
+            bk.console("Warning: could not resolve starting address and no address is provided.\n");
             return 0;
         }
         return address;
@@ -1702,11 +1716,11 @@ static int cmd_list(int argc, char **argv)
     }
 
     if (offset == 0xFFFF) {
-        printf("Warning: offset is unreliable, call could have happened from anywhere of this function.\n");
+        bk.console("Warning: offset is unreliable, call could have happened from anywhere of this function.\n");
     }
 
     if ( debug_find_source_location(addr, &filename, &lineno) < 0 ) {
-        printf("No mapping found for $%04x\n", addr);
+        bk.console("No mapping found for $%04x\n", addr);
         return 0;
     }
     srcfile_display(filename, lineno - 5, 10, lineno);
@@ -1731,5 +1745,40 @@ static void print_hotspots()
             }
         }
         fclose(fp);
+    }
+}
+
+void stdout_log(const char *fmt, ...)
+{
+    va_list args;
+    int len;
+
+    /* Initialize a variable argument list */
+    va_start(args, fmt);
+
+    /* Get length of format including arguments */
+    len = vsnprintf(NULL, 0, fmt, args);
+
+    /* End using variable argument list */
+    va_end(args);
+
+    if (len < 0) {
+        /* vsnprintf failed */
+        return;
+    } else {
+        /* Declare a character buffer for the formatted string */
+        char formatted[len + 1];
+
+        /* Initialize a variable argument list */
+        va_start(args, fmt);
+
+        /* Write the formatted output */
+        vsnprintf(formatted, sizeof(formatted), fmt, args);
+
+        /* End using variable argument list */
+        va_end(args);
+
+        /* Call the wrapped function using the formatted output and return */
+        printf("%s", formatted);
     }
 }
