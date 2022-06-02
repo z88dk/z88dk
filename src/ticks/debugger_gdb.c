@@ -537,12 +537,39 @@ uint8_t breakpoints_check()
 
 void debugger_next()
 {
+    extern int next_address;
     char  buf[100];
-    int len = disassemble2(bk.pc(), buf, sizeof(buf), 0);
+    int   len;
+    const unsigned short pc = bk.pc();
 
-    char req[64];
-    sprintf(req, "i%d", len);
-    schedule_write_packet(req);
+    uint8_t opcode = bk.get_memory(pc);
+
+    len = disassemble2(pc, buf, sizeof(buf), 0);
+
+    // Set a breakpoint after the call
+    switch ( opcode ) {
+        case 0xed: // ED prefix
+        case 0xcb: // CB prefix
+        case 0xc4:
+        case 0xcc:
+        case 0xcd:
+        case 0xd4:
+        case 0xdc:
+        case 0xe4:
+        case 0xec:
+        case 0xf4:
+        {
+            // It's a call, so step it over
+            char req[64];
+            sprintf(req, "i%d", len);
+            schedule_write_packet(req);
+            debugger_active = 0;
+            return;
+        }
+    }
+
+    // it's something else, so do a regular step
+    schedule_write_packet("s");
     debugger_active = 0;
 }
 

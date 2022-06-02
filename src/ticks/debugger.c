@@ -423,18 +423,14 @@ void debugger()
                         }
                         // we're still on the same source line
                         if ((strcmp(filename, temp_br->source_file) == 0) && (lineno == temp_br->source_line)) {
-                            remove_temp_breakpoints();
                             if (reason == TMP_REASON_STEP_SOURCE_LINE) {
-                                add_temporary_internal_breakpoint(0xFFFFFFFF, reason, filename, lineno);
                                 bk.step();
                             } else {
-                                char  b[100];
-                                int len = disassemble2(pc, b, sizeof(b), 0);
-                                add_temporary_internal_breakpoint(pc + len, reason, filename, lineno);
                                 bk.next();
                             }
                             return;
                         } else {
+                            remove_temp_breakpoints();
                             trace_source = 1;
                         }
                         break;
@@ -645,13 +641,7 @@ static int cmd_next_source(int argc, char **argv)
         printf("Warning: cannot obtain current source line.\n");
         return 0;
     }
-    uint16_t break_at;
-    {
-        char  buf[100];
-        int len = disassemble2(pc, buf, sizeof(buf), 0);
-        break_at = pc + len;
-    }
-    add_temporary_internal_breakpoint(break_at, TMP_REASON_NEXT_SOURCE_LINE, filename, lineno);
+    add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_NEXT_SOURCE_LINE, filename, lineno);
     bk.next();
     return 1;
 }
