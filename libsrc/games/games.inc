@@ -292,6 +292,12 @@ IF FORmikro80
     defc SOUND_ONEBIT_mask   = $2	;
 ENDIF
 
+IF FORtvc
+    defc SOUND_ONEBIT_port      = $06           ; PORT 6 sets volume
+    defc SOUND_ONEBIT_mask      = @00111100     ; 4 bit wide volume: 0 or 1 -> 0000 or 1111
+    defc SOUND_ONEBIT_bit       = 5             ; bit 5 is just fine to test (could be bit 2-5)
+ENDIF
+
 
 ; ********************************************************
 ;  SN76489 PSG chip definitions

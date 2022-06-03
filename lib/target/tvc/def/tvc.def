@@ -27,7 +27,9 @@ defc BON            = $08     ; Pen on paper
 defc BOFF           = $09     ; Pen off paper
 defc FILL           = $0A     ; Fill
 defc VID_DEFC       = $0B     ; Define a character
-defc PAL            = $0C     ; Define a palette color 
+defc PAL            = $0C     ; Define a palette color
+
+defc TONE_SET       = $33     ; Starts a tone for a specified amount of time (in ~20ms units), volume and tone.
 
 ; Special ports
 defc PORT_BORDER    = $00     ; color of the border - output only
@@ -36,7 +38,12 @@ defc PORT_MMAP      = $02     ; mapping of TVC memory
 ; Special addresses
 defc P_SAVE         = $0003   ; Save address of PORT 2, the memory mapping port
 defc PORT03         = $0B11   ; Save address of PORT 3, the keyboard row select and IO socket select port
+defc PORT05         = $0B12   ; Save address of PORT 5, (cas motor, sound enable/disable, sound IT, sound pitch hi-part)
 defc PORT06         = $0B13   ; Save address of PORT 6
+defc SND_ACTIVE     = $0B14   ; $00: no sound is being played by OS function
+                              ; $FF: sound is being played by OS function
+defc SND_IRQ        = $0B15   ; $00: a new OS sound play (TONE_SET) will wait till the actual sound being played.
+                              ; $FF: a new OS sound play (TONE_SET) will interrupt the actual sound being played.
 defc INTINC         = $0B1D   ; Address of the interrupt counter (happens once in each 20.096ms)
 defc L_MODE         = $0B4B   ; Mode of line draw: 0-overwrite, 1-OR, 2-AND, 3-XOR
 defc L_STYLE        = $0B4C   ; Line style (0-16)

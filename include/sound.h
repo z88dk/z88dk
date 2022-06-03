@@ -179,6 +179,10 @@ extern void __LIB__ playzb4(unsigned char *SamStart, unsigned int SamLen) __smal
   //#define BEEP_TSTATES 500000.0  /* (4 Mhz) Model II, Model IV or modified Model III */
 #endif
 
+#ifdef TVC
+  #define BEEP_TSTATES 390625.0  /* 3.125 Mhz */
+#endif
+
 #ifdef VG5000
   #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif

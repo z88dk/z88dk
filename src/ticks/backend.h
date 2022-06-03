@@ -1,6 +1,7 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 
+#include "breakpoints.h"
 #include <inttypes.h>
 
 struct debugger_regs_t;
@@ -19,14 +20,6 @@ typedef void (*void_cb)();
 typedef uint8_t (*uint8_t_cb)();
 typedef uint8_t (*breakpoints_check_cb)();
 typedef void (*breakpoint_cb)(uint8_t type, uint16_t at, uint8_t sz);
-
-enum bk_breakpoint_type
-{
-    BK_BREAKPOINT_SOFTWARE = 0,
-    BK_BREAKPOINT_HARDWARE = 1,
-    BK_BREAKPOINT_WATCHPOINT = 2,
-    BK_BREAKPOINT_REGISTER = 2,
-};
 
 typedef struct {
     get_longlong_cb st;

@@ -3,27 +3,6 @@
 
 #include <stdint.h>
 
-typedef enum {
-    BREAK_PC,
-    BREAK_REGISTER,
-    BREAK_CHECK8,
-    BREAK_CHECK16,
-    BREAK_READ,
-    BREAK_WRITE,
-} breakpoint_type;
-
-typedef struct breakpoint {
-    breakpoint_type    type;
-    int                value;
-    unsigned char      lvalue;
-    uint16_t           lcheck_arg;
-    unsigned char      hvalue;
-    uint16_t           hcheck_arg;
-    char               enabled;
-    char               *text;
-    struct breakpoint  *next;
-} breakpoint;
-
 extern int debugger_active;
 extern void      debugger_init();
 extern void      debugger();

@@ -5,6 +5,7 @@
 #include "debug.h"
 #include "backend.h"
 #include "disassembler.h"
+#include "breakpoints.h"
 
 uint8_t verbose = 0;
 
@@ -92,9 +93,6 @@ void set_regs(struct debugger_regs_t* regs)
     yl = regs->yl;
 }
 
-extern breakpoint *breakpoints;
-extern breakpoint *watchpoints;
-
 void debugger_write_memory(int addr, uint8_t val)
 {
     breakpoint *elem;
@@ -138,10 +136,8 @@ uint8_t restore(const char* file_path, uint16_t at, uint8_t set_pc) {
     printf("Not supported.\n");
     return 1;
 }
-void add_breakpoint(uint8_t type, uint16_t at, uint8_t sz) {}
-void remove_breakpoint(uint8_t type, uint16_t at, uint8_t sz) {}
-void disable_breakpoint(uint8_t type, uint16_t at, uint8_t sz) {}
-void enable_breakpoint(uint8_t type, uint16_t at, uint8_t sz) {}
+
+static void do_nothing(uint8_t type, uint16_t at, uint8_t sz) {}
 
 void next()
 {
@@ -208,10 +204,10 @@ backend_t ticks_debugger_backend = {
     .confirm_detach_w_breakpoints = 0,
     .detach = &detach,
     .restore = &restore,
-    .add_breakpoint = &add_breakpoint,
-    .remove_breakpoint = &remove_breakpoint,
-    .disable_breakpoint = &disable_breakpoint,
-    .enable_breakpoint = &enable_breakpoint,
+    .add_breakpoint = &do_nothing,
+    .remove_breakpoint = &do_nothing,
+    .disable_breakpoint = &do_nothing,
+    .enable_breakpoint = &do_nothing,
     .breakpoints_check = &breakpoints_check,
     .is_verbose = is_verbose
 };

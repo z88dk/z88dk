@@ -922,7 +922,8 @@ tvc_clib.lib:
 	@echo ''
 	$(call buildgeneric,tvc)
 	$(MAKE) -C games TARGET=tvc
-	$(MAKE) -C target/tvc
+	$(MAKE) -C target/tvc/sound TARGET=tvc
+	$(MAKE) -C target/tvc TARGET=tvc
 	TARGET=tvc TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORtvc -x$(OUTPUT_DIRECTORY)/tvc_clib @$(TARGET_DIRECTORY)/tvc/tvc.lst
 
 # Videoton TV Computer ROM implemented graphics library - Sandor

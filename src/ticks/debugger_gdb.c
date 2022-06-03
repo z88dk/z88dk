@@ -480,7 +480,7 @@ void debugger_resume()
     send_request_no_response("c");
 }
 
-void add_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
+void gdb_add_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
     switch (type)
     {
@@ -505,7 +505,7 @@ void add_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
     }
 }
 
-void remove_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
+void gdb_remove_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
     char req[64];
     sprintf(req, "z%zx,%zx,%zx", (size_t)type, (size_t)at, (size_t)sz);
@@ -520,12 +520,12 @@ void remove_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
     }
 }
 
-void disable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
+void gdb_disable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
     printf("Warning: not supported.\n");
 }
 
-void enable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
+void gdb_enable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
     printf("Warning: not supported.\n");
 }
@@ -537,12 +537,39 @@ uint8_t breakpoints_check()
 
 void debugger_next()
 {
+    extern int next_address;
     char  buf[100];
-    int len = disassemble2(bk.pc(), buf, sizeof(buf), 0);
+    int   len;
+    const unsigned short pc = bk.pc();
 
-    char req[64];
-    sprintf(req, "i%d", len);
-    schedule_write_packet(req);
+    uint8_t opcode = bk.get_memory(pc);
+
+    len = disassemble2(pc, buf, sizeof(buf), 0);
+
+    // Set a breakpoint after the call
+    switch ( opcode ) {
+        case 0xed: // ED prefix
+        case 0xcb: // CB prefix
+        case 0xc4:
+        case 0xcc:
+        case 0xcd:
+        case 0xd4:
+        case 0xdc:
+        case 0xe4:
+        case 0xec:
+        case 0xf4:
+        {
+            // It's a call, so step it over
+            char req[64];
+            sprintf(req, "i%d", len);
+            schedule_write_packet(req);
+            debugger_active = 0;
+            return;
+        }
+    }
+
+    // it's something else, so do a regular step
+    schedule_write_packet("s");
     debugger_active = 0;
 }
 
@@ -631,10 +658,10 @@ static backend_t gdb_backend = {
     .confirm_detach_w_breakpoints = 1,
     .detach = &debugger_detach,
     .restore = &debugger_restore,
-    .add_breakpoint = &add_breakpoint,
-    .remove_breakpoint = &remove_breakpoint,
-    .disable_breakpoint = &disable_breakpoint,
-    .enable_breakpoint = &enable_breakpoint,
+    .add_breakpoint = &gdb_add_breakpoint,
+    .remove_breakpoint = &gdb_remove_breakpoint,
+    .disable_breakpoint = &gdb_disable_breakpoint,
+    .enable_breakpoint = &gdb_enable_breakpoint,
     .breakpoints_check = &breakpoints_check,
     .is_verbose = is_verbose
 };
