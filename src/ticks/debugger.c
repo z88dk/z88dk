@@ -740,7 +740,7 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
         // try static locals
         char sname[128];
         sprintf(sname, "st_%s_%s", fn->function_name, lookup->symbol_name);
-        debug_sym_symbol *s = cdb_find_symbol(sname);
+        debug_sym_symbol *s = cdb_find_symbol(sname, fp->filename);
         if (s != NULL && s->address_space.address_space == 'E') {
             debug_get_symbol_value_expression(s, fp, result);
             debug_stack_frames_free(first_frame_pointer);
@@ -749,7 +749,7 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
     }
 
     // try globals
-    debug_sym_symbol* s = cdb_find_symbol(lookup->symbol_name);
+    debug_sym_symbol* s = cdb_find_symbol(lookup->symbol_name, fp->filename);
     if (s != NULL && s->address_space.address_space == 'E') {
         debug_get_symbol_value_expression(s, fp, result);
         debug_stack_frames_free(first_frame_pointer);
@@ -762,7 +762,7 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
         utstring_init(&prefixed);
         utstring_printf(&prefixed, "_%s", lookup->symbol_name);
 
-        s = cdb_find_symbol(utstring_body(&prefixed));
+        s = cdb_find_symbol(utstring_body(&prefixed), fp->filename);
         if (s != NULL && s->address_space.address_space == 'E') {
             debug_get_symbol_value_expression(s, fp, result);
             debug_stack_frames_free(first_frame_pointer);
@@ -905,8 +905,32 @@ static void info_section_globals() {
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
 
-    for (debug_sym_symbol *s = cdb_get_first_symbol(); s != NULL; s = s->hh.next) {
-        // globals only
+    // file-local symbols
+    for (debug_sym_symbol *s = cdb_get_first_local_symbol(fp->filename); s != NULL; s = s->hh.next) {
+        if (s->address_space.address_space != 'E') {
+            continue;
+        }
+        if (s->type_record.first == NULL || (s->type_record.first->type_ == TYPE_FUNCTION)) {
+            continue;
+        }
+
+        struct expression_result_t exp = {0};
+        debug_get_symbol_value_expression(s, fp, &exp);
+
+        if (is_expression_result_error(&exp)) {
+            continue;
+        }
+
+        UT_string* exp_type = expression_result_type_to_string(&exp.type, exp.type.first);
+        UT_string* exp_value = expression_result_value_to_string(&exp);
+        bk.console("  <%s>%s = %s\n", utstring_body(exp_type), s->symbol_name, utstring_body(exp_value));
+        utstring_free(exp_value);
+        utstring_free(exp_type);
+        expression_result_free(&exp);
+    }
+
+    // globals only
+    for (debug_sym_symbol *s = cdb_get_first_global_symbol(); s != NULL; s = s->hh.next) {
         if (s->address_space.address_space != 'E') {
             continue;
         }
@@ -1070,10 +1094,10 @@ int parse_address(char *arg, const char** corrected_source)
 
     where = parse_number(arg, &end);
     if ( end == arg ) {
-        where = symbol_resolve(arg);
+        where = symbol_resolve(arg, NULL);
         if ( where == -1 ) {
             snprintf(temp,sizeof(temp),"_%s",arg);
-            where = symbol_resolve(temp);
+            where = symbol_resolve(temp, NULL);
             if ( where == -1 ) {
                 // And now try to resolve a line expression
                 where = debug_resolve_source(arg, corrected_source);
@@ -1644,9 +1668,9 @@ static int get_restore_address(int argc, char **argv)
     if ( argc == 3 ) {
         return parse_address(argv[2], NULL);
     } else {
-        int address = symbol_resolve("__head");
+        int address = symbol_resolve("__head", NULL);
         if (address == -1) {
-            bk.console("Warning: could not resolve starting address and no address is provided.\n");
+            bk.debug("Warning: could not resolve starting address and no address is provided.\n");
             return 0;
         }
         return address;

@@ -759,15 +759,15 @@ int main (int argc, char **argv){
           memory_model = argv[1];
           break;
         case 'p':
-          symbol_addr= symbol_resolve(argv[1]);
+          symbol_addr= symbol_resolve(argv[1], NULL);
           pc= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 's':
-          symbol_addr= symbol_resolve(argv[1]);
+          symbol_addr= symbol_resolve(argv[1], NULL);
           start= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 'e':
-          symbol_addr= symbol_resolve(argv[1]);
+          symbol_addr= symbol_resolve(argv[1], NULL);
           end= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 'r':
