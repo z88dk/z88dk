@@ -21,10 +21,6 @@ typedef enum {
     BREAK_WRITE,
 } breakpoint_type;
 
-typedef struct breakpoint breakpoint;
-
-typedef void (*breakpoint_deleted_cb)(breakpoint* b);
-
 typedef struct breakpoint {
     breakpoint_type         type;
     int                     value;
@@ -66,9 +62,12 @@ extern int break_required;
 extern int next_breakpoint_number;
 
 extern breakpoint* add_breakpoint(breakpoint_type type, enum bk_breakpoint_type bk_type, int bk_size, int value, const char* text);
+extern breakpoint* add_watchpoint(breakpoint_type operation, int value);
 extern void delete_breakpoint(breakpoint* b);
+extern void delete_watchpoint(breakpoint* w);
 extern void delete_all_breakpoints();
 extern breakpoint* find_breakpoint(int number);
+extern breakpoint* find_watchpoint(int number);
 
 extern temporary_breakpoint_t* add_temporary_internal_breakpoint(uint32_t address, temporary_breakpoint_reason_t reason,
     const char *source_filename, int source_lineno);

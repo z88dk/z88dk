@@ -1228,40 +1228,35 @@ static int cmd_watch(int argc, char **argv)
         int value = parse_address(argv[2], &corrected_source);
 
         if ( value != -1 ) {
-            elem = calloc(1, sizeof(*elem));
-            elem->number = next_breakpoint_number++;
-            elem->type = breakwrite ? BREAK_WRITE : BREAK_READ;
-            elem->value = value;
-            elem->enabled = 1;
-            LL_APPEND(watchpoints, elem);
-            bk.console("Adding %s watchpoint at '%s' $%04x (%s)\n",breakwrite ? "write" : "read", corrected_source, value,  resolve_to_label(value));
+            elem = add_watchpoint(breakwrite ? BREAK_WRITE : BREAK_READ, value);
+            bk.console("Adding %s watchpoint at '%s' $%04x (%s)\n",
+                breakwrite ? "write" : "read", corrected_source, value,  resolve_to_label(value));
         } else {
             bk.console("Cannot set watchpoint on '%s'\n", corrected_source);
         }
     } else if ( argc == 3 && strcmp(argv[1],"delete") == 0 ) {
-        int num = atoi(argv[2]);
-        delete_breakpoint_by_number_and_log(num);
+        breakpoint *elem = find_watchpoint(atoi(argv[2]));
+        if (elem) {
+            bk.console("Deleting watchpoint %d \n", atoi(argv[2]));
+            delete_watchpoint(elem);
+        } else {
+            bk.console("Unknown watchpoint\n");
+        }
     } else if ( argc == 3 && strcmp(argv[1],"disable") == 0 ) {
-        int num = atoi(argv[2]);
-        breakpoint *elem;
-        LL_FOREACH(watchpoints, elem) {
-            num--;
-            if ( num == 0 ) {
-                bk.console("Disabling watchpoint %d\n",atoi(argv[2]));
-                elem->enabled = 0;
-                break;
-            }
+        breakpoint *elem = find_watchpoint(atoi(argv[2]));
+        if (elem) {
+            bk.console("Disabling watchpoint %d\n", atoi(argv[2]));
+            elem->enabled = 0;
+        } else {
+            bk.console("Unknown watchpoint\n");
         }
     } else if ( argc == 3 && strcmp(argv[1],"enable") == 0 ) {
-        int num = atoi(argv[2]);
-        breakpoint *elem;
-        LL_FOREACH(watchpoints, elem) {
-            num--;
-            if ( num == 0 ) {
-                bk.console("Enabling watchpoint %d\n",atoi(argv[2]));
-                elem->enabled = 1;
-                break;
-            }
+        breakpoint *elem = find_watchpoint(atoi(argv[2]));
+        if (elem) {
+            bk.console("Enabling watchpoint %d\n",atoi(argv[2]));
+            elem->enabled = 1;
+        } else {
+            bk.console("Unknown watchpoint\n");
         }
     } 
     return 0;
