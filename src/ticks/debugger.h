@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#ifndef va_copy
+#define va_copy(a,b) (a)=(b)
+#endif
+
 extern int debugger_active;
 extern size_t current_frame;
 

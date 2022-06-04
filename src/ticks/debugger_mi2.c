@@ -1258,101 +1258,134 @@ static void* debugger_mi2_console_loop(void* arg) {
     return NULL;
 }
 
-static void slash(char* formatted)
+static UT_string* slash(UT_string* formatted)
 {
-    char* newline;
-    while ((newline = strchr(formatted, '\n')))
+    /*
+     * Find and replace '\n' (newline, 1 char) with '\\n' (two chars)
+     * Find and replace '\t' (tab, 1 char) with '\\t' (two chars)
+     */
+
     {
-        *newline = '\\';
-        newline++;
+        char* newline;
+        while ((newline = strchr(utstring_body(formatted), '\n')))
+        {
+            size_t left_side = newline - utstring_body(formatted);
 
-        // make way for '\n'
-        memmove(newline + 1, newline, strlen(newline) + 1);
+            UT_string* new_string;
+            utstring_new(new_string);
+            if (left_side) {
+                utstring_bincpy(new_string, utstring_body(formatted), left_side);
+            }
+            utstring_printf(new_string, "\\n");
+            if (strlen(++newline)) {
+                utstring_printf(new_string, "%s", newline);
+            }
 
-        *newline = 'n';
+            utstring_free(formatted);
+            formatted = new_string;
+        }
     }
 
-    char* tab;
-    while ((tab = strchr(formatted, '\t')))
     {
-        *tab = '\\';
-        tab++;
+        char* tab;
+        while ((tab = strchr(utstring_body(formatted), '\t')))
+        {
+            size_t left_side = tab - utstring_body(formatted);
 
-        // make way for '\n'
-        memmove(tab + 1, tab, strlen(tab) + 1);
+            UT_string* new_string;
+            utstring_new(new_string);
+            if (left_side) {
+                utstring_bincpy(new_string, utstring_body(formatted), left_side);
+            }
+            utstring_printf(new_string, "\\t");
+            if (strlen(++tab)) {
+                utstring_printf(new_string, "%s", tab);
+            }
 
-        *tab = 't';
+            utstring_free(formatted);
+            formatted = new_string;
+        }
     }
+
+    return formatted;
 }
 
 static void mi2_console_printf(const char *fmt, ...) {
     va_list args;
+    va_list args2;
     int len;
 
     /* Initialize a variable argument list */
     va_start(args, fmt);
+    va_copy(args2, args);
 
     /* Get length of format including arguments */
-    len = vsnprintf(NULL, 0, fmt, args);
+    len = vsnprintf(NULL, 0, fmt, args2);
 
     /* End using variable argument list */
-    va_end(args);
+    va_end(args2);
 
     if (len < 0) {
         return;
     } else {
         /* Declare a character buffer for the formatted string */
-        char formatted[len + 64];
+        UT_string* formatted;
+        utstring_new(formatted);
 
         /* Initialize a variable argument list */
         va_start(args, fmt);
 
         /* Write the formatted output */
-        vsnprintf(formatted, sizeof(formatted), fmt, args);
+        utstring_printf_va(formatted, fmt, args);
 
         /* End using variable argument list */
         va_end(args);
 
-        slash(formatted);
+        formatted = slash(formatted);
 
         /* Call the wrapped function using the formatted output and return */
-        printf("~\"%s\"\n", formatted);
+        printf("~\"%s\"\n", utstring_body(formatted));
+        utstring_free(formatted);
     }
 }
 
 static void mi2_internal_printf(const char *fmt, ...) {
     va_list args;
+    va_list args2;
     int len;
 
     /* Initialize a variable argument list */
     va_start(args, fmt);
+    va_copy(args2, args);
 
     /* Get length of format including arguments */
-    len = vsnprintf(NULL, 0, fmt, args);
+    len = vsnprintf(NULL, 0, fmt, args2);
 
     /* End using variable argument list */
-    va_end(args);
+    va_end(args2);
 
     if (len < 0) {
         /* vsnprintf failed */
         return;
     } else {
         /* Declare a character buffer for the formatted string */
-        char formatted[len + 64];
+        UT_string* formatted;
+        utstring_new(formatted);
 
         /* Initialize a variable argument list */
         va_start(args, fmt);
 
         /* Write the formatted output */
-        vsnprintf(formatted, sizeof(formatted), fmt, args);
+        utstring_printf_va(formatted, fmt, args);
 
         /* End using variable argument list */
         va_end(args);
 
-        slash(formatted);
+        formatted = slash(formatted);
 
         /* Call the wrapped function using the formatted output and return */
-        printf("&\"%s\"\n", formatted);
+        printf("&\"%s\"\n", utstring_body(formatted));
+        utstring_free(formatted);
     }
 }
 
