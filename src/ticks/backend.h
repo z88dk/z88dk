@@ -65,6 +65,7 @@ typedef struct {
     log_cb console;
     log_cb debug;
     connect_cb remote_connect;
+    uint8_t_cb is_remote_connected;
     void_cb execution_stopped;
     void_cb ctrl_c;
 } backend_t;

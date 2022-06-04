@@ -1,6 +1,7 @@
 
 #include "debugger_mi2.h"
 #include "backend.h"
+#include "breakpoints.h"
 #include "syms.h"
 #include "debug.h"
 #include "debugger.h"
@@ -27,36 +28,39 @@ static mi2_var* mi2_vars = NULL;
 
 typedef struct {
     char   *cmd;
-    void   (*func)(int argc, char **argv);
+    void   (*func)(const char* flow, int argc, char **argv);
 } command;
 
-static void cmd_exit(int argc, char **argv);
-static void cmd_do_nothing(int argc, char **argv);
-static void cmd_target_select(int argc, char **argv);
-static void cmd_target_detach(int argc, char **argv);
-static void cmd_show(int argc, char **argv);
-static void cmd_info(int argc, char **argv);
-static void cmd_maintenance(int argc, char **argv);
-static void cmd_continue(int argc, char **argv);
-static void cmd_file_exec_and_symbols(int argc, char **argv);
-static void cmd_break(int argc, char **argv);
-static void cmd_next(int argc, char **argv);
-static void cmd_next_instruction(int argc, char **argv);
-static void cmd_step(int argc, char **argv);
-static void cmd_fin(int argc, char **argv);
-static void cmd_break_insert(int argc, char **argv);
-static void cmd_break_delete(int argc, char **argv);
-static void cmd_thread_info(int argc, char **argv);
-static void cmd_data_disassemble(int argc, char **argv);
-static void cmd_plain_disassemble(int argc, char **argv);
-static void cmd_stack_list_frames(int argc, char **argv);
-static void cmd_stack_list_variables(int argc, char **argv);
-static void cmd_interpreter_exec(int argc, char **argv);
-static void cmd_evaluate_expression(int argc, char **argv);
-static void cmd_var_create(int argc, char **argv);
-static void cmd_var_delete(int argc, char **argv);
-static void cmd_var_evaluate_expression(int argc, char **argv);
-static void cmd_var_list_children(int argc, char **argv);
+static void cmd_exit(const char* flow, int argc, char **argv);
+static void cmd_do_nothing(const char* flow, int argc, char **argv);
+static void cmd_target_select(const char* flow, int argc, char **argv);
+static void cmd_target_detach(const char* flow, int argc, char **argv);
+static void cmd_show(const char* flow, int argc, char **argv);
+static void cmd_info(const char* flow, int argc, char **argv);
+static void cmd_maintenance(const char* flow, int argc, char **argv);
+static void cmd_continue(const char* flow, int argc, char **argv);
+static void cmd_file_exec_and_symbols(const char* flow, int argc, char **argv);
+static void cmd_break(const char* flow, int argc, char **argv);
+static void cmd_next(const char* flow, int argc, char **argv);
+static void cmd_next_instruction(const char* flow, int argc, char **argv);
+static void cmd_step(const char* flow, int argc, char **argv);
+static void cmd_fin(const char* flow, int argc, char **argv);
+static void cmd_break_insert(const char* flow, int argc, char **argv);
+static void cmd_break_delete(const char* flow, int argc, char **argv);
+static void cmd_thread_info(const char* flow, int argc, char **argv);
+static void cmd_data_disassemble(const char* flow, int argc, char **argv);
+static void cmd_plain_disassemble(const char* flow, int argc, char **argv);
+static void cmd_stack_info_depth(const char* flow, int argc, char **argv);
+static void cmd_stack_list_frames(const char* flow, int argc, char **argv);
+static void cmd_stack_list_variables(const char* flow, int argc, char **argv);
+static void cmd_interpreter_exec(const char* flow, int argc, char **argv);
+static void cmd_evaluate_expression(const char* flow, int argc, char **argv);
+static void cmd_var_create(const char* flow, int argc, char **argv);
+static void cmd_var_delete(const char* flow, int argc, char **argv);
+static void cmd_var_evaluate_expression(const char* flow, int argc, char **argv);
+static void cmd_var_list_children(const char* flow, int argc, char **argv);
+static void cmd_list_features(const char* flow, int argc, char **argv);
+static void cmd_environment_directory(const char* flow, int argc, char **argv);
 
 static command mi2_commands[] = {
     {"-gdb-exit",                   cmd_exit},
@@ -82,13 +86,15 @@ static command mi2_commands[] = {
     {"disassemble",                 cmd_plain_disassemble},
     {"-stack-list-frames",          cmd_stack_list_frames},
     {"-stack-list-variables",       cmd_stack_list_variables},
+    {"-stack-info-depth",           cmd_stack_info_depth},
     {"-interpreter-exec",           cmd_interpreter_exec},
-    {"0-interpreter-exec",          cmd_interpreter_exec},
     {"-data-evaluate-expression",   cmd_evaluate_expression},
     {"-var-create",                 cmd_var_create},
     {"-var-delete",                 cmd_var_delete},
     {"-var-evaluate-expression",    cmd_var_evaluate_expression},
     {"-var-list-children",          cmd_var_list_children},
+    {"-list-features",              cmd_list_features},
+    {"-environment-directory",      cmd_environment_directory},
     { NULL, NULL }
 };
 
@@ -97,23 +103,44 @@ static void report_continue() {
     mi2_printf_async("running,thread-id=\"all\"")
 }
 
-static void cmd_exit(int argc, char **argv) {
-    mi2_printf_response("exit");
+static void cmd_exit(const char* flow, int argc, char **argv) {
+    if (bk.is_remote_connected()) {
+        delete_all_breakpoints();
+    }
+
+    mi2_printf_response(flow, "exit");
     exit(0);
 }
 
-static void cmd_file_exec_and_symbols(int argc, char **argv) {
+static void cmd_list_features(const char* flow, int argc, char **argv) {
+    // gdb supports:
+    // "pending-breakpoints","thread-info","data-read-memory-bytes","breakpoint-notifications",
+    // "ada-task-info","language-option","info-gdb-mi-command","undefined-command-error-code",
+    // "exec-run-start-option","data-disassemble-a-option","python"
+
+    mi2_printf_response(flow, "done,features=[\"pending-breakpoints\",\"thread-info\","
+                              "\"data-read-memory-bytes\",\"breakpoint-notifications\","
+                              "\"info-gdb-mi-command\",\"undefined-command-error-code\","
+                              "\"exec-run-start-option\",\"data-disassemble-a-option\"]");
+}
+
+static void cmd_environment_directory(const char* flow, int argc, char **argv) {
+    // we do that by default
+    mi2_printf_response(flow, "done");
+}
+
+static void cmd_file_exec_and_symbols(const char* flow, int argc, char **argv) {
     if (argc < 2) {
-        mi2_printf_error("No file specified");
+        mi2_printf_error(flow, "No file specified");
         return;
     }
     read_symbol_file(argv[1]);
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
 }
 
-static void cmd_info(int argc, char **argv) {
+static void cmd_info(const char* flow, int argc, char **argv) {
     if (argc < 2) {
-        mi2_printf_error("please specify section");
+        mi2_printf_error(flow, "please specify section");
         return;
     }
 
@@ -124,12 +151,12 @@ static void cmd_info(int argc, char **argv) {
         bk.debug("unknown info section: %s\n", section);
     }
 
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
 }
 
-static void cmd_maintenance(int argc, char **argv) {
+static void cmd_maintenance(const char* flow, int argc, char **argv) {
     if (argc < 3) {
-        mi2_printf_error("please specify section");
+        mi2_printf_error(flow, "please specify section");
         return;
     }
 
@@ -142,10 +169,10 @@ static void cmd_maintenance(int argc, char **argv) {
         bk.debug("unknown info section: %s\n", section);
     }
 
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
 }
 
-static void cmd_thread_info(int argc, char **argv) {
+static void cmd_thread_info(const char* flow, int argc, char **argv) {
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
 
@@ -153,7 +180,7 @@ static void cmd_thread_info(int argc, char **argv) {
 
     if (fp) {
         if (fp->symbol && fp->filename && fp->function) {
-            mi2_printf_response(
+            mi2_printf_response(flow, 
                 "done,threads=[{id=\"1\",target-id=\"Thread\","
                 "frame={level=\"0\",addr=\"0x%08x\",func=\"%s\","
                 "args=[],file=\"%s\","
@@ -173,14 +200,14 @@ static void cmd_thread_info(int argc, char **argv) {
     const char* filename;
     int lineno;
     if (s == NULL || debug_find_source_location(regs.pc, &filename, &lineno)) {
-        mi2_printf_response(
+        mi2_printf_response(flow, 
             "done,threads=[{id=\"1\",target-id=\"Thread\","
             "frame={level=\"0\",addr=\"0x%08x\","
             "args=[]},"
             "state=\"stopped\"}],current-thread-id=\"1\"",
             regs.pc);
     } else {
-        mi2_printf_response(
+        mi2_printf_response(flow, 
             "done,threads=[{id=\"1\",target-id=\"Thread\","
             "frame={level=\"0\",addr=\"0x%08x\",func=\"%s\","
             "args=[],file=\"%s\","
@@ -190,7 +217,7 @@ static void cmd_thread_info(int argc, char **argv) {
     }
 }
 
-static void cmd_stack_list_variables(int argc, char **argv) {
+static void cmd_stack_list_variables(const char* flow, int argc, char **argv) {
     uint8_t no_values = 0;
 
     for (int i = 1; i < argc; i++) {
@@ -255,11 +282,11 @@ static void cmd_stack_list_variables(int argc, char **argv) {
     }
 
     debug_stack_frames_free(first_frame_pointer);
-    mi2_printf_response("done,variables=[%s]", utstring_body(response));
+    mi2_printf_response(flow, "done,variables=[%s]", utstring_body(response));
     utstring_free(response);
 }
 
-static void cmd_interpreter_exec(int argc_, char **argv_) {
+static void cmd_interpreter_exec(const char* flow, int argc_, char **argv_) {
     char* interpreter = NULL;
     char* exec = NULL;
 
@@ -280,13 +307,13 @@ static void cmd_interpreter_exec(int argc_, char **argv_) {
     }
 
     if (interpreter == NULL || exec == NULL) {
-        mi2_printf_error("Interpreter or exec are not specified.");
+        mi2_printf_error(flow, "Interpreter or exec are not specified.");
         return;
     }
 
     if (strcmp(interpreter, "console") == 0) {
         debugger_evaluate(exec);
-        mi2_printf_response("done");
+        mi2_printf_response(flow, "done");
     } else if (strcmp(interpreter, "mi2") == 0) {
         int argc;
         char **argv = parse_words(exec, &argc);
@@ -299,7 +326,7 @@ static void cmd_interpreter_exec(int argc_, char **argv_) {
             while ( cmd->cmd ) {
                 if ( strcmp(command_name, cmd->cmd) == 0 ) {
                     command_found = 1;
-                    cmd->func(argc, argv);
+                    cmd->func("", argc, argv);
                     break;
                 }
                 cmd++;
@@ -308,16 +335,18 @@ static void cmd_interpreter_exec(int argc_, char **argv_) {
             free(argv);
 
             if (command_found == 0) {
-                mi2_printf_error("Cannot evaluate command: %s", exec);
+                mi2_printf_error(flow, "Cannot evaluate command: %s", exec);
+            } else {
+                mi2_printf_response(flow, "done");
             }
         }
     } else {
-        mi2_printf_error("Unsupported interpreter");
+        mi2_printf_error(flow, "Unsupported interpreter");
     }
 
 }
 
-static void cmd_var_create(int argc, char **argv)
+static void cmd_var_create(const char* flow, int argc, char **argv)
 {
     int frame = 0;
     char* name = NULL;
@@ -342,7 +371,7 @@ static void cmd_var_create(int argc, char **argv)
     }
 
     if (expr == NULL) {
-        mi2_printf_error("expression is not specified");
+        mi2_printf_error(flow, "expression is not specified");
         return;
     }
 
@@ -358,7 +387,7 @@ static void cmd_var_create(int argc, char **argv)
     struct expression_result_t* result = get_expression_result();
     if (is_expression_result_error(result))
     {
-        mi2_printf_response("done,name=\"%s\",numchild=\"0\",thread-id=\"1\"", name);
+        mi2_printf_response(flow, "done,name=\"%s\",numchild=\"0\",thread-id=\"1\"", name);
         return;
     }
 
@@ -368,17 +397,17 @@ static void cmd_var_create(int argc, char **argv)
     int num_members = expression_count_members(result);
 
     HASH_ADD_STR(mi2_vars, name, var);
-    mi2_printf_response("done,name=\"%s\",numchild=\"%d\",type=\"%s\",value=\"%s\",thread-id=\"1\"",
+    mi2_printf_response(flow, "done,name=\"%s\",numchild=\"%d\",type=\"%s\",value=\"%s\",thread-id=\"1\"",
         name, num_members, utstring_body(type), utstring_body(value));
 
     utstring_free(value);
     utstring_free(type);
 }
 
-static void cmd_var_delete(int argc, char **argv)
+static void cmd_var_delete(const char* flow, int argc, char **argv)
 {
     if (argc < 2) {
-        mi2_printf_error("Not enough arguments");
+        mi2_printf_error(flow, "Not enough arguments");
         return;
     }
 
@@ -386,19 +415,19 @@ static void cmd_var_delete(int argc, char **argv)
     HASH_FIND_STR(mi2_vars, argv[1], var);
 
     if (var == NULL) {
-        mi2_printf_error("Unknown variable");
+        mi2_printf_error(flow, "Unknown variable");
         return;
     }
 
     HASH_DEL(mi2_vars, var);
     free(var);
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
 }
 
-static void cmd_var_evaluate_expression(int argc, char **argv)
+static void cmd_var_evaluate_expression(const char* flow, int argc, char **argv)
 {
     if (argc < 2) {
-        mi2_printf_error("Not enough arguments");
+        mi2_printf_error(flow, "Not enough arguments");
         return;
     }
 
@@ -406,7 +435,7 @@ static void cmd_var_evaluate_expression(int argc, char **argv)
     HASH_FIND_STR(mi2_vars, argv[1], var);
 
     if (var == NULL) {
-        mi2_printf_error("Unknown variable");
+        mi2_printf_error(flow, "Unknown variable");
         return;
     }
 
@@ -416,12 +445,12 @@ static void cmd_var_evaluate_expression(int argc, char **argv)
     struct expression_result_t* result = get_expression_result();
     if (is_expression_result_error(result))
     {
-        mi2_printf_response("done,value=\"%s\"", result->as_error);
+        mi2_printf_response(flow, "done,value=\"%s\"", result->as_error);
         return;
     }
 
     UT_string* value = expression_result_value_to_string(result);
-    mi2_printf_response("done,value=\"%s\"", utstring_body(value));
+    mi2_printf_response(flow, "done,value=\"%s\"", utstring_body(value));
     utstring_free(value);
 }
 
@@ -453,7 +482,7 @@ static UT_string* resolve_expression_result_to_child(
     return buffer;
 }
 
-static void cmd_var_list_children(int argc, char **argv)
+static void cmd_var_list_children(const char* flow, int argc, char **argv)
 {
     int all_values = 0;
     char* name = NULL;
@@ -470,7 +499,7 @@ static void cmd_var_list_children(int argc, char **argv)
     }
 
     if (name == NULL) {
-        mi2_printf_error("variable name is not specified");
+        mi2_printf_error(flow, "variable name is not specified");
         return;
     }
 
@@ -478,7 +507,7 @@ static void cmd_var_list_children(int argc, char **argv)
     HASH_FIND_STR(mi2_vars, name, var);
 
     if (var == NULL) {
-        mi2_printf_error("Unknown variable %s", name);
+        mi2_printf_error(flow, "Unknown variable %s", name);
         return;
     }
 
@@ -489,7 +518,7 @@ static void cmd_var_list_children(int argc, char **argv)
 
     if (is_expression_result_error(result))
     {
-        mi2_printf_error("%s", result->as_error);
+        mi2_printf_error(flow, "%s", result->as_error);
         return;
     }
 
@@ -516,7 +545,7 @@ static void cmd_var_list_children(int argc, char **argv)
         }
         default:
         {
-            mi2_printf_error("Do not know how to process this");
+            mi2_printf_error(flow, "Do not know how to process this");
             break;
         }
     }
@@ -544,7 +573,7 @@ static void cmd_var_list_children(int argc, char **argv)
         expression_result_free(&member_result);
     }
 
-    mi2_printf_response("done,children=[%s]", utstring_body(child_buffer));
+    mi2_printf_response(flow, "done,children=[%s]", utstring_body(child_buffer));
     utstring_free(child_buffer);
 
     if (dereferenced)
@@ -553,9 +582,11 @@ static void cmd_var_list_children(int argc, char **argv)
     }
 }
 
-static void cmd_evaluate_expression(int argc, char **argv) {
+static void cmd_evaluate_expression(const char* flow, int argc, char **argv) {
     UT_string* expression;
     utstring_new(expression);
+
+    current_frame = 0;
 
     for (int i = 1; i < argc; i++) {
         char* arg = argv[i];
@@ -574,7 +605,7 @@ static void cmd_evaluate_expression(int argc, char **argv) {
     }
 
     if (utstring_len(expression) == 0) {
-        mi2_printf_error("expression is not specified");
+        mi2_printf_error(flow, "expression is not specified");
         utstring_free(expression);
         return;
     }
@@ -587,13 +618,13 @@ static void cmd_evaluate_expression(int argc, char **argv) {
     struct expression_result_t* result = get_expression_result();
     if (is_expression_result_error(result))
     {
-        mi2_printf_error("%s", result->as_error);
+        mi2_printf_error(flow, "%s", result->as_error);
         utstring_free(expression);
         return;
     }
 
     UT_string* evaluated_value = expression_result_value_to_string(result);
-    mi2_printf_response("done,value=\"%s\"", utstring_body(evaluated_value));
+    mi2_printf_response(flow, "done,value=\"%s\"", utstring_body(evaluated_value));
     utstring_free(evaluated_value);
     utstring_free(expression);
 }
@@ -640,7 +671,7 @@ done:
     return ptr;
 }
 
-static void cmd_stack_list_frames(int argc, char **argv) {
+static void cmd_stack_list_frames(const char* flow, int argc, char **argv) {
 
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
@@ -706,11 +737,37 @@ static void cmd_stack_list_frames(int argc, char **argv) {
         debug_stack_frames_free(first_frame_pointer);
     }
 
-    mi2_printf_response("done,stack=[%s]", utstring_body(dump_buffer));
+    mi2_printf_response(flow, "done,stack=[%s]", utstring_body(dump_buffer));
     utstring_free(dump_buffer);
 }
 
-static void cmd_data_disassemble(int argc, char **argv) {
+static void cmd_stack_info_depth(const char* flow, int argc, char **argv) {
+    struct debugger_regs_t regs;
+    bk.get_regs(&regs);
+
+    uint16_t stack = regs.sp;
+    uint16_t initial_stack = stack;
+    uint16_t at = bk.pc();
+
+    debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(regs.pc, regs.sp, &regs, 0);
+    if (first_frame_pointer == NULL) {
+        mi2_printf_response(flow, "done,depth=\"0\"");
+        return;
+    }
+
+    int depth = 0;
+
+    debug_frame_pointer* fp = first_frame_pointer;
+    while (fp) {
+        depth++;
+        fp = fp->next;
+    }
+
+    mi2_printf_response(flow, "done,depth=\"%d\"", depth);
+    debug_stack_frames_free(first_frame_pointer);
+}
+
+static void cmd_data_disassemble(const char* flow, int argc, char **argv) {
     const char* from = NULL;
     const char* to = NULL;
     const char* mode = NULL;
@@ -727,7 +784,7 @@ static void cmd_data_disassemble(int argc, char **argv) {
     }
 
     if (from == NULL || to == NULL) {
-        mi2_printf_error("Range is not properly specified");
+        mi2_printf_error(flow, "Range is not properly specified");
         return;
     }
 
@@ -736,7 +793,7 @@ static void cmd_data_disassemble(int argc, char **argv) {
     if (mode != NULL) {
         mode_d = atoi(mode);
         if (mode_d != 0 && mode_d != 2) {
-            mi2_printf_error("Mode is not properly specified");
+            mi2_printf_error(flow, "Mode is not properly specified");
             return;
         }
     } else {
@@ -748,18 +805,18 @@ static void cmd_data_disassemble(int argc, char **argv) {
 
     from += 2; // skip 0x
     if (sscanf(from, "%x", &from_d) != 1) {
-        mi2_printf_error("Range 'from' is not properly specified");
+        mi2_printf_error(flow, "Range 'from' is not properly specified");
         return;
     }
 
     to += 2; // skip 0x
     if (sscanf(to, "%x", &to_d) != 1) {
-        mi2_printf_error("Range 'to' is not properly specified");
+        mi2_printf_error(flow, "Range 'to' is not properly specified");
         return;
     }
 
     if (to_d <= from_d) {
-        mi2_printf_error("Incorrect range");
+        mi2_printf_error(flow, "Incorrect range");
         return;
     }
 
@@ -808,11 +865,11 @@ static void cmd_data_disassemble(int argc, char **argv) {
         first = 0;
     }
 
-    mi2_printf_response("done,asm_insns=[%s]", utstring_body(dump_buffer));
+    mi2_printf_response(flow, "done,asm_insns=[%s]", utstring_body(dump_buffer));
     utstring_free(dump_buffer);
 }
 
-static void cmd_plain_disassemble(int argc, char **argv) {
+static void cmd_plain_disassemble(const char* flow, int argc, char **argv) {
     const char* address = NULL;
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
@@ -836,7 +893,7 @@ static void cmd_plain_disassemble(int argc, char **argv) {
     address += 2;
     if (sscanf(address, "%x,+%d", &from_d, &len_d) != 2) {
         if (sscanf(address, "%x", &from_d) != 1) {
-            mi2_printf_error("Range is not properly specified");
+            mi2_printf_error(flow, "Range is not properly specified");
             return;
         } else {
             to_d = regs.pc + 256;
@@ -876,44 +933,44 @@ static void cmd_plain_disassemble(int argc, char **argv) {
     }
 
     bk.console("End of assembler dump.\n");
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
 }
 
-static void cmd_show(int argc, char **argv) {
+static void cmd_show(const char* flow, int argc, char **argv) {
     if (argc < 2) {
-        mi2_printf_error("please specify variable");
+        mi2_printf_error(flow, "please specify variable");
         return;
     }
 
     const char* variable = argv[1];
 
     if (strcmp(variable, "mi-async") == 0) {
-        mi2_printf_response("done,value=\"on\"");
+        mi2_printf_response(flow, "done,value=\"on\"");
         return;
     }
 
-    mi2_printf_response("done,value=\"unknown\"");
+    mi2_printf_response(flow, "done,value=\"unknown\"");
 }
 
-static void cmd_continue(int argc, char **argv) {
+static void cmd_continue(const char* flow, int argc, char **argv) {
     bk.console("Resuming execution\n");
     bk.resume();
-    mi2_printf_response("running");
+    mi2_printf_response(flow, "running");
     report_continue();
 }
 
-static void cmd_break(int argc, char **argv) {
+static void cmd_break(const char* flow, int argc, char **argv) {
     bk.break_(0);
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
 }
 
-static void cmd_next_instruction(int argc, char **argv) {
+static void cmd_next_instruction(const char* flow, int argc, char **argv) {
     bk.next();
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
     report_continue();
 }
 
-static void cmd_fin(int argc, char **argv) {
+static void cmd_fin(const char* flow, int argc, char **argv) {
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
 
@@ -940,10 +997,10 @@ static void cmd_fin(int argc, char **argv) {
         bk.step();
     }
 
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
 }
 
-static void cmd_next(int argc, char **argv) {
+static void cmd_next(const char* flow, int argc, char **argv) {
 
     const char *filename;
     int   lineno;
@@ -952,17 +1009,17 @@ static void cmd_next(int argc, char **argv) {
         add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_NEXT_SOURCE_LINE, NULL, 0);
         bk.next();
         report_continue();
-        mi2_printf_response("done");
+        mi2_printf_response(flow, "done");
         return;
     }
 
     add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_NEXT_SOURCE_LINE, filename, lineno);
     bk.next();
     report_continue();
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
 }
 
-static void cmd_step(int argc, char **argv) {
+static void cmd_step(const char* flow, int argc, char **argv) {
 
     const char *filename;
     int   lineno;
@@ -971,31 +1028,32 @@ static void cmd_step(int argc, char **argv) {
         add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_STEP_SOURCE_LINE, NULL, 0);
         bk.step();
         report_continue();
-        mi2_printf_response("done");
+        mi2_printf_response(flow, "done");
         return;
     }
 
     add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_STEP_SOURCE_LINE, filename, lineno);
     bk.step();
     report_continue();
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
 }
 
-static void cmd_do_nothing(int argc, char **argv) {
+static void cmd_do_nothing(const char* flow, int argc, char **argv) {
     // we don't set anything
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
 }
 
 static uint8_t report_connected = 0;
+static char connect_flow[64] = "";
 
-static void cmd_target_select(int argc, char **argv) {
+static void cmd_target_select(const char* flow, int argc, char **argv) {
     if (argc < 3) {
-        mi2_printf_error("target-select: requires 2 arguments");
+        mi2_printf_error(flow, "target-select: requires 2 arguments");
         return;
     }
 
     if (strcmp(argv[1], "remote") != 0) {
-        mi2_printf_error("target-select: unsupported %s", argv[1]);
+        mi2_printf_error(flow, "target-select: unsupported %s", argv[1]);
         return;
     }
 
@@ -1005,27 +1063,34 @@ static void cmd_target_select(int argc, char **argv) {
     {
         int scanf_res = sscanf(argv[2], "tcp:%[^:]:%d", hostname, &port);
         if (scanf_res != 2) {
-            mi2_printf_error("target-select: cannot process target address: %s", argv[2]);
-            return;
+            scanf_res = sscanf(argv[2], "%[^:]:%d", hostname, &port);
+            if (scanf_res != 2) {
+                mi2_printf_error(flow, "target-select: cannot process target address: %s", argv[2]);
+                return;
+            }
         }
     }
 
+    bk.debug("Connecting to %s port %d...\n", hostname, port);
+    strcpy(connect_flow, flow);
+
     if (bk.remote_connect(hostname, port) ) {
-        mi2_printf_error("target-select: cannot connect hostname %s port %d", hostname, port);
+        mi2_printf_error(flow, "target-select: cannot connect hostname %s port %d", hostname, port);
         return;
     }
 
+    bk.debug("Connected\n");
     report_connected = 1;
 }
 
-static void cmd_target_detach(int argc, char **argv)
+static void cmd_target_detach(const char* flow, int argc, char **argv)
 {
     delete_all_breakpoints();
     bk.detach();
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
 }
 
-static void cmd_break_insert(int argc, char **argv) {
+static void cmd_break_insert(const char* flow, int argc, char **argv) {
     char* insert_path = NULL;
 
     for (int i = 1; i < argc; i++) {
@@ -1051,46 +1116,48 @@ static void cmd_break_insert(int argc, char **argv) {
             const char* filename;
             int lineno;
             if (debug_find_source_location(value, &filename, &lineno)) {
-                mi2_printf_response(
+                mi2_printf_response(flow, 
                     "done,bkpt={number=\"%d\",type=\"breakpoint\",disp=\"keep\",enabled=\"y\","
                     "addr=\"0x%08x\",func=\"%s\",file=\"%s\","
                     "fullname=\"%s\",thread-groups=[\"i1\"],"
                     "times=\"0\"}", elem->number, value, s->name, s->file, s->file);
             } else {
-                mi2_printf_response(
+                mi2_printf_response(flow, 
                     "done,bkpt={number=\"%d\",type=\"breakpoint\",disp=\"keep\",enabled=\"y\","
                     "addr=\"0x%08x\",func=\"%s\",file=\"%s\","
                     "fullname=\"%s\",line=\"%d\",thread-groups=[\"i1\"],"
                     "times=\"0\"}", elem->number, value, s->name, s->file, s->file, lineno);
             }
         } else {
-            mi2_printf_error("Cannot break on '%s'", corrected_source);
+            mi2_printf_error(flow, "Cannot break on '%s'", corrected_source);
         }
     } else {
-        mi2_printf_error("Cannot understand this");
+        mi2_printf_error(flow, "Cannot understand this");
     }
 }
 
-static void cmd_break_delete(int argc, char **argv) {
+static void cmd_break_delete(const char* flow, int argc, char **argv) {
     char* insert_path = NULL;
 
     if (argc < 2) {
-        mi2_printf_error("Specify breakpoint number");
+        mi2_printf_error(flow, "Specify breakpoint number");
         return;
     }
 
     breakpoint* b = find_breakpoint(atoi(argv[1]));
 
     if (b == NULL) {
-        mi2_printf_error("unknown breakpoint");
+        mi2_printf_error(flow, "unknown breakpoint");
         return;
     }
 
     delete_breakpoint(b);
-    mi2_printf_response("done");
+    mi2_printf_response(flow, "done");
 }
 
 typedef struct mi2_command_execution {
+    const char* flow;
+    const char* command;
     command *cmd;
     char **argv;
     int argc;
@@ -1181,20 +1248,21 @@ static void mi2_execution_stopped() {
     if (report_connected) {
         report_connected = 0;
         mi2_printf_async(
-            "stopped,reason=\"first-break\",frame={%s},thread-id=\"1\",stopped-threads=\"all\"", frame);
-        mi2_printf_response("connected");
+            "stopped,reason=\"fork\",frame={%s},thread-id=\"1\",stopped-threads=\"all\"", frame);
+        mi2_printf_response(connect_flow, "connected");
         mi2_printf_prompt();
     }
 }
 
 void execute_mi2_command_on_main_thread(const void* data, void* response) {
     const mi2_command_execution* exec = (const mi2_command_execution*)data;
-    exec->cmd->func(exec->argc, exec->argv);
+    exec->cmd->func(exec->flow, exec->argc, exec->argv);
 }
 
 void execute_unknown_command(const void* data, void* response) {
-    bk.debug("warning: unknown command: %s\n", (char*)data);
-    mi2_printf_response("done");
+    const mi2_command_execution* exec = (const mi2_command_execution*)data;
+    bk.debug("warning: unknown command: %s\n", exec->command);
+    mi2_printf_response(exec->flow, "done");
 }
 
 void execute_prompt(const void* data, void* response) {
@@ -1225,7 +1293,17 @@ static void* debugger_mi2_console_loop(void* arg) {
         char **argv = parse_words(debugger_line, &argc);
 
         if ( argc > 0 ) {
-            const char* command_name = argv[0];
+            char* command_name = argv[0];
+            char flow[32] = "";
+
+            char* dash = strchr(command_name, '-');
+            if (dash && (dash != command_name)) {
+                // we have 'xxx-command' syntext, split it into 'xxx' and '-command'
+                memset(flow, 0, sizeof(flow));
+                memcpy(flow, command_name, dash - command_name);
+                command_name = dash;
+            }
+
             command *cmd = &mi2_commands[0];
             uint8_t command_found = 0;
 
@@ -1234,6 +1312,7 @@ static void* debugger_mi2_console_loop(void* arg) {
                     command_found = 1;
 
                     mi2_command_execution exec;
+                    exec.flow = flow;
                     exec.cmd = cmd;
                     exec.argv = argv;
                     exec.argc = argc;
@@ -1246,7 +1325,11 @@ static void* debugger_mi2_console_loop(void* arg) {
             }
 
             if (command_found == 0) {
-                execute_on_main_thread(execute_unknown_command, argv[0], NULL);
+                mi2_command_execution exec;
+                exec.flow = flow;
+                exec.command = command_name;
+
+                execute_on_main_thread(execute_unknown_command, &exec, NULL);
             }
         }
 

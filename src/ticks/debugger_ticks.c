@@ -217,6 +217,7 @@ backend_t ticks_debugger_backend = {
     .breakpoints_check = &breakpoints_check,
     .is_verbose = is_verbose,
     .remote_connect = NULL,
+    .is_remote_connected = NULL,
     .console = stdout_log,
     .debug = stdout_log,
     .execution_stopped = NULL,

@@ -868,6 +868,11 @@ static void init_mutexes()
     pthread_cond_init(&network_op_cond, NULL);
 }
 
+static uint8_t is_gdbserver_connected()
+{
+    return connection_socket;
+}
+
 static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
 {
     connection_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -1054,6 +1059,7 @@ static backend_t gdb_backend = {
     .breakpoints_check = &breakpoints_check,
     .is_verbose = is_verbose,
     .remote_connect = connect_to_gdbserver,
+    .is_remote_connected = is_gdbserver_connected,
     .console = stdout_log,
     .debug = stdout_log,
     .execution_stopped = gdb_execution_stopped,
@@ -1105,6 +1111,7 @@ int main(int argc, char **argv) {
     set_backend(gdb_backend);
 
     uint8_t debugger_mi2_mode = 0;
+    char* map_file = NULL;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-p") == 0) {
@@ -1122,6 +1129,8 @@ int main(int argc, char **argv) {
             }
         } else if (strcmp(argv[i], "-v") == 0) {
             verbose = 1;
+        } else if (strcmp(argv[i], "-q") == 0) {
+            // ignore
         } else if (strcmp(argv[i], "--version") == 0) {
             printf("GNU gdb (GDB) 11.0\n");
             printf("The line above is fake, we're pretending to be a gdb here.\n");
@@ -1130,6 +1139,13 @@ int main(int argc, char **argv) {
             const char* interpreter = argv[i] + 14;
             if (strcmp(interpreter, "mi2") == 0) {
                 debugger_mi2_mode = 1;
+            }
+        } else {
+            if (map_file == NULL) {
+                map_file = argv[i];
+            } else {
+                printf("Unknown option: %s\n", argv[i]);
+                exit(1);
             }
         }
     }
@@ -1142,6 +1158,12 @@ int main(int argc, char **argv) {
 
         mi2_printf_thread("thread-group-added,id=\"i1\"");
         bk.console("z88dk-gdb, a gdb client for z88dk\n");
+
+        if (map_file) {
+            bk.console("Reading symbol file %s...\n", map_file);
+            read_symbol_file(map_file);
+            bk.console("Done.\n");
+        }
 
         while (1) {
             registers_invalidated = 1;
