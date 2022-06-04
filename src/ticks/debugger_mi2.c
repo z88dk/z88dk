@@ -429,12 +429,11 @@ static void resolve_expression_result_to_child(
     if (is_expression_result_error(result)) {
         sprintf(ptr, "child={exp=\"%s\",type=\"<error>\",value=\"%s\"}", member, result->as_error);
     } else {
-        char type[255] = {};
-
+        char type[255] = "<unknown>";
         expression_result_type_to_string(&result->type, result->type.first, type);
 
         if (all_values) {
-            char value[255] = {};
+            char value[255] = "<undefined>";
             expression_result_value_to_string(result, value, sizeof(value));
             sprintf(ptr, "child={exp=\"%s\",value=\"%s\",type=\"%s\"}", member, value, type);
         } else {
@@ -761,7 +760,7 @@ static void cmd_data_disassemble(int argc, char **argv) {
     *ptr = 0;
 
     while (pc <= to_d) {
-        char db[256] = {};
+        char db[256] = "";
         int len = disassemble2(pc, db, sizeof(db), 2);
 
         if (!first) {
@@ -838,7 +837,7 @@ static void cmd_plain_disassemble(int argc, char **argv) {
     bk.console("Dump of assembler code from 0x%08x to 0x%08x:\n", from_d, to_d);
 
     while (pc <= to_d) {
-        char db[256] = {};
+        char db[256] = "";
         int len = disassemble2(pc, db, sizeof(db), 2);
 
         const char* ppp = (pc == regs.pc) ? "=> " : "   ";
@@ -1145,7 +1144,7 @@ static void mi2_execution_stopped() {
         }
     }
 
-    char frame[512] = {};
+    char frame[512] = "";
     sprintf_frame0(frame);
 
     if (breakpoint_hit) {
