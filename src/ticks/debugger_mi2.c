@@ -14,6 +14,7 @@
 #include <pthread.h>
 #include <ctype.h>
 #include <stdarg.h>
+#include <utstring.h>
 
 typedef struct {
     char name[128];
@@ -211,9 +212,9 @@ static void cmd_stack_list_variables(int argc, char **argv) {
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
 
-    char* response = malloc(4096);
-    *response = '\0';
-    char* ptr = response;
+    UT_string* response;
+    utstring_new(response);
+
     uint8_t first = 1;
 
     debug_sym_function* fn = fp->function;
@@ -222,29 +223,30 @@ static void cmd_stack_list_variables(int argc, char **argv) {
         debug_sym_function_argument* arg = fn->arguments;
         while (arg) {
             if (!first) {
-                ptr += sprintf(ptr, ",");
+                utstring_printf(response, ",");
             }
             debug_sym_symbol* s = arg->symbol;
             if (no_values) {
-                ptr += sprintf(ptr, "{name=\"%s\"}", s->symbol_name);
+                utstring_printf(response, "{name=\"%s\"}", s->symbol_name);
             } else {
                 if (debug_symbol_valid(s, initial_stack, fp)) {
                     struct expression_result_t exp = {0};
                     debug_get_symbol_value_expression(s, fp, &exp);
                     if (is_expression_result_error(&exp)) {
-                        ptr += sprintf(ptr, "{name=\"%s\",value=\"<error>\"}", s->symbol_name);
+                        utstring_printf(response, "{name=\"%s\",value=\"<error>\"}", s->symbol_name);
                     } else {
-                        char exp_type[128] = "unknown";
-                        char* exp_value = malloc(2048);
-                        strcpy(exp_value, "???");
-                        expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
-                        expression_result_value_to_string(&exp, exp_value, 2048);
-                        ptr += sprintf(ptr, "{name=\"%s\",type=\"%s\",value=\"%s\"}", s->symbol_name, exp_type, exp_value);
-                        free(exp_value);
+                        UT_string* exp_type = expression_result_type_to_string(&exp.type, exp.type.first);
+                        UT_string* exp_value = expression_result_value_to_string(&exp);
+
+                        utstring_printf(response, "{name=\"%s\",type=\"%s\",value=\"%s\"}", s->symbol_name,
+                            utstring_body(exp_type), utstring_body(exp_value));
+
+                        utstring_free(exp_type);
+                        utstring_free(exp_value);
                     }
                     expression_result_free(&exp);
                 } else {
-                    ptr += sprintf(ptr, "{name=\"%s\",value=\"<invalid>\"}", s->symbol_name);
+                    utstring_printf(response, "{name=\"%s\",value=\"<invalid>\"}", s->symbol_name);
                 }
             }
             first = 0;
@@ -253,8 +255,8 @@ static void cmd_stack_list_variables(int argc, char **argv) {
     }
 
     debug_stack_frames_free(first_frame_pointer);
-    mi2_printf_response("done,variables=[%s]", response);
-    free(response);
+    mi2_printf_response("done,variables=[%s]", utstring_body(response));
+    utstring_free(response);
 }
 
 static void cmd_interpreter_exec(int argc_, char **argv_) {
@@ -360,17 +362,17 @@ static void cmd_var_create(int argc, char **argv)
         return;
     }
 
-    char type[128] = {};
-    char value[255] = {};
-
-    expression_result_value_to_string(result, value, sizeof(value));
-    expression_result_type_to_string(&result->type, result->type.first, type);
+    UT_string* value = expression_result_value_to_string(result);
+    UT_string* type = expression_result_type_to_string(&result->type, result->type.first);
 
     int num_members = expression_count_members(result);
 
     HASH_ADD_STR(mi2_vars, name, var);
     mi2_printf_response("done,name=\"%s\",numchild=\"%d\",type=\"%s\",value=\"%s\",thread-id=\"1\"",
-        name, num_members, type, value);
+        name, num_members, utstring_body(type), utstring_body(value));
+
+    utstring_free(value);
+    utstring_free(type);
 }
 
 static void cmd_var_delete(int argc, char **argv)
@@ -418,28 +420,37 @@ static void cmd_var_evaluate_expression(int argc, char **argv)
         return;
     }
 
-    char value[255] = {};
-    expression_result_value_to_string(result, value, sizeof(value));
-    mi2_printf_response("done,value=\"%s\"", value);
+    UT_string* value = expression_result_value_to_string(result);
+    mi2_printf_response("done,value=\"%s\"", utstring_body(value));
+    utstring_free(value);
 }
 
-static void resolve_expression_result_to_child(
-    const char* member, struct expression_result_t* result, char* ptr, int all_values)
+static UT_string* resolve_expression_result_to_child(
+    const char* member, struct expression_result_t* result, int all_values)
 {
+    UT_string* buffer;
+    utstring_new(buffer);
+
     if (is_expression_result_error(result)) {
-        sprintf(ptr, "child={exp=\"%s\",type=\"<error>\",value=\"%s\"}", member, result->as_error);
+        utstring_printf(buffer,
+            "child={exp=\"%s\",type=\"<error>\",value=\"%s\"}", member, result->as_error);
     } else {
-        char type[255] = "<unknown>";
-        expression_result_type_to_string(&result->type, result->type.first, type);
+        UT_string* type = expression_result_type_to_string(&result->type, result->type.first);
 
         if (all_values) {
-            char value[255] = "<undefined>";
-            expression_result_value_to_string(result, value, sizeof(value));
-            sprintf(ptr, "child={exp=\"%s\",value=\"%s\",type=\"%s\"}", member, value, type);
+            UT_string* value = expression_result_value_to_string(result);
+            utstring_printf(buffer,
+                "child={exp=\"%s\",value=\"%s\",type=\"%s\"}", member, utstring_body(value), utstring_body(type));
+            utstring_free(value);
         } else {
-            sprintf(ptr, "child={exp=\"%s\",type=\"%s\"}", member, type);
+            utstring_printf(buffer,
+                "child={exp=\"%s\",type=\"%s\"}", member, utstring_body(type));
         }
+
+        utstring_free(type);
     }
+
+    return buffer;
 }
 
 static void cmd_var_list_children(int argc, char **argv)
@@ -512,13 +523,12 @@ static void cmd_var_list_children(int argc, char **argv)
 
     expression_get_struct_members(struct_, &num_child, (char**)&members);
 
-    char* child_buffer = malloc(8192);
-    *child_buffer = '\0';
-    char* ptr = child_buffer;
+    UT_string* child_buffer;
+    utstring_new(child_buffer);
 
     for (int i = 0; i < num_child; i++) {
         if (i) {
-            ptr += sprintf(ptr, ",");
+            utstring_printf(child_buffer, ",");
         }
 
         char* member = members[i];
@@ -526,16 +536,16 @@ static void cmd_var_list_children(int argc, char **argv)
         struct expression_result_t member_result = {};
         expression_resolve_struct_member(struct_, member, &member_result);
 
-        char* child_resolved = malloc(4096);
-        resolve_expression_result_to_child(member, &member_result, child_resolved, all_values);
-        ptr += sprintf(ptr, "%s", child_resolved);
+        UT_string* child_resolved =
+            resolve_expression_result_to_child(member, &member_result, all_values);
+        utstring_printf(child_buffer, "%s", utstring_body(child_resolved));
+        utstring_free(child_resolved);
 
-        free(child_resolved);
         expression_result_free(&member_result);
     }
 
-    mi2_printf_response("done,children=[%s]", child_buffer);
-    free(child_buffer);
+    mi2_printf_response("done,children=[%s]", utstring_body(child_buffer));
+    utstring_free(child_buffer);
 
     if (dereferenced)
     {
@@ -544,7 +554,8 @@ static void cmd_var_list_children(int argc, char **argv)
 }
 
 static void cmd_evaluate_expression(int argc, char **argv) {
-    char* expression = NULL;
+    UT_string* expression;
+    utstring_new(expression);
 
     for (int i = 1; i < argc; i++) {
         char* arg = argv[i];
@@ -554,38 +565,37 @@ static void cmd_evaluate_expression(int argc, char **argv) {
             // ignore next option
             i++;
         } else {
-            if (expression == NULL) {
-                expression = strdup(arg);
+            if (utstring_len(expression) == 0) {
+                utstring_printf(expression, "%s", arg);
             } else {
-                char spaced[256];
-                sprintf(spaced, "%s %s", expression, arg);
-                free(expression);
-                expression = strdup(spaced);
+                utstring_printf(expression, " %s", arg);
             }
         }
     }
 
-    if (expression == NULL) {
+    if (utstring_len(expression) == 0) {
         mi2_printf_error("expression is not specified");
+        utstring_free(expression);
         return;
     }
 
-    bk.debug("evaluating expression %s\n", expression);
-    evaluate_expression_string(expression);
+    if (bk.is_verbose()) {
+        bk.debug("evaluating expression %s\n", utstring_body(expression));
+    }
+    evaluate_expression_string(utstring_body(expression));
 
     struct expression_result_t* result = get_expression_result();
     if (is_expression_result_error(result))
     {
         mi2_printf_error("%s", result->as_error);
-        free(expression);
+        utstring_free(expression);
         return;
     }
 
-    char evaluated_value[128] = "<unknown>";
-    expression_result_value_to_string(result, evaluated_value, sizeof(evaluated_value));
-
-    mi2_printf_response("done,value=\"%s\"", evaluated_value);
-    free(expression);
+    UT_string* evaluated_value = expression_result_value_to_string(result);
+    mi2_printf_response("done,value=\"%s\"", utstring_body(evaluated_value));
+    utstring_free(evaluated_value);
+    utstring_free(expression);
 }
 
 static char* sprintf_frame0(char* ptr) {
@@ -639,9 +649,8 @@ static void cmd_stack_list_frames(int argc, char **argv) {
     uint16_t initial_stack = stack;
     uint16_t at = bk.pc();
 
-    char* dump_buffer = malloc(65536);
-    char* ptr = dump_buffer;
-    *ptr = 0;
+    UT_string* dump_buffer;
+    utstring_new(dump_buffer);
 
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(regs.pc, regs.sp, &regs, 0);
     if (first_frame_pointer == NULL) {
@@ -652,18 +661,21 @@ static void cmd_stack_list_frames(int argc, char **argv) {
             const char *filename;
             int lineno;
             if (debug_find_source_location(regs.pc, &filename, &lineno)) {
-                ptr += sprintf(ptr, "frame={level=\"0\",addr=\"0x%08x\",func=\"%s\","
-                                    "file=\"%s\","
-                                    "fullname=\"%s\",line=\"%d\","
-                                    "arch=\"z80\"}", regs.pc, sym->name, sym->file, filename, lineno);
+                utstring_printf(dump_buffer,
+                    "frame={level=\"0\",addr=\"0x%08x\",func=\"%s\","
+                    "file=\"%s\","
+                    "fullname=\"%s\",line=\"%d\","
+                    "arch=\"z80\"}", regs.pc, sym->name, sym->file, filename, lineno);
             } else {
-                ptr += sprintf(ptr, "frame={level=\"0\",addr=\"0x%08x\",func=\"%s\","
-                                    "file=\"%s\","
-                                    "fullname=\"%s\","
-                                    "arch=\"z80\"}", regs.pc, sym->name, sym->file, sym->file);
+                utstring_printf(dump_buffer,
+                    "frame={level=\"0\",addr=\"0x%08x\",func=\"%s\","
+                    "file=\"%s\","
+                    "fullname=\"%s\","
+                    "arch=\"z80\"}", regs.pc, sym->name, sym->file, sym->file);
             }
         } else {
-            ptr += sprintf(ptr, "frame={level=\"0\",addr=\"0x%08x\"}", regs.pc);
+            utstring_printf(dump_buffer,
+                "frame={level=\"0\",addr=\"0x%08x\"}", regs.pc);
         }
     } else {
         debug_frame_pointer* fp = first_frame_pointer;
@@ -671,17 +683,19 @@ static void cmd_stack_list_frames(int argc, char **argv) {
 
         while (fp) {
             if (level != 0) {
-                ptr += sprintf(ptr, ",");
+                utstring_printf(dump_buffer, ",");
             }
 
             if (fp->symbol && fp->filename && fp->function) {
-                ptr += sprintf(ptr, "frame={level=\"%d\",addr=\"0x%08x\",func=\"%s\","
-                                    "file=\"%s\","
-                                    "fullname=\"%s\",line=\"%d\","
-                                    "arch=\"z80\"}", level, fp->address, fp->function->name,
+                utstring_printf(dump_buffer,
+                    "frame={level=\"%d\",addr=\"0x%08x\",func=\"%s\","
+                    "file=\"%s\","
+                    "fullname=\"%s\",line=\"%d\","
+                    "arch=\"z80\"}", level, fp->address, fp->function->name,
                     fp->filename, fp->filename, fp->lineno);
             } else {
-                ptr += sprintf(ptr, "frame={level=\"%d\",addr=\"0x%08x\"}",
+                utstring_printf(dump_buffer,
+                    "frame={level=\"%d\",addr=\"0x%08x\"}",
                     level, fp->address);
             }
 
@@ -692,8 +706,8 @@ static void cmd_stack_list_frames(int argc, char **argv) {
         debug_stack_frames_free(first_frame_pointer);
     }
 
-    mi2_printf_response("done,stack=[%s]", dump_buffer);
-    free(dump_buffer);
+    mi2_printf_response("done,stack=[%s]", utstring_body(dump_buffer));
+    utstring_free(dump_buffer);
 }
 
 static void cmd_data_disassemble(int argc, char **argv) {
@@ -755,16 +769,15 @@ static void cmd_data_disassemble(int argc, char **argv) {
     symbol* sym = symbol_find_lower(pc, SYM_ADDRESS, &offset);
     uint8_t first = 1;
 
-    char* dump_buffer = malloc(65536);
-    char* ptr = dump_buffer;
-    *ptr = 0;
+    UT_string* dump_buffer;
+    utstring_new(dump_buffer);
 
     while (pc <= to_d) {
         char db[256] = "";
         int len = disassemble2(pc, db, sizeof(db), 2);
 
         if (!first) {
-            ptr += sprintf(ptr, ",");
+            utstring_printf(dump_buffer, ",");
         }
 
         if (mode_d == 2) {
@@ -772,17 +785,21 @@ static void cmd_data_disassemble(int argc, char **argv) {
             *opcodes = 0;
             opcodes++;
             if (sym) {
-                ptr += sprintf(ptr, "{address=\"0x%08x\",func-name=\"%s\",offset=\"%d\",inst=\"%s\",opcodes=\"%s\"}",
+                utstring_printf(dump_buffer,
+                    "{address=\"0x%08x\",func-name=\"%s\",offset=\"%d\",inst=\"%s\",opcodes=\"%s\"}",
                     pc, sym->name, offset, db, opcodes);
             } else {
-                ptr += sprintf(ptr, "{address=\"0x%08x\",inst=\"%s\",opcodes=\"%s\"}", pc, db, opcodes);
+                utstring_printf(dump_buffer,
+                    "{address=\"0x%08x\",inst=\"%s\",opcodes=\"%s\"}", pc, db, opcodes);
             }
         } else {
             if (sym) {
-                ptr += sprintf(ptr, "{address=\"0x%08x\",func-name=\"%s\",offset=\"%d\",inst=\"%s\"}",
+                utstring_printf(dump_buffer,
+                    "{address=\"0x%08x\",func-name=\"%s\",offset=\"%d\",inst=\"%s\"}",
                     pc, sym->name, offset, db);
             } else {
-                ptr += sprintf(ptr, "{address=\"0x%08x\",inst=\"%s\"}", pc, db);
+                utstring_printf(dump_buffer,
+                    "{address=\"0x%08x\",inst=\"%s\"}", pc, db);
             }
         }
 
@@ -791,8 +808,8 @@ static void cmd_data_disassemble(int argc, char **argv) {
         first = 0;
     }
 
-    mi2_printf_response("done,asm_insns=[%s]", dump_buffer);
-    free(dump_buffer);
+    mi2_printf_response("done,asm_insns=[%s]", utstring_body(dump_buffer));
+    utstring_free(dump_buffer);
 }
 
 static void cmd_plain_disassemble(int argc, char **argv) {

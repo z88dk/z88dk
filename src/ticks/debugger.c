@@ -565,8 +565,9 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
     if (sym && fp->filename && fp->function) {
         debug_sym_function* fn = fp->function;
         if (fn != NULL) {
-            static char function_args[2048];
-            strcpy(function_args, "");
+            UT_string* function_args;
+            utstring_new(function_args);
+
             int buffer_offset = 0;
             int buffer_length = 255;
             debug_sym_function_argument* arg = fn->arguments;
@@ -581,27 +582,23 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
                 }
 
                 if (!first_arg) {
-                    strcat(function_args, ", ");
+                    utstring_printf(function_args, ", ");
                 }
-                static char arg_text[2048];
-                strcpy(arg_text, "");
 
                 struct expression_result_t exp = {0};
                 debug_get_symbol_value_expression(s, fp, &exp);
 
                 if (is_expression_result_error(&exp)) {
-                    sprintf(arg_text, "<error>%s", s->symbol_name);
-                    strcat(function_args, arg_text);
+                    utstring_printf(function_args, "<error>%s", s->symbol_name);
                 } else {
-                    char exp_type[128] = "unknown";
-                    static char exp_value[2048];
-                    strcpy(exp_value, "???");
+                    UT_string* exp_type = expression_result_type_to_string(&exp.type, exp.type.first);
+                    UT_string* exp_value = expression_result_value_to_string(&exp);
 
-                    expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
-                    expression_result_value_to_string(&exp, exp_value, 2048);
+                    utstring_printf(function_args, "<%s>%s = %s", utstring_body(exp_type),
+                        s->symbol_name, utstring_body(exp_value));
 
-                    snprintf(arg_text, sizeof(arg_text), "<%s>%s = %s", exp_type, s->symbol_name, exp_value);
-                    strcat(function_args, arg_text);
+                    utstring_free(exp_type);
+                    utstring_free(exp_value);
                 }
 
                 expression_result_free(&exp);
@@ -612,12 +609,14 @@ static void print_frame(debug_frame_pointer *fp, debug_frame_pointer *current, u
 
             if (fp->offset == 0xFFFF) {
                 bk.console("%sfunction %s+??? (unreliable offset, %s)\n       at %s\n", frame_marker,
-                    fn->function_name, function_args, fp->filename);
+                    fn->function_name, utstring_body(function_args), fp->filename);
             } else {
                 bk.console("%sfunction %s+%d (%s)\n       at %s:%d\n", frame_marker,
-                    fn->function_name, fp->offset, function_args,
+                    fn->function_name, fp->offset, utstring_body(function_args),
                     fp->filename, fp->lineno);
             }
+
+            utstring_free(function_args);
         } else {
             if (fp->offset == 0xFFFF) {
                 bk.console("%s%s+??? (unreliable offset) at %s\n", frame_marker, sym->name, fp->filename);
@@ -795,16 +794,15 @@ static int cmd_print(int argc, char **argv)
         return 0;
     }
 
-    char type[128] = "unknown";
-    char* value = malloc(2048);
-    strcpy(value, "???");
-    expression_result_type_to_string(&result->type, result->type.first, type);
-    expression_result_value_to_string(result, value, 2048);
+    UT_string* type = expression_result_type_to_string(&result->type, result->type.first);
+    UT_string* value = expression_result_value_to_string(result);
 
     char result_id[32];
     sprintf(result_id, "$%d", ++last_evaluation_id);
-    bk.console("%s = <%s> %s\n", result_id, type, value);
-    free(value);
+    bk.console("%s = <%s> %s\n", result_id, utstring_body(type), utstring_body(value));
+
+    utstring_free(type);
+    utstring_free(value);
 
     struct history_expression_t* he = calloc(1, sizeof(struct history_expression_t));
     strcpy(he->name, result_id);
@@ -853,7 +851,6 @@ static void info_section_locals() {
 
     debug_sym_function* fn = fp->function;
     if (fn != NULL) {
-        char function_args[255] = {0};
         debug_sym_function_argument* arg = fn->arguments;
         while (arg) {
             debug_sym_symbol* s = arg->symbol;
@@ -863,13 +860,11 @@ static void info_section_locals() {
                 if (is_expression_result_error(&exp)) {
                     bk.console("  %s = <error>\n", s->symbol_name);
                 } else {
-                    char exp_type[128] = "unknown";
-                    char* exp_value = malloc(2048);
-                    strcpy(exp_value, "???");
-                    expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
-                    expression_result_value_to_string(&exp, exp_value, 2048);
-                    bk.console("  <%s>%s = %s\n", exp_type, s->symbol_name, exp_value);
-                    free(exp_value);
+                    UT_string* exp_type = expression_result_type_to_string(&exp.type, exp.type.first);
+                    UT_string* exp_value = expression_result_value_to_string(&exp);
+                    bk.console("  <%s>%s = %s\n", utstring_body(exp_type), s->symbol_name, utstring_body(exp_value));
+                    utstring_free(exp_value);
+                    utstring_free(exp_type);
                 }
                 expression_result_free(&exp);
             } else {
@@ -909,13 +904,11 @@ static void info_section_globals() {
             continue;
         }
 
-        char exp_type[128] = "unknown";
-        char* exp_value = malloc(2048);
-        strcpy(exp_value, "???");
-        expression_result_type_to_string(&exp.type, exp.type.first, exp_type);
-        expression_result_value_to_string(&exp, exp_value, 2048);
-        bk.console("  <%s>%s = %s\n", exp_type, s->symbol_name, exp_value);
-        free(exp_value);
+        UT_string* exp_type = expression_result_type_to_string(&exp.type, exp.type.first);
+        UT_string* exp_value = expression_result_value_to_string(&exp);
+        bk.console("  <%s>%s = %s\n", utstring_body(exp_type), s->symbol_name, utstring_body(exp_value));
+        utstring_free(exp_value);
+        utstring_free(exp_type);
         expression_result_free(&exp);
     }
 
@@ -1494,10 +1487,10 @@ static int cmd_typeof(int argc, char **argv)
         return 0;
     }
 
-    char type[128] = "unknown";
-    expression_result_type_to_string(&result->type, result->type.first, type);
+    UT_string* type = expression_result_type_to_string(&result->type, result->type.first);
+    bk.console("type = %s\n", utstring_body(type));
+    utstring_free(type);
 
-    bk.console("type = %s\n", type);
     return 0;
 }
 

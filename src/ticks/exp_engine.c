@@ -96,9 +96,10 @@ void expression_value_to_pointer(struct expression_result_t *from, struct expres
         }
         default: {
             set_expression_result_error(to);
-            char tp[128];
-            expression_result_type_to_string(&from->type, from->type.first, tp);
-            sprintf(to->as_error, "Cannot convert type %s to a pointer", tp);
+            UT_string* tp = expression_result_type_to_string(&from->type, from->type.first);
+            snprintf(to->as_error, sizeof(to->as_error),
+                "Cannot convert type %s to a pointer", utstring_body(tp));
+            utstring_free(tp);
             return;
         }
     }
@@ -106,12 +107,12 @@ void expression_value_to_pointer(struct expression_result_t *from, struct expres
 
 void expression_dereference_pointer(struct expression_result_t *from, struct expression_result_t *to) {
     zero_expression_result(to);
-    extern backend_t bk;
+
     if (!(is_type_a_pointer(from->type.first))) {
         to->flags = EXPRESSION_ERROR;
-        char tp[128];
-        expression_result_type_to_string(&from->type, from->type.first, tp);
-        sprintf(to->as_error, "Cannot dereference type <%s>", tp);
+        UT_string* tp = expression_result_type_to_string(&from->type, from->type.first);
+        snprintf(to->as_error, sizeof(to->as_error), "Cannot dereference type <%s>", utstring_body(tp));
+        utstring_free(tp);
         return;
     }
 
@@ -125,7 +126,7 @@ void expression_dereference_pointer(struct expression_result_t *from, struct exp
     to->type.first = copy_type_chain(to->type.first->next);
     to->memory_location = from->as_pointer.ptr;
 
-    int16_t data = from->as_pointer.ptr;
+    int16_t data = (int16_t)from->as_pointer.ptr;
 
     switch (from->type.first->next->type_) {
         case TYPE_VOID: {
@@ -156,9 +157,10 @@ void expression_dereference_pointer(struct expression_result_t *from, struct exp
         }
         default: {
             set_expression_result_error(to);
-            char tp[128];
-            expression_result_type_to_string(&from->type, from->type.first->next, tp);
-            sprintf(to->as_error, "Cannot dereference type (not implemented) <%s>", tp);
+            UT_string* tp = expression_result_type_to_string(&from->type, from->type.first->next);
+            snprintf(to->as_error, sizeof(to->as_error),
+                "Cannot dereference type (not implemented) <%s>", utstring_body(tp));
+            utstring_free(tp);
             break;
         }
     }
@@ -168,9 +170,10 @@ void expression_resolve_struct_member_ptr(struct expression_result_t *struct_ptr
     zero_expression_result(result);
     if (!is_type_a_pointer(struct_ptr->type.first)) {
         set_expression_result_error(result);
-        char tp[128];
-        expression_result_type_to_string(&struct_ptr->type, struct_ptr->type.first, tp);
-        sprintf(result->as_error, "Cannot do arrow (->) on a non-pointer type <%s>", tp);
+        UT_string* tp = expression_result_type_to_string(&struct_ptr->type, struct_ptr->type.first);
+        snprintf(result->as_error, sizeof(result->as_error),
+            "Cannot do arrow (->) on a non-pointer type <%s>", utstring_body(tp));
+        utstring_free(tp);
         return;
     }
     struct expression_result_t dereferenced = {0};
@@ -188,18 +191,20 @@ void expression_resolve_struct_member(struct expression_result_t *struct_, const
     zero_expression_result(result);
     if (struct_->type.first == NULL || (struct_->type.first->type_ != TYPE_STRUCTURE)) {
         set_expression_result_error(result);
-        char tp[128];
-        expression_result_type_to_string(&struct_->type, struct_->type.first, tp);
-        sprintf(result->as_error, "Child member can only be resolved on a struct, got <%s> instead", tp);
+        UT_string* tp = expression_result_type_to_string(&struct_->type, struct_->type.first);
+        snprintf(result->as_error, sizeof(result->as_error),
+            "Child member can only be resolved on a struct, got <%s> instead", utstring_body(tp));
+        utstring_free(tp);
         return;
     }
 
     debug_sym_type* t = cdb_find_type(struct_->type.first->data);
     if (t == NULL) {
         set_expression_result_error(result);
-        char tp[128];
-        expression_result_type_to_string(&struct_->type, struct_->type.first, tp);
-        sprintf(result->as_error, "Cannot lookup child member on an unknown %s", tp);
+        UT_string* tp = expression_result_type_to_string(&struct_->type, struct_->type.first);
+        snprintf(result->as_error, sizeof(result->as_error),
+            "Cannot lookup child member on an unknown %s", utstring_body(tp));
+        utstring_free(tp);
         return;
     }
 
@@ -218,9 +223,10 @@ void expression_resolve_struct_member(struct expression_result_t *struct_, const
     }
 
     set_expression_result_error(result);
-    char tp[128];
-    expression_result_type_to_string(&struct_->type, struct_->type.first, tp);
-    sprintf(result->as_error, "Cannot find child member '%s' on an type <%s>", member, tp);
+    UT_string* tp = expression_result_type_to_string(&struct_->type, struct_->type.first);
+    snprintf(result->as_error, sizeof(result->as_error),
+        "Cannot find child member '%s' on an type <%s>", member, utstring_body(tp));
+    utstring_free(tp);
 }
 
 void expression_get_struct_members(struct expression_result_t* result, int* count, char** members)
@@ -318,52 +324,57 @@ void expression_string_get_type(const char* str, type_record* type) {
     type->first = malloc_type(TYPE_UNKNOWN);
 }
 
-void expression_result_type_to_string(type_record* root, type_chain* type, char* buffer) {
+UT_string* expression_result_type_to_string(type_record* root, type_chain* type) {
+    UT_string* buffer;
+    utstring_new(buffer);
+
     if (type == NULL) {
-        sprintf(buffer, "void");
-        return;
+        utstring_printf(buffer, "void");
+        return buffer;
     }
 
     for (int i = 0; primitive_types[i].type_name; i++) {
         if (primitive_types[i].is_signed == root->signed_ && primitive_types[i].type_of == type->type_) {
-            strcpy(buffer, primitive_types[i].type_name);
-            return;
+            utstring_printf(buffer, "%s", primitive_types[i].type_name);
+            return buffer;
         }
     }
 
     switch (type->type_) {
         case TYPE_GENERIC_POINTER: {
             if (type->next == NULL) {
-                sprintf(buffer, "void*");
+                utstring_printf(buffer, "void*");
             } else {
-                char pointer_type[128] = {};
-                expression_result_type_to_string(root, type->next, pointer_type);
-                sprintf(buffer, "%s*", pointer_type);
+                UT_string* pointer_type = expression_result_type_to_string(root, type->next);
+                utstring_printf(buffer, "%s*", utstring_body(pointer_type));
+                utstring_free(pointer_type);
             }
             break;
         }
         case TYPE_ARRAY: {
             if (type->next == NULL) {
-                sprintf(buffer, "void*");
+                utstring_printf(buffer, "void*");
             } else {
-                char array_type[128];
-                expression_result_type_to_string(root, type->next, array_type);
-                sprintf(buffer, "%s[]", array_type);
+                UT_string* array_type = expression_result_type_to_string(root, type->next);
+                utstring_printf(buffer, "%s[]", utstring_body(array_type));
+                utstring_free(array_type);
             }
             break;
         }
         case TYPE_STRUCTURE: {
-            sprintf(buffer, "struct %s", type->data);
+            utstring_printf(buffer, "struct %s", type->data);
             break;
         }
         case TYPE_FUNCTION: {
-            sprintf(buffer, "function");
+            utstring_printf(buffer, "function");
             break;
         }
         default: {
             break;
         }
     }
+
+    return buffer;
 }
 
 void expression_math_add(struct expression_result_t* a, struct expression_result_t* b, struct expression_result_t* result) {
@@ -414,9 +425,10 @@ void expression_math_add(struct expression_result_t* a, struct expression_result
         }
         default: {
             set_expression_result_error(result);
-            char tp[128];
-            expression_result_type_to_string(&a->type, a->type.first, tp);
-            sprintf(result->as_error, "Cannot perform math '+' on type %s", tp);
+            UT_string* tp = expression_result_type_to_string(&a->type, a->type.first);
+            snprintf(result->as_error, sizeof(result->as_error),
+                "Cannot perform math '+' on type %s", utstring_body(tp));
+            utstring_free(tp);
             break;
         }
     }
@@ -473,9 +485,10 @@ void expression_math_sub(struct expression_result_t* a, struct expression_result
         }
         default: {
             set_expression_result_error(result);
-            char tp[128];
-            expression_result_type_to_string(&a->type, a->type.first, tp);
-            sprintf(result->as_error, "Cannot perform math '+' on type %s", tp);
+            UT_string* tp = expression_result_type_to_string(&a->type, a->type.first);
+            snprintf(result->as_error, sizeof(result->as_error),
+                "Cannot perform math '+' on type %s", utstring_body(tp));
+            utstring_free(tp);
             break;
         }
     }
@@ -512,9 +525,10 @@ void expression_math_mul(struct expression_result_t* a, struct expression_result
         }
         default: {
             set_expression_result_error(result);
-            char tp[128];
-            expression_result_type_to_string(&a->type, a->type.first, tp);
-            sprintf(result->as_error, "Cannot perform math '+' on type %s", tp);
+            UT_string* tp = expression_result_type_to_string(&a->type, a->type.first);
+            snprintf(result->as_error, sizeof(result->as_error),
+                "Cannot perform math '+' on type %s", utstring_body(tp));
+            utstring_free(tp);
             break;
         }
     }
@@ -551,9 +565,10 @@ void expression_math_div(struct expression_result_t* a, struct expression_result
         }
         default: {
             set_expression_result_error(result);
-            char tp[128];
-            expression_result_type_to_string(&a->type, a->type.first, tp);
-            sprintf(result->as_error, "Cannot perform math '+' on type %s", tp);
+            UT_string* tp = expression_result_type_to_string(&a->type, a->type.first);
+            snprintf(result->as_error, sizeof(result->as_error),
+                "Cannot perform math '+' on type %s", utstring_body(tp));
+            utstring_free(tp);
             break;
         }
     }
@@ -562,89 +577,104 @@ void expression_math_div(struct expression_result_t* a, struct expression_result
 static int Min(int a, int b) { if (a < b ) return a; else return b;}
 static int Max(int a, int b) { if (a > b ) return a; else return b;}
 
-int expression_result_value_to_string(struct expression_result_t* result, char* buffer, int buffer_len) {
+UT_string* expression_result_value_to_string(struct expression_result_t* result) {
+    UT_string* buffer;
+    utstring_new(buffer);
     if (result->type.first == NULL) {
-        return snprintf(buffer, buffer_len, "<none>");
+        utstring_printf(buffer, "<none>");
+        return buffer;
     }
     switch (result->type.first->type_) {
         case TYPE_UNKNOWN: {
-            return snprintf(buffer, buffer_len, "<unknown>");
+            utstring_printf(buffer, "<unknown>");
+            return buffer;
         }
         case TYPE_FUNCTION: {
-            return snprintf(buffer, buffer_len, "<function>");
+            utstring_printf(buffer, "<function>");
+            return buffer;
         }
         case TYPE_ARRAY: {
-            int maxlen = Max(0, Min(10, result->type.size));
-            int offs = snprintf(buffer, buffer_len, "%#04x [%d] = { ", result->as_pointer.ptr, (int)result->type.size);
+            int maxlen = Max(0, Min(10, (int)result->type.size));
+            utstring_printf(buffer, "%#04x [%d] = { ", result->as_pointer.ptr, (int)result->type.size);
             uint16_t ptr = result->as_pointer.ptr;
             for ( int i = 0; i < maxlen; i++ ) {
-                offs += snprintf(buffer + offs, buffer_len - offs, "%s[%d] = ", i != 0 ? ", " : "", i);
+                utstring_printf(buffer, "%s[%d] = ", i != 0 ? ", " : "", i);
                 struct expression_result_t elr = {0};
                 debug_resolve_expression_element(&result->type, result->type.first->next, RESOLVE_BY_POINTER, ptr, &elr);
                 if (is_expression_result_error(&elr)) {
-                    offs += snprintf(buffer + offs, buffer_len - offs, "<error:%s>", elr.as_error);
+                    utstring_printf(buffer, "<error:%s>", elr.as_error);
                     break;
                 } else {
-                    offs += expression_result_value_to_string(&elr, buffer + offs, buffer_len - offs);
+                    UT_string* sub_value = expression_result_value_to_string(&elr);
+                    utstring_printf(buffer, "%s", utstring_body(sub_value));
+                    utstring_free(sub_value);
                     ptr += get_type_memory_size(result->type.first->next);
                 }
                 expression_result_free(&elr);
             }
-            offs += snprintf(buffer + offs, buffer_len - offs,"%s }", maxlen != result->type.size ? " ..." : "");
-            return offs;
+            utstring_printf(buffer, "%s }", maxlen != result->type.size ? " ..." : "");
+            return buffer;
         }
         case TYPE_CHAR:
         case TYPE_INT:
         case TYPE_LONG: {
             if (result->type.signed_) {
-                return snprintf(buffer, buffer_len, "%i", result->as_int);
+                utstring_printf(buffer, "%i", result->as_int);
+                return buffer;
             } else {
-                return snprintf(buffer, buffer_len, "%u", result->as_uint);
+                utstring_printf(buffer, "%u", result->as_uint);
+                return buffer;
             }
         }
         case TYPE_FLOAT: {
-            return snprintf(buffer, buffer_len, "%f", result->as_float);
+            utstring_printf(buffer, "%f", result->as_float);
+            return buffer;
         }
         case TYPE_STRUCTURE: {
             const char* struct_name = result->type.first->data;
             if (struct_name == NULL) {
-                return snprintf(buffer, buffer_len, "{%#04x}", result->as_pointer.ptr);
+                utstring_printf(buffer, "{%#04x}", result->as_pointer.ptr);
+                return buffer;
             }
             debug_sym_type* t = cdb_find_type(struct_name);
             if (t == NULL) {
-                return snprintf(buffer, buffer_len, "{%#04x}", result->as_pointer.ptr);
+                utstring_printf(buffer, "{%#04x}", result->as_pointer.ptr);
+                return buffer;
             }
             debug_sym_type_member* child = t->first_child;
             uint16_t ptr = result->as_pointer.ptr;
-            int offs = snprintf(buffer, buffer_len, "{");
+            utstring_printf(buffer, "{");
             uint8_t first = 1;
             while (child) {
                 if (first) {
                     first = 0;
-                    offs += snprintf(buffer + offs, buffer_len - offs, "%s=", child->symbol->symbol_name);
+                    utstring_printf(buffer, "%s=", child->symbol->symbol_name);
                 } else {
-                    offs += snprintf(buffer + offs, buffer_len - offs, ", %s=", child->symbol->symbol_name);
+                    utstring_printf(buffer, ", %s=", child->symbol->symbol_name);
                 }
                 struct expression_result_t child_result = {0};
                 debug_resolve_expression_element(&child->symbol->type_record, child->symbol->type_record.first,
                     RESOLVE_BY_POINTER, ptr + child->offset, &child_result);
                 if (is_expression_result_error(&child_result)) {
-                    offs += snprintf(buffer + offs, buffer_len - offs, "<error:%s>", child_result.as_error);
+                    utstring_printf(buffer, "<error:%s>", child_result.as_error);
                     expression_result_free(&child_result);
                     break;
                 } else {
-                    offs += expression_result_value_to_string(&child_result, buffer + offs, buffer_len - offs);
+                    UT_string* sub_value = expression_result_value_to_string(&child_result);
+                    utstring_printf(buffer, "%s", utstring_body(sub_value));
+                    utstring_free(sub_value);
                     expression_result_free(&child_result);
                 }
                 child = child->next;
             }
-            offs += snprintf(buffer + offs, buffer_len - offs, "}");
-            return offs;
+            utstring_printf(buffer, "}");
+            return buffer;
         }
         case TYPE_GENERIC_POINTER:
         case TYPE_CODE_POINTER: {
             if (result->type.first->next == NULL) {
-                return snprintf(buffer, buffer_len, "%#04x", result->as_pointer.ptr);
+                utstring_printf(buffer, "%#04x", result->as_pointer.ptr);
+                return buffer;
             }
             switch (result->type.first->next->type_) {
                 case TYPE_INT:
@@ -652,45 +682,47 @@ int expression_result_value_to_string(struct expression_result_t* result, char* 
                 {
                     struct expression_result_t local = {0};
                     expression_dereference_pointer(result, &local);
-                    int offs;
                     if (local.flags & EXPRESSION_ERROR) {
-                        offs = snprintf(buffer, buffer_len, "%#04x(error:%s)", result->as_pointer.ptr, local.as_error);
+                        utstring_printf(buffer, "%#04x(error:%s)", result->as_pointer.ptr, local.as_error);
                     } else {
-                        char buff[128];
-                        expression_result_value_to_string(&local, buff, 128);
-                        offs = snprintf(buffer, buffer_len, "%#04x(%s)", result->as_pointer.ptr, buff);
+                        UT_string* resolved_int = expression_result_value_to_string(&local);
+                        utstring_printf(buffer, "%#04x(%s)", result->as_pointer.ptr, utstring_body(resolved_int));
+                        utstring_free(resolved_int);
                     }
                     expression_result_free(&local);
-                    return offs;
+                    return buffer;
                 }
                 case TYPE_CHAR: {
                     char buff [128];
 
                     int i = 0;
                     while (i < 128) {
-                        char c = bk.get_memory(result->as_pointer.ptr + i);
+                        uint8_t c = bk.get_memory(result->as_pointer.ptr + i);
                         if (c == 0) {
                             break;
                         }
                         if (isprint(c)) {
-                            buff[i++] = c;
+                            buff[i++] = (char)c;
                         } else {
                             buff[i++] = '.';
                         }
                     }
                     buff[i] = 0;
-                    return snprintf(buffer, buffer_len, "%#04x('%s')", result->as_pointer.ptr, buff);
+                    utstring_printf(buffer, "%#04x('%s')", result->as_pointer.ptr, buff);
+                    return buffer;
                 }
                 default: {
-                    return snprintf(buffer, buffer_len, "%#04x", result->as_pointer.ptr);
+                    utstring_printf(buffer, "%#04x", result->as_pointer.ptr);
+                    return buffer;
                 }
             }
         }
         default: {
-            return snprintf(buffer, buffer_len, "<unknown:%d>", result->type.first->type_);
+            utstring_printf(buffer, "<unknown:%d>", result->type.first->type_);
+            return buffer;
         }
     }
-    return 0;
+    return buffer;
 }
 
 void convert_expression(struct expression_result_t* from, struct expression_result_t* to, type_record* type) {
@@ -726,7 +758,7 @@ void convert_expression(struct expression_result_t* from, struct expression_resu
         case TYPE_LONG: {
             switch (type->first->type_) {
                 case TYPE_FLOAT: {
-                    to->as_float = (int32_t)from->as_int;
+                    to->as_float = (float)(int32_t)from->as_int;
                     break;
                 }
                 case TYPE_CHAR:
