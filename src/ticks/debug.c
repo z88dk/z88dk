@@ -177,7 +177,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                         break;
                     }
                     default: {
-                        printf("Warning: unknown type D%c.\n", c);
+                        bk.debug("Warning: unknown type D%c.\n", c);
                         goto err;
                     }
                 }
@@ -228,7 +228,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                         break;
                     }
                     default: {
-                        printf("Warning: unknown type F%c.\n", c);
+                        bk.debug("Warning: unknown type F%c.\n", c);
                         goto err;
                     }
                 }
@@ -280,7 +280,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                 break;
             }
             case RECORD_PARSING_MODE_DONE: {
-                printf("Warning: data after sign.\n");
+                bk.debug("Warning: data after sign.\n");
                 goto err;
             }
         }
@@ -353,7 +353,7 @@ static void debug_add_function_info(const char *encoded)
         }
         default:
         {
-            printf("Warning: unknown function scope: %c\n", function_scope);
+            bk.debug("Warning: unknown function scope: %c\n", function_scope);
             return;
         }
     }
@@ -378,12 +378,12 @@ static void debug_add_function_info(const char *encoded)
     }
 
     if (parse_record_type(type_record, &f->type_record)) {
-        printf("Warning cannot parse type record.\n");
+        bk.debug("Warning cannot parse type record.\n");
         goto err;
     }
 
     if (parse_address_space(encoded, &encoded, &f->address_space)) {
-        printf("Warning cannot parse address space.\n");
+        bk.debug("Warning cannot parse address space.\n");
         goto err;
     }
 
@@ -393,7 +393,7 @@ static void debug_add_function_info(const char *encoded)
 
 err:
     free(f);
-    printf("Warning: could not add debug info on function.\n");
+    bk.debug("Warning: could not add debug info on function.\n");
 }
 
 static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char** result)
@@ -456,7 +456,7 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
         }
         default:
         {
-            printf("Warning: unknown symbol scope: %c\n", symbol_scope);
+            bk.debug("Warning: unknown symbol scope: %c\n", symbol_scope);
         }
     }
 
@@ -501,7 +501,7 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
                     arg->next = last;
                     s->belongs_to_function->arguments = arg;
                 } else {
-                    printf("Warning: could not find function %s.%s for argument %s.\n",
+                    bk.debug("Warning: could not find function %s.%s for argument %s.\n",
                         file_name, function_name, s->symbol_name);
                 }
 
@@ -512,12 +512,12 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
     }
 
     if (parse_record_type(type_record, &s->type_record)) {
-        printf("Warning cannot parse type record.\n");
+        bk.debug("Warning cannot parse type record.\n");
         goto err;
     }
 
     if (parse_address_space(encoded, &encoded, &s->address_space)) {
-        printf("Warning cannot parse address space.\n");
+        bk.debug("Warning cannot parse address space.\n");
         goto err;
     }
 
@@ -527,7 +527,7 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
 err:
     *result = NULL;
     free(s);
-    printf("Warning: could not add debug info on symbol.\n");
+    bk.debug("Warning: could not add debug info on symbol.\n");
     return NULL;
 }
 
@@ -578,7 +578,7 @@ static debug_sym_type* debug_parse_type_info(const char* encoded)
         }
         default:
         {
-            printf("Warning: unknown symbol scope: %c\n", symbol_scope);
+            bk.debug("Warning: unknown symbol scope: %c\n", symbol_scope);
             break;
         }
     }
@@ -630,7 +630,7 @@ err_type_info:
     free(type_info);
 err:
     free(t);
-    printf("Warning: could not add debug info on type.\n");
+    bk.debug("Warning: could not add debug info on type.\n");
     return NULL;
 }
 
@@ -695,13 +695,13 @@ void debug_add_info_encoded(char *encoded)
         }
         default:
         {
-            printf("Warning: unknown record type: %c\n", record_type);
+            bk.debug("Warning: unknown record type: %c\n", record_type);
             break;
         }
     }
 
     if (bk.is_verbose()) {
-        printf("Decoded cdb: <%s>\n",encoded);
+        bk.debug("Decoded cdb: <%s>\n",encoded);
     }
 }
 
@@ -1182,7 +1182,7 @@ uint8_t debug_symbol_valid(debug_sym_symbol *sym, uint16_t stack, debug_frame_po
 }
 
 debug_sym_symbol* cdb_find_symbol(const char* cname) {
-    debug_sym_symbol* result;
+    debug_sym_symbol* result = NULL;
     HASH_FIND_STR(cdb_csymbols, cname, result);
     return result;
 }

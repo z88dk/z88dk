@@ -722,7 +722,6 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
 
     debug_sym_function* fn = fp->function;
     if (fn != NULL) {
-        char function_args[255] = {0};
         debug_sym_function_argument* arg = fn->arguments;
         while (arg) {
             debug_sym_symbol* s = arg->symbol;
@@ -750,11 +749,29 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
     }
 
     // try globals
-    debug_sym_symbol *s = cdb_find_symbol(lookup->symbol_name);
+    debug_sym_symbol* s = cdb_find_symbol(lookup->symbol_name);
     if (s != NULL && s->address_space.address_space == 'E') {
         debug_get_symbol_value_expression(s, fp, result);
         debug_stack_frames_free(first_frame_pointer);
         return;
+    }
+
+    // try prefixing it with "_"
+    {
+        UT_string prefixed;
+        utstring_init(&prefixed);
+        utstring_printf(&prefixed, "_%s", lookup->symbol_name);
+
+        s = cdb_find_symbol(utstring_body(&prefixed));
+        if (s != NULL && s->address_space.address_space == 'E') {
+            debug_get_symbol_value_expression(s, fp, result);
+            debug_stack_frames_free(first_frame_pointer);
+
+            utstring_done(&prefixed);
+            return;
+        }
+
+        utstring_done(&prefixed);
     }
 
     debug_stack_frames_free(first_frame_pointer);
