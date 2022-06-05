@@ -226,6 +226,19 @@ int symbol_resolve(char *name, const char *filename)
         return sym->address;
     }
 
+    if (filename == NULL) {
+        // well, try and find something
+        symbol_file* f;
+        symbol_file* tmp;
+        HASH_ITER(hh, symbol_files, f, tmp)
+        {
+            HASH_FIND_STR(f->symbols, name, sym);
+            if (sym) {
+                return sym->address;
+            }
+        }
+    }
+
     return -1;
 }
 
