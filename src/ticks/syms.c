@@ -65,7 +65,7 @@ static int symbol_compare(const void *p1, const void *p2)
     return s2->address - s1->address;
 }
 
-static char read_symbol_buf[2048];
+static char read_symbol_buf[8192];
 
 void read_symbol_file(char *filename)
 {
