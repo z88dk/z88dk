@@ -590,6 +590,7 @@ void debugger_next()
             char req[64];
             sprintf(req, "i%d", len);
             schedule_write_packet(req);
+            add_temp_breakpoint_one_instruction();
             debugger_active = 0;
             return;
         }
@@ -597,12 +598,14 @@ void debugger_next()
 
     // it's something else, so do a regular step
     schedule_write_packet("s");
+    add_temp_breakpoint_one_instruction();
     debugger_active = 0;
 }
 
 void debugger_step()
 {
     schedule_write_packet("s");
+    add_temp_breakpoint_one_instruction();
     debugger_active = 0;
 }
 
@@ -1024,9 +1027,19 @@ shutdown:
     return 1;
 }
 
+static void ctrl_c_main_thread(const void* data, void* response)
+{
+    debugger_request_a_break();
+}
+
 static void ctrl_c()
 {
-    break_required = 1;
+    if (debugger_active)
+    {
+        return;
+    }
+
+    execute_on_main_thread_no_response(ctrl_c_main_thread, NULL);
 }
 
 static backend_t gdb_backend = {
@@ -1192,9 +1205,6 @@ int main(int argc, char **argv) {
 
             while (1) {
                 registers_invalidated = 1;
-
-                debugger_process_signals();
-
                 if (debugger_active) {
                     debugger();
                 } else {

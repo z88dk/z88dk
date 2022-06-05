@@ -618,7 +618,7 @@ static void cmd_evaluate_expression(const char* flow, int argc, char **argv) {
     struct expression_result_t* result = get_expression_result();
     if (is_expression_result_error(result))
     {
-        mi2_printf_error(flow, "%s", result->as_error);
+        mi2_printf_response(flow, "done,value=\"<%s>\"", result->as_error);
         utstring_free(expression);
         return;
     }
@@ -993,7 +993,7 @@ static void cmd_fin(const char* flow, int argc, char **argv) {
     } else {
         debug_stack_frames_free(first_frame_pointer);
 
-        add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_FIN, NULL, 0);
+        add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_FIN, NULL, 0);
         bk.step();
     }
 
@@ -1006,14 +1006,14 @@ static void cmd_next(const char* flow, int argc, char **argv) {
     int   lineno;
     const unsigned short pc = bk.pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
-        add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_NEXT_SOURCE_LINE, NULL, 0);
+        add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_NEXT_SOURCE_LINE, NULL, 0);
         bk.next();
         report_continue();
         mi2_printf_response(flow, "done");
         return;
     }
 
-    add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_NEXT_SOURCE_LINE, filename, lineno);
+    add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_NEXT_SOURCE_LINE, filename, lineno);
     bk.next();
     report_continue();
     mi2_printf_response(flow, "done");
@@ -1025,14 +1025,14 @@ static void cmd_step(const char* flow, int argc, char **argv) {
     int   lineno;
     const unsigned short pc = bk.pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
-        add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_STEP_SOURCE_LINE, NULL, 0);
+        add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_STEP_SOURCE_LINE, NULL, 0);
         bk.step();
         report_continue();
         mi2_printf_response(flow, "done");
         return;
     }
 
-    add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_STEP_SOURCE_LINE, filename, lineno);
+    add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_STEP_SOURCE_LINE, filename, lineno);
     bk.step();
     report_continue();
     mi2_printf_response(flow, "done");

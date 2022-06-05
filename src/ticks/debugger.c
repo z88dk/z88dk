@@ -196,7 +196,6 @@ static struct {
 };
 
        int debugger_active = 0;
-       int next_address = -1;
        int trace = 0;
        int trace_source = 0;
 static int hotspot = 0;
@@ -263,21 +262,15 @@ static void completion(const char *buf, linenoiseCompletions *lc, void *ctx)
 
 static uint8_t confirm(const char* message);
 
-void debugger_process_signals()
-{
-    if (break_required)
-    {
-        if (bk.breakable) {
-            bk.console("Requesting a break...\n");
-            bk.break_(0);
-        } else {
-            if (confirm("Cannot request a break, would you like to quit instead?"))
-            {
-                exit(1);
-            }
+void debugger_request_a_break() {
+    if (bk.breakable) {
+        bk.console("Requesting a break...\n");
+        bk.break_(0);
+    } else {
+        if (confirm("Cannot request a break, would you like to quit instead?"))
+        {
+            exit(1);
         }
-        break_required = 0;
-        return;
     }
 }
 
@@ -358,7 +351,6 @@ void debugger()
     int dodebug = process_temp_breakpoints();
 
     if (dodebug) {
-        next_address = -1;
         trace_source = 1;
     }
 
@@ -428,15 +420,8 @@ void debugger()
         }
     }
 
-    if (debugger_active == 0)
-    {
-        if ( bk.pc() == next_address ) {
-            next_address = -1;
-            dodebug = 1;
-        }
-        /* Check breakpoints */
-        if ( dodebug == 0 ) return;
-    }
+    if ((debugger_active == 0) && (dodebug == 0))
+        return;
 
     if (trace_source) {
         trace_source = 0;
@@ -523,7 +508,7 @@ static int cmd_next_source(int argc, char **argv)
         bk.console("Warning: cannot obtain current source line.\n");
         return 0;
     }
-    add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_NEXT_SOURCE_LINE, filename, lineno);
+    add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_NEXT_SOURCE_LINE, filename, lineno);
     bk.next();
     return 1;
 }
@@ -544,7 +529,7 @@ static int cmd_step_source(int argc, char **argv)
         return 0;
     }
 
-    add_temporary_internal_breakpoint(0xFFFFFFFF, TMP_REASON_STEP_SOURCE_LINE, filename, lineno);
+    add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_STEP_SOURCE_LINE, filename, lineno);
     bk.step();
     return 1;
 }

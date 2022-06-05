@@ -14,7 +14,7 @@ extern size_t current_frame;
 extern void debugger_init();
 extern void debugger();
 int debugger_evaluate(char* line);
-extern void debugger_process_signals();
+extern void debugger_request_a_break();
 
 void stdout_log(const char *fmt, ...);
 

@@ -14,7 +14,6 @@ breakpoint *watchpoints;
 // temporary breakpoints live to the point one of them is hit. in that case all of them has to be removed
 temporary_breakpoint_t* temporary_breakpoints = NULL;
 int next_breakpoint_number = 1;
-int break_required = 0;
 
 breakpoint* add_watchpoint(breakpoint_type operation, int value) {
     breakpoint* w = calloc(1, sizeof(breakpoint));
@@ -142,26 +141,39 @@ temporary_breakpoint_t* add_temporary_internal_breakpoint(uint32_t address, temp
     return tmp_step;
 }
 
+temporary_breakpoint_t* add_temp_breakpoint_one_instruction()
+{
+    return add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_ONE_INSTRUCTION, NULL, 0);
+}
+
+void remove_temp_breakpoint(temporary_breakpoint_t* b) {
+    if (b->external) {
+        bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, b->at, 1);
+    }
+    LL_DELETE(temporary_breakpoints, b);
+    free(b);
+}
+
 void remove_temp_breakpoints() {
     // regardless of the reason we've stopped, all temp breakpoints have to be removed
-    while (temporary_breakpoints) {
-        if (temporary_breakpoints->external) {
-            bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, temporary_breakpoints->at, 1);
-        }
-        temporary_breakpoint_t* next = temporary_breakpoints->next;
-        free(temporary_breakpoints);
-        temporary_breakpoints = next;
+
+    temporary_breakpoint_t* b;
+    temporary_breakpoint_t* tmp;
+    LL_FOREACH_SAFE(temporary_breakpoints, b, tmp)
+    {
+        remove_temp_breakpoint(b);
     }
 }
 
 uint8_t process_temp_breakpoints() {
     uint8_t dodebug = 0;
 
-    temporary_breakpoint_t *temp_br;
-    LL_FOREACH(temporary_breakpoints, temp_br) {
-        if ((temp_br->at == 0xFFFFFFFF) || (bk.pc() == temp_br->at)) {
+    temporary_breakpoint_t* b;
+    temporary_breakpoint_t* tmp;
+    LL_FOREACH_SAFE(temporary_breakpoints, b, tmp) {
+        if ((b->at == TEMP_BREAKPOINT_ANYWHERE) || (bk.pc() == b->at)) {
             dodebug = 1;
-            temporary_breakpoint_reason_t reason = temp_br->reason;
+            temporary_breakpoint_reason_t reason = b->reason;
             switch (reason) {
                 case TMP_REASON_FIN: {
                     struct debugger_regs_t regs;
@@ -169,8 +181,8 @@ uint8_t process_temp_breakpoints() {
                     uint16_t hl = wrap_reg(regs.h, regs.l);
                     uint16_t de = wrap_reg(regs.d, regs.e);
                     uint32_t return_value = ((uint32_t)de << 16) | hl;
-                    if (temp_br->callee) {
-                        type_chain *ttt = temp_br->callee->type_record.first;
+                    if (b->callee) {
+                        type_chain *ttt = b->callee->type_record.first;
                         if (ttt->type_ == TYPE_FUNCTION) {
                             // skip DF
                             ttt = ttt->next;
@@ -180,14 +192,14 @@ uint8_t process_temp_breakpoints() {
                         } else {
                             if (ttt->type_ != TYPE_VOID) {
                                 struct expression_result_t result = {0};
-                                debug_resolve_expression_element(&temp_br->callee->type_record, ttt,
+                                debug_resolve_expression_element(&b->callee->type_record, ttt,
                                     RESOLVE_BY_VALUE, return_value, &result);
                                 if (is_expression_result_error(&result)) {
-                                    bk.debug("function %s errored: %s\n", temp_br->callee->function_name, result.as_error);
+                                    bk.debug("function %s errored: %s\n", b->callee->function_name, result.as_error);
                                 } else {
                                     UT_string* resolved_result =
                                         expression_result_value_to_string(&result);
-                                    bk.debug("function %s returned: %s\n", temp_br->callee->function_name,
+                                    bk.debug("function %s returned: %s\n", b->callee->function_name,
                                         utstring_body(resolved_result));
                                     utstring_free(resolved_result);
                                 }
@@ -201,7 +213,7 @@ uint8_t process_temp_breakpoints() {
                 }
                 case TMP_REASON_STEP_SOURCE_LINE:
                 case TMP_REASON_NEXT_SOURCE_LINE: {
-                    if (temp_br->source_file == NULL) {
+                    if (b->source_file == NULL) {
                         // breakpoint was shady to begin with
                         dodebug = 1;
                     } else {
@@ -215,15 +227,17 @@ uint8_t process_temp_breakpoints() {
                             } else {
                                 bk.next();
                             }
+                            // keep the temp breakpoint
                             return 0;
                         }
                         // we're still on the same source line
-                        if ((strcmp(filename, temp_br->source_file) == 0) && (lineno == temp_br->source_line)) {
+                        if ((strcmp(filename, b->source_file) == 0) && (lineno == b->source_line)) {
                             if (reason == TMP_REASON_STEP_SOURCE_LINE) {
                                 bk.step();
                             } else {
                                 bk.next();
                             }
+                            // keep the temp breakpoint
                             return 0;
                         } else {
                             dodebug = 1;
@@ -231,16 +245,19 @@ uint8_t process_temp_breakpoints() {
                     }
                     break;
                 }
+                case TMP_REASON_ONE_INSTRUCTION:
+                {
+                    dodebug = 1;
+                    break;
+                }
                 default: {
                     bk.debug("Warning: unknown reason why we stopped on temporary breakpoint.\n");
                     break;
                 }
             }
-        }
-    }
 
-    if (dodebug) {
-        remove_temp_breakpoints();
+            remove_temp_breakpoint(b);
+        }
     }
 
     return dodebug;

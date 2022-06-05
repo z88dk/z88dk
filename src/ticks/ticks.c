@@ -582,6 +582,7 @@ int    ioport = -1;
 int    rom_size = 0;
 int    rc2014_mode = 0;
 int    c_autolabel = 0;
+int    break_required = 0;
 
 static const uint8_t mirror_table[] = {
     0x0, 0x8, 0x4, 0xC,  /*  0-3  */
@@ -1042,7 +1043,10 @@ int main (int argc, char **argv){
   do{
     char buf[256];
     if ( ih ) {
-        debugger_process_signals();
+        if (break_required) {
+            break_required = 0;
+            debugger_request_a_break();
+        }
         debugger();
     }
     if( pc==start )
