@@ -262,13 +262,15 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
     state->pc = pc;
     
     label = find_symbol(pc, SYM_ADDRESS);
-    if (label ) {
+    if (label && (compact <= 1)) {
         offs += snprintf(bufstart + offs, buflen - offs, "%s:%s",label, compact ? "" : "\n");
     }
     buf = bufstart + offs;
     buflen -= offs;
 
-    offs = snprintf(buf, buflen, "%-20s", "");
+    if (compact <= 1) {
+        offs = snprintf(buf, buflen, "%-20s", "");
+    }
 
     if ( address_is_code(state->pc) == 0 ) {
         READ_BYTE(state, b);
@@ -683,16 +685,24 @@ int disassemble2(int pc, char *bufstart, size_t buflen, int compact)
         } while (1);
     }
 
-    while ( offs < 60 ) {
-        buf[offs++] = ' ';
-        buf[offs] = 0;
+    if (compact <= 1) {
+        while ( offs < 60 ) {
+            buf[offs++] = ' ';
+            buf[offs] = 0;
+        }
+
+        offs += snprintf(buf + offs, buflen - offs, ";[%04x] ", start_pc & 0xffff);
+    } else {
+        offs += snprintf(buf + offs, buflen - offs, ";");
     }
-    offs += snprintf(buf + offs, buflen - offs, ";[%04x] ", start_pc & 0xffff);
+
     for ( i = state->skip; i < state->len; i++ ) {
         offs += snprintf(buf + offs, buflen - offs,"%s%02x", i ? " " : "", state->instr_bytes[i]);
     }
-    if ( dolf ) {
-        offs += snprintf(buf + offs, buflen - offs,"\n");
+    if (compact <= 1) {
+        if ( dolf ) {
+            offs += snprintf(buf + offs, buflen - offs,"\n");
+        }
     }
 
     return state->len;

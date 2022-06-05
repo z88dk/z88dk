@@ -16,10 +16,22 @@ typedef void (*out_cb)(int port, int value);
 typedef void (*debugger_write_memory_cb)(int addr, uint8_t val);
 typedef void (*debugger_read_memory_cb)(int addr);
 typedef void (*get_regs_cb)(struct debugger_regs_t* regs);
+typedef void (*break_cb)(uint8_t temporary);
 typedef void (*void_cb)();
 typedef uint8_t (*uint8_t_cb)();
+typedef void (*log_cb)(const char *fmt, ...);
 typedef uint8_t (*breakpoints_check_cb)();
-typedef void (*breakpoint_cb)(uint8_t type, uint16_t at, uint8_t sz);
+
+typedef enum
+{
+    BREAKPOINT_ERROR_OK = 0,
+    BREAKPOINT_ERROR_NOT_CONNECTED,
+    BREAKPOINT_ERROR_RUNNING,
+    BREAKPOINT_ERROR_FAILURE,
+} breakpoint_ret_t;
+
+typedef breakpoint_ret_t (*breakpoint_cb)(uint8_t type, uint16_t at, uint8_t sz);
+typedef uint8_t (*connect_cb)(const char* hostname, int port);
 
 typedef struct {
     get_longlong_cb st;
@@ -37,7 +49,7 @@ typedef struct {
     debugger_read_memory_cb debugger_read_memory;
     void_cb invalidate;
     uint8_t breakable;
-    void_cb break_;
+    break_cb break_;
     void_cb resume;
     void_cb next;
     void_cb step;
@@ -50,6 +62,12 @@ typedef struct {
     breakpoint_cb enable_breakpoint;
     breakpoints_check_cb breakpoints_check;
     uint8_t_cb is_verbose;
+    log_cb console;
+    log_cb debug;
+    connect_cb remote_connect;
+    uint8_t_cb is_remote_connected;
+    void_cb execution_stopped;
+    void_cb ctrl_c;
 } backend_t;
 
 extern backend_t bk;

@@ -1,4 +1,6 @@
+#include "debugger_gdb.h"
 #include "debugger.h"
+#include "debugger_mi2.h"
 #include "backend.h"
 #include "debug.h"
 #include "disassembler.h"
@@ -8,37 +10,40 @@
 #include <stdio.h>
 
 #include <pthread.h>
-#include <sys/fcntl.h>
-#include <semaphore.h>
+#include <unistd.h>
 #include "debugger_gdb_packets.h"
 #include "sxmlc.h"
 #include "sxmlsearch.h"
 
-typedef void (*trapped_action_t)(const void* data, void* response);
-typedef void (*network_op_cb)(void* arg);
-
-struct network_op
-{
-    network_op_cb callback;
-    void* arg;
-    struct network_op* prev;
-};
-
 static uint8_t verbose = 0;
 int c_autolabel = 0;
+uint8_t temporary_break = 0;
 static uint8_t registers_invalidated = 1;
-static sem_t* req_response_mutex = NULL;
-static sem_t* response_mutex = NULL;
-static sem_t* trap_mutex = NULL;
 static pthread_cond_t network_op_cond;
 static pthread_mutex_t network_op_mutex;
-static pthread_mutex_t trap_process_mutex;
+
+static pthread_cond_t main_thread_cond;
+static pthread_mutex_t main_thread_mutex;
 static int supported_packet_size = 1024;
-static trapped_action_t scheduled_action = NULL;
-static const void* scheduled_action_data = NULL;
-static void* scheduled_action_response = NULL;
+
+struct scheduled_action_t
+{
+    trapped_action_t scheduled_action;
+    const void* scheduled_action_data;
+    void* scheduled_action_response;
+    uint8_t* wait;
+
+    pthread_mutex_t* wait_mutex;
+    pthread_cond_t* wait_cond;
+
+    struct scheduled_action_t* next;
+};
+
+static struct scheduled_action_t* first_scheduled_action = NULL;
 static char request_response[1024];
 static uint8_t write_request = 0;
+static pthread_mutex_t req_response_mutex;
+static pthread_cond_t req_response_cond;
 static uint8_t waiting_for_response = 0;
 static const char hexchars[] = "0123456789abcdef";
 static struct debugger_regs_t registers;
@@ -134,17 +139,19 @@ void schedule_write_raw(const uint8_t* data, ssize_t length)
 
 static void send_request_no_response(const char* request)
 {
-    waiting_for_response = 0;
-
     schedule_write_packet(request);
 }
 
 static const char* send_request(const char* request)
 {
+    pthread_mutex_lock(&req_response_mutex);
     waiting_for_response = 1;
-
     schedule_write_packet(request);
-    sem_wait(req_response_mutex);
+
+    while (waiting_for_response) {
+        pthread_cond_wait(&req_response_cond, &req_response_mutex);
+    }
+    pthread_mutex_unlock(&req_response_mutex);
 
     return request_response;
 }
@@ -462,8 +469,19 @@ void port_out(int port, int value) {}
 void debugger_write_memory(int addr, uint8_t val) {}
 void debugger_read_memory(int addr) {}
 
-void debugger_break()
+void debugger_break(uint8_t temporary)
 {
+    if (temporary)
+    {
+        temporary_break = 1;
+    }
+
+    if (connection_socket == 0)
+    {
+        bk.debug("Nothing to break, as we're not connected.\n");
+        return;
+    }
+
     static uint8_t req[] = { 0x03 };
     schedule_write_raw(req, 1);
 }
@@ -472,6 +490,7 @@ void debugger_detach()
 {
     send_request("D");
     shutdown(connection_socket, 0);
+    connection_socket = 0;
 }
 
 void debugger_resume()
@@ -480,54 +499,63 @@ void debugger_resume()
     send_request_no_response("c");
 }
 
-void gdb_add_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
+breakpoint_ret_t gdb_add_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
-    switch (type)
-    {
+    if (connection_socket == 0) {
+        return BREAKPOINT_ERROR_NOT_CONNECTED;
+    }
+
+    if (debugger_active == 0) {
+        return BREAKPOINT_ERROR_RUNNING;
+    }
+
+    switch (type) {
         case BK_BREAKPOINT_REGISTER:
         case BK_BREAKPOINT_HARDWARE:
         {
-            printf("Warning: not supported.\n");
-            return;
+            return BREAKPOINT_ERROR_FAILURE;
         }
     }
 
     char req[64];
     sprintf(req, "Z%zx,%zx,%zx", (size_t)type, (size_t)at, (size_t)sz);
     const char* resp = send_request(req);
-    if (strcmp(resp, "E01") == 0)
+    if (strcmp(resp, "OK") != 0)
     {
-        printf("Could not set breakpoint.\n");
+        return BREAKPOINT_ERROR_FAILURE;
     }
-    else if (strcmp(resp, "OK") != 0)
-    {
-        printf("Could not set breakpoint: %s\n", resp);
-    }
+
+    return BREAKPOINT_ERROR_OK;
 }
 
-void gdb_remove_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
+breakpoint_ret_t gdb_remove_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
+    if (connection_socket == 0) {
+        return BREAKPOINT_ERROR_NOT_CONNECTED;
+    }
+    if (debugger_active == 0) {
+        return BREAKPOINT_ERROR_RUNNING;
+    }
+
     char req[64];
     sprintf(req, "z%zx,%zx,%zx", (size_t)type, (size_t)at, (size_t)sz);
     const char* resp = send_request(req);
-    if (strcmp(resp, "E01") == 0)
+    if (strcmp(resp, "OK") != 0)
     {
-        printf("Could not set breakpoint.\n");
+        return BREAKPOINT_ERROR_FAILURE;
     }
-    else if (strcmp(resp, "OK") != 0)
-    {
-        printf("Could not set breakpoint: %s\n", resp);
-    }
+
+    return BREAKPOINT_ERROR_OK;
 }
 
-void gdb_disable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
+breakpoint_ret_t gdb_disable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
-    printf("Warning: not supported.\n");
+    return BREAKPOINT_ERROR_FAILURE;
 }
 
-void gdb_enable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
+breakpoint_ret_t gdb_enable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
-    printf("Warning: not supported.\n");
+    return BREAKPOINT_ERROR_FAILURE;
 }
 
 uint8_t breakpoints_check()
@@ -563,6 +591,7 @@ void debugger_next()
             char req[64];
             sprintf(req, "i%d", len);
             schedule_write_packet(req);
+            add_temp_breakpoint_one_instruction();
             debugger_active = 0;
             return;
         }
@@ -570,12 +599,14 @@ void debugger_next()
 
     // it's something else, so do a regular step
     schedule_write_packet("s");
+    add_temp_breakpoint_one_instruction();
     debugger_active = 0;
 }
 
 void debugger_step()
 {
     schedule_write_packet("s");
+    add_temp_breakpoint_one_instruction();
     debugger_active = 0;
 }
 
@@ -635,67 +666,63 @@ uint8_t debugger_restore(const char* file_path, uint16_t at, uint8_t set_pc)
     return 0;
 }
 
-static backend_t gdb_backend = {
-    .st = &get_st,
-    .ff = &get_ff,
-    .pc = &get_pc,
-    .sp = &get_sp,
-    .get_memory = &get_memory,
-    .get_regs = &get_regs,
-    .set_regs = &set_regs,
-    .f = &f,
-    .f_ = &f_,
-    .memory_reset_paging = &memory_reset_paging,
-    .out = &port_out,
-    .debugger_write_memory = &debugger_write_memory,
-    .debugger_read_memory = &debugger_read_memory,
-    .invalidate = &invalidate,
-    .breakable = 1,
-    .break_ = &debugger_break,
-    .resume = &debugger_resume,
-    .next = &debugger_next,
-    .step = &debugger_step,
-    .confirm_detach_w_breakpoints = 1,
-    .detach = &debugger_detach,
-    .restore = &debugger_restore,
-    .add_breakpoint = &gdb_add_breakpoint,
-    .remove_breakpoint = &gdb_remove_breakpoint,
-    .disable_breakpoint = &gdb_disable_breakpoint,
-    .enable_breakpoint = &gdb_enable_breakpoint,
-    .breakpoints_check = &breakpoints_check,
-    .is_verbose = is_verbose
-};
-
-static void execute_on_main_thread(trapped_action_t call, const void* data, void* response)
+void execute_on_main_thread(trapped_action_t call, const void* data, void* response)
 {
+    pthread_mutex_t wait_mutex;
+    pthread_cond_t wait_cond;
+
+    pthread_mutex_init(&wait_mutex, NULL);
+    pthread_cond_init(&wait_cond, NULL);
+
+    uint8_t wait = 1;
+
     // prepare the action arguments
-    pthread_mutex_lock(&trap_process_mutex);
-    scheduled_action = call;
-    scheduled_action_data = data;
-    scheduled_action_response = response;
-    pthread_mutex_unlock(&trap_process_mutex);
+    pthread_mutex_lock(&main_thread_mutex);
+    struct scheduled_action_t* aa = calloc(1, sizeof(struct scheduled_action_t));
+    aa->scheduled_action = call;
+    aa->scheduled_action_data = data;
+    aa->scheduled_action_response = response;
+    aa->wait = &wait;
+    aa->wait_mutex = &wait_mutex;
+    aa->wait_cond = &wait_cond;
+    LL_APPEND(first_scheduled_action, aa);
 
     // notify the main thread
-    sem_post(trap_mutex);
+    pthread_cond_signal(&main_thread_cond);
+    pthread_mutex_unlock(&main_thread_mutex);
 
-    // wait for the response
-    sem_wait(response_mutex);
+    pthread_mutex_lock(&wait_mutex);
+
+    // wait for the response on the same cond
+    while (wait)
+    {
+        pthread_cond_wait(&wait_cond, &wait_mutex);
+    }
+
+    pthread_mutex_unlock(&wait_mutex);
+
+    pthread_mutex_destroy(&wait_mutex);
+    pthread_cond_destroy(&wait_cond);
 }
 
-static void execute_on_main_thread_no_response(trapped_action_t call, const void* data)
+void execute_on_main_thread_no_response(trapped_action_t call, const void* data)
 {
     // prepare the action arguments
-    pthread_mutex_lock(&trap_process_mutex);
-    scheduled_action = call;
-    scheduled_action_data = data;
-    scheduled_action_response = NULL;
-    pthread_mutex_unlock(&trap_process_mutex);
+    pthread_mutex_lock(&main_thread_mutex);
+    struct scheduled_action_t* aa = calloc(1, sizeof(struct scheduled_action_t));
+    aa->scheduled_action = call;
+    aa->scheduled_action_data = data;
+    aa->scheduled_action_response = NULL;
+    aa->wait = NULL;
+    LL_APPEND(first_scheduled_action, aa);
 
     // notify the main thread
-    sem_post(trap_mutex);
+    pthread_cond_signal(&main_thread_cond);
+
+    pthread_mutex_unlock(&main_thread_mutex);
 }
 
-void remote_execution_stopped(const void* data, void* response)
+static void gdb_execution_stopped()
 {
     if (debugger_active == 1)
     {
@@ -704,10 +731,15 @@ void remote_execution_stopped(const void* data, void* response)
 
     if (bk.is_verbose())
     {
-        printf("Execution stopped.\n");
+        bk.debug("Execution stopped\n");
     }
 
     debugger_active = 1;
+}
+
+void remote_execution_stopped(const void* data, void* response)
+{
+    bk.execution_stopped();
 }
 
 static uint8_t process_packet()
@@ -721,14 +753,14 @@ static uint8_t process_packet()
 
     if (inbuf_size > 0 && *inbuf == '+') {
         if (bk.is_verbose()) {
-            printf("ack.\n");
+            bk.debug("ack.\n");
         }
         inbuf_erase_head(1);
         return 1;
     }
 
     if (bk.is_verbose()) {
-        printf("r: %.*s\n", inbuf_size, inbuf);
+        bk.debug("r: %.*s\n", inbuf_size, inbuf);
     }
 
     uint8_t *packetend_ptr = (uint8_t *)memchr(inbuf, '#', inbuf_size);
@@ -747,7 +779,7 @@ static uint8_t process_packet()
     if (checksum != (hex(inbuf[packetend + 1]) << 4 | hex(inbuf[packetend + 2])))
     {
         if (bk.is_verbose()) {
-            printf("Warning: incorrect checksum, expected: %02x\n", checksum);
+            bk.debug("Warning: incorrect checksum, expected: %02x\n", checksum);
         }
         inbuf_erase_head(packetend + 3);
         return 1;
@@ -757,25 +789,29 @@ static uint8_t process_packet()
     strcpy(recv_data, (char*)&inbuf[1]);
     inbuf_erase_head(packetend + 3);
 
+    pthread_mutex_lock(&req_response_mutex);
+
     if (waiting_for_response)
     {
         waiting_for_response = 0;
         strcpy(request_response, recv_data);
-        sem_post(req_response_mutex);
+        pthread_cond_signal(&req_response_cond);
+        pthread_mutex_unlock(&req_response_mutex);
+        return 1;
     }
-    else
+
+    pthread_mutex_unlock(&req_response_mutex);
+
+    char request = recv_data[0];
+    char *payload = (char *)&recv_data[1];
+
+    switch (request)
     {
-        char request = recv_data[0];
-        char *payload = (char *)&recv_data[1];
-
-        switch (request)
+        case 'T':
         {
-            case 'T':
-            {
-                execute_on_main_thread_no_response(&remote_execution_stopped, NULL);
+            execute_on_main_thread_no_response(&remote_execution_stopped, NULL);
 
-                break;
-            }
+            break;
         }
     }
 
@@ -786,21 +822,16 @@ static void* network_read_thread(void* arg)
 {
     sock_t socket = *(sock_t*)arg;
 
-    while (1)
+    while (connection_socket)
     {
         int ret;
         if ((ret = read_packet(socket)))
         {
-            printf("A network error occured: %d\n", ret);
             break;
         }
 
         while (process_packet()) {};
     }
-
-    shutdown(socket, 0);
-    printf("Disconnected.\n");
-    exit(1);
 
     return NULL;
 }
@@ -809,7 +840,7 @@ static void* network_write_thread(void* arg)
 {
     sock_t socket = *(sock_t*)arg;
 
-    while (1)
+    while (connection_socket)
     {
         pthread_mutex_lock(&network_op_mutex);
         while (last_network_op == NULL) {
@@ -829,47 +860,25 @@ static void* network_write_thread(void* arg)
     return NULL;
 }
 
+static void init_mutexes()
+{
+    pthread_mutex_init(&main_thread_mutex, NULL);
+    pthread_cond_init(&main_thread_cond, NULL);
 
-int main(int argc, char **argv) {
-    char* connect_host = NULL;
-    int connect_port = 0;
+    pthread_mutex_init(&req_response_mutex, NULL);
+    pthread_cond_init(&req_response_cond, NULL);
 
-    printf("----------------------------------\n"
-           "z88dk-gdb, a gdb client for z88dk.\n"
-           "----------------------------------\n"
-           "\n"
-           "See the following for a list of compatible gdb servers: "
-           "https://github.com/z88dk/z88dk/wiki/Tool-z88dk-gdb\n"
-           "\n");
+    pthread_mutex_init(&network_op_mutex, NULL);
+    pthread_cond_init(&network_op_cond, NULL);
+}
 
-    set_backend(gdb_backend);
+static uint8_t is_gdbserver_connected()
+{
+    return connection_socket;
+}
 
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-p") == 0) {
-            connect_port = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "-h") == 0) {
-            connect_host = argv[++i];
-        } else if (strcmp(argv[i], "-x") == 0) {
-            char* debug_symbols = argv[++i];
-            if (bk.is_verbose()) {
-                printf("Reading debug symbols...");
-            }
-            read_symbol_file(debug_symbols);
-            if (bk.is_verbose()) {
-                printf("OK\n");
-            }
-        } else if (strcmp(argv[i], "-v") == 0) {
-            verbose = 1;
-        }
-    }
-
-    if (connect_port == 0 || connect_host == NULL) {
-        printf("Usage: z88dk-gdb -h <connect host> -p <connect port> -x <debug symbols> [-x <debug symbols>] [-v]\n");
-        return 1;
-    }
-
-    debugger_init();
-
+static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
+{
     connection_socket = socket(AF_INET, SOCK_STREAM, 0);
 
     struct sockaddr_in servaddr;
@@ -883,22 +892,8 @@ int main(int argc, char **argv) {
     // connect the client socket to server socket
     int ret = connect(connection_socket, (struct sockaddr*)&servaddr, sizeof(servaddr));
     if (ret) {
-        printf("Could not connect to the server: %d\n", ret);
         return 1;
-    } else {
-        printf("Connected to the server.\n");
     }
-
-    sem_unlink("req_response_mutex");
-    req_response_mutex = sem_open("req_response_mutex", O_CREAT|O_EXCL, 0600, 0);
-    sem_unlink("response_mutex");
-    response_mutex = sem_open("response_mutex", O_CREAT|O_EXCL, 0600, 0);
-    sem_unlink("trap_mutex");
-    trap_mutex = sem_open("trap_mutex", O_CREAT|O_EXCL, 0600, 0);
-
-    pthread_cond_init(&network_op_cond, NULL);
-    pthread_mutex_init(&network_op_mutex, NULL);
-    pthread_mutex_init(&trap_process_mutex, NULL);
 
     {
         pthread_t id;
@@ -1026,38 +1021,218 @@ int main(int argc, char **argv) {
     // this should break us
     send_request_no_response("?");
 
-    while (1)
-    {
-        registers_invalidated = 1;
-
-        debugger_process_signals();
-
-        if (debugger_active)
-        {
-            debugger();
-        }
-        else
-        {
-            sem_wait(trap_mutex);
-
-            pthread_mutex_lock(&trap_process_mutex);
-            if (scheduled_action != NULL)
-            {
-                scheduled_action(scheduled_action_data, scheduled_action_response);
-                scheduled_action = NULL;
-
-                if (scheduled_action_response != NULL)
-                {
-                    // notify the waiter that we're done
-                    sem_post(response_mutex);
-                }
-            }
-            pthread_mutex_unlock(&trap_process_mutex);
-        }
-    }
+    return 0;
 
 shutdown:
     shutdown(connection_socket, 0);
+    return 1;
+}
+
+static void ctrl_c_main_thread(const void* data, void* response) {
+    debugger_request_a_break();
+}
+
+static volatile uint8_t ctrl_c_requested = 0;
+
+/*
+ * The purpose of this crude loop is to offload signal handling to main thread,
+ * as it is not safe to do most of the stuff in a signal handler directly.
+ */
+static void* ctrl_c_signal_loop(void* arg) {
+    while (1) {
+        if (ctrl_c_requested) {
+            ctrl_c_requested = 0;
+            execute_on_main_thread_no_response(ctrl_c_main_thread, NULL);
+        }
+        sleep(1);
+    }
+    return NULL;
+}
+
+static void start_ctrl_c_signal_loop() {
+    static pthread_t ctrl_c_thread;
+    pthread_create(&ctrl_c_thread, NULL, ctrl_c_signal_loop, NULL);
+}
+
+static void ctrl_c() {
+    ctrl_c_requested = 1;
+}
+
+static backend_t gdb_backend = {
+    .st = &get_st,
+    .ff = &get_ff,
+    .pc = &get_pc,
+    .sp = &get_sp,
+    .get_memory = &get_memory,
+    .get_regs = &get_regs,
+    .set_regs = &set_regs,
+    .f = &f,
+    .f_ = &f_,
+    .memory_reset_paging = &memory_reset_paging,
+    .out = &port_out,
+    .debugger_write_memory = &debugger_write_memory,
+    .debugger_read_memory = &debugger_read_memory,
+    .invalidate = &invalidate,
+    .breakable = 1,
+    .break_ = &debugger_break,
+    .resume = &debugger_resume,
+    .next = &debugger_next,
+    .step = &debugger_step,
+    .confirm_detach_w_breakpoints = 1,
+    .detach = &debugger_detach,
+    .restore = &debugger_restore,
+    .add_breakpoint = &gdb_add_breakpoint,
+    .remove_breakpoint = &gdb_remove_breakpoint,
+    .disable_breakpoint = &gdb_disable_breakpoint,
+    .enable_breakpoint = &gdb_enable_breakpoint,
+    .breakpoints_check = &breakpoints_check,
+    .is_verbose = is_verbose,
+    .remote_connect = connect_to_gdbserver,
+    .is_remote_connected = is_gdbserver_connected,
+    .console = stdout_log,
+    .debug = stdout_log,
+    .execution_stopped = gdb_execution_stopped,
+    .ctrl_c = ctrl_c
+};
+
+static void process_scheduled_actions()
+{
+    pthread_mutex_lock(&main_thread_mutex);
+
+    // wait until we have a job
+    while (first_scheduled_action == NULL)
+    {
+        pthread_cond_wait(&main_thread_cond, &main_thread_mutex);
+    }
+
+    // we need to unblock the queue for new jobs. jobs scheduled on main thread may want to
+    // schedule new jobs. to mitigate that deadlock, the queue is blocked on its own
+    struct scheduled_action_t* first_to_process = first_scheduled_action;
+    first_scheduled_action = NULL;
+
+    pthread_mutex_unlock(&main_thread_mutex);
+
+    struct scheduled_action_t* entry;
+    struct scheduled_action_t* tmp;
+
+    LL_FOREACH_SAFE(first_to_process, entry, tmp)
+    {
+        entry->scheduled_action(entry->scheduled_action_data, entry->scheduled_action_response);
+
+        if (entry->wait)
+        {
+            pthread_mutex_lock(entry->wait_mutex);
+            // notify the waiter that we're done
+            *entry->wait = 0;
+            pthread_cond_signal(entry->wait_cond);
+            pthread_mutex_unlock(entry->wait_mutex);
+        }
+
+        LL_DELETE(first_to_process, entry);
+        free(entry);
+    }
+}
+
+int main(int argc, char **argv) {
+    char* connect_host = NULL;
+    int connect_port = 0;
+
+    set_backend(gdb_backend);
+
+    uint8_t debugger_mi2_mode = 0;
+    char* map_file = NULL;
+
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-p") == 0) {
+            connect_port = atoi(argv[++i]);
+        } else if (strcmp(argv[i], "-h") == 0) {
+            connect_host = argv[++i];
+        } else if (strcmp(argv[i], "-x") == 0) {
+            char* debug_symbols = argv[++i];
+            if (bk.is_verbose()) {
+                printf("Reading debug symbols...");
+            }
+            read_symbol_file(debug_symbols);
+            if (bk.is_verbose()) {
+                printf("OK\n");
+            }
+        } else if (strcmp(argv[i], "-v") == 0) {
+            verbose = 1;
+        } else if (strcmp(argv[i], "-q") == 0) {
+            // ignore
+        } else if (strcmp(argv[i], "--version") == 0) {
+            printf("GNU gdb (GDB) 11.0\n");
+            printf("The line above is fake, we're pretending to be a gdb here.\n");
+            exit(0);
+        } else if (strstr(argv[i], "--interpreter=")) {
+            const char* interpreter = argv[i] + 14;
+            if (strcmp(interpreter, "mi2") == 0) {
+                debugger_mi2_mode = 1;
+            }
+        } else {
+            if (map_file == NULL) {
+                map_file = argv[i];
+            } else {
+                printf("Unknown option: %s\n", argv[i]);
+                exit(1);
+            }
+        }
+    }
+
+    debugger_init();
+    init_mutexes();
+
+    if (debugger_mi2_mode) {
+        debugger_mi2_init();
+
+        mi2_printf_thread("thread-group-added,id=\"i1\"");
+        bk.console("z88dk-gdb, a gdb client for z88dk\n");
+
+        if (map_file) {
+            bk.console("Reading symbol file %s...\n", map_file);
+            read_symbol_file(map_file);
+            bk.console("Done.\n");
+        }
+
+        while (1) {
+            registers_invalidated = 1;
+            process_scheduled_actions();
+        }
+
+    } else {
+        printf("----------------------------------\n"
+               "z88dk-gdb, a gdb client for z88dk.\n"
+               "----------------------------------\n"
+               "\n"
+               "See the following for a list of compatible gdb servers: "
+               "https://github.com/z88dk/z88dk/wiki/Tool-z88dk-gdb\n"
+               "\n");
+
+        if (connect_port == 0 || connect_host == NULL) {
+            printf("Usage: z88dk-gdb -h <connect host> -p <connect port> -x <debug symbols> [-x <debug symbols>] [-v]\n");
+            return 1;
+        } else {
+            start_ctrl_c_signal_loop();
+
+            bk.console("Connecting...\n");
+
+            if (connect_to_gdbserver(connect_host, connect_port)) {
+                printf("Could not connect to the server\n");
+                return 1;
+            }
+
+            bk.console("Connected to the server.\n");
+
+            while (1) {
+                registers_invalidated = 1;
+                if (debugger_active) {
+                    debugger();
+                } else {
+                    process_scheduled_actions();
+                }
+            }
+        }
+    }
 
     return 0;
 }

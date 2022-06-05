@@ -5,8 +5,9 @@
 #include "ticks.h"
 #include "debug.h"
 
-static symbol  *symbols[SYM_TAB_SIZE] = {0};
-static symbol  *symbols_byname = NULL;
+static symbol*          symbols[SYM_TAB_SIZE] = {0};
+static symbol*          global_symbols = NULL;
+static symbol_file*     symbol_files = NULL;
 
 typedef struct section_s section;
 
@@ -64,7 +65,7 @@ static int symbol_compare(const void *p1, const void *p2)
     return s2->address - s1->address;
 }
 
-static char read_symbol_buf[2048];
+static char read_symbol_buf[8192];
 
 void read_symbol_file(char *filename)
 {
@@ -92,7 +93,7 @@ void read_symbol_file(char *filename)
                             symbol *sym;
                             int     start;
                             strcpy(argv[0]+len - 5, "_head");
-                            if ((start = symbol_resolve(argv[0])) != -1 ) { // Looking for __head
+                            if ((start = symbol_resolve(argv[0], NULL)) != -1 ) { // Looking for __head
                                 section *sect = calloc(1,sizeof(*sect));
                                 sect->start = start;
                                 sect->end = start + size;
@@ -122,7 +123,7 @@ void read_symbol_file(char *filename)
                             LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
                         }
                     }
-                    HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
+                    HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
                 }
                 free(argv);
                 continue;
@@ -145,16 +146,28 @@ void read_symbol_file(char *filename)
 
                 sym->section = strdup(argv[8]); // TODO, comma
                 sym->islocal = 0;
-                if ( strcmp(argv[5], "local,")) {
+                if (strcmp(argv[5], "local,") == 0) {
                     sym->islocal = 1;
                 }
                 sym->symtype = SYM_ADDRESS;
-                if ( strcmp(argv[4],"const,") == 0 ) {
+                if (strcmp(argv[4],"const,") == 0 ) {
                     sym->symtype = SYM_CONST;
                 }
                 sym->address = strtol(argv[2] + 1, NULL, 16);
                 LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
-                HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
+
+                if (sym->islocal) {
+                    symbol_file* f = NULL;
+                    HASH_FIND_STR(symbol_files, sym->file, f);
+                    if (f == NULL) {
+                        f = calloc(1, sizeof(symbol_file));
+                        f->name = strdup(sym->file);
+                        HASH_ADD_STR(symbol_files, name, f);
+                    }
+                    HASH_ADD_KEYPTR(hh, f->symbols, sym->name, strlen(sym->name), sym);
+                } else {
+                    HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
+                }
             } else if ( argc > 9 ) {
                 /* It's a cline/asmline symbol */
                 char   filename[FILENAME_MAX+1];
@@ -172,23 +185,58 @@ void read_symbol_file(char *filename)
     }
 }
 
-symbol *find_symbol_byname(const char *name)
+symbol *find_symbol_byname(const char *name, const char *filename)
 {
-    symbol *sym;
+    if (filename) {
+        symbol_file* f = NULL;
+        HASH_FIND_STR(symbol_files, filename, f);
+        if (f) {
+            symbol *sym = NULL;
+            HASH_FIND_STR(f->symbols, name, sym);
+            if (sym) {
+                return sym;
+            }
+        }
+    }
 
-    HASH_FIND_STR(symbols_byname, name, sym);
-
+    symbol *sym = NULL;
+    HASH_FIND_STR(global_symbols, name, sym);
     return sym;
 }
 
-int symbol_resolve(char *name)
+int symbol_resolve(char *name, const char *filename)
 {
+    if (filename) {
+        symbol_file* f = NULL;
+        HASH_FIND_STR(symbol_files, filename, f);
+        if (f) {
+            symbol *sym = NULL;
+            HASH_FIND_STR(f->symbols, name, sym);
+            if (sym) {
+                return sym->address;
+            }
+        }
+    }
+
     symbol *sym;
     char   *ptr;
 
-    HASH_FIND_STR(symbols_byname, name, sym);
+    HASH_FIND_STR(global_symbols, name, sym);
     if ( sym != NULL ) {
         return sym->address;
+    }
+
+    if (filename == NULL) {
+        // well, try and find something
+        symbol_file* f;
+        symbol_file* tmp;
+        HASH_ITER(hh, symbol_files, f, tmp)
+        {
+            HASH_FIND_STR(f->symbols, name, sym);
+            if (sym) {
+                return sym->address;
+            }
+        }
     }
 
     return -1;
@@ -352,7 +400,7 @@ void symbol_add_autolabel(int address, char *label)
     sym->address = address;
     sym->symtype = SYM_ADDRESS;
     LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
-    HASH_ADD_KEYPTR(hh, symbols_byname, sym->name, strlen(sym->name), sym);
+    HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
 
 }
 
