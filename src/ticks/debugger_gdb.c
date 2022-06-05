@@ -10,6 +10,7 @@
 #include <stdio.h>
 
 #include <pthread.h>
+#include <unistd.h>
 #include "debugger_gdb_packets.h"
 #include "sxmlc.h"
 #include "sxmlsearch.h"
@@ -1027,19 +1028,34 @@ shutdown:
     return 1;
 }
 
-static void ctrl_c_main_thread(const void* data, void* response)
-{
+static void ctrl_c_main_thread(const void* data, void* response) {
     debugger_request_a_break();
 }
 
-static void ctrl_c()
-{
-    if (debugger_active)
-    {
-        return;
-    }
+static volatile uint8_t ctrl_c_requested = 0;
 
-    execute_on_main_thread_no_response(ctrl_c_main_thread, NULL);
+/*
+ * The purpose of this crude loop is to offload signal handling to main thread,
+ * as it is not safe to do most of the stuff in a signal handler directly.
+ */
+static void* ctrl_c_signal_loop(void* arg) {
+    while (1) {
+        if (ctrl_c_requested) {
+            ctrl_c_requested = 0;
+            execute_on_main_thread_no_response(ctrl_c_main_thread, NULL);
+        }
+        sleep(1);
+    }
+    return NULL;
+}
+
+static void start_ctrl_c_signal_loop() {
+    static pthread_t ctrl_c_thread;
+    pthread_create(&ctrl_c_thread, NULL, ctrl_c_signal_loop, NULL);
+}
+
+static void ctrl_c() {
+    ctrl_c_requested = 1;
 }
 
 static backend_t gdb_backend = {
@@ -1196,12 +1212,16 @@ int main(int argc, char **argv) {
             printf("Usage: z88dk-gdb -h <connect host> -p <connect port> -x <debug symbols> [-x <debug symbols>] [-v]\n");
             return 1;
         } else {
+            start_ctrl_c_signal_loop();
+
+            bk.console("Connecting...\n");
+
             if (connect_to_gdbserver(connect_host, connect_port)) {
                 printf("Could not connect to the server\n");
                 return 1;
             }
 
-            printf("Connected to the server.\n");
+            bk.console("Connected to the server.\n");
 
             while (1) {
                 registers_invalidated = 1;

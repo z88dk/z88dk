@@ -9,6 +9,7 @@
 #endif
 
 extern int debugger_active;
+extern int debugger_break_requested;
 extern size_t current_frame;
 
 extern void debugger_init();

@@ -196,6 +196,7 @@ static struct {
 };
 
        int debugger_active = 0;
+       int debugger_break_requested = 0;
        int trace = 0;
        int trace_source = 0;
 static int hotspot = 0;
@@ -209,13 +210,19 @@ static int last_stacktrace_at = 0;
 
 static int interact_with_tty = 0;
 
-void ctrl_c_handler(int dummy) {
+void ctrl_c_handler() {
     bk.ctrl_c();
 }
 
 void debugger_init()
 {
-    signal(SIGINT, ctrl_c_handler);
+    struct sigaction act;
+    sigemptyset(&act.sa_mask);
+
+    act.sa_handler = ctrl_c_handler;
+    act.sa_flags = SA_NODEFER;
+    sigaction(SIGINT, &act, 0);
+
     linenoiseSetCompletionCallback(completion, NULL);
     linenoiseHistoryLoad(HISTORY_FILE); /* Load the history at startup */
     atexit(print_hotspots);
@@ -264,6 +271,7 @@ static uint8_t confirm(const char* message);
 
 void debugger_request_a_break() {
     if (bk.breakable) {
+        debugger_break_requested = 1;
         bk.console("Requesting a break...\n");
         bk.break_(0);
     } else {
@@ -420,8 +428,11 @@ void debugger()
         }
     }
 
-    if ((debugger_active == 0) && (dodebug == 0))
+    if ((debugger_break_requested == 0) && (debugger_active == 0) && (dodebug == 0))
         return;
+
+    // clear up the debugger_break_requested
+    debugger_break_requested = 0;
 
     if (trace_source) {
         trace_source = 0;

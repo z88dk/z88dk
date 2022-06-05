@@ -1269,17 +1269,6 @@ void execute_prompt(const void* data, void* response) {
     mi2_printf_prompt();
 }
 
-
-void execute_ctrl_c(const void* data, void* response) {
-    bk.console("Caught ctrl-c.");
-    bk.break_(0);
-    mi2_printf_prompt();
-}
-
-static void ctrl_c() {
-    execute_on_main_thread_no_response(execute_ctrl_c, NULL);
-}
-
 static void* debugger_mi2_console_loop(void* arg) {
     char *debugger_line = malloc(1024);
     size_t debugger_line_size = 1024;
@@ -1481,7 +1470,6 @@ void debugger_mi2_init()
     bk.console = mi2_console_printf;
     bk.debug = mi2_internal_printf;
     bk.execution_stopped = mi2_execution_stopped;
-    bk.ctrl_c = ctrl_c;
 
     {
         pthread_t id;
