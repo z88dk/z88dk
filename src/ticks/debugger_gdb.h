@@ -17,6 +17,6 @@ extern void execute_on_main_thread(trapped_action_t call, const void* data, void
 extern void execute_on_main_thread_no_response(trapped_action_t call, const void* data);
 extern char *mem2hex(const uint8_t *mem, char *buf, uint32_t count);
 
-uint8_t temporary_break;
+extern uint8_t temporary_break;
 
 #endif
