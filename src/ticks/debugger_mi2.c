@@ -1276,7 +1276,7 @@ static void* debugger_mi2_console_loop(void* arg) {
     while (1) {
         execute_on_main_thread(execute_prompt, NULL, NULL);
 
-        while (getline(&debugger_line, &debugger_line_size, stdin) == 0) ;
+        while (gets(debugger_line) == 0) ;
 
         int argc;
         char **argv = parse_words(debugger_line, &argc);
