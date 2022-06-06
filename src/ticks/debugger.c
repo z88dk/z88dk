@@ -210,19 +210,13 @@ static int last_stacktrace_at = 0;
 
 static int interact_with_tty = 0;
 
-void ctrl_c_handler() {
+void ctrl_c_handler(int signum) {
     bk.ctrl_c();
 }
 
 void debugger_init()
 {
-    struct sigaction act;
-    sigemptyset(&act.sa_mask);
-
-    act.sa_handler = ctrl_c_handler;
-    act.sa_flags = SA_NODEFER;
-    sigaction(SIGINT, &act, 0);
-
+    signal(SIGINT, ctrl_c_handler);
     linenoiseSetCompletionCallback(completion, NULL);
     linenoiseHistoryLoad(HISTORY_FILE); /* Load the history at startup */
     atexit(print_hotspots);
