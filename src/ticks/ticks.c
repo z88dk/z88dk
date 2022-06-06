@@ -7,6 +7,7 @@
 #include "cpu.h"
 #include "debugger.h"
 #include "backend.h"
+#include "profiler.h"
 
 // fr = zero, ff&256 = carry, ff&128 = s/p
 
@@ -4702,6 +4703,9 @@ int main (int argc, char **argv){
     sttap= st+( tap= tapcycles() );
   if ( counter != -1 )
     printf("%llu\n", st);
+  if (profiler_enabled) {
+      profiler_stop();
+  }
   if( output ){
     fh= fopen(output, "wb+");
     if( !fh )

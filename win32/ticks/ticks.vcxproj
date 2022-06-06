@@ -186,6 +186,7 @@
     <ClCompile Include="..\..\src\ticks\lex.yy.c" />
     <ClCompile Include="..\..\src\ticks\linenoise.c" />
     <ClCompile Include="..\..\src\ticks\memory.c" />
+    <ClCompile Include="..\..\src\ticks\profiler.c" />
     <ClCompile Include="..\..\src\ticks\srcfile.c" />
     <ClCompile Include="..\..\src\ticks\syms.c" />
     <ClCompile Include="..\..\src\ticks\ticks.c" />

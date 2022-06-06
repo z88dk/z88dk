@@ -190,6 +190,11 @@ uint8_t breakpoints_check()
     return debugger_active == 0;
 }
 
+static uint32_t ticks_time()
+{
+    return st;
+}
+
 backend_t ticks_debugger_backend = {
     .st = &get_st,
     .ff = &get_ff,
@@ -224,5 +229,6 @@ backend_t ticks_debugger_backend = {
     .console = stdout_log,
     .debug = stdout_log,
     .execution_stopped = NULL,
-    .ctrl_c = ctrl_c
+    .ctrl_c = ctrl_c,
+    .time = ticks_time
 };

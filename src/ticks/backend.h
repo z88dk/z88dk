@@ -19,6 +19,7 @@ typedef void (*get_regs_cb)(struct debugger_regs_t* regs);
 typedef void (*break_cb)(uint8_t temporary);
 typedef void (*void_cb)();
 typedef uint8_t (*uint8_t_cb)();
+typedef uint32_t (*uint32_t_cb)();
 typedef void (*log_cb)(const char *fmt, ...);
 typedef uint8_t (*breakpoints_check_cb)();
 
@@ -68,6 +69,7 @@ typedef struct {
     uint8_t_cb is_remote_connected;
     void_cb execution_stopped;
     void_cb ctrl_c;
+    uint32_t_cb time;
 } backend_t;
 
 extern backend_t bk;

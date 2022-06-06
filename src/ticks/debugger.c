@@ -18,6 +18,7 @@
 #include "disassembler.h"
 #include "debug.h"
 #include "backend.h"
+#include "profiler.h"
 #include "syms.h"
 #include "linenoise.h"
 #include "srcfile.h"
@@ -130,6 +131,7 @@ static int cmd_set(int argc, char **argv);
 static int cmd_out(int argc, char **argv);
 static int cmd_trace(int argc, char **argv);
 static int cmd_hotspot(int argc, char **argv);
+static int cmd_profiler(int argc, char **argv);
 static int cmd_list(int argc, char **argv);
 static int cmd_del_break(int argc, char **argv);
 static int cmd_restore(int argc, char **argv);
@@ -171,6 +173,7 @@ static command commands[] = {
     { "out",       cmd_out,         "<address> <value>",    "Send to IO bus"},
     { "trace",     cmd_trace,       "<on/off>",             "Disassemble every instruction"},
     { "hotspot",   cmd_hotspot,     "<on/off>",             "Track address counts and write to hotspots file"},
+    { "profiler",  cmd_profiler,    "<start/stop>",         "start/stop profiling"},
     { "list",      cmd_list,        "[<address>]",          "List the source code at location given or pc"},
     { "help",      cmd_help,        "",                     "Display this help text" },
     { "whatis/rmt",cmd_typeof,      "",                     NULL },
@@ -357,68 +360,74 @@ void debugger()
     }
 
     if ( bk.breakpoints_check() ) {
-        int         i = 1;
-        breakpoint *elem;
-        LL_FOREACH(breakpoints, elem) {
-            if ( elem->enabled == 0 ) {
-                continue;
-            }
+        if (profiler_check(bk.pc())) {
+            // we've hit a profiler breakpoint
+            bk.resume();
+            debugger_active = 0;
+        } else {
+            int         i = 1;
+            breakpoint *elem;
+            LL_FOREACH(breakpoints, elem) {
+                if ( elem->enabled == 0 ) {
+                    continue;
+                }
 
-            if ( elem->type == BREAK_PC && elem->value == bk.pc() ) {
-                bk.console("Hit breakpoint %d: @%04x (%s)\n",i,bk.pc(),resolve_to_label(bk.pc()));
-                dodebug=1;
-                break;
-            } else if ( elem->type == BREAK_CHECK8 && bk.get_memory(elem->lcheck_arg) == elem->lvalue ) {
-                bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
-                elem->enabled = 0;
-                dodebug=1;
-                break;
-            } else if ( elem->type == BREAK_CHECK16 &&
-                bk.get_memory(elem->lcheck_arg) == elem->lvalue  &&
-                bk.get_memory(elem->hcheck_arg) == elem->hvalue  ) {
-                bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
-                elem->enabled = 0;
-                dodebug=1;
-                break;
-            } else if ( elem->type == BREAK_REGISTER) {
-                struct reg* r = &registers[elem->lcheck_arg];
-                struct debugger_regs_t regs;
-                bk.get_regs(&regs);
+                if ( elem->type == BREAK_PC && elem->value == bk.pc() ) {
+                    bk.console("Hit breakpoint %d: @%04x (%s)\n",i,bk.pc(),resolve_to_label(bk.pc()));
+                    dodebug=1;
+                    break;
+                } else if ( elem->type == BREAK_CHECK8 && bk.get_memory(elem->lcheck_arg) == elem->lvalue ) {
+                    bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                    elem->enabled = 0;
+                    dodebug=1;
+                    break;
+                } else if ( elem->type == BREAK_CHECK16 &&
+                            bk.get_memory(elem->lcheck_arg) == elem->lvalue  &&
+                            bk.get_memory(elem->hcheck_arg) == elem->hvalue  ) {
+                    bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                    elem->enabled = 0;
+                    dodebug=1;
+                    break;
+                } else if ( elem->type == BREAK_REGISTER) {
+                    struct reg* r = &registers[elem->lcheck_arg];
+                    struct debugger_regs_t regs;
+                    bk.get_regs(&regs);
 
-                if (r->word) {
-                    uint8_t* lc;
-                    uint8_t* hc;
+                    if (r->word) {
+                        uint8_t* lc;
+                        uint8_t* hc;
 #ifdef __BIG_ENDIAN__
-                    lc = ((uint8_t *)search->word(&regs)) + 1;
+                        lc = ((uint8_t *)search->word(&regs)) + 1;
                     hc = ((uint8_t *)search->word(&regs));
 #else
-                    hc = ((uint8_t *)r->word(&regs)) + 1;
-                    lc = ((uint8_t *)r->word(&regs));
+                        hc = ((uint8_t *)r->word(&regs)) + 1;
+                        lc = ((uint8_t *)r->word(&regs));
 #endif
-                    if (*lc == elem->lvalue && *hc == elem->hvalue) {
-                        bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
-                        elem->enabled = 0;
-                        dodebug=1;
-                        break;
-                    }
-                } else if (r->high == NULL) {
-                    if (*(r->low(&regs)) == elem->lvalue) {
-                        bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
-                        elem->enabled = 0;
-                        dodebug=1;
-                        break;
-                    }
-                } else {
-                    if (*(r->low(&regs)) == elem->lvalue && *(r->high(&regs)) == elem->hvalue)
-                    {
-                        bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
-                        elem->enabled = 0;
-                        dodebug=1;
-                        break;
+                        if (*lc == elem->lvalue && *hc == elem->hvalue) {
+                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            elem->enabled = 0;
+                            dodebug=1;
+                            break;
+                        }
+                    } else if (r->high == NULL) {
+                        if (*(r->low(&regs)) == elem->lvalue) {
+                            bk.console("Hit breakpoint %d (%s = $%02x): @%04x (%s)\n",i,elem->text, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            elem->enabled = 0;
+                            dodebug=1;
+                            break;
+                        }
+                    } else {
+                        if (*(r->low(&regs)) == elem->lvalue && *(r->high(&regs)) == elem->hvalue)
+                        {
+                            bk.console("Hit breakpoint %d (%s = $%02x%02x): @%04x (%s)\n",i,elem->text, elem->hvalue, elem->lvalue,bk.pc(),resolve_to_label(bk.pc()));
+                            elem->enabled = 0;
+                            dodebug=1;
+                            break;
+                        }
                     }
                 }
+                i++;
             }
-            i++;
         }
     }
 
@@ -710,31 +719,33 @@ void debug_lookup_symbol(struct lookup_t* lookup, struct expression_result_t* re
     debug_frame_pointer* first_frame_pointer = debug_stack_frames_construct(at, stack, &regs, 0);
     debug_frame_pointer* fp = debug_stack_frames_at(first_frame_pointer, current_frame);
 
-    debug_sym_function* fn = fp->function;
-    if (fn != NULL) {
-        debug_sym_function_argument* arg = fn->arguments;
-        while (arg) {
-            debug_sym_symbol* s = arg->symbol;
-            if (strcmp(s->symbol_name, lookup->symbol_name) == 0) {
-                if (!debug_symbol_valid(s, initial_stack, fp)) {
-                    arg = arg->next;
-                    continue;
+    if (fp != NULL) {
+        debug_sym_function* fn = fp->function;
+        if (fn != NULL) {
+            debug_sym_function_argument* arg = fn->arguments;
+            while (arg) {
+                debug_sym_symbol* s = arg->symbol;
+                if (strcmp(s->symbol_name, lookup->symbol_name) == 0) {
+                    if (!debug_symbol_valid(s, initial_stack, fp)) {
+                        arg = arg->next;
+                        continue;
+                    }
+                    debug_get_symbol_value_expression(s, fp, result);
+                    debug_stack_frames_free(first_frame_pointer);
+                    return;
                 }
+                arg = arg->next;
+            }
+
+            // try static locals
+            char sname[128];
+            sprintf(sname, "st_%s_%s", fn->function_name, lookup->symbol_name);
+            debug_sym_symbol *s = cdb_find_symbol(sname, fp->filename);
+            if (s != NULL && s->address_space.address_space == 'E') {
                 debug_get_symbol_value_expression(s, fp, result);
                 debug_stack_frames_free(first_frame_pointer);
                 return;
             }
-            arg = arg->next;
-        }
-
-        // try static locals
-        char sname[128];
-        sprintf(sname, "st_%s_%s", fn->function_name, lookup->symbol_name);
-        debug_sym_symbol *s = cdb_find_symbol(sname, fp->filename);
-        if (s != NULL && s->address_space.address_space == 'E') {
-            debug_get_symbol_value_expression(s, fp, result);
-            debug_stack_frames_free(first_frame_pointer);
-            return;
         }
     }
 
@@ -1588,7 +1599,25 @@ static int cmd_trace(int argc, char **argv)
     return 0;
 }
 
-
+static int cmd_profiler(int argc, char **argv)
+{
+    if (argc <= 1) {
+        if (profiler_enabled) {
+            profiler_stop();
+        } else {
+            profiler_start();
+        }
+    } else {
+        if (strcmp(argv[1], "start") == 0) {
+            profiler_start();
+        } else if (strcmp(argv[1], "stop") == 0) {
+            profiler_stop();
+        } else {
+            bk.console("Warning: unknown profiler action.\n");
+        }
+    }
+    return 0;
+}
 
 static int cmd_hotspot(int argc, char **argv)
 {
@@ -1602,8 +1631,6 @@ static int cmd_hotspot(int argc, char **argv)
     }
     return 0;
 }
-
-
 
 static int cmd_help(int argc, char **argv)
 {

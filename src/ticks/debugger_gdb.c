@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include <pthread.h>
 #include <unistd.h>
@@ -15,9 +16,13 @@
 #include "sxmlc.h"
 #include "sxmlsearch.h"
 
+#define SEC_TO_US(sec) ((sec)*1000000)
+#define NS_TO_US(ns)    ((ns)/1000)
+
 static uint8_t verbose = 0;
 int c_autolabel = 0;
 uint8_t temporary_break = 0;
+static uint8_t has_clock_register = 0;
 static uint8_t registers_invalidated = 1;
 static pthread_cond_t network_op_cond;
 static pthread_mutex_t network_op_mutex;
@@ -68,7 +73,13 @@ enum register_mapping_t {
     REGISTER_MAPPING_SP,
     REGISTER_MAPPING_PC,
 
-    REGISTER_MAPPING_MAX
+    /*
+     * Some emulators would report this 16bit register pair, which could be used
+     * to track ticks for profiling purposes
+     */
+    REGISTER_MAPPING_CLOCKL,
+    REGISTER_MAPPING_CLOCKH,
+
     REGISTER_MAPPING_MAX,
     REGISTER_MAPPING_UNKNOWN
 };
@@ -86,6 +97,13 @@ static const char* register_mapping_names[] = {
     "iy",
     "sp",
     "pc",
+
+    /*
+     * Some emulators would report this 16bit register pair, which could be used
+     * to track ticks for profiling purposes
+     */
+    "clockl_",
+    "clockh_",
 };
 
 static enum register_mapping_t register_mappings[32] = {};
@@ -242,6 +260,22 @@ static struct debugger_regs_t* fetch_registers()
                     registers.pc = (value>>8)|((value&0xff)<<8);
 #else
                     registers.pc = value;
+#endif
+                    break;
+                }
+                case REGISTER_MAPPING_CLOCKL: {
+#ifdef __BIG_ENDIAN__
+                    registers.clockl = (value>>8)|((value&0xff)<<8);
+#else
+                    registers.clockl = value;
+#endif
+                    break;
+                }
+                case REGISTER_MAPPING_CLOCKH: {
+#ifdef __BIG_ENDIAN__
+                    registers.clockh = (value>>8)|((value&0xff)<<8);
+#else
+                    registers.clockh = value;
 #endif
                     break;
                 }
@@ -1030,6 +1064,11 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         if (got_pc == 0 || got_sp == 0) {
             bk.console("Insufficient register information.\n");
         }
+        if (has_clock_register) {
+            if (verbose) {
+                bk.console("Remote has 'clock' register.\n");
+            }
+        }
     }
 
     // this should break us
@@ -1072,6 +1111,24 @@ static void ctrl_c() {
     ctrl_c_requested = 1;
 }
 
+uint32_t gdb_profiler_time() {
+    if (has_clock_register) {
+        /*
+         * Some emulators would report this 16bit register pair, which could be used
+         * to track ticks for profiling purposes
+         */
+        struct debugger_regs_t regs;
+        bk.get_regs(&regs);
+        return ((uint32_t)regs.clockh << 16) + regs.clockl;
+    }
+
+    // Otherwise, get a time stamp in microseconds. Inaccurate but beats nothing.
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    uint64_t us = SEC_TO_US((uint64_t)ts.tv_sec) + NS_TO_US((uint64_t)ts.tv_nsec);
+    return (uint32_t)us;
+}
+
 static backend_t gdb_backend = {
     .st = &get_st,
     .ff = &get_ff,
@@ -1106,7 +1163,8 @@ static backend_t gdb_backend = {
     .console = stdout_log,
     .debug = stdout_log,
     .execution_stopped = gdb_execution_stopped,
-    .ctrl_c = ctrl_c
+    .ctrl_c = ctrl_c,
+    .time = gdb_profiler_time
 };
 
 static void process_scheduled_actions()

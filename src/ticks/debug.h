@@ -155,6 +155,13 @@ struct debugger_regs_t {
     unsigned char a_,b_,c_,d_,e_,h_,l_;
     unsigned char f, f_;
     unsigned char xh, xl, yh, yl;
+
+    /*
+     * Some emulators would report this 16bit register pair, which could be used
+     * to track ticks for profiling purposes
+     */
+    uint16_t clockl;
+    uint16_t clockh;
 };
 
 // debug
