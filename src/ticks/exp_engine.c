@@ -105,6 +105,27 @@ void expression_value_to_pointer(struct expression_result_t *from, struct expres
     }
 }
 
+void expression_primitive_func_call_1(const char* call, struct expression_result_t* a, struct expression_result_t* to) {
+    if (is_expression_result_error(a)) {
+        set_expression_result_error(to);
+        snprintf(to->as_error, sizeof(to->as_error), "Can not obtain sizeof: %s", a->as_error);
+        return;
+    }
+    if (strcmp(call, "sizeof") == 0) {
+        if (a->type.first != NULL) {
+            to->type.first = malloc_type(TYPE_INT);
+            to->as_int = a->type.first->size;
+        } else {
+            to->type.first = malloc_type(TYPE_INT);
+            to->as_int = a->type.size;
+        }
+        return;
+    }
+
+    set_expression_result_error(to);
+    sprintf(to->as_error, "Unknown function call: %s", call);
+}
+
 void expression_dereference_pointer(struct expression_result_t *from, struct expression_result_t *to) {
     zero_expression_result(to);
 

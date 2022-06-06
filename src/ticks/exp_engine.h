@@ -45,6 +45,7 @@ extern void expression_result_free(struct expression_result_t* result);
 extern void convert_expression(struct expression_result_t* from, struct expression_result_t* to, type_record* type);
 extern UT_string* expression_result_type_to_string(type_record* root, type_chain* type);
 extern void expression_dereference_pointer(struct expression_result_t *from, struct expression_result_t *to);
+extern void expression_primitive_func_call_1(const char* call, struct expression_result_t *a, struct expression_result_t *to);
 extern void expression_resolve_struct_member(struct expression_result_t *struct_, const char *member, struct expression_result_t* result);
 extern void expression_resolve_struct_member_ptr(struct expression_result_t *struct_ptr, const char *member, struct expression_result_t* result);
 extern void expression_value_to_pointer(struct expression_result_t *from, struct expression_result_t *to, type_record* pointer_type);

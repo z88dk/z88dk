@@ -881,6 +881,8 @@ type_chain* copy_type_chain(type_chain* from) {
             ptr->next = copy_ptr;
         }
         *copy_ptr = *from;
+        // recalculate size since malloc_type had NULL data
+        copy_ptr->size = get_type_memory_size(copy_ptr);
         ptr = copy_ptr;
         ptr->next = NULL;
         from = from->next;
