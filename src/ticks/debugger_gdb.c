@@ -914,26 +914,26 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         const char* supported = send_request("qSupported");
         if (supported == NULL || strstr(supported, "qXfer:features:read+") == NULL)
         {
-            printf("Remote target does not support qXfer:features:read+\n");
+            bk.console("Remote target does not support qXfer:features:read+\n");
             goto shutdown;
         }
 
         if (strstr(supported, "NonBreakable")) {
-            printf("Warning: remote is not breakable; cannot request execution to stop from here\n");
+            bk.console("Warning: remote is not breakable; cannot request execution to stop from here\n");
             bk.breakable = 0;
         }
 
         int pkt_size;
         const char* pkt_size_str = strstr(supported, "PacketSize");
         if (pkt_size_str == NULL) {
-            printf("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
+            bk.console("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
         } else {
             if (sscanf(pkt_size_str, "PacketSize=%d", &pkt_size) != 1) {
-                printf("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
+                bk.console("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
             } else {
                 supported_packet_size = pkt_size;
                 if (verbose) {
-                    printf("Synced on packet size: %d\n", supported_packet_size);
+                    bk.console("Synced on packet size: %d\n", supported_packet_size);
                 }
             }
         }
@@ -942,7 +942,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
     {
         const char* target = send_request("qXfer:features:read:target.xml:0,3fff");
         if (target == NULL || *target++ != 'l') {
-            printf("Could not obtain target.xml\n");
+            bk.console("Could not obtain target.xml\n");
             goto shutdown;
         }
 
@@ -950,7 +950,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         XMLDoc_init(&xml);
 
         if (XMLDoc_parse_buffer_DOM(target, "features", &xml) == 0) {
-            printf("Cannot parse target.xml.\n");
+            bk.console("Cannot parse target.xml.\n");
             XMLDoc_free(&xml);
             goto shutdown;
         }
@@ -960,12 +960,12 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
             XMLSearch_init_from_XPath("target/architecture", &search);
             XMLNode* arch = xml.nodes[xml.i_root];
             if ((arch = XMLSearch_next(arch, &search)) == NULL) {
-                printf("Unknown architecture.\n");
+                bk.console("Unknown architecture.\n");
                 goto shutdown;
             }
 
             if (strcmp(arch->text, "z80") != 0) {
-                printf("Unsupported architecture: %s\n", arch->text);
+                bk.console("Unsupported architecture: %s\n", arch->text);
                 goto shutdown;
             }
             XMLSearch_free(&search, 1);
@@ -1005,7 +1005,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         uint8_t got_sp = 0;
         uint8_t got_pc = 0;
         if (verbose) {
-            printf("Registers: ");
+            bk.console("Registers: ");
         }
         for (int i = 0; i < register_mappings_count; i++) {
             if (verbose) {
@@ -1025,10 +1025,10 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
             }
         }
         if (verbose) {
-            printf("\n");
+            bk.console("\n");
         }
         if (got_pc == 0 || got_sp == 0) {
-            printf("Insufficient register information.\n");
+            bk.console("Insufficient register information.\n");
         }
     }
 
