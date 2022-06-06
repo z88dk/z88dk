@@ -69,6 +69,8 @@ enum register_mapping_t {
     REGISTER_MAPPING_PC,
 
     REGISTER_MAPPING_MAX
+    REGISTER_MAPPING_MAX,
+    REGISTER_MAPPING_UNKNOWN
 };
 
 static const char* register_mapping_names[] = {
@@ -267,9 +269,9 @@ static struct debugger_regs_t* fetch_registers()
                     unwrap_reg(value, &registers.h_, &registers.l_);
                     break;
                 }
-                default:
-                {
-                    printf("Warning: unknown mapping %d\n", reg);
+                case REGISTER_MAPPING_UNKNOWN:
+                default: {
+                    // we don't support such register, so we chose to ignore it
                     break;
                 }
             }
@@ -429,6 +431,7 @@ void set_regs(struct debugger_regs_t* regs)
                 value = wrap_reg(regs->h_, regs->l_);
                 break;
             }
+            case REGISTER_MAPPING_UNKNOWN:
             default:
             {
                 continue;
@@ -979,11 +982,18 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
                     continue;
                 }
 
+                uint8_t found_mapping = 0;
+
                 for (int i = 0; i < REGISTER_MAPPING_MAX; i++) {
                     if (strcmp(reg_name, register_mapping_names[i]) == 0) {
                         register_mappings[register_mappings_count++] = i;
+                        found_mapping = 1;
                         break;
                     }
+                }
+
+                if (found_mapping == 0) {
+                    register_mappings[register_mappings_count++] = REGISTER_MAPPING_UNKNOWN;
                 }
             }
 
@@ -1007,6 +1017,10 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
             }
             if (register_mappings[i] == REGISTER_MAPPING_PC) {
                 got_pc = 1;
+                continue;
+            }
+            if (register_mappings[i] == REGISTER_MAPPING_CLOCKL) {
+                has_clock_register = 1;
                 continue;
             }
         }
