@@ -629,7 +629,7 @@ static void cmd_evaluate_expression(const char* flow, int argc, char **argv) {
     utstring_free(expression);
 }
 
-static char* sprintf_frame0(char* ptr) {
+static void sprintf_frame0(UT_string* ptr) {
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
 
@@ -637,7 +637,7 @@ static char* sprintf_frame0(char* ptr) {
 
     if (fp) {
         if (fp->symbol && fp->filename && fp->function) {
-            ptr += sprintf(ptr,
+            utstring_printf(ptr,
                 "level=\"0\",addr=\"0x%08x\",func=\"%s\","
                 "args=[],file=\"%s\","
                 "fullname=\"%s\",line=\"%d\"",
@@ -651,24 +651,23 @@ static char* sprintf_frame0(char* ptr) {
             const char *filename;
             int lineno;
             if (debug_find_source_location(regs.pc, &filename, &lineno)) {
-                ptr += sprintf(ptr, "level=\"0\",addr=\"0x%08x\",func=\"%s\","
-                                    "file=\"%s\","
-                                    "fullname=\"%s\",line=\"%d\","
-                                    "arch=\"z80\"", regs.pc, sym->name, sym->file, filename, lineno);
+                utstring_printf(ptr, "level=\"0\",addr=\"0x%08x\",func=\"%s\","
+                                     "file=\"%s\","
+                                     "fullname=\"%s\",line=\"%d\","
+                                     "arch=\"z80\"", regs.pc, sym->name, sym->file, filename, lineno);
             } else {
-                ptr += sprintf(ptr, "level=\"0\",addr=\"0x%08x\",func=\"%s\","
-                                    "file=\"%s\","
-                                    "fullname=\"%s\","
-                                    "arch=\"z80\"", regs.pc, sym->name, sym->file, sym->file);
+                utstring_printf(ptr, "level=\"0\",addr=\"0x%08x\",func=\"%s\","
+                                     "file=\"%s\","
+                                     "fullname=\"%s\","
+                                     "arch=\"z80\"", regs.pc, sym->name, sym->file, sym->file);
             }
         } else {
-            ptr += sprintf(ptr, "level=\"0\",addr=\"0x%08x\"", regs.pc);
+            utstring_printf(ptr, "level=\"0\",addr=\"0x%08x\"", regs.pc);
         }
     }
 
 done:
     debug_stack_frames_free(fp);
-    return ptr;
 }
 
 static void cmd_stack_list_frames(const char* flow, int argc, char **argv) {
@@ -1228,7 +1227,8 @@ static void mi2_execution_stopped() {
         }
     }
 
-    char frame[512] = "";
+    UT_string* frame;
+    utstring_new(frame);
     sprintf_frame0(frame);
 
     if (breakpoint_hit) {
@@ -1236,11 +1236,13 @@ static void mi2_execution_stopped() {
         mi2_printf_async(
             "stopped,reason=\"breakpoint-hit\",disp=\"keep\",bkptno=\"%d\","
             "frame={%s},thread-id=\"1\",stopped-threads=\"all\"",
-            breakpoint_hit->number, frame);
+            breakpoint_hit->number, utstring_body(frame));
     } else {
         if (process_temp_breakpoints()) {
             mi2_printf_async(
-                "stopped,reason=\"end-stepping-range\",frame={%s},thread-id=\"1\",stopped-threads=\"all\"", frame);
+                "stopped,reason=\"end-stepping-range\",frame={%s},thread-id=\"1\",stopped-threads=\"all\"",
+                utstring_body(frame));
+            utstring_free(frame);
             return;
         }
     }
@@ -1248,10 +1250,12 @@ static void mi2_execution_stopped() {
     if (report_connected) {
         report_connected = 0;
         mi2_printf_async(
-            "stopped,reason=\"fork\",frame={%s},thread-id=\"1\",stopped-threads=\"all\"", frame);
+            "stopped,reason=\"fork\",frame={%s},thread-id=\"1\",stopped-threads=\"all\"", utstring_body(frame));
         mi2_printf_response(connect_flow, "connected");
         mi2_printf_prompt();
     }
+
+    utstring_free(frame);
 }
 
 void execute_mi2_command_on_main_thread(const void* data, void* response) {
