@@ -16,7 +16,7 @@ WORLD_TARGETS = abc80 abc800 ace adam alphatro altair8800 aquarius bee c128 c742
 WORLD_TARGETS += cpm_px8 cpm_px4 cpm_einstein cpm_attache cpm_osborne1 cpm_kaypro83 cpm_kaypro84 \
 	cpm_mz2500 cpm_microbee cpm_qc10 cpm_nascom cpm_tiki100 cpm_svi cpm_dmv cpm_adam \
 	cpm_smc777 cpm_rc700 cpm_fp1100 cpm_x1 cpm_lynx cpm_bic cpm_excali64 cpm_vector06c \
-	cpm_zxplus3 cpm_bondwell cpm_bw2 cpm_8080
+	cpm_zxplus3 cpm_bondwell cpm_bw2 cpm_8080 cpm_corvette
 
 LDFLAGS_world = -lndos -pragma-define:CLIB_OPT_PRINTF=0x00000001
 
