@@ -1130,11 +1130,16 @@ uint32_t gdb_profiler_time() {
         return ((uint32_t)regs.clockh << 16) + regs.clockl;
     }
 
+#ifdef WIN32
+    // limit ourselfs to few milliseconds on windows
+    return GetTickCount();
+#else
     // Otherwise, get a time stamp in microseconds. Inaccurate but beats nothing.
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
     uint64_t us = SEC_TO_US((uint64_t)ts.tv_sec) + NS_TO_US((uint64_t)ts.tv_nsec);
     return (uint32_t)us;
+#endif
 }
 
 static backend_t gdb_backend = {
