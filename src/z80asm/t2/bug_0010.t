@@ -5,53 +5,53 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 # BUG_0010 : heap corruption when reaching MAXCODESIZE
 # raise HEAP CORRUPTION DETECTED in MSVC
 
-z80asm_ok("", "", "", <<END, bytes((0xaa) x 65536));
-        defs 65536, 0xaa
+z80asm_ok("", "", "", <<END, bytes((0x55) x 65536));
+        defs 65536, 0x55
 END
 
 
-z80asm_ok("", "", "", <<END, bytes((0xaa) x 65534, 0x3e, 0xaa));
-        defs 65534, 0xaa
-        ld a, 0xaa
-END
-
-z80asm_nok("", "", <<END, <<END);
-        defs 65535, 0xaa
-        ld a, 0xaa
-END
-${test}.asm:2: error: segment overflow
-  ^---- ld a, 0xaa
-      ^---- ld a,170
-END
-
-
-z80asm_ok("", "", "", <<END, bytes((0xaa) x 65533, 0x01, 0xaa, 0xaa));
-        defs 65533, 0xaa
-        ld bc, 0xaaaa
+z80asm_ok("", "", "", <<END, bytes((0x55) x 65534, 0x3e, 0x55));
+        defs 65534, 0x55
+        ld a, 0x55
 END
 
 z80asm_nok("", "", <<END, <<END);
-        defs 65534, 0xaa
-        ld bc, 0xaaaa
+        defs 65535, 0x55
+        ld a, 0x55
 END
 ${test}.asm:2: error: segment overflow
-  ^---- ld bc, 0xaaaa
-      ^---- ld bc,43690
+  ^---- ld a, 0x55
+      ^---- ld a,85
 END
 
 
-z80asm_ok("", "", "", <<END, bytes((0xaa) x 65536));
-        defs 65532, 0xaa
-        defq 0xaaaaaaaa
+z80asm_ok("", "", "", <<END, bytes((0x55) x 65533, 0x01, 0x55, 0x55));
+        defs 65533, 0x55
+        ld bc, 0x5555
 END
 
 z80asm_nok("", "", <<END, <<END);
-        defs 65533, 0xaa
-        defq 0xaaaaaaaa
+        defs 65534, 0x55
+        ld bc, 0x5555
 END
 ${test}.asm:2: error: segment overflow
-  ^---- defq 0xaaaaaaaa
-      ^---- defq-1431655766
+  ^---- ld bc, 0x5555
+      ^---- ld bc,21845
+END
+
+
+z80asm_ok("", "", "", <<END, bytes((0x55) x 65536));
+        defs 65532, 0x55
+        defq 0x55555555
+END
+
+z80asm_nok("", "", <<END, <<END);
+        defs 65533, 0x55
+        defq 0x55555555
+END
+${test}.asm:2: error: segment overflow
+  ^---- defq 0x55555555
+      ^---- defq 1431655765
 END
 
 unlink_testfiles;
