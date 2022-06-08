@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include <time.h>
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include <pthread.h>
 #include <unistd.h>
 #include "debugger_gdb_packets.h"
@@ -1097,7 +1101,11 @@ static void* ctrl_c_signal_loop(void* arg) {
             ctrl_c_requested = 0;
             execute_on_main_thread_no_response(ctrl_c_main_thread, NULL);
         }
+#ifdef WIN32
+        Sleep(100);
+#else
         sleep(1);
+#endif
     }
     return NULL;
 }
