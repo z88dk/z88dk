@@ -10,15 +10,16 @@
 #include <stdio.h>
 #include <time.h>
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 #include <pthread.h>
 #include <unistd.h>
 #include "debugger_gdb_packets.h"
 #include "sxmlc.h"
 #include "sxmlsearch.h"
+
+#ifdef WIN32
+#include <winsock2.h>
+#include <windows.h>
+#endif
 
 #define SEC_TO_US(sec) ((sec)*1000000)
 #define NS_TO_US(ns)    ((ns)/1000)
