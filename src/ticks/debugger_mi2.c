@@ -1289,12 +1289,13 @@ static void* debugger_mi2_console_loop(void* arg) {
             char* command_name = argv[0];
             char flow[32] = "";
 
-            char* dash = strchr(command_name, '-');
-            if (dash && (dash != command_name)) {
+            uint32_t flow_id;
+            int end;
+            if (sscanf(command_name, "%d-%n", &flow_id, &end) == 1) {
                 // we have 'xxx-command' syntext, split it into 'xxx' and '-command'
                 memset(flow, 0, sizeof(flow));
-                memcpy(flow, command_name, dash - command_name);
-                command_name = dash;
+                memcpy(flow, command_name, end - 1);
+                command_name += end - 1;
             }
 
             command *cmd = &mi2_commands[0];
