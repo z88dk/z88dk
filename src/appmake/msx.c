@@ -118,6 +118,7 @@ int msx_exec(char* target)
 {
     char filename[FILENAME_MAX + 1];
     char wavfile[FILENAME_MAX + 1];
+    char crtname[FILENAME_MAX + 1];
     FILE *fpin, *fpout;
     char name[11];
     int c;
@@ -128,14 +129,21 @@ int msx_exec(char* target)
     if (help)
         return -1;
 
-    if (binname == NULL || (!dumb && (crtfile == NULL && origin == -1))) {
+    if (binname == NULL) {
         return -1;
+    }
+
+    if (crtfile == NULL)
+    {
+        snprintf(crtname, sizeof(crtname) - 4, "%s", binname);
+        suffix_change(crtname, "");
+        crtfile = crtname;
     }
 
     if (origin != -1) {
         pos = origin;
     } else {
-        if ((pos = get_org_addr(crtfile)) == -1) {
+        if (!dumb && (pos = get_org_addr(crtfile)) == -1) {
             exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
         }
     }
@@ -230,7 +238,7 @@ int msx_exec(char* target)
     }
 
     if ( disk ) {
-        return fat_write_file_to_image("msxbasic", "raw", NULL, filename, NULL, NULL);
+        return fat_write_file_to_image("msxbasic", "raw", NULL, filename, crtfile, NULL);
     }
 
     /* ***************************************** */
