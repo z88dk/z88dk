@@ -9,8 +9,6 @@
  * have to do a nasty kludge around them
  */
 
-extern int ftoa_fudgeit(double x, double scale);
-
 
 void ftoa(x,f,str)
 double x;       /* the number to be converted */
@@ -61,5 +59,5 @@ char *str;      /* output string */
                 *str++ = d + '0' ;
                 x -= (double)d ;
         }
-        *str = 0;
+        *str = 0 ;
 }

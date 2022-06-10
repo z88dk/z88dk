@@ -15,7 +15,7 @@
  *
  *   Examples on how to compile in graphics mode:
  *   zcc +zx -lndos -O3 -create-app -zorg=50000 -DGRAPHICS othello.c
- *   zcc +ts2068 -clib=ansi -O3 -lgfx2068hr -lndos -create-app -zorg=45000 -DWIDEGRAPHICS othello.c
+ *   zcc +ts2068 -clib=ansi -O3 -lndos -create-app -zorg=45000 -DWIDEGRAPHICS -pragma-define:CLIB_DEFAULT_SCREEN_MODE=0x3e -DANSITEXT othello.c
  *   (16K, WRX HRG mode)
  *   zcc +zx81 -O3 -subtype=_wrx64 -clib=wrx64ansi -create-app -DSMALLGRAPHICS othello.c
  *   (32K + WRX HRG, add the '#pragma output hrgpage = 36096' line)

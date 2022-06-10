@@ -800,7 +800,7 @@ void raw2wav(char *wavfile)
     int      c;
     long     i, len;
 
-    strcpy(rawfilename,wavfile);
+    strncpy(rawfilename,wavfile,FILENAME_MAX);
 
     if ( (fpin=fopen(wavfile,"rb") ) == NULL ) {
         exit_log(1,"Can't open file %s for wave conversion\n",wavfile);
@@ -821,7 +821,7 @@ void raw2wav(char *wavfile)
 
     /* Now let's think at the WAV file */
     writestring("RIFF",fpout);
-    writelong(len+63,fpout);
+	writelong(len+36,fpout);
     writestring("WAVEfmt ",fpout);
     writelong(0x10,fpout);
     writeword(1,fpout);
@@ -833,27 +833,20 @@ void raw2wav(char *wavfile)
     writestring("data",fpout);
     writelong(len,fpout);
 
-    for (i=0; i<63;i++) {
-      fputc(0x20,fpout);
-    }
-
-    /*
-    //writestring(wav_table,fpout);
-    for (i=0; i<28;i++) {
-      fputc(0x20,fpout);
-    }
-    */
-
     for (i=0; i<len;i++) {
+		// Small alteration of the square wave to make it look analogue
+		// It should be enough for all the emulators to accept it as a valid feed
+		// still permitting a good compression rate to the LZ algorithms
       c=getc(fpin);
-      fputc(c,fpout);
+      fputc(c-(i&1),fpout);
     }
 
     fclose(fpin);
     fclose(fpout);
-    remove (rawfilename);
-}
 
+    if (unlink (rawfilename) != 0) fprintf(stderr, "Warning: Couldn't remove: %s\n",rawfilename);
+
+}
 
 /* Convert a 44100 Khz RAW sound file to a 22050 Khz WAV file */
 void raw2wav_22k(char *wavfile, int mode)
@@ -863,7 +856,7 @@ void raw2wav_22k(char *wavfile, int mode)
     int      c;
     long     i, len;
 
-    strcpy(rawfilename,wavfile);
+    strncpy(rawfilename,wavfile,FILENAME_MAX);
 
     if ( (fpin=fopen(wavfile,"rb") ) == NULL ) {
         exit_log(1,"Can't open file %s for wave conversion\n",wavfile);
@@ -884,7 +877,7 @@ void raw2wav_22k(char *wavfile, int mode)
 
     /* Now let's think at the WAV file */
     writestring("RIFF",fpout);
-    writelong(len+63,fpout);
+    writelong(len+36,fpout);
     writestring("WAVEfmt ",fpout);
     writelong(0x10,fpout);
     writeword(1,fpout);
@@ -895,17 +888,6 @@ void raw2wav_22k(char *wavfile, int mode)
     writeword(8,fpout);
     writestring("data",fpout);
     writelong(len,fpout);
-
-    for (i=0; i<63;i++) {
-      fputc(0x20,fpout);
-    }
-
-    /*
-    //writestring(wav_table,fpout);
-    for (i=0; i<28;i++) {
-      fputc(0x20,fpout);
-    }
-    */
 
     for (i=0; i<len;i++) {
 
@@ -923,12 +905,16 @@ void raw2wav_22k(char *wavfile, int mode)
 			c=getc(fpin);
 			c=(c+getc(fpin))/2;
 	}
-      fputc(c,fpout);
+	// Small alteration of the square wave to make it look analogue
+	// It should be enough for all the emulators to accept it as a valid feed
+	// still permitting a good compression rate to the LZ algorithms
+      fputc(c-(i&1),fpout);
     }
 
     fclose(fpin);
     fclose(fpout);
-    remove (rawfilename);
+	
+    if (unlink (rawfilename) != 0) fprintf(stderr, "Warning: Couldn't remove: %s\n",rawfilename);
 }
 
 
@@ -1151,6 +1137,7 @@ static void  cleanup_temporary_files(void)
 /* memory banks */
 
 #define MBLINEMAX 1024
+#define MBBUFFERMAX 4096
 
 void mb_create_bankspace(struct banked_memory *memory, char *bank_id)
 {
@@ -1169,17 +1156,17 @@ enum
 
 void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *memory, struct aligned_data *aligned)
 {
-    char buffer[MBLINEMAX-6];           // Prevent sscanf of buffer overflowing symbol_name
-    char symbol_name[MBLINEMAX-5];      // Prevent 'snprintf(section_name,...' overflow warning
+    char* buffer = malloc(MBBUFFERMAX-6);           // Prevent sscanf of buffer overflowing symbol_name
+    char* symbol_name = malloc(MBBUFFERMAX-5);      // Prevent 'snprintf(section_name,...' overflow warning
     long symbol_value;
-    char section_name[MBLINEMAX-5];     // Prevent 'snprintf(bfilename,...' overflow warning
-    char bfilename[MBLINEMAX];
+    char section_name[MBLINEMAX-5];                 // Prevent 'snprintf(bfilename,...' overflow warning
+    char* bfilename = malloc(MBBUFFERMAX);
     int  c,i;
     struct stat st;
 
     // organize output binaries into banks
 
-    while (fgets(buffer, MBLINEMAX-7, fmap) != NULL)
+    while (fgets(buffer, MBBUFFERMAX-7, fmap) != NULL)
     {
         // have one line of the map file
         // make sure the entire line is consumed
@@ -1216,7 +1203,7 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
                         // classic can generate main bank binaries with empty section names
 
                         section_name[0] = 0;
-                        snprintf(bfilename, sizeof(bfilename), "%s.bin", binname);
+                        snprintf(bfilename, MBBUFFERMAX, "%s.bin", binname);
                         if ((stat(bfilename, &st) < 0) || (S_IFREG != (st.st_mode & S_IFMT)))
                             suffix_change(bfilename, "");
                     }
@@ -1226,14 +1213,14 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
 
                         snprintf(section_name, sizeof(section_name), "%s", &symbol_name[2]);
                         section_name[len - 7] = 0;
-                        snprintf(bfilename, sizeof(bfilename), "%s_%s.bin", binname, section_name);
+                        snprintf(bfilename, MBBUFFERMAX, "%s_%s.bin", binname, section_name);
                         if ( stat(bfilename, &st) < 0 ) {
                             char binname_buf[FILENAME_MAX+1];
 
                             snprintf(binname_buf,sizeof(binname_buf),"%s", binname);
                             suffix_change(binname_buf, "");
 
-                            snprintf(bfilename, sizeof(bfilename), "%s_%s.bin", binname_buf, section_name);
+                            snprintf(bfilename, MBBUFFERMAX, "%s_%s.bin", binname_buf, section_name);
                         }
                     }
 
@@ -1340,6 +1327,10 @@ void mb_enumerate_banks(FILE *fmap, const char *binname, struct banked_memory *m
 
     if (mb_remove_section(memory, "UNASSIGNED", 0))
         printf("Warning: Non-empty UNASSIGNED section ignored -\n  this indicates that some code/data is not part of the memory map\n");
+
+    free(buffer);
+    free(symbol_name);
+    free(bfilename);
 }
 
 int mb_find_bankspace(struct banked_memory *memory, char *bankspace_name)

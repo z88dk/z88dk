@@ -102,6 +102,7 @@ value_expression: T_PRIMITIVE_VALUE
 		expression_result_free(&$2);
 	 }
 	| T_LEFT type_expression T_STAR T_RIGHT value_expression		{ expression_value_to_pointer(&$5, &$$, &$2); free_type($2.first); expression_result_free(&$5); }
+	| T_STRING T_LEFT value_expression T_RIGHT 				{ expression_primitive_func_call_1($1, &$3, &$$); expression_result_free(&$3); }
 
 error_expression: T_ERROR							{ strcpy($$, $1); }
 ;

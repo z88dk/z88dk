@@ -69,6 +69,7 @@ static struct zx_tape zxt = {
     NULL,       // merge
     -1,         // patchpos
     -1,         // clear_address
+    -1,         // usr_address
     NULL,       // patchdata
     NULL,       // screen
     0,          // audio
@@ -155,6 +156,7 @@ option_t zx_options[] = {
     { 0 , "merge",     "Merge a custom loader from external TAP file", OPT_STR, &zxt.merge },
     { 0 , "blockname", "Name of the code block in tap file", OPT_STR, &zxt.blockname },
     { 0,  "clearaddr", "Address to CLEAR at",       OPT_INT,   &zxt.clear_address },
+    { 0,  "usraddr",   "USR address to run from",   OPT_INT,   &zxt.usr_address },
     { 0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
 

@@ -55,9 +55,6 @@ check_mode:
 	jr	z,set_mode
 	cp	1
 	jr	nz,failure
-	ld	hl,$be00
-	ld	($2a6a),hl
-	call	$e000
 	call	$e057
 	ld	a,$ff
 	ld	($2ba8),a
@@ -73,8 +70,6 @@ set_mode:
 	jr	nz,not_mode0
  	ld	a,$c
 	ld	($2ba8),a
-	ld	hl,$bfe0
-	ld	($2a6a),hl
 	halt
 	im	1
 not_mode0:

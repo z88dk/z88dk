@@ -18,15 +18,6 @@
 #define PRINTF2(a,b)
 #endif
 
-#ifdef TIMER
-#define TIMER_START()     intrinsic_label(TIMER_START)
-#define TIMER_STOP()      intrinsic_label(TIMER_STOP)
-#else
-#define TIMER_START()
-#define TIMER_STOP()
-#endif
-
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -121,43 +112,43 @@ void offset_momentum(int nbodies, struct planet * bodies)
 #define NBODIES 5
 struct planet bodies[NBODIES] = {
   {                               /* sun */
-    0, 0, 0, 0, 0, 0, solar_mass
+    0, 0, 0, 0, 0, 0, 3.9478417604E+01
   },
   {                               /* jupiter */
-    4.84143144246472090e+00,
-    -1.16032004402742839e+00,
-    -1.03622044471123109e-01,
-    1.66007664274403694e-03 * days_per_year,
-    7.69901118419740425e-03 * days_per_year,
-    -6.90460016972063023e-05 * days_per_year,
-    9.54791938424326609e-04 * solar_mass
+     4.8414314425E+00,
+    -1.1603200440E+00,
+    -1.0362204447E-01,
+     6.0632639300E-01,
+     2.8119868449E+00,
+    -2.5218361660E-02,
+     3.7693674870E-02
   },
   {                               /* saturn */
-    8.34336671824457987e+00,
-    4.12479856412430479e+00,
-    -4.03523417114321381e-01,
-    -2.76742510726862411e-03 * days_per_year,
-    4.99852801234917238e-03 * days_per_year,
-    2.30417297573763929e-05 * days_per_year,
-    2.85885980666130812e-04 * solar_mass
+     8.3433667182E+00,
+     4.1247985641E+00,
+    -4.0352341711E-01,
+    -1.0107743462E+00,
+     1.8256623712E+00,
+     8.4157613766E-03,
+     1.1286326132E-02
   },
   {                               /* uranus */
-    1.28943695621391310e+01,
-    -1.51111514016986312e+01,
-    -2.23307578892655734e-01,
-    2.96460137564761618e-03 * days_per_year,
-    2.37847173959480950e-03 * days_per_year,
-    -2.96589568540237556e-05 * days_per_year,
-    4.36624404335156298e-05 * solar_mass
+     1.2894369562E+01,
+    -1.5111151402E+01,
+    -2.2330757889E-01,
+     1.0827910064E+00,
+     8.6871301817E-01,
+    -1.0832637401E-02,
+     1.7237240571E-03
   },
   {                               /* neptune */
-    1.53796971148509165e+01,
-    -2.59193146099879641e+01,
-    1.79258772950371181e-01,
-    2.68067772490389322e-03 * days_per_year,
-    1.62824170038242295e-03 * days_per_year,
-    -9.51592254519715870e-05 * days_per_year,
-    5.15138902046611451e-05 * solar_mass
+     1.5379697115E+01,
+    -2.5919314610E+01,
+     1.7925877295E-01,
+     9.7909073224E-01,
+     5.9469899865E-01,
+    -3.4755955504E-02,
+     2.0336868699E-03
   }
 };
 
@@ -190,8 +181,6 @@ int main(int argc, char ** argv)
   n = atoi(argv[1]);
 #endif
 
-TIMER_START();
-
   offset_momentum(NBODIES, bodies);
   PRINTF2("%.9f\n", energy(NBODIES, bodies));
   scale_bodies(NBODIES, bodies, DT);
@@ -200,8 +189,6 @@ TIMER_START();
   }
   scale_bodies(NBODIES, bodies, RECIP_DT);
   PRINTF2("%.9f\n", energy(NBODIES, bodies));
-
-TIMER_STOP();
 
   return 0;
 }

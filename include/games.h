@@ -92,10 +92,9 @@ extern const unsigned char *joystick_type[];
 	#define GAME_DEVICES 2
 #endif
 
-
 #ifdef __GAL__
 #ifdef DEFINE_JOYSTICK_TYPE
-	const unsigned char *joystick_type[] = {"Arrows and SPACE", "5678-0"};
+	const unsigned char *joystick_type[] = {"Arrows and SPACE", "QAOP-MN"};
 #endif
 	#define GAME_DEVICES 2
 #endif

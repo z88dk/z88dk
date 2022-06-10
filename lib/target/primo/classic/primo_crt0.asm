@@ -26,18 +26,20 @@
 
 
         ; We use the generic driver by default
-        defc    TAR__fputc_cons_generic = 1
+        defc    TAR__fputc_cons_generic = 0
 
         defc    TAR__clib_exit_stack_size = 4
-        defc    TAR__register_sp = -1		; $c000
+        defc    TAR__register_sp = -1		; SP left untouched
 	defc	CRT_KEY_DEL = 12
 	defc	__CPU_CLOCK = 2500000
+        ; These CONSOLE_* are used by generic console code
         defc    CONSOLE_COLUMNS = 32
         defc    CONSOLE_ROWS = 24
         INCLUDE "crt/classic/crt_rules.inc"
 
-        defc CRT_ORG_CODE = 0x4100
-
+IF !DEFINED_CRT_ORG_CODE
+        defc CRT_ORG_CODE = 0x4400 ; BASIC area starts at $43EA, 0000-3FFF is ROM, 4000-43E9 system variables/buffers etc...
+ENDIF
 	org	  CRT_ORG_CODE
 
 program:
@@ -57,15 +59,7 @@ program:
 IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
-	ld	hl,$6800
-	ld	a,(__sp+1)
-	cp	$80
-	jr	c,set_screen
-	ld	hl,$a800
-	cp	$c0
-	jr	c,set_screen
-	ld	hl,$e800
-set_screen:
+	ld	hl,($0013)
 	ld	(__primo_screen_base),hl
 	ld	hl,0
 	push	hl	;argv

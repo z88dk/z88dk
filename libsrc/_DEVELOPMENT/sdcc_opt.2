@@ -603,6 +603,46 @@
 	ld	hl,%1
 	push	hl
 
+	call	___mulsint2slong
+	pop	af
+	pop	af
+=
+	call	___mulsint2slong_callee
+
+	call	___muluint2ulong
+	pop	af
+	pop	af
+=
+	call	___muluint2ulong_callee
+
+	call	___mulsint2slong
+	pop	bc
+	pop	bc
+=
+	call	___mulsint2slong_callee
+
+	call	___muluint2ulong
+	pop	bc
+	pop	bc
+=
+	call	___muluint2ulong_callee
+
+	call	___mulsint2slong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	___mulsint2slong_callee
+
+	call	___muluint2ulong
+	inc	sp
+	inc	sp
+	inc	sp
+	inc	sp
+=
+	call	___muluint2ulong_callee
+
 	call	__mullong
 	pop	af
 	pop	af

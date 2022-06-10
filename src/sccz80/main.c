@@ -500,9 +500,7 @@ static void dumpfns()
                 if ( storage != LSTATIC && storage != TYPDEF ) {
                     GlobalPrefix();                    
                     outname(ptr->name, dopref(ptr)); nl();
-                    if ( storage != STATIK ) {
-                        debug_write_symbol(ptr);
-                    }
+                    debug_write_symbol(ptr);
                 }
                 if ( ptr->flags & ASSIGNED_ADDR ) {
                     outfmt("\tdefc\t"); outname(ptr->name,1); outfmt("\t= %d\n", ptr->ctype->value);

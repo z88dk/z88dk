@@ -20,35 +20,41 @@
 	jp  z,arrows
 
 	ld	e,0
-	ld	hl,$2020
-	ld	a,(hl); zero
+	ld	hl,$200E
+	ld	a,(hl)
 	cpl
 	rrca
-	rl e		; fire
+	rl e		; fire2
 	
-	ld	l,$27	;U
+	ld	l,$0D
+	ld	a,(hl)
+	cpl
+	rrca
+	rl e	;fire1
+	
+	ld	l,17	;U
 	ld	a,(hl)
 	cpl
 	rrca
 	rl e
 	
-	ld	l,$26	;D
+	ld	l,1 	;D
 	ld	a,(hl)
 	cpl
 	rrca
-	rl e		; fire
+	rl e
 	
-	ld	l,$25	;L
+	ld	l,15	;L
 	ld	a,(hl)
 	cpl
 	rrca
-	rl e		; fire
+	rl e
 	
-	ld	l,$28	;R
+	ld	l,16	;R
 	ld	a,(hl)
 	cpl
 	rrca
-	rl e		; fire
+	rl e
 	
 	ld	h,0
 	ld	l,e

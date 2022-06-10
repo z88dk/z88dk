@@ -43,7 +43,7 @@ This library is also designed to be as fast as possible on the z80 processor, us
 
 ## IEEE-754 Floating Point Format
 
-The z88dk floating point format (compatible with Intel/ IEEE, etc.) is as follows:
+The z88dk floating point format (compatible with Intel / IEEE, etc.) is as follows:
 
 ```
   dehl = seeeeeee emmmmmmm mmmmmmmm mmmmmmmm (s-sign, e-exponent, m-mantissa)
@@ -202,21 +202,21 @@ Using these intrinsic functions (and the compact assembly square root and polyno
 
 Although some algorithms from the Digi International functions remain in these intrinsic functions, they have been rewritten to exploit the z180 and z80n 8-bit multiply hardware capabilities, rather than the 16-bit capabilities of Rabbit processors. Hence the relationship is only of descent, like "West Side Story" is derived from "Romeo and Juliet".
 
-To calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z80 to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function.
+For the z80 to calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 3 optimised `32_24x8` multiplies. This provides the fastest solution where no hardware multiply is available.
+
+For the z180 and z80n to calculate the 24-bit mantissa a special `mulu_32h_24x24` function has been built using 8 multiplies, the minimum number of `16_8x8` multiply terms. It is much more natural for the z180 and z80n to work in `16_8x8` multiplies than the Rabbit's `32_16x16` multiply. It is not a "correct" multiply, in that all terms are calculated and carry forward is considered. The lowest term is not calculated, as it doesn't impact the 32-bit result. The lower 16-bits of the result are simply truncated, leaving a further 8-bits for mantissa rounding within the calling function.
 
 By providing a specific square function, all squaring (found in square root, trigonometric functions) can use the `_fssqr` or the equivalent C version `sqr()`. This means that for the z180 and z80n the inverse `_fsinvsqrt` function uses `_fssqr` for 5 multiplies in its `mulu_32h_24x24` mantissa calculation, in some situations, instead of 8 multiplies with the normal `_fsmul` function, and also avoids the need to use the alternate register set.
-
-For the z80 CPU, with no hardware multiply instruction, an efficient `mulu_32h_24x24` multiplication function was written for normal mantissa multiplies.
 
 #### mulu_32h_32x32
 
 The `mulu_32h_32x32` provides just the high order bytes from a 32-bit multiply calculation for the `_fsdiv` Newton-Raphson iteration. In this iteration calculation it is important to have access to the full 32-bits (rather than just 24-bits for normal mantissa calculations).
 
-For the z180 and z80n, thee implementation of the `mulu_32h_32x32` is not a "correct" multiplication as the lower order bytes are not included in the carry calculation, for efficiency reasons. The calculation begins at the 3rd byte (of 8), and this byte provides carry bits into the 4th byte. Further rounding from the third byte is applied to the 4th byte. There are 11 multiplications required for this function.
+For the z80 to calculate the 32-bit mantissa a special `mulu_32h_32x32` function has been built using 4 optimised `32_16x16` multiplies. This provides the fastest solution where no hardware multiply is available.
+
+For the z180 and z80n the implementation of the `mulu_32h_32x32` is not a "correct" multiplication as the lower order bytes are not included in the carry calculation, for efficiency reasons. The calculation begins at the 3rd byte (of 8), and this byte provides carry bits into the 4th byte. Further rounding from the third byte is applied to the 4th byte. There are 11 multiplications required for this function.
 
 By calculating 3rd through to 7th bytes, but returning only byte 4 through 7, there is only maximally a small error in the least significant nibble of the 32-bit mantissa, which is discarded after rounding to 24-bit precision anyway. Doing this avoids calculating the 0th through 2nd bytes, which saves 5 `16_8x8` multiply operations, and the respective word push and pop baggage.
-
-For the z80 CPU, with no hardware multiply instruction, an efficient `mulu_32h_32x32` multiplication function was written for extended mantissa multiplies.
 
 #### _add()_ and _sub()_
 

@@ -1,6 +1,7 @@
 // Routines for displaying source files
 
 #include "ticks.h"
+#include "backend.h"
 #include <stdio.h>
 
 typedef struct srcfile_s srcfile;
@@ -70,9 +71,9 @@ void srcfile_display(const char *filename, int start_line, int count, int highli
 
     for ( i = start_line; i <= end_line; i++ ) {
         if ( count > 1 ) {
-            printf("%s% 5d: %s\n", i == highlight ? ">" : " ", i, file->lines[i-1]);
+            bk.console("%s% 5d: %s\n", i == highlight ? ">" : " ", i, file->lines[i-1]);
         } else {
-            printf("        %s\n", file->lines[i-1]);
+            bk.console("        %s\n", file->lines[i-1]);
         }
     }
 }

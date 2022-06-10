@@ -28,14 +28,9 @@ generic_console_set_ink:
 	
 
 generic_console_cls:
-	ld	hl, DISPLAY
-	ld	de, DISPLAY +1
-	ld	bc, +(CONSOLE_COLUMNS * CONSOLE_ROWS) - 1
-	ld	(hl),32
-	ldir
 	ld	a,(__gal_mode)
-	cp	1
-	ret	nz
+        and     a
+        jr      z,cls_mode0
 	ld	hl, ($2a6a)
 	ld	de,$20
 	add	hl,de
@@ -44,6 +39,13 @@ generic_console_cls:
 	inc	de
 	ld	bc, +(32 * 208) - 1
 	ld	(hl),0xff
+	ldir
+	ret
+cls_mode0:
+	ld	hl, DISPLAY
+	ld	de, DISPLAY +1
+	ld	bc, +(CONSOLE_COLUMNS * CONSOLE_ROWS) - 1
+	ld	(hl),32
 	ldir
 	ret
 

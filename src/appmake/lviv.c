@@ -9,6 +9,7 @@ static char             *tapename     = NULL;
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
 static char             *crtfile      = NULL;
+static char              khz_22       = 0;
 static int               origin       = -1;
 static int               exec         = -1;
 static char              snapshot     = 0;
@@ -23,6 +24,7 @@ option_t lviv_options[] = {
     {  0,  "snapshot",   "Generate a snapshot",              OPT_BOOL,  &snapshot },
     {  0 , "org",        "Origin of the embedded binary",    OPT_INT,   &origin },
     {  0 , "exec",       "Starting execution address",       OPT_INT,   &exec },
+    {  0,  "22",         "22050hz bitrate option",           OPT_BOOL,  &khz_22 },
     { 'c', "crt0file",   "crt0 used to link binary",         OPT_STR,   &crtfile },
     { 'o', "output",     "Name of output file",              OPT_STR,   &outfile },
     {  0,   NULL,        NULL,                               OPT_NONE,  NULL }
@@ -263,7 +265,12 @@ int lviv_exec(char *target)
             writebyte_lviv(c,fpout, fpwav);
         }
         fclose(fpwav);
-        raw2wav(filename);
+
+        // And now convert raw to a .wav
+        if (khz_22)
+            raw2wav_22k(filename,2);
+        else
+            raw2wav(filename);
     }
   
     fclose(fpin);

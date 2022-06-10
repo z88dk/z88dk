@@ -16,7 +16,7 @@ int lookup_word();
 
 %}
 
-history_expr $[0-9]+
+history_expr $[a-zA-Z0-9_]+
 word [a-zA-Z_][a-zA-Z0-9_]*
 struct_word "struct "[a-zA-Z_][a-zA-Z0-9_]*
 multiple_words "unsigned char"|"unsigned short"|"unsigned int"|"unsigned long"

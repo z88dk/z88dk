@@ -43,8 +43,6 @@ IF NEEDunplot
 ELSE
         ld      a,(__smc777_ink16)
 ENDIF
-        rlca
-        rlca
         ld      e,a
         ld      a,@00000011
         jr      z, rotated         ; pixel is at bit 0...

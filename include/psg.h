@@ -76,7 +76,7 @@
 #endif
 
 #ifdef __GAL__
-#define psgT(hz)		((int)(1536000.0 / (hz)))
+#define psgT(hz)		((int)(111562.5 / (hz)))
 #endif
 
 #ifdef __MC1000__

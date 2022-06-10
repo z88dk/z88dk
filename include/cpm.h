@@ -93,6 +93,32 @@ struct sfcb {
 extern struct fcb  _fcb[0];	// Has MAXFILES entries
 
 
+/* DPB and DPH related functions will probably work on CP/M v2 only.
+   block size, basing on BSH and BLM
+                 1,024     3       7
+                 2,048     4      15
+                 4,096     5      31
+                 8,192     6      63
+                16,384     7     127
+*/
+
+struct dpb {
+    int 	SPT;			/* "Sectors Per Track", total number of 128 bytes sectors per track */
+    uint8_t BSH;            /* "Block Shift Factor", number of 128 bytes sectors per "Allocation Block" */
+    uint8_t BLM;            /* "Block Mask", the values of BSH and BLM implicitly determine the data allocation size */
+    uint8_t EXM;            /* "Extent Mask", number of extents per directory entry */
+    int     DSM;            /* "Total storage capacity" of the disk drive (Number of the last Allocation Block) */
+    int     DRM;            /* "Total # of directory entries" (-1) */
+    uint8_t AL0;            /* Allocation table (MSB) */
+    uint8_t AL1;            /* Allocation table (LSB) */
+    int 	CKS;			/* "Check area Size", number of directory entries to check for disk change. */
+    uint8_t OFF;            /* "Offset", number of system reserved tracks at the beginning of the disk */
+};
+
+
+extern struct dpb __LIB__  *get_dpb(int drive)  __z88dk_fastcall;
+
+
 /* BDOS calls */
 #define CPM_RCON 1               /* read console */
 #define CPM_WCON 2               /* write console */

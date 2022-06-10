@@ -8,9 +8,12 @@
 
 
 scrollup_MODE1:
-        ld      de,($2a6a)
-        ld      h,d
-        ld      l,e
+        ld      hl,($2a6a)
+	ld	bc,$20
+	add	hl,bc
+        ld      d,h
+        ld      e,l
+	ex	de,hl
         inc     h
         ld      bc,32 * 200
         ldir

@@ -9,8 +9,7 @@
 ;	To handle multi module programs which use floating point
 ;	routines in different modules, we have got rid of
 ;	the conditional assembly around the float routines
-;
-;	$Id: z80_crt0.hdr,v 1.12 2015-11-24 06:47:17 stefano Exp $
+
 
 	EXTERN	base_graphics	; Address of graphics screen
 
@@ -21,9 +20,9 @@
 	EXTERN	cleanup		; cleanup before program exit
 
 
-	EXTERN	l_jphl	   ; another jp(hl)
-	EXTERN	l_jpix	   ; jp(ix)
-	EXTERN	l_jpiy	   ; jp(iy)
+	EXTERN	l_jphl		; another jp(hl)
+	EXTERN	l_jpix		; jp(ix)
+	EXTERN	l_jpiy		; jp(iy)
 
 	EXTERN	l_ldi
 	EXTERN	l_ldi_128
@@ -47,61 +46,61 @@
 ; Scopes for integer library routines
 ;------------------------------------
 
-	EXTERN    l_getptr	;Get 3 byte pointer
-	EXTERN    l_putptr	;Put 3 byte pointer
-	EXTERN    l_gchar	;Get signed char
-	EXTERN    l_gcharsp	;Get signed char  (peephole opt)
-	EXTERN    l_gcharspsp	;Get signed char and push  (peephole opt)
-	EXTERN    l_g2charspsp	;Get 2 signed char and push  (peephole opt)
-	EXTERN    l_sxt		;Sign extend char
-	EXTERN    l_gint	;Get int ld hl,(hl)
-	EXTERN    l_gintsp	;Get int (peephole opt)
-	EXTERN    l_gintspchar	;Get int,char (peephole opt)
-	EXTERN    l_gintspsp	;Get int and push (peephole opt)
-	EXTERN    l_g2intspsp	;Get 2 int and push (peephole opt)
-	EXTERN    l_gintsp2de	;Get int, multiply by 2 and add from SP by de
-	EXTERN    l_gint7de	;Get int, multiply by 7 and add from SP by de
-	EXTERN    l_gint_eq	;Get int and test == 0
-	EXTERN    l_ghtonsint	;Get reverse order int
-	EXTERN    l_pint	;Put int: ld (de),hl
-	EXTERN    l_pint_eq	;Put int and test == 0
-	EXTERN    l_pint_pop	;Put int and pop place address
-	EXTERN    l_or		;Int logical or
-	EXTERN    l_xor		;Int logical xor
-	EXTERN    l_and		;Int logical and
-	EXTERN    l_eq		;Int equality
-	EXTERN    l_ne		;Int inequality
-	EXTERN    l_gt		;Int signed de >  hl
-	EXTERN    l_le		;Int signed de <= hl
-	EXTERN    l_ge		;Int signed de >= hl
-	EXTERN    l_lt		;Int signed de <  hl
-	EXTERN    l_uge		;Int unsigned de >= hl
-	EXTERN    l_ult		;Int unsigned de <  hl
-	EXTERN    l_ugt		;Int unsigned de >  hl
-	EXTERN    l_ule		;Int unsigned de <= hl
-	EXTERN    l_cmp		;Int signed compare
-	EXTERN    l_ucmp	;Int unsigned compare
-	EXTERN    l_asr		;Int signed de >> hl
-	EXTERN    l_asr_hl_by_e	;Int signed hl >> e 
-	EXTERN    l_asr_u	;Int unsigned de >> hl
-	EXTERN    l_asr_u_hl_by_e	;Int unsigned hl >> e
-	EXTERN    l_asl		;Int de << hl
-	EXTERN    l_sub		;Int subtract hl = de - hl
-	EXTERN    l_neg		;Int negate
-	EXTERN    l_com		;Int ~
-	EXTERN    l_lneg	;Int logical negate
-	EXTERN    l_bool	;Int boolean test
-	EXTERN    l_cm_de	;
-	EXTERN    l_cm_bc
-	EXTERN    l_deneg
-	EXTERN    l_bcneg
-	EXTERN    l_case	;Integer case
-	EXTERN    l_mult	;Integer hl = hl * de
-	EXTERN    l_mult_u	;Integer unsigned *
-	EXTERN    l_div		;Integer signed / hl=de/hl, de=de%hl
-	EXTERN    l_div_u	;Integer unsigned /
-	EXTERN    l_mod		;Integer % (for gbz80) hl=de%hl
-	EXTERN    l_mod_u	;Integer unsigned % (for gbz80)
+	EXTERN	l_getptr	;Get 3 byte pointer
+	EXTERN	l_putptr	;Put 3 byte pointer
+	EXTERN	l_gchar		;Get signed char
+	EXTERN	l_gcharsp	;Get signed char  (peephole opt)
+	EXTERN	l_gcharspsp	;Get signed char and push  (peephole opt)
+	EXTERN	l_g2charspsp	;Get 2 signed char and push  (peephole opt)
+	EXTERN	l_sxt		;Sign extend char
+	EXTERN	l_gint		;Get int ld hl,(hl)
+	EXTERN	l_gintsp	;Get int (peephole opt)
+	EXTERN	l_gintspchar	;Get int,char (peephole opt)
+	EXTERN	l_gintspsp	;Get int and push (peephole opt)
+	EXTERN	l_g2intspsp	;Get 2 int and push (peephole opt)
+	EXTERN	l_gintsp2de	;Get int, multiply by 2 and add from SP by de
+	EXTERN	l_gint7de	;Get int, multiply by 7 and add from SP by de
+	EXTERN	l_gint_eq	;Get int and test == 0
+	EXTERN	l_ghtonsint	;Get reverse order int
+	EXTERN	l_pint		;Put int: ld (de),hl
+	EXTERN	l_pint_eq	;Put int and test == 0
+	EXTERN	l_pint_pop	;Put int and pop place address
+	EXTERN	l_or		;Int logical or
+	EXTERN	l_xor		;Int logical xor
+	EXTERN	l_and		;Int logical and
+	EXTERN	l_eq		;Int equality
+	EXTERN	l_ne		;Int inequality
+	EXTERN	l_gt		;Int signed de >  hl
+	EXTERN	l_le		;Int signed de <= hl
+	EXTERN	l_ge		;Int signed de >= hl
+	EXTERN	l_lt		;Int signed de <  hl
+	EXTERN	l_uge		;Int unsigned de >= hl
+	EXTERN	l_ult		;Int unsigned de <  hl
+	EXTERN	l_ugt		;Int unsigned de >  hl
+	EXTERN	l_ule		;Int unsigned de <= hl
+	EXTERN	l_cmp		;Int signed compare
+	EXTERN	l_ucmp		;Int unsigned compare
+	EXTERN	l_asr		;Int signed de >> hl
+	EXTERN	l_asr_hl_by_e	;Int signed hl >> e
+	EXTERN	l_asr_u		;Int unsigned de >> hl
+	EXTERN	l_asr_u_hl_by_e	;Int unsigned hl >> e
+	EXTERN	l_asl		;Int de << hl
+	EXTERN	l_sub		;Int subtract hl = de - hl
+	EXTERN	l_neg		;Int negate
+	EXTERN	l_com		;Int ~
+	EXTERN	l_lneg		;Int logical negate
+	EXTERN	l_bool		;Int boolean test
+	EXTERN	l_cm_de	;
+	EXTERN	l_cm_bc
+	EXTERN	l_deneg
+	EXTERN	l_bcneg
+	EXTERN	l_case		;Integer case
+	EXTERN	l_mult		;Integer hl = hl * de
+	EXTERN	l_mult_u	;Integer unsigned *
+	EXTERN	l_div		;Integer signed / hl=de/hl, de=de%hl
+	EXTERN	l_div_u		;Integer unsigned /
+	EXTERN	l_mod		;Integer % (for gbz80) hl=de%hl
+	EXTERN	l_mod_u		;Integer unsigned % (for gbz80)
 
 ;------------------
 ;Long functions now
@@ -302,7 +301,7 @@
 ; Routines for handling 64 bit integers for sccz80
 ;--------------------------------------------------
 
-        EXTERN  __i64_acc
+	EXTERN	__i64_acc
 	EXTERN	l_i64_load
 	EXTERN	l_i64_store
 	EXTERN	l_i64_push
@@ -347,7 +346,7 @@
 	EXTERN	l_i64_ulong2i64
 	EXTERN	l_i64_sint2i64
 	EXTERN	l_i64_uint2i64
-        EXTERN  l_i64_u64_toi32
+	EXTERN	l_i64_u64_toi32
 
 
 ;-------------------
@@ -391,12 +390,12 @@
 	EXTERN	__rrslong_rrx_s
 	EXTERN	__rlslong_rrx_s
 	EXTERN	__rlulong_rrx_s
-        EXTERN  __muluchar
-        EXTERN  __mulschar
+	EXTERN	__muluchar
+	EXTERN	__mulschar
 
 	EXTERN	l_push_di
 	EXTERN	l_pop_ei
 
-        EXTERN  l_debug_push_frame
-        EXTERN  l_debug_pop_frame
+	EXTERN	l_debug_push_frame
+	EXTERN	l_debug_pop_frame
 

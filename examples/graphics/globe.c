@@ -15,14 +15,14 @@
 	  
 	  zcc +zx -lndos -create-app -lm globe.c
 	  
-	  zcc +ts2068 -lgfx2068hr -lm -Dhires -create-app globe.c
+	  zcc +ts2068  -pragma-define:CLIB_ZX_CONIO32=1 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -lm -Dhires -create-app globe.c
 	  
 	  zcc  +enterprise  -lm -create-app -lgfxephr -Dhires -lm globe.c
 	   
 	  zcc +cpm -subtype=tiki100 -create-app -Dhires -lm globe.c
 
 	  zcc +zx81 -clib=wrx -subtype=wrx -create-app -lm -DVIEW=1 globe.c
-	  (32K) zcc +zx81 -clib=wrxansi -subtype=wrx  -lndos -create-app -lm globe.c
+	  (32K, uncommment "hrgpage") zcc +zx81 -clib=wrxansi -subtype=wrx  -lndos -create-app -lm globe.c
 	  zcc +zx81 -clib=mt  -create-app -lm globe.c
 	  (after loading to activate the G007 graphics mode type CLS 2 and SLOW 4, then RUN)
 	  zcc +zx81 -clib=g007  -create-app -lm -DVIEW=1  globe.c
@@ -270,6 +270,7 @@ void setorg()
 
 void main()
 {
+
 restart:
 	fputc_cons(12);
 

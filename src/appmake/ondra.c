@@ -8,6 +8,7 @@
 static char             *binname      = NULL;
 static char             *outfile      = NULL;
 static char             *crtfile      = NULL;
+static char              khz_22       = 0;
 static int               origin       = -1;
 static int               exec         = -1;
 static char              help         = 0;
@@ -20,6 +21,7 @@ option_t ondra_options[] = {
     { 'b', "binfile",    "Binary file to embed",             OPT_STR,   &binname },
     {  0 , "org",        "Origin of the embedded binary",    OPT_INT,   &origin },
     {  0 , "exec",       "Starting execution address",       OPT_INT,   &exec },
+    {  0,  "22",         "22050hz bitrate option",           OPT_BOOL,  &khz_22 },
     { 'c', "crt0file",   "crt0 used to link binary",         OPT_STR,   &crtfile },
     { 'o', "output",     "Name of output file",              OPT_STR,   &outfile },
     {  0,   NULL,        NULL,                               OPT_NONE,  NULL }
@@ -214,7 +216,10 @@ int ondra_exec(char *target)
     fclose(fpout);
 
     // And now convert raw to a .wav
-    raw2wav(filename);
+    if (khz_22)
+        raw2wav_22k(filename,2);
+    else
+        raw2wav(filename);
     
     return 0;
 }

@@ -293,6 +293,8 @@ extern option_t  zx81_options;
 extern int       tvc_exec(char *target);
 extern option_t  tvc_options;
 
+extern int       primo_exec(char *target);
+extern option_t  primo_options;
 
 
 struct {
@@ -568,6 +570,10 @@ struct {
       "Generate TVC .cas file from the linked binary",
       NULL,
       tvc_exec,   &tvc_options },
+    { "bin2pri",   "primo",      "(C) 2022 Sandor Vass",
+      "Generate Primo .pri/.ptp file from the linked binary",
+      NULL,
+      primo_exec,   &primo_options },
     { "bin2fdd",  "vector06c", "(C) 2020 z88dk",
       "Create a bootable vector06c disk",
       NULL,

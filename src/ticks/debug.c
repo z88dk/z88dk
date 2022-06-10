@@ -10,10 +10,16 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-static cfile *cfiles = NULL;
-static debug_sym_function *cfunctions = NULL;
-static debug_sym_symbol *cdb_csymbols = NULL;
-static debug_sym_type *cdb_ctypes = NULL;
+static cfile* cfiles = NULL;
+static debug_sym_function* cfunctions = NULL;
+
+// Global symbols only
+static debug_sym_symbol* cdb_global_symbols = NULL;
+
+// Files that might contain static symbols
+static debug_sym_file* cdb_files = NULL;
+
+static debug_sym_type* cdb_ctypes = NULL;
 static cline *clines[65536] = {0};
 
 
@@ -177,7 +183,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                         break;
                     }
                     default: {
-                        printf("Warning: unknown type D%c.\n", c);
+                        bk.debug("Warning: unknown type D%c.\n", c);
                         goto err;
                     }
                 }
@@ -228,7 +234,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                         break;
                     }
                     default: {
-                        printf("Warning: unknown type F%c.\n", c);
+                        bk.debug("Warning: unknown type F%c.\n", c);
                         goto err;
                     }
                 }
@@ -280,7 +286,7 @@ static uint8_t parse_record_type(const char *rt, type_record *record)
                 break;
             }
             case RECORD_PARSING_MODE_DONE: {
-                printf("Warning: data after sign.\n");
+                bk.debug("Warning: data after sign.\n");
                 goto err;
             }
         }
@@ -353,7 +359,7 @@ static void debug_add_function_info(const char *encoded)
         }
         default:
         {
-            printf("Warning: unknown function scope: %c\n", function_scope);
+            bk.debug("Warning: unknown function scope: %c\n", function_scope);
             return;
         }
     }
@@ -378,12 +384,12 @@ static void debug_add_function_info(const char *encoded)
     }
 
     if (parse_record_type(type_record, &f->type_record)) {
-        printf("Warning cannot parse type record.\n");
+        bk.debug("Warning cannot parse type record.\n");
         goto err;
     }
 
     if (parse_address_space(encoded, &encoded, &f->address_space)) {
-        printf("Warning cannot parse address space.\n");
+        bk.debug("Warning cannot parse address space.\n");
         goto err;
     }
 
@@ -393,7 +399,7 @@ static void debug_add_function_info(const char *encoded)
 
 err:
     free(f);
-    printf("Warning: could not add debug info on function.\n");
+    bk.debug("Warning: could not add debug info on function.\n");
 }
 
 static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char** result)
@@ -456,7 +462,7 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
         }
         default:
         {
-            printf("Warning: unknown symbol scope: %c\n", symbol_scope);
+            bk.debug("Warning: unknown symbol scope: %c\n", symbol_scope);
         }
     }
 
@@ -467,7 +473,13 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
     int end;
 
     if (sscanf(encoded, "%[^$]$%[^$]$%[^(](%[^)]),%n", symbol_name, level, block, type_record, &end) != 4) {
-        goto err;
+        if (sscanf(encoded, "$%[^$]$%[^(](%[^)]),%n", level, block, type_record, &end) == 3) {
+            static int anon_id = 1;
+            // we've got anonymous type, so come up with something
+            sprintf(symbol_name, "anon_%d", anon_id++);
+        } else {
+            goto err;
+        }
     }
     s->symbol_name = strdup(symbol_name);
     encoded += end;
@@ -495,7 +507,7 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
                     arg->next = last;
                     s->belongs_to_function->arguments = arg;
                 } else {
-                    printf("Warning: could not find function %s.%s for argument %s.\n",
+                    bk.debug("Warning: could not find function %s.%s for argument %s.\n",
                         file_name, function_name, s->symbol_name);
                 }
 
@@ -506,12 +518,12 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
     }
 
     if (parse_record_type(type_record, &s->type_record)) {
-        printf("Warning cannot parse type record.\n");
+        bk.debug("Warning cannot parse type record.\n");
         goto err;
     }
 
     if (parse_address_space(encoded, &encoded, &s->address_space)) {
-        printf("Warning cannot parse address space.\n");
+        bk.debug("Warning cannot parse address space.\n");
         goto err;
     }
 
@@ -521,7 +533,7 @@ static debug_sym_symbol* debug_parse_symbol_info(const char* encoded, const char
 err:
     *result = NULL;
     free(s);
-    printf("Warning: could not add debug info on symbol.\n");
+    bk.debug("Warning: could not add debug info on symbol.\n");
     return NULL;
 }
 
@@ -572,7 +584,7 @@ static debug_sym_type* debug_parse_type_info(const char* encoded)
         }
         default:
         {
-            printf("Warning: unknown symbol scope: %c\n", symbol_scope);
+            bk.debug("Warning: unknown symbol scope: %c\n", symbol_scope);
             break;
         }
     }
@@ -624,7 +636,7 @@ err_type_info:
     free(type_info);
 err:
     free(t);
-    printf("Warning: could not add debug info on type.\n");
+    bk.debug("Warning: could not add debug info on type.\n");
     return NULL;
 }
 
@@ -675,7 +687,18 @@ void debug_add_info_encoded(char *encoded)
             const char* res;
             debug_sym_symbol* s = debug_parse_symbol_info(subtype, &res);
             if (s) {
-                HASH_ADD_STR(cdb_csymbols, symbol_name, s);
+                if (s->scope == SYMBOL_SCOPE_FILE) {
+                    debug_sym_file* f = NULL;
+                    HASH_FIND_STR(cdb_files, s->scope_value, f);
+                    if (f == NULL) {
+                        f = calloc(1, sizeof(debug_sym_file));
+                        strcpy(f->name, s->scope_value);
+                        HASH_ADD_STR(cdb_files, name, f);
+                    }
+                    HASH_ADD_STR(f->file_local_symbols, symbol_name, s);
+                } else {
+                    HASH_ADD_STR(cdb_global_symbols, symbol_name, s);
+                }
             }
             break;
         }
@@ -689,12 +712,14 @@ void debug_add_info_encoded(char *encoded)
         }
         default:
         {
-            printf("Warning: unknown record type: %c\n", record_type);
+            bk.debug("Warning: unknown record type: %c\n", record_type);
             break;
         }
     }
 
-    printf("Decoded cdb: <%s>\n",encoded);
+    if (bk.is_verbose()) {
+        bk.debug("Decoded cdb: <%s>\n",encoded);
+    }
 }
 
 
@@ -746,7 +771,7 @@ int debug_find_source_location(int address, const char **filename, int *lineno)
     return 0;
 }
 
-int debug_resolve_source(char *name)
+int debug_resolve_source(char *name, const char** corrected_name)
 {
     char *ptr;
 
@@ -767,6 +792,31 @@ int debug_resolve_source(char *name)
 
             if ( cl != NULL ) {
                 return cl->address;
+            }
+        } else {
+            // try and do partial match
+            cfile *elem, *tmp;
+            uint32_t filename_len = strlen(filename);
+            HASH_ITER(hh, cfiles, elem, tmp) {
+                uint32_t elem_file_len = strlen(elem->file);
+
+                if (elem_file_len < filename_len)
+                    continue;
+
+                if (memcmp(filename, elem->file + elem_file_len - filename_len, filename_len) != 0)
+                    continue;
+
+                cline *cl;
+                HASH_FIND_INT(elem->lines, &line, cl);
+
+                if ( cl != NULL ) {
+                    if (corrected_name) {
+                        *corrected_name = elem->file;
+                    }
+                    return cl->address;
+                }
+
+                break;
             }
         }
     }
@@ -831,6 +881,8 @@ type_chain* copy_type_chain(type_chain* from) {
             ptr->next = copy_ptr;
         }
         *copy_ptr = *from;
+        // recalculate size since malloc_type had NULL data
+        copy_ptr->size = get_type_memory_size(copy_ptr);
         ptr = copy_ptr;
         ptr->next = NULL;
         from = from->next;
@@ -1102,7 +1154,7 @@ void debug_resolve_expression_element(type_record* record, type_chain* chain, en
 }
 
 static int debug_get_symbol_address(debug_sym_symbol *s) {
-    int address = symbol_resolve((char*)s->symbol_name);
+    int address = symbol_resolve((char*)s->symbol_name, (s->scope == SYMBOL_SCOPE_FILE) ? s->scope_value : NULL);
     if (address >= 0) {
         return address;
     }
@@ -1110,7 +1162,7 @@ static int debug_get_symbol_address(debug_sym_symbol *s) {
     char underscored_name[255];
     sprintf(underscored_name, "_%s", s->symbol_name);
 
-    address = symbol_resolve(underscored_name);
+    address = symbol_resolve(underscored_name, (s->scope == SYMBOL_SCOPE_FILE) ? s->scope_value : NULL);
     if (address >= 0) {
         return address;
     }
@@ -1148,9 +1200,22 @@ uint8_t debug_symbol_valid(debug_sym_symbol *sym, uint16_t stack, debug_frame_po
     return 1;
 }
 
-debug_sym_symbol* cdb_find_symbol(const char* cname) {
-    debug_sym_symbol* result;
-    HASH_FIND_STR(cdb_csymbols, cname, result);
+debug_sym_symbol* cdb_find_symbol(const char* cname, const char* filename) {
+    if (filename) {
+        // look for a file local first
+        debug_sym_file* f = NULL;
+        HASH_FIND_STR(cdb_files, filename, f);
+        if (f) {
+            debug_sym_symbol* local_symbol = NULL;
+            HASH_FIND_STR(f->file_local_symbols, cname, local_symbol);
+            if (local_symbol) {
+                return local_symbol;
+            }
+        }
+    }
+
+    debug_sym_symbol* result = NULL;
+    HASH_FIND_STR(cdb_global_symbols, cname, result);
     return result;
 }
 
@@ -1163,8 +1228,17 @@ debug_sym_type* cdb_find_type(const char* tname) {
     return result;
 }
 
-debug_sym_symbol* cdb_get_first_symbol() {
-    return cdb_csymbols;
+debug_sym_symbol* cdb_get_first_global_symbol() {
+    return cdb_global_symbols;
+}
+
+debug_sym_symbol* cdb_get_first_local_symbol(const char* filename) {
+    debug_sym_file* f = NULL;
+    HASH_FIND_STR(cdb_files, filename, f);
+    if (f) {
+        return f->file_local_symbols;
+    }
+    return NULL;
 }
 
 static uint16_t wrap_reg(uint8_t h, uint8_t l)
@@ -1204,7 +1278,7 @@ static uint16_t get_current_framepointer(struct debugger_regs_t *regs, size_t* i
     // If the symbol __debug_framepointer is defined, then extract the value from there
     // The rest of the stack can be walked as normal since the value is pushed onto
     // the stack as usual
-    int where = symbol_resolve("__debug_framepointer");
+    int where = symbol_resolve("__debug_framepointer", NULL);
 
     if ( where != -1 ) {
         // call l_debug_push_frame
