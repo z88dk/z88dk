@@ -70,7 +70,7 @@ int main(int argc, char **argv)
         if( argv[1][0] == '-' && argv[2] ) {
             switch (argc--, argv++[1][1]){
             case 'o':
-                symbol_addr = symbol_resolve(argv[1]);
+                symbol_addr = symbol_resolve(argv[1], NULL);
                 org = (-1 == symbol_addr) ? strtol(argv[1], &endp, 0) : symbol_addr;
                 if ( start == -1 ) {
                     start = org;
@@ -78,12 +78,12 @@ int main(int argc, char **argv)
                 argc--; argv++;
                 break;
             case 's':
-                symbol_addr = symbol_resolve(argv[1]);
+                symbol_addr = symbol_resolve(argv[1], NULL);
                 start = (-1 == symbol_addr) ? strtol(argv[1], &endp, 0) : symbol_addr;
                 argc--; argv++;
                 break;
             case 'e':
-                symbol_addr = symbol_resolve(argv[1]);
+                symbol_addr = symbol_resolve(argv[1], NULL);
                 end = (-1 == symbol_addr) ? strtol(argv[1], &endp, 0) : symbol_addr;
                 argc--; argv++;
                 break;

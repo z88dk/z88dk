@@ -66,13 +66,11 @@ RESULTS
 =======
 
 1.
-HITECH C CPM V309
-1872 bytes less cpm overhead
+HITECH C CPM V309-15
+3479 bytes exact
 
-cycle count  = 1852698998
-time @ 4MHz  = 1852698998 / 4*10^6 = 7 min 43 sec
-
-Very fast float library but only accurate for */+-
+cycle count  = 1870290979
+time @ 4MHz  = 1870290979 / 4*10^6 = 7 min 47 sec
 
 2.
 IAR Z80 V4.06A

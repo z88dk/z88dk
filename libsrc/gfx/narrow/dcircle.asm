@@ -33,7 +33,7 @@ DEFVARS 0
     ld      (ix+func),l
     ld      (ix+func+1),h
     call    l9900
-    ld      hl,6
+    ld      hl,8
     add     hl,sp
     ld      sp,hl
     ret

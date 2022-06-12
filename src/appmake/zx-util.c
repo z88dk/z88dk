@@ -280,6 +280,10 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                 exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
             }
         }
+        if (zxt->usr_address == -1 )
+        {
+          zxt->usr_address = pos;
+        }
 
         if ((fpin = fopen_bin(zxc->binname, zxc->crtfile)) == NULL) {
             exit_log(1, "Can't open input file %s\n", zxc->binname);
@@ -350,7 +354,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
             writebyte_p(0xf9, fpout, &zxt->parity);       /* RANDOMIZE */
             writebyte_p(0xc0, fpout, &zxt->parity);       /* USR */
             writebyte_p(0xb0, fpout, &zxt->parity);       /* VAL */
-            sprintf(mybuf, "\"%i\"", (int)pos);      /* Location for USR */
+            sprintf(mybuf, "\"%i\"", zxt->usr_address);      /* Location for USR */
             writestring_p(mybuf, fpout, &zxt->parity);
             writebyte_p(0x0d, fpout, &zxt->parity);       /* ENTER (end of BASIC line) */
             writebyte_p(zxt->parity, fpout, &zxt->parity);
@@ -515,7 +519,7 @@ int zx_tape(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *me
                     writebyte_p(0xf9, fpout, &zxt->parity);       /* RANDOMIZE */
                     writebyte_p(0xc0, fpout, &zxt->parity);       /* USR */
                     writebyte_p(0xb0, fpout, &zxt->parity);       /* VAL */
-                    sprintf(mybuf, "\"%i\"", (int)pos);           /* Location for USR */
+                    sprintf(mybuf, "\"%i\"", zxt->usr_address);           /* Location for USR */
                     writestring_p(mybuf, fpout, &zxt->parity);
                     writebyte_p(0x0d, fpout, &zxt->parity);       /* ENTER (end of BASIC line) */
                     writebyte_p(zxt->parity, fpout, &zxt->parity);
@@ -2200,6 +2204,10 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *m
             exit_log(1,"Could not find parameter ZORG (not z88dk compiled?)\n");
         }
     }
+    if (zxt->usr_address == -1 )
+    {
+      zxt->usr_address = (int)origin;
+    }
 
     if ((fpin = fopen_bin(zxc->binname, zxc->crtfile)) == NULL) {
         exit_log(1,"Can't open input file %s\n", zxc->binname);
@@ -2254,7 +2262,7 @@ int zx_plus3(struct zx_common *zxc, struct zx_tape *zxt, struct banked_memory *m
     writebyte_b(0xf9, &ptr);	/* RANDOMIZE */
     writebyte_b(0xc0, &ptr);	/* USR */
     writebyte_b(0xb0, &ptr);	/* VAL */
-    snprintf(tbuf,sizeof(tbuf), "\"%i\"", (int)origin);           /* Location for USR */
+    snprintf(tbuf,sizeof(tbuf), "\"%i\"", zxt->usr_address);           /* Location for USR */
     writestring_b(tbuf, &ptr);
     writebyte_b(':', &ptr);
     writebyte_b(234, &ptr);      /* REM */

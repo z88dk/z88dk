@@ -12,6 +12,7 @@ typedef struct type_chain_s type_chain;
 typedef struct address_space_s address_space;
 typedef struct debug_sym_function_s debug_sym_function;
 typedef struct debug_sym_symbol_s debug_sym_symbol;
+typedef struct debug_sym_file_s debug_sym_file;
 typedef struct debug_sym_type_s debug_sym_type;
 typedef struct debug_sym_type_member_s debug_sym_type_member;
 typedef struct debug_sym_function_argument_s debug_sym_function_argument;
@@ -111,6 +112,12 @@ struct debug_sym_symbol_s {
     UT_hash_handle          hh;
 };
 
+struct debug_sym_file_s {
+    char                    name[128];
+    debug_sym_symbol*       file_local_symbols;
+    UT_hash_handle          hh;
+};
+
 struct debug_sym_type_member_s {
     uint16_t                    offset;
     debug_sym_symbol*           symbol;
@@ -148,6 +155,13 @@ struct debugger_regs_t {
     unsigned char a_,b_,c_,d_,e_,h_,l_;
     unsigned char f, f_;
     unsigned char xh, xl, yh, yl;
+
+    /*
+     * Some emulators would report this 16bit register pair, which could be used
+     * to track ticks for profiling purposes
+     */
+    uint16_t clockl;
+    uint16_t clockh;
 };
 
 // debug
@@ -171,8 +185,9 @@ extern debug_sym_function* debug_find_function(const char* function_name, const 
 extern void debug_resolve_expression_element(type_record* record, type_chain* chain, enum resolve_chain_value_kind resolve_by, uint32_t data, struct expression_result_t* into);
 extern void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, struct expression_result_t* into);
 extern uint8_t debug_symbol_valid(debug_sym_symbol* sym, uint16_t stack, debug_frame_pointer* frame_pointer);
-extern debug_sym_symbol* cdb_get_first_symbol();
-extern debug_sym_symbol* cdb_find_symbol(const char* cname);
+extern debug_sym_symbol* cdb_get_first_global_symbol();
+extern debug_sym_symbol* cdb_get_first_local_symbol(const char* filename);
+extern debug_sym_symbol* cdb_find_symbol(const char* cname, const char* filename);
 extern debug_sym_type* cdb_find_type(const char* tname);
 
 extern debug_frame_pointer* debug_stack_frames_construct(uint16_t pc, uint16_t sp, struct debugger_regs_t* regs, uint16_t limit);

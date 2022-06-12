@@ -46,15 +46,13 @@ RESULTS
 =======
 
 1.
-HITECH C CPM V309
-3778 bytes less cpm overhead
+HITECH C CPM V309-15
+2135 bytes exact
 
 error: 1 * 10^(-6)
 
-cycle count  = 6798318787
-time @ 4MHz  = 6798318787 / 4*10^6 = 28 min 20 sec
-
-Very fast float library but only accurate for */+-
+cycle count  = 6790499956
+time @ 4MHz  = 6790499956 / 4*10^6 = 28 min 18 sec
 
 2.
 Z88DK April 20, 2020

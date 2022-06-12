@@ -15,37 +15,35 @@ The backslash used to continue the string definition of
 "char *alu =" had to be deleted.  It seems things work out ok
 without the backslash for line continuation.
 
+Compiled with C309-15 from https://github.com/agn453/HI-TECH-Z80-C
+
 VERIFY CORRECT RESULT
 =====================
 
-C -V -LF -DSTATIC -DPRINTF -O FASTA.C
+CC -V -N -OF -DSTATIC -DPRINTF FASTA.C -LF
 
 Run FASTA.COM and verify correct printout.
 
 TIMING
 ======
 
-C -V -LF -DSTATIC -O -MFASTA.MAP FASTA.C
+CC -V -N -OF -DSTATIC -MFASTA.MAP FASTA.C -LF
 
 Program size can be determined from information in the
 map file.
 
-SIZE = text + data + bss = 0xd88 + 0x1df + 0x71 = 4056 bytes
+TOTAL       Name         Link     Load   Length
+            (abs)           0        0        0
+            text            0        0     1056
+            data         1056     1056      53D
+            bss          1593     1593       73
+                
+SIZE = text + data + bss = 0x1056 + 0x53D + 0x73 = 5638 bytes
 
-CP/M COM files begin at address 0x100.  To time with TICKS
-this needs to be embedded into a binary that starts at
-address 0.  Bytes leading up to 0x100 are zeroes, meaning NOP.
+To determine timing, the output binary was uploaded and run as a CP/M file.
 
-appmake +rom -s 32768 -f 0 -o fa0.bin
-appmake +inject -b fa0.bin -i FASTA.COM -s 256 -o fa.bin
+z88dk-ticks FASTA.COM -counter 999999999
 
-To determine start and stop timing points, the output binary
-was manually inspected.  TICKS command:
-
-ticks fa.bin -start 0420 -end 0494 -counter 999999999
-
-start   = TIMER_START in hex
-end     = TIMER_STOP in hex
 counter = High value to ensure completion
 
 If the result is close to the counter value, the program may have
@@ -54,8 +52,8 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-HITECH C CPM V309
-4056 bytes less cpm overhead
+HITECH C CPM V309-15
+5638 bytes exact
 
-cycle count  = 188751954
-time @ 4MHz  = 188751954 / 4*10^6 = 47.19 sec
+cycle count  = 189901647
+time @ 4MHz  = 189901647 / 4*10^6 = 47.4754 sec

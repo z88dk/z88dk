@@ -16,40 +16,37 @@ After "include <math.h>" add:
 typedef float float_t;
 typedef float double_t;
 
+Compiled with C309-15 from https://github.com/agn453/HI-TECH-Z80-C
+
 VERIFY CORRECT RESULT
 =====================
 
-C -V -DSTATIC -DPRINTF -O DHRY_1.C DHRY_2.C
+CC -V -N -OF -DSTATIC -DPRINTF -EDHRY.COM DHRY-1.C DHRY-2.C
 
-Rename output from DHRY_1.COM to DHRY.COM
-(CP/M has difficulty with underscores in filenames).
+Renamed source files because CP/M has difficulty with underscores in filenames.
 
 Run DHRY.COM and verify correct printout.
 
 TIMING
 ======
 
-C -V -DSTATIC -O -MDHRY.MAP DHRY_1.C DHRY_2.C
+CC -V -N -OF -DSTATIC -MDHRY.MAP -EDHRY.COM DHRY-1.C DHRY-2.C
 
 Program size can be determined from information in the
 map file.
 
-SIZE = text + data + bss = 0x84c + 0x80 + 0x1463 = 7471 bytes
+TOTAL       Name         Link     Load   Length
+            (abs)           0        0        0
+            text            0        0      AD9
+            data          AD9      AD9      3DE
+            bss           EB7      EB7     1465
+                
+SIZE = text + data + bss = 0xAD9 + 0x3DE + 0x1465 = 8988 bytes
 
-CP/M COM files begin at address 0x100.  To time with TICKS
-this needs to be embedded into a binary that starts at
-address 0.  Bytes leading up to 0x100 are zeroes, meaning NOP.
+To determine timing, the output binary was uploaded and run as a CP/M file.
 
-appmake +rom -s 32768 -f 0 -o dhry0.bin
-appmake +inject -b dhry0.bin -i DHRY.COM -s 256 -o dhry.bin
+z88dk-ticks DHRY.COM -counter 999999999
 
-To determine start and stop timing points, the output binary
-was manually inspected.  TICKS command:
-
-ticks dhry.bin -start 019c -end 0136 -counter 999999999
-
-start   = TIMER_START in hex
-end     = TIMER_STOP in hex
 counter = High value to ensure completion
 
 If the result is close to the counter value, the program may have
@@ -58,10 +55,10 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-HITECH C CPM V309
-7471 bytes less cpm overhead
+HITECH C CPM V309-15
+8988 bytes exact
 
-cycle count  = 354120220
-time @ 4MHz  = 354120220 / 4*10^6 = 88.53 sec
-dhrystones/s = 20000 / 88.53 = 225.9120
-DMIPS        = 225.9120 / 1757 = 0.12858
+cycle count  = 356235065
+time @ 4MHz  = 356235065 / 4*10^6 = 89.0588 sec
+dhrystones/s = 20000 / 89.0588 = 224.5708
+DMIPS        = 224.5708 / 1757 = 0.1278

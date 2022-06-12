@@ -23,6 +23,7 @@ struct zx_tape
     char          *merge;
     int            patchpos;
     int            clear_address;
+    int            usr_address;
     char          *patchdata;
     char          *screen;
     char           audio;

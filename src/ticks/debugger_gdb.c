@@ -1,4 +1,6 @@
+#include "debugger_gdb.h"
 #include "debugger.h"
+#include "debugger_mi2.h"
 #include "backend.h"
 #include "debug.h"
 #include "disassembler.h"
@@ -6,39 +8,52 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #include <pthread.h>
-#include <sys/fcntl.h>
-#include <semaphore.h>
+#include <unistd.h>
 #include "debugger_gdb_packets.h"
 #include "sxmlc.h"
 #include "sxmlsearch.h"
 
-typedef void (*trapped_action_t)(const void* data, void* response);
-typedef void (*network_op_cb)(void* arg);
+#ifdef WIN32
+#include <winsock2.h>
+#include <windows.h>
+#endif
 
-struct network_op
-{
-    network_op_cb callback;
-    void* arg;
-    struct network_op* prev;
-};
+#define SEC_TO_US(sec) ((sec)*1000000)
+#define NS_TO_US(ns)    ((ns)/1000)
 
 static uint8_t verbose = 0;
 int c_autolabel = 0;
+uint8_t temporary_break = 0;
+static uint8_t has_clock_register = 0;
 static uint8_t registers_invalidated = 1;
-static sem_t* req_response_mutex = NULL;
-static sem_t* response_mutex = NULL;
-static sem_t* trap_mutex = NULL;
 static pthread_cond_t network_op_cond;
 static pthread_mutex_t network_op_mutex;
-static pthread_mutex_t trap_process_mutex;
+
+static pthread_cond_t main_thread_cond;
+static pthread_mutex_t main_thread_mutex;
 static int supported_packet_size = 1024;
-static trapped_action_t scheduled_action = NULL;
-static const void* scheduled_action_data = NULL;
-static void* scheduled_action_response = NULL;
+
+struct scheduled_action_t
+{
+    trapped_action_t scheduled_action;
+    const void* scheduled_action_data;
+    void* scheduled_action_response;
+    uint8_t* wait;
+
+    pthread_mutex_t* wait_mutex;
+    pthread_cond_t* wait_cond;
+
+    struct scheduled_action_t* next;
+};
+
+static struct scheduled_action_t* first_scheduled_action = NULL;
 static char request_response[1024];
 static uint8_t write_request = 0;
+static pthread_mutex_t req_response_mutex;
+static pthread_cond_t req_response_cond;
 static uint8_t waiting_for_response = 0;
 static const char hexchars[] = "0123456789abcdef";
 static struct debugger_regs_t registers;
@@ -63,7 +78,15 @@ enum register_mapping_t {
     REGISTER_MAPPING_SP,
     REGISTER_MAPPING_PC,
 
-    REGISTER_MAPPING_MAX
+    /*
+     * Some emulators would report this 16bit register pair, which could be used
+     * to track ticks for profiling purposes
+     */
+    REGISTER_MAPPING_CLOCKL,
+    REGISTER_MAPPING_CLOCKH,
+
+    REGISTER_MAPPING_MAX,
+    REGISTER_MAPPING_UNKNOWN
 };
 
 static const char* register_mapping_names[] = {
@@ -79,6 +102,13 @@ static const char* register_mapping_names[] = {
     "iy",
     "sp",
     "pc",
+
+    /*
+     * Some emulators would report this 16bit register pair, which could be used
+     * to track ticks for profiling purposes
+     */
+    "clockl_",
+    "clockh_",
 };
 
 static enum register_mapping_t register_mappings[32] = {};
@@ -134,17 +164,19 @@ void schedule_write_raw(const uint8_t* data, ssize_t length)
 
 static void send_request_no_response(const char* request)
 {
-    waiting_for_response = 0;
-
     schedule_write_packet(request);
 }
 
 static const char* send_request(const char* request)
 {
+    pthread_mutex_lock(&req_response_mutex);
     waiting_for_response = 1;
-
     schedule_write_packet(request);
-    sem_wait(req_response_mutex);
+
+    while (waiting_for_response) {
+        pthread_cond_wait(&req_response_cond, &req_response_mutex);
+    }
+    pthread_mutex_unlock(&req_response_mutex);
 
     return request_response;
 }
@@ -236,6 +268,22 @@ static struct debugger_regs_t* fetch_registers()
 #endif
                     break;
                 }
+                case REGISTER_MAPPING_CLOCKL: {
+#ifdef __BIG_ENDIAN__
+                    registers.clockl = (value>>8)|((value&0xff)<<8);
+#else
+                    registers.clockl = value;
+#endif
+                    break;
+                }
+                case REGISTER_MAPPING_CLOCKH: {
+#ifdef __BIG_ENDIAN__
+                    registers.clockh = (value>>8)|((value&0xff)<<8);
+#else
+                    registers.clockh = value;
+#endif
+                    break;
+                }
                 case REGISTER_MAPPING_IX: {
                     unwrap_reg(value, &registers.xh, &registers.xl);
                     break;
@@ -260,9 +308,9 @@ static struct debugger_regs_t* fetch_registers()
                     unwrap_reg(value, &registers.h_, &registers.l_);
                     break;
                 }
-                default:
-                {
-                    printf("Warning: unknown mapping %d\n", reg);
+                case REGISTER_MAPPING_UNKNOWN:
+                default: {
+                    // we don't support such register, so we chose to ignore it
                     break;
                 }
             }
@@ -422,6 +470,7 @@ void set_regs(struct debugger_regs_t* regs)
                 value = wrap_reg(regs->h_, regs->l_);
                 break;
             }
+            case REGISTER_MAPPING_UNKNOWN:
             default:
             {
                 continue;
@@ -462,8 +511,19 @@ void port_out(int port, int value) {}
 void debugger_write_memory(int addr, uint8_t val) {}
 void debugger_read_memory(int addr) {}
 
-void debugger_break()
+void debugger_break(uint8_t temporary)
 {
+    if (temporary)
+    {
+        temporary_break = 1;
+    }
+
+    if (connection_socket == 0)
+    {
+        bk.debug("Nothing to break, as we're not connected.\n");
+        return;
+    }
+
     static uint8_t req[] = { 0x03 };
     schedule_write_raw(req, 1);
 }
@@ -472,6 +532,7 @@ void debugger_detach()
 {
     send_request("D");
     shutdown(connection_socket, 0);
+    connection_socket = 0;
 }
 
 void debugger_resume()
@@ -480,54 +541,63 @@ void debugger_resume()
     send_request_no_response("c");
 }
 
-void gdb_add_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
+breakpoint_ret_t gdb_add_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
-    switch (type)
-    {
+    if (connection_socket == 0) {
+        return BREAKPOINT_ERROR_NOT_CONNECTED;
+    }
+
+    if (debugger_active == 0) {
+        return BREAKPOINT_ERROR_RUNNING;
+    }
+
+    switch (type) {
         case BK_BREAKPOINT_REGISTER:
         case BK_BREAKPOINT_HARDWARE:
         {
-            printf("Warning: not supported.\n");
-            return;
+            return BREAKPOINT_ERROR_FAILURE;
         }
     }
 
     char req[64];
     sprintf(req, "Z%zx,%zx,%zx", (size_t)type, (size_t)at, (size_t)sz);
     const char* resp = send_request(req);
-    if (strcmp(resp, "E01") == 0)
+    if (strcmp(resp, "OK") != 0)
     {
-        printf("Could not set breakpoint.\n");
+        return BREAKPOINT_ERROR_FAILURE;
     }
-    else if (strcmp(resp, "OK") != 0)
-    {
-        printf("Could not set breakpoint: %s\n", resp);
-    }
+
+    return BREAKPOINT_ERROR_OK;
 }
 
-void gdb_remove_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
+breakpoint_ret_t gdb_remove_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
+    if (connection_socket == 0) {
+        return BREAKPOINT_ERROR_NOT_CONNECTED;
+    }
+    if (debugger_active == 0) {
+        return BREAKPOINT_ERROR_RUNNING;
+    }
+
     char req[64];
     sprintf(req, "z%zx,%zx,%zx", (size_t)type, (size_t)at, (size_t)sz);
     const char* resp = send_request(req);
-    if (strcmp(resp, "E01") == 0)
+    if (strcmp(resp, "OK") != 0)
     {
-        printf("Could not set breakpoint.\n");
+        return BREAKPOINT_ERROR_FAILURE;
     }
-    else if (strcmp(resp, "OK") != 0)
-    {
-        printf("Could not set breakpoint: %s\n", resp);
-    }
+
+    return BREAKPOINT_ERROR_OK;
 }
 
-void gdb_disable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
+breakpoint_ret_t gdb_disable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
-    printf("Warning: not supported.\n");
+    return BREAKPOINT_ERROR_FAILURE;
 }
 
-void gdb_enable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
+breakpoint_ret_t gdb_enable_breakpoint(uint8_t type, uint16_t at, uint8_t sz)
 {
-    printf("Warning: not supported.\n");
+    return BREAKPOINT_ERROR_FAILURE;
 }
 
 uint8_t breakpoints_check()
@@ -563,6 +633,7 @@ void debugger_next()
             char req[64];
             sprintf(req, "i%d", len);
             schedule_write_packet(req);
+            add_temp_breakpoint_one_instruction();
             debugger_active = 0;
             return;
         }
@@ -570,12 +641,14 @@ void debugger_next()
 
     // it's something else, so do a regular step
     schedule_write_packet("s");
+    add_temp_breakpoint_one_instruction();
     debugger_active = 0;
 }
 
 void debugger_step()
 {
     schedule_write_packet("s");
+    add_temp_breakpoint_one_instruction();
     debugger_active = 0;
 }
 
@@ -635,6 +708,441 @@ uint8_t debugger_restore(const char* file_path, uint16_t at, uint8_t set_pc)
     return 0;
 }
 
+void execute_on_main_thread(trapped_action_t call, const void* data, void* response)
+{
+    pthread_mutex_t wait_mutex;
+    pthread_cond_t wait_cond;
+
+    pthread_mutex_init(&wait_mutex, NULL);
+    pthread_cond_init(&wait_cond, NULL);
+
+    uint8_t wait = 1;
+
+    // prepare the action arguments
+    pthread_mutex_lock(&main_thread_mutex);
+    struct scheduled_action_t* aa = calloc(1, sizeof(struct scheduled_action_t));
+    aa->scheduled_action = call;
+    aa->scheduled_action_data = data;
+    aa->scheduled_action_response = response;
+    aa->wait = &wait;
+    aa->wait_mutex = &wait_mutex;
+    aa->wait_cond = &wait_cond;
+    LL_APPEND(first_scheduled_action, aa);
+
+    // notify the main thread
+    pthread_cond_signal(&main_thread_cond);
+    pthread_mutex_unlock(&main_thread_mutex);
+
+    pthread_mutex_lock(&wait_mutex);
+
+    // wait for the response on the same cond
+    while (wait)
+    {
+        pthread_cond_wait(&wait_cond, &wait_mutex);
+    }
+
+    pthread_mutex_unlock(&wait_mutex);
+
+    pthread_mutex_destroy(&wait_mutex);
+    pthread_cond_destroy(&wait_cond);
+}
+
+void execute_on_main_thread_no_response(trapped_action_t call, const void* data)
+{
+    // prepare the action arguments
+    pthread_mutex_lock(&main_thread_mutex);
+    struct scheduled_action_t* aa = calloc(1, sizeof(struct scheduled_action_t));
+    aa->scheduled_action = call;
+    aa->scheduled_action_data = data;
+    aa->scheduled_action_response = NULL;
+    aa->wait = NULL;
+    LL_APPEND(first_scheduled_action, aa);
+
+    // notify the main thread
+    pthread_cond_signal(&main_thread_cond);
+
+    pthread_mutex_unlock(&main_thread_mutex);
+}
+
+static void gdb_execution_stopped()
+{
+    if (debugger_active == 1)
+    {
+        return;
+    }
+
+    if (bk.is_verbose())
+    {
+        bk.debug("Execution stopped\n");
+    }
+
+    debugger_active = 1;
+}
+
+void remote_execution_stopped(const void* data, void* response)
+{
+    bk.execution_stopped();
+}
+
+static uint8_t process_packet()
+{
+    uint8_t *inbuf = inbuf_get();
+    int inbuf_size = inbuf_end();
+
+    if (inbuf_size == 0) {
+        return 0;
+    }
+
+    if (inbuf_size > 0 && *inbuf == '+') {
+        if (bk.is_verbose()) {
+            bk.debug("ack.\n");
+        }
+        inbuf_erase_head(1);
+        return 1;
+    }
+
+    if (bk.is_verbose()) {
+        bk.debug("r: %.*s\n", inbuf_size, inbuf);
+    }
+
+    uint8_t *packetend_ptr = (uint8_t *)memchr(inbuf, '#', inbuf_size);
+    if (packetend_ptr == NULL) {
+        return 0;
+    }
+
+    int packetend = packetend_ptr - inbuf;
+    inbuf[packetend] = '\0';
+
+    uint8_t checksum = 0;
+    int i;
+    for (i = 1; i < packetend; i++)
+        checksum += inbuf[i];
+
+    if (checksum != (hex(inbuf[packetend + 1]) << 4 | hex(inbuf[packetend + 2])))
+    {
+        if (bk.is_verbose()) {
+            bk.debug("Warning: incorrect checksum, expected: %02x\n", checksum);
+        }
+        inbuf_erase_head(packetend + 3);
+        return 1;
+    }
+
+    char recv_data[1024];
+    strcpy(recv_data, (char*)&inbuf[1]);
+    inbuf_erase_head(packetend + 3);
+
+    pthread_mutex_lock(&req_response_mutex);
+
+    if (waiting_for_response)
+    {
+        waiting_for_response = 0;
+        strcpy(request_response, recv_data);
+        pthread_cond_signal(&req_response_cond);
+        pthread_mutex_unlock(&req_response_mutex);
+        return 1;
+    }
+
+    pthread_mutex_unlock(&req_response_mutex);
+
+    char request = recv_data[0];
+    char *payload = (char *)&recv_data[1];
+
+    switch (request)
+    {
+        case 'T':
+        {
+            execute_on_main_thread_no_response(&remote_execution_stopped, NULL);
+
+            break;
+        }
+    }
+
+    return 1;
+}
+
+static void* network_read_thread(void* arg)
+{
+    sock_t socket = *(sock_t*)arg;
+
+    while (connection_socket)
+    {
+        int ret;
+        if ((ret = read_packet(socket)))
+        {
+            break;
+        }
+
+        while (process_packet()) {};
+    }
+
+    return NULL;
+}
+
+static void* network_write_thread(void* arg)
+{
+    sock_t socket = *(sock_t*)arg;
+
+    while (connection_socket)
+    {
+        pthread_mutex_lock(&network_op_mutex);
+        while (last_network_op == NULL) {
+            pthread_cond_wait(&network_op_cond, &network_op_mutex);
+        }
+        // execute network operations from main thread
+        while (last_network_op) {
+            struct network_op* prev = last_network_op->prev;
+            last_network_op->callback(last_network_op->arg);
+            free(last_network_op);
+            last_network_op = prev;
+        }
+        write_flush(socket);
+        pthread_mutex_unlock(&network_op_mutex);
+    }
+
+    return NULL;
+}
+
+static void init_mutexes()
+{
+    pthread_mutex_init(&main_thread_mutex, NULL);
+    pthread_cond_init(&main_thread_cond, NULL);
+
+    pthread_mutex_init(&req_response_mutex, NULL);
+    pthread_cond_init(&req_response_cond, NULL);
+
+    pthread_mutex_init(&network_op_mutex, NULL);
+    pthread_cond_init(&network_op_cond, NULL);
+}
+
+static uint8_t is_gdbserver_connected()
+{
+    return connection_socket;
+}
+
+static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
+{
+    connection_socket = socket(AF_INET, SOCK_STREAM, 0);
+
+    struct sockaddr_in servaddr;
+    memset(&servaddr, 0, sizeof(servaddr));
+
+    // assign IP, PORT
+    servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = inet_addr(connect_host);
+    servaddr.sin_port = htons(connect_port);
+
+    // connect the client socket to server socket
+    int ret = connect(connection_socket, (struct sockaddr*)&servaddr, sizeof(servaddr));
+    if (ret) {
+        return 1;
+    }
+
+    {
+        pthread_t id;
+        pthread_create(&id, NULL, network_read_thread, &connection_socket);
+        pthread_detach(id);
+    }
+
+    {
+        pthread_t id;
+        pthread_create(&id, NULL, network_write_thread, &connection_socket);
+        pthread_detach(id);
+    }
+
+    {
+        const char* supported = send_request("qSupported");
+        if (supported == NULL || strstr(supported, "qXfer:features:read+") == NULL)
+        {
+            bk.console("Remote target does not support qXfer:features:read+\n");
+            goto shutdown;
+        }
+
+        if (strstr(supported, "NonBreakable")) {
+            bk.console("Warning: remote is not breakable; cannot request execution to stop from here\n");
+            bk.breakable = 0;
+        }
+
+        int pkt_size;
+        const char* pkt_size_str = strstr(supported, "PacketSize");
+        if (pkt_size_str == NULL) {
+            bk.console("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
+        } else {
+            if (sscanf(pkt_size_str, "PacketSize=%d", &pkt_size) != 1) {
+                bk.console("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
+            } else {
+                supported_packet_size = pkt_size;
+                if (verbose) {
+                    bk.console("Synced on packet size: %d\n", supported_packet_size);
+                }
+            }
+        }
+    }
+
+    {
+        const char* target = send_request("qXfer:features:read:target.xml:0,3fff");
+        if (target == NULL || *target++ != 'l') {
+            bk.console("Could not obtain target.xml\n");
+            goto shutdown;
+        }
+
+        XMLDoc xml;
+        XMLDoc_init(&xml);
+
+        if (XMLDoc_parse_buffer_DOM(target, "features", &xml) == 0) {
+            bk.console("Cannot parse target.xml.\n");
+            XMLDoc_free(&xml);
+            goto shutdown;
+        }
+
+        {
+            XMLSearch search;
+            XMLSearch_init_from_XPath("target/architecture", &search);
+            XMLNode* arch = xml.nodes[xml.i_root];
+            if ((arch = XMLSearch_next(arch, &search)) == NULL) {
+                bk.console("Unknown architecture.\n");
+                goto shutdown;
+            }
+
+            if (strcmp(arch->text, "z80") != 0) {
+                bk.console("Unsupported architecture: %s\n", arch->text);
+                goto shutdown;
+            }
+            XMLSearch_free(&search, 1);
+        }
+
+        {
+            XMLSearch search;
+            XMLSearch_init_from_XPath("target/feature[@name='*z80*']/reg", &search);
+            XMLNode* reg = xml.nodes[xml.i_root];
+            while ((reg = XMLSearch_next(reg, &search)))
+            {
+                const char* reg_name;
+                if (XMLNode_get_attribute(reg, "name", &reg_name) == 0) {
+                    continue;
+                }
+
+                uint8_t found_mapping = 0;
+
+                for (int i = 0; i < REGISTER_MAPPING_MAX; i++) {
+                    if (strcmp(reg_name, register_mapping_names[i]) == 0) {
+                        register_mappings[register_mappings_count++] = i;
+                        found_mapping = 1;
+                        break;
+                    }
+                }
+
+                if (found_mapping == 0) {
+                    register_mappings[register_mappings_count++] = REGISTER_MAPPING_UNKNOWN;
+                }
+            }
+
+            XMLSearch_free(&search, 1);
+        }
+
+        XMLDoc_free(&xml);
+
+        uint8_t got_sp = 0;
+        uint8_t got_pc = 0;
+        if (verbose) {
+            bk.console("Registers: ");
+        }
+        for (int i = 0; i < register_mappings_count; i++) {
+            if (verbose) {
+                printf(" %s", register_mapping_names[register_mappings[i]]);
+            }
+            if (register_mappings[i] == REGISTER_MAPPING_SP) {
+                got_sp = 1;
+                continue;
+            }
+            if (register_mappings[i] == REGISTER_MAPPING_PC) {
+                got_pc = 1;
+                continue;
+            }
+            if (register_mappings[i] == REGISTER_MAPPING_CLOCKL) {
+                has_clock_register = 1;
+                continue;
+            }
+        }
+        if (verbose) {
+            bk.console("\n");
+        }
+        if (got_pc == 0 || got_sp == 0) {
+            bk.console("Insufficient register information.\n");
+        }
+        if (has_clock_register) {
+            if (verbose) {
+                bk.console("Remote has 'clock' register.\n");
+            }
+        }
+    }
+
+    // this should break us
+    send_request_no_response("?");
+
+    return 0;
+
+shutdown:
+    shutdown(connection_socket, 0);
+    return 1;
+}
+
+static void ctrl_c_main_thread(const void* data, void* response) {
+    debugger_request_a_break();
+}
+
+static volatile uint8_t ctrl_c_requested = 0;
+
+/*
+ * The purpose of this crude loop is to offload signal handling to main thread,
+ * as it is not safe to do most of the stuff in a signal handler directly.
+ */
+static void* ctrl_c_signal_loop(void* arg) {
+    while (1) {
+        if (ctrl_c_requested) {
+            ctrl_c_requested = 0;
+            execute_on_main_thread_no_response(ctrl_c_main_thread, NULL);
+        }
+#ifdef WIN32
+        Sleep(100);
+#else
+        sleep(1);
+#endif
+    }
+    return NULL;
+}
+
+static void start_ctrl_c_signal_loop() {
+    static pthread_t ctrl_c_thread;
+    pthread_create(&ctrl_c_thread, NULL, ctrl_c_signal_loop, NULL);
+}
+
+static void ctrl_c() {
+    ctrl_c_requested = 1;
+}
+
+uint32_t gdb_profiler_time() {
+    if (has_clock_register) {
+        /*
+         * Some emulators would report this 16bit register pair, which could be used
+         * to track ticks for profiling purposes
+         */
+        struct debugger_regs_t regs;
+        bk.get_regs(&regs);
+        return ((uint32_t)regs.clockh << 16) + regs.clockl;
+    }
+
+#ifdef WIN32
+    // limit ourselfs to few milliseconds on windows
+    return GetTickCount();
+#else
+    // Otherwise, get a time stamp in microseconds. Inaccurate but beats nothing.
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+    uint64_t us = SEC_TO_US((uint64_t)ts.tv_sec) + NS_TO_US((uint64_t)ts.tv_nsec);
+    return (uint32_t)us;
+#endif
+}
+
 static backend_t gdb_backend = {
     .st = &get_st,
     .ff = &get_ff,
@@ -663,186 +1171,62 @@ static backend_t gdb_backend = {
     .disable_breakpoint = &gdb_disable_breakpoint,
     .enable_breakpoint = &gdb_enable_breakpoint,
     .breakpoints_check = &breakpoints_check,
-    .is_verbose = is_verbose
+    .is_verbose = is_verbose,
+    .remote_connect = connect_to_gdbserver,
+    .is_remote_connected = is_gdbserver_connected,
+    .console = stdout_log,
+    .debug = stdout_log,
+    .execution_stopped = gdb_execution_stopped,
+    .ctrl_c = ctrl_c,
+    .time = gdb_profiler_time
 };
 
-static void execute_on_main_thread(trapped_action_t call, const void* data, void* response)
+static void process_scheduled_actions()
 {
-    // prepare the action arguments
-    pthread_mutex_lock(&trap_process_mutex);
-    scheduled_action = call;
-    scheduled_action_data = data;
-    scheduled_action_response = response;
-    pthread_mutex_unlock(&trap_process_mutex);
+    pthread_mutex_lock(&main_thread_mutex);
 
-    // notify the main thread
-    sem_post(trap_mutex);
-
-    // wait for the response
-    sem_wait(response_mutex);
-}
-
-static void execute_on_main_thread_no_response(trapped_action_t call, const void* data)
-{
-    // prepare the action arguments
-    pthread_mutex_lock(&trap_process_mutex);
-    scheduled_action = call;
-    scheduled_action_data = data;
-    scheduled_action_response = NULL;
-    pthread_mutex_unlock(&trap_process_mutex);
-
-    // notify the main thread
-    sem_post(trap_mutex);
-}
-
-void remote_execution_stopped(const void* data, void* response)
-{
-    if (debugger_active == 1)
+    // wait until we have a job
+    while (first_scheduled_action == NULL)
     {
-        return;
+        pthread_cond_wait(&main_thread_cond, &main_thread_mutex);
     }
 
-    if (bk.is_verbose())
+    // we need to unblock the queue for new jobs. jobs scheduled on main thread may want to
+    // schedule new jobs. to mitigate that deadlock, the queue is blocked on its own
+    struct scheduled_action_t* first_to_process = first_scheduled_action;
+    first_scheduled_action = NULL;
+
+    pthread_mutex_unlock(&main_thread_mutex);
+
+    struct scheduled_action_t* entry;
+    struct scheduled_action_t* tmp;
+
+    LL_FOREACH_SAFE(first_to_process, entry, tmp)
     {
-        printf("Execution stopped.\n");
-    }
+        entry->scheduled_action(entry->scheduled_action_data, entry->scheduled_action_response);
 
-    debugger_active = 1;
-}
-
-static uint8_t process_packet()
-{
-    uint8_t *inbuf = inbuf_get();
-    int inbuf_size = inbuf_end();
-
-    if (inbuf_size == 0) {
-        return 0;
-    }
-
-    if (inbuf_size > 0 && *inbuf == '+') {
-        if (bk.is_verbose()) {
-            printf("ack.\n");
-        }
-        inbuf_erase_head(1);
-        return 1;
-    }
-
-    if (bk.is_verbose()) {
-        printf("r: %.*s\n", inbuf_size, inbuf);
-    }
-
-    uint8_t *packetend_ptr = (uint8_t *)memchr(inbuf, '#', inbuf_size);
-    if (packetend_ptr == NULL) {
-        return 0;
-    }
-
-    int packetend = packetend_ptr - inbuf;
-    inbuf[packetend] = '\0';
-
-    uint8_t checksum = 0;
-    int i;
-    for (i = 1; i < packetend; i++)
-        checksum += inbuf[i];
-
-    if (checksum != (hex(inbuf[packetend + 1]) << 4 | hex(inbuf[packetend + 2])))
-    {
-        if (bk.is_verbose()) {
-            printf("Warning: incorrect checksum, expected: %02x\n", checksum);
-        }
-        inbuf_erase_head(packetend + 3);
-        return 1;
-    }
-
-    char recv_data[1024];
-    strcpy(recv_data, (char*)&inbuf[1]);
-    inbuf_erase_head(packetend + 3);
-
-    if (waiting_for_response)
-    {
-        waiting_for_response = 0;
-        strcpy(request_response, recv_data);
-        sem_post(req_response_mutex);
-    }
-    else
-    {
-        char request = recv_data[0];
-        char *payload = (char *)&recv_data[1];
-
-        switch (request)
+        if (entry->wait)
         {
-            case 'T':
-            {
-                execute_on_main_thread_no_response(&remote_execution_stopped, NULL);
-
-                break;
-            }
+            pthread_mutex_lock(entry->wait_mutex);
+            // notify the waiter that we're done
+            *entry->wait = 0;
+            pthread_cond_signal(entry->wait_cond);
+            pthread_mutex_unlock(entry->wait_mutex);
         }
+
+        LL_DELETE(first_to_process, entry);
+        free(entry);
     }
-
-    return 1;
 }
-
-static void* network_read_thread(void* arg)
-{
-    sock_t socket = *(sock_t*)arg;
-
-    while (1)
-    {
-        int ret;
-        if ((ret = read_packet(socket)))
-        {
-            printf("A network error occured: %d\n", ret);
-            break;
-        }
-
-        while (process_packet()) {};
-    }
-
-    shutdown(socket, 0);
-    printf("Disconnected.\n");
-    exit(1);
-
-    return NULL;
-}
-
-static void* network_write_thread(void* arg)
-{
-    sock_t socket = *(sock_t*)arg;
-
-    while (1)
-    {
-        pthread_mutex_lock(&network_op_mutex);
-        while (last_network_op == NULL) {
-            pthread_cond_wait(&network_op_cond, &network_op_mutex);
-        }
-        // execute network operations from main thread
-        while (last_network_op) {
-            struct network_op* prev = last_network_op->prev;
-            last_network_op->callback(last_network_op->arg);
-            free(last_network_op);
-            last_network_op = prev;
-        }
-        write_flush(socket);
-        pthread_mutex_unlock(&network_op_mutex);
-    }
-
-    return NULL;
-}
-
 
 int main(int argc, char **argv) {
     char* connect_host = NULL;
     int connect_port = 0;
 
-    printf("----------------------------------\n"
-           "z88dk-gdb, a gdb client for z88dk.\n"
-           "----------------------------------\n"
-           "\n"
-           "See the following for a list of compatible gdb servers: "
-           "https://github.com/z88dk/z88dk/wiki/Tool-z88dk-gdb\n"
-           "\n");
-
     set_backend(gdb_backend);
+
+    uint8_t debugger_mi2_mode = 0;
+    char* map_file = NULL;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-p") == 0) {
@@ -860,204 +1244,81 @@ int main(int argc, char **argv) {
             }
         } else if (strcmp(argv[i], "-v") == 0) {
             verbose = 1;
+        } else if (strcmp(argv[i], "-q") == 0) {
+            // ignore
+        } else if (strcmp(argv[i], "--version") == 0) {
+            printf("GNU gdb (GDB) 11.0\n");
+            printf("The line above is fake, we're pretending to be a gdb here.\n");
+            exit(0);
+        } else if (strstr(argv[i], "--interpreter=")) {
+            const char* interpreter = argv[i] + 14;
+            if (strcmp(interpreter, "mi2") == 0) {
+                debugger_mi2_mode = 1;
+            }
+        } else {
+            if (map_file == NULL) {
+                map_file = argv[i];
+            } else {
+                printf("Unknown option: %s\n", argv[i]);
+                exit(1);
+            }
         }
-    }
-
-    if (connect_port == 0 || connect_host == NULL) {
-        printf("Usage: z88dk-gdb -h <connect host> -p <connect port> -x <debug symbols> [-x <debug symbols>] [-v]\n");
-        return 1;
     }
 
     debugger_init();
+    init_mutexes();
 
-    connection_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (debugger_mi2_mode) {
+        debugger_mi2_init();
 
-    struct sockaddr_in servaddr;
-    memset(&servaddr, 0, sizeof(servaddr));
+        mi2_printf_thread("thread-group-added,id=\"i1\"");
+        bk.console("z88dk-gdb, a gdb client for z88dk\n");
 
-    // assign IP, PORT
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_addr.s_addr = inet_addr(connect_host);
-    servaddr.sin_port = htons(connect_port);
+        if (map_file) {
+            bk.console("Reading symbol file %s...\n", map_file);
+            read_symbol_file(map_file);
+            bk.console("Done.\n");
+        }
 
-    // connect the client socket to server socket
-    int ret = connect(connection_socket, (struct sockaddr*)&servaddr, sizeof(servaddr));
-    if (ret) {
-        printf("Could not connect to the server: %d\n", ret);
-        return 1;
+        while (1) {
+            registers_invalidated = 1;
+            process_scheduled_actions();
+        }
+
     } else {
-        printf("Connected to the server.\n");
-    }
+        printf("----------------------------------\n"
+               "z88dk-gdb, a gdb client for z88dk.\n"
+               "----------------------------------\n"
+               "\n"
+               "See the following for a list of compatible gdb servers: "
+               "https://github.com/z88dk/z88dk/wiki/Tool-z88dk-gdb\n"
+               "\n");
 
-    sem_unlink("req_response_mutex");
-    req_response_mutex = sem_open("req_response_mutex", O_CREAT|O_EXCL, 0600, 0);
-    sem_unlink("response_mutex");
-    response_mutex = sem_open("response_mutex", O_CREAT|O_EXCL, 0600, 0);
-    sem_unlink("trap_mutex");
-    trap_mutex = sem_open("trap_mutex", O_CREAT|O_EXCL, 0600, 0);
-
-    pthread_cond_init(&network_op_cond, NULL);
-    pthread_mutex_init(&network_op_mutex, NULL);
-    pthread_mutex_init(&trap_process_mutex, NULL);
-
-    {
-        pthread_t id;
-        pthread_create(&id, NULL, network_read_thread, &connection_socket);
-        pthread_detach(id);
-    }
-
-    {
-        pthread_t id;
-        pthread_create(&id, NULL, network_write_thread, &connection_socket);
-        pthread_detach(id);
-    }
-
-    {
-        const char* supported = send_request("qSupported");
-        if (supported == NULL || strstr(supported, "qXfer:features:read+") == NULL)
-        {
-            printf("Remote target does not support qXfer:features:read+\n");
-            goto shutdown;
-        }
-
-        if (strstr(supported, "NonBreakable")) {
-            printf("Warning: remote is not breakable; cannot request execution to stop from here\n");
-            bk.breakable = 0;
-        }
-
-        int pkt_size;
-        const char* pkt_size_str = strstr(supported, "PacketSize");
-        if (pkt_size_str == NULL) {
-            printf("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
+        if (connect_port == 0 || connect_host == NULL) {
+            printf("Usage: z88dk-gdb -h <connect host> -p <connect port> -x <debug symbols> [-x <debug symbols>] [-v]\n");
+            return 1;
         } else {
-            if (sscanf(pkt_size_str, "PacketSize=%d", &pkt_size) != 1) {
-                printf("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
-            } else {
-                supported_packet_size = pkt_size;
-                if (verbose) {
-                    printf("Synced on packet size: %d\n", supported_packet_size);
+            start_ctrl_c_signal_loop();
+
+            bk.console("Connecting...\n");
+
+            if (connect_to_gdbserver(connect_host, connect_port)) {
+                printf("Could not connect to the server\n");
+                return 1;
+            }
+
+            bk.console("Connected to the server.\n");
+
+            while (1) {
+                registers_invalidated = 1;
+                if (debugger_active) {
+                    debugger();
+                } else {
+                    process_scheduled_actions();
                 }
             }
         }
     }
-
-    {
-        const char* target = send_request("qXfer:features:read:target.xml:0,3fff");
-        if (target == NULL || *target++ != 'l') {
-            printf("Could not obtain target.xml\n");
-            goto shutdown;
-        }
-
-        XMLDoc xml;
-        XMLDoc_init(&xml);
-
-        if (XMLDoc_parse_buffer_DOM(target, "features", &xml) == 0) {
-            printf("Cannot parse target.xml.\n");
-            XMLDoc_free(&xml);
-            goto shutdown;
-        }
-
-        {
-            XMLSearch search;
-            XMLSearch_init_from_XPath("target/architecture", &search);
-            XMLNode* arch = xml.nodes[xml.i_root];
-            if ((arch = XMLSearch_next(arch, &search)) == NULL) {
-                printf("Unknown architecture.\n");
-                goto shutdown;
-            }
-
-            if (strcmp(arch->text, "z80") != 0) {
-                printf("Unsupported architecture: %s\n", arch->text);
-                goto shutdown;
-            }
-            XMLSearch_free(&search, 1);
-        }
-
-        {
-            XMLSearch search;
-            XMLSearch_init_from_XPath("target/feature[@name='*z80*']/reg", &search);
-            XMLNode* reg = xml.nodes[xml.i_root];
-            while ((reg = XMLSearch_next(reg, &search)))
-            {
-                const char* reg_name;
-                if (XMLNode_get_attribute(reg, "name", &reg_name) == 0) {
-                    continue;
-                }
-
-                for (int i = 0; i < REGISTER_MAPPING_MAX; i++) {
-                    if (strcmp(reg_name, register_mapping_names[i]) == 0) {
-                        register_mappings[register_mappings_count++] = i;
-                        break;
-                    }
-                }
-            }
-
-            XMLSearch_free(&search, 1);
-        }
-
-        XMLDoc_free(&xml);
-
-        uint8_t got_sp = 0;
-        uint8_t got_pc = 0;
-        if (verbose) {
-            printf("Registers: ");
-        }
-        for (int i = 0; i < register_mappings_count; i++) {
-            if (verbose) {
-                printf(" %s", register_mapping_names[register_mappings[i]]);
-            }
-            if (register_mappings[i] == REGISTER_MAPPING_SP) {
-                got_sp = 1;
-                continue;
-            }
-            if (register_mappings[i] == REGISTER_MAPPING_PC) {
-                got_pc = 1;
-                continue;
-            }
-        }
-        if (verbose) {
-            printf("\n");
-        }
-        if (got_pc == 0 || got_sp == 0) {
-            printf("Insufficient register information.\n");
-        }
-    }
-
-    // this should break us
-    send_request_no_response("?");
-
-    while (1)
-    {
-        registers_invalidated = 1;
-
-        debugger_process_signals();
-
-        if (debugger_active)
-        {
-            debugger();
-        }
-        else
-        {
-            sem_wait(trap_mutex);
-
-            pthread_mutex_lock(&trap_process_mutex);
-            if (scheduled_action != NULL)
-            {
-                scheduled_action(scheduled_action_data, scheduled_action_response);
-                scheduled_action = NULL;
-
-                if (scheduled_action_response != NULL)
-                {
-                    // notify the waiter that we're done
-                    sem_post(response_mutex);
-                }
-            }
-            pthread_mutex_unlock(&trap_process_mutex);
-        }
-    }
-
-shutdown:
-    shutdown(connection_socket, 0);
 
     return 0;
 }

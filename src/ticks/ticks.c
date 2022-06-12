@@ -7,6 +7,7 @@
 #include "cpu.h"
 #include "debugger.h"
 #include "backend.h"
+#include "profiler.h"
 
 // fr = zero, ff&256 = carry, ff&128 = s/p
 
@@ -582,6 +583,7 @@ int    ioport = -1;
 int    rom_size = 0;
 int    rc2014_mode = 0;
 int    c_autolabel = 0;
+int    break_required = 0;
 
 static const uint8_t mirror_table[] = {
     0x0, 0x8, 0x4, 0xC,  /*  0-3  */
@@ -759,15 +761,15 @@ int main (int argc, char **argv){
           memory_model = argv[1];
           break;
         case 'p':
-          symbol_addr= symbol_resolve(argv[1]);
+          symbol_addr= symbol_resolve(argv[1], NULL);
           pc= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 's':
-          symbol_addr= symbol_resolve(argv[1]);
+          symbol_addr= symbol_resolve(argv[1], NULL);
           start= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 'e':
-          symbol_addr= symbol_resolve(argv[1]);
+          symbol_addr= symbol_resolve(argv[1], NULL);
           end= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 'r':
@@ -1042,7 +1044,10 @@ int main (int argc, char **argv){
   do{
     char buf[256];
     if ( ih ) {
-        debugger_process_signals();
+        if (break_required) {
+            break_required = 0;
+            debugger_request_a_break();
+        }
         debugger();
     }
     if( pc==start )
@@ -4698,6 +4703,9 @@ int main (int argc, char **argv){
     sttap= st+( tap= tapcycles() );
   if ( counter != -1 )
     printf("%llu\n", st);
+  if (profiler_enabled) {
+      profiler_stop();
+  }
   if( output ){
     fh= fopen(output, "wb+");
     if( !fh )
