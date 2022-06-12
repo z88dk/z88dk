@@ -212,14 +212,14 @@ cycle count  = 1600543903
 time @ 4MHz  = 1600543903 / 4*10^6 = 6 min 40 sec
 
 14.
-HITECH C CPM V309-12
-16492 bytes less cpm overhead
+HITECH C CPM V309-15
+5633 bytes exact
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 1593755080
-time @ 4MHz  = 1593755080 / 4*10^6 = 6 min 38 sec
+cycle count  = 1594771948
+time @ 4MHz  = 1594771948 / 4*10^6 = 6 min 38 sec
 
 
 BENCHMARKS GAME COMMENTS

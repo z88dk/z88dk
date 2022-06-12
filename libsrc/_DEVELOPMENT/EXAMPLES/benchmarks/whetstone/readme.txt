@@ -135,15 +135,15 @@ RESULTS
 =======
 
 1.
-HITECH C CPM V309
-** Several results with large error (maybe should be DQ)
+HITECH C CPM V309-15
+** INCORRECT RESULTS
 24 bit mantissa + 8 bit exponent
-7605 bytes less cpm overhead
+9076 bytes exact
 
-cycle count  = 639413871
-time @ 4MHz  = 639413871 / 4*10^6 = 159.8535 seconds
-KWIPS        = 100*10*1 / 159.8535 = 6.2557
-MWIPS        = 6.2557 / 1000 = 0.0062557
+cycle count  = 646520995
+time @ 4MHz  = 646520995 / 4*10^6 = 161.6302 sec
+KWIPS        = 100*10*1 / 161.6302 = 6.187
+MWIPS        = 6.187 / 1000 = 0.006187
 
 2.
 IAR Z80 V4.06A

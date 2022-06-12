@@ -97,11 +97,11 @@ cycle count  = 4110873
 time @ 4MHZ  = 4110873 / 4*10^6 = 1.0277 sec
 
 5.
-HITECH C CPM V309
-8725 bytes less cpm overhead
+HITECH C CPM V309-15
+10297 bytes exact
 
-cycle count  = 4547538
-time @ 4MHz  = 4547538 / 4*10^6 = 1.1369 sec
+cycle count  = 7916099
+time @ 4MHz  = 7916099 / 4*10^6 = 1.979 sec
 
 6.
 SDCC 4.2.0 Linux

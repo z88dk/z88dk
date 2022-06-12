@@ -17,39 +17,35 @@ not understand the suffix.  The compiler should be able to
 infer the result size anyway since in all instances the other
 operand is 32 bit.
 
-HTC CPM V309 does not have an ldiv() function.
+HighTech C CP/M V309 does not have an ldiv() function.
+
+Compiled with C309-15 from https://github.com/agn453/HI-TECH-Z80-C
 
 VERIFY CORRECT RESULT
 =====================
 
-C -V -O -DSTATIC -DPRINTF PI.C
+CC -V -N -OF -DSTATIC -DPRINTF PI.C
 
 Run PI.COM and verify correct output.
 
 TIMING
 ======
 
-C -V -O -DSTATIC -MPI.MAP PI.C
+CC -V -N -OF -DSTATIC -MPI.MAP PI.C
 
 Program size can be determined from information in the
 map file.
 
-SIZE = text + data + bss = 0x495 + 0x02 + 0x15f2 = 6793 bytes
+TOTAL       Name         Link     Load   Length
+            (abs)           0        0        0
+            text            0        0      742
+            data          742      742      360
+            bss           AA2      AA2     15F4
 
-CP/M COM files begin at address 0x100.  To time with TICKS
-this needs to be embedded into a binary that starts at
-address 0.  Bytes leading up to 0x100 are zeroes, meaning NOP.
+SIZE = text + data + bss = 0x742 + 0x360 + 0x15F4 = 8342 bytes
 
-appmake +rom -s 32768 -f 0 -o pi0.bin
-appmake +inject -b pi0.bin -i PI.COM -s 256 -o pi.bin
+z88dk-ticks PI.COM -counter 99999999999 
 
-To determine start and stop timing points, the output binary
-was manually inspected.  TICKS command:
-
-ticks pi.bin -start 013d -end 0136 -counter 9999999999
-
-start   = TIMER_START in hex
-end     = TIMER_STOP in hex
 counter = High value to ensure completion
 
 If the result is close to the counter value, the program may have
@@ -58,8 +54,8 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-HITECH C CPM V309
-6793 bytes less cpm overhead
+HITECH C CPM V309-15
+8342 bytes exact
 
-cycle count  = 5531933581
-time @ 4MHz  = 5531933581 / 4*10^6 = 23 min 03 sec
+cycle count  = 5532347800
+time @ 4MHz  = 5532347800 / 4*10^6 = 23 min 03 sec

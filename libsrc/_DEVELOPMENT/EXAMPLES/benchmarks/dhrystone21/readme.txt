@@ -137,10 +137,10 @@ dhrystones/s = 20000 / 76.7151 = 260.7047
 DMIPS        = 260.7047 / 1757 = 0.14838
 
 6.
-HITECH C CPM V309
-7471 bytes less cpm overhead
+HITECH C CPM V309-15
+8988 bytes exact
 
-cycle count  = 354120220
-time @ 4MHz  = 354120220 / 4*10^6 = 88.53 sec
-dhrystones/s = 20000 / 88.53 = 225.9120
-DMIPS        = 225.9120 / 1757 = 0.12858
+cycle count  = 356235065
+time @ 4MHz  = 356235065 / 4*10^6 = 89.0588 sec
+dhrystones/s = 20000 / 89.0588 = 224.5708
+DMIPS        = 224.5708 / 1757 = 0.1278
