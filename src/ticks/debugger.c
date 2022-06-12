@@ -6,6 +6,8 @@
 #include <signal.h>
 #ifdef WIN32
 #include <io.h>
+#define F_OK 0
+#define access _access
 #else
 #include <unistd.h>                         // For declarations of isatty()
 #include <stdarg.h>
@@ -24,7 +26,7 @@
 #include "srcfile.h"
 #include "exp_engine.h"
 #include "breakpoints.h"
-
+#include "../common/dirname.h"
 
 #define HISTORY_FILE ".ticks_history.txt"
 
@@ -210,6 +212,7 @@ static int hotspots[65536];
 static int hotspots_t[65536];
 size_t current_frame = 0;
 static int last_stacktrace_at = 0;
+UT_string* pending_executable_binary = NULL;
 
 static int interact_with_tty = 0;
 
@@ -217,8 +220,7 @@ void ctrl_c_handler(int signum) {
     bk.ctrl_c();
 }
 
-void debugger_init()
-{
+void debugger_init() {
     signal(SIGINT, ctrl_c_handler);
     linenoiseSetCompletionCallback(completion, NULL);
     linenoiseHistoryLoad(HISTORY_FILE); /* Load the history at startup */
@@ -226,6 +228,64 @@ void debugger_init()
     memset(hotspots, 0, sizeof(hotspots));
     interact_with_tty = isatty(fileno(stdin)) && isatty(fileno(stdout)); // Only colors with active tty
     exp_engine_init();
+}
+
+uint8_t debugger_read_symbol_file(char* symbol_file) {
+    if (access(symbol_file, F_OK)) {
+        return 1;
+    }
+
+    read_symbol_file(symbol_file);
+
+    char* filename = zbasename(symbol_file);
+    char* ext;
+    if ((ext = strrchr(filename, '.'))) {
+        int filename_w_ext_len = (int)(ext - filename);
+        char* dir = zdirname(symbol_file);
+        if (pending_executable_binary) {
+            utstring_free(pending_executable_binary);
+        }
+
+        // test <path>/<file>.bin first
+        utstring_new(pending_executable_binary);
+        utstring_printf(pending_executable_binary, "%s/%.*s.bin", dir, filename_w_ext_len, filename);
+        if (access(utstring_body(pending_executable_binary), F_OK)) {
+            // test <path>/<file> first
+            utstring_clear(pending_executable_binary);
+            utstring_printf(pending_executable_binary, "%s/%.*s", dir, filename_w_ext_len, filename);
+            if (access(utstring_body(pending_executable_binary), F_OK)) {
+                // neither of those passed
+                utstring_free(pending_executable_binary);
+                pending_executable_binary = NULL;
+            }
+        }
+
+        if (bk.is_remote_connected()) {
+            debugger_restore_pending_binary_file();
+        } else {
+            bk.debug("debug file %s has a binary %s nearby, going to upload it after the connect\n",
+                symbol_file, utstring_body(pending_executable_binary));
+        }
+    }
+    return  0;
+}
+
+void debugger_restore_pending_binary_file()
+{
+    if (pending_executable_binary) {
+        bk.debug("uploading pending binary %s right now...\n",
+            utstring_body(pending_executable_binary));
+
+        int address = get_restore_address(NULL);
+        if (address == 0) {
+            bk.debug("Warning: can not upload binary; restore address is unknown\n");
+        } else {
+            bk.restore(utstring_body(pending_executable_binary), address, 1);
+        }
+
+        utstring_free(pending_executable_binary);
+        pending_executable_binary = NULL;
+    }
 }
 
 void unwrap_reg(uint16_t data, uint8_t* h, uint8_t* l)
@@ -1684,10 +1744,10 @@ static int cmd_quit(int argc, char **argv)
     exit(0);
 }
 
-static int get_restore_address(int argc, char **argv)
+int get_restore_address(char* address_text)
 {
-    if ( argc == 3 ) {
-        return parse_address(argv[2], NULL);
+    if (address_text) {
+        return parse_address(address_text, NULL);
     } else {
         int address = symbol_resolve("__head", NULL);
         if (address == -1) {
@@ -1700,7 +1760,7 @@ static int get_restore_address(int argc, char **argv)
 
 static int cmd_restore(int argc, char **argv)
 {
-    int address = get_restore_address(argc, argv);
+    int address = get_restore_address(argc == 3 ? argv[2] : NULL);
     if (address == 0) {
         return 0;
     }
@@ -1714,7 +1774,7 @@ static int cmd_restore(int argc, char **argv)
 
 static int cmd_restore_pc(int argc, char **argv)
 {
-    int address = get_restore_address(argc, argv);
+    int address = get_restore_address(argc == 3 ? argv[2] : NULL);
     if (address == 0) {
         return 0;
     }

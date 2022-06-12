@@ -12,6 +12,7 @@
 
 #include <pthread.h>
 #include <unistd.h>
+#include <utstring.h>
 #include "debugger_gdb_packets.h"
 #include "sxmlc.h"
 #include "sxmlsearch.h"
@@ -224,7 +225,7 @@ static struct debugger_regs_t* fetch_registers()
         const char* regs = send_request("g");
         if (strlen(regs) != register_mappings_count * 4)
         {
-            printf("Warning: received incorrect amount of register data: %lu.\n", strlen(regs));
+            bk.debug("Warning: received incorrect amount of register data: %lu.\n", strlen(regs));
             return &registers;
         }
 
@@ -378,7 +379,7 @@ uint8_t get_memory(uint16_t at)
 
     if (bk.is_verbose())
     {
-        printf("Fetching a chunk of %d bytes starting from address %d.\n", mem_requested_amount, mem_requested_at);
+        bk.debug("Fetching a chunk of %d bytes starting from address %d.\n", mem_requested_amount, mem_requested_at);
     }
 
     char req[64];
@@ -388,7 +389,7 @@ uint8_t get_memory(uint16_t at)
     uint32_t bytes_recv = strlen(mem) / 2;
     if (bytes_recv != mem_requested_amount)
     {
-        printf("Warning: received incorrect amount of data.");
+        bk.debug("Warning: received incorrect amount of data.");
         return 0;
     }
 
@@ -487,7 +488,7 @@ void set_regs(struct debugger_regs_t* regs)
 
     if (strcmp(resp, "OK") != 0)
     {
-        printf("Warning: could not set the registers: %s\n", resp);
+        bk.debug("Warning: could not set the registers: %s\n", resp);
     }
     else
     {
@@ -511,7 +512,7 @@ void port_out(int port, int value) {}
 void debugger_write_memory(int addr, uint8_t val) {}
 void debugger_read_memory(int addr) {}
 
-void debugger_break(uint8_t temporary)
+void debugger_gdb_break(uint8_t temporary)
 {
     if (temporary)
     {
@@ -654,46 +655,52 @@ void debugger_step()
 
 uint8_t debugger_restore(const char* file_path, uint16_t at, uint8_t set_pc)
 {
+    bk.debug("Uploading binary %s\n", file_path);
+
     FILE *f = fopen(file_path, "rb");
     if (f == NULL)
     {
-        printf("Could not open file.\n");
+        bk.debug("Could not open file.\n");
         return 1;
     }
 
-    printf("Restoring... ");
-    fflush(stdout);
-
     size_t addr = at;
+    size_t post_at_once = (supported_packet_size - 16) / 2;
 
-    int post_at_once = (supported_packet_size - 16) / 2;
-    if (post_at_once > 256) {
-        post_at_once = 256;
-    }
-
-    uint8_t buff[post_at_once];
+    uint8_t* buff = malloc(post_at_once);
+    char* hex_buff = malloc(post_at_once * 2 + 1);
     size_t read_;
     while ((read_ = fread(buff, 1, post_at_once, f)))
     {
-        char s[1024];
-        int offset;
-        sprintf(s, "M%zx,%zx:%n", addr, read_, &offset);
-        mem2hex(buff, &s[offset], read_);
-        const char* response = send_request(s);
+        UT_string s;
+        utstring_init(&s);
+        utstring_printf(&s, "M%zx,%zx:", addr, read_);
+        mem2hex(buff, hex_buff, read_);
+        utstring_bincpy(&s, hex_buff, read_ * 2);
+        const char* response = send_request(utstring_body(&s));
         if (strcmp(response, "OK") != 0)
         {
-            printf("Warning: Cannot restore file at addr %zx: %s\n", addr, response);
+            bk.debug("Warning: Cannot restore file at addr %zx: %s\n", addr, response);
+
+            free(buff);
+            free(hex_buff);
+            fclose(f);
+
+            utstring_done(&s);
             return 1;
         }
 
         addr += read_;
+        utstring_done(&s);
     }
 
+    free(buff);
+    free(hex_buff);
     fclose(f);
 
     mem_requested_amount = 0;
 
-    printf("OK\n");
+    bk.debug("Uploading binary %s complete\n", file_path);
 
     if (set_pc) {
         // zero out all registers except for pc
@@ -704,6 +711,8 @@ uint8_t debugger_restore(const char* file_path, uint16_t at, uint8_t set_pc)
         regs.pc = at;
         regs.sp = sp;
         set_regs(&regs);
+
+        bk.debug("Replaced register PC=%04x\n", at);
     }
     return 0;
 }
@@ -953,26 +962,26 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         const char* supported = send_request("qSupported");
         if (supported == NULL || strstr(supported, "qXfer:features:read+") == NULL)
         {
-            bk.console("Remote target does not support qXfer:features:read+\n");
+            bk.debug("Remote target does not support qXfer:features:read+\n");
             goto shutdown;
         }
 
         if (strstr(supported, "NonBreakable")) {
-            bk.console("Warning: remote is not breakable; cannot request execution to stop from here\n");
+            bk.debug("Warning: remote is not breakable; cannot request execution to stop from here\n");
             bk.breakable = 0;
         }
 
         int pkt_size;
         const char* pkt_size_str = strstr(supported, "PacketSize");
         if (pkt_size_str == NULL) {
-            bk.console("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
+            bk.debug("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
         } else {
             if (sscanf(pkt_size_str, "PacketSize=%d", &pkt_size) != 1) {
-                bk.console("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
+                bk.debug("Warning: cannot sync packet size, assuming %d\n", supported_packet_size);
             } else {
                 supported_packet_size = pkt_size;
                 if (verbose) {
-                    bk.console("Synced on packet size: %d\n", supported_packet_size);
+                    bk.debug("Synced on packet size: %d\n", supported_packet_size);
                 }
             }
         }
@@ -981,7 +990,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
     {
         const char* target = send_request("qXfer:features:read:target.xml:0,3fff");
         if (target == NULL || *target++ != 'l') {
-            bk.console("Could not obtain target.xml\n");
+            bk.debug("Could not obtain target.xml\n");
             goto shutdown;
         }
 
@@ -989,7 +998,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         XMLDoc_init(&xml);
 
         if (XMLDoc_parse_buffer_DOM(target, "features", &xml) == 0) {
-            bk.console("Cannot parse target.xml.\n");
+            bk.debug("Cannot parse target.xml.\n");
             XMLDoc_free(&xml);
             goto shutdown;
         }
@@ -999,12 +1008,12 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
             XMLSearch_init_from_XPath("target/architecture", &search);
             XMLNode* arch = xml.nodes[xml.i_root];
             if ((arch = XMLSearch_next(arch, &search)) == NULL) {
-                bk.console("Unknown architecture.\n");
+                bk.debug("Unknown architecture.\n");
                 goto shutdown;
             }
 
             if (strcmp(arch->text, "z80") != 0) {
-                bk.console("Unsupported architecture: %s\n", arch->text);
+                bk.debug("Unsupported architecture: %s\n", arch->text);
                 goto shutdown;
             }
             XMLSearch_free(&search, 1);
@@ -1044,11 +1053,11 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
         uint8_t got_sp = 0;
         uint8_t got_pc = 0;
         if (verbose) {
-            bk.console("Registers: ");
+            bk.debug("Registers: ");
         }
         for (int i = 0; i < register_mappings_count; i++) {
             if (verbose) {
-                printf(" %s", register_mapping_names[register_mappings[i]]);
+                bk.debug(" %s", register_mapping_names[register_mappings[i]]);
             }
             if (register_mappings[i] == REGISTER_MAPPING_SP) {
                 got_sp = 1;
@@ -1064,14 +1073,14 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
             }
         }
         if (verbose) {
-            bk.console("\n");
+            bk.debug("\n");
         }
         if (got_pc == 0 || got_sp == 0) {
-            bk.console("Insufficient register information.\n");
+            bk.debug("Insufficient register information.\n");
         }
         if (has_clock_register) {
             if (verbose) {
-                bk.console("Remote has 'clock' register.\n");
+                bk.debug("Remote has 'clock' register.\n");
             }
         }
     }
@@ -1105,7 +1114,7 @@ static void* ctrl_c_signal_loop(void* arg) {
 #ifdef WIN32
         Sleep(100);
 #else
-        sleep(1);
+        usleep(100000);
 #endif
     }
     return NULL;
@@ -1159,7 +1168,7 @@ static backend_t gdb_backend = {
     .debugger_read_memory = &debugger_read_memory,
     .invalidate = &invalidate,
     .breakable = 1,
-    .break_ = &debugger_break,
+    .break_ = &debugger_gdb_break,
     .resume = &debugger_resume,
     .next = &debugger_next,
     .step = &debugger_step,
@@ -1201,9 +1210,12 @@ static void process_scheduled_actions()
     struct scheduled_action_t* entry;
     struct scheduled_action_t* tmp;
 
+    size_t processed = 0;
+
     LL_FOREACH_SAFE(first_to_process, entry, tmp)
     {
         entry->scheduled_action(entry->scheduled_action_data, entry->scheduled_action_response);
+        processed++;
 
         if (entry->wait)
         {
@@ -1217,6 +1229,12 @@ static void process_scheduled_actions()
         LL_DELETE(first_to_process, entry);
         free(entry);
     }
+
+    pthread_mutex_lock(&main_thread_mutex);
+    if (processed > 1) {
+        bk.debug("Processed %d actions on main thread.\n", processed);
+    }
+    pthread_mutex_unlock(&main_thread_mutex);
 }
 
 int main(int argc, char **argv) {
@@ -1236,19 +1254,19 @@ int main(int argc, char **argv) {
         } else if (strcmp(argv[i], "-x") == 0) {
             char* debug_symbols = argv[++i];
             if (bk.is_verbose()) {
-                printf("Reading debug symbols...");
+                bk.debug("Reading debug symbols...");
             }
             read_symbol_file(debug_symbols);
             if (bk.is_verbose()) {
-                printf("OK\n");
+                bk.debug("OK\n");
             }
         } else if (strcmp(argv[i], "-v") == 0) {
             verbose = 1;
         } else if (strcmp(argv[i], "-q") == 0) {
             // ignore
         } else if (strcmp(argv[i], "--version") == 0) {
-            printf("GNU gdb (GDB) 11.0\n");
-            printf("The line above is fake, we're pretending to be a gdb here.\n");
+            bk.debug("GNU gdb (GDB) 11.0\n");
+            bk.debug("The line above is fake, we're pretending to be a gdb here.\n");
             exit(0);
         } else if (strstr(argv[i], "--interpreter=")) {
             const char* interpreter = argv[i] + 14;
@@ -1259,7 +1277,7 @@ int main(int argc, char **argv) {
             if (map_file == NULL) {
                 map_file = argv[i];
             } else {
-                printf("Unknown option: %s\n", argv[i]);
+                bk.debug("Unknown option: %s\n", argv[i]);
                 exit(1);
             }
         }
@@ -1275,9 +1293,9 @@ int main(int argc, char **argv) {
         bk.console("z88dk-gdb, a gdb client for z88dk\n");
 
         if (map_file) {
-            bk.console("Reading symbol file %s...\n", map_file);
-            read_symbol_file(map_file);
-            bk.console("Done.\n");
+            bk.debug("Reading symbol file %s...\n", map_file);
+            debugger_read_symbol_file(map_file);
+            bk.debug("Done.\n");
         }
 
         while (1) {
@@ -1286,7 +1304,7 @@ int main(int argc, char **argv) {
         }
 
     } else {
-        printf("----------------------------------\n"
+        bk.debug("----------------------------------\n"
                "z88dk-gdb, a gdb client for z88dk.\n"
                "----------------------------------\n"
                "\n"
@@ -1295,7 +1313,7 @@ int main(int argc, char **argv) {
                "\n");
 
         if (connect_port == 0 || connect_host == NULL) {
-            printf("Usage: z88dk-gdb -h <connect host> -p <connect port> -x <debug symbols> [-x <debug symbols>] [-v]\n");
+            bk.debug("Usage: z88dk-gdb -h <connect host> -p <connect port> -x <debug symbols> [-x <debug symbols>] [-v]\n");
             return 1;
         } else {
             start_ctrl_c_signal_loop();
@@ -1303,7 +1321,7 @@ int main(int argc, char **argv) {
             bk.console("Connecting...\n");
 
             if (connect_to_gdbserver(connect_host, connect_port)) {
-                printf("Could not connect to the server\n");
+                bk.debug("Could not connect to the server\n");
                 return 1;
             }
 
