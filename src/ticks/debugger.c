@@ -173,7 +173,7 @@ static command commands[] = {
     { "out",       cmd_out,         "<address> <value>",    "Send to IO bus"},
     { "trace",     cmd_trace,       "<on/off>",             "Disassemble every instruction"},
     { "hotspot",   cmd_hotspot,     "<on/off>",             "Track address counts and write to hotspots file"},
-    { "profiler",  cmd_profiler,    "<start/stop>",         "start/stop profiling"},
+    { "profiler",  cmd_profiler,    "[-f fun][-i iter]",    "start/stop profiling (-f function limit, -i iteration limit)"},
     { "list",      cmd_list,        "[<address>]",          "List the source code at location given or pc"},
     { "help",      cmd_help,        "",                     "Display this help text" },
     { "whatis/rmt",cmd_typeof,      "",                     NULL },
@@ -1601,21 +1601,25 @@ static int cmd_trace(int argc, char **argv)
 
 static int cmd_profiler(int argc, char **argv)
 {
-    if (argc <= 1) {
-        if (profiler_enabled) {
-            profiler_stop();
-        } else {
-            profiler_start();
-        }
-    } else {
-        if (strcmp(argv[1], "start") == 0) {
-            profiler_start();
-        } else if (strcmp(argv[1], "stop") == 0) {
-            profiler_stop();
-        } else {
-            bk.console("Warning: unknown profiler action.\n");
+    if (profiler_enabled) {
+        profiler_stop();
+        return 0;
+    }
+
+    const char* function_only = NULL;
+    int limit = 0;
+
+    for (int i = 1; i < argc; i++) {
+        const char* arg = argv[i];
+        if (strcmp(arg, "-i") == 0) {
+            limit = atoi(argv[++i]);
+        } else if (strcmp(arg, "-f") == 0) {
+            function_only = argv[++i];
         }
     }
+
+    profiler_start(function_only, limit);
+
     return 0;
 }
 

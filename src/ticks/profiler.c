@@ -6,6 +6,9 @@ int profiler_enabled = 0;
 static breakpoint* breakpoint_push_frame = NULL;
 static breakpoint* breakpoint_pop_frame = NULL;
 static struct profile_function_t* profiling_functions = NULL;
+static int stack_level = 0;
+const char* within_function_only = NULL;
+static int profiling_iterations_limit = 0;
 
 struct profile_function_call_t {
     uint32_t time;
@@ -58,6 +61,11 @@ uint8_t profiler_check(uint16_t pc) {
             return 1;
         }
 
+        if ((stack_level == 0) && (within_function_only != NULL) && (strcmp(within_function_only, fp->function->function_name) != 0))
+        {
+            return 1;
+        }
+
         // a new function has been called
         struct profile_function_t* f = lookup_function(fp->function, 1);
 
@@ -66,8 +74,28 @@ uint8_t profiler_check(uint16_t pc) {
         DL_PREPEND(f->calls, call);
 
         debug_stack_frames_free(fp);
+        stack_level++;
+
         return 1;
     } else if (breakpoint_pop_frame->value == pc) {
+
+        if (stack_level) {
+            if (--stack_level == 0) {
+                // we've just reached an end of iteration
+                if (profiling_iterations_limit) {
+                    // we have a limit
+                    if (--profiling_iterations_limit == 0) {
+                        // it just completed
+                        debugger_active = 1;
+                        profiler_stop();
+                        return 0;
+                    }
+                }
+            }
+        } else {
+            // stack discrepancy, we don't care
+            return 1;
+        }
 
         uint16_t stack = bk.sp();
         struct debugger_regs_t regs;
@@ -100,11 +128,15 @@ uint8_t profiler_check(uint16_t pc) {
     return 0;
 }
 
-void profiler_start() {
+void profiler_start(const char* function, int iterations_limit) {
     if (profiler_enabled) {
         bk.console("Warning: profiler is already enabled.\n");
         return;
     }
+
+    stack_level = 0;
+    within_function_only = function;
+    profiling_iterations_limit = iterations_limit;
 
     int push_frame = symbol_resolve("l_debug_push_frame", NULL);
     int pop_frame = symbol_resolve("l_debug_pop_frame", NULL);
@@ -118,6 +150,12 @@ void profiler_start() {
     breakpoint_pop_frame = add_breakpoint(BREAK_PC, BK_BREAKPOINT_SOFTWARE, 1, pop_frame, strdup("profiler pop"));
 
     bk.console("Profiler enabled.\n");
+    if (within_function_only) {
+        bk.console(" (limited to function %s)\n", within_function_only);
+    }
+    if (iterations_limit) {
+        bk.console(" (limited to %d iterations)\n", iterations_limit);
+    }
     profiler_enabled = 1;
 }
 
