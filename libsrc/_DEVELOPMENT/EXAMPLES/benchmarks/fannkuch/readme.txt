@@ -70,11 +70,11 @@ cycle count  = 56090095
 time @ 4MHz  = 56090095 / 4*10^6 = 14.02 sec
 
 3.
-HITECH C CPM V309
-1218 bytes less cpm overhead
+HITECH C CPM V309-15
+2771 bytes exact
 
-cycle count  = 56667034
-time @ 4MHz  = 56667034 / 4*10^6 = 14.17 sec
+cycle count  = 56614856
+time @ 4MHz  = 56614856 / 4*10^6 = 14.1537 sec
 
 4.
 IAR Z80 V4.06A

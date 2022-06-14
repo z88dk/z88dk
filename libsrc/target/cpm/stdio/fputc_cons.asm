@@ -12,6 +12,9 @@
 	SECTION	code_clib
 	PUBLIC  fputc_cons_native
 	EXTERN	__bdos
+        EXTERN CLIB_CPM_NATIVE_VT100
+        EXTERN CLIB_FPUTC_CLS_CODE
+        
 
 ;
 ; Entry:        hl = points to char
@@ -42,6 +45,13 @@ ENDIF
 	ld      c,2
 	jp	__bdos
 .docls
+        ld      a,CLIB_CPM_NATIVE_VT100
+        and     a
+        jr      nz,cls_ansi
+        ld      a,CLIB_FPUTC_CLS_CODE
+        jp      __bdos
+
+cls_ansi:
 ;	This is the ANSI CLS call
 	ld	e,27
 	ld	c,2

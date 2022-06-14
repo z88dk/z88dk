@@ -20,12 +20,11 @@ my $OPCODE = 2*$TAB;
 my $ARGS = 4*$TAB;
 my $COMMENT = 10*$TAB;
 my $DEFVARS = 6*$TAB;
-my $LEVEL = 0;
+my $LEVEL = 1;
 my $DEFVARSLEVEL = 0;
 
 @ARGV or die "Usage: ",path($0)->basename," FILES...\n";
 for my $asm (@ARGV) {
-    $LEVEL = 0;
 	open(my $in, "<", $asm) or die "$asm: $!\n";
 	open(my $out, ">:raw", $asm.".new") or die "$asm.new: $!\n";
 	while (<$in>) {
