@@ -13,7 +13,7 @@
 
 __z80asm__rl_bc:
 
-IF  __CPU_INTEL__
+  IF    __CPU_INTEL__
         push    af
 
         ld      a, c
@@ -32,9 +32,9 @@ carry0:
         pop     af
         and     a
         ret
-ELSE
+  ELSE
         rl      c
         rl      b
         ret
-ENDIF
+  ENDIF
 

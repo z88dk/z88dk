@@ -9,7 +9,7 @@
 ;------------------------------------------------------------------------------
 
 
-IF  __CPU_RABBIT__
+  IF    __CPU_RABBIT__
         SECTION code_l_sccz80
         PUBLIC  __z80asm__daa
 
@@ -117,4 +117,4 @@ positive:
         pop     af
         pop     bc
         ret
-ENDIF
+  ENDIF
