@@ -282,10 +282,10 @@ main(unsigned int arg2, char *arg1)
 
 // Capture arguments and push them on the stack
 // The macros will also fire a "Nonsense in BASIC" message when the argument type is wrong
-// Arguments must be declared and captured in reverse order
+// Arguments must be declared in reverse order but captured sequentially
 
 // int
-#define ARG_INT   asm("rst\t0x20\ncall\t0x1C82\ncall\t0x2DA2\n  defb\t0x28,7\n ld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
+#define ARG_INT   asm("rst\t0x20\ncall\t0x1C82\ncall\t0x2DA2\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
 
 // unsigned int
 #define ARG_UINT   asm("rst\t0x20\ncall\t0x1C82\ncall\t0x2DA2\npush\tbc\n")
