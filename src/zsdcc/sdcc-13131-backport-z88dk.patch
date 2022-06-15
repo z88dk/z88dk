@@ -16,6 +16,12 @@ Index: ChangeLog
  2022-02-26 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
  
  	* src/SDCCsymt.c,
+@@ -48216,4 +48206,4 @@
+ 	* as/mcs51/lklex.c:  accept everything as symbol name in rel-files, bug fix ID 452601
+ 	* as/mcs51/lksym.c:  accept everything as symbol name in rel-files, bug fix ID 452601
+ 
+-$Revision: 13081 $
++$Revision: 13131 $
 Index: src/SDCCasm.c
 ===================================================================
 --- src/SDCCasm.c	(revision 13131)
