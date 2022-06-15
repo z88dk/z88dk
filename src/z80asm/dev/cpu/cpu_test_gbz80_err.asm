@@ -1945,11 +1945,11 @@
  bool hl'                       ; Error
  bool ix                        ; Error
  bool iy                        ; Error
- brlc de,b                      ; Error
- bsla de,b                      ; Error
- bsra de,b                      ; Error
- bsrf de,b                      ; Error
- bsrl de,b                      ; Error
+ brlc de, b                     ; Error
+ bsla de, b                     ; Error
+ bsra de, b                     ; Error
+ bsrf de, b                     ; Error
+ bsrl de, b                     ; Error
  c_lo -32768                    ; Error
  c_lo 32767                     ; Error
  c_lo 65535                     ; Error

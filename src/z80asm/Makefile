@@ -111,23 +111,40 @@ dev:
 # ragel parser generator
 dev: src/c/scan_rules.h
 
-src/c/scan_rules.h : src/c/scan_rules.rl src/c/tokens.h src/c/scan_def.h \
+src/c/scan_rules.h: src/c/scan_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile 
 	perl parse_ragel.pl src/c/scan_rules.rl
+	dos2unix -q src/c/scan_rules.h
 	
 dev: src/c/parse_rules.h
 
-dev/cpu/cpu_rules.h : dev/cpu/cpu.pl Makefile
-	perl dev/cpu/cpu.pl
-
-src/c/parse_rules.h : src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
+src/c/parse_rules.h: src/c/parse_rules.rl src/c/tokens.h src/c/scan_def.h \
 				parse_ragel.pl Makefile \
 				dev/cpu/cpu_rules.h
 	perl parse_ragel.pl src/c/parse_rules.rl
+	dos2unix -q src/c/parse_rules.h
 
 src/c/tokens.h : make_tokens.pl Makefile
-	perl make_tokens.pl > $@
-	dos2unix -q $@
+	perl make_tokens.pl > src/c/tokens.h
+	dos2unix -q src/c/tokens.h
+
+# opcode tables generator
+dev: dev/cpu/opcodes.yaml \
+	 dev/cpu/opcodes.txt \
+	 dev/cpu/cpu_test_z80_ok.asm \
+	 dev/cpu/cpu_rules.h
+
+dev/cpu/opcodes.yaml: dev/cpu/make_opcodes.pl Makefile
+	cd dev/cpu; perl make_opcodes.pl; dos2unix -q opcodes.yaml
+
+dev/cpu/opcodes.txt: dev/cpu/opcodes.yaml dev/cpu/dump_opcodes.pl Makefile
+	cd dev/cpu; perl dump_opcodes.pl; dos2unix -q opcodes.txt
+
+dev/cpu/cpu_test_z80_ok.asm: dev/cpu/opcodes.yaml dev/cpu/make_cpu_test.pl Makefile
+	cd dev/cpu; perl make_cpu_test.pl; dos2unix -q cpu_test_*.asm
+
+dev/cpu/cpu_rules.h: dev/cpu/opcodes.yaml dev/cpu/make_cpu_rules.pl Makefile
+	cd dev/cpu; perl make_cpu_rules.pl; dos2unix -q cpu_rules.h
 
 # re2c
 define MAKE_RE2C

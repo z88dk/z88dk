@@ -4,7 +4,7 @@
 ;
 ;       8/12/02 - Stefano Bodrato
 ;
-;       $Id: ftoa.asm,v 1.8 2016-06-22 19:59:18 dom Exp $
+;       $Id: ftoa.asm$
 ;
 ;
 ;void ftoa(x,prec,str)   -> Convert double to string
@@ -41,7 +41,17 @@ ENDIF
 
 IF TINYMODE
 		; we cut away the precision handling
-		ld iy,$4000		; STACK-BC would fix IY already
+
+IF FORzx
+		ld iy,$5C3A		; STACK-BC would fix IY already
+ELSE
+IF FORts2068
+		ld iy,$5C3A		; STACK-BC would fix IY already
+ELSE
+		ld ix,$4000		; STACK-BC would fix IY already
+ENDIF
+ENDIF
+
 		inc	hl
 		inc	hl
 ELSE
@@ -53,7 +63,7 @@ ELSE
 		push	hl
 		push	de
 IF FORlambda
-		ld iy,$4000
+		ld ix,$4000
 ENDIF
 		call	ZXFP_STACK_BC	; put precision on stack
 		pop	de

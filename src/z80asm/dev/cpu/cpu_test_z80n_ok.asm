@@ -296,11 +296,11 @@
  bit 7, e                       ; CB 7B
  bit 7, h                       ; CB 7C
  bit 7, l                       ; CB 7D
- brlc de,b                      ; ED 2C
- bsla de,b                      ; ED 28
- bsra de,b                      ; ED 29
- bsrf de,b                      ; ED 2B
- bsrl de,b                      ; ED 2A
+ brlc de, b                     ; ED 2C
+ bsla de, b                     ; ED 28
+ bsra de, b                     ; ED 29
+ bsrf de, b                     ; ED 2B
+ bsrl de, b                     ; ED 2A
  c_c -32768                     ; DC 00 80
  c_c 32767                      ; DC FF 7F
  c_c 65535                      ; DC FF FF
