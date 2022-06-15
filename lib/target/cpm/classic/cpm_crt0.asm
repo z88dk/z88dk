@@ -51,6 +51,18 @@
         defc    CONSOLE_COLUMNS = 80
     ENDIF
 
+    ; Default CLS to the ADM-3a code
+    PUBLIC  CLIB_FPUTC_CLS_CODE
+    IF !DEFINED_CLIB_FPUTC_CLS_CODE
+        defc    CLIB_FPUTC_CLS_CODE = 0x1a
+    ENDIF
+
+    ; fputc_cons can use vt100 codes as well
+    PUBLIC  CLIB_CPM_NATIVE_VT100
+    IF !DEFINED_CLIB_CPM_NATIVE_VT100
+        defc    CLIB_CPM_NATIVE_VT100 = 0
+    ENDIF
+
     INCLUDE "crt/classic/crt_rules.inc"
 
     org     CRT_ORG_CODE

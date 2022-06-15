@@ -5,9 +5,9 @@
         SECTION code_l_sccz80
         PUBLIC  __z80asm__cpdr
 
-IF  __CPU_GBZ80__
+  IF    __CPU_GBZ80__
         EXTERN  __z80asm__ex_sp_hl
-ENDIF
+  ENDIF
 
 __z80asm__cpdr:
 
@@ -17,18 +17,18 @@ __z80asm__cpdr:
 
 ; scf clears N and H - must set carry the hard way
         push    af
-IF  __CPU_GBZ80__
+  IF    __CPU_GBZ80__
         call    __z80asm__ex_sp_hl
-ELSE
+  ELSE
         ex      (sp), hl
-ENDIF
-IF  __CPU_INTEL__
+  ENDIF
+  IF    __CPU_INTEL__
         ld      a, l
         or      @00000001
         ld      l, a
-ELSE
+  ELSE
         set     0, l                    ; set carry
-ENDIF
+  ENDIF
         jr      retflags
 
 loop:
@@ -56,19 +56,19 @@ enterloop:
 
 joinbc0:
 
-IF  __CPU_GBZ80__
+  IF    __CPU_GBZ80__
         call    __z80asm__ex_sp_hl
-ELSE
+  ELSE
         ex      (sp), hl
-ENDIF
-IF  __CPU_INTEL__
+  ENDIF
+  IF    __CPU_INTEL__
         ld      a, l
         and     @11111010
         ld      l, a
-ELSE
+  ELSE
         res     0, l                    ; clear carry
         res     2, l                    ; clear P/V -> BC == 0
-ENDIF
+  ENDIF
         jr      retflags
 
 match:
@@ -80,26 +80,26 @@ match:
         or      c
         jr      z, joinbc0
 
-IF  __CPU_GBZ80__
+  IF    __CPU_GBZ80__
         call    __z80asm__ex_sp_hl
-ELSE
+  ELSE
         ex      (sp), hl
-ENDIF
-IF  __CPU_INTEL__
+  ENDIF
+  IF    __CPU_INTEL__
         ld      a, l
         and     @11111110
         or      @00000100
         ld      l, a
-ELSE
+  ELSE
         res     0, l                    ; clear carry
         set     2, l                    ; set P/V -> BC != 0
-ENDIF
+  ENDIF
 
 retflags:
-IF  __CPU_GBZ80__
+  IF    __CPU_GBZ80__
         call    __z80asm__ex_sp_hl
-ELSE
+  ELSE
         ex      (sp), hl
-ENDIF
+  ENDIF
         pop     af
         ret

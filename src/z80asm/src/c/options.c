@@ -626,7 +626,7 @@ static void show_option( enum OptType type, bool *pflag,
     else
         printf( "%-*s %s\n",                    ALIGN_HELP, Str_data(msg), help_text );
 
-	STR_DELETE(msg);
+    STR_DELETE(msg);
 }
 #undef ALIGN_HELP
 

@@ -22,7 +22,7 @@ __z80asm__rld:
 
 dorld:
 
-IF  __CPU_INTEL__                       ; a = xi, (hl) = jk --> a = xj, (hl) = ki
+  IF    __CPU_INTEL__                   ; a = xi, (hl) = jk --> a = xj, (hl) = ki
         push    de
         push    hl
 
@@ -52,7 +52,7 @@ IF  __CPU_INTEL__                       ; a = xi, (hl) = jk --> a = xj, (hl) = k
         ld      (hl), e                 ; a = xj, (hl) = ki
 
         pop     de
-ELSE
+  ELSE
         rlca
         rlca
         rlca
@@ -73,7 +73,7 @@ ELSE
         rla
         rl      (hl)
         adc     a, 0
-ENDIF
+  ENDIF
 
         or      a
         ret

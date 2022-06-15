@@ -1,7 +1,7 @@
 /*
  * Headerfile for Spectrum specific stuff
  *
- * $Id: spectrum.h,v 1.41 2016-06-11 19:53:08 dom Exp $
+ * $Id: spectrum.h$
  */
 
 #ifndef __SPECTRUM_H__
@@ -219,6 +219,76 @@ extern void __LIB__    zx_setfloat_callee(char *variable, double_t value) __smal
 #define zx_setstr(a,b)           zx_setstr_callee(a,b)
 #define zx_setint(a,b)           zx_setint_callee(a,b)
 #define zx_setfloat(a,b)         zx_setfloat_callee(a,b)
+
+
+///////////////////////////////
+// INTERFACE FOR BASIC CALLS
+///////////////////////////////
+
+// BASIC error messages.  This will abruptly stop the program execution.
+#define REPORT_OK asm("rst\t8\ndefb\t255\n") // OK
+#define REPORT_1  asm("rst\t8\ndefb\t0\n")   // NEXT without FOR
+#define REPORT_2  asm("rst\t8\ndefb\t1\n")   // Variable not found
+#define REPORT_3  asm("rst\t8\ndefb\t2\n")   // Subscript wrong
+#define REPORT_4  asm("rst\t8\ndefb\t3\n")   // Out of memory
+#define REPORT_5  asm("rst\t8\ndefb\t4\n")   // Out of screen
+#define REPORT_6  asm("rst\t8\ndefb\t5\n")   // Number too big
+#define REPORT_7  asm("rst\t8\ndefb\t6\n")   // RETURN without GOSUB
+#define REPORT_8  asm("rst\t8\ndefb\t7\n")   // End of file
+#define REPORT_9  asm("rst\t8\ndefb\t8\n")   // STOP statement
+#define REPORT_A  asm("rst\t8\ndefb\t9\n")   // Invalid argument
+#define REPORT_B  asm("rst\t8\ndefb\t10\n")  // Integer out of range
+#define REPORT_C  asm("rst\t8\ndefb\t11\n")  // Nonsense in BASIC
+#define REPORT_D  asm("rst\t8\ndefb\t12\n")  // BREAK - CONT repeat
+#define REPORT_E  asm("rst\t8\ndefb\t13\n")  // Out of DATA
+#define REPORT_F  asm("rst\t8\ndefb\t14\n")  // Invalid file name
+#define REPORT_G  asm("rst\t8\ndefb\t15\n")  // No room for line
+#define REPORT_H  asm("rst\t8\ndefb\t16\n")  // STOP in INPUT
+#define REPORT_I  asm("rst\t8\ndefb\t17\n")  // FOR without NEXT
+#define REPORT_J  asm("rst\t8\ndefb\t18\n")  // Invalid I/O device
+#define REPORT_K  asm("rst\t8\ndefb\t19\n")  // Invalid colour
+#define REPORT_L  asm("rst\t8\ndefb\t20\n")  // BREAK into program
+#define REPORT_M  asm("rst\t8\ndefb\t21\n")  // RAMTOP no good
+#define REPORT_N  asm("rst\t8\ndefb\t22\n")  // Statement lost
+#define REPORT_O  asm("rst\t8\ndefb\t23\n")  // Invalid stream
+#define REPORT_P  asm("rst\t8\ndefb\t24\n")  // FN without DEF
+#define REPORT_Q  asm("rst\t8\ndefb\t25\n")  // Parameter error
+#define REPORT_R  asm("rst\t8\ndefb\t26\n")  // Tape loading error
+
+
+/*
+Macros to write new BASIC statement in C, in example:
+
+#include <stdio.h>
+#include <arch/zx/spectrum.h>
+
+main(unsigned int arg2, unsigned int arg1)
+{
+	ARG_UINT;
+	ARG_UINT;
+	ARG_END;
+	
+	printf("Arg1: %u, arg2: %u \n",arg1 ,arg2);
+	
+	STMT_RET;
+}
+
+------------------
+10   LET a1=1: LET a2=2
+20   PRINT USR 32768,a1,a2
+------------------
+
+*/
+
+// Capture an argument and push it on stack (agruments are in reverse order)
+#define ARG_UINT   asm("rst\t0x20\ncall\t0x1C82\ncall\t0x2DA2\npush\tbc\n")
+
+// End of argument list
+#define ARG_END    asm("push\tbc\n")
+
+// Terminate your custom statement and get back to the BASIC interpreter
+#define STMT_RET   asm("ld\tiy,0x5C3A\nld\tsp,(0x5C3D)\njp\t0x1b76\n")
+
 
 
 //////////////

@@ -6,16 +6,16 @@
 
 __z80asm__ldi:
         push    af                      ;Save incoming flags
-IF  __CPU_GBZ80__
+  IF    __CPU_GBZ80__
         ld      a, (hl+)
-ELSE
+  ELSE
         ld      a, (hl)
         inc     hl
-ENDIF
+  ENDIF
         ld      (de), a
         inc     de
         dec     bc
-IF  !__CPU_GBZ80__
+  IF    !__CPU_GBZ80__
                               ; There's no point setting PV flag on a gbz80 since flag doesn't exist
         ex      (sp), hl                ;incoming af in hl, outgoing hl on stack
         push    bc                      ;Save bc, we need a temporary
@@ -31,6 +31,6 @@ set_pv:
         ld      l, a
         pop     bc
         ex      (sp), hl                ;Get hl back
-ENDIF
+  ENDIF
         pop     af                      ;And restore our modified af
         ret
