@@ -2,7 +2,7 @@ Index: ChangeLog
 ===================================================================
 --- ChangeLog	(revision 13131)
 +++ ChangeLog	(working copy)
-@@ -1,3 +1,13 @@
+@@ -1,3 +1,18 @@
 +2022-06-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 +
 +	* src/SDCCast.c:
@@ -13,10 +13,15 @@ Index: ChangeLog
 +	* src/z80/gen.c:
 +	  Fix bug #3388.
 +
++2022-03-28 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
++
++	* src/z80/ralloc2.cc:
++	  Fix code generation issues in use of iy.
++
  2022-02-26 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
  
  	* src/SDCCsymt.c,
-@@ -48216,4 +48206,4 @@
+@@ -48206,4 +48221,4 @@
  	* as/mcs51/lklex.c:  accept everything as symbol name in rel-files, bug fix ID 452601
  	* as/mcs51/lksym.c:  accept everything as symbol name in rel-files, bug fix ID 452601
  
@@ -456,3 +461,85 @@ Index: src/z80/peep.c
        if(f)
            preserved_regs = f->type->funcAttrs.preserved_regs;
        else // Err on the safe side.
+Index: src/z80/ralloc2.cc
+===================================================================
+--- src/z80/ralloc2.cc	(revision 13131)
++++ src/z80/ralloc2.cc	(working copy)
+@@ -1001,6 +1001,13 @@
+   bool result_in_IYH = operand_in_reg(result, REG_IYH, ia, i, G);
+   bool result_in_IY = result_in_IYL || result_in_IYH;
+ 
++  const cfg_dying_t &dying = G[i].dying;
++
++  bool dead_IYL = result_in_IYL || unused_IYL || dying.find(ia.registers[REG_IYL][1]) != dying.end() || dying.find(ia.registers[REG_IYL][0]) != dying.end();
++  bool dead_IYH = result_in_IYH || unused_IYH || dying.find(ia.registers[REG_IYH][1]) != dying.end() || dying.find(ia.registers[REG_IYH][0]) != dying.end();
++
++  bool dead_IY = dead_IYL && dead_IYH;
++
+   bool input_in_IYL, input_in_IYH;
+   switch(ic->op)
+     {
+@@ -1019,13 +1026,6 @@
+     }
+   bool input_in_IY = input_in_IYL || input_in_IYH;
+ 
+-  //const std::set<var_t> &dying = G[i].dying;
+-  
+-  //bool dying_IYL = result_in_IYL || dying.find(ia.registers[REG_IYL][1]) != dying.end() || dying.find(ia.registers[REG_IYL][0]) != dying.end();
+-  //bool dying_IYH = result_in_IYH || dying.find(ia.registers[REG_IYH][1]) != dying.end() || dying.find(ia.registers[REG_IYH][0]) != dying.end();
+-
+-  //bool result_only_IY = (result_in_IYL || unused_IYL || dying_IYL) && (result_in_IYH || unused_IYH || dying_IYH);
+-
+   if(unused_IYL && unused_IYH)
+     return(true); // Register IY not in use.
+ 
+@@ -1038,7 +1038,6 @@
+   // Some instructions can handle anything.
+   if(ic->op == IPUSH || ic->op == CALL ||
+     ic->op == '+' ||
+-    ic->op == '|' ||
+     ic->op == GETBYTE || ic->op == GETWORD || ic->op == SWAP && (getSize(operandType(IC_RESULT (ic))) == 1 || operand_in_reg(result, ia, i, G)) ||
+     ic->op == '=' && !POINTER_SET(ic) ||
+     ic->op == CAST ||
+@@ -1045,6 +1044,7 @@
+     ic->op == SEND)
+     return(true);
+ 
++  // Avoid overwriting operand in iy by use of iy as pointer reg to global operand.
+   if(!result_in_IY && !input_in_IY &&
+     !(IC_RESULT(ic) && isOperandInDirSpace(IC_RESULT(ic))) &&
+     !(IC_RIGHT(ic) && IS_TRUE_SYMOP(IC_RIGHT(ic))) &&
+@@ -1051,6 +1051,16 @@
+     !(IC_LEFT(ic) && IS_TRUE_SYMOP(IC_LEFT(ic))))
+     return(true);
+ 
++  // Some instructions can handle anything if no operand is pointed to by iy.
++  if((!(IC_RESULT(ic) && isOperandInDirSpace(IC_RESULT(ic))) || dead_IY && getSize(operandType(IC_RESULT (ic))) == 1) &&
++    !(IC_RIGHT(ic) && IS_TRUE_SYMOP(IC_RIGHT(ic))) &&
++    !(IC_LEFT(ic) && IS_TRUE_SYMOP(IC_LEFT(ic))) &&
++    (ic->op == '|' ||
++    ic->op == '^' ||
++    ic->op == '~' ||
++    ic->op == BITWISEAND))
++    return(true);
++
+   // Code generator mostly cannot handle variables that are only partially in IY.
+   if(unused_IYL ^ unused_IYH)
+     return(false);
+@@ -1070,16 +1080,6 @@
+   if(ia.registers[REG_IYL][0] >= 0 && I[ia.registers[REG_IYL][0]].byte != 0 || ia.registers[REG_IYH][0] >= 0 && I[ia.registers[REG_IYH][0]].byte != 1)
+     return(false);
+ 
+-#if 0
+-  if(ic->key == 32)
+-    {
+-      std::cout << "A IYinst_ok: Assignment: ";
+-      //print_assignment(a);
+-      std::cout << "\n";
+-      std::cout << "2IYinst_ok: at (" << i << ", " << ic->key << ")\nIYL = (" << ia.registers[REG_IYL][0] << ", " << ia.registers[REG_IYL][1] << "), IYH = (" << ia.registers[REG_IYH][0] << ", " << ia.registers[REG_IYH][1] << ")inst " << i << ", " << ic->key << "\n";
+-    }
+-#endif
+-
+   if(result_in_IY &&
+     (ic->op == '-' || ic->op == UNARYMINUS)) // todo: More instructions that can write iy.
+     return(true);
