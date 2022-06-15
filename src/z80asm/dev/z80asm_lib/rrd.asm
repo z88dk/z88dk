@@ -22,7 +22,7 @@ __z80asm__rrd:
 
 dorrd:
 
-IF  __CPU_INTEL__                       ; a = xi, (hl) = jk --> a = xk, (hl) = ij
+  IF    __CPU_INTEL__                   ; a = xi, (hl) = jk --> a = xk, (hl) = ij
         push    de
         push    hl
 
@@ -58,7 +58,7 @@ IF  __CPU_INTEL__                       ; a = xi, (hl) = jk --> a = xk, (hl) = i
 
         ld      a, e                    ; a = xk
         pop     de
-ELSE
+  ELSE
         srl     a
         rr      (hl)
 
@@ -77,7 +77,7 @@ ELSE
         rra
         rra
 
-ENDIF
+  ENDIF
 
         or      a
         ret

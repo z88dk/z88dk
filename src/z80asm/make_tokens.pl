@@ -74,7 +74,8 @@ my @tokens = (
 	'SETAE', 'TEST', 'MMU', 'MMU0', 'MMU1', 'MMU2', 'MMU3', 'MMU4', 'MMU5', 
 	'MMU6', 'MMU7', 'CU_WAIT', 'CU_MOVE', 'CU_STOP', 'CU_NOP', 'DMA_WR0', 
 	'DMA_WR1', 'DMA_WR2', 'DMA_WR3', 'DMA_WR4', 'DMA_WR5', 'DMA_WR6', 'DMA_CMD',
-	'BSLA', 'BSRA', 'BSRL', 'BSRF', 'BRLC',
+	'BSLA', 'BSRA', 'BSRL', 'BSRF', 'BRLC', 'LDRX', 'LIRX', 'LPRX', 'MIRR', 
+	'NREG', 'OTIB', 'PXAD', 'PXDN', 'STAE', 
 
 	# Z180 specific opcodes
 	'SLP', 'MLT', 'IN0', 'OUT0', 'OTIM', 'OTIMR', 'OTDM', 'OTDMR', 'TST', 'TSTIO',
