@@ -677,7 +677,8 @@ uint8_t debugger_restore(const char* file_path, uint16_t at, uint8_t set_pc)
     {
         char s[1024];
         int offset;
-        sprintf(s, "M%zx,%zx:%n", addr, read_, &offset);
+        sprintf(s, "M%zx,%zx:", addr, read_);
+        offset = strlen(s);
         mem2hex(buff, &s[offset], read_);
         const char* response = send_request(s);
         if (strcmp(response, "OK") != 0)
@@ -1137,7 +1138,11 @@ uint32_t gdb_profiler_time() {
 #else
     // Otherwise, get a time stamp in microseconds. Inaccurate but beats nothing.
     struct timespec ts;
+#if defined(CLOCK_MONOTONIC_RAW)
     clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+#else
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+#endif
     uint64_t us = SEC_TO_US((uint64_t)ts.tv_sec) + NS_TO_US((uint64_t)ts.tv_nsec);
     return (uint32_t)us;
 #endif
