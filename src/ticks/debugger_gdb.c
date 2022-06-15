@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <sys/time.h>
 
 #include <pthread.h>
 #include <unistd.h>
@@ -1136,9 +1137,10 @@ uint32_t gdb_profiler_time() {
     return GetTickCount();
 #else
     // Otherwise, get a time stamp in microseconds. Inaccurate but beats nothing.
-    struct timespec ts;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-    uint64_t us = SEC_TO_US((uint64_t)ts.tv_sec) + NS_TO_US((uint64_t)ts.tv_nsec);
+    struct timeval tv;
+
+    gettimeofday(&tv, NULL);
+    uint64_t us = SEC_TO_US((uint64_t)tv.tv_sec) + tv.tv_usec;
     return (uint32_t)us;
 #endif
 }
