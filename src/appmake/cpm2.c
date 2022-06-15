@@ -484,6 +484,7 @@ static disc_spec fp1100_spec = {
     .first_sector_offset = 1,
 };
 
+
 static disc_spec vector06c_spec = {
     .name = "Vector06c",
     .sectors_per_track = 10,
@@ -500,21 +501,6 @@ static disc_spec vector06c_spec = {
     .first_sector_offset = 1,
 };
 
-static disc_spec corvette_spec = {
-    .name = "Corvette",
-    .sectors_per_track = 5,
-    .tracks = 80,
-    .sides = 2,
-    .sector_size = 1024,
-    .gap3_length = 0x2a,   //?
-    .filler_byte = 0xe5,
-    .boottracks = 1,
-    .directory_entries = 128,
-    .alternate_sides = 1,
-    .extent_size = 2048,
-    .byte_size_extents = 0,  //?
-    .first_sector_offset = 1,
-};
 
 static disc_spec z80pack_spec = {
     .name = "Z80pack",
@@ -568,6 +554,8 @@ static disc_spec corvette_spec = {
  };
 
 
+
+
 static struct formats {
      const char    *name;
      const char    *description;
@@ -606,7 +594,6 @@ static struct formats {
     { "tiki100-40t","Tiki 100 (200k)",      &tiki100_spec, 0, NULL, 1 },
     { "ts803",      "Televideo TS803/TPC1", &ts803_spec, 0, NULL, 1 },
     { "vector06c",  "Vector 06c",           &vector06c_spec, 0, NULL, 1 },
-    { "corvette",  "Corvette",              &corvette_spec, 32, "\x80\xc3\0\xda\x0a\0\0\x01\x01\x01\x03\x01\x05\0\x50\0\x28\0\x04\x0f\0\x8c\x01\x7f\0\xc0\0\x20\0\x01\0\x11", 1 },
     { "z80pack",    "z80pack 8\" format",   &z80pack_spec, 0, NULL, 1 },
     { NULL, NULL }
 };
