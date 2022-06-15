@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.35 2016-06-26 20:36:33 dom Exp $
+ * $Id: zx81.h$
  */
 
 #ifndef __ZX81_H__
@@ -338,6 +338,95 @@ extern void __LIB__    zx_setfloat_callee(char *variable, double_t value) __smal
 #define zx_setstr(a,b)           zx_setstr_callee(a,b)
 #define zx_setint(a,b)           zx_setint_callee(a,b)
 #define zx_setfloat(a,b)         zx_setfloat_callee(a,b)
+
+
+///////////////////////////////
+// INTERFACE FOR BASIC CALLS
+///////////////////////////////
+
+// BASIC error messages.  This will abruptly stop the program execution.
+#define REPORT_OK asm("rst\t8\ndefb\t255\n") // OK
+#define REPORT_1  asm("rst\t8\ndefb\t0\n")   // NEXT without FOR
+#define REPORT_2  asm("rst\t8\ndefb\t1\n")   // Variable not found
+#define REPORT_3  asm("rst\t8\ndefb\t2\n")   // Subscript wrong
+#define REPORT_4  asm("rst\t8\ndefb\t3\n")   // Out of memory
+#define REPORT_5  asm("rst\t8\ndefb\t4\n")   // Out of screen
+#define REPORT_6  asm("rst\t8\ndefb\t5\n")   // Number too big
+#define REPORT_7  asm("rst\t8\ndefb\t6\n")   // RETURN without GOSUB
+#define REPORT_8  asm("rst\t8\ndefb\t7\n")   // You have attempted INPUT as a command (not allowed).
+#define REPORT_9  asm("rst\t8\ndefb\t8\n")   // STOP statement
+#define REPORT_A  asm("rst\t8\ndefb\t9\n")   // Invalid argument
+#define REPORT_B  asm("rst\t8\ndefb\t10\n")  // Integer out of range
+#define REPORT_C  asm("rst\t8\ndefb\t11\n")  // Nonsense in BASIC (bad values in a VAL expression)
+#define REPORT_D  asm("rst\t8\ndefb\t12\n")  // BREAK - CONT repeat
+#define REPORT_E  asm("rst\t8\ndefb\t13\n")  // Not used   (Out of DATA)
+#define REPORT_F  asm("rst\t8\ndefb\t14\n")  // Invalid file name (The program name provided is the empty string)
+
+#define REPORT_G  asm("rst\t8\ndefb\t15\n")  // Not used   (No room for line)
+#define REPORT_H  asm("rst\t8\ndefb\t16\n")  // Not used   (STOP in INPUT)
+#define REPORT_I  asm("rst\t8\ndefb\t17\n")  // Not used   (FOR without NEXT)
+#define REPORT_J  asm("rst\t8\ndefb\t18\n")  // Not used   (Invalid I/O device)
+#define REPORT_K  asm("rst\t8\ndefb\t19\n")  // Not used   (Invalid colour)
+#define REPORT_L  asm("rst\t8\ndefb\t20\n")  // Not used   (BREAK into program)
+#define REPORT_M  asm("rst\t8\ndefb\t21\n")  // Not used   (RAMTOP no good)
+#define REPORT_N  asm("rst\t8\ndefb\t22\n")  // Not used   (Statement lost)
+#define REPORT_O  asm("rst\t8\ndefb\t23\n")  // Not used   (Invalid stream)
+#define REPORT_P  asm("rst\t8\ndefb\t24\n")  // Not used   (FN without DEF)
+#define REPORT_Q  asm("rst\t8\ndefb\t25\n")  // Not used   (Parameter error)
+#define REPORT_R  asm("rst\t8\ndefb\t26\n")  // Not used   (Tape loading error)
+
+
+/*
+Macros to write new BASIC statement in C, in example:
+
+#include <stdio.h>
+#include <zx81.h>
+
+main(unsigned int arg2, char *arg1)
+{
+	ARG_STR;
+	ARG_UINT;
+	ARG_END;
+	
+	printf("Arg1: ");
+	zx_asciimode(0);
+	printf("%s", arg1);
+	zx_asciimode(1);
+	printf(", arg2: %u \n" ,arg2);
+
+	STMT_RET;
+}
+
+------------------
+1   REM  @#@#@# <-- C compiled code
+10  LET A$="ABC": LET A2=123
+20  PRINT USR 16514,A$,A2
+------------------
+
+*/
+
+// Capture arguments and push them on the stack
+// The macros will also fire a "Nonsense in BASIC" message when the argument type is wrong
+// Arguments must be declared in reverse order but captured sequentially
+
+// int
+#define ARG_INT    asm("rst\t0x20\ncall\t0x0D92\ncall\t0x158A\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
+
+// unsigned int
+#define ARG_UINT   asm("rst\t0x20\ncall\t0x0D92\ncall\t0x158A\npush\tbc\n")
+
+// void *, struct, char *...
+#define ARG_PTR    asm("rst\t0x20\ncall\t0x0F55\ncall\t0x13F8\npush\tde\n")
+
+// C style strings (adds the string termination automatically)
+#define ARG_STR    asm("rst\t0x20\ncall\t0x0F55\nld\tde,0x001E\nld\tbc,1\ncall\t0x12C3\ncall\t0x1B62\ncall\t0x13F8\npush\tde\n")
+
+
+// End of argument list
+#define ARG_END    asm("push\tbc\n")
+
+// Terminate your custom statement and get back to the BASIC interpreter
+#define STMT_RET   asm("ld\tix,0x4000\nld\tsp,(0x4002)\njp\t0x09F2\n")
 
 
 //////////////
