@@ -140,11 +140,11 @@
  bit 8, e                       ; Error
  bit 8, h                       ; Error
  bit 8, l                       ; Error
- brlc de,b                      ; Error
- bsla de,b                      ; Error
- bsra de,b                      ; Error
- bsrf de,b                      ; Error
- bsrl de,b                      ; Error
+ brlc de, b                     ; Error
+ bsla de, b                     ; Error
+ bsra de, b                     ; Error
+ bsrf de, b                     ; Error
+ bsrl de, b                     ; Error
  cmp a, ixh                     ; Error
  cmp a, ixl                     ; Error
  cmp a, iyh                     ; Error
