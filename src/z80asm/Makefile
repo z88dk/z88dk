@@ -137,8 +137,16 @@ dev: dev/cpu/opcodes.yaml \
 dev/cpu/opcodes.yaml: dev/cpu/make_opcodes.pl Makefile
 	cd dev/cpu; perl make_opcodes.pl; dos2unix -q opcodes.yaml
 
-dev/cpu/opcodes.txt: dev/cpu/opcodes.yaml dev/cpu/dump_opcodes.pl Makefile
+dev/cpu/opcodes.txt: dev/cpu/opcodes.yaml \
+					 dev/cpu/dump_opcodes.pl \
+					 dev/cpu/make_docs.pl \
+					 Makefile
 	cd dev/cpu; perl dump_opcodes.pl; dos2unix -q opcodes.txt
+	cd dev/cpu; \
+	if [ -d ../../../../../z88dk.wiki ]; then \
+		perl make_docs.pl; dos2unix -q Tool---z80asm---opcodes.md; \
+		cp Tool---z80asm---opcodes.md ../../../../../z88dk.wiki; \
+	fi
 
 dev/cpu/cpu_test_z80_ok.asm: dev/cpu/opcodes.yaml dev/cpu/make_cpu_test.pl Makefile
 	cd dev/cpu; perl make_cpu_test.pl; dos2unix -q cpu_test_*.asm
