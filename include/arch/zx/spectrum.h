@@ -262,26 +262,39 @@ Macros to write new BASIC statement in C, in example:
 #include <stdio.h>
 #include <arch/zx/spectrum.h>
 
-main(unsigned int arg2, unsigned int arg1)
+main(unsigned int arg2, char *arg1)
 {
-	ARG_UINT;
+	ARG_STR;
 	ARG_UINT;
 	ARG_END;
 	
-	printf("Arg1: %u, arg2: %u \n",arg1 ,arg2);
-	
+	printf("Arg1: %s, arg2: %u \n", arg1 ,arg2);
+
 	STMT_RET;
 }
 
 ------------------
-10   LET a1=1: LET a2=2
-20   PRINT USR 32768,a1,a2
+10   LET a$="abc": LET a2=123
+20   PRINT USR 32768,a$,a2
 ------------------
 
 */
 
-// Capture an argument and push it on stack (agruments are in reverse order)
+// Capture arguments and push them on the stack
+// The macros will also fire a "Nonsense in BASIC" message when the argument type is wrong
+// Arguments must be declared and captured in reverse order
+
+// int
+#define ARG_INT   asm("rst\t0x20\ncall\t0x1C82\ncall\t0x2DA2\n  defb\t0x28,7\n ld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
+
+// unsigned int
 #define ARG_UINT   asm("rst\t0x20\ncall\t0x1C82\ncall\t0x2DA2\npush\tbc\n")
+
+// void *, struct, char *...
+#define ARG_PTR    asm("rst\t0x20\ncall\t0x1C8C\ncall\t0x2BF1\npush\tde\n")
+
+// C style strings (adds the string termination automatically)
+#define ARG_STR    asm("rst\t0x20\ncall\t0x1C8C\nld\tde,0x03d1\nld\tbc,1\ncall\t0x2ab2\ncall\t0x359C\ncall\t0x2BF1\npush\tde\n")
 
 // End of argument list
 #define ARG_END    asm("push\tbc\n")
