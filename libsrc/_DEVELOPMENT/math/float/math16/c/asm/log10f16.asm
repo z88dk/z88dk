@@ -1,9 +1,9 @@
 ;* * * * *  Small-C/Plus z88dk * * * * *
-;  Version: 19027-7557a4792-20211229
+;  Version: 19569-078eaec31-20220528
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Mar  9 22:05:21 2022
+;	Module compile time: Thu Jun 16 20:24:29 2022
 
 
 	C_LINE	0,"log10f16.c"
