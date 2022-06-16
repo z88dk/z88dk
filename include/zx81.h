@@ -409,6 +409,28 @@ main(unsigned int arg2, char *arg1)
 // The macros will also fire a "Nonsense in BASIC" message when the argument type is wrong
 // Arguments must be declared in reverse order but captured sequentially
 
+#ifdef __LAMBDA__
+
+// int
+#define ARG_INT    asm("rst\t0x08\ncall\t0x0A11\ncall\t0x1509\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
+
+// unsigned int
+#define ARG_UINT   asm("rst\t0x08\ncall\t0x0A11\ncall\t0x1509\npush\tbc\n")
+
+// void *, struct, char *...
+#define ARG_PTR    asm("rst\t0x08\ncall\t0x0806\nrst\t0x20\npush\tde\n")
+
+// C style strings (adds the string termination automatically)
+#define ARG_STR    asm("rst\t0x08\ncall\t0x0806\nld\tde,0x0008\nld\tbc,1\ncall\t0x13BC\ncall\t0x189B\nrst\t0x20\npush\tde\n")
+
+// End of argument list
+#define ARG_END    asm("push\tbc\n")
+
+// Terminate your custom statement and get back to the BASIC interpreter
+#define STMT_RET   asm("ld\tix,0x4000\nld\tsp,(0x4002)\njp\t0x1A13\n")
+
+#else
+
 // int
 #define ARG_INT    asm("rst\t0x20\ncall\t0x0D92\ncall\t0x158A\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
 
@@ -427,6 +449,7 @@ main(unsigned int arg2, char *arg1)
 // Terminate your custom statement and get back to the BASIC interpreter
 #define STMT_RET   asm("ld\tix,0x4000\nld\tsp,(0x4002)\njp\t0x09F2\n")
 
+#endif
 
 //////////////
 // ZX PRINTER
