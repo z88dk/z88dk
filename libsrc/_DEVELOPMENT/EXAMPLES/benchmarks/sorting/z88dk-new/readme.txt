@@ -113,7 +113,7 @@ sort-equ-5000     36069168     9.0173 sec
 
 
 Z88DK March 21, 2022
-new c library / zsdcc 4.2.0 #13081 / __CLIB_OPT_SORT = 2, __CLIB_OPT_SORT_QSORT = 0xc
+new c library / zsdcc 4.2.0 #13131 / __CLIB_OPT_SORT = 2, __CLIB_OPT_SORT_QSORT = 0xc
 1391 bytes less page zero
 
                cycle count    time @ 4MHz

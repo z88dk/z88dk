@@ -71,7 +71,7 @@ time @ 4MHz  = 4028061102 / 4*10^6 = 16 min 47 sec
 
 
 Z88DK April 4, 2022
-zsdcc #13081 / classic c library
+zsdcc #13131 / classic c library
 7146 bytes less page zero
 
 cycle count  = 4013954322

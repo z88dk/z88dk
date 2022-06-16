@@ -128,7 +128,7 @@ new/zsdcc/small (6299 bytes less page zero)
 
 cycle count  = 5278798872 (March 2, 2017, ZSDCC #9833)
 cycle count  = 4067517071 (April 4, 2020,  ZSDCC #11556)
-cycle count  = 4011979932 (April 4, 2022,  ZSDCC #13081)
+cycle count  = 4011979932 (April 4, 2022,  ZSDCC #13131)
 time @ 4MHz  = 4011979932 / 4*10^6 = 16 min 43 sec
 
 new/sccz80/fast (9049 bytes less page zero)
@@ -142,7 +142,7 @@ new/zsdcc/fast (9049 bytes less page zero)
 
 cycle count  = 1739403552 (March 2, 2017, ZSDCC #9833)
 cycle count  = 1756864232 (April 4, 2020, ZSDCC #11556)
-cycle count  = 1736106244 (April 4, 2022,  ZSDCC #13081)
+cycle count  = 1736106244 (April 4, 2022,  ZSDCC #13131)
 time @ 4MHz  = 1736106244 / 4*10^6 =  7 min 14 sec
 
 
@@ -159,7 +159,7 @@ new/zsdcc/small (6391 bytes less page zero)
 
 cycle count  = 3827247920 (March 2, 2017, ZSDCC #9833) 
 cycle count  = 2609489119 (April 4, 2020, ZSDCC #11556)
-cycle count  = 2551419380 (April 4, 2022,  ZSDCC #13081)
+cycle count  = 2551419380 (April 4, 2022,  ZSDCC #13131)
 time @ 4MHz  = 2551419380 / 4*10^6 = 10 min 38 sec
 
 new/sccz80/fast (9137 bytes less page zero)
@@ -173,5 +173,5 @@ new/zsdcc/fast (9123 bytes less page zero)
 
 cycle count  = 1328865976 (March 2, 2017, ZSDCC #9833)
 cycle count  = 1339849656 (April 4, 2020, ZSDCC #11556)
-cycle count  = 1316559068 (April 4, 2022,  ZSDCC #13081)
+cycle count  = 1316559068 (April 4, 2022,  ZSDCC #13131)
 time @ 4MHz  = 1316559068 / 4*10^6 =  5 min 29 sec

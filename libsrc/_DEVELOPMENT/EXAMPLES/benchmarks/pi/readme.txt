@@ -69,7 +69,7 @@ time @ 4MHz  = 1766815709 / 4*10^6 =  7 min 22 sec
 
 2.
 Z88DK April 4, 2022
-zsdcc #13081 / new c library / fast int math
+zsdcc #13131 / new c library / fast int math
 9049 bytes less page zero
 
 cycle count  = 1736106244
@@ -85,7 +85,7 @@ time @ 4MHz  = 4028061102 / 4*10^6 = 16 min 47 sec
 
 4.
 Z88DK April 4, 2022
-zsdcc #13081 / new c library / small int math
+zsdcc #13131 / new c library / small int math
 6299 bytes less page zero
 
 cycle count  = 4011979932
@@ -93,7 +93,7 @@ time @ 4MHz  = 4011979932 / 4*10^6 = 16 min 43 sec
 
 5.
 Z88DK April 4, 2022
-zsdcc #13081 / classic c library
+zsdcc #13131 / classic c library
 7146 bytes less page zero
 
 cycle count  = 4013954322
@@ -160,7 +160,7 @@ time @ 4MHz  = 1358535133 / 4*10^6 =  5 min 39 sec
 
 2.
 Z88DK April 4, 2022
-zsdcc #13081 / new c library / fast int math
+zsdcc #13131 / new c library / fast int math
 9123 bytes less page zero
 
 cycle count  = 1316559068
@@ -176,7 +176,7 @@ time @ 4MHz  = 2578767150 / 4*10^6 = 10 min 45 sec
 
 4.
 Z88DK April 4, 2022
-zsdcc #13081 / new c library / small int math
+zsdcc #13131 / new c library / small int math
 6391 bytes less page zero
 
 cycle count  = 2551419380
