@@ -8,11 +8,7 @@
 #pragma once
 
 #include <iostream>
-<<<<<<< HEAD
-#include <iomanip>
-=======
 #include <iomanip> 
->>>>>>> master
 #include <sstream>
 #include <string>
 #include <vector>
