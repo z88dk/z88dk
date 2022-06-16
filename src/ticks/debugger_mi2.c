@@ -16,6 +16,11 @@
 #include <ctype.h>
 #include <stdarg.h>
 #include <utstring.h>
+#include <unistd.h>
+
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 typedef struct {
     char name[128];
@@ -25,6 +30,9 @@ typedef struct {
 } mi2_var;
 
 static mi2_var* mi2_vars = NULL;
+static uint8_t report_connected = 0;
+static uint8_t report_execution_stopped = 0;
+static char connect_flow[64] = "";
 
 typedef struct {
     char   *cmd;
@@ -134,7 +142,12 @@ static void cmd_file_exec_and_symbols(const char* flow, int argc, char **argv) {
         mi2_printf_error(flow, "No file specified");
         return;
     }
-    read_symbol_file(argv[1]);
+
+    char* symbol_file = argv[1];
+    if (debugger_read_symbol_file(symbol_file)) {
+        mi2_printf_error(flow, "File %s upload failed", symbol_file);
+    }
+
     mi2_printf_response(flow, "done");
 }
 
@@ -173,6 +186,11 @@ static void cmd_maintenance(const char* flow, int argc, char **argv) {
 }
 
 static void cmd_thread_info(const char* flow, int argc, char **argv) {
+    if (debugger_active == 0) {
+        mi2_printf_error(flow, "A program is running.");
+        return;
+    }
+
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
 
@@ -218,6 +236,11 @@ static void cmd_thread_info(const char* flow, int argc, char **argv) {
 }
 
 static void cmd_stack_list_variables(const char* flow, int argc, char **argv) {
+    if (debugger_active == 0) {
+        mi2_printf_error(flow, "A program is running.");
+        return;
+    }
+
     uint8_t no_values = 0;
 
     for (int i = 1; i < argc; i++) {
@@ -671,6 +694,10 @@ done:
 }
 
 static void cmd_stack_list_frames(const char* flow, int argc, char **argv) {
+    if (debugger_active == 0) {
+        mi2_printf_error(flow, "A program is running.");
+        return;
+    }
 
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
@@ -741,6 +768,11 @@ static void cmd_stack_list_frames(const char* flow, int argc, char **argv) {
 }
 
 static void cmd_stack_info_depth(const char* flow, int argc, char **argv) {
+    if (debugger_active == 0) {
+        mi2_printf_error(flow, "A program is running.");
+        return;
+    }
+
     struct debugger_regs_t regs;
     bk.get_regs(&regs);
 
@@ -767,6 +799,11 @@ static void cmd_stack_info_depth(const char* flow, int argc, char **argv) {
 }
 
 static void cmd_data_disassemble(const char* flow, int argc, char **argv) {
+    if (debugger_active == 0) {
+        mi2_printf_error(flow, "A program is running.");
+        return;
+    }
+
     const char* from = NULL;
     const char* to = NULL;
     const char* mode = NULL;
@@ -952,7 +989,6 @@ static void cmd_show(const char* flow, int argc, char **argv) {
 }
 
 static void cmd_continue(const char* flow, int argc, char **argv) {
-    bk.console("Resuming execution\n");
     bk.resume();
     mi2_printf_response(flow, "running");
     report_continue();
@@ -987,8 +1023,8 @@ static void cmd_fin(const char* flow, int argc, char **argv) {
         bk.add_breakpoint(BK_BREAKPOINT_SOFTWARE, first_frame_pointer->return_address, 1);
 
         debug_stack_frames_free(first_frame_pointer);
-        debugger_active = 0;
         bk.resume();
+        report_continue();
     } else {
         debug_stack_frames_free(first_frame_pointer);
 
@@ -1042,9 +1078,6 @@ static void cmd_do_nothing(const char* flow, int argc, char **argv) {
     mi2_printf_response(flow, "done");
 }
 
-static uint8_t report_connected = 0;
-static char connect_flow[64] = "";
-
 static void cmd_target_select(const char* flow, int argc, char **argv) {
     if (argc < 3) {
         mi2_printf_error(flow, "target-select: requires 2 arguments");
@@ -1080,6 +1113,7 @@ static void cmd_target_select(const char* flow, int argc, char **argv) {
 
     bk.debug("Connected\n");
     report_connected = 1;
+    report_execution_stopped = 1;
 }
 
 static void cmd_target_detach(const char* flow, int argc, char **argv)
@@ -1201,6 +1235,7 @@ static void mi2_execution_stopped() {
 
     if (report_thread) {
         report_thread = 0;
+        mi2_printf_thread("thread-group-started,id=\"i1\",pid=\"1\"");
         mi2_printf_thread("thread-created,id=\"1\",group-id=\"i1\"");
     }
 
@@ -1242,17 +1277,21 @@ static void mi2_execution_stopped() {
             mi2_printf_async(
                 "stopped,reason=\"end-stepping-range\",frame={%s},thread-id=\"1\",stopped-threads=\"all\"",
                 utstring_body(frame));
-            utstring_free(frame);
-            return;
+        } else {
+            if (report_execution_stopped) {
+                report_execution_stopped = 0;
+                mi2_printf_async("stopped,frame={%s},thread-id=\"1\",stopped-threads=\"all\"", utstring_body(frame));
+            }
         }
     }
 
     if (report_connected) {
         report_connected = 0;
-        mi2_printf_async(
-            "stopped,reason=\"fork\",frame={%s},thread-id=\"1\",stopped-threads=\"all\"", utstring_body(frame));
+
         mi2_printf_response(connect_flow, "connected");
         mi2_printf_prompt();
+
+        debugger_restore_pending_binary_file();
     }
 
     utstring_free(frame);
@@ -1466,6 +1505,14 @@ static void mi2_internal_printf(const char *fmt, ...) {
     }
 }
 
+static void mi2_break(uint8_t temporary)
+{
+    if (temporary == 0) {
+        report_execution_stopped = 1;
+    }
+
+    debugger_gdb_break(temporary);
+}
 
 void debugger_mi2_init()
 {
@@ -1475,6 +1522,7 @@ void debugger_mi2_init()
     bk.console = mi2_console_printf;
     bk.debug = mi2_internal_printf;
     bk.execution_stopped = mi2_execution_stopped;
+    bk.break_ = mi2_break;
 
     {
         pthread_t id;
