@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h$
+ * $Id: zx81.h,v 1.35 2016-06-26 20:36:33 dom Exp $
  */
 
 #ifndef __ZX81_H__
@@ -314,7 +314,7 @@ extern int  __LIB__ zx_var_length(void);
 // INTERFACE FOR CALLING BASIC
 ///////////////////////////////
 
-// extern int  __LIB__  zx_goto(int line) __z88dk_fastcall;	// calls the BASIC interpreter at a single line
+extern int  __LIB__  zx_goto(int line) __z88dk_fastcall;	// calls the BASIC interpreter at a single line
 extern int  __LIB__  zx_line(int line) __z88dk_fastcall;	// executes a single BASIC line
 
 // set/get string variable values, e.g. for A$: zx_setstr('a',"hello");
@@ -420,7 +420,6 @@ main(unsigned int arg2, char *arg1)
 
 // C style strings (adds the string termination automatically)
 #define ARG_STR    asm("rst\t0x20\ncall\t0x0F55\nld\tde,0x001E\nld\tbc,1\ncall\t0x12C3\ncall\t0x1B62\ncall\t0x13F8\npush\tde\n")
-
 
 // End of argument list
 #define ARG_END    asm("push\tbc\n")
