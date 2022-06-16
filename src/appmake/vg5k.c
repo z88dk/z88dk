@@ -267,6 +267,11 @@ int vg5k_exec(char* target)
             writebyte(c, fpout);
         }
 
+        /* The ROM is expecting the file to have 10 zeroes at the end of the data payload */
+        for (i = 0; i < 10; i++) {
+            writebyte(0, fpout);
+        }
+
         fclose(fpin);
         fclose(fpout);
     }
