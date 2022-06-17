@@ -5,7 +5,7 @@
  */
 
 #include "appmake.h"
-
+#include "cpm-boot-corvette.h"
 
 
 static char             *c_binary_name      = NULL;
@@ -501,6 +501,37 @@ static disc_spec vector06c_spec = {
     .first_sector_offset = 1,
 };
 
+static disc_spec corvette_spec = {
+    .name = "Corvette",
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,   //?
+    .filler_byte = 0xe5,
+    .boottracks = 1,
+    .directory_entries = 128,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 0,  //?
+    .first_sector_offset = 1,
+};
+
+static disc_spec corvetteBOOT_spec = {
+    .name = "Corvette-boot",
+    .sectors_per_track = 5,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 1024,
+    .gap3_length = 0x2a,   //?
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .alternate_sides = 1,
+    .extent_size = 2048,
+    .byte_size_extents = 0,  //?
+    .first_sector_offset = 1,
+};
 
 static disc_spec z80pack_spec = {
     .name = "Z80pack",
@@ -537,30 +568,13 @@ static disc_spec caos_spec = {
     .first_sector_offset = 1,
 };
 
-static disc_spec corvette_spec = {
-     .name = "Corvette",
-     .sectors_per_track = 5,
-     .tracks = 80,
-     .sides = 2,
-     .sector_size = 1024,
-     .gap3_length = 0x2a,   //?
-     .filler_byte = 0xe5,
-     .boottracks = 1,
-     .directory_entries = 128,
-     .alternate_sides = 1,
-     .extent_size = 2048,
-     .byte_size_extents = 0,  //?
-     .first_sector_offset = 1,
- };
-
-
 
 
 static struct formats {
      const char    *name;
      const char    *description;
      disc_spec  *spec;
-     size_t         bootlen; 
+     size_t         bootlen;
      void          *bootsector;
      char           force_com_extension;
      void         (*extra_hook)(disc_handle *handle);
@@ -573,6 +587,7 @@ static struct formats {
     { "cpcsystem", "CPC System Disc",       &cpcsystem_spec, 0, NULL, 0 },
     { "col1",      "Coleco ADAM 40T SSDD",  &col1_spec, 0, NULL, 1 },
     { "corvette", "Corvette", &corvette_spec, 32, "\x80\xc3\0\xda\x0a\0\0\x01\x01\x01\x03\x01\x05\0\x50\0\x28\0\x04\x0f\0\x8c\x01\x7f\0\xc0\0\x20\0\x01\0\x11", 1 },
+    { "corvetteBOOT", "Corvette-boot", &corvetteBOOT_spec, 10240, cpm_boot_corvette, 1 },
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
@@ -662,7 +677,7 @@ int cpm2_exec(char* target)
 
 
 // TODO: Needs bootsector handling
-disc_handle *cpm_create_with_format(const char *disc_format) 
+disc_handle *cpm_create_with_format(const char *disc_format)
 {
     disc_spec* spec = NULL;
     struct formats* f = &formats[0];
@@ -787,14 +802,14 @@ int cpm_write_file_to_image(const char *disc_format, const char *container, cons
 
     disc_write_file(h, cpm_filename, filebuf, binlen);
 
-  
+
 
     if ( f->extra_hook ) {
         f->extra_hook(h);
     }
 
     write_extra_files(h);
-    
+
     if (writer(h, disc_name) < 0) {
         exit_log(1, "Can't write disc image\n");
     }
