@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h$
+ * $Id: zx81.h,v 1.35 2016-06-26 20:36:33 dom Exp $
  */
 
 #ifndef __ZX81_H__
@@ -314,7 +314,7 @@ extern int  __LIB__ zx_var_length(void);
 // INTERFACE FOR CALLING BASIC
 ///////////////////////////////
 
-// extern int  __LIB__  zx_goto(int line) __z88dk_fastcall;	// calls the BASIC interpreter at a single line
+extern int  __LIB__  zx_goto(int line) __z88dk_fastcall;	// calls the BASIC interpreter at a single line
 extern int  __LIB__  zx_line(int line) __z88dk_fastcall;	// executes a single BASIC line
 
 // set/get string variable values, e.g. for A$: zx_setstr('a',"hello");
@@ -409,6 +409,28 @@ main(unsigned int arg2, char *arg1)
 // The macros will also fire a "Nonsense in BASIC" message when the argument type is wrong
 // Arguments must be declared in reverse order but captured sequentially
 
+#ifdef __LAMBDA__
+
+// int
+#define ARG_INT    asm("rst\t0x08\ncall\t0x0A11\ncall\t0x1509\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
+
+// unsigned int
+#define ARG_UINT   asm("rst\t0x08\ncall\t0x0A11\ncall\t0x1509\npush\tbc\n")
+
+// void *, struct, char *...
+#define ARG_PTR    asm("rst\t0x08\ncall\t0x0806\nrst\t0x20\npush\tde\n")
+
+// C style strings (adds the string termination automatically)
+#define ARG_STR    asm("rst\t0x08\ncall\t0x0806\nld\tde,0x0008\nld\tbc,1\ncall\t0x13BC\ncall\t0x189B\nrst\t0x20\npush\tde\n")
+
+// End of argument list
+#define ARG_END    asm("push\tbc\n")
+
+// Terminate your custom statement and get back to the BASIC interpreter
+#define STMT_RET   asm("ld\tix,0x4000\nld\tsp,(0x4002)\njp\t0x1A13\n")
+
+#else
+
 // int
 #define ARG_INT    asm("rst\t0x20\ncall\t0x0D92\ncall\t0x158A\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
 
@@ -421,13 +443,13 @@ main(unsigned int arg2, char *arg1)
 // C style strings (adds the string termination automatically)
 #define ARG_STR    asm("rst\t0x20\ncall\t0x0F55\nld\tde,0x001E\nld\tbc,1\ncall\t0x12C3\ncall\t0x1B62\ncall\t0x13F8\npush\tde\n")
 
-
 // End of argument list
 #define ARG_END    asm("push\tbc\n")
 
 // Terminate your custom statement and get back to the BASIC interpreter
 #define STMT_RET   asm("ld\tix,0x4000\nld\tsp,(0x4002)\njp\t0x09F2\n")
 
+#endif
 
 //////////////
 // ZX PRINTER
