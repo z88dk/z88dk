@@ -12,15 +12,15 @@
 #include <sys/time.h>
 
 #include <pthread.h>
-#include <unistd.h>
 #include <utstring.h>
 #include "debugger_gdb_packets.h"
 #include "sxmlc.h"
 #include "sxmlsearch.h"
 
 #ifdef WIN32
-#include <winsock2.h>
 #include <windows.h>
+#else
+#include <unistd.h>
 #endif
 
 #define SEC_TO_US(sec) ((sec)*1000000)
@@ -60,7 +60,7 @@ static uint8_t waiting_for_response = 0;
 static const char hexchars[] = "0123456789abcdef";
 static struct debugger_regs_t registers;
 #define MEM_FETCH_SIZE (32)
-static uint8_t mem_fetch[MEM_FETCH_SIZE] = {};
+static uint8_t mem_fetch[MEM_FETCH_SIZE] = {0};
 static uint16_t mem_requested_at = 0;
 static uint16_t mem_requested_amount = 0;
 static int connection_socket = 0;
@@ -113,7 +113,7 @@ static const char* register_mapping_names[] = {
     "clockh_",
 };
 
-static enum register_mapping_t register_mappings[32] = {};
+static enum register_mapping_t register_mappings[32] = {0};
 static int register_mappings_count = 0;
 
 void post_network_op(network_op_cb calllack, void* arg)
@@ -409,7 +409,7 @@ void set_regs(struct debugger_regs_t* regs)
     memcpy(&registers, regs, sizeof(struct debugger_regs_t));
 
 
-    uint16_t rr[32] = {};
+    uint16_t rr[32] = {0};
 
     for (int i = 0; i < register_mappings_count; i++) {
         enum register_mapping_t reg = register_mappings[i];

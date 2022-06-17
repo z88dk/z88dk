@@ -2,6 +2,9 @@
 #include "ticks.h"
 #include <time.h>
 #include <sys/time.h>
+#ifdef WIN32
+#include <WinSock2.h>
+#endif
 
 static time_t start_time = 0;
 

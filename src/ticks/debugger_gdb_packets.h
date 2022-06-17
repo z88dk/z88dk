@@ -8,6 +8,7 @@
 #ifdef WIN32
 #include <winsock2.h>
 typedef SOCKET sock_t;
+typedef SSIZE_T ssize_t;
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>

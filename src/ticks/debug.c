@@ -1173,7 +1173,8 @@ static int debug_get_symbol_address(debug_sym_symbol *s) {
 void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointer* frame_pointer, struct expression_result_t* into) {
     switch (sym->address_space.address_space) {
         case 'B': {
-            return debug_resolve_expression_element(&sym->type_record, sym->type_record.first, RESOLVE_BY_POINTER, frame_pointer->frame_pointer + sym->address_space.b, into);
+            debug_resolve_expression_element(&sym->type_record, sym->type_record.first, RESOLVE_BY_POINTER, frame_pointer->frame_pointer + sym->address_space.b, into);
+			return;
         }
         case 'E': {
             int addr = debug_get_symbol_address(sym);
@@ -1181,7 +1182,8 @@ void debug_get_symbol_value_expression(debug_sym_symbol* sym, debug_frame_pointe
                 into->type.first = malloc_type(TYPE_UNKNOWN);
                 return;
             }
-            return debug_resolve_expression_element(&sym->type_record, sym->type_record.first, RESOLVE_BY_POINTER, addr, into);
+            debug_resolve_expression_element(&sym->type_record, sym->type_record.first, RESOLVE_BY_POINTER, addr, into);
+			return;
         }
         default: {
             sprintf(into->as_error, "Incorrect address space (not implemented)");

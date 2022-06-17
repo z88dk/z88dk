@@ -29,26 +29,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
@@ -88,7 +88,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;WIN32_LEAN_AND_MEAN;UNIXEM_WINSOCK_IS_INCLUDED;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\ext\uthash\src;..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -118,7 +118,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;WIN32;WIN32_LEAN_AND_MEAN;UNIXEM_WINSOCK_IS_INCLUDED;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\ext\uthash\src;..\..\ext\UNIXem\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -172,7 +172,6 @@
     <ClCompile Include="..\..\src\ticks\cpu.c" />
     <ClCompile Include="..\..\src\ticks\debug.c" />
     <ClCompile Include="..\..\src\ticks\debugger.c" />
-    <ClCompile Include="..\..\src\ticks\debugger_mi2.c" />
     <ClCompile Include="..\..\src\ticks\debugger_ticks.c" />
     <ClCompile Include="..\..\src\ticks\disassembler_alg.c" />
     <ClCompile Include="..\..\src\ticks\expressions.tab.c" />
@@ -195,18 +194,17 @@
   <ItemGroup>
     <ClInclude Include="..\..\ext\uthash\src\uthash.h" />
     <ClInclude Include="..\..\src\ticks\backend.h" />
+    <ClInclude Include="..\..\src\ticks\breakpoints.h" />
     <ClInclude Include="..\..\src\ticks\cmds.h" />
     <ClInclude Include="..\..\src\ticks\cpu.h" />
     <ClInclude Include="..\..\src\ticks\debug.h" />
     <ClInclude Include="..\..\src\ticks\debugger.h" />
-    <ClInclude Include="..\..\src\ticks\debugger_gdb_packets.h" />
     <ClInclude Include="..\..\src\ticks\disassembler.h" />
     <ClInclude Include="..\..\src\ticks\expressions.tab.h" />
     <ClInclude Include="..\..\src\ticks\exp_engine.h" />
     <ClInclude Include="..\..\src\ticks\linenoise.h" />
+    <ClInclude Include="..\..\src\ticks\profiler.h" />
     <ClInclude Include="..\..\src\ticks\srcfile.h" />
-    <ClInclude Include="..\..\src\ticks\sxmlc.h" />
-    <ClInclude Include="..\..\src\ticks\sxmlsearch.h" />
     <ClInclude Include="..\..\src\ticks\syms.h" />
     <ClInclude Include="..\..\src\ticks\ticks.h" />
     <ClInclude Include="..\..\src\ticks\utf8.h" />
@@ -217,11 +215,13 @@
     <None Include="..\..\src\ticks\expressions.y" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\common\common.vcxproj">
+      <Project>{d7bc7a18-5bc5-4543-9f93-87a055319826}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\UNIXem\UNIXem.vcxproj">
       <Project>{7d0213a3-87fa-4f56-a5d6-cc23682acad8}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
