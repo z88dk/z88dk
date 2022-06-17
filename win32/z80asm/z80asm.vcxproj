@@ -227,6 +227,7 @@
     <ClInclude Include="..\..\src\z80asm\src\c\parse.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\parse_rules.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\queue.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\reloc_code.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\scan.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\scan_def.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\scan_rules.h" />
@@ -266,6 +267,7 @@
     <ClCompile Include="..\..\src\z80asm\src\c\opcodes.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\options.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\parse.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\reloc_code.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\scan.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\str.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\strhash.c" />

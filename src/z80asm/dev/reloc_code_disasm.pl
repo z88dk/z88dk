@@ -3,6 +3,7 @@
 # Show the source code of the z80asm reloc routine
 
 use Modern::Perl;
+use Path::Tiny;
 use CPU::Z80::Disassembler;
 
 my $reloc_code = 
@@ -18,3 +19,4 @@ $dis->code(0);
 
 $dis->write_dump;
 $dis->write_asm;
+path("reloc_code.ori")->spew_raw($reloc_code);
