@@ -3,7 +3,7 @@
 BEGIN { use lib 't2'; require 'testlib.pl'; }
 
 # BUG_0015: Relocation issue - dubious addresses come out of linking
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 				PUBLIC L1
 
 	    L1:		ld l,1		; 802C  2E 01
@@ -14,9 +14,9 @@ path("$test.asm")->spew(<<END);
 							; 8036
 END
 
-run_ok("./z88dk-z80asm -x$test.lib $test.asm");
+run_ok("z88dk-z80asm -x$test.lib $test.asm");
 
-path("$test.1.asm")->spew(<<END);
+spew("$test.1.asm", <<END);
 				PUBLIC A1, A2
 				EXTERN B1, B2, L1
 
@@ -32,7 +32,7 @@ path("$test.1.asm")->spew(<<END);
 							; 8016
 END
 
-path("$test.2.asm")->spew(<<END);
+spew("$test.2.asm", <<END);
 				PUBLIC B1, B2
 				EXTERN A1, A2, L1
 
@@ -52,7 +52,7 @@ path("$test.2.asm")->spew(<<END);
 							; 8036
 END
 
-run_ok("./z88dk-z80asm -l$test.lib -b -r0x8000 -o$test.bin $test.1.asm $test.2.asm");
+run_ok("z88dk-z80asm -l$test.lib -b -r0x8000 -o$test.bin $test.1.asm $test.2.asm");
 
 check_bin_file("$test.bin", bytes(0x3e, 0x01,
 								  0xcd, 0x16, 0x80,

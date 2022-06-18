@@ -25,9 +25,9 @@ my $bin = bytes(0xC9);
 # first run without -O
 unlink_testfiles;
 path($test_dir)->remove_tree;
-path("${test}.asm")->spew($asm);
+spew("${test}.asm", $asm);
 
-run_ok("./z88dk-z80asm -b -s -l -m -g ${test}.asm");
+run_ok("z88dk-z80asm -b -s -l -m -g ${test}.asm");
 check_bin_file("${test}.bin", $bin);
 
 for (@output) {
@@ -38,9 +38,9 @@ ok ! -d "${test_dir}", "no ${test_dir}";
 # second run with -O
 for my $dir ("${test_dir}", "${test_dir}/sub/dir/") {
 	unlink_testfiles;
-	path("${test}.asm")->spew($asm);
+	spew("${test}.asm", $asm);
 	
-	run_ok("./z88dk-z80asm -b -s -l -m -g -O${dir} ${test}.asm");
+	run_ok("z88dk-z80asm -b -s -l -m -g -O${dir} ${test}.asm");
 	check_bin_file("${dir}/${test}.bin", $bin);
 
 	ok -d ${dir}, ${dir};
@@ -54,11 +54,11 @@ for my $dir ("${test_dir}", "${test_dir}/sub/dir/") {
 unlink_testfiles;
 path($test_dir)->remove_tree;
 path("${test_dir}/src/s1/s2")->mkpath;
-path("${test_dir}/src/s1/s2/${test}.asm")->spew($asm);
+spew("${test_dir}/src/s1/s2/${test}.asm", $asm);
 
 my $output_dir = "${test_dir}/bin/${test_dir}/src/s1/s2";
 
-run_ok("./z88dk-z80asm -b -s -l -m -g ".
+run_ok("z88dk-z80asm -b -s -l -m -g ".
 	   "-O${test_dir}/bin ${test_dir}/src/s1/s2/${test}.asm");
 check_bin_file("${output_dir}/${test}.bin", $bin);
 

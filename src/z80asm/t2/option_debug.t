@@ -5,7 +5,7 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 # Test -debug info in map file
 
 # only ASM code
-path("${test}1.asm")->spew(<<END);
+spew("${test}1.asm", <<END);
 	public func
 
 	c_line 1, "${test}1.c"
@@ -18,7 +18,7 @@ func:
 	ret
 END
 
-path("${test}.asm")->spew(<<END);
+spew("${test}.asm", <<END);
 	extern func
 
 main:
@@ -26,7 +26,7 @@ main:
 	ret
 END
 
-run_ok("./z88dk-z80asm -b -m ${test}.asm ${test}1.asm");
+run_ok("z88dk-z80asm -b -m ${test}.asm ${test}1.asm");
 
 check_txt_file("${test}.map", <<'END');
 main                            = $0000 ; addr, local, , test_t2_option_debug, , test_t2_option_debug.asm:3
@@ -36,7 +36,7 @@ __tail                          = $000A ; const, public, def, , ,
 __size                          = $000A ; const, public, def, , ,
 END
 
-run_ok("./z88dk-z80asm -b -debug ${test}.asm ${test}1.asm");
+run_ok("z88dk-z80asm -b -debug ${test}.asm ${test}1.asm");
 
 check_txt_file("${test}.map", <<'END');
 main                            = $0000 ; addr, local, , test_t2_option_debug, , test_t2_option_debug.asm:3
@@ -53,21 +53,21 @@ END
 
 # ASM and C code
 unlink_testfiles();
-path("${test}1.asm")->spew(<<END);
+spew("${test}1.asm", <<END);
 	public _one
 _one:
 	ld hl, 1
 	ret
 END
 
-path("${test}.h")->spew(<<END);
+spew("${test}.h", <<END);
 // some
 // random
 extern int one();
 // lines
 END
 
-path("${test}.c")->spew(<<END);
+spew("${test}.c", <<END);
 #include "${test}.h"
 int main() {
 	return one()+one();
@@ -75,10 +75,10 @@ int main() {
 END
 
 run_ok("zcc +zx -m -debug ${test}.c ${test}1.asm -o ${test}.bin");
+
 (my $test_expanded = $test) =~ s/([^a-z0-9])/ sprintf("_%02x", ord($1)) /ige;
-run_ok("cat ${test}.map | ".
-	   "perl -ne 'next if /crt|generic_console/; ".
-				 "print if /${test_expanded}|_main|_one/' > ${test}1.map");
+my @map = grep {!/zcc|crt0/ && /$test_expanded|_main|_one/} path("${test}.map")->lines;
+spew("${test}1.map", @map);
 
 check_txt_file("${test}1.map", <<'END');
 __C_LINE_0_test_5ft2_5foption_5fdebug_2ec = $80CD ; addr, local, , test_t2_option_debug_c, , test_t2_option_debug.c:0

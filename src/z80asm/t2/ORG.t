@@ -85,7 +85,7 @@ for my $origin (0, 0x10000, 0x1234) {
 						 "0${origin_hex}h", "0${origin_hex}H", 
 						 "\$${origin_hex}") {
 		my $expected = bytes(0xc3, $origin & 0xff, ($origin >> 8) & 0xff);
-		z80asm_ok("-b '-r$origin_text'", "", "", <<END, $expected);
+		z80asm_ok("-b ".quote_os("-r$origin_text"), "", "", <<END, $expected);
 				org 0x1000
 		start:	jp start
 END
@@ -93,11 +93,11 @@ END
 }
 
 # command line range check
-capture_nok("./z88dk-z80asm -b -r-1", <<END);
+capture_nok("z88dk-z80asm -b -r-1", <<END);
 error: invalid origin (-r) option: -1
 END
 
-capture_nok("./z88dk-z80asm -b -r123Z", <<END);
+capture_nok("z88dk-z80asm -b -r123Z", <<END);
 error: invalid origin (-r) option: 123Z
 END
 
@@ -118,7 +118,7 @@ END_ERR
 
 # -split-bin, ORG -1
 unlink_testfiles;
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 	defw ASMPC
 	
 	section code
@@ -131,14 +131,14 @@ path("$test.asm")->spew(<<END);
 	org 0x4000
 	defw ASMPC
 END
-run_ok("./z88dk-z80asm -b $test.asm");
+run_ok("z88dk-z80asm -b $test.asm");
 check_bin_file("${test}.bin", 		words(0, 2, 4));
 ok ! -f "${test}_code.bin", "${test}_code.bin";
 ok ! -f "${test}_data.bin", "${test}_data.bin";
 check_bin_file("${test}_bss.bin",	words(0x4000));
 
 unlink_testfiles;
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 	defw ASMPC		; split file here
 	
 	section code	; split file here
@@ -151,14 +151,14 @@ path("$test.asm")->spew(<<END);
 	org 0x4000
 	defw ASMPC
 END
-run_ok("./z88dk-z80asm -b -split-bin $test.asm");
+run_ok("z88dk-z80asm -b -split-bin $test.asm");
 check_bin_file("${test}.bin", 		words(0));
 check_bin_file("${test}_code.bin", 	words(2));
 check_bin_file("${test}_data.bin", 	words(4));
 check_bin_file("${test}_bss.bin", 	words(0x4000));
 
 unlink_testfiles;
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 	defw ASMPC
 	
 	section code
@@ -172,7 +172,7 @@ path("$test.asm")->spew(<<END);
 	org -1
 	defw ASMPC
 END
-run_ok("./z88dk-z80asm -b $test.asm");
+run_ok("z88dk-z80asm -b $test.asm");
 check_bin_file("${test}.bin", 		words(0, 2));
 ok ! -f "${test}_code.bin", "${test}_code.bin";
 check_bin_file("${test}_data.bin", 	words(0x4000));

@@ -12,7 +12,7 @@ if (!$got_zsdcc) {
 }
 else {
 	path("$test.dir")->mkpath;
-	path("$test.dir/test.c")->spew(<<END_C);
+	spew("$test.dir/test.c", <<END_C);
 char f(char a) {
 	return (a >> 4);		/* translated to "swap a" */
 }
@@ -23,10 +23,10 @@ int main() {
 END_C
 
 	run_ok("zcc +zxn --list -o $test.dir/test $test.dir/test.c");
-	run_ok("grep -w swap $test.dir/test.c.lis");
+	ok scalar(grep {/\bswap\b/} path("$test.dir/test.c.lis")->lines), "found swap";
 
 	run_ok("zcc +zx  --list -o $test.dir/test $test.dir/test.c");
-	run_nok("grep -w swap $test.dir/test.c.lis");
+	ok !scalar(grep {/\bswap\b/} path("$test.dir/test.c.lis")->lines), "did not found swap";
 
 	path("$test.dir")->remove_tree if Test::More->builder->is_passing;
 }

@@ -26,7 +26,7 @@ $test.asm:1: error: syntax error
   ^---- include "test_t2_INCLUDE.inc" extra
 END_ERR
 
-path("$test.inc")->spew(<<END);
+spew("$test.inc", <<END);
 		ld a, 10
 END
 
@@ -40,12 +40,12 @@ END
 #-------------------------------------------------------------------------------
 # no directories, multiple levels
 #-------------------------------------------------------------------------------
-path("$test.0.inc")->spew(<<END);
+spew("$test.0.inc", <<END);
 		ld a, 10
 END
 for my $n (1..9) { 
 	my $n1 = $n-1;
-	path("$test.$n.inc")->spew(<<END);
+	spew("$test.$n.inc", <<END);
 l$n1:	include "$test.$n1.inc"
 		defb	$n
 END
@@ -60,7 +60,7 @@ END
 #-------------------------------------------------------------------------------
 path("$test.dir")->mkpath;
 
-path("$test.dir/test.inc")->spew(<<END);
+spew("$test.dir/test.inc", <<END);
 		ld a, 10
 END
 
@@ -101,13 +101,13 @@ path("$test.dir")->remove_tree if Test::More->builder->is_passing;
 #-------------------------------------------------------------------------------
 path("$test.dir")->mkpath;
 
-path("$test.dir/test.inc")->spew(<<END);
+spew("$test.dir/test.inc", <<END);
 		ld a, 10
 END
-path("$test.dir/test.asm")->spew(<<END);
+spew("$test.dir/test.asm", <<END);
 		include "test.inc"
 END
-run_ok("./z88dk-z80asm -b $test.dir/test.asm");
+run_ok("z88dk-z80asm -b $test.dir/test.asm");
 check_bin_file("$test.dir/test.bin", bytes(0x3e, 10));
 
 path("$test.dir")->remove_tree if Test::More->builder->is_passing;
@@ -127,7 +127,7 @@ ok ! -f "$test.lib", "$test.lib does not exist";
 #-------------------------------------------------------------------------------
 # include recursion
 #-------------------------------------------------------------------------------
-path("$test.inc")->spew(<<END);
+spew("$test.inc", <<END);
 		include "$test.asm"
 END
 z80asm_nok("", "", <<END_ASM, <<END_ERR);

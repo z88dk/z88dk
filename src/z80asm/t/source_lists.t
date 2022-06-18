@@ -14,7 +14,7 @@ use File::Path 'make_path';
 require './t/testlib.pl';
 
 make_test_files();
-run('./z88dk-z80asm -b test1.asm test2.asm test3.asm test4.asm');
+run('z88dk-z80asm -b test1.asm test2.asm test3.asm test4.asm');
 check_bin_file("test1.bin", pack("C*", 1..4));
 
 # list file with blank lines and comments
@@ -35,7 +35,7 @@ spew("test2.lst",
 	"test4.asm".
 	"\n");
 
-run('./z88dk-z80asm -b test1.asm "@test1.lst"');
+run('z88dk-z80asm -b test1.asm "@test1.lst"');
 check_bin_file("test1.bin", pack("C*", 1..4));
 
 # recursive includes
@@ -51,7 +51,7 @@ spew("test2.lst",
 	"test2.asm".
 	"  \r\r\n\n  \@ ".
 	"test1.lst");
-run('./z88dk-z80asm -b test1.asm "@test1.lst"', 1, "", <<'ERR');
+run('z88dk-z80asm -b test1.asm "@test1.lst"', 1, "", <<'ERR');
 test2.lst:7: error: include recursion: test1.lst
   ^---- @ test1.lst
 ERR
@@ -60,7 +60,7 @@ ERR
 make_test_files();
 $ENV{TEST_ENV} = 'test';
 
-run('./z88dk-z80asm -b "${TEST_ENV}1.asm" "${TEST_ENV}2.asm" "${TEST_ENV}3.asm" "${TEST_ENV}4.asm"');
+run('z88dk-z80asm -b "${TEST_ENV}1.asm" "${TEST_ENV}2.asm" "${TEST_ENV}3.asm" "${TEST_ENV}4.asm"');
 check_bin_file("test1.bin", pack("C*", 1..4));
 
 make_test_files();
@@ -77,14 +77,14 @@ spew("test2.lst", <<'END');
   ${TEST_ENV}4.asm
 END
 
-run('./z88dk-z80asm -b "@test1.lst"');
+run('z88dk-z80asm -b "@test1.lst"');
 check_bin_file("test1.bin", pack("C*", 1..4));
 
 # non-existent environment variable is empty
 delete $ENV{TEST_ENV};
 
 make_test_files();
-run('./z88dk-z80asm -b "te${TEST_ENV}st1.asm" "te${TEST_ENV}st2.asm" "te${TEST_ENV}st3.asm" "te${TEST_ENV}st4.asm"');
+run('z88dk-z80asm -b "te${TEST_ENV}st1.asm" "te${TEST_ENV}st2.asm" "te${TEST_ENV}st3.asm" "te${TEST_ENV}st4.asm"');
 check_bin_file("test1.bin", pack("C*", 1..4));
 
 make_test_files();
@@ -101,14 +101,14 @@ spew("test2.lst", <<'END');
   te${TEST_ENV}st4.asm
 END
 
-run('./z88dk-z80asm -b "@test1.lst"');
+run('z88dk-z80asm -b "@test1.lst"');
 check_bin_file("test1.bin", pack("C*", 1..4));
 
 # use globs in command line
 # Note: only relevant for Windows as Unix expands the command line 
 # before calling the command
 make_test_files("test_dir");
-run('./z88dk-z80asm -b "test_dir/*.asm"');
+run('z88dk-z80asm -b "test_dir/*.asm"');
 check_bin_file("test_dir/test1.bin", pack("C*", 1..4));
 
 # use globs in list file
@@ -116,7 +116,7 @@ make_test_files("test_dir");
 spew("test1.lst", <<'END');
 	test_dir/*.asm
 END
-run('./z88dk-z80asm -b "@test1.lst"');
+run('z88dk-z80asm -b "@test1.lst"');
 check_bin_file("test_dir/test1.bin", pack("C*", 1..4));
 
 # error if no files are returned
@@ -125,7 +125,7 @@ mkdir("test_dir");
 spew("test1.lst", <<'END');
 	test_dir/*.asm
 END
-run('./z88dk-z80asm -b "@test1.lst"', 1, "", <<'ERR');
+run('z88dk-z80asm -b "@test1.lst"', 1, "", <<'ERR');
 test1.lst:1: error: pattern returned no files: test_dir/*.asm
   ^---- test_dir/*.asm
 ERR
@@ -138,7 +138,7 @@ END
 for (1..4) {
 	spew("test_dir/test$_.lst", "test_dir/test$_.asm");
 }
-run('./z88dk-z80asm -b "@test1.lst"');
+run('z88dk-z80asm -b "@test1.lst"');
 check_bin_file("test_dir/test1.bin", pack("C*", 1..4));
 
 # use ** glob for any number of directories
@@ -153,11 +153,11 @@ for (1..4) {
 spew("test1.lst", <<'END');
 	test_dir/**/*.asm
 END
-run('./z88dk-z80asm -b "@test1.lst"');
+run('z88dk-z80asm -b "@test1.lst"');
 check_bin_file("test_dir/1/a/b/test1.bin", pack("C*", 1..4));
 
 # run again, .o files are not read as asm
-run('./z88dk-z80asm -b "@test1.lst"');
+run('z88dk-z80asm -b "@test1.lst"');
 check_bin_file("test_dir/1/a/b/test1.bin", pack("C*", 1..4));
 
 unlink_testfiles();

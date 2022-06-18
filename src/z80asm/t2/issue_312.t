@@ -214,7 +214,7 @@ my $HOR = 1;
 my $VER = 2; 
 my $REG = 3; 
 my $VAL = 4;
-path("${test}1.asm")->spew(<<END);
+spew("${test}1.asm", <<END);
 	public VER,HOR,REG,VAL
 	defc VER = $VER
 	defc HOR = $HOR
@@ -222,15 +222,15 @@ path("${test}1.asm")->spew(<<END);
 	defc VAL = $VAL
 END
 
-path("${test}.asm")->spew(<<END);
+spew("${test}.asm", <<END);
 	extern VER,HOR,REG,VAL
 	cu.wait VER,HOR
 	cu.move REG,VAL
 END
 
-capture_ok("./z88dk-z80asm ${test}1.asm", "");
+capture_ok("z88dk-z80asm ${test}1.asm", "");
 
-capture_ok("./z88dk-z80asm -b -mz80n ${test}.asm ${test}1.o", "");
+capture_ok("z88dk-z80asm -b -mz80n ${test}.asm ${test}1.o", "");
 
 check_bin_file("${test}.bin", 
 	pack("n*", 0x8000 + ($HOR << 9) + $VER, ($REG << 8) + $VAL));

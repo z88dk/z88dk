@@ -2,7 +2,7 @@
 
 BEGIN { use lib 't2'; require 'testlib.pl'; }
 
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 REPTC var, 45
 defb var
 ENDR
@@ -18,7 +18,7 @@ RST 38h
 END
 
 # list 
-run_ok("./z88dk-z80asm -b -l $test.asm");
+run_ok("z88dk-z80asm -b -l $test.asm");
 check_bin_file("$test.bin", "45".bytes(0xff)."23".bytes(0xff));
 check_txt_file("$test.lis", <<END);
 test_t2_issue_1928.asm:
@@ -39,7 +39,7 @@ END
 
 
 # verbose list
-run_ok("./z88dk-z80asm -b -l -v $test.asm >/dev/null");
+run_ok("z88dk-z80asm -b -l -v $test.asm > $null");
 check_bin_file("$test.bin", "45".bytes(0xff)."23".bytes(0xff));
 check_txt_file("$test.lis", <<END);
 test_t2_issue_1928.asm:

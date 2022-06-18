@@ -18,7 +18,7 @@ my $bin = "";
 for my $n (1 .. $NUM_FILES) {
 	my $id = sprintf("%04d", $n);
 	unlink("${test}_$id.o", "${test}_$id.bin", "${test}_$id.err");
-    path("${test}_$id.asm")->spew(<<END);
+    spew("${test}_$id.asm", <<END);
 		public lbl$id
 		defw $n
 		defc lbl$id = $n
@@ -29,19 +29,19 @@ END
 
 # assemble
 unlink "${test}_0001.bin";
-path("${test}.lst")->spew(join("\n", @list), "\n");
-run_ok("./z88dk-z80asm -b \"\@${test}.lst\"");
+spew("${test}.lst", join("\n", @list), "\n");
+run_ok("z88dk-z80asm -b \"\@${test}.lst\"");
 check_bin_file("${test}_0001.bin", $bin);
 
 # link only
 unlink "${test}_0001.bin";
 for (@list) { unlink "$_.asm"; }
-run_ok("./z88dk-z80asm -b \"\@${test}.lst\"");
+run_ok("z88dk-z80asm -b \"\@${test}.lst\"");
 check_bin_file("${test}_0001.bin", $bin);
 
 # make library
 unlink "${test}.lib";
-run_ok("./z88dk-z80asm -b -x${test} \"\@${test}.lst\"");
+run_ok("z88dk-z80asm -b -x${test} \"\@${test}.lst\"");
 ok -f "${test}.lib";
 
 # use library

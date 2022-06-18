@@ -16,11 +16,11 @@ use File::Path 'remove_tree';
 
 my @TEST_EXT = qw( asm bin c h d dat def err inc lis lst map o P out sym tap reloc );
 
-# run z80asm from .
-$ENV{PATH} = ".".$Config{path_sep}.$ENV{PATH};
-
 # add path to z80asm top directory
 _prepend_path(_root());
+
+# run z80asm from .
+$ENV{PATH} = ".".$Config{path_sep}.$ENV{PATH};
 
 #------------------------------------------------------------------------------
 # Portability
@@ -82,7 +82,7 @@ sub z80asm {
 	$options //= "-b";
 	
 	spew("test.asm", $source);
-	run("./z88dk-z80asm $options test.asm", $return, $out, $err);
+	run("z88dk-z80asm $options test.asm", $return, $out, $err);
 }
 
 sub appmake {

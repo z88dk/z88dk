@@ -53,8 +53,8 @@ my $asm = "section code\norg $code_addr\n".code_asm("").
 		  "section data\n".data_asm("2");
 
 unlink_testfiles;
-path("${test}.asm")->spew($asm);
-capture_ok("./z88dk-z80asm -b -m -reloc-info ${test}.asm", "");
+spew("${test}.asm", $asm);
+capture_ok("z88dk-z80asm -b -m -reloc-info ${test}.asm", "");
 
 ok ! -f "${test}.bin", "no empty section";
 ok ! -f "${test}.reloc", "no empty section";
@@ -97,7 +97,7 @@ END
 # with -R, one module
 
 unlink_testfiles;
-path("${test}.asm")->spew($asm);
+spew("${test}.asm", $asm);
 
 # same asm in default section
 my $asm = code_asm("").code_asm("1").code_asm("2").
@@ -106,7 +106,7 @@ my $asm = code_asm("").code_asm("1").code_asm("2").
 my @reloc = reloc_addrs($asm);
 my $reloc_header = reloc_header(@reloc);
 
-capture_ok("./z88dk-z80asm -b -m -R ${test}.asm 2>${test}.err", 
+capture_ok("z88dk-z80asm -b -m -R ${test}.asm 2>${test}.err", 
 		"Relocation header is ".length($reloc_header)." bytes.\n");
 
 check_txt_file("${test}.err", <<END);
@@ -144,28 +144,28 @@ END
 # without -R, several modules
 
 unlink_testfiles;
-path("${test}.asm")->spew(
+spew("${test}.asm", 
 		"section code\norg $code_addr\n".
 		"public start,string\nextern start,start1,start2,string,string1,string2\n".
 		code_asm("").
 		"section data\norg $data_addr\n".
 		data_asm(""));
 
-path("${test}1.asm")->spew(
+spew("${test}1.asm", 
 		"section code\n".
 		"public start1,string1\nextern start,start1,start2,string,string1,string2\n".
 		code_asm("1").
 		"section data\n".
 		data_asm("1"));
 
-path("${test}2.asm")->spew(
+spew("${test}2.asm", 
 		"section code\n".
 		"public start2,string2\nextern start,start1,start2,string,string1,string2\n".
 		code_asm("2").
 		"section data\n".
 		data_asm("2"));
 
-capture_ok("./z88dk-z80asm -b -m -reloc-info ${test}.asm ${test}1.asm ${test}2.asm", "");
+capture_ok("z88dk-z80asm -b -m -reloc-info ${test}.asm ${test}1.asm ${test}2.asm", "");
 ok ! -f "${test}.bin";
 ok ! -f "${test}.reloc";
 
@@ -207,21 +207,21 @@ END
 # with -R, several modules
 
 unlink_testfiles;
-path("${test}.asm")->spew(
+spew("${test}.asm", 
 		"section code\norg $code_addr\n".
 		"public start,string\nextern start,start1,start2,string,string1,string2\n".
 		code_asm("").
 		"section data\norg $data_addr\n".
 		data_asm(""));
 		
-path("${test}1.asm")->spew(
+spew("${test}1.asm", 
 		"section code\n".
 		"public start1,string1\nextern start,start1,start2,string,string1,string2\n".
 		code_asm("1").
 		"section data\n".
 		data_asm("1"));
 		
-path("${test}2.asm")->spew(
+spew("${test}2.asm", 
 		"section code\n".
 		"public start2,string2\nextern start,start1,start2,string,string1,string2\n".
 		code_asm("2").
@@ -234,7 +234,7 @@ $asm = code_asm("").code_asm("1").code_asm("2").
 @reloc = reloc_addrs($asm);
 $reloc_header = reloc_header(@reloc);
 
-capture_ok("./z88dk-z80asm -b -m -R ${test}.asm ${test}1.asm ${test}2.asm ".
+capture_ok("z88dk-z80asm -b -m -R ${test}.asm ${test}1.asm ${test}2.asm ".
 		   "2>${test}.err", 
 		   "Relocation header is ".length($reloc_header)." bytes.\n");
 
@@ -277,7 +277,7 @@ END
 # without -R, several sections
 
 unlink_testfiles;
-path("${test}.asm")->spew(<<END.
+spew("${test}.asm", <<END.
 	section code
 	section code1
 	section code2
@@ -296,7 +296,7 @@ END
 	"section data1\n".data_asm("1").
 	"section data2\n".data_asm("2"));
 	
-capture_ok("./z88dk-z80asm -b -m -reloc-info ${test}.asm", "");
+capture_ok("z88dk-z80asm -b -m -reloc-info ${test}.asm", "");
 
 ok ! -f "${test}.bin";
 ok ! -f "${test}.reloc";
@@ -373,9 +373,9 @@ sub test_reloc {
 	# -R
 	for my $options ('-R', '-R -reloc-info') {
 		unlink_testfiles;
-		path("${test}.asm")->spew($asm);
+		spew("${test}.asm", $asm);
 		
-		capture_ok("./z88dk-z80asm -b $options ${test}.asm", 
+		capture_ok("z88dk-z80asm -b $options ${test}.asm", 
 				"Relocation header is ".length($reloc_header)." bytes.\n");
 						 
 		check_bin_file("${test}.bin", $reloc_header.$bin0);
@@ -384,17 +384,17 @@ sub test_reloc {
 
 	# no -R, no -reloc-info
 	unlink_testfiles;
-	path("${test}.asm")->spew("org 1\n".$asm);
+	spew("${test}.asm", "org 1\n".$asm);
 	
-	capture_ok("./z88dk-z80asm -b ${test}.asm", "");
+	capture_ok("z88dk-z80asm -b ${test}.asm", "");
 	check_bin_file("${test}.bin", $bin1);
 	ok ! -f "${test}.reloc";
 	
 	# no -R, -reloc-info
 	unlink_testfiles;
-	path("${test}.asm")->spew("org 1\n".$asm);
+	spew("${test}.asm", "org 1\n".$asm);
 	
-	capture_ok("./z88dk-z80asm -b -reloc-info ${test}.asm", "");
+	capture_ok("z88dk-z80asm -b -reloc-info ${test}.asm", "");
 	check_bin_file("${test}.bin", $bin1);
 	check_bin_file("${test}.reloc", pack("v*", @reloc));
 }	

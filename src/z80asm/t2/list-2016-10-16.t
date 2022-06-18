@@ -6,7 +6,7 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 # alvin (alvin_albrecht@hotmail.com) <lists@suborbital.org.uk> 	Sun, Oct 16, 2016 at 6:30 PM
 # JR across sections generate wrong code
 for my $op ("jr", "djnz", "jr nc,") {
-	path("$test.asm")->spew(<<END);
+	spew("$test.asm", <<END);
 		SECTION LOADER
 		$op 0+(pietro_loader)
 		
@@ -14,7 +14,7 @@ for my $op ("jr", "djnz", "jr nc,") {
 	pietro_loader:
 		ret
 END
-	capture_nok("./z88dk-z80asm -b $test.asm", <<END);
+	capture_nok("z88dk-z80asm -b $test.asm", <<END);
 $test.asm:2: error: relative jump address not local
   ^---- 0+(pietro_loader)
 END

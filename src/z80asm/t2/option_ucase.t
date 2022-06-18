@@ -2,13 +2,13 @@
 
 BEGIN { use lib 't2'; require 'testlib.pl'; }
 
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 SubRoutine: ret
 Main:       call SubRoutine
 END
 
 # no -ucase
-run_ok("./z88dk-z80asm -b -m $test.asm");
+run_ok("z88dk-z80asm -b -m $test.asm");
 
 check_bin_file("$test.bin", bytes(0xc9, 0xcd, 0, 0));
 
@@ -33,7 +33,7 @@ Object  file $test.o at \$0000: Z80RMF16
 END
 
 # with -ucase
-run_ok("./z88dk-z80asm -b -m -ucase $test.asm");
+run_ok("z88dk-z80asm -b -m -ucase $test.asm");
 
 check_bin_file("$test.bin", bytes(0xc9, 0xcd, 0, 0));
 

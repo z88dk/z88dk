@@ -3,7 +3,7 @@
 BEGIN { use lib 't2'; require 'testlib.pl'; }
 
 # BUG_0043: buffer overflow on constants longer than 128 chars in object file
-path("$test.1.asm")->spew(<<END);
+spew("$test.1.asm", <<END);
 		public one
 		defc one = 1
 END

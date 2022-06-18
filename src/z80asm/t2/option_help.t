@@ -2,11 +2,11 @@
 
 BEGIN { use lib 't2'; require 'testlib.pl'; }
 
-my $config = path("../config.h")->slurp;
+my $config = slurp("../config.h");
 my($version) = $config =~ /Z88DK_VERSION\s*"(.*)"/;
 ok $version, "version $version";
 
-capture_ok("./z88dk-z80asm -h", <<"END");
+capture_ok("z88dk-z80asm -h", <<"END");
 Z80 Macro Assembler $version
 (c) InterLogic 1993-2009, Paulo Custodio 2011-2022
 
@@ -84,7 +84,7 @@ Appmake Options:
                          for above RAMTOP
 END
 
-capture_nok("./z88dk-z80asm -h=x", <<END);
+capture_nok("z88dk-z80asm -h=x", <<END);
 error: illegal option: -h=x
 END
 

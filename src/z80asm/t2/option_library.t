@@ -10,12 +10,12 @@ my $lib_dir  = "t/data";
 my $lib_base = "${test}.lib";
 my $lib = "$lib_dir/$lib_base";
 
-path("${test}.asm")->spew(<<END);
+spew("${test}.asm", <<END);
 	PUBLIC main
 main: ret
 END
 
-run_ok("./z88dk-z80asm -x$lib ${test}.asm");
+run_ok("z88dk-z80asm -x$lib ${test}.asm");
 ok -f $lib, "library created";
 
 my $asm = <<END;
@@ -50,67 +50,67 @@ unlink_testfiles($lib);
 # link objects and libs
 # library modules are loaded in alpha-sequence of labels, starting at 10
 unlink_testfiles;
-path("${test}1.asm")->spew(<<END);
+spew("${test}1.asm", <<END);
 	PUBLIC A1
 A1:	defb 1
 END
 
-path("${test}2.asm")->spew(<<END);
+spew("${test}2.asm", <<END);
 	PUBLIC A2
 A2:	defb 2
 END
 
-path("${test}3.asm")->spew(<<END);
+spew("${test}3.asm", <<END);
 	PUBLIC A3
 A3:	defb 3
 END
 
-capture_ok("./z88dk-z80asm ".
+capture_ok("z88dk-z80asm ".
 		   "-x${test}1.lib ${test}1.asm ${test}2.asm ${test}3.asm", "");
 ok -f "${test}1.lib";
 
-path("${test}4.asm")->spew(<<END);
+spew("${test}4.asm", <<END);
 	PUBLIC A4
 A4:	defb 4
 END
 
-path("${test}5.asm")->spew(<<END);
+spew("${test}5.asm", <<END);
 	PUBLIC A5
 A5:	defb 5
 END
 
-path("${test}6.asm")->spew(<<END);
+spew("${test}6.asm", <<END);
 	PUBLIC A6
 A6:	defb 6
 END
 
-capture_ok("./z88dk-z80asm ".
+capture_ok("z88dk-z80asm ".
 		   "-x${test}2.lib ${test}4.asm ${test}5.asm ${test}6.asm", "");
 ok -f "${test}2.lib";
 
-path("${test}.asm")->spew(<<END);
+spew("${test}.asm", <<END);
 A0:	
 	EXTERN A1,A2,A3,A4,A5,A6,A7,A8,A9
 	defb   A1,A2,A3,A4,A5,A6,A7,A8,A9
 	defb   0
 END
 
-path("${test}7.asm")->spew(<<END);
+spew("${test}7.asm", <<END);
 	PUBLIC A7
 A7:	defb 7
 END
 
-path("${test}8.asm")->spew(<<END);
+spew("${test}8.asm", <<END);
 	PUBLIC A8
 A8:	defb 8
 END
 
-path("${test}9.asm")->spew(<<END);
+spew("${test}9.asm", <<END);
 	PUBLIC A9
 A9: defb 9
 END
 
-capture_ok("./z88dk-z80asm ".
+capture_ok("z88dk-z80asm ".
 		   "-l -b -l${test}1.lib -l${test}2.lib ".
 		   "${test}.asm ${test}7.asm ${test}8.asm ${test}9.asm", "");
 ok -f "${test}.bin";
@@ -123,7 +123,7 @@ check_bin_file("${test}.bin",
 
 # PUBLIC and EXTERN
 unlink_testfiles;
-path("${test}1.asm")->spew(<<END);
+spew("${test}1.asm", <<END);
 	PUBLIC func_1
 	PUBLIC func_2
 func_1:
@@ -133,20 +133,20 @@ func_2:
 	ret
 END
 
-path("${test}2.asm")->spew(<<END);
+spew("${test}2.asm", <<END);
 	EXTERN  func_2
 	call func_2
 	ret
 END
 
 # link object files
-capture_ok("./z88dk-z80asm -b ${test}2.asm ${test}1.asm", "");
+capture_ok("z88dk-z80asm -b ${test}2.asm ${test}1.asm", "");
 check_bin_file("${test}2.bin", 
 		bytes(0xCD, 0x06, 0x00, 0xC9, 0x3E, 0x01, 0x3E, 0x02, 0xC9));
 
 # link library files
-capture_ok("./z88dk-z80asm -x${test}1.lib ${test}1.asm", "");
-capture_ok("./z88dk-z80asm -b -l${test}1.lib ${test}2.asm", "");
+capture_ok("z88dk-z80asm -x${test}1.lib ${test}1.asm", "");
+capture_ok("z88dk-z80asm -b -l${test}1.lib ${test}2.asm", "");
 check_bin_file("${test}2.bin", 
 		bytes(0xCD, 0x06, 0x00, 0xC9, 0x3E, 0x01, 0x3E, 0x02, 0xC9));
 

@@ -295,7 +295,7 @@ END
 # include file
 unlink_testfiles;
 
-path("${test}.inc")->spew(<<END);
+spew("${test}.inc", <<END);
 	ld a, A1
 	ld b, B1
 	add a, b

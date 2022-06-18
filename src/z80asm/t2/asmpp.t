@@ -444,7 +444,7 @@ END
 #------------------------------------------------------------------------------
 run_ok("perl asmpp.pl --ucase -l -b -It/data CAMEL80.AZM");
 
-check_bin_file("CAMEL80.bin", path("t/data/CAMEL80.COM")->slurp_raw);
+check_bin_file("CAMEL80.bin", slurp("t/data/CAMEL80.COM"));
 
 unlink_testfiles(qw( 
 	CAMEL80.i CAMEL80.o CAMEL80.sym CAMEL80.lis CAMEL80.map 
@@ -459,7 +459,7 @@ sub t_asmpp_ok {
 	my($in, $args, $bin) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-	path("${test}.asm")->spew($in);
+	spew("${test}.asm", $in);
 	unlink("${test}.bin");
 	run_ok("perl asmpp.pl -b $args ${test}.asm");
 	check_bin_file("${test}.bin", $bin);
@@ -470,7 +470,7 @@ sub t_asmpp_error {
 	my($in, $args, $error) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-	path("${test}.asm")->spew($in);
+	spew("${test}.asm", $in);
 	run_nok("perl asmpp.pl -b $args ${test}.asm 2> ${test}.err");
 	check_txt_file("${test}.err", $error);
 }

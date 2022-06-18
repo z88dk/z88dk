@@ -52,7 +52,7 @@ ici:
     DEFC toto = ici %8
     defw _main, ici, toto
 END
-run("./z88dk-z80asm -m -b -r$org test.asm");
+run("z88dk-z80asm -m -b -r$org test.asm");
 check_bin_file("test.bin", pack("v*", $org, $org, $org % 8));
 test_map("test.map");
 

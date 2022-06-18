@@ -3,7 +3,7 @@
 BEGIN { use lib 't2'; require 'testlib.pl'; }
 
 # cannot specify name of generated object file
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 		public test_function
 test_function:  ret
 local_function: ret
@@ -11,7 +11,7 @@ END
 
 # assemble
 unlink "$test.o";
-run_ok("./z88dk-z80asm $test.asm");
+run_ok("z88dk-z80asm $test.asm");
 ok -f "$test.o", "$test.o exists";
 
 capture_ok("z88dk-z80nm -a $test.o", <<END);
@@ -27,7 +27,7 @@ END
 # assemble to a new object file in a different directory
 unlink "$test.o";
 path("$test.dir")->mkpath;
-run_ok("./z88dk-z80asm -O$test.dir -ozcc0000.o $test.asm");
+run_ok("z88dk-z80asm -O$test.dir -ozcc0000.o $test.asm");
 ok ! -f "$test.o", "no $test.o";
 ok -f "$test.dir/zcc0000.o", "$test.dir/zcc0000.o exists";
 

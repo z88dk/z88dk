@@ -91,14 +91,14 @@ z80asm_ok("", "", "",
 		'#define ret nop'		=> "",
 		'ret'					=> bytes(0));
 
-path("$test.1.asm")->spew(<<END);
+spew("$test.1.asm", <<END);
 #define ret nop
 END
-path("$test.2.asm")->spew(<<END);
+spew("$test.2.asm", <<END);
 ret
 END
 
-run_ok("./z88dk-z80asm -b $test.1.asm $test.2.asm");
+run_ok("z88dk-z80asm -b $test.1.asm $test.2.asm");
 check_bin_file("$test.1.bin", bytes(0xc9));
 
 z80asm_ok("", "", "",

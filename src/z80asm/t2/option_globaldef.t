@@ -33,16 +33,16 @@ my $bin = bytes(0x06, 0x0A, 0x10, 0xFE, 0x00, 0x00, 0xC9);
 
 # no -g
 unlink_testfiles;
-path("${test}.asm")->spew($asm);
-path("${test}1.asm")->spew($asm1);
-run_ok("./z88dk-z80asm -b ${test}.asm ${test}1.asm");
+spew("${test}.asm", $asm);
+spew("${test}1.asm", $asm1);
+run_ok("z88dk-z80asm -b ${test}.asm ${test}1.asm");
 ok !-f "${test}.def", "no definitions file";
 
 # -g
 unlink_testfiles;
-path("${test}.asm")->spew($asm);
-path("${test}1.asm")->spew($asm1);
-run_ok("./z88dk-z80asm -b -g ${test}.asm ${test}1.asm");
+spew("${test}.asm", $asm);
+spew("${test}1.asm", $asm1);
+run_ok("z88dk-z80asm -b -g ${test}.asm ${test}1.asm");
 ok -f "${test}.def", "no definitions file";
 check_txt_file("${test}.def", <<END);
 DEFC main                            = \$0000
