@@ -90,7 +90,6 @@ void read_symbol_file(char *filename)
                     if ( strcmp(argv[0] + len - 5, "_size") == 0 ) {
                         int size = strtol(!isxdigit(argv[2][0]) ? &argv[2][1] : argv[2], NULL, 16);
                         if ( size != 0 ) {
-                            symbol *sym;
                             int     start;
                             strcpy(argv[0]+len - 5, "_head");
                             if ((start = symbol_resolve(argv[0], NULL)) != -1 ) { // Looking for __head
@@ -175,7 +174,6 @@ void read_symbol_file(char *filename)
                 int    lineno;
                 int    level;;
                 int    scope_block;
-                char  *ptr;
 
                 demangle_filename(argv[9], filename, funcname, &lineno,&level, &scope_block);;
                 debug_add_cline(filename, funcname, lineno, level, scope_block, argv[2]);
@@ -219,7 +217,6 @@ int symbol_resolve(char *name, const char *filename)
     }
 
     symbol *sym;
-    char   *ptr;
 
     HASH_FIND_STR(global_symbols, name, sym);
     if ( sym != NULL ) {

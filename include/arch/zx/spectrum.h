@@ -284,8 +284,33 @@ main(unsigned int arg2, char *arg1)
 // The macros will also fire a "Nonsense in BASIC" message when the argument type is wrong
 // Arguments must be declared in reverse order but captured sequentially
 
+
+#ifdef __TS2068__
+
 // int
-#define ARG_INT   asm("rst\t0x20\ncall\t0x1C82\ncall\t0x2DA2\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\n   push\tbc\n")
+#define ARG_INT    asm("rst\t0x20\ncall\t0x1BE5\ncall\t0x3160\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\npush\tbc\n")
+
+// unsigned int
+#define ARG_UINT   asm("rst\t0x20\ncall\t0x1BE5\ncall\t0x3160\npush\tbc\n")
+
+// void *, struct, char *...
+#define ARG_PTR    asm("rst\t0x20\ncall\t0x1BEF\ncall\t0x2FAF\npush\tde\n")
+
+// C style strings (adds the string termination automatically)
+#define ARG_STR    asm("rst\t0x20\ncall\t0x1BEF\nld\tde,0x040F\nld\tbc,1\ncall\t0x2E70\ncall\t0x39B7\ncall\t0x2FAF\npush\tde\n")
+
+// End of argument list
+#define ARG_END    asm("push\tbc\n")
+
+// Terminate your custom statement and get back to the BASIC interpreter
+#define STMT_RET   asm("ld\tiy,0x5C3A\nld\tsp,(0x5C3D)\njp\t0x1AB9\n")
+
+
+#else
+
+
+// int
+#define ARG_INT    asm("rst\t0x20\ncall\t0x1C82\ncall\t0x2DA2\ndefb\t0x28,7\nld\thl,0\nsbc\thl,bc\nld\tb,h\nld\tc,l\npush\tbc\n")
 
 // unsigned int
 #define ARG_UINT   asm("rst\t0x20\ncall\t0x1C82\ncall\t0x2DA2\npush\tbc\n")
@@ -301,6 +326,8 @@ main(unsigned int arg2, char *arg1)
 
 // Terminate your custom statement and get back to the BASIC interpreter
 #define STMT_RET   asm("ld\tiy,0x5C3A\nld\tsp,(0x5C3D)\njp\t0x1b76\n")
+
+#endif
 
 
 

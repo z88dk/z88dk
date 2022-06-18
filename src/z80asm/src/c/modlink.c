@@ -16,6 +16,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "modlink.h"
 #include "options.h"
 #include "parse.h"
+#include "reloc_code.h"
 #include "scan.h"
 #include "str.h"
 #include "strutil.h"
@@ -50,7 +51,6 @@ void CreateBinFile(void);
 
 /* global variables */
 extern char Z80objhdr[];
-extern byte_t reloc_routine[];
 extern char* reloctable, * relocptr;
 
 int totaladdr, curroffset;
@@ -937,7 +937,7 @@ void link_modules(void)
 
 	if (opts.relocatable)
 	{
-		reloctable = m_new_n(char, 32768U);
+		reloctable = m_new_n(char, 32768U);		// TODO: make this a dymanic array
 		relocptr = reloctable;
 		relocptr += 4;  /* point at first offset to store */
 		totaladdr = 0;

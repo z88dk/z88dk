@@ -5,7 +5,11 @@
 #include <string.h>
 #include <signal.h>
 #include <assert.h>
+#ifdef WIN32
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
 #include <stdbool.h>
 #include "backend.h"
 #include "debugger_gdb_packets.h"
@@ -14,7 +18,7 @@ struct packet_buf
 {
     uint8_t buf[PACKET_BUF_SIZE];
     int end;
-} in = {}, out = {};
+} in = {0}, out = {0};
 
 uint8_t *inbuf_get()
 {

@@ -146,6 +146,13 @@ dev/cpu/cpu_test_z80_ok.asm: dev/cpu/opcodes.yaml dev/cpu/make_cpu_test.pl Makef
 dev/cpu/cpu_rules.h: dev/cpu/opcodes.yaml dev/cpu/make_cpu_rules.pl Makefile
 	cd dev/cpu; perl make_cpu_rules.pl; dos2unix -q cpu_rules.h
 
+# reloc routine
+dev: src/c/reloc_code.c
+
+src/c/reloc_code.c: dev/reloc_code.asm dev/make_reloc_code.pl Makefile
+	cd dev; perl make_reloc_code.pl; dos2unix -q reloc_code.[ch]; \
+		mv -f reloc_code.[ch] ../src/c/
+
 # re2c
 define MAKE_RE2C
 dev: $(1).o

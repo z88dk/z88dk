@@ -162,6 +162,9 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\lstfile.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\reloc_code.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\src\c\alloc.c">
@@ -262,6 +265,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\cpp\lstfile.cpp">
       <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\c\reloc_code.c">
+      <Filter>Source Files\c</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

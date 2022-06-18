@@ -11,7 +11,6 @@
 #else
 #include <unistd.h>                         // For declarations of isatty()
 #include <stdarg.h>
-
 #endif
 
 #include "debugger.h"
@@ -141,7 +140,7 @@ static int cmd_restore_pc(int argc, char **argv);
 static int cmd_typeof(int argc, char **argv);
 static int cmd_help(int argc, char **argv);
 static int cmd_quit(int argc, char **argv);
-static void print_hotspots();
+static void print_hotspots(void);
 
 static command commands[] = {
     { "si",        cmd_step,        "",  NULL },
@@ -534,9 +533,7 @@ void debugger()
     }
 
     while ( (line = linenoise(prompt) ) != NULL ) {
-        int argc;
         char freeline = 0;
-        char **argv;
 
         if ( line == NULL || line[0] == '\0') {
             line = strdup(last_line);
@@ -1088,7 +1085,6 @@ static int cmd_backtrace(int argc, char **argv)
 static int parse_number(char *str, char **end)
 {
     int   base = 0;
-    int   ret;
 
     if ( *str == '$' ) {
         base = 16;
@@ -1323,8 +1319,6 @@ static int cmd_watch(int argc, char **argv)
         }
 
     } else if ( argc == 3 && (strcmp(argv[1],"read") == 0 || (breakwrite=1,strcmp(argv[1],"write") == 0)) ) {
-        char *end;
-        const char *sym;
         breakpoint *elem;
         const char* corrected_source = argv[2];
         int value = parse_address(argv[2], &corrected_source);
@@ -1434,8 +1428,6 @@ static int cmd_break(int argc, char **argv)
         /* Just show the breakpoints */
         print_breakpoints();
     } else if ( argc == 2 ) {
-        char *end;
-        const char *sym;
         breakpoint *elem;
         const char* corrected_source = argv[1];
         int value = parse_address(argv[1], &corrected_source);
@@ -1839,7 +1831,7 @@ static int cmd_list(int argc, char **argv)
 }
 
 
-static void print_hotspots()
+static void print_hotspots(void)
 {
     char   buf[256];
     int    i;

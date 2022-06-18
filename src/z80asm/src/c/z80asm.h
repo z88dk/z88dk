@@ -22,7 +22,7 @@ Repository: https://github.com/z88dk/z88dk
 #define MAXCODESIZE 65536
 #endif
 
-extern size_t sizeof_relocroutine, sizeof_reloctable;
+extern size_t sizeof_reloctable;
 
 extern void assemble_file( const char *filename );
 extern bool Pass2info(range_t range);

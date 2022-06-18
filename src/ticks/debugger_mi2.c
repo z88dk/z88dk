@@ -16,10 +16,11 @@
 #include <ctype.h>
 #include <stdarg.h>
 #include <utstring.h>
-#include <unistd.h>
 
 #ifdef WIN32
 #include <windows.h>
+#else
+#include <unistd.h>
 #endif
 
 typedef struct {
@@ -545,7 +546,7 @@ static void cmd_var_list_children(const char* flow, int argc, char **argv)
         return;
     }
 
-    char* members[64] = {};
+    char* members[64] = {0};
     int num_child = 0;
 
     struct expression_result_t* struct_ = NULL;
@@ -585,7 +586,7 @@ static void cmd_var_list_children(const char* flow, int argc, char **argv)
 
         char* member = members[i];
 
-        struct expression_result_t member_result = {};
+        struct expression_result_t member_result = {0};
         expression_resolve_struct_member(struct_, member, &member_result);
 
         UT_string* child_resolved =
