@@ -10,7 +10,7 @@ path("$test.dir/00main.c")->spew(<<END_C);
 int main() { }
 END_C
 
-run_ok("zcc +test -v --list $test.dir/00main.c");
+run_ok("zcc +test --list -o $test.dir/00main $test.dir/00main.c");
 run_ok("grep MODULE $test.dir/00main.c.lis");
 
 path("$test.dir")->remove_tree if Test::More->builder->is_passing;

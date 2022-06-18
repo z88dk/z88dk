@@ -119,7 +119,8 @@ sub pointers { return join('', map {pack("vC", $_ & 0xFFFF, ($_ >> 16) & 0xFF)} 
 sub dwords { return pack("V*", @_); }
 
 sub unlink_testfiles {
-    unlink(<${test}*>) 
+	my(@additional) = @_;
+    unlink(<${test}*>, @additional) 
         if Test::More->builder->is_passing;
 }
 
@@ -225,6 +226,18 @@ sub libfile {
 	}
 
 	return $lib;
+}
+
+#------------------------------------------------------------------------------
+# quote command line argument with "" on Windows, '' otherwise
+sub quote_os {
+	my($txt) = @_;
+	if ($^O eq 'MSWin32') {
+		return '"'.$txt.'"';
+	}
+	else {
+		return "'".$txt."'";
+	}
 }
 
 1;

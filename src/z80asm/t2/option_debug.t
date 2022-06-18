@@ -74,9 +74,7 @@ int main() {
 }
 END
 
-
 run_ok("zcc +zx -m -debug ${test}.c ${test}1.asm -o ${test}.bin");
-
 (my $test_expanded = $test) =~ s/([^a-z0-9])/ sprintf("_%02x", ord($1)) /ige;
 run_ok("cat ${test}.map | ".
 	   "perl -ne 'next if /crt|generic_console/; ".
