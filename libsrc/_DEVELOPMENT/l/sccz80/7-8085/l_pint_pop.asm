@@ -12,8 +12,8 @@ SECTION code_l_sccz80
 PUBLIC l_pint_pop, l_pint_pop_pint
 
 .l_pint_pop
-    pop bc                      ; return address
-    pop de                      ; where to put it
+    pop bc                  ; return address
+    pop de                  ; where to put it
     push bc
 
 ; store int from HL into (DE)
