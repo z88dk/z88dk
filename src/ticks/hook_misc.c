@@ -2,7 +2,7 @@
 #include "ticks.h"
 #include <time.h>
 #include <sys/time.h>
-#ifdef WIN32
+#ifdef _MSC_VER
 #include <WinSock2.h>
 #endif
 

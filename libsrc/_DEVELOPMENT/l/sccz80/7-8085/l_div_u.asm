@@ -6,14 +6,14 @@ SECTION code_clib
 SECTION code_l_sccz80
 
 PUBLIC  l_div_u
-PUBLIC  l_div_u_0
+PUBLIC  l_div_0
 
 ; HL = DE / HL, DE = DE % HL
 .l_div_u
     ld      bc,hl           ;copy divisor to bc
 
 ; HL = DE / BC, DE = DE % BC
-.l_div_u_0
+.l_div_0
     ld      hl,0            ;clear remainder
     ld      a,8             ;16 bits (8 iterations)
 
