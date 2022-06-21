@@ -220,7 +220,9 @@ test: $(ALL)
 	$(MAKE) -C test
 
 testsuite: $(BINS)
+ifeq ($(CROSS),0)
 	$(MAKE) -C testsuite
+endif
 
 install-clean:
 	$(MAKE) -C libsrc install-clean

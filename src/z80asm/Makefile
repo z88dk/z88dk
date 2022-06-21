@@ -172,7 +172,9 @@ install: $(PROJ)$(EXESUFFIX) z80asm_lib
 	$(INSTALL) $(PROJ)$(EXESUFFIX)     $(PREFIX)/bin/$(BARE_PROJ)$(EXESUFFIX)
 	$(INSTALL) asmpp.pl      $(PREFIX)/bin/z88dk-asmpp
 	$(INSTALL) asmstyle.pl   $(PREFIX)/bin/z88dk-asmstyle
+ifeq ($(CROSS),0)
 	$(MAKE) -C dev/z80asm_lib install PREFIX=$(PREFIX_SHARE)
+endif
 
 #------------------------------------------------------------------------------
 # clean
