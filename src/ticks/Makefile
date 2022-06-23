@@ -56,9 +56,7 @@ clean:
 	$(RM) z88dk-dis$(EXESUFFIX) $(DISOBJS) core
 	$(RM) z88dk-gdb$(EXESUFFIX) $(GDBOBJS) core
 	$(RM) $(DEPENDS)
-	$(RM) lex.yy.c
 	$(RM) expressions.output
-	$(RM) expressions.tab.*
 	$(RM) -rf Debug Release
 
 -include $(DEPENDS)
