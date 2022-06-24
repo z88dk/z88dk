@@ -55,6 +55,7 @@ clean:
 	$(RM) z88dk-ticks$(EXESUFFIX) $(OBJS) core
 	$(RM) z88dk-dis$(EXESUFFIX) $(DISOBJS) core
 	$(RM) z88dk-gdb$(EXESUFFIX) $(GDBOBJS) core
+	$(RM) $(LEXOBJS)
 	$(RM) $(DEPENDS)
 	$(RM) expressions.output
 	$(RM) -rf Debug Release
