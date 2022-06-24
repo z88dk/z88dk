@@ -1,0 +1,28 @@
+name: build-on-macos
+
+on:
+  push:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+      with: 
+        submodules: 'true'
+    - name: Install homebrew dependencies
+      run: brew install perl dos2unix boost ragel re2c
+    - name: Install perl prerequisites
+      run: cpan App::Prove Capture::Tiny::Extended Clone Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Test::Cmd::Common Test::Differences Test::HexDifferences Text::Table Object::Tiny::RW List::Uniq YAML::Tiny
+    - name: Build binaries
+      run: ./build.sh -l
+    - name: Build libraries
+      run: ./build.sh -b
+    - name: Build examples
+      run: ./build.sh -b -l -e
+    - name: Build sdcc needed for tests
+      run: make BUILD_SDCC=1 BUILD_SDCC_HTTP=1 bin/z88dk-zsdcc
+    - name: Build tests
+      run: ./build.sh -b -l -t

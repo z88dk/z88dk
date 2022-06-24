@@ -763,7 +763,7 @@ void run_fileutil_xfseek(void)
 
 void t_fileutil_file_spew_slurp(void)
 {
-	unlink("test.txt");
+	remove("test.txt");
 	TEST_ASSERT(!file_exists("test.txt"));
 	TEST_ASSERT_EQUAL(-1, file_size("test.txt"));
 
@@ -904,7 +904,7 @@ void t_fileutil_file_spew_slurp(void)
 	TEST_ASSERT_EQUAL_STRING(text, utstr_body(s));
 	utstr_free(s);
 
-	unlink("test.txt");
+	remove("test.txt");
 	TEST_ASSERT(!file_exists("test.txt"));
 	TEST_ASSERT_EQUAL(-1, file_size("test.txt"));
 }

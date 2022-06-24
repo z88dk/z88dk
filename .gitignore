@@ -5,13 +5,10 @@
 **/*.dSYM/
 **/*.err
 **/*.exe
-**/*.lib
 **/*.lis
 **/*.map
-**/*.tab.*
 **/*.o
 **/*.orig
-**/*.yy.c
 **/*.output
 **/*.vcxproj.user
 **/.prove*
@@ -21,6 +18,10 @@
 **/nbproject/**
 **/zcc_opt.def
 **/zcc_proj.lst
+examples/**/*.lib
+lib/**/*.lib
+libsrc/**/*.lib
+src/**/*.lib
 bin/
 examples/c128/SGDEMO.T64
 examples/console/_dir.txt

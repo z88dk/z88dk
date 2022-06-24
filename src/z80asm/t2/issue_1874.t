@@ -22,13 +22,13 @@ int main() {
 }
 END_C
 
-	run_ok("zcc +zxn --list $test.dir/test.c");
+	run_ok("zcc +zxn --list -o $test.dir/test $test.dir/test.c");
 	run_ok("grep -w swap $test.dir/test.c.lis");
 
-	run_ok("zcc +zx  --list $test.dir/test.c");
+	run_ok("zcc +zx  --list -o $test.dir/test $test.dir/test.c");
 	run_nok("grep -w swap $test.dir/test.c.lis");
 
-	path("$test.dir")->remove_tree;
+	path("$test.dir")->remove_tree if Test::More->builder->is_passing;
 }
 
 unlink_testfiles;

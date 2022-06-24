@@ -135,22 +135,22 @@ dev: dev/cpu/opcodes.yaml \
 	 dev/cpu/cpu_rules.h
 
 dev/cpu/opcodes.yaml: dev/cpu/make_opcodes.pl Makefile
-	cd dev/cpu; perl make_opcodes.pl; dos2unix -q opcodes.yaml
+	cd dev/cpu && perl make_opcodes.pl && dos2unix -q opcodes.yaml
 
 dev/cpu/opcodes.txt: dev/cpu/opcodes.yaml dev/cpu/dump_opcodes.pl Makefile
-	cd dev/cpu; perl dump_opcodes.pl; dos2unix -q opcodes.txt
+	cd dev/cpu && perl dump_opcodes.pl && dos2unix -q opcodes.txt
 
 dev/cpu/cpu_test_z80_ok.asm: dev/cpu/opcodes.yaml dev/cpu/make_cpu_test.pl Makefile
-	cd dev/cpu; perl make_cpu_test.pl; dos2unix -q cpu_test_*.asm
+	cd dev/cpu && perl make_cpu_test.pl && dos2unix -q cpu_test_*.asm
 
 dev/cpu/cpu_rules.h: dev/cpu/opcodes.yaml dev/cpu/make_cpu_rules.pl Makefile
-	cd dev/cpu; perl make_cpu_rules.pl; dos2unix -q cpu_rules.h
+	cd dev/cpu && perl make_cpu_rules.pl && dos2unix -q cpu_rules.h
 
 # reloc routine
 dev: src/c/reloc_code.c
 
 src/c/reloc_code.c: dev/reloc_code.asm dev/make_reloc_code.pl Makefile
-	cd dev; perl make_reloc_code.pl; dos2unix -q reloc_code.[ch]; \
+	cd dev && perl make_reloc_code.pl && dos2unix -q reloc_code.[ch] && \
 		mv -f reloc_code.[ch] ../src/c/
 
 # re2c
@@ -164,9 +164,6 @@ endef
 
 $(eval $(call MAKE_RE2C,src/cpp/lex))
 
-clean::
-	$(MAKE) -C lib clean
-
 #------------------------------------------------------------------------------
 # install
 #------------------------------------------------------------------------------
@@ -175,7 +172,9 @@ install: $(PROJ)$(EXESUFFIX) z80asm_lib
 	$(INSTALL) $(PROJ)$(EXESUFFIX)     $(PREFIX)/bin/$(BARE_PROJ)$(EXESUFFIX)
 	$(INSTALL) asmpp.pl      $(PREFIX)/bin/z88dk-asmpp
 	$(INSTALL) asmstyle.pl   $(PREFIX)/bin/z88dk-asmstyle
+ifeq ($(CROSS),0)
 	$(MAKE) -C dev/z80asm_lib install PREFIX=$(PREFIX_SHARE)
+endif
 
 #------------------------------------------------------------------------------
 # clean

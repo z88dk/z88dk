@@ -57,13 +57,13 @@ ENDIF
 	PUBLIC	INVRS
 	PUBLIC	BOLD
 
-IF G007
-	SECTION	code_crt_init
-	EXTERN	_console_h
-	ld	a,23
-	ld	(_console_h),a
-	SECTION	code_clib
-ENDIF
+;IF G007
+;	SECTION	code_crt_init
+;	EXTERN	_console_h
+;	ld	a,23
+;	ld	(_console_h),a
+;	SECTION	code_clib
+;ENDIF
 
 
 .ansi_CHAR
