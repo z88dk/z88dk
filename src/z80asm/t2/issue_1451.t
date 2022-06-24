@@ -2,7 +2,7 @@
 
 BEGIN { use lib 't2'; require 'testlib.pl'; }
 
-my $got_zsdcc = `which z88dk-zsdcc 2> /dev/null`;
+my $got_zsdcc = -f "../../bin/z88dk-zsdcc$Config{_exe}";
 if (!$got_zsdcc) {
     diag("z88dk-zsdcc not found, test skipped");
     ok 1;

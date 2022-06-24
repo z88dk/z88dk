@@ -4,6 +4,7 @@ use Modern::Perl;
 use Test::More;
 use Capture::Tiny 'capture_merged';
 use Path::Tiny;
+use Config;
 
 my $OBJ_FILE_VERSION = "16";
 

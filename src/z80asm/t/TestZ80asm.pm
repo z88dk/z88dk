@@ -22,17 +22,13 @@ use Capture::Tiny::Extended 'capture';
 our @EXPORT = qw( z80asm z80nm 
 				  read_binfile write_binfile test_binfile );
 
-#our $AR = -d "ar" ? "ar" : "../../src/z80nm";
-our $AR = "../z80nm";
-
 $ENV{PATH} = join($Config{path_sep}, 
 			".",
-			$AR,
 			"../../bin",
 			$ENV{PATH});
 
 our $KEEP_FILES;
-our $Z80ASM_EXE = $ENV{Z80ASM_EXE} || "./z88dk-z80asm";
+our $Z80ASM_EXE = $ENV{Z80ASM_EXE} || "z88dk-z80asm";
 
 #------------------------------------------------------------------------------
 # startup and cleanup
@@ -241,8 +237,6 @@ sub test_binfile {
 sub z80nm {
 	my($o_file, $expected_out) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
-
-	system("make -C $AR") and die;
 
 	my $line = "[line ".((caller)[2])."]";
 	my($stdout, $stderr, $return) = capture {

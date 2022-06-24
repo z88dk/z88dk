@@ -12,9 +12,10 @@
 use Modern::Perl;
 use Test::More;
 use Path::Tiny;
+use Config;
 require './t/testlib.pl';
 
-my $got_zsdcc = `which z88dk-zsdcc 2> /dev/null`;
+my $got_zsdcc = -f "../../bin/z88dk-zsdcc$Config{_exe}";
 
 my $c_code = <<'END';
 void main(void)
