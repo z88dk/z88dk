@@ -16,7 +16,6 @@ require './t/testlib.pl';
 
 unlink_testfiles();
 
-build_z80nm();
 spew("test.asm", <DATA>);
 run("z88dk-z80asm -l test.asm");
 open(my $p, "z88dk-z80nm -a test.o|");

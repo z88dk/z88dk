@@ -39,37 +39,6 @@ sub _prepend_path {
 }
 
 #------------------------------------------------------------------------------
-# Build z88dk tools
-#------------------------------------------------------------------------------
-
-sub _build_tool {
-	my($tool) = @_;
-	our %have_built;
-	
-	unless ($have_built{$tool}) {
-		note "Building $tool";
-		
-		my $dir = cwd();
-		chdir _root()."/../$tool" or die;
-		
-		my $tool_dir = abs_path(cwd());
-		
-		# cannot make -C because make does not understand \\ in filenames
-		run("make", 0, 'IGNORE', 'IGNORE');	
-		
-		chdir $dir or die;
-		
-		_prepend_path($tool_dir);
-		
-		$have_built{$tool}++;
-	}
-}
-
-sub build_appmake {	_build_tool('appmake'); }
-sub build_ticks	{	_build_tool('ticks');	}
-sub build_z80nm {	_build_tool('z80nm');	}
-
-#------------------------------------------------------------------------------
 # Run tools
 #------------------------------------------------------------------------------
 
@@ -120,7 +89,6 @@ sub appmake {
 	my($args) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-	build_appmake();
 	run("z88dk-appmake $args", 0, 'IGNORE');
 }
 
@@ -128,7 +96,6 @@ sub ticks {
 	my($source, $options) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-	build_ticks();
 	z80asm($source, $options." -b");
 	
 	my $cpu = ($options =~ /(?:-m=?)(\S+)/) ? $1 : "z80";
@@ -205,7 +172,6 @@ sub z80nm {
 	my($file, $out) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
-	build_z80nm();
 	run("z88dk-z80nm -a $file", 0, $out);
 }
 
