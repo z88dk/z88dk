@@ -15,7 +15,7 @@ jobs:
     - name: Install homebrew dependencies
       run: brew install perl dos2unix boost ragel re2c
     - name: Install perl prerequisites
-      run: cpan App::Prove Capture::Tiny::Extended Clone Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Test::Cmd::Common Test::Differences Test::HexDifferences Text::Table Object::Tiny::RW List::Uniq YAML::Tiny
+      run: cpan App::Prove Capture::Tiny::Extended Clone Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Test::Cmd::Common Test::Differences Test::HexDifferences Text::Diff Text::Table Object::Tiny::RW List::Uniq YAML::Tiny
     - name: Build binaries
       run: ./build.sh -l
     - name: Build libraries
