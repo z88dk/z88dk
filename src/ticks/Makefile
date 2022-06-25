@@ -1,11 +1,3 @@
-
-# EXESUFFIX is passed when cross-compiling Win32 on Linux
-ifeq ($(OS),Windows_NT)
-  EXESUFFIX 		:= .exe
-else
-  EXESUFFIX 		?=
-endif
-
 include ../Make.common
 
 OBJS = ticks.o cpu.o backend.o hook_cpm.o hook_console.o hook_io.o hook_misc.o hook.o debugger.o breakpoints.o profiler.o exp_engine.o debugger_ticks.o linenoise.o utf8.o syms.o disassembler_alg.o memory.o am9511.o acia.o hook_rc2014.o debug.o srcfile.o ../common/dirname.o $(UNIXem_OBJS)

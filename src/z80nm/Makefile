@@ -2,13 +2,6 @@
 # z88dk z80nm Makefile
 #------------------------------------------------------------------------------
 
-# EXESUFFIX is passed when cross-compiling Win32 on Linux
-ifeq ($(OS),Windows_NT)
-  EXESUFFIX 		:= .exe
-else
-  EXESUFFIX 		?=
-endif
-
 include ../Make.common
 
 SRCS 		:= $(wildcard *.c) \

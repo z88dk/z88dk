@@ -59,7 +59,7 @@ jobs:
         set -e -x
         eval $(perl -Mlocal::lib)
         ./build.sh -b -l -e
-    - name: Build tests
+    - name: Run tests
       run: |
         set -e -x
         eval $(perl -Mlocal::lib)

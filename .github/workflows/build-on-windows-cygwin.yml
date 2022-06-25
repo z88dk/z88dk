@@ -1,0 +1,61 @@
+name: build-on-windows-cygwin
+
+on:
+  push:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
+    env:
+      SHELLOPTS: igncr
+      CHERE_INVOKING: 1
+      CYGWIN_NOWINPATH: 1
+    steps:
+    - name: Configure git
+      run: |
+        git config --global core.autocrlf input
+      shell: cmd
+    - name: Checkout from git
+      uses: actions/checkout@v3
+      with: 
+        submodules: 'true'
+    - name: Setup Cygwin
+      uses: egor-tensin/setup-cygwin@v3
+      with:
+        platform: x64
+        packages: make gcc-g++ bison flex libxml2-devel libiconv-devel zlib-devel liblzma-devel wget unzip dos2unix autoconf automake libtool ragel perl perl-Regexp-Common perl-Test-Harness perl-Text-Diff perl-YAML-Tiny perl-Module-Build perl-List-MoreUtils perl-Params-Util Perl-B-COW Perl-Clone
+    - name: Install choco packages
+      run: |
+        choco install re2c
+      shell: cmd
+    - name: Install perl prerequisites
+      run: |
+        PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        cpanm --force File::Path Test::Cmd
+        cpanm App::Prove Capture::Tiny::Extended CPU::Z80::Assembler Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Path::Tiny Regexp::Common Test::Cmd Test::Cmd::Common Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
+    - name: Build binaries
+      run: |
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
+        ./build.sh -l
+    - name: Build libraries
+      run: |
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
+        ./build.sh -b
+    - name: Build examples
+      run: |
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
+        ./build.sh -b -l -e
+    - name: Run tests
+      run: |
+        eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+        export PATH=$PATH:/cygdrive/c/ProgramData/chocolatey/bin
+        ./build.sh -b -l -t
