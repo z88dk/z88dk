@@ -37,6 +37,8 @@
 #define FILEEXT_MAP     ".map"    
 #define FILEEXT_RELOC   ".reloc"  
 
+#define BL ' '
+
 /* types */
 enum OptType
 {
@@ -72,8 +74,8 @@ static void include_z80asm_lib();
 static const char *search_z80asm_lib();
 static void make_output_dir();
 
-static void process_options( int *parg, int argc, char *argv[] );
-static void process_files( int arg, int argc, char *argv[] );
+static void process_option(const char* option);
+static void process_file(const char* filename_);
 static void expand_source_glob(const char *pattern);
 static void expand_list_glob(const char *filename);
 
@@ -126,60 +128,124 @@ DEFINE_dtor_module()
 	argv_free(opts.files);
 }
 
+//-----------------------------------------------------------------------------
+//	parse arguments from argv[], Z80ASM environment or @ files
+//-----------------------------------------------------------------------------
+static const char* delim_string(const char** ptext, char delim) {
+	const char* p = *ptext;
+
+	if (delim != BL && *p == delim) {	// skip start quotes
+		p++;
+		*ptext = p;
+	}
+
+	while (*p != '\0') {	// scan for end delimiter
+		char c = *p;
+		if (isspace(c))
+			c = BL;
+		if (c == delim)
+			break;
+		p++;
+	}
+
+	const char* ret = spool_add_n(*ptext, p - *ptext);
+
+	if (*p != '\0' && delim != BL)		// skip end quote
+		p++;
+
+	*ptext = p;
+	return ret;
+}
+
+static void parse_args_in_text(const char* text) {
+	const char* p = text;
+
+	while (*p != '\0') {
+		if (isspace(*p)) {				// skip blanks
+			while (isspace(*p))
+				p++;
+		}
+		else {
+			switch (*p) {
+			case ';':					// comment
+			case '#':
+				return;
+			case '-':					// option
+			case '+':
+				process_option(delim_string(&p, BL));
+				break;
+			case '"':
+				process_file(delim_string(&p, '"'));
+				break;
+			case '\'':
+				process_file(delim_string(&p, '\''));
+				break;
+			case '@':
+			default:
+				process_file(delim_string(&p, BL));
+				break;
+			}
+		}
+	}
+}
+
+static void parse_args(int argc, char* argv[]) {
+	bool got_dash_dash = false;
+
+	for (int i = 1; i < argc; i++) {		// parse options and files
+		if (0 == strcmp(argv[i], "--")) {
+			got_dash_dash = true;
+		}
+		else {
+			if ((argv[i][0] == '-' || argv[i][0] == '+') && !got_dash_dash)
+				process_option(argv[i]);
+			else
+				process_file(argv[i]);
+		}
+
+		if (get_num_errors())
+			break;
+	}
+}
+
 /*-----------------------------------------------------------------------------
 *   Parse command line, set options, including opts.files with list of
 *	input files, including parsing of '@' lists
 *----------------------------------------------------------------------------*/
-static void process_env_options()
-{
-	const char *opts = getenv("Z80ASM");
-	if (!opts)
-		return;
-
-	// add dummy program name option
-	argv_t* args = argv_new();
-	argv_push(args, "z80asm");
-
-	char *opts_copy = xstrdup(opts);		// strtok needs writeable string
-	char *tok = strtok(opts_copy, " ");
-	while (tok) {
-		argv_push(args, tok);
-		tok = strtok(NULL, " ");
-	}
-
-	// parse args
-	int argc = argv_len(args);
-	int arg;
-	process_options(&arg, argc, argv_front(args));
-
-	xfree(opts_copy);
-	argv_free(args);
+static void process_env_options() {
+	const char *options = getenv("Z80ASM");
+	if (options)
+		parse_args_in_text(options);
 }
 
-void parse_argv( int argc, char *argv[] )
-{
-	int arg = 0;
+void parse_argv(int argc, char* argv[]) {
+	init_module();
 
-    init_module();
+	if (argc == 1)
+		exit_copyright();					// exit if no arguments
 
-	if ( argc == 1 )
-		exit_copyright();					/* exit if no arguments */
+	if (get_num_errors())
+		return;
 
-	if (!get_num_errors())
-		process_env_options();				/* process options from Z80ASM environment variable */
+	process_env_options();					// process options from Z80ASM environment variable
 
-	if (!get_num_errors())
-		process_options( &arg, argc, argv );/* process all options, set arg to next */
+	if (get_num_errors())
+		return;
 
-	if (!get_num_errors() && arg >= argc)
-		error_no_src_file();				/* no source file */
+	parse_args(argc, argv);					// parse options and files
 
-	if ( ! get_num_errors() )
-		process_files( arg, argc, argv );	/* process each source file */
+	if (get_num_errors())
+		return;
 
-	make_output_dir();						/* create output directory if needed */
-	include_z80asm_lib();					/* search for z88dk-z80asm-*.lib, append to library path */
-	define_assembly_defines();				/* defined options-dependent constants */
+	if (argv_len(opts.files) == 0)
+		error_no_src_file();				// no source file
+
+	if (get_num_errors())
+		return;
+
+	make_output_dir();						// create output directory if needed
+	include_z80asm_lib();					// search for z88dk-z80asm-*.lib, append to library path
+	define_assembly_defines();				// defined options-dependent constants
 }
 
 /*-----------------------------------------------------------------------------
@@ -187,83 +253,81 @@ void parse_argv( int argc, char *argv[] )
 *----------------------------------------------------------------------------*/
 /* check if this option is matched, return char pointer after option, ready
    to retrieve an argument, if any */
-static char *check_option( char *arg, char *opt )
-{
-    size_t len = strlen( opt );
+static const char* check_option(const char* arg, const char* opt) {
+	size_t len = strlen(opt);
 
-    if ( *opt &&				/* ignore empty option strings */
-            strncmp( arg, opt, len ) == 0 )
-    {
-        if ( arg[len] == '=' )
-            len++;				/* skip '=' after option, to point at argument */
+	if (*opt &&					// ignore empty option strings
+		strncmp(arg, opt, len) == 0)
+	{
+		if (arg[len] == '=')
+			len++;				// skip '=' after option, to point at argument
 
-        return arg + len;		/* point to after argument */
-    }
-    else
-        return NULL;			/* not found */
+		return arg + len;		// point to after argument
+	}
+	else
+		return NULL;			// not found
 }
 
-static void process_opt( int *parg, int argc, char *argv[] )
+static void process_option(const char* option)
 {
-#define II (*parg)
     int		 j;
 	const char *opt_arg_ptr;
 
 	/* search options that are exceptions to the look-up table */
-	if (strcmp(argv[II], "-mz80n") == 0 || strcmp(argv[II], "-m=z80n") == 0) {
+	if (strcmp(option, "-mz80n") == 0 || strcmp(option, "-m=z80n") == 0) {
 		option_cpu_z80n();
 		return;
 	}
-	else if (strcmp(argv[II], "-mz80") == 0 || strcmp(argv[II], "-m=z80") == 0) {
+	else if (strcmp(option, "-mz80") == 0 || strcmp(option, "-m=z80") == 0) {
 		option_cpu_z80();
 		return;
 	}
-	else if (strcmp(argv[II], "-mgbz80") == 0 || strcmp(argv[II], "-m=gbz80") == 0) {
+	else if (strcmp(option, "-mgbz80") == 0 || strcmp(option, "-m=gbz80") == 0) {
 		option_cpu_gbz80();
 		return;
 	}
-	else if (strcmp(argv[II], "-m8080") == 0 || strcmp(argv[II], "-m=8080") == 0) {
+	else if (strcmp(option, "-m8080") == 0 || strcmp(option, "-m=8080") == 0) {
 		option_cpu_8080();
 		return;
 	}
-	else if (strcmp(argv[II], "-m8085") == 0 || strcmp(argv[II], "-m=8085") == 0) {
+	else if (strcmp(option, "-m8085") == 0 || strcmp(option, "-m=8085") == 0) {
 		option_cpu_8085();
 		return;
 	}
-	else if (strcmp(argv[II], "-mz180") == 0 || strcmp(argv[II], "-m=z180") == 0) {
+	else if (strcmp(option, "-mz180") == 0 || strcmp(option, "-m=z180") == 0) {
 		option_cpu_z180();
 		return;
 	}
-	else if(strcmp(argv[II], "-mr2ka") == 0 || strcmp(argv[II], "-m=r2ka") == 0) {
+	else if(strcmp(option, "-mr2ka") == 0 || strcmp(option, "-m=r2ka") == 0) {
 		option_cpu_r2ka();
 		return;
 	}
-	else if(strcmp(argv[II], "-mr3k") == 0 || strcmp(argv[II], "-m=r3k") == 0) {
+	else if(strcmp(option, "-mr3k") == 0 || strcmp(option, "-m=r3k") == 0) {
 		option_cpu_r3k();
 		return;
 	}
-	else if (strcmp(argv[II], "-mti83") == 0 || strcmp(argv[II], "-m=ti83") == 0) {
+	else if (strcmp(option, "-mti83") == 0 || strcmp(option, "-m=ti83") == 0) {
 		option_cpu_ti83();
 		return;
 	}
-	else if (strcmp(argv[II], "-mti83plus") == 0 || strcmp(argv[II], "-m=ti83plus") == 0) {
+	else if (strcmp(option, "-mti83plus") == 0 || strcmp(option, "-m=ti83plus") == 0) {
 		option_cpu_ti83plus();
 		return;
 	}
-	else if (strncmp(argv[II], "-l", 2) == 0 && argv[II][2] != '\0') {
-		library_file_append(&argv[II][2]);
+	else if (strncmp(option, "-l", 2) == 0 && option[2] != '\0') {
+		library_file_append(option + 2);
 		return;
 	}
-	else if (strcmp(argv[II], "-l") == 0) {
+	else if (strcmp(option, "-l") == 0) {
 		opts.list = true;
 		return;
 	}
-	else if (strcmp(argv[II], "-reloc-info") == 0) {
+	else if (strcmp(option, "-reloc-info") == 0) {
 		opts.reloc_info = true;
 		return;
 	}
-	else if (strncmp(argv[II], "-float", 6) == 0) {
-		const char* format = &argv[II][6];
+	else if (strncmp(option, "-float", 6) == 0) {
+		const char* format = option + 6;
 		if (*format == '=') format++;
 		if (!set_float_format(format))
 			error_invalid_float_format();
@@ -272,15 +336,15 @@ static void process_opt( int *parg, int argc, char *argv[] )
 		/* search opts_lu[] */
 		for (j = 0; j < NUM_ELEMS(opts_lu); j++)
 		{
-			if ((opt_arg_ptr = check_option(argv[II], opts_lu[j].long_opt)) != NULL ||
-				(opt_arg_ptr = check_option(argv[II], opts_lu[j].short_opt)) != NULL)
+			if ((opt_arg_ptr = check_option(option, opts_lu[j].long_opt)) != NULL ||
+				(opt_arg_ptr = check_option(option, opts_lu[j].short_opt)) != NULL)
 			{
 				/* found option, opt_arg_ptr points to after option */
 				switch (opts_lu[j].type)
 				{
 				case OptSet:
 					if (*opt_arg_ptr)
-						error_illegal_option(argv[II]);
+						error_illegal_option(option);
 					else
 						*((bool *)(opts_lu[j].arg)) = true;
 
@@ -288,7 +352,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 
 				case OptCall:
 					if (*opt_arg_ptr)
-						error_illegal_option(argv[II]);
+						error_illegal_option(option);
 					else
 						((void(*)(void))(opts_lu[j].arg))();
 
@@ -300,7 +364,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 						((void(*)(const char *))(opts_lu[j].arg))(opt_arg_ptr);
 					}
 					else
-						error_illegal_option(argv[II]);
+						error_illegal_option(option);
 
 					break;
 
@@ -310,7 +374,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 						*((const char **)(opts_lu[j].arg)) = opt_arg_ptr;
 					}
 					else
-						error_illegal_option(argv[II]);
+						error_illegal_option(option);
 
 					break;
 
@@ -322,7 +386,7 @@ static void process_opt( int *parg, int argc, char *argv[] )
 						argv_push(*p_path, opt_arg_ptr);
 					}
 					else
-						error_illegal_option(argv[II]);
+						error_illegal_option(option);
 
 					break;
 
@@ -335,27 +399,9 @@ static void process_opt( int *parg, int argc, char *argv[] )
 		}
 
 		/* not found */
-		error_illegal_option(argv[II]);
+		error_illegal_option(option);
 
 	}
-
-#undef II
-}
-
-static void process_options( int *parg, int argc, char *argv[] )
-{
-#define II (*parg)
-	for (II = 1; II < argc && (argv[II][0] == '-' || argv[II][0] == '+'); II++) {
-		if (strcmp(argv[II], "--") == 0) {
-			// end of options
-			II++;
-			break;
-		}
-		else {
-			process_opt(&II, argc, argv);
-		}
-	}
-#undef II
 }
 
 /*-----------------------------------------------------------------------------
@@ -462,9 +508,11 @@ void expand_list_glob(const char* filename)
 			argv_push(opts.inc_path, path_dir(filename));
 
 			if (sfile_open(filename, false)) {
-				const char* line;
-				while ((line = sfile_getline()) != NULL)
-					process_file(line);
+				char* line;
+				while ((line = sfile_getline()) != NULL) {
+					parse_args_in_text(line);
+					xfree(line);
+				}
 			}
 
 			// finished assembly, remove dirname from include path
@@ -473,14 +521,15 @@ void expand_list_glob(const char* filename)
 		argv_free(files);
 	}
 	else {
-
 		// append the directoy of the list file to the include path	and remove it at the end
 		argv_push(opts.inc_path, path_dir(filename));
 
 		if (sfile_open(filename, false)) {
-			const char* line;
-			while ((line = sfile_getline()) != NULL)
-				process_file(line);
+			char* line;
+			while ((line = sfile_getline()) != NULL) {
+				parse_args_in_text(line);
+				xfree(line);
+			}
 		}
 
 		// finished assembly, remove dirname from include path
@@ -565,18 +614,6 @@ static char *replace_str(const char *str, const char *old, const char *new)
 	strcpy(r, p);
 
 	return ret;
-}
-
-/*-----------------------------------------------------------------------------
-*   process all files
-*----------------------------------------------------------------------------*/
-static void process_files( int arg, int argc, char *argv[] )
-{
-    int i;
-
-    /* Assemble file list */
-    for ( i = arg; i < argc; i++ )
-        process_file( argv[i] );
 }
 
 /*-----------------------------------------------------------------------------

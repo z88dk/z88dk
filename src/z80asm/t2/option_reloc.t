@@ -409,8 +409,7 @@ __data2_tail                    = \$3060 ; const, public, def, , ,
 __data2_size                    = \$000B ; const, public, def, , ,
 END
 
-
-unlink_testfiles(<${test}_code* ${test}_data*>);
+unlink_testfiles;
 done_testing;
 
 

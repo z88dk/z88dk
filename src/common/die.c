@@ -62,3 +62,26 @@ int xglob(const char * pattern, int flags,
 				"unknown problem"));
 	return ret;
 }
+
+//-----------------------------------------------------------------------------
+// functions called from C++
+//-----------------------------------------------------------------------------
+void* must_malloc(size_t size) {
+	return xmalloc(size);
+}
+
+void* must_calloc(size_t count, size_t size) {
+	return xcalloc(count, size);
+}
+
+void* must_realloc(void* block, size_t size) {
+	return xrealloc(block, size);
+}
+
+void must_free(void* block) {
+	xfree(block);
+}
+
+char* must_strdup(const char* str) {
+	return xstrdup(str);
+}

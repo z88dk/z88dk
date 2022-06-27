@@ -23,8 +23,8 @@ spew("test1.lst", <<'END');
 ; comment followed by blank line
 
 # comment
-   test2.asm  
-@  test2.lst  
+ test2.asm  
+@test2.lst  
 END
 
 # list file with different EOL chars
@@ -43,17 +43,17 @@ make_test_files();
 spew("test1.lst", 
 	"\r\r\n\n  ".
 	"test2.asm".
-	"  \r\r\n\n  \@ ".
+	"  \r\r\n\n  \@".
 	"test2.lst");
 	
 spew("test2.lst", 
 	"\r\r\n\n  ".
 	"test2.asm".
-	"  \r\r\n\n  \@ ".
+	"  \r\r\n\n  \@".
 	"test1.lst");
 run('z88dk-z80asm -b test1.asm "@test1.lst"', 1, "", <<'ERR');
 test2.lst:7: error: include recursion: test1.lst
-  ^---- @ test1.lst
+  ^---- @test1.lst
 ERR
 
 # expand environment variables in source and list files
@@ -69,7 +69,7 @@ spew("test1.lst", <<'END');
   ${TEST_ENV}2.asm
 
 # see #440
-@ ${TEST_ENV}2.lst
+@${TEST_ENV}2.lst
 END
 
 spew("test2.lst", <<'END');
@@ -93,7 +93,7 @@ spew("test1.lst", <<'END');
   te${TEST_ENV}st2.asm
 
 # see #440
-@ te${TEST_ENV}st2.lst
+@te${TEST_ENV}st2.lst
 END
 
 spew("test2.lst", <<'END');
@@ -133,7 +133,7 @@ ERR
 # use globs in recursive list file name
 make_test_files("test_dir");
 spew("test1.lst", <<'END');
-	@ test_dir/*.lst
+	@test_dir/*.lst
 END
 for (1..4) {
 	spew("test_dir/test$_.lst", "test_dir/test$_.asm");

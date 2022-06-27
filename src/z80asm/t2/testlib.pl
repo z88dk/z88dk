@@ -110,6 +110,7 @@ sub capture_nok {
 sub run_ok {
     my($cmd) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+	
     ok 0==system($cmd), $cmd;
 }
 
@@ -117,6 +118,7 @@ sub run_ok {
 sub run_nok {
     my($cmd) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+	
     ok 0!=system($cmd), $cmd;
 }
 
