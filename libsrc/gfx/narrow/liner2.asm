@@ -294,7 +294,9 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     push    de    ;    hl =    (x0,y0)...
     jp    (ix)    ;    execute PLOT at (x0,y0)
 .plot_RET    pop    hl    ;    restore H,L distances...
-    djnz    drawloop    ; NEXT N
+    ;djnz    drawloop    ; NEXT N
+	dec   b
+	jp    nz,drawloop
     jr    exit_draw
 .range_error    pop    hl    ; remove H,L distances...
 .exit_draw    pop    hl    ; restore    relative horisontal    distance
