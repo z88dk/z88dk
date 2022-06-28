@@ -7,11 +7,11 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     EXTERN    __gfx_coords
 
 ;
-;    $Id: liner2.asm,v 1.7 2016-07-02 09:01:35 dom Exp $
+;    $Id: liner2.asm $
 ;
 
 ;    ...SLLLOOOW Variant by Stefano Bodrato
-;    with the alternate registers left untouched
+;    with the alternate registers left untouched and 8080 compatible instructions
 
 ; ******************************************************************************
 ;
@@ -202,7 +202,11 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 
 .init_drawloop    ld    b,h
     ld    c,h    ; B = H
-    srl    c    ; i = INT(B/2)
+    ;srl    c    ; i = INT(B/2)
+	xor   a
+	add   c
+	rra
+	ld    c,a
           ; FOR N=B    TO 1    STEP    -1
 .drawloop
 
@@ -319,7 +323,9 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 .sgn    ld    a,h
     or    l
     ret    z    ; integer    is zero, return 0...
-    bit    7,h
+;    bit    7,h
+    ld     a,128	; trying to be 8080 compatible  ;)
+	and    h
     jr    nz, negative_int
        ld    a,1
        ret
@@ -338,14 +344,24 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;    A.BCDE../IXIY    same
 ;    .F....HL/....    different
 ;
-.abs    bit    7,h
+.abs
+;    bit    7,h
+    ld     a,128	; trying to be 8080 compatible  ;)
+	and    h
     ret    z    ; integer    is positive...
-    push    de
-    ex    de,hl
-    ld    hl,0
-    cp    a    ; Fc    = 0,    may not be used...
-    sbc    hl,de    ; convert    negative integer
-    pop    de
+;    push    de
+;    ex    de,hl
+    ;ld    hl,0
+    ;cp    a    ; Fc    = 0,    may not be used...
+    ;sbc    hl,de    ; convert    negative integer
+	xor   a
+	sub   l
+	ld    l,a
+;	ld    a,0	; values between 0..255 are expected
+;	sbc   h
+;	ld    h,a
+
+;    pop    de
     ret
 
      SECTION bss_graphics
