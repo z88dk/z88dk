@@ -206,7 +206,7 @@ extern void __LIB__  filltxt(char character) __z88dk_fastcall;
 
 // Special effect: roll all displayed text characters vertically
 // 0..7, where '0' is the 'correct' adjustment
-extern void __LIB__  rolltxt(int offset) __z88dk_fastcall;
+extern void __LIB__  rollchr(int offset) __z88dk_fastcall;
 
 // Scroll up text screen
 extern void __LIB__ scrolluptxt();
