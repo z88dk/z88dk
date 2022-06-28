@@ -204,7 +204,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     ld    c,h    ; B = H
     srl    c    ; i = INT(B/2)
           ; FOR N=B    TO 1    STEP    -1
-.drawloop    ld    a,c
+.drawloop
+
+    xor   a               ; (Stefano)
+	or    h               ; .. vertical line drawing was slow
+	jr    z, i_greater    ; this shortcut seems to solve the problem
+
+    ld    a,c
     add    a,l
     jr    c, i_greater    ;    i + L > 255  (i > H)
     cp    h
