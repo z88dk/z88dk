@@ -2,11 +2,16 @@
 
 use Modern::Perl;
 use Test::More;
+use Config;
 use Capture::Tiny 'capture_merged';
 use Data::HexDump;
 use Path::Tiny;
 use Text::Diff;
-use Config;
+
+$ENV{PATH} = join($Config{path_sep}, 
+			".",
+			"../../bin",
+			$ENV{PATH});
 
 my $OBJ_FILE_VERSION = "16";
 
@@ -250,8 +255,14 @@ sub quote_os {
 # replace by a simpler spew without renames
 sub spew {
 	my($file, @data) = @_;
-	open(my $fh, ">:raw", $file) or die "write $file: $!"; 
-	print $fh join('', @data);
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+	my $open_ok = open(my $fh, ">:raw", $file);
+	ok $open_ok, "write $file"; 
+	
+	if ($open_ok) {
+		print $fh join('', @data);
+	}
 }
 
 #------------------------------------------------------------------------------
@@ -259,9 +270,18 @@ sub spew {
 sub slurp {
 	my($file) = @_;
 	local $/;
-	open(my $fh, "<:raw", $file) or die "read $file: $!";
-	my $data = <$fh>;
-	return $data;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+	my $open_ok = open(my $fh, "<:raw", $file);
+	ok $open_ok, "read $file";
+	
+	if ($open_ok) {
+		my $data = <$fh>;
+		return $data;
+	}
+	else {
+		return "";
+	}
 }
 
 1;

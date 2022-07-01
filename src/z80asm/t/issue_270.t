@@ -163,5 +163,6 @@ my $buffer = "\0" x 200;
 ok $bss =~ /$buffer\z/, "test_BSS.bin contents";
 
 
+unlink("test");
 unlink_testfiles();
 done_testing;

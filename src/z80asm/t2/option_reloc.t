@@ -9,6 +9,61 @@ use CPU::Z80::Assembler;
 my $reloc_code = z80asm_file("dev/reloc_code.asm");
 
 #------------------------------------------------------------------------------
+# test verbose reloc
+
+# without reloc data
+my $asm = "ld hl, 0";
+my $bin0 = bytes(0x21, 0, 0);
+my $reloc_header = "";
+my $reloc_header_size = length($reloc_header);
+
+unlink_testfiles;
+spew("${test}.asm", $asm);
+
+capture_ok("z88dk-z80asm -b -v -R ${test}.asm", <<END);
+Reading library 'z88dk-z80asm-z80-.lib'
+Predefined constant: __CPU_Z80__ = \$0001
+Predefined constant: __CPU_ZILOG__ = \$0001
+Predefined constant: __FLOAT_GENMATH__ = \$0001
+Assembling '${test}.asm' to '${test}.o'
+Reading '${test}.asm' = '${test}.asm'
+Writing object file '${test}.o'
+Module '${test}' size: 3 bytes
+
+Code size: 3 bytes (\$0000 to \$0002)
+Creating binary '${test}.bin'
+END
+
+check_bin_file("${test}.bin", $reloc_header.$bin0);
+
+
+# with reloc data
+$asm = "start: jp start";
+$bin0 = bytes(0xC3, 0, 0);
+$reloc_header = reloc_header(1);
+$reloc_header_size = length($reloc_header);
+
+unlink_testfiles;
+spew("${test}.asm", $asm);
+
+capture_ok("z88dk-z80asm -b -v -R ${test}.asm", <<END);
+Reading library 'z88dk-z80asm-z80-.lib'
+Predefined constant: __CPU_Z80__ = \$0001
+Predefined constant: __CPU_ZILOG__ = \$0001
+Predefined constant: __FLOAT_GENMATH__ = \$0001
+Assembling '${test}.asm' to '${test}.o'
+Reading '${test}.asm' = '${test}.asm'
+Writing object file '${test}.o'
+Module '${test}' size: 3 bytes
+
+Code size: 3 bytes (\$0000 to \$0002)
+Creating binary '${test}.bin'
+Relocation header is $reloc_header_size bytes.
+END
+
+check_bin_file("${test}.bin", $reloc_header.$bin0);
+
+#------------------------------------------------------------------------------
 # test reloc
 test_reloc("start: jp start");
 test_reloc("start: defw start,start,start");
@@ -56,8 +111,8 @@ unlink_testfiles;
 spew("${test}.asm", $asm);
 capture_ok("z88dk-z80asm -b -m -reloc-info ${test}.asm", "");
 
-ok ! -f "${test}.bin", "no empty section";
-ok ! -f "${test}.reloc", "no empty section";
+check_bin_file("${test}.bin", bytes());
+check_bin_file("${test}.reloc", words());
 
 check_bin_file("${test}_code.bin", 
 		z80asm("org $code_addr\n".
@@ -73,8 +128,6 @@ check_bin_file("${test}_code.reloc",
 check_bin_file("${test}_data.bin", 
 		z80asm(data_asm("").data_asm("1").data_asm("2")));
 		
-ok ! -f "${test}.reloc";
-
 check_txt_file("${test}.map", <<END);
 start                           = \$1020 ; addr, local, , ${test}, code, ${test}.asm:3
 string                          = \$3040 ; addr, local, , ${test}, data, ${test}.asm:12
@@ -106,8 +159,7 @@ my $asm = code_asm("").code_asm("1").code_asm("2").
 my @reloc = reloc_addrs($asm);
 my $reloc_header = reloc_header(@reloc);
 
-capture_ok("z88dk-z80asm -b -m -R ${test}.asm 2>${test}.err", 
-		"Relocation header is ".length($reloc_header)." bytes.\n");
+capture_ok("z88dk-z80asm -b -m -R ${test}.asm 2>${test}.err", "");
 
 check_txt_file("${test}.err", <<END);
 ${test}.asm: warning: ORG ignored: file ${test}.o, section code
@@ -166,8 +218,9 @@ spew("${test}2.asm",
 		data_asm("2"));
 
 capture_ok("z88dk-z80asm -b -m -reloc-info ${test}.asm ${test}1.asm ${test}2.asm", "");
-ok ! -f "${test}.bin";
-ok ! -f "${test}.reloc";
+
+check_bin_file("${test}.bin", bytes());
+check_bin_file("${test}.reloc", words());
 
 check_bin_file("${test}_code.bin", 
 		z80asm("org $code_addr\n".
@@ -235,8 +288,7 @@ $asm = code_asm("").code_asm("1").code_asm("2").
 $reloc_header = reloc_header(@reloc);
 
 capture_ok("z88dk-z80asm -b -m -R ${test}.asm ${test}1.asm ${test}2.asm ".
-		   "2>${test}.err", 
-		   "Relocation header is ".length($reloc_header)." bytes.\n");
+		   "2>${test}.err", "");
 
 check_txt_file("${test}.err", <<ERR);
 ${test}.asm: warning: ORG ignored: file ${test}.o, section code
@@ -298,8 +350,8 @@ END
 	
 capture_ok("z88dk-z80asm -b -m -reloc-info ${test}.asm", "");
 
-ok ! -f "${test}.bin";
-ok ! -f "${test}.reloc";
+check_bin_file("${test}.bin", bytes());
+check_bin_file("${test}.reloc", words());
 
 check_bin_file("${test}_code.bin", 
 		z80asm("org $code_addr\n".
@@ -366,7 +418,7 @@ done_testing;
 # test with and without -R
 sub test_reloc {
 	my($asm) = @_;
-	local $Test::Builder::Level = $Test::Builder::Level + 1;
+	#local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
 	my($bin0, $bin1, $reloc_header, @reloc) = compute_reloc_addrs($asm);
 
@@ -374,9 +426,8 @@ sub test_reloc {
 	for my $options ('-R', '-R -reloc-info') {
 		unlink_testfiles;
 		spew("${test}.asm", $asm);
-		
-		capture_ok("z88dk-z80asm -b $options ${test}.asm", 
-				"Relocation header is ".length($reloc_header)." bytes.\n");
+
+		capture_ok("z88dk-z80asm -b $options ${test}.asm", "");
 						 
 		check_bin_file("${test}.bin", $reloc_header.$bin0);
 		ok ! -f "${test}.reloc", "no reloc-info with -R";

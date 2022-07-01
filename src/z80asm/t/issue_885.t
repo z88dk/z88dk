@@ -56,6 +56,7 @@ run("z88dk-z80asm -m -b -r$org test.asm");
 check_bin_file("test.bin", pack("v*", $org, $org, $org % 8));
 test_map("test.map");
 
+unlink("test");
 unlink_testfiles();
 done_testing();
 

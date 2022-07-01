@@ -63,6 +63,15 @@ END_CLASS;
 CLASS_HASH( Section );
 
 /*-----------------------------------------------------------------------------
+*   FILE* and filename or current code area
+*----------------------------------------------------------------------------*/
+typedef struct CodeareaFile {
+	const char* filename;			// kept in strpool
+	FILE*		fp;					// open file handle
+	const char* initial_filename;	// kept in strpool
+} CodeareaFile;
+
+/*-----------------------------------------------------------------------------
 *   Handle list of current sections
 *----------------------------------------------------------------------------*/
 
@@ -160,7 +169,9 @@ extern bool fwrite_module_code(FILE *file, int* p_code_size);
 /*-----------------------------------------------------------------------------
 *   write whole code area to an open file
 *----------------------------------------------------------------------------*/
-extern void fwrite_codearea(const char *filename, FILE **pbinfile, FILE **prelocfile );
+extern void fwrite_codearea(const char* filename,
+	CodeareaFile* binfile, CodeareaFile* relocfile);
+extern void codearea_close_remove(CodeareaFile* binfile, CodeareaFile* relocfile);
 
 /*-----------------------------------------------------------------------------
 *   Assembly directives

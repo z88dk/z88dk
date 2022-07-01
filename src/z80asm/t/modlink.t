@@ -717,7 +717,7 @@ ok 1, $cmd;
 is_text( $stdout, "", "stdout" );
 is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
-ok ! -f "test.bin", "test.bin";
+is -s "test.bin", 0, "test.bin";
 is read_binfile("test_bank0.bin"), "\xC9\0\0\0\0\0\0\0\xC9\xC9", "test_bank0.bin";
 is read_binfile("test_bank1.bin"), "\xCD\x08\x00\x00\x00\0\0\0\xC9\x00\xC9", "test_bank1.bin";
 is read_binfile("test_main.bin"), "\xCD\x08\x00\x09\x00\xCD\x08\x00\x0A\x00\xC9", "test_main.bin";

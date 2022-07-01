@@ -114,5 +114,6 @@ for my $one_step (0, 1) {
 }
 
 
+unlink("test");
 unlink_testfiles();
 done_testing;
