@@ -29,7 +29,10 @@ void _xfputc (char c, char *font, Bool bold)
     }
     if ((_xchar_proportional = _xfindchar( (char) (c - 32), (char *) font)) == -1) return;
 
-    if (_x_proportional + _xchar_proportional[0] >= DisplayWidth(0, 0)) _xfputc (13, font, bold);
+    if (_x_proportional + _xchar_proportional[0] >= getmaxx()) {
+		_x_proportional = 0;
+		_y_proportional += _yh_proportional; // line spacing, default is 9
+	};
 
     putsprite (SPR_OR, _x_proportional, _y_proportional, _xchar_proportional);
     if (bold) putsprite (SPR_OR, ++_x_proportional, _y_proportional, _xchar_proportional);
