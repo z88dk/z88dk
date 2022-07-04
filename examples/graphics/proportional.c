@@ -251,13 +251,13 @@ char font[] = { 6, 12, 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0
  6, 2, 0xE8 , 0xB8  };
 
 
-int blod_flg=0;
+int bold_flg=0;
 
 extern char __LIB__ xputc (char c);
 
 extern char xputc (char c) {
 	_yh_proportional=17;
-	_xfputc (c, font, blod_flg);  // char, font, bold flag
+	_xfputc (c, font, bold_flg);  // char, font, bold flag
 	return (c);
 }
 
@@ -268,7 +268,7 @@ main()
 	clg();
 	printf("Importing proportional fonts !\n\n");
 	printf("abcdefghijklmnopqrstuvwxyz\n");
-	blod_flg=1;
+	bold_flg=1;
 	printf("abcdefghijklmnopqrstuvwxyz\n");
 	while (getk()!=0){};
 	while (getk()==0){};
