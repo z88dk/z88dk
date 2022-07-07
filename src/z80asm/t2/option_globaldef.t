@@ -44,7 +44,7 @@ spew("${test}.asm", $asm);
 spew("${test}1.asm", $asm1);
 run_ok("z88dk-z80asm -b -g ${test}.asm ${test}1.asm");
 ok -f "${test}.def", "no definitions file";
-check_txt_file("${test}.def", <<END);
+check_text_file("${test}.def", <<END);
 DEFC main                            = \$0000
 DEFC x31_x31_x31_x31_x31_x31_x31_x31 = \$0004
 DEFC x_32_x32_x32_x32_x32_x32_x32_x32 = \$0005

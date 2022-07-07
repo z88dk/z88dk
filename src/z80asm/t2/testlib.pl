@@ -19,6 +19,8 @@ use vars '$test', '$null', '$os_ls', '$os_cmd_sep';
 $test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
 $null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
 
+unlink_testfiles();
+
 #------------------------------------------------------------------------------
 sub check_bin_file {
     my($got_file, $exp_bin) = @_;
@@ -30,11 +32,11 @@ sub check_bin_file {
 	my $exp_hex = HexDump($exp_bin);
 	
 	my $diff = diff(\$exp_hex, \$got_hex, {STYLE => 'Context'});
-	is $diff, "", "bin file";
+	is $diff, "", "bin file $got_file ok";
 }
 
 #------------------------------------------------------------------------------
-sub check_txt_file {
+sub check_text_file {
     my($got_file, $exp_text) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
@@ -42,7 +44,7 @@ sub check_txt_file {
 	$exp_text =~ s/\r\n/\n/g;
 	
 	my $diff = diff(\$exp_text, \$got_text, {STYLE => 'Context'});
-	is $diff, "", "text file";
+	is $diff, "", "text file $got_file ok";
 }
 
 #------------------------------------------------------------------------------
@@ -69,7 +71,7 @@ sub z80asm_ok {
 
     run_ok("z88dk-z80asm $options $files 2> ${test}.stderr");
     check_bin_file($bin_file, $bin);
-    check_txt_file("${test}.stderr", $exp_warn) if $exp_warn;
+    check_text_file("${test}.stderr", $exp_warn) if $exp_warn;
 }
 
 #------------------------------------------------------------------------------
@@ -94,7 +96,7 @@ sub capture_ok {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
     run_ok($cmd." > ${test}.stdout");
-    check_txt_file("${test}.stdout", $exp_out);
+    check_text_file("${test}.stdout", $exp_out);
 }
 
 #------------------------------------------------------------------------------
@@ -103,7 +105,7 @@ sub capture_nok {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     run_nok($cmd." 2> ${test}.stderr");
-    check_txt_file("${test}.stderr", $exp_err);
+    check_text_file("${test}.stderr", $exp_err);
 }
 
 #------------------------------------------------------------------------------
@@ -271,14 +273,13 @@ sub spew {
 # and for simetry
 sub slurp {
 	my($file) = @_;
-	local $/;
 	local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	my $open_ok = open(my $fh, "<:raw", $file);
 	ok $open_ok, "read $file";
 	
 	if ($open_ok) {
-		my $data = <$fh>;
+		read($fh, my $data, -s $file);
 		return $data;
 	}
 	else {

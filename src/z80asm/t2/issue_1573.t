@@ -8,7 +8,14 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 mkdir "t2/1573/output";
 unlink <t2/1573/output/*>;
 chdir("t2/1573/input") or die;
+{
+	local $ENV{PATH} = join($Config{path_sep}, 
+				"../../..",
+				"../../../../../bin",
+				$ENV{PATH});
+
 	run_ok("z88dk-z80asm -O../output -b -l -g -m -reloc-info file1.asm file2.asm");
+}
 chdir("../../..") or die;
 
 list_files_ok("t2/1573/input", qw( 
@@ -33,7 +40,14 @@ list_files_ok("t2/1573/output", ());
 # test2.sh
 unlink <t2/1573/output/*>;
 chdir("t2/1573/input") or die;
+{
+	local $ENV{PATH} = join($Config{path_sep}, 
+				"../../..",
+				"../../../../../bin",
+				$ENV{PATH});
+
 	run_ok("z88dk-z80asm -O../output -ofoobar.bin -b -l -g -m -reloc-info file1.asm file2.asm");
+}
 chdir("../../..") or die;
 
 list_files_ok("t2/1573/input", qw(

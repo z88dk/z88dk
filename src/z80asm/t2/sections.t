@@ -7,7 +7,7 @@ z80asm_ok("-r4 -b -m -g -Dminus_d_var", "", "", <<END, bytes());
 				; empty			;; 
 END
 
-check_txt_file("$test.map", <<END);
+check_text_file("$test.map", <<END);
 __head                          = \$0004 ; const, public, def, , ,
 __tail                          = \$0004 ; const, public, def, , ,
 __size                          = \$0000 ; const, public, def, , ,
@@ -20,7 +20,7 @@ z80asm_ok("-b -m", "", "", <<END, bytes(0));
 				nop				;; 00
 END
 
-check_txt_file("$test.map", <<END);
+check_text_file("$test.map", <<END);
 __head                          = \$0000 ; const, public, def, , ,
 __tail                          = \$0001 ; const, public, def, , ,
 __size                          = \$0001 ; const, public, def, , ,

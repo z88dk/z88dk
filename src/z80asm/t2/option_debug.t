@@ -28,7 +28,7 @@ END
 
 run_ok("z88dk-z80asm -b -m ${test}.asm ${test}1.asm");
 
-check_txt_file("${test}.map", <<'END');
+check_text_file("${test}.map", <<'END');
 main                            = $0000 ; addr, local, , test_t2_option_debug, , test_t2_option_debug.asm:3
 func                            = $0004 ; addr, public, , test_t2_option_debug1, , test_t2_option_debug1.c:1
 __head                          = $0000 ; const, public, def, , ,
@@ -38,7 +38,7 @@ END
 
 run_ok("z88dk-z80asm -b -debug ${test}.asm ${test}1.asm");
 
-check_txt_file("${test}.map", <<'END');
+check_text_file("${test}.map", <<'END');
 main                            = $0000 ; addr, local, , test_t2_option_debug, , test_t2_option_debug.asm:3
 __ASM_LINE_3_test_5ft2_5foption_5fdebug_2easm = $0000 ; addr, local, , test_t2_option_debug, , test_t2_option_debug.asm:3
 __ASM_LINE_4_test_5ft2_5foption_5fdebug_2easm = $0000 ; addr, local, , test_t2_option_debug, , test_t2_option_debug.asm:4
@@ -80,7 +80,7 @@ run_ok("zcc +zx -m -debug ${test}.c ${test}1.asm -o ${test}.bin");
 my @map = grep {!/zcc|crt0/ && /$test_expanded|_main|_one/} path("${test}.map")->lines;
 spew("${test}1.map", @map);
 
-check_txt_file("${test}1.map", <<'END');
+check_text_file("${test}1.map", <<'END');
 __C_LINE_0_test_5ft2_5foption_5fdebug_2ec = $80CD ; addr, local, , test_t2_option_debug_c, , test_t2_option_debug.c:0
 __C_LINE_1_test_5ft2_5foption_5fdebug_2ec = $80CD ; addr, local, , test_t2_option_debug_c, , test_t2_option_debug.c:1
 __C_LINE_0_test_5ft2_5foption_5fdebug_2eh = $80CD ; addr, local, , test_t2_option_debug_c, , test_t2_option_debug.h:0

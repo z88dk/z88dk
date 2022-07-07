@@ -192,7 +192,7 @@ z80asm_ok("-b -mz80n -l", "", "", <<END, bytes(0x82, 0));
 	cu.wait 0,1
 END
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1   000000 8200            	cu.wait 0,1
      2                          

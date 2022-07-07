@@ -827,6 +827,7 @@ static void link_libraries(StrHash* extern_syms) {
 static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 	// load code sections
 	if (goto_code(obj)) {
+		bool first_section = true;
 		while (true) {				// read sections until end marker
 			int code_size = parse_int(obj);
 			if (code_size < 0)		// end marker
@@ -846,10 +847,19 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 				section->origin = -1;
 				section->section_split = false;
 			}
+			// if running appmake, ignore origin except for first module
+			else if (opts.appmake && section->origin >= 0 && !first_section) {
+				warn_org_ignored(obj->filename, section->name);
+
+				section->origin = -1;
+				section->section_split = false;
+			}
 
 			// load bytes to section
 			patch_from_memory(obj->data + obj->i, 0, code_size);
 			obj->i += code_size;
+
+			first_section = false;
 		}
 	}
 

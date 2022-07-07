@@ -20,7 +20,7 @@ END
 # list 
 run_ok("z88dk-z80asm -b -l $test.asm");
 check_bin_file("$test.bin", "45".bytes(0xff)."23".bytes(0xff));
-check_txt_file("$test.lis", <<END);
+check_text_file("$test.lis", <<END);
 test_t2_issue_1928.asm:
      1                          REPTC var, 45
      2                          defb var
@@ -41,7 +41,7 @@ END
 # verbose list
 run_ok("z88dk-z80asm -b -l -v $test.asm > $null");
 check_bin_file("$test.bin", "45".bytes(0xff)."23".bytes(0xff));
-check_txt_file("$test.lis", <<END);
+check_text_file("$test.lis", <<END);
 test_t2_issue_1928.asm:
      1                          REPTC var, 45
      2                          defb var

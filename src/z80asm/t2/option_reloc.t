@@ -2,7 +2,10 @@
 
 BEGIN { use lib 't2'; require 'testlib.pl'; }
 
-# option -R 
+# test option -R 
+
+# Test https://github.com/z88dk/z88dk/issues/2045
+# z80asm: +zx creates invalid tap file if code has split sections
 
 use CPU::Z80::Assembler;
 
@@ -128,7 +131,7 @@ check_bin_file("${test}_code.reloc",
 check_bin_file("${test}_data.bin", 
 		z80asm(data_asm("").data_asm("1").data_asm("2")));
 		
-check_txt_file("${test}.map", <<END);
+check_text_file("${test}.map", <<END);
 start                           = \$1020 ; addr, local, , ${test}, code, ${test}.asm:3
 string                          = \$3040 ; addr, local, , ${test}, data, ${test}.asm:12
 string1                         = \$304A ; addr, local, , ${test}, data, ${test}.asm:23
@@ -161,7 +164,7 @@ my $reloc_header = reloc_header(@reloc);
 
 capture_ok("z88dk-z80asm -b -m -R ${test}.asm 2>${test}.err", "");
 
-check_txt_file("${test}.err", <<END);
+check_text_file("${test}.err", <<END);
 ${test}.asm: warning: ORG ignored: file ${test}.o, section code
 ${test}.asm: warning: ORG ignored: file ${test}.o, section data
 END
@@ -174,7 +177,7 @@ ok ! -f "${test}_code.reloc";
 ok ! -f "${test}_data.bin";
 ok ! -f "${test}_data.reloc";
 
-check_txt_file("${test}.map", <<END);
+check_text_file("${test}.map", <<END);
 start                           = \$005F ; addr, local, , ${test}, code, ${test}.asm:3
 string                          = \$0095 ; addr, local, , ${test}, data, ${test}.asm:12
 string1                         = \$009F ; addr, local, , ${test}, data, ${test}.asm:23
@@ -238,7 +241,7 @@ check_bin_file("${test}_data.bin",
 
 check_bin_file("${test}_data.reloc", "");
 
-check_txt_file("${test}.map", <<END);
+check_text_file("${test}.map", <<END);
 start                           = \$1020 ; addr, public, , ${test}, code, ${test}.asm:5
 string                          = \$3040 ; addr, public, , ${test}, data, ${test}.asm:14
 start1                          = \$1032 ; addr, public, , ${test}1, code, ${test}1.asm:4
@@ -290,7 +293,7 @@ $reloc_header = reloc_header(@reloc);
 capture_ok("z88dk-z80asm -b -m -R ${test}.asm ${test}1.asm ${test}2.asm ".
 		   "2>${test}.err", "");
 
-check_txt_file("${test}.err", <<ERR);
+check_text_file("${test}.err", <<ERR);
 ${test}.asm: warning: ORG ignored: file ${test}.o, section code
 ${test}.asm: warning: ORG ignored: file ${test}.o, section data
 ${test}1.asm: warning: ORG ignored: file ${test}1.o, section code
@@ -307,7 +310,7 @@ ok ! -f "${test}_code.reloc";
 ok ! -f "${test}_data.bin";
 ok ! -f "${test}_data.reloc";
 
-check_txt_file("${test}.map", <<END);
+check_text_file("${test}.map", <<END);
 start                           = \$005F ; addr, public, , ${test}, code, ${test}.asm:5
 string                          = \$0095 ; addr, public, , ${test}, data, ${test}.asm:14
 start1                          = \$0071 ; addr, public, , ${test}1, code, ${test}1.asm:4
@@ -323,6 +326,62 @@ __code_size                     = \$0095 ; const, public, def, , ,
 __data_head                     = \$0095 ; const, public, def, , ,
 __data_tail                     = \$00B5 ; const, public, def, , ,
 __data_size                     = \$007F ; const, public, def, , ,
+END
+
+#------------------------------------------------------------------------------
+# with -R, several sections with orgs
+
+unlink_testfiles;
+spew("${test}.asm", <<END);
+	section code1
+	org 0x1000
+	
+start: jp cont
+	
+	section code2
+	org 0x8000
+	
+cont:  ret
+END
+
+my $bin = z80asm(<<END);
+	org 0
+	
+start: jp cont
+cont:  ret
+END
+
+@reloc = (1);
+$reloc_header = reloc_header(@reloc);
+
+capture_ok("z88dk-z80asm -b -m -R ${test}.asm 2>${test}.err", "");
+
+check_text_file("${test}.err", <<ERR);
+${test}.asm: warning: ORG ignored: file ${test}.o, section code1
+${test}.asm: warning: ORG ignored: file ${test}.o, section code2
+ERR
+
+check_bin_file("${test}.bin", $reloc_header.$bin);
+
+ok ! -f "${test}.reloc";
+
+ok ! -f "${test}_code1.bin";
+ok ! -f "${test}_code1.reloc";
+ok ! -f "${test}_code2.bin";
+ok ! -f "${test}_code2.reloc";
+
+check_text_file("${test}.map", <<END);
+cont                            = \$0051 ; addr, local, , ${test}, code2, ${test}.asm:9
+start                           = \$004E ; addr, local, , ${test}, code1, ${test}.asm:4
+__head                          = \$004E ; const, public, def, , ,
+__tail                          = \$0052 ; const, public, def, , ,
+__size                          = \$0052 ; const, public, def, , ,
+__code1_head                    = \$004E ; const, public, def, , ,
+__code1_tail                    = \$0051 ; const, public, def, , ,
+__code1_size                    = \$0051 ; const, public, def, , ,
+__code2_head                    = \$0051 ; const, public, def, , ,
+__code2_tail                    = \$0052 ; const, public, def, , ,
+__code2_size                    = \$004F ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
@@ -379,7 +438,7 @@ ok ! -f "${test}_data1.reloc";
 ok ! -f "${test}_data2.bin";
 ok ! -f "${test}_data2.reloc";
 
-check_txt_file("${test}.map", <<END);
+check_text_file("${test}.map", <<END);
 start                           = \$1020 ; addr, local, , ${test}, code, ${test}.asm:12
 string                          = \$3040 ; addr, local, , ${test}, data, ${test}.asm:36
 string1                         = \$304A ; addr, local, , ${test}, data1, ${test}.asm:39

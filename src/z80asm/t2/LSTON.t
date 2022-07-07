@@ -13,7 +13,7 @@ run_ok("z88dk-z80asm -b -l $test.asm");
 ok -f "$test.lis", "$test.lis exists";
 
 check_bin_file("$test.bin", bytes(1, 1, 0, 0x21, 1, 0));
-check_txt_file("$test.lis", <<END);
+check_text_file("$test.lis", <<END);
 test_t2_LSTON.asm:
      1                          lstoff
      4   000003 210100          ld hl,1

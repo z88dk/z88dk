@@ -40,7 +40,7 @@ Creating binary '${test}.bin'
 END
 
 check_bin_file("${test}.bin", bytes(0,0,0));
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          	nop
          000000 00                    + nop
@@ -52,7 +52,7 @@ ${test}.asm:
                                       +
 END
 
-check_txt_file("${test}.def", <<END);
+check_text_file("${test}.def", <<END);
 END
 
 unlink_testfiles;

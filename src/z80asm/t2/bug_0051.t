@@ -19,14 +19,14 @@ z80asm_ok("-r4 -b -m -g -Dminus_d_var", "", "", <<END,
 END
 	bytes(1, 2, 3, 4, 9));
 
-check_txt_file("$test.def", <<END);
+check_text_file("$test.def", <<END);
 DEFC minus_d_var                     = \$0001
 DEFC defc_var                        = \$0002
 DEFC defvars_var                     = \$0003
 DEFC public_label                    = \$0004
 END
 
-check_txt_file("$test.map", <<END);
+check_text_file("$test.map", <<END);
 local_label                     = \$0009 ; addr, local, , $test, , $test.asm:12
 minus_d_var                     = \$0001 ; const, public, , $test, , $test.o:0
 defc_var                        = \$0002 ; const, public, , $test, , $test.asm:2

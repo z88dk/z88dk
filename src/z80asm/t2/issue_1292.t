@@ -66,7 +66,7 @@ check_bin_file("${test}.bin", pack("C*",
 				0x01, 0xC0, 0x02, 0x00,	#	defq func2
 ));
 
-check_txt_file("${test}.map", <<END);
+check_text_file("${test}.map", <<END);
 banked_call                     = \$0000 ; addr, local, , ${test}, test, ${test}.asm:3
 func1                           = \$1C000 ; addr, public, , ${test}1, test1, ${test}1.asm:4
 func2                           = \$2C001 ; addr, public, , ${test}2, test2, ${test}2.asm:5

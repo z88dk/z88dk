@@ -81,7 +81,7 @@ spew("$test.1.asm", <<'END');
 END
 
 run_ok("z88dk-z80asm -b $test.asm $test.1.asm 2> $test.err");
-check_txt_file("$test.err", <<END);
+check_text_file("$test.err", <<END);
 $test.asm:4: warning: integer range: -129
   ^---- L_129
 $test.asm:19: warning: integer range: 0x100

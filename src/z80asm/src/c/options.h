@@ -106,3 +106,4 @@ extern void checkrun_appmake(void);
 bool option_ucase();
 bool option_list_file();
 bool option_cur_list();
+bool option_single_binary_block();	// required by opts.relocatable and aps.appmake

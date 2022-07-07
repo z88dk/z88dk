@@ -68,7 +68,7 @@ spew("${test}1.asm", $asm1_s);
 run_ok("z88dk-z80asm -b -m ${test}.asm ${test}1.asm");
 ok -f "${test}.map", "found ${test}.map";
 check_bin_file("${test}.bin", $bin);
-check_txt_file("${test}.map", <<'END');
+check_text_file("${test}.map", <<'END');
 __head                          = $0000 ; const, public, def, , ,
 __tail                          = $000B ; const, public, def, , ,
 __size                          = $000B ; const, public, def, , ,
@@ -82,7 +82,7 @@ spew("${test}1.asm", $asm1);
 run_ok("z88dk-z80asm -b -m ${test}.asm ${test}1.asm");
 ok -f "${test}.map", "found ${test}.map";
 check_bin_file("${test}.bin", $bin);
-check_txt_file("${test}.map", <<'END');
+check_text_file("${test}.map", <<'END');
 zero                            = $0000 ; const, local, , test_t2_option_map, , test_t2_option_map.asm:2
 loop                            = $0002 ; addr, local, , test_t2_option_map, , test_t2_option_map.asm:5
 x31_x31_x31_x31_x31_x31_x31_x31 = $0004 ; addr, local, , test_t2_option_map, , test_t2_option_map.asm:8

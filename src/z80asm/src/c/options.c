@@ -1138,6 +1138,10 @@ bool option_cur_list() {
 	return opts.cur_list;
 }
 
+bool option_single_binary_block() {
+	return opts.relocatable || opts.appmake;
+}
+
 bool option_verbose() {
 	return opts.verbose;
 }
