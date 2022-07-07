@@ -204,6 +204,19 @@ formatchar:
     ld      c,a
     cp      '%'            ; %% should match a single %
     jr      z,scanf_ordinary_char
+IF __CPU_INTEL__
+	push    hl
+	push    af
+    ld      hl,(__scanf_context)
+    dec     hl
+	ld      a,(hl)
+	inc     a              ; # conversions done
+	ld      (hl),a
+	pop     af
+	pop     hl
+ELSE
+    inc     (ix-1)         ; # conversions done
+ENDIF
     cp      'h'            ; short specifier
     jr      z,get_next_char
     cp      'l'
