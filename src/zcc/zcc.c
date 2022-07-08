@@ -510,6 +510,7 @@ static option options[] = {
     { 0, "custom-copt-rules", OPT_STRING,  "Custom user copt rules" , &c_coptrules_user, NULL, 0},
     { 'M', NULL, OPT_BOOL|OPT_PRIVATE,  "Swallow -M option in configs" , &swallow_M, NULL, 0},
     { 0, "vn", OPT_BOOL_FALSE|OPT_PRIVATE,  "Turn off command tracing" , &verbose, NULL, 0},
+    { 0, "no-cleanup", OPT_BOOL_FALSE, "Don't cleanup temporary files", &cleanup, NULL, 0 },
     { 0, "", 0, NULL },
 
 };
@@ -2858,10 +2859,10 @@ void remove_temporary_files(void)
             remove_file_with_extension(temporary_filenames[j], ".tmp");
             remove_file_with_extension(temporary_filenames[j], ".lis");
         }
+        /* Cleanup zcc_opt files */
+        remove(zcc_opt_def);
+        rmdir(zcc_opt_dir);
     }
-    /* Cleanup zcc_opt files */
-    remove(zcc_opt_def);
-    rmdir(zcc_opt_dir);
 }
 
 
