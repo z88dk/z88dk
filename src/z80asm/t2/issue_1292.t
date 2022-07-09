@@ -6,7 +6,7 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 # z80asm: Linker support to banked memory
 # Test 32-bit addresses
 
-path("${test}1.asm")->spew(<<'END');
+spew("${test}1.asm", <<'END');
 	section test1
 	org 	$01C000
 	public 	func1
@@ -15,7 +15,7 @@ path("${test}1.asm")->spew(<<'END');
 	jp   	func1
 END
 
-path("${test}2.asm")->spew(<<'END');
+spew("${test}2.asm", <<'END');
 	section test2
 	org 	$02C000
 	public 	func2
@@ -25,7 +25,7 @@ path("${test}2.asm")->spew(<<'END');
 	jp   	func2
 END
 
-path("${test}.asm")->spew(<<'END');
+spew("${test}.asm", <<'END');
 	section test
 	extern func1, func2
 	banked_call: ret
@@ -35,7 +35,7 @@ path("${test}.asm")->spew(<<'END');
 	defq func2
 END
 
-run_ok("./z88dk-z80asm -b -m -l ${test}.asm ${test}1.asm ${test}2.asm");
+run_ok("z88dk-z80asm -b -m -l ${test}.asm ${test}1.asm ${test}2.asm");
 
 check_bin_file("${test}_test1.bin", pack("C*",
 										#	section test1
@@ -66,7 +66,7 @@ check_bin_file("${test}.bin", pack("C*",
 				0x01, 0xC0, 0x02, 0x00,	#	defq func2
 ));
 
-check_txt_file("${test}.map", <<END);
+check_text_file("${test}.map", <<END);
 banked_call                     = \$0000 ; addr, local, , ${test}, test, ${test}.asm:3
 func1                           = \$1C000 ; addr, public, , ${test}1, test1, ${test}1.asm:4
 func2                           = \$2C001 ; addr, public, , ${test}2, test2, ${test}2.asm:5

@@ -91,7 +91,7 @@ END
 ));
 
 # multiple sources
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 	defc defvars_base = 0x80			
 	defvars defvars_base				
 										
@@ -106,7 +106,7 @@ path("$test.asm")->spew(<<END);
 	defb df1, df2, df3, df4, df5		;; 80 84 88 8E 96
 END
 
-path("$test.1.asm")->spew(<<END);
+spew("$test.1.asm", <<END);
 	defvars -1 ; continue after df5		
 	{									
 		df9  ds.b 1						; df9 = 0x96
@@ -117,7 +117,7 @@ path("$test.1.asm")->spew(<<END);
 	defb df9, df10, df11, df12			;; 96 97 98 98
 END
 
-path("$test.2.asm")->spew(<<END);
+spew("$test.2.asm", <<END);
 	defvars -1 ; continue after df12	
 	{									
 		df16 ds.b 1						; df16 = 0x98
@@ -127,7 +127,7 @@ path("$test.2.asm")->spew(<<END);
 	defb df16, df17, df18				;; 98 99 9A
 END
 
-run_ok("./z88dk-z80asm -b $test.asm $test.1.asm $test.2.asm");
+run_ok("z88dk-z80asm -b $test.asm $test.1.asm $test.2.asm");
 check_bin_file("$test.bin", 
 	bytes(0x80, 0x84, 0x88, 0x8E, 0x96, 0x96, 0x97, 0x98, 0x98, 0x98, 0x99, 0x9A));
 

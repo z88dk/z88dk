@@ -19,16 +19,12 @@ require './t/test_utils.pl';
 use Config;
 $ENV{PATH} = join($Config{path_sep},
 			".",
-			"../z80nm",
 			"../../bin",
 			$ENV{PATH});
-
-our $AR = -d "ar" ? "ar" : "../../src/z80nm";
 
 #------------------------------------------------------------------------------
 # test with z80nm
 #------------------------------------------------------------------------------
-system("make -C $AR") and die;
 sub t_z80nm {
 	my($o_file, $expected_out) = @_;
 

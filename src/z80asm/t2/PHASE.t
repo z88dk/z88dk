@@ -75,7 +75,7 @@ END
 		  1, 2, 3, 4,
 ));
 
-check_txt_file("$test.lis", <<'END');
+check_text_file("$test.lis", <<'END');
 test_t2_PHASE.asm:
      1                          	section PART_1
      2                          	part1:
@@ -106,7 +106,7 @@ test_t2_PHASE.asm:
     27                          
 END
 
-check_txt_file("$test.map", <<END);
+check_text_file("$test.map", <<END);
 part1                           = \$0000 ; addr, local, , $test, PART_1, $test.asm:2
 start                           = \$0012 ; addr, local, , $test, PART_1, $test.asm:11
 end                             = \$001A ; addr, local, , $test, PART_1, $test.asm:24

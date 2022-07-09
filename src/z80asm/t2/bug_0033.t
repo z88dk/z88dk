@@ -6,7 +6,7 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 z80asm_ok("", "", "", "ld a, 3", bytes(0x3e, 3));
 ok 2 == unlink("$test.asm", "$test.bin");
 
-run_ok("./z88dk-z80asm -b -d $test.asm");
+run_ok("z88dk-z80asm -b -d $test.asm");
 check_bin_file("$test.bin", bytes(0x3e, 3));
 
 unlink_testfiles;

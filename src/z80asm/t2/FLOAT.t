@@ -9,11 +9,11 @@ use Math::Trig;
 my $invalid_format_error = "invalid float format, expected: ".
 	"genmath,math48,ieee16,ieee32,ieee64,z80,zx81,zx,z88,mbfs,mbf40,mbf64,am9511";
 
-capture_nok("./z88dk-z80asm -float", <<END);
+capture_nok("z88dk-z80asm -float", <<END);
 error: $invalid_format_error
 END
 
-capture_nok("./z88dk-z80asm -float=xx", <<END);
+capture_nok("z88dk-z80asm -float=xx", <<END);
 error: $invalid_format_error
 END
 
@@ -41,14 +41,14 @@ END_ERR
 #-------------------------------------------------------------------------------
 # check that setfloat does not spill over to next file
 #-------------------------------------------------------------------------------
-path("$test.1.asm")->spew(<<END);
+spew("$test.1.asm", <<END);
 		setfloat ieee16
 		float 5.5
 END
-path("$test.2.asm")->spew(<<END);
+spew("$test.2.asm", <<END);
 		float 5.5
 END
-run_ok("./z88dk-z80asm -b $test.1.asm $test.2.asm");
+run_ok("z88dk-z80asm -b $test.1.asm $test.2.asm");
 check_bin_file("$test.1.bin", bytes(128,69, 0,0,0,0,48,131));
 
 #-------------------------------------------------------------------------------
@@ -340,7 +340,7 @@ sub check_c {
 	$fdata = join(",", @fdata);
 
 	# build C code
-	path("$test.c")->spew(<<END);
+	spew("$test.c", <<END);
 		$c_type fdata[] = { $fdata };
 		$c_type fend = 0.0;
 		int main() {}
@@ -360,19 +360,19 @@ END
 	my $fsize = ($fend-$fstart);
 
 	# extract binary data
-	my $bin_data = path("$test.bin")->slurp_raw;
+	my $bin_data = slurp("$test.bin");
 	my $c_bytes = unpack("H*", substr($bin_data, $fstart, $fsize)); 
 
 	# build asm code
-	path("$test.asm")->spew(<<END);
+	spew("$test.asm", <<END);
 		float $fdata
 END
 
 	# assemble
-	run_ok("./z88dk-z80asm -b -l $asm_opts $test.asm");
+	run_ok("z88dk-z80asm -b -l $asm_opts $test.asm");
 	
 	# extract binary data
-	my $bin_data = path("$test.bin")->slurp_raw;
+	my $bin_data = slurp("$test.bin");
 	my $asm_bytes = unpack("H*", $bin_data); 
 	
 	# compare
@@ -407,12 +407,13 @@ sub check_float_expr {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
 	# assemble with verbose list file
-	path("$test.asm")->spew("float $expr");
-	run_ok("./z88dk-z80asm -l -v $test.asm > /dev/null");
+	spew("$test.asm", "float $expr");
+	run_ok("z88dk-z80asm -l -v $test.asm > $null");
 	
 	# parse "+ defb 0,0,0,0,0,129;float.genmath(1.000000)" from list file
-	my $list = path("$test.lis")->slurp;
-	$list =~ /\+ defb [\d,]+;float\.genmath\(([0-9.e+-]+)\)/i or die "float not found in $list";
+	my $list = slurp("$test.lis");
+	$list =~ /\+ defb [\d,]+;float\.genmath\(([0-9.e+-]+)\)/i 
+		or die "float not found in $list";
 	my $found = $1;
 	
 	ok abs($expected-$found)<1e-6, "expr $expr = $expected = $found";

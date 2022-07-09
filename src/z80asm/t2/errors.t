@@ -7,8 +7,8 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 my $obj = objfile(NAME => "test",
 				  CODE => [["", -1, 1, "\0\0"]],
 				  EXPR => [["C", "test.asm",1, "", 0, 0, "", "*+VAL"]]);
-path("$test.o")->spew_raw($obj);
-capture_nok("./z88dk-z80asm -b -d $test.o", <<END);
+spew("$test.o", $obj);
+capture_nok("z88dk-z80asm -b -d $test.o", <<END);
 test.asm:1: error: syntax error in expression
   ^---- *+VAL
 END
@@ -16,7 +16,7 @@ END
 #------------------------------------------------------------------------------
 # warn_int_range / error_int_range on pass2 and multi-module assembly
 #------------------------------------------------------------------------------
-path("$test.asm")->spew(<<'END');
+spew("$test.asm", <<'END');
 		extern G_129, G_128, G0, G127, G128, G255, G256
 
 ; Byte = -129
@@ -68,7 +68,7 @@ path("$test.asm")->spew(<<'END');
 		defc L128    =  128
 END
 
-path("$test.1.asm")->spew(<<'END');
+spew("$test.1.asm", <<'END');
 ; Global variables
 		public G_129, G_128, G0, G127, G128, G255, G256
 		defc G_129   = -129
@@ -80,8 +80,8 @@ path("$test.1.asm")->spew(<<'END');
 		defc G256    =  256
 END
 
-run_ok("./z88dk-z80asm -b $test.asm $test.1.asm 2> $test.err");
-check_txt_file("$test.err", <<END);
+run_ok("z88dk-z80asm -b $test.asm $test.1.asm 2> $test.err");
+check_text_file("$test.err", <<END);
 $test.asm:4: warning: integer range: -129
   ^---- L_129
 $test.asm:19: warning: integer range: 0x100
@@ -247,10 +247,10 @@ $test.asm:1: error: undefined symbol: NOSYMBOL
   ^---- NOSYMBOL
 END
 
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 		main: ret
 END
-run_ok("./z88dk-z80asm -x$test.lib $test.asm");
+run_ok("z88dk-z80asm -x$test.lib $test.asm");
 z80asm_nok("-b -l$test.lib", "", <<END_ASM, <<END_ERR);
 		EXTERN main
 		call main
@@ -262,17 +262,17 @@ END_ERR
 #------------------------------------------------------------------------------
 # options
 #------------------------------------------------------------------------------
-capture_nok("./z88dk-z80asm -b", <<END);
+capture_nok("z88dk-z80asm -b", <<END);
 error: source file expected
 END
 
-path("$test.asm")->spew("");
-capture_nok("./z88dk-z80asm -Zillegaloption $test.asm", <<END);
+spew("$test.asm", "");
+capture_nok("z88dk-z80asm -Zillegaloption $test.asm", <<END);
 error: illegal option: -Zillegaloption
 END
 
-path("$test.asm")->spew("");
-capture_nok("./z88dk-z80asm +Zillegaloption $test.asm", <<END);
+spew("$test.asm", "");
+capture_nok("z88dk-z80asm +Zillegaloption $test.asm", <<END);
 error: illegal option: +Zillegaloption
 END
 
@@ -295,49 +295,41 @@ $test.asm:2: error: segment overflow
 END
 
 # Linker
-path("$test.1.asm")->spew(<<END);
+spew("$test.1.asm", <<END);
 		defb 0xAA
 END
 
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 		defs 65535, 0xAA
 END
 
-run_ok("./z88dk-z80asm -b $test.asm $test.1.asm");
+run_ok("z88dk-z80asm -b $test.asm $test.1.asm");
 check_bin_file("$test.bin", bytes(0xAA) x 65536);
 
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 		defs 65536, 0xAA
 END
 
-run_ok("./z88dk-z80asm $test.asm $test.1.asm");
+run_ok("z88dk-z80asm $test.asm $test.1.asm");
 unlink("$test.asm", "$test.1.asm");
-capture_nok("./z88dk-z80asm -b -d $test.o $test.1.o", <<END);
+capture_nok("z88dk-z80asm -b -d $test.o $test.1.o", <<END);
 $test.1.o: error: segment overflow
-END
-
-#------------------------------------------------------------------------------
-# error_illegal_src_filename
-#------------------------------------------------------------------------------
-path("$test.asm")->spew("nop");
-capture_nok("./z88dk-z80asm $test.asm -illegal_filename", <<END);
-error: file open: -illegal_filename
 END
 
 #------------------------------------------------------------------------------
 # error_jr_not_local
 #------------------------------------------------------------------------------
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 		extern loop
 		jr loop
 END
 
-path("$test.1.asm")->spew(<<END);
+spew("$test.1.asm", <<END);
 		public loop
 loop: 	ret
 END
 
-run_ok("./z88dk-z80asm -b $test.asm $test.1.asm");
+run_ok("z88dk-z80asm -b $test.asm $test.1.asm");
 check_bin_file("$test.bin", bytes(0x18, 0x00, 0xc9));
 
 #------------------------------------------------------------------------------
@@ -345,8 +337,8 @@ check_bin_file("$test.bin", bytes(0x18, 0x00, 0xc9));
 #------------------------------------------------------------------------------
 my $obj = objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] );
 substr($obj,6,2) = "99";		# change version
-path("$test.o")->spew_raw($obj);
-capture_nok("./z88dk-z80asm -b $test.o", <<END);
+spew("$test.o", $obj);
+capture_nok("z88dk-z80asm -b $test.o", <<END);
 $test.o: error: invalid object file version: file=$test.o, found=99, expected=16
 END
 
@@ -355,48 +347,48 @@ END
 #------------------------------------------------------------------------------
 my $lib = libfile(objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] ));
 substr($lib,6,2) = "99";		# change version
-path("$test.lib")->spew_raw($lib);
-path("$test.asm")->spew("nop");
-capture_nok("./z88dk-z80asm -b -l$test.lib $test.asm", <<END);
+spew("$test.lib", $lib);
+spew("$test.asm", "nop");
+capture_nok("z88dk-z80asm -b -l$test.lib $test.asm", <<END);
 error: invalid library file version: file=$test.lib, found=99, expected=16
 END
 
 #------------------------------------------------------------------------------
 # error_not_obj_file
 #------------------------------------------------------------------------------
-path("$test.o")->spew_raw("not an object");
-capture_nok("./z88dk-z80asm -b $test.o", <<END);
+spew("$test.o", "not an object");
+capture_nok("z88dk-z80asm -b $test.o", <<END);
 $test.o: error: not an object file: $test.o
 END
 
 sleep 1;
-path("$test.asm")->spew("nop");
-run_ok("./z88dk-z80asm -b -d $test.asm");
+spew("$test.asm", "nop");
+run_ok("z88dk-z80asm -b -d $test.asm");
 check_bin_file("$test.bin", bytes(0));
 
 # CreateLib uses a different error call
-path("$test.o")->spew_raw("not an object");
+spew("$test.o", "not an object");
 sleep 1;
-path("$test.asm")->spew("nop");
-run_ok("./z88dk-z80asm -x$test.lib -d $test.asm");
+spew("$test.asm", "nop");
+run_ok("z88dk-z80asm -x$test.lib -d $test.asm");
 check_bin_file("$test.lib",
 	libfile(objfile(NAME => $test,
 				    CODE => [["", -1, 1, "\x00"]])));
 
-path("$test.o")->spew_raw(
+spew("$test.o", 
 	objfile(NAME => $test,
 			CODE => [["", -1, 1, "\0\0"]],
 			SYMBOLS => [ ["Z", "Z", "", 0, "ABCD", "", 0] ] ));
-capture_nok("./z88dk-z80asm -b -d $test.o", <<END);
+capture_nok("z88dk-z80asm -b -d $test.o", <<END);
 $test.o: error: not an object file: $test.o
 END
 
 #------------------------------------------------------------------------------
 # error_not_lib_file
 #------------------------------------------------------------------------------
-path("$test.asm")->spew("nop");
-path("$test.lib")->spew_raw("not a library");
-capture_nok("./z88dk-z80asm -b -l$test.lib $test.asm", <<END);
+spew("$test.asm", "nop");
+spew("$test.lib", "not a library");
+capture_nok("z88dk-z80asm -b -l$test.lib $test.asm", <<END);
 error: not a library file: $test.lib
 END
 

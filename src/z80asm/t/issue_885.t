@@ -12,9 +12,10 @@
 use Modern::Perl;
 use Test::More;
 use Path::Tiny;
+use Config;
 require './t/testlib.pl';
 
-my $got_zsdcc = `which z88dk-zsdcc 2> /dev/null`;
+my $got_zsdcc = -f "../../bin/z88dk-zsdcc$Config{_exe}";
 
 my $c_code = <<'END';
 void main(void)
@@ -51,10 +52,11 @@ ici:
     DEFC toto = ici %8
     defw _main, ici, toto
 END
-run("./z88dk-z80asm -m -b -r$org test.asm");
+run("z88dk-z80asm -m -b -r$org test.asm");
 check_bin_file("test.bin", pack("v*", $org, $org, $org % 8));
 test_map("test.map");
 
+unlink("test");
 unlink_testfiles();
 done_testing();
 

@@ -6,12 +6,13 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 # https://github.com/z88dk/z88dk/issues/1883
 
 path("$test.dir")->mkpath;
-path("$test.dir/00main.c")->spew(<<END_C);
+spew("$test.dir/00main.c", <<END_C);
 int main() { }
 END_C
 
 run_ok("zcc +test --list -o $test.dir/00main $test.dir/00main.c");
-run_ok("grep MODULE $test.dir/00main.c.lis");
+ok scalar(grep {/MODULE _00main_c/} path("$test.dir/00main.c.lis")->lines), 
+	"found MODULE _00main_c";
 
 path("$test.dir")->remove_tree if Test::More->builder->is_passing;
 

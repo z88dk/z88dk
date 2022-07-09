@@ -5,7 +5,7 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 # CH_0012 : wrappers on OS calls to raise fatal error
 
 unlink "$test.asm";
-capture_nok("./z88dk-z80asm $test.asm", <<END);
+capture_nok("z88dk-z80asm $test.asm", <<END);
 error: file open: $test.asm
 END
 

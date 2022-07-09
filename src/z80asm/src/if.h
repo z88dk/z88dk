@@ -8,6 +8,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,6 +19,13 @@ int z80asm_main(int argc, char *argv[]);
 
 // string pool
 const char* spool_add(const char* str);
+
+// C memory allocation
+void* must_malloc(size_t size);
+void* must_calloc(size_t count, size_t size);
+void* must_realloc(void* block, size_t size);
+void must_free(void* block);
+char* must_strdup(const char* str);
 
 // errors
 int get_num_errors();
@@ -97,8 +105,8 @@ bool check_ifdef_condition(const char* name);
 bool sfile_open(const char* filename, bool search_include_path);
 void sfile_hold_input();
 void sfile_unhold_input();
-const char* sfile_getline();
-const char* sfile_get_source_line();
+char* sfile_getline();			// NOTE: user must free returned pointer
+char* sfile_get_source_line();	// NOTE: user must free returned pointer
 const char* sfile_filename();
 int sfile_line_num();
 bool sfile_is_c_source();

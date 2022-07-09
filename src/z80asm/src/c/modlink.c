@@ -827,6 +827,7 @@ static void link_libraries(StrHash* extern_syms) {
 static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 	// load code sections
 	if (goto_code(obj)) {
+		bool first_section = true;
 		while (true) {				// read sections until end marker
 			int code_size = parse_int(obj);
 			if (code_size < 0)		// end marker
@@ -846,10 +847,19 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 				section->origin = -1;
 				section->section_split = false;
 			}
+			// if running appmake, ignore origin except for first module
+			else if (opts.appmake && section->origin >= 0 && !first_section) {
+				warn_org_ignored(obj->filename, section->name);
+
+				section->origin = -1;
+				section->section_split = false;
+			}
 
 			// load bytes to section
 			patch_from_memory(obj->data + obj->i, 0, code_size);
 			obj->i += code_size;
+
+			first_section = false;
 		}
 	}
 
@@ -1028,32 +1038,38 @@ void link_modules(void)
 
 void
 CreateBinFile(void) {
-	FILE* binaryfile, * inital_binaryfile;
-	FILE* relocfile, * initial_relocfile;
-	const char* filename;
-	bool is_relocatable = (opts.relocatable && totaladdr != 0);
+	CodeareaFile binfile = { 0 }, relocfile = { 0 };
+	const char* filename = NULL;
+	bool need_reloc_routine = (opts.relocatable && totaladdr != 0);
 
-	if (opts.bin_file)        /* use predined output filename from command line */
-		filename = path_prepend_output_dir(opts.bin_file);
-	else						/* create output filename, based on project filename */
-		filename = get_bin_filename(get_first_module(NULL)->filename);		/* add '.bin' extension */
+	if (opts.bin_file)      /* use predined output filename from command line */
+		filename = path_canon(path_prepend_output_dir(opts.bin_file));
+	else					/* create output filename, based on project filename */
+		/* add '.bin' extension */
+		filename = path_canon(get_bin_filename(get_first_module(NULL)->filename));		
 
 	/* binary output to filename.bin */
 	if (opts.verbose)
-		printf("Creating binary '%s'\n", path_canon(filename));
+		printf("Creating binary '%s'\n", filename);
 
-	binaryfile = xfopen(filename, "wb");
-	inital_binaryfile = binaryfile;
+	binfile.initial_filename = binfile.filename = filename;
+	binfile.fp = xfopen(binfile.filename, "wb");
 
-	relocfile = opts.relocatable ? NULL : opts.reloc_info ? xfopen(get_reloc_filename(filename), "wb") : NULL;
-	initial_relocfile = relocfile;
+	// no reloc-info with -R
+	if (opts.reloc_info && !opts.relocatable) {
+		relocfile.initial_filename = relocfile.filename = get_reloc_filename(filename);
+		relocfile.fp = xfopen(relocfile.filename, "wb");
+	}
+	else {
+		relocfile.fp = NULL;
+	}
 
-	if (binaryfile)
+	if (binfile.fp)
 	{
-		if (is_relocatable)
+		if (need_reloc_routine)
 		{
 			/* relocate routine */
-			xfwrite_bytes((char*)reloc_routine, sizeof_relocroutine, binaryfile);
+			xfwrite_bytes((char*)reloc_routine, sizeof_relocroutine, binfile.fp);
 
 			*(reloctable + 0) = (byte_t)totaladdr % 256U;
 			*(reloctable + 1) = (byte_t)totaladdr / 256U;  /* total of relocation elements */
@@ -1061,25 +1077,17 @@ CreateBinFile(void) {
 			*(reloctable + 3) = (byte_t)sizeof_reloctable / 256U; /* total size of relocation table elements */
 
 			/* write relocation table, inclusive 4 byte header */
-			xfwrite_bytes(reloctable, sizeof_reloctable + 4, binaryfile);
+			xfwrite_bytes(reloctable, sizeof_reloctable + 4, binfile.fp);
 
-			printf("Relocation header is %d bytes.\n", (int)(sizeof_relocroutine + sizeof_reloctable + 4));
+			if (opts.verbose)
+				printf("Relocation header is %d bytes.\n",
+					(int)(sizeof_relocroutine + sizeof_reloctable + 4));
 		}
 
-		fwrite_codearea(filename, &binaryfile, &relocfile);		/* write code as one big chunk */
+		fwrite_codearea(filename, &binfile, &relocfile);		/* write code as one big chunk */
 
-		/* delete output file if empty, except main output file */
-		if (binaryfile == inital_binaryfile)
-			xfclose(binaryfile);
-		else
-			xfclose_remove_empty(binaryfile);
-
-		if (relocfile != NULL) {
-			if (relocfile == initial_relocfile)
-				xfclose(relocfile);
-			else
-				xfclose_remove_empty(relocfile);
-		}
+		// close old files, remove if empty and not initial files
+		codearea_close_remove(&binfile, &relocfile);
 	}
 }
 

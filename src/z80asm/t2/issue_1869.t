@@ -15,19 +15,19 @@ $test.asm:2: error: undefined symbol: i_61
   ^---- i_64
 END_ERR
 
-path("$test.1.asm")->spew(<<END_ASM);
+spew("$test.1.asm", <<END_ASM);
         public  i_64
         extern  i_61
         defc    i_64 = i_61
 END_ASM
 
-path("$test.2.asm")->spew(<<END_ASM);
+spew("$test.2.asm", <<END_ASM);
         public  i_61
         extern  i_64
         defc    i_61 = i_64
 END_ASM
 
-capture_nok("./z88dk-z80asm -b $test.1.asm $test.2.asm", <<END_ERR);
+capture_nok("z88dk-z80asm -b $test.1.asm $test.2.asm", <<END_ERR);
 $test.1.asm:3: error: undefined symbol: i_64
   ^---- i_61
 $test.2.asm:3: error: undefined symbol: i_61

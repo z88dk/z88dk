@@ -26,7 +26,7 @@ ok !-f "${test}.sym", "no symbol table";
 unlink_testfiles;
 z80asm_ok("-b -s", "", "", @asm_bin);
 ok -f "${test}.sym", "symbol table";
-check_txt_file("${test}.sym", <<END);
+check_text_file("${test}.sym", <<END);
 loop                            = \$0002 ; addr, local, , , , ${test}.asm:3
 main                            = \$0000 ; addr, public, , , , ${test}.asm:2
 END
@@ -40,7 +40,7 @@ ok !-f "${test}.lis", "no list file";
 unlink_testfiles;
 z80asm_ok("-b -l", "", "", @asm_bin);
 ok -f "${test}.lis", "list file";
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          PUBLIC main
      2   000000 060a            main:	ld b,10
@@ -61,14 +61,14 @@ z80asm_ok("-b -s -l", "", "", <<END, bytes(0, 1, 0, 1));
 	local1: defb 1
 END
 
-check_txt_file("${test}.sym", <<END);
+check_text_file("${test}.sym", <<END);
 local0                          = \$0002 ; addr, local, , , , ${test}.asm:5
 local1                          = \$0003 ; addr, local, , , , ${test}.asm:6
 global0                         = \$0000 ; addr, public, , , , ${test}.asm:3
 global1                         = \$0001 ; addr, public, , , , ${test}.asm:4
 END
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          	public global0
      2                          	public global1
@@ -86,11 +86,11 @@ z80asm_ok("-b -s -l", "", "", <<END, bytes(0xFF));
 X_255_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X: defb 255
 END
 
-check_txt_file("${test}.sym", <<END);
+check_text_file("${test}.sym", <<END);
 X_255_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X = \$0000 ; addr, local, , , , ${test}.asm:1
 END
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1   000000 ff              X_255_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X: defb 255
      2                          
@@ -109,9 +109,9 @@ for (1..6, 64, 65) {
 
 z80asm_ok("-b -s -l", "", "", $asm, $bin);
 
-check_txt_file("${test}.sym", "");
+check_text_file("${test}.sym", "");
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1   000000 01              defb 1
      2   000001 0102            defb 1,2
@@ -149,11 +149,11 @@ $bin = bytes((42) x 256);
 
 z80asm_ok("-b -s -l", "", "", $asm, $bin);
 
-check_txt_file("${test}.sym", <<END);
+check_text_file("${test}.sym", <<END);
 X                               = \$002A ; const, local, , , , ${test}.asm:2
 END
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1   000000 2a2a2a2a2a2a2a2adefb X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
                 2a2a2a2a2a2a2a2a
@@ -202,11 +202,11 @@ z80asm_ok("-b -s -l", "", "", <<END, bytes(1, 1,0, 1,0,0,0));
 	defq A1
 END
 
-check_txt_file("${test}.sym", <<END);
+check_text_file("${test}.sym", <<END);
 A1                              = \$0001 ; const, local, , , , ${test}.asm:1
 END
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          	defc A1 = 1
      2   000000 01              	defb A1
@@ -227,11 +227,11 @@ z80asm_ok("-b -s -l", "", "", <<END, bytes(1, 1,0, 1,0,0,0));
 	public A1
 END
 
-check_txt_file("${test}.sym", <<END);
+check_text_file("${test}.sym", <<END);
 A1                              = \$0001 ; const, public, , , , ${test}.asm:1
 END
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          	defc A1 = 1
      2   000000 01              	defb A1
@@ -252,11 +252,11 @@ z80asm_ok("-b -s -l", "", "", <<END, bytes(1, 1,0, 1,0,0,0));
 	defc A1 = 1
 END
 
-check_txt_file("${test}.sym", <<END);
+check_text_file("${test}.sym", <<END);
 A1                              = \$0001 ; const, local, , , , ${test}.asm:4
 END
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1   000000 01              	defb A1
      2   000001 0100            	defw A1
@@ -277,11 +277,11 @@ z80asm_ok("-b -s -l", "", "", <<END, bytes(1, 1,0, 1,0,0,0));
 	public A1
 END
 
-check_txt_file("${test}.sym", <<END);
+check_text_file("${test}.sym", <<END);
 A1                              = \$0001 ; const, public, , , , ${test}.asm:4
 END
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1   000000 01              	defb A1
      2   000001 0100            	defw A1
@@ -295,7 +295,7 @@ END
 # include file
 unlink_testfiles;
 
-path("${test}.inc")->spew(<<END);
+spew("${test}.inc", <<END);
 	ld a, A1
 	ld b, B1
 	add a, b
@@ -311,12 +311,12 @@ z80asm_ok("-b -s -l", "", "",
 	include "${test}.inc"
 END
 
-check_txt_file("${test}.sym", <<END);
+check_text_file("${test}.sym", <<END);
 A1                              = \$0001 ; const, local, , , , ${test}.asm:2
 B1                              = \$0002 ; const, public, , , , ${test}.asm:3
 END
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1   000000 0102            	defb A1, B1
      2                          	defc A1 = 1
@@ -352,12 +352,12 @@ z80asm_ok("-b -s -l", "", "", <<END, words(0x4000, 0x4001));
 	defw RUNTIMEFLAGS1, RUNTIMEFLAGS2
 END
 
-check_txt_file("${test}.sym", <<END);
+check_text_file("${test}.sym", <<END);
 RUNTIMEFLAGS1                   = \$4000 ; const, local, , , , ${test}.asm:3
 RUNTIMEFLAGS2                   = \$4001 ; const, local, , , , ${test}.asm:4
 END
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          	defvars 0x4000
      2                          	{
@@ -384,7 +384,7 @@ z80asm_ok("-b -s -l", "", "", <<END, bytes(0..8));
 	defb SYM_LCURLY, SYM_RCURLY
 END
 
-check_txt_file("${test}.sym", <<END);
+check_text_file("${test}.sym", <<END);
 SYM_NULL                        = \$0000 ; const, local, , , , ${test}.asm:3
 SYM_DQUOTE                      = \$0001 ; const, local, , , , ${test}.asm:3
 SYM_SQUOTE                      = \$0002 ; const, local, , , , ${test}.asm:3
@@ -396,7 +396,7 @@ SYM_LCURLY                      = \$0007 ; const, local, , , , ${test}.asm:5
 SYM_RCURLY                      = \$0008 ; const, local, , , , ${test}.asm:5
 END
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          	defgroup
      2                          	{
@@ -422,9 +422,9 @@ z80asm_ok("-b -s -l", "", "", <<END, bytes(1, 0,0, 1, 255,255, 3));
 	inc bc
 END
 
-check_txt_file("${test}.sym", "");
+check_text_file("${test}.sym", "");
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1   000000 010000          	ld bc, 0
      2                          	lstoff
@@ -450,9 +450,9 @@ z80asm_ok("-b -s -l", "", "", <<END, bytes(1, 1,0, 0x21, 1,0));
 	endif
 END
 
-check_txt_file("${test}.sym", "");
+check_text_file("${test}.sym", "");
 
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          	if 0
      2                          		ld bc, 0
@@ -477,9 +477,9 @@ z80asm_ok("-b -s -l", "", "",
 	join("\n", ("nop") x $num_lines)."\n", 
 	bytes((0) x $num_lines));
 
-check_txt_file("${test}.sym", "");
+check_text_file("${test}.sym", "");
 
-check_txt_file("${test}.lis", 
+check_text_file("${test}.lis", 
 	"${test}.asm:\n".
 	join("", map {sprintf("%6d   %06x %02x              nop\n", $_+1, $_, 0)} 
 				0..$num_lines-1).

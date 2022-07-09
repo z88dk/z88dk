@@ -7,11 +7,11 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 # first compiles; second skips
 unlink_testfiles;
 
-path("${test}.asm")->spew(<<END);
+spew("${test}.asm", <<END);
 	nop
 END
 
-capture_ok("./z88dk-z80asm -d ${test}.asm", "");
+capture_ok("z88dk-z80asm -d ${test}.asm", "");
 ok -f "${test}.o", "object file";
 
 my $date_obj = -M "${test}.o";
@@ -19,7 +19,7 @@ my $date_obj = -M "${test}.o";
 # now skips compile
 sleep(1);		# make sure our obj is older
 
-capture_ok("./z88dk-z80asm -d ${test}.asm", "");
+capture_ok("z88dk-z80asm -d ${test}.asm", "");
 ok -f "${test}.o", "object file";
 
 ok abs((-M "${test}.o") - $date_obj) < 0.001, "same object";
@@ -27,11 +27,11 @@ ok abs((-M "${test}.o") - $date_obj) < 0.001, "same object";
 # touch source
 sleep(1);		# make sure our obj is older
 
-path("${test}.asm")->spew(<<END);
+spew("${test}.asm", <<END);
 	nop
 END
 
-capture_ok("./z88dk-z80asm -d ${test}.asm", "");
+capture_ok("z88dk-z80asm -d ${test}.asm", "");
 ok -f "${test}.o", "object file";
 
 ok abs((-M "${test}.o") - $date_obj) > 0, "new object";
@@ -41,7 +41,7 @@ unlink "${test}.asm";
 
 $date_obj = -M "${test}.o";
 
-capture_ok("./z88dk-z80asm -d ${test}.asm", "");
+capture_ok("z88dk-z80asm -d ${test}.asm", "");
 ok -f "${test}.o", "object file";
 
 is -M "${test}.o", $date_obj, "same object";
@@ -51,7 +51,7 @@ unlink "${test}.asm";
 
 $date_obj = -M "${test}.o";
 
-capture_ok("./z88dk-z80asm -d ${test}", "");
+capture_ok("z88dk-z80asm -d ${test}", "");
 ok -f "${test}.o", "object file";
 
 is -M "${test}.o", $date_obj, "same object";

@@ -10,14 +10,14 @@ for my $slash (@slashes) {
 	ok 1, "test with slash = $slash";
 	
 	path("$test.dir")->mkpath;
-	path("$test.dir/test.inc")->spew("defb 1");
-	path("$test.dir/test1.bin")->spew_raw(bytes(2));
-	path("$test.asm")->spew(<<END);
+	spew("$test.dir/test.inc", "defb 1");
+	spew("$test.dir/test1.bin", bytes(2));
+	spew("$test.asm", <<END);
 		include "$test.dir${slash}test.inc"
 		binary  "$test.dir${slash}test1.bin"
 		defb 3
 END
-	run_ok("./z88dk-z80asm -b $test.asm");
+	run_ok("z88dk-z80asm -b $test.asm");
 	check_bin_file("$test.bin", bytes(1, 2, 3));
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);

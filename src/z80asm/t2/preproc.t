@@ -7,7 +7,7 @@ z80asm_ok("-b -l", "", "", <<'END', bytes(0x3e, 1));
 ld a,\
 1
 END
-check_txt_file("$test.lis", <<'END');
+check_text_file("$test.lis", <<'END');
 test_t2_preproc.asm:
      1                          ld a,\
      2   000000 3e01            1
@@ -27,7 +27,7 @@ END
 z80asm_ok("-b -l", "", "", <<'END', bytes(0x3e, 1, 0xc9));
 ld a,1\ret
 END
-check_txt_file("$test.lis", <<'END');
+check_text_file("$test.lis", <<'END');
 test_t2_preproc.asm:
      1   000000 3e01c9          ld a,1\ret
      2                          

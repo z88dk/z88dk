@@ -42,14 +42,14 @@ for my $id (1..12) {
 
 # assemble 7..12, remove .asm keep .o to as if called from zcc
 for my $id (7..12) {
-	run("./z88dk-z80asm $dir/f$id.asm");
+	run("z88dk-z80asm $dir/f$id.asm");
 	ok -f "$dir/f$id.o", "$dir/f$id.o";
 	ok unlink "$dir/f$id.asm", "$dir/f$id.asm";
 }
 
 # link all
 unlink_testfiles();
-run("./z88dk-z80asm -b -d -o=test.bin \"\@$dir/lib.lst\"");
+run("z88dk-z80asm -b -d -o=test.bin \"\@$dir/lib.lst\"");
 t_binary(path("test.bin")->slurp_raw, pack("C*", 1..12));
 
 # test file not found
@@ -57,7 +57,7 @@ ok unlink "$dir/f1.asm", "$dir/f1.asm";
 ok unlink "$dir/f1.o",   "$dir/f1.o";
 
 unlink_testfiles();
-run("./z88dk-z80asm -b -d -o=test.bin \"\@$dir/lib.lst\"", 1, "", <<END);
+run("z88dk-z80asm -b -d -o=test.bin \"\@$dir/lib.lst\"", 1, "", <<END);
 test/my/deep/lib/lib.lst:1: error: file open: test/my/deep/lib/f1.asm
   ^---- test/my/deep/lib/f1.asm
 END

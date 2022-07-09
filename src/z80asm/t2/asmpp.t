@@ -165,7 +165,7 @@ END
 		""
 );
 
-check_txt_file("${test}.i", <<END);
+check_text_file("${test}.i", <<END);
 ;;${test}.asm:1
 		defc value = 4660
 ;;${test}.asm:2
@@ -216,7 +216,7 @@ t_asmpp_ok(<<END, "-r0x1234", "\x12\x34\x12\x36");
 		DEFB .HIGH.\$,.LOW.ASMPC
 END
 
-check_txt_file("${test}.i", <<END);
+check_text_file("${test}.i", <<END);
 ;;${test}.asm:1
 AUTOLABEL_pc_1:
 		defb (((( AUTOLABEL_pc_1 ) >> 8) & 255)),((( AUTOLABEL_pc_1 ) & 255))
@@ -243,7 +243,7 @@ val		defl val+1
 		defw val
 END
 
-check_txt_file("${test}.i", <<END);
+check_text_file("${test}.i", <<END);
 ;;${test}.asm:2
 		defb 1
 ;;${test}.asm:4
@@ -268,7 +268,7 @@ t_asmpp_ok(<<END, "-Done -Dtwo=2 -Dthree=0x2+1", "\1\2\3\1\2\3");
 		DEFB one,two,three
 END
 
-check_txt_file("${test}.i", <<END);
+check_text_file("${test}.i", <<END);
 ;;${test}.asm:1
 		defb 1,2,3
 ;;${test}.asm:2
@@ -284,7 +284,7 @@ t_asmpp_ok(<<END, "", "\1\2\3\4");
 		defb 5,6,7,8
 END
 
-check_txt_file("${test}.i", <<END);
+check_text_file("${test}.i", <<END);
 ;;${test}.asm:1
 		defb 1,2,3,4
 END
@@ -295,7 +295,7 @@ label:	end
 		defb 5,6,7,8
 END
 
-check_txt_file("${test}.i", <<END);
+check_text_file("${test}.i", <<END);
 ;;${test}.asm:1
 		defb 1,2,3,4
 END
@@ -306,7 +306,7 @@ label:	end start
 		defb 5,6,7,8
 END
 
-check_txt_file("${test}.i", <<END);
+check_text_file("${test}.i", <<END);
 ;;${test}.asm:1
 start:	defb 1,2,3,4
 END
@@ -363,7 +363,7 @@ END
 		"\1\2\3".
 		"");
 
-check_txt_file("${test}.i", <<END);
+check_text_file("${test}.i", <<END);
 ;;${test}.asm:1
 lbl1:	DEFW 4660
 ;;${test}.asm:2
@@ -425,7 +425,7 @@ t_asmpp_ok(<<END, "", "\0");
 		nop
 END
 
-check_txt_file("${test}.i", <<END);
+check_text_file("${test}.i", <<END);
 ;;${test}.asm:1
 		nop
 END
@@ -434,7 +434,7 @@ t_asmpp_ok(<<END, "--ucase", "\0");
 		nop
 END
 
-check_txt_file("${test}.i", <<END);
+check_text_file("${test}.i", <<END);
 ;;${test}.asm:1
 		NOP
 END
@@ -444,7 +444,7 @@ END
 #------------------------------------------------------------------------------
 run_ok("perl asmpp.pl --ucase -l -b -It/data CAMEL80.AZM");
 
-check_bin_file("CAMEL80.bin", path("t/data/CAMEL80.COM")->slurp_raw);
+check_bin_file("CAMEL80.bin", slurp("t/data/CAMEL80.COM"));
 
 unlink_testfiles(qw( 
 	CAMEL80.i CAMEL80.o CAMEL80.sym CAMEL80.lis CAMEL80.map 
@@ -459,7 +459,7 @@ sub t_asmpp_ok {
 	my($in, $args, $bin) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-	path("${test}.asm")->spew($in);
+	spew("${test}.asm", $in);
 	unlink("${test}.bin");
 	run_ok("perl asmpp.pl -b $args ${test}.asm");
 	check_bin_file("${test}.bin", $bin);
@@ -470,7 +470,7 @@ sub t_asmpp_error {
 	my($in, $args, $error) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-	path("${test}.asm")->spew($in);
+	spew("${test}.asm", $in);
 	run_nok("perl asmpp.pl -b $args ${test}.asm 2> ${test}.err");
-	check_txt_file("${test}.err", $error);
+	check_text_file("${test}.err", $error);
 }

@@ -13,17 +13,43 @@ use Modern::Perl;
 use Config;
 use Path::Tiny;
 use File::Slurp;
+use File::Basename;
+use Cwd qw( cwd abs_path );
 use Capture::Tiny::Extended 'capture';
 use Test::Differences;
 use List::Uniq 'uniq';
 use Data::HexDump;
+
+# add path to z80asm top directory
+_prepend_path(_root());
+
+# run z80asm from .
+$ENV{PATH} = ".".$Config{path_sep}.$ENV{PATH};
+
+#------------------------------------------------------------------------------
+# Portability
+#------------------------------------------------------------------------------
+
+# return the top directory of z80asm
+sub _root {
+	our $root;
+	$root or $root = abs_path(dirname(dirname(__FILE__)));
+	return $root
+}
+
+sub _prepend_path {
+	my($dir) = @_;
+	$ENV{PATH} = $dir . $Config{path_sep} . $ENV{PATH};
+}
+
+#------------------------------------------------------------------------------
 
 my $OBJ_FILE_VERSION = "16";
 my $STOP_ON_ERR = grep {/-stop/} @ARGV;
 my $KEEP_FILES	= grep {/-keep/} @ARGV;
 my $test	 = "test";
 
-sub z80asm	 { $ENV{Z80ASM_EXE} || "./z88dk-z80asm" }
+sub z80asm	 { $ENV{Z80ASM_EXE} || "z88dk-z80asm" }
 
 my @TEST_EXT = (qw( asm lis inc bin map o lib sym def 
 					exe c cpp lst prj i reloc tap P ));

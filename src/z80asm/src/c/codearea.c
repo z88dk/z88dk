@@ -294,8 +294,14 @@ void sections_alloc_addr(void)
 	/* allocate addr in sequence */
 	addr = 0;
 	for (section = get_first_section(&iter); section != NULL; section = next_section) {
-		if (section->origin >= 0)		/* break in address space */
-			addr = section->origin;
+		if (section->origin >= 0) {		/* break in address space */
+			if (option_single_binary_block() && section != get_first_section(&iter)) {
+				/* merge sections together if appmake or relocatable */
+			}
+			else {
+				addr = section->origin;
+			}
+		}
 
 		section->addr = addr;
 		addr += get_section_size(section);
@@ -549,9 +555,12 @@ bool fwrite_module_code(FILE *file, int* p_code_size)
 /*-----------------------------------------------------------------------------
 *   read/write whole code area to an open file
 *----------------------------------------------------------------------------*/
-void fwrite_codearea(const char *filename, FILE **pbinfile, FILE **prelocfile)
+void fwrite_codearea(const char *filename,
+	CodeareaFile* binfile, CodeareaFile* relocfile)
 {
-	STR_DEFINE(new_name, FILENAME_MAX);
+	UT_string* new_basename;
+	utstring_new(new_basename);
+
 	Section *section;
 	SectionHashElem *iter;
 	int section_size;
@@ -573,45 +582,53 @@ void fwrite_codearea(const char *filename, FILE **pbinfile, FILE **prelocfile)
 		/* bytes from this section */
 		if (section_size > 0 || section->origin >= 0 || section->section_split)
 		{
-			if (section->name && *section->name)					/* only if section name not empty */
+			if (section->name && *section->name)	/* only if section name not empty */
 			{
 				/* change current file if address changed, or option -split-bin, or section_split */
-				if ((!opts.relocatable && opts.split_bin) ||
+				if ((!option_single_binary_block() && opts.split_bin) ||
 					section->section_split ||
 					cur_addr != section->addr ||
 					(section != get_first_section(NULL) && section->origin >= 0))
 				{
-					if (opts.appmake)
-						warn_org_ignored(get_obj_filename(filename), section->name);
-					else {
-						Str_set(new_name, path_remove_ext(filename));	/* "test" */
-						Str_append_char(new_name, '_');
-						Str_append(new_name, section->name);
+					utstring_clear(new_basename);
+					utstring_printf(new_basename, "%s_%s",
+						path_remove_ext(filename),		/* e.g. "test" */
+						section->name);					/* e.g. "_code" */
 
-                        xfclose_remove_empty(*pbinfile);
+					// close old files, remove if empty and not initial files
+					codearea_close_remove(binfile, relocfile);
 
-						if (opts.verbose)
-							printf("Creating binary '%s'\n", path_canon(get_bin_filename(Str_data(new_name))));
+					// open next bin file
+					binfile->filename = path_canon(
+						get_bin_filename(
+							utstring_body(new_basename)));
+					binfile->fp = xfopen(binfile->filename, "wb");
 
-						*pbinfile = xfopen(get_bin_filename(Str_data(new_name)), "wb");
+					if (opts.verbose)
+						printf("Creating binary '%s'\n", binfile->filename);
 
-						if (*prelocfile) {
-                            xfclose_remove_empty(*prelocfile);
-							*prelocfile = xfopen(get_reloc_filename(Str_data(new_name)), "wb");
-							cur_section_block_size = 0;
-						}
+					// open next reloc file
+					if (relocfile->fp) {
+						relocfile->filename = path_canon(
+							get_reloc_filename(
+								utstring_body(new_basename)));
+						relocfile->fp = xfopen(relocfile->filename, "wb");
 
-						cur_addr = section->addr;
+						cur_section_block_size = 0;
 					}
+
+					cur_addr = section->addr;
 				}
 			}
 
-			xfwrite_bytes((char *)ByteArray_item(section->bytes, 0), section_size, *pbinfile);
+			xfwrite_bytes((char*)ByteArray_item(section->bytes, 0),
+				section_size, binfile->fp);
 
-			if (*prelocfile) {
+			if (relocfile->fp) {
 				unsigned i;
 				for (i = 0; i < intArray_size(section->reloc); i++) {
-					xfwrite_word(*(intArray_item(section->reloc, i)) + cur_section_block_size, *prelocfile);
+					xfwrite_word(*(intArray_item(section->reloc, i)) + cur_section_block_size,
+						relocfile->fp);
 				}
 			}
 
@@ -621,7 +638,27 @@ void fwrite_codearea(const char *filename, FILE **pbinfile, FILE **prelocfile)
 		cur_addr += section_size;
 	}
 
-	STR_DELETE(new_name);
+	utstring_free(new_basename);
+}
+
+// close old files, remove if empty and not initial files
+void codearea_close_remove(CodeareaFile* binfile, CodeareaFile* relocfile) {
+	// get size of bin file
+	xfseek(binfile->fp, 0, SEEK_END);
+	long bin_size = ftell(binfile->fp);
+
+	// close both files
+	xfclose(binfile->fp);
+	if (relocfile->fp)
+		xfclose(relocfile->fp);
+
+	// delete both if bin is not empty and not the first file
+	if (bin_size == 0 &&
+		0 != strcmp(binfile->filename, binfile->initial_filename)) {
+		remove(binfile->filename);
+		if (relocfile->fp)
+			remove(relocfile->filename);
+	}
 }
 
 /*-----------------------------------------------------------------------------

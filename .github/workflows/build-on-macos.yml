@@ -13,16 +13,30 @@ jobs:
       with: 
         submodules: 'true'
     - name: Install homebrew dependencies
-      run: brew install perl dos2unix boost ragel re2c
+      run: |
+        brew install perl dos2unix boost ragel re2c
     - name: Install perl prerequisites
-      run: cpan App::Prove Capture::Tiny::Extended Clone Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Test::Cmd::Common Test::Differences Test::HexDifferences Text::Table Object::Tiny::RW List::Uniq YAML::Tiny
+      run: |
+        export PATH=/usr/local/bin:$PATH
+        cpan -T Capture::Tiny
+        cpan App::Prove Capture::Tiny::Extended Clone Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Test::Cmd::Common Test::Differences Test::HexDifferences Text::Diff Text::Table Object::Tiny::RW List::Uniq YAML::Tiny
     - name: Build binaries
-      run: ./build.sh -l
+      run: |
+        export PATH=/usr/local/bin:$PATH
+        ./build.sh -l
     - name: Build libraries
-      run: ./build.sh -b
+      run: |
+        export PATH=/usr/local/bin:$PATH
+        ./build.sh -b
     - name: Build examples
-      run: ./build.sh -b -l -e
+      run: |
+        export PATH=/usr/local/bin:$PATH
+        ./build.sh -b -l -e
     - name: Build sdcc needed for tests
-      run: make BUILD_SDCC=1 BUILD_SDCC_HTTP=1 bin/z88dk-zsdcc
-    - name: Build tests
-      run: ./build.sh -b -l -t
+      run: |
+        export PATH=/usr/local/bin:$PATH
+        make BUILD_SDCC=1 BUILD_SDCC_HTTP=1 bin/z88dk-zsdcc
+    - name: Run tests
+      run: |
+        export PATH=/usr/local/bin:$PATH
+        ./build.sh -b -l -t

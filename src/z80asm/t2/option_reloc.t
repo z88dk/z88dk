@@ -2,11 +2,69 @@
 
 BEGIN { use lib 't2'; require 'testlib.pl'; }
 
-# option -R 
+# test option -R 
+
+# Test https://github.com/z88dk/z88dk/issues/2045
+# z80asm: +zx creates invalid tap file if code has split sections
 
 use CPU::Z80::Assembler;
 
 my $reloc_code = z80asm_file("dev/reloc_code.asm");
+
+#------------------------------------------------------------------------------
+# test verbose reloc
+
+# without reloc data
+my $asm = "ld hl, 0";
+my $bin0 = bytes(0x21, 0, 0);
+my $reloc_header = "";
+my $reloc_header_size = length($reloc_header);
+
+unlink_testfiles;
+spew("${test}.asm", $asm);
+
+capture_ok("z88dk-z80asm -b -v -R ${test}.asm", <<END);
+Reading library 'z88dk-z80asm-z80-.lib'
+Predefined constant: __CPU_Z80__ = \$0001
+Predefined constant: __CPU_ZILOG__ = \$0001
+Predefined constant: __FLOAT_GENMATH__ = \$0001
+Assembling '${test}.asm' to '${test}.o'
+Reading '${test}.asm' = '${test}.asm'
+Writing object file '${test}.o'
+Module '${test}' size: 3 bytes
+
+Code size: 3 bytes (\$0000 to \$0002)
+Creating binary '${test}.bin'
+END
+
+check_bin_file("${test}.bin", $reloc_header.$bin0);
+
+
+# with reloc data
+$asm = "start: jp start";
+$bin0 = bytes(0xC3, 0, 0);
+$reloc_header = reloc_header(1);
+$reloc_header_size = length($reloc_header);
+
+unlink_testfiles;
+spew("${test}.asm", $asm);
+
+capture_ok("z88dk-z80asm -b -v -R ${test}.asm", <<END);
+Reading library 'z88dk-z80asm-z80-.lib'
+Predefined constant: __CPU_Z80__ = \$0001
+Predefined constant: __CPU_ZILOG__ = \$0001
+Predefined constant: __FLOAT_GENMATH__ = \$0001
+Assembling '${test}.asm' to '${test}.o'
+Reading '${test}.asm' = '${test}.asm'
+Writing object file '${test}.o'
+Module '${test}' size: 3 bytes
+
+Code size: 3 bytes (\$0000 to \$0002)
+Creating binary '${test}.bin'
+Relocation header is $reloc_header_size bytes.
+END
+
+check_bin_file("${test}.bin", $reloc_header.$bin0);
 
 #------------------------------------------------------------------------------
 # test reloc
@@ -53,11 +111,11 @@ my $asm = "section code\norg $code_addr\n".code_asm("").
 		  "section data\n".data_asm("2");
 
 unlink_testfiles;
-path("${test}.asm")->spew($asm);
-capture_ok("./z88dk-z80asm -b -m -reloc-info ${test}.asm", "");
+spew("${test}.asm", $asm);
+capture_ok("z88dk-z80asm -b -m -reloc-info ${test}.asm", "");
 
-ok ! -f "${test}.bin", "no empty section";
-ok ! -f "${test}.reloc", "no empty section";
+check_bin_file("${test}.bin", bytes());
+check_bin_file("${test}.reloc", words());
 
 check_bin_file("${test}_code.bin", 
 		z80asm("org $code_addr\n".
@@ -73,9 +131,7 @@ check_bin_file("${test}_code.reloc",
 check_bin_file("${test}_data.bin", 
 		z80asm(data_asm("").data_asm("1").data_asm("2")));
 		
-ok ! -f "${test}.reloc";
-
-check_txt_file("${test}.map", <<END);
+check_text_file("${test}.map", <<END);
 start                           = \$1020 ; addr, local, , ${test}, code, ${test}.asm:3
 string                          = \$3040 ; addr, local, , ${test}, data, ${test}.asm:12
 string1                         = \$304A ; addr, local, , ${test}, data, ${test}.asm:23
@@ -97,7 +153,7 @@ END
 # with -R, one module
 
 unlink_testfiles;
-path("${test}.asm")->spew($asm);
+spew("${test}.asm", $asm);
 
 # same asm in default section
 my $asm = code_asm("").code_asm("1").code_asm("2").
@@ -106,10 +162,9 @@ my $asm = code_asm("").code_asm("1").code_asm("2").
 my @reloc = reloc_addrs($asm);
 my $reloc_header = reloc_header(@reloc);
 
-capture_ok("./z88dk-z80asm -b -m -R ${test}.asm 2>${test}.err", 
-		"Relocation header is ".length($reloc_header)." bytes.\n");
+capture_ok("z88dk-z80asm -b -m -R ${test}.asm 2>${test}.err", "");
 
-check_txt_file("${test}.err", <<END);
+check_text_file("${test}.err", <<END);
 ${test}.asm: warning: ORG ignored: file ${test}.o, section code
 ${test}.asm: warning: ORG ignored: file ${test}.o, section data
 END
@@ -122,7 +177,7 @@ ok ! -f "${test}_code.reloc";
 ok ! -f "${test}_data.bin";
 ok ! -f "${test}_data.reloc";
 
-check_txt_file("${test}.map", <<END);
+check_text_file("${test}.map", <<END);
 start                           = \$005F ; addr, local, , ${test}, code, ${test}.asm:3
 string                          = \$0095 ; addr, local, , ${test}, data, ${test}.asm:12
 string1                         = \$009F ; addr, local, , ${test}, data, ${test}.asm:23
@@ -144,30 +199,31 @@ END
 # without -R, several modules
 
 unlink_testfiles;
-path("${test}.asm")->spew(
+spew("${test}.asm", 
 		"section code\norg $code_addr\n".
 		"public start,string\nextern start,start1,start2,string,string1,string2\n".
 		code_asm("").
 		"section data\norg $data_addr\n".
 		data_asm(""));
 
-path("${test}1.asm")->spew(
+spew("${test}1.asm", 
 		"section code\n".
 		"public start1,string1\nextern start,start1,start2,string,string1,string2\n".
 		code_asm("1").
 		"section data\n".
 		data_asm("1"));
 
-path("${test}2.asm")->spew(
+spew("${test}2.asm", 
 		"section code\n".
 		"public start2,string2\nextern start,start1,start2,string,string1,string2\n".
 		code_asm("2").
 		"section data\n".
 		data_asm("2"));
 
-capture_ok("./z88dk-z80asm -b -m -reloc-info ${test}.asm ${test}1.asm ${test}2.asm", "");
-ok ! -f "${test}.bin";
-ok ! -f "${test}.reloc";
+capture_ok("z88dk-z80asm -b -m -reloc-info ${test}.asm ${test}1.asm ${test}2.asm", "");
+
+check_bin_file("${test}.bin", bytes());
+check_bin_file("${test}.reloc", words());
 
 check_bin_file("${test}_code.bin", 
 		z80asm("org $code_addr\n".
@@ -185,7 +241,7 @@ check_bin_file("${test}_data.bin",
 
 check_bin_file("${test}_data.reloc", "");
 
-check_txt_file("${test}.map", <<END);
+check_text_file("${test}.map", <<END);
 start                           = \$1020 ; addr, public, , ${test}, code, ${test}.asm:5
 string                          = \$3040 ; addr, public, , ${test}, data, ${test}.asm:14
 start1                          = \$1032 ; addr, public, , ${test}1, code, ${test}1.asm:4
@@ -207,21 +263,21 @@ END
 # with -R, several modules
 
 unlink_testfiles;
-path("${test}.asm")->spew(
+spew("${test}.asm", 
 		"section code\norg $code_addr\n".
 		"public start,string\nextern start,start1,start2,string,string1,string2\n".
 		code_asm("").
 		"section data\norg $data_addr\n".
 		data_asm(""));
 		
-path("${test}1.asm")->spew(
+spew("${test}1.asm", 
 		"section code\n".
 		"public start1,string1\nextern start,start1,start2,string,string1,string2\n".
 		code_asm("1").
 		"section data\n".
 		data_asm("1"));
 		
-path("${test}2.asm")->spew(
+spew("${test}2.asm", 
 		"section code\n".
 		"public start2,string2\nextern start,start1,start2,string,string1,string2\n".
 		code_asm("2").
@@ -234,11 +290,10 @@ $asm = code_asm("").code_asm("1").code_asm("2").
 @reloc = reloc_addrs($asm);
 $reloc_header = reloc_header(@reloc);
 
-capture_ok("./z88dk-z80asm -b -m -R ${test}.asm ${test}1.asm ${test}2.asm ".
-		   "2>${test}.err", 
-		   "Relocation header is ".length($reloc_header)." bytes.\n");
+capture_ok("z88dk-z80asm -b -m -R ${test}.asm ${test}1.asm ${test}2.asm ".
+		   "2>${test}.err", "");
 
-check_txt_file("${test}.err", <<ERR);
+check_text_file("${test}.err", <<ERR);
 ${test}.asm: warning: ORG ignored: file ${test}.o, section code
 ${test}.asm: warning: ORG ignored: file ${test}.o, section data
 ${test}1.asm: warning: ORG ignored: file ${test}1.o, section code
@@ -255,7 +310,7 @@ ok ! -f "${test}_code.reloc";
 ok ! -f "${test}_data.bin";
 ok ! -f "${test}_data.reloc";
 
-check_txt_file("${test}.map", <<END);
+check_text_file("${test}.map", <<END);
 start                           = \$005F ; addr, public, , ${test}, code, ${test}.asm:5
 string                          = \$0095 ; addr, public, , ${test}, data, ${test}.asm:14
 start1                          = \$0071 ; addr, public, , ${test}1, code, ${test}1.asm:4
@@ -274,10 +329,66 @@ __data_size                     = \$007F ; const, public, def, , ,
 END
 
 #------------------------------------------------------------------------------
+# with -R, several sections with orgs
+
+unlink_testfiles;
+spew("${test}.asm", <<END);
+	section code1
+	org 0x1000
+	
+start: jp cont
+	
+	section code2
+	org 0x8000
+	
+cont:  ret
+END
+
+my $bin = z80asm(<<END);
+	org 0
+	
+start: jp cont
+cont:  ret
+END
+
+@reloc = (1);
+$reloc_header = reloc_header(@reloc);
+
+capture_ok("z88dk-z80asm -b -m -R ${test}.asm 2>${test}.err", "");
+
+check_text_file("${test}.err", <<ERR);
+${test}.asm: warning: ORG ignored: file ${test}.o, section code1
+${test}.asm: warning: ORG ignored: file ${test}.o, section code2
+ERR
+
+check_bin_file("${test}.bin", $reloc_header.$bin);
+
+ok ! -f "${test}.reloc";
+
+ok ! -f "${test}_code1.bin";
+ok ! -f "${test}_code1.reloc";
+ok ! -f "${test}_code2.bin";
+ok ! -f "${test}_code2.reloc";
+
+check_text_file("${test}.map", <<END);
+cont                            = \$0051 ; addr, local, , ${test}, code2, ${test}.asm:9
+start                           = \$004E ; addr, local, , ${test}, code1, ${test}.asm:4
+__head                          = \$004E ; const, public, def, , ,
+__tail                          = \$0052 ; const, public, def, , ,
+__size                          = \$0052 ; const, public, def, , ,
+__code1_head                    = \$004E ; const, public, def, , ,
+__code1_tail                    = \$0051 ; const, public, def, , ,
+__code1_size                    = \$0051 ; const, public, def, , ,
+__code2_head                    = \$0051 ; const, public, def, , ,
+__code2_tail                    = \$0052 ; const, public, def, , ,
+__code2_size                    = \$004F ; const, public, def, , ,
+END
+
+#------------------------------------------------------------------------------
 # without -R, several sections
 
 unlink_testfiles;
-path("${test}.asm")->spew(<<END.
+spew("${test}.asm", <<END.
 	section code
 	section code1
 	section code2
@@ -296,10 +407,10 @@ END
 	"section data1\n".data_asm("1").
 	"section data2\n".data_asm("2"));
 	
-capture_ok("./z88dk-z80asm -b -m -reloc-info ${test}.asm", "");
+capture_ok("z88dk-z80asm -b -m -reloc-info ${test}.asm", "");
 
-ok ! -f "${test}.bin";
-ok ! -f "${test}.reloc";
+check_bin_file("${test}.bin", bytes());
+check_bin_file("${test}.reloc", words());
 
 check_bin_file("${test}_code.bin", 
 		z80asm("org $code_addr\n".
@@ -327,7 +438,7 @@ ok ! -f "${test}_data1.reloc";
 ok ! -f "${test}_data2.bin";
 ok ! -f "${test}_data2.reloc";
 
-check_txt_file("${test}.map", <<END);
+check_text_file("${test}.map", <<END);
 start                           = \$1020 ; addr, local, , ${test}, code, ${test}.asm:12
 string                          = \$3040 ; addr, local, , ${test}, data, ${test}.asm:36
 string1                         = \$304A ; addr, local, , ${test}, data1, ${test}.asm:39
@@ -357,8 +468,7 @@ __data2_tail                    = \$3060 ; const, public, def, , ,
 __data2_size                    = \$000B ; const, public, def, , ,
 END
 
-
-unlink_testfiles(<${test}_code* ${test}_data*>);
+unlink_testfiles;
 done_testing;
 
 
@@ -366,17 +476,16 @@ done_testing;
 # test with and without -R
 sub test_reloc {
 	my($asm) = @_;
-	local $Test::Builder::Level = $Test::Builder::Level + 1;
+	#local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
 	my($bin0, $bin1, $reloc_header, @reloc) = compute_reloc_addrs($asm);
 
 	# -R
 	for my $options ('-R', '-R -reloc-info') {
 		unlink_testfiles;
-		path("${test}.asm")->spew($asm);
-		
-		capture_ok("./z88dk-z80asm -b $options ${test}.asm", 
-				"Relocation header is ".length($reloc_header)." bytes.\n");
+		spew("${test}.asm", $asm);
+
+		capture_ok("z88dk-z80asm -b $options ${test}.asm", "");
 						 
 		check_bin_file("${test}.bin", $reloc_header.$bin0);
 		ok ! -f "${test}.reloc", "no reloc-info with -R";
@@ -384,17 +493,17 @@ sub test_reloc {
 
 	# no -R, no -reloc-info
 	unlink_testfiles;
-	path("${test}.asm")->spew("org 1\n".$asm);
+	spew("${test}.asm", "org 1\n".$asm);
 	
-	capture_ok("./z88dk-z80asm -b ${test}.asm", "");
+	capture_ok("z88dk-z80asm -b ${test}.asm", "");
 	check_bin_file("${test}.bin", $bin1);
 	ok ! -f "${test}.reloc";
 	
 	# no -R, -reloc-info
 	unlink_testfiles;
-	path("${test}.asm")->spew("org 1\n".$asm);
+	spew("${test}.asm", "org 1\n".$asm);
 	
-	capture_ok("./z88dk-z80asm -b -reloc-info ${test}.asm", "");
+	capture_ok("z88dk-z80asm -b -reloc-info ${test}.asm", "");
 	check_bin_file("${test}.bin", $bin1);
 	check_bin_file("${test}.reloc", pack("v*", @reloc));
 }	

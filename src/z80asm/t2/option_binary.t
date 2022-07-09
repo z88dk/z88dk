@@ -6,15 +6,15 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 
 # no -b
 unlink_testfiles;
-path("${test}.asm")->spew("nop");
-run_ok("./z88dk-z80asm ${test}.asm");
+spew("${test}.asm", "nop");
+run_ok("z88dk-z80asm ${test}.asm");
 ok -f "${test}.o", "object file";
 ok !-f "${test}.bin", "no binary file";
 
 # -b
 unlink_testfiles;
-path("${test}.asm")->spew("nop");
-run_ok("./z88dk-z80asm -b ${test}.asm");
+spew("${test}.asm", "nop");
+run_ok("z88dk-z80asm -b ${test}.asm");
 ok -f "${test}.o", "object file";
 ok -f "${test}.bin", "binary file";
 check_bin_file("${test}.bin", bytes(0));

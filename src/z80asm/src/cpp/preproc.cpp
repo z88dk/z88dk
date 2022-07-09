@@ -1309,26 +1309,28 @@ bool sfile_open(const char* filename, bool search_include_path) {
 	return g_preproc.open(filename, search_include_path);
 }
 
-const char* sfile_getline() {
-	static string line;				// to return line.c_str() - NOT REENTRANT
+// NOTE: user must free returned pointer
+char* sfile_getline() {
+	string line;
 	if (g_hold_getline)
 		return nullptr;
 	g_do_preproc_line = false;		// no preprocessing on input line
 	if (g_preproc.getline(line))
-		return line.c_str();
+		return must_strdup(line.c_str());	// needs to be freed by the user
 	else
 		return nullptr;
 }
 
-const char* sfile_get_source_line() {
-	static string line;				// to return line.c_str() - NOT REENTRANT
+// NOTE: user must free returned pointer
+char* sfile_get_source_line() {
+	string line;
 	if (g_hold_getline)
 		return nullptr;
 	g_do_preproc_line = true;		// preprocessing on input line
 	if (g_preproc.getline(line)) {
 		list_got_expanded_line(line.c_str());
 		set_error_expanded_line(line.c_str());
-		return line.c_str();
+		return must_strdup(line.c_str());	// needs to be freed by the user
 	}
 	else
 		return nullptr;

@@ -27,7 +27,7 @@ $test.asm:7: error: syntax error
   ^---- lib
 END
 
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 		public	p1,p2
 		xdef p3
 		xlib p4
@@ -42,7 +42,7 @@ path("$test.asm")->spew(<<END);
 		defb g1, g2, g3, g4	;; 10 20 30 40
 END
 
-path("$test.1.asm")->spew(<<END);
+spew("$test.1.asm", <<END);
 		extern 	p1,p2
 		xref p3
 		lib p4
@@ -54,7 +54,7 @@ path("$test.1.asm")->spew(<<END);
 		defb g1, g2, g3, g4	;; 10 20 30 40
 END
 
-run_ok("./z88dk-z80asm -b $test.asm $test.1.asm");
+run_ok("z88dk-z80asm -b $test.asm $test.1.asm");
 check_bin_file("$test.bin", bytes(0x00,
 								  0x01,
 								  0x02,

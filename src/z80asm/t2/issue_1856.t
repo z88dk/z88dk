@@ -12,19 +12,19 @@ for my $len (255, 256, 1023, 1024, 8192) {
 	my $module = "m" x $len;
 	my $section = "s" x $len;
 	my $file = "f" x $len;
-	path("$test.asm")->spew(<<END);
+	spew("$test.asm", <<END);
 		module $module
 		extern $var1, $var2
 		section $section
 		line $len, "$file"
 		defw $var1, $var2
 END
-	path("$test-1.asm")->spew(<<END);
+	spew("$test-1.asm", <<END);
 		public $var1
 		extern $var2
 		defc $var1 = 0+$var2
 END
-	path("$test-2.asm")->spew(<<END);
+	spew("$test-2.asm", <<END);
 		public $var2
 		defc $var2 = $len
 END

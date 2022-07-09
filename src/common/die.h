@@ -15,7 +15,7 @@
 #include <direct.h>
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_CYGWIN)
 #include <unixem/glob.h>
 #endif
 #include <glob.h>

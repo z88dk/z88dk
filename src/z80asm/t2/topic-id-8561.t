@@ -11,14 +11,14 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 # labels defined in the same module is a constant and not an address.
 # Remove '#' operator after this is fixed.
 
-path("$test.asm")->spew(<<END);
+spew("$test.asm", <<END);
 		EXTERN l_div
 
 		call l_div					; 0000 ;; CD 04 00
 		ret							; 0003 ;; C9
 END
 
-path("$test.1.asm")->spew(<<END);
+spew("$test.1.asm", <<END);
 		PUBLIC l_div
 		EXTERN l_div_u, L_DIVENTRY
 		
@@ -27,7 +27,7 @@ path("$test.1.asm")->spew(<<END);
 		ret							; 0007 ;; C9
 END
 
-path("$test.2.asm")->spew(<<END);
+spew("$test.2.asm", <<END);
 		PUBLIC l_div_u, L_DIVENTRY
 		
 	l_div_u:
@@ -42,7 +42,7 @@ path("$test.2.asm")->spew(<<END);
 		DEFC L_DIVENTRY = entry - l_div_u
 END
 
-run_ok("./z88dk-z80asm -b $test.asm $test.1.asm $test.2.asm");
+run_ok("z88dk-z80asm -b $test.asm $test.1.asm $test.2.asm");
 check_bin_file("$test.bin", bytes(	0xCD, 0x04, 0x00,
 									0xC9,
 									0xCD, 0x0D, 0x00,

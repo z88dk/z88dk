@@ -5,7 +5,7 @@ BEGIN { use lib 't2'; require 'testlib.pl'; }
 # BUG_0001: Error in expression during link
 # BUG_0001(a): during correction of BUG_0001, new symbol 
 
-path("${test}1.asm")->spew(<<'END');
+spew("${test}1.asm", <<'END');
                 PUBLIC value
                 DEFC   value = 10
 END

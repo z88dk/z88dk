@@ -2,38 +2,49 @@
 
 use Modern::Perl;
 use Test::More;
+use Config;
 use Capture::Tiny 'capture_merged';
+use Data::HexDump;
 use Path::Tiny;
+use Text::Diff;
+
+$ENV{PATH} = join($Config{path_sep}, 
+			".",
+			"../../bin",
+			$ENV{PATH});
 
 my $OBJ_FILE_VERSION = "16";
 
-use vars '$test';
-$test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/]/_/gr);
+use vars '$test', '$null', '$os_ls', '$os_cmd_sep';
+$test = "test_".(($0 =~ s/\.t$//r) =~ s/[\.\/\\]/_/gr);
+$null = ($^O eq 'MSWin32') ? 'nul' : '/dev/null';
+
+unlink_testfiles();
 
 #------------------------------------------------------------------------------
 sub check_bin_file {
-    my($got_file, $exp) = @_;
+    my($got_file, $exp_bin) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
-    run_ok("xxd -g1 $got_file > $got_file.hex");
-    
-    my $exp_file = ($got_file =~ s/\.\w+$/.exp/ir);
-    path($exp_file)->spew_raw($exp);
-    run_ok("xxd -g1 $exp_file > $exp_file.hex");
-    
-    run_ok("diff $exp_file.hex $got_file.hex");
+	my $got_bin = slurp($got_file);
+	my $got_hex = HexDump($got_bin);
+	
+	my $exp_hex = HexDump($exp_bin);
+	
+	my $diff = diff(\$exp_hex, \$got_hex, {STYLE => 'Context'});
+	is $diff, "", "bin file $got_file ok";
 }
 
 #------------------------------------------------------------------------------
-sub check_txt_file {
-    my($got_file, $exp) = @_;
+sub check_text_file {
+    my($got_file, $exp_text) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
-    my $exp_file = ($got_file =~ s/\.\w+$/.exp/ir);
-    path($exp_file)->spew($exp);
-    
-    run_ok("dos2unix -q $exp_file $got_file");
-    run_ok("diff $exp_file $got_file");
+	(my $got_text = slurp($got_file)) =~ s/\r\n/\n/g;
+	$exp_text =~ s/\r\n/\n/g;
+	
+	my $diff = diff(\$exp_text, \$got_text, {STYLE => 'Context'});
+	is $diff, "", "text file $got_file ok";
 }
 
 #------------------------------------------------------------------------------
@@ -51,16 +62,16 @@ sub z80asm_ok {
     # save asm file
     my $asm_file = "${test}.asm";
     my $bin_file = "${test}.bin";
-    path($asm_file)->spew($asm);
+    spew($asm_file, $asm);
     unlink($bin_file);
     
     # assemble
     $options ||= "-b";
     $files ||= $asm_file;
 
-    run_ok("./z88dk-z80asm $options $files 2> ${test}.stderr");
+    run_ok("z88dk-z80asm $options $files 2> ${test}.stderr");
     check_bin_file($bin_file, $bin);
-    check_txt_file("${test}.stderr", $exp_warn) if $exp_warn;
+    check_text_file("${test}.stderr", $exp_warn) if $exp_warn;
 }
 
 #------------------------------------------------------------------------------
@@ -70,13 +81,13 @@ sub z80asm_nok {
     
     # save asm file
     my $asm_file = "${test}.asm";
-    path($asm_file)->spew($asm);
+	spew($asm_file, $asm);
     
     # assemble
     $options ||= "-b";
     $files ||= $asm_file;
 
-    capture_nok("./z88dk-z80asm $options $files", $exp_err);
+    capture_nok("z88dk-z80asm $options $files", $exp_err);
 }
 
 #------------------------------------------------------------------------------
@@ -85,7 +96,7 @@ sub capture_ok {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     
     run_ok($cmd." > ${test}.stdout");
-    check_txt_file("${test}.stdout", $exp_out);
+    check_text_file("${test}.stdout", $exp_out);
 }
 
 #------------------------------------------------------------------------------
@@ -94,13 +105,14 @@ sub capture_nok {
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     run_nok($cmd." 2> ${test}.stderr");
-    check_txt_file("${test}.stderr", $exp_err);
+    check_text_file("${test}.stderr", $exp_err);
 }
 
 #------------------------------------------------------------------------------
 sub run_ok {
     my($cmd) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+	
     ok 0==system($cmd), $cmd;
 }
 
@@ -108,6 +120,7 @@ sub run_ok {
 sub run_nok {
     my($cmd) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+	
     ok 0!=system($cmd), $cmd;
 }
 
@@ -237,6 +250,40 @@ sub quote_os {
 	}
 	else {
 		return "'".$txt."'";
+	}
+}
+
+#------------------------------------------------------------------------------
+# path()->spew fails sometimes on Windows (race condition?) with 
+# Error rename on 'test_t2_ALIGN.asm37032647357911' -> 'test_t2_ALIGN.asm': Permission denied
+# replace by a simpler spew without renames
+sub spew {
+	my($file, @data) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+	my $open_ok = open(my $fh, ">:raw", $file);
+	ok $open_ok, "write $file"; 
+	
+	if ($open_ok) {
+		print $fh join('', @data);
+	}
+}
+
+#------------------------------------------------------------------------------
+# and for simetry
+sub slurp {
+	my($file) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+
+	my $open_ok = open(my $fh, "<:raw", $file);
+	ok $open_ok, "read $file";
+	
+	if ($open_ok) {
+		read($fh, my $data, -s $file);
+		return $data;
+	}
+	else {
+		return "";
 	}
 }
 

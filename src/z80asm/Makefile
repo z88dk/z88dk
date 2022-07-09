@@ -7,24 +7,11 @@
 BARE_PROJ	:= z80asm
 PROJ		:= z88dk-$(BARE_PROJ)
 
-# EXESUFFIX is passed when cross-compiling Win32 on Linux
-ifeq ($(OS),Windows_NT)
-  EXESUFFIX 	:= .exe
-else
-  EXESUFFIX 	?=
-endif
-
-# UNIXem is needed in both Windows_NT and in a MinGW build in Unix
-ifeq ($(EXESUFFIX),.exe)
-  UNIXem_CFLAGS	:= -I../../ext/UNIXem/include
-  UNIXem_OBJS	:= ../../ext/UNIXem/src/glob.o \
-				   ../../ext/UNIXem/src/dirent.o
-endif
+include ../Make.common
 
 CC 			?= gcc
 CXX			?= g++
 INSTALL 	?= install
-CROSS		?= 0
 RE2C		= re2c -W --tags --no-debug-info --no-generation-date 
 
 OPT 		= -O3
@@ -218,6 +205,7 @@ clean::
 
 clean::
 	$(RM) -r *.dSYM
+	$(RM) -r $(PROJ)$(EXESUFFIX) test*.dir
 	$(RM) $(PROJ)$(EXESUFFIX) test*
 	$(RM) t/*.tmp t/dev/*.tmp
 

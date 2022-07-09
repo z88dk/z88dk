@@ -12,7 +12,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 	my($cpu) = $base =~ /cpu_test(?:old)?_(\w+)$/; $cpu =~ tr/_/-/;
 	
 	# build command line
-	my $cmd = "./z88dk-z80asm -m$cpu ".
+	my $cmd = "z88dk-z80asm -m$cpu ".
 			($ixiy ? "-IXIY " : "").
 			" -m -l -b $file 2> $test.err";
 
@@ -74,7 +74,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 		my $bin = join('', map {chr} @bin);
 		
 		# read output binary
-		my $out_bin = substr(path($file_bin)->slurp_raw, 0, $length);
+		my $out_bin = substr(slurp($file_bin), 0, $length);
 		ok $out_bin eq $bin, "$file_bin ok";
 		if ($out_bin ne $bin) {
 			my $addr = 0;
@@ -89,7 +89,7 @@ for my $file (<dev/cpu/cpu_test*.asm>) {
 	}
 	else {
 		# check that all lines have error messages
-		my $num_lines = (path($file)->slurp =~ tr/\n/\n/);
+		my $num_lines = (slurp($file) =~ tr/\n/\n/);
 		my @err_lines;
 		
 		# run assembler

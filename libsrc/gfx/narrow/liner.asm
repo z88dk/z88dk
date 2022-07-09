@@ -52,8 +52,8 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;
 ; The algorithm in pseudo-code:
 ;
-;    direc_x =    SGN x: direc_y    = SGN y
-;    x = ABS x: y =    ABS y
+;    direc_x = SGN x:  direc_y = SGN y
+;    x = ABS x:  y = ABS y
 ;
 ;    if x    >= y
 ;    if x+y=0 then return
@@ -70,20 +70,21 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
 ;
 ;    B = H
 ;    i = INT(B/2)
+;
 ;    FOR N=B TO 1 STEP -1
 ;    i = i + L
-;    if i    < H
-;    ix =    ddx
-;    iy =    ddy
+;    if i < H
+;      ix = ddx
+;      iy = ddy
 ;    else
-;    i = i - H
-;    ix =    direc_x
-;    iy =    direc_y
+;      i = i - H
+;      ix = direc_x
+;      iy = direc_y
 ;    endif
-;    x0 =    x0 +    ix
-;    y0 =    y0 +    iy
-;    plot    (x0,y0)
-;    NEXT    N
+;    x0 = x0 + ix
+;    y0 = y0 + iy
+;    plot (x0,y0)
+;    NEXT N
 ;
 ;
 ;    Registers    changed after return:
@@ -134,7 +135,13 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     ld    c,h    ; B = H
     srl    c    ; i = INT(B/2)
           ; FOR N=B    TO 1    STEP    -1
-.drawloop    ld    a,c
+.drawloop
+
+    xor   a               ; (Stefano)
+	or    h               ; .. vertical line drawing was slow
+	jr    z, i_greater    ; this shortcut seems to solve the problem
+
+    ld    a,c
     add    a,l
     jr    c, i_greater    ;    i + L > 255  (i > H)
     cp    h

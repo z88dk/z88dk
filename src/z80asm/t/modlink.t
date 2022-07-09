@@ -584,7 +584,7 @@ write_file("test.asm", <<'END');
 			sd_write_sector:
 				jp sd_write_block_2gb + ASMDISP_SD_WRITE_BLOCK_2GB_CALLEE ;; error: undefined symbol: sd_write_block_2gb
 END
-my($stdout, $stderr, $return, @dummy) = capture { system "./z88dk-z80asm test.asm"; };
+my($stdout, $stderr, $return, @dummy) = capture { system "z88dk-z80asm test.asm"; };
 is_text( $stdout, "" );
 is_text( $stderr, <<'END' );
 test.asm:5: error: undefined symbol: sd_write_block_2gb
@@ -711,13 +711,13 @@ write_file("test2.asm", <<'...');
 		defw func1
 		ret
 ...
-my $cmd = "./z88dk-z80asm -b test.asm test1.asm test2.asm";
+my $cmd = "z88dk-z80asm -b test.asm test1.asm test2.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 is_text( $stdout, "", "stdout" );
 is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
-ok ! -f "test.bin", "test.bin";
+is -s "test.bin", 0, "test.bin";
 is read_binfile("test_bank0.bin"), "\xC9\0\0\0\0\0\0\0\xC9\xC9", "test_bank0.bin";
 is read_binfile("test_bank1.bin"), "\xCD\x08\x00\x00\x00\0\0\0\xC9\x00\xC9", "test_bank1.bin";
 is read_binfile("test_main.bin"), "\xCD\x08\x00\x09\x00\xCD\x08\x00\x0A\x00\xC9", "test_main.bin";
@@ -865,7 +865,7 @@ my $bincode = sub {
 	return $bin;
 };
 
-$cmd = "./z88dk-z80asm -s -otest.o test1.asm test2.asm test3.asm test4.asm";
+$cmd = "z88dk-z80asm -s -otest.o test1.asm test2.asm test3.asm test4.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 is_text( $stdout, "", "stdout" );
@@ -932,7 +932,7 @@ END
 # at address 0
 unlink "test.asm", "test.bin";
 
-$cmd = "./z88dk-z80asm -b -m test.o test_lib.asm";
+$cmd = "z88dk-z80asm -b -m test.o test_lib.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 is_text( $stdout, "", "stdout" );
@@ -970,7 +970,7 @@ END
 # at address 0x1234
 unlink "test.asm", "test.bin";
 
-$cmd = "./z88dk-z80asm -b -m -r0x1234 test.o test_lib.asm";
+$cmd = "z88dk-z80asm -b -m -r0x1234 test.o test_lib.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 is_text( $stdout, "", "stdout" );
@@ -1020,7 +1020,7 @@ write_file("test_gen.asm", <<'...');
 write_file("test_plat1.asm", <<'...');
 ...
 
-$cmd = "./z88dk-z80asm -xtest_plat1.lib test_plat1 test_gen";
+$cmd = "z88dk-z80asm -xtest_plat1.lib test_plat1 test_gen";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 is_text( $stdout, "", "stdout" );
@@ -1037,7 +1037,7 @@ write_file("test_plat2.asm", <<'...');
 		ret
 ...
 
-$cmd = "./z88dk-z80asm -xtest_plat2.lib test_plat2 test_gen";
+$cmd = "z88dk-z80asm -xtest_plat2.lib test_plat2 test_gen";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 is_text( $stdout, "", "stdout" );
@@ -1053,7 +1053,7 @@ write_file("test.asm", <<'...');
 
 
 # link on platform 1
-$cmd = "./z88dk-z80asm -ltest_plat1.lib -b test";
+$cmd = "z88dk-z80asm -ltest_plat1.lib -b test";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 is_text( $stdout, "", "stdout" );
@@ -1063,7 +1063,7 @@ test_binfile("test.bin", pack("C*", 0xC3, 3, 0, 0x3E, 1, 0xC9));
 
 
 # link on platform 2
-$cmd = "./z88dk-z80asm -ltest_plat2.lib -b test";
+$cmd = "z88dk-z80asm -ltest_plat2.lib -b test";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 is_text( $stdout, "", "stdout" );
@@ -1116,14 +1116,14 @@ write_file("test1.asm", <<'...');
 	ld hl, __LOADER_tail -__LOADER_head
 ...
 
-$cmd = "./z88dk-z80asm test1.asm";
+$cmd = "z88dk-z80asm test1.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 is_text( $stdout, "", "stdout" );
 is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 
-$cmd = "../../src/z80nm/z88dk-z80nm test1.o";
+$cmd = "z88dk-z80nm test1.o";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 $stdout = join("\n", grep {/__/} split(/\n/, $stdout))."\n";
@@ -1135,14 +1135,14 @@ is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 
 
-$cmd = "./z88dk-z80asm -otest1.o test1.asm";
+$cmd = "z88dk-z80asm -otest1.o test1.asm";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 is_text( $stdout, "", "stdout" );
 is_text( $stderr, "", "stderr" );
 ok !!$return == !!0, "retval";
 
-$cmd = "../../src/z80nm/z88dk-z80nm test1.o";
+$cmd = "z88dk-z80nm test1.o";
 ok 1, $cmd;
 ($stdout, $stderr, $return, @dummy) = capture { system $cmd; };
 $stdout = join("\n", grep {/__/} split(/\n/, $stdout))."\n";

@@ -12,18 +12,18 @@ END
 
 # no -v
 unlink_testfiles;
-path("${test}.asm")->spew($asm);
+spew("${test}.asm", $asm);
 
-capture_ok("./z88dk-z80asm -b -s -l -g ${test}.asm", <<END);
+capture_ok("z88dk-z80asm -b -s -l -g ${test}.asm", <<END);
 END
 
 check_bin_file("${test}.bin", bytes(0,0,0));
 
 # -v
 unlink_testfiles;
-path("${test}.asm")->spew($asm);
+spew("${test}.asm", $asm);
 
-capture_ok("./z88dk-z80asm -b -s -l -g -v ${test}.asm", <<END);
+capture_ok("z88dk-z80asm -b -s -l -g -v ${test}.asm", <<END);
 Reading library 'z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = \$0001
 Predefined constant: __CPU_ZILOG__ = \$0001
@@ -40,7 +40,7 @@ Creating binary '${test}.bin'
 END
 
 check_bin_file("${test}.bin", bytes(0,0,0));
-check_txt_file("${test}.lis", <<END);
+check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          	nop
          000000 00                    + nop
@@ -52,7 +52,7 @@ ${test}.asm:
                                       +
 END
 
-check_txt_file("${test}.def", <<END);
+check_text_file("${test}.def", <<END);
 END
 
 unlink_testfiles;

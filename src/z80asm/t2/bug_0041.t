@@ -3,7 +3,7 @@
 BEGIN { use lib 't2'; require 'testlib.pl'; }
 
 # BUG_0041: truncate negative powers to zero, i.e. pow(2,-1) == 0
-path("$test.1.asm")->spew(<<END);
+spew("$test.1.asm", <<END);
 		public ZERO
 		defc ZERO = 0
 END

@@ -24,7 +24,7 @@ spew("test.map",	"test");
 spew("test.reloc",	"test");
 spew("test.def",	"test");
 
-run("./z88dk-z80asm test");
+run("z88dk-z80asm test");
 
 z80nm("test.o", <<'END');
 Object  file test.o at $0000: Z80RMF16
