@@ -6,14 +6,6 @@ use Modern::Perl;
 
 # Test asmpp.pl
 
-#use strict;
-#use warnings;
-#use Test::More;
-#use File::Slurp;
-#use Capture::Tiny::Extended 'capture';
-#
-#require './t/test_utils.pl';
-
 #------------------------------------------------------------------------------
 # simple code
 #------------------------------------------------------------------------------

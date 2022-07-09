@@ -34,7 +34,7 @@ steps:
     sudo apt-get update
     sudo apt-get install -y ragel re2c dos2unix texinfo texi2html gdb curl cpanminus ccache libboost-all-dev libmodern-perl-perl libtemplate-perl libtemplate-plugin-yaml-perl libyaml-perl liblocal-lib-perl libcapture-tiny-perl libpath-tiny-perl libtest-differences-perl libtext-table-perl libdata-hexdump-perl libregexp-common-perl libclone-perl
     eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
-    cpanm  App::Prove Capture::Tiny::Extended CPU::Z80::Assembler File::Path List::Uniq Object::Tiny::RW Regexp::Common Test::Cmd::Common Test::HexDifferences Text::Diff YAML::Tiny
+    cpanm  App::Prove CPU::Z80::Assembler File::Path List::Uniq Object::Tiny::RW Regexp::Common Text::Diff YAML::Tiny
   displayName: "Install prerequisites"
 - bash: |
     eval $(perl -I$PERL_CACHE -Mlocal::lib=$PERL_CACHE)
