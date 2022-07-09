@@ -11,8 +11,6 @@ Define CPU opcodes
 
 #pragma once
 
-#include "options.h"
-
 /* forward declaration without include cycle */
 struct Expr;
 
@@ -72,26 +70,26 @@ void add_copper_unit_stop();
 void add_copper_unit_nop();
 
 /* assert we are on a Z80 */
-#define _Z80_ONLY(x)		(!(opts.cpu & (CPU_Z80|CPU_Z80N)) ? \
+#define _Z80_ONLY(x)		(!(option_cpu() & (CPU_Z80|CPU_Z80N)) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _EXCEPT_Z80(x)		((opts.cpu & (CPU_Z80|CPU_Z80N)) ? \
+#define _EXCEPT_Z80(x)		((option_cpu() & (CPU_Z80|CPU_Z80N)) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _Z180_ONLY(x)		(!(opts.cpu & CPU_Z180) ? \
+#define _Z180_ONLY(x)		(!(option_cpu() & CPU_Z180) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _RCM2000_ONLY(x)	(!(opts.cpu & CPU_R2KA) ? \
+#define _RCM2000_ONLY(x)	(!(option_cpu() & CPU_R2KA) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _RCM3000_ONLY(x)	(!(opts.cpu & CPU_R3K) ? \
+#define _RCM3000_ONLY(x)	(!(option_cpu() & CPU_R3K) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
 
-#define _ZILOG_ONLY(x)		(!(opts.cpu & CPU_ZILOG) ? \
+#define _ZILOG_ONLY(x)		(!(option_cpu() & CPU_ZILOG) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _RABBIT_ONLY(x)		(!(opts.cpu & CPU_RABBIT) ? \
+#define _RABBIT_ONLY(x)		(!(option_cpu() & CPU_RABBIT) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
 
@@ -101,8 +99,8 @@ void add_copper_unit_nop();
 #define P_HL	0
 #define P_AF	0
 #define P_SP	0
-#define P_IX	(opts.swap_ix_iy ? 0xFD00 : 0xDD00)
-#define P_IY	(opts.swap_ix_iy ? 0xDD00 : 0xFD00)
+#define P_IX	(option_swap_ixiy() ? 0xFD00 : 0xDD00)
+#define P_IY	(option_swap_ixiy() ? 0xDD00 : 0xFD00)
 
 /* Flags constants */
 enum { FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO_LZ, FLAG_PE_LO, FLAG_P, FLAG_M };
@@ -160,7 +158,7 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 /* choose RST opcode */
 #define _RST_ARG(n)			((n) < 0 || (n) > 0x38 || (((n) & 7) != 0) ? \
 								(error_int_range(n),0) : \
-								((opts.cpu & CPU_RABBIT) && \
+								((option_cpu() & CPU_RABBIT) && \
 									((n) == 0 || (n) == 8 || (n) == 0x30) ? \
 										(error_illegal_ident(),0) : \
 										0xC7 + (n)))
@@ -197,7 +195,7 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_EXX				0xD9
 #define Z80_EX_AF_AF		0x08
 #define Z80_EX_DE_HL		0xEB
-#define Z80_EX_IND_SP_HL	((opts.cpu & CPU_RABBIT) ? 0xED54 : 0xE3)
+#define Z80_EX_IND_SP_HL	((option_cpu() & CPU_RABBIT) ? 0xED54 : 0xE3)
 #define Z80_EX_IND_SP_idx	0xE3	/* (IX) or (IY) */
 #define Z80_HALT			_ZILOG_ONLY(0x76)
 #define Z80_IM(n)			_ZILOG_ONLY(_CHOOSE3_((n), 0, 0xED46, 1, 0xED56, 2, 0xED5E))
@@ -286,9 +284,9 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 
 /* Z180 opcodes */
 #define Z80_SLP				_Z180_ONLY(0xED76)
-#define Z80_MLT(dd)			((opts.cpu & CPU_Z80) ? \
+#define Z80_MLT(dd)			((option_cpu() & CPU_Z80) ? \
 								(error_illegal_ident(), 0) : \
-								(opts.cpu & CPU_RABBIT) && (dd) == REG_SP ? \
+								(option_cpu() & CPU_RABBIT) && (dd) == REG_SP ? \
 									(error_illegal_ident(), 0) : \
 									0xED4C + ((dd) << 4))
 #define Z80_IN0(r)			_Z180_ONLY(0xED00 + ((r) << 3))

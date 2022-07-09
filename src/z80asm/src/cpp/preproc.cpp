@@ -18,7 +18,8 @@ using namespace std;
 // global state
 static bool g_hold_getline;
 static bool g_do_preproc_line;
-static Preproc g_preproc;
+
+Preproc g_preproc;
 
 //-----------------------------------------------------------------------------
 
@@ -164,7 +165,10 @@ Preproc::Preproc() {
 	m_levels.emplace_back();
 }
 
-bool Preproc::open(const string& filename, bool search_include_path) {
+bool Preproc::open(const string& filename_, bool search_include_path) {
+	// canonize path
+	string filename = fs::path(filename_).generic_string();
+
 	// search file in path
 	string found_filename = filename;
 	if (search_include_path)
@@ -1001,7 +1005,7 @@ void Preproc::do_setfloat() {
 		sublexer.next();
 		if (!sublexer.peek().is(TType::Newline))
 			g_errors.error(ErrCode::Syntax);
-		else if (!set_float_format(format.c_str()))
+		else if (!g_float_format.set_text(format))
 			g_errors.error(ErrCode::InvalidFloatFormat, FloatFormat::get_formats());
 		else {}
 	}

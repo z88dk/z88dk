@@ -370,7 +370,7 @@ void parse_file(const char* filename)
 	ParseCtx* ctx = ParseCtx_new();
 	{
 		if (sfile_open(filename, true)) {
-			if (opts.verbose)
+			if (option_verbose())
 				printf("Reading '%s' = '%s'\n",
 					path_canon(filename), path_canon(sfile_filename()));	/* display name of file */
 

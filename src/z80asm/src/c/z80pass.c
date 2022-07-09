@@ -155,7 +155,7 @@ Z80pass2(void)
 			}
 		}
 
-		if (opts.list) {
+		if (option_list_file()) {
 			if (expr->range == RANGE_WORD_BE) {
 				int swapped = ((value & 0xFF00) >> 8) | ((value & 0x00FF) << 8);
 				list_patch_bytes(expr->listpos, swapped, range_size(expr->range));
@@ -191,9 +191,9 @@ Z80pass2(void)
 
 	// add to the list of objects to link
 	if (!get_num_errors())
-		object_file_append(get_obj_filename(CURRENTMODULE->filename), CURRENTMODULE, false, false);
+		object_file_append(get_o_filename(CURRENTMODULE->filename), CURRENTMODULE, false, false);
 
-	if (!get_num_errors() && opts.symtable)
+	if (!get_num_errors() && option_symtable())
 		write_sym_file(CURRENTMODULE);
 }
 
@@ -205,7 +205,7 @@ bool Pass2infoExpr(range_t range, Expr* expr)
 		expr->range = range;
 		expr->code_pos = get_cur_module_size();			/* update expression location */
 
-		if (opts.cur_list)
+		if (list_is_on())
 			expr->listpos = expr->code_pos;
 		else
 			expr->listpos = -1;

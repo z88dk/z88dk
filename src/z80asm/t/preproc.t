@@ -135,14 +135,19 @@ $test.asm:2: error: syntax error
   ^---- ld a,"a"
 END_ERR
 
-# backslash inside include filename not converted to escape sequence 
-# backslash inside defb converted to escape sequence
-z80asm_nok("", "", <<'END_ASM', <<END_ERR);
-		include "a\run\new\folder"
+SKIP: {
+    skip "Only works on Windows systems with backslash as path separator", 1 
+		unless $Config{path_sep} eq ';';
+
+    # backslash inside include filename not converted to escape sequence 
+    # backslash inside defb converted to escape sequence
+    z80asm_nok("", "", <<'END_ASM', <<END_ERR);
+        include "a\run\new\folder"
 END_ASM
 $test.asm:1: error: file open: a/run/new/folder
   ^---- include "a\\run\\new\\folder"
 END_ERR
+}
 
 z80asm_ok("", "", "", <<'END_ASM', "a\run\new\folder");
 		defb "a\run\new\folder"

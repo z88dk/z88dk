@@ -7011,7 +7011,7 @@ _eof_trans:
 	break;
 	case 474:
 	{te = p;p--;{
-	if (opts.cpu & CPU_Z80N) {
+	if (option_cpu() & CPU_Z80N) {
 		sym.tok = TK_X;
 	}
 	else {
@@ -8039,7 +8039,7 @@ _eof_trans:
 	break;
 	case 45:
 	{{p = ((te))-1;}
-	if ((opts.cpu & CPU_R2KA) || (opts.cpu & CPU_R3K)) {
+	if ((option_cpu() & CPU_R2KA) || (option_cpu() & CPU_R3K)) {
 		sym.tok = TK_LZ;
 	}
 	else {
@@ -8050,7 +8050,7 @@ _eof_trans:
 	break;
 	case 46:
 	{{p = ((te))-1;}
-	if ((opts.cpu & CPU_R2KA) || (opts.cpu & CPU_R3K)) {
+	if ((option_cpu() & CPU_R2KA) || (option_cpu() & CPU_R3K)) {
 		sym.tok = TK_LO;
 	}
 	else {
@@ -8075,7 +8075,7 @@ _eof_trans:
 	break;
 	case 49:
 	{{p = ((te))-1;}
-	if (opts.cpu == CPU_8085) {
+	if (option_cpu() == CPU_8085) {
 		sym.tok = TK_X5;
 	}
 	else {
@@ -8086,7 +8086,7 @@ _eof_trans:
 	break;
 	case 50:
 	{{p = ((te))-1;}
-	if (opts.cpu == CPU_8085) {
+	if (option_cpu() == CPU_8085) {
 		sym.tok = TK_NX5;
 	}
 	else {
@@ -8097,7 +8097,7 @@ _eof_trans:
 	break;
 	case 51:
 	{{p = ((te))-1;}
-	if (opts.cpu == CPU_8085) {
+	if (option_cpu() == CPU_8085) {
 		sym.tok = TK_K;
 	}
 	else {
@@ -8108,7 +8108,7 @@ _eof_trans:
 	break;
 	case 52:
 	{{p = ((te))-1;}
-	if (opts.cpu == CPU_8085) {
+	if (option_cpu() == CPU_8085) {
 		sym.tok = TK_NK;
 	}
 	else {
@@ -8224,7 +8224,7 @@ _eof_trans:
 	break;
 	case 68:
 	{{p = ((te))-1;}
-	if (opts.cpu & CPU_Z80N) {
+	if (option_cpu() & CPU_Z80N) {
 		sym.tok = TK_X;
 	}
 	else {

@@ -15,7 +15,6 @@ Handle object file contruction, reading and writing
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
-#include "options.h"
 #include "str.h"
 #include "strutil.h"
 #include "utstring.h"
@@ -211,7 +210,7 @@ static long write_code(FILE* fp)
 	code_ptr = ftell(fp);
 	wrote_data = fwrite_module_code(fp, &code_size);
 
-	if (opts.verbose)
+	if (option_verbose())
 		printf("Module '%s' size: %ld bytes\n", CURRENTMODULE->modname, (long)code_size);
 
 	if (wrote_data)
@@ -228,9 +227,9 @@ void write_obj_file(const char* source_filename)
 	int i;
 
 	/* open file */
-	obj_filename = get_obj_filename(source_filename);
+	obj_filename = get_o_filename(source_filename);
 
-	if (opts.verbose)
+	if (option_verbose())
 		printf("Writing object file '%s'\n", path_canon(obj_filename));
 
 	fp = xfopen(obj_filename, "wb");

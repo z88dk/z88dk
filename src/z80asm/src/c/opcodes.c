@@ -53,7 +53,7 @@ void add_opcode_jr_n(int opcode, struct Expr* expr, int asmpc_offset)
 {
 	expr->asmpc += asmpc_offset;		// expr is assumed to be at asmpc+1; add offset if this is not true
 
-	if (opts.opt_speed) {
+	if (option_speed()) {
 		switch (opcode) {
 		case Z80_JR:
 			add_opcode(Z80_JP);
@@ -210,10 +210,10 @@ void add_Z88_FPP(int argument)
 
 void add_Z88_INVOKE(int argument)
 {
-	if (opts.ti83 || opts.ti83plus) {
+	if (option_ti83() || option_ti83plus()) {
 		int opcode;
 
-		if (opts.ti83plus)
+		if (option_ti83plus())
 			opcode = Z80_RST(0x28);		/* Ti83Plus: RST 28H instruction */
 		else
 			opcode = Z80_CALL;			/* Ti83: CALL */
@@ -234,7 +234,7 @@ void add_Z88_INVOKE(int argument)
 // (0<=VER<=311, 0<=HOR<=55)  BIG ENDIAN!
 void add_copper_unit_wait(Expr *ver, Expr *hor)
 { 
-	if (opts.cpu != CPU_Z80N)
+	if (option_cpu() != CPU_Z80N)
 		error_illegal_ident();
 	else {
 		char expr_text[MAXLINE];
@@ -252,7 +252,7 @@ void add_copper_unit_wait(Expr *ver, Expr *hor)
 // (0<= REG <= 127, 0 <= VAL <= 255)  BIG ENDIAN!
 void add_copper_unit_move(Expr *reg, Expr *val)
 {
-	if (opts.cpu != CPU_Z80N)
+	if (option_cpu() != CPU_Z80N)
 		error_illegal_ident();
 	else {
 		char expr_text[MAXLINE];
@@ -270,7 +270,7 @@ void add_copper_unit_move(Expr *reg, Expr *val)
 // cu.stop   -> 16 - bit encoding 0xffff (impossible cu.wait)
 void add_copper_unit_stop()
 {
-	if (opts.cpu != CPU_Z80N)
+	if (option_cpu() != CPU_Z80N)
 		error_illegal_ident();
 	else
 		append_word_be(0xFFFF);
@@ -279,7 +279,7 @@ void add_copper_unit_stop()
 // cu.nop  -> 16 - bit encoding 0x0000 (do nothing cu.move)
 void add_copper_unit_nop()
 {
-	if (opts.cpu != CPU_Z80N)
+	if (option_cpu() != CPU_Z80N)
 		error_illegal_ident();
 	else
 		append_word_be(0x0000);

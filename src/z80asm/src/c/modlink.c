@@ -14,7 +14,6 @@ Repository: https://github.com/z88dk/z88dk
 #include "if.h"
 #include "libfile.h"
 #include "modlink.h"
-#include "options.h"
 #include "parse.h"
 #include "reloc_code.h"
 #include "scan.h"
@@ -181,29 +180,27 @@ static void obj_files_free(obj_file_t** plist) {
 	}
 }
 
-bool library_file_append(const char * filename) {
+void library_file_append(const char * filename) {
 	init();
 
 	// check for empty file name
 	if (!*filename) {
 		error_not_lib_file(filename);
-		return false;
 	}
+	else {
+		// search library path
+		filename = search_libraries(get_lib_filename(filename));
 
-	// search library path
-	filename = path_search(get_lib_filename(filename), opts.lib_path);
+		// check if file exists and version is correct
+		if (check_library_file(filename)) {
 
-	// check if file exists and version is correct
-	if (!check_library_file(filename))
-		return false;
+			// create a new library and append to list - file will be loaded when linking
+			obj_files_append(&g_libraries, filename, NULL);
 
-	// create a new library and append to list - file will be loaded when linking
-	obj_files_append(&g_libraries, filename, NULL);
-
-	if (opts.verbose)
-		printf("Reading library '%s'\n", path_canon(filename));
-
-	return true;
+			if (option_verbose())
+				printf("Reading library '%s'\n", path_canon(filename));
+		}
+	}
 }
 
 bool object_file_append(const char* filename, Module* module, bool reserve_space, bool no_errors) {
@@ -572,7 +569,7 @@ static void patch_exprs(ExprList* exprs)
 					*(intArray_push(expr->section->reloc)) = expr->code_pos + get_cur_module_start();
 
 					/* relocate code */
-					if (opts.relocatable)
+					if (option_relocatable())
 					{
 						int offset = get_cur_module_start() + expr->section->addr;
 						int distance = expr->code_pos + offset - curroffset;
@@ -685,7 +682,7 @@ static void define_location_symbols(void)
 	section = get_last_section();
 	end_addr = section->addr + get_section_size(section);
 
-	if (opts.verbose)
+	if (option_verbose())
 		printf("Code size: %d bytes ($%04X to $%04X)\n",
 		(int)(get_sections_size()), (int)start_addr, (int)end_addr - 1);
 
@@ -707,7 +704,7 @@ static void define_location_symbols(void)
 			start_addr = section->addr;
 			end_addr = start_addr + get_section_size(section);
 
-			if (opts.verbose)
+			if (option_verbose())
 				printf("Section '%s' size: %d bytes ($%04X to $%04X)\n",
 					section->name, (int)(end_addr - start_addr),
 					(unsigned int)start_addr, (unsigned int)end_addr - 1);
@@ -841,14 +838,14 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 			section->align = parse_int(obj);
 
 			// if creating relocatable code, ignore origin 
-			if (opts.relocatable && section->origin >= 0) {
+			if (option_relocatable() && section->origin >= 0) {
 				warn_org_ignored(obj->filename, section->name);
 
 				section->origin = -1;
 				section->section_split = false;
 			}
 			// if running appmake, ignore origin except for first module
-			else if (opts.appmake && section->origin >= 0 && !first_section) {
+			else if (option_appmake() && section->origin >= 0 && !first_section) {
 				warn_org_ignored(obj->filename, section->name);
 
 				section->origin = -1;
@@ -926,7 +923,7 @@ static void link_lib_module(const char* modname, obj_file_t* obj, StrHash* exter
 	lib_module->modname = spool_add(modname);
 	object_module_append(obj, lib_module);
 
-	if (opts.verbose)
+	if (option_verbose())
 		printf("Linking library module '%s'\n", modname);
 
 	link_module(obj, extern_syms);
@@ -943,9 +940,9 @@ void link_modules(void)
 	if (!obj_files_read_data(&g_objects) || !obj_files_read_data(&g_libraries))
 		return;
 	
-	opts.cur_list = false;
+	list_set(false);
 
-	if (opts.relocatable)
+	if (option_relocatable())
 	{
 		reloctable = m_new_n(char, 32768U);		// TODO: make this a dymanic array
 		relocptr = reloctable;
@@ -984,14 +981,14 @@ void link_modules(void)
 	}
 
 	// link libraries, unless building a consol_obj_file 
-	if (!get_num_errors() && !opts.consol_obj_file && g_libraries != NULL)
+	if (!get_num_errors() && !option_consol_obj_file() && g_libraries != NULL)
 		link_libraries(extern_syms);
 
 	clear_error_location();
 
 	/* allocate segment addresses and compute absolute addresses of symbols */
 	/* in consol_obj_file sections are zero-based */
-	if (!get_num_errors() && !opts.consol_obj_file)
+	if (!get_num_errors() && !option_consol_obj_file())
 		sections_alloc_addr();
 
 	/* relocate address symbols */
@@ -999,10 +996,10 @@ void link_modules(void)
 		relocate_symbols();
 
 	/* define assembly size */
-	if (!get_num_errors() && !opts.consol_obj_file)
+	if (!get_num_errors() && !option_consol_obj_file())
 		define_location_symbols();
 
-	if (opts.consol_obj_file) {
+	if (option_consol_obj_file()) {
 		if (!get_num_errors())
 			merge_modules(extern_syms);
 	}
@@ -1026,38 +1023,39 @@ void link_modules(void)
 	clear_error_location();
 
 	if (!get_num_errors()) {
-		if (opts.map)
+		if (option_map())
 			write_map_file();
 
-		if (opts.globaldef)
+		if (option_globaldef())
 			write_def_file();
 	}
 
 	OBJ_DELETE(extern_syms);
 }
 
-void
-CreateBinFile(void) {
+void CreateBinFile(void) {
 	CodeareaFile binfile = { 0 }, relocfile = { 0 };
-	const char* filename = NULL;
-	bool need_reloc_routine = (opts.relocatable && totaladdr != 0);
+	bool need_reloc_routine = (option_relocatable() && totaladdr != 0);
 
-	if (opts.bin_file)      /* use predined output filename from command line */
-		filename = path_canon(path_prepend_output_dir(opts.bin_file));
-	else					/* create output filename, based on project filename */
-		/* add '.bin' extension */
-		filename = path_canon(get_bin_filename(get_first_module(NULL)->filename));		
+	binfile.initial_filename
+		= binfile.filename
+		= get_bin_filename(get_first_module(NULL)->filename, "");
 
 	/* binary output to filename.bin */
-	if (opts.verbose)
-		printf("Creating binary '%s'\n", filename);
+	if (option_verbose())
+		printf("Creating binary '%s'\n", binfile.filename);
 
-	binfile.initial_filename = binfile.filename = filename;
 	binfile.fp = xfopen(binfile.filename, "wb");
 
 	// no reloc-info with -R
-	if (opts.reloc_info && !opts.relocatable) {
-		relocfile.initial_filename = relocfile.filename = get_reloc_filename(filename);
+	if (option_reloc_info() && !option_relocatable()) {
+		relocfile.initial_filename
+			= relocfile.filename
+			= get_reloc_filename(binfile.filename);
+
+		if (option_verbose())
+			printf("Creating reloc '%s'\n", relocfile.filename);
+
 		relocfile.fp = xfopen(relocfile.filename, "wb");
 	}
 	else {
@@ -1079,12 +1077,12 @@ CreateBinFile(void) {
 			/* write relocation table, inclusive 4 byte header */
 			xfwrite_bytes(reloctable, sizeof_reloctable + 4, binfile.fp);
 
-			if (opts.verbose)
+			if (option_verbose())
 				printf("Relocation header is %d bytes.\n",
 					(int)(sizeof_relocroutine + sizeof_reloctable + 4));
 		}
 
-		fwrite_codearea(filename, &binfile, &relocfile);		/* write code as one big chunk */
+		fwrite_codearea(&binfile, &relocfile);		/* write code as one big chunk */
 
 		// close old files, remove if empty and not initial files
 		codearea_close_remove(&binfile, &relocfile);
@@ -1304,4 +1302,56 @@ static void merge_modules(StrHash* extern_syms)
 	/* touch symbols so that they are copied to the output object file */
 	set_cur_module(first_module);
 	touch_symbols();
+}
+
+/*-----------------------------------------------------------------------------
+*   Appmake options
+*	+zx without ORG - sets org at 25760, in a REM statement
+*	+zx with ORG - uses that org
+*----------------------------------------------------------------------------*/
+static void run_appmake(const char* appmake_opts, const char* out_ext,
+	int origin_min, int origin_max) {
+
+	Section* first_section = get_first_section(NULL);
+
+	int origin = first_section->origin;
+	if (origin < origin_min || origin > origin_max) {
+		error_invalid_org(origin);
+	}
+	else {
+		const char* bin_filename = get_bin_filename(get_first_module(NULL)->filename, "");
+		const char* out_filename = replace_extension(bin_filename, out_ext);
+
+		UT_string* cmd;
+		utstring_new(cmd);
+		utstring_printf(cmd, "z88dk-appmake %s -b \"%s\" -o \"%s\" --org %d",
+			appmake_opts,
+			bin_filename,
+			out_filename,
+			origin);
+
+		if (option_verbose())
+			puts(utstring_body(cmd));
+
+		int rv = system(utstring_body(cmd));
+		if (rv != 0)
+			error_cmd_failed(utstring_body(cmd));
+
+		utstring_free(cmd);
+	}
+}
+
+void checkrun_appmake(void) {
+	switch (option_appmake()) {
+	case APPMAKE_NONE:
+		break;
+	case APPMAKE_ZX:
+		run_appmake("+zx", ZX_APP_EXT, ZX_ORIGIN_MIN, ZX_ORIGIN_MAX);
+		break;
+	case APPMAKE_ZX81:
+		run_appmake("+zx81", ZX81_APP_EXT, ZX81_ORIGIN_MIN, ZX81_ORIGIN_MAX);
+		break;
+	default:
+		assert(0);
+	}
 }

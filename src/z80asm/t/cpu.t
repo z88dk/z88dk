@@ -4,6 +4,15 @@ BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
 
+# test error
+z80asm_nok("-mcc", "", "", <<END);
+error: invalid cpu: cc; expected: z80,z80n,z180,r2ka,r3k,8080,8085,gbz80,ti83,ti83plus
+END
+
+z80asm_nok("-m=cc", "", "", <<END);
+error: invalid cpu: cc; expected: z80,z80n,z180,r2ka,r3k,8080,8085,gbz80,ti83,ti83plus
+END
+
 # Test cpu opcode files created by ../dev/cpu/cpu.pl
 
 for my $file (<dev/cpu/cpu_test*.asm>) {

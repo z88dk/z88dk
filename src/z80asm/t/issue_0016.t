@@ -43,7 +43,6 @@ Object  file $test.dir/zcc0000.o at \$0000: Z80RMF16
     G A \$0000 test_function (section "") (file $test.asm:2)
 END
 
-path("$test.dir")->remove_tree;
-
+path("$test.dir")->remove_tree if Test::More->builder->is_passing;
 unlink_testfiles;
 done_testing;

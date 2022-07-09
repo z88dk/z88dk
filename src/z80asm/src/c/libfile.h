@@ -13,8 +13,8 @@
 
 extern char Z80libhdr[];
 
-/* make library from list of files; convert each source to object file name */
-extern void make_library(const char *lib_filename, argv_t *src_files);
+/* make library from source files; convert each source to object file name */
+extern void make_library(const char *lib_filename);
 
 // check if the given filename exists and is a library file of the correct version
 extern bool check_library_file(const char *src_filename);

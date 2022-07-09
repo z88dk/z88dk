@@ -23,6 +23,7 @@ X(InvalidOrgOption, "invalid origin (-r) option")
 X(InvalidDefineOption, "invalid define (-Dvar=value) option")
 X(InvalidFillerOption, "invalid filler (-f) option")
 X(CmdFailed, "command failed")
+X(InvalidCpu, "invalid cpu")
 
 // lexer
 X(InvalidChar, "invalid character")

@@ -20,6 +20,17 @@ $ENV{Z80ASM} = "-r0x8000";
 
 z80asm_ok("-b", "", "", $asm, bytes(0xC3, 0, 0x80));
 
+# with quotes
+unlink_testfiles;
+$ENV{Z80ASM} = "-r'0x8000'";
+
+z80asm_ok("-b", "", "", $asm, bytes(0xC3, 0, 0x80));
+
+unlink_testfiles;
+$ENV{Z80ASM} = '-r"0x8000"';
+
+z80asm_ok("-b", "", "", $asm, bytes(0xC3, 0, 0x80));
+
 delete $ENV{Z80ASM};
 unlink_testfiles;
 done_testing;

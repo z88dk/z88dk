@@ -74,7 +74,6 @@ copy('../z88dk-z80asm-z80-.lib', $ENV{ZCCCFG}.'/../z88dk-z80asm-z80-.lib');
 
 capture_ok("z88dk-z80asm -b -v ../${test}.asm", <<END);
 Library 'z88dk-z80asm-z80-.lib' not found
-Library '/usr/local/share/z88dk/lib/z88dk-z80asm-z80-.lib' not found
 Reading library 'root/lib/z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = \$0001
 Predefined constant: __CPU_ZILOG__ = \$0001
@@ -99,7 +98,6 @@ unlink("../${test}.bin");
 
 capture_ok("z88dk-z80asm -b -v -Lroot/lib ../${test}.asm", <<END);
 Library 'z88dk-z80asm-z80-.lib' not found
-Library '/usr/local/share/z88dk/lib/z88dk-z80asm-z80-.lib' not found
 Reading library 'root/lib/z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = \$0001
 Predefined constant: __CPU_ZILOG__ = \$0001
@@ -125,7 +123,6 @@ run_nok("z88dk-z80asm -b -v ../${test}.asm > ../${test}.out 2> ../${test}.err");
 check_text_file("../${test}.out", <<END);
 Library 'z88dk-z80asm-z80-.lib' not found
 Library '/usr/local/share/z88dk/lib/z88dk-z80asm-z80-.lib' not found
-Library '/../z88dk-z80asm-z80-.lib' not found
 Predefined constant: __CPU_Z80__ = \$0001
 Predefined constant: __CPU_ZILOG__ = \$0001
 Predefined constant: __FLOAT_GENMATH__ = \$0001
@@ -179,7 +176,7 @@ for my $cpu ("", qw(z80 z80n z180 gbz80 8080 8085 r2ka r3k)) {
 }
 
 
-path("${test}dir")->remove_tree;
+path("${test}dir")->remove_tree if Test::More->builder->is_passing;
 unlink_testfiles;
 done_testing;
 

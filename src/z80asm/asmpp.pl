@@ -34,7 +34,6 @@ use Iterator::Simple qw( iter ienumerate iflatten imap igrep );
 use Iterator::Simple::Lookahead;
 use Regexp::Common;
 use FindBin;
-use Data::Dump 'dump';
 
 #------------------------------------------------------------------------------
 # Globals

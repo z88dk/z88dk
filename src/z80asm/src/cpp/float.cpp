@@ -621,10 +621,6 @@ string FloatFormat::get_formats() {
 
 //-----------------------------------------------------------------------------
 
-bool set_float_format(const char* format) {
-	return g_float_format.set_text(format);
-}
-
 const char* get_float_format_define(void) {
 	static string define;		// need to return c_str() of string
 	define = g_float_format.get_define();

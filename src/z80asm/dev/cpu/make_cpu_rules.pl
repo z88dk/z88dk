@@ -120,7 +120,7 @@ sub parse_code_opcode {
 			"if (expr_value > 0 && expr_value < 8) expr_value *= 8;",
 			"switch (expr_value) {",
 			"case 0x00: case 0x08: case 0x30:",
-			"  if (opts.cpu & CPU_RABBIT)",
+			"  if (option_cpu() & CPU_RABBIT)",
 			"    DO_stmt(0xCD0000 + (expr_value << 8));",
 			"  else",
 			"    DO_stmt(0xC7 + expr_value);",
@@ -260,7 +260,7 @@ sub merge_cpu {
 	}
 	else {
 		# variants per CPU
-		$ret .= "switch (opts.cpu) {\n";
+		$ret .= "switch (option_cpu()) {\n";
 		for my $code (sort keys %code) {
 			for my $cpu (sort keys %{$code{$code}}) {
 				$ret .= "case CPU_".uc($cpu).": ";
@@ -316,7 +316,7 @@ sub merge_ixiy {
 	else {
 		(my $common, $ixiy, $iyix) = extract_common($ixiy, $iyix);
 		return $common.
-				"if (!opts.swap_ix_iy) { $ixiy } else { $iyix }";
+				"if (!option_swap_ixiy()) { $ixiy } else { $iyix }";
 	}
 }
 

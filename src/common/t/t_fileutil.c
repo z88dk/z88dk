@@ -122,46 +122,46 @@ void t_fileutil_path_ext(void)
 	TEST_ASSERT_EQUAL_STRING("", path_ext("c:/.c"));
 }
 
-void t_fileutil_path_remove_ext(void)
+void t_fileutil_remove_extension(void)
 {
-	TEST_ASSERT_EQUAL_STRING("abc", path_remove_ext("abc"));
-	TEST_ASSERT_EQUAL_STRING("abc", path_remove_ext("abc."));
-	TEST_ASSERT_EQUAL_STRING("abc", path_remove_ext("abc.xpt"));
-	TEST_ASSERT_EQUAL_STRING("abc.xpt", path_remove_ext("abc.xpt."));
-	TEST_ASSERT_EQUAL_STRING("abc.xpt", path_remove_ext("abc.xpt.obj"));
+	TEST_ASSERT_EQUAL_STRING("abc", remove_extension("abc"));
+	TEST_ASSERT_EQUAL_STRING("abc", remove_extension("abc."));
+	TEST_ASSERT_EQUAL_STRING("abc", remove_extension("abc.xpt"));
+	TEST_ASSERT_EQUAL_STRING("abc.xpt", remove_extension("abc.xpt."));
+	TEST_ASSERT_EQUAL_STRING("abc.xpt", remove_extension("abc.xpt.obj"));
 
-	TEST_ASSERT_EQUAL_STRING(".x/abc", path_remove_ext(".x/abc"));
-	TEST_ASSERT_EQUAL_STRING(".x/abc", path_remove_ext(".x\\abc"));
-	TEST_ASSERT_EQUAL_STRING(".x/abc", path_remove_ext(".x/abc."));
-	TEST_ASSERT_EQUAL_STRING(".x/abc", path_remove_ext(".x\\abc."));
-	TEST_ASSERT_EQUAL_STRING(".x/abc", path_remove_ext(".x/abc.xpt"));
-	TEST_ASSERT_EQUAL_STRING(".x/abc.xpt", path_remove_ext(".x/abc.xpt."));
-	TEST_ASSERT_EQUAL_STRING(".x/abc.xpt", path_remove_ext(".x/abc.xpt.obj"));
+	TEST_ASSERT_EQUAL_STRING(".x/abc", remove_extension(".x/abc"));
+	TEST_ASSERT_EQUAL_STRING(".x/abc", remove_extension(".x\\abc"));
+	TEST_ASSERT_EQUAL_STRING(".x/abc", remove_extension(".x/abc."));
+	TEST_ASSERT_EQUAL_STRING(".x/abc", remove_extension(".x\\abc."));
+	TEST_ASSERT_EQUAL_STRING(".x/abc", remove_extension(".x/abc.xpt"));
+	TEST_ASSERT_EQUAL_STRING(".x/abc.xpt", remove_extension(".x/abc.xpt."));
+	TEST_ASSERT_EQUAL_STRING(".x/abc.xpt", remove_extension(".x/abc.xpt.obj"));
 
-	TEST_ASSERT_EQUAL_STRING(".rc", path_remove_ext(".rc"));
-	TEST_ASSERT_EQUAL_STRING("/.rc", path_remove_ext("/.rc"));
-	TEST_ASSERT_EQUAL_STRING(".x/.rc", path_remove_ext(".x/.rc"));
+	TEST_ASSERT_EQUAL_STRING(".rc", remove_extension(".rc"));
+	TEST_ASSERT_EQUAL_STRING("/.rc", remove_extension("/.rc"));
+	TEST_ASSERT_EQUAL_STRING(".x/.rc", remove_extension(".x/.rc"));
 }
 
-void t_fileutil_path_replace_ext(void)
+void t_fileutil_replace_extension(void)
 {
-	TEST_ASSERT_EQUAL_STRING("abc", path_replace_ext("abc", ""));
-	TEST_ASSERT_EQUAL_STRING("abc", path_replace_ext("abc.", ""));
+	TEST_ASSERT_EQUAL_STRING("abc", replace_extension("abc", ""));
+	TEST_ASSERT_EQUAL_STRING("abc", replace_extension("abc.", ""));
 
-	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc", "obj"));
-	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc.", "obj"));
-	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc", ".obj"));
-	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc.", ".obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", replace_extension("abc", "obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", replace_extension("abc.", "obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", replace_extension("abc", ".obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", replace_extension("abc.", ".obj"));
 
-	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc", "obj"));
-	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc.", "obj"));
-	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc", ".obj"));
-	TEST_ASSERT_EQUAL_STRING("abc.obj", path_replace_ext("abc.", ".obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", replace_extension("abc", "obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", replace_extension("abc.", "obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", replace_extension("abc", ".obj"));
+	TEST_ASSERT_EQUAL_STRING("abc.obj", replace_extension("abc.", ".obj"));
 
-	TEST_ASSERT_EQUAL_STRING("x./abc.obj", path_replace_ext("x./abc", "obj"));
-	TEST_ASSERT_EQUAL_STRING("x./abc.obj", path_replace_ext("x./abc.", "obj"));
-	TEST_ASSERT_EQUAL_STRING("x./abc.obj", path_replace_ext("x./abc", ".obj"));
-	TEST_ASSERT_EQUAL_STRING("x./abc.obj", path_replace_ext("x./abc.", ".obj"));
+	TEST_ASSERT_EQUAL_STRING("x./abc.obj", replace_extension("x./abc", "obj"));
+	TEST_ASSERT_EQUAL_STRING("x./abc.obj", replace_extension("x./abc.", "obj"));
+	TEST_ASSERT_EQUAL_STRING("x./abc.obj", replace_extension("x./abc", ".obj"));
+	TEST_ASSERT_EQUAL_STRING("x./abc.obj", replace_extension("x./abc.", ".obj"));
 }
 
 void t_fileutil_xfopen(void)

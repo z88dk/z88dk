@@ -137,12 +137,12 @@ const char *path_combine(const char *path1, const char *path2)
 	return ret;
 }
 
-const char *path_remove_ext(const char *path1)
+const char *remove_extension(const char *path1)
 {
-	return path_replace_ext(path1, "");
+	return replace_extension(path1, "");
 }
 
-const char *path_replace_ext(const char *path1, const char *new_ext)
+const char *replace_extension(const char *path1, const char *new_ext)
 {
 	UT_string *path = utstr_new_init(path1);	
 	str_path_canon(path);

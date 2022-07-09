@@ -6,6 +6,8 @@
 //-----------------------------------------------------------------------------
 
 #include "utils.h"
+#include <regex>
+#include <set>
 
 string str_tolower(string str) {
 	for (auto& c : str)
@@ -148,6 +150,15 @@ string str_remove_extra_blanks(const string& str) {
 	return str_strip(out);
 }
 
+string str_replace_all(string text, const string& find, const string& replace) {
+	size_t p = 0;
+	while ((p = text.find(find, p)) != std::string::npos) {
+		text.replace(p, find.length(), replace);
+		p += replace.length();
+	}
+	return text;
+}
+
 // https://stackoverflow.com/questions/6089231/getting-std-ifstream-to-handle-lf-cr-and-crlf
 istream& safe_getline(istream& is, string& t) {
 	t.clear();
@@ -187,3 +198,89 @@ istream& safe_getline(istream& is, string& t) {
 	}
 }
 
+static void expand_glob_1(set<fs::path>& result, const string& pattern);
+
+static void expand_wildcards(set<fs::path>& result,
+	const vector<string>& elems, size_t cur_elem) {
+	// build prefix and suffix
+	fs::path prefix;
+	for (size_t i = 0; i < cur_elem; i++)
+		prefix /= fs::path(elems[i]);
+
+	fs::path suffix;
+	for (size_t i = cur_elem + 1; i < elems.size(); i++)
+		suffix /= elems[i];
+
+	// expand current element
+	if (elems[cur_elem] == "**") {
+		fs::path new_path{ prefix };
+		if (!suffix.empty())
+			new_path /= suffix;
+		expand_glob_1(result, new_path.generic_string());		// recurse
+
+		for (auto& entry : fs::recursive_directory_iterator(prefix)) {
+			if (fs::is_directory(entry)) {
+				fs::path new_path{ entry };
+				if (!suffix.empty())
+					new_path /= suffix;
+				expand_glob_1(result, new_path.generic_string());		// recurse
+			}
+			else if (suffix.empty() && fs::is_regular_file(entry)) {
+				expand_glob_1(result, entry.path().generic_string());
+			}
+		}
+	}
+	else {
+		// make a regex pattern
+		string pattern = elems[cur_elem];
+		pattern = str_replace_all(pattern, ".", "\\.");
+		pattern = str_replace_all(pattern, "*", ".*");
+		pattern = str_replace_all(pattern, "?", ".");
+		std::regex re{ pattern };
+
+		// iterate through directory and recurse for each match
+		if (fs::is_directory(prefix)) {
+			for (auto& entry : fs::directory_iterator(prefix)) {
+				string entry_basename_str = entry.path().filename().generic_string();
+				if (regex_match(entry_basename_str, re)) {
+					fs::path new_path{ entry };
+					if (!suffix.empty())
+						new_path /= suffix;
+					expand_glob_1(result, new_path.generic_string());		// recurse
+				}
+			}
+		}
+	}
+}
+
+static void expand_glob_1(set<fs::path>& result, const string& pattern) {
+	// split path in directory/file elements
+	fs::path full_path{ pattern };
+	vector<string> elems;
+	for (auto& elem : full_path) {
+		elems.push_back(elem.generic_string());
+	}
+
+	// iterate through element looking for wildcards
+	for (size_t i = 0; i < elems.size(); i++) {
+		// check if this element has wildcards
+		size_t wc_pos = elems[i].find_first_of("?*");
+		if (wc_pos != string::npos) {
+			expand_wildcards(result, elems, i);
+			return;
+		}
+	}
+
+	// if we reached here, there are no wildcards
+	fs::path path{ pattern };
+	if (fs::is_directory(path) || fs::is_regular_file(path))
+		result.insert(path);
+}
+
+// use set in recursion to eliminate duplicates
+void expand_glob(vector<fs::path>& result, const string& pattern) {
+	set<fs::path> files;
+	expand_glob_1(files, pattern);
+	for (auto& file : files) 
+		result.push_back(file.generic_string());
+}

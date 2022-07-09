@@ -16,7 +16,6 @@ b) performance - avltree 50% slower when loading the symbols from the ZX 48 ROM 
 #include "die.h"
 #include "fileutil.h"
 #include "if.h"
-#include "options.h"
 #include "reloc_code.h"
 #include "str.h"
 #include "symbol.h"
@@ -155,7 +154,7 @@ Symbol *define_static_def_sym(const char *name, long value )
     Symbol *sym = _define_sym( name, value, TYPE_CONSTANT, SCOPE_LOCAL, 
 						NULL, get_first_section(NULL), 
 						& static_symtab );
-	if (opts.verbose) 
+	if (option_verbose()) 
 		printf("Predefined constant: %s = $%04X\n", name, (int)value);
 	return sym;
 }
@@ -578,12 +577,12 @@ static void _write_symbol_file(const char *filename, Module *module, bool(*cond)
 	long			reloc_offset;
 	STR_DEFINE(line, STR_SIZE);
 
-	if (opts.relocatable && module == NULL)		// module is NULL in link phase
+	if (option_relocatable() && module == NULL)		// module is NULL in link phase
 		reloc_offset = sizeof_relocroutine + sizeof_reloctable + 4;
 	else
 		reloc_offset = 0;
 
-	if (opts.verbose)
+	if (option_verbose())
 		printf("Creating file '%s'\n", path_canon(filename));
 
 	file = xfopen(filename, "w");
@@ -627,8 +626,8 @@ static bool cond_all_symbols(Symbol *sym) { return true; }
 
 void write_map_file(void) {
 	const char* filename;
-	if (opts.bin_file)
-		filename = get_map_filename(opts.bin_file);
+	if (option_bin_file())
+		filename = get_map_filename(option_bin_file());
 	else
 		filename = get_map_filename(get_first_module(NULL)->filename);
 
@@ -642,8 +641,8 @@ static bool cond_global_symbols(Symbol *sym)
 
 void write_def_file(void) {
 	const char* filename;
-	if (opts.bin_file)
-		filename = get_def_filename(opts.bin_file);
+	if (option_bin_file())
+		filename = get_def_filename(option_bin_file());
 	else
 		filename = get_def_filename(get_first_module(NULL)->filename);
 

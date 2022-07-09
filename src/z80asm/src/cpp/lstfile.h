@@ -26,6 +26,8 @@ public:
 	void append_bytes(const vector<uint8_t>& bytes);
 	void patch_bytes(int asmpc, const vector<uint8_t>& bytes);
 	void end_line();
+	void set_list_on(bool f = true) { m_list_on = f; }
+	bool list_is_on() const { return m_list_on; }
 
 private:
 	ofstream	m_ofs;				// output file handle
@@ -37,6 +39,7 @@ private:
 	vector<uint8_t> m_bytes;		// bytes collected in this line
 	string		m_text;				// line text
 	string		m_last_filename;	// last filename output
+	bool		m_list_on{ false };
 
 	void out_filename();
 	void out_line();

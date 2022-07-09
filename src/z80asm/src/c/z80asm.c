@@ -54,8 +54,8 @@ void assemble_file( const char *filename )
 	Module *module;
 
 	/* create output directory*/
-	obj_filename = path_canon(get_obj_filename(filename));
-	path_mkdir(path_dir(obj_filename));
+	obj_filename = path_canon(get_o_filename(filename));
+	path_mkdir(path_parent_dir(obj_filename));
 
 	set_error_location(obj_filename, 0);
 
@@ -91,15 +91,15 @@ void assemble_file( const char *filename )
 	
 	/* append the directoy of the file being assembled to the include path 
 	   and remove it at function end */
-	argv_push(opts.inc_path, path_dir(src_filename));
+	push_includes(path_parent_dir(src_filename));
 
     /* normal case - assemble a asm source file */
-    opts.cur_list = opts.list;		/* initial LSTON status */
+    list_set(option_list_file());		/* initial LSTON status */
 
 	/* when building libraries need to reset codearea to allow total library size > 64K
 	   when building binary cannot reset codearea so that each module is linked
 	   after the previous one, allocating addresses */
-	if (!(opts.make_bin || opts.bin_file))
+	if (!(option_make_bin() || option_bin_file()))
 		reset_codearea();
 
     /* Create module data structures for new file */
@@ -112,10 +112,10 @@ void assemble_file( const char *filename )
 		query_assemble(src_filename);			/* try to assemble, check -d */
 
     clear_error_location();							/* no more module in error messages */
-	opts.cur_list = false;
+	list_set(false);
 
 	/* finished assembly, remove dirname from include path */
-	argv_pop(opts.inc_path);
+	pop_includes();
 
 	clear_error_location();
 }
@@ -128,13 +128,13 @@ static void query_assemble(const char *src_filename )
 {
     struct stat src_stat, obj_stat;
     int src_stat_result, obj_stat_result;
-	const char *obj_filename = get_obj_filename( src_filename );
+	const char *obj_filename = get_o_filename( src_filename );
 
     /* get time stamp of files, error if source not found */
     src_stat_result = stat( src_filename, &src_stat );		/* BUG_0033 */
     obj_stat_result = stat( obj_filename, &obj_stat );
 
-    if ( opts.date_stamp &&									/* -d option */
+    if (option_date_stamp() &&									/* -d option */
             obj_stat_result >= 0 &&							/* object file exists */
             ( src_stat_result >= 0 ?						/* if source file exists, ... */
               src_stat.st_mtime <= obj_stat.st_mtime		/* ... source older than object */
@@ -159,7 +159,7 @@ static void query_assemble(const char *src_filename )
 static void do_assemble(const char *src_filename )
 {
     int start_errors = get_num_errors();     /* count errors in this source file */
-	const char *obj_filename = get_obj_filename(src_filename);
+	const char *obj_filename = get_o_filename(src_filename);
 
 	/* initialize local symtab with copy of static one (-D defines) */
 	copy_static_syms();
@@ -167,10 +167,10 @@ static void do_assemble(const char *src_filename )
 	/* Init ASMPC */
 	set_PC(0);
 
-	if (opts.verbose)
+	if (option_verbose())
 		printf("Assembling '%s' to '%s'\n", path_canon(src_filename), path_canon(obj_filename));
 
-	list_open(get_list_filename(src_filename));
+	list_open(get_lis_filename(src_filename));
 	parse_file(src_filename);
 	asm_MODULE_default();			/* Module name must be defined */
 	clear_error_location();
@@ -180,36 +180,31 @@ static void do_assemble(const char *src_filename )
 
 	/* remove incomplete object file */
 	if (start_errors != get_num_errors())
-		remove(get_obj_filename(src_filename));
+		remove(get_o_filename(src_filename));
 
 	remove_all_local_syms();
 	remove_all_global_syms();
 	ExprList_remove_all(CURRENTMODULE->exprs);
 
-	if (opts.verbose)
+	if (option_verbose())
 		putchar('\n');    /* separate module texts */
 }
 
 /***************************************************************************************************
  * Main entry of Z80asm
  ***************************************************************************************************/
-int z80asm_main(int argc, char* argv[]) {
-	/* parse command line and call-back via assemble_file() */
-	/* If filename starts with '@', reads the file as a list of filenames
-	*	and assembles each one in turn */
-	parse_argv(argc, argv);
+int z80asm_main() {
 	if (!get_num_errors()) {
-		for (char** pfile = argv_front(opts.files); *pfile; pfile++)
-			assemble_file(*pfile);
+		for (size_t i = 0; i < option_files_size(); i++)
+			assemble_file(option_file(i));
 	}
 
 	/* Create output file */
 	if (!get_num_errors()) {
-		if (opts.lib_file) {
-			make_library(opts.lib_file, opts.files);
+		if (option_lib_file()) {
+			make_library(option_lib_file());
 		}
-		else if (opts.make_bin) {
-			xassert(opts.consol_obj_file == NULL);
+		else if (option_make_bin()) {
 			link_modules();
 
 			if (!get_num_errors())
@@ -218,22 +213,18 @@ int z80asm_main(int argc, char* argv[]) {
 			if (!get_num_errors())
 				checkrun_appmake();		/* call appmake if requested in the options */
 		}
-		else if (opts.bin_file) {	// -o consolidated obj
-			opts.consol_obj_file = opts.bin_file;
-			opts.bin_file = NULL;
-
-			xassert(opts.consol_obj_file != NULL);
+		else if (option_consol_obj_file()) {	// -o consolidated obj
 			link_modules();
 
 			set_cur_module(get_first_module(NULL));
 
-			CURRENTMODULE->filename = get_asm_filename(opts.consol_obj_file);
-			CURRENTMODULE->modname = path_remove_ext(path_file(CURRENTMODULE->filename));
+			CURRENTMODULE->filename = get_asm_filename(option_consol_obj_file_name());
+			CURRENTMODULE->modname = remove_extension(path_file(CURRENTMODULE->filename));
 
 			if (!get_num_errors())
-				write_obj_file(opts.consol_obj_file);
+				write_obj_file(option_consol_obj_file_name());
 
-			if (!get_num_errors() && opts.symtable)
+			if (!get_num_errors() && option_symtable())
 				write_sym_file(CURRENTMODULE);
 		}
 	}
@@ -241,7 +232,7 @@ int z80asm_main(int argc, char* argv[]) {
 	clear_error_location();
 	delete_modules();		/* Release module information (symbols, etc.) */
 
-	if (opts.relocatable) {
+	if (option_relocatable()) {
 		if (reloctable != NULL)
 			m_free(reloctable);
 	}

@@ -8,17 +8,19 @@ use Modern::Perl;
 
 # create library
 unlink_testfiles;
-my $lib_dir  = "t/data";
-my $lib_base = "${test}.lib";
-my $lib = "$lib_dir/$lib_base";
+my $lib_dir  = "${test}dir";
+
+path($lib_dir)->mkpath;
 
 spew("${test}.asm", <<END);
 	PUBLIC main
 main: ret
 END
 
-run_ok("z88dk-z80asm -x$lib ${test}.asm");
-ok -f $lib, "library created";
+for my $ext ('', '.lib') {
+	run_ok("z88dk-z80asm -x${lib_dir}/${test}${ext} ${test}.asm");
+	ok -f "${lib_dir}/${test}.lib", "library ${lib_dir}/${test}.lib created";
+}
 
 my $asm = <<END;
 	EXTERN main
@@ -28,25 +30,27 @@ END
 
 my $bin = bytes(0xCD, 0x04, 0x00, 0xC9, 0xC9);
 
-# no -L, full path : OK
-z80asm_ok("-b -l$lib", "", "", $asm, $bin);
+for my $ext ('', '.lib') {
+	# no -L, full path : OK
+	z80asm_ok("-b -l${lib_dir}/${test}${ext}", "", "", $asm, $bin);
 
-# no -L, only file name : error
-z80asm_nok("-b -l$lib_base", "", $asm, <<END);
+	# no -L, only file name : error
+	z80asm_nok("-b -l${test}${ext}", "", $asm, <<END);
 error: file open: ${test}.lib
 END
 
-# -L : OK
-z80asm_ok("-b -L$lib_dir -l$lib_base", "", "", $asm, $bin);
+	# -L : OK
+	z80asm_ok("-b -L${lib_dir} -l${test}${ext}", "", "", $asm, $bin);
 
-# use environment variable in -L
-$ENV{TEST_ENV} = 'data';
-z80asm_ok("-b -Lt/\${TEST_ENV} -l$lib_base", "", "", $asm, $bin);
+	# use environment variable in -L
+	$ENV{TEST_ENV} = $test;
+	z80asm_ok("-b -L\${TEST_ENV}dir -l${test}${ext}", "", "", $asm, $bin);
 
-delete $ENV{TEST_ENV};
-z80asm_ok("-b -Lt/\${TEST_ENV}data -l$lib_base", "", "", $asm, $bin);
+	delete $ENV{TEST_ENV};
+	z80asm_ok("-b -L${test}\${TEST_ENV}dir -l${test}${ext}", "", "", $asm, $bin);
+}
 
-unlink_testfiles($lib);
+unlink_testfiles("${lib_dir}/${test}.lib");
 
 
 # link objects and libs
@@ -153,5 +157,6 @@ check_bin_file("${test}2.bin",
 		bytes(0xCD, 0x06, 0x00, 0xC9, 0x3E, 0x01, 0x3E, 0x02, 0xC9));
 
 
+path($lib_dir)->remove_tree if Test::More->builder->is_passing;
 unlink_testfiles;
 done_testing;

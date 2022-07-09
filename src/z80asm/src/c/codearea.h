@@ -169,8 +169,7 @@ extern bool fwrite_module_code(FILE *file, int* p_code_size);
 /*-----------------------------------------------------------------------------
 *   write whole code area to an open file
 *----------------------------------------------------------------------------*/
-extern void fwrite_codearea(const char* filename,
-	CodeareaFile* binfile, CodeareaFile* relocfile);
+extern void fwrite_codearea(CodeareaFile* binfile, CodeareaFile* relocfile);
 extern void codearea_close_remove(CodeareaFile* binfile, CodeareaFile* relocfile);
 
 /*-----------------------------------------------------------------------------

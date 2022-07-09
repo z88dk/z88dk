@@ -17,6 +17,8 @@ inline bool isident(char c) {
 	return c == '_' || isalnum(c);
 }
 
+bool isident(const string& ident);
+
 inline const char* skip_spaces(const char* p) {
 	while (isspace(*p) && *p != '\r' && *p != '\n')
 		p++;

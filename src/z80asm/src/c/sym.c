@@ -9,7 +9,7 @@ Repository: https://github.com/z88dk/z88dk
 One symbol from the assembly code - label or constant.
 */
 
-#include "options.h"
+#include "if.h"
 #include "str.h"
 #include "strutil.h"
 #include "sym.h"

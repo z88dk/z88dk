@@ -115,6 +115,5 @@ run_ok("z88dk-z80asm -b $test.dir/test.asm");
 check_bin_file("$test.dir/test.bin", $blob);
 
 path("$test.dir")->remove_tree if Test::More->builder->is_passing;
-
 unlink_testfiles;
 done_testing;

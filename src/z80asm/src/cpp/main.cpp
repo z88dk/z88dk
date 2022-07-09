@@ -5,7 +5,14 @@
 //-----------------------------------------------------------------------------
 
 #include "if.h"
+#include "args.h"
+#include <string>
+#include <vector>
+using namespace std;
 
 int main(int argc, char *argv[]) {
-	return z80asm_main(argc, argv);
+	vector<string> args{ argv + 1, argv + argc };
+	g_args.parse_args(args);
+
+	return z80asm_main();
 }

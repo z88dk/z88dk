@@ -15,10 +15,13 @@ Repository: https://github.com/z88dk/z88dk
 #include "utlist.h"
 
 // append a library from the command line to the list to be linked
-bool library_file_append(const char* filename);
+void library_file_append(const char* filename);
 
 // append an object from the command line to the list to be linked
 bool object_file_append(const char* filename, Module* module, bool reserve_space, bool no_errors);
 
 void link_modules(void);
 void compute_equ_exprs(ExprList *exprs, bool show_error, bool module_relative_addr);
+
+// call appmake if required by command line
+void checkrun_appmake(void);

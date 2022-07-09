@@ -11,11 +11,8 @@ use Math::Trig;
 my $invalid_format_error = "invalid float format, expected: ".
 	"genmath,math48,ieee16,ieee32,ieee64,z80,zx81,zx,z88,mbfs,mbf40,mbf64,am9511";
 
-capture_nok("z88dk-z80asm -float", <<END);
-error: $invalid_format_error
-END
-
-capture_nok("z88dk-z80asm -float=xx", <<END);
+spew("${test}.asm", "");
+capture_nok("z88dk-z80asm -float=x ${test}.asm", <<END);
 error: $invalid_format_error
 END
 

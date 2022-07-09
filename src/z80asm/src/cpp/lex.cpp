@@ -6,6 +6,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "args.h"
 #include "asmerrors.h"
 #include "if.h"
 #include "lex.h"
@@ -37,10 +38,24 @@ static Keyword lu_keyword(const string& text) {
 }
 
 static string ident_change_case(const string& ident) {
-	if (option_ucase())
+	if (g_args.ucase())
 		return str_toupper(ident);
 	else
 		return ident;
+}
+
+bool isident(const string& ident) {
+	if (ident.empty())
+		return false;
+	else if (ident[0] != '_' && !isalpha(ident[0]))
+		return false;
+	else {
+		for (auto c : ident) {
+			if (c != '_' && !isalnum(c))
+				return false;
+		}
+	}
+	return true;
 }
 
 bool starts_with_hash(const string& line) {

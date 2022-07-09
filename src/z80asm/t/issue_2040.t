@@ -66,7 +66,7 @@ check_3_object_files($test);
 
 
 unlink_testfiles;
-path("${test}.dir")->remove_tree;
+path("${test}.dir")->remove_tree if Test::More->builder->is_passing;
 done_testing;
 
 #------------------------------------------------------------------------------

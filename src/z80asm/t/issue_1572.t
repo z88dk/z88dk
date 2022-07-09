@@ -28,6 +28,6 @@ ok -f "${test}dir/${test}.reloc", 	"${test}dir/${test}.reloc created";
 
 check_bin_file("${test}dir/${test}.bin", bytes(0,0xC3,0,0));
 
-path("${test}dir")->remove_tree;
+path("${test}dir")->remove_tree if Test::More->builder->is_passing;
 unlink_testfiles;
 done_testing;

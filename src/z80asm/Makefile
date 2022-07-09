@@ -18,7 +18,7 @@ OPT 		= -O3
 #OPT		= -g -Wextra 
 
 COMMON_FLAGS = -MMD -Wall $(OPT) \
-			-Isrc
+			-I. -Isrc
 
 LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 			-Isrc/c \
@@ -92,7 +92,6 @@ clean::
 .PHONY: dev
 dev:
 	perl asmstyle.pl dev/z80asm_lib/*.asm
-	touch src/c/hist.c
 	$(MAKE) all
 
 # ragel parser generator

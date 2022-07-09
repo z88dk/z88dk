@@ -149,10 +149,6 @@ void error_syntax_expr() {
 	g_errors.error(ErrCode::SyntaxExpr);
 }
 
-void error_invalid_float_format() {
-	g_errors.error(ErrCode::InvalidFloatFormat, FloatFormat::get_formats());
-}
-
 void error_segment_overflow() {
 	g_errors.error(ErrCode::SegmentOverflow);
 }
@@ -180,18 +176,6 @@ void error_not_obj_file(const char* filename) {
 
 void error_not_lib_file(const char* filename) {
 	g_errors.error(ErrCode::NotLibFile, filename);
-}
-
-void error_no_src_file() {
-	g_errors.error(ErrCode::NoSrcFile);
-}
-
-void error_illegal_option(const char* option) {
-	g_errors.error(ErrCode::IllegalOption, option);
-}
-
-void error_glob_no_files(const char* pattern) {
-	g_errors.error(ErrCode::GlobNoFiles, pattern);
 }
 
 void warn_expr_in_parens() {
@@ -247,20 +231,8 @@ void error_org_not_aligned(int origin, int align) {
 		"origin=" + int_to_hex(origin) + ", align=" + int_to_hex(align));
 }
 
-void error_invalid_org_option(const char* origin_text) {
-	g_errors.error(ErrCode::InvalidOrgOption, origin_text);
-}
-
-void error_invalid_define_option(const char* define_text) {
-	g_errors.error(ErrCode::InvalidDefineOption, define_text);
-}
-
 void error_invalid_org(int origin) {
 	g_errors.error(ErrCode::InvalidOrg, int_to_hex(origin));
-}
-
-void error_invalid_filler_option(const char* filler_text) {
-	g_errors.error(ErrCode::InvalidFillerOption, filler_text);
 }
 
 void error_obj_file_version(const char* filename, int found_version, int expected_version) {

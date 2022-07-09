@@ -163,3 +163,5 @@ private:
 	string collect_macro_body(Keyword start_keyword, Keyword end_keyword);
 	string collect_reptc_arg(Lexer& lexer);
 };
+
+extern Preproc g_preproc;

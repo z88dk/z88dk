@@ -9,7 +9,6 @@
 #include "if.h"
 #include "libfile.h"
 #include "modlink.h"
-#include "options.h"
 #include "utlist.h"
 #include "zobjfile.h"
 
@@ -30,9 +29,9 @@ static const char *search_libfile(const char *filename )
 }
 
 /*-----------------------------------------------------------------------------
-*	make library from list of files; convert each source to object file name 
+*	make library from source files; convert each source to object file name 
 *----------------------------------------------------------------------------*/
-void make_library(const char *lib_filename, argv_t *src_files)
+void make_library(const char *lib_filename)
 {
 	ByteArray *obj_file_data;
 	FILE	*lib_file;
@@ -43,7 +42,7 @@ void make_library(const char *lib_filename, argv_t *src_files)
 	if ( lib_filename == NULL )
 		return;					/* ERROR */
 
-	if (opts.verbose)
+	if (option_verbose())
 		printf("Creating library '%s'\n", path_canon(lib_filename));
 
 	/* write library header */
@@ -51,12 +50,12 @@ void make_library(const char *lib_filename, argv_t *src_files)
 	xfwrite_cstr(Z80libhdr, lib_file);
 
 	/* write each object file */
-	for (char **pfile = argv_front(src_files); *pfile; pfile++)
+	for (size_t i = 0; i < option_files_size(); i++)
 	{
 		fptr = ftell( lib_file );
 
 		/* read object file */
-		obj_filename  = get_obj_filename( *pfile );
+		obj_filename = get_o_filename(option_file(i));
 		obj_file_data = read_obj_file_data( obj_filename );
 		if ( obj_file_data == NULL )
 		{
@@ -67,7 +66,7 @@ void make_library(const char *lib_filename, argv_t *src_files)
 
 		/* write file pointer of next file, or -1 if last */
 		obj_size = ByteArray_size( obj_file_data );
-		if (pfile + 1 == argv_back(src_files))
+		if (i + 1 == option_files_size())
 			xfwrite_dword(-1, lib_file);
         else
             xfwrite_dword(fptr + 4 + 4 + obj_size,  lib_file); 

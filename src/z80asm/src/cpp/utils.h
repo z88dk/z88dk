@@ -38,8 +38,14 @@ string str_strip(const string& str);				// remove start and end blanks
 string str_remove_all_blanks(const string& str);	// remove all blanks
 string str_remove_extra_blanks(const string& str);	// replace sequences of blanks with one space
 
+// search_replace
+string str_replace_all(string text, const string& find, const string& replace);
+
 // read lines with any EOL terminator
 istream& safe_getline(istream& is, string& t);
+
+// globs a pattern including *, ? and ** and returns all matching files and directories
+void expand_glob(vector<fs::path>& result, const string& pattern);
 
 // convert int to hex
 // https://stackoverflow.com/questions/5100718/integer-to-hex-string-in-c

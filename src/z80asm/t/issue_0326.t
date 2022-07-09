@@ -52,7 +52,7 @@ $dir/lib.lst:1: error: file open: $dir/f1.asm
   ^---- $dir/f1.asm
 END
 
-path("${test}dir")->remove_tree;
+path("${test}dir")->remove_tree if Test::More->builder->is_passing;
 unlink_testfiles;
 done_testing;
 

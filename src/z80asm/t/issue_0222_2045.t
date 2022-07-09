@@ -134,7 +134,6 @@ spew("test.asm", $asm);
 
 capture_ok("z88dk-z80asm +zx -v -m -L.. test.asm", <<'END');
 Library 'z88dk-z80asm-z80-.lib' not found
-Library '/usr/local/share/z88dk/lib/z88dk-z80asm-z80-.lib' not found
 Reading library '../z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
 Predefined constant: __CPU_ZILOG__ = $0001
@@ -410,7 +409,6 @@ spew("test.asm", $asm);
 
 capture_ok("z88dk-z80asm +zx81 -m -v -L.. test.asm 2> ${test}.err", <<'END');
 Library 'z88dk-z80asm-z80-.lib' not found
-Library '/usr/local/share/z88dk/lib/z88dk-z80asm-z80-.lib' not found
 Reading library '../z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = $0001
 Predefined constant: __CPU_ZILOG__ = $0001
@@ -442,7 +440,7 @@ END
 
 }
 chdir("..") or die;
-path("${test}dir")->remove_tree;
+path("${test}dir")->remove_tree if Test::More->builder->is_passing;
 unlink_testfiles;
 done_testing;
 

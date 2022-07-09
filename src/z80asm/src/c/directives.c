@@ -75,7 +75,7 @@ void asm_cond_LABEL(Str* label)
 		Str_len(label) = 0;
 	}
 
-	if (opts.debug_info && !sfile_is_c_source()) {
+	if (option_debug() && !sfile_is_c_source()) {
 		STR_DEFINE(name, STR_SIZE);
 
 		char fname_encoded[FILENAME_MAX * 2];
@@ -166,15 +166,15 @@ void asm_DEFVARS_define_const(const char* name, int elem_size, int count)
 *----------------------------------------------------------------------------*/
 void asm_LSTON(void)
 {
-	if (opts.list)
-		opts.cur_list = true;
+	if (option_list_file())
+		list_set(true);
 	list_end_line();
 }
 
 void asm_LSTOFF(void)
 {
-	if (opts.list)
-		opts.cur_list = false;
+	if (option_list_file())
+		list_set(false);
 	list_end_line();
 }
 
@@ -196,7 +196,7 @@ void asm_C_LINE(int line_num, const char* filename) {
 
 	set_error_location(filename, line_num);
 
-	if (opts.debug_info) {
+	if (option_debug()) {
 		STR_DEFINE(name, STR_SIZE);
 
 		char fname_encoded[FILENAME_MAX * 2];
@@ -237,7 +237,7 @@ void asm_MODULE(const char* name)
 void asm_MODULE_default(void)
 {
 	if (!CURRENTMODULE->modname)     /* Module name must be defined */
-		CURRENTMODULE->modname = path_remove_ext(path_file(CURRENTMODULE->filename));
+		CURRENTMODULE->modname = remove_extension(path_file(CURRENTMODULE->filename));
 }
 
 void asm_SECTION(const char* name)
@@ -349,7 +349,7 @@ void asm_DEFS_str(int count, const char* str, int len)
         while (len-- > 0)
             add_opcode((*str++) & 0xFF);
         while (zeros-- > 0)
-            add_opcode(opts.filler);
+            add_opcode(option_filler());
     }
 }
 
@@ -824,7 +824,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 void asm_DMA_command(int cmd, UT_array* exprs)
 {
-	if (opts.cpu != CPU_Z80N) {
+	if (option_cpu() != CPU_Z80N) {
 		error_illegal_ident();
 		return;
 	}
