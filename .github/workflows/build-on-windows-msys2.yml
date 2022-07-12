@@ -43,7 +43,7 @@ jobs:
         eval $(perl -Mlocal::lib)
         # install modules that fail tests in msys2 with -f
         cpan -f Test::Harness
-        cpan App::Prove Capture::Tiny CPU::Z80::Assembler Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
+        cpan App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
     - name: Build binaries
       run: |
         set -e -x
