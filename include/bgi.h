@@ -178,8 +178,8 @@ struct textsettingstype {
 #define	putpixel(a,b,c)	((c) ? plot((a)*GFXSCALEX,(b)*GFXSCALEY):unplot((a)*GFXSCALEX,(b)*GFXSCALEY))
 #define	moveto(a,b) xorplot((a)*GFXSCALEX,(b)*GFXSCALEY);xorplot((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	moverel(a,b) bgi_x=getx()+(a)*GFXSCALEX;bgi_y=gety()+(b)*GFXSCALEY;xorplot(bgi_x,bgi_y);xorplot(bgi_x,bgi_y)
-
 #define	linerel(a,b)	drawr((a)*GFXSCALEX,(b)*GFXSCALEY)
+#define	lineto(a,b)	drawto((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	rectangle(a,b,c,d)	drawb((a)*GFXSCALEX,(b)*GFXSCALEY,((c)-(a))*GFXSCALEX,((d)-(b))*GFXSCALEY)
 //#define	bar(a,b,c,d)	fillb((a)*GFXSCALEX,(b)*GFXSCALEY,((c)-(a))*GFXSCALEX,((d)-(b))*GFXSCALEY)
 #define	bar(a,b,c,d)	stencil_init(bgi_stencil);stencil_add_side((a)*GFXSCALEX,(b)*GFXSCALEY,(a)*GFXSCALEX,(d)*GFXSCALEY,bgi_stencil);stencil_add_side((c)*GFXSCALEX,(b)*GFXSCALEY,(c)*GFXSCALEX,(d)*GFXSCALEY,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);drawb((a)*GFXSCALEX,(b)*GFXSCALEY,((c)-(a))*GFXSCALEX+1,((d)-(b))*GFXSCALEY+1)
@@ -205,8 +205,6 @@ struct textsettingstype {
 #define floodfill(a,b,c)	fill((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	outtext(c) XDrawString(bgi_display,bgi_mywin,bgi_gc,bgi_x*GFXSCALEX,bgi_y*GFXSCALEY,c,strlen(c));bgi_x+=XTextWidth(bgi_font_info->fid,c,strlen(c))
 #define	outtextxy(a,b,c) XDrawString(bgi_display,bgi_mywin,bgi_gc,(a)*GFXSCALEX,(b)*GFXSCALEY,c,strlen(c));
-
-
 #define	settextstyle(a,b,c) itoa((c)+(a)*3*GFXSCALEX,bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
 #define	setusercharsize(a,b,c,d) itoa(10*(a)*GFXSCALEX/(b),bgi_font,10);bgi_font_info=XLoadQueryFont(0,bgi_font);XSetFont(bgi_display,bgi_gc,bgi_font_info->fid);
 #define textheight(a) 10*GFXSCALEY
@@ -221,6 +219,7 @@ struct textsettingstype {
 #define	moveto(a,b) xorplot(a,b);xorplot(a,b)
 #define	moverel(a,b) bgi_x=getx()+(a);bgi_y=gety()+(b);xorplot(bgi_x,bgi_y);xorplot(bgi_x,bgi_y)
 #define	linerel(a,b)	drawr(a,b)
+#define	lineto(a,b)	drawto(a,b)
 #define	rectangle(a,b,c,d)	drawb(a,b,(c)-(a),(d)-(b))
 //#define	bar(a,b,c,d)	fillb(a,b,(c)-(a),(d)-(b))
 #define	bar(a,b,c,d)	stencil_init(bgi_stencil);stencil_add_side((a),(b),(a),(d),bgi_stencil);stencil_add_side((c),(b),(c),(d),bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);drawb((a),(b),((c)-(a))+1,((d)-(b))+1)
