@@ -38,6 +38,7 @@
 unsigned char bgi_stencil[256*4];
 int bgi_fillstyle;
 //int bgi_fillcolor;
+//#define	setfillstyle(a,b) bgi_fillstyle=(a?12-a:0);printf("\033[%um",PCDOS_COLORS[b]+30)
 #define	setfillstyle(a,b) bgi_fillstyle=(a?12-a:0)
 
 // setcolor(a) printf("\033[%um",PCDOS_COLORS[a]+30)
@@ -115,6 +116,7 @@ int bgi_y;
 #define grapherrormsg(a) "z88dk gfx emulation ready"
 //#define DETECT	0
 
+#define getdrivername() ("z88dk gfx emulation")
 
 
 #define	settextjustify(a,b)	{}
