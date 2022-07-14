@@ -9,7 +9,7 @@
  *
  *      stefano - 18/3/2004
  *
- *	$Id: conio.h,v 1.10 2013-06-20 08:25:45 stefano Exp $
+ *	$Id: conio.h $
  */
 
 #ifndef __CONIO_H__
@@ -102,7 +102,7 @@ extern void __LIB__ cgets(char *dest);
 //#define ungetch(bp)  ungetc(bp,stdin)  // this one doesn't work
 //#define _ungetch(bp)  ungetc(bp,stdin)  // this one doesn't work
 
-#define random(a) rand()%a
+#define random(a) (rand()%(a))
 
 extern int __LIB__ kbhit(void);
 extern int __LIB__ getch(void);
