@@ -178,7 +178,7 @@ struct textsettingstype {
 #ifdef GFXSCALEX
 #define	getpixel(a,b)	point((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	putpixel(a,b,c)	((c) ? plot((a)*GFXSCALEX,(b)*GFXSCALEY):unplot((a)*GFXSCALEX,(b)*GFXSCALEY))
-#define	moveto(a,b) xorplot((a)*GFXSCALEX,(b)*GFXSCALEY);xorplot((a)*GFXSCALEX,(b)*GFXSCALEY)
+#define	moveto(a,b) bgi_x=a;bgi_y=b;xorplot((a)*GFXSCALEX,(b)*GFXSCALEY);xorplot((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	moverel(a,b) bgi_x=getx()+(a)*GFXSCALEX;bgi_y=gety()+(b)*GFXSCALEY;xorplot(bgi_x,bgi_y);xorplot(bgi_x,bgi_y)
 #define	linerel(a,b)	drawr((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	lineto(a,b)	drawto((a)*GFXSCALEX,(b)*GFXSCALEY)
@@ -193,7 +193,6 @@ struct textsettingstype {
 //#define	circle(a,b,c) polygon((a)*GFXSCALEX,(b)*GFXSCALEY,180,(c)*GFXSCALEY,0);
 //#define	sector(a,b,c,d,e,f)	ellipse(a,b,360-(d),360-(c),e,f);drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(f)/256)*GFXSCALEY);fill(((a)+icos(358-(c))*((e)-2)/256)*GFXSCALEX,((b)+isin(358-(c))*((f)-2)/256)*GFXSCALEY)
 #define	sector(a,b,c,d,e,f)		stencil_init(bgi_stencil);stencil_add_ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,360-(d),360-(c),(e)*GFXSCALEX,(f)*GFXSCALEY,bgi_stencil);stencil_add_lineto((a)*GFXSCALEX,(b)*GFXSCALEY,bgi_stencil);stencil_add_lineto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(f)/256)*GFXSCALEY,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);	ellipse((a),(b),360-(d),360-(c),(e),(f));drawto((a)*GFXSCALEX,(b)*GFXSCALEY);drawto(((a)+icos(360-(d))*(e)/256)*GFXSCALEX,((b)+isin(360-(d))*(f)/256)*GFXSCALEY)
-
 #define	ellipse(a,b,c,d,e,f)	ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,c,d,(e)*GFXSCALEX,(f)*GFXSCALEY)
 //#define	fillellipse(a,b,c,d)	ellipse(a,b,0,360,c,d);fill((a)*GFXSCALEX,(b)*GFXSCALEY)
 #define	fillellipse(a,b,c,d)	stencil_init(bgi_stencil);stencil_add_ellipse((a)*GFXSCALEX,(b)*GFXSCALEY,0,360,(c)*GFXSCALEX,(d)*GFXSCALEY,bgi_stencil);stencil_render(bgi_stencil,bgi_fillstyle);ellipse(a,b,0,360,c,d)
@@ -218,7 +217,7 @@ struct textsettingstype {
 #else
 #define	getpixel(a,b)	point(a,b)
 #define	putpixel(a,b,c)	(c ? plot(a,b):unplot(a,b))
-#define	moveto(a,b) xorplot(a,b);xorplot(a,b)
+#define	moveto(a,b) bgi_x=a;bgi_y=b;xorplot(a,b);xorplot(a,b)
 #define	moverel(a,b) bgi_x=getx()+(a);bgi_y=gety()+(b);xorplot(bgi_x,bgi_y);xorplot(bgi_x,bgi_y)
 #define	linerel(a,b)	drawr(a,b)
 #define	lineto(a,b)	drawto(a,b)
