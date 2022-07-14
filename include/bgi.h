@@ -17,8 +17,8 @@
  * 
  * 
  * Build examples:
- *  zcc +zx -lndos -DGFXSCALEX=2/5 -llib3d -create-app myprogram.c
- *  zcc +ts2068 -startup=2 -lgfx2068hr -lndos -llib3d -DGFXSCALEX=4/5 -DGFXSCALEY=2/5 -llib3d -create-app -zorg=40000 -O3 bar3d.c
+ *  zcc +zx -lndos -DGFXSCALEX=2/5 -llib3d -lm -create-app myprogram.c
+ *  zcc +ts2068 -llib3d -DGFXSCALEX=4/5 -DGFXSCALEY=2/5 -create-app -lm -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6  myprogram.c
  *
  *      stefano - 22/10/2012
  *
