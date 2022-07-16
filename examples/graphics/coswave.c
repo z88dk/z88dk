@@ -20,7 +20,6 @@
 #include <graphics.h>
 #include <stdio.h>
 #include <math.h>
-#include <lib3d.h>
 
 void main()
 {
