@@ -187,8 +187,7 @@ testlib:
 	$(MAKE) -C lib test
 
 prove_perl: $(PROJ)$(EXESUFFIX)
-	perl -S prove --state=slow,save -j9 t2/*.t
-	perl -S prove t/*.t
+	perl -S prove --state=slow,save -j9 t/*.t
 
 clean::
 	$(RM) zcc_opt.def zcc_proj.lst

@@ -286,7 +286,6 @@
     <None Include="..\..\src\z80asm\src\cpp\lex.re" />
     <None Include="..\..\src\z80asm\src\c\parse_rules.rl" />
     <None Include="..\..\src\z80asm\src\c\scan_rules.rl" />
-    <None Include="..\..\src\z80asm\tt\tokens.yaml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

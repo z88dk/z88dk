@@ -39,8 +39,7 @@ jobs:
     - name: Install perl prerequisites
       run: |
         perl -S cpan App::cpanminus
-        perl -S cpanm --force Capture::Tiny::Extended
-        perl -S cpanm App::Prove Capture::Tiny::Extended CPU::Z80::Assembler Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Cmd Test::Cmd::Common Test::Harness Test::HexDifferences Text::Diff Text::Table YAML::Tiny
+        perl -S cpanm App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
     - name: Run z80asm tests
       run: |
         copy /y bin\z88dk-z80asm.exe src\z80asm\

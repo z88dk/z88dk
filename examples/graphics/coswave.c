@@ -6,6 +6,8 @@
 	The picture size is automatically adapted to the target display size
 	
 	to build:  zcc +<target> <stdio options> -lm -create-app sinwave.c
+	or
+	to build using math32:  zcc +<target> <stdio options> --math32 -create-app sinwave.c
 	
 	Examples:
 	  zcc +zx -lm -lndos -create-app sinwave.c

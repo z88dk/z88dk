@@ -5,7 +5,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     SECTION code_graphics
     PUBLIC  drawr_callee
     PUBLIC  _drawr_callee
-    PUBLIC  asm_drawb
+    PUBLIC  asm_drawr
     
     EXTERN  swapgfxbk
     EXTERN  w_line_r
@@ -22,7 +22,7 @@ IF !__CPU_INTEL__ && !__CPU_GBZ80__
     pop     hl
     push    af
 
-.asm_drawb
+.asm_drawr
     push ix
 IF NEED_swapgfxbk = 1
     call    swapgfxbk
