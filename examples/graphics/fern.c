@@ -4,6 +4,8 @@
  * 
 
 	to build:  zcc +<target> -lm -create-app fern.c
+	or
+	to build using math32:  zcc +<target> --math32 -create-app fern.c
 	
 	zcc +zx -lndos -create-app -lm fern.c
 	zcc +ts2068 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -lm -create-app fern.c

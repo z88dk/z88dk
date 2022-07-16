@@ -8,6 +8,8 @@
 	A = 25.0   <- Globe inclinationh
 
 	to build:  zcc +<target> <stdio options> -lm -create-app globe.c
+	or
+	to build using math32:  zcc +<target> <stdio options> --math32 -create-app globe.c
 	
 	Examples:
 	
