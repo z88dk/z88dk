@@ -1922,9 +1922,11 @@ r2k_crt0.lib:
 	TYPE=r2k $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/r2k_crt0 @$(LISTFILE_DIRECTORY)/rabbit.lst
 
 
-clean: classic-clean new-clean
+clean: clean-classic clean-new
 
-classic-clean:
+clean-install: clean-classic clean-install-new
+
+clean-classic:
 	$(MAKE) -C assert clean
 	$(MAKE) -C ctype clean
 	$(MAKE) -C fcntl clean
@@ -1961,13 +1963,12 @@ classic-clean:
 	$(RM) graphics/retrofit/*.o
 	$(RM) *.lib
 
-new-clean:
+clean-new:
 	$(MAKE) -C _DEVELOPMENT clean
 
-new-install-clean:
+clean-install-new:
 	$(MAKE) -C _DEVELOPMENT install-clean
-
-install-clean: classic-clean new-install-clean
 
 install:
 	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs
+

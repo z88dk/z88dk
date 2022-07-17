@@ -179,7 +179,7 @@ libs: $(BINS)
 	cd libsrc ; $(MAKE)
 	cd libsrc ; $(MAKE) install
 
-install: install-clean
+install: clean-install
 	install -d $(DESTDIR) $(DESTDIR)/bin $(prefix_share)/lib $(prefix_share)/src
 	$(MAKE) -C src/appmake PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/copt PREFIX=$(DESTDIR) install
@@ -224,15 +224,11 @@ ifeq ($(CROSS),0)
 	$(MAKE) -C testsuite
 endif
 
-install-clean:
-	$(MAKE) -C libsrc install-clean
-	$(RM) lib/z80asm*.lib
 
-clean: clean-bins
+clean: clean-bins clean-test clean-examples
 	$(MAKE) -C libsrc clean
 	$(RM) lib/clibs/*.lib
 	$(RM) lib/z80asm*.lib
-
 
 clean-bins:
 	$(MAKE) -C src/appmake clean
@@ -261,5 +257,15 @@ ifdef BUILD_SDCC_HTTP
 endif
 endif
 	#if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
+
+clean-install:
+	$(MAKE) -C libsrc clean-install
+	$(RM) lib/z80asm*.lib
+
+clean-test:
+	$(MAKE) -C test clean
+
+clean-examples:
+	$(MAKE) -C examples clean
 
 .PHONY: test testsuite
