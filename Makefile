@@ -179,7 +179,7 @@ libs: $(BINS)
 	cd libsrc ; $(MAKE)
 	cd libsrc ; $(MAKE) install
 
-install: clean-install
+install: install-clean
 	install -d $(DESTDIR) $(DESTDIR)/bin $(prefix_share)/lib $(prefix_share)/src
 	$(MAKE) -C src/appmake PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/copt PREFIX=$(DESTDIR) install
@@ -205,6 +205,9 @@ install: clean-install
 	cp -r libsrc $(prefix_share)/
 	cp -r src/m4 $(prefix_share)/src/
 
+install-clean:
+	$(MAKE) -C libsrc install-clean
+	$(RM) lib/z80asm*.lib
 
 	# BSD install syntax below
 	#find include -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{}  \;
@@ -216,7 +219,7 @@ install: clean-install
 
 
 # Needs to have a dependency on libs
-test: $(ALL) 
+test: $(ALL)
 	$(MAKE) -C test
 
 testsuite: $(BINS)
@@ -224,13 +227,12 @@ ifeq ($(CROSS),0)
 	$(MAKE) -C testsuite
 endif
 
-
-clean: clean-bins clean-test clean-examples
+clean: bins-clean
 	$(MAKE) -C libsrc clean
 	$(RM) lib/clibs/*.lib
 	$(RM) lib/z80asm*.lib
 
-clean-bins:
+bins-clean:
 	$(MAKE) -C src/appmake clean
 	$(MAKE) -C src/common clean
 	$(MAKE) -C src/copt clean
@@ -246,6 +248,7 @@ clean-bins:
 	$(MAKE) -C src/zpragma clean
 	$(MAKE) -C src/zx7 clean
 	$(MAKE) -C src/zx0 clean
+	$(MAKE) -C examples clean
 	$(MAKE) -C support clean
 	$(MAKE) -C test clean
 	$(MAKE) -C testsuite clean
@@ -258,14 +261,13 @@ endif
 endif
 	#if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
 
-clean-install:
-	$(MAKE) -C libsrc clean-install
-	$(RM) lib/z80asm*.lib
-
-clean-test:
+test-clean:
 	$(MAKE) -C test clean
 
-clean-examples:
+testsuite-clean:
+	$(MAKE) -C testsuite clean
+
+examples-clean:
 	$(MAKE) -C examples clean
 
 .PHONY: test testsuite
