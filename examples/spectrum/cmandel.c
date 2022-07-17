@@ -10,9 +10,9 @@
 	              - or -
 	              zcc +zx -lndos -lm -create-app -Dlr64x48 cmandel.c
     
-    zcc +zx -lndos -O3 -lm cmandel.c -o cmandel48 -create-app
-    zcc +zx -lndos -O3 --math32 cmandel.c -o cmandel32 -create-app
-    zcc +zx -lndos -O3 --math16  cmandel.c -o cmandel16 -create-app
+    zcc +zx -lndos -O2 -lm cmandel.c -o cmandel -create-app
+    zcc +zx -lndos -O2 --math32 cmandel.c -o cmandel32 -create-app
+    zcc +zx -lndos -O2 --math16  cmandel.c -o cmandel16 -create-app
 
 	$Id: cmandel.c,v 1.3 2010-04-02 09:05:06 stefano Exp $
 */
