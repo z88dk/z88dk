@@ -9,12 +9,14 @@
 	build with:   zcc +zx -lndos -lm -create-app cmandel.c
 	              - or -
 	              zcc +zx -lndos -lm -create-app -Dlr64x48 cmandel.c
-    
-    zcc +zx -lndos -O2 -lm cmandel.c -o cmandel -create-app
-    zcc +zx -lndos -O2 --math32 cmandel.c -o cmandel32 -create-app
-    zcc +zx -lndos -O2 --math16  cmandel.c -o cmandel16 -create-app
 
-	$Id: cmandel.c,v 1.3 2010-04-02 09:05:06 stefano Exp $
+	Build and link with alternative floating point libraries:
+	zcc +zx -lndos -O2 -lm cmandel.c -o cmandel -create-app
+	zcc +zx -lndos -O2 -lm48 cmandel.c -o cmandel48 -create-app
+	zcc +zx -lndos -O2 --math32 cmandel.c -o cmandel32 -create-app
+	zcc +zx -lndos -O2 --math16  cmandel.c -o cmandel16 -create-app
+
+	stefano
 */
 
 //#define DALTLOWGFX  1

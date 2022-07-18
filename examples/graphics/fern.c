@@ -9,14 +9,12 @@
 	
 	zcc +zx -lndos -create-app -lm fern.c
 	zcc +ts2068 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -lm -create-app fern.c
-    zcc +c128 -lgfx128hr -lm -create-app -DVERTICAL fern.c
-
+	zcc +c128 -lgfx128hr -lm -create-app -DVERTICAL fern.c
 
  * 
  * Original program by Guido Gonzato, May 2015.
  * z88dk version by Stefano Bodrato, Jul 2022.
  *
- 
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,9 +50,9 @@
     b[4] = {0.0, 0.04, -0.26, 0.28},
     c[4] = {0.0, 0.04, 0.23, 0.26},
     d[4] = {0.16, 0.85, 0.22, 0.24},
-    /* e[4] = {0.0, 0.0, 0.0, 0.0}, */
+/*  e[4] = {0.0, 0.0, 0.0, 0.0}, */
     f[4] = {0.0, 1.6, 1.6, 0.44};
-    /* p[4] = {0.01, 0.85, 0.07, 0.07}; */
+/*  p[4] = {0.01, 0.85, 0.07, 0.07}; */
 
 
 void main()
@@ -64,7 +62,7 @@ void main()
 
   clg();
 
-  //srand (clock());
+//srand (clock());
 
 
 #ifdef VERTICAL

@@ -13,7 +13,7 @@
 	  zcc +zx -lm -lndos -create-app sinwave.c
 	  zcc +aquarius -lm -create-app sinwave.c
 	
-	$Id: sinwave.c,v 1.4 2011-04-01 06:50:45 stefano Exp $
+	stefano
 
 */
 
