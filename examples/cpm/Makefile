@@ -1,7 +1,10 @@
 
 #CFLAGS = -compiler=sdcc
 
-all: wc.com tail.com sort.com ddir.com adv_a.com enigma.com fib.com mm.com rpn.com tic.com sorter.com othello.com
+all: dpb.com wc.com tail.com sort.com ddir.com adv_a.com enigma.com fib.com mm.com rpn.com tic.com sorter.com othello.com
+
+dpb.com: dpb.c
+	zcc +cpm -vn  $(CFLAGS) -create-app dpb.c -odpb.bin
 
 wc.com: ../osca/wc.c
 	zcc +cpm -vn $(CFLAGS) -DWILDCARD ../osca/wc.c -create-app -owc.bin
@@ -40,5 +43,5 @@ othello.com: ../othello.c
 	zcc +cpm -vn  $(CFLAGS) -O3 -create-app ../othello.c -I.. -oothello.bin
 
 clean:
-	$(RM) *.com *.i *.asm *.tap *.op* *.o *~ zcc_opt.def *.COM *.bin *.def
+	$(RM) *.com *.i *.asm *.tap *.op* *.o *~ zcc_opt.def *.COM *.bin *.lis *.def
 
