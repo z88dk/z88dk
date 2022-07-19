@@ -36,7 +36,7 @@ int main(void)
 	int i;
 	float a;
 
-#if !(defined(__CPM) | defined(__SPECTRUM))
+#if defined(__EMBEDDED)
 	init_uart(0,1);
 #endif
 

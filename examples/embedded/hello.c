@@ -3,6 +3,8 @@
 
 main()
 {
+#if defined(__EMBEDDED)
 	init_uart(0,1);
+#endif
 	printf("Hello world!");
 }
