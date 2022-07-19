@@ -117,13 +117,6 @@ filein()
 
 
 
-
-
-
-
-
-
-
 /*  swap -- exchange pointers.  K&R p. 117  */
 swap(px,py)
 char  *px[], *py[];

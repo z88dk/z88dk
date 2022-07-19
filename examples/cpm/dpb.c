@@ -6,7 +6,7 @@
  *  zcc +cpm dpb.c -o dpb.bin -create-app
  *
  *  Compile with sdcc
- *  zcc +cpm -compiler=sdcc dpb.c -o dpb.bin -create-app
+ *  zcc +cpm -compiler=sdcc -O3 dpb.c -o dpb.bin -create-app
  *
  *  By Stefano Bodrato, May 2022
  *
