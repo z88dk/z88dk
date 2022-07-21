@@ -97,7 +97,7 @@ sort-equ-5000     41378393    10.3446 sec
 
 
 Z88DK March 14, 2022
-classic / zsdcc Build: 4.2.0 #13081
+classic / zsdcc Build: 4.2.0 #13131
 1711 bytes less page zero
 
                cycle count    time @ 4MHz

@@ -21,7 +21,7 @@ PUBLIC __Z88DK
 
 
 
-defc __Z88DK = 2100
+defc __Z88DK = 2200
 
 
 
