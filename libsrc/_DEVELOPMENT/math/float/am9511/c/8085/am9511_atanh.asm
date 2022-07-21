@@ -1,9 +1,9 @@
 ;* * * * *  Small-C/Plus z88dk * * * * *
-;  Version: 19027-7557a4792-20211229
+;  Version: 19569-078eaec31-20220528
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Wed Feb  2 15:03:02 2022
+;	Module compile time: Thu Jun 16 20:23:14 2022
 
 
 	C_LINE	0,"am9511_atanh.c"
