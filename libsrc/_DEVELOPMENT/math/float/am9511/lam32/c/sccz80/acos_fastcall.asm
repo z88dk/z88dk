@@ -5,6 +5,7 @@
 
 	defc	acos_fastcall = asm_am9511_acos_fastcall
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _acos_fastcall

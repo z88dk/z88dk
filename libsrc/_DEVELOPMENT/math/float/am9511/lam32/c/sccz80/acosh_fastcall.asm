@@ -5,6 +5,7 @@
 
 	defc	acosh_fastcall = _am9511_acosh
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _acosh_fastcall

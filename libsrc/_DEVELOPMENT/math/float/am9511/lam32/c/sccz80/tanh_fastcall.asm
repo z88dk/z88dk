@@ -5,6 +5,7 @@
 
 	defc	tanh_fastcall = _am9511_tanh
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _tanh_fastcall

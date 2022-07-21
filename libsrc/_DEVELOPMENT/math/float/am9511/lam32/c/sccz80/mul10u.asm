@@ -8,7 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _mul10u
-EXTERN cam32_sdcc_fmul10u
-defc _mul10u = cam32_sdcc_fmul10u
+defc _mul10u = cam32_sccz80_fmul10u
 ENDIF
 

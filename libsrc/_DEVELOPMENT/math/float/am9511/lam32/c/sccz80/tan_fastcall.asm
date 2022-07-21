@@ -5,6 +5,7 @@
 
 	defc	tan_fastcall = asm_am9511_tan_fastcall
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _tan_fastcall

@@ -5,6 +5,7 @@
 
 	defc	neg_fastcall = asm_am9511_neg
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _neg_fastcall

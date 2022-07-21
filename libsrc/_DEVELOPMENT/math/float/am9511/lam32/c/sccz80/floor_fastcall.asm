@@ -5,6 +5,7 @@
 
 	defc	floor_fastcall = asm_am9511_floor_fastcall
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _floor_fastcall

@@ -9,6 +9,5 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _exp2
-EXTERN cam32_sdcc_exp2
-defc _exp2 = cam32_sdcc_exp2
+defc _exp2 = cam32_sccz80_exp2
 ENDIF

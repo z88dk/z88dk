@@ -5,6 +5,7 @@
 
 	defc	sin_fastcall = asm_am9511_sin_fastcall
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _sin_fastcall

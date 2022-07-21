@@ -5,6 +5,7 @@
 
 	defc	atanh_fastcall = _am9511_atanh
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _atanh_fastcall

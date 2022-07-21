@@ -5,10 +5,10 @@
 
 	defc	log2 = cam32_sccz80_log2
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _log2
-EXTERN cam32_sdcc_log2
-defc _log2 = cam32_sdcc_log2
+defc _log2 = cam32_sccz80_log2
 ENDIF
 

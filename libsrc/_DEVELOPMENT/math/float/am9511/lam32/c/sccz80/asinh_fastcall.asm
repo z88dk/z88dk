@@ -5,6 +5,7 @@
 
 	defc	asinh_fastcall = _am9511_asinh
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _asinh_fastcall

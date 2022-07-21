@@ -5,6 +5,7 @@
 
 	defc	cos_fastcall = asm_am9511_cos_fastcall
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _cos_fastcall

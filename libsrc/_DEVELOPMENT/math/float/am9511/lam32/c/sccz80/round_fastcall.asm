@@ -5,6 +5,7 @@
 
 	defc	round_fastcall = _am9511_round
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _round_fastcall
