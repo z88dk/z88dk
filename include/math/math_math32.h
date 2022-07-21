@@ -51,8 +51,10 @@ extern double_t __LIB__ acosh(double_t x) __smallc __z88dk_fastcall;
 extern double_t __LIB__ atanh(double_t x) __smallc __z88dk_fastcall;
 
 /* Power functions */
+extern double_t __LIB__ inv(double_t a) __smallc __z88dk_fastcall;
+extern double_t __LIB__ invsqrt(double_t a) __smallc __z88dk_fastcall;
 extern double_t __LIB__ sqr(double_t a) __smallc __z88dk_fastcall;
-extern double_t __LIB__ sqrt(double_t a)  __smallc __z88dk_fastcall;
+extern double_t __LIB__ sqrt(double_t a) __smallc __z88dk_fastcall;
 extern double_t __LIB__ pow(double_t x,double_t y) __smallc;
 extern double_t __LIB__ pow_callee(double_t x,double_t y) __smallc __z88dk_callee;
 #define pow(a,b) pow_callee(a,b)
@@ -115,12 +117,12 @@ extern double_t __LIB__ fam9511_f32(double_t x) __smallc __z88dk_fastcall;
 #ifdef __SDCC
 
 /* Trigonometric functions */
-extern double_t sin(double_t x)  __z88dk_fastcall;
-extern double_t cos(double_t x)  __z88dk_fastcall;
-extern double_t tan(double_t x)  __z88dk_fastcall;
-extern double_t asin(double_t x)  __z88dk_fastcall;
-extern double_t acos(double_t x)  __z88dk_fastcall;
-extern double_t atan(double_t x)  __z88dk_fastcall;
+extern double_t sin(double_t x) __z88dk_fastcall;
+extern double_t cos(double_t x) __z88dk_fastcall;
+extern double_t tan(double_t x) __z88dk_fastcall;
+extern double_t asin(double_t x) __z88dk_fastcall;
+extern double_t acos(double_t x) __z88dk_fastcall;
+extern double_t atan(double_t x) __z88dk_fastcall;
 extern double_t atan2(double_t y,double_t x);
 extern double_t atan2_callee(double_t y,double_t x) __z88dk_callee;
 #define atan2(a,b) atan2_callee(a,b)
@@ -134,8 +136,10 @@ extern double_t acosh(double_t x) __z88dk_fastcall;
 extern double_t atanh(double_t x) __z88dk_fastcall;
 
 /* Power functions */
+extern double_t inv(double_t a) __z88dk_fastcall;
+extern double_t invsqrt(double_t a) __z88dk_fastcall;
 extern double_t sqr(double_t a) __z88dk_fastcall;
-extern double_t sqrt(double_t a)  __z88dk_fastcall;
+extern double_t sqrt(double_t a) __z88dk_fastcall;
 extern double_t pow(double_t x,double_t y);
 extern double_t pow_callee(double_t x,double_t y) __z88dk_callee;
 #define pow(a,b) pow_callee(a,b)

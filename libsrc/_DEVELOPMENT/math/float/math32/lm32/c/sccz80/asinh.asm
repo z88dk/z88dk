@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _asinh
-EXTERN cm32_sdcc_asinh
-defc _asinh = cm32_sdcc_asinh
+defc _asinh = _m32_asinhf
 ENDIF
 

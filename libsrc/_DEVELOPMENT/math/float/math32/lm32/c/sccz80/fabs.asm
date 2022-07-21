@@ -8,7 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _fabs
-EXTERN cm32_sdcc_fabs
-defc _fabs = cm32_sdcc_fabs
+defc _fabs = m32_fabs_fastcall
 ENDIF
 

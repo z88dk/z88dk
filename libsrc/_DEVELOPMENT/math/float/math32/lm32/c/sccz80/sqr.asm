@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _sqr
-EXTERN cm32_sdcc_fssqr
-defc _sqr = cm32_sdcc_fssqr
+defc _sqr = m32_fssqr_fastcall
 ENDIF
 
