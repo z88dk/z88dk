@@ -62,6 +62,7 @@ parts:
       - libregexp-common-perl 
       - libclone-perl
       - libfile-slurp-perl
+      - libyaml-tiny-perl
     stage-packages:
       - libicu66
       - perl-modules-5.30
