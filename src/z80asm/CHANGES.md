@@ -1,6 +1,23 @@
 Z88DK Z80 Module Assembler Change Log
 =====================================
 
+2022
+----
+- 2022-01-04 Add support for '#include' C style include directive
+- 2022-01-05 Remove z80asm .err files, change error format to more standard file:line: error
+- 2022-01-06 Add predefined constant for -mti83plus
+- 2022-01-07 z80asm is now a Macro Assembler
+- 2022-01-07 Issue #18 remove INVOKE directive unless -mti83 or -mti83plus is passed in the comand line
+- 2022-01-08 Fix #16: -Opath was added twice to consolidated object file name
+- 2022-01-09 Fix #1573 now map and def files use same basename as bin file
+- 2022-06-14 Several fixes to compound assembly instructions
+- 2022-06-15 Add table of recognized opcodes to the wiki
+- 2022-06-25 Fix #2036 build and test on Windows
+- 2022-06-27 Fix #2040 allow options and filenames in @ files
+- 2022-07-01 Fix #2043 z80asm: deletion of empty binary files except first not always working
+- 2022-07-04 Parallelize z80asm tests
+- 2022-07-07 Fix #2045 ignore ORG statements when producing a binary for appmake
+
 2021
 ----
 - 2021-01-18 Fix #1671 Define INCBIN as alias to BINARY
@@ -43,6 +60,7 @@ Z88DK Z80 Module Assembler Change Log
 - 2019-07-14 Convert Spectrum Next CPU to (--cpu=z80n) (thank you Phillip Stevens)
 - 2019-07-20 Support Intel 8080 with Zilog syntax (--cpu=8080) (thank you @suborb)
 - 2019-07-22 Support Intel 8080/8085 with Intel syntax, except Jump Positive (jp conflicts with Zilog jump) and Call Positive (cp conflicts with Zilog compare). Support alternative j_p and c_p for Jump Positive and Call Positive.
+- 2019-07-22 Remove '#' constant operator
 - 2019-12-03 Implement rld and rrd emulation for 8080/8085
 - 2019-12-17 Add linker support for sign-extended 8-bit values
 - 2019-12-24 Fix #1364 Fix barrel rotate instruction (brlc)
