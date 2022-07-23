@@ -5,6 +5,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "args.h"
 #include "float.h"
 #include "if.h"
 #include "lex.h"
@@ -1023,7 +1024,46 @@ ExpandedText Preproc::expand(Lexer& lexer, Macros& defines) {
 			break;
 		case TType::Newline: out.append("\n"); break;
 		case TType::Ident:
-			expand_ident(out, token.svalue, lexer, defines);
+			switch (token.keyword) {
+			case Keyword::IX:
+				if (g_args.swap_ixiy())
+					expand_ident(out, "iy", lexer, defines);
+				else
+					expand_ident(out, "ix", lexer, defines);
+				break;
+			case Keyword::IXH:
+				if (g_args.swap_ixiy())
+					expand_ident(out, "iyh", lexer, defines);
+				else
+					expand_ident(out, "ixh", lexer, defines);
+				break;
+			case Keyword::IXL:
+				if (g_args.swap_ixiy())
+					expand_ident(out, "iyl", lexer, defines);
+				else
+					expand_ident(out, "ixl", lexer, defines);
+				break;
+			case Keyword::IY:
+				if (g_args.swap_ixiy())
+					expand_ident(out, "ix", lexer, defines);
+				else
+					expand_ident(out, "iy", lexer, defines);
+				break;
+			case Keyword::IYH:
+				if (g_args.swap_ixiy())
+					expand_ident(out, "ixh", lexer, defines);
+				else
+					expand_ident(out, "iyh", lexer, defines);
+				break;
+			case Keyword::IYL:
+				if (g_args.swap_ixiy())
+					expand_ident(out, "ixl", lexer, defines);
+				else
+					expand_ident(out, "iyl", lexer, defines);
+				break;
+			default:
+				expand_ident(out, token.svalue, lexer, defines);
+			}
 			break;
 		case TType::Label:
 			expand_ident(out, token.svalue, lexer, defines);
