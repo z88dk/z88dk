@@ -13,6 +13,7 @@ Handle object file contruction, reading and writing
 
 #include "array.h"
 #include "class.h"
+#include "if.h"
 #include "module.h"
 #include "types.h"
 #include <stdio.h>

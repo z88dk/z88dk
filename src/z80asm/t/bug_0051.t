@@ -30,7 +30,7 @@ END
 
 check_text_file("$test.map", <<END);
 local_label                     = \$0009 ; addr, local, , $test, , $test.asm:12
-minus_d_var                     = \$0001 ; const, public, , $test, , $test.o:0
+minus_d_var                     = \$0001 ; const, public, , $test, , $test.asm:0
 defc_var                        = \$0002 ; const, public, , $test, , $test.asm:2
 defvars_var                     = \$0003 ; const, public, , $test, , $test.asm:4
 public_label                    = \$0004 ; addr, public, , $test, , $test.asm:6

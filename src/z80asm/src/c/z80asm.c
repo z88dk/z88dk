@@ -33,124 +33,59 @@ size_t sizeof_reloctable = 0;
 char *reloctable = NULL, *relocptr = NULL;
 
 /* local functions */
-static void query_assemble(const char *src_filename );
 static void do_assemble(const char *src_filename );
 
 /*-----------------------------------------------------------------------------
-*   Assemble one source file
-*	- if a .o file is given, and it exists, it is used without trying to assemble first
-*	- if the given file exists, whatever the extension, try to assembly it
-*	- if all above fail, try to replace/append the .asm extension and assemble
-*	- if all above fail, try to replace/append the .o extension and link
+*   Assemble one source file or link one object file
 *----------------------------------------------------------------------------*/
-void assemble_file( const char *filename )
-{
-	// must canonize input file name so that comparison to .o below works
-	filename = path_canon(filename);
+void assemble_file( const char *filename ) {
+	const char* src_filename;
+	const char* obj_filename;
 
-	const char *src_filename;
-	const char *obj_filename;
-	bool load_obj_only;
-	Module *module;
+	set_error_location(filename, 0);
 
-	/* create output directory*/
-	obj_filename = path_canon(get_o_filename(filename));
-	path_mkdir(path_parent_dir(obj_filename));
-
-	set_error_location(obj_filename, 0);
-
-	/* try to load object file */
-	if (strcmp(filename, obj_filename) == 0 &&			/* input is object file */
-		file_exists(filename)							/* .o file exists */
-		) {
-		load_obj_only = true;
-		src_filename = filename;
+	// check if we got a source or object file
+	bool got_obj = strcmp(filename + strlen(filename) - strlen(EXT_O), EXT_O) == 0;
+	if (got_obj) {
+		src_filename = get_asm_filename(filename);
+		obj_filename = spool_add(filename);
 	}
 	else {
-		load_obj_only = false;
-
-		/* use input file if it exists */
-		if (file_exists(filename)) {
-			src_filename = filename;						/* use whatever extension was given */
-		}
-		else {
-			const char *asm_filename = get_asm_filename(filename);
-			if (file_exists(asm_filename)) {				/* file with .asm extension exists */
-				src_filename = asm_filename;
-			}
-			else if (file_exists(obj_filename)) {
-				load_obj_only = true;
-				src_filename = obj_filename;
-			}
-			else {				
-				error_file_open(filename);
-				return;
-			}
-		}
+		src_filename = spool_add(filename);
+		obj_filename = get_o_filename(filename);
 	}
-	
-	/* append the directoy of the file being assembled to the include path 
-	   and remove it at function end */
-	push_includes(path_parent_dir(src_filename));
 
-    /* normal case - assemble a asm source file */
-    list_set(option_list_file());		/* initial LSTON status */
+	// create output directory
+	path_mkdir(path_parent_dir(obj_filename));
 
-	/* when building libraries need to reset codearea to allow total library size > 64K
-	   when building binary cannot reset codearea so that each module is linked
-	   after the previous one, allocating addresses */
+	// when building libraries need to reset codearea to allow total library size > 64K
+	// when building binary cannot reset codearea so that each module is linked
+	// after the previous one, allocating addresses
 	if (!(option_make_bin() || option_bin_file()))
 		reset_codearea();
 
-    /* Create module data structures for new file */
-	module = set_cur_module( new_module() );
-	module->filename = spool_add( src_filename );
+	// Create module data structures for new file
+	Module* module = set_cur_module(new_module());
+	module->filename = spool_add(src_filename);
 
-	if (load_obj_only)
+	if (got_obj) {
 		object_file_append(obj_filename, CURRENTMODULE, true, false);
-	else
-		query_assemble(src_filename);			/* try to assemble, check -d */
-
-    clear_error_location();							/* no more module in error messages */
-	list_set(false);
-
-	/* finished assembly, remove dirname from include path */
-	pop_includes();
+	}
+	else {
+		// append the directoy of the file being assembled to the include path 
+		// and remove it at function end 
+		push_includes(path_parent_dir(src_filename));
+		{
+			// normal case - assemble a asm source file 
+			list_set(option_list_file());		// initial LSTON status
+			do_assemble(src_filename);
+			list_set(false);
+		}
+		// finished assembly, remove dirname from include path
+		pop_includes();
+	}
 
 	clear_error_location();
-}
-
-/*-----------------------------------------------------------------------------
-*	Assemble file or load object module size if datestamp option was given
-*	and object file is up-to-date
-*----------------------------------------------------------------------------*/
-static void query_assemble(const char *src_filename )
-{
-    struct stat src_stat, obj_stat;
-    int src_stat_result, obj_stat_result;
-	const char *obj_filename = get_o_filename( src_filename );
-
-    /* get time stamp of files, error if source not found */
-    src_stat_result = stat( src_filename, &src_stat );		/* BUG_0033 */
-    obj_stat_result = stat( obj_filename, &obj_stat );
-
-    if (option_date_stamp() &&									/* -d option */
-            obj_stat_result >= 0 &&							/* object file exists */
-            ( src_stat_result >= 0 ?						/* if source file exists, ... */
-              src_stat.st_mtime <= obj_stat.st_mtime		/* ... source older than object */
-              : true										/* ... else source does not exist, but object exists
-															   --> consider up-to-date (e.g. test.c -> test.o) */
-            ) &&
-			object_file_append(obj_filename, CURRENTMODULE, true, true)	/* object file valid and size loaded */
-       )
-    {
-        /* OK - object file is up-to-date */
-    }
-    else
-    {
-        /* Assemble source file */
-        do_assemble( src_filename );
-    }
 }
 
 /*-----------------------------------------------------------------------------

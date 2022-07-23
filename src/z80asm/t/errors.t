@@ -337,11 +337,12 @@ check_bin_file("$test.bin", bytes(0x18, 0x00, 0xc9));
 #------------------------------------------------------------------------------
 # error_obj_file_version
 #------------------------------------------------------------------------------
+unlink_testfiles;
 $obj = objfile(NAME => "test", CODE => [["", -1, 1, "\x00"]] );
 substr($obj,6,2) = "99";		# change version
 spew("$test.o", $obj);
 capture_nok("z88dk-z80asm -b $test.o", <<END);
-$test.o: error: invalid object file version: file=$test.o, found=99, expected=16
+error: invalid object file version: file=$test.o, found=99, expected=16
 END
 
 #------------------------------------------------------------------------------
@@ -358,9 +359,10 @@ END
 #------------------------------------------------------------------------------
 # error_not_obj_file
 #------------------------------------------------------------------------------
+unlink_testfiles;
 spew("$test.o", "not an object");
 capture_nok("z88dk-z80asm -b $test.o", <<END);
-$test.o: error: not an object file: $test.o
+error: not an object file: $test.o
 END
 
 sleep 1;
@@ -382,7 +384,7 @@ spew("$test.o",
 			CODE => [["", -1, 1, "\0\0"]],
 			SYMBOLS => [ ["Z", "Z", "", 0, "ABCD", "", 0] ] ));
 capture_nok("z88dk-z80asm -b -d $test.o", <<END);
-$test.o: error: not an object file: $test.o
+$test.asm: error: not an object file: $test.o
 END
 
 #------------------------------------------------------------------------------

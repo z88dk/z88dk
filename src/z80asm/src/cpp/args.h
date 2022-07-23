@@ -100,6 +100,7 @@ private:
 	void expand_source_glob(const string& pattern);
 	void expand_list_glob(const string& pattern);
 	string search_source(const string& filename);
+	bool check_source(const string& filename, string& out_filename);
 	void pre_parsing_actions();
 	void post_parsing_actions();
 	void parse_env_vars();

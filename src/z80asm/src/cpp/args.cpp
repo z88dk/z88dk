@@ -421,42 +421,119 @@ void Args::expand_list_glob(const string& pattern) {
 
 // search for the first file in path, with the given extension,
 // with .asm extension and with .o extension
-// if not found, return original file
+// if not found, output error and return original file
 string Args::search_source(const string& filename) {
+	string out_filename;
+
+	// check plain filename
+	if (check_source(filename, out_filename))
+		return out_filename;
+
+	// check plain file in include path
+	string found_file = search_include_path(filename);
+	if (check_source(found_file, out_filename))
+		return out_filename;
+
+	// check filename with .asm extension
+	string asm_file = asm_filename(filename);
+	if (check_source(asm_file, out_filename))
+		return out_filename;
+
+	// check filename with .asm extension in include path
+	found_file = search_include_path(asm_file);
+	if (check_source(found_file, out_filename))
+		return out_filename;
+
+	// check filename with .o extension
+	string o_file = o_filename(filename);
+	if (check_source(o_file, out_filename))
+		return out_filename;
+
+	// check filename with .o extension in include path
+	found_file = search_include_path(o_file);
+	if (check_source(found_file, out_filename))
+		return out_filename;
+
+	// not found, avoid cascade of errors
+	if (g_errors.count() == 0)
+		g_errors.error(ErrCode::FileOpen, filename);
+
+	return fs::path(filename).generic_string();
+}
+
+bool Args::check_source(const string& filename, string& out_filename) {
+	out_filename.clear();
+
+	// avoid cascade of errors
+	if (g_errors.count() > 0) {
+		out_filename = fs::path(filename).generic_string();
+		return true;
+	}
+
 	fs::path file_path{ filename };
+	fs::path src_file, obj_file;
+	bool got_obj;
 
-	// test plain filename
-	if (fs::is_regular_file(file_path))
-		return file_path.generic_string();
+	if (!file_path.has_extension()) {
+		if (fs::is_regular_file(file_path))
+			src_file = filename;
+		else
+			src_file = asm_filename(filename);
+		obj_file = o_filename(filename);
+		got_obj = false;
+	}
+	else if (file_path.extension().generic_string() == EXT_O) {
+		src_file = asm_filename(filename);
+		obj_file = file_path;
+		got_obj = true;
+	}
+	else {
+		src_file = file_path;
+		obj_file = o_filename(filename);
+		got_obj = false;
+	}
 
-	fs::path found_path{ search_include_path(filename) };
-	if (fs::is_regular_file(found_path))
-		return found_path.generic_string();
+	bool src_ok = fs::is_regular_file(src_file);
+	bool obj_ok = fs::is_regular_file(obj_file) &&
+		check_object_file_no_errors(obj_file.generic_string().c_str());
 
-	// test filename - extension + ".asm"
-	string asm_file = get_asm_filename(filename.c_str());
-	fs::path asm_path{ asm_file };
-	if (fs::is_regular_file(asm_path))
-		return asm_path.generic_string();
-
-	found_path = fs::path(search_include_path(asm_file));
-	if (fs::is_regular_file(found_path))
-		return found_path.generic_string();
-
-	// test filename - extension + ".o"
-	string o_file = get_o_filename(filename.c_str());
-	fs::path o_path{ o_file };
-	if (fs::is_regular_file(o_path))
-		return o_path.generic_string();
-
-	found_path = fs::path(search_include_path(o_file));
-	if (fs::is_regular_file(found_path))
-		return found_path.generic_string();
-
-	// not found
-	g_errors.error(ErrCode::FileOpen, filename);
-
-	return file_path.generic_string();
+	// if both .o and .asm exist and .o is valid, return .asm
+	// or .o if -d and .o is newer
+	// NOTE: -d must come before the file to have effect
+	if (src_ok && obj_ok) {
+		if (!m_date_stamp) {
+			// no -d
+			if (got_obj)
+				out_filename = obj_file.generic_string();
+			else
+				out_filename = src_file.generic_string();
+			return true;
+		}
+		else if (fs::last_write_time(obj_file) >= fs::last_write_time(src_file)) {
+			// -d and .o is up-to-date
+			out_filename = obj_file.generic_string();
+			return true;
+		}
+		else {
+			// -d and .o is old
+			out_filename = src_file.generic_string();
+			return true;
+		}
+	}
+	else if (src_ok) {
+		out_filename = src_file.generic_string();
+		return true;
+	}
+	else if (obj_ok) {
+		out_filename = obj_file.generic_string();
+		return true;
+	}
+	else {
+		// output object file errors, if any
+		if (fs::is_regular_file(obj_file))
+			check_object_file(obj_file.generic_string().c_str());
+		return false;
+	}
 }
 
 static string next_arg(const char*& p) {
