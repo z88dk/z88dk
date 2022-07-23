@@ -157,30 +157,35 @@ string Args::def_filename(const string& filename) {
 	return prepend_output_dir(replace_ext(filename, EXT_DEF));
 }
 
+// see https://github.com/z88dk/z88dk/issues/2049
+// No fix, to avoid breaking too many things:
+// -oFILE generates single binary FILE
+// -oFILE.EXT generates single binary file FILE.EXT
+// section outputs are always FILE_CODE.bin
 string Args::bin_filename(const string& filename, const string& section) {
 	fs::path file_path, file_ext;
 
 	if (m_bin_file.empty()) {
-		file_path = fs::path(filename);
-		file_ext = fs::path(EXT_BIN);
+		file_path = filename;
+		file_ext = EXT_BIN;
 	}
 	else {
 		// output file may have no extension
-		file_path = fs::path(m_bin_file);
+		file_path = m_bin_file;
 		file_ext = file_path.extension();
 	}
 
 	string filename1 = prepend_output_dir(file_path.generic_string());
 	string filename2 = replace_ext(filename1, file_ext.generic_string());
-	file_path = fs::path(filename2);
+	file_path = filename2;
 
 	if (!section.empty()) {
 		// output file with section has .bin extension
 		fs::path new_path;
 		new_path = file_path.parent_path();
 		new_path /= file_path.stem();
-		new_path += fs::path("_");
-		new_path += fs::path(section);
+		new_path += "_";
+		new_path += section;
 		new_path += EXT_BIN;
 		file_path = new_path;
 	}

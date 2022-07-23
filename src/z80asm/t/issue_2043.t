@@ -113,6 +113,5 @@ ok -f "${test}_code.reloc", "${test}_code.reloc exists";
 check_bin_file("${test}_code.reloc", words());
 
 
-
 unlink_testfiles;
 done_testing;
