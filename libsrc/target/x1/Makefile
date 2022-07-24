@@ -3,7 +3,7 @@ include ../../Make.config
 TARGET = x1
 
 SUBDIRS = x1 time 
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 all: subdirs-all 
 
@@ -24,5 +24,5 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 	$(RM) */*.o
