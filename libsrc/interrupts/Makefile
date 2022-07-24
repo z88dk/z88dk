@@ -4,7 +4,7 @@ TARGET ?= test
 
 SUBDIRS = common im1 im2 nmi
 
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 ASMFILES = $(wildcard *.asm)
 OBJECTS = $(ASMFILES:.asm=.o)
@@ -33,5 +33,5 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all TARGET=$(TARGET)
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 	$(RM) */*.o
