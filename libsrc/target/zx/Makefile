@@ -12,7 +12,7 @@ ifeq ($(TARGET),zxn)
   SUBDIRS += fzx fcntl 
 endif
 
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 ASMFILES = $(wildcard *.asm)
 OBJECTS = $(ASMFILES:.asm=.o)
@@ -33,7 +33,7 @@ clean: subdirs-clean
 subdirs-clean: $(CLEANDIRS)
 
 obj/$(TARGET)/%.o: %.asm
-	$(Q)$(ASSEMBLER) -DFOR$(TARGET) -I../.. -I../../../lib/ $^
+	$(Q)$(ASSEMBLER) -DFOR$(TARGET) -I../.. -I../../../lib/  $^
 	@mv $(^:.asm=.o) $@
 
 dirs:
@@ -45,5 +45,5 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all TARGET=$(TARGET)
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 	$(RM) */*.o

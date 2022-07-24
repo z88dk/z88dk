@@ -4,7 +4,7 @@ TARGET ?= zx
 
 SUBDIRS = graphics fcntl
 
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 ASMFILES = $(wildcard *.asm)
 OBJECTS = $(ASMFILES:.asm=.o)
@@ -37,5 +37,5 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all TARGET=$(TARGET)
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 	$(RM) */*.o

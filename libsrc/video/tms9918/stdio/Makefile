@@ -2,7 +2,7 @@ include ../../../Make.config
 
 
 SUBDIRS = ansi generic_console
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 all: $(SUBDIRS)
 
@@ -23,5 +23,5 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all TARGET=$(TARGET)
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 	$(RM) */*.o

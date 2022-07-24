@@ -1,5 +1,5 @@
 SUBDIRS = flos flosmulti
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 include ../../../Make.config
      
@@ -13,4 +13,4 @@ $(SUBDIRS):
 clean: $(CLEANDIRS)
 
 $(CLEANDIRS): 
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean

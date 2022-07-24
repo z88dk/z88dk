@@ -10,10 +10,9 @@ FLAVOUR ?= narrow
 
 SUBDIRS += $(FLAVOUR)
 
-CLEANDIRS = $(ALLSUBDIRS:%=clean-%) $(TARGETDIRS:%=clean-%)
+CLEANDIRS = $(ALLSUBDIRS:%=%-clean) $(TARGETDIRS:%=%-clean)
 
 all: $(SUBDIRS)
-
 
 
 subdirs-all: $(SUBDIRS) $(TARGETDIRS)
@@ -37,4 +36,4 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean

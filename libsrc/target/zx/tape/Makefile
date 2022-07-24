@@ -10,7 +10,7 @@ SUBDIRS =
 
 CFLAGS += -I$(Z88DK_INCLUDE)/arch/zx
 
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 ASMFILES = $(wildcard *.asm)
 CFILES = $(wildcard *.c)
@@ -47,5 +47,5 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all TARGET=$(TARGET)
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 	$(RM) */*.o

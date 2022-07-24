@@ -3,10 +3,9 @@ include ../Make.config
 
 SUBDIRS = aplib zx7 zx0 zx1 zx2
 
-CLEANDIRS = $(SUBDIRS:%=clean-%) 
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 all: $(SUBDIRS)
-
 
 
 subdirs-all: $(SUBDIRS) $(TARGETDIRS)
@@ -25,4 +24,4 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean

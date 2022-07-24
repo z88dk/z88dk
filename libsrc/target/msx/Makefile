@@ -3,7 +3,7 @@ include ../../Make.config
 TARGET = msx
 
 SUBDIRS = asmlib msxbios fcntl
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 ASMFILES = $(wildcard *.asm)
 OBJECTS = $(ASMFILES:.asm=.o)
@@ -36,5 +36,5 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 	$(RM) */*.o
