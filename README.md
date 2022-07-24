@@ -13,6 +13,10 @@ There are several ways to install z88dk.
 3. Use the [Snap package](https://github.com/z88dk/z88dk/wiki/Snap-usage) on Linux
 4. Use GitHub and build it yourself. The z88dk repository uses git submodules, these are not automatically downloaded by git by default so you will have to either adjust your clone line, or retrieve them manually. To clone with submodules use `git clone --recursive https://github.com/z88dk/z88dk.git`. To add the submodules to an already existing clone use `git submodule update --init --recursive`. To build, the following [instructions](https://github.com/z88dk/z88dk/wiki/installation#linux--unix) should be followed.
 
+## CMAKE
+
+CMake can be used to build Z88DK projects (a toolchain is provided).
+Please refer to [CMake](https://github.com/z88dk/z88dk/wiki/CMake) wiki.
 
 ## THE TOOLS
 
