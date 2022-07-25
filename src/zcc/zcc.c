@@ -24,6 +24,8 @@
 #include        <inttypes.h>
 #include        <time.h>
 #include        <sys/stat.h>
+#include        "uthash.h"
+#include        "utlist.h"
 #include        "zcc.h"
 #include        "regex/regex.h"
 #include        "dirname.h"
@@ -98,12 +100,20 @@ struct pragma_m4_s {
     const char *m4_name;
 };
 
+struct tokens_list_s
+{
+    char* token;
+    struct tokens_list_s* next;
+};
 
 /* All our function prototypes */
 
 static void            add_option_to_compiler(char *arg);
-static void            gather_from_list_file(char *filename);
-static void            add_file_to_process(char *filename);
+static struct tokens_list_s*    gather_from_list_file(char *filename);
+static void            add_file_to_process(char *filename, char process_extension);
+
+static void cmd_line_to_tokens(char* line, struct tokens_list_s** tokens);
+static void cmd_free_tokens(struct tokens_list_s* tokens);
 
 static void            SetNumber(arg_t *argument, char *arg);
 static void            SetStringConfig(arg_t *argument, char *arg);
@@ -167,7 +177,7 @@ static int             copy_file(char *src, char *src_extension, char *dest, cha
 static int             prepend_file(char *src, char *src_extension, char *dest, char *dest_extension, char *prepend);
 static int             copy_defc_file(char *name1, char *ext1, char *name2, char *ext2);
 static void            tempname(char *);
-static int             find_zcc_config_fileFile(const char *program, char *arg, int argc, char *buf, size_t buflen);
+static void            find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t buflen);
 static void            parse_option(char *option);
 static void            add_zccopt(char *fmt, ...);
 static char           *replace_str(const char *str, const char *old, const char *new);
@@ -180,6 +190,13 @@ static char           *strip_outer_quotes(char *p);
 static int             zcc_asprintf(char **s, const char *fmt, ...);
 static int             zcc_getdelim(char **lineptr, unsigned int *n, int delimiter, FILE *stream);
 
+struct explicit_extension
+{
+    char* filename;
+    char* extension;
+    UT_hash_handle hh;
+};
+
 static int             createapp = 0;    /* Go the next stage and create the app */
 static int             z80verbose = 0;
 static int             cleanup = 1;
@@ -190,6 +207,8 @@ static int             m4only = 0;
 static int             clangonly = 0;
 static int             llvmonly = 0;
 static int             makelib = 0;
+static int             explicit_file_type_c = 0;
+static struct explicit_extension* explicit_extensions = NULL;
 static int             build_bin = 0;
 static int             c_code_in_asm = 0;
 static int             opt_code_size = 0;
@@ -203,6 +222,7 @@ static int             mapon = 0;
 static int             globaldefon = 0;
 static char           *globaldefrefile = NULL;
 static int             preprocessonly = 0;
+static int             printmacros = 0;
 static int             relocate = 0;
 static int             relocinfo = 0;
 static int             sdcc_signed_char = 0;
@@ -210,9 +230,7 @@ static int             swallow_M = 0;
 static int             c_print_specs = 0;
 static int             c_zorg = -1;
 static int             c_sccz80_inline_ints = 0;
-static int             max_argc;
 static int             gargc;
-static char          **gargv;
 /* filelist has to stay as ** because we change suffix all the time */
 static int             nfiles = 0;
 static char          **filelist = NULL;              /* Working filenames   */
@@ -447,10 +465,12 @@ static option options[] = {
     { 0, "", OPT_HEADER, "Lifecycle options:", NULL, NULL, 0 },
     { 0, "m4", OPT_BOOL,  "Stop after processing m4 files" , &m4only, NULL, 0},
     { 'E', "preprocess-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after preprocessing files" , &preprocessonly, NULL, 0},
+    { 0, "dD", OPT_BOOL,  "Print macro definitions in -E mode in addition to normal output" , &printmacros, NULL, 0},
     { 'c', "compile-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after compiling .c .s .asm files to .o files" , &compileonly, NULL, 0},
     { 'a', "assemble-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after compiling .c .s files to .asm files" , &assembleonly, NULL, 0},
     { 'S', "assemble-only", OPT_BOOL|OPT_DOUBLE_DASH,  "Stop after compiling .c .s files to .asm files" , &assembleonly, NULL, 0},
     { 'x', NULL, OPT_BOOL,  "Make a library out of source files" , &makelib, NULL, 0},
+    { 0, "xc", OPT_BOOL,  "Explicitly specify file type as C" , &explicit_file_type_c, NULL, 0},
     { 0, "create-app", OPT_BOOL,  "Run appmake on the resulting binary to create emulator usable file" , &createapp, NULL, 0},
 
 
@@ -597,6 +617,14 @@ static int hassuffix(char *name, char *suffix)
 {
     int             nlen, slen;
 
+    {
+        struct explicit_extension* exp = NULL;
+        HASH_FIND_STR(explicit_extensions, name, exp);
+        if (exp && (strcmp(exp->extension, suffix) == 0)) {
+            return 1;
+        }
+    }
+
     nlen = strlen(name);
     slen = strlen(suffix);
 
@@ -632,6 +660,20 @@ static char *changesuffix(char *name, char *suffix)
     }
 
     return (r);
+}
+
+static int explicit_file_type_defined()
+{
+    return explicit_file_type_c;
+}
+
+static char* get_explicit_file_type()
+{
+    if (explicit_file_type_c) {
+        return ".c";
+    }
+
+    return NULL;
 }
 
 int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, enum iostyle ios, int number, int needsuffix, int src_is_original)
@@ -813,7 +855,7 @@ int linkthem(char *linker)
 
 int main(int argc, char **argv)
 {
-    int             i, ft, gc;
+    int             i, ft;
     char           *ptr;
     char            config_filename[FILENAME_MAX + 1];
     char            asmarg[4096];    /* Hell, that should be long enough! */
@@ -837,7 +879,6 @@ int main(int argc, char **argv)
     atexit(remove_temporary_files);
     add_option_to_compiler("");
 
-    gc = 1;            /* Set for the first argument to scan for */
     if (argc == 1) {
         print_help_text(argv[0]);
         exit(1);
@@ -845,17 +886,45 @@ int main(int argc, char **argv)
 
     /* Setup the install prefix based on ZCCCFG */
     if ((ptr = getenv("ZCCCFG")) != NULL) {
+        char ccc[1024];
 #ifdef WIN32
-        snprintf(config_filename, sizeof(config_filename), "%s\\..\\..\\", ptr);
+        snprintf(ccc, sizeof(ccc), "%s\\..\\..\\", ptr);
 #else
-        snprintf(config_filename, sizeof(config_filename), "%s/../../", ptr);
+        snprintf(ccc, sizeof(ccc), "%s/../../", ptr);
 #endif
-        c_install_dir = muststrdup(config_filename);
+        c_install_dir = muststrdup(ccc);
     }
 
     setup_default_configuration();
 
-    gc = find_zcc_config_fileFile(argv[0], argv[gc], gc, config_filename, sizeof(config_filename));
+    char configuration[1024] = {0};
+
+    for (gargc = 1; gargc < argc; gargc++) {
+        char* aa = argv[gargc];
+        if (aa[0] == '+') {
+            strcpy(configuration, aa);
+            break;
+        } else if (aa[0] == '@') {
+            struct tokens_list_s* tokens = gather_from_list_file(aa + 1);
+
+            struct tokens_list_s* token;
+            LL_FOREACH(tokens, token) {
+                char* tk = token->token;
+                if (tk[0] == '+') {
+                    strcpy(configuration, tk);
+                }
+            }
+            cmd_free_tokens(tokens);
+        }
+    }
+
+    if (strlen(configuration) == 0) {
+        fprintf(stderr, "A config file must be specified with +file as the first argument\n\n");
+        print_help_text(argv[0]);
+        exit(1);
+    }
+
+    find_zcc_config_fileFile(argv[0], configuration, config_filename, sizeof(config_filename));
     parse_configfile(config_filename);
 
 
@@ -880,18 +949,15 @@ int main(int argc, char **argv)
         aliases[aliases_num++] = strdup(ptr);
     }
 
-    /* Now, let's parse the command line arguments */
-    max_argc = argc;
-    gargv = argv;        /* Point argv to start of command line */
-
     processing_user_command_line_arg = 1;
-    argc = option_parse(&options[0], argc - 1, &argv[1]);
-    for (gargc = 1; gargc < argc+1; gargc++) {
+    argc = option_parse(&options[0], argc, argv);
+    for (gargc = 0; gargc < argc; gargc++) {
+        char* aa = argv[gargc];
         // We have some options left over, it may well be an alias
-        if (argv[gargc][0] == '-') {
-            parse_cmdline_arg(argv[gargc]);
-        } else {
-            add_file_to_process(argv[gargc]);
+        if (aa[0] == '-') {
+            parse_cmdline_arg(aa);
+        } else if (aa[0] != '+') {
+            add_file_to_process(aa, 1);
         }
     }
     processing_user_command_line_arg = 0; 
@@ -1042,6 +1108,10 @@ int main(int argc, char **argv)
     BuildOptions(&llvmarg, llvmarg ? "-disable-partial-libcall-inlining " : "-O2 -disable-partial-libcall-inlining ");
     BuildOptions(&llvmopt, llvmopt ? "-disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S " : "-O2 -disable-simplify-libcalls -disable-loop-vectorization -disable-slp-vectorization -S ");
 
+    if (printmacros)
+    {
+        BuildOptions(&cpparg, "-d");
+    }
 
     /* Peephole optimization level for sdcc */
     if (compiler_type == CC_SDCC && c_cpu != CPU_TYPE_GBZ80)
@@ -1118,7 +1188,7 @@ int main(int argc, char **argv)
     /* Activate target's crt file */
     if ((c_nocrt == 0) && build_bin) {
         /* append target crt to end of filelist */
-        add_file_to_process(c_crt0);
+        add_file_to_process(c_crt0, 0);
         /* move crt to front of filelist */
         ptr = original_filenames[nfiles - 1];
         memmove(&original_filenames[1], &original_filenames[0], (nfiles - 1) * sizeof(*original_filenames));
@@ -2211,6 +2281,15 @@ void add_option_to_compiler(char *arg)
 
 char *find_file_ext(char *filename)
 {
+    {
+        struct explicit_extension* explicit = NULL;
+        HASH_FIND_STR(explicit_extensions, filename, explicit);
+        if (explicit)
+        {
+            return explicit->extension;
+        }
+    }
+
     char *p;
 
     if ((p = last_path_char(filename)) == NULL)
@@ -2231,17 +2310,42 @@ int is_path_absolute(char *p)
 #endif
 }
 
-void gather_from_list_file(char *filename)
+static void cmd_line_to_tokens(char* line, struct tokens_list_s** tokens)
+{
+    char* p = strtok(line, " \r\n\t");
+
+    while (p != NULL)
+    {
+        struct tokens_list_s* token = mustmalloc(sizeof(struct tokens_list_s));
+        token->token = strdup(p);
+        LL_APPEND((*tokens), token);
+        p = strtok(NULL, " \r\n\t");
+    }
+}
+
+void cmd_free_tokens(struct tokens_list_s* tokens)
+{
+    struct tokens_list_s* tmp;
+    struct tokens_list_s* token;
+    LL_FOREACH_SAFE(tokens, token, tmp)
+    {
+        LL_DELETE(tokens, token);
+        free(token);
+    }
+}
+
+static struct tokens_list_s* gather_from_list_file(char *filename)
 {
     FILE *in;
     char *line, *p;
     unsigned int len;
     char pathname[FILENAME_MAX + 1];
-    char outname[FILENAME_MAX * 2 + 2];
+
+    struct tokens_list_s* tokens = NULL;
 
     /* reject non-filenames */
     if (((filename = strtok(filename, " \r\n\t")) == NULL) || !(*filename))
-        return;
+        return NULL;
 
     /* open list file for reading */
     if ((in = fopen(filename, "r")) == NULL) {
@@ -2258,43 +2362,7 @@ void gather_from_list_file(char *filename)
     /* read filenames from list file */
     line = NULL;
     while (zcc_getdelim(&line, &len, '\n', in) > 0) {
-        if (((p = strtok(line, " \r\n\t")) != NULL) && *p) {
-            /* check for comment line */
-            if ((*p == ';') || (*p == '#'))
-                continue;
-
-            /* clear output filename */
-            *outname = '\0';
-
-            /* prepend list file indicator if the filename is a list file */
-            if (*p == '@') {
-                strcpy(outname, "@");
-                if (((p = strtok(p + 1, " \r\n\t")) == NULL) || !(*p))
-                    continue;
-            }
-
-            /* sanity check */
-            if (strlen(p) > FILENAME_MAX) {
-                fprintf(stderr, "Filename is too long \"%s\"\n", p);
-                exit(1);
-            }
-
-            /* prepend path if filename is not absolute */
-            if (!lstcwd && !is_path_absolute(p))
-                strcat(outname, pathname);
-
-            /* append rest of filename */
-            strcat(outname, p);
-
-            /* add file to process */
-
-            if (strlen(outname) >= FILENAME_MAX) {
-                fprintf(stderr, "Filename is too long \"%s\"\n", outname);
-                exit(1);
-            }
-
-            add_file_to_process(outname);
-        }
+        cmd_line_to_tokens(line, &tokens);
     }
 
     if (!feof(in)) {
@@ -2304,9 +2372,11 @@ void gather_from_list_file(char *filename)
 
     free(line);
     fclose(in);
+
+    return tokens;
 }
 
-void add_file_to_process(char *filename)
+void add_file_to_process(char *filename, char process_extension)
 {
     FILE *fclaim;
     char tname[FILENAME_MAX + 1];
@@ -2317,8 +2387,53 @@ void add_file_to_process(char *filename)
         p = strip_outer_quotes(p);
 
         if (*p == '@') {
-            gather_from_list_file(p + 1);
-    } else if ((*p != ';') && (*p != '#')) { /* ignore filename leading with semicolon or hash */
+            struct tokens_list_s* tokens = gather_from_list_file(p + 1);
+
+            char outname[FILENAME_MAX * 2 + 2];
+            char pathname[FILENAME_MAX + 1];
+
+            struct tokens_list_s* token;
+            LL_FOREACH(tokens, token) {
+                p = token->token;
+
+                /* check for comment line */
+                if ((*p == ';') || (*p == '#'))
+                    continue;
+
+                /* clear output filename */
+                *outname = '\0';
+
+                /* sanity check */
+                if (strlen(p) > FILENAME_MAX) {
+                    fprintf(stderr, "Filename is too long \"%s\"\n", p);
+                    exit(1);
+                }
+
+                if (p[0] == '-') {
+                    parse_cmdline_arg(p);
+                } else if (p[0] != '+') {
+                    /* prepend path if filename is not absolute */
+                    if (!lstcwd && !is_path_absolute(p))
+                        strcat(outname, pathname);
+
+                    /* append rest of filename */
+                    strcat(outname, p);
+
+                    /* add file to process */
+
+                    if (strlen(outname) >= FILENAME_MAX) {
+                        fprintf(stderr, "Filename is too long \"%s\"\n", outname);
+                        exit(1);
+                    }
+
+                    add_file_to_process(outname, 1);
+                }
+
+                p = strtok(NULL, " \r\n\t");
+            }
+
+            cmd_free_tokens(tokens);
+        } else if ((*p != ';') && (*p != '#')) { /* ignore filename leading with semicolon or hash */
             /* Expand memory for filenames */
             if ((original_filenames = realloc(original_filenames, (nfiles + 1) * sizeof(char *))) == NULL) {
                 fprintf(stderr, "Unable to realloc memory for input filenames\n");
@@ -2333,24 +2448,32 @@ void add_file_to_process(char *filename)
                 exit(1);
             }
 
-            /* Add this file to the list of original files */
-            if (find_file_ext(p) == NULL) {
-                /* file without extension - see if it exists, exclude directories */
-                if ((stat(p, &tmp) == 0) && (!(tmp.st_mode & S_IFDIR))) {
-                    fprintf(stderr, "Unrecognized file type %s\n", p);
-                    exit(1);
-                }
-                /* input file has no extension and does not exist so assume .asm then .o then .asm.m4 */
-                original_filenames[nfiles] = mustmalloc((strlen(p) + 8) * sizeof(char));
-                strcpy(original_filenames[nfiles], p);
-                strcat(original_filenames[nfiles], ".asm");
-                if (stat(original_filenames[nfiles], &tmp) != 0) {
-                    strcpy(strrchr(original_filenames[nfiles], '.'), ".o");
-                    if (stat(original_filenames[nfiles], &tmp) != 0)
-                        strcpy(strrchr(original_filenames[nfiles], '.'), ".asm.m4");
-                }
-            } else {
+            if (process_extension && explicit_file_type_defined()) {
+                struct explicit_extension* exp = mustmalloc(sizeof(struct explicit_extension));
+                exp->filename = muststrdup(p);
+                exp->extension = get_explicit_file_type();
+                HASH_ADD_STR(explicit_extensions, filename, exp);
                 original_filenames[nfiles] = muststrdup(p);
+            } else {
+                /* Add this file to the list of original files */
+                if (find_file_ext(p) == NULL) {
+                    /* file without extension - see if it exists, exclude directories */
+                    if ((stat(p, &tmp) == 0) && (!(tmp.st_mode & S_IFDIR))) {
+                        fprintf(stderr, "Unrecognized file type %s\n", p);
+                        exit(1);
+                    }
+                    /* input file has no extension and does not exist so assume .asm then .o then .asm.m4 */
+                    original_filenames[nfiles] = mustmalloc((strlen(p) + 8) * sizeof(char));
+                    strcpy(original_filenames[nfiles], p);
+                    strcat(original_filenames[nfiles], ".asm");
+                    if (stat(original_filenames[nfiles], &tmp) != 0) {
+                        strcpy(strrchr(original_filenames[nfiles], '.'), ".o");
+                        if (stat(original_filenames[nfiles], &tmp) != 0)
+                            strcpy(strrchr(original_filenames[nfiles], '.'), ".asm.m4");
+                    }
+                } else {
+                    original_filenames[nfiles] = muststrdup(p);
+                }
             }
 
             /* Working file is the original file */
@@ -2819,6 +2942,17 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
                     free(name);
                 }
 
+                if (verbose) {
+                    FILE* f = fopen(ptr, "r");
+                    if (f) {
+                        static char buf[1024];
+                        unsigned long nread;
+                        while ((nread = fread(buf, 1, sizeof(buf), f)) > 0)
+                            fwrite(buf, 1, nread, stdout);
+                        fclose(f);
+                    }
+                }
+
                 /* copy to output directory */
                 if (copy_file(ptr, "", fname, "")) {
                     fprintf(stderr, "Couldn't copy output file %s\n", fname);
@@ -2932,7 +3066,7 @@ void tempname(char *filen)
 *
 *    If ZCCCFG doesn't exist then we take the c_install_dir/lib/config/zcc.cfg
 */
-int find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, size_t buflen)
+void find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t buflen)
 {
     FILE           *fp;
     char           *cfgfile;
@@ -2940,12 +3074,11 @@ int find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, 
     /* Scan for an option file on the command line */
     if (arg[0] == '+') {
         snprintf(buf, buflen, "%s", arg + 1);
-        gc++;        /* Increment first arg to search from */
         if (strstr(arg, ".cfg") != NULL) {
             if ((fp = fopen(buf, "r")) != NULL) {
                 /* Local config file */
                 fclose(fp);
-                return (gc);
+                return;
             }
         }
         cfgfile = getenv("ZCCCFG");
@@ -2956,7 +3089,7 @@ int find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, 
             }
             /* Config file in config directory */
             snprintf(buf, buflen, "%s/%s.cfg", cfgfile, arg + 1);
-            return (gc);
+            return;
         } else {
             snprintf(buf, buflen, "%s/lib/config/%s.cfg", c_install_dir, arg + 1);
         }
@@ -2964,7 +3097,7 @@ int find_zcc_config_fileFile(const char *program, char *arg, int gc, char *buf, 
          * User supplied invalid config file, let it fall over back
          * when
          */
-        return (gc);
+        return;
     }
     /* Without a config file, we should just print usage and then exit */
     fprintf(stderr, "A config file must be specified with +file as the first argument\n\n");
@@ -2984,7 +3117,7 @@ void parse_option(char *option)
             if (ptr[0] == '-') {
                 parse_cmdline_arg(strip_inner_quotes(ptr));
             } else {
-                add_file_to_process(strip_outer_quotes(ptr));
+                add_file_to_process(strip_outer_quotes(ptr), 1);
             }
             ptr = qstrtok(NULL, " \t\r\n");
         }

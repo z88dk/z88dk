@@ -49,7 +49,9 @@ int option_parse(option *args, int argc, char **argv)
 
     for ( i = 1; i < argc; i++ ) {
         option *myarg;
-        if ( argv[i][0] == '-') {
+        if ( argv[i][0] == '+') {
+            // do nothing
+        } else if ( argv[i][0] == '-') {
             char   *argstart = argv[i] + 1;
             int     doubledash = 0;
 
