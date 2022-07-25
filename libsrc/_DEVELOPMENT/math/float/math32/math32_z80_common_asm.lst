@@ -2,7 +2,7 @@ math/float/math32/asm/f32_fabs
 math/float/math32/asm/f32_fsceil
 math/float/math32/asm/f32_floor
 math/float/math32/asm/f32_fsconst
-math/float/math32/asm/d32_fsutil
+math/float/math32/asm/f32_fsutil
 math/float/math32/asm/f32_fssigdig
 math/float/math32/asm/f32_nan_b
 

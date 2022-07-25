@@ -28,15 +28,16 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_fp_am9511
+SECTION code_fp_math32
 
-EXTERN asm_am9511_zero, asm_am9511_max
+EXTERN m32_fszero, m32_fsmax
 
-PUBLIC asm_am9511_ldexp_callee
-
+PUBLIC m32_fsldexp_callee
+PUBLIC _m32_ldexpf
 
 ; float ldexpf (float x, int16_t pw2);
-.asm_am9511_ldexp_callee
+._m32_ldexpf
+.m32_fsldexp_callee
     ; evaluation of fraction and exponent
     ;
     ; enter : stack = int16_t pw2, float x, ret
@@ -87,7 +88,7 @@ PUBLIC asm_am9511_ldexp_callee
     pop de                      ; old mantissa and exponent
     pop af                      ; discard pw2
     push bc                     ; replace return
-    jp asm_am9511_zero          ; return IEEE signed ZERO in DEHL
+    jp m32_fszero               ; return IEEE signed ZERO in DEHL
 
 .max
     pop bc                      ; pop return
@@ -95,4 +96,4 @@ PUBLIC asm_am9511_ldexp_callee
     pop de                      ; old mantissa and exponent
     pop af                      ; discard pw2
     push bc                     ; replace return
-    jp asm_am9511_max           ; return IEEE signed infinity in DEHL
+    jp m32_fsmaxnnnnn           ; return IEEE signed infinity in DEHL

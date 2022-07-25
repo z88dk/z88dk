@@ -29,13 +29,15 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_fp_am9511
+SECTION code_fp_math32
 
-PUBLIC asm_am9511_frexp_callee
+PUBLIC m32_fsfrexp_callee
+PUBLIC _m32_frexpf
 
 
 ; float frexpf (float x, int *pw2);
-.asm_am9511_frexp_callee
+._m32_frexpf
+.m32_fsfrexp_callee
     ; evaluation of fraction and exponent
     ;
     ; enter : stack = float *pw2, float x, ret

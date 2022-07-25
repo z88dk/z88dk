@@ -12,9 +12,8 @@
 ; Multiplication by 2 is incrementing the exponent. An easy optimisation.
 ;
 ;-------------------------------------------------------------------------
-; FIXME clocks
-;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_math32
 
 PUBLIC m32_fsmul2_fastcall

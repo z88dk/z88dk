@@ -16,11 +16,14 @@
 ;-------------------------------------------------------------------------
 
 SECTION code_clib
-SECTION code_fp_am9511
+SECTION code_fp_math32
 
-PUBLIC asm_am9511_fmul2_fastcall
+PUBLIC m32_fsmul2_fastcall
+PUBLIC _m32_mul2f
 
-.asm_am9511_fmul2_fastcall
+
+._m32_mul2f
+.m32_fsmul2_fastcall
     rl de                       ; get exponent in d
 
     inc d

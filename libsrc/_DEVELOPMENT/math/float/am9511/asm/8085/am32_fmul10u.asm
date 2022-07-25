@@ -8,7 +8,7 @@
 ;  feilipu, January 2022
 ;
 ;-------------------------------------------------------------------------
-; asm_am9511_fmul10 - z80, z180, z80n floating point multiply by 10 positive
+; asm_am9511_fmul10 - 8085 floating point multiply by 10 positive
 ;-------------------------------------------------------------------------
 
 SECTION code_clib

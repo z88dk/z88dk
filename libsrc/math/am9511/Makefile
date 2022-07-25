@@ -27,7 +27,7 @@ $(OUTPUT_DIRECTORY)/am9511_8085.lib: $(addprefix obj/8085/, $(OBJECTS))
 	TYPE=8085 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/am9511_8085 @am9511.lst
 
 dirs:
-	@mkdir -p obj/z80/c obj/ixiy/c  obj/8085/c
+	@mkdir -p obj/z80/c obj/ixiy/c obj/8085/c
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt config_private.inc
