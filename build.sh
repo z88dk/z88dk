@@ -94,6 +94,25 @@ if [ $do_clean     != 1 ]          \
   show_help_and_exit 1
 fi
 
+# check that all module dependencies are downloaded
+MODULE_PATH=./ext
+MODULES="cpm optparse regex Unity UNIXem uthash"
+echo "Checking if module dependencies are met..."
+MOD_ERRORS=0
+for mod in $MODULES; do
+	if [ ! -d "$MODULE_PATH/$mod/.git/config" ]; then
+		echo "** Error: $GIT module '$mod' missing"
+		MOD_ERRORS=$(( MOD_ERRORS + 1 ))
+	fi
+done
+if [ "$MOD_ERRORS" -gt 0 ]; then
+	echo "Please clone this GIT repo with --recursive option"
+	exit 1
+else
+	echo "Module dependencies are present"
+fi
+
+
 if [ $do_clean = 1 -o $do_clean_bin = 1 ]; then              # Dont remove bin, as zsdcc and szdcpp must be built by hand in win32
   $MAKE clean
 fi
