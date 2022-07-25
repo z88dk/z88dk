@@ -198,6 +198,7 @@ install: install-clean
 	$(MAKE) -C support/graphics PREFIX=$(DESTDIR) install
 	$(MAKE) -C support/basck PREFIX=$(DESTDIR) install
 	$(MAKE) -C support/pv1000 PREFIX=$(DESTDIR) install
+	cp -r support/cmake $(prefix_share)/
 	if [ -f bin/z88dk-zsdcpp$(EXESUFFIX) ]; then cp bin/z88dk-zsdcpp$(EXESUFFIX) $(DESTDIR)/bin/; fi
 	if [ -f bin/z88dk-zsdcc$(EXESUFFIX) ]; then cp bin/z88dk-zsdcc$(EXESUFFIX) $(DESTDIR)/bin/; fi
 	cp -r include $(prefix_share)/
