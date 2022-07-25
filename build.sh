@@ -96,12 +96,12 @@ fi
 
 # check that all module dependencies are downloaded
 MODULE_PATH=./ext
-MODULES="cpm optparse regex Unity UNIXem uthash"
-echo "Checking if module dependencies are met..."
+MODULES="optparse regex Unity UNIXem uthash"
+echo "Checking if submodule dependencies are met..."
 MOD_ERRORS=0
 for mod in $MODULES; do
-	if [ ! -d "$MODULE_PATH/$mod/.git/config" ]; then
-		echo "** Error: $GIT module '$mod' missing"
+	if [ ! -r "$MODULE_PATH/$mod/.git" ]; then
+		echo "** Error: $GIT submodule '$mod' missing"
 		MOD_ERRORS=$(( MOD_ERRORS + 1 ))
 	fi
 done
