@@ -96,4 +96,4 @@ PUBLIC _m32_ldexpf
     pop de                      ; old mantissa and exponent
     pop af                      ; discard pw2
     push bc                     ; replace return
-    jp m32_fsmaxnnnnn           ; return IEEE signed infinity in DEHL
+    jp m32_fsmax                ; return IEEE signed infinity in DEHL
