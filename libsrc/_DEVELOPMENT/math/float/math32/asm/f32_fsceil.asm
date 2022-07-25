@@ -14,8 +14,9 @@ PUBLIC _m32_ceilf
 ; Entry: dehl = floating point number
 .m32_ceil_fastcall
     call m32_discardfraction
-    bit 7,d
-    ret NZ
+    ld a,d
+    rla
+    ret C
 
 .was_positive
     ; Add 1

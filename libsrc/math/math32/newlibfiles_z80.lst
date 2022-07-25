@@ -183,19 +183,20 @@
 ../../_DEVELOPMENT/math/float/math32/asm/h32_coeff_logf.asm
 ../../_DEVELOPMENT/math/float/math32/asm/h32_coeff_sinf.asm
 
+../../_DEVELOPMENT/math/float/math32/asm/f32_fabs.asm
+../../_DEVELOPMENT/math/float/math32/asm/f32_fsceil.asm
+../../_DEVELOPMENT/math/float/math32/asm/f32_floor.asm
+../../_DEVELOPMENT/math/float/math32/asm/f32_fsconst.asm
+../../_DEVELOPMENT/math/float/math32/asm/d32_fsutil.asm
+../../_DEVELOPMENT/math/float/math32/asm/f32_nan_b.asm
+
 ../../_DEVELOPMENT/math/float/math32/asm/z80/f32_discardfraction
-../../_DEVELOPMENT/math/float/math32/asm/z80/f32_nan_b.asm
 ../../_DEVELOPMENT/math/float/math32/asm/z80/d32_fsadd.asm
-../../_DEVELOPMENT/math/float/math32/asm/z80/f32_fsconst.asm
 ../../_DEVELOPMENT/math/float/math32/asm/z80/d32_fsconv.asm
 ../../_DEVELOPMENT/math/float/math32/asm/z80/d32_fsnormalize.asm
-../../_DEVELOPMENT/math/float/math32/asm/z80/d32_fsutil.asm
 ../../_DEVELOPMENT/math/float/math32/asm/z80/f32_f2long.asm
-../../_DEVELOPMENT/math/float/math32/asm/z80/f32_fabs.asm
-../../_DEVELOPMENT/math/float/math32/asm/z80/f32_floor.asm
 ../../_DEVELOPMENT/math/float/math32/asm/z80/f32_fpclassify.asm
 ../../_DEVELOPMENT/math/float/math32/asm/z80/f32_fsadd32.asm
-../../_DEVELOPMENT/math/float/math32/asm/z80/f32_fsceil.asm
 ../../_DEVELOPMENT/math/float/math32/asm/z80/f32_fscompare.asm
 ../../_DEVELOPMENT/math/float/math32/asm/z80/f32_fsdiv.asm
 ../../_DEVELOPMENT/math/float/math32/asm/z80/f32_fsdiv2.asm

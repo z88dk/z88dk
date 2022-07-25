@@ -14,8 +14,9 @@ PUBLIC _m32_floorf
 ; Entry: dehl = floating point number
 .m32_floor_fastcall
     call m32_discardfraction
-    bit 7,d
-    ret Z
+    ld a,d
+    rla
+    ret NC
 
 .was_negative
     ; And subtract 1
