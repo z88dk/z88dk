@@ -213,10 +213,6 @@
 ../../_DEVELOPMENT/math/float/math32/asm/z80/f32_fssqr.asm
 ../../_DEVELOPMENT/math/float/math32/asm/z80/f32_fssqrt.asm
 
-../../_DEVELOPMENT/math/float/math32/asm/z80/f32_z80_mulu_32h_24x24.asm
-../../_DEVELOPMENT/math/float/math32/asm/z80/f32_z80_mulu_32h_32x32.asm
-../../_DEVELOPMENT/math/float/math32/asm/z80/f32_z80_sqr_32h_24x24.asm
-
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_acosf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_acoshf.asm
 ../../_DEVELOPMENT/math/float/math32/c/asm/m32_asinf.asm
