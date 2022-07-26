@@ -31,10 +31,15 @@ jobs:
       uses: microsoft/setup-msbuild@v1.1
       with:
         msbuild-architecture: x86
-    - name: Build for release
+    - name: Create config.h
       run: |
         call win32\config\make_config.cmd
-        msbuild win32\z88dk.sln -t:rebuild -verbosity:diag -property:Configuration=Release
+    - name: Build for Debug
+      run: |
+        msbuild win32\z88dk.sln -t:rebuild -verbosity:diag -property:Platform=Win32 -property:Configuration=Debug
+    - name: Build for Release
+      run: |
+        msbuild win32\z88dk.sln -t:rebuild -verbosity:diag -property:Platform=Win32 -property:Configuration=Release
     - name: Copy files from nightly
       run: |
         copy /y bin\z88dk-z80asm.exe src\z80asm\
