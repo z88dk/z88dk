@@ -2942,7 +2942,7 @@ void copy_output_files_to_destdir(char *suffix, int die_on_fail)
                     free(name);
                 }
 
-                if (verbose) {
+                if (verbose && preprocessonly && printmacros) {
                     FILE* f = fopen(ptr, "r");
                     if (f) {
                         static char buf[1024];
