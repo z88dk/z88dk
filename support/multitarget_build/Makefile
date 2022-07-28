@@ -197,6 +197,9 @@ build/$(1)/$(2): $(addprefix build/$(1)/,$(patsubst %.c,%.o,$(filter %.c,$(3))))
 		$(addprefix build/$(1)/,$(patsubst %.c,%.o,$(wildcard $(target)/*.c))) \
 		$(addprefix build/$(1)/,$(patsubst %.asm,%.o,$(wildcard $(target)/*.asm))) 
 	$(Q)zcc +$(Z88DKTARGET_$(1)) -m -o $$@ $$^ $(CFLAGS) $(LDFLAGS) $(CFLAGS_$(1)) $(CFLAGS_$(basename $(2))) $(CFLAGS_$(1)_$(basename $(2))) $(ZCFLAGS_$(1)) $(LDFLAGS_$(1)) $(LDFLAGS_$(basename $(2))) $(LDFLAGS_$(1)_$(basename $(2)))  $(ZLDFLAGS_$(1)) -create-app 
+# delete object files to solve problem with appmake +zx80 creating a .o file
+# that is a tape image and not an object file, causing a second make to fail
+	$(Q)$(RM) build/$(1)/*.o
 endef
 
 
