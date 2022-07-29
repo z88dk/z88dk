@@ -69,6 +69,8 @@
  *
  * if (ERROR == (fd_out = creat(filename)))    ->    if((fd_out = fopen(filename,"wb"))==0)
  * 
+ * if (ERROR == close (fd))    ->    if (fclose (fd))
+ *
 */
 
 #define fgets(a,b) fgets(a,MAXLINE,b)
