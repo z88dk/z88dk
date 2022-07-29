@@ -56,10 +56,18 @@
  * 'buffers' were defined in place of file handles; the easiest way to port it
  * is to change the "char buf1[BUFSIZ]" into "FILE *buf1" declarations
  * 
- * The fopen calls can be changed, in example, follows:
- *       //if(fopen(argv[1],buf1)==ERROR)
- *       if(buf1=fopen(argv[1],"r"))
- * choose "r" or "w" properly.
+ *
+ * conversion hints:
+ *
+ * read(file, buffer, blocks)    ->    fread(buffer, 1, blocks*SECSIZ, file)
+ *   ..read() result was '0' when successful,  fread() gives the number of bytes successfully received
+ *
+ * if (blocks != write (fd_out, buffer, blocks))    ->    if (fwrite(buffer, 1, blocks*SECSIZ, fd_out) < blocks*SECSIZ)
+ *
+ * if (ERROR == (fd_in = open(filename, READ)))    ->    if((fd_in = fopen(filename,"rb"))==0)
+ *    ..READ was defined as '0' in BDS C
+ *
+ * if (ERROR == (fd_out = creat(filename)))    ->    if((fd_out = fopen(filename,"wb"))==0)
  * 
 */
 
@@ -92,6 +100,7 @@
 #define exec(a,b) execl(a,b)
 
 #define movmem(a,b,c) memcpy(b,a,c)
+#define setmem(a,b,c) memchr(a,c,b)
 
 #define alloc(a) malloc(a)
 #undef sbrk
