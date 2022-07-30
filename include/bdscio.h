@@ -71,6 +71,8 @@
  * 
  * if (ERROR == close (fd))    ->    if (fclose (fd))
  *
+ * seek(fd,3,0)    ->    fseek(tfd,3L,SEEK_SET)
+ *
 */
 
 #define fgets(a,b) fgets(a,MAXLINE,b)
