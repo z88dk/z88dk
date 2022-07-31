@@ -23,15 +23,15 @@ jobs:
     - name: Build binaries
       run: |
         export PATH=/usr/local/bin:$PATH
-        ./build.sh -l
+        ./build.sh -v -l
     - name: Build libraries
       run: |
         export PATH=/usr/local/bin:$PATH
-        ./build.sh -b
+        ./build.sh -v -b
     - name: Build examples
       run: |
         export PATH=/usr/local/bin:$PATH
-        ./build.sh -b -l -e
+        ./build.sh -v -b -l -e
     - name: Build sdcc needed for tests
       run: |
         export PATH=/usr/local/bin:$PATH
@@ -39,4 +39,4 @@ jobs:
     - name: Run tests
       run: |
         export PATH=/usr/local/bin:$PATH
-        ./build.sh -b -l -t
+        ./build.sh -v -b -l -t

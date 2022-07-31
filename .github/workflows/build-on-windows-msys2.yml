@@ -48,19 +48,19 @@ jobs:
       run: |
         set -e -x
         eval $(perl -Mlocal::lib)
-        ./build.sh -l
+        ./build.sh -v -l
     - name: Build libraries
       run: |
         set -e -x
         eval $(perl -Mlocal::lib)
-        ./build.sh -b
+        ./build.sh -v -b
     - name: Build examples
       run: |
         set -e -x
         eval $(perl -Mlocal::lib)
-        ./build.sh -b -l -e
+        ./build.sh -v -b -l -e
     - name: Run tests
       run: |
         set -e -x
         eval $(perl -Mlocal::lib)
-        ./build.sh -b -l -t
+        ./build.sh -v -b -l -t

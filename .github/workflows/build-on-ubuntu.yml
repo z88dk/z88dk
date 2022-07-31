@@ -32,19 +32,19 @@ jobs:
     - name: Build binaries
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        ./build.sh -l
+        ./build.sh -v -l
     - name: Build libraries
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        ./build.sh -b
+        ./build.sh -v -b
     - name: Build examples
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        ./build.sh -b -l -e
+        ./build.sh -v -b -l -e
     - name: Build sdcc needed for tests
       run: |
         make BUILD_SDCC=1 BUILD_SDCC_HTTP=1 bin/z88dk-zsdcc
     - name: Run tests
       run: |
         eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
-        ./build.sh -b -l -t
+        ./build.sh -v -b -l -t

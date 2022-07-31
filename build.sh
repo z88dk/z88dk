@@ -24,6 +24,7 @@ show_help_and_exit()
   echo "  -p    TARGET Build specified targets"
   echo "  -i    PATH Final installation directory"
   echo "  -t    Run tests"
+  echo "  -v    Be verbose"
   echo ""
   echo "Default is to build binaries and libraries"
   echo ""
@@ -69,7 +70,7 @@ export ZCCCFG
 export PATH
 
 
-while getopts "bcCehkltp:i:" arg; do       # Handle all given arguments
+while getopts "bcCehkltp:i:v" arg; do       # Handle all given arguments
   case "$arg" in
     b)     do_build=0              ;;   # Don't build
     c)     do_clean=1              ;;   # clean except bin/*
@@ -80,6 +81,7 @@ while getopts "bcCehkltp:i:" arg; do       # Handle all given arguments
     p)     TARGETS=$OPTARG  ;;
     i)     DESTDIR=$OPTARG  ;;
     t)     do_tests=1              ;;   # Run tests as well
+    v)     export Q=               ;;   # verbose makefiles
     h | *) show_help_and_exit 0    ;;   # Show help on demand
   esac
 done
