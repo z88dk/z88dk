@@ -1978,7 +1978,7 @@ int copyprepend_file(char *name1, char *ext1, char *name2, char *ext2, char *pre
     cmd = muststrdup(buffer);
 #endif
     if (verbose) {
-        printf("%s\n", buffer);
+        printf("%s\n", cmd);
         fflush(stdout);
     }
     ret = (system(cmd));
