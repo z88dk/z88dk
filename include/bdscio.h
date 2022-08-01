@@ -71,7 +71,7 @@
  * 
  * if (ERROR == close (fd))    ->    if (fclose (fd))
  *
- * seek(fd,3,0)    ->    fseek(tfd,3L,SEEK_SET)
+ * seek(fd,3,0)    ->    fseek(tfd,SECSIZ*3L,SEEK_SET)
  *
 */
 
@@ -111,7 +111,6 @@
 #define sbrk(a) malloc(a)?asm("\n"):-1
 
 #define isalpnum(a) isalnum(a)
-#define toupper(a) strupr(a)
 
 #define biosh(a,b) bios(a,b,0)
 
