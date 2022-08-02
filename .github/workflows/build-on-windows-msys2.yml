@@ -58,6 +58,13 @@ jobs:
       run: |
         set -e -x
         eval $(perl -Mlocal::lib)
+        # In the github workflow for windows/msys2 zcc fails very often with the
+        # message "Building application code failed", which means the system() call
+        # to execute z88dk-appmake failed before the sub-process started 
+        # (as there is no output from appmake). The problem seems to be solved if
+        # the process is somehow delayed (by including printf() statements)
+        # Delay execution by setting z80asm to verbose mode:
+        export Z80ASM=-v
         ./build.sh -v -b -l -e
     - name: Run tests
       run: |
