@@ -104,7 +104,7 @@
 #define exec(a,b) execl(a,b)
 
 #define movmem(a,b,c) memcpy(b,a,c)
-#define setmem(a,b,c) memchr(a,c,b)
+#define setmem(a,b,c) memset(a,c,b)
 
 #define alloc(a) malloc(a)
 #undef sbrk
