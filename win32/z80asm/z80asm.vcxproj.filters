@@ -87,7 +87,7 @@
     <ClInclude Include="..\..\src\z80asm\src\c\directives.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\c\expr_def.h">
+    <ClInclude Include="..\..\src\z80asm\src\c\expr1.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\expr1.h">
@@ -186,8 +186,11 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\args.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\c\symtab1.h">
-      <Filter>Header Files\c</Filter>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\asm.h">
+      <Filter>Header Files\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\cpu_rules.h">
+      <Filter>Resource Files\c</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -288,6 +291,12 @@
       <Filter>Source Files\c</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\cpp\args.cpp">
+      <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\asm.cpp">
+      <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\asm_parser_assembly.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
   </ItemGroup>

@@ -30,7 +30,7 @@ private:
 	string			m_name;
 	vector<string>	m_args;
 	string			m_body;
-	bool				m_is_expanding{ false };
+	bool			m_is_expanding{ false };
 };
 
 class Macros {

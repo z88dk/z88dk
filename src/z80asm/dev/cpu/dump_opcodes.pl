@@ -1,10 +1,17 @@
 #!/usr/bin/env perl
 
+#------------------------------------------------------------------------------
+# Build text table representation of opcodes.yaml
+#------------------------------------------------------------------------------
+
 use Modern::Perl;
 use YAML::Tiny;
 use Text::Table;
 
-my $yaml = YAML::Tiny->read("opcodes.yaml");
+@ARGV==2 or die "Usage: $0 input_file.yaml output_file.txt\n";
+my($input_file, $output_file) = @ARGV;
+
+my $yaml = YAML::Tiny->read($input_file);
 my %opcodes = %{$yaml->[0]};
 
 my $sep = \"|";
@@ -29,8 +36,7 @@ for my $asm (sort keys %opcodes) {
 	}
 }
 
-open(my $fh, ">", "opcodes.txt") or die $!;
+open(my $fh, ">", $output_file) or die $!;
 print $fh $tb->title;
 print $fh $tb->rule('=');
 print $fh $tb->body;
-

@@ -9,6 +9,8 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,6 +18,14 @@ extern "C" {
 
 #define TOSTR(x)	_TOSTR(x)
 #define _TOSTR(x)	#x
+
+// Assert for internal errors, similar to assert but not removed in release builds
+#define Assert(f)    do { \
+                        if (!(f)) { \
+                            fprintf(stderr, "z80asm panic at %s:%d\n", __FILE__, __LINE__); \
+                            exit(EXIT_FAILURE); \
+                        } \
+                    } while(0)
 
 // default file name extensions
 #define EXT_ASM     ".asm"    
@@ -185,6 +195,10 @@ const char* get_sym_filename(const char* filename);
 const char* get_map_filename(const char* filename);
 const char* get_reloc_filename(const char* filename);
 
+// symbol table
+struct Symbol;
+struct Symbol* define_static_def_sym(const char* name, long value);
+
 // expressions
 void parse_const_expr_eval(const char* expr_text, int* result, bool* error);
 void parse_expr_eval_if_condition(const char *expr_text, bool* condition, bool* error);
@@ -202,10 +216,6 @@ bool sfile_is_c_source();
 void sfile_set_filename(const char* filename);
 void sfile_set_line_num(int line_num, int line_inc);
 void sfile_set_c_source(bool f);
-
-// symbol table
-struct Symbol1;
-struct Symbol1* define_static_def_sym(const char* name, long value);
 
 // code area
 int get_PC();

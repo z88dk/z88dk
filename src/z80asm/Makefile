@@ -120,23 +120,12 @@ src/c/tokens.h : make_tokens.pl Makefile
 	dos2unix -q src/c/tokens.h
 
 # opcode tables generator
-dev: dev/cpu/opcodes.yaml \
-	 dev/cpu/opcodes.txt \
-	 dev/cpu/cpu_test_z80_ok.asm \
-	 dev/cpu/cpu_rules.h
-
-dev/cpu/opcodes.yaml: dev/cpu/make_opcodes.pl Makefile
-	cd dev/cpu && perl make_opcodes.pl && dos2unix -q opcodes.yaml
-
-dev/cpu/opcodes.txt: dev/cpu/opcodes.yaml dev/cpu/dump_opcodes.pl Makefile
-	cd dev/cpu && perl dump_opcodes.pl && dos2unix -q opcodes.txt
-
-dev/cpu/cpu_test_z80_ok.asm: dev/cpu/opcodes.yaml dev/cpu/make_cpu_test.pl Makefile
-	cd dev/cpu && perl make_cpu_test.pl && dos2unix -q cpu_test_*.asm
-
-dev/cpu/cpu_rules.h: dev/cpu/opcodes.yaml dev/cpu/make_cpu_rules.pl Makefile
-	cd dev/cpu && perl make_cpu_rules.pl && dos2unix -q cpu_rules.h
-
+dev: src/cpp/asm_parser_assembly.cpp
+src/cpp/asm_parser_assembly.cpp: $(wildcard dev/cpu/*.pl dev/cpu/*.y dev/cpu/Makefile)
+	$(MAKE) -$(MAKEFLAGS) -C dev/cpu
+	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
+	cp dev/cpu/asm_parser_assembly.cpp src/cpp/asm_parser_assembly.cpp
+	
 # reloc routine
 dev: src/c/reloc_code.c
 

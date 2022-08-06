@@ -1,0 +1,5 @@
+---
+'Keyword::ORG expr TType::End': "\t/*set_origin(expr);*/\n"
+'TType::Dot TType::Ident Keyword::EQU expr TType::End': "\t/*add_equ();*/\n"
+'TType::Ident Keyword::EQU expr TType::End': "\t/*add_equ();*/\n"
+'TType::Ident TType::Colon Keyword::EQU expr TType::End': "\t/*add_equ();*/\n"

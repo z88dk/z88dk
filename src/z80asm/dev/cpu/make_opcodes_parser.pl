@@ -1,13 +1,13 @@
 #!/usr/bin/env perl
 
 #------------------------------------------------------------------------------
-# Build ragel source code to parse opcodes
+# Build parser rules for parsing the opcodes
 #------------------------------------------------------------------------------
 
 use Modern::Perl;
 use YAML::Tiny;
 
-@ARGV==2 or die "Usage $0 input_file.yaml output_file.h\n";
+@ARGV==2 or die "Usage: $0 input_file.yaml output_file.yaml\n";
 my($input_file, $output_file) = @ARGV;
 
 my $yaml = YAML::Tiny->read($input_file);
@@ -18,7 +18,7 @@ my %parser;
 my @CPUS = sort keys %{$opcodes{"nop"}};
 
 for my $asm (sort keys %opcodes) {
-	my $tokens = parser_tokens($asm);
+	my @tokens = parser_tokens($asm);
 	
 	# check for parens
 	my $parens;
@@ -29,17 +29,18 @@ for my $asm (sort keys %opcodes) {
 	for my $cpu (sort keys %{$opcodes{$asm}}) {
 		my @ops = @{$opcodes{$asm}{$cpu}};
 		
-		$parser{$tokens}{$cpu}{$parens} = [$asm, @ops];
+		$parser{"@tokens"}{$cpu}{$parens} = [$asm, @ops];
 	}
 }
 
-open(my $rules, ">", $output_file) or die $!;
+my %parser_yaml;
 
 for my $tokens (sort keys %parser) {
-	print $rules $tokens, ' @{', "\n";
-	print $rules merge_cpu($parser{$tokens});
-	print $rules '}', "\n\n";
+	$parser_yaml{$tokens} = merge_cpu($parser{$tokens});
 }
+
+$yaml = YAML::Tiny->new(\%parser_yaml);
+$yaml->write($output_file);
 
 exit 0;
 
@@ -49,21 +50,22 @@ sub parser_tokens {
 	
 	while (!/\G \z 				/gcx) {
 		if (/\G \s+ 			/gcx) {}
-		elsif (/\G \( (\w+)		/gcx) { push @tokens, "_TK_IND_".uc($1); }
-		elsif (/\G , 			/gcx) { push @tokens, "_TK_COMMA"; }
-		elsif (/\G \) 			/gcx) { push @tokens, "_TK_RPAREN"; }
 		elsif (/\G \( %[nmh] \)	/gcx) { push @tokens, "expr"; }
 		elsif (/\G    %[snmMj]	/gcx) { push @tokens, "expr"; }
 		elsif (/\G \+ %[dsu]	/gcx) { push @tokens, "expr"; }
 		elsif (/\G    %[c]		/gcx) { push @tokens, "const_expr"; }
-		elsif (/\G    (\w+)	'	/gcx) { push @tokens, "_TK_".uc($1)."1"; }
-		elsif (/\G    (\w+)		/gcx) { push @tokens, "_TK_".uc($1); }
-		elsif (/\G \+   		/gcx) { push @tokens, "_TK_PLUS"; }
-		elsif (/\G \-   		/gcx) { push @tokens, "_TK_MINUS"; }
-		elsif (/\G \.   		/gcx) { push @tokens, "_TK_DOT"; }
+		elsif (/\G    (\w+)	'	/gcx) { push @tokens, "Keyword::".uc($1)."1"; }
+		elsif (/\G    (\w+)		/gcx) { push @tokens, "Keyword::".uc($1); }
+		elsif (/\G \(    		/gcx) { push @tokens, "TType::LParen"; }
+		elsif (/\G , 			/gcx) { push @tokens, "TType::Comma"; }
+		elsif (/\G \) 			/gcx) { push @tokens, "TType::RParen"; }
+		elsif (/\G \+   		/gcx) { push @tokens, "TType::Plus"; }
+		elsif (/\G \-   		/gcx) { push @tokens, "TType::Minus"; }
+		elsif (/\G \.   		/gcx) { push @tokens, "TType::Dot"; }
 		else { die "$_ ; ", substr($_, pos($_)||0) }
 	}
-	return join(' ', ('| label?', @tokens, "_TK_NEWLINE"));
+	push @tokens, "TType::End";
+	return @tokens;
 }
 
 sub parse_code {
@@ -75,21 +77,21 @@ sub parse_code {
 		my $op1 = $ops[0][0];
 		my $op2 = $ops[1][0];
 		push @code,
-			"DO_STMT_LABEL();",
-			"Expr1 *target_expr = pop_expr(ctx);",
+			"/*DO_STMT_LABEL();",
+			"Expr *target_expr = pop_expr(ctx);",
 			"const char *end_label = autolabel();",
-			"Expr1 *end_label_expr = parse_expr(end_label);",
+			"Expr *end_label_expr = parse_expr(end_label);",
 			"add_opcode_nn(0x".fmthex($op1).", end_label_expr);",	# jump over
 			"add_opcode_nn(0x".fmthex($op2).", target_expr);",		# call
-			"asm_LABEL_offset(end_label, 6);";
+			"asm_LABEL_offset(end_label, 6);*/";
 	}
 	# handle special case of dec b;jr nz, %j
 	elsif (@ops==2 && $ops[0][0] == 0x05 && $ops[1][1] eq '%j') {
 		my $opc = "0x".fmthex($ops[1][0]);
 		push @code, 
-			"DO_stmt(0x05);",
+			"/*DO_stmt(0x05)*/;",
 			# compensate for extra byte
-			"add_opcode_jr_n($opc, pop_expr(ctx), 1);";	
+			"/*add_opcode_jr_n($opc, pop_expr(ctx), 1)*/;";	
 	}
 	else {
 		for my $bin (@ops) {
@@ -112,12 +114,12 @@ sub parse_code_opcode {
 	if ($bin =~ s/ \@(\w+)//) {
 		my $func = $1;
 		push @code, 
-			"DO_STMT_LABEL();",
-			"add_call_emul_func(\"$func\");";
+			"/*DO_STMT_LABEL();",
+			"add_call_emul_func(\"$func\")*/;";
 	}
 	elsif ($asm =~ /^rst /) {
 		push @code, 
-			"DO_STMT_LABEL();",
+			"/*DO_STMT_LABEL();",
 			"if (expr_error) { error_expected_const_expr(); } else {",
 			"if (expr_value > 0 && expr_value < 8) expr_value *= 8;",
 			"switch (expr_value) {",
@@ -130,21 +132,21 @@ sub parse_code_opcode {
 			"case 0x10: case 0x18: case 0x20: case 0x28: case 0x38:",
 			"  DO_stmt(0xC7 + expr_value); break;",
 			"default: error_int_range(expr_value);",
-			"}}";
+			"}}*/";
 	}
 	elsif ($asm =~ /^mmu %c, %n/) {
 		push @code, 
-			"DO_STMT_LABEL();",
+			"/*DO_STMT_LABEL();",
 			"if (expr_error) { error_expected_const_expr(); } else {",
 			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
-			"DO_stmt_n(0xED9150 + expr_value);}";
+			"DO_stmt_n(0xED9150 + expr_value);}*/";
 	}
 	elsif ($asm =~ /^mmu %c, a/) {
 		push @code, 
-			"DO_STMT_LABEL();",
+			"/*DO_STMT_LABEL();",
 			"if (expr_error) { error_expected_const_expr(); } else {",
 			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
-			"DO_stmt(0xED9250 + expr_value);}";
+			"DO_stmt(0xED9250 + expr_value);}*/";
 		my $code = join("\n", @code);
 		return $code;
 	}
@@ -185,11 +187,11 @@ sub parse_code_opcode {
 		my @values = eval($1); die "$cpu, $asm, @bin, $1" if $@;
 		$bin =~ s/%c/expr_value/g;		# replace all other %c in bin
 		push @code,
-			"if (expr_error) { error_expected_const_expr(); } else {",
+			"/*if (expr_error) { error_expected_const_expr(); } else {",
 			"switch (expr_value) {",
 			join(" ", map {"case $_:"} @values)." break;",
 			"default: error_int_range(expr_value);",
-			"}}";
+			"}}*/";
 			
 		if ($bin =~ s/ %d// || $bin =~ s/%d //) {
 			$stmt = "DO_stmt_idx";
@@ -234,7 +236,7 @@ sub parse_code_opcode {
 			$opc .= ' << '.($bytes_shift * 8) if $bytes_shift;
 			$opc .= ')';
 		}
-		push @code, $stmt."(".$opc.$extra_arg.");";
+		push @code, "/*".$stmt."(".$opc.$extra_arg.")*/;";
 	}
 
 	my $code = join("\n", @code);
@@ -269,7 +271,7 @@ sub merge_cpu {
 			}
 			$ret .= "\n$code\nbreak;\n"
 		}
-		$ret .= "default: error_illegal_ident(); }\n";
+		$ret .= "default: /*error_illegal_ident()*/; }\n";
 	}
 	
 	return $ret;
@@ -278,7 +280,7 @@ sub merge_cpu {
 sub merge_parens {
 	my($cpu, $t) = @_;
 	my $ret = '';
-	
+
 	if ($t->{no_expr}) {
 		die if $t->{expr_no_parens} || $t->{expr_in_parens};
 		return parse_code($cpu, @{$t->{no_expr}});
@@ -287,11 +289,11 @@ sub merge_parens {
 		die;
 	}
 	elsif (!$t->{expr_no_parens} && $t->{expr_in_parens}) {
-		return "if (!expr_in_parens) return false;\n".
+		return "/*if (!expr_in_parens) return false;*/\n".
 				parse_code($cpu, @{$t->{expr_in_parens}});			
 	}
 	elsif ($t->{expr_no_parens} && !$t->{expr_in_parens}) {
-		return "if (expr_in_parens) warn_expr_in_parens();\n".
+		return "/*if (expr_in_parens) warn_expr_in_parens();*/\n".
 				parse_code($cpu, @{$t->{expr_no_parens}});
 	}
 	elsif ($t->{expr_no_parens} && $t->{expr_in_parens}) {
@@ -299,7 +301,7 @@ sub merge_parens {
 			extract_common(parse_code($cpu, @{$t->{expr_in_parens}}),
 						   parse_code($cpu, @{$t->{expr_no_parens}}));
 		return $common.
-				"if (expr_in_parens) { $in_parens } else { $no_parens }";
+				"#if 0\nif (expr_in_parens) { $in_parens } else { $no_parens }\n#endif\n";
 	}
 	else {
 		die;
