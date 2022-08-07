@@ -45,15 +45,9 @@
  * See https://www.freertos.org/a00110.html.
  *----------------------------------------------------------*/
 
-// And on to the things the same no matter the Z80 type...
+/* And on to the things the same no matter the Z180 type... */
 #define configUSE_PREEMPTION                1
 
-// Define configUSE_IDLE_HOOK
-#ifndef configUSE_IDLE_HOOK
-    #define configUSE_IDLE_HOOK             0
-#endif
-
-#define configUSE_TICK_HOOK                 0
 #define configCPU_CLOCK_HZ                  ( ( uint32_t ) __CPU_CLOCK )
 #define configMAX_PRIORITIES                8
 #define configIDLE_SHOULD_YIELD             1
@@ -75,6 +69,9 @@
 
 #define configSUPPORT_DYNAMIC_ALLOCATION    1
 #define configSUPPORT_STATIC_ALLOCATION     0
+
+#define configUSE_IDLE_HOOK                 1
+#define configUSE_TICK_HOOK                 0
 
 /* Timer definitions. */
 #define configUSE_TIMERS                    1
@@ -101,7 +98,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelay                      1
 #define INCLUDE_xTaskGetSchedulerState          0
 #define INCLUDE_xTaskGetIdleTaskHandle          0 // create an idle task handle.
-#define INCLUDE_xTaskGetCurrentTaskHandle       0
+#define INCLUDE_xTaskGetCurrentTaskHandle       1
 #define INCLUDE_uxTaskGetStackHighWaterMark     1
 
 /**
