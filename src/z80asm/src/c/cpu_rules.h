@@ -12227,9 +12227,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xE2, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -12242,9 +12242,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xEA, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -12257,9 +12257,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xF2, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -12290,9 +12290,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xEA, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -12323,9 +12323,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xFA, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -12342,9 +12342,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xE2, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -12361,9 +12361,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xEA, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -12380,9 +12380,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xE2, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -12445,9 +12445,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xE2, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -12460,9 +12460,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xEA, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -12475,9 +12475,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xF2, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -12742,9 +12742,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xEA, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -13021,9 +13021,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xE2, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -13086,9 +13086,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xEA, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -13105,9 +13105,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xE2, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -13152,9 +13152,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xE2, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -13167,9 +13167,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xEA, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -13182,9 +13182,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xF2, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -13215,9 +13215,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xEA, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -13248,9 +13248,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xFA, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -13267,9 +13267,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xE2, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -13286,9 +13286,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xEA, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);
@@ -13305,9 +13305,9 @@ switch (option_cpu()) {
 case CPU_R2KA: case CPU_R3K: 
 if (expr_in_parens) warn_expr_in_parens();
 DO_STMT_LABEL();
-Expr *target_expr = pop_expr(ctx);
+Expr1 *target_expr = pop_expr(ctx);
 const char *end_label = autolabel();
-Expr *end_label_expr = parse_expr(end_label);
+Expr1 *end_label_expr = parse_expr(end_label);
 add_opcode_nn(0xE2, end_label_expr);
 add_opcode_nn(0xCD, target_expr);
 asm_LABEL_offset(end_label, 6);

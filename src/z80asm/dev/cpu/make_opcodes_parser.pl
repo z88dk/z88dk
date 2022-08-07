@@ -78,9 +78,9 @@ sub parse_code {
 		my $op2 = $ops[1][0];
 		push @code,
 			"/*DO_STMT_LABEL();",
-			"Expr *target_expr = pop_expr(ctx);",
+			"Expr1 *target_expr = pop_expr(ctx);",
 			"const char *end_label = autolabel();",
-			"Expr *end_label_expr = parse_expr(end_label);",
+			"Expr1 *end_label_expr = parse_expr(end_label);",
 			"add_opcode_nn(0x".fmthex($op1).", end_label_expr);",	# jump over
 			"add_opcode_nn(0x".fmthex($op2).", target_expr);",		# call
 			"asm_LABEL_offset(end_label, 6);*/";
