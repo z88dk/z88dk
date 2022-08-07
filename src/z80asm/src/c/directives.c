@@ -52,7 +52,7 @@ static void url_encode(const char *s, char *enc)
 *   LABEL: define a label at the current location
 *----------------------------------------------------------------------------*/
 static void define_label_offset(const char* name, int offset) {
-	Symbol* sym;
+	Symbol1* sym;
 
 	if (get_phased_PC() >= 0)
 		sym = define_symbol(name, get_phased_PC() + offset, TYPE_CONSTANT);
@@ -71,9 +71,9 @@ void asm_LABEL_offset(const char* name, int offset) {
 		char fname_encoded[FILENAME_MAX * 2];
 		url_encode(sfile_filename(), fname_encoded);
 
-	Str_sprintf(name, "__ASM_LINE_%ld_%s", get_error_line_num(), fname_encoded);
-	if (!find_local_symbol(Str_data(name)))
-		define_label_offset(Str_data(name), 0);
+		Str_sprintf(name, "__ASM_LINE_%ld_%s", get_error_line_num(), fname_encoded);
+		if (!find_local_symbol(Str_data(name)))
+			define_label_offset(Str_data(name), 0);
 
 		STR_DELETE(name);
 	}

@@ -196,8 +196,8 @@ const char* get_map_filename(const char* filename);
 const char* get_reloc_filename(const char* filename);
 
 // symbol table
-struct Symbol;
-struct Symbol* define_static_def_sym(const char* name, long value);
+struct Symbol1;
+struct Symbol1* define_static_def_sym(const char* name, long value);
 
 // expressions
 void parse_const_expr_eval(const char* expr_text, int* result, bool* error);
