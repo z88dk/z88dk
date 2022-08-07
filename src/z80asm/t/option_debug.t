@@ -43,8 +43,6 @@ run_ok("z88dk-z80asm -b -debug ${test}.asm ${test}1.asm");
 check_text_file("${test}.map", <<'END');
 main                            = $0000 ; addr, local, , test_t_option_debug, , test_t_option_debug.asm:3
 __ASM_LINE_3_test_5ft_5foption_5fdebug_2easm = $0000 ; addr, local, , test_t_option_debug, , test_t_option_debug.asm:3
-__ASM_LINE_4_test_5ft_5foption_5fdebug_2easm = $0000 ; addr, local, , test_t_option_debug, , test_t_option_debug.asm:4
-__ASM_LINE_5_test_5ft_5foption_5fdebug_2easm = $0003 ; addr, local, , test_t_option_debug, , test_t_option_debug.asm:5
 __C_LINE_1_test_5ft_5foption_5fdebug1_2ec = $0004 ; addr, local, , test_t_option_debug1, , test_t_option_debug1.c:1
 __C_LINE_2_test_5ft_5foption_5fdebug1_2ec = $0008 ; addr, local, , test_t_option_debug1, , test_t_option_debug1.c:2
 func                            = $0004 ; addr, public, , test_t_option_debug1, , test_t_option_debug1.c:1
@@ -93,8 +91,6 @@ __C_LINE_2_test_5ft_5foption_5fdebug_2ec = $80CD ; addr, local, , test_t_option_
 __C_LINE_2_test_5ft_5foption_5fdebug_2ec_3a_3amain_3a_3a0_3a_3a1 = $8286 ; addr, local, , test_t_option_debug_c, code_compiler, test_t_option_debug.c::main::0::1:2
 __C_LINE_3_test_5ft_5foption_5fdebug_2ec_3a_3amain_3a_3a1_3a_3a2 = $8289 ; addr, local, , test_t_option_debug_c, code_compiler, test_t_option_debug.c::main::1::2:3
 __ASM_LINE_2_test_5ft_5foption_5fdebug1_2easm = $80CD ; addr, local, , test_t_option_debug1_asm, , test_t_option_debug1.asm:2
-__ASM_LINE_3_test_5ft_5foption_5fdebug1_2easm = $80CD ; addr, local, , test_t_option_debug1_asm, , test_t_option_debug1.asm:3
-__ASM_LINE_4_test_5ft_5foption_5fdebug1_2easm = $80D0 ; addr, local, , test_t_option_debug1_asm, , test_t_option_debug1.asm:4
 _main                           = $8286 ; addr, public, , test_t_option_debug_c, code_compiler, test_t_option_debug.c::main::0::1:2
 _one                            = $80CD ; addr, public, , test_t_option_debug1_asm, , test_t_option_debug1.asm:2
 END

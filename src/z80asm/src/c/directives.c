@@ -73,19 +73,19 @@ void asm_cond_LABEL(Str* label)
 	if (Str_len(label)) {
 		asm_LABEL(Str_data(label));
 		Str_len(label) = 0;
-	}
 
-	if (option_debug() && !sfile_is_c_source()) {
-		STR_DEFINE(name, STR_SIZE);
+		if (option_debug() && !sfile_is_c_source()) {
+			STR_DEFINE(name, STR_SIZE);
 
-		char fname_encoded[FILENAME_MAX * 2];
-		url_encode(sfile_filename(), fname_encoded);
+			char fname_encoded[FILENAME_MAX * 2];
+			url_encode(sfile_filename(), fname_encoded);
 
-		Str_sprintf(name, "__ASM_LINE_%ld_%s", get_error_line_num(), fname_encoded);
-		if (!find_local_symbol(Str_data(name)))
-			asm_LABEL(Str_data(name));
+			Str_sprintf(name, "__ASM_LINE_%ld_%s", get_error_line_num(), fname_encoded);
+			if (!find_local_symbol(Str_data(name)))
+				asm_LABEL(Str_data(name));
 
-		STR_DELETE(name);
+			STR_DELETE(name);
+		}
 	}
 }
 
