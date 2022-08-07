@@ -53,9 +53,9 @@ typedef enum {
 extern char *sym_scope_str[];
 
 /*-----------------------------------------------------------------------------
-*   Symbol
+*   Symbol1
 *----------------------------------------------------------------------------*/
-CLASS( Symbol )
+CLASS( Symbol1 )
 	const char	   *name;				/* name, kept in strpool */
 	long			value;				/* computed value of symbol */
 	sym_type_t		type;				/* type of symbol */
@@ -73,13 +73,13 @@ CLASS( Symbol )
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
-*   Symbol API
+*   Symbol1 API
 *----------------------------------------------------------------------------*/
 
 /* create a new symbol, needs to be deleted by OBJ_DELETE()
    adds a reference to the page were referred to */
-extern Symbol *Symbol_create(const char *name, long value, sym_type_t type, sym_scope_t scope,
+extern Symbol1 *Symbol_create(const char *name, long value, sym_type_t type, sym_scope_t scope,
 							  struct Module *module, struct Section *section );
 
 /* return full symbol name NAME@MODULE stored in strpool */
-extern const char *Symbol_fullname( Symbol *sym );
+extern const char *Symbol_fullname( Symbol1 *sym );

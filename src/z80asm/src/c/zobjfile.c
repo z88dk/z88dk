@@ -35,17 +35,17 @@ char Z80objhdr[] = "Z80RMF" OBJ_VERSION;
 static long write_expr(FILE* fp)
 {
 	STR_DEFINE(last_sourcefile, STR_SIZE);		/* keep last source file referred to in object */
-	ExprListElem* iter;
-	Expr* expr;
+	Expr1ListElem* iter;
+	Expr1* expr;
 	char range;
 	const char* target_name;
 	long expr_ptr;
 
-	if (ExprList_empty(CURRENTMODULE->exprs))	/* no expressions */
+	if (Expr1List_empty(CURRENTMODULE->exprs))	/* no expressions */
 		return -1;
 
 	expr_ptr = ftell(fp);
-	for (iter = ExprList_first(CURRENTMODULE->exprs); iter != NULL; iter = ExprList_next(iter))
+	for (iter = Expr1List_first(CURRENTMODULE->exprs); iter != NULL; iter = Expr1List_next(iter))
 	{
 		expr = iter->obj;
 
@@ -103,16 +103,16 @@ static long write_expr(FILE* fp)
 	return expr_ptr;
 }
 
-static int write_symbols_symtab(FILE* fp, SymbolHash* symtab)
+static int write_symbols_symtab(FILE* fp, Symbol1Hash* symtab)
 {
-	SymbolHashElem* iter;
-	Symbol* sym;
+	Symbol1HashElem* iter;
+	Symbol1* sym;
 	int written = 0;
 	char scope, type;
 
-	for (iter = SymbolHash_first(symtab); iter; iter = SymbolHash_next(iter))
+	for (iter = Symbol1Hash_first(symtab); iter; iter = Symbol1Hash_next(iter))
 	{
-		sym = (Symbol*)iter->value;
+		sym = (Symbol1*)iter->value;
 
 		/* scope */
 		scope =
@@ -169,16 +169,16 @@ static long write_symbols(FILE* fp)
 
 static long write_externsym(FILE* fp)
 {
-	SymbolHashElem* iter;
-	Symbol* sym;
+	Symbol1HashElem* iter;
+	Symbol1* sym;
 	long externsym_ptr;
 	int written = 0;
 
 	externsym_ptr = ftell(fp);
 
-	for (iter = SymbolHash_first(global_symtab); iter; iter = SymbolHash_next(iter))
+	for (iter = Symbol1Hash_first(global_symtab); iter; iter = Symbol1Hash_next(iter))
 	{
-		sym = (Symbol*)iter->value;
+		sym = (Symbol1*)iter->value;
 
 		if (sym->is_touched &&
 			(sym->scope == SCOPE_EXTERN || (!sym->is_defined && sym->scope == SCOPE_GLOBAL)))

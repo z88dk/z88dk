@@ -9,7 +9,7 @@ Repository: https://github.com/z88dk/z88dk
 
 #include "die.h"
 #include "directives.h"
-#include "expr.h"
+#include "expr1.h"
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
@@ -18,7 +18,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "parse.h"
 #include "scan.h"
 #include "strutil.h"
-#include "symtab.h"
+#include "symtab1.h"
 #include "types.h"
 #include "utstring.h"
 #include "zobjfile.h"
@@ -121,7 +121,7 @@ static void do_assemble(const char *src_filename )
 
 	remove_all_local_syms();
 	remove_all_global_syms();
-	ExprList_remove_all(CURRENTMODULE->exprs);
+	Expr1List_remove_all(CURRENTMODULE->exprs);
 
 	if (option_verbose())
 		putchar('\n');    /* separate module texts */

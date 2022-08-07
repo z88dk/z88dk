@@ -15,8 +15,8 @@ Assembled module, i.e. result of assembling a .asm file
 #include "classlist.h"
 #include "classhash.h"
 #include "codearea.h"
-#include "expr.h"
-#include "symtab.h"
+#include "expr1.h"
+#include "symtab1.h"
 #include "types.h"
 
 #include "objfile.h"
@@ -28,8 +28,8 @@ CLASS( Module )
 	const char	*modname;			/* module name, kept in strpool */
 	const char	*filename;			/* source file name, kept in strpool */
 	int			 module_id;			/* sequence number of linked modules in sections */
-    ExprList	*exprs;				/* list of expressions */
-	SymbolHash	*local_symtab;		/* module local symbols */
+    Expr1List	*exprs;				/* list of expressions */
+	Symbol1Hash	*local_symtab;		/* module local symbols */
 
 	objfile_t	*objfile;
 END_CLASS;

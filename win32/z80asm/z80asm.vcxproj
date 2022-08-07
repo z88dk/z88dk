@@ -215,7 +215,7 @@
     <ClInclude Include="..\..\src\z80asm\src\c\common.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\dbg.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\directives.h" />
-    <ClInclude Include="..\..\src\z80asm\src\c\expr.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\expr1.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\expr_def.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\init.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\libfile.h" />
@@ -257,7 +257,7 @@
     <ClCompile Include="..\..\src\z80asm\src\c\common.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\dbg.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\directives.c" />
-    <ClCompile Include="..\..\src\z80asm\src\c\expr.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\expr1.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\libfile.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\list.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\minunit.c" />
@@ -270,7 +270,7 @@
     <ClCompile Include="..\..\src\z80asm\src\c\str.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\strhash.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\sym.c" />
-    <ClCompile Include="..\..\src\z80asm\src\c\symtab.c" />
+    <ClCompile Include="..\..\src\z80asm\src\c\symtab1.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\z80asm.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\z80pass.c" />
     <ClCompile Include="..\..\src\z80asm\src\c\zobjfile.c" />

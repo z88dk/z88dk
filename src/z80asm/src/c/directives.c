@@ -17,7 +17,7 @@ Assembly directives.
 #include "module.h"
 #include "parse.h"
 #include "strutil.h"
-#include "symtab.h"
+#include "symtab1.h"
 #include "types.h"
 #include "utstring.h"
 #include "z80asm.h"
@@ -53,7 +53,7 @@ static void url_encode(const char *s, char *enc)
 *----------------------------------------------------------------------------*/
 void asm_LABEL_offset(const char* name, int offset)
 {
-	Symbol* sym;
+	Symbol1* sym;
 
 	if (get_phased_PC() >= 0)
 		sym = define_symbol(name, get_phased_PC() + offset, TYPE_CONSTANT);
@@ -290,13 +290,13 @@ void asm_DEFINE(const char* name)
 
 void asm_UNDEFINE(const char* name)
 {
-	SymbolHash_remove(CURRENTMODULE->local_symtab, name);
+	Symbol1Hash_remove(CURRENTMODULE->local_symtab, name);
 }
 
 /*-----------------------------------------------------------------------------
 *   define a constant or expression
 *----------------------------------------------------------------------------*/
-void asm_DEFC(const char* name, Expr* expr)
+void asm_DEFC(const char* name, Expr1* expr)
 {
 	int value;
 
@@ -312,7 +312,7 @@ void asm_DEFC(const char* name, Expr* expr)
 			expr->range = RANGE_WORD;
 			expr->target_name = spool_add(name);
 
-			ExprList_push(&CURRENTMODULE->exprs, expr);
+			Expr1List_push(&CURRENTMODULE->exprs, expr);
 
 			/* create symbol */
 			define_symbol(expr->target_name, 0, TYPE_COMPUTED);
@@ -363,22 +363,22 @@ void asm_DEFB_str(const char* str, int length)
 		add_opcode((*str++) & 0xFF);
 }
 
-void asm_DEFB_expr(Expr* expr)
+void asm_DEFB_expr(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, expr);
 }
 
-void asm_DEFP(Expr* expr)
+void asm_DEFP(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_PTR24, expr);
 }
 
-void asm_PTR(Expr* expr)
+void asm_PTR(Expr1* expr)
 {
 	asm_DEFP(expr);
 }
 
-void asm_DP(Expr* expr)
+void asm_DP(Expr1* expr)
 {
 	asm_DEFP(expr);
 }
@@ -386,42 +386,42 @@ void asm_DP(Expr* expr)
 /*-----------------------------------------------------------------------------
 *   DEFW, DEFQ, DEFDB - add 2-byte and 4-byte expressions
 *----------------------------------------------------------------------------*/
-void asm_DEFW(Expr* expr)
+void asm_DEFW(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_WORD, expr);
 }
 
-void asm_WORD(Expr* expr)
+void asm_WORD(Expr1* expr)
 {
 	asm_DEFW(expr);
 }
 
-void asm_DW(Expr* expr)
+void asm_DW(Expr1* expr)
 {
 	asm_DEFW(expr);
 }
 
-void asm_DEFDB(Expr* expr)
+void asm_DEFDB(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_WORD_BE, expr);
 }
 
-void asm_DDB(Expr* expr)
+void asm_DDB(Expr1* expr)
 {
 	asm_DEFDB(expr);
 }
 
-void asm_DEFQ(Expr* expr)
+void asm_DEFQ(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_DWORD, expr);
 }
 
-void asm_DWORD(Expr* expr)
+void asm_DWORD(Expr1* expr)
 {
 	asm_DEFQ(expr);
 }
 
-void asm_DQ(Expr* expr)
+void asm_DQ(Expr1* expr)
 {
 	asm_DEFQ(expr);
 }
@@ -464,12 +464,12 @@ static void check_org_align()
 /*-----------------------------------------------------------------------------
 *   DMA
 *----------------------------------------------------------------------------*/
-static Expr* asm_DMA_shift_exprs(UT_array* exprs)
+static Expr1* asm_DMA_shift_exprs(UT_array* exprs)
 {
 	xassert(utarray_len(exprs) > 0);
 
-	Expr* expr = *((Expr**)utarray_front(exprs));	// copy first element
-	*((Expr**)utarray_front(exprs)) = NULL;		// do not destroy
+	Expr1* expr = *((Expr1**)utarray_front(exprs));	// copy first element
+	*((Expr1**)utarray_front(exprs)) = NULL;		// do not destroy
 	utarray_erase(exprs, 0, 1);						// delete first element
 
 	return expr;
@@ -479,7 +479,7 @@ static bool asm_DMA_shift_byte(UT_array* exprs, int* out_value)
 {
 	*out_value = 0;
 
-	Expr* expr = asm_DMA_shift_exprs(exprs);
+	Expr1* expr = asm_DMA_shift_exprs(exprs);
 	*out_value = Expr_eval(expr, true);
 	bool not_evaluable = expr->result.not_evaluable;
 	OBJ_DELETE(expr);

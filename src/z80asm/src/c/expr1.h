@@ -23,7 +23,7 @@ struct Module;
 struct Section;
 
 /*-----------------------------------------------------------------------------
-*	UT_array of Expr*
+*	UT_array of Expr1*
 *----------------------------------------------------------------------------*/
 extern UT_icd ut_exprs_icd;
 
@@ -72,7 +72,7 @@ typedef struct ExprOp				/* hold one operation or operand */
 		long	value;				/* operand value */
 
 		/* SYMBOL_OP */
-		Symbol* symbol;				/* symbol in symbol table */
+		Symbol1* symbol;				/* symbol in symbol table */
 
 		/* CONST_EXPR_OP - no data */
 
@@ -81,7 +81,7 @@ typedef struct ExprOp				/* hold one operation or operand */
 	} d;
 } ExprOp;
 
-ARRAY(ExprOp);					/* hold list of Expr operations/operands */
+ARRAY(ExprOp);					/* hold list of Expr1 operations/operands */
 
 /*-----------------------------------------------------------------------------
 *	Expression range
@@ -105,7 +105,7 @@ extern int range_size(range_t range);
 /*-----------------------------------------------------------------------------
 *	Expression
 *----------------------------------------------------------------------------*/
-CLASS(Expr)
+CLASS(Expr1)
 ExprOpArray* rpn_ops;			/* list of operands / operators in reverse polish notation */
 Str*		text;				/* expression in infix text */
 
@@ -136,30 +136,30 @@ int			 line_num;			/* source line */
 long		 listpos;			/* position in listing file to patch (in pass 2), -1 if not listing */
 END_CLASS;
 
-CLASS_LIST(Expr);					/* list of expressions */
+CLASS_LIST(Expr1);					/* list of expressions */
 
 /* compute ExprOp using Calc_xxx functions */
-extern void ExprOp_compute(ExprOp* self, Expr* expr, bool not_defined_error);
+extern void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error);
 
-/* parse expression at current input, return new Expr object;
+/* parse expression at current input, return new Expr1 object;
    return NULL and issue syntax error on error */
-extern Expr* expr_parse(void);
+extern Expr1* expr_parse(void);
 
 /* evaluate expression if possible, set result.not_evaluable if failed
    e.g. symbol not defined; show error messages if not_defined_error */
-extern long Expr_eval(Expr* self, bool not_defined_error);
+extern long Expr_eval(Expr1* self, bool not_defined_error);
 
 /* check if all variables used in an expression are local to the same module
    and section; if yes, the expression can be computed in phase 2 of the compile,
    if not the expression must be passed to the link phase */
-extern bool Expr_is_local_in_section(Expr* self, struct Module* module, struct Section* section);
+extern bool Expr_is_local_in_section(Expr1* self, struct Module* module, struct Section* section);
 
 /* check if the expression refers to more than one address expression; if yes,
    it needs to be computed at link time */
-extern bool Expr_without_addresses(Expr* self);
+extern bool Expr_without_addresses(Expr1* self);
 
 /* check if expression depends on itself */
-extern bool Expr_is_recusive(Expr* self, const char* name);
+extern bool Expr_is_recusive(Expr1* self, const char* name);
 
 /*-----------------------------------------------------------------------------
 *	Stack for calculator

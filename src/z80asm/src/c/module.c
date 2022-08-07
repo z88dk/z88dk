@@ -43,10 +43,10 @@ void Module_init (Module *self)
 {
 	self->module_id	= new_module_id();
 
-	self->local_symtab	= OBJ_NEW( SymbolHash );
+	self->local_symtab	= OBJ_NEW( Symbol1Hash );
 	OBJ_AUTODELETE( self->local_symtab ) = false;
 
-	self->exprs			= OBJ_NEW( ExprList );
+	self->exprs			= OBJ_NEW( Expr1List );
 	OBJ_AUTODELETE( self->exprs ) = false;
 
 	self->objfile = objfile_new();
@@ -54,8 +54,8 @@ void Module_init (Module *self)
 
 void Module_copy (Module *self, Module *other)	
 { 
-	self->exprs = ExprList_clone( other->exprs ); 
-	self->local_symtab = SymbolHash_clone( other->local_symtab );
+	self->exprs = Expr1List_clone( other->exprs ); 
+	self->local_symtab = Symbol1Hash_clone( other->local_symtab );
 }
 
 void Module_fini (Module *self)

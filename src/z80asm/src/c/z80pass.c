@@ -8,12 +8,12 @@ Repository: https://github.com/z88dk/z88dk
 */
 
 #include "die.h"
-#include "expr.h"
+#include "expr1.h"
 #include "if.h"
 #include "limits.h"
 #include "modlink.h"
 #include "scan.h"
-#include "symtab.h"
+#include "symtab1.h"
 #include "types.h"
 #include "zobjfile.h"
 
@@ -25,8 +25,8 @@ void Z80pass2(void);
 void
 Z80pass2(void)
 {
-	ExprListElem* iter;
-	Expr* expr, * expr2;
+	Expr1ListElem* iter;
+	Expr1* expr, * expr2;
 	long value;
 	bool do_patch, do_store;
 	long asmpc;		// should be an int!
@@ -34,7 +34,7 @@ Z80pass2(void)
 	/* compute all dependent expressions */
 	compute_equ_exprs(CURRENTMODULE->exprs, false, true);
 
-	iter = ExprList_first(CURRENTMODULE->exprs);
+	iter = Expr1List_first(CURRENTMODULE->exprs);
 	while (iter != NULL)
 	{
 		expr = iter->obj;
@@ -171,11 +171,11 @@ Z80pass2(void)
 
 		/* continue loop - delete expression unless needs to be stored in object file */
 		if (do_store)
-			iter = ExprList_next(iter);
+			iter = Expr1List_next(iter);
 		else
 		{
 			/* remove current expression, advance iterator */
-			expr2 = ExprList_remove(CURRENTMODULE->exprs, &iter);
+			expr2 = Expr1List_remove(CURRENTMODULE->exprs, &iter);
 			xassert(expr == expr2);
 
 			OBJ_DELETE(expr);
@@ -202,7 +202,7 @@ Z80pass2(void)
 }
 
 
-bool Pass2infoExpr(range_t range, Expr* expr)
+bool Pass2infoExpr(range_t range, Expr1* expr)
 {
 	if (expr != NULL)
 	{
@@ -214,7 +214,7 @@ bool Pass2infoExpr(range_t range, Expr* expr)
 		else
 			expr->listpos = -1;
 
-		ExprList_push(&CURRENTMODULE->exprs, expr);
+		Expr1List_push(&CURRENTMODULE->exprs, expr);
 	}
 
 	/* reserve space */
@@ -225,7 +225,7 @@ bool Pass2infoExpr(range_t range, Expr* expr)
 
 bool Pass2info(range_t range)
 {
-	Expr* expr;
+	Expr1* expr;
 
 	/* Offset of (ix+d) should be optional; '+' or '-' are necessary */
 	if (range == RANGE_BYTE_SIGNED)

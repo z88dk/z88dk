@@ -9,7 +9,7 @@ Repository: https://github.com/z88dk/z88dk
 
 #include "alloc.h"
 #include "codearea.h"
-#include "expr.h"
+#include "expr1.h"
 #include "fileutil.h"
 #include "if.h"
 #include "libfile.h"
@@ -20,7 +20,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "str.h"
 #include "strutil.h"
 #include "sym.h"
-#include "symtab.h"
+#include "symtab1.h"
 #include "types.h"
 #include "utstring.h"
 #include "z80asm.h"
@@ -303,7 +303,7 @@ static void set_asmpc_env(Module* module, const char* section_name,
 }
 
 /* set environment to compute expression */
-static void set_expr_env(Expr* expr, bool module_relative_addr)
+static void set_expr_env(Expr1* expr, bool module_relative_addr)
 {
 	set_asmpc_env(expr->module, expr->section->name,
 		expr->text->data, expr->filename, expr->line_num,
@@ -311,7 +311,7 @@ static void set_expr_env(Expr* expr, bool module_relative_addr)
 		module_relative_addr);
 }
 
-static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
+static void read_cur_module_exprs(Expr1List* exprs, obj_file_t* obj) {
 	const char* last_filename = spool_add(obj->filename);
 
 	while (true) {
@@ -338,7 +338,7 @@ static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
 		// call parser to interpret expression
 		set_asmpc_env(CURRENTMODULE, section_name, expr_text, source_filename, line_num,
 			asmpc, false);
-		Expr* expr = parse_expr(expr_text);
+		Expr1* expr = parse_expr(expr_text);
 		if (expr) {
 			expr->range = 0;
 			switch (type) {
@@ -368,13 +368,13 @@ static void read_cur_module_exprs(ExprList* exprs, obj_file_t* obj) {
 			expr->line_num = line_num;
 			expr->listpos = -1;
 
-			ExprList_push(&exprs, expr);
+			Expr1List_push(&exprs, expr);
 		}
 	}
 }
 
 // read all the modules' expressions to the given list, or to the module's if NULL
-static void read_module_exprs(ExprList* exprs) {
+static void read_module_exprs(Expr1List* exprs) {
 	for (obj_file_t* obj = g_objects; obj; obj = obj->next) {
 		xassert(obj->module);
 		set_cur_module(obj->module);
@@ -395,16 +395,16 @@ static void read_module_exprs(ExprList* exprs) {
    return 0 : nothing done, all EQU expression computed and removed from list
    return <0: -(number of expressions with unresolved symbols)
 */
-static int compute_equ_exprs_once(ExprList* exprs, bool show_error, bool module_relative_addr)
+static int compute_equ_exprs_once(Expr1List* exprs, bool show_error, bool module_relative_addr)
 {
-	ExprListElem* iter;
-	Expr* expr, * expr2;
+	Expr1ListElem* iter;
+	Expr1* expr, * expr2;
 	long value;
 	int  num_computed = 0;
 	int  num_unresolved = 0;
 	bool computed;
 
-	iter = ExprList_first(exprs);
+	iter = Expr1List_first(exprs);
 	while (iter != NULL)
 	{
 		expr = iter->obj;
@@ -413,7 +413,7 @@ static int compute_equ_exprs_once(ExprList* exprs, bool show_error, bool module_
 		if (expr->target_name)
 		{
 			/* touch symbol so that it ends in object file */
-			Symbol* sym = get_used_symbol(expr->target_name);
+			Symbol1* sym = get_used_symbol(expr->target_name);
 			sym->is_touched = true;
 
 			/* expressions with symbols from other sections need to be passed to the link phase */
@@ -445,13 +445,13 @@ static int compute_equ_exprs_once(ExprList* exprs, bool show_error, bool module_
 		if (computed)
 		{
 			/* remove current expression, advance iterator */
-			expr2 = ExprList_remove(exprs, &iter);
+			expr2 = Expr1List_remove(exprs, &iter);
 			xassert(expr == expr2);
 
 			OBJ_DELETE(expr);
 		}
 		else
-			iter = ExprList_next(iter);
+			iter = Expr1List_next(iter);
 	}
 
 	if (num_computed > 0)
@@ -463,23 +463,23 @@ static int compute_equ_exprs_once(ExprList* exprs, bool show_error, bool module_
 }
 
 /* check if we have expressions still with target, i.e. circular definitions (see #1869) */
-static void check_equ_exprs_solved(ExprList* exprs, bool module_relative_addr) {
+static void check_equ_exprs_solved(Expr1List* exprs, bool module_relative_addr) {
 	if (module_relative_addr)			/* not linking */
 		return;
 
-	ExprListElem* iter = ExprList_first(exprs);
+	Expr1ListElem* iter = Expr1List_first(exprs);
 	while (iter != NULL) {
-		Expr* expr = iter->obj;
+		Expr1* expr = iter->obj;
 		if (expr->target_name) {
 			set_expr_env(expr, module_relative_addr);
 			error_undefined_symbol(expr->target_name);
 		}
-		iter = ExprList_next(iter);
+		iter = Expr1List_next(iter);
 	}
 }
 
 /* compute all equ expressions, removing them from the list */
-void compute_equ_exprs(ExprList* exprs, bool show_error, bool module_relative_addr)
+void compute_equ_exprs(Expr1List* exprs, bool show_error, bool module_relative_addr)
 {
 	int  compute_result;
 
@@ -497,13 +497,13 @@ void compute_equ_exprs(ExprList* exprs, bool show_error, bool module_relative_ad
 }
 
 /* compute and patch expressions */
-static void patch_exprs(ExprList* exprs)
+static void patch_exprs(Expr1List* exprs)
 {
-	ExprListElem* iter;
-	Expr* expr, * expr2;
+	Expr1ListElem* iter;
+	Expr1* expr, * expr2;
 	long value, asmpc;
 
-	iter = ExprList_first(exprs);
+	iter = Expr1List_first(exprs);
 	while (iter != NULL)
 	{
 		expr = iter->obj;
@@ -619,7 +619,7 @@ static void patch_exprs(ExprList* exprs)
 		}
 
 		/* remove current expression, advance iterator */
-		expr2 = ExprList_remove(exprs, &iter);
+		expr2 = Expr1List_remove(exprs, &iter);
 		xassert(expr == expr2);
 
 		OBJ_DELETE(expr);
@@ -629,16 +629,16 @@ static void patch_exprs(ExprList* exprs)
 /*-----------------------------------------------------------------------------
 *   relocate all SYM_ADDR symbols based on address from start of sections
 *----------------------------------------------------------------------------*/
-static void relocate_symbols_symtab(SymbolHash* symtab)
+static void relocate_symbols_symtab(Symbol1Hash* symtab)
 {
-	SymbolHashElem* iter;
-	Symbol* sym;
+	Symbol1HashElem* iter;
+	Symbol1* sym;
 	int			base_addr;
 	int			offset;
 
-	for (iter = SymbolHash_first(symtab); iter; iter = SymbolHash_next(iter))
+	for (iter = Symbol1Hash_first(symtab); iter; iter = Symbol1Hash_next(iter))
 	{
-		sym = (Symbol*)iter->value;
+		sym = (Symbol1*)iter->value;
 		if (sym->type == TYPE_ADDRESS)
 		{
 			xassert(sym->module);				/* owner should exist except for -D defines */
@@ -889,7 +889,7 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 				return;
 			}
 
-			Symbol* sym = NULL;
+			Symbol1* sym = NULL;
 			switch (scope)
 			{
 			case 'L': sym = define_local_sym(name, value, type); break;
@@ -935,7 +935,7 @@ static void link_lib_module(const char* modname, obj_file_t* obj, StrHash* exter
 
 void link_modules(void)
 {
-	ExprList* exprs = NULL;
+	Expr1List* exprs = NULL;
 	StrHash* extern_syms = OBJ_NEW(StrHash);
 
 	// load all objects and libraries to memory, to speed-up linking
@@ -1007,7 +1007,7 @@ void link_modules(void)
 	}
 	else {
 		/* collect expressions from all modules */
-		exprs = OBJ_NEW(ExprList);
+		exprs = OBJ_NEW(Expr1List);
 		if (!get_num_errors())
 			read_module_exprs(exprs);
 
@@ -1129,20 +1129,20 @@ static void replace_names(Str* result, const char* input, StrHash* map)
 
 static void rename_module_local_symbols(Module* module)
 {
-	Symbol* sym;
-	SymbolHashElem* sym_it;
+	Symbol1* sym;
+	Symbol1HashElem* sym_it;
 	StrHash* old_syms = OBJ_NEW(StrHash);
 	StrHashElem* name_it;
-	Expr* expr;
-	ExprListElem* expr_it;
+	Expr1* expr;
+	Expr1ListElem* expr_it;
 	const char* old_name;
 	const char* value;
 	STR_DEFINE(new_name, STR_SIZE);
 	STR_DEFINE(new_text, STR_SIZE);
 
 	/* collect list of symbol names to change - cannot iterate through symbols hash while changing it */
-	for (sym_it = SymbolHash_first(module->local_symtab); sym_it != NULL; sym_it = SymbolHash_next(sym_it)) {
-		sym = (Symbol*)sym_it->value;
+	for (sym_it = Symbol1Hash_first(module->local_symtab); sym_it != NULL; sym_it = Symbol1Hash_next(sym_it)) {
+		sym = (Symbol1*)sym_it->value;
 
 		old_name = spool_add(sym->name);
 		Str_sprintf(new_name, "%s_%s", module->modname, old_name);
@@ -1153,13 +1153,13 @@ static void rename_module_local_symbols(Module* module)
 	for (name_it = StrHash_first(old_syms); name_it != NULL; name_it = StrHash_next(name_it)) {
 		value = spool_add(name_it->value);
 
-		sym = SymbolHash_extract(module->local_symtab, name_it->key);
+		sym = Symbol1Hash_extract(module->local_symtab, name_it->key);
 		sym->name = value;
-		SymbolHash_set(&module->local_symtab, value, sym);
+		Symbol1Hash_set(&module->local_symtab, value, sym);
 	}
 
 	/* rename symbols in expressions */
-	for (expr_it = ExprList_first(module->exprs); expr_it != NULL; expr_it = ExprList_next(expr_it)) {
+	for (expr_it = Expr1List_first(module->exprs); expr_it != NULL; expr_it = Expr1List_next(expr_it)) {
 		expr = expr_it->obj;
 
 		/* rpn_ops already point to symbol table, no rename needed - change only text and target_name */
@@ -1180,9 +1180,9 @@ static void merge_local_symbols(StrHash* extern_syms)
 	Module* module;
 	Module* first_module;
 	ModuleListElem* it;
-	Symbol* sym;
-	SymbolHashElem* sym_it, * next_sym;
-	Expr* expr;
+	Symbol1* sym;
+	Symbol1HashElem* sym_it, * next_sym;
+	Expr1* expr;
 	StrHashElem* elem, * next;
 	int start;
 
@@ -1190,11 +1190,11 @@ static void merge_local_symbols(StrHash* extern_syms)
 
 	for (module = get_first_module(&it); module != NULL; module = get_next_module(&it)) {
 		/* remove local symbols that are not defined */
-		for (sym_it = SymbolHash_first(module->local_symtab); sym_it != NULL; sym_it = next_sym) {
-			next_sym = SymbolHash_next(sym_it);
-			sym = (Symbol*)sym_it->value;
+		for (sym_it = Symbol1Hash_first(module->local_symtab); sym_it != NULL; sym_it = next_sym) {
+			next_sym = Symbol1Hash_next(sym_it);
+			sym = (Symbol1*)sym_it->value;
 			if (!sym->is_defined)
-				SymbolHash_remove_elem(module->local_symtab, sym_it);
+				Symbol1Hash_remove_elem(module->local_symtab, sym_it);
 		}
 
 		/* remove extern_syms defined in this module */
@@ -1214,14 +1214,14 @@ static void merge_local_symbols(StrHash* extern_syms)
 
 		if (module != first_module) {
 			/* move local symbols */
-			while ((sym_it = SymbolHash_first(module->local_symtab)) != NULL) {
-				sym = SymbolHash_extract(module->local_symtab, sym_it->key);
-				SymbolHash_set(&first_module->local_symtab, sym->name, sym);
+			while ((sym_it = Symbol1Hash_first(module->local_symtab)) != NULL) {
+				sym = Symbol1Hash_extract(module->local_symtab, sym_it->key);
+				Symbol1Hash_set(&first_module->local_symtab, sym->name, sym);
 			}
 
 			/* move local expressions */
-			while ((expr = ExprList_pop(module->exprs)) != NULL) {
-				ExprList_push(&first_module->exprs, expr);
+			while ((expr = Expr1List_pop(module->exprs)) != NULL) {
+				Expr1List_push(&first_module->exprs, expr);
 
 				/* relocate expression address */
 				set_cur_module(expr->module);
@@ -1246,13 +1246,13 @@ static void merge_codearea()
 	}
 }
 
-static void touch_symtab_symbols(SymbolHash* symtab)
+static void touch_symtab_symbols(Symbol1Hash* symtab)
 {
-	SymbolHashElem* iter;
-	Symbol* sym;
+	Symbol1HashElem* iter;
+	Symbol1* sym;
 
-	for (iter = SymbolHash_first(symtab); iter; iter = SymbolHash_next(iter)) {
-		sym = (Symbol*)iter->value;
+	for (iter = Symbol1Hash_first(symtab); iter; iter = Symbol1Hash_next(iter)) {
+		sym = (Symbol1*)iter->value;
 		//Bug 563 -- if (sym->type == TYPE_ADDRESS || sym->scope == SCOPE_EXTERN)
 		sym->is_touched = true;
 	}
