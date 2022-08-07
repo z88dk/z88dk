@@ -144,6 +144,9 @@
     <ClInclude Include="..\..\src\z80asm\src\c\sym.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\symtab1.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\tokens.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
@@ -152,6 +155,36 @@
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\zobjfile.h">
       <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\if.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\preproc.h">
+      <Filter>Header Files\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\lex.h">
+      <Filter>Header Files\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\utils.h">
+      <Filter>Header Files\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\defines.h">
+      <Filter>Header Files\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\float.h">
+      <Filter>Header Files\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\errors.h">
+      <Filter>Header Files\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\lstfile.h">
+      <Filter>Header Files\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\c\reloc_code.h">
+      <Filter>Header Files\c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\args.h">
+      <Filter>Header Files\cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\symtab1.h">
       <Filter>Header Files\c</Filter>
