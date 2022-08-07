@@ -9,12 +9,16 @@ Repository: https://github.com/z88dk/z88dk
 One symbol from the assembly code - label or constant.
 */
 
+#include "expr.h"
 #include "if.h"
+#include "scan.h"
 #include "str.h"
 #include "strutil.h"
 #include "sym.h"
-#include "symbol.h"
+#include "symtab.h"
+#include "types.h"
 #include "utstring.h"
+#include "zobjfile.h"
 
 /*-----------------------------------------------------------------------------
 *   Constant tables

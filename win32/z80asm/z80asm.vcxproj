@@ -234,8 +234,7 @@
     <ClInclude Include="..\..\src\z80asm\src\c\str.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\strhash.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\sym.h" />
-    <ClInclude Include="..\..\src\z80asm\src\c\symbol.h" />
-    <ClInclude Include="..\..\src\z80asm\src\c\symtab.h" />
+    <ClInclude Include="..\..\src\z80asm\src\c\symtab1.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\tokens.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\z80asm.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\zobjfile.h" />

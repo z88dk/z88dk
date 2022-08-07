@@ -114,9 +114,6 @@
     <ClInclude Include="..\..\src\z80asm\src\c\sym.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\c\symbol.h">
-      <Filter>Header Files\c</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\symtab.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>

@@ -20,9 +20,11 @@ Repository: https://github.com/z88dk/z88dk
 #include "str.h"
 #include "strutil.h"
 #include "sym.h"
-#include "symbol.h"
+#include "symtab.h"
+#include "types.h"
 #include "utstring.h"
 #include "z80asm.h"
+#include "zobjfile.h"
 #include "zutils.h"
 #include <ctype.h>
 #include <limits.h>
