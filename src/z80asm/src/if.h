@@ -9,8 +9,6 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,14 +16,6 @@ extern "C" {
 
 #define TOSTR(x)	_TOSTR(x)
 #define _TOSTR(x)	#x
-
-// Assert for internal errors, similar to assert but not removed in release builds
-#define Assert(f)    do { \
-                        if (!(f)) { \
-                            fprintf(stderr, "z80asm panic at %s:%d\n", __FILE__, __LINE__); \
-                            exit(EXIT_FAILURE); \
-                        } \
-                    } while(0)
 
 // default file name extensions
 #define EXT_ASM     ".asm"    

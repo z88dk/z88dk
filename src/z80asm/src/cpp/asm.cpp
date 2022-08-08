@@ -8,6 +8,7 @@
 #include "asm.h"
 #include "errors.h"
 #include "if.h"
+#include "utils.h"
 using namespace std;
 
 bool Asm::assemble(const string& filename) {
