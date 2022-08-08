@@ -453,7 +453,7 @@ static bool objmodule_loaded_1(const char* obj_filename, UT_string* section_name
 {
 	int code_size;
 	OFile* ofile;
-	Section* section;
+	Section1* section;
 
 	ofile = OFile_test_file(obj_filename);
 	if (ofile != NULL)

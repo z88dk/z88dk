@@ -15,7 +15,7 @@ Define ragel-based parser.
 #include "directives.h"
 #include "expr1.h"
 #include "if.h"
-#include "module.h"
+#include "module1.h"
 #include "opcodes.h"
 #include "parse.h"
 #include "scan.h"

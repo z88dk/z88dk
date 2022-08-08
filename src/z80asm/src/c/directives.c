@@ -14,7 +14,7 @@ Assembly directives.
 #include "directives.h"
 #include "fileutil.h"
 #include "if.h"
-#include "module.h"
+#include "module1.h"
 #include "parse.h"
 #include "strutil.h"
 #include "symtab1.h"
@@ -236,7 +236,7 @@ void asm_MODULE(const char* name)
 
 void asm_MODULE_default(void)
 {
-	if (!CURRENTMODULE->modname)     /* Module name must be defined */
+	if (!CURRENTMODULE->modname)     /* Module1 name must be defined */
 		CURRENTMODULE->modname = remove_extension(path_file(CURRENTMODULE->filename));
 }
 

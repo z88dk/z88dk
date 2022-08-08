@@ -108,7 +108,7 @@
     <ClInclude Include="..\..\src\z80asm\src\c\modlink.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\c\module.h">
+    <ClInclude Include="..\..\src\z80asm\src\c\module1.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\opcodes.h">
@@ -194,7 +194,7 @@
     <ClCompile Include="..\..\src\z80asm\src\c\modlink.c">
       <Filter>Source Files\c</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\c\module.c">
+    <ClCompile Include="..\..\src\z80asm\src\c\module1.c">
       <Filter>Source Files\c</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\c\opcodes.c">

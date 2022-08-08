@@ -39,14 +39,14 @@ typedef struct obj_file_t {
 	int				size;				// size of library file
 	byte_t*			data;				// contents of library file, loaded before linking
 	int				i;					// point to next position to parse
-	Module*			module;				// weak pointer to main module information, if object file
+	Module1*			module;				// weak pointer to main module information, if object file
 } obj_file_t;
 
 
 /* local functions */
 static void link_lib_module(const char* modname, obj_file_t* obj, StrHash* extern_syms);
 static void merge_modules(StrHash* extern_syms);
-static void object_module_append(obj_file_t* obj, Module* module);
+static void object_module_append(obj_file_t* obj, Module1* module);
 static void obj_files_free(obj_file_t** plist);
 void CreateBinFile(void);
 
@@ -140,7 +140,7 @@ static bool goto_code(obj_file_t* obj) {
 	return obj->i >= 0;
 }
 
-static void obj_files_append(obj_file_t** plist, const char* filename, Module* module) {
+static void obj_files_append(obj_file_t** plist, const char* filename, Module1* module) {
 	init();
 
 	// create a obj and append to list - file will be loaded when linking
@@ -205,7 +205,7 @@ void library_file_append(const char * filename) {
 	}
 }
 
-bool object_file_append(const char* filename, Module* module, bool reserve_space, bool no_errors) {
+bool object_file_append(const char* filename, Module1* module, bool reserve_space, bool no_errors) {
 	init();
 
 	// check for empty file name
@@ -238,7 +238,7 @@ bool object_file_append(const char* filename, Module* module, bool reserve_space
 	return true;
 }
 
-void object_module_append(obj_file_t* obj, Module* module) {
+void object_module_append(obj_file_t* obj, Module1* module) {
 	init();
 
 	// reserve space for the module's sections
@@ -254,7 +254,7 @@ void object_module_append(obj_file_t* obj, Module* module) {
 
 			// reserve space in section
 			const char* section_name = parse_wcount_str(obj);
-			Section* section = new_section(section_name);
+			Section1* section = new_section(section_name);
 			int origin = parse_int(obj);
 			set_origin(origin, section);
 			section->align = parse_int(obj);
@@ -277,7 +277,7 @@ void object_module_append(obj_file_t* obj, Module* module) {
 }
 
 /* set environment to compute expression */
-static void set_asmpc_env(Module* module, const char* section_name,
+static void set_asmpc_env(Module1* module, const char* section_name,
 	const char* expr_text, const char* filename, int line_num, 
 	int asmpc, bool module_relative_addr) {
 	int base_addr, offset;
@@ -658,8 +658,8 @@ static void relocate_symbols_symtab(Symbol1Hash* symtab)
 
 static void relocate_symbols(void)
 {
-	Module* module;
-	ModuleListElem* iter;
+	Module1* module;
+	Module1ListElem* iter;
 
 	for (module = get_first_module(&iter); module != NULL;
 		module = get_next_module(&iter))
@@ -674,8 +674,8 @@ static void relocate_symbols(void)
 *----------------------------------------------------------------------------*/
 static void define_location_symbols(void)
 {
-	Section* section;
-	SectionHashElem* iter;
+	Section1* section;
+	Section1HashElem* iter;
 	STR_DEFINE(name, STR_SIZE);
 	int start_addr, end_addr;
 
@@ -834,7 +834,7 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 
 			// next section
 			const char* section_name = parse_wcount_str(obj);
-			Section* section = new_section(section_name);
+			Section1* section = new_section(section_name);
 			int origin = parse_int(obj);
 			set_origin(origin, section);
 			section->align = parse_int(obj);
@@ -919,9 +919,9 @@ static void link_module(obj_file_t* obj, StrHash* extern_syms) {
 }
 
 static void link_lib_module(const char* modname, obj_file_t* obj, StrHash* extern_syms) {
-	Module* old_module = get_cur_module();			// remember current module
+	Module1* old_module = get_cur_module();			// remember current module
 
-	Module* lib_module = set_cur_module(new_module());	// new module to link library
+	Module1* lib_module = set_cur_module(new_module());	// new module to link library
 	lib_module->modname = spool_add(modname);
 	object_module_append(obj, lib_module);
 
@@ -958,9 +958,9 @@ void link_modules(void)
 		reloctable = NULL;
 	}
 
-	// <TODO>: merge Module and obj_file_t; for now check they are in sync
-	ModuleListElem* iter;
-	Module* mod = get_first_module(&iter);
+	// <TODO>: merge Module1 and obj_file_t; for now check they are in sync
+	Module1ListElem* iter;
+	Module1* mod = get_first_module(&iter);
 	obj_file_t* obj = g_objects;
 	while (mod) {
 		xassert(obj);
@@ -1127,7 +1127,7 @@ static void replace_names(Str* result, const char* input, StrHash* map)
 	}
 }
 
-static void rename_module_local_symbols(Module* module)
+static void rename_module_local_symbols(Module1* module)
 {
 	Symbol1* sym;
 	Symbol1HashElem* sym_it;
@@ -1177,9 +1177,9 @@ static void rename_module_local_symbols(Module* module)
 
 static void merge_local_symbols(StrHash* extern_syms)
 {
-	Module* module;
-	Module* first_module;
-	ModuleListElem* it;
+	Module1* module;
+	Module1* first_module;
+	Module1ListElem* it;
 	Symbol1* sym;
 	Symbol1HashElem* sym_it, * next_sym;
 	Expr1* expr;
@@ -1238,8 +1238,8 @@ static void merge_local_symbols(StrHash* extern_syms)
 
 static void merge_codearea()
 {
-	Section* section;
-	SectionHashElem* iter;
+	Section1* section;
+	Section1HashElem* iter;
 
 	for (section = get_first_section(&iter); section != NULL; section = get_next_section(&iter)) {
 		intArray_set_size(section->module_start, 1);		/* delete all module boundaries */
@@ -1260,8 +1260,8 @@ static void touch_symtab_symbols(Symbol1Hash* symtab)
 
 static void touch_symbols()
 {
-	Module* module;
-	ModuleListElem* it;
+	Module1* module;
+	Module1ListElem* it;
 
 	for (module = get_first_module(&it); module != NULL; module = get_next_module(&it)) {
 		touch_symtab_symbols(module->local_symtab);
@@ -1282,7 +1282,7 @@ static void create_extern_symbols(StrHash* extern_syms)
 
 static void merge_modules(StrHash* extern_syms)
 {
-	Module* first_module;
+	Module1* first_module;
 	first_module = get_first_module(NULL); xassert(first_module != NULL);
 
 	/* read each module's expression list */
@@ -1314,7 +1314,7 @@ static void merge_modules(StrHash* extern_syms)
 static void run_appmake(const char* appmake_opts, const char* out_ext,
 	int origin_min, int origin_max) {
 
-	Section* first_section = get_first_section(NULL);
+	Section1* first_section = get_first_section(NULL);
 
 	int origin = first_section->origin;
 	if (origin < origin_min || origin > origin_max) {

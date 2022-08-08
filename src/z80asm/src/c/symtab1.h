@@ -58,7 +58,7 @@ extern Symbol1 *define_global_sym(const char *name, long value, sym_type_t type)
 /* get the symbols for which the passed function returns true,
    mapped NAME@MODULE -> Symbol1, needs to be deleted by OBJ_DELETE() */
 extern Symbol1Hash *select_symbols( bool (*cond)(Symbol1 *sym) );
-extern Symbol1Hash *select_module_symbols( struct Module *module, bool (*cond)(Symbol1 *sym) );
+extern Symbol1Hash *select_module_symbols( struct Module1 *module, bool (*cond)(Symbol1 *sym) );
 
 /* copy the static symbols to CURRENTMODULE->local_symtab */
 extern void copy_static_syms( void );
@@ -98,6 +98,6 @@ extern void declare_extern_symbol(const char *name );
 *----------------------------------------------------------------------------*/
 extern void write_map_file(void);
 extern void write_def_file(void);
-extern void write_sym_file(struct Module *module);
+extern void write_sym_file(struct Module1 *module);
 
 extern void check_undefined_symbols(Symbol1Hash *symtab);

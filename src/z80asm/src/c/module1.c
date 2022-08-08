@@ -11,13 +11,13 @@ Assembled module, i.e. result of assembling a .asm file
 
 #include "codearea.h"
 #include "init.h"
-#include "module.h"
+#include "module1.h"
 
 /*-----------------------------------------------------------------------------
 *   Global data
 *----------------------------------------------------------------------------*/
-static ModuleList		*g_module_list;			/* list of input modules */
-static Module			*g_cur_module;			/* current module being handled */
+static Module1List		*g_module_list;			/* list of input modules */
+static Module1			*g_cur_module;			/* current module being handled */
 
 /*-----------------------------------------------------------------------------
 *   Initialize data structures
@@ -25,7 +25,7 @@ static Module			*g_cur_module;			/* current module being handled */
 DEFINE_init_module()
 {
 	/* setup module list */
-	g_module_list = OBJ_NEW( ModuleList );
+	g_module_list = OBJ_NEW( Module1List );
 }
 
 DEFINE_dtor_module()
@@ -36,10 +36,10 @@ DEFINE_dtor_module()
 /*-----------------------------------------------------------------------------
 *   Assembly module
 *----------------------------------------------------------------------------*/
-DEF_CLASS( Module );
-DEF_CLASS_LIST( Module );
+DEF_CLASS( Module1 );
+DEF_CLASS_LIST( Module1 );
 
-void Module_init (Module *self)   
+void Module1_init (Module1 *self)   
 {
 	self->module_id	= new_module_id();
 
@@ -52,13 +52,13 @@ void Module_init (Module *self)
 	self->objfile = objfile_new();
 }
 
-void Module_copy (Module *self, Module *other)	
+void Module1_copy (Module1 *self, Module1 *other)	
 { 
 	self->exprs = Expr1List_clone( other->exprs ); 
 	self->local_symtab = Symbol1Hash_clone( other->local_symtab );
 }
 
-void Module_fini (Module *self)
+void Module1_fini (Module1 *self)
 { 
 	OBJ_DELETE( self->exprs);
 	OBJ_DELETE( self->local_symtab );
@@ -69,13 +69,13 @@ void Module_fini (Module *self)
 /*-----------------------------------------------------------------------------
 *   new and delete modules
 *----------------------------------------------------------------------------*/
-Module *new_module( void )
+Module1 *new_module( void )
 {
-	Module *module;
+	Module1 *module;
 
 	init_module();
-	module = OBJ_NEW( Module );
-	ModuleList_push( &g_module_list, module );
+	module = OBJ_NEW( Module1 );
+	Module1List_push( &g_module_list, module );
 
 	return module;
 }
@@ -84,13 +84,13 @@ void delete_modules( void )
 {
 	init_module();
 	g_cur_module = NULL;
-	ModuleList_remove_all( g_module_list );
+	Module1List_remove_all( g_module_list );
 }
 
 /*-----------------------------------------------------------------------------
 *   current module
 *----------------------------------------------------------------------------*/
-Module *set_cur_module( Module *module )
+Module1 *set_cur_module( Module1 *module )
 {
 	init_module();
 	set_cur_module_id( module->module_id );
@@ -98,7 +98,7 @@ Module *set_cur_module( Module *module )
 	return (g_cur_module = module);		/* result result of assignment */
 }
 
-Module *get_cur_module( void )
+Module1 *get_cur_module( void )
 {
 	init_module();
 	return g_cur_module;
@@ -108,33 +108,33 @@ Module *get_cur_module( void )
 *   list of modules iterator
 *	pointer to iterator may be NULL if no need to iterate
 *----------------------------------------------------------------------------*/
-Module *get_first_module( ModuleListElem **piter )
+Module1 *get_first_module( Module1ListElem **piter )
 {
-	ModuleListElem *iter;
+	Module1ListElem *iter;
 
 	init_module();
 	if ( piter == NULL )
 		piter = &iter;		/* user does not need to iterate */
 
-	*piter = ModuleList_first( g_module_list );
-	return *piter == NULL ? NULL : (Module *) (*piter)->obj;
+	*piter = Module1List_first( g_module_list );
+	return *piter == NULL ? NULL : (Module1 *) (*piter)->obj;
 }
 
-Module *get_last_module( ModuleListElem **piter )
+Module1 *get_last_module( Module1ListElem **piter )
 {
-	ModuleListElem *iter;
+	Module1ListElem *iter;
 
 	init_module();
 	if ( piter == NULL )
 		piter = &iter;		/* user does not need to iterate */
 
-	*piter = ModuleList_last( g_module_list );
-	return *piter == NULL ? NULL : (Module *) (*piter)->obj;
+	*piter = Module1List_last( g_module_list );
+	return *piter == NULL ? NULL : (Module1 *) (*piter)->obj;
 }
 
-Module *get_next_module( ModuleListElem **piter )
+Module1 *get_next_module( Module1ListElem **piter )
 {
 	init_module();
-	*piter = ModuleList_next( *piter );
-	return *piter == NULL ? NULL : (Module *) (*piter)->obj;
+	*piter = Module1List_next( *piter );
+	return *piter == NULL ? NULL : (Module1 *) (*piter)->obj;
 }

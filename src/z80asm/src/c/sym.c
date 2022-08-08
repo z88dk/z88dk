@@ -51,7 +51,7 @@ void Symbol1_fini( Symbol1 *self ) {}
 *	adds a reference to the page were referred to
 *----------------------------------------------------------------------------*/
 Symbol1 *Symbol_create(const char *name, long value, sym_type_t type, sym_scope_t scope,
-					   Module *module, Section *section )
+					   Module1 *module, Section1 *section )
 {
     Symbol1 *self 	= OBJ_NEW( Symbol1 );
 

@@ -81,7 +81,7 @@ Symbol1 *find_global_symbol(const char *name )
 *   create a symbol in the given table, error if already defined
 *----------------------------------------------------------------------------*/
 Symbol1 *_define_sym(const char *name, long value, sym_type_t type, sym_scope_t scope,
-                     Module *module, Section *section,
+                     Module1 *module, Section1 *section,
 					 Symbol1Hash **psymtab )
 {
     Symbol1 *sym;
@@ -223,9 +223,9 @@ static void copy_full_sym_names( Symbol1Hash **ptarget, Symbol1Hash *source,
 *   get the symbols for which the passed function returns true,
 *   mapped NAME@MODULE -> Symbol1, needs to be deleted by OBJ_DELETE()
 *----------------------------------------------------------------------------*/
-static Symbol1Hash *_select_module_symbols(Module *module, bool(*cond)(Symbol1 *sym))
+static Symbol1Hash *_select_module_symbols(Module1 *module, bool(*cond)(Symbol1 *sym))
 {
-	ModuleListElem *iter;
+	Module1ListElem *iter;
 	Symbol1Hash *all_syms = OBJ_NEW(Symbol1Hash);
 
 	if (module == NULL) {
@@ -245,7 +245,7 @@ Symbol1Hash *select_symbols( bool (*cond)(Symbol1 *sym) )
 	return _select_module_symbols(NULL, cond);
 }
 
-Symbol1Hash *select_module_symbols(Module *module, bool(*cond)(Symbol1 *sym))
+Symbol1Hash *select_module_symbols(Module1 *module, bool(*cond)(Symbol1 *sym))
 {
 	return _select_module_symbols(module, cond);
 }
@@ -570,7 +570,7 @@ void declare_extern_symbol(const char *name)
 /*-----------------------------------------------------------------------------
 *   generate output files with lists of symbols
 *----------------------------------------------------------------------------*/
-static void _write_symbol_file(const char *filename, Module *module, bool(*cond)(Symbol1 *sym),
+static void _write_symbol_file(const char *filename, Module1 *module, bool(*cond)(Symbol1 *sym),
 							   char *prefix, bool type_flag) 
 {
 	FILE *file;
@@ -662,7 +662,7 @@ static bool cond_module_symbols(Symbol1 *sym)
 		return false;
 }
 
-void write_sym_file(Module *module)
+void write_sym_file(Module1 *module)
 {
 	_write_symbol_file(
 		get_sym_filename(module->filename),

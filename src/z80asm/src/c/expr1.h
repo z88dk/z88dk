@@ -19,8 +19,8 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "sym.h"
 #include "utarray.h"
 
-struct Module;
-struct Section;
+struct Module1;
+struct Section1;
 
 /*-----------------------------------------------------------------------------
 *	UT_array of Expr1*
@@ -126,8 +126,8 @@ const char* target_name;		/* name of the symbol, stored in strpool,
 								* to receive the result value of the expression
 								* computation, NULL if not an EQU expression */
 
-struct Module* module;			/* module where expression is patched (weak ref) */
-struct Section* section;		/* section where expression is patched (weak ref) */
+struct Module1* module;			/* module where expression is patched (weak ref) */
+struct Section1* section;		/* section where expression is patched (weak ref) */
 int			asmpc;				/* ASMPC value during linking */
 int			code_pos;			/* Address to patch expression value */
 
@@ -152,7 +152,7 @@ extern long Expr_eval(Expr1* self, bool not_defined_error);
 /* check if all variables used in an expression are local to the same module
    and section; if yes, the expression can be computed in phase 2 of the compile,
    if not the expression must be passed to the link phase */
-extern bool Expr_is_local_in_section(Expr1* self, struct Module* module, struct Section* section);
+extern bool Expr_is_local_in_section(Expr1* self, struct Module1* module, struct Section1* section);
 
 /* check if the expression refers to more than one address expression; if yes,
    it needs to be computed at link time */

@@ -16,7 +16,7 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "expr1.h"
 #include "if.h"
 #include "init.h"
-#include "module.h"
+#include "module1.h"
 #include "strhash.h"
 #include "strutil.h"
 #include "sym.h"
@@ -689,7 +689,7 @@ long Expr_eval(Expr1* self, bool not_defined_error)
 /* check if all variables used in an expression are local to the same module
 and section; if yes, the expression can be computed in phase 2 of the compile,
 if not the expression must be passed to the link phase */
-bool Expr_is_local_in_section(Expr1* self, struct Module* module, struct Section* section)
+bool Expr_is_local_in_section(Expr1* self, struct Module1* module, struct Section1* section)
 {
 	size_t i;
 

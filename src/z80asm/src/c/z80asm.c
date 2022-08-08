@@ -14,7 +14,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "if.h"
 #include "libfile.h"
 #include "modlink.h"
-#include "module.h"
+#include "module1.h"
 #include "parse.h"
 #include "scan.h"
 #include "strutil.h"
@@ -67,7 +67,7 @@ void assemble_file( const char *filename ) {
 		reset_codearea();
 
 	// Create module data structures for new file
-	Module* module = set_cur_module(new_module());
+	Module1* module = set_cur_module(new_module());
 	module->filename = spool_add(src_filename);
 
 	if (got_obj) {
@@ -109,7 +109,7 @@ static void do_assemble(const char *src_filename )
 
 	list_open(get_lis_filename(src_filename));
 	parse_file(src_filename);
-	asm_MODULE_default();			/* Module name must be defined */
+	asm_MODULE_default();			/* Module1 name must be defined */
 	clear_error_location();
 	Z80pass2();						/* call pass 2 even if errors found, to issue pass2 errors */
 	clear_error_location();
