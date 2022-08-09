@@ -22,7 +22,7 @@
     <ClCompile Include="..\..\src\z88dk-lib\z88dk-lib.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\z88dk-lib\dirent.h" />
+    <ClInclude Include="..\..\src\z88dk-lib\win32\dirent.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FD985972-6500-4DCA-AE01-390180135C97}</ProjectGuid>
