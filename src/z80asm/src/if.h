@@ -188,6 +188,7 @@ const char* get_reloc_filename(const char* filename);
 // symbol table
 struct Symbol1;
 struct Symbol1* define_static_def_sym(const char* name, long value);
+void symtab_insert_global_def(const char* name, int value);
 
 // expressions
 void parse_const_expr_eval(const char* expr_text, int* result, bool* error);

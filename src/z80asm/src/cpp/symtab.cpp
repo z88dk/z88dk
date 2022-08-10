@@ -5,30 +5,34 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "preproc.h"
+#include "args.h"
+#include "errors.h"
+#include "if.h"
+#include "symbol.h"
 #include "symtab.h"
 #include "utils.h"
+#include <iostream>
 using namespace std;
 
-Symtab g_symtab;
+static shared_ptr<Symtab> g_global_def_symbols;
+static shared_ptr<Symtab> g_global_symbols;
 
-Symbol::Symbol(const string& name, int value)
-	: m_name(name)
-	, m_value(value)
-	, m_filename(g_preproc.filename())
-	, m_line_num(g_preproc.line_num()) {
-}
-
-Symtab::Symtab(Symtab* parent)
+Symtab::Symtab(shared_ptr<Symtab> parent)
 	: m_parent(parent) {
 }
 
-shared_ptr<Symbol> Symtab::add(const string& name) {
-	Assert(find(name) == nullptr);
-
-	auto symbol = make_shared<Symbol>(name);
-	m_table[name] = symbol;
-	return symbol;
+bool Symtab::insert(shared_ptr<Symbol> symbol) {
+	const string& name = symbol->name();
+	if (find(name) != nullptr) {
+		if (name.substr(0, 11) == "__CDBINFO__")
+			return true;	// ignore duplicates of these
+		else
+			return false;
+	}
+	else {
+		m_table[name] = symbol;
+		return true;
+	}
 }
 
 shared_ptr<Symbol> Symtab::find(const string& name) {
@@ -40,12 +44,42 @@ shared_ptr<Symbol> Symtab::find(const string& name) {
 }
 
 shared_ptr<Symbol> Symtab::find_all(const string& name) {
-	Symtab* table = this;
-	while (table != nullptr) {
-		auto symbol = table->find(name);
-		if (symbol != nullptr)
-			return symbol;
-		table = table->m_parent;
-	}
-	return nullptr;
+	auto symbol = find(name);
+	if (symbol)
+		return symbol;
+	else if (m_parent.lock()) 
+		return m_parent.lock()->find(name);
+	else
+		return nullptr;
 }
+
+static void init_globals() {
+	if (!g_global_def_symbols) {
+		g_global_def_symbols = make_shared<Symtab>();
+		g_global_symbols = make_shared<Symtab>(g_global_def_symbols);
+	}
+}
+
+shared_ptr<Symtab> global_def_symbols() {
+	init_globals();
+	return g_global_def_symbols;
+}
+
+shared_ptr<Symtab> global_symbols() {
+	init_globals();
+	return g_global_symbols;
+}
+
+void symtab_insert_global_def(const char* name, int value) {
+	auto symbol = make_shared<Symbol>(name, value);
+	if (global_def_symbols()->insert(symbol)) {
+		if (g_args.verbose())
+			cout << "Predefined constant: "
+			<< name << " = " << int_to_hex(value) << endl;
+		define_static_def_sym(name, value);
+	}
+	else {
+		g_errors.error(ErrCode::DuplicateDefinition, name);
+	}	
+}
+
