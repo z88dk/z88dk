@@ -229,14 +229,25 @@ void Args::parse_option(const string& arg_) {
 	g_errors.error(ErrCode::IllegalOption, arg);
 }
 
-// return -1 if cannot parse integer
-int Args::parse_opt_int(const string& opt_arg) {
+// return false if cannot parse integer
+bool Args::parse_opt_int(int& value, const string& opt_arg) {
+	value = 0;
 	int radix = 10;
 	char suffix = '\0';
 	const char* p = opt_arg.c_str();
 
+	if (opt_arg[0] == '-') {
+		int this_value = 0;
+		bool ret = parse_opt_int(this_value, opt_arg.substr(1));
+		value = -this_value;
+		return ret;
+	}
+	else if (opt_arg[0] == '+') {
+		return parse_opt_int(value, opt_arg.substr(1));
+	}
+
 	if (opt_arg.empty()) {
-		return -1;
+		return false;
 	}
 	else if (opt_arg[0] == '$') {
 		p++;
@@ -257,9 +268,11 @@ int Args::parse_opt_int(const string& opt_arg) {
 	char* end = nullptr;
 	long lval = strtol(p, &end, radix);
 	if (*end != suffix || errno == ERANGE || lval < 0 || lval > INT_MAX)
-		return -1;
-	else
-		return static_cast<int>(lval);
+		return false;
+	else {
+		value = static_cast<int>(lval);
+		return true;
+	}
 }
 
 void Args::parse_define(const string& opt_arg) {
@@ -280,11 +293,11 @@ void Args::parse_define(const string& opt_arg) {
 			define_static_def_sym(ident.c_str(), 1);
 		}
 		else {
-			int value = parse_opt_int(opt_arg.substr(equal_pos + 1));
-			if (value < 0)
-				g_errors.error(ErrCode::InvalidDefineOption, opt_arg);
-			else
+			int value = 0;
+			if (parse_opt_int(value, opt_arg.substr(equal_pos + 1))) 
 				define_static_def_sym(ident.c_str(), value);
+			else
+				g_errors.error(ErrCode::InvalidDefineOption, opt_arg);
 		}
 	}
 }
@@ -332,8 +345,8 @@ void Args::set_float_format(const string& format) {
 }
 
 void Args::set_origin(const string& opt_arg) {
-	int value = parse_opt_int(opt_arg);
-	if (value < 0)		// value can be >0xffff for banked address
+	int value = 0;
+	if (!parse_opt_int(value, opt_arg) || value < 0)	// value can be >0xffff for banked address
 		g_errors.error(ErrCode::InvalidOrgOption, opt_arg);
 	else
 		set_origin_option(value);
@@ -690,8 +703,8 @@ void Args::set_cpu(const string& name) {
 }
 
 void Args::set_filler(const string& opt_arg) {
-	int value = parse_opt_int(opt_arg);
-	if (value < 0 || value > 0xFF)
+	int value = 0;
+	if (!parse_opt_int(value, opt_arg) || value < 0 || value > 0xFF)
 		g_errors.error(ErrCode::InvalidFillerOption, opt_arg);
 	else
 		m_filler = value;

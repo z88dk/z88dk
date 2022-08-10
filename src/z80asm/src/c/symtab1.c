@@ -157,8 +157,14 @@ Symbol1 *define_static_def_sym(const char *name, long value )
     Symbol1 *sym = _define_sym( name, value, TYPE_CONSTANT, SCOPE_LOCAL, 
 						NULL, get_first_section(NULL), 
 						& static_symtab );
-	if (option_verbose()) 
-		printf("Predefined constant: %s = $%04X\n", name, (int)value);
+	if (option_verbose()) {
+		if (value <= -10)
+			printf("Predefined constant: %s = -0x%04X\n", name, (int)-value);
+		else if (value < 10)
+			printf("Predefined constant: %s = %d\n", name, (int)value);
+		else
+			printf("Predefined constant: %s = 0x%04X\n", name, (int)value);
+	}
 	return sym;
 }
 
