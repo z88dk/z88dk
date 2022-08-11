@@ -204,6 +204,9 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\symbol.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\expr.h">
+      <Filter>Header Files\cpp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\src\c\alloc.c">
@@ -314,10 +317,13 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\symtab.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\cpp\model.cpp">
-      <Filter>Header Files\cpp</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\cpp\symbol.cpp">
+      <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\model.cpp">
+      <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\expr.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
   </ItemGroup>
