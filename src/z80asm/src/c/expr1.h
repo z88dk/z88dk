@@ -111,7 +111,7 @@ Str*		text;				/* expression in infix text */
 
 /* flags set during eval */
 struct {
-	bool not_evaluable : 1;		/* true if expression did not retunr a value */
+	bool not_evaluable : 1;		/* true if expression did not return a value */
 	bool undefined_symbol : 1;	/* true if expression contains one undefined symbol */
 	bool extern_symbol : 1;		/* true if expression contains one EXTERN symbol */
 	bool cross_section_addr : 1;/* true if expression referred to symbol on another section */
