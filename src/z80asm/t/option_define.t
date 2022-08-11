@@ -63,11 +63,11 @@ z80asm_ok("-b ".quote_os("-D_value\${TEST_ENV}23"), "", "",
 spew("${test}.asm", "nop");
 capture_ok("z88dk-z80asm -v ".
 		   "-Dmten=-+-+-10 -Dmnine=-9 -Dzero=0 -Dnine=+9 -Dten=10 ${test}.asm", <<END);
-Predefined constant: mten = -0x000A
+Predefined constant: mten = -\$000A
 Predefined constant: mnine = -9
 Predefined constant: zero = 0
 Predefined constant: nine = 9
-Predefined constant: ten = 0x000A
+Predefined constant: ten = \$000A
 Reading library 'z88dk-z80asm-z80-.lib'
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
