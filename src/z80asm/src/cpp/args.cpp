@@ -295,7 +295,7 @@ void Args::parse_define(const string& opt_arg) {
 		else {
 			int value = 0;
 			if (parse_opt_int(value, opt_arg.substr(equal_pos + 1))) 
-				define_static_def_sym(ident.c_str(), value);
+				symtab_insert_global_def(ident.c_str(), value);
 			else
 				g_errors.error(ErrCode::InvalidDefineOption, opt_arg);
 		}

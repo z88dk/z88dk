@@ -75,7 +75,7 @@ void symtab_insert_global_def(const char* name, int value) {
 	if (global_def_symbols()->insert(symbol)) {
 		if (g_args.verbose())
 			cout << "Predefined constant: "
-			<< name << " = " << int_to_hex(value) << endl;
+			<< name << " = " << int_to_hex(value, 4) << endl;
 		define_static_def_sym(name, value);
 	}
 	else {
