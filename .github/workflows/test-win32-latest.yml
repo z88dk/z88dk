@@ -2,7 +2,7 @@ name: test-win32-latest
 
 on:
   schedule:
-    - cron: '00,15,30,45 * * * *'
+    - cron: '00 06 * * *'
 
 jobs:
   build:

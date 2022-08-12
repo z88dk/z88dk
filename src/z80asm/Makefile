@@ -31,6 +31,11 @@ LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS) -Wextra -Werror -pedantic-errors \
 			-Isrc/cpp
 
+# so that we can use C++17 features on older systems
+ifeq ($(CROSS),1)
+LDFLAGS 	+= -static-libstdc++ -static-libgcc
+endif
+
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
@@ -53,8 +58,6 @@ $(PROJ)$(EXESUFFIX): ../config.h $(OBJS)
 
 ../config.h:
 	@echo \#define PREFIX \"/usr/local/share/z88dk\" 				 > $@
-	@echo \#define UNIX 1											>> $@
-	@echo \#define EXEC_PREFIX \"\"									>> $@
 	@echo \#define Z88DK_VERSION \"build-$(shell date +%Y%m%d)\"	>> $@
 
 %.o: %.c
