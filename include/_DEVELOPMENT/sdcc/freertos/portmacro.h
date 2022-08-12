@@ -418,6 +418,12 @@ extern void vPortYield(void);
 
 #define portYIELD()                 vPortYield()
 
+/*
+extern void vPortYieldFromISR( void );
+ */
+extern void vPortYieldFromISR(void);
+
+#define portYIELD_FROM_ISR()        vPortYieldFromISR()
 /*-----------------------------------------------------------*/
 
 /* Task function macros as described on the FreeRTOS.org WEB site. */

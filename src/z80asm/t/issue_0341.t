@@ -48,7 +48,6 @@ __C_LINE_9_${test_expanded}_2ec_3a_3amain_3a_3a1_3a_3a3 = \$017F ; addr, local, 
 __C_LINE_10_${test_expanded}_2ec_3a_3amain_3a_3a1_3a_3a3 = \$0183 ; addr, local, , ${test}_c, code_compiler, ${test}.c::main::1::3:10
 __C_LINE_11_${test_expanded}_2ec_3a_3amain_3a_3a1_3a_3a3 = \$0183 ; addr, local, , ${test}_c, code_compiler, ${test}.c::main::1::3:11
 __ASM_LINE_2_${test_expanded}1_2easm = \$0000 ; addr, local, , ${test}1_asm, , ${test}1.asm:2
-__ASM_LINE_3_${test_expanded}1_2easm = \$0000 ; addr, local, , ${test}1_asm, , ${test}1.asm:3
 _add                            = \$016E ; addr, public, , ${test}_c, code_compiler, ${test}.c::add::0::0:2
 _main                           = \$017B ; addr, public, , ${test}_c, code_compiler, ${test}.c::main::0::2:7
 func                            = \$0000 ; addr, public, , ${test}1_asm, , ${test}1.asm:2

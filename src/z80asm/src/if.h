@@ -205,8 +205,8 @@ void sfile_set_line_num(int line_num, int line_inc);
 void sfile_set_c_source(bool f);
 
 // symbol table
-struct Symbol;
-struct Symbol* define_static_def_sym(const char* name, long value);
+struct Symbol1;
+struct Symbol1* define_static_def_sym(const char* name, long value);
 
 // code area
 int get_PC();

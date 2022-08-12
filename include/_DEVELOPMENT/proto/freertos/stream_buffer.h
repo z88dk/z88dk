@@ -73,6 +73,12 @@ include(__link__.m4)
 struct StreamBufferDef_t;
 typedef struct StreamBufferDef_t * StreamBufferHandle_t;
 
+/**
+ *  Type used as a stream buffer's optional callback.
+ */
+typedef void (* StreamBufferCallbackFunction_t)( StreamBufferHandle_t xStreamBuffer,
+                                                 BaseType_t xIsInsideISR,
+                                                 BaseType_t * const pxHigherPriorityTaskWoken );
 
 /**
  * stream_buffer.h
@@ -104,6 +110,16 @@ typedef struct StreamBufferDef_t * StreamBufferHandle_t;
  * are actually available.  Setting a trigger level of 0 will result in a
  * trigger level of 1 being used.  It is not valid to specify a trigger level
  * that is greater than the buffer size.
+ *
+ * @param pxSendCompletedCallback Callback invoked when number of bytes at least equal to
+ * trigger level is sent to the stream buffer. If the parameter is NULL, it will use the default
+ * implementation provided by sbSEND_COMPLETED macro. To enable the callback,
+ * configUSE_SB_COMPLETED_CALLBACK must be set to 1 in FreeRTOSConfig.h.
+ *
+ * @param pxReceiveCompletedCallback Callback invoked when more than zero bytes are read from a
+ * stream buffer. If the parameter is NULL, it will use the default
+ * implementation provided by sbRECEIVE_COMPLETED macro. To enable the callback,
+ * configUSE_SB_COMPLETED_CALLBACK must be set to 1 in FreeRTOSConfig.h.
  *
  * @return If NULL is returned, then the stream buffer cannot be created
  * because there is insufficient heap memory available for FreeRTOS to allocate
@@ -139,7 +155,14 @@ typedef struct StreamBufferDef_t * StreamBufferHandle_t;
  * \defgroup xStreamBufferCreate xStreamBufferCreate
  * \ingroup StreamBufferManagement
  */
-#define xStreamBufferCreate( xBufferSizeBytes, xTriggerLevelBytes )    xStreamBufferGenericCreate( xBufferSizeBytes, xTriggerLevelBytes, pdFALSE )
+
+#define xStreamBufferCreate( xBufferSizeBytes, xTriggerLevelBytes ) \
+    xStreamBufferGenericCreate( xBufferSizeBytes, xTriggerLevelBytes, pdFALSE, NULL, NULL )
+
+#if ( configUSE_SB_COMPLETED_CALLBACK == 1 )
+    #define xStreamBufferCreateWithCallback( xBufferSizeBytes, xTriggerLevelBytes, pxSendCompletedCallback, pxReceiveCompletedCallback ) \
+    xStreamBufferGenericCreate( xBufferSizeBytes, xTriggerLevelBytes, pdFALSE, pxSendCompletedCallback, pxReceiveCompletedCallback )
+#endif
 
 /**
  * stream_buffer.h
@@ -181,6 +204,16 @@ typedef struct StreamBufferDef_t * StreamBufferHandle_t;
  * StaticStreamBuffer_t, which will be used to hold the stream buffer's data
  * structure.
  *
+ * @param pxSendCompletedCallback Callback invoked when number of bytes at least equal to
+ * trigger level is sent to the stream buffer. If the parameter is NULL, it will use the default
+ * implementation provided by sbSEND_COMPLETED macro. To enable the callback,
+ * configUSE_SB_COMPLETED_CALLBACK must be set to 1 in FreeRTOSConfig.h.
+ *
+ * @param pxReceiveCompletedCallback Callback invoked when more than zero bytes are read from a
+ * stream buffer. If the parameter is NULL, it will use the default
+ * implementation provided by sbRECEIVE_COMPLETED macro. To enable the callback,
+ * configUSE_SB_COMPLETED_CALLBACK must be set to 1 in FreeRTOSConfig.h.
+ *
  * @return If the stream buffer is created successfully then a handle to the
  * created stream buffer is returned. If either pucStreamBufferStorageArea or
  * pxStaticstreamBuffer are NULL then NULL is returned.
@@ -220,8 +253,14 @@ typedef struct StreamBufferDef_t * StreamBufferHandle_t;
  * \defgroup xStreamBufferCreateStatic xStreamBufferCreateStatic
  * \ingroup StreamBufferManagement
  */
+
 #define xStreamBufferCreateStatic( xBufferSizeBytes, xTriggerLevelBytes, pucStreamBufferStorageArea, pxStaticStreamBuffer ) \
-    xStreamBufferGenericCreateStatic( xBufferSizeBytes, xTriggerLevelBytes, pdFALSE, pucStreamBufferStorageArea, pxStaticStreamBuffer )
+    xStreamBufferGenericCreateStatic( xBufferSizeBytes, xTriggerLevelBytes, pdFALSE, pucStreamBufferStorageArea, pxStaticStreamBuffer, NULL, NULL )
+
+#if ( configUSE_SB_COMPLETED_CALLBACK == 1 )
+    #define xStreamBufferCreateStaticWithCallback( xBufferSizeBytes, xTriggerLevelBytes, pucStreamBufferStorageArea, pxStaticStreamBuffer, pxSendCompletedCallback, pxReceiveCompletedCallback ) \
+    xStreamBufferGenericCreateStatic( xBufferSizeBytes, xTriggerLevelBytes, pdFALSE, pucStreamBufferStorageArea, pxStaticStreamBuffer, pxSendCompletedCallback, pxReceiveCompletedCallback )
+#endif
 
 /**
  * stream_buffer.h
@@ -410,10 +449,10 @@ __OPROTO(,,size_t,,xStreamBufferSend,StreamBufferHandle_t xStreamBuffer,const vo
  *  // priority of the currently executing task was unblocked and a context
  *  // switch should be performed to ensure the ISR returns to the unblocked
  *  // task.  In most FreeRTOS ports this is done by simply passing
- *  // xHigherPriorityTaskWoken into taskYIELD_FROM_ISR(), which will test the
+ *  // xHigherPriorityTaskWoken into portYIELD_FROM_ISR(), which will test the
  *  // variables value, and perform the context switch if necessary.  Check the
  *  // documentation for the port in use for port specific instructions.
- *  taskYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+ *  portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
  * }
  * @endcode
  * \defgroup xStreamBufferSendFromISR xStreamBufferSendFromISR
@@ -503,7 +542,7 @@ __OPROTO(,,size_t,,xStreamBufferSendFromISR,StreamBufferHandle_t xStreamBuffer,c
  *
  *  if( xReceivedBytes > 0 )
  *  {
- *      // A ucRxData contains another xRecievedBytes bytes of data, which can
+ *      // A ucRxData contains another xReceivedBytes bytes of data, which can
  *      // be processed here....
  *  }
  * }
@@ -591,10 +630,10 @@ __OPROTO(,,size_t,,xStreamBufferReceive,StreamBufferHandle_t xStreamBuffer,void 
  *  // priority of the currently executing task was unblocked and a context
  *  // switch should be performed to ensure the ISR returns to the unblocked
  *  // task.  In most FreeRTOS ports this is done by simply passing
- *  // xHigherPriorityTaskWoken into taskYIELD_FROM_ISR(), which will test the
+ *  // xHigherPriorityTaskWoken into portYIELD_FROM_ISR(), which will test the
  *  // variables value, and perform the context switch if necessary.  Check the
  *  // documentation for the port in use for port specific instructions.
- *  taskYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+ *  portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
  * }
  * @endcode
  * \defgroup xStreamBufferReceiveFromISR xStreamBufferReceiveFromISR
@@ -885,18 +924,23 @@ __OPROTO(,,BaseType_t,,xStreamBufferReceiveCompletedFromISR,StreamBufferHandle_t
 /*
 StreamBufferHandle_t xStreamBufferGenericCreate( size_t xBufferSizeBytes,
                                                  size_t xTriggerLevelBytes,
-                                                 BaseType_t xIsMessageBuffer ) PRIVILEGED_FUNCTION;
+                                                 BaseType_t xIsMessageBuffer,
+                                                 StreamBufferCallbackFunction_t pxSendCompletedCallback,
+                                                 StreamBufferCallbackFunction_t pxReceiveCompletedCallback ) PRIVILEGED_FUNCTION;
+
 
 StreamBufferHandle_t xStreamBufferGenericCreateStatic( size_t xBufferSizeBytes,
                                                        size_t xTriggerLevelBytes,
                                                        BaseType_t xIsMessageBuffer,
                                                        uint8_t * const pucStreamBufferStorageArea,
-                                                       StaticStreamBuffer_t * const pxStaticStreamBuffer ) PRIVILEGED_FUNCTION;
+                                                       StaticStreamBuffer_t * const pxStaticStreamBuffer,
+                                                       StreamBufferCallbackFunction_t pxSendCompletedCallback,
+                                                       StreamBufferCallbackFunction_t pxReceiveCompletedCallback ) PRIVILEGED_FUNCTION;
 
 size_t xStreamBufferNextMessageLengthBytes( StreamBufferHandle_t xStreamBuffer ) PRIVILEGED_FUNCTION;
 */
-__OPROTO(,,StreamBufferHandle_t,,xStreamBufferGenericCreate,size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer)
-__OPROTO(,,StreamBufferHandle_t,,xStreamBufferGenericCreateStatic,size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer,uint8_t * const pucStreamBufferStorageArea,StaticStreamBuffer_t * const pxStaticStreamBuffer)
+__OPROTO(,,StreamBufferHandle_t,,xStreamBufferGenericCreate,size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer,StreamBufferCallbackFunction_t pxSendCompletedCallback,StreamBufferCallbackFunction_t pxReceiveCompletedCallback)
+__OPROTO(,,StreamBufferHandle_t,,xStreamBufferGenericCreateStatic,size_t xBufferSizeBytes,size_t xTriggerLevelBytes,BaseType_t xIsMessageBuffer,uint8_t * const pucStreamBufferStorageArea,StaticStreamBuffer_t * const pxStaticStreamBuffer,StreamBufferCallbackFunction_t pxSendCompletedCallback,StreamBufferCallbackFunction_t pxReceiveCompletedCallback)
 __OPROTO(,,size_t,,xStreamBufferNextMessageLengthBytes,StreamBufferHandle_t xStreamBuffer)
 
 #if ( configUSE_TRACE_FACILITY == 1 )
