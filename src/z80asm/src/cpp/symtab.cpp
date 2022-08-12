@@ -53,6 +53,16 @@ shared_ptr<Symbol> Symtab::find_all(const string& name) {
 		return nullptr;
 }
 
+shared_ptr<Symbol> Symtab::use(const string& name) {
+	shared_ptr<Symbol> symbol = find(name);
+	if (!symbol) {
+		symbol = make_shared<Symbol>(name);
+		symbol->set_used(true);
+		insert(symbol);
+	}
+	return symbol;
+}
+
 static void init_globals() {
 	if (!g_global_def_symbols) {
 		g_global_def_symbols = make_shared<Symtab>();
