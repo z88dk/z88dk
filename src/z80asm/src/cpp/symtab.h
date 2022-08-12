@@ -21,8 +21,11 @@ public:
 	bool insert(shared_ptr<Symbol> symbol);
 	void erase(const string& name) { m_table.erase(name); }
 	void clear() { m_table.clear(); }
+
 	shared_ptr<Symbol> find(const string& name);
 	shared_ptr<Symbol> find_all(const string& name);
+
+	shared_ptr<Symbol> use(const string& name);
 
 private:
 	weak_ptr<Symtab> m_parent;		// parent, if any

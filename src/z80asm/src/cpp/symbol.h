@@ -16,7 +16,7 @@ class Section;
 class Symbol {
 public:
 	enum class Type {
-		Unknown,					// not known yet
+		Undefined,					// not defined yet
 		Constant,					// constant value
 		Address,					// address computed at link time
 		Computed,					// DEFC computed at link time
@@ -39,10 +39,10 @@ public:
 	void set_type(Type t) { m_type = t; }
 	Scope scope() const { return m_scope; }
 	void set_scope(Scope s) { m_scope = s; }
+	bool is_const() const { return m_is_const; }
+	void set_const(bool f = true) { m_is_const = f; }
 	bool is_computed() const { return m_is_computed; }
 	void set_computed(bool f = true) { m_is_computed = f; }
-	bool is_defined() const { return m_is_defined; }
-	void set_defined(bool f = true) { m_is_defined = f; }
 	bool is_used() const { return m_is_used; }
 	void set_used(bool f = true) { m_is_used = f; }
 	shared_ptr<Section> section() { return m_section.lock(); }
@@ -54,11 +54,11 @@ private:
 	string	m_name;					// name
 	int		m_value{ 0 };			// value if constant or computed
 
-	Type	m_type{ Type::Unknown };
+	Type	m_type{ Type::Undefined };
 	Scope	m_scope{ Scope::Local };
 
+	bool	m_is_const{ true };		// does not depend from external or address
 	bool	m_is_computed{ false };	// true if Type::Computed or Type::Address and value computed
-	bool	m_is_defined{ false };	// true if symbol was defined in the current module
 	bool	m_is_used{ false };		// true if symbol was used and shall be writen to the object file
 
 	weak_ptr<Section>	m_section;	// section where defined
