@@ -19,11 +19,11 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "sym.h"
 #include "utarray.h"
 
-struct Module;
-struct Section;
+struct Module1;
+struct Section1;
 
 /*-----------------------------------------------------------------------------
-*	UT_array of Expr*
+*	UT_array of Expr1*
 *----------------------------------------------------------------------------*/
 extern UT_icd ut_exprs_icd;
 
@@ -72,7 +72,7 @@ typedef struct ExprOp				/* hold one operation or operand */
 		long	value;				/* operand value */
 
 		/* SYMBOL_OP */
-		Symbol* symbol;				/* symbol in symbol table */
+		Symbol1* symbol;				/* symbol in symbol table */
 
 		/* CONST_EXPR_OP - no data */
 
@@ -81,7 +81,7 @@ typedef struct ExprOp				/* hold one operation or operand */
 	} d;
 } ExprOp;
 
-ARRAY(ExprOp);					/* hold list of Expr operations/operands */
+ARRAY(ExprOp);					/* hold list of Expr1 operations/operands */
 
 /*-----------------------------------------------------------------------------
 *	Expression range
@@ -105,13 +105,13 @@ extern int range_size(range_t range);
 /*-----------------------------------------------------------------------------
 *	Expression
 *----------------------------------------------------------------------------*/
-CLASS(Expr)
+CLASS(Expr1)
 ExprOpArray* rpn_ops;			/* list of operands / operators in reverse polish notation */
 Str*		text;				/* expression in infix text */
 
 /* flags set during eval */
 struct {
-	bool not_evaluable : 1;		/* true if expression did not retunr a value */
+	bool not_evaluable : 1;		/* true if expression did not return a value */
 	bool undefined_symbol : 1;	/* true if expression contains one undefined symbol */
 	bool extern_symbol : 1;		/* true if expression contains one EXTERN symbol */
 	bool cross_section_addr : 1;/* true if expression referred to symbol on another section */
@@ -126,8 +126,8 @@ const char* target_name;		/* name of the symbol, stored in strpool,
 								* to receive the result value of the expression
 								* computation, NULL if not an EQU expression */
 
-struct Module* module;			/* module where expression is patched (weak ref) */
-struct Section* section;		/* section where expression is patched (weak ref) */
+struct Module1* module;			/* module where expression is patched (weak ref) */
+struct Section1* section;		/* section where expression is patched (weak ref) */
 int			asmpc;				/* ASMPC value during linking */
 int			code_pos;			/* Address to patch expression value */
 
@@ -136,30 +136,30 @@ int			 line_num;			/* source line */
 long		 listpos;			/* position in listing file to patch (in pass 2), -1 if not listing */
 END_CLASS;
 
-CLASS_LIST(Expr);					/* list of expressions */
+CLASS_LIST(Expr1);					/* list of expressions */
 
 /* compute ExprOp using Calc_xxx functions */
-extern void ExprOp_compute(ExprOp* self, Expr* expr, bool not_defined_error);
+extern void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error);
 
-/* parse expression at current input, return new Expr object;
+/* parse expression at current input, return new Expr1 object;
    return NULL and issue syntax error on error */
-extern Expr* expr_parse(void);
+extern Expr1* expr_parse(void);
 
 /* evaluate expression if possible, set result.not_evaluable if failed
    e.g. symbol not defined; show error messages if not_defined_error */
-extern long Expr_eval(Expr* self, bool not_defined_error);
+extern long Expr_eval(Expr1* self, bool not_defined_error);
 
 /* check if all variables used in an expression are local to the same module
    and section; if yes, the expression can be computed in phase 2 of the compile,
    if not the expression must be passed to the link phase */
-extern bool Expr_is_local_in_section(Expr* self, struct Module* module, struct Section* section);
+extern bool Expr_is_local_in_section(Expr1* self, struct Module1* module, struct Section1* section);
 
 /* check if the expression refers to more than one address expression; if yes,
    it needs to be computed at link time */
-extern bool Expr_without_addresses(Expr* self);
+extern bool Expr_without_addresses(Expr1* self);
 
 /* check if expression depends on itself */
-extern bool Expr_is_recusive(Expr* self, const char* name);
+extern bool Expr_is_recusive(Expr1* self, const char* name);
 
 /*-----------------------------------------------------------------------------
 *	Stack for calculator

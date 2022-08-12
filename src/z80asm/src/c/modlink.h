@@ -10,18 +10,18 @@ Repository: https://github.com/z88dk/z88dk
 #pragma once
 
 #include "types.h"
-#include "expr.h"
-#include "module.h"
+#include "expr1.h"
+#include "module1.h"
 #include "utlist.h"
 
 // append a library from the command line to the list to be linked
 void library_file_append(const char* filename);
 
 // append an object from the command line to the list to be linked
-bool object_file_append(const char* filename, Module* module, bool reserve_space, bool no_errors);
+bool object_file_append(const char* filename, Module1* module, bool reserve_space, bool no_errors);
 
 void link_modules(void);
-void compute_equ_exprs(ExprList *exprs, bool show_error, bool module_relative_addr);
+void compute_equ_exprs(Expr1List *exprs, bool show_error, bool module_relative_addr);
 
 // call appmake if required by command line
 void checkrun_appmake(void);

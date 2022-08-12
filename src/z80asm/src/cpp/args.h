@@ -123,7 +123,7 @@ private:
 	static bool collect_opt_arg(const string& opt_name, const string& arg,
 								string& opt_arg);
 
-	static int parse_opt_int(const string& opt_arg);
+	static bool parse_opt_int(int& value, const string& opt_arg);
 	static void parse_define(const string& opt_arg);
 	static string unquote(string text);
 	static string expand_env_vars(string text);

@@ -9,12 +9,16 @@ Repository: https://github.com/z88dk/z88dk
 One symbol from the assembly code - label or constant.
 */
 
+#include "expr1.h"
 #include "if.h"
+#include "scan.h"
 #include "str.h"
 #include "strutil.h"
 #include "sym.h"
-#include "symbol.h"
+#include "symtab1.h"
+#include "types.h"
 #include "utstring.h"
+#include "zobjfile.h"
 
 /*-----------------------------------------------------------------------------
 *   Constant tables
@@ -34,22 +38,22 @@ char *sym_scope_str[] = {
 };
 
 /*-----------------------------------------------------------------------------
-*   Symbol
+*   Symbol1
 *----------------------------------------------------------------------------*/
-DEF_CLASS( Symbol )
+DEF_CLASS( Symbol1 )
 
-void Symbol_init( Symbol *self ) {}
-void Symbol_copy( Symbol *self, Symbol *other ) {}
-void Symbol_fini( Symbol *self ) {}
+void Symbol1_init( Symbol1 *self ) {}
+void Symbol1_copy( Symbol1 *self, Symbol1 *other ) {}
+void Symbol1_fini( Symbol1 *self ) {}
 
 /*-----------------------------------------------------------------------------
 *   create a new symbol, needs to be deleted by OBJ_DELETE()
 *	adds a reference to the page were referred to
 *----------------------------------------------------------------------------*/
-Symbol *Symbol_create(const char *name, long value, sym_type_t type, sym_scope_t scope,
-					   Module *module, Section *section )
+Symbol1 *Symbol_create(const char *name, long value, sym_type_t type, sym_scope_t scope,
+					   Module1 *module, Section1 *section )
 {
-    Symbol *self 	= OBJ_NEW( Symbol );
+    Symbol1 *self 	= OBJ_NEW( Symbol1 );
 
 	self->name = spool_add(name);			/* name in strpool, not freed */
 	self->value = value;
@@ -66,7 +70,7 @@ Symbol *Symbol_create(const char *name, long value, sym_type_t type, sym_scope_t
 /*-----------------------------------------------------------------------------
 *   return full symbol name NAME@MODULE stored in strpool
 *----------------------------------------------------------------------------*/
-const char *Symbol_fullname( Symbol *sym )
+const char *Symbol_fullname( Symbol1 *sym )
 {
 	STR_DEFINE(name, STR_SIZE);
 	const char *ret;

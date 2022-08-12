@@ -16,11 +16,19 @@ rc_01_input_hbios1_iterm_msg_getc:
    ;
    ;  can use : af, bc, de, hl
 
+block_loop:
+
+   ld bc,__BF_CIOIST<<8|0x01
+   call asm_hbios               ; check for character in Rx buffer
+   or a
+   jr Z,block_loop
+
    ld bc,__BF_CIOIN<<8|0x01
-   call asm_hbios               ; block and get character in Rx buffer
+   call asm_hbios               ; get character in Rx buffer
+
+   ; e = ascii code
 
    ld a,e
-   ; a = ascii code
 
    cp 32
    ret nc

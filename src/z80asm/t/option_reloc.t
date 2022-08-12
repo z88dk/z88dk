@@ -26,9 +26,9 @@ spew("${test}.asm", $asm);
 
 capture_ok("z88dk-z80asm -b -v -R ${test}.asm", <<END);
 Reading library 'z88dk-z80asm-z80-.lib'
-Predefined constant: __CPU_Z80__ = \$0001
-Predefined constant: __CPU_ZILOG__ = \$0001
-Predefined constant: __FLOAT_GENMATH__ = \$0001
+Predefined constant: __CPU_Z80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Predefined constant: __FLOAT_GENMATH__ = 1
 Assembling '${test}.asm' to '${test}.o'
 Reading '${test}.asm' = '${test}.asm'
 Writing object file '${test}.o'
@@ -52,9 +52,9 @@ spew("${test}.asm", $asm);
 
 capture_ok("z88dk-z80asm -b -v -R ${test}.asm", <<END);
 Reading library 'z88dk-z80asm-z80-.lib'
-Predefined constant: __CPU_Z80__ = \$0001
-Predefined constant: __CPU_ZILOG__ = \$0001
-Predefined constant: __FLOAT_GENMATH__ = \$0001
+Predefined constant: __CPU_Z80__ = 1
+Predefined constant: __CPU_ZILOG__ = 1
+Predefined constant: __FLOAT_GENMATH__ = 1
 Assembling '${test}.asm' to '${test}.o'
 Reading '${test}.asm' = '${test}.asm'
 Writing object file '${test}.o'

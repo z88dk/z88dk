@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\z88dk-lib\dirent.h">
+    <ClInclude Include="..\..\src\z88dk-lib\win32\dirent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

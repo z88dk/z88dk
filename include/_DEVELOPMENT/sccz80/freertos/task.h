@@ -56,7 +56,7 @@
  * The tskKERNEL_VERSION_MAJOR, tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD
  * values will reflect the last released version number.
  */
-#define tskKERNEL_VERSION_NUMBER       "V10.4.6"
+#define tskKERNEL_VERSION_NUMBER       "V10.4.6+"
 #define tskKERNEL_VERSION_MAJOR        10
 #define tskKERNEL_VERSION_MINOR        4
 #define tskKERNEL_VERSION_BUILD        6
@@ -164,15 +164,21 @@ typedef struct xTASK_STATUS
     UBaseType_t uxBasePriority;                   /* The priority to which the task will return if the task's current priority has been inherited to avoid unbounded priority inversion when obtaining a mutex.  Only valid if configUSE_MUTEXES is defined as 1 in FreeRTOSConfig.h. */
     configRUN_TIME_COUNTER_TYPE ulRunTimeCounter; /* The total run time allocated to the task so far, as defined by the run time stats clock.  See https://www.FreeRTOS.org/rtos-run-time-stats.html.  Only valid when configGENERATE_RUN_TIME_STATS is defined as 1 in FreeRTOSConfig.h. */
     StackType_t * pxStackBase;                    /* Points to the lowest address of the task's stack area. */
+    #if ( ( portSTACK_GROWTH > 0 ) && ( configRECORD_STACK_HIGH_ADDRESS == 1 ) )
+        StackType_t * pxTopOfStack;               /* Points to the top address of the task's stack area. */
+        StackType_t * pxEndOfStack;               /* Points to the end address of the task's stack area. */
+    #endif
     configSTACK_DEPTH_TYPE uxStackHighWaterMark;  /* The minimum amount of stack space that has remained for the task since the task was created.  The closer this value is to zero the closer the task has come to overflowing its stack. */
 } TaskStatus_t;
 
 /* Possible return values for eTaskConfirmSleepModeStatus(). */
 typedef enum
 {
-    eAbortSleep = 0,       /* A task has been made ready or a context switch pended since portSUPPRESS_TICKS_AND_SLEEP() was called - abort entering a sleep mode. */
-    eStandardSleep,        /* Enter a sleep mode that will not last any longer than the expected idle time. */
-    eNoTasksWaitingTimeout /* No tasks are waiting for a timeout so it is safe to enter a sleep mode that can only be exited by an external interrupt. */
+    eAbortSleep = 0,           /* A task has been made ready or a context switch pended since portSUPPRESS_TICKS_AND_SLEEP() was called - abort entering a sleep mode. */
+    eStandardSleep,            /* Enter a sleep mode that will not last any longer than the expected idle time. */
+    #if ( INCLUDE_vTaskSuspend == 1 )
+        eNoTasksWaitingTimeout /* No tasks are waiting for a timeout so it is safe to enter a sleep mode that can only be exited by an external interrupt. */
+    #endif /* INCLUDE_vTaskSuspend */
 } eSleepModeStatus;
 
 /**
@@ -1057,7 +1063,7 @@ extern eTaskState __LIB__ eTaskGetState(TaskHandle_t xTask) __smallc;
  * filled with information about the task referenced by the handle passed using
  * the xTask parameter.
  *
- * @xGetFreeStackSpace The TaskStatus_t structure contains a member to report
+ * @param xGetFreeStackSpace The TaskStatus_t structure contains a member to report
  * the stack high water mark of the task being queried.  Calculating the stack
  * high water mark takes a relatively long time, and can make the system
  * temporarily unresponsive - so the xGetFreeStackSpace parameter is provided to
@@ -2608,7 +2614,7 @@ extern BaseType_t __LIB__ xTaskGenericNotifyWait(UBaseType_t uxIndexToWaitOn,uin
  *
  * When task notifications are being used as a binary or counting semaphore
  * equivalent then the task being notified should wait for the notification
- * using the ulTaskNotificationTakeIndexed() API function rather than the
+ * using the ulTaskNotifyTakeIndexed() API function rather than the
  * xTaskNotifyWaitIndexed() API function.
  *
  * **NOTE** Each notification within the array operates independently - a task
@@ -2685,7 +2691,7 @@ extern BaseType_t __LIB__ xTaskGenericNotifyWait(UBaseType_t uxIndexToWaitOn,uin
  *
  * When task notifications are being used as a binary or counting semaphore
  * equivalent then the task being notified should wait for the notification
- * using the ulTaskNotificationTakeIndexed() API function rather than the
+ * using the ulTaskNotifyTakeIndexed() API function rather than the
  * xTaskNotifyWaitIndexed() API function.
  *
  * **NOTE** Each notification within the array operates independently - a task
@@ -3359,7 +3365,7 @@ extern void __LIB__ vTaskPriorityDisinheritAfterTimeout(TaskHandle_t const pxMut
 
 
 /*
- * Get the uxTCBNumber assigned to the task referenced by the xTask parameter.
+ * Get the uxTaskNumber assigned to the task referenced by the xTask parameter.
  */
 /*
 UBaseType_t uxTaskGetTaskNumber( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
@@ -3389,9 +3395,9 @@ extern void __LIB__ vTaskSetTaskNumber(TaskHandle_t xTask,const UBaseType_t uxHa
  * equal to the idle period.
  */
 /*
-void vTaskStepTick( const TickType_t xTicksToJump ) PRIVILEGED_FUNCTION;
+void vTaskStepTick( TickType_t xTicksToJump ) PRIVILEGED_FUNCTION;
  */
-extern void __LIB__ vTaskStepTick(const TickType_t xTicksToJump) __smallc;
+extern void __LIB__ vTaskStepTick(TickType_t xTicksToJump) __smallc;
 
 
 

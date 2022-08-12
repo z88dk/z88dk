@@ -13,32 +13,32 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "array.h"
 #include "codearea.h"
 #include "die.h"
-#include "expr.h"
+#include "expr1.h"
 #include "if.h"
 #include "init.h"
-#include "module.h"
+#include "module1.h"
 #include "strhash.h"
 #include "strutil.h"
 #include "sym.h"
-#include "symtab.h"
+#include "symtab1.h"
 #include "utstring.h"
 
 /*-----------------------------------------------------------------------------
-*	UT_array of Expr*
+*	UT_array of Expr1*
 *----------------------------------------------------------------------------*/
 void ut_exprs_init(void* elt)
 {
-	Expr* expr = OBJ_NEW(Expr);
-	*((Expr**)elt) = expr;
+	Expr1* expr = OBJ_NEW(Expr1);
+	*((Expr1**)elt) = expr;
 }
 
 void ut_exprs_dtor(void* elt)
 {
-	Expr* expr = *((Expr**)elt);
+	Expr1* expr = *((Expr1**)elt);
 	OBJ_DELETE(expr);
 }
 
-UT_icd ut_exprs_icd = { sizeof(Expr*), ut_exprs_init, NULL, ut_exprs_dtor };
+UT_icd ut_exprs_icd = { sizeof(Expr1*), ut_exprs_init, NULL, ut_exprs_dtor };
 
 
 /*-----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ UT_icd ut_exprs_icd = { sizeof(Expr*), ut_exprs_init, NULL, ut_exprs_dtor };
 /* init each type of ExprOp */
 static void ExprOp_init_asmpc(ExprOp* self);
 static void ExprOp_init_number(ExprOp* self, long value);
-static void ExprOp_init_symbol(ExprOp* self, Symbol* symbol);
+static void ExprOp_init_symbol(ExprOp* self, Symbol1* symbol);
 static void ExprOp_init_operator(ExprOp* self, tokid_t tok, op_type_t op_type);
 
 /*-----------------------------------------------------------------------------
@@ -249,7 +249,7 @@ void ExprOp_init_number(ExprOp* self, long value)
 	self->d.value = value;
 }
 
-void ExprOp_init_symbol(ExprOp* self, Symbol* symbol)
+void ExprOp_init_symbol(ExprOp* self, Symbol1* symbol)
 {
 	self->op_type = SYMBOL_OP;
 	self->d.symbol = symbol;
@@ -266,7 +266,7 @@ void ExprOp_init_operator(ExprOp* self, tokid_t tok, op_type_t op_type)
 }
 
 /* compute ExprOp using Calc_xxx functions */
-void ExprOp_compute(ExprOp* self, Expr* expr, bool not_defined_error)
+void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 {
 	switch (self->op_type)
 	{
@@ -362,10 +362,10 @@ int range_size(range_t range)
 /*-----------------------------------------------------------------------------
 *	Class to hold one parsed expression
 *----------------------------------------------------------------------------*/
-DEF_CLASS(Expr);
-DEF_CLASS_LIST(Expr);
+DEF_CLASS(Expr1);
+DEF_CLASS_LIST(Expr1);
 
-void Expr_init(Expr* self)
+void Expr1_init(Expr1* self)
 {
 	self->rpn_ops = OBJ_NEW(ExprOpArray);
 	OBJ_AUTODELETE(self->rpn_ops) = false;
@@ -386,14 +386,14 @@ void Expr_init(Expr* self)
 	self->listpos = -1;
 }
 
-void Expr_copy(Expr* self, Expr* other)
+void Expr1_copy(Expr1* self, Expr1* other)
 {
 	self->rpn_ops = ExprOpArray_clone(other->rpn_ops);
 	self->text = Str_new(STR_SIZE);
 	Str_set(self->text, Str_data(other->text));
 }
 
-void Expr_fini(Expr* self)
+void Expr1_fini(Expr1* self)
 {
 	OBJ_DELETE(self->rpn_ops);
 	Str_delete(self->text);
@@ -402,10 +402,10 @@ void Expr_fini(Expr* self)
 /*-----------------------------------------------------------------------------
 *	Expression parser
 *----------------------------------------------------------------------------*/
-static bool Expr_parse_ternary_cond(Expr* expr);
+static bool Expr_parse_ternary_cond(Expr1* expr);
 
 #define DEFINE_PARSER( name, prev_name, condition )			\
-	static bool name( Expr *self )							\
+	static bool name( Expr1 *self )							\
 	{														\
 		tokid_t op = TK_NIL;								\
 															\
@@ -432,9 +432,9 @@ static bool Expr_parse_ternary_cond(Expr* expr);
 	}
 
 /* parse value */
-static bool Expr_parse_factor(Expr* self)
+static bool Expr_parse_factor(Expr1* self)
 {
-	Symbol* symptr;
+	Symbol1* symptr;
 
 	switch (sym.tok)
 	{
@@ -476,7 +476,7 @@ static bool Expr_parse_factor(Expr* self)
 }
 
 /* parse unary operators */
-static bool Expr_parse_unary(Expr* self)
+static bool Expr_parse_unary(Expr1* self)
 {
 	tokid_t open_paren;
 
@@ -541,7 +541,7 @@ static bool Expr_parse_unary(Expr* self)
 }
 
 /* parse A ** B */
-static bool Expr_parse_power(Expr* self)
+static bool Expr_parse_power(Expr1* self)
 {
 	if (!Expr_parse_unary(self))
 		return false;
@@ -595,7 +595,7 @@ DEFINE_PARSER(Expr_parse_multiplication, Expr_parse_power,
 		sym.tok == TK_LOG_OR)
 
 	/* parse cond ? true : false */
-	static bool Expr_parse_ternary_cond(Expr* self)
+	static bool Expr_parse_ternary_cond(Expr1* self)
 {
 	if (!Expr_parse_logical_or(self))		/* get cond or expression */
 		return false;
@@ -623,10 +623,10 @@ DEFINE_PARSER(Expr_parse_multiplication, Expr_parse_power,
 	return true;
 }
 
-/* parse expression at current input, return new Expr object;
+/* parse expression at current input, return new Expr1 object;
    return NULL and issue syntax error on error */
-Expr* expr_parse(void) {
-	Expr* self = OBJ_NEW(Expr);
+Expr1* expr_parse(void) {
+	Expr1* self = OBJ_NEW(Expr1);
 	if (!Expr_parse_ternary_cond(self))
 	{
 		/* syntax error in expression */
@@ -644,7 +644,7 @@ Expr* expr_parse(void) {
 *	NOTE: needs to understand that x + addr1 - addr2, when addr1 and addr2 are
 *		in the same module and section, is a constant and not an address
 *----------------------------------------------------------------------------*/
-long Expr_eval(Expr* self, bool not_defined_error)
+long Expr_eval(Expr1* self, bool not_defined_error)
 {
 	size_t i;
 
@@ -689,7 +689,7 @@ long Expr_eval(Expr* self, bool not_defined_error)
 /* check if all variables used in an expression are local to the same module
 and section; if yes, the expression can be computed in phase 2 of the compile,
 if not the expression must be passed to the link phase */
-bool Expr_is_local_in_section(Expr* self, struct Module* module, struct Section* section)
+bool Expr_is_local_in_section(Expr1* self, struct Module1* module, struct Section1* section)
 {
 	size_t i;
 
@@ -719,7 +719,7 @@ bool Expr_is_local_in_section(Expr* self, struct Module* module, struct Section*
 	return true;
 }
 
-bool Expr_without_addresses(Expr* self)
+bool Expr_without_addresses(Expr1* self)
 {
 	size_t i;
 	int num_addresses = 0;
@@ -759,7 +759,7 @@ bool Expr_without_addresses(Expr* self)
 }
 
 /* check if expression depends on itself */
-bool Expr_is_recusive(Expr* self, const char* name)
+bool Expr_is_recusive(Expr1* self, const char* name)
 {
 	size_t i;
 

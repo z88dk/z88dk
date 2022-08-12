@@ -12,10 +12,10 @@ Define CPU opcodes
 #include "../portability.h"
 #include "codearea.h"
 #include "directives.h"
-#include "expr.h"
+#include "expr1.h"
 #include "opcodes.h"
 #include "parse.h"
-#include "symtab.h"
+#include "symtab1.h"
 #include "z80asm.h"
 #include <assert.h>
 
@@ -44,12 +44,12 @@ void add_opcode(int opcode)
 }
 
 /* add opcode followed by jump relative offset expression */
-void add_opcode_jr(int opcode, Expr *expr)
+void add_opcode_jr(int opcode, Expr1 *expr)
 {
 	add_opcode_jr_n(opcode, expr, 0);
 }
 
-void add_opcode_jr_n(int opcode, struct Expr* expr, int asmpc_offset)
+void add_opcode_jr_n(int opcode, struct Expr1* expr, int asmpc_offset)
 {
 	expr->asmpc += asmpc_offset;		// expr is assumed to be at asmpc+1; add offset if this is not true
 
@@ -81,55 +81,55 @@ void add_opcode_jr_n(int opcode, struct Expr* expr, int asmpc_offset)
 }
 
 /* add opcode followed by 8-bit unsigned expression */
-void add_opcode_n(int opcode, Expr* expr)
+void add_opcode_n(int opcode, Expr1* expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, expr);
 }
 
 /* add opcode followed by 8-bit offset to 0xff00 expression */
-void add_opcode_h(int opcode, Expr* expr)
+void add_opcode_h(int opcode, Expr1* expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_HIGH_OFFSET, expr);
 }
 
 /* add opcode followed by 8-bit unsigned expression and a zero byte */
-void add_opcode_n_0(int opcode, struct Expr* expr)
+void add_opcode_n_0(int opcode, struct Expr1* expr)
 {
     add_opcode(opcode);
     Pass2infoExpr(RANGE_BYTE_TO_WORD_UNSIGNED, expr);
 }
 
-void add_opcode_s_0(int opcode, struct Expr* expr)
+void add_opcode_s_0(int opcode, struct Expr1* expr)
 {
     add_opcode(opcode);
     Pass2infoExpr(RANGE_BYTE_TO_WORD_SIGNED, expr);
 }
 
 /* add opcode followed by 8-bit signed expression */
-void add_opcode_d(int opcode, Expr *expr)
+void add_opcode_d(int opcode, Expr1 *expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_BYTE_SIGNED, expr);
 }
 
 /* add opcode followed by 16-bit expression */
-void add_opcode_nn(int opcode, Expr *expr)
+void add_opcode_nn(int opcode, Expr1 *expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_WORD, expr);
 }
 
 /* add opcode followed by big-endian 16-bit expression */
-void add_opcode_NN(int opcode, struct Expr *expr)
+void add_opcode_NN(int opcode, struct Expr1 *expr)
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_WORD_BE, expr);
 }
 
 /* add opcode followed by IX/IY offset expression */
-void add_opcode_idx(int opcode, Expr *expr)
+void add_opcode_idx(int opcode, Expr1 *expr)
 {
 	if (opcode & 0xFF0000) 
 	{				/* 3 bytes, insert idx offset as 2nd byte */
@@ -145,8 +145,8 @@ void add_opcode_idx(int opcode, Expr *expr)
 }
 
 /* add opcode followed by IX/IY offset expression and 8 bit expression */
-void add_opcode_idx_n(int opcode, struct Expr *idx_expr,
-								  struct Expr *n_expr )
+void add_opcode_idx_n(int opcode, struct Expr1 *idx_expr,
+								  struct Expr1 *n_expr )
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_BYTE_SIGNED, idx_expr);
@@ -154,8 +154,8 @@ void add_opcode_idx_n(int opcode, struct Expr *idx_expr,
 }
 
 /* add opcode followed by two 8-bit expressions */
-void add_opcode_n_n(int opcode, struct Expr *n1_expr,
-								struct Expr *n2_expr )
+void add_opcode_n_n(int opcode, struct Expr1 *n1_expr,
+								struct Expr1 *n2_expr )
 {
 	add_opcode(opcode);
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, n1_expr);
@@ -165,7 +165,7 @@ void add_opcode_n_n(int opcode, struct Expr *n1_expr,
 void add_call_emul_func(char * emul_func)
 { 
 	declare_extern_symbol(emul_func);
-	Expr *emul_expr = parse_expr(emul_func);
+	Expr1 *emul_expr = parse_expr(emul_func);
 	add_opcode_nn(0xCD, emul_expr);
 }
 
@@ -232,7 +232,7 @@ void add_Z88_INVOKE(int argument)
 
 // cu.wait VER, HOR   ->  16 - bit encoding 0x8000 + (HOR << 9) + VER
 // (0<=VER<=311, 0<=HOR<=55)  BIG ENDIAN!
-void add_copper_unit_wait(Expr *ver, Expr *hor)
+void add_copper_unit_wait(Expr1 *ver, Expr1 *hor)
 { 
 	if (option_cpu() != CPU_Z80N)
 		error_illegal_ident();
@@ -240,7 +240,7 @@ void add_copper_unit_wait(Expr *ver, Expr *hor)
 		char expr_text[MAXLINE];
 		snprintf(expr_text, sizeof(expr_text),
 			"0x8000 + (((%s) & 0x3F) << 9) + ((%s) & 0x1FF)", Str_data(hor->text), Str_data(ver->text));
-		Expr *expr = parse_expr(expr_text);
+		Expr1 *expr = parse_expr(expr_text);
 
 		Pass2infoExpr(RANGE_WORD_BE, expr);
 		OBJ_DELETE(ver);
@@ -250,7 +250,7 @@ void add_copper_unit_wait(Expr *ver, Expr *hor)
 
 // cu.move REG, VAL  -> 16 - bit encoding(REG << 8) + VAL
 // (0<= REG <= 127, 0 <= VAL <= 255)  BIG ENDIAN!
-void add_copper_unit_move(Expr *reg, Expr *val)
+void add_copper_unit_move(Expr1 *reg, Expr1 *val)
 {
 	if (option_cpu() != CPU_Z80N)
 		error_illegal_ident();
@@ -258,7 +258,7 @@ void add_copper_unit_move(Expr *reg, Expr *val)
 		char expr_text[MAXLINE];
 		snprintf(expr_text, sizeof(expr_text),
 			"(((%s) & 0x7F) << 8) + ((%s) & 0xFF)", Str_data(reg->text), Str_data(val->text));
-		Expr *expr = parse_expr(expr_text);
+		Expr1 *expr = parse_expr(expr_text);
 
 		Pass2infoExpr(RANGE_WORD_BE, expr);
 		OBJ_DELETE(reg);
