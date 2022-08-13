@@ -2,7 +2,7 @@ name: test-macos-latest
 
 on:
   schedule:
-    - cron: '00 06 * * *'
+    - cron: '00 * * * *'
 
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
         unzip -d osx-latest z88dk-osx-latest.zip
     - name: Copy files from nightly
       run: |
-        cp osx-latest/z88dk/bin/z88dk-z80asm osx-latest/z88dk/src/z80asm/
+        cp osx-latest/z88dk/bin/z88dk-z80asm      osx-latest/z88dk/src/z80asm/
         cp osx-latest/z88dk/lib/z88dk-z80asm*.lib osx-latest/z88dk/src/z80asm/
     - name: Run z80asm tests
       run: |
