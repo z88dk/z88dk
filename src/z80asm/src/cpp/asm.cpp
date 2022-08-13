@@ -12,7 +12,7 @@
 using namespace std;
 
 bool Asm::assemble(const string& filename) {
-	if (!m_preproc.open(filename, true)) return false;
+	if (!g_preproc.open(filename, true)) return false;
 	if (!parse()) return false;
 	return true;
 }
@@ -20,8 +20,9 @@ bool Asm::assemble(const string& filename) {
 bool Asm::parse() {
 	int initial_error_count = g_errors.count();
 
-	ScannedLine line;
-	while (m_preproc.getline(line)) {
+	string line;
+	while (g_preproc.getline(line)) {
+		m_lexer.set(line);
 		parse_line();
 	}
 
@@ -33,38 +34,38 @@ bool Asm::parse() {
 
 void Asm::parse_line() {
 	switch (m_state) {
-	case State::Assembly: parse_line_assembly(); break;
+	case State::Main: parse_line_main(); break;
 	default: Assert(0);
 	}
 }
 
-void Asm::parse_line_assembly() {
-	string label = check_label();
-	/*
-	if (!label.empty())
-		asm_LABEL(label.c_str());
-	*/
+void Asm::parse_line_main() {
+	while (!m_lexer.at_end()) {
+		string label = check_label();
+		/*
+		if (!label.empty())
+			asm_LABEL(label.c_str());
+		*/
 
-	while (!m_line.at_end()) {
-		if (m_line.peek().type() == TType::Backslash)
-			m_line.next();
+		if (m_lexer.peek().ttype == TType::Backslash)
+			m_lexer.next();
 		else
-			asm_parser_assembly();
+			asm_parse_main();
 	}
 }
 
 string Asm::check_label() {
-	if (m_line.peek(0).type() == TType::Dot &&
-		m_line.peek(1).type() == TType::Ident &&
-		m_line.peek(2).keyword() != Keyword::EQU) {
-		m_line.next(2);
-		return m_line.peek(-1).svalue();
+	if (m_lexer.peek(0).ttype == TType::Dot &&
+		m_lexer.peek(1).ttype == TType::Ident &&
+		m_lexer.peek(2).keyword != Keyword::EQU) {
+		m_lexer.next(2);
+		return m_lexer.peek(-1).svalue;
 	}
-	else if (m_line.peek(0).type() == TType::Ident &&
-		m_line.peek(1).type() == TType::Colon &&
-		m_line.peek(2).keyword() != Keyword::EQU) {
-		m_line.next(2);
-		return m_line.peek(-2).svalue();
+	else if (m_lexer.peek(0).ttype == TType::Ident &&
+		m_lexer.peek(1).ttype == TType::Colon &&
+		m_lexer.peek(2).keyword != Keyword::EQU) {
+		m_lexer.next(2);
+		return m_lexer.peek(-2).svalue;
 	}
 	else
 		return string();

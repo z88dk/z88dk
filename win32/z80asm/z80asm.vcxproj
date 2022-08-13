@@ -248,9 +248,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\src\cpp\args.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\cpp\asm_parse_main.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\asm.cpp" />
-    <ClCompile Include="..\..\src\z80asm\src\cpp\asm_parser_assembly.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\defines.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\float.cpp" />

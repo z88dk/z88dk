@@ -64,8 +64,8 @@ say $fh <<END;
 #include "asm.h"
 #include "errors.h"
 #include "if.h"
-
 using namespace std;
+
 void Asm::$function() {
 END
 
