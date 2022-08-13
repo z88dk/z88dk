@@ -12,6 +12,7 @@
 using namespace std;
 
 class Section;
+class Expr;
 
 class Symbol {
 public:
@@ -31,16 +32,16 @@ public:
 
 	Symbol(const string& name);
 	Symbol(const string& name, int value);
+	Symbol(const string& name, shared_ptr<Expr> expr);
 
 	const string& name() const { return m_name; }
 	int value() const { return m_value; }
 	void set_value(int n) { m_value = n; }
+	shared_ptr<Expr> expr() { return m_expr; }
 	Type type() const { return m_type; }
 	void set_type(Type t) { m_type = t; }
 	Scope scope() const { return m_scope; }
 	void set_scope(Scope s) { m_scope = s; }
-	bool is_const() const { return m_is_const; }
-	void set_const(bool f = true) { m_is_const = f; }
 	bool is_computed() const { return m_is_computed; }
 	void set_computed(bool f = true) { m_is_computed = f; }
 	bool is_used() const { return m_is_used; }
@@ -53,11 +54,11 @@ public:
 private:
 	string	m_name;					// name
 	int		m_value{ 0 };			// value if constant or computed
+	shared_ptr<Expr> m_expr;		// DEFC symbol
 
 	Type	m_type{ Type::Undefined };
 	Scope	m_scope{ Scope::Local };
 
-	bool	m_is_const{ true };		// does not depend from external or address
 	bool	m_is_computed{ false };	// true if Type::Computed or Type::Address and value computed
 	bool	m_is_used{ false };		// true if symbol was used and shall be writen to the object file
 
