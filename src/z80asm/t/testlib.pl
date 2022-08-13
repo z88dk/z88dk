@@ -113,6 +113,7 @@ sub run_ok {
     my($cmd) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
+	ok 1, "Running: $cmd";
     ok 0==system($cmd), $cmd;
 }
 
@@ -121,6 +122,7 @@ sub run_nok {
     my($cmd) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 	
+	ok 1, "Running: $cmd";
     ok 0!=system($cmd), $cmd;
 }
 

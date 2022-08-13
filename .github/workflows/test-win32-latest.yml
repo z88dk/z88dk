@@ -31,5 +31,4 @@ jobs:
         cd win32-latest\z88dk\src\z80asm
         set PATH=%RUNNER_WORKSPACE%\win32-latest\z88dk\bin;%PATH%
         set ZCCCFG=%RUNNER_WORKSPACE%\win32-latest\z88dk\lib\config
-        set PATH
         perl -S prove t\*.t
