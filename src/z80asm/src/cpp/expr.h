@@ -77,6 +77,7 @@ private:
 	int					m_asmpc{ 0 };		// ASMPC value
 	bool				m_silent{ false };	// silence errors
 	bool				m_is_const{ true };	// is a contant expression
+	bool				m_evaluating{ false };	// detect recursive evals
 	string				m_filename;			// filename where defined
 	int					m_line_num{ 0 };	// line number where defined
 

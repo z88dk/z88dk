@@ -23,3 +23,12 @@ Symbol::Symbol(const string& name, int value)
 	, m_filename(g_preproc.filename())
 	, m_line_num(g_preproc.line_num()) {
 }
+
+Symbol::Symbol(const string& name, shared_ptr<Expr> expr)
+	: m_name(name)
+	, m_expr(expr)
+	, m_type(Type::Computed)
+	, m_is_computed(true)
+	, m_filename(g_preproc.filename())
+	, m_line_num(g_preproc.line_num()) {
+}

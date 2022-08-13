@@ -489,12 +489,12 @@ int Expr::eval_node(shared_ptr<ExprNode> node) {
 	case ExprNode::Type::Mult: return a * b;
 	case ExprNode::Type::Div:
 		if (b == 0)
-			throw(ExprException(ErrCode::DivisionByZero));
+			throw(ExprException(ErrCode::DivisionByZero, m_text));
 		return a / b;
 
 	case ExprNode::Type::Mod:
 		if (b == 0)
-			throw(ExprException(ErrCode::DivisionByZero));
+			throw(ExprException(ErrCode::DivisionByZero, m_text));
 		return a % b;
 
 	case ExprNode::Type::Power: return ipow(a, b);
@@ -521,11 +521,22 @@ int Expr::eval_symbol(shared_ptr<Symbol> symbol) {
 			return symbol->value();
 
 	case Symbol::Type::Computed:
-		m_is_const = symbol->is_const();
-		if (!symbol->is_computed())
-			throw(ExprException(ErrCode::UnknownValue, symbol->name()));
-		else
-			return symbol->value();
+		if (m_evaluating)
+			throw(ExprException(ErrCode::RecursiveExpression, m_text));
+		else {
+			// recurse to eval symbol expression
+			m_evaluating = true;
+			{
+				if (m_silent)
+					symbol->expr()->eval_silent(m_asmpc);
+				else
+					symbol->expr()->eval_noisy(m_asmpc);
+				if (!symbol->expr()->is_const())
+					m_is_const = false;
+			}
+			m_evaluating = false;
+			return symbol->expr()->value();
+		}
 	}
 
 	Assert(0);	// not reached
