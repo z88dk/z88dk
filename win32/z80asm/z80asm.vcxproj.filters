@@ -311,9 +311,6 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\asm.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\cpp\asm_parser_assembly.cpp">
-      <Filter>Source Files\cpp</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\cpp\symtab.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
@@ -324,6 +321,9 @@
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\cpp\expr.cpp">
+      <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\asm_parse_main.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
   </ItemGroup>

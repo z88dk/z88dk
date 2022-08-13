@@ -12,7 +12,7 @@
 using namespace std;
 
 bool Asm::assemble(const string& filename) {
-	if (!m_preproc.open(filename, true)) return false;
+	if (!g_preproc.open(filename, true)) return false;
 	if (!parse()) return false;
 	return true;
 }
@@ -21,7 +21,7 @@ bool Asm::parse() {
 	int initial_error_count = g_errors.count();
 
 	string line;
-	while (m_preproc.getline(line)) {
+	while (g_preproc.getline(line)) {
 		m_lexer.set(line);
 		parse_line();
 	}
@@ -34,23 +34,23 @@ bool Asm::parse() {
 
 void Asm::parse_line() {
 	switch (m_state) {
-	case State::Assembly: parse_line_assembly(); break;
+	case State::Main: parse_line_main(); break;
 	default: Assert(0);
 	}
 }
 
-void Asm::parse_line_assembly() {
-	string label = check_label();
-	/*
-	if (!label.empty())
-		asm_LABEL(label.c_str());
-	*/
-
+void Asm::parse_line_main() {
 	while (!m_lexer.at_end()) {
+		string label = check_label();
+		/*
+		if (!label.empty())
+			asm_LABEL(label.c_str());
+		*/
+
 		if (m_lexer.peek().ttype == TType::Backslash)
 			m_lexer.next();
 		else
-			asm_parser_assembly();
+			asm_parse_main();
 	}
 }
 

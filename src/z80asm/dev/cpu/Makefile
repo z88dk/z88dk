@@ -33,8 +33,6 @@ all: parser.yaml
 parser.yaml: parser1.yaml parser2.yaml merge_parsers.pl Makefile
 	perl merge_parsers.pl parser1.yaml parser2.yaml parser.yaml && dos2unix -q parser.yaml
 
-all: asm_parser_assembly.cpp
-asm_parser_assembly.cpp: parser.yaml make_parser_code.pl Makefile
-	perl make_parser_code.pl parser.yaml asm_parser_assembly.cpp && dos2unix -q asm_parser_assembly.cpp
-
-
+all: asm_parse_main.cpp
+asm_parse_main.cpp: parser.yaml make_parser_code.pl Makefile
+	perl make_parser_code.pl parser.yaml asm_parse_main.cpp && dos2unix -q asm_parse_main.cpp

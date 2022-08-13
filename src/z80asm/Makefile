@@ -120,11 +120,11 @@ src/c/tokens.h : make_tokens.pl Makefile
 	dos2unix -q src/c/tokens.h
 
 # opcode tables generator
-dev: src/cpp/asm_parser_assembly.cpp
-src/cpp/asm_parser_assembly.cpp: $(wildcard dev/cpu/*.pl dev/cpu/*.y dev/cpu/Makefile)
+dev: src/cpp/asm_parse_main.cpp
+src/cpp/asm_parse_main.cpp: $(wildcard dev/cpu/*.pl dev/cpu/*.y dev/cpu/Makefile)
 	$(MAKE) -$(MAKEFLAGS) -C dev/cpu
 	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
-	cp dev/cpu/asm_parser_assembly.cpp src/cpp/asm_parser_assembly.cpp
+	cp dev/cpu/asm_parse_main.cpp src/cpp/asm_parse_main.cpp
 	
 # reloc routine
 dev: src/c/reloc_code.c

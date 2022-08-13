@@ -2,9 +2,9 @@
 #include "asm.h"
 #include "errors.h"
 #include "if.h"
-
 using namespace std;
-void Asm::asm_parser_assembly() {
+
+void Asm::asm_parse_main() {
 
 	// check keywords
 	switch (m_lexer.peek().keyword) {
