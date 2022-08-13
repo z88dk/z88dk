@@ -33,7 +33,9 @@ CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS) -Wextra -Werror -pedantic-errors \
 
 # so that we can use C++17 features on older systems
 ifeq ($(CROSS),1)
+  ifeq ($(EXESUFFIX),.exe)
 LDFLAGS 	+= -static-libstdc++ -static-libgcc
+  endif
 endif
 
 #------------------------------------------------------------------------------
