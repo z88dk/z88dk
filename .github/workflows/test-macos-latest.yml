@@ -7,9 +7,6 @@ on:
 jobs:
   build:
     runs-on: macos-latest
-    defaults:
-      run:
-        shell: cmd
     steps:
     - name: Install homebrew dependencies
       run: |
