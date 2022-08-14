@@ -17,8 +17,8 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 // global state
-static bool g_hold_getline;
-static bool g_do_preproc_line;
+static bool g_hold_getline = false;
+static bool g_is_preproc_active = true;
 
 Preproc g_preproc;
 
@@ -75,7 +75,8 @@ PreprocLevel::PreprocLevel(Macros* parent)
 
 void PreprocLevel::init(const string& text) {
 	if (!text.empty()) {
-		if (g_do_preproc_line && !starts_with_hash(text))
+		// do not split while reading list files as backslash may be path separator
+		if (g_is_preproc_active && !starts_with_hash(text))
 			split_lines(m_lines, text);
 		else
 			m_lines.push_back(text);
@@ -204,7 +205,7 @@ void Preproc::close() {
 	g_float_format.set(FloatFormat::Format::genmath);
 }
 
-bool Preproc::getline(string& line) {
+bool Preproc::getline_(string& line) {
 	line.clear();
 	while (true) {
 		if (!m_output.empty()) {		// output queue
@@ -214,7 +215,7 @@ bool Preproc::getline(string& line) {
 				return true;
 		}
 		else if (m_levels.back().getline(line)) {	// read from macro expansion
-			if (g_do_preproc_line)
+			if (g_is_preproc_active)
 				parse_line(line);
 			else
 				m_output.push_back(line);
@@ -226,7 +227,7 @@ bool Preproc::getline(string& line) {
 			return false;
 		}
 		else if (m_files.back().getline(line)) {	// read from file
-			if (g_do_preproc_line)
+			if (g_is_preproc_active)
 				parse_line(line);
 			else
 				m_output.push_back(line);
@@ -236,11 +237,16 @@ bool Preproc::getline(string& line) {
 	}
 }
 
+bool Preproc::getline(string& line) {
+	g_is_preproc_active = true;
+	return getline_(line);
+}
+
 bool Preproc::get_unpreproc_line(string& line) {
-	bool save_do_preproc_line = g_do_preproc_line;
-	g_do_preproc_line = false;
-	bool ret = getline(line);
-	g_do_preproc_line = save_do_preproc_line;
+	bool save_active = g_is_preproc_active;
+	g_is_preproc_active = false;
+	bool ret = getline_(line);
+	g_is_preproc_active = save_active;
 	return ret;
 }
 
@@ -1358,8 +1364,7 @@ char* sfile_getline() {
 	string line;
 	if (g_hold_getline)
 		return nullptr;
-	g_do_preproc_line = false;		// no preprocessing on input line
-	if (g_preproc.getline(line))
+	if (g_preproc.get_unpreproc_line(line))
 		return must_strdup(line.c_str());	// needs to be freed by the user
 	else
 		return nullptr;
@@ -1370,7 +1375,6 @@ char* sfile_get_source_line() {
 	string line;
 	if (g_hold_getline)
 		return nullptr;
-	g_do_preproc_line = true;		// preprocessing on input line
 	if (g_preproc.getline(line)) {
 		list_got_expanded_line(line.c_str());
 		set_error_expanded_line(line.c_str());

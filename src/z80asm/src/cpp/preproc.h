@@ -110,6 +110,7 @@ private:
 	Lexer				m_lexer;		// line being parsed
 	Macros				m_macros;		// MACRO..ENDM macros
 
+	bool getline_(string& line);
 	bool recursive_include(const string& filename);
 
 	Macros& defines() { return m_levels.back().defines; }
