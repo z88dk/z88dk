@@ -9,17 +9,19 @@
 
 #include "lex.h"
 #include "preproc.h"
+#include <memory>
 using namespace std;
 
 // parser output
 
 class Asm {
 public:
+	Asm();
 	bool assemble(const string& filename);
 
 private:
 	enum class State { Main };
-	Lexer		m_lexer;
+	shared_ptr<Lexer>	m_lexer;
 	State		m_state{ State::Main };
 
 	bool parse();

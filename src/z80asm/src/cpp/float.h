@@ -1,28 +1,29 @@
 //-----------------------------------------------------------------------------
 // z80asm
-// Copyright (C) Paulo Custodio, 2011-2023
+// Copyright (C) Paulo Custodio, 2011-2022
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
 #pragma once
 
 #include "if.h"
-#include "scan.h"
+#include "lex.h"
 #include <cstdint>
+#include <memory>
 #include <vector>
 using namespace std;
 
 // expression parser
 class FloatExpr {
 public:
-	FloatExpr(ScannedLine& line);
+	FloatExpr(shared_ptr<Lexer> lexer);
 
 	bool parse();
 	bool eval_error() const { return m_eval_error; }
 	double value() const { return m_value; }
 
 private:
-    ScannedLine& m_line;
+	shared_ptr<Lexer> m_lexer;
 	double m_value{ 0.0 };
 	bool   m_parse_error{ false };	// expression could not be parsed
 	bool   m_eval_error{ false };	// expression could not be evaluated

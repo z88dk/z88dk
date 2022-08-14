@@ -1,7 +1,7 @@
 ---
-Keyword::EXTERN: "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
-Keyword::GLOBAL: "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
-'Keyword::ORG expr TType::End': "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
-Keyword::PUBLIC: "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
-Keyword::SECTION: "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
-'TType::Label Keyword::EQU expr TType::End': "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
+Keyword::EXTERN: "\twhile (!m_lexer->at_end()) m_lexer->next();\n"
+Keyword::GLOBAL: "\twhile (!m_lexer->at_end()) m_lexer->next();\n"
+'Keyword::ORG expr TType::End': "\twhile (!m_lexer->at_end()) m_lexer->next();\n"
+Keyword::PUBLIC: "\twhile (!m_lexer->at_end()) m_lexer->next();\n"
+Keyword::SECTION: "\twhile (!m_lexer->at_end()) m_lexer->next();\n"
+'TType::Label Keyword::EQU expr TType::End': "\twhile (!m_lexer->at_end()) m_lexer->next();\n"

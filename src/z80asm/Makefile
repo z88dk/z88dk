@@ -71,6 +71,10 @@ $(PROJ)$(EXESUFFIX): ../config.h $(OBJS)
 # parser is too big to optimize with -O3
 src/c/parse.o: src/c/parse.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -O0 -c -o $@ $<
+	
+# parser is too big to optimize with -O3
+src/cpp/asm_parse_main.o: src/cpp/asm_parse_main.cpp
+	$(CXX) $(CXX_FLAGS) -O0 -c -o $@ $<
 
 #------------------------------------------------------------------------------
 # libraries

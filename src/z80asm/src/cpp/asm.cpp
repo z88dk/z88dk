@@ -11,6 +11,10 @@
 #include "utils.h"
 using namespace std;
 
+Asm::Asm() {
+	m_lexer = make_shared<Lexer>();
+}
+
 bool Asm::assemble(const string& filename) {
 	if (!g_preproc.open(filename, true)) return false;
 	if (!parse()) return false;
@@ -22,7 +26,7 @@ bool Asm::parse() {
 
 	string line;
 	while (g_preproc.getline(line)) {
-		m_lexer.set(line);
+		m_lexer->set(line);
 		if (!parse_line())
 			ok = false;
 	}
@@ -38,19 +42,19 @@ bool Asm::parse_line() {
 }
 
 bool Asm::parse_line_main() {
-	while (!m_lexer.at_end()) {
+	while (!m_lexer->at_end()) {
 		string label = check_label();
 		/*
 		if (!label.empty())
 			asm_LABEL(label.c_str());
 		*/
 
-		switch (m_lexer.peek().ttype) {
+		switch (m_lexer->peek().ttype) {
 		case TType::End:
 			break;
 		case TType::Backslash:
 		case TType::Newline:
-			m_lexer.next();
+			m_lexer->next();
 			break;
 		default:
 			if (!asm_parse_main())
@@ -61,12 +65,12 @@ bool Asm::parse_line_main() {
 }
 
 string Asm::check_label() {
-	TType ttype0 = m_lexer.peek(0).ttype;
-	Keyword keyword1 = m_lexer.peek(1).keyword;
+	TType ttype0 = m_lexer->peek(0).ttype;
+	Keyword keyword1 = m_lexer->peek(1).keyword;
 
 	if (ttype0 == TType::Label && keyword1 != Keyword::EQU) {
-		m_lexer.next();
-		return m_lexer.peek(-1).svalue;
+		m_lexer->next();
+		return m_lexer->peek(-1).svalue;
 	}
 	else
 		return string();
