@@ -88,7 +88,7 @@ void Expr::error(ErrCode err, const string& text) {
 }
 
 bool Expr::parse(const string& text, shared_ptr<Symtab> symtab) {
-	auto lexer = make_shared<Lexer>(text);
+	Lexer lexer{ text };
 	if (!parse(lexer, symtab))
 		return false;
 
@@ -104,9 +104,9 @@ bool Expr::parse(const string& text, shared_ptr<Symtab> symtab) {
 	}
 }
 
-bool Expr::parse(shared_ptr<Lexer> lexer, shared_ptr<Symtab> symtab) {
+bool Expr::parse(Lexer& lexer, shared_ptr<Symtab> symtab) {
 	clear();
-	m_lexer = lexer;
+	m_lexer = &lexer;
 	m_symtab = symtab;
 	const char* expr_start = m_lexer->text_ptr();
 	const char* expr_end = expr_start + strlen(expr_start);
@@ -114,6 +114,7 @@ bool Expr::parse(shared_ptr<Lexer> lexer, shared_ptr<Symtab> symtab) {
 	m_root = parse_expr();
 
 	m_text = string(expr_start, expr_end);
+	m_lexer = nullptr;
 	return m_result == ErrCode::Ok ? true : false;
 }
 
