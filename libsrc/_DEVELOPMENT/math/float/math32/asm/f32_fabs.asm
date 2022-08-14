@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_fp_math32
 
 PUBLIC  m32_fabs_fastcall
@@ -10,4 +11,4 @@ PUBLIC _m32_fabsf
     ld a,d
     and $7f         ;reset sign bit
     ld d,a
-    ret
+	ret

@@ -34,8 +34,6 @@
 ; unpacked format: mantissa= dehl, exponent in b, sign in c[7]
 ;
 ;-------------------------------------------------------------------------
-; FIXME clocks
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

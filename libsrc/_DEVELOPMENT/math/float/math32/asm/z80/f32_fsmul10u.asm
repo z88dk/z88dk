@@ -25,7 +25,7 @@ PUBLIC _m32_mul10uf
     scf                         ; set hidden bit
     rr e                        ; return mantissa to ehl
 
-                                ; 10*a = 2*(4*a + a)     
+                                ; 10*a = 2*(4*a + a)
     push de                     ; dehl *= 10
     push hl
 
@@ -48,7 +48,7 @@ PUBLIC _m32_mul10uf
 
     ld a,3                      ; exponent increase
     jr NC,no_carry
-    
+
     rr e                        ; shift if a carry
     rr h
     rr l
@@ -66,15 +66,13 @@ PUBLIC _m32_mul10uf
 
 .zero_legal
     ld e,d                      ; use 0
-    ld h,d
-    ld l,d        
+    ld hl,de
     rr d                        ; restore the sign
     ret                         ; return IEEE signed ZERO in DEHL
 
 .infinity
     ld de,0
-    ld h,d
-    ld l,d
+    ld hl,de
     dec d                       ; 0xff
     rr d                        ; restore the sign
     rr e

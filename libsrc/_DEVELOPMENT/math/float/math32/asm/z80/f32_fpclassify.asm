@@ -1,4 +1,4 @@
-SECTION code_clib
+
 SECTION code_fp_math32
 
 PUBLIC m32_fpclassify

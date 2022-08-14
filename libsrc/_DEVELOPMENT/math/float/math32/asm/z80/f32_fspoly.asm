@@ -36,8 +36,6 @@
 ; where n is the maximum coefficient index. Same as the C index.
 ;
 ;-------------------------------------------------------------------------
-; FIXME clocks
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

@@ -46,8 +46,6 @@
 ; 6) 6th section pack up in separate file d32_fsnormalize.asm
 ;
 ;-------------------------------------------------------------------------
-; FIXME clocks
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -221,7 +219,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     jr aldone
 
 ; here possible 16
-.al_5 
+.al_5
     rra                         ; shift in a zero, lost bits in 6,5,4
     jr NC,al_6                  ; no shift by 16
 ; here shift by 16
@@ -243,7 +241,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ld h,0
     jr Z,aldone
     set 0,e
-    
+
 ; aldone here
 .aldone
     ex af,af                    ; carry clear
@@ -378,6 +376,7 @@ PUBLIC m32_fsadd, m32_fsadd_callee
     ex (sp),hl
     exx
     pop de                      ; get least part of result
+
 ; sub zero alignment from fadd
 ; difference larger-smaller in hlde
 ; exponent of result in c sign of result in b

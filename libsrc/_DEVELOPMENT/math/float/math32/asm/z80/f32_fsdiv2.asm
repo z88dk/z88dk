@@ -13,6 +13,7 @@
 ;
 ;-------------------------------------------------------------------------
 
+SECTION code_clib
 SECTION code_fp_math32
 
 PUBLIC m32_fsdiv2_fastcall
@@ -34,15 +35,13 @@ PUBLIC _m32_div2f
 
 .zero_legal
     ld e,d                      ; use 0
-    ld h,d
-    ld l,d        
+    ld hl,de
     rr d                        ; restore the sign
     ret                         ; return IEEE signed ZERO in DEHL
 
 .zero_underflow
     ld e,d                      ; use 0
-    ld h,d
-    ld l,d
+    ld hl,de
     rr d                        ; restore the sign
     scf
     ret                         ; return IEEE signed ZERO in DEHL

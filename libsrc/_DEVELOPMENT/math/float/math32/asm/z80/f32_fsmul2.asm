@@ -38,15 +38,13 @@ PUBLIC _m32_mul2f
 
 .zero_legal
     ld e,d                      ; use 0
-    ld h,d
-    ld l,d        
+    ld hl,de
     rr d                        ; restore the sign
     ret                         ; return IEEE signed ZERO in DEHL
 
 .infinity
     ld e,d                      ; use 0
-    ld h,d
-    ld l,d
+    ld hl,de
     dec d                       ; 0xff
     rr d                        ; restore the sign
     rr e

@@ -1,4 +1,4 @@
-SECTION code_clib
+
 SECTION code_fp_math32
 
 EXTERN  l_neg_dehl

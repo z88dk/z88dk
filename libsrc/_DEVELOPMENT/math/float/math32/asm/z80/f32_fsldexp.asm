@@ -100,7 +100,6 @@ PUBLIC _m32_ldexpf
 
 .zero_legal
     ld e,d                      ; use 0
-    ld h,d
-    ld l,d
+    ld hl,de
     rr d                        ; restore the sign
     ret                         ; return IEEE signed ZERO in DEHL
