@@ -5,14 +5,21 @@
 # License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 #------------------------------------------------------------------------------
 
-org expr $
-	/*set_origin(expr);*/
+org EXPR $
+	while (!m_lexer.at_end()) m_lexer.next();
 
-. ident equ expr $
-	/*add_equ();*/
+LABEL equ EXPR $
+	while (!m_lexer.at_end()) m_lexer.next();
 
-ident : equ expr $
-	/*add_equ();*/
+section
+	while (!m_lexer.at_end()) m_lexer.next();
 
-ident equ expr $
-	/*add_equ();*/
+public
+	while (!m_lexer.at_end()) m_lexer.next();
+
+extern
+	while (!m_lexer.at_end()) m_lexer.next();
+
+global
+	while (!m_lexer.at_end()) m_lexer.next();
+

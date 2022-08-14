@@ -62,7 +62,7 @@ public:
 	int line_num() const { return m_line_num; }
 
 	bool parse(const string& text, shared_ptr<Symtab> symtab);
-	bool parse(shared_ptr<Lexer> lexer, shared_ptr<Symtab> symtab);
+	bool parse(Lexer& lexer, shared_ptr<Symtab> symtab);
 
 	bool eval_silent(int asmpc);
 	bool eval_noisy(int asmpc);
@@ -71,7 +71,7 @@ private:
 	shared_ptr<ExprNode> m_root;			// root node of expression
 	int					m_value{ 0 };		// value computed during eval
 	ErrCode				m_result{ ErrCode::Ok };// result computed during eval
-	shared_ptr<Lexer>	m_lexer;			// used while parsing
+	Lexer*				m_lexer{ nullptr };	// used while parsing
 	shared_ptr<Symtab>	m_symtab;			// used while parsing
 	string				m_text;				// expression text
 	int					m_asmpc{ 0 };		// ASMPC value

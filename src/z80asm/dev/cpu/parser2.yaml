@@ -1,5 +1,7 @@
 ---
-'Keyword::ORG expr TType::End': "\t/*set_origin(expr);*/\n"
-'TType::Dot TType::Ident Keyword::EQU expr TType::End': "\t/*add_equ();*/\n"
-'TType::Ident Keyword::EQU expr TType::End': "\t/*add_equ();*/\n"
-'TType::Ident TType::Colon Keyword::EQU expr TType::End': "\t/*add_equ();*/\n"
+Keyword::EXTERN: "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
+Keyword::GLOBAL: "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
+'Keyword::ORG expr TType::End': "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
+Keyword::PUBLIC: "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
+Keyword::SECTION: "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
+'TType::Label Keyword::EQU expr TType::End': "\twhile (!m_lexer.at_end()) m_lexer.next();\n"

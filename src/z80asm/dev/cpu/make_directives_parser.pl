@@ -37,8 +37,9 @@ sub parser_tokens {
 	
 	while (!/\G \z 				/gcx) {
 		if (/\G \s+ 			/gcx) {}
-		elsif (/\G expr  \b		/gcx) { push @tokens, "expr"; }
-		elsif (/\G ident \b		/gcx) { push @tokens, "TType::Ident"; }
+		elsif (/\G EXPR  \b		/gcx) { push @tokens, "expr"; }
+		elsif (/\G IDENT \b		/gcx) { push @tokens, "TType::Ident"; }
+		elsif (/\G LABEL \b		/gcx) { push @tokens, "TType::Label"; }
 		elsif (/\G    (\w+)	'	/gcx) { push @tokens, "Keyword::".uc($1)."1"; }
 		elsif (/\G    (\w+)		/gcx) { push @tokens, "Keyword::".uc($1); }
 		elsif (/\G \(    		/gcx) { push @tokens, "TType::LParen"; }

@@ -18,28 +18,26 @@ bool Asm::assemble(const string& filename) {
 }
 
 bool Asm::parse() {
-	int initial_error_count = g_errors.count();
+	bool ok = true;
 
 	string line;
 	while (g_preproc.getline(line)) {
 		m_lexer.set(line);
-		parse_line();
+		if (!parse_line())
+			ok = false;
 	}
 
-	if (g_errors.count() == initial_error_count)
-		return true;
-	else
-		return false;
+	return ok;
 }
 
-void Asm::parse_line() {
+bool Asm::parse_line() {
 	switch (m_state) {
-	case State::Main: parse_line_main(); break;
-	default: Assert(0);
+	case State::Main: return parse_line_main();
+	default: Assert(0); return false;
 	}
 }
 
-void Asm::parse_line_main() {
+bool Asm::parse_line_main() {
 	while (!m_lexer.at_end()) {
 		string label = check_label();
 		/*
@@ -55,23 +53,20 @@ void Asm::parse_line_main() {
 			m_lexer.next();
 			break;
 		default:
-			asm_parse_main();
+			if (!asm_parse_main())
+				return false;
 		}
 	}
+	return true;
 }
 
 string Asm::check_label() {
-	if (m_lexer.peek(0).ttype == TType::Dot &&
-		m_lexer.peek(1).ttype == TType::Ident &&
-		m_lexer.peek(2).keyword != Keyword::EQU) {
-		m_lexer.next(2);
+	TType ttype0 = m_lexer.peek(0).ttype;
+	Keyword keyword1 = m_lexer.peek(1).keyword;
+
+	if (ttype0 == TType::Label && keyword1 != Keyword::EQU) {
+		m_lexer.next();
 		return m_lexer.peek(-1).svalue;
-	}
-	else if (m_lexer.peek(0).ttype == TType::Ident &&
-		m_lexer.peek(1).ttype == TType::Colon &&
-		m_lexer.peek(2).keyword != Keyword::EQU) {
-		m_lexer.next(2);
-		return m_lexer.peek(-2).svalue;
 	}
 	else
 		return string();

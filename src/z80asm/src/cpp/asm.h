@@ -23,8 +23,8 @@ private:
 	State		m_state{ State::Main };
 
 	bool parse();
-	void parse_line();
-	void parse_line_main();
-	void asm_parse_main();
+	bool parse_line();
+	bool parse_line_main();
+	bool asm_parse_main();
 	string check_label();
 };
