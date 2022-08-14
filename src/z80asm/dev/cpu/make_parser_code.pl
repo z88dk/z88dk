@@ -133,7 +133,8 @@ sub dump_state {
 									"state_".$tree->{next}{$token}{state};
 					if ($token =~ /^TType::End/) {
 						say $fh "\tcase TType::End: goto $target;";
-						say $fh "\tcase TType::Backslash: m_lexer.next(); goto $target;";
+						say $fh "\tcase TType::Backslash:";
+						say $fh "\tcase TType::Newline: m_lexer.next(); goto $target;";
 					}
 					else {
 						say $fh "\tcase $token: m_lexer.next(); goto $target;";
