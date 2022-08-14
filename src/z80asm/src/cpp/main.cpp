@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 	for (auto& file : g_args.files()) {
 		if (fs::path(file).extension().generic_string() != EXT_O) {
 			Asm assembler;
-			assembler.assemble(file);
+			//assembler.assemble(file);
 		}
 	}
 

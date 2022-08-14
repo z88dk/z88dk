@@ -47,10 +47,16 @@ void Asm::parse_line_main() {
 			asm_LABEL(label.c_str());
 		*/
 
-		if (m_lexer.peek().ttype == TType::Backslash)
+		switch (m_lexer.peek().ttype) {
+		case TType::End:
+			break;
+		case TType::Backslash:
+		case TType::Newline:
 			m_lexer.next();
-		else
+			break;
+		default:
 			asm_parse_main();
+		}
 	}
 }
 
