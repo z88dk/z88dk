@@ -8,7 +8,7 @@
 ;  feilipu, January 2022
 ;
 ;-------------------------------------------------------------------------
-; asm_am9511_frexp - z80, z180, z80n fraction and exponent
+; asm_am9511_frexp - 8085 fraction and exponent
 ;-------------------------------------------------------------------------
 ;
 ;   float frexpf (float x, int *pw2)

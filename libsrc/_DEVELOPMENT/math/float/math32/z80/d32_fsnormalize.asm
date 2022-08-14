@@ -17,8 +17,6 @@
 ;    unpacked format: h==0; mantissa= lde, sign in b, exponent in c
 ;
 ;-------------------------------------------------------------------------
-; FIXME clocks
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32

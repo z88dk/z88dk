@@ -65,7 +65,7 @@ PUBLIC m32__dtoa_base10
 
     exx
     push de                     ; push x for fsmul
-    push hl 
+    push hl
 
     ld l,a                      ; -e
     call m32_float8             ; convert L to float in DEHL
@@ -112,7 +112,7 @@ PUBLIC m32__dtoa_base10
 .digit_loop
     srl d                       ; shift mantissa bits right
     rr e
-    rr h 
+    rr h
     rr l
     dec a
     jr NZ,digit_loop

@@ -1,4 +1,5 @@
 
+SECTION code_clib
 SECTION code_fp_math32
 
 EXTERN m32_fsadd_callee
