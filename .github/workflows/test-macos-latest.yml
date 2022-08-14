@@ -29,4 +29,5 @@ jobs:
         cd osx-latest/z88dk/src/z80asm
         export PATH=$RUNNER_WORKSPACE/osx-latest/z88dk/bin:$PATH
         export ZCCCFG=$RUNNER_WORKSPACE/osx-latest/z88dk/lib/config
+        ls -l $ZCCCFG
         perl -S prove t/*.t
