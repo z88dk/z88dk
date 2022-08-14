@@ -6,20 +6,20 @@
 #------------------------------------------------------------------------------
 
 org EXPR $
-	while (!m_lexer.at_end()) m_lexer.next();
+	while (!m_lexer->at_end()) m_lexer->next();
 
 LABEL equ EXPR $
-	while (!m_lexer.at_end()) m_lexer.next();
+	while (!m_lexer->at_end()) m_lexer->next();
 
 section
-	while (!m_lexer.at_end()) m_lexer.next();
+	while (!m_lexer->at_end()) m_lexer->next();
 
 public
-	while (!m_lexer.at_end()) m_lexer.next();
+	while (!m_lexer->at_end()) m_lexer->next();
 
 extern
-	while (!m_lexer.at_end()) m_lexer.next();
+	while (!m_lexer->at_end()) m_lexer->next();
 
 global
-	while (!m_lexer.at_end()) m_lexer.next();
+	while (!m_lexer->at_end()) m_lexer->next();
 
