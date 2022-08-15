@@ -543,3 +543,7 @@ int Expr::eval_symbol(shared_ptr<Symbol> symbol) {
 	Assert(0);	// not reached
 	return 0;
 }
+
+PatchExpr::PatchExpr(shared_ptr<Expr> expr, Type type, size_t offset)
+	: m_type(type), m_offset(offset), m_expr(expr) {
+}

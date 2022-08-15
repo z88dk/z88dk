@@ -105,3 +105,28 @@ private:
 	int eval_node(shared_ptr<ExprNode> node);
 	int eval_symbol(shared_ptr<Symbol> symbol);
 };
+
+class PatchExpr {
+public:
+	enum class Type {
+		UByte, SByte,					// unsigned and signed bytes
+		Word, BEWord,					// word and big-endian word (2 bytes)
+		Ptr24,							// poiter (3 bytes)
+		Dword,							// double word (4 bytes)
+		JrOffset,						// jump relative offset
+		UByte2Word,						// unsigned byte extended to 16 bits
+		SByte2Word,						// signed byte extended to 16 bits
+		HighOffset,						// byte offset to 0xFF00 
+	};
+
+	PatchExpr(shared_ptr<Expr> expr, Type type = Type::UByte, size_t offset = 0);
+
+	Type type() const { return m_type; }
+	size_t offset() const { return m_offset; }
+	shared_ptr<Expr> expr() { return m_expr; }
+
+private:
+	Type	m_type;						// type of patch
+	size_t	m_offset;					// offset to start of instruction to patch
+	shared_ptr<Expr>	m_expr;			// expression to compute
+};
