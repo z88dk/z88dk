@@ -7,17 +7,28 @@
 
 #include "asm.h"
 #include "errors.h"
+#include "icode.h"
 #include "if.h"
+#include "preproc.h"
 #include "utils.h"
 using namespace std;
 
-Asm::Asm() {
-	m_lexer = make_shared<Lexer>();
-}
-
 bool Asm::assemble(const string& filename) {
+	m_lexer = make_shared<Lexer>();
+	m_state = State::Main;
+
+	m_object = make_shared<Object>(filename);
+	set_cur_module("");
+	set_cur_section("", "");
+
 	if (!g_preproc.open(filename, true)) return false;
 	if (!parse()) return false;
+
+	m_lexer.reset();
+	m_object.reset();
+	m_cur_module.reset();
+	m_cur_section.reset();
+
 	return true;
 }
 
@@ -74,4 +85,13 @@ string Asm::check_label() {
 	}
 	else
 		return string();
+}
+
+void Asm::set_cur_module(const string& name) {
+	m_cur_module = m_object->insert(name);
+}
+
+void Asm::set_cur_section(const string& group_name, const string& section_name) {
+	m_cur_group = m_cur_module.lock()->insert(group_name);
+	m_cur_section = m_cur_group.lock()->insert(section_name);
 }

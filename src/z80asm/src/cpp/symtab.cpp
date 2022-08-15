@@ -8,7 +8,7 @@
 #include "args.h"
 #include "errors.h"
 #include "if.h"
-#include "symbol.h"
+#include "preproc.h"
 #include "symtab.h"
 #include "utils.h"
 #include <iostream>
@@ -16,6 +16,30 @@ using namespace std;
 
 static shared_ptr<Symtab> g_global_def_symbols;
 static shared_ptr<Symtab> g_global_symbols;
+
+Symbol::Symbol(const string& name)
+	: m_name(name)
+	, m_filename(g_preproc.filename())
+	, m_line_num(g_preproc.line_num()) {
+}
+
+Symbol::Symbol(const string& name, int value)
+	: m_name(name)
+	, m_value(value)
+	, m_type(Type::Constant)
+	, m_is_computed(true)
+	, m_filename(g_preproc.filename())
+	, m_line_num(g_preproc.line_num()) {
+}
+
+Symbol::Symbol(const string& name, shared_ptr<Expr> expr)
+	: m_name(name)
+	, m_expr(expr)
+	, m_type(Type::Computed)
+	, m_is_computed(true)
+	, m_filename(g_preproc.filename())
+	, m_line_num(g_preproc.line_num()) {
+}
 
 Symtab::Symtab(shared_ptr<Symtab> parent)
 	: m_parent(parent) {
