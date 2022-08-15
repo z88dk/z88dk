@@ -270,7 +270,7 @@ IF DEFINED_USING_amalloc
     ld hl,__BSS_END_tail
     ld (_heap),hl
 
-    include "../../../../../lib/crt/classic/crt_init_amalloc.asm"
+    include "../../../../lib/crt/classic/crt_init_amalloc.asm"
 
 ENDIF
 
@@ -371,7 +371,7 @@ SECTION code_crt_return
 
     SECTION data_crt
 
-include "../../../../../lib/crt/classic/crt_runtime_selection.asm" 
+include "../../../../lib/crt/classic/crt_runtime_selection.asm" 
 
 PUBLIC _8085_int65
 EXTERN  acia_interrupt
