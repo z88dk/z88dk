@@ -26,8 +26,14 @@ jobs:
         cp osx-latest/z88dk/lib/z88dk-z80asm*.lib osx-latest/z88dk/src/z80asm/
     - name: Run z80asm tests
       run: |
+        set -x
         cd osx-latest/z88dk/src/z80asm
         export PATH=$RUNNER_WORKSPACE/osx-latest/z88dk/bin:$PATH
         export ZCCCFG=$RUNNER_WORKSPACE/osx-latest/z88dk/lib/config
+        ls -l $RUNNER_WORKSPACE
+        ls -l $RUNNER_WORKSPACE/osx-latest
+        ls -l $RUNNER_WORKSPACE/osx-latest/z88dk
+        ls -l $RUNNER_WORKSPACE/osx-latest/z88dk/lib
+        ls -l $RUNNER_WORKSPACE/osx-latest/z88dk/lib/config
         ls -l $ZCCCFG
         perl -S prove t/*.t
