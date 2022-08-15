@@ -204,6 +204,7 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\defines.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\expr.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\float.h" />
+    <ClInclude Include="..\..\src\z80asm\src\cpp\icode.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\lex.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\lstfile.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\model.h" />
@@ -254,6 +255,7 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\defines.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\expr.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\float.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\cpp\icode.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\lex.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\lstfile.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\main.cpp" />
