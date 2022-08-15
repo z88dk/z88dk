@@ -11,12 +11,17 @@
 #include <list>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 using namespace std;
 
 class PatchExpr;
-class Section;
-class Group;
+class Symtab;
+class Object;						// represents object file
+class Module;						// that contains modules, each wit its symbol table
+class Group;						// that include groups of sections
+class Section;						// that include sections
+class Icode;						// that include code
 
 class Icode {
 public:
@@ -24,10 +29,10 @@ public:
 		Label,
 	};
 
-	Icode(shared_ptr<Section> parent);
-	shared_ptr<Icode> make_label(const string& name);
+	Icode(Section* parent);
+	static shared_ptr<Icode> make_label(const string& name);
 
-	shared_ptr<Section> parent() { return m_parent.lock(); }
+	const Section* parent() { return m_parent; }
 
 	size_t asmpc() const { return m_asmpc; }
 	void set_asmpc(size_t n);
@@ -44,7 +49,7 @@ public:
 private:
 	static inline const size_t UndefinedAsmpc = static_cast<size_t>(-1);
 
-	weak_ptr<Section>	m_parent;
+	Section* m_parent{ nullptr };
 	size_t	m_asmpc{ UndefinedAsmpc };
 	size_t	m_prev_asmpc{ UndefinedAsmpc };
 	size_t	m_size{ 0 };
@@ -56,18 +61,69 @@ private:
 
 class Section {
 public:
-	Section(const string& name, shared_ptr<Group> parent);
+	Section(const string& name, Group* parent);
 
 	void push_back(shared_ptr<Icode> node);
 
-	shared_ptr<Group> parent() { return m_parent.lock(); }
+	const Group* parent() { return m_parent; }
 	const list<shared_ptr<Icode>>& nodes() const { return m_nodes; }
 
 	size_t asmpc() const;
 
 private:
 	string	m_name;
-	weak_ptr<Group>	m_parent;
+	Group*	m_parent{ nullptr };
 	list<shared_ptr<Icode>> m_nodes;
+};
 
+class Group {
+public:
+	Group(const string& name, Module* parent);
+
+	shared_ptr<Section> get_child(const string& name);
+	shared_ptr<Section> insert(const string& name);	// appends or returns existing
+
+	const Module* parent() { return m_parent; }
+	const list<shared_ptr<Section>>& nodes() const { return m_nodes; }
+
+private:
+	string	m_name;
+	Module* m_parent{ nullptr };
+	list<shared_ptr<Section>> m_nodes;
+	unordered_map<string, shared_ptr<Section>> m_node_map;
+};
+
+class Module {
+public:
+	Module(const string& name, Object* parent);
+
+	shared_ptr<Group> get_child(const string& name);
+	shared_ptr<Group> insert(const string& name);	// appends or returns existing
+
+	const Object* parent() { return m_parent; }
+	const list<shared_ptr<Group>>& nodes() const { return m_nodes; }
+	shared_ptr<Symtab> symtab() { return m_symtab; }
+
+private:
+	string	m_name;
+	Object* m_parent{ nullptr };
+	list<shared_ptr<Group>> m_nodes;
+	unordered_map<string, shared_ptr<Group>> m_node_map;
+	shared_ptr<Symtab>	m_symtab;			// module symbols
+};
+
+class Object {
+public:
+	Object(const string& filename);
+
+	shared_ptr<Module> get_child(const string& name);
+	shared_ptr<Module> insert(const string& name);	// appends or returns existing
+
+	const string& filename() const { return m_filename; }
+	const list<shared_ptr<Module>> nodes() const { return m_nodes; }
+
+private:
+	string m_filename;
+	list<shared_ptr<Module>> m_nodes;
+	unordered_map<string, shared_ptr<Module>> m_node_map;
 };

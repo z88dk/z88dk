@@ -8,7 +8,6 @@
 #include "expr.h"
 #include "lex.h"
 #include "preproc.h"
-#include "symbol.h"
 #include "symtab.h"
 #include "utils.h"
 #include <exception>
