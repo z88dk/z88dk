@@ -38,5 +38,6 @@ private:
 	string check_label();
 
 	void set_cur_module(const string& name);
-	void set_cur_section(const string& group_name, const string& section_name);
+	void set_cur_group(const string& name);
+	void set_cur_section(const string& name);
 };
