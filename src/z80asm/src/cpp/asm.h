@@ -35,9 +35,11 @@ private:
 	bool parse_line();
 	bool parse_line_main();
 	bool asm_parse_main();
-	string check_label();
 
 	void set_cur_module(const string& name);
 	void set_cur_group(const string& name);
 	void set_cur_section(const string& name);
+
+	string check_label();
+	bool add_label(const string& name);
 };

@@ -24,6 +24,8 @@ class Icode;						// icode instructions
 
 class Icode {
 public:
+	static inline const int UndefinedAsmpc = -1;
+
 	enum class Type {
 		Label,
 	};
@@ -35,6 +37,8 @@ public:
 
 	int asmpc() const { return m_asmpc; }
 	void set_asmpc(int n);
+	int asmpc_phased() const { return m_asmpc_phased; }
+	void set_asmpc_phased(int n) { m_asmpc_phased = n; }
 	bool asmpc_changed() const { return m_asmpc != m_prev_asmpc; }
 
 	int size() const { return m_size; }
@@ -46,10 +50,9 @@ public:
 	int line_num() const { return m_line_num; }
 
 private:
-	static inline const int UndefinedAsmpc = -1;
-
 	Section* m_parent{ nullptr };
 	int		m_asmpc{ UndefinedAsmpc };
+	int		m_asmpc_phased{ UndefinedAsmpc };
 	int		m_prev_asmpc{ UndefinedAsmpc };
 	int		m_size{ 0 };
 	vector<uint8_t> m_bytes;
@@ -68,6 +71,7 @@ public:
 	const list<shared_ptr<Icode>>& icode() const { return m_icode; }
 
 	int asmpc() const;
+	int asmpc_phased() const;
 
 private:
 	string	m_name;
