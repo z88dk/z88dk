@@ -40,6 +40,15 @@ int Section::asmpc() const {
 		return m_icode.back()->asmpc() + m_icode.back()->size();
 }
 
+int Section::asmpc_phased() const {
+	if (m_icode.empty())
+		return Icode::UndefinedAsmpc;
+	else if (m_icode.back()->asmpc_phased() == Icode::UndefinedAsmpc)
+		return Icode::UndefinedAsmpc;
+	else
+		return m_icode.back()->asmpc_phased() + m_icode.back()->size();
+}
+
 Group::Group(const string& name, Module* module)
 	: m_name(name), m_module(module) {
 	insert_section("");		// create default section with empty name

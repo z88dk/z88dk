@@ -10,6 +10,7 @@
 #include "icode.h"
 #include "if.h"
 #include "preproc.h"
+#include "symtab.h"
 #include "utils.h"
 using namespace std;
 
@@ -78,10 +79,10 @@ bool Asm::parse_line_main() {
 }
 
 string Asm::check_label() {
-	TType ttype0 = m_lexer->peek(0).ttype;
-	Keyword keyword1 = m_lexer->peek(1).keyword;
+	TType t0 = m_lexer->peek(0).ttype;
+	Keyword kw1 = m_lexer->peek(1).keyword;
 
-	if (ttype0 == TType::Label && keyword1 != Keyword::EQU) {
+	if (t0 == TType::Label && kw1 != Keyword::EQU) {
 		m_lexer->next();
 		return m_lexer->peek(-1).svalue;
 	}
