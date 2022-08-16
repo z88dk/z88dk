@@ -19,7 +19,8 @@ bool Asm::assemble(const string& filename) {
 
 	m_object = make_shared<Object>(filename);
 	set_cur_module("");
-	set_cur_section("", "");
+	set_cur_group("");
+	set_cur_section("");
 
 	if (!g_preproc.open(filename, true)) return false;
 	if (!parse()) return false;
@@ -27,6 +28,7 @@ bool Asm::assemble(const string& filename) {
 	m_lexer.reset();
 	m_object.reset();
 	m_cur_module.reset();
+	m_cur_group.reset();
 	m_cur_section.reset();
 
 	return true;
@@ -88,10 +90,13 @@ string Asm::check_label() {
 }
 
 void Asm::set_cur_module(const string& name) {
-	m_cur_module = m_object->insert(name);
+	m_cur_module = m_object->insert_module(name);
 }
 
-void Asm::set_cur_section(const string& group_name, const string& section_name) {
-	m_cur_group = m_cur_module.lock()->insert(group_name);
-	m_cur_section = m_cur_group.lock()->insert(section_name);
+void Asm::set_cur_group(const string& name) {
+	m_cur_group = m_cur_module.lock()->insert_group(name);
+}
+
+void Asm::set_cur_section(const string& name) {
+	m_cur_section = m_cur_module.lock()->insert_section(name);
 }
