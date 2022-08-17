@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "args.h"
-#include "asm.h"
+#include "assm.h"
 #include "if.h"
 #include "utils.h"
 #include <string>
@@ -20,8 +20,8 @@ int main(int argc, char *argv[]) {
 	// asssemble required files
 	for (auto& file : g_args.files()) {
 		if (fs::path(file).extension().generic_string() != EXT_O) {
-			Asm assembler;
-			//assembler.assemble(file);
+			Assm assm;
+			//assm.assemble(file);
 		}
 	}
 

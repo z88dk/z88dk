@@ -75,10 +75,9 @@ shared_ptr<Section> Group::insert_section(const string& name) {
 }
 
 Module::Module(const string& name, Object* object)
-	: m_name(name), m_object(object) {
+	: m_name(name), m_object(object), m_symtab(&g_symbols) {
 	insert_section("");		// create default section with empty name
 	insert_group("");		// create default group with empty name
-	m_symtab = make_shared<Symtab>(global_symbols());
 }
 
 shared_ptr<Section> Module::get_section(const string& name) {

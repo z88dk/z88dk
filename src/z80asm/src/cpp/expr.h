@@ -14,6 +14,7 @@
 #include <vector>
 using namespace std;
 
+class Assm;
 class Lexer;
 class Symbol;
 class Symtab;
@@ -51,7 +52,7 @@ private:
 
 class Expr {
 public:
-	Expr();
+	Expr(Lexer& lexer, Assm& assm);
 	void clear();
 
 	int value() const { return m_value; }
@@ -61,18 +62,18 @@ public:
 	const string& filename() const { return m_filename; }
 	int line_num() const { return m_line_num; }
 
-	bool parse(const string& text, shared_ptr<Symtab> symtab);
-	bool parse(shared_ptr<Lexer> lexer, shared_ptr<Symtab> symtab);
+	bool parse();				// parse expression, leave lexer after expression
+	bool parse_at_end();		// parse expression, issue error if not end of statement
 
 	bool eval_silent(int asmpc);
 	bool eval_noisy(int asmpc);
 
 private:
+	Lexer&				m_lexer;			// point at expression to parse
+	Assm&				m_assm;				// used to use/define symbols
 	shared_ptr<ExprNode> m_root;			// root node of expression
 	int					m_value{ 0 };		// value computed during eval
 	ErrCode				m_result{ ErrCode::Ok };// result computed during eval
-	shared_ptr<Lexer>	m_lexer;			// used while parsing
-	shared_ptr<Symtab>	m_symtab;			// used while parsing
 	string				m_text;				// expression text
 	int					m_asmpc{ 0 };		// ASMPC value
 	bool				m_silent{ false };	// silence errors
@@ -83,9 +84,9 @@ private:
 
 	void error(ErrCode err, const string& text);
 
-	TType ttype() const { return m_lexer->peek().ttype; }
-	const Token& token() const { return m_lexer->peek(); }
-	void next() { m_lexer->next(); }
+	TType ttype() const { return m_lexer.peek().ttype; }
+	const Token& token() const { return m_lexer.peek(); }
+	void next() { m_lexer.next(); }
 
 	shared_ptr<ExprNode> parse_expr();
 	shared_ptr<ExprNode> parse_ternary_condition();

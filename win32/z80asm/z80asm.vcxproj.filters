@@ -186,7 +186,7 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\args.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\cpp\asm.h">
+    <ClInclude Include="..\..\src\z80asm\src\cpp\assm.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\cpu_rules.h">
@@ -305,7 +305,7 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\args.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\cpp\asm.cpp">
+    <ClCompile Include="..\..\src\z80asm\src\cpp\assm.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\cpp\symtab.cpp">

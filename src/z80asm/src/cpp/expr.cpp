@@ -50,7 +50,8 @@ shared_ptr<ExprNode> ExprNode::arg(size_t i) {
 	return m_args[i];
 }
 
-Expr::Expr() {
+Expr::Expr(Lexer& lexer, Assm& assm)
+	: m_lexer(lexer), m_assm(assm) {
 	clear();
 }
 
@@ -58,8 +59,6 @@ void Expr::clear() {
 	m_root = nullptr;
 	m_value = 0;
 	m_result = ErrCode::Ok;
-	m_lexer = nullptr;
-	m_symtab = nullptr;
 	m_text.clear();
 	m_asmpc = 0;
 	m_silent = false;
@@ -86,35 +85,33 @@ void Expr::error(ErrCode err, const string& text) {
 		g_errors.error(m_result, text);
 }
 
-bool Expr::parse(const string& text, shared_ptr<Symtab> symtab) {
-	auto lexer = make_shared<Lexer>(text);
-	if (!parse(lexer, symtab))
+bool Expr::parse() {
+	clear();
+	const char* expr_start = m_lexer.text_ptr();
+	const char* expr_end = expr_start + strlen(expr_start);
+
+	m_root = parse_expr();
+
+	expr_end = m_lexer.text_ptr();
+	m_text = string(expr_start, expr_end);
+
+	return m_result == ErrCode::Ok ? true : false;
+}
+
+bool Expr::parse_at_end() {
+	if (!parse())
 		return false;
 
-	// check for end of string
+	// check for end of statement
 	switch (ttype()) {
 	case TType::End:
 	case TType::Backslash:
 	case TType::Newline:
 		return true;
 	default:
-		error(ErrCode::SyntaxExpr, m_lexer->text_ptr());
+		error(ErrCode::SyntaxExpr, m_lexer.text_ptr());
 		return false;
 	}
-}
-
-bool Expr::parse(shared_ptr<Lexer> lexer, shared_ptr<Symtab> symtab) {
-	clear();
-	m_lexer = lexer;
-	m_symtab = symtab;
-	const char* expr_start = m_lexer->text_ptr();
-	const char* expr_end = expr_start + strlen(expr_start);
-
-	m_root = parse_expr();
-
-	m_text = string(expr_start, expr_end);
-	m_lexer = nullptr;
-	return m_result == ErrCode::Ok ? true : false;
 }
 
 bool Expr::eval_silent(int asmpc) {
@@ -152,7 +149,7 @@ shared_ptr<ExprNode> Expr::parse_ternary_condition() {
 				node, t, f);
 		}
 		else {
-			throw ExprException(ErrCode::ColonExpected, m_lexer->text_ptr());
+			throw ExprException(ErrCode::ColonExpected, m_lexer.text_ptr());
 		}
 	}
 	return node;
@@ -367,14 +364,14 @@ shared_ptr<ExprNode> Expr::parse_unary() {
 		node = parse_expr();
 		if (ttype() != TType::RParen)
 			throw ExprException(ErrCode::UnbalancedParens,
-				m_lexer->text_ptr());
+				m_lexer.text_ptr());
 		next();
 		return node;
 	case TType::LSquare:
 		next();
 		node = parse_expr();
 		throw ExprException(ErrCode::UnbalancedParens,
-			m_lexer->text_ptr());
+			m_lexer.text_ptr());
 		next();
 		return node;
 	default:
@@ -393,7 +390,7 @@ shared_ptr<ExprNode> Expr::parse_primary() {
 			next();
 			return make_shared<ExprNode>(ExprNode::Type::LeafASMPC);
 		default:
-			symbol = m_symtab->use(token().svalue);
+			//symbol = m_symtab->use(token().svalue);
 			node = make_shared<ExprNode>(symbol);
 			next();
 			return node;
@@ -404,7 +401,7 @@ shared_ptr<ExprNode> Expr::parse_primary() {
 		return node;
 	default:
 		throw ExprException(ErrCode::IntOrIdentExpected,
-			m_lexer->text_ptr());
+			m_lexer.text_ptr());
 	}
 }
 

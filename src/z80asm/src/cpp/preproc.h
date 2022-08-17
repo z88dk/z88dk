@@ -15,7 +15,6 @@
 #include <fstream>
 #include <iostream>
 #include <list>
-#include <memory>
 #include <string>
 using namespace std;
 
@@ -94,9 +93,9 @@ public:
 private:
 	list<PreprocFile>	m_files;		// input stack of files
 	list<PreprocLevel>	m_levels;		// levels of macro expansion
-	shared_ptr<Lexer>	m_lexer;		// line being parsed
 	deque<string>		m_output;       // parsed output
 	vector<IfNest>		m_if_stack;		// state of nested IFs
+	Lexer				m_lexer;		// line being parsed
 	Macros				m_macros;		// MACRO..ENDM macros
 
 	bool getline1(string& line);
@@ -143,17 +142,15 @@ private:
 	void do_float();
 	void do_setfloat();
 
-	ExpandedText expand(shared_ptr<Lexer> lexer, Macros& defines);
+	ExpandedText expand(Lexer& lexer, Macros& defines);
 	string expand(const string& text);
-	void expand_ident(ExpandedText& out, const string& ident,
-		shared_ptr<Lexer> lexer, Macros& defines);
-	ExpandedText expand_define_call(const string& name,
-		shared_ptr<Lexer> lexer, Macros& defines);
-	string collect_param(shared_ptr<Lexer> lexer);
-	vector<string> collect_macro_params(shared_ptr<Lexer> lexer);
-	vector<string> collect_name_list(shared_ptr<Lexer> lexer);
+	void expand_ident(ExpandedText& out, const string& ident, Lexer& lexer, Macros& defines);
+	ExpandedText expand_define_call(const string& name, Lexer& lexer, Macros& defines);
+	string collect_param(Lexer& lexer);
+	vector<string> collect_macro_params(Lexer& lexer);
+	vector<string> collect_name_list(Lexer& lexer);
 	string collect_macro_body(Keyword start_keyword, Keyword end_keyword);
-	string collect_reptc_arg(shared_ptr<Lexer> lexer);
+	string collect_reptc_arg(Lexer& lexer);
 };
 
 extern Preproc g_preproc;
