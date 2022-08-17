@@ -71,7 +71,7 @@ private:
 
 class Symtab {
 public:
-	Symtab(shared_ptr<Symtab> parent = nullptr);
+	Symtab(Symtab* parent = nullptr);
 
 	bool insert(shared_ptr<Symbol> symbol);
 	void erase(const string& name) { m_table.erase(name); }
@@ -80,12 +80,10 @@ public:
 	shared_ptr<Symbol> find(const string& name);
 	shared_ptr<Symbol> find_all(const string& name);
 
-	shared_ptr<Symbol> use(const string& name);
-
 private:
-	weak_ptr<Symtab> m_parent;		// parent, if any
+	Symtab* m_parent{ nullptr };				// parent, if any
 	map<string, shared_ptr<Symbol>>	m_table;	// symbols table
 };
 
-shared_ptr<Symtab> global_def_symbols();// symbols defined by -D and predefined constants	
-shared_ptr<Symtab> global_symbols();	// symbols declared PUBLIC, EXTERN or GLOBAL
+extern Symtab g_def_symbols;	// symbols defined by -D and predefined constants	
+extern Symtab g_symbols;		// symbols declared PUBLIC, EXTERN or GLOBAL

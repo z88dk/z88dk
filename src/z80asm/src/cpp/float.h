@@ -9,21 +9,20 @@
 #include "if.h"
 #include "lex.h"
 #include <cstdint>
-#include <memory>
 #include <vector>
 using namespace std;
 
 // expression parser
 class FloatExpr {
 public:
-	FloatExpr(shared_ptr<Lexer> lexer);
+	FloatExpr(Lexer& lexer);
 
 	bool parse();
 	bool eval_error() const { return m_eval_error; }
 	double value() const { return m_value; }
 
 private:
-	shared_ptr<Lexer> m_lexer;
+	Lexer& m_lexer;
 	double m_value{ 0.0 };
 	bool   m_parse_error{ false };	// expression could not be parsed
 	bool   m_eval_error{ false };	// expression could not be evaluated

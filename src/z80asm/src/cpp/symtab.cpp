@@ -14,8 +14,8 @@
 #include <iostream>
 using namespace std;
 
-static shared_ptr<Symtab> g_global_def_symbols;
-static shared_ptr<Symtab> g_global_symbols;
+Symtab g_def_symbols;		
+Symtab g_symbols{ &g_def_symbols };
 
 Symbol::Symbol(const string& name)
 	: m_name(name)
@@ -41,7 +41,7 @@ Symbol::Symbol(const string& name, shared_ptr<Expr> expr)
 	, m_line_num(g_preproc.line_num()) {
 }
 
-Symtab::Symtab(shared_ptr<Symtab> parent)
+Symtab::Symtab(Symtab* parent)
 	: m_parent(parent) {
 }
 
@@ -68,45 +68,19 @@ shared_ptr<Symbol> Symtab::find(const string& name) {
 }
 
 shared_ptr<Symbol> Symtab::find_all(const string& name) {
-	auto symbol = find(name);
-	if (symbol)
-		return symbol;
-	else if (m_parent.lock()) 
-		return m_parent.lock()->find(name);
-	else
-		return nullptr;
-}
-
-shared_ptr<Symbol> Symtab::use(const string& name) {
-	shared_ptr<Symbol> symbol = find(name);
-	if (!symbol) {
-		symbol = make_shared<Symbol>(name);
-		symbol->set_used(true);
-		insert(symbol);
+	Symtab* symtab = this;
+	while (symtab) {
+		auto symbol = find(name);
+		if (symbol)
+			return symbol;
+		symtab = symtab->m_parent;
 	}
-	return symbol;
-}
-
-static void init_globals() {
-	if (!g_global_def_symbols) {
-		g_global_def_symbols = make_shared<Symtab>();
-		g_global_symbols = make_shared<Symtab>(g_global_def_symbols);
-	}
-}
-
-shared_ptr<Symtab> global_def_symbols() {
-	init_globals();
-	return g_global_def_symbols;
-}
-
-shared_ptr<Symtab> global_symbols() {
-	init_globals();
-	return g_global_symbols;
+	return nullptr;
 }
 
 void symtab_insert_global_def(const char* name, int value) {
 	auto symbol = make_shared<Symbol>(name, value);
-	if (global_def_symbols()->insert(symbol)) {
+	if (g_def_symbols.insert(symbol)) {
 		if (g_args.verbose())
 			cout << "Predefined constant: "
 			<< name << " = " << int_to_hex(value, 4) << endl;

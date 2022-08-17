@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "symtab.h"
 #include <cinttypes>
 #include <list>
 #include <memory>
@@ -109,16 +110,16 @@ public:
 	const Object* object() { return m_object; }
 	const list<shared_ptr<Section>>& sections() const { return m_sections; }
 	const list<shared_ptr<Group>>& groups() const { return m_groups; }
-	shared_ptr<Symtab> symtab() { return m_symtab; }
+	Symtab& symtab() { return m_symtab; }
 
 private:
 	string	m_name;
 	Object* m_object{ nullptr };
+	Symtab	m_symtab;			// module symbols
 	list<shared_ptr<Section>> m_sections;
 	unordered_map<string, shared_ptr<Section>> m_sections_map;
 	list<shared_ptr<Group>> m_groups;
 	unordered_map<string, shared_ptr<Group>> m_groups_map;
-	shared_ptr<Symtab>	m_symtab;			// module symbols
 };
 
 class Object {
