@@ -40,8 +40,6 @@
 #define __HBIOS  1
 #define __HBIOS_VERS  030001
 
-#define __CPU_CLOCK  18432000
-
 #define __CLOCKS_PER_SECOND 50
 
 
