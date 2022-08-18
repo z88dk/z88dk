@@ -28,7 +28,6 @@ jobs:
       run: |
         set -x
         cd osx-latest/z88dk/src/z80asm
-        export PATH=$RUNNER_WORKSPACE/osx-latest/z88dk/bin:$PATH
-        export ZCCCFG=$RUNNER_WORKSPACE/osx-latest/z88dk/lib/config
-        find $RUNNER_WORKSPACE -type d -print
+        export PATH=$RUNNER_WORKSPACE/z88dk/osx-latest/z88dk/bin:$PATH
+        export ZCCCFG=$RUNNER_WORKSPACE/z88dk/osx-latest/z88dk/lib/config
         perl -S prove t/*.t
