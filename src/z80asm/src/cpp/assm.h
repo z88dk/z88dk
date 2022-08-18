@@ -33,6 +33,7 @@ private:
 	weak_ptr<Section>	m_cur_section;
 	vector<shared_ptr<Expr>> m_exprs;		// expressions parsed
 
+	bool assemble1(const string& filename);
 	bool parse();
 	bool parse_line();
 	bool parse_line_main();

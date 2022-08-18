@@ -366,7 +366,7 @@ void Lexer::set(const string& text) {
 								  if (keyword == Keyword::ASMPC)
 									  m_tokens.emplace_back(TType::ASMPC);
 								  else
-								  m_tokens.emplace_back(TType::Ident, str, keyword);
+									  m_tokens.emplace_back(TType::Ident, str, keyword);
 							  }
 							  m_tokens.back().col = col;
 							  continue; }

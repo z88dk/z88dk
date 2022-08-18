@@ -385,23 +385,21 @@ shared_ptr<ExprNode> Expr::parse_primary() {
 
 	switch (ttype()) {
 	case TType::Ident:
-		switch (token().keyword) {
-		case Keyword::ASMPC:
-			next();
-			return make_shared<ExprNode>(ExprNode::Type::LeafASMPC);
-		default:
-			//symbol = m_symtab->use(token().svalue);
-			node = make_shared<ExprNode>(symbol);
-			next();
-			return node;
-		}
+		//symbol = m_symtab->use(token().svalue);
+		node = make_shared<ExprNode>(symbol);
+		next();
+		return node;
+	case TType::ASMPC:
+		node = make_shared<ExprNode>(ExprNode::Type::LeafASMPC);
+		next();
+		return node;
 	case TType::Integer:
 		node = make_shared<ExprNode>(token().ivalue);
 		next();
 		return node;
 	default:
 		throw ExprException(ErrCode::IntOrIdentExpected,
-			m_lexer.text_ptr());
+			m_lexer.token_text());
 	}
 }
 
