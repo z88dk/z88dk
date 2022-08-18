@@ -3,7 +3,7 @@
  *
  *  27/1/2002 - djm
  *
- *  $Id: setfcb.c,v 1.3 2013-06-06 08:58:32 stefano Exp $
+ *  $Id: setfcb.c $
  */
 
 
@@ -17,7 +17,7 @@
 static char devnames[] = "CON:RDR:PUN:LST:";
 #endif
 
-int setfcb( struct fcb *fc, unsigned char *name)
+int setfcb( struct fcb *fc, char *name)
 {
 #ifdef DEVICES
     int  i,j;
