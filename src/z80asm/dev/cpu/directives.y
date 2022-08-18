@@ -22,4 +22,3 @@ extern
 
 global
 	while (!m_lexer.at_end()) m_lexer.next();
-

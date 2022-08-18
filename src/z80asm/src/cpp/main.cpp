@@ -20,8 +20,10 @@ int main(int argc, char *argv[]) {
 	// asssemble required files
 	for (auto& file : g_args.files()) {
 		if (fs::path(file).extension().generic_string() != EXT_O) {
-			//Assm assm;
-			//assm.assemble(file);
+			/*
+			Assm assm;
+			assm.assemble(file);
+			*/
 		}
 	}
 

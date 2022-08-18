@@ -47,6 +47,7 @@ bool Assm::parse() {
 }
 
 bool Assm::parse_line() {
+	m_exprs.clear();
 	switch (m_state) {
 	case State::Main: return parse_line_main();
 	default: Assert(0); return false;
