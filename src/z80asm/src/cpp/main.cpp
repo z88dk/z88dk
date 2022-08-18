@@ -6,6 +6,7 @@
 
 #include "args.h"
 #include "assm.h"
+#include "errors.h"
 #include "if.h"
 #include "utils.h"
 #include <string>
@@ -18,15 +19,18 @@ int main(int argc, char *argv[]) {
 	g_args.parse_args(args);
 
 	// asssemble required files
-	for (auto& file : g_args.files()) {
-		if (fs::path(file).extension().generic_string() != EXT_O) {
-			/*
-			Assm assm;
-			assm.assemble(file);
-			*/
+	if (!g_errors.count()) {		// if no errors in command line parsing 
+		for (auto& file : g_args.files()) {
+			if (fs::path(file).extension().generic_string() != EXT_O) {
+				// for now, only t/cpu.t can be parsed
+				if (file.substr(0, 17) == "dev/cpu/cpu_test_") {
+					Assm assm;
+					assm.assemble(file);
+					g_errors.reset_count();	// so that legacy code assembles files
+				}
+			}
 		}
 	}
-
 	// continue with the legacy code
 	return z80asm_main();
 }

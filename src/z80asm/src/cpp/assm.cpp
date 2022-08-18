@@ -22,14 +22,19 @@ bool Assm::assemble(const string& filename) {
 	set_cur_group("");
 	set_cur_section("");
 
-	if (!g_preproc.open(filename, true)) return false;
-	if (!parse()) return false;
+	bool ret = assemble1(filename);
 
 	m_object.reset();
 	m_cur_module.reset();
 	m_cur_group.reset();
 	m_cur_section.reset();
 
+	return ret;
+}
+
+bool Assm::assemble1(const string& filename) {
+	if (!g_preproc.open(filename, true)) return false;
+	if (!parse()) return false;
 	return true;
 }
 
