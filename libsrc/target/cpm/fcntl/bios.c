@@ -7,10 +7,9 @@
 #include <cpm.h>
 
 
-int bios(int func,int arg,int arg2)
-{
 #asm
-	ld	hl,2
+cpm_bios:
+	ld	hl,4
 	add	hl,sp
 	ld	e,(hl)	;arg2
 	inc	hl
@@ -45,7 +44,23 @@ int bios(int func,int arg,int arg2)
 	jp  (hl)
 
 retadd:
+    ret
+
+#endasm
+
+
+int bios(int func,int arg,int arg2)
+{
+#asm
+	call cpm_bios
 	ld	l,a     ; all done. now put return value in HL
 	ld	h,0
+#endasm
+}
+
+int biosh(int func,int arg,int arg2)
+{
+#asm
+	call cpm_bios
 #endasm
 }
