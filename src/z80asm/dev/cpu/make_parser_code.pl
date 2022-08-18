@@ -15,15 +15,25 @@ my %parser = %{$yaml->[0]};
 
 my $tree = { state=>0, next=>{}, current=>"top" };
 my @states = ($tree);
-my @actions;
+my @actions = ('');		# actions start at 1
 my %actions;
+my %keywords;
 
-for my $tokens (sort keys %parser) {
-	my @tokens = split(' ', $tokens);
-	my $current = $tokens =~ s/\b\w+:://gr;
+# read keywords from source
+%keywords = read_keywords("../../src/cpp/keyword.def");
+my $nr_keywords = scalar(keys %keywords);
+
+# read tokens from source
+my %tokens = read_tokens("../../src/cpp/lex.h");
+my $nr_tokens = scalar(keys %tokens);
+
+# convert parser data into trie tree
+for my $asm (sort keys %parser) {
+	my @asm = split(' ', $asm);
+	my $current = $asm =~ s/\b\w+:://gr;
 
 	# create new action
-	my $code = $parser{$tokens};
+	my $code = $parser{$asm};
 	my $action_nr;
 	if (defined $actions{$code}) {
 		$action_nr = $actions{$code};
@@ -38,11 +48,11 @@ for my $tokens (sort keys %parser) {
 	# create tree branch
 	my $t = $tree;
 	my @current;
-	for my $i (0..$#tokens) {
-		my $token = $tokens[$i];
+	for my $i (0..$#asm) {
+		my $token = $asm[$i];
 		push @current, $token =~ s/^\w+:://r;
 		if (!$t->{next}{$token}) {
-			if ($i == $#tokens) {
+			if ($i == $#asm) {
 				$t->{next}{$token} = {action=>$action_nr, next=>{}, current=>"@current"};
 			}
 			else {
@@ -55,6 +65,8 @@ for my $tokens (sort keys %parser) {
 	}
 }
 
+my $nr_states = scalar(@states);
+
 # dump state machine
 open(my $fh, ">", $output_file) or die "open $output_file: $!";
 my $function = ($output_file =~ s/\.\w+$//r);
@@ -65,108 +77,272 @@ say $fh <<END;
 #include "errors.h"
 #include "expr.h"
 #include "if.h"
-#include "symtab.h"
+#include "utils.h"
+#include <memory>
+#include <cinttypes>
 using namespace std;
-
-bool Assm::$function() {
 END
 
+# dump state-keyword transition table
+print $fh <<END;
+static const int16_t state_keyword_tt[$nr_states][$nr_keywords] = {
+END
 for my $state (@states) {
-	dump_state($fh, $state);
+	dump_state_keyword($fh, $state);
 }
+say $fh <<END;
+};
+END
 
-for my $action_nr (0..$#actions) {
-	say $fh "// action for: ", $actions[$action_nr]{current};
-	say $fh "action_$action_nr:";
-	say $fh $actions[$action_nr]{code} =~ s/\s+$//sr;
-	say $fh "return true;\n";
+# dump state-token transition table
+print $fh <<END;
+static const int16_t state_token_tt[$nr_states][$nr_tokens] = {
+END
+for my $state (@states) {
+	dump_state_token($fh, $state);
 }
+say $fh <<END;
+};
+END
 
-say $fh "}";
+# dump state-expressions table
+print $fh <<END;
+static const struct { int16_t expr_type, next; } state_expr[$nr_states] = {
+END
+for my $state (@states) {
+	dump_state_expr($fh, $state);
+}
+say $fh <<END;
+};
+END
 
-# dump one state
-sub dump_state {
-	my($fh, $tree) = @_;
+# dump function
+print $fh <<END;
+bool Assm::$function() {
+	int state = 0;
+	int next, expr_type;
+	shared_ptr<Expr> expr;
 
-	if ($tree->{state} > 0) {
-		say $fh "// state: ", $tree->{current};
-		say $fh "state_", $tree->{state},":";
+	while (true) {
+		Assert(state >= 0 && state < $nr_states);
+
+		// check keyword
+		int keyword_nr = static_cast<int>(m_lexer.peek().keyword);
+		Assert(keyword_nr >= 0 && keyword_nr < $nr_keywords);
+		next = state_keyword_tt[state][keyword_nr];
+		if (next < 0) {
+			m_lexer.next();
+			return ${function}_action(-next);
+		}
+		else if (next > 0) {
+			m_lexer.next();
+			state = next;
+			continue;
+		}
+
+		// check token
+		int token_nr = static_cast<int>(m_lexer.peek().ttype);
+		Assert(token_nr >= 0 && token_nr < $nr_tokens);
+		next = state_token_tt[state][token_nr];
+		if (next < 0) {
+			m_lexer.next();
+			return ${function}_action(-next);
+		}
+		else if (next > 0) {
+			m_lexer.next();
+			state = next;
+			continue;
+		}
+
+		// check expression
+		expr_type = state_expr[state].expr_type;
+		next = state_expr[state].next;
+		switch (expr_type) {
+		case 0:		// no expression
+			break;
+		case 1:		// expression
+			expr = make_shared<Expr>(m_lexer, *this); 
+			if (expr->parse()) {
+				m_exprs.push_back(expr);
+				if (next < 0) {
+					return ${function}_action(-next);
+				}
+				else if (next > 0) {
+					state = next;
+					continue;
+				}
+			}
+			break;
+		case 2:		// const expression
+			expr = make_shared<Expr>(m_lexer, *this); 
+			if (expr->parse()) {
+				if (expr->eval_silent(0) && expr->is_const()) {
+					m_exprs.push_back(expr);
+					if (next < 0) {
+						return ${function}_action(-next);
+					}
+					else if (next > 0) {
+						state = next;
+						continue;
+					}
+				}
+				else {
+					g_errors.error(ErrCode::ConstExprExpected);
+					return false;
+				}
+			}
+			break;
+		default:
+			Assert(0);
+			return false;	// not reached
+		}
+
+		// no valid transition from this state
+		g_errors.error(ErrCode::Syntax);
+		return false;
 	}
+}
+
+bool Assm::${function}_action(int action) {
+	switch (action) {
+END
+
+# dump actions
+for my $action_nr (1..$#actions) {
+	my $comment = $actions[$action_nr]{current};
+	my $code = $actions[$action_nr]{code};
+	$code =~ s/\s+$//s;
+	$code =~ s/^/\t\t/gm;
+	print $fh <<END;
+	case $action_nr:	// $comment
+$code
+		return true;
+END
+}
+
+say $fh <<END;
+	default: 
+		Assert(0);
+		return false; // not reached
+	}
+}
+END
+
+# dump one state-keyword transition row:
+# 0 for invalid transition
+# >0 to jump to state n
+# <0 to jump to action -n
+sub dump_state_keyword {
+	my($fh, $tree) = @_;
+	my @row = (0) x $nr_keywords;
 
 	if ($tree->{next}) {
-		# check keywords
-		my $have_keywords;
 		for my $token (keys %{$tree->{next}}) {
 			if ($token =~ /^Keyword::/) {
-				$have_keywords = 1;
-				last;
-			}
-		}
-		if ($have_keywords) {
-			say $fh "\t// check keywords";
-			say $fh "\tswitch (m_lexer.peek().keyword) {";
-			for my $token (sort keys %{$tree->{next}}) {
-				if ($token =~ /^Keyword::/) {
-					my $target = (exists $tree->{next}{$token}{action}) ? 
-									"action_".$tree->{next}{$token}{action} :
-									"state_".$tree->{next}{$token}{state};
-					say $fh "\tcase $token: m_lexer.next(); goto $target;";
+				if (exists $tree->{next}{$token}{action}) {
+					$row[$keywords{$token}] = - $tree->{next}{$token}{action};
+				}
+				else {
+					$row[$keywords{$token}] = $tree->{next}{$token}{state};
 				}
 			}
-			say $fh "\tdefault:;";
-			say $fh "\t}\n";
-		}
-
-		# check tokens
-		my $have_tokens;
-		for my $token (keys %{$tree->{next}}) {
-			if ($token =~ /^TType::/) {
-				$have_tokens = 1;
-				last;
-			}
-		}
-		if ($have_tokens) {
-			say $fh "\t// check tokens";
-			say $fh "\tswitch (m_lexer.peek().ttype) {";
-			for my $token (sort keys %{$tree->{next}}) {
-				if ($token =~ /^TType::/) {
-					my $target = (exists $tree->{next}{$token}{action}) ? 
-									"action_".$tree->{next}{$token}{action} :
-									"state_".$tree->{next}{$token}{state};
-					if ($token =~ /^TType::End/) {
-						say $fh "\tcase TType::End: goto $target;";
-						say $fh "\tcase TType::Backslash:";
-						say $fh "\tcase TType::Newline: m_lexer.next(); goto $target;";
-					}
-					else {
-						say $fh "\tcase $token: m_lexer.next(); goto $target;";
-					}
-				}
-			}
-			say $fh "\tdefault:;";
-			say $fh "\t}\n";
-		}
-
-		# check expressions
-		if (defined $tree->{next}{expr}) {
-			my $target = (exists $tree->{next}{expr}{action}) ? 
-							"action_".$tree->{next}{expr}{action} :
-							"state_".$tree->{next}{expr}{state};
-			say $fh "\t// check expression";
-			say $fh "\t{ Expr e(m_lexer, *this); if (e.parse()) goto $target; }";
-			say $fh "\t/*if (check_expr())*/ goto $target;";
-		}
-		if (defined $tree->{next}{const_expr}) {
-			my $target = (exists $tree->{next}{const_expr}{action}) ? 
-							"action_".$tree->{next}{const_expr}{action} :
-							"state_".$tree->{next}{const_expr}{state};
-			say $fh "\t// check expression";
-			say $fh "\t{ Expr e(m_lexer, *this); if (e.parse()) goto $target; }";
-			say $fh "\t/*if (check_const_expr())*/ goto $target;";
 		}
 	}
 
-	say $fh "\tg_errors.error(ErrCode::Syntax);";
-	say $fh "\treturn false;";
-	say $fh "";
+	say $fh "\t{", join(",", @row), "},";
+}
+
+# dump one state-token transition row:
+sub dump_state_token {
+	my($fh, $tree) = @_;
+	my @row = (0) x $nr_tokens;
+
+	if ($tree->{next}) {
+		for my $token (keys %{$tree->{next}}) {
+			if ($token =~ /^TType::/) {
+				my $next;
+				if (exists $tree->{next}{$token}{action}) {
+					$next = - $tree->{next}{$token}{action};
+				}
+				else {
+					$next = $tree->{next}{$token}{state};
+				}
+				if ($token =~ /^TType::End/) {
+					$row[$tokens{'TType::End'}] = $next;
+					$row[$tokens{'TType::Backslash'}] = $next;
+					$row[$tokens{'TType::Newline'}] = $next;
+				}
+				else {
+					$row[$tokens{$token}] = $next;
+				}
+			}
+		}
+	}
+
+	say $fh "\t{", join(",", @row), "},";
+}
+
+# dump type of expression at each state
+sub dump_state_expr {
+	my($fh, $tree) = @_;
+	my $type = 0;
+	my $next = 0;
+
+	if ($tree->{next}) {
+		if (defined $tree->{next}{expr}) {
+			$type = 1;
+			if (exists $tree->{next}{expr}{action}) {
+				$next = - $tree->{next}{expr}{action};
+			}
+			else {
+				$next = $tree->{next}{expr}{state};
+			}
+		}
+		elsif (defined $tree->{next}{const_expr}) {
+			$type = 2;
+			if (exists $tree->{next}{const_expr}{action}) {
+				$next = - $tree->{next}{const_expr}{action};
+			}
+			else {
+				$next = $tree->{next}{const_expr}{state};
+			}
+		}
+	}
+
+	say $fh "\t{", join(",", $type, $next), "},";
+}
+
+# read %keywords
+sub read_keywords {
+	my($file) = @_;
+	my $keyword_id = 0;
+	my %keywords;
+
+	open(my $fh, "<", $file) or die "open $file: $!";
+	while (<$fh>) {
+		if (/^ \s* X\( \s* (\w+) \s* , /x) {
+			my $keyword = "Keyword::$1";
+			$keywords{$keyword} = $keyword_id++;
+		}
+	}
+	return %keywords;
+}
+
+# read %tokens
+sub read_tokens {
+	my($file) = @_;
+	my $token_id = 0;
+	my %tokens;
+
+	open(my $fh, "<", $file) or die "open $file: $!";
+	local $/;
+	my $text = <$fh>;
+	$text =~ /\b enum \s+ class \s+ TType \s+ \{ 
+		         ([^}]+) \} /x or die "TType not found in $file";
+	my $list = $1;
+	$list =~ s/\s+//g;
+	for my $token (split /,/, $list) {
+		$tokens{"TType::$token"} = $token_id++;
+	}
+	return %tokens;
 }

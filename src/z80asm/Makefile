@@ -125,7 +125,11 @@ src/c/tokens.h : make_tokens.pl Makefile
 
 # opcode tables generator
 dev: src/cpp/asm_parse_main.cpp
-src/cpp/asm_parse_main.cpp: $(wildcard dev/cpu/*.pl dev/cpu/*.y dev/cpu/Makefile)
+src/cpp/asm_parse_main.cpp: \
+		$(wildcard dev/cpu/*.pl dev/cpu/*.y) \
+		dev/cpu/Makefile \
+		src/cpp/keyword.def \
+		src/cpp/lex.h
 	$(MAKE) -$(MAKEFLAGS) -C dev/cpu
 	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
 	cp dev/cpu/asm_parse_main.cpp src/cpp/asm_parse_main.cpp
