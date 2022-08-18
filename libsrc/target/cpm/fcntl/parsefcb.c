@@ -4,7 +4,7 @@
  *
  *  27/1/2002 - djm
  *
- *  $Id: parsefcb.c,   stefano Exp 4/11/2020 $
+ *  $Id: parsefcb.c $
  */
 
 
@@ -14,11 +14,11 @@
 #include <ctype.h>
 
 
-void parsefcb(struct fcb *fc, unsigned char *name)
+void parsefcb(struct fcb *fc, char *name)
 {
 #ifdef DEVICES
-    unsigned char *ptr;
-    unsigned char c;
+    char *ptr;
+    char c;
 
     fc->drive = 0;         /* Default drive */
     fc->uid   = getuid();  /* Set the userid */
