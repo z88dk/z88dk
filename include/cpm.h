@@ -170,8 +170,8 @@ extern int __LIB__ cpm_cache_get(struct fcb *fcb, unsigned long record_nr, int f
 extern int __LIB__ cpm_cache_flush(struct fcb *fcb);
 
 /* Fill up the filename stuff */
-extern int __LIB__ setfcb(struct fcb *fc, unsigned char *name) __smallc;
-extern void __LIB__ parsefcb(struct fcb *fc, unsigned char *name) __smallc;
+extern int __LIB__ setfcb(struct fcb *fc, char *name) __smallc;
+extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
 /* Write the file offset into the FCB */
 extern void __LIB__ putoffset(char *dest, long val) __smallc;
 
