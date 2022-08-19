@@ -22,12 +22,11 @@ int main(int argc, char *argv[]) {
 	if (!g_errors.count()) {		// if no errors in command line parsing 
 		for (auto& file : g_args.files()) {
 			if (fs::path(file).extension().generic_string() != EXT_O) {
-				// for now, only t/cpu.t can be parsed
-				if (file.substr(0, 17) == "dev/cpu/cpu_test_") {
-					Assm assm;
-					assm.assemble(file);
-					g_errors.reset_count();	// so that legacy code assembles files
-				}
+				/*
+				Assm assm;
+				assm.assemble(file);
+				g_errors.reset_count();	// so that legacy code assembles files
+				*/
 			}
 		}
 	}

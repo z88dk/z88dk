@@ -15,10 +15,10 @@ section
 	while (!m_lexer.at_end()) m_lexer.next();
 
 public
-	while (!m_lexer.at_end()) m_lexer.next();
+	return parse_symbol_declare(Symbol::Scope::Public);
 
 extern
-	while (!m_lexer.at_end()) m_lexer.next();
+	return parse_symbol_declare(Symbol::Scope::Extern);
 
 global
-	while (!m_lexer.at_end()) m_lexer.next();
+	return parse_symbol_declare(Symbol::Scope::Global);

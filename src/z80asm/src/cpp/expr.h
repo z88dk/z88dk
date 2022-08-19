@@ -59,8 +59,7 @@ public:
 	ErrCode result() const { return m_result; }
 	const string& text() const { return m_text; }
 	bool is_const() const { return m_is_const; }
-	const string& filename() const { return m_filename; }
-	int line_num() const { return m_line_num; }
+	const Location& location() const { return m_location; }
 
 	bool parse();				// parse expression, leave lexer after expression
 	bool parse_at_end();		// parse expression, issue error if not end of statement
@@ -79,8 +78,7 @@ private:
 	bool				m_silent{ false };	// silence errors
 	bool				m_is_const{ true };	// is a contant expression
 	bool				m_evaluating{ false };	// detect recursive evals
-	string				m_filename;			// filename where defined
-	int					m_line_num{ 0 };	// line number where defined
+	Location			m_location;			// location where defined
 
 	void error(ErrCode err, const string& text);
 

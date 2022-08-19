@@ -130,7 +130,7 @@ src/cpp/asm_parse_main.cpp: \
 		dev/cpu/Makefile \
 		src/cpp/keyword.def \
 		src/cpp/lex.h
-	$(MAKE) -$(MAKEFLAGS) -C dev/cpu
+	$(MAKE) -C dev/cpu
 	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
 	cp dev/cpu/asm_parse_main.cpp src/cpp/asm_parse_main.cpp
 	

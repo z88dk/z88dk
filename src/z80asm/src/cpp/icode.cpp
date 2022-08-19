@@ -14,8 +14,7 @@ using namespace std;
 
 Icode::Icode(Section* parent)
 	: m_parent(parent)
-	, m_filename(g_preproc.filename())
-	, m_line_num(g_preproc.line_num()) {
+	, m_location(g_preproc.location()) {
 }
 
 void Icode::set_asmpc(int n) {
@@ -75,9 +74,14 @@ shared_ptr<Section> Group::insert_section(const string& name) {
 }
 
 Module::Module(const string& name, Object* object)
-	: m_name(name), m_object(object), m_symtab(&g_symbols) {
-	insert_section("");		// create default section with empty name
-	insert_group("");		// create default group with empty name
+	: m_name(name), m_object(object) {
+	// copy global defines
+	for (auto& symbol : g_def_symbols)
+		m_symtab.insert(symbol.second);
+
+	// create default section and group
+	insert_section("");
+	insert_group("");
 }
 
 shared_ptr<Section> Module::get_section(const string& name) {

@@ -1,7 +1,7 @@
 ---
-Keyword::EXTERN: "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
-Keyword::GLOBAL: "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
+Keyword::EXTERN: "\treturn parse_symbol_declare(Symbol::Scope::Extern);\n"
+Keyword::GLOBAL: "\treturn parse_symbol_declare(Symbol::Scope::Global);\n"
 'Keyword::ORG expr TType::End': "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
-Keyword::PUBLIC: "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
+Keyword::PUBLIC: "\treturn parse_symbol_declare(Symbol::Scope::Public);\n"
 Keyword::SECTION: "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
 'TType::Label Keyword::EQU expr TType::End': "\twhile (!m_lexer.at_end()) m_lexer.next();\n"
