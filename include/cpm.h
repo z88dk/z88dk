@@ -155,6 +155,9 @@ extern struct dpb __LIB__  *get_dpb(int drive)  __z88dk_fastcall;
 
 /* The CPM bdos call */
 extern int __LIB__ bdos(int func,int arg) __smallc;
+extern int __LIB__ bdos_callee(int func,int arg) __smallc __z88dk_callee;
+#define bdos(a,b)   bdos_callee(a,b)
+
 /* Executes the BIOS function passing BC and DE as arguments, error status in A on exit */
 extern int __LIB__ bios(int func,int arg,int arg2) __smallc;
 /* Executes the BIOS function passing BC and DE as arguments, gets the result value from HL on exit */
