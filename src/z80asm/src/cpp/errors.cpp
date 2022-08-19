@@ -347,3 +347,4 @@ void error_cmd_failed(const char* cmd) {
 void error_assert_failed() {
 	g_errors.error(ErrCode::AssertFailed);
 }
+

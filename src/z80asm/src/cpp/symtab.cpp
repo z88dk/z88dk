@@ -15,12 +15,11 @@
 using namespace std;
 
 Symtab g_def_symbols;		
-Symtab g_symbols{ &g_def_symbols };
+Symtab g_symbols;
 
 Symbol::Symbol(const string& name)
 	: m_name(name)
-	, m_filename(g_preproc.filename())
-	, m_line_num(g_preproc.line_num()) {
+	, m_location(g_preproc.location()) {
 }
 
 Symbol::Symbol(const string& name, int value)
@@ -28,8 +27,7 @@ Symbol::Symbol(const string& name, int value)
 	, m_value(value)
 	, m_type(Type::Constant)
 	, m_is_computed(true)
-	, m_filename(g_preproc.filename())
-	, m_line_num(g_preproc.line_num()) {
+	, m_location(g_preproc.location()) {
 }
 
 Symbol::Symbol(const string& name, shared_ptr<Expr> expr)
@@ -37,12 +35,7 @@ Symbol::Symbol(const string& name, shared_ptr<Expr> expr)
 	, m_expr(expr)
 	, m_type(Type::Computed)
 	, m_is_computed(true)
-	, m_filename(g_preproc.filename())
-	, m_line_num(g_preproc.line_num()) {
-}
-
-Symtab::Symtab(Symtab* parent)
-	: m_parent(parent) {
+	, m_location(g_preproc.location()) {
 }
 
 bool Symtab::insert(shared_ptr<Symbol> symbol) {
@@ -67,16 +60,9 @@ shared_ptr<Symbol> Symtab::find(const string& name) {
 		return it->second;
 }
 
-shared_ptr<Symbol> Symtab::find_all(const string& name) {
-	Symtab* symtab = this;
-	while (symtab) {
-		auto symbol = find(name);
-		if (symbol)
-			return symbol;
-		symtab = symtab->m_parent;
-	}
-	return nullptr;
-}
+//-----------------------------------------------------------------------------
+// C interface
+//-----------------------------------------------------------------------------
 
 void symtab_insert_global_def(const char* name, int value) {
 	auto symbol = make_shared<Symbol>(name, value);

@@ -269,7 +269,6 @@ sub dump_state_token {
 				}
 				if ($token =~ /^TType::End/) {
 					$row[$tokens{'TType::End'}] = $next;
-					$row[$tokens{'TType::Backslash'}] = $next;
 					$row[$tokens{'TType::Newline'}] = $next;
 				}
 				else {

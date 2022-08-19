@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "errors.h"
 #include "symtab.h"
 #include <cinttypes>
 #include <list>
@@ -47,8 +48,7 @@ public:
 	const vector<uint8_t>& bytes() const { return m_bytes; }
 	const vector<shared_ptr<PatchExpr>> patches() const { return m_patches; }
 
-	const string& filename() const { return m_filename; }
-	int line_num() const { return m_line_num; }
+	const Location& location() const { return m_location; }
 
 private:
 	Section* m_parent{ nullptr };
@@ -58,8 +58,7 @@ private:
 	int		m_size{ 0 };
 	vector<uint8_t> m_bytes;
 	vector<shared_ptr<PatchExpr>> m_patches;
-	string	m_filename;
-	int		m_line_num{ 0 };
+	Location m_location;
 };
 
 class Section {

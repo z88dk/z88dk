@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "errors.h"
 #include <string>
 #include <memory>
 #include <map>
@@ -14,6 +15,7 @@ using namespace std;
 
 class Section;
 class Expr;
+class Icode;
 
 class Symbol {
 public:
@@ -49,12 +51,11 @@ public:
 	void set_used(bool f = true) { m_is_used = f; }
 	shared_ptr<Section> section() { return m_section.lock(); }
 	void set_section(weak_ptr<Section> s) { m_section = s; }
-	const string& filename() const { return m_filename; }
-	int line_num() const { return m_line_num; }
+	const Location& location() const { return m_location; }
 
 private:
 	string	m_name;					// name
-	int		m_value{ 0 };			// value if constant or computed
+	int		m_value{ 0 };			// value if constant or evaluated if computed or address
 	shared_ptr<Expr> m_expr;		// DEFC symbol
 
 	Type	m_type{ Type::Undefined };
@@ -65,23 +66,20 @@ private:
 
 	weak_ptr<Section>	m_section;	// section where defined
 
-	string	m_filename;				// file where defined
-	int		m_line_num{ 0 };		// line where defined
+	Location m_location;			// location where defined
 };
 
 class Symtab {
 public:
-	Symtab(Symtab* parent = nullptr);
-
 	bool insert(shared_ptr<Symbol> symbol);
 	void erase(const string& name) { m_table.erase(name); }
 	void clear() { m_table.clear(); }
+	auto begin() { return m_table.begin(); }
+	auto end() { return m_table.end(); }
 
 	shared_ptr<Symbol> find(const string& name);
-	shared_ptr<Symbol> find_all(const string& name);
 
 private:
-	Symtab* m_parent{ nullptr };				// parent, if any
 	map<string, shared_ptr<Symbol>>	m_table;	// symbols table
 };
 

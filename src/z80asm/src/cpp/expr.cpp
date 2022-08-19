@@ -63,8 +63,7 @@ void Expr::clear() {
 	m_asmpc = 0;
 	m_silent = false;
 	m_is_const = true;
-	m_filename = g_preproc.filename();
-	m_line_num = g_preproc.line_num();
+	m_location = g_preproc.location();
 }
 
 class ExprException : public exception {
@@ -105,7 +104,6 @@ bool Expr::parse_at_end() {
 	// check for end of statement
 	switch (ttype()) {
 	case TType::End:
-	case TType::Backslash:
 	case TType::Newline:
 		return true;
 	default:
@@ -412,18 +410,9 @@ bool Expr::eval() {
 		m_value = eval_node(m_root);
 	}
 	catch (ExprException& e) {
-		// set filename,line_num for the error
-		string save_filename = g_preproc.filename();
-		int save_line_num = g_preproc.line_num();
-
-		g_preproc.set_filename(m_filename);
-		g_preproc.set_line_num(m_line_num);
-
+		g_errors.push_location(m_location);
 		error(e.err(), e.text());
-
-		// restore filename, line_num
-		g_preproc.set_filename(save_filename);
-		g_preproc.set_line_num(save_line_num);
+		g_errors.pop_location();
 	}
 
 	return m_result == ErrCode::Ok ? true : false;
