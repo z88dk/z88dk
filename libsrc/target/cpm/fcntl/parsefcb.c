@@ -103,6 +103,7 @@ void parsefcb(struct fcb *fc, char *name)
 EXTERN asm_toupper
 EXTERN asm_isdigit
 
+EXTERN __bdos
 
 vstfcu:
 
@@ -131,13 +132,7 @@ setfc0:
 	;;LD 	c,gsuser  ;else get current effective user number
 	ld	c,32
 	LD 	e,0ffh
-IF !__CPU_INTEL__
-	push	ix
-	call	5
-	pop	ix
-ELSE
-	call	5
-ENDIF
+	call __bdos
 
 	pop	DE	;restore text pointer
 setfc1:
