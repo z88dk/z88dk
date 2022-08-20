@@ -107,14 +107,14 @@ END
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		jr ASMPC+2-129
 END_ASM
-$test.asm:1: error: integer range: -129
+$test.asm:1: error: integer range: -\$81
   ^---- \$+2-129
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		jr ASMPC+2+128
 END_ASM
-$test.asm:1: error: integer range: 0x80
+$test.asm:1: error: integer range: \$80
   ^---- \$+2+128
 END_ERR
 

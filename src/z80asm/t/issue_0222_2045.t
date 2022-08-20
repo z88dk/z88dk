@@ -183,8 +183,8 @@ unlink(qw( test.asm test.o test.map test.bin test.tap ));
 
 spew("test.asm", $asm);
 
-capture_nok("z88dk-z80asm +zx -r".($zx_rem_org-1)." -m test.asm", <<'END');
-error: invalid ORG: 0x5ccf
+capture_nok("z88dk-z80asm +zx -r".($zx_rem_org-1)." -m test.asm", <<END);
+error: invalid ORG: \$5ccf
 END
 
 check_bin_file("test.bin", bin_code($zx_rem_org-1));

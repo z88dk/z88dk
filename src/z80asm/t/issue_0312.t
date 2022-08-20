@@ -298,7 +298,7 @@ z80asm_nok("-b -mz80n", "", <<END, <<END);
 	dma.wr0 255
 	ld a,2
 END
-${test}.asm:2: error: DMA base register byte illegal: 0xff
+${test}.asm:2: error: DMA base register byte illegal: \$ff
   ^---- dma.wr0 255
 END
 
@@ -316,7 +316,7 @@ ${test}.asm:3: error: DMA base register byte illegal: 2
   ^---- dma.wr0 2
 ${test}.asm:4: error: DMA base register byte illegal: 3
   ^---- dma.wr0 3
-${test}.asm:5: error: DMA base register byte illegal: 0x80
+${test}.asm:5: error: DMA base register byte illegal: \$80
   ^---- dma.wr0 128
 END
 
@@ -448,7 +448,7 @@ ${test}.asm:6: error: DMA base register byte illegal: 6
   ^---- dma.wr1 6
 ${test}.asm:7: error: DMA base register byte illegal: 7
   ^---- dma.wr1 7
-${test}.asm:8: error: DMA base register byte illegal: 0x80
+${test}.asm:8: error: DMA base register byte illegal: \$80
   ^---- dma.wr1 128
 END
 
@@ -561,7 +561,7 @@ ${test}.asm:7: error: DMA base register byte illegal: 6
   ^---- dma.wr2 6
 ${test}.asm:8: error: DMA base register byte illegal: 7
   ^---- dma.wr2 7
-${test}.asm:9: error: DMA base register byte illegal: 0x80
+${test}.asm:9: error: DMA base register byte illegal: \$80
   ^---- dma.wr2 128
 END
 
@@ -838,7 +838,7 @@ ${test}.asm:2: error: DMA base register byte illegal: 1
 ${test}.asm:3: error: DMA base register byte illegal: 4
   ^---- dma.wr5 0x04
       ^---- dma.wr5 4
-${test}.asm:4: error: DMA base register byte illegal: 0x40
+${test}.asm:4: error: DMA base register byte illegal: \$40
   ^---- dma.wr5 0x40
       ^---- dma.wr5 64
 END

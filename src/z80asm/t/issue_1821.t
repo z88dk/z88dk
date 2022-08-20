@@ -39,7 +39,7 @@ ASM
 ${test}.asm:2: error: syntax error
   ^---- ldh a,0xff01
       ^---- ldh a,65281
-${test}.asm:1: warning: integer range: 0xfe01
+${test}.asm:1: warning: integer range: \$fe01
   ^---- (65025)
 ERR
 

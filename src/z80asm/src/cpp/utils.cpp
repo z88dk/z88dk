@@ -97,9 +97,11 @@ string str_expand_escapes(const string& in) {
 			else if (c < 8)
 				out += "\\" + to_string(c);			// \o
 			else {
-				string c_hex = int_to_hex(c);		// 0xhh
-				c_hex[0] = '\\';					// \xhh
-				out += c_hex;
+				std::ostringstream ss;
+				ss << "\\x"
+					<< std::setfill('0') << std::setw(2)
+					<< std::hex << c << std::dec;
+				out += ss.str();
 			}
 		}
 	}

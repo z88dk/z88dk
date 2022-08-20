@@ -199,7 +199,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\z80asm\src\cpp\args.h" />
-    <ClInclude Include="..\..\src\z80asm\src\cpp\asmerrors.h" />
+    <ClInclude Include="..\..\src\z80asm\src\cpp\errors.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\defines.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\float.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\lex.h" />
@@ -242,7 +242,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\src\cpp\args.cpp" />
-    <ClCompile Include="..\..\src\z80asm\src\cpp\asmerrors.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\cpp\errors.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\defines.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\float.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\lex.cpp" />
@@ -277,7 +277,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\z80asm\src\cpp\args.def" />
-    <None Include="..\..\src\z80asm\src\cpp\asmerrors.def" />
+    <None Include="..\..\src\z80asm\src\cpp\errors.def" />
     <None Include="..\..\src\z80asm\src\cpp\float.def" />
     <None Include="..\..\src\z80asm\src\cpp\keyword.def" />
     <None Include="..\..\src\z80asm\src\cpp\lex.re" />

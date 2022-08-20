@@ -150,7 +150,7 @@ z80asm_nok("", "", <<END, <<END);
 		df2	ds.q 16383
 	}
 END
-$test.asm:4: error: integer range: 0x10024
+$test.asm:4: error: integer range: \$10024
   ^---- df2 ds.q 16383
 END
 
@@ -161,7 +161,7 @@ z80asm_nok("", "", <<END, <<END);
 		df2	ds.q 16384
 	}
 END
-$test.asm:3: error: integer range: 0x10000
+$test.asm:3: error: integer range: \$10000
   ^---- df2 ds.q 16384
 END
 

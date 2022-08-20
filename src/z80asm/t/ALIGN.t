@@ -11,7 +11,7 @@ $test.asm:1: error: integer range: 0
 END_ERR
 
 z80asm_nok("", "", "align 0x10000", <<END_ERR);
-$test.asm:1: error: integer range: 0x10000
+$test.asm:1: error: integer range: \$10000
   ^---- align 0x10000
       ^---- align 65536
 END_ERR
@@ -30,7 +30,7 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		org		1
 		align	16
 END_ASM
-$test.asm:2: error: ORG not aligned: origin=1, align=0x10
+$test.asm:2: error: ORG not aligned: origin=1, align=\$10
   ^---- align 16
 END_ERR
 
@@ -38,7 +38,7 @@ z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		align	16
 		org		1
 END_ASM
-$test.asm:2: error: ORG not aligned: origin=1, align=0x10
+$test.asm:2: error: ORG not aligned: origin=1, align=\$10
   ^---- org 1
 END_ERR
 
