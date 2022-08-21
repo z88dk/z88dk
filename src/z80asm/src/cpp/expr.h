@@ -14,7 +14,7 @@
 #include <vector>
 using namespace std;
 
-class Assm;
+class Asm;
 class Lexer;
 class Symbol;
 class Symtab;
@@ -52,7 +52,7 @@ private:
 
 class Expr {
 public:
-	Expr(Lexer& lexer, Assm& assm);
+	Expr(Lexer& lexer);
 	void clear();
 
 	int value() const { return m_value; }
@@ -69,7 +69,6 @@ public:
 
 private:
 	Lexer&				m_lexer;			// point at expression to parse
-	Assm&				m_assm;				// used to use/define symbols
 	shared_ptr<ExprNode> m_root;			// root node of expression
 	int					m_value{ 0 };		// value computed during eval
 	ErrCode				m_result{ ErrCode::Ok };// result computed during eval

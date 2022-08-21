@@ -50,8 +50,8 @@ shared_ptr<ExprNode> ExprNode::arg(size_t i) {
 	return m_args[i];
 }
 
-Expr::Expr(Lexer& lexer, Assm& assm)
-	: m_lexer(lexer), m_assm(assm) {
+Expr::Expr(Lexer& lexer)
+	: m_lexer(lexer) {
 	clear();
 }
 

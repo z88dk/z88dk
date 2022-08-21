@@ -73,7 +73,7 @@ src/c/parse.o: src/c/parse.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -O0 -c -o $@ $<
 	
 # parser is too big to optimize with -O3
-src/cpp/asm_parse_main.o: src/cpp/asm_parse_main.cpp
+src/cpp/parse_main1.o: src/cpp/parse_main1.cpp
 	$(CXX) $(CXX_FLAGS) -O0 -c -o $@ $<
 
 #------------------------------------------------------------------------------
@@ -124,15 +124,15 @@ src/c/tokens.h : make_tokens.pl Makefile
 	dos2unix -q src/c/tokens.h
 
 # opcode tables generator
-dev: src/cpp/asm_parse_main.cpp
-src/cpp/asm_parse_main.cpp: \
+dev: src/cpp/parse_main1.cpp
+src/cpp/parse_main1.cpp: \
 		$(wildcard dev/cpu/*.pl dev/cpu/*.y) \
 		dev/cpu/Makefile \
 		src/cpp/keyword.def \
 		src/cpp/lex.h
 	$(MAKE) -C dev/cpu
 	cp dev/cpu/cpu_rules.h src/c/cpu_rules.h
-	cp dev/cpu/asm_parse_main.cpp src/cpp/asm_parse_main.cpp
+	cp dev/cpu/parse_main1.cpp src/cpp/parse_main1.cpp
 	
 # reloc routine
 dev: src/c/reloc_code.c

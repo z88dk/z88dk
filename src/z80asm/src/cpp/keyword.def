@@ -407,8 +407,12 @@ X(XTHL, "xthl")
 X(EQU, "equ")
 X(EXTERN, "extern")
 X(GLOBAL, "global")
+X(LIB, "lib")
 X(ORG, "org")
 X(PUBLIC, "public")
 X(SECTION, "section")
+X(XDEF, "xdef")
+X(XLIB, "xlib")
+X(XREF, "xref")
 
 #undef X

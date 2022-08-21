@@ -5,7 +5,7 @@
 //-----------------------------------------------------------------------------
 
 #include "args.h"
-#include "assm.h"
+#include "asm.h"
 #include "errors.h"
 #include "if.h"
 #include "utils.h"
@@ -23,8 +23,7 @@ int main(int argc, char *argv[]) {
 		for (auto& file : g_args.files()) {
 			if (fs::path(file).extension().generic_string() != EXT_O) {
 				/*
-				Assm assm;
-				assm.assemble(file);
+				g_asm.assemble(file);
 				g_errors.reset_count();	// so that legacy code assembles files
 				*/
 			}

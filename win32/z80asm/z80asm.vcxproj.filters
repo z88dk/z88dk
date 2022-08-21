@@ -114,7 +114,7 @@
     <ClInclude Include="..\..\src\z80asm\src\c\opcodes.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\c\parse.h">
+    <ClInclude Include="..\..\src\z80asm\src\c\parse1.h">
       <Filter>Header Files\c</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\parse_rules.h">
@@ -186,7 +186,7 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\args.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\z80asm\src\cpp\assm.h">
+    <ClInclude Include="..\..\src\z80asm\src\cpp\asm.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\c\cpu_rules.h">
@@ -202,6 +202,9 @@
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\z80asm\src\cpp\icode.h">
+      <Filter>Header Files\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\cpp\parse.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
   </ItemGroup>
@@ -248,7 +251,7 @@
     <ClCompile Include="..\..\src\z80asm\src\c\opcodes.c">
       <Filter>Source Files\c</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\c\parse.c">
+    <ClCompile Include="..\..\src\z80asm\src\c\parse1.c">
       <Filter>Source Files\c</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\c\scan.c">
@@ -305,7 +308,7 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\args.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\cpp\assm.cpp">
+    <ClCompile Include="..\..\src\z80asm\src\cpp\asm.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\z80asm\src\cpp\symtab.cpp">
@@ -314,10 +317,13 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\expr.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\cpp\asm_parse_main.cpp">
+    <ClCompile Include="..\..\src\z80asm\src\cpp\icode.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\z80asm\src\cpp\icode.cpp">
+    <ClCompile Include="..\..\src\z80asm\src\cpp\parse.cpp">
+      <Filter>Source Files\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\z80asm\src\cpp\parse_main1.cpp">
       <Filter>Source Files\cpp</Filter>
     </ClCompile>
   </ItemGroup>

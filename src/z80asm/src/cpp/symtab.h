@@ -13,6 +13,7 @@
 #include <map>
 using namespace std;
 
+class Module;
 class Section;
 class Expr;
 class Icode;
@@ -49,6 +50,8 @@ public:
 	void set_computed(bool f = true) { m_is_computed = f; }
 	bool is_used() const { return m_is_used; }
 	void set_used(bool f = true) { m_is_used = f; }
+	shared_ptr<Module> module() { return m_module.lock(); }
+	void set_module(weak_ptr<Module> m) { m_module = m; }
 	shared_ptr<Section> section() { return m_section.lock(); }
 	void set_section(weak_ptr<Section> s) { m_section = s; }
 	const Location& location() const { return m_location; }
@@ -64,6 +67,7 @@ private:
 	bool	m_is_computed{ false };	// true if Type::Computed or Type::Address and value computed
 	bool	m_is_used{ false };		// true if symbol was used and shall be writen to the object file
 
+	weak_ptr<Module>	m_module;	// module where defined
 	weak_ptr<Section>	m_section;	// section where defined
 
 	Location m_location;			// location where defined
@@ -83,5 +87,22 @@ private:
 	map<string, shared_ptr<Symbol>>	m_table;	// symbols table
 };
 
-extern Symtab g_def_symbols;	// symbols defined by -D and predefined constants	
-extern Symtab g_symbols;		// symbols declared PUBLIC, EXTERN or GLOBAL
+class Symbols {
+public:
+	Symtab& defines() { return m_defines; }
+	Symtab& globals() { return m_globals; }
+
+	bool declare(const string& name, Symbol::Scope scope);
+
+private:
+	Symtab	m_defines;
+	Symtab	m_globals;
+
+	vector<shared_ptr<Symbol>> find_in_modules(const string& name);
+	bool declare_global(const string& name);
+	bool declare_public(const string& name);
+	bool declare_extern(const string& name);
+
+};
+
+extern Symbols g_symbols;

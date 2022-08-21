@@ -14,7 +14,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "if.h"
 #include "libfile.h"
 #include "modlink.h"
-#include "parse.h"
+#include "parse1.h"
 #include "reloc_code.h"
 #include "scan.h"
 #include "str.h"
