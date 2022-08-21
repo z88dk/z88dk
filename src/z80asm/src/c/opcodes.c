@@ -15,7 +15,7 @@ Define CPU opcodes
 #include "expr1.h"
 #include "z80asm_cpu.h"
 #include "opcodes.h"
-#include "parse.h"
+#include "parse1.h"
 #include "symtab1.h"
 #include "z80asm.h"
 #include <assert.h>

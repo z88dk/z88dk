@@ -75,10 +75,6 @@ shared_ptr<Section> Group::insert_section(const string& name) {
 
 Module::Module(const string& name, Object* object)
 	: m_name(name), m_object(object) {
-	// copy global defines
-	for (auto& symbol : g_def_symbols)
-		m_symtab.insert(symbol.second);
-
 	// create default section and group
 	insert_section("");
 	insert_group("");

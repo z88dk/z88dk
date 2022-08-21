@@ -15,7 +15,7 @@ Repository: https://github.com/z88dk/z88dk
 #include "libfile.h"
 #include "modlink.h"
 #include "module1.h"
-#include "parse.h"
+#include "parse1.h"
 #include "scan.h"
 #include "strutil.h"
 #include "symtab1.h"

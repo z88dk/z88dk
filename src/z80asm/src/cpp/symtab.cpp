@@ -6,16 +6,19 @@
 //-----------------------------------------------------------------------------
 
 #include "args.h"
+#include "asm.h"
 #include "errors.h"
+#include "icode.h"
 #include "if.h"
 #include "preproc.h"
 #include "symtab.h"
 #include "utils.h"
 #include <iostream>
+#include <set>
+#include <vector>
 using namespace std;
 
-Symtab g_def_symbols;		
-Symtab g_symbols;
+Symbols g_symbols;
 
 Symbol::Symbol(const string& name)
 	: m_name(name)
@@ -60,13 +63,52 @@ shared_ptr<Symbol> Symtab::find(const string& name) {
 		return it->second;
 }
 
+// return all symbols with the given name in the same order as the modules
+vector<shared_ptr<Symbol>> Symbols::find_in_modules(const string& name) {
+	set<shared_ptr<Symbol>> symbol_set;
+	vector<shared_ptr<Symbol>> symbol_list;
+
+	for (auto& module : g_asm.object()->modules()) {
+		auto symbol = module->symtab().find(name);
+		if (symbol) {
+			if (symbol_set.insert(symbol).second) {		// insert done, not duplicate
+				symbol_list.push_back(symbol);
+			}
+		}
+	}
+
+	return symbol_list;
+}
+
+bool Symbols::declare(const string& name, Symbol::Scope scope) {
+	switch (scope) {
+	case Symbol::Scope::Global: return declare_global(name);
+	case Symbol::Scope::Public: return declare_public(name);
+	case Symbol::Scope::Extern: return declare_extern(name);
+	case Symbol::Scope::Local: Assert(0); return false;
+	default: Assert(0); return false;
+	}
+}
+
+bool Symbols::declare_global(const string& /*name*/) {
+	return false;	
+}
+
+bool Symbols::declare_public(const string& /*name*/) {
+	return false;
+}
+
+bool Symbols::declare_extern(const string& /*name*/) {
+	return false;
+}
+
 //-----------------------------------------------------------------------------
 // C interface
 //-----------------------------------------------------------------------------
 
 void symtab_insert_global_def(const char* name, int value) {
 	auto symbol = make_shared<Symbol>(name, value);
-	if (g_def_symbols.insert(symbol)) {
+	if (g_symbols.defines().insert(symbol)) {
 		if (g_args.verbose())
 			cout << "Predefined constant: "
 			<< name << " = " << int_to_hex(value, 4) << endl;
