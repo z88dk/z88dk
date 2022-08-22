@@ -111,6 +111,11 @@ public:
 	Symtab& defines() { return m_defines; }
 	Symtab& globals() { return m_globals; }
 
+	void copy_defines_to_cur_module();
+
+	shared_ptr<Symbol> find_local(const string& name);
+	shared_ptr<Symbol> find_global(const string& name);
+
 	shared_ptr<Symbol> add_define(const string& name, int value);		// -D
 	shared_ptr<Symbol> add_global_def(const string& name, int value);	// head, tail
 	shared_ptr<Symbol> add_local_def(const string& name, int value);	// DEFINE
@@ -124,9 +129,6 @@ public:
 private:
 	Symtab	m_defines;
 	Symtab	m_globals;
-
-	shared_ptr<Symbol> find_local(const string& name);
-	shared_ptr<Symbol> find_global(const string& name);
 
 	shared_ptr<Symbol> create_or_update(Symtab& symtab,
 		const string& name, int value,

@@ -29,6 +29,9 @@ bool Asm::assemble(const string& filename) {
 	// clear globals
 	g_symbols.globals().clear();
 
+	// copy defines as locals in module
+	g_symbols.copy_defines_to_cur_module();
+
 	m_start_errors = g_errors.count();
 
 	bool ret = assemble1(filename);

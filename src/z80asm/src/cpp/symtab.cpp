@@ -68,6 +68,11 @@ shared_ptr<Symbol> Symbols::find_global(const string& name) {
 	return m_globals.find(name);
 }
 
+void Symbols::copy_defines_to_cur_module() {
+	for (auto& symbol : m_defines)
+		add_local_def(symbol.second->name(), symbol.second->value());
+}
+
 // create/update a symbol in the given table, error if already defined
 shared_ptr<Symbol> Symbols::create_or_update(Symtab& symtab,
 	const string& name, int value,

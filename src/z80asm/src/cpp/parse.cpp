@@ -5,6 +5,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "asm.h"
 #include "parse.h"
 #include "preproc.h"
 using namespace std;
@@ -39,10 +40,8 @@ bool Parser::parse_line() {
 bool Parser::parse_line_main() {
 	while (!m_lexer.at_end()) {
 		string label = check_label();
-		/*
 		if (!label.empty())
-			asm_LABEL(label.c_str());
-		*/
+			g_asm.cur_section()->add_label(label);
 
 		switch (m_lexer.peek().ttype) {
 		case TType::End:

@@ -29,21 +29,24 @@ public:
 	static inline const int UndefinedAsmpc = -1;
 
 	enum class Type {
-		Label,
+		None, Label,
 	};
 
-	Icode(Section* parent);
-	static shared_ptr<Icode> make_label(const string& name);
+	Icode(Section* parent, Type type);
 
 	const Section* parent() { return m_parent; }
+	Type type() const { return m_type; }
 
 	int asmpc() const { return m_asmpc; }
 	void set_asmpc(int n);
+
 	int asmpc_phased() const { return m_asmpc_phased; }
 	void set_asmpc_phased(int n) { m_asmpc_phased = n; }
-	bool asmpc_changed() const { return m_asmpc != m_prev_asmpc; }
 
-	int size() const { return m_size; }
+	shared_ptr<Symbol> label() { return m_label; }
+	void set_label(shared_ptr<Symbol> l) { m_label = l; }
+
+	int size() const { return static_cast<int>(m_bytes.size()); }
 
 	const vector<uint8_t>& bytes() const { return m_bytes; }
 	const vector<shared_ptr<PatchExpr>> patches() const { return m_patches; }
@@ -52,10 +55,10 @@ public:
 
 private:
 	Section* m_parent{ nullptr };
+	Type	m_type{ Type::None };
 	int		m_asmpc{ UndefinedAsmpc };
 	int		m_asmpc_phased{ UndefinedAsmpc };
-	int		m_prev_asmpc{ UndefinedAsmpc };
-	int		m_size{ 0 };
+	shared_ptr<Symbol> m_label;
 	vector<uint8_t> m_bytes;
 	vector<shared_ptr<PatchExpr>> m_patches;
 	Location m_location;
@@ -73,10 +76,15 @@ public:
 	int asmpc() const;
 	int asmpc_phased() const;
 
+	void add_label(const string& name);
+	string autolabel();
+
 private:
 	string	m_name;
 	Module*	m_module{ nullptr };
 	list<shared_ptr<Icode>> m_icode;
+
+	void add_label_(const string& name);
 };
 
 class Group {
