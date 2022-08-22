@@ -29,7 +29,7 @@ public:
 	static inline const int UndefinedAsmpc = -1;
 
 	enum class Type {
-		None, Label,
+		None, Label, Opcode,
 	};
 
 	Icode(Section* parent, Type type);
@@ -48,8 +48,8 @@ public:
 
 	int size() const { return static_cast<int>(m_bytes.size()); }
 
-	const vector<uint8_t>& bytes() const { return m_bytes; }
-	const vector<shared_ptr<PatchExpr>> patches() const { return m_patches; }
+	vector<uint8_t>& bytes() { return m_bytes; }
+	vector<shared_ptr<PatchExpr>> patches() { return m_patches; }
 
 	const Location& location() const { return m_location; }
 
@@ -77,6 +77,8 @@ public:
 	int asmpc_phased() const;
 
 	void add_label(const string& name);
+	void add_opcode(unsigned bytes);
+
 	string autolabel();
 
 private:
