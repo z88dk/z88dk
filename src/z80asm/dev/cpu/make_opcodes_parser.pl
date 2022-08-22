@@ -236,8 +236,8 @@ sub parse_code_opcode {
 			$opc .= ' << '.($bytes_shift * 8) if $bytes_shift;
 			$opc .= ')';
 		}
-		if ($stmt eq 'DO_stmt' && @expr == 0) {
-			push @code, $stmt."(".$opc.$extra_arg.");";
+		if ($stmt eq 'DO_stmt' && $opc !~ /\+/) {
+			push @code, "g_asm.cur_section()->add_opcode(".$opc.$extra_arg.");";
 		}
 		else {
 			push @code, "/*".$stmt."(".$opc.$extra_arg.")*/;";
