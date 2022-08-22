@@ -5,22 +5,38 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "args.h"
 #include "icode.h"
 #include "preproc.h"
 #include "symtab.h"
 #include "utils.h"
+#include <iostream>
 #include <memory>
+#include <sstream>
+#include <cctype>
 using namespace std;
 
-Icode::Icode(Section* parent)
-	: m_parent(parent)
+// Encoding for C_LINEand ASM_LINE
+static string url_encode(const string& text) {
+	ostringstream ss;
+	for (auto c : text) {
+		if (isalnum(c))
+			ss << c;
+		else
+			ss << '_' << setfill('0') << setw(2) << hex << static_cast<unsigned int>(c) << dec;
+	}
+	return ss.str();
+}
+
+Icode::Icode(Section* parent, Type type)
+	: m_parent(parent), m_type(type)
 	, m_location(g_preproc.location()) {
+	m_asmpc = parent->asmpc();
+	m_asmpc_phased = parent->asmpc_phased();
 }
 
 void Icode::set_asmpc(int n) {
 	m_asmpc = n;
-	if (m_prev_asmpc == UndefinedAsmpc)
-		m_prev_asmpc = n;
 }
 
 Section::Section(const string& name, Module* module)
@@ -46,6 +62,43 @@ int Section::asmpc_phased() const {
 		return Icode::UndefinedAsmpc;
 	else
 		return m_icode.back()->asmpc_phased() + m_icode.back()->size();
+}
+
+void Section::add_label(const string& name) {
+	add_label_(name);
+
+	// add debug label
+	if (g_args.debug() && g_preproc.is_c_source()) {
+		ostringstream ss;
+		ss << "__ASM_LINE_" << g_preproc.location().line_num
+			<< "_" << url_encode(g_preproc.location().filename);
+		string debug_name = ss.str();
+		if (!g_symbols.find_local(debug_name))
+			add_label_(debug_name);
+	}
+}
+
+string Section::autolabel() {
+	static int n;
+	ostringstream ss;
+	ss << "__autolabel_" << setfill('0') << setw(4) << ++n;
+	return ss.str();
+}
+
+void Section::add_label_(const string& name) {
+	auto instr = make_shared<Icode>(this, Icode::Type::Label);
+
+	shared_ptr<Symbol> label;
+	if (asmpc_phased() != Icode::UndefinedAsmpc)
+		label = g_symbols.add(name, asmpc_phased(), Symbol::Type::Constant);
+	else
+		label = g_symbols.add(name, asmpc(), Symbol::Type::Address);
+
+	if (label) {		// no error
+		label->set_touched();
+		instr->set_label(label);
+		m_icode.push_back(instr);
+	}
 }
 
 Group::Group(const string& name, Module* module)
@@ -153,11 +206,6 @@ shared_ptr<Module> Object::insert_module(const string& name) {
 		m_modules.push_back(module);
 		m_modules_map[name] = module;
 		m_cur_module = module;
-
-		// copy defines as locals in module
-		for (auto& symbol : g_symbols.defines())
-			g_symbols.add_local_def(symbol.second->name(), symbol.second->value());
-
 		return module;
 	}
 }
