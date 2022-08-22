@@ -555,7 +555,6 @@ void declare_extern_symbol(const char *name)
                symbol as external symbol, but only if local symbol is not defined yet */
             if ( ! sym->is_defined )
             {
-				sym->type = TYPE_CONSTANT;
 				sym->scope = SCOPE_EXTERN;
 				
 				ext_sym = Symbol1Hash_extract( CURRENTMODULE->local_symtab, name );

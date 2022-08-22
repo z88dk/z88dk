@@ -77,8 +77,8 @@ bool Parser::parse_symbol_declare(Symbol::Scope scope) {
 			g_errors.error(ErrCode::IdentExpected);
 			return false;
 		}
-		if (!g_symbols.declare(token.svalue, scope))
-			return false;
+
+		g_symbols.declare(token.svalue, scope);
 
 		// get comma or end
 		m_lexer.next();

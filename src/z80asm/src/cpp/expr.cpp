@@ -383,7 +383,7 @@ shared_ptr<ExprNode> Expr::parse_primary() {
 
 	switch (ttype()) {
 	case TType::Ident:
-		//symbol = m_symtab->use(token().svalue);
+		symbol = g_symbols.get_used(token().svalue);
 		node = make_shared<ExprNode>(symbol);
 		next();
 		return node;
@@ -491,7 +491,7 @@ int Expr::eval_node(shared_ptr<ExprNode> node) {
 
 int Expr::eval_symbol(shared_ptr<Symbol> symbol) {
 	switch (symbol->type()) {
-	case Symbol::Type::Undefined:
+	case Symbol::Type::Unknown:
 		throw(ExprException(ErrCode::UndefinedSymbol, symbol->name()));
 
 	case Symbol::Type::Constant:

@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "icode.h"
 #include "lex.h"
 #include "parse.h"
 #include <string>
@@ -24,16 +25,13 @@ public:
 	bool assemble(const string& filename);
 
 	shared_ptr<Object> object() { return m_object; }
-	shared_ptr<Module> cur_module() { return m_cur_module; }
-	shared_ptr<Group> cur_group() { return m_cur_group; }
-	shared_ptr<Section> cur_section() { return m_cur_section; }
+	shared_ptr<Module> cur_module() { return m_object->cur_module(); }
+	shared_ptr<Group> cur_group() { return m_object->cur_module()->cur_group(); }
+	shared_ptr<Section> cur_section() { return m_object->cur_module()->cur_section(); }
 
 private:
 	Parser				m_parser;
 	shared_ptr<Object>	m_object;
-	shared_ptr<Module>	m_cur_module;
-	shared_ptr<Group>	m_cur_group;
-	shared_ptr<Section>	m_cur_section;
 	int					m_start_errors;		// errors at start of assembly
 
 	// controler

@@ -53,7 +53,7 @@ Group::Group(const string& name, Module* module)
 	insert_section("");		// create default section with empty name
 }
 
-shared_ptr<Section> Group::get_section(const string& name) {
+shared_ptr<Section> Group::section(const string& name) {
 	auto it = m_sections_map.find(name);
 	if (it != m_sections_map.end())			// found
 		return it->second;
@@ -80,10 +80,13 @@ Module::Module(const string& name, Object* object)
 	insert_group("");
 }
 
-shared_ptr<Section> Module::get_section(const string& name) {
+shared_ptr<Section> Module::section(const string& name) {
 	auto it = m_sections_map.find(name);
-	if (it != m_sections_map.end())		// found
-		return it->second;
+	if (it != m_sections_map.end()) {	// found
+		shared_ptr<Section> section = it->second;
+		m_cur_section = section;
+		return section;
+	}
 	else
 		return nullptr;
 }
@@ -93,17 +96,21 @@ shared_ptr<Section> Module::insert_section(const string& name) {
 	if (it != m_sections_map.end())		// found
 		return it->second;
 	else {								// not found
-		auto group = make_shared<Section>(name, this);
-		m_sections.push_back(group);
-		m_sections_map[name] = group;
-		return group;
+		auto section = make_shared<Section>(name, this);
+		m_sections.push_back(section);
+		m_sections_map[name] = section;
+		m_cur_section = section;
+		return section;
 	}
 }
 
-shared_ptr<Group> Module::get_group(const string& name) {
+shared_ptr<Group> Module::group(const string& name) {
 	auto it = m_groups_map.find(name);
-	if (it != m_groups_map.end())			// found
-		return it->second;
+	if (it != m_groups_map.end()) {			// found
+		shared_ptr<Group> group = it->second;
+		m_cur_group = group;
+		return group;
+	}
 	else
 		return nullptr;
 }
@@ -116,6 +123,7 @@ shared_ptr<Group> Module::insert_group(const string& name) {
 		auto group = make_shared<Group>(name, this);
 		m_groups.push_back(group);
 		m_groups_map[name] = group;
+		m_cur_group = group;
 		return group;
 	}
 }
@@ -125,22 +133,31 @@ Object::Object(const string& filename) {
 	m_filename = fs::path(filename).replace_extension(EXT_O).generic_string();
 }
 
-shared_ptr<Module> Object::get_module(const string& name) {
+shared_ptr<Module> Object::module(const string& name) {
 	auto it = m_modules_map.find(name);
-	if (it != m_modules_map.end())			// found
-		return it->second;
+	if (it != m_modules_map.end()) {		// found
+		shared_ptr<Module> module = it->second;
+		m_cur_module = module;
+		return module;
+	}
 	else
 		return nullptr;
 }
 
 shared_ptr<Module> Object::insert_module(const string& name) {
 	auto it = m_modules_map.find(name);
-	if (it != m_modules_map.end())			// found
+	if (it != m_modules_map.end())		// found
 		return it->second;
 	else {								// not found
 		auto module = make_shared<Module>(name, this);
 		m_modules.push_back(module);
 		m_modules_map[name] = module;
+		m_cur_module = module;
+
+		// copy defines as locals in module
+		for (auto& symbol : g_symbols.defines())
+			g_symbols.add_local_def(symbol.second->name(), symbol.second->value());
+
 		return module;
 	}
 }

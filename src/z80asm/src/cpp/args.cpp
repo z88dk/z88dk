@@ -290,12 +290,12 @@ void Args::parse_define(const string& opt_arg) {
 		g_errors.error(ErrCode::IllegalIdent, ident);
 	else {
 		if (equal_pos == string::npos) {
-			symtab_insert_global_def(ident.c_str(), 1);
+			symtab_insert_static(ident.c_str(), 1);
 		}
 		else {
 			int value = 0;
 			if (parse_opt_int(value, opt_arg.substr(equal_pos + 1))) 
-				symtab_insert_global_def(ident.c_str(), value);
+				symtab_insert_static(ident.c_str(), value);
 			else
 				g_errors.error(ErrCode::InvalidDefineOption, opt_arg);
 		}
@@ -819,53 +819,53 @@ bool Args::check_library(const fs::path& file_path) {
 void Args::define_assembly_defines() {
 	switch (m_cpu) {
 	case CPU_Z80:
-		symtab_insert_global_def("__CPU_Z80__", 1);
-		symtab_insert_global_def("__CPU_ZILOG__", 1);
+		symtab_insert_static("__CPU_Z80__", 1);
+		symtab_insert_static("__CPU_ZILOG__", 1);
 		break;
 	case CPU_Z80N:
-		symtab_insert_global_def("__CPU_Z80N__", 1);
-		symtab_insert_global_def("__CPU_ZILOG__", 1);
+		symtab_insert_static("__CPU_Z80N__", 1);
+		symtab_insert_static("__CPU_ZILOG__", 1);
 		break;
 	case CPU_Z180:
-		symtab_insert_global_def("__CPU_Z180__", 1);
-		symtab_insert_global_def("__CPU_ZILOG__", 1);
+		symtab_insert_static("__CPU_Z180__", 1);
+		symtab_insert_static("__CPU_ZILOG__", 1);
 		break;
 	case CPU_R2KA:
-		symtab_insert_global_def("__CPU_R2KA__", 1);
-		symtab_insert_global_def("__CPU_RABBIT__", 1);
+		symtab_insert_static("__CPU_R2KA__", 1);
+		symtab_insert_static("__CPU_RABBIT__", 1);
 		break;
 	case CPU_R3K:
-		symtab_insert_global_def("__CPU_R3K__", 1);
-		symtab_insert_global_def("__CPU_RABBIT__", 1);
+		symtab_insert_static("__CPU_R3K__", 1);
+		symtab_insert_static("__CPU_RABBIT__", 1);
 		break;
 	case CPU_8080:
-		symtab_insert_global_def("__CPU_8080__", 1);
-		symtab_insert_global_def("__CPU_INTEL__", 1);
+		symtab_insert_static("__CPU_8080__", 1);
+		symtab_insert_static("__CPU_INTEL__", 1);
 		break;
 	case CPU_8085:
-		symtab_insert_global_def("__CPU_8085__", 1);
-		symtab_insert_global_def("__CPU_INTEL__", 1);
+		symtab_insert_static("__CPU_8085__", 1);
+		symtab_insert_static("__CPU_INTEL__", 1);
 		break;
 	case CPU_GBZ80:
-		symtab_insert_global_def("__CPU_GBZ80__", 1);
+		symtab_insert_static("__CPU_GBZ80__", 1);
 		break;
 	default:
 		assert(0);
 	}
 
 	if (m_swap_ixiy) {
-		symtab_insert_global_def("__SWAP_IX_IY__", 1);
+		symtab_insert_static("__SWAP_IX_IY__", 1);
 	}
 
 	if (m_ti83) {
-		symtab_insert_global_def("__CPU_TI83__", 1);
+		symtab_insert_static("__CPU_TI83__", 1);
 	}
 	else if (m_ti83plus) {
-		symtab_insert_global_def("__CPU_TI83PLUS__", 1);
+		symtab_insert_static("__CPU_TI83PLUS__", 1);
 	}
 
 	// __FLOAT__xxx__
-	symtab_insert_global_def(get_float_format_define(), 1);
+	symtab_insert_static(get_float_format_define(), 1);
 }
 
 //-----------------------------------------------------------------------------

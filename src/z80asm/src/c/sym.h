@@ -39,7 +39,7 @@ CLASS( Symbol1 )
 	bool			is_touched : 1;		/* true if symbol was used, e.g. returned by 
 										 * a symbol table search */
 	bool			is_global_def : 1;	/* true for __head, __tail, __size symbols */
-	struct Module1  *module;				/* module which owns symbol (weak ref) */
+	struct Module1  *module;			/* module which owns symbol (weak ref) */
 	struct Section1 *section;			/* section where expression is defined (weak ref) */
 	const char	   *filename;			/* file where defined */
 	int				line_num;			/* line where defined */
