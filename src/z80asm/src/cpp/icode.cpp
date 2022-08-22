@@ -28,6 +28,8 @@ static string url_encode(const string& text) {
 	return ss.str();
 }
 
+//-----------------------------------------------------------------------------
+
 Icode::Icode(Section* parent, Type type)
 	: m_parent(parent), m_type(type)
 	, m_location(g_preproc.location()) {
@@ -38,6 +40,8 @@ Icode::Icode(Section* parent, Type type)
 void Icode::set_asmpc(int n) {
 	m_asmpc = n;
 }
+
+//-----------------------------------------------------------------------------
 
 Section::Section(const string& name, Module* module)
 	: m_name(name), m_module(module) {
@@ -78,6 +82,27 @@ void Section::add_label(const string& name) {
 	}
 }
 
+void Section::add_opcode(unsigned bytes) {
+	auto instr = make_shared<Icode>(this, Icode::Type::Opcode);
+
+	bool found = false;
+	if (found || (bytes & 0xff000000) != 0) {
+		instr->bytes().push_back((bytes >> 24) & 0xff);
+		found = true;
+	}
+	if (found || (bytes & 0xff0000) != 0) {
+		instr->bytes().push_back((bytes >> 16) & 0xff);
+		found = true;
+	}
+	if (found || (bytes & 0xff00) != 0) {
+		instr->bytes().push_back((bytes >> 8) & 0xff);
+		found = true;
+	}
+	instr->bytes().push_back(bytes & 0xff);
+
+	m_icode.push_back(instr);
+}
+
 string Section::autolabel() {
 	static int n;
 	ostringstream ss;
@@ -100,6 +125,8 @@ void Section::add_label_(const string& name) {
 		m_icode.push_back(instr);
 	}
 }
+
+//-----------------------------------------------------------------------------
 
 Group::Group(const string& name, Module* module)
 	: m_name(name), m_module(module) {
@@ -125,6 +152,8 @@ shared_ptr<Section> Group::insert_section(const string& name) {
 		return section;
 	}
 }
+
+//-----------------------------------------------------------------------------
 
 Module::Module(const string& name, Object* object)
 	: m_name(name), m_object(object) {
@@ -180,6 +209,8 @@ shared_ptr<Group> Module::insert_group(const string& name) {
 		return group;
 	}
 }
+
+//-----------------------------------------------------------------------------
 
 Object::Object(const string& filename) {
 	insert_module("");		// create default module with empty name
