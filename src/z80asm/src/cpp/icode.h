@@ -83,7 +83,7 @@ class Group {
 public:
 	Group(const string& name, Module* module);
 
-	shared_ptr<Section> get_section(const string& name);	// nullptr if not found
+	shared_ptr<Section> section(const string& name);	// nullptr if not found
 	shared_ptr<Section> insert_section(const string& name);	// appends or returns existing
 
 	const Module* module() { return m_module; }
@@ -100,11 +100,15 @@ class Module {
 public:
 	Module(const string& name, Object* object);
 
-	shared_ptr<Section> get_section(const string& name);	// nullptr if not found
-	shared_ptr<Section> insert_section(const string& name);	// appends or returns existing
+	const string& name() const { return m_name; }
 
-	shared_ptr<Group> get_group(const string& name);	// nullptr if not found
+	shared_ptr<Section> section(const string& name);	// nullptr if not found
+	shared_ptr<Section> insert_section(const string& name);	// appends or returns existing
+	shared_ptr<Section> cur_section() { return m_cur_section; }
+
+	shared_ptr<Group> group(const string& name);	// nullptr if not found
 	shared_ptr<Group> insert_group(const string& name);	// appends or returns existing
+	shared_ptr<Group> cur_group() { return m_cur_group; }
 
 	const Object* object() { return m_object; }
 	const list<shared_ptr<Section>>& sections() const { return m_sections; }
@@ -115,18 +119,23 @@ private:
 	string	m_name;
 	Object* m_object{ nullptr };
 	Symtab	m_symtab;			// module symbols
+
 	list<shared_ptr<Section>> m_sections;
 	unordered_map<string, shared_ptr<Section>> m_sections_map;
+	shared_ptr<Section> m_cur_section;
+
 	list<shared_ptr<Group>> m_groups;
 	unordered_map<string, shared_ptr<Group>> m_groups_map;
+	shared_ptr<Group> m_cur_group;
 };
 
 class Object {
 public:
 	Object(const string& filename);
 
-	shared_ptr<Module> get_module(const string& name);	// nullptr if not found
+	shared_ptr<Module> module(const string& name);	// nullptr if not found
 	shared_ptr<Module> insert_module(const string& name);	// appends or returns existing
+	shared_ptr<Module> cur_module() { return m_cur_module; }
 
 	const string& filename() const { return m_filename; }
 	const list<shared_ptr<Module>> modules() const { return m_modules; }
@@ -135,4 +144,5 @@ private:
 	string m_filename;
 	list<shared_ptr<Module>> m_modules;
 	unordered_map<string, shared_ptr<Module>> m_modules_map;
+	shared_ptr<Module> m_cur_module;
 };

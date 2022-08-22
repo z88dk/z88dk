@@ -26,19 +26,14 @@ bool Asm::assemble(const string& filename) {
 	set_cur_group("");
 	set_cur_section("");
 
-	// copy global defines
+	// clear globals
 	g_symbols.globals().clear();
-	for (auto& symbol : g_symbols.defines())
-		g_symbols.globals().insert(symbol.second);
 
 	m_start_errors = g_errors.count();
 
 	bool ret = assemble1(filename);
 
 	m_object.reset();
-	m_cur_module.reset();
-	m_cur_group.reset();
-	m_cur_section.reset();
 	m_start_errors = 0;
 
 	return ret;
@@ -51,41 +46,17 @@ bool Asm::assemble1(const string& filename) {
 }
 
 void Asm::set_cur_module(const string& name) {
-	m_cur_module = m_object->insert_module(name);
+	m_object->insert_module(name);
 }
 
 void Asm::set_cur_group(const string& name) {
-	m_cur_group = m_cur_module->insert_group(name);
+	cur_module()->insert_group(name);
 }
 
 void Asm::set_cur_section(const string& name) {
-	m_cur_section = m_cur_module->insert_section(name);
+	cur_module()->insert_section(name);
 }
 
 bool Asm::got_errors() {
 	return m_start_errors != g_errors.count();
 }
-
-/*
-bool Asm::symbol_declare(const string& name, Symbol::Scope scope) {
-	auto symbol = g_symbols.find(name);
-	if (!symbol) {			// not found, create a new one
-		symbol = make_shared<Symbol>(name);
-		symbol->set_scope(scope);
-		g_symbols.insert(symbol);
-	}
-	else {					// found, check if same scope
-		if (symbol->scope() == Symbol::Scope::Global || scope == Symbol::Scope::Global) {
-			// global can coexist with public and extern
-		}
-		else if (symbol->scope() != scope) {
-			g_errors.error(ErrCode::SymbolRedeclaration, name);	// error at this location
-			g_errors.push_location(symbol->location());
-			g_errors.error(ErrCode::SymbolRedeclaration, name);	// error at other symbol location
-			g_errors.pop_location();
-			return false;
-		}
-	}
-	return true;
-}
-*/

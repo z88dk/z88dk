@@ -22,10 +22,10 @@ int main(int argc, char *argv[]) {
 	if (!g_errors.count()) {		// if no errors in command line parsing 
 		for (auto& file : g_args.files()) {
 			if (fs::path(file).extension().generic_string() != EXT_O) {
-				/*
+#if 0
 				g_asm.assemble(file);
 				g_errors.reset_count();	// so that legacy code assembles files
-				*/
+#endif
 			}
 		}
 	}

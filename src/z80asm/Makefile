@@ -69,7 +69,7 @@ $(PROJ)$(EXESUFFIX): ../config.h $(OBJS)
 	$(CXX) $(CXX_FLAGS) -c -o $@ $<
 
 # parser is too big to optimize with -O3
-src/c/parse.o: src/c/parse.c
+src/c/parse1.o: src/c/parse1.c
 	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) -O0 -c -o $@ $<
 	
 # parser is too big to optimize with -O3
