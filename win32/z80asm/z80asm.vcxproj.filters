@@ -207,6 +207,9 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\parse.h">
       <Filter>Header Files\cpp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\z80asm\src\cpu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\z80asm\src\c\alloc.c">

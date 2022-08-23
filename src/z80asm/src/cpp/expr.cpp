@@ -124,6 +124,10 @@ bool Expr::eval_noisy(int asmpc) {
 	return eval();
 }
 
+bool Expr::in_parens() {
+	return m_root && m_root->type() == ExprNode::Type::Parens;
+}
+
 shared_ptr<ExprNode> Expr::parse_expr() {
 	shared_ptr<ExprNode> node;
 	try {
@@ -364,14 +368,14 @@ shared_ptr<ExprNode> Expr::parse_unary() {
 			throw ExprException(ErrCode::UnbalancedParens,
 				m_lexer.text_ptr());
 		next();
-		return node;
+		return make_shared<ExprNode>(ExprNode::Type::Parens, node);
 	case TType::LSquare:
 		next();
 		node = parse_expr();
 		throw ExprException(ErrCode::UnbalancedParens,
 			m_lexer.text_ptr());
 		next();
-		return node;
+		return make_shared<ExprNode>(ExprNode::Type::Parens, node);
 	default:
 		return parse_primary();
 	}

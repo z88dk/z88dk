@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include "cpu.h"
 #include "errors.h"
+#include "expr.h"
 #include "symtab.h"
 #include <cinttypes>
 #include <list>
@@ -17,6 +19,7 @@
 #include <vector>
 using namespace std;
 
+class Expr;
 class PatchExpr;
 class Symtab;
 class Object;						// represents object file, including modules
@@ -29,7 +32,7 @@ public:
 	static inline const int UndefinedAsmpc = -1;
 
 	enum class Type {
-		None, Label, Opcode,
+		None, Label, Opcode, JumpRelative,
 	};
 
 	Icode(Section* parent, Type type);
@@ -78,6 +81,12 @@ public:
 
 	void add_label(const string& name);
 	void add_opcode(unsigned bytes);
+	void add_opcode_n(unsigned bytes, shared_ptr<Expr> n, PatchExpr::Type type);
+	void add_opcode_nn(unsigned bytes, shared_ptr<Expr> nn, PatchExpr::Type type);
+	void add_opcode_idx(unsigned bytes, shared_ptr<Expr> dis);
+	void add_opcode_idx_n(unsigned bytes, shared_ptr<Expr> dis, shared_ptr<Expr> n);
+	void add_opcode_n_n(unsigned bytes, shared_ptr<Expr> n1, shared_ptr<Expr> n2);
+	void add_jump_relative(unsigned bytes, shared_ptr<Expr> nn);
 
 	string autolabel();
 
@@ -87,6 +96,8 @@ private:
 	list<shared_ptr<Icode>> m_icode;
 
 	void add_label_(const string& name);
+	void add_jump_relative_(unsigned bytes, shared_ptr<Expr> nn);
+	void add_opcode_idx_(unsigned bytes);
 };
 
 class Group {

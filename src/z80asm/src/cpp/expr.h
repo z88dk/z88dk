@@ -67,6 +67,8 @@ public:
 	bool eval_silent(int asmpc);
 	bool eval_noisy(int asmpc);
 
+	bool in_parens();
+
 private:
 	Lexer&				m_lexer;			// point at expression to parse
 	shared_ptr<ExprNode> m_root;			// root node of expression

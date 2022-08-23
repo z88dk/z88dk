@@ -6,6 +6,7 @@
 //-----------------------------------------------------------------------------
 
 #include "args.h"
+#include "cpu.h"
 #include "icode.h"
 #include "preproc.h"
 #include "symtab.h"
@@ -82,27 +83,6 @@ void Section::add_label(const string& name) {
 	}
 }
 
-void Section::add_opcode(unsigned bytes) {
-	auto instr = make_shared<Icode>(this, Icode::Type::Opcode);
-
-	bool found = false;
-	if (found || (bytes & 0xff000000) != 0) {
-		instr->bytes().push_back((bytes >> 24) & 0xff);
-		found = true;
-	}
-	if (found || (bytes & 0xff0000) != 0) {
-		instr->bytes().push_back((bytes >> 16) & 0xff);
-		found = true;
-	}
-	if (found || (bytes & 0xff00) != 0) {
-		instr->bytes().push_back((bytes >> 8) & 0xff);
-		found = true;
-	}
-	instr->bytes().push_back(bytes & 0xff);
-
-	m_icode.push_back(instr);
-}
-
 string Section::autolabel() {
 	static int n;
 	ostringstream ss;
@@ -124,6 +104,129 @@ void Section::add_label_(const string& name) {
 		instr->set_label(label);
 		m_icode.push_back(instr);
 	}
+}
+
+void Section::add_opcode(unsigned bytes) {
+	auto instr = make_shared<Icode>(this, Icode::Type::Opcode);
+
+	bool found = false;
+	if (found || (bytes & 0xff000000) != 0) {
+		instr->bytes().push_back((bytes >> 24) & 0xff);
+		found = true;
+	}
+	if (found || (bytes & 0xff0000) != 0) {
+		instr->bytes().push_back((bytes >> 16) & 0xff);
+		found = true;
+	}
+	if (found || (bytes & 0xff00) != 0) {
+		instr->bytes().push_back((bytes >> 8) & 0xff);
+		found = true;
+	}
+	instr->bytes().push_back(bytes & 0xff);
+
+	m_icode.push_back(instr);
+}
+
+void Section::add_opcode_n(unsigned bytes, shared_ptr<Expr> n, PatchExpr::Type type) {
+	// add bytes
+	add_opcode(bytes);
+	shared_ptr<Icode> instr = m_icode.back();
+
+	// add patch
+	auto patch = make_shared<PatchExpr>(n, type, instr->size());
+	instr->bytes().push_back(0);
+	instr->patches().push_back(patch);
+}
+
+void Section::add_opcode_nn(unsigned bytes, shared_ptr<Expr> nn, PatchExpr::Type type) {
+	// add bytes
+	add_opcode(bytes);
+	shared_ptr<Icode> instr = m_icode.back();
+
+	// add patch
+	auto patch = make_shared<PatchExpr>(nn, type, instr->size());
+	instr->bytes().push_back(0);
+	instr->bytes().push_back(0);
+	instr->patches().push_back(patch);
+}
+
+void Section::add_opcode_idx_(unsigned bytes) {
+	// add bytes
+	if (bytes & 0xFF0000) 			// 3 bytes, insert dis at second byte
+		bytes = (((bytes >> 8) & 0xFFFF) << 16) | (bytes & 0xFF);
+	else							// 2 bytes, insert 0 for dis
+		bytes <<= 8;
+	add_opcode(bytes);
+}
+
+void Section::add_opcode_idx(unsigned bytes, shared_ptr<Expr> dis) {
+	// add bytes
+	add_opcode_idx_(bytes);
+	shared_ptr<Icode> instr = m_icode.back();
+
+	// add patch
+	auto patch = make_shared<PatchExpr>(dis, PatchExpr::Type::SByte, 2);
+	instr->patches().push_back(patch);
+}
+
+void Section::add_opcode_idx_n(unsigned bytes, shared_ptr<Expr> dis, shared_ptr<Expr> n) {
+	// add bytes
+	add_opcode_idx_(bytes);
+	shared_ptr<Icode> instr = m_icode.back();
+
+	// add patches
+	auto dis_patch = make_shared<PatchExpr>(dis, PatchExpr::Type::SByte, 2);
+	instr->patches().push_back(dis_patch);
+
+	auto n_patch = make_shared<PatchExpr>(n, PatchExpr::Type::UByte, instr->size());
+	instr->patches().push_back(n_patch);
+}
+
+void Section::add_opcode_n_n(unsigned bytes, shared_ptr<Expr> n1, shared_ptr<Expr> n2) {
+	// add bytes
+	add_opcode(bytes);
+	shared_ptr<Icode> instr = m_icode.back();
+
+	// add patches
+	auto n1_patch = make_shared<PatchExpr>(n1, PatchExpr::Type::UByte, instr->size());
+	instr->patches().push_back(n1_patch);
+
+	auto n2_patch = make_shared<PatchExpr>(n2, PatchExpr::Type::UByte, instr->size());
+	instr->patches().push_back(n2_patch);
+}
+
+void Section::add_jump_relative(unsigned bytes, shared_ptr<Expr> nn) {
+	if (g_args.opt_speed()) {			// convert short to long jumps
+		switch (bytes) {
+		case Z80_JR:
+			add_opcode_nn(Z80_JP, nn, PatchExpr::Type::Word);
+			break;
+		case Z80_JR_FLAG(FLAG_NZ):
+		case Z80_JR_FLAG(FLAG_Z):
+		case Z80_JR_FLAG(FLAG_NC):
+		case Z80_JR_FLAG(FLAG_C):
+			add_opcode_nn(bytes - Z80_JR_FLAG(0) + Z80_JP_FLAG(0), nn, PatchExpr::Type::Word);
+			break;
+		case Z80_DJNZ:					// "dec b; jp nz" is always slower
+			add_jump_relative_(bytes, nn);
+			break;
+		default:
+			Assert(0);
+		}
+	}
+	else {
+		add_jump_relative_(bytes, nn);
+	}
+}
+
+void Section::add_jump_relative_(unsigned bytes, shared_ptr<Expr> nn) {
+	auto instr = make_shared<Icode>(this, Icode::Type::JumpRelative);
+	instr->bytes().push_back(bytes & 0xff);
+
+	auto patch = make_shared<PatchExpr>(nn, PatchExpr::Type::JrOffset, instr->size());
+	instr->patches().push_back(patch);
+
+	m_icode.push_back(instr);
 }
 
 //-----------------------------------------------------------------------------

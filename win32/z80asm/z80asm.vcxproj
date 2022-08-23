@@ -211,6 +211,7 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\preproc.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\symtab.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\utils.h" />
+    <ClInclude Include="..\..\src\z80asm\src\cpu.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\alloc.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\array.h" />
     <ClInclude Include="..\..\src\z80asm\src\c\class.h" />

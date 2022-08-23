@@ -34,18 +34,22 @@ bool Asm::assemble(const string& filename) {
 
 	m_start_errors = g_errors.count();
 
-	bool ret = assemble1(filename);
+	assemble1(filename);
 
 	m_object.reset();
 	m_start_errors = 0;
 
-	return ret;
+	return !got_errors();
 }
 
-bool Asm::assemble1(const string& filename) {
-	if (!g_preproc.open(filename, true)) return false;
-	if (!m_parser.parse()) return false;
-	return true;
+void Asm::assemble1(const string& filename) {
+	if (!g_preproc.open(filename, true))
+		return;
+
+	m_parser.parse();
+	if (got_errors())
+		return;
+
 }
 
 void Asm::set_cur_module(const string& name) {
