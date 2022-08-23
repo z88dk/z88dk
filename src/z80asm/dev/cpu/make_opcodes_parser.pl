@@ -76,22 +76,7 @@ sub parse_code {
 	if (grep {/%t/} @{$ops[0]}) {
 		my $op1 = $ops[0][0];
 		my $op2 = $ops[1][0];
-		push @code,
-			"/*DO_STMT_LABEL();",
-			"Expr1 *target_expr = pop_expr(ctx);",
-			"const char *end_label = autolabel();",
-			"Expr1 *end_label_expr = parse_expr(end_label);",
-			"add_opcode_nn(0x".fmthex($op1).", end_label_expr);",	# jump over
-			"add_opcode_nn(0x".fmthex($op2).", target_expr);",		# call
-			"asm_LABEL_offset(end_label, 6);*/";
-	}
-	# handle special case of dec b;jr nz, %j
-	elsif (@ops==2 && $ops[0][0] == 0x05 && $ops[1][1] eq '%j') {
-		my $opc = "0x".fmthex($ops[1][0]);
-		push @code, 
-			"/*DO_stmt(0x05)*/;",
-			# compensate for extra byte
-			"/*add_opcode_jr_n($opc, pop_expr(ctx), 1)*/;";	
+		push @code, "add_emul_call_flag(0x".fmthex($op1).", 0x".fmthex($op2).");";
 	}
 	else {
 		for my $bin (@ops) {
@@ -104,148 +89,115 @@ sub parse_code {
 
 sub parse_code_opcode {
 	my($cpu, $asm, @bin) = @_;
-	my @bin0 = @bin;
-	my @code;
-	
-	# check for argument type
-	my($stmt, $extra_arg) = ("", "");
 	my $bin = join(' ', @bin);
 	
 	if ($bin =~ s/ \@(\w+)//) {
-		my $func = $1;
-		push @code, 
-			"/*DO_STMT_LABEL();",
-			"add_call_emul_func(\"$func\")*/;";
+		return "add_call_function(\"$1\");";
 	}
 	elsif ($asm =~ /^rst /) {
-		push @code, 
-			"/*DO_STMT_LABEL();",
-			"if (expr_error) { error_expected_const_expr(); } else {",
-			"if (expr_value > 0 && expr_value < 8) expr_value *= 8;",
-			"switch (expr_value) {",
-			"case 0x00: case 0x08: case 0x30:",
-			"  if (option_cpu() & CPU_RABBIT)",
-			"    DO_stmt(0xCD0000 + (expr_value << 8));",
-			"  else",
-			"    DO_stmt(0xC7 + expr_value);",
-			"  break;",
-			"case 0x10: case 0x18: case 0x20: case 0x28: case 0x38:",
-			"  DO_stmt(0xC7 + expr_value); break;",
-			"default: error_int_range(expr_value);",
-			"}}*/";
+		return "add_restart();";
 	}
 	elsif ($asm =~ /^mmu %c, %n/) {
-		push @code, 
-			"/*DO_STMT_LABEL();",
-			"if (expr_error) { error_expected_const_expr(); } else {",
-			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
-			"DO_stmt_n(0xED9150 + expr_value);}*/";
+		return "add_z80n_mmu_n();";
 	}
 	elsif ($asm =~ /^mmu %c, a/) {
-		push @code, 
-			"/*DO_STMT_LABEL();",
-			"if (expr_error) { error_expected_const_expr(); } else {",
-			"if (expr_value < 0 || expr_value > 7) error_int_range(expr_value);",
-			"DO_stmt(0xED9250 + expr_value);}*/";
-		my $code = join("\n", @code);
-		return $code;
+		return "add_z80n_mmu_a();";
 	}
 	elsif ($bin =~ s/ %d %n$//) {
-		$stmt = "DO_stmt_idx_n";
+		return "add_opcode_idx_n(".build_bytes($bin).");";
 	}
 	elsif ($bin =~ s/ %n %n$//) {
-		$stmt = "DO_stmt_n_n";
+		return "add_opcode_n_n(".build_bytes($bin).");";
 	}
 	elsif ($bin =~ s/ %n$//) {
-		$stmt = "DO_stmt_n";
+		return "add_opcode_n(".build_bytes($bin).");";
 	}
 	elsif ($bin =~ s/ %u$//) {
-		$stmt = "DO_stmt_n";
+		return "add_opcode_n(".build_bytes($bin).");";
 	}
 	elsif ($bin =~ s/ %s$//) {
-		$stmt = "DO_stmt_d";
+		return "add_opcode_s(".build_bytes($bin).");";
 	}
 	elsif ($bin =~ s/ %h$//) {
-		$stmt = "DO_stmt_h";
+		return "add_opcode_h(".build_bytes($bin).");";
 	}
 	elsif ($bin =~ s/ %m %m$//) {
-		$stmt = "DO_stmt_nn";
+		return "add_opcode_nn(".build_bytes($bin).");";
 	}
 	elsif ($bin =~ s/ %u 0$//) {
-		$stmt = "DO_stmt_n_0";
+		return "add_opcode_n_0(".build_bytes($bin).");";
 	}
 	elsif ($bin =~ s/ %s 0$//) {
-		$stmt = "DO_stmt_s_0";
+		return "add_opcode_s_0(".build_bytes($bin).");";
 	}
 	elsif ($bin =~ s/ %M %M$//) {
-		$stmt = "DO_stmt_NN";
+		return "add_opcode_NN(".build_bytes($bin).");";
 	}
 	elsif ($bin =~ s/ %j$//) {
-		$stmt = "DO_stmt_jr";
+		return "add_jump_relative(".build_bytes($bin).");";
 	}
-	elsif ($bin =~ s/%c\((.*?)\)/expr_value/) {
+	elsif ($bin =~ s/%c\((.*?)\)/c/) {
 		my @values = eval($1); die "$cpu, $asm, @bin, $1" if $@;
-		$bin =~ s/%c/expr_value/g;		# replace all other %c in bin
-		push @code,
-			"/*if (expr_error) { error_expected_const_expr(); } else {",
-			"switch (expr_value) {",
-			join(" ", map {"case $_:"} @values)." break;",
-			"default: error_int_range(expr_value);",
-			"}}*/";
-			
+		$bin =~ s/%c/c/g;		# replace all other %c in bin
+		my $code =  "{\n".
+					"Assert(m_exprs.size() >= 1);\n".
+					"Assert(m_exprs[0]->is_const());\n".
+					"int c = m_exprs[0]->value();\n".
+					"m_exprs.pop_front();\n".
+					"switch (c) {\n".
+					join(" ", map {"case $_:"} @values)." break;\n".
+					"default: ".
+					"g_errors.error(ErrCode::IntRange, int_to_hex(c, 2));\n".
+					"}\n";
 		if ($bin =~ s/ %d// || $bin =~ s/%d //) {
-			$stmt = "DO_stmt_idx";
+			$code .= "add_opcode_idx(".build_bytes($bin).");\n";
 		} 
 		else {
-			$stmt = "DO_stmt";
+			$code .= "add_opcode(".build_bytes($bin).");\n";
 		}
+		$code .= "}";
+		return $code;
 	}
 	elsif ($bin =~ s/ %d//) {
-		$stmt = "DO_stmt_idx";
+		return "add_opcode_idx(".build_bytes($bin).");";
 	}
 	else {
-		$stmt = "DO_stmt";
+		return "add_opcode(".build_bytes($bin).");";
 	}
+}
 
-	# build statement - need to leave expressions for C compiler
-	if ($stmt) {
-		@bin = split(' ', $bin);	# $bin has %x removed
-		my @expr;
-		for (@bin) {
-			if (/[+*?<>]/) {
-				my $offset = 0;
-				if (s/^(\d+)\+//) {
-					$offset = $1;
-				}
-				$_ =~ s/\b(\d+)\b/ $1 < 10 ? $1 : "0x".fmthex($1) /ge;
-				push @expr, $_;
-				$_ = fmthex($offset);
+# build opcode bytes - need to leave expressions for C compiler
+sub build_bytes {
+	my($bin) = @_;
+	my @bin = split(' ', $bin);
+	my @expr;
+	for (@bin) {
+		if (/[+*?<>]/) {
+			my $offset = 0;
+			if (s/^(\d+)\+//) {
+				$offset = $1;
 			}
-			else {
-				push @expr, undef;
-				$_ = eval($_); die "$cpu, $asm, @bin, $_" if $@;
-				$_ = fmthex($_);
-			}
-		}
-		
-		my $opc = "0x".join('', @bin);
-		for (0..$#expr) {
-			next unless defined $expr[$_];
-			my $bytes_shift = scalar(@bin) - $_ - 1;
-			$opc .= '+(('.($expr[$_]).')';
-			$opc .= ' << '.($bytes_shift * 8) if $bytes_shift;
-			$opc .= ')';
-		}
-		if ($stmt eq 'DO_stmt' && $opc !~ /\+/) {
-			push @code, "g_asm.cur_section()->add_opcode(".$opc.$extra_arg.");";
+			$_ =~ s/\b(\d+)\b/ $1 < 10 ? $1 : "0x".fmthex($1) /ge;
+			push @expr, $_;
+			$_ = fmthex($offset);
 		}
 		else {
-			push @code, "/*".$stmt."(".$opc.$extra_arg.")*/;";
+			push @expr, undef;
+			$_ = eval($_); die "$bin, $_" if $@;
+			$_ = fmthex($_);
 		}
 	}
-
-	my $code = join("\n", @code);
-	return $code;
+	
+	my $opc = "0x".join('', @bin);
+	for (0..$#expr) {
+		next unless defined $expr[$_];
+		my $bytes_shift = scalar(@bin) - $_ - 1;
+		$opc .= '+(('.($expr[$_]).')';
+		$opc .= ' << '.($bytes_shift * 8) if $bytes_shift;
+		$opc .= ')';
+	}
+	
+	return $opc;
 }
 
 sub merge_cpu {
@@ -269,14 +221,16 @@ sub merge_cpu {
 	}
 	else {
 		# variants per CPU
-		$ret .= "switch (option_cpu()) {\n";
+		$ret .= "switch (g_args.cpu()) {\n";
 		for my $code (sort keys %code) {
 			for my $cpu (sort keys %{$code{$code}}) {
 				$ret .= "case CPU_".uc($cpu).": ";
 			}
 			$ret .= "\n$code\nbreak;\n"
 		}
-		$ret .= "default: /*error_illegal_ident()*/; }\n";
+		$ret .= "default: ".
+				"g_errors.error(ErrCode::IllegalIdent); ".
+				"}\n";
 	}
 	
 	return $ret;
@@ -294,11 +248,14 @@ sub merge_parens {
 		die;
 	}
 	elsif (!$t->{expr_no_parens} && $t->{expr_in_parens}) {
-		return "/*if (!expr_in_parens) return false;*/\n".
+		return "if (!expr_in_parens()) { ".
+				"g_errors.error(ErrCode::ExprNotInParens); ".
+				"return; }\n".
 				parse_code($cpu, @{$t->{expr_in_parens}});			
 	}
 	elsif ($t->{expr_no_parens} && !$t->{expr_in_parens}) {
-		return "/*if (expr_in_parens) warn_expr_in_parens();*/\n".
+		return "if (expr_in_parens()) ".
+				"g_errors.warning(ErrCode::ExprInParens);\n".
 				parse_code($cpu, @{$t->{expr_no_parens}});
 	}
 	elsif ($t->{expr_no_parens} && $t->{expr_in_parens}) {
@@ -306,7 +263,11 @@ sub merge_parens {
 			extract_common(parse_code($cpu, @{$t->{expr_in_parens}}),
 						   parse_code($cpu, @{$t->{expr_no_parens}}));
 		return $common.
-				"#if 0\nif (expr_in_parens) { $in_parens } else { $no_parens }\n#endif\n";
+				"if (expr_in_parens()) { ".
+				$in_parens.
+				" } else { ".
+				$no_parens.
+				" }";
 	}
 	else {
 		die;

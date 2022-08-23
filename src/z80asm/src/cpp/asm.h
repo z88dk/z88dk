@@ -35,7 +35,7 @@ private:
 	int					m_start_errors;		// errors at start of assembly
 
 	// controler
-	bool assemble1(const string& filename);
+	void assemble1(const string& filename);
 	void set_cur_module(const string& name);
 	void set_cur_group(const string& name);
 	void set_cur_section(const string& name);

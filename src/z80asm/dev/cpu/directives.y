@@ -14,25 +14,27 @@ LABEL equ EXPR $
 section
 	while (!m_lexer.at_end()) m_lexer.next();
 
+#------------------------------------------------------------------------------
 # symbol declaration
+#------------------------------------------------------------------------------
 
 global
-	return parse_symbol_declare(Symbol::Scope::Global);
+	parse_symbol_declare(Symbol::Scope::Global);
 
 extern
-	return parse_symbol_declare(Symbol::Scope::Extern);
+	parse_symbol_declare(Symbol::Scope::Extern);
 
 xref
-	return parse_symbol_declare(Symbol::Scope::Extern);
+	parse_symbol_declare(Symbol::Scope::Extern);
 
 lib
-	return parse_symbol_declare(Symbol::Scope::Extern);
+	parse_symbol_declare(Symbol::Scope::Extern);
 
 public
-	return parse_symbol_declare(Symbol::Scope::Public);
+	parse_symbol_declare(Symbol::Scope::Public);
 
 xdef
-	return parse_symbol_declare(Symbol::Scope::Public);
+	parse_symbol_declare(Symbol::Scope::Public);
 
 xlib
-	return parse_symbol_declare(Symbol::Scope::Public);
+	parse_symbol_declare(Symbol::Scope::Public);

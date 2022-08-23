@@ -60,6 +60,7 @@ X(InvalidFloatFormat, "invalid float format, expected")
 
 // assembler
 X(ExprInParens, "interpreting indirect value as immediate")
+X(ExprNotInParens, "expecting indirect expression")
 X(IllegalIdent, "illegal identifier")
 X(IntRange, "integer range")
 X(MissingBlock, "missing {} block")

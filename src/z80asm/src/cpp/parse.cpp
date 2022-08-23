@@ -5,7 +5,9 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "args.h"
 #include "asm.h"
+#include "errors.h"
 #include "parse.h"
 #include "preproc.h"
 using namespace std;
@@ -17,28 +19,29 @@ void Parser::clear() {
 }
 
 bool Parser::parse() {
-	bool ok = true;
+	int start_errors = g_errors.count();
 
 	string line;
 	while (g_preproc.getline(line)) {
 		m_lexer.set(line);
-		if (!parse_line())
-			ok = false;
+		parse_line();
 	}
 
-	return ok;
+	return start_errors == g_errors.count();
 }
 
-bool Parser::parse_line() {
+void Parser::parse_line() {
 	m_exprs.clear();
 	switch (m_state) {
-	case State::Main: return parse_line_main();
-	default: Assert(0); return false;
+	case State::Main: parse_line_main(); return;
+	default: Assert(0); return;
 	}
 }
 
-bool Parser::parse_line_main() {
-	while (!m_lexer.at_end()) {
+void Parser::parse_line_main() {
+	int start_errors = g_errors.count();
+
+	while (!m_lexer.at_end() && start_errors == g_errors.count()) {
 		string label = check_label();
 		if (!label.empty())
 			g_asm.cur_section()->add_label(label);
@@ -49,11 +52,9 @@ bool Parser::parse_line_main() {
 			m_lexer.next();
 			break;
 		default:
-			if (!parse_main1())
-				return false;
+			parse_main1();
 		}
 	}
-	return true;
 }
 
 string Parser::check_label() {
@@ -68,13 +69,13 @@ string Parser::check_label() {
 		return string();
 }
 
-bool Parser::parse_symbol_declare(Symbol::Scope scope) {
+void Parser::parse_symbol_declare(Symbol::Scope scope) {
 	while (true) {
 		// get identifier
 		Token& token = m_lexer.peek();
 		if (token.ttype != TType::Ident) {
 			g_errors.error(ErrCode::IdentExpected);
-			return false;
+			return;
 		}
 
 		g_symbols.declare(token.svalue, scope);
@@ -89,11 +90,166 @@ bool Parser::parse_symbol_declare(Symbol::Scope scope) {
 		case TType::End:
 		case TType::Newline:
 			m_lexer.next();
-			return true;
+			return;
 		default:
 			g_errors.error(ErrCode::EolExpected);
-			return false;
+			return;
 		}
 	}
 }
 
+bool Parser::expr_in_parens() {
+	Assert(m_exprs.size() >= 1);
+	return m_exprs.back()->in_parens();
+}
+
+// emulate "CALL flag, target" on the Rabbit, by:
+// jp !flag, temp ; call target ; temp:
+void Parser::add_emul_call_flag(unsigned bytes_jump, unsigned bytes_call) {
+	Assert(m_exprs.size() == 1);
+
+	// create label and expression
+	string temp_label_name = g_asm.cur_section()->autolabel();
+	Lexer lexer{ temp_label_name };			// prepare to parse expression with temp label
+	auto temp_label_expr = make_shared<Expr>(lexer);
+	Assert(temp_label_expr->parse());		// parse temp label
+
+	// jp !flag, temp
+	g_asm.cur_section()->add_opcode_nn(bytes_jump, temp_label_expr, PatchExpr::Type::Word);
+
+	// call target
+	g_asm.cur_section()->add_opcode_nn(bytes_call, m_exprs[0], PatchExpr::Type::Word);
+
+	// temp:
+	g_asm.cur_section()->add_label(temp_label_name);
+}
+
+void Parser::add_call_function(const string& function_name) {
+	Assert(m_exprs.size() == 0);
+
+	// declare function as extern
+	g_symbols.declare(function_name, Symbol::Scope::Extern);
+
+	// create expression with function name
+	Lexer lexer{ function_name };			// prepare to parse expression with function name
+	auto function_expr = make_shared<Expr>(lexer);
+	Assert(function_expr->parse());			// parse function name
+
+	// add call instruction
+	g_asm.cur_section()->add_opcode_nn(Z80_CALL, function_expr, PatchExpr::Type::Word);
+}
+
+void Parser::add_jump_relative(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	g_asm.cur_section()->add_jump_relative(bytes, m_exprs[0]);
+}
+
+void Parser::add_z80n_mmu_n() {
+	Assert(m_exprs.size() == 2);
+	Assert(m_exprs[0]->is_const());
+
+	int c = m_exprs[0]->value();
+	if (c < 0 || c > 7)
+		g_errors.error(ErrCode::IntRange, int_to_hex(c, 2));
+	else
+		g_asm.cur_section()->add_opcode_n(Z80N_MMU_N(c), m_exprs[1], PatchExpr::Type::UByte);
+}
+
+void Parser::add_z80n_mmu_a() {
+	Assert(m_exprs.size() == 1);
+	Assert(m_exprs[0]->is_const());
+
+	int c = m_exprs[0]->value();
+	if (c < 0 || c > 7)
+		g_errors.error(ErrCode::IntRange, int_to_hex(c, 2));
+	else
+		g_asm.cur_section()->add_opcode(Z80N_MMU_A(c));
+}
+
+void Parser::add_restart() {
+	Assert(m_exprs.size() == 1);
+	Assert(m_exprs[0]->is_const());
+
+	int addr = m_exprs[0]->value();
+	if (addr > 0 && addr < 8)			// rst 0..7 -> 0..0x38
+		addr <<= 3;
+
+	switch (addr) {
+	case 0x00: case 0x08: case 0x30:
+		if (g_args.cpu() & CPU_RABBIT)
+			add_opcode((Z80_CALL << 16) | (addr << 8));
+		else
+			add_opcode(Z80_RST(addr));
+		break;
+	case 0x10: case 0x18: case 0x20: case 0x28: case 0x38:
+		add_opcode(Z80_RST(addr));
+		break;
+	default:
+		g_errors.error(ErrCode::IntRange, int_to_hex(addr, 2));
+	}
+}
+
+void Parser::add_opcode(unsigned bytes) {
+	g_asm.cur_section()->add_opcode(bytes);
+}
+
+void Parser::add_opcode_n(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	g_asm.cur_section()->add_opcode_n(bytes, m_exprs[0], PatchExpr::Type::UByte);
+}
+
+void Parser::add_opcode_s(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	g_asm.cur_section()->add_opcode_n(bytes, m_exprs[0], PatchExpr::Type::SByte);
+}
+
+void Parser::add_opcode_h(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	g_asm.cur_section()->add_opcode_n(bytes, m_exprs[0], PatchExpr::Type::HighOffset);
+}
+
+void Parser::add_opcode_n_0(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	g_asm.cur_section()->add_opcode_n(bytes, m_exprs[0], PatchExpr::Type::UByte2Word);
+}
+
+void Parser::add_opcode_s_0(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	g_asm.cur_section()->add_opcode_n(bytes, m_exprs[0], PatchExpr::Type::SByte2Word);
+}
+
+void Parser::add_opcode_nn(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	g_asm.cur_section()->add_opcode_nn(bytes, m_exprs[0], PatchExpr::Type::Word);
+}
+
+void Parser::add_opcode_NN(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	g_asm.cur_section()->add_opcode_nn(bytes, m_exprs[0], PatchExpr::Type::BEWord);
+}
+
+void Parser::add_opcode_idx(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	g_asm.cur_section()->add_opcode_idx(bytes, m_exprs[0]);
+}
+
+void Parser::add_opcode_idx_n(unsigned bytes) {
+	Assert(m_exprs.size() == 2);
+
+	g_asm.cur_section()->add_opcode_idx_n(bytes, m_exprs[0], m_exprs[1]);
+}
+
+void Parser::add_opcode_n_n(unsigned bytes) {
+	Assert(m_exprs.size() == 2);
+
+	g_asm.cur_section()->add_opcode_n_n(bytes, m_exprs[0], m_exprs[1]);
+}
