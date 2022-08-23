@@ -36,7 +36,7 @@ for my $n (-129, -128, 0, 255, 256) {
 	
 	ok 1, "n=$n";
 	
-	my $n_report = $n<10 ? $n : sprintf("0x%02x", $n);
+	my $n_report = int_to_hex($n);
 	my $warning = ($n >= -128 && $n < 256) ? "" : <<END;
 ${test}.asm:1: warning: integer range: $n_report
   ^---- $n
@@ -66,7 +66,7 @@ for my $n (-129, -128, 0, 127, 128) {
 
 	ok 1, "n=$n";
 
-	my $n_report = $n<10 ? $n : sprintf("0x%02x", $n);
+	my $n_report = int_to_hex($n);
 	my $warning = ($n >= -128 && $n < 128) ? "" : <<END;
 ${test}.asm:1: warning: integer range: $n_report
   ^---- $n
@@ -83,3 +83,18 @@ END
 
 unlink_testfiles;
 done_testing;
+
+
+sub int_to_hex {
+	my($n) = @_;
+	if ($n <= -10) {
+		return sprintf("-\$%02x", -$n);
+	}
+	elsif ($n < 10) {
+		return $n;
+	}
+	else {
+		return sprintf("\$%02x", $n);
+	}
+}
+

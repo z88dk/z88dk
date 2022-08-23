@@ -8,7 +8,7 @@
 ;  feilipu, January 2022
 ;
 ;-------------------------------------------------------------------------
-; asm_am9511_fdiv2 - am9511 floating point divide by 2
+; asm_am9511_fdiv2 - 8085 floating point divide by 2
 ;-------------------------------------------------------------------------
 ; 
 ; Division by 2 is decrementing the exponent. An easy optimisation.

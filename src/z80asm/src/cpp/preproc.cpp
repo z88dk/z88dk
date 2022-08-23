@@ -11,14 +11,14 @@
 #include "lex.h"
 #include "preproc.h"
 #include "utils.h"
-#include "asmerrors.h"
+#include "errors.h"
 #include <cassert>
 using namespace std;
 
 //-----------------------------------------------------------------------------
 // global state
-static bool g_hold_getline;
-static bool g_do_preproc_line;
+static bool g_hold_getline = false;
+static bool g_is_preproc_active = true;
 
 Preproc g_preproc;
 
@@ -63,11 +63,6 @@ static string unique_name(const string& name) {
 
 //-----------------------------------------------------------------------------
 
-Location::Location(const string& filename, int line_num)
-	: filename(filename), line_num(line_num) {}
-
-//-----------------------------------------------------------------------------
-
 PreprocLevel::PreprocLevel(Macros* parent)
 	: defines(parent) {
 	init();
@@ -75,7 +70,8 @@ PreprocLevel::PreprocLevel(Macros* parent)
 
 void PreprocLevel::init(const string& text) {
 	if (!text.empty()) {
-		if (g_do_preproc_line && !starts_with_hash(text))
+		// do not split while reading list files as backslash may be path separator
+		if (g_is_preproc_active && !starts_with_hash(text))
 			split_lines(m_lines, text);
 		else
 			m_lines.push_back(text);
@@ -141,10 +137,11 @@ bool PreprocFile::get_source_line(string& line) {
 
 	line.push_back('\n');
 	location.inc_line();
+	location.source_line = line;
+	location.expanded_line.clear();
 
 	list_got_source_line(location.filename.c_str(), location.line_num, line.c_str());
-	set_error_location(location.filename.c_str(), location.line_num);
-	set_error_source_line(line.c_str());
+	g_errors.set_location(location);
 
 	return true;
 }
@@ -204,7 +201,7 @@ void Preproc::close() {
 	g_float_format.set(FloatFormat::Format::genmath);
 }
 
-bool Preproc::getline(string& line) {
+bool Preproc::getline1(string& line) {
 	line.clear();
 	while (true) {
 		if (!m_output.empty()) {		// output queue
@@ -214,7 +211,7 @@ bool Preproc::getline(string& line) {
 				return true;
 		}
 		else if (m_levels.back().getline(line)) {	// read from macro expansion
-			if (g_do_preproc_line)
+			if (g_is_preproc_active)
 				parse_line(line);
 			else
 				m_output.push_back(line);
@@ -226,7 +223,7 @@ bool Preproc::getline(string& line) {
 			return false;
 		}
 		else if (m_files.back().getline(line)) {	// read from file
-			if (g_do_preproc_line)
+			if (g_is_preproc_active)
 				parse_line(line);
 			else
 				m_output.push_back(line);
@@ -236,26 +233,32 @@ bool Preproc::getline(string& line) {
 	}
 }
 
+bool Preproc::getline(string& line) {
+	g_is_preproc_active = true;
+	if (getline1(line)) {
+		// publish expaneded line
+		list_got_expanded_line(line.c_str());
+		set_error_expanded_line(line.c_str());
+		return true;
+	}
+	else
+		return false;
+}
+
 bool Preproc::get_unpreproc_line(string& line) {
-	bool save_do_preproc_line = g_do_preproc_line;
-	g_do_preproc_line = false;
-	bool ret = getline(line);
-	g_do_preproc_line = save_do_preproc_line;
+	bool save_active = g_is_preproc_active;
+	g_is_preproc_active = false;
+	bool ret = getline1(line);
+	g_is_preproc_active = save_active;
 	return ret;
 }
 
-string Preproc::filename() const {
+const Location& Preproc::location() const {
+	static Location empty_location;
 	if (!m_files.empty())
-		return m_files.back().location.filename;
+		return m_files.back().location;
 	else
-		return "";
-}
-
-int Preproc::line_num() const {
-	if (!m_files.empty())
-		return m_files.back().location.line_num;
-	else
-		return 0;
+		return empty_location;
 }
 
 bool Preproc::is_c_source() const {
@@ -363,7 +366,7 @@ bool Preproc::ifs_active() {
 }
 
 bool Preproc::check_opcode(Keyword keyword, void(Preproc::* do_action)()) {
-	if (m_lexer[0].is(TType::Label) && m_lexer[1].is(keyword)) {
+	if (m_lexer.peek(0).is(TType::Label) && m_lexer.peek(1).is(keyword)) {
 		if (ifs_active())
 			do_label();
 		else
@@ -372,7 +375,7 @@ bool Preproc::check_opcode(Keyword keyword, void(Preproc::* do_action)()) {
 		((*this).*(do_action))();
 		return true;
 	}
-	else if (m_lexer[0].is(keyword)) {
+	else if (m_lexer.peek(0).is(keyword)) {
 		m_lexer.next();
 		((*this).*(do_action))();
 		return true;
@@ -382,9 +385,8 @@ bool Preproc::check_opcode(Keyword keyword, void(Preproc::* do_action)()) {
 }
 
 bool Preproc::check_hash_directive(Keyword keyword, void(Preproc::* do_action)()) {
-	if (m_lexer[0].is(TType::Hash) && m_lexer[1].is(keyword)) {
-		m_lexer.next();
-		m_lexer.next();
+	if (m_lexer.peek(0).is(TType::Hash) && m_lexer.peek(1).is(keyword)) {
+		m_lexer.next(2);
 		((*this).*(do_action))();
 		return true;
 	}
@@ -393,28 +395,25 @@ bool Preproc::check_hash_directive(Keyword keyword, void(Preproc::* do_action)()
 }
 
 bool Preproc::check_hash() {
-	if (m_lexer[0].is(TType::Hash))
+	if (m_lexer.peek(0).is(TType::Hash))
 		return true;
 	else
 		return false;
 }
 
 bool Preproc::check_defl() {
-	if (m_lexer[0].is(TType::Label, TType::Ident) &&
-		m_lexer[1].is(Keyword::DEFL)) {
-		string name = m_lexer[0].svalue;
-		m_lexer.next();				// skip name
-		m_lexer.next();				// skip DEFC
+	if (m_lexer.peek(0).is(TType::Label, TType::Ident) &&
+		m_lexer.peek(1).is(Keyword::DEFL)) {
+		string name = m_lexer.peek(0).svalue;
+		m_lexer.next(2);			// skip name, DEFC
 		do_defl(name);
 		return true;
 	}
-	else if (m_lexer[0].is(Keyword::DEFL) &&
-		m_lexer[1].is(TType::Ident) &&
-		m_lexer[2].is(TType::Eq)) { 
-		string name = m_lexer[1].svalue;
-		m_lexer.next();				// skip DEFL
-		m_lexer.next();				// skip name
-		m_lexer.next();				// skip '='
+	else if (m_lexer.peek(0).is(Keyword::DEFL) &&
+		m_lexer.peek(1).is(TType::Ident) &&
+		m_lexer.peek(2).is(TType::Eq)) { 
+		string name = m_lexer.peek(1).svalue;
+		m_lexer.next(3);			// skip DEFL, name, '='
 		do_defl(name);
 		return true;
 	}
@@ -423,23 +422,21 @@ bool Preproc::check_defl() {
 }
 
 bool Preproc::check_macro() {
-	if (m_lexer[0].is(TType::Label, TType::Ident) &&
-		m_lexer[1].is(Keyword::MACRO)) {
-		string name = m_lexer[0].svalue;
-		m_lexer.next();				// skip name
-		m_lexer.next();				// skip MACRO
+	if (m_lexer.peek(0).is(TType::Label, TType::Ident) &&
+		m_lexer.peek(1).is(Keyword::MACRO)) {
+		string name = m_lexer.peek(0).svalue;
+		m_lexer.next(2);			// skip name, MACRO
 		do_macro(name);
 		return true;
 	}
-	else if (m_lexer[0].is(Keyword::MACRO) &&
-		m_lexer[1].is(TType::Ident)) {
-		string name = m_lexer[1].svalue;
-		m_lexer.next();				// skip MACRO
-		m_lexer.next();				// skip name
+	else if (m_lexer.peek(0).is(Keyword::MACRO) &&
+		m_lexer.peek(1).is(TType::Ident)) {
+		string name = m_lexer.peek(1).svalue;
+		m_lexer.next(2);			// skip MACRO, name
 		do_macro(name);
 		return true;
 	}
-	else if (m_lexer[0].is(Keyword::ENDM)) {
+	else if (m_lexer.peek(0).is(Keyword::ENDM)) {
 		g_errors.error(ErrCode::UnbalancedStruct);
 		return true;
 	}
@@ -448,8 +445,8 @@ bool Preproc::check_macro() {
 }
 
 bool Preproc::check_macro_call() {
-	if (m_lexer[0].is(TType::Label) && m_lexer[1].is(TType::Ident)) {
-		string name = m_lexer[1].svalue;
+	if (m_lexer.peek(0).is(TType::Label) && m_lexer.peek(1).is(TType::Ident)) {
+		string name = m_lexer.peek(1).svalue;
 		// find in MACRO macros OR in #define macros
 		shared_ptr<Macro> macro = m_macros.find_all(name);
 		if (!macro)       macro = defines().find_all(name);
@@ -461,8 +458,8 @@ bool Preproc::check_macro_call() {
 		}
 	}
 
-	if (m_lexer[0].is(TType::Ident)) {
-		string name = m_lexer[0].svalue;
+	if (m_lexer.peek(0).is(TType::Ident)) {
+		string name = m_lexer.peek(0).svalue;
 		// find in MACRO macros OR in #define macros
 		shared_ptr<Macro> macro = m_macros.find_all(name);
 		if (!macro)       macro = defines().find_all(name);
@@ -477,22 +474,22 @@ bool Preproc::check_macro_call() {
 }
 
 bool Preproc::check_reptx() {
-	if (m_lexer[0].is(Keyword::REPT)) {
+	if (m_lexer.peek(0).is(Keyword::REPT)) {
 		m_lexer.next();
 		do_rept();
 		return true;
 	}
-	else if (m_lexer[0].is(Keyword::REPTC)) {
+	else if (m_lexer.peek(0).is(Keyword::REPTC)) {
 		m_lexer.next();
 		do_reptc();
 		return true;
 	}
-	else if (m_lexer[0].is(Keyword::REPTI)) {
+	else if (m_lexer.peek(0).is(Keyword::REPTI)) {
 		m_lexer.next();
 		do_repti();
 		return true;
 	}
-	else if (m_lexer[0].is(Keyword::ENDR)) {
+	else if (m_lexer.peek(0).is(Keyword::ENDR)) {
 		g_errors.error(ErrCode::UnbalancedStruct);
 		return true;
 	}
@@ -716,7 +713,7 @@ void Preproc::do_define() {
 		// check if name is followed by '(' without spaces
 		size_t this_col = m_lexer.peek().col;
 		bool has_space = (this_col > name_col + name.length());
-		bool has_args = (!has_space && m_lexer.peek().is(TType::Lparen));
+		bool has_args = (!has_space && m_lexer.peek().is(TType::LParen));
 
 		// create macro
 		auto macro = make_shared<Macro>(name);
@@ -738,7 +735,7 @@ void Preproc::do_define() {
 					m_lexer.next();				// skip ','
 					continue;
 				}
-				else if (m_lexer.peek().is(TType::Rparen)) {
+				else if (m_lexer.peek().is(TType::RParen)) {
 					m_lexer.next();				// skip ')'
 					break;
 				}
@@ -1016,7 +1013,7 @@ ExpandedText Preproc::expand(Lexer& lexer, Macros& defines) {
 	ExpandedText out;
 
 	while (!lexer.at_end()) {
-		Token token = lexer[0];
+		Token token = lexer.peek(0);
 		lexer.next();
 
 		switch (token.ttype) {
@@ -1093,20 +1090,20 @@ ExpandedText Preproc::expand(Lexer& lexer, Macros& defines) {
 		case TType::Le: out.append("<="); break;
 		case TType::Gt: out.append(">"); break;
 		case TType::Ge: out.append(">="); break;
-		case TType::Shl: out.append("<<"); break;
-		case TType::Shr: out.append(">>"); break;
+		case TType::LShift: out.append("<<"); break;
+		case TType::RShift: out.append(">>"); break;
 		case TType::Quest: out.append("?"); break;
 		case TType::Colon: out.append(":"); break;
 		case TType::Dot: out.append("."); break;
 		case TType::Comma: out.append(","); break;
 		case TType::Hash: out.append("#"); break;
 		case TType::DblHash: out.append("##"); break;
-		case TType::Lparen: out.append("("); break;
-		case TType::Rparen: out.append(")"); break;
-		case TType::Lsquare: out.append("["); break;
-		case TType::Rsquare: out.append("]"); break;
-		case TType::Lbrace: out.append("{"); break;
-		case TType::Rbrace: out.append("}"); break;
+		case TType::LParen: out.append("("); break;
+		case TType::RParen: out.append(")"); break;
+		case TType::LSquare: out.append("["); break;
+		case TType::RSquare: out.append("]"); break;
+		case TType::LBrace: out.append("{"); break;
+		case TType::RBrace: out.append("}"); break;
 		case TType::Backslash: out.append("\n"); break;
 		default: assert(0);
 		}
@@ -1185,11 +1182,11 @@ string Preproc::collect_param(Lexer& lexer) {
 		switch (lexer.peek().ttype) {
 		case TType::Newline:
 			return string(p0, p1);
-		case TType::Lparen:
+		case TType::LParen:
 			open_parens++;
 			lexer.next();
 			break;
-		case TType::Rparen:
+		case TType::RParen:
 			open_parens--;
 			if (open_parens < 0)
 				return string(p0, p1);
@@ -1211,7 +1208,7 @@ string Preproc::collect_param(Lexer& lexer) {
 vector<string> Preproc::collect_macro_params(Lexer& lexer) {
 	vector<string> params;
 
-	bool in_parens = (lexer.peek().ttype == TType::Lparen);
+	bool in_parens = (lexer.peek().ttype == TType::LParen);
 	if (in_parens)
 		lexer.next();
 
@@ -1222,7 +1219,7 @@ vector<string> Preproc::collect_macro_params(Lexer& lexer) {
 		case TType::Comma:
 			lexer.next();
 			continue;
-		case TType::Rparen:
+		case TType::RParen:
 			if (in_parens)
 				lexer.next();
 			return params;
@@ -1266,16 +1263,16 @@ string Preproc::collect_macro_body(Keyword start_keyword, Keyword end_keyword) {
 	while (get_unpreproc_line(line)) {
 		m_lexer.set(line);
 
-		if ((m_lexer[0].is(TType::Label, TType::Ident) && m_lexer[1].is(start_keyword)) ||
-			(m_lexer[0].is(start_keyword))) {
+		if ((m_lexer.peek(0).is(TType::Label, TType::Ident) && m_lexer.peek(1).is(start_keyword)) ||
+			(m_lexer.peek(0).is(start_keyword))) {
 			g_errors.error(ErrCode::UnbalancedStructStartedAt,
 				start_location.filename + ":" +
 				std::to_string(start_location.line_num));
 			return "";
 		}
-		else if (m_lexer[0].is(end_keyword)) {
+		else if (m_lexer.peek(0).is(end_keyword)) {
 			m_lexer.next();
-			if (!m_lexer[0].is(TType::Newline)) {
+			if (!m_lexer.peek(0).is(TType::Newline)) {
 				g_errors.error(ErrCode::Syntax);
 				return "";
 			}
@@ -1358,8 +1355,7 @@ char* sfile_getline() {
 	string line;
 	if (g_hold_getline)
 		return nullptr;
-	g_do_preproc_line = false;		// no preprocessing on input line
-	if (g_preproc.getline(line))
+	if (g_preproc.get_unpreproc_line(line))
 		return must_strdup(line.c_str());	// needs to be freed by the user
 	else
 		return nullptr;
@@ -1370,25 +1366,21 @@ char* sfile_get_source_line() {
 	string line;
 	if (g_hold_getline)
 		return nullptr;
-	g_do_preproc_line = true;		// preprocessing on input line
-	if (g_preproc.getline(line)) {
-		list_got_expanded_line(line.c_str());
-		set_error_expanded_line(line.c_str());
+	if (g_preproc.getline(line)) 
 		return must_strdup(line.c_str());	// needs to be freed by the user
-	}
 	else
 		return nullptr;
 }
 
 const char* sfile_filename() {
-	if (g_preproc.filename().empty())
+	if (g_preproc.location().filename.empty())
 		return nullptr;
 	else
-		return spool_add(g_preproc.filename().c_str());
+		return spool_add(g_preproc.location().filename.c_str());
 }
 
 int sfile_line_num() {
-	return g_preproc.line_num();
+	return g_preproc.location().line_num;
 }
 
 bool sfile_is_c_source() {

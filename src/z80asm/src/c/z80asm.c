@@ -25,7 +25,7 @@ Repository: https://github.com/z88dk/z88dk
 #include <sys/stat.h>
 
 /* external functions */
-void Z80pass2( void );
+void Z80pass2(int start_errors);
 void CreateBinFile( void );
 
 extern char Z80objhdr[];
@@ -111,7 +111,7 @@ static void do_assemble(const char *src_filename )
 	parse_file(src_filename);
 	asm_MODULE_default();			/* Module1 name must be defined */
 	clear_error_location();
-	Z80pass2();						/* call pass 2 even if errors found, to issue pass2 errors */
+	Z80pass2(start_errors);			/* call pass 2 even if errors found, to issue pass2 errors */
 	clear_error_location();
 	list_close();
 

@@ -453,11 +453,11 @@ double FloatExpr::parse_unary() {
 		a = parse_unary();
 		if (m_parse_error) return 0.0;
 		return a;
-	case TType::Lparen:
+	case TType::LParen:
 		m_lexer.next();
 		a = parse_expr();
 		if (m_parse_error) return 0.0;
-		if (!m_lexer.peek().is(TType::Rparen)) {
+		if (!m_lexer.peek().is(TType::RParen)) {
 			m_parse_error = true;
 			return 0.0;
 		}
@@ -525,7 +525,7 @@ double FloatExpr::parse_primary() {
 }
 
 double FloatExpr::parse_func(double(*f)(double)) {
-	if (!m_lexer.peek().is(TType::Lparen)) {
+	if (!m_lexer.peek().is(TType::LParen)) {
 		m_parse_error = true;
 		return 0.0;
 	}
@@ -537,7 +537,7 @@ double FloatExpr::parse_func(double(*f)(double)) {
 }
 
 double FloatExpr::parse_func2(double(*f)(double, double)) {
-	if (!m_lexer.peek().is(TType::Lparen)) {
+	if (!m_lexer.peek().is(TType::LParen)) {
 		m_parse_error = true;
 		return 0.0;
 	}
@@ -555,7 +555,7 @@ double FloatExpr::parse_func2(double(*f)(double, double)) {
 			double b = parse_expr();
 			if (m_parse_error) return 0.0;
 
-			if (!m_lexer.peek().is(TType::Rparen)) {
+			if (!m_lexer.peek().is(TType::RParen)) {
 				m_parse_error = true;
 				return 0.0;
 			}

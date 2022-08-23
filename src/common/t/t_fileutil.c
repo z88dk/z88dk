@@ -56,6 +56,12 @@ void t_fileutil_path_canon(void)
 	TEST_ASSERT_EQUAL_STRING("../abc", path_canon("../abc"));
 	TEST_ASSERT_EQUAL_STRING("../../abc", path_canon("../../abc"));
 	TEST_ASSERT_EQUAL_STRING("../../../abc", path_canon("../../../abc"));
+
+	// handle series of ../..
+	TEST_ASSERT_EQUAL_STRING("/a/b/c/x", path_canon("/a/b/c/d/../x"));
+	TEST_ASSERT_EQUAL_STRING("/a/b/x", path_canon("/a/b/c/d/../../x"));
+	TEST_ASSERT_EQUAL_STRING("/a/x", path_canon("/a/b/c/d/../../../x"));
+	TEST_ASSERT_EQUAL_STRING("/x", path_canon("/a/b/c/d/../../../../x"));
 }
 
 void t_fileutil_path_os(void)

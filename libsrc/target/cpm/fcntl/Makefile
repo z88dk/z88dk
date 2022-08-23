@@ -4,6 +4,7 @@ CFILES = \
 	_putoffset.c \
 	bios.c \
 	bdos.c \
+	bdos_callee.c \
 	cache.c \
 	close.c \
 	creat.c \

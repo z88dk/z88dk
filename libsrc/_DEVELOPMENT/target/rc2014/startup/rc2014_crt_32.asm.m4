@@ -260,7 +260,7 @@ IF DEFINED_USING_amalloc
     ld hl,__BSS_END_tail
     ld (_heap),hl
 
-    include "../../../../../lib/crt/classic/crt_init_amalloc.asm"
+    include "../../../../lib/crt/classic/crt_init_amalloc.asm"
 
 ENDIF
 
@@ -346,7 +346,7 @@ ENDIF
 
     SECTION data_crt
 
-include "../../../../../lib/crt/classic/crt_runtime_selection.asm" 
+include "../../../../lib/crt/classic/crt_runtime_selection.asm" 
 
     SECTION bss_crt
 

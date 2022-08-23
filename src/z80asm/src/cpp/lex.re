@@ -6,7 +6,7 @@
 //-----------------------------------------------------------------------------
 
 #include "args.h"
-#include "asmerrors.h"
+#include "errors.h"
 #include "if.h"
 #include "lex.h"
 #include "preproc.h"
@@ -135,8 +135,20 @@ void split_lines(deque<string>& lines, const string& line) {
 
 //-----------------------------------------------------------------------------
 
-Token& Lexer::operator[](int offset) {
-	return peek(offset);
+const char* Lexer::text_ptr(int offset) const {
+	int index = m_pos + offset;
+	if (index < 0)
+		return m_text.c_str();
+	else if (index < static_cast<int>(m_tokens.size()))
+		return m_text.c_str() + m_tokens[index].col;
+	else
+		return m_text.c_str() + m_text.length();
+}
+
+string Lexer::token_text(int offset) const {
+	const char* p1 = text_ptr(offset);
+	const char* p2 = text_ptr(offset + 1);
+	return string(p1, p2);
 }
 
 Token& Lexer::peek(int offset) {
@@ -148,9 +160,10 @@ Token& Lexer::peek(int offset) {
 		return m_tokens[index];
 }
 
-void Lexer::next() {
-	if (m_pos < m_tokens.size())
-		m_pos++;
+void Lexer::next(int n) {
+	m_pos += n;
+	if (m_pos > m_tokens.size())
+		m_pos = m_tokens.size();
 }
 
 void Lexer::set(const string& text) {
@@ -242,10 +255,10 @@ void Lexer::set(const string& text) {
 			'&&'			{ m_tokens.emplace_back(TType::LogAnd);
 							  m_tokens.back().col = col;
 							  continue; }
-			'('				{ m_tokens.emplace_back(TType::Lparen);
+			'('				{ m_tokens.emplace_back(TType::LParen);
 							  m_tokens.back().col = col;
 							  continue; }
-			')'				{ m_tokens.emplace_back(TType::Rparen);
+			')'				{ m_tokens.emplace_back(TType::RParen);
 							  m_tokens.back().col = col;
 							  continue; }
 			'*'				{ m_tokens.emplace_back(TType::Mul);
@@ -278,7 +291,7 @@ void Lexer::set(const string& text) {
 			'<='			{ m_tokens.emplace_back(TType::Le);
 							  m_tokens.back().col = col;
 							  continue; }
-			'<<'			{ m_tokens.emplace_back(TType::Shl);
+			'<<'			{ m_tokens.emplace_back(TType::LShift);
 							  m_tokens.back().col = col;
 							  continue; }
 			'='  | '=='		{ m_tokens.emplace_back(TType::Eq);
@@ -293,19 +306,19 @@ void Lexer::set(const string& text) {
 			'>='			{ m_tokens.emplace_back(TType::Ge);
 							  m_tokens.back().col = col;
 							  continue; }
-			'>>'			{ m_tokens.emplace_back(TType::Shr);
+			'>>'			{ m_tokens.emplace_back(TType::RShift);
 							  m_tokens.back().col = col;
 							  continue; }
 			'?'				{ m_tokens.emplace_back(TType::Quest);
 							  m_tokens.back().col = col;
 							  continue; }
-			'['				{ m_tokens.emplace_back(TType::Lsquare);
+			'['				{ m_tokens.emplace_back(TType::LSquare);
 							  m_tokens.back().col = col;
 							  continue; }
 			'\\'			{ m_tokens.emplace_back(TType::Backslash);
 							  m_tokens.back().col = col;
 							  continue; }
-			']'				{ m_tokens.emplace_back(TType::Rsquare);
+			']'				{ m_tokens.emplace_back(TType::RSquare);
 							  m_tokens.back().col = col;
 							  continue; }
 			'^'				{ m_tokens.emplace_back(TType::BinXor);
@@ -314,7 +327,7 @@ void Lexer::set(const string& text) {
 			'^^'			{ m_tokens.emplace_back(TType::LogXor);
 							  m_tokens.back().col = col;
 							  continue; }
-			'{'				{ m_tokens.emplace_back(TType::Lbrace);
+			'{'				{ m_tokens.emplace_back(TType::LBrace);
 							  m_tokens.back().col = col;
 							  continue; }
 			'|'				{ m_tokens.emplace_back(TType::BinOr);
@@ -323,7 +336,7 @@ void Lexer::set(const string& text) {
 			'||'			{ m_tokens.emplace_back(TType::LogOr);
 							  m_tokens.back().col = col;
 							  continue; }
-			'}'				{ m_tokens.emplace_back(TType::Rbrace);
+			'}'				{ m_tokens.emplace_back(TType::RBrace);
 							  m_tokens.back().col = col;
 							  continue; }
 			'~'				{ m_tokens.emplace_back(TType::BinNot);
@@ -350,6 +363,9 @@ void Lexer::set(const string& text) {
 							  else {
 								  p = p1;
 								  Keyword keyword = lu_keyword(str);
+								  if (keyword == Keyword::ASMPC)
+									  m_tokens.emplace_back(TType::ASMPC);
+								  else
 								  m_tokens.emplace_back(TType::Ident, str, keyword);
 							  }
 							  m_tokens.back().col = col;

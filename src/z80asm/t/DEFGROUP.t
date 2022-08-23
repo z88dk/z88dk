@@ -95,9 +95,9 @@ z80asm_nok("", "", <<END, <<END);
 		dg4 = -32769
 	}
 END
-$test.asm:3: error: integer range: 0x10000
+$test.asm:3: error: integer range: \$10000
   ^---- dg2 = 65536
-$test.asm:5: error: integer range: -32769
+$test.asm:5: error: integer range: -\$8001
   ^---- dg4 = -32769
 END
 

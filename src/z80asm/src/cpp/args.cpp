@@ -6,7 +6,7 @@
 
 #include "if.h"
 #include "args.h"
-#include "asmerrors.h"
+#include "errors.h"
 #include "float.h"
 #include "lex.h"
 #include "preproc.h"

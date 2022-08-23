@@ -14,7 +14,7 @@ END_ERR
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		phase 65536
 END_ASM
-$test.asm:1: error: integer range: 0x10000
+$test.asm:1: error: integer range: \$10000
   ^---- phase 65536
 END_ERR
 

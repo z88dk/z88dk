@@ -4,10 +4,10 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "asmerrors.h"
+#include "errors.h"
+#include "float.h"
 #include "if.h"
 #include "utils.h"
-#include "float.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -17,35 +17,63 @@ Errors g_errors;
 
 static const char* err_messages[] = {
 #	define X(code, message)		message,
-#	include "asmerrors.def"
+#	include "errors.def"
 };
+
+Location::Location(const string& filename_, int line_num_,
+	const string& source_line_, const string& expanded_line_)
+	: filename(filename_), line_num(line_num_)
+	, source_line(source_line_), expanded_line(expanded_line_) {
+}
+
+void Location::clear() {
+	filename.clear();
+	line_num = 0;
+	line_inc = 1;
+	source_line.clear();
+	expanded_line.clear();
+}
 
 Errors::Errors()
 	: m_count(0) {
-	clear();
+	m_locations.emplace_back();		// keep always one element in vector
 }
 
 void Errors::clear() {
-	m_filename.clear();
-	m_line_num = 0;
-	m_source_line.clear();
-	m_expanded_line.clear();
+	Assert(!m_locations.empty());
+	Location& location = m_locations.back();
+
+	location.clear();
 }
 
-void Errors::set_location(const string& filename, int line_num) {
-	m_filename = filename;
-	m_line_num = line_num;
-	m_source_line.clear();
-	m_expanded_line.clear();
+void Errors::set_location(const Location& location) {
+	Assert(!m_locations.empty());
+	m_locations.back() = location;
+}
+
+void Errors::set_file_location(const string& filename, int line_num) {
+	Assert(!m_locations.empty());
+	Location& location = m_locations.back();
+
+	location.filename = filename;
+	location.line_num = line_num;
+	location.source_line.clear();
+	location.expanded_line.clear();
 }
 
 void Errors::set_source_line(const string& line) {
-	m_source_line = line;
-	m_expanded_line.clear();
+	Assert(!m_locations.empty());
+	Location& location = m_locations.back();
+
+	location.source_line = line;
+	location.expanded_line.clear();
 }
 
 void Errors::set_expanded_line(const string& line) {
-	m_expanded_line = line;
+	Assert(!m_locations.empty());
+	Location& location = m_locations.back();
+
+	location.expanded_line = line;
 }
 
 void Errors::error(ErrCode code, const string& arg) {
@@ -57,12 +85,26 @@ void Errors::warning(ErrCode code, const string& arg) {
 	show_error("warning", code, arg);
 }
 
+void Errors::push_location(const Location& location) {
+	m_locations.push_back(location);
+}
+
+void Errors::pop_location() {
+	if (m_locations.size() > 1)
+		m_locations.pop_back();
+	else
+		clear();
+}
+
 void Errors::show_error(const string& prefix, ErrCode code, const string& arg) {
+	Assert(!m_locations.empty());
+	Location& location = m_locations.back();
+
 	// error message
-	if (!m_filename.empty()) {
-		cerr << m_filename << ":";
-		if (m_line_num)
-			cerr << m_line_num << ":";
+	if (!location.filename.empty()) {
+		cerr << location.filename << ":";
+		if (location.line_num)
+			cerr << location.line_num << ":";
 		cerr << " ";
 	}
 	cerr << prefix << ": " << err_messages[static_cast<int>(code)];
@@ -71,16 +113,17 @@ void Errors::show_error(const string& prefix, ErrCode code, const string& arg) {
 	cerr << endl;
 
 	// source line - remove extra spaces
-	m_source_line = str_remove_extra_blanks(m_source_line);
-	m_expanded_line = str_remove_extra_blanks(m_expanded_line);
+	string striped_source_line = str_remove_extra_blanks(location.source_line);
+	string striped_expanded_line = str_remove_extra_blanks(location.expanded_line);
 
-	if (!m_source_line.empty()) {
-		cerr << "  ^---- " << m_source_line << endl;
+	if (!striped_source_line.empty()) {
+		cerr << "  ^---- " << striped_source_line << endl;
 
 		// only show expanded line if it differs from source, ignoring blanks
-		if (!m_expanded_line.empty())
-			if (str_remove_all_blanks(m_source_line) != str_remove_all_blanks(m_expanded_line))
-				cerr << "      ^---- " << m_expanded_line << endl;
+		if (!striped_expanded_line.empty())
+			if (str_remove_all_blanks(striped_source_line)
+				!= str_remove_all_blanks(striped_expanded_line))
+				cerr << "      ^---- " << striped_expanded_line << endl;
 	}
 }
 
@@ -97,18 +140,18 @@ void clear_error_location() {
 
 void set_error_location(const char* filename, int line_num) {
 	if (filename)
-		g_errors.set_location(filename, line_num);
+		g_errors.set_file_location(filename, line_num);
 	else
 		g_errors.clear();
 }
 
 const char* get_error_filename() {
-	string filename = g_errors.filename();
+	string filename = g_errors.location().filename;
 	return spool_add(filename.c_str());
 }
 
 int get_error_line_num() {
-	return g_errors.line_num();
+	return g_errors.location().line_num;
 }
 
 void set_error_source_line(const char* line) {
@@ -163,11 +206,11 @@ void error_org_redefined() {
 }
 
 void error_int_range(int value) {
-	g_errors.error(ErrCode::IntRange, int_to_hex(value));
+	g_errors.error(ErrCode::IntRange, int_to_hex(value, 2));
 }
 
 void warn_int_range(int value) {
-	g_errors.warning(ErrCode::IntRange, int_to_hex(value));
+	g_errors.warning(ErrCode::IntRange, int_to_hex(value, 2));
 }
 
 void error_not_obj_file(const char* filename) {
@@ -215,7 +258,7 @@ void error_expected_const_expr() {
 }
 
 void error_symbol_redecl(const char* name) {
-	g_errors.error(ErrCode::SymbolRedecl, name);
+	g_errors.error(ErrCode::SymbolRedeclaration, name);
 }
 
 void error_expr_recursion() {
@@ -228,11 +271,11 @@ void error_align_redefined() {
 
 void error_org_not_aligned(int origin, int align) {
 	g_errors.error(ErrCode::OrgNotAligned,
-		"origin=" + int_to_hex(origin) + ", align=" + int_to_hex(align));
+		"origin=" + int_to_hex(origin, 4) + ", align=" + int_to_hex(align, 2));
 }
 
 void error_invalid_org(int origin) {
-	g_errors.error(ErrCode::InvalidOrg, int_to_hex(origin));
+	g_errors.error(ErrCode::InvalidOrg, int_to_hex(origin, 4));
 }
 
 void error_obj_file_version(const char* filename, int found_version, int expected_version) {
@@ -250,7 +293,7 @@ void error_lib_file_version(const char* filename, int found_version, int expecte
 }
 
 void error_dma_base_register_illegal(int value) {
-	g_errors.error(ErrCode::DMABaseRegisterIllegal, int_to_hex(value));
+	g_errors.error(ErrCode::DMABaseRegisterIllegal, int_to_hex(value, 2));
 }
 
 void error_dma_missing_args() {

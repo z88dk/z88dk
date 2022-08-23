@@ -33,16 +33,16 @@ define(`__COMMON_AREA_1_PHASE_DRIVER', 0x`'eval(__COMMON_AREA_1_BASE+__COMMON_AR
 
 # Z180 ASCI0 driver
 
-define(`__ASCI0_RX_SIZE', 0x100)                    # Size of the Rx Buffer, must be 2^n >= 8
+define(`__ASCI0_RX_SIZE', 0x100)                    # Size of the Rx Buffer, must be 2^n >= 8 (Default)
 define(`__ASCI0_RX_FULLISH', 0x`'eval(__ASCI0_RX_SIZE-16,16))
                                                     # Fullness of the Rx Buffer, when NOT_RTS is signalled
 define(`__ASCI0_RX_EMPTYISH', 0x08)                 # Fullness of the Rx Buffer, when RTS is signalled
-define(`__ASCI0_TX_SIZE', 0x080)                    # Size of the Tx Buffer, must be 2^n >= 8
+define(`__ASCI0_TX_SIZE', 0x080)                    # Size of the Tx Buffer, must be 2^n >= 8 (Default)
 
 # Z180 ASCI1 driver
 
-define(`__ASCI1_RX_SIZE', 0x100)                    # Size of the Rx Buffer, must be 2^n >= 8
-define(`__ASCI1_TX_SIZE', 0x080)                    # Size of the Tx Buffer, must be 2^n >= 8
+define(`__ASCI1_RX_SIZE', 0x100)                    # Size of the Rx Buffer, must be 2^n >= 8 (Default)
+define(`__ASCI1_TX_SIZE', 0x080)                    # Size of the Tx Buffer, must be 2^n >= 8 (Default)
 
 # I/O BASE ADDRESS OF INTERNAL PERIPHERALS
 
@@ -83,8 +83,6 @@ dnl#
 ifdef(`CFG_ASM_PUB',
 `
 PUBLIC `__YAZ180'
-
-PUBLIC `__CPU_CLOCK'
 
 PUBLIC `__CLOCKS_PER_SECOND'
 
@@ -168,8 +166,6 @@ ifdef(`CFG_C_DEF',
 `
 `#undef'  `__YAZ180'
 `#define' `__YAZ180'  __YAZ180
-
-`#define' `__CPU_CLOCK'  __CPU_CLOCK
 
 `#define' `__CLOCKS_PER_SECOND'  __CLOCKS_PER_SECOND
 

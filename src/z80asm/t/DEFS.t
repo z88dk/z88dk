@@ -103,26 +103,26 @@ z80asm_nok("", "", <<END, <<END);
 	defs 65537, 0xff
 	defs 65537, "hello"
 END
-$test.asm:1: error: integer range: 0x10001
+$test.asm:1: error: integer range: \$10001
   ^---- defs 65537
-$test.asm:2: error: integer range: 0x10001
+$test.asm:2: error: integer range: \$10001
   ^---- defs 65537, 0xff
       ^---- defs 65537,255
-$test.asm:3: error: integer range: 0x10001
+$test.asm:3: error: integer range: \$10001
   ^---- defs 65537, "hello"
 END
 
 z80asm_nok("", "", <<END, <<END);
 	defs 2, -129
 END
-$test.asm:1: error: integer range: -129
+$test.asm:1: error: integer range: -\$81
   ^---- defs 2, -129
 END
 
 z80asm_nok("", "", <<END, <<END);
 	defs 2, 0x100
 END
-$test.asm:1: error: integer range: 0x100
+$test.asm:1: error: integer range: \$100
   ^---- defs 2, 0x100
       ^---- defs 2,256
 END

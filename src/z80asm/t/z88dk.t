@@ -43,9 +43,9 @@ z80asm_nok("", "", <<END, <<END);
 END
 $test.asm:1: error: integer range: 0
   ^---- fpp 0
-$test.asm:2: error: integer range: 0xff
+$test.asm:2: error: integer range: \$ff
   ^---- fpp 255
-$test.asm:3: error: integer range: 0x100
+$test.asm:3: error: integer range: \$100
   ^---- fpp 256
 END
 

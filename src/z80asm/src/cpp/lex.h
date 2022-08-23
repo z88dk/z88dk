@@ -30,14 +30,13 @@ bool remove_final_backslash(string& line);
 void split_lines(deque<string>& lines, const string& line);
 
 enum class TType {
-	End, Newline,
+	End, Newline, Backslash, 
 	Ident, Label, Integer, Floating, String, ASMPC,
 	BinNot, LogNot, BinAnd, LogAnd, BinOr, LogOr, BinXor, LogXor,
 	Plus, Minus, Mul, Pow, Div, Mod,
-	Eq, Ne, Lt, Le, Gt, Ge, Shl, Shr,
+	Eq, Ne, Lt, Le, Gt, Ge, LShift, RShift,
 	Quest, Colon, Dot, Comma, Hash, DblHash,
-	Lparen, Rparen, Lsquare, Rsquare, Lbrace, Rbrace,
-	Backslash, 
+	LParen, RParen, LSquare, RSquare, LBrace, RBrace,
 };
 
 enum class Keyword {
@@ -82,11 +81,8 @@ public:
 	void clear() { set(); }
 
 	const string& text() const { return m_text; }
-	const char* text_ptr() const {
-		return m_pos < m_tokens.size() ?
-			m_text.c_str() + m_tokens[m_pos].col :
-			m_text.c_str() + m_text.length();
-	}
+	const char* text_ptr(int offset = 0) const;
+	string token_text(int offset = 0) const;
 	size_t size() const { return m_tokens.size(); }
 
 	void rewind() { m_pos = 0; }
@@ -95,8 +91,7 @@ public:
 	void set_pos(size_t pos) { m_pos = pos; }
 
 	Token& peek(int offset = 0);			// 0: current; 1: next; -1: previous
-	Token& operator[](int offset);
-	void next();
+	void next(int n = 1);
 
 private:
 	string			m_text;

@@ -61,8 +61,6 @@ ifdef(`CFG_ASM_PUB',
 `
 PUBLIC `__RC2014'
 
-PUBLIC `__CPU_CLOCK'
-
 PUBLIC `__IO_DIO_PORT'
 PUBLIC `__IO_CF_PORT'
 PUBLIC `__IO_PIO_PORT_BASE'
@@ -103,8 +101,6 @@ ifdef(`CFG_C_DEF',
 `
 `#undef'  `__RC2014'
 `#define' `__RC2014'  __RC2014
-
-`#define' `__CPU_CLOCK'  __CPU_CLOCK
 
 `#define' `__IO_DIO_PORT'  __IO_DIO_PORT
 `#define' `__IO_CF_PORT'  __IO_CF_PORT

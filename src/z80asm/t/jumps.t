@@ -71,29 +71,29 @@ z80asm_nok("", "", <<END, <<END);
 	jr  c,ASMPC-0x7F
 	jr  c,ASMPC+0x82
 END
-$test.asm:1: error: integer range: -129
+$test.asm:1: error: integer range: -\$81
   ^---- \$-127
-$test.asm:2: error: integer range: 0x80
+$test.asm:2: error: integer range: \$80
   ^---- \$+130
-$test.asm:3: error: integer range: -129
+$test.asm:3: error: integer range: -\$81
   ^---- \$-127
-$test.asm:4: error: integer range: 0x80
+$test.asm:4: error: integer range: \$80
   ^---- \$+130
-$test.asm:5: error: integer range: -129
+$test.asm:5: error: integer range: -\$81
   ^---- \$-127
-$test.asm:6: error: integer range: 0x80
+$test.asm:6: error: integer range: \$80
   ^---- \$+130
-$test.asm:7: error: integer range: -129
+$test.asm:7: error: integer range: -\$81
   ^---- \$-127
-$test.asm:8: error: integer range: 0x80
+$test.asm:8: error: integer range: \$80
   ^---- \$+130
-$test.asm:9: error: integer range: -129
+$test.asm:9: error: integer range: -\$81
   ^---- \$-127
-$test.asm:10: error: integer range: 0x80
+$test.asm:10: error: integer range: \$80
   ^---- \$+130
-$test.asm:11: error: integer range: -129
+$test.asm:11: error: integer range: -\$81
   ^---- \$-127
-$test.asm:12: error: integer range: 0x80
+$test.asm:12: error: integer range: \$80
   ^---- \$+130
 END
 

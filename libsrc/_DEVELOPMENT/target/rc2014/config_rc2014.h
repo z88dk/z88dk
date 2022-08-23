@@ -39,8 +39,6 @@
 #undef  __RC2014
 #define __RC2014  1
 
-#define __CPU_CLOCK  7372800
-
 #define __IO_DIO_PORT  0x00
 #define __IO_CF_PORT  0x10
 #define __IO_PIO_PORT_BASE  0x20

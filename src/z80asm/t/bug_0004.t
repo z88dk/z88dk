@@ -6,13 +6,13 @@ use Modern::Perl;
 
 # BUG_0004 : 8bit unsigned constants are not checked for out-of-range
 z80asm_ok("", "", <<END_WARN, 
-$test.asm:1: warning: integer range: -129
+$test.asm:1: warning: integer range: -\$81
   ^---- -129
-$test.asm:2: warning: integer range: 0x100
+$test.asm:2: warning: integer range: \$100
   ^---- 256
-$test.asm:3: warning: integer range: -129
+$test.asm:3: warning: integer range: -\$81
   ^---- -129
-$test.asm:4: warning: integer range: 0x80
+$test.asm:4: warning: integer range: \$80
   ^---- 128
 END_WARN
 		"ld a, -129",		bytes(0x3e, 0x7f),

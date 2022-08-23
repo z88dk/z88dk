@@ -39,8 +39,6 @@
 #undef  __YAZ180
 #define __YAZ180  1
 
-#define __CPU_CLOCK  36864000
-
 #define __CLOCKS_PER_SECOND  256
 
 #define __BIOS_SP   0xFFDE

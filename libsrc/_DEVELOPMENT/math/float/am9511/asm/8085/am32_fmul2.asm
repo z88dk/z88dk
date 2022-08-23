@@ -8,7 +8,7 @@
 ;  feilipu, January 2022
 ;
 ;-------------------------------------------------------------------------
-; asm_am9511_fmul2 - z80, z180, z80n floating point multiply by 2
+; asm_am9511_fmul2 - 8085 floating point multiply by 2
 ;-------------------------------------------------------------------------
 ; 
 ; Multiplication by 2 is incrementing the exponent. An easy optimisation.

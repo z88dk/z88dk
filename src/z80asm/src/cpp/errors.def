@@ -30,10 +30,17 @@ X(InvalidChar, "invalid character")
 X(MissingQuote, "missing quote")
 X(InvalidCharConst, "invalid character constant")
 
+// parser
+X(ColonExpected, "colon expected")
+X(UnbalancedParens, "unbalanced parens")
+X(IntOrIdentExpected, "integer or identifier expected")
+
 // symbols
 X(DuplicateDefinition, "duplicate definition")
 X(UndefinedSymbol, "undefined symbol")
-X(SymbolRedecl, "symbol redeclaration")
+X(SymbolRedeclaration, "symbol redeclaration")
+X(UnknownValue, "value not yet known")
+X(RecursiveExpression, "recursive expression")
 
 // expressions
 X(ConstExprExpected, "constant expression expected")

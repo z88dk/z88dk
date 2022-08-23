@@ -67,7 +67,7 @@ static void str_path_canon(UT_string *path)
 				p++;
 			if (strncmp(p, "/../", 4) == 0) {
 				memmove(p1, p + 4, strlen(p + 4) + 1);	// copy also null
-				p = p1;
+				p = root;								// need to check again
 			}
 			else if (strcmp(p, "/..") == 0) {
 				p = p1;

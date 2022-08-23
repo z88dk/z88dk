@@ -40,8 +40,6 @@
 ; 5) 5th section normalize in separate file d32_fsnormalize32.asm
 ;
 ;-------------------------------------------------------------------------
-; FIXME clocks
-;-------------------------------------------------------------------------
 
 SECTION code_clib
 SECTION code_fp_math32
@@ -185,7 +183,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     jr aligndone
 
 ; here possible 16
-.al_5 
+.al_5
     rra                         ; 4th lost bit in 6,5,4,3
     jr NC,al_6                  ; no shift by 16
 ; here shift by 16
@@ -202,7 +200,7 @@ PUBLIC m32_fsadd24x32, m32_fsadd32x32
     jr Z,aligndone
     set 0,e                     ; lost bits
 ;   jr aligndone
-    
+
 ; align done here
 .aligndone
     ex af,af                    ; carry clear

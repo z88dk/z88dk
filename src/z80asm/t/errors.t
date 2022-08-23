@@ -84,29 +84,29 @@ END
 
 run_ok("z88dk-z80asm -b $test.asm $test.1.asm 2> $test.err");
 check_text_file("$test.err", <<END);
-$test.asm:4: warning: integer range: -129
+$test.asm:4: warning: integer range: -\$81
   ^---- L_129
-$test.asm:19: warning: integer range: 0x100
+$test.asm:19: warning: integer range: \$100
   ^---- L256
-$test.asm:24: warning: integer range: -129
+$test.asm:24: warning: integer range: -\$81
   ^---- L_129
-$test.asm:39: warning: integer range: 0x80
+$test.asm:39: warning: integer range: \$80
   ^---- L128
-$test.asm:5: warning: integer range: -129
+$test.asm:5: warning: integer range: -\$81
   ^---- G_129
-$test.asm:6: warning: integer range: -129
+$test.asm:6: warning: integer range: -\$81
   ^---- G0-129
-$test.asm:20: warning: integer range: 0x100
+$test.asm:20: warning: integer range: \$100
   ^---- G256
-$test.asm:21: warning: integer range: 0x100
+$test.asm:21: warning: integer range: \$100
   ^---- G0+256
-$test.asm:25: warning: integer range: -129
+$test.asm:25: warning: integer range: -\$81
   ^---- G_129
-$test.asm:26: warning: integer range: -129
+$test.asm:26: warning: integer range: -\$81
   ^---- G0-129
-$test.asm:40: warning: integer range: 0x80
+$test.asm:40: warning: integer range: \$80
   ^---- G128
-$test.asm:41: warning: integer range: 0x80
+$test.asm:41: warning: integer range: \$80
   ^---- G0+128
 END
 
@@ -171,22 +171,22 @@ for ([jr => 0x18], [djnz => 0x10]) {
 	my($jump, $opcode) = @$_;
 
 	z80asm_nok("", "", "$jump ASMPC+2-129", <<END);
-$test.asm:1: error: integer range: -129
+$test.asm:1: error: integer range: -\$81
   ^---- \$+2-129
 END
 
 	z80asm_nok("", "", "$jump label \n defc label = ASMPC-129", <<END);
-$test.asm:1: error: integer range: -129
+$test.asm:1: error: integer range: -\$81
   ^---- label
 END
 
 	z80asm_nok("", "", "$jump ASMPC+2+128", <<END);
-$test.asm:1: error: integer range: 0x80
+$test.asm:1: error: integer range: \$80
   ^---- \$+2+128
 END
 
 	z80asm_nok("", "", "$jump label \n defc label = ASMPC+128", <<END);
-$test.asm:1: error: integer range: 0x80
+$test.asm:1: error: integer range: \$80
   ^---- label
 END
 
