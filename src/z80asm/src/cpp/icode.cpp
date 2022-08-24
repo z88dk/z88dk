@@ -48,9 +48,10 @@ Section::Section(const string& name, Module* module)
 	: m_name(name), m_module(module) {
 }
 
-void Section::push_back(shared_ptr<Icode> node) {
-	node->set_asmpc(asmpc());
-	m_icode.push_back(node);
+void Section::add_instr(shared_ptr<Icode> instr) {
+	instr->set_asmpc(asmpc());
+	instr->set_asmpc_phased(asmpc_phased());
+	m_icode.push_back(instr);
 }
 
 int Section::asmpc() const {
@@ -67,6 +68,20 @@ int Section::asmpc_phased() const {
 		return Icode::UndefinedAsmpc;
 	else
 		return m_icode.back()->asmpc_phased() + m_icode.back()->size();
+}
+
+bool Section::is_phased() const {
+	return asmpc_phased() != Icode::UndefinedAsmpc;
+}
+
+int Section::pc() const {
+	return is_phased() ? asmpc_phased() : asmpc();
+}
+
+shared_ptr<Icode> Section::add_asmpc() {
+	auto instr = make_shared<Icode>(this, Icode::Type::Asmpc);
+	add_instr(instr);
+	return instr;
 }
 
 void Section::add_label(const string& name) {
@@ -93,16 +108,13 @@ string Section::autolabel() {
 void Section::add_label_(const string& name) {
 	auto instr = make_shared<Icode>(this, Icode::Type::Label);
 
-	shared_ptr<Symbol> label;
-	if (asmpc_phased() != Icode::UndefinedAsmpc)
-		label = g_symbols.add(name, asmpc_phased(), Symbol::Type::Constant);
-	else
-		label = g_symbols.add(name, asmpc(), Symbol::Type::Address);
-
-	if (label) {		// no error
+	shared_ptr<Symbol> label = g_symbols.add(name, 0, Symbol::Type::Label);
+	if (label) {		// not duplicate symbol
 		label->set_touched();
+		label->set_instr(instr);
+
 		instr->set_label(label);
-		m_icode.push_back(instr);
+		add_instr(instr);
 	}
 }
 
@@ -124,7 +136,7 @@ void Section::add_opcode(unsigned bytes) {
 	}
 	instr->bytes().push_back(bytes & 0xff);
 
-	m_icode.push_back(instr);
+	add_instr(instr);
 }
 
 void Section::add_opcode_n(unsigned bytes, shared_ptr<Expr> n, PatchExpr::Type type) {
@@ -157,6 +169,87 @@ void Section::add_opcode_idx_(unsigned bytes) {
 	else							// 2 bytes, insert 0 for dis
 		bytes <<= 8;
 	add_opcode(bytes);
+}
+
+void Section::check_relative_jumps() {
+	// decrement B instruction
+	auto dec_b = make_shared<Icode>(this, Icode::Type::Opcode);
+	dec_b->bytes().push_back(Z80_DEC(REG_B));
+
+	bool modified;
+	do {
+		modified = false;
+		recompute_asmpc();
+
+		for (auto it = m_icode.begin(); it != m_icode.end(); ++it) {
+			shared_ptr<Icode> instr = *it;
+			if (instr->type() == Icode::Type::JumpRelative) {
+				shared_ptr<PatchExpr> patch = instr->patches().front();
+				shared_ptr<Expr> expr = patch->expr();
+				if (expr->eval_silent()) {
+					int target = expr->value();
+					int distance = target - (instr->pc() + 2);
+					if (distance < -128 || distance >127) {
+						// convert short to long jump
+						switch (instr->bytes()[0]) {
+						case Z80_JR:
+							instr->set_type(Icode::Type::Opcode);
+							instr->bytes()[0] = Z80_JP;
+							instr->bytes().push_back(0);
+							patch->set_type(PatchExpr::Type::Word);
+							modified = true;
+							continue;
+						case Z80_JR_FLAG(FLAG_NZ):
+						case Z80_JR_FLAG(FLAG_Z):
+						case Z80_JR_FLAG(FLAG_NC):
+						case Z80_JR_FLAG(FLAG_C):
+							instr->set_type(Icode::Type::Opcode);
+							instr->bytes()[0] += Z80_JP_FLAG(0) - Z80_JR_FLAG(0);
+							instr->bytes().push_back(0);
+							patch->set_type(PatchExpr::Type::Word);
+							modified = true;
+							continue;
+						case Z80_DJNZ:	// dec b; jp nz, target
+							m_icode.insert(it, dec_b);
+							instr->set_type(Icode::Type::Opcode);
+							instr->bytes()[0] = Z80_JP_FLAG(FLAG_NZ);
+							instr->bytes().push_back(0);
+							patch->set_type(PatchExpr::Type::Word);
+							modified = true;
+							continue;
+						default:
+							Assert(0);
+						}
+					}
+				}
+			}
+		}
+	} while (modified);
+}
+
+void Section::recompute_asmpc(int start) {
+	update_asmpc(start);
+	g_symbols.update_exprs();
+}
+
+void Section::update_asmpc(int start) {
+	int asmpc = start;
+	int asmpc_phased = Icode::UndefinedAsmpc;
+	for (auto& instr : m_icode) {
+		// set asmpc of instruction
+		instr->set_asmpc(asmpc);
+		if (asmpc_phased == Icode::UndefinedAsmpc &&
+			instr->asmpc_phased() != Icode::UndefinedAsmpc)
+			asmpc_phased = instr->asmpc_phased();
+		else
+			instr->set_asmpc(asmpc_phased);
+
+		// advance to next address
+		int size = instr->size();
+		asmpc += size;
+		if (asmpc_phased != Icode::UndefinedAsmpc)
+			asmpc_phased += size;
+	}
 }
 
 void Section::add_opcode_idx(unsigned bytes, shared_ptr<Expr> dis) {
@@ -226,7 +319,7 @@ void Section::add_jump_relative_(unsigned bytes, shared_ptr<Expr> nn) {
 	auto patch = make_shared<PatchExpr>(nn, PatchExpr::Type::JrOffset, instr->size());
 	instr->patches().push_back(patch);
 
-	m_icode.push_back(instr);
+	add_instr(instr);
 }
 
 //-----------------------------------------------------------------------------
@@ -313,6 +406,11 @@ shared_ptr<Group> Module::insert_group(const string& name) {
 	}
 }
 
+void Module::check_relative_jumps() {
+	for (auto& section : m_sections)
+		section->check_relative_jumps();
+}
+
 //-----------------------------------------------------------------------------
 
 Object::Object(const string& filename) {
@@ -342,4 +440,13 @@ shared_ptr<Module> Object::insert_module(const string& name) {
 		m_cur_module = module;
 		return module;
 	}
+}
+
+const string Object::name() const {
+	return fs::path(m_filename).stem().generic_string();
+}
+
+void Object::check_relative_jumps() {
+	for (auto& module : m_modules)
+		module->check_relative_jumps();
 }

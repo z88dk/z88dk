@@ -105,7 +105,6 @@ void add_copper_unit_nop();
 #define P_IY	(option_swap_ixiy() ? 0xDD00 : 0xFD00)
 
 /* 8-bit registers */
-enum { REG_B, REG_C, REG_D, REG_E, REG_H, REG_L, REG_idx, REG_A, REG_F=6 };
 #define REG_IXH _Z80_ONLY(REG_H)
 #define REG_IYH _Z80_ONLY(REG_H)
 #define REG_IXL _Z80_ONLY(REG_L)
@@ -176,7 +175,6 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_CPL				0x2F
 #define Z80_CP_n			_Z80_ALU_n(ALU_CP)
 #define Z80_DAA				_ZILOG_ONLY(0x27)
-#define Z80_DEC(reg)		(0x05 + ((reg) << 3))
 #define Z80_DEC16(reg)		(0x0B + ((reg) << 4))
 #define Z80_DI				_ZILOG_ONLY(0xF3)
 #define Z80_EI				_ZILOG_ONLY(0xFB)
@@ -187,7 +185,6 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_EX_IND_SP_idx	0xE3	/* (IX) or (IY) */
 #define Z80_HALT			_ZILOG_ONLY(0x76)
 #define Z80_IM(n)			_ZILOG_ONLY(_CHOOSE3_((n), 0, 0xED46, 1, 0xED56, 2, 0xED5E))
-#define Z80_INC(reg)		(0x04 + ((reg) << 3))
 #define Z80_INC16(reg)		(0x03 + ((reg) << 4))
 #define Z80_IND				_ZILOG_ONLY(0xEDAA)
 #define Z80_INDR			_ZILOG_ONLY(0xEDBA)

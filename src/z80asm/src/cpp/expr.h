@@ -18,6 +18,7 @@ class Asm;
 class Lexer;
 class Symbol;
 class Symtab;
+class Icode;
 
 class ExprNode {
 public:
@@ -37,16 +38,19 @@ public:
 
 	ExprNode(int n);
 	ExprNode(shared_ptr<Symbol> symbol);
+	ExprNode(shared_ptr<Icode> instr);
 
 	Type type() const { return m_type; }
 	int value() const { return m_value; }
 	shared_ptr<Symbol> symbol() const { return m_symbol; };
+	shared_ptr<Icode>  instr() const { return m_instr; };
 	shared_ptr<ExprNode> arg(size_t i);
 
 private:
 	Type		m_type{ Type::LeafNumber };	// type of node
 	int			m_value{ 0 };				// for LeafNumber
 	shared_ptr<Symbol> m_symbol;			// for LeafSymbol
+	shared_ptr<Icode>  m_instr;				// for LeafASMPC
 	vector<shared_ptr<ExprNode>> m_args;	// for other operators
 };
 
@@ -57,15 +61,15 @@ public:
 
 	int value() const { return m_value; }
 	ErrCode result() const { return m_result; }
-	const string& text() const { return m_text; }
+	string text() const { return node_text(m_root); }
 	bool is_const() const { return m_is_const; }
 	const Location& location() const { return m_location; }
 
 	bool parse();				// parse expression, leave lexer after expression
 	bool parse_at_end();		// parse expression, issue error if not end of statement
 
-	bool eval_silent(int asmpc);
-	bool eval_noisy(int asmpc);
+	bool eval_silent();
+	bool eval_noisy();
 
 	bool in_parens();
 
@@ -74,8 +78,6 @@ private:
 	shared_ptr<ExprNode> m_root;			// root node of expression
 	int					m_value{ 0 };		// value computed during eval
 	ErrCode				m_result{ ErrCode::Ok };// result computed during eval
-	string				m_text;				// expression text
-	int					m_asmpc{ 0 };		// ASMPC value
 	bool				m_silent{ false };	// silence errors
 	bool				m_is_const{ true };	// is a contant expression
 	bool				m_evaluating{ false };	// detect recursive evals
@@ -104,6 +106,8 @@ private:
 	bool eval();
 	int eval_node(shared_ptr<ExprNode> node);
 	int eval_symbol(shared_ptr<Symbol> symbol);
+
+	string node_text(shared_ptr<ExprNode> node) const;
 };
 
 class PatchExpr {
@@ -122,6 +126,8 @@ public:
 	PatchExpr(shared_ptr<Expr> expr, Type type = Type::UByte, size_t offset = 0);
 
 	Type type() const { return m_type; }
+	void set_type(Type t) { m_type = t; }
+
 	size_t offset() const { return m_offset; }
 	shared_ptr<Expr> expr() { return m_expr; }
 

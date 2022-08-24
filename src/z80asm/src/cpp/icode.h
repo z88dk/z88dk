@@ -32,13 +32,15 @@ public:
 	static inline const int UndefinedAsmpc = -1;
 
 	enum class Type {
-		None, Label, Opcode, JumpRelative,
+		None, Asmpc, Label, Opcode, JumpRelative,
 	};
 
 	Icode(Section* parent, Type type);
 
 	const Section* parent() { return m_parent; }
+
 	Type type() const { return m_type; }
+	void set_type(Type t) { m_type = t; }
 
 	int asmpc() const { return m_asmpc; }
 	void set_asmpc(int n);
@@ -46,7 +48,11 @@ public:
 	int asmpc_phased() const { return m_asmpc_phased; }
 	void set_asmpc_phased(int n) { m_asmpc_phased = n; }
 
-	shared_ptr<Symbol> label() { return m_label; }
+	bool is_phased() const { return m_asmpc_phased != UndefinedAsmpc; }
+	int pc() const { return is_phased() ? m_asmpc_phased : m_asmpc; }
+	void set_pc(int n) { if (is_phased()) m_asmpc_phased = n; else m_asmpc = n; }
+
+	shared_ptr<Symbol> label() { return m_label.lock(); }
 	void set_label(shared_ptr<Symbol> l) { m_label = l; }
 
 	int size() const { return static_cast<int>(m_bytes.size()); }
@@ -61,7 +67,7 @@ private:
 	Type	m_type{ Type::None };
 	int		m_asmpc{ UndefinedAsmpc };
 	int		m_asmpc_phased{ UndefinedAsmpc };
-	shared_ptr<Symbol> m_label;
+	weak_ptr<Symbol> m_label;
 	vector<uint8_t> m_bytes;
 	vector<shared_ptr<PatchExpr>> m_patches;
 	Location m_location;
@@ -71,14 +77,17 @@ class Section {
 public:
 	Section(const string& name, Module* module);
 
-	void push_back(shared_ptr<Icode> node);
+	void add_instr(shared_ptr<Icode> instr);
 
 	const Module* module() { return m_module; }
 	const list<shared_ptr<Icode>>& icode() const { return m_icode; }
 
 	int asmpc() const;
 	int asmpc_phased() const;
+	bool is_phased() const;
+	int pc() const;
 
+	shared_ptr<Icode> add_asmpc();
 	void add_label(const string& name);
 	void add_opcode(unsigned bytes);
 	void add_opcode_n(unsigned bytes, shared_ptr<Expr> n, PatchExpr::Type type);
@@ -90,6 +99,8 @@ public:
 
 	string autolabel();
 
+	void check_relative_jumps();
+
 private:
 	string	m_name;
 	Module*	m_module{ nullptr };
@@ -98,6 +109,9 @@ private:
 	void add_label_(const string& name);
 	void add_jump_relative_(unsigned bytes, shared_ptr<Expr> nn);
 	void add_opcode_idx_(unsigned bytes);
+
+	void recompute_asmpc(int start = 0);
+	void update_asmpc(int start);
 };
 
 class Group {
@@ -136,6 +150,8 @@ public:
 	const list<shared_ptr<Group>>& groups() const { return m_groups; }
 	Symtab& symtab() { return m_symtab; }
 
+	void check_relative_jumps();
+
 private:
 	string	m_name;
 	Object* m_object{ nullptr };
@@ -160,6 +176,9 @@ public:
 
 	const string& filename() const { return m_filename; }
 	const list<shared_ptr<Module>> modules() const { return m_modules; }
+	const string name() const;
+
+	void check_relative_jumps();
 
 private:
 	string m_filename;

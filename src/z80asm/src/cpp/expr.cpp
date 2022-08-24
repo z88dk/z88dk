@@ -5,6 +5,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "asm.h"
 #include "expr.h"
 #include "lex.h"
 #include "preproc.h"
@@ -45,6 +46,10 @@ ExprNode::ExprNode(shared_ptr<Symbol> symbol)
 	: m_type(Type::LeafSymbol), m_symbol(symbol) {
 }
 
+ExprNode::ExprNode(shared_ptr<Icode> instr)
+	: m_type(Type::LeafASMPC), m_instr(instr) {
+}
+
 shared_ptr<ExprNode> ExprNode::arg(size_t i) {
 	Assert(i < m_args.size());
 	return m_args[i];
@@ -59,8 +64,6 @@ void Expr::clear() {
 	m_root = nullptr;
 	m_value = 0;
 	m_result = ErrCode::Ok;
-	m_text.clear();
-	m_asmpc = 0;
 	m_silent = false;
 	m_is_const = true;
 	m_location = g_preproc.location();
@@ -86,14 +89,7 @@ void Expr::error(ErrCode err, const string& text) {
 
 bool Expr::parse() {
 	clear();
-	const char* expr_start = m_lexer.text_ptr();
-	const char* expr_end = expr_start + strlen(expr_start);
-
 	m_root = parse_expr();
-
-	expr_end = m_lexer.text_ptr();
-	m_text = string(expr_start, expr_end);
-
 	return m_result == ErrCode::Ok ? true : false;
 }
 
@@ -112,14 +108,12 @@ bool Expr::parse_at_end() {
 	}
 }
 
-bool Expr::eval_silent(int asmpc) {
-	m_asmpc = asmpc;
+bool Expr::eval_silent() {
 	m_silent = true;
 	return eval();
 }
 
-bool Expr::eval_noisy(int asmpc) {
-	m_asmpc = asmpc;
+bool Expr::eval_noisy() {
 	m_silent = false;
 	return eval();
 }
@@ -384,6 +378,7 @@ shared_ptr<ExprNode> Expr::parse_unary() {
 shared_ptr<ExprNode> Expr::parse_primary() {
 	shared_ptr<ExprNode> node;
 	shared_ptr<Symbol> symbol;
+	shared_ptr<Icode> instr;
 
 	switch (ttype()) {
 	case TType::Ident:
@@ -392,7 +387,8 @@ shared_ptr<ExprNode> Expr::parse_primary() {
 		next();
 		return node;
 	case TType::ASMPC:
-		node = make_shared<ExprNode>(ExprNode::Type::LeafASMPC);
+		instr = g_asm.cur_section()->add_asmpc();
+		node = make_shared<ExprNode>(instr);
 		next();
 		return node;
 	case TType::Integer:
@@ -436,7 +432,7 @@ int Expr::eval_node(shared_ptr<ExprNode> node) {
 
 	case ExprNode::Type::LeafASMPC:
 		m_is_const = false;
-		return m_asmpc;
+		return node->instr()->pc();
 
 	default:;
 	}
@@ -477,12 +473,12 @@ int Expr::eval_node(shared_ptr<ExprNode> node) {
 	case ExprNode::Type::Mult: return a * b;
 	case ExprNode::Type::Div:
 		if (b == 0)
-			throw(ExprException(ErrCode::DivisionByZero, m_text));
+			throw(ExprException(ErrCode::DivisionByZero, text()));
 		return a / b;
 
 	case ExprNode::Type::Mod:
 		if (b == 0)
-			throw(ExprException(ErrCode::DivisionByZero, m_text));
+			throw(ExprException(ErrCode::DivisionByZero, text()));
 		return a % b;
 
 	case ExprNode::Type::Power: return ipow(a, b);
@@ -498,6 +494,13 @@ int Expr::eval_symbol(shared_ptr<Symbol> symbol) {
 	case Symbol::Type::Unknown:
 		throw(ExprException(ErrCode::UndefinedSymbol, symbol->name()));
 
+	case Symbol::Type::Label:
+		m_is_const = false;
+		if (!symbol->is_computed())
+			throw(ExprException(ErrCode::UnknownValue, symbol->name()));
+		else
+			return symbol->instr()->pc();
+
 	case Symbol::Type::Constant:
 		return symbol->value();
 
@@ -510,16 +513,22 @@ int Expr::eval_symbol(shared_ptr<Symbol> symbol) {
 
 	case Symbol::Type::Computed:
 		if (m_evaluating)
-			throw(ExprException(ErrCode::RecursiveExpression, m_text));
+			throw(ExprException(ErrCode::RecursiveExpression, text()));
 		else {
 			// recurse to eval symbol expression
 			m_evaluating = true;
 			{
+				auto subexpr = symbol->expr();
+
 				if (m_silent)
-					symbol->expr()->eval_silent(m_asmpc);
+					subexpr->eval_silent();
 				else
-					symbol->expr()->eval_noisy(m_asmpc);
-				if (!symbol->expr()->is_const())
+					subexpr->eval_noisy();
+
+				if (subexpr->result() != ErrCode::Ok)
+					m_result = subexpr->result();
+
+				if (!subexpr->is_const())
 					m_is_const = false;
 			}
 			m_evaluating = false;
@@ -529,6 +538,45 @@ int Expr::eval_symbol(shared_ptr<Symbol> symbol) {
 
 	Assert(0);	// not reached
 	return 0;
+}
+
+string Expr::node_text(shared_ptr<ExprNode> node) const {
+	if (!node)
+		return string();
+
+	switch (node->type()) {
+	case ExprNode::Type::LeafNumber: return int_to_hex(node->value(), 2); break;
+	case ExprNode::Type::LeafSymbol: return node->symbol()->name(); break;
+	case ExprNode::Type::LeafASMPC: return "$"; break;
+	case ExprNode::Type::TernCond: return node_text(node->arg(0)) + "?"
+		+ node_text(node->arg(1)) + ":" + node_text(node->arg(2)); break;
+	case ExprNode::Type::LogOr: return node_text(node->arg(0)) + "||" + node_text(node->arg(1)); break;
+	case ExprNode::Type::LogXor: return node_text(node->arg(0)) + "^^" + node_text(node->arg(1)); break;
+	case ExprNode::Type::LogAnd: return node_text(node->arg(0)) + "&&" + node_text(node->arg(1)); break;
+	case ExprNode::Type::BinOr: return node_text(node->arg(0)) + "|" + node_text(node->arg(1)); break;
+	case ExprNode::Type::BinXor: return node_text(node->arg(0)) + "^" + node_text(node->arg(1)); break;
+	case ExprNode::Type::BinAnd: return node_text(node->arg(0)) + "&" + node_text(node->arg(1)); break;
+	case ExprNode::Type::Lt: return node_text(node->arg(0)) + "<" + node_text(node->arg(1)); break;
+	case ExprNode::Type::Le: return node_text(node->arg(0)) + "<=" + node_text(node->arg(1)); break;
+	case ExprNode::Type::Gt: return node_text(node->arg(0)) + ">" + node_text(node->arg(1)); break;
+	case ExprNode::Type::Ge: return node_text(node->arg(0)) + ">=" + node_text(node->arg(1)); break;
+	case ExprNode::Type::Eq: return node_text(node->arg(0)) + "=" + node_text(node->arg(1)); break;
+	case ExprNode::Type::Ne: return node_text(node->arg(0)) + "<>" + node_text(node->arg(1)); break;
+	case ExprNode::Type::LShift: return node_text(node->arg(0)) + "<<" + node_text(node->arg(1)); break;
+	case ExprNode::Type::RShift: return node_text(node->arg(0)) + ">>" + node_text(node->arg(1)); break;
+	case ExprNode::Type::Plus: return node_text(node->arg(0)) + "+" + node_text(node->arg(1)); break;
+	case ExprNode::Type::Minus: return node_text(node->arg(0)) + "-" + node_text(node->arg(1)); break;
+	case ExprNode::Type::Mult: return node_text(node->arg(0)) + "*" + node_text(node->arg(1)); break;
+	case ExprNode::Type::Div: return node_text(node->arg(0)) + "/" + node_text(node->arg(1)); break;
+	case ExprNode::Type::Mod: return node_text(node->arg(0)) + "%" + node_text(node->arg(1)); break;
+	case ExprNode::Type::Power: return node_text(node->arg(0)) + "**" + node_text(node->arg(1)); break;
+	case ExprNode::Type::UnaryPlus: return string("+") + node_text(node->arg(0)); break;
+	case ExprNode::Type::UnaryMinus: return string("-") + node_text(node->arg(0)); break;
+	case ExprNode::Type::LogNot: return string("!") + node_text(node->arg(0)); break;
+	case ExprNode::Type::BinNot: return string("~") + node_text(node->arg(0)); break;
+	case ExprNode::Type::Parens: return string("(") + node_text(node->arg(0)) + ")"; break;
+	default: Assert(0); return string(); // not reached
+	}
 }
 
 PatchExpr::PatchExpr(shared_ptr<Expr> expr, Type type, size_t offset)

@@ -23,6 +23,7 @@ public:
 	enum class Type {
 		Unknown,					// not known yet
 		Constant,					// constant value
+		Label,						// label
 		Address,					// address computed at link time
 		Computed,					// DEFC computed at link time
 	};
@@ -45,6 +46,9 @@ public:
 
 	shared_ptr<Expr> expr() { return m_expr; }
 	void set_expr(shared_ptr<Expr> e) { m_expr = e; }
+
+	shared_ptr<Icode> instr() { return m_instr.lock(); }
+	void set_instr(shared_ptr<Icode> i) { m_instr = i; }
 
 	Type type() const { return m_type; }
 	void set_type(Type t) { m_type = t; }
@@ -77,6 +81,7 @@ private:
 	string	m_name;					// name
 	int		m_value{ 0 };			// value if constant or evaluated if computed or address
 	shared_ptr<Expr> m_expr;		// DEFC expression
+	weak_ptr<Icode>  m_instr;		// LABEL
 
 	Type	m_type{ Type::Unknown };
 	Scope	m_scope{ Scope::Local };
@@ -125,6 +130,7 @@ public:
 	shared_ptr<Symbol> update(const string& name, int value, Symbol::Type type);
 
 	void declare(const string& name, Symbol::Scope scope);
+	void update_exprs();
 
 private:
 	Symtab	m_defines;
@@ -141,6 +147,9 @@ private:
 	void declare_global(const string& name);
 	void declare_public(const string& name);
 	void declare_extern(const string& name);
+
+	void update_exprs(shared_ptr<Symbol> symbol);
+
 };
 
 extern Symbols g_symbols;

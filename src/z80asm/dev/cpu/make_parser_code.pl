@@ -181,7 +181,7 @@ void Parser::$function() {
 		case 2:		// const expression
 			expr = make_shared<Expr>(m_lexer); 
 			if (expr->parse()) {
-				if (expr->eval_silent(0) && expr->is_const()) {
+				if (expr->eval_silent() && expr->is_const()) {
 					m_exprs.push_back(expr);
 					if (next < 0) {
 						${function}_action(-next);

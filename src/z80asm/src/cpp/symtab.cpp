@@ -226,6 +226,13 @@ void Symbols::declare(const string& name, Symbol::Scope scope) {
 	}
 }
 
+void Symbols::update_exprs() {
+	for (auto& it : m_globals)
+		update_exprs(it.second);
+	for (auto& it : g_asm.cur_module()->symtab())
+		update_exprs(it.second);
+}
+
 void Symbols::declare_global(const string& name) {
 	auto symbol = find_local(name);
 	if (!symbol) {						// not local
@@ -341,6 +348,16 @@ void Symbols::declare_extern(const string& name) {
 		}
 		else {							// re-declaration not allowed
 			g_errors.error(ErrCode::SymbolRedeclaration, name);
+		}
+	}
+}
+
+void Symbols::update_exprs(shared_ptr<Symbol> symbol) {
+	if (symbol->type() == Symbol::Type::Computed) {
+		auto expr = symbol->expr();
+		if (expr->eval_silent()) {
+			symbol->set_value(expr->value());
+			symbol->set_computed();
 		}
 	}
 }

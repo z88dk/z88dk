@@ -22,7 +22,7 @@ bool Asm::assemble(const string& filename) {
 
 	// create object and default module, section and group
 	m_object = make_shared<Object>(filename);
-	set_cur_module("");
+	set_cur_module(m_object->name());
 	set_cur_group("");
 	set_cur_section("");
 
@@ -47,6 +47,10 @@ void Asm::assemble1(const string& filename) {
 		return;
 
 	m_parser.parse();
+	if (got_errors())
+		return;
+
+	m_object->check_relative_jumps();
 	if (got_errors())
 		return;
 

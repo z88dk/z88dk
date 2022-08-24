@@ -7,6 +7,7 @@
 
 #include "args.h"
 #include "asm.h"
+#include "asm.h"
 #include "errors.h"
 #include "parse.h"
 #include "preproc.h"
