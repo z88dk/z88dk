@@ -7,6 +7,11 @@ use File::Copy;
 
 # Test loading of z88dk-z80asm-*.lib
 
+# locartion of default library
+my $default_lib_path = ($^O eq 'MSWin32') ?
+	"c:/z88dk/lib" :
+	"/usr/local/share/z88dk/lib";
+
 # check our RLD code is compiling
 
 my @RLD_AT_0004 = map {hex} qw( 
@@ -122,7 +127,7 @@ run_nok("z88dk-z80asm -b -v ../${test}.asm > ../${test}.out 2> ../${test}.err");
 
 check_text_file("../${test}.out", <<END);
 Library 'z88dk-z80asm-z80-.lib' not found
-Library '/usr/local/share/z88dk/lib/z88dk-z80asm-z80-.lib' not found
+Library '$default_lib_path/z88dk-z80asm-z80-.lib' not found
 Predefined constant: __CPU_Z80__ = 1
 Predefined constant: __CPU_ZILOG__ = 1
 Predefined constant: __FLOAT_GENMATH__ = 1
