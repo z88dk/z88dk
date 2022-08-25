@@ -5,7 +5,7 @@ pushd %dir%
 set today=%date%
 set today=%today:-=%
 rem if not exist config.h (
-  echo #define PREFIX "/usr/local/share/z88dk"	>  config.h
+  echo #define PREFIX "c:/z88dk/lib"	>  config.h
   echo #define Z88DK_VERSION "MSC build-%today%"	>> config.h
   echo Created %dir%\config.h
 rem ) else (
