@@ -54,6 +54,10 @@ void Asm::assemble1(const string& filename) {
 	if (got_errors())
 		return;
 
+	m_object->patch_local_exprs();
+	if (got_errors())
+		return;
+
 }
 
 void Asm::set_cur_module(const string& name) {

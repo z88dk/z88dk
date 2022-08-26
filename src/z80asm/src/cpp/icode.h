@@ -100,6 +100,7 @@ public:
 	string autolabel();
 
 	void check_relative_jumps();
+	void patch_local_exprs();
 
 private:
 	string	m_name;
@@ -110,8 +111,7 @@ private:
 	void add_jump_relative_(unsigned bytes, shared_ptr<Expr> nn);
 	void add_opcode_idx_(unsigned bytes);
 
-	void recompute_asmpc(int start = 0);
-	void update_asmpc(int start);
+	void update_asmpc(int start = 0);
 };
 
 class Group {
@@ -151,6 +151,7 @@ public:
 	Symtab& symtab() { return m_symtab; }
 
 	void check_relative_jumps();
+	void patch_local_exprs();
 
 private:
 	string	m_name;
@@ -179,6 +180,7 @@ public:
 	const string name() const;
 
 	void check_relative_jumps();
+	void patch_local_exprs();
 
 private:
 	string m_filename;

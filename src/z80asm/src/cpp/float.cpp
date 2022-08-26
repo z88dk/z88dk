@@ -406,14 +406,14 @@ double FloatExpr::parse_multiplication() {
 	double a = parse_power();
 	if (m_parse_error) return 0.0;
 
-	while (m_lexer.peek().is(TType::Mul, TType::Div)) {
+	while (m_lexer.peek().is(TType::Mult, TType::Div)) {
 		TType op = m_lexer.peek().ttype;
 		m_lexer.next();
 
 		double b = parse_power();
 		if (m_parse_error) return 0.0;
 
-		if (op == TType::Mul)
+		if (op == TType::Mult)
 			a *= b;
 		else if (b == 0.0) {
 			m_eval_error = true;		// division by zero
@@ -429,7 +429,7 @@ double FloatExpr::parse_power() {
 	double a = parse_unary();
 	if (m_parse_error) return 0.0;
 
-	while (m_lexer.peek().is(TType::Pow)) {
+	while (m_lexer.peek().is(TType::Power)) {
 		m_lexer.next();
 
 		double b = parse_power();

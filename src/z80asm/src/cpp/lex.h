@@ -33,7 +33,7 @@ enum class TType {
 	End, Newline, Backslash, 
 	Ident, Label, Integer, Floating, String, ASMPC,
 	BinNot, LogNot, BinAnd, LogAnd, BinOr, LogOr, BinXor, LogXor,
-	Plus, Minus, Mul, Pow, Div, Mod,
+	Plus, Minus, Mult, Power, Div, Mod,
 	Eq, Ne, Lt, Le, Gt, Ge, LShift, RShift,
 	Quest, Colon, Dot, Comma, Hash, DblHash,
 	LParen, RParen, LSquare, RSquare, LBrace, RBrace,

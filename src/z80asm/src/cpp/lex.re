@@ -261,10 +261,10 @@ void Lexer::set(const string& text) {
 			')'				{ m_tokens.emplace_back(TType::RParen);
 							  m_tokens.back().col = col;
 							  continue; }
-			'*'				{ m_tokens.emplace_back(TType::Mul);
+			'*'				{ m_tokens.emplace_back(TType::Mult);
 							  m_tokens.back().col = col;
 							  continue; }
-			'**'			{ m_tokens.emplace_back(TType::Pow);
+			'**'			{ m_tokens.emplace_back(TType::Power);
 							  m_tokens.back().col = col;
 							  continue; }
 			'+'				{ m_tokens.emplace_back(TType::Plus);

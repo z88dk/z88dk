@@ -286,3 +286,16 @@ void expand_glob(vector<fs::path>& result, const string& pattern) {
 	for (auto& file : files) 
 		result.push_back(file.generic_string());
 }
+
+int ipow(int base, int exp) {
+	int result = 1;
+	for (;;) {
+		if (exp & 1)
+			result *= base;
+		exp >>= 1;
+		if (!exp)
+			break;
+		base *= base;
+	}
+	return result;
+}

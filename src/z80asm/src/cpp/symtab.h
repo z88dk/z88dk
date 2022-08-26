@@ -56,9 +56,6 @@ public:
 	Scope scope() const { return m_scope; }
 	void set_scope(Scope s) { m_scope = s; }
 
-	bool is_computed() const { return m_is_computed; }
-	void set_computed(bool f = true) { m_is_computed = f; }
-
 	bool is_defined() const { return m_is_defined; }
 	void set_defined(bool f = true) { m_is_defined = f; }
 
@@ -86,7 +83,6 @@ private:
 	Type	m_type{ Type::Unknown };
 	Scope	m_scope{ Scope::Local };
 
-	bool	m_is_computed{ false };	// true if Type::Computed or Type::Address and value computed
 	bool	m_is_defined{ false };	// true if defined
 	bool	m_is_touched{ false };	// true if used and shall be writen to the object file
 	bool	m_is_global_def{ false }; // true for __head, __tail, __size symbols
@@ -127,10 +123,8 @@ public:
 
 	shared_ptr<Symbol> get_used(const string& name);
 	shared_ptr<Symbol> add(const string& name, int value, Symbol::Type type);
-	shared_ptr<Symbol> update(const string& name, int value, Symbol::Type type);
 
 	void declare(const string& name, Symbol::Scope scope);
-	void update_exprs();
 
 private:
 	Symtab	m_defines;
@@ -147,9 +141,6 @@ private:
 	void declare_global(const string& name);
 	void declare_public(const string& name);
 	void declare_extern(const string& name);
-
-	void update_exprs(shared_ptr<Symbol> symbol);
-
 };
 
 extern Symbols g_symbols;

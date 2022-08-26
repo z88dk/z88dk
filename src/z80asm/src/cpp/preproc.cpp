@@ -1080,8 +1080,8 @@ ExpandedText Preproc::expand(Lexer& lexer, Macros& defines) {
 		case TType::LogXor: out.append("^^"); break;
 		case TType::Plus: out.append("+"); break;
 		case TType::Minus: out.append("-"); break;
-		case TType::Mul: out.append("*"); break;
-		case TType::Pow: out.append("**"); break;
+		case TType::Mult: out.append("*"); break;
+		case TType::Power: out.append("**"); break;
 		case TType::Div: out.append("/"); break;
 		case TType::Mod: out.append("%"); break;
 		case TType::Eq: out.append("="); break;

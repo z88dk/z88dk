@@ -15,19 +15,6 @@
 #include <cstring>
 using namespace std;
 
-static int ipow(int base, int exp) {
-	int result = 1;
-	for (;;) {
-		if (exp & 1)
-			result *= base;
-		exp >>= 1;
-		if (!exp)
-			break;
-		base *= base;
-	}
-	return result;
-}
-
 ExprNode::ExprNode(Type type,
 	shared_ptr<ExprNode> arg1,
 	shared_ptr<ExprNode> arg2,
@@ -305,7 +292,7 @@ shared_ptr<ExprNode> Expr::parse_multiplication() {
 	shared_ptr<ExprNode> node = parse_power();
 	while (true) {
 		switch (ttype()) {
-		case TType::Mul:
+		case TType::Mult:
 			next();
 			node = make_shared<ExprNode>(ExprNode::Type::Mult,
 				node, parse_power());
@@ -328,7 +315,7 @@ shared_ptr<ExprNode> Expr::parse_multiplication() {
 
 shared_ptr<ExprNode> Expr::parse_power() {
 	shared_ptr<ExprNode> node = parse_unary();
-	if (ttype() == TType::Pow) {
+	if (ttype() == TType::Power) {
 		next();
 		node = make_shared<ExprNode>(ExprNode::Type::Power,
 			node, parse_power());
@@ -494,22 +481,16 @@ int Expr::eval_symbol(shared_ptr<Symbol> symbol) {
 	case Symbol::Type::Unknown:
 		throw(ExprException(ErrCode::UndefinedSymbol, symbol->name()));
 
-	case Symbol::Type::Label:
-		m_is_const = false;
-		if (!symbol->is_computed())
-			throw(ExprException(ErrCode::UnknownValue, symbol->name()));
-		else
-			return symbol->instr()->pc();
-
 	case Symbol::Type::Constant:
 		return symbol->value();
 
+	case Symbol::Type::Label:
+		m_is_const = false;
+		return symbol->instr()->pc();
+
 	case Symbol::Type::Address:
 		m_is_const = false;
-		if (!symbol->is_computed())
-			throw(ExprException(ErrCode::UnknownValue, symbol->name()));
-		else
-			return symbol->value();
+		return symbol->value();
 
 	case Symbol::Type::Computed:
 		if (m_evaluating)

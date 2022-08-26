@@ -200,22 +200,6 @@ shared_ptr<Symbol> Symbols::add(const string& name, int value, Symbol::Type type
 	}
 }
 
-// update a symbol value, used to compute EQU symbols
-shared_ptr<Symbol> Symbols::update(const string& name, int value, Symbol::Type type) {
-	auto symbol = find_local(name);
-	if (!symbol)
-		symbol = find_global(name);
-	if (!symbol) {
-		g_errors.error(ErrCode::UndefinedSymbol, name);
-		return nullptr;
-	}
-
-	symbol->set_value(value);
-	symbol->set_type(type);
-	symbol->set_computed();
-	return symbol;
-}
-
 void Symbols::declare(const string& name, Symbol::Scope scope) {
 	switch (scope) {
 	case Symbol::Scope::Global: declare_global(name); return;
@@ -224,13 +208,6 @@ void Symbols::declare(const string& name, Symbol::Scope scope) {
 	case Symbol::Scope::Local: Assert(0); return;
 	default: Assert(0); return;
 	}
-}
-
-void Symbols::update_exprs() {
-	for (auto& it : m_globals)
-		update_exprs(it.second);
-	for (auto& it : g_asm.cur_module()->symtab())
-		update_exprs(it.second);
 }
 
 void Symbols::declare_global(const string& name) {
@@ -348,16 +325,6 @@ void Symbols::declare_extern(const string& name) {
 		}
 		else {							// re-declaration not allowed
 			g_errors.error(ErrCode::SymbolRedeclaration, name);
-		}
-	}
-}
-
-void Symbols::update_exprs(shared_ptr<Symbol> symbol) {
-	if (symbol->type() == Symbol::Type::Computed) {
-		auto expr = symbol->expr();
-		if (expr->eval_silent()) {
-			symbol->set_value(expr->value());
-			symbol->set_computed();
 		}
 	}
 }

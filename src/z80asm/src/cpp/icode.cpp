@@ -179,7 +179,7 @@ void Section::check_relative_jumps() {
 	bool modified;
 	do {
 		modified = false;
-		recompute_asmpc();
+		update_asmpc();
 
 		for (auto it = m_icode.begin(); it != m_icode.end(); ++it) {
 			shared_ptr<Icode> instr = *it;
@@ -227,9 +227,12 @@ void Section::check_relative_jumps() {
 	} while (modified);
 }
 
-void Section::recompute_asmpc(int start) {
-	update_asmpc(start);
-	g_symbols.update_exprs();
+void Section::patch_local_exprs() {
+	/*
+	for (auto& instr : m_icode) {
+
+	}
+	*/
 }
 
 void Section::update_asmpc(int start) {
@@ -411,6 +414,11 @@ void Module::check_relative_jumps() {
 		section->check_relative_jumps();
 }
 
+void Module::patch_local_exprs() {
+	for (auto& section : m_sections)
+		section->patch_local_exprs();
+}
+
 //-----------------------------------------------------------------------------
 
 Object::Object(const string& filename) {
@@ -449,4 +457,9 @@ const string Object::name() const {
 void Object::check_relative_jumps() {
 	for (auto& module : m_modules)
 		module->check_relative_jumps();
+}
+
+void Object::patch_local_exprs() {
+	for (auto& module : m_modules)
+		module->patch_local_exprs();
 }

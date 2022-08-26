@@ -55,6 +55,9 @@ istream& safe_getline(istream& is, string& t);
 // globs a pattern including *, ? and ** and returns all matching files and directories
 void expand_glob(vector<fs::path>& result, const string& pattern);
 
+// integer power function
+int ipow(int base, int exp);
+
 // convert int to hex
 // https://stackoverflow.com/questions/5100718/integer-to-hex-string-in-c
 template<typename T>

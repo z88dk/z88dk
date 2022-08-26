@@ -1115,7 +1115,7 @@ yy115:
 			default:	goto yy116;
 			}
 yy116:
-			{ m_tokens.emplace_back(TType::Mul);
+			{ m_tokens.emplace_back(TType::Mult);
 							  m_tokens.back().col = col;
 							  continue; }
 yy117:
@@ -1715,7 +1715,7 @@ yy198:
 			}
 yy199:
 			++p;
-			{ m_tokens.emplace_back(TType::Pow);
+			{ m_tokens.emplace_back(TType::Power);
 							  m_tokens.back().col = col;
 							  continue; }
 yy201:
