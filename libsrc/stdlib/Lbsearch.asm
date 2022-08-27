@@ -35,9 +35,9 @@ EXTERN l_jpix
 
 .slice
    push hl      ; Get the address at the halfway index + the base address
-   sra h
-   rr l
-   add hl,hl
+   ld a, $fe
+   and l
+   ld l,a
    add hl,de
 
 .compare            ; is key < datum?
