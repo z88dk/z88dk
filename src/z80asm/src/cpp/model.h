@@ -8,7 +8,7 @@
 #pragma once
 
 #include "lex.h"
-#include "model_expr.h"
+#include "expr.h"
 #include "utils.h"
 #include <list>
 #include <unordered_map>
@@ -107,41 +107,3 @@ private:
 	list<shared_ptr<Section>> m_sections;
 	unordered_map<string, shared_ptr<Section>> m_section_map;
 };
-
-
-
-
-
-
-
-
-
-
-class Patch {
-public:
-	enum class Type {
-		UByte, SByte,					// unsigned and signed bytes
-		Word, BEWord,					// word and big-endian word (2 bytes)
-		Ptr24,							// poiter (3 bytes)
-		Dword,							// double word (4 bytes)
-		JrOffset,						// jump relative offset
-		UByte2Word,						// unsigned byte extended to 16 bits
-		SByte2Word,						// signed byte extended to 16 bits
-		HighOffset,						// byte offset to 0xFF00 
-	};
-
-	Patch(shared_ptr<Expr> expr, Type type = Type::UByte, size_t offset = 0);
-
-	Type type() const { return m_type; }
-	void set_type(Type t) { m_type = t; }
-
-	size_t offset() const { return m_offset; }
-	shared_ptr<Expr> expr() { return m_expr; }
-
-private:
-	Type	m_type;						// type of patch
-	size_t	m_offset;					// offset to start of instruction to patch
-	shared_ptr<Expr>	m_expr;			// expression to compute
-
-};
-

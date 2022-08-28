@@ -836,7 +836,7 @@ string Lexer::token_text(int offset) const {
 
 Token& Lexer::peek(int offset) {
 	static Token end{ TType::End };
-	size_t index = m_pos + offset;
+	unsigned index = m_pos + offset;
 	if (index >= m_tokens.size())
 		return end;
 	else
@@ -846,7 +846,7 @@ Token& Lexer::peek(int offset) {
 void Lexer::next(int n) {
 	m_pos += n;
 	if (m_pos > m_tokens.size())
-		m_pos = m_tokens.size();
+		m_pos = static_cast<unsigned>(m_tokens.size());
 }
 
 void Lexer::set(const string& text) {
@@ -856,7 +856,7 @@ void Lexer::set(const string& text) {
 	const char* p = text.c_str(), * YYMARKER{ nullptr };
 	while (true) {
 		const char* p0{ p }, * p1{ nullptr }, * p2{ nullptr }, * yyt1{ nullptr };
-		size_t col = p - text.c_str();
+		unsigned col = static_cast<unsigned>(p - text.c_str());
 		bool first_token = m_tokens.empty();
 		
 		{

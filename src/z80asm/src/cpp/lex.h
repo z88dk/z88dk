@@ -50,7 +50,7 @@ struct Token {
 	string  svalue;
 	double	fvalue{ 0.0 };
 	Keyword	keyword{ Keyword::None };
-	size_t	col{ 0 };
+	unsigned col{ 0 };
 
 	Token(TType ttype = TType::End, int ivalue = 0)
 		: ttype(ttype), ivalue(ivalue) {}
@@ -83,12 +83,12 @@ public:
 	const string& text() const { return m_text; }
 	const char* text_ptr(int offset = 0) const;
 	string token_text(int offset = 0) const;
-	size_t size() const { return m_tokens.size(); }
+	unsigned size() const { return static_cast<unsigned>(m_tokens.size()); }
 
 	void rewind() { m_pos = 0; }
 	bool at_end() const { return m_pos >= m_tokens.size(); }
-	size_t pos() const { return m_pos; }
-	void set_pos(size_t pos) { m_pos = pos; }
+	unsigned pos() const { return m_pos; }
+	void set_pos(unsigned pos) { m_pos = pos; }
 
 	Token& peek(int offset = 0);			// 0: current; 1: next; -1: previous
 	void next(int n = 1);
@@ -96,5 +96,5 @@ public:
 private:
 	string			m_text;
 	vector<Token>	m_tokens;
-	size_t			m_pos;
+	unsigned		m_pos;
 };

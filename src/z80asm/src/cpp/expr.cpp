@@ -5,56 +5,569 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#include "asm.h"
-#include "expr.h"
-#include "lex.h"
+#include "model.h"
 #include "preproc.h"
-#include "symtab.h"
 #include "utils.h"
-#include <exception>
-#include <cstring>
 using namespace std;
 
-ExprNode::ExprNode(Type type,
-	shared_ptr<ExprNode> arg1,
-	shared_ptr<ExprNode> arg2,
-	shared_ptr<ExprNode> arg3)
-	: m_type(type) {
-	if (arg1) m_args.push_back(arg1);
-	if (arg2) m_args.push_back(arg2);
-	if (arg3) m_args.push_back(arg3);
+ExprResult::ExprResult(int value)
+	: m_value(value) {}
+
+ExprResult ExprResult::merge(const ExprResult& a, const ExprResult& b) {
+	ExprResult r;
+
+	if (a.m_depends_on_asmpc || b.m_depends_on_asmpc)
+		r.m_depends_on_asmpc = true;
+
+	for (auto& symbol : a.m_depends_on_symbols)
+		r.m_depends_on_symbols.insert(symbol);
+	for (auto& symbol : b.m_depends_on_symbols)
+		r.m_depends_on_symbols.insert(symbol);
+
+	if (a.m_division_by_zero || b.m_division_by_zero)
+		r.m_division_by_zero = true;
+
+	return r;
 }
 
-ExprNode::ExprNode(int n)
-	: m_type(Type::LeafNumber), m_value(n) {
+//-----------------------------------------------------------------------------
+
+ConstNode::ConstNode(int value)
+	: m_value(value) {}
+
+ExprResult ConstNode::value() const {
+	return ExprResult(m_value);
 }
 
-ExprNode::ExprNode(shared_ptr<Symbol> symbol)
-	: m_type(Type::LeafSymbol), m_symbol(symbol) {
+string ConstNode::text() const {
+	return int_to_hex(m_value, 2);
 }
 
-ExprNode::ExprNode(shared_ptr<Icode> instr)
-	: m_type(Type::LeafASMPC), m_instr(instr) {
+//-----------------------------------------------------------------------------
+
+SymbolNode::SymbolNode(shared_ptr<Symbol> symbol)
+	: m_symbol(symbol) {}
+
+ExprResult SymbolNode::value() const {
+	return ExprResult(0);
+	// TODO: return m_symbol.lock()->value();
+	// TODO: depends_on
 }
 
-shared_ptr<ExprNode> ExprNode::arg(size_t i) {
-	Assert(i < m_args.size());
-	return m_args[i];
+string SymbolNode::text() const {
+	return string();
+	// TODO: return m_symbol.lock()->name();
 }
 
-Expr::Expr(Lexer& lexer)
-	: m_lexer(lexer) {
-	clear();
+//-----------------------------------------------------------------------------
+
+AsmpcNode::AsmpcNode(shared_ptr<Instr> instr)
+	: m_instr(instr) {}
+
+ExprResult AsmpcNode::value() const {
+	return ExprResult(0);
+	/* TODO
+	auto instr = m_instr.lock();
+	Result r(instr->pc());
+	if (instr->is_phased())
+		return r;		// is constant
+	else {
+		r.set_depends_on_asmpc();
+		return r;
+	}
+	*/
 }
 
-void Expr::clear() {
-	m_root = nullptr;
-	m_value = 0;
-	m_result = ErrCode::Ok;
-	m_silent = false;
-	m_is_const = true;
-	m_location = g_preproc.location();
+string AsmpcNode::text() const {
+	return "$";
 }
+
+//-----------------------------------------------------------------------------
+
+TernCondNode::TernCondNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b, shared_ptr<ExprNode> c) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+	m_args.push_back(c);
+}
+
+ExprResult TernCondNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult rc = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, ExprResult::merge(rb, rc));
+	r.set_value(ra.value() ? rb.value() : rc.value());
+	return r;
+}
+
+string TernCondNode::text() const {
+	return m_args[0]->text() + "?" + m_args[1]->text() + ":" + m_args[2]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+LogOrNode::LogOrNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult LogOrNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(!!ra.value() || !!rb.value());
+	return r;
+}
+
+string LogOrNode::text() const {
+	return m_args[0]->text() + "||" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+LogXorNode::LogXorNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult LogXorNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(!!ra.value() != !!rb.value());
+	return r;
+}
+
+string LogXorNode::text() const {
+	return m_args[0]->text() + "^^" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+LogAndNode::LogAndNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult LogAndNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(!!ra.value() && !!rb.value());
+	return r;
+}
+
+string LogAndNode::text() const {
+	return m_args[0]->text() + "&&" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+BinOrNode::BinOrNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult BinOrNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() | rb.value());
+	return r;
+}
+
+string BinOrNode::text() const {
+	return m_args[0]->text() + "|" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+BinXorNode::BinXorNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult BinXorNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() ^ rb.value());
+	return r;
+}
+
+string BinXorNode::text() const {
+	return m_args[0]->text() + "^" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+BinAndNode::BinAndNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult BinAndNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() & rb.value());
+	return r;
+}
+
+string BinAndNode::text() const {
+	return m_args[0]->text() + "&" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+LtNode::LtNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult LtNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() < rb.value());
+	return r;
+}
+
+string LtNode::text() const {
+	return m_args[0]->text() + "<" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+LeNode::LeNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult LeNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() <= rb.value());
+	return r;
+}
+
+string LeNode::text() const {
+	return m_args[0]->text() + "<=" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+GtNode::GtNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult GtNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() > rb.value());
+	return r;
+}
+
+string GtNode::text() const {
+	return m_args[0]->text() + ">" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+GeNode::GeNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult GeNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() >= rb.value());
+	return r;
+}
+
+string GeNode::text() const {
+	return m_args[0]->text() + ">=" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+EqNode::EqNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult EqNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() == rb.value());
+	return r;
+}
+
+string EqNode::text() const {
+	return m_args[0]->text() + "==" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+NeNode::NeNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult NeNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() != rb.value());
+	return r;
+}
+
+string NeNode::text() const {
+	return m_args[0]->text() + "!=" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+LShiftNode::LShiftNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult LShiftNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() << rb.value());
+	return r;
+}
+
+string LShiftNode::text() const {
+	return m_args[0]->text() + "<<" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+RShiftNode::RShiftNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult RShiftNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() >> rb.value());
+	return r;
+}
+
+string RShiftNode::text() const {
+	return m_args[0]->text() + ">>" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+PlusNode::PlusNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult PlusNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() + rb.value());
+	return r;
+}
+
+string PlusNode::text() const {
+	return m_args[0]->text() + "+" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+MinusNode::MinusNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult MinusNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() - rb.value());
+	return r;
+}
+
+string MinusNode::text() const {
+	return m_args[0]->text() + "-" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+MultNode::MultNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult MultNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ra.value() * rb.value());
+	return r;
+}
+
+string MultNode::text() const {
+	return m_args[0]->text() + "*" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+DivNode::DivNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult DivNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	if (rb.value() == 0) 
+		r.set_division_by_zero();
+	else 
+		r.set_value(ra.value() / rb.value());
+	return r;
+}
+
+string DivNode::text() const {
+	return m_args[0]->text() + "/" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+ModNode::ModNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult ModNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	if (rb.value() == 0) 
+		r.set_division_by_zero();
+	else 
+		r.set_value(ra.value() % rb.value());
+	return r;
+}
+
+string ModNode::text() const {
+	return m_args[0]->text() + "%" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+PowerNode::PowerNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
+	m_args.push_back(a);
+	m_args.push_back(b);
+}
+
+ExprResult PowerNode::value() const {
+	ExprResult ra = m_args[0]->value();
+	ExprResult rb = m_args[0]->value();
+	ExprResult r = ExprResult::merge(ra, rb);
+	r.set_value(ipow(ra.value(), rb.value()));
+	return r;
+}
+
+string PowerNode::text() const {
+	return m_args[0]->text() + "**" + m_args[1]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+UnaryPlusNode::UnaryPlusNode(shared_ptr<ExprNode> a) {
+	m_args.push_back(a);
+}
+
+ExprResult UnaryPlusNode::value() const {
+	ExprResult r = m_args[0]->value();
+	return r;
+}
+
+string UnaryPlusNode::text() const {
+	return string("+") + m_args[0]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+UnaryMinusNode::UnaryMinusNode(shared_ptr<ExprNode> a) {
+	m_args.push_back(a);
+}
+
+ExprResult UnaryMinusNode::value() const {
+	ExprResult r = m_args[0]->value();
+	r.set_value(-r.value());
+	return r;
+}
+
+string UnaryMinusNode::text() const {
+	return string("-") + m_args[0]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+LogNotNode::LogNotNode(shared_ptr<ExprNode> a) {
+	m_args.push_back(a);
+}
+
+ExprResult LogNotNode::value() const {
+	ExprResult r = m_args[0]->value();
+	r.set_value(!r.value());
+	return r;
+}
+
+string LogNotNode::text() const {
+	return string("!") + m_args[0]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+BinNotNode::BinNotNode(shared_ptr<ExprNode> a) {
+	m_args.push_back(a);
+}
+
+ExprResult BinNotNode::value() const {
+	ExprResult r = m_args[0]->value();
+	r.set_value(~r.value());
+	return r;
+}
+
+string BinNotNode::text() const {
+	return string("~") + m_args[0]->text();
+}
+
+//-----------------------------------------------------------------------------
+
+ParensNode::ParensNode(shared_ptr<ExprNode> a) {
+	m_args.push_back(a);
+}
+
+ExprResult ParensNode::value() const {
+	ExprResult r = m_args[0]->value();
+	return r;
+}
+
+string ParensNode::text() const {
+	return string("(") + m_args[0]->text() + ")";
+}
+
+//-----------------------------------------------------------------------------
 
 class ExprException : public exception {
 public:
@@ -68,56 +581,51 @@ private:
 	string	m_text;
 };
 
-void Expr::error(ErrCode err, const string& text) {
-	m_result = err;
-	if (!m_silent)
-		g_errors.error(m_result, text);
+//-----------------------------------------------------------------------------
+
+Expr::Expr(Lexer& lexer)
+	: m_lexer(lexer) {
+	clear();
+}
+
+void Expr::clear() {
+	m_root = nullptr;
+	m_location = g_preproc.location();
+}
+
+string Expr::text() const {
+	if (m_root)
+		return m_root->text();
+	else
+		return string();
 }
 
 bool Expr::parse() {
 	clear();
 	m_root = parse_expr();
-	return m_result == ErrCode::Ok ? true : false;
-}
 
-bool Expr::parse_at_end() {
-	if (!parse())
-		return false;
-
-	// check for end of statement
-	switch (ttype()) {
-	case TType::End:
-	case TType::Newline:
+	if (m_root)
 		return true;
-	default:
-		error(ErrCode::SyntaxExpr, m_lexer.text_ptr());
+	else
 		return false;
-	}
-}
-
-bool Expr::eval_silent() {
-	m_silent = true;
-	return eval();
-}
-
-bool Expr::eval_noisy() {
-	m_silent = false;
-	return eval();
-}
-
-bool Expr::in_parens() {
-	return m_root && m_root->type() == ExprNode::Type::Parens;
 }
 
 shared_ptr<ExprNode> Expr::parse_expr() {
 	shared_ptr<ExprNode> node;
+	bool ok = true;
+
 	try {
 		node = parse_ternary_condition();
 	}
 	catch (ExprException& e) {
-		error(e.err(), e.text());
+		g_errors.error(e.err(), e.text());
+		ok = false;
 	}
-	return node;
+
+	if (ok)
+		return node;
+	else
+		return nullptr;
 }
 
 shared_ptr<ExprNode> Expr::parse_ternary_condition() {
@@ -128,8 +636,7 @@ shared_ptr<ExprNode> Expr::parse_ternary_condition() {
 		if (ttype() == TType::Colon) {
 			next();
 			shared_ptr<ExprNode> f = parse_ternary_condition();
-			node = make_shared<ExprNode>(ExprNode::Type::TernCond,
-				node, t, f);
+			node = make_shared<TernCondNode>(node, t, f);
 		}
 		else {
 			throw ExprException(ErrCode::ColonExpected, m_lexer.text_ptr());
@@ -144,13 +651,11 @@ shared_ptr<ExprNode> Expr::parse_logical_or() {
 		switch (ttype()) {
 		case TType::LogOr:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::LogOr,
-				node, parse_logical_and());
+			node = make_shared<LogOrNode>(node, parse_logical_and());
 			break;
 		case TType::LogXor:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::LogXor,
-				node, parse_logical_and());
+			node = make_shared<LogXorNode>(node, parse_logical_and());
 			break;
 		default:
 			return node;
@@ -164,8 +669,7 @@ shared_ptr<ExprNode> Expr::parse_logical_and() {
 		switch (ttype()) {
 		case TType::LogAnd:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::LogAnd,
-				node, parse_binary_or());
+			node = make_shared<LogAndNode>(node, parse_binary_or());
 			break;
 		default:
 			return node;
@@ -179,13 +683,11 @@ shared_ptr<ExprNode> Expr::parse_binary_or() {
 		switch (ttype()) {
 		case TType::BinOr:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::BinOr,
-				node, parse_binary_and());
+			node = make_shared<BinOrNode>(node, parse_binary_and());
 			break;
 		case TType::BinXor:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::BinXor,
-				node, parse_binary_and());
+			node = make_shared<BinXorNode>(node, parse_binary_and());
 			break;
 		default:
 			return node;
@@ -199,8 +701,7 @@ shared_ptr<ExprNode> Expr::parse_binary_and() {
 		switch (ttype()) {
 		case TType::BinAnd:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::BinAnd,
-				node, parse_condition());
+			node = make_shared<BinAndNode>(node, parse_condition());
 			break;
 		default:
 			return node;
@@ -214,33 +715,27 @@ shared_ptr<ExprNode> Expr::parse_condition() {
 		switch (ttype()) {
 		case TType::Lt:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::Lt,
-				node, parse_shift());
+			node = make_shared<LtNode>(node, parse_shift());
 			break;
 		case TType::Le:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::Le,
-				node, parse_shift());
+			node = make_shared<LeNode>(node, parse_shift());
 			break;
 		case TType::Gt:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::Gt,
-				node, parse_shift());
+			node = make_shared<GtNode>(node, parse_shift());
 			break;
 		case TType::Ge:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::Ge,
-				node, parse_shift());
+			node = make_shared<GeNode>(node, parse_shift());
 			break;
 		case TType::Eq:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::Eq,
-				node, parse_shift());
+			node = make_shared<EqNode>(node, parse_shift());
 			break;
 		case TType::Ne:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::Ne,
-				node, parse_shift());
+			node = make_shared<NeNode>(node, parse_shift());
 			break;
 		default:
 			return node;
@@ -254,13 +749,11 @@ shared_ptr<ExprNode> Expr::parse_shift() {
 		switch (ttype()) {
 		case TType::LShift:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::LShift,
-				node, parse_addition());
+			node = make_shared<LShiftNode>(node, parse_addition());
 			break;
 		case TType::RShift:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::RShift,
-				node, parse_addition());
+			node = make_shared<RShiftNode>(node, parse_addition());
 			break;
 		default:
 			return node;
@@ -274,13 +767,11 @@ shared_ptr<ExprNode> Expr::parse_addition() {
 		switch (ttype()) {
 		case TType::Plus:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::Plus,
-				node, parse_multiplication());
+			node = make_shared<PlusNode>(node, parse_multiplication());
 			break;
 		case TType::Minus:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::Minus,
-				node, parse_multiplication());
+			node = make_shared<MinusNode>(node, parse_multiplication());
 			break;
 		default:
 			return node;
@@ -294,18 +785,15 @@ shared_ptr<ExprNode> Expr::parse_multiplication() {
 		switch (ttype()) {
 		case TType::Mult:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::Mult,
-				node, parse_power());
+			node = make_shared<MultNode>(node, parse_power());
 			break;
 		case TType::Div:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::Div,
-				node, parse_power());
+			node = make_shared<DivNode>(node, parse_power());
 			break;
 		case TType::Mod:
 			next();
-			node = make_shared<ExprNode>(ExprNode::Type::Mod,
-				node, parse_power());
+			node = make_shared<ModNode>(node, parse_power());
 			break;
 		default:
 			return node;
@@ -317,8 +805,7 @@ shared_ptr<ExprNode> Expr::parse_power() {
 	shared_ptr<ExprNode> node = parse_unary();
 	if (ttype() == TType::Power) {
 		next();
-		node = make_shared<ExprNode>(ExprNode::Type::Power,
-			node, parse_power());
+		node = make_shared<PowerNode>(node, parse_power());
 	}
 	return node;
 }
@@ -328,35 +815,30 @@ shared_ptr<ExprNode> Expr::parse_unary() {
 	switch (ttype()) {
 	case TType::Minus:
 		next();
-		return make_shared<ExprNode>(ExprNode::Type::UnaryMinus,
-			parse_unary());
+		return make_shared<UnaryMinusNode>(parse_unary());
 	case TType::Plus:
 		next();
-		return make_shared<ExprNode>(ExprNode::Type::UnaryPlus,
-			parse_unary());
+		return make_shared<UnaryPlusNode>(parse_unary());
 	case TType::LogNot:
 		next();
-		return make_shared<ExprNode>(ExprNode::Type::LogNot,
-			parse_unary());
+		return make_shared<LogNotNode>(parse_unary());
 	case TType::BinNot:
 		next();
-		return make_shared<ExprNode>(ExprNode::Type::BinNot,
-			parse_unary());
+		return make_shared<BinNotNode>(parse_unary());
 	case TType::LParen:
 		next();
 		node = parse_expr();
 		if (ttype() != TType::RParen)
-			throw ExprException(ErrCode::UnbalancedParens,
-				m_lexer.text_ptr());
+			throw ExprException(ErrCode::UnbalancedParens, m_lexer.text_ptr());
 		next();
-		return make_shared<ExprNode>(ExprNode::Type::Parens, node);
+		return make_shared<ParensNode>(node);
 	case TType::LSquare:
 		next();
 		node = parse_expr();
-		throw ExprException(ErrCode::UnbalancedParens,
-			m_lexer.text_ptr());
+		if (ttype() != TType::RSquare)
+			throw ExprException(ErrCode::UnbalancedParens, m_lexer.text_ptr());
 		next();
-		return make_shared<ExprNode>(ExprNode::Type::Parens, node);
+		return make_shared<ParensNode>(node);
 	default:
 		return parse_primary();
 	}
@@ -365,21 +847,21 @@ shared_ptr<ExprNode> Expr::parse_unary() {
 shared_ptr<ExprNode> Expr::parse_primary() {
 	shared_ptr<ExprNode> node;
 	shared_ptr<Symbol> symbol;
-	shared_ptr<Icode> instr;
+	shared_ptr<Instr> instr;
 
 	switch (ttype()) {
 	case TType::Ident:
-		symbol = g_symbols.get_used(token().svalue);
-		node = make_shared<ExprNode>(symbol);
+		// TODO symbol = g_symbols.get_used(token().svalue);
+		// TODO node = make_shared<SymbolNode>(symbol);
 		next();
 		return node;
 	case TType::ASMPC:
-		instr = g_asm.cur_section()->add_asmpc();
-		node = make_shared<ExprNode>(instr);
+		// TODO instr = g_asm.cur_section()->add_asmpc();
+		// TODO node = make_shared<AsmpcNode>(instr);
 		next();
 		return node;
 	case TType::Integer:
-		node = make_shared<ExprNode>(token().ivalue);
+		node = make_shared<ConstNode>(token().ivalue);
 		next();
 		return node;
 	default:
@@ -388,178 +870,39 @@ shared_ptr<ExprNode> Expr::parse_primary() {
 	}
 }
 
-bool Expr::eval() {
-	m_value = 0;
-	m_result = ErrCode::Ok;
-	m_is_const = true;
-
-	try {
-		m_value = eval_node(m_root);
-	}
-	catch (ExprException& e) {
-		g_errors.push_location(m_location);
-		error(e.err(), e.text());
-		g_errors.pop_location();
-	}
-
-	return m_result == ErrCode::Ok ? true : false;
+ExprResult Expr::eval_silent() const {
+	if (m_root == nullptr)
+		return ExprResult();
+	else
+		return m_root->value();
 }
 
-int Expr::eval_node(shared_ptr<ExprNode> node) {
-	if (!node)				// empty expression
-		return 0;
+ExprResult Expr::eval_noisy() const {
+	ExprResult r = eval_silent();
 
-	// nodes without arguments
-	switch (node->type()) {
-	case ExprNode::Type::LeafNumber:
-		return node->value();
+	g_errors.push_location(m_location);
+	if (r.depends_on_symbols())
+		g_errors.error(ErrCode::UndefinedSymbol /*, TODO::SymbolName*/);
+	g_errors.pop_location();
 
-	case ExprNode::Type::LeafSymbol:
-		return eval_symbol(node->symbol());
-
-	case ExprNode::Type::LeafASMPC:
-		m_is_const = false;
-		return node->instr()->pc();
-
-	default:;
-	}
-
-	// nodes with one argument and ternary condition
-	int a = eval_node(node->arg(0));
-	switch (node->type()) {
-	case ExprNode::Type::TernCond:
-		return a ? eval_node(node->arg(1)) : eval_node(node->arg(2));
-
-	case ExprNode::Type::UnaryPlus:	return a;
-	case ExprNode::Type::UnaryMinus: return -a;
-	case ExprNode::Type::LogNot: return !a;
-	case ExprNode::Type::BinNot: return ~a;
-	case ExprNode::Type::Parens: return a;
-	default:;
-	}
-
-	// nodes with two arguments
-	int b = eval_node(node->arg(1));
-	switch (node->type()) {
-	case ExprNode::Type::LogOr: return a || b;
-	case ExprNode::Type::LogXor: return a != b;
-	case ExprNode::Type::LogAnd: return a && b;
-	case ExprNode::Type::BinOr: return a | b;
-	case ExprNode::Type::BinXor: return a ^ b;
-	case ExprNode::Type::BinAnd: return a & b;
-	case ExprNode::Type::Lt: return a < b;
-	case ExprNode::Type::Le: return a <= b;
-	case ExprNode::Type::Gt: return a > b;
-	case ExprNode::Type::Ge: return a >= b;
-	case ExprNode::Type::Eq: return a == b;
-	case ExprNode::Type::Ne: return a != b;
-	case ExprNode::Type::LShift: return a << b;
-	case ExprNode::Type::RShift: return a >> b;
-	case ExprNode::Type::Plus: return a + b;
-	case ExprNode::Type::Minus: return a - b;
-	case ExprNode::Type::Mult: return a * b;
-	case ExprNode::Type::Div:
-		if (b == 0)
-			throw(ExprException(ErrCode::DivisionByZero, text()));
-		return a / b;
-
-	case ExprNode::Type::Mod:
-		if (b == 0)
-			throw(ExprException(ErrCode::DivisionByZero, text()));
-		return a % b;
-
-	case ExprNode::Type::Power: return ipow(a, b);
-	default:;
-	}
-
-	Assert(0); // not reached
-	return 0;
+	return r;
 }
 
-int Expr::eval_symbol(shared_ptr<Symbol> symbol) {
-	switch (symbol->type()) {
-	case Symbol::Type::Unknown:
-		throw(ExprException(ErrCode::UndefinedSymbol, symbol->name()));
-
-	case Symbol::Type::Constant:
-		return symbol->value();
-
-	case Symbol::Type::Label:
-		m_is_const = false;
-		return symbol->instr()->pc();
-
-	case Symbol::Type::Address:
-		m_is_const = false;
-		return symbol->value();
-
-	case Symbol::Type::Computed:
-		if (m_evaluating)
-			throw(ExprException(ErrCode::RecursiveExpression, text()));
-		else {
-			// recurse to eval symbol expression
-			m_evaluating = true;
-			{
-				auto subexpr = symbol->expr();
-
-				if (m_silent)
-					subexpr->eval_silent();
-				else
-					subexpr->eval_noisy();
-
-				if (subexpr->result() != ErrCode::Ok)
-					m_result = subexpr->result();
-
-				if (!subexpr->is_const())
-					m_is_const = false;
-			}
-			m_evaluating = false;
-			return symbol->expr()->value();
-		}
-	}
-
-	Assert(0);	// not reached
-	return 0;
+bool Expr::in_parens() const {
+	return m_root && m_root->type() == ExprNode::Type::Parens;
 }
 
-string Expr::node_text(shared_ptr<ExprNode> node) const {
-	if (!node)
-		return string();
-
-	switch (node->type()) {
-	case ExprNode::Type::LeafNumber: return int_to_hex(node->value(), 2); break;
-	case ExprNode::Type::LeafSymbol: return node->symbol()->name(); break;
-	case ExprNode::Type::LeafASMPC: return "$"; break;
-	case ExprNode::Type::TernCond: return node_text(node->arg(0)) + "?"
-		+ node_text(node->arg(1)) + ":" + node_text(node->arg(2)); break;
-	case ExprNode::Type::LogOr: return node_text(node->arg(0)) + "||" + node_text(node->arg(1)); break;
-	case ExprNode::Type::LogXor: return node_text(node->arg(0)) + "^^" + node_text(node->arg(1)); break;
-	case ExprNode::Type::LogAnd: return node_text(node->arg(0)) + "&&" + node_text(node->arg(1)); break;
-	case ExprNode::Type::BinOr: return node_text(node->arg(0)) + "|" + node_text(node->arg(1)); break;
-	case ExprNode::Type::BinXor: return node_text(node->arg(0)) + "^" + node_text(node->arg(1)); break;
-	case ExprNode::Type::BinAnd: return node_text(node->arg(0)) + "&" + node_text(node->arg(1)); break;
-	case ExprNode::Type::Lt: return node_text(node->arg(0)) + "<" + node_text(node->arg(1)); break;
-	case ExprNode::Type::Le: return node_text(node->arg(0)) + "<=" + node_text(node->arg(1)); break;
-	case ExprNode::Type::Gt: return node_text(node->arg(0)) + ">" + node_text(node->arg(1)); break;
-	case ExprNode::Type::Ge: return node_text(node->arg(0)) + ">=" + node_text(node->arg(1)); break;
-	case ExprNode::Type::Eq: return node_text(node->arg(0)) + "=" + node_text(node->arg(1)); break;
-	case ExprNode::Type::Ne: return node_text(node->arg(0)) + "<>" + node_text(node->arg(1)); break;
-	case ExprNode::Type::LShift: return node_text(node->arg(0)) + "<<" + node_text(node->arg(1)); break;
-	case ExprNode::Type::RShift: return node_text(node->arg(0)) + ">>" + node_text(node->arg(1)); break;
-	case ExprNode::Type::Plus: return node_text(node->arg(0)) + "+" + node_text(node->arg(1)); break;
-	case ExprNode::Type::Minus: return node_text(node->arg(0)) + "-" + node_text(node->arg(1)); break;
-	case ExprNode::Type::Mult: return node_text(node->arg(0)) + "*" + node_text(node->arg(1)); break;
-	case ExprNode::Type::Div: return node_text(node->arg(0)) + "/" + node_text(node->arg(1)); break;
-	case ExprNode::Type::Mod: return node_text(node->arg(0)) + "%" + node_text(node->arg(1)); break;
-	case ExprNode::Type::Power: return node_text(node->arg(0)) + "**" + node_text(node->arg(1)); break;
-	case ExprNode::Type::UnaryPlus: return string("+") + node_text(node->arg(0)); break;
-	case ExprNode::Type::UnaryMinus: return string("-") + node_text(node->arg(0)); break;
-	case ExprNode::Type::LogNot: return string("!") + node_text(node->arg(0)); break;
-	case ExprNode::Type::BinNot: return string("~") + node_text(node->arg(0)); break;
-	case ExprNode::Type::Parens: return string("(") + node_text(node->arg(0)) + ")"; break;
-	default: Assert(0); return string(); // not reached
+bool Expr::is_const() const {
+	if (!m_root)
+		return true;
+	else {
+		ExprResult r = eval_silent();
+		return r.is_const();
 	}
 }
 
-PatchExpr::PatchExpr(shared_ptr<Expr> expr, Type type, size_t offset)
-	: m_type(type), m_offset(offset), m_expr(expr) {
-}
+//-----------------------------------------------------------------------------
+
+Patch::Patch(shared_ptr<Expr> expr, int offset)
+	: m_expr(expr), m_offset(offset) {}
+

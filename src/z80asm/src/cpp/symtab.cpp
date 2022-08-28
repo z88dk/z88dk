@@ -5,6 +5,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#if 0
+
 #include "args.h"
 #include "asm.h"
 #include "errors.h"
@@ -349,3 +351,5 @@ void symtab_insert_global_def(const char* name, int value) {
 		define_global_def_sym(name, value);
 	}
 }
+
+#endif

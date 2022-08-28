@@ -684,11 +684,11 @@ void Preproc::do_binary() {
 
 				while (!ifs.eof()) {
 					ifs.read(reinterpret_cast<char*>(bytes), line_len);
-					size_t num_read = static_cast<size_t>(ifs.gcount());
+					unsigned num_read = static_cast<unsigned>(ifs.gcount());
 					if (num_read > 0) {
 						string line = "defb ";
 						string separator = "";
-						for (size_t i = 0; i < num_read; i++) {
+						for (unsigned i = 0; i < num_read; i++) {
 							line += separator + std::to_string(bytes[i]);
 							separator = ",";
 						}
@@ -706,12 +706,12 @@ void Preproc::do_define() {
 		g_errors.error(ErrCode::Syntax);
 	else {
 		// get name
-		size_t name_col = m_lexer.peek().col;
+		unsigned name_col = m_lexer.peek().col;
 		string name = m_lexer.peek().svalue;
 		m_lexer.next();
 
 		// check if name is followed by '(' without spaces
-		size_t this_col = m_lexer.peek().col;
+		unsigned this_col = m_lexer.peek().col;
 		bool has_space = (this_col > name_col + name.length());
 		bool has_args = (!has_space && m_lexer.peek().is(TType::LParen));
 
@@ -822,7 +822,7 @@ void Preproc::do_macro_call(shared_ptr<Macro> macro) {
 	m_levels.emplace_back(&defines());
 
 	// create macros in the new level for each argument
-	for (size_t i = 0; i < macro->args().size(); i++) {
+	for (unsigned i = 0; i < macro->args().size(); i++) {
 		string arg = macro->args()[i];
 		string param = i < params.size() ? params[i] : "";
 		shared_ptr<Macro> param_macro = make_shared<Macro>(arg, param);
@@ -1121,7 +1121,7 @@ string Preproc::expand(const string& text) {
 }
 
 void Preproc::expand_ident(ExpandedText& out, const string& ident, Lexer& lexer, Macros& defines) {
-	size_t pos = lexer.pos();
+	unsigned pos = lexer.pos();
 	ExpandedText expanded = expand_define_call(ident, lexer, defines);
 	if (expanded.got_error()) {
 		lexer.set_pos(pos);
@@ -1159,7 +1159,7 @@ ExpandedText Preproc::expand_define_call(const string& name, Lexer& lexer, Macro
 
 	// create macros for each argument
 	Macros sub_defines{ defines };				// create scope for arguments
-	for (size_t i = 0; i < macro->args().size(); i++) {
+	for (unsigned i = 0; i < macro->args().size(); i++) {
 		string arg = macro->args()[i];
 		string param = i < params.size() ? params[i] : "";
 		shared_ptr<Macro> param_macro = make_shared<Macro>(arg, param);
