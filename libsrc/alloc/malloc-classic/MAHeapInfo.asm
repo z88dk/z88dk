@@ -14,27 +14,29 @@ PUBLIC MAHeapInfo
 
    ld de,0                   ; de = total available bytes in heap
    ld bc,0                   ; bc = largest single block available
-   
+
    inc hl
    inc hl
-   
+
 .loop
 
    ld a,(hl)
    inc hl
    ld h,(hl)
    ld l,a                    ; hl = & block
-   
+
    or h
-   ret z                     ; if no more blocks, all done
-   
+   ret Z                     ; if no more blocks, all done
+
    ld a,(hl)
    inc hl
    push hl                   ; save & block->size + 1b
    ld h,(hl)
    ld l,a                    ; hl = block size
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
+IF __CPU_8085__
+   sub hl,bc
+ELIF __CPU_8080__ || __CPU_GBZ80
    ld a,l
    sub c
    ld l,a
@@ -44,16 +46,16 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
 ELSE
    sbc hl,bc
 ENDIF
+
    add hl,bc
-   jr c, notbigger
-   ld c,l
-   ld b,h                    ; bc = new largest block size
-   
+   jr C,notbigger
+   ld bc,hl                   ; bc = new largest block size
+
 .notbigger
 
    add hl,de
    ex de,hl                  ; de = add this block size into total bytes available
-   
+
    pop hl
    inc hl
    jp loop
