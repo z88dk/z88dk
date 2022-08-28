@@ -35,9 +35,7 @@ EXTERN l_jpix
 
 .slice
    push hl      ; Get the address at the halfway index + the base address
-   ld a, $fe
-   and l
-   ld l,a
+   res 0,l      ; Integer division of hl by 2 (to get the midpoint item index) then multiply it 2 because each pointer is 2 bytes.
    add hl,de
 
 .compare            ; is key < datum?
