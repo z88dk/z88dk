@@ -25,7 +25,7 @@
 	ld h,d
 	ld l,e
 	inc	de
-	
+        ld      (hl),0	
 	ld	bc,10239
 	ldir
 	
