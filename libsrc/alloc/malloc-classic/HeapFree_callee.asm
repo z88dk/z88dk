@@ -166,9 +166,7 @@ ENDIF
    ; de = & block to free
    ; stack = & lagger->next
 
-IF __CPU_8085__
-   sub hl,bc
-ELIF __CPU_8080__ || __CPU_GBZ80
+IF __CPU_INTEL__ || __CPU_GBZ80
    ld a,l
    sub e
    ld l,a

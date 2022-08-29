@@ -4,14 +4,14 @@
 ; the compiled program and the stack pointer
 
 ; It works only with a _heap pointer defined somewhere else in the crt0.
-; Such (long) pointer will hold, at startup, the (word) value of ASMTAIL
+; Such (long) pointer will hold, at startup, the (word) value of __tail
 ; that points to the last used byte in the compiled program:
 
 ;IF DEFINED_USING_amalloc
-;EXTERN ASMTAIL
+;EXTERN __tail
 ;PUBLIC _heap
 ;._heap
-;   defw ASMTAIL    ; Location of the last program byte
+;   defw __tail    ; Location of the last program byte
 ;   defw 0
 ;ENDIF
 
@@ -24,7 +24,7 @@ ELSE
     ld      hl,sp
 ENDIF
     ; HL must hold SP or the end of free memory
-    push    hl
+    ex      de,hl
 
     ld      hl,_heap
     ld      c,(hl)
@@ -37,7 +37,7 @@ ENDIF
     dec     hl
     ld      (hl),a
 
-    pop     hl      ; sp
+    ex      de,hl   ; sp or the end of free memory
 
 IF __CPU_8085__
     sub     hl,bc   ; hl = total free memory
