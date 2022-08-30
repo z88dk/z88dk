@@ -33,8 +33,6 @@ ifdef(`CFG_ASM_PUB',
 PUBLIC `__HBIOS'
 PUBLIC `__HBIOS_VERS'
 
-PUBLIC `__CPU_CLOCK'
-
 PUBLIC `__CLOCKS_PER_SECOND'
 ')
 
@@ -61,8 +59,6 @@ ifdef(`CFG_C_DEF',
 `#undef'  `__HBIOS'
 `#define' `__HBIOS'  __HBIOS
 `#define' `__HBIOS_VERS'  __HBIOS_VERS
-
-`#define' `__CPU_CLOCK'  __CPU_CLOCK
 
 `#define' `__CLOCKS_PER_SECOND' __CLOCKS_PER_SECOND
 ')

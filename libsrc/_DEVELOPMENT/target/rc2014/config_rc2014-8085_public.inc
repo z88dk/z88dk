@@ -21,7 +21,7 @@ PUBLIC __Z88DK
 
 
 
-defc __Z88DK = 2100
+defc __Z88DK = 2200
 
 
 
@@ -32,8 +32,6 @@ defc __Z88DK = 2100
 
 
 PUBLIC __RC2014
-
-PUBLIC __CPU_CLOCK
 
 PUBLIC __IO_DIO_PORT
 PUBLIC __IO_CF_PORT

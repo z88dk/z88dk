@@ -75,20 +75,20 @@ RESULTS
 
 
 1.
-Z88DK April 20, 2020
-zsdcc #11566 / classic c library
-2978 bytes less page zero
+Z88DK August 28, 2022
+zsdcc #13131 / classic c library
+3536 bytes less page zero
 
-cycle count  = 150508687
-time @ 4MHz  = 150508687 / 4*10^6 = 37.63 sec
+cycle count  = 150118736
+time @ 4MHz  = 150118736 / 4*10^6 = 37.52 sec
 
 2.
-Z88DK January 3, 2022
+Z88DK August 28, 2022
 sccz80 / classic c library
 3800 bytes less page zero
 
-cycle count  = 145559470
-time @ 4MHz  = 145559470 / 4*10^6 = 36.39 sec
+cycle count  = 145563150
+time @ 4MHz  = 145563150 / 4*10^6 = 36.39 sec
 
 3.
 SDCC 4.2.0 Linux

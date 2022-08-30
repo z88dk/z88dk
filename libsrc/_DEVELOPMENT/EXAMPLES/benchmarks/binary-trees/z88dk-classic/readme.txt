@@ -40,7 +40,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks bt.bin -start 0214 -end 0391 -counter 999999999999
+z88dk-ticks bt.bin -x bt.map -start TIMER_START -end TIMER_END -counter 999999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -52,25 +52,25 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK January 3, 2022
+Z88DK August 28, 2022
 classic/sccz80/8085
 3831 bytes less page zero
 
-cycle count  = 156017339
-time @ 4MHz  = 156017339 / 4*10^6 = 39.00 sec
+cycle count  = 156020673
+time @ 4MHz  = 156020673 / 4*10^6 = 39.00 sec
 
 
-Z88DK January 3, 2022
+Z88DK August 28, 2022
 classic/sccz80
 3800 bytes less page zero
 
-cycle count  = 145559470
-time @ 4MHz  = 145559470 / 4*10^6 = 36.39 sec
+cycle count  = 145563150
+time @ 4MHz  = 145563150 / 4*10^6 = 36.39 sec
 
 
-Z88DK April 20, 2020
-classic / zsdcc #11566
-2978 bytes less page zero
+Z88DK August 28, 2020
+classic / zsdcc #13131
+3536 bytes less page zero
 
-cycle count  = 150508687
-time @ 4MHz  = 150508687 / 4*10^6 = 37.63 sec
+cycle count  = 150118736
+time @ 4MHz  = 150118736 / 4*10^6 = 37.52 sec

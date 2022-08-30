@@ -4,6 +4,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#pragma once
+
 #include "if.h"
 #include "lex.h"
 #include <cstdint>
@@ -22,8 +24,8 @@ public:
 private:
 	Lexer& m_lexer;
 	double m_value{ 0.0 };
-	bool   m_parse_error{ false };	// expression cound not be parsed
-	bool   m_eval_error{ false };	// expression cound not be evaluated
+	bool   m_parse_error{ false };	// expression could not be parsed
+	bool   m_eval_error{ false };	// expression could not be evaluated
 
 	double parse_expr();
 	double parse_addition();

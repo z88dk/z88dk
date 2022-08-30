@@ -13,6 +13,3 @@
 [submodule "ext/regex"]
 	path = ext/regex
 	url = https://github.com/geoffmcl/regex.git
-[submodule "ext/cpm"]
-	path = ext/cpm
-	url = https://github.com/z88dk/cpm.git

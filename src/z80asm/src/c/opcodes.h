@@ -11,50 +11,48 @@ Define CPU opcodes
 
 #pragma once
 
-#include "options.h"
-
 /* forward declaration without include cycle */
-struct Expr;
+struct Expr1;
 
 /* add 1 to 4 bytes opcode opcode to object code 
 *  bytes in big-endian format, e.g. 0xED46 */
 void add_opcode(int opcode);
 
 /* add opcode followed by jump relative offset expression */
-void add_opcode_jr(int opcode, struct Expr *expr);
-void add_opcode_jr_n(int opcode, struct Expr* expr, int asmpc_offset);
+void add_opcode_jr(int opcode, struct Expr1 *expr);
+void add_opcode_jr_n(int opcode, struct Expr1* expr, int asmpc_offset);
 
 /* add opcode followed by 8-bit unsigned expression */
-void add_opcode_n(int opcode, struct Expr *expr);
+void add_opcode_n(int opcode, struct Expr1 *expr);
 
 /* add opcode followed by 8-bit offset to 0xff00 expression */
-void add_opcode_h(int opcode, struct Expr* expr);
+void add_opcode_h(int opcode, struct Expr1* expr);
 
 /* add opcode followed by 8-bit unsigned expression and a zero byte */
-void add_opcode_n_0(int opcode, struct Expr* expr);
+void add_opcode_n_0(int opcode, struct Expr1* expr);
 
 /* add opcode followed by 8-bit signed expression and a zero or 0xff byte depending on sign */
-void add_opcode_s_0(int opcode, struct Expr* expr);
+void add_opcode_s_0(int opcode, struct Expr1* expr);
 
 /* add opcode followed by 8-bit signed expression */
-void add_opcode_d(int opcode, struct Expr *expr);
+void add_opcode_d(int opcode, struct Expr1 *expr);
 
 /* add opcode followed by 16-bit expression */
-void add_opcode_nn(int opcode, struct Expr *expr);
+void add_opcode_nn(int opcode, struct Expr1 *expr);
 
 /* add opcode followed by big-endian 16-bit expression */
-void add_opcode_NN(int opcode, struct Expr *expr);
+void add_opcode_NN(int opcode, struct Expr1 *expr);
 
 /* add opcode followed by IX/IY offset expression */
-void add_opcode_idx(int opcode, struct Expr *expr);
+void add_opcode_idx(int opcode, struct Expr1 *expr);
 
 /* add opcode followed by IX/IY offset expression and 8 bit expression */
-void add_opcode_idx_n(int opcode, struct Expr *idx_expr,
-										 struct Expr *n_expr );
+void add_opcode_idx_n(int opcode, struct Expr1 *idx_expr,
+										 struct Expr1 *n_expr );
 
 /* add opcode followed by two 8-bit expressions */
-void add_opcode_n_n(int opcode, struct Expr *n1_expr,
-									   struct Expr *n2_expr );
+void add_opcode_n_n(int opcode, struct Expr1 *n1_expr,
+									   struct Expr1 *n2_expr );
 
 /* call emulation function by name */
 void add_call_emul_func(char *emul_func);
@@ -66,32 +64,32 @@ void add_Z88_FPP(int argument);
 void add_Z88_INVOKE(int argument);
 
 /* add COPPER UNIT opcodes (ZX Next) */
-void add_copper_unit_wait(struct Expr *ver, struct Expr *hor);
-void add_copper_unit_move(struct Expr *reg, struct Expr *val);
+void add_copper_unit_wait(struct Expr1 *ver, struct Expr1 *hor);
+void add_copper_unit_move(struct Expr1 *reg, struct Expr1 *val);
 void add_copper_unit_stop();
 void add_copper_unit_nop();
 
 /* assert we are on a Z80 */
-#define _Z80_ONLY(x)		(!(opts.cpu & (CPU_Z80|CPU_Z80N)) ? \
+#define _Z80_ONLY(x)		(!(option_cpu() & (CPU_Z80|CPU_Z80N)) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _EXCEPT_Z80(x)		((opts.cpu & (CPU_Z80|CPU_Z80N)) ? \
+#define _EXCEPT_Z80(x)		((option_cpu() & (CPU_Z80|CPU_Z80N)) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _Z180_ONLY(x)		(!(opts.cpu & CPU_Z180) ? \
+#define _Z180_ONLY(x)		(!(option_cpu() & CPU_Z180) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _RCM2000_ONLY(x)	(!(opts.cpu & CPU_R2KA) ? \
+#define _RCM2000_ONLY(x)	(!(option_cpu() & CPU_R2KA) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _RCM3000_ONLY(x)	(!(opts.cpu & CPU_R3K) ? \
+#define _RCM3000_ONLY(x)	(!(option_cpu() & CPU_R3K) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
 
-#define _ZILOG_ONLY(x)		(!(opts.cpu & CPU_ZILOG) ? \
+#define _ZILOG_ONLY(x)		(!(option_cpu() & CPU_ZILOG) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
-#define _RABBIT_ONLY(x)		(!(opts.cpu & CPU_RABBIT) ? \
+#define _RABBIT_ONLY(x)		(!(option_cpu() & CPU_RABBIT) ? \
 								(error_illegal_ident(), 0) : \
 								(x))
 
@@ -101,8 +99,8 @@ void add_copper_unit_nop();
 #define P_HL	0
 #define P_AF	0
 #define P_SP	0
-#define P_IX	(opts.swap_ix_iy ? 0xFD00 : 0xDD00)
-#define P_IY	(opts.swap_ix_iy ? 0xDD00 : 0xFD00)
+#define P_IX	(option_swap_ixiy() ? 0xFD00 : 0xDD00)
+#define P_IY	(option_swap_ixiy() ? 0xDD00 : 0xFD00)
 
 /* Flags constants */
 enum { FLAG_NZ, FLAG_Z, FLAG_NC, FLAG_C, FLAG_PO_LZ, FLAG_PE_LO, FLAG_P, FLAG_M };
@@ -160,7 +158,7 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 /* choose RST opcode */
 #define _RST_ARG(n)			((n) < 0 || (n) > 0x38 || (((n) & 7) != 0) ? \
 								(error_int_range(n),0) : \
-								((opts.cpu & CPU_RABBIT) && \
+								((option_cpu() & CPU_RABBIT) && \
 									((n) == 0 || (n) == 8 || (n) == 0x30) ? \
 										(error_illegal_ident(),0) : \
 										0xC7 + (n)))
@@ -197,7 +195,7 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 #define Z80_EXX				0xD9
 #define Z80_EX_AF_AF		0x08
 #define Z80_EX_DE_HL		0xEB
-#define Z80_EX_IND_SP_HL	((opts.cpu & CPU_RABBIT) ? 0xED54 : 0xE3)
+#define Z80_EX_IND_SP_HL	((option_cpu() & CPU_RABBIT) ? 0xED54 : 0xE3)
 #define Z80_EX_IND_SP_idx	0xE3	/* (IX) or (IY) */
 #define Z80_HALT			_ZILOG_ONLY(0x76)
 #define Z80_IM(n)			_ZILOG_ONLY(_CHOOSE3_((n), 0, 0xED46, 1, 0xED56, 2, 0xED5E))
@@ -286,9 +284,9 @@ enum { BRS_BIT = 0x40, BRS_RES = 0x80, BRS_SET = 0xC0 };
 
 /* Z180 opcodes */
 #define Z80_SLP				_Z180_ONLY(0xED76)
-#define Z80_MLT(dd)			((opts.cpu & CPU_Z80) ? \
+#define Z80_MLT(dd)			((option_cpu() & CPU_Z80) ? \
 								(error_illegal_ident(), 0) : \
-								(opts.cpu & CPU_RABBIT) && (dd) == REG_SP ? \
+								(option_cpu() & CPU_RABBIT) && (dd) == REG_SP ? \
 									(error_illegal_ident(), 0) : \
 									0xED4C + ((dd) << 4))
 #define Z80_IN0(r)			_Z180_ONLY(0xED00 + ((r) << 3))

@@ -27,7 +27,7 @@ include(__link__.m4)
 
 /* freeRTOSBoardDefs.h
  *
- * Board (hardware) specific definitions for the Z80 boards that I use regularly.
+ * Board (hardware) specific definitions for the Z180 boards that I use regularly.
  * This includes
  * YAZ180 with Z8S180
  * SCZ180 with Z8S180

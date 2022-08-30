@@ -1,7 +1,7 @@
 /*
  * Headerfile for ZX81 specific stuff
  *
- * $Id: zx81.h,v 1.35 2016-06-26 20:36:33 dom Exp $
+ * $Id: zx81.h $
  */
 
 #ifndef __ZX81_H__
@@ -188,6 +188,7 @@ extern void __LIB__  copytxt(int ovmode) __z88dk_fastcall;
 //////////////////
 
 // Clear text screen and set cursor at (0;0)
+// It also restores the ROM character set and expands a collapsed D-FILE
 extern void __LIB__ zx_cls();
 
 // Position text cursor at (0;0)
@@ -205,7 +206,7 @@ extern void __LIB__  filltxt(char character) __z88dk_fastcall;
 
 // Special effect: roll all displayed text characters vertically
 // 0..7, where '0' is the 'correct' adjustment
-extern void __LIB__  rolltxt(int offset) __z88dk_fastcall;
+extern void __LIB__  rollchr(int offset) __z88dk_fastcall;
 
 // Scroll up text screen
 extern void __LIB__ scrolluptxt();

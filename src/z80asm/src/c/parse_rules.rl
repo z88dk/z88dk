@@ -27,7 +27,7 @@ Define rules for a ragel-based parser.
 
 #define _DO_stmt_(suffix, opcode) \
 			do { \
-			 	Expr *expr = pop_expr(ctx); \
+			 	Expr1 *expr = pop_expr(ctx); \
 				DO_STMT_LABEL(); \
 				add_opcode_##suffix((opcode), expr); \
 			} while(0)
@@ -44,15 +44,15 @@ Define rules for a ragel-based parser.
 
 #define DO_stmt_idx_n(opcode) \
 			do { \
-			 	Expr *n_expr   = pop_expr(ctx); \
-				Expr *idx_expr = pop_expr(ctx); \
+			 	Expr1 *n_expr   = pop_expr(ctx); \
+				Expr1 *idx_expr = pop_expr(ctx); \
 				DO_STMT_LABEL(); \
 				add_opcode_idx_n((opcode), idx_expr, n_expr); \
 			} while(0)
 
 #define DO_stmt_n_n(opcode) \
-			{ 	Expr *n2_expr = pop_expr(ctx); \
-				Expr *n1_expr = pop_expr(ctx); \
+			{ 	Expr1 *n2_expr = pop_expr(ctx); \
+				Expr1 *n1_expr = pop_expr(ctx); \
 				DO_STMT_LABEL(); \
 				add_opcode_n_n((opcode), n1_expr, n2_expr); \
 			}
@@ -281,7 +281,7 @@ Define rules for a ragel-based parser.
 		     if (expr_error)
 				error_expected_const_expr();
 			 else
-				asm_DEFS(expr_value, opts.filler); }
+				asm_DEFS(expr_value, option_filler()); }
 		| label? (_TK_DEFS | _TK_DS)
 				const_expr _TK_COMMA
 				@{ if (expr_error)
@@ -492,7 +492,7 @@ Define rules for a ragel-based parser.
 			if (expr_error)
 				error_expected_const_expr();
 			else
-				asm_ALIGN(expr_value, opts.filler);
+				asm_ALIGN(expr_value, option_filler());
 		}
 		| label? _TK_ALIGN const_expr _TK_COMMA
 				@{ if (expr_error)
@@ -552,15 +552,15 @@ Define rules for a ragel-based parser.
 		*--------------------------------------------------------------------*/
 		| label? _TK_CU_WAIT expr _TK_COMMA	expr _TK_NEWLINE @{
 			DO_STMT_LABEL();
-			Expr *hor = pop_expr(ctx);
-			Expr *ver = pop_expr(ctx);
+			Expr1 *hor = pop_expr(ctx);
+			Expr1 *ver = pop_expr(ctx);
 			add_copper_unit_wait(ver, hor);
 		}
 
 		| label? _TK_CU_MOVE expr _TK_COMMA expr _TK_NEWLINE @{
 			DO_STMT_LABEL();
-			Expr *val = pop_expr(ctx);
-			Expr *reg = pop_expr(ctx);
+			Expr1 *val = pop_expr(ctx);
+			Expr1 *reg = pop_expr(ctx);
 			add_copper_unit_move(reg, val);
 		}
 

@@ -419,6 +419,13 @@ extern void __LIB__ vPortYield(void) __smallc;
 
 #define portYIELD()                 vPortYield()
 
+/*
+extern void vPortYieldFromISR( void );
+ */
+extern void __LIB__ vPortYieldFromISR(void) __smallc;
+
+
+#define portYIELD_FROM_ISR()        vPortYieldFromISR()
 /*-----------------------------------------------------------*/
 
 /* Task function macros as described on the FreeRTOS.org WEB site. */

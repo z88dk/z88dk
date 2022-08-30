@@ -9,6 +9,7 @@
 ; Coefficients for sinf() and cosf()
 ;-------------------------------------------------------------------------
 
+SECTION rodata_clib
 SECTION rodata_fp_math32
 
 PUBLIC _m32_coeff_sin, _m32_coeff_cos

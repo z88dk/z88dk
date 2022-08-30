@@ -7,31 +7,18 @@
 BARE_PROJ	:= z80asm
 PROJ		:= z88dk-$(BARE_PROJ)
 
-# EXESUFFIX is passed when cross-compiling Win32 on Linux
-ifeq ($(OS),Windows_NT)
-  EXESUFFIX 	:= .exe
-else
-  EXESUFFIX 	?=
-endif
-
-# UNIXem is needed in both Windows_NT and in a MinGW build in Unix
-ifeq ($(EXESUFFIX),.exe)
-  UNIXem_CFLAGS	:= -I../../ext/UNIXem/include
-  UNIXem_OBJS	:= ../../ext/UNIXem/src/glob.o \
-				   ../../ext/UNIXem/src/dirent.o
-endif
+include ../Make.common
 
 CC 			?= gcc
 CXX			?= g++
 INSTALL 	?= install
-CROSS		?= 0
 RE2C		= re2c -W --tags --no-debug-info --no-generation-date 
 
 OPT 		= -O3
 #OPT		= -g -Wextra 
 
 COMMON_FLAGS = -MMD -Wall $(OPT) \
-			-Isrc
+			-I. -Isrc
 
 LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 			-Isrc/c \
@@ -43,6 +30,13 @@ LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 			$(UNIXem_CFLAGS)
 CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS) -Wextra -Werror -pedantic-errors \
 			-Isrc/cpp
+
+# so that we can use C++17 features on older systems
+ifeq ($(CROSS),1)
+  ifeq ($(EXESUFFIX),.exe)
+LDFLAGS 	+= -static-libstdc++ -static-libgcc
+  endif
+endif
 
 #------------------------------------------------------------------------------
 # Object files
@@ -66,8 +60,6 @@ $(PROJ)$(EXESUFFIX): ../config.h $(OBJS)
 
 ../config.h:
 	@echo \#define PREFIX \"/usr/local/share/z88dk\" 				 > $@
-	@echo \#define UNIX 1											>> $@
-	@echo \#define EXEC_PREFIX \"\"									>> $@
 	@echo \#define Z88DK_VERSION \"build-$(shell date +%Y%m%d)\"	>> $@
 
 %.o: %.c
@@ -90,9 +82,9 @@ z80asm_lib:
 ifeq ($(CROSS),0)
 	$(MAKE) -C dev/z80asm_lib
 	cp dev/z80asm_lib/$(PROJ)-*.lib .
-ifdef ZCCCFG
+  ifdef ZCCCFG
 	cp dev/z80asm_lib/$(PROJ)-*.lib $(ZCCCFG)/../
-endif
+  endif
 endif
 
 clean::
@@ -105,7 +97,6 @@ clean::
 .PHONY: dev
 dev:
 	perl asmstyle.pl dev/z80asm_lib/*.asm
-	touch src/c/hist.c
 	$(MAKE) all
 
 # ragel parser generator
@@ -135,16 +126,23 @@ dev: dev/cpu/opcodes.yaml \
 	 dev/cpu/cpu_rules.h
 
 dev/cpu/opcodes.yaml: dev/cpu/make_opcodes.pl Makefile
-	cd dev/cpu; perl make_opcodes.pl; dos2unix -q opcodes.yaml
+	cd dev/cpu && perl make_opcodes.pl && dos2unix -q opcodes.yaml
 
 dev/cpu/opcodes.txt: dev/cpu/opcodes.yaml dev/cpu/dump_opcodes.pl Makefile
-	cd dev/cpu; perl dump_opcodes.pl; dos2unix -q opcodes.txt
+	cd dev/cpu && perl dump_opcodes.pl && dos2unix -q opcodes.txt
 
 dev/cpu/cpu_test_z80_ok.asm: dev/cpu/opcodes.yaml dev/cpu/make_cpu_test.pl Makefile
-	cd dev/cpu; perl make_cpu_test.pl; dos2unix -q cpu_test_*.asm
+	cd dev/cpu && perl make_cpu_test.pl && dos2unix -q cpu_test_*.asm
 
 dev/cpu/cpu_rules.h: dev/cpu/opcodes.yaml dev/cpu/make_cpu_rules.pl Makefile
-	cd dev/cpu; perl make_cpu_rules.pl; dos2unix -q cpu_rules.h
+	cd dev/cpu && perl make_cpu_rules.pl && dos2unix -q cpu_rules.h
+
+# reloc routine
+dev: src/c/reloc_code.c
+
+src/c/reloc_code.c: dev/reloc_code.asm dev/make_reloc_code.pl Makefile
+	cd dev && perl make_reloc_code.pl && dos2unix -q reloc_code.[ch] && \
+		mv -f reloc_code.[ch] ../src/c/
 
 # re2c
 define MAKE_RE2C
@@ -157,9 +155,6 @@ endef
 
 $(eval $(call MAKE_RE2C,src/cpp/lex))
 
-clean::
-	$(MAKE) -C lib clean
-
 #------------------------------------------------------------------------------
 # install
 #------------------------------------------------------------------------------
@@ -168,7 +163,9 @@ install: $(PROJ)$(EXESUFFIX) z80asm_lib
 	$(INSTALL) $(PROJ)$(EXESUFFIX)     $(PREFIX)/bin/$(BARE_PROJ)$(EXESUFFIX)
 	$(INSTALL) asmpp.pl      $(PREFIX)/bin/z88dk-asmpp
 	$(INSTALL) asmstyle.pl   $(PREFIX)/bin/z88dk-asmstyle
+ifeq ($(CROSS),0)
 	$(MAKE) -C dev/z80asm_lib install PREFIX=$(PREFIX_SHARE)
+endif
 
 #------------------------------------------------------------------------------
 # clean
@@ -194,8 +191,7 @@ testlib:
 	$(MAKE) -C lib test
 
 prove_perl: $(PROJ)$(EXESUFFIX)
-	perl -S prove --state=slow,save -j9 t2/*.t
-	perl -S prove t/*.t
+	perl -S prove --state=slow,save -j9 t/*.t
 
 clean::
 	$(RM) zcc_opt.def zcc_proj.lst
@@ -212,6 +208,7 @@ clean::
 
 clean::
 	$(RM) -r *.dSYM
+	$(RM) -r $(PROJ)$(EXESUFFIX) test*.dir
 	$(RM) $(PROJ)$(EXESUFFIX) test*
 	$(RM) t/*.tmp t/dev/*.tmp
 

@@ -14,10 +14,10 @@ Assembly directives.
 #include "directives.h"
 #include "fileutil.h"
 #include "if.h"
-#include "module.h"
+#include "module1.h"
 #include "parse.h"
 #include "strutil.h"
-#include "symtab.h"
+#include "symtab1.h"
 #include "types.h"
 #include "utstring.h"
 #include "z80asm.h"
@@ -53,7 +53,7 @@ static void url_encode(const char *s, char *enc)
 *----------------------------------------------------------------------------*/
 void asm_LABEL_offset(const char* name, int offset)
 {
-	Symbol* sym;
+	Symbol1* sym;
 
 	if (get_phased_PC() >= 0)
 		sym = define_symbol(name, get_phased_PC() + offset, TYPE_CONSTANT);
@@ -73,19 +73,19 @@ void asm_cond_LABEL(Str* label)
 	if (Str_len(label)) {
 		asm_LABEL(Str_data(label));
 		Str_len(label) = 0;
-	}
 
-	if (opts.debug_info && !sfile_is_c_source()) {
-		STR_DEFINE(name, STR_SIZE);
+		if (option_debug() && !sfile_is_c_source()) {
+			STR_DEFINE(name, STR_SIZE);
 
-		char fname_encoded[FILENAME_MAX * 2];
-		url_encode(sfile_filename(), fname_encoded);
+			char fname_encoded[FILENAME_MAX * 2];
+			url_encode(sfile_filename(), fname_encoded);
 
-		Str_sprintf(name, "__ASM_LINE_%ld_%s", get_error_line_num(), fname_encoded);
-		if (!find_local_symbol(Str_data(name)))
-			asm_LABEL(Str_data(name));
+			Str_sprintf(name, "__ASM_LINE_%ld_%s", get_error_line_num(), fname_encoded);
+			if (!find_local_symbol(Str_data(name)))
+				asm_LABEL(Str_data(name));
 
-		STR_DELETE(name);
+			STR_DELETE(name);
+		}
 	}
 }
 
@@ -166,15 +166,15 @@ void asm_DEFVARS_define_const(const char* name, int elem_size, int count)
 *----------------------------------------------------------------------------*/
 void asm_LSTON(void)
 {
-	if (opts.list)
-		opts.cur_list = true;
+	if (option_list_file())
+		list_set(true);
 	list_end_line();
 }
 
 void asm_LSTOFF(void)
 {
-	if (opts.list)
-		opts.cur_list = false;
+	if (option_list_file())
+		list_set(false);
 	list_end_line();
 }
 
@@ -196,7 +196,7 @@ void asm_C_LINE(int line_num, const char* filename) {
 
 	set_error_location(filename, line_num);
 
-	if (opts.debug_info) {
+	if (option_debug()) {
 		STR_DEFINE(name, STR_SIZE);
 
 		char fname_encoded[FILENAME_MAX * 2];
@@ -236,8 +236,8 @@ void asm_MODULE(const char* name)
 
 void asm_MODULE_default(void)
 {
-	if (!CURRENTMODULE->modname)     /* Module name must be defined */
-		CURRENTMODULE->modname = path_remove_ext(path_file(CURRENTMODULE->filename));
+	if (!CURRENTMODULE->modname)     /* Module1 name must be defined */
+		CURRENTMODULE->modname = remove_extension(path_file(CURRENTMODULE->filename));
 }
 
 void asm_SECTION(const char* name)
@@ -290,13 +290,13 @@ void asm_DEFINE(const char* name)
 
 void asm_UNDEFINE(const char* name)
 {
-	SymbolHash_remove(CURRENTMODULE->local_symtab, name);
+	Symbol1Hash_remove(CURRENTMODULE->local_symtab, name);
 }
 
 /*-----------------------------------------------------------------------------
 *   define a constant or expression
 *----------------------------------------------------------------------------*/
-void asm_DEFC(const char* name, Expr* expr)
+void asm_DEFC(const char* name, Expr1* expr)
 {
 	int value;
 
@@ -312,7 +312,7 @@ void asm_DEFC(const char* name, Expr* expr)
 			expr->range = RANGE_WORD;
 			expr->target_name = spool_add(name);
 
-			ExprList_push(&CURRENTMODULE->exprs, expr);
+			Expr1List_push(&CURRENTMODULE->exprs, expr);
 
 			/* create symbol */
 			define_symbol(expr->target_name, 0, TYPE_COMPUTED);
@@ -349,7 +349,7 @@ void asm_DEFS_str(int count, const char* str, int len)
         while (len-- > 0)
             add_opcode((*str++) & 0xFF);
         while (zeros-- > 0)
-            add_opcode(opts.filler);
+            add_opcode(option_filler());
     }
 }
 
@@ -363,22 +363,22 @@ void asm_DEFB_str(const char* str, int length)
 		add_opcode((*str++) & 0xFF);
 }
 
-void asm_DEFB_expr(Expr* expr)
+void asm_DEFB_expr(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_BYTE_UNSIGNED, expr);
 }
 
-void asm_DEFP(Expr* expr)
+void asm_DEFP(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_PTR24, expr);
 }
 
-void asm_PTR(Expr* expr)
+void asm_PTR(Expr1* expr)
 {
 	asm_DEFP(expr);
 }
 
-void asm_DP(Expr* expr)
+void asm_DP(Expr1* expr)
 {
 	asm_DEFP(expr);
 }
@@ -386,42 +386,42 @@ void asm_DP(Expr* expr)
 /*-----------------------------------------------------------------------------
 *   DEFW, DEFQ, DEFDB - add 2-byte and 4-byte expressions
 *----------------------------------------------------------------------------*/
-void asm_DEFW(Expr* expr)
+void asm_DEFW(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_WORD, expr);
 }
 
-void asm_WORD(Expr* expr)
+void asm_WORD(Expr1* expr)
 {
 	asm_DEFW(expr);
 }
 
-void asm_DW(Expr* expr)
+void asm_DW(Expr1* expr)
 {
 	asm_DEFW(expr);
 }
 
-void asm_DEFDB(Expr* expr)
+void asm_DEFDB(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_WORD_BE, expr);
 }
 
-void asm_DDB(Expr* expr)
+void asm_DDB(Expr1* expr)
 {
 	asm_DEFDB(expr);
 }
 
-void asm_DEFQ(Expr* expr)
+void asm_DEFQ(Expr1* expr)
 {
 	Pass2infoExpr(RANGE_DWORD, expr);
 }
 
-void asm_DWORD(Expr* expr)
+void asm_DWORD(Expr1* expr)
 {
 	asm_DEFQ(expr);
 }
 
-void asm_DQ(Expr* expr)
+void asm_DQ(Expr1* expr)
 {
 	asm_DEFQ(expr);
 }
@@ -464,12 +464,12 @@ static void check_org_align()
 /*-----------------------------------------------------------------------------
 *   DMA
 *----------------------------------------------------------------------------*/
-static Expr* asm_DMA_shift_exprs(UT_array* exprs)
+static Expr1* asm_DMA_shift_exprs(UT_array* exprs)
 {
 	xassert(utarray_len(exprs) > 0);
 
-	Expr* expr = *((Expr**)utarray_front(exprs));	// copy first element
-	*((Expr**)utarray_front(exprs)) = NULL;		// do not destroy
+	Expr1* expr = *((Expr1**)utarray_front(exprs));	// copy first element
+	*((Expr1**)utarray_front(exprs)) = NULL;		// do not destroy
 	utarray_erase(exprs, 0, 1);						// delete first element
 
 	return expr;
@@ -479,7 +479,7 @@ static bool asm_DMA_shift_byte(UT_array* exprs, int* out_value)
 {
 	*out_value = 0;
 
-	Expr* expr = asm_DMA_shift_exprs(exprs);
+	Expr1* expr = asm_DMA_shift_exprs(exprs);
 	*out_value = Expr_eval(expr, true);
 	bool not_evaluable = expr->result.not_evaluable;
 	OBJ_DELETE(expr);
@@ -824,7 +824,7 @@ static void asm_DMA_command_1(int cmd, UT_array* exprs)
 
 void asm_DMA_command(int cmd, UT_array* exprs)
 {
-	if (opts.cpu != CPU_Z80N) {
+	if (option_cpu() != CPU_Z80N) {
 		error_illegal_ident();
 		return;
 	}

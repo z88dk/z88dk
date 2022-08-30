@@ -87,19 +87,23 @@ void read_symbol_file(char *filename)
                     int len = strlen(argv[0]);
 
                     // Rely on z80asm writing them out, __head, __tail, __size
+                    // Once we detect __size, we have all the informaiton we need
+                    // from previously processed symbols to create an entry in the
+                    // sections linked-list.
                     if ( strcmp(argv[0] + len - 5, "_size") == 0 ) {
                         int size = strtol(!isxdigit(argv[2][0]) ? &argv[2][1] : argv[2], NULL, 16);
                         if ( size != 0 ) {
-                            symbol *sym;
                             int     start;
-                            strcpy(argv[0]+len - 5, "_head");
-                            if ((start = symbol_resolve(argv[0], NULL)) != -1 ) { // Looking for __head
+                            char    *sect_head = strdup(argv[0]); // Duplicate the name before modifying it
+                            strcpy(sect_head+len - 5, "_head");
+                            if ((start = symbol_resolve(sect_head, NULL)) != -1 ) { // Looking for __head
                                 section *sect = calloc(1,sizeof(*sect));
                                 sect->start = start;
                                 sect->end = start + size;
                                 sect->name = duplen(argv[0] + 2, len - 5 - 2);
                                 LL_APPEND(sections, sect);
                             }
+                            free(sect_head);
                         }
                     }
                 }
@@ -119,9 +123,7 @@ void read_symbol_file(char *filename)
                         sym->symtype = SYM_ADDRESS;
                     }
                     if (sym->symtype == SYM_ADDRESS) {
-                        if ( sym->address >= 0 && sym->address <= 65535 ) {
-                            LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
-                        }
+                        LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
                     }
                     HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
                 }
@@ -175,7 +177,6 @@ void read_symbol_file(char *filename)
                 int    lineno;
                 int    level;;
                 int    scope_block;
-                char  *ptr;
 
                 demangle_filename(argv[9], filename, funcname, &lineno,&level, &scope_block);;
                 debug_add_cline(filename, funcname, lineno, level, scope_block, argv[2]);
@@ -219,7 +220,6 @@ int symbol_resolve(char *name, const char *filename)
     }
 
     symbol *sym;
-    char   *ptr;
 
     HASH_FIND_STR(global_symbols, name, sym);
     if ( sym != NULL ) {
@@ -411,7 +411,13 @@ int address_is_code(int addr)
 
     while ( sect != NULL ) {
         if ( addr >= sect->start && addr < sect->end) {
-            return (strncasecmp(sect->name, "code_",5) == 0 || strncasecmp(sect->name, "smc_",4) == 0 );
+            // Section names could be 'code' or 'code_xxxx'.
+            // We don't want to match on partial words
+            // like 'coded_data'. So, check for both.
+            return (strncasecmp(sect->name, "code_",5) == 0 ||
+                    strncasecmp(sect->name, "smc_",4) == 0 ||
+                    strcasecmp(sect->name, "code") == 0 ||
+                    strcasecmp(sect->name, "smc") == 0);
         }
         sect = sect->next;
     }

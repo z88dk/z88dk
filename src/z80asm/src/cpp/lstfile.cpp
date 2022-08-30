@@ -5,6 +5,7 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "args.h"
 #include "if.h"
 #include "lstfile.h"
 #include "utils.h"
@@ -238,7 +239,7 @@ void list_end_line() {
 
 // send line to list file
 void list_got_source_line(const char* filename, int line_num, const char* text) {
-	if (filename && option_cur_list()) {
+	if (filename && list_is_on()) {
 		list_source_line(filename, line_num,
 			get_PC(), get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
 			text);
@@ -247,10 +248,18 @@ void list_got_source_line(const char* filename, int line_num, const char* text) 
 
 // send line to list file
 void list_got_expanded_line(const char* text) {
-	if (option_cur_list() && option_verbose()) {
+	if (list_is_on() && g_args.verbose()) {
 		string line = string("      + ") + text;
 		list_expanded_line(
 			get_PC(), get_phased_PC() >= 0 ? get_phased_PC() : get_PC(),
 			line.c_str());
 	}
+}
+
+void list_set(bool f) {
+	g_list_file.set_list_on(f);
+}
+
+bool list_is_on() {
+	return g_list_file.list_is_on();
 }

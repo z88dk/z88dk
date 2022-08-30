@@ -14,7 +14,6 @@ Scanner. Scanning engine is built by ragel from scan_rules.rl.
 #include "if.h"
 #include "init.h"
 #include "list.h"
-#include "options.h"
 #include "scan.h"
 #include "str.h"
 #include "utarray.h"
@@ -308,12 +307,13 @@ static bool fill_buffer( void )
 		else 
 		{
 			/* get next line from input source file */
-			const char* line = sfile_get_source_line();
+			char* line = sfile_get_source_line();
 			if ( line == NULL )
 				return false;
 
 			/* got new line */
 			set_scan_buf( line, true );		/* read from file - at BOL */
+			xfree(line);
 		}
 	}
 

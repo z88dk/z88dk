@@ -1,4 +1,4 @@
-/* $Id: Xz88dk.h,v 1.2 2016-06-11 13:37:14 dom Exp $ */
+/* $Id: Xz88dk.h $ */
 
 #ifndef _XZ88DK_H_
 #define _XZ88DK_H_
@@ -14,6 +14,7 @@
 
 extern int _x_proportional;
 extern int _y_proportional;
+extern int _yh_proportional;
 extern char *_xchar_proportional;
 extern int _X_int1;
 extern int _X_int2;

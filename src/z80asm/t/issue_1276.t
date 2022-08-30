@@ -1,104 +1,100 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-# Z88DK Z80 Macro Assembler
-#
-# Copyright (C) Paulo Custodio, 2011-2022
-# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/z88dk/z88dk/
-#
-# Test https://github.com/z88dk/z88dk/issues/1077
-# z80asm: ld hl, sp+ -6
+BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
-use Test::More;
-use Path::Tiny;
-require './t/testlib.pl';
+
+# Test https://github.com/z88dk/z88dk/issues/1077
+# z80asm: ld hl, sp+ -6
 
 for my $n (-4, 0, 4) {
 	my $offset = $n > 0 ? "+$n" : $n < 0 ? "$n" : "";
 	
-	unlink_testfiles();
-	z80asm("ld hl, sp$offset",			'-b -mgbz80'); 	
-	check_bin_file("test.bin", pack("C*", 0xF8, $n & 0xFF));
+	unlink_testfiles;
+	z80asm_ok("-b -mgbz80", "", "", "ld hl, sp$offset", bytes(0xF8, $n & 0xFF));
 	
-	unlink_testfiles();
-	z80asm("ldhi $n \n".
-		   "adi hl,$n \n".
-		   "ld de, hl$offset \n".
-		   "ldsi $n \n".
-		   "adi sp,$n \n".
-		   "ld de, sp$offset \n",		'-b -m8085'); 	
-    if ($n == 0) {
-        check_bin_file("test.bin", pack("C*", 
-                (0x28, $n & 0xFF) x 2,
-                0x54, 0x5D,
-                (0x38, $n & 0xFF) x 3));
-    }
-    else {
-        check_bin_file("test.bin", pack("C*", 
-                (0x28, $n & 0xFF) x 3,
-                (0x38, $n & 0xFF) x 3));
-    }
+	unlink_testfiles;
+	z80asm_ok("-b -m8085", "", "", 
+			"ldhi $n"			=> bytes(0x28, $n & 0xFF),
+			"adi hl,$n"			=> bytes(0x28, $n & 0xFF),
+			"ld de, hl$offset"	=> $n==0 ? bytes(0x54, 0x5D) : bytes(0x28, $n & 0xFF),
+			"ldsi $n"			=> bytes(0x38, $n & 0xFF),
+			"adi sp,$n"			=> bytes(0x38, $n & 0xFF),
+			"ld de, sp$offset"	=> bytes(0x38, $n & 0xFF));
     
-	unlink_testfiles();
-	z80asm("ld hl, (ix$offset) \n".
-		   "ld (ix$offset), hl \n".
-		   "ld hl, (sp$offset) \n".
-		   "ld (sp$offset), hl \n",		'-b -mr2ka'); 	
-	check_bin_file("test.bin", pack("C*", 
-			0xE4, $n & 0xFF,
-			0xF4, $n & 0xFF,
-			0xC4, $n & 0xFF,
-			0xD4, $n & 0xFF));
+	unlink_testfiles;
+	z80asm_ok("-b -mr2ka", "", "", 
+			"ld hl, (ix$offset)"	=> bytes(0xE4, $n & 0xFF),
+			"ld (ix$offset), hl"	=> bytes(0xF4, $n & 0xFF),
+			"ld hl, (sp$offset)"	=> bytes(0xC4, $n & 0xFF),
+			"ld (sp$offset), hl"	=> bytes(0xD4, $n & 0xFF));
 }
 
 # check warnings
 for my $n (-129, -128, 0, 255, 256) {
 	my $offset = $n > 0 ? "+$n" : $n < 0 ? "$n" : "";
-	my $n_report = $n<10 ? $n : sprintf("0x%02x", $n);
-	my $warning = ($n >= -128 && $n < 256) ? "" : <<END;
-test.asm:1: warning: integer range: $n_report
-  ^---- $n
-END
+	
 	ok 1, "n=$n";
 	
+	my $n_report = int_to_hex($n);
+	my $warning = ($n >= -128 && $n < 256) ? "" : <<END;
+${test}.asm:1: warning: integer range: $n_report
+  ^---- $n
+END
+
     if ($n != 0) {
-        unlink_testfiles();
-        z80asm("ld de, hl$offset",		'-b -m8085', 0, "", $warning); 	
-        check_bin_file("test.bin", pack("C*", 0x28, $n & 0xFF));
+        unlink_testfiles;
+        z80asm_ok("-b -m8085", "", $warning,
+				"ld de, hl$offset"		=> bytes(0x28, $n & 0xFF));
     }
     
-	unlink_testfiles();
-	z80asm("ld de, sp$offset",		'-b -m8085', 0, "", $warning); 	
-	check_bin_file("test.bin", pack("C*", 0x38, $n & 0xFF));
+	unlink_testfiles;
+	z80asm_ok("-b -m8085", "", $warning,
+				"ld de, sp$offset"		=> bytes(0x38, $n & 0xFF));
 
-	unlink_testfiles();
-	z80asm("ld hl, (sp$offset)",		'-b -mr2ka', 0, "", $warning); 	
-	check_bin_file("test.bin", pack("C*", 0xC4, $n & 0xFF));
+	unlink_testfiles;
+	z80asm_ok("-b -mr2ka", "", $warning, 
+				"ld hl, (sp$offset)"	=> bytes(0xC4, $n & 0xFF));
 
-	unlink_testfiles();
-	z80asm("ld (sp$offset), hl",		'-b -mr2ka', 0, "", $warning); 	
-	check_bin_file("test.bin", pack("C*", 0xD4, $n & 0xFF));
+	unlink_testfiles;
+	z80asm_ok("-b -mr2ka", "", $warning, 
+				"ld (sp$offset), hl"	=> bytes(0xD4, $n & 0xFF));
 }
 
 for my $n (-129, -128, 0, 127, 128) {
 	my $offset = $n > 0 ? "+$n" : $n < 0 ? "$n" : "";
-	my $n_report = $n<10 ? $n : sprintf("0x%02x", $n);
-	my $warning = ($n >= -128 && $n < 128) ? "" : <<END;
-test.asm:1: warning: integer range: $n_report
-  ^---- $n
-END
 
 	ok 1, "n=$n";
 
- 	unlink_testfiles();
-	z80asm("ld hl, (ix$offset)",		'-b -mr2ka', 0, "", $warning); 	
-	check_bin_file("test.bin", pack("C*", 0xE4, $n & 0xFF));
+	my $n_report = int_to_hex($n);
+	my $warning = ($n >= -128 && $n < 128) ? "" : <<END;
+${test}.asm:1: warning: integer range: $n_report
+  ^---- $n
+END
 
-	unlink_testfiles();
-	z80asm("ld (ix$offset), hl",		'-b -mr2ka', 0, "", $warning); 	
-	check_bin_file("test.bin", pack("C*", 0xF4, $n & 0xFF));
+ 	unlink_testfiles;
+	z80asm_ok("-b -mr2ka", "", $warning, 
+			"ld hl, (ix$offset)"		=> bytes(0xE4, $n & 0xFF));
+
+	unlink_testfiles;
+	z80asm_ok("-b -mr2ka", "", $warning, 
+			"ld (ix$offset), hl"		=> bytes(0xF4, $n & 0xFF));
 }
 
-unlink_testfiles();
-done_testing();
+unlink_testfiles;
+done_testing;
+
+
+sub int_to_hex {
+	my($n) = @_;
+	if ($n <= -10) {
+		return sprintf("-\$%02x", -$n);
+	}
+	elsif ($n < 10) {
+		return $n;
+	}
+	else {
+		return sprintf("\$%02x", $n);
+	}
+}
+

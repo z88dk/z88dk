@@ -55,23 +55,23 @@ include(__link__.m4)
 #endif
 
 #if portBYTE_ALIGNMENT == 32
-    #define portBYTE_ALIGNMENT_MASK    ( 0x001f )
+    #define portBYTE_ALIGNMENT_MASK     ( 0x001f )
 #elif portBYTE_ALIGNMENT == 16
-    #define portBYTE_ALIGNMENT_MASK    ( 0x000f )
+    #define portBYTE_ALIGNMENT_MASK     ( 0x000f )
 #elif portBYTE_ALIGNMENT == 8
-    #define portBYTE_ALIGNMENT_MASK    ( 0x0007 )
+    #define portBYTE_ALIGNMENT_MASK     ( 0x0007 )
 #elif portBYTE_ALIGNMENT == 4
-    #define portBYTE_ALIGNMENT_MASK    ( 0x0003 )
+    #define portBYTE_ALIGNMENT_MASK     ( 0x0003 )
 #elif portBYTE_ALIGNMENT == 2
-    #define portBYTE_ALIGNMENT_MASK    ( 0x0001 )
+    #define portBYTE_ALIGNMENT_MASK     ( 0x0001 )
 #elif portBYTE_ALIGNMENT == 1
-    #define portBYTE_ALIGNMENT_MASK    ( 0x0000 )
+    #define portBYTE_ALIGNMENT_MASK     ( 0x0000 )
 #else /* if portBYTE_ALIGNMENT == 32 */
     #error "Invalid portBYTE_ALIGNMENT definition"
 #endif /* if portBYTE_ALIGNMENT == 32 */
 
 #ifndef portUSING_MPU_WRAPPERS
-    #define portUSING_MPU_WRAPPERS    0
+    #define portUSING_MPU_WRAPPERS      0
 #endif
 
 #ifndef portNUM_CONFIGURABLE_REGIONS
@@ -83,7 +83,7 @@ include(__link__.m4)
 #endif
 
 #ifndef portARCH_NAME
-    #define portARCH_NAME    NULL
+    #define portARCH_NAME               NULL
 #endif
 
 #ifndef PRIVILEGED_FUNCTION
@@ -184,12 +184,15 @@ __OPROTO(,,void,,vPortGetHeapStats,HeapStats_t * pxHeapStats)
  */
 /*
 void * pvPortMalloc( size_t xSize ) PRIVILEGED_FUNCTION;
+void * pvPortCalloc( size_t xNum,
+                     size_t xSize ) PRIVILEGED_FUNCTION;
 void vPortFree( void * pv ) PRIVILEGED_FUNCTION;
 void vPortInitialiseBlocks( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetFreeHeapSize( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;
  */
 __OPROTO(,,void,*,pvPortMalloc,size_t xSize)
+__OPROTO(,,void,*,pvPortCalloc,size_t xNum,size_t xSize)
 __OPROTO(,,void,,vPortFree,void * pv)
 __OPROTO(,,void,,vPortInitialiseBlocks,void)
 __OPROTO(,,size_t,,xPortGetFreeHeapSize,void)
@@ -197,14 +200,30 @@ __OPROTO(,,size_t,,xPortGetMinimumEverFreeHeapSize,void)
 
 #if ( configSTACK_ALLOCATION_FROM_SEPARATE_HEAP == 1 )
 /*
-    void *pvPortMallocStack( size_t xSize ) PRIVILEGED_FUNCTION;
-    void vPortFreeStack( void *pv ) PRIVILEGED_FUNCTION;
+    void * pvPortMallocStack( size_t xSize ) PRIVILEGED_FUNCTION;
+    void vPortFreeStack( void * pv ) PRIVILEGED_FUNCTION;
  */
     __OPROTO(,,void,*,pvPortMallocStack,size_t xSize)
     __OPROTO(,,void,,vPortFreeStack,void * pv)
 #else
-    #define pvPortMallocStack pvPortMalloc
-    #define vPortFreeStack vPortFree
+    #define pvPortMallocStack    pvPortMalloc
+    #define vPortFreeStack       vPortFree
+#endif
+
+#if ( configUSE_MALLOC_FAILED_HOOK == 1 )
+
+/**
+ * task.h
+ * @code{c}
+ * void vApplicationMallocFailedHook( void )
+ * @endcode
+ *
+ * This hook function is called when allocation failed.
+ */
+/*
+    void vApplicationMallocFailedHook( void ); /*lint !e526 Symbol not defined as it is an application callback. */
+ */
+    __OPROTO(,,void,,vApplicationMallocFailedHook,void)
 #endif
 
 /*

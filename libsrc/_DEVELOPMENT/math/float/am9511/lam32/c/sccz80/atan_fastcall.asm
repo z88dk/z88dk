@@ -5,6 +5,7 @@
 
 	defc	atan_fastcall = asm_am9511_atan_fastcall
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _atan_fastcall

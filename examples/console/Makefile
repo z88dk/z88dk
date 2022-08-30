@@ -70,7 +70,5 @@ CFLAGS_msx_adva = -subtype=rom
 
 $(eval $(call build_app, $(ADVA_TARGETS), adva.bin, adv_a.c) )
 
-
-
 binaries: $(OUTPUT_BINS)
 

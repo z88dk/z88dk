@@ -1,4 +1,3 @@
-# $Id: Makefile $
 
 include ../../../Make.config
 
@@ -22,11 +21,8 @@ OFILES = $(CFILES:.c=.o)
 OBJECTS = $(addprefix obj/,$(OFILES))
 
 all: dirs $(OBJECTS)
-	@echo ''
-	@echo '---> Building TRSDOS library <---'
-	@echo ''
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/trsdos @trsdos.lst
-	
+
 
 obj/%.o: %.c
 	$(ZCC) +trs80 $(CFLAGS) $^ -o $@

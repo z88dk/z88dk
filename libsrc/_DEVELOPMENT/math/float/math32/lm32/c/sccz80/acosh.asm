@@ -9,7 +9,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _acosh
-EXTERN cm32_sdcc_acosh
-defc _acosh = cm32_sdcc_acosh
+defc _acosh = _m32_acoshf
 ENDIF
 

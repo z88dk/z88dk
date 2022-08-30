@@ -13,16 +13,16 @@ Define ragel-based parser.
 #include "codearea.h"
 #include "die.h"
 #include "directives.h"
-#include "expr.h"
+#include "expr1.h"
 #include "if.h"
-#include "module.h"
+#include "module1.h"
 #include "opcodes.h"
 #include "parse.h"
 #include "scan.h"
 #include "str.h"
 #include "strutil.h"
 #include "sym.h"
-#include "symtab.h"
+#include "symtab1.h"
 #include "utarray.h"
 #include "utstring.h"
 #include "zutils.h"
@@ -62,9 +62,9 @@ void ParseCtx_delete(ParseCtx *ctx)
 *----------------------------------------------------------------------------*/
 
 /* save the current scanner context and parse the given expression */
-struct Expr *parse_expr(const char *expr_text)
+struct Expr1 *parse_expr(const char *expr_text)
 {
-	Expr *expr;
+	Expr1 *expr;
 	int num_errors;
 
 	save_scan_state();
@@ -95,7 +95,7 @@ struct Expr *parse_expr(const char *expr_text)
 static void push_expr(ParseCtx *ctx)
 {
 	STR_DEFINE(expr_text, STR_SIZE);
-	Expr *expr;
+	Expr1 *expr;
 	Sym  *expr_p;
 
 	/* build expression text - split constant prefixes from numbers and names */
@@ -140,12 +140,12 @@ static void push_expr(ParseCtx *ctx)
 /*-----------------------------------------------------------------------------
 *   Pop and return expression
 *----------------------------------------------------------------------------*/
-static Expr *pop_expr(ParseCtx *ctx)
+static Expr1 *pop_expr(ParseCtx *ctx)
 {
-	Expr *expr;
+	Expr1 *expr;
 
-	expr = *((Expr **)utarray_back(ctx->exprs));
-	*((Expr **)utarray_back(ctx->exprs)) = NULL;		/* do not destroy */
+	expr = *((Expr1 **)utarray_back(ctx->exprs));
+	*((Expr1 **)utarray_back(ctx->exprs)) = NULL;		/* do not destroy */
 	
 	utarray_pop_back(ctx->exprs);
 
@@ -157,7 +157,7 @@ static Expr *pop_expr(ParseCtx *ctx)
 *----------------------------------------------------------------------------*/
 static void pop_eval_expr(ParseCtx *ctx, int *pvalue, bool *perror)
 {
-	Expr *expr;
+	Expr1 *expr;
 
 	*pvalue = 0;
 	*perror = false;
@@ -279,7 +279,7 @@ static void free_tokens(ParseCtx *ctx)
 void parse_const_expr_eval(const char* expr_text, int* result, bool* error) {
 	*result = 0;
 	*error = false;
-	struct Expr* expr = parse_expr(expr_text);
+	struct Expr1* expr = parse_expr(expr_text);
 	if (!expr)
 		*error = true;
 	else {
@@ -295,14 +295,14 @@ void parse_const_expr_eval(const char* expr_text, int* result, bool* error) {
 
 void parse_expr_eval_if_condition(const char* expr_text, bool* condition, bool* error) {
 	*condition = *error = false;
-	struct Expr *expr = parse_expr(expr_text);
+	struct Expr1 *expr = parse_expr(expr_text);
 	if (expr)
 		*condition = check_if_condition(expr);
 	else
 		*error = true;
 }
 
-bool check_if_condition(Expr *expr) {
+bool check_if_condition(Expr1 *expr) {
 	int value;
 	bool condition;
 
@@ -319,7 +319,7 @@ bool check_if_condition(Expr *expr) {
 }
 
 bool check_ifdef_condition(const char *name) {
-	Symbol *symbol;
+	Symbol1 *symbol;
 
 	symbol = find_symbol(name, CURRENTMODULE->local_symtab);
 	if (symbol != NULL && (symbol->is_defined || (symbol->scope == SCOPE_EXTERN || symbol->scope == SCOPE_GLOBAL)))
@@ -370,7 +370,7 @@ void parse_file(const char* filename)
 	ParseCtx* ctx = ParseCtx_new();
 	{
 		if (sfile_open(filename, true)) {
-			if (opts.verbose)
+			if (option_verbose())
 				printf("Reading '%s' = '%s'\n",
 					path_canon(filename), path_canon(sfile_filename()));	/* display name of file */
 

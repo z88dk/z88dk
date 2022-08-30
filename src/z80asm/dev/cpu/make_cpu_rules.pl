@@ -13,9 +13,6 @@ my @CPUS = sort keys %{$opcodes{"nop"}};
 for my $asm (sort keys %opcodes) {
 	my $tokens = parser_tokens($asm);
 	
-	# asm for swap_ix_iy
-	(my $asm_swap = $asm) =~ s/\b(ix|iy)/ $1 eq 'ix' ? 'iy' : 'ix' /ge;
-	
 	# check for parens
 	my $parens;
 	if    ($asm =~ /\(%[nmh]\)/) {		$parens = 'expr_in_parens'; }
@@ -24,10 +21,8 @@ for my $asm (sort keys %opcodes) {
 		
 	for my $cpu (sort keys %{$opcodes{$asm}}) {
 		my @ops = @{$opcodes{$asm}{$cpu}};
-		my @ops_swap = @{$opcodes{$asm_swap}{$cpu}};
 		
-		$parser{$tokens}{$cpu}{$parens}{ixiy} = [$asm, @ops];
-		$parser{$tokens}{$cpu}{$parens}{iyix} = [$asm_swap, @ops_swap];
+		$parser{$tokens}{$cpu}{$parens} = [$asm, @ops];
 	}
 }
 
@@ -74,9 +69,9 @@ sub parse_code {
 		my $op2 = $ops[1][0];
 		push @code,
 			"DO_STMT_LABEL();",
-			"Expr *target_expr = pop_expr(ctx);",
+			"Expr1 *target_expr = pop_expr(ctx);",
 			"const char *end_label = autolabel();",
-			"Expr *end_label_expr = parse_expr(end_label);",
+			"Expr1 *end_label_expr = parse_expr(end_label);",
 			"add_opcode_nn(0x".fmthex($op1).", end_label_expr);",	# jump over
 			"add_opcode_nn(0x".fmthex($op2).", target_expr);",		# call
 			"asm_LABEL_offset(end_label, 6);";
@@ -120,7 +115,7 @@ sub parse_code_opcode {
 			"if (expr_value > 0 && expr_value < 8) expr_value *= 8;",
 			"switch (expr_value) {",
 			"case 0x00: case 0x08: case 0x30:",
-			"  if (opts.cpu & CPU_RABBIT)",
+			"  if (option_cpu() & CPU_RABBIT)",
 			"    DO_stmt(0xCD0000 + (expr_value << 8));",
 			"  else",
 			"    DO_stmt(0xC7 + expr_value);",
@@ -260,7 +255,7 @@ sub merge_cpu {
 	}
 	else {
 		# variants per CPU
-		$ret .= "switch (opts.cpu) {\n";
+		$ret .= "switch (option_cpu()) {\n";
 		for my $code (sort keys %code) {
 			for my $cpu (sort keys %{$code{$code}}) {
 				$ret .= "case CPU_".uc($cpu).": ";
@@ -279,44 +274,28 @@ sub merge_parens {
 	
 	if ($t->{no_expr}) {
 		die if $t->{expr_no_parens} || $t->{expr_in_parens};
-		return merge_ixiy($cpu, $t->{no_expr});
+		return parse_code($cpu, @{$t->{no_expr}});
 	}
 	elsif (!$t->{expr_no_parens} && !$t->{expr_in_parens}) {
 		die;
 	}
 	elsif (!$t->{expr_no_parens} && $t->{expr_in_parens}) {
 		return "if (!expr_in_parens) return false;\n".
-				merge_ixiy($cpu, $t->{expr_in_parens});			
+				parse_code($cpu, @{$t->{expr_in_parens}});			
 	}
 	elsif ($t->{expr_no_parens} && !$t->{expr_in_parens}) {
 		return "if (expr_in_parens) warn_expr_in_parens();\n".
-				merge_ixiy($cpu, $t->{expr_no_parens});
+				parse_code($cpu, @{$t->{expr_no_parens}});
 	}
 	elsif ($t->{expr_no_parens} && $t->{expr_in_parens}) {
 		my($common, $in_parens, $no_parens) = 
-			extract_common(merge_ixiy($cpu, $t->{expr_in_parens}),
-						   merge_ixiy($cpu, $t->{expr_no_parens}));
+			extract_common(parse_code($cpu, @{$t->{expr_in_parens}}),
+						   parse_code($cpu, @{$t->{expr_no_parens}}));
 		return $common.
 				"if (expr_in_parens) { $in_parens } else { $no_parens }";
 	}
 	else {
 		die;
-	}
-}
-
-sub merge_ixiy {
-	my($cpu, $t) = @_;
-	
-	my $ixiy = parse_code($cpu, @{$t->{ixiy}});
-	my $iyix = parse_code($cpu, @{$t->{iyix}});
-	
-	if ($ixiy eq $iyix) {
-		return $ixiy;
-	}
-	else {
-		(my $common, $ixiy, $iyix) = extract_common($ixiy, $iyix);
-		return $common.
-				"if (!opts.swap_ix_iy) { $ixiy } else { $iyix }";
 	}
 }
 

@@ -9,10 +9,45 @@ else
   EXESUFFIX 		?=
 endif
 
-# UNIXem is needed in both Windows_NT and in a MinGW build in Unix
-ifeq ($(EXESUFFIX),.exe)
+#------------------------------------------------------------------------------
+# UNIXem is needed in Windows_NT, MinGW and when cross-compiling with ningw
+# but not in Unix or Cygwin installation
+ifeq ('$(findstring ;,$(PATH))',';')
+  detected_OS := Windows
+else
+  detected_OS := $(shell uname 2>/dev/null || echo Unknown)
+  detected_OS := $(patsubst CYGWIN%,Cygwin,$(detected_OS))
+  detected_OS := $(patsubst MSYS%,MSYS,$(detected_OS))
+  detected_OS := $(patsubst MINGW%,MSYS,$(detected_OS))
+endif
+
+# needed when including glob.h
+ifeq ($(detected_OS),Cygwin)
+  CFLAGS += -D_CYGWIN
+endif
+
+NEED_UNIXEM := 0
+
+# cross-compiling with mingw32 in Linux
+ifeq ('$(findstring mingw32-gcc,$(CC))','mingw32-gcc')
+  NEED_UNIXEM := 1
+endif  
+
+# compiling in windows except in Cygwin
+ifeq ($(OS),Windows_NT)
+  ifneq ($(detected_OS),Cygwin)
+    NEED_UNIXEM := 1
+  endif
+endif  
+
+# set UNIXem flags
+ifeq ($(NEED_UNIXEM),1)    
   UNIXem_CFLAGS	:= -I../../ext/UNIXem/include
   UNIXem_OBJS	:= ../../ext/UNIXem/src/glob.o \
-		   ../../ext/UNIXem/src/dirent.o \
-		   ../../ext/UNIXem/src/time.o
+  				   ../../ext/UNIXem/src/dirent.o \
+  				   ../../ext/UNIXem/src/time.o
 endif
+
+#------------------------------------------------------------------------------
+# Set to 1 when cross-compiling
+CROSS		?= 0

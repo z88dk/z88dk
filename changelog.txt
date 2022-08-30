@@ -1,7 +1,7 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
-z88dk v2.2 - xx.xx.xxx
+z88dk v2.2 - 23.07.2022
 
 Detailed but incomplete changelist:
 
@@ -10,11 +10,11 @@ Detailed but incomplete changelist:
 - [appmake] Compressed ROM data sections can now use zx0
 - [classic] features.h added for improved portability
 - [classic] ZX0,1,2 decompression functions added
-- [classic] MBF32 8085 and Z80 instruction optimisation
+- [classic] math MBF32: 8085 and Z80 instruction optimisation
+- [classic] math AM9511: support for 8085
 - [classic] sccz80 8080, 8085, gbz80 l_ primitive reentrancy
 - [classic] string function loop overhead optimisation
 - [classic] string callee functions made 8080, 8085 safe
-- [classic] AM9511 math library support for 8085
 - [classic] +cpc: Screen driver fixes
 - [classic] +cpc: Banking support
 - [classic] +cpm: Amstrad, Televideo, Bondwell disc creation
@@ -37,9 +37,9 @@ Detailed but incomplete changelist:
 - [classic] +zx: Improved Interface 1/Microdrive support
 - [classic] +zx: esxdos and plus3 fcntl enhancements
 - [newlib] ZX0 decompression functions added
-- [newlib] +rc2014: Support for shadow RAM access (disabled by default)
-- [newlib] +rc2014: 8085 CPU support through hybrid classic library
+- [newlib] +rc2014: 8085 CPU support through new/classic hybrid library
 - [newlib] +zxn: dot files are now created correctly
+- [gdb] Debugger interface from ticks, connects to a gdbserver
 - [sccz80] Temporary files now removed on windows
 - [sccz80] Bug fixes + optimisations
 - [sccz80] Debug information using -debug
@@ -47,6 +47,8 @@ Detailed but incomplete changelist:
 - [z80asm] Now supports assembling undocumented 8085 instructions
 - [z80asm] Replace --cpu=r2k with --cpu=r2ka
 - [z80asm] Macros are now supported
+- [z80asm] New ASSERT directive 
+- [z80asm] New FLOAT directive
 - [zsdcc] Upgraded to SDCC 4.2.0 r13131
 
 z88dk v2.1 - 07.02.2021

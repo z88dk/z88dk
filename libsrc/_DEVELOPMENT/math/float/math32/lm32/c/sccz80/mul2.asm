@@ -8,7 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _mul2
-EXTERN cm32_sdcc_fsmul2
-defc _mul2 = cm32_sdcc_fsmul2
+defc _mul2 = m32_fsmul2_fastcall
 ENDIF
 

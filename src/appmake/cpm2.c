@@ -551,7 +551,23 @@ static disc_spec corvette_spec = {
      .extent_size = 2048,
      .byte_size_extents = 0,  //?
      .first_sector_offset = 1,
- };
+};
+
+static disc_spec corvetteBOOT_spec = {
+     .name = "Corvette-boot",
+     .sectors_per_track = 5,
+     .tracks = 80,
+     .sides = 2,
+     .sector_size = 1024,
+     .gap3_length = 0x2a,   //?
+     .filler_byte = 0xe5,
+     .boottracks = 2,
+     .directory_entries = 128,
+     .alternate_sides = 1,
+     .extent_size = 2048,
+     .byte_size_extents = 0,  //?
+     .first_sector_offset = 1,
+};
 
 
 
@@ -572,7 +588,8 @@ static struct formats {
     { "caos",      "CAOS/NANOS/z1013 CP/M", &caos_spec, 0, NULL, 1 },
     { "cpcsystem", "CPC System Disc",       &cpcsystem_spec, 0, NULL, 0 },
     { "col1",      "Coleco ADAM 40T SSDD",  &col1_spec, 0, NULL, 1 },
-    { "corvette", "Corvette", &corvette_spec, 32, "\x80\xc3\0\xda\x0a\0\0\x01\x01\x01\x03\x01\x05\0\x50\0\x28\0\x04\x0f\0\x8c\x01\x7f\0\xc0\0\x20\0\x01\0\x11", 1 },
+    { "corvette", "Corvette", &corvette_spec, 32,         "\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8c\x01\x7f\x00\xc0\x00\x20\x00\x01\x00\x11", 1 },
+    { "corvboot", "Corvette Boot", &corvetteBOOT_spec, 32,"\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8a\x01\x7f\x00\xc0\x00\x20\x00\x02\x00\x10", 1 }, // Needs a CP/M bootstrap file specified to auto-boot
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },

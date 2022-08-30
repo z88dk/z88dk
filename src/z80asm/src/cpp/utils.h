@@ -23,6 +23,14 @@ using namespace std;
 	namespace fs = std::experimental::filesystem;
 #endif
 
+// Assert for internal errors, similar to assert but not removed in release builds
+#define Assert(f)    do { \
+                        if (!(f)) { \
+                            cerr << "z88dk-z80asm panic at " << __FILE__ << ":" << __LINE__ << endl; \
+                            exit(EXIT_FAILURE); \
+                        } \
+                    } while(0)
+
 // change case
 string str_tolower(string str);
 string str_toupper(string str);
@@ -38,20 +46,30 @@ string str_strip(const string& str);				// remove start and end blanks
 string str_remove_all_blanks(const string& str);	// remove all blanks
 string str_remove_extra_blanks(const string& str);	// replace sequences of blanks with one space
 
+// search_replace
+string str_replace_all(string text, const string& find, const string& replace);
+
 // read lines with any EOL terminator
 istream& safe_getline(istream& is, string& t);
+
+// globs a pattern including *, ? and ** and returns all matching files and directories
+void expand_glob(vector<fs::path>& result, const string& pattern);
 
 // convert int to hex
 // https://stackoverflow.com/questions/5100718/integer-to-hex-string-in-c
 template<typename T>
-string int_to_hex(T i)
+string int_to_hex(T i, int width)
 {
 	std::ostringstream ss;
-	if (i < 10)
+	if (i <= -10)
+		ss << "-$"
+		<< std::setfill('0') << std::setw(width)
+		<< std::hex << -i << std::dec;
+	else if (i < 10)
 		ss << i;
 	else
-		ss << "0x"
-		<< std::setfill('0') << std::setw(2)
+		ss << "$"
+			<< std::setfill('0') << std::setw(width)
 		<< std::hex << i << std::dec;
 	return ss.str();
 }

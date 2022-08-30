@@ -1,0 +1,33 @@
+name: test-macos-latest
+
+on:
+  schedule:
+    - cron: '00 06 * * *'
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+    - name: Install homebrew dependencies
+      run: |
+        brew install perl
+    - name: Install perl prerequisites
+      run: |
+        export PATH=/usr/local/bin:$PATH
+        cpan -T Capture::Tiny
+        cpan App::Prove Clone Data::Dump Data::HexDump Modern::Perl File::Path CPU::Z80::Assembler Path::Tiny Regexp::Common Text::Diff Text::Table Object::Tiny::RW List::Uniq YAML::Tiny
+    - name: Get lastest nightly
+      run: |
+        curl -L -o z88dk-osx-latest.zip http://nightly.z88dk.org/z88dk-osx-latest.zip
+        unzip -d osx-latest z88dk-osx-latest.zip
+    - name: Copy files from nightly
+      run: |
+        cp osx-latest/z88dk/bin/z88dk-z80asm      osx-latest/z88dk/src/z80asm/
+        cp osx-latest/z88dk/lib/z88dk-z80asm*.lib osx-latest/z88dk/src/z80asm/
+    - name: Run z80asm tests
+      run: |
+        set -x
+        cd osx-latest/z88dk/src/z80asm
+        export PATH=$RUNNER_WORKSPACE/z88dk/osx-latest/z88dk/bin:$PATH
+        export ZCCCFG=$RUNNER_WORKSPACE/z88dk/osx-latest/z88dk/lib/config
+        perl -S prove t/*.t

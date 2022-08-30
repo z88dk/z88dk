@@ -51,10 +51,10 @@ PUBLIC asm_HeapAlloc
 
    ld a,b                    ; requests must be at least 2 bytes
    or a
-   jp nz, loop
+   jp NZ,loop
    ld a,c
    cp 2
-   jp nc, loop
+   jp NC,loop
    ld c,2
 
 .loop
@@ -69,17 +69,20 @@ PUBLIC asm_HeapAlloc
    ld l,a                    ; hl = & next block
 
    or h
-   jr z, exit0               ; if no next block, return with hl=0 and nc for fail
-   
+   jr Z,exit0                ; if no next block, return with hl=0 and NC for fail
+
    ; hl = & block
    ; bc = size
    ; stack = & lagger->next + 1b
-   
+
    ld e,(hl)
    inc hl
    ld d,(hl)
    ex de,hl                  ; hl = block's size, de = & block + 1b
-IF __CPU_INTEL__ || __CPU_GBZ80__
+
+IF __CPU_8085__
+   sub hl,bc
+ELIF __CPU_8080__ || __CPU_GBZ80
    ld a,l
    sub c
    ld l,a
@@ -89,23 +92,27 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
 ELSE
    sbc hl,bc                 ; is block size at least as big as requested?
 ENDIF
-   jr nc, foundblk           ; if so branch to foundblk
-   
+
+   jr NC,foundblk            ; if so branch to foundblk
+
    pop hl                    ; junk lagger on stack
    ex de,hl
    inc hl                    ; hl = & block->next
    jp loop                   ; try again with next block
-   
+
 .foundblk
 
    ; bc = size
    ; de = & block + 1b
    ; hl = block's excess size
    ; stack = & lagger->next + 1b
-   
+
    push bc
    ld bc,4
-IF __CPU_INTEL__ || __CPU_GBZ80__
+
+IF __CPU_8085__
+   sub hl,bc
+ELIF __CPU_8080__ || __CPU_GBZ80
    ld a,l
    sub c
    ld l,a
@@ -115,8 +122,9 @@ IF __CPU_INTEL__ || __CPU_GBZ80__
 ELSE
    sbc hl,bc
 ENDIF
+
    pop bc
-   jr c, usewholeblk         ; if too small to split, use whole block
+   jr C,usewholeblk          ; if too small to split, use whole block
 
 .splitblk
 
@@ -124,7 +132,7 @@ ENDIF
    ; de = & block + 1b
    ; hl = size remaining of block after allocation satisfied - 2
    ; stack = & lagger->next + 1b
-   
+
    inc hl
    inc hl
    ex de,hl                  ; de = size of remaining part of block
@@ -153,20 +161,20 @@ ENDIF
    inc de                    ; de = & block->next + 1b
    pop hl                    ; hl = & lagger->next + 1b
    ex de,hl
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
-   ld a,(hl)
-   ld (de),a
-   inc hl
-   inc de
+   ld a,(hl+)
+   ld (de+),a
    dec bc
 ELSE
    ldd                       ; write next block after this one into lagger's pointer
 ENDIF
+
    ld a,(hl)                 ; hl = & allocated memory block = & block->next
    ld (de),a
    scf                       ; indicate success
    ret
-   
+
 .exit0
 
    pop de                    ; junk lagger on stack

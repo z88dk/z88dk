@@ -5,10 +5,10 @@
 
 	defc	asin = cam32_sccz80_asin
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _asin
-EXTERN cam32_sdcc_asin
-defc _asin = cam32_sdcc_asin
+defc _asin = cam32_sccz80_asin
 ENDIF
 

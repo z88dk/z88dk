@@ -73,7 +73,7 @@ int getch()
 int hook_console_out(int port, int value)
 {
     if (ioport !=-1 && (port&0xff) == ioport) {
-        fputc(c,stdout);
+        fputc(value,stdout);
         return 0;
     }
 

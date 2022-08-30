@@ -97,7 +97,7 @@ void set_regs(struct debugger_regs_t* regs)
 void debugger_write_memory(int addr, uint8_t val)
 {
     breakpoint *elem;
-    int         i;
+    int         i = 0;
     LL_FOREACH(watchpoints, elem) {
         if ( elem->enabled == 0 ) {
             continue;
@@ -114,7 +114,7 @@ void debugger_write_memory(int addr, uint8_t val)
 void debugger_read_memory(int addr)
 {
     breakpoint *elem;
-    int         i;
+    int         i = 0;
 
     LL_FOREACH(watchpoints, elem) {
         if ( elem->enabled == 0 ) {

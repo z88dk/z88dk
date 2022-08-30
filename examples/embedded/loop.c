@@ -13,7 +13,9 @@ int main(void)
 {
 	char	c;
 
+#if defined(__EMBEDDED)
 	init_uart(0,1);
+#endif
 
 	for (;;)
 	{

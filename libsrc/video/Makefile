@@ -3,7 +3,7 @@ include ../Make.config
 
 SUBDIRS = tms9918 upd7220 krt
 # Directories that need a target passed down
-CLEANDIRS = $(SUBDIRS:%=clean-%) $(TARGETDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean) $(TARGETDIRS:%=%-clean)
 
 all: $(SUBDIRS)
 
@@ -25,4 +25,4 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean

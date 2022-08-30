@@ -59,7 +59,7 @@ int smc777_exec(char *target)
     }
     if ( fseek(bootstrap_fp,0,SEEK_END) ) {
         fclose(bootstrap_fp);
-        fprintf(stderr,"Couldn't determine size of file\n");
+        exit_log(1, "Couldn't determine size of file\n");
     }
     bootlen = ftell(bootstrap_fp);
     fseek(bootstrap_fp,0L,SEEK_SET);

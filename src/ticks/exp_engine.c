@@ -257,7 +257,7 @@ void expression_get_struct_members(struct expression_result_t* result, int* coun
     if (result->type.first->type_ == TYPE_GENERIC_POINTER ||
         result->type.first->type_ == TYPE_CODE_POINTER) {
 
-        struct expression_result_t dereferenced = {};
+        struct expression_result_t dereferenced = {0};
         expression_dereference_pointer(result, &dereferenced);
         expression_get_struct_members(&dereferenced, count, members);
         expression_result_free(&dereferenced);
@@ -302,7 +302,7 @@ int expression_count_members(struct expression_result_t* result)
         case TYPE_CODE_POINTER:
         case TYPE_GENERIC_POINTER:
         {
-            struct expression_result_t dereferenced = {};
+            struct expression_result_t dereferenced = {0};
             expression_dereference_pointer(result, &dereferenced);
             num_child = expression_count_members(&dereferenced);
             expression_result_free(&dereferenced);

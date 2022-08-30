@@ -8,7 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _log
-EXTERN cm32_sdcc_log
-defc _log = cm32_sdcc_log
+defc _log = _m32_logf
 ENDIF
 

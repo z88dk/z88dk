@@ -7,8 +7,6 @@ static hook_command  hooks[256];
 
 void PatchZ80(void)
 {
-    int   val;
-
     // CP/M Emulation bodge
     if ( pc == 7 ) {
         hook_cpm();

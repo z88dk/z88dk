@@ -28,8 +28,8 @@ extern const char *path_file(const char *path);
 extern const char *path_ext(const char *path);
 
 // manipulate extension
-extern const char *path_remove_ext(const char *path);
-extern const char *path_replace_ext(const char *path, const char *new_ext);
+extern const char *remove_extension(const char *path);
+extern const char *replace_extension(const char *path, const char *new_ext);
 
 // file IO, die if error
 // maps internally FILE* -> fileno -> filename for error messages

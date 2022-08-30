@@ -23,7 +23,7 @@
 
 
 #undef  __Z88DK
-#define __Z88DK  2100
+#define __Z88DK  2200
 
 
 
@@ -38,8 +38,6 @@
 
 #undef  __RC2014
 #define __RC2014  1
-
-#define __CPU_CLOCK  7372800
 
 #define __IO_DIO_PORT  0x00
 #define __IO_CF_PORT  0x10

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set +e        # allow tests to fail without aborting make test
+
 fail=0
 nr=0
 for t in $( cat t/test1.hh | sed -e 's/^[^"]*"//' -e 's/".*//'); do

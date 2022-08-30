@@ -8,6 +8,7 @@
 #pragma once
 
 #include "defines.h"
+#include "errors.h"
 #include "if.h"
 #include "lex.h"
 #include <deque>
@@ -16,18 +17,6 @@
 #include <list>
 #include <string>
 using namespace std;
-
-//-----------------------------------------------------------------------------
-
-struct Location {
-	string filename;
-	int line_num;
-	int line_inc{ 1 };
-
-	Location(const string& filename = "", int line_num = 0);
-	void clear() { filename.clear(); line_num = 0; line_inc = 1; }
-	void inc_line() { line_num += line_inc; }
-};
 
 //-----------------------------------------------------------------------------
 
@@ -95,8 +84,7 @@ public:
 	void close();
 	bool getline(string& line);
 	bool get_unpreproc_line(string& line);
-	string filename() const;
-	int line_num() const;
+	const Location& location() const;
 	bool is_c_source() const;
 	void set_filename(const string& filename);
 	void set_line_num(int line_num, int line_inc = 1);
@@ -110,6 +98,7 @@ private:
 	Lexer				m_lexer;		// line being parsed
 	Macros				m_macros;		// MACRO..ENDM macros
 
+	bool getline1(string& line);
 	bool recursive_include(const string& filename);
 
 	Macros& defines() { return m_levels.back().defines; }
@@ -163,3 +152,5 @@ private:
 	string collect_macro_body(Keyword start_keyword, Keyword end_keyword);
 	string collect_reptc_arg(Lexer& lexer);
 };
+
+extern Preproc g_preproc;

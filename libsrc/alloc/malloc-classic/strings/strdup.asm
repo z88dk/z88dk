@@ -29,34 +29,33 @@ EXTERN _heap
    ld a,(hl)
    inc hl
    or a
-   jp nz, sizeloop
-   
+   jp NZ,sizeloop
+
    ld hl,_heap
    push bc
    call asm_HeapAlloc
    pop bc
    pop de
-   ret nc
-   
+   ret NC
+
    ex de,hl
    push de
+
 IF __CPU_INTEL__ || __CPU_GBZ80__
-loop:
- IF __CPU_GBZ80__
-   ld a,(hl+)
- ELSE
-   ld a,(hl)
-   inc hl
- ENDIF
-   ld (de),a
-   inc de
    dec bc
-   ld a,b
-   or c
-   jr nz,loop
+   inc b
+   inc c
+.ldir_loop
+   ld a,(hl+)
+   ld (de+),a
+   dec c
+   jr NZ,ldir_loop
+   dec b
+   jr NZ,ldir_loop
 ELSE
    ldir
 ENDIF
+
    pop hl
    ret
 

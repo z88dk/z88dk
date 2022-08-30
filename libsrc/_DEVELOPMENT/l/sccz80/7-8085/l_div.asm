@@ -8,7 +8,7 @@ SECTION code_l_sccz80
 EXTERN  l_hlneg
 EXTERN  l_deneg
 EXTERN  l_bcneg
-EXTERN  l_div_u_0
+EXTERN  l_div_0
 
 PUBLIC  l_div
 
@@ -28,20 +28,20 @@ PUBLIC  l_div
     or      a
     call    M,l_bcneg
 
-    call    l_div_u_0       ;unsigned HL = DE / BC, DE = DE % BC
+    call    l_div_0         ;unsigned HL = DE / BC, DE = DE % BC
 
     ; C standard requires that the result of division satisfy
     ; a = (a/b)*b + a%b
     ; remainder takes sign of the dividend
 
-    pop     bc                  ;restore sign info
+    pop     bc              ;restore sign info
 
     ld      a,b
-    xor     c                   ;quotient, sign of dividend^divisor
+    xor     c               ;quotient, sign of dividend^divisor
     call    M,l_hlneg
 
     ld      a,c
-    or      a,a                 ;remainder, sign of dividend
+    or      a,a             ;remainder, sign of dividend
     ret     P
 
     jp      l_deneg

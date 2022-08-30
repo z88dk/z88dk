@@ -26,6 +26,7 @@
 use strict;
 use warnings;
 use Capture::Tiny 'capture';
+use Config;
 use File::Basename;
 use IO::File;
 use File::Spec;
@@ -33,7 +34,6 @@ use Iterator::Simple qw( iter ienumerate iflatten imap igrep );
 use Iterator::Simple::Lookahead;
 use Regexp::Common;
 use FindBin;
-use Data::Dump 'dump';
 
 #------------------------------------------------------------------------------
 # Globals
@@ -618,10 +618,10 @@ sub assemble_file {
 	
 	# assemble, translate error messages
 	my @cmd = ('z88dk-z80asm', @OPTIONS, $i_file);
+	$cmd[0] = $FindBin::Bin.'/z88dk-z80asm'.$Config{_exe};
 	if ($VERBOSE) {
 		print "@cmd\n";
 	}
-	$cmd[0] = $FindBin::Bin.'/z88dk-z80asm';
 	my ($stdout, $stderr, $exit) = capture {
 		system @cmd;
 	};

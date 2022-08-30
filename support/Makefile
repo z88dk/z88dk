@@ -2,8 +2,8 @@ include
 
 
 SUBDIRS = basck debugger graphics pv1000 rcmx000
-CLEANDIRS = $(SUBDIRS:%=clean-%)
-INSTALLDIRS = $(SUBDIRS:%=install-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
+INSTALLDIRS = $(SUBDIRS:%=%-install)
 
 all: subdirs-all
 
@@ -31,7 +31,7 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 
 $(INSTALLDIRS):
-	$(MAKE) -C $(@:install-%=%) PREFIX=$(PREFIX) install
+	$(MAKE) -C $(@:%-install=%) PREFIX=$(PREFIX) install

@@ -26,6 +26,6 @@ cubeflt16.63: cube.c
 	zcc +z88 $^ -subtype=app -create-app -o $(@:.app=.bin) -lm
 
 clean:
-	$(RM) *.bas *.bin *.reloc *.63 *.epr
+	$(RM) *.bas *.bin *.ap0 *.reloc *.63 *.epr
 	$(RM) zcc_opt.def *.op* *.o *.i *.asm *.err *.map *.sym
 	$(MAKE) -C app clean

@@ -67,7 +67,7 @@ static void str_path_canon(UT_string *path)
 				p++;
 			if (strncmp(p, "/../", 4) == 0) {
 				memmove(p1, p + 4, strlen(p + 4) + 1);	// copy also null
-				p = p1;
+				p = root;								// need to check again
 			}
 			else if (strcmp(p, "/..") == 0) {
 				p = p1;
@@ -137,12 +137,12 @@ const char *path_combine(const char *path1, const char *path2)
 	return ret;
 }
 
-const char *path_remove_ext(const char *path1)
+const char *remove_extension(const char *path1)
 {
-	return path_replace_ext(path1, "");
+	return replace_extension(path1, "");
 }
 
-const char *path_replace_ext(const char *path1, const char *new_ext)
+const char *replace_extension(const char *path1, const char *new_ext)
 {
 	UT_string *path = utstr_new_init(path1);	
 	str_path_canon(path);

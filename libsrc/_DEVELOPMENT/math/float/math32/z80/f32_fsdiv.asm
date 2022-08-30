@@ -176,7 +176,7 @@ PUBLIC _m32_invf
     rr c                        ; save sign in c
     sub a,07fh                  ; calculate new exponent for 1/D
     neg
-    add a,07eh   
+    add a,07eh
     ld b,a
 
     ld a,l

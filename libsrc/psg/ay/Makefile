@@ -1,12 +1,12 @@
 #
-# Build the PSG lib componente
+# Build the PSG lib components
 #
 
 include ../../Make.config
 
 SUBDIRS = wyz vt2
 
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 CFILES = \
 	psg_channels.c \
@@ -21,7 +21,6 @@ OBJECTS = $(CFILES:.c=.o)
 
 
 all:    dirs $(SUBDIRS) $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/ixiy/, $(OBJECTS))  $(addprefix obj/8080/, $(OBJECTS)) $(addprefix obj/z80n/,$(OBJECTS))
-
 
 
 dirs:
@@ -42,4 +41,4 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean

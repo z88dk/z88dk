@@ -3,7 +3,7 @@ include ../../Make.config
 TARGET = newbrain
 
 SUBDIRS = fcntl
-CLEANDIRS = $(SUBDIRS:%=clean-%)
+CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 ASMFILES = 
 OBJECTS = $(ASMFILES:.asm=.o)
@@ -35,7 +35,7 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:clean-%=%) clean
+	$(MAKE) -C $(@:%-clean=%) clean
 	$(RM) */*.o
 	$(RM) -r obj
 	$(RM) zcc_opt.def

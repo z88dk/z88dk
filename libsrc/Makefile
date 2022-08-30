@@ -1921,8 +1921,12 @@ r2k_crt0.lib:
 	$(call buildcrt)
 	TYPE=r2k $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/r2k_crt0 @$(LISTFILE_DIRECTORY)/rabbit.lst
 
+install:
+	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs
 
 clean: classic-clean new-clean
+
+install-clean: classic-clean new-install-clean
 
 classic-clean:
 	$(MAKE) -C assert clean
@@ -1967,7 +1971,3 @@ new-clean:
 new-install-clean:
 	$(MAKE) -C _DEVELOPMENT install-clean
 
-install-clean: classic-clean new-install-clean
-
-install:
-	cp $(OUTPUT_DIRECTORY)/*.lib ../lib/clibs

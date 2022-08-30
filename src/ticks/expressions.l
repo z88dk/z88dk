@@ -1,4 +1,4 @@
-%option noyywrap
+%option noyywrap never-interactive
 
 %top{
 #include <stdint.h>

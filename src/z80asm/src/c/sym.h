@@ -14,8 +14,8 @@ One symbol from the assembly code - label or constant.
 #include "class.h"
 #include "types.h"
 
-struct Module;
-struct Section;
+struct Module1;
+struct Section1;
 
 /*-----------------------------------------------------------------------------
 *   Special symbols
@@ -53,9 +53,9 @@ typedef enum {
 extern char *sym_scope_str[];
 
 /*-----------------------------------------------------------------------------
-*   Symbol
+*   Symbol1
 *----------------------------------------------------------------------------*/
-CLASS( Symbol )
+CLASS( Symbol1 )
 	const char	   *name;				/* name, kept in strpool */
 	long			value;				/* computed value of symbol */
 	sym_type_t		type;				/* type of symbol */
@@ -66,20 +66,20 @@ CLASS( Symbol )
 	bool			is_touched : 1;		/* true if symbol was used, e.g. returned by 
 										 * a symbol table search */
 	bool			is_global_def : 1;	/* true for __head, __tail, __size symbols */
-	struct Module  *module;				/* module which owns symbol (weak ref) */
-	struct Section *section;			/* section where expression is defined (weak ref) */
+	struct Module1  *module;				/* module which owns symbol (weak ref) */
+	struct Section1 *section;			/* section where expression is defined (weak ref) */
 	const char	   *filename;			/* file where defined */
 	int				line_num;			/* line where defined */
 END_CLASS;
 
 /*-----------------------------------------------------------------------------
-*   Symbol API
+*   Symbol1 API
 *----------------------------------------------------------------------------*/
 
 /* create a new symbol, needs to be deleted by OBJ_DELETE()
    adds a reference to the page were referred to */
-extern Symbol *Symbol_create(const char *name, long value, sym_type_t type, sym_scope_t scope,
-							  struct Module *module, struct Section *section );
+extern Symbol1 *Symbol_create(const char *name, long value, sym_type_t type, sym_scope_t scope,
+							  struct Module1 *module, struct Section1 *section );
 
 /* return full symbol name NAME@MODULE stored in strpool */
-extern const char *Symbol_fullname( Symbol *sym );
+extern const char *Symbol_fullname( Symbol1 *sym );

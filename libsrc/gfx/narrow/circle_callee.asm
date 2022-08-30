@@ -27,8 +27,11 @@ IF !__CPU_INTEL__ & !__CPU_GBZ80__
     pop     hl    ; x
     ld      b,l
     push    af
-.asm_circle
+
     push    ix
+
+
+.asm_circle
 IF NEED_swapgfxbk = 1
     call    swapgfxbk
 ENDIF

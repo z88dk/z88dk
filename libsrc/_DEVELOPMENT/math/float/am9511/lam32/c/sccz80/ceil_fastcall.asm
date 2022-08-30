@@ -5,6 +5,7 @@
 
 	defc	ceil_fastcall = asm_am9511_ceil_fastcall
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _ceil_fastcall

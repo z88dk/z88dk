@@ -5,6 +5,7 @@
 
 	defc	fabs_fastcall = asm_am9511_fabs_fastcall
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _fabs_fastcall

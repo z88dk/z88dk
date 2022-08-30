@@ -13,7 +13,8 @@ Handle object file contruction, reading and writing
 
 #include "array.h"
 #include "class.h"
-#include "module.h"
+#include "if.h"
+#include "module1.h"
 #include "types.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +41,7 @@ const char* filename;		/* object file name, in strpool */
 const char* modname;		/* module name, in strpool */
 
 /* all file pointers are -1 if not defined */
-long	 modname_ptr;		/* offset in file to Module Name */
+long	 modname_ptr;		/* offset in file to Module1 Name */
 long	 expr_ptr;			/* offset if file to Expression Declaration */
 long	 symbols_ptr;		/* offset if file to Name Definition */
 long	 externsym_ptr;		/* offset if file to External Name Declaration */
@@ -75,7 +76,7 @@ extern void   OFile_close(OFile* self);
 extern ByteArray* read_obj_file_data(const char* filename);
 
 /*-----------------------------------------------------------------------------
-*   Module interface to object files
+*   Module1 interface to object files
 *----------------------------------------------------------------------------*/
 
 /* Updates current module name and size, if object file of given source is valid

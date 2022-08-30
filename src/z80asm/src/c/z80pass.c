@@ -8,21 +8,22 @@ Repository: https://github.com/z88dk/z88dk
 */
 
 #include "die.h"
+#include "expr1.h"
 #include "if.h"
 #include "limits.h"
 #include "modlink.h"
-#include "symbol.h"
+#include "scan.h"
+#include "symtab1.h"
+#include "types.h"
+#include "zobjfile.h"
 
 /* external functions */
 
 /* local functions */
-void Z80pass2(void);
-
-void
-Z80pass2(void)
+void Z80pass2(int start_errors)
 {
-	ExprListElem* iter;
-	Expr* expr, * expr2;
+	Expr1ListElem* iter;
+	Expr1* expr, * expr2;
 	long value;
 	bool do_patch, do_store;
 	long asmpc;		// should be an int!
@@ -30,7 +31,7 @@ Z80pass2(void)
 	/* compute all dependent expressions */
 	compute_equ_exprs(CURRENTMODULE->exprs, false, true);
 
-	iter = ExprList_first(CURRENTMODULE->exprs);
+	iter = Expr1List_first(CURRENTMODULE->exprs);
 	while (iter != NULL)
 	{
 		expr = iter->obj;
@@ -155,7 +156,7 @@ Z80pass2(void)
 			}
 		}
 
-		if (opts.list) {
+		if (option_list_file()) {
 			if (expr->range == RANGE_WORD_BE) {
 				int swapped = ((value & 0xFF00) >> 8) | ((value & 0x00FF) << 8);
 				list_patch_bytes(expr->listpos, swapped, range_size(expr->range));
@@ -167,11 +168,11 @@ Z80pass2(void)
 
 		/* continue loop - delete expression unless needs to be stored in object file */
 		if (do_store)
-			iter = ExprList_next(iter);
+			iter = Expr1List_next(iter);
 		else
 		{
 			/* remove current expression, advance iterator */
-			expr2 = ExprList_remove(CURRENTMODULE->exprs, &iter);
+			expr2 = Expr1List_remove(CURRENTMODULE->exprs, &iter);
 			xassert(expr == expr2);
 
 			OBJ_DELETE(expr);
@@ -186,31 +187,31 @@ Z80pass2(void)
 	clear_error_location();
 
 	/* create object file */
-	if (!get_num_errors())
+	if (start_errors == get_num_errors())
 		write_obj_file(CURRENTMODULE->filename);
 
 	// add to the list of objects to link
-	if (!get_num_errors())
-		object_file_append(get_obj_filename(CURRENTMODULE->filename), CURRENTMODULE, false, false);
+	if (start_errors == get_num_errors())
+		object_file_append(get_o_filename(CURRENTMODULE->filename), CURRENTMODULE, false, false);
 
-	if (!get_num_errors() && opts.symtable)
+	if (start_errors == get_num_errors() && option_symtable())
 		write_sym_file(CURRENTMODULE);
 }
 
 
-bool Pass2infoExpr(range_t range, Expr* expr)
+bool Pass2infoExpr(range_t range, Expr1* expr)
 {
 	if (expr != NULL)
 	{
 		expr->range = range;
 		expr->code_pos = get_cur_module_size();			/* update expression location */
 
-		if (opts.cur_list)
+		if (list_is_on())
 			expr->listpos = expr->code_pos;
 		else
 			expr->listpos = -1;
 
-		ExprList_push(&CURRENTMODULE->exprs, expr);
+		Expr1List_push(&CURRENTMODULE->exprs, expr);
 	}
 
 	/* reserve space */
@@ -221,7 +222,7 @@ bool Pass2infoExpr(range_t range, Expr* expr)
 
 bool Pass2info(range_t range)
 {
-	Expr* expr;
+	Expr1* expr;
 
 	/* Offset of (ix+d) should be optional; '+' or '-' are necessary */
 	if (range == RANGE_BYTE_SIGNED)

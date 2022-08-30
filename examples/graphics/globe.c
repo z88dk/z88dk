@@ -8,6 +8,8 @@
 	A = 25.0   <- Globe inclinationh
 
 	to build:  zcc +<target> <stdio options> -lm -create-app globe.c
+	or
+	to build using math32:  zcc +<target> <stdio options> --math32 -create-app globe.c
 	
 	Examples:
 	
@@ -223,11 +225,11 @@ char plane[] = { 83, 38, 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x20 , 0x00 , 0x00 ,
 
 
 float rsin(float x) {
-	return sin(pi()*x/180.0);
+	return sin(M_PI*x/180.0);
 }
 
 float rcos(float x) {
-	return cos(pi()*x/180.0);
+	return cos(M_PI*x/180.0);
 }
 
 void plotline()

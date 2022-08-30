@@ -5,20 +5,21 @@
 	
 	The picture size is automatically adapted to the target display size
 	
-	to build:  zcc +<target> <stdio options> -lm -create-app sinwave.c
+	to build:  zcc +<target> <stdio options> -lm -create-app coswave.c
+	or
+	to build using math32:  zcc +<target> <stdio options> --math32 -create-app coswave.c
 	
 	Examples:
-	  zcc +zx -lm -lndos -create-app sinwave.c
-	  zcc +aquarius -lm -create-app sinwave.c
+	  zcc +zx -lm -lndos -create-app coswave.c
+	  zcc +aquarius -lm -create-app coswave.c
 	
-	$Id: coswave.c,v 1.4 2011-04-01 06:50:45 stefano Exp $
+	stefano
 
 */
 
 #include <graphics.h>
 #include <stdio.h>
 #include <math.h>
-#include <lib3d.h>
 
 void main()
 {

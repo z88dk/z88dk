@@ -31,9 +31,9 @@ Manage the code area in memory
 *----------------------------------------------------------------------------*/
 
 /*-----------------------------------------------------------------------------
-*   Named Section of code, introduced by "SECTION" keyword
+*   Named Section1 of code, introduced by "SECTION" keyword
 *----------------------------------------------------------------------------*/
-CLASS( Section )
+CLASS( Section1 )
 	const char	*name;				// name of section, kept in strpool
 	int			 addr;				// start address of this section,
 									// computed by sections_alloc_addr()
@@ -60,7 +60,16 @@ CLASS( Section )
 									// addr of module ID
 END_CLASS;
 
-CLASS_HASH( Section );
+CLASS_HASH( Section1 );
+
+/*-----------------------------------------------------------------------------
+*   FILE* and filename or current code area
+*----------------------------------------------------------------------------*/
+typedef struct CodeareaFile {
+	const char* filename;			// kept in strpool
+	FILE*		fp;					// open file handle
+	const char* initial_filename;	// kept in strpool
+} CodeareaFile;
 
 /*-----------------------------------------------------------------------------
 *   Handle list of current sections
@@ -70,25 +79,25 @@ CLASS_HASH( Section );
 extern void reset_codearea( void );
 
 /* return size of current section */
-extern int get_section_size( Section *section );
+extern int get_section_size( Section1 *section );
 
 /* compute total size of all sections */
 extern int get_sections_size( void );
 
 /* get section by name, creates a new section if new name; make it the current section */
-extern Section *new_section(const char *name );
+extern Section1 *new_section(const char *name );
 
 /* get/set current section */
-extern Section *get_cur_section( void );
-extern Section *set_cur_section( Section *section );
+extern Section1 *get_cur_section( void );
+extern Section1 *set_cur_section( Section1 *section );
 
 #define CURRENTSECTION	(get_cur_section())
 
 /* iterate through sections, 
    pointer to iterator may be NULL if no need to iterate */
-extern Section *get_first_section( SectionHashElem **piter );
-extern Section *get_last_section( void );
-extern Section *get_next_section( SectionHashElem **piter );
+extern Section1 *get_first_section( Section1HashElem **piter );
+extern Section1 *get_last_section( void );
+extern Section1 *get_next_section( Section1HashElem **piter );
 
 /*-----------------------------------------------------------------------------
 *   allocate the addr of each of the sections, concatenating the sections in
@@ -160,7 +169,8 @@ extern bool fwrite_module_code(FILE *file, int* p_code_size);
 /*-----------------------------------------------------------------------------
 *   write whole code area to an open file
 *----------------------------------------------------------------------------*/
-extern void fwrite_codearea(const char *filename, FILE **pbinfile, FILE **prelocfile );
+extern void fwrite_codearea(CodeareaFile* binfile, CodeareaFile* relocfile);
+extern void codearea_close_remove(CodeareaFile* binfile, CodeareaFile* relocfile);
 
 /*-----------------------------------------------------------------------------
 *   Assembly directives
@@ -177,9 +187,9 @@ extern void set_origin_option(int origin);
    origin = 0..0xFFFF - origin defined;
    origin = -1 - origin not defined 
    origin = -1 and section_split - origin not defined, but section split */
-extern void read_origin(FILE* file, Section *section);
-extern void set_origin(int origin, Section *section);
-extern void write_origin(FILE* file, Section *section);
+extern void read_origin(FILE* file, Section1 *section);
+extern void set_origin(int origin, Section1 *section);
+extern void write_origin(FILE* file, Section1 *section);
 
 // set/clear the new asmpc_phase
 extern void set_phase_directive(int address);

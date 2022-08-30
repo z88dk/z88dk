@@ -1,10 +1,10 @@
 
-    SECTION code_fp_am9511
+	SECTION	code_fp_am9511
+	PUBLIC	sqr_fastcall
+	EXTERN	asm_am9511_sqr_fastcall
 
-    PUBLIC sqr_fastcall
-    EXTERN asm_am9511_sqr_fastcall
+	defc	sqr_fastcall = asm_am9511_sqr_fastcall
 
-    defc sqr_fastcall = asm_am9511_sqr_fastcall
 
 ; SDCC bridge for Classic
 IF __CLASSIC

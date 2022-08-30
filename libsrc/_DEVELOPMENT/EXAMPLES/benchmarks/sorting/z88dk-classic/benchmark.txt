@@ -14,7 +14,7 @@ sort-sccz80-rev-5000 63352461
 sort-sccz80-equ-5000 41378393
 
 classic / zsdcc
-Build: 4.2.0 #13081 (Linux) Mar 10 2022
+Build: 4.2.0 #13131 (Linux) Mar 10 2022
 
 sort-zsdcc-ran-20 76591
 sort-zsdcc-ord-20 48639

@@ -1042,7 +1042,6 @@ int main (int argc, char **argv){
 
 
   do{
-    char buf[256];
     if ( ih ) {
         if (break_required) {
             break_required = 0;

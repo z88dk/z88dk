@@ -39,8 +39,6 @@ PUBLIC `__Z80'
 PUBLIC `__Z80_NMOS'
 PUBLIC `__Z80_CMOS'
 
-PUBLIC `__CPU_CLOCK'
-
 PUBLIC `__CPU_INFO'
 
 PUBLIC `__CPU_INFO_ENABLE_SLL'
@@ -75,8 +73,6 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__Z80_NMOS'  __Z80_NMOS
 `#define' `__Z80_CMOS'  __Z80_CMOS
-
-`#define' `__CPU_CLOCK'  __CPU_CLOCK
 
 `#define' `__CPU_INFO'  __CPU_INFO
 

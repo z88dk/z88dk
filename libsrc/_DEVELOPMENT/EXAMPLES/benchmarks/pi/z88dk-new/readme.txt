@@ -96,10 +96,9 @@ execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks pi.bin -start 01a8 -end 0318 -counter 9999999999
+z88dk-ticks pi.bin -x pi.map -start TIMER_START -end TIMER_STOP -counter 9999999999
+z88dk-ticks pi_ldiv.bin -x pi_ldiv.map -start TIMER_START -end TIMER_STOP -counter 9999999999
 
-start   = TIMER_START in hex
-end     = TIMER_STOP in hex
 counter = High value to ensure completion
 
 If the result is close to the counter value, the program may have
@@ -118,53 +117,61 @@ PR #1436 demotion of small uint32*uint32 where multipliers are uint16*uint16
 
 PI.C
 
-new/sccz80/small (6269 bytes less page zero)
+new/sccz80/small (6340 bytes less page zero)
 
 cycle count  = 5246791210 (March 2, 2017)
 cycle count  = 4012440735 (April 4, 2020)
-time @ 4MHz  = 4012440735 / 4*10^6 = 17 min 43 sec
+cycle count  = 4028061102 (April 4, 2022)
+time @ 4MHz  = 4028061102 / 4*10^6 = 17 min 47 sec
 
-new/zsdcc/small (6246 bytes less page zero)
+new/zsdcc/small (6299 bytes less page zero)
 
 cycle count  = 5278798872 (March 2, 2017, ZSDCC #9833)
 cycle count  = 4067517071 (April 4, 2020,  ZSDCC #11556)
-time @ 4MHz  = 4067517071 / 4*10^6 = 16 min 57 sec
+cycle count  = 4011979932 (April 4, 2022,  ZSDCC #13131)
+time @ 4MHz  = 4011979932 / 4*10^6 = 16 min 43 sec
 
-new/sccz80/fast (8999 bytes less page zero)
+new/sccz80/fast (9049 bytes less page zero)
 
 cycle count  = 1708903088 (March 2, 2017)
 cycle count  = 1696878309 (April 4, 2020)
-time @ 4MHz  = 1696878309 / 4*10^6 =  7 min 04 sec
+cycle count  = 1766815709 (April 4, 2022)
+time @ 4MHz  = 1766815709 / 4*10^6 =  7 min 22 sec
 
-new/zsdcc/fast (8997 bytes less page zero)
+new/zsdcc/fast (9049 bytes less page zero)
 
 cycle count  = 1739403552 (March 2, 2017, ZSDCC #9833)
 cycle count  = 1756864232 (April 4, 2020, ZSDCC #11556)
-time @ 4MHz  = 1756864232 / 4*10^6 =  7 min 19 sec
+cycle count  = 1736106244 (April 4, 2022,  ZSDCC #13131)
+time @ 4MHz  = 1736106244 / 4*10^6 =  7 min 14 sec
 
 
 PI_LDIV.C
 
-new/sccz80/small (6400 bytes less page zero)
+new/sccz80/small (6428 bytes less page zero)
 
 cycle count  = 3810732458 (March 2, 2017)
 cycle count  = 2576381983 (April 4, 2020)
-time @ 4MHz  = 2576381983 / 4*10^6 = 10 min 44 sec
+cycle count  = 2578767150 (April 4, 2022)
+time @ 4MHz  = 2578767150 / 4*10^6 = 10 min 45 sec
 
-new/zsdcc/small (6388 bytes less page zero)
+new/zsdcc/small (6391 bytes less page zero)
 
 cycle count  = 3827247920 (March 2, 2017, ZSDCC #9833) 
 cycle count  = 2609489119 (April 4, 2020, ZSDCC #11556)
-time @ 4MHz  = 2609489119 / 4*10^6 = 10 min 52 sec
+cycle count  = 2551419380 (April 4, 2022,  ZSDCC #13131)
+time @ 4MHz  = 2551419380 / 4*10^6 = 10 min 38 sec
 
-new/sccz80/fast (9131 bytes less page zero)
+new/sccz80/fast (9137 bytes less page zero)
 
 cycle count  = 1313857712 (March 2, 2017)
 cycle count  = 1301832933 (April 4, 2020)
-time @ 4MHz  = 1301832933 / 4*10^6 =  5 min 25 sec
+cycle count  = 1358535133 (April 4, 2022)
+time @ 4MHz  = 1358535133 / 4*10^6 =  5 min 39 sec
 
-new/zsdcc/fast (9097 bytes less page zero)
+new/zsdcc/fast (9123 bytes less page zero)
 
 cycle count  = 1328865976 (March 2, 2017, ZSDCC #9833)
 cycle count  = 1339849656 (April 4, 2020, ZSDCC #11556)
-time @ 4MHz  = 1339849656 / 4*10^6 =  5 min 35 sec
+cycle count  = 1316559068 (April 4, 2022,  ZSDCC #13131)
+time @ 4MHz  = 1316559068 / 4*10^6 =  5 min 29 sec

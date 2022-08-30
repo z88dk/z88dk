@@ -1,0 +1,51 @@
+name: build-mingw-on-ubuntu
+
+on:
+  push:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout from git
+      uses: actions/checkout@v2
+      with: 
+        submodules: 'true'
+    - name: Update apt 
+      run: |
+        sudo apt-get update -y
+    - name: Install apt dependencies
+      run: |
+        sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 dos2unix ragel re2c
+    - name: Install libxml2
+      run: |
+        set -ex
+        wget http://xmlsoft.org/sources/win32/64bit/libxml2-2.9.1-win32-x86_64.7z
+        ( mkdir libxml2-2.9.1-win32-x86_64 && cd libxml2-2.9.1-win32-x86_64 && 7z x ../libxml2-2.9.1-win32-x86_64.7z && sudo rsync -avhH . /usr/x86_64-w64-mingw32 )
+        sudo chmod +x /usr/x86_64-w64-mingw32/bin/xml2-config
+    - name: Install libiconv
+      run: |
+        set -ex
+        wget https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-libiconv-1.17-1-any.pkg.tar.zst
+        zstd -d mingw-w64-x86_64-libiconv-1.17-1-any.pkg.tar.zst
+        ( mkdir mingw-w64-x86_64-libiconv-1.17-1-any && cd mingw-w64-x86_64-libiconv-1.17-1-any && tar xvf ../mingw-w64-x86_64-libiconv-1.17-1-any.pkg.tar && cd mingw64 && rsync -avhH . /usr/x86_64-w64-mingw32 )
+    - name: Install zlib
+      run: |
+        set -ex
+        wget https://mirror.msys2.org/mingw/mingw64/mingw-w64-x86_64-zlib-1.2.12-1-any.pkg.tar.zst
+        zstd -d mingw-w64-x86_64-zlib-1.2.12-1-any.pkg.tar.zst
+        ( mkdir mingw-w64-x86_64-zlib-1.2.12-1-any && cd mingw-w64-x86_64-zlib-1.2.12-1-any && tar xvf ../mingw-w64-x86_64-zlib-1.2.12-1-any.pkg.tar && cd mingw64 && rsync -avhH . /usr/x86_64-w64-mingw32 )
+    - name: Build binaries
+      run: |
+        set -ex
+        export CFLAGS="-g -O2"
+        export CC="x86_64-w64-mingw32-gcc"
+        export CXX="x86_64-w64-mingw32-g++"
+        export PREFIX="c:/z88dk/"
+        export CROSS=1
+        export EXESUFFIX=".exe"
+        export PKG_CONFIG_PATH=/usr/x86_64-w64-mingw32/lib/pkgconfig/
+        export XML2CONFIG="/usr/x86_64-w64-mingw32/bin/xml2-config --prefix=/usr/x86_64-w64-mingw32"
+        make

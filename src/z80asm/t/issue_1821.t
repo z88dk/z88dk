@@ -1,25 +1,13 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-# Z88DK Z80 Macro Assembler
-#
-# Copyright (C) Paulo Custodio, 2011-2022
-# License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
-# Repository: https://github.com/z88dk/z88dk/
-#
-# Test https://github.com/z88dk/z88dk/issues/1572
-# z80asm: -reloc-info adds -O directory path twice
+BEGIN { use lib 't'; require 'testlib.pl'; }
 
 use Modern::Perl;
-use Test::More;
-use Path::Tiny;
-require './t/testlib.pl';
 
-path("test1.asm")->spew(<<END);
-    public hhll, ll
-    defc hhll = 0xff40
-    defc ll = 0x40
-END
-z80asm(<<END, "-mgbz80 -b -l test.asm test1.asm", 0, "", "");
+# Test https://github.com/z88dk/z88dk/issues/1821
+# z80asm: Wrong warning using ZSDCC and GameBoy target
+
+spew("${test}.asm", <<END);
     extern hhll, ll
 
     ldh a,(0x40)
@@ -33,16 +21,27 @@ z80asm(<<END, "-mgbz80 -b -l test.asm test1.asm", 0, "", "");
     ldh (hhll),a
 END
 
-z80asm(<<END1, "-mgbz80 -l", 1, "", <<END2);
+spew("${test}1.asm", <<END);
+    public hhll, ll
+    defc hhll = 0xff40
+    defc ll = 0x40
+END
+
+capture_ok("z88dk-z80asm -mgbz80 -b -l ${test}.asm ${test}1.asm", "");
+check_bin_file("${test}.bin", 
+			   bytes(0xF0,0x40,0xF0,0x40,0xE0,0x40,0xE0,0x40,
+			         0xF0,0x40,0xF0,0x40,0xE0,0x40,0xE0,0x40));
+
+z80asm_nok("-mgbz80 -l", "", <<ASM, <<ERR);
     ldh a,(0xfe01)
     ldh a,0xff01
-END1
-test.asm:2: error: syntax error
+ASM
+${test}.asm:2: error: syntax error
   ^---- ldh a,0xff01
       ^---- ldh a,65281
-test.asm:1: warning: integer range: 0xfe01
+${test}.asm:1: warning: integer range: \$fe01
   ^---- (65025)
-END2
+ERR
 
-unlink_testfiles();
-done_testing();
+unlink_testfiles;
+done_testing;

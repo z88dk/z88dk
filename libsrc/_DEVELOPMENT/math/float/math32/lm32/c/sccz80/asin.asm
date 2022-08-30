@@ -8,7 +8,6 @@
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _asin
-EXTERN cm32_sdcc_asin
-defc _asin = cm32_sdcc_asin
+defc _asin = _m32_asinf
 ENDIF
 

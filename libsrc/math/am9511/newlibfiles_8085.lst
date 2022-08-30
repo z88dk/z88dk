@@ -13,7 +13,6 @@
 ../../_DEVELOPMENT/math/float/am9511/lam32/z80/asm_fmul10u
 ../../_DEVELOPMENT/math/float/am9511/lam32/z80/asm_fsub
 ../../_DEVELOPMENT/math/float/am9511/lam32/z80/asm_hypotf
-../../_DEVELOPMENT/math/float/am9511/lam32/z80/asm_nan_b
 ../../_DEVELOPMENT/math/float/am9511/lam32/z80/asm_negf
 ../../_DEVELOPMENT/math/float/am9511/lam32/z80/asm_sinf
 ../../_DEVELOPMENT/math/float/am9511/lam32/z80/asm_sqrf
@@ -142,7 +141,6 @@
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_log.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_log10.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_lsub.asm
-../../_DEVELOPMENT/math/float/am9511/asm/am32_nan_b.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_pow.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_sigdig.asm
 ../../_DEVELOPMENT/math/float/am9511/asm/am32_sin.asm

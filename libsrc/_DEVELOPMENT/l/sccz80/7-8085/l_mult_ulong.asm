@@ -15,7 +15,7 @@ PUBLIC l_mult_ulong_0
 ; DEHL = DE * BC [unsigned]
 .l_mult_ulong_0
     ld      hl,0
-    ld      a,8         ; 16 bits (8 iterations)
+    ld      a,8             ; 16 bits (8 iterations)
 .mul1
     add     hl,hl
     rl      de

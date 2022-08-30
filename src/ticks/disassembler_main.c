@@ -50,7 +50,6 @@ static backend_t disassembler_backend = {
 int main(int argc, char **argv)
 {
     char  *program = argv[0];
-    char  *filename;
     char  *endp;
     unsigned int    org = 0;
     int    start = -1;

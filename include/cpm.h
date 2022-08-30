@@ -7,7 +7,7 @@
  *    Many of these values have been obtained via reference to
  *    Hitech C
  *
- *    $Id: cpm.h,v 1.16 2016-11-03 09:25:26 stefano Exp $
+ *    $Id: cpm.h $
  */
 
 #include <sys/compiler.h>
@@ -155,7 +155,13 @@ extern struct dpb __LIB__  *get_dpb(int drive)  __z88dk_fastcall;
 
 /* The CPM bdos call */
 extern int __LIB__ bdos(int func,int arg) __smallc;
+extern int __LIB__ bdos_callee(int func,int arg) __smallc __z88dk_callee;
+#define bdos(a,b)   bdos_callee(a,b)
+
+/* Executes the BIOS function passing BC and DE as arguments, error status in A on exit */
 extern int __LIB__ bios(int func,int arg,int arg2) __smallc;
+/* Executes the BIOS function passing BC and DE as arguments, gets the result value from HL on exit */
+extern int __LIB__ biosh(int func,int arg,int arg2) __smallc;
 
 
 /* Get a free FCB */
@@ -167,8 +173,8 @@ extern int __LIB__ cpm_cache_get(struct fcb *fcb, unsigned long record_nr, int f
 extern int __LIB__ cpm_cache_flush(struct fcb *fcb);
 
 /* Fill up the filename stuff */
-extern int __LIB__ setfcb(struct fcb *fc, unsigned char *name) __smallc;
-extern void __LIB__ parsefcb(struct fcb *fc, unsigned char *name) __smallc;
+extern int __LIB__ setfcb(struct fcb *fc, char *name) __smallc;
+extern void __LIB__ parsefcb(struct fcb *fc, char *name) __smallc;
 /* Write the file offset into the FCB */
 extern void __LIB__ putoffset(char *dest, long val) __smallc;
 

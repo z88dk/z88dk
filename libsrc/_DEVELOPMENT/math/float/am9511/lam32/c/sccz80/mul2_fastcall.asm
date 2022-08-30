@@ -5,6 +5,7 @@
 
 	defc	mul2_fastcall = asm_am9511_fmul2_fastcall
 
+
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _mul2_fastcall

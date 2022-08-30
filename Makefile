@@ -198,6 +198,7 @@ install: install-clean
 	$(MAKE) -C support/graphics PREFIX=$(DESTDIR) install
 	$(MAKE) -C support/basck PREFIX=$(DESTDIR) install
 	$(MAKE) -C support/pv1000 PREFIX=$(DESTDIR) install
+	cp -r support/cmake $(prefix_share)/
 	if [ -f bin/z88dk-zsdcpp$(EXESUFFIX) ]; then cp bin/z88dk-zsdcpp$(EXESUFFIX) $(DESTDIR)/bin/; fi
 	if [ -f bin/z88dk-zsdcc$(EXESUFFIX) ]; then cp bin/z88dk-zsdcc$(EXESUFFIX) $(DESTDIR)/bin/; fi
 	cp -r include $(prefix_share)/
@@ -205,6 +206,9 @@ install: install-clean
 	cp -r libsrc $(prefix_share)/
 	cp -r src/m4 $(prefix_share)/src/
 
+install-clean:
+	$(MAKE) -C libsrc install-clean
+	$(RM) lib/z80asm*.lib
 
 	# BSD install syntax below
 	#find include -type d -exec $(INSTALL) -d -m 755 {,$(prefix_share)/}{}  \;
@@ -216,23 +220,20 @@ install: install-clean
 
 
 # Needs to have a dependency on libs
-test: $(ALL) 
+test: $(ALL)
 	$(MAKE) -C test
 
 testsuite: $(BINS)
+ifeq ($(CROSS),0)
 	$(MAKE) -C testsuite
+endif
 
-install-clean:
-	$(MAKE) -C libsrc install-clean
-	$(RM) lib/z80asm*.lib
-
-clean: clean-bins
+clean: bins-clean
 	$(MAKE) -C libsrc clean
 	$(RM) lib/clibs/*.lib
 	$(RM) lib/z80asm*.lib
 
-
-clean-bins:
+bins-clean:
 	$(MAKE) -C src/appmake clean
 	$(MAKE) -C src/common clean
 	$(MAKE) -C src/copt clean
@@ -248,6 +249,7 @@ clean-bins:
 	$(MAKE) -C src/zpragma clean
 	$(MAKE) -C src/zx7 clean
 	$(MAKE) -C src/zx0 clean
+	$(MAKE) -C examples clean
 	$(MAKE) -C support clean
 	$(MAKE) -C test clean
 	$(MAKE) -C testsuite clean
@@ -259,5 +261,14 @@ ifdef BUILD_SDCC_HTTP
 endif
 endif
 	#if [ -d bin ]; then find bin -type f -exec rm -f {} ';' ; fi
+
+test-clean:
+	$(MAKE) -C test clean
+
+testsuite-clean:
+	$(MAKE) -C testsuite clean
+
+examples-clean:
+	$(MAKE) -C examples clean
 
 .PHONY: test testsuite

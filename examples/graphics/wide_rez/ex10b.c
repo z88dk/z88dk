@@ -21,6 +21,17 @@ Contact the author:
 
 =========================================================================*/
 
+
+/*
+	How to build for the Timex Sinclair 2068:
+	   zcc +ts2068 -pragma-define:CLIB_DEFAULT_SCREEN_MODE=6 -create-app ex10b.c
+   
+	How to build for the Commodore 128:
+	   zcc +c128 -lgfx128hr -create-app ex10b.c
+	   
+*/
+
+
 #include <graphics.h>
 
 #pragma output nogfxglobals
