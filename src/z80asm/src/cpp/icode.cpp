@@ -17,7 +17,7 @@
 #include <cctype>
 using namespace std;
 
-// Encoding for C_LINEand ASM_LINE
+// Encoding for C_LINE and ASM_LINE
 static string url_encode(const string& text) {
 	ostringstream ss;
 	for (auto c : text) {
@@ -31,61 +31,96 @@ static string url_encode(const string& text) {
 
 //-----------------------------------------------------------------------------
 
-Icode::Icode(Section* parent, Type type)
-	: m_parent(parent), m_type(type)
-	, m_location(g_preproc.location()) {
-	m_asmpc = parent->asmpc();
-	m_asmpc_phased = parent->asmpc_phased();
+Instr::Instr(Section* section)
+	: m_section(section), m_location(g_preproc.location()) {
+	Assert(section);
+	m_asmpc = m_section->asmpc();
+	m_asmpc_phased = m_section->asmpc_phased();
 }
 
-void Icode::set_asmpc(int n) {
-	m_asmpc = n;
+void Instr::add_patch(shared_ptr<Patch> patch) {
+	// add patch
+	m_patches.push_back(patch);
+
+	// add placeholder zeros
+	patch->set_offset(size());
+	for (int i = 0; i < patch->size(); i++)
+		m_bytes.push_back(0);
+}
+
+bool Instr::is_relative_jump() const {
+	return m_patches.size() == 1 && m_patches[0]->type() == Patch::Type::JrOffset;
 }
 
 //-----------------------------------------------------------------------------
 
 Section::Section(const string& name, Module* module)
 	: m_name(name), m_module(module) {
+	Assert(module);
 }
 
-void Section::add_instr(shared_ptr<Icode> instr) {
+void Section::add_instr(shared_ptr<Instr> instr) {
 	instr->set_asmpc(asmpc());
 	instr->set_asmpc_phased(asmpc_phased());
-	m_icode.push_back(instr);
+	m_instrs.push_back(instr);
 }
 
 int Section::asmpc() const {
-	if (m_icode.empty())
+	if (m_instrs.empty())
 		return 0;
 	else
-		return m_icode.back()->asmpc() + m_icode.back()->size();
+		return m_instrs.back()->asmpc() + m_instrs.back()->size();
 }
 
 int Section::asmpc_phased() const {
-	if (m_icode.empty())
-		return Icode::UndefinedAsmpc;
-	else if (m_icode.back()->asmpc_phased() == Icode::UndefinedAsmpc)
-		return Icode::UndefinedAsmpc;
+	if (m_instrs.empty())
+		return Instr::UndefinedAsmpc;
+	else if (m_instrs.back()->asmpc_phased() == Instr::UndefinedAsmpc)
+		return Instr::UndefinedAsmpc;
 	else
-		return m_icode.back()->asmpc_phased() + m_icode.back()->size();
+		return m_instrs.back()->asmpc_phased() + m_instrs.back()->size();
 }
 
 bool Section::is_phased() const {
-	return asmpc_phased() != Icode::UndefinedAsmpc;
+	return asmpc_phased() != Instr::UndefinedAsmpc;
 }
 
 int Section::pc() const {
 	return is_phased() ? asmpc_phased() : asmpc();
 }
 
-shared_ptr<Icode> Section::add_asmpc() {
-	auto instr = make_shared<Icode>(this, Icode::Type::Asmpc);
+string Section::autolabel() {
+	static int n;
+	ostringstream ss;
+	ss << "__autolabel_" << setfill('0') << setw(4) << ++n;
+	return ss.str();
+}
+
+shared_ptr<Instr> Section::add_asmpc() {
+	auto instr = make_shared<Instr>(this);
 	add_instr(instr);
 	return instr;
 }
 
-void Section::add_label(const string& name) {
-	add_label_(name);
+shared_ptr<Instr> Section::add_label_(const string& name) {
+	auto instr = make_shared<Instr>(this);
+
+	shared_ptr<Symbol> symbol;
+	if (is_phased())
+		symbol = make_shared<Symbol>(Symbol::MakeAsmpcPhased(), name, instr);
+	else
+		symbol = make_shared<Symbol>(Symbol::MakeAsmpc(), name, instr);
+
+	shared_ptr<Symbol> label = g_symbols.add(symbol);
+	if (label)			// not duplicate symbol
+		label->set_touched();
+
+	add_instr(instr);
+	return instr;
+}
+
+shared_ptr<Instr> Section::add_label(const string& name) {
+	auto ret = add_label_(name);
 
 	// add debug label
 	if (g_args.debug() && g_preproc.is_c_source()) {
@@ -96,95 +131,47 @@ void Section::add_label(const string& name) {
 		if (!g_symbols.find_local(debug_name))
 			add_label_(debug_name);
 	}
+
+	return ret;
 }
 
-string Section::autolabel() {
-	static int n;
-	ostringstream ss;
-	ss << "__autolabel_" << setfill('0') << setw(4) << ++n;
-	return ss.str();
-}
-
-void Section::add_label_(const string& name) {
-	auto instr = make_shared<Icode>(this, Icode::Type::Label);
-
-	shared_ptr<Symbol> label = g_symbols.add(name, 0, Symbol::Type::Label);
-	if (label) {		// not duplicate symbol
-		label->set_touched();
-		label->set_instr(instr);
-
-		instr->set_label(label);
-		add_instr(instr);
-	}
-}
-
-void Section::add_opcode(unsigned bytes) {
-	auto instr = make_shared<Icode>(this, Icode::Type::Opcode);
+shared_ptr<Instr> Section::add_opcode(unsigned bytes) {
+	auto instr = make_shared<Instr>(this);
 
 	bool found = false;
 	if (found || (bytes & 0xff000000) != 0) {
-		instr->bytes().push_back((bytes >> 24) & 0xff);
+		instr->add_byte((bytes >> 24) & 0xff);
 		found = true;
 	}
 	if (found || (bytes & 0xff0000) != 0) {
-		instr->bytes().push_back((bytes >> 16) & 0xff);
+		instr->add_byte((bytes >> 16) & 0xff);
 		found = true;
 	}
 	if (found || (bytes & 0xff00) != 0) {
-		instr->bytes().push_back((bytes >> 8) & 0xff);
+		instr->add_byte((bytes >> 8) & 0xff);
 		found = true;
 	}
-	instr->bytes().push_back(bytes & 0xff);
+	instr->add_byte(bytes & 0xff);
 
 	add_instr(instr);
-}
-
-void Section::add_opcode_n(unsigned bytes, shared_ptr<Expr> n, PatchExpr::Type type) {
-	// add bytes
-	add_opcode(bytes);
-	shared_ptr<Icode> instr = m_icode.back();
-
-	// add patch
-	auto patch = make_shared<PatchExpr>(n, type, instr->size());
-	instr->bytes().push_back(0);
-	instr->patches().push_back(patch);
-}
-
-void Section::add_opcode_nn(unsigned bytes, shared_ptr<Expr> nn, PatchExpr::Type type) {
-	// add bytes
-	add_opcode(bytes);
-	shared_ptr<Icode> instr = m_icode.back();
-
-	// add patch
-	auto patch = make_shared<PatchExpr>(nn, type, instr->size());
-	instr->bytes().push_back(0);
-	instr->bytes().push_back(0);
-	instr->patches().push_back(patch);
-}
-
-void Section::add_opcode_idx_(unsigned bytes) {
-	// add bytes
-	if (bytes & 0xFF0000) 			// 3 bytes, insert dis at second byte
-		bytes = (((bytes >> 8) & 0xFFFF) << 16) | (bytes & 0xFF);
-	else							// 2 bytes, insert 0 for dis
-		bytes <<= 8;
-	add_opcode(bytes);
+	return instr;
 }
 
 void Section::check_relative_jumps() {
+#if 0
 	// decrement B instruction
-	auto dec_b = make_shared<Icode>(this, Icode::Type::Opcode);
-	dec_b->bytes().push_back(Z80_DEC(REG_B));
+	auto dec_b = make_shared<Instr>(this, Instr::Type::Opcode);
+	dec_b->add_byte(Z80_DEC(REG_B));
 
 	bool modified;
 	do {
 		modified = false;
 		update_asmpc();
 
-		for (auto it = m_icode.begin(); it != m_icode.end(); ++it) {
-			shared_ptr<Icode> instr = *it;
-			if (instr->type() == Icode::Type::JumpRelative) {
-				shared_ptr<PatchExpr> patch = instr->patches().front();
+		for (auto it = m_instrs.begin(); it != m_instrs.end(); ++it) {
+			shared_ptr<Instr> instr = *it;
+			if (instr->type() == Instr::Type::JumpRelative) {
+				shared_ptr<Patch> patch = instr->patches().front();
 				shared_ptr<Expr> expr = patch->expr();
 				if (expr->eval_silent()) {
 					int target = expr->value();
@@ -193,28 +180,28 @@ void Section::check_relative_jumps() {
 						// convert short to long jump
 						switch (instr->bytes()[0]) {
 						case Z80_JR:
-							instr->set_type(Icode::Type::Opcode);
+							instr->set_type(Instr::Type::Opcode);
 							instr->bytes()[0] = Z80_JP;
-							instr->bytes().push_back(0);
-							patch->set_type(PatchExpr::Type::Word);
+							instr->add_byte(0);
+							patch->set_type(Patch::Type::Word);
 							modified = true;
 							continue;
 						case Z80_JR_FLAG(FLAG_NZ):
 						case Z80_JR_FLAG(FLAG_Z):
 						case Z80_JR_FLAG(FLAG_NC):
 						case Z80_JR_FLAG(FLAG_C):
-							instr->set_type(Icode::Type::Opcode);
+							instr->set_type(Instr::Type::Opcode);
 							instr->bytes()[0] += Z80_JP_FLAG(0) - Z80_JR_FLAG(0);
-							instr->bytes().push_back(0);
-							patch->set_type(PatchExpr::Type::Word);
+							instr->add_byte(0);
+							patch->set_type(Patch::Type::Word);
 							modified = true;
 							continue;
 						case Z80_DJNZ:	// dec b; jp nz, target
-							m_icode.insert(it, dec_b);
-							instr->set_type(Icode::Type::Opcode);
+							m_instrs.insert(it, dec_b);
+							instr->set_type(Instr::Type::Opcode);
 							instr->bytes()[0] = Z80_JP_FLAG(FLAG_NZ);
-							instr->bytes().push_back(0);
-							patch->set_type(PatchExpr::Type::Word);
+							instr->add_byte(0);
+							patch->set_type(Patch::Type::Word);
 							modified = true;
 							continue;
 						default:
@@ -225,11 +212,12 @@ void Section::check_relative_jumps() {
 			}
 		}
 	} while (modified);
+#endif
 }
 
 void Section::patch_local_exprs() {
 	/*
-	for (auto& instr : m_icode) {
+	for (auto& instr : m_instrs) {
 
 	}
 	*/
@@ -237,118 +225,24 @@ void Section::patch_local_exprs() {
 
 void Section::update_asmpc(int start) {
 	int asmpc = start;
-	int asmpc_phased = Icode::UndefinedAsmpc;
-	for (auto& instr : m_icode) {
+	int asmpc_phased = Instr::UndefinedAsmpc;
+	for (auto& instr : m_instrs) {
 		// set asmpc of instruction
 		instr->set_asmpc(asmpc);
-		if (asmpc_phased == Icode::UndefinedAsmpc &&
-			instr->asmpc_phased() != Icode::UndefinedAsmpc)
+		if (asmpc_phased == Instr::UndefinedAsmpc &&
+			instr->asmpc_phased() != Instr::UndefinedAsmpc)
 			asmpc_phased = instr->asmpc_phased();
+		else if (asmpc_phased != Instr::UndefinedAsmpc &&
+			instr->asmpc_phased() == Instr::UndefinedAsmpc)
+			asmpc_phased = Instr::UndefinedAsmpc;
 		else
 			instr->set_asmpc(asmpc_phased);
 
 		// advance to next address
 		int size = instr->size();
 		asmpc += size;
-		if (asmpc_phased != Icode::UndefinedAsmpc)
+		if (asmpc_phased != Instr::UndefinedAsmpc)
 			asmpc_phased += size;
-	}
-}
-
-void Section::add_opcode_idx(unsigned bytes, shared_ptr<Expr> dis) {
-	// add bytes
-	add_opcode_idx_(bytes);
-	shared_ptr<Icode> instr = m_icode.back();
-
-	// add patch
-	auto patch = make_shared<PatchExpr>(dis, PatchExpr::Type::SByte, 2);
-	instr->patches().push_back(patch);
-}
-
-void Section::add_opcode_idx_n(unsigned bytes, shared_ptr<Expr> dis, shared_ptr<Expr> n) {
-	// add bytes
-	add_opcode_idx_(bytes);
-	shared_ptr<Icode> instr = m_icode.back();
-
-	// add patches
-	auto dis_patch = make_shared<PatchExpr>(dis, PatchExpr::Type::SByte, 2);
-	instr->patches().push_back(dis_patch);
-
-	auto n_patch = make_shared<PatchExpr>(n, PatchExpr::Type::UByte, instr->size());
-	instr->patches().push_back(n_patch);
-}
-
-void Section::add_opcode_n_n(unsigned bytes, shared_ptr<Expr> n1, shared_ptr<Expr> n2) {
-	// add bytes
-	add_opcode(bytes);
-	shared_ptr<Icode> instr = m_icode.back();
-
-	// add patches
-	auto n1_patch = make_shared<PatchExpr>(n1, PatchExpr::Type::UByte, instr->size());
-	instr->patches().push_back(n1_patch);
-
-	auto n2_patch = make_shared<PatchExpr>(n2, PatchExpr::Type::UByte, instr->size());
-	instr->patches().push_back(n2_patch);
-}
-
-void Section::add_jump_relative(unsigned bytes, shared_ptr<Expr> nn) {
-	if (g_args.opt_speed()) {			// convert short to long jumps
-		switch (bytes) {
-		case Z80_JR:
-			add_opcode_nn(Z80_JP, nn, PatchExpr::Type::Word);
-			break;
-		case Z80_JR_FLAG(FLAG_NZ):
-		case Z80_JR_FLAG(FLAG_Z):
-		case Z80_JR_FLAG(FLAG_NC):
-		case Z80_JR_FLAG(FLAG_C):
-			add_opcode_nn(bytes - Z80_JR_FLAG(0) + Z80_JP_FLAG(0), nn, PatchExpr::Type::Word);
-			break;
-		case Z80_DJNZ:					// "dec b; jp nz" is always slower
-			add_jump_relative_(bytes, nn);
-			break;
-		default:
-			Assert(0);
-		}
-	}
-	else {
-		add_jump_relative_(bytes, nn);
-	}
-}
-
-void Section::add_jump_relative_(unsigned bytes, shared_ptr<Expr> nn) {
-	auto instr = make_shared<Icode>(this, Icode::Type::JumpRelative);
-	instr->bytes().push_back(bytes & 0xff);
-
-	auto patch = make_shared<PatchExpr>(nn, PatchExpr::Type::JrOffset, instr->size());
-	instr->patches().push_back(patch);
-
-	add_instr(instr);
-}
-
-//-----------------------------------------------------------------------------
-
-Group::Group(const string& name, Module* module)
-	: m_name(name), m_module(module) {
-	insert_section("");		// create default section with empty name
-}
-
-shared_ptr<Section> Group::section(const string& name) {
-	auto it = m_sections_map.find(name);
-	if (it != m_sections_map.end())			// found
-		return it->second;
-	else
-		return nullptr;
-}
-
-shared_ptr<Section> Group::insert_section(const string& name) {
-	auto it = m_sections_map.find(name);
-	if (it != m_sections_map.end())			// found
-		return it->second;	
-	else {								// not found
-		auto section = make_shared<Section>(name, m_module);
-		m_sections.push_back(section);
-		m_sections_map[name] = section;
-		return section;
 	}
 }
 
@@ -356,57 +250,15 @@ shared_ptr<Section> Group::insert_section(const string& name) {
 
 Module::Module(const string& name, Object* object)
 	: m_name(name), m_object(object) {
-	// create default section and group
-	insert_section("");
-	insert_group("");
+	add_section("");			// create default section
 }
 
-shared_ptr<Section> Module::section(const string& name) {
-	auto it = m_sections_map.find(name);
-	if (it != m_sections_map.end()) {	// found
-		shared_ptr<Section> section = it->second;
-		m_cur_section = section;
+shared_ptr<Section> Module::add_section(const string& name) {
+	shared_ptr<Section> section = m_sections.find(name);
+	if (section)
 		return section;
-	}
 	else
-		return nullptr;
-}
-
-shared_ptr<Section> Module::insert_section(const string& name) {
-	auto it = m_sections_map.find(name);
-	if (it != m_sections_map.end())		// found
-		return it->second;
-	else {								// not found
-		auto section = make_shared<Section>(name, this);
-		m_sections.push_back(section);
-		m_sections_map[name] = section;
-		m_cur_section = section;
-		return section;
-	}
-}
-
-shared_ptr<Group> Module::group(const string& name) {
-	auto it = m_groups_map.find(name);
-	if (it != m_groups_map.end()) {			// found
-		shared_ptr<Group> group = it->second;
-		m_cur_group = group;
-		return group;
-	}
-	else
-		return nullptr;
-}
-
-shared_ptr<Group> Module::insert_group(const string& name) {
-	auto it = m_groups_map.find(name);
-	if (it != m_groups_map.end())			// found
-		return it->second;
-	else {								// not found
-		auto group = make_shared<Group>(name, this);
-		m_groups.push_back(group);
-		m_groups_map[name] = group;
-		m_cur_group = group;
-		return group;
-	}
+		return m_sections.add(make_shared<Section>(name, this));
 }
 
 void Module::check_relative_jumps() {
@@ -418,6 +270,18 @@ void Module::patch_local_exprs() {
 	for (auto& section : m_sections)
 		section->patch_local_exprs();
 }
+
+#if 0
+
+
+
+
+
+
+//-----------------------------------------------------------------------------
+
+
+
 
 //-----------------------------------------------------------------------------
 
@@ -463,3 +327,5 @@ void Object::patch_local_exprs() {
 	for (auto& module : m_modules)
 		module->patch_local_exprs();
 }
+
+#endif

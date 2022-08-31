@@ -5,13 +5,22 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "icode.h"
 #include "model.h"
 #include "preproc.h"
+#include "symtab.h"
 #include "utils.h"
 using namespace std;
 
 ExprResult::ExprResult(int value)
 	: m_value(value) {}
+
+bool ExprResult::is_const() const {
+	if (m_depends_on_asmpc || undefined_symbol())
+		return false;
+	else
+		return true;
+}
 
 ExprResult ExprResult::merge(const ExprResult& a, const ExprResult& b) {
 	ExprResult r;
@@ -19,13 +28,20 @@ ExprResult ExprResult::merge(const ExprResult& a, const ExprResult& b) {
 	if (a.m_depends_on_asmpc || b.m_depends_on_asmpc)
 		r.m_depends_on_asmpc = true;
 
-	for (auto& symbol : a.m_depends_on_symbols)
-		r.m_depends_on_symbols.insert(symbol);
-	for (auto& symbol : b.m_depends_on_symbols)
-		r.m_depends_on_symbols.insert(symbol);
-
 	if (a.m_division_by_zero || b.m_division_by_zero)
 		r.m_division_by_zero = true;
+
+	if (a.m_recursive_expr || b.m_recursive_expr)
+		r.m_recursive_expr = true;
+
+	if (a.undefined_symbol() && b.undefined_symbol())
+		r.m_undefined_symbols = a.m_undefined_symbols + "," + b.m_undefined_symbols;
+	else if (a.undefined_symbol())
+		r.m_undefined_symbols = a.m_undefined_symbols;
+	else if (b.undefined_symbol())
+		r.m_undefined_symbols = b.m_undefined_symbols;
+	else {
+	}
 
 	return r;
 }
@@ -35,7 +51,7 @@ ExprResult ExprResult::merge(const ExprResult& a, const ExprResult& b) {
 ConstNode::ConstNode(int value)
 	: m_value(value) {}
 
-ExprResult ConstNode::value() const {
+ExprResult ConstNode::value() {
 	return ExprResult(m_value);
 }
 
@@ -48,15 +64,22 @@ string ConstNode::text() const {
 SymbolNode::SymbolNode(shared_ptr<Symbol> symbol)
 	: m_symbol(symbol) {}
 
-ExprResult SymbolNode::value() const {
-	return ExprResult(0);
-	// TODO: return m_symbol.lock()->value();
-	// TODO: depends_on
+ExprResult SymbolNode::value() {
+	ExprResult r;
+
+	if (m_in_eval) {		// recursive expression
+		r.set_recursive_expr();
+	}
+	else {
+		m_in_eval = true;
+		r = m_symbol.lock()->value();
+		m_in_eval = false;
+	}
+	return r;
 }
 
 string SymbolNode::text() const {
-	return string();
-	// TODO: return m_symbol.lock()->name();
+	return m_symbol.lock()->name();
 }
 
 //-----------------------------------------------------------------------------
@@ -64,18 +87,15 @@ string SymbolNode::text() const {
 AsmpcNode::AsmpcNode(shared_ptr<Instr> instr)
 	: m_instr(instr) {}
 
-ExprResult AsmpcNode::value() const {
-	return ExprResult(0);
-	/* TODO
+ExprResult AsmpcNode::value() {
 	auto instr = m_instr.lock();
-	Result r(instr->pc());
+	ExprResult r(instr->pc());
 	if (instr->is_phased())
 		return r;		// is constant
 	else {
 		r.set_depends_on_asmpc();
 		return r;
 	}
-	*/
 }
 
 string AsmpcNode::text() const {
@@ -90,7 +110,7 @@ TernCondNode::TernCondNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b, share
 	m_args.push_back(c);
 }
 
-ExprResult TernCondNode::value() const {
+ExprResult TernCondNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult rc = m_args[0]->value();
@@ -110,7 +130,7 @@ LogOrNode::LogOrNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult LogOrNode::value() const {
+ExprResult LogOrNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -129,7 +149,7 @@ LogXorNode::LogXorNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult LogXorNode::value() const {
+ExprResult LogXorNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -148,7 +168,7 @@ LogAndNode::LogAndNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult LogAndNode::value() const {
+ExprResult LogAndNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -167,7 +187,7 @@ BinOrNode::BinOrNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult BinOrNode::value() const {
+ExprResult BinOrNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -186,7 +206,7 @@ BinXorNode::BinXorNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult BinXorNode::value() const {
+ExprResult BinXorNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -205,7 +225,7 @@ BinAndNode::BinAndNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult BinAndNode::value() const {
+ExprResult BinAndNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -224,7 +244,7 @@ LtNode::LtNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult LtNode::value() const {
+ExprResult LtNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -243,7 +263,7 @@ LeNode::LeNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult LeNode::value() const {
+ExprResult LeNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -262,7 +282,7 @@ GtNode::GtNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult GtNode::value() const {
+ExprResult GtNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -281,7 +301,7 @@ GeNode::GeNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult GeNode::value() const {
+ExprResult GeNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -300,7 +320,7 @@ EqNode::EqNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult EqNode::value() const {
+ExprResult EqNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -319,7 +339,7 @@ NeNode::NeNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult NeNode::value() const {
+ExprResult NeNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -338,7 +358,7 @@ LShiftNode::LShiftNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult LShiftNode::value() const {
+ExprResult LShiftNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -357,7 +377,7 @@ RShiftNode::RShiftNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult RShiftNode::value() const {
+ExprResult RShiftNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -376,7 +396,7 @@ PlusNode::PlusNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult PlusNode::value() const {
+ExprResult PlusNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -395,7 +415,7 @@ MinusNode::MinusNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult MinusNode::value() const {
+ExprResult MinusNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -414,7 +434,7 @@ MultNode::MultNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult MultNode::value() const {
+ExprResult MultNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -433,7 +453,7 @@ DivNode::DivNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult DivNode::value() const {
+ExprResult DivNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -455,7 +475,7 @@ ModNode::ModNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult ModNode::value() const {
+ExprResult ModNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -477,7 +497,7 @@ PowerNode::PowerNode(shared_ptr<ExprNode> a, shared_ptr<ExprNode> b) {
 	m_args.push_back(b);
 }
 
-ExprResult PowerNode::value() const {
+ExprResult PowerNode::value() {
 	ExprResult ra = m_args[0]->value();
 	ExprResult rb = m_args[0]->value();
 	ExprResult r = ExprResult::merge(ra, rb);
@@ -495,7 +515,7 @@ UnaryPlusNode::UnaryPlusNode(shared_ptr<ExprNode> a) {
 	m_args.push_back(a);
 }
 
-ExprResult UnaryPlusNode::value() const {
+ExprResult UnaryPlusNode::value() {
 	ExprResult r = m_args[0]->value();
 	return r;
 }
@@ -510,7 +530,7 @@ UnaryMinusNode::UnaryMinusNode(shared_ptr<ExprNode> a) {
 	m_args.push_back(a);
 }
 
-ExprResult UnaryMinusNode::value() const {
+ExprResult UnaryMinusNode::value() {
 	ExprResult r = m_args[0]->value();
 	r.set_value(-r.value());
 	return r;
@@ -526,9 +546,9 @@ LogNotNode::LogNotNode(shared_ptr<ExprNode> a) {
 	m_args.push_back(a);
 }
 
-ExprResult LogNotNode::value() const {
+ExprResult LogNotNode::value() {
 	ExprResult r = m_args[0]->value();
-	r.set_value(!r.value());
+	r.set_value(!!!r.value());
 	return r;
 }
 
@@ -542,7 +562,7 @@ BinNotNode::BinNotNode(shared_ptr<ExprNode> a) {
 	m_args.push_back(a);
 }
 
-ExprResult BinNotNode::value() const {
+ExprResult BinNotNode::value() {
 	ExprResult r = m_args[0]->value();
 	r.set_value(~r.value());
 	return r;
@@ -558,7 +578,7 @@ ParensNode::ParensNode(shared_ptr<ExprNode> a) {
 	m_args.push_back(a);
 }
 
-ExprResult ParensNode::value() const {
+ExprResult ParensNode::value() {
 	ExprResult r = m_args[0]->value();
 	return r;
 }
@@ -881,8 +901,16 @@ ExprResult Expr::eval_noisy() const {
 	ExprResult r = eval_silent();
 
 	g_errors.push_location(m_location);
-	if (r.depends_on_symbols())
-		g_errors.error(ErrCode::UndefinedSymbol /*, TODO::SymbolName*/);
+
+	if (r.recursive_expr())
+		g_errors.error(ErrCode::RecursiveExpression);
+
+	if (r.division_by_zero())
+		g_errors.error(ErrCode::DivisionByZero);
+
+	if (r.undefined_symbol())
+		g_errors.error(ErrCode::UndefinedSymbol, r.undefined_symbol_names());
+
 	g_errors.pop_location();
 
 	return r;

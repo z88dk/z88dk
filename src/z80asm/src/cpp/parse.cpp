@@ -104,6 +104,106 @@ bool Parser::expr_in_parens() {
 	return m_exprs.back()->in_parens();
 }
 
+void Parser::add_opcode(unsigned bytes) {
+	g_asm.cur_section()->add_opcode(bytes);
+}
+
+void Parser::add_opcode_n(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	auto instr = g_asm.cur_section()->add_opcode(bytes);
+	auto patch = make_shared<UBytePatch>(m_exprs[0]);
+	instr->add_patch(patch);
+}
+
+void Parser::add_opcode_s(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	auto instr = g_asm.cur_section()->add_opcode(bytes);
+	auto patch = make_shared<SBytePatch>(m_exprs[0]);
+	instr->add_patch(patch);
+}
+
+void Parser::add_opcode_h(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	auto instr = g_asm.cur_section()->add_opcode(bytes);
+	auto patch = make_shared<HighOffsetPatch>(m_exprs[0]);
+	instr->add_patch(patch);
+}
+
+void Parser::add_opcode_n_0(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	auto instr = g_asm.cur_section()->add_opcode(bytes);
+	auto patch = make_shared<UByte2WordPatch>(m_exprs[0]);
+	instr->add_patch(patch);
+}
+
+void Parser::add_opcode_s_0(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	auto instr = g_asm.cur_section()->add_opcode(bytes);
+	auto patch = make_shared<SByte2WordPatch>(m_exprs[0]);
+	instr->add_patch(patch);
+}
+
+void Parser::add_opcode_nn(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	auto instr = g_asm.cur_section()->add_opcode(bytes);
+	auto patch = make_shared<WordPatch>(m_exprs[0]);
+	instr->add_patch(patch);
+}
+
+void Parser::add_opcode_NN(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	auto instr = g_asm.cur_section()->add_opcode(bytes);
+	auto patch = make_shared<BEWordPatch>(m_exprs[0]);
+	instr->add_patch(patch);
+}
+
+void Parser::add_opcode_idx(unsigned bytes) {
+	Assert(m_exprs.size() == 1);
+
+	auto patch = make_shared<SBytePatch>(m_exprs[0]);
+
+	if (bytes & 0xFF0000) {			// 3 bytes, insert dis at second byte
+		auto instr = g_asm.cur_section()->add_opcode(bytes >> 8);
+		instr->add_patch(patch);
+		instr->add_byte(bytes & 0xff);
+	}
+	else {							// 2 bytes
+		auto instr = g_asm.cur_section()->add_opcode(bytes);
+		instr->add_patch(patch);
+	}
+}
+
+void Parser::add_opcode_idx_n(unsigned bytes) {
+	Assert(m_exprs.size() == 2);
+
+	auto instr = g_asm.cur_section()->add_opcode(bytes);
+
+	auto patch_idx = make_shared<SBytePatch>(m_exprs[0]);
+	instr->add_patch(patch_idx);
+
+	auto patch_n = make_shared<UBytePatch>(m_exprs[1]);
+	instr->add_patch(patch_n);
+}
+
+void Parser::add_opcode_n_n(unsigned bytes) {
+	Assert(m_exprs.size() == 2);
+
+	auto instr = g_asm.cur_section()->add_opcode(bytes);
+
+	auto patch_n1 = make_shared<UBytePatch>(m_exprs[0]);
+	instr->add_patch(patch_n1);
+
+	auto patch_n2 = make_shared<UBytePatch>(m_exprs[1]);
+	instr->add_patch(patch_n2);
+}
+
 // emulate "CALL flag, target" on the Rabbit, by:
 // jp !flag, temp ; call target ; temp:
 void Parser::add_emul_call_flag(unsigned bytes_jump, unsigned bytes_call) {
@@ -116,10 +216,14 @@ void Parser::add_emul_call_flag(unsigned bytes_jump, unsigned bytes_call) {
 	Assert(temp_label_expr->parse());		// parse temp label
 
 	// jp !flag, temp
-	g_asm.cur_section()->add_opcode_nn(bytes_jump, temp_label_expr, PatchExpr::Type::Word);
+	auto instr1 = g_asm.cur_section()->add_opcode(bytes_jump);
+	auto patch1 = make_shared<WordPatch>(temp_label_expr);
+	instr1->add_patch(patch1);
 
 	// call target
-	g_asm.cur_section()->add_opcode_nn(bytes_call, m_exprs[0], PatchExpr::Type::Word);
+	auto instr2 = g_asm.cur_section()->add_opcode(bytes_call);
+	auto patch2 = make_shared<WordPatch>(m_exprs[0]);
+	instr2->add_patch(patch2);
 
 	// temp:
 	g_asm.cur_section()->add_label(temp_label_name);
@@ -137,42 +241,77 @@ void Parser::add_call_function(const string& function_name) {
 	Assert(function_expr->parse());			// parse function name
 
 	// add call instruction
-	g_asm.cur_section()->add_opcode_nn(Z80_CALL, function_expr, PatchExpr::Type::Word);
+	auto instr = g_asm.cur_section()->add_opcode(Z80_CALL);
+	auto patch = make_shared<WordPatch>(function_expr);
+	instr->add_patch(patch);
 }
 
 void Parser::add_jump_relative(unsigned bytes) {
 	Assert(m_exprs.size() == 1);
 
-	g_asm.cur_section()->add_jump_relative(bytes, m_exprs[0]);
+	if (g_args.opt_speed() && bytes != Z80_DJNZ) {	// convert short to long jumps, except DJNZ
+		switch (bytes) {
+		case Z80_JR:
+			bytes = Z80_JP;
+			break;
+		case Z80_JR_FLAG(FLAG_NZ):
+		case Z80_JR_FLAG(FLAG_Z):
+		case Z80_JR_FLAG(FLAG_NC):
+		case Z80_JR_FLAG(FLAG_C):
+			bytes += Z80_JP_FLAG(0) - Z80_JR_FLAG(0);
+			break;
+		default:
+			Assert(0);
+		}
+
+		auto instr = g_asm.cur_section()->add_opcode(bytes);
+		auto patch = make_shared<WordPatch>(m_exprs[0]);
+		instr->add_patch(patch);
+	}
+	else {
+		auto instr = g_asm.cur_section()->add_opcode(bytes);
+		auto patch = make_shared<JrOffsetPatch>(m_exprs[0]);
+		instr->add_patch(patch);
+	}
 }
 
 void Parser::add_z80n_mmu_n() {
 	Assert(m_exprs.size() == 2);
-	Assert(m_exprs[0]->is_const());
 
-	int c = m_exprs[0]->value();
+	ExprResult r = m_exprs[0]->eval_silent();
+	Assert(r.is_const());
+
+	int c = r.value();
 	if (c < 0 || c > 7)
 		g_errors.error(ErrCode::IntRange, int_to_hex(c, 2));
-	else
-		g_asm.cur_section()->add_opcode_n(Z80N_MMU_N(c), m_exprs[1], PatchExpr::Type::UByte);
+	else {
+		auto instr = g_asm.cur_section()->add_opcode(Z80N_MMU_N(c));
+		auto patch = make_shared<UBytePatch>(m_exprs[1]);
+		instr->add_patch(patch);
+	}
 }
 
 void Parser::add_z80n_mmu_a() {
 	Assert(m_exprs.size() == 1);
-	Assert(m_exprs[0]->is_const());
 
-	int c = m_exprs[0]->value();
+	ExprResult r = m_exprs[0]->eval_silent();
+	Assert(r.is_const());
+
+	int c = r.value();
 	if (c < 0 || c > 7)
 		g_errors.error(ErrCode::IntRange, int_to_hex(c, 2));
 	else
-		g_asm.cur_section()->add_opcode(Z80N_MMU_A(c));
+		auto instr = g_asm.cur_section()->add_opcode(Z80N_MMU_A(c));
 }
 
 void Parser::add_restart() {
 	Assert(m_exprs.size() == 1);
-	Assert(m_exprs[0]->is_const());
 
-	int addr = m_exprs[0]->value();
+	ExprResult r = m_exprs[0]->eval_silent();
+	Assert(r.is_const());
+
+	int addr = r.value();
+
 	if (addr > 0 && addr < 8)			// rst 0..7 -> 0..0x38
 		addr <<= 3;
 
@@ -191,66 +330,3 @@ void Parser::add_restart() {
 	}
 }
 
-void Parser::add_opcode(unsigned bytes) {
-	g_asm.cur_section()->add_opcode(bytes);
-}
-
-void Parser::add_opcode_n(unsigned bytes) {
-	Assert(m_exprs.size() == 1);
-
-	g_asm.cur_section()->add_opcode_n(bytes, m_exprs[0], PatchExpr::Type::UByte);
-}
-
-void Parser::add_opcode_s(unsigned bytes) {
-	Assert(m_exprs.size() == 1);
-
-	g_asm.cur_section()->add_opcode_n(bytes, m_exprs[0], PatchExpr::Type::SByte);
-}
-
-void Parser::add_opcode_h(unsigned bytes) {
-	Assert(m_exprs.size() == 1);
-
-	g_asm.cur_section()->add_opcode_n(bytes, m_exprs[0], PatchExpr::Type::HighOffset);
-}
-
-void Parser::add_opcode_n_0(unsigned bytes) {
-	Assert(m_exprs.size() == 1);
-
-	g_asm.cur_section()->add_opcode_n(bytes, m_exprs[0], PatchExpr::Type::UByte2Word);
-}
-
-void Parser::add_opcode_s_0(unsigned bytes) {
-	Assert(m_exprs.size() == 1);
-
-	g_asm.cur_section()->add_opcode_n(bytes, m_exprs[0], PatchExpr::Type::SByte2Word);
-}
-
-void Parser::add_opcode_nn(unsigned bytes) {
-	Assert(m_exprs.size() == 1);
-
-	g_asm.cur_section()->add_opcode_nn(bytes, m_exprs[0], PatchExpr::Type::Word);
-}
-
-void Parser::add_opcode_NN(unsigned bytes) {
-	Assert(m_exprs.size() == 1);
-
-	g_asm.cur_section()->add_opcode_nn(bytes, m_exprs[0], PatchExpr::Type::BEWord);
-}
-
-void Parser::add_opcode_idx(unsigned bytes) {
-	Assert(m_exprs.size() == 1);
-
-	g_asm.cur_section()->add_opcode_idx(bytes, m_exprs[0]);
-}
-
-void Parser::add_opcode_idx_n(unsigned bytes) {
-	Assert(m_exprs.size() == 2);
-
-	g_asm.cur_section()->add_opcode_idx_n(bytes, m_exprs[0], m_exprs[1]);
-}
-
-void Parser::add_opcode_n_n(unsigned bytes) {
-	Assert(m_exprs.size() == 2);
-
-	g_asm.cur_section()->add_opcode_n_n(bytes, m_exprs[0], m_exprs[1]);
-}

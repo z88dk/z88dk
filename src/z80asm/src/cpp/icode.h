@@ -19,31 +19,66 @@
 #include <vector>
 using namespace std;
 
-class Expr;
-class PatchExpr;
-class Symtab;
 class Object;						// represents object file, including modules
 class Module;						// each module has a symbol table, a list of groups and a list of sections
-class Section;						// list of icode instructions in this section
-class Icode;						// icode instructions
+class Section;						// list of instructions in this section
+class Instr;						// instructions
 
-class Icode {
+//-----------------------------------------------------------------------------
+
+template<class Child>
+class child_list {
+public:
+	auto begin() { return m_list.begin(); }
+	auto end() { return m_list.end(); }
+
+	// find by name, return nullptr if not found
+	shared_ptr<Child> find(const string& name) const {
+		auto it = m_map.find(name);
+		if (it == m_map.end())
+			return nullptr;
+		else
+			return it.second;
+	}
+
+	// return exisiting, or insert new one; sets m_current
+	shared_ptr<Child> add(shared_ptr<Child> elem) {
+		auto it = m_map.find(elem->name());
+		if (it != m_map.end()) {
+			m_current = it->second;
+		}
+		else {
+			m_list.push_back(elem);
+			m_map[elem->name()] = elem;
+			m_current = elem;
+		}
+		return m_current;
+	}
+
+	// returns last child add()ed
+	shared_ptr<Child> current() const { Assert(m_current); return m_current; }
+
+private:
+	list<shared_ptr<Child>> m_list;
+	unordered_map<string, shared_ptr<Child>> m_map;
+	shared_ptr<Child> m_current;
+};
+
+//-----------------------------------------------------------------------------
+
+class Instr {
 public:
 	static inline const int UndefinedAsmpc = -1;
 
-	enum class Type {
-		None, Asmpc, Label, Opcode, JumpRelative,
-	};
+	Instr(Section* section);
 
-	Icode(Section* parent, Type type);
+	const Section* section() { return m_section; }
 
-	const Section* parent() { return m_parent; }
-
-	Type type() const { return m_type; }
-	void set_type(Type t) { m_type = t; }
+	void add_patch(shared_ptr<Patch> patch);
+	void add_byte(int n) { m_bytes.push_back(n & 0xff); }
 
 	int asmpc() const { return m_asmpc; }
-	void set_asmpc(int n);
+	void set_asmpc(int n) { m_asmpc = n; }
 
 	int asmpc_phased() const { return m_asmpc_phased; }
 	void set_asmpc_phased(int n) { m_asmpc_phased = n; }
@@ -52,52 +87,47 @@ public:
 	int pc() const { return is_phased() ? m_asmpc_phased : m_asmpc; }
 	void set_pc(int n) { if (is_phased()) m_asmpc_phased = n; else m_asmpc = n; }
 
-	shared_ptr<Symbol> label() { return m_label.lock(); }
-	void set_label(shared_ptr<Symbol> l) { m_label = l; }
+	bool is_relative_jump() const;
 
 	int size() const { return static_cast<int>(m_bytes.size()); }
 
 	vector<uint8_t>& bytes() { return m_bytes; }
-	vector<shared_ptr<PatchExpr>> patches() { return m_patches; }
+	vector<shared_ptr<Patch>> patches() { return m_patches; }
 
 	const Location& location() const { return m_location; }
 
 private:
-	Section* m_parent{ nullptr };
-	Type	m_type{ Type::None };
+	Section* m_section{ nullptr };
 	int		m_asmpc{ UndefinedAsmpc };
 	int		m_asmpc_phased{ UndefinedAsmpc };
-	weak_ptr<Symbol> m_label;
 	vector<uint8_t> m_bytes;
-	vector<shared_ptr<PatchExpr>> m_patches;
+	vector<shared_ptr<Patch>> m_patches;
 	Location m_location;
 };
+
+//-----------------------------------------------------------------------------
 
 class Section {
 public:
 	Section(const string& name, Module* module);
 
-	void add_instr(shared_ptr<Icode> instr);
-
+	const string& name() const { return m_name; }
 	const Module* module() { return m_module; }
-	const list<shared_ptr<Icode>>& icode() const { return m_icode; }
+
+	void add_instr(shared_ptr<Instr> instr);
+
+	const list<shared_ptr<Instr>>& instrs() const { return m_instrs; }
 
 	int asmpc() const;
 	int asmpc_phased() const;
 	bool is_phased() const;
 	int pc() const;
 
-	shared_ptr<Icode> add_asmpc();
-	void add_label(const string& name);
-	void add_opcode(unsigned bytes);
-	void add_opcode_n(unsigned bytes, shared_ptr<Expr> n, PatchExpr::Type type);
-	void add_opcode_nn(unsigned bytes, shared_ptr<Expr> nn, PatchExpr::Type type);
-	void add_opcode_idx(unsigned bytes, shared_ptr<Expr> dis);
-	void add_opcode_idx_n(unsigned bytes, shared_ptr<Expr> dis, shared_ptr<Expr> n);
-	void add_opcode_n_n(unsigned bytes, shared_ptr<Expr> n1, shared_ptr<Expr> n2);
-	void add_jump_relative(unsigned bytes, shared_ptr<Expr> nn);
-
 	string autolabel();
+
+	shared_ptr<Instr> add_asmpc();
+	shared_ptr<Instr> add_label(const string& name);
+	shared_ptr<Instr> add_opcode(unsigned bytes);
 
 	void check_relative_jumps();
 	void patch_local_exprs();
@@ -105,53 +135,49 @@ public:
 private:
 	string	m_name;
 	Module*	m_module{ nullptr };
-	list<shared_ptr<Icode>> m_icode;
+	list<shared_ptr<Instr>> m_instrs;
 
-	void add_label_(const string& name);
-	void add_jump_relative_(unsigned bytes, shared_ptr<Expr> nn);
-	void add_opcode_idx_(unsigned bytes);
+	shared_ptr<Instr> add_label_(const string& name);
 
 	void update_asmpc(int start = 0);
 };
 
-class Group {
-public:
-	Group(const string& name, Module* module);
-
-	shared_ptr<Section> section(const string& name);	// nullptr if not found
-	shared_ptr<Section> insert_section(const string& name);	// appends or returns existing
-
-	const Module* module() { return m_module; }
-	const list<shared_ptr<Section>>& sections() const { return m_sections; }
-
-private:
-	string	m_name;
-	Module* m_module{ nullptr };
-	list<shared_ptr<Section>> m_sections;
-	unordered_map<string, shared_ptr<Section>> m_sections_map;
-};
+//-----------------------------------------------------------------------------
 
 class Module {
 public:
 	Module(const string& name, Object* object);
 
 	const string& name() const { return m_name; }
-
-	shared_ptr<Section> section(const string& name);	// nullptr if not found
-	shared_ptr<Section> insert_section(const string& name);	// appends or returns existing
-	shared_ptr<Section> cur_section() { return m_cur_section; }
-
-	shared_ptr<Group> group(const string& name);	// nullptr if not found
-	shared_ptr<Group> insert_group(const string& name);	// appends or returns existing
-	shared_ptr<Group> cur_group() { return m_cur_group; }
-
 	const Object* object() { return m_object; }
-	const list<shared_ptr<Section>>& sections() const { return m_sections; }
-	const list<shared_ptr<Group>>& groups() const { return m_groups; }
 	Symtab& symtab() { return m_symtab; }
+
+	shared_ptr<Section> find_section(const string& name) { return m_sections.find(name); }
+	shared_ptr<Section> add_section(const string& name);
+	shared_ptr<Section> cur_section() { return m_sections.current(); }
+	auto begin() { return m_sections.begin(); }
+	auto end() { return m_sections.end(); }
 
 	void check_relative_jumps();
 	void patch_local_exprs();
+
+private:
+	string	m_name;					// module name
+	Object* m_object{ nullptr };	// parent
+	Symtab	m_symtab;				// module symbols
+	child_list<Section> m_sections;	// list of sections
+};
+
+
+#if 0
+
+
+class Module {
+public:
+
+
+
+
 
 private:
 	string	m_name;
@@ -188,3 +214,5 @@ private:
 	unordered_map<string, shared_ptr<Module>> m_modules_map;
 	shared_ptr<Module> m_cur_module;
 };
+
+#endif

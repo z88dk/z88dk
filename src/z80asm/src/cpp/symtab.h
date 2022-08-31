@@ -7,28 +7,24 @@
 
 #pragma once
 
-
-
-#if 0
-
 #include "errors.h"
+#include "expr.h"
 #include <string>
 #include <memory>
 #include <map>
 using namespace std;
 
-class Module;
 class Section;
 class Expr;
-class Icode;
+class Instr;
 
 class Symbol {
 public:
 	enum class Type {
-		Unknown,					// not known yet
+		Undef,						// not defined or extern
 		Constant,					// constant value
-		Label,						// label
-		Address,					// address computed at link time
+		Asmpc,						// address computed at link time
+		AsmpcPhased,				// constant linked to Instr
 		Computed,					// DEFC computed at link time
 	};
 
@@ -39,29 +35,31 @@ public:
 		Global,						// Public if defined, Extern if not defined
 	};
 
-	Symbol(const string& name, int value = 0,
-		Symbol::Type type = Type::Unknown, Symbol::Scope scope = Scope::Local,
-		shared_ptr<Module> module = nullptr, shared_ptr<Section> section = nullptr);
+	// tags for constructors
+	struct MakeUndef {};
+	struct MakeConstant {};
+	struct MakeAsmpc {};
+	struct MakeAsmpcPhased {};
+	struct MakeComputed {};
+
+	Symbol(const string& name, Symbol::Scope scope = Scope::Local);
+	Symbol(MakeUndef tag, const string& name, Symbol::Scope scope = Scope::Local);
+	Symbol(MakeConstant tag, const string& name, int value, Symbol::Scope scope = Scope::Local);
+	Symbol(MakeAsmpc tag, const string& name, shared_ptr<Instr> instr, Symbol::Scope scope = Scope::Local);
+	Symbol(MakeAsmpcPhased tag, const string& name, shared_ptr<Instr> instr, Symbol::Scope scope = Scope::Local);
+	Symbol(MakeComputed tag, const string& name, shared_ptr<Expr> expr, Symbol::Scope scope = Scope::Local);
+
+	void update(const Symbol& other);
+	void update(MakeConstant tag, int value);
+	void update(MakeAsmpc tag, shared_ptr<Instr> instr);
+	void update(MakeAsmpcPhased tag, shared_ptr<Instr> instr);
+	void update(MakeComputed tag, shared_ptr<Expr> expr);
 
 	const string& name() const { return m_name; }
-
-	int value() const { return m_value; }
-	void set_value(int n) { m_value = n; }
-
-	shared_ptr<Expr> expr() { return m_expr; }
-	void set_expr(shared_ptr<Expr> e) { m_expr = e; }
-
-	shared_ptr<Icode> instr() { return m_instr.lock(); }
-	void set_instr(shared_ptr<Icode> i) { m_instr = i; }
-
 	Type type() const { return m_type; }
-	void set_type(Type t) { m_type = t; }
 
 	Scope scope() const { return m_scope; }
 	void set_scope(Scope s) { m_scope = s; }
-
-	bool is_defined() const { return m_is_defined; }
-	void set_defined(bool f = true) { m_is_defined = f; }
 
 	bool is_touched() const { return m_is_touched; }
 	void set_touched(bool f = true) { m_is_touched = f; }
@@ -69,29 +67,26 @@ public:
 	bool is_global_def() const { return m_is_global_def; }
 	void set_global_def(bool f = true) { m_is_global_def = f; }
 
-	shared_ptr<Module> module() { return m_module.lock(); }
-	void set_module(weak_ptr<Module> m) { m_module = m; }
-
 	shared_ptr<Section> section() { return m_section.lock(); }
 	void set_section(weak_ptr<Section> s) { m_section = s; }
 
 	const Location& location() const { return m_location; }
 	void set_location(const Location& l) { m_location = l; }
 
+	ExprResult value() const;
+
 private:
 	string	m_name;					// name
-	int		m_value{ 0 };			// value if constant or evaluated if computed or address
-	shared_ptr<Expr> m_expr;		// DEFC expression
-	weak_ptr<Icode>  m_instr;		// LABEL
+	int		m_value{ 0 };			// value if Constant
+	weak_ptr<Instr>  m_instr;		// value if Asmpc or AsmpcPhased
+	shared_ptr<Expr> m_expr;		// value if Computed
 
-	Type	m_type{ Type::Unknown };
+	Type	m_type{ Type::Undef };
 	Scope	m_scope{ Scope::Local };
 
-	bool	m_is_defined{ false };	// true if defined
 	bool	m_is_touched{ false };	// true if used and shall be writen to the object file
-	bool	m_is_global_def{ false }; // true for __head, __tail, __size symbols
+	bool	m_is_global_def{ false }; // head, tail, ...
 
-	weak_ptr<Module>	m_module;	// module where defined
 	weak_ptr<Section>	m_section;	// section where defined
 
 	Location m_location;			// location where defined
@@ -116,31 +111,24 @@ public:
 	Symtab& defines() { return m_defines; }
 	Symtab& globals() { return m_globals; }
 
-	void copy_defines_to_cur_module();
-
 	shared_ptr<Symbol> find_local(const string& name);
 	shared_ptr<Symbol> find_global(const string& name);
+	void copy_defines_to_cur_module();
 
+	shared_ptr<Symbol> get_used(const string& name);
 	shared_ptr<Symbol> add_define(const string& name, int value);		// -D
 	shared_ptr<Symbol> add_global_def(const string& name, int value);	// head, tail
 	shared_ptr<Symbol> add_local_def(const string& name, int value);	// DEFINE
-
-	shared_ptr<Symbol> get_used(const string& name);
-	shared_ptr<Symbol> add(const string& name, int value, Symbol::Type type);
-
+	shared_ptr<Symbol> add(shared_ptr<Symbol> new_symbol);
 	void declare(const string& name, Symbol::Scope scope);
 
 private:
 	Symtab	m_defines;
 	Symtab	m_globals;
 
-	shared_ptr<Symbol> create_or_update(Symtab& symtab,
-		const string& name, int value,
-		Symbol::Type type, Symbol::Scope scope,
-		shared_ptr<Module> module, shared_ptr<Section> section);
-
-	shared_ptr<Symbol> add_local_symbol(const string& name, int value, Symbol::Type type);
-	shared_ptr<Symbol> add_global_symbol(const string& name, int value, Symbol::Type type);
+	shared_ptr<Symbol> create_or_update(Symtab& symtab, shared_ptr<Symbol> new_symbol);
+	shared_ptr<Symbol> add_local_symbol(shared_ptr<Symbol> new_symbol);
+	shared_ptr<Symbol> add_global_symbol(shared_ptr<Symbol> new_symbol);
 
 	void declare_global(const string& name);
 	void declare_public(const string& name);
@@ -148,5 +136,3 @@ private:
 };
 
 extern Symbols g_symbols;
-
-#endif

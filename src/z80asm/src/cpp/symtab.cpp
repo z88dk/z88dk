@@ -5,32 +5,122 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
-#if 0
-
 #include "args.h"
 #include "asm.h"
-#include "errors.h"
+#include "expr.h"
 #include "icode.h"
 #include "if.h"
 #include "preproc.h"
 #include "symtab.h"
 #include "utils.h"
-#include <iostream>
-#include <set>
-#include <vector>
 using namespace std;
 
 Symbols g_symbols;
 
 //-----------------------------------------------------------------------------
 
-Symbol::Symbol(const string& name, int value,
-	Symbol::Type type, Symbol::Scope scope,
-	shared_ptr<Module> module, shared_ptr<Section> section)
-	: m_name(name), m_value(value)
-	, m_type(type), m_scope(scope)
-	, m_module(module),m_section(section)
+Symbol::Symbol(const string& name, Symbol::Scope scope)
+	: m_name(name)
+	, m_type(Type::Undef), m_scope(scope)
 	, m_location(g_preproc.location()) {
+}
+
+Symbol::Symbol(MakeUndef tag, const string& name, Symbol::Scope scope)
+	: m_name(name)
+	, m_type(Type::Undef), m_scope(scope)
+	, m_location(g_preproc.location()) {
+}
+
+Symbol::Symbol(MakeConstant tag, const string& name, int value, Symbol::Scope scope)
+	: m_name(name)
+	, m_value(value)
+	, m_type(Type::Constant), m_scope(scope)
+	, m_location(g_preproc.location()) {
+}
+
+Symbol::Symbol(MakeAsmpc tag, const string& name, shared_ptr<Instr> instr, Symbol::Scope scope)
+	: m_name(name)
+	, m_instr(instr)
+	, m_type(Type::Asmpc), m_scope(scope)
+	, m_location(g_preproc.location()) {
+}
+
+Symbol::Symbol(MakeAsmpcPhased tag, const string& name, shared_ptr<Instr> instr, Symbol::Scope scope)
+	: m_name(name)
+	, m_instr(instr)
+	, m_type(Type::AsmpcPhased), m_scope(scope)
+	, m_location(g_preproc.location()) {
+}
+
+Symbol::Symbol(MakeComputed tag, const string& name, shared_ptr<Expr> expr, Symbol::Scope scope)
+	: m_name(name)
+	, m_expr(expr)
+	, m_type(Type::Computed), m_scope(scope)
+	, m_location(g_preproc.location()) {
+}
+
+void Symbol::update(const Symbol& other) {
+	m_value = other.m_value;
+	m_instr = other.m_instr;
+	m_expr = other.m_expr;
+	m_type = other.m_type;
+	m_scope = other.m_scope;
+	m_is_touched = other.m_is_touched;
+	m_is_global_def = other.m_is_global_def;
+	m_section = other.m_section;
+	m_location = other.m_location;
+}
+
+void Symbol::update(MakeConstant tag, int value) {
+	m_type = Type::Constant;
+	m_value = value;
+	m_instr.reset();
+	m_expr.reset();
+}
+
+void Symbol::update(MakeAsmpc tag, shared_ptr<Instr> instr) {
+	m_type = Type::Asmpc;
+	m_value = 0;
+	m_instr = instr;
+	m_expr.reset();
+}
+
+void Symbol::update(MakeAsmpcPhased tag, shared_ptr<Instr> instr) {
+	m_type = Type::AsmpcPhased;
+	m_value = 0;
+	m_instr = instr;
+	m_expr.reset();
+}
+
+void Symbol::update(MakeComputed tag, shared_ptr<Expr> expr) {
+	m_type = Type::Computed;
+	m_value = 0;
+	m_instr.reset();
+	m_expr = expr;
+}
+
+ExprResult Symbol::value() const {
+	ExprResult r;
+
+	switch (m_type) {
+	case Type::Undef:
+		r.set_undefined_symbol(m_name);
+		return r;
+	case Type::Constant:
+		r.set_value(m_value);
+		return r;
+	case Type::Asmpc:
+		r.set_value(m_instr.lock()->asmpc());
+		r.set_depends_on_asmpc();
+		return r;
+	case Type::AsmpcPhased:
+		r.set_value(m_instr.lock()->asmpc_phased());
+		return r;
+	case Type::Computed:
+		r = m_expr->eval_silent();
+		return r;
+	default: Assert(0); return r;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -54,7 +144,7 @@ shared_ptr<Symbol> Symtab::find(const string& name) {
 	if (it == m_table.end())
 		return nullptr;
 	else {
-		auto symbol = it->second;
+		shared_ptr<Symbol> symbol = it->second;
 		symbol->set_touched();
 		return symbol;
 	}
@@ -71,42 +161,31 @@ shared_ptr<Symbol> Symbols::find_global(const string& name) {
 }
 
 void Symbols::copy_defines_to_cur_module() {
-	for (auto& symbol : m_defines)
-		add_local_def(symbol.second->name(), symbol.second->value());
+	for (auto& it : m_defines) {
+		shared_ptr<Symbol> symbol = it.second;
+		add_local_def(symbol->name(), symbol->value().value());
+	}
 }
 
-// create/update a symbol in the given table, error if already defined
-shared_ptr<Symbol> Symbols::create_or_update(Symtab& symtab,
-	const string& name, int value,
-	Symbol::Type type, Symbol::Scope scope,
-	shared_ptr<Module> module, shared_ptr<Section> section) {
-
-	shared_ptr<Symbol> symbol = symtab.find(name);
-	if (!symbol) {						// does not exist
-		symbol = make_shared<Symbol>(name, value, type, scope, module, section);
-		symbol->set_defined();
-		Assert(symtab.insert(symbol));
-		return symbol;
+shared_ptr<Symbol> Symbols::create_or_update(Symtab& symtab, shared_ptr<Symbol> new_symbol) {
+	const string& name = new_symbol->name();
+	shared_ptr<Symbol> old_symbol = symtab.find(name);
+	if (!old_symbol) {						// does not exist
+		Assert(symtab.insert(new_symbol));
+		return new_symbol;
 	}
-	else if (!symbol->is_defined()) {	// declared but not defined
-		symbol->set_value(value);
-		if (symbol->type() < type)
-			symbol->set_type(type);
-		symbol->set_scope(scope);
-		symbol->set_defined();
-		symbol->set_module(module);
-		symbol->set_section(section);
-		symbol->set_location(g_preproc.location());
-		return symbol;
+	else if (old_symbol->type() == Symbol::Type::Undef) {	// declared but not defined
+		old_symbol->update(*new_symbol);
+		return old_symbol;
 	}
 	else {								// already defined
 		if (name.substr(0, 11) == "__CDBINFO__") {
-			return symbol;				// ignore duplicates of these
+			return old_symbol;			// ignore duplicates of these
 		}
-		else if (symbol->module().get() != nullptr &&
-			symbol->module().get() != module.get()) {
+		else if (old_symbol->section() != nullptr &&
+			old_symbol->section()->module() != new_symbol->section()->module()) {
 			g_errors.error(ErrCode::DuplicateDefinition,
-				symbol->module()->name() + "::" + name);
+				old_symbol->section()->module()->name() + "::" + name);
 			return nullptr;
 		}
 		else {
@@ -131,26 +210,24 @@ shared_ptr<Symbol> Symbols::get_used(const string& name) {
 		return symbol;
 
 	// create undefined symbol
-	symbol = make_shared<Symbol>(name, 0,
-		Symbol::Type::Unknown, Symbol::Scope::Local,
-		g_asm.cur_module(), g_asm.cur_section());
+	symbol = make_shared<Symbol>(Symbol::MakeUndef(), name, Symbol::Scope::Local);
+	symbol->set_section(g_asm.cur_section());
+	symbol->set_touched();
 	Assert(g_asm.cur_module()->symtab().insert(symbol));
 	return symbol;
 }
 
 // define a static symbol(from - D command line)
 shared_ptr<Symbol> Symbols::add_define(const string& name, int value) {
-	auto symbol = create_or_update(m_defines, name, value,
-		Symbol::Type::Constant, Symbol::Scope::Local,
-		nullptr, nullptr);
+	auto new_symbol = make_shared<Symbol>(Symbol::MakeConstant(), name, value, Symbol::Scope::Local);
+	auto symbol = create_or_update(m_defines, new_symbol);
 	return symbol;
 }
 
 // define a global define (head, tail, ...)
 shared_ptr<Symbol> Symbols::add_global_def(const string& name, int value) {
-	auto symbol = create_or_update(m_globals, name, value,
-		Symbol::Type::Constant, Symbol::Scope::Public,
-		nullptr, nullptr);
+	auto new_symbol = make_shared<Symbol>(Symbol::MakeConstant(), name, value, Symbol::Scope::Public);
+	auto symbol = create_or_update(m_globals, new_symbol);
 	if (symbol)
 		symbol->set_global_def();
 	return symbol;
@@ -158,24 +235,27 @@ shared_ptr<Symbol> Symbols::add_global_def(const string& name, int value) {
 
 // define a local define (DEFINE)
 shared_ptr<Symbol> Symbols::add_local_def(const string& name, int value) {
-	return add_local_symbol(name, value, Symbol::Type::Constant);
+	auto symbol = make_shared<Symbol>(Symbol::MakeConstant(), name, value);
+	return add_local_symbol(symbol);
 }
 
 // local symbol
-shared_ptr<Symbol> Symbols::add_local_symbol(const string& name, int value, Symbol::Type type) {
-	auto symbol = create_or_update(g_asm.cur_module()->symtab(),
-		name, value,
-		type, Symbol::Scope::Local,
-		g_asm.cur_module(), g_asm.cur_section());
+shared_ptr<Symbol> Symbols::add_local_symbol(shared_ptr<Symbol> new_symbol) {
+	auto symbol = create_or_update(g_asm.cur_module()->symtab(), new_symbol);
+	if (symbol) {
+		symbol->set_scope(Symbol::Scope::Local);
+		symbol->set_section(g_asm.cur_section());
+	}
 	return symbol;
 }
 
 // global symbol
-shared_ptr<Symbol> Symbols::add_global_symbol(const string& name, int value, Symbol::Type type) {
-	auto symbol = create_or_update(m_globals,
-		name, value,
-		type, Symbol::Scope::Public,
-		g_asm.cur_module(), g_asm.cur_section());
+shared_ptr<Symbol> Symbols::add_global_symbol(shared_ptr<Symbol> new_symbol) {
+	auto symbol = create_or_update(m_globals, new_symbol);
+	if (symbol) {
+		symbol->set_scope(Symbol::Scope::Public);
+		symbol->set_section(g_asm.cur_section());
+	}
 	return symbol;
 }
 
@@ -184,22 +264,15 @@ shared_ptr<Symbol> Symbols::add_global_symbol(const string& name, int value, Sym
 // b) if declared global/extern and not defined, define now
 // c) if declared global/extern and defined -> error REDEFINED
 // d) if in global table and not global/extern -> define a new local symbol
-shared_ptr<Symbol> Symbols::add(const string& name, int value, Symbol::Type type) {
-	auto symbol = find_global(name);
-	if (!symbol) {						// not declared as global/extern
+shared_ptr<Symbol> Symbols::add(shared_ptr<Symbol> new_symbol) {
+	const string& name = new_symbol->name();
+	auto found = find_global(name);
+	if (!found) 						// not declared as global/extern
 		// create/update local
-		return create_or_update(g_asm.cur_module()->symtab(),
-			name, value,
-			type, Symbol::Scope::Local,
-			g_asm.cur_module(), g_asm.cur_section());
-	}
-	else {
+		return add_local_symbol(new_symbol);
+	else 
 		// create/update global
-		return create_or_update(m_globals,
-			name, value,
-			type, Symbol::Scope::Public,
-			g_asm.cur_module(), g_asm.cur_section());
-	}
+		return add_global_symbol(new_symbol);
 }
 
 void Symbols::declare(const string& name, Symbol::Scope scope) {
@@ -217,17 +290,16 @@ void Symbols::declare_global(const string& name) {
 	if (!symbol) {						// not local
 		symbol = find_global(name);
 		if (!symbol) {					// not local, not global -> declare as global
-			symbol = make_shared<Symbol>(name, 0,
-				Symbol::Type::Unknown, Symbol::Scope::Global,
-				g_asm.cur_module(), g_asm.cur_section());
+			symbol = make_shared<Symbol>(Symbol::MakeUndef(), name, Symbol::Scope::Global);
+			symbol->set_section(g_asm.cur_section());
 			Assert(m_globals.insert(symbol));
 		}
-		else if (symbol->module().get() == g_asm.cur_module().get() &&
+		else if (symbol->section()->module() == g_asm.cur_module().get() &&
 			(symbol->scope() == Symbol::Scope::Public ||
 				symbol->scope() == Symbol::Scope::Extern)) {
 			// already declared public or extern in same module, ignore global
 		}
-		else if (symbol->module().get() != g_asm.cur_module().get() ||
+		else if (symbol->section()->module() != g_asm.cur_module().get() ||
 			symbol->scope() != Symbol::Scope::Global) {
 			g_errors.error(ErrCode::SymbolRedeclaration, name);
 		}
@@ -253,21 +325,20 @@ void Symbols::declare_public(const string& name) {
 	if (!symbol) {						// not local
 		symbol = find_global(name);
 		if (!symbol) {					// not local, not global -> declare as global
-			symbol = make_shared<Symbol>(name, 0,
-				Symbol::Type::Unknown, Symbol::Scope::Public,
-				g_asm.cur_module(), g_asm.cur_section());
+			symbol = make_shared<Symbol>(Symbol::MakeUndef(), name, Symbol::Scope::Public);
+			symbol->set_section(g_asm.cur_section());
 			Assert(m_globals.insert(symbol));
 		}
-		else if (symbol->module().get() == g_asm.cur_module().get() &&
+		else if (symbol->section()->module() == g_asm.cur_module().get() &&
 			symbol->scope() == Symbol::Scope::Extern) {
 			// Declared already EXTERN in the same module, change to PUBLIC
 			symbol->set_scope(Symbol::Scope::Public);
 		}
-		else if (symbol->module().get() == g_asm.cur_module().get() &&
+		else if (symbol->section()->module() == g_asm.cur_module().get() &&
 			symbol->scope() == Symbol::Scope::Global) {
 			// Declared already GLOBAL in the same module, ignore
 		}
-		else if (symbol->module().get() != g_asm.cur_module().get() ||
+		else if (symbol->section()->module() != g_asm.cur_module().get() ||
 			symbol->scope() != Symbol::Scope::Public) {
 			g_errors.error(ErrCode::SymbolRedeclaration, name);
 		}
@@ -293,17 +364,16 @@ void Symbols::declare_extern(const string& name) {
 	if (!symbol) {						// not local
 		symbol = find_global(name);
 		if (!symbol) {					// not local, not global -> declare as global
-			symbol = make_shared<Symbol>(name, 0,
-				Symbol::Type::Unknown, Symbol::Scope::Extern,
-				g_asm.cur_module(), g_asm.cur_section());
+			symbol = make_shared<Symbol>(Symbol::MakeUndef(), name, Symbol::Scope::Extern);
+			symbol->set_section(g_asm.cur_section());
 			Assert(m_globals.insert(symbol));
 		}
-		else if (symbol->module().get() == g_asm.cur_module().get() &&
+		else if (symbol->section()->module() == g_asm.cur_module().get() &&
 			(symbol->scope() == Symbol::Scope::Public ||
 				symbol->scope() == Symbol::Scope::Global)) {
 			// Declared already PUBLIC or GLOBAL in the same module, ignore EXTERN
 		}
-		else if (symbol->module().get() != g_asm.cur_module().get() ||
+		else if (symbol->section()->module() != g_asm.cur_module().get() ||
 			symbol->scope() != Symbol::Scope::Extern) {
 			g_errors.error(ErrCode::SymbolRedeclaration, name);
 		}
@@ -316,7 +386,7 @@ void Symbols::declare_extern(const string& name) {
 		if (!global_symbol) {
 			// If no external symbol of identical name has been declared, then re-declare local
 			// symbol as external symbol, but only if local symbol is not defined yet
-			if (!symbol->is_defined()) {
+			if (symbol->type()!=Symbol::Type::Undef) {
 				symbol->set_scope(Symbol::Scope::Extern);
 				g_asm.cur_module()->symtab().erase(name);
 				Assert(m_globals.insert(symbol));
@@ -324,7 +394,7 @@ void Symbols::declare_extern(const string& name) {
 			else {						// already declared local
 				g_errors.error(ErrCode::SymbolRedeclaration, name);
 			}
-		}
+}
 		else {							// re-declaration not allowed
 			g_errors.error(ErrCode::SymbolRedeclaration, name);
 		}
@@ -351,5 +421,3 @@ void symtab_insert_global_def(const char* name, int value) {
 		define_global_def_sym(name, value);
 	}
 }
-
-#endif

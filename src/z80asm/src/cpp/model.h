@@ -16,44 +16,6 @@
 #include <string>
 using namespace std;
 
-template<class Parent, class Child>
-class child_list {
-public:
-	shared_ptr<Parent> parent() const { Assert(m_parent); return m_parent.lock(); }
-
-	auto begin() { return m_list.begin(); }
-	auto end() { return m_list.end(); }
-
-	shared_ptr<Child> find(const string& name) const {
-		auto it = m_map.find(name);
-		if (it == m_map.end())
-			return nullptr;
-		else
-			return it.second;
-	}
-
-	bool add(shared_ptr<Child> elem) {
-		auto found = find(elem.name());
-		if (found) {
-			m_current = found;
-			return false;
-		}
-		else {
-			m_list.push_back(elem);
-			m_map[elem.name()] = elem;
-			return true;
-		}
-	}
-
-	shared_ptr<Child> current() const { return m_current; }
-
-private:
-	weak_ptr<Parent> m_parent;
-	list<shared_ptr<Child>> m_list;
-	unordered_map<string, shared_ptr<Child>> m_map;
-	shared_ptr<Child> m_current;
-};
-
 class Prog;
 class Object;
 class Module;
