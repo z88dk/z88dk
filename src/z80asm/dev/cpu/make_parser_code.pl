@@ -124,6 +124,7 @@ void Parser::$function() {
 	int state = 0;
 	int next, expr_type;
 	shared_ptr<Expr> expr;
+	m_const_expr = -1;		// init invalid value
 
 	while (true) {
 		Assert(state >= 0 && state < $nr_states);
@@ -181,8 +182,14 @@ void Parser::$function() {
 		case 2:		// const expression
 			expr = make_shared<Expr>(m_lexer); 
 			if (expr->parse()) {
-				if (expr->eval_silent() && expr->is_const()) {
-					m_exprs.push_back(expr);
+				m_exprs.push_back(expr);
+				ExprResult r = expr->eval_silent();
+				if (!r.is_const()) {
+					g_errors.error(ErrCode::ConstExprExpected);
+					return;
+				}
+				else {
+					m_const_expr = r.value();
 					if (next < 0) {
 						${function}_action(-next);
 						return;
@@ -191,10 +198,6 @@ void Parser::$function() {
 						state = next;
 						continue;
 					}
-				}
-				else {
-					g_errors.error(ErrCode::ConstExprExpected);
-					return;
 				}
 			}
 			break;

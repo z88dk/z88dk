@@ -136,18 +136,16 @@ sub parse_code_opcode {
 	elsif ($bin =~ s/ %j$//) {
 		return "add_jump_relative(".build_bytes($bin).");";
 	}
-	elsif ($bin =~ s/%c\((.*?)\)/c/) {
+	elsif ($bin =~ s/%c\((.*?)\)/m_const_expr/) {
 		my @values = eval($1); die "$cpu, $asm, @bin, $1" if $@;
-		$bin =~ s/%c/c/g;		# replace all other %c in bin
+		$bin =~ s/%c/m_const_expr/g;		# replace all other %c in bin
 		my $code =  "{\n".
 					"Assert(m_exprs.size() >= 1);\n".
-					"Assert(m_exprs[0]->is_const());\n".
-					"int c = m_exprs[0]->value();\n".
-					"m_exprs.pop_front();\n".
-					"switch (c) {\n".
+                    "m_exprs.pop_front();\n".
+					"switch (m_const_expr) {\n".
 					join(" ", map {"case $_:"} @values)." break;\n".
 					"default: ".
-					"g_errors.error(ErrCode::IntRange, int_to_hex(c, 2));\n".
+					"g_errors.error(ErrCode::IntRange, int_to_hex(m_const_expr, 2));\n".
 					"}\n";
 		if ($bin =~ s/ %d// || $bin =~ s/%d //) {
 			$code .= "add_opcode_idx(".build_bytes($bin).");\n";

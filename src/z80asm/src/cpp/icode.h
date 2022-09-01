@@ -11,6 +11,7 @@
 #include "errors.h"
 #include "expr.h"
 #include "symtab.h"
+#include "utils.h"
 #include <cinttypes>
 #include <list>
 #include <memory>
@@ -32,13 +33,15 @@ public:
 	auto begin() { return m_list.begin(); }
 	auto end() { return m_list.end(); }
 
-	// find by name, return nullptr if not found
-	shared_ptr<Child> find(const string& name) const {
+	// find by name, return nullptr if not found; sets m_current
+	shared_ptr<Child> find(const string& name) {
 		auto it = m_map.find(name);
 		if (it == m_map.end())
 			return nullptr;
-		else
-			return it.second;
+		else {
+			m_current = it->second;
+			return m_current;
+		}
 	}
 
 	// return exisiting, or insert new one; sets m_current
@@ -75,7 +78,7 @@ public:
 	const Section* section() { return m_section; }
 
 	void add_patch(shared_ptr<Patch> patch);
-	void add_byte(int n) { m_bytes.push_back(n & 0xff); }
+	void add_byte(int n);
 
 	int asmpc() const { return m_asmpc; }
 	void set_asmpc(int n) { m_asmpc = n; }
@@ -168,51 +171,25 @@ private:
 	child_list<Section> m_sections;	// list of sections
 };
 
-
-#if 0
-
-
-class Module {
-public:
-
-
-
-
-
-private:
-	string	m_name;
-	Object* m_object{ nullptr };
-	Symtab	m_symtab;			// module symbols
-
-	list<shared_ptr<Section>> m_sections;
-	unordered_map<string, shared_ptr<Section>> m_sections_map;
-	shared_ptr<Section> m_cur_section;
-
-	list<shared_ptr<Group>> m_groups;
-	unordered_map<string, shared_ptr<Group>> m_groups_map;
-	shared_ptr<Group> m_cur_group;
-};
+//-----------------------------------------------------------------------------
 
 class Object {
 public:
 	Object(const string& filename);
 
-	shared_ptr<Module> module(const string& name);	// nullptr if not found
-	shared_ptr<Module> insert_module(const string& name);	// appends or returns existing
-	shared_ptr<Module> cur_module() { return m_cur_module; }
-
 	const string& filename() const { return m_filename; }
-	const list<shared_ptr<Module>> modules() const { return m_modules; }
 	const string name() const;
+
+	shared_ptr<Module> find_module(const string& name) { return m_modules.find(name); }
+	shared_ptr<Module> add_module(const string& name);
+	shared_ptr<Module> cur_module() { return m_modules.current(); }
+	auto begin() { return m_modules.begin(); }
+	auto end() { return m_modules.end(); }
 
 	void check_relative_jumps();
 	void patch_local_exprs();
 
 private:
 	string m_filename;
-	list<shared_ptr<Module>> m_modules;
-	unordered_map<string, shared_ptr<Module>> m_modules_map;
-	shared_ptr<Module> m_cur_module;
+	child_list<Module> m_modules;
 };
-
-#endif

@@ -15,7 +15,6 @@ using namespace std;
 
 class Object;
 class Module;
-class Group;
 class Section;
 class Expr;
 class Symbol;
@@ -26,7 +25,6 @@ public:
 
 	shared_ptr<Object> object() { return m_object; }
 	shared_ptr<Module> cur_module() { return m_object->cur_module(); }
-	shared_ptr<Group> cur_group() { return m_object->cur_module()->cur_group(); }
 	shared_ptr<Section> cur_section() { return m_object->cur_module()->cur_section(); }
 
 private:
@@ -37,13 +35,10 @@ private:
 	// controler
 	void assemble1(const string& filename);
 	void set_cur_module(const string& name);
-	void set_cur_group(const string& name);
 	void set_cur_section(const string& name);
 
 	// errors
 	bool got_errors();
-
-	bool add_label(const string& name);
 };
 
 extern Asm g_asm;

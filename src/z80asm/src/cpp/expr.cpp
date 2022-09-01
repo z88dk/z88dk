@@ -5,8 +5,8 @@
 // License: The Artistic License 2.0, http://www.perlfoundation.org/artistic_license_2_0
 //-----------------------------------------------------------------------------
 
+#include "asm.h"
 #include "icode.h"
-#include "model.h"
 #include "preproc.h"
 #include "symtab.h"
 #include "utils.h"
@@ -871,13 +871,13 @@ shared_ptr<ExprNode> Expr::parse_primary() {
 
 	switch (ttype()) {
 	case TType::Ident:
-		// TODO symbol = g_symbols.get_used(token().svalue);
-		// TODO node = make_shared<SymbolNode>(symbol);
+		symbol = g_symbols.get_used(token().svalue);
+		node = make_shared<SymbolNode>(symbol);
 		next();
 		return node;
 	case TType::ASMPC:
-		// TODO instr = g_asm.cur_section()->add_asmpc();
-		// TODO node = make_shared<AsmpcNode>(instr);
+		instr = g_asm.cur_section()->add_asmpc();
+		node = make_shared<AsmpcNode>(instr);
 		next();
 		return node;
 	case TType::Integer:
@@ -885,8 +885,7 @@ shared_ptr<ExprNode> Expr::parse_primary() {
 		next();
 		return node;
 	default:
-		throw ExprException(ErrCode::IntOrIdentExpected,
-			m_lexer.token_text());
+		throw ExprException(ErrCode::IntOrIdentExpected, m_lexer.token_text());
 	}
 }
 

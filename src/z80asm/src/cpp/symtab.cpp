@@ -25,34 +25,34 @@ Symbol::Symbol(const string& name, Symbol::Scope scope)
 	, m_location(g_preproc.location()) {
 }
 
-Symbol::Symbol(MakeUndef tag, const string& name, Symbol::Scope scope)
+Symbol::Symbol(MakeUndef /*tag*/, const string& name, Symbol::Scope scope)
 	: m_name(name)
 	, m_type(Type::Undef), m_scope(scope)
 	, m_location(g_preproc.location()) {
 }
 
-Symbol::Symbol(MakeConstant tag, const string& name, int value, Symbol::Scope scope)
+Symbol::Symbol(MakeConstant /*tag*/, const string& name, int value, Symbol::Scope scope)
 	: m_name(name)
 	, m_value(value)
 	, m_type(Type::Constant), m_scope(scope)
 	, m_location(g_preproc.location()) {
 }
 
-Symbol::Symbol(MakeAsmpc tag, const string& name, shared_ptr<Instr> instr, Symbol::Scope scope)
+Symbol::Symbol(MakeAsmpc /*tag*/, const string& name, shared_ptr<Instr> instr, Symbol::Scope scope)
 	: m_name(name)
 	, m_instr(instr)
 	, m_type(Type::Asmpc), m_scope(scope)
 	, m_location(g_preproc.location()) {
 }
 
-Symbol::Symbol(MakeAsmpcPhased tag, const string& name, shared_ptr<Instr> instr, Symbol::Scope scope)
+Symbol::Symbol(MakeAsmpcPhased /*tag*/, const string& name, shared_ptr<Instr> instr, Symbol::Scope scope)
 	: m_name(name)
 	, m_instr(instr)
 	, m_type(Type::AsmpcPhased), m_scope(scope)
 	, m_location(g_preproc.location()) {
 }
 
-Symbol::Symbol(MakeComputed tag, const string& name, shared_ptr<Expr> expr, Symbol::Scope scope)
+Symbol::Symbol(MakeComputed /*tag*/, const string& name, shared_ptr<Expr> expr, Symbol::Scope scope)
 	: m_name(name)
 	, m_expr(expr)
 	, m_type(Type::Computed), m_scope(scope)
@@ -71,28 +71,28 @@ void Symbol::update(const Symbol& other) {
 	m_location = other.m_location;
 }
 
-void Symbol::update(MakeConstant tag, int value) {
+void Symbol::update(MakeConstant /*tag*/, int value) {
 	m_type = Type::Constant;
 	m_value = value;
 	m_instr.reset();
 	m_expr.reset();
 }
 
-void Symbol::update(MakeAsmpc tag, shared_ptr<Instr> instr) {
+void Symbol::update(MakeAsmpc /*tag*/, shared_ptr<Instr> instr) {
 	m_type = Type::Asmpc;
 	m_value = 0;
 	m_instr = instr;
 	m_expr.reset();
 }
 
-void Symbol::update(MakeAsmpcPhased tag, shared_ptr<Instr> instr) {
+void Symbol::update(MakeAsmpcPhased /*tag*/, shared_ptr<Instr> instr) {
 	m_type = Type::AsmpcPhased;
 	m_value = 0;
 	m_instr = instr;
 	m_expr.reset();
 }
 
-void Symbol::update(MakeComputed tag, shared_ptr<Expr> expr) {
+void Symbol::update(MakeComputed /*tag*/, shared_ptr<Expr> expr) {
 	m_type = Type::Computed;
 	m_value = 0;
 	m_instr.reset();

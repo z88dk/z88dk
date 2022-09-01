@@ -28,6 +28,7 @@ private:
 	Lexer	m_lexer;						// line being parsed
 	State	m_state{ State::Main };			// parser state
 	deque<shared_ptr<Expr>> m_exprs;		// parsed expressions
+	int		m_const_expr{ -1 };				// last const expression value, init invalid
 
 	void parse_line();
 	void parse_line_main();

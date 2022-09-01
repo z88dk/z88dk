@@ -10,7 +10,6 @@
 #include "icode.h"
 #include "preproc.h"
 #include "symtab.h"
-#include "utils.h"
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -46,6 +45,10 @@ void Instr::add_patch(shared_ptr<Patch> patch) {
 	patch->set_offset(size());
 	for (int i = 0; i < patch->size(); i++)
 		m_bytes.push_back(0);
+}
+
+void Instr::add_byte(int n) {
+	m_bytes.push_back(n & 0xff);
 }
 
 bool Instr::is_relative_jump() const {
@@ -271,51 +274,23 @@ void Module::patch_local_exprs() {
 		section->patch_local_exprs();
 }
 
-#if 0
-
-
-
-
-
-
-//-----------------------------------------------------------------------------
-
-
-
-
 //-----------------------------------------------------------------------------
 
 Object::Object(const string& filename) {
-	insert_module("");		// create default module with empty name
 	m_filename = fs::path(filename).replace_extension(EXT_O).generic_string();
-}
-
-shared_ptr<Module> Object::module(const string& name) {
-	auto it = m_modules_map.find(name);
-	if (it != m_modules_map.end()) {		// found
-		shared_ptr<Module> module = it->second;
-		m_cur_module = module;
-		return module;
-	}
-	else
-		return nullptr;
-}
-
-shared_ptr<Module> Object::insert_module(const string& name) {
-	auto it = m_modules_map.find(name);
-	if (it != m_modules_map.end())		// found
-		return it->second;
-	else {								// not found
-		auto module = make_shared<Module>(name, this);
-		m_modules.push_back(module);
-		m_modules_map[name] = module;
-		m_cur_module = module;
-		return module;
-	}
+	add_module(name());		// create default module with stem of file name
 }
 
 const string Object::name() const {
 	return fs::path(m_filename).stem().generic_string();
+}
+
+shared_ptr<Module> Object::add_module(const string& name) {
+	shared_ptr<Module> module = m_modules.find(name);
+	if (module)
+		return module;
+	else
+		return m_modules.add(make_shared<Module>(name, this));
 }
 
 void Object::check_relative_jumps() {
@@ -328,4 +303,3 @@ void Object::patch_local_exprs() {
 		module->patch_local_exprs();
 }
 
-#endif

@@ -23,7 +23,6 @@ bool Asm::assemble(const string& filename) {
 	// create object and default module, section and group
 	m_object = make_shared<Object>(filename);
 	set_cur_module(m_object->name());
-	set_cur_group("");
 	set_cur_section("");
 
 	// clear globals
@@ -61,15 +60,11 @@ void Asm::assemble1(const string& filename) {
 }
 
 void Asm::set_cur_module(const string& name) {
-	m_object->insert_module(name);
-}
-
-void Asm::set_cur_group(const string& name) {
-	cur_module()->insert_group(name);
+	m_object->add_module(name);
 }
 
 void Asm::set_cur_section(const string& name) {
-	cur_module()->insert_section(name);
+	cur_module()->add_section(name);
 }
 
 bool Asm::got_errors() {
