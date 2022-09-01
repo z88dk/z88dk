@@ -5,6 +5,8 @@ ELIF __CPU_Z80__
 INCLUDE "config_private.inc"
 ENDIF
 
+SECTION code_driver
+
 PUBLIC _acia_interrupt
 
 EXTERN aciaRxCount, aciaRxIn, aciaRxBuffer
