@@ -17,10 +17,10 @@ EXTERN ide_read_byte
 ; Wait for the drive to be ready to transfer data.
 ; Returns the drive's status in A
 ; Uses AF, DE
-; Carry is set on wait success.
+; return carry on success
 
 .ide_wait_drq
-    ld a,__IO_IDE_ALT_STATUS    ;get IDE alt status register
+    ld d,__IO_IDE_ALT_STATUS    ;get IDE alt status register
     call ide_read_byte
     and 00100001b               ;test for ERR or DFE
     ret NZ                      ;return clear carry flag on failure

@@ -11,32 +11,25 @@ PUBLIC ide_write_block
     ;Write a block of 512 bytes (one sector) from (HL++) to
     ;the drive 16 bit data register
     ;uses AF, BC, HL
-.ide_write_block
-    ld b,0                      ;keep iterative count in b
 
+.ide_write_block
     ld a,__IO_PIO_IDE_WR
     out (__IO_PIO_IDE_CONFIG),a ;config 8255 chip, write mode
-
     ld a,__IO_IDE_DATA
     out (__IO_PIO_IDE_CTL),a    ;drive address onto control lines
+    ld b,0                      ;keep iterative count in b
 
 .ide_wrblk
     ld a,__IO_IDE_DATA|__IO_IDE_WR_LINE
     out (__IO_PIO_IDE_CTL),a    ;and assert write pin
-    ld a,(hl)
-    inc hl
+    ld a,(hl+)
     out (__IO_PIO_IDE_LSB),a    ;write the lower byte (HL++)
-    ld a,(hl)
-    inc hl
+    ld a,(hl+)
     out (__IO_PIO_IDE_MSB),a    ;write the upper byte (HL++)
     ld a,__IO_IDE_DATA
     out (__IO_PIO_IDE_CTL),a    ;deassert write pin
-    dec b                       ;keep iterative count in b
-    jp NZ,ide_wrblk
+    djnz ide_wrblk              ;keep iterative count in b
 
     xor a
     out (__IO_PIO_IDE_CTL),a    ;deassert all control pins
-
-    ld a,__IO_PIO_IDE_RD
-    out (__IO_PIO_IDE_CONFIG),a ;config 8255 chip, read mode
     ret

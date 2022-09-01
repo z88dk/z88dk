@@ -20,10 +20,10 @@ EXTERN ide_read_byte
 ; Or until bit 0 (ERR, value = 0x01) or bit 5 (DFE, value = 0x20) sets.
 ; If neither error bit is set, the device is ready right then.
 ; Uses AF, DE
-; Carry is set on wait success.
+; return carry on success
 
 .ide_wait_ready
-    ld a,__IO_IDE_ALT_STATUS    ;get IDE alt status register
+    ld d,__IO_IDE_ALT_STATUS    ;get IDE alt status register
     call ide_read_byte
     and 00100001b               ;test for ERR or DFE
     ret NZ                      ;return clear carry flag on failure
