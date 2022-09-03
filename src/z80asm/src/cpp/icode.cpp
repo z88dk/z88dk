@@ -6,6 +6,7 @@
 //-----------------------------------------------------------------------------
 
 #include "args.h"
+#include "asm.h"
 #include "cpu.h"
 #include "icode.h"
 #include "preproc.h"
@@ -219,11 +220,32 @@ void Section::check_relative_jumps() {
 }
 
 void Section::patch_local_exprs() {
-	/*
-	for (auto& instr : m_instrs) {
+	g_asm.set_cur_section(m_name);		// set section scope for expressions
 
+	for (auto& instr : m_instrs) {
+		g_errors.push_location(instr->location());	// set error scope for expression
+
+		for (auto it = instr->patches().begin(); it != instr->patches().end(); ++it) {
+			shared_ptr<Patch> patch = *it;
+			shared_ptr<Expr> expr = patch->expr();
+
+			ExprResult r = expr->eval_silent();
+
+			if (r.depends_on_asmpc() || r.cross_section() || r.undefined_symbol()) {
+				// keep in object file
+			}
+			if (patch->type() == Patch::Type::JrOffset) {
+				if (r.cross_section() || r.undefined_symbol()) 
+
+				
+			}
+			else if 
+
+		}
+
+		g_errors.pop_location();
 	}
-	*/
+
 }
 
 void Section::update_asmpc(int start) {

@@ -105,22 +105,29 @@ ExprResult Symbol::value() const {
 	switch (m_type) {
 	case Type::Undef:
 		r.set_undefined_symbol(m_name);
-		return r;
+		break;
 	case Type::Constant:
 		r.set_value(m_value);
-		return r;
+		break;
 	case Type::Asmpc:
 		r.set_value(m_instr.lock()->asmpc());
 		r.set_depends_on_asmpc();
-		return r;
+		break;
 	case Type::AsmpcPhased:
 		r.set_value(m_instr.lock()->asmpc_phased());
-		return r;
+		break;
 	case Type::Computed:
 		r = m_expr->eval_silent();
-		return r;
-	default: Assert(0); return r;
+		break;
+	default:
+		Assert(0);
+		break;
 	}
+
+	if (g_asm.cur_section() != m_section.lock())
+		r.set_cross_section();
+
+	return r;
 }
 
 //-----------------------------------------------------------------------------

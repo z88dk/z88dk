@@ -49,9 +49,11 @@ void Asm::assemble1(const string& filename) {
 	if (got_errors())
 		return;
 
+#if 0
 	m_object->check_relative_jumps();
 	if (got_errors())
 		return;
+#endif
 
 	m_object->patch_local_exprs();
 	if (got_errors())

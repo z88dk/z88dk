@@ -34,6 +34,9 @@ public:
 	bool recursive_expr() const { return m_recursive_expr; }
 	void set_recursive_expr(bool f = true) { m_recursive_expr = f; }
 
+	bool cross_section() const { return m_cross_section; }
+	void set_cross_section(bool f = true) { m_cross_section = f; }
+
 	bool undefined_symbol() const { return !m_undefined_symbols.empty(); }
 	void set_undefined_symbol(const string& name) { m_undefined_symbols = name; }
 	const string& undefined_symbol_names() const { return m_undefined_symbols; }
@@ -45,6 +48,7 @@ private:
 	bool m_depends_on_asmpc{ false };
 	bool m_division_by_zero{ false };
 	bool m_recursive_expr{ false };
+	bool m_cross_section{ false };
 	string m_undefined_symbols;			// "," separated list of symbols
 };
 

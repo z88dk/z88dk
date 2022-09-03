@@ -24,8 +24,12 @@ public:
 	bool assemble(const string& filename);
 
 	shared_ptr<Object> object() { return m_object; }
+
 	shared_ptr<Module> cur_module() { return m_object->cur_module(); }
+	void set_cur_module(const string& name);
+
 	shared_ptr<Section> cur_section() { return m_object->cur_module()->cur_section(); }
+	void set_cur_section(const string& name);
 
 private:
 	Parser				m_parser;
@@ -34,8 +38,6 @@ private:
 
 	// controler
 	void assemble1(const string& filename);
-	void set_cur_module(const string& name);
-	void set_cur_section(const string& name);
 
 	// errors
 	bool got_errors();
