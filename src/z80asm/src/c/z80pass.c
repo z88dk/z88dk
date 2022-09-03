@@ -25,7 +25,7 @@ void Z80pass2(int start_errors)
 	Expr1ListElem* iter;
 	Expr1* expr, * expr2;
 	long value;
-	bool do_patch, do_store;
+	bool do_patch;
 	long asmpc;		// should be an int!
 
 	/* compute all dependent expressions */
@@ -49,29 +49,23 @@ void Z80pass2(int start_errors)
 
 		/* check if expression is stored in object file or computed and patched */
 		do_patch = true;
-		do_store = false;
 
 		if (expr->result.undefined_symbol ||
 			expr->result.not_evaluable ||
+			expr->result.cross_section_addr ||
+			expr->result.extern_symbol ||
 			!expr->is_computed)
 		{
 			do_patch = false;
-			do_store = true;
 		}
 		else if (expr->range == RANGE_JR_OFFSET)
 		{
-			if (expr->result.extern_symbol || expr->result.cross_section_addr)
-			{
-				error_jr_not_local();	/* JR must be local */
-				do_patch = false;
-			}
+			do_patch = true;
 		}
 		else if (expr->type >= TYPE_ADDRESS ||
-			expr->result.extern_symbol ||
 			expr->target_name)
 		{
-			do_patch = false;
-			do_store = true;            /* store expression in relocatable file */
+			do_patch = false;            /* store expression in relocatable file */
 		}
 
 
@@ -167,16 +161,15 @@ void Z80pass2(int start_errors)
 		}
 
 		/* continue loop - delete expression unless needs to be stored in object file */
-		if (do_store)
-			iter = Expr1List_next(iter);
-		else
-		{
+		if (do_patch) {
 			/* remove current expression, advance iterator */
 			expr2 = Expr1List_remove(CURRENTMODULE->exprs, &iter);
 			xassert(expr == expr2);
 
 			OBJ_DELETE(expr);
 		}
+		else
+			iter = Expr1List_next(iter);
 	}
 
 	// check for undefined symbols

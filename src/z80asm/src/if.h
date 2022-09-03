@@ -103,7 +103,6 @@ void error_illegal_ident();
 void error_int_range(int value);
 void error_invalid_char_const();
 void error_invalid_org(int origin);
-void error_jr_not_local();
 void error_lib_file_version(const char* filename, int found_version, int expected_version);
 void error_missing_block();
 void error_missing_close_block();

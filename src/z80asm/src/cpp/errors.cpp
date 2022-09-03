@@ -249,10 +249,6 @@ void error_illegal_ident() {
 	g_errors.error(ErrCode::IllegalIdent);
 }
 
-void error_jr_not_local() {
-	g_errors.error(ErrCode::JrNoLocal);
-}
-
 void error_expected_const_expr() {
 	g_errors.error(ErrCode::ConstExprExpected);
 }
