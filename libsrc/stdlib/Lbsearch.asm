@@ -24,34 +24,19 @@ EXTERN l_jpix
 ;        carry set indicates item not found with HL=0
 ; uses : af, de, hl
 ;
-; Call Lbsearch + 3 if you prefer to enter with hl = last item in array
 
 .Lbsearch
-
-   dec hl
-   add hl,hl
-   add hl,de        ; HL = right side
-
-.loop               ; DE = left, HL = right
-   ld a,d           ; is left <= right or are we done?
-   cp h
-   jr c, slice
-   jr nz, done
-   ld a,e
-   cp l
-   jr nc, done
+.loop
+   ld a,h       ; Number of items still to check is 0? if so, return not found
+   or l
+   jr nz, slice
+   scf
+   ret
 
 .slice
-   push hl          ; stack right side
-   add hl,de        ; HL = left + right
-   rr h
-   rr l             ; HL = unrounded address of middle item
-
-   ld a,l           ; shenanigans to ensure HL aligns on item
-   xor e
-   rra
-   jr nc, compare
-   dec hl
+   push hl      ; Get the address at the halfway index + the base address
+   res 0,l      ; Integer division of hl by 2 (to get the midpoint item index) then multiply it 2 because each pointer is 2 bytes.
+   add hl,de
 
 .compare            ; is key < datum?
    call l_jpix      ; returns A<0 for less, A==0 for equals, A>0 for greater
@@ -59,22 +44,20 @@ EXTERN l_jpix
    jr z, caseEqual
    jp m, caseLess
 .caseGreater
-   pop de
    inc hl
    inc hl
-   ex de,hl         ; middle becomes left, right is still right
+   ex de,hl         ; update the base address to point to the upper half of the array
+   pop hl
+   dec hl
+   sra h
+   rr l
    jp loop
 .caseLess
-   pop af           ; throw away stacked right side
-   dec hl
-   dec hl
-   jp loop          ; middle becomes right, left is still left
+   pop hl
+   sra h
+   rr l
+   jp loop
 
 .caseEqual
    pop de           ; clear stack
    ret              ; HL = address of found item
-
-.done               ; failed to find
-   scf
-   ld hl,0
-   ret
