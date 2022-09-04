@@ -15,6 +15,7 @@ extern int test_strtol();
 extern int test_unbcd();
 extern int test_qsort();
 extern int test_qsort_newlib();
+extern int test_bsearch();
 
 
 #endif
