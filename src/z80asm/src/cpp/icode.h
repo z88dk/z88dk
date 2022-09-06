@@ -77,9 +77,6 @@ public:
 
 	const Section* section() { return m_section; }
 
-	void add_patch(shared_ptr<Patch> patch);
-	void add_byte(int n);
-
 	int asmpc() const { return m_asmpc; }
 	void set_asmpc(int n) { m_asmpc = n; }
 
@@ -98,6 +95,10 @@ public:
 	vector<shared_ptr<Patch>> patches() { return m_patches; }
 
 	const Location& location() const { return m_location; }
+
+	void add_patch(shared_ptr<Patch> patch);
+	void add_byte(int n);
+	void do_patch(shared_ptr<Patch> patch);
 
 private:
 	Section* m_section{ nullptr };

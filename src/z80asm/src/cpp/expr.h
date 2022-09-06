@@ -370,6 +370,7 @@ public:
 	Patch(shared_ptr<Expr> expr, int offset = 0);
 	virtual Type type() const = 0;
 	virtual int size() const = 0;
+	virtual void do_patch(vector<uint8_t>& bytes, int asmpc) = 0;
 
 	shared_ptr<Expr> expr() const { return m_expr; }
 	int offset() const { return m_offset; }
@@ -385,6 +386,7 @@ public:
 	UBytePatch(shared_ptr<Expr> expr, int offset = 0) : Patch(expr, offset) {}
 	Type type() const override { return Type::UByte; }
 	int size() const override { return 1; }
+	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
 };
 
 class SBytePatch : public Patch {
@@ -392,6 +394,7 @@ public:
 	SBytePatch(shared_ptr<Expr> expr, int offset = 0) : Patch(expr, offset) {}
 	Type type() const override { return Type::SByte; }
 	int size() const override { return 1; }
+	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
 };
 
 class WordPatch : public Patch {
@@ -399,6 +402,7 @@ public:
 	WordPatch(shared_ptr<Expr> expr, int offset = 0) : Patch(expr, offset) {}
 	Type type() const override { return Type::Word; }
 	int size() const override { return 2; }
+	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
 };
 
 class BEWordPatch : public Patch {
@@ -406,6 +410,7 @@ public:
 	BEWordPatch(shared_ptr<Expr> expr, int offset = 0) : Patch(expr, offset) {}
 	Type type() const override { return Type::BEWord; }
 	int size() const override { return 2; }
+	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
 };
 
 class Ptr24Patch : public Patch {
@@ -413,6 +418,7 @@ public:
 	Ptr24Patch(shared_ptr<Expr> expr, int offset = 0) : Patch(expr, offset) {}
 	Type type() const override { return Type::Ptr24; }
 	int size() const override { return 3; }
+	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
 };
 
 class DWordPatch : public Patch {
@@ -420,6 +426,7 @@ public:
 	DWordPatch(shared_ptr<Expr> expr, int offset = 0) : Patch(expr, offset) {}
 	Type type() const override { return Type::DWord; }
 	int size() const override { return 4; }
+	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
 };
 
 class JrOffsetPatch : public Patch {
@@ -427,6 +434,7 @@ public:
 	JrOffsetPatch(shared_ptr<Expr> expr, int offset = 0) : Patch(expr, offset) {}
 	Type type() const override { return Type::JrOffset; }
 	int size() const override { return 1; }
+	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
 };
 
 class UByte2WordPatch : public Patch {
@@ -434,6 +442,7 @@ public:
 	UByte2WordPatch(shared_ptr<Expr> expr, int offset = 0) : Patch(expr, offset) {}
 	Type type() const override { return Type::UByte2Word; }
 	int size() const override { return 2; }
+	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
 };
 
 class SByte2WordPatch : public Patch {
@@ -441,6 +450,7 @@ public:
 	SByte2WordPatch(shared_ptr<Expr> expr, int offset = 0) : Patch(expr, offset) {}
 	Type type() const override { return Type::SByte2Word; }
 	int size() const override { return 2; }
+	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
 };
 
 class HighOffsetPatch : public Patch {
@@ -448,5 +458,5 @@ public:
 	HighOffsetPatch(shared_ptr<Expr> expr, int offset = 0) : Patch(expr, offset) {}
 	Type type() const override { return Type::HighOffset; }
 	int size() const override { return 1; }
+	void do_patch(vector<uint8_t>& bytes, int asmpc) override;
 };
-

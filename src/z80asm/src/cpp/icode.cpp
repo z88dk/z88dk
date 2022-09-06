@@ -52,6 +52,12 @@ void Instr::add_byte(int n) {
 	m_bytes.push_back(n & 0xff);
 }
 
+void Instr::do_patch(shared_ptr<Patch> patch) {
+	g_errors.push_location(m_location);
+	patch->do_patch(m_bytes, pc());
+	g_errors.pop_location();
+}
+
 bool Instr::is_relative_jump() const {
 	return m_patches.size() == 1 && m_patches[0]->type() == Patch::Type::JrOffset;
 }
@@ -231,21 +237,26 @@ void Section::patch_local_exprs() {
 
 			ExprResult r = expr->eval_silent();
 
-			if (r.depends_on_asmpc() || r.cross_section() || r.undefined_symbol()) {
+			if (r.undefined_symbol() || r.cross_section()) {
 				// keep in object file
 			}
-			if (patch->type() == Patch::Type::JrOffset) {
-				if (r.cross_section() || r.undefined_symbol()) 
-
-				
+			else if (patch->type() == Patch::Type::JrOffset) {
+				// patch
+				instr->do_patch(patch);
+				instr->patches().erase(it);
 			}
-			else if 
-
+			else if (r.depends_on_asmpc()) {
+				// keep in object file
+			}
+			else {
+				// patch
+				instr->do_patch(patch);
+				instr->patches().erase(it);
+			}
 		}
 
 		g_errors.pop_location();
 	}
-
 }
 
 void Section::update_asmpc(int start) {
