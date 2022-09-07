@@ -2174,17 +2174,17 @@ void zsub(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_speed_optimisation & OPT_SUB32 && !IS_8080() && !IS_GBZ80() ) {
+        if ( c_speed_optimisation & OPT_SUB32 && !IS_808x() && !IS_GBZ80() ) {
             ol("ld\tc,l");        /* 13 bytes: 4 + 4 + 10 + 4 + 15 + 4  + 4 + 4 + 10 + 15 + 4 = 78T */
             ol("ld\tb,h");
             ol("pop\thl");        
             ol("and\ta");
-            if ( IS_8085() ) ol("sub\thl,bc"); else ol("sbc\thl,bc");
+            ol("sbc\thl,bc");
             ol("ex\tde,hl");
             ol("ld\tc,l");
             ol("ld\tb,h");
             ol("pop\thl");
-            if ( IS_8085() ) ol("sub\thl,bc"); else ol("sbc\thl,bc");
+            ol("sbc\thl,bc");
             ol("ex\tde,hl");
         } else {
             callrts("l_long_sub"); /* 3 bytes: 100 + 17T = 117t */
