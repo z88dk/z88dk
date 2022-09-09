@@ -318,12 +318,12 @@ void gen_load_static(SYMBOL* sym)
     } else if (sym->ctype->kind == KIND_LONG || (sym->ctype->kind == KIND_DOUBLE && c_fp_size == 4) || sym->ctype->kind == KIND_CPTR ) {  // 4 byte doubles only
         if ( IS_GBZ80() ) {
             ot("ld\thl,");
-            outname(sym->name, dopref(sym));  
+            outname(sym->name, dopref(sym));
             outstr("\n");
             callrts("l_glong");
         } else {
             ot("ld\thl,(");
-            outname(sym->name, dopref(sym));    
+            outname(sym->name, dopref(sym));
             outstr(")\n");
             if ( !IS_808x() ) { 
                 ot("ld\tde,(");
@@ -344,7 +344,7 @@ void gen_load_static(SYMBOL* sym)
         if ( IS_GBZ80() ) {
             ot("ld\thl,");
             outname(sym->name, dopref(sym));
-            outstr("\n");    
+            outstr("\n");
             callrts("l_gint");
         } else {
             ot("ld\thl,(");
@@ -1585,8 +1585,8 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
         }
         // We're on 8080 and returning a value
         if ( save == KIND_LONG ) {
-            ol("ld\tc,l");
             ol("ld\tb,h");
+            ol("ld\tc,l");
         } else if ( ( save != KIND_NONE && save != KIND_DOUBLE)) {
             swap(); 
         }
@@ -1594,8 +1594,8 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
         ol("add\thl,sp");
         ol("ld\tsp,hl");
         if ( save == KIND_LONG ) {
-            ol("ld\tl,c");
             ol("ld\th,b");
+            ol("ld\tl,c");
         } else if ( ( save != KIND_NONE && save != KIND_DOUBLE)) {
             swap(); 
         }
@@ -1669,7 +1669,7 @@ static void quikmult(int type, int32_t size, char preserve)
                 vlongconst(0);
                 break;
             case 1:
-                break;  
+                break;
             case 65536:
                 ol("ex\tde,hl");
                 vconst(0);
@@ -1679,7 +1679,7 @@ static void quikmult(int type, int32_t size, char preserve)
                 ol("ld\te,h");
                 ol("ld\th,l");
                 ol("ld\tl,0");
-                break;      
+                break;
             case 8: /* 15 bytes */
                 ol("add\thl,hl");
                 if ( IS_8085() ) {
@@ -1693,9 +1693,9 @@ static void quikmult(int type, int32_t size, char preserve)
                     ol("ld\td,a");
                 } else {
                     ol("rl\te");
-                    ol("rl\td");  
+                    ol("rl\td");
                 }
-                /* Fall through */              
+                /* Fall through */
             case 4: /* 10 bytes */
                 ol("add\thl,hl");
                 if ( IS_8085() ) {
@@ -1711,7 +1711,7 @@ static void quikmult(int type, int32_t size, char preserve)
                     ol("rl\te");
                     ol("rl\td");  
                 }
-                /* Fall through */            
+                /* Fall through */
             case 2: /* 5 bytes */
                 ol("add\thl,hl");
                 if ( IS_8085() ) {
@@ -1725,23 +1725,37 @@ static void quikmult(int type, int32_t size, char preserve)
                     ol("ld\td,a");
                 } else {
                     ol("rl\te");
-                    ol("rl\td");  
-                } 
+                    ol("rl\td");
+                }
                 break;
             case 8192:
                 asl_const(&lval, 13);
                 break;
             case 3: /* 13 bytes */
-                if ( !IS_808x() ) {
-                    ol("push\tde");
-                    ol("push\thl");
-                    ol("add\thl,hl");
-                    ol("rl\te");
-                    ol("rl\td");   
-                    ol("pop\tbc");
-                    ol("add\thl,bc");
-                    ol("pop\tbc");
-                    if ( IS_GBZ80() ) {
+                if ( !IS_8080() ) {
+                    if ( IS_8085() ) {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\tde");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
+                        ol("ld\ta,e");
+                        ol("adc\tc");
+                        ol("ld\te,a");
+                        ol("ld\ta,d");
+                        ol("adc\tb");
+                        ol("ld\td,a");
+                    } else if ( IS_GBZ80() ) {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
                         ol("ld\ta,e");
                         ol("adc\tc");
                         ol("ld\te,a");
@@ -1749,6 +1763,14 @@ static void quikmult(int type, int32_t size, char preserve)
                         ol("adc\tb");
                         ol("ld\td,a");
                     } else {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
                         ol("ex\tde,hl");
                         ol("adc\thl,bc");
                         ol("ex\tde,hl");
@@ -1757,47 +1779,87 @@ static void quikmult(int type, int32_t size, char preserve)
                 }
                 // Fall through all the way to default for 8080
             case 6:  /* 19 bytes */
-                if ( !IS_808x() ) {
-                    ol("push\tde");
-                    ol("push\thl");
-                    ol("add\thl,hl");
-                    ol("rl\te");
-                    ol("rl\td");   
-                    ol("pop\tbc");
-                    ol("add\thl,bc");
-                    ol("pop\tbc");
-                    if ( IS_GBZ80() ) {
+                if ( !IS_8080() ) {
+                    if ( IS_8085() ) {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\tde");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
                         ol("ld\ta,e");
                         ol("adc\tc");
                         ol("ld\te,a");
                         ol("ld\ta,d");
                         ol("adc\tb");
                         ol("ld\td,a");
-                    } else {
+                        ol("add\thl,hl");
+                        ol("rl\tde");
+                    } else if ( IS_GBZ80() ) {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
                         ol("ex\tde,hl");
                         ol("adc\thl,bc");
                         ol("ex\tde,hl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                    } else {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
+                        ol("ex\tde,hl");
+                        ol("adc\thl,bc");
+                        ol("ex\tde,hl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
                     }
-                    ol("add\thl,hl");
-                    ol("rl\te");
-                    ol("rl\td");  
                     break;
                 }
                 // Fall through all the way to default for 8080
             case 5: /* 19 bytes */
-                if ( !IS_808x() ) {
-                    ol("push\tde");
-                    ol("push\thl");
-                    ol("add\thl,hl");;
-                    ol("rl\te");
-                    ol("rl\td");  
-                    ol("add\thl,hl");;
-                    ol("rl\te");
-                    ol("rl\td"); 
-                    ol("pop\tbc"); 
-                    ol("add\thl,bc");
-                    ol("pop\tbc");
-                    if ( IS_GBZ80() ) {
+                if ( !IS_8080() ) {
+                    if ( IS_8085() ) {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\tde");
+                        ol("add\thl,hl");
+                        ol("rl\tde");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
+                        ol("ld\ta,e");
+                        ol("adc\tc");
+                        ol("ld\te,a");
+                        ol("ld\ta,d");
+                        ol("adc\tb");
+                        ol("ld\td,a");
+                    } else if ( IS_GBZ80() ) {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
                         ol("ld\ta,e");
                         ol("adc\tc");
                         ol("ld\te,a");
@@ -1805,6 +1867,17 @@ static void quikmult(int type, int32_t size, char preserve)
                         ol("adc\tb");
                         ol("ld\td,a");
                     } else {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
                         ol("ex\tde,hl");
                         ol("adc\thl,bc");
                         ol("ex\tde,hl");
@@ -1813,7 +1886,7 @@ static void quikmult(int type, int32_t size, char preserve)
                 }
                 // Fall through all the way to default for 8080
             default:
-                lpush();       
+                lpush();
                 vlongconst(size);
                 callrts("l_long_mult");
                 Zsp += 4;
@@ -1960,13 +2033,25 @@ void zadd(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_speed_optimisation & OPT_ADD32 && !IS_808x() && !IS_GBZ80() ) {
-            ol("pop\tbc");        /* 7 bytes, 54T */
-            ol("add\thl,bc");
-            ol("ex\tde,hl");
-            ol("pop\tbc");
-            ol("adc\thl,bc");
-            ol("ex\tde,hl");
+        if ( c_speed_optimisation & OPT_ADD32 ) {
+            if ( IS_808x() || IS_GBZ80() ) {
+                ol("pop\tbc");        /* 9 bytes, 54T */
+                ol("add\thl,bc");
+                ol("pop\tbc");
+                ol("ld\ta,c");
+                ol("adc\te");
+                ol("ld\te,a");
+                ol("ld\ta,b");
+                ol("adc\td");
+                ol("ld\td,a");
+            } else {
+                ol("pop\tbc");        /* 7 bytes, 54T */
+                ol("add\thl,bc");
+                ol("ex\tde,hl");
+                ol("pop\tbc");
+                ol("adc\thl,bc");
+                ol("ex\tde,hl");
+            }
         } else {
             callrts("l_long_add"); /* 3 bytes, 76 + 17 = 93T */
         }
@@ -2174,18 +2259,44 @@ void zsub(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-        if ( c_speed_optimisation & OPT_SUB32 && !IS_808x() && !IS_GBZ80() ) {
-            ol("ld\tc,l");        /* 13 bytes: 4 + 4 + 10 + 4 + 15 + 4  + 4 + 4 + 10 + 15 + 4 = 78T */
-            ol("ld\tb,h");
-            ol("pop\thl");        
-            ol("and\ta");
-            ol("sbc\thl,bc");
-            ol("ex\tde,hl");
-            ol("ld\tc,l");
-            ol("ld\tb,h");
-            ol("pop\thl");
-            ol("sbc\thl,bc");
-            ol("ex\tde,hl");
+        if ( c_speed_optimisation & OPT_SUB32 ) {
+            if ( IS_8085() ) {
+                ol("ld\tbc,hl");        /* 11 bytes: 8 + 10 + 10 + 10 + 6*4 = 62T */
+                ol("pop\thl");
+                ol("sub\thl,bc");
+                ol("pop\tbc");
+                ol("ld\ta,c");
+                ol("sbc\te");
+                ol("ld\te,a");
+                ol("ld\ta,b");
+                ol("sbc\td");
+                ol("ld\td,a");
+            } else if ( IS_8080() || IS_GBZ80() ) {
+                ol("pop\tbc");          /* 14 bytes: 10 + 6*4 + 10 + 6*4 = 68T */
+                ol("ld\ta,c");
+                ol("sub\tl");
+                ol("ld\tl,a");
+                ol("ld\ta,b");
+                ol("sbc\th");
+                ol("ld\th,a");
+                ol("pop\tbc");
+                ol("ld\ta,c");
+                ol("sbc\te");
+                ol("ld\te,a");
+                ol("ld\ta,b");
+                ol("sbc\td");
+                ol("ld\td,a");
+            } else {
+                ol("ld\tbc,hl");        /* 13 bytes: 8 + 10 + 4 + 15 + 4  + 8 + 10 + 15 + 4 = 78T */
+                ol("pop\thl");
+                ol("and\ta");
+                ol("sbc\thl,bc");
+                ol("ex\tde,hl");
+                ol("ld\tbc,hl");
+                ol("pop\thl");
+                ol("sbc\thl,bc");
+                ol("ex\tde,hl");
+            }
         } else {
             callrts("l_long_sub"); /* 3 bytes: 100 + 17T = 117t */
         }
@@ -2200,10 +2311,23 @@ void zsub(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     default:
-        if ( c_speed_optimisation & OPT_SUB16 && !IS_808x() && !IS_GBZ80()) {
-            swap();
-            ol("and\ta");
-            ol("sbc\thl,de");
+        if ( c_speed_optimisation & OPT_SUB16 ) {
+            if ( IS_8085() ) {
+                ol("ex\tde,hl");
+                ol("ld\tbc,de");
+                ol("sub\thl,bc");
+            } else if ( IS_8080() || IS_GBZ80() ) {
+                ol("ld\ta,e");
+                ol("sub\tl");
+                ol("ld\tl,a");
+                ol("ld\ta,d");
+                ol("sbc\th");
+                ol("ld\th,a");
+            } else {
+                ol("ex\tde,hl");
+                ol("and\ta");
+                ol("sbc\thl,de");
+            }
         } else {
             callrts("l_sub");
         }
@@ -3148,8 +3272,8 @@ void asr_const(LVALUE *lval, int64_t value64)
                 ol("srl\td"); /* 8 bytes 30T */
                 ol("rr\te");
                 if ( IS_GBZ80() ) {
-                    ol("ld\tl,e");
                     ol("ld\th,d");
+                    ol("ld\tl,e");
                 } else {
                     ol("ex\tde,hl");
                 }
@@ -3157,8 +3281,8 @@ void asr_const(LVALUE *lval, int64_t value64)
             ol("ld\tde,0");
         } else if ( value == 18 && ulvalue(lval) && !IS_808x()) {
             if ( IS_GBZ80() ) {
-                ol("ld\tl,e");
                 ol("ld\th,d");
+                ol("ld\tl,e");
                 ol("ld\tde,0");
             } else {
                 ol("ld\thl,0"); /* 12 bytes, 46T */
@@ -3170,8 +3294,8 @@ void asr_const(LVALUE *lval, int64_t value64)
             ol("rr\tl");
         } else if ( value == 20 && ulvalue(lval) && (c_speed_optimisation & OPT_RSHIFT32) && !IS_808x() ) {
             if ( IS_GBZ80() ) {
-                ol("ld\tl,e");
                 ol("ld\th,d");
+                ol("ld\tl,e");
             } else {
                 ol("ex\tde,hl"); /* 20 bytes, 78T */
             }
@@ -3485,7 +3609,7 @@ void asl_const(LVALUE *lval, int64_t value64)
             }
             break;
         case 7:
-            if ( 0 &&  c_speed_optimisation & OPT_LSHIFT32) {
+            if ( 0 && c_speed_optimisation & OPT_LSHIFT32 && !IS_808x() ) { /* 0 out */
                 ol("rr\td");  // 15 bytes, 59T
                 ol("ld\td,e");
                 ol("ld\te,h");
@@ -3497,7 +3621,7 @@ void asl_const(LVALUE *lval, int64_t value64)
                 ol("rr\tl");
             } else {
                 loada( value );
-                callrts("l_long_aslo");                
+                callrts("l_long_aslo");
             }
             break;
         case 9:
@@ -5435,8 +5559,8 @@ void zwiden_stack_to_long(LVALUE *lval)
     if ( IS_808x() || IS_GBZ80() ) {
         int label = getlabel();
         // We have a value in dehl that we must preserve
-        ol("ld\tc,l");
         ol("ld\tb,h");
+        ol("ld\tc,l");
         ol("ld\thl,0");
         ol("ex\t(sp),hl"); // Emulated on GBZ80 unfortunately
         ol("ld\ta,h");
@@ -5447,8 +5571,8 @@ void zwiden_stack_to_long(LVALUE *lval)
         ol("ex\t(sp),hl"); // Emulated on GBZ80 unfortunately
         postlabel(label);
         push("hl");
-        ol("ld\tl,c");
         ol("ld\th,b");
+        ol("ld\tl,c");
     } else {
         ol("exx"); /* Preserve other operator */
         pop("hl");
