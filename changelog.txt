@@ -1,6 +1,16 @@
 Concise Record of Changes to Z88DK Releases
 -------------------------------------------
 
+
+z88dk v2.3 - xx.xx.202x
+
+Detailed but incomplete changelist:
+
+- [sccz80] 8085, 8085, and gbz80 inlined add32, sub32, quikmult
+
+
+
+
 z88dk v2.2 - 23.07.2022
 
 Detailed but incomplete changelist:

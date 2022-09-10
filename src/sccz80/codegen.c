@@ -2313,18 +2313,18 @@ void zsub(LVALUE* lval)
     default:
         if ( c_speed_optimisation & OPT_SUB16 ) {
             if ( IS_8085() ) {
-                ol("ex\tde,hl");
+                ol("ex\tde,hl");        /* 4 bytes: 4 + 8 + 10 = 22T */
                 ol("ld\tbc,de");
                 ol("sub\thl,bc");
             } else if ( IS_8080() || IS_GBZ80() ) {
-                ol("ld\ta,e");
+                ol("ld\ta,e");          /* 6 bytes: 4 + 4 + 4 + 4 + 4 + 4 +  = 24T */
                 ol("sub\tl");
                 ol("ld\tl,a");
                 ol("ld\ta,d");
                 ol("sbc\th");
                 ol("ld\th,a");
             } else {
-                ol("ex\tde,hl");
+                ol("ex\tde,hl");        /* 4 bytes: 4 + 4 + 15 = 25T */
                 ol("and\ta");
                 ol("sbc\thl,de");
             }
