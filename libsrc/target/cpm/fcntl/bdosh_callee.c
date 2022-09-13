@@ -1,7 +1,7 @@
 /*
  *	Call a CPM BDOS routine
  *
- *	$Id: bdos_callee.c $
+ *	$Id: bdosh_callee.c $
  */
 
 #include <cpm.h>
