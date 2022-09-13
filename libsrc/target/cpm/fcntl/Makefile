@@ -5,6 +5,8 @@ CFILES = \
 	bios.c \
 	bdos.c \
 	bdos_callee.c \
+	bdosh.c \
+	bdosh_callee.c \
 	cache.c \
 	close.c \
 	creat.c \
