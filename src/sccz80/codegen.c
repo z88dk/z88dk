@@ -1652,14 +1652,9 @@ void scale(Kind type, Type *tag)
     }
 }
 
-
 static void quikmult(int type, int32_t size, char preserve)
 {
      if ( type == KIND_LONG ) {
-        LVALUE lval = {0};
-
-        lval.val_type = type;
-        lval.ltype = type_long;
 
         /* Normal long multiplication is:
            push, push, ld hl, ld de, call l_long_mult = 11 bytes
@@ -1973,6 +1968,7 @@ static void quikmult(int type, int32_t size, char preserve)
                     }
                     break;
                 }
+                // Fall through all the way to default for 8080
             case 7:
                 if ( !IS_8080() ) {
                     if ( IS_8085() ) {
@@ -2058,110 +2054,171 @@ static void quikmult(int type, int32_t size, char preserve)
                     break;
                 }
                 // Fall through all the way to default for 8080
+            case 9:
+                if ( !IS_8080() ) {
+                    if ( IS_8085() ) {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\tde");
+                        ol("add\thl,hl");
+                        ol("rl\tde");
+                        ol("add\thl,hl");
+                        ol("rl\tde");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
+                        ol("ld\ta,e");
+                        ol("adc\tc");
+                        ol("ld\te,a");
+                        ol("ld\ta,d");
+                        ol("adc\tb");
+                        ol("ld\td,a");
+                    } else if ( IS_GBZ80() ) {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
+                        ol("ld\ta,e");
+                        ol("adc\tc");
+                        ol("ld\te,a");
+                        ol("ld\ta,d");
+                        ol("adc\tb");
+                        ol("ld\td,a");
+                    } else {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
+                        ol("ex\tde,hl");
+                        ol("adc\thl,bc");
+                        ol("ex\tde,hl");
+                    }
+                    break;
+                }
+                // Fall through all the way to default for 8080
             default:
                 lpush();
                 vlongconst(size);
                 callrts("l_long_mult");
                 Zsp += 4;
         }
-        return;
-    }
 
-    switch (size) {
-    case 0:
-        vconst(0);
-        break;
-    case 2048:
-        ol("ld\th,l"); /* 6 bytes, 44T */
-        ol("ld\tl,0");
-        ol("add\thl,hl");
-        ol("add\thl,hl");
-        ol("add\thl,hl");
-        break;
-    case 1024:
-        ol("ld\th,l"); /* 5 bytes, 33T */
-        ol("ld\tl,0");
-        ol("add\thl,hl");
-        ol("add\thl,hl");
-        break;
-    case 512:
-        ol("ld\th,l");  /* 4 bytes, 22T */
-        ol("ld\tl,0");
-        ol("add\thl,hl");
-        break;
-    case 256:
-        ol("ld\th,l"); /* 3 bytes, 11T */
-        ol("ld\tl,0");
-        break;
-    case 1:
-        break;
-    case 64:
-        ol("add\thl,hl");  /* 6 bytes, 66T, (RCM) 6 bytes, 12T */
-    case 32:
-        ol("add\thl,hl");
-    case 16:
-        ol("add\thl,hl");
-    case 8:
-        ol("add\thl,hl");
-    case 4:
-        ol("add\thl,hl");
-    case 2:
-        ol("add\thl,hl");
-        break;
-    case 12:
-        ol("add\thl,hl");
-    case 6:
-        sixreg();
-        break;
-    case 9:
-        threereg();
-    case 3:
-        threereg();
-        break;
-    case 15:
-        threereg();
-    case 5:
-        fivereg();
-        break;
-    case 10:
-        fivereg();
-        ol("add\thl,hl");
-        break;
-    case 20:
-        fivereg();
-        ol("add\thl,hl");
-        ol("add\thl,hl");
-        break;
-    case 40:
-        fivereg();
-        ol("add\thl,hl");
-        ol("add\thl,hl");
-        ol("add\thl,hl");
-        break;
-    case 14:
-        ol("add\thl,hl");
-    case 7:
-        sixreg();
-        ol("add\thl,bc");  /* BC contains original value */
-        break;
-    case 65535:
-    case -1:
-        callrts("l_neg");
-        break;
-    default:
-        if (preserve)
-            ol("push\tde");
-        const2(size);
-        callrts("l_mult"); /* WATCH OUT!! */
-        if (preserve)
-            ol("pop\tde");
-        break;
+    } else {    // type == KIND_INT
+
+        switch (size) {
+        case 0:
+            vconst(0);
+            break;
+        case 2048:
+            ol("ld\th,l"); /* 6 bytes, 44T */
+            ol("ld\tl,0");
+            ol("add\thl,hl");
+            ol("add\thl,hl");
+            ol("add\thl,hl");
+            break;
+        case 1024:
+            ol("ld\th,l"); /* 5 bytes, 33T */
+            ol("ld\tl,0");
+            ol("add\thl,hl");
+            ol("add\thl,hl");
+            break;
+        case 512:
+            ol("ld\th,l");  /* 4 bytes, 22T */
+            ol("ld\tl,0");
+            ol("add\thl,hl");
+            break;
+        case 256:
+            ol("ld\th,l"); /* 3 bytes, 11T */
+            ol("ld\tl,0");
+            break;
+        case 1:
+            break;
+        case 64:
+            ol("add\thl,hl");  /* 6 bytes, 66T, (RCM) 6 bytes, 12T */
+        case 32:
+            ol("add\thl,hl");
+        case 16:
+            ol("add\thl,hl");
+        case 8:
+            ol("add\thl,hl");
+        case 4:
+            ol("add\thl,hl");
+        case 2:
+            ol("add\thl,hl");
+            break;
+        case 12:
+            ol("add\thl,hl");
+        case 6:
+            sixreg();
+            break;
+        case 9:
+            threereg();
+        case 3:
+            threereg();
+            break;
+        case 15:
+            threereg();
+        case 5:
+            fivereg();
+            break;
+        case 10:
+            fivereg();
+            ol("add\thl,hl");
+            break;
+        case 20:
+            fivereg();
+            ol("add\thl,hl");
+            ol("add\thl,hl");
+            break;
+        case 40:
+            fivereg();
+            ol("add\thl,hl");
+            ol("add\thl,hl");
+            ol("add\thl,hl");
+            break;
+        case 14:
+            ol("add\thl,hl");
+        case 7:
+            sixreg();
+            ol("add\thl,bc");  /* BC contains original value */
+            break;
+        case 65535:
+        case -1:
+            callrts("l_neg");
+            break;
+        default:
+            if (preserve)
+                ol("push\tde");
+            const2(size);
+            callrts("l_mult"); /* WATCH OUT!! */
+            if (preserve)
+                ol("pop\tde");
+            break;
+        }
+
     }
 }
-
-
-
-
 
 /* Multiply the primary register by three */
 static void threereg(void)

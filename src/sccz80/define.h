@@ -46,7 +46,7 @@
 #if defined(__MSDOS__) && defined(__TURBOC__)
 #define NUMLOC          33
 #else
-#define NUMLOC		512
+#define NUMLOC          512
 #endif
 #define STARTLOC        loctab
 #define ENDLOC          (STARTLOC+NUMLOC)
@@ -249,7 +249,7 @@ typedef struct switchtab_s SW_TAB;
 
 struct switchtab_s {
         int label ;             /* label for start of case */
-        int64_t value ;             /* value associated with case */
+        int64_t value ;         /* value associated with case */
 } ;
 
 
@@ -396,15 +396,15 @@ typedef struct lvalue_s LVALUE;
 struct lvalue_s {
         SYMBOL *symbol ;                /* symbol table address, or 0 for constant */
         Type   *ltype;
-        Kind    indirect_kind;                  /* type of indirect object, 0 for static object */
-        Kind ptr_type ;                  /* type of pointer or array, 0 for other idents */
+        Kind indirect_kind;             /* type of indirect object, 0 for static object */
+        Kind ptr_type ;                 /* type of pointer or array, 0 for other idents */
         int is_const ;                  /* true if constant expression */
-        zdouble const_val ;                        /* value of constant expression (& other uses) */
-        void (*binop)(LVALUE *lval) ;                /* function address of highest/last binary operator */
+        zdouble const_val ;             /* value of constant expression (& other uses) */
+        void (*binop)(LVALUE *lval) ;   /* function address of highest/last binary operator */
         char *stage_add ;               /* stage addess of "oper 0" code, else 0 */
         Type *stage_add_ltype;          /* Type at stage_add being set */
-        Kind val_type ;                  /* type of value calculated */
-	    Kind oldval_kind;		/* What the valtype was */
+        Kind val_type ;                 /* type of value calculated */
+	    Kind oldval_kind;               /* What the valtype was */
         enum symbol_flags flags;        /* As per symbol */
         char oflags;                    /* Needed for deref of far str*/
         int type;                       /* type (from symbol table) */
