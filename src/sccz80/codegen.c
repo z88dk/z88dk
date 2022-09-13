@@ -1674,64 +1674,169 @@ static void quikmult(int type, int32_t size, char preserve)
                 ol("ex\tde,hl");
                 vconst(0);
                 break;
-            case 256:  /* 5 bytes */
+            case 64:
+                ol("add\thl,hl");
+                if ( IS_8085() ) {
+                    ol("rl\tde");
+                } else if ( IS_8080() ) {
+                    ol("ld\ta,e");
+                    ol("rla");
+                    ol("ld\te,a");
+                    ol("ld\ta,d");
+                    ol("rla");
+                    ol("ld\td,a");
+                } else {
+                    ol("rl\te");
+                    ol("rl\td");
+                }
+                /* Fall through to x32 */
+            case 32:
+                ol("add\thl,hl");
+                if ( IS_8085() ) {
+                    ol("rl\tde");
+                } else if ( IS_8080() ) {
+                    ol("ld\ta,e");
+                    ol("rla");
+                    ol("ld\te,a");
+                    ol("ld\ta,d");
+                    ol("rla");
+                    ol("ld\td,a");
+                } else {
+                    ol("rl\te");
+                    ol("rl\td");
+                }
+                /* Fall through to x16 */
+            case 16:
+                ol("add\thl,hl");
+                if ( IS_8085() ) {
+                    ol("rl\tde");
+                } else if ( IS_8080() ) {
+                    ol("ld\ta,e");
+                    ol("rla");
+                    ol("ld\te,a");
+                    ol("ld\ta,d");
+                    ol("rla");
+                    ol("ld\td,a");
+                } else {
+                    ol("rl\te");
+                    ol("rl\td");
+                }
+                /* Fall through to x8 */
+            case 8:
+                ol("add\thl,hl");
+                if ( IS_8085() ) {
+                    ol("rl\tde");
+                } else if ( IS_8080() ) {
+                    ol("ld\ta,e");
+                    ol("rla");
+                    ol("ld\te,a");
+                    ol("ld\ta,d");
+                    ol("rla");
+                    ol("ld\td,a");
+                } else {
+                    ol("rl\te");
+                    ol("rl\td");
+                }
+                /* Fall through to x4 */
+            case 4:
+                ol("add\thl,hl");
+                if ( IS_8085() ) {
+                    ol("rl\tde");
+                } else if ( IS_8080() ) {
+                    ol("ld\ta,e");
+                    ol("rla");
+                    ol("ld\te,a");
+                    ol("ld\ta,d");
+                    ol("rla");
+                    ol("ld\td,a");
+                } else {
+                    ol("rl\te");
+                    ol("rl\td");
+                }
+                /* Fall through to x2 */
+            case 2:
+                ol("add\thl,hl");
+                if ( IS_8085() ) {
+                    ol("rl\tde");
+                } else if ( IS_8080() ) {
+                    ol("ld\ta,e");
+                    ol("rla");
+                    ol("ld\te,a");
+                    ol("ld\ta,d");
+                    ol("rla");
+                    ol("ld\td,a");
+                } else {
+                    ol("rl\te");
+                    ol("rl\td");
+                }
+                break;
+            case 2048:
+                ol("add\thl,hl");
+                if ( IS_8085() ) {
+                    ol("rl\tde");
+                } else if ( IS_8080() ) {
+                    ol("ld\ta,e");
+                    ol("rla");
+                    ol("ld\te,a");
+                    ol("ld\ta,d");
+                    ol("rla");
+                    ol("ld\td,a");
+                } else {
+                    ol("rl\te");
+                    ol("rl\td");
+                }
+                /* Fall through to x1024 */
+            case 1024:
+                ol("add\thl,hl");
+                if ( IS_8085() ) {
+                    ol("rl\tde");
+                } else if ( IS_8080() ) {
+                    ol("ld\ta,e");
+                    ol("rla");
+                    ol("ld\te,a");
+                    ol("ld\ta,d");
+                    ol("rla");
+                    ol("ld\td,a");
+                } else {
+                    ol("rl\te");
+                    ol("rl\td");
+                }
+                /* Fall through to x512 */
+            case 512:
+                ol("add\thl,hl");
+                if ( IS_8085() ) {
+                    ol("rl\tde");
+                } else if ( IS_8080() ) {
+                    ol("ld\ta,e");
+                    ol("rla");
+                    ol("ld\te,a");
+                    ol("ld\ta,d");
+                    ol("rla");
+                    ol("ld\td,a");
+                } else {
+                    ol("rl\te");
+                    ol("rl\td");
+                }
+                /* Fall through to x256 */
+            case 256:
                 ol("ld\td,e");
                 ol("ld\te,h");
                 ol("ld\th,l");
                 ol("ld\tl,0");
                 break;
-            case 8: /* 15 bytes */
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");
+            case 6:
+                if ( !IS_8080() ) {
+                    ol("add\thl,hl");
+                    if ( IS_8085() ) {
+                        ol("rl\tde");
+                    } else {
+                        ol("rl\te");
+                        ol("rl\td");
+                    }
+                    /* Fall through to x3 */
                 }
-                /* Fall through */
-            case 4: /* 10 bytes */
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");  
-                }
-                /* Fall through */
-            case 2: /* 5 bytes */
-                ol("add\thl,hl");
-                if ( IS_8085() ) {
-                    ol("rl\tde");
-                } else if ( IS_8080() ) {
-                    ol("ld\ta,e");
-                    ol("rla");
-                    ol("ld\te,a");
-                    ol("ld\ta,d");
-                    ol("rla");
-                    ol("ld\td,a");
-                } else {
-                    ol("rl\te");
-                    ol("rl\td");
-                }
-                break;
-            case 8192:
-                asl_const(&lval, 13);
-                break;
-            case 3: /* 13 bytes */
+                // Fall through all the way to default for 8080
+            case 3:
                 if ( !IS_8080() ) {
                     if ( IS_8085() ) {
                         ol("push\tde");
@@ -1778,59 +1883,43 @@ static void quikmult(int type, int32_t size, char preserve)
                     break;
                 }
                 // Fall through all the way to default for 8080
-            case 6:  /* 19 bytes */
+            case 40:
                 if ( !IS_8080() ) {
+                    ol("add\thl,hl");
                     if ( IS_8085() ) {
-                        ol("push\tde");
-                        ol("push\thl");
-                        ol("add\thl,hl");
                         ol("rl\tde");
-                        ol("pop\tbc");
-                        ol("add\thl,bc");
-                        ol("pop\tbc");
-                        ol("ld\ta,e");
-                        ol("adc\tc");
-                        ol("ld\te,a");
-                        ol("ld\ta,d");
-                        ol("adc\tb");
-                        ol("ld\td,a");
-                        ol("add\thl,hl");
-                        ol("rl\tde");
-                    } else if ( IS_GBZ80() ) {
-                        ol("push\tde");
-                        ol("push\thl");
-                        ol("add\thl,hl");
-                        ol("rl\te");
-                        ol("rl\td");
-                        ol("pop\tbc");
-                        ol("add\thl,bc");
-                        ol("pop\tbc");
-                        ol("ex\tde,hl");
-                        ol("adc\thl,bc");
-                        ol("ex\tde,hl");
-                        ol("add\thl,hl");
-                        ol("rl\te");
-                        ol("rl\td");
                     } else {
-                        ol("push\tde");
-                        ol("push\thl");
-                        ol("add\thl,hl");
-                        ol("rl\te");
-                        ol("rl\td");
-                        ol("pop\tbc");
-                        ol("add\thl,bc");
-                        ol("pop\tbc");
-                        ol("ex\tde,hl");
-                        ol("adc\thl,bc");
-                        ol("ex\tde,hl");
-                        ol("add\thl,hl");
                         ol("rl\te");
                         ol("rl\td");
                     }
-                    break;
+                    /* Fall through to x20 */
                 }
                 // Fall through all the way to default for 8080
-            case 5: /* 19 bytes */
+            case 20:
+                if ( !IS_8080() ) {
+                    ol("add\thl,hl");
+                    if ( IS_8085() ) {
+                        ol("rl\tde");
+                    } else {
+                        ol("rl\te");
+                        ol("rl\td");
+                    }
+                    /* Fall through to x10 */
+                }
+                // Fall through all the way to default for 8080
+            case 10:
+                if ( !IS_8080() ) {
+                    ol("add\thl,hl");
+                    if ( IS_8085() ) {
+                        ol("rl\tde");
+                    } else {
+                        ol("rl\te");
+                        ol("rl\td");
+                    }
+                    /* Fall through to x5 */
+                }
+                // Fall through all the way to default for 8080
+            case 5:
                 if ( !IS_8080() ) {
                     if ( IS_8085() ) {
                         ol("push\tde");
@@ -1875,6 +1964,90 @@ static void quikmult(int type, int32_t size, char preserve)
                         ol("add\thl,hl");
                         ol("rl\te");
                         ol("rl\td");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
+                        ol("ex\tde,hl");
+                        ol("adc\thl,bc");
+                        ol("ex\tde,hl");
+                    }
+                    break;
+                }
+            case 7:
+                if ( !IS_8080() ) {
+                    if ( IS_8085() ) {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\tde");
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\tde");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
+                        ol("ld\ta,e");
+                        ol("adc\tc");
+                        ol("ld\te,a");
+                        ol("ld\ta,d");
+                        ol("adc\tb");
+                        ol("ld\td,a");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
+                        ol("ld\ta,e");
+                        ol("adc\tc");
+                        ol("ld\te,a");
+                        ol("ld\ta,d");
+                        ol("adc\tb");
+                        ol("ld\td,a");
+                    } else if ( IS_GBZ80() ) {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
+                        ol("ld\ta,e");
+                        ol("adc\tc");
+                        ol("ld\te,a");
+                        ol("ld\ta,d");
+                        ol("adc\tb");
+                        ol("ld\td,a");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
+                        ol("ld\ta,e");
+                        ol("adc\tc");
+                        ol("ld\te,a");
+                        ol("ld\ta,d");
+                        ol("adc\tb");
+                        ol("ld\td,a");
+                    } else {
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("push\tde");
+                        ol("push\thl");
+                        ol("add\thl,hl");
+                        ol("rl\te");
+                        ol("rl\td");
+                        ol("pop\tbc");
+                        ol("add\thl,bc");
+                        ol("pop\tbc");
+                        ol("ex\tde,hl");
+                        ol("adc\thl,bc");
+                        ol("ex\tde,hl");
                         ol("pop\tbc");
                         ol("add\thl,bc");
                         ol("pop\tbc");
@@ -1893,7 +2066,6 @@ static void quikmult(int type, int32_t size, char preserve)
         }
         return;
     }
-
 
     switch (size) {
     case 0:
