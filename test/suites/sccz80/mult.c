@@ -26,12 +26,16 @@ void test_quickmult_long()
      long val = 3;
 
      Assert( val * 256 == 768, "3 * 256");
-     Assert( val * 8  == 24, "3 * 8");
-     Assert( val * 4  == 12, "3 * 4");
+     Assert( val * 64 == 192, "3 * 64");
      Assert( val * 2  == 6, "3 * 2");
      Assert( val * 3  == 9, "3 * 3");
+     Assert( val * 4  == 12, "3 * 4");
      Assert( val * 5  == 15, "3 * 5");
      Assert( val * 6  == 18, "3 * 6");
+     Assert( val * 7  == 21, "3 * 7");
+     Assert( val * 8  == 24, "3 * 8");
+     Assert( val * 9  == 27, "3 * 9");
+     Assert( val * 40 == 120, "3 * 40");
 }
 
 void test_mult_long()
