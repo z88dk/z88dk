@@ -64,6 +64,8 @@ ifdef(`CFG_ASM_PUB',
 `
 PUBLIC `__SCZ180'
 
+PUBLIC `__CPU_CLOCK'
+
 PUBLIC `__CLOCKS_PER_SECOND'
 
 PUBLIC `__ASCI0_RX_SIZE'
@@ -124,6 +126,8 @@ ifdef(`CFG_C_DEF',
 `
 `#undef'  `__SCZ180'
 `#define' `__SCZ180'  __SCZ180
+
+`#define' `__CPU_CLOCK'  __CPU_CLOCK
 
 `#define' `__CLOCKS_PER_SECOND' __CLOCKS_PER_SECOND
 

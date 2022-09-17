@@ -84,6 +84,8 @@ ifdef(`CFG_ASM_PUB',
 `
 PUBLIC `__YAZ180'
 
+PUBLIC `__CPU_CLOCK'
+
 PUBLIC `__CLOCKS_PER_SECOND'
 
 PUBLIC `__BIOS_SP'
@@ -166,6 +168,8 @@ ifdef(`CFG_C_DEF',
 `
 `#undef'  `__YAZ180'
 `#define' `__YAZ180'  __YAZ180
+
+`#define' `__CPU_CLOCK'  __CPU_CLOCK
 
 `#define' `__CLOCKS_PER_SECOND'  __CLOCKS_PER_SECOND
 

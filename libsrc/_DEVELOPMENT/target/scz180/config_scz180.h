@@ -39,6 +39,8 @@
 #undef  __SCZ180
 #define __SCZ180  1
 
+#define __CPU_CLOCK  18432000
+
 #define __CLOCKS_PER_SECOND 50
 
 #define __ASCI0_RX_SIZE  0x100
