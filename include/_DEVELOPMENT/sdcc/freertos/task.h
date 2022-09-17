@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.6
+ * FreeRTOS Kernel V10.5.0
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -56,10 +56,10 @@
  * The tskKERNEL_VERSION_MAJOR, tskKERNEL_VERSION_MINOR, tskKERNEL_VERSION_BUILD
  * values will reflect the last released version number.
  */
-#define tskKERNEL_VERSION_NUMBER       "V10.4.6+"
+#define tskKERNEL_VERSION_NUMBER       "V10.5.0"
 #define tskKERNEL_VERSION_MAJOR        10
-#define tskKERNEL_VERSION_MINOR        4
-#define tskKERNEL_VERSION_BUILD        6
+#define tskKERNEL_VERSION_MINOR        5
+#define tskKERNEL_VERSION_BUILD        0
 
 /* MPU region parameters passed in ulParameters
  * of MemoryRegion_t struct. */
@@ -900,10 +900,10 @@ extern BaseType_t xTaskDelayUntil(TickType_t * const pxPreviousWakeTime,const Ti
  * vTaskDelayUntil() is the older version of xTaskDelayUntil() and does not
  * return a value.
  */
-#define vTaskDelayUntil( pxPreviousWakeTime, xTimeIncrement )           \
-    {                                                                   \
-        ( void ) xTaskDelayUntil( pxPreviousWakeTime, xTimeIncrement ); \
-    }
+#define vTaskDelayUntil( pxPreviousWakeTime, xTimeIncrement )                   \
+    do {                                                                        \
+        ( void ) xTaskDelayUntil( ( pxPreviousWakeTime ), ( xTimeIncrement ) ); \
+    } while( 0 )
 
 
 /**
@@ -2693,9 +2693,9 @@ void vTaskGenericNotifyGiveFromISR( TaskHandle_t xTaskToNotify,
 extern void vTaskGenericNotifyGiveFromISR(TaskHandle_t xTaskToNotify,UBaseType_t uxIndexToNotify,BaseType_t * pxHigherPriorityTaskWoken);
 
 #define vTaskNotifyGiveFromISR( xTaskToNotify, pxHigherPriorityTaskWoken ) \
-    vTaskGenericNotifyGiveFromISR( ( xTaskToNotify ), ( tskDEFAULT_INDEX_TO_NOTIFY ), ( pxHigherPriorityTaskWoken ) );
+    vTaskGenericNotifyGiveFromISR( ( xTaskToNotify ), ( tskDEFAULT_INDEX_TO_NOTIFY ), ( pxHigherPriorityTaskWoken ) )
 #define vTaskNotifyGiveIndexedFromISR( xTaskToNotify, uxIndexToNotify, pxHigherPriorityTaskWoken ) \
-    vTaskGenericNotifyGiveFromISR( ( xTaskToNotify ), ( uxIndexToNotify ), ( pxHigherPriorityTaskWoken ) );
+    vTaskGenericNotifyGiveFromISR( ( xTaskToNotify ), ( uxIndexToNotify ), ( pxHigherPriorityTaskWoken ) )
 
 /**
  * task. h

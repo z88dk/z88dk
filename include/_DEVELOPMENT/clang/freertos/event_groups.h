@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.6
+ * FreeRTOS Kernel V10.5.0
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -452,7 +452,7 @@ extern EventBits_t xEventGroupClearBits(EventGroupHandle_t xEventGroup,const Eve
 
 #else
     #define xEventGroupClearBitsFromISR( xEventGroup, uxBitsToClear ) \
-    xTimerPendFunctionCallFromISR( vEventGroupClearBitsCallback, ( void * ) xEventGroup, ( uint32_t ) uxBitsToClear, NULL )
+    xTimerPendFunctionCallFromISR( vEventGroupClearBitsCallback, ( void * ) ( xEventGroup ), ( uint32_t ) ( uxBitsToClear ), NULL )
 #endif
 
 /**
@@ -618,7 +618,7 @@ extern EventBits_t xEventGroupSetBits(EventGroupHandle_t xEventGroup,const Event
 
 #else
     #define xEventGroupSetBitsFromISR( xEventGroup, uxBitsToSet, pxHigherPriorityTaskWoken ) \
-    xTimerPendFunctionCallFromISR( vEventGroupSetBitsCallback, ( void * ) xEventGroup, ( uint32_t ) uxBitsToSet, pxHigherPriorityTaskWoken )
+    xTimerPendFunctionCallFromISR( vEventGroupSetBitsCallback, ( void * ) ( xEventGroup ), ( uint32_t ) ( uxBitsToSet ), ( pxHigherPriorityTaskWoken ) )
 #endif
 
 /**
@@ -772,7 +772,7 @@ extern EventBits_t xEventGroupSync(EventGroupHandle_t xEventGroup,const EventBit
  * \defgroup xEventGroupGetBits xEventGroupGetBits
  * \ingroup EventGroup
  */
-#define xEventGroupGetBits( xEventGroup )    xEventGroupClearBits( xEventGroup, 0 )
+#define xEventGroupGetBits( xEventGroup )    xEventGroupClearBits( ( xEventGroup ), 0 )
 
 /**
  * event_groups.h

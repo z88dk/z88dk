@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.6
+ * FreeRTOS Kernel V10.5.0
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -1529,7 +1529,7 @@ extern BaseType_t xQueueGiveMutexRecursive(QueueHandle_t xMutex);
  * Reset a queue back to its original empty state.  The return value is now
  * obsolete and is always set to pdPASS.
  */
-#define xQueueReset( xQueue )    xQueueGenericReset( xQueue, pdFALSE )
+#define xQueueReset( xQueue )    xQueueGenericReset( ( xQueue ), pdFALSE )
 
 /*
  * The registry is provided as a means for kernel aware debuggers to

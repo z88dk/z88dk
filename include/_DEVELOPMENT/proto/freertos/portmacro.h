@@ -412,13 +412,13 @@ typedef uint8_t                     UBaseType_t;
 /*
 extern void vPortYield( void );
  */
-__OPROTO(,,void,,vPortYield,void)
+__OPROTO(extern,,void,,vPortYield,void)
 #define portYIELD()                 vPortYield()
 
 /*
 extern void vPortYieldFromISR( void );
  */
-__OPROTO(,,void,,vPortYieldFromISR,void)
+__OPROTO(extern,,void,,vPortYieldFromISR,void)
 #define portYIELD_FROM_ISR()        vPortYieldFromISR()
 /*-----------------------------------------------------------*/
 

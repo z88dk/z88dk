@@ -1,5 +1,5 @@
 /*
- * FreeRTOS Kernel V10.4.6
+ * FreeRTOS Kernel V10.5.0
  * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * SPDX-License-Identifier: MIT
@@ -159,11 +159,11 @@ typedef void (* StreamBufferCallbackFunction_t)( StreamBufferHandle_t xStreamBuf
  */
 
 #define xStreamBufferCreate( xBufferSizeBytes, xTriggerLevelBytes ) \
-    xStreamBufferGenericCreate( xBufferSizeBytes, xTriggerLevelBytes, pdFALSE, NULL, NULL )
+    xStreamBufferGenericCreate( ( xBufferSizeBytes ), ( xTriggerLevelBytes ), pdFALSE, NULL, NULL )
 
 #if ( configUSE_SB_COMPLETED_CALLBACK == 1 )
     #define xStreamBufferCreateWithCallback( xBufferSizeBytes, xTriggerLevelBytes, pxSendCompletedCallback, pxReceiveCompletedCallback ) \
-    xStreamBufferGenericCreate( xBufferSizeBytes, xTriggerLevelBytes, pdFALSE, pxSendCompletedCallback, pxReceiveCompletedCallback )
+    xStreamBufferGenericCreate( ( xBufferSizeBytes ), ( xTriggerLevelBytes ), pdFALSE, ( pxSendCompletedCallback ), ( pxReceiveCompletedCallback ) )
 #endif
 
 /**
@@ -257,11 +257,11 @@ typedef void (* StreamBufferCallbackFunction_t)( StreamBufferHandle_t xStreamBuf
  */
 
 #define xStreamBufferCreateStatic( xBufferSizeBytes, xTriggerLevelBytes, pucStreamBufferStorageArea, pxStaticStreamBuffer ) \
-    xStreamBufferGenericCreateStatic( xBufferSizeBytes, xTriggerLevelBytes, pdFALSE, pucStreamBufferStorageArea, pxStaticStreamBuffer, NULL, NULL )
+    xStreamBufferGenericCreateStatic( ( xBufferSizeBytes ), ( xTriggerLevelBytes ), pdFALSE, ( pucStreamBufferStorageArea ), ( pxStaticStreamBuffer ), NULL, NULL )
 
 #if ( configUSE_SB_COMPLETED_CALLBACK == 1 )
     #define xStreamBufferCreateStaticWithCallback( xBufferSizeBytes, xTriggerLevelBytes, pucStreamBufferStorageArea, pxStaticStreamBuffer, pxSendCompletedCallback, pxReceiveCompletedCallback ) \
-    xStreamBufferGenericCreateStatic( xBufferSizeBytes, xTriggerLevelBytes, pdFALSE, pucStreamBufferStorageArea, pxStaticStreamBuffer, pxSendCompletedCallback, pxReceiveCompletedCallback )
+    xStreamBufferGenericCreateStatic( ( xBufferSizeBytes ), ( xTriggerLevelBytes ), pdFALSE, ( pucStreamBufferStorageArea ), ( pxStaticStreamBuffer ), ( pxSendCompletedCallback ), ( pxReceiveCompletedCallback ) )
 #endif
 
 /**
