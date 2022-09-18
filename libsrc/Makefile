@@ -741,6 +741,7 @@ mz_clib.lib:
 	@echo '--- Building Sharp MZ Library ---'
 	@echo ''
 	$(MAKE) msxdeps
+	$(MAKE) -C target/mz
 	$(MAKE) -C games TARGET=mz
 	$(call buildgeneric,mz)
 	TARGET=mz TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmz -x$(OUTPUT_DIRECTORY)/mz_clib @$(TARGET_DIRECTORY)/mz/mz.lst
