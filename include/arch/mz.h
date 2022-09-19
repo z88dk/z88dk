@@ -1,6 +1,9 @@
 #ifndef __MZ_H__
 #define __MZ_H__
 
+#include <sys/compiler.h>
+#include <sys/types.h>
+
 
 // Works on later models only (MZ-700, MZ-800, MZ-1500)
 
@@ -32,6 +35,47 @@ extern int __LIB__  get_mz800_vmode();
 // Wait VSYNC
 extern void __LIB__  mz800_vsync();
 
+
+////////////
+// TAPE I/O
+////////////
+
+// MZ tape file types:
+// 01 machine code program file
+// 02 MZ-80 BASIC program file
+// 03 MZ-80 data file
+// 04 MZ-700 data file
+// 05 MZ-700 BASIC program file
+
+// The tape header is loaded into the monitor's work area starting at address $10F0 in the length of 128 bytes.
+
+struct mztapehdr {             // standard tape header
+   unsigned char type;
+   char          name[17];     // file name (end = $0D)
+   size_t        length;
+   size_t        address;
+   size_t        exec;         // execution address of a program file
+   char          comment[104];
+};
+
+extern int  __LIB__            tape_save(char *name, size_t loadstart,void *start,void *exec,size_t len) __smallc;
+extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type) __smallc;
+extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type) __smallc;
+
+extern int  __LIB__            mztape_save_header(void *addr, size_t len) __smallc;
+extern int  __LIB__            mztape_load_header(void *addr, size_t len) __smallc;
+extern int  __LIB__            mztape_save_block(void *addr, size_t len) __smallc;
+extern int  __LIB__            mztape_load_block(void *addr, size_t len) __smallc;
+
+extern int  __LIB__  mztape_save_header_callee(void *addr, size_t len) __smallc __z88dk_callee;
+extern int  __LIB__  mztape_load_header_callee(void *addr, size_t len) __smallc __z88dk_callee;
+extern int  __LIB__  mztape_save_block_callee(void *addr, size_t len) __smallc __z88dk_callee;
+extern int  __LIB__  mztape_load_block_callee(void *addr, size_t len) __smallc __z88dk_callee;
+
+#define mztape_save_header(a,b) mztape_save_header_callee(a,b)
+#define mztape_load_header(a,b) mztape_load_header_callee(a,b)
+#define mztape_save_block(a,b) mztape_save_block_callee(a,b)
+#define mztape_load_block(a,b) mztape_load_block_callee(a,b)
 
 
 #endif
