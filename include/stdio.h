@@ -36,6 +36,10 @@
 #include <msx.h>
 #endif
 
+#ifdef __SHARPMZ__
+#include <arch/mz.h>
+#endif
+
 #ifdef __OSCA__
 /* This will define __STDIO_BINARY, __STDIO_EOFMARKER and __STDIO_CRLF  */
 #include <flos.h>
