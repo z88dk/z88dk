@@ -24,7 +24,7 @@ ide_wait_drq:
 ide_wait_drq2:
     ld a, __IO_IDE_ALT_STATUS    ;get IDE alt status register
     call ide_read_byte
-    tst 00100001b           ;test for ERR or DFE
+    tst 00100001b           ;test for ERR or WFT
     jr nz, ide_wait_error
     and 10001000b           ;mask off BuSY and DRQ bits
     xor 00001000b           ;wait for DRQ to be set and BuSY to be clear

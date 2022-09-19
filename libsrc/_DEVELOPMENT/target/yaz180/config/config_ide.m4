@@ -101,7 +101,7 @@ define(`__IO_IDE_LBA3',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO
 
 #       Bit 7   = BSY   1=busy, 0=not busy
 #       Bit 6   = RDY   1=ready for command, 0=not ready yet
-#       Bit 5   = DWF   1=fault occured inside drive
+#       Bit 5   = WFT   1=write fault occured
 #       Bit 4   = DSC   1=seek complete
 #       Bit 3   = DRQ   1=data request ready, 0=not ready to xfer yet
 #       Bit 2   = ECC   1=correctable error occured
