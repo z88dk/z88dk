@@ -22,7 +22,7 @@ EXTERN ide_read_byte
 .ide_wait_drq
     ld d,__IO_IDE_ALT_STATUS    ;get IDE alt status register
     call ide_read_byte
-    and 00100001b               ;test for ERR or DFE
+    and 00100001b               ;test for ERR or WFT
     ret NZ                      ;return clear carry flag on failure
 
     ld a,e                      ;get byte from alternate ide_read_byte return
