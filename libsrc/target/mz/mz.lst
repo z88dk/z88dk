@@ -21,6 +21,17 @@ target/mz/mz_border
 target/mz/get_mz800_vmode
 target/mz/set_mz800_vmode
 target/mz/mz800_vsync
+target/mz/tape/obj/${TARGET}/mztape_load_block
+target/mz/tape/obj/${TARGET}/mztape_load_block_callee
+target/mz/tape/obj/${TARGET}/mztape_save_block
+target/mz/tape/obj/${TARGET}/mztape_save_block_callee
+target/mz/tape/obj/${TARGET}/mztape_load_header
+target/mz/tape/obj/${TARGET}/mztape_load_header_callee
+target/mz/tape/obj/${TARGET}/mztape_save_header
+target/mz/tape/obj/${TARGET}/mztape_save_header_callee
+target/mz/tape/obj/${TARGET}/tape_save
+target/mz/tape/obj/${TARGET}/tape_save_block
+target/mz/tape/obj/${TARGET}/tape_load_block
 @gfx/narrow/gfx_narrow.lst
 @games/games.lst
 
