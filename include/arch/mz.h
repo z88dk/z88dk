@@ -58,14 +58,18 @@ struct mztapehdr {             // standard tape header
    char          comment[104];
 };
 
-extern int  __LIB__            tape_save(char *name, size_t loadstart,void *start,void *exec,size_t len) __smallc;
-extern int  __LIB__            tape_save_block(void *addr, size_t len, unsigned char type) __smallc;
-extern int  __LIB__            tape_load_block(void *addr, size_t len, unsigned char type) __smallc;
 
-extern int  __LIB__            mztape_save_header(void *addr, size_t len) __smallc;
-extern int  __LIB__            mztape_load_header(void *addr, size_t len) __smallc;
-extern int  __LIB__            mztape_save_block(void *addr, size_t len) __smallc;
-extern int  __LIB__            mztape_load_block(void *addr, size_t len) __smallc;
+extern struct  mztapehdr mz_hdr;
+
+
+extern int  __LIB__  tape_save(char *name, size_t loadstart,void *start,void *exec,size_t len) __smallc;
+extern int  __LIB__  tape_save_block(void *addr, size_t len, unsigned char type) __smallc;
+extern int  __LIB__  tape_load_block(void *addr, size_t len, unsigned char type) __smallc;
+
+extern int  __LIB__  mztape_save_header(void *addr, size_t len) __smallc;
+extern int  __LIB__  mztape_load_header(void *addr, size_t len) __smallc;
+extern int  __LIB__  mztape_save_block(void *addr, size_t len) __smallc;
+extern int  __LIB__  mztape_load_block(void *addr, size_t len) __smallc;
 
 extern int  __LIB__  mztape_save_header_callee(void *addr, size_t len) __smallc __z88dk_callee;
 extern int  __LIB__  mztape_load_header_callee(void *addr, size_t len) __smallc __z88dk_callee;
