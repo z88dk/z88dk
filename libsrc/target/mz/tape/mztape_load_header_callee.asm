@@ -29,7 +29,7 @@ PUBLIC asm_mztape_load_header
 ;--------------------
 
 	push ix
-	call 0x2A	; LOAD data block
+	call 0x27	; LOAD header block
 	pop ix
 
 	ld  hl,0
