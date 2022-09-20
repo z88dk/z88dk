@@ -7,7 +7,7 @@
 
 // Works on later models only (MZ-700, MZ-800, MZ-1500)
 
-extern void __LIB__  mz_border() __z88dk_fastcall;
+extern void __LIB__  mz_border(char colour) __z88dk_fastcall;
 
 
 /*
@@ -34,6 +34,21 @@ extern int __LIB__  get_mz800_vmode();
 
 // Wait VSYNC
 extern void __LIB__  mz800_vsync();
+
+
+
+////////////
+// MACROS
+////////////
+
+// Beep
+#define MZ_BELL()    asm("call\t0x3E\n");
+
+// Play music (monitor 1A-013A)
+#define MZ_MELDY(music) asm("ld\thl,"#music"\ncall\t0x30\n");
+
+// Set the musical tempo (1..7  -> slow..fast)
+#define MZ_XTEMP(tempo) asm("ld\ta,"#tempo"\ncall\t0x41\n");
 
 
 ////////////
