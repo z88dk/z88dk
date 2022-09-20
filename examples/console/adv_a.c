@@ -2604,9 +2604,14 @@ void SH_QUIT()
 #ifdef DISKBLOCK
 		PrintStr("\nPrepare disc or cartrige, then press a key\n");
 #else
+#ifndef __SHARPMZ__
 		PrintStr("\nStart tape, then press a key\n");
 #endif
+#endif
+
+#ifndef __SHARPMZ__
 		i_GetCh();
+#endif
 		
 #ifdef DISKBLOCK
 		rnd_erase("GVARS.SAV");

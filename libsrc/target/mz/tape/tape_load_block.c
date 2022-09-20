@@ -23,10 +23,16 @@ char mz_compare[2];
 		mz_type[1]=mz_compare[1]=0;
 		// unique identifier for the block type
 		itoa(type,mz_compare,16);
+		mz_hdr.type    = 3;
+		mz_hdr.length  = 2;
+		mz_hdr.address = mz_type;
 		if (mztape_load_block(mz_type, 2))
 			return(-1);
 	} while (strncmp(mz_type,mz_compare,2)!=0);
 
+	mz_hdr.type    = 3;
+	mz_hdr.length  = len;
+	mz_hdr.address = addr;
 	if (mztape_load_block(addr, len))
 		return(-1);
 

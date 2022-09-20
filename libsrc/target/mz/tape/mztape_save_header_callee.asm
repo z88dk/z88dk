@@ -29,7 +29,7 @@ PUBLIC asm_mztape_save_header
 ;--------------------
 
 	push ix
-	call 0x24	; SAVE data block
+	call 0x21	; SAVE header block
 	pop ix
 
 	ld  hl,0
