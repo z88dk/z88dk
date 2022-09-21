@@ -1,7 +1,7 @@
 #
 # Makefile for S-OS
 #
-# $Id: Makefile,v 1.2 2014-01-14 07:48:41 stefano Exp $
+# $Id: Makefile $
 #
 
 include ../../../Make.config
