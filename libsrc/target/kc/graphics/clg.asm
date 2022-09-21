@@ -1,5 +1,5 @@
 ;
-;       Fast CLS for the Robotron KC85/2..5
+;       Fast CLS for the VEB MPM KC85/2..5
 ;       Stefano - Sept 2016
 ;
 ;

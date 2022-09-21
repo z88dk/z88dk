@@ -380,7 +380,7 @@ struct {
       inject_longhelp,
       inject_exec,     &inject_options },
     { "kcc",      "kc",          "(C) 2016 Stefano Bodrato",
-      "Prapares a .KCC file for the Robotron KC85/2..KC85/4",
+      "Prapares a .KCC file for the VEB MPM KC85/2..KC85/4",
       NULL,
       kc_exec,       &kc_options },
     { "laser2cas", "laser500",     "(C) 2010-2018 Stefano Bodrato",

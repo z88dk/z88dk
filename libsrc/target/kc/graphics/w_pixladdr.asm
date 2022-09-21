@@ -1,5 +1,5 @@
 ;
-;   Robotron KC85/2..5 Graphics Functions
+;   VEB MPM KC85/2..5 Graphics Functions
 ;
 ;	by Stefano Bodrato  - Oct 2016
 ;

@@ -1,5 +1,5 @@
 ;
-;	Console routines for the Robotron VEB KC85/2,3,4
+;	Console routines for the VEB MPM KC85/2,3,4
 ;
 ;	By Stefano Bodrato - Oct. 2016
 ;
