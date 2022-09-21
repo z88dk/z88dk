@@ -2,7 +2,7 @@
 ;	S-OS specific routines
 ;	by Stefano Bodrato, 2013
 ;
-;       $Id: rnd_loadblock.c,v 1.1 2014-01-14 07:48:41 stefano Exp $
+;       $Id: rnd_saveblock.c $
 ;
 */
 
@@ -12,21 +12,21 @@
 #include <fcntl.h>
 #include <sos.h>
 
-int rnd_loadblock(char *name,void *pos, unsigned int len) {
+int rnd_saveblock(char *name,void *pos, unsigned int len) {
 	sos_file (name,SOS_FILEATTR_BIN);
 	SOS_SIZE=len;
 	SOS_DTADR=(unsigned int)pos;
 	SOS_EXADR=SOS_HOT;
 	
-    //if ( !sos_ropen() )
+    //if ( !sos_wopen() )
     //            return -1;
-	sos_ropen();
+    sos_wopen();
 /*
 	SOS_SIZE=len;
 	SOS_DTADR=pos;
 	SOS_EXADR=SOS_HOT;
 */
-    if ( !sos_rdd() )
+    if ( !sos_wrd() )
                 return -1;
 	return (0);
 
