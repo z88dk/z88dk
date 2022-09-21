@@ -18,4 +18,9 @@ target/ace/time/clock
 target/ace/games/joystick
 @games/games.lst
 @target/ace/ace/ace.lst
+target/ace/tape/obj/${TARGET}/tape_load_block
+target/ace/tape/obj/${TARGET}/tape_load_block_callee
+target/ace/tape/obj/${TARGET}/tape_save
+target/ace/tape/obj/${TARGET}/tape_save_block
+target/ace/tape/obj/${TARGET}/tape_save_block_callee
 @input/input_keyboard.lst
