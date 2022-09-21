@@ -13,11 +13,11 @@ PUBLIC asm_tape_load_block
 .tape_load_block_callee
 ._tape_load_block_callee
 
-	pop ix
+	pop af
 	pop bc
 	pop de
 	pop hl
-	push ix
+	push af
 
 .asm_tape_load_block
 

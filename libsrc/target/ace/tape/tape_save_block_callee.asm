@@ -12,11 +12,11 @@ PUBLIC asm_tape_save_block
 .tape_save_block_callee
 ._tape_save_block_callee
 
-	pop ix
+	pop af
 	pop bc
 	pop de
 	pop hl
-	push ix
+	push af
 
 ; enter : hl = addr
 ;         de = len
