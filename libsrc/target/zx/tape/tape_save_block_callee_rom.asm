@@ -19,7 +19,7 @@ EXTERN __SYSVAR_BORDCR
 	pop bc
 	ld a,c
 	pop de
-	pop ix
+	pop bc
 	push hl
 
 ; enter : ix = addr
@@ -28,6 +28,10 @@ EXTERN __SYSVAR_BORDCR
 
 .asm_tape_save_block
 		
+	push ix
+	push bc
+	pop ix
+
 		CALL    SA_BYTES
 		
         LD       A,(__SYSVAR_BORDCR)
@@ -40,6 +44,9 @@ EXTERN __SYSVAR_BORDCR
         IN      A,($FE)
         RRA
         EI
+
+	pop ix
+
 		LD      HL,0
 		RET     NC
 		
