@@ -2,8 +2,8 @@ include ../../../Make.config
 
 TARGET = sos
 
-SUBDIRS = tape
-CLEANDIRS = $(SUBDIRS:%=%-clean)
+SUBDIRS = 
+CLEANDIRS = $(SUBDIRS:%=clean-%)
 
 ASMFILES = $(wildcard *.asm)
 OBJECTS = $(ASMFILES:.asm=.o)
@@ -35,5 +35,5 @@ $(SUBDIRS):
 	$(MAKE) -C $@ all
 
 $(CLEANDIRS):
-	$(MAKE) -C $(@:%-clean=%) clean
+	$(MAKE) -C $(@:clean-%=%) clean
 	$(RM) */*.o
