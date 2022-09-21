@@ -4,7 +4,6 @@
 PUBLIC tape_load_block
 PUBLIC _tape_load_block
 
-EXTERN tape_load_block_callee
 EXTERN asm_tape_load_block
 
 .tape_load_block
@@ -14,8 +13,8 @@ EXTERN asm_tape_load_block
    pop bc
    ld a,c
    pop de
-   pop ix
-   push hl
+   pop bc
+   push bc
    push de
    push bc
    push hl
