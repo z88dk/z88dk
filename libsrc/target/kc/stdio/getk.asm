@@ -5,34 +5,35 @@
 ;
 ;	getk() Read key status
 ;
-;
-;	$Id: getk.asm,v 1.2 2016-10-10 07:09:14 stefano Exp $
+;	Patched in #2081
 ;
 
 	SECTION code_clib
-	PUBLIC	getk
-	PUBLIC	_getk
-	
+	PUBLIC  getk
+	PUBLIC  _getk
+
 	INCLUDE  "target/kc/def/caos.def"
 
 .getk
 ._getk
-	push	iy
-	ld	iy,$1f0
-;    ld l,0
-    call PV1
-    defb FNKBDS
-	pop	iy
-;    jr nc,gkret
+	push iy
+	ld iy,$1f0
+	call PV1
+	defb FNKBDS
+	pop iy
+	jr NC,nokey
 
 IF STANDARDESCAPECHARS
-	cp	13
-	jr	nz,not_return
-	ld	a,10
+	cp 13
+	jr NZ,not_return
+	ld a,10
 .not_return
 ENDIF
 
-    ld l, a
-;.gkret
-	ld	h,0
+	ld l,a
+	jr gkret
+.nokey
++	ld l,0
+.gkret
+	ld h,0
 	ret
