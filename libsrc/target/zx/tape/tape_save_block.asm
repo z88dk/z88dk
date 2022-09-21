@@ -13,8 +13,8 @@ EXTERN asm_tape_save_block
    pop bc
    ld a,c
    pop de
-   pop ix
-   push hl
+   pop bc
+   push bc
    push de
    push bc
    push hl
