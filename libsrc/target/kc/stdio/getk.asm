@@ -33,7 +33,7 @@ ENDIF
 	ld l,a
 	jr gkret
 .nokey
-+	ld l,0
+	ld l,0
 .gkret
 	ld h,0
 	ret
