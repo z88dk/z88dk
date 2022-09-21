@@ -22,7 +22,7 @@ ENDIF
 	pop bc
 	ld a,c
 	pop de
-	pop ix
+	pop bc
 	push hl
 
 ; enter : ix = addr
@@ -31,9 +31,14 @@ ENDIF
 
 .asm_tape_save_block
 
+	push ix
+	push bc
+	pop ix
+
 	IF FORts2068
 		ld		hl,$68
         call    call_extrom
+		pop ix
         ld		hl,0
         ret
 	ELSE
@@ -51,6 +56,7 @@ ENDIF
         pop     de
         pop     de
         ld      (23613),de      ;get back original 23613
+		pop     ix
         ret
 
 .saveblock1
