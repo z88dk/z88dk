@@ -1,7 +1,2 @@
-target/ace/tape/obj/${TARGET}/tape_load_block
-target/ace/tape/obj/${TARGET}/tape_load_block_callee
-target/ace/tape/obj/${TARGET}/tape_save
-target/ace/tape/obj/${TARGET}/tape_save_block
-target/ace/tape/obj/${TARGET}/tape_save_block_callee
 target/ace/ace/ace_freemem
 target/ace/ace/zx_print_buf
