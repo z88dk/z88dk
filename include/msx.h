@@ -13,6 +13,7 @@
 #include <sys/compiler.h>
 #include <sys/types.h>
 #include <lib3d.h>
+#include <sys/types.h>
 
 
 // PSG register, sound, ...
@@ -313,8 +314,58 @@ enum stick_direction {
 
 
 
+////////////
+// TAPE I/O
+////////////
 
+// leading bytes (type is repeated 10 times)
+#define HDR_BASIC  0xD3    // The program body follows in a next block, terminated by 00H x 7
+#define HDR_ASCII  0xEA    // 256 bytes chuncks, CTRL+Z (EOF) is included in data
+#define HDR_CODE   0x0D    // Must have 6 extra bytes on top: addr, end_addr, exec.
+
+// Standard filename header
+struct msxtapehdr {
+   char          leader[10];    // leading bytes (leading type repeated x 10)
+   char          name[6];
+};
+
+// Standard BSAVE tape format (untested)
+extern int  __LIB__  tape_save(char *name, size_t loadstart,unsigned char *start,size_t exec,size_t len) __smallc;
+
+// Custom data blocks transfer (no filename, just a short byte for "type" discrimination
+extern int  __LIB__  tape_save_block(void *addr, size_t len, unsigned char type) __smallc;
+extern int  __LIB__  tape_load_block(void *addr, size_t len, unsigned char type) __smallc;
+
+// save_header is equivalent to save_block with a longer leading tone
+extern int  __LIB__  msxtape_save_header(void *addr, size_t len) __smallc;
+extern int  __LIB__  msxtape_save_block(void *addr, size_t len) __smallc;
+extern int  __LIB__  msxtape_load_block(void *addr, size_t len) __smallc;
+
+extern int  __LIB__  msxtape_save_header_callee(void *addr, size_t len) __smallc __z88dk_callee;
+extern int  __LIB__  msxtape_save_block_callee(void *addr, size_t len) __smallc __z88dk_callee;
+extern int  __LIB__  msxtape_load_block_callee(void *addr, size_t len) __smallc __z88dk_callee;
+
+#define msxtape_save_header(a,b) msxtape_save_header_callee(a,b)
+#define msxtape_save_block(a,b) msxtape_save_block_callee(a,b)
+#define msxtape_load_block(a,b) msxtape_load_block_callee(a,b)
+
+
+// Low level tape control
+// WARNING: the output sequences must avoid gaps !
+extern int __LIB__  msxtape_rd_opn();
+extern int __LIB__  msxtape_wr_opn();
+extern int __LIB__  msxtape_wr_opn_hdr();
+extern int __LIB__  msxtape_rd_cls();
+extern int __LIB__  msxtape_wr_cls();
+extern int __LIB__  msxtape_send_byte(unsigned char msxbyte) __z88dk_fastcall;
+extern int __LIB__  msxtape_get_byte();
+
+
+
+
+//////////////////
 // Misc functions
+//////////////////
 
 // Check the current MSX type:
 // 1: MSX 1

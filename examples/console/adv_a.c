@@ -37,7 +37,14 @@
   * 7650 SAVE *"m";d;n$ CODE a,l : STOP
   * 7900 ERASE "m";d;n$ : STOP
   *
+  *
+  * TAPE support is, at the moment available for J.ACE, Spectrum, TS2068, Sharp MZ, MSX, Spectravideo SVI, S-OS, ZX80, ZX81
+  * e.g.
+  * zcc +msx -lmsxbios -DTAPE -create-app adv_a.c
+  *
   */
+
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,6 +61,13 @@
 #include <ace.h>
 #endif
 
+#ifdef __MSX__
+#include <msx.h>
+#endif
+
+#ifdef __SVI__
+#include <msx.h>
+#endif
 
 #ifndef getkey
 #include <conio.h>
