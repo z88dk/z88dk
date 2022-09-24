@@ -2,24 +2,11 @@
 
 
 
-IFNDEF __CONFIG_Z88DK_INC_
-defc   __CONFIG_Z88DK_INC_ = 1
+IFNDEF __CONFIG_Z88DK_AM9511_INC_
+defc   __CONFIG_Z88DK_AM9511_INC_ = 1
 
 ; Automatically Generated at Library Build Time
 
-
-
-
-
-
-
-
-
-
-
-
-
-defc __Z88DK = 2200
 
 
 
@@ -38,25 +25,6 @@ defc __IO_APU0_PORT_BASE = 0x42
 defc __IO_APU1_PORT_BASE = 0x62
 defc __IO_APU2_PORT_BASE = 0xC2
 defc __IO_APU3_PORT_BASE = 0xE2
-
-
-
-
-
-
-
-
-
-
-defc __Z80 = 0x02
-
-defc __Z80_NMOS = 0x01
-defc __Z80_CMOS = 0x02
-
-defc __CPU_INFO = 0x00
-defc __CPU_INFO_ENABLE_SLL = 0x01
-
-
 
 
 
