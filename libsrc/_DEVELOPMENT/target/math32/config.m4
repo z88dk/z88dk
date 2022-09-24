@@ -16,8 +16,8 @@ dnl############################################################
 
 ifdef(`CFG_ASM_DEF',
 `
-IFNDEF __CONFIG_Z88DK_INC_
-defc   __CONFIG_Z88DK_INC_ = 1
+IFNDEF __CONFIG_Z88DK_MATH32_INC_
+defc   __CONFIG_Z88DK_MATH32_INC_ = 1
 
 ; Automatically Generated at Library Build Time
 
@@ -25,8 +25,8 @@ defc   __CONFIG_Z88DK_INC_ = 1
 
 ifdef(`CFG_C_DEF',
 `
-#ifndef __CONFIG_Z88DK_H_
-#define __CONFIG_Z88DK_H_
+#ifndef __CONFIG_Z88DK_MATH32_H_
+#define __CONFIG_Z88DK_MATH32_H_
 
 // Automatically Generated at Library Build Time
 
@@ -36,8 +36,6 @@ dnl############################################################
 dnl# INCLUDE ALL CONFIG FILES
 dnl############################################################
 
-include(`target/z88dk_version.m4')
-include(`target/math32/config_cpu.m4')
 
 dnl############################################################
 dnl# END IF GUARDS
