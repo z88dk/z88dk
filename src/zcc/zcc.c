@@ -102,8 +102,9 @@ struct pragma_m4_s {
 
 struct tokens_list_s
 {
-    char* token;
-    struct tokens_list_s* next;
+    char                *token;
+    char                 *path;
+    struct tokens_list_s *next;
 };
 
 /* All our function prototypes */
@@ -112,7 +113,7 @@ static void            add_option_to_compiler(char *arg);
 static struct tokens_list_s*    gather_from_list_file(char *filename);
 static void            add_file_to_process(char *filename, char process_extension);
 
-static void cmd_line_to_tokens(char* line, struct tokens_list_s** tokens);
+static void cmd_line_to_tokens(char* line, const char *path, struct tokens_list_s** tokens);
 static void cmd_free_tokens(struct tokens_list_s* tokens);
 
 static void            SetNumber(arg_t *argument, char *arg);
@@ -2310,14 +2311,23 @@ int is_path_absolute(char *p)
 #endif
 }
 
-static void cmd_line_to_tokens(char* line, struct tokens_list_s** tokens)
+static void cmd_line_to_tokens(char* line, const char *path, struct tokens_list_s** tokens)
 {
-    char* p = strtok(line, " \r\n\t");
+    char* p;
+    
+    while (*line && isspace(*line))
+        line++;
+
+    if ( *line == ';' || *line == '#')
+        return;
+    
+    p = strtok(line, " \r\n\t");
 
     while (p != NULL)
     {
         struct tokens_list_s* token = mustmalloc(sizeof(struct tokens_list_s));
         token->token = strdup(p);
+        token->path = strdup(path);
         LL_APPEND((*tokens), token);
         p = strtok(NULL, " \r\n\t");
     }
@@ -2330,6 +2340,8 @@ void cmd_free_tokens(struct tokens_list_s* tokens)
     LL_FOREACH_SAFE(tokens, token, tmp)
     {
         LL_DELETE(tokens, token);
+        free(token->path);
+        free(token->token);
         free(token);
     }
 }
@@ -2362,7 +2374,7 @@ static struct tokens_list_s* gather_from_list_file(char *filename)
     /* read filenames from list file */
     line = NULL;
     while (zcc_getdelim(&line, &len, '\n', in) > 0) {
-        cmd_line_to_tokens(line, &tokens);
+        cmd_line_to_tokens(line, pathname, &tokens);
     }
 
     if (!feof(in)) {
@@ -2390,7 +2402,7 @@ void add_file_to_process(char *filename, char process_extension)
             struct tokens_list_s* tokens = gather_from_list_file(p + 1);
 
             char outname[FILENAME_MAX * 2 + 2];
-            char pathname[FILENAME_MAX + 1];
+
 
             struct tokens_list_s* token;
             LL_FOREACH(tokens, token) {
@@ -2412,9 +2424,14 @@ void add_file_to_process(char *filename, char process_extension)
                 if (p[0] == '-') {
                     parse_cmdline_arg(p);
                 } else if (p[0] != '+') {
+
+                    if ( p[0] == '@') {
+                        strcpy(outname,"@");
+                        p++;
+                    }
                     /* prepend path if filename is not absolute */
                     if (!lstcwd && !is_path_absolute(p))
-                        strcat(outname, pathname);
+                        strcat(outname, token->path);
 
                     /* append rest of filename */
                     strcat(outname, p);
