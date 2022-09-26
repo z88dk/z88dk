@@ -55,6 +55,7 @@
 #ifdef PICS
 #include <graphics.h>
 #include <adv_a.h>
+int mazepic;
 #endif
 
 #ifdef ACE
@@ -1862,6 +1863,7 @@ void ShowRoom()
 			draw_profile(80, 80, 240, tree2);
 			draw_profile(80, 120, 80, mountain);
 			draw_profile(60, 110, 200, tree2);
+			mazepic = 0;			
 			break;
 		case 3:
 			for (nItem = 1; nItem < 5; ++nItem) {
@@ -1882,7 +1884,8 @@ void ShowRoom()
 		case 8:
 		case 9:
 		case 10:
-			draw_profile(60, 60, 240, maze);
+			if (!mazepic++)
+				draw_profile(60, 60, 240, maze);
 			break;
 		case 14:
 			draw_profile(20, 100, 200, keyboard);
