@@ -39,16 +39,30 @@ start:
 
 ; port fixing; required for ROMs
 ; port fixing = set the memory configuration, must be first!
+    call    $0138       ;read primary slot #
+    rrca                ;move it to bit 0,1 of [Acc]
+    rrca
+    and     $03
+    ld      c,a
+    ld      b,0
+    ld      hl,$0FCC1   ;see if this slot is expanded or not
+    add     hl,bc
+    ld      c,a         ;save primary slot #
+    ld      a,(hl)      ;get the slot is expanded or not
+    and     $80
+    or      c           ;set MSB if so
+    ld      c,a         ;save it to [c]
+    inc     hl          ;Point to SLTTBL entry
+    inc     hl
+    inc     hl
+    inc     hl
+    ld      a,(hl)      ;Get what  is  currently  output
+                        ;to expansion   slot    register
+    and     $0c
+    or      c           ;Finaly form slot address
+    ld      h,$80
+    call    $0024       ;enable page 2
 
-    in      a,($A8)
-    and     a, $CF
-    ld      d,a
-    in      a,($A8)
-    and     a, $0C
-    add     a,a
-    add     a,a
-    or      d
-    out     ($A8),a
 
     INCLUDE	"crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
