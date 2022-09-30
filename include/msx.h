@@ -329,8 +329,17 @@ struct msxtapehdr {
    char          name[6];
 };
 
-// Standard BSAVE tape format (untested)
-extern int  __LIB__  tape_save(char *name, size_t loadstart,unsigned char *start,size_t exec,size_t len) __smallc;
+struct msxcodehdr {
+   int           addr;
+   int           end_addr;
+   int           exec;
+};
+
+// Standard BSAVE tape format
+extern int  __LIB__  tape_save(char *name, size_t loadstart, void *start, size_t exec, size_t len) __smallc;
+extern int  __LIB__  tape_save_callee(char *name, size_t loadstart, void *start, size_t exec, size_t len) __smallc __z88dk_callee;
+
+#define tape_save(a,b,c,d,e) tape_save_callee(a,b,c,d,e)
 
 // Custom data blocks transfer (no filename, just a short byte for "type" discrimination
 extern int  __LIB__  tape_save_block(void *addr, size_t len, unsigned char type) __smallc;
