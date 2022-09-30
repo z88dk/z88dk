@@ -9,8 +9,8 @@ SECTION code_l_sccz80
 PUBLIC    l_long_asr_u
 PUBLIC    l_long_asr_uo
 
-; Entry: dehl = long
-;           c = shift
+; Entry:    dehl = unsigned long
+;           c = shift counter
 .l_long_asr_uo
     ld      a,c
     jp      entry

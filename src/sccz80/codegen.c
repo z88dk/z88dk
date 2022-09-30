@@ -1021,8 +1021,8 @@ int push_function_argument_fnptr(Kind expr, Type *type, Type *functype, int push
         }
     } else if (expr == KIND_STRUCT ) {
         // 13 bytes
-        swap();    // de = address of struct
-        ol("pop\tbc");	// return address
+        swap();             // de = address of struct
+        ol("pop\tbc");      // return address
         vconst(-type->size);
         ol("add\thl,sp");
         ol("ld\tsp,hl");
@@ -1055,11 +1055,11 @@ void dpush_under(Kind val_type)
    // Only called for KIND_DOUBLE
     if ( val_type == KIND_LONG || val_type == KIND_CPTR ) {
         if ( c_fp_size == 4 ) {
-            ol("pop\tbc");	// addr2 -> bc
+            ol("pop\tbc");  // addr2 -> bc
             swap(); /* MSW -> hl */
             ol("ex\t(sp),hl"); /* MSW -> stack, addr1 -> hl */
             push("de"); /* LSW -> stack, addr1 = hl */
-            push("hl");   // addr -> stack
+            push("hl");     // addr -> stack
             ol("push\tbc"); // addr2 -> stack
         } else {
            dcallrts("dpush_under_long",KIND_DOUBLE);
@@ -1497,13 +1497,13 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
     if (k == 0)
         return newsp;
     if ( (c_cpu & CPU_RABBIT) && abs(k) > 1 && abs(k) <= 127 ) {
-	/* Rabbit is 4 clocks so always makes sense to use this -pop
-	is 7 clocks */
+    /* Rabbit is 4 clocks so always makes sense to use this -pop
+    is 7 clocks */
         outstr("\tadd\tsp,"); outdec(k); nl();
         return newsp;
     }
     if ( (c_cpu & CPU_GBZ80) && abs(k) > 2 && abs(k) <= 127 ) {
-	/* gbz80 is 16 clocks, 2 bytes; pop xx is 12 clocks, 1 byte */
+    /* gbz80 is 16 clocks, 2 bytes; pop xx is 12 clocks, 1 byte */
         outstr("\tadd\tsp,"); outdec(k); nl();
         return newsp;
     }
@@ -2044,7 +2044,7 @@ static void quikmult(int type, int32_t size, char preserve)
                         ol("rl\te");
                         ol("rl\td");
                         ol("pop\tbc");
-                        ol("or\ta");
+                        ol("and\ta");
                         ol("sbc\thl,bc");
                         ol("pop\tbc");
                         ol("ex\tde,hl");
@@ -2264,7 +2264,7 @@ void zadd(LVALUE* lval)
     case KIND_CPTR:
         if ( c_speed_optimisation & OPT_ADD32 ) {
             if ( IS_808x() || IS_GBZ80() ) {
-                ol("pop\tbc");        /* 9 bytes, 54T */
+                ol("pop\tbc");      /* 9 bytes, 54T */
                 ol("add\thl,bc");
                 ol("pop\tbc");
                 ol("ld\ta,c");
@@ -2274,7 +2274,7 @@ void zadd(LVALUE* lval)
                 ol("adc\td");
                 ol("ld\td,a");
             } else {
-                ol("pop\tbc");        /* 7 bytes, 54T */
+                ol("pop\tbc");      /* 7 bytes, 54T */
                 ol("add\thl,bc");
                 ol("ex\tde,hl");
                 ol("pop\tbc");
@@ -2282,7 +2282,7 @@ void zadd(LVALUE* lval)
                 ol("ex\tde,hl");
             }
         } else {
-            callrts("l_long_add"); /* 3 bytes, 76 + 17 = 93T */
+            callrts("l_long_add");  /* 3 bytes, 76 + 17 = 93T */
         }
         Zsp += 4;
         break;
@@ -2295,7 +2295,7 @@ void zadd(LVALUE* lval)
         Zsp += c_fp_size;
         break;
     default:
-        ol("add\thl,de");	// 11T
+        ol("add\thl,de");           // 11T
     }
 }
 
@@ -4140,24 +4140,49 @@ void zeq_const(LVALUE *lval, int64_t value64)
             ol("scf");
             set_carry(lval);
         } else if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() && !IS_GBZ80() ) {
-            constbc(value % 65536); // 18 bytes or 14 with zero top word
-            ol("and\ta");
-            if ( IS_8085() ) ol("sub\thl,bc"); else ol("sbc\thl,bc");
-            if ( value / 65536 == 0 ) {
-                ol("jr\tnz,ASMPC+7");
-                ol("ld\ta,d");
-                ol("or\te");
-                ol("scf");
-                ol("jr\tz,ASMPC+3");
-                ol("and\ta");
-            } else {
-                ol("jr\tnz,ASMPC+11");
-                ol("ex\tde,hl");
-                constbc(value / 65536);
-                if ( IS_8085() ) ol("sub\thl,bc"); else ol("sbc\thl,bc");
-                ol("scf");
-                ol("jr\tz,ASMPC+3");
-                ol("and\ta");
+            constbc(value % 65536);
+            if ( IS_8085() ) {                  // 17 bytes or 14 with zero top word
+                if ( value / 65536 == 0 ) {
+                    ol("sub\thl,bc");
+                    ol("jp\tnz,ASMPC+9");
+                    ol("ld\ta,d");
+                    ol("or\te");
+                    ol("scf");
+                    ol("jp\tz,ASMPC+4");
+                    ol("and\ta");               // reset carry
+                } else {
+                    ol("sub\thl,bc");
+                    ol("jp\tnz,ASMPC+12");
+                    // Carry should still be reset if zero
+                    ol("ex\tde,hl");
+                    constbc(value / 65536);
+                    ol("sub\thl,bc");
+                    ol("scf");
+                    ol("jp\tz,ASMPC+4");
+                    ol("and\ta");               // reset carry
+                }
+            } else {                            // 18 bytes or 14 with zero top word
+                if ( value / 65536 == 0 ) {
+                    ol("and\ta");
+                    ol("sbc\thl,bc");
+                    ol("jr\tnz,ASMPC+7");
+                    ol("ld\ta,d");
+                    ol("or\te");
+                    ol("scf");
+                    ol("jr\tz,ASMPC+3");
+                    ol("and\ta");               // reset carry
+                } else {
+                    ol("and\ta");
+                    ol("sbc\thl,bc");
+                    ol("jr\tnz,ASMPC+11");
+                    // Carry should still be reset if zero
+                    ol("ex\tde,hl");
+                    constbc(value / 65536);
+                    ol("sbc\thl,bc");
+                    ol("scf");
+                    ol("jr\tz,ASMPC+3");
+                    ol("and\ta");               // reset carry
+                }
             }
             set_carry(lval);
         } else {
@@ -4296,26 +4321,51 @@ void zne_const(LVALUE *lval, int64_t value64)
             set_carry(lval);
         } else {
             if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() && !IS_GBZ80() ) {
-                ol("and\ta");   // 18 bytes, 14 bytes if zero top word
                 constbc(value % 65536);
-                if ( IS_8085() ) ol("sub\thl,bc"); else ol("sbc\thl,bc");
-                if ( value / 65536 == 0 ) {
-                    ol("jr\tnz,ASMPC+4");  // into scf
-                    ol("ld\ta,d");
-                    ol("or\te");
-                    ol("scf");
-                    ol("jr\tnz,ASMPC+3");
-                    ol("and\ta");
-                } else {
-                    ol("jr\tnz,ASMPC+8");  // into scf
-                    // Carry should still be reset if zero
-                    swap();
-                    constbc(value / 65536);
-                    if ( IS_8085() ) ol("sub\thl,bc"); else ol("sbc\thl,bc");
-                    ol("scf");
-                    ol("jr\tnz,ASMPC+3");  // into scf§
-                    ol("and\ta");   // Reset carry
-                    set_carry(lval);
+                if ( IS_8085() ) {              // 17 bytes, 14 bytes if zero top word
+                    if ( value / 65536 == 0 ) {
+                        ol("sub\thl,bc");
+                        ol("jp\tnz,ASMPC+5");   // into scf
+                        ol("ld\ta,d");
+                        ol("or\te");
+                        ol("scf");
+                        ol("jp\tnz,ASMPC+4");
+                        ol("and\ta");           // reset carry
+                    } else {
+                        ol("sub\thl,bc");
+                        ol("jp\tnz,ASMPC+8");   // into scf
+                        // Carry should still be reset if zero
+                        ol("ex\tde,hl");
+                        constbc(value / 65536);
+                        ol("sub\thl,bc");
+                        ol("scf");
+                        ol("jp\tnz,ASMPC+4");   // into scf
+                        ol("and\ta");           // reset carry
+                        set_carry(lval);
+                    }
+                } else {                        // 18 bytes, 14 bytes if zero top word
+                    if ( value / 65536 == 0 ) {
+                        ol("and\ta");
+                        ol("sbc\thl,bc");
+                        ol("jr\tnz,ASMPC+4");   // into scf
+                        ol("ld\ta,d");
+                        ol("or\te");
+                        ol("scf");
+                        ol("jr\tnz,ASMPC+3");
+                        ol("and\ta");           // reset carry
+                    } else {
+                        ol("and\ta");
+                        ol("sbc\thl,bc");
+                        ol("jr\tnz,ASMPC+8");   // into scf
+                        // Carry should still be reset if zero
+                        ol("ex\tde,hl");
+                        constbc(value / 65536);
+                        ol("sbc\thl,bc");
+                        ol("scf");
+                        ol("jr\tnz,ASMPC+3");   // into scf
+                        ol("and\ta");           // reset carry
+                        set_carry(lval);
+                    }
                 }
             } else {
                 lpush();  // 11 bytes
@@ -5415,14 +5465,14 @@ void gen_builtin_memcpy(int32_t src, int32_t n)
         ol("push\tde");
         Zsp += 2;
         outstr("\tld\tbc,"); outdec(n % 65536); nl();
-	ol("ldir");
+    ol("ldir");
     } else {
         /* hl is dst */
         ol("push\thl");
         ol("ex\tde,hl");
         outstr("\tld\thl,"); outdec(src % 65536); nl();
         outstr("\tld\tbc,"); outdec(n % 65536); nl();
-	ol("ldir");
+    ol("ldir");
     }
     ol("pop\thl");
 }

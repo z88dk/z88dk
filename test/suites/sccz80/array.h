@@ -23,7 +23,6 @@ static unsigned long array_long[4] = {TL(0), TL(1), TL(2), TL(3)};
 static volatile unsigned TYPE idx;
 static volatile unsigned TYPE idx2;
 
-#ifndef __SDCC_pdk14 // Not enough RAM for all the temporaries.
   idx = 2;
 
   ASSERT(array_const_char[idx] == TC(2));
@@ -58,6 +57,5 @@ static volatile unsigned TYPE idx2;
   ASSERT(array_char[idx2] == (TC(3) | 0x80));
   ASSERT(array_int [idx2] == (TI(3) | 0x8080));
   ASSERT(array_long[idx2] == (TL(3) | 0x80808080));
-#endif
 }
 

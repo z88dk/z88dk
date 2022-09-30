@@ -10,7 +10,7 @@ PUBLIC    l_long_asr
 PUBLIC    l_long_asro
 
 ; Entry:    dehl = long
-;        c = shift couter
+;           c = shift counter
 .l_long_asro
     ld      a,c
     jp      entry
