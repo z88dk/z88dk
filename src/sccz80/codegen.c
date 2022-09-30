@@ -4140,9 +4140,9 @@ void zeq_const(LVALUE *lval, int64_t value64)
             ol("scf");
             set_carry(lval);
         } else if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() && !IS_GBZ80() ) {
-            constbc(value % 65536);
+            constbc((uint32_t)value % 65536);
             if ( IS_8085() ) {                  // 17 bytes or 14 with zero top word
-                if ( value / 65536 == 0 ) {
+                if ( (uint32_t)value / 65536 == 0 ) {
                     ol("sub\thl,bc");
                     ol("jp\tnz,ASMPC+9");
                     ol("ld\ta,d");
@@ -4155,14 +4155,14 @@ void zeq_const(LVALUE *lval, int64_t value64)
                     ol("jp\tnz,ASMPC+12");
                     // Carry should still be reset if zero
                     ol("ex\tde,hl");
-                    constbc(value / 65536);
+                    constbc((uint32_t)value / 65536);
                     ol("sub\thl,bc");
                     ol("scf");
                     ol("jp\tz,ASMPC+4");
                     ol("and\ta");               // reset carry
                 }
             } else {                            // 18 bytes or 14 with zero top word
-                if ( value / 65536 == 0 ) {
+                if ( (uint32_t)value / 65536 == 0 ) {
                     ol("and\ta");
                     ol("sbc\thl,bc");
                     ol("jr\tnz,ASMPC+7");
@@ -4177,7 +4177,7 @@ void zeq_const(LVALUE *lval, int64_t value64)
                     ol("jr\tnz,ASMPC+11");
                     // Carry should still be reset if zero
                     ol("ex\tde,hl");
-                    constbc(value / 65536);
+                    constbc((uint32_t)value / 65536);
                     ol("sbc\thl,bc");
                     ol("scf");
                     ol("jr\tz,ASMPC+3");
@@ -4321,9 +4321,9 @@ void zne_const(LVALUE *lval, int64_t value64)
             set_carry(lval);
         } else {
             if ( c_speed_optimisation & OPT_LONG_COMPARE && !IS_8080() && !IS_GBZ80() ) {
-                constbc(value % 65536);
+                constbc((uint32_t)value % 65536);
                 if ( IS_8085() ) {              // 17 bytes, 14 bytes if zero top word
-                    if ( value / 65536 == 0 ) {
+                    if ( (uint32_t)value / 65536 == 0 ) {
                         ol("sub\thl,bc");
                         ol("jp\tnz,ASMPC+5");   // into scf
                         ol("ld\ta,d");
@@ -4336,15 +4336,14 @@ void zne_const(LVALUE *lval, int64_t value64)
                         ol("jp\tnz,ASMPC+8");   // into scf
                         // Carry should still be reset if zero
                         ol("ex\tde,hl");
-                        constbc(value / 65536);
+                        constbc((uint32_t)value / 65536);
                         ol("sub\thl,bc");
                         ol("scf");
                         ol("jp\tnz,ASMPC+4");   // into scf
                         ol("and\ta");           // reset carry
-                        set_carry(lval);
                     }
                 } else {                        // 18 bytes, 14 bytes if zero top word
-                    if ( value / 65536 == 0 ) {
+                    if ( (uint32_t)value / 65536 == 0 ) {
                         ol("and\ta");
                         ol("sbc\thl,bc");
                         ol("jr\tnz,ASMPC+4");   // into scf
@@ -4359,14 +4358,14 @@ void zne_const(LVALUE *lval, int64_t value64)
                         ol("jr\tnz,ASMPC+8");   // into scf
                         // Carry should still be reset if zero
                         ol("ex\tde,hl");
-                        constbc(value / 65536);
+                        constbc((uint32_t)value / 65536);
                         ol("sbc\thl,bc");
                         ol("scf");
                         ol("jr\tnz,ASMPC+3");   // into scf
                         ol("and\ta");           // reset carry
-                        set_carry(lval);
                     }
                 }
+                set_carry(lval);
             } else {
                 lpush();  // 11 bytes
                 vlongconst(value);
