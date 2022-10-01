@@ -24,4 +24,15 @@ sp1_PrintAtInv:
    inc hl
    ld d,(hl)
    
-   jp asm_sp1_PrintAtInv
+;   jp asm_sp1_PrintAtInv
+   push ix
+   call asm_sp1_PrintAtInv
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PrintAtInv
+defc _sp1_PrintAtInv = sp1_PrintAtInv
+ENDIF
+

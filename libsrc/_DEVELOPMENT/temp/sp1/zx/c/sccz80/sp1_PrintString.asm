@@ -21,5 +21,15 @@ sp1_PrintString:
    ld h,(hl)
    ld l,a                    ; hl = & struct sp1_pss
 
-   jp asm_sp1_PrintString
+;   jp asm_sp1_PrintString
+   push ix
+   call asm_sp1_PrintString
+   pop ix
+   ret
    
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PrintString
+defc _sp1_PrintString = sp1_PrintString
+ENDIF
+

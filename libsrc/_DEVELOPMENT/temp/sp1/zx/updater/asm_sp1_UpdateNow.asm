@@ -20,13 +20,17 @@ EXTERN SP1DrawUpdateStruct
 
 asm_sp1_UpdateNow:
 
+   push ix
+   push iy
+
    ld hl,(SP1V_UPDATELISTH+6) ; get the first struct update char to draw
    ld a,l
    ld l,h
    ld h,a                    ; correct endianness
    or a
    jp nz, updatelp
-   ret                       ; if empty update list
+
+   jr all_return              ; if empty update list
 
 .skipthischar
 
@@ -70,4 +74,8 @@ asm_sp1_UpdateNow:
    ld (SP1V_UPDATELISTH+6),a ; mark update list empty
    ld hl,SP1V_UPDATELISTH
    ld (SP1V_UPDATELISTT),hl
+
+all_return:
+   pop iy
+   pop ix
    ret

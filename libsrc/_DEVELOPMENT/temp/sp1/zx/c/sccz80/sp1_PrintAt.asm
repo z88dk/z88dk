@@ -24,4 +24,15 @@ sp1_PrintAt:
    inc hl
    ld d,(hl)
    
-   jp asm_sp1_PrintAt
+;   jp asm_sp1_PrintAt
+   push ix
+   call asm_sp1_PrintAt
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_PrintAt
+defc _sp1_PrintAt = sp1_PrintAt
+ENDIF
+

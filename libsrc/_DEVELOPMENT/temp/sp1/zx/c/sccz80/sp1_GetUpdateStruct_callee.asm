@@ -14,4 +14,15 @@ sp1_GetUpdateStruct_callee:
    ex (sp),hl
    ld d,l
 
-   jp asm_sp1_GetUpdateStruct
+;   jp asm_sp1_GetUpdateStruct
+   push ix
+   call asm_sp1_GetUpdateStruct
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_GetUpdateStruct_callee
+defc _sp1_GetUpdateStruct_callee = sp1_GetUpdateStruct_callee
+ENDIF
+

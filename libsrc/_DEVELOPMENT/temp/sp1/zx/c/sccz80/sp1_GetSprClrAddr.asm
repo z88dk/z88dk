@@ -16,4 +16,15 @@ sp1_GetSprClrAddr:
    push de
    push bc
    
-   jp asm_sp1_GetSprClrAddr
+;   jp asm_sp1_GetSprClrAddr
+   push ix
+   call asm_sp1_GetSprClrAddr
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_GetSprClrAddr
+defc _sp1_GetSprClrAddr = sp1_GetSprClrAddr
+ENDIF
+

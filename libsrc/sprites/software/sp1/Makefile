@@ -5,25 +5,23 @@ default: sp1-all
 sp1-all:
 	@echo
 	@echo --- SP1 Software Sprite Engine ---
-	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1 @spectrum.lst
+	# newlib and sccz80 + classic libraries
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1-ts2068 @ts2068hr.lst
 	$(LIBLINKER) -x$(OUTPUT_DIRECTORY)/sp1-zx81hr -IXIY @zx81hr.lst
-
+	# sdcc + classic library
+	make -C zx all
+	cp zx/sp1-zx.lib $(OUTPUT_DIRECTORY)
 
 clean:
+	@make -s -C zx clean
 	$(RM) *.o
-	$(RM) spectrum/sprites/*.o
-	$(RM) spectrum/sprites/draw/*.o
-	$(RM) spectrum/tiles/*.o
-	$(RM) spectrum/updater/*.o
-	$(RM) spectrum/sp1.lib
-	$(RM) ts2068hr/sprites/*.o
-	$(RM) ts2068hr/sprites/draw/*.o
-	$(RM) ts2068hr/tiles/*.o
-	$(RM) ts2068hr/updater/*.o
-	$(RM) ts2068hr/sp1.lib
-	$(RM) zx81hr/sprites/*.o
-	$(RM) zx81hr/sprites/draw/*.o
-	$(RM) zx81hr/tiles/*.o
-	$(RM) zx81hr/updater/*.o
-	$(RM) zx81hr/sp1.lib
+	$(RM) deprecated/ts2068hr/sprites/*.o
+	$(RM) deprecated/ts2068hr/sprites/draw/*.o
+	$(RM) deprecated/ts2068hr/tiles/*.o
+	$(RM) deprecated/ts2068hr/updater/*.o
+	$(RM) deprecated/ts2068hr/sp1.lib
+	$(RM) deprecated/zx81hr/sprites/*.o
+	$(RM) deprecated/zx81hr/sprites/draw/*.o
+	$(RM) deprecated/zx81hr/tiles/*.o
+	$(RM) deprecated/zx81hr/updater/*.o
+	$(RM) deprecated/zx81hr/sp1.lib

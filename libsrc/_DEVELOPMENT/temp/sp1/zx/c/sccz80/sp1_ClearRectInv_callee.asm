@@ -29,4 +29,15 @@ sp1_ClearRectInv_callee:
    ld c,(hl)
    pop hl   
 
-   jp asm_sp1_ClearRectInv
+;   jp asm_sp1_ClearRectInv
+   push ix              ; save/restore IX, it's garbled by asm function
+   call asm_sp1_ClearRectInv
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_ClearRectInv_callee
+defc _sp1_ClearRectInv_callee = sp1_ClearRectInv_callee
+ENDIF
+

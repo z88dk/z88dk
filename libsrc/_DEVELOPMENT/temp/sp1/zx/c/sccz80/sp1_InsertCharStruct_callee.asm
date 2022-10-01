@@ -17,4 +17,15 @@ sp1_InsertCharStruct_callee:
    ex (sp),hl
    ex de,hl
 
-   jp asm_sp1_InsertCharStruct
+;   jp asm_sp1_InsertCharStruct
+   push ix
+   call asm_sp1_InsertCharStruct
+   pop ix
+   ret
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _sp1_InsertCharStruct_callee
+defc _sp1_InsertCharStruct_callee = sp1_InsertCharStruct_callee
+ENDIF
+
