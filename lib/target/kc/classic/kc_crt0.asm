@@ -71,7 +71,7 @@ IF !DEFINED_nosound
     ld      hl,INT01E4
     ld      ($01E4),hl
 
-    ; Cassete output
+    ; Cassette output
     ld      hl,($01EA)
     ld      (INT01EA+7),hl
     ld      hl,INT01EA
@@ -115,7 +115,7 @@ IF !DEFINED_nosound
         ld      hl,(INT01E4+7)
         ld      ($01E4),hl
 
-        ; Cassete output
+        ; Cassette output
         ld      hl,(INT01EA+7)
         ld      ($01EA),hl
 ENDIF
