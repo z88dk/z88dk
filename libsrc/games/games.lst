@@ -26,6 +26,9 @@ games/obj/${TARGET}/bit_noise_callee
 games/obj/${TARGET}/playzb4_big
 games/obj/${TARGET}/__bit_irqstatus
 games/obj/${TARGET}/__snd_tick
+games/obj/${TARGET}/bit_save_zx
+games/obj/${TARGET}/bit_save_block_zx
+games/obj/${TARGET}/bit_save_block_zx_callee
 games/obj/${TARGET}/bit_open
 games/obj/${TARGET}/bit_open_di
 games/obj/${TARGET}/bit_close
