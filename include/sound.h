@@ -109,6 +109,16 @@ extern void __LIB__ playzb4(unsigned char *SamStart, unsigned int SamLen) __smal
 #endif
 
 
+/* DATA Save - ZX Spectrum style */
+
+extern int  __LIB__            bit_save_zx(char *name, size_t loadstart,void *start, size_t len) __smallc;
+extern int  __LIB__            bit_save_block_zx(void *addr, size_t len, unsigned char type) __smallc;
+
+extern int  __LIB__  bit_save_block_zx_callee(void *addr, size_t len, unsigned char type) __smallc __z88dk_callee;
+
+#define bit_save_block_zx(a,b,c) bit_save_block_zx_callee(a,b,c)
+
+
 /* Platform specific parameters (mainly timing stuff) 
 
    The BEEP_TSTATES constant is obtained by dividing the
