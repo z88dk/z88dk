@@ -6,12 +6,51 @@ z88dk v2.3 - xx.xx.202x
 
 Detailed but incomplete changelist:
 
-- [sccz80] 8085, 8085, and gbz80 inlined add32, sub32, quikmult
-
-
-
+- [classic] +cpm: support for corvette boot disk
+- [classic] +msx: tape libraries for MSX and Spectravideo
+- [classic] Shared SP1 between classic and newlib
+- [sccz80] 8080, 8085, gbz80 opt-code-speed: add32, sub32, longcompare
+- [sccz80] Extended quikmult cases
+- [z80asm] Allow jr across sections
+- [zcc] +config at any place, support for -xc
+- [make] add cmake support
 
 z88dk v2.2 - 23.07.2022
+
+As usual, there's 100s of changes, the major features for this release include:
+
+* Source code debugging support for programs compiled with sccz80
+* Enhanced and optimised 8080/8085/gbz80 support
+* Macros and improvements to z80asm
+* <features.h> for cross target compatibility
+* SDCC has been upgraded to v4.2.0 r13131
+
+Targets added or improved significantly in this release are:
+
+* Sam Coupé (+sam)
+* PC88 (+pc88)
+* Micro85 (+micro85)
+* Radio 86 (+radio86)
+* Bondwell 2 (via +cpm)
+* PTC Sol 20 (+sol20)
+* GSX Graphics (+cpm)
+* RC2014 8085 support (+rc2014)
+
+Some Additional Details
+
+* z88dk-gdb - IDE debugging is now supported using CLion/VSCode with MAME, or FUSE (Spectrum Emulator).
+
+* z88dk-z80asm - Is now a MACRO assembler, supporting all of the classic macro assembly key words. Additionally many synthetic instructions have been added across all platforms. A new FLOAT directive allows the assembly of floating point numbers in any one of the library's formats. The Intel 8085 undocumented instructions are now supported, as are all Z80N extension instructions.
+
+* z88dk-zsdcc - The latest stable release SDCC 4.2.0 has been patched to support z88dk and is included. The traditional z88dk calling conventions (__z88dk_fastcall & __z88dk_callee) have been retained.
+
+* Further integration of the classic and new libraries has been completed. To a large extent Z80 machines now share the same code base across both libraries. For the other machine types found in the classic library (I8080, I8085, and GBZ80) code has been organised for hierarchical inheritance, rewritten to be re-entrant, and provide callee support wherever possible.
+
+* The floating point maths libraries have been extended, with the Microsoft mbf32 library receiving code optimisation paths with I8085 and Z80 specific instructions. The IEEE single-precision math32 Z80 support has been further performance optimised. The am9511 APU maths library now works with I8085 CPUs and the classic library.
+
+* Improved or new support for many machines including the GL6000, the homebrew Micro85, the Radio86 family, the SAM support was extensively reworked, the NEC PC-88 video was reworked, and support for the PTC Sol 20 was added. Support for the RC2014 using the I8085 CPU was added, making use of the tighter integration between classic and new libraries. The CP/M target has been extended to support disc creation for Amstrad, Televideo, and Bondwell systems, and Amstrad PCW Graphics support was added. A generalised CP/M GSX graphics library is also now available.
+
+* And finally, building z88dk from source on ARM64 (AArch64) architecture (eg Apple M1, or Raspberry Pi 3 or later) is now supported, enabling a new generation of host systems.
 
 Detailed but incomplete changelist:
 
@@ -20,7 +59,7 @@ Detailed but incomplete changelist:
 - [appmake] Compressed ROM data sections can now use zx0
 - [classic] features.h added for improved portability
 - [classic] ZX0,1,2 decompression functions added
-- [classic] math MBF32: 8085 and Z80 instruction optimisation
+- [classic] math MBF32: 8085 and z80 instruction optimisation
 - [classic] math AM9511: support for 8085
 - [classic] sccz80 8080, 8085, gbz80 l_ primitive reentrancy
 - [classic] string function loop overhead optimisation
@@ -62,6 +101,41 @@ Detailed but incomplete changelist:
 - [zsdcc] Upgraded to SDCC 4.2.0 r13131
 
 z88dk v2.1 - 07.02.2021
+
+As usual there's hundreds of changes ranging from more targets, to changes to speed up compilation and smoothing the development experience, some highlights:
+
+There's new support for a bunch of 808x (and other) machines:
+
+* Altair8800
+* DAI32
+* Homelab 2 and Homelab3/4
+* Krokha
+* LM80-C homebrew machine
+* Lviv/Lvov PK-01
+* Ondra Vili
+* Specialist
+* Vector 06c
+* Spectrum Next
+
+There's also been some work around floating point again:
+
+* A 16 bit IEEE754 maths library
+* DAI 8080 maths library (classic)
+* AM9511 support (newlib)
+
+To create some noise, there's some tracker changes:
+
+* Imported WYZplayer (AY)
+* Imported Vortex Tracker2 (AY)
+* PSGlib is now available for other targets (SN76489)
+
+The toolchain has had some improvements too:
+
+* zsdcc has been updated to sdcc 4.0.7 r12036
+* sccz80 supports long long data types
+* Concurrent builds from same directory are now supported
+* Banking/MegaROMs supported on several targets
+* Linking is now significantly faster on Windows
 
 Detailed but incomplete changelist:
 
