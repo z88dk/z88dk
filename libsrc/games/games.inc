@@ -382,19 +382,6 @@ IFNDEF SOUND_ONEBIT_port
         defc SOUND_ONEBIT_mask   = 0
 ENDIF
 
-IFNDEF PLAY_DATA_LEAD
-        defc PLAY_DATA_LEAD    = $A3	; ($A4) Timing for the leading tone
-
-        defc PLAY_DATA_SYNC1   = $2D	; ($2F) Sync bit
-        defc PLAY_DATA_SYNC2   = $35	; ($37)
-        defc PLAY_DATA_SYNC3   = $38	; ($3B)
-
-        defc PLAY_DATA_BIT1    = $41	; ($42) Delay for bit 1 uses both PLAY_DATA_BIT0 and PLAY_DATA_BIT1
-        defc PLAY_DATA_BIT0    = $3D	; ($3E)
-        defc PLAY_DATA_BYTE    = $30	; ($31) Tuned delay for switching to the next byte
-ENDIF
-
-
 MACRO ONEBITOUT
 LOCAL l1, l2, l3, l4
 IF SOUND_INOUT = 1
