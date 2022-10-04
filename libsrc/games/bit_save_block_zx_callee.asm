@@ -17,6 +17,11 @@ EXTERN  bit_open_di
 EXTERN  bit_close_ei
 EXTERN  __snd_tick
 
+IF __CPU_GBZ80__ || __CPU_INTEL__
+.bit_save_block_zx_callee
+._bit_save_block_zx_callee
+    ret
+ELSE
 
 .bit_save_block_zx_callee
 ._bit_save_block_zx_callee
@@ -184,3 +189,6 @@ ENDIF
 .SA_DELAY
         DJNZ    SA_DELAY
         RET
+
+
+ENDIF
