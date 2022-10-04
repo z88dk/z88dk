@@ -29,6 +29,8 @@ games/obj/${TARGET}/__snd_tick
 games/obj/${TARGET}/bit_save_zx
 games/obj/${TARGET}/bit_save_block_zx
 games/obj/${TARGET}/bit_save_block_zx_callee
+games/obj/${TARGET}/bit_save_msx
+games/obj/${TARGET}/bit_save_msx_callee
 games/obj/${TARGET}/bit_open
 games/obj/${TARGET}/bit_open_di
 games/obj/${TARGET}/bit_close
