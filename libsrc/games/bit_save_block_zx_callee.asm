@@ -20,6 +20,7 @@ EXTERN  __snd_tick
 IF __CPU_GBZ80__ || __CPU_INTEL__
 .bit_save_block_zx_callee
 ._bit_save_block_zx_callee
+.asm_bit_save_block_zx
     ret
 ELSE
 
