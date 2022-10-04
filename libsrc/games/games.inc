@@ -376,6 +376,7 @@ IF FORpencil2
     defc INPUT_JOY_useinkey = 1
 ENDIF
 
+
 IFNDEF SOUND_ONEBIT_port
         defc SOUND_ONEBIT_port   = 0
         defc SOUND_ONEBIT_bit    = 0
@@ -392,6 +393,16 @@ IFNDEF PLAY_DATA_LEAD
         defc PLAY_DATA_BIT1    = $41	; ($42) Delay for bit 1 uses both PLAY_DATA_BIT0 and PLAY_DATA_BIT1
         defc PLAY_DATA_BIT0    = $3D	; ($3E)
         defc PLAY_DATA_BYTE    = $30	; ($31) Tuned delay for switching to the next byte
+ENDIF
+
+IFNDEF PLAY_MSXDATA_HI
+       defc PLAY_MSXDATA_HI    = 11558    ; 1200 baud, High tone period
+       defc PLAY_MSXDATA_LO    = 23635    ; 1200 baud, Low tone period
+       defc PLAY_MSXDATA_HDR   = 15       ; 1200 baud, leading tone cycle count
+
+       ;defc PLAY_MSXDATA_HI    = 5646    ; 2400 baud, High tone period
+       ;defc PLAY_MSXDATA_LO    = 11557   ; 2400 baud, Low tone period
+       ;defc PLAY_MSXDATA_HDR   = 31      ; 2400 baud, leading tone cycle count
 ENDIF
 
 
