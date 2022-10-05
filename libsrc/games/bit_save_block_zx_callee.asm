@@ -108,7 +108,7 @@ ENDIF
 
 		ONEBITOUT				; MIC off
 
-		LD      B,PLAY_DATA_SYNC3
+		LD      B,PLAY_DATA_SYNC2+PLAY_DATA_BIAS
 		ld      c,a				; 'MIC off'
 		xor  SOUND_ONEBIT_mask
 		
@@ -151,7 +151,7 @@ ENDIF
 
         JR      NC,SA_OUT		; Jump, taking the shorter path, if saving a '0'.
 
-        LD      B,PLAY_DATA_BIT1	; However if saving a '1' then add 855 T states.
+        LD      B,PLAY_DATA_BIT0+PLAY_DATA_BIAS	; However if saving a '1' then add 855 T states.
 
 .SA_SET
         DJNZ    SA_SET
@@ -174,7 +174,7 @@ ENDIF
 
         DEC     DE
         INC     IX
-        LD      B,PLAY_DATA_BYTE			; Set the timing constant for the first bit of the next byte.
+        LD      B,PLAY_DATA_SYNC1			; Set the timing constant for the first bit of the next byte.
 
 ;        LD      A,$7F			; Return (to SA_LD_RET) if the BREAK key is being pressed.
 ;        IN      A,($FE)
@@ -185,7 +185,7 @@ ENDIF
         INC     A				; ..even if it has reached zero (so as to send the 'parity' byte).
         JP      NZ,SA_LOOP
 
-        LD      B,PLAY_DATA_SYNC3			; Exit when the 'counter' reaches +FFFF. But first give a short delay.
+        LD      B,PLAY_DATA_SYNC2+PLAY_DATA_BIAS			; Exit when the 'counter' reaches +FFFF. But first give a short delay.
 
 .SA_DELAY
         DJNZ    SA_DELAY
