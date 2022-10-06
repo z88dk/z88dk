@@ -1,4 +1,4 @@
-; $Id: beeper.asm,v 1.6 2016-04-23 21:06:31 dom Exp $
+; $Id: beeper.asm $
 ;
 ; Generic 1 bit sound functions
 ;
@@ -8,11 +8,6 @@
     PUBLIC     _beeper
     INCLUDE  "games/games.inc"
 
-IF __CPU_GBZ80__ || __CPU_INTEL__
-beeper:
-_beeper:
-    ret
-ELSE
     ;EXTERN      bit_open_di
     ;EXTERN      bit_close_ei	
     EXTERN      __snd_tick
@@ -29,11 +24,14 @@ ELSE
 
 .beeper
 ._beeper
+IF __CPU_GBZ80__ || __CPU_INTEL__
+ELSE
     push	ix
 IF SOUND_ONEBIT_port >= 256
     exx
     ld   bc,SOUND_ONEBIT_port
     exx
+ENDIF
 ENDIF
     ld   a,l
     srl  l
@@ -42,8 +40,14 @@ ENDIF
     and  3
     ld   c,a
     ld   b,0
+IF __CPU_GBZ80__ || __CPU_INTEL__
+	push hl
+    ld   hl,beixp3
+    add  hl,bc
+ELSE
     ld   ix,beixp3
     add  ix,bc
+ENDIF
     ;call bit_open_di
     ld	a,(__snd_tick)
 
@@ -53,6 +57,9 @@ ENDIF
     nop
     inc  b
     inc  c
+IF __CPU_GBZ80__ || __CPU_INTEL__
+	ex (sp),hl
+ENDIF
 .behllp   dec  c
     jr   nz,behllp
     ld   c,$3F
@@ -73,14 +80,27 @@ ENDIF
     ld   a,c
     ld   c,l
     dec  de
+IF __CPU_GBZ80__ || __CPU_INTEL__
+	ex (sp),hl
+    jp   (hl)
+ELSE
     jp   (ix)
+ENDIF
 .be_again
     ld   c,l
     inc  c
+IF __CPU_GBZ80__ || __CPU_INTEL__
+	ex (sp),hl
+    jp   (hl)
+ELSE
     jp   (ix)
+ENDIF
 .be_end
+IF __CPU_GBZ80__ || __CPU_INTEL__
+    pop	hl
+ELSE
     pop	ix
+ENDIF
     ;call   bit_close_ei
     ret
 
-ENDIF
