@@ -24,18 +24,31 @@
 
 .beeper
 ._beeper
+
 IF __CPU_GBZ80__ || __CPU_INTEL__
+    ld   a,l
+    and a
+    rra
+    and a
+    rra
+    ld   c,a
+    ld   a,l
+    ld   l,c
+
 ELSE
+
     push	ix
 IF SOUND_ONEBIT_port >= 256
     exx
     ld   bc,SOUND_ONEBIT_port
     exx
 ENDIF
-ENDIF
     ld   a,l
     srl  l
     srl  l
+
+ENDIF
+
     cpl
     and  3
     ld   c,a
@@ -72,7 +85,12 @@ ENDIF
 
     ld   b,h
     ld   c,a
+IF __CPU_GBZ80__ || __CPU_INTEL__
+	and  SOUND_ONEBIT_mask
+	ld a,c
+ELSE
     bit  SOUND_ONEBIT_bit,a            ;if o/p go again!
+ENDIF
     jr   nz,be_again
     ld   a,d
     or   e
