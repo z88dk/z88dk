@@ -307,5 +307,10 @@ extern int __LIB__              exos_display_page(int channel, int first_row, in
 extern int __LIB__  exos_reset_font(int channel) __z88dk_fastcall;
 
 
+// TAPE I/O
+
+extern int  __LIB__  tape_save_block(void *addr, size_t len, unsigned char type) __smallc;
+extern int  __LIB__  tape_load_block(void *addr, size_t len, unsigned char type) __smallc;
+
 
 #endif
