@@ -18,6 +18,16 @@ IF FORc128
         defc SOUND_ONEBIT_port   = 54296	; $D418: addres is a word: uses a special lib version
         defc SOUND_ONEBIT_bit    = 3
         defc SOUND_ONEBIT_mask   = 15
+		;----
+        defc PLAY_DATA_LEAD    = 93   ; (164) Timing for the leading tone
+        defc PLAY_DATA_SYNC1   = 26    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
+        defc PLAY_DATA_BIAS    = 2     ; Fine tuning the parameters
+        defc PLAY_DATA_SYNC2   = 31    ; (55, 59)
+        defc PLAY_DATA_BIT0    = 34    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
+        defc PLAY_MSXDATA_HI     = 6457    ; 1200 baud, High tone period
+        defc PLAY_MSXDATA_LO     = 13204   ; 1200 baud, Low tone period
+        defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
+		;----
 ENDIF
 
 IF FORzx
@@ -123,6 +133,16 @@ IF FORp2000
         defc SOUND_ONEBIT_port   = 80
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 1
+		;----
+        defc PLAY_DATA_LEAD    = 119   ; (164) Timing for the leading tone
+        defc PLAY_DATA_SYNC1   = 33    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
+        defc PLAY_DATA_BIAS    = 3     ; Fine tuning the parameters
+        defc PLAY_DATA_SYNC2   = 39    ; (55, 59)
+        defc PLAY_DATA_BIT0    = 44    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
+        defc PLAY_MSXDATA_HI     = 8475    ; 1200 baud, High tone period
+        defc PLAY_MSXDATA_LO     = 17332   ; 1200 baud, Low tone period
+        defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
+		;----
 ENDIF
 
 IF FORpc88
@@ -145,12 +165,32 @@ IF FORti82
         defc SOUND_ONEBIT_port   = 0
         defc SOUND_ONEBIT_bit    = 2
         defc SOUND_ONEBIT_mask   = @00111100
+		;----
+        defc PLAY_DATA_LEAD    = 279   ; (164) Timing for the leading tone
+        defc PLAY_DATA_SYNC1   = 77    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
+        defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
+        defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
+        defc PLAY_DATA_BIT0    = 104   ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
+        defc PLAY_MSXDATA_HI     = 19813    ; 1200 baud, High tone period
+        defc PLAY_MSXDATA_LO     = 40517    ; 1200 baud, Low tone period
+        defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
+		;----
 ENDIF
 
 IF FORti83
         defc SOUND_ONEBIT_port   = 0
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 3
+		;----
+        defc PLAY_DATA_LEAD    = 279   ; (164) Timing for the leading tone
+        defc PLAY_DATA_SYNC1   = 77    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
+        defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
+        defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
+        defc PLAY_DATA_BIT0    = 104   ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
+        defc PLAY_MSXDATA_HI     = 19813    ; 1200 baud, High tone period
+        defc PLAY_MSXDATA_LO     = 40517    ; 1200 baud, Low tone period
+        defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
+		;----
 ENDIF
 
 ; Confusing name
@@ -158,12 +198,32 @@ IF FORti8x
         defc SOUND_ONEBIT_port   = 0
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 3
+		;----
+        defc PLAY_DATA_LEAD    = 279   ; (164) Timing for the leading tone
+        defc PLAY_DATA_SYNC1   = 77    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
+        defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
+        defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
+        defc PLAY_DATA_BIT0    = 104   ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
+        defc PLAY_MSXDATA_HI     = 19813    ; 1200 baud, High tone period
+        defc PLAY_MSXDATA_LO     = 40517    ; 1200 baud, Low tone period
+        defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
+		;----
 ENDIF
 
 IF FORti85
         defc SOUND_ONEBIT_port   = 7
         defc SOUND_ONEBIT_bit    = 2
         defc SOUND_ONEBIT_mask   = @00111100
+		;----
+        defc PLAY_DATA_LEAD    = 279   ; (164) Timing for the leading tone
+        defc PLAY_DATA_SYNC1   = 77    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
+        defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
+        defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
+        defc PLAY_DATA_BIT0    = 104   ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
+        defc PLAY_MSXDATA_HI     = 19813    ; 1200 baud, High tone period
+        defc PLAY_MSXDATA_LO     = 40517    ; 1200 baud, Low tone period
+        defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
+		;----
 ENDIF
 
 
@@ -171,6 +231,16 @@ IF FORti86
         defc SOUND_ONEBIT_port   = 7
         defc SOUND_ONEBIT_bit    = 2
         defc SOUND_ONEBIT_mask   = @00111100
+		;----
+        defc PLAY_DATA_LEAD    = 279   ; (164) Timing for the leading tone
+        defc PLAY_DATA_SYNC1   = 77    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
+        defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
+        defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
+        defc PLAY_DATA_BIT0    = 104   ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
+        defc PLAY_MSXDATA_HI     = 19813    ; 1200 baud, High tone period
+        defc PLAY_MSXDATA_LO     = 40517    ; 1200 baud, Low tone period
+        defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
+		;----
 ENDIF
 
 IF FORtrs80
@@ -237,12 +307,32 @@ IF FORz9001
         defc SOUND_ONEBIT_port   = 136
         defc SOUND_ONEBIT_bit    = 7
         defc SOUND_ONEBIT_mask   = 128
+		;----
+        defc PLAY_DATA_LEAD    = 119   ; (164) Timing for the leading tone
+        defc PLAY_DATA_SYNC1   = 33    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
+        defc PLAY_DATA_BIAS    = 3     ; Fine tuning the parameters
+        defc PLAY_DATA_SYNC2   = 39    ; (55, 59)
+        defc PLAY_DATA_BIT0    = 44    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
+        defc PLAY_MSXDATA_HI     = 8475    ; 1200 baud, High tone period
+        defc PLAY_MSXDATA_LO     = 17332   ; 1200 baud, Low tone period
+        defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
+		;----
 ENDIF
 
 IF FORbee
         defc SOUND_ONEBIT_port   = 2
         defc SOUND_ONEBIT_bit    = 6
         defc SOUND_ONEBIT_mask   = 64
+		;----
+        defc PLAY_DATA_LEAD    = 93   ; (164) Timing for the leading tone
+        defc PLAY_DATA_SYNC1   = 26    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
+        defc PLAY_DATA_BIAS    = 2     ; Fine tuning the parameters
+        defc PLAY_DATA_SYNC2   = 31    ; (55, 59)
+        defc PLAY_DATA_BIT0    = 34    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
+        defc PLAY_MSXDATA_HI     = 6457    ; 1200 baud, High tone period
+        defc PLAY_MSXDATA_LO     = 13204   ; 1200 baud, Low tone period
+        defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
+		;----
 ENDIF
 
 IF FORaussie

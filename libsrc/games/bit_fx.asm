@@ -55,11 +55,7 @@ ENDIF
     defw    fx2           ; effect #0
     defw    fx5
     defw    fx6
-IF __CPU_INTEL__
-    defw    aret
-ELSE
     defw    zap0
-ENDIF
     defw    zap1
     defw    clackson
     defw    zap3
@@ -130,30 +126,32 @@ ENDIF
           
           
 ;Eating sound
-IF !__CPU_INTEL__
 .zap0     
     call  bit_open_di
     ld    h,4
-.zap0_1   
-    ld    b,(hl)  
-    dec   hl  
-.zap0_2   
-    djnz  zap0_2  
+.zap0_1
+    ld    b,(hl)
+    dec   hl
+.zap0_2
+IF __CPU_INTEL__
+    dec   b
+    jp    nz,zap0_2
+ELSE
+    djnz  zap0_2
+ENDIF
 
     ONEBITOUT
 
     xor   SOUND_ONEBIT_mask
-    ex    af,af
-    ld    a,h  
+	
+	ld    e,a
+    ld    a,h
     or    l
     jr    z,zap0_3
-    ex    af,af
-    jr    zap0_1  
-.zap0_3   
+	ld    a,e
+    jr    zap0_1
+.zap0_3
     jp    bit_close_ei
-ELSE
-aret:   ret
-ENDIF
 
           
 ;Clackson sound
@@ -268,7 +266,6 @@ ENDIF
     xor   SOUND_ONEBIT_mask  ;oscillate between high and low bits...
 
     ONEBITOUT
-
 
 .zap1_2   
     nop

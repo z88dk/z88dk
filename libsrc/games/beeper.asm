@@ -24,6 +24,9 @@
 
 .beeper
 ._beeper
+IF __CPU_GBZ80__
+    ret
+ELSE
 
 IF __CPU_GBZ80__ || __CPU_INTEL__
     ld   a,l
@@ -122,3 +125,4 @@ ENDIF
     ;call   bit_close_ei
     ret
 
+ENDIF
