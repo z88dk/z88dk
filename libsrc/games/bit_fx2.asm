@@ -47,11 +47,7 @@ ENDIF
     defw    TSpace2
     defw    TSpace3	; effect #5
     defw    Squoink
-IF __CPU_INTEL__
-    defw    aret
-ELSE
     defw    explosion
-ENDIF
           
 ;Space sound
           
@@ -387,18 +383,23 @@ ENDIF
 
     ONEBITOUT
 
-
 .qi_FR_2
     ld      l,0
     djnz    qi_loop
     call    bit_close_ei
     ret
 
-IF !__CPU_INTEL__
+
 .explosion
     call  bit_open_di
     ld	hl,1
+IF __CPU_INTEL__
+	push    af
+ENDIF
 .expl
+IF __CPU_INTEL__
+	pop     af
+ENDIF
     push    hl
     push    af
     ld      a,SOUND_ONEBIT_mask
@@ -409,7 +410,6 @@ IF !__CPU_INTEL__
     xor     l
 
     ONEBITOUT
-
 
     pop     hl
 
@@ -424,13 +424,21 @@ IF !__CPU_INTEL__
     pop     af
     
     inc     hl
+IF __CPU_INTEL__
+	push    af
+	xor     a
+	add     h
+ELSE
     bit     1,h
+ENDIF
     jr      z,expl
-    
+
+IF __CPU_INTEL__
+	pop     af
+ENDIF
+
     call	bit_close_ei
     ret
-ELSE
-aret:   ret
-ENDIF
+
 
 ENDIF
