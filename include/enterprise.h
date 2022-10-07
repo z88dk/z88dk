@@ -8,6 +8,7 @@
 #define __ENTERPRISE_H__
 
 #include <sys/compiler.h>
+#include <sys/types.h>
 
 
 // EXOS VARIABLES
