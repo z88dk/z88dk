@@ -17,10 +17,15 @@
 
 int tape_load_block(void *addr, size_t len, unsigned char type)
 {
-	char devspec[]="TAPE-1:xxx";
-
-	memset(devspec+7,0,3);
-	itoa(type,devspec+7,16);
+	char filnm[3];
+	struct EXOS_STRING devspec;
+	
+	memset(filnm,0,3);
+	itoa(type,filnm,16);
+	
+	strcpy(devspec.text, "TAPE-1:FILE.");
+	strcat(devspec.text, filnm);
+	devspec.len=strlen(devspec.text);
 
 	if (exos_open_channel(111, devspec)) return (-1);
 	if (exos_read_block(111, len, addr)) return (-1);
