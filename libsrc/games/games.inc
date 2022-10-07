@@ -166,7 +166,7 @@ IF FORti82
         defc SOUND_ONEBIT_bit    = 2
         defc SOUND_ONEBIT_mask   = @00111100
 		;----
-        defc PLAY_DATA_LEAD    = 279   ; (164) Timing for the leading tone
+        defc PLAY_DATA_LEAD    = 254   ; (164) Timing for the leading tone
         defc PLAY_DATA_SYNC1   = 77    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
         defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
@@ -182,7 +182,7 @@ IF FORti83
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 3
 		;----
-        defc PLAY_DATA_LEAD    = 279   ; (164) Timing for the leading tone
+        defc PLAY_DATA_LEAD    = 254   ; (164) Timing for the leading tone
         defc PLAY_DATA_SYNC1   = 77    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
         defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
@@ -199,7 +199,7 @@ IF FORti8x
         defc SOUND_ONEBIT_bit    = 0
         defc SOUND_ONEBIT_mask   = 3
 		;----
-        defc PLAY_DATA_LEAD    = 279   ; (164) Timing for the leading tone
+        defc PLAY_DATA_LEAD    = 254   ; (164) Timing for the leading tone
         defc PLAY_DATA_SYNC1   = 77    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
         defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
@@ -215,7 +215,7 @@ IF FORti85
         defc SOUND_ONEBIT_bit    = 2
         defc SOUND_ONEBIT_mask   = @00111100
 		;----
-        defc PLAY_DATA_LEAD    = 279   ; (164) Timing for the leading tone
+        defc PLAY_DATA_LEAD    = 254   ; (164) Timing for the leading tone
         defc PLAY_DATA_SYNC1   = 77    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
         defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
@@ -232,7 +232,7 @@ IF FORti86
         defc SOUND_ONEBIT_bit    = 2
         defc SOUND_ONEBIT_mask   = @00111100
 		;----
-        defc PLAY_DATA_LEAD    = 279   ; (164) Timing for the leading tone
+        defc PLAY_DATA_LEAD    = 254   ; (164) Timing for the leading tone
         defc PLAY_DATA_SYNC1   = 77    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
         defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
