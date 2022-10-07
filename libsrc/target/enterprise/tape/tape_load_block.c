@@ -23,7 +23,7 @@ int tape_load_block(void *addr, size_t len, unsigned char type)
 	itoa(type,devspec+7,16);
 
 	if (exos_open_channel(111, devspec)) return (-1);
-	if (exos_read_block(111, len, address)) return (-1);
+	if (exos_read_block(111, len, addr)) return (-1);
 	if (exos_destroy_channel(111)) return (-1);
 	return (0);	
 }
