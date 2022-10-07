@@ -185,6 +185,11 @@ extern int __LIB__    exos_capture_channel_callee(int main_channel, int secondar
 
 extern int __LIB__  exos_channel_read_status(int channel) __z88dk_fastcall;
 
+struct EXOS_STRING {
+	unsigned char	len;		// String length
+	unsigned char	text[100];
+};
+
 extern int __LIB__              exos_create_channel(int channel, char *device) __smallc;
 extern int __LIB__    exos_create_channel_callee(int channel, char *device) __smallc __z88dk_callee;
 #define exos_create_channel(a,b)    exos_create_channel_callee(a,b)
@@ -310,6 +315,7 @@ extern int __LIB__  exos_reset_font(int channel) __z88dk_fastcall;
 
 // TAPE I/O
 
+extern int  __LIB__  tape_save(char *name, void *addr, size_t len) __smallc;
 extern int  __LIB__  tape_save_block(void *addr, size_t len, unsigned char type) __smallc;
 extern int  __LIB__  tape_load_block(void *addr, size_t len, unsigned char type) __smallc;
 
