@@ -1,13 +1,13 @@
 #
 # Make Enterprise 64/128 graphics libs (only the C code portions)
 #
-# $Id: Makefile $
+# $Id: Makefile,v 1.1 2011-04-01 06:50:45 stefano Exp $
 #
 
 include ../../../Make.config
 
 EPFILES = \
-	tape_load_block.c tape_save_block.c
+	tape_load_block.c tape_save_block.c tape_save.c
 
 EPOBJECTS = $(EPFILES:.c=.o)
 
