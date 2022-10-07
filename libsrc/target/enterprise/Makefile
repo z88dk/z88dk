@@ -2,7 +2,7 @@ include ../../Make.config
 
 TARGET = enterprise
 
-SUBDIRS = enterprise graphics graphics_hr
+SUBDIRS = enterprise tape graphics graphics_hr
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 ASMFILES = $(wildcard *.asm)
