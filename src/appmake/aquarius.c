@@ -511,7 +511,7 @@ int aquarius_exec(char *target)
 
 			step++;
 			fclose(fpin);
-		} while (step != 2);
+		} while (step < 2);
 
         fclose(fpout);
 
