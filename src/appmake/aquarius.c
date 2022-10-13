@@ -8,6 +8,7 @@
  *   little changes in the BASIC loader, but we don't need it.
  *
  *   Stefano Bodrato - December 2001: first release
+ *   Stefano Bodrato - Fall 2022: WAV output options
  *
  *   $Id: aquarius.c $
  */
@@ -79,8 +80,8 @@ int i,j;
 int p0, p1;
 
 if (fast) {
-	p0=10;
-	p1=22;
+	p0=5;
+	p1=20;
 } else {
 	p0=12;
 	p1=24;
