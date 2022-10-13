@@ -2,7 +2,7 @@
  *  D E A T H   S T A R  -  Mattel Aquarius version
  * 
  * How to build:
- * zcc +aquarius -create-app dstar.c -Cz--audio
+ * zcc +aquarius -create-app -Cz--audio -Cz--fast -DSOUNDB dstar.c
  * (.. CLOAD, ENTER, RUN, ENTER)
  * 
  * 
@@ -128,9 +128,16 @@ void Gamekeys(void)
 		  #ifdef SOUND
 		    bit_fx4 (5);
 		  #endif
+		  #ifdef SOUNDB
+			bit_fx6 (6);
+		  #endif
 		  while (getk() == K_SWITCH) {}
 		  break;
 		case K_EXIT:
+		case K_EXIT|0x20:
+		  #ifdef SOUNDB
+		  bit_fx6 (4);
+		  #endif
 		  exit(0);
 		case K_NEXTLEV:    /* Okay this IS cheating... */
 		  if(++Level==MAXLEVEL)
@@ -142,8 +149,12 @@ void Gamekeys(void)
 		  { ++Level; break; }
 		  /* fall thrue */
 		case K_CLEAR:
+		case K_CLEAR|0x20:
 		  #ifdef SOUND
 		    bit_fx4 (3);
+		  #endif
+		  #ifdef SOUNDB
+			bit_fx6 (1);
 		  #endif
 		  SetupLevel();
 	}
@@ -191,6 +202,9 @@ void SetupLevel(void)
 
 #ifdef SOUND
 	bit_fx4 (1);
+#endif
+#ifdef SOUNDB
+	bit_fx6 (0);
 #endif
 }
 
@@ -279,6 +293,9 @@ void MovePiece(char *ptr, char plusx, char plusy)
 			#ifdef SOUND
 			bit_fx2 (5);
 			#endif
+			#ifdef SOUNDB
+			bit_fx6 (3);
+			#endif
 		}
 
 		*(locn+temp2) = *locn;
@@ -293,8 +310,10 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		putpic (x+plusx,y+plusy,temp);
 
 		#ifdef SOUND
-		//bit_fx2 (6);
-		bit_fx4 (2);
+		bit_fx2 (2);
+		#endif
+		#ifdef SOUNDB
+		bit_fx6 (7);
 		#endif
 
 		(*ptr) += temp2;
