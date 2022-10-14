@@ -2,7 +2,7 @@
  *  D E A T H   S T A R  -  Mattel Aquarius version
  * 
  * How to build:
- * zcc +aquarius -create-app -Cz--audio -Cz--fast -DSOUNDB dstar.c
+ * zcc +aquarius -create-app -Cz--audio -Cz--fast -DSOUND dstar.c
  * (.. CLOAD, ENTER, RUN, ENTER)
  * 
  * 
@@ -339,8 +339,8 @@ void putpic(int x, int y, int picture) {
 		break;
 	case BUBB:
 		display[y*80+44+x*2]=32;
-		display[y*80+44+x*2+1]=28;
-		display[y*80+44+40+x*2]=32;
+		display[y*80+44+x*2+1]=201;
+		display[y*80+44+40+x*2]=199;
 		display[y*80+44+40+x*2+1]=32;
 		attr[y*80+44+x*2]=7+96;
 		attr[y*80+44+x*2+1]=7+96;
@@ -358,7 +358,7 @@ void putpic(int x, int y, int picture) {
 		attr[y*80+44+40+x*2+1]=7+64;
 		break;
 	case BOX:
-		display[y*80+44+x*2]=222;		//216 = 'X'
+		display[y*80+44+x*2]=222;
 		display[y*80+44+x*2+1]=206;
 		display[y*80+44+40+x*2]=207;
 		display[y*80+44+40+x*2+1]=223;
