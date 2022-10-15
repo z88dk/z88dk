@@ -5,13 +5,25 @@ SECTION code_clib
 PUBLIC l_bsearch_callee
 PUBLIC _l_bsearch_callee
 PUBLIC asm_l_bsearch
-EXTERN Lbsearch, l_jpiy
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+  EXTERN Lbsearch, l_jpiy_8080, l_setix_8080, l_setiy_8080
+ELSE
+  EXTERN Lbsearch, l_jpiy, l_setix, l_setiy
+ENDIF
 
 .l_bsearch_callee
 ._l_bsearch_callee
 
    pop af
-   pop iy
+   pop hl
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   call l_setiy_8080
+ELSE
+   call l_setiy
+ENDIF
+
    pop hl
    pop de
    pop bc
@@ -19,7 +31,16 @@ EXTERN Lbsearch, l_jpiy
 
 .asm_l_bsearch
 
-   ld ix,compare
+   push hl
+   ld hl,compare
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   call l_setix_8080
+ELSE
+   call l_setix
+ENDIF
+
+   pop hl
    jp Lbsearch
 
 .compare
@@ -27,7 +48,13 @@ EXTERN Lbsearch, l_jpiy
    push de
    push bc
    push hl
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   call l_jpiy_8080
+ELSE
    call l_jpiy
+ENDIF
+
    ld a,l
    pop hl
    pop bc

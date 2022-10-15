@@ -64,6 +64,10 @@ ${NEWLIB_ROOT}l/z80/long/l_dec_dehl
 ${NEWLIB_ROOT}l/z80/long/l_inc_dehl
 ${NEWLIB_ROOT}l/z80/long/l_neg_dehl
 ${NEWLIB_ROOT}l/z80/l_jphl
+${NEWLIB_ROOT}l/8080/l_jpix_8080
+${NEWLIB_ROOT}l/8080/l_jpiy_8080
+${NEWLIB_ROOT}l/8080/l_setix_8080
+${NEWLIB_ROOT}l/8080/l_setiy_8080
 ${NEWLIB_ROOT}l/z80/l_jrbc
 ${NEWLIB_ROOT}l/z80/l_jrde
 @${NEWLIB_ROOT}l/sccz80/8080.lst
