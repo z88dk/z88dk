@@ -1,7 +1,7 @@
 /*
  * Header file for Sharp X1 specific stuff
  *
- * $Id: x1.h,v 1.11 2016-06-11 19:53:08 dom Exp $
+ * $Id: x1.h $
  *
  */
 

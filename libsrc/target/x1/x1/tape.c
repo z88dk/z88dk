@@ -10,7 +10,7 @@
  * $Id: tape.c $
  */
 
-#include <x1.h>
+#include <arch/x1.h>
 
 
 /*

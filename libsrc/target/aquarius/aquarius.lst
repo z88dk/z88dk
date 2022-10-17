@@ -26,5 +26,7 @@ target/aquarius/psg/set_psg
 target/aquarius/psg/set_psg_callee
 target/aquarius/psg/get_psg
 target/aquarius/psg/psg_init
+target/aquarius/tape/tape_load_block
+target/aquarius/tape/tape_load_block_callee
 @psg/ay/psg.lst
 

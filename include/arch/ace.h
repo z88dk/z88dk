@@ -1,7 +1,7 @@
 /*
  * Headerfile for Jupiter ACE specific stuff
  *
- * $Id: ace.h,v 1.1 2010-05-31 08:29:06 stefano Exp $
+ * $Id: ace.h $
  */
 
 #ifndef __ACE_H__

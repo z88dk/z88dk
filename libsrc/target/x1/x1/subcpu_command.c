@@ -7,7 +7,8 @@
  *
 */
 
-#include <x1.h>
+
+#include <arch/x1.h>
 
 
 extern void __FASTCALL__ subcpu_command(int command) {
