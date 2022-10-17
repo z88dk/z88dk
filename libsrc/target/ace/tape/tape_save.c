@@ -8,7 +8,7 @@
 #define __HAVESEED
 #include <stdlib.h>
 #include <string.h>
-#include <ace.h>
+#include <arch/ace.h>
 
 int tape_save(char *name, size_t loadstart,void *start, size_t len)
 {
