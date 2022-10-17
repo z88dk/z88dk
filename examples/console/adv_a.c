@@ -59,7 +59,11 @@ int mazepic;
 #endif
 
 #ifdef ACE
-#include <ace.h>
+#include <arch/ace.h>
+#endif
+
+#ifdef __AQUARIUS__
+#include <arch/aquarius.h>
 #endif
 
 #ifdef __MSX__
