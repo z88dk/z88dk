@@ -6,6 +6,7 @@
 ;
 ;		OPTIMIZATIONS:
 ;		#pragma output nosound   - Save few bytes not preserving IX on tape and sound interrupts
+;		#pragma output nointerrupsaving   - do not save some interrupt vectors on startup (includes nosound)
 ;
 ; - - - - - - -
 ;
@@ -13,7 +14,7 @@
 ;
 ; - - - - - - -
 ;
-; NB. Compiled with -IXIY so all iy references are actually iy
+; NB. Compiled with -IXIY so all iy references are actually ix
 
 
     MODULE  kc_crt0
@@ -45,6 +46,7 @@ ENDIF
 
 
 start:
+IF !DEFINED_nointerrupsaving
     ; Keyboard
     ld      hl,($01EE)
     ld      (INT01EE+7),hl
@@ -63,16 +65,18 @@ IF !DEFINED_nosound
     ld      hl,INT01EC
     ld      ($01EC),hl
 
-    ; Cassette
+    ; Cassette input
     ld      hl,($01E4)
     ld      (INT01E4+7),hl
     ld      hl,INT01E4
     ld      ($01E4),hl
 
+    ; Cassette output
     ld      hl,($01EA)
     ld      (INT01EA+7),hl
     ld      hl,INT01EA
     ld      ($01EA),hl
+ENDIF
 ENDIF
 
     ld      (__restore_sp_onexit+1),sp	;Save entry stack
@@ -94,6 +98,28 @@ cleanup:
     push    hl
     call    crt0_exit
 
+IF !DEFINED_nointerrupsaving
+        ; Keyboard
+        ld      hl,(INT01EE+7)
+        ld      ($01EE),hl
+
+        ld      hl,(INT01E6+7)
+        ld      ($01E6),hl
+
+IF !DEFINED_nosound
+        ; Sound
+        ld      hl,(INT01EC+7)
+        ld      ($01EC),hl
+
+        ; Cassette input
+        ld      hl,(INT01E4+7)
+        ld      ($01E4),hl
+
+        ; Cassette output
+        ld      hl,(INT01EA+7)
+        ld      ($01EA),hl
+ENDIF
+ENDIF
 
 	pop	bc
 __restore_sp_onexit:
@@ -116,6 +142,7 @@ l_dcal:	jp	(hl)		;Used for function pointer calls
 ;	01EC 	CTC channel 2 (sound duration)
 ;	01EE 	CTC channel 3 (keyboard input)
 
+IF !DEFINED_nointerrupsaving
 ; CTC channel 3 (keyboard input)
 INT01EE:
     push    iy
@@ -131,6 +158,7 @@ INT01E6:
     call    0
     pop     iy
     ret
+
 
 IF !DEFINED_nosound
 ; CTC channel 2 (sound duration)
@@ -156,6 +184,7 @@ INT01EA:
     call    0
     pop     iy
     ret
+ENDIF
 ENDIF
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"
