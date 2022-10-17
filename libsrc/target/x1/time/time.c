@@ -6,12 +6,12 @@
  *	Our epoch is the UNIX epoch of 00:00:00 1/1/1970
  *
  * --------
- * $Id: time.c,v 1.3 2013-11-14 06:57:05 stefano Exp $
+ * $Id: time.c $
  */
 
 
 #include <time.h>
-#include <x1.h>
+#include <arch/x1.h>
 
 unsigned int unbcd(unsigned int value) {
 	return ( (value >> 4) * 10 + (value & 15) );
