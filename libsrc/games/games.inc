@@ -25,7 +25,7 @@ IF FORc128
         defc PLAY_DATA_BIAS    = 2     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 31    ; (55, 59)
         defc PLAY_DATA_BIT0    = 34    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 17
+        defc LDR_DATA_TIMING   = 17
         defc PLAY_MSXDATA_HI     = 6457    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 13204   ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -75,7 +75,7 @@ IF FORmsx
         defc PLAY_DATA_BIAS    = 4     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 58    ; (55, 59)
         defc PLAY_DATA_BIT0    = 66    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 24    ; 3.58 mhz
+        defc LDR_DATA_TIMING   = 23    ; 3.58 mhz
         ;----
 ENDIF
 
@@ -92,7 +92,7 @@ IF FORsvi
         defc PLAY_DATA_BIAS    = 4     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 58    ; (55, 59)
         defc PLAY_DATA_BIT0    = 66    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 24    ; 3.58 mhz
+        defc LDR_DATA_TIMING   = 23    ; 3.58 mhz
         ;----
 	defc INPUT_JOY_useinkey = 1
 ENDIF
@@ -120,7 +120,7 @@ IF FORsam
         defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
         defc PLAY_DATA_BIT0    = 104   ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 51
+        defc LDR_DATA_TIMING   = 51
         defc PLAY_MSXDATA_HI     = 19813    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 40517    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -153,7 +153,7 @@ IF FORaquarius
         defc PLAY_DATA_BIAS    = 5     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 62    ; (55, 59)
         defc PLAY_DATA_BIT0    = 69    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 34
+        defc LDR_DATA_TIMING   = 34
         defc PLAY_MSXDATA_HI     = 12914    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 26408    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -175,7 +175,7 @@ IF FORenterprise
         defc PLAY_DATA_BIAS    = 5     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 62    ; (55, 59)
         defc PLAY_DATA_BIT0    = 69    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 34
+        defc LDR_DATA_TIMING   = 34
         defc PLAY_MSXDATA_HI     = 12914    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 26408    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -198,7 +198,7 @@ IF FORp2000
         defc PLAY_DATA_BIAS    = 3     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 39    ; (55, 59)
         defc PLAY_DATA_BIT0    = 44    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 22
+        defc LDR_DATA_TIMING   = 22
         defc PLAY_MSXDATA_HI     = 8475    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 17332   ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -215,7 +215,7 @@ IF FORpc88
         defc PLAY_DATA_BIAS    = 5     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 62    ; (55, 59)
         defc PLAY_DATA_BIT0    = 69    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 34
+        defc LDR_DATA_TIMING   = 34
         defc PLAY_MSXDATA_HI     = 12914    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 26408    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -232,7 +232,7 @@ IF FORti82
         defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
         defc PLAY_DATA_BIT0    = 104   ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 51
+        defc LDR_DATA_TIMING   = 51
         defc PLAY_MSXDATA_HI     = 19813    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 40517    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -249,7 +249,7 @@ IF FORti83
         defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
         defc PLAY_DATA_BIT0    = 104   ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 51
+        defc LDR_DATA_TIMING   = 51
         defc PLAY_MSXDATA_HI     = 19813    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 40517    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -267,7 +267,7 @@ IF FORti8x
         defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
         defc PLAY_DATA_BIT0    = 104   ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 51
+        defc LDR_DATA_TIMING   = 51
         defc PLAY_MSXDATA_HI     = 19813    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 40517    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -284,7 +284,7 @@ IF FORti85
         defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
         defc PLAY_DATA_BIT0    = 104   ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 51
+        defc LDR_DATA_TIMING   = 51
         defc PLAY_MSXDATA_HI     = 19813    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 40517    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -301,7 +301,7 @@ IF FORti86
         defc PLAY_DATA_BIAS    = 7     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 92    ; (55, 59)
         defc PLAY_DATA_BIT0    = 104   ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 51
+        defc LDR_DATA_TIMING   = 51
         defc PLAY_MSXDATA_HI     = 19813    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 40517    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -326,7 +326,7 @@ IF FORtrs80
         defc PLAY_DATA_BIAS    = 3     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 39    ; (55, 59)
         defc PLAY_DATA_BIT0    = 44    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 22
+        defc LDR_DATA_TIMING   = 22
         defc PLAY_MSXDATA_HI     = 8475    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 17332   ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -344,7 +344,7 @@ IF FORvg5k
         defc PLAY_DATA_BIAS    = 5     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 62    ; (55, 59)
         defc PLAY_DATA_BIT0    = 69    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 34
+        defc LDR_DATA_TIMING   = 34
         defc PLAY_MSXDATA_HI     = 12914    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 26408    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -398,7 +398,7 @@ IF FORz9001
         defc PLAY_DATA_BIAS    = 3     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 39    ; (55, 59)
         defc PLAY_DATA_BIT0    = 44    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 22
+        defc LDR_DATA_TIMING   = 22
         defc PLAY_MSXDATA_HI     = 8475    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 17332   ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -415,7 +415,7 @@ IF FORbee
         defc PLAY_DATA_BIAS    = 2     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 31    ; (55, 59)
         defc PLAY_DATA_BIT0    = 34    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 17
+        defc LDR_DATA_TIMING   = 17
         defc PLAY_MSXDATA_HI     = 6457    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 13204   ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -432,7 +432,7 @@ IF FORaussie
         defc PLAY_DATA_BIAS    = 5     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 62    ; (55, 59)
         defc PLAY_DATA_BIT0    = 69    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 34
+        defc LDR_DATA_TIMING   = 34
         defc PLAY_MSXDATA_HI     = 12914    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 26408    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -455,7 +455,7 @@ IF FORpasopia7
         defc PLAY_DATA_BIAS    = 5     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 62    ; (55, 59)
         defc PLAY_DATA_BIT0    = 69    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 34
+        defc LDR_DATA_TIMING   = 34
         defc PLAY_MSXDATA_HI     = 12914    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 26408    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -475,7 +475,7 @@ IF FORsuper80
         defc PLAY_DATA_BIAS    = 2     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 31    ; (55, 59)
         defc PLAY_DATA_BIT0    = 34    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 17
+        defc LDR_DATA_TIMING   = 17
         defc PLAY_MSXDATA_HI     = 6457    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 13204   ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -519,7 +519,7 @@ IF FORlynx
         defc PLAY_DATA_BIAS    = 5     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 62    ; (55, 59)
         defc PLAY_DATA_BIT0    = 69    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 34
+        defc LDR_DATA_TIMING   = 34
         defc PLAY_MSXDATA_HI     = 12914    ; 1200 baud, High tone period
         defc PLAY_MSXDATA_LO     = 26408    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
@@ -622,7 +622,7 @@ IF FORcoleco
         defc PLAY_DATA_BIAS    = 4     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 58    ; (55, 59)
         defc PLAY_DATA_BIT0    = 66    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 24    ; 3.58 mhz
+        defc LDR_DATA_TIMING   = 23    ; 3.58 mhz
         ;----
 ENDIF
 
@@ -636,7 +636,7 @@ IF FORbit90
         defc PLAY_DATA_BIAS    = 4     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 58    ; (55, 59)
         defc PLAY_DATA_BIT0    = 66    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 24    ; 3.58 mhz
+        defc LDR_DATA_TIMING   = 23    ; 3.58 mhz
         ;----
 ENDIF
 
@@ -651,7 +651,7 @@ IF FORpencil2
         defc PLAY_DATA_BIAS    = 4     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 58    ; (55, 59)
         defc PLAY_DATA_BIT0    = 66    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 24    ; 3.58 mhz
+        defc LDR_DATA_TIMING   = 23    ; 3.58 mhz
         ;----
 ENDIF
 
@@ -685,7 +685,7 @@ IFNDEF PLAY_DATA_LEAD
         defc PLAY_DATA_BIAS    = 4     ; Fine tuning the parameters
         defc PLAY_DATA_SYNC2   = 54    ; (55, 59)
         defc PLAY_DATA_BIT0    = 61    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
-        defc REC_DATA_TIMING   = 22    ; 3.5 mhz
+        defc LDR_DATA_TIMING   = 22    ; 3.5 mhz
 ENDIF
 
 ; ** Standard MSX values, for a 3.58 Mhz CPU, but the loader does auto-tuning, so it's fine for 3.5 Mhz **
