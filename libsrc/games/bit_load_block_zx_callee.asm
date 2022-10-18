@@ -7,7 +7,7 @@
 
 PUBLIC bit_load_block_zx_callee
 PUBLIC _bit_load_block_zx_callee
-PUBLIC asm_bit_load_block
+PUBLIC asm_bit_load_block_zx
 
 INCLUDE  "games/games.inc"
 
@@ -26,7 +26,7 @@ ELSE
 	pop bc
 	push hl
 
-.asm_bit_load_block
+.asm_bit_load_block_zx
 
 ; enter : ix = addr
 ;         de = len
