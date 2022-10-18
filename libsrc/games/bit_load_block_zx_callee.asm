@@ -15,6 +15,7 @@ INCLUDE  "games/games.inc"
 ._bit_load_block_zx_callee
 
 IF __CPU_GBZ80__ || __CPU_INTEL__
+.asm_bit_load_block_zx
     ret
 ELSE
 
@@ -42,8 +43,25 @@ ELSE
 
         INC     D
         EX      AF,AF'
+
+IF FORmsx
+		LD A,$08
+		OUT ($AB),A	; MOTOR ON
+ENDIF
+
+IF FORsvi
+		LD A,$08
+		OUT ($97),A	; MOTOR ON
+ENDIF
+
+IF FORmc1000
+		LD A,$0F
+		OUT ($20),A	; Set PSG register for data input port
+ENDIF
+
         DEC     D
         DI                      ; Disable Interrupts
+
 ;        LD      A,$0F
 ;        OUT     ($FC),A
         
@@ -59,6 +77,16 @@ ELSE
 ;        IN      A,($FC)
 ;        RRA
         EI
+
+IF FORmsx
+		LD A,$09
+		OUT ($AB),A	; MOTOR OFF
+ENDIF
+
+IF FORsvi
+		LD A,$09
+		OUT ($97),A	; MOTOR OFF
+ENDIF
 
 	pop ix
 
