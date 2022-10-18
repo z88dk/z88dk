@@ -52,6 +52,19 @@
 #include <ctype.h>
 
 
+/* This hack forces the ZX Spectrum tape format using the generic sound library */
+/* Only a limited set of targets is supported for data input and no border flashing happens during LOAD/SAVE operations */
+/*
+#include <sound.h>
+#ifdef ZXTAPE
+#undef tape_load_block
+#undef tape_save_block
+#define tape_load_block bit_load_block_zx
+#define tape_save_block bit_save_block_zx
+#endif
+*/
+
+
 #ifdef PICS
 #include <graphics.h>
 #include <adv_a.h>
@@ -2608,7 +2621,6 @@ void SH_OK()
 	PrintStr("OK..\n");
 	nNextParseAction = NA_DO_AUTO;
 }
-
 
 
 
