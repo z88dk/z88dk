@@ -109,14 +109,20 @@ extern void __LIB__ playzb4(unsigned char *SamStart, unsigned int SamLen) __smal
 #endif
 
 
-/* DATA Save - ZX Spectrum style */
+/* DATA Load/Save - ZX Spectrum style */
 
 extern int  __LIB__            bit_save_zx(char *name, size_t loadstart,void *start, size_t len) __smallc;
-extern int  __LIB__            bit_save_block_zx(void *addr, size_t len, unsigned char type) __smallc;
 
+extern int  __LIB__            bit_save_block_zx(void *addr, size_t len, unsigned char type) __smallc;
 extern int  __LIB__  bit_save_block_zx_callee(void *addr, size_t len, unsigned char type) __smallc __z88dk_callee;
 
 #define bit_save_block_zx(a,b,c) bit_save_block_zx_callee(a,b,c)
+
+extern int  __LIB__            bit_load_block_zx(void *addr, size_t len, unsigned char type) __smallc;
+extern int  __LIB__  bit_load_block_zx_callee(void *addr, size_t len, unsigned char type) __smallc __z88dk_callee;
+
+#define bit_load_block_zx(a,b,c) bit_load_block_zx_callee(a,b,c)
+
 
 
 /* DATA Save - MSX BSAVE style */
