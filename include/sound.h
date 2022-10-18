@@ -137,85 +137,108 @@ extern int  __LIB__  bit_save_msx_callee(char *name, size_t loadstart, void *sta
 */
 
 
-#ifdef ACE
+#ifdef __ACE__
   #define BEEP_TSTATES 406250.0 /* 3.25 Mhz */
 #endif
 
-#ifdef AQUARIUS
+#ifdef __AQUARIUS__
   #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
-#ifdef AUSSIEBYTE
+#ifdef __AUSSIE__
   #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
-#ifdef BEE
+#ifdef __BEE__
   #define BEEP_TSTATES 250000.0 /* 2 Mhz */
   /* #define BEEP_TSTATES 421875.0 -> 3.375 Mhz */
 #endif
 
-#ifdef C128
+#ifdef __C128__
   #define BEEP_TSTATES 250000.0  /* 2 Mhz.. VIC-II steals time */
 #endif
 
-#ifdef ENTERPRISE
+#ifdef __SUPER80__
+  #define BEEP_TSTATES 250000.0 /* 2 Mhz */
+#endif
+
+#ifdef __ENTERPRISE__
   #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
-#ifdef GAL
+#ifdef __GAL__
   #define BEEP_TSTATES 384000.0  /* 3.072 MHz*/
 #endif
 
-#ifdef MSX
+#ifdef __MSX__
   #define BEEP_TSTATES 447500.0  /* 3.58 Mhz */
 #endif
 
-#ifdef MC1000
+#ifdef __MC1000__
   #define BEEP_TSTATES 447443.1 /* 3.579545 Mhz */
 #endif
 
-#ifdef P2000
+#ifdef __P2000__
   #define BEEP_TSTATES 312500.0 /* 2.5 Mhz */
 #endif
 
-#ifdef PC88
+#ifdef __PC88__
   #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
-#ifdef SPECTRUM
+#ifdef __SPECTRUM__
   #define BEEP_TSTATES 437500.0  /* 3.5 Mhz; float value = CPU_CLOCK*125 */
 #endif
 
-#ifdef TICALC
-// TICALC, TI82, TI83, TI8X, TI85, TI86, SHARP OZ
+#ifdef __TI82__
   #define BEEP_TSTATES 750000.0 /* 6 Mhz */
-  /* TI-83 Plus should have 1875000.0 (15 Mhz) if Silver Edition */
-  /* #define BEEP_TSTATES 1875000.0 */
 #endif
 
-#ifdef TRS80
+#ifdef __TI83__
+  #define BEEP_TSTATES 750000.0 /* 6 Mhz */
+#endif
+
+#ifdef __TI8x__
+  /* TI-83 Plus should have 1875000.0 (15 Mhz) if Silver Edition */
+  /* #define BEEP_TSTATES 1875000.0 */
+  #define BEEP_TSTATES 750000.0 /* 6 Mhz */
+#endif
+
+#ifdef __TI85__
+  #define BEEP_TSTATES 750000.0 /* 6 Mhz */
+#endif
+
+#ifdef __TI86__
+  #define BEEP_TSTATES 750000.0 /* 6 Mhz */
+#endif
+
+#ifdef __OZ__
+  #define BEEP_TSTATES 750000.0 /* 6 Mhz */
+#endif
+
+#ifdef __TRS80__
   //#define BEEP_TSTATES 221750.0 /* 1.774 Mhz , TRS 80 Model I */
   #define BEEP_TSTATES 275000.0 /* 2.03 Mhz , EACA EG2000 */
   //#define BEEP_TSTATES 287500.0 /* 2.2 Mhz , TRS 80 Model III */
   //#define BEEP_TSTATES 500000.0  /* (4 Mhz) Model II, Model IV or modified Model III */
 #endif
 
-#ifdef TVC
+#ifdef __TVC__
   #define BEEP_TSTATES 390625.0  /* 3.125 Mhz */
 #endif
 
-#ifdef VG5000
+#ifdef __VG5000__
   #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
 /* Clock timing is not perfect, here we have a slightly different 
    routine, with the inner loop differing for one cycle,and
    VZ300 has a CPU clock of 3,54 Mhz, VZ200 -> 3,58.. we stay in the middle */
-#ifdef VZ
+#ifdef __VZ200__
   #define BEEP_TSTATES 442500.0  /* 3.54 Mhz */
 #endif
 
-#ifdef Z9001
+#ifdef __Z9001__
   #define BEEP_TSTATES 307200.0 /* 2.4576 Mhz */
 #endif
 
