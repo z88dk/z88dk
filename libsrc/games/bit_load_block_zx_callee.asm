@@ -221,7 +221,7 @@ ENDIF
         RET     NC
 
 .LD_EDGE_1
-        LD      A,34	; Original value was $16, but we have a 4mhz CPU here
+        LD      A,REC_DATA_TIMING	; Original value was $16, but we have a 4mhz CPU here
 
 ;; LD-DELAY
 .L05E9   DEC     A
