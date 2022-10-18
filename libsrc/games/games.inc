@@ -68,7 +68,7 @@ IF FORmsx
         defc SOUND_ONEBIT_mask   = 158        ; bit 7 (key click) and 5 (tape)
         ;----
         defc TAPEIN_ONEBIT_port  = $A2
-        defc TAPEIN_ONEBIT_mask  = 1
+        defc TAPEIN_ONEBIT_mask  = 128
         ;----
         defc PLAY_DATA_LEAD    = 176   ; (164) Timing for the leading tone
         defc PLAY_DATA_SYNC1   = 48    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
@@ -85,7 +85,7 @@ IF FORsvi
         defc SOUND_ONEBIT_mask   = 158        ; bit 7 (key click) and 5 (tape)
         ;----
         defc TAPEIN_ONEBIT_port  = $90
-        defc TAPEIN_ONEBIT_mask  = 1
+        defc TAPEIN_ONEBIT_mask  = 128
         ;----
         defc PLAY_DATA_LEAD    = 176   ; (164) Timing for the leading tone
         defc PLAY_DATA_SYNC1   = 48    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
