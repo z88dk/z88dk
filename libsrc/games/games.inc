@@ -101,6 +101,10 @@ IF FORmc1000
         defc SOUND_ONEBIT_port   = 96            ; $60 = YM amplitude register
         defc SOUND_ONEBIT_bit    = 3            ; More significant bit
         defc SOUND_ONEBIT_mask   = 15
+        ;----
+        defc TAPEIN_ONEBIT_port  = $40
+        defc TAPEIN_ONEBIT_mask  = 128
+        ;----
 ENDIF
 
 IF FORsam
