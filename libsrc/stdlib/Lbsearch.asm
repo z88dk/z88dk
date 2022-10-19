@@ -34,9 +34,8 @@ ENDIF
 .loop
    ld a,h       ; Number of items still to check is 0? if so, return not found
    or l
-   jp nz, slice
-   scf
-   ret
+   cp 1
+   ret c  ; return when HL == 0 with CF == 1
 
 .slice
    push hl      ; Get the address at the halfway index + the base address

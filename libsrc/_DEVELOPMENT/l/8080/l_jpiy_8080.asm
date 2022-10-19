@@ -3,9 +3,10 @@ SECTION data_clib
 PUBLIC l_jpiy_8080
 
 l_jpiy_8080:
-   db $c3 ;jp $0000
+   jp iMessedUp
 
-fake_iy:
-   dw 0
+iMessedUp:
+   ; You didn't call l_setiy_8080 first! This should never happen, but just in case it does...
+   ret
 
-; use for library code only
+; use for library code only!
