@@ -70,6 +70,8 @@ static char read_symbol_buf[8192];
 void read_symbol_file(char *filename)
 {
     FILE *fp = fopen(filename,"r");
+    char * temp;
+    int length;
 
     if ( fp != NULL ) {
         while ( fgets(read_symbol_buf, sizeof(read_symbol_buf), fp) != NULL ) {
@@ -122,10 +124,32 @@ void read_symbol_file(char *filename)
                     } else {
                         sym->symtype = SYM_ADDRESS;
                     }
+
+                    if(argc >= 8) {
+                      length = strlen(sym->name) + strlen(argv[7]);
+                      temp = malloc(length + 2 /* '_' and null terminator */ );
+                      sprintf(temp, "%s_%s", sym->name, argv[7]);
+                      temp[length] = '\0';  /* chop off trailing comma */
+                      sym->name_module = temp;
+                    }
+                    else {
+                      sym->name_module = strdup(sym->name);
+                    }
+
                     if (sym->symtype == SYM_ADDRESS) {
                         LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
                     }
-                    HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
+
+                    symbol *oldsym = NULL;
+                    HASH_FIND_STR(global_symbols, sym->name, oldsym);
+
+                    if(oldsym) {
+                      oldsym->unique = sym->unique = 0;
+                    }
+                    else {
+                      sym->unique = 1;
+                      HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
+                    }
                 }
                 free(argv);
                 continue;
@@ -156,20 +180,30 @@ void read_symbol_file(char *filename)
                     sym->symtype = SYM_CONST;
                 }
                 sym->address = strtol(argv[2] + 1, NULL, 16);
+
+                if(argc >= 8) {
+                  length = strlen(sym->name) + strlen(argv[7]);
+                  temp = malloc(length + 2 /* '_' and null terminator */ );
+                  sprintf(temp, "%s_%s", sym->name, argv[7]);
+                  temp[length] = '\0';  /* chop off trailing comma */
+                }
+                else {
+                  sym->name_module = strdup(sym->name);
+                }
+
                 LL_APPEND(symbols[sym->address % SYM_TAB_SIZE], sym);
 
-                if (sym->islocal) {
-                    symbol_file* f = NULL;
-                    HASH_FIND_STR(symbol_files, sym->file, f);
-                    if (f == NULL) {
-                        f = calloc(1, sizeof(symbol_file));
-                        f->name = strdup(sym->file);
-                        HASH_ADD_STR(symbol_files, name, f);
-                    }
-                    HASH_ADD_KEYPTR(hh, f->symbols, sym->name, strlen(sym->name), sym);
-                } else {
-                    HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
+                symbol *oldsym = NULL;
+                HASH_FIND_STR(global_symbols, sym->name, oldsym);
+
+                if(oldsym) {
+                  oldsym->unique = sym->unique = 0;
                 }
+                else {
+                  sym->unique = 1;
+                  HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
+                }
+
             } else if ( argc > 9 ) {
                 /* It's a cline/asmline symbol */
                 char   filename[FILENAME_MAX+1];
@@ -281,28 +315,48 @@ symbol* symbol_find_lower(int addr, symboltype preferred_type, uint16_t* offset)
 
 const char *find_symbol(int addr, symboltype preferred_type)
 {
-    symbol *sym;
+    symbol *sym = NULL;
+    int globalsOnly = 1;
 
     if ( addr < 0 ) {
         return NULL;
     }
-    
-    sym = symbols[addr % SYM_TAB_SIZE];
 
-    while ( sym != NULL ) {
-        if (sym->address == addr)
-        {
-            if (preferred_type == SYM_ANY)
+    do {
+        sym = symbols[addr % SYM_TAB_SIZE];
+
+        while ( sym != NULL ) {
+            if (sym->address == addr && !(sym->islocal && globalsOnly))
             {
-                return sym->name;
+                if(sym->unique == 1) {
+                  if (preferred_type == SYM_ANY)
+                  {
+                      return sym->name;
+                  }
+
+                  if (preferred_type == sym->symtype)
+                  {
+                      return sym->name;
+                  }
+                }
+                else if(globalsOnly || sym->next) {
+                  sym = sym->next;
+                  continue;
+                }
+
+                if (preferred_type == SYM_ANY)
+                {
+                    return sym->name_module;
+                }
+
+                if (preferred_type == sym->symtype)
+                {
+                    return sym->name_module;
+                }
             }
-            if (preferred_type == sym->symtype)
-            {
-                return sym->name;
-            }
+            sym = sym->next;
         }
-        sym = sym->next;
-    }
+    } while(globalsOnly--);
     return NULL;
 }
 
