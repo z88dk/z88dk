@@ -1,6 +1,3 @@
-
-#ifndef __8080__
-
 #include "stdlib_tests.h"
 #include <stdint.h>
 
@@ -671,5 +668,3 @@ int test_bsearch()
     suite_add_test(bsearch_case1);
     return suite_run();
 }
-
-#endif

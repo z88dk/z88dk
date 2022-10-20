@@ -16,8 +16,8 @@ int main(int argc, char *argv[])
 #ifndef __8080__
     res += test_qsort();
     res += test_qsort_newlib();
-    res += test_bsearch();
 #endif
+    res += test_bsearch();
 
     return res;
 }
