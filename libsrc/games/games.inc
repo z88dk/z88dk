@@ -512,7 +512,11 @@ IF FORsol20
 ENDIF
 
 IF FORlynx
-        defc INPUT_JOY_useinkey = 1
+        defc SOUND_ONEBIT_port   = $84
+        defc SOUND_ONEBIT_bit    = 5
+        defc SOUND_ONEBIT_mask   = 16
+        defc TAPEIN_ONEBIT_port  = $80	; The original ROM uses a 16 bit port addressing (BC)
+        defc TAPEIN_ONEBIT_mask  = 1
         ;----
         defc PLAY_DATA_LEAD    = 186   ; (164) Timing for the leading tone
         defc PLAY_DATA_SYNC1   = 51    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
@@ -524,6 +528,7 @@ IF FORlynx
         defc PLAY_MSXDATA_LO     = 26408    ; 1200 baud, Low tone period
         defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
         ;----
+	defc INPUT_JOY_useinkey = 1
 ENDIF
 
 IF FORsrr
