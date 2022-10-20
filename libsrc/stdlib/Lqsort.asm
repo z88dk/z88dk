@@ -3,7 +3,12 @@
 
 SECTION code_clib
 PUBLIC Lqsort
-EXTERN l_jpix
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+  EXTERN l_jpix_8080
+ELSE
+  EXTERN l_jpix
+ENDIF
 
 ; The ansi-C qsort function sorts an array of n-byte items.
 ; This is a 'little' version that sorts arrays of 2-byte items.
@@ -19,7 +24,7 @@ EXTERN l_jpix
 ;        hl = size of array
 ;        ix = cmp function (DE=key, BC=datum ; result in A (see ".compare"),
 ;                           MUST PRESERVE BC,DE,HL,IX registers)
-; uses : AF,BC,DE,HL,AF'
+; uses : AF,BC,DE,HL
 ;
 ; If you prefer to enter with hl = last item in array, call Lqsort+3
 
@@ -43,42 +48,70 @@ EXTERN l_jpix
 .qsort2                   ; qsort(bc=left,hl=right)
    ld a,b                 ; left < right?  bc < hl?
    cp h
-   jr c, swap3
-   jr nz, qsort1
+   jp c, swap3
+   jp nz, qsort1
    ld a,c
    cp l
-   jr nc, qsort1
+   jp nc, qsort1
                           ; picking middle item as partition element
 .swap3                    ; swap(left,(left+right)/2)
    ld e,l
    ld d,h                 ; de = right
 
    add hl,bc
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   push af
+   ld a,h
+   rra
+   ld h,a
+   ld a,l
+   rra
+   ld l,a
+   pop af
+ELSE
    rr h
    rr l                   ; hl = unrounded (left+right)/2
+ENDIF
 
    ld a,l                 ; shenanigans to ensure HL aligns on item
    xor c
    rra
-   jr nc, doswap
+   jp nc, doswap
    dec hl
 
 .doswap                   ; move partition element to start of array
+   push de
    ld a,(bc)
-   ex af,af
+
+   ; ex af,af
+   ld d,a
+
    ld a,(hl)
    ld (bc),a
-   ex af,af
+
+   ; ex af,af
+   ld e,a
+   ld a,d
+
    ld (hl),a
    inc hl
    inc bc                 ; bc = left+1b, de=right
 
    ld a,(bc)
-   ex af,af
+
+   ;ex af,af
+   ld d,a
+   ld a,e
+
    ld a,(hl)
    ld (bc),a
-   ex af,af
+
+   ;ex af,af
+   ld a,d
+
    ld (hl),a
+   pop de
 
    inc bc
    push bc                ; stack = left+1 = last+1
@@ -98,35 +131,60 @@ EXTERN l_jpix
 .ent
    ld a,h                 ; i <= right?  de <= hl ?
    cp d
-   jr c, endlp
-   jr nz, compare
+   jp c, endlp
+   jp nz, compare
    ld a,l
    cp e
-   jr c, endlp
+   jp c, endlp
 
 .compare                  ; is v[i] < v[left]?  (de) < (bc) ?
-   call l_jpix            ; returns A<0 for less, A==0 for equals, A>0 for greater
-   or a
-   jp p, partition
+
+IF __CPU_INTEL__ || __CPU_GBZ80__
+   call l_jpix_8080      ; returns A<0 for less, A==0 for equals, A>0 for greater
+ELSE
+   call l_jpix      ; returns A<0 for less, A==0 for equals, A>0 for greater
+ENDIF
+
+   add a,$80
+   cp $80
+   jp c,swap1
+   jp partition
 
 .swap1                    ; swap(i,++last)
    ex (sp),hl             ; hl = ++last, stack = right
 
+   push bc
    ld a,(de)
-   ex af,af
+
+   ; ex af,af
+   ld b,a
+
    ld a,(hl)
    ld (de),a
-   ex af,af
+
+   ; ex af,af
+   ld c,a
+   ld a,b
+
    ld (hl),a
    inc hl
    inc de
 
    ld a,(de)
-   ex af,af
+
+   ; ex af,af
+   ld b,a
+   ld a,c
+
    ld a,(hl)
    ld (de),a
-   ex af,af
+
+   ; ex af,af
+   ld a,b
+
    ld (hl),a
+   pop bc
+
    inc hl
    inc de
 
@@ -141,21 +199,37 @@ EXTERN l_jpix
    inc bc                ; bc = left+1b
    dec hl                ; hl = last+1b
 
+   push de
    ld a,(bc)
-   ex af,af
+
+   ; ex af,af
+   ld d,a
+
    ld a,(hl)
    ld (bc),a
-   ex af,af
+
+   ; ex af,af
+   ld e,a
+   ld a,d
+
    ld (hl),a
    dec hl                ; hl = last
    dec bc                ; bc = left
 
    ld a,(bc)
-   ex af,af
+
+   ; ex af,af
+   ld d,a
+   ld a,e
+
    ld a,(hl)
    ld (bc),a
-   ex af,af
+
+   ; ex af,af
+   ld a,d
+
    ld (hl),a
+   pop de
 
    dec hl
    dec hl                ; hl = last-1

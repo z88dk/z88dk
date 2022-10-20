@@ -65,6 +65,10 @@ ${NEWLIB_ROOT}l/z80/long/l_dec_dehl
 ${NEWLIB_ROOT}l/z80/long/l_inc_dehl
 ${NEWLIB_ROOT}l/z80/long/l_neg_dehl
 ${NEWLIB_ROOT}l/z80/l_jphl
+${NEWLIB_ROOT}l/z80/l_jpix_8080
+${NEWLIB_ROOT}l/z80/l_jpiy_8080
+${NEWLIB_ROOT}l/z80/l_setix_8080
+${NEWLIB_ROOT}l/z80/l_setiy_8080
 ${NEWLIB_ROOT}l/sdcc/___sdcc_call_hl
 ${NEWLIB_ROOT}l/sdcc/gbz80/__divschar
 ${NEWLIB_ROOT}l/sdcc/gbz80/__divsint
