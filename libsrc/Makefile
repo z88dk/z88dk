@@ -732,6 +732,7 @@ srr_clib.lib:
 	@echo '--- Building Sorcerer Exidy Library ---'
 	@echo ''
 	$(call buildgeneric,srr,"gencon narrow")
+	$(MAKE) -C target/srr
 	$(MAKE) -C games TARGET=srr
 	TARGET=srr TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORsorcerer -x$(OUTPUT_DIRECTORY)/srr_clib @$(TARGET_DIRECTORY)/srr/srr.lst
 

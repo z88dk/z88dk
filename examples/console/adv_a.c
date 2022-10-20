@@ -87,6 +87,10 @@ int mazepic;
 #include <msx.h>
 #endif
 
+#ifdef SORCERER
+#include <arch/sorcerer.h>
+#endif
+
 #ifndef getkey
 #include <conio.h>
 #define getkey() getch()
