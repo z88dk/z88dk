@@ -43,7 +43,7 @@ _cursor:
     OR  a
     JP  NZ,curses
 
-    call    0e1a2h      	; Make IY point to work area (close to RAMPTOP)
+    call    0e1a2h          ; Make IY point to work area (close to RAMPTOP)
     call    0e9e8h      ;remove the old cursor
     LD      A,(srr_arg1)
     LD      e,a             ;and multiply it be 64
@@ -54,11 +54,11 @@ cur04:
     rl      d
     DEC     b
     JP      NZ,cur04
-	LD		(IY+68h),E	;and save it in the MWA
-	LD		(IY+69h),D	;(both bytes)
+    LD      (IY+68h),E  ;and save it in the MWA
+    LD      (IY+69h),D  ;(both bytes)
     LD      A,(srr_arg2)    ;now get the column
-	LD		(IY+6Ah),A	;and save it too
-	LD		(IY+6Bh),0	;high byte is zero
+    LD      (IY+6Ah),A  ;and save it too
+    LD      (IY+6Bh),0  ;high byte is zero
     call    0e9cch      ;and put the cursor there!
 
 curses:
