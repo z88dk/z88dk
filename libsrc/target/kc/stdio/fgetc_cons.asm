@@ -17,12 +17,9 @@
 
 .fgetc_cons
 ._fgetc_cons
-	push	iy
-	ld	iy,$1f0
-
-    call PV1
-    defb FNKBD
-	pop	iy
+.nokey  call    PV1
+        defb    FNKBDS
+        jr      NC,nokey
 IF STANDARDESCAPECHARS
 	cp	13
 	jr	nz,not_return
