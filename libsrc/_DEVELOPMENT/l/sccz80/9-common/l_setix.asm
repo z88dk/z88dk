@@ -5,5 +5,10 @@ PUBLIC l_setix
 EXTERN l_jpix_addr
 
 l_setix:
-    ld (l_jpix_addr),hl
+    push af
+    ld a,l
+    ld (l_jpix_addr),a
+    ld a,h
+    ld (l_jpix_addr+1),a
+    pop af
     ret
