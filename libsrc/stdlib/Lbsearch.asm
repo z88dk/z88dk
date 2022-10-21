@@ -3,11 +3,7 @@
 
 SECTION code_clib
 PUBLIC Lbsearch
-IF __CPU_INTEL__ || __CPU_GBZ80__
-  EXTERN l_jpix_8080
-ELSE
-  EXTERN l_jpix
-ENDIF
+EXTERN l_jpix
 
 
 ; The ansi-C bsearch function searches an array of n-byte items.
@@ -52,11 +48,7 @@ ENDIF
 
 .compare            ; is key < datum?
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
-   call l_jpix_8080      ; returns A<0 for less, A==0 for equals, A>0 for greater
-ELSE
    call l_jpix      ; returns A<0 for less, A==0 for equals, A>0 for greater
-ENDIF
 
    add a,$80
    cp $80

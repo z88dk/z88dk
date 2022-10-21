@@ -14,14 +14,9 @@ l_utod_hl:
    ;         carry unaffected
    ;
    ; uses  : f, hl + a (8080)
-IF __CPU_INTEL__
-   ld a,h
-   rla
-   ret nc
-ELSE
+
    bit 7,h
-   ret z
-ENDIF
-   
+   ret Z
+
    ld hl,$7fff
    ret

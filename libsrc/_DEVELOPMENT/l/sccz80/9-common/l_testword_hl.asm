@@ -33,7 +33,7 @@ l_testword_hl:
    or (hl)
 
    ld hl,0
-   ret nz
-   
+   ret NZ
+
    inc l
    ret

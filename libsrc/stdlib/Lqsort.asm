@@ -3,12 +3,8 @@
 
 SECTION code_clib
 PUBLIC Lqsort
+EXTERN l_jpix
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
-  EXTERN l_jpix_8080
-ELSE
-  EXTERN l_jpix
-ENDIF
 
 ; The ansi-C qsort function sorts an array of n-byte items.
 ; This is a 'little' version that sorts arrays of 2-byte items.
@@ -139,11 +135,7 @@ ENDIF
 
 .compare                  ; is v[i] < v[left]?  (de) < (bc) ?
 
-IF __CPU_INTEL__ || __CPU_GBZ80__
-   call l_jpix_8080      ; returns A<0 for less, A==0 for equals, A>0 for greater
-ELSE
    call l_jpix      ; returns A<0 for less, A==0 for equals, A>0 for greater
-ENDIF
 
    add a,$80
    cp $80

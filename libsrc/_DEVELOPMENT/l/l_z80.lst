@@ -1,3 +1,2 @@
 @${NEWLIB_ROOT}l/sccz80/z80.lst
 @${NEWLIB_ROOT}l/sdcc.lst
-@${NEWLIB_ROOT}l/l.lst

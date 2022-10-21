@@ -13,16 +13,10 @@ l_utod_de:
    ; exit  : de = int, maximum $7fff
    ;         carry unaffected
    ;
-   ; uses  : f, hl, a (8080)
-   
-IF __CPU_INTEL__
-   ld a,d
-   rla
-   ret nc
-ELSE
+   ; uses  : f
+
    bit 7,d
-   ret z
-ENDIF
-   
+   ret Z
+
    ld de,$7fff
    ret
