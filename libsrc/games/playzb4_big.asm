@@ -100,6 +100,7 @@ do_sound:
 
 	ld   bc,SOUND_ONEBIT_port
 	
+	push hl
 	; 15 times
 	outi
 	outi
@@ -119,6 +120,44 @@ do_sound:
 	outi
 	outi
 	outi
+
+	pop hl
+
+IF PLAY_DATA_LEAD >200
+	push hl
+	; 15 times
+	outi
+	outi
+	outi
+	outi
+
+	outi
+	outi
+	outi
+	outi
+
+	outi
+	outi
+	outi
+	outi
+
+	outi
+	outi
+	outi
+	pop hl
+ENDIF
+
+IF PLAY_DATA_LEAD >180
+	outi
+	outi
+	outi
+	outi
+
+	outi
+	outi
+	outi
+	outi
+ENDIF
 
 	pop hl
 	ret
