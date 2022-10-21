@@ -336,6 +336,7 @@ zxrom.lib:
 	@echo '--- Building ZXROM Library ---'
 	@echo ''
 	$(RM) target/zx/stdio/generic_console_scrollup.o
+	$(MAKE) -C games TARGET=zx
 	$(LIBLINKER) -DFORzx -DSTANDARDESCAPECHARS -DNOROMCALLS -x$(OUTPUT_DIRECTORY)/zxrom @$(TARGET_DIRECTORY)/zx/zxrom.lst
 	$(RM) target/zx/stdio/generic_console_scrollup.o
 

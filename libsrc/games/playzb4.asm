@@ -81,7 +81,11 @@ do_sound:
 	ld	a,(hl)
 
 ;  LOOP UNROLLING !!
+IF PLAY_DATA_LEAD >120
 	ld b,4
+ELSE
+	ld b,3
+ENDIF
 byte1:
 	  rlca
 	  ld   l,a
