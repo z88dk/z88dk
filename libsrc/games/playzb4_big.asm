@@ -53,6 +53,7 @@ rep:
 noz:
 	  ld   d,a
 	  ld   a,(__snd_tick)
+	  res  SOUND_ONEBIT_bit,a
 	  or  d                 ; toggle the sound bit to be sure it 'plays'
 	  ld   (hl),a
 	  inc  hl
@@ -100,7 +101,9 @@ do_sound:
 
 	ld   bc,SOUND_ONEBIT_port
 	
+IF PLAY_DATA_LEAD <120
 	push hl
+ENDIF
 	; 15 times
 	outi
 	outi
@@ -108,6 +111,7 @@ do_sound:
 	outi
 
 	outi
+IF PLAY_DATA_LEAD <120
 	outi
 	outi
 	outi
@@ -122,6 +126,7 @@ do_sound:
 	outi
 
 	pop hl
+ENDIF
 
 IF PLAY_DATA_LEAD >200
 	push hl
