@@ -17,6 +17,8 @@ ${NEWLIB_ROOT}l/sccz80/8-8080/l_glong
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_asl
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_asr_u
 ${NEWLIB_ROOT}l/sccz80/8-8080/l_div
+${NEWLIB_ROOT}l/sccz80/8-8080/l_setix
+${NEWLIB_ROOT}l/sccz80/8-8080/l_setiy
 ${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_sub
 ${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_div
 ${NEWLIB_ROOT}l/sccz80/8-8080/i32/l_long_div_0
