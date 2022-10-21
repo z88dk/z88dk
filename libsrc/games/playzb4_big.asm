@@ -15,7 +15,7 @@
 
 IF !__CPU_GBZ80__ && !__CPU_INTEL__
 
-	SECTION code_clib
+	SECTION smc_clib
 	
 	PUBLIC	playzb4
 	PUBLIC	_playzb4
@@ -39,6 +39,12 @@ _playzb4:
 	push	de
 	push	bc
 
+;	ld a,(probe_dithpat)
+;	cpl
+;	ld b,a
+;	ld a,(probe_dithpat+1)
+;	sub b
+;	jr z,rep1
 
 	push hl
 	push de
@@ -47,14 +53,14 @@ _playzb4:
 rep:
 	  ld	a,(hl)
 	  and  SOUND_ONEBIT_mask      ; check the bit status
-	  ld   a,0
-	  jr   z,noz
-	  dec  a
-noz:
 	  ld   d,a
+;	  ld   a,0
+;	  jr   z,noz
+;	  dec  a
+;noz:
 	  ld   a,(__snd_tick)
 	  res  SOUND_ONEBIT_bit,a
-	  or  d                 ; toggle the sound bit to be sure it 'plays'
+	  or  d                 ; set the sound bit to be sure it 'plays'
 	  ld   (hl),a
 	  inc  hl
 	djnz rep
@@ -101,9 +107,8 @@ do_sound:
 
 	ld   bc,SOUND_ONEBIT_port
 	
-IF PLAY_DATA_LEAD <120
+
 	push hl
-ENDIF
 	; 15 times
 	outi
 	outi
@@ -111,7 +116,6 @@ ENDIF
 	outi
 
 	outi
-IF PLAY_DATA_LEAD <120
 	outi
 	outi
 	outi
@@ -126,7 +130,7 @@ IF PLAY_DATA_LEAD <120
 	outi
 
 	pop hl
-ENDIF
+
 
 IF PLAY_DATA_LEAD >200
 	push hl
@@ -152,7 +156,7 @@ IF PLAY_DATA_LEAD >200
 	pop hl
 ENDIF
 
-IF PLAY_DATA_LEAD >180
+IF PLAY_DATA_LEAD >150
 	outi
 	outi
 	outi
@@ -161,6 +165,8 @@ IF PLAY_DATA_LEAD >180
 	outi
 	outi
 	outi
+	outi
+
 	outi
 ENDIF
 
@@ -192,6 +198,7 @@ dithpat:
 	defb	@00000000
 	defb	@00000000
 	defb	@00000000
+probe_dithpat:
 	defb	@00000000	; 3
 	defb	@11111111
 	defb	@00000000
