@@ -13,6 +13,6 @@ target/lynx/stdio/CRT_FONT
 target/lynx/graphics/textpixl
 @gfx/gencon/gfx_gencon.lst
 @video/mc6845/mc6845.lst
+target/lynx/playzb4
 target/lynx/games/keys_joystick
 @games/games.lst
-
