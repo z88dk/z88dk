@@ -137,7 +137,7 @@ extern int __LIB__ f2i (long v);
     #define INV(x)      (i2f(1)/(long)x)
     #define SQR(x)      sqrfx(x)
     #define SQRT(x)     sqrtfx(x)
-    #define INVSQRT(x)  (f2i(i2f(1)/sqrtfx(x))
+    #define INVSQRT(x)  (f2i(i2f(1)/sqrtfx(x)))
 
     #define COS(x)      icos(x)
     #define SIN(x)      isin(x)
