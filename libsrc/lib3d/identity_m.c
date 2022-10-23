@@ -60,6 +60,6 @@ void identity_m(matrix_t * matrix)
 
     uint8_t i = 0;
     do{
-        matrix->e[i] = 1.0;
+        matrix->e[i] = (ELEMENT)1;
     }while( (i += (MATRIX_ORDER+1)) < (MATRIX_ORDER*MATRIX_ORDER) );
 }

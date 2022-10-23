@@ -68,7 +68,7 @@ void projection_w3woody_m(matrix_t * matrix, ELEMENT fov, ELEMENT aspect_ratio, 
     matrix->e[0]  =  aspect_ratio / f;
     matrix->e[5]  =  INV(f);
     matrix->e[10] =  0;
-    matrix->e[11] = -1;
+    matrix->e[11] =  (ELEMENT)-1;
     matrix->e[14] = -near;
     matrix->e[15] =  0;
 }

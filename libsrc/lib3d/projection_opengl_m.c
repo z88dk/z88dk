@@ -63,7 +63,7 @@ void projection_opengl_m(matrix_t * matrix, ELEMENT fov, ELEMENT aspect_ratio, E
     matrix->e[0]  =  aspect_ratio / f;
     matrix->e[5]  =  INV(f);
     matrix->e[10] = -(far + near) / (far - near);
-    matrix->e[11] = -1;
+    matrix->e[11] =  (ELEMENT)-1;
     matrix->e[14] = -(far * near) / ((far - near) * 2);
     matrix->e[15] =  0;
 }
