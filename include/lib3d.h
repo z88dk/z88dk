@@ -73,13 +73,13 @@ extern long __LIB__  i2f (int v) __z88dk_fastcall;
 extern int __LIB__ f2i (long v);
 
 /// fixed-point multiplication
-#define mulfx(x,y)	f2i((long)y * (long)x)
+#define mulfx(x,y)	(f2i((long)(x * y)))
 
 /// fixed-point division
-#define divfx(x,y)	(i2f(x)/(long)y)
+#define divfx(x,y)	(f2i(i2f(x)/y))
 
 /// fixed-point square
-#define sqrfx(x)	(f2i((long)x * (long)x))
+#define sqrfx(x)	(f2i((long)(x * x)))
 
 /// fixed-point square root
 #define sqrtfx(x)	(((long)(sqrt(x)))*8)
