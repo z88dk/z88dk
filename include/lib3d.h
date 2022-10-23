@@ -7,11 +7,62 @@ Copyright 2002, Mark Hamilton
 
 */
 
+/*
+ * 3d.h
+ *
+ * Copyright (c) 2022 Phillip Stevens
+ * Create Time: October 2022
+ *
+ * The MIT License (MIT)
+ *
+ * Permission is hereby granted,free of charge,to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"),to deal
+ * in the Software without restriction,including without limitation the rights
+ * to use,copy,modify,merge,publish,distribute,sublicense,and/or sell
+ * copies of the Software,and to permit persons to whom the Software is
+ * furnished to do so,subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS",WITHOUT WARRANTY OF ANY KIND,EXPRESS OR
+ * IMPLIED,INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,DAMAGES OR OTHER
+ * LIABILITY,WHETHER IN AN ACTION OF CONTRACT,TORT OR OTHERWISE,ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ */
+
+/*
+ * 3D homogeneous coordinate definition
+ * https://en.wikipedia.org/wiki/Homogeneous_coordinates
+ *
+ * project 3D coords onto 2D screen
+ * https://stackoverflow.com/questions/724219/how-to-convert-a-3d-point-into-2d-perspective-projection
+ *
+ * Goodbye Far Clipping Plane.
+ * https://chaosinmotion.com/2010/09/06/goodbye-far-clipping-plane/
+ *
+ * 3D Clipping in Homogeneous Coordinates
+ * https://chaosinmotion.com/2016/05/22/3d-clipping-in-homogeneous-coordinates/
+ *
+ * transformation matrix:
+ * https://www.tutorialspoint.com/computer_graphics/3d_transformation.htm
+ *
+ */
+
 #ifndef __LIB3D_H__
 #define __LIB3D_H__
 
-#include <sys/compiler.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+#include <sys/compiler.h>
+#include <stdint.h>
+#include <math.h>
 
 // fixed point arithmetic
 
@@ -36,12 +87,77 @@ extern int __LIB__ f2i (long v);
 /// weighted average (w=0.0 -> x, w=0.5->average, w=1.0 ->y)
 //#define wgavgfx(x, y, w)	(mulfx(i2f(1) - w, x) + mulfx(w, y))
 
+// ELEMENTing point arithmetic
 
-#define PI   3.141592
+#define MATRIX_ORDER    4           // order for 3D homogeneous coordinate graphics
 
-/// represents a vector in 3 dimensions
-typedef struct {
-	int x, y, z;
+#ifdef __MATH_AM9511
+
+    #define ELEMENT     ELEMENT_t
+
+    #define INV(x)      1/(x)
+    #define SQR(x)      sqr(x)
+    #define SQRT(x)     sqrt(x)
+    #define INVSQRT(x)  1/SQRT(x)
+
+    #define COS(x)      cos(x)
+    #define SIN(x)      sin(x)
+    #define TAN(x)      tan(x)
+
+#elif __MATH_MATH32
+
+    #define ELEMENT     ELEMENT_t
+
+    #define INV(x)      inv(x)
+    #define SQR(x)      sqr(x)
+    #define SQRT(x)     sqrt(x)
+    #define INVSQRT(x)  invsqrt(x)
+
+    #define COS(x)      cos(x)
+    #define SIN(x)      sin(x)
+    #define TAN(x)      tan(x)
+
+#elif __MATH_MATH16
+
+    #define ELEMENT     _ELEMENT16
+
+    #define INV(x)      invf16(x)
+    #define SQR(x)      ((x)*(x))
+    #define SQRT(x)     sqrtf16(x)
+    #define INVSQRT(x)  invsqrtf16(x)
+
+    #define COS(x)      cosf16(x)
+    #define SIN(x)      sinf16(x)
+    #define TAN(x)      tanf16(x)
+
+#else
+
+    #define ELEMENT     int
+
+    #define INV(x)      (i2f(1)/(long)x)
+    #define SQR(x)      sqrfx(x)
+    #define SQRT(x)     sqrtfx(x)
+    #define INVSQRT(x)  (f2i(i2f(1)/sqrtfx(x))
+
+    #define COS(x)      icos(x)
+    #define SIN(x)      isin(x)
+    #define TAN(x)      (f2i(i2f(icos(x))/(long)isin(x)))
+
+#endif
+
+
+/****************************************************************************/
+/***          Type Definitions                                            ***/
+/****************************************************************************/
+
+
+/// represents a vector in 4 dimensions
+typedef struct Vector_s
+{
+    ELEMENT x;          // x dimension
+    ELEMENT y;          // y dimension
+    ELEMENT z;          // z dimension
+    ELEMENT w;          // w dimension
 } Vector_t;
 
 #define vector_t Vector_t
@@ -79,6 +195,16 @@ typedef struct {
 	int pitch, roll, yaw;
 	int x, y, z;
 } Cam_t;
+
+typedef struct matrix_s // homogeneous coordinate system
+{
+    ELEMENT e[MATRIX_ORDER*MATRIX_ORDER];
+} matrix_t;
+
+
+/****************************************************************************/
+/***        Function Definitions                                          ***/
+/****************************************************************************/
 
 
 /* protos */
@@ -173,8 +299,53 @@ extern int __LIB__  fwd(int length) __z88dk_fastcall;
 extern int __LIB__  turn_left(int degrees) __z88dk_fastcall; /* input must be between 0 and 360 */
 extern int __LIB__  turn_right(int degrees) __z88dk_fastcall; /* input must be between 0 and 360 */
 
+/* Homogenous Coordinate 3D Graphics */
+
+/* Produce a unit vector */
+extern void __LIB__ unit_v(vector_t * vect) __smallc;
+
+/* Scale a vector by m, but don't touch w dimension */
+extern void __LIB__ scale_v(vector_t * vect, ELEMENT scale) __smallc;
+
+/* Produce a dot product between vectors */
+ELEMENT __LIB__ dot_v(vector_t * vect1, vector_t * vect2) __smallc;
+
+/* Vector Matrix Multiplication */
+extern void __LIB__ mult_v(vector_t * vect, matrix_t * multiplier) __smallc;
+
+/* Produce an identity matrix */
+extern void __LIB__ identity_m(matrix_t * matrix) __smallc;
+
+/* Produce a transformation (translation) */
+extern void __LIB__ translate_m(matrix_t * matrix, ELEMENT x, ELEMENT y, ELEMENT z) __smallc;
+
+/* Produce a transformation (scale) */
+extern void __LIB__ scale_m(matrix_t * matrix, ELEMENT x, ELEMENT y, ELEMENT z) __smallc;
+
+/* Produce a transformation (shear) */
+extern void __LIB__ shear_m(matrix_t * matrix, ELEMENT x, ELEMENT y, ELEMENT z) __smallc;
+
+/* Rotation in x dimension */
+extern void __LIB__ rotx_m(matrix_t * matrix, ELEMENT angle) __smallc;
+
+/* Rotation in y dimension */
+extern void __LIB__ roty_m(matrix_t * matrix, ELEMENT angle) __smallc;
+
+/* Rotation in z dimension */
+extern void __LIB__ rotz_m(matrix_t * matrix, ELEMENT angle) __smallc;
+
+/* Set up projection OpenGL */
+extern void __LIB__ projection_opengl_m(matrix_t * matrix, ELEMENT fov, ELEMENT aspect_ratio, ELEMENT near, ELEMENT far) __smallc;
+
+/* Set up projection W3Woody */
+extern void __LIB__ projection_w3woody_m(matrix_t * matrix, ELEMENT fov, ELEMENT aspect_ratio, ELEMENT near, ELEMENT far) __smallc;
+
+/* Matrix Multiplication */
+extern void __LIB__ mult_m(matrix_t * multiplicand, matrix_t * multiplier) __smallc;
 
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __LIB3D_H__ */
