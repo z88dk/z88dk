@@ -132,7 +132,7 @@ extern int __LIB__ f2i (long v);
 
     #define ELEMENT     int
 
-    #define INV(x)      (i2f(1)/(long)x)
+    #define INV(x)      (i2f(1)/(x))
     #define SQR(x)      sqrfx(x)
     #define SQRT(x)     sqrtfx(x)
     #define INVSQRT(x)  (f2i(i2f(1)/sqrtfx(x)))
