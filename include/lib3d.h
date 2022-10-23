@@ -87,13 +87,13 @@ extern int __LIB__ f2i (long v);
 /// weighted average (w=0.0 -> x, w=0.5->average, w=1.0 ->y)
 //#define wgavgfx(x, y, w)	(mulfx(i2f(1) - w, x) + mulfx(w, y))
 
-// ELEMENTing point arithmetic
+// Floating point arithmetic
 
 #define MATRIX_ORDER    4           // order for 3D homogeneous coordinate graphics
 
 #ifdef __MATH_AM9511
 
-    #define ELEMENT     ELEMENT_t
+    #define ELEMENT     float_t
 
     #define INV(x)      1/(x)
     #define SQR(x)      sqr(x)
@@ -106,7 +106,7 @@ extern int __LIB__ f2i (long v);
 
 #elif __MATH_MATH32
 
-    #define ELEMENT     ELEMENT_t
+    #define ELEMENT     float_t
 
     #define INV(x)      inv(x)
     #define SQR(x)      sqr(x)
@@ -119,7 +119,7 @@ extern int __LIB__ f2i (long v);
 
 #elif __MATH_MATH16
 
-    #define ELEMENT     _ELEMENT16
+    #define ELEMENT     _Float16
 
     #define INV(x)      invf16(x)
     #define SQR(x)      ((x)*(x))
