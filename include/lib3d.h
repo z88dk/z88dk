@@ -288,6 +288,7 @@ extern void __LIB__ stencil_add_ellipse(int cx, int cy, int sa, int ea, int xrad
 
 
 /* Turtle Graphics */
+
 #define T_NORTH 270
 #define T_SOUTH 90
 #define T_WEST 180
@@ -296,6 +297,7 @@ extern int __LIB__  set_direction(int degrees) __z88dk_fastcall; /* input must b
 extern int __LIB__  fwd(int length) __z88dk_fastcall;
 extern int __LIB__  turn_left(int degrees) __z88dk_fastcall; /* input must be between 0 and 360 */
 extern int __LIB__  turn_right(int degrees) __z88dk_fastcall; /* input must be between 0 and 360 */
+
 
 /* Homogenous Coordinate 3D Graphics */
 
@@ -308,7 +310,7 @@ extern void __LIB__ scale_v(vector_t * vect, ELEMENT scale) __smallc;
 /* Produce a dot product between vectors */
 ELEMENT __LIB__ dot_v(vector_t * vect1, vector_t * vect2) __smallc;
 
-/* Vector Matrix Multiplication */
+/* Vector Matrix Multiplication [vect] = [vect]*[multiplier] */
 extern void __LIB__ mult_v(vector_t * vect, matrix_t * multiplier) __smallc;
 
 /* Produce an identity matrix */
@@ -338,7 +340,7 @@ extern void __LIB__ projection_opengl_m(matrix_t * matrix, ELEMENT fov, ELEMENT 
 /* Set up projection W3Woody */
 extern void __LIB__ projection_w3woody_m(matrix_t * matrix, ELEMENT fov, ELEMENT aspect_ratio, ELEMENT near, ELEMENT far) __smallc;
 
-/* Matrix Multiplication */
+/* Matrix Multiplication [multiplicand] = [multiplicand]*[multiplier] */
 extern void __LIB__ mult_m(matrix_t * multiplicand, matrix_t * multiplier) __smallc;
 
 
