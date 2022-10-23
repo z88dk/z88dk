@@ -1,15 +1,13 @@
 /*
-lib3d.h
-
-Structs for standard Wizard 3d and 4d math functions
-
-Copyright 2002, Mark Hamilton
-
-*/
+ * lib3d.h
+ *
+ * Structs for standard Wizard 3d and 4d math functions
+ *
+ * Copyright 2002, Mark Hamilton
+ *
+ */
 
 /*
- * 3d.h
- *
  * Copyright (c) 2022 Phillip Stevens
  * Create Time: October 2022
  *
@@ -82,7 +80,7 @@ extern int __LIB__ f2i (long v);
 #define sqrfx(x)	(f2i((long)(x * x)))
 
 /// fixed-point square root
-#define sqrtfx(x)	(((long)(sqrt(x)))*8)
+#define sqrtfx(x)	(f2i(((long)(sqrt(x)))*8))
 
 /// weighted average (w=0.0 -> x, w=0.5->average, w=1.0 ->y)
 //#define wgavgfx(x, y, w)	(mulfx(i2f(1) - w, x) + mulfx(w, y))
@@ -141,7 +139,7 @@ extern int __LIB__ f2i (long v);
 
     #define COS(x)      icos(x)
     #define SIN(x)      isin(x)
-    #define TAN(x)      (f2i(i2f(icos(x))/(long)isin(x)))
+    #define TAN(x)      (f2i(i2f(icos(x))/isin(x)))
 
 #endif
 
