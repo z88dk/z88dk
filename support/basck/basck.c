@@ -351,6 +351,10 @@ int microsoft_skel[]={9, CATCH, 'i', 'c', 'r', 'o', 's', 'o', 'f', 't'};
 int bastxt_skel[]={8, 0x2A, CATCH, CATCH, 0x44, 0x4D, 0x7E, 0x23, 0xB6, 0x2B, 0xC8, 0x23, 0x23, 0x7E, 0x23, 0x66};
 int bastxt_skel2[]={11, SKIP_JP_RET, 0xC0, 0x2A, CATCH, CATCH, 0xAF, 0x77, 0x23, 0x77, 0x23, 0x22 };
 
+int bakstk_skel[]={19, ADDR, 33, 4, 0, 0x39, 0x7E, 0x23,      0x3D,     0xC0, 0x4E, 0x23, 0x46, 0x23, 0xE5, 0x60, 0x69, 0x7A, 0xB3, 0xEB, };
+int bakstk_skel2[]={20, ADDR, 33, 4, 0, 0x39, 0x7E, 0x23,  0xFE, SKIP,  0xC0, 0x4E, 0x23, 0x46, 0x23, 0xE5, 0x60, 0x69, 0x7A, 0xB3, 0xEB, };
+
+
 int microsoft_extended_skel[]={11, ADDR, 0xFE, '%', 0xC8, 0x14, 0xFE, '$', 0xC8, 0x14, 0xFE, '!'};
 
 /* Looking for a buggy ATN table to discriminate between N82(TRS80 M100/200, Olivetti M10) and N83(MSX, KC85) */
@@ -1262,6 +1266,10 @@ int main(int argc, char *argv[])
 		res=find_skel(bastxt_skel);
 	if (res<0)
 		res=find_skel(bastxt_skel2);
+	if (res<0)
+		res=find_skel(bakstk_skel);
+	if (res<0)
+		res=find_skel(bakstk_skel2);
 	if (res<0) {
 		res=find_skel(errtab_skel);
 		if (res>0) res =0xFFFF;
@@ -1793,6 +1801,16 @@ int main(int argc, char *argv[])
 			res=find_skel(oprnd_skel2);
 		if (res>0)
 			clbl("OPRND", res, "Get next expression value");
+
+
+		res=find_skel(bakstk_skel);
+		if (res<0)
+			res=find_skel(bakstk_skel2);
+		if (res>0) {
+			clbl("BAKSTK", res+pos+1, "Search FOR or GOSUB block on stack (skip 2 words)");
+			clbl("LOKFOR", res+pos+5, "Look for existing 'FOR' block");
+		}
+
 
 		res=find_skel(ptrfil_skel);
 		if (res<0)
