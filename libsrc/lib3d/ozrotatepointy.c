@@ -12,8 +12,8 @@ Copyright© 2002, Mark Hamilton
 void ozrotatepointy(Vector_t *v, int rot)
 {
     static long x, z;
-	x = v->x;
-	z = v->z;
+    x = v->x;
+    z = v->z;
     v->x = div256(x * icos(rot) - z * isin(rot));
     v->z = div256(x * isin(rot) + z * icos(rot));
 }

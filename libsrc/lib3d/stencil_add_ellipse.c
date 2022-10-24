@@ -4,11 +4,10 @@
 	* stencil version
 
 	stencil_add_ellipse( cx,  cy,  startangle,  endangle,  xradius,  yradius, stencil)
-	
+
 	Draw an ellipse arc delimited by 'startangle' and 'endangle',
 	specified in degrees.
-	
-	
+
 	$Id: stencil_add_ellipse.c,v 1.2 2013-10-09 06:10:34 stefano Exp $
 */
 

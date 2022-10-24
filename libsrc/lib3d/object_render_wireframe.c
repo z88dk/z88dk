@@ -6,7 +6,7 @@
 	Copyright (C) 2004  Rafael de Oliveira Jannone
 
 	Render an object with wireframes
-	
+
 	$Id: object_render_wireframe.c,v 1.1 2009-04-10 12:47:42 stefano Exp $
 */
 

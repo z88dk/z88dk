@@ -33,3 +33,17 @@ get_direction
 fwd
 turn_left
 turn_right
+dot_v
+mult_v
+scale_v
+unit_v
+identity_m
+mult_m
+rotx_m
+roty_m
+rotz_m
+scale_m
+shear_m
+translate_m
+projection_opengl_m
+projection_w3woody_m

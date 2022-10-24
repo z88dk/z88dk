@@ -6,7 +6,7 @@
 	Copyright (C) 2004  Rafael de Oliveira Jannone
 
 	Render an object with flat-shading, requires a normalized source of light
-	
+
 	$Id: object_render_flatshading.c,v 1.1 2009-04-10 12:47:42 stefano Exp $
 */
 

@@ -40,13 +40,13 @@ void star_randomize(star_t* st) {
 void star_move(star_t* st) {
 	int x, y, z;
 	z = (st->z -= 2);
-	x = f2i(divfx(st->x, z)) + 128;
-	y = f2i(divfx(st->y, z)) + 96;
+	x = st->x / z + 128;
+	y = st->y / z + 96;
 	if (z < 1 || x < 0 || x >= MODE2_WIDTH || y < 0 || y >= MODE2_HEIGHT) {
 		star_randomize(st);
 		z = st->z;
-		x = f2i(divfx(st->x, z)) + 128;
-		y = f2i(divfx(st->y, z)) + 96;
+		x = st->x / z + 128;
+		y = st->y / z + 96;
 	}
 	st->last = st->addr;
 	st->addr = map_pixel(x, y);
