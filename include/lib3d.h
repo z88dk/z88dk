@@ -60,30 +60,31 @@ extern "C" {
 
 #include <sys/compiler.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <math.h>
 
 // fixed point arithmetic
 
-/// integer to fixed-point
+/// integer to fixed-point 26.6
 extern long __LIB__  i2f (int v) __z88dk_fastcall;
 
-/// fixed-point to integer
-extern int __LIB__ f2i (long v);
+/// fixed-point 26.6 to integer
+extern int __LIB__ f2i (long v) __z88dk_fastcall;
 
 /// fixed-point multiplication
-#define mulfx(x,y)	(f2i((long)(x * y)))
+//#define mulfx(x,y)    (f2i(i2f(x)*y))
 
 /// fixed-point division
-#define divfx(x,y)	(f2i(i2f(x)/y))
+//#define divfx(x,y)    (f2i(i2f(x)/y))
 
 /// fixed-point square
-#define sqrfx(x)	(f2i((long)(x * x)))
+//#define sqrfx(x)      (f2i(i2f(x)*x))
 
 /// fixed-point square root
-#define sqrtfx(x)	(f2i(((long)(sqrt(x)))*8))
+//#define sqrtfx(x)     (((long)(sqrt(x)))*8)
 
 /// weighted average (w=0.0 -> x, w=0.5->average, w=1.0 ->y)
-//#define wgavgfx(x, y, w)	(mulfx(i2f(1) - w, x) + mulfx(w, y))
+//#define wgavgfx(x, y, w)  (mulfx(i2f(1) - w, x) + mulfx(w, y))
 
 // Floating point arithmetic
 
@@ -96,7 +97,6 @@ extern int __LIB__ f2i (long v);
     #define INV(x)      1/(x)
     #define SQR(x)      sqr(x)
     #define SQRT(x)     sqrt(x)
-    #define INVSQRT(x)  1/SQRT(x)
 
     #define COS(x)      cos(x)
     #define SIN(x)      sin(x)
@@ -109,7 +109,6 @@ extern int __LIB__ f2i (long v);
     #define INV(x)      inv(x)
     #define SQR(x)      sqr(x)
     #define SQRT(x)     sqrt(x)
-    #define INVSQRT(x)  invsqrt(x)
 
     #define COS(x)      cos(x)
     #define SIN(x)      sin(x)
@@ -122,7 +121,6 @@ extern int __LIB__ f2i (long v);
     #define INV(x)      invf16(x)
     #define SQR(x)      ((x)*(x))
     #define SQRT(x)     sqrtf16(x)
-    #define INVSQRT(x)  invsqrtf16(x)
 
     #define COS(x)      cosf16(x)
     #define SIN(x)      sinf16(x)
@@ -132,10 +130,9 @@ extern int __LIB__ f2i (long v);
 
     #define ELEMENT     int
 
-    #define INV(x)      (i2f(1)/(x))
-    #define SQR(x)      sqrfx(x)
-    #define SQRT(x)     sqrtfx(x)
-    #define INVSQRT(x)  (f2i(i2f(1)/sqrtfx(x)))
+    #define INV(x)      1
+    #define SQR(x)      ((x)*(x))
+    #define SQRT(x)     isqrt(x)
 
     #define COS(x)      icos(x)
     #define SIN(x)      isin(x)
@@ -152,46 +149,46 @@ extern int __LIB__ f2i (long v);
 /// represents a vector in 4 dimensions
 typedef struct Vector_s
 {
-    ELEMENT x;          // x dimension
-    ELEMENT y;          // y dimension
-    ELEMENT z;          // z dimension
-    ELEMENT w;          // w dimension
+    ELEMENT x;              /// x dimension
+    ELEMENT y;              /// y dimension
+    ELEMENT z;              /// z dimension
+    ELEMENT w;              /// w dimension
 } Vector_t;
 
 #define vector_t Vector_t
 
 /// a triangle made of 3 vertexes
 typedef struct {
-	vector_t* vertexes[3];	///< 3 vertexes
+    vector_t* vertexes[3];  ///< 3 vertexes
 } triangle_t;
 
 /// mesh: a set of points (vectors) refered by a set of triangles
 typedef struct {
-	int pcount;	///< number of points
-	int tcount;	///< number of triangles
+    int pcount;             ///< number of points
+    int tcount;             ///< number of triangles
 
-	vector_t* points;	///< points
-	triangle_t* triangles;	///< triangles
+    vector_t* points;       ///< points
+    triangle_t* triangles;  ///< triangles
 } mesh_t;
 
 /// an object is a solid in a scene, with translation, rotation and the solid's mesh
 typedef struct {
-	mesh_t* mesh;	///< mesh
-	unsigned char rot_x;	///< angle of rotation X-axis
-	unsigned char rot_y;	///< angle of rotation Y-axis
-	unsigned char rot_z;	///< angle of rotation Z-axis
-	int trans_x;	///< translation on X-axis
-	int trans_y;	///< translation on Y-axis
-	int trans_z;	///< translation on Z-axis
+    mesh_t* mesh;           ///< mesh
+    unsigned char rot_x;    ///< angle of rotation X-axis
+    unsigned char rot_y;    ///< angle of rotation Y-axis
+    unsigned char rot_z;    ///< angle of rotation Z-axis
+    int trans_x;            ///< translation on X-axis
+    int trans_y;            ///< translation on Y-axis
+    int trans_z;            ///< translation on Z-axis
 } object_t;
 
 typedef struct {
-	int x, y;
+    int x, y;
 } Point_t;
 
 typedef struct {
-	int pitch, roll, yaw;
-	int x, y, z;
+    int pitch, roll, yaw;
+    int x, y, z;
 } Cam_t;
 
 typedef struct matrix_s // homogeneous coordinate system
@@ -257,15 +254,15 @@ extern void __LIB__ mesh_delete(mesh_t* mesh) __smallc;
 extern void __LIB__ object_apply_transformations(object_t* obj, vector_t* pbuffer, int x, int y) __smallc;
 
 /*
-	Integer sin functions taken from the lib3d library, OZ7xx DK
-	by Hamilton, Green and Pruss
-	isin and icos return a value between -254 and +255
-	(changed by Stefano, originally it was +/- 16384)
+    Integer sin functions taken from the lib3d library, OZ7xx DK
+    by Hamilton, Green and Pruss
+    isin and icos return a value between -254 and +255
+    (changed by Stefano, originally it was +/- 16384)
 */
 
-extern int __LIB__  isin(unsigned int degrees) __z88dk_fastcall; /* input must be between 0 and 360 */
-extern int __LIB__  icos(unsigned int degrees) __z88dk_fastcall; /* input must be between 0 and 360 */
-extern int __LIB__  div256(long value); /* divide by 255 */
+extern int __LIB__  isin(unsigned int degrees) __z88dk_fastcall;    /* input must be between 0 and 360 */
+extern int __LIB__  icos(unsigned int degrees) __z88dk_fastcall;    /* input must be between 0 and 360 */
+extern int __LIB__  div256(long value) __z88dk_fastcall;            /* divide by 255 */
 
 
 /* Monochrome graphics functions depending on lib3d portions */

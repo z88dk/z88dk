@@ -56,10 +56,10 @@
 /* Produce a unit vector */
 void unit_v(vector_t * vect)
 {
-    ELEMENT inv_magnitude = INVSQRT( SQR(vect->x) + SQR(vect->y) + SQR(vect->z) );
+    ELEMENT magnitude = SQRT( SQR(vect->x) + SQR(vect->y) + SQR(vect->z) );
 
-    vect->x *= inv_magnitude;
-    vect->y *= inv_magnitude;
-    vect->z *= inv_magnitude;
+    vect->x /= magnitude;
+    vect->y /= magnitude;
+    vect->z /= magnitude;
     vect->w  = (ELEMENT)1;
 }

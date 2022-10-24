@@ -3,10 +3,9 @@
 	Graphics functions requiring some of the LIB3D Extensions
 
 	polygon(cx, cy, corners, radius, startangle)
-	
+
 	Draw a polygon of a given no. of corners and a corner at a given angle (0..360).
-	
-	
+
 	$Id: polygon.c,v 1.1 2013-05-08 16:41:36 stefano Exp $
 */
 

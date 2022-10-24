@@ -11,7 +11,7 @@ Copyright© 2002, Mark Hamilton
 
 void oztranslatevector(Vector_t *v, Vector_t *offset)
 {
-	v->x += offset->x;
-	v->y += offset->y;
-	v->z += offset->z;
+    v->x += offset->x;
+    v->y += offset->y;
+    v->z += offset->z;
 }

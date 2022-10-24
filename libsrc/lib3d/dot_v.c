@@ -55,5 +55,5 @@
 /* Produce a dot product between vectors */
 ELEMENT dot_v(vector_t * vect1,vector_t * vect2)
 {
-    return vect1->x * vect2->x + vect1->y * vect2->y + vect1->z * vect2->z;
+    return (vect1->x * vect2->x) + (vect1->y * vect2->y) + (vect1->z * vect2->z);
 }

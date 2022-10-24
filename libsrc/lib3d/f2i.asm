@@ -1,8 +1,8 @@
 ;
 ;    Fixed Point functions
 ;
-;    int f2i (long v)
-;    fixed point to integer
+;    int f2i (long v) __z88dk_fastcall;
+;    fixed point 26.6 to integer
 ;
 
     SECTION code_clib
@@ -12,12 +12,12 @@
 
 .f2i
 ._f2i
-    pop     bc    ; RET addr.
-    pop     hl
-    pop     de
-    push    de
-    push    hl
-    push    bc
+    ;pop     bc    ; RET addr.
+    ;pop     hl
+    ;pop     de
+    ;push    de
+    ;push    hl
+    ;push    bc
 
 ;; DEHL holds value
 

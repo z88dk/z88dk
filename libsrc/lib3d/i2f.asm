@@ -2,7 +2,7 @@
 ;    Fixed Point functions
 ;
 ;    long i2f (int v) __z88dk_fastcall;
-;    integer to float;
+;    integer to fixed point 26.6;
 ;
 
     SECTION code_clib
