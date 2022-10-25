@@ -10,10 +10,10 @@ EXTERN getk
 joystick:
 _joystick:
     ld      a,l
-    ld      c,$20
+    ld      c,$40
     cp      1
     jr      z,read_stick
-    ld      c,$40
+    ld      c,$20
     cp      2
     jr      z,read_stick
     cp      3
