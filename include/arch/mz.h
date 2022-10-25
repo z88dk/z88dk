@@ -85,6 +85,8 @@ extern int  __LIB__  mztape_save_header(void *addr, size_t len) __smallc;
 extern int  __LIB__  mztape_load_header(void *addr, size_t len) __smallc;
 extern int  __LIB__  mztape_save_block(void *addr, size_t len) __smallc;
 extern int  __LIB__  mztape_load_block(void *addr, size_t len) __smallc;
+// Start/stop the tape motor (1:ON, 2:OFF)
+extern void  __LIB__  mztape_motor(int cmd) __z88dk_fastcall;
 
 extern int  __LIB__  mztape_save_header_callee(void *addr, size_t len) __smallc __z88dk_callee;
 extern int  __LIB__  mztape_load_header_callee(void *addr, size_t len) __smallc __z88dk_callee;
