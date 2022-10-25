@@ -32,6 +32,9 @@ target/mz/tape/obj/${TARGET}/mztape_save_header_callee
 target/mz/tape/obj/${TARGET}/tape_save
 target/mz/tape/obj/${TARGET}/tape_save_block
 target/mz/tape/obj/${TARGET}/tape_load_block
+target/mz/tape/obj/${TARGET}/mztape_motor
+target/mz/tape/obj/${TARGET}/bit_load_block_zx
+target/mz/tape/obj/${TARGET}/bit_load_block_zx_callee
 @gfx/narrow/gfx_narrow.lst
 @games/games.lst
 
