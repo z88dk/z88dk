@@ -19,10 +19,12 @@
 	EXTERN	l_dcal		; jp(hl)
 	EXTERN	cleanup		; cleanup before program exit
 
-
 	EXTERN	l_jphl		; another jp(hl)
 	EXTERN	l_jpix		; jp(ix)
 	EXTERN	l_jpiy		; jp(iy)
+
+	EXTERN	l_setix		; set non-z80 jp(ix) smc
+	EXTERN	l_setiy		; set non-z80 jp(iy) smc
 
 	EXTERN	l_ldi
 	EXTERN	l_ldi_128
@@ -31,16 +33,14 @@
 	EXTERN	l_outi
 	EXTERN	l_outi_128
 	EXTERN	l_outi_256
-	
+
 	EXTERN	l_ini
 	EXTERN	l_ini_128
 	EXTERN	l_ini_256
 	EXTERN	l_ini_512
 
-
 	; Used for banked calls for __banked for sccz80 + sdcc
 	EXTERN	banked_call
-
 
 ;------------------------------------
 ; Scopes for integer library routines
@@ -90,7 +90,7 @@
 	EXTERN	l_com		;Int ~
 	EXTERN	l_lneg		;Int logical negate
 	EXTERN	l_bool		;Int boolean test
-	EXTERN	l_cm_de	;
+	EXTERN	l_cm_de
 	EXTERN	l_cm_bc
 	EXTERN	l_deneg
 	EXTERN	l_bcneg
@@ -109,7 +109,7 @@
 	EXTERN	lpush2		;Push a long under the stack
 	EXTERN	l_int2long_s	;Int->long signed conversion
 	EXTERN	l_int2long_s_float	;Int->long->float signed conversion (optimizer: use -O3)
-	EXTERN	l_int2long_u_float	;uInt->ulong->float signed conversion 
+	EXTERN	l_int2long_u_float	;uInt->ulong->float signed conversion
 	EXTERN	l_glong		;Get long
 	EXTERN	l_glongsp	;Get long (peephole opt)
 	EXTERN	l_glonghlp	;Get pointer, then get long
@@ -398,4 +398,3 @@
 
 	EXTERN	l_debug_push_frame
 	EXTERN	l_debug_pop_frame
-

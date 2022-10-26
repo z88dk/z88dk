@@ -1,6 +1,6 @@
 SECTION smc_clib
 
-PUBLIC l_jpiy, l_jpiy_addr
+PUBLIC l_jpiy, l_iy_addr
 EXTERN l_ret
 
 l_jpiy:
@@ -9,6 +9,6 @@ l_jpiy:
     ; You MUST call l_setiy first!
     ; This should never happen, but just in case it does.. l_ret
 
-defc l_jpiy_addr = l_jpiy+1
+defc l_iy_addr = l_jpiy+1
 
 ; use for library code only!

@@ -1,9 +1,10 @@
+
 SECTION code_clib
-SECTION code_l
+SECTION code_l_sccz80
 
 PUBLIC l_setix
-EXTERN l_jpix_addr
+EXTERN l_ix_addr
 
 l_setix:
-    ld (l_jpix_addr),hl
+    ld (l_ix_addr),hl
     ret

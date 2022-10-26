@@ -1,9 +1,10 @@
+
 SECTION code_clib
-SECTION code_l
+SECTION code_l_sccz80
 
 PUBLIC l_setiy
-EXTERN l_jpiy_addr
+EXTERN l_iy_addr
 
 l_setiy:
-    ld (l_jpiy_addr),hl
+    ld (l_iy_addr),hl
     ret
