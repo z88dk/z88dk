@@ -1,6 +1,5 @@
 ${NEWLIB_ROOT}l/util/9-common/getarg
 ${NEWLIB_ROOT}l/util/9-common/htons
-${NEWLIB_ROOT}l/util/9-common/l_compare_result
 ${NEWLIB_ROOT}l/util/9-common/l_dec_bc
 ${NEWLIB_ROOT}l/util/9-common/l_dec_de
 ${NEWLIB_ROOT}l/util/9-common/l_ex_bc_de

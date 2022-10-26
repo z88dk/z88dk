@@ -1,4 +1,5 @@
 ${NEWLIB_ROOT}l/sccz80/9-common/l_lneg
+${NEWLIB_ROOT}l/sccz80/9-common/l_compare_result
 ${NEWLIB_ROOT}l/sccz80/9-common/l_or
 ${NEWLIB_ROOT}l/sccz80/9-common/l_gint_eq
 ${NEWLIB_ROOT}l/sccz80/9-common/l_neg
