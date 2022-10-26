@@ -44,15 +44,6 @@ ${NEWLIB_ROOT}l/util/9-common/ascii/num_to_txt/fast/l_fast_utoa
 ${NEWLIB_ROOT}l/util/9-common/ascii/num_to_txt/fast/l_fast_utob
 ${NEWLIB_ROOT}l/util/9-common/ascii/num_to_txt/fast/l_fast_utoh
 ${NEWLIB_ROOT}l/util/9-common/ascii/num_to_txt/fast/l_fast_utoo
-${NEWLIB_ROOT}l/util/9-common/ascii/txt_to_num/fast/l_fast_atou
-${NEWLIB_ROOT}l/util/9-common/ascii/txt_to_num/fast/l_fast_atoul
-${NEWLIB_ROOT}l/util/9-common/ascii/txt_to_num/fast/l_fast_btou
-${NEWLIB_ROOT}l/util/9-common/ascii/txt_to_num/fast/l_fast_btoul
-${NEWLIB_ROOT}l/util/9-common/ascii/txt_to_num/fast/l_fast_htou
-${NEWLIB_ROOT}l/util/9-common/ascii/txt_to_num/fast/l_fast_htoul
-${NEWLIB_ROOT}l/util/9-common/ascii/txt_to_num/fast/l_fast_otou
-${NEWLIB_ROOT}l/util/9-common/ascii/txt_to_num/fast/l_fast_otoul
-
 ${NEWLIB_ROOT}l/util/9-common/ascii/txt_to_num/l_atou
 ${NEWLIB_ROOT}l/util/9-common/ascii/txt_to_num/l_atoul
 ${NEWLIB_ROOT}l/util/9-common/ascii/txt_to_num/l_btou
