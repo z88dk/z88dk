@@ -12,5 +12,6 @@ target/cpm/cpm/obj/${TYPE}/cpm_platform_init
 @target/cpm/fcntl/fcntl.lst
 @target/cpm/gsx.lst
 target/cpm/cpm/obj/${TYPE}/execl
+target/cpm/cpm/obj/${TYPE}/playzb4
 games/joystick
 
