@@ -45,6 +45,10 @@ jr  nz,rep1b
 
 ld      a,(hl)          ; a = sample byte
 and     $f0             ; 4 bit nibble
+and     a
+rrca
+and     a
+rrca
 out		($24),a
 
 ;; delay 2
@@ -59,6 +63,10 @@ rlca                    ;
 rlca                    ;
 rlca                    ;
 and     $f0             ; 4 bit nibble
+and     a
+rrca
+and     a
+rrca
 out		($24),a
 
 inc     hl              ; hl = hl+1
