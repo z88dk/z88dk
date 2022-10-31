@@ -207,6 +207,7 @@
     <ClInclude Include="..\..\src\z80asm\src\cpp\icode.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\lex.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\lstfile.h" />
+    <ClInclude Include="..\..\src\z80asm\src\cpp\ofile.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\parse.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\preproc.h" />
     <ClInclude Include="..\..\src\z80asm\src\cpp\symtab.h" />
@@ -258,6 +259,7 @@
     <ClCompile Include="..\..\src\z80asm\src\cpp\lex.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\lstfile.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\main.cpp" />
+    <ClCompile Include="..\..\src\z80asm\src\cpp\ofile.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\parse.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\parse_main1.cpp" />
     <ClCompile Include="..\..\src\z80asm\src\cpp\preproc.cpp" />

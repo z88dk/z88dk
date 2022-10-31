@@ -307,6 +307,10 @@ void Module::patch_local_exprs() {
 		section->patch_local_exprs();
 }
 
+void Module::check_undefined_symbols() {
+	m_symtab.check_undefined_symbols();
+}
+
 //-----------------------------------------------------------------------------
 
 Object::Object(const string& filename) {
@@ -334,5 +338,11 @@ void Object::check_relative_jumps() {
 void Object::patch_local_exprs() {
 	for (auto& module : m_modules)
 		module->patch_local_exprs();
+}
+
+void Object::check_undefined_symbols() {
+	for (auto& module : m_modules) {
+		module->check_undefined_symbols();
+	}
 }
 

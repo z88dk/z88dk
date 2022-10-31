@@ -59,6 +59,17 @@ void Asm::assemble1(const string& filename) {
 	if (got_errors())
 		return;
 
+	g_symbols.check_undefined_symbols();
+	if (got_errors())
+		return;
+
+	m_object->check_undefined_symbols();
+	if (got_errors())
+		return;
+
+	m_object->write_obj_file();
+	if (got_errors())
+		return;
 }
 
 void Asm::set_cur_module(const string& name) {

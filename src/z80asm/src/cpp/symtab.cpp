@@ -157,6 +157,18 @@ shared_ptr<Symbol> Symtab::find(const string& name) {
 	}
 }
 
+void Symtab::check_undefined_symbols() {
+	for (auto& it : m_table) {
+		shared_ptr<Symbol> symbol = it.second;
+		if (symbol->type() == Symbol::Type::Undef &&
+			symbol->scope() != Symbol::Scope::Extern) {
+			g_errors.push_location(symbol->location());
+			g_errors.error(ErrCode::UndefinedSymbol, symbol->name());
+			g_errors.pop_location();
+		}
+	}
+}
+
 //-----------------------------------------------------------------------------
 
 shared_ptr<Symbol> Symbols::find_local(const string& name) {
@@ -290,6 +302,10 @@ void Symbols::declare(const string& name, Symbol::Scope scope) {
 	case Symbol::Scope::Local: Assert(0); return;
 	default: Assert(0); return;
 	}
+}
+
+void Symbols::check_undefined_symbols() {
+	m_globals.check_undefined_symbols();
 }
 
 void Symbols::declare_global(const string& name) {

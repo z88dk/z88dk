@@ -8,6 +8,7 @@
 #include "utils.h"
 #include <regex>
 #include <set>
+#include <cstdint>
 
 string str_tolower(string str) {
 	for (auto& c : str)
@@ -298,4 +299,22 @@ int ipow(int base, int exp) {
 		base *= base;
 	}
 	return result;
+}
+
+void swrite_int16(int n, ostream& os) {
+	os.put((n >> 0) & 0xff);
+	os.put((n >> 8) & 0xff);
+}
+
+void swrite_int32(int n, ostream& os) {
+	os.put((n >> 0) & 0xff);
+	os.put((n >> 8) & 0xff);
+	os.put((n >> 16) & 0xff);
+	os.put((n >> 24) & 0xff);
+}
+
+void swrite_string(const string& s, ostream& os) {
+	Assert(s.size() <= INT16_MAX);
+	swrite_int16(s.size());
+	os.write(s.c_str(), s.size());
 }

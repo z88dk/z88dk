@@ -611,6 +611,7 @@ Expr::Expr(Lexer& lexer)
 void Expr::clear() {
 	m_root = nullptr;
 	m_location = g_preproc.location();
+	m_section = g_asm.cur_section();
 }
 
 string Expr::text() const {
@@ -933,8 +934,8 @@ bool Expr::is_const() const {
 Patch::Patch(shared_ptr<Expr> expr, int offset)
 	: m_expr(expr), m_offset(offset) {}
 
-void UBytePatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
-	Assert(m_offset + size() <= bytes.size());
+void UBytePatch::do_patch(vector<uint8_t>& bytes, int /*asmpc*/) {
+	Assert(m_offset + size() <= static_cast<int>(bytes.size()));
 	ExprResult r = m_expr->eval_noisy();
 	int value = r.value();
 	if (value < -128 || value > 255)
@@ -942,8 +943,8 @@ void UBytePatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
 	bytes[m_offset] = value & 0xff;
 }
 
-void SBytePatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
-	Assert(m_offset + size() <= bytes.size());
+void SBytePatch::do_patch(vector<uint8_t>& bytes, int /*asmpc*/) {
+	Assert(m_offset + size() <= static_cast<int>(bytes.size()));
 	ExprResult r = m_expr->eval_noisy();
 	int value = r.value();
 	if (value < -128 || value > 127)
@@ -951,24 +952,24 @@ void SBytePatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
 	bytes[m_offset] = value & 0xff;
 }
 
-void WordPatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
-	Assert(m_offset + size() <= bytes.size());
+void WordPatch::do_patch(vector<uint8_t>& bytes, int /*asmpc*/) {
+	Assert(m_offset + size() <= static_cast<int>(bytes.size()));
 	ExprResult r = m_expr->eval_noisy();
 	int value = r.value();
 	bytes[m_offset + 0] = value & 0xff;
 	bytes[m_offset + 1] = (value >> 8) & 0xff;
 }
 
-void BEWordPatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
-	Assert(m_offset + size() <= bytes.size());
+void BEWordPatch::do_patch(vector<uint8_t>& bytes, int /*asmpc*/) {
+	Assert(m_offset + size() <= static_cast<int>(bytes.size()));
 	ExprResult r = m_expr->eval_noisy();
 	int value = r.value();
 	bytes[m_offset + 0] = (value >> 8) & 0xff;
 	bytes[m_offset + 1] = value & 0xff;
 }
 
-void Ptr24Patch::do_patch(vector<uint8_t>& bytes, int asmpc) {
-	Assert(m_offset + size() <= bytes.size());
+void Ptr24Patch::do_patch(vector<uint8_t>& bytes, int /*asmpc*/) {
+	Assert(m_offset + size() <= static_cast<int>(bytes.size()));
 	ExprResult r = m_expr->eval_noisy();
 	int value = r.value();
 	bytes[m_offset + 0] = value & 0xff;
@@ -976,8 +977,8 @@ void Ptr24Patch::do_patch(vector<uint8_t>& bytes, int asmpc) {
 	bytes[m_offset + 2] = (value >> 16) & 0xff;
 }
 
-void DWordPatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
-	Assert(m_offset + size() <= bytes.size());
+void DWordPatch::do_patch(vector<uint8_t>& bytes, int /*asmpc*/) {
+	Assert(m_offset + size() <= static_cast<int>(bytes.size()));
 	ExprResult r = m_expr->eval_noisy();
 	int value = r.value();
 	bytes[m_offset + 0] = value & 0xff;
@@ -987,7 +988,7 @@ void DWordPatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
 }
 
 void JrOffsetPatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
-	Assert(m_offset + size() <= bytes.size());
+	Assert(m_offset + size() <= static_cast<int>(bytes.size()));
 	ExprResult r = m_expr->eval_noisy();
 	int value = r.value() - asmpc + 2;
 	if (value >= -128 && value <= 127) 
@@ -996,8 +997,8 @@ void JrOffsetPatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
 		g_errors.error(ErrCode::IntRange, int_to_hex(value, 2));
 }
 
-void UByte2WordPatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
-	Assert(m_offset + size() <= bytes.size());
+void UByte2WordPatch::do_patch(vector<uint8_t>& bytes, int /*asmpc*/) {
+	Assert(m_offset + size() <= static_cast<int>(bytes.size()));
 	ExprResult r = m_expr->eval_noisy();
 	int value = r.value();
 	if (value < 0 || value > 255)
@@ -1006,8 +1007,8 @@ void UByte2WordPatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
 	bytes[m_offset + 1] = 0;
 }
 
-void SByte2WordPatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
-	Assert(m_offset + size() <= bytes.size());
+void SByte2WordPatch::do_patch(vector<uint8_t>& bytes, int /*asmpc*/) {
+	Assert(m_offset + size() <= static_cast<int>(bytes.size()));
 	ExprResult r = m_expr->eval_noisy();
 	int value = r.value();
 	if (value < -128 || value > 127)
@@ -1016,8 +1017,8 @@ void SByte2WordPatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
 	bytes[m_offset + 1] = (value & 0x80) ? 0xff : 0;
 }
 
-void HighOffsetPatch::do_patch(vector<uint8_t>& bytes, int asmpc) {
-	Assert(m_offset + size() <= bytes.size());
+void HighOffsetPatch::do_patch(vector<uint8_t>& bytes, int /*asmpc*/) {
+	Assert(m_offset + size() <= static_cast<int>(bytes.size()));
 	ExprResult r = m_expr->eval_noisy();
 	int value = r.value();
 	if ((value & 0xff00) != 0) {

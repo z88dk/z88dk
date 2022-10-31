@@ -205,6 +205,8 @@ bool list_is_on();
 const char* get_float_format_define(void);
 
 // object files
+#define OBJ_VERSION	"16"
+
 bool check_object_file(const char* obj_filename);
 bool check_object_file_no_errors(const char* obj_filename);
 

@@ -87,3 +87,11 @@ string vector_to_csv(vector<T> items) {
 		out.pop_back();		// remove end comma
 	return out;
 }
+
+// read/write binary data from/to streams
+void swrite_int16(int n, ostream& os);
+void swrite_int32(int n, ostream& os);
+void swrite_string(const string& s, ostream& os);
+
+int sread_int32(istream& is);
+string sread_string(istream& is);

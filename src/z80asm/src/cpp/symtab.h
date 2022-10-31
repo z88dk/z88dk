@@ -56,6 +56,9 @@ public:
 	void update(MakeComputed tag, shared_ptr<Expr> expr);
 
 	const string& name() const { return m_name; }
+
+	shared_ptr<Expr> expr() { return m_expr; }
+
 	Type type() const { return m_type; }
 
 	Scope scope() const { return m_scope; }
@@ -101,6 +104,7 @@ public:
 	auto end() { return m_table.end(); }
 
 	shared_ptr<Symbol> find(const string& name);
+	void check_undefined_symbols();
 
 private:
 	map<string, shared_ptr<Symbol>>	m_table;	// symbols table
@@ -121,6 +125,7 @@ public:
 	shared_ptr<Symbol> add_local_def(const string& name, int value);	// DEFINE
 	shared_ptr<Symbol> add(shared_ptr<Symbol> new_symbol);
 	void declare(const string& name, Symbol::Scope scope);
+	void check_undefined_symbols();
 
 private:
 	Symtab	m_defines;

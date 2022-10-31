@@ -16,10 +16,9 @@ Handle object file contruction, reading and writing
 #include "if.h"
 #include "module1.h"
 #include "types.h"
+#include "if.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-#define OBJ_VERSION	"16"
 
 /*-----------------------------------------------------------------------------
 *   Write current module to object file - object file name is computed

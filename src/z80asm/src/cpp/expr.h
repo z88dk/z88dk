@@ -319,6 +319,8 @@ public:
 	Expr(Lexer& lexer);
 	void clear();
 	string text() const;
+	Location location() const { return m_location; }
+	shared_ptr<Section> section() { return m_section.lock(); }
 
 	bool parse();				// parse expression, leave lexer after expression
 
@@ -332,6 +334,7 @@ private:
 	Lexer&				m_lexer;			// point at expression to parse
 	shared_ptr<ExprNode> m_root;			// root node of expression
 	Location			m_location;			// location where defined
+	weak_ptr<Section>	m_section;			// section where defined
 
 	TType ttype() const { return m_lexer.peek().ttype; }
 	const Token& token() const { return m_lexer.peek(); }

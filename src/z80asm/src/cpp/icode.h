@@ -159,11 +159,11 @@ public:
 	shared_ptr<Section> find_section(const string& name) { return m_sections.find(name); }
 	shared_ptr<Section> add_section(const string& name);
 	shared_ptr<Section> cur_section() { return m_sections.current(); }
-	auto begin() { return m_sections.begin(); }
-	auto end() { return m_sections.end(); }
+	child_list<Section>& sections() { return m_sections; }
 
 	void check_relative_jumps();
 	void patch_local_exprs();
+	void check_undefined_symbols();
 
 private:
 	string	m_name;					// module name
@@ -189,6 +189,8 @@ public:
 
 	void check_relative_jumps();
 	void patch_local_exprs();
+	void check_undefined_symbols();
+	void write_obj_file();
 
 private:
 	string m_filename;
