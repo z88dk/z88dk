@@ -33,7 +33,6 @@
         EXTERN        log10
         EXTERN        log
         EXTERN        minusfa
-        EXTERN        pi
         EXTERN        pow10
         EXTERN        pow
         EXTERN        rad
@@ -64,7 +63,6 @@
         EXTERN        log10c
         EXTERN        logc
         EXTERN        minusfac
-        EXTERN        pic
         EXTERN        pow10c
         EXTERN        powc
         EXTERN        radc
@@ -123,8 +121,6 @@
         ld      (logc),hl
         ld      hl,CPCFP464_FLO_INV_SGN
         ld      (minusfac),hl
-        ld      hl,CPCFP464_FLO_PI
-        ld      (pic),hl
         ld      hl,CPCFP464_FLO_POW10
         ld      (pow10c),hl
         ld      hl,CPCFP464_FLO_POW
@@ -178,8 +174,6 @@
         ld      (logc),hl
         ld      hl,CPCFP664_FLO_INV_SGN
         ld      (minusfac),hl
-        ld      hl,CPCFP664_FLO_PI
-        ld      (pic),hl
         ld      hl,CPCFP664_FLO_POW10
         ld      (pow10c),hl
         ld      hl,CPCFP664_FLO_POW
