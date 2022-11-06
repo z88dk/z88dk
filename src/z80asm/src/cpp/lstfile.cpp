@@ -18,13 +18,12 @@ LstFile g_list_file;
 /*-----------------------------------------------------------------------------
 List format:
 <------><------><------><------>
-nnnnnN hhHHHHHH HHhhhhhhhhhhhhhhasm
+nnnnnN  HHHH  HHhhhhhhhhhhhhhh  asm
 linenum address bytes           sourceline
 //---------------------------------------------------------------------------*/
 static const int LineNumWidth = 6;
-static const int SeparatorWidth = 1;
-static const int AddressWidth = 8;
-static const int AddressMinWidth = 6;
+static const int SeparatorWidth = 2;
+static const int AddressWidth = 4;
 static const int BytesWidth = 16;
 
 
@@ -91,7 +90,7 @@ void LstFile::patch_bytes(int asmpc, const vector<uint8_t>& bytes) {
 	if (m_ofs.is_open()) {
 		out_line();									// output any pending bytes
 
-		for (size_t i = 0; i < bytes.size(); i++) {
+		for (int i = 0; i < static_cast<int>(bytes.size()); i++) {
 			int addr = asmpc + i;
 			auto it = m_patch_pos.find(addr);
 			assert(it != m_patch_pos.end());		// address must exist
@@ -135,26 +134,20 @@ void LstFile::out_line() {
 
 		// output hex address and bytes
 		if (m_bytes.empty())
-			m_ofs << setw(AddressWidth + SeparatorWidth + BytesWidth) << "";
+			m_ofs << setw(AddressWidth + SeparatorWidth + BytesWidth + SeparatorWidth) << "";
 		else {
-			// hex address with up to 8 positions and 6 filled positions
-			ostringstream hex_addr_ss;
-			hex_addr_ss << setw(AddressMinWidth)
+			// hex address with 4 positions
+			m_ofs << setw(AddressWidth)
 				<< setfill('0')
 				<< hex
 				<< m_phased_pc
 				<< setfill(' ')
 				<< dec;
 
-			string hex_addr = hex_addr_ss.str();
-			if (hex_addr.length() > AddressWidth)
-				hex_addr.erase(0, hex_addr.length() - AddressWidth);
-
-			m_ofs << setw(AddressWidth - hex_addr.length()) << "" << hex_addr
-				<< setw(SeparatorWidth) << "";
-
 			// first 8 hex bytes
+			m_ofs << setw(SeparatorWidth) << "";
 			out_bytes(0);
+			m_ofs << setw(SeparatorWidth) << "";
 		}
 
 		// output asm line
@@ -164,6 +157,7 @@ void LstFile::out_line() {
 		for (int row = 1; row < num_rows(); row++) {
 			m_ofs << setw(LineNumWidth + SeparatorWidth + AddressWidth + SeparatorWidth) << "";
 			out_bytes(row);
+			m_ofs << setw(SeparatorWidth) << "";
 			m_ofs << endl;
 		}
 	}
@@ -192,7 +186,7 @@ void LstFile::out_bytes(int row) {
 }
 
 int LstFile::num_rows() {
-	return (m_bytes.size() + BytesWidth / 2 - 1) / (BytesWidth / 2);
+	return (static_cast<int>(m_bytes.size()) + BytesWidth / 2 - 1) / (BytesWidth / 2);
 }
 
 //-----------------------------------------------------------------------------

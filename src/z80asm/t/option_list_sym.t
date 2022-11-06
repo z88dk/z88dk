@@ -45,9 +45,9 @@ ok -f "${test}.lis", "list file";
 check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          PUBLIC main
-     2   000000 060a            main:	ld b,10
-     3   000002 10fe            loop:	djnz loop
-     4   000004 c9              ret
+     2  0000  060a              main:	ld b,10
+     3  0002  10fe              loop:	djnz loop
+     4  0004  c9                ret
      5                          
 END
 
@@ -74,10 +74,10 @@ check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          	public global0
      2                          	public global1
-     3   000000 00              	global0: defb 0
-     4   000001 01              	global1: defb 1
-     5   000002 00              	local0: defb 0
-     6   000003 01              	local1: defb 1
+     3  0000  00                	global0: defb 0
+     4  0001  01                	global1: defb 1
+     5  0002  00                	local0: defb 0
+     6  0003  01                	local1: defb 1
      7                          
      8                          
 END
@@ -94,7 +94,7 @@ END
 
 check_text_file("${test}.lis", <<END);
 ${test}.asm:
-     1   000000 ff              X_255_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X: defb 255
+     1  0000  ff                X_255_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X_X: defb 255
      2                          
      3                          
 END
@@ -115,29 +115,29 @@ check_text_file("${test}.sym", "");
 
 check_text_file("${test}.lis", <<END);
 ${test}.asm:
-     1   000000 01              defb 1
-     2   000001 0102            defb 1,2
-     3   000003 010203          defb 1,2,3
-     4   000006 01020304        defb 1,2,3,4
-     5   00000a 0102030405      defb 1,2,3,4,5
-     6   00000f 010203040506    defb 1,2,3,4,5,6
-     7   000015 0102030405060708defb 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64
-                090a0b0c0d0e0f10
-                1112131415161718
-                191a1b1c1d1e1f20
-                2122232425262728
-                292a2b2c2d2e2f30
-                3132333435363738
-                393a3b3c3d3e3f40
-     8   000055 0102030405060708defb 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65
-                090a0b0c0d0e0f10
-                1112131415161718
-                191a1b1c1d1e1f20
-                2122232425262728
-                292a2b2c2d2e2f30
-                3132333435363738
-                393a3b3c3d3e3f40
-                41              
+     1  0000  01                defb 1
+     2  0001  0102              defb 1,2
+     3  0003  010203            defb 1,2,3
+     4  0006  01020304          defb 1,2,3,4
+     5  000a  0102030405        defb 1,2,3,4,5
+     6  000f  010203040506      defb 1,2,3,4,5,6
+     7  0015  0102030405060708  defb 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64
+              090a0b0c0d0e0f10  
+              1112131415161718  
+              191a1b1c1d1e1f20  
+              2122232425262728  
+              292a2b2c2d2e2f30  
+              3132333435363738  
+              393a3b3c3d3e3f40  
+     8  0055  0102030405060708  defb 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65
+              090a0b0c0d0e0f10  
+              1112131415161718  
+              191a1b1c1d1e1f20  
+              2122232425262728  
+              292a2b2c2d2e2f30  
+              3132333435363738  
+              393a3b3c3d3e3f40  
+              41                
      9                          
     10                          
 END
@@ -157,38 +157,38 @@ END
 
 check_text_file("${test}.lis", <<END);
 ${test}.asm:
-     1   000000 2a2a2a2a2a2a2a2adefb X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
-                2a2a2a2a2a2a2a2a
+     1  0000  2a2a2a2a2a2a2a2a  defb X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X,X
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
+              2a2a2a2a2a2a2a2a  
      2                          defc X = 42
      3                          
      4                          
@@ -211,9 +211,9 @@ END
 check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          	defc A1 = 1
-     2   000000 01              	defb A1
-     3   000001 0100            	defw A1
-     4   000003 01000000        	defq A1
+     2  0000  01                	defb A1
+     3  0001  0100              	defw A1
+     4  0003  01000000          	defq A1
      5                          
      6                          
 END
@@ -236,9 +236,9 @@ END
 check_text_file("${test}.lis", <<END);
 ${test}.asm:
      1                          	defc A1 = 1
-     2   000000 01              	defb A1
-     3   000001 0100            	defw A1
-     4   000003 01000000        	defq A1
+     2  0000  01                	defb A1
+     3  0001  0100              	defw A1
+     4  0003  01000000          	defq A1
      5                          	public A1
      6                          
      7                          
@@ -260,9 +260,9 @@ END
 
 check_text_file("${test}.lis", <<END);
 ${test}.asm:
-     1   000000 01              	defb A1
-     2   000001 0100            	defw A1
-     3   000003 01000000        	defq A1
+     1  0000  01                	defb A1
+     2  0001  0100              	defw A1
+     3  0003  01000000          	defq A1
      4                          	defc A1 = 1
      5                          
      6                          
@@ -285,9 +285,9 @@ END
 
 check_text_file("${test}.lis", <<END);
 ${test}.asm:
-     1   000000 01              	defb A1
-     2   000001 0100            	defw A1
-     3   000003 01000000        	defq A1
+     1  0000  01                	defb A1
+     2  0001  0100              	defw A1
+     3  0003  01000000          	defq A1
      4                          	defc A1 = 1
      5                          	public A1
      6                          
@@ -320,22 +320,22 @@ END
 
 check_text_file("${test}.lis", <<END);
 ${test}.asm:
-     1   000000 0102            	defb A1, B1
+     1  0000  0102              	defb A1, B1
      2                          	defc A1 = 1
      3                          	defc B1 = 2
      4                          	public B1
      5                          	include "${test}.inc"
 ${test}.inc:
-     1   000002 3e01            	ld a, A1
-     2   000004 0602            	ld b, B1
-     3   000006 80              	add a, b
+     1  0002  3e01              	ld a, A1
+     2  0004  0602              	ld b, B1
+     3  0006  80                	add a, b
      4                          
 ${test}.asm:
      6                          	include "${test}.inc"
 ${test}.inc:
-     1   000007 3e01            	ld a, A1
-     2   000009 0602            	ld b, B1
-     3   00000b 80              	add a, b
+     1  0007  3e01              	ld a, A1
+     2  0009  0602              	ld b, B1
+     3  000b  80                	add a, b
      4                          
 ${test}.asm:
      7                          
@@ -366,7 +366,7 @@ ${test}.asm:
      3                          		RUNTIMEFLAGS1 ds.b 1
      4                          		RUNTIMEFLAGS2 ds.b 1
      5                          	}
-     6   000000 00400140        	defw RUNTIMEFLAGS1, RUNTIMEFLAGS2
+     6  0000  00400140          	defw RUNTIMEFLAGS1, RUNTIMEFLAGS2
      7                          
      8                          
 END
@@ -406,9 +406,9 @@ ${test}.asm:
      4                          		SYM_COMMA, SYM_FULLSTOP, SYM_LPAREN,
      5                          		SYM_LCURLY, SYM_RCURLY
      6                          	}
-     7   000000 00010203        	defb SYM_NULL, SYM_DQUOTE, SYM_SQUOTE, SYM_SEMICOLON
-     8   000004 040506          	defb SYM_COMMA, SYM_FULLSTOP, SYM_LPAREN
-     9   000007 0708            	defb SYM_LCURLY, SYM_RCURLY
+     7  0000  00010203          	defb SYM_NULL, SYM_DQUOTE, SYM_SQUOTE, SYM_SEMICOLON
+     8  0004  040506            	defb SYM_COMMA, SYM_FULLSTOP, SYM_LPAREN
+     9  0007  0708              	defb SYM_LCURLY, SYM_RCURLY
     10                          
     11                          
 END
@@ -428,9 +428,9 @@ check_text_file("${test}.sym", "");
 
 check_text_file("${test}.lis", <<END);
 ${test}.asm:
-     1   000000 010000          	ld bc, 0
+     1  0000  010000            	ld bc, 0
      2                          	lstoff
-     5   000006 03              	inc bc
+     5  0006  03                	inc bc
      6                          
      7                          
 END
@@ -459,11 +459,11 @@ ${test}.asm:
      1                          	if 0
      2                          		ld bc, 0
      3                          	else
-     4   000000 010100          		ld bc, 1
+     4  0000  010100            		ld bc, 1
      5                          	endif
      6                          
      7                          	if 1
-     8   000003 210100          		ld hl, 1
+     8  0003  210100            		ld hl, 1
      9                          	else
     10                          		ld hl, 0
     11                          	endif
@@ -483,7 +483,7 @@ check_text_file("${test}.sym", "");
 
 check_text_file("${test}.lis", 
 	"${test}.asm:\n".
-	join("", map {sprintf("%6d   %06x %02x              nop\n", $_+1, $_, 0)} 
+	join("", map {sprintf("%6d  %04x  %02x                nop\n", $_+1, $_, 0)} 
 				0..$num_lines-1).
 	sprintf("%6d                          \n", $num_lines+1).
 	sprintf("%6d                          \n", $num_lines+2));

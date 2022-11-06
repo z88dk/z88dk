@@ -18,7 +18,7 @@ check_bin_file("$test.bin", bytes(1, 1, 0, 0x21, 1, 0));
 check_text_file("$test.lis", <<END);
 test_t_LSTON.asm:
      1                          lstoff
-     4   000003 210100          ld hl,1
+     4  0003  210100            ld hl,1
      5                          
 END
 
