@@ -12,7 +12,7 @@ END
 check_text_file("$test.lis", <<'END');
 test_t_preproc.asm:
      1                          ld a,\
-     2   000000 3e01            1
+     2  0000  3e01              1
      3                          
      4                          
 END
@@ -31,7 +31,7 @@ ld a,1\ret
 END
 check_text_file("$test.lis", <<'END');
 test_t_preproc.asm:
-     1   000000 3e01c9          ld a,1\ret
+     1  0000  3e01c9            ld a,1\ret
      2                          
      3                          
 END

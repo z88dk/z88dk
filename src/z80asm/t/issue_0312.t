@@ -196,7 +196,7 @@ END
 
 check_text_file("${test}.lis", <<END);
 ${test}.asm:
-     1   000000 8200            	cu.wait 0,1
+     1  0000  8200              	cu.wait 0,1
      2                          
      3                          
 END

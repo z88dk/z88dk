@@ -81,29 +81,29 @@ check_text_file("$test.lis", <<'END');
 test_t_PHASE.asm:
      1                          	section PART_1
      2                          	part1:
-     3   000000 210000          		ld hl, start
-     4   000003 110080          		ld de, 0x8000
-     5   000006 010800          		ld bc, end-start
-     6   000009 edb0            		ldir
-     7   00000b 1800            		jr l1
+     3  0000  210000            		ld hl, start
+     4  0003  110080            		ld de, 0x8000
+     5  0006  010800            		ld bc, end-start
+     6  0009  edb0              		ldir
+     7  000b  1800              		jr l1
      8                          	l1:
-     9   00000d c30080          		jp 0x8000
-    10   000010 1000            		defw asmpc
+     9  000d  c30080            		jp 0x8000
+    10  0010  1000              		defw asmpc
     11                          	start:
     12                          		PHASE 0x8000
-    13   008000 cd0380          	f1: call f2
-    14   008003 1800            	f2: jr l2
+    13  8000  cd0380            	f1: call f2
+    14  8003  1800              	f2: jr l2
     15                          
     16                          		section PART_2
     17                          	part2:
-    18   000000 01020304        		defb 1,2,3,4
+    18  0000  01020304          		defb 1,2,3,4
     19                          
     20                          		section PART_1
-    21   008005 c9              	l2:	ret
-    22   008006 0680            		defw asmpc
+    21  8005  c9                	l2:	ret
+    22  8006  0680              		defw asmpc
     23                          		DEPHASE
     24                          	end:
-    25   00001a 1a00            		defw asmpc
+    25  001a  1a00              		defw asmpc
     26                          
     27                          
 END
