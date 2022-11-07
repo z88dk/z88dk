@@ -6,7 +6,7 @@
 ;    $Id: init_floatpack.asm,v 1.5 2016-06-22 19:50:49 dom Exp $
 ;
 
-        SECTION        code_fp_cpc
+        SECTION        code_fp
         INCLUDE        "target/cpc/def/cpcfp.def"
 
         PUBLIC        init_floatpack
