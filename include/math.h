@@ -35,19 +35,18 @@
 
 #if __MATH_MATH32
 #include <math/math_math32.h>
+#elif __MATH_AM9511
+#include <math/math_am9511.h>
 #elif __MATH_MBF32
 #include <math/math_mbf32.h>
+#elif __MATH_DAI32
+#include <math/math_dai32.h>
 #elif __MATH_ZX
 #include <math/math_zx.h>
 #elif __MATH_CPC
 #include <math/math_cpc.h>
-#elif __MATH_DAI32
-#include <math/math_dai32.h>
-#elif __MATH_AM9511
-#include <math/math_am9511.h>
 #else
 #include <math/math_genmath.h>
 #endif
-
 
 #endif /* __MATH_H__ */
