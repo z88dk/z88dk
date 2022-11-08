@@ -20,5 +20,8 @@
 	        push    de      ;put it back
 	        ld      l,a
 	        ld      h,0
+                and     a
+                ret     z
+                scf
 	        ret		
 
