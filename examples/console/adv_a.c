@@ -14,9 +14,10 @@
  *	 - casts removed in structures
  *	 - Few defines to make life easier
  *   - tape or disk save     (-DTAPE, -DDISK)
- *   - disk save in data block mode (-DDISKBLOCK)
  *   - lowercase text taken from the oz700 port in the 'ozdev' web site
+ *   - disk save in data block mode (-DDISKBLOCK)
  *   - opt graphics scenes   (-DPICS)
+ *   - low resolution graphics scenes   (-DPICS -DRASTER)
  *   - score made optional   (-DCOMPUTE_SCORE)
  *
  *	Found at: http://www.penelope.demon.co.uk/pod/
@@ -54,7 +55,7 @@
 
 /* This hack forces the ZX Spectrum tape format using the generic sound library */
 /* Only a limited set of targets is supported for data input and no border flashing happens during LOAD/SAVE operations */
-/*
+
 #include <sound.h>
 #ifdef ZXTAPE
 #undef tape_load_block
@@ -62,11 +63,12 @@
 #define tape_load_block bit_load_block_zx
 #define tape_save_block bit_save_block_zx
 #endif
-*/
+
 
 
 #ifdef PICS
 #include <graphics.h>
+#include <games.h>
 #include <adv_a.h>
 int mazepic;
 #endif
@@ -1878,42 +1880,88 @@ void ShowRoom()
 	switch(CUR_RM)
 	{
 		case 0:
+#ifdef RASTER
+			//putsprite(spr_or, 70, 6, mountain);
+			putsprite(spr_or, 0, 20, mountain);
+#else
 			draw_profile(60, 60, 160, mountain);
 			//draw_profile(63, 63, 152, mountain);
 			//draw(135,73,175,71);
 			draw_profile(80, 80, 240, tree2);
 			draw_profile(80, 120, 80, mountain);
 			draw_profile(60, 110, 200, tree2);
+#endif
 			mazepic = 0;			
 			break;
 		case 3:
+#ifdef RASTER
+			//putsprite(spr_or, 65, 28, forest);
+			putsprite(spr_or, 0, 5, forest);
+#else
 			for (nItem = 1; nItem < 5; ++nItem) {
 				draw_profile(nItem*10-rand()%100, 20+rand()%40, 170+nItem*20, tree2);
 				draw_profile(60-rand()%100, nItem+rand()%40, 170+nItem*20, tree1);
 			}
+#endif
 			break;
 		case 4:
+#ifdef RASTER
+			//putsprite(spr_or, 8, 28, lake);
+			putsprite(spr_or, 0, 5, lake);
+#else
 			draw_profile(50, 20, 160, lake);
+#endif
 			break;
 		case 5:
+#ifdef RASTER
+			//putsprite(spr_or, 83, 10, house);
+			putsprite(spr_or, 0, 20, house);
+#endif
 			//draw_profile(50, 20, 240, strange_house);
 			break;
 		case 6:
+#ifdef RASTER
+			//putsprite(spr_or, 85, 20, shed);
+			putsprite(spr_or, 0, 5, shed);
+#else
 			draw_profile(60, 3, 180, shed);
+#endif
 			break;
 		case 7:
 		case 8:
 		case 9:
 		case 10:
 			if (!mazepic++)
+#ifdef RASTER
+				//putsprite(spr_or, 40, 32, maze);
+				putsprite(spr_or, 0, 6, maze);
+#else
 				draw_profile(60, 60, 240, maze);
+#endif
 			break;
 		case 14:
+#ifdef RASTER
+			//putsprite(spr_or, 90, 2, keyboard);
+			putsprite(spr_or, 0, 20, keyboard);
+#else
 			draw_profile(20, 100, 200, keyboard);
+#endif
 			break;
 		case 19:
+#ifdef RASTER
+			//putsprite(spr_or, 90, 2, jail);
+			putsprite(spr_or, 0, 8, jail);
+#else
 			draw_profile(60, 20, 160, jail);
+#endif
 			break;
+
+#ifdef RASTER
+		case 20:
+			//putsprite(spr_or, 20, 28, spaceship);
+			putsprite(spr_or, 0, 10, spaceship);
+			break;
+#endif
 
 	}
 #endif
@@ -3034,6 +3082,7 @@ int main()
 		nScore = 0;
 #endif
 		
+
 		PrintInstr();
 
 		/* copy data from naItemStart to naItemLoc at start of game */
