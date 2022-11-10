@@ -416,6 +416,23 @@ static disc_spec excali_spec = {
 };
 
 
+static disc_spec gemini_spec = {
+    .name = "Gemini",
+    .sectors_per_track = 10,
+    .tracks = 35,
+    .sides = 2,
+    .sector_size = 512,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .alternate_sides = 1,
+};
+
+
 static disc_spec lynx_spec = {
     .name = "CampLynx",
     .sectors_per_track = 10,
@@ -594,6 +611,7 @@ static struct formats {
     { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
     { "fp1100",    "Casio FP1100",          &fp1100_spec, 0, NULL, 1 },
+    { "gemini",    "GeminiGalaxy",          &gemini_spec, 0, NULL, 1 },
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
