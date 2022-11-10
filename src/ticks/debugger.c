@@ -1618,7 +1618,8 @@ static int cmd_set(int argc, char **argv)
     } else {
         bk.console("Incorrect number of arguments\n");
     }
-    return 1;
+
+    return 0;
 }
 
 
