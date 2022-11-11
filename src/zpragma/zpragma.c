@@ -350,12 +350,18 @@ int main(int argc, char **argv)
         ptr = skip_ws(buf);
         if ( strncmp(ptr,"#pragma", 7) == 0 ) {
             int  ol = 1;
+
+            if ( ptr[7] == '-' )
+                ptr++;
             ptr = skip_ws(ptr + 7);
          
             if ( ( strncmp(ptr, "output",6) == 0 ) || ( strncmp(ptr, "define",6) == 0 ) || ( strncmp(ptr, "export",6) == 0 ) ) {
                 char *offs;
                 int   value = 0;
-				int   exp = strncmp(ptr, "export",6) == 0;
+                int   exp = strncmp(ptr, "export",6) == 0;
+
+                if (ispunct(ptr[6]))
+                    ptr++;
 
                 ptr = skip_ws(ptr+6);
                 
@@ -373,6 +379,9 @@ int main(int argc, char **argv)
             } else if ( strncmp(ptr, "redirect",8) == 0 ) {
                 char *offs;
                 char *value = "0";
+
+                if (ispunct(ptr[8]))
+                    ptr++;
                 ptr = skip_ws(ptr+8);
                 if ( (offs = strchr(ptr+1,'=') ) != NULL  ) {
                     value = offs + 1;
