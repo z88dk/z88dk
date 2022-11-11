@@ -159,6 +159,7 @@ enum storage_type {
     STKLOC,        /* On the stack */
     EXTERNAL,      /* External to this file */
     LSTATIC,       /* Static to this file */
+    FASTATIC,      /* Function arguments */
     TYPDEF
 };
 
@@ -184,6 +185,7 @@ enum symbol_flags {
         HL_CALL = 0x20000,    /* Call via ld hl, (module) call (addr) */
         INTERRUPT = 0x40000,   /* Function is used for interrupts */
         ASSIGNED_ADDR = 0x80000, /* Symbol has been assigned an address */
+        NON_REENTRANT = 0x100000, /* Parameters are passed globally */
 };
 
 

@@ -246,6 +246,7 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
     while ( tmpfiles[argnumber+1] ) {
         Type *type;        
         char *before, *start;
+        Type *prototype_argument;
 
         argnumber++;
         rewind(tmpfiles[argnumber]);
@@ -270,35 +271,35 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
         }
         if ( functype->funcattrs.oldstyle == 0 && argnumber <= array_len(functype->parameters)) {       
             int proto_argnumber;
-            Type *prototype;
+
             if ( (functype->flags & SMALLC) == SMALLC)  {
                 proto_argnumber = argnumber - 1;                
             } else {
                 proto_argnumber = array_len(functype->parameters) - argnumber;                
             }
-            prototype = array_get_byindex(functype->parameters, proto_argnumber);
+            prototype_argument = array_get_byindex(functype->parameters, proto_argnumber);
 
-            if ( prototype->kind != KIND_ELLIPSES && type->kind != prototype->kind ) {
-                if ( vconst && (kind_is_floating(prototype->kind) || kind_is_integer(prototype->kind))) {                 
+            if ( prototype_argument->kind != KIND_ELLIPSES && type->kind != prototype_argument->kind ) {
+                if ( vconst && (kind_is_floating(prototype_argument->kind) || kind_is_integer(prototype_argument->kind))) {                 
                      LVALUE lval = {0};
                      clearstage(before,start);
                      start = NULL;
-                     lval.val_type = prototype->kind;
+                     lval.val_type = prototype_argument->kind;
                      lval.const_val = val;
                      load_constant(&lval);
-                     expr = prototype->kind;
+                     expr = prototype_argument->kind;
                 } else {
-                    expr = ForceArgs(prototype, type, vconst);
+                    expr = ForceArgs(prototype_argument, type, vconst);
                 }
-            } else if ( prototype->kind != KIND_ELLIPSES && ispointer(prototype)) {
-                if ( type_matches_pointer(prototype, type) == 0 ) {
+            } else if ( prototype_argument->kind != KIND_ELLIPSES && ispointer(prototype_argument)) {
+                if ( type_matches_pointer(prototype_argument, type) == 0 ) {
                     UT_string *str;
                     
                     utstring_new(str);
                     utstring_printf(str,"Converting type: ");
                     type_describe(type,str);
                     utstring_printf(str," to ");
-                    type_describe(prototype, str);
+                    type_describe(prototype_argument, str);
                     warningfmt("incompatible-pointer-types","%s", utstring_body(str));
                     utstring_free(str);
                 }
@@ -326,7 +327,21 @@ void callfunction(SYMBOL *ptr, Type *fnptr_type)
                 }
             }
             if ( function_pointer_call == 0 ||  fnptr_type->kind == KIND_CPTR ) {
-                nargs += gen_push_function_argument(expr, type,  functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters));
+                if ( functype->flags & NON_REENTRANT) {
+                    char   namebuf[1024];
+                    SYMBOL *sym;
+
+                    snprintf(namebuf,sizeof(namebuf),"st_%s_%s", functype->name, prototype_argument->name);
+
+                    sym = findglb(namebuf);
+                    if ( sym == NULL ) {
+                        printf("Booohoo <%s>\n",namebuf);
+                    } else {
+                        gen_store_static(sym);
+                    }
+                } else {
+                    nargs += gen_push_function_argument(expr, type,  functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters));
+                }
             } else {
                 last_argument_size = push_function_argument_fnptr(expr, type, functype, functype->flags & SDCCDECL && argnumber <= array_len(functype->parameters), tmpfiles[argnumber+1] == NULL);
                 nargs += last_argument_size;

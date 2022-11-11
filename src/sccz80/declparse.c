@@ -628,7 +628,9 @@ static void parse_trailing_modifiers(Type *type)
             type->flags &= ~(SMALLC|FLOATINGDECL);
         } else if (amatch("__naked")) {
             type->flags |= NAKED;
-            continue;
+        } else if (amatch("__z88dk_non_reentrant")) {
+            type->flags |= NON_REENTRANT;
+            type->flags &= ~FLOATINGDECL;
         } else if ( amatch("__critical")) {
             type->flags |= CRITICAL;
             continue;
@@ -1118,6 +1120,20 @@ Type *dodeclare(enum storage_type storage)
         }
 
         sym = addglb(type->name, type, ID_VARIABLE, type->kind, 0, storage);
+
+        if ( type->kind == KIND_FUNC && (type->flags & NON_REENTRANT) ) {
+            int i;
+            for ( i = 0; i < array_len(type->parameters); i++ ) {    
+                Type      *ptype = array_get_byindex(type->parameters, i);
+                SYMBOL    *ptr;
+                char  namebuf[NAMESIZE * 2 + 10];
+
+                snprintf(namebuf, sizeof(namebuf),"st_%s_%s", type->name, ptype->name);
+                ptr = addglb(namebuf, ptype, ID_VARIABLE, ptype->kind, 0, EXTERNAL);
+                ptr->flags |= NON_REENTRANT;
+            }
+        }
+
         sym->isassigned = 1; // Assigned to 0
      
         snprintf(drop_name, sizeof(drop_name), "%s", type->name);
@@ -1866,14 +1882,24 @@ static void declfunc(Type *functype, enum storage_type storage)
             if ( (strlen(ptype->name) == 0 || ptype->name[0] == '0') && ptype->kind != KIND_ELLIPSES) {
                 errorfmt("Function parameters (argument %d) must be named when defining a function",1,i);
                 continue;
-            } 
-            // Create a local variable
-            ptr = addloc(ptype->name, ptype, ID_VARIABLE, ptype->kind, where);
-            type_describe(ptype, str);
-            outfmt("; parameter '%s' at sp+%d size(%d)\n",utstring_body(str),where, ptype->size);
-            utstring_free(str);
-            ptr->isassigned = 1;
-            where += get_parameter_size(functype,ptype);
+            }
+            if ((functype->flags & NON_REENTRANT) == 0 || ( (functype->flags & FASTCALL) && i == array_len(functype->parameters) - 1) ) {
+                // Create a local variable
+                ptr = addloc(ptype->name, ptype, ID_VARIABLE, ptype->kind, where);
+                type_describe(ptype, str);
+                outfmt("; parameter '%s' at sp+%d size(%d)\n",utstring_body(str),where, ptype->size);
+                utstring_free(str);
+                ptr->isassigned = 1;
+                where += get_parameter_size(functype,ptype);
+            } else {
+                char  namebuf[NAMESIZE * 2 + 10];
+                snprintf(namebuf, sizeof(namebuf),"st_%s_%s", currfn->name, ptype->name);
+                ptr = addglb(namebuf, ptype, ID_VARIABLE, ptype->kind, 0, FASTATIC);
+                ptr->flags |= NON_REENTRANT;
+                type_describe(ptype, str);
+                outfmt("; parameter '%s' at static size(%d)\n",utstring_body(str), ptype->size);
+                utstring_free(str);
+            }
         }
     } else {
         int i;
@@ -1889,14 +1915,24 @@ static void declfunc(Type *functype, enum storage_type storage)
                 errorfmt("Function parameters (argument %d) must be named when defining a function",1,i);
                 continue;
             }
-            // Create a local variable
-            ptr = addloc(ptype->name, ptype, ID_VARIABLE, ptype->kind, where);
+            if ((functype->flags & NON_REENTRANT) == 0 || ( (functype->flags & FASTCALL) && i == array_len(functype->parameters) - 1) ) {
+                // Create a local variable
+                ptr = addloc(ptype->name, ptype, ID_VARIABLE, ptype->kind, where);
 
-            type_describe(ptype, str);            
-            outfmt("; parameter '%s' at %d size(%d)\n", utstring_body(str),where, ptype->size);  
-            utstring_free(str);            
-            ptr->isassigned = 1;            
-            where += get_parameter_size(functype, ptype);
+                type_describe(ptype, str);            
+                outfmt("; parameter '%s' at %d size(%d)\n", utstring_body(str),where, ptype->size);  
+                utstring_free(str);            
+                ptr->isassigned = 1;            
+                where += get_parameter_size(functype, ptype);
+            } else {
+                char  namebuf[NAMESIZE * 2 + 10];
+                snprintf(namebuf, sizeof(namebuf),"st_%s_%s", currfn->name, ptype->name);
+                ptr = addglb(namebuf, ptype, ID_VARIABLE, ptype->kind, 0, FASTATIC);
+                ptr->flags |= NON_REENTRANT;
+                type_describe(ptype, str);
+                outfmt("; parameter '%s' at static size(%d)\n",utstring_body(str), ptype->size);
+                utstring_free(str);
+            }
         }
     }
 
