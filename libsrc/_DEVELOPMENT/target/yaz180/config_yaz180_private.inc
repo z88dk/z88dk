@@ -766,6 +766,7 @@ defc __IO_PIO_IDE_RST_LINE = 0x80
 
 defc __IO_PIO_IDE_DATA = 0x08
 defc __IO_PIO_IDE_ERROR = 0x18
+defc __IO_PIO_IDE_FEATURE = 0x18
 defc __IO_PIO_IDE_SEC_CNT = 0xc
 defc __IO_PIO_IDE_SECTOR = 0x1c
 defc __IO_PIO_IDE_CYL_LSB = 0x48
@@ -790,6 +791,7 @@ defc __IDE_CMD_IDLE = 0xE1
 defc __IDE_CMD_SLEEP = 0xE6
 defc __IDE_CMD_CACHE_FLUSH = 0xE7
 defc __IDE_CMD_ID = 0xEC
+defc __IDE_CMD_FEATURE = 0xEF
 
 
 

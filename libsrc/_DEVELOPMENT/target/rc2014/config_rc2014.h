@@ -671,6 +671,7 @@
 
 #define __IO_PIO_IDE_DATA  0x08
 #define __IO_PIO_IDE_ERROR  0x9
+#define __IO_PIO_IDE_FEATURE  0x9
 #define __IO_PIO_IDE_SEC_CNT  0xa
 #define __IO_PIO_IDE_SECTOR  0xb
 #define __IO_PIO_IDE_CYL_LSB  0xc
@@ -695,6 +696,7 @@
 #define __IDE_CMD_SLEEP  0xE6
 #define __IDE_CMD_CACHE_FLUSH  0xE7
 #define __IDE_CMD_ID  0xEC
+#define __IDE_CMD_FEATURE  0xEF
 
 
 

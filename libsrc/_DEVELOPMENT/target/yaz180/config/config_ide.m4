@@ -39,6 +39,7 @@ define(`__IO_PIO_IDE_RST_LINE', 0x80)  # inverter between 8255 and ide interface
 # always specifying the address pins.
 define(`__IO_PIO_IDE_DATA',         __IO_PIO_IDE_CS0_LINE)
 define(`__IO_PIO_IDE_ERROR',        0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A0_LINE,16))
+define(`__IO_PIO_IDE_FEATURE',      0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A0_LINE,16))
 define(`__IO_PIO_IDE_SEC_CNT',      0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A1_LINE,16))   #Typically 1 Sector only
 define(`__IO_PIO_IDE_SECTOR',       0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A1_LINE+__IO_PIO_IDE_A0_LINE,16))  #LBA0
 define(`__IO_PIO_IDE_CYL_LSB',      0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A2_LINE,16))                   #LBA1
@@ -63,6 +64,7 @@ define(`__IO_PIO_IDE_LBA3',         0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_
 #
 #       0x0    000    0    1     IDE Data Port
 #       0x1    001    0    1     Read: Error code (also see $$)
+#       0x1    001    0    1     Write: Compact Flash Feature code (also see %%)
 #       0x2    010    0    1     Number Of Sectors To Transfer
 #       0x3    011    0    1     Sector address LBA 0 (0:7)
 #       0x4    100    0    1     Sector address LBA 1 (8:15)
@@ -89,7 +91,31 @@ define(`__IO_PIO_IDE_LBA3',         0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_
 #       Bit 1   = TK0NF Track 0 unavailable -> Trash
 #       Bit 0   = AMNF  Address mark not found
 
-#       ** Bits in LBA 3 Register $6:
+#       %% Bits in Compact Flash Feature Register $1
+
+#       01h             Enable 8 bit data transfers.
+#       02h             Enable Write Cache.
+#       03h             Set transfer mode based on value in Sector Count register.
+#       05h             Enable Advanced Power Management.
+#       09h             Enable Extended Power operations.
+#       0Ah             Enable Power Level 1 commands.
+#       44h             Product specific ECC bytes apply on Read/Write Long commands.
+#       55h             Disable Read Look Ahead.
+#       66h             Disable Power on Reset (POR) establishment of defaults at Soft Reset.
+#       69h             NOP - Accepted for backward compatibility.
+#       81h             Disable 8 bit data transfer.
+#       82h             Disable Write Cache.
+#       85h             Disable Advanced Power Management.
+#       89h             Disable Extended Power operations.
+#       8Ah             Disable Power Level 1 commands.
+#       96h             NOP - Accepted for backward compatibility.
+#       97h             Accepted for backward compatibility.
+#       9Ah             Set the host current source capability.
+#       AAh             Enable Read Look Ahead.
+#       BBh             4 bytes of data apply on Read/Write Long commands.
+#       CCh             Enable Power on Reset (POR) establishment of defaults at Soft Reset.
+
+#       ** Bits in LBA 3 Register $6
 
 #       Bit 7   = Always set to 1
 #       Bit 6   = Always Set to 1 for LBA Mode Access
@@ -97,7 +123,7 @@ define(`__IO_PIO_IDE_LBA3',         0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_
 #       Bit 4   = Select Master (0) or Slave (1) drive
 #       Bit 0:3 = LBA bits (24:27)
 
-#       ## Bits in Command / Status Register $7:
+#       ## Bits in Command / Status Register $7
 
 #       Bit 7   = BSY   1=busy, 0=not busy
 #       Bit 6   = RDY   1=ready for command, 0=not ready yet
@@ -119,6 +145,7 @@ define(`__IDE_CMD_IDLE',        0xE1)   # immediate idle of disk
 define(`__IDE_CMD_SLEEP',       0xE6)   # powerdown, reset to recover
 define(`__IDE_CMD_CACHE_FLUSH', 0xE7)   # flush hardware write cache
 define(`__IDE_CMD_ID',          0xEC)   # identify drive
+define(`__IDE_CMD_FEATURE',     0xEF)   # set feature (compact flash)
 
 #
 # END OF USER CONFIGURATION
@@ -150,6 +177,7 @@ PUBLIC `__IO_PIO_IDE_RST_LINE'
 
 PUBLIC `__IO_PIO_IDE_DATA'
 PUBLIC `__IO_PIO_IDE_ERROR'
+PUBLIC `__IO_PIO_IDE_FEATURE'
 PUBLIC `__IO_PIO_IDE_SEC_CNT'
 PUBLIC `__IO_PIO_IDE_SECTOR'
 PUBLIC `__IO_PIO_IDE_CYL_LSB'
@@ -174,6 +202,7 @@ PUBLIC `__IDE_CMD_IDLE'
 PUBLIC `__IDE_CMD_SLEEP'
 PUBLIC `__IDE_CMD_CACHE_FLUSH'
 PUBLIC `__IDE_CMD_ID'
+PUBLIC `__IDE_CMD_FEATURE'
 ')
 
 dnl#
@@ -200,6 +229,7 @@ defc `__IO_PIO_IDE_RST_LINE' = __IO_PIO_IDE_RST_LINE
 
 defc `__IO_PIO_IDE_DATA' = __IO_PIO_IDE_DATA
 defc `__IO_PIO_IDE_ERROR' = __IO_PIO_IDE_ERROR
+defc `__IO_PIO_IDE_FEATURE' = __IO_PIO_IDE_FEATURE
 defc `__IO_PIO_IDE_SEC_CNT' = __IO_PIO_IDE_SEC_CNT
 defc `__IO_PIO_IDE_SECTOR' = __IO_PIO_IDE_SECTOR
 defc `__IO_PIO_IDE_CYL_LSB' = __IO_PIO_IDE_CYL_LSB
@@ -224,6 +254,7 @@ defc `__IDE_CMD_IDLE' = __IDE_CMD_IDLE
 defc `__IDE_CMD_SLEEP' = __IDE_CMD_SLEEP
 defc `__IDE_CMD_CACHE_FLUSH' = __IDE_CMD_CACHE_FLUSH
 defc `__IDE_CMD_ID' = __IDE_CMD_ID
+defc `__IDE_CMD_FEATURE' = __IDE_CMD_FEATURE
 ')
 
 dnl#
@@ -250,6 +281,7 @@ ifdef(`CFG_C_DEF',
 
 `#define' `__IO_PIO_IDE_DATA'  __IO_PIO_IDE_DATA
 `#define' `__IO_PIO_IDE_ERROR'  __IO_PIO_IDE_ERROR
+`#define' `__IO_PIO_IDE_FEATURE'  __IO_PIO_IDE_FEATURE
 `#define' `__IO_PIO_IDE_SEC_CNT'  __IO_PIO_IDE_SEC_CNT
 `#define' `__IO_PIO_IDE_SECTOR'  __IO_PIO_IDE_SECTOR
 `#define' `__IO_PIO_IDE_CYL_LSB'  __IO_PIO_IDE_CYL_LSB
@@ -274,5 +306,6 @@ ifdef(`CFG_C_DEF',
 `#define' `__IDE_CMD_SLEEP'  __IDE_CMD_SLEEP
 `#define' `__IDE_CMD_CACHE_FLUSH'  __IDE_CMD_CACHE_FLUSH
 `#define' `__IDE_CMD_ID'  __IDE_CMD_ID
+`#define' `__IDE_CMD_FEATURE'  __IDE_CMD_FEATURE
 ')
 
