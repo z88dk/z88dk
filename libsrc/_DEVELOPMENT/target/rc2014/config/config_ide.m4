@@ -23,37 +23,37 @@ define(`__IO_PIO_IDE_WR',     __IO_PIO_CNTL_00)   # all PIO ports output
 # IDE control signals is connected.  All the control signals must
 # be on the same port, but these 8 lines let you connect them to
 # whichever pins on that port.
-define(`__IO_IDE_A0_LINE',  0x01)  # direct from 8255 to ide interface
-define(`__IO_IDE_A1_LINE',  0x02)  # direct from 8255 to ide interface
-define(`__IO_IDE_A2_LINE',  0x04)  # direct from 8255 to ide interface
-define(`__IO_IDE_CS0_LINE', 0x08)  # inverter between 8255 and ide interface
-define(`__IO_IDE_CS1_LINE', 0x10)  # inverter between 8255 and ide interface
-define(`__IO_IDE_WR_LINE',  0x20)  # inverter between 8255 and ide interface
-define(`__IO_IDE_RD_LINE',  0x40)  # inverter between 8255 and ide interface
-define(`__IO_IDE_RST_LINE', 0x80)  # inverter between 8255 and ide interface
+define(`__IO_PIO_IDE_A0_LINE',  0x01)  # direct from 8255 to ide interface
+define(`__IO_PIO_IDE_A1_LINE',  0x02)  # direct from 8255 to ide interface
+define(`__IO_PIO_IDE_A2_LINE',  0x04)  # direct from 8255 to ide interface
+define(`__IO_PIO_IDE_CS0_LINE', 0x08)  # inverter between 8255 and ide interface
+define(`__IO_PIO_IDE_CS1_LINE', 0x10)  # inverter between 8255 and ide interface
+define(`__IO_PIO_IDE_WR_LINE',  0x20)  # inverter between 8255 and ide interface
+define(`__IO_PIO_IDE_RD_LINE',  0x40)  # inverter between 8255 and ide interface
+define(`__IO_PIO_IDE_RST_LINE', 0x80)  # inverter between 8255 and ide interface
 
 # IDE I/O Register Addressing
 #
 # IDE control lines for use with __IO_PIO_IDE_CTL. Symbolic constants
 # for the IDE registers, which makes the code more readable than
 # always specifying the address pins.
-define(`__IO_IDE_DATA',         __IO_IDE_CS0_LINE)
-define(`__IO_IDE_ERROR',        0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A0_LINE,16))
-define(`__IO_IDE_SEC_CNT',      0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A1_LINE,16))   #Typically 1 Sector only
-define(`__IO_IDE_SECTOR',       0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A1_LINE+__IO_IDE_A0_LINE,16))  #LBA0
-define(`__IO_IDE_CYL_LSB',      0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE,16))                   #LBA1
-define(`__IO_IDE_CYL_MSB',      0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A0_LINE,16))  #LBA2
-define(`__IO_IDE_HEAD',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE,16))  #LBA3
-define(`__IO_IDE_COMMAND',      0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE+__IO_IDE_A0_LINE,16))
-define(`__IO_IDE_STATUS',       0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE+__IO_IDE_A0_LINE,16))
+define(`__IO_PIO_IDE_DATA',         __IO_PIO_IDE_CS0_LINE)
+define(`__IO_PIO_IDE_ERROR',        0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A0_LINE,16))
+define(`__IO_PIO_IDE_SEC_CNT',      0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A1_LINE,16))   #Typically 1 Sector only
+define(`__IO_PIO_IDE_SECTOR',       0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A1_LINE+__IO_PIO_IDE_A0_LINE,16))  #LBA0
+define(`__IO_PIO_IDE_CYL_LSB',      0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A2_LINE,16))                   #LBA1
+define(`__IO_PIO_IDE_CYL_MSB',      0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A2_LINE+__IO_PIO_IDE_A0_LINE,16))  #LBA2
+define(`__IO_PIO_IDE_HEAD',         0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A2_LINE+__IO_PIO_IDE_A1_LINE,16))  #LBA3
+define(`__IO_PIO_IDE_COMMAND',      0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A2_LINE+__IO_PIO_IDE_A1_LINE+__IO_PIO_IDE_A0_LINE,16))
+define(`__IO_PIO_IDE_STATUS',       0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A2_LINE+__IO_PIO_IDE_A1_LINE+__IO_PIO_IDE_A0_LINE,16))
 
-define(`__IO_IDE_CONTROL',      0x`'eval(__IO_IDE_CS1_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE,16))
-define(`__IO_IDE_ALT_STATUS',   0x`'eval(__IO_IDE_CS1_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE,16))
+define(`__IO_PIO_IDE_CONTROL',      0x`'eval(__IO_PIO_IDE_CS1_LINE+__IO_PIO_IDE_A2_LINE+__IO_PIO_IDE_A1_LINE,16))
+define(`__IO_PIO_IDE_ALT_STATUS',   0x`'eval(__IO_PIO_IDE_CS1_LINE+__IO_PIO_IDE_A2_LINE+__IO_PIO_IDE_A1_LINE,16))
 
-define(`__IO_IDE_LBA0',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A1_LINE+__IO_IDE_A0_LINE,16)) #SECTOR
-define(`__IO_IDE_LBA1',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE,16))                  #CYL_LSB
-define(`__IO_IDE_LBA2',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A0_LINE,16)) #CYL_MSB
-define(`__IO_IDE_LBA3',         0x`'eval(__IO_IDE_CS0_LINE+__IO_IDE_A2_LINE+__IO_IDE_A1_LINE,16)) #HEAD
+define(`__IO_PIO_IDE_LBA0',         0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A1_LINE+__IO_PIO_IDE_A0_LINE,16)) #SECTOR
+define(`__IO_PIO_IDE_LBA1',         0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A2_LINE,16))                  #CYL_LSB
+define(`__IO_PIO_IDE_LBA2',         0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A2_LINE+__IO_PIO_IDE_A0_LINE,16)) #CYL_MSB
+define(`__IO_PIO_IDE_LBA3',         0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_A2_LINE+__IO_PIO_IDE_A1_LINE,16)) #HEAD
 
 #==============================================================================
 #
@@ -139,32 +139,32 @@ PUBLIC `__IO_PIO_IDE_CONFIG'
 PUBLIC `__IO_PIO_IDE_RD'
 PUBLIC `__IO_PIO_IDE_WR'
 
-PUBLIC `__IO_IDE_A0_LINE'
-PUBLIC `__IO_IDE_A1_LINE'
-PUBLIC `__IO_IDE_A2_LINE'
-PUBLIC `__IO_IDE_CS0_LINE'
-PUBLIC `__IO_IDE_CS1_LINE'
-PUBLIC `__IO_IDE_WR_LINE'
-PUBLIC `__IO_IDE_RD_LINE'
-PUBLIC `__IO_IDE_RST_LINE'
+PUBLIC `__IO_PIO_IDE_A0_LINE'
+PUBLIC `__IO_PIO_IDE_A1_LINE'
+PUBLIC `__IO_PIO_IDE_A2_LINE'
+PUBLIC `__IO_PIO_IDE_CS0_LINE'
+PUBLIC `__IO_PIO_IDE_CS1_LINE'
+PUBLIC `__IO_PIO_IDE_WR_LINE'
+PUBLIC `__IO_PIO_IDE_RD_LINE'
+PUBLIC `__IO_PIO_IDE_RST_LINE'
 
-PUBLIC `__IO_IDE_DATA'
-PUBLIC `__IO_IDE_ERROR'
-PUBLIC `__IO_IDE_SEC_CNT'
-PUBLIC `__IO_IDE_SECTOR'
-PUBLIC `__IO_IDE_CYL_LSB'
-PUBLIC `__IO_IDE_CYL_MSB'
-PUBLIC `__IO_IDE_HEAD'
-PUBLIC `__IO_IDE_COMMAND'
-PUBLIC `__IO_IDE_STATUS'
+PUBLIC `__IO_PIO_IDE_DATA'
+PUBLIC `__IO_PIO_IDE_ERROR'
+PUBLIC `__IO_PIO_IDE_SEC_CNT'
+PUBLIC `__IO_PIO_IDE_SECTOR'
+PUBLIC `__IO_PIO_IDE_CYL_LSB'
+PUBLIC `__IO_PIO_IDE_CYL_MSB'
+PUBLIC `__IO_PIO_IDE_HEAD'
+PUBLIC `__IO_PIO_IDE_COMMAND'
+PUBLIC `__IO_PIO_IDE_STATUS'
 
-PUBLIC `__IO_IDE_CONTROL'
-PUBLIC `__IO_IDE_ALT_STATUS'
+PUBLIC `__IO_PIO_IDE_CONTROL'
+PUBLIC `__IO_PIO_IDE_ALT_STATUS'
 
-PUBLIC `__IO_IDE_LBA0'
-PUBLIC `__IO_IDE_LBA1'
-PUBLIC `__IO_IDE_LBA2'
-PUBLIC `__IO_IDE_LBA3'
+PUBLIC `__IO_PIO_IDE_LBA0'
+PUBLIC `__IO_PIO_IDE_LBA1'
+PUBLIC `__IO_PIO_IDE_LBA2'
+PUBLIC `__IO_PIO_IDE_LBA3'
 
 PUBLIC `__IDE_CMD_READ'
 PUBLIC `__IDE_CMD_WRITE'
@@ -189,32 +189,32 @@ defc `__IO_PIO_IDE_CONFIG' = __IO_PIO_IDE_CONFIG
 defc `__IO_PIO_IDE_RD' = __IO_PIO_IDE_RD
 defc `__IO_PIO_IDE_WR' = __IO_PIO_IDE_WR
 
-defc `__IO_IDE_A0_LINE' = __IO_IDE_A0_LINE
-defc `__IO_IDE_A1_LINE' = __IO_IDE_A1_LINE
-defc `__IO_IDE_A2_LINE' = __IO_IDE_A2_LINE
-defc `__IO_IDE_CS0_LINE' = __IO_IDE_CS0_LINE
-defc `__IO_IDE_CS1_LINE' = __IO_IDE_CS1_LINE
-defc `__IO_IDE_WR_LINE' = __IO_IDE_WR_LINE
-defc `__IO_IDE_RD_LINE' = __IO_IDE_RD_LINE
-defc `__IO_IDE_RST_LINE' = __IO_IDE_RST_LINE
+defc `__IO_PIO_IDE_A0_LINE' = __IO_PIO_IDE_A0_LINE
+defc `__IO_PIO_IDE_A1_LINE' = __IO_PIO_IDE_A1_LINE
+defc `__IO_PIO_IDE_A2_LINE' = __IO_PIO_IDE_A2_LINE
+defc `__IO_PIO_IDE_CS0_LINE' = __IO_PIO_IDE_CS0_LINE
+defc `__IO_PIO_IDE_CS1_LINE' = __IO_PIO_IDE_CS1_LINE
+defc `__IO_PIO_IDE_WR_LINE' = __IO_PIO_IDE_WR_LINE
+defc `__IO_PIO_IDE_RD_LINE' = __IO_PIO_IDE_RD_LINE
+defc `__IO_PIO_IDE_RST_LINE' = __IO_PIO_IDE_RST_LINE
 
-defc `__IO_IDE_DATA' = __IO_IDE_DATA
-defc `__IO_IDE_ERROR' = __IO_IDE_ERROR
-defc `__IO_IDE_SEC_CNT' = __IO_IDE_SEC_CNT
-defc `__IO_IDE_SECTOR' = __IO_IDE_SECTOR
-defc `__IO_IDE_CYL_LSB' = __IO_IDE_CYL_LSB
-defc `__IO_IDE_CYL_MSB' = __IO_IDE_CYL_MSB
-defc `__IO_IDE_HEAD' = __IO_IDE_HEAD
-defc `__IO_IDE_COMMAND' = __IO_IDE_COMMAND
-defc `__IO_IDE_STATUS' = __IO_IDE_STATUS
+defc `__IO_PIO_IDE_DATA' = __IO_PIO_IDE_DATA
+defc `__IO_PIO_IDE_ERROR' = __IO_PIO_IDE_ERROR
+defc `__IO_PIO_IDE_SEC_CNT' = __IO_PIO_IDE_SEC_CNT
+defc `__IO_PIO_IDE_SECTOR' = __IO_PIO_IDE_SECTOR
+defc `__IO_PIO_IDE_CYL_LSB' = __IO_PIO_IDE_CYL_LSB
+defc `__IO_PIO_IDE_CYL_MSB' = __IO_PIO_IDE_CYL_MSB
+defc `__IO_PIO_IDE_HEAD' = __IO_PIO_IDE_HEAD
+defc `__IO_PIO_IDE_COMMAND' = __IO_PIO_IDE_COMMAND
+defc `__IO_PIO_IDE_STATUS' = __IO_PIO_IDE_STATUS
 
-defc `__IO_IDE_CONTROL' = __IO_IDE_CONTROL
-defc `__IO_IDE_ALT_STATUS' = __IO_IDE_ALT_STATUS
+defc `__IO_PIO_IDE_CONTROL' = __IO_PIO_IDE_CONTROL
+defc `__IO_PIO_IDE_ALT_STATUS' = __IO_PIO_IDE_ALT_STATUS
 
-defc `__IO_IDE_LBA0' = __IO_IDE_LBA0
-defc `__IO_IDE_LBA1' = __IO_IDE_LBA1
-defc `__IO_IDE_LBA2' = __IO_IDE_LBA2
-defc `__IO_IDE_LBA3' = __IO_IDE_LBA3
+defc `__IO_PIO_IDE_LBA0' = __IO_PIO_IDE_LBA0
+defc `__IO_PIO_IDE_LBA1' = __IO_PIO_IDE_LBA1
+defc `__IO_PIO_IDE_LBA2' = __IO_PIO_IDE_LBA2
+defc `__IO_PIO_IDE_LBA3' = __IO_PIO_IDE_LBA3
 
 defc `__IDE_CMD_READ' = __IDE_CMD_READ
 defc `__IDE_CMD_WRITE' = __IDE_CMD_WRITE
@@ -239,32 +239,32 @@ ifdef(`CFG_C_DEF',
 `#define' `__IO_PIO_IDE_RD'  __IO_PIO_IDE_RD
 `#define' `__IO_PIO_IDE_WR'  __IO_PIO_IDE_WR
 
-`#define' `__IO_IDE_A0_LINE'  __IO_IDE_A0_LINE
-`#define' `__IO_IDE_A1_LINE'  __IO_IDE_A1_LINE
-`#define' `__IO_IDE_A2_LINE'  __IO_IDE_A2_LINE
-`#define' `__IO_IDE_CS0_LINE'  __IO_IDE_CS0_LINE
-`#define' `__IO_IDE_CS1_LINE'  __IO_IDE_CS1_LINE
-`#define' `__IO_IDE_WR_LINE'  __IO_IDE_WR_LINE
-`#define' `__IO_IDE_RD_LINE'  __IO_IDE_RD_LINE
-`#define' `__IO_IDE_RST_LINE'  __IO_IDE_RST_LINE
+`#define' `__IO_PIO_IDE_A0_LINE'  __IO_PIO_IDE_A0_LINE
+`#define' `__IO_PIO_IDE_A1_LINE'  __IO_PIO_IDE_A1_LINE
+`#define' `__IO_PIO_IDE_A2_LINE'  __IO_PIO_IDE_A2_LINE
+`#define' `__IO_PIO_IDE_CS0_LINE'  __IO_PIO_IDE_CS0_LINE
+`#define' `__IO_PIO_IDE_CS1_LINE'  __IO_PIO_IDE_CS1_LINE
+`#define' `__IO_PIO_IDE_WR_LINE'  __IO_PIO_IDE_WR_LINE
+`#define' `__IO_PIO_IDE_RD_LINE'  __IO_PIO_IDE_RD_LINE
+`#define' `__IO_PIO_IDE_RST_LINE'  __IO_PIO_IDE_RST_LINE
 
-`#define' `__IO_IDE_DATA'  __IO_IDE_DATA
-`#define' `__IO_IDE_ERROR'  __IO_IDE_ERROR
-`#define' `__IO_IDE_SEC_CNT'  __IO_IDE_SEC_CNT
-`#define' `__IO_IDE_SECTOR'  __IO_IDE_SECTOR
-`#define' `__IO_IDE_CYL_LSB'  __IO_IDE_CYL_LSB
-`#define' `__IO_IDE_CYL_MSB'  __IO_IDE_CYL_MSB
-`#define' `__IO_IDE_HEAD'  __IO_IDE_HEAD
-`#define' `__IO_IDE_COMMAND'  __IO_IDE_COMMAND
-`#define' `__IO_IDE_STATUS'  __IO_IDE_STATUS
+`#define' `__IO_PIO_IDE_DATA'  __IO_PIO_IDE_DATA
+`#define' `__IO_PIO_IDE_ERROR'  __IO_PIO_IDE_ERROR
+`#define' `__IO_PIO_IDE_SEC_CNT'  __IO_PIO_IDE_SEC_CNT
+`#define' `__IO_PIO_IDE_SECTOR'  __IO_PIO_IDE_SECTOR
+`#define' `__IO_PIO_IDE_CYL_LSB'  __IO_PIO_IDE_CYL_LSB
+`#define' `__IO_PIO_IDE_CYL_MSB'  __IO_PIO_IDE_CYL_MSB
+`#define' `__IO_PIO_IDE_HEAD'  __IO_PIO_IDE_HEAD
+`#define' `__IO_PIO_IDE_COMMAND'  __IO_PIO_IDE_COMMAND
+`#define' `__IO_PIO_IDE_STATUS'  __IO_PIO_IDE_STATUS
 
-`#define' `__IO_IDE_CONTROL'  __IO_IDE_CONTROL
-`#define' `__IO_IDE_ALT_STATUS'  __IO_IDE_ALT_STATUS
+`#define' `__IO_PIO_IDE_CONTROL'  __IO_PIO_IDE_CONTROL
+`#define' `__IO_PIO_IDE_ALT_STATUS'  __IO_PIO_IDE_ALT_STATUS
 
-`#define' `__IO_IDE_LBA0'  __IO_IDE_LBA0
-`#define' `__IO_IDE_LBA1'  __IO_IDE_LBA1
-`#define' `__IO_IDE_LBA2'  __IO_IDE_LBA2
-`#define' `__IO_IDE_LBA3'  __IO_IDE_LBA3
+`#define' `__IO_PIO_IDE_LBA0'  __IO_PIO_IDE_LBA0
+`#define' `__IO_PIO_IDE_LBA1'  __IO_PIO_IDE_LBA1
+`#define' `__IO_PIO_IDE_LBA2'  __IO_PIO_IDE_LBA2
+`#define' `__IO_PIO_IDE_LBA3'  __IO_PIO_IDE_LBA3
 
 `#define' `__IDE_CMD_READ'  __IDE_CMD_READ
 `#define' `__IDE_CMD_WRITE'  __IDE_CMD_WRITE

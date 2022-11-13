@@ -21,7 +21,7 @@ PUBLIC ide_write_byte_preset
 .ide_write_byte_preset
     ld a,d
     out (__IO_PIO_IDE_CTL),a    ;drive address onto control lines
-    or __IO_IDE_WR_LINE
+    or __IO_PIO_IDE_WR_LINE
     out (__IO_PIO_IDE_CTL),a    ;and assert write pin
     ld a,e
     out (__IO_PIO_IDE_LSB),a    ;drive lower lines with lsb

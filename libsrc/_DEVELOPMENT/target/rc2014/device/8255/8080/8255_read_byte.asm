@@ -20,7 +20,7 @@ PUBLIC ide_read_byte
     out (__IO_PIO_IDE_CONFIG),a ;config 8255 chip, read mode
     ld a,d
     out (__IO_PIO_IDE_CTL),a    ;drive address onto control lines
-    or __IO_IDE_RD_LINE
+    or __IO_PIO_IDE_RD_LINE
     out (__IO_PIO_IDE_CTL),a    ;and assert read pin
     in a,(__IO_PIO_IDE_LSB)     ;read the lower byte
     ld e,a                      ;save read byte to E

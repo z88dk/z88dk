@@ -659,32 +659,32 @@ defc __IO_PIO_IDE_CONFIG = 0x23
 defc __IO_PIO_IDE_RD = 0x92
 defc __IO_PIO_IDE_WR = 0x80
 
-defc __IO_IDE_A0_LINE = 0x01
-defc __IO_IDE_A1_LINE = 0x02
-defc __IO_IDE_A2_LINE = 0x04
-defc __IO_IDE_CS0_LINE = 0x08
-defc __IO_IDE_CS1_LINE = 0x10
-defc __IO_IDE_WR_LINE = 0x20
-defc __IO_IDE_RD_LINE = 0x40
-defc __IO_IDE_RST_LINE = 0x80
+defc __IO_PIO_IDE_A0_LINE = 0x01
+defc __IO_PIO_IDE_A1_LINE = 0x02
+defc __IO_PIO_IDE_A2_LINE = 0x04
+defc __IO_PIO_IDE_CS0_LINE = 0x08
+defc __IO_PIO_IDE_CS1_LINE = 0x10
+defc __IO_PIO_IDE_WR_LINE = 0x20
+defc __IO_PIO_IDE_RD_LINE = 0x40
+defc __IO_PIO_IDE_RST_LINE = 0x80
 
-defc __IO_IDE_DATA = 0x08
-defc __IO_IDE_ERROR = 0x9
-defc __IO_IDE_SEC_CNT = 0xa
-defc __IO_IDE_SECTOR = 0xb
-defc __IO_IDE_CYL_LSB = 0xc
-defc __IO_IDE_CYL_MSB = 0xd
-defc __IO_IDE_HEAD = 0xe
-defc __IO_IDE_COMMAND = 0xf
-defc __IO_IDE_STATUS = 0xf
+defc __IO_PIO_IDE_DATA = 0x08
+defc __IO_PIO_IDE_ERROR = 0x9
+defc __IO_PIO_IDE_SEC_CNT = 0xa
+defc __IO_PIO_IDE_SECTOR = 0xb
+defc __IO_PIO_IDE_CYL_LSB = 0xc
+defc __IO_PIO_IDE_CYL_MSB = 0xd
+defc __IO_PIO_IDE_HEAD = 0xe
+defc __IO_PIO_IDE_COMMAND = 0xf
+defc __IO_PIO_IDE_STATUS = 0xf
 
-defc __IO_IDE_CONTROL = 0x16
-defc __IO_IDE_ALT_STATUS = 0x16
+defc __IO_PIO_IDE_CONTROL = 0x16
+defc __IO_PIO_IDE_ALT_STATUS = 0x16
 
-defc __IO_IDE_LBA0 = 0xb
-defc __IO_IDE_LBA1 = 0xc
-defc __IO_IDE_LBA2 = 0xd
-defc __IO_IDE_LBA3 = 0xe
+defc __IO_PIO_IDE_LBA0 = 0xb
+defc __IO_PIO_IDE_LBA1 = 0xc
+defc __IO_PIO_IDE_LBA2 = 0xd
+defc __IO_PIO_IDE_LBA3 = 0xe
 
 defc __IDE_CMD_READ = 0x20
 defc __IDE_CMD_WRITE = 0x30

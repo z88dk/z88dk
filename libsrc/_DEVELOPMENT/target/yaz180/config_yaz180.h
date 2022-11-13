@@ -761,32 +761,32 @@
 #define __IO_PIO_IDE_RD  0x92
 #define __IO_PIO_IDE_WR  0x80
 
-#define __IO_IDE_A0_LINE  0x10
-#define __IO_IDE_A1_LINE  0x04
-#define __IO_IDE_A2_LINE  0x40
-#define __IO_IDE_CS0_LINE  0x08
-#define __IO_IDE_CS1_LINE  0x20
-#define __IO_IDE_WR_LINE  0x01
-#define __IO_IDE_RD_LINE  0x02
-#define __IO_IDE_RST_LINE  0x80
+#define __IO_PIO_IDE_A0_LINE  0x10
+#define __IO_PIO_IDE_A1_LINE  0x04
+#define __IO_PIO_IDE_A2_LINE  0x40
+#define __IO_PIO_IDE_CS0_LINE  0x08
+#define __IO_PIO_IDE_CS1_LINE  0x20
+#define __IO_PIO_IDE_WR_LINE  0x01
+#define __IO_PIO_IDE_RD_LINE  0x02
+#define __IO_PIO_IDE_RST_LINE  0x80
 
-#define __IO_IDE_DATA  0x08
-#define __IO_IDE_ERROR  0x18
-#define __IO_IDE_SEC_CNT  0xc
-#define __IO_IDE_SECTOR  0x1c
-#define __IO_IDE_CYL_LSB  0x48
-#define __IO_IDE_CYL_MSB  0x58
-#define __IO_IDE_HEAD  0x4c
-#define __IO_IDE_COMMAND  0x5c
-#define __IO_IDE_STATUS  0x5c
+#define __IO_PIO_IDE_DATA  0x08
+#define __IO_PIO_IDE_ERROR  0x18
+#define __IO_PIO_IDE_SEC_CNT  0xc
+#define __IO_PIO_IDE_SECTOR  0x1c
+#define __IO_PIO_IDE_CYL_LSB  0x48
+#define __IO_PIO_IDE_CYL_MSB  0x58
+#define __IO_PIO_IDE_HEAD  0x4c
+#define __IO_PIO_IDE_COMMAND  0x5c
+#define __IO_PIO_IDE_STATUS  0x5c
 
-#define __IO_IDE_CONTROL  0x64
-#define __IO_IDE_ALT_STATUS  0x64
+#define __IO_PIO_IDE_CONTROL  0x64
+#define __IO_PIO_IDE_ALT_STATUS  0x64
 
-#define __IO_IDE_LBA0  0x1c
-#define __IO_IDE_LBA1  0x48
-#define __IO_IDE_LBA2  0x58
-#define __IO_IDE_LBA3  0x4c
+#define __IO_PIO_IDE_LBA0  0x1c
+#define __IO_PIO_IDE_LBA1  0x48
+#define __IO_PIO_IDE_LBA2  0x58
+#define __IO_PIO_IDE_LBA3  0x4c
 
 #define __IDE_CMD_READ  0x20
 #define __IDE_CMD_WRITE  0x30
