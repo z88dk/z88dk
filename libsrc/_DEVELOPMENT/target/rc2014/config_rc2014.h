@@ -40,7 +40,8 @@
 #define __RC2014  1
 
 #define __IO_DIO_PORT  0x00
-#define __IO_CF_PORT  0x10
+#define __IO_CF_8_BIT  0x01
+#define __IO_CF_PORT_BASE  0x10
 #define __IO_PIO_PORT_BASE  0x20
 
 
@@ -641,6 +642,37 @@
 #define __IO_PIO_CNTL_13  0x99
 #define __IO_PIO_CNTL_14  0x9A
 #define __IO_PIO_CNTL_15  0x9B
+
+
+
+
+
+
+
+
+
+
+
+
+#define __IO_CF_IDE_DATA  0x10
+#define __IO_CF_IDE_ERROR  0x11
+#define __IO_CF_IDE_FEATURE  0x11
+#define __IO_CF_IDE_SEC_CNT  0x12
+#define __IO_CF_IDE_SECTOR  0x13
+#define __IO_CF_IDE_CYL_LSB  0x14
+#define __IO_CF_IDE_CYL_MSB  0x15
+#define __IO_CF_IDE_HEAD  0x16
+#define __IO_CF_IDE_COMMAND  0x17
+#define __IO_CF_IDE_STATUS  0x17
+
+#define __IO_CF_IDE_CONTROL  0x1e
+#define __IO_CF_IDE_ALT_STATUS  0x1e
+
+#define __IO_CF_IDE_LBA0  0x13
+#define __IO_CF_IDE_LBA1  0x14
+#define __IO_CF_IDE_LBA2  0x15
+#define __IO_CF_IDE_LBA3  0x16
+
 
 
 

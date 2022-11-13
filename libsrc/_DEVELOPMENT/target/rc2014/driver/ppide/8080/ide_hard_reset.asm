@@ -3,6 +3,8 @@ SECTION code_driver
 
 PUBLIC ide_hard_reset
 
+IF __IO_CF_8_BIT = 0
+
 EXTERN __IO_PIO_IDE_CTL, __IO_PIO_IDE_CONFIG
 EXTERN __IO_PIO_IDE_RD
 
@@ -40,3 +42,4 @@ EXTERN ide_wait_ready
 
     jp ide_wait_ready           ;carry set on return = operation ok
 
+ENDIF

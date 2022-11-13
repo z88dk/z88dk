@@ -3,6 +3,30 @@ SECTION code_driver
 
 PUBLIC ide_idle
 
+IF __IO_CF_8_BIT = 1
+
+EXTERN __IO_CF_IDE_COMMAND
+
+EXTERN __IDE_CMD_IDLE
+
+EXTERN ide_wait_ready
+
+;------------------------------------------------------------------------------
+; Routines that talk with the IDE drive, these should be called by
+; the main program.
+; tell the drive to immediately idle
+; Uses AF
+; return carry on success
+
+.ide_idle
+    call ide_wait_ready
+
+    ld a,__IDE_CMD_IDLE
+    out (__IO_CF_IDE_COMMAND),a
+    jp ide_wait_ready           ;carry set on return = operation ok
+
+ELSE
+
 EXTERN __IO_PIO_IDE_COMMAND
 
 EXTERN __IDE_CMD_IDLE
@@ -25,3 +49,4 @@ EXTERN ide_write_byte
     call ide_write_byte
     jp ide_wait_ready           ;carry set on return = operation ok
 
+ENDIF

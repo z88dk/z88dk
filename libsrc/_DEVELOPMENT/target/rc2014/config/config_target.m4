@@ -19,7 +19,8 @@ define(`__IO_DIO_PORT', 0x00)    # Port Address for DIO Module
 
 # Compact Flash Module Port Definition
 
-define(`__IO_CF_PORT', 0x10)    # Port Address for CF Module
+define(`__IO_CF_8_BIT', 0x01)       # Use 8-bit mode for CF Module (0x01)
+define(`__IO_CF_PORT_BASE', 0x10)   # Port Address for CF Module
 
 # 82C55 PIO Port Definition
 
@@ -62,7 +63,8 @@ ifdef(`CFG_ASM_PUB',
 PUBLIC `__RC2014'
 
 PUBLIC `__IO_DIO_PORT'
-PUBLIC `__IO_CF_PORT'
+PUBLIC `__IO_CF_8_BIT'
+PUBLIC `__IO_CF_PORT_BASE'
 PUBLIC `__IO_PIO_PORT_BASE'
 PUBLIC `__IO_ACIA_PORT_BASE'
 PUBLIC `__IO_SIO_PORT_BASE'
@@ -83,7 +85,8 @@ defc `__RC2014' = __RC2014
 defc `__CPU_CLOCK' = __CPU_CLOCK
 
 defc `__IO_DIO_PORT' = __IO_DIO_PORT
-defc `__IO_CF_PORT' = __IO_CF_PORT
+defc `__IO_CF_8_BIT' = __IO_CF_8_BIT
+defc `__IO_CF_PORT_BASE' = __IO_CF_PORT_BASE
 defc `__IO_PIO_PORT_BASE' = __IO_PIO_PORT_BASE
 defc `__IO_ACIA_PORT_BASE' = __IO_ACIA_PORT_BASE
 defc `__IO_SIO_PORT_BASE' = __IO_SIO_PORT_BASE
@@ -103,6 +106,7 @@ ifdef(`CFG_C_DEF',
 `#define' `__RC2014'  __RC2014
 
 `#define' `__IO_DIO_PORT'  __IO_DIO_PORT
-`#define' `__IO_CF_PORT'  __IO_CF_PORT
+`#define' `__IO_CF_8_BIT'  __IO_CF_8_BIT
+`#define' `__IO_CF_PORT_BASE'  __IO_CF_PORT_BASE
 `#define' `__IO_PIO_PORT_BASE'  __IO_PIO_PORT_BASE
 ')

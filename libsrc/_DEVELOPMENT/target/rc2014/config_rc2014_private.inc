@@ -37,7 +37,8 @@ defc __RC2014 = 1
 defc __CPU_CLOCK = 7372800
 
 defc __IO_DIO_PORT = 0x00
-defc __IO_CF_PORT = 0x10
+defc __IO_CF_8_BIT = 0x01
+defc __IO_CF_PORT_BASE = 0x10
 defc __IO_PIO_PORT_BASE = 0x20
 defc __IO_ACIA_PORT_BASE = 0x80
 defc __IO_SIO_PORT_BASE = 0x80
@@ -643,6 +644,37 @@ defc __IO_PIO_CNTL_12 = 0x98
 defc __IO_PIO_CNTL_13 = 0x99
 defc __IO_PIO_CNTL_14 = 0x9A
 defc __IO_PIO_CNTL_15 = 0x9B
+
+
+
+
+
+
+
+
+
+
+
+
+defc __IO_CF_IDE_DATA = 0x10
+defc __IO_CF_IDE_ERROR = 0x11
+defc __IO_CF_IDE_FEATURE = 0x11
+defc __IO_CF_IDE_SEC_CNT = 0x12
+defc __IO_CF_IDE_SECTOR = 0x13
+defc __IO_CF_IDE_CYL_LSB = 0x14
+defc __IO_CF_IDE_CYL_MSB = 0x15
+defc __IO_CF_IDE_HEAD = 0x16
+defc __IO_CF_IDE_COMMAND = 0x17
+defc __IO_CF_IDE_STATUS = 0x17
+
+defc __IO_CF_IDE_CONTROL = 0x1e
+defc __IO_CF_IDE_ALT_STATUS = 0x1e
+
+defc __IO_CF_IDE_LBA0 = 0x13
+defc __IO_CF_IDE_LBA1 = 0x14
+defc __IO_CF_IDE_LBA2 = 0x15
+defc __IO_CF_IDE_LBA3 = 0x16
+
 
 
 

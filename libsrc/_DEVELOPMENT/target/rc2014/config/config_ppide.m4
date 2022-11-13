@@ -18,23 +18,23 @@ define(`__IO_PIO_IDE_CONFIG', __IO_PIO_CONTROL)   # PIO configuration
 define(`__IO_PIO_IDE_RD',     __IO_PIO_CNTL_10)   # _IO_PIO_IDE_CTL out, _IO_PIO_IDE_LSB/MSB input
 define(`__IO_PIO_IDE_WR',     __IO_PIO_CNTL_00)   # all PIO ports output
 
-# IDE control lines for use with __IO_PIO_IDE_CTL. Change these 8
+# IDE control lines for use with __IO_PIO_IDE. Change these 8
 # constants to reflect where each signal of the 8255 each of the
 # IDE control signals is connected.  All the control signals must
 # be on the same port, but these 8 lines let you connect them to
 # whichever pins on that port.
-define(`__IO_PIO_IDE_A0_LINE',  0x10)  # direct from 8255 to ide interface
-define(`__IO_PIO_IDE_A1_LINE',  0x04)  # direct from 8255 to ide interface
-define(`__IO_PIO_IDE_A2_LINE',  0x40)  # direct from 8255 to ide interface
+define(`__IO_PIO_IDE_A0_LINE',  0x01)  # direct from 8255 to ide interface
+define(`__IO_PIO_IDE_A1_LINE',  0x02)  # direct from 8255 to ide interface
+define(`__IO_PIO_IDE_A2_LINE',  0x04)  # direct from 8255 to ide interface
 define(`__IO_PIO_IDE_CS0_LINE', 0x08)  # inverter between 8255 and ide interface
-define(`__IO_PIO_IDE_CS1_LINE', 0x20)  # inverter between 8255 and ide interface
-define(`__IO_PIO_IDE_WR_LINE',  0x01)  # inverter between 8255 and ide interface
-define(`__IO_PIO_IDE_RD_LINE',  0x02)  # inverter between 8255 and ide interface
+define(`__IO_PIO_IDE_CS1_LINE', 0x10)  # inverter between 8255 and ide interface
+define(`__IO_PIO_IDE_WR_LINE',  0x20)  # inverter between 8255 and ide interface
+define(`__IO_PIO_IDE_RD_LINE',  0x40)  # inverter between 8255 and ide interface
 define(`__IO_PIO_IDE_RST_LINE', 0x80)  # inverter between 8255 and ide interface
 
 # IDE I/O Register Addressing
 #
-# IDE control lines for use with __IO_PIO_IDE_CTL. Symbolic constants
+# IDE control lines for use with __IO_PIO_IDE. Symbolic constants
 # for the IDE registers, which makes the code more readable than
 # always specifying the address pins.
 define(`__IO_PIO_IDE_DATA',         __IO_PIO_IDE_CS0_LINE)
@@ -60,7 +60,7 @@ define(`__IO_PIO_IDE_LBA3',         0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_
 #
 # DEFINES SECTION
 
-# IDE reg: A0-A2: /CS0: /CS1: Use:
+# IDE reg: A0-A2: /CS0: /CS1: Use
 #
 #       0x0    000    0    1     IDE Data Port
 #       0x1    001    0    1     Read: Error code (also see $$)
@@ -123,7 +123,7 @@ define(`__IO_PIO_IDE_LBA3',         0x`'eval(__IO_PIO_IDE_CS0_LINE+__IO_PIO_IDE_
 #       Bit 4   = Select Master (0) or Slave (1) drive
 #       Bit 0:3 = LBA bits (24:27)
 
-#       ## Bits in Command / Status Register $7
+#       ## Bits in Status Register $7
 
 #       Bit 7   = BSY   1=busy, 0=not busy
 #       Bit 6   = RDY   1=ready for command, 0=not ready yet
