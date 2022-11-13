@@ -165,6 +165,14 @@ void remove_temp_breakpoints() {
     }
 }
 
+void warn_existing_temp_breakpoints()
+{
+    if (temporary_breakpoints)
+    {
+        bk.console("Warning: a step operation might have failed, as the process has terminated before the operation could complete.\n");
+    }
+}
+
 uint8_t process_temp_breakpoints() {
     uint8_t dodebug = 0;
 

@@ -76,6 +76,7 @@ extern temporary_breakpoint_t* add_temporary_internal_breakpoint(uint32_t addres
     const char *source_filename, int source_lineno);
 extern void remove_temp_breakpoint(temporary_breakpoint_t* b);
 extern void remove_temp_breakpoints();
+extern void warn_existing_temp_breakpoints();
 extern uint8_t process_temp_breakpoints();
 
 #endif

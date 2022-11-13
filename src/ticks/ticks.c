@@ -4702,6 +4702,7 @@ int main (int argc, char **argv){
     sttap= st+( tap= tapcycles() );
   if ( counter != -1 )
     printf("%llu\n", st);
+  warn_existing_temp_breakpoints();
   if (profiler_enabled) {
       profiler_stop();
   }

@@ -1,4 +1,5 @@
 #include "ticks.h"
+#include "breakpoints.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +31,7 @@ void PatchZ80(void)
 static void cmd_exit(void)
 {
 	printf("\nTicks: %llu\n",st);
+    warn_existing_temp_breakpoints();
     exit(l);
 }
 
