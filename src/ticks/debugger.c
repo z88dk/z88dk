@@ -163,7 +163,7 @@ static command commands[] = {
     { "down",      cmd_down,        "",                     "Go one frame down" },
     { "print",     cmd_print,       "<expression>",         "Print an expression" },
     { "info",      cmd_info,        "locals,...",           "Get info request" },
-    { "dis",       cmd_disassemble, "[<address>]",          "Disassemble from pc/<address>" },
+    { "dis",       cmd_disassemble, "[<address>] [<size>]", "Disassemble from pc/<address> a block of <size>" },
     { "finish",    cmd_finish,      "",                     "Exit current function (and print result if any)" },
     { "reg",       cmd_registers,   "",                     "Display the registers" },
     { "break",     cmd_break,       "<address/label>",      "Handle breakpoints" },
@@ -1190,11 +1190,16 @@ static int cmd_disassemble(int argc, char **argv)
 {
     char buf[256];
     int i = 0;
+    int disassemble_size = 10;
     int where = -1;
     const unsigned short pc = bk.pc();
 
-    if ( argc == 2 ) {
+    if ( argc >= 2 ) {
         where = parse_address(argv[1], NULL);
+    }
+
+    if ( argc >= 3 ) {
+        disassemble_size = atoi(argv[2]);
     }
 
     if ( where == -1 )
@@ -1221,7 +1226,7 @@ static int cmd_disassemble(int argc, char **argv)
         debug_stack_frames_free(first_frame_pointer);
     }
 
-    while ( i < 10 ) {
+    while ( i < disassemble_size ) {
        where += disassemble2(where, buf, sizeof(buf), 0);
        bk.console("%s\n",buf);
        i++;
