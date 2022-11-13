@@ -3,7 +3,21 @@ SECTION code_driver
 
 PUBLIC ide_hard_reset
 
-IF __IO_CF_8_BIT = 0
+IF __IO_CF_8_BIT = 1
+
+;------------------------------------------------------------------------------
+; Routines that talk with the IDE drive, these should be called by
+; the main program.
+
+; do a hard reset on the drive, by pulsing its reset pin.
+; this doesn't work on a CF interface.
+; this should be followed with a call to "ide_init".
+
+.ide_hard_reset
+    scf
+    ret
+
+ELSE
 
 EXTERN __IO_PIO_IDE_CTL, __IO_PIO_IDE_CONFIG
 EXTERN __IO_PIO_IDE_RD

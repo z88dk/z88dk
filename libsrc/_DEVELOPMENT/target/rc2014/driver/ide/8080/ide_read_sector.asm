@@ -1,31 +1,29 @@
 
 SECTION code_driver
 
-PUBLIC ide_write_sector
+PUBLIC ide_read_sector
 
 IF __IO_CF_8_BIT = 1
 
 EXTERN __IO_CF_IDE_SEC_CNT, __IO_CF_IDE_COMMAND
 
-EXTERN __IDE_CMD_WRITE, __IDE_CMD_CACHE_FLUSH
+EXTERN __IDE_CMD_READ
 
 EXTERN ide_wait_ready, ide_wait_drq
 EXTERN ide_setup_lba
-
-EXTERN ide_write_block
 
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called by
 ; the main program.
 
-; write a sector
-; specified by the 4 bytes in BCDE
-; the address of the origin buffer is in HL
+; read a sector
+; LBA specified by the 4 bytes in BCDE
+; the address of the buffer to fill is in HL
 ; HL is left incremented by 512 bytes
 ; uses AF, BC, DE, HL
 ; return carry on success
 
-.ide_write_sector
+.ide_read_sector
     push de
     call ide_wait_ready         ;make sure drive is ready
 
@@ -35,43 +33,50 @@ EXTERN ide_write_block
     ld a,1
     out (__IO_CF_IDE_SEC_CNT),a ;set sector count to 1
 
-    ld a,__IDE_CMD_WRITE
-    out (__IO_CF_IDE_COMMAND),a ;instruct drive to write a sector
+    ld a,__IDE_CMD_READ
+    out (__IO_CF_IDE_COMMAND),a ;ask the drive to read it
 
     call ide_wait_ready         ;make sure drive is ready to proceed
-    call ide_wait_drq           ;wait until it wants the data
-    call ide_write_block        ;send the data to the drive from (HL++)
+    call ide_wait_drq           ;wait until it's got the data
 
-;   call ide_wait_ready
-;   ld a,__IDE_CMD_CACHE_FLUSH
-;   out (__IO_CF_IDE_COMMAND),a; tell drive to flush its hardware cache
+    ;Read a block of 512 bytes (one sector) from the drive
+    ;16 bit data register and store it in memory at (HL++)
 
-    jp ide_wait_ready           ;wait until the write is complete
+    ld b,0                      ;keep iterative count in b
+.ide_rdblk
+    in a,(__IO_CF_IDE_DATA)     ;read the data byte (hl++)
+    ld (hl+),a
+    in a,(__IO_CF_IDE_DATA)     ;read the data byte (hl++)
+    ld (hl+),a
+    djnz ide_rdblk              ;keep iterative count in b
+
+    scf                         ;carry = 1 on return = operation ok
+    ret
 
 ELSE
 
 EXTERN __IO_PIO_IDE_SEC_CNT, __IO_PIO_IDE_COMMAND
 
-EXTERN __IDE_CMD_WRITE, __IDE_CMD_CACHE_FLUSH
+EXTERN __IDE_CMD_READ
 
 EXTERN ide_wait_ready, ide_wait_drq
 EXTERN ide_setup_lba
 
 EXTERN ide_write_byte, ide_write_byte_preset
-EXTERN ide_write_block
+EXTERN ide_read_block
 
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called by
 ; the main program.
 
-; write a sector
-; specified by the 4 bytes in BCDE
-; the address of the origin buffer is in HL
+; read a sector
+; LBA specified by the 4 bytes in BCDE
+; the address of the buffer to fill is in HL
 ; HL is left incremented by 512 bytes
 ; uses AF, BC, DE, HL
 ; return carry on success
 
-.ide_write_sector
+.ide_read_sector
     push de
     call ide_wait_ready         ;make sure drive is ready
 
@@ -81,17 +86,15 @@ EXTERN ide_write_block
     ld de,__IO_PIO_IDE_SEC_CNT<<8|1
     call ide_write_byte_preset  ;set sector count to 1
 
-    ld de,__IO_PIO_IDE_COMMAND<<8|__IDE_CMD_WRITE
-    call ide_write_byte_preset  ;instruct drive to write a sector
+    ld de,__IO_PIO_IDE_COMMAND<<8|__IDE_CMD_READ
+    call ide_write_byte_preset  ;ask the drive to read it
 
     call ide_wait_ready         ;make sure drive is ready to proceed
-    call ide_wait_drq           ;wait until it wants the data
-    call ide_write_block        ;send the data to the drive from (HL++)
+    call ide_wait_drq           ;wait until it's got the data
 
-;   call ide_wait_ready
-;   ld de, __IO_PIO_IDE_COMMAND<<8|__IDE_CMD_CACHE_FLUSH
-;   call ide_write_byte         ;tell drive to flush its hardware cache
+    call ide_read_block         ;grab the data into (HL++)
 
-    jp ide_wait_ready           ;wait until the write is complete
+    scf                         ;carry = 1 on return = operation ok
+    ret
 
 ENDIF
