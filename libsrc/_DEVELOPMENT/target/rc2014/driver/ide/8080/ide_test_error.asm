@@ -1,11 +1,15 @@
 
+IF __CPU_INTEL__
+INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
+ELIF __CPU_Z80__
+INCLUDE "config_private.inc"
+ENDIF
+
 SECTION code_driver
 
 PUBLIC ide_test_error
 
 IF __IO_CF_8_BIT = 1
-
-EXTERN __IO_CF_IDE_STATUS, __IO_CF_IDE_ERROR
 
 ;------------------------------------------------------------------------------
 ; IDE internal subroutines 
@@ -21,12 +25,11 @@ EXTERN __IO_CF_IDE_STATUS, __IO_CF_IDE_ERROR
 
 .ide_test_error
     in a,(__IO_CF_IDE_STATUS)
-    ld e,a
     and 00000001b               ;test ERR bit
     scf                         ;set carry flag on success
     ret Z                       ;return with carry set
 
-    ld a,e                      ;get status byte
+    in a,(__IO_CF_IDE_STATUS)   ;get status byte again
     and 00100000b               ;test write error bit
     ret Z                       ;return carry clear, a = 0, ide write busy timed out
 
@@ -35,8 +38,6 @@ EXTERN __IO_CF_IDE_STATUS, __IO_CF_IDE_ERROR
     ret                         ;if a = 0, ide write busy timed out
 
 ELSE
-
-EXTERN __IO_PIO_IDE_ERROR, __IO_PIO_IDE_ALT_STATUS
 
 EXTERN ide_read_byte
 

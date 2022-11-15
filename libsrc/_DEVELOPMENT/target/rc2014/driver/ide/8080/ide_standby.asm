@@ -1,13 +1,15 @@
 
+IF __CPU_INTEL__
+INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
+ELIF __CPU_Z80__
+INCLUDE "config_private.inc"
+ENDIF
+
 SECTION code_driver
 
 PUBLIC ide_standby
 
 IF __IO_CF_8_BIT = 1
-
-EXTERN __IO_CF_IDE_COMMAND
-
-EXTERN __IDE_CMD_STANDBY
 
 EXTERN ide_wait_ready
 
@@ -27,12 +29,7 @@ EXTERN ide_wait_ready
 
 ELSE
 
-EXTERN __IO_PIO_IDE_COMMAND
-
-EXTERN __IDE_CMD_STANDBY
-
 EXTERN ide_wait_ready
-
 EXTERN ide_write_byte
 
 ;------------------------------------------------------------------------------

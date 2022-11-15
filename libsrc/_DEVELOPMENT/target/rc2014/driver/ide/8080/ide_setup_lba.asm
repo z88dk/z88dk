@@ -1,11 +1,15 @@
 
+IF __CPU_INTEL__
+INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
+ELIF __CPU_Z80__
+INCLUDE "config_private.inc"
+ENDIF
+
 SECTION code_driver
 
 PUBLIC ide_setup_lba
 
 IF __IO_CF_8_BIT = 1
-
-EXTERN __IO_CF_IDE_LBA0, __IO_CF_IDE_LBA1, __IO_CF_IDE_LBA2 = 0x15, __IO_CF_IDE_LBA3
 
 ;------------------------------------------------------------------------------
 ; IDE internal subroutines 
@@ -32,8 +36,6 @@ EXTERN __IO_CF_IDE_LBA0, __IO_CF_IDE_LBA1, __IO_CF_IDE_LBA2 = 0x15, __IO_CF_IDE_
     ret
 
 ELSE
-
-EXTERN __IO_PIO_IDE_LBA0, __IO_PIO_IDE_LBA1, __IO_PIO_IDE_LBA2, __IO_PIO_IDE_LBA3
 
 EXTERN ide_write_byte
 EXTERN ide_write_byte_preset

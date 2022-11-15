@@ -1,13 +1,15 @@
 
+IF __CPU_INTEL__
+INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
+ELIF __CPU_Z80__
+INCLUDE "config_private.inc"
+ENDIF
+
 SECTION code_driver
 
 PUBLIC ide_read_sector
 
 IF __IO_CF_8_BIT = 1
-
-EXTERN __IO_CF_IDE_SEC_CNT, __IO_CF_IDE_COMMAND
-
-EXTERN __IDE_CMD_READ
 
 EXTERN ide_wait_ready, ide_wait_drq
 EXTERN ide_setup_lba
@@ -24,10 +26,7 @@ EXTERN ide_setup_lba
 ; return carry on success
 
 .ide_read_sector
-    push de
     call ide_wait_ready         ;make sure drive is ready
-
-    pop de
     call ide_setup_lba          ;tell it which sector we want in BCDE
 
     ld a,1
@@ -54,10 +53,6 @@ EXTERN ide_setup_lba
     ret
 
 ELSE
-
-EXTERN __IO_PIO_IDE_SEC_CNT, __IO_PIO_IDE_COMMAND
-
-EXTERN __IDE_CMD_READ
 
 EXTERN ide_wait_ready, ide_wait_drq
 EXTERN ide_setup_lba

@@ -1,11 +1,15 @@
 
+IF __CPU_INTEL__
+INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
+ELIF __CPU_Z80__
+INCLUDE "config_private.inc"
+ENDIF
+
 SECTION code_driver
 
 PUBLIC ide_wait_ready
 
 IF __IO_CF_8_BIT = 1
-
-EXTERN __IO_CF_IDE_STATUS
 
 ;------------------------------------------------------------------------------
 ; IDE internal subroutines 
@@ -24,11 +28,10 @@ EXTERN __IO_CF_IDE_STATUS
 
 .ide_wait_ready
     in a,(__IO_CF_IDE_STATUS)
-    ld e,a
     and 00100001b               ;test for ERR or WFT
     ret NZ                      ;return clear carry flag on failure
 
-    ld a,e                      ;get status byte
+    in a,(__IO_CF_IDE_STATUS)   ;get status byte again
     and 11000000b               ;mask off BuSY and RDY bits
     xor 01000000b               ;wait for RDY to be set and BuSY to be clear
     jp NZ,ide_wait_ready
@@ -37,8 +40,6 @@ EXTERN __IO_CF_IDE_STATUS
     ret
 
 ELSE
-
-EXTERN __IO_PIO_IDE_ALT_STATUS
 
 EXTERN ide_read_byte
 

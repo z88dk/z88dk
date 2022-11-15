@@ -1,15 +1,15 @@
 
+IF __CPU_INTEL__
+INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
+ELIF __CPU_Z80__
+INCLUDE "config_private.inc"
+ENDIF
+
 SECTION code_driver
 
 PUBLIC ide_drive_id
 
 IF __IO_CF_8_BIT = 1
-
-EXTERN __IO_CF_IDE_COMMAND
-
-EXTERN __IDE_CMD_ID
-
-EXTERN __IO_CF_IDE_HEAD
 
 EXTERN ide_wait_ready, ide_wait_drq
 
@@ -26,8 +26,8 @@ EXTERN ide_wait_ready, ide_wait_drq
 .ide_drive_id
     call ide_wait_ready
 
-    ld a,|11100000b             ;select the master device, LBA mode
-    out (__IO_CF_IDE_HEAD)a
+    ld a,11100000b              ;select the master device, LBA mode
+    out (__IO_CF_IDE_HEAD),a
     call ide_wait_ready
 
     ld a,__IDE_CMD_ID
@@ -50,12 +50,6 @@ EXTERN ide_wait_ready, ide_wait_drq
     ret
 
 ELSE
-
-EXTERN __IO_PIO_IDE_COMMAND
-
-EXTERN __IO_PIO_IDE_HEAD
-
-EXTERN __IDE_CMD_ID
 
 EXTERN ide_wait_ready, ide_wait_drq
 

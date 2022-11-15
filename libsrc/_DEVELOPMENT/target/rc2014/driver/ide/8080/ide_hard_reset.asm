@@ -1,4 +1,10 @@
 
+IF __CPU_INTEL__
+INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
+ELIF __CPU_Z80__
+INCLUDE "config_private.inc"
+ENDIF
+
 SECTION code_driver
 
 PUBLIC ide_hard_reset
@@ -18,11 +24,6 @@ IF __IO_CF_8_BIT = 1
     ret
 
 ELSE
-
-EXTERN __IO_PIO_IDE_CTL, __IO_PIO_IDE_CONFIG
-EXTERN __IO_PIO_IDE_RD
-
-EXTERN  __IO_PIO_IDE_RST_LINE
 
 EXTERN ide_wait_ready
 
