@@ -5,7 +5,7 @@ PUBLIC ide_test_error
 
 IF __IO_CF_8_BIT = 1
 
-EXTERN __IO_CF_IDE_ALT_STATUS, __IO_CF_IDE_ERROR
+EXTERN __IO_CF_IDE_STATUS, __IO_CF_IDE_ERROR
 
 ;------------------------------------------------------------------------------
 ; IDE internal subroutines 
@@ -20,7 +20,7 @@ EXTERN __IO_CF_IDE_ALT_STATUS, __IO_CF_IDE_ERROR
 ; Carry is set on no error.
 
 .ide_test_error
-    in a,(__IO_CF_IDE_ALT_STATUS)
+    in a,(__IO_CF_IDE_STATUS)
     ld e,a
     and 00000001b               ;test ERR bit
     scf                         ;set carry flag on success

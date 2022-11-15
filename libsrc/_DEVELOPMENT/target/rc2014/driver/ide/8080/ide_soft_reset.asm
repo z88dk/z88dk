@@ -12,17 +12,20 @@ EXTERN ide_wait_ready
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called by
 ; the main program.
-; Uses AF
 ; by writing to the __IO_CF_IDE_CONTROL register, a software reset
 ; can be initiated.
+; this is not available on the standard CF interface.
 ; this should be followed with a call to "ide_init".
 
 .ide_soft_reset
-    ld a,00000110b              ;no interrupt, set drives reset
-    out (__IO_CF_IDE_CONTROL),a
-    ld a,00000010b              ;no interrupt, clear drives reset
-    out (__IO_CF_IDE_CONTROL),a
-    jp ide_wait_ready           ;carry set on return = operation ok
+;   ld a,00000110b              ;no interrupt, set drives reset
+;   out (__IO_CF_IDE_CONTROL),a
+;   ld a,00000010b              ;no interrupt, clear drives reset
+;   out (__IO_CF_IDE_CONTROL),a
+;   jp ide_wait_ready           ;carry set on return = operation ok
+
+    scf
+    ret
 
 ELSE
 

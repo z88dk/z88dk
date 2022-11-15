@@ -10,7 +10,7 @@ IF __IO_CF_8_BIT = 1
 ; the main program.
 
 ; do a hard reset on the drive, by pulsing its reset pin.
-; this doesn't work on a CF interface.
+; this is not available on the standard CF interface.
 ; this should be followed with a call to "ide_init".
 
 .ide_hard_reset

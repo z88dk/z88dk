@@ -19,8 +19,8 @@ define(`__IO_CF_IDE_HEAD',         0x`'eval(__IO_CF_PORT_BASE+06,16))   #LBA3
 define(`__IO_CF_IDE_COMMAND',      0x`'eval(__IO_CF_PORT_BASE+07,16))
 define(`__IO_CF_IDE_STATUS',       0x`'eval(__IO_CF_PORT_BASE+07,16))
 
-define(`__IO_CF_IDE_CONTROL',      0x`'eval(__IO_CF_PORT_BASE+14,16))
-define(`__IO_CF_IDE_ALT_STATUS',   0x`'eval(__IO_CF_PORT_BASE+14,16))
+define(`__IO_CF_IDE_CONTROL',      0x`'eval(__IO_CF_PORT_BASE+14,16))   # NOT AVAILABLE
+define(`__IO_CF_IDE_ALT_STATUS',   0x`'eval(__IO_CF_PORT_BASE+14,16))   # NOT AVAILABLE
 
 define(`__IO_CF_IDE_LBA0',         0x`'eval(__IO_CF_PORT_BASE+03,16))   #SECTOR
 define(`__IO_CF_IDE_LBA1',         0x`'eval(__IO_CF_PORT_BASE+04,16))   #CYL_LSB

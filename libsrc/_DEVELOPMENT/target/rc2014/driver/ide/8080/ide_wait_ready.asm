@@ -5,7 +5,7 @@ PUBLIC ide_wait_ready
 
 IF __IO_CF_8_BIT = 1
 
-EXTERN __IO_CF_IDE_ALT_STATUS
+EXTERN __IO_CF_IDE_STATUS
 
 ;------------------------------------------------------------------------------
 ; IDE internal subroutines 
@@ -23,7 +23,7 @@ EXTERN __IO_CF_IDE_ALT_STATUS
 ; return carry on success
 
 .ide_wait_ready
-    in a,(__IO_CF_IDE_ALT_STATUS)
+    in a,(__IO_CF_IDE_STATUS)
     ld e,a
     and 00100001b               ;test for ERR or WFT
     ret NZ                      ;return clear carry flag on failure
