@@ -116,6 +116,20 @@ IF FORbeehr512
     defc maxy    = 256
 ENDIF
 
+IF FORgemini
+    DEFINE gotgfx
+    defc maxx    = 160
+    defc maxy    = 75
+    defc blankch    = 128
+ENDIF
+
+IF FORgeminihr
+    DEFINE gotgfx
+    defc maxx    = 256
+    defc maxy    = 256
+    defc blankch    = 128
+ENDIF
+
 IF FORzx80
     DEFINE gotgfx
     defc maxx    = 64
