@@ -602,8 +602,8 @@
 #define __IO_SIO_RR1_RX_FRAMING_ERROR     0x40
 #define __IO_SIO_RR1_SDLC_EOF     0x80
 
-#define __IO_SIO_RX_SIZE        0x100
-#define __IO_SIO_RX_FULLISH     0xf0
+#define __IO_SIO_RX_SIZE        0x80
+#define __IO_SIO_RX_FULLISH     0x70
 #define __IO_SIO_RX_EMPTYISH    0x08
 #define __IO_SIO_TX_SIZE        0x10
 
