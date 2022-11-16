@@ -23,6 +23,9 @@ EXTERN ide_wait_ready
     ld a,00000001b              ;select the CF 8-bit interface feature
     out (__IO_CF_IDE_FEATURE),a
 
+    ld a,__IDE_CMD_FEATURE      ;set the feature
+    out (__IO_CF_IDE_COMMAND),a
+
     ld a,11100000b              ;select the master device, LBA mode
     out (__IO_CF_IDE_HEAD),a
 
