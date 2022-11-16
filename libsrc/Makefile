@@ -48,6 +48,7 @@ TOCREATE += $(call check_target,excali64,excali64_clib.lib $(CPMLIBS))
 TOCREATE += $(call check_target,fp1100,fp1100_clib.lib)
 TOCREATE += $(call check_target,g800,g800_clib.lib)
 TOCREATE += $(call check_target,gal,gal_clib.lib)
+TOCREATE += $(call check_target,gemini $(CPMLIBS))
 TOCREATE += $(call check_target,gb,gb_clib.lib)
 TOCREATE += $(call check_target,gl,gl_clib.lib)
 TOCREATE += $(call check_target,gl6000,gl6000_clib.lib)
@@ -847,6 +848,15 @@ microbee.lib:
 	TARGET=beehr320 TYPE=z80 $(LIBLINKER) -DFORbeehr320 -x$(OUTPUT_DIRECTORY)/gfxbee320.lib @$(TARGET_DIRECTORY)/bee/beegfxhr320.lst
 	$(MAKE) -C gfx TARGET=bee FLAVOUR="wide" SUBTYPE=beehr512
 	TARGET=beehr512 TYPE=z80 $(LIBLINKER) -DFORbeehr512 -x$(OUTPUT_DIRECTORY)/gfxbee512.lib @$(TARGET_DIRECTORY)/bee/beegfxhr512.lst
+
+# Gemini Galaxy library - Stefano
+gemini.lib:
+	@echo ''
+	@echo '--- Building Gemini Galaxy Library (CP/M & graphics) ---'
+	@echo ''
+	$(call buildgeneric,cpm)
+	$(MAKE) -C gfx TARGET=cpm FLAVOUR="narrow" SUBTYPE=gemini
+	TARGET=gemini TYPE=z80 $(LIBLINKER) -DFORgemini -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/gemini.lib @$(TARGET_DIRECTORY)/gemini/gemini.lst
 
 # Philips Videopac C7420 library - Stefano
 c7420_clib.lib:
