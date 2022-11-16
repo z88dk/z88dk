@@ -1,11 +1,11 @@
 
 SECTION code_driver
 
-PUBLIC ide_cache_flush
+PUBLIC ide_standby
 
-EXTERN __IO_IDE_COMMAND
+EXTERN __IO_PIO_IDE_COMMAND
 
-EXTERN __IDE_CMD_CACHE_FLUSH
+EXTERN __IDE_CMD_STANDBY
 
 EXTERN ide_wait_ready
 EXTERN ide_test_error
@@ -16,15 +16,15 @@ EXTERN ide_write_byte
 ; Routines that talk with the IDE drive, these should be called by
 ; the main program.
 
-; tell the drive to flush its write cache
+; tell the drive to spin down though standby command
 
-ide_cache_flush:
+ide_standby:
     push af
     push de
     call ide_wait_ready
     jr nc, error
-    ld e, __IDE_CMD_CACHE_FLUSH
-    ld a, __IO_IDE_COMMAND
+    ld e, __IDE_CMD_STANDBY
+    ld a, __IO_PIO_IDE_COMMAND
     call ide_write_byte
     call ide_wait_ready
     jr nc, error

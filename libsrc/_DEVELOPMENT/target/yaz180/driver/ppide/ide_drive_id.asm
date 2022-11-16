@@ -3,9 +3,9 @@ SECTION code_driver
 
 PUBLIC ide_drive_id
 
-EXTERN __IO_IDE_COMMAND
+EXTERN __IO_PIO_IDE_COMMAND
 
-EXTERN __IO_IDE_HEAD
+EXTERN __IO_PIO_IDE_HEAD
 
 EXTERN __IDE_CMD_ID
 
@@ -32,12 +32,12 @@ ide_drive_id:
     call ide_wait_ready
     jr nc, error
     ld e, 11100000b
-    ld a, __IO_IDE_HEAD
+    ld a, __IO_PIO_IDE_HEAD
     call ide_write_byte     ;select the master device, LBA mode
     call ide_wait_ready
     jr nc, error
     ld e, __IDE_CMD_ID
-    ld a, __IO_IDE_COMMAND
+    ld a, __IO_PIO_IDE_COMMAND
     call ide_write_byte     ;issue the command
     call ide_wait_ready     ;make sure drive is ready to proceed
     jr nc, error

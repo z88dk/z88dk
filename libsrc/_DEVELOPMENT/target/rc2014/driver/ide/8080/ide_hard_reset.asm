@@ -1,12 +1,29 @@
 
+IF __CPU_INTEL__
+INCLUDE "_DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc"
+ELIF __CPU_Z80__
+INCLUDE "config_private.inc"
+ENDIF
+
 SECTION code_driver
 
 PUBLIC ide_hard_reset
 
-EXTERN __IO_PIO_IDE_CTL, __IO_PIO_IDE_CONFIG
-EXTERN __IO_PIO_IDE_RD
+IF __IO_CF_8_BIT = 1
 
-EXTERN  __IO_IDE_RST_LINE
+;------------------------------------------------------------------------------
+; Routines that talk with the IDE drive, these should be called by
+; the main program.
+
+; do a hard reset on the drive, by pulsing its reset pin.
+; this is not available on the standard CF interface.
+; this should be followed with a call to "ide_init".
+
+.ide_hard_reset
+    scf
+    ret
+
+ELSE
 
 EXTERN ide_wait_ready
 
@@ -23,7 +40,7 @@ EXTERN ide_wait_ready
     ld a,__IO_PIO_IDE_RD
     out (__IO_PIO_IDE_CONFIG),a ;config 8255 chip, read mode
 
-    ld a,__IO_IDE_RST_LINE
+    ld a,__IO_PIO_IDE_RST_LINE
     out (__IO_PIO_IDE_CTL),a    ;hard reset the disk drive
 
     xor a                       ;keep iterative count in A
@@ -40,3 +57,4 @@ EXTERN ide_wait_ready
 
     jp ide_wait_ready           ;carry set on return = operation ok
 
+ENDIF

@@ -18,7 +18,7 @@ ide_write_byte:
     ld bc, __IO_PIO_IDE_CTL
     ld a, d    
     out (c), a              ;drive address onto control lines
-    or __IO_IDE_WR_LINE    
+    or __IO_PIO_IDE_WR_LINE    
     out (c), a              ;and assert write pin
     ld bc, __IO_PIO_IDE_LSB
     out (c), e              ;drive lower lines with lsb

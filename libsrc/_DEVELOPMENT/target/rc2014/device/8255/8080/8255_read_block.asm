@@ -16,18 +16,18 @@ PUBLIC ide_read_block
 .ide_read_block
     ld a,__IO_PIO_IDE_RD
     out (__IO_PIO_IDE_CONFIG),a ;config 8255 chip, read mode
-    ld a,__IO_IDE_DATA
+    ld a,__IO_PIO_IDE_DATA
     out (__IO_PIO_IDE_CTL),a    ;drive address onto control lines
     ld b,0                      ;keep iterative count in b
 
 .ide_rdblk
-    ld a,__IO_IDE_DATA|__IO_IDE_RD_LINE
+    ld a,__IO_PIO_IDE_DATA|__IO_PIO_IDE_RD_LINE
     out (__IO_PIO_IDE_CTL),a    ;and assert read pin
     in a,(__IO_PIO_IDE_LSB)     ;read the lower byte (HL++)
     ld (hl+),a
     in a,(__IO_PIO_IDE_MSB)     ;read the upper byte (HL++)
     ld (hl+),a
-    ld a,__IO_IDE_DATA
+    ld a,__IO_PIO_IDE_DATA
     out (__IO_PIO_IDE_CTL),a    ;deassert read pin
     djnz ide_rdblk              ;keep iterative count in b
 

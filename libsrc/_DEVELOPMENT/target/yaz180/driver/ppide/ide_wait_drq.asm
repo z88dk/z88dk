@@ -3,7 +3,7 @@ SECTION code_driver
 
 PUBLIC ide_wait_drq
 
-EXTERN __IO_IDE_ALT_STATUS
+EXTERN __IO_PIO_IDE_ALT_STATUS
 
 EXTERN ide_read_byte
 
@@ -22,7 +22,7 @@ EXTERN ide_read_byte
 ide_wait_drq:
     push af
 ide_wait_drq2:
-    ld a, __IO_IDE_ALT_STATUS    ;get IDE alt status register
+    ld a, __IO_PIO_IDE_ALT_STATUS    ;get IDE alt status register
     call ide_read_byte
     tst 00100001b           ;test for ERR or WFT
     jr nz, ide_wait_error

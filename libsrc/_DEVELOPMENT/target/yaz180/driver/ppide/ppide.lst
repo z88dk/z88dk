@@ -1,0 +1,17 @@
+target/yaz180/driver/ppide/__ide_data
+
+target/yaz180/driver/ppide/ide_wait_ready
+target/yaz180/driver/ppide/ide_wait_drq
+target/yaz180/driver/ppide/ide_test_error
+target/yaz180/driver/ppide/ide_setup_lba
+target/yaz180/driver/ppide/ide_read_sector
+target/yaz180/driver/ppide/ide_write_sector
+
+target/yaz180/driver/ppide/ide_hard_reset
+target/yaz180/driver/ppide/ide_soft_reset
+target/yaz180/driver/ppide/ide_init
+target/yaz180/driver/ppide/ide_drive_id
+target/yaz180/driver/ppide/ide_idle
+target/yaz180/driver/ppide/ide_standby
+target/yaz180/driver/ppide/ide_sleep
+target/yaz180/driver/ppide/ide_cache_flush

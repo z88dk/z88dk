@@ -3,9 +3,9 @@ SECTION code_driver
 
 PUBLIC ide_init
 
-EXTERN __IO_IDE_COMMAND
+EXTERN __IO_PIO_IDE_COMMAND
 
-EXTERN __IO_IDE_HEAD
+EXTERN __IO_PIO_IDE_HEAD
 
 EXTERN ide_wait_ready
 EXTERN ide_test_error
@@ -26,7 +26,7 @@ ide_init:
     xor a
     ld (ideStatus), a       ;set master device
     ld e, 11100000b
-    ld a, __IO_IDE_HEAD
+    ld a, __IO_PIO_IDE_HEAD
     call ide_write_byte     ;select the master device, LBA mode
     pop de 
     pop af

@@ -3,7 +3,7 @@ SECTION code_driver
 
 PUBLIC ide_test_error
 
-EXTERN __IO_IDE_ERROR, __IO_IDE_ALT_STATUS
+EXTERN __IO_PIO_IDE_ERROR, __IO_PIO_IDE_ALT_STATUS
 
 EXTERN ide_read_byte
 
@@ -21,14 +21,14 @@ EXTERN ide_read_byte
 
 ide_test_error:
     push af
-    ld a, __IO_IDE_ALT_STATUS    ;select status register
+    ld a, __IO_PIO_IDE_ALT_STATUS    ;select status register
     call ide_read_byte      ;get status in A
     bit 0, a                ;test ERR bit
     jr z, ide_test_success
     bit 5, a
     jr nz, ide_test2        ;test write error bit
     
-    ld a, __IO_IDE_ERROR    ;select error register
+    ld a, __IO_PIO_IDE_ERROR    ;select error register
     call ide_read_byte      ;get error register in a
 ide_test2:
     inc sp                  ;pop old af

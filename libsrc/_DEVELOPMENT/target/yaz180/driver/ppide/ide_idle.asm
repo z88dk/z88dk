@@ -1,11 +1,11 @@
 
 SECTION code_driver
 
-PUBLIC ide_sleep
+PUBLIC ide_idle
 
-EXTERN __IO_IDE_COMMAND
+EXTERN __IO_PIO_IDE_COMMAND
 
-EXTERN __IDE_CMD_SLEEP
+EXTERN __IDE_CMD_IDLE
 
 EXTERN ide_wait_ready
 EXTERN ide_test_error
@@ -16,15 +16,15 @@ EXTERN ide_write_byte
 ; Routines that talk with the IDE drive, these should be called by
 ; the main program.
 
-; tell the drive to sleep. only recoverable through hard_reset
+; tell the drive to imediately idle
 
-ide_sleep:
+ide_idle:
     push af
     push de
     call ide_wait_ready
     jr nc, error
-    ld e, __IDE_CMD_SLEEP
-    ld a, __IO_IDE_COMMAND
+    ld e, __IDE_CMD_IDLE
+    ld a, __IO_PIO_IDE_COMMAND
     call ide_write_byte
     call ide_wait_ready
     jr nc, error

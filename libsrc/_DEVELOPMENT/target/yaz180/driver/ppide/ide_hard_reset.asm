@@ -6,7 +6,7 @@ PUBLIC ide_hard_reset
 EXTERN __IO_PIO_IDE_CTL, __IO_PIO_IDE_CONFIG
 EXTERN __IO_PIO_IDE_RD
 
-EXTERN  __IO_IDE_RST_LINE
+EXTERN  __IO_PIO_IDE_RST_LINE
 
 EXTERN ide_wait_ready
 
@@ -25,7 +25,7 @@ ide_hard_reset:
     ld a, __IO_PIO_IDE_RD
     out (c), a          ;config 8255 chip, read mode
     ld bc, __IO_PIO_IDE_CTL
-    ld a, __IO_IDE_RST_LINE
+    ld a, __IO_PIO_IDE_RST_LINE
     out (c),a           ;hard reset the disk drive
     ld b, $0
 ide_rst_dly:

@@ -3,7 +3,7 @@ SECTION code_driver
 
 PUBLIC ide_read_sector
 
-EXTERN __IO_IDE_SEC_CNT, __IO_IDE_COMMAND
+EXTERN __IO_PIO_IDE_SEC_CNT, __IO_PIO_IDE_COMMAND
 
 EXTERN __IDE_CMD_READ
 
@@ -32,10 +32,10 @@ ide_read_sector:
     jr nc, error
     call ide_setup_lba      ;tell it which sector we want in BCDE
     ld e, $1
-    ld a, __IO_IDE_SEC_CNT    
+    ld a, __IO_PIO_IDE_SEC_CNT
     call ide_write_byte     ;set sector count to 1
     ld e, __IDE_CMD_READ    
-    ld a, __IO_IDE_COMMAND
+    ld a, __IO_PIO_IDE_COMMAND
     call ide_write_byte     ;ask the drive to read it
     call ide_wait_ready     ;make sure drive is ready to proceed
     jr nc, error
