@@ -41,6 +41,7 @@ EXTERN ide_setup_lba
     ;Write a block of 512 bytes (one sector) from (HL++) to
     ;the drive 16 bit data register
 
+IF __CPU_INTEL__
     ld b,0                      ;keep iterative count in b
 .ide_wrblk
     ld a,(hl+)
@@ -48,6 +49,13 @@ EXTERN ide_setup_lba
     ld a,(hl+)
     out (__IO_CF_IDE_DATA),a    ;write the data byte (hl++)
     djnz ide_wrblk              ;keep iterative count in b
+
+ELSE
+    ld bc,__IO_CF_IDE_DATA&0xFF ;keep iterative count in b, I/O port in c
+    otir
+    otir
+
+ENDIF
 
 ;   call ide_wait_ready
 ;   ld a,__IDE_CMD_CACHE_FLUSH
