@@ -9,7 +9,7 @@ SECTION code_driver
 
 PUBLIC ide_test_error
 
-IF __IO_CF_8_BIT = 1
+IF __IO_CF_8_BIT
 
 ;------------------------------------------------------------------------------
 ; IDE internal subroutines 

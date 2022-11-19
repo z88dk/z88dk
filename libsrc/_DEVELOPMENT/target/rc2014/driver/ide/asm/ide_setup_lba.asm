@@ -9,7 +9,7 @@ SECTION code_driver
 
 PUBLIC ide_setup_lba
 
-IF __IO_CF_8_BIT = 1
+IF __IO_CF_8_BIT
 
 ;------------------------------------------------------------------------------
 ; IDE internal subroutines 

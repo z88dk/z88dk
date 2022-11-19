@@ -9,7 +9,7 @@ SECTION code_driver
 
 PUBLIC ide_read_sector
 
-IF __IO_CF_8_BIT = 1
+IF __IO_CF_8_BIT
 
 EXTERN ide_wait_ready, ide_wait_drq
 EXTERN ide_setup_lba

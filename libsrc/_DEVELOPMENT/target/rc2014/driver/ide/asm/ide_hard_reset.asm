@@ -9,7 +9,7 @@ SECTION code_driver
 
 PUBLIC ide_hard_reset
 
-IF __IO_CF_8_BIT = 1
+IF __IO_CF_8_BIT
 
 ;------------------------------------------------------------------------------
 ; Routines that talk with the IDE drive, these should be called by

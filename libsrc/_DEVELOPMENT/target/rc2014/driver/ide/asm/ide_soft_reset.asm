@@ -9,7 +9,7 @@ SECTION code_driver
 
 PUBLIC ide_soft_reset
 
-IF __IO_CF_8_BIT = 1
+IF __IO_CF_8_BIT
 
 EXTERN ide_wait_ready
 
