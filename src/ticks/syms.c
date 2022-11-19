@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <utstring.h>
 #include "ticks.h"
 #include "debug.h"
 
@@ -70,7 +71,7 @@ static char read_symbol_buf[8192];
 void read_symbol_file(char *filename)
 {
     FILE *fp = fopen(filename,"r");
-    char * temp;
+    UT_string* temp;
     int length;
 
     if ( fp != NULL ) {
@@ -126,11 +127,10 @@ void read_symbol_file(char *filename)
                     }
 
                     if(argc >= 8) {
-                      length = strlen(sym->name) + strlen(argv[7]);
-                      temp = malloc(length + 2 /* '_' and null terminator */ );
-                      sprintf(temp, "%s_%s", sym->name, argv[7]);
-                      temp[length] = '\0';  /* chop off trailing comma */
-                      sym->name_module = temp;
+                      utstring_new(temp);
+                      utstring_printf(temp, "%s_%.*s", sym->name, strlen(argv[7])-1 /* don't include trailing comma */, argv[7]);
+                      sym->name_module = strdup(utstring_body(temp));
+                      utstring_free(temp);
                     }
                     else {
                       sym->name_module = strdup(sym->name);
@@ -182,10 +182,10 @@ void read_symbol_file(char *filename)
                 sym->address = strtol(argv[2] + 1, NULL, 16);
 
                 if(argc >= 8) {
-                  length = strlen(sym->name) + strlen(argv[7]);
-                  temp = malloc(length + 2 /* '_' and null terminator */ );
-                  sprintf(temp, "%s_%s", sym->name, argv[7]);
-                  temp[length] = '\0';  /* chop off trailing comma */
+                  utstring_new(temp);
+                  utstring_printf(temp, "%s_%.*s", sym->name, strlen(argv[7])-1 /* don't include trailing comma */, argv[7]);
+                  sym->name_module = strdup(utstring_body(temp));
+                  utstring_free(temp);
                 }
                 else {
                   sym->name_module = strdup(sym->name);
