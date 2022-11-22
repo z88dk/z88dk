@@ -468,6 +468,25 @@ static disc_spec rc700_spec = {
 };
 
 
+// The Alphatronic-PC should have 16 tracks, 2 sides
+// but it works only in this way (same on cpmtools)
+static disc_spec alphatro_spec = {
+    .name = "Alphatronic",
+    .sectors_per_track = 32,
+    .tracks = 40,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 128,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .alternate_sides = 0,
+};
+
+
 static disc_spec sharpx1_spec = {
     .name = "Sharp-X1",
     .sectors_per_track = 16,
@@ -598,6 +617,7 @@ static struct formats {
      char           force_com_extension;
      void         (*extra_hook)(disc_handle *handle);
 } formats[] = {
+    { "alphatro",  "Alphatronic PC (RAW)",  &alphatro_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bw12",      "Bondwell 12/14",        &bondwell12_spec, 0, NULL, 1 },
@@ -605,8 +625,8 @@ static struct formats {
     { "caos",      "CAOS/NANOS/z1013 CP/M", &caos_spec, 0, NULL, 1 },
     { "cpcsystem", "CPC System Disc",       &cpcsystem_spec, 0, NULL, 0 },
     { "col1",      "Coleco ADAM 40T SSDD",  &col1_spec, 0, NULL, 1 },
-    { "corvette", "Corvette", &corvette_spec, 32,         "\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8c\x01\x7f\x00\xc0\x00\x20\x00\x01\x00\x11", 1 },
-    { "corvboot", "Corvette Boot", &corvetteBOOT_spec, 32,"\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8a\x01\x7f\x00\xc0\x00\x20\x00\x02\x00\x10", 1 }, // Needs a CP/M bootstrap file specified to auto-boot
+    { "corvette",  "Corvette", &corvette_spec, 32,         "\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8c\x01\x7f\x00\xc0\x00\x20\x00\x01\x00\x11", 1 },
+    { "corvboot",  "Corvette Boot", &corvetteBOOT_spec, 32,"\x80\xc3\x00\xda\x0a\x00\x00\x01\x01\x01\x03\x01\x05\x00\x50\x00\x28\x00\x04\x0f\x00\x8a\x01\x7f\x00\xc0\x00\x20\x00\x02\x00\x10", 1 }, // Needs a CP/M bootstrap file specified to auto-boot
     { "dmv",       "NCR Decision Mate",     &dmv_spec, 16, "\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5\xe5NCR F3", 1 },
     { "einstein",  "Tatung Einstein",       &einstein_spec, 0, NULL, 1 },
     { "excali64",  "Excalibur 64",          &excali_spec, 0, NULL, 1 },
