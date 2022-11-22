@@ -468,22 +468,21 @@ static disc_spec rc700_spec = {
 };
 
 
-// The Alphatronic-PC should have 16 tracks, 2 sides
-// but it works only in this way (same on cpmtools)
 static disc_spec alphatro_spec = {
     .name = "Alphatronic",
-    .sectors_per_track = 32,
+    .sectors_per_track = 16,
     .tracks = 40,
-    .sides = 1,
+    .sides = 2,
     .sector_size = 256,
     .gap3_length = 0x17,
     .filler_byte = 0xe5,
-    .boottracks = 2,
+    //.boottracks = 2,
+	.boottracks = 4,
     .directory_entries = 128,
     .extent_size = 2048,
     .byte_size_extents = 1,
     .first_sector_offset = 0,
-    .alternate_sides = 0,
+    .alternate_sides = 1,
 };
 
 
@@ -617,7 +616,7 @@ static struct formats {
      char           force_com_extension;
      void         (*extra_hook)(disc_handle *handle);
 } formats[] = {
-    { "alphatro",  "Alphatronic PC (RAW)",  &alphatro_spec, 0, NULL, 1 },
+    { "alphatro",  "Alphatronic PC",        &alphatro_spec, 0, NULL, 1 },
     { "attache",   "Otrona Attache'",       &attache_spec, 0, NULL, 1 },
     { "bic",       "BIC / A5105",           &bic_spec, 0, NULL, 1, bic_write_system_file },
     { "bw12",      "Bondwell 12/14",        &bondwell12_spec, 0, NULL, 1 },
