@@ -1,5 +1,12 @@
 stdio/inkey/fgetc_cons
 stdio/inkey/getk
+@stdio/ansicore.lst
+target/alphatro/stdio/ansi/f_ansi_attr
+target/alphatro/stdio/ansi/f_ansi_bel
+target/alphatro/stdio/ansi/f_ansi_char
+target/alphatro/stdio/ansi/f_ansi_cls
+target/alphatro/stdio/ansi/f_ansi_dline
+target/alphatro/stdio/ansi/f_ansi_scrollup
 target/alphatro/stdio/fputc_cons_native
 target/alphatro/stdio/generic_console
 target/alphatro/stdio/generic_console_ioctl
