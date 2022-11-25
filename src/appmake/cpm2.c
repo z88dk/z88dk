@@ -469,19 +469,19 @@ static disc_spec rc700_spec = {
 
 
 static disc_spec alphatro_spec = {
-    .name = "Alphatronic",
+    .name = "Alphatronic PC",
+    .disk_mode = MFM300,	// 300 kbps MFM, visible only when using the IMD format
     .sectors_per_track = 16,
     .tracks = 40,
     .sides = 2,
     .sector_size = 256,
     .gap3_length = 0x17,
     .filler_byte = 0xe5,
-    //.boottracks = 2,
-	.boottracks = 4,
+    .boottracks = 4,
     .directory_entries = 128,
     .extent_size = 2048,
     .byte_size_extents = 1,
-    .first_sector_offset = 0,
+    .first_sector_offset = 1,
     .alternate_sides = 1,
 };
 
