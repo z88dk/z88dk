@@ -541,7 +541,11 @@ int disc_write_imd(disc_handle* h, const char* filename)
         for (s = 0; s < h->spec.sides; s++) {
             ptr = buffer;
 
-            *ptr++ = 3; // Mode + transfer rate
+			if (h->spec.disk_mode)
+				*ptr++ = h->spec.disk_mode-1; // Mode + transfer rate
+			else 
+				*ptr++ = 3; // 500 kbps MFM
+			
             *ptr++ = i; // track
             *ptr++ = s; // head
             *ptr++ = h->spec.sectors_per_track; // Sectors per track
@@ -551,6 +555,7 @@ int disc_write_imd(disc_handle* h, const char* filename)
             for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
                 *ptr++ = j  +  h->spec.first_sector_offset;
             }
+
             // And write the header
             fwrite(buffer, ptr - buffer, 1, fp);
 
