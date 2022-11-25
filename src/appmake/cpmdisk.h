@@ -5,6 +5,8 @@
 // We need the FATfs header
 #include "ff.h"
 
+enum diskmode{ DEFAULT, FM500, FM300, FM250, MFM500, MFM300, MFM250 };
+
 typedef struct {
     const char *name;			// Name of the format
     // Generic parameters
@@ -28,6 +30,9 @@ typedef struct {
     uint8_t   number_of_fats;
     uint16_t  fat_format_flags;
     uint16_t  cluster_size;
+
+    // Hardware/Image peculiarities
+    uint8_t   disk_mode;	/* 0..5: 500,300,250 kbps FM .. 500,300,250 kbps MFM */
 
     // Image layout
     uint8_t   alternate_sides;
