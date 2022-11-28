@@ -262,6 +262,7 @@ static disc_spec ts803_spec = {
 
 static disc_spec nascom_spec = {
     .name = "Nascom",
+    .disk_mode = MFM300,
     .sectors_per_track = 10,
     .tracks = 77,
     .sides = 2,
@@ -271,7 +272,7 @@ static disc_spec nascom_spec = {
     .boottracks = 2,
     .directory_entries = 128,
     .extent_size = 2048,
-    .byte_size_extents = 1,
+    .byte_size_extents = 0,
     .first_sector_offset = 1,
 };
 
