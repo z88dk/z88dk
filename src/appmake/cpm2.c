@@ -327,6 +327,7 @@ static disc_spec svi40ss_spec = {
 
 static disc_spec col1_spec = {
     .name = "ColAdam",
+    .disk_mode = MFM300,
     .sectors_per_track = 8,
     .tracks = 40,
     .sides = 1,
@@ -399,6 +400,7 @@ static disc_spec bic_spec = {
 
 static disc_spec excali_spec = {
     .name = "Excalibur64",
+    .disk_mode = MFM300,
     .sectors_per_track = 5,
     .tracks = 80,
     .sides = 2,
@@ -435,6 +437,7 @@ static disc_spec gemini_spec = {
 
 static disc_spec lynx_spec = {
     .name = "CampLynx",
+    .disk_mode = FM500,			// possibly wrong information gathered online, IMD format is UNTESTED
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 1,
