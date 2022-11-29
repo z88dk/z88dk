@@ -4,7 +4,6 @@ target/cpc/stdio/getk
 target/cpc/stdio/generic_console
 target/cpc/stdio/generic_console_ioctl
 target/cpc/stdio/generic_console_vpeek
-target/cpc/stdio/conio_vars
 target/cpc/stdio/bordercolour
 target/cpc/stdio/conio_map_colour
 target/cpc/stdio/CRT_FONT
