@@ -9,6 +9,9 @@
 #ifdef __MSX__
 #include <msx.h>
 #endif
+#ifdef __CPC__
+#include <cpc.h>
+#endif
 #ifdef __SAM__
 #include <arch/sam.h>
 #endif

@@ -189,12 +189,21 @@ ENDIF
 
 IF startup != 2
 
+   EXTERN im1_vectors
+   EXTERN asm_interrupt_handler
+
 __interposer_isr__:
 
    call cpc_enable_fw_exx_set
    call 0x0038
    di
    call cpc_enable_process_exx_set
+   push    af
+   push    hl
+   ld      hl,im1_vectors
+   call    asm_interrupt_handler
+   pop     hl
+   pop     af
    ei
    ret
 

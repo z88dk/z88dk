@@ -9,6 +9,11 @@
 
 #include <sys/compiler.h>
 #include <sys/types.h>
+#include <interrupt.h>
+
+// Add a raster interrupt handler
+extern void __LIB__ add_raster_int(isr_t handler);
+
 
 ///////////////////////////////////////////
 // DIAGNOSTICS AND HARDWARE IDENTIFICATION

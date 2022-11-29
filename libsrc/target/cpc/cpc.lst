@@ -4,6 +4,7 @@ target/cpc/stdio/getk
 target/cpc/stdio/generic_console
 target/cpc/stdio/generic_console_ioctl
 target/cpc/stdio/generic_console_vpeek
+target/cpc/stdio/conio_vars
 target/cpc/stdio/bordercolour
 target/cpc/stdio/conio_map_colour
 target/cpc/stdio/CRT_FONT
@@ -114,6 +115,7 @@ target/cpc/psg/get_psg
 target/cpc/psg/psg_init
 target/cpc/psg/asm_wyz_hardware_out
 target/cpc/banked_call
+target/cpc/interrupts/add_raster_int
 @psg/ay/psg.lst
 @psg/ay/wyz/psg_wyz.lst
 
