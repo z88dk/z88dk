@@ -20,11 +20,14 @@
                 PUBLIC          generic_console_set_paper
                 PUBLIC          generic_console_set_attribute
 
-		EXTERN		CONSOLE_COLUMNS
-		EXTERN		CONSOLE_ROWS
+;		EXTERN		CONSOLE_COLUMNS
+;		EXTERN		CONSOLE_ROWS
+	defc		CONSOLE_ROWS=16
 
-		defc		DISPLAY = 0x0800
-                defc            TOPROW = DISPLAY + (CONSOLE_ROWS - 1) * 64 + 10
+		EXTERN		CONSOLE_DISPLAY	
+;		defc		CONSOLE_DISPLAY = 0x0800
+
+                defc            TOPROW = CONSOLE_DISPLAY + (CONSOLE_ROWS - 1) * 64 + 10
 
 		PUBLIC          CLIB_GENCON_CAPS
 		defc            CLIB_GENCON_CAPS = 0
@@ -38,8 +41,8 @@ generic_console_set_attribute:
 	ret
 
 generic_console_cls:
-	ld	hl, DISPLAY
-	ld	de, DISPLAY +1
+	ld	hl, CONSOLE_DISPLAY
+	ld	de, CONSOLE_DISPLAY +1
 	ld	bc,1023
 	ld	(hl),32
 	ldir
@@ -71,26 +74,26 @@ xypos:
 	and	a
 	ld	a,d		
 	jr	z,generic_console_printc_3
-	ld	hl, DISPLAY - 64 + 10
+	ld	hl, CONSOLE_DISPLAY - 64 + 10
 	ld	de,64
 generic_console_printc_1:
 	add	hl,de
 	djnz	generic_console_printc_1
 generic_console_printc_3:
-	add	hl,bc			;hl now points to address in display
+	add	hl,bc			;hl now points to address in CONSOLE_DISPLAY
 	ret
 
 generic_console_scrollup:
 	push	de
 	push	bc
 	; Move row 1 to row 0
-	ld	hl, DISPLAY
+	ld	hl, CONSOLE_DISPLAY
 	ld	de, TOPROW
 	ld	bc, 64
 	ldir
 	; Move Row 2-15 to row 1-14
-	ld	hl, DISPLAY + 64
-	ld	de, DISPLAY
+	ld	hl, CONSOLE_DISPLAY + 64
+	ld	de, CONSOLE_DISPLAY
 	ld	bc, 14 * 64
 	ldir
 	; And blank out row 15
