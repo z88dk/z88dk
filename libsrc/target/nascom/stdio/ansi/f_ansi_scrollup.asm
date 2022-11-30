@@ -22,7 +22,6 @@
 	
 	; first line
 	ld	hl, CONSOLE_DISPLAY + 10
-	ld	hl,0xF80A
 	ld	de,TOPROW
 	ld	bc,48
 	ldir
