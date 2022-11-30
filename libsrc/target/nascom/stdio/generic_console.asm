@@ -87,9 +87,10 @@ generic_console_scrollup:
 	push	de
 	push	bc
 	; Move row 1 to row 0
-	ld	hl, CONSOLE_DISPLAY
-	ld	de, TOPROW
-	ld	bc, 64
+	; first line
+	ld	hl, CONSOLE_DISPLAY + 10
+	ld	de,TOPROW
+	ld	bc,48
 	ldir
 	; Move Row 2-15 to row 1-14
 	ld	hl, CONSOLE_DISPLAY + 64
