@@ -11,7 +11,7 @@
 ;	Stefano Bodrato - Jul 2004
 ;
 ;
-;	$Id: f_ansi_char.asm,v 1.5 2016-06-12 16:06:42 dom Exp $
+;	$Id: f_ansi_char.asm $
 ;
 
 	SECTION	code_clib
@@ -21,17 +21,20 @@
 	EXTERN	__console_y
 	EXTERN	__console_x
 
+	defc		CONSOLE_ROWS=16
+	EXTERN		CONSOLE_DISPLAY	
+
+              defc            TOPROW = CONSOLE_DISPLAY + (CONSOLE_ROWS - 1) * 64 + 10
 
 .ansi_CHAR
 
 	push	af
 	ld	a,(__console_y)
-	ld	hl,0BCAh
+	ld	hl,TOPROW
 	and	a
 	jr	z,gotline
 
-;	ld	hl,$84a
-	ld	hl,$80a
+	ld	hl, CONSOLE_DISPLAY + 10
 	dec	a
 	jr	z,gotline
 

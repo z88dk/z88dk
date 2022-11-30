@@ -1072,10 +1072,11 @@ mc1000_clib.lib:
 # NASCOM library - Stefano
 nascom_clib.lib:
 	@echo ''
-	@echo '--- Building NASCOM Library ---'
+	@echo '--- Building NASCOM Library (std and CP/M)---'
 	@echo ''
 	$(call buildgeneric,nascom,"gencon narrow")
 	TARGET=nascom TYPE=z80 $(LIBLINKER) -DFORnascom -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascom_clib @$(TARGET_DIRECTORY)/nascom/nascom.lst
+	TARGET=nascom TYPE=z80 $(LIBLINKER) -DFORnascom -DFORnascomcpm -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/nascomcpm @$(TARGET_DIRECTORY)/nascom/nascomcpm.lst
 	
 # Robotron Z1013 library - Stefano
 z1013_clib.lib:
