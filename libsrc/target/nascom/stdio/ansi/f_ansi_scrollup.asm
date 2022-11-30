@@ -6,24 +6,30 @@
 ;	Stefano Bodrato - Jul 2004
 ;
 ;
-;	$Id: f_ansi_scrollup.asm,v 1.4 2016-04-04 18:31:22 dom Exp $
+;	$Id: f_ansi_scrollup.asm $
 ;
 
 	SECTION	code_clib
 
 	PUBLIC	ansi_SCROLLUP
 
+	defc		CONSOLE_ROWS=16
+	EXTERN		CONSOLE_DISPLAY	
+              defc            TOPROW = CONSOLE_DISPLAY + (CONSOLE_ROWS - 1) * 64 + 10
+
+
 .ansi_SCROLLUP
 	
 	; first line
-	ld	hl,$80a
-	ld	de,$bca
+	ld	hl, CONSOLE_DISPLAY + 10
+	ld	hl,0xF80A
+	ld	de,TOPROW
 	ld	bc,48
 	ldir
 
 	; remaining lines
 	ld	a,14
-	ld	hl,$80a
+	ld	hl, CONSOLE_DISPLAY + 10
 .scrlloop
 	ld	d,h
 	ld	e,l
