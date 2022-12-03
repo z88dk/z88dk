@@ -1830,7 +1830,6 @@ rc2014-8085_clib.lib:
 	m4 -DCFG_ASM_DEF _DEVELOPMENT/target/rc2014/config_8085.m4 > _DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc
 	m4 -DCFG_ASM_PUB _DEVELOPMENT/target/rc2014/config_8085.m4 > _DEVELOPMENT/target/rc2014/config_rc2014-8085_public.inc
 	m4 -DCFG_C_DEF _DEVELOPMENT/target/rc2014/config_8085.m4 > _DEVELOPMENT/target/rc2014/config_rc2014-8085.h
-	cp _DEVELOPMENT/target/rc2014/config_rc2014-8085_private.inc _DEVELOPMENT/target/rc2014/obj/config_8085_private.inc
 	$(call buildgeneric,rc2014,portable)
 	TARGET=rc2014 TYPE=8085 $(LIBLINKER) -DSTANDARDESCAPECHARS -m8085 -DFORrc2014 -x$(OUTPUT_DIRECTORY)/rc2014-8085_clib @$(TARGET_DIRECTORY)/rc2014/rc2014-8085.lst
 
