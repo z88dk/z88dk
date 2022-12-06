@@ -8,12 +8,12 @@ EXTERN asm_bpoke
 .bpoke
 ._bpoke
 
-   pop af
+   pop bc
    pop de
    pop hl
    push hl
    push de
-   push af
+   push bc
    
    jp asm_bpoke
 
