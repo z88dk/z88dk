@@ -8,12 +8,12 @@ EXTERN asm_outp
 .outp
 ._outp
 
-   pop bc
+   pop hl
    pop de
    pop bc
    push bc
    push de
-   push bc
+   push hl
    
    jp asm_outp
 
