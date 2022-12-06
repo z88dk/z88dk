@@ -17,7 +17,7 @@ IF __CPU_R2KA__|__CPU_R3K__
    ld h,0
    ld l,a
 
-ELIF __CPU_8080__
+ELIF __CPU_INTEL__
 
    ; port in l
    ld h,l         ; port

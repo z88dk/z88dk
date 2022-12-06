@@ -29,7 +29,7 @@ IF __CPU_R2KA__|__CPU_R3K__
    defb 0d3h ; ioi
    ld (hl),a
 
-ELIF __CPU_8080__
+ELIF __CPU_INTEL__
 
    ld l,0xd3  ; out
    ld h,c     ; port
