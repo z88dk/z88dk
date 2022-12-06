@@ -10,7 +10,7 @@ include ../Make.config
 
 GENOBJECTS = unbcd.o wcmatch.o getopt.o
 ASMFILES = $(wildcard *.asm)
-ASMFILES_8080 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *sort_s*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
+ASMFILES_8080 = $(filter-out $(wildcard *sqrt*.asm *extract*.asm *sort_s*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
 ASMFILES_GBZ80 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *sort_s*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
 
 
