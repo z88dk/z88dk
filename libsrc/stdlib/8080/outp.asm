@@ -1,5 +1,7 @@
 ; CALLER linkage for function pointers
 
+IF __CPU_INTEL__
+
 SECTION code_clib
 PUBLIC outp
 PUBLIC _outp
@@ -16,4 +18,6 @@ EXTERN asm_outp
    push hl
    
    jp asm_outp
+
+ENDIF
 

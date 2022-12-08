@@ -9,10 +9,10 @@ PUBLIC asm_outp
 .outp_callee
 ._outp_callee
 
-   pop af
+   pop hl
    pop de
    pop bc
-   push af
+   push hl
 
 .asm_outp
 
@@ -34,3 +34,4 @@ ELSE
 ENDIF
 
    ret
+
