@@ -16,8 +16,8 @@ EXTERN iotmp
    ; port in l
    ld h,l         ; port
    ld l,0xdb      ; in
-   shld iotmp
-   lxi h,iotmp + 2
+   ld (iotmp),hl
+   ld hl,iotmp+2
    ld (hl),0xc9   ; ret
    call iotmp
    ld h,0
