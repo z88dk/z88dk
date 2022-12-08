@@ -10,7 +10,7 @@ include ../Make.config
 
 GENOBJECTS = unbcd.o wcmatch.o getopt.o
 ASMFILES = $(wildcard *.asm)
-ASMFILES_8080 = $(filter-out $(wildcard *sqrt*.asm *extract*.asm *sort_s*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
+ASMFILES_8080 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *sort_s*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
 ASMFILES_GBZ80 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *sort_s*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
 
 
@@ -77,7 +77,7 @@ obj/zxn/%.o: %.c
 
 
 dirs:
-	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k obj/gbz80 -p obj/$(TARGET) obj/newlib-8080 obj/8080 obj/8080/8080 obj/gbz80 obj/gbz80/8080
+	@mkdir -p obj/z80 obj/z80n obj/ixiy obj/r2k obj/gbz80 obj/$(TARGET) obj/newlib-8080 obj/8080 obj/8080/8080 obj/gbz80 obj/gbz80/8080
 
 
 clean:
