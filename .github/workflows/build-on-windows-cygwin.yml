@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     defaults:
       run:
-        shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
+        shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
     env:
       SHELLOPTS: igncr
       CHERE_INVOKING: 1
@@ -33,10 +33,6 @@ jobs:
       run: |
         choco install re2c
       shell: cmd
-    - name: Install perl prerequisites
-      run: |
-        PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
-      shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
     - name: Install perl prerequisites
       run: |
         PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
