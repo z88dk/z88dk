@@ -35,7 +35,7 @@ jobs:
       shell: cmd
     - name: Install perl prerequisites
       run: |
-        PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
+        export PERL_MM_USE_DEFAULT=1
     - name: Install perl prerequisites
       run: |
         PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
