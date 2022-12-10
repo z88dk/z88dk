@@ -36,7 +36,7 @@ jobs:
     - name: Install perl prerequisites
       run: |
         PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
-      shell: C:\tools\cygwin\bin\bash.exe --login --norc -eo pipefail -o igncr '{0}'
+      shell: bash.exe --login --norc -eo pipefail -o igncr '{0}'
     - name: Install perl prerequisites
       run: |
         PERL_MM_USE_DEFAULT=1 cpan local::lib App::cpanminus 
