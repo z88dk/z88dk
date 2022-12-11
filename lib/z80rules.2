@@ -1256,6 +1256,7 @@
 	call	ufloat
 	call	dpush
 
+%notcpu 8085
 %notcpu gbz80
 	ld	hl,%1	;const
 	add	hl,sp
@@ -1278,6 +1279,7 @@
 	call	l_gcharspsp	;
 	ld	hl,%2	;const
 
+%notcpu 8085
 %notcpu gbz80
 	ld	hl,%1	;const
 	call	l_gintspsp	;
