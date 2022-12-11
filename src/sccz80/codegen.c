@@ -649,7 +649,11 @@ void putstk(LVALUE *lval)
         break;
     default:
         pop("de");
-        callrts("l_pint");
+        if ( IS_8085() ) {
+            ol("ld\t(de),hl\t;l_pint");
+        } else {
+            callrts("l_pint");
+        }
     }
 }
 
@@ -860,13 +864,18 @@ void gen_load_indirect(LVALUE* lval)
     case KIND_STRUCT:
         break;
     default:
-        ot("call\tl_gint\t;");
+        if ( IS_8085() ) {
+            ol("ex\tde,hl\t;l_gint");
+            ol("ld\thl,(de)");
+        } else {
+            ot("call\tl_gint\t;");
+            nl();
+        }
 #ifdef USEFRAME
         if (c_framepointer_is_ix != -1 && CheckOffset(lval->offset)) {
             OutIndex(lval->offset);
         }
 #endif
-        nl();
     }
 }
 
