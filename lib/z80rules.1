@@ -6481,6 +6481,43 @@
 .%1
 	ld	hl,%2
 
+%cpu 8085
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;%9
+=
+	ld	de,sp+%1
+	ld	hl,(de)	;l_gint
+
+%cpu 8085
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;%9
+=
+	ld	de,sp+%1
+	push	de
+	ld	hl,(de)	;l_gint
+
+%cpu 8085
+	call	l_gint
+=
+	ex	de,hl
+	ld	hl,(de)	;l_gint
+
+%cpu 8085
+	call	l_gint	;%9
+=
+	ex	de,hl
+	ld	hl,(de)	;l_gint
+
+%cpu 8085
+	call	l_pint
+=
+	ld	(de),hl	;l_pint
+
 %notcpu gbz80
 	ld	hl,_%1
 	inc	(hl)
