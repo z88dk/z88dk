@@ -189,15 +189,15 @@ time @ 4MHz  = 1848679330 / 4*10^6 =  7 min 42 sec
 Microsoft 32-bit float implementation, accurate to 7 significant digits.
 
 12.
-Z88DK January 5, 2022
+Z88DK December 12, 2022
 sccz80 / classic / 8085 / MBF32
-4889 bytes less page zero
+4868 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 1852019035
-time @ 4MHz  = 1852019035 / 4*10^6 =  7 min 43 sec
+cycle count  = 1851095771
+time @ 4MHz  = 1851095771 / 4*10^6 =  7 min 43 sec
 
 Microsoft 32-bit float implementation, accurate to 7 significant digits.
 
@@ -241,4 +241,4 @@ We ask that contributed programs not only give the correct result, but also use 
 
 Each program should:
 
-    use the same simple symplectic-integrator - see the Java program. 
+    use the same simple symplectic-integrator - see the Java program.

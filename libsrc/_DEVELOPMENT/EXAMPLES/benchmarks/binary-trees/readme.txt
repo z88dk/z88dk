@@ -17,7 +17,7 @@ When compiling binary-trees, several defines are possible:
 
 /*
  * COMMAND LINE DEFINES
- * 
+ *
  * -DSTATIC
  * Use static variables instead of locals.
  *
@@ -141,12 +141,12 @@ IAR is likely implementing a heap similar to z88dk's new c library
 where an emphasis is placed on the speed of realloc().
 
 8.
-Z88DK January 3, 2022
+Z88DK December 12, 2022
 sccz80 / classic c library / 8085 CPU
-3831 bytes less page zero
+3807 bytes less page zero
 
-cycle count  = 156017339
-time @ 4MHz  = 156017339 / 4*10^6 = 39.00 sec
+cycle count  = 145472403
+time @ 4MHz  = 145472403 / 4*10^6 = 36.37 sec
 
 9.
 HITECH C CPM V309-15
@@ -192,7 +192,7 @@ We ask that contributed programs not only give the correct result, but also use 
 
 Each program should:
 
-    define a tree node class and methods, a tree node record and procedures, or an algebraic data type and functions, or…
+    define a tree node class and methods, a tree node record and procedures, or an algebraic data type and functions, orï¿½
 
     allocate a binary tree to 'stretch' memory, check it exists, and deallocate it
 
@@ -204,10 +204,10 @@ Each program should:
 
         walk the tree nodes, checksum the node items (and maybe deallocate the node)
 
-        deallocate the tree 
+        deallocate the tree
 
-    check that the long-lived binary tree still exists 
+    check that the long-lived binary tree still exists
 
 diff program output N = 10 with this 1KB output file to check your program output has the correct format, before you contribute your program.
 
-Use a larger command line argument (20) to check program performance. 
+Use a larger command line argument (20) to check program performance.

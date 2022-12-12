@@ -52,12 +52,12 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK August 28, 2022
+Z88DK December 12, 2022
 classic/sccz80/8085
-3831 bytes less page zero
+3807 bytes less page zero
 
-cycle count  = 156020673
-time @ 4MHz  = 156020673 / 4*10^6 = 39.00 sec
+cycle count  = 145472403
+time @ 4MHz  = 145472403 / 4*10^6 = 36.37 sec
 
 
 Z88DK August 28, 2022

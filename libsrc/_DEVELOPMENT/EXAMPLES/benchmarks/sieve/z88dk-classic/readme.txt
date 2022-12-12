@@ -39,7 +39,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks sieve.bin -start 00ca -end 0164 -counter 9999999999
+z88dk-ticks sieve.bin -x sieve.map -start TIMER_START -end TIMER_STOP -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex

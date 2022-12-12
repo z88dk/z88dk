@@ -129,12 +129,12 @@ time @ 4MHz  = 136057141 / 4*10^6 = 34.01 sec
 IEEE 32-bit float implementation.
 
 10.
-Z88DK January 5, 2022
+Z88DK December 12, 2022
 sccz80 / classic c library / 8085 / MBF32
-4930 bytes less page zero
+4869 bytes less page zero
 
-cycle count  = 215257269
-time @ 4MHz  = 215257269 / 4*10^6 = 53.81 sec
+cycle count  = 206325540
+time @ 4MHz  = 206325540 / 4*10^6 = 51.58 sec
 
 Microsoft 32-bit float implementation.
 
@@ -151,7 +151,7 @@ BENCHMARKS GAME COMMENTS
 Variance
 --------
 
-Please don't optimize the cumulative-probabilities lookup (for example, by using a scaling factor) or naïve LCG arithmetic - those programs will not be accepted.
+Please don't optimize the cumulative-probabilities lookup (for example, by using a scaling factor) or naï¿½ve LCG arithmetic - those programs will not be accepted.
 
 How to implement
 ----------------
@@ -168,13 +168,13 @@ Each program should:
 
         match a random number against those cumulative probabilities to select each nucleotide (use linear search or binary search)
 
-        use this naïve linear congruential generator to calculate a random number each time a nucleotide needs to be selected (don't cache the random number sequence)
+        use this naï¿½ve linear congruential generator to calculate a random number each time a nucleotide needs to be selected (don't cache the random number sequence)
 
         IM = 139968
         IA = 3877
         IC = 29573
         Seed = 42
-         	
+
         Random (Max)
            Seed = (Seed * IA + IC) modulo IM
            = Max * Seed / IM

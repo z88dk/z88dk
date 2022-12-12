@@ -21,7 +21,7 @@ The performance metric is time to complete in minutes and seconds.
 
 /*
  * COMMAND LINE DEFINES
- * 
+ *
  * -DSTATIC
  * Use static variables instead of locals.
  *
@@ -140,12 +140,12 @@ time @ 4MHz  = 8762223085 / 4*10^6 = 36 min 31 sec
 It looks like IAR implements its 32-bit math in C.
 
 11.
-Z88DK April 7, 2022
+Z88DK December 12, 2022
 sccz80 / classic c library / 8085 CPU
-7317 bytes less page zero
+7335 bytes less page zero
 
-cycle count  = 7834839279
-time @ 4MHz  = 7834839279 / 4*10^6 = 32 min 38 sec
+cycle count  = 7824146079
+time @ 4MHz  = 7824146079 / 4*10^6 = 32 min 36 sec
 
 RESULTS - PI_LDIV.C (LDIV USED)
 ===============================

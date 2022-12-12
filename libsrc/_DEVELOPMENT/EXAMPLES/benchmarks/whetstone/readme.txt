@@ -36,7 +36,7 @@ When compiling whetstone 1.2, several defines are possible:
 
 /*
  * COMMAND LINE DEFINES
- * 
+ *
  * -DSTATIC
  * Use static variables instead of locals.
  *
@@ -245,15 +245,15 @@ KWIPS        = 100*10*1 / 136.7603 = 7.3121
 MWIPS        = 7.3121 / 1000 = 0.0073121
 
 11.
-Z88DK January 3, 2022
+Z88DK December 12, 2022
 sccz80 / classic c library / 8085 CPU / MBF32
 Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
-6133 bytes less page zero
+6078 bytes less page zero
 
-cycle count  = 549592505
-time @ 4MHz  = 549592505 / 4x10^6 = 137.3981 seconds
-KWIPS        = 100*10*1 / 137.3981 = 7.2781
-MWIPS        = 7.2781 / 1000 = 0.0072781
+cycle count  = 549312725
+time @ 4MHz  = 549312725 / 4x10^6 = 137.3281 seconds
+KWIPS        = 100*10*1 / 137.3281 = 7.2818
+MWIPS        = 7.2818 / 1000 = 0.0072818
 
 12.
 HITECH C MSDOS V780pl2
@@ -264,4 +264,3 @@ cycle count  = 614748605
 time @ 4MHz  = 614748605 / 4x10^6 = 153.6871 seconds
 KWIPS        = 100*10*1 / 153.6871 = 6.5067
 MWIPS        = 6.5067 / 1000 = 0.0065067
-

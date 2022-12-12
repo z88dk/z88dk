@@ -154,14 +154,14 @@ cycle count  = 6306469660
 time @ 4MHz  = 6306469660 / 4*10^6 = 26 min 16 sec
 
 11.
-Z88DK January 3, 2022
+Z88DK December 12, 2022
 sccz80 / classic c library / 8085 / MBF32
-4620 bytes less page zero
+4604 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 6279854918
-time @ 4MHz  = 6279854918 / 4*10^6 = 26 min 10 sec
+cycle count  = 6237494435
+time @ 4MHz  = 6237494435 / 4*10^6 = 25 min 59 sec
 
 12.
 HITECH C MSDOS V780pl2
@@ -190,4 +190,4 @@ Each program should:
 
     calculate the spectral norm of an infinite matrix A, with entries a11=1, a12=1/2, a21=1/3, a13=1/4, a22=1/5, a31=1/6, etc
 
-    implement 4 separate functions / procedures / methods like the C# program 
+    implement 4 separate functions / procedures / methods like the C# program

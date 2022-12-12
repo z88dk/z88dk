@@ -51,7 +51,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks n-body.bin -start 0dc6 -end 0e25 -counter 999999999999
+z88dk-ticks n-body.bin -x n-body.map -start TIMER_START -end TIMER_END -counter 999999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -85,15 +85,15 @@ cycle count  = 3659884553
 time @ 4MHz  = 3659884553 / 4*10^6 = 15 min 15 sec
 
 
-Z88DK January 5, 2022
+Z88DK December 12, 2022
 sccz80 / classic / 8085 / MBF32
-4889 bytes less page zero
+4868 bytes less page zero
 
 first number error : 1 * 10^(-7)
 second number error: 1 * 10^(-4)
 
-cycle count  = 1852019035
-time @ 4MHz  = 1852019035 / 4*10^6 =  7 min 43 sec
+cycle count  = 1851095771
+time @ 4MHz  = 1851095771 / 4*10^6 =  7 min 43 sec
 
 
 Z88DK January 3, 2022

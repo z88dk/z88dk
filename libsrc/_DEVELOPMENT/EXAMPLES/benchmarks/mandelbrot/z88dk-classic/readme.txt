@@ -15,7 +15,7 @@ classic/sccz80/math32
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math32 -lndos -m
 
 classic/sccz80/8085/MBF32
-zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=inlineints mandelbrot.c -o mandelbrot.bin --math-mbf32_8085 -lndos -m
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O3 --opt-code-speed=all mandelbrot.c -o mandelbrot.bin --math-mbf32_8085 -lndos -m
 
 classic/zsdcc
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -compiler=sdcc -SO3 --max-allocs-per-node200000 mandelbrot.c -o mandelbrot.bin -lmath48 -lndos -m
@@ -36,7 +36,7 @@ measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks mandelbrot.bin -start 00cd -end 0364 -counter 999999999999 -output verify.bin
+z88dk-ticks mandelbrot.bin -x mandelbrot.map -start TIMER_START -end TIMER_END -counter 999999999999 -output verify.bin
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex

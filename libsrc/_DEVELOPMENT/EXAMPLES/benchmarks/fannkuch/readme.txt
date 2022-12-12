@@ -115,12 +115,12 @@ cycle count  = 75381296
 time @ 4MHz  = 75381296 / 4*10^6 = 18.84 sec
 
 9.
-Z88DK January 3, 2022
+Z88DK December 12, 2022
 sccz80 / classic c library / 8085 CPU
-1821 bytes less page zero
+1783 bytes less page zero
 
-cycle count  = 75221898
-time @ 4MHz  = 75221898 / 4*10^6 = 18.81 sec
+cycle count  = 67446120
+time @ 4MHz  = 67446120 / 4*10^6 = 16.86 sec
 
 
 Background
@@ -148,10 +148,10 @@ Each program should:
 
         checksum = checksum + (if permutation_index is even then flips_count else -flips_count)
 
-        checksum = checksum + (toggle_sign_-1_1 * flips_count) 
+        checksum = checksum + (toggle_sign_-1_1 * flips_count)
 
-    Do this for all n! permutations, and record the maximum number of flips needed for any permutation. 
+    Do this for all n! permutations, and record the maximum number of flips needed for any permutation.
 
 diff program output N = 7 with this output file to check your program output has the correct format, before you contribute your program.
 
-Use a larger command line argument (12) to check program performance. 
+Use a larger command line argument (12) to check program performance.

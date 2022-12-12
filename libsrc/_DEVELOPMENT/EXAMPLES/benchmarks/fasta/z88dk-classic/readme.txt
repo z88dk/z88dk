@@ -46,7 +46,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks fasta.bin -start 0546 -end 05bc -counter 999999999999
+z88dk-ticks fasta.bin -x fasta.map -start TIMER_START -end TIMER_END -counter 999999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -66,12 +66,12 @@ cycle count  = 248331410
 time @ 4MHz  = 248331410 / 4*10^6 = 62.08 sec
 
 
-Z88DK January 5, 2022
+Z88DK December 12, 2022
 classic/sccz80/8085/MBF32
-4930 bytes less page zero
+4869 bytes less page zero
 
-cycle count  = 215257269
-time @ 4MHz  = 215257269 / 4*10^6 = 53.81 sec
+cycle count  = 206325540
+time @ 4MHz  = 206325540 / 4*10^6 = 51.58 sec
 
 
 Z88DK January 3, 2022
@@ -88,4 +88,3 @@ classic/sccz80/math32
 
 cycle count  = 136057474
 time @ 4MHz  = 136057474 / 4*10^6 = 34.01 sec
-

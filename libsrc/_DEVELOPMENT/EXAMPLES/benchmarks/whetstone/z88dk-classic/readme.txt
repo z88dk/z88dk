@@ -47,7 +47,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks whetstone.bin -start 00d1 -end 09f9 -counter 99999999999
+z88dk-ticks whetstone.bin -x whetstone.map -start TIMER_START -end TIMER_STOP -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -59,15 +59,15 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK January 3, 2022
+Z88DK December 12, 2022
 classic/sccz80/8085/MBF32
 Microsoft 32-bit math 24 bit mantissa + 8 bit exponent
-6133 bytes less page zero
+6078 bytes less page zero
 
-cycle count  = 549592505
-time @ 4MHz  = 549592505 / 4x10^6 = 137.3981 seconds
-KWIPS        = 100*10*1 / 137.3981 = 7.2781
-MWIPS        = 7.2781 / 1000 = 0.0072781
+cycle count  = 549312725
+time @ 4MHz  = 549312725 / 4x10^6 = 137.3281 seconds
+KWIPS        = 100*10*1 / 137.3281 = 7.2818
+MWIPS        = 7.2818 / 1000 = 0.0072818
 
 
 Z88DK January 3, 2022

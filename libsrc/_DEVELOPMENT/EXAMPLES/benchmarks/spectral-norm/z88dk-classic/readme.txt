@@ -46,7 +46,7 @@ These address bounds were given to TICKS to measure execution time.
 
 A typical invocation of TICKS looked like this:
 
-z88dk-ticks spectral-norm.bin -start 0268 -end 0395 -counter 99999999999999
+z88dk-ticks spectral-norm.bin -x specral-norm.map -start TIMER_START -end TIMER_STOP -counter 9999999999
 
 start   = TIMER_START in hex
 end     = TIMER_STOP in hex
@@ -108,12 +108,11 @@ cycle count  = 6306469660
 time @ 4MHz  = 6306469660 / 4*10^6 = 26 min 16 sec
 
 
-Z88DK January 3, 2022
+Z88DK December 12, 2022
 sccz80 / classic c library / 8085 / MBF32
-4620 bytes less page zero
+4604 bytes less page zero
 
 error: 2 * 10^(-7)
 
-cycle count  = 6279854918
-time @ 4MHz  = 6279854918 / 4*10^6 = 26 min 10 sec
-
+cycle count  = 6237494435
+time @ 4MHz  = 6237494435 / 4*10^6 = 25 min 59 sec
