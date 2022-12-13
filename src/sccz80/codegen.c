@@ -861,12 +861,12 @@ void gen_load_indirect(LVALUE* lval)
         break;
     default:
         ot("call\tl_gint\t;");
-        nl();
 #ifdef USEFRAME
         if (c_framepointer_is_ix != -1 && CheckOffset(lval->offset)) {
             OutIndex(lval->offset);
         }
 #endif
+        nl();
     }
 }
 
