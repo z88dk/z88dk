@@ -18,7 +18,7 @@
 .fgetc_cons
 ._fgetc_cons
 .nokey  call    PV1
-        defb    FNKBDS
+        defb    FNKBDZ
         jr      NC,nokey
 IF STANDARDESCAPECHARS
 	cp	13
