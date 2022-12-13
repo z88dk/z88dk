@@ -76,6 +76,7 @@ TOCREATE += $(call check_target,multi8,multi8_clib.lib)
 TOCREATE += $(call check_target,myvision,myvision_clib.lib)
 TOCREATE += $(call check_target,mz,mz_clib.lib)
 TOCREATE += $(call check_target,mz2500,mz2500_clib.lib)
+TOCREATE += $(call check_target,nabu,nabu_clib.lib)
 TOCREATE += $(call check_target,nascom,nascom_clib.lib)
 TOCREATE += $(call check_target,nc,nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib zxfcntl)
 TOCREATE += $(call check_target,newbrain,newbrain_clib.lib)
@@ -1325,6 +1326,18 @@ lm80c_clib.lib:
 	$(MAKE) -C target/lm80c
 	$(MAKE) -C video/tms9918 TARGET=lm80c
 	TARGET=lm80c TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORlm80c -x$(OUTPUT_DIRECTORY)/lm80c_clib @$(TARGET_DIRECTORY)/lm80c/lm80c.lst
+
+# NabuPC
+nabu_clib.lib:
+	@echo ''
+	@echo '--- Building Naby Library ---'
+	@echo ''
+	$(MAKE) msxdeps
+	$(MAKE) -C games TARGET=nabu
+	$(call buildgeneric,nabu)
+#	$(MAKE) -C target/nabu
+	$(MAKE) -C video/tms9918 TARGET=nabu
+	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_clib @$(TARGET_DIRECTORY)/nabu/nabu.lst
 
 
 # Genius Leader 2000/4000 - dom

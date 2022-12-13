@@ -144,3 +144,12 @@ IF FORlm80c
 	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
+IF FORnabu
+	defc VDP_DATA    = $a0
+	defc VDP_DATAIN  = $a0
+	defc VDP_CMD     = $a1
+	defc VDP_STATUS  = $a1
+	defc VRAM_SIZE   = 16
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
+ENDIF
