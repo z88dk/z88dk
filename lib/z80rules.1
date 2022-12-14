@@ -4906,24 +4906,6 @@
 	push	hl
 	push	bc
 
-	jp	i_%1	;%5
-.%2
-	jp	i_%3	;%6
-=
-%activate
-	jp	i_%1	;%5
-.%2
-	jp	i_%3	;%6
-=
-%once
-	jp	i_%1	;%5
-%activate
-; --- Start of Optimiser additions ---
-=
-%once
-; --- Start of Optimiser additions ---
-	defc	%2 = i_%3
-
 	jr	c,%1
 .%2
 	jp	i_%3	;%5
@@ -6710,6 +6692,7 @@
 	ld	(%1),a
 
 %title De-dupe labels
+%eval 0 = %2 %1 - !
 .i_%1
 .i_%2
 =
