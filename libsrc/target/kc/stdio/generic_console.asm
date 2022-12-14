@@ -348,7 +348,7 @@ not_udg:
 	ld	l,a
 	call	print_half
 
-	; And now colour (again only KC82/2)
+	; And now colour (again only KC85/2)
 	pop	bc
 
 	call	cxypos
