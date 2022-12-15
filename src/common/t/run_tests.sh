@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set +e        # allow tests to fail without aborting make test
 
@@ -9,23 +9,23 @@ for t in $( cat t/test1.hh | sed -e 's/^[^"]*"//' -e 's/".*//'); do
 	if [ ! -f $f ] ; then
 		touch $f
 	fi
-	
-	nr=$[$nr+1]
+
+	nr=$((nr+1))
 	t/test $t > $f.mine.stdout 2> $f.mine.stderr
 	rv=$?
 	(echo stdout: ; cat $f.mine.stdout ; echo stderr: ; cat $f.mine.stderr ; echo exit: $rv ) > $f.mine
-	
+
 	if diff -q -w $f $f.mine ; then
 		echo ok $nr, $t
 	else
 		echo not ok $nr, $t
 		echo \# test $nr: t/test $t \> $f.mine
-		if [ "$DIFF" != "" ] ; then
+		if [ -n "$DIFF" ] ; then
 			$DIFF -w $f $f.mine &
 		else
 			diff -w $f $f.mine | sed -e 's/^/\# /'
 		fi
-		fail=$[$fail+1]
+		fail=$((fail+1))
 	fi
 done
 
@@ -35,6 +35,6 @@ if [ $fail = 0 ] ; then
 	rm -f t/*.bak t/*.out.mine* test.*
 	exit 0
 else
-	echo \# Looks like you failed $fail test of $nr.
+	echo \# Looks like you failed $fail test(s) of $nr.
 	exit 1
 fi
