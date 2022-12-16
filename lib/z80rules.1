@@ -378,7 +378,7 @@
 =
 	ld	hl,%1	;const
 
-	add	hl,%1	
+	add	hl,%1
 	ld	hl,%2	;const
 =
 	ld	hl,%2	;const
@@ -781,7 +781,7 @@
 	jp	nz,%1	;%3
 	ld	hl,1	;const
 =
-	ld	a,h	
+	ld	a,h
 	or	l
 	jp	nz,%1	;%3
 	inc	hl
@@ -3537,7 +3537,7 @@
 =
 	ld	a,(_%1)
 	ld	l,a
-	rla	
+	rla
 	sbc	a
 	ld	h,a
 
@@ -3672,7 +3672,7 @@
 	and	%2
 	ld	l,a
 	ld	h,0
-	push	hl	
+	push	hl
 
 	scf
 	jr	z,ASMPC+3
@@ -3940,7 +3940,7 @@
 	pop	bc
 	call	l_plong
 =
-	call	l_glong	
+	call	l_glong
 
 	ld	l,(hl)
 	ld	h,l
@@ -5366,7 +5366,7 @@
 	ld	hl,%5	;const
 
 %check 1 <= %1 <= 255
-%title 16bit >= becomes 8bit >= 
+%title 16bit >= becomes 8bit >=
 	ld	e,(hl)
 	ld	d,0
 	ld	hl,%1	;const
@@ -6462,6 +6462,23 @@
 	ld	(de),a
 .%1
 	ld	hl,%2
+
+%cpu 8085
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gchar
+	push	hl
+	ld	hl,%2	;const
+=
+	ld	de,sp+%1
+	ld	a,(de)	;l_gchar
+	ld	l,a
+	rlca
+	sbc	a,a
+	ld	h,a
+	push	hl
+	ld	hl,%2	;const
 
 %cpu 8085
 %check 0 <= %1 <= 255
