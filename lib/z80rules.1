@@ -6473,10 +6473,7 @@
 =
 	ld	de,sp+%1
 	ld	a,(de)	;l_gchar
-	ld	l,a
-	rlca
-	sbc	a,a
-	ld	h,a
+	call	l_sxt
 	push	hl
 	ld	hl,%2	;const
 
@@ -6484,10 +6481,11 @@
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
 	add	hl,sp
-	call	l_gint	;%9
+	call	l_gchar
 =
 	ld	de,sp+%1
-	ld	hl,(de)	;l_gint
+	ld	a,(de)	;l_gchar
+	call	l_sxt
 
 %cpu 8085
 %check 0 <= %1 <= 255
@@ -6498,6 +6496,15 @@
 =
 	ld	de,sp+%1
 	push	de
+	ld	hl,(de)	;l_gint
+
+%cpu 8085
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;%9
+=
+	ld	de,sp+%1
 	ld	hl,(de)	;l_gint
 
 %cpu 8085
