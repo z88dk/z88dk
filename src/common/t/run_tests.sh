@@ -35,6 +35,6 @@ if [ $fail = 0 ] ; then
 	rm -f t/*.bak t/*.out.mine* test.*
 	exit 0
 else
-	echo \# Looks like you failed $fail test(s) of $nr.
+	echo \# Looks like you failed $fail test of $nr.
 	exit 1
 fi
