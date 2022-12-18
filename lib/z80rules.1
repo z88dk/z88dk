@@ -2732,6 +2732,7 @@
 	ld	h,0
 	ex	de,hl
 
+$notcpu 8085
 	call	l_gint	;
 	call	l_glong
 =
@@ -2807,6 +2808,7 @@
 	call	l_glong2sp
 	ld	hl,%1
 
+%notcpu 8085
 %notcpu gbz80
 	call	l_glonghlp
 	push	de
