@@ -131,8 +131,7 @@ void read_symbol_file(char *filename)
                       utstring_printf(temp, "%s_%.*s", sym->name, strlen(argv[7])-1 /* don't include trailing comma */, argv[7]);
                       sym->name_module = strdup(utstring_body(temp));
                       utstring_free(temp);
-                    }
-                    else {
+                    } else {
                       sym->name_module = strdup(sym->name);
                     }
 
@@ -143,10 +142,9 @@ void read_symbol_file(char *filename)
                     symbol *oldsym = NULL;
                     HASH_FIND_STR(global_symbols, sym->name, oldsym);
 
-                    if(oldsym) {
+                    if (oldsym) {
                       oldsym->unique = sym->unique = 0;
-                    }
-                    else {
+                    } else {
                       sym->unique = 1;
                       HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
                     }
@@ -176,7 +174,7 @@ void read_symbol_file(char *filename)
                     sym->islocal = 1;
                 }
                 sym->symtype = SYM_ADDRESS;
-                if (strcmp(argv[4],"const,") == 0 ) {
+                if (strcmp(argv[4],"const,") == 0) {
                     sym->symtype = SYM_CONST;
                 }
                 sym->address = strtol(argv[2] + 1, NULL, 16);
@@ -186,8 +184,7 @@ void read_symbol_file(char *filename)
                   utstring_printf(temp, "%s_%.*s", sym->name, strlen(argv[7])-1 /* don't include trailing comma */, argv[7]);
                   sym->name_module = strdup(utstring_body(temp));
                   utstring_free(temp);
-                }
-                else {
+                } else {
                   sym->name_module = strdup(sym->name);
                 }
 
@@ -196,10 +193,9 @@ void read_symbol_file(char *filename)
                 symbol *oldsym = NULL;
                 HASH_FIND_STR(global_symbols, sym->name, oldsym);
 
-                if(oldsym) {
+                if (oldsym) {
                   oldsym->unique = sym->unique = 0;
-                }
-                else {
+                } else {
                   sym->unique = 1;
                   HASH_ADD_KEYPTR(hh, global_symbols, sym->name, strlen(sym->name), sym);
                 }
@@ -326,31 +322,22 @@ const char *find_symbol(int addr, symboltype preferred_type)
         sym = symbols[addr % SYM_TAB_SIZE];
 
         while ( sym != NULL ) {
-            if (sym->address == addr && !(sym->islocal && globalsOnly))
-            {
-                if(sym->unique == 1) {
-                  if (preferred_type == SYM_ANY)
-                  {
-                      return sym->name;
-                  }
-
-                  if (preferred_type == sym->symtype)
-                  {
-                      return sym->name;
-                  }
+            if (sym->address == addr && !(sym->islocal && globalsOnly)) {
+                if (sym->unique == 1) {
+                    if (preferred_type == SYM_ANY) {
+                        return sym->name;
+                    }
+                    if (preferred_type == sym->symtype) {
+                        return sym->name;
+                    }
+                } else if (globalsOnly || sym->next) {
+                    sym = sym->next;
+                    continue;
                 }
-                else if(globalsOnly || sym->next) {
-                  sym = sym->next;
-                  continue;
-                }
-
-                if (preferred_type == SYM_ANY)
-                {
+                if (preferred_type == SYM_ANY) {
                     return sym->name_module;
                 }
-
-                if (preferred_type == sym->symtype)
-                {
+                if (preferred_type == sym->symtype) {
                     return sym->name_module;
                 }
             }
