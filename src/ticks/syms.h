@@ -22,6 +22,8 @@ struct symbol_s {
     char           islocal;
     const char    *section;
     symbol        *next;
+    int            unique;
+    const char    *name_module;
     UT_hash_handle hh;
 };
 
