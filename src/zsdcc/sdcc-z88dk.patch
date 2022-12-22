@@ -2,7 +2,13 @@ Index: ChangeLog
 ===================================================================
 --- ChangeLog	(revision 13131)
 +++ ChangeLog	(working copy)
-@@ -1,3 +1,18 @@
+@@ -1,3 +1,24 @@
++2022-06-25 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
++
++	* src/z80/gen.c,
++	  support/regression/tests/bug-3458.c.in:
++	  Fix bug #3458.
++
 +2022-06-01 Philipp Klaus Krause <krauseph AT informatik.uni-freiburg.de>
 +
 +	* src/SDCCast.c:
@@ -21,7 +27,7 @@ Index: ChangeLog
  2022-02-26 Philipp Klaus Krause <krauseph@informatik.uni-freiburg.de>
  
  	* src/SDCCsymt.c,
-@@ -48206,4 +48221,4 @@
+@@ -48206,4 +48227,4 @@
  	* as/mcs51/lklex.c:  accept everything as symbol name in rel-files, bug fix ID 452601
  	* as/mcs51/lksym.c:  accept everything as symbol name in rel-files, bug fix ID 452601
  
@@ -245,6 +251,39 @@ Index: src/z80/gen.c
 ===================================================================
 --- src/z80/gen.c	(revision 13131)
 +++ src/z80/gen.c	(working copy)
+@@ -5828,7 +5828,7 @@
+               emit2 ("ld b, h");
+               regalloc_dry_run_cost += 2;
+               _pop (PAIR_HL);
+-              pair = PAIR_BC;             
++              pair = PAIR_BC;
+             }
+         }
+       emit2 ("push %s", _pairs[pair].name);
+@@ -5841,11 +5841,6 @@
+ 
+   // Check if we can do tail call optimization.
+   else if (!(currFunc && IFFUNC_ISISR (currFunc->type)) &&
+-    (!SomethingReturned || aopInReg (IC_RESULT (ic)->aop, 0, aopRet (ftype)->aopu.aop_reg[0]->rIdx) &&
+-      (IC_RESULT (ic)->aop->size <= 1 || aopInReg (IC_RESULT (ic)->aop, 1, aopRet (ftype)->aopu.aop_reg[1]->rIdx)) &&
+-      (IC_RESULT (ic)->aop->size <= 2 || aopInReg (IC_RESULT (ic)->aop, 2, aopRet (ftype)->aopu.aop_reg[2]->rIdx)) &&
+-      (IC_RESULT (ic)->aop->size <= 3 || aopInReg (IC_RESULT (ic)->aop, 3, aopRet (ftype)->aopu.aop_reg[3]->rIdx)) &&
+-      IC_RESULT (ic)->aop->size <= 4) &&
+     !ic->parmBytes &&
+     (!isFuncCalleeStackCleanup (currFunc->type) || !ic->parmEscapeAlive && ic->op == CALL && 0 /* todo: test and enable depending on optimization goal - as done for stm8 - for z80 and r3ka this will be slower and bigger than without tail call optimization, but it saves RAM */) &&
+     !ic->localEscapeAlive &&
+@@ -5918,6 +5913,11 @@
+         }
+     }
+ 
++  if (tailjump && SomethingReturned) // Explicitly check for matching registers, as otherwise calls between __sdcccall(1) and __z88dk_fastcall will go wrong.
++    for (int i = 0; i < IC_RESULT (ic)->aop->size; i++)
++      if (!aopInReg (aopRet (currFunc->type), 0, aopRet (ftype)->aopu.aop_reg[0]->rIdx))
++        tailjump = false;
++
+   const bool jump = tailjump || !ic->parmBytes && !bigreturn && ic->op != PCALL && !IFFUNC_ISBANKEDCALL (dtype) && !IFFUNC_ISZ88DK_SHORTCALL(ftype) && IFFUNC_ISNORETURN (ftype);
+ 
+   if (ic->op == PCALL)
 @@ -10163,7 +10163,8 @@
              }
            /* Non-destructive and when exactly one bit per byte is set. */
