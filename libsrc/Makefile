@@ -1330,7 +1330,7 @@ lm80c_clib.lib:
 # NabuPC
 nabu_clib.lib:
 	@echo ''
-	@echo '--- Building Naby Library ---'
+	@echo '--- Building Nabu Library ---'
 	@echo ''
 	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=nabu
