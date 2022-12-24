@@ -272,7 +272,7 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 	{
 	case SYMBOL_OP:
 		/* symbol was not defined */
-		if (!self->d.symbol->is_defined)
+		if (!self->d.symbol->is_defined || self->d.symbol->type == TYPE_COMPUTED)
 		{
 			expr->result.not_evaluable = true;
 
@@ -787,4 +787,34 @@ bool Expr_is_recusive(Expr1* self, const char* name)
 		}
 	}
 	return false;
+}
+
+/* check if expression is difference of two addresses in the same section, convert it to a constant */
+bool Expr_is_addr_diff(Expr1* self) {
+	if (ExprOpArray_size(self->rpn_ops) != 3)
+		return false;
+	ExprOp* op1 = ExprOpArray_item(self->rpn_ops, 0);
+	ExprOp* op2 = ExprOpArray_item(self->rpn_ops, 1);
+	ExprOp* op3 = ExprOpArray_item(self->rpn_ops, 2);
+
+	if (op1->op_type != SYMBOL_OP)
+		return false;
+	if (op2->op_type != SYMBOL_OP)
+		return false;
+
+	Symbol1* sym1 = op1->d.symbol;
+	Symbol1* sym2 = op2->d.symbol;
+	if (sym1->type != TYPE_ADDRESS)
+		return false;
+	if (sym2->type != TYPE_ADDRESS)
+		return false;
+	if (sym1->section != sym2->section)
+		return false;
+
+	if (op3->op_type != BINARY_OP)
+		return false;
+	if (op3->d.op->tok != TK_MINUS)
+		return false;
+	else
+		return true;
 }

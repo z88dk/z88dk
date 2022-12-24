@@ -298,10 +298,15 @@ void asm_UNDEFINE(const char* name)
 *----------------------------------------------------------------------------*/
 void asm_DEFC(const char* name, Expr1* expr)
 {
-	int value;
+	int value = Expr_eval(expr, false);		/* DEFC constant expression */
 
-	value = Expr_eval(expr, false);		/* DEFC constant expression */
-	if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
+	/* if expression is difference of two addresses in the same
+	   section, convert it to a constant */
+	if (Expr_is_addr_diff(expr)) {
+		define_symbol(name, value, TYPE_CONSTANT);
+		OBJ_DELETE(expr);
+	}
+	else if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
 	{
 		/* check if expression depends on itself */
 		if (Expr_is_recusive(expr, name)) {

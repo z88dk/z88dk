@@ -161,6 +161,9 @@ extern bool Expr_without_addresses(Expr1* self);
 /* check if expression depends on itself */
 extern bool Expr_is_recusive(Expr1* self, const char* name);
 
+/* check if expression is difference of two addresses in the same section, convert it to a constant */
+bool Expr_is_addr_diff(Expr1* expr);
+
 /*-----------------------------------------------------------------------------
 *	Stack for calculator
 *----------------------------------------------------------------------------*/
