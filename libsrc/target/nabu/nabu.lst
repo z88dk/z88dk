@@ -5,4 +5,6 @@
 @gfx/narrow/gfx_narrow.lst
 @games/games.lst
 target/nabu/stdio/fputc_cons.asm
+target/nabu/stdio/fgetc_cons.asm
+target/nabu/stdio/getk.asm
 

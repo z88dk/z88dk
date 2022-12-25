@@ -1,0 +1,7 @@
+
+
+
+defc IO_HCCA = 0x80
+
+defc IO_KEYBOARD = 0x90
+defc IO_KEYBOARD_STATUS = 0x91
