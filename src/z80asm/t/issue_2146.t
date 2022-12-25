@@ -61,14 +61,39 @@ IF ERROR
 ENDIF
 END
 
-capture_ok("z88dk-z80asm -b -m $test.asm", "");
+capture_ok("z88dk-z80asm -b $test.asm", "");
 check_bin_file("$test.bin",
 			bytes(1, 2, 3, 4));
 
-capture_nok("z88dk-z80asm -DERROR -b -m $test.asm", <<END);
+capture_nok("z88dk-z80asm -DERROR -b $test.asm", <<END);
 $test.asm:16: error: constant expression expected
   ^---- defs nonsence, 5
 END
+
+# no DEFC
+spew("$test.asm", <<'END');
+aa_start:	defb 1
+aa_end:
+bb_start:	defb 2, 2
+bb_end:
+
+	defs aa_end-aa_start, 3
+	defs 2*(aa_end-aa_start), 4
+	defs -aa_start+aa_end, 5
+	defs aa_end+2-aa_start, 6
+	defs bb_end-bb_start+aa_end-aa_start, 7
+END
+
+capture_ok("z88dk-z80asm -b $test.asm", "");
+check_bin_file("$test.bin",
+			bytes(1).
+			bytes(2,2).
+			bytes(3).
+			bytes(4,4).
+			bytes(5).
+			bytes(6,6,6).
+			bytes(7,7,7));
+
 
 unlink_testfiles;
 done_testing;
