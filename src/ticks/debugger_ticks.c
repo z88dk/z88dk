@@ -142,8 +142,8 @@ static breakpoint_ret_t do_nothing(uint8_t type, uint16_t at, uint8_t sz) { retu
 
 void next()
 {
-    char  buf[100];
-    int   len;
+    static char buf[2048];
+    int len;
     const unsigned short pc = bk.pc();
 
     uint8_t opcode = bk.get_memory(pc);

@@ -151,8 +151,8 @@ int main(int argc, char **argv)
 
 static void disassemble_loop(int start, int end)
 {
-    char   buf[256];
-    int    start2 = start;
+    static char buf[2048];
+    int start2 = start;
 
     while ( start2 < end ) {
         start2 += disassemble2(start2, buf, sizeof(buf), 0);

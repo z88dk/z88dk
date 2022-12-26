@@ -609,9 +609,8 @@ uint8_t breakpoints_check()
 
 void debugger_next()
 {
-    extern int next_address;
-    char  buf[100];
-    int   len;
+    static char buf[2048];
+    int len;
     const unsigned short pc = bk.pc();
 
     uint8_t opcode = bk.get_memory(pc);

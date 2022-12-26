@@ -867,7 +867,7 @@ static void cmd_data_disassemble(const char* flow, int argc, char **argv) {
     utstring_new(dump_buffer);
 
     while (pc <= to_d) {
-        char db[256] = "";
+        static char db[2048];
         int len = disassemble2(pc, db, sizeof(db), 2);
 
         if (!first) {
@@ -948,7 +948,7 @@ static void cmd_plain_disassemble(const char* flow, int argc, char **argv) {
     bk.console("Dump of assembler code from 0x%08x to 0x%08x:\n", from_d, to_d);
 
     while (pc <= to_d) {
-        char db[256] = "";
+        static char db[2048];
         int len = disassemble2(pc, db, sizeof(db), 2);
 
         const char* ppp = (pc == regs.pc) ? "=> " : "   ";

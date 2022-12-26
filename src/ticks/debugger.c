@@ -379,9 +379,9 @@ int debugger_evaluate(char* line)
 void debugger()
 {
     static char *last_line = NULL;
-    char   buf[256];
-    char   prompt[300];
-    char  *line;
+    static char buf[2048];
+    char prompt[300];
+    char *line;
 
     if ( last_line == NULL ) {
         last_line = strdup("");
@@ -1188,7 +1188,7 @@ const char *resolve_to_label(int addr)
 
 static int cmd_disassemble(int argc, char **argv)
 {
-    char buf[256];
+    static char buf[2048];
     int i = 0;
     int disassemble_size = 10;
     int where = -1;
@@ -1839,8 +1839,8 @@ static int cmd_list(int argc, char **argv)
 
 static void print_hotspots(void)
 {
-    char   buf[256];
-    int    i;
+    static char buf[2048];
+    int i;
     FILE  *fp;
 
     if ( hotspot == 0 ) return;
