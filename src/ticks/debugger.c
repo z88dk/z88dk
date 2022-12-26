@@ -565,7 +565,7 @@ void debugger()
 
 static int cmd_next(int argc, char **argv)
 {
-    bk.next();
+    bk.next(1);
     return 1;  /* We should exit the loop */
 }
 
@@ -580,13 +580,13 @@ static int cmd_next_source(int argc, char **argv)
         return 0;
     }
     add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_NEXT_SOURCE_LINE, filename, lineno);
-    bk.next();
+    bk.next(0);
     return 1;
 }
 
 static int cmd_step(int argc, char **argv)
 {
-    bk.step();
+    bk.step(1);
     return 1;  /* We should exit the loop */
 }
 
@@ -601,7 +601,7 @@ static int cmd_step_source(int argc, char **argv)
     }
 
     add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_STEP_SOURCE_LINE, filename, lineno);
-    bk.step();
+    bk.step(0);
     return 1;
 }
 

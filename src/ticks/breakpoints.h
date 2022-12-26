@@ -56,6 +56,7 @@ typedef struct temporary_breakpoint_t {
     int                             source_line;
     uint8_t                         external;
     struct temporary_breakpoint_t*  next;
+    struct temporary_breakpoint_t*  prev;
 } temporary_breakpoint_t;
 
 extern breakpoint *breakpoints;

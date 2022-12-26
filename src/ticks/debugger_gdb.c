@@ -607,7 +607,7 @@ uint8_t breakpoints_check()
     return 1;
 }
 
-void debugger_next()
+void debugger_next(uint8_t add_bp)
 {
     static char buf[2048];
     int len;
@@ -634,7 +634,9 @@ void debugger_next()
             char req[64];
             sprintf(req, "i%d", len);
             schedule_write_packet(req);
-            add_temp_breakpoint_one_instruction();
+            if (add_bp) {
+                add_temp_breakpoint_one_instruction();
+            }
             debugger_active = 0;
             return;
         }
@@ -642,14 +644,18 @@ void debugger_next()
 
     // it's something else, so do a regular step
     schedule_write_packet("s");
-    add_temp_breakpoint_one_instruction();
+    if (add_bp) {
+        add_temp_breakpoint_one_instruction();
+    }
     debugger_active = 0;
 }
 
-void debugger_step()
+void debugger_step(uint8_t add_bp)
 {
+    if (add_bp) {
+        add_temp_breakpoint_one_instruction();
+    }
     schedule_write_packet("s");
-    add_temp_breakpoint_one_instruction();
     debugger_active = 0;
 }
 

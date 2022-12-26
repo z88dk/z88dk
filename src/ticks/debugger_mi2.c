@@ -1001,7 +1001,7 @@ static void cmd_break(const char* flow, int argc, char **argv) {
 }
 
 static void cmd_next_instruction(const char* flow, int argc, char **argv) {
-    bk.next();
+    bk.next(1);
     mi2_printf_response(flow, "done");
     report_continue();
 }
@@ -1030,7 +1030,7 @@ static void cmd_fin(const char* flow, int argc, char **argv) {
         debug_stack_frames_free(first_frame_pointer);
 
         add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_FIN, NULL, 0);
-        bk.step();
+        bk.step(0);
     }
 
     mi2_printf_response(flow, "done");
@@ -1043,14 +1043,14 @@ static void cmd_next(const char* flow, int argc, char **argv) {
     const unsigned short pc = bk.pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
         add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_NEXT_SOURCE_LINE, NULL, 0);
-        bk.next();
+        bk.next(0);
         report_continue();
         mi2_printf_response(flow, "done");
         return;
     }
 
     add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_NEXT_SOURCE_LINE, filename, lineno);
-    bk.next();
+    bk.next(0);
     report_continue();
     mi2_printf_response(flow, "done");
 }
@@ -1062,14 +1062,14 @@ static void cmd_step(const char* flow, int argc, char **argv) {
     const unsigned short pc = bk.pc();
     if (debug_find_source_location(pc, &filename, &lineno) < 0) {
         add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_STEP_SOURCE_LINE, NULL, 0);
-        bk.step();
+        bk.step(0);
         report_continue();
         mi2_printf_response(flow, "done");
         return;
     }
 
     add_temporary_internal_breakpoint(TEMP_BREAKPOINT_ANYWHERE, TMP_REASON_STEP_SOURCE_LINE, filename, lineno);
-    bk.step();
+    bk.step(0);
     report_continue();
     mi2_printf_response(flow, "done");
 }

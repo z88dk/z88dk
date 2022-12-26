@@ -140,7 +140,7 @@ uint8_t restore(const char* file_path, uint16_t at, uint8_t set_pc) {
 
 static breakpoint_ret_t do_nothing(uint8_t type, uint16_t at, uint8_t sz) { return BREAKPOINT_ERROR_OK; }
 
-void next()
+void next(uint8_t add_bp)
 {
     static char buf[2048];
     int len;
@@ -164,19 +164,25 @@ void next()
         case 0xf4:
         {
             // It's a call
-            add_temporary_internal_breakpoint(pc + len, TMP_REASON_ONE_INSTRUCTION, NULL, 0);
+            if (add_bp) {
+                add_temporary_internal_breakpoint(pc + len, TMP_REASON_ONE_INSTRUCTION, NULL, 0);
+            }
             debugger_active = 0;
             return;
         }
     }
 
-    add_temp_breakpoint_one_instruction();
+    if (add_bp) {
+        add_temp_breakpoint_one_instruction();
+    }
     debugger_active = 0;
 }
 
-void step()
+void step(uint8_t add_bp)
 {
-    add_temp_breakpoint_one_instruction();
+    if (add_bp) {
+        add_temp_breakpoint_one_instruction();
+    }
     debugger_active = 0;
 }
 

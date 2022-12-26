@@ -137,7 +137,7 @@ temporary_breakpoint_t* add_temporary_internal_breakpoint(uint32_t address, temp
     tmp_step->source_file = source_filename;
     tmp_step->source_line = source_lineno;
     tmp_step->reason = reason;
-    LL_APPEND(temporary_breakpoints, tmp_step);
+    DL_APPEND(temporary_breakpoints, tmp_step);
     return tmp_step;
 }
 
@@ -150,7 +150,7 @@ void remove_temp_breakpoint(temporary_breakpoint_t* b) {
     if (b->external) {
         bk.remove_breakpoint(BK_BREAKPOINT_SOFTWARE, b->at, 1);
     }
-    LL_DELETE(temporary_breakpoints, b);
+    DL_DELETE(temporary_breakpoints, b);
     free(b);
 }
 
@@ -159,7 +159,7 @@ void remove_temp_breakpoints() {
 
     temporary_breakpoint_t* b;
     temporary_breakpoint_t* tmp;
-    LL_FOREACH_SAFE(temporary_breakpoints, b, tmp)
+    DL_FOREACH_SAFE(temporary_breakpoints, b, tmp)
     {
         remove_temp_breakpoint(b);
     }
@@ -178,7 +178,7 @@ uint8_t process_temp_breakpoints() {
 
     temporary_breakpoint_t* b;
     temporary_breakpoint_t* tmp;
-    LL_FOREACH_SAFE(temporary_breakpoints, b, tmp) {
+    DL_FOREACH_SAFE(temporary_breakpoints, b, tmp) {
         if ((b->at == TEMP_BREAKPOINT_ANYWHERE) || (bk.pc() == b->at)) {
             dodebug = 1;
             temporary_breakpoint_reason_t reason = b->reason;
@@ -231,9 +231,9 @@ uint8_t process_temp_breakpoints() {
                         if (debug_find_source_location(pc, &filename, &lineno) < 0) {
                             // don't know where we are, keep going
                             if (reason == TMP_REASON_STEP_SOURCE_LINE) {
-                                bk.step();
+                                bk.step(0);
                             } else {
-                                bk.next();
+                                bk.next(0);
                             }
                             // keep the temp breakpoint
                             return 0;
@@ -241,9 +241,9 @@ uint8_t process_temp_breakpoints() {
                         // we're still on the same source line
                         if ((strcmp(filename, b->source_file) == 0) && (lineno == b->source_line)) {
                             if (reason == TMP_REASON_STEP_SOURCE_LINE) {
-                                bk.step();
+                                bk.step(0);
                             } else {
-                                bk.next();
+                                bk.next(0);
                             }
                             // keep the temp breakpoint
                             return 0;

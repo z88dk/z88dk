@@ -18,6 +18,7 @@ typedef void (*debugger_read_memory_cb)(int addr);
 typedef void (*get_regs_cb)(struct debugger_regs_t* regs);
 typedef void (*break_cb)(uint8_t temporary);
 typedef void (*void_cb)();
+typedef void (*step_cb)(uint8_t add_bp);
 typedef uint8_t (*uint8_t_cb)();
 typedef uint32_t (*uint32_t_cb)();
 typedef void (*log_cb)(const char *fmt, ...);
@@ -52,8 +53,8 @@ typedef struct {
     uint8_t breakable;
     break_cb break_;
     void_cb resume;
-    void_cb next;
-    void_cb step;
+    step_cb next;
+    step_cb step;
     void_cb detach;
     uint8_t confirm_detach_w_breakpoints;
     restore_cb restore;
