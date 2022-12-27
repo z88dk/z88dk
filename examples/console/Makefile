@@ -16,7 +16,7 @@ WORLD_TARGETS = abc80 abc800 ace adam alphatro altair8800 aquarius bee c128 c742
 WORLD_TARGETS += cpm_px8 cpm_px4 cpm_einstein cpm_attache cpm_osborne1 cpm_kaypro83 cpm_kaypro84 \
 	cpm_mz2500 cpm_microbee cpm_qc10 cpm_nascom cpm_tiki100 cpm_svi cpm_dmv cpm_adam \
 	cpm_smc777 cpm_rc700 cpm_fp1100 cpm_x1 cpm_lynx cpm_bic cpm_excali64 cpm_vector06c \
-	cpm_zxplus3 cpm_bondwell cpm_bw2 cpm_8080 cpm_corvette
+	cpm_zxplus3 cpm_bondwell cpm_bw2 cpm_8080 cpm_corvette cpm_nabu
 
 LDFLAGS_world = -lndos -pragma-define:CLIB_OPT_PRINTF=0x00000001
 
@@ -27,7 +27,7 @@ $(eval $(call build_app, $(WORLD_TARGETS), world.bin, world.c) )
 # Hello world using conio features
 
 CONIO_TARGETS = abc80 ace adam alphatro aquarius bee cpc coleco cpm fp1100 gb hemc hgmc homelab homelab2 \
-	kramermc laser500 mc1000 mikro80  \
+	kramermc laser500 mc1000 mikro80 nabu \
 	nascom ondra pmd85 pv1000 pps rx78 sam spc1000 srr super80 super80_vduem trs80 vg5k vz z1013 zx80 zx81 \
 	msx pv2000 sc3000 smc777 svi m5 mtx multi8 z80tvgame z9001 vector06c zx
 
