@@ -46450,11 +46450,7 @@ _match:
  }
 	break;
 	case 6:
-	{ expr_in_parens =
-     ((ctx->expr_start->tok == TK_LPAREN) &&
-      (ctx->p[-1].tok == TK_RPAREN)) ||
-     ((ctx->expr_start->tok == TK_LSQUARE) &&
-      (ctx->p[-1].tok == TK_RSQUARE));
+	{ expr_in_parens = check_expr_in_parens(ctx->expr_start, ctx->p);
         push_expr(ctx); }
 	break;
 	case 7:

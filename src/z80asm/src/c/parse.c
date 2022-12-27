@@ -176,6 +176,52 @@ static void pop_eval_expr(ParseCtx *ctx, int *pvalue, bool *perror)
 }
 
 /*-----------------------------------------------------------------------------
+*   check if whole expression is in parens
+*----------------------------------------------------------------------------*/
+static bool check_expr_in_parens(Sym* start, Sym* end) {
+	if (start->tok != TK_LPAREN && start->tok != TK_LSQUARE)
+		return false;
+
+	UT_string* stack;
+	utstring_new(stack);
+
+	size_t len;
+	bool extra_text = false;
+	for (Sym* p = start; !extra_text && p != end; p++) {
+		switch (p->tok) {
+		case TK_LPAREN:
+			utstring_printf(stack, "%c", TK_RPAREN);
+			break;
+		case TK_LSQUARE:
+			utstring_printf(stack, "%c", TK_RSQUARE);
+			break;
+		case TK_RPAREN:
+		case TK_RSQUARE:
+			len = utstring_len(stack);
+			if (len == 0)			/* syntax error */
+				extra_text = true;
+			else {
+				len--;
+				if (utstring_body(stack)[len] != p->tok)			/* syntax error */
+					extra_text = true;
+				else {
+					utstring_len(stack) = len;
+					if (len == 0 && p + 1 != end)
+						extra_text = true;
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	utstring_free(stack);
+
+	return !extra_text;
+}
+
+/*-----------------------------------------------------------------------------
 *   return new auto-label in strpool
 *----------------------------------------------------------------------------*/
 const char *autolabel(void)
