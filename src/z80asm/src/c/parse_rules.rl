@@ -111,15 +111,18 @@ Define rules for a ragel-based parser.
 
 	action expr_start_action {
 		ctx->expr_start = ctx->p;
-		expr_in_parens =
-			(ctx->expr_start->tok == TK_LPAREN) ? true : false;
 		expr_open_parens = 0;
 	}
 
 	/* expression */
 	expr 	= expr1
 			  >expr_start_action
-			  %{ push_expr(ctx); };
+			  %{ expr_in_parens =
+					((ctx->expr_start->tok == TK_LPAREN) &&
+					 (ctx->p[-1].tok == TK_RPAREN)) ||
+					((ctx->expr_start->tok == TK_LSQUARE) &&
+					 (ctx->p[-1].tok == TK_RSQUARE));
+			     push_expr(ctx); };
 
 	const_expr =
 			  expr %{ pop_eval_expr(ctx, &expr_value, &expr_error); };

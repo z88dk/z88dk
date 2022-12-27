@@ -46446,13 +46446,16 @@ _match:
 	case 5:
 	{
   ctx->expr_start = ctx->p;
-  expr_in_parens =
-   (ctx->expr_start->tok == TK_LPAREN) ? true : false;
   expr_open_parens = 0;
  }
 	break;
 	case 6:
-	{ push_expr(ctx); }
+	{ expr_in_parens =
+     ((ctx->expr_start->tok == TK_LPAREN) &&
+      (ctx->p[-1].tok == TK_RPAREN)) ||
+     ((ctx->expr_start->tok == TK_LSQUARE) &&
+      (ctx->p[-1].tok == TK_RSQUARE));
+        push_expr(ctx); }
 	break;
 	case 7:
 	{ pop_eval_expr(ctx, &expr_value, &expr_error); }
