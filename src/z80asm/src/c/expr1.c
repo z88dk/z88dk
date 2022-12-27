@@ -22,6 +22,7 @@ see http://www.engr.mun.ca/~theo/Misc/exp_parsing.htm
 #include "sym.h"
 #include "symtab1.h"
 #include "utstring.h"
+#include "utlist.h"
 
 /*-----------------------------------------------------------------------------
 *	UT_array of Expr1*
@@ -306,10 +307,6 @@ void ExprOp_compute(ExprOp* self, Expr1* expr, bool not_defined_error)
 		if (self->d.symbol->type == TYPE_COMPUTED && !self->d.symbol->is_computed)
 			expr->is_computed = false;
 
-		break;
-
-	case CONST_EXPR_OP:
-		expr->type = TYPE_CONSTANT;		/* convert to constant expression */
 		break;
 
 	case ASMPC_OP:
@@ -674,13 +671,40 @@ long Expr_eval(Expr1* self, bool not_defined_error)
 			switch (expr_op->op_type)
 			{
 			case SYMBOL_OP:		type = MAX(type, expr_op->d.symbol->type); break;
-			case CONST_EXPR_OP:	type = MAX(type, TYPE_CONSTANT); break;
 			case ASMPC_OP:		type = MAX(type, TYPE_ADDRESS); break;
 			default:; /* no change */
 			}
 		}
 		xassert(type != TYPE_COMPUTED);
 		self->type = type;
+	}
+
+	/* need to downgrade to CONSTANT if it is the difference of two addresses */
+	if (Expr_is_addr_diff(self))
+		self->type = TYPE_CONSTANT;
+
+	/* need to upgrade to TYPE_COMPUTED if it contains more than one address */
+	if (self->type == TYPE_ADDRESS) {
+		int count_addr = 0;
+
+		for (i = 0; i < ExprOpArray_size(self->rpn_ops); i++)
+		{
+			ExprOp* expr_op = ExprOpArray_item(self->rpn_ops, i);
+
+			switch (expr_op->op_type)
+			{
+			case SYMBOL_OP:	
+				if (expr_op->d.symbol->type == TYPE_ADDRESS)
+					count_addr++;
+				break;
+			case ASMPC_OP:
+				count_addr++;
+				break;
+			default:; /* no change */
+			}
+		}
+		if (count_addr > 1)
+			self->type = TYPE_COMPUTED;
 	}
 
 	return Calc_pop();
@@ -704,7 +728,6 @@ bool Expr_is_local_in_section(Expr1* self, struct Module1* module, struct Sectio
 				return false;
 			break;
 
-		case CONST_EXPR_OP:
 		case ASMPC_OP:
 		case NUMBER_OP:
 		case UNARY_OP:
@@ -739,7 +762,6 @@ bool Expr_without_addresses(Expr1* self)
 			num_addresses++;
 			break;
 
-		case CONST_EXPR_OP:
 		case NUMBER_OP:
 		case UNARY_OP:
 		case BINARY_OP:
@@ -774,7 +796,6 @@ bool Expr_is_recusive(Expr1* self, const char* name)
 				return true;
 			break;
 
-		case CONST_EXPR_OP:
 		case ASMPC_OP:
 		case NUMBER_OP:
 		case UNARY_OP:
@@ -789,32 +810,184 @@ bool Expr_is_recusive(Expr1* self, const char* name)
 	return false;
 }
 
-/* check if expression is difference of two addresses in the same section, convert it to a constant */
-bool Expr_is_addr_diff(Expr1* self) {
-	if (ExprOpArray_size(self->rpn_ops) != 3)
-		return false;
-	ExprOp* op1 = ExprOpArray_item(self->rpn_ops, 0);
-	ExprOp* op2 = ExprOpArray_item(self->rpn_ops, 1);
-	ExprOp* op3 = ExprOpArray_item(self->rpn_ops, 2);
+/* check if expression is difference of two addresses in the same section */
+enum stack_item_type { SI_CONST, SI_ADDR };
+struct stack_item {
+	enum stack_item_type type;
+	bool positive;
+	Section1* section;
+	struct stack_item* next;
+};
 
-	if (op1->op_type != SYMBOL_OP)
-		return false;
-	if (op2->op_type != SYMBOL_OP)
-		return false;
+static bool Expr_is_addr_diff1(Expr1* self, struct stack_item** phead) {
+	for (int i = 0; i < ExprOpArray_size(self->rpn_ops); i++) {
+		struct stack_item* elt = NULL;
 
-	Symbol1* sym1 = op1->d.symbol;
-	Symbol1* sym2 = op2->d.symbol;
-	if (sym1->type != TYPE_ADDRESS)
-		return false;
-	if (sym2->type != TYPE_ADDRESS)
-		return false;
-	if (sym1->section != sym2->section)
-		return false;
+		ExprOp* op = ExprOpArray_item(self->rpn_ops, i);
+		switch (op->op_type) {
+		case ASMPC_OP:
+			elt = xnew(struct stack_item);
+			elt->type = SI_ADDR;
+			elt->positive = true;
+			elt->section = CURRENTSECTION;
+			LL_PREPEND(*phead, elt);
+			break;
+		case NUMBER_OP:
+			elt = xnew(struct stack_item);
+			elt->type = SI_CONST;
+			elt->positive = true;
+			elt->section = NULL;
+			LL_PREPEND(*phead, elt);
+			break;
+		case SYMBOL_OP:
+			if (!op->d.symbol->is_defined)
+				return false;
+			switch (op->d.symbol->type) {
+			case TYPE_UNKNOWN:
+				return false;
+			case TYPE_CONSTANT:
+				elt = xnew(struct stack_item);
+				elt->type = SI_CONST;
+				elt->positive = true;
+				elt->section = NULL;
+				LL_PREPEND(*phead, elt);
+				break;
+			case TYPE_ADDRESS:
+				elt = xnew(struct stack_item);
+				elt->type = SI_ADDR;
+				elt->positive = true;
+				elt->section = op->d.symbol->section;
+				LL_PREPEND(*phead, elt);
+				break;
+			case TYPE_COMPUTED:
+				return false;
+			default:
+				xassert(0);
+			}
+			break;
+		case UNARY_OP:
+			xassert(*phead);
+			switch (op->d.op->tok) {
+			case TK_MINUS:
+				(*phead)->positive = !(*phead)->positive;
+				break;
+			case TK_BIN_NOT:
+			case TK_LOG_NOT:
+				if ((*phead)->type == SI_ADDR)
+					return false;
+				break;
+			default:
+				xassert(0);
+			}
+			break;
+		case BINARY_OP:
+			xassert(*phead);
+			xassert((*phead)->next);
+			switch (op->d.op->tok) {
+			case TK_MULTIPLY:
+			case TK_DIVIDE:
+			case TK_MOD:
+			case TK_LEFT_SHIFT:
+			case TK_RIGHT_SHIFT:
+			case TK_LESS:
+			case TK_LESS_EQ:
+			case TK_EQUAL:
+			case TK_NOT_EQ:
+			case TK_GREATER:
+			case TK_GREATER_EQ:
+			case TK_BIN_AND:
+			case TK_BIN_OR:
+			case TK_BIN_XOR:
+			case TK_LOG_AND:
+			case TK_LOG_OR:
+			case TK_POWER:
+				if ((*phead)->type == SI_ADDR || (*phead)->next->type == SI_ADDR)
+					return false;
+				else {
+					elt = *phead;
+					LL_DELETE(*phead, elt);
+					xfree(elt);
+					xassert((*phead)->type == SI_CONST);
+				}
+				break;
+			case TK_MINUS:
+				(*phead)->positive = !(*phead)->positive;
+				/* fall through */
+			case TK_PLUS:
+				if ((*phead)->type == SI_CONST &&
+					(*phead)->next->type == SI_CONST) {
+					elt = *phead;
+					LL_DELETE(*phead, elt);
+					xfree(elt);
+					xassert((*phead)->type == SI_CONST);
+				}
+				else if ((*phead)->type == SI_CONST &&
+					(*phead)->next->type == SI_ADDR) {
+					elt = *phead;
+					LL_DELETE(*phead, elt);
+					xfree(elt);
+					xassert((*phead)->type == SI_ADDR);
+				}
+				else if ((*phead)->type == SI_ADDR &&
+					(*phead)->next->type == SI_CONST) {
+					(*phead)->next->type = (*phead)->type;
+					(*phead)->next->positive = (*phead)->positive;
+					(*phead)->next->section = (*phead)->section;
+					elt = *phead;
+					LL_DELETE(*phead, elt);
+					xfree(elt);
+					xassert((*phead)->type == SI_ADDR);
+				}
+				else if ((*phead)->type == SI_ADDR &&
+					(*phead)->next->type == SI_ADDR) {
+					if ((*phead)->section == (*phead)->next->section &&
+						(*phead)->positive != (*phead)->next->positive) {
+						/* difference of two addresses */
+						elt = *phead;
+						LL_DELETE(*phead, elt);
+						xfree(elt);
+						(*phead)->type = SI_CONST;
+						(*phead)->positive = true;
+						(*phead)->section = NULL;
+					}
+					else
+						return false;
+					xassert((*phead)->type == SI_CONST);
+				}
+				else
+					xassert(0);
+				break;
+			default:
+				xassert(0);
+			}
+			break;
+		case TERNARY_OP:
+			xassert(*phead);
+			xassert((*phead)->next);
+			xassert((*phead)->next->next);
+			return false;
+		default:
+			xassert(0);
+		}
+	}
 
-	if (op3->op_type != BINARY_OP)
-		return false;
-	if (op3->d.op->tok != TK_MINUS)
-		return false;
-	else
+	xassert((*phead) != NULL);
+	xassert((*phead)->next == NULL);
+	if ((*phead)->type == SI_CONST)
 		return true;
+	else
+		return false;
+}
+
+bool Expr_is_addr_diff(Expr1* self) {
+	struct stack_item* head = NULL;
+	bool ret = Expr_is_addr_diff1(self, &head);
+
+	// delete stack
+	struct stack_item* elt, * tmp;
+	LL_FOREACH_SAFE(head, elt, tmp) {
+		xfree(elt);
+	}
+
+	return ret;
 }

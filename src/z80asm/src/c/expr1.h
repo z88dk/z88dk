@@ -32,7 +32,7 @@ extern UT_icd ut_exprs_icd;
 *----------------------------------------------------------------------------*/
 typedef enum
 {
-	ASMPC_OP, NUMBER_OP, SYMBOL_OP, CONST_EXPR_OP,
+	ASMPC_OP, NUMBER_OP, SYMBOL_OP,
 	UNARY_OP, BINARY_OP, TERNARY_OP,
 } op_type_t;
 
@@ -73,8 +73,6 @@ typedef struct ExprOp				/* hold one operation or operand */
 
 		/* SYMBOL_OP */
 		Symbol1* symbol;				/* symbol in symbol table */
-
-		/* CONST_EXPR_OP - no data */
 
 		/* UNARY_OP, BINARY_OP, TERNARY_OP */
 		Operator* op;				/* static struct, retrieved by Operator_get() */

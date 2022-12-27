@@ -302,11 +302,7 @@ void asm_DEFC(const char* name, Expr1* expr)
 
 	/* if expression is difference of two addresses in the same
 	   section, convert it to a constant */
-	if (Expr_is_addr_diff(expr)) {
-		define_symbol(name, value, TYPE_CONSTANT);
-		OBJ_DELETE(expr);
-	}
-	else if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
+	if ((expr->result.not_evaluable) || (expr->type >= TYPE_ADDRESS))
 	{
 		/* check if expression depends on itself */
 		if (Expr_is_recusive(expr, name)) {

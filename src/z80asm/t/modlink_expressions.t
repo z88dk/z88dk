@@ -86,7 +86,7 @@ capture_ok("z88dk-z80nm -a ${test}.o ${test}1.o", <<END);
 Object  file ${test}.o at \$0000: Z80RMF16
   Name: ${test}
   Section "": 28 bytes, ORG \$1234
-    C \$0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
+    C \$0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 06 00
     C \$0010: 11 00 00 21 00 00 11 00 00 01 00 00
   Symbols:
     L A \$0000 a0 (section "") (file ${test}.asm:5)
@@ -102,7 +102,6 @@ Object  file ${test}.o at \$0000: Z80RMF16
     E Ub \$0005 \$0006: a1-4608 (section "") (file ${test}.asm:8)
     E Cw \$0007 \$0008: a1 (section "") (file ${test}.asm:9)
     E Cw \$000A \$000B: a2-a1 (section "") (file ${test}.asm:10)
-    E Cw \$000D \$000E: a1-\$ (section "") (file ${test}.asm:11)
     E Cw \$0010 \$0011: a2-\$ (section "") (file ${test}.asm:12)
     E Cw \$0013 \$0014: __head (section "") (file ${test}.asm:14)
     E Cw \$0016 \$0017: __tail (section "") (file ${test}.asm:15)
@@ -111,7 +110,7 @@ Object  file ${test}1.o at \$0000: Z80RMF16
   Name: ${test}1
   Section "": 28 bytes, ORG \$1234
     C \$0000: 3E 00 C3 00 00 06 00 C3 00 00 21 00 00 01 00 00
-    C \$0010: 11 00 00 21 00 00 11 00 00 01 00 00
+    C \$0010: 11 03 00 21 00 00 11 00 00 01 00 00
   Symbols:
     G A \$0013 a2 (section "") (file ${test}1.asm:11)
   Externs:
@@ -126,7 +125,6 @@ Object  file ${test}1.o at \$0000: Z80RMF16
     E Cw \$0007 \$0008: a2 (section "") (file ${test}1.asm:7)
     E Cw \$000A \$000B: a2-a1 (section "") (file ${test}1.asm:8)
     E Cw \$000D \$000E: \$-a1 (section "") (file ${test}1.asm:9)
-    E Cw \$0010 \$0011: a2-\$ (section "") (file ${test}1.asm:10)
     E Cw \$0013 \$0014: __head (section "") (file ${test}1.asm:12)
     E Cw \$0016 \$0017: __tail (section "") (file ${test}1.asm:13)
     E Cw \$0019 \$001A: __size (section "") (file ${test}1.asm:14)
