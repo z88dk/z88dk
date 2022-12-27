@@ -122,7 +122,7 @@ ENDIF
 	ld hl,buf
 	add hl,de
 
-	ld	(rowadr1)+1,hl
+	ld	(rowadr1+1),hl
 
 	ld       d,8
 IF ASCIIFONT
