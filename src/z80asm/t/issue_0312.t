@@ -22,9 +22,6 @@ add("swapnib",			0xED, 0x23);
 # T=4+           8T     mirror a          ED 24           mirror the bits in A
 add("mirror a",			0xED, 0x24);
 
-# 4T     mirror de         ED 26           mirror the bits in DE     
-# add("mirror de",		0xED, 0x26);
-
 # M=2+          11T   test NN (tst A,NN)  ED 27 NN       AND A with NN and set all flags. A is not affected.
 add("tst 31",			0xED, 0x27, 0x1F);
 add("test 31",			0xED, 0x27, 0x1F);   
@@ -65,9 +62,6 @@ add("add bc,32767",		0xED, 0x36, 0xFF, 0x7F);
 add("push 1",			0xED, 0x8A, 0x00, 0x01);
 add("push 256",			0xED, 0x8A, 0x01, 0x00);
 add("push 32767",		0xED, 0x8A, 0x7F, 0xFF);
-
-# 4T*    pop x             ED 8B           pop value and discard
-# add("pop x",			0xED, 0x8B);
 
 # 16T   outinb             ED 90          outi without modifying B, out (c),(hl), hl++
 add("outinb",			0xED, 0x90);
@@ -119,6 +113,10 @@ add("lddrx",			0xED, 0xBC);
 # "popx" 
 # "fillde" 
 # "ldirscale"		add("ldirscale",		0xED, 0xB6);
+# 4T     mirror de         ED 26           mirror the bits in DE     
+# add("mirror de",		0xED, 0x26);
+# 4T*    pop x             ED 8B           pop value and discard
+# add("pop x",			0xED, 0x8B);
 
 
 # Memory mapping - specify which 8k ram page is placed into
