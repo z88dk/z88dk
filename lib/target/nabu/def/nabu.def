@@ -5,3 +5,8 @@ defc IO_HCCA = 0x80
 
 defc IO_KEYBOARD = 0x90
 defc IO_KEYBOARD_STATUS = 0x91
+
+defc IO_AY_LATCH = 0x41
+defc IO_AY_DATA = 0x40
+
+

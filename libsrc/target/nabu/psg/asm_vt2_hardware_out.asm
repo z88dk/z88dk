@@ -15,6 +15,13 @@
 asm_vt_hardware_out:
     XOR     A
 asm_vt_hardware_out_A0:
+    ld      b,a
+    LD      HL,asm_VT_AYREGS+7
+    ld      a,@00111111
+    and     (hl)
+    or      @01000000
+    ld      (hl),a
+    ld      a,b
     LD      bC,$41
     LD      HL,asm_VT_AYREGS
 LOUT:
@@ -34,3 +41,11 @@ LOUT:
     OUT     (C),A
     RET
 
+
+    ; Disable all interrupts to start off with
+    ; This is called before userland has a chance to enable them...
+    SECTION code_crt_init
+    EXTERN  nabu_set_interrupts
+
+    ld     l,0
+    call   nabu_set_interrupts

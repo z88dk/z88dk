@@ -20,6 +20,13 @@ asm_wyz_hardware_out:
     LD      (asm_wyz_ENVOLVENTE_BACK),A     ;08.13 / GUARDA LA ENVOLVENTE EN EL BACKUP
     XOR     A
 NO_BACKUP_ENVOLVENTE:
+    ld      b,a
+    LD      HL,asm_wyz_PSG_REG_SEC+7
+    ld      a,@00111111
+    and     (hl)
+    or      @01000000
+    ld      (hl),a
+    ld      a,b
     LD      HL,asm_wyz_PSG_REG_SEC
     LD      BC,$41
 LOUT:
@@ -42,3 +49,10 @@ LOUT:
     LD      (asm_wyz_PSG_REG+13),A
     RET
 
+    ; Disable all interrupts to start off with
+    ; This is called before userland has a chance to enable them...
+    SECTION code_crt_init
+    EXTERN  nabu_set_interrupts
+
+    ld     l,0
+    call   nabu_set_interrupts
