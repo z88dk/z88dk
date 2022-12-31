@@ -48,11 +48,3 @@ LOUT:
     LD      (asm_wyz_PSG_REG_SEC+13),A
     LD      (asm_wyz_PSG_REG+13),A
     RET
-
-    ; Disable all interrupts to start off with
-    ; This is called before userland has a chance to enable them...
-    SECTION code_crt_init
-    EXTERN  nabu_set_interrupts
-
-    ld     l,0
-    call   nabu_set_interrupts

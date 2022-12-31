@@ -42,8 +42,8 @@ ENDIF
         EXTERN    VDP_STATUS
 
         defc    TAR__clib_exit_stack_size = 0
-        defc    TAR__register_sp = -1
-        defc    TAR__fputc_cons_generic = 0
+        defc    TAR__register_sp = $1400
+        defc    TAR__fputc_cons_generic = 1
 
 	defc CRT_ORG_CODE = $140d
 
@@ -57,7 +57,14 @@ start:
     ld      (__restore_sp_onexit+1),sp
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
+    di
+    ld      a,$ff
+    ld      i,a
+    im      2
     call    crt0_init_bss
+    ; Code is shared with CP/M. This is a noop, but pulls in code
+    ; into crt0_init and crt0_exit
+    call    cpm_platform_init 
     ld      (exitsp),sp
 
 ; Optional definition for auto MALLOC init
@@ -66,8 +73,6 @@ start:
     IF DEFINED_USING_amalloc
         INCLUDE "crt/classic/crt_init_amalloc.asm"
     ENDIF
-
-    ; TODO: Interrupt hooking
 
         call    _main
 cleanup:
@@ -81,25 +86,6 @@ __restore_sp_onexit:
 
 l_dcal:
         jp      (hl)
-
-; VDP interrupt
-IF 0
-        EXTERN    __vdp_enable_status
-        EXTERN    VDP_STATUS
-interrupt:
-        push    af
-        push    hl
-        ld      a,(__vdp_enable_status)
-        rlca
-        jr      c,no_vbl
-        in      a,(VDP_STATUS)
-no_vbl:
-        ld      hl,nmi_vectors
-        call    asm_interrupt_handler
-        pop     hl
-        pop     af
-        retn
-ENDIF
 
 
 	INCLUDE "crt/classic/crt_runtime_selection.asm" 
