@@ -37,10 +37,11 @@ ENDIF
         defc    PSG_AY_DATA = $41
 
         EXTERN  cpm_platform_init
+        EXTERN  msx_set_mode
 
         defc    TAR__clib_exit_stack_size = 0
         defc    TAR__register_sp = $1400
-        defc    TAR__fputc_cons_generic = 0
+        defc    TAR__fputc_cons_generic = 1
 
 	defc CRT_ORG_CODE = $140d
 
@@ -63,6 +64,11 @@ start:
     ; into crt0_init and crt0_exit
     call    cpm_platform_init 
     ld      (exitsp),sp
+
+     ; Initialise mode 2 by default
+    ld      hl,2
+    call    msx_set_mode
+
 
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
