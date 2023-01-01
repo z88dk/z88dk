@@ -31,12 +31,12 @@ asm_interrupt_init:
 cpm_platform_init:
     ret
 
-; Noop interrupt handler
-int_noop:
+
+; Keyboard handler
+int_keyboard:
     di
     push    af
     push    hl
-    ;; Must be something else triggering us...
     call    handle_keyboard
     call    handle_vdp
     pop     hl
@@ -52,14 +52,18 @@ int_vsync:
     push    af
     push    hl
     call    handle_vdp
-int_not_VBL:
     pop     hl
     pop     af
     ei
     ret
 
+int_noop:
+    ret
+
 handle_keyboard:
     in      a,($90)
+    bit     7,a
+    ret     nz
     ld      (__nabu_lastk),a
     ;; TODO: Debounce stuff etc
     ret
@@ -97,7 +101,7 @@ handle_vdp:
 def_ints:
     defw    int_noop       ; HCCA RX
     defw    int_noop       ; HCCA Send
-    defw    int_noop       ; Keyboard
+    defw    int_keyboard   ; Keyboard
     defw    int_vsync      ; VSync
     defw    int_noop       ; Card0
     defw    int_noop       ; Card1
