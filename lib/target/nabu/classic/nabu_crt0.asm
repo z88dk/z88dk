@@ -28,7 +28,7 @@ ENDIF
 
 
         defc    TAR__no_ansifont = 1
-	defc	CRT_KEY_DEL = 12
+	defc	CRT_KEY_DEL = 127
 	defc	__CPU_CLOCK = 3570000
 
         PUBLIC  PSG_AY_REG
