@@ -9,7 +9,7 @@ This document covers the BiFrost library which provides multicolour graphics
 support for Spectrum programs. Although this might be considered a rather niche
 topic, the discussion also covers other aspects of Z88DK which will be referred
 to in future installments. We introduce separately loaded libraries and the
-BASIC loader required to load them, more advanced appmake usage, and a
+BASIC loader required to load them, more advanced z88dk-appmake usage, and a
 makefile. The reader is encouraged to read the document even if they have no
 particular interest in BiFrost.
 
@@ -299,33 +299,33 @@ created. In previous examples we've used zcc's -create-app option to do this
 step, but since we're now working with multiple code files which are beyond
 zcc's remit we need to do it manually.
 
-The command to convert a binary machine code file to a .TAP file is _appmake_
+The command to convert a binary machine code file to a .TAP file is _z88dk-appmake_
 and for our piece of code we build a command as follows.
 
 Our target machine, as ever, will be a ZX Spectrum:
 
 ```
-appmake +zx ...
+z88dk-appmake +zx ...
 ```
 
 Our binary input file is bifrost_01_CODE.bin:
 
 ```
-appmake +zx -b bifrost_01_CODE.bin ...
+z88dk-appmake +zx -b bifrost_01_CODE.bin ...
 ```
 
 and the output file will be bifrost_01_code.tap:
 
 ```
-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap ...
+z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap ...
 ```
 
-By default the appmake utility produces a little BASIC loader program to load
+By default the z88dk-appmake utility produces a little BASIC loader program to load
 machine code. In this case we've already written our own, so we need to suppress
 that:
 
 ```
-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader ...
+z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader ...
 ```
 
 Next we need to specify where the piece of code will be LOADed. This value goes
@@ -335,13 +335,13 @@ the code. By default Z88DK compiled code expects to load and run from address
 32768, so:
 
 ```
-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 ...
+z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 ...
 ```
 
 Finally we need to provide a name for the block of CODE on the tape:
 
 ```
-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 --blockname bifrost_01_code
+z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 --blockname bifrost_01_code
 ```
 
 We have to create two pieces of tape loadable code for our BiFrost project, the
@@ -349,8 +349,8 @@ second containing the BiFrost code which expects to load and run from address
 58625. So the two commands to create the .TAP files are:
 
 ```
-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 --blockname bifrost_01_code
-appmake +zx -b bifrost_01_BIFROSTL.bin -o bifrostl.tap --noloader --org 58625 --blockname bifrostl
+z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 --blockname bifrost_01_code
+z88dk-appmake +zx -b bifrost_01_BIFROSTL.bin -o bifrostl.tap --noloader --org 58625 --blockname bifrostl
 ```
 
 Finally, we need to merge our 3 tape files into a single one. The .TAP format is
@@ -370,8 +370,8 @@ bifrost_01_CODE.bin: bifrost_01.c ctile.asm coloured_ball.ctile
 	zcc +zx -vn -startup=31 -clib=sdcc_iy bifrost_01.c ctile.asm -o bifrost_01
 
 bifrost_01_code.tap: bifrost_01_CODE.bin
-	appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 --blockname bifrost_01_code
-	appmake +zx -b bifrost_01_BIFROSTL.bin -o bifrostl.tap --noloader --org 58625 --blockname bifrostl
+	z88dk-appmake +zx -b bifrost_01_CODE.bin -o bifrost_01_code.tap --noloader --org 32768 --blockname bifrost_01_code
+	z88dk-appmake +zx -b bifrost_01_BIFROSTL.bin -o bifrostl.tap --noloader --org 58625 --blockname bifrostl
 
 bifrost_01.tap: bifrost_01_code.tap
 	cat bifrost_loader.tap bifrost_01_code.tap bifrostl.tap > bifrost_01.tap
@@ -547,8 +547,8 @@ bifrost_02_CODE.bin: bifrost_02.c ctile.asm coloured_ball.ctile
 	zcc +zx -vn -startup=31 -clib=sdcc_iy bifrost_02.c ctile.asm -o bifrost_02
 
 bifrost_02_code.tap: bifrost_02_CODE.bin
-	appmake +zx -b bifrost_02_CODE.bin -o bifrost_02_code.tap --noloader --org 32768 --blockname bifrost_02_code
-	appmake +zx -b bifrost_02_BIFROSTH.bin -o bifrosth.tap --noloader --org 57047 --blockname bifrosth
+	z88dk-appmake +zx -b bifrost_02_CODE.bin -o bifrost_02_code.tap --noloader --org 32768 --blockname bifrost_02_code
+	z88dk-appmake +zx -b bifrost_02_BIFROSTH.bin -o bifrosth.tap --noloader --org 57047 --blockname bifrosth
 
 bifrost_02.tap: bifrost_02_code.tap
 	cat bifrost_loader.tap bifrost_02_code.tap bifrosth.tap > bifrost_02.tap
@@ -683,20 +683,20 @@ different approach for building. Use these commands to build the example:
 
 ```
 zcc +zx -vn -m -startup=31 -clib=sdcc_iy bifrost_03.c ctile.asm -o bifrost_03
-appmake +glue -b bifrost_03 --filler 0 --clean
-appmake +zx -b bifrost_03__.bin --org 32768 --blockname bifrost_03 -o bifrost_03.tap
+z88dk-appmake +glue -b bifrost_03 --filler 0 --clean
+z88dk-appmake +zx -b bifrost_03__.bin --org 32768 --blockname bifrost_03 -o bifrost_03.tap
 ```
 
 The -m option to zcc causes it to output a _map_ file. The map is a text file
 containing the addresses of all the symbols the compiler encountered in generating its
 output. You can use it to find the location of main(), BiFrost, the tile
 buffers, etc., which can be useful when working with a disassembler, debugger or
-memory monitor. In this build, the first run of appmake uses the +glue target
+memory monitor. In this build, the first run of z88dk-appmake uses the +glue target
 and (by implication) the map file to generate a single binary file containing the C
 program and the BiFrost*2 library. It _glues_ the two binary pieces together,
 filling the hole between them with zeroes. This negates the need for the BASIC
 loader we've used throughout the examples, which loads two pieces of CODE. The
-second call to appmake takes this one large binary file and wraps a standard
+second call to z88dk-appmake takes this one large binary file and wraps a standard
 BASIC loader around it.
 
 The +glue approach is much less fussy than building the two separate binary
