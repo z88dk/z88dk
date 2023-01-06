@@ -3,7 +3,6 @@
 @video/tms9918/video_tms9918.lst
 @stdio/stdio.lst
 @gfx/narrow/gfx_narrow.lst
-@games/games.lst
 target/nabu/psg/asm_vt2_hardware_out
 target/nabu/psg/set_psg_callee
 target/nabu/psg/psg_init
@@ -18,3 +17,5 @@ target/nabu/interrupts/asm_interrupt_init
 target/nabu/stdio/fgetc_cons.asm
 target/nabu/stdio/getk.asm
 target/nabu/stdio/vars.asm
+target/nabu/games/joystick.asm
+@games/games.lst

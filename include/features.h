@@ -863,8 +863,8 @@
 // #define __HAVE_VIDEO_MC6845 0
 #define __HAVE_VIDEO_VDP 1
 // #define __HAVE_JOYSTICK 0
-#define __HARDWARE_JOY1_INDEX -1
-#define __HARDWARE_JOY2_INDEX -1
+#define __HARDWARE_JOY1_INDEX 1
+#define __HARDWARE_JOY2_INDEX 2
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
@@ -2403,8 +2403,8 @@
 // #define __HAVE_VIDEO_MC6845 0
 #define __HAVE_VIDEO_VDP 1
 // #define __HAVE_JOYSTICK 0
-#define __HARDWARE_JOY1_INDEX -1
-#define __HARDWARE_JOY2_INDEX -1
+#define __HARDWARE_JOY1_INDEX 1
+#define __HARDWARE_JOY2_INDEX 2
 #define __GENCON_MAX_UDGS 128
 #define __HAVE_GFX 1
 #define __HAVE_GFX_COLOUR 1
