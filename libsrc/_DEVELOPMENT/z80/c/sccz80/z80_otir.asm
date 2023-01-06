@@ -22,3 +22,10 @@ z80_otir:
 
    ld b,e
    jp asm_z80_otir
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _z80_otir
+defc _z80_otir = z80_otir
+ENDIF
+

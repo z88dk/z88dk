@@ -22,3 +22,10 @@ z80_indr:
 
    ld b,e
    jp asm_z80_indr
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _z80_indr
+defc _z80_indr = z80_indr
+ENDIF
+

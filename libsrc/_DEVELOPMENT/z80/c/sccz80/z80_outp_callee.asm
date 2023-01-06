@@ -16,3 +16,10 @@ z80_outp_callee:
    push af
    
    jp asm_z80_outp
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _z80_outp_callee
+defc _z80_outp_callee = z80_outp_callee
+ENDIF
+

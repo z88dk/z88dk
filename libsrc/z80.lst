@@ -25,7 +25,7 @@ stdio/ansi/ansifont_f8
 @debug/debug.lst
 @rect/rect.lst
 @algorithm/alg.lst
-arch/z80/AsmCall
+@arch/z80/z80.lst
 @interrupts/interrupts.lst
 @time/time.lst
 @z80_crt0s/crt0.lst
