@@ -1,0 +1,38 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	data_compiler
+._a
+	defw	1
+	defw	0
+	defw	14
+	SECTION	code_compiler
+	SECTION	data_compiler
+._kek1
+	defw	_a + 0
+	SECTION	code_compiler
+	SECTION	data_compiler
+._kek2
+	defw	_a + 2
+	SECTION	code_compiler
+	SECTION	data_compiler
+._kek3
+	defw	_a + 4
+	SECTION	code_compiler
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+
+
+
+

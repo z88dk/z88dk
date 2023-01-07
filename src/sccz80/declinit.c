@@ -273,6 +273,17 @@ static int init(Type *type, int dump)
                 /* Actually found sommat..very good! */
                 if ( ispointer(type)|| type->kind == KIND_ARRAY ) {
                     int offset = 0;
+                    Type *as_struct_ptype = ptype;
+                    /* this is &xx.yy.zz kind of deal */
+                    while (as_struct_ptype->kind == KIND_STRUCT && rcmatch('.')) {
+                        cmatch('.');
+                        char subname[NAMESIZE];
+                        Type *member;
+                        if (symname(subname) && (member = find_tag_field(as_struct_ptype->tag, subname))) {
+                            offset += member->offset;
+                        }
+                        as_struct_ptype = member;
+                    }
 
                     if ( rcmatch('[')) {
                         if ( gotref == 0 ) {
