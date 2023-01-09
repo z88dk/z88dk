@@ -24,7 +24,7 @@ endif
 all: z88dk-ticks$(EXESUFFIX) z88dk-dis$(EXESUFFIX) z88dk-gdb$(EXESUFFIX)
 
 z88dk-ticks$(EXESUFFIX):	$(OBJS) $(LEXOBJS)
-	$(CC) -o $@ $(CFLAGS) $(OBJS) $(LEXOBJS) $(LDFLAGS)
+	$(CC) -o $@ $(CFLAGS) $(OBJS) $(LEXOBJS) $(LDFLAGS) $(GDBLDFLAGS)
 
 z88dk-gdb$(EXESUFFIX):	$(GDBOBJS) $(LEXOBJS)
 	$(CC) -o $@ $(CFLAGS) $(GDBOBJS) $(LEXOBJS) $(LDFLAGS) $(GDBLDFLAGS)
