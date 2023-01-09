@@ -13,6 +13,10 @@
 #include <stdarg.h>
 #endif
 
+#ifdef _MSC_VER
+#include <WinSock2.h>
+#endif
+
 #include "debugger.h"
 #include "utlist.h"
 
@@ -220,6 +224,14 @@ void ctrl_c_handler(int signum) {
 }
 
 void debugger_init() {
+#ifdef _WIN32
+			struct WSAData wsa;
+			int ret = WSAStartup(MAKEWORD(2, 2), &wsa);
+			if (ret) {
+				bk.debug("Socket initialization error: %d\n", ret);
+			}
+#endif
+
     signal(SIGINT, ctrl_c_handler);
     linenoiseSetCompletionCallback(completion, NULL);
     linenoiseHistoryLoad(HISTORY_FILE); /* Load the history at startup */

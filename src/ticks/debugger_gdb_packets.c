@@ -70,7 +70,7 @@ int read_data_once(sock_t sockfd)
     ssize_t nread;
     uint8_t buf[4096];
 
-    nread = read(sockfd, buf, sizeof(buf));
+    nread = recv(sockfd, buf, sizeof(buf), 0);
     if (nread <= 0)
     {
         return -1;
@@ -86,7 +86,7 @@ void write_flush(sock_t sockfd)
     while (write_index < out.end)
     {
         ssize_t nwritten;
-        nwritten = write(sockfd, out.buf + write_index, out.end - write_index);
+        nwritten = send(sockfd, out.buf + write_index, out.end - write_index, 0);
         if (nwritten < 0)
         {
             printf("Write error\n");
