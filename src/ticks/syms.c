@@ -42,16 +42,35 @@ static int demangle_filename(const char *input, char *filename, char *funcname, 
     *funcname = 0;
 
     // Full packed format
+#ifdef WIN32
+	// Match path with drive letter in it
+    if ( sscanf(input,"%c:%[^:]::%[^:]::%d::%d:%d",filename,&filename[2], funcname, level, scope, lineno) == 6) {
+		filename[1] = ':';
+        return 0;
+    }
+#endif
     if ( sscanf(input,"%[^:]::%[^:]::%d::%d:%d",filename,funcname, level, scope, lineno) == 5 ) {
         return 0;
     }
 
     // Classic in function format: adv_a.c::CHKAWAY:2206
+#ifdef WIN32
+    if ( sscanf(input,"%c:%[^:]::%[^:]:%d",filename,&filename[2],funcname, lineno) == 4 ) {
+		filename[1] = ':';
+        return 0;
+    }
+#endif
     if ( sscanf(input,"%[^:]::%[^:]:%d",filename,funcname, lineno) == 3 ) {
         return 0;
     }
 
     // Just a waypoint file:line
+#ifdef WIN32
+    if ( sscanf(input,"%c:%[^:]:%d",filename,&filename[2], lineno) == 3) {
+		filename[1] = ':';
+        return 0;
+    }
+#endif
     if ( sscanf(input,"%[^:]:%d",filename,lineno) == 2 ) {
         return 0;
     }
