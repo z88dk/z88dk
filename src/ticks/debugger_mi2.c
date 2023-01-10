@@ -107,6 +107,35 @@ static command mi2_commands[] = {
     { NULL, NULL }
 };
 
+static char* escape(char* input) {
+	int len = strlen(input);
+	int count = 0;
+	char* ptr = input;
+	while ((ptr = strchr(ptr, '\\')) != NULL) {
+		ptr++;
+		count++;
+	}
+
+	char* res = malloc(len + count * 2);
+	char* last = NULL;
+	*res = '\0';
+	count = 0;
+	ptr = input;
+	while ((ptr = strchr(ptr, '\\')) != NULL) {
+		strncat(res, &input[strlen(res) - count], ptr - input - strlen(res) + count);
+		strncat(res, "\\\\", 2);
+		count++;
+		ptr++;
+		last = ptr;
+	}
+
+	if (last != NULL) {
+		strcat(res, last);
+	}
+
+	return res;
+}
+
 static void report_continue() {
     debugger_active = 0;
     mi2_printf_async("running,thread-id=\"all\"")
@@ -199,13 +228,15 @@ static void cmd_thread_info(const char* flow, int argc, char **argv) {
 
     if (fp) {
         if (fp->symbol && fp->filename && fp->function) {
+			char* escaped_filename = escape(fp->filename);
             mi2_printf_response(flow, 
                 "done,threads=[{id=\"1\",target-id=\"Thread\","
                 "frame={level=\"0\",addr=\"0x%08x\",func=\"%s\","
                 "args=[],file=\"%s\","
                 "fullname=\"%s\",line=\"%d\"},"
                 "state=\"stopped\"}],current-thread-id=\"1\"",
-                regs.pc, fp->function->name, fp->filename, fp->filename, fp->lineno);
+                regs.pc, fp->function->name, escaped_filename, escaped_filename, fp->lineno);
+			free(escaped_filename);
             debug_stack_frames_free(fp);
             return;
         }
@@ -226,13 +257,15 @@ static void cmd_thread_info(const char* flow, int argc, char **argv) {
             "state=\"stopped\"}],current-thread-id=\"1\"",
             regs.pc);
     } else {
+		char* escaped_filename = escape(filename);
         mi2_printf_response(flow, 
             "done,threads=[{id=\"1\",target-id=\"Thread\","
             "frame={level=\"0\",addr=\"0x%08x\",func=\"%s\","
             "args=[],file=\"%s\","
             "fullname=\"%s\",line=\"%d\"},"
             "state=\"stopped\"}],current-thread-id=\"1\"",
-            regs.pc, s->name, filename, filename, lineno);
+            regs.pc, s->name, escaped_filename, escaped_filename, lineno);
+		free(escaped_filename);
     }
 }
 
@@ -661,11 +694,13 @@ static void sprintf_frame0(UT_string* ptr) {
 
     if (fp) {
         if (fp->symbol && fp->filename && fp->function) {
+			char* escaped_filename = escape(fp->filename);
             utstring_printf(ptr,
                 "level=\"0\",addr=\"0x%08x\",func=\"%s\","
                 "args=[],file=\"%s\","
                 "fullname=\"%s\",line=\"%d\"",
-                regs.pc, fp->function->name, fp->filename, fp->filename, fp->lineno);
+                regs.pc, fp->function->name, escaped_filename, escaped_filename, fp->lineno);
+			free(escaped_filename);
             goto done;
         }
     } else {
@@ -674,17 +709,21 @@ static void sprintf_frame0(UT_string* ptr) {
         if (sym != NULL) {
             const char *filename;
             int lineno;
+			char* escaped_filename = escape(sym->file);
             if (debug_find_source_location(regs.pc, &filename, &lineno)) {
+				char* escaped_fullname = escape(filename);
                 utstring_printf(ptr, "level=\"0\",addr=\"0x%08x\",func=\"%s\","
                                      "file=\"%s\","
                                      "fullname=\"%s\",line=\"%d\","
-                                     "arch=\"z80\"", regs.pc, sym->name, sym->file, filename, lineno);
+                                     "arch=\"z80\"", regs.pc, sym->name, escaped_filename, escaped_fullname, lineno);
+				free(escaped_fullname);
             } else {
                 utstring_printf(ptr, "level=\"0\",addr=\"0x%08x\",func=\"%s\","
                                      "file=\"%s\","
                                      "fullname=\"%s\","
-                                     "arch=\"z80\"", regs.pc, sym->name, sym->file, sym->file);
+                                     "arch=\"z80\"", regs.pc, sym->name, escaped_filename, escaped_filename);
             }
+			free(escaped_filename);
         } else {
             utstring_printf(ptr, "level=\"0\",addr=\"0x%08x\"", regs.pc);
         }
@@ -718,19 +757,23 @@ static void cmd_stack_list_frames(const char* flow, int argc, char **argv) {
 
             const char *filename;
             int lineno;
+			char* escaped_filename = escape(sym->file);
             if (debug_find_source_location(regs.pc, &filename, &lineno)) {
+				char* escaped_fullname = escape(filename);
                 utstring_printf(dump_buffer,
                     "frame={level=\"0\",addr=\"0x%08x\",func=\"%s\","
                     "file=\"%s\","
                     "fullname=\"%s\",line=\"%d\","
-                    "arch=\"z80\"}", regs.pc, sym->name, sym->file, filename, lineno);
+                    "arch=\"z80\"}", regs.pc, sym->name, escaped_filename, escaped_fullname, lineno);
+				free(escaped_fullname);
             } else {
                 utstring_printf(dump_buffer,
                     "frame={level=\"0\",addr=\"0x%08x\",func=\"%s\","
                     "file=\"%s\","
                     "fullname=\"%s\","
-                    "arch=\"z80\"}", regs.pc, sym->name, sym->file, sym->file);
+                    "arch=\"z80\"}", regs.pc, sym->name, escaped_filename, escaped_filename);
             }
+			free(escaped_filename);
         } else {
             utstring_printf(dump_buffer,
                 "frame={level=\"0\",addr=\"0x%08x\"}", regs.pc);
@@ -745,12 +788,14 @@ static void cmd_stack_list_frames(const char* flow, int argc, char **argv) {
             }
 
             if (fp->symbol && fp->filename && fp->function) {
+				char* escaped_filename = escape(fp->filename);
                 utstring_printf(dump_buffer,
                     "frame={level=\"%d\",addr=\"0x%08x\",func=\"%s\","
                     "file=\"%s\","
                     "fullname=\"%s\",line=\"%d\","
                     "arch=\"z80\"}", level, fp->address, fp->function->name,
-                    fp->filename, fp->filename, fp->lineno);
+                    escaped_filename, escaped_filename, fp->lineno);
+				free(escaped_filename);
             } else {
                 utstring_printf(dump_buffer,
                     "frame={level=\"%d\",addr=\"0x%08x\"}",
@@ -1149,19 +1194,21 @@ static void cmd_break_insert(const char* flow, int argc, char **argv) {
 
             const char* filename;
             int lineno;
+			char* escaped_filename = escape(s->file);
             if (debug_find_source_location(value, &filename, &lineno)) {
                 mi2_printf_response(flow, 
                     "done,bkpt={number=\"%d\",type=\"breakpoint\",disp=\"keep\",enabled=\"y\","
                     "addr=\"0x%08x\",func=\"%s\",file=\"%s\","
                     "fullname=\"%s\",thread-groups=[\"i1\"],"
-                    "times=\"0\"}", elem->number, value, s->name, s->file, s->file);
+                    "times=\"0\"}", elem->number, value, s->name, escaped_filename, escaped_filename);
             } else {
                 mi2_printf_response(flow, 
                     "done,bkpt={number=\"%d\",type=\"breakpoint\",disp=\"keep\",enabled=\"y\","
                     "addr=\"0x%08x\",func=\"%s\",file=\"%s\","
                     "fullname=\"%s\",line=\"%d\",thread-groups=[\"i1\"],"
-                    "times=\"0\"}", elem->number, value, s->name, s->file, s->file, lineno);
+                    "times=\"0\"}", elem->number, value, s->name, escaped_filename, escaped_filename, lineno);
             }
+			free(escaped_filename);
         } else {
             mi2_printf_error(flow, "Cannot break on '%s'", corrected_source);
         }

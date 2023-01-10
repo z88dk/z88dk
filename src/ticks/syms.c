@@ -180,7 +180,13 @@ void read_symbol_file(char *filename)
 
                 {
                     char fname[FILENAME_MAX];
-                    if (sscanf(argv[9], "%[^:]", fname) == 1) {
+#ifdef WIN32
+					if (sscanf(argv[9], "%c:%[^:]", fname, &fname[2]) == 2) {
+						fname[1] = ':';
+						sym->file = strdup(fname);
+					} else
+#endif
+					if (sscanf(argv[9], "%[^:]", fname) == 1) {
                         sym->file = strdup(fname);
                     } else {
                         sym->file = NULL;
