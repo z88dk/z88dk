@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include <signal.h>
 #ifdef WIN32
-#include <WinSock2.h>
+#include <winsock2.h>
 #include <io.h>
 #define F_OK 0
 #define access _access
