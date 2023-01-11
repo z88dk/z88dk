@@ -937,6 +937,12 @@ static uint8_t is_gdbserver_connected()
 static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
 {
     connection_socket = socket(AF_INET, SOCK_STREAM, 0);
+#ifdef _WIN32
+	if (connection_socket == SOCKET_ERROR) {
+		bk.debug("Socket error: %d\n", WSAGetLastError());
+		return 1;
+	}
+#endif
 
     struct sockaddr_in servaddr;
     memset(&servaddr, 0, sizeof(servaddr));
