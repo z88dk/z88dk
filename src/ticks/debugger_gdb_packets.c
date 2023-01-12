@@ -7,6 +7,7 @@
 #include <assert.h>
 #ifdef WIN32
 #include <io.h>
+#include <winsock.h>
 #else
 #include <unistd.h>
 #endif
