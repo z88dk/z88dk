@@ -4,9 +4,11 @@
 #include <stdint.h>
 #include <sys/types.h>
 
+#ifdef WIN32
+#include <winsock2.h>
+#endif
 
 #ifdef _MSC_VER
-#include <WinSock2.h>
 typedef SOCKET sock_t;
 typedef SSIZE_T ssize_t;
 #else
