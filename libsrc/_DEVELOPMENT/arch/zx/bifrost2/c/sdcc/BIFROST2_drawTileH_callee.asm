@@ -16,11 +16,12 @@ EXTERN asm_BIFROST2_drawTileH
 
 _BIFROST2_drawTileH_callee:
 
-   pop hl
+	pop hl
 	dec sp
 	pop de          ; D = lin
 	ex (sp),hl
 	ld e,l          ; E = col
 	ld a,h          ; A = tile
+	and 127         ; discard BIFROST2STATIC
 
-   jp asm_BIFROST2_drawTileH
+	jp asm_BIFROST2_drawTileH
