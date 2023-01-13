@@ -18,6 +18,7 @@ BIFROST2_drawTileH:
    	ld hl,2
    	add hl,sp
    	ld a,(hl)       ; A=tile
+   	and 127         ; discard BIFROST2STATIC
    	inc hl
    	inc hl
    	ld e,(hl)       ; E=col
@@ -25,4 +26,4 @@ BIFROST2_drawTileH:
    	inc hl
    	ld d,(hl)       ; D=lin
 
-    jp asm_BIFROST2_drawTileH        ; execute 'draw_tile'
+   	jp asm_BIFROST2_drawTileH        ; execute 'draw_tile'
