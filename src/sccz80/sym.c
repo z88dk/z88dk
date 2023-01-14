@@ -110,6 +110,7 @@ SYMBOL* addloc(
         return 0;
     }
     cptr = locptr++;
+	memset(cptr, 0, sizeof(*cptr));
     initialise_sym(cptr, sname, id, kind, STKLOC);
     cptr->ctype = type;
     cptr->level = ncmp;
