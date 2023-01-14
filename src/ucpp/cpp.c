@@ -676,12 +676,16 @@ static FILE *find_file(char *name, int localdir)
 			: current_filename;
 
 		for (i = strlen(rfn) - 1; i >= 0; i --)
-#ifdef MSDOS
+#if defined _WIN32
+			if (rfn[i] == '\\' || rfn[i] == '/') break;
+#elif defined MSDOS
 			if (rfn[i] == '\\') break;
 #else
 			if (rfn[i] == '/') break;
 #endif
-#if defined MSDOS
+#if defined _WIN32
+		if (i >= 0 && *name != '\\' && *name != '/' && (nl < 2 || name[1] != ':'))
+#elif defined MSDOS
 		if (i >= 0 && *name != '\\' && (nl < 2 || name[1] != ':'))
 #elif defined AMIGA
 		if (i >= 0 && *name != '/' && (nl < 2 || name[1] != ':'))
@@ -698,7 +702,7 @@ static FILE *find_file(char *name, int localdir)
 			 */
 			s = getmem(i + 2 + nl);
 			mmv(s, rfn, i);
-#ifdef MSDOS
+#if defined MSDOS || defined _WIN32
 			s[i] = '\\';
 #else
 			s[i] = '/';
@@ -1289,7 +1293,7 @@ include_last_chance:
 	if (alt_ls.pbuf < alt_ls.ebuf) goto include_error;
 		/* tokenizing failed */
 	goto include_macro2;
-	
+
 include_error:
 	error(l, "invalid '#include'");
 	return 1;
@@ -2465,7 +2469,7 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 		} else if (argv[i][1] != 'I' && argv[i][1] != 'J'
 			&& argv[i][1] != 'D' && argv[i][1] != 'U'
 			&& argv[i][1] != 'A' && argv[i][1] != 'B'
-			&& strncmp(argv[i]+1,"isystem",7) 
+			&& strncmp(argv[i]+1,"isystem",7)
 			&& strncmp(argv[i]+1,"iquote",6) )
 			warning(-1, "unknown option '%s'", argv[i]);
 	} else {
@@ -2546,7 +2550,7 @@ static int parse_opt(int argc, char *argv[], struct lexer_state *ls)
 	for (i = 1; i < argc; i ++) {
 		if (argv[i][0] == '-' && argv[i][1] == 'J')
 			add_incpath(argv[i][2] ? argv[i] + 2 : argv[i + 1]);
-		if (strncmp(argv[i],"-isystem",8) == 0 ) 
+		if (strncmp(argv[i],"-isystem",8) == 0 )
 			add_incpath(argv[i][8] ? argv[i] + 8 : argv[i + 1]);
 
         }
