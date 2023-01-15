@@ -174,7 +174,9 @@ __OPROTO(`b,c,d,e',`b,c,d,e',void,,BIFROST2_resetAnim4Frames,void)
 #define COL2PY_RIGHT(col)       ((col)>>1)
 
 // ----------------------------------------------------------------
-// Instantly draw a multicolor tile at the specified screen position
+// Instantly draw a multicolor tile at the specified screen position.
+// Adding value BIFROST2STATIC (or not) to tile index won't make any
+// difference since it will be drawn only once.
 //
 // Parameters:
 //     lin: pixel line (0-192)
