@@ -18,4 +18,8 @@ target/nabu/stdio/fgetc_cons.asm
 target/nabu/stdio/getk.asm
 target/nabu/stdio/vars.asm
 target/nabu/games/joystick.asm
+target/nabu/hcca/hcca
+target/nabu/hcca/hcca_ints
+target/nabu/hcca/vars
+target/nabu/retronet/retronet
 @games/games.lst
