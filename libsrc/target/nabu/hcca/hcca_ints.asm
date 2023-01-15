@@ -28,15 +28,21 @@
     EXTERN  __nabu_hcca_write_blocklen
 
     EXTERN  __nabu_hcca_rxbuf
-    EXTERN  HCCA_READBUF_SIZE
+    EXTERN  CLIB_RXBUF_SIZE
 
 
     PUBLIC  hcca_reset_write
     PUBLIC  _hcca_reset_write
     PUBLIC  hcca_write_byte
     PUBLIC  _hcca_write_byte
+    PUBLIC  hcca_writeByte
+    PUBLIC  _hcca_writeByte
+
+    
     PUBLIC  hcca_read_byte
     PUBLIC  _hcca_read_byte
+    PUBLIC  hcca_readByte
+    PUBLIC  _hcca_readByte
     PUBLIC  hcca_start_write
     PUBLIC  _hcca_start_write
     PUBLIC  hcca_start_read
@@ -50,6 +56,8 @@
 ; void hcca_write_byte(uint8_t byte)
 hcca_write_byte:
 _hcca_write_byte:
+hcca_writeByte:
+_hcca_writeByte:
     ld      hl,2
     add     hl,sp
     ld      a,(hl)
@@ -277,6 +285,8 @@ setup_read_int:
 ; uint8_t hcca_read_byte(void)
 hcca_read_byte:
 _hcca_read_byte:
+hcca_readByte:
+_hcca_readByte:
     ld      hl,(__nabu_hcca_rxpos)
     ld      de,(__nabu_hcca_rxrpos)
     and     a
@@ -289,7 +299,7 @@ _hcca_read_byte:
     ld      a,(hl)
     inc     de
     ld      a,d
-    and     +((HCCA_READBUF_SIZE -1) / 256)
+    and     +((CLIB_RXBUF_SIZE -1) / 256)
     ld      d,a
     ld      (__nabu_hcca_rxrpos),de
     ld      l,a
@@ -373,7 +383,7 @@ hcca_read_ringbuf:
     ex      de,hl
     inc     hl
     ld      a,h
-    and     +((HCCA_READBUF_SIZE -1) / 256)
+    and     +((CLIB_RXBUF_SIZE-1) / 256)
     ld      h,a
     ld      (__nabu_hcca_rxpos),hl
     pop     hl

@@ -6,6 +6,7 @@
     PUBLIC  __nabu_hcca_rxheader
     PUBLIC  __nabu_hcca_rxcount
     PUBLIC  __nabu_hcca_read_block
+    PUBLIC  __nabu_hcca_read_blocklen
     PUBLIC  __nabu_hcca_rxpos
     PUBLIC  __nabu_hcca_rxrpos
 

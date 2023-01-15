@@ -66,7 +66,7 @@ int32_t hcca_readInt32();
 /// <summary>
 /// Read bufferLen into buffer, starting at the offset
 /// </summary>
-void hcca_readBytes(uint8_t offset, uint8_t bufferLen, uint8_t* buffer);
+void hcca_readBytes(uint8_t offset, uint8_t bufferLen, void *buffer);
 
 
 
@@ -116,7 +116,7 @@ void hcca_writeString(uint8_t* str);
 /// <summary>
 /// Write to the HCCA
 /// </summary>
-void hcca_writeBytes(uint16_t offset, uint16_t length, uint8_t* bytes);
+void hcca_writeBytes(uint16_t offset, uint16_t length, void *bytes);
 
 
 

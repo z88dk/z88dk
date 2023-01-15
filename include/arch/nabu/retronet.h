@@ -133,7 +133,7 @@ typedef struct {
 /// passed to it. If the fileHandle that you passed is already in use, a new file handle will be assigned
 /// to you and returned. 
 /// </summary>
-uint8_t rn_fileOpen(uint8_t filenameLen, uint8_t* filename, uint16_t fileFlag, uint8_t fileHandle);
+uint8_t rn_fileOpen(uint8_t filenameLen, char *filename, uint16_t fileFlag, uint8_t fileHandle);
 
 /// <summary>
 /// Closes and releases the file with the specified fileHandle. The handle can be used again for another
@@ -151,7 +151,7 @@ void rn_fileHandleClose(uint8_t fileHandle);
 /// a file handle is assigned. If you want to see if a file exists without creating it first, this
 /// is the function you would use. 
 /// </summary>
-int32_t rn_fileSize(uint8_t filenameLen, uint8_t* filename);
+int32_t rn_fileSize(uint8_t filenameLen, char *filename);
 
 /// <summary>
 /// Get the file size of the specified file handle.
@@ -170,7 +170,7 @@ int32_t rn_fileHandleSize(uint8_t fileHandle);
 /// The FileDetailStruct is populated with details about the file. If the file does not exist,
 /// the FileDetailStruct->Exists will reflect that.
 /// </summary>
-void rn_fileDetails(uint8_t filenameLen, uint8_t* filename, FileDetailsStruct* s);
+void rn_fileDetails(uint8_t filenameLen, char *filename, FileDetailsStruct* s);
 
 /// <summary>
 /// Get the file details by file handle.
@@ -204,7 +204,7 @@ uint16_t rn_fileHandleRead(uint8_t fileHandle, uint8_t* buffer, uint16_t bufferO
 /// - dataLen is the length of data that will be written 
 /// - data is a pointer to the data
 /// </summary>
-void rn_fileHandleAppend(uint8_t fileHandle, uint16_t dataOffset, uint16_t dataLen, uint8_t* data);
+void rn_fileHandleAppend(uint8_t fileHandle, uint16_t dataOffset, uint16_t dataLen, void *data);
 
 /// <summary>
 /// Insert data in the file at the specified offset. This function will shift all data following the
@@ -216,7 +216,7 @@ void rn_fileHandleAppend(uint8_t fileHandle, uint16_t dataOffset, uint16_t dataL
 /// - dataLen is the length of data that will be written 
 /// - data is a pointer to the data
 /// </summary>
-void rn_fileHandleInsert(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, uint8_t* data);
+void rn_fileHandleInsert(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, void *data);
 
 /// <summary>
 /// Delete range of bytes from within file handle
@@ -245,7 +245,7 @@ void rn_fileHandleEmptyFile(uint8_t fileHandle);
 /// - dataLen is the length of data that will be written 
 /// - data is a pointer to the data
 /// </summary>
-void rn_fileHandleReplace(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, uint8_t* data);
+void rn_fileHandleReplace(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, void *data);
 
 /// <summary>
 /// Delete the physical file from the store. If the file has a handle, it is closed
@@ -253,7 +253,7 @@ void rn_fileHandleReplace(uint8_t fileHandle, uint32_t fileOffset, uint16_t data
 /// - filenameLen is the length of the filename
 /// - filename is the filename string
 /// </summary>
-void rn_fileDelete(uint8_t filenameLen, uint8_t* filename);
+void rn_fileDelete(uint8_t filenameLen, char *filename);
 
 /// <summary>
 /// Copy the src file to the dest file. The source file can be of any type (http, ftp, file) but the
@@ -307,7 +307,7 @@ void rn_fileHandleMove(uint8_t srcFilenameLen, uint8_t* srcFilename, uint8_t des
 /// 
 /// Returns the number of matching files. Call rn_fileListItem() from 0 to N
 /// </summary>
-uint16_t rn_fileList(uint8_t pathLen, uint8_t* path, uint8_t wildcardLen, uint8_t* wildcard, uint8_t fileListFlags);
+uint16_t rn_fileList(uint8_t pathLen, char *path, uint8_t wildcardLen, char *wildcard, uint8_t fileListFlags);
 
 /// <summary>
 /// Populates buffer with the size, created datetime, modified datetime, 

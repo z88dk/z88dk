@@ -30,10 +30,11 @@ int32_t hcca_readInt32() {
     ((int32_t)hcca_readByte() << 24);
 }
 
-void hcca_readBytes(uint8_t offset, uint8_t bufferLen, uint8_t* buffer) {
+void hcca_readBytes(uint8_t offset, uint8_t bufferLen, void *buffer) {
+  uint8_t *buf = buffer;
 
   for (uint8_t i = 0; i < bufferLen; i++)
-    buffer[offset + i] = hcca_readByte();
+    buf[offset + i] = hcca_readByte();
 }
 
 
@@ -71,9 +72,9 @@ void hcca_writeString(uint8_t* str) {
     hcca_writeByte(str[i]);
 }
 
-void hcca_writeBytes(uint16_t offset, uint16_t length, uint8_t* bytes) {
-
+void hcca_writeBytes(uint16_t offset, uint16_t length, void *bytes) {
+  uint8_t *buf = bytes; 
   for (uint16_t i = 0; i < length; i++)
-    hcca_writeByte(bytes[offset + i]);
+    hcca_writeByte(buf[offset + i]);
 }
 

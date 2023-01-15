@@ -48,7 +48,7 @@
 // ------------
 // **************************************************************************
 
-uint8_t rn_fileOpen(uint8_t filenameLen, uint8_t* filename, uint16_t fileFlag, uint8_t fileHandle) {
+uint8_t rn_fileOpen(uint8_t filenameLen, char *filename, uint16_t fileFlag, uint8_t fileHandle) {
 
     //0xa3
     hcca_reset_write();
@@ -74,7 +74,7 @@ void rn_fileHandleClose(uint8_t fileHandle)
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
 }
 
-int32_t rn_fileSize(uint8_t filenameLen, uint8_t* filename) {
+int32_t rn_fileSize(uint8_t filenameLen, char *filename) {
 
     //0xa8
     hcca_reset_write();
@@ -125,7 +125,7 @@ uint16_t rn_fileHandleRead(uint8_t fileHandle, uint8_t* buffer, uint16_t bufferO
     return toRead;
 }
 
-void rn_fileHandleAppend(uint8_t fileHandle, uint16_t dataOffset, uint16_t dataLen, uint8_t* data) {
+void rn_fileHandleAppend(uint8_t fileHandle, uint16_t dataOffset, uint16_t dataLen, void *data) {
 
     //0xa9
     hcca_reset_write();
@@ -138,7 +138,7 @@ void rn_fileHandleAppend(uint8_t fileHandle, uint16_t dataOffset, uint16_t dataL
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
 }
 
-void rn_fileHandleInsert(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, uint8_t* data) {
+void rn_fileHandleInsert(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, void *data) {
 
     //0xaa
     hcca_reset_write();
@@ -184,7 +184,7 @@ void rn_fileHandleEmptyFile(uint8_t fileHandle) {
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
 }
 
-void rn_fileHandleReplace(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, uint8_t* data) {
+void rn_fileHandleReplace(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, void *data) {
 
     // 0xac
 
@@ -203,7 +203,7 @@ void rn_fileHandleReplace(uint8_t fileHandle, uint32_t fileOffset, uint16_t data
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
 }
 
-void rn_fileDelete(uint8_t filenameLen, uint8_t* filename) {
+void rn_fileDelete(uint8_t filenameLen, char *filename) {
 
   // 0xad
 
@@ -255,7 +255,7 @@ void rn_fileHandleMove(uint8_t srcFilenameLen, uint8_t* srcFilename, uint8_t des
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
 }
 
-uint16_t rn_fileList(uint8_t pathLen, uint8_t* path, uint8_t wildcardLen, uint8_t* wildcard, uint8_t fileListFlags) {
+uint16_t rn_fileList(uint8_t pathLen, char *path, uint8_t wildcardLen, char *wildcard, uint8_t fileListFlags) {
 
     // 0xb1
 
@@ -332,7 +332,7 @@ void rn_fileListItem(uint16_t fileItemIndex, FileDetailsStruct* s) {
     s->Exists = (s->FileSize != -2);
 }
 
-void rn_fileDetails(uint8_t filenameLen, uint8_t* filename, FileDetailsStruct* s) {
+void rn_fileDetails(uint8_t filenameLen, char *filename, FileDetailsStruct* s) {
 
     // 0xb3
     hcca_reset_write();
