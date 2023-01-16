@@ -38,6 +38,7 @@ EXTERN ide_wait_ready, ide_wait_drq
     ;Read a block of 512 bytes (one sector) from the drive
     ;16 bit data register and store it in memory at (HL++)
 
+IF __CPU_INTEL__
     ld b,0                      ;keep iterative count in b
 .ide_rdblk
     in a,(__IO_CF_IDE_DATA)     ;read the data byte (hl++)
@@ -45,6 +46,13 @@ EXTERN ide_wait_ready, ide_wait_drq
     in a,(__IO_CF_IDE_DATA)     ;read the data byte (hl++)
     ld (hl+),a
     djnz ide_rdblk              ;keep iterative count in b
+
+ELSE
+    ld bc,__IO_CF_IDE_DATA&0xFF ;keep iterative count in b, I/O port in c
+    inir
+    inir
+
+ENDIF
 
     scf                         ;carry = 1 on return = operation ok
     ret
