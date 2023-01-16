@@ -18,18 +18,17 @@ EXTERN ide_wait_ready
 ; the main program.
 ; by writing to the __IO_CF_IDE_CONTROL register, a software reset
 ; can be initiated.
-; this is not available on the standard CF interface.
+;
 ; this should be followed with a call to "ide_init".
+; this is register not available on the standard CF interface.
 
 .ide_soft_reset
 ;   ld a,00000110b              ;no interrupt, set drives reset
 ;   out (__IO_CF_IDE_CONTROL),a
 ;   ld a,00000010b              ;no interrupt, clear drives reset
 ;   out (__IO_CF_IDE_CONTROL),a
-;   jp ide_wait_ready           ;carry set on return = operation ok
 
-    scf
-    ret
+    jp ide_wait_ready           ;carry set on return = operation ok
 
 ELSE
 
@@ -42,6 +41,7 @@ EXTERN ide_write_byte, ide_write_byte_preset
 ; Uses AF, DE
 ; by writing to the __IO_PIO_IDE_CONTROL register, a software reset
 ; can be initiated.
+;
 ; this should be followed with a call to "ide_init".
 
 .ide_soft_reset
