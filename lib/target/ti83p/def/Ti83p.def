@@ -460,7 +460,7 @@ DEFC _LoadPattern =	$4CB1
 DEFC _LogX =		$40AE
 
 DEFC _Max =		$4057
-DEFC	MemFree =		$42E5
+DEFC _MemChk =		$42E5
 DEFC _MemClear =	$4C30
 DEFC _MemSet =		$4C33
 DEFC _Min =		$4054

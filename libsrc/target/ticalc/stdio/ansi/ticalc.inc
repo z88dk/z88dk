@@ -49,13 +49,19 @@ IF FORti83p
 	defc char_dots	= 3
 	defc TIALPHAKEY	= $30
 	defc getkey	= $4972
-	
+
 	defc ti_putchar = $4504
 	defc ti_scroll  = $452E
 	defc ti_x_text	= $844C
 	defc ti_y_text	= $844B
 	defc ti_maxx_t	= 15
 	defc ti_maxy_t	= 7
+
+	defc ti_putchar_small = $455E
+	defc ti_x_text_small  = $86D7
+	defc ti_y_text_small  = $86D8
+	defc ti_maxx_t_small  = (95 - 5) ; subtract a margin to avoid losing chars
+	defc ti_maxy_t_small  = 63
 ENDIF
 
 ; TI 85 and TI 86 can go up to 42 columns if char_dots is set to 3

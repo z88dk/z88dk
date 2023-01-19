@@ -41,6 +41,7 @@
 	INCLUDE	"zcc_opt.def"	; Receive all compiler-defines
 
 	defc	CONSOLE_ROWS = 8
+	defc    CONSOLE_COLUMNS = 21
         defc    TAR__clib_exit_stack_size = 3
         defc    TAR__register_sp = -1
 	defc	__CPU_CLOCK = 6000000

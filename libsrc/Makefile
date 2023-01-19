@@ -580,6 +580,7 @@ ti82_clib.lib:
 	@echo '--- Building TI82 Library ---'
 	@echo ''
 	$(MAKE) -C target/ticalc clean
+	$(MAKE) -C target/ticalc
 	$(call buildgeneric,ti82,"gray narrow")
 	$(RM) games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti82
@@ -590,6 +591,7 @@ ti83_clib.lib:
 	@echo '--- Building TI83 Library ---'
 	@echo ''
 	$(MAKE) -C target/ticalc clean
+	$(MAKE) -C target/ticalc
 	$(call buildgeneric,ti83,"gray narrow")
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti83
@@ -600,6 +602,7 @@ ti83p_clib.lib:
 	@echo '--- Building TI83+ Library ---'
 	@echo ''
 	$(MAKE) -C target/ticalc clean
+	$(MAKE) -C target/ticalc
 	$(call buildgeneric,ti8x,"gray narrow")
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti8x
@@ -610,6 +613,7 @@ ti85_clib.lib:
 	@echo '--- Building TI85 Library ---'
 	@echo ''
 	$(MAKE) -C target/ticalc clean
+	$(MAKE) -C target/ticalc
 	$(call buildgeneric,ti85,"gray narrow")
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti85
@@ -620,6 +624,7 @@ ti86_clib.lib:
 	@echo '--- Building TI86 Library ---'
 	@echo ''
 	$(MAKE) -C target/ticalc clean
+	$(MAKE) -C target/ticalc
 	$(call buildgeneric,ti86,"gray narrow")
 	$(RM) -f games/ticalc/*.o
 	$(MAKE) -C games TARGET=ti86

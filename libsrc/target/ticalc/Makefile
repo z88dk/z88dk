@@ -2,11 +2,12 @@ include ../../Make.config
 
 TARGET ?= ti82
 
-SUBDIRS = 
+SUBDIRS = fcntl
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 ASMFILES = $(wildcard *.asm)
-OBJECTS = $(ASMFILES:.asm=.o)
+CFILES = $(wildcard *.c)
+OBJECTS = $(ASMFILES:.asm=.o) $(CFILES:.c=.o)
 
 all: dirs subdirs-all $(addprefix obj/$(TARGET)/,$(OBJECTS))
 
@@ -23,6 +24,10 @@ clean: subdirs-clean
 	$(RM) */*/*.o
 
 subdirs-clean: $(CLEANDIRS)
+
+obj/$(TARGET)/%.o: %.c
+	@$(CC) -DFOR$(TARGET) -I../..  $^
+	@mv $(^:.asm=.o) $@
 
 obj/$(TARGET)/%.o: %.asm
 	@$(ASSEMBLER) -DFOR$(TARGET) -I../..  $^

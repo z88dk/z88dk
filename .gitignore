@@ -25,6 +25,7 @@ lib/**/*.lib
 libsrc/**/*.lib
 src/**/*.lib
 bin/
+/bin
 examples/c128/SGDEMO.T64
 examples/console/_dir.txt
 examples/console/build/
