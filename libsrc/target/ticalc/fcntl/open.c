@@ -22,6 +22,7 @@ static unsigned int create_app_var(char *name, unsigned int length) {
 	ld h,(iy+1)
 
 ; Compare length requested with available memory
+	or a
 	sbc hl,de
 	add hl,de
 	jr c,_create_app_var_enough_memory

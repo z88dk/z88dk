@@ -21,6 +21,7 @@ unsigned char _ti_insert_mem(void* dst, unsigned int length) {
 	ld h,(iy+1)
 
 ; Compare length requested with available memory
+	or a
 	sbc hl,de
 	add hl,de
 	jr c,_insert_mem_enough_memory
