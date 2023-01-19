@@ -2,7 +2,6 @@ target/ticalc/stdio/fputc_cons
 target/ticalc/stdio/fgetc_cons
 target/ticalc/stdio/getk
 target/ticalc/stdio/getk_decode
-target/ticalc/stdio/ti_set_small_text
 @stdio/ansicore.lst
 target/ticalc/stdio/ansi/f_ansi_attr
 target/ticalc/stdio/ansi/f_ansi_bel
@@ -10,7 +9,6 @@ target/ticalc/stdio/ansi/f_ansi_char
 target/ticalc/stdio/ansi/f_ansi_cls
 target/ticalc/stdio/ansi/f_ansi_dline
 target/ticalc/stdio/ansi/f_ansi_scrollup
-target/ticalc/stdio/conio/console_coords
 @stdio/stdio.lst
 @target/ticalc/tigray.lst
 target/ticalc/graphics/clg
