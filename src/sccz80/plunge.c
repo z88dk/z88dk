@@ -407,7 +407,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if ( lval2->is_const && kind_is_integer(lval->val_type) ) {
             doconstoper = 1;
 	    if ( lval2->ltype->isunsigned ) {
-                const_val = (uint64_t)lval2->const_val;
+                const_val = (uint64_t)(int64_t)lval2->const_val;
 	    } else if (lval2->const_val > (long double)LLONG_MAX ) {
                 const_val = (int64_t)(uint64_t)lval2->const_val;
 	    } else {
