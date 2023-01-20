@@ -4,7 +4,7 @@
 ;
 ;       9/12/02 - Stefano Bodrato
 ;
-;       $Id: float.asm,v 1.7 2016-06-22 19:59:18 dom Exp $
+;       $Id: float.asm $
 ;
 
 
@@ -42,28 +42,6 @@ ENDIF
 		EXTERN	l_long_neg
 		
 .float
-IF TINYMODE
-
-	ld	b,h
-	ld	c,l
-	bit	7,d		; is it	negative ?
-	push	af
-	call	ZXFP_STACK_BC 
-	pop	af
-	jr	z,nointneg
-
-	rst	ZXFP_BEGIN_CALC
-IF FORlambda
-	defb	ZXFP_NEGATE + 128
-ELSE
-	defb	ZXFP_NEGATE
-	defb	ZXFP_END_CALC
-ENDIF
-
-.nointneg
-	
-
-ELSE
 	bit	7,d
 	push	af
 	call	nz,l_long_neg
@@ -87,7 +65,6 @@ IF FORlambda
 ELSE
 	defb	ZXFP_ADDITION
 	defb	ZXFP_END_CALC
-ENDIF
 
 	pop	af
 	jr	z,nointneg
