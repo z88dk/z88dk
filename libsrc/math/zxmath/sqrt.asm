@@ -4,11 +4,11 @@
 ;
 ;       10/12/02 - Stefano Bodrato
 ;
-;       $Id: sqrt.asm,v 1.5 2016-06-22 19:59:18 dom Exp $
+;       $Id: sqrt.asm $
 ;
 
 
-;double sqrt(double)  
+;double sqrt(double)
 ;Number in FA..
 
 
@@ -33,6 +33,15 @@ ENDIF
 
 .sqrt
         call    fsetup1
+
+; In C the square root of a negative number forces ZERO.
+; SQR( (ABS(N)+N) / 2 ) does the trick
+	defb	ZXFP_DUPLICATE
+	defb	ZXFP_ABS
+	defb	ZXFP_ADDITION
+	defb	ZXFP_STK_HALF
+	defb	ZXFP_MULTIPLY
+
 IF FORlambda
 	defb	ZXFP_SQR + 128
 ELSE
