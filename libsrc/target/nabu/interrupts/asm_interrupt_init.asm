@@ -35,8 +35,6 @@ asm_interrupt_init:
     ldir
     ld      a,PSG_REG_IO_A
     out     (IO_AY_LATCH),a
-    in      a,(IO_AY_DATA)
-    ld      (old_enabled),a
     ei
 cpm_platform_init:
     ret
@@ -149,8 +147,8 @@ handle_vdp:
     ld     hl,old_ints
     ld     bc,16
     ldir
-    ld     a,(old_enabled)
-    ld     l,a
+    ; Restore the keyboard + VDP interrupt (CP/M enables both of these)
+    ld     l,INT_MASK_VDP | INT_MASK_KEYBOARD
     call   nabu_set_interrupts
     ei
 
@@ -168,5 +166,4 @@ def_ints:
 
 SECTION bss_clib
 
-old_enabled: defb 0
 old_ints: defs 16

@@ -6,6 +6,9 @@
 
     SECTION code_clib
 
+    EXTERN  nabu_disable_interrupt
+    EXTERN  nabu_enable_interrupt
+
     EXTERN  __nabu_hcca_rxmode
     EXTERN  __nabu_hcca_rxfinished
     EXTERN  __nabu_hcca_rxheader
@@ -86,15 +89,8 @@ _hcca_reset_write:
     ld      (__nabu_hcca_txpos),hl
     ld      hl,0
     ld      (__nabu_hcca_txcount),hl
-    ld      a, PSG_REG_IO_A
-    out     (IO_AY_LATCH), a
-    in      a, (IO_AY_DATA)
-    and     ~INT_MASK_HCCATX
-    push    af
-    ld      a, PSG_REG_IO_A
-    out     (IO_AY_LATCH), a
-    pop     af
-    out     (IO_AY_DATA), a
+    ld      l,INT_MASK_HCCATX
+    call    nabu_disable_interrupt
     ei
     ret
 
@@ -136,15 +132,8 @@ _hcca_start_write:
     ld      (hl),e
     inc     hl
     ld      (hl),d
-    ld      a, PSG_REG_IO_A
-    out     (IO_AY_LATCH), a
-    in      a, (IO_AY_DATA)
-    or      INT_MASK_HCCATX
-    push    af
-    ld      a, PSG_REG_IO_A
-    out     (IO_AY_LATCH), a
-    pop     af
-    out     (IO_AY_DATA), a
+    ld      l,INT_MASK_HCCATX
+    call    nabu_enable_interrupt
     ei
     ret
 
@@ -185,15 +174,8 @@ finished_writing:
     ; Signal that we've finished writing
     ld      (__nabu_hcca_txfinished),a      ;a != 0
     ; Finished writing, disable the interrupt
-    ld      a, PSG_REG_IO_A
-    out     (IO_AY_LATCH), a
-    in      a, (IO_AY_DATA)
-    and     ~INT_MASK_HCCATX
-    push    af
-    ld      a, PSG_REG_IO_A
-    out     (IO_AY_LATCH), a
-    pop     af
-    out     (IO_AY_DATA), a
+    ld      l,INT_MASK_HCCATX
+    call    nabu_disable_interrupt
 not_finished_tx:
     pop     hl
     pop     af
@@ -256,25 +238,19 @@ setup_read_header:
 setup_read_rb:
     ld      hl,0
     ld      (__nabu_hcca_rxpos),hl
+    ld      (__nabu_hcca_rxrpos),hl
 
     
 setup_read_int:
     ld      a,i
     ld      h,a
-    ld      l,4
+    ld      l,0
     ld      de,hcca_read_int
     ld      (hl),e
     inc     hl
     ld      (hl),d
-    ld      a, PSG_REG_IO_A
-    out     (IO_AY_LATCH), a
-    in      a, (IO_AY_DATA)
-    or      INT_MASK_HCCARX
-    push    af
-    ld      a, PSG_REG_IO_A
-    out     (IO_AY_LATCH), a
-    pop     af
-    out     (IO_AY_DATA), a
+    ld      l,INT_MASK_HCCARX
+    call    nabu_enable_interrupt
     ei
     ret
 
@@ -296,14 +272,13 @@ _hcca_readByte:
     jr      z,hcca_read_byte
     ld      hl,__nabu_hcca_rxbuf
     add     hl,de
-    ld      a,(hl)
+    ld      l,(hl)
+    ld      h,0
     inc     de
     ld      a,d
     and     +((CLIB_RXBUF_SIZE -1) / 256)
     ld      d,a
     ld      (__nabu_hcca_rxrpos),de
-    ld      l,a
-    ld      h,0
     ret
 
 ead_mode:
@@ -354,16 +329,9 @@ signal_block_read:
     ld      hl,__nabu_hcca_rxheader
     ld      (__nabu_hcca_rxpos),hl
 
-    ; Finished reading, disable the interrupt
-    ; ld      a, PSG_REG_IO_A
-    ; out     (IO_AY_LATCH), a
-    ; in      a, (IO_AY_DATA)
-    ; and     ~INT_MASK_HCCARX
-    ; push    af
-    ; ld      a, PSG_REG_IO_A
-    ; out     (IO_AY_LATCH), a
-    ; pop     af
-    ; out     (IO_AY_DATA), a
+    ld      l,INT_MASK_HCCARX
+    call    nabu_disable_interrupt
+
 
 continue_reading:
     pop     hl
