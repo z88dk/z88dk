@@ -4,7 +4,7 @@
 ;
 ;       8/12/02 - Stefano Bodrato
 ;
-;       $Id: pow.asm,v 1.5 2016-06-22 19:59:18 dom Exp $
+;       $Id: pow.asm $
 ;
 ;double pow(double x,double y)  
 ;y is in the FA
@@ -33,6 +33,12 @@ ENDIF
 
 .pow
         call    fsetupf
+
+	; deal with negative exponents and force them to positive
+	defb	ZXFP_EXCHANGE
+	defb	ZXFP_ABS
+	defb	ZXFP_EXCHANGE
+
 IF FORlambda
 	defb	ZXFP_TO_POWER + 128
 ELSE
