@@ -12,7 +12,6 @@
 
 
 
-    PUBLIC  __nabu_hcca_txbuf
     PUBLIC  __nabu_hcca_txcount
     PUBLIC  __nabu_hcca_txpos
     PUBLIC  __nabu_hcca_txmode
@@ -20,10 +19,6 @@
     PUBLIC  __nabu_hcca_write_blocklen
     PUBLIC  __nabu_hcca_txfinished
 
-
-; TODO: Externalise this buffer size?
-__nabu_hcca_txbuf:
-    defs    256
 
 __nabu_hcca_txcount:
     defw    0
@@ -79,9 +74,3 @@ __nabu_hcca_read_blocklen:
 ; Ringbuffer: Offset within the ringbuffer for reading
 __nabu_hcca_rxrpos:
     defw    0
-
-; Ringbuffer: Buffer to read into 
-__nabu_hcca_rxbuf:
-    defs    0
-
-

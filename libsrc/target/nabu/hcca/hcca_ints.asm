@@ -42,7 +42,8 @@
     PUBLIC  _hcca_writeByte
     PUBLIC  hcca_write_wait_finished
     PUBLIC  _hcca_write_wait_finished
-
+    PUBLIC  hcca_read_wait_finished
+    PUBLIC  _hcca_read_wait_finished
     
     PUBLIC  hcca_read_byte
     PUBLIC  _hcca_read_byte
@@ -146,6 +147,13 @@ _hcca_write_wait_finished:
     ld      a,(__nabu_hcca_txfinished)
     and     a
     jr      z,hcca_write_wait_finished
+    ret
+
+hcca_read_wait_finished:
+_hcca_read_wait_finished:
+    ld      a,(__nabu_hcca_rxfinished)
+    and     a
+    jr      z,hcca_read_wait_finished
     ret
 
 ;
