@@ -72,6 +72,7 @@ void rn_fileHandleClose(uint8_t fileHandle)
 
     hcca_writeByte(fileHandle);
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
+    hcca_write_wait_finished();
 }
 
 int32_t rn_fileSize(uint8_t filenameLen, char *filename) {
@@ -136,6 +137,7 @@ void rn_fileHandleAppend(uint8_t fileHandle, uint16_t dataOffset, uint16_t dataL
     hcca_writeUInt16(dataLen);
     hcca_writeBytes(dataOffset, dataLen, data);
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
+    hcca_write_wait_finished();
 }
 
 void rn_fileHandleInsert(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, void *data) {
@@ -153,6 +155,8 @@ void rn_fileHandleInsert(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataO
     hcca_writeUInt16(dataLen);
 
     hcca_start_write(HCCA_MODE_HDR, data + dataOffset, dataLen);
+
+    hcca_write_wait_finished();
 }
 
 void rn_fileHandleDeleteRange(uint8_t fileHandle, uint32_t fileOffset, uint16_t deleteLen) {
@@ -170,7 +174,7 @@ void rn_fileHandleDeleteRange(uint8_t fileHandle, uint32_t fileOffset, uint16_t 
 
     hcca_writeUInt16(deleteLen);
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
-
+    hcca_write_wait_finished();
 }
 
 void rn_fileHandleEmptyFile(uint8_t fileHandle) {
@@ -182,6 +186,7 @@ void rn_fileHandleEmptyFile(uint8_t fileHandle) {
 
     hcca_writeByte(fileHandle);
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
+    hcca_write_wait_finished();
 }
 
 void rn_fileHandleReplace(uint8_t fileHandle, uint32_t fileOffset, uint16_t dataOffset, uint16_t dataLen, void *data) {
@@ -201,6 +206,7 @@ void rn_fileHandleReplace(uint8_t fileHandle, uint32_t fileOffset, uint16_t data
 
     hcca_writeBytes(dataOffset, dataLen, data);
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
+    hcca_write_wait_finished();
 }
 
 void rn_fileDelete(uint8_t filenameLen, char *filename) {
@@ -215,6 +221,7 @@ void rn_fileDelete(uint8_t filenameLen, char *filename) {
 
     hcca_writeBytes(0, filenameLen, filename);
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
+    hcca_write_wait_finished();
 }
 
 void rn_fileHandleCopy(uint8_t srcFilenameLen, uint8_t* srcFilename, uint8_t destFilenameLen, uint8_t* destFilename, uint8_t copyMoveFlag) {
@@ -235,6 +242,7 @@ void rn_fileHandleCopy(uint8_t srcFilenameLen, uint8_t* srcFilename, uint8_t des
 
     hcca_writeByte(copyMoveFlag);
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
+    hcca_write_wait_finished();
 }
 
 void rn_fileHandleMove(uint8_t srcFilenameLen, uint8_t* srcFilename, uint8_t destFilenameLen, uint8_t* destFilename, uint8_t copyMoveFlag) {
@@ -253,6 +261,7 @@ void rn_fileHandleMove(uint8_t srcFilenameLen, uint8_t* srcFilename, uint8_t des
 
     hcca_writeByte(copyMoveFlag);
     hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
+    hcca_write_wait_finished();
 }
 
 uint16_t rn_fileList(uint8_t pathLen, char *path, uint8_t wildcardLen, char *wildcard, uint8_t fileListFlags) {
@@ -412,6 +421,7 @@ uint16_t rn_fileHandleReadSeq(uint8_t fileHandle, uint8_t* buffer, uint16_t buff
     hcca_writeByte(fileHandle);
 
     hcca_writeUInt16(readLength);
+    hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
 
     uint16_t toRead = hcca_readUInt16();
 
@@ -434,6 +444,7 @@ uint32_t rn_fileHandleSeek(uint8_t fileHandle, int32_t offset, uint8_t seekOptio
     hcca_writeInt32(offset);
 
     hcca_writeByte(seekOption);
+    hcca_start_write(HCCA_MODE_BLOCK, NULL, 0);
 
     return hcca_readUInt32();
 }

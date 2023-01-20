@@ -40,6 +40,8 @@
     PUBLIC  _hcca_write_byte
     PUBLIC  hcca_writeByte
     PUBLIC  _hcca_writeByte
+    PUBLIC  hcca_write_wait_finished
+    PUBLIC  _hcca_write_wait_finished
 
     
     PUBLIC  hcca_read_byte
@@ -125,6 +127,8 @@ _hcca_start_write:
     ld      (__nabu_hcca_write_block),de
     ld      a,(hl)
     ld      (__nabu_hcca_txmode),a
+    xor     a
+    ld      (__nabu_hcca_txfinished),a
     ld      a,i
     ld      h,a
     ld      l,2
@@ -137,6 +141,12 @@ _hcca_start_write:
     ei
     ret
 
+hcca_write_wait_finished:
+_hcca_write_wait_finished:
+    ld      a,(__nabu_hcca_txfinished)
+    and     a
+    jr      z,hcca_write_wait_finished
+    ret
 
 ;
 ; For writing we setup variables:

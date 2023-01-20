@@ -12,6 +12,7 @@
 extern void hcca_reset_write(void);
 extern void hcca_start_write(uint8_t mode, void *buf, size_t buflen);
 extern void hcca_start_read(uint8_t mode, void *buf, size_t buflen);
+extern void hcca_write_wait_finished(void);
 
 // **************************************************************************
 // HCCA Receive
