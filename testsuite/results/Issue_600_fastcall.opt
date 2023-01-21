@@ -15,9 +15,7 @@
 	ld	e,l
 	push	de
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	push	hl
 	call	_func
 	pop	bc
@@ -33,9 +31,7 @@
 	ld	hl,4	;const
 	add	hl,sp
 	call	l_glong2sp
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	push	hl
 	call	_func
 	pop	bc
@@ -53,9 +49,7 @@
 	ld	e,l
 	push	de
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	push	hl
 	call	_func
 	pop	bc

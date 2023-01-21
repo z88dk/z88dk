@@ -27,9 +27,7 @@
 	call	l_declong
 	push	de
 	push	hl
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	dec	hl
 	push	hl
 	call	_BottomUpTree
@@ -45,9 +43,7 @@
 	rl	d
 	push	de
 	push	hl
-	ld	hl,8	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint8sp	;
 	dec	hl
 	push	hl
 	call	_BottomUpTree

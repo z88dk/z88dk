@@ -68,9 +68,7 @@
 	push	hl
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	push	hl
 	ld	a,3
 	call	printf
@@ -140,9 +138,7 @@
 	push	hl
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	push	hl
 	ld	a,3
 	call	printf

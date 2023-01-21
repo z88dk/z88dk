@@ -1,0 +1,128 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._check1
+	call	l_gint8sp	;
+	add	hl,hl
+	push	hl
+	call	l_gint8sp	;
+	ld	b,h
+	ld	c,l
+	add	hl,bc
+	add	hl,bc
+	pop	de
+	add	hl,de
+	push	hl
+	call	l_gint6sp	;
+	add	hl,hl
+	add	hl,hl
+	pop	de
+	add	hl,de
+	push	hl
+	call	l_gint4sp	;
+	ld	b,h
+	ld	c,l
+	add	hl,hl
+	add	hl,hl
+	add	hl,bc
+	pop	de
+	add	hl,de
+	ret
+
+
+
+._check_gchar
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	call	l_gchar
+	push	hl
+	call	l_gint4sp	;
+	call	l_gchar1
+	pop	de
+	add	hl,de
+	push	hl
+	call	l_gint4sp	;
+	call	l_gchar2
+	pop	de
+	add	hl,de
+	push	hl
+	call	l_gint4sp	;
+	call	l_gchar3
+	pop	de
+	add	hl,de
+	push	hl
+	call	l_gint4sp	;
+	call	l_gchar4
+	pop	de
+	add	hl,de
+	push	hl
+	call	l_gint4sp	;
+	call	l_gchar5
+	pop	de
+	add	hl,de
+	ret
+
+
+
+._check_gint
+	pop	bc
+	pop	hl
+	push	hl
+	push	bc
+	ld	e,(hl)
+	inc	hl
+	ld	d,(hl)
+	push	de
+	call	l_gint4sp	;
+	call	l_gint2	;
+	pop	de
+	add	hl,de
+	push	hl
+	call	l_gint4sp	;
+	call	l_gint4	;
+	pop	de
+	add	hl,de
+	push	hl
+	call	l_gint4sp	;
+	call	l_gint6	;
+	pop	de
+	add	hl,de
+	push	hl
+	call	l_gint4sp	;
+	call	l_gint8	;
+	pop	de
+	add	hl,de
+	push	hl
+	call	l_gint4sp	;
+	ld	bc,10
+	add	hl,bc
+	call	l_gint	;
+	pop	de
+	add	hl,de
+	ret
+
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_check1
+	GLOBAL	_check_gchar
+	GLOBAL	_check_gint
+
+
+
+

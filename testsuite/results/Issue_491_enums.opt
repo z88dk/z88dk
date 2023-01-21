@@ -20,9 +20,7 @@
 	pop	bc
 	push	hl
 	ld	hl,(_editedNoteStep)
-	ld	bc,5
-	add	hl,bc
-	call	l_gint	;
+	call	l_gint5	;
 	pop	bc
 	push	hl
 	ld	hl,1	;const

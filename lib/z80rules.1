@@ -6837,3 +6837,87 @@ $notcpu 8085
 	ld	hl,%1
 	%3c	(hl)
 	ld	hl,%2
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+	inc	hl
+	inc	hl
+	inc	hl
+	call	l_gint	;
+=
+	call	l_gint3	;
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+	inc	hl
+	inc	hl
+	call	l_gint	;
+=
+	call	l_gint2	;
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+	inc	hl
+	call	l_gint	;
+=
+	call	l_gint1	;
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+%check 4 <= %1 <= 8
+	ld	bc,%1
+	add	hl,bc
+	call	l_gint	;
+=
+	call	l_gint%1	;
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+%check 1 <= %1 <= 8
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;
+=
+	call	l_gint%1sp	;
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+	inc	hl
+	inc	hl
+	inc	hl
+	call	l_gchar
+=
+	call	l_gchar3
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+	inc	hl
+	inc	hl
+	call	l_gchar
+=
+	call	l_gchar2
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+	inc	hl
+	call	l_gchar
+=
+	call	l_gchar1
+
+%notcpu 8085
+%notcpu r2ka
+%notcpu r3k
+%check 4 <= %1 <= 8
+	ld	bc,%1
+	add	hl,bc
+	call	l_gchar
+=
+	call	l_gchar%1

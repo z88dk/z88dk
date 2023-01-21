@@ -29,12 +29,9 @@
 	jp	nc,i_3	;
 	push	bc
 	push	bc
-	ld	hl,4	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
-	ld	hl,5
+	call	l_gint4sp	;
+	ld	de,5
+	ex	de,hl
 	call	l_ge
 	jp	nc,i_5	;
 	pop	bc
@@ -43,9 +40,7 @@
 .i_5
 	ld	hl,i_1+0
 	push	hl
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	push	hl
 	ld	a,2
 	call	printf
