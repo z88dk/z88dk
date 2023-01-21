@@ -429,7 +429,7 @@ _m32_logf:
 	add	ix,sp
 	ld	c, l
 	ld	b, h
-	ld	hl, -18
+	ld	hl, -22
 	add	hl, sp
 	ld	sp, hl
 	ld	(ix-6),c
@@ -448,11 +448,18 @@ _m32_logf:
 	call	___fslt_callee
 	bit	0,l
 	jr	NZ,l_m32_logf_00102
-	ld	de,0xff00
-	ld	hl,0x0000
+	ld	a,0xff
+	ld	(ix-22),a
+	ld	(ix-21),a
+	ld	(ix-20),a
+	ld	(ix-19),a
+	pop	hl
+	push	hl
+	ld	e,(ix-20)
+	ld	d,(ix-19)
 	jp	l_m32_logf_00106
 l_m32_logf_00102:
-	ld	hl,16
+	ld	hl,20
 	add	hl, sp
 	push	hl
 	ld	l,(ix-4)
@@ -494,7 +501,8 @@ l_m32_logf_00102:
 	push	de
 	push	hl
 	call	___fssub_callee
-	ex	(sp), hl
+	ld	(ix-18),l
+	ld	(ix-17),h
 	ld	(ix-16),e
 	ld	(ix-15),d
 	jr	l_m32_logf_00105
@@ -506,12 +514,13 @@ l_m32_logf_00104:
 	push	de
 	push	bc
 	call	___fssub_callee
-	ex	(sp), hl
+	ld	(ix-18),l
+	ld	(ix-17),h
 	ld	(ix-16),e
 	ld	(ix-15),d
 l_m32_logf_00105:
-	pop	hl
-	push	hl
+	ld	l,(ix-18)
+	ld	h,(ix-17)
 	ld	e,(ix-16)
 	ld	d,(ix-15)
 	call	_m32_sqrf

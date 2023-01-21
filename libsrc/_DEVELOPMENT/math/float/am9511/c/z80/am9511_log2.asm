@@ -398,6 +398,11 @@ ENDIF
 ; Function am9511_log2
 ; ---------------------------------
 _am9511_log2:
+	push	ix
+	ld	ix,0
+	add	ix,sp
+	push	af
+	push	af
 	push	hl
 	ld	c,l
 	ld	b,h
@@ -412,8 +417,15 @@ _am9511_log2:
 	pop	bc
 	bit	0, l
 	jr	NZ,l_am9511_log2_00102
-	ld	de,0xdeff
-	ld	hl,0x59ef
+	ld	a,0xff
+	ld	(ix-4),a
+	ld	(ix-3),a
+	ld	(ix-2),a
+	ld	(ix-1),a
+	pop	hl
+	push	hl
+	ld	e,(ix-2)
+	ld	d,(ix-1)
 	jr	l_am9511_log2_00103
 l_am9511_log2_00102:
 	ld	l, c
@@ -427,5 +439,7 @@ l_am9511_log2_00102:
 	push	hl
 	call	___fsmul_callee
 l_am9511_log2_00103:
+	ld	sp, ix
+	pop	ix
 	ret
 	SECTION IGNORE

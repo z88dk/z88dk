@@ -17,10 +17,11 @@
 #define MAXL10_F16              (+4.816)            /* 0x44D1 */
 #define MINL10_F16              (-4.215)            /* 0xC437 */
 
-#define HUGE_VAL_F16            (0x7C00)
-#define INFINITY_POS_F16        (0x7C00)
-#define INFINITY_NEG_F16        (0xFC00)
-
+#define HUGE_VAL_F16            ((unsigned int)0x7C00)
+#define INFINITY_POS_F16        ((unsigned int)0x7C00)
+#define INFINITY_NEG_F16        ((unsigned int)0xFC00)
+#define NAN_POS_F16             ((unsigned int)0x7FFF)
+#define NAN_NEG_F16             ((unsigned int)0xFFFF)
 
 /* Conversion functions */
 #ifdef __SCCZ80

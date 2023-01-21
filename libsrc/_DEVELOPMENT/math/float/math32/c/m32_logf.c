@@ -49,13 +49,21 @@ extern float m32_coeff_logf[];
 
 float m32_logf (float x) __z88dk_fastcall
 {
-    float y, z, floate;
+    union fl32 {
+        float f;
+        uint32_t l;
+    };
+
+    float y, z;
+    float floate;
     int16_t e;
 
     /* Test for domain */
     if( x <= 0.0 )
     {
-        return( HUGE_NEG_F32 );
+        union fl32 fl;
+        fl.l = NAN_NEG_F32;
+        return fl.f;
     }
 
     x = m32_frexpf(x, &e);

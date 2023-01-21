@@ -25,9 +25,11 @@
 #define MAXL10_F32          (+18.9638)
 #define MINL10_F32          (−19.5686)
 
-#define HUGE_VAL_F32        (0x7F800000)
-#define INFINITY_POS_F32    (0x7F800000)
-#define INFINITY_NEG_F32    (0xFF800000)
+#define HUGE_VAL_F32        ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32    ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32    ((unsigned long)0xFF800000)
+#define NAN_POS_F32         ((unsigned long)0x7FFFFFFF)
+#define NAN_NEG_F32         ((unsigned long)0xFFFFFFFF)
 
 #ifdef __SCCZ80
 

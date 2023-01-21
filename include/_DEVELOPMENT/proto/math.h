@@ -123,29 +123,33 @@ typedef _Float16 half_t;
 #define MAXL10_F32              (+18.9638)
 #define MINL10_F32              (−19.5686)
 
-#define HUGE_VAL_F32           (0x7F800000)
-#define INFINITY_POS_F32       (0x7F800000)
-#define INFINITY_NEG_F32       (0xFF800000)
+#define HUGE_VAL_F32            ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32        ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32        ((unsigned long)0xFF800000)
+#define NAN_POS_F32             ((unsigned long)0x7FFFFFFF)
+#define NAN_NEG_F32             ((unsigned long)0xFFFFFFFF)
 
 #endif
 
 #ifdef __MATH_MATH32
 
-#define HUGE_POS_F32           (+3.4028234664E+38)
-#define TINY_POS_F32           (+1.1754943508E−38)
-#define HUGE_NEG_F32           (-1.7014118346E+38)
-#define TINY_NEG_F32           (-1.1754943508E-38)
+#define HUGE_POS_F32            (+3.4028234664E+38)
+#define TINY_POS_F32            (+1.1754943508E−38)
+#define HUGE_NEG_F32            (-1.7014118346E+38)
+#define TINY_NEG_F32            (-1.1754943508E-38)
 
-#define MAXL2_F32              (+127.999999914)
-#define MINL2_F32              (-126.0)
-#define MAXLOG_F32             (+88.722839052)
-#define MINLOG_F32             (−87.336544751)
-#define MAXL10_F32             (+38.230809449)
-#define MINL10_F32             (−37.929779454)
+#define MAXL2_F32               (+127.999999914)
+#define MINL2_F32               (-126.0)
+#define MAXLOG_F32              (+88.722839052)
+#define MINLOG_F32              (−87.336544751)
+#define MAXL10_F32              (+38.230809449)
+#define MINL10_F32              (−37.929779454)
 
-#define HUGE_VAL_F32           (0x7F800000)
-#define INFINITY_POS_F32       (0x7F800000)
-#define INFINITY_NEG_F32       (0xFF800000)
+#define HUGE_VAL_F32            ((unsigned long)0x7F800000)
+#define INFINITY_POS_F32        ((unsigned long)0x7F800000)
+#define INFINITY_NEG_F32        ((unsigned long)0xFF800000)
+#define NAN_POS_F32             ((unsigned long)0x7FFFFFFF)
+#define NAN_NEG_F32             ((unsigned long)0xFFFFFFFF)
 
 #endif
 
@@ -163,9 +167,11 @@ typedef _Float16 half_t;
 #define MAXL10_F16              (+4.816)            /* 0x44D1 */
 #define MINL10_F16              (-4.215)            /* 0xC437 */
 
-#define HUGE_VAL_F16            (0x7C00)
-#define INFINITY_POS_F16        (0x7C00)
-#define INFINITY_NEG_F16        (0xFC00)
+#define HUGE_VAL_F16            ((unsigned int)0x7C00)
+#define INFINITY_POS_F16        ((unsigned int)0x7C00)
+#define INFINITY_NEG_F16        ((unsigned int)0xFC00)
+#define NAN_POS_F16             ((unsigned int)0x7FFF)
+#define NAN_NEG_F16             ((unsigned int)0xFFFF)
 
 #endif
 
