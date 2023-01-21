@@ -465,8 +465,8 @@ void debugger()
                         uint8_t* lc;
                         uint8_t* hc;
 #ifdef __BIG_ENDIAN__
-                        lc = ((uint8_t *)search->word(&regs)) + 1;
-                    hc = ((uint8_t *)search->word(&regs));
+                        lc = ((uint8_t *)r->word(&regs)) + 1;
+                        hc = ((uint8_t *)r->word(&regs));
 #else
                         hc = ((uint8_t *)r->word(&regs)) + 1;
                         lc = ((uint8_t *)r->word(&regs));
