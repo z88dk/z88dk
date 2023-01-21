@@ -4,6 +4,7 @@
 
 		PUBLIC		generic_console_cls
 		PUBLIC		generic_console_printc
+		PUBLIC		generic_console_plotc
 		PUBLIC		generic_console_scrollup
                 PUBLIC          generic_console_set_ink
                 PUBLIC          generic_console_set_paper
@@ -49,6 +50,10 @@ cls_mode0:
 	ldir
 	ret
 
+
+generic_console_plotc:
+        add     128
+
 ; c = x
 ; b = y
 ; a = character to print
@@ -80,6 +85,12 @@ generic_console_printc_3:
 	ret
 
 convert_character:
+        ; Issue #2139 suggests converting ' to a block character
+        cp      39
+        jr      nz,not_apostrophe
+        ld      a,129
+        ret
+not_apostrophe:
         cp      97
         jr      c,isupper
         sub     32
