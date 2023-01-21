@@ -95,5 +95,5 @@ l_dcal:
 	
 	INCLUDE	"crt/classic/crt_section.asm"
 
-        INCLUDE "target/nabu/classic/nabu_rxbuf.asm"
+        INCLUDE "target/nabu/classic/nabu_hccabuf.asm"
 
