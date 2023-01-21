@@ -49,11 +49,35 @@
 	EXTERN	l_getptr	;Get 3 byte pointer
 	EXTERN	l_putptr	;Put 3 byte pointer
 	EXTERN	l_gchar		;Get signed char
+	EXTERN	l_gchar1
+	EXTERN	l_gchar2
+	EXTERN	l_gchar3
+	EXTERN	l_gchar4
+	EXTERN	l_gchar5
+	EXTERN	l_gchar6
+	EXTERN	l_gchar7
+	EXTERN	l_gchar8
 	EXTERN	l_gcharsp	;Get signed char  (peephole opt)
 	EXTERN	l_gcharspsp	;Get signed char and push  (peephole opt)
 	EXTERN	l_g2charspsp	;Get 2 signed char and push  (peephole opt)
 	EXTERN	l_sxt		;Sign extend char
 	EXTERN	l_gint		;Get int ld hl,(hl)
+	EXTERN	l_gint1sp	;Optimized variants ld hl,x add hl,sp ld hl,(hl)
+	EXTERN	l_gint2sp
+	EXTERN	l_gint3sp
+	EXTERN	l_gint4sp
+	EXTERN	l_gint5sp
+	EXTERN	l_gint6sp
+	EXTERN	l_gint7sp
+	EXTERN	l_gint8sp
+	EXTERN	l_gint1	    ;Optimized variants inc hl,x ld hl,(hl)
+	EXTERN	l_gint2
+	EXTERN	l_gint3
+	EXTERN	l_gint4
+	EXTERN	l_gint5
+	EXTERN	l_gint6
+	EXTERN	l_gint7
+	EXTERN	l_gint8
 	EXTERN	l_gintsp	;Get int (peephole opt)
 	EXTERN	l_gintspchar	;Get int,char (peephole opt)
 	EXTERN	l_gintspsp	;Get int and push (peephole opt)
