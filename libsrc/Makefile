@@ -1335,7 +1335,7 @@ nabu_clib.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=nabu
 	$(call buildgeneric,nabu)
-#	$(MAKE) -C target/nabu
+	$(MAKE) -C target/nabu
 	$(MAKE) -C video/tms9918 TARGET=nabu
 	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_clib @$(TARGET_DIRECTORY)/nabu/nabu.lst
 
@@ -1346,7 +1346,7 @@ nabu_cpm.lib:
 	$(MAKE) msxdeps
 	$(MAKE) -C games TARGET=nabu
 	$(call buildgeneric,nabu)
-#	$(MAKE) -C target/nabu
+	$(MAKE) -C target/nabu
 	$(MAKE) -C video/tms9918 TARGET=nabu
 	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_cpm @$(TARGET_DIRECTORY)/nabu/nabu_cpm.lst
 

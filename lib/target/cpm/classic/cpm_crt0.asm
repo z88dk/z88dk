@@ -253,6 +253,10 @@ ENDIF
     INCLUDE	"crt/classic/crt_section.asm"
     INCLUDE "crt/classic/crt_cpm_fcntl.asm"
 
+IF __NABUPC__
+    INCLUDE "target/nabu/classic/nabu_hccabuf.asm"
+ENDIF
+
     SECTION code_crt_init
     ld      c,25
     call    5
