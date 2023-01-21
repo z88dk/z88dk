@@ -11,7 +11,7 @@
  #include "utstring.h"
  
 // Detect various platforms - horrible bit masking issues hide behind
-#if defined(_M_ARM) || defined(__arm__) || defined(__s390__) || defined(__ppc64__)
+#if defined(__s390__) || defined(__ppc64__)
 #define NEED_BITMASK_KLUDGE 1
 #endif
 
