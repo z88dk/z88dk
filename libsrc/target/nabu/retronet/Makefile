@@ -1,7 +1,7 @@
 include ../../../Make.config
 
 CFILES = \
-	retronet.c 
+	$(wildcard *.c)
 
 AFILES  = $(CFILES:.c=.asm)
 OBJECTS = $(CFILES:.c=.o)
