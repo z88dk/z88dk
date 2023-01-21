@@ -355,5 +355,26 @@ extern uint16_t __LIB__ rn_fileHandleReadSeq(uint8_t fileHandle, uint8_t* buffer
 extern uint32_t __LIB__ rn_fileHandleSeek(uint8_t fileHandle, int32_t offset, uint8_t seekOption);
 
 
+// Internal codes for the transport
+#define RETRONET_CMD_FILE_OPEN  0xa3
+#define RETRONET_CMD_FH_SIZE 0xa4
+#define RETRONET_CMD_FH_READ 0xa5
+#define RETRONET_CMD_FH_CLOSE 0xa7
+#define RETRONET_CMD_FILE_SIZE  0xa8
+#define RETRONET_CMD_FH_WRITE_APPEND 0xa9
+#define RETRONET_CMD_FH_WRITE_INSERT 0xaa
+#define RETRONET_CMD_FH_DELETE_RANGE 0xab
+#define RETRONET_CMD_FH_REPLACE_RANGE 0xac
+#define RETRONET_CMD_FILE_DELETE       0xad
+#define RETRONET_CMD_FILE_COPY         0xae
+#define RETRONET_CMD_FILE_MOVE         0xaf
+#define RETRONET_CMD_FH_TRUNCATE        0xb0
+#define RETRONET_CMD_FILE_LIST         0xb1
+#define RETRONET_CMD_FILEIDX_STAT      0xb2
+#define RETRONET_CMD_FILE_STAT         0xb3
+#define RETRONET_CMD_FH_DETAILS        0xb4
+#define RETRONET_CMD_FILE_READ_SEQ     0xb5
+#define RETRONET_CMD_FH_SEEK         0xb6
+
 
 #endif
