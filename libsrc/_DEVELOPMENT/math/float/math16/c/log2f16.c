@@ -53,12 +53,21 @@ extern float f16_coeff_log[];
 
 half_t log2f16 (half_t x)
 {
+    union fl16 {
+        half_t f;
+        uint16_t l;
+    };
+
     half_t y, z;
     int16_t e;
 
     /* Test for domain */
     if( x <= 0.0 )
-        return HUGE_NEG_F16;
+    {
+        union fl16 fl;
+        fl.l = NAN_NEG_F16;
+        return fl.f;
+    }
 
     /* separate mantissa from exponent */
     x = frexpf16( x, &e );

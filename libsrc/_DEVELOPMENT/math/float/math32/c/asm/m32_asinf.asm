@@ -428,11 +428,36 @@ _m32_asinf:
 	add	ix,sp
 	push	af
 	push	af
-	ex	(sp), hl
+	push	af
+	push	af
+	ld	(ix-4),l
+	ld	(ix-3),h
 	ld	(ix-2),e
 	ld	(ix-1),d
+	call	_fabs_fastcall
+	push	de
+	push	hl
+	ld	hl,0x3f80
+	push	hl
+	ld	hl,0x0000
+	push	hl
+	call	___fslt_callee
+	ld	a, l
+	or	a, a
+	jr	Z,l_m32_asinf_00102
+	ld	a,0xff
+	ld	(ix-8),a
+	ld	(ix-7),a
+	ld	(ix-6),a
+	ld	(ix-5),a
 	pop	hl
 	push	hl
+	ld	e,(ix-6)
+	ld	d,(ix-5)
+	jr	l_m32_asinf_00103
+l_m32_asinf_00102:
+	ld	l,(ix-4)
+	ld	h,(ix-3)
 	ld	e,(ix-2)
 	ld	d,(ix-1)
 	call	_m32_sqrf
@@ -454,6 +479,7 @@ _m32_asinf:
 	push	hl
 	call	___fsdiv_callee
 	call	_m32_atanf
+l_m32_asinf_00103:
 	ld	sp, ix
 	pop	ix
 	ret

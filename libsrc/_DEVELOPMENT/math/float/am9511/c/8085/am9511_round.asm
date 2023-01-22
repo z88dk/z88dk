@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Thu Jun 16 20:23:14 2022
+;	Module compile time: Sun Jan 22 01:07:48 2023
 
 
 	C_LINE	0,"am9511_round.c"
@@ -80,103 +80,103 @@
 	C_LINE	6,"/home/phillip/Z80/z88dk/lib/config/../..//include/float.h"
 	C_LINE	8,"/home/phillip/Z80/z88dk/lib/config/../..//include/math.h"
 	C_LINE	0,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	27,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	28,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	30,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	29,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	31,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	33,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	32,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	34,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	35,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	36,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	38,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	37,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	39,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	40,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	41,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	42,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	43,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	119,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	44,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	120,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	121,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	122,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	124,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	123,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	125,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	126,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	129,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	127,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	130,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	131,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	132,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	135,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	133,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	136,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	137,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	138,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	140,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	139,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	141,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	142,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	145,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	143,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	146,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	147,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	148,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	149,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	150,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	151,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	154,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	152,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	155,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	161,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	156,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	162,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	166,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	163,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	167,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
-	C_LINE	170,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	168,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	171,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
+	C_LINE	172,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_math16.h"
 	C_LINE	34,"/home/phillip/Z80/z88dk/lib/config/../..//include/math.h"
 	C_LINE	0,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	35,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	36,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	37,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	38,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	39,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	40,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	41,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	42,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	46,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	47,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	43,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	44,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	48,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	49,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	50,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	51,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	54,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	55,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	52,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	53,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	56,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	57,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	62,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	63,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	58,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	59,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	64,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	65,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	66,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	67,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	72,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	73,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	68,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	69,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	74,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	80,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	81,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	75,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	76,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	82,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	83,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	84,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	87,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	88,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	85,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	86,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	89,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	90,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	91,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	95,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	96,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	92,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	93,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	97,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	100,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	101,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	105,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	106,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	98,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	99,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	102,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	103,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	107,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	108,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
 	C_LINE	109,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	110,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	203,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
-	C_LINE	47,"/home/phillip/Z80/z88dk/lib/config/../..//include/math.h"
+	C_LINE	111,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	112,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	205,"/home/phillip/Z80/z88dk/lib/config/../..//include/math/math_am9511.h"
+	C_LINE	39,"/home/phillip/Z80/z88dk/lib/config/../..//include/math.h"
 	C_LINE	35,"am9511_math.h"
 	C_LINE	37,"am9511_math.h"
 	C_LINE	100,"am9511_math.h"
@@ -252,7 +252,7 @@
 	ld	de,32768
 	call	l_long_and
 	pop	de
-	ld	(de),hl
+	ld	(de),hl	;l_pint
 	ld	hl,2	;const
 	add	hl,sp
 	call	l_glong2sp
@@ -306,7 +306,11 @@
 .i_3
 	pop	hl
 	push	hl
-	call	l_int2long_s
+	ld	a,h
+	rla
+	sbc	a
+	ld	e,a
+	ld	d,a
 	ld	bc,127
 	push	bc
 	ld	bc,65535
@@ -316,9 +320,8 @@
 	ld	hl,4	;const
 	add	hl,sp
 	call	l_glong2sp
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	ld	de,sp+4
+	ld	hl,(de)	;l_gint
 	ld	de,0
 	call	l_long_and
 	ld	a,d
@@ -331,13 +334,13 @@
 	ld	hl,14	;const
 	add	hl,sp
 	call	l_glong
-	ld	c,l
 	ld	b,h
+	ld	c,l
 	ld	hl,18	;const
 	add	hl,sp
 	ld	sp,hl
-	ld	l,c
 	ld	h,b
+	ld	l,c
 	ret
 
 
@@ -346,25 +349,35 @@
 	add	hl,sp
 	push	hl
 	call	l_glong2sp
-	ld	hl,8	;const
-	add	hl,sp
-	call	l_gint	;
-	call	l_int2long_s
+	ld	de,sp+8
+	ld	hl,(de)	;l_gint
+	ld	a,h
+	rla
+	sbc	a
+	ld	e,a
+	ld	d,a
 	ld	bc,64
 	push	bc
 	ld	bc,0
 	push	bc
 	call	l_long_asr
-	call	l_long_add
+	pop	bc
+	add	hl,bc
+	pop	bc
+	ld	a,c
+	adc	e
+	ld	e,a
+	ld	a,b
+	adc	d
+	ld	d,a
 	pop	bc
 	call	l_plong
 	ld	hl,4	;const
 	add	hl,sp
 	push	hl
 	call	l_glong2sp
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	ld	de,sp+6
+	ld	hl,(de)	;l_gint
 	call	l_com
 	ld	de,0
 	call	l_long_and
@@ -385,13 +398,13 @@
 	add	hl,sp
 	call	l_glong
 	call	l_f32_add
-	ld	c,l
 	ld	b,h
+	ld	c,l
 	ld	hl,16	;const
 	add	hl,sp
 	ld	sp,hl
-	ld	l,c
 	ld	h,b
+	ld	l,c
 	ret
 
 
@@ -399,13 +412,13 @@
 	ld	hl,12	;const
 	add	hl,sp
 	call	l_glong
-	ld	c,l
 	ld	b,h
+	ld	c,l
 	ld	hl,16	;const
 	add	hl,sp
 	ld	sp,hl
-	ld	l,c
 	ld	h,b
+	ld	l,c
 	ret
 
 
@@ -421,13 +434,13 @@
 	ld	hl,6	;const
 	add	hl,sp
 	call	l_glong
-	ld	c,l
 	ld	b,h
+	ld	c,l
 	ld	hl,16	;const
 	add	hl,sp
 	ld	sp,hl
-	ld	l,c
 	ld	h,b
+	ld	l,c
 	ret
 
 

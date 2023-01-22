@@ -54,13 +54,20 @@ extern float m32_coeff_logf[];
 
 float m32_log2f (float x) __z88dk_fastcall
 {
+    union fl32 {
+        float f;
+        uint32_t l;
+    };
+
     float y, z;
     int16_t e;
 
     /* Test for domain */
     if( x <= 0.0 )
     {
-        return( HUGE_NEG_F32 );
+        union fl32 fl;
+        fl.l = NAN_NEG_F32;
+        return fl.f;
     }
 
     /* separate mantissa from exponent */

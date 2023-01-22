@@ -429,7 +429,7 @@ _m32_log10f:
 	add	ix,sp
 	ld	c, l
 	ld	b, h
-	ld	hl, -14
+	ld	hl, -18
 	add	hl, sp
 	ld	sp, hl
 	ld	(ix-10),c
@@ -448,11 +448,18 @@ _m32_log10f:
 	call	___fslt_callee
 	bit	0,l
 	jr	NZ,l_m32_log10f_00102
-	ld	de,0xff00
-	ld	hl,0x0000
+	ld	a,0xff
+	ld	(ix-18),a
+	ld	(ix-17),a
+	ld	(ix-16),a
+	ld	(ix-15),a
+	pop	hl
+	push	hl
+	ld	e,(ix-16)
+	ld	d,(ix-15)
 	jp	l_m32_log10f_00106
 l_m32_log10f_00102:
-	ld	hl,12
+	ld	hl,16
 	add	hl, sp
 	push	hl
 	ld	l,(ix-8)
@@ -517,7 +524,8 @@ l_m32_log10f_00105:
 	ld	e,(ix-4)
 	ld	d,(ix-3)
 	call	_m32_sqrf
-	ex	(sp), hl
+	ld	(ix-14),l
+	ld	(ix-13),h
 	ld	(ix-12),e
 	ld	(ix-11),d
 	ld	hl,0x0009
@@ -544,8 +552,8 @@ l_m32_log10f_00105:
 	ld	(ix-9),h
 	ld	(ix-8),e
 	ld	(ix-7),d
-	pop	hl
-	push	hl
+	ld	l,(ix-14)
+	ld	h,(ix-13)
 	ld	e,(ix-12)
 	ld	d,(ix-11)
 	call	_m32_div2f
@@ -558,16 +566,10 @@ l_m32_log10f_00105:
 	ld	h,(ix-9)
 	push	hl
 	call	___fssub_callee
-	ex	(sp), hl
+	ld	(ix-14),l
+	ld	(ix-13),h
 	ld	(ix-12),e
 	ld	(ix-11),d
-	pop	de
-	pop	hl
-	push	hl
-	push	de
-	ex	de,hl
-	pop	hl
-	push	hl
 	push	de
 	push	hl
 	ld	l,(ix-4)
@@ -588,14 +590,11 @@ l_m32_log10f_00105:
 	ld	(ix-9),h
 	ld	(ix-8),e
 	ld	(ix-7),d
-	pop	de
-	pop	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
 	push	hl
-	push	de
-	ex	de,hl
-	pop	hl
-	push	hl
-	push	de
+	ld	l,(ix-14)
+	ld	h,(ix-13)
 	push	hl
 	ld	hl,0x3ede
 	push	hl
@@ -643,16 +642,10 @@ l_m32_log10f_00105:
 	ld	h,(ix-1)
 	push	hl
 	call	___sint2fs_callee
-	ex	(sp), hl
+	ld	(ix-14),l
+	ld	(ix-13),h
 	ld	(ix-12),e
 	ld	(ix-11),d
-	pop	de
-	pop	hl
-	push	hl
-	push	de
-	ex	de,hl
-	pop	hl
-	push	hl
 	push	de
 	push	hl
 	ld	hl,0x3982
@@ -673,14 +666,11 @@ l_m32_log10f_00105:
 	ld	(ix-9),h
 	ld	(ix-8),e
 	ld	(ix-7),d
-	pop	de
-	pop	hl
+	ld	l,(ix-12)
+	ld	h,(ix-11)
 	push	hl
-	push	de
-	ex	de,hl
-	pop	hl
-	push	hl
-	push	de
+	ld	l,(ix-14)
+	ld	h,(ix-13)
 	push	hl
 	ld	hl,0x3e9a
 	push	hl
