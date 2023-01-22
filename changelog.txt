@@ -6,8 +6,10 @@ z88dk v2.3 - xx.xx.202x
 
 Detailed but incomplete changelist:
 
-- [classic] +cpm: support for corvette boot disk
+- [classic] +cpm: Support for corvette boot disk
+- [classic] +cpm: Support for NabuPC
 - [classic] +msx: tape libraries for MSX and Spectravideo
+- [classic] +nabu: New target: Nabu PC
 - [classic] Shared SP1 between classic and newlib
 - [sccz80] 8080, 8085, gbz80 opt-code-speed: add32, sub32, longcompare
 - [sccz80] Extended quikmult cases
