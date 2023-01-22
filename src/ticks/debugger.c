@@ -220,6 +220,59 @@ void ctrl_c_handler(int signum) {
     bk.ctrl_c();
 }
 
+#if _WIN32
+// https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#example-of-enabling-virtual-terminal-processing
+static int setup_console() {
+	// Set output mode to handle virtual terminal sequences
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (hOut == INVALID_HANDLE_VALUE)
+	{
+		return 0;
+	}
+	HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+	if (hIn == INVALID_HANDLE_VALUE)
+	{
+		return 0;
+	}
+
+	DWORD dwOriginalOutMode = 0;
+	DWORD dwOriginalInMode = 0;
+	if (!GetConsoleMode(hOut, &dwOriginalOutMode))
+	{
+		return 0;
+	}
+	if (!GetConsoleMode(hIn, &dwOriginalInMode))
+	{
+		return 0;
+	}
+
+	DWORD dwRequestedOutModes = ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN;
+	DWORD dwRequestedInModes = ENABLE_VIRTUAL_TERMINAL_INPUT;
+
+	DWORD dwOutMode = dwOriginalOutMode | dwRequestedOutModes;
+	if (!SetConsoleMode(hOut, dwOutMode))
+	{
+		// we failed to set both modes, try to step down mode gracefully.
+		dwRequestedOutModes = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+		dwOutMode = dwOriginalOutMode | dwRequestedOutModes;
+		if (!SetConsoleMode(hOut, dwOutMode))
+		{
+			// Failed to set any VT mode, can't do anything here.
+			return -1;
+		}
+	}
+
+	DWORD dwInMode = dwOriginalInMode | dwRequestedInModes;
+	if (!SetConsoleMode(hIn, dwInMode))
+	{
+		// Failed to set VT input mode, can't do anything here.
+		return -1;
+	}
+
+	return 1;
+}
+#endif
+
 void debugger_init() {
 #ifdef _WIN32
 			struct WSAData wsa;
@@ -227,6 +280,8 @@ void debugger_init() {
 			if (ret) {
 				bk.debug("Socket initialization error: %d\n", ret);
 			}
+
+			setup_console();
 #endif
 
     signal(SIGINT, ctrl_c_handler);
