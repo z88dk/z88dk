@@ -10,7 +10,7 @@ show_help_and_exit()
   if [ -n $1 ]; then rc=$1; else rc=0; fi
 
   echo ""
-  echo "Usage: $0 [-b][-c][-C][-e][-h][-k][-l][-p][-t]"
+  echo "Usage: $0 [-b][-c][-C][-e][-h][-k][-l][-p][-t][-z]"
   echo ""
   echo "  -b    Don't build binaries"
   echo "  -c    Clean build environment"
@@ -24,6 +24,7 @@ show_help_and_exit()
   echo "  -p    TARGET Build specified targets"
   echo "  -i    PATH Final installation directory"
   echo "  -t    Run tests"
+  echo "  -z    Skip the z80asm tests"
   echo "  -v    Be verbose"
   echo ""
   echo "Default is to build binaries and libraries"
@@ -60,6 +61,7 @@ do_clean_bin=0
 do_examples=0
 do_libbuild=1
 do_tests=0
+skip_z80asm_tests=0
 
 DESTDIR=/usr/local
 
@@ -70,7 +72,7 @@ export ZCCCFG
 export PATH
 
 
-while getopts "bcCehkltp:i:v" arg; do       # Handle all given arguments
+while getopts "bcCehkltzp:i:v" arg; do       # Handle all given arguments
   case "$arg" in
     b)     do_build=0              ;;   # Don't build
     c)     do_clean=1              ;;   # clean except bin/*
@@ -81,6 +83,7 @@ while getopts "bcCehkltp:i:v" arg; do       # Handle all given arguments
     p)     TARGETS=$OPTARG  ;;
     i)     DESTDIR=$OPTARG  ;;
     t)     do_tests=1              ;;   # Run tests as well
+    z)     skip_z80asm_tests=1     ;;   # Skip z80asm tests
     v)     export Q=               ;;   # verbose makefiles
     h | *) show_help_and_exit 0    ;;   # Show help on demand
   esac
@@ -188,9 +191,17 @@ fi
 
 if [ $do_tests = 1 ]; then              # Build tests or not...
   $MAKE -C testsuite
-  $MAKE -C test
+  if [ $skip_z80asm_tests = 1 ]; then
+      $MAKE -C test suites feature
+  else
+      $MAKE -C test
+  fi
 fi
 
+if [ $do_ticks_tests = 1 ]; then              # Build tests or not...
+  $MAKE -C testsuite
+  $MAKE -C test
+fi
 
 if [ $do_examples = 1 ]; then           # Build examples or not...
   $MAKE -C examples
