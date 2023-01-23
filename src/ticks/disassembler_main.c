@@ -126,12 +126,16 @@ int main(int argc, char **argv)
             FILE *fp = fopen(argv[1],"rb");
 
             if ( fp != NULL ) {
-                size_t r = fread(mem + (org % BUFF_SIZE), sizeof(char), BUFF_SIZE - (start % BUFF_SIZE), fp);
+                size_t amount = end - start;
+                fseek(fp, start - org, SEEK_SET);
+                size_t r = fread(mem + (start % BUFF_SIZE), sizeof(char), (amount % BUFF_SIZE), fp);
                 loaded = 1;
                 fclose(fp);
-                if ( r < end - org ) {
-                    end = org + r;
+                if (r < amount)
+                {
+                    amount = r;
                 }
+                end = start + amount;
             } else {
                 fprintf(stderr, "Cannot load file '%s'\n",argv[1]);
             }

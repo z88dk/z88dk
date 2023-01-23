@@ -717,7 +717,7 @@ void debug_add_info_encoded(char *encoded)
         }
     }
 
-    if (bk.is_verbose()) {
+    if (bk.is_verbose && bk.is_verbose()) {
         bk.debug("Decoded cdb: <%s>\n",encoded);
     }
 }
