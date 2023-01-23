@@ -258,6 +258,7 @@ static char           *appmakeargs;
 static char           *sccz80arg = NULL;
 static char           *sdccarg = NULL;
 static char           *m4arg = NULL;
+static char           *coptarg = NULL;
 static char           *pragincname = NULL;  /* File containing pragmas to append to zcc_opt.def */
 static char           *zccopt = NULL;       /* Text to append to zcc_opt.def */
 static char           *c_subtype = NULL;
@@ -496,6 +497,7 @@ static option options[] = {
     { 0, "Cc", OPT_FUNCTION,  "Add an option to sccz80" , &sccz80arg, AddToArgs, 0},
     { 0, "set-r2l-by-default", OPT_BOOL,  "(sccz80) Use r2l calling convention by default", &c_sccz80_r2l_calling, NULL, 0},
     { 0, "O", OPT_INT,  "Set the peephole optimiser setting for copt" , &peepholeopt, NULL, 0},
+    { 0, "Ch", OPT_FUNCTION,  "Add an option to the sccz80 peepholer" , &coptarg, AddToArgs, 0},
     { 0, "", OPT_HEADER, "Compiler (sdcc) options:", NULL, NULL, 0 },
     { 0, "Cs", OPT_FUNCTION,  "Add an option to sdcc" , &sdccarg, AddToArgs, 0},
     { 0, "opt-code-size", OPT_BOOL|OPT_DOUBLE_DASH,  "Optimize for code size (sdcc only)" , &opt_code_size, NULL, 0},
@@ -1675,7 +1677,7 @@ static void apply_copt_rules(int filenumber, int num, char **rules, char *ext1, 
         if ( i == (num-1) ) {
             output_ext = ext;
         }
-        snprintf(argbuf,sizeof(argbuf),"%s %s", select_cpu(CPU_MAP_TOOL_COPT), rules[i]);
+        snprintf(argbuf,sizeof(argbuf),"%s %s %s", select_cpu(CPU_MAP_TOOL_COPT), coptarg ? coptarg : "", rules[i]);
         if (process(input_ext, output_ext, c_copt_exe, argbuf, filter, filenumber, YES, NO))
             exit(1);
     }
