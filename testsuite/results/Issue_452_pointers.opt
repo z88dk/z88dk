@@ -18,6 +18,10 @@
 	pop	bc
 	push	hl
 	push	de
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	call	l_gint4sp	;
+	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -37,6 +41,10 @@
 	pop	bc
 	push	hl
 	push	de
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	call	l_gint4sp	;
+	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -58,6 +66,10 @@
 	pop	bc
 	push	hl
 	push	de
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	call	l_gint4sp	;
+	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -81,6 +93,10 @@
 	pop	bc
 	push	hl
 	push	de
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	call	l_gint4sp	;
+	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de
@@ -103,6 +119,10 @@
 	pop	bc
 	push	hl
 	push	de
+	ld	hl,0	;const
+	call	l_gintspsp	;
+	call	l_gint4sp	;
+	pop	de
 	ex	de,hl
 	and	a
 	sbc	hl,de

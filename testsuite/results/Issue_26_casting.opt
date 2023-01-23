@@ -16,9 +16,7 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	ld	de,0
 	call	lp_glong
 	pop	bc
@@ -38,9 +36,7 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	ld	de,0
 	call	lp_gint
 	call	l_int2long_s

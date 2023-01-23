@@ -26,9 +26,7 @@
 ._func0b
 	ld	hl,_y_endpositions
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
@@ -36,9 +34,7 @@
 	add	hl,hl
 	pop	de
 	add	hl,de
-	ld	bc,4
-	add	hl,bc
-	call	l_gint	;
+	call	l_gint4	;
 	ret
 
 
@@ -46,9 +42,7 @@
 ._func1b
 	ld	hl,(_y_endpos)
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	add	hl,hl
 	add	hl,hl
 	add	hl,hl
@@ -56,18 +50,14 @@
 	add	hl,hl
 	pop	de
 	add	hl,de
-	ld	bc,4
-	add	hl,bc
-	call	l_gint	;
+	call	l_gint4	;
 	ret
 
 
 
 ._func2
 	ld	hl,(_x_endpos+20)
-	ld	bc,4
-	add	hl,bc
-	call	l_gint	;
+	call	l_gint4	;
 	ret
 
 

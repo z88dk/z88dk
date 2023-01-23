@@ -50,9 +50,7 @@
 	ld	a,h
 	or	l
 	jp	z,i_4	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	pop	bc
 	pop	af
 	pop	af
@@ -61,14 +59,10 @@
 
 
 .i_4
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	call	logf16
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	call	l_f16_mul
 	call	expf16
 	pop	bc

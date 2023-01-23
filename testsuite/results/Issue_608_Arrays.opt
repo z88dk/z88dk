@@ -35,11 +35,10 @@
 	SECTION	code_compiler
 
 ._func
-	ld	de,_carray
-	pop	bc
-	pop	hl
+	ld	hl,_carray
 	push	hl
-	push	bc
+	call	l_gint4sp	;
+	pop	de
 	add	hl,de
 	call	l_gchar
 	ret
@@ -49,9 +48,7 @@
 ._func2
 	ld	hl,_larray
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	add	hl,hl
 	add	hl,hl
 	pop	de
@@ -64,9 +61,7 @@
 ._func2_b
 	ld	hl,_larrays
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	add	hl,hl
 	add	hl,hl
 	pop	de
@@ -79,9 +74,7 @@
 ._func3
 	ld	hl,_narray
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	ld	b,h
 	ld	c,l
 	add	hl,bc
@@ -89,9 +82,7 @@
 	add	hl,hl
 	pop	de
 	add	hl,de
-	inc	hl
-	inc	hl
-	call	l_gint	;
+	call	l_gint2	;
 	ret
 
 

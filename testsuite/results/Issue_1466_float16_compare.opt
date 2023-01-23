@@ -157,9 +157,7 @@
 ._eq_int
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	call	l_f16_sint2f
 	call	l_f16_eq
 	ld	a,h
@@ -219,9 +217,7 @@
 ._eq_float16
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	call	l_f16_eq
 	ld	a,h
 	or	l
@@ -238,9 +234,7 @@
 ._eq_int_r
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	ex	(sp),hl
 	call	l_f16_sint2f
 	call	l_f16_eq
@@ -304,9 +298,7 @@
 ._eq_float16_r
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	call	l_f16_eq
 	ld	a,h
 	or	l
@@ -467,9 +459,7 @@
 ._lt_int
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	call	l_f16_sint2f
 	call	l_f16_lt
 	ld	a,h
@@ -530,9 +520,7 @@
 ._lt_float16
 	ld	hl,4	;const
 	call	l_gintspsp	;
-	ld	hl,4	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint4sp	;
 	call	l_f16_lt
 	ld	a,h
 	or	l
@@ -549,9 +537,7 @@
 ._lt_int_r
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	ex	(sp),hl
 	call	l_f16_sint2f
 	ex	(sp),hl
@@ -617,9 +603,7 @@
 ._lt_float16_r
 	ld	hl,2	;const
 	call	l_gintspsp	;
-	ld	hl,6	;const
-	add	hl,sp
-	call	l_gint	;
+	call	l_gint6sp	;
 	call	l_f16_lt
 	ld	a,h
 	or	l
