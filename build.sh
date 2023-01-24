@@ -198,11 +198,6 @@ if [ $do_tests = 1 ]; then              # Build tests or not...
   fi
 fi
 
-if [ $do_ticks_tests = 1 ]; then              # Build tests or not...
-  $MAKE -C testsuite
-  $MAKE -C test
-fi
-
 if [ $do_examples = 1 ]; then           # Build examples or not...
   $MAKE -C examples
 fi
