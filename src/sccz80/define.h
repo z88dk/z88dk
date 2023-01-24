@@ -10,11 +10,6 @@
  #include "uthash.h"
  #include "utstring.h"
  
-// Detect various platforms - horrible bit masking issues hide behind
-#if defined(__s390__) || defined(__ppc64__)
-#define NEED_BITMASK_KLUDGE 1
-#endif
-
 
 #define MALLOC(x)   malloc(x)
 #define CALLOC(x,y) calloc(x,y)
