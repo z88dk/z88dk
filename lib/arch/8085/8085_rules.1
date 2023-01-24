@@ -113,3 +113,24 @@
 	ld	b,d
 	ld	de,sp+%2
 	ld	hl,(de)
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_glong%2
+=
+	ld	de,sp+%1
+	ex	de,hl
+	call	l_glong%2
+
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	push	hl
+	call	l_glong%2
+=
+	ld	de,sp+%1
+	ex	de,hl
+	push	hl
+	call	l_glong%2

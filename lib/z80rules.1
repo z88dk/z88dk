@@ -6980,3 +6980,36 @@ $notcpu 8085
 	call	l_gchar
 =
 	call	l_gchar%1
+
+%title Clear up a misoptimisation
+%cpu 8085
+	push	de
+	ld	hl,(de)	;l_gint
+	%2c	hl
+	pop	de
+	ld	(de),hl	;l_pint
+=
+	ld	hl,(de)	;l_gint
+	%2c	hl
+	ld	(de),hl	;l_pint
+
+%cpu 8085
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	ex	de,hl
+	ld	hl,%2	;const
+=
+	ld	de,sp+%1
+	ld	hl,%2	;const
+
+%cpu 8085
+%check 0 <= %2 <= 255
+	ld	de,sp+%1
+	ld	hl,%2	;const
+	add	hl,sp
+	ex	de,hl
+=
+	ld	de,sp+%1
+	ex	de,hl
+	ld	de,sp+%2
