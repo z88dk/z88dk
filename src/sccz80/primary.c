@@ -196,7 +196,7 @@ zdouble calc(
             warningfmt("limited-range", "Right shifting by more than size of object, changed to zero");
             right = 0;
         }
-        if ( is16bit ) return ((int16_t)left) >> (int16_t)right;
+        if ( is16bit ) return ((int16_t)(int64_t)left) >> (int16_t)right;
         else if (left_kind == KIND_LONG) return ((int32_t)(int64_t)left) >> (int)right;
         else return (int64_t)((int64_t)left) >> (int)right;
     } else
