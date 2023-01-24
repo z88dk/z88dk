@@ -70,7 +70,7 @@
 	EXTERN	l_gint6sp
 	EXTERN	l_gint7sp
 	EXTERN	l_gint8sp
-	EXTERN	l_gint1	    ;Optimized variants inc hl,x ld hl,(hl)
+	EXTERN	l_gint1		;Optimized variants inc hl,x ld hl,(hl)
 	EXTERN	l_gint2
 	EXTERN	l_gint3
 	EXTERN	l_gint4
