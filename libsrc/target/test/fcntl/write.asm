@@ -12,14 +12,21 @@
 
 .write
 ._write
-        pop     af
-        pop     hl
-        pop     de
-        pop     bc
+        ld      hl,2
+        add     hl,sp
+        ld      c,(hl)
+        inc     hl
+        ld      b,(hl)
         push    bc
-        push    de
-        push    hl
-        push    af
+        inc     hl
+        ld      e,(hl)
+        inc     hl
+        ld      d,(hl)
+        inc     hl
+        ld      c,(hl)
+        inc     hl
+        ld      b,(hl)
+        pop     hl
         ld      b,c
         ld      a,CMD_WRITEBLOCK
 	call	SYSCALL

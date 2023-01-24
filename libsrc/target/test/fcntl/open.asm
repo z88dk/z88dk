@@ -4,22 +4,28 @@
 ;
 
                 SECTION code_clib
-		INCLUDE	"target/test/def/test_cmds.def"
+                INCLUDE "target/test/def/test_cmds.def"
 
-		PUBLIC	open
-		PUBLIC	_open
+                PUBLIC  open
+                PUBLIC  _open
 
 ; char *name, int flags, mode_t mode)
 .open
 ._open
-	pop	af
-	pop	bc
-	pop	de
-	pop	hl
-	push	hl
-	push	de
-	push	bc
-	push	af
-	ld	a,CMD_OPENF
-	call	SYSCALL
-	ret
+        ld      hl,2
+        add     hl,sp
+        ld      c,(hl)
+        inc     hl
+        ld      b,(hl)
+        inc     hl
+        ld      e,(hl)
+        inc     hl
+        ld      d,(hl)
+        inc     hl
+        ld      a,(hl)
+        inc     hl
+        ld      h,(hl)
+        ld      l,a
+        ld      a,CMD_OPENF
+        call    SYSCALL
+        ret
