@@ -6487,7 +6487,7 @@ $notcpu 8085
 	call	l_sxt
 
 %cpu 8085
-%check 1 <= %1 <= 255
+%check 0 <= %1 <= 255
 	ld	bc,%1
 	add	hl,bc
 	call	l_gchar
@@ -6536,7 +6536,7 @@ $notcpu 8085
 	ld	hl,(de)	;l_gint
 
 %cpu 8085
-%check 1 <= %1 <= 255
+%check 0 <= %1 <= 255
 	ld	bc,%1
 	add	hl,bc
 	call	l_gint	;%9
