@@ -7013,3 +7013,14 @@ $notcpu 8085
 	ld	de,sp+%1
 	ex	de,hl
 	ld	de,sp+%2
+
+	pop	bc
+	call	l_debug_pop_frame
+	ret
+=
+	jp	l_debug_pop_frame_bc
+
+	call	l_debug_pop_frame
+	ret
+=
+	jp	l_debug_pop_frame

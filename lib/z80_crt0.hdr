@@ -422,3 +422,4 @@
 
 	EXTERN	l_debug_push_frame
 	EXTERN	l_debug_pop_frame
+	EXTERN	l_debug_pop_frame_bc
