@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sun Jan 22 01:07:47 2023
+;	Module compile time: Fri Jan 27 20:24:10 2023
 
 
 	C_LINE	0,"am9511_atan2.c"
@@ -224,8 +224,8 @@
 ._am9511_atan2
 	push	bc
 	push	bc
-	ld	hl,6	;const
-	add	hl,sp
+	ld	de,sp+6
+	ex	de,hl
 	call	l_glong2sp
 	ld	hl,0	;const
 	ld	d,h
@@ -234,14 +234,14 @@
 	ld	a,h
 	or	l
 	jp	z,i_2	;
-	ld	hl,6	;const
-	add	hl,sp
+	ld	de,sp+6
+	ex	de,hl
 	call	l_glong
 	call	_fabs
 	push	de
 	push	hl
-	ld	hl,14	;const
-	add	hl,sp
+	ld	de,sp+14
+	ex	de,hl
 	call	l_glong
 	call	_fabs
 	call	l_f32_ge
@@ -251,18 +251,18 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	ld	hl,12	;const
-	add	hl,sp
+	ld	de,sp+12
+	ex	de,hl
 	call	l_glong2sp
-	ld	hl,12	;const
-	add	hl,sp
+	ld	de,sp+12
+	ex	de,hl
 	call	l_glong
 	call	l_f32_div
 	call	_atan
 	pop	bc
 	call	l_plong
-	ld	hl,6	;const
-	add	hl,sp
+	ld	de,sp+6
+	ex	de,hl
 	call	l_glong2sp
 	ld	hl,0	;const
 	ld	d,h
@@ -271,8 +271,8 @@
 	ld	a,h
 	or	l
 	jp	z,i_4	;
-	ld	hl,10	;const
-	add	hl,sp
+	ld	de,sp+10
+	ex	de,hl
 	call	l_glong2sp
 	ld	hl,0	;const
 	ld	d,h
@@ -281,8 +281,8 @@
 	ld	a,h
 	or	l
 	jp	z,i_5	;
-	ld	hl,0	;const
-	add	hl,sp
+	ld	de,sp+0
+	ex	de,hl
 	push	hl
 	call	l_glong2sp
 	ld	hl,4059	;const
@@ -292,8 +292,8 @@
 	call	l_plong
 	jp	i_6	;EOS
 .i_5
-	ld	hl,0	;const
-	add	hl,sp
+	ld	de,sp+0
+	ex	de,hl
 	push	hl
 	call	l_glong2sp
 	ld	hl,4059	;const
@@ -306,11 +306,11 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	ld	hl,8	;const
-	add	hl,sp
+	ld	de,sp+8
+	ex	de,hl
 	call	l_glong2sp
-	ld	hl,16	;const
-	add	hl,sp
+	ld	de,sp+16
+	ex	de,hl
 	call	l_glong
 	call	l_f32_div
 	call	_atan
@@ -319,8 +319,8 @@
 	ld	d,a
 	pop	bc
 	call	l_plong
-	ld	hl,10	;const
-	add	hl,sp
+	ld	de,sp+10
+	ex	de,hl
 	call	l_glong2sp
 	ld	hl,0	;const
 	ld	d,h
@@ -329,8 +329,8 @@
 	ld	a,h
 	or	l
 	jp	z,i_8	;
-	ld	hl,0	;const
-	add	hl,sp
+	ld	de,sp+0
+	ex	de,hl
 	push	hl
 	call	l_glong2sp
 	ld	hl,4058	;const
@@ -340,8 +340,8 @@
 	call	l_plong
 	jp	i_9	;EOS
 .i_8
-	ld	hl,0	;const
-	add	hl,sp
+	ld	de,sp+0
+	ex	de,hl
 	push	hl
 	call	l_glong2sp
 	ld	hl,4058	;const
@@ -350,8 +350,8 @@
 	pop	bc
 	call	l_plong
 .i_7
-	ld	hl,0	;const
-	add	hl,sp
+	ld	de,sp+0
+	ex	de,hl
 	call	l_glong
 	pop	bc
 	pop	bc
@@ -359,8 +359,8 @@
 
 
 .i_2
-	ld	hl,10	;const
-	add	hl,sp
+	ld	de,sp+10
+	ex	de,hl
 	call	l_glong2sp
 	ld	hl,0	;const
 	ld	d,h
@@ -377,8 +377,8 @@
 
 
 .i_11
-	ld	hl,10	;const
-	add	hl,sp
+	ld	de,sp+10
+	ex	de,hl
 	call	l_glong2sp
 	ld	hl,0	;const
 	ld	d,h

@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sun Jan 22 01:07:48 2023
+;	Module compile time: Fri Jan 27 20:24:11 2023
 
 
 	C_LINE	0,"am9511_log2.c"
@@ -225,8 +225,8 @@
 	push	hl
 	push	bc
 	push	bc
-	ld	hl,4	;const
-	add	hl,sp
+	ld	de,sp+4
+	ex	de,hl
 	call	l_glong2sp
 	ld	hl,0	;const
 	ld	d,h
@@ -246,8 +246,8 @@
 	ld	(hl),255
 	inc	hl
 	ld	(hl),255
-	ld	hl,0	;const
-	add	hl,sp
+	ld	de,sp+0
+	ex	de,hl
 	call	l_glong
 	ld	b,h
 	ld	c,l
@@ -260,8 +260,8 @@
 
 
 .i_2
-	ld	hl,4	;const
-	add	hl,sp
+	ld	de,sp+4
+	ex	de,hl
 	call	l_glong
 	call	_log
 	push	de

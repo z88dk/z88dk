@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sun Jan 22 01:07:48 2023
+;	Module compile time: Fri Jan 27 20:24:11 2023
 
 
 	C_LINE	0,"am9511_exp2.c"
@@ -240,8 +240,8 @@
 
 
 .i_2
-	ld	hl,0	;const
-	add	hl,sp
+	ld	de,sp+0
+	ex	de,hl
 	call	l_glong2sp
 	ld	hl,29208	;const
 	ld	de,16177

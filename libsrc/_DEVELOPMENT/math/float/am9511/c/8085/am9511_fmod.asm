@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sun Jan 22 01:07:48 2023
+;	Module compile time: Fri Jan 27 20:24:11 2023
 
 
 	C_LINE	0,"am9511_fmod.c"
@@ -226,8 +226,8 @@
 	push	bc
 	push	bc
 	push	bc
-	ld	hl,10	;const
-	add	hl,sp
+	ld	de,sp+10
+	ex	de,hl
 	call	l_glong2sp
 	ld	hl,0	;const
 	ld	d,h
@@ -250,11 +250,11 @@
 	ld	hl,4	;const
 	add	hl,sp
 	push	hl
-	ld	hl,16	;const
-	add	hl,sp
+	ld	de,sp+16
+	ex	de,hl
 	call	l_glong2sp
-	ld	hl,16	;const
-	add	hl,sp
+	ld	de,sp+16
+	ex	de,hl
 	call	l_glong
 	call	l_f32_div
 	call	l_f32_f2slong
@@ -263,43 +263,43 @@
 	ld	hl,0	;const
 	add	hl,sp
 	push	hl
-	ld	hl,16	;const
-	add	hl,sp
+	ld	de,sp+16
+	ex	de,hl
 	call	l_glong2sp
-	ld	hl,10	;const
-	add	hl,sp
+	ld	de,sp+10
+	ex	de,hl
 	call	l_glong
 	call	l_f32_slong2f
 	push	de
 	push	hl
-	ld	hl,20	;const
-	add	hl,sp
+	ld	de,sp+20
+	ex	de,hl
 	call	l_glong
 	call	l_f32_mul
 	call	l_f32_sub
 	pop	bc
 	call	l_plong
-	ld	hl,0	;const
-	add	hl,sp
+	ld	de,sp+0
+	ex	de,hl
 	call	l_glong2sp
-	ld	hl,14	;const
-	add	hl,sp
+	ld	de,sp+14
+	ex	de,hl
 	call	l_glong
 	call	l_f32_ge
 	ld	a,h
 	or	l
 	jp	z,i_3	;
-	ld	hl,0	;const
-	add	hl,sp
+	ld	de,sp+0
+	ex	de,hl
 	call	l_glong2sp
-	ld	hl,14	;const
-	add	hl,sp
+	ld	de,sp+14
+	ex	de,hl
 	call	l_glong
 	call	l_f32_sub
 	jp	i_4	;
 .i_3
-	ld	hl,0	;const
-	add	hl,sp
+	ld	de,sp+0
+	ex	de,hl
 	call	l_glong
 .i_4
 	pop	bc

@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sun Jan 22 01:07:48 2023
+;	Module compile time: Fri Jan 27 20:24:11 2023
 
 
 	C_LINE	0,"am9511_round.c"
@@ -229,32 +229,32 @@
 	ld	hl,6	;const
 	add	hl,sp
 	push	hl
-	ld	hl,14	;const
-	add	hl,sp
+	ld	de,sp+14
+	ex	de,hl
 	call	l_glong
 	pop	bc
 	call	l_plong
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
-	ld	hl,8	;const
-	add	hl,sp
+	ld	de,sp+8
+	ex	de,hl
 	call	l_glong
 	pop	bc
 	call	l_plong
 	ld	hl,10	;const
 	add	hl,sp
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
+	ld	de,sp+4
+	ex	de,hl
 	call	l_glong2sp
 	ld	hl,0	;const
 	ld	de,32768
 	call	l_long_and
 	pop	de
 	ld	(de),hl	;l_pint
-	ld	hl,2	;const
-	add	hl,sp
+	ld	de,sp+2
+	ex	de,hl
 	call	l_glong2sp
 	ld	hl,0	;const
 	ld	de,32640
@@ -279,8 +279,8 @@
 	ld	a,h
 	rla
 	jp	nc,i_3	;
-	ld	hl,2	;const
-	add	hl,sp
+	ld	de,sp+2
+	ex	de,hl
 	push	hl
 	call	l_glong2sp
 	ld	hl,0	;const
@@ -293,8 +293,8 @@
 	ld	de,65535
 	call	l_eq
 	jp	nc,i_4	;
-	ld	hl,2	;const
-	add	hl,sp
+	ld	de,sp+2
+	ex	de,hl
 	push	hl
 	call	l_glong2sp
 	ld	hl,0	;const
@@ -317,8 +317,8 @@
 	push	bc
 	call	l_long_asr
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
+	ld	de,sp+4
+	ex	de,hl
 	call	l_glong2sp
 	ld	de,sp+4
 	ld	hl,(de)	;l_gint
@@ -331,8 +331,8 @@
 	jp	nz,ASMPC+4
 	scf
 	jp	nc,i_6	;
-	ld	hl,14	;const
-	add	hl,sp
+	ld	de,sp+14
+	ex	de,hl
 	call	l_glong
 	ld	b,h
 	ld	c,l
@@ -345,8 +345,8 @@
 
 
 .i_6
-	ld	hl,4	;const
-	add	hl,sp
+	ld	de,sp+4
+	ex	de,hl
 	push	hl
 	call	l_glong2sp
 	ld	de,sp+8
@@ -372,8 +372,8 @@
 	ld	d,a
 	pop	bc
 	call	l_plong
-	ld	hl,4	;const
-	add	hl,sp
+	ld	de,sp+4
+	ex	de,hl
 	push	hl
 	call	l_glong2sp
 	ld	de,sp+6
@@ -391,11 +391,11 @@
 	ld	de,128
 	call	l_eq
 	jp	nc,i_8	;
-	ld	hl,12	;const
-	add	hl,sp
+	ld	de,sp+12
+	ex	de,hl
 	call	l_glong2sp
-	ld	hl,16	;const
-	add	hl,sp
+	ld	de,sp+16
+	ex	de,hl
 	call	l_glong
 	call	l_f32_add
 	ld	b,h
@@ -409,8 +409,8 @@
 
 
 .i_8
-	ld	hl,12	;const
-	add	hl,sp
+	ld	de,sp+12
+	ex	de,hl
 	call	l_glong
 	ld	b,h
 	ld	c,l
@@ -426,13 +426,13 @@
 	ld	hl,6	;const
 	add	hl,sp
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
+	ld	de,sp+4
+	ex	de,hl
 	call	l_glong
 	pop	bc
 	call	l_plong
-	ld	hl,6	;const
-	add	hl,sp
+	ld	de,sp+6
+	ex	de,hl
 	call	l_glong
 	ld	b,h
 	ld	c,l

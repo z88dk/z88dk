@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sun Jan 22 01:07:47 2023
+;	Module compile time: Fri Jan 27 20:24:10 2023
 
 
 	C_LINE	0,"am9511_atanh.c"
@@ -230,8 +230,8 @@
 	call	l_f32_add
 	push	de
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
+	ld	de,sp+4
+	ex	de,hl
 	call	l_glong
 	ld	bc,16256
 	push	bc

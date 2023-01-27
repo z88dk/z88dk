@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sun Jan 22 01:07:48 2023
+;	Module compile time: Fri Jan 27 20:24:11 2023
 
 
 	C_LINE	0,"am9511_modf.c"
@@ -222,8 +222,8 @@
 ; parameter 'double x' at sp+4 size(4)
 	C_LINE	34,"am9511_modf.c::am9511_modf::0::0"
 ._am9511_modf
-	ld	hl,4	;const
-	add	hl,sp
+	ld	de,sp+4
+	ex	de,hl
 	call	l_glong2sp
 	ld	hl,0	;const
 	ld	d,h
@@ -237,8 +237,8 @@
 	push	hl
 	push	bc
 	push	hl
-	ld	hl,6	;const
-	add	hl,sp
+	ld	de,sp+6
+	ex	de,hl
 	call	l_glong
 	call	_ceil
 	pop	bc
@@ -250,15 +250,15 @@
 	push	hl
 	push	bc
 	push	hl
-	ld	hl,6	;const
-	add	hl,sp
+	ld	de,sp+6
+	ex	de,hl
 	call	l_glong
 	call	_floor
 	pop	bc
 	call	l_plong
 .i_3
-	ld	hl,4	;const
-	add	hl,sp
+	ld	de,sp+4
+	ex	de,hl
 	call	l_glong2sp
 	ld	de,sp+6
 	ld	hl,(de)	;l_gint

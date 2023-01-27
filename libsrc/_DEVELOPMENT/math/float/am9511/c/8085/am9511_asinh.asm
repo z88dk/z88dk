@@ -3,7 +3,7 @@
 ;
 ;	Reconstructed for z80 Module Assembler
 ;
-;	Module compile time: Sun Jan 22 01:07:47 2023
+;	Module compile time: Fri Jan 27 20:24:10 2023
 
 
 	C_LINE	0,"am9511_asinh.c"
@@ -227,8 +227,8 @@
 	call	_mul2
 	push	de
 	push	hl
-	ld	hl,4	;const
-	add	hl,sp
+	ld	de,sp+4
+	ex	de,hl
 	call	l_glong
 	call	_sqr
 	push	de
@@ -239,8 +239,8 @@
 	call	_sqrt
 	push	de
 	push	hl
-	ld	hl,8	;const
-	add	hl,sp
+	ld	de,sp+8
+	ex	de,hl
 	call	l_glong
 	call	_fabs
 	call	l_f32_add
