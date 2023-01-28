@@ -1,6 +1,151 @@
 %check 0 <= %1 <= 255
 	ld	hl,%1	;const
 	add	hl,sp
+	call	l_gchar
+	push	hl
+	ld	hl,%2	;const
+=
+	ld	de,sp+%1
+	ld	a,(de)	;l_gchar
+	call	l_sxt
+	push	hl
+	ld	hl,%2	;const
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gchar
+=
+	ld	de,sp+%1
+	ld	a,(de)	;l_gchar
+	call	l_sxt
+
+%check 0 <= %1 <= 255
+	ld	bc,%1
+	add	hl,bc
+	call	l_gchar
+=
+	ld	de,hl+%1
+	ld	a,(de)	;l_gchar
+	call	l_sxt
+
+	inc	hl
+	inc	hl
+	inc	hl
+	call	l_gchar
+=
+	ld	de,hl+3
+	ld	a,(de)	;l_gchar
+	call	l_sxt
+
+	inc	hl
+	inc	hl
+	call	l_gchar
+=
+	ld	de,hl+2
+	ld	a,(de)	;l_gchar
+	call	l_sxt
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	push	hl
+	call	l_gint	;%9
+=
+	ld	de,sp+%1
+	push	de
+	ld	hl,(de)	;l_gint
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gint	;%9
+=
+	ld	de,sp+%1
+	ld	hl,(de)	;l_gint
+
+%check 0 <= %1 <= 255
+	ld	bc,%1
+	add	hl,bc
+	call	l_gint	;%9
+=
+	ld	de,hl+%1
+	ld	hl,(de)	;l_gint
+
+	inc	hl
+	inc	hl
+	inc	hl
+	call	l_gint	;%9
+=
+	ld	de,hl+3
+	ld	hl,(de)	;l_gint
+
+	inc	hl
+	inc	hl
+	call	l_gint	;%9
+=
+	ld	de,hl+2
+	ld	hl,(de)	;l_gint
+
+	inc	hl
+	call	l_gint	;%9
+=
+	ld	de,hl+1
+	ld	hl,(de)	;l_gint
+
+	call	l_gint
+=
+	ex	de,hl
+	ld	hl,(de)	;l_gint
+
+	call	l_gint	;%9
+=
+	ex	de,hl
+	ld	hl,(de)	;l_gint
+
+	call	l_pint
+=
+	ld	(de),hl	;l_pint
+
+
+
+
+%title Clear up a misoptimisation
+	push	de
+	ld	hl,(de)	;l_gint
+	%2c	hl
+	pop	de
+	ld	(de),hl	;l_pint
+=
+	ld	hl,(de)	;l_gint
+	%2c	hl
+	ld	(de),hl	;l_pint
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
+	ex	de,hl
+	ld	hl,%2	;const
+=
+	ld	de,sp+%1
+	ld	hl,%2	;const
+
+%check 0 <= %2 <= 255
+	ld	de,sp+%1
+	ld	hl,%2	;const
+	add	hl,sp
+	ex	de,hl
+=
+	ld	de,sp+%1
+	ex	de,hl
+	ld	de,sp+%2
+
+
+
+
+%check 0 <= %1 <= 255
+	ld	hl,%1	;const
+	add	hl,sp
 	call	l_gint	;
 	pop	de
 =
@@ -29,7 +174,7 @@
 	pop	de
 	ld	(de),hl
 =
-	ld	de,sp + %1
+	ld	de,sp+%1
 	ld	hl,(de)
 	%2c	hl
 	ld	(de),hl
@@ -45,7 +190,7 @@
 	ex	de,hl
 	ld	(de),hl
 =
-	ld	de,sp + %1
+	ld	de,sp+%1
 	ld	hl,%2	;const
 	ld	(de),hl
 
@@ -103,7 +248,7 @@
 	ex	de,hl
 	ld	hl,%2	;const
 	add	hl,sp
-	call	l_gint	;%3
+	call	l_gint	;%9
 	ld	c,e
 	ld	b,d
 =
