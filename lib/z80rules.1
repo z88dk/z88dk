@@ -289,6 +289,7 @@
 	ld	de,%1	;const
 	ex	de,hl
 
+%notcpu 8085
 	ld	hl,0	;const
 	add	hl,sp
 	call	l_gint	;%9
@@ -841,6 +842,7 @@
 	ld	d,0
 	ld	hl,%1	;const
 
+%notcpu 8085
 	call	l_gint	;%9
 	push	hl
 	ld	hl,%1
@@ -1396,6 +1398,7 @@
 	push	bc
 	ld	hl,%1	;const
 
+%notcpu 8085
 %notcpu gbz80
 	push	hl
 	ld	hl,%1	;const
@@ -1747,6 +1750,8 @@
 =
 ;
 
+%notcpu 8080
+%notcpu 8085
 	ld	hl,0	;const
 	call	l_lt
 	jp	nc,%1	;%3
@@ -1756,6 +1761,8 @@
 	jp	z,%1	;%3
 	ld	hl,%2
 
+%notcpu 8080
+%notcpu 8085
 	ld	hl,0	;const
 	call	l_lt
 	jp	c,%1	;%3
@@ -1765,6 +1772,8 @@
 	jp	nz,%1	;%3
 	ld	hl,%2
 
+%notcpu 8080
+%notcpu 8085
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -2889,6 +2898,7 @@ $notcpu 8085
 	pop	hl
 	push	hl
 
+%notcpu 8085
 	push	de
 	ld	hl,%1	;const
 	add	hl,sp
@@ -5710,6 +5720,8 @@ $notcpu 8085
 	jp	c,%2
 
 %title Clean up setting bit in char
+%notcpu 8080
+%notcpu 8085
 	push	hl
 	call	l_gchar
 	set	%1,l
