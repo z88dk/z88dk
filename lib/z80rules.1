@@ -112,6 +112,7 @@
 	dec	hl
 	push	hl
 
+%notcpu 8085
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
@@ -173,6 +174,7 @@
 	push	hl
 	push	de
 
+%notcpu 8085
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
@@ -5049,6 +5051,7 @@ $notcpu 8085
 	add	hl,sp
 	call	l_gint	;%4
 
+%notcpu 8085
 	ex	de,hl
 	call	l_pint
 =
@@ -5057,6 +5060,7 @@ $notcpu 8085
 	ld	(hl),d
 	ex	de,hl
 
+%notcpu 8085
 	call	l_gint	;%1
 	ld	bc,%2
 	add	hl,bc
@@ -5529,6 +5533,7 @@ $notcpu 8085
 	ld	hl,%4
 
 %title Load 8 bit value into integer
+%notcpu 8085
 	ld	l,(hl)
 	ld	h,0
 	pop	de
