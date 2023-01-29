@@ -150,10 +150,10 @@ static char *handle_hl(int index)
 
 static char *handle_register8(dcontext *state, uint8_t y, char *buf, size_t buflen)
 {
-    static char *table[3][8] = { 
+    static char *table[3][8] = {
         { "b", "c", "d", "e", "h", "l", "(hl)", "a" },
         { "b", "c", "d", "e", "ixh", "ixl", "(ix", "a" },
-        { "b", "c", "d", "e", "iyh", "ixl", "(iy", "a" }
+        { "b", "c", "d", "e", "iyh", "iyl", "(iy", "a" }
     };
     size_t offs = 0;
     int index = state->index;
