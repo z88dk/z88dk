@@ -268,11 +268,24 @@
 	ex	de,hl
 	ld	de,sp+%2
 
-
 	call	l_pint
 =
 	ld	(de),hl	;l_pint
 
+%title To avoid sbc hl,de in z80_rules.8
+	pop	de
+	call	l_sub
+=
+	ld	bc,hl
+	pop	hl
+	sub	hl,bc	;l_sub
+
+%title To avoid sbc hl,de in z80_rules.8
+	call	l_sub
+=
+	ld	bc,hl
+	ex	de,hl
+	sub	hl,bc	;l_sub
 
 %title Clear up a misoptimisation
 	push	de
