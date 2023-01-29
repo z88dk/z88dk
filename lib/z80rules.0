@@ -141,6 +141,7 @@
 	call	l_eq
 	jr	c,%1
 
+%notcpu 8085
 	pop	de
 	call	l_pint
 =
