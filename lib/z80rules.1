@@ -6831,6 +6831,7 @@ $notcpu 8085
 %notcpu 8085
 %notcpu r2ka
 %notcpu r3k
+%notcpu gbz80
 %check 1 <= %1 <= 8
 	ld	hl,%1	;const
 	add	hl,sp
@@ -6875,3 +6876,15 @@ $notcpu 8085
 =
 	call	l_gchar%1
 
+%title Truncating long
+	call	l_glong
+	ex	de,hl
+	ld	hl,%1	;const
+	push	de
+	ex	de,hl
+	ld	hl,%2	;const
+=
+	call	l_gint
+	push	hl
+	ld	de,%1	;const
+	ld	hl,%2	;const
