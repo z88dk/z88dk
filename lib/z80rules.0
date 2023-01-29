@@ -606,6 +606,15 @@
 =
 	call	l_gint7de	;
 
+%notcpu 8085
+	ld	hl,%1	;const
+	add	hl,sp
+	call	l_gchar
+=
+	ld	hl,%1	;const
+	call	l_gcharsp	;
+
+%notcpu 8085
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_gint	;
@@ -613,6 +622,7 @@
 	ld	hl,%1	;const
 	call	l_gintsp	;
 
+%notcpu 8085
 	ld	hl,%1	;const
 	add	hl,sp
 	call	l_glong
@@ -632,13 +642,6 @@
 	ld	hl,%3
 =
 	ld	hl,%3
-
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_gchar
-=
-	ld	hl,%1	;const
-	call	l_gcharsp	;
 
 	ld	de,256	;const
 	ex	de,hl
