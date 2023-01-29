@@ -272,7 +272,20 @@
 =
 	ld	(de),hl	;l_pint
 
-%title To avoid sbc hl,de in z80_rules.8
+	ld	de,%1
+	call	l_sub
+=
+	ld	bc,hl
+	ld	hl,%1
+	sub	hl,bc	;l_sub
+
+	pop	hl
+	call	l_sub
+=
+	ex	de,hl
+	pop	bc
+	sub	hl,bc	;l_sub
+
 	pop	de
 	call	l_sub
 =
@@ -280,11 +293,10 @@
 	pop	hl
 	sub	hl,bc	;l_sub
 
-%title To avoid sbc hl,de in z80_rules.8
 	call	l_sub
 =
-	ld	bc,hl
 	ex	de,hl
+	ld	bc,de
 	sub	hl,bc	;l_sub
 
 %title Clear up a misoptimisation
