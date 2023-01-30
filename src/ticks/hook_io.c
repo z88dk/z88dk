@@ -79,7 +79,7 @@ static void cmd_openfile(void)
     l = h = 255; 
     if ( slot != -1 ) {
 #ifdef WIN32
-        int fd = open(filename, flags, _S_IREAD | _S_IWRITE);
+        int fd = open(filename, flags|O_BINARY, _S_IREAD | _S_IWRITE);
 #else
         int fd = open(filename, flags, S_IRWXU);
 #endif
