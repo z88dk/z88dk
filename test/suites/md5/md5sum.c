@@ -436,7 +436,7 @@ void hexdump(const void *data, int size)
 
 void md5_testfile()
 {
-    char  result[100];
+    static char  result[100];
     char  buf[40];
     char  *expected = "996d17ca7b233f87a94325b21762dc35";
 
