@@ -2403,6 +2403,7 @@ void zadd_const(LVALUE *lval, int64_t value64)
         inc(lval);  // (int) =1, 6T, (ling) = 3 + (17 + 4 + 5 + 4 + 5 + 6 + 10) = 51T worst case  (17 + 4 + 11 = 33T = best)
         return;
     }
+
     if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
         uint32_t highword = ((uint32_t)value) / 65536;
         if ( (value % 65536) == 0 ) {
@@ -2442,11 +2443,20 @@ void zadd_const(LVALUE *lval, int64_t value64)
             }
             add_to_high_word(value);          // it will be < 7 bytes, 33T
         } else {
-            ol("ex\tde,hl");                      // 1, 4
-            // TODO: 8080/gbz80 - this adc is emulated and we could probably do better with an 8 bit operation
-            constbc(((uint32_t)value) / 65536);   // 3, 10
-            ol("adc\thl,bc");                     // 2, 15
-            ol("ex\tde,hl");                      // 1, 4
+            if ( IS_808x() || IS_GBZ80()) {
+                uint32_t v = ((uint32_t)value) / 65536;
+                outfmt("\tld\ta,%d\n",v % 256);         // 2, 7
+                ol("adc\te");                         // 1, 4
+                ol("ld\te,a");                        // 1, 4
+                outfmt("\tld\ta,%d\n",v / 256);         // 2, 7
+                ol("adc\td");                         // 1, 4
+                ol("ld\td,a");                        // 1, 4
+            } else {
+                ol("ex\tde,hl");                      // 1, 4
+                constbc(((uint32_t)value) / 65536);   // 3, 10
+                ol("adc\thl,bc");                     // 2, 15
+                ol("ex\tde,hl");                      // 1, 4
+            }
         }
 
     } else {

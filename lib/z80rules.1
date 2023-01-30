@@ -112,6 +112,7 @@
 	dec	hl
 	push	hl
 
+%notcpu 8085
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
@@ -173,6 +174,7 @@
 	push	hl
 	push	de
 
+%notcpu 8085
 	ld	hl,2	;const
 	add	hl,sp
 	push	hl
@@ -841,6 +843,7 @@
 	ld	d,0
 	ld	hl,%1	;const
 
+%notcpu 8085
 	call	l_gint	;%9
 	push	hl
 	ld	hl,%1
@@ -1396,6 +1399,7 @@
 	push	bc
 	ld	hl,%1	;const
 
+%notcpu 8085
 %notcpu gbz80
 	push	hl
 	ld	hl,%1	;const
@@ -1747,6 +1751,8 @@
 =
 ;
 
+%notcpu 8080
+%notcpu 8085
 	ld	hl,0	;const
 	call	l_lt
 	jp	nc,%1	;%3
@@ -1756,6 +1762,8 @@
 	jp	z,%1	;%3
 	ld	hl,%2
 
+%notcpu 8080
+%notcpu 8085
 	ld	hl,0	;const
 	call	l_lt
 	jp	c,%1	;%3
@@ -1765,6 +1773,8 @@
 	jp	nz,%1	;%3
 	ld	hl,%2
 
+%notcpu 8080
+%notcpu 8085
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -2421,6 +2431,7 @@
 	and	a
 	jr	%1
 
+%notcpu 8085
 	call	l_gint	;%2
 	ld	de,%1
 	ex	de,hl
@@ -2889,6 +2900,7 @@ $notcpu 8085
 	pop	hl
 	push	hl
 
+%notcpu 8085
 	push	de
 	ld	hl,%1	;const
 	add	hl,sp
@@ -3743,9 +3755,9 @@ $notcpu 8085
 	ld	hl,%eval( %1 2 -)	;const
 	add	hl,sp
 
-%check 0 <= %1 <= 7
 %notcpu 8080
 %notcpu 8085
+%check 0 <= %1 <= 7
 	ld	e,(hl)
 	inc	hl
 	ld	d,(hl)
@@ -5039,6 +5051,7 @@ $notcpu 8085
 	add	hl,sp
 	call	l_gint	;%4
 
+%notcpu 8085
 	ex	de,hl
 	call	l_pint
 =
@@ -5047,6 +5060,7 @@ $notcpu 8085
 	ld	(hl),d
 	ex	de,hl
 
+%notcpu 8085
 	call	l_gint	;%1
 	ld	bc,%2
 	add	hl,bc
@@ -5519,6 +5533,7 @@ $notcpu 8085
 	ld	hl,%4
 
 %title Load 8 bit value into integer
+%notcpu 8085
 	ld	l,(hl)
 	ld	h,0
 	pop	de
@@ -5710,6 +5725,8 @@ $notcpu 8085
 	jp	c,%2
 
 %title Clean up setting bit in char
+%notcpu 8080
+%notcpu 8085
 	push	hl
 	call	l_gchar
 	set	%1,l
@@ -6462,129 +6479,6 @@ $notcpu 8085
 .%1
 	ld	hl,%2
 
-%cpu 8085
-%check 0 <= %1 <= 255
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_gchar
-	push	hl
-	ld	hl,%2	;const
-=
-	ld	de,sp+%1
-	ld	a,(de)	;l_gchar
-	call	l_sxt
-	push	hl
-	ld	hl,%2	;const
-
-%cpu 8085
-%check 0 <= %1 <= 255
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_gchar
-=
-	ld	de,sp+%1
-	ld	a,(de)	;l_gchar
-	call	l_sxt
-
-%cpu 8085
-%check 0 <= %1 <= 255
-	ld	bc,%1
-	add	hl,bc
-	call	l_gchar
-=
-	ld	de,hl+%1
-	ld	a,(de)	;l_gchar
-	call	l_sxt
-
-%cpu 8085
-	inc	hl
-	inc	hl
-	inc	hl
-	call	l_gchar
-=
-	ld	de,hl+3
-	ld	a,(de)	;l_gchar
-	call	l_sxt
-
-%cpu 8085
-	inc	hl
-	inc	hl
-	call	l_gchar
-=
-	ld	de,hl+2
-	ld	a,(de)	;l_gchar
-	call	l_sxt
-
-%cpu 8085
-%check 0 <= %1 <= 255
-	ld	hl,%1	;const
-	add	hl,sp
-	push	hl
-	call	l_gint	;%9
-=
-	ld	de,sp+%1
-	push	de
-	ld	hl,(de)	;l_gint
-
-%cpu 8085
-%check 0 <= %1 <= 255
-	ld	hl,%1	;const
-	add	hl,sp
-	call	l_gint	;%9
-=
-	ld	de,sp+%1
-	ld	hl,(de)	;l_gint
-
-%cpu 8085
-%check 0 <= %1 <= 255
-	ld	bc,%1
-	add	hl,bc
-	call	l_gint	;%9
-=
-	ld	de,hl+%1
-	ld	hl,(de)	;l_gint
-
-%cpu 8085
-	inc	hl
-	inc	hl
-	inc	hl
-	call	l_gint	;%9
-=
-	ld	de,hl+3
-	ld	hl,(de)	;l_gint
-
-%cpu 8085
-	inc	hl
-	inc	hl
-	call	l_gint	;%9
-=
-	ld	de,hl+2
-	ld	hl,(de)	;l_gint
-
-%cpu 8085
-	inc	hl
-	call	l_gint	;%9
-=
-	ld	de,hl+1
-	ld	hl,(de)	;l_gint
-
-%cpu 8085
-	call	l_gint
-=
-	ex	de,hl
-	ld	hl,(de)	;l_gint
-
-%cpu 8085
-	call	l_gint	;%9
-=
-	ex	de,hl
-	ld	hl,(de)	;l_gint
-
-%cpu 8085
-	call	l_pint
-=
-	ld	(de),hl	;l_pint
-
 %notcpu gbz80
 	ld	hl,_%1
 	inc	(hl)
@@ -6937,6 +6831,7 @@ $notcpu 8085
 %notcpu 8085
 %notcpu r2ka
 %notcpu r3k
+%notcpu gbz80
 %check 1 <= %1 <= 8
 	ld	hl,%1	;const
 	add	hl,sp
@@ -6981,35 +6876,15 @@ $notcpu 8085
 =
 	call	l_gchar%1
 
-%title Clear up a misoptimisation
-%cpu 8085
-	push	de
-	ld	hl,(de)	;l_gint
-	%2c	hl
-	pop	de
-	ld	(de),hl	;l_pint
-=
-	ld	hl,(de)	;l_gint
-	%2c	hl
-	ld	(de),hl	;l_pint
-
-%cpu 8085
-%check 0 <= %1 <= 255
+%title Truncating long
+	call	l_glong
+	ex	de,hl
 	ld	hl,%1	;const
-	add	hl,sp
+	push	de
 	ex	de,hl
 	ld	hl,%2	;const
 =
-	ld	de,sp+%1
+	call	l_gint
+	push	hl
+	ld	de,%1	;const
 	ld	hl,%2	;const
-
-%cpu 8085
-%check 0 <= %2 <= 255
-	ld	de,sp+%1
-	ld	hl,%2	;const
-	add	hl,sp
-	ex	de,hl
-=
-	ld	de,sp+%1
-	ex	de,hl
-	ld	de,sp+%2

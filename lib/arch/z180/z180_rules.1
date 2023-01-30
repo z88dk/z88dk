@@ -9,7 +9,7 @@
 	mlt	hl
 =
 	ld	e,(hl)
-	ld	hl,%2 - 2	;const
+	ld	hl,%eval(%2 2 -)	;const
 	add	hl,sp
 	ld	d,(hl)
 	ex	de,hl
@@ -26,7 +26,7 @@
 =
 	add	hl,sp
 	ld	e,(hl)
-	ld	hl,+(%1 - 2)	;const
+	ld	hl,%eval(%1 2 -)	;const
 	add	hl,sp
 	ld	d,(hl)
 	ex	de,hl
@@ -41,7 +41,7 @@
 	mlt	hl
 =
 	ld	e,l
-	ld	hl,+(%1 - 2)	;const
+	ld	hl,%eval(%1 2 -)	;const
 	add	hl,sp
 	ld	d,(hl)
 	ex	de,hl

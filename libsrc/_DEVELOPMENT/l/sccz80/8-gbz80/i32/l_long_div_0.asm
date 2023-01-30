@@ -15,39 +15,31 @@ PUBLIC  l_long_div_0
 .div_loop
     rra                         ;save Carry
     ld      hl,sp+4             ;remainder (hl)
-    ex      de,hl
+    ld      d,h
+    ld      e,l
     ld      hl,sp+14            ;dividend (hl)
     rla                         ;restore Carry
 
     ;rotate left dividend + quotient Carry
-    ld      a,(hl)
-    rla
-    ld      (hl+),a
-    ld      a,(hl)
-    rla
-    ld      (hl+),a
-    ld      a,(hl)
-    rla
-    ld      (hl+),a
-    ld      a,(hl)
-    rla
-    ld      (hl),a
+    rl      (hl)
+    inc     hl
+    rl      (hl)
+    inc     hl
+    rl      (hl)
+    inc     hl
+    rl      (hl)
+
 
     ex      de,hl
 
     ;rotate left remainder + dividend Carry
-    ld      a,(hl)
-    rla
-    ld      (hl+),a
-    ld      a,(hl)
-    rla
-    ld      (hl+),a
-    ld      a,(hl)
-    rla
-    ld      (hl+),a
-    ld      a,(hl)
-    rla
-    ld      (hl),a
+    rl      (hl)
+    inc     hl
+    rl      (hl)
+    inc     hl
+    rl      (hl)
+    inc     hl
+    rl      (hl)
 
     ;compare (remainder - divisor)
     ld      hl,sp+4
@@ -105,18 +97,13 @@ PUBLIC  l_long_div_0
     ld      hl,sp+14
     rla                         ;restore Carry
 
-    ld      a,(hl)              ;rotate left quotient Carry
-    rla
-    ld      (hl+),a
-    ld      a,(hl)
-    rla
-    ld      (hl+),a
-    ld      a,(hl)
-    rla
-    ld      (hl+),a
-    ld      a,(hl)
-    rla
-    ld      (hl),a
+    rl      (hl)		;rotate left quotient Carry
+    inc     hl
+    rl      (hl)
+    inc     hl
+    rl      (hl)
+    inc     hl
+    rl      (hl)
 
     ret
 

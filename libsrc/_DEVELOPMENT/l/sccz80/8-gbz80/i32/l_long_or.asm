@@ -39,10 +39,7 @@ PUBLIC  l_long_or
     ld      hl,bc       ;get the lower 16 back into hl
 
     pop     bc          ;get return
-    inc     sp
-    inc     sp
-    inc     sp
-    inc     sp
+    add     sp,4
     push    bc          ;save return
 
     ret

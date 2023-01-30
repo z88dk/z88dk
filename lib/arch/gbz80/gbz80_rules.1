@@ -168,3 +168,19 @@
 	ld	e,l
 	ld	d,h
 	ld	hl,%2
+
+%title Cleanup a rules generated mess
+	call	l_glong
+	push	hl
+	ld	l,e
+	ld	h,d
+	pop	de
+	ld	hl,%1	;const
+	push	de
+	ex	de,hl
+	ld	hl,%2
+=
+	call	l_gint
+	push	hl
+	ld	de,%1	;const
+	ld	hl,%2
