@@ -4,7 +4,7 @@
 	ld	h,(hl)
 	ld	l,a
 
-%check 0 <= %1 <= 127
+%check -128 <= %1 <= 127
 	ld	hl,%1	;const
 	add	hl,sp
 =
@@ -45,8 +45,7 @@
 	ld	l,a
 	push	hl
 
-
-%check 0 <= %1 <= 127
+%check -128 <= %1 <= 127
 	ld	hl,%1	;const
 	add	hl,sp
 	ld	sp,hl
