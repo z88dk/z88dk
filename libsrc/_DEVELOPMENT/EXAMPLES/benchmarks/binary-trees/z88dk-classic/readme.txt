@@ -10,7 +10,7 @@ To verify the correct result, compile for the zx target
 and run on a spectrum emulator.
 
 classic/sccz80/8085
-zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 binary-trees.c -o bt --math-mbf32_8085 -lndos -create-app -pragma-define:USING_amalloc
+zcc +cpm -clib=8085 -vn -DSTATIC -DPRINTF -O2 --opt-code-speed binary-trees.c -o bt --math-mbf32_8085 -lndos -create-app -pragma-define:USING_amalloc
 
 classic/sccz80
 zcc +zx -vn -DSTATIC -DPRINTF -O2 binary-trees.c -o bt --math-mbf32 -lndos -create-app -pragma-define:USING_amalloc
@@ -27,7 +27,7 @@ a binary ORGed at address 0 was produced.
 This simplifies the use of TICKS for timing.
 
 classic/sccz80/8085
-zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 binary-trees.c -o bt.bin --math-mbf32_8085 -lndos -m -pragma-define:USING_amalloc
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed binary-trees.c -o bt.bin --math-mbf32_8085 -lndos -m -pragma-define:USING_amalloc
 
 classic/sccz80
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 binary-trees.c -o bt.bin --math-mbf32 -lndos -m -pragma-define:USING_amalloc
@@ -52,12 +52,12 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK December 12, 2022
+Z88DK January 31, 2023
 classic/sccz80/8085
-3807 bytes less page zero
+3775 bytes less page zero
 
-cycle count  = 145472403
-time @ 4MHz  = 145472403 / 4*10^6 = 36.37 sec
+cycle count  = 137783936
+time @ 4MHz  = 137783936 / 4*10^6 = 34.45 sec
 
 
 Z88DK August 28, 2022

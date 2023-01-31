@@ -27,7 +27,7 @@ a binary ORGed at address 0 was produced.
 This simplifies the use of TICKS for timing.
 
 classic/sccz80/8085
-zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 fannkuch.c -o fannkuch.bin -lndos -m
+zcc +test -clib=8085 -vn -DSTATIC -DTIMER -D__Z88DK -O2 --opt-code-speed fannkuch.c -o fannkuch.bin -lndos -m
 
 classic/sccz80
 zcc +test -vn -DSTATIC -DTIMER -D__Z88DK -O2 fannkuch.c -o fannkuch.bin -lndos -m
@@ -52,12 +52,12 @@ prematurely terminated so rerun with a higher counter if that is the case.
 RESULT
 ======
 
-Z88DK December 12, 2022
+Z88DK January 31, 2023
 classic/sccz80/8085
-1783 bytes less page zero
+1782 bytes less page zero
 
-cycle count  = 67446120
-time @ 4MHz  = 67446120 / 4*10^6 = 16.86 sec
+cycle count  = 64389094
+time @ 4MHz  = 64389094 / 4*10^6 = 16.10 sec
 
 
 Z88DK January 3, 2022

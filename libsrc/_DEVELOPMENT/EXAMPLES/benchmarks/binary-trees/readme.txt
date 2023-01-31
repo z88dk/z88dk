@@ -141,12 +141,12 @@ IAR is likely implementing a heap similar to z88dk's new c library
 where an emphasis is placed on the speed of realloc().
 
 8.
-Z88DK December 12, 2022
+Z88DK January 31, 2023
 sccz80 / classic c library / 8085 CPU
-3807 bytes less page zero
+3775 bytes less page zero
 
-cycle count  = 145472403
-time @ 4MHz  = 145472403 / 4*10^6 = 36.37 sec
+cycle count  = 137783936
+time @ 4MHz  = 137783936 / 4*10^6 = 34.45 sec
 
 9.
 HITECH C CPM V309-15
