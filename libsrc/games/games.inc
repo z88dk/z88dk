@@ -507,17 +507,13 @@ IF FORlviv
         defc SOUND_ONEBIT_mask   = 1
 ENDIF
 
-IF FORsol20
-    defc SOUND_IFF     = 1
-ENDIF
-
 IF FORlynx
         defc SOUND_ONEBIT_port   = $84
         defc SOUND_ONEBIT_bit    = 5
-        defc SOUND_ONEBIT_mask   = 16
+        defc SOUND_ONEBIT_mask   = 32
         defc TAPEIN_ONEBIT_port  = $80	; The original ROM uses a 16 bit port addressing (BC)
-        defc TAPEIN_ONEBIT_mask  = 1
-        ;----
+        defc TAPEIN_ONEBIT_mask  = 4
+	;----
         defc PLAY_DATA_LEAD    = 186   ; (164) Timing for the leading tone
         defc PLAY_DATA_SYNC1   = 51    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
         defc PLAY_DATA_BIAS    = 5     ; Fine tuning the parameters
@@ -531,11 +527,39 @@ IF FORlynx
 	defc INPUT_JOY_useinkey = 1
 ENDIF
 
+IF FORmz
+;   PSG on the MZ-800
+	defc SOUND_ONEBIT_port	= $F2
+    defc SOUND_ONEBIT_bit    = 3
+    defc SOUND_ONEBIT_mask   = $0F        	; $0F for full volume output
+;    defc SOUND_ONEBIT_port   = -0xe007
+;    defc SOUND_ONEBIT_bit    = 3
+;    defc SOUND_ONEBIT_mask   = $28        	; $0F for full volume output
+ENDIF
+
+IF FORsol20
+    defc SOUND_IFF     = 1
+ENDIF
+
 IF FORsrr
 	defc INPUT_JOY_useinkey = 1
 ENDIF
 
 IF FORspc1000
+        defc SOUND_ONEBIT_port   = $6000	; 16 bit port addressing (BC)
+        defc SOUND_ONEBIT_bit    = 0
+        defc SOUND_ONEBIT_mask   = 1
+        ;----
+        defc PLAY_DATA_LEAD    = 186   ; (164) Timing for the leading tone
+        defc PLAY_DATA_SYNC1   = 51    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
+        defc PLAY_DATA_BIAS    = 5     ; Fine tuning the parameters
+        defc PLAY_DATA_SYNC2   = 62    ; (55, 59)
+        defc PLAY_DATA_BIT0    = 69    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
+        defc LDR_DATA_TIMING   = 34
+        defc PLAY_MSXDATA_HI     = 12914    ; 1200 baud, High tone period
+        defc PLAY_MSXDATA_LO     = 26408    ; 1200 baud, Low tone period
+        defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
+        ;----
 	defc INPUT_JOY_useinkey = 1
 ENDIF
 
@@ -565,12 +589,6 @@ ENDIF
 ; ********************************************************
 ;  SN76489 PSG chip definitions
 ; ********************************************************
-
-IF FORmz
-	defc SOUND_ONEBIT_port	= $F2
-    defc SOUND_ONEBIT_bit    = 3
-    defc SOUND_ONEBIT_mask   = $0F        	; $0F for full volume output
-ENDIF
 
 IF FORsc3000
 	defc SOUND_ONEBIT_port	= $7F        ; also valid for SG-1000
