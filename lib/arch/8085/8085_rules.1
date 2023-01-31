@@ -309,3 +309,13 @@
 	ld	hl,(de)	;l_gint
 	%2c	hl
 	ld	(de),hl	;l_pint
+
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	de,%2	;const
+	ex	de,hl
+	ld	(de),hl	;l_pint
+=
+	ld	de,sp+%1
+	ld	hl,%2	;const
+	ld	(de),hl
