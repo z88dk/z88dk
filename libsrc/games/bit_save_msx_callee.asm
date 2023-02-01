@@ -146,7 +146,7 @@ CWRTON_0:
 CWRTON_1:
   LD B,A
   LD C,$00
-  DI
+  ;DI
 CWRTON_2:
   CALL TAPSEND_HIGH
   CALL TAPSEND_RET
@@ -229,6 +229,7 @@ TAPSEND_1:
   JP NZ,TAPSEND_1
 		ld	a,(__snd_tick)		; MIC on
 		xor  SOUND_ONEBIT_mask	; MIC on<>off
+		;xor  $1E
 		ONEBITOUT
 TAPSEND_2:
   DEC H
@@ -237,9 +238,6 @@ TAPSEND_2:
 		ONEBITOUT
   POP AF
   RET
-
-
-
 
 
 ENDIF
