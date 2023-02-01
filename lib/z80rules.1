@@ -5012,11 +5012,11 @@ $notcpu 8085
 	%3c	hl
 	pop	de
 =
-	ld	de,_%1
 	ld	hl,%eval(%2 2 -)	;const
 	add	hl,sp
 	call	l_gint	;%4
 	%3c	hl
+	ld	de,_%1
 
 	call	l_gint	;
 	ld	a,h
@@ -6888,3 +6888,12 @@ $notcpu 8085
 	push	hl
 	ld	de,%1	;const
 	ld	hl,%2	;const
+
+%check 4 <= %2 <= 8
+	ld	hl,%1X
+	push	hl
+	call	l_gint%2sp	;
+	pop	de
+=
+	call	l_gint%eval(%2 2-)sp	;
+	ld	de,%1
