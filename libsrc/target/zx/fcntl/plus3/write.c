@@ -30,7 +30,7 @@ ssize_t write(int handle, void *buf, size_t len)
 	ld	b,(ix+6)	;handle
 	ld	c,0		;page FIXME
 	push	de
-	ld	iy,DOS_WRITE
+	ld	ix,DOS_WRITE
 	call	dodos
 	pop	hl		;bytes we wanted to write
 	pop	ix		;restore caller

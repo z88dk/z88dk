@@ -23,7 +23,7 @@
 	push	hl
 	push	ix
 	ld	b,c
-	ld	iy,DOS_GET_POSITION	;corrupts ix
+	ld	ix,DOS_GET_POSITION	;corrupts ix
 	call	dodos
 	pop	ix
 IF !idedos

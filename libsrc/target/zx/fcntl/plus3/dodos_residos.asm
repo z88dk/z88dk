@@ -12,10 +12,9 @@
 ; that they suit us somewhat
 dodos_residos:
         exx
-        push    iy
+        push    ix
         pop     hl
         ld      b,PKG_IDEDOS
         rst     RST_HOOK
         defb    HOOK_PACKAGE
-        ld      iy,23610
         ret

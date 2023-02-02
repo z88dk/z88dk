@@ -26,9 +26,9 @@ int writebyte(int handle, int byte)
 	push	bc
 	ld	c,l	;byte
 	ld	b,e	;file handle
-	ld	iy,DOS_BYTE_WRITE
 	push	bc	;keep byte
 	push	ix
+	ld	ix,DOS_BYTE_WRITE
 	call	dodos
 	pop	ix
 	pop	bc

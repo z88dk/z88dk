@@ -20,8 +20,8 @@ int readbyte(int fd)
 	pop	bc	;for FASTCALL parameter is pushed on entry
 	push	bc
 	ld	b,c	;file handle
-	ld	iy,DOS_BYTE_READ	
 	push	ix
+	ld	ix,DOS_BYTE_READ	
 	call	dodos
 	pop	ix
 	ld	hl,-1	;EOF
