@@ -19,7 +19,7 @@ PUBLIC _bit_tapion
 
 
 EXTERN bit_open_di
-EXTERN bit_close_ei
+EXTERN bit_tapiof
 EXTERN bit_tapin_bit
 
 PUBLIC __LOWLIM
@@ -86,7 +86,7 @@ ENDIF
 
 TAPION_0:
   ;LD HL,1111
-  LD HL,600
+  LD HL,400
 
 TAPION_1:
   LD D,C              ; Get tape block mode
@@ -149,8 +149,8 @@ TAPION_4:
   RET
 
 TAPION_ERROR:
+  call bit_tapiof
   LD HL,-1
-  call bit_close_ei
   RET
 
 
