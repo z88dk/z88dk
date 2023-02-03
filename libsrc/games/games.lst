@@ -33,6 +33,9 @@ games/obj/${TARGET}/bit_load_block_zx
 games/obj/${TARGET}/bit_load_block_zx_callee
 games/obj/${TARGET}/bit_save_msx
 games/obj/${TARGET}/bit_save_msx_callee
+games/obj/${TARGET}/bit_tapion
+games/obj/${TARGET}/bit_tapiof
+games/obj/${TARGET}/bit_tapin
 games/obj/${TARGET}/bit_open
 games/obj/${TARGET}/bit_open_di
 games/obj/${TARGET}/bit_close
