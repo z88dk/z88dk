@@ -28,13 +28,17 @@ EXTERN __WINWID
 INCLUDE  "games/games.inc"
 
 
+IF __CPU_GBZ80__ || __CPU_INTEL__
 bit_tapin:
 _bit_tapin:
-
-IF __CPU_GBZ80__ || __CPU_INTEL__
+bit_tapin_bit:
+_bit_tapin_bit:
 	ret
 ELSE
 
+
+bit_tapin:
+_bit_tapin:
 
   LD A,(__LOWLIM)			; Minimal length of startbit
   LD D,A
