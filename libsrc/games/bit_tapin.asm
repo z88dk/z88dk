@@ -18,7 +18,7 @@ PUBLIC _bit_tapin
 PUBLIC bit_tapin_bit
 PUBLIC _bit_tapin_bit
 
-EXTERN bit_close_ei
+EXTERN bit_tapiof
 
 
 EXTERN __LOWLIM
@@ -107,8 +107,8 @@ TAPIN_BYTE:
   RET
 
 TAPIN_ERROR:
+  call bit_tapiof
   LD HL,-1		; error code
-  call bit_close_ei
   RET
 
 
