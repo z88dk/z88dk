@@ -133,6 +133,25 @@ extern int  __LIB__  bit_save_msx_callee(char *name, size_t loadstart, void *sta
 #define bit_save_msx(a,b,c,d,e) bit_save_msx_callee(a,b,c,d,e)
 
 
+/* Generic, auto speed adaptive, Kansas City Standard DATA loader */
+/* It should be possible to get stream data created by:  MSX, SVI, Philips VG-5000, Sega SC-3000 and many others */
+/* Supported by few z88dk targets only  */
+
+/* Open tape device for input and sync with the carrier tone */
+/* 0..256 = sync speed, -1=sync failed */
+extern int  __LIB__  bit_tapion();
+
+/* Close the previously opened device and restore interrupts */
+extern void __LIB__ bit_tapiof();
+
+/* Read a single byte from tape.  Sync must have succeded. */
+/* On exit: byte value or -1 (load failed or end of stream) */
+extern int  __LIB__  bit_tapin();
+
+/* Skip the next bit (can be used to deal with stop bits( */
+extern void __LIB__ bit_tapin_bit();
+
+
 
 
 
