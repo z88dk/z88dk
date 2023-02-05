@@ -746,6 +746,7 @@ int main (int argc, char **argv){
     printf("  -rom X         write-protect memory, X in hexadecimal is first RAM address\n"),
     printf("  -w X           Maximum amount of running time (400000000 cycles per unit)\n"),
     printf("  -x <file>      Symbol or map file to read\n"),
+	printf("  -script <file> Script file to run at the console\n"),
     printf("                 Use before -pc,-start,-end to enable symbols\n\n"),
     printf("  Default values for -pc, -start and -end are 0000 if omitted.\n"),
     printf("  When the program exits, it'll show the number of cycles between start and end trigger in decimal\n\n"),
@@ -765,8 +766,13 @@ int main (int argc, char **argv){
           pc= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
           break;
         case 's':
-          symbol_addr= symbol_resolve(argv[1], NULL);
-          start= (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
+			if (strcmp(&argv[0][1], "start") == 0) {
+				symbol_addr = symbol_resolve(argv[1], NULL);
+				start = (-1 == symbol_addr) ? strtol(argv[1], NULL, 16) : symbol_addr;
+			} 
+			else if (strcmp(&argv[0][1], "script") == 0) {
+				script_file = argv[1];
+			}
           break;
         case 'e':
           symbol_addr= symbol_resolve(argv[1], NULL);

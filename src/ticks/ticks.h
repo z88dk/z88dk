@@ -41,6 +41,7 @@ extern int rc2014_mode;
 extern int break_required;
 
 extern uint8_t verbose;
+extern char* script_file;
 
 /* Break down flags */
 extern int f(void);

@@ -131,6 +131,7 @@ static int cmd_watch(int argc, char **argv);
 static int cmd_examine(int argc, char **argv);
 static int cmd_set(int argc, char **argv);
 static int cmd_out(int argc, char **argv);
+static int cmd_define(int argc, char **argv);
 static int cmd_trace(int argc, char **argv);
 static int cmd_hotspot(int argc, char **argv);
 static int cmd_profiler(int argc, char **argv);
@@ -170,10 +171,11 @@ static command commands[] = {
     { "break",     cmd_break,       "<address/label>",      "Handle breakpoints" },
     { "delete",    cmd_del_break,   "<breakpoint id>",      "Delete breakpoint(s)" },
     { "watch",     cmd_watch,       "<address/label>",      "Handle watchpoints" },
-    { "x",         cmd_examine,     "<address>",            "Examine memory" },
+    { "x",         cmd_examine,     "[/<length>] <address>","Examine memory" },
     { "set",       cmd_set,         "<hl/h/l/...> <value>", "Set registers" },
     { "out",       cmd_out,         "<address> <value>",    "Send to IO bus"},
     { "trace",     cmd_trace,       "<on/off>",             "Disassemble every instruction"},
+    { "define",    cmd_define,   "define {hook_stop|...}",        "Specify a command block:\n\t\t\t\t\thook-stop: commands to execute when trace occurs"},
     { "hotspot",   cmd_hotspot,     "<on/off>",             "Track address counts and write to hotspots file"},
     { "profiler",  cmd_profiler,    "[-f fun][-i iter]",    "start/stop profiling (-f function limit, -i iteration limit)"},
     { "list",      cmd_list,        "[<address>]",          "List the source code at location given or pc"},
@@ -204,6 +206,7 @@ static struct {
        int debugger_break_requested = 0;
        int trace = 0;
        int trace_source = 0;
+static int blockmode = 0;
 static int hotspot = 0;
 static int max_hotspot_addr = 0;
 static int last_hotspot_addr;
@@ -402,12 +405,29 @@ void debugger_request_a_break() {
     }
 }
 
-int debugger_evaluate(char* line)
-{
-    int return_to_execution = 0;
+static void debugger_print_prompt(char *prompt, size_t prompt_size, char *buf, size_t buf_size) {
+    uint16_t sym_offset;
+    symbol* sym = symbol_find_lower(bk.pc(), SYM_ADDRESS, &sym_offset);
+    if (sym == NULL) {
+        buf[0] = 0;
+    } else {
+        snprintf(buf,buf_size,"%s+%d", sym->name, sym_offset);
+    }
 
-    int argc;
-    char** argv = parse_words(line, &argc);
+	if (interact_with_tty) {
+		if (blockmode) {
+			snprintf(prompt, prompt_size, "\n" FNT_BCK "    ..." FNT_RST " ", bk.pc(), buf);
+		} else {
+			snprintf(prompt, prompt_size, "\n" FNT_BCK "    $%04x    (%s)>" FNT_RST " ", bk.pc(), buf);
+		}
+	} else {
+		// Original output for non-active tty 
+        snprintf(prompt, prompt_size, " %04x (%s)>", bk.pc(), buf);
+	}
+}
+
+static int debugger_evaluate_argv(int argc, char **argv) {
+    int return_to_execution = 0;
 
     if ( argc > 0 ) {
         command *cmd = &commands[0];
@@ -435,13 +455,127 @@ int debugger_evaluate(char* line)
                 bk.console("    %s\n", ambiguous_commands[i]->cmd);
             }
         }
-        free(argv);
     }
+
     return return_to_execution;
 }
 
+static int debugger_evaluate_multiple(int argc, char** argv) {
+    static char buf[600];
+    char prompt[300];
+
+	int return_to_execution = 0;
+
+	if (argc > 0) {
+		char** sub_argv = argv;
+		int sub_argc = 0;
+		for (int i = 0; i < argc; i++) {
+			if (argv[i] == NULL) {
+				debugger_print_prompt(prompt, sizeof(prompt), buf, sizeof(buf));
+				fputs(prompt, stdout);
+				for (int i = 0; i < sub_argc; i++) {
+					if (interact_with_tty) {
+						bk.console(FNT_BLD "%s " FNT_RST, sub_argv[i]);
+					}
+					else {
+						bk.console("%s ", sub_argv[i]);
+					}
+				}
+				bk.console("\n");
+
+				return_to_execution = debugger_evaluate_argv(sub_argc, sub_argv);
+				if (return_to_execution) {
+					return return_to_execution;
+				}
+				sub_argv = &argv[i + 1];
+				sub_argc = 0;
+			}
+			else {
+				sub_argc++;
+			}
+		}
+		if (sub_argc > 0) {
+			debugger_print_prompt(prompt, sizeof(prompt), buf, sizeof(buf));
+			fputs(prompt, stdout);
+			for (int i = 0; i < sub_argc; i++) {
+				if (interact_with_tty) {
+					bk.console(FNT_BLD "%s " FNT_RST, sub_argv[i]);
+				}
+				else {
+					bk.console("%s ", sub_argv[i]);
+				}
+			}
+			bk.console("\n");
+
+			return_to_execution = debugger_evaluate_argv(sub_argc, sub_argv);
+			if (return_to_execution) {
+				return return_to_execution;
+			}
+		}
+	}
+
+	return return_to_execution;
+}
+
+static char **hookstop_argv = NULL;
+static int hookstop_argc = 0;
+
+static int blockmode_argc = 0;
+static char **blockmode_argv = NULL;
+
+static int add_blockline(int argc, char** argv) {
+	blockmode = 1;
+	if (argc <= 0) {
+		return 0;
+	}
+
+	if (argc == 1 && strcmp(argv[0], "end") == 0) {
+		blockmode = 0;
+		int ret = debugger_evaluate_argv(blockmode_argc, blockmode_argv);
+		blockmode_argc = 0;
+		return ret;
+	}
+
+	blockmode_argc += argc + 1;
+
+	size_t size = blockmode_argc * sizeof(argv[0]);
+	if (blockmode_argv == NULL) {
+		blockmode_argv = malloc(size);
+	}
+	else {
+		blockmode_argv = realloc(blockmode_argv, size);
+	}
+
+	memcpy(&blockmode_argv[blockmode_argc - (argc + 1)], argv, argc * sizeof(blockmode_argv[0]));
+	blockmode_argv[blockmode_argc - 1] = NULL;
+
+	return 0;
+}
+
+int debugger_evaluate(char* line)
+{
+
+    int argc;
+	int return_to_execution;
+    char** argv = parse_words(line, &argc);
+	if (blockmode) {
+		return_to_execution = add_blockline(argc, argv);
+	}
+	else {
+		return_to_execution = debugger_evaluate_argv(argc, argv);
+	}
+
+	if ( argc > 0 ) {
+		free(argv);
+	}
+
+    return return_to_execution;
+}
+
+
 void debugger()
 {
+	static FILE *script_file = NULL;
     static char *last_line = NULL;
     static char buf[2048];
     char prompt[300];
@@ -452,13 +586,24 @@ void debugger()
     }
 
     if ( trace ) {
-        cmd_registers(0, NULL);
-        disassemble2(bk.pc(), buf, sizeof(buf), 0);
+		int return_to_execution = 0;
+		if (hookstop_argc > 0) {
+			return_to_execution = debugger_evaluate_multiple(hookstop_argc, hookstop_argv);
+		}
+		else {
+			cmd_registers(0, NULL);
+		}
+
+		disassemble2(bk.pc(), buf, sizeof(buf), 0);
 
         if (interact_with_tty)
             bk.console( "\n%s\n\n",buf);    // In case of active tty, double LF to improve layout in case of 'cont'
         else
             bk.console("%s\n",buf);         // Unchanged in case of non-active tty
+
+		if (return_to_execution) {
+			return;
+		}
     }
 
     if ( hotspot ) {
@@ -578,23 +723,37 @@ void debugger()
 
     /* In the debugger, loop continuously for commands */
 
-    uint16_t sym_offset;
-    symbol* sym = symbol_find_lower(bk.pc(), SYM_ADDRESS, &sym_offset);
-    if (sym == NULL) {
-        buf[0] = 0;
-    } else {
-        snprintf(buf,sizeof(buf),"%s+%d", sym->name, sym_offset);
-    }
-
-    if (interact_with_tty)
-        snprintf(prompt,sizeof(prompt), "\n" FNT_BCK "    $%04x    (%s)>" FNT_RST " ", bk.pc(), buf);
-    else                                                                                // Original output for non-active tty
-        snprintf(prompt,sizeof(prompt), " %04x (%s)>", bk.pc(), buf);
-
     if (last_stacktrace_at != bk.pc()) {
         last_stacktrace_at = bk.pc();
         current_frame = 0;
     }
+
+	if (bk.script_filename()) {
+		if (!script_file) {
+			script_file = fopen(bk.script_filename(), "r");
+		}
+
+		if (script_file) {
+			char lineBuf[2048];
+			while ((line = fgets(lineBuf, sizeof(lineBuf), script_file)) != NULL) {
+				line = strdup(lineBuf);
+				debugger_print_prompt(prompt, sizeof(prompt), buf, sizeof(buf));
+				fputs(prompt, stdout);
+				if (interact_with_tty) {
+					bk.console(FNT_BLD "%s\n" FNT_RST, line);
+				}
+				else {
+					bk.console("%s\n", line);
+				}
+				int return_to_execution = debugger_evaluate(line);
+				if ( return_to_execution ) {
+					return;
+				}
+			}
+		}
+	}
+
+	debugger_print_prompt(prompt, sizeof(prompt), buf, sizeof(buf));
 
     while ( (line = linenoise(prompt) ) != NULL ) {
         char freeline = 0;
@@ -622,6 +781,8 @@ void debugger()
             bk.break_(0);
             break;
         }
+
+		debugger_print_prompt(prompt, sizeof(prompt), buf, sizeof(buf));
     }
 }
 
@@ -1594,36 +1755,50 @@ static int cmd_examine(int argc, char **argv)
     const unsigned short pc = bk.pc();
 
     static int addr = -1;
+	int len = -1;
     char  abuf[17];
     int    i;
 
-    if ( argc == 2 ) {
-        addr = parse_address(argv[1], NULL);
+	if (argc >= 3 && strncmp("/", argv[1], 1) == 0 && strlen(argv[1]) > 1) {
+		len = parse_number(&argv[1][1], NULL);
+	}
+
+    if ( argc >= 2 && strncmp("/", argv[argc - 1], 1) != 0) {
+        addr = parse_address(argv[argc - 1], NULL);
     }
 
-    if ( addr == -1 ) addr = pc;
+	if (addr == -1) {
+		addr = pc;
+	}
+	if (len == -1) {
+		len = 128;
+	}
 
+    abuf[16] = 0;                                             // Zero terminated string
+    addr %= 0x10000;                                          // First address with overflow correction
 
-    abuf[16] = 0;                                       // Zero terminated string
-    addr %= 0x10000;                                    // First address with overflow correction
-
-    for ( i = 0; i < 128; i++ ) {
+    for ( i = 0; i < len; i++ ) {
         uint8_t b = bk.get_memory(addr);
-        abuf[i % 16] = isprint(b) ? ((char) b) : '.';   // Prepare end of dump in ASCII format
+        abuf[i % 16] = isprint(b) ? ((char) b) : '.';         // Prepare end of dump in ASCII format
 
-        if ( i % 16 == 0 ) {                            // Handle line prefix
+        if ( i % 16 == 0 ) {                                  // Handle line prefix
             if (interact_with_tty) {
                 bk.console(FNT_CLR"%04X"FNT_RST":   ", addr);
             } else {
-                bk.console("%04X:   ", addr);               // Non-color output for non-active tty
+                bk.console("%04X:   ", addr);                 // Non-color output for non-active tty
             }
         }
 
-        bk.console("%02X ", b);                             // Hex dump of actual byte
+        bk.console("%02X ", b);                               // Hex dump of actual byte
 
-        if (i % 16 == 15) bk.console("   %s\n", abuf);      // Suffix line with ASCII dump
+		if (i == len - 1 || i % 16 == 15) {
+			for (int j = 0; j < 16 - (i % 16); j++) {
+				bk.console("   ");                            // Skipped bytes
+			}
+			bk.console("   %.*s\n", (i % 16) + 1, abuf);      // Suffix line with ASCII dump
+		}
 
-        addr = (addr + 1) % 0x10000;                    // Next address with overflow correction
+        addr = (addr + 1) % 0x10000;                          // Next address with overflow correction
     }
     return 0;
 }
@@ -1718,6 +1893,40 @@ static int cmd_trace(int argc, char **argv)
         }
         bk.console("Tracing is %s\n", trace ? "on" : "off");
     }
+    return 0;
+}
+
+static int cmd_define(int argc, char **argv)
+{
+	int null_pos = -1;
+	for (int i = 0; i < argc; i++) {
+		if (argv[i] == NULL) {
+			null_pos = i;
+			break;
+		}
+	}
+
+	if (null_pos == -1) {
+		return add_blockline(argc, argv);
+	}
+
+	if (null_pos < 2) {
+		bk.debug("Warning: You must specify a name.\n");
+		return 0;
+	}
+
+	// The only command we support for now
+	if (strcmp(argv[1], "hook-stop") != 0) {
+		bk.debug("Warning: Unimplemented define: %s\n", argv[1]);
+		return 0;
+	}
+
+	hookstop_argc = argc - (null_pos + 1);
+	size_t size = hookstop_argc * sizeof(argv[0]);
+	hookstop_argv = malloc(size);
+	memcpy(hookstop_argv, &argv[null_pos + 1], size);
+	bk.console("Trace commands set. Tracing is %s\n", trace ? "on" : "off");
+
     return 0;
 }
 
