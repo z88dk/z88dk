@@ -18,7 +18,8 @@ _vsscanf:
 IF !__CPU_INTEL__
 	push	ix	;save callers
 ENDIF
-
+        ld      bc,65535        ;infinite length
+        push    bc
 	ld	bc,1+2+128      ;h=ungetc, l=_IOREAD|_IOSTRING|_IOUSE
 	push	bc
 	ld	c,(hl)		;get buf
@@ -44,6 +45,7 @@ ENDIF
 	inc	hl
 	push	bc	;ap
 	call	asm_scanf
+	pop	bc
 	pop	bc
 	pop	bc
 	pop	bc

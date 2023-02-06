@@ -14,7 +14,7 @@
 _vfscanf:
     ld      hl,7
     add     hl,sp
-    ld      b,(hl)      ;fp
+    ld      b,(hl)      ;ap
     dec     hl
     ld      c,(hl)
     dec     hl

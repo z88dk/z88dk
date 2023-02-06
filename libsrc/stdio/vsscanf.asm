@@ -28,6 +28,8 @@ ENDIF
 	ld	c,(hl)
 	dec	hl		;&fmt+1
 	ex	de,hl		;de=&fmt+1
+        ld      hl,65535        ;ininite length
+        push    hl 
 	ld	hl,1+2+128	;h=ungetc, l=_IOREAD|_IOSTRING|_IOUSE
 	push	hl		;
 	push	bc		;buf
@@ -47,6 +49,7 @@ ENDIF
 	ld	c,(hl)
 	push	bc
 	call	asm_scanf
+	pop	bc
 	pop	bc
 	pop	bc
 	pop	bc
