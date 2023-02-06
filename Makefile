@@ -32,13 +32,13 @@ ifneq (, $(shell which ccache))
    CC := ccache $(CC)
 endif
 
-Z88DK_PATH	= $(shell pwd)
-SDCC_PATH	= $(Z88DK_PATH)/src/sdcc-build
-SDCC_VERSION    = 13131
+Z88DK_PATH		= $(shell pwd)
+SDCC_PATH		= $(Z88DK_PATH)/src/sdcc-build
+SDCC_VERSION	= 13854
 
 ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
-SDCC_DEPS = zsdcc_r$(SDCC_VERSION)_src.tar.gz
+SDCC_DEPS		= zsdcc_r$(SDCC_VERSION)_src.tar.gz
 endif
 endif
 
