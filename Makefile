@@ -118,8 +118,8 @@ endif
 
 bin/z88dk-zsdcc$(EXESUFFIX): $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)
 ifdef BUILD_SDCC
-	cp $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
-	cp $(SDCC_PATH)/bin/sdcpp$(EXESUFFIX) $(Z88DK_PATH)/bin/z88dk-zsdcpp$(EXESUFFIX)
+	cp $(SDCC_PATH)/src/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
+	cp $(SDCC_PATH)/support/cpp/gcc/cpp$(EXESUFFIX) $(Z88DK_PATH)/bin/z88dk-zsdcpp$(EXESUFFIX)
 endif
 
 
