@@ -133,9 +133,10 @@ extern int  __LIB__  bit_save_msx_callee(char *name, size_t loadstart, void *sta
 #define bit_save_msx(a,b,c,d,e) bit_save_msx_callee(a,b,c,d,e)
 
 /* We get any file matching with the (even partial) filespec in *name.          */
-/* If *name is an empty string, it will get the first "BLOAD type" file found.  */
+/* If *name is an empty string, it will get the first "BLOAD/CLOADM" type file found.  */
 /* To load the whole block, set len to zero  */
 extern int  __LIB__  bit_load_msx(char *name, void *loadstart, size_t len) __smallc;
+extern int  __LIB__  bit_load_vg5000(char *name, void *loadstart, size_t len) __smallc;
 
 
 
