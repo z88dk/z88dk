@@ -148,6 +148,12 @@ IF (TAPEIN_ONEBIT_port=$FE)
 	OR      $0A		; Changing the output mask we may alter the color of the data being loaded
 	OUT     ($FE),A
 ENDIF
+
+IF FORaquarius
+	AND     $07
+	OR      $01
+	ld (13312),a
+ENDIF
 ;------------------ Target specific section --------------------
 
   INC C
@@ -214,6 +220,12 @@ IF (TAPEIN_ONEBIT_port=$FE)
 	AND     $07
 	OR      $09
 	OUT     ($FE),A
+ENDIF
+
+IF FORaquarius
+	AND     $07
+	OR      $02
+	ld (13312),a
 ENDIF
 ;---------------------------------------------------------------
 
