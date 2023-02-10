@@ -125,12 +125,16 @@ extern int  __LIB__  bit_load_block_zx_callee(void *addr, size_t len, unsigned c
 
 
 
-/* DATA Load/Save - MSX BSAVE style */
+/* DATA Save - MSX BSAVE style */
 
 extern int  __LIB__  bit_save_msx(char *name, size_t loadstart, void *start, size_t exec, size_t len) __smallc;
 extern int  __LIB__  bit_save_msx_callee(char *name, size_t loadstart, void *start, size_t exec, size_t len) __smallc __z88dk_callee;
 
 #define bit_save_msx(a,b,c,d,e) bit_save_msx_callee(a,b,c,d,e)
+
+
+/* bit_load_*() work on a limited number of targets, (NOT on the Spectravideo SVI) */
+/* Known working targets:  MSX, Aquarius, ZX Spectrum(SAM, etc..),  */
 
 /* We get any file matching with the (even partial) filespec in *name.          */
 /* If *name is an empty string, it will get the first "BLOAD/CLOADM" type file found.  */
