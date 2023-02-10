@@ -71,6 +71,11 @@ IF FORsvi
 		OUT ($88),A	; Set PSG register for data input port
 ENDIF
 
+IF FORvg5k
+		LD A,2
+		OUT ($AF),A	; MOTOR ON
+ENDIF
+
 IF FORmc1000
 		LD A,$0F
 		OUT ($20),A	; Set PSG register for data input port
@@ -80,6 +85,12 @@ ENDIF
 IF (TAPEIN_ONEBIT_port=$FE)
 	out ($FE),a
 ENDIF
+
+IF FORaquarius
+	ld a,(13312)	; save border
+	ex af,af
+ENDIF
+
 
 ;---------------------------------------------------------------
 
