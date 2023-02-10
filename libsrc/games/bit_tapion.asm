@@ -71,6 +71,11 @@ IF FORsvi
 		OUT ($88),A	; Set PSG register for data input port
 ENDIF
 
+IF FORvg5k
+		LD A,2
+		OUT ($AF),A	; MOTOR ON
+ENDIF
+
 IF FORmc1000
 		LD A,$0F
 		OUT ($20),A	; Set PSG register for data input port
