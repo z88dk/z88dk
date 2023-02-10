@@ -34,6 +34,11 @@ IF FORsvi
 		OUT ($97),A	; MOTOR OFF
 ENDIF
 
+IF FORvg5k
+		XOR A
+		OUT ($AF),A	; MOTOR OFF
+ENDIF
+
 ; ZX Spectrum, SAM, TS2068, etc..
 IF (TAPEIN_ONEBIT_port=$FE)
 EXTERN  __snd_tick
