@@ -132,6 +132,13 @@ TAPIN_STARTBIT_0:
 
 ;  IN A,(PSG_DATAIN)
 
+IF FORsam
+	ex (sp),hl
+	ex (sp),hl
+	ex (sp),hl
+	ex (sp),hl
+ENDIF
+
   IN A,(TAPEIN_ONEBIT_port)
   XOR E
   AND TAPEIN_ONEBIT_mask
@@ -139,6 +146,13 @@ TAPIN_STARTBIT_0:
   LD A,E
   CPL
   LD E,A
+
+IF FORsam
+	ex (sp),hl
+	ex (sp),hl
+	ex (sp),hl
+	ex (sp),hl
+ENDIF
 
 ;------------------ Target specific section --------------------
 ; ZX Spectrum, SAM, TS2068, etc..
@@ -204,6 +218,12 @@ TAPIN_PERIOD_1:
   INC C
   JR Z,TAPIN_PERIOD_OVERFLOW
 
+IF FORsam
+	ex (sp),hl
+	ex (sp),hl
+	ex (sp),hl
+	ex (sp),hl
+ENDIF
 
   IN A,(TAPEIN_ONEBIT_port)
 
@@ -214,6 +234,14 @@ TAPIN_PERIOD_1:
   LD A,E
   CPL
   LD E,A
+
+IF FORsam
+	ex (sp),hl
+	ex (sp),hl
+	ex (sp),hl
+	ex (sp),hl
+ENDIF
+
 ;------------------ Target specific section --------------------
 ; ZX Spectrum, SAM, TS2068, etc..
 IF (TAPEIN_ONEBIT_port=$FE)
