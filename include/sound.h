@@ -133,8 +133,8 @@ extern int  __LIB__  bit_save_msx_callee(char *name, size_t loadstart, void *sta
 #define bit_save_msx(a,b,c,d,e) bit_save_msx_callee(a,b,c,d,e)
 
 
-/* bit_load_*() work on a limited number of targets, (NOT on the Spectravideo SVI) */
-/* Known working targets:  MSX, Aquarius, ZX Spectrum(SAM, etc..),  */
+/* bit_load_*() work on a limited number of targets, (not on the Spectravideo SVI) */
+/* Known working targets:  MSX, Aquarius, ZX Spectrum (SAM, etc..) */
 
 /* We get any file matching with the (even partial) filespec in *name.          */
 /* If *name is an empty string, it will get the first "BLOAD/CLOADM" type file found.  */
