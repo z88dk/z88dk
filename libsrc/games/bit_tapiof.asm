@@ -40,6 +40,11 @@ EXTERN  __snd_tick
 	LD	A,(__snd_tick)
 	out	($FE),a
 ENDIF
+
+IF FORaquarius
+	ex af,af
+	ld (13312),a	; restore border
+ENDIF
 ;---------------------------------------------------------------
 
 	jp bit_close_ei
