@@ -81,6 +81,12 @@ IF (TAPEIN_ONEBIT_port=$FE)
 	out ($FE),a
 ENDIF
 
+IF FORaquarius
+	ld a,(13312)	; save border
+	ex af,af
+ENDIF
+
+
 ;---------------------------------------------------------------
 
 
