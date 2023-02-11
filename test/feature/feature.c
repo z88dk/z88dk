@@ -34,7 +34,7 @@ int main()
  #endif
 #endif
 #ifdef __HAVE_ONEBITSOUND
-   bit_click(1);
+   bit_click();
 #endif
 #ifdef __HAVE_TIME
    c = time(NULL);
