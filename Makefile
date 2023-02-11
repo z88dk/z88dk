@@ -112,7 +112,8 @@ endif
 
 $(SDCC_PATH)/bin/sdcc$(EXESUFFIX): $(SDCC_PATH)/Makefile
 ifdef BUILD_SDCC
-	$(MAKE) -C $(SDCC_PATH) install
+	$(MAKE) -C $(SDCC_PATH)
+	sudo $(MAKE) -C $(SDCC_PATH) install
 endif
 
 
