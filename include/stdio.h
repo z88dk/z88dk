@@ -338,7 +338,7 @@ extern int __LIB__ remove(const char *name);
 extern int __LIB__ getk(void);
 /* Scan for a keypress using the "inkey" keyboard driver */
 extern int __LIB__ getk_inkey(void);
-#define getkey() fgetc_cons(void)
+#define getkey() fgetc_cons()
 
 /* Print a formatted string directly to the console using the default driver */
 extern int __LIB__ printk(const char *fmt,...) __vasmallc;
