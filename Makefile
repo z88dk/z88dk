@@ -106,21 +106,23 @@ ifdef BUILD_SDCC
 		--disable-pdk15-port --disable-pdk16-port \
 		--disable-mos6502-port --disable-mos65c02-port \
 		--disable-r2k-port \
-		--disable-ucsim --disable-device-lib --disable-packihx
+		--disable-ucsim --disable-device-lib --disable-packihx \
+		--prefix=`pwd`/sdcc-install
+		
 endif
 
 
 $(SDCC_PATH)/bin/sdcc$(EXESUFFIX): $(SDCC_PATH)/Makefile
 ifdef BUILD_SDCC
 	$(MAKE) -C $(SDCC_PATH)
-	sudo $(MAKE) -C $(SDCC_PATH) install
+	$(MAKE) -C $(SDCC_PATH) install
 endif
 
 
 bin/z88dk-zsdcc$(EXESUFFIX): $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)
 ifdef BUILD_SDCC
-	cp $(SDCC_PATH)/usr/local/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
-	cp $(SDCC_PATH)/usr/local/bin/sdcpp$(EXESUFFIX) $(Z88DK_PATH)/bin/z88dk-zsdcpp$(EXESUFFIX)
+	cp $(SDCC_PATH)/sdcc-install/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
+	cp $(SDCC_PATH)/sdcc-install/bin/sdcpp$(EXESUFFIX) $(Z88DK_PATH)/bin/z88dk-zsdcpp$(EXESUFFIX)
 endif
 
 
