@@ -9,9 +9,9 @@
 
 # EXESUFFIX is passed when cross-compiling Win32 on Linux
 ifeq ($(OS),Windows_NT)
-  EXESUFFIX 		:= .exe
+  EXESUFFIX 	:= .exe
 else
-  EXESUFFIX 		?=
+  EXESUFFIX 	?=
 endif
 
 DESTDIR ?= /usr/local
@@ -32,13 +32,13 @@ ifneq (, $(shell which ccache))
    CC := ccache $(CC)
 endif
 
-Z88DK_PATH		= $(shell pwd)
-SDCC_PATH		= $(Z88DK_PATH)/src/sdcc-build
+Z88DK_PATH	= $(shell pwd)
+SDCC_PATH	= $(Z88DK_PATH)/src/sdcc-build
 SDCC_VERSION	= 13854
 
 ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
-SDCC_DEPS		= zsdcc_r$(SDCC_VERSION)_src.tar.gz
+SDCC_DEPS	= zsdcc_r$(SDCC_VERSION)_src.tar.gz
 endif
 endif
 
@@ -112,14 +112,14 @@ endif
 
 $(SDCC_PATH)/bin/sdcc$(EXESUFFIX): $(SDCC_PATH)/Makefile
 ifdef BUILD_SDCC
-	$(MAKE) -C $(SDCC_PATH)
+	$(MAKE) -C $(SDCC_PATH) install
 endif
 
 
 bin/z88dk-zsdcc$(EXESUFFIX): $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)
 ifdef BUILD_SDCC
-	cp $(SDCC_PATH)/src/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
-	cp $(SDCC_PATH)/support/cpp/gcc/cpp$(EXESUFFIX) $(Z88DK_PATH)/bin/z88dk-zsdcpp$(EXESUFFIX)
+	cp $(SDCC_PATH)/usr/local/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
+	cp $(SDCC_PATH)/usr/local/bin/sdcpp$(EXESUFFIX) $(Z88DK_PATH)/bin/z88dk-zsdcpp$(EXESUFFIX)
 endif
 
 
