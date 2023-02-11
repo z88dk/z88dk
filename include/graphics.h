@@ -141,8 +141,8 @@ extern void __LIB__ setpos_callee(int px, int py) __smallc __z88dk_callee;
 #define setpos(a,b)           setpos_callee(a,b)
 
 /* Get current X position of graphics cursor */
-extern int __LIB__ getx();
-extern int __LIB__ gety();
+extern int __LIB__ getx(void);
+extern int __LIB__ gety(void);
 
 /* Draw a box (minimum size: 3x3) */
 extern void __LIB__ drawb(int tlx, int tly, int width, int height) __smallc;

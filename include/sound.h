@@ -20,11 +20,11 @@
 
 /* 1 bit sound library */
 
-extern void  __LIB__ bit_open();
-extern void  __LIB__ bit_open_di();
-extern void __LIB__ bit_close();
-extern void __LIB__ bit_close_ei();
-extern void __LIB__ bit_click();
+extern void  __LIB__ bit_open(void);
+extern void  __LIB__ bit_open_di(void);
+extern void __LIB__ bit_close(void);
+extern void __LIB__ bit_close_ei(void);
+extern void __LIB__ bit_click(void);
 
 /* Sound effects; every library contains 8 different sounds (effect no. 0..7) */
 extern void __LIB__ bit_fx(int effect) __smallc __z88dk_fastcall;
@@ -150,17 +150,17 @@ extern int  __LIB__  bit_load_vg5000(char *name, void *loadstart, size_t len) __
 
 /* Open tape device for input and sync with the carrier tone */
 /* 0..256 = sync speed, -1=sync failed */
-extern int  __LIB__  bit_tapion();
+extern int  __LIB__  bit_tapion(void);
 
 /* Close the previously opened device and restore interrupts */
-extern void __LIB__ bit_tapiof();
+extern void __LIB__ bit_tapiof(void);
 
 /* Read a single byte from tape.  Sync must have succeded. */
 /* On exit: byte value or -1 (load failed or end of stream) */
-extern int  __LIB__  bit_tapin();
+extern int  __LIB__  bit_tapin(void);
 
 /* Skip the next bit (can be used to deal with stop bits( */
-extern void __LIB__ bit_tapin_bit();
+extern void __LIB__ bit_tapin_bit(void);
 
 
 

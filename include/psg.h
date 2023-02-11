@@ -198,7 +198,7 @@ extern void __LIB__    set_psg_callee(unsigned int reg, unsigned int val) __smal
 extern int __LIB__  get_psg(int regno) __z88dk_fastcall;
 
 // Init the PSG (reset sound etc..)
-extern void __LIB__ psg_init();
+extern void __LIB__ psg_init(void);
 
 
 // alias for setting psg registers (for the BASIC fans)
@@ -220,10 +220,10 @@ extern void __LIB__ psg_envelope(unsigned int waveform, int period, unsigned int
 extern void __LIB__ psg_channels(unsigned int tone_channels, unsigned int noise_channels) __smallc;
 
 // Get the group of channels currently generating tone (ORed bits)
-extern unsigned char __LIB__ psg_tone_channels();
+extern unsigned char __LIB__ psg_tone_channels(void);
 
 // Get the group of channels currently generating noise (ORed bits)
-extern unsigned char __LIB__ psg_noise_channels();
+extern unsigned char __LIB__ psg_noise_channels(void);
 
 
 

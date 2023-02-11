@@ -205,14 +205,14 @@ extern char __LIB__ *fc_dirbuf;
 
 /* Disk control (as for OSCA FLOS) */
 extern int __LIB__  change_volume(int volume);
-extern int __LIB__ get_current_volume();   // Current 'drive' (0..n)
+extern int __LIB__ get_current_volume(void);   // Current 'drive' (0..n)
 /* Directory related commands (as for OSCA FLOS) */
-extern int __LIB__ dir_move_first();
-extern int __LIB__ dir_move_next();
-extern int __LIB__ dir_get_entry_type();  // 0=normal, 1=directory
-extern char __LIB__ *dir_get_entry_name();
-extern unsigned long __LIB__ dir_get_entry_size();
-extern int __LIB__ get_dir_name();
+extern int __LIB__ dir_move_first(void);
+extern int __LIB__ dir_move_next(void);
+extern int __LIB__ dir_get_entry_type(void);  // 0=normal, 1=directory
+extern char __LIB__ *dir_get_entry_name(void);
+extern unsigned long __LIB__ dir_get_entry_size(void);
+extern int __LIB__ get_dir_name(void);
 
 
 /********************************/
@@ -235,7 +235,7 @@ extern int __LIB__ a_curx();
 extern int __LIB__ a_cury();
 
 /* Get Machine */
-extern int __LIB__ a_machine();
+extern int __LIB__ a_machine(void);
 #define M_CPC        0    // CPC6128
 #define M_PCW        1    // PCW8000/9000/10 series
 #define M_SPECTRUM   3    // Spectrum +3
