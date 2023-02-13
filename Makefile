@@ -181,7 +181,6 @@ install: install-clean
 	$(MAKE) -C src/appmake PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/copt PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/ucpp PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/cpp PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/sccz80 PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/z80asm  PREFIX=$(DESTDIR) PREFIX_SHARE=$(prefix_share) install
 	$(MAKE) -C src/zcc PREFIX=$(DESTDIR) install
@@ -234,7 +233,6 @@ bins-clean:
 	$(MAKE) -C src/appmake clean
 	$(MAKE) -C src/common clean
 	$(MAKE) -C src/copt clean
-	$(MAKE) -C src/cpp clean
 	$(MAKE) -C src/sccz80 clean
 	$(MAKE) -C src/ticks clean
 	$(MAKE) -C src/ucpp clean
