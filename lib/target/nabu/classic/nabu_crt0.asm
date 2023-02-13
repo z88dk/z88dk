@@ -40,7 +40,7 @@ ENDIF
         EXTERN  msx_set_mode
 
         defc    TAR__clib_exit_stack_size = 0
-        defc    TAR__register_sp = $1400
+        defc    TAR__register_sp = $ff00
         defc    TAR__fputc_cons_generic = 1
 
 	defc CRT_ORG_CODE = $140d
