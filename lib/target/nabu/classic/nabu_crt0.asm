@@ -27,7 +27,6 @@ IF !DEFINED_CONSOLE_ROWS
 ENDIF
 
 
-        defc    TAR__no_ansifont = 1
 	defc	CRT_KEY_DEL = 127
 	defc	__CPU_CLOCK = 3570000
 

@@ -135,6 +135,13 @@
 #endif
 #endif
 
+#ifdef __NABUPC__
+// Clock is 3579545
+#ifndef psgT
+#define psgT(hz)		((int)(118750.0 / (hz)))
+#endif
+#endif
+
 #ifdef __SPC1000__
 // Clock is 4000000
 #ifndef psgT

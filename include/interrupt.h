@@ -29,6 +29,9 @@ extern int __LIB__ nmi_install_isr(isr_t handler) ;
 // Deegister an NMI ISR
 extern int __LIB__ nmi_uninstall_isr(isr_t handler) ;
 
+// Register an ISR to run on frame sync
+extern void __LIB__ add_raster_int(isr_t handler);
+
 
 // Simple timer tick handler
 extern void __LIB__ tick_count_isr(void);
