@@ -93,7 +93,7 @@ bool PreprocLevel::getline(string& line) {
 
 PreprocFile::PreprocFile(const string& filename, ifstream& ifs)
 	: filename(filename)
-	, ifs(move(ifs))
+	, ifs(std::move(ifs))
 	, location(filename, 0) {}
 
 bool PreprocFile::getline(string& line) {
