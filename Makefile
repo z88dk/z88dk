@@ -93,7 +93,6 @@ zsdcc_r$(SDCC_VERSION)_src.tar.gz:
 zsdcc-tarball: $(SDCC_PATH)/configure
 	@mkdir -p dist
 	tar --exclude=.svn -cvzf dist/zsdcc_r$(SDCC_VERSION)_src.tar.gz src/sdcc-build
-	
 
 $(SDCC_PATH)/Makefile: $(SDCC_PATH)/configure
 ifdef BUILD_SDCC
@@ -106,15 +105,15 @@ ifdef BUILD_SDCC
 		--disable-pdk15-port --disable-pdk16-port \
 		--disable-mos6502-port --disable-mos65c02-port \
 		--disable-r2k-port \
-		--disable-ucsim --disable-device-lib --disable-packihx \
+		--disable-ucsim --disable-packihx \
+		--disable-device-lib --disable-sdcpp \
 		--prefix=`pwd`/sdcc-install
-		
 endif
 
 
 $(SDCC_PATH)/bin/sdcc$(EXESUFFIX): $(SDCC_PATH)/Makefile
 ifdef BUILD_SDCC
-	$(MAKE) -C $(SDCC_PATH)
+	$(MAKE) -C $(SDCC_PATH) all
 	$(MAKE) -C $(SDCC_PATH) install
 endif
 
@@ -122,7 +121,6 @@ endif
 bin/z88dk-zsdcc$(EXESUFFIX): $(SDCC_PATH)/bin/sdcc$(EXESUFFIX)
 ifdef BUILD_SDCC
 	cp $(SDCC_PATH)/sdcc-install/bin/sdcc$(EXESUFFIX)  $(Z88DK_PATH)/bin/z88dk-zsdcc$(EXESUFFIX)
-	cp $(SDCC_PATH)/sdcc-install/bin/sdcpp$(EXESUFFIX) $(Z88DK_PATH)/bin/z88dk-zsdcpp$(EXESUFFIX)
 endif
 
 
