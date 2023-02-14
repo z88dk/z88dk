@@ -12,6 +12,7 @@ Detailed but incomplete changelist:
 - [classic] Shared SP1 between classic and newlib
 - [sccz80] 8080, 8085, gbz80 opt-code-speed: add32, sub32, longcompare
 - [sccz80] Extended quikmult cases
+- [ucpp] Extended use for zsdcc
 - [z80asm] Allow jr across sections
 - [zsdcc] Upgraded to SDCC 4.3.0 r13xxx
 - [zcc] +config at any place, support for -xc
