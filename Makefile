@@ -46,7 +46,7 @@ endif
 
 export CC INSTALL CFLAGS CROSS
 
-BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) bin/z88dk-zcpp$(EXESUFFIX) \
+BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) \
 	bin/z88dk-ucpp$(EXESUFFIX) bin/z88dk-sccz80$(EXESUFFIX) bin/z88dk-z80asm$(EXESUFFIX) \
 	bin/zcc$(EXESUFFIX) bin/z88dk-zpragma$(EXESUFFIX) bin/z88dk-zx7$(EXESUFFIX) \
 	bin/z88dk-z80nm$(EXESUFFIX) bin/z88dk-zobjcopy$(EXESUFFIX)  \
@@ -133,9 +133,6 @@ bin/z88dk-copt$(EXESUFFIX): src/config.h
 bin/z88dk-ucpp$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/ucpp PREFIX=`pwd` install
 
-bin/z88dk-zcpp$(EXESUFFIX): src/config.h
-	$(MAKE) -C src/cpp PREFIX=`pwd` install
-
 bin/z88dk-sccz80$(EXESUFFIX): src/config.h
 	$(MAKE) -C src/sccz80 PREFIX=`pwd` install
 
@@ -185,7 +182,6 @@ install: install-clean
 	$(MAKE) -C src/appmake PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/copt PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/ucpp PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/cpp PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/sccz80 PREFIX=$(DESTDIR) install
 	$(MAKE) -C src/z80asm  PREFIX=$(DESTDIR) PREFIX_SHARE=$(prefix_share) install
 	$(MAKE) -C src/zcc PREFIX=$(DESTDIR) install
@@ -238,7 +234,6 @@ bins-clean:
 	$(MAKE) -C src/appmake clean
 	$(MAKE) -C src/common clean
 	$(MAKE) -C src/copt clean
-	$(MAKE) -C src/cpp clean
 	$(MAKE) -C src/sccz80 clean
 	$(MAKE) -C src/ticks clean
 	$(MAKE) -C src/ucpp clean

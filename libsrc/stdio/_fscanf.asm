@@ -22,8 +22,10 @@ ENDIF
 	ld	c,(hl)		;fp
 	inc	hl
 	ld	b,(hl)
+        push    bc
 	inc	hl		;&fmt
 	ld	bc,0		;sdcc
+        push    bc
 	ld	c,(hl)		;fmt
 	inc	hl
 	ld	b,(hl)
@@ -31,8 +33,6 @@ ENDIF
 	push	bc
 	push	hl		;&ap
 	call	asm_scanf
-	pop	bc
-	pop	bc
 	pop	bc
 	pop	bc
 	pop	bc

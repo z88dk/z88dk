@@ -58,11 +58,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zcc", "zcc\zcc.vcxproj", "{
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-zcpp", "zcpp\zcpp.vcxproj", "{6ED563F1-DC26-4619-A2EA-3BF91B015976}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "z88dk-zpragma", "zpragma\zpragma.vcxproj", "{748E94AB-5E0D-4B30-A8C5-E7E4582DEB10}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E82ADEEF-219A-44C3-A670-AACFD2D419EA} = {E82ADEEF-219A-44C3-A670-AACFD2D419EA}

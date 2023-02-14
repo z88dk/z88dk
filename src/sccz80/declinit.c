@@ -278,9 +278,11 @@ static int init(Type *type, int dump)
                     while (as_struct_ptype->kind == KIND_STRUCT && rcmatch('.')) {
                         cmatch('.');
                         char subname[NAMESIZE];
-                        Type *member;
+                        Type *member = NULL;
                         if (symname(subname) && (member = find_tag_field(as_struct_ptype->tag, subname))) {
                             offset += member->offset;
+                        } else {
+                            errorfmt("Tag <%s> not found in struct", 1, subname);
                         }
                         as_struct_ptype = member;
                     }

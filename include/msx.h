@@ -25,7 +25,7 @@
 extern void __LIB__  msx_screen(int mode) __z88dk_fastcall;
 
 // Get the screen mode
-extern int __LIB__ msx_screenmode();
+extern int __LIB__ msx_screenmode(void);
 
 // Set the screen mode (alternate method)
 extern void __LIB__  msx_set_mode(int mode) __z88dk_fastcall;
@@ -72,7 +72,7 @@ enum video_mode {
 #endif
 
 // Set screen to mangled mode (screen 1 + 2)
-extern void __LIB__ msx_set_mangled_mode();
+extern void __LIB__ msx_set_mangled_mode(void);
 
 // Mangled screen sections (3 maps)
 enum screen_map {
@@ -150,16 +150,16 @@ extern unsigned int __LIB__  get_vdp_reg(int) __z88dk_fastcall;
 //extern void __LIB__ msx_pset(int x, int y) __smallc;
 
 // Switch to text mode
-extern void __LIB__ msx_text();
+extern void __LIB__ msx_text(void);
 
 // Move the screen cursor to a given position
 extern void __LIB__ msx_locate(unsigned int x, unsigned int y) __smallc;
 
 // Disable screen
-extern void __LIB__ msx_blank();
+extern void __LIB__ msx_blank(void);
 
 // Enable screen
-extern void __LIB__ msx_noblank();
+extern void __LIB__ msx_noblank(void);
 
 // Change the MSX color attributes
 extern int __LIB__ msx_color(int foreground, int background, int border) __smallc;
@@ -253,8 +253,8 @@ typedef struct {
 
 /// create / destroy lookup tables aren't necessary: 
 /// we use the existing sin/cos functions
-#define create_lookup_tables() 
-#define destroy_lookup_tables() 
+#define create_lookup_tables(void) 
+#define destroy_lookup_tables(void) 
 
 
 extern void __LIB__ msx_blit(surface_t *source, surface_t *dest, rect_t *from, rect_t *to) __smallc;
@@ -361,13 +361,13 @@ extern int  __LIB__  msxtape_load_block_callee(void *addr, size_t len) __smallc 
 
 // Low level tape control
 // WARNING: the output sequences must avoid gaps !
-extern int __LIB__  msxtape_rd_opn();
-extern int __LIB__  msxtape_wr_opn();
-extern int __LIB__  msxtape_wr_opn_hdr();
-extern int __LIB__  msxtape_rd_cls();
-extern int __LIB__  msxtape_wr_cls();
+extern int __LIB__  msxtape_rd_opn(void);
+extern int __LIB__  msxtape_wr_opn(void);
+extern int __LIB__  msxtape_wr_opn_hdr(void);
+extern int __LIB__  msxtape_rd_cls(void);
+extern int __LIB__  msxtape_wr_cls(void);
 extern int __LIB__  msxtape_send_byte(unsigned char msxbyte) __z88dk_fastcall;
-extern int __LIB__  msxtape_get_byte();
+extern int __LIB__  msxtape_get_byte(void);
 
 
 
@@ -382,7 +382,7 @@ extern int __LIB__  msxtape_get_byte();
 // 3: SVI-318
 // 4: SVI-328
 // 5: SVI-328 MKII
-extern int __LIB__ msx_type();
+extern int __LIB__ msx_type(void);
 
 // MSX2 version number
 // 0 = MSX 1
@@ -392,23 +392,23 @@ extern int __LIB__ msx_type();
 static __at(0x2d) unsigned char MSX2_SUBTYPE;
 
 // Detect the VRAM size (in KB)
-extern int __LIB__ msx_vram();
+extern int __LIB__ msx_vram(void);
 
 // Check if the line printer is ready (1=ready, 0 if not)
-extern bool_t __LIB__ msx_lpt();
+extern bool_t __LIB__ msx_lpt(void);
 #define lpt_ready() msx_lpt()
 
 // Check if Ctrl-STOP is being pressed (1=if pressed, 0 if not)
-extern bool_t __LIB__ msx_break();
+extern bool_t __LIB__ msx_break(void);
 
 // Clear the keyboard buffer
-extern void __LIB__ msx_clearkey();
+extern void __LIB__ msx_clearkey(void);
 
 // Disable the CTRL-STOP effect (when a BASIC routine is being called)
-extern void __LIB__ msx_breakoff();
+extern void __LIB__ msx_breakoff(void);
 
 // Restore the CTRL-STOP break command
-extern void __LIB__ msx_breakon();
+extern void __LIB__ msx_breakon(void);
 
 
 

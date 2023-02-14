@@ -31,6 +31,7 @@ static struct zx_tape zxt = {
     NULL,       // merge
     -1,         // patchpos
     -1,         // clear_address
+    -1,         // usr_address
     NULL,       // patchdata
     NULL,       // screen
     0,          // audio
@@ -43,6 +44,9 @@ static struct zx_tape zxt = {
     0,          // noheader
     0           // parity
 };
+
+
+
 
 static struct zx_sna zxs = {
     -1,         // stackloc

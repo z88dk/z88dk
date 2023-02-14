@@ -228,8 +228,11 @@ TAPSEND_1:
   DEC L
   JP NZ,TAPSEND_1
 		ld	a,(__snd_tick)		; MIC on
+IF (TAPEIN_ONEBIT_port=$FE)
+		xor  $1E		; On the ZX Spectrum we extend the output to MIC, EAR, and BORDER
+ELSE
 		xor  SOUND_ONEBIT_mask	; MIC on<>off
-		;xor  $1E
+ENDIF
 		ONEBITOUT
 TAPSEND_2:
   DEC H

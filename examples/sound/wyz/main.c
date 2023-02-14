@@ -1,5 +1,9 @@
 // zcc +zx main.c sham.mus.asm effects.asm -create-app
 // zcc +sam main.c sham.mus.asm effects.asm -create-app
+// zcc +nabu main.c effects.asm sham.mus.asm -create-app
+// zcc +msx main.c effects.asm sham.mus.asm -create-app
+// etc etc
+//
 #include <stdio.h>
 #include <intrinsic.h>
 #include <interrupt.h>
@@ -38,6 +42,10 @@ extern void __LIB__ add_raster_int(isr_t handler);
 #define NO_INTERRUPT_INIT 1
 #endif
 
+#ifdef __NABUPC__
+#define NO_INTERRUPT_INIT 1
+#endif
+
 
 extern wyz_song mysong;
 extern wyz_effects myeffects;
@@ -67,7 +75,7 @@ void setup_int() {
 
 void main()
 {
-   //printf("%cWYZ Tracker example\n",12);
+   printf("%cWYZ Tracker example\n",12);
 
    // Load the tracker file
    ay_wyz_init(&mysong);
@@ -81,37 +89,26 @@ void main()
 
    // Just loop
    while  ( 1 ) {
-      int k = getk();
+      int k =getk();
+      if ( k != 0 ) printf("%c \n",k);
       switch ( k ) {
       case '0':
-          asm("di");
           ay_wyz_start_effect(3, 0);
-          asm("ei");
           break;
       case '1':
-          asm("di");
           ay_wyz_start_effect(3, 1);
-          asm("ei");
           break;
       case '2':
-          asm("di");
           ay_wyz_start_effect(3, 2);
-          asm("ei");
           break;
       case '3':
-          asm("di");
           ay_wyz_start_effect(3, 3);
-          asm("ei");
           break;
       case ' ':
-          asm("di");
           ay_wyz_stop();
-          asm("ei");
           break;
       case 's':
-          asm("di");
           ay_wyz_start(0);
-          asm("ei");
           break;
       }
 #ifdef NO_INTERRUPT
