@@ -1,6 +1,6 @@
 ## Instructions
 
-Windows and MacOSX users can get zsdcc and zsdcpp binaries from the [nightly build](http://nightly.z88dk.org/).
+Windows and MacOSX users can get the zsdcc binary from the [nightly build](http://nightly.z88dk.org/).
 
 For Linux users follow the instructions on the [installation page](https://github.com/z88dk/z88dk/wiki/installation) and sdcc will be built for you.
 

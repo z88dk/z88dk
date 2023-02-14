@@ -42,7 +42,7 @@ Many tools have a `z88dk-` prefix to distinguish them from tools from other pack
 
 * **Z88DK-ZX0** and **Z88DK-ZX7** are PC side data compression tools with companion decompression functions in the z80 library.
 
-* **Z88DK-ZX0** and **Z88DK-ZX7** are  PC-side decompressor counterparties to the z88dk-zx0 and z88dk-zx7.
+* **Z88DK-DZX0** and **Z88DK-DZX7** are  PC-side decompressor counterparties to the z88dk-zx0 and z88dk-zx7.
 
 These tools are not normally directly invoked by the user:
 

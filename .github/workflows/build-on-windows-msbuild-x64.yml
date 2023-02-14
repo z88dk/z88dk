@@ -50,7 +50,6 @@ jobs:
         copy /y win32-latest\z88dk\lib\z88dk-z80asm*.lib src\z80asm\
         copy /y win32-latest\z88dk\lib\clibs\*.lib lib\clibs\
         copy /y win32-latest\z88dk\bin\z88dk-zsdcc.exe bin\
-        copy /y win32-latest\z88dk\bin\z88dk-zsdcpp.exe bin\
         copy /y win32-latest\z88dk\bin\m4.exe bin\
         copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sccz80\*.lib libsrc\_DEVELOPMENT\lib\sccz80\
         copy /y win32-latest\z88dk\libsrc\_DEVELOPMENT\lib\sdcc_ix\*.lib libsrc\_DEVELOPMENT\lib\sdcc_ix\
