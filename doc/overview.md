@@ -40,7 +40,7 @@ These tools are not normally directly invoked by the user:
 
 * **M4** acts as z88dk's macro preprocessor and can optionally process files ahead of the c preprocessor or assembler.
 
-* **ZCPP** is the c preprocessor invoked for sccz80.
+* **UCPP** is the c preprocessor invoked for sccz80.
 
 * **ZSDCPP** is the c preprocessor invoked for zsdcc.
 

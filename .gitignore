@@ -114,7 +114,6 @@ src/appmake/z88dk-appmake
 src/common/t/test
 src/config.h
 src/copt/z88dk-copt
-src/cpp/z88dk-zcpp
 src/lstmanip/z88dk-lstmanip
 src/scanner/z88dk-zpragma
 src/sccz80/sccz80
