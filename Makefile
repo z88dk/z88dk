@@ -53,7 +53,7 @@ BINS = bin/z88dk-appmake$(EXESUFFIX) bin/z88dk-copt$(EXESUFFIX) \
 	bin/z88dk-ticks$(EXESUFFIX) bin/z88dk-z80svg$(EXESUFFIX) \
 	bin/z88dk-font2pv1000$(EXESUFFIX) bin/z88dk-basck$(EXESUFFIX) \
 	bin/z88dk-lib$(EXESUFFIX) bin/z88dk-zx0$(EXESUFFIX)
-	
+
 ALL = $(BINS) testsuite
 
 ALL_EXT = bin/z88dk-zsdcc$(EXESUFFIX)
@@ -81,7 +81,7 @@ ifdef BUILD_SDCC_HTTP
 	tar xzf $^
 	touch $@
 else
-	svn checkout -r $(SDCC_VERSION) https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH) 
+	svn checkout -r $(SDCC_VERSION) https://svn.code.sf.net/p/sdcc/code/trunk/sdcc -q $(SDCC_PATH)
 	patch -d $(SDCC_PATH) -p0 < $(Z88DK_PATH)/src/zsdcc/sdcc-z88dk.patch
 endif
 endif
@@ -105,8 +105,9 @@ ifdef BUILD_SDCC
 		--disable-pdk15-port --disable-pdk16-port \
 		--disable-mos6502-port --disable-mos65c02-port \
 		--disable-r2k-port \
+		--disable-non-free --disable-device-lib \
 		--disable-ucsim --disable-packihx \
-		--disable-device-lib --disable-sdcpp \
+		--disable-sdcpp --disable-sdcdb --disable-sdbinutil \
 		--prefix=`pwd`/sdcc-install
 endif
 
