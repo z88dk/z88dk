@@ -11,7 +11,7 @@ typedef struct {
     const char *name;			// Name of the format
     // Generic parameters
     uint8_t   sectors_per_track;
-    uint8_t   tracks;
+    uint16_t  tracks;
     uint8_t   sides;
     uint16_t  sector_size;
     uint8_t   gap3_length;
