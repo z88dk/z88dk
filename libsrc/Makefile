@@ -76,7 +76,7 @@ TOCREATE += $(call check_target,multi8,multi8_clib.lib)
 TOCREATE += $(call check_target,myvision,myvision_clib.lib)
 TOCREATE += $(call check_target,mz,mz_clib.lib)
 TOCREATE += $(call check_target,mz2500,mz2500_clib.lib)
-TOCREATE += $(call check_target,nabu,nabu_clib.lib nabu_cpm.lib)
+TOCREATE += $(call check_target,nabu,nabu_clib.lib nabu_cpm.lib,nabu_int.lib)
 TOCREATE += $(call check_target,nascom,nascom_clib.lib)
 TOCREATE += $(call check_target,nc,nc_clib.lib gfxnc100.lib gfxzcn.lib gfxnc200.lib zxfcntl)
 TOCREATE += $(call check_target,newbrain,newbrain_clib.lib)
@@ -1349,6 +1349,13 @@ nabu_cpm.lib:
 	$(MAKE) -C target/nabu
 	$(MAKE) -C video/tms9918 TARGET=nabu
 	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_cpm @$(TARGET_DIRECTORY)/nabu/nabu_cpm.lst
+
+nabu_int.lib:
+	@echo ''
+	@echo '--- Building Nabu Interrupt Library ---'
+	@echo ''
+	$(MAKE) -C target/nabu
+	TARGET=nabu TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORnabu -x$(OUTPUT_DIRECTORY)/nabu_int @$(TARGET_DIRECTORY)/nabu/nabu_int.lst
 
 
 # Genius Leader 2000/4000 - dom
