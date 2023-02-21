@@ -497,7 +497,7 @@ extern uchar __LIB__    *zx_saddrpright_callee(void *pixeladdr, uchar *mask) __s
 #define zx_cyx2saddr(a,b)          zx_cxy2saddr_callee(b,a)
 #define zx_cxy2saddr(a,b)          zx_cxy2saddr_callee(a,b)
 
-#define zx_pxy2saddr(a,b)        zx_pxy2saddr_callee(a,b)
+#define zx_pxy2saddr(a,b)          zx_pxy2saddr_callee(a,b)
 #define zx_saddr2px(a,b)           zx_saddr2px_callee(a,b)
 #define zx_saddrpleft(a,b)         zx_saddrpleft_callee(a,b)
 #define zx_saddrpright(a,b)        zx_saddrpright_callee(a,b)
