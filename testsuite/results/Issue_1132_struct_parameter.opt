@@ -28,7 +28,8 @@
 	inc	hl
 	ld	(hl),d
 	ex	de,hl
-	ld	hl,18	;const
+	pop	bc
+	ld	hl,16	;const
 	add	hl,sp
 	ld	sp,hl
 	push	bc

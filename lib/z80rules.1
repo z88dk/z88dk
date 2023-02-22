@@ -6954,45 +6954,6 @@ $notcpu 8085
 	ex	de,hl
 	ld	a,%1
 
-%check 0 <= %1 <= 255
-	ld	e,(hl)
-	ld	d,0
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	l,(hl)
-	ld	h,0
-	add	hl,de
-	pop	de
-=
-	ld	a,(hl)
-	ld	hl,%1	;const
-	add	hl,sp
-	add	(hl)
-	ld	l,a
-	ld	a,h
-	adc	h
-	ld	h,a
-	pop	de
-
-%check 0 <= %1 <= 256
-	ld	e,a
-	ld	d,0
-	ld	hl,%1	;const
-	add	hl,sp
-	ld	l,(hl)
-	ld	h,0
-	add	hl,de
-	pop	de
-=
-	ld	hl,%1	;const
-	add	hl,sp
-	add	(hl)
-	ld	l,a
-	ld	a,h
-	adc	h
-	ld	h,a
-	pop	de
-
 %title Remove redundant ld h,0
 	ld	h,0
 	ld	bc,%1
@@ -7003,25 +6964,17 @@ $notcpu 8085
 	add	hl,bc
 	ld	h,0
 
-%title Use 8 bit maths
-%check 0 <= %1 <= 255
-	ld	l,(hl)
-	ld	bc,%1
-	add	hl,bc
-=
-	ld	a,(hl)
-	add	%1
-	ld	l,a
-
 %title Tidy up function tail
 	pop	bc
 	ld	hl,%1	;const
 	add	hl,sp
 	ld	sp,hl
+	ret
 =
 	ld	hl,%eval(%1 2 +)	;const
 	add	hl,sp
 	ld	sp,hl
+	ret
 
 %title Better sdccdecl handling 1
 	ld	h,0
