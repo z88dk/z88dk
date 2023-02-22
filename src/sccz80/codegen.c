@@ -5192,14 +5192,9 @@ void constbc(int32_t val)
 
 void addbchl(int val)
 {
-    if ( c_cpu == CPU_Z80N ) {
-        ot("add\thl,");
-        outdec(val); nl();
-    } else {
-        ot("ld\tbc,");
-        outdec(val);
-        outstr("\n\tadd\thl,bc\n");
-    }
+    ot("ld\tbc,");
+    outdec(val);
+    outstr("\n\tadd\thl,bc\n");
 }
 
 

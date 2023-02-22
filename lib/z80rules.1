@@ -5896,7 +5896,7 @@ $notcpu 8085
 	ld	h,0
 =
 	ld	a,(_%1)
-	add	%eval(%2 256 %%)
+	add	%eval(%2 256 + 256 %%)
 	ld	l,a
 	ld	h,0
 
@@ -6402,7 +6402,7 @@ $notcpu 8085
 	ld	hl,%2
 =
 	ld	a,(hl)
-	add	%eval(%1 256 %%)
+	add	%eval(%1 256 + 256 %%)
 	pop	de
 	ld	(de),a
 	ld	hl,%2
@@ -6889,11 +6889,212 @@ $notcpu 8085
 	ld	de,%1	;const
 	ld	hl,%2	;const
 
+%title Reverse primary/secondary load
 %check 4 <= %2 <= 8
-	ld	hl,%1X
+	ld	hl,%1	;const
 	push	hl
 	call	l_gint%2sp	;
 	pop	de
 =
 	call	l_gint%eval(%2 2-)sp	;
 	ld	de,%1
+
+%title Optimise secondary load (perf)
+	ld	hl,(_%1)	X
+	ld	h,0
+	ex	de,hl
+	ld	hl,%2	;const
+=
+	ld	a,(_%1)
+	ld	e,a
+	ld	d,0
+	ld	hl,%2	;const
+
+%title Use 8 bit addition
+%check 0 <= %2 <= 256
+	ld	hl,(_%1)
+	ld	h,0
+	ld	bc,%2
+	add	hl,bc
+	ld	h,0
+=
+	ld	a,(_%1)
+	add	%eval(%2 256 + 256 %%)
+	ld	l,a
+	ld	h,0
+
+%title Load directly into a rather than via hl
+	ld	hl,_%1
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+	ld	hl,%2
+=
+	ld	a,(_%1)
+	pop	de
+	ld	(de),a
+	ld	hl,%2
+
+	ld	hl,_%1
+	ld	a,(hl)
+	pop	de
+	ld	(de),a
+	ld	l,a
+=
+	ld	a,(_%1)
+	pop	de
+	ld	(de),a
+	ld	l,a
+
+%notcpu gbz80
+	push	hl
+	ld	a,%1
+	pop	de
+=
+	ex	de,hl
+	ld	a,%1
+
+%check 0 <= %1 <= 255
+	ld	e,(hl)
+	ld	d,0
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	add	hl,de
+	pop	de
+=
+	ld	a,(hl)
+	ld	hl,%1	;const
+	add	hl,sp
+	add	(hl)
+	ld	l,a
+	ld	a,h
+	adc	h
+	ld	h,a
+	pop	de
+
+%check 0 <= %1 <= 256
+	ld	e,a
+	ld	d,0
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	add	hl,de
+	pop	de
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	add	(hl)
+	ld	l,a
+	ld	a,h
+	adc	h
+	ld	h,a
+	pop	de
+
+%title Remove redundant ld h,0
+	ld	h,0
+	ld	bc,%1
+	add	hl,bc
+	ld	h,0
+=
+	ld	bc,%1
+	add	hl,bc
+	ld	h,0
+
+%title Use 8 bit maths
+%check 0 <= %1 <= 255
+	ld	l,(hl)
+	ld	bc,%1
+	add	hl,bc
+=
+	ld	a,(hl)
+	add	%1
+	ld	l,a
+
+%title Tidy up function tail
+	pop	bc
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	sp,hl
+=
+	ld	hl,%eval(%1 2 +)	;const
+	add	hl,sp
+	ld	sp,hl
+
+%title Better sdccdecl handling 1
+	ld	h,0
+	ld	b,l
+	push	bc
+	inc	sp
+	ld	hl,%1
+=
+	ld	a,l
+	push	af
+	inc	sp
+	ld	hl,%1
+
+%title Better sdccdecl handling - global
+	ld	hl,(_%1)
+	ld	a,l
+	push	af
+	inc	sp
+	ld	hl,%2
+=
+	ld	a,(_%1)
+	push	af
+	inc	sp
+	ld	hl,%2
+
+%title Better sdccdecl handling - local
+	ld	l,(hl)
+	ld	a,l
+	push	af
+	inc	sp
+	ld	hl,%2
+=
+	ld	a,(hl)
+	push	af
+	inc	sp
+	ld	hl,%2
+
+
+%title Better sdccdecl handling - local 2
+%eval 2 = %2 %1 -
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	a,(hl)
+	push	af
+	inc	sp
+	ld	hl,%2	;const
+	add	hl,sp
+	ld	a,(hl)
+	push	af
+	inc	sp
+	ld	hl,%3
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	d,(hl)
+	inc	hl
+	ld	e,(hl)
+	push	de
+	ld	hl,%3
+
+%title Char parameter passing
+%eval 3 = %2 %1 -
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	l,(hl)
+	ld	h,0
+	push	hl
+	ld	hl,%2	;const
+	add	hl,sp
+=
+	ld	hl,%1	;const
+	add	hl,sp
+	ld	c,(hl)
+	ld	b,0
+	push	bc
+	inc	hl
