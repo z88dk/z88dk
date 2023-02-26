@@ -136,11 +136,6 @@ setfc0:
 
 	pop	DE	;restore text pointer
 setfc1:
-	RLCA		;rotate into upper 5 bits of A
-	RLCA
-	RLCA
-	;; LD	(usrnum),A	;and save
-	;;ld	(ix+41),a
 	push de		; preserve text pointer
 	ld	de,41	; offset for UID
 	add	hl,de
@@ -176,7 +171,7 @@ setfc3:
 
 setfc4:
 	INC	DE	;ok, allow the user number
-	pop	HL	;get old text pointer off the stack
+        pop     af      ;dump saved textptr
 	LD 	a,b	;get user number value
 	JP	setfc1	;and go store it and parse rest of filename
 
@@ -313,4 +308,3 @@ igwsp1:
 
 #endif
 }
-
