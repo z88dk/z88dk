@@ -627,6 +627,26 @@ static disc_spec nabupc_spec = {
      .skew_tab = { 0, 2, 4, 1, 3 }
 };
 
+static disc_spec naburn_spec = {
+     .name = "Nabu PC",
+     .sectors_per_track = 4,
+     .tracks = 16384,
+     .sides = 1,
+     .sector_size = 128,
+     .gap3_length = 0x2a,   //?
+     .filler_byte = 0xe5,
+     .boottracks = 0,
+     .directory_entries = 512,
+     .alternate_sides = 0,
+     .extent_size = 4096,
+     .byte_size_extents = 0, 
+     .first_sector_offset = 0,
+     .has_skew = 0,
+};
+
+
+
+
 
 
 static struct formats {
@@ -656,6 +676,7 @@ static struct formats {
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
+    { "naburn",    "Nabu PC (8mb)",         &naburn_spec, 0, NULL, 1 },
     { "nabupc",    "Nabu PC",               &nabupc_spec, 0, NULL, 1 },
     { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
