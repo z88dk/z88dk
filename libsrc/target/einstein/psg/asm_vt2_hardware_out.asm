@@ -1,6 +1,6 @@
 ; Vortextracker II player
 ;
-; Hardware output routine for MSX
+; Hardware output routine for Tatung Einstein
 ;
 ;
 
