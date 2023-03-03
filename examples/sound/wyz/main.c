@@ -2,6 +2,7 @@
 // zcc +sam main.c sham.mus.asm effects.asm -create-app
 // zcc +nabu main.c effects.asm sham.mus.asm -create-app
 // zcc +msx main.c effects.asm sham.mus.asm -create-app
+// zcc +cpm -subtype=einstein main.c effects.asm sham.mus.asm -create-app
 // etc etc
 //
 #include <stdio.h>
@@ -26,7 +27,7 @@
 #include <stdlib.h>
 
 
-#if __PC6001__ | __MULTI8__ | __LM80C__  
+#if __PC6001__ | __MULTI8__ | __LM80C__ | __EINSTEIN__
 #define NO_INTERRUPT 1
 #endif
 

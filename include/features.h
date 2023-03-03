@@ -150,8 +150,8 @@
 // #define __HAVE_INKEY 0
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
-// #define __HAVE_PSG_AY_WYZ 0
-// #define __HAVE_PSG_AY_VT2 0
+#define __HAVE_PSG_AY_WYZ 1
+#define __HAVE_PSG_AY_VT2 1
 // #define __HAVE_PSG_SN76489 0
 // #define __HAVE_PSG_SAA1099 0
 // #define __HAVE_INTERRUPTS 0

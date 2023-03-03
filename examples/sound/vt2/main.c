@@ -1,5 +1,6 @@
 // zcc +zx main.c sound.asm -lndos -create-app
 // zcc +msx main.c sound.asm -subtype=rom -create-app
+// zcc +cpm -subtype=einstein main.c sound.asm -subtype=rom -create-app
 #include <stdio.h>
 #include <intrinsic.h>
 #include <interrupt.h>
@@ -16,7 +17,7 @@
 #include <stdlib.h>
 
 
-#if __PC6001__ | __MULTI8__ 
+#if __PC6001__ | __MULTI8__  | __NABUPC__ | __EINSTEIN__
 #define NO_INTERRUPT 1
 #endif
 
@@ -58,7 +59,7 @@ void main()
 
    // Just loop
    while  ( 1 ) {
-      int k = 0; // getk();
+      int k = getk();
       switch ( k ) {
       case ' ':
           ay_vt2_stop();
