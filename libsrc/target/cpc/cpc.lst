@@ -113,8 +113,10 @@ target/cpc/psg/set_psg_callee
 target/cpc/psg/get_psg
 target/cpc/psg/psg_init
 target/cpc/psg/asm_wyz_hardware_out
+target/cpc/psg/asm_vt2_hardware_out
 target/cpc/banked_call
 target/cpc/interrupts/add_raster_int
 @psg/ay/psg.lst
 @psg/ay/wyz/psg_wyz.lst
+@psg/ay/vt2/psg_vt2.lst
 

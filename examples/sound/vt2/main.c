@@ -1,5 +1,6 @@
 // zcc +zx main.c sound.asm -lndos -create-app
 // zcc +msx main.c sound.asm -subtype=rom -create-app
+// zcc +cpc main.c sound.asm -create-app
 // zcc +cpm -subtype=einstein main.c sound.asm -subtype=rom -create-app
 #include <stdio.h>
 #include <intrinsic.h>
@@ -68,6 +69,10 @@ void main()
           ay_vt2_start();
           break;
       }
+#ifdef __CPC__
+       msleep(40);
+#endif
+       
 #ifdef NO_INTERRUPT
        ay_vt2_play();
        msleep(10);
