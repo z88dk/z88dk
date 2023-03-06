@@ -200,8 +200,13 @@ __interposer_isr__:
    call cpc_enable_process_exx_set
    push    af
    push    hl
+   ld      hl,__im_counter
+   dec     (hl)
+   jr      nz,no_int
+   ld      (hl),6
    ld      hl,im1_vectors
    call    asm_interrupt_handler
+no_int:
    pop     hl
    pop     af
    ei
@@ -230,6 +235,9 @@ __process_exx_set_bc__:   defs 2
 __process_exx_set_de__:   defs 2
 __process_exx_set_hl__:   defs 2
 __fw_int_address__:       defs 2
+
+    SECTION     data_crt
+__im_counter:             defb 6
 
 
 IF __MMAP != -1
