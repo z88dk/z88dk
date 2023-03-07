@@ -644,10 +644,22 @@ static disc_spec naburn_spec = {
      .has_skew = 0,
 };
 
-
-
-
-
+static disc_spec idpfdd_spec = {
+     .name = "Iskra Delta Partner FDD",
+     .sectors_per_track = 18,
+     .tracks = 73, // 146
+     .sides = 2,
+     .sector_size = 256,
+     .gap3_length = 0x2a, //?
+     .filler_byte = 0xe5,
+     .boottracks = 2,
+     .directory_entries = 128,
+     .alternate_sides = 2,
+     .extent_size = 2048,
+     .byte_size_extents = 0, 
+     .first_sector_offset = 0,
+     .has_skew = 0
+};
 
 static struct formats {
      const char    *name;
@@ -681,6 +693,7 @@ static struct formats {
     { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
     { "mz2500cpm", "Sharp MZ2500 - CPM",    &mz2500cpm_spec, 0, NULL, 1 },
     { "osborne1",  "Osborne 1",             &osborne_spec, 0, NULL, 1 },
+    { "idpfdd",    "Iskra Delta Partner",   &idpfdd_spec, 0, NULL, 1 },
     { "pcw80",     "Amstrad PCW, 80T",      &pcw80_spec, 16, "\x03\x81\x50\x09\x02\x01\x04\x04\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "pcw40",     "Amstrad PCW, 40T",      &pcw40_spec, 16, "\x00\x00\x28\x09\x02\x01\x03\x02\x2A\x52\x00\x00\x00\x00\x00\x00", 1 },
     { "plus3",     "Spectrum +3 173k",      &plus3_spec, 0, NULL, 1 },
