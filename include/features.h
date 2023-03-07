@@ -91,7 +91,7 @@
 #define __HAVE_KEYBOARD 1
 #define __HAVE_FGETC_CONS 1
 #define __HAVE_GETK 1
-// #define __HAVE_INKEY 0
+#define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
 #define __HAVE_PSG_AY_WYZ 1
@@ -1295,7 +1295,7 @@
 #define __HAVE_KEYBOARD 1
 #define __HAVE_FGETC_CONS 1
 #define __HAVE_GETK 1
-// #define __HAVE_INKEY 0
+#define __HAVE_INKEY 1
 // #define __HAVE_ONEBITSOUND 0
 #define __HAVE_PSG_AY 1
 #define __HAVE_PSG_AY_WYZ 1

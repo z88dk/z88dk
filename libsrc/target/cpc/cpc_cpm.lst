@@ -104,3 +104,5 @@ target/cpc/psg/asm_vt2_hardware_out
 @psg/ay/psg.lst
 @psg/ay/wyz/psg_wyz.lst
 @psg/ay/vt2/psg_vt2.lst
+@input/input_keyboard.lst
+target/cpc/input/__cpc_scan_allrows
