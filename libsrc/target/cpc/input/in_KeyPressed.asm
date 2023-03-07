@@ -44,15 +44,14 @@ keypressed:
     xor      a
     bit      7,e    ;shift
     jr       z,noshift
-    or       @0010000
+    or       @00100000
 noshift:
     bit      6,e
     jr       z,noctrl
     or       @10000000
 noctrl:
     ld       d,a
-    ld       hl,__cpc_keystate+2
-    ld       a,(hl)
+    ld       a,(__cpc_keystate+2)
     cpl
     and      d
     cp       d
