@@ -3,7 +3,7 @@
 ;       Joaopa Jun. 2014
 ;       Stefano Bodrato Lug. 2014
 ;
-;       $Id: vg5k_crt0.asm,v 1.15 2016-07-15 21:03:25 dom Exp $
+;       $Id: vg5k_crt0.asm $
 ;
 
 
@@ -32,7 +32,7 @@
     defc    CONSOLE_COLUMNS = 40
     defc    CONSOLE_ROWS = 25
 
-    defc    TAR__fputc_cons_generic = 1
+    defc    TAR__fputc_cons_generic = 0
     defc	TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -1
@@ -61,10 +61,18 @@ start:
 IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
+
     di
+	ld hl,$47D0  ;INTHK - Hook Code for Interrupt
+	ld (hl),$c3  ; JP nn
+	inc hl
+	ld de,int_patch
+	ld (hl),de
+	ei
+	
     call    _main
     ld      iy,$47FA
-    ei
+
 cleanup:
     call    crt0_exit
 
@@ -76,6 +84,17 @@ __restore_sp_onexit:
 
 
 l_dcal:	jp	(hl)        ;Used for function pointer calls
+
+
+int_patch:
+    ld (iy_val+2),iy	; Preserve IX
+    ld iy,$47FA
+	call $3b
+    pop iy
+iy_val:
+	ld iy,0
+	ret
+
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"
 
