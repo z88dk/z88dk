@@ -126,7 +126,13 @@ int main(int argc, char **argv)
             FILE *fp = fopen(argv[1],"rb");
 
             if ( fp != NULL ) {
-                size_t amount = end - start;
+                size_t amount;
+
+                if ( start < 0 ) {
+                    start = 0;
+                }
+                amount = end - start;
+
                 fseek(fp, start - org, SEEK_SET);
                 size_t r = fread(mem + (start % BUFF_SIZE), sizeof(char), (amount % BUFF_SIZE), fp);
                 loaded = 1;
@@ -141,9 +147,6 @@ int main(int argc, char **argv)
             }
             argc--; argv++;
         }
-    }
-    if ( start < 0 ) {
-        start = 0;
     }
     if ( loaded ) {
         disassemble_loop(start,end);
