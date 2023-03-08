@@ -10,10 +10,12 @@
 #include <interrupt.h>
 
 // Add a raster interrupt handler (50Hz)
-extern void __LIB__ add_raster_int(isr_t handler);
+extern void __LIB__ cpc_add_vsync_isr(isr_t handler);
+extern void __LIB__ cpc_del_vsync_isr(isr_t handler);
 
 // Add a fast interrupt handler (300Hz)
 extern void __LIB__ cpc_add_fast_isr(isr_t handler);
+extern void __LIB__ cpc_del_fast_isr(isr_t handler);
 
 ///////////////////////////////////////////
 // DIAGNOSTICS AND HARDWARE IDENTIFICATION

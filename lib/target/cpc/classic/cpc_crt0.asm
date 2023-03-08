@@ -32,6 +32,12 @@ ENDIF
 
 IF !DEFINED_CRT_DISABLE_FIRMWARE_ISR
     defc CRT_DISABLE_FIRMWARE_ISR = 0
+    PUBLIC CRT_EVENT_BLOCKS
+    PUBLIC CRT_EVENT_BLOCKS_NUM
+
+    ; 8 slots of 16 bytes = 128
+    defc CRT_EVENT_BLOCKS = 0xa600
+    defc CRT_EVENT_BLOCKS_NUM = 8
 ENDIF
 
 
@@ -202,33 +208,53 @@ ENDIF
     ret
 
 IF startup != 2
-
-   EXTERN im1_vectors
-   EXTERN fast_vectors
-   EXTERN asm_interrupt_handler
+   PUBLIC  cpc_add_vsync_isr
+   PUBLIC  _cpc_add_vsync_isr
+   PUBLIC  cpc_add_fast_isr
+   PUBLIC  _cpc_add_fast_isr
 
 __interposer_isr__:
 IF CRT_DISABLE_FIRMWARE_ISR = 0
+   EXTERN __fw_add_vsync_isr
+   EXTERN __fw_del_vsync_isr
+   EXTERN __fw_add_fast_isr
+   EXTERN __fw_del_fast_isr
+   
+   defc cpc_add_vsync_isr = __fw_add_vsync_isr
+   defc _cpc_add_vsync_isr = cpc_add_vsync_isr
+   defc cpc_del_vsync_isr = __fw_del_vsync_isr
+   defc _cpc_del_vsync_isr = cpc_del_vsync_isr
+
+   defc cpc_add_fast_isr = __fw_add_fast_isr
+   defc _cpc_add_fast_isr = cpc_add_fast_isr
+   defc cpc_del_fast_isr = __fw_del_fast_isr
+   defc _cpc_del_sfastisr = cpc_del_fast_isr
+
    call cpc_enable_fw_exx_set
    call 0x0038
    di
    call cpc_enable_process_exx_set
-   push    af
-   push    hl
-   ; Given that we've already called the ROM ISR, then
-   ; we probably can't read the vsync state
-   ld      hl,__im_counter
-   dec     (hl)
-   jr      nz,no_int
-   ld      (hl),6
-   ld      hl,im1_vectors
-   call    asm_interrupt_handler
-no_int:
-   pop     hl
-   pop     af
    ei
    ret
 ELSE
+   EXTERN im1_vectors
+   EXTERN fast_vectors
+   EXTERN im1_install_isr
+   EXTERN im1_uninstall_isr
+   EXTERN __add_fast_isr
+   EXTERN __del_fast_isr
+   EXTERN asm_interrupt_handler
+
+   defc cpc_add_vsync_isr = im1_install_isr
+   defc _cpc_add_vsync_isr = cpc_add_vsync_isr
+   defc cpc_del_vsync_isr = im1_uninstall_isr
+   defc _cpc_del_vsync_isr = cpc_del_vsync_isr
+
+   defc cpc_add_fast_isr = __add_fast_isr
+   defc _cpc_add_fast_isr = cpc_add_fast_isr
+   defc cpc_del_fast_isr = __del_fast_isr
+   defc _cpc_del_sfastisr = cpc_del_fast_isr
+
    push    af
    push    hl
    push    bc
