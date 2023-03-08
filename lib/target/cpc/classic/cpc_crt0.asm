@@ -30,6 +30,11 @@ ELSE
 ENDIF
     defc    CONSOLE_ROWS = 25
 
+IF !DEFINED_CRT_DISABLE_FIRMWARE_ISR
+    defc CRT_DISABLE_FIRMWARE_ISR = 0
+ENDIF
+
+
     PUBLIC  cpc_enable_fw_exx_set       ;needed by firmware interposer
     PUBLIC  cpc_enable_process_exx_set  ;needed by firmware interposer
 
@@ -148,8 +153,13 @@ cpc_enable_fw_exx_set:
     ld      (__process_exx_set_af__),hl
    
 IF startup != 2
+  IF CRT_DISABLE_FIRMWARE_ISR = 0
     ld      hl,(__fw_int_address__)
     ld      (0x0039),hl                      ; restore firmware isr
+  ELSE
+    ld      hl,$c9fb                         ; ei ret
+    ld      (0x0038),hl
+  ENDIF
 ENDIF
    
     ld      bc,(__fw_exx_set_bc__)           ; restore firmware exx set
@@ -168,9 +178,13 @@ cpc_enable_process_exx_set:
     ld      (__fw_exx_set_bc__),bc           ; save firmware exx set
 
 IF startup != 2
+  IF CRT_DISABLE_FIRMWARE_ISR = 0
     ld      hl,(0x0039)
     ld      (__fw_int_address__),hl          ; save firmware interrupt entry
-
+  ELSE
+    ld      a,195                            ; jp
+    ld      (0x0038),a
+  ENDIF
     ld      hl,__interposer_isr__
     ld      (0x0039),hl                      ; interposer receives interrupts
 ENDIF
@@ -190,16 +204,19 @@ ENDIF
 IF startup != 2
 
    EXTERN im1_vectors
+   EXTERN fast_vectors
    EXTERN asm_interrupt_handler
 
 __interposer_isr__:
-
+IF CRT_DISABLE_FIRMWARE_ISR = 0
    call cpc_enable_fw_exx_set
    call 0x0038
    di
    call cpc_enable_process_exx_set
    push    af
    push    hl
+   ; Given that we've already called the ROM ISR, then
+   ; we probably can't read the vsync state
    ld      hl,__im_counter
    dec     (hl)
    jr      nz,no_int
@@ -211,6 +228,27 @@ no_int:
    pop     af
    ei
    ret
+ELSE
+   push    af
+   push    hl
+   push    bc
+   ld      hl,im1_vectors
+   ; Test for VSYNC
+   ld      b,$f5
+   in      a,(c)
+   rra
+   ; Call the raster/VSYNC interrupts
+   call    c,asm_interrupt_handler
+   ; Call the fast handlers
+   ld      hl,fast_vectors
+   call    asm_interrupt_handler
+no_int:
+   pop     bc
+   pop     hl
+   pop     af
+   ei
+   ret
+ENDIF
 
 ENDIF
 
@@ -236,8 +274,10 @@ __process_exx_set_de__:   defs 2
 __process_exx_set_hl__:   defs 2
 __fw_int_address__:       defs 2
 
+IF CRT_DISABLE_FIRMWARE_ISR = 0
     SECTION     data_crt
 __im_counter:             defb 6
+ENDIF
 
 
 IF __MMAP != -1

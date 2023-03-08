@@ -1,19 +1,19 @@
 /*
  * Headerfile for Amstrad CPC specific functions
- *
- * $Id: cpc.h - fall 2107 - $
  */
 
-#ifndef __CPC_H__
-#define __CPC_H__
+#ifndef __ARCH_CPC_CPC_H__
+#define __ARCH_CPC_CPC_H__
 
 #include <sys/compiler.h>
 #include <sys/types.h>
 #include <interrupt.h>
 
-// Add a raster interrupt handler
+// Add a raster interrupt handler (50Hz)
 extern void __LIB__ add_raster_int(isr_t handler);
 
+// Add a fast interrupt handler (300Hz)
+extern void __LIB__ cpc_add_fast_isr(isr_t handler);
 
 ///////////////////////////////////////////
 // DIAGNOSTICS AND HARDWARE IDENTIFICATION

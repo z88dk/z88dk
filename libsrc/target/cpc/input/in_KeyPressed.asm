@@ -3,6 +3,7 @@
 SECTION code_clib
 PUBLIC in_KeyPressed
 PUBLIC _in_KeyPressed
+PUBLIC asm_in_KeyPressed_direct
 EXTERN __cpc_scan_allrows
 EXTERN __cpc_keystate
 
@@ -22,11 +23,13 @@ _in_KeyPressed:
     push    hl
     call    __cpc_scan_allrows
     pop     de
+asm_in_KeyPressed_direct:
     ld      a,e
     and     15
     ld      c,a
     ld      b,0
     ld      hl,__cpc_keystate
+    add     hl,bc
     ld      a,(hl)
     cpl
     and     d
@@ -53,7 +56,7 @@ noctrl:
     ld       d,a
     ld       a,(__cpc_keystate+2)
     cpl
-    and      d
+    and      @10100000
     cp       d
     jr       nz,fail
     ld       hl,1
