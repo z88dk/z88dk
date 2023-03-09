@@ -61,9 +61,9 @@ if ( $song_mode ) {
 		PLY_AKG_INITSOUNDEFFECTS
 		PLY_AKG_PLAYSOUNDEFFECT
 	);
-	push @output, map { sprintf( "defc %s_%s = %s\n", $function_prefix, $_, $_ ) } @arkos_functions;
+	push @output, map { sprintf( "defc asm_%s_%s = %s\n", $function_prefix, $_, $_ ) } @arkos_functions;
 	push @output, "\n";
-	push @output, map { sprintf( "public %s_%s\n", $function_prefix, $_ ) } @arkos_functions;
+	push @output, map { sprintf( "public asm_%s_%s\n", $function_prefix, $_ ) } @arkos_functions;
 	push @output, "\n";
 }
 

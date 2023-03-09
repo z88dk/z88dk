@@ -7,17 +7,17 @@
 
 section code_sound_ay
 
-defc msx_rom_PLY_AKG_INIT = PLY_AKG_INIT
-defc msx_rom_PLY_AKG_STOP = PLY_AKG_STOP
-defc msx_rom_PLY_AKG_PLAY = PLY_AKG_PLAY
-defc msx_rom_PLY_AKG_INITSOUNDEFFECTS = PLY_AKG_INITSOUNDEFFECTS
-defc msx_rom_PLY_AKG_PLAYSOUNDEFFECT = PLY_AKG_PLAYSOUNDEFFECT
+defc asm_msx_rom_PLY_AKG_INIT = PLY_AKG_INIT
+defc asm_msx_rom_PLY_AKG_STOP = PLY_AKG_STOP
+defc asm_msx_rom_PLY_AKG_PLAY = PLY_AKG_PLAY
+defc asm_msx_rom_PLY_AKG_INITSOUNDEFFECTS = PLY_AKG_INITSOUNDEFFECTS
+defc asm_msx_rom_PLY_AKG_PLAYSOUNDEFFECT = PLY_AKG_PLAYSOUNDEFFECT
 
-public msx_rom_PLY_AKG_INIT
-public msx_rom_PLY_AKG_STOP
-public msx_rom_PLY_AKG_PLAY
-public msx_rom_PLY_AKG_INITSOUNDEFFECTS
-public msx_rom_PLY_AKG_PLAYSOUNDEFFECT
+public asm_msx_rom_PLY_AKG_INIT
+public asm_msx_rom_PLY_AKG_STOP
+public asm_msx_rom_PLY_AKG_PLAY
+public asm_msx_rom_PLY_AKG_INITSOUNDEFFECTS
+public asm_msx_rom_PLY_AKG_PLAYSOUNDEFFECT
 
 defc PLY_AKG_FULL_INIT_CODE = ASMPC +1
 defc PLY_AKG_USE_HOOKS = ASMPC +1
