@@ -13,17 +13,24 @@ ARKOS_ZX_RAM_ASM = asm_arkos2_zx_ram.asm
 
 # targets
 .SILENT:
-.PHONY: clean generate-all-players update-all-players
+.PHONY: clean generate-all-players update-all-players update-all-players-classic update-all-players-newlib
 
 generate-all-players: clean
 	make $(ARKOS_MSX_RAM_ASM)
 	make $(ARKOS_MSX_ROM_ASM)
 	make $(ARKOS_ZX_RAM_ASM)
 
-update-all-players: generate-all-players
-	mv -f $(ARKOS_MSX_RAM_ASM) ../../libsrc/target/msx/psg
-	mv -f $(ARKOS_MSX_ROM_ASM) ../../libsrc/target/msx/psg
-	mv -f $(ARKOS_ZX_RAM_ASM) ../../libsrc/target/zx/psg
+update-all-players-classic: generate-all-players
+	cp -f $(ARKOS_MSX_RAM_ASM) ../../libsrc/target/msx/psg
+	cp -f $(ARKOS_MSX_ROM_ASM) ../../libsrc/target/msx/psg
+	cp -f $(ARKOS_ZX_RAM_ASM) ../../libsrc/target/zx/psg
+
+update-all-players-newlib: generate-all-players
+	cp -f $(ARKOS_MSX_RAM_ASM) ../../libsrc/_DEVELOPMENT/arch/msx/arkos
+	cp -f $(ARKOS_MSX_ROM_ASM) ../../libsrc/_DEVELOPMENT/arch/msx/arkos  
+	cp -f $(ARKOS_ZX_RAM_ASM) ../../libsrc/_DEVELOPMENT/arch/zx/arkos
+
+update-all-players: update-all-players-classic update-all-players-newlib
 
 # convert Arkos RASM player source to relocatable Z88DK asm player
 # reference: "Source conversion with Disark" article:
@@ -65,4 +72,4 @@ $(ARKOS_ZX_RAM_ASM):
 	$(ARKOS2Z88DK) -t zx $(PASMO_ASM) > $(ARKOS_ZX_RAM_ASM)
 
 clean:
-	@-rm conf_PlayerAkg.asm *.lis *.bin *.tap *.o *.sym $(PASMO_ASM) 2>/dev/null
+	@-rm conf_PlayerAkg.asm *.lis *.bin *.tap *.o *.sym $(PASMO_ASM) $(ARKOS_ZX_RAM_ASM) $(ARKOS_MSX_RAM_ASM) $(ARKOS_MSX_ROM_ASM) 2>/dev/null

@@ -1,17 +1,23 @@
 ;;
-;; Arkos Tracker 2 player - https://www.julien-nevo.com/arkostracker/
+;; Arkos 2 Player automatically generated for msx target in rom mode. 
+;; Do not modify this file directly.  Go instead to support/arkos directory
+;; and regenerate the Player with the proper Makefile recipes!  - ZXjogv
+;; (zx@jogv.es)
 ;;
-;; z88dk integration by ZXjogv <zx@jogv.es>
-;; 
-;; This code has been generated from the original Arkos2 player sources,
-;; configured for ROM mode (i.e.  non-SMC).  Tests, demos and scripts for
-;; recreating it when new versions are available can be found here:
-;; https://github.com/jorgegv/z88dk-arkos-relocatable
-;;
-
-IF !__CPU_INTEL__ && !__CPU_GBZ80__
 
 section code_sound_ay
+
+defc asm_msx_rom_PLY_AKG_INIT = PLY_AKG_INIT
+defc asm_msx_rom_PLY_AKG_STOP = PLY_AKG_STOP
+defc asm_msx_rom_PLY_AKG_PLAY = PLY_AKG_PLAY
+defc asm_msx_rom_PLY_AKG_INITSOUNDEFFECTS = PLY_AKG_INITSOUNDEFFECTS
+defc asm_msx_rom_PLY_AKG_PLAYSOUNDEFFECT = PLY_AKG_PLAYSOUNDEFFECT
+
+public asm_msx_rom_PLY_AKG_INIT
+public asm_msx_rom_PLY_AKG_STOP
+public asm_msx_rom_PLY_AKG_PLAY
+public asm_msx_rom_PLY_AKG_INITSOUNDEFFECTS
+public asm_msx_rom_PLY_AKG_PLAYSOUNDEFFECT
 
 defc PLY_AKG_FULL_INIT_CODE = ASMPC +1
 defc PLY_AKG_USE_HOOKS = ASMPC +1
@@ -2238,16 +2244,7 @@ PLY_AKG_TICKDECREASINGCOUNTER equ _arkos_var_buffer + 4
 ;; _arkos_var_buffer size: 269
 
 
-public PLY_AKG_INIT
-public PLY_AKG_STOP
-public PLY_AKG_PLAY
-public PLY_AKG_INITSOUNDEFFECTS
-public PLY_AKG_PLAYSOUNDEFFECT
-
 section bss_sound_ay
-
-;; see above for size
 _arkos_var_buffer:
 	defs 269
 
-ENDIF
