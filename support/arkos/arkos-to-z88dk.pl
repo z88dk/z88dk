@@ -5,36 +5,66 @@ use warnings;
 use utf8;
 use Getopt::Std;
 
+my @valid_targets = qw( zx msx );
+my $valid_targets = join( ', ', @valid_targets );
+
 sub show_help_and_die {
 	die <<EOF_HELP
-usage: $0 <pasmo_asm_file> [-r] [-e]
+usage: $0 <pasmo_asm_file> [-r] [-e] -t <target>
   -r: the ASM input file has been configured for ROM code
   -s: process input in SONG mode (does not include EXTERN declarations for Arkos player functions)
+  -t: sets the target for which the player will be generated - valid targets: $valid_targets
 EOF_HELP
 ;
 }
 
 # check arguments and options
-our ( $opt_r, $opt_s );
-getopts("rs");
+our ( $opt_r, $opt_s, $opt_t );
+getopts("rst:");
 my $rom_mode = $opt_r || 0;
 my $song_mode = $opt_s || 0;
+my $target = $opt_t;
+my $mode = ( $rom_mode ? 'rom' : 'ram' );
 
 my $input = $ARGV[0];
-defined( $input ) or show_help_and_die;
+( defined( $input ) and defined( $target ) and ( grep { $_ eq $target } @valid_targets ) ) or show_help_and_die;
 
 # open input and start processing
 open SRC, $input or
 	die "Could not open $input for reading...\n";
 
+# output some boilerplate
 my @output;
+push @output, <<EOF_HEADING
+;;
+;; Arkos 2 Player automatically generated for $target target in $mode mode. 
+;; Do not modify this file directly.  Go instead to support/arkos directory
+;; and regenerate the Player with the proper Makefile recipes!  - ZXjogv
+;; (zx\@jogv.es)
+;;
 
+EOF_HEADING
+;
 # output proper section name, and if in code mode, public declarations
 if ( $song_mode ) {
-	push @output, "section data_sound_ay\n";
+	push @output, "section data_sound_ay\n\n";
 } else {
-	push @output, "section code_sound_ay\n";
-	push @output, map { "public PLY_AKG_$_\n" } qw( INIT STOP PLAY INITSOUNDEFFECTS PLAYSOUNDEFFECT );
+	push @output, "section code_sound_ay\n\n";
+
+	# define function constants and export them
+	# a different prefix for different combinations of (target,mode)
+	my $function_prefix = sprintf( "%s_%s", $target, $mode );
+	my @arkos_functions = qw(
+		PLY_AKG_INIT
+		PLY_AKG_STOP
+		PLY_AKG_PLAY
+		PLY_AKG_INITSOUNDEFFECTS
+		PLY_AKG_PLAYSOUNDEFFECT
+	);
+	push @output, map { sprintf( "defc %s_%s = %s\n", $function_prefix, $_, $_ ) } @arkos_functions;
+	push @output, "\n";
+	push @output, map { sprintf( "public %s_%s\n", $function_prefix, $_ ) } @arkos_functions;
+	push @output, "\n";
 }
 
 my @all_symbols;
@@ -74,7 +104,9 @@ while ( my $line = <SRC> ) {
 
 	# if it is an arkos variable definition, transform it into an external ref
 	if ( $line =~ /^(PLY_AKG_\w+)\s+equ\s+(\d+)$/ ) {
-		my $var_offset = $2 - 0xc000;
+		# the substracted value must match the configured value for
+		# PLY_AKG_ROM_Buffer in Makefile recipes
+		my $var_offset = $2 - 0xC000;
 		push @output, sprintf( "%s equ _arkos_var_buffer + %d\n", $1, $var_offset );
 		push @all_symbols, $1;
 		if ( $arkos_var_offset_max < $var_offset ) {
