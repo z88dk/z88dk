@@ -29,8 +29,8 @@
 
 */
 
-#ifndef _ARKOS2_H
-#define _ARKOS2_H
+#ifndef _ARKOS_H
+#define _ARKOS_H
 
 /*
     Different symbols for different configs and targets are defined, but we
@@ -66,6 +66,7 @@
 #else
     #warning "Arkos Tracker 2 support is not available for this target"
 #endif
+#endif
 
 // Here follow all declarations for all target and mode combinations.  It
 // does not hurt to have all of them here mixed - the right ones for your
@@ -95,4 +96,4 @@ void zx_ram_ply_akg_stop( void );
 void zx_ram_ply_akg_initsoundeffects( void *effects_table[] ) __z88dk_fastcall;
 void zx_ram_ply_akg_playsoundeffect( uint16_t effect, uint16_t channel, uint16_t inv_volume ) __z88dk_callee __smallc;
 
-#endif // _ARKOS2_H
+#endif // _ARKOS_H
