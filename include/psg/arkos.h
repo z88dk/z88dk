@@ -40,7 +40,7 @@
 #ifdef __MSX__
 
 // MSX declarations - this can in turn be in RAM or ROM mode
-#ifdef ARKOS2_USE_ROM_PLAYER
+#ifdef ARKOS_USE_ROM_PLAYER
     #define ply_akg_init(a,b)			msx_rom_ply_akg_init(a,b)
     #define ply_akg_play()			msx_rom_ply_akg_play()
     #define ply_akg_stop()			msx_rom_ply_akg_stop()
