@@ -21,6 +21,12 @@ target/zx/psg/get_psg
 target/zx/psg/psg_init
 target/zx/psg/asm_wyz_hardware_out
 target/zx/psg/asm_vt2_hardware_out
+target/zx/arkos_zx_ram_ply_akg_init
+target/zx/arkos_zx_ram_ply_akg_initsoundeffects
+target/zx/arkos_zx_ram_ply_akg_play
+target/zx/arkos_zx_ram_ply_akg_playsoundeffect
+target/zx/arkos_zx_ram_ply_akg_stop
+target/zx/asm_arkos_zx_ram
 @psg/ay/psg.lst
 @psg/ay/wyz/psg_wyz.lst
 @psg/ay/vt2/psg_vt2.lst
