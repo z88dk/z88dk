@@ -4,9 +4,9 @@
 
     Arkos C function prototypes
 
-    NOTE FOR MSX TARGET: if you #define the macro ARKOS2_USE_ROM_PLAYER in
-    your code before #include <sound/psg/arkos2.h>, a ROMable player will be
-    used.
+    NOTE FOR MSX TARGET: if you #define the macro ARKOS_USE_ROM_PLAYER in
+    your code before #including this file, a ROMable player will be used. 
+    You _must_ use the ROM player when compiling for a ROM target!
 
     Arkos Player Functions:
 
