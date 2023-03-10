@@ -1,12 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
 // periodic-rom.c - Example code for using loop driven music playback with
-// Arkos player
+// Arkos player running in ROM
 //
 // 10/03/2023 - ZXjogv <zx@jogv.es>
 //
 // Compile with:
-//   zcc +msx -subtype=rom -vn -DARKOS_USE_ROM_PLAYER periodic-rom.c hocuspocus.asm -m -s --list -create-app -o arkos.rom
+//   zcc +msx -subtype=rom -vn -DARKOS_USE_ROM_PLAYER periodic-rom.c hocuspocus.asm -m -s --list -create-app -o arkos
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -19,7 +19,7 @@
 // #define ARKOS_USE_ROM_PLAYER
 //
 // You can also define it adding -DARKOS_USE_ROM_PLAYER to the zcc compile
-// command
+// command, see above
 
 #include <psg/arkos.h>
 
