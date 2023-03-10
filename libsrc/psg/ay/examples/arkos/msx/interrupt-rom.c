@@ -1,3 +1,15 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// interrupt-rom.c - Example code for using interrupt-driven music playback
+// with Arkos player
+//
+// 10/03/2023 - ZXjogv <zx@jogv.es>
+//
+// Compile with:
+//   zcc +msx -subtype=rom -vn -DARKOS_USE_ROM_PLAYER interrupt-rom.c hocuspocus.asm -m -s --list -create-app -o arkos.rom
+//
+///////////////////////////////////////////////////////////////////////////////
+
 #include <intrinsic.h>
 #include <stdint.h>
 #include <interrupt.h>
@@ -17,8 +29,7 @@ extern uint8_t song[];
 
 void service_interrupt( void )
 {
-        (*(uint8_t *)0x4000)++;	// show something on screen
-        ply_akg_play();
+    ply_akg_play();
 }
 
 void init_interrupts( void ) {
@@ -33,7 +44,7 @@ void main( void ) {
     ply_akg_init( song, 0 );
     init_interrupts();
     while ( 1 ) {
-        (*(uint8_t *)0x4020)++;	// show something on screen
-                                // music playback should happen in interrupt context
+        // do whatever in your main loop
+        // music playback should happen in interrupt context
     }
 }
