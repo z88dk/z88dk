@@ -31,6 +31,12 @@ LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS) -Wextra -Werror -pedantic-errors \
 			-Isrc/cpp
 
+ifeq ($(USE_BOOST_FILESYSTEM),1)
+   CXX_FLAGS += -DUSE_BOOST_FILESYSTEM
+   LDFLAGS += -lboost_filesystem -lboost_system
+endif
+
+
 # so that we can use C++17 features on older systems
 ifeq ($(CROSS),1)
   ifeq ($(EXESUFFIX),.exe)

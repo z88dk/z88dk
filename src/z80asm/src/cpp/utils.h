@@ -14,7 +14,11 @@
 #include <vector>
 using namespace std;
 
-#if __has_include(<filesystem>)
+
+#ifdef USE_BOOST_FILESYSTEM
+	#include <boost/filesystem.hpp>
+	namespace fs = boost::filesystem;
+#elif __has_include(<filesystem>)
 	// std::filesystem from C++17
 	#include <filesystem>
 	namespace fs = std::filesystem;
