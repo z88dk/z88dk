@@ -15,6 +15,8 @@
 #include <interrupt.h>
 #include <msx.h>
 
+#include <psg/arkos.h>
+
 extern uint8_t song[];
 
 void service_interrupt( void )

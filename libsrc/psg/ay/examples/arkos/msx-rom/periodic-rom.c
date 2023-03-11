@@ -28,10 +28,10 @@ extern uint8_t song[];
 void main( void ) {
     ply_akg_init( song, 0 );
     while ( 1 ) {
-        intrinsic_halt();
         intrinsic_di();
         ply_akg_play();
         intrinsic_ei();
+        intrinsic_halt();
         // do whatever in your main loop
     }
 }
