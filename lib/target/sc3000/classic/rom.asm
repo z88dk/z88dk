@@ -70,7 +70,7 @@ ENDIF
 
 
     ; Initialise mode 2 by default
-    ld      hl,2
+    ld      hl,1
     call    msx_set_mode
     im      1
     ;	ei

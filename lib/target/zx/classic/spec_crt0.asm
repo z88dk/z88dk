@@ -33,7 +33,7 @@
             defc    CRT_ORG_CODE = $5CCB     ; repleaces BASIC program
             defc	DEFINED_CRT_ORG_CODE = 1
         ENDIF
-        defc TAR__register_sp = 0xff57	; below UDG, keep eye when using banks
+        defc REG__register_sp = 0xff57	; below UDG, keep eye when using banks
     ENDIF
 
 
@@ -87,7 +87,7 @@
     ; We use the generic driver by default
     defc    TAR__fputc_cons_generic = 1
 
-    defc    DEF__register_sp = -1
+    defc    TAR__register_sp = -1
     defc    TAR__clib_exit_stack_size = 32
     defc    CRT_KEY_DEL = 12
     defc    __CPU_CLOCK = 3500000
