@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Getopt::Std;
 
-my @valid_targets = qw( zx msx );
+my @valid_targets = qw( zx msx cpc );
 my $valid_targets = join( ', ', @valid_targets );
 
 sub show_help_and_die {
@@ -24,7 +24,7 @@ getopts("rst:");
 my $rom_mode = $opt_r || 0;
 my $song_mode = $opt_s || 0;
 my $target = $opt_t;
-my $mode = ( $rom_mode ? 'rom' : 'ram' );
+my $mode = ( $rom_mode ? 'rom' : 'smc' );
 
 my $input = $ARGV[0];
 ( defined( $input ) and defined( $target ) and ( grep { $_ eq $target } @valid_targets ) ) or show_help_and_die;
@@ -49,11 +49,15 @@ EOF_HEADING
 if ( $song_mode ) {
 	push @output, "section data_sound_ay\n\n";
 } else {
-	push @output, "section code_sound_ay\n\n";
+	if ( $mode eq 'rom' ) {
+		push @output, "section code_sound_ay\n\n";
+	} else {
+		push @output, "section smc_sound_ay\n\n";
+	}
 
+	my $function_prefix = ( $mode eq 'rom' ) ? $mode : "smc";
 	# define function constants and export them
 	# a different prefix for different combinations of (target,mode)
-	my $function_prefix = sprintf( "%s_%s", $target, $mode );
 	my @arkos_functions = qw(
 		PLY_AKG_INIT
 		PLY_AKG_STOP

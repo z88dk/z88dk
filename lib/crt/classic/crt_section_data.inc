@@ -5,6 +5,7 @@
     SECTION smc_clib
   ENDIF
     SECTION smc_fp
+    SECTION smc_sound_ay
     SECTION smc_compress
     SECTION smc_user
     SECTION data_driver

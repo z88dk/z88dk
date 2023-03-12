@@ -1,12 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// periodic.c - Example code for using loop driven music playback with Arkos
-// player
+// periodic-rom.c - Example code for using loop driven music playback with
 //
 // 10/03/2023 - ZXjogv <zx@jogv.es>
-//
-// Compile with:
-//   zcc +zx -vn periodic.c hocuspocus.asm -m -s --list -create-app -o arkos
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -17,14 +13,21 @@
 
 extern uint8_t song[];
 
+void wrapper() __naked
+{
+__asm
+   INCLUDE "hocuspocus.asm"
+__endasm;
+}
+
+
 void main( void ) {
     ply_akg_init( song, 0 );
     while ( 1 ) {
-        intrinsic_halt();
         intrinsic_di();
         ply_akg_play();
         intrinsic_ei();
-        // show something on screen
-        (*(uint8_t *)0x4000)++;
+        intrinsic_halt();
+        // do whatever in your main loop
     }
 }
