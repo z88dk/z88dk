@@ -54,6 +54,7 @@ IF CRT_ORG_CODE = 0x0000
 ENDIF
 
 start:
+	INCLUDE	"crt/classic/crt_start_eidi.inc"
 	INCLUDE	"crt/classic/crt_init_sp.asm"
 	; Make room for the atexit() stack
 	INCLUDE	"crt/classic/crt_init_atexit.asm"
@@ -72,8 +73,8 @@ ENDIF
 cleanup:
         call    crt0_exit
 
-        ; Include the restart behaviour
-	INCLUDE "crt/classic/crt_terminate.asm"
+	; How does the program end?
+	INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal:
 	jp      (hl)
