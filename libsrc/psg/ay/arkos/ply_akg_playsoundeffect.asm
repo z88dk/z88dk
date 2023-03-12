@@ -5,16 +5,18 @@
 section code_sound_ay
 
 ;; public C symbols, matching .h header file
-PUBLIC _msx_ram_ply_akg_playsoundeffect
+PUBLIC ply_akg_playsoundeffect
+PUBLIC _ply_akg_playsoundeffect
 
 ;; external Arkos 2 entry points
-EXTERN asm_msx_ram_PLY_AKG_PLAYSOUNDEFFECT
+EXTERN asm_smc_PLY_AKG_PLAYSOUNDEFFECT
 
 ;;
 ;; void ply_akg_playsoundeffect( uint16_t effect, uint16_t channel, uint16_t inv_volume ) __z88dk_callee __smallc;
 ;;   (params pushed on the stack left to right, all 16-bit)
 ;;
-_msx_ram_ply_akg_playsoundeffect:
+ply_akg_playsoundeffect:
+_ply_akg_playsoundeffect:
         pop hl          ; HL = retaddr
 
         pop bc
@@ -25,4 +27,4 @@ _msx_ram_ply_akg_playsoundeffect:
         ld a,e          ; A = sound effect number
 
         push hl         ; restore retaddr
-        jp asm_msx_ram_PLY_AKG_PLAYSOUNDEFFECT
+        jp asm_smc_PLY_AKG_PLAYSOUNDEFFECT

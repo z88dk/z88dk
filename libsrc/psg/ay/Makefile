@@ -4,7 +4,7 @@
 
 include ../../Make.config
 
-SUBDIRS = wyz vt2
+SUBDIRS = wyz vt2 arkos
 
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 

@@ -5,13 +5,15 @@
 section code_sound_ay
 
 ;; public C symbols, matching .h header file
-PUBLIC _msx_rom_ply_akg_initsoundeffects
+PUBLIC ply_akg_initsoundeffects
+PUBLIC _ply_akg_initsoundeffects
 
 ;; external Arkos 2 entry points
-EXTERN asm_msx_rom_PLY_AKG_INITSOUNDEFFECTS
+EXTERN asm_smc_PLY_AKG_INITSOUNDEFFECTS
 
 ;;
 ;; void ply_akg_initsoundeffects( void *effects_table ) __z88dk_fastcall;
 ;;   (param in HL)
 ;;
-defc _msx_rom_ply_akg_initsoundeffects = asm_msx_rom_PLY_AKG_INITSOUNDEFFECTS
+defc ply_akg_initsoundeffects = asm_smc_PLY_AKG_INITSOUNDEFFECTS
+defc _ply_akg_initsoundeffects = ply_akg_initsoundeffects

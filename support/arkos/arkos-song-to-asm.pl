@@ -36,7 +36,7 @@ sub arkos2_convert_song_to_asm {
 
     my @asmout;
 
-    push @asmout, "section data_sound_ay\n";
+    push @asmout, "section rodata_user\n";
     push @asmout, sprintf( "public %s\n", $song_symbol );
     push @asmout, sprintf( "%s:\n", $song_symbol );
 
