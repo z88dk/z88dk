@@ -65,6 +65,16 @@
   ENDIF
 
 
+   IFDEF CRT_ENABLE_EIDI
+      defc __crt_enable_eidi = CRT_ENABLE_EIDI
+   ELSE
+      IFDEF TAR__crt_enable_eidi
+         defc __crt_enable_eidi = TAR__crt_enable_eidi
+      ELSE
+         defc __crt_enable_eidi = DEF__crt_enable_eidi
+      ENDIF
+   ENDIF
+
 
    ; By default we want to have stdio working for us
    IFNDEF CRT_ENABLE_STDIO
