@@ -1,6 +1,7 @@
 
 ; Rules for setting up defaults for configuring the build
 
+   INCLUDE "crt/classic/crt_defaults.inc"
 
    IFNDEF CRT_INITIALIZE_BSS
       defc CRT_INITIALIZE_BSS = 1
@@ -21,7 +22,7 @@
    ENDIF
 
    IFNDEF TAR__crt_enable_rst
-       defc TAR__crt_enable_rst = 0x0000
+       defc TAR__crt_enable_rst = DEF__crt_enable_rst
    ENDIF
 
    IFDEF CRT_ENABLE_RST
@@ -38,6 +39,42 @@
      ENDIF
      defc __crt_enable_nmi = TAR__crt_enable_nmi
    ENDIF
+
+   IFDEF CRT_ENABLE_RESTART
+      defc __crt_enable_restart = CRT_ENABLE_RESTART
+   ELSE
+      IFDEF TAR__crt_enable_restart
+         defc __crt_enable_restart = TAR__crt_enable_restart
+      ELSE
+         defc __crt_enable_restart = DEF__crt_enable_restart
+      ENDIF
+   ENDIF
+
+  IF __crt_enable_restart
+      defc __crt_on_exit = 0x10008
+   ELSE
+      IFDEF CRT_ON_EXIT
+         defc __crt_on_exit = CRT_ON_EXIT
+      ELSE
+         IFDEF TAR__crt_on_exit
+            defc __crt_on_exit = TAR__crt_on_exit
+         ELSE
+            defc __crt_on_exit = DEF__crt_on_exit
+         ENDIF
+      ENDIF
+  ENDIF
+
+
+   IFDEF CRT_ENABLE_EIDI
+      defc __crt_enable_eidi = CRT_ENABLE_EIDI
+   ELSE
+      IFDEF TAR__crt_enable_eidi
+         defc __crt_enable_eidi = TAR__crt_enable_eidi
+      ELSE
+         defc __crt_enable_eidi = DEF__crt_enable_eidi
+      ENDIF
+   ENDIF
+
 
    ; By default we want to have stdio working for us
    IFNDEF CRT_ENABLE_STDIO
@@ -61,7 +98,7 @@
       IFDEF TAR__clib_banking_stack_size
          defc CLIB_BANKING_STACK_SIZE = TAR__clib_banking_stack_size
       ELSE
-         defc CLIB_BANKING_STACK_SIZE = 100
+         defc CLIB_BANKING_STACK_SIZE = DEF__clib_banking_stack_size
       ENDIF
    ENDIF
 

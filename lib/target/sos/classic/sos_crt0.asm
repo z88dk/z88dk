@@ -24,7 +24,7 @@ ENDIF
 
     IF !DEFINED_CRT_COMMANDLINE_REDIRECTION
         define  DEFINED_CRT_COMMANDLINE_REDIRECTION
-        defc    DEF__CRT_COMMANDLINE_REDIRECTION = 0
+        defc    TAR__CRT_COMMANDLINE_REDIRECTION = 0
     ENDIF
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = -0x1f6a	;;Upper limit of the user area
