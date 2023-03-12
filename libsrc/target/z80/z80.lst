@@ -1,0 +1,2 @@
+target/z80/stdio/fputc_cons_native
+@stdio/stdio.lst
