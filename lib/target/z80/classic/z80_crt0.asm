@@ -26,7 +26,7 @@ IF DEFINED_CRT_ORG_BSS
         defc    __crt_org_bss = CRT_ORG_BSS
 ENDIF
 
-IF      !CRT_ORG_CODE
+IFNDEF      CRT_ORG_CODE
 	defc	CRT_ORG_CODE = 0x0000
 ENDIF
 

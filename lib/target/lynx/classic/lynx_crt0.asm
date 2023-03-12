@@ -6,30 +6,23 @@
 ;
 
 
-                MODULE  lynx_crt0
+    MODULE  lynx_crt0
 
 ;
 ; Initially include the zcc_opt.def file to find out lots of lovely
 ; information about what we should do..
 ;
 
-        	defc    crt0 = 1
-                INCLUDE "zcc_opt.def"
+    defc    crt0 = 1
+    INCLUDE "zcc_opt.def"
 
-		defc	CONSOLE_COLUMNS = 32
-		defc	CONSOLE_ROWS = 32
+    defc	CONSOLE_COLUMNS = 32
+    defc	CONSOLE_ROWS = 32
 
-; No matter what set up we have, main is always, always external to
-; this file
 
-        EXTERN    _main
-
-;
-; Some variables which are needed for both app and basic startup
-;
-
-        PUBLIC    cleanup
-        PUBLIC    l_dcal
+    EXTERN    _main
+    PUBLIC    cleanup
+    PUBLIC    l_dcal
 
 
 
@@ -38,15 +31,15 @@
 ; Set an origin for the application (-zorg=) default to $7000
 ;--------
 
-        IF      !DEFINED_CRT_ORG_CODE
-                defc    CRT_ORG_CODE  = $7000
-        ENDIF
+IF      !DEFINED_CRT_ORG_CODE
+    defc    CRT_ORG_CODE  = $7000
+ENDIF
 
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
-	defc	__CPU_CLOCK = 4000000
-        INCLUDE "crt/classic/crt_rules.inc"
-        org     CRT_ORG_CODE
+    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__register_sp = -1
+    defc    __CPU_CLOCK = 4000000
+    INCLUDE "crt/classic/crt_rules.inc"
+    org     CRT_ORG_CODE
 
 start:
 
@@ -61,27 +54,27 @@ start:
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of 
 ; the compiled program and the stack pointer
-	IF DEFINED_USING_amalloc
-		INCLUDE "crt/classic/crt_init_amalloc.asm"
-	ENDIF
+IF DEFINED_USING_amalloc
+    INCLUDE "crt/classic/crt_init_amalloc.asm"
+ENDIF
 
-        call    _main
+    call    _main
 cleanup:
-	push	hl
+    push    hl
     call    crt0_exit
 
-	pop	bc
+    pop     bc
 __restore_sp_onexit:
-        ld      sp,0
-		ret
+    ld      sp,0
+    ret
 
 		
 l_dcal:
-        jp      (hl)
+    jp      (hl)
 
 
 
-        INCLUDE "crt/classic/crt_runtime_selection.asm"
+    INCLUDE "crt/classic/crt_runtime_selection.asm"
 
-	INCLUDE	"crt/classic/crt_section.asm"
+    INCLUDE	"crt/classic/crt_section.asm"
 
