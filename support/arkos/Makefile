@@ -24,9 +24,9 @@ update-all-players: generate-all-players
 	cp -f $(ARKOS_MSX_RAM_ASM) ../../libsrc/target/msx/psg			# classic
 	cp -f $(ARKOS_MSX_ROM_ASM) ../../libsrc/target/msx/psg
 	cp -f $(ARKOS_ZX_RAM_ASM) ../../libsrc/target/zx/psg
-#	cp -f $(ARKOS_MSX_RAM_ASM) ../../libsrc/_DEVELOPMENT/arch/msx/arkos	# newlib
-#	cp -f $(ARKOS_MSX_ROM_ASM) ../../libsrc/_DEVELOPMENT/arch/msx/arkos  
-#	cp -f $(ARKOS_ZX_RAM_ASM) ../../libsrc/_DEVELOPMENT/arch/zx/arkos
+	cp -f $(ARKOS_MSX_RAM_ASM) ../../libsrc/_DEVELOPMENT/arch/msx/arkos	# newlib
+	cp -f $(ARKOS_MSX_ROM_ASM) ../../libsrc/_DEVELOPMENT/arch/msx/arkos  
+	cp -f $(ARKOS_ZX_RAM_ASM) ../../libsrc/_DEVELOPMENT/arch/zx/arkos
 
 # convert Arkos RASM player source to relocatable Z88DK asm player
 # reference: "Source conversion with Disark" article:
