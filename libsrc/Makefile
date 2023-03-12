@@ -134,7 +134,7 @@ TOCREATE += $(call check_target,vz,vz_clib.lib)
 TOCREATE += $(call check_target,x07,x07_clib.lib)
 TOCREATE += $(call check_target,x1,x1_clib.lib x1_cpm.lib $(CPMLIBS))
 TOCREATE += $(call check_target,z1013,z1013_clib.lib)
-TOCREATE += $(call check_target,z80,z80_clib.lib 8080_clib.lib 8085_clib.lib r2ka_clib.lib)
+TOCREATE += $(call check_target,z80,z80_clib.lib ixiy_clib.lib 8080_clib.lib 8085_clib.lib r2ka_clib.lib)
 TOCREATE += $(call check_target,z80tvgame,z80tvgame_clib.lib)
 TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
 TOCREATE += $(call check_target,z9001,z9001_clib.lib)
@@ -1108,6 +1108,14 @@ z80_clib.lib:
 	$(call buildgeneric,z80)
 	TARGET=z80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/z80_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
+# Barebone z80 (ixiy swapped)clib
+ixiy_clib.lib:
+	@echo ''
+	@echo '--- Building +z80 (ixiy) Library ---'
+	@echo ''
+	$(call buildgeneric,z80)
+	TARGET=z80 TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/ixiy_clib @$(TARGET_DIRECTORY)/z80/z80.lst
+
 # Barebone z80/8080 clib
 8080_clib.lib:
 	@echo ''
@@ -1125,7 +1133,7 @@ z80_clib.lib:
 	TARGET=z80 TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8085_clib @$(TARGET_DIRECTORY)/z80/808x.lst
 
 # Barebone z80/r2k clib
-r2k_clib.lib:
+r2ka_clib.lib:
 	@echo ''
 	@echo '--- Building +z80 (r2ka) Library ---'
 	@echo ''
