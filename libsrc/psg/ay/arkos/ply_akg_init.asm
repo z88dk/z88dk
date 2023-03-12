@@ -5,19 +5,21 @@
 section code_sound_ay
 
 ;; public C symbols, matching .h header file
-PUBLIC _msx_ram_ply_akg_init
+PUBLIC ply_akg_init
+PUBLIC _ply_akg_init
 
 ;; external Arkos 2 entry points
-EXTERN asm_msx_ram_PLY_AKG_INIT
+EXTERN asm_smc_PLY_AKG_INIT
 
 ;;
 ;; void ply_akg_init( void *song, uint8_t subsong ) __z88dk_callee __smallc;
 ;;   (params pushed on the stack left to right, all 16-bit)
 ;;
-_msx_ram_ply_akg_init:
+ply_akg_init:
+_ply_akg_init:
 	pop bc		; BC = retaddr
 	pop de		; E = subsong number
 	pop hl		; HL = song address
 	ld a,e		; A = subsong number
 	push bc		; restore retaddr
-	jp asm_msx_ram_PLY_AKG_INIT
+	jp asm_smc_PLY_AKG_INIT

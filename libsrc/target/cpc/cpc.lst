@@ -114,6 +114,8 @@ target/cpc/psg/get_psg
 target/cpc/psg/psg_init
 target/cpc/psg/asm_wyz_hardware_out
 target/cpc/psg/asm_vt2_hardware_out
+target/cpc/psg/asm_arkos_cpc_rom
+target/cpc/psg/asm_arkos_cpc_smc
 target/cpc/banked_call
 target/cpc/interrupts/fast_vectors
 target/cpc/interrupts/__fast_isr
@@ -122,5 +124,6 @@ target/cpc/interrupts/add_raster_int
 @psg/ay/psg.lst
 @psg/ay/wyz/psg_wyz.lst
 @psg/ay/vt2/psg_vt2.lst
+@psg/ay/arkos/psg_arkos.lst
 @input/input_keyboard.lst
 target/cpc/input/__cpc_scan_allrows

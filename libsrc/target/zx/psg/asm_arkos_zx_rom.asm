@@ -1,5 +1,5 @@
 ;;
-;; Arkos 2 Player automatically generated for msx target in rom mode. 
+;; Arkos 2 Player automatically generated for zx target in rom mode. 
 ;; Do not modify this file directly.  Go instead to support/arkos directory
 ;; and regenerate the Player with the proper Makefile recipes!  - ZXjogv
 ;; (zx@jogv.es)
@@ -104,14 +104,13 @@ PLY_AKG_PLAYSOUNDEFFECTSSTREAM:
 	exx
 	ld hl,PLY_AKG_PSGREG23_INSTR
 	exx
-	srl c
+	rr c
 	call PLY_AKG_PSES_PLAY
 	ld ix,PLY_AKG_CHANNEL3_SOUNDEFFECTDATA
 	ld iy,PLY_AKG_PSGREG10
 	exx
 	ld hl,PLY_AKG_PSGREG45_INSTR
 	exx
-	scf
 	rr c
 	call PLY_AKG_PSES_PLAY
 	ld a,c
@@ -162,11 +161,11 @@ PLY_AKG_PSES_SAVEPOINTERANDEXIT:
 	db 116
 	db 1
 	ret 
-defc PLY_AKG_OPCODE_JP = ASMPC +2
 PLY_AKG_PSES_NOTREACHED:
 	inc (ix+3)
+PLY_AKG_OPCODE_JP:
 	ret 
-defc PLY_AKG_OPCODE_ADD_A_IMMEDIATE = ASMPC +1
+defc PLY_AKG_OPCODE_ADD_A_IMMEDIATE = ASMPC +2
 PLY_AKG_PSES_HARDWAREONLY:
 	call PLY_AKG_PSES_SHARED_READRETRIGHARDWAREENVPERIODNOISE
 	set 2,c
@@ -176,8 +175,8 @@ PLY_AKG_PSES_SOFTWAREORSOFTWAREANDHARDWARE:
 	jr c,PLY_AKG_PSES_SOFTWAREANDHARDWARE
 	call PLY_AKG_PSES_MANAGEVOLUMEFROMA_FILTER4BITS
 	rl b
-defc PLY_AKG_OPCODE_SUB_IMMEDIATE = ASMPC +2
 	call PLY_AKG_PSES_READNOISEIFNEEDEDANDOPENORCLOSENOISECHANNEL
+PLY_AKG_OPCODE_SUB_IMMEDIATE:
 	res 2,c
 	call PLY_AKG_PSES_READSOFTWAREPERIOD
 	jr PLY_AKG_PSES_SAVEPOINTERANDEXIT
@@ -190,8 +189,8 @@ PLY_AKG_PSES_SHARED_READRETRIGHARDWAREENVPERIODNOISE:
 	rra 
 	jr nc,PLY_AKG_PSES_H_AFTERRETRIG
 	ld d,a
-defc PLY_AKG_OPCODE_SBC_HL_BC_MSB = ASMPC +1
 	ld a,255
+PLY_AKG_OPCODE_SBC_HL_BC_MSB:
 	ld (PLY_AKG_PSGREG13_OLDVALUE),a
 	ld a,d
 PLY_AKG_PSES_H_AFTERRETRIG:
@@ -200,7 +199,7 @@ PLY_AKG_PSES_H_AFTERRETRIG:
 	ld (PLY_AKG_PSGREG13_INSTR),a
 	rl b
 	call PLY_AKG_PSES_READNOISEIFNEEDEDANDOPENORCLOSENOISECHANNEL
-defc PLY_AKG_OPCODE_SCF = ASMPC +1
+defc PLY_AKG_OPCODE_SCF = ASMPC +2
 	call PLY_AKG_PSES_READHARDWAREPERIOD
 	ld a,16
 	jp PLY_AKG_PSES_MANAGEVOLUMEFROMA_HARD
@@ -395,7 +394,7 @@ PLY_AKG_STOP:
 	ld h,a
 	ld (PLY_AKG_PSGREG8),a
 	ld (PLY_AKG_PSGREG9_10_INSTR),hl
-	ld a,191
+	ld a,63
 	jp PLY_AKG_SENDPSGREGISTERS
 PLY_AKG_PLAY:
 	ld (PLY_AKG_SAVESP),sp
@@ -1209,7 +1208,7 @@ PLY_AKG_CHANNEL1_SETINSTRUMENTSTEP:
 	ld (PLY_AKG_CHANNEL1_INSTRUMENTSTEP),a
 	ld a,e
 	ld (PLY_AKG_PSGREG8),a
-	srl d
+	rr d
 	exx
 	ld (PLY_AKG_PSGREG01_INSTR),hl
 	ld hl,(PLY_AKG_CHANNEL2_GENERATEDCURRENTPITCH)
@@ -1240,7 +1239,6 @@ PLY_AKG_CHANNEL2_SETINSTRUMENTSTEP:
 	ld (PLY_AKG_CHANNEL2_INSTRUMENTSTEP),a
 	ld a,e
 	ld (PLY_AKG_PSGREG9_10_INSTR),a
-	scf
 	rr d
 	exx
 	ld (PLY_AKG_PSGREG23_INSTR),hl
@@ -1277,67 +1275,84 @@ PLY_AKG_CHANNEL3_SETINSTRUMENTSTEP:
 	ld (PLY_AKG_PSGREG45_INSTR),hl
 	call PLY_AKG_PLAYSOUNDEFFECTSSTREAM
 PLY_AKG_SENDPSGREGISTERS:
-	ld b,a
-	ld a,7
-	out (160),a
-	ld a,b
-	out (161),a
-	ld hl,(PLY_AKG_PSGREG01_INSTR)
-	xor a
-	out (160),a
-	ld a,l
-	out (161),a
+	ex af,af'
+	ld de,49151
+	ld bc,65533
 	ld a,1
-	out (160),a
-	ld a,h
-	out (161),a
+	ld hl,(PLY_AKG_PSGREG01_INSTR)
+	db 237
+	db 113
+	ld b,d
+	out (c),l
+	ld b,e
+	out (c),a
+	ld b,d
+	out (c),h
+	ld b,e
 	ld hl,(PLY_AKG_PSGREG23_INSTR)
-	ld a,2
-	out (160),a
-	ld a,l
-	out (161),a
-	ld a,3
-	out (160),a
-	ld a,h
-	out (161),a
+	inc a
+	out (c),a
+	ld b,d
+	out (c),l
+	ld b,e
+	inc a
+	out (c),a
+	ld b,d
+	out (c),h
+	ld b,e
 	ld hl,(PLY_AKG_PSGREG45_INSTR)
-	ld a,4
-	out (160),a
-	ld a,l
-	out (161),a
-	ld a,5
-	out (160),a
-	ld a,h
-	out (161),a
+	inc a
+	out (c),a
+	ld b,d
+	out (c),l
+	ld b,e
+	inc a
+	out (c),a
+	ld b,d
+	out (c),h
+	ld b,e
 	ld hl,(PLY_AKG_PSGREG6_8_INSTR)
-	ld a,6
-	out (160),a
-	ld a,l
-	out (161),a
-	ld a,8
-	out (160),a
-	ld a,h
-	out (161),a
+	inc a
+	out (c),a
+	ld b,d
+	out (c),l
+	ld b,e
+	inc a
+	out (c),a
+	ld b,d
+	ex af,af'
+	out (c),a
+	ex af,af'
+	ld b,e
+	inc a
+	out (c),a
+	ld b,d
+	out (c),h
+	ld b,e
 	ld hl,(PLY_AKG_PSGREG9_10_INSTR)
-	ld a,9
-	out (160),a
-	ld a,l
-	out (161),a
-	ld a,10
-	out (160),a
-	ld a,h
-	out (161),a
+	inc a
+	out (c),a
+	ld b,d
+	out (c),l
+	ld b,e
+	inc a
+	out (c),a
+	ld b,d
+	out (c),h
+	ld b,e
 	ld hl,(PLY_AKG_PSGHARDWAREPERIOD_INSTR)
-	ld a,11
-	out (160),a
-	ld a,l
-	out (161),a
-	ld a,12
-	out (160),a
-	ld a,h
-	out (161),a
-	ld a,13
-	out (160),a
+	inc a
+	out (c),a
+	ld b,d
+	out (c),l
+	ld b,e
+	inc a
+	out (c),a
+	ld b,d
+	out (c),h
+	ld b,e
+	inc a
+	out (c),a
 	ld a,(PLY_AKG_PSGREG13_INSTR)
 	ld l,a
 	ld a,(PLY_AKG_RETRIG)
@@ -1348,7 +1363,8 @@ PLY_AKG_SENDPSGREGISTERS:
 	jr z,PLY_AKG_PSGREG13_END
 	ld a,l
 	ld (PLY_AKG_PSGREG13_OLDVALUE),a
-	out (161),a
+	ld b,d
+	out (c),a
 	xor a
 	ld (PLY_AKG_RETRIG),a
 PLY_AKG_PSGREG13_END:

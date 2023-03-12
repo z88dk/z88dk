@@ -5,12 +5,14 @@
 section code_sound_ay
 
 ;; public C symbols, matching .h header file
-PUBLIC _zx_ram_ply_akg_stop
+PUBLIC ply_akg_stop
+PUBLIC _ply_akg_stop
 
 ;; external Arkos 2 entry points
-EXTERN asm_zx_ram_PLY_AKG_STOP
+EXTERN asm_smc_PLY_AKG_STOP
 
 ;;
 ;; void ply_akg_stop( void );
 ;;
-defc _zx_ram_ply_akg_stop = asm_zx_ram_PLY_AKG_STOP
+defc ply_akg_stop = asm_smc_PLY_AKG_STOP
+defc _ply_akg_stop = ply_akg_stop

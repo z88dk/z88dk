@@ -1,29 +1,25 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// periodic-rom.c - Example code for using loop driven music playback with
-// Arkos player running in ROM
+// arkos_periodic.c - Example code for using loop driven music playback with
 //
 // 10/03/2023 - ZXjogv <zx@jogv.es>
-//
-// Compile with:
-//   zcc +msx -subtype=rom -vn -DARKOS_USE_ROM_PLAYER periodic-rom.c hocuspocus.asm -m -s --list -create-app -o arkos
 //
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <intrinsic.h>
 #include <stdint.h>
 
-// If we are compiling for a ROM target we _have_ to use the ROM player by
-// using this #define before the #include below:
-//
-// #define ARKOS_USE_ROM_PLAYER
-//
-// You can also define it adding -DARKOS_USE_ROM_PLAYER to the zcc compile
-// command, see above
-
 #include <psg/arkos.h>
 
 extern uint8_t song[];
+
+void wrapper() __naked
+{
+__asm
+   INCLUDE "hocuspocus.asm"
+__endasm;
+}
+
 
 void main( void ) {
     ply_akg_init( song, 0 );
