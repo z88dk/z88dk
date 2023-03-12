@@ -10,7 +10,7 @@ my $valid_targets = join( ', ', @valid_targets );
 
 sub show_help_and_die {
 	die <<EOF_HELP
-usage: $0 <pasmo_asm_file> [-r] [-e] -t <target>
+usage: $0 [-r] [-s] -t <target> <pasmo_asm_file>
   -r: the ASM input file has been configured for ROM code
   -s: process input in SONG mode (does not include EXTERN declarations for Arkos player functions)
   -t: sets the target for which the player will be generated - valid targets: $valid_targets
