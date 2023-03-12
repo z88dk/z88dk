@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// periodic-rom.c - Example code for using loop driven music playback with
+// arkos_periodic.c - Example code for using loop driven music playback with
 //
 // 10/03/2023 - ZXjogv <zx@jogv.es>
 //

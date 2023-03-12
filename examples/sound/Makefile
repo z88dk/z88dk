@@ -1,4 +1,4 @@
-SUBDIRS = arkos
+SUBDIRS = arkos wyz vt2
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 

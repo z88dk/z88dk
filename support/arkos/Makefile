@@ -40,7 +40,7 @@ update-all-players: $(PLAYERS)
 # Player conversion to Z88DK asm
 # Makefile targets for different hardware targets and player configurations
 
-# MSX, running in SMC (self-modifying code), ~3300 bytes
+# MSX, running in RAM (self-modifying code), ~3300 bytes
 $(ARKOS_MSX_SMC_ASM): PlayerAkg.asm arkos-to-z88dk.pl
 	-rm -f conf_PlayerAkg.asm 2>/dev/null
 	echo "PLY_AKG_HARDWARE_MSX = 1" 	>> conf_PlayerAkg.asm
@@ -62,7 +62,7 @@ $(ARKOS_MSX_ROM_ASM): PlayerAkg.asm arkos-to-z88dk.pl
 	$(DISARK) AT2Player.bin $(PASMO_ASM) --symbolFile AT2Player.sym --sourceProfile pasmo
 	$(ARKOS2Z88DK) -t msx -r $(PASMO_ASM) > $@
 
-# ZX, running in SMC (self-modifying code), ~3300 bytes
+# ZX, running in RAM (self-modifying code), ~3300 bytes
 $(ARKOS_ZX_SMC_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
 	-rm -f conf_PlayerAkg.asm 2>/dev/null
 	echo "PLY_AKG_HARDWARE_SPECTRUM = 1" 	>> conf_PlayerAkg.asm
@@ -84,7 +84,7 @@ $(ARKOS_ZX_ROM_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
 	$(DISARK) AT2Player.bin $(PASMO_ASM) --symbolFile AT2Player.sym --sourceProfile pasmo
 	$(ARKOS2Z88DK) -t zx -r $(PASMO_ASM) > $@
 
-# CPC running in SMC (self-modifying code), ~3400 bytes
+# CPC running in RAM (self-modifying code), ~3400 bytes
 $(ARKOS_CPC_SMC_ASM):  PlayerAkg.asm arkos-to-z88dk.pl
 	-rm -f conf_PlayerAkg.asm 2>/dev/null
 	echo "PLY_AKG_HARDWARE_CPC = 1" 	>> conf_PlayerAkg.asm

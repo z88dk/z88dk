@@ -41,7 +41,7 @@ redirecting the output to `my_effects.asm`:
 
 You can (most probably should) pass the optional `-p <arkos_install_path>`
 argument to specify where your Arkos install is, so that the script can find
-and use the neeed Arkos export tools.
+and use the needed Arkos export tools.
 
 ## Updating the player from original Arkos sources
 

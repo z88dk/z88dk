@@ -1,6 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// arkos-interrupt.c - Example code for using interrupt-driven music playback
+// arkos_rominterrupt.c - Example code for using interrupt-driven music playback
+// Uses ROMable player
 //
 // 10/03/2023 - ZXjogv <zx@jogv.es>
 //

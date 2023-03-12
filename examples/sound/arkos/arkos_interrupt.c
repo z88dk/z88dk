@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-// arkos-interrupt.c - Example code for using interrupt-driven music playback
+// arkos_interrupt.c - Example code for using interrupt-driven music playback
 //
 // 10/03/2023 - ZXjogv <zx@jogv.es>
 //
