@@ -4208,6 +4208,35 @@
 #define __HAVE_GFX_POINTXY 1
 #define __HAVE_GFX_XORPLOT 1
 
+#elif defined(__EMBEDDED_Z80)
+// #define __HAVE_KEYBOARD 0
+// #define __HAVE_FGETC_CONS 0
+// #define __HAVE_GETK 0
+// #define __HAVE_INKEY 0
+// #define __HAVE_ONEBITSOUND 0
+// #define __HAVE_PSG_AY 0
+// #define __HAVE_PSG_AY_WYZ 0
+// #define __HAVE_PSG_AY_VT2 0
+// #define __HAVE_PSG_AY_ARKOS 0
+// #define __HAVE_PSG_SN76489 0
+// #define __HAVE_PSG_SAA1099 0
+// #define __HAVE_INTERRUPTS 0
+#define __NEED_INTERRUPT_INIT 0
+// #define __HAVE_RS232 0
+// #define __HAVE_FILEIO 0
+// #define __HAVE_TIME 0
+// #define __HAVE_VIDEO_MC6847 0
+// #define __HAVE_VIDEO_MC6845 0
+// #define __HAVE_VIDEO_VDP 0
+// #define __HAVE_JOYSTICK 0
+#define __HARDWARE_JOY1_INDEX -1
+#define __HARDWARE_JOY2_INDEX -1
+#define __GENCON_MAX_UDGS 0
+// #define __HAVE_GFX 0
+// #define __HAVE_GFX_COLOUR 0
+// #define __HAVE_GFX_POINTXY 0
+// #define __HAVE_GFX_XORPLOT 0
+
 #elif defined(__Z80TVGAME__)
 // #define __HAVE_KEYBOARD 0
 // #define __HAVE_FGETC_CONS 0
@@ -4497,6 +4526,209 @@
 #define __HAVE_GFX_COLOUR 1
 #define __HAVE_GFX_POINTXY 1
 #define __HAVE_GFX_XORPLOT 1
+
+#elif defined()
+#define __HAVE_KEYBOARD 
+#define __HAVE_FGETC_CONS 
+#define __HAVE_GETK 
+#define __HAVE_INKEY 
+#define __HAVE_ONEBITSOUND 
+#define __HAVE_PSG_AY 
+#define __HAVE_PSG_AY_WYZ 
+#define __HAVE_PSG_AY_VT2 
+#define __HAVE_PSG_AY_ARKOS 
+#define __HAVE_PSG_SN76489 
+#define __HAVE_PSG_SAA1099 
+#define __HAVE_INTERRUPTS 
+#define __NEED_INTERRUPT_INIT 
+#define __HAVE_RS232 
+#define __HAVE_FILEIO 
+#define __HAVE_TIME 
+#define __HAVE_VIDEO_MC6847 
+#define __HAVE_VIDEO_MC6845 
+#define __HAVE_VIDEO_VDP 
+#define __HAVE_JOYSTICK 
+#define __HARDWARE_JOY1_INDEX 
+#define __HARDWARE_JOY2_INDEX 
+#define __GENCON_MAX_UDGS 
+#define __HAVE_GFX 
+#define __HAVE_GFX_COLOUR 
+#define __HAVE_GFX_POINTXY 
+#define __HAVE_GFX_XORPLOT 
+
+#elif defined()
+#define __HAVE_KEYBOARD 
+#define __HAVE_FGETC_CONS 
+#define __HAVE_GETK 
+#define __HAVE_INKEY 
+#define __HAVE_ONEBITSOUND 
+#define __HAVE_PSG_AY 
+#define __HAVE_PSG_AY_WYZ 
+#define __HAVE_PSG_AY_VT2 
+#define __HAVE_PSG_AY_ARKOS 
+#define __HAVE_PSG_SN76489 
+#define __HAVE_PSG_SAA1099 
+#define __HAVE_INTERRUPTS 
+#define __NEED_INTERRUPT_INIT 
+#define __HAVE_RS232 
+#define __HAVE_FILEIO 
+#define __HAVE_TIME 
+#define __HAVE_VIDEO_MC6847 
+#define __HAVE_VIDEO_MC6845 
+#define __HAVE_VIDEO_VDP 
+#define __HAVE_JOYSTICK 
+#define __HARDWARE_JOY1_INDEX 
+#define __HARDWARE_JOY2_INDEX 
+#define __GENCON_MAX_UDGS 
+#define __HAVE_GFX 
+#define __HAVE_GFX_COLOUR 
+#define __HAVE_GFX_POINTXY 
+#define __HAVE_GFX_XORPLOT 
+
+#elif defined()
+#define __HAVE_KEYBOARD 
+#define __HAVE_FGETC_CONS 
+#define __HAVE_GETK 
+#define __HAVE_INKEY 
+#define __HAVE_ONEBITSOUND 
+#define __HAVE_PSG_AY 
+#define __HAVE_PSG_AY_WYZ 
+#define __HAVE_PSG_AY_VT2 
+#define __HAVE_PSG_AY_ARKOS 
+#define __HAVE_PSG_SN76489 
+#define __HAVE_PSG_SAA1099 
+#define __HAVE_INTERRUPTS 
+#define __NEED_INTERRUPT_INIT 
+#define __HAVE_RS232 
+#define __HAVE_FILEIO 
+#define __HAVE_TIME 
+#define __HAVE_VIDEO_MC6847 
+#define __HAVE_VIDEO_MC6845 
+#define __HAVE_VIDEO_VDP 
+#define __HAVE_JOYSTICK 
+#define __HARDWARE_JOY1_INDEX 
+#define __HARDWARE_JOY2_INDEX 
+#define __GENCON_MAX_UDGS 
+#define __HAVE_GFX 
+#define __HAVE_GFX_COLOUR 
+#define __HAVE_GFX_POINTXY 
+#define __HAVE_GFX_XORPLOT 
+
+#elif defined()
+#define __HAVE_KEYBOARD 
+#define __HAVE_FGETC_CONS 
+#define __HAVE_GETK 
+#define __HAVE_INKEY 
+#define __HAVE_ONEBITSOUND 
+#define __HAVE_PSG_AY 
+#define __HAVE_PSG_AY_WYZ 
+#define __HAVE_PSG_AY_VT2 
+#define __HAVE_PSG_AY_ARKOS 
+#define __HAVE_PSG_SN76489 
+#define __HAVE_PSG_SAA1099 
+#define __HAVE_INTERRUPTS 
+#define __NEED_INTERRUPT_INIT 
+#define __HAVE_RS232 
+#define __HAVE_FILEIO 
+#define __HAVE_TIME 
+#define __HAVE_VIDEO_MC6847 
+#define __HAVE_VIDEO_MC6845 
+#define __HAVE_VIDEO_VDP 
+#define __HAVE_JOYSTICK 
+#define __HARDWARE_JOY1_INDEX 
+#define __HARDWARE_JOY2_INDEX 
+#define __GENCON_MAX_UDGS 
+#define __HAVE_GFX 
+#define __HAVE_GFX_COLOUR 
+#define __HAVE_GFX_POINTXY 
+#define __HAVE_GFX_XORPLOT 
+
+#elif defined()
+#define __HAVE_KEYBOARD 
+#define __HAVE_FGETC_CONS 
+#define __HAVE_GETK 
+#define __HAVE_INKEY 
+#define __HAVE_ONEBITSOUND 
+#define __HAVE_PSG_AY 
+#define __HAVE_PSG_AY_WYZ 
+#define __HAVE_PSG_AY_VT2 
+#define __HAVE_PSG_AY_ARKOS 
+#define __HAVE_PSG_SN76489 
+#define __HAVE_PSG_SAA1099 
+#define __HAVE_INTERRUPTS 
+#define __NEED_INTERRUPT_INIT 
+#define __HAVE_RS232 
+#define __HAVE_FILEIO 
+#define __HAVE_TIME 
+#define __HAVE_VIDEO_MC6847 
+#define __HAVE_VIDEO_MC6845 
+#define __HAVE_VIDEO_VDP 
+#define __HAVE_JOYSTICK 
+#define __HARDWARE_JOY1_INDEX 
+#define __HARDWARE_JOY2_INDEX 
+#define __GENCON_MAX_UDGS 
+#define __HAVE_GFX 
+#define __HAVE_GFX_COLOUR 
+#define __HAVE_GFX_POINTXY 
+#define __HAVE_GFX_XORPLOT 
+
+#elif defined()
+#define __HAVE_KEYBOARD 
+#define __HAVE_FGETC_CONS 
+#define __HAVE_GETK 
+#define __HAVE_INKEY 
+#define __HAVE_ONEBITSOUND 
+#define __HAVE_PSG_AY 
+#define __HAVE_PSG_AY_WYZ 
+#define __HAVE_PSG_AY_VT2 
+#define __HAVE_PSG_AY_ARKOS 
+#define __HAVE_PSG_SN76489 
+#define __HAVE_PSG_SAA1099 
+#define __HAVE_INTERRUPTS 
+#define __NEED_INTERRUPT_INIT 
+#define __HAVE_RS232 
+#define __HAVE_FILEIO 
+#define __HAVE_TIME 
+#define __HAVE_VIDEO_MC6847 
+#define __HAVE_VIDEO_MC6845 
+#define __HAVE_VIDEO_VDP 
+#define __HAVE_JOYSTICK 
+#define __HARDWARE_JOY1_INDEX 
+#define __HARDWARE_JOY2_INDEX 
+#define __GENCON_MAX_UDGS 
+#define __HAVE_GFX 
+#define __HAVE_GFX_COLOUR 
+#define __HAVE_GFX_POINTXY 
+#define __HAVE_GFX_XORPLOT 
+
+#elif defined()
+#define __HAVE_KEYBOARD 
+#define __HAVE_FGETC_CONS 
+#define __HAVE_GETK 
+#define __HAVE_INKEY 
+#define __HAVE_ONEBITSOUND 
+#define __HAVE_PSG_AY 
+#define __HAVE_PSG_AY_WYZ 
+#define __HAVE_PSG_AY_VT2 
+#define __HAVE_PSG_AY_ARKOS 
+#define __HAVE_PSG_SN76489 
+#define __HAVE_PSG_SAA1099 
+#define __HAVE_INTERRUPTS 
+#define __NEED_INTERRUPT_INIT 
+#define __HAVE_RS232 
+#define __HAVE_FILEIO 
+#define __HAVE_TIME 
+#define __HAVE_VIDEO_MC6847 
+#define __HAVE_VIDEO_MC6845 
+#define __HAVE_VIDEO_VDP 
+#define __HAVE_JOYSTICK 
+#define __HARDWARE_JOY1_INDEX 
+#define __HARDWARE_JOY2_INDEX 
+#define __GENCON_MAX_UDGS 
+#define __HAVE_GFX 
+#define __HAVE_GFX_COLOUR 
+#define __HAVE_GFX_POINTXY 
+#define __HAVE_GFX_XORPLOT 
 #endif
 
 #endif
