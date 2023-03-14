@@ -1914,6 +1914,14 @@ gfxvti.lib:
 	$(MAKE) -C gfx TARGET=altair8800 SUBTYPE=vti FLAVOUR="gencon portable"
 	TARGET=vti TYPE=8080 $(LIBLINKER) -m8080 -DFORvti -x$(OUTPUT_DIRECTORY)/gfxvti @$(LISTFILE_DIRECTORY)/video/vti/video_vti.lst
 
+gfxtek.lib:
+	@echo ''
+	@echo '--- Building TEK4010 graphics Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=test SUBTYPE=tek FLAVOUR="wide"
+	$(MAKE) -C video/tek401x TARGET=test 
+	TARGET=tek TYPE=z80 $(LIBLINKER) -mz80 -DFORtek -x$(OUTPUT_DIRECTORY)/gfxtek @$(LISTFILE_DIRECTORY)/video/tek401x/video_tek.lst
+
 gfxvio.lib:
 	@echo ''
 	@echo '--- Building VIO graphics Library ---'
