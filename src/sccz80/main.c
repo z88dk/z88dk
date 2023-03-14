@@ -977,7 +977,7 @@ void atexit_deallocate()
     FREENULL(glbq);
     FREENULL(loctab);
     FREENULL(wqueue);
-    FREENULL(swnext);
+//    FREENULL(swnext);
     FREENULL(stage);
     FREENULL(gotoq);
 }
