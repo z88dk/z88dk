@@ -6,7 +6,6 @@ section code_sound_ay
 
 ;; public C symbols, matching .h header file
 PUBLIC ply_akg_init
-PUBLIC _ply_akg_init
 
 ;; external Arkos 2 entry points
 EXTERN asm_smc_PLY_AKG_INIT
@@ -16,10 +15,15 @@ EXTERN asm_smc_PLY_AKG_INIT
 ;;   (params pushed on the stack left to right, all 16-bit)
 ;;
 ply_akg_init:
-_ply_akg_init:
 	pop bc		; BC = retaddr
 	pop de		; E = subsong number
 	pop hl		; HL = song address
 	ld a,e		; A = subsong number
 	push bc		; restore retaddr
 	jp asm_smc_PLY_AKG_INIT
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _ply_akg_init
+defc _ply_akg_init = ply_akg_init
+ENDIF

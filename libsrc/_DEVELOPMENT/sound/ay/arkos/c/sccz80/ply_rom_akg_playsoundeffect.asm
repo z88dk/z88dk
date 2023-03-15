@@ -6,7 +6,6 @@ section code_sound_ay
 
 ;; public C symbols, matching .h header file
 PUBLIC ply_rom_akg_playsoundeffect
-PUBLIC _ply_rom_akg_playsoundeffect
 
 ;; external Arkos 2 entry points
 EXTERN asm_rom_PLY_AKG_PLAYSOUNDEFFECT
@@ -16,7 +15,6 @@ EXTERN asm_rom_PLY_AKG_PLAYSOUNDEFFECT
 ;;   (params pushed on the stack left to right, all 16-bit)
 ;;
 ply_rom_akg_playsoundeffect:
-_ply_rom_akg_playsoundeffect:
         pop hl          ; HL = retaddr
 
         pop bc
@@ -28,3 +26,9 @@ _ply_rom_akg_playsoundeffect:
 
         push hl         ; restore retaddr
         jp asm_rom_PLY_AKG_PLAYSOUNDEFFECT
+
+; SDCC bridge for Classic
+IF __CLASSIC
+PUBLIC _ply_rom_akg_playsoundeffect
+defc _ply_rom_akg_playsoundeffect = ply_rom_akg_playsoundeffect
+ENDIF
