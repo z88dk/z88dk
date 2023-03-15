@@ -1,1 +1,5 @@
 sound/ay/z80/wyzplay
+sound/ay/z80/asm_arkos_msx_rom
+sound/ay/z80/asm_arkos_msx_smc
+sound/ay/z80/asm_arkos_zx_rom
+sound/ay/z80/asm_arkos_zx_smc

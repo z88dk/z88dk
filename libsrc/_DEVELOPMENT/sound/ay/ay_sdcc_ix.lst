@@ -5,4 +5,14 @@ sound/ay/c/sdcc_ix/ay_wyz_effect_init
 sound/ay/c/sdcc_ix/ay_wyz_start_effect
 sound/ay/c/sdcc_ix/ay_wyz_start
 sound/ay/c/sdcc_ix/ay_wyz_play
+sound/ay/c/sdcc_ix/ply_akg_init
+sound/ay/c/sdcc_ix/ply_akg_initsoundeffects
+sound/ay/c/sdcc_ix/ply_akg_play
+sound/ay/c/sdcc_ix/ply_akg_playsoundeffect
+sound/ay/c/sdcc_ix/ply_akg_stop
+sound/ay/c/sdcc_ix/ply_rom_akg_init
+sound/ay/c/sdcc_ix/ply_rom_akg_initsoundeffects
+sound/ay/c/sdcc_ix/ply_rom_akg_play
+sound/ay/c/sdcc_ix/ply_rom_akg_playsoundeffect
+sound/ay/c/sdcc_ix/ply_rom_akg_stop
 @sound/ay/ay_asm.lst
