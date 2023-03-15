@@ -30,5 +30,5 @@ ply_akg_playsoundeffect:
 ; SDCC bridge for Classic
 IF __CLASSIC
 PUBLIC _ply_akg_playsoundeffect
-defc _ply_ply_akg_playsoundeffect = ply_akg_playsoundeffect
+defc _ply_akg_playsoundeffect = ply_akg_playsoundeffect
 ENDIF
