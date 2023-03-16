@@ -31,12 +31,8 @@ LOCAL_CFLAGS += -std=gnu11 $(COMMON_FLAGS) \
 CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS) -Wextra -Werror -pedantic-errors \
 			-Isrc/cpp
 
-# so that we can use C++17 features on older systems
-ifeq ($(CROSS),1)
-  ifeq ($(EXESUFFIX),.exe)
-LDFLAGS 	+= -static-libstdc++ -static-libgcc
-  endif
-endif
+# link boost::filesystem if needed
+LDFLAGS 	+= $(shell perl build_ldflags.pl)
 
 #------------------------------------------------------------------------------
 # Object files

@@ -19,8 +19,9 @@ using namespace std;
 	#include <filesystem>
 	namespace fs = std::filesystem;
 #else
-	#include <experimental/filesystem>
-	namespace fs = std::experimental::filesystem;
+	// boost::filesystem from Boost
+	#include <boost/filesystem.hpp>
+	namespace fs = boost::filesystem;
 #endif
 
 // Assert for internal errors, similar to assert but not removed in release builds
