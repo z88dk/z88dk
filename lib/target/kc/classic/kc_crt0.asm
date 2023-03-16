@@ -99,26 +99,26 @@ cleanup:
     call    crt0_exit
 
 IF !DEFINED_nointerrupsaving
-        ; Keyboard
-        ld      hl,(INT01EE+7)
-        ld      ($01EE),hl
+    ; Keyboard
+    ld      hl,(INT01EE+7)
+    ld      ($01EE),hl
 
-        ld      hl,(INT01E6+7)
-        ld      ($01E6),hl
+    ld      hl,(INT01E6+7)
+    ld      ($01E6),hl
 
-IF !DEFINED_nosound
-        ; Sound
-        ld      hl,(INT01EC+7)
-        ld      ($01EC),hl
+  IF !DEFINED_nosound
+    ; Sound
+    ld      hl,(INT01EC+7)
+    ld      ($01EC),hl
 
-        ; Cassette input
-        ld      hl,(INT01E4+7)
-        ld      ($01E4),hl
+    ; Cassette input
+    ld      hl,(INT01E4+7)
+    ld      ($01E4),hl
 
-        ; Cassette output
-        ld      hl,(INT01EA+7)
-        ld      ($01EA),hl
-ENDIF
+    ; Cassette output
+    ld      hl,(INT01EA+7)
+    ld      ($01EA),hl
+  ENDIF
 ENDIF
 
 	pop	bc
