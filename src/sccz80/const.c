@@ -498,6 +498,7 @@ void offset_of(LVALUE *lval)
 
     memb_name[0] = struct_name[0] = 0;
     needchar('(');
+    swallow("struct");
     if ( symname(struct_name) ) {
         needchar(',');
         if ( symname(memb_name) ) {

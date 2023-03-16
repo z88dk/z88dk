@@ -266,7 +266,8 @@ static int init(Type *type, int dump)
         char sname[NAMESIZE];
         SYMBOL *ptr;
         int gotref = cmatch('&');
-        if (symname(sname) && strcmp(sname, "sizeof") != 0) { /* We have got something.. */
+
+        if (symname(sname) ) {
             if ((ptr = findglb(sname))) {
                 Type *ptype = ptr->ctype;
 
@@ -328,6 +329,22 @@ static int init(Type *type, int dump)
                     errorfmt("Dodgy declaration (not pointer)", 0);
                     junk();
                 }
+            } else if ( strcmp(sname, "sizeof") == 0 ) {
+                LVALUE lval;
+                char *before, *start;
+                setstage(&before, &start);
+                size_of(&lval);
+                clearstage(before, 0);
+                value = lval.const_val;
+                goto constdecl;
+            } else if ( strcmp(sname, "__builtin_offsetof") == 0 ) {
+                LVALUE lval;
+                char *before, *start;
+                setstage(&before, &start);
+                offset_of(&lval);
+                clearstage(before, 0);
+                value = lval.const_val;
+                goto constdecl;
             } else {
                 errorfmt("Unknown symbol: %s", 1, sname);
                 junk();
