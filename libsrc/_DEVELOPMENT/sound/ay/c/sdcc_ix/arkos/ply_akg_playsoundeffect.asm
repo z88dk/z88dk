@@ -5,7 +5,7 @@
 section code_sound_ay
 
 ;; public C symbols, matching .h header file
-PUBLIC ply_akg_playsoundeffect
+PUBLIC _ply_akg_playsoundeffect
 
 ;; external Arkos 2 entry points
 EXTERN asm_smc_PLY_AKG_PLAYSOUNDEFFECT
@@ -14,7 +14,7 @@ EXTERN asm_smc_PLY_AKG_PLAYSOUNDEFFECT
 ;; void ply_akg_playsoundeffect( uint16_t effect, uint16_t channel, uint16_t inv_volume ) __z88dk_callee __smallc;
 ;;   (params pushed on the stack left to right, all 16-bit)
 ;;
-ply_akg_playsoundeffect:
+_ply_akg_playsoundeffect:
         pop hl          ; HL = retaddr
         pop bc
         ld b,c          ; B = inv volume
@@ -28,9 +28,3 @@ ply_akg_playsoundeffect:
         call asm_smc_PLY_AKG_PLAYSOUNDEFFECT
         pop ix
         ret
-
-; SDCC bridge for Classic
-IF __CLASSIC
-PUBLIC _ply_akg_playsoundeffect
-defc _ply_ply_akg_playsoundeffect = ply_akg_playsoundeffect
-ENDIF
