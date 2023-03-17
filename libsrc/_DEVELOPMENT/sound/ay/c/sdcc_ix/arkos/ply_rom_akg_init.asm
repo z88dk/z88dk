@@ -11,13 +11,13 @@ PUBLIC _ply_rom_akg_init
 EXTERN asm_rom_PLY_AKG_INIT
 
 ;;
-;; void ply_akg_init( void *song, uint8_t subsong ) __z88dk_callee __smallc;
-;;   (params pushed on the stack left to right, all 16-bit)
+;; void ply_akg_init( void *song, uint16_t subsong ) __z88dk_callee;
+;;  SDCC:  (params pushed on the stack right to left, all 16-bit)
 ;;
 _ply_rom_akg_init:
         pop bc          ; BC = retaddr
-        pop de          ; E = subsong number
         pop hl          ; HL = song address
+        pop de          ; E = subsong number
         ld a,e          ; A = subsong number
         push bc         ; restore retaddr
 

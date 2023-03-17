@@ -11,17 +11,17 @@ PUBLIC _ply_akg_playsoundeffect
 EXTERN asm_smc_PLY_AKG_PLAYSOUNDEFFECT
 
 ;;
-;; void ply_akg_playsoundeffect( uint16_t effect, uint16_t channel, uint16_t inv_volume ) __z88dk_callee __smallc;
-;;   (params pushed on the stack left to right, all 16-bit)
+;; void ply_akg_playsoundeffect( uint16_t effect, uint16_t channel, uint16_t inv_volume ) __z88dk_callee;
+;;   SDCC: (params pushed on the stack right to left, all 16-bit)
 ;;
 _ply_akg_playsoundeffect:
         pop hl          ; HL = retaddr
-        pop bc
-        ld b,c          ; B = inv volume
+        pop de
+        ld a,e          ; A = sound effect number
         pop de
         ld c,e          ; C = num channel
         pop de
-        ld a,e          ; A = sound effect number
+        ld b,e          ; B = inv volume
         push hl         ; restore retaddr
 
         push ix         ; preserve IX for sdcc_ix
