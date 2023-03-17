@@ -223,6 +223,14 @@ extern int __LIB__ getmaxy(void);
  */
 extern void __LIB__ gfx_set_fatpix(int enable);
 
+/*
+ * Some graphics library need a signal to redraw the screen. Call this 
+ * function periodically.
+ *
+ * At present, this is only needed for the ReGIS driver
+ */
+extern void __LIB__ gfx_refresh(void);
+
 /* The "stencil" object is an evolution of a base concept introduced 
  * by Rafael de Oliveira Jannone in his gfx library: 
  * a convex area is defined by two byte vectors, pointing 

@@ -786,6 +786,17 @@ ENDIF
 
 ; =============================================
 
+IF FORtek
+   DEFINE gotgfx
+   defc maxx = 1024
+   defc maxy = 768
+ENDIF
+
+IF FORregis
+   DEFINE gotgfx
+   defc maxx = 768
+   defc maxy = 480
+ENDIF
 
 ; Catch all to sort things out
 

@@ -19,6 +19,7 @@ check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(
 CPMLIBS = cpm_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxvio.lib
 GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2k_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib lib3d.lib fastmath.lib preempt.lib sp1-all
 GENLIBS += 8080_opt.lib 8085_opt.lib z180_opt.lib ez80_opt.lib
+GENLIBS += gfxtek.lib gfxregis.lib
 
 
 TOCREATE := $(call check_target,altair8800,altair8800_clib.lib gfxvti.lib gfxvdm.lib)
@@ -1921,6 +1922,14 @@ gfxtek.lib:
 	$(MAKE) -C gfx TARGET=test SUBTYPE=tek FLAVOUR="wide"
 	$(MAKE) -C video/tek401x TARGET=test 
 	TARGET=tek TYPE=z80 $(LIBLINKER) -mz80 -DFORtek -x$(OUTPUT_DIRECTORY)/gfxtek @$(LISTFILE_DIRECTORY)/video/tek401x/video_tek.lst
+
+gfxregis.lib:
+	@echo ''
+	@echo '--- Building ReGIS graphics Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=test SUBTYPE=regis FLAVOUR="wide"
+	$(MAKE) -C video/regis TARGET=test 
+	TARGET=regis TYPE=z80 $(LIBLINKER) -mz80 -DFORregis -x$(OUTPUT_DIRECTORY)/gfxregis @$(LISTFILE_DIRECTORY)/video/regis/video_regis.lst
 
 gfxvio.lib:
 	@echo ''
