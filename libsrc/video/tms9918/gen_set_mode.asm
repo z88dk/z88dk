@@ -32,6 +32,7 @@
     EXTERN   __tms9918_CAPS_MODE0
     EXTERN   __tms9918_CAPS_MODE1
     EXTERN   __tms9918_CAPS_MODE2
+    EXTERN   __tms9918_CAPS_MODE3
 
 msx_set_mode:
 _msx_set_mode:
@@ -43,6 +44,8 @@ _msx_set_mode:
     jr    z,init_mode0
     cp    2
     jp    z,init_mode2
+    cp    3
+    jp    z,init_mode3
     ret
 
 
@@ -295,16 +298,91 @@ ENDIF
 
     
 ; Switch 2 Video Mode n. 3
-inimlt:
-; On MTX, a game sets the 16 colours mode as follows:
-; -- graph mode (reg0=2)
-; reg1 - c2
-; reg2 - 06        -- bit 0 and 3 are toggled ??
-; reg3 - ff
-; reg4 - 03
-; reg5 - 38
-; reg6 - 07
-; reg7 - 01
+; PAttern name = 0x800
+; Pattern generator = 0x000
+; Sprite attribute = 0x1b00
+; Sprite pattern = 0x3800
+init_mode3:
+    ld   (hl),a
+    call clear_sprites
+
+    ld    e,$00
+IF FORm5___2
+    ld    a,1           ; external video flag bit must be set on M5
+ELSE
+    xor   a        ; .. and reset on the other targets
+ENDIF    
+    call  VDPreg_Write
+
+    ld    e,$01
+IF FORadam
+    ld    a,@11001000     ;disable interrupts on adam
+ELSE
+    ld    a,@11101000
+ENDIF
+    call  VDPreg_Write    ; reg1  - multicolour MODE
+    
+    ld    a,$02           ; $800 (character map, 768 bytes)
+    call  VDPreg_Write    ; reg2  -  NAME TABLE
+    
+    ld    a,$00           ; $0000  - 
+    call  VDPreg_Write    ; reg3  -  COLOUR TABLE
+    
+    ld    a,$00           ; $0000  - Where the bytes go
+    call  VDPreg_Write    ; reg4  -  PT./TXT/MCOL-GEN.TAB.
+    
+    ld    a,$36           ; $1b00
+    call  VDPreg_Write    ; reg5  -  SPRITE ATTR. TAB.
+    
+    ld    a,$07           ; $3800
+    call  VDPreg_Write    ; reg6  -  SPRITE PATTERN GEN. TAB.
+    
+    ld    a,(__tms9918_border)
+    and   15
+    call  VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
+   
+    ld    a,__tms9918_CAPS_MODE3
+    ld    (generic_console_caps),a
+    ld    a,CONSOLE_COLUMNS	;Needs to be overridden by ANSI
+    ld    (__console_w),a 
+    ld    hl,$800
+    ld    (__tms9918_pattern_name),hl
+    ld    hl,$0000
+    ld    (__tms9918_pattern_generator),hl
+
+    ld    hl,$0000	;Clear the pattern generator table
+    ld    bc,768
+    xor   a
+    call  FILVRM
+
+    ld    hl,$800	;Set up the name table
+    call  SETWRT
+
+IF VDP_DATA >= 0
+    ld    bc,VDP_DATA
+    exx
+ENDIF
+    ld      de,6
+inimlt0:
+    ld      c,4
+inimlt1:
+    ld      a,d
+    ld      b,$20
+inimlt2:
+IF VDP_DATA < 0
+    ld    (-VDP_DATA),a
+ELSE
+    exx
+    out   (c),a
+    exx
+ENDIF
+    inc     a
+    djnz    inimlt2
+    dec     c
+    jr      nz,inimlt1
+    ld      d,a
+    dec     e
+    jr      nz,inimlt0
     ret
 
 

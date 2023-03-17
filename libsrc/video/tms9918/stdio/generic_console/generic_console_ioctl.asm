@@ -52,6 +52,8 @@ check_mode:
         jr      z,set_mode
         cp      2
         jr      z,set_mode
+        cp      3
+        jr      z,set_mode
         cp      1
         jr      nz,failure
 set_mode:
