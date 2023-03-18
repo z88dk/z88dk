@@ -12,3 +12,4 @@
 arch/zxn/sysvar/system_variables
 @arch/zx/tape/tape_sccz80.lst
 @arch/zxn/version/version_sccz80.lst
+@arch/zxn/arkos/arkos_sccz80.lst

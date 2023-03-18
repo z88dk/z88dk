@@ -1,1 +1,1 @@
-psg/ay/arkos/obj/${TARGET}/**/*.o
+psg/ay/arkos/obj/${TYPE}/**/*.o

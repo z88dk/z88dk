@@ -7,7 +7,7 @@ include ../../../Make.config
 
 TARGET ?= test
 
-NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/sound/ay/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/sound/ay/z80/*.asm"
+NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/sound/ay/c/sccz80/wyz/*.asm" "$(NEWLIB_DIRECTORY)/sound/ay/z80/wyz/*.asm"
 NEWLIB_TARGETS := obj/newlib-z80 obj/newlib-z80n obj/newlib-r2k obj/newlib-ixiy 
 
 space :=

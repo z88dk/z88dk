@@ -5,7 +5,6 @@
 section code_sound_ay
 
 ;; public C symbols, matching .h header file
-PUBLIC ply_rom_akg_play
 PUBLIC _ply_rom_akg_play
 
 ;; external Arkos 2 entry points
@@ -14,5 +13,8 @@ EXTERN asm_rom_PLY_AKG_PLAY
 ;;
 ;; void ply_akg_play( void );
 ;;
-defc ply_rom_akg_play = asm_rom_PLY_AKG_PLAY
-defc _ply_rom_akg_play = ply_rom_akg_play
+_ply_rom_akg_play:
+        push ix         ; preserve IX for sdcc_ix
+        call asm_rom_PLY_AKG_PLAY
+        pop ix
+        ret

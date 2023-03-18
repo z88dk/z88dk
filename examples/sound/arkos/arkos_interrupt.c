@@ -4,9 +4,6 @@
 //
 // 10/03/2023 - ZXjogv <zx@jogv.es>
 //
-// Compile with:
-//   zcc +msx -subtype=rom -vn -DARKOS_USE_ROM_PLAYER interrupt-rom.c hocuspocus.asm -m -s --list -create-app -o arkos
-//
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <intrinsic.h>
