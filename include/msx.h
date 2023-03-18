@@ -15,8 +15,15 @@
 #include <lib3d.h>
 #include <sys/types.h>
 
+// Include all the VDP routines
+#include <video/tms99x8.h>
 
-// PSG register, sound, ...
+// Include some aliases for old MSX programs
+#include <msx/defs.h>
+
+
+// And now alias all the TMS99x8 routines into msx_ variants
+
 
 
 // Video related functions
@@ -24,52 +31,8 @@
 // Set the screen mode via BIOS (only valid BIOS modes)
 extern void __LIB__  msx_screen(int mode) __z88dk_fastcall;
 
-// Get the screen mode
+// Get the screen mode 
 extern int __LIB__ msx_screenmode(void);
-
-// Set the screen mode (alternate method)
-extern void __LIB__  msx_set_mode(int mode) __z88dk_fastcall;
-
-// Video modes for set_mode
-
-#ifdef __MSX__UNUSED
-#define vmode_defined 1
-enum video_mode {
-	mode_0 = 0x6C,	// INITXT
-	mode_1 = 0x6F,	// INIT32
-	mode_2 = 0x72,	// INIGRP
-	mode_3 = 0x75	// INIMLT
-};
-#endif
-
-#ifdef __SC3000__UNUSED
-#define vmode_defined 1
-enum video_mode {
-	mode_0 = 0x39E5,    // INITXT
-	mode_1 = 0,         // patched code for INIT32
-	mode_2 = 0x39E2,   // INIGRP
-	mode_3 = 0x39E2    // INIMLT
-};
-#endif
-
-#ifdef __SVI__
-#define vmode_defined 1
-enum video_mode {
-	mode_0 = 0x47,	// INITXT
-	mode_1 = 0,		// patched code for INIT32
-	mode_2 = 0x4A,	// INIGRP
-	mode_3 = 0x4D	// INIMLT
-};
-#endif
-
-#ifndef vmode_defined
-enum video_mode {
-	mode_0 = 0,
-	mode_1 = 1,
-	mode_2 = 2,
-	mode_3 = 3
-};
-#endif
 
 // Set screen to mangled mode (screen 1 + 2)
 extern void __LIB__ msx_set_mangled_mode(void);
@@ -98,57 +61,6 @@ extern void __LIB__ msx_set_char(int c, void* form, void *attr, unsigned int col
 
 
 
-// VRAM read
-extern int __LIB__     msx_vpeek(int address) __z88dk_fastcall;
-#define vpeek(addr)    msx_vpeek(addr)
-
-// VRAM block read
-extern void __LIB__ msx_vread(unsigned int source, char* dest, unsigned int count) __smallc;
-
-// VRAM write
-extern int  __LIB__               vpoke(int address, int value) __smallc;
-extern int  __LIB__           msx_vpoke(int address, int value) __smallc;
-extern int  __LIB__    msx_vpoke_callee(int address, int value) __smallc __z88dk_callee;
-#define msx_vpoke(a,b) msx_vpoke_callee(a,b)
-#define vpoke(a,b)     msx_vpoke_callee(a,b)
-
-
-// VRAM block write
-extern void __LIB__ msx_vwrite(void* source, unsigned int dest, unsigned int count) __smallc;
-extern void __LIB__ msx_vwrite_direct(void* source, unsigned int dest, unsigned int count) __smallc;
-
-// VRAM fill
-extern void __LIB__ msx_vfill(unsigned int addr, unsigned int value, unsigned int count) __smallc;
-
-// VRAM vertical fill
-extern void __LIB__ msx_vfill_v(unsigned int addr, unsigned int value, unsigned int count) __smallc;
-
-// set \a value at a given VRAM address \a addr, merging bits (OR) with the existing value
-extern void __LIB__ msx_vmerge(unsigned int addr, unsigned int value) __smallc;
-
-// screen 2 section bytecount
-#define MODE2_MAX	6144
-
-// screen 2 attributes section start address
-#define MODE2_ATTR	8192
-
-// screen 2 width in pixels
-#define MODE2_WIDTH	256
-
-// screen 2 height in pixels
-#define MODE2_HEIGHT	192
-
-// Set a VDP register with a value
-extern void __LIB__ set_vdp_reg(int reg, int value) __smallc;
-#define msx_set_vdp(reg, value) set_vdp_reg(reg, value)
-
-// Get a value from a VDP register
-extern unsigned int __LIB__  get_vdp_reg(int) __z88dk_fastcall;
-#define msx_get_vdp(reg) get_vdp_reg(reg)
-
-// Set point at the given position on VRAM
-//extern void __LIB__ msx_pset(int x, int y) __smallc;
-
 // Switch to text mode
 extern void __LIB__ msx_text(void);
 
@@ -161,141 +73,7 @@ extern void __LIB__ msx_blank(void);
 // Enable screen
 extern void __LIB__ msx_noblank(void);
 
-// Change the MSX color attributes
-extern int __LIB__ msx_color(int foreground, int background, int border) __smallc;
-extern int __LIB__ msx_set_border(int border) __z88dk_fastcall;
-
-#define INK_TRANSPARENT    0x00
-#undef INK_BLACK
-#define INK_BLACK          0x01
-#define INK_MEDIUM_GREEN   0x02
-#define INK_LIGHT_GREEN    0x03
-#define INK_DARK_BLUE      0x04
-#define INK_LIGHT_BLUE     0x05
-#define INK_DARK_RED       0x06
-#undef INK_CYAN
-#define INK_CYAN           0x07
-#define INK_MEDIUM_RED     0x08
-#define INK_LIGHT_RED      0x09
-#define INK_DARK_YELLOW    0x0A
-#define INK_LIGHT_YELLOW   0x0B
-#define INK_DARK_GREEN     0x0C
-#undef INK_MAGENTA
-#define INK_MAGENTA        0x0D
-#define INK_GRAY           0x0E
-#undef INK_WHITE
-#define INK_WHITE          0x0F
-
-/************************************************************************/
-/**********  Moved here from its original location in 'defs.h' **********/
-/************************************************************************/
-
-// screen mapping
-
-//extern unsigned int map_pixel(unsigned int x, unsigned int y);
-
-/// maps a block in the screen 2 model
-//xdefine map_block(x,y)	((((y) & ~(7)) << 5) + ((x) & ~(7)))
-extern int __LIB__ msx_map_m2_block(int x, int y) __smallc;
-#define map_block(x,y)	msx_map_m2_block(x,y)
-
-/// maps a pixel coordinate to a vram address
-//xdefine map_pixel(x,y)	(map_block(x,y) + ((y) & 7))
-extern int __LIB__ msx_map_m2_pixel(int x, int y) __smallc;
-#define map_pixel(x,y)	msx_map_m2_pixel(x,y)
-
-/*
-	here is how it works:
-
-	// map the row start (by row I mean a block of 8 lines)
-	addr = (y & ~(7)) << 5;		// this is the same as (y / 8) * 256
-
-	// then we aim for the column (column = block of 8 pixels)
-	addr += (x & ~(7));	// this is the same as (x / 8) * 8
-
-	// finally, aim for the remaining "sub-row" inside the row block
-	addr += (y & 7);
-*/
-
-/// maps the subpixel (bit) inside the vram byte
-#define map_subpixel(x)	(128 >> ((x) & 7))
-//extern int __LIB__  msx_map_m2_subpixel(int x) __z88dk_fastcall;
-//xdefine map_subpixel(x)	msx_map_m2_subpixel(x)
-
-/************************************************************************/
-
-
-// Surface (Blit) - Under Construction
-
-/// represents a drawing surface
-typedef struct {
-        int width;
-        int height;
-	int type;
-	union {
-	        unsigned char* ram;	///< ram adress, for off-screen surfaces
-		unsigned int vram;
-	} data;
-} surface_t;
-
-
-
-enum surface_type {
-	surface_ram,
-	surface_vram
-};
-
-typedef struct {
-	int x, y;
-	int width, height;
-} rect_t; 
-
-
-/// create / destroy lookup tables aren't necessary: 
-/// we use the existing sin/cos functions
-#define create_lookup_tables(void) 
-#define destroy_lookup_tables(void) 
-
-
-extern void __LIB__ msx_blit(surface_t *source, surface_t *dest, rect_t *from, rect_t *to) __smallc;
-extern void __LIB__ msx_blit_ram_vram(unsigned char* source, unsigned int dest, unsigned int w, unsigned int h, int sjmp, int djmp) __smallc;
-extern void __LIB__ msx_blit_fill_vram(unsigned int dest, unsigned int value, unsigned int w, unsigned int h, int djmp) __smallc;
-
-// Hardware sprite related functions
-
-// Set the sprite mode
-extern void __LIB__ msx_set_sprite_mode(unsigned int mode);
-
-// Sprite modes
-enum sprite_mode {
-	sprite_default = 0,
-	sprite_scaled = 1,
-	sprite_large = 2
-};
-
-// Set the sprite handle with the shape from data (small size)
-extern void __LIB__ msx_set_sprite_8(unsigned int handle, void* data) __smallc;
-
-// Set the sprite handle, with the shape from data (big size)
-extern void __LIB__ msx_set_sprite_16(unsigned int handle, void* data) __smallc;
-
-// Put the sprite with id and shape from handle, into the given position with color (small size)
-extern void __LIB__ msx_put_sprite_8(unsigned int id, int x, int y, unsigned int handle, unsigned int color) __smallc;
-	
-// Put the sprite with id and shape from handle, into the given position with color (big size)
-extern void __LIB__ msx_put_sprite_16(unsigned int id, int x, int y, unsigned int handle, unsigned int color) __smallc;
-
-// Sprite data
-typedef struct {
-        unsigned char y;	///< Y position
-        unsigned char x;	///< X position
-        unsigned char handle;	///< internal vdp handle
-        unsigned char color;	///< sprite color
-} sprite_t;
-
-
-
-// Joystick related stuff
+// Joystick related stuff - only for +svi, +msx using BIOS
 
 // Get state of joystick number \a id
 extern int  __LIB__ msx_get_stick(unsigned int id) __z88dk_fastcall;
@@ -306,11 +84,12 @@ extern bool_t  __LIB__ msx_get_trigger(unsigned int id) __z88dk_fastcall;
 extern unsigned int st_dir[];
 
 enum stick_direction {
-	st_up = 1,
-	st_right = 2,
-	st_down = 4,
-	st_left = 8
+       st_up = 1,
+       st_right = 2,
+       st_down = 4,
+       st_left = 8
 };
+
 
 
 
@@ -391,8 +170,6 @@ extern int __LIB__ msx_type(void);
 // 3 = MSX turbo R
 static __at(0x2d) unsigned char MSX2_SUBTYPE;
 
-// Detect the VRAM size (in KB)
-extern int __LIB__ msx_vram(void);
 
 // Check if the line printer is ready (1=ready, 0 if not)
 extern bool_t __LIB__ msx_lpt(void);
@@ -409,64 +186,5 @@ extern void __LIB__ msx_breakoff(void);
 
 // Restore the CTRL-STOP break command
 extern void __LIB__ msx_breakon(void);
-
-
-
-// Advanced line drawing functionalities
-
-/************************************************************************/
-/**********  Moved here from its original location in 'line.c' **********/
-/************************************************************************/
-
-#define LINE_T_MEMBERS \
-	int dinc1, dinc2;	\
-	char xinc1, xinc2;	\
-	char yinc1, yinc2;	\
-	int numpixels;		\
-	int d
-
-typedef struct {
-	LINE_T_MEMBERS;
-} line_t;
-
-/*
- NOTE: the REVERSE_LINE_T_MEMBERS trick seems not to be necessary with z88dk **
-*/
-
-/************************************************************************/
-/************************************************************************/
-
-
-// set point at the given position on vram
-//xdefine pset(x,y) msx_pset(x,y)
-#define pset(x,y) plot(x,y)
-
-// Draw a line on a surface
-#define surface_line(s,x1,y1,x2,y2) surface_draw(s,x1,y1,x2,y2)
-
-/* Render an area in a specified buffer (in surface), with the specified dither intensity (0..11) */
-extern void __LIB__ surface_stencil_render(surface_t *s, unsigned char *stencil, unsigned int intensity) __smallc;
-
-// Draw a line on video
-#define line(x1,y1,x2,y2) draw(x1,y1,x2,y2) 
-
-// Draw a line on video (was a slow and smaller version, now it is the same)
-#define line_slow(x1,y1,x2,y2) draw(x1,y1,x2,y2) 
-
-// Draw a line on a surface
-extern void __LIB__ surface_draw(surface_t *s, int x1, int y1, int x2, int y2) __smallc;
-
-// Draw a circle on a surface
-extern void __LIB__ surface_circle(surface_t *s, int x, int y, int radius, int skip) __smallc;
-
-/// render object obj with flat-shading, requires a normalized source of light
-//extern void __LIB__ object_render_flatshading(surface_t* s, object_t* obj, vector_t* pbuffer, int* low, int* high, vector_t* light);
-extern void __LIB__ object_render_flatshading(surface_t* s, object_t* obj, vector_t* pbuffer, char* stencil, vector_t* light) __smallc;
-
-/// render object obj with wireframes
-extern void __LIB__ object_render_wireframe(surface_t* s, object_t* obj, vector_t* pbuffer) __smallc;
-
-// Add a raster interrupt handler
-extern void __LIB__ add_raster_int(void *);
 
 #endif

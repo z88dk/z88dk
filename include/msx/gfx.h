@@ -37,7 +37,7 @@ $Id: gfx.h,v 1.9 2014-05-02 08:10:24 stefano Exp $
 
 #include <msx/defs.h>
 #include <stdlib.h>
-#include <msx.h>
+#include <video/tms99x8.h>
 #include <string.h>
 #include <graphics.h>
 #include <psg.h>

@@ -9,26 +9,26 @@
 ;
 
 
-        SECTION code_clib
-	PUBLIC	msx_vfill
-	PUBLIC	_msx_vfill
-	
-	EXTERN     FILVRM
+    SECTION code_clib
+    PUBLIC	msx_vfill
+    PUBLIC	_msx_vfill
 
-	
-	INCLUDE	"video/tms9918/vdp.inc"
+    EXTERN     FILVRM
+
+
+    INCLUDE	"video/tms9918/vdp.inc"
 
 
 msx_vfill:
 _msx_vfill:
-        push    ix
-	ld      ix,4
-	add     ix,sp
-	ld c,   (ix+0)	; count
-	ld b,   (ix+1)
-	ld a,   (ix+2)	; value
-	ld l,   (ix+4)	; addr
-	ld h,   (ix+5)
-	call    FILVRM
-        pop     ix
-        ret
+    push    ix
+    ld      ix,4
+    add     ix,sp
+    ld c,   (ix+0)	; count
+    ld b,   (ix+1)
+    ld a,   (ix+2)	; value
+    ld l,   (ix+4)	; addr
+    ld h,   (ix+5)
+    call    FILVRM
+    pop     ix
+    ret

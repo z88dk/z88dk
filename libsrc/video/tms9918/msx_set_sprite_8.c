@@ -13,5 +13,5 @@
 #include <msx.h>
 
 void msx_set_sprite_8(unsigned int handle, void* data) {
-	msx_vwrite_direct(data, 0x3800 + (handle << 3), 8);
+	msx_vwrite_direct(data, _tms9918_sprite_generator + (handle << 3), 8);
 }

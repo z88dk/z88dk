@@ -36,4 +36,17 @@ $Id: line.h,v 1.4 2009-04-15 21:00:57 stefano Exp $
 
 #include <msx/gfx.h>
 
+
+// set point at the given position on vram
+#define pset(x,y) plot(x,y)
+
+// Draw a line on a surface
+#define surface_line(s,x1,y1,x2,y2) surface_draw(s,x1,y1,x2,y2)
+
+// Draw a line on video
+#define line(x1,y1,x2,y2) draw(x1,y1,x2,y2)
+
+// Draw a line on video (was a slow and smaller version, now it is the same)
+#define line_slow(x1,y1,x2,y2) draw(x1,y1,x2,y2)
+
 #endif

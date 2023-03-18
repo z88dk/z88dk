@@ -22,5 +22,5 @@ void msx_put_sprite_16(unsigned int id, int x, int y, unsigned int handle, unsig
 	sp.x = x;
 	sp.handle = (handle << 2);
 	sp.color = color;
-	msx_vwrite_direct(&sp, 0x1b00 + (id << 2), 4);
+	msx_vwrite_direct(&sp, _tms9918_sprite_attribute + (id << 2), 4);
 }

@@ -26,6 +26,9 @@
     EXTERN   __tms9918_set_font
     EXTERN   __tms9918_pattern_name
     EXTERN   __tms9918_pattern_generator
+    EXTERN   __tms9918_colour_table
+    EXTERN   __tms9918_sprite_attribute
+    EXTERN   __tms9918_sprite_generator
     EXTERN   __console_w
 
     EXTERN   generic_console_caps
@@ -39,7 +42,7 @@ _msx_set_mode:
     ld    a,l
     ld    hl,__tms9918_screen_mode
     and   a
-    jr    z,init_mode1
+    jp    z,init_mode1
     cp    1
     jr    z,init_mode0
     cp    2
@@ -96,35 +99,42 @@ ENDIF
     ld    (generic_console_caps),a
     ld    a,CONSOLE_COLUMNS	;Needs to be overridden by ANSI
     ld    (__console_w),a 
-    ld    hl,$1800
-    ld    (__tms9918_pattern_name),hl
     ld    hl,$0000
     ld    (__tms9918_pattern_generator),hl
 
     ld    hl,$1800	;Clear the name table
+    ld    (__tms9918_pattern_name),hl
     ld    bc,768
     ld    a,32
     call  FILVRM
     ; Set the colour for all characters
     ld    a,(__tms9918_attribute)
     ld    hl,$2000
+    ld    (__tms9918_colour_table),hl
     ld    bc,32
     call  FILVRM
     call  __tms9918_set_font
     ret
 
 clear_sprites:
-    ld    hl,$3800
-    ld    bc,2048
-    xor   a
-    call  FILVRM
+    ld      hl,$1b00
+    ld      (__tms9918_sprite_attribute),hl
+    ld      hl,$3800
+    ld      (__tms9918_sprite_generator),hl
+    ld      bc,2048
+    xor     a
+    call    FILVRM
     ret
 
-; Switch 2 VDP Mode 1
+; Switch 2 VDP Mode 1 (MSX mode 0)
 ; 40x24
 init_mode1:
-    ld   (hl),a
-    call  clear_sprites
+    ld      (hl),a
+    call    clear_sprites
+    ld      hl,0
+    ld      (__tms9918_sprite_attribute),hl
+    ld      (__tms9918_sprite_generator),hl
+    ld      (__tms9918_colour_table),hl
 
     ; reg0  - TEXT MODE
     ld    e,$00
@@ -257,12 +267,12 @@ ELSE
 ENDIF
     call  VDPreg_Write
     
-    
-    ; Pattern table should probably be initialized on other targets as well,
-    ; Memotech MTX does not seem to require the initialization (discovered experimentally)
-    ; SETWRT on the M5 sets C correctly on exit, it may be differente elsewhere
+    ld      hl,0
+    ld      (__tms9918_pattern_generator),hl
 
-    ld    hl,$1800
+    ; Setup the pattern names
+    ld      hl,$1800      ;pattern name
+    ld      (__tms9918_pattern_name),hl
     call  SETWRT
 IF VDP_DATA >= 0
     ld    bc,VDP_DATA
@@ -287,7 +297,8 @@ ENDIF
 	
     ld    bc,6144    ; set VRAM attribute area
     ld    a,(__tms9918_attribute)   ; white on black
-    ld    hl,8192
+    ld    hl,$2000     ;colour table
+    ld      (__tms9918_colour_table),hl
     push  bc
     call  FILVRM
     pop   bc
@@ -349,6 +360,7 @@ ENDIF
     ld    (__tms9918_pattern_name),hl
     ld    hl,$0000
     ld    (__tms9918_pattern_generator),hl
+    ld    (__tms9918_colour_table),hl
 
     ld    hl,$0000	;Clear the pattern generator table
     ld    bc,768
