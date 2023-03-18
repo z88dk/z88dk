@@ -67,7 +67,7 @@ void main(void)
 	fill(MODE2_ATTR, 0xF1, MODE2_MAX);
 
 
-	while (!get_trigger(0)) {
+	while (!getk()) {
 		//if(ozkeyhit()) c = ozngetch();
 		//if(getk()) c = fgetc_cons();
 

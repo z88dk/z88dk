@@ -20,6 +20,7 @@ Contact the author:
 
 // note: this is my personal favorite demo :) - Rafael
 
+#include <stdio.h>
 #include <msx/gfx.h>
 
 // shapes and attributes
@@ -386,7 +387,7 @@ void main() {
 	for (;;) {
 		move_player(&player);
 
-		player.trig |= get_trigger(0);
+		player.trig |= getk();
 
 		if ((c & 2) && player.trig && (rckt = alloc_rocket(rockets))) {
 			rckt->x = player.x + 4;

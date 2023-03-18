@@ -18,6 +18,7 @@ Contact the author:
 
 =========================================================================*/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <msx/gfx.h>
 
@@ -41,7 +42,7 @@ void main() {
 		addr = map_pixel(c << 3, 96 - l);
 		fill_v(8192 + addr, (c % 14) + 2, l << 1);
 	}	
-	while (!get_trigger(0)) {}
+	while (!getk()) {}
 
 	set_mode(mode_0);
 }

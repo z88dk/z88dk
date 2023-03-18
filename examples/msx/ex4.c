@@ -81,7 +81,7 @@ void main() {
 	// internally stored sprite option
 	set_sprite_16(0, sprite0);
 		
-	while (!get_trigger(0)) 
+	while (!getk()) 
 		for (c = 0; c < MAX_POINT; c++) { // for each starting point
 			for (i = 0; i < 8; i++) { // set location for the 8 sprites contiguously
 				l = (c + (i << 4)) % MAX_POINT;

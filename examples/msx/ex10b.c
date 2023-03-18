@@ -22,6 +22,7 @@ Contact the author:
 #include <msx/defs.h>
 #include <stdlib.h>
 #include <msx/line.h>
+#include <stdio.h>
 
 
 	unsigned char stencil[MODE2_HEIGHT*2];
@@ -68,7 +69,7 @@ void main() {
 		c = (c+1) & 15;
 
 		msx_vwrite_direct(surf.data.ram, 0, MODE2_MAX);
-		if (get_trigger(0))
+		if (getk())
 			break;
 	}
 

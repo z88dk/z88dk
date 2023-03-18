@@ -19,6 +19,7 @@ Contact the author:
 =========================================================================*/
 
 #include <msx/defs.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <msx/gfx.h>
 
@@ -60,7 +61,7 @@ void main() {
 		surface_stencil_render(&surf, stencil, i);
 
 		msx_vwrite_direct(surf.data.ram, 0, MODE2_MAX);
-		if (get_trigger(0))
+		if (getk())
 			break;
 	}
 

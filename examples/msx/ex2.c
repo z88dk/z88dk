@@ -18,6 +18,7 @@ Contact the author:
 
 =========================================================================*/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <msx/gfx.h>
 
@@ -53,7 +54,7 @@ void main() {
 	for (c = 0; c < 24; c++)
 		vwrite(buf, c * 256, 256);
 
-	while (!get_trigger(0)) {
+	while (!getk()) {
 		// randomly color one chosen smiley
 		c = rand() & 15;
 		addr = (rand() % MODE2_MAX) & ~(7);

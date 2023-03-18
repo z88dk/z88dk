@@ -72,7 +72,7 @@ void do_preview(u_char* buf) {
 	x = 0; y = 0;
 
 	// preview loop
-	while (!get_trigger(0)) {
+	while (!getk()) {
 		// move the cursor and set the zooming
 		st = st_dir[get_stick(0)];
 

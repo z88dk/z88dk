@@ -21,6 +21,7 @@ Contact the author:
 // note: this is exactly the same as ex #1, but with sprites instead of 
 // pixels
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <msx/gfx.h>
 
@@ -82,7 +83,7 @@ void main() {
 	set_sprite_8(0, star);
 
 	// animation loop
-	while (!get_trigger(0)) {
+	while (!getk()) {
 		// calculate star movement
 		for (st=stars, c=0; c < MAX_STARS; c++, st++)
 			star_move(st);

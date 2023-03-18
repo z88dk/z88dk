@@ -26,7 +26,7 @@
 //#define T32NAM *((int *)0xf3bd)
 #define T32NAM 0x1800
 
-void fill(char ch)
+void myfill(char ch)
 {
 	int i, j, k;
 	int ad = T32NAM - 1;
@@ -64,8 +64,8 @@ void main()
 	msx_color(15, 0, 0);
 	//screen(1);
 	msx_set_mode(mode_1);
-	fill('?');
-	fill(' ');
+	myfill('?');
+	myfill(' ');
 	//screen(0);
 	msx_set_mode(mode_0);
 }

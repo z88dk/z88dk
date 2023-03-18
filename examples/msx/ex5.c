@@ -82,7 +82,7 @@ void main() {
 	// finally show the surface
 	msx_vwrite_direct(surf.data.ram, 0, MODE2_MAX);
 
-	while (!get_trigger(0)) {}
+	while (!getk()) {}
 
 	set_mode(mode_0);
 }

@@ -42,7 +42,7 @@ void main() {
 	// print the '&' in the middle of the screen
 	vpoke(6144 + 32 * 12 + 16, '&');
 
-	while (!get_trigger(0)) {
+	while (!getk()) {
 		// show the sprite into whatever position the joystick is pointing
 		d = get_stick(0);
 		switch (d) {

@@ -18,6 +18,7 @@ Contact the author:
 
 =========================================================================*/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <msx/gfx.h>
 
@@ -76,7 +77,7 @@ void main() {
 	}
 
 	// animation loop
-	while (!get_trigger(0)) {
+	while (!getk()) {
 		// calculate star movement
 		for (st=stars, c=0; c < MAX_STARS; c++, st++)
 			star_move(st);

@@ -150,7 +150,7 @@ void main() {
 
 	//surface_line(&screen, 0, 0, 0, 0); // FIXME: won't compile without this crap
 
-	while (!get_trigger(0)) {
+	while (!getk()) {
 		if (get_stick(0) == 1)
 			flat = !flat;
 
