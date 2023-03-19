@@ -64,10 +64,10 @@ void do_preview(u_char* buf) {
 	addr = map_block(16, 16);
 
 	// 16 chars of width (*8), 16 "lines", jump 256 in VRAM for each line
-	blit_ram_vram(buf, addr, 16 * 8, 16, 16 * 8, 256);
+	vdp_blit_ram_vram(buf, addr, 16 * 8, 16, 16 * 8, 256);
 
 	// fill yellow background
-	blit_fill_vram(MODE2_ATTR + map_block(8, 8), 0x1A, 8 * 18, 18, 256);
+	vdp_blit_fill_vram(MODE2_ATTR + map_block(8, 8), 0x1A, 8 * 18, 18, 256);
 
 	x = 0; y = 0;
 

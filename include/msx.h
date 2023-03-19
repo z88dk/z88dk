@@ -49,6 +49,9 @@
 #define msx_put_sprite_8(id,x,y,handle,color)  vdp_put_sprite_8(id,x,y,handle,color)
 #define msx_put_sprite_16(id,x,y,handle,color) vdp_put_sprite_16(id,x,y,handle,color)
 
+#define msx_blit_ram_vram(source, dest, w, h, sjmp, djmp)   vdp_blit_ram_vram(source, dest, w, h, jmp, djmp)
+#define msx_blit_vram_ram(dest, value, w, h, djmp)          vdp_blit_vram_ram(dest, value, w, h, djmp)
+
 // Video related functions
 
 // Set the screen mode via BIOS (only valid BIOS modes)

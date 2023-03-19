@@ -153,9 +153,9 @@ extern void *put_sprite(unsigned char, int, int, unsigned char, unsigned char);
 // surface
 // FIXME: this is not usable right now
 
-#define blit(source,dest,from,to) msx_blit(source,dest,from,to)
-#define blit_ram_vram(source,dest,w,h,sjmp,djmp) msx_blit_ram_vram(source,dest,w,h,sjmp,djmp)
-#define blit_fill_vram(dest,value,w,h,djmp) msx_blit_fill_vram(dest,value,w,h,djmp)
+#define blit(source,dest,from,to) vdp_blit(source,dest,from,to)
+#define blit_ram_vram(source,dest,w,h,sjmp,djmp) vdp_blit_ram_vram(source,dest,w,h,sjmp,djmp)
+#define blit_fill_vram(dest,value,w,h,djmp) vdp_blit_fill_vram(dest,value,w,h,djmp)
 
 
 /// @name Controllers

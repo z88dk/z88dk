@@ -1,6 +1,6 @@
 video/tms9918/obj/${TARGET}/vdp_set_char_attr
 video/tms9918/obj/${TARGET}/msx_calculate_side
-video/tms9918/obj/${TARGET}/msx_blit_fill_vram
+video/tms9918/obj/${TARGET}/vdp_blit_fill_vram
 video/tms9918/obj/${TARGET}/vdp_set_sprite_8
 video/tms9918/obj/${TARGET}/vdp_vpeek
 video/tms9918/obj/${TARGET}/FILVRM
@@ -24,11 +24,11 @@ video/tms9918/obj/${TARGET}/msx_map_m2_subpixel
 video/tms9918/obj/${TARGET}/vdp_put_sprite_8
 video/tms9918/obj/${TARGET}/SETWRT
 video/tms9918/obj/${TARGET}/vdp_vread
-video/tms9918/obj/${TARGET}/msx_blit_ram_vram
+video/tms9918/obj/${TARGET}/vdp_blit_ram_vram
 video/tms9918/obj/${TARGET}/vdp_vfill_v
 video/tms9918/obj/${TARGET}/vdp_get_reg
 video/tms9918/obj/${TARGET}/vdp_set_border
-video/tms9918/obj/${TARGET}/msx_blit
+video/tms9918/obj/${TARGET}/vdp_blit
 video/tms9918/obj/${TARGET}/vdp_set_char
 video/tms9918/obj/${TARGET}/vdp_vpoke_callee
 video/tms9918/obj/${TARGET}/vdp_vpoke

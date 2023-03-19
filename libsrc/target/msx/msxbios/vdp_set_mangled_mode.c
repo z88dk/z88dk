@@ -5,11 +5,11 @@
 	GFX - a small graphics library 
 	Copyright (C) 2004  Rafael de Oliveira Jannone
 
-	extern void msx_set_mangled_mode();
+	extern void vdp_set_mangled_mode();
 	
 	Set screen to mangled mode (screen 1 + 2)
 	
-	$Id: msx_set_mangled_mode.c $
+	$Id: vdp_set_mangled_mode.c $
 */
 
 #include <msx.h>
@@ -18,7 +18,7 @@
 char blank_char[8]={0,0,0,0,0,0,0,0};
 #endif
 
-void msx_set_mangled_mode() {
+void vdp_set_mangled_mode() {
 
 	vdp_set_mode(mode_1);
 

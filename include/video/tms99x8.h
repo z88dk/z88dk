@@ -183,24 +183,24 @@ extern void __LIB__ add_raster_int(void *);
 
 /// represents a drawing surface
 typedef struct {
-        int width;
-        int height;
-	int type;
-	union {
-	        unsigned char* ram;	///< ram adress, for off-screen surfaces
-		unsigned int vram;
-	} data;
+    int width;
+    int height;
+    int type;
+    union {
+        unsigned char *ram;	///< ram adress, for off-screen surfaces
+        unsigned int   vram;
+    } data;
 } surface_t;
 
 
 enum surface_type {
-	surface_ram,
-	surface_vram
+    surface_ram,
+    surface_vram
 };
 
 typedef struct {
-	int x, y;
-	int width, height;
+    int x, y;
+    int width, height;
 } rect_t; 
 
 
@@ -210,9 +210,13 @@ typedef struct {
 #define destroy_lookup_tables(void) 
 
 
-extern void __LIB__ msx_blit(surface_t *source, surface_t *dest, rect_t *from, rect_t *to) __smallc;
-extern void __LIB__ msx_blit_ram_vram(unsigned char* source, unsigned int dest, unsigned int w, unsigned int h, int sjmp, int djmp) __smallc;
-extern void __LIB__ msx_blit_fill_vram(unsigned int dest, unsigned int value, unsigned int w, unsigned int h, int djmp) __smallc;
+// Not implemented
+extern void __LIB__ vdp_blit(surface_t *source, surface_t *dest, rect_t *from, rect_t *to) __smallc;
+
+
+
+extern void __LIB__ vdp_blit_ram_vram(unsigned char* source, unsigned int dest, unsigned int w, unsigned int h, int sjmp, int djmp) __smallc;
+extern void __LIB__ vdp_blit_fill_vram(unsigned int dest, unsigned int value, unsigned int w, unsigned int h, int djmp) __smallc;
 
 
 // Surface render 
