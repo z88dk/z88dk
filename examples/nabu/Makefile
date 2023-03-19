@@ -16,9 +16,9 @@ CFILES = \
 	ex1.c \
 	ex1b.c \
 	ex2.c \
-	ex3.c \
 	ex4.c \
 	ex5.c \
+	ex7.c \
 	ex9.c \
 	ex10.c \
 	ex10b.c \
