@@ -5,7 +5,9 @@
 ; Used:  hl,bc,f
 ;
 
-	MODULE	code_clib
+	MODULE __tms9918_map_colour
+	SECTION	code_clib
+
 	PUBLIC	__tms9918_map_colour
 
 	EXTERN	__CLIB_CONIO_NATIVE_COLOUR
