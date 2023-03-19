@@ -24,6 +24,11 @@
 
 // And now alias all the TMS99x8 routines into msx_ variants
 #define msx_set_mode(mode)                     vdp_set_mode(mode)
+#define msx_set_mangled_mode()                 vdp_set_mangled_mode()
+#define msx_set_char(c,form,attr,color,place)  vdp_set_char(c,form,attr,color,place)
+#define msx_set_char_form(c,form,place)        vdp_set_char_form(c,form,place)
+#define msx_set_char_attr(c,attr,place)        vdp_set_char_attr(c,attr,place)
+#define msx_set_char_color(c,color,place)      vdp_set_char_color(c,color,place) 
 #define msx_screenmode()                       vdp_get_mode()
 #define msx_vpoke(addr, val)                   vdp_vpoke(addr, val)
 #define msx_vpeek(addr)                        vdp_vpeek(addr)
@@ -48,34 +53,6 @@
 
 // Set the screen mode via BIOS (only valid BIOS modes)
 extern void __LIB__  msx_screen(int mode) __z88dk_fastcall;
-
-
-// Set screen to mangled mode (screen 1 + 2)
-extern void __LIB__ msx_set_mangled_mode(void);
-
-// Mangled screen sections (3 maps)
-enum screen_map {
-	place_1 = 1,
-	place_2 = 2,
-	place_3 = 4,
-	place_all = 255
-};
-
-// mangled mode chars
-
-// Set char \a c shape, from \a form, at the given screen map \a place
-extern void __LIB__ msx_set_char_form(int c, void* form, unsigned int place) __smallc;
-
-// Set char \a c attributes, from \a attr, at the given screen map \a place
-extern void __LIB__ msx_set_char_attr(int c, void *attr, unsigned int place) __smallc;
-
-// Set char \a c with \a color, at the given screen map \a place
-extern void __LIB__ msx_set_char_color(int c, unsigned int color, unsigned int place) __smallc;
-
-// Set char \a c shape, attributes and color, all in one
-extern void __LIB__ msx_set_char(int c, void* form, void *attr, unsigned int color, unsigned int place) __smallc;
-
-
 
 // Switch to text mode
 extern void __LIB__ msx_text(void);

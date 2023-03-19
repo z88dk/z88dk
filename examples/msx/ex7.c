@@ -21,21 +21,23 @@ Contact the author:
 // note: this is my personal favorite demo :) - Rafael
 
 #include <stdio.h>
-#include <msx/gfx.h>
+#include <stdint.h>
+#include <games.h>
+#include <video/tms99x8.h>
 
 // shapes and attributes
 
 /*
-extern u_char grass1[8];
-extern u_char grass1_attr[8];
-extern u_char grass2[8];
-extern u_char grass2_attr[8];
-extern u_char water1[8];
-extern u_char water2[8];
-extern u_char water3[8];
+extern uint8_t grass1[8];
+extern uint8_t grass1_attr[8];
+extern uint8_t grass2[8];
+extern uint8_t grass2_attr[8];
+extern uint8_t water1[8];
+extern uint8_t water2[8];
+extern uint8_t water3[8];
 
-extern u_char spaceship[32];
-extern u_char fire[32];
+extern uint8_t spaceship[32];
+extern uint8_t fire[32];
 */
 
 
@@ -64,8 +66,8 @@ extern u_char fire[32];
 	defb	0A2h ;00011010
 */
 
-u_char grass1[] = {0, 0x38, 0, 0x83 , 0, 0x30, 4, 0x1a};
-u_char grass1_attr[] = {0x32, 0x32, 0x32, 0xB2, 0x32, 0x32, 0xB2, 0xA2};
+uint8_t grass1[] = {0, 0x38, 0, 0x83 , 0, 0x30, 4, 0x1a};
+uint8_t grass1_attr[] = {0x32, 0x32, 0x32, 0xB2, 0x32, 0x32, 0xB2, 0xA2};
 
 /*
 ._grass2
@@ -88,8 +90,8 @@ u_char grass1_attr[] = {0x32, 0x32, 0x32, 0xB2, 0x32, 0x32, 0xB2, 0xA2};
 	defb	032h 
 	defb	0B2h 
 */
-u_char grass2[] = {0x58, 0, 0, 0xE0, 0, 7, 0, 0x20};
-u_char grass2_attr[] = {0xA2, 0x32, 0x32, 0xB2, 0x32, 0x32, 0x32, 0xB2};
+uint8_t grass2[] = {0x58, 0, 0, 0xE0, 0, 7, 0, 0x20};
+uint8_t grass2_attr[] = {0xA2, 0x32, 0x32, 0xB2, 0x32, 0x32, 0x32, 0xB2};
 
 /*
 ._water1
@@ -116,9 +118,9 @@ u_char grass2_attr[] = {0xA2, 0x32, 0x32, 0xB2, 0x32, 0x32, 0x32, 0xB2};
 	defb	0,0,0,0,0,0,0,0
 */
 
-u_char water1[] = {0, 0, 0, 0, 0xFF, 0, 7, 0};
-u_char water2[] = {0, 0xF8, 0, 0, 0x3F, 0, 0, 0};
-u_char water3[] = {0, 0, 0, 0, 0, 0, 0, 0};
+uint8_t water1[] = {0, 0, 0, 0, 0xFF, 0, 7, 0};
+uint8_t water2[] = {0, 0xF8, 0, 0, 0x3F, 0, 0, 0};
+uint8_t water3[] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 /*
 ._spaceship
@@ -157,7 +159,7 @@ u_char water3[] = {0, 0, 0, 0, 0, 0, 0, 0};
 	defb	@00001001
 */
 
-u_char spaceship[] = {3, 3, 3, 7, 7, 0xc7, 0xc7, 0xe7, 0xee, 0xee, 0xfe, 0xff, 0xe7, 0xc3, 0xf0, 0x90,
+uint8_t spaceship[] = {3, 3, 3, 7, 7, 0xc7, 0xc7, 0xe7, 0xee, 0xee, 0xfe, 0xff, 0xe7, 0xc3, 0xf0, 0x90,
 					0xc0, 0xc0, 0xc0, 0xe0, 0xe0, 0xe3, 0xe3, 0xe7, 0x77, 0x77, 0x7f, 0xff, 0xe7, 0xc3, 0x0f, 9 };
 
 /*
@@ -184,7 +186,7 @@ u_char spaceship[] = {3, 3, 3, 7, 7, 0xc7, 0xc7, 0xe7, 0xee, 0xee, 0xfe, 0xff, 0
 #endasm
 */
 
-u_char fire[] = {0x18, 0x3C, 0x3C, 0x7E, 0x7E, 0x7E, 0x76, 0x54, 0x10, 0x10, 0x10, 0, 0, 0, 0, 0,
+uint8_t fire[] = {0x18, 0x3C, 0x3C, 0x7E, 0x7E, 0x7E, 0x76, 0x54, 0x10, 0x10, 0x10, 0, 0, 0, 0, 0,
 				0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 // terrain definitions
@@ -202,9 +204,9 @@ u_char fire[] = {0x18, 0x3C, 0x3C, 0x7E, 0x7E, 0x7E, 0x76, 0x54, 0x10, 0x10, 0x1
 
 // terrain functions
 
-void show_map(u_char *map, int line_start) {
+void show_map(uint8_t *map, int line_start) {
 	int y, addr;
-	u_char *l;
+	uint8_t *l;
 
 	l = map + (line_start * MAP_WIDTH);
 	addr = 6144;
@@ -221,26 +223,26 @@ void show_map(u_char *map, int line_start) {
 	}
 }
 
-void map_fill_line(u_char* myline, int river_width, int river_offs) {
+void map_fill_line(uint8_t* myline, int river_width, int river_offs) {
 	int river_left;
-	u_char *last;
+	uint8_t *last;
 
 	river_left = (MAP_WIDTH - river_width) / 2 + river_offs;
 	last = myline + MAP_WIDTH;
 
 	while (river_left--)
-		*myline++ = (get_rnd() & 1) + '%';
+		*myline++ = (rand() & 1) + '%';
 
 	while (river_width--)
-		*myline++ = (get_rnd() % 3) + '"';
+		*myline++ = (rand() % 3) + '"';
 
 	while (myline < last)
-		*myline++ = (get_rnd() & 1) + '%';
+		*myline++ = (rand() & 1) + '%';
 }
 
 void randomize_river(int *width, int *offs) {
-	*width += (get_rnd() & 2) - 1;
-	*offs  += (get_rnd() & 2) - 1;
+	*width += (rand() & 2) - 1;
+	*offs  += (rand() & 2) - 1;
 	KEEP_RANGE(*width, 8, 16);
 	KEEP_RANGE(*offs, -4, 4);
 }
@@ -252,7 +254,7 @@ typedef struct {
 	int x;
 	int y;	
 	int vx, vy;
-	bool trig;
+	uint8_t trig;
 } player_t;
 
 
@@ -261,8 +263,8 @@ typedef struct {
 typedef struct {
 	int x;
 	int y;
-	u_char sp;
-	bool active;
+	uint8_t sp;
+	uint8_t active;
 } rocket_t;
 
 
@@ -277,7 +279,7 @@ rocket_t* alloc_rocket(rocket_t *array) {
 	int c;
 	for (c = 0; c < MAX_ROCKET; c++) {
 		if (!array->active) {
-			array->active = true;
+			array->active = 1;
 			array->sp = 10 + c;
 			return array;
 		}
@@ -287,8 +289,8 @@ rocket_t* alloc_rocket(rocket_t *array) {
 }
 
 void free_rocket(rocket_t *r) {
-	r->active = false;
-	put_sprite_16(r->sp, 0, 192, 0, 0);
+	r->active = 0;
+	vdp_put_sprite_16(r->sp, 0, 192, 0, 0);
 }
 
 void initialize_rockets(rocket_t *array) {
@@ -304,7 +306,7 @@ void move_rockets(rocket_t *array) {
 			if ((array->y -= 7) < 0)
 				free_rocket(array);
 			else
-				put_sprite_16(array->sp, array->x, array->y, 1, 6);
+				vdp_put_sprite_16(array->sp, array->x, array->y, 1, 6);
 		} 
 		++array;
 	}
@@ -314,13 +316,13 @@ void move_rockets(rocket_t *array) {
 // player functions
 
 void move_player(player_t *player) {
-	u_char s;
+	uint8_t s;
 	char ax, ay;
 	
-	s = st_dir[get_stick(0)];
+	s = joystick(1);
 
-	ay = (s & st_up) ? -1 : ((s & st_down) ? 1 : 0);
-	ax = (s & st_left) ? -1 : ((s & st_right) ? 1 : 0);
+	ay = (s & MOVE_UP) ? -1 : ((s & MOVE_DOWN) ? 1 : 0);
+	ax = (s & MOVE_LEFT) ? -1 : ((s & MOVE_RIGHT) ? 1 : 0);
 	
 	player->vx += ax;
 	player->vy += ay;
@@ -330,8 +332,8 @@ void move_player(player_t *player) {
 	player->x += player->vx;
 	player->y += player->vy;
 
-	put_sprite_16(0, player->x, player->y, 0, 15);
-	put_sprite_16(31, player->x + 6, player->y + 6, 0, 1);		
+	vdp_put_sprite_16(0, player->x, player->y, 0, 15);
+	vdp_put_sprite_16(31, player->x + 6, player->y + 6, 0, 1);		
 }
 
 
@@ -344,12 +346,12 @@ void main() {
 	player_t player;
 	rocket_t rockets[MAX_ROCKET], *rckt;
 
-	u_char *l;
-	u_char map[MAP_WIDTH * MAP_HEIGHT];
+	uint8_t *l;
+	uint8_t map[MAP_WIDTH * MAP_HEIGHT];
 
 	// set screen
 	vdp_color(15, 1, 1);
-	set_mangled_mode();
+	vdp_set_mangled_mode();
 
 	// set sprites
 	vdp_set_sprite_mode(sprite_large);
@@ -358,11 +360,11 @@ void main() {
 	vdp_set_sprite_16(1, fire);
 
 	// set char shapes and colors
-	set_char('"', water1, NULL, 0x54, place_all);
-	set_char('#', water2, NULL, 0x54, place_all);
-	set_char('$', water3, NULL, 0x54, place_all);
-	set_char('%', grass1, grass1_attr, 0, place_all);
-	set_char('&', grass2, grass2_attr, 0, place_all);
+	vdp_set_char('"', water1, NULL, 0x54, place_all);
+	vdp_set_char('#', water2, NULL, 0x54, place_all);
+	vdp_set_char('$', water3, NULL, 0x54, place_all);
+	vdp_set_char('%', grass1, grass1_attr, 0, place_all);
+	vdp_set_char('&', grass2, grass2_attr, 0, place_all);
 
 	// initializing 
 	initialize_rockets(rockets);
@@ -387,12 +389,12 @@ void main() {
 	for (;;) {
 		move_player(&player);
 
-		player.trig |= getk();
+		player.trig |= joystick(1) & MOVE_FIRE;
 
 		if ((c & 2) && player.trig && (rckt = alloc_rocket(rockets))) {
 			rckt->x = player.x + 4;
 			rckt->y = player.y - 8;
-			player.trig = false;
+			player.trig = 0;
 		}
 		move_rockets(rockets);
 

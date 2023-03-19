@@ -1,10 +1,10 @@
-video/tms9918/obj/${TARGET}/msx_set_char_attr
+video/tms9918/obj/${TARGET}/vdp_set_char_attr
 video/tms9918/obj/${TARGET}/msx_calculate_side
 video/tms9918/obj/${TARGET}/msx_blit_fill_vram
 video/tms9918/obj/${TARGET}/vdp_set_sprite_8
 video/tms9918/obj/${TARGET}/vdp_vpeek
 video/tms9918/obj/${TARGET}/FILVRM
-video/tms9918/obj/${TARGET}/msx_set_char_form
+video/tms9918/obj/${TARGET}/vdp_set_char_form
 video/tms9918/obj/${TARGET}/vdp_set_sprite_mode
 video/tms9918/obj/${TARGET}/msxbios
 video/tms9918/obj/${TARGET}/vdp_put_sprite_16
@@ -16,7 +16,7 @@ video/tms9918/obj/${TARGET}/msx_map_m2_block
 video/tms9918/obj/${TARGET}/vdp_vwrite_direct
 video/tms9918/obj/${TARGET}/SETRD
 video/tms9918/obj/${TARGET}/add_raster_im1
-video/tms9918/obj/${TARGET}/msx_set_char_color
+video/tms9918/obj/${TARGET}/vdp_set_char_color
 video/tms9918/obj/${TARGET}/vdp_vfill
 video/tms9918/obj/${TARGET}/l_tms9918_disable_interrupts_im1
 video/tms9918/obj/${TARGET}/vdp_set_reg
@@ -29,7 +29,7 @@ video/tms9918/obj/${TARGET}/vdp_vfill_v
 video/tms9918/obj/${TARGET}/vdp_get_reg
 video/tms9918/obj/${TARGET}/vdp_set_border
 video/tms9918/obj/${TARGET}/msx_blit
-video/tms9918/obj/${TARGET}/msx_set_char
+video/tms9918/obj/${TARGET}/vdp_set_char
 video/tms9918/obj/${TARGET}/vdp_vpoke_callee
 video/tms9918/obj/${TARGET}/vdp_vpoke
 video/tms9918/obj/${TARGET}/LDIRMV

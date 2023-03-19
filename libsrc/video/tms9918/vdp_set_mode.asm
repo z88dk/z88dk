@@ -11,6 +11,8 @@
     SECTION  code_clib
     PUBLIC   vdp_set_mode
     PUBLIC   _vdp_set_mode
+    PUBLIC  vdp_set_mangled_mode
+    PUBLIC  _vdp_set_mangled_mode
     
     INCLUDE  "video/tms9918/vdp.inc"
 
@@ -24,6 +26,7 @@
     EXTERN   __tms9918_attribute
     EXTERN   __tms9918_border
     EXTERN   __tms9918_set_font
+    EXTERN   __tms9918_set_font_at_addr
     EXTERN   __tms9918_pattern_name
     EXTERN   __tms9918_pattern_generator
     EXTERN   __tms9918_colour_table
@@ -266,7 +269,8 @@ ELSE
     ld    a,$E0   ; MTX, M5
 ENDIF
     call  VDPreg_Write
-    
+
+__tms9918_mode2_setup_tables:
     ld      hl,0
     ld      (__tms9918_pattern_generator),hl
 
@@ -395,6 +399,46 @@ ENDIF
     ld      d,a
     dec     e
     jr      nz,inimlt0
+    ret
+
+
+vdp_set_mangled_mode:
+_vdp_set_mangled_mode:
+    call    init_mode0
+
+    ld      e,$00
+IF FORm5___2
+    ld      a,3           ; external video flag bit must be set on M5
+ELSE
+    ld      a,2           ; .. and reset on the other targets
+ENDIF    
+    call    VDPreg_Write
+    ld      e,3
+    ld      a,$ff
+    call    VDPreg_Write
+    ld      a,3
+    call    VDPreg_Write    ;register 4
+    call    __tms9918_mode2_setup_tables
+
+    ; Clear the colour table
+    ld      hl,(__tms9918_colour_table)	;Clear the pattern generator table
+    ld      bc,6144
+    ld      a,(__tms9918_attribute)   ; white on black
+    call    FILVRM
+
+    ; Now copy the font 3 times
+    call    __tms9918_set_font
+    ld      de,(__tms9918_pattern_generator)
+    ld      a,d
+    add     8
+    ld      d,a
+    call    __tms9918_set_font_at_addr
+    ld      de,(__tms9918_pattern_generator)
+    ld      a,d
+    add     16
+    ld      d,a
+    call    __tms9918_set_font_at_addr
+    call    clear_sprites
     ret
 
 

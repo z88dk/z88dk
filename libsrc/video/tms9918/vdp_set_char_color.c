@@ -7,13 +7,13 @@
 
 	Set char \a c with \a color, at the given screen map \a place
 	
-	$Id: msx_set_char_color.c,v 1.2 2016-06-16 20:54:24 dom Exp $
+	$Id: vdp_set_char_color.c,v 1.2 2016-06-16 20:54:24 dom Exp $
 */
 
-#include <msx.h>
+#include <video/tms99x8.h>
 
 
-void msx_set_char_color(int c, unsigned int color, unsigned int place) {
+void vdp_set_char_color(int c, unsigned int color, unsigned int place) {
 	unsigned int addr = c;
 	addr <<= 3;
 	addr += MODE2_ATTR;

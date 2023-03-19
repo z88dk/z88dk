@@ -106,16 +106,16 @@ $Id: gfx.h,v 1.9 2014-05-02 08:10:24 stefano Exp $
 // mangled mode chars
 
 /// set char \a c shape, from \a form, at the given screen map \a place
-#define set_char_form(c,form,place) msx_set_char_form(c,form,place)
+#define set_char_form(c,form,place) vdp_set_char_form(c,form,place)
 
 /// set char \a c attributes, from \a attr, at the given screen map \a place
-#define set_char_attr(c,attr,place) msx_set_char_attr(c,attr,place)
+#define set_char_attr(c,attr,place) vdp_set_char_attr(c,attr,place)
 
 /// set char \a c with \a color, at the given screen map \a place
-#define set_char_color(c,color,place) msx_set_char_color(c,color,place) 
+#define set_char_color(c,color,place) vdp_set_char_color(c,color,place) 
 
 // set char \a c shape, attributes and color, all in one
-#define set_char(c,form,attr,color,place) msx_set_char(c,form,attr,color,place)
+#define set_char(c,form,attr,color,place) vdp_set_char(c,form,attr,color,place)
 
 //@}
 

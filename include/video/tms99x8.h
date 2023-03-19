@@ -18,6 +18,13 @@
 
 // Video related functions
 
+// Video modes for set_mode
+enum video_mode {
+	mode_0 = 0,
+	mode_1 = 1,
+	mode_2 = 2,
+	mode_3 = 3
+};
 
 
 // Set the screen mode (alternate method)
@@ -26,14 +33,33 @@ extern void __LIB__  vdp_set_mode(int mode) __z88dk_fastcall;
 // Get the screen mode
 extern int __LIB__ vdp_get_mode(void);
 
+// Mangled (mode 1+2) not support on V9938
+extern void __LIB__   vdp_set_mangled_mode(void);
 
-// Video modes for set_mode
-enum video_mode {
-	mode_0 = 0,
-	mode_1 = 1,
-	mode_2 = 2,
-	mode_3 = 3
+
+// mangled mode chars
+
+// Set char \a c shape, from \a form, at the given screen map \a place
+extern void __LIB__ vdp_set_char_form(int c, void* form, unsigned int place) __smallc;
+
+// Set char \a c attributes, from \a attr, at the given screen map \a place
+extern void __LIB__ vdp_set_char_attr(int c, void *attr, unsigned int place) __smallc;
+
+// Set char \a c with \a color, at the given screen map \a place
+extern void __LIB__ vdp_set_char_color(int c, unsigned int color, unsigned int place) __smallc;
+
+// Set char \a c shape, attributes and color, all in one
+extern void __LIB__ vdp_set_char(int c, void* form, void *attr, unsigned int color, unsigned int place) __smallc;
+
+// Mangled screen sections (3 maps)
+enum screen_map {
+	place_1 = 1,
+	place_2 = 2,
+	place_3 = 4,
+	place_all = 255
 };
+
+
 
 // The addresses of the various tms9918 memory areas
 extern const void *_tms9918_pattern_generator;
@@ -58,6 +84,8 @@ extern int  __LIB__    vdp_vpoke_callee(int address, int value) __smallc __z88dk
 
 // VRAM block write
 extern void __LIB__ vdp_vwrite(void* source, unsigned int dest, unsigned int count) __smallc;
+
+
 extern void __LIB__ vdp_vwrite_direct(void* source, unsigned int dest, unsigned int count) __smallc;
 
 // VRAM fill

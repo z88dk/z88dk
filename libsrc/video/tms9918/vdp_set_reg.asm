@@ -37,11 +37,13 @@ ELSE
 ENDIF
 	
 	ld	e, (hl)		; Register #
+    ld      a,e
+    and   $07
+    or    $80        ; enable bit for "set register" command
 IF VDP_CMD < 0
-	ld	a,e
 	ld	(-VDP_CMD),a
 ELSE
-	out	(c),e
+	out	(c),a
 ENDIF
 	call	l_tms9918_enable_interrupts
         ld      a,e
