@@ -20,10 +20,11 @@ Contact the author:
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <video/tms99x8.h>
 
 void main() {
-	u_int addr;
+	uint16_t addr;
 	int c, l;
 
 	vdp_color(15, 1, 1);

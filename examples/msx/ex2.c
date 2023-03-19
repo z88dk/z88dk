@@ -20,13 +20,14 @@ Contact the author:
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <video/tms99x8.h>
 
 void main() {
-	u_char g[8];
-	u_int addr;
+	uint8_t g[8];
+	uint16_t addr;
 	int c;
-	u_char buf[256];
+	uint8_t buf[256];
 
 	vdp_color(15, 1, 1);
 

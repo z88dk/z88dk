@@ -23,6 +23,7 @@ Contact the author:
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <video/tms99x8.h>
 
 // 8x8 sprite with only the top-left pixel lit
@@ -59,7 +60,7 @@ void star_move(star_t* st) {
 #define MAX_STARS 16
 
 void main() {
-	u_char c;
+	uint8_t c;
 	star_t *st, stars[MAX_STARS];
 
 	vdp_color(15, 1, 1);
