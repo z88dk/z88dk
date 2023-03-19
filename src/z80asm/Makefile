@@ -32,7 +32,7 @@ CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS) -Wextra -Werror -pedantic-errors \
 			-Isrc/cpp
 
 # link boost::filesystem if needed
-LDFLAGS 	+= $(shell perl build_ldflags.pl)
+LDFLAGS 	+= $(shell perl build_ldflags.pl $(CXX) $(CROSS))
 
 #------------------------------------------------------------------------------
 # Object files

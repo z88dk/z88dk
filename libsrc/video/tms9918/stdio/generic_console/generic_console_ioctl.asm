@@ -11,7 +11,7 @@
         EXTERN  __tms9918_cls
         EXTERN  __tms9918_set_font
         EXTERN  __console_w
-        EXTERN  msx_set_mode
+        EXTERN  vdp_set_mode
         EXTERN  LDIRVM
  
         INCLUDE "video/tms9918/vdp.inc"
@@ -59,7 +59,7 @@ check_mode:
 set_mode:
         ld      l,c
         ld      h,0
-        call    msx_set_mode	;Sets up __console_w + sets up fonts
+        call    vdp_set_mode	;Sets up __console_w + sets up fonts
         call    __tms9918_cls
         jr      success
 failure:

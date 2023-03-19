@@ -210,7 +210,7 @@ zx_border (INK_CYAN);
 
 #if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX)
 #if (spritesize == 8)
-msx_set_border(INK_CYAN);
+vdp_set_border(VDP_INK_CYAN);
 #endif
 #endif
 
@@ -510,7 +510,7 @@ restart:
 	hit_border();
 #ifndef LOMEM
 #if defined(MSX) || defined(SVI)
-	msx_set_mode(0);
+	vdp_set_mode(0);
 #endif
 
 #ifdef SPECTRUM
@@ -640,8 +640,8 @@ start_level:
 	
 	#if defined(MSX) || defined(SVI) || defined(SC3000) || defined(MTX) || defined(EINSTEIN) || defined(M5)
 	#if (spritesize == 8)
-		set_attr(m+3,n,INK_LIGHT_YELLOW|0x10);
-		set_attr(m+3,n+1,INK_LIGHT_YELLOW|0x10);
+		set_attr(m+3,n,VDP_INK_LIGHT_YELLOW|0x10);
+		set_attr(m+3,n+1,VDP_INK_LIGHT_YELLOW|0x10);
 	#endif
 	#endif
 	}

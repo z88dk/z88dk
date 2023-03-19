@@ -35,9 +35,9 @@ void object_render_wireframe(surface_t* s, object_t* obj, vector_t* pbuffer) {
 		vector_subtract(k, i, &q2);
 		
 		if (vector_cross_product_z(&q1, &q2) > 0) {
-			surface_line(s, i->x, i->y, j->x, j->y);
-			surface_line(s, j->x, j->y, k->x, k->y);
-			surface_line(s, k->x, k->y, i->x, i->y);
+			surface_draw(s, i->x, i->y, j->x, j->y);
+			surface_draw(s, j->x, j->y, k->x, k->y);
+			surface_draw(s, k->x, k->y, i->x, i->y);
 		}
 		t++;
 	}	

@@ -3,7 +3,7 @@
     INCLUDE     "target/coleco/def/eos.def"
 
 
-    EXTERN  msx_set_mode
+    EXTERN  vdp_set_mode
 
     defc    TAR__register_sp = 0xd390
     defc    TAR__clib_exit_stack_size = 32
@@ -39,7 +39,7 @@ program:
     ld      (exitsp),sp
 
     ld      hl,2
-    call    msx_set_mode
+    call    vdp_set_mode
 
 IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"

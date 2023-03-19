@@ -23,11 +23,11 @@ Compile with:   zcc +msx -lm -startup=2 ex5.c
 
 =========================================================================*/
 
-#include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <math.h>
-#include <msx/gfx.h>
-#include <msx/line.h>
+#include <video/tms99x8.h>
 
 typedef struct {
 	int x;
@@ -36,12 +36,12 @@ typedef struct {
 
 #define MAX_POINT	12
 
-u_char buf[MODE2_MAX];
-//u_char* buf;
+uint8_t buf[MODE2_MAX];
+//uint8_t* buf;
 
 void main() {
 	
-	//buf = (u_char*)malloc(MODE2_MAX);
+	//buf = (uint8_t*)malloc(MODE2_MAX);
 
 	double	m_pi;
 	double	a;
@@ -70,19 +70,19 @@ void main() {
 	// draw the eye's lines into the surface (obs: we are NOT in graphic mode yet)
 	for (c = 0; c < MAX_POINT; c++) 
 		for (i = c+1; i < MAX_POINT; i++)
-			surface_line(&surf, p[c].x, p[c].y, p[i].x, p[i].y);
+			surface_draw(&surf, p[c].x, p[c].y, p[i].x, p[i].y);
 
 	surface_circle(&surf, 128, 96, 50, 1);
 
 	// set screen to graphic mode
-	set_color(15, 1, 1);
-	set_mode(mode_2);
-	fill(MODE2_ATTR, 0xF1, MODE2_MAX);
+	vdp_color(15, 1, 1);
+	vdp_set_mode(mode_2);
+	vdp_vfill(MODE2_ATTR, 0xF1, MODE2_MAX);
 
 	// finally show the surface
-	msx_vwrite_direct(surf.data.ram, 0, MODE2_MAX);
+	vdp_vwrite_direct(surf.data.ram, 0, MODE2_MAX);
 
-	while (!get_trigger(0)) {}
+	while (!getk()) {}
 
-	set_mode(mode_0);
+	vdp_set_mode(mode_0);
 }
