@@ -16,8 +16,8 @@
     PUBLIC  clg
     PUBLIC  _clg
 
-    EXTERN  msx_set_border
-    EXTERN  msx_set_mode
+    EXTERN  vdp_set_border
+    EXTERN  vdp_set_mode
     EXTERN  FILVRM
     EXTERN  __tms9918_attribute
     EXTERN  __tms9918_screen_mode
@@ -44,7 +44,7 @@ _clg:
 
 clg_mode2:
     ld      hl,2
-    call    msx_set_mode
+    call    vdp_set_mode
     ld      a,$1F   	; black on white attributes
     ld      (__tms9918_attribute),a
     ld      hl,8192    ; set VRAM attribute area
@@ -57,6 +57,6 @@ clg_mode2:
     call    FILVRM
 
     ld      l,$0F
-    call    msx_set_border
+    call    vdp_set_border
 
     ret

@@ -1,7 +1,7 @@
 ;
 ;    z88dk library: Generic VDP support code
 ;
-;    extern void __FASTCALL__ msx_set_mode(unsigned char id);
+;    extern void __FASTCALL__ vdp_set_mode(unsigned char id);
 ;
 ;    set screen mode
 ;
@@ -9,8 +9,8 @@
 ;
 
     SECTION  code_clib
-    PUBLIC   msx_set_mode
-    PUBLIC   _msx_set_mode
+    PUBLIC   vdp_set_mode
+    PUBLIC   _vdp_set_mode
     
     INCLUDE  "video/tms9918/vdp.inc"
 
@@ -37,8 +37,8 @@
     EXTERN   __tms9918_CAPS_MODE2
     EXTERN   __tms9918_CAPS_MODE3
 
-msx_set_mode:
-_msx_set_mode:
+vdp_set_mode:
+_vdp_set_mode:
     ld    a,l
     ld    hl,__tms9918_screen_mode
     and   a

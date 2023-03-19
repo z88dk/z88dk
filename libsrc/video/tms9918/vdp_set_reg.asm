@@ -1,18 +1,18 @@
 ;
 ;	z88dk library: Generic VDP support code
 ;
-;	void set_vdp_reg(int reg, int value)
+;	void vdp_set_reg(int reg, int value)
 ;
 ;==============================================================
 ;	Sets the value of a VDP register
 ;==============================================================
 ;
-;	$Id: gen_set_vdp_reg.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
+;	$Id: gen_vdp_set_reg.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
     SECTION code_clib
-	PUBLIC	set_vdp_reg
-	PUBLIC	_set_vdp_reg
+	PUBLIC	vdp_set_reg
+	PUBLIC	_vdp_set_reg
 	EXTERN	RG0SAV
 	EXTERN	l_tms9918_disable_interrupts
 	EXTERN	l_tms9918_enable_interrupts
@@ -20,8 +20,8 @@
 	INCLUDE	"video/tms9918/vdp.inc"
 
 
-.set_vdp_reg
-._set_vdp_reg
+.vdp_set_reg
+._vdp_set_reg
 	ld	hl, 2
 	add	hl, sp
 	ld	d, (hl)		; Value

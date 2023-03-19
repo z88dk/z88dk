@@ -51,13 +51,13 @@ $Id: gfx.h,v 1.9 2014-05-02 08:10:24 stefano Exp $
 // VDP and VRAM functions
 
 /// set screen mode
-#define set_mode(mode) msx_set_mode(mode)
+#define set_mode(mode) vdp_set_mode(mode)
 
 /// set screen to mangled mode (screen 1 + 2)
 #define set_mangled_mode() msx_set_mangled_mode()
 
 /// set screen color
-#define set_color(front,back,border) msx_color(front,back,border)
+#define set_color(front,back,border) vdp_color(front,back,border)
 
 
 // SORRY, WE HAVE A FUNCTION NAME CONFLICT.
@@ -67,29 +67,29 @@ $Id: gfx.h,v 1.9 2014-05-02 08:10:24 stefano Exp $
 #undef fill
 
 /// fill vram from \a addr, with \a value, for \a count bytes
-#define fill(addr,value,count) msx_vfill(addr,value,count)
+#define fill(addr,value,count) vdp_vfill(addr,value,count)
 
 
 /// set \a value at a given vram address \a addr
-//define vpoke(addr,value) msx_vpoke(addr,value)
+#define vpoke(addr,value) vdp_vpoke(addr,value)
 
 /// get value from a given vram address \a addr
-//#define vpeek(addr) msx_vpeek(addr)
+#define vpeek(addr) vdp_vpeek(addr)
 
 /// set \a value at a given vram address \a addr, merging bits (OR) with the existing value
-#define vmerge(addr,value) msx_vmerge(addr,value)
+#define vmerge(addr,value) vdp_vmerge(addr,value)
 
 /// transfer \a count bytes from ram to vram
-#define vwrite(source,dest,count) msx_vwrite(source,dest,count)
+#define vwrite(source,dest,count) vdp_vwrite(source,dest,count)
 
 /// transfer \a count bytes from vram to ram
-#define vread(source,dest,count) msx_vread(source,dest,count)
+#define vread(source,dest,count) vdp_vread(source,dest,count)
 
 /// set a vdp register with a \a value
-#define set_vdp(reg,value) set_vdp_reg(reg,value) 
+#define set_vdp(reg,value) vdp_set_reg(reg,value) 
 
 /// get a vdp value from register \a reg
-#define get_vdp(reg) get_vdp_reg(reg)
+#define get_vdp(reg) vdp_get_reg(reg)
 
 /// move the screen cursor to a given position
 #define locate(x,y) msx_locate(x,y)
@@ -99,7 +99,7 @@ $Id: gfx.h,v 1.9 2014-05-02 08:10:24 stefano Exp $
 // primitives (not many yet :))
 
 /// vertical fill on vram starting at adress \a addr, of a given \a value, for \a count lines
-#define fill_v(addr,value,count) msx_vfill_v(addr,value,count)
+#define fill_v(addr,value,count) vdp_vfill_v(addr,value,count)
 
 
 
@@ -125,7 +125,7 @@ $Id: gfx.h,v 1.9 2014-05-02 08:10:24 stefano Exp $
 
 
 /// set the sprite \a mode
-#define set_sprite_mode(mode) msx_set_sprite_mode(mode)
+#define set_sprite_mode(mode) vdp_set_sprite_mode(mode)
 
 /*
 // this is not compiling... I suggest some #define's instead
@@ -135,17 +135,17 @@ extern void *put_sprite(unsigned char, int, int, unsigned char, unsigned char);
 */
 
 /// set the sprite \a handle, with the shape from \a data (small size)
-#define set_sprite_8(handle,data) msx_set_sprite_8(handle,data)
+#define set_sprite_8(handle,data) vdp_set_sprite_8(handle,data)
 
 
 /// set the sprite \a handle, with the shape from \a data (big size)
-#define set_sprite_16(handle,data) msx_set_sprite_16(handle,data)
+#define set_sprite_16(handle,data) vdp_set_sprite_16(handle,data)
 
 /// put the sprite with \a id and shape from \a handle, into the given position with \a color (small size)
-#define put_sprite_8(id,x,y,handle,color) msx_put_sprite_8(id,x,y,handle,color)
+#define put_sprite_8(id,x,y,handle,color) vdp_put_sprite_8(id,x,y,handle,color)
 
 /// put the sprite with \a id and shape from \a handle, into the given position with \a color (big size)
-#define put_sprite_16(id,x,y,handle,color) msx_put_sprite_16(id,x,y,handle,color)
+#define put_sprite_16(id,x,y,handle,color) vdp_put_sprite_16(id,x,y,handle,color)
 
 //@}
 

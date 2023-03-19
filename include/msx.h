@@ -23,16 +23,32 @@
 
 
 // And now alias all the TMS99x8 routines into msx_ variants
-
-
+#define msx_set_mode(mode)                     vdp_set_mode(mode)
+#define msx_screenmode()                       vdp_get_mode()
+#define msx_vpoke(addr, val)                   vdp_vpoke(addr, val)
+#define msx_vpeek(addr)                        vdp_vpeek(addr)
+#define msx_vread(source,dest,count)           vdp_vread(source,dest,count)
+#define msx_vwrite(source,dest,count)          vdp_vwrite(source,dest,count)
+#define msx_vwrite_direct(source,dest,count)   vdp_write_direct(source,dest,count)
+#define msx_vram()                             vdp_vram()
+#define msx_fill(addr,value,count)             vdp_vfill(addr,value,count)
+#define msx_fill_v(addr,value,count)           vdp_vfill_v(addr,value,count)
+#define msx_vmerge(addr,value)                 vdp_vmerge(addr,value)
+#define msx_set_vdp(reg, value)                vdp_set_vdp(reg, value)
+#define msx_get_vdp(reg)                       vdp_get_reg(reg)
+#define msx_color(fgcol, bgcol, border)        vdp_color(fgcol, bgcol, border)
+#define msx_set_border(colour)                 vdp_set_border(colour)
+#define msx_set_sprite_mode(mode)              vdp_set_sprite_mode(mode)
+#define msx_set_sprite_8(handle,data)          vdp_set_sprite_8(handle,data)
+#define msx_set_sprite_16(handle,data)         vdp_set_sprite_16(handle,data)
+#define msx_put_sprite_8(id,x,y,handle,color)  vdp_put_sprite_8(id,x,y,handle,color)
+#define msx_put_sprite_16(id,x,y,handle,color) vdp_put_sprite_16(id,x,y,handle,color)
 
 // Video related functions
 
 // Set the screen mode via BIOS (only valid BIOS modes)
 extern void __LIB__  msx_screen(int mode) __z88dk_fastcall;
 
-// Get the screen mode 
-extern int __LIB__ msx_screenmode(void);
 
 // Set screen to mangled mode (screen 1 + 2)
 extern void __LIB__ msx_set_mangled_mode(void);

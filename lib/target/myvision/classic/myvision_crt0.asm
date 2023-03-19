@@ -16,7 +16,7 @@
     PUBLIC  cleanup         ;jp'd to by exit()
     PUBLIC  l_dcal          ;jp(hl)
     PUBLIC	msxbios
-    EXTERN	msx_set_mode
+    EXTERN	vdp_set_mode
     EXTERN  asm_im1_handler
     EXTERN  nmi_vectors
     EXTERN  im1_vectors
@@ -76,7 +76,7 @@ start:
     call    crt0_init_bss
     ld      (exitsp),sp
     ld      hl,2
-    call    msx_set_mode
+    call    vdp_set_mode
     im      1
  
     ; Configure the AY to enable reading the keys

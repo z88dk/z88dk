@@ -4,16 +4,16 @@
 ;	GFX - a small graphics library 
 ;	Copyright (C) 2004  Rafael de Oliveira Jannone
 ;
-;	extern bool __FASTCALL__ msx_set_mode(unsigned char id);
+;	extern bool __FASTCALL__ vdp_set_mode(unsigned char id);
 ;
 ;	set screen mode - used for MSX and SVI only
 ;
-;	$Id: msx_set_mode.asm $
+;	$Id: vdp_set_mode.asm $
 ;
 
     SECTION code_clib
-    PUBLIC	msx_set_mode
-    PUBLIC	_msx_set_mode
+    PUBLIC	vdp_set_mode
+    PUBLIC	_vdp_set_mode
 
     EXTERN	msxbios
     EXTERN  __tms9918_pattern_name
@@ -41,8 +41,8 @@ IF FORsvi
     INCLUDE "target/svi/def/svibasic.def"
 ENDIF
 
-msx_set_mode:
-_msx_set_mode:
+vdp_set_mode:
+_vdp_set_mode:
 
     ex      de,hl
     ld      a,e

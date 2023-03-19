@@ -209,13 +209,13 @@ void show_map(u_char *map, int line_start) {
 	l = map + (line_start * MAP_WIDTH);
 	addr = 6144;
 	for (y = line_start; y < MAP_HEIGHT; y++) {
-		vwrite(l, addr, MAP_WIDTH);
+		vdp_vwrite(l, addr, MAP_WIDTH);
 		addr += MAP_WIDTH;
 		l += MAP_WIDTH;
 	}
 	l = map;
 	for (y = 0; y < line_start; y++) {
-		vwrite(l, addr, MAP_WIDTH);
+		vdp_vwrite(l, addr, MAP_WIDTH);
 		addr += MAP_WIDTH;
 		l += MAP_WIDTH;
 	}
@@ -348,14 +348,14 @@ void main() {
 	u_char map[MAP_WIDTH * MAP_HEIGHT];
 
 	// set screen
-	set_color(15, 1, 1);
+	vdp_color(15, 1, 1);
 	set_mangled_mode();
 
 	// set sprites
-	set_sprite_mode(sprite_large);
+	vdp_set_sprite_mode(sprite_large);
 
-	set_sprite_16(0, spaceship);
-	set_sprite_16(1, fire);
+	vdp_set_sprite_16(0, spaceship);
+	vdp_set_sprite_16(1, fire);
 
 	// set char shapes and colors
 	set_char('"', water1, NULL, 0x54, place_all);

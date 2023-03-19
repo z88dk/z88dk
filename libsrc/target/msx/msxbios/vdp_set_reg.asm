@@ -4,16 +4,16 @@
 ;	GFX - a small graphics library 
 ;	Copyright (C) 2004  Rafael de Oliveira Jannone
 ;
-;	void set_vdp_reg(int reg, int value);
+;	void vdp_set_reg(int reg, int value);
 ;
 ;	Write data to a VDP register
 ;
-;	$Id: set_vdp_reg.asm,v 1.5 2016-06-16 19:30:25 dom Exp $
+;	$Id: vdp_set_reg.asm,v 1.5 2016-06-16 19:30:25 dom Exp $
 ;
 
         SECTION code_clib
-	PUBLIC	set_vdp_reg
-	PUBLIC	_set_vdp_reg
+	PUBLIC	vdp_set_reg
+	PUBLIC	_vdp_set_reg
 	EXTERN	msxbios
 	
 IF FORmsx
@@ -22,8 +22,8 @@ ELSE
         INCLUDE "target/svi/def/svibios.def"
 ENDIF
 
-set_vdp_reg:
-_set_vdp_reg:
+vdp_set_reg:
+_vdp_set_reg:
 	pop	hl
 	pop	de
 	pop	bc

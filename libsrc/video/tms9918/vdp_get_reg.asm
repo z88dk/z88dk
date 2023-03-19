@@ -1,23 +1,23 @@
 ;
 ;	z88dk library: Generic VDP support code
 ;
-;	void get_vdp_reg(int reg)
+;	void vdp_get_reg(int reg)
 ;
 ;==============================================================
 ;	Gets the value of a VDP register
 ;==============================================================
 ;
-;	$Id: gen_get_vdp_reg.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
+;	$Id: gen_vdp_get_reg.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
     SECTION code_clib
-    PUBLIC  get_vdp_reg
-    PUBLIC  _get_vdp_reg
+    PUBLIC  vdp_get_reg
+    PUBLIC  _vdp_get_reg
     EXTERN  RG0SAV
 
 
-get_vdp_reg:
-_get_vdp_reg:
+vdp_get_reg:
+_vdp_get_reg:
 
     ;;return *(u_char*)(RG0SAV + reg);
 

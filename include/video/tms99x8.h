@@ -18,11 +18,14 @@
 
 // Video related functions
 
-// Get the screen mode
-extern int __LIB__ msx_screenmode(void);
+
 
 // Set the screen mode (alternate method)
-extern void __LIB__  msx_set_mode(int mode) __z88dk_fastcall;
+extern void __LIB__  vdp_set_mode(int mode) __z88dk_fastcall;
+
+// Get the screen mode
+extern int __LIB__ vdp_get_mode(void);
+
 
 // Video modes for set_mode
 enum video_mode {
@@ -41,32 +44,30 @@ extern const void *_tms9918_sprite_table;
 
 
 // VRAM read
-extern int __LIB__     msx_vpeek(int address) __z88dk_fastcall;
-#define vpeek(addr)    msx_vpeek(addr)
+extern int __LIB__     vdp_vpeek(int address) __z88dk_fastcall;
 
 // VRAM block read
-extern void __LIB__ msx_vread(unsigned int source, char* dest, unsigned int count) __smallc;
+extern void __LIB__    vdp_vread(unsigned int source, char* dest, unsigned int count) __smallc;
 
 // VRAM write
-extern int  __LIB__               vpoke(int address, int value) __smallc;
-extern int  __LIB__           msx_vpoke(int address, int value) __smallc;
-extern int  __LIB__    msx_vpoke_callee(int address, int value) __smallc __z88dk_callee;
-#define msx_vpoke(a,b) msx_vpoke_callee(a,b)
-#define vpoke(a,b)     msx_vpoke_callee(a,b)
+extern int  __LIB__    vdp_vpoke(int address, int value) __smallc;
+extern int  __LIB__    vdp_vpoke_callee(int address, int value) __smallc __z88dk_callee;
+#define vdp_vpoke(a,b) vdp_vpoke_callee(a,b)
+
 
 
 // VRAM block write
-extern void __LIB__ msx_vwrite(void* source, unsigned int dest, unsigned int count) __smallc;
-extern void __LIB__ msx_vwrite_direct(void* source, unsigned int dest, unsigned int count) __smallc;
+extern void __LIB__ vdp_vwrite(void* source, unsigned int dest, unsigned int count) __smallc;
+extern void __LIB__ vdp_vwrite_direct(void* source, unsigned int dest, unsigned int count) __smallc;
 
 // VRAM fill
-extern void __LIB__ msx_vfill(unsigned int addr, unsigned int value, unsigned int count) __smallc;
+extern void __LIB__ vdp_vfill(unsigned int addr, unsigned int value, unsigned int count) __smallc;
 
 // VRAM vertical fill
-extern void __LIB__ msx_vfill_v(unsigned int addr, unsigned int value, unsigned int count) __smallc;
+extern void __LIB__ vdp_vfill_v(unsigned int addr, unsigned int value, unsigned int count) __smallc;
 
 // set \a value at a given VRAM address \a addr, merging bits (OR) with the existing value
-extern void __LIB__ msx_vmerge(unsigned int addr, unsigned int value) __smallc;
+extern void __LIB__ vdp_vmerge(unsigned int addr, unsigned int value) __smallc;
 
 // screen 2 section bytecount
 #define MODE2_MAX	6144
@@ -81,42 +82,37 @@ extern void __LIB__ msx_vmerge(unsigned int addr, unsigned int value) __smallc;
 #define MODE2_HEIGHT	192
 
 // Set a VDP register with a value
-extern void __LIB__ set_vdp_reg(int reg, int value) __smallc;
-#define msx_set_vdp(reg, value) set_vdp_reg(reg, value)
+extern void __LIB__ vdp_set_reg(int reg, int value) __smallc;
+
 
 // Get a value from a VDP register
-extern unsigned int __LIB__  get_vdp_reg(int) __z88dk_fastcall;
-#define msx_get_vdp(reg) get_vdp_reg(reg)
+extern unsigned int __LIB__  vdp_get_reg(int) __z88dk_fastcall;
 
 // Change the MSX color attributes
-extern int __LIB__ msx_color(int foreground, int background, int border) __smallc;
-extern int __LIB__ msx_set_border(int border) __z88dk_fastcall;
+extern int __LIB__ vdp_color(int foreground, int background, int border) __smallc;
+extern int __LIB__ vdp_set_border(int border) __z88dk_fastcall;
 
-#define INK_TRANSPARENT    0x00
-#undef INK_BLACK
-#define INK_BLACK          0x01
-#define INK_MEDIUM_GREEN   0x02
-#define INK_LIGHT_GREEN    0x03
-#define INK_DARK_BLUE      0x04
-#define INK_LIGHT_BLUE     0x05
-#define INK_DARK_RED       0x06
-#undef INK_CYAN
-#define INK_CYAN           0x07
-#define INK_MEDIUM_RED     0x08
-#define INK_LIGHT_RED      0x09
-#define INK_DARK_YELLOW    0x0A
-#define INK_LIGHT_YELLOW   0x0B
-#define INK_DARK_GREEN     0x0C
-#undef INK_MAGENTA
-#define INK_MAGENTA        0x0D
-#define INK_GRAY           0x0E
-#undef INK_WHITE
-#define INK_WHITE          0x0F
+#define VDP_INK_TRANSPARENT    0x00
+#define VDP_INK_BLACK          0x01
+#define VDP_INK_MEDIUM_GREEN   0x02
+#define VDP_INK_LIGHT_GREEN    0x03
+#define VDP_INK_DARK_BLUE      0x04
+#define VDP_INK_LIGHT_BLUE     0x05
+#define VDP_INK_DARK_RED       0x06
+#define VDP_INK_CYAN           0x07
+#define VDP_INK_MEDIUM_RED     0x08
+#define VDP_INK_LIGHT_RED      0x09
+#define VDP_INK_DARK_YELLOW    0x0A
+#define VDP_INK_LIGHT_YELLOW   0x0B
+#define VDP_INK_DARK_GREEN     0x0C
+#define VDP_INK_MAGENTA        0x0D
+#define VDP_INK_GRAY           0x0E
+#define VDP_INK_WHITE          0x0F
 
 // Hardware sprite related functions
 
 // Set the sprite mode
-extern void __LIB__ msx_set_sprite_mode(unsigned int mode);
+extern void __LIB__ vdp_set_sprite_mode(unsigned int mode);
 
 // Sprite modes
 enum sprite_mode {
@@ -126,16 +122,16 @@ enum sprite_mode {
 };
 
 // Set the sprite handle with the shape from data (small size)
-extern void __LIB__ msx_set_sprite_8(unsigned int handle, void* data) __smallc;
+extern void __LIB__ vdp_set_sprite_8(unsigned int handle, void* data) __smallc;
 
 // Set the sprite handle, with the shape from data (big size)
-extern void __LIB__ msx_set_sprite_16(unsigned int handle, void* data) __smallc;
+extern void __LIB__ vdp_set_sprite_16(unsigned int handle, void* data) __smallc;
 
 // Put the sprite with id and shape from handle, into the given position with color (small size)
-extern void __LIB__ msx_put_sprite_8(unsigned int id, int x, int y, unsigned int handle, unsigned int color) __smallc;
+extern void __LIB__ vdp_put_sprite_8(unsigned int id, int x, int y, unsigned int handle, unsigned int color) __smallc;
 	
 // Put the sprite with id and shape from handle, into the given position with color (big size)
-extern void __LIB__ msx_put_sprite_16(unsigned int id, int x, int y, unsigned int handle, unsigned int color) __smallc;
+extern void __LIB__ vdp_put_sprite_16(unsigned int id, int x, int y, unsigned int handle, unsigned int color) __smallc;
 
 // Sprite data
 typedef struct {
@@ -149,7 +145,7 @@ typedef struct {
 
 
 // Detect the VRAM size (in KB)
-extern int __LIB__ msx_vram(void);
+extern int __LIB__ vdp_vram(void);
 
 // Add a raster interrupt handler
 extern void __LIB__ add_raster_int(void *);

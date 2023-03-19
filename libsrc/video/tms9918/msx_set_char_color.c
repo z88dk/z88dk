@@ -18,8 +18,8 @@ void msx_set_char_color(int c, unsigned int color, unsigned int place) {
 	addr <<= 3;
 	addr += MODE2_ATTR;
 
-	if (place & place_1) msx_vfill(addr, color, 8);
-	if (place & place_2) msx_vfill((256 * 8) + addr, color, 8);
-	if (place & place_3) msx_vfill((256 * 8 * 2) + addr, color, 8);
+	if (place & place_1) vdp_vfill(addr, color, 8);
+	if (place & place_2) vdp_vfill((256 * 8) + addr, color, 8);
+	if (place & place_3) vdp_vfill((256 * 8 * 2) + addr, color, 8);
 }
 

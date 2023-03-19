@@ -19,17 +19,17 @@ Contact the author:
 
 =========================================================================*/
 
-#include <msx/defs.h>
-#include <stdlib.h>
-#include <msx/line.h>
 #include <stdio.h>
+#include <string.h>
+
+#include <video/tms99x8.h>
 
 
-	unsigned char stencil[MODE2_HEIGHT*2];
-	//unsigned char high[MODE2_HEIGHT];
+unsigned char stencil[MODE2_HEIGHT*2];
+//unsigned char high[MODE2_HEIGHT];
 //u_char *buf;
 
-	unsigned char buf[MODE2_MAX];
+unsigned char buf[MODE2_MAX];
 
 void main() {
 	int c, l;
@@ -40,9 +40,9 @@ void main() {
 	
 	surf.data.ram = buf;
 
-	set_color(15, 1, 1);
-	set_mode(mode_2);
-	fill(MODE2_ATTR, 0x31, MODE2_MAX);
+	vdp_color(15, 1, 1);
+	vdp_set_mode(mode_2);
+	vdp_vfill(MODE2_ATTR, 0x31, MODE2_MAX);
 
 	c = 0;
 	//i = 0;
@@ -68,10 +68,10 @@ void main() {
 
 		c = (c+1) & 15;
 
-		msx_vwrite_direct(surf.data.ram, 0, MODE2_MAX);
+		vdp_vwrite_direct(surf.data.ram, 0, MODE2_MAX);
 		if (getk())
 			break;
 	}
 
-	set_mode(mode_0);
+	vdp_set_mode(mode_0);
 }

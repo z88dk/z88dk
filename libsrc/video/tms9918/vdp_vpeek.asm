@@ -4,24 +4,24 @@
 ;        Improved functions by Rafael de Oliveira Jannone
 ;        Originally released in 2004 for GFX - a small graphics library
 ;
-;        int msx_vpeek(int address);
+;        int vdp_vpeek(int address);
 ;
 ;        Read the MSX video memory
 ;
-;        $Id: msx_vpeek.asm,v 1.10 2016-06-16 19:30:25 dom Exp $
+;        $Id: vdp_vpeek.asm,v 1.10 2016-06-16 19:30:25 dom Exp $
 ;
 
         SECTION code_clib
-        PUBLIC  msx_vpeek
-        PUBLIC  _msx_vpeek
+        PUBLIC  vdp_vpeek
+        PUBLIC  _vdp_vpeek
         EXTERN  l_tms9918_disable_interrupts
         EXTERN  l_tms9918_enable_interrupts
         
         INCLUDE        "video/tms9918/vdp.inc"
 
 
-msx_vpeek:
-_msx_vpeek:
+vdp_vpeek:
+_vdp_vpeek:
         ; (FASTCALL) -> HL = address
         ; enter vdp address pointer
         ld      a,l

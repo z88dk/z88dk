@@ -1,7 +1,7 @@
 ;
 ;	z88dk library: Generic VDP support code
 ;
-;	int msx_vram();
+;	int vdp_vram();
 ;
 ;	Detects the VRAM size (in KB)
 ;
@@ -9,12 +9,12 @@
 ;
 
         SECTION code_clib
-	PUBLIC	msx_vram
-	PUBLIC	_msx_vram
+	PUBLIC	vdp_vram
+	PUBLIC	_vdp_vram
 
 	INCLUDE	"video/tms9918/vdp.inc"
 
-msx_vram:
-_msx_vram:
+vdp_vram:
+_vdp_vram:
 	ld	hl,VRAM_SIZE
 	ret

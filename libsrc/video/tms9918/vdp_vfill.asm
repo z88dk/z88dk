@@ -1,7 +1,7 @@
 ;
 ;	z88dk library: Generic VDP support code
 ;
-;	extern void msx_vfill(unsigned int addr, unsigned char value, unsigned int count);
+;	extern void vdp_vfill(unsigned int addr, unsigned char value, unsigned int count);
 ;
 ;	Fills a VRAM portion with the given value
 ;
@@ -10,8 +10,8 @@
 
 
     SECTION code_clib
-    PUBLIC	msx_vfill
-    PUBLIC	_msx_vfill
+    PUBLIC	vdp_vfill
+    PUBLIC	_vdp_vfill
 
     EXTERN     FILVRM
 
@@ -19,8 +19,8 @@
     INCLUDE	"video/tms9918/vdp.inc"
 
 
-msx_vfill:
-_msx_vfill:
+vdp_vfill:
+_vdp_vfill:
     push    ix
     ld      ix,4
     add     ix,sp

@@ -9,12 +9,12 @@
 ;
 ;	Get a VDP register value
 ;
-;	$Id: get_vdp_reg.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
+;	$Id: vdp_get_reg.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
 ;
 
         SECTION code_clib
-	PUBLIC	get_vdp_reg
-	PUBLIC	_get_vdp_reg
+	PUBLIC	vdp_get_reg
+	PUBLIC	_vdp_get_reg
 
 
 IF FORmsx
@@ -23,8 +23,8 @@ ELSE
         INCLUDE "target/svi/def/svibasic.def"
 ENDIF
 
-get_vdp_reg:
-_get_vdp_reg:
+vdp_get_reg:
+_vdp_get_reg:
 	
 	;;return *(u_char*)(0xF3DF + reg);
 	

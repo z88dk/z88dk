@@ -20,29 +20,29 @@ Contact the author:
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <msx/gfx.h>
+#include <video/tms99x8.h>
 
 void main() {
 	u_int addr;
 	int c, l;
 
-	set_color(15, 1, 1);
+	vdp_color(15, 1, 1);
 
 	// set video mode to screen 2
-	set_mode(mode_2);
+	vdp_set_mode(mode_2);
 
 	// draw horizontal lines
 	for (c = 0; c < MODE2_MAX; c += 8)
-		vpoke(MODE2_ATTR + c, 0xFF);
+		vdp_vpoke(MODE2_ATTR + c, 0xFF);
 
 	// for each column...
 	for (c = 0; c < 32; c++) {
 		// randomly draw one colored vertical bar
 		l = rand() & 63;
 		addr = map_pixel(c << 3, 96 - l);
-		fill_v(8192 + addr, (c % 14) + 2, l << 1);
+		vdp_vfill(8192 + addr, (c % 14) + 2, l << 1);
 	}	
 	while (!getk()) {}
 
-	set_mode(mode_0);
+	vdp_set_mode(mode_0);
 }

@@ -17,7 +17,6 @@
 	PUBLIC	_clg
 	
 	EXTERN	msxbios
-	EXTERN	msx_set_mode
 	EXTERN	__tms9918_attribute
 	EXTERN	__tms9918_screen_mode
 

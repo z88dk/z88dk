@@ -15,8 +15,8 @@
 void msx_set_char_form(int c, void* form, unsigned int place) {
 	unsigned int addr = c;
 	addr <<= 3;
-	if (place & place_1) msx_vwrite_direct(form, addr, 8);
-	if (place & place_2) msx_vwrite_direct(form, (256 * 8) + addr, 8);
-	if (place & place_3) msx_vwrite_direct(form, (256 * 8 * 2) + addr, 8);
+	if (place & place_1) vdp_vwrite_direct(form, addr, 8);
+	if (place & place_2) vdp_vwrite_direct(form, (256 * 8) + addr, 8);
+	if (place & place_3) vdp_vwrite_direct(form, (256 * 8 * 2) + addr, 8);
 }
 

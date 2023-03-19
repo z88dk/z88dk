@@ -20,7 +20,7 @@ Contact the author:
 
 #include <stdio.h>
 #include <math.h>
-#include <msx/gfx.h>
+#include <video/tms99x8.h>
 
 char sprite0[] = {
  0x00 , 0x07 , 0x6C , 0x1B , 0xC8 , 0x6C , 0x0C , 0x34,
@@ -60,34 +60,34 @@ void main() {
 	printf("done!\n");
 	
 	// set graphic screen
-	set_color(15, 1, 1);
-	set_mode(mode_2);
+	vdp_color(15, 1, 1);
+	vdp_set_mode(mode_2);
 	
 	// depends on get_vdp_reg, available on MSX and SVI only
-	set_sprite_mode(sprite_large);
-	//set_vdp_reg(1, (m & 0xFC) | mode);
+	vdp_set_sprite_mode(sprite_large);
+	//vd_set_vdp_reg(1, (m & 0xFC) | mode);
 
-	fill(MODE2_ATTR, 0xF1, MODE2_MAX);
+	vdp_vfill(MODE2_ATTR, 0xF1, MODE2_MAX);
 
 	// create one sprite with a shape from the character table
 
 	// __SC3000__ (not yet working)
-	//set_sprite_16(0, (void*)(0x10C0 + 8));
+	//vdp_set_sprite_16(0, (void*)(0x10C0 + 8));
 	
 	// __MSX__ 
-	//set_sprite_16(0, (void*)(0x1BBF + 8));
-	// ..equivalent to:  msx_vwrite((void*)(0x1BBF + 8), 14336, 32);
+	//vdp_set_sprite_16(0, (void*)(0x1BBF + 8));
+	// ..equivalent to:  vdp_vwrite((void*)(0x1BBF + 8), 14336, 32);
 
 	// internally stored sprite option
-	set_sprite_16(0, sprite0);
+	vdp_set_sprite_16(0, sprite0);
 		
 	while (!getk()) 
 		for (c = 0; c < MAX_POINT; c++) { // for each starting point
 			for (i = 0; i < 8; i++) { // set location for the 8 sprites contiguously
 				l = (c + (i << 4)) % MAX_POINT;
-				put_sprite_16(i, p[l].x, p[l].y, 0, i + 2);
+				vdp_put_sprite_16(i, p[l].x, p[l].y, 0, i + 2);
 			}
 		}
 
-	set_mode(mode_0);
+	vdp_set_mode(mode_0);
 }

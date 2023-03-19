@@ -10,7 +10,7 @@
 	$Id: msx_blit.c,v 1.1 2009-01-07 09:50:15 stefano Exp $
 */
 
-#include <msx.h>
+#include <video/tms99x8.h>
 
 
 void msx_blit(surface_t *source, surface_t *dest, rect_t *from, rect_t *to) {

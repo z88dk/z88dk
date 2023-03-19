@@ -5,20 +5,18 @@
 ;
 ;	Transfer count bytes from VRAM to RAM
 ;
-;	$Id: gen_vread.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
-;
 
-        SECTION code_clib
-	PUBLIC	msx_vread
-	PUBLIC	_msx_vread
+    SECTION code_clib
+    PUBLIC	vdp_vread
+    PUBLIC	_vdp_vread
 
-	EXTERN     SETRD
-	
-	INCLUDE	"video/tms9918/vdp.inc"
+    EXTERN     SETRD
+
+    INCLUDE	"video/tms9918/vdp.inc"
 
 
-msx_vread:
-_msx_vread:
+vdp_vread:
+_vdp_vread:
 	push	ix		;save callers ix
 	ld      ix,4
 	add     ix,sp
@@ -31,9 +29,6 @@ _msx_vread:
 	ld l, (ix+4)	; source
 	ld h, (ix+5)
 	
-	;ld	ix,LDIRMV
-	;jp	msxbios
-
 	call	SETRD
 	ex	(sp),hl		; VDP Timing
 	ex	(sp),hl		; VDP Timing

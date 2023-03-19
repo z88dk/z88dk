@@ -4,16 +4,16 @@
 ;	GFX - a small graphics library 
 ;	Copyright (C) 2004  Rafael de Oliveira Jannone
 ;
-;	extern void msx_vwrite_direct(void *source, u_int dest, u_int count)
+;	extern void vdp_vwrite_direct(void *source, u_int dest, u_int count)
 ;
 ;	Transfer count bytes from RAM (current memory page) to VRAM
 ;
-;	$Id: msx_vwrite_direct.asm,v 1.8 2016-06-16 19:30:25 dom Exp $
+;	$Id: vdp_vwrite_direct.asm,v 1.8 2016-06-16 19:30:25 dom Exp $
 ;
 
         SECTION code_clib
-	PUBLIC	msx_vwrite_direct
-	PUBLIC	_msx_vwrite_direct
+	PUBLIC	vdp_vwrite_direct
+	PUBLIC	_vdp_vwrite_direct
 	
 	EXTERN     msxbios
 	
@@ -26,8 +26,8 @@ ELSE
 ENDIF
 
 
-msx_vwrite_direct:
-_msx_vwrite_direct:
+vdp_vwrite_direct:
+_vdp_vwrite_direct:
 	push	ix
         ld      ix,4
         add     ix,sp

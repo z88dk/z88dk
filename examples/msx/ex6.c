@@ -28,19 +28,19 @@ void main() {
 	int d;
 	int x, y;
 
-	set_color(15, 1, 1);
+	vdp_color(15, 1, 1);
 	set_mangled_mode();
 
-	set_sprite_mode(sprite_large);
+	vdp_set_sprite_mode(sprite_large);
 
 	// set char '&' to a diamond shape WITH colors (attributes)
-	set_char('&', diamond, diamond_attr, 0, place_all);
+	msx_set_char('&', diamond, diamond_attr, 0, place_all);
 
 	// also set sprite 0 with the diamond shape
-	set_sprite_8(0, diamond);
+	vdp_set_sprite_8(0, diamond);
 
 	// print the '&' in the middle of the screen
-	vpoke(6144 + 32 * 12 + 16, '&');
+	vdp_vpoke(6144 + 32 * 12 + 16, '&');
 
 	while (!getk()) {
 		// show the sprite into whatever position the joystick is pointing
@@ -59,6 +59,6 @@ void main() {
 		put_sprite_8(0, 128 + x, 96 + y, 0, 15);
 	}
 
-	set_mode(mode_0);
+	vdp_set_mode(mode_0);
 }
 

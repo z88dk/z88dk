@@ -2,16 +2,16 @@
 ;	MSX specific routines
 ;	by Stefano Bodrato, 29/11/2007
 ;
-;	int msx_color(int foreground, int background, int border );
+;	int vdp_color(int foreground, int background, int border );
 ;
 ;	Change the MSX color attributes
 ;
-;	$Id: msx_color.asm $
+;	$Id: vdp_color.asm $
 ;
 
         SECTION code_clib
-	PUBLIC	msx_color
-	PUBLIC	_msx_color
+	PUBLIC	vdp_color
+	PUBLIC	_vdp_color
 	EXTERN	msxbios
 	EXTERN	__tms9918_attribute
 	
@@ -24,8 +24,8 @@ ELSE
 ENDIF
 
 
-msx_color:
-_msx_color:
+vdp_color:
+_vdp_color:
 	push	ix
 	ld	ix,2
 	add	ix,sp

@@ -12,11 +12,11 @@
 	$Id: msx_set_sprite_mode.c,v 1.3 2016-06-16 20:54:25 dom Exp $
 */
 
-#include <msx.h>
+#include <video/tms99x8.h>
 
-void msx_set_sprite_mode(unsigned int mode) {
-	unsigned char m = get_vdp_reg(1);
-	set_vdp_reg(1, (m & 0xFC) | mode);
+void vdp_set_sprite_mode(unsigned int mode) {
+	unsigned char m = vdp_get_reg(1);
+	vdp_set_reg(1, (m & 0xFC) | mode);
 
 	//_init_sprites();
 }

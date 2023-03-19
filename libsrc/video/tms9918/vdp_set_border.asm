@@ -1,9 +1,9 @@
-; void msx_set_border(int c) __z88dk_fastcall
+; void vdp_set_border(int c) __z88dk_fastcall
 
 
 	SECTION		code_clib
-	PUBLIC		msx_set_border
-	PUBLIC		_msx_set_border
+	PUBLIC		vdp_set_border
+	PUBLIC		_vdp_set_border
 
 	EXTERN		l_tms9918_disable_interrupts
 	EXTERN		l_tms9918_enable_interrupts
@@ -11,8 +11,8 @@
 
 	INCLUDE		"video/tms9918/vdp.inc"
 
-msx_set_border:
-_msx_set_border:
+vdp_set_border:
+_vdp_set_border:
 	ld	a,l
 	and	15
 	ld	l,a

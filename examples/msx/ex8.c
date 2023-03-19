@@ -43,7 +43,7 @@ void preview_char(u_char* p) {
 		addr = map_pixel(22 * 8, (y << 3) + 8);
 		c = *p++;
 		for (x = 0; x < 8; x++) {
-			fill(addr, (c & 128) ? 255 : 0, 8);
+			vdp_vfill(addr, (c & 128) ? 255 : 0, 8);
 			c <<= 1;
 			addr += 8;
 		}
@@ -55,10 +55,10 @@ void do_preview(u_char* buf) {
 	int asc, x, y, addr;
 	u_char st;
 
-	set_color(15, 4, 4);
-	set_sprite_8(0, square);
+	vdp_color(15, 4, 4);
+	vdp_set_sprite_8(0, square);
 
-	fill(MODE2_ATTR, 0xF0, MODE2_MAX);
+	vdp_vfill(MODE2_ATTR, 0xF0, MODE2_MAX);
 
 	// start blitting buffer at pixel (16,16)
 	addr = map_block(16, 16);
@@ -138,11 +138,11 @@ int main(int argc, char *argv[]) {
 	// here is the thing: when not previewing, the vwrite will set
 	// your whole char table with the given alphabet. nice :)
 
-	set_mode((preview) ? mode_2 : mode_1);
+	vdp_set_mode((preview) ? mode_2 : mode_1);
 
 	if (preview) {
 		do_preview(buf);
-		set_mode(mode_0);
+		vdp_set_mode(mode_0);
 	} else
-		vwrite(buf + 8, VRAM_OFFS, MAX_BUF);
+		vdp_vwrite(buf + 8, VRAM_OFFS, MAX_BUF);
 }

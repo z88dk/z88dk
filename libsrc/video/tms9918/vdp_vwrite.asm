@@ -1,7 +1,7 @@
 ;
 ;	z88dk library: Generic VDP support code
 ;
-;	extern void msx_vwrite(void *source, u_int dest, u_int count)
+;	extern void vdp_vwrite(void *source, u_int dest, u_int count)
 ;
 ;	Transfer count bytes from RAM to VRAM (BIOS paged version)
 ;
@@ -9,16 +9,16 @@
 ;
 
         SECTION code_clib
-	PUBLIC	msx_vwrite
-	PUBLIC	_msx_vwrite
+	PUBLIC	vdp_vwrite
+	PUBLIC	_vdp_vwrite
 	
 	EXTERN     LDIRVM
 	
 	INCLUDE	"video/tms9918/vdp.inc"
 
 
-msx_vwrite:
-_msx_vwrite:
+vdp_vwrite:
+_vdp_vwrite:
 	push	ix		;save callers
 	ld      ix,4
 	add     ix,sp

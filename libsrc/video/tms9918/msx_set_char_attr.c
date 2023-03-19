@@ -18,8 +18,8 @@ void msx_set_char_attr(int c, void *attr, unsigned int place) {
 	addr <<= 3;
 	addr += MODE2_ATTR;
 
-	if (place & place_1) msx_vwrite_direct(attr, addr, 8);
-	if (place & place_2) msx_vwrite_direct(attr, (256 * 8) + addr, 8);
-	if (place & place_3) msx_vwrite_direct(attr, (256 * 8 * 2) + addr, 8);
+	if (place & place_1) vdp_vwrite_direct(attr, addr, 8);
+	if (place & place_2) vdp_vwrite_direct(attr, (256 * 8) + addr, 8);
+	if (place & place_3) vdp_vwrite_direct(attr, (256 * 8 * 2) + addr, 8);
 }
 

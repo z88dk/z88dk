@@ -20,7 +20,7 @@ Contact the author:
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <msx/gfx.h>
+#include <video/tms99x8.h>
 
 void main() {
 	u_char g[8];
@@ -28,10 +28,10 @@ void main() {
 	int c;
 	u_char buf[256];
 
-	set_color(15, 1, 1);
+	vdp_color(15, 1, 1);
 
 	// set video mode to screen 2
-	set_mode(mode_2);
+	vdp_set_mode(mode_2);
 
 	// define smiley face :)
 	g[0] = 60;
@@ -48,18 +48,18 @@ void main() {
 		buf[c] = g[c & 7];
 	
 	// set whole screen to color black
-	fill(0x2000, 0x11, MODE2_MAX);
+	vdp_vfill(0x2000, 0x11, MODE2_MAX);
 
 	// blit the buffer for each "line", as a smiley pattern for the whole screen
 	for (c = 0; c < 24; c++)
-		vwrite(buf, c * 256, 256);
+		vdp_vwrite(buf, c * 256, 256);
 
 	while (!getk()) {
 		// randomly color one chosen smiley
 		c = rand() & 15;
 		addr = (rand() % MODE2_MAX) & ~(7);
-		fill(MODE2_ATTR + addr, c << 4, 8);
+		vdp_vfill(MODE2_ATTR + addr, c << 4, 8);
 	}	
 
-	set_mode(mode_0);
+	vdp_set_mode(mode_0);
 }

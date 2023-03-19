@@ -10,8 +10,8 @@
 	$Id: msx_set_sprite_16.c,v 1.5 2016-06-16 20:54:25 dom Exp $
 */
 
-#include <msx.h>
+#include <video/tms99x8.h>
 
-void msx_set_sprite_16(unsigned int handle, void* data) {
-	msx_vwrite_direct(data, _tms9918_sprite_generator + (handle << 5), 32);
+void vdp_set_sprite_16(unsigned int handle, void* data) {
+	vdp_vwrite_direct(data, _tms9918_sprite_generator + (handle << 5), 32);
 }

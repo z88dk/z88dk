@@ -2,19 +2,19 @@
 ;	MSX specific routines
 ;	by Stefano Bodrato, 29/11/2007
 ;
-;	int msx_vram();
+;	int vdp_vram();
 ;
 ;	Detects the VRAM size (in KB)
 ;
-;	$Id: msx_vram.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
+;	$Id: vdp_vram.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
 ;
 
         SECTION code_clib
-	PUBLIC	msx_vram
-	PUBLIC	_msx_vram
+	PUBLIC	vdp_vram
+	PUBLIC	_vdp_vram
 	
-msx_vram:
-_msx_vram:
+vdp_vram:
+_vdp_vram:
 
 	ld	a,(0FAFCh)		; mode
 	and	@00000110		; extract VRAM size

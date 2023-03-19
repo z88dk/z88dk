@@ -10,11 +10,11 @@
 	$Id: msx_blit_fill_vram.c,v 1.2 2016-06-16 20:54:24 dom Exp $
 */
 
-#include <msx.h>
+#include <video/tms99x8.h>
 
 void msx_blit_fill_vram(unsigned int dest, unsigned int value, unsigned int w, unsigned int h, int djmp) {
 	while (h--) {
-		msx_vfill(dest, value, w);
+		vdp_vfill(dest, value, w);
 		dest += djmp;		
 	}
 }

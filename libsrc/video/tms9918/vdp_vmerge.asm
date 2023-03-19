@@ -8,12 +8,11 @@
 ;
 ;        set \a value at a given vram address \a addr, merging bits (OR) with the existing value
 ;
-;        $Id: msx_vmerge.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
 ;
 
         SECTION code_clib
-        PUBLIC        msx_vmerge
-        PUBLIC        _msx_vmerge
+        PUBLIC        vdp_vmerge
+        PUBLIC        _vdp_vmerge
 
         EXTERN  l_tms9918_disable_interrupts
         EXTERN  l_tms9918_enable_interrupts
@@ -21,8 +20,8 @@
         INCLUDE        "video/tms9918/vdp.inc"
 
 
-msx_vmerge:
-_msx_vmerge:
+vdp_vmerge:
+_vdp_vmerge:
 
         ; enter vdp address pointer
 

@@ -62,9 +62,9 @@ void main(void)
 
 
 	// set screen to graphic mode
-	set_color(15, 1, 1);
-	set_mode(mode_2);
-	fill(MODE2_ATTR, 0xF1, MODE2_MAX);
+	vdp_color(15, 1, 1);
+	vdp_set_mode(mode_2);
+	vdp_vfill(MODE2_ATTR, 0xF1, MODE2_MAX);
 
 
 	while (!getk()) {
@@ -119,9 +119,9 @@ void main(void)
 		//ozsetactivepage(!ozgetactivepage());
 
 		// show the off-screen buffer
-		msx_vwrite_direct(sbuffer, 0, MODE2_MAX);
+		vdp_vwrite_direct(sbuffer, 0, MODE2_MAX);
 	}
 
 	// go back to text mode
-	set_mode(mode_0);
+	vdp_set_mode(mode_0);
 }
