@@ -34,6 +34,13 @@ CXX_FLAGS	+= -std=gnu++17 $(COMMON_FLAGS) -Wextra -Werror -pedantic-errors \
 # link boost::filesystem if needed
 LDFLAGS 	+= $(shell perl build_ldflags.pl $(CXX) $(CROSS))
 
+# so that we can use C++17 features on older systems
+ifeq ($(CROSS),1)
+  ifeq ($(EXESUFFIX),.exe)
+LDFLAGS        += -static-libstdc++ -static-libgcc
+  endif
+endif
+
 #------------------------------------------------------------------------------
 # Object files
 #------------------------------------------------------------------------------
