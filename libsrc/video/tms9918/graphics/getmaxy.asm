@@ -3,7 +3,7 @@
     MODULE   __tms9918_getmaxx
     SECTION  code_clib
     PUBLIC   __tms9918_getmaxy
-    EXTERN   __tms9918_spec_gfxh
+    EXTERN   __tms9918_gfxh
 
     INCLUDE	"graphics/grafix.inc"
     INCLUDE	"video/tms9918/vdp.inc"
@@ -16,7 +16,7 @@ IF VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
 .__tms9918_getmaxy
-    ld      hl,(__tms9918_spec_gfxh)
+    ld      hl,(__tms9918_gfxh)
     ld      h,0
     ret
     

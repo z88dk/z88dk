@@ -41,6 +41,12 @@ SECTION rodata_clib
 
 ; Specification of VDP mode 0
 spec_mode3:
+
+
+
+
+; Table adderesses
+mode3_addresses:
     defb     32      ;columsn
     defb     24      ;rows
     defb     64-1    ;Graphics w
@@ -49,9 +55,6 @@ spec_mode3:
     defb     __tms9918_CAPS_MODE3  ; Console capabilities
 
 
-
-; Table adderesses
-mode3_addresses:
     defb    0         ;register 0:   -     -  -    -  -  - M2 EXTVID
     defb    @11101000 ;register 1:   4/16K BL GINT M1 M3 - SI MAG
     defw    PATTERN_NAME
@@ -115,12 +118,9 @@ ENDIF
     dec     e
     jr      nz,inimlt0
     call    l_tms9918_enable_interrupts
-
-    ; Return our info block
-    ld      hl,spec_mode3
-    call    __tms9918_setup_spec
     ret
-
+    
+    
 __tms9918_mode3_cls:
     ;Clear the pattern generator table
     ld      hl,(__tms9918_pattern_generator) 

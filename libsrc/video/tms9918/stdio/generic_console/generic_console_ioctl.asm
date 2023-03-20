@@ -16,7 +16,7 @@
 
     INCLUDE "video/tms9918/vdp.inc"
 
-    IF VDP_EXPORT_DIRECT = 1
+IF VDP_EXPORT_DIRECT = 1
     PUBLIC  generic_console_ioctl
     PUBLIC  CLIB_GENCON_CAPS
 

@@ -1,4 +1,4 @@
-; Noop for disable screenmodes
+; Noop for disabled screenmodes
 
 SECTION rodata_clib
 PUBLIC __vdp_mode_noop_term

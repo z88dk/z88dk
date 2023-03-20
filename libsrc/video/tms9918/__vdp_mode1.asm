@@ -21,7 +21,6 @@ EXTERN  __tms9918_set_font
 EXTERN  __tms9918_clear_vram
 EXTERN  __tms9918_attribute
 EXTERN  __tms9918_border
-EXTERN  __tms9918_switch_mode
 EXTERN  __tms9918_CAPS_MODE1
 EXTERN  __tms9918_set_tables
 EXTERN  __tms9918_setup_spec
@@ -32,19 +31,15 @@ EXTERN  FILVRM
 
 SECTION rodata_clib
 
-; Specification of VDP mode 0
-spec_mode1:
+
+; Table adderesses
+mode1_addresses:
     defb     COLUMNS ;columsn
     defb     24      ;rows
     defb     64-1    ;Graphics w
     defb     48-1    ;Graphic h
     defb     1       ;Sprites enabled
     defb     __tms9918_CAPS_MODE1  ; Console capabilities
-
-
-
-; Table adderesses
-mode1_addresses:
 
     defb    0         ;register 0:   -     -  -    -  -  - M2 EXTVID
     defb    $E0       ;register 1:   4/16K BL GINT M1 M3 - SI MAG
@@ -91,8 +86,5 @@ __vdp_mode1:
     ; Set the font
     call    __tms9918_set_font
 
-    ; Return our info block (cls is issued after return)
-    ld      hl,spec_mode1
-    call    __tms9918_setup_spec
     ret
-
+    

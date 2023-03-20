@@ -19,6 +19,9 @@
     PUBLIC __tms9918_colour_table
     PUBLIC __tms9918_sprite_generator
     PUBLIC __tms9918_sprite_attribute
+    PUBLIC __tms9918_gfxw
+    PUBLIC __tms9918_gfxh
+
     
 RG0SAV:         defb    0       ;keeping track of VDP register values
 RG1SAV:         defb    0
@@ -37,6 +40,10 @@ __tms9918_pattern_generator:    defw    0
 __tms9918_colour_table:         defw    0
 __tms9918_sprite_generator:     defw    0
 __tms9918_sprite_attribute:     defw    0
+
+
+__tms9918_gfxw:     defb    0
+__tms9918_gfxh:     defb    0
 
     SECTION		data_clib
 

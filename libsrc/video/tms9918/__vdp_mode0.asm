@@ -29,18 +29,17 @@ EXTERN  VDPreg_Write
 
 SECTION rodata_clib
 
-; Specification of VDP mode 1
-spec_mode0:
-    defb     COLUMNS ;columsn
-    defb     24      ;rows
-    defb     80-1    ;Graphics w
-    defb     48-1    ;Graphic h
-    defb     0       ;Sprites not enabled
-    defb     __tms9918_CAPS_MODE0  ; Console capabilities
-
 
 ; Table adderesses
 mode0_addresses:
+    defb    COLUMNS         ;text columns
+    defb    24              ;text rows
+    defb    80-1            ;graphics w
+    defb    48-1            ;graphics h
+    defb    0               ;sprites not enabled
+    defb     __tms9918_CAPS_MODE0  ; Console capabilities
+
+
     defb    0               ;register 0: -     -  -    -  -  - M2 EXTVID
     defb    $F0             ;register 1: 4/16K BL GINT M1 M3 - SI MAG
     defw    PATTERN_NAME
@@ -78,9 +77,4 @@ __vdp_mode0:
 
     ; Set the font
     call    __tms9918_set_font
-
-    ; Return our info block (cls is issued after return)
-    ld      hl,spec_mode0
-    call    __tms9918_setup_spec
     ret
-

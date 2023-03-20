@@ -12,6 +12,7 @@
 
 SECTION code_clib
 PUBLIC  __tms9918_set_tables
+PUBLIC  __tms9918_gencon_hook
 
 EXTERN __tms9918_screen_mode
 EXTERN __tms9918_colour_table
@@ -20,13 +21,48 @@ EXTERN __tms9918_pattern_name
 EXTERN __tms9918_sprite_attribute
 EXTERN __tms9918_sprite_generator
 
+EXTERN  __console_w
+EXTERN  __tms9918_gfxw
+EXTERN  generic_console_caps
+
 EXTERN  VDPreg_Write
+EXTERN  l_dcal
+
 
 
 __tms9918_set_tables:
     ;hl = address table
     ;a = screenmode
     ld      (__tms9918_screen_mode),a
+
+    ; Call the gencon hook to setup print/cls etc functions
+    ld      d,a
+    push    hl
+    ld      hl,(__tms9918_gencon_hook)
+    ld      a,h
+    or      l
+    ld      a,d
+    call    nz,l_dcal
+    pop     hl
+
+    ; Now copy other info about the mode
+    ld      e,(hl)      ;consolew
+    inc     hl
+    ld      d,(hl)      ;consoleh
+    inc     hl
+    ld      (__console_w),de
+    ld      e,(hl)      ;gfxw
+    inc     hl
+    ld      d,(hl)      ;gfxh
+    inc     hl
+    ld      (__tms9918_gfxw),de
+    ;hl = &sprites_enabled
+    inc     hl
+    ld      a,(hl)
+    inc     hl
+    ld      (generic_console_caps),a
+    
+
     ld      e,0             ;Start from register 0
     ld      a,(hl)          ;register 0
     inc     hl
@@ -100,3 +136,9 @@ reg_loop:
     call    VDPreg_Write
     jr      reg_loop
     ret
+
+
+
+SECTION bss_clib
+
+__tms9918_gencon_hook:    defw    0           ;Hook for setting the mode for gencon as necessary
