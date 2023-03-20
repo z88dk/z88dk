@@ -27,14 +27,14 @@ clg:
 _clg:
 
     ld      a,(__tms9918_screen_mode)
-    and     a   ;MODE 0
+    and     a   ;MODE 0 (no gfx)
     jr      z,clg_mode2
-    dec     a   ;MODE 1
+    dec     a   ;MODE 1 (no gfx)
     jr      z,clg_mode2
     dec     a   ;MODE 2
     jr      z,clg_mode2
 
-; Clearing for an already entered mode3 here
+    ; Clearing for an already entered mode3 here
     xor     a       ;Tranparent
     ld      hl,(__tms9918_pattern_generator)	;Clear the pattern generator table
     ld      bc,1536
@@ -43,20 +43,4 @@ _clg:
     ret
 
 clg_mode2:
-    ld      hl,2
-    call    vdp_set_mode
-    ld      a,$1F   	; black on white attributes
-    ld      (__tms9918_attribute),a
-    ld      hl,8192    ; set VRAM attribute area
-    ld      bc,6144
-    push    bc
-    call    FILVRM
-    pop     bc
-    xor     a
-    ld      hl,(__tms9918_pattern_generator)
-    call    FILVRM
-
-    ld      l,$0F
-    call    vdp_set_border
-
-    ret
+    jp      ansi_cls

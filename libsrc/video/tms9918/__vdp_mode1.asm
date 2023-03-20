@@ -1,0 +1,99 @@
+; We follow the MSX naming convention, so confusingly this is VDP mode 0 - 32x24
+
+SECTION code_clib
+
+PUBLIC  __vdp_mode1
+
+
+; VDP map definitions
+defc    COLOUR_TABLE      = $2000
+defc    PATTERN_NAME      = $1800
+defc    PATTERN_GENERATOR = $0000
+
+defc    SPRITE_GENERATOR  = $3800
+defc    SPRITE_ATTRIBUTE  = $1b00
+
+
+defc    COLUMNS = 32
+
+
+EXTERN  __tms9918_set_font
+EXTERN  __tms9918_clear_vram
+EXTERN  __tms9918_attribute
+EXTERN  __tms9918_border
+EXTERN  __tms9918_switch_mode
+EXTERN  __tms9918_CAPS_MODE1
+EXTERN  __tms9918_set_tables
+EXTERN  __tms9918_setup_spec
+
+EXTERN  VDPreg_Write
+EXTERN  FILVRM
+
+
+SECTION rodata_clib
+
+; Specification of VDP mode 0
+spec_mode1:
+    defb     COLUMNS ;columsn
+    defb     24      ;rows
+    defb     64-1    ;Graphics w
+    defb     48-1    ;Graphic h
+    defb     1       ;Sprites enabled
+    defb     __tms9918_CAPS_MODE1  ; Console capabilities
+
+
+
+; Table adderesses
+mode1_addresses:
+    defw    PATTERN_NAME
+    defw    COLOUR_TABLE
+    defb    $80             ;register 3
+    defw    PATTERN_GENERATOR
+    defb    $00             ;register 4
+    defw    SPRITE_ATTRIBUTE
+    defw    SPRITE_GENERATOR
+    defb    $ff             ;endmarker
+
+
+SECTION code_clib
+
+; Initialises the display + returns terminal structure
+; Entry: a = screenmode
+__vdp_mode1:
+    push    af
+    call    __tms9918_clear_vram
+    pop     af
+
+    ld      l,0         ;register 0:   -     -  -    -  -  - M2 EXTVID
+    ld      h,$E0       ;register 1:   4/16K BL GINT M1 M3 - SI MAG
+    call    __tms9918_switch_mode   ;Writes the appropriate registers (a = screenmode)
+
+    ld      hl, mode1_addresses
+    call    __tms9918_set_tables
+
+    ; Set the screen colour
+    ld      a,(__tms9918_border)
+    and     15
+    ld      e,7
+    call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
+
+
+    ld      hl,PATTERN_NAME
+    ld      bc,768
+    ld      a,65
+    call    FILVRM
+
+    ; Set the colour for all characters
+    ld      a,(__tms9918_attribute)
+    ld      hl,COLOUR_TABLE
+    ld      bc,32
+    call    FILVRM
+
+    ; Set the font
+    call    __tms9918_set_font
+
+    ; Return our info block (cls is issued after return)
+    ld      hl,spec_mode1
+    call    __tms9918_setup_spec
+    ret
+

@@ -14,24 +14,24 @@
         INCLUDE "video/tms9918/vdp.inc"
         
 FILVRM:
-        push    af
-        push    bc
-        call    SETWRT
-        pop     hl
+    push    af
+    push    bc
+    call    SETWRT
+    pop     hl
 IF VDP_DATA > 0
-        ld      bc, VDP_DATA
+    ld      bc, VDP_DATA
 ENDIF
 loop:         
-        pop     af
+    pop     af
 IF VDP_DATA < 0
-        ld      (-VDP_DATA),a
+    ld      (-VDP_DATA),a
 ELSE
-        out     (c),a
+    out     (c),a
 ENDIF
-        push    af
-        dec     hl
-        ld      a,h
-        or      l
-        jr      nz,loop
-        pop     af
-        ret
+    push    af
+    dec     hl
+    ld      a,h
+    or      l
+    jr      nz,loop
+    pop     af
+    ret
