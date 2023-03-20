@@ -1,6 +1,6 @@
 ; We follow the MSX naming convention, so confusingly this is VDP mode 0 - 32x24
 
-SECTION code_clib
+SECTION code_video_vdp
 
 PUBLIC  __vdp_mode1
 
@@ -23,13 +23,12 @@ EXTERN  __tms9918_attribute
 EXTERN  __tms9918_border
 EXTERN  __tms9918_CAPS_MODE1
 EXTERN  __tms9918_set_tables
-EXTERN  __tms9918_setup_spec
 
 EXTERN  VDPreg_Write
 EXTERN  FILVRM
 
 
-SECTION rodata_clib
+SECTION rodata_video_vdp
 
 
 ; Table adderesses
@@ -53,7 +52,7 @@ mode1_addresses:
     defb    $ff             ;endmarker
 
 
-SECTION code_clib
+SECTION code_video_vdp
 
 ; Initialises the display + returns terminal structure
 ; Entry: a = screenmode

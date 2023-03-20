@@ -1,5 +1,5 @@
 
-SECTION code_clib
+SECTION code_video_vdp
 
 PUBLIC  __vdp_mode2
 
@@ -26,8 +26,7 @@ EXTERN  __tms9918_clear_vram
 EXTERN  __tms9918_attribute
 EXTERN  __tms9918_border
 EXTERN  __tms9918_CAPS_MODE2
-EXTERN  __tms9918_set_tables
-EXTERN  __tms9918_setup_spec
+EXTERN  __tms9918_set_tables  
 
 EXTERN  __tms9918_colour_table
 EXTERN  __tms9918_pattern_generator
@@ -38,7 +37,7 @@ EXTERN  FILVRM
 EXTERN  SETWRT
 
 
-SECTION rodata_clib
+SECTION rodata_video_vdp
 
 
 
@@ -65,7 +64,7 @@ mode2_addresses:
     defb    $ff             ;endmarker
 
 
-SECTION code_clib
+SECTION code_video_vdp
 
 
 ; Initialises the display + returns terminal structure

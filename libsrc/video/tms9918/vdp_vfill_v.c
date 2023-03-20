@@ -12,6 +12,11 @@
 
 #include <video/tms99x8.h>
 
+#pragma codeseg code_video_vdp
+#pragma constseg rodata_video_vdp
+#pragma bssseg bss_video_vdp
+#pragma dataseg data_video_vdp
+
 void vdp_vfill_v(unsigned int addr, unsigned int value, unsigned int count) {
 	unsigned int diff;
 

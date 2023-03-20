@@ -1,5 +1,5 @@
 
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC  __tms9918_set_font
     PUBLIC  __tms9918_set_font_at_addr
 

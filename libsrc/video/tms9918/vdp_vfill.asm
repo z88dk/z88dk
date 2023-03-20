@@ -9,7 +9,7 @@
 ;
 
 
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC	vdp_vfill
     PUBLIC	_vdp_vfill
 

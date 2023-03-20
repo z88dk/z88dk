@@ -12,6 +12,10 @@
 
 #include <video/tms99x8.h>
 
+#pragma codeseg code_video_vdp
+#pragma constseg rodata_video_vdp
+#pragma bssseg bss_video_vdp
+#pragma dataseg data_video_vdp
 
 void vdp_set_char(int c, void* form, void *attr, unsigned int color, unsigned int place) {
 	vdp_set_char_form(c, form, place);

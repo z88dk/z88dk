@@ -12,6 +12,11 @@
 
 #include <video/tms99x8.h>
 
+#pragma codeseg code_video_vdp
+#pragma constseg rodata_video_vdp
+#pragma bssseg bss_video_vdp
+#pragma dataseg data_video_vdp
+
 void vdp_blit_ram_vram(unsigned char* source, unsigned int dest, unsigned int w, unsigned int h, int sjmp, int djmp) {
 	while (h--) {
 		vdp_vwrite_direct(source, dest, w);

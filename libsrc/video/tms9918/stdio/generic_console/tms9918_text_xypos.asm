@@ -1,5 +1,5 @@
 
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC  __tms9918_text_xypos
 
     EXTERN  __tms9918_pattern_name

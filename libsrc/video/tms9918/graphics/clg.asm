@@ -11,7 +11,7 @@
 ;	$Id: clg.asm $
 ;
 
-    SECTION code_clib
+    SECTION code_video_vdp
 
     PUBLIC  clg
     PUBLIC  _clg

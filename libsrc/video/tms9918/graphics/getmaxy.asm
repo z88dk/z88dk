@@ -1,7 +1,7 @@
 
 
     MODULE   __tms9918_getmaxx
-    SECTION  code_clib
+    SECTION  code_video_vdp
     PUBLIC   __tms9918_getmaxy
     EXTERN   __tms9918_gfxh
 

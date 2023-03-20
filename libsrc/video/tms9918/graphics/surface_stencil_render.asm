@@ -13,7 +13,7 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-	SECTION code_clib
+	SECTION code_video_vdp
 	PUBLIC	surface_stencil_render
 	PUBLIC	_surface_stencil_render
 	EXTERN	base_graphics

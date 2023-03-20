@@ -1,6 +1,6 @@
 
     MODULE  __tms9918_plotpixel
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC  __tms9918_plotpixel
 
     EXTERN  __gfx_coords

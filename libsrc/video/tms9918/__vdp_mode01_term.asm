@@ -1,6 +1,6 @@
 ; Mode 0 + mode 1 have hte same terminal spec
 
-SECTION rodata_clib
+SECTION rodata_video_vdp
 PUBLIC __vdp_mode0_term
 PUBLIC __vdp_mode1_term
 

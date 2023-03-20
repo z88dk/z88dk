@@ -12,6 +12,11 @@
 
 #include <video/tms99x8.h>
 
+#pragma codeseg code_video_vdp
+#pragma constseg rodata_video_vdp
+#pragma bssseg bss_video_vdp
+#pragma dataseg data_video_vdp
+
 void vdp_put_sprite_8(unsigned int id, int x, int y, unsigned int handle, unsigned int color) {
 	sprite_t sp;
 	if (x < 0) {

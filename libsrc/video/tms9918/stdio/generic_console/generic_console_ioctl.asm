@@ -1,7 +1,7 @@
 
     MODULE  tms9918_console_ioctl
 
-    SECTION code_clib
+    SECTION code_video_vdp
     INCLUDE "ioctl.def"
 
     PUBLIC  __tms9918_console_ioctl

@@ -1,6 +1,6 @@
 
 
-SECTION bss_clib
+SECTION bss_video_vdp
 
 PUBLIC __tms9918_status_register
 

@@ -1,5 +1,5 @@
 
-    SECTION bss_clib
+    SECTION bss_video_vdp
 
     PUBLIC  __tms9918_screen_mode
     PUBLIC  __tms9918_attribute
@@ -45,7 +45,7 @@ __tms9918_sprite_attribute:     defw    0
 __tms9918_gfxw:     defb    0
 __tms9918_gfxh:     defb    0
 
-    SECTION		data_clib
+    SECTION		data_video_vdp
 
 __tms9918_attribute:	defb	$f1	;white on black
 __tms9918_border:	defb	$01	;black border

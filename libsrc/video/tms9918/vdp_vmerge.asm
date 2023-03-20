@@ -10,7 +10,7 @@
 ;
 ;
 
-        SECTION code_clib
+        SECTION code_video_vdp
         PUBLIC        vdp_vmerge
         PUBLIC        _vdp_vmerge
 

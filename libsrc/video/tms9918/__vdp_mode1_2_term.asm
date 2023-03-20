@@ -1,7 +1,7 @@
 ; Console table for mangled mode 1+2
 
 
-SECTION rodata_clib
+SECTION rodata_video_vdp
 PUBLIC __vdp_mode1_2_term
 
 EXTERN  __tms9918_pattern_generator
@@ -13,7 +13,7 @@ __vdp_mode1_2_term:
     defw    l_ret       ;printc
     defw    l_ret       ;scroll
 
-SECTION code_clib
+SECTION code_video_vdp
 
 mode_1_2_cls:
     ld      hl,(__tms9918_pattern_generator)

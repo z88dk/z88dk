@@ -1,6 +1,6 @@
 
     MODULE  __tms9918_pointxy
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC  __tms9918_pointxy
 
     EXTERN  __tms9918_pixeladdress

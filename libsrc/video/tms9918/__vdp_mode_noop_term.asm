@@ -1,6 +1,6 @@
 ; Noop for disabled screenmodes
 
-SECTION rodata_clib
+SECTION rodata_video_vdp
 PUBLIC __vdp_mode_noop_term
 
 EXTERN  l_ret

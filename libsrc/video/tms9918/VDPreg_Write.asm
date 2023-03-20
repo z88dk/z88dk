@@ -1,4 +1,4 @@
-SECTION code_clib
+SECTION code_video_vdp
 
 PUBLIC VDPreg_Write
 

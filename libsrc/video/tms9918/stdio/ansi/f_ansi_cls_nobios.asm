@@ -10,7 +10,7 @@
 ;	$Id: f_ansi_cls_nobios.asm $
 ;
 
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC  ansi_cls
     PUBLIC  _ansi_cls
 

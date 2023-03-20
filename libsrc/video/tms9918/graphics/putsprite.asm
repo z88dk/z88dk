@@ -9,7 +9,7 @@
 ; $Id: putsprite.asm $
 ;
 
-	SECTION smc_clib
+	SECTION smc_video_vdp
 	PUBLIC  putsprite
 	PUBLIC  _putsprite
 	EXTERN	__tms9918_pixeladdress
@@ -309,10 +309,10 @@ ENDIF
 	pop	af
         ret
         
-	SECTION	rodata_clib
+	SECTION	rodata_video_vdp
 .offsets_table
          defb	1,2,4,8,16,32,64,128
 
-	SECTION data_clib
+	SECTION data_video_vdp
 .actcoord
 	 defw	0

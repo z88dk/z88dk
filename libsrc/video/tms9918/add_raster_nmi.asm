@@ -1,5 +1,5 @@
 
-		SECTION		code_clib
+		SECTION		code_video_vdp
 		PUBLIC		add_raster_int
 		PUBLIC		_add_raster_int
 

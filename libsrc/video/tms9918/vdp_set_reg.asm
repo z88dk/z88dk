@@ -10,7 +10,7 @@
 ;	$Id: gen_vdp_set_reg.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC	vdp_set_reg
     PUBLIC	_vdp_set_reg
     EXTERN  VDPreg_Write

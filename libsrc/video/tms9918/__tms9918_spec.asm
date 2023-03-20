@@ -1,6 +1,6 @@
 
 
-SECTION data_clib
+SECTION data_video_vdp
 
 
 PUBLIC  __tms9918_spec_funcs

@@ -4,7 +4,7 @@
 
 	INCLUDE	"graphics/grafix.inc"
 
-	SECTION code_clib
+	SECTION code_video_vdp
 	PUBLIC	surface_plotpixel
 
 	EXTERN	surface_pixeladdress

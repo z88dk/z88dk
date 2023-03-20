@@ -17,7 +17,7 @@
 ;	$Id: surface_draw.asm,v 1.8 2017-01-02 22:57:58 aralbrec Exp $
 ;
 
-		SECTION	  code_clib
+		SECTION	  code_video_vdp
                 PUBLIC    surface_draw
                 PUBLIC    _surface_draw
                 

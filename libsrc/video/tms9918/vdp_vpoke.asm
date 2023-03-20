@@ -10,7 +10,7 @@
 ;	$Id: vdp_vpoke.asm$
 ;
 
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC	vpoke
     PUBLIC	_vpoke
     PUBLIC	vdp_vpoke

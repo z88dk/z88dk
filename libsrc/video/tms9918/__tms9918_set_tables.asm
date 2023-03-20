@@ -10,7 +10,7 @@
 ;5          -      SA13 SA12 SA11 SA10 SA9  SA8  SA7    * $80
 ;6          -      -    -    -    -    SG13 SG12 SG11   * $800
 
-SECTION code_clib
+SECTION code_video_vdp
 PUBLIC  __tms9918_set_tables
 PUBLIC  __tms9918_gencon_hook
 
@@ -139,6 +139,6 @@ reg_loop:
 
 
 
-SECTION bss_clib
+SECTION bss_video_vdp
 
 __tms9918_gencon_hook:    defw    0           ;Hook for setting the mode for gencon as necessary

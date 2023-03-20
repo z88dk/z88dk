@@ -10,7 +10,7 @@
 ;	$Id: f_ansi_bel.asm $
 ;
 
-	SECTION  code_clib
+	SECTION  code_video_vdp
 	
 	PUBLIC	ansi_BEL
 

@@ -1,7 +1,7 @@
 
 
     MODULE  tms9918_console_vpeek
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC  __tms9918_console_vpeek
 
     EXTERN  generic_console_font32

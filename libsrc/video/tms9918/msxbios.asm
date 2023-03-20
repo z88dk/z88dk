@@ -6,7 +6,7 @@
 ;	$Id: gen_msxbios.asm $
 ;
 
-        SECTION code_clib
+        SECTION code_video_vdp
 		
 ; Used by Tatung Einstein, 3 extra bytes only
 	PUBLIC    msxbios

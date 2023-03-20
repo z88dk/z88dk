@@ -8,7 +8,7 @@
 ;	$Id: gen_color.asm,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC	vdp_color
     PUBLIC	_vdp_color
 

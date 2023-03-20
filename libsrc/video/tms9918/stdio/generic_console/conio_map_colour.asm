@@ -5,7 +5,7 @@
 ; Used:  hl,bc,f
 ;
 
-	MODULE	code_clib
+	MODULE	code_video_vdp
 	PUBLIC	__tms9918_map_colour
 
 	EXTERN	__CLIB_CONIO_NATIVE_COLOUR
@@ -23,7 +23,7 @@ __tms9918_map_colour:
     ld      a,(hl)
     ret
 
-    SECTION	rodata_clib
+    SECTION	rodata_video_vdp
 table:
     defb    $1	;BLACK -> BLACK
     defb    $4	;BLUE -> DARK BLUE

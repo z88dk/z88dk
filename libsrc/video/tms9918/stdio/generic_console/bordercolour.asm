@@ -2,7 +2,7 @@
 ;
 ;
 
-	SECTION		code_clib
+	SECTION		code_video_vdp
 	PUBLIC		__tms9918_bordercolor
 	EXTERN		__tms9918_map_colour
 	EXTERN		vdp_set_border

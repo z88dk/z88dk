@@ -1,6 +1,6 @@
 
 
-SECTION rodata_clib
+SECTION rodata_video_vdp
 PUBLIC __vdp_mode3_term
 
 EXTERN  FILVRM

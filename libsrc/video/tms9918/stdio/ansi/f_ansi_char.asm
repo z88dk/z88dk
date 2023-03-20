@@ -12,7 +12,7 @@
 ;	Stefano Bodrato - Oct. 2017
 ;
 
-    SECTION	smc_clib
+    SECTION	smc_video_vdp
 
     PUBLIC	ansi_CHAR
 
@@ -420,7 +420,7 @@ ENDIF
   	jp	__graphics_end
 
 
-;	SECTION bss_clib
+;	SECTION bss_video_vdp
 	
 .chline_buffer
 	defs 2

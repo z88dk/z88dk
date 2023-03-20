@@ -1,7 +1,7 @@
 ; void vdp_set_border(int c) __z88dk_fastcall
 
 
-	SECTION		code_clib
+	SECTION		code_video_vdp
 	PUBLIC		vdp_set_border
 	PUBLIC		_vdp_set_border
 

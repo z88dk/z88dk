@@ -13,7 +13,7 @@
 ;	$Id: f_ansi_attr.asm $
 ;
 
-        SECTION code_clib
+        SECTION code_video_vdp
 	PUBLIC	ansi_attr
 	EXTERN	__tms9918_attribute
 	EXTERN	INVRS

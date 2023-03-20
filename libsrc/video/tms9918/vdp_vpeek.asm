@@ -11,7 +11,7 @@
 ;        $Id: vdp_vpeek.asm,v 1.10 2016-06-16 19:30:25 dom Exp $
 ;
 
-        SECTION code_clib
+        SECTION code_video_vdp
         PUBLIC  vdp_vpeek
         PUBLIC  _vdp_vpeek
         EXTERN  l_tms9918_disable_interrupts

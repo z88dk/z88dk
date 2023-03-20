@@ -1,7 +1,7 @@
 
 
     MODULE	tms9918_generic_console
-    SECTION code_clib
+    SECTION code_video_vdp
 
     EXTERN	__tms9918_cls
     PUBLIC  __tms9918_scrollup
@@ -128,7 +128,7 @@ loop:
     ret
 
 
-    SECTION rodata_clib
+    SECTION rodata_video_vdp
 
 mode_term_table:
     defb    0

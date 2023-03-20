@@ -1,6 +1,6 @@
 
 
-SECTION  code_clib
+SECTION  code_video_vdp
 PUBLIC   vdp_set_mode
 PUBLIC   _vdp_set_mode
 
@@ -31,7 +31,7 @@ loop:
     jp      (hl)
 
 
-SECTION rodata_clib
+SECTION rodata_video_vdp
 
 mode_table:
     defb    0

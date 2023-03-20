@@ -1,6 +1,6 @@
 ; We follow the MSX naming convention, so confusingly this is VDP mode 0 - 32x24
 
-SECTION code_graphics
+SECTION code_video_vdp_
 
 PUBLIC  __vdp_mode3
 PUBLIC  __tms9918_mode3_cls
@@ -22,7 +22,6 @@ EXTERN  __tms9918_clear_vram
 EXTERN  __tms9918_border
 EXTERN  __tms9918_CAPS_MODE3
 EXTERN  __tms9918_set_tables
-EXTERN  __tms9918_setup_spec
 
 EXTERN  __tms9918_pattern_generator
 EXTERN  __tms9918_pattern_name
@@ -36,7 +35,7 @@ EXTERN  SETWRT
 EXTERN  l_ret
 
 
-SECTION rodata_clib
+SECTION rodata_video_vdp
 
 
 ; Specification of VDP mode 0
@@ -67,7 +66,7 @@ mode3_addresses:
     defb    $ff             ;endmarker
 
 
-SECTION code_clib
+SECTION code_video_vdp
 
 
 ; Initialises the display + returns terminal structure
@@ -120,7 +119,7 @@ ENDIF
     call    l_tms9918_enable_interrupts
     ret
     
-    
+
 __tms9918_mode3_cls:
     ;Clear the pattern generator table
     ld      hl,(__tms9918_pattern_generator) 

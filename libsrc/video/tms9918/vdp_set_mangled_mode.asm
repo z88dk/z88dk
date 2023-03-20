@@ -1,5 +1,5 @@
 
-SECTION code_graphics
+SECTION code_video_vdp
 PUBLIC  vdp_set_mangled_mode
 PUBLIC  _vdp_set_mangled_mode
 

@@ -10,7 +10,7 @@
 ;        $Id: f_ansi_scrollup_nobios.asm $
 ;
 
-        SECTION code_clib
+        SECTION code_video_vdp
         PUBLIC  ansi_SCROLLUP
         
         EXTERN  __tms9918_scroll_buffer

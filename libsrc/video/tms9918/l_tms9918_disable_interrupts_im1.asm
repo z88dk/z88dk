@@ -1,5 +1,5 @@
 
-	SECTION	code_clib
+	SECTION	code_video_vdp
 
 	PUBLIC	l_tms9918_disable_interrupts
 	PUBLIC	l_tms9918_enable_interrupts	
