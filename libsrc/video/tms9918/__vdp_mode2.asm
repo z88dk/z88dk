@@ -55,6 +55,8 @@ spec_mode2:
 
 ; Table adderesses
 mode2_addresses:
+    defb    2         ;register 0:   -     -  -    -  -  - M2 EXTVID
+    defb    $E0       ;register 1:   4/16K BL GINT M1 M3 - SI MAG
     defw    PATTERN_NAME
     defw    COLOUR_TABLE
     defb    $ff             ;register 3
@@ -74,10 +76,6 @@ __vdp_mode2:
     push    af
     call    __tms9918_clear_vram
     pop     af
-
-    ld      l,2         ;register 0:   -     -  -    -  -  - M2 EXTVID
-    ld      h,$E0       ;register 1:   4/16K BL GINT M1 M3 - SI MAG
-    call    __tms9918_switch_mode   ;Writes the appropriate registers (a = screenmode)
 
     ld      hl, mode2_addresses
     call    __tms9918_set_tables

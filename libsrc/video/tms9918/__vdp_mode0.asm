@@ -19,7 +19,6 @@ defc    COLUMNS = 40
 EXTERN  __tms9918_set_font
 EXTERN  __tms9918_clear_vram
 EXTERN  __tms9918_attribute
-EXTERN  __tms9918_switch_mode
 EXTERN  __tms9918_CAPS_MODE0
 EXTERN  __tms9918_set_tables
 EXTERN  __tms9918_setup_spec
@@ -42,6 +41,8 @@ spec_mode0:
 
 ; Table adderesses
 mode0_addresses:
+    defb    0               ;register 0: -     -  -    -  -  - M2 EXTVID
+    defb    $F0             ;register 1: 4/16K BL GINT M1 M3 - SI MAG
     defw    PATTERN_NAME
     defw    COLOUR_TABLE
     defb    $80             ;register 3
@@ -61,10 +62,6 @@ __vdp_mode0:
     push    af
     call    __tms9918_clear_vram
     pop     af
-
-    ld      l,0         ;register 0:   -     -  -    -  -  - M2 EXTVID
-    ld      h,$F0       ;register 1:   4/16K BL GINT M1 M3 - SI MAG
-    call    __tms9918_switch_mode   ;Writes the appropriate registers (a = screenmode)
 
     ld      hl, mode0_addresses
     call    __tms9918_set_tables

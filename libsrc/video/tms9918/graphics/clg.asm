@@ -16,10 +16,8 @@
     PUBLIC  clg
     PUBLIC  _clg
 
-    EXTERN  vdp_set_border
-    EXTERN  vdp_set_mode
+    EXTERN  ansi_cls
     EXTERN  FILVRM
-    EXTERN  __tms9918_attribute
     EXTERN  __tms9918_screen_mode
     EXTERN  __tms9918_pattern_generator
 

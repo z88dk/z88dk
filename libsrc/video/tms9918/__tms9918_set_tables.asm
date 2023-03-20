@@ -13,7 +13,7 @@
 SECTION code_clib
 PUBLIC  __tms9918_set_tables
 
-
+EXTERN __tms9918_screen_mode
 EXTERN __tms9918_colour_table
 EXTERN __tms9918_pattern_generator
 EXTERN __tms9918_pattern_name
@@ -25,8 +25,22 @@ EXTERN  VDPreg_Write
 
 __tms9918_set_tables:
     ;hl = address table
-    ; Consider from register 2 onwards
-    ld      e,2
+    ;a = screenmode
+    ld      (__tms9918_screen_mode),a
+    ld      e,0             ;Start from register 0
+    ld      a,(hl)          ;register 0
+    inc     hl
+IF FORm5
+    set     0,a             ;EXT Video has to always be on
+ENDIF
+    call    VDPreg_Write
+    ld      a,(hl)          ;register 1
+    inc     hl
+IF FORadam
+    res     5,a             ;No interrupts on an adam for CP/M breaks
+ENDIF
+    call    VDPreg_Write
+
     ld      c,(hl)
     inc     hl
     ld      b,(hl)

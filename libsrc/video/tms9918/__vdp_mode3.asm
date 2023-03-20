@@ -20,7 +20,6 @@ defc    SPRITE_ATTRIBUTE  = $1b00
 
 EXTERN  __tms9918_clear_vram
 EXTERN  __tms9918_border
-EXTERN  __tms9918_switch_mode
 EXTERN  __tms9918_CAPS_MODE3
 EXTERN  __tms9918_set_tables
 EXTERN  __tms9918_setup_spec
@@ -53,6 +52,8 @@ spec_mode3:
 
 ; Table adderesses
 mode3_addresses:
+    defb    0         ;register 0:   -     -  -    -  -  - M2 EXTVID
+    defb    @11101000 ;register 1:   4/16K BL GINT M1 M3 - SI MAG
     defw    PATTERN_NAME
     defw    COLOUR_TABLE
     defb    $00             ;register 3
@@ -72,10 +73,6 @@ __vdp_mode3:
     push    af
     call    __tms9918_clear_vram
     pop     af
-
-    ld      l,0         ;register 0:   -     -  -    -  -  - M2 EXTVID
-    ld      h,@11101000 ;register 1:   4/16K BL GINT M1 M3 - SI MAG
-    call    __tms9918_switch_mode   ;Writes the appropriate registers (a = screenmode)
 
     ld      hl, mode3_addresses
     call    __tms9918_set_tables
