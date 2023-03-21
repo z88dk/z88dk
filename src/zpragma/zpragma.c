@@ -398,7 +398,7 @@ int main(int argc, char **argv)
                 write_defined("CLIB_OPT_SCANF_2", (int32_t)((value >> 32) & 0xffffffff), 0);
             } else if ( strncmp(ptr,"string",6) == 0 ) {
                 write_pragma_string(ptr + 6);
-            } else if ( strncmp(ptr, "data", 4) == 0 ) {
+            } else if ( strncmp(ptr, "data", 4) == 0 && isspace(*(ptr+4)) ) {
                 write_bytes(ptr + 4, 1);
             } else if ( strncmp(ptr, "byte", 4) == 0 ) {
                 write_bytes(ptr + 4, 0);
