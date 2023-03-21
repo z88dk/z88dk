@@ -1,4 +1,6 @@
-
+;
+; Generic console function pointers for operations
+;
 
 SECTION data_video_vdp
 
@@ -11,10 +13,6 @@ PUBLIC  __tms9918_spec_funcs_end
 
 
 EXTERN  l_ret
-
-
-
-;; Should cls go in the spec?
 
 __tms9918_spec_funcs:
 __tms9918_cls_func:

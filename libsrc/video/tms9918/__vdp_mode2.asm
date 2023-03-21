@@ -3,8 +3,6 @@ SECTION code_video_vdp
 
 PUBLIC  __vdp_mode2
 
-PUBLIC  __tms9918_mode2_setup_tables
-
 
 INCLUDE  "video/tms9918/vdp.inc"
 
@@ -31,6 +29,8 @@ EXTERN  __tms9918_set_tables
 EXTERN  __tms9918_colour_table
 EXTERN  __tms9918_pattern_generator
 EXTERN  __tms9918_pattern_name
+
+EXTERN  __tms9918_setup_mode2_pattern
 
 EXTERN  VDPreg_Write
 EXTERN  FILVRM
@@ -84,7 +84,7 @@ __vdp_mode2:
     call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
 
    ; Setup the pattern names
-    call    __tms9918_mode2_setup_tables
+    call    __tms9918_setup_mode2_pattern
 
     ; Set the VRAM attribute area
     ld      bc,6144
@@ -96,26 +96,6 @@ __vdp_mode2:
     ; And clear the pattern generator
     xor     a                       ; clear graphics page
     ld      hl,(__tms9918_pattern_generator)
-    call    FILVRM
-    ret
+    jp      FILVRM
 
 
-__tms9918_mode2_setup_tables:
-    ld      hl,(__tms9918_pattern_name)      ;pattern name
-    call    SETWRT
-IF VDP_DATA >= 0
-    ld      bc,VDP_DATA
-ENDIF
-    xor     a
-    ld      e,3
-pattern:
-IF VDP_DATA < 0
-    ld      (-VDP_DATA),a
-ELSE
-    out     (c),a
-ENDIF
-    inc     a
-    jr      nz,pattern
-    dec     e
-    jr      nz,pattern
-    ret

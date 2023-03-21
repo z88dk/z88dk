@@ -14,13 +14,14 @@
     PUBLIC  RG7SAV
 
 
-    PUBLIC __tms9918_pattern_name
-    PUBLIC __tms9918_pattern_generator
-    PUBLIC __tms9918_colour_table
-    PUBLIC __tms9918_sprite_generator
-    PUBLIC __tms9918_sprite_attribute
-    PUBLIC __tms9918_gfxw
-    PUBLIC __tms9918_gfxh
+    PUBLIC  __tms9918_pattern_name
+    PUBLIC  __tms9918_pattern_generator
+    PUBLIC  __tms9918_colour_table
+    PUBLIC  __tms9918_sprite_generator
+    PUBLIC  __tms9918_sprite_attribute
+    PUBLIC  __tms9918_gfxw
+    PUBLIC  __tms9918_gfxh
+    PUBLIC  __tms9918_gencon_hook
 
     
 RG0SAV:         defb    0       ;keeping track of VDP register values
@@ -44,6 +45,7 @@ __tms9918_sprite_attribute:     defw    0
 
 __tms9918_gfxw:     defb    0
 __tms9918_gfxh:     defb    0
+__tms9918_gencon_hook:    defw    0           ;Hook for setting the mode for gencon as necessary
 
     SECTION		data_video_vdp
 

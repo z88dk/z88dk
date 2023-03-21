@@ -1,5 +1,9 @@
-
-
+;
+; Read the mode definition table 
+;
+; - Setup library variables
+; - Output to the VDP
+; - Call the gencon hook so it can setup tty funcs
 
 ;Reg/Bit    7      6    5    4    3    2    1    0
 ;0          -      -    -    -    -    -    M2   EXTVID
@@ -12,14 +16,14 @@
 
 SECTION code_video_vdp
 PUBLIC  __tms9918_set_tables
-PUBLIC  __tms9918_gencon_hook
 
-EXTERN __tms9918_screen_mode
-EXTERN __tms9918_colour_table
-EXTERN __tms9918_pattern_generator
-EXTERN __tms9918_pattern_name
-EXTERN __tms9918_sprite_attribute
-EXTERN __tms9918_sprite_generator
+EXTERN  __tms9918_screen_mode
+EXTERN  __tms9918_colour_table
+EXTERN  __tms9918_pattern_generator
+EXTERN  __tms9918_pattern_name
+EXTERN  __tms9918_sprite_attribute
+EXTERN  __tms9918_sprite_generator
+EXTERN  __tms9918_gencon_hook
 
 EXTERN  __console_w
 EXTERN  __tms9918_gfxw
@@ -138,7 +142,3 @@ reg_loop:
     ret
 
 
-
-SECTION bss_video_vdp
-
-__tms9918_gencon_hook:    defw    0           ;Hook for setting the mode for gencon as necessary

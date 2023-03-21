@@ -94,6 +94,10 @@ ENDIF
     ; All startup modes follow on here
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"
+
+    ; And include handling disabling screenmodes
+    INCLUDE "crt/classic/tms9918/mode_disable.asm"
+
     INCLUDE	"crt/classic/crt_section.asm"
 
 IF startup = 2

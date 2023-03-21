@@ -29,6 +29,8 @@ IF startup = 3
     INCLUDE	"target/msx/classic/rom.asm"
 ENDIF
 
+    ; And include handling disabling screenmodes
+    INCLUDE "crt/classic/tms9918/mode_disable.asm"
 
     SECTION code_clib
 

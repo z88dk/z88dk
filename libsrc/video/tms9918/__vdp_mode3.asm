@@ -1,6 +1,6 @@
 ; We follow the MSX naming convention, so confusingly this is VDP mode 0 - 32x24
 
-SECTION code_video_vdp_
+SECTION code_video_vdp
 
 PUBLIC  __vdp_mode3
 PUBLIC  __tms9918_mode3_cls
@@ -125,5 +125,4 @@ __tms9918_mode3_cls:
     ld      hl,(__tms9918_pattern_generator) 
     ld      bc,1536
     xor     a
-    call    FILVRM
-    ret
+    jp      FILVRM

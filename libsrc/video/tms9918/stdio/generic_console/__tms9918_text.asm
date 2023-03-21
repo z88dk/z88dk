@@ -22,8 +22,7 @@ __tms9918_text_cls:
     ld      hl,(__tms9918_pattern_name)
     ld      bc,960
     ld      a,32
-    call    FILVRM
-    ret
+    jp      FILVRM
 
 ; Entry: d = character
 ;        bc = xy coordinates
@@ -33,8 +32,7 @@ __tms9918_text_printc:
     pop     de
     ld      a,d
     ld      bc,1
-    call    FILVRM
-    ret
+    jp      FILVRM
 
 __tms9918_text_scroll:
 scroll_text:

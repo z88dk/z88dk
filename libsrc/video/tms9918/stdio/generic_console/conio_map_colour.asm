@@ -5,10 +5,10 @@
 ; Used:  hl,bc,f
 ;
 
-	MODULE	code_video_vdp
-	PUBLIC	__tms9918_map_colour
+    SECTION code_video_vdp
+    PUBLIC  __tms9918_map_colour
 
-	EXTERN	__CLIB_CONIO_NATIVE_COLOUR
+    EXTERN  __CLIB_CONIO_NATIVE_COLOUR
 
 __tms9918_map_colour:
     ld      c,__CLIB_CONIO_NATIVE_COLOUR

@@ -82,5 +82,4 @@ not_underline:
     add     hl,de        
     ld      a,(__tms9918_attribute)
     ld      bc,8
-    call    FILVRM
-    ret
+    jp      FILVRM

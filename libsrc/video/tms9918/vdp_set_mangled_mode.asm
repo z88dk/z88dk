@@ -13,7 +13,7 @@ EXTERN  __tms9918_attribute
 
 EXTERN  __tms9918_set_font
 EXTERN  __tms9918_set_font_at_addr
-EXTERN  __tms9918_mode2_setup_tables
+EXTERN  __tms9918_setup_mode2_pattern
 
 EXTERN  __vdp_mode1
 
@@ -34,8 +34,13 @@ ENDIF
     call    VDPreg_Write
     ld      a,3
     call    VDPreg_Write    ;register 4
+
+    ld      hl,(__tms9918_pattern_generator)
+    ld      bc,6144
+    xor     a
+    call    FILVRM
     
-    call    __tms9918_mode2_setup_tables
+    call    __tms9918_setup_mode2_pattern
 
     ; Clear the colour table
     ld      hl,(__tms9918_colour_table)	;Clear the pattern generator table
@@ -43,16 +48,16 @@ ENDIF
     ld      a,(__tms9918_attribute)   ; white on black
     call    FILVRM
 
-    ; Now copy the font 3 times
-    call    __tms9918_set_font
-    ld      de,(__tms9918_pattern_generator)
-    ld      a,d
-    add     8
-    ld      d,a
-    call    __tms9918_set_font_at_addr
-    ld      de,(__tms9918_pattern_generator)
-    ld      a,d
-    add     16
-    ld      d,a
-    call    __tms9918_set_font_at_addr
+    ; ; Now copy the font 3 times
+    ; call    __tms9918_set_font
+    ; ld      de,(__tms9918_pattern_generator)
+    ; ld      a,d
+    ; add     8
+    ; ld      d,a
+    ; call    __tms9918_set_font_at_addr
+    ; ld      de,(__tms9918_pattern_generator)
+    ; ld      a,d
+    ; add     16
+    ; ld      d,a
+    ; call    __tms9918_set_font_at_addr
     ret

@@ -75,5 +75,4 @@ __vdp_mode0:
     call    FILVRM
 
     ; Set the font
-    call    __tms9918_set_font
-    ret
+    jp     __tms9918_set_font
