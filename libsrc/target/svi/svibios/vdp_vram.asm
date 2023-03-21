@@ -2,7 +2,7 @@
 ;	Spectravideo SVI specific routines
 ;	by Stefano Bodrato, 29/05/2009
 ;
-;	int msx_vram();
+;	int vdp_vram();
 ;
 ;	Detects the VRAM size (in KB)
 ;
@@ -10,10 +10,10 @@
 ;
 
         SECTION code_clib
-	PUBLIC	msx_vram
-	PUBLIC	_msx_vram
+	PUBLIC	vdp_vram
+	PUBLIC	_vdp_vram
 		
-msx_vram:
-_msx_vram:
+vdp_vram:
+_vdp_vram:
 	ld	hl,16			; assume 16K
 	ret
