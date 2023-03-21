@@ -10,9 +10,9 @@
 ;        $Id: f_ansi_scrollup.asm $
 ;
 
-        SECTION code_clib
+        SECTION code_video_vdp
         PUBLIC  ansi_SCROLLUP
-        PUBLIC  __tms9918_scroll_buffer
+        EXTERN  __tms9918_scroll_buffer
         EXTERN  __tms9918_attribute
         
 IF FORmsx
@@ -78,6 +78,3 @@ ENDIF
         ret
  
 
-        SECTION bss_clib        
-        
-__tms9918_scroll_buffer:        defs 256

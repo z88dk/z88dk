@@ -6,7 +6,7 @@
 ;	Transfer count bytes from VRAM to RAM
 ;
 
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC	vdp_vread
     PUBLIC	_vdp_vread
 

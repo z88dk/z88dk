@@ -10,7 +10,7 @@
 ;	$Id: vdp_get_mode.asm,v 1.5 2016-06-16 19:30:25 dom Exp $
 ;
 
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC  vdp_get_mode
     PUBLIC  _vdp_get_mode
     EXTERN  __tms9918_screen_mode

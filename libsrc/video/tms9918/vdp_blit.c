@@ -12,6 +12,10 @@
 
 #include <video/tms99x8.h>
 
+#pragma codeseg code_video_vdp
+#pragma constseg rodata_video_vdp
+#pragma bssseg bss_video_vdp
+#pragma dataseg data_video_vdp
 
 void vdp_blit(surface_t *source, surface_t *dest, rect_t *from, rect_t *to) {
 	// one can always dream :)	

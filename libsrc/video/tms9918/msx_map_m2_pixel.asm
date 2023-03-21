@@ -13,7 +13,7 @@
 ;	$Id: msx_map_m2_pixel.asm,v 1.6 2016-06-16 19:30:25 dom Exp $
 ;
 
-        SECTION code_clib
+        SECTION code_video_vdp
 	PUBLIC	msx_map_m2_pixel
 	PUBLIC	_msx_map_m2_pixel
 	

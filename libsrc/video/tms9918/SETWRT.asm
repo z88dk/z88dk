@@ -4,14 +4,14 @@
 ; $Id: gen_setwrt.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
-        SECTION code_clib
-	PUBLIC	SETWRT
-	PUBLIC	_SETWRT
+    SECTION code_video_vdp
+    PUBLIC  SETWRT
+    PUBLIC  _SETWRT
 
-	EXTERN	l_tms9918_disable_interrupts
-	EXTERN	l_tms9918_enable_interrupts
+    EXTERN  l_tms9918_disable_interrupts
+    EXTERN  l_tms9918_enable_interrupts
 
-	INCLUDE	"video/tms9918/vdp.inc"
+    INCLUDE	"video/tms9918/vdp.inc"
 
 ;==============================================================
 ; VRAM to HL

@@ -12,26 +12,26 @@
 ;	Stefano Bodrato - Oct. 2017
 ;
 
-	SECTION	smc_clib
-	
-	PUBLIC	ansi_CHAR
+    SECTION	smc_video_vdp
 
-	
-	EXTERN	FILVRM
-	EXTERN	LDIRVM
+    PUBLIC	ansi_CHAR
 
 
-	EXTERN	__tms9918_attribute
-	
-	EXTERN	ansicharacter_pixelwidth
-	EXTERN	ansifont_is_packed
-	EXTERN	ansifont
-	
-	EXTERN	__console_y
-	EXTERN	__console_x
+    EXTERN	FILVRM
+    EXTERN	LDIRVM
 
-	EXTERN     swapgfxbk
-        EXTERN	__graphics_end
+
+    EXTERN	__tms9918_attribute
+
+    EXTERN	ansicharacter_pixelwidth
+    EXTERN	ansifont_is_packed
+    EXTERN	ansifont
+
+    EXTERN	__console_y
+    EXTERN	__console_x
+
+    EXTERN     swapgfxbk
+    EXTERN	__graphics_end
 
 	INCLUDE	"video/tms9918/vdp.inc"
 
@@ -420,7 +420,7 @@ ENDIF
   	jp	__graphics_end
 
 
-;	SECTION bss_clib
+;	SECTION bss_video_vdp
 	
 .chline_buffer
 	defs 2

@@ -101,23 +101,23 @@ restart_ret:
 	ret
 
 program:
-        INCLUDE "crt/classic/crt_init_sp.asm"
-        INCLUDE "crt/classic/crt_init_atexit.asm"
-	call    crt0_init_bss
-	ld	(exitsp),sp
-	ld	hl,2
-	call	vdp_set_mode
-	im	1
-    	ei
+    INCLUDE "crt/classic/crt_init_sp.asm"
+    INCLUDE "crt/classic/crt_init_atexit.asm"
+    call    crt0_init_bss
+    ld      (exitsp),sp
+    ld      hl,2
+    call    vdp_set_mode
+    im      1
+    ei
 ; Optional definition for auto MALLOC init
 ; it assumes we have free space between the end of
 ; the compiled program and the stack pointer
 IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
-	call	_main
+    call    _main
 cleanup:
-	rst	0		;Restart when main finishes
+    rst	0       ;Restart when main finishes
 
 
 
@@ -148,6 +148,10 @@ msxbios:
 l_dcal: jp      (hl)            ;Used for function pointer calls
 
     INCLUDE "crt/classic/crt_runtime_selection.asm" 
+
+    ; And include handling disabling screenmodes
+    INCLUDE "crt/classic/tms9918/mode_disable.asm"
+
 
     defc	__crt_org_bss = CRT_ORG_BSS
     IF DEFINED_CRT_MODEL

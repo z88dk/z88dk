@@ -12,6 +12,11 @@
 
 #include <video/tms99x8.h>
 
+#pragma codeseg code_video_vdp
+#pragma constseg rodata_video_vdp
+#pragma bssseg bss_video_vdp
+#pragma dataseg data_video_vdp
+
 void vdp_set_sprite_16(unsigned int handle, void* data) {
 	vdp_vwrite_direct(data, _tms9918_sprite_generator + (handle << 5), 32);
 }

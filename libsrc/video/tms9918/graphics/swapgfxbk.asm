@@ -7,7 +7,7 @@
 ;
 
                 MODULE    __tms9918_swapgfxbk
-		SECTION   code_clib
+		SECTION   code_video_vdp
                 PUBLIC    swapgfxbk
 		PUBLIC	swapgfxbk1
 

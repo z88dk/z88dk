@@ -2,7 +2,7 @@
 ;	MSX extension for "GFX - a small graphics library" by Jannone
 ;
 
-	SECTION code_clib
+	SECTION code_video_vdp
 	PUBLIC	surface_pixeladdress
 
 	EXTERN	base_graphics

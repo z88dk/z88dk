@@ -110,6 +110,9 @@ l_dcal:
 
     INCLUDE "crt/classic/crt_runtime_selection.asm" 
 
+    ; And include handling disabling screenmodes
+    INCLUDE "crt/classic/tms9918/mode_disable.asm"
+
     defc	__crt_org_bss = CRT_ORG_BSS
     IF DEFINED_CRT_MODEL
         defc __crt_model = CRT_MODEL

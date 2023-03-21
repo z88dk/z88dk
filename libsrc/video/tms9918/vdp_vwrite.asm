@@ -8,7 +8,7 @@
 ;	$Id: gen_vwrite.asm,v 1.3 2016-06-16 19:30:25 dom Exp $
 ;
 
-    SECTION code_clib
+    SECTION code_video_vdp
     PUBLIC  vdp_vwrite
     PUBLIC  _vdp_vwrite
 

@@ -20,11 +20,11 @@
     org     CRT_ORG_CODE
 
     defb	$00     ;$2000 Needs to be non zero
-    defw	l_ret   ;$2001 pre hook
+    defw	prehook ;$2001 pre hook
     defw	start   ;$2003 main routine
 
 
-l_ret:
+prehook:
     ret
 
 

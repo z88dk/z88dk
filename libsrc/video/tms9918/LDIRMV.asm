@@ -7,7 +7,7 @@
 ;	$Id: gen_ldirmv.asm$
 ;
 
-	SECTION code_clib
+	SECTION code_video_vdp
 	PUBLIC	LDIRMV
 	PUBLIC	_LDIRMV
 	EXTERN		SETRD

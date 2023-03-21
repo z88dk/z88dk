@@ -7,6 +7,7 @@
     SECTION smc_fp
     SECTION smc_sound_ay
     SECTION smc_compress
+    SECTION smc_video_vdp
     SECTION smc_user
     SECTION data_driver
     SECTION data_clib
@@ -22,6 +23,7 @@
     SECTION data_arch
     SECTION data_compiler
     SECTION data_splib2
+    SECTION data_video_vdp
     SECTION data_user
     SECTION data_alloc_balloc
     SECTION DATA_END

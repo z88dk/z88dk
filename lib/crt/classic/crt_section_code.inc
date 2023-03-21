@@ -65,5 +65,6 @@
 IF !__crt_org_graphics
     SECTION code_graphics
 ENDIF
+    SECTION code_video_vdp
     SECTION code_user
     SECTION CODE_END
