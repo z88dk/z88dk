@@ -8,6 +8,7 @@
     SECTION code_video_vdp
     PUBLIC  __tms9918_map_colour
 
+
     EXTERN  __CLIB_CONIO_NATIVE_COLOUR
 
 __tms9918_map_colour:
