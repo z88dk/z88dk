@@ -1,7 +1,10 @@
+; V9938, mode4 = screen 4 = GRAPHIC 3
+;
+; Effectively the same as the regular mode 2, but with v2 sprites
 
 SECTION code_video_vdp
 
-PUBLIC  __vdp_mode2
+PUBLIC  __vdp_mode4
 
 
 INCLUDE  "video/tms9918/vdp.inc"
@@ -16,9 +19,7 @@ defc    SPRITE_GENERATOR  = $3800
 defc    SPRITE_ATTRIBUTE  = $1b00
 
 
-EXTERN  __tms9918_mode2_scroll
-EXTERN  __tms9918_mode2_cls
-EXTERN  __tms9918_mode2_vpeek
+
 EXTERN  __tms9918_set_font
 EXTERN  __tms9918_clear_vram
 EXTERN  __tms9918_attribute
@@ -43,17 +44,16 @@ SECTION rodata_video_vdp
 
 
 ; Table adderesses
-mode2_addresses:
+mode4_addresses:
     defb     32      ;columsn
     defb     24      ;rows
     defb     256-1   ;Graphics w
     defb     192-1   ;Graphic h
-    defb     1       ;Sprite mode
+    defb     2       ;Sprite mode
     defb     __tms9918_CAPS_MODE2  ; Console capabilities
 
-
-    defb    2         ;register 0:   -     -  -    -  -  - M2 EXTVID
-    defb    $E0       ;register 1:   4/16K BL GINT M1 M3 - SI MAG
+    defb    4         ;register 0:   0     DG IE2  IE1 M5 M4 M2 EXTVID
+    defb    $60       ;register 1:   4/16K BL GINT M1  M3 -  SI MAG
     defw    PATTERN_NAME
     defb    +((PATTERN_NAME >> 10) & 0x7F)          ;r2
     defw    COLOUR_TABLE
@@ -62,6 +62,7 @@ mode2_addresses:
     defb    +(((PATTERN_GENERATOR >> 11) & 0x3F) | 0x03)    ;r4
     defw    SPRITE_ATTRIBUTE
     defw    SPRITE_GENERATOR
+    defb    10, +((COLOUR_TABLE >> 14) & 0x07)
     defb    $ff             ;endmarker
 
 
@@ -70,12 +71,12 @@ SECTION code_video_vdp
 
 ; Initialises the display + returns terminal structure
 ; Entry: a = screenmode
-__vdp_mode2:
+__vdp_mode4:
     push    af
     call    __tms9918_clear_vram
     pop     af
 
-    ld      hl, mode2_addresses
+    ld      hl, mode4_addresses
     call    __tms9918_set_tables
 
     ; Set the screen colour

@@ -50,7 +50,7 @@ mode3_addresses:
     defb     24      ;rows
     defb     64-1    ;Graphics w
     defb     48-1    ;Graphic h
-    defb     1       ;Sprites enabled
+    defb     1       ;Sprite mode
     defb     __tms9918_CAPS_MODE3  ; Console capabilities
 
 

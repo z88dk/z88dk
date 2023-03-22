@@ -23,6 +23,7 @@
     EXTERN  __vdp_mode0_80col_term
     EXTERN  __vdp_mode2_term
     EXTERN  __vdp_mode3_term
+    EXTERN  __vdp_mode4_term
     EXTERN  __vdp_mode1_2_term
     
 
@@ -144,6 +145,10 @@ ENDIF
     defw    __vdp_mode2_term
     defb    3
     defw    __vdp_mode3_term
+IFDEF V9938
+    defb    4
+    defw    __vdp_mode4_term
+ENDIF
     defb    81
     defw    __vdp_mode1_2_term
     defb    $ff

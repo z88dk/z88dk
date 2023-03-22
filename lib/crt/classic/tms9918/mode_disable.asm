@@ -62,3 +62,30 @@ IF CLIB_DISABLE_MODE3
     PUBLIC  __CLIB_DISABLE_MODE3
     defc    __CLIB_DISABLE_MODE3 = 1
 ENDIF
+
+
+
+
+IF CLIB_DISABLE_MODE4
+    ; MSX V9938 GRAPHICS III
+    PUBLIC __vdp_mode4
+    PUBLIC __vdp_mode4_term
+
+    defc __vdp_mode4 = l_ret
+    defc __vdp_mode4_term = __vdp_mode_noop_term
+
+    PUBLIC  __CLIB_DISABLE_MODE4
+    defc    __CLIB_DISABLE_MODE4 = 1
+ENDIF
+
+IF CLIB_DISABLE_MODE80
+    ; MSX V99938 TEXT II
+    PUBLIC __vdp_mode0_80col
+    PUBLIC __vdp_mode0_80col_term
+
+    defc __vdp_mode0_80col = l_ret
+    defc __vdp_mode0_80col_term = __vdp_mode_noop_term
+
+    PUBLIC  __CLIB_DISABLE_MODE4
+    defc    __CLIB_DISABLE_MODE4 = 1
+ENDIF

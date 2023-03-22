@@ -13,6 +13,7 @@
     SECTION code_video_vdp
     PUBLIC  ansi_cls
     PUBLIC  _ansi_cls
+    PUBLIC  __tms9918_mode2_cls
 
     EXTERN  vdp_set_mode
 
@@ -29,7 +30,7 @@
 ._ansi_cls
     ld      hl,2            ; set graphics mode
     call    vdp_set_mode
-
+__tms9918_mode2_cls:
     ld      a,(__tms9918_attribute)
     ld      hl,(__tms9918_colour_table)
     ld      bc,6144

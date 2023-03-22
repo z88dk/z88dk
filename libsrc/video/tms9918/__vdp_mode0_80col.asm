@@ -40,8 +40,8 @@ mode0_addresses:
     defb     __tms9918_CAPS_MODE0  ; Console capabilities
 
 
-    defb    $04             ;register 0: -     -  -    -  -  - M2 EXTVID
-    defb    $70             ;register 1: 4/16K BL GINT M1 M3 - SI MAG
+    defb    $04             ;register 0:   0     DG IE2  IE1 M5 M4 M2 EXTVID 
+    defb    $70             ;register 1:   4/16K BL GINT M1  M3 -  SI MAG
     defw    PATTERN_NAME
     defb    +(((PATTERN_NAME >> 10) & 0x7F) | 0x03) ;register 2
     defw    COLOUR_TABLE
