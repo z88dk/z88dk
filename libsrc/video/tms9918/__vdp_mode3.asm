@@ -57,10 +57,11 @@ mode3_addresses:
     defb    0         ;register 0:   -     -  -    -  -  - M2 EXTVID
     defb    @11101000 ;register 1:   4/16K BL GINT M1 M3 - SI MAG
     defw    PATTERN_NAME
+    defb    +((PATTERN_NAME >> 10) & 0x7F)
     defw    COLOUR_TABLE
     defb    $00             ;register 3
     defw    PATTERN_GENERATOR
-    defb    $00             ;register 4
+    defb    +((PATTERN_GENERATOR >> 11) & 0x3F)     ;register 4
     defw    SPRITE_ATTRIBUTE
     defw    SPRITE_GENERATOR
     defb    $ff             ;endmarker

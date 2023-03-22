@@ -1,4 +1,5 @@
-; We follow the MSX naming convention, so confusingly this is VDP mode 1 - 40x24
+; VDP TEXT II mode
+
 
 SECTION code_video_vdp
 
@@ -42,13 +43,13 @@ mode0_addresses:
     defb    $04             ;register 0: -     -  -    -  -  - M2 EXTVID
     defb    $70             ;register 1: 4/16K BL GINT M1 M3 - SI MAG
     defw    PATTERN_NAME
+    defb    +(((PATTERN_NAME >> 10) & 0x7F) | 0x03) ;register 2
     defw    COLOUR_TABLE
     defb    +(((COLOUR_TABLE >> 6) & 0xff) | 0x07)  ;register 3
     defw    PATTERN_GENERATOR
     defb    +((PATTERN_GENERATOR >> 11) & 0x3F)     ;register 4
     defw    SPRITE_ATTRIBUTE
     defw    SPRITE_GENERATOR
-    defb    2,  +(((PATTERN_NAME >> 10) & 0x7F) | 0x03)         ;fix up pattern name
     defb    10, +((COLOUR_TABLE >> 14) & 0x07)                  ;Colour table high
     defb    13, $0f         ;Blink off
     defb    $ff             ;endmarker

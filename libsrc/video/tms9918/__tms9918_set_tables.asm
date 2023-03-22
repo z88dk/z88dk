@@ -86,9 +86,8 @@ ENDIF
     ld      b,(hl)
     inc     hl
     ld      (__tms9918_pattern_name),bc
-    ld      a,b
-    srl     a
-    srl     a
+    ld      a,(hl)              ;r2 value
+    inc     hl
     call    VDPreg_Write        ;Register 2 - pattern name
     ld      c,(hl)
     inc     hl
