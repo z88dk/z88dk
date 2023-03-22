@@ -130,15 +130,14 @@ ENDIF
 
     ;; And any extra registers afterwards
 reg_loop:
-    ld      a,(hl)
-    cp      255
+    ld      e,(hl)
+    inc     e
     ret     z
-    ld      e,a
+    dec     e
     inc     hl
     ld      a,(hl)
     inc     hl
     call    VDPreg_Write
     jr      reg_loop
-    ret
 
 

@@ -6,10 +6,13 @@ PUBLIC   _vdp_set_mode
 
 
 EXTERN  __vdp_mode0
+EXTERN  __vdp_mode0_80col
 EXTERN  __vdp_mode1
 EXTERN  __vdp_mode2
 EXTERN  __vdp_mode3
 EXTERN  vdp_set_mangled_mode
+
+INCLUDE "video/tms9918/vdp.inc"
 
 vdp_set_mode:
 _vdp_set_mode:
@@ -36,6 +39,10 @@ SECTION rodata_video_vdp
 mode_table:
     defb    0
     defw    __vdp_mode0
+IFDEF V9938
+    defb    80
+    defw    __vdp_mode0_80col
+ENDIF
     defb    1
     defw    __vdp_mode1
     defb    2

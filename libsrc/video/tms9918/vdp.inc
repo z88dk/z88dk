@@ -34,6 +34,17 @@ IF FORmsx
 	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
 
+IF FORmsx2
+	defc VDP_DATA    = $98
+	defc VDP_DATAIN  = $98
+	defc VDP_CMD     = $99
+	defc VDP_STATUS  = $99
+	defc VRAM_SIZE   = 64		; extended are able to get the right size
+	defc VDP_EXPORT_DIRECT = 1
+	defc VDP_EXPORT_GFX_DIRECT = 1
+	defc V9938 = 1
+ENDIF
+
 IF FORsvi
 	defc VDP_DATA    = $80
 	defc VDP_DATAIN  = $84

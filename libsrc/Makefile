@@ -1,4 +1,4 @@
-# Ah, that'd be nice, a library makefile!
+ #Ah, that'd be nice, a library makefile!
 #
 # Problems? Contact the person to blame(!) above the section
 # for the library
@@ -71,7 +71,7 @@ TOCREATE += $(call check_target,m5,m5_clib.lib)
 TOCREATE += $(call check_target,mc1000,mc1000_clib.lib)
 TOCREATE += $(call check_target,micro8085,micro8085_clib.lib)
 TOCREATE += $(call check_target,mikro80,mikro80_clib.lib)
-TOCREATE += $(call check_target,msx,msx_clib.lib)
+TOCREATE += $(call check_target,msx,msx_clib.lib msx2.lib)
 TOCREATE += $(call check_target,mtx,mtx_clib.lib)
 TOCREATE += $(call check_target,multi8,multi8_clib.lib)
 TOCREATE += $(call check_target,myvision,myvision_clib.lib)
@@ -918,6 +918,13 @@ msx_clib.lib:
 	$(MAKE) -C psg TARGET=msx
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(TARGET_DIRECTORY)/msx/msx.lst
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msxbios @$(TARGET_DIRECTORY)/msx/arch_msxbios.lst
+
+msx2.lib:
+	@echo ''
+	@echo '--- Building MSX2 Library ---'
+	@echo ''
+	$(MAKE) -C video/tms9918 TARGET=msx SUBTYPE=msx2
+	TARGET=msx2 TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx2 -x$(OUTPUT_DIRECTORY)/msx2 @$(TARGET_DIRECTORY)/msx/msx2.lst
 
 # MTX library - Stefano
 mtx_clib.lib:

@@ -20,6 +20,7 @@
 
     EXTERN  __vdp_mode0_term
     EXTERN  __vdp_mode1_term
+    EXTERN  __vdp_mode0_80col_term
     EXTERN  __vdp_mode2_term
     EXTERN  __vdp_mode3_term
     EXTERN  __vdp_mode1_2_term
@@ -133,6 +134,10 @@ loop:
 mode_term_table:
     defb    0
     defw    __vdp_mode0_term
+IFDEF V9938
+    defb    80
+    defw    __vdp_mode0_80col_term
+ENDIF
     defb    1
     defw    __vdp_mode1_term
     defb    2

@@ -16,11 +16,15 @@ EXTERN  __tms9918_text_xypos
 
 EXTERN  __console_w
 EXTERN  __console_h
+EXTERN  l_mulu_16_8x8
 
 __tms9918_text_cls:
-    ; Lets just clear the maximum size
+    ld      hl,(__console_w)
+    ld      e,h
+    call    l_mulu_16_8x8
+    ld      c,l
+    ld      b,h
     ld      hl,(__tms9918_pattern_name)
-    ld      bc,960
     ld      a,32
     jp      FILVRM
 

@@ -23,6 +23,7 @@
     PUBLIC  __tms9918_gfxh
     PUBLIC  __tms9918_gencon_hook
 
+    INCLUDE       "video/tms9918/vdp.inc"
     
 RG0SAV:         defb    0       ;keeping track of VDP register values
 RG1SAV:         defb    0
@@ -32,6 +33,11 @@ RG4SAV:         defb    0
 RG5SAV:         defb    0
 RG6SAV:         defb    0
 RG7SAV:         defb    0
+IFDEF V9938
+RG8SAV:
+                ; We need to store registers 8->23
+                defs    16
+ENDIF
 
 
 __tms9918_screen_mode:	        defb    0
