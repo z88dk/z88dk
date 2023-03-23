@@ -16,7 +16,7 @@
 
     PUBLIC  msxbios
 
-    EXTERN  msx_set_mode
+    EXTERN  vdp_set_mode
 
     EXTERN  nmi_vectors
     EXTERN  im1_vectors
@@ -63,7 +63,7 @@ start:
     call    crt0_init_bss
     ld      (exitsp),sp
     ld      hl,2
-    call    msx_set_mode
+    call    vdp_set_mode
     ei
 
 
@@ -132,6 +132,9 @@ msxbios:
 
 
     INCLUDE "crt/classic/crt_runtime_selection.asm"
+    
+    ; And include handling disabling screenmodes
+    INCLUDE "crt/classic/tms9918/mode_disable.asm"
 
     defc    __crt_org_bss = CRT_ORG_BSS
     IF DEFINED_CRT_MODEL

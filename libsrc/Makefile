@@ -1,4 +1,4 @@
-# Ah, that'd be nice, a library makefile!
+ #Ah, that'd be nice, a library makefile!
 #
 # Problems? Contact the person to blame(!) above the section
 # for the library
@@ -19,6 +19,7 @@ check_target = $(if $(or $(filter $(1),$(TARGETS)), $(filter all,$(TARGETS))),$(
 CPMLIBS = cpm_clib.lib cpm8080_clib.lib cpmdevice.lib cpmdevice_8080.lib gfxvio.lib
 GENLIBS = z80_crt0.lib z80iy_crt0.lib z80n_crt0.lib 8080_crt0.lib gbz80_crt0.lib r2k_crt0.lib math48.lib genmath.lib mbf32.lib mbf64.lib math16.lib math32.lib daimath32.lib am9511.lib gendos.lib ndos.lib lib3d.lib fastmath.lib preempt.lib sp1-all
 GENLIBS += 8080_opt.lib 8085_opt.lib z180_opt.lib ez80_opt.lib
+GENLIBS += gfxtek.lib gfxregis.lib
 
 
 TOCREATE := $(call check_target,altair8800,altair8800_clib.lib gfxvti.lib gfxvdm.lib)
@@ -70,7 +71,7 @@ TOCREATE += $(call check_target,m5,m5_clib.lib)
 TOCREATE += $(call check_target,mc1000,mc1000_clib.lib)
 TOCREATE += $(call check_target,micro8085,micro8085_clib.lib)
 TOCREATE += $(call check_target,mikro80,mikro80_clib.lib)
-TOCREATE += $(call check_target,msx,msx_clib.lib)
+TOCREATE += $(call check_target,msx,msx_clib.lib msx2.lib)
 TOCREATE += $(call check_target,mtx,mtx_clib.lib)
 TOCREATE += $(call check_target,multi8,multi8_clib.lib)
 TOCREATE += $(call check_target,myvision,myvision_clib.lib)
@@ -134,6 +135,7 @@ TOCREATE += $(call check_target,vz,vz_clib.lib)
 TOCREATE += $(call check_target,x07,x07_clib.lib)
 TOCREATE += $(call check_target,x1,x1_clib.lib x1_cpm.lib $(CPMLIBS))
 TOCREATE += $(call check_target,z1013,z1013_clib.lib)
+TOCREATE += $(call check_target,z80,z80_clib.lib ixiy_clib.lib 8080_clib.lib 8085_clib.lib r2ka_clib.lib)
 TOCREATE += $(call check_target,z80tvgame,z80tvgame_clib.lib)
 TOCREATE += $(call check_target,z88,z88_clib.lib z88_math.lib)
 TOCREATE += $(call check_target,z9001,z9001_clib.lib)
@@ -917,6 +919,13 @@ msx_clib.lib:
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msx_clib @$(TARGET_DIRECTORY)/msx/msx.lst
 	TARGET=msx TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx -x$(OUTPUT_DIRECTORY)/msxbios @$(TARGET_DIRECTORY)/msx/arch_msxbios.lst
 
+msx2.lib:
+	@echo ''
+	@echo '--- Building MSX2 Library ---'
+	@echo ''
+	$(MAKE) -C video/tms9918 TARGET=msx SUBTYPE=msx2
+	TARGET=msx2 TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORmsx2 -x$(OUTPUT_DIRECTORY)/msx2 @$(TARGET_DIRECTORY)/msx/msx2.lst
+
 # MTX library - Stefano
 mtx_clib.lib:
 	@echo ''
@@ -1098,6 +1107,46 @@ z9001_clib.lib:
 	$(MAKE) -C games TARGET=z9001
 	$(MAKE) -C video/krt TARGET=z9001
 	TARGET=z9001 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz9001 -x$(OUTPUT_DIRECTORY)/z9001_clib @$(TARGET_DIRECTORY)/z9001/z9001.lst
+
+# Barebone z80 clib
+z80_clib.lib:
+	@echo ''
+	@echo '--- Building +z80 Library ---'
+	@echo ''
+	$(call buildgeneric,z80)
+	TARGET=z80 TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/z80_clib @$(TARGET_DIRECTORY)/z80/z80.lst
+
+# Barebone z80 (ixiy swapped)clib
+ixiy_clib.lib:
+	@echo ''
+	@echo '--- Building +z80 (ixiy) Library ---'
+	@echo ''
+	$(call buildgeneric,z80)
+	TARGET=z80 TYPE=ixiy $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/ixiy_clib @$(TARGET_DIRECTORY)/z80/z80.lst
+
+# Barebone z80/8080 clib
+8080_clib.lib:
+	@echo ''
+	@echo '--- Building +z80 (8080) Library ---'
+	@echo ''
+	$(call buildgeneric,z80)
+	TARGET=z80 TYPE=8080 $(LIBLINKER) -m8080 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8080_clib @$(TARGET_DIRECTORY)/z80/808x.lst
+
+# Barebone z80/8085 clib
+8085_clib.lib:
+	@echo ''
+	@echo '--- Building +z80 (8085) Library ---'
+	@echo ''
+	$(call buildgeneric,z80)
+	TARGET=z80 TYPE=8085 $(LIBLINKER) -m8085 -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/8085_clib @$(TARGET_DIRECTORY)/z80/808x.lst
+
+# Barebone z80/r2k clib
+r2ka_clib.lib:
+	@echo ''
+	@echo '--- Building +z80 (r2ka) Library ---'
+	@echo ''
+	$(call buildgeneric,z80)
+	TARGET=z80 TYPE=r2k $(LIBLINKER) -mr2ka -DSTANDARDESCAPECHARS -DFORz80 -x$(OUTPUT_DIRECTORY)/r2ka_clib @$(TARGET_DIRECTORY)/z80/z80.lst
 
 # Robotron HC900, KC85/2..KC85/5 library - Stefano
 kc_clib.lib:
@@ -1872,6 +1921,22 @@ gfxvti.lib:
 	@echo ''
 	$(MAKE) -C gfx TARGET=altair8800 SUBTYPE=vti FLAVOUR="gencon portable"
 	TARGET=vti TYPE=8080 $(LIBLINKER) -m8080 -DFORvti -x$(OUTPUT_DIRECTORY)/gfxvti @$(LISTFILE_DIRECTORY)/video/vti/video_vti.lst
+
+gfxtek.lib:
+	@echo ''
+	@echo '--- Building TEK4010 graphics Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=test SUBTYPE=tek FLAVOUR="wide"
+	$(MAKE) -C video/tek401x TARGET=test 
+	TARGET=tek TYPE=z80 $(LIBLINKER) -mz80 -DFORtek -x$(OUTPUT_DIRECTORY)/gfxtek @$(LISTFILE_DIRECTORY)/video/tek401x/video_tek.lst
+
+gfxregis.lib:
+	@echo ''
+	@echo '--- Building ReGIS graphics Library ---'
+	@echo ''
+	$(MAKE) -C gfx TARGET=test SUBTYPE=regis FLAVOUR="wide"
+	$(MAKE) -C video/regis TARGET=test 
+	TARGET=regis TYPE=z80 $(LIBLINKER) -mz80 -DFORregis -x$(OUTPUT_DIRECTORY)/gfxregis @$(LISTFILE_DIRECTORY)/video/regis/video_regis.lst
 
 gfxvio.lib:
 	@echo ''

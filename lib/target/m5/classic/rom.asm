@@ -13,18 +13,18 @@
     INCLUDE "crt/classic/crt_rules.inc"
 
 
-    EXTERN  msx_set_mode
+    EXTERN  vdp_set_mode
     EXTERN  im1_vectors
     EXTERN  asm_interrupt_handler
 
     org     CRT_ORG_CODE
 
     defb	$00     ;$2000 Needs to be non zero
-    defw	l_ret   ;$2001 pre hook
+    defw	prehook ;$2001 pre hook
     defw	start   ;$2003 main routine
 
 
-l_ret:
+prehook:
     ret
 
 
@@ -41,7 +41,7 @@ start:
     call    crt0_init_bss
     ld      (exitsp),sp
     ld      hl,2
-    call    msx_set_mode
+    call    vdp_set_mode
     ei
 
 

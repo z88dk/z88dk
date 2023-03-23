@@ -14,7 +14,7 @@
          INCLUDE        "graphics/grafix.inc"
          INCLUDE        "video/tms9918/vdp.inc"
 
-         SECTION	smc_clib
+         SECTION	smc_video_vdp
          PUBLIC        stencil_render
          PUBLIC        _stencil_render
          EXTERN        dither_pattern

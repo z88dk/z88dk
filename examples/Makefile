@@ -1,4 +1,4 @@
-SUBDIRS = console ace cpm embedded msx osca rex sam sms sos spectrum vz z88 zxvgs pacman rcmx000 g800 gb c128 nabu
+SUBDIRS = console ace cpm embedded msx osca rex sam sms sos spectrum vz z88 zxvgs pacman rcmx000 g800 gb c128 nabu sound
 CLEANDIRS = $(SUBDIRS:%=%-clean)
 
 

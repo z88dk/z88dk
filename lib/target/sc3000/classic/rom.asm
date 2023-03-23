@@ -28,7 +28,7 @@
     ENDIF
     INCLUDE	"crt/classic/crt_rules.inc"
 
-    EXTERN  msx_set_mode
+    EXTERN  vdp_set_mode
     EXTERN  im1_vectors
     EXTERN  asm_interrupt_handler
 
@@ -70,8 +70,8 @@ ENDIF
 
 
     ; Initialise mode 2 by default
-    ld      hl,2
-    call    msx_set_mode
+    ld      hl,1
+    call    vdp_set_mode
     im      1
     ;	ei
 

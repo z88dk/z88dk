@@ -1,4 +1,5 @@
 target/vg5k/stdio/fgetc_cons
+target/vg5k/stdio/fputc_cons
 target/vg5k/stdio/getk
 @stdio/ansicore.lst
 target/vg5k/stdio/ansi/f_ansi_attr

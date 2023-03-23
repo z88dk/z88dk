@@ -37,6 +37,7 @@ jobs:
           mingw64/mingw-w64-x86_64-gcc
           mingw64/mingw-w64-x86_64-libxml2
           mingw64/mingw-w64-x86_64-ragel
+          mingw64/mingw-w64-x86_64-boost
           git
           re2c
           vim

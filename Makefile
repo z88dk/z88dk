@@ -14,9 +14,9 @@ else
   EXESUFFIX 	?=
 endif
 
-DESTDIR ?= /usr/local
+PREFIX ?= /usr/local
 
-prefix_share = $(DESTDIR)/share/z88dk
+prefix_share = $(PREFIX)/share/z88dk
 git_rev ?= $(shell git rev-parse --short HEAD)
 git_count ?= $(shell git rev-list --count HEAD)
 version ?= $(shell date +%Y%m%d)
@@ -175,33 +175,34 @@ bin/z88dk-lib$(EXESUFFIX): src/config.h
 
 
 libs: $(BINS)
-	cd libsrc ; $(MAKE)
-	cd libsrc ; $(MAKE) install
+	$(MAKE) -C libsrc
+	$(MAKE) -C libsrc  install
 
 install: install-clean
-	install -d $(DESTDIR) $(DESTDIR)/bin $(prefix_share)/lib $(prefix_share)/src
-	$(MAKE) -C src/appmake PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/copt PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/ucpp PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/sccz80 PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/z80asm  PREFIX=$(DESTDIR) PREFIX_SHARE=$(prefix_share) install
-	$(MAKE) -C src/zcc PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/zx0 PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/z80nm PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/zobjcopy PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/ticks PREFIX=$(DESTDIR) install
-	$(MAKE) -C src/z88dk-lib PREFIX=$(DESTDIR) install
-	$(MAKE) -C support/graphics PREFIX=$(DESTDIR) install
-	$(MAKE) -C support/basck PREFIX=$(DESTDIR) install
-	$(MAKE) -C support/pv1000 PREFIX=$(DESTDIR) install
-	cp -r support/cmake $(prefix_share)/
-	if [ -f bin/z88dk-zsdcc$(EXESUFFIX) ]; then cp bin/z88dk-zsdcc$(EXESUFFIX) $(DESTDIR)/bin/; fi
-	cp -r include $(prefix_share)/
-	cp -r lib $(prefix_share)/
-	cp -r libsrc $(prefix_share)/
-	cp -r src/m4 $(prefix_share)/src/
+	mkdir -p $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(prefix_share)/lib $(DESTDIR)$(prefix_share)/src
+	$(MAKE) -C src/appmake PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/copt PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/ucpp PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/sccz80 PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/z80asm  PREFIX=$(DESTDIR)$(PREFIX) PREFIX_SHARE=$(DESTDIR)$(prefix_share) install
+	$(MAKE) -C src/zcc PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/zpragma PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/zx7 PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/zx0 PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/z80nm PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/zobjcopy PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/ticks PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C src/z88dk-lib PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C support/graphics PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C support/basck PREFIX=$(DESTDIR)$(PREFIX) install
+	$(MAKE) -C support/pv1000 PREFIX=$(DESTDIR)$(PREFIX) install
+	cp -r support/cmake $(DESTDIR)$(prefix_share)/
+	if [ -f bin/z88dk-zsdcpp$(EXESUFFIX) ]; then cp bin/z88dk-zsdcpp$(EXESUFFIX) $(DESTDIR)$(PREFIX)/bin/; fi
+	if [ -f bin/z88dk-zsdcc$(EXESUFFIX) ]; then cp bin/z88dk-zsdcc$(EXESUFFIX) $(DESTDIR)$(PREFIX)/bin/; fi
+	cp -r include $(DESTDIR)$(prefix_share)/
+	cp -r lib $(DESTDIR)$(prefix_share)/
+	cp -r libsrc $(DESTDIR)$(prefix_share)/
+	cp -r src/m4 $(DESTDIR)$(prefix_share)/src/
 
 install-clean:
 	$(MAKE) -C libsrc install-clean

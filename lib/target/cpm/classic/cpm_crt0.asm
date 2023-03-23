@@ -253,6 +253,11 @@ ENDIF
     INCLUDE	"crt/classic/crt_section.asm"
     INCLUDE "crt/classic/crt_cpm_fcntl.asm"
 
+IF __HAVE_TMS99X8
+    ; And include handling disabling screenmodes
+    INCLUDE "crt/classic/tms9918/mode_disable.asm"
+ENDIF
+
 IF __NABUPC__
     INCLUDE "target/nabu/classic/nabu_hccabuf.asm"
 ENDIF

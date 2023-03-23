@@ -27,3 +27,6 @@ IF (!DEFINED_startup || (startup=1))
 ELSE
     INCLUDE "target/coleco/classic/allram.asm"
 ENDIF
+
+    ; And include handling disabling screenmodes
+    INCLUDE "crt/classic/tms9918/mode_disable.asm"

@@ -10,9 +10,10 @@
 ;        $Id: f_ansi_scrollup_nobios.asm $
 ;
 
-        SECTION code_clib
+        SECTION code_video_vdp
         PUBLIC  ansi_SCROLLUP
-        PUBLIC  __tms9918_scroll_buffer
+        
+        EXTERN  __tms9918_scroll_buffer
         EXTERN  __tms9918_attribute
         
         EXTERN  CONSOLE_ROWS
@@ -65,7 +66,3 @@
         pop     ix
         ret
  
-
-        SECTION bss_clib        
-        
-.__tms9918_scroll_buffer                        defs 256

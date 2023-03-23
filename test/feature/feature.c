@@ -6,6 +6,10 @@
 #include <games.h>
 #include <time.h>
 
+#include <psg/arkos.h>
+#include <psg/wyz.h>
+#include <psg/vt2.h>
+
 int main()
 {
    char buf[10];
@@ -49,6 +53,15 @@ int main()
    {
      char *d = joystick_type[0];
    }
+#endif
+#ifdef __HAVE_PSG_AY_ARKOS
+   ply_akg_play();
+#endif
+#ifdef __HAVE_PSG_AY_WYZ
+   ay_wyz_play();
+#endif
+#ifdef __HAVE_PSG_AY_VT2
+   ay_vt2_play();
 #endif
 }
 

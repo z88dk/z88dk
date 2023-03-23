@@ -35,7 +35,7 @@ ENDIF
 start:
     di
     INCLUDE "crt/classic/crt_init_sp.asm"
-    ei
+    ;; interrupts are enabled later some ROM routines disable them
 
 ; port fixing; required for ROMs
 ; port fixing = set the memory configuration, must be first!
@@ -62,7 +62,10 @@ start:
     or      c           ;Finaly form slot address
     ld      h,$80
     call    $0024       ;enable page 2
+                        ;beware: this call returns with ints disabled!
 
+    ;; reenable interrupts
+    ei
 
     INCLUDE	"crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss

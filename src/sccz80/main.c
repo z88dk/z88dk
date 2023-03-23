@@ -791,9 +791,16 @@ void openin()
             fprintf(stderr, "Can't open: %s\n", Filename);
             exit(1);
         } else {
+            unsigned char bombuf[4];
+            unsigned char utf8bom[] = { 0xef, 0xbb, 0xbf };
             if (c_verbose)
                 fprintf(stderr, "Compiling: %s\n", Filename);
             ncomp++;
+            fread(bombuf, sizeof(char), 3, input);
+            if ( memcmp(bombuf, utf8bom, 3) ) {
+                rewind(input);
+            }
+            
             newfile();
         }
     }
@@ -970,7 +977,7 @@ void atexit_deallocate()
     FREENULL(glbq);
     FREENULL(loctab);
     FREENULL(wqueue);
-    FREENULL(swnext);
+//    FREENULL(swnext);
     FREENULL(stage);
     FREENULL(gotoq);
 }

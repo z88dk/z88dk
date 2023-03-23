@@ -14,6 +14,7 @@ include(__link__.m4)
 #define __stdc
 #define __z88dk_deprecated
 #define __z88dk_sdccdecl
+#define __z88dk_saveframe
 
 // Make intellisense run easier..
 #ifdef __clang__

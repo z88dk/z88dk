@@ -6,7 +6,7 @@
 ;        $Id: bkrestore.asm $
 ;
 
-        SECTION smc_clib
+        SECTION smc_video_vdp
         
         PUBLIC  bkrestore
         PUBLIC  _bkrestore

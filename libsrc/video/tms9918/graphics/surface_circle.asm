@@ -17,7 +17,7 @@
 ;	$Id: surface_circle.asm,v 1.5 2016-07-14 17:44:17 pauloscustodio Exp $
 ;
 
-		SECTION	code_clib
+		SECTION	code_video_vdp
                 PUBLIC    surface_circle
                 PUBLIC    _surface_circle
                 

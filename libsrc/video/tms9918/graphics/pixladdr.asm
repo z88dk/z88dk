@@ -1,6 +1,6 @@
 
         MODULE  __tms9918_pixeladdress
-	SECTION	code_clib
+	SECTION	code_video_vdp
 	PUBLIC	__tms9918_pixeladdress
 	PUBLIC	__tms9918_pix_return
 
@@ -130,7 +130,7 @@ ENDIF
         pop      bc
         ret
 
-	SECTION bss_clib
+	SECTION bss_video_vdp
 	PUBLIC	__tms9918_pixelbyte
 
 .__tms9918_pixelbyte

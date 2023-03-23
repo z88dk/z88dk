@@ -93,7 +93,7 @@ static void cmd_printchar(void)
 {
     if ( l == '\n' || l == '\r' ) {
         fputc('\n',stdout);
-    } else if ( l == 8 || l == 127 ) {
+    } else if ( l == 8 ) {
         // VT100 code, understood by all terminals, honest
         printf("%c[1D",27);
     } else {

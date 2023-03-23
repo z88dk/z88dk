@@ -25,11 +25,10 @@ Contact the author:
 
 
 #include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <lib3d.h>
-#include <msx/line.h>
-
+#include <video/tms99x8.h>
 
 #pragma printf %s
 
@@ -144,14 +143,14 @@ void main() {
 	create_lookup_tables();
 
 	// set screen to graphic mode
-	set_color(15, 1, 1);
-	set_mode(mode_2);
-	fill(MODE2_ATTR, 0xF1, MODE2_MAX);
+	vdp_color(15, 1, 1);
+	vdp_set_mode(mode_2);
+	vdp_vfill(MODE2_ATTR, 0xF1, MODE2_MAX);
 
 	//surface_line(&screen, 0, 0, 0, 0); // FIXME: won't compile without this crap
 
-	while (!get_trigger(0)) {
-		if (get_stick(0) == 1)
+	while (!getk() != 'q' ) {
+		if (getk() == ' ')
 			flat = !flat;
 
 		// rotate a bit
@@ -172,14 +171,14 @@ void main() {
 			object_render_wireframe(&screen, &triangle, pbuffer);
 
 		// show the off-screen buffer
-		//vwrite(screen.data.ram, 0, MODE2_MAX); // [*]
-		msx_vwrite_direct(screen.data.ram, 0, MODE2_MAX);
+		//vdp_vwrite(screen.data.ram, 0, MODE2_MAX); // [*]
+		vdp_vwrite_direct(screen.data.ram, 0, MODE2_MAX);
 
 		// [*] FIXME: there will be better ways of doing this (soon)
 	}
 
 	// go back to text mode
-	set_mode(mode_0);
+	vdp_set_mode(mode_0);
 
 	// deallocate stuff
 

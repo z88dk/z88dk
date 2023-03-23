@@ -2,6 +2,8 @@
 // zcc +sam main.c sham.mus.asm effects.asm -create-app
 // zcc +nabu main.c effects.asm sham.mus.asm -create-app
 // zcc +msx main.c effects.asm sham.mus.asm -create-app
+// zcc +cpc main.c effects.asm sham.mus.asm -create-app
+// zcc +cpm -subtype=einstein main.c effects.asm sham.mus.asm -create-app
 // etc etc
 //
 #include <stdio.h>
@@ -26,7 +28,7 @@
 #include <stdlib.h>
 
 
-#if __PC6001__ | __MULTI8__ | __LM80C__  
+#if __PC6001__ | __MULTI8__ | __LM80C__ | __EINSTEIN__
 #define NO_INTERRUPT 1
 #endif
 
@@ -89,7 +91,7 @@ void main()
 
    // Just loop
    while  ( 1 ) {
-      int k =getk();
+      int k = getk();
       if ( k != 0 ) printf("%c \n",k);
       switch ( k ) {
       case '0':
@@ -111,6 +113,11 @@ void main()
           ay_wyz_start(0);
           break;
       }
+#ifdef __CPC__
+      // Calling the firmwae too often disables our interrupt handler, so lets only
+      // do it once per frame
+      msleep(40);
+#endif
 #ifdef NO_INTERRUPT
        ay_wyz_play();
        msleep(40);

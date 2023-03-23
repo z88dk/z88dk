@@ -1,6 +1,6 @@
 
 
-        SECTION code_clib
+        SECTION code_video_vdp
 
         PUBLIC  ansi_del_line
         EXTERN  ansi_del_line_generic

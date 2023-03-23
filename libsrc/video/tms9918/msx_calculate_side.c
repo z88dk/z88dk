@@ -10,8 +10,7 @@
 	$Id: msx_calculate_side.c,v 1.3 2009-04-15 21:00:58 stefano Exp $
 */
 
-#include <msx.h>
-#include <msx/defs.h>
+#include <video/tms99x8.h>
 
 
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
