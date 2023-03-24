@@ -17,6 +17,7 @@
 	EXTERN	l_tms9918_disable_interrupts
 	EXTERN	l_tms9918_enable_interrupts
 	EXTERN	__tms9918_attribute
+        EXTERN  __tms9918_screen_mode
 
 	EXTERN  swapgfxbk
         EXTERN	__graphics_end
@@ -31,6 +32,12 @@
 
 .putsprite
 ._putsprite
+        ld      a,(__tms9918_screen_mode)
+        cp      2
+        jr      z,dorender
+        cp      4
+        ret     nz
+dorender:
 	push	ix		;save callers
         ld      hl,4
         add     hl,sp

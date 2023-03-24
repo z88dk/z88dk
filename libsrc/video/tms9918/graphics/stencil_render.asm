@@ -20,6 +20,7 @@
          EXTERN        dither_pattern
 
          EXTERN swapgfxbk
+         EXTERN __tms9918_screen_mode
          EXTERN __tms9918_pixeladdress
          EXTERN __tms9918_pixelbyte
          EXTERN	l_tms9918_disable_interrupts
@@ -35,6 +36,12 @@
 
 .stencil_render
 ._stencil_render
+       ld      a,(__tms9918_screen_mode)
+       cp      2
+       jr      z,dorender
+       cp      4
+       ret     nz
+dorender:
         push     ix        ;save callers
         ld       ix,4
         add      ix,sp

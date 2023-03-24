@@ -22,6 +22,9 @@
     PUBLIC  __tms9918_gfxw
     PUBLIC  __tms9918_gfxh
     PUBLIC  __tms9918_gencon_hook
+    PUBLIC  __tms9918_graphics_hook
+
+    EXTERN  l_ret
 
     INCLUDE       "video/tms9918/vdp.inc"
     
@@ -51,11 +54,13 @@ __tms9918_sprite_attribute:     defw    0
 
 __tms9918_gfxw:     defb    0
 __tms9918_gfxh:     defb    0
-__tms9918_gencon_hook:    defw    0           ;Hook for setting the mode for gencon as necessary
 
     SECTION		data_video_vdp
 
 __tms9918_attribute:	defb	$f1	;white on black
 __tms9918_border:	defb	$01	;black border
+__tms9918_gencon_hook:  defw    l_ret       ;Hook for setting the mode for gencon as necessary
+__tms9918_graphics_hook:defw    l_ret     ;Hook for setting the mode for graphics as necessary
 
 	
+
