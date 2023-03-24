@@ -90,6 +90,14 @@ int ldir_skel2[]={11, 17, CATCH, CATCH, 33, SKIP, SKIP, 1, SKIP, SKIP, 0xED, 0xB
 
 
 
+/***************/
+/* Sanyo BASIC */
+/***************/
+
+int sbasic_skel[]={11, CATCH, 0, 'U', 'N', 'P', 'A', 'C', 'K', '$', 0xC2, 0};
+
+
+
 /***************************/
 /* 'OMEGASOFT' SHARP BASIC */
 /***************************/
@@ -1438,7 +1446,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(tmpstr_skel);
 		if (res>0)
-			dlbl("TMPSTR", res, "Temporary string");
+			dlbl("TMPSTR", res, "aka DSCTMP, temporary string");
 
 		res=find_skel(curpos_skel);
 		if (res<0)
@@ -1466,7 +1474,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(varend_skel2);
 		if (res>0)
-			dlbl("ARYTAB", res, "End of variables, begin of array aariables (a.k.a. VAREND)");
+			dlbl("ARYTAB", res, "End of variables, begin of array variables (a.k.a. VAREND)");
 
 		res=find_skel(arrend_skel);
 		if (res<0)
@@ -4122,6 +4130,17 @@ int main(int argc, char *argv[])
 			printf("#  'SHARP' signature found\n\n");
 		else
 			printf("#  'SHARP' signature not present\n\n");
+	}
+
+
+	/*************************************************/
+	/* OMEGASOFT BASIC (standard on early MZ models) */
+	/*************************************************/
+
+	res=find_skel(sbasic_skel);
+	if (res>0) {
+		printf("\n# Sanyo BASIC found\n");
+
 	}
 
 
