@@ -4133,9 +4133,9 @@ int main(int argc, char *argv[])
 	}
 
 
-	/*************************************************/
-	/* OMEGASOFT BASIC (standard on early MZ models) */
-	/*************************************************/
+	/*****************************************/
+	/* Sanyo BASIC (on CP/M MBC-xxxx models) */
+	/*****************************************/
 
 	res=find_skel(sbasic_skel);
 	if (res>0) {
