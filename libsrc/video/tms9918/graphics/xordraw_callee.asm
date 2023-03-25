@@ -10,7 +10,7 @@
 
 
     EXTERN  __tms9918_screen_mode
-    EXTERN  __v9938_xordraw_line
+    EXTERN  __v9938_xordraw
 
     EXTERN  Line
     EXTERN  xorpixel
@@ -31,7 +31,7 @@
 IFDEF V9938
     ld      a,(__tms9918_screen_mode)
     cp      5
-    jp      z,__v9938_xordraw_line
+    jp      z,__v9938_xordraw
 ENDIF
     push    ix
     push    hl

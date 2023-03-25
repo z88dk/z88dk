@@ -6,45 +6,11 @@ INCLUDE "video/tms9918/vdp.inc"
 IFDEF V9938
 
 PUBLIC  __v9938_draw_line
-PUBLIC  __v9938_undraw_line
-PUBLIC  __v9938_xordraw_line
 
 EXTERN  l_tms9918_disable_interrupts
 EXTERN  l_tms9918_enable_interrupts
-EXTERN  __tms9918_attribute
 EXTERN  __v9938_wait_vdp
 EXTERN  __gfx_coords
-
-
-__v9938_undraw_line:
-    ld      a,(__tms9918_attribute)
-    and     15
-    ld      b,a
-    ld      a,V9938_LOGIC_SET
-    jr      LINE
-
-__v9938_xordraw_line:
-    ld      a,(__tms9918_attribute)
-    rrca
-    rrca
-    rrca
-    rrca
-    and     15
-    ld      b,a
-    ld      a,V9938_LOGIC_XOR
-    jr      LINE
-
-
-; x0 = h, y0 =l, x1 = d, y1 =e
-__v9938_draw_line:
-    ld      a,(__tms9918_attribute)
-    rrca
-    rrca
-    rrca
-    rrca
-    and     15
-    ld      b,a
-    ld      a,V9938_LOGIC_SET
 
 
 ;****************************************************************
@@ -55,7 +21,7 @@ __v9938_draw_line:
 ;
 ;----- program start -----
 
-LINE:   
+__v9938_draw_line:   
     ld      (__gfx_coords),de
     ld      c,a
     call    l_tms9918_disable_interrupts

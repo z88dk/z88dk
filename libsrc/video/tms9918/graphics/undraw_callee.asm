@@ -10,7 +10,7 @@
 
 
     EXTERN  __tms9918_screen_mode
-    EXTERN  __v9938_undraw_line
+    EXTERN  __v9938_undraw
 
     EXTERN  Line
     EXTERN  respixel
@@ -31,7 +31,7 @@
 IFDEF V9938
     ld      a,(__tms9918_screen_mode)
     cp      5
-    jp      z,__v9938_undraw_line
+    jp      z,__v9938_undraw
 ENDIF
     push    ix
     push    hl
