@@ -39,6 +39,9 @@ IF FORmsx2
 	defc VDP_DATAIN  = $98
 	defc VDP_CMD     = $99
 	defc VDP_STATUS  = $99
+    ; Additional ports for V9938
+	defc VDP_PORT2   = $9a
+	defc VDP_PORT3   = $9b
 	defc VRAM_SIZE   = 64		; extended are able to get the right size
 	defc VDP_EXPORT_DIRECT = 1
 	defc VDP_EXPORT_GFX_DIRECT = 1
@@ -164,3 +167,27 @@ IF FORnabu
 	defc VDP_EXPORT_DIRECT = 1
 	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
+
+; Macro to help writing to ports
+; If port >= 256 we expect bc to hold the port
+MACRO VDPOUT PORT
+IF PORT < 0
+    ld      (-PORT),a
+ELIF PORT < 256
+    out     (PORT),a
+ELSE
+    out     (c),a
+ENDIF
+ENDM
+
+; Macro to help reading from ports
+; If port >= 256 we expect bc to hold the port
+MACRO VDPIN PORT
+IF PORT < 0
+    ld      a,(-PORT)
+ELIF PORT < 256
+    in      a,(PORT)
+ELSE
+    in      a,(c)
+ENDIF
+ENDM

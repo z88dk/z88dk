@@ -4,11 +4,14 @@
 
 SECTION code_video_vdp
 
+INCLUDE  "video/tms9918/vdp.inc"
+
+IFDEF V9938
+
 PUBLIC  __vdp_mode5
 PUBLIC  __tms9918_mode5_cls
 
 
-INCLUDE  "video/tms9918/vdp.inc"
 
 
 ; VDP map definitions
@@ -43,7 +46,7 @@ SECTION rodata_video_vdp
 
 ; Table adderesses
 mode5_addresses:
-    defb     32      ;columsn
+    defb     32      ;columns
     defb     24      ;rows
     defb     256-1   ;Graphics w
     defb     192-1   ;Graphic h
@@ -103,3 +106,4 @@ __tms9918_mode5_cls:
     jp      FILVRM
 
 
+ENDIF

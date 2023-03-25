@@ -20,43 +20,33 @@ VDPreg_Write:
     push  hl
     ld    d,a
     call  l_tms9918_disable_interrupts
-IF VDP_CMD < 0
-    ld    a,d
-    ld    (-VDP_CMD),a
-ELIF VDP_CMD < 256
-    ld    a,d
-    out   (VDP_CMD),a
-ELSE
-    ld    bc,VDP_CMD
-    out   (c),d
-ENDIF
-    ld    a,e
-    or    $80        ; enable bit for "set register" command
-IF VDP_CMD < 0
-    ld    (-VDP_CMD),a
-ELIF VDP_CMD < 256
-    out   (VDP_CMD),a
-ELSE
-    out   (c),a
+IF VDP_CMD >= 256
+    ld      bc,VDP_CMD
 ENDIF
 
+    ld      a,d
+    VDPOUT(VDP_CMD)
+    ld      a,e
+    or      $80        ; enable bit for "set register" command
+    VDPOUT(VDP_CMD)
+
 IFDEF V9938
-    ld    a,e
-    cp    24
-    jr    nc,dont_store
+    ld      a,e
+    cp      24
+    jr      nc,dont_store
 ELSE
-    ld    a,e
-    cp    8
-    jr    nc,dont_store
+    ld      a,e
+    cp      8
+    jr      nc,dont_store
 ENDIF
-    ld    a,d
-    ld    hl,RG0SAV
-    ld    d,0
-    add   hl,de
-    ld    (hl),a
+    ld      a,d
+    ld      hl,RG0SAV
+    ld      d,0
+    add     hl,de
+    ld      (hl),a
 dont_store:
-    inc   e
-    call  l_tms9918_enable_interrupts
-    pop   hl
+    inc     e
+    call    l_tms9918_enable_interrupts
+    pop     hl
     ret
 

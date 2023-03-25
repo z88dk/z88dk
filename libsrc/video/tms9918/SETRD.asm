@@ -23,41 +23,23 @@
 .SETRD
 ._SETRD
     call    l_tms9918_disable_interrupts
+IF VDP_CMD >= 256
+    ld      bc,VDP_CMD
+ENDIF
 IFDEF V9938
     ; High bit of address (bits 14,15,16)
     ld      a,h
     rlca
     rlca
     and     3           ;Ignoring bit 16
-  IF VDP_DATA < 0
-    ld      (-VDP_CMD),a
+    VDPOUT(VDP_CMD)
     ld      a,14 + 0x80
-    ld      (-VDP_CMD),a
-  ELIF VDP_DATA < 256
-    out     (VDP_CMD),a
-    ld      a,14 + 0x80
-    out     (VDP_CMD),a
-  ELSE
-     ; TODO V9938 on SPC-1000 etc
-  ENDIF
+    VDPOUT(VDP_CMD)
 ENDIF
     ld      a,l
-IF VDP_CMD < 0
-    ld      (-VDP_CMD),a
-ELIF VDP_CMD < 256
-    out     (VDP_CMD),a
-ELSE
-    ld      bc,VDP_CMD
-    out     (c),a
-ENDIF
+    VDPOUT(VDP_CMD)
     ld      a,h
     and     $3F
-IF VDP_CMD < 0
-    ld      (-VDP_CMD),a
-ELIF VDP_CMD < 256
-    out     (VDP_CMD),a
-ELSE
-    out     (c),a
-ENDIF
+    VDPOUT(VDP_CMD)
     call    l_tms9918_enable_interrupts
     ret

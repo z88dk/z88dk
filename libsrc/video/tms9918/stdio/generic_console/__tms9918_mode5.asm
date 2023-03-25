@@ -1,8 +1,12 @@
 ; This file is not universal - we use 8 bit IO
 SECTION code_video_vdp
 
+INCLUDE "video/tms9918/vdp.inc"
+
+IFDEF V9938
 
 PUBLIC __tms9918_mode5_printc
+PUBLIC __tms9918_mode5_scroll
 
 EXTERN  generic_console_font32
 EXTERN  generic_console_udg32
@@ -20,7 +24,6 @@ EXTERN  FILVRM
 EXTERN  LDIRVM
 EXTERN  SETWRT
 
-INCLUDE "video/tms9918/vdp.inc"
 
 
 ; p0 p0 p0 p0 p1 p1 p1 p1
@@ -141,3 +144,99 @@ xypos:
     sla     c       ;4 bytes needed for a character
     ld      l,c
     ret
+
+
+__tms9918_mode5_scroll:
+    ld      bc,0        ;To coordinate 0,0
+    ld      l,8
+    ld      e,192
+    ld      d,2
+    call    ymmm
+    ; Blank out the bottom line of the screen
+    ld      hl,(__tms9918_pattern_name)
+    ld      de,23*1024
+    add     hl,de
+    ld      a,(__tms9918_4bpp_attr+1)
+    ld      e,a
+    rrca
+    rrca
+    rrca
+    rrca
+    or      e
+    ld      a,$85
+    ld      bc,1024
+    jp      FILVRM
+    
+;****************************************************************
+;  List 4.9   YMMM sample
+;               to use, set L, E, B, C, D(bit 2) and go
+;               VRAM (B,l)-(*,e) ⟶ VRAM (B,C)
+;               DIX must be set in D(bit 2)
+;****************************************************************
+;
+ymmm:   
+    call    l_tms9918_disable_interrupts
+    push    bc
+    call    wait_vdp
+    ld      a,34
+    VDPOUT(VDP_CMD)
+    ld      a,17+$80
+    VDPOUT(VDP_CMD)     ;Set R#17 = 34 (so writes go there?)
+
+    ld      bc,VDP_PORT3        ;sx
+    out     (c),l
+    xor     a
+    out     (c),a
+
+    ld      a,l                     ;make NY and DIY
+    sub     e
+    ld      e,00001000B
+    jp      nc,YMMM1
+    ld      e,00000000B
+    neg
+YMMM1:  
+    ld      l,a                     ;L := NY , D := DIY
+
+    ld      a,d
+    or      e
+
+    pop     de                      ;restore DX,dY
+    push    af                      ;save DIX,dIY
+    xor     a
+    out     (c),d                   ;DX
+    out     (c),a
+    out     (c),e                   ;DY
+    out     (c),a
+    out     (c),a                   ;dummy
+    out     (c),a                   ;dummy
+    out     (c),l                   ;NY
+    out     (c),a
+    out     (c),a                   ;dummy
+    pop     af
+    out     (c),a                   ;DIX and DIY
+    ld      a,11100000B             ;YMMM command
+    out     (c),a
+    call    wait_vdp
+    call    l_tms9918_enable_interrupts
+    ret
+
+
+get_status:
+    push    bc
+    out     (VDP_CMD),a
+    ld      a,$8f           ;Set r5 so status register reads what we want
+    out     (VDP_CMD),a
+    in      a,(VDP_STATUS)
+    pop     bc
+    ret
+
+wait_vdp:
+    ld      a,2
+    call    get_status
+    and     1
+    jp      nz,wait_vdp
+    xor     a               ;Restore the status back to usual
+    call    get_status
+    ret
+
+ENDIF

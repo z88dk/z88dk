@@ -46,7 +46,7 @@ spec_mode3:
 
 ; Table adderesses
 mode3_addresses:
-    defb     32      ;columsn
+    defb     32      ;columns
     defb     24      ;rows
     defb     64-1    ;Graphics w
     defb     48-1    ;Graphic h
@@ -92,7 +92,7 @@ __vdp_mode3:
     call    l_tms9918_disable_interrupts
     ld      hl,(__tms9918_pattern_name)
     call    SETWRT
-IF VDP_DATA >= 0
+IF VDP_DATA >= 256
     ld      bc,VDP_DATA
     exx
 ENDIF
@@ -103,8 +103,8 @@ inimlt1:
     ld      a,d
     ld      b,$20
 inimlt2:
-IF VDP_DATA < 0
-    ld      (-VDP_DATA),a
+IF VDP_DATA < 256
+    VDPOUT(VDP_DATA)
 ELSE
     exx
     out     (c),a

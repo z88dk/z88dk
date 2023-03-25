@@ -45,7 +45,7 @@ SECTION rodata_video_vdp
 
 ; Table adderesses
 mode4_addresses:
-    defb     32      ;columsn
+    defb     32      ;columns
     defb     24      ;rows
     defb     256-1   ;Graphics w
     defb     192-1   ;Graphic h

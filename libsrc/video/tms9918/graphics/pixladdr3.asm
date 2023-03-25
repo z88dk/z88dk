@@ -47,26 +47,24 @@
 
 ;-------
     call    l_tms9918_disable_interrupts
-IF VDP_CMD < 0
-    ld      a,l
-    ld      (-VDP_CMD),a
-    ld      a,h		;4
-    and     @00111111	;7
-    ld      (-VDP_CMD),a
-    push    bc
-    pop     bc
-    ld      a,(-VDP_DATAIN)
-ELSE
+IF VDP_CMD >= 256
     push    bc
     ld      bc,VDP_CMD
-    out     (c), l          ; LSB of video memory ptr
-    ld      a,h		; MSB of video mem ptr
-    and     @00111111	; masked with "read command" bits
-    out     (c), a
-    ld      bc,VDP_DATAIN
+ENDIF
+
+    ld      a,l
+    VDPOUT(VDP_CMD)
+    ld      a,h		;4
+    and     @00111111	;7
+    VDPOUT(VDP_CMD)
     push    bc
     pop     bc
-    in      a,(c)
+
+IF VDP_DATAIN >= 256
+    ld      bc,VDP_DATAIN
+ENDIF
+    VDPIN(VDP_DATAIN)
+IF VDP_CMD >= 256
     pop     bc
 ENDIF
     ex      de,hl           ;de = VDP address
@@ -80,30 +78,24 @@ ENDIF
 .__tms9918_pix_return3
     ld       (hl),a	; hl points to "__tms9918_pixelbyte3"
     call    l_tms9918_disable_interrupts
-IF VDP_CMD < 0
+
+IF VDP_CMD >= 256
+    ld      bc,VDP_CMD
+ENDIF
+
     ld      a,e
-    ld      (-VDP_CMD),a
+    VDPOUT(VDP_CMD)
     ld      a,d
     and     @00111111
     or      @01000000
-    ld      (-VDP_CMD),a
+    VDPOUT(VDP_CMD)
     ld      a,(__tms9918_pixelbyte3)
     push    bc
     pop     bc
-    ld      (-VDP_DATA),a
-ELSE
-    ld      bc,VDP_CMD
-    out     (c),e
-    ld      a,d		; MSB of video mem ptr
-    and     @00111111	; masked with "write command" bits
-    or      @01000000
-    out     (c),a
-    ld      a,(__tms9918_pixelbyte3) ; Can it be optimized ? what about VDP timing ?
+IF VDP_DATA >= 256
     ld      bc,VDP_DATA
-    push    bc
-    pop     bc
-    out     (c),a
 ENDIF
+    VDPOUT(VDP_DATA)
     call    l_tms9918_enable_interrupts
     pop      bc
     ret
