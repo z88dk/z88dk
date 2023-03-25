@@ -11,6 +11,7 @@ EXTERN  __vdp_mode1
 EXTERN  __vdp_mode2
 EXTERN  __vdp_mode3
 EXTERN  __vdp_mode4
+EXTERN  __vdp_mode5
 EXTERN  vdp_set_mangled_mode
 
 INCLUDE "video/tms9918/vdp.inc"
@@ -53,6 +54,8 @@ ENDIF
 IFDEF V9938
     defb    4
     defw    __vdp_mode4
+    defb    5
+    defw    __vdp_mode5
 ENDIF
     defb    81
     defw    vdp_set_mangled_mode

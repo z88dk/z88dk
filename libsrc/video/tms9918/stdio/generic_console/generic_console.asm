@@ -9,6 +9,8 @@
     PUBLIC  __tms9918_set_ink
     PUBLIC  __tms9918_set_paper
     PUBLIC  __tms9918_set_attribute
+    EXTERN  __tms9918_2bpp_attr
+    EXTERN  __tms9918_4bpp_attr
 
     EXTERN  __tms9918_spec_funcs
     EXTERN  __tms9918_spec_funcs_end
@@ -24,6 +26,7 @@
     EXTERN  __vdp_mode2_term
     EXTERN  __vdp_mode3_term
     EXTERN  __vdp_mode4_term
+    EXTERN  __vdp_mode5_term
     EXTERN  __vdp_mode1_2_term
     
 
@@ -63,6 +66,20 @@ __tms9918_set_attribute:
     ret
 
 __tms9918_set_ink:
+IFDEF V9938
+    ld      c,a     ;Save it for a moment
+    rrca
+    rrca
+    rrca
+    rrca
+    and     0xf0
+    ld      (__tms9918_4bpp_attr+0),a
+    rlca
+    rlca
+    and     @11000000
+    ld      (__tms9918_2bpp_attr+0),a
+    ld      a,c
+ENDIF
     call    __tms9918_map_colour
     rla
     rla
@@ -80,6 +97,20 @@ set_attr:
     ret
 
 __tms9918_set_paper:
+IFDEF V9938
+    ld      c,a     ;Save it for a moment
+    rrca
+    rrca
+    rrca
+    rrca
+    and     0xf0
+    ld      (__tms9918_4bpp_attr+1),a
+    rlca
+    rlca
+    and     @11000000
+    ld      (__tms9918_2bpp_attr+1),a
+    ld      a,c
+ENDIF
     call    __tms9918_map_colour
     and     15
     ld      b,0xf0
@@ -148,6 +179,8 @@ ENDIF
 IFDEF V9938
     defb    4
     defw    __vdp_mode4_term
+    defb    5
+    defw    __vdp_mode5_term
 ENDIF
     defb    81
     defw    __vdp_mode1_2_term

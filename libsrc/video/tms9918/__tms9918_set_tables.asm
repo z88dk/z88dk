@@ -125,8 +125,8 @@ ENDIF
     srl     a
     srl     a
     srl     a
-    and     @00000111
-    call    VDPreg_Write        ;Register 5 - sprite generator
+    and     @00011111           ;Ignoring bit 16
+    call    VDPreg_Write        ;Register 6 - sprite generator
 
     ;; And any extra registers afterwards
 reg_loop:

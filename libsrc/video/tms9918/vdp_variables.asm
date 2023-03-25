@@ -58,6 +58,16 @@ __tms9918_gfxh:     defb    0
     SECTION		data_video_vdp
 
 __tms9918_attribute:	defb	$f1	;white on black
+IFDEF V9938
+    PUBLIC  __tms9918_2bpp_attr
+    PUBLIC  __tms9918_4bpp_attr
+
+__tms9918_2bpp_attr:
+    defb    @11000000, @00000000        ;ink = pen3, paper = pen0
+
+__tms9918_4bpp_attr:
+    defb    @11110000, @00000000        ;ink = pen15, paper = pen0
+ENDIF
 __tms9918_border:	defb	$01	;black border
 __tms9918_gencon_hook:  defw    l_ret       ;Hook for setting the mode for gencon as necessary
 __tms9918_graphics_hook:defw    l_ret     ;Hook for setting the mode for graphics as necessary

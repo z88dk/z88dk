@@ -24,7 +24,7 @@ EXTERN  __tms9918_set_font
 EXTERN  __tms9918_clear_vram
 EXTERN  __tms9918_attribute
 EXTERN  __tms9918_border
-EXTERN  __tms9918_CAPS_MODE2
+EXTERN  __tms9918_CAPS_MODE4
 EXTERN  __tms9918_set_tables  
 
 EXTERN  __tms9918_colour_table
@@ -50,7 +50,7 @@ mode4_addresses:
     defb     256-1   ;Graphics w
     defb     192-1   ;Graphic h
     defb     2       ;Sprite mode
-    defb     __tms9918_CAPS_MODE2  ; Console capabilities
+    defb     __tms9918_CAPS_MODE4  ; Console capabilities
 
     defb    4         ;register 0:   0     DG IE2  IE1 M5 M4 M2 EXTVID
     defb    $60       ;register 1:   4/16K BL GINT M1  M3 -  SI MAG
