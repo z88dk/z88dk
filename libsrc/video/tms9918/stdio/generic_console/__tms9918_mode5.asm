@@ -18,6 +18,7 @@ EXTERN  __tms9918_attribute
 EXTERN  __tms9918_scroll_buffer
 EXTERN  FILVRM
 EXTERN  LDIRVM
+EXTERN  SETWRT
 
 INCLUDE "video/tms9918/vdp.inc"
 
@@ -74,7 +75,7 @@ printc_mode5_not_bold:
     exx
 
     ex      af,af
-    call    vmem_set_address
+    call    SETWRT
 
     ld      a,4
     ld      de,(__tms9918_4bpp_attr)    ;e = ink, d = paper
@@ -101,7 +102,13 @@ printc_mode5_is_paper2:
     and     0x0f
     or      c
 
+IF VDP_DATA < 0
+    ld      (-VDP_DATA),a
+ELIF VDP_DATA < 256
     out     (VDP_DATA),a
+ELSE
+    ;; TODO
+ENDIF
 
     ld      a,b
     ex      af,af
@@ -111,28 +118,6 @@ printc_mode5_is_paper2:
     add     hl,de
     pop     bc
     djnz    printc_mode5_1
-    ret
-
-; hl = address
-;  a = value
-vmem_set_address:
-    call    l_tms9918_disable_interrupts
-    ; High bit of address (bits 14,15,16)
-    ld      a,h
-    rlca
-    rlca
-    and     3           ;Ignoring bit 16
-    out     (VDP_CMD),a
-    ld      a,14 + 0x80
-    out     (VDP_CMD),a
-
-    ld      a,l
-    out     (VDP_CMD),a           ;LSB of video memory ptr
-    ld      a,h		; MSB of video mem ptr
-    and     @00111111	; masked with "write command" bits
-    or      @00000000
-    out     (VDP_CMD),a
-    call    l_tms9918_enable_interrupts
     ret
 
 
@@ -147,9 +132,9 @@ xypos:
     ld      a,b
     add     a
     add     a       ;*4
-    ; ld      h,a
-    ; ld      a,(__tms9918_pattern_name+1)
-    ; add     h
+    ld      h,a
+    ld      a,(__tms9918_pattern_name+1)
+    add     h
     ld      h,a     ;Row * 1024 + screen base
     ; Now, how many bytes per character?
     sla     c
