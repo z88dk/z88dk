@@ -5,8 +5,8 @@ INCLUDE "video/tms9918/vdp.inc"
 
 IFDEF V9938
 
-PUBLIC __tms9918_mode5_printc
-PUBLIC __tms9918_mode5_scroll
+PUBLIC __v9938_mode5_printc
+PUBLIC __v9938_mode5_scroll
 
 EXTERN  generic_console_font32
 EXTERN  generic_console_udg32
@@ -20,6 +20,10 @@ EXTERN  __tms9918_4bpp_attr
 
 EXTERN  __tms9918_attribute
 EXTERN  __tms9918_scroll_buffer
+
+EXTERN  __v9938_wait_vdp
+
+
 EXTERN  FILVRM
 EXTERN  LDIRVM
 EXTERN  SETWRT
@@ -27,7 +31,7 @@ EXTERN  SETWRT
 
 
 ; p0 p0 p0 p0 p1 p1 p1 p1
-__tms9918_mode5_printc:
+__v9938_mode5_printc:
     ld      a,d         ;save character
     exx
     ld      bc,(generic_console_font32)
@@ -146,7 +150,7 @@ xypos:
     ret
 
 
-__tms9918_mode5_scroll:
+__v9938_mode5_scroll:
     ld      bc,0        ;To coordinate 0,0
     ld      l,8
     ld      e,192
@@ -177,7 +181,7 @@ __tms9918_mode5_scroll:
 ymmm:   
     call    l_tms9918_disable_interrupts
     push    bc
-    call    wait_vdp
+    call    __v9938_wait_vdp
     ld      a,34
     VDPOUT(VDP_CMD)
     ld      a,17+$80
@@ -216,27 +220,8 @@ YMMM1:
     out     (c),a                   ;DIX and DIY
     ld      a,11100000B             ;YMMM command
     out     (c),a
-    call    wait_vdp
+    call    __v9938_wait_vdp
     call    l_tms9918_enable_interrupts
-    ret
-
-
-get_status:
-    push    bc
-    out     (VDP_CMD),a
-    ld      a,$8f           ;Set r5 so status register reads what we want
-    out     (VDP_CMD),a
-    in      a,(VDP_STATUS)
-    pop     bc
-    ret
-
-wait_vdp:
-    ld      a,2
-    call    get_status
-    and     1
-    jp      nz,wait_vdp
-    xor     a               ;Restore the status back to usual
-    call    get_status
     ret
 
 ENDIF

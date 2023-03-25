@@ -9,7 +9,7 @@ INCLUDE  "video/tms9918/vdp.inc"
 IFDEF V9938
 
 PUBLIC  __vdp_mode5
-PUBLIC  __tms9918_mode5_cls
+PUBLIC  __v9938_mode5_cls
 
 
 
@@ -89,7 +89,7 @@ __vdp_mode5:
     call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
 
 
-__tms9918_mode5_cls:
+__v9938_mode5_cls:
     ; Clear VRAM screen
     ld      bc,+((256 * 192) / 2)
 

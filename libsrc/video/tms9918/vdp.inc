@@ -191,3 +191,9 @@ ELSE
     in      a,(c)
 ENDIF
 ENDM
+
+
+; Logic operations for the V9938
+
+defc V9938_LOGIC_SET = 0
+defc V9938_LOGIC_XOR = 0011b
