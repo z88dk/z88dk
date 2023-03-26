@@ -32,7 +32,7 @@ parts:
     override-build: |
       cpanm -n -L $SNAPCRAFT_PART_INSTALL Path::Tiny App::Prove Capture::Tiny CPU::Z80::Assembler Data::Dump Data::HexDump File::Path List::Uniq Modern::Perl Object::Tiny::RW Regexp::Common Test::Harness Text::Diff Text::Table YAML::Tiny
       ./build.sh -t -z -i $SNAP
-      make DESTDIR=$SNAPCRAFT_PART_INSTALL install
+      make DESTDIR=$SNAPCRAFT_PART_INSTALL PREFIX= install
     build-packages:
       - cpanminus
       - build-essential
