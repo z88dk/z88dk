@@ -26,9 +26,11 @@ EXTERN l_tms9918_enable_interrupts
 
 
 __v9938_pset:
-    push    af
+    ld      c,a
     call    l_tms9918_disable_interrupts
     call    __v9938_wait_vdp
+    ld      a,c
+    push    af
 
     ld      a,36
     out     (VDP_CMD),a
