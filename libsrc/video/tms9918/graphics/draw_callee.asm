@@ -10,7 +10,8 @@
 
 
     EXTERN  __tms9918_screen_mode
-    EXTERN  __v9938_draw
+    EXTERN  __v9938_4bpp_draw
+    EXTERN  __v9938_8bpp_draw
 
     EXTERN  Line
     EXTERN  plotpixel
@@ -32,7 +33,9 @@
 IFDEF V9938
     ld      a,(__tms9918_screen_mode)
     cp      5
-    jp      z,__v9938_draw
+    jp      z,__v9938_4bpp_draw
+    cp      8
+    jp      z,__v9938_8bpp_draw
 ENDIF
     push    ix
     push    hl

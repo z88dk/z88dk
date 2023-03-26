@@ -26,7 +26,7 @@ defc    SPRITE_ATTRIBUTE  = $7600
 
 EXTERN  __tms9918_set_font
 EXTERN  __tms9918_clear_vram
-EXTERN  __tms9918_4bpp_attr
+EXTERN  __tms9918_attribute
 EXTERN  __tms9918_border
 EXTERN  __tms9918_CAPS_MODE5
 EXTERN  __tms9918_set_tables  
@@ -94,12 +94,13 @@ __v9938_mode5_cls:
     ld      bc,+((256 * 192) / 2)
 
     ; Get the background colour
-    ld      a,(__tms9918_4bpp_attr+1)
+    ld      a,(__tms9918_attribute)
+    and     @00001111
     ld      d,a
-    rrca
-    rrca
-    rrca
-    rrca
+    rlca
+    rlca
+    rlca
+    rlca
     and     @00001111
     or      d
     ld      hl,(__tms9918_pattern_name)

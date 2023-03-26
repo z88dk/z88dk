@@ -7,7 +7,8 @@
     
     PUBLIC  asm_drawr
 
-    EXTERN  __v9938_drawr
+    EXTERN  __v9938_4bpp_drawr
+    EXTERN  __v9938_8bpp_drawr
     EXTERN  __tms9918_screen_mode
     
     EXTERN  Line_r
@@ -26,7 +27,9 @@
 IFDEF V9938
     ld      a,(__tms9918_screen_mode)
     cp      5
-    jp      z,__v9938_drawr
+    jp      z,__v9938_4bpp_drawr
+    cp      8
+    jp      z,__v9938_4bpp_drawr
 ENDIF
     push    ix
     ld      ix,plotpixel

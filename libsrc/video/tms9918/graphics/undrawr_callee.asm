@@ -8,7 +8,8 @@
     PUBLIC  asm_undrawr
 
 
-    EXTERN  __v9938_undrawr
+    EXTERN  __v9938_4bpp_undrawr
+    EXTERN  __v9938_8bpp_undrawr
     EXTERN  __tms9918_screen_mode
     
     EXTERN  Line_r
@@ -27,7 +28,9 @@
 IFDEF V9938
     ld      a,(__tms9918_screen_mode)
     cp      5
-    jp      z,__v9938_undrawr
+    jp      z,__v9938_4bpp_undrawr
+    cp      8
+    jp      z,__v9938_8bpp_undrawr
 ENDIF
     push    ix
     ld      ix,respixel

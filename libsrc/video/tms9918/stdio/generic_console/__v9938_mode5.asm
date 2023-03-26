@@ -16,7 +16,7 @@ EXTERN  l_tms9918_disable_interrupts
 EXTERN  l_tms9918_enable_interrupts
 
 EXTERN  __tms9918_pattern_name
-EXTERN  __tms9918_4bpp_attr
+EXTERN  __tms9918_attribute
 
 EXTERN  __tms9918_attribute
 EXTERN  __tms9918_scroll_buffer
@@ -87,8 +87,15 @@ printc_mode5_not_bold:
     call    l_tms9918_disable_interrupts
     call    SETWRT
 
+    ld      a,(__tms9918_attribute)
+    ld      d,a
+    and     $f0
+    ld      e,a
+    ld      a,d
+    and     $0f
+    ld      d,a
+
     ld      a,4
-    ld      de,(__tms9918_4bpp_attr)    ;e = ink, d = paper
 
 printc_mode5_2:
     ex      af,af
@@ -144,7 +151,8 @@ __v9938_mode5_scroll:
     ld      hl,(__tms9918_pattern_name)
     ld      de,23*1024
     add     hl,de
-    ld      a,(__tms9918_4bpp_attr+1)
+    ld      a,(__tms9918_attribute)
+    and     $0f
     ld      e,a
     rrca
     rrca

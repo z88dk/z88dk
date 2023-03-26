@@ -33,7 +33,7 @@ __v9938_xor:
     rrca
     rrca
     and     $0f
-    ld      e,a
+    ld      b,a
     ld      a,V9938_LOGIC_XOR
     call    __v9938_pset
     pop     bc

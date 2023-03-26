@@ -1,6 +1,6 @@
-; V9938, mode6 = screen 5 = graphic 4
+; V9938, mode8 = screen 8 = graphic 7
 ;
-; 256x192 4bpp
+; 256x192 8bpp
 
 SECTION code_video_vdp
 
@@ -8,8 +8,8 @@ INCLUDE  "video/tms9918/vdp.inc"
 
 IFDEF V9938
 
-PUBLIC  __vdp_mode6
-PUBLIC  __v9938_mode6_cls
+PUBLIC  __vdp_mode8
+PUBLIC  __v9938_mode8_cls
 
 
 
@@ -19,16 +19,16 @@ defc    COLOUR_TABLE      = $0000       ;unused
 defc    PATTERN_NAME      = $0000       
 defc    PATTERN_GENERATOR = $0000       ;unused
 
-defc    SPRITE_GENERATOR  = $7a00
-defc    SPRITE_ATTRIBUTE  = $7600
+defc    SPRITE_GENERATOR  = $f000
+defc    SPRITE_ATTRIBUTE  = $fa00
 
 
 
 EXTERN  __tms9918_set_font
 EXTERN  __tms9918_clear_vram
-EXTERN  __tms9918_2bpp_attr
+EXTERN  __tms9918_8bpp_attr
 EXTERN  __tms9918_border
-EXTERN  __tms9918_CAPS_MODE6
+EXTERN  __tms9918_CAPS_MODE8
 EXTERN  __tms9918_set_tables  
 
 EXTERN  __tms9918_pattern_name
@@ -45,15 +45,15 @@ SECTION rodata_video_vdp
 
 
 ; Table adderesses
-mode6_addresses:
-    defb     64      ;columns
+mode8_addresses:
+    defb     32      ;columns
     defb     24      ;rows
-    defb     256-1   ;Graphics w  // HOHO
+    defb     256-1   ;Graphics w
     defb     192-1   ;Graphic h
     defb     2       ;Sprite mode
-    defb     __tms9918_CAPS_MODE6  ; Console capabilities
+    defb     __tms9918_CAPS_MODE8  ; Console capabilities
 
-    defb    8         ;register 0:   0     DG IE2  IE1 M5 M4 M2 EXTVID
+    defb    14         ;register 0:   0     DG IE2  IE1 M5 M4 M2 EXTVID
     defb    $60       ;register 1:   4/16K BL GINT M1  M3 -  SI MAG
     defw    PATTERN_NAME
     defb    +(((PATTERN_NAME >> 10) & 0x7F) | 0x1F) ;r2
@@ -74,12 +74,12 @@ SECTION code_video_vdp
 
 ; Initialises the display + returns terminal structure
 ; Entry: a = screenmode
-__vdp_mode6:
+__vdp_mode8:
     push    af
     call    __tms9918_clear_vram
     pop     af
 
-    ld      hl, mode6_addresses
+    ld      hl, mode8_addresses
     call    __tms9918_set_tables
 
     ; Set the screen colour
@@ -89,23 +89,12 @@ __vdp_mode6:
     call    VDPreg_Write    ; reg7  -  INK & PAPER-/BACKDROPCOL.
 
 
-__v9938_mode6_cls:
+__v9938_mode8_cls:
     ; Clear VRAM screen
-    ld      bc,+((256 * 192) / 2)
+    ld      bc,+((256 * 192))
 
     ; Get the background colour
-    ld      a,(__tms9918_2bpp_attr+1)
-    and     @11000000
-    ld      d,a
-    srl     d
-    srl     d
-    or      d
-    srl     d
-    srl     d
-    or      d
-    srl     d
-    srl     d
-    or      d
+    ld      a,(__tms9918_8bpp_attr+1)
     ld      hl,(__tms9918_pattern_name)
     jp      FILVRM
 

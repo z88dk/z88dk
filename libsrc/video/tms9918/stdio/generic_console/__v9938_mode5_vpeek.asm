@@ -13,7 +13,7 @@ EXTERN  __v9938_mode5_xypos
 EXTERN  l_tms9918_disable_interrupts
 EXTERN  l_tms9918_enable_interrupts
 EXTERN  __tms9918_vpeek_continue
-EXTERN  __tms9918_4bpp_attr
+EXTERN  __tms9918_attribute
 EXTERN  SETRD
 
 __v9938_mode5_vpeek:
@@ -37,7 +37,8 @@ vpeek_mode5_row_loop:
     ld      a,4     ;4 bytes to do
 vpeek_mode5_loop:
     ex      af,af
-    ld      a,(__tms9918_4bpp_attr+1)       ;current paper colour
+    ld      a,(__tms9918_attribute)       ;current paper colour
+    and     15
     ld      e,a
 IF VDP_DATAIN < 0
     ld      a,(-VDP_DATAIN)

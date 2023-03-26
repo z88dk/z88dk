@@ -10,7 +10,7 @@
     PUBLIC  __tms9918_set_paper
     PUBLIC  __tms9918_set_attribute
     EXTERN  __tms9918_2bpp_attr
-    EXTERN  __tms9918_4bpp_attr
+    EXTERN  __tms9918_8bpp_attr
 
     EXTERN  __tms9918_spec_funcs
     EXTERN  __tms9918_spec_funcs_end
@@ -67,17 +67,12 @@ __tms9918_set_attribute:
     ret
 
 __tms9918_set_ink:
+    ld      (__tms9918_8bpp_attr+0),a
     call    __tms9918_map_colour
 IFDEF V9938
     ld      c,a     ;Save it for a moment
     rrca
     rrca
-    rrca
-    rrca
-    and     0xf0
-    ld      (__tms9918_4bpp_attr+0),a
-    rlca
-    rlca
     and     @11000000
     ld      (__tms9918_2bpp_attr+0),a
     ld      a,c
@@ -98,18 +93,13 @@ set_attr:
     ret
 
 __tms9918_set_paper:
+    ld      (__tms9918_8bpp_attr+1),a
     call    __tms9918_map_colour
     and     15
 IFDEF V9938
     ld      c,a     ;Save it for a moment
     rrca
     rrca
-    rrca
-    rrca
-    and     0xf0
-    ld      (__tms9918_4bpp_attr+1),a
-    rlca
-    rlca
     and     @11000000
     ld      (__tms9918_2bpp_attr+1),a
     ld      a,c

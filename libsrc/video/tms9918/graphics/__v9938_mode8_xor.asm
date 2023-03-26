@@ -6,12 +6,11 @@ INCLUDE "video/tms9918/vdp.inc"
 
 IFDEF V9938
 
-PUBLIC  __v9938_plot
+PUBLIC  __v9938_mode8_xor
 
 EXTERN  __tms9918_gfxh
-EXTERN  __tms9918_attribute
+EXTERN  __tms9918_8bpp_attr
 EXTERN  __v9938_pset
-EXTERN  __gfx_coords
 
 ; ******************************************************************
 ;
@@ -19,8 +18,7 @@ EXTERN  __gfx_coords
 ;
 ; in:  de = (x,y) coordinate of pixel (h,l)
 
-
-__v9938_plot:
+__v9938_mode8_xor:
     ex      de,hl
 
     ; Only range check the height
@@ -28,17 +26,10 @@ __v9938_plot:
     cp      l
     ret     c
 
-    ld      (__gfx_coords),hl
-    ld      de,0            ;High coords
     push    bc
-    ld      a,(__tms9918_attribute)
-    rrca
-    rrca
-    rrca
-    rrca
-    and     $0f
+    ld      a,(__tms9918_8bpp_attr)
     ld      b,a
-    ld      a,V9938_LOGIC_SET
+    ld      a,V9938_LOGIC_XOR
     call    __v9938_pset
     pop     bc
     ret

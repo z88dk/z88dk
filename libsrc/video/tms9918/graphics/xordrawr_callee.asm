@@ -8,7 +8,8 @@
     PUBLIC  asm_xordrawr
     
 
-    EXTERN  __v9938_xordrawr
+    EXTERN  __v9938_4bpp_xordrawr
+    EXTERN  __v9938_8bpp_xordrawr
     EXTERN  __tms9918_screen_mode
     
     EXTERN    Line_r
@@ -27,7 +28,9 @@
 IFDEF V9938
     ld      a,(__tms9918_screen_mode)
     cp      5
-    jp      z,__v9938_xordrawr
+    jp      z,__v9938_4bpp_xordrawr
+    cp      8
+    jp      z,__v9938_8bpp_xordrawr
 ENDIF
     push    ix
     ld      ix,xorpixel
