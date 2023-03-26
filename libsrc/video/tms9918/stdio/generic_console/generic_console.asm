@@ -67,7 +67,9 @@ __tms9918_set_attribute:
     ret
 
 __tms9918_set_ink:
+IFDEF V9938
     ld      (__tms9918_8bpp_attr+0),a
+ENDIF
     call    __tms9918_map_colour
 IFDEF V9938
     ld      c,a     ;Save it for a moment
@@ -93,7 +95,9 @@ set_attr:
     ret
 
 __tms9918_set_paper:
+IFDEF V9938
     ld      (__tms9918_8bpp_attr+1),a
+ENDIF
     call    __tms9918_map_colour
     and     15
 IFDEF V9938
