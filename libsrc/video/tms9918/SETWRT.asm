@@ -40,6 +40,7 @@ ENDIF
     ld      a,l
     VDPOUT(VDP_CMD)
     ld      a,h
+    and     $3f
     or      $40
     VDPOUT(VDP_CMD)
     

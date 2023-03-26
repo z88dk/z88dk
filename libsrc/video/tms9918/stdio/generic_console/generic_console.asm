@@ -28,6 +28,7 @@
     EXTERN  __vdp_mode4_term
     EXTERN  __vdp_mode5_term
     EXTERN  __vdp_mode6_term
+    EXTERN  __vdp_mode8_term
     EXTERN  __vdp_mode1_2_term
     
 
@@ -178,6 +179,8 @@ IFDEF V9938
     defw    __vdp_mode5_term
     defb    6
     defw    __vdp_mode6_term
+    defb    8
+    defw    __vdp_mode8_term
 ENDIF
     defb    81
     defw    __vdp_mode1_2_term
