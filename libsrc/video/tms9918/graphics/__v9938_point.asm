@@ -14,20 +14,13 @@ EXTERN  __v9938_get_vdp_status
 EXTERN  __v9938_wait_vdp
 
 
-__v9938_point:
-    ex      de,hl
-    call    POINT
-    and     a
-    ret
-
-
 ;****************************************************************
 ;  List 4.21   POINT sample
 ;                to use, set H, L as follows
-;                POINT ( x:H, y:L )
+;                POINT ( x:HD, y:LE )
 ;                returns:   A := COLOR CODE
 ;****************************************************************
-POINT:
+__v9938_point:
     call    l_tms9918_disable_interrupts
     call    __v9938_wait_vdp
 
@@ -37,12 +30,11 @@ POINT:
     out     (VDP_CMD),a
 
     ld      bc,VDP_PORT3
-
     xor     a
     out     (c),h
-    out     (c),a
+    out     (c),d
     out     (c),l
-    out     (c),a
+    out     (c),e
 
     out     (VDP_CMD),a
     ld      A,80H+45

@@ -17,7 +17,7 @@ EXTERN l_tms9918_enable_interrupts
 ;****************************************************************
 ;  List 4.20   PSET sample
 ;                to use, set H, L, E, A as follows
-;                pset (x:H, y:L), color:E, logi-OP:A
+;                pset (x:HD, y:LE), color:b, logi-OP:A
 ;****************************************************************
 ;
 
@@ -26,11 +26,8 @@ EXTERN l_tms9918_enable_interrupts
 
 
 __v9938_pset:
-    ld      (__gfx_coords),hl
-    ld      d,a
-    call    l_tms9918_disable_interrupts
-    ld      a,d
     push    af
+    call    l_tms9918_disable_interrupts
     call    __v9938_wait_vdp
 
     ld      a,36
@@ -38,19 +35,21 @@ __v9938_pset:
     ld      a,$80+17
     out     (VDP_CMD),a
 
+    ld      a,b         ;Save away the colour
+    ex      af,af
     ld      bc,VDP_PORT3
-    xor     a
     out     (c),h
-    out     (c),a
+    out     (c),d
     out     (c),l
-    out     (c),a
+    out     (c),e
 
     ld      a,44
     out     (VDP_CMD),a
     ld      a,$80+17
     out     (VDP_CMD),a
 
-    out     (c),e
+    ex      af,af       ;Get colour back
+    out     (c),a
     xor     a
     out     (c),a
 

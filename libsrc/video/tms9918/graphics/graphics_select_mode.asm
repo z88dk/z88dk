@@ -65,6 +65,7 @@ EXTERN  __vdp_mode2_graphics
 EXTERN  __vdp_mode3_graphics
 EXTERN  __vdp_mode4_graphics
 EXTERN  __vdp_mode5_graphics
+EXTERN  __vdp_mode6_graphics
 EXTERN  __vdp_mode1_2_graphics
 
 mode_graphics_table:
@@ -85,6 +86,8 @@ IFDEF V9938
     defw    __vdp_mode4_graphics
     defb    5
     defw    __vdp_mode5_graphics
+    defb    6
+    defw    __vdp_mode6_graphics
 ENDIF
     defb    81
     defw    __vdp_mode1_2_graphics

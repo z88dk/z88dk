@@ -11,6 +11,7 @@ PUBLIC  __v9938_plot
 EXTERN  __tms9918_gfxh
 EXTERN  __tms9918_attribute
 EXTERN  __v9938_pset
+EXTERN  __gfx_coords
 
 ; ******************************************************************
 ;
@@ -26,6 +27,8 @@ __v9938_plot:
     cp      l
     ret     c
 
+    ld      (__gfx_coords),hl
+    ld      de,0            ;High coords
     push    bc
     ld      a,(__tms9918_attribute)
     rrca
@@ -33,7 +36,7 @@ __v9938_plot:
     rrca
     rrca
     and     $0f
-    ld      e,a
+    ld      b,a
     ld      a,V9938_LOGIC_SET
     call    __v9938_pset
     pop     bc
