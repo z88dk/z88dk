@@ -13,6 +13,7 @@
     EXTERN  __tms9918_text_xypos
     EXTERN  __v9938_mode5_vpeek
     EXTERN  __v9938_mode6_vpeek
+    EXTERN  __v9938_mode8_vpeek
 
     EXTERN  LDIRMV
     EXTERN	CONSOLE_XOFFSET
@@ -34,6 +35,8 @@ IF V9938
         jp      z,__v9938_mode5_vpeek
         cp      6
         jp      z,__v9938_mode6_vpeek
+        cp      8
+        jp      z,__v9938_mode8_vpeek
 ENDIF
         cp      2
         jr      z,vpeek_mode2
