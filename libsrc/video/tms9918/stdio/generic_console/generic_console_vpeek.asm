@@ -3,6 +3,7 @@
     MODULE  tms9918_console_vpeek
     SECTION code_video_vdp
     PUBLIC  __tms9918_console_vpeek
+    PUBLIC  __tms9918_vpeek_continue
 
     EXTERN  generic_console_font32
     EXTERN  generic_console_udg32
@@ -10,6 +11,7 @@
     EXTERN  screendollar_with_count
     EXTERN  __tms9918_screen_mode
     EXTERN  __tms9918_text_xypos
+    EXTERN  __v9938_mode5_vpeek
 
     EXTERN  LDIRMV
     EXTERN	CONSOLE_XOFFSET
@@ -24,13 +26,16 @@ ENDIF
 
 __tms9918_console_vpeek:
         ld      a,(__tms9918_screen_mode)
+IF V9938
+        cp      5
+        jp      z,__v9938_mode5_vpeek
+ENDIF
         cp      2
         jr      z,vpeek_mode2
         ccf
         ret     c           ;Not a text mode
 
         ; So here we have the text modes
-        push    ix
         call    __tms9918_text_xypos
         ; hl = screen address, now read that byte
         ex      de,hl
@@ -41,7 +46,6 @@ __tms9918_console_vpeek:
         ld      bc,1
         call    LDIRMV
         pop     bc
-        pop     ix
         ld      a,c
         and     a
         ret
@@ -49,7 +53,6 @@ __tms9918_console_vpeek:
 
 
 vpeek_mode2:
-    push    ix
     ld      a,c
     add     CONSOLE_XOFFSET
     add     a
@@ -68,6 +71,7 @@ vpeek_mode2:
     ex      de,hl
     ld      bc,8
     call    LDIRMV
+__tms9918_vpeek_continue:
     pop     de                ;buffer
     ld      hl,(generic_console_font32)
     call    screendollar
@@ -83,5 +87,4 @@ gotit:
     add     hl,sp
     ld      sp,hl
     ex      af,af
-    pop     ix
     ret
