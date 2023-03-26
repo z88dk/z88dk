@@ -12,6 +12,7 @@
     EXTERN  __tms9918_screen_mode
     EXTERN  __tms9918_text_xypos
     EXTERN  __v9938_mode5_vpeek
+    EXTERN  __v9938_mode6_vpeek
 
     EXTERN  LDIRMV
     EXTERN	CONSOLE_XOFFSET
@@ -27,14 +28,18 @@ ENDIF
 __tms9918_console_vpeek:
         ld      a,(__tms9918_screen_mode)
 IF V9938
+        cp      80
+        jr      z,text_vpeek
         cp      5
         jp      z,__v9938_mode5_vpeek
+        cp      6
+        jp      z,__v9938_mode6_vpeek
 ENDIF
         cp      2
         jr      z,vpeek_mode2
         ccf
         ret     c           ;Not a text mode
-
+text_vpeek:
         ; So here we have the text modes
         call    __tms9918_text_xypos
         ; hl = screen address, now read that byte

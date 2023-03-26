@@ -23,6 +23,7 @@ EXTERN  __tms9918_attribute
 EXTERN  __tms9918_scroll_buffer
 
 EXTERN  __v9938_wait_vdp
+EXTERN  __v9938_mode6_xypos
 
 EXTERN  __v9938_YMMM
 EXTERN  FILVRM
@@ -58,7 +59,7 @@ handle_characters:
 ;       hl' = font entry to print
 ;        c' = inverse mask
 ;        b' = flags
-    call    xypos
+    call    __v9938_mode6_xypos
     ld      b,8
 printc_mode6_1:
     push    bc
@@ -131,19 +132,6 @@ ENDIF
     djnz    printc_mode6_1
     ret
 
-xypos:
-    ld      a,b
-    add     a
-    add     a       ;*4
-    ld      h,a
-    ld      a,(__tms9918_pattern_name+1)
-    add     h
-    ld      h,a     ;Row * 1024 + screen base
-    ; Now, how many bytes per character?
-    ld      a,c
-    add     a
-    ld      l,a
-    ret
 
 
 __v9938_mode6_scroll:
