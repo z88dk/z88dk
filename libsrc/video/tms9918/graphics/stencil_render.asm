@@ -27,6 +27,7 @@
          EXTERN	l_tms9918_enable_interrupts
          EXTERN leftbitmask, rightbitmask
          EXTERN __graphics_end
+         EXTERN __generic_stencil_render
          ;EXTERN swapgfxbk1
 
 ;        
@@ -38,9 +39,11 @@
 ._stencil_render
        ld      a,(__tms9918_screen_mode)
        cp      2
+IFDEF V9938
        jr      z,dorender
        cp      4
-       ret     nz
+ENDIF
+       jp      nz, __generic_stencil_render
 dorender:
         push     ix        ;save callers
         ld       ix,4
