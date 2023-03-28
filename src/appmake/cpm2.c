@@ -1,7 +1,7 @@
 /*
- *	CP/M disc generator
+ *   CP/M disc generator
  *
- *      $Id: cpm2.c $
+ *   $Id: cpm2.c $
  */
 
 #include "appmake.h"
@@ -37,6 +37,9 @@ option_t cpm2_options[] = {
     {  0,  "extension", "Extension for the output file", OPT_STR, &c_extension},
     {  0,  "force-com-ext", "Always force COM extension", OPT_BOOL, &c_force_com_extension},
     {  0,  "no-com-file", "Don't create a separate .com file", OPT_BOOL, &c_disable_com_file_creation },
+                              /* ISO C does not require that a void pointer can be cast to a function pointer
+                                 (and vice versa), but conforming compilers are required to warn you about it.
+                                 If this is your case, you can probably ignore the warning. */
     { 'a', "add-file", "Add additional files [hostfile:cpmfile] or [hostfile]", OPT_FUNCTION, (void *)c_add_file },
     {  0 ,  NULL,       NULL,                        OPT_NONE,  NULL }
 };
@@ -175,6 +178,60 @@ static disc_spec microbee_spec = {
     .has_skew = 1,
     .skew_track_start = 5,
     .skew_tab = { 1, 4, 7, 0, 3, 6, 9, 2, 5, 8 }
+};
+
+
+static disc_spec mbc1000_spec = {
+    .name = "MBC-1000",
+    .sectors_per_track = 16,
+    .tracks = 80,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 2,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .has_skew = 1,
+    .skew_tab = { 0,3,6,9,12,15,2,5,8,11,14,1,4,7,10,13 }
+};
+
+
+static disc_spec mbc1200_spec = {
+    .name = "MBC-1200",
+    .sectors_per_track = 16,
+    .tracks = 80,
+    .sides = 2,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 128,
+    .extent_size = 4096,
+    .byte_size_extents = 1,
+    .first_sector_offset = 0,
+    .alternate_sides = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,3,6,9,12,15,2,5,8,11,14,1,4,7,10,13 }
+};
+
+  
+static disc_spec mbc2000_spec = {
+    .name = "MBC-2000",
+    .sectors_per_track = 16,
+    .tracks = 80,
+    .sides = 1,
+    .sector_size = 256,
+    .gap3_length = 0x17,
+    .filler_byte = 0xe5,
+    .boottracks = 4,
+    .directory_entries = 64,
+    .extent_size = 2048,
+    .byte_size_extents = 1,
+    .has_skew = 1,
+    .skew_tab = { 0,5,10,15,4,9,14,3,8,13,2,7,12,1,6,11 }
 };
 
 // Unverified gap size
@@ -438,7 +495,7 @@ static disc_spec gemini_spec = {
 
 static disc_spec lynx_spec = {
     .name = "CampLynx",
-    .disk_mode = FM500,			// possibly wrong information gathered online, IMD format is UNTESTED
+    .disk_mode = FM500,           // possibly wrong information gathered online, IMD format is UNTESTED
     .sectors_per_track = 10,
     .tracks = 40,
     .sides = 1,
@@ -474,7 +531,7 @@ static disc_spec rc700_spec = {
 
 static disc_spec alphatro_spec = {
     .name = "Alphatronic PC",
-    .disk_mode = MFM300,	// 300 kbps MFM, visible only when using the IMD format
+    .disk_mode = MFM300,           // 300 kbps MFM, visible only when using the IMD format
     .sectors_per_track = 16,
     .tracks = 40,
     .sides = 2,
@@ -608,6 +665,7 @@ static disc_spec corvetteBOOT_spec = {
      .first_sector_offset = 1,
 };
 
+
 static disc_spec nabupc_spec = {
      .name = "Nabu PC",
      .sectors_per_track = 5,
@@ -646,9 +704,6 @@ static disc_spec naburn_spec = {
 
 
 
-
-
-
 static struct formats {
      const char    *name;
      const char    *description;
@@ -676,6 +731,9 @@ static struct formats {
     { "kayproii",  "Kaypro ii",             &kayproii_spec, 0, NULL, 1 },
     { "lynx",      "Camputers Lynx",        &lynx_spec, 0, NULL, 1 },
     { "microbee-ds80",  "Microbee DS80",    &microbee_spec, 0, NULL, 1 },
+    { "mbc1000",   "Sanyo MBC-1000/1150",   &mbc1000_spec, 0, NULL, 1 },
+    { "mbc1200",   "Sanyo MBC-200/1250",    &mbc1200_spec, 0, NULL, 1 },
+    { "mbc2000",   "Sanyo MBC-2000",        &mbc2000_spec, 0, NULL, 1 },
     { "naburn",    "Nabu PC (8mb)",         &naburn_spec, 0, NULL, 1 },
     { "nabupc",    "Nabu PC",               &nabupc_spec, 0, NULL, 1 },
     { "nascomcpm", "Nascom CPM",            &nascom_spec, 0, NULL, 1 },
