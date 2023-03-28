@@ -26,7 +26,7 @@
 
     EXTERN  l_ret
 
-    INCLUDE       "video/tms9918/vdp.inc"
+    INCLUDE "video/tms9918/vdp.inc"
     
 RG0SAV:         defb    0       ;keeping track of VDP register values
 RG1SAV:         defb    0
@@ -55,9 +55,10 @@ __tms9918_sprite_attribute:     defw    0
 __tms9918_gfxw:     defb    0
 __tms9918_gfxh:     defb    0
 
-    SECTION		data_video_vdp
+    SECTION data_video_vdp
 
-__tms9918_attribute:	defb	$f1	;white on black
+__tms9918_attribute:
+    defb	$f1	;white on black
 IFDEF V9938
     PUBLIC  __tms9918_2bpp_attr
     PUBLIC  __tms9918_8bpp_attr
@@ -72,5 +73,4 @@ __tms9918_border:       defb	$01	;black border
 __tms9918_gencon_hook:  defw    l_ret       ;Hook for setting the mode for gencon as necessary
 __tms9918_graphics_hook:defw    l_ret     ;Hook for setting the mode for graphics as necessary
 
-	
 

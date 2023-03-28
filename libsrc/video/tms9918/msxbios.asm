@@ -6,11 +6,11 @@
 ;	$Id: gen_msxbios.asm $
 ;
 
-        SECTION code_video_vdp
-		
-; Used by Tatung Einstein, 3 extra bytes only
-	PUBLIC    msxbios
-	
+    SECTION code_video_vdp
+
+    ; Used by Tatung Einstein, 3 extra bytes only
+    PUBLIC  msxbios
+
 msxbios:
-	push	ix
-	ret
+    push    ix
+    ret

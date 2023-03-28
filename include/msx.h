@@ -49,6 +49,12 @@
 #define msx_put_sprite_8(id,x,y,handle,color)  vdp_put_sprite_8(id,x,y,handle,color)
 #define msx_put_sprite_16(id,x,y,handle,color) vdp_put_sprite_16(id,x,y,handle,color)
 
+// Disable screen
+#define msx_blank()                            vdp_blank()
+
+// Enable screen
+#define msx_noblank()                          vdp_noblank()
+
 #define msx_blit_ram_vram(source, dest, w, h, sjmp, djmp)   vdp_blit_ram_vram(source, dest, w, h, jmp, djmp)
 #define msx_blit_vram_ram(dest, value, w, h, djmp)          vdp_blit_vram_ram(dest, value, w, h, djmp)
 
@@ -63,11 +69,6 @@ extern void __LIB__ msx_text(void);
 // Move the screen cursor to a given position
 extern void __LIB__ msx_locate(unsigned int x, unsigned int y) __smallc;
 
-// Disable screen
-extern void __LIB__ msx_blank(void);
-
-// Enable screen
-extern void __LIB__ msx_noblank(void);
 
 // Joystick related stuff - only for +svi, +msx using BIOS
 

@@ -53,10 +53,10 @@ extern void __LIB__ vdp_set_char(int c, void* form, void *attr, unsigned int col
 
 // Mangled screen sections (3 maps)
 enum screen_map {
-	place_1 = 1,
-	place_2 = 2,
-	place_3 = 4,
-	place_all = 255
+    place_1 = 1,
+    place_2 = 2,
+    place_3 = 4,
+    place_all = 255
 };
 
 
@@ -175,8 +175,12 @@ typedef struct {
 // Detect the VRAM size (in KB)
 extern int __LIB__ vdp_vram(void);
 
-// Add a raster interrupt handler
-extern void __LIB__ add_raster_int(void *);
+#include <interrupt.h>
+
+// Blank the screen
+extern void __LIB__ vdp_blank(void);
+// Unblank the screen
+extern void __LIB__ vdp_noblank(void);
 
 
 // Surface (Blit) - Under Construction

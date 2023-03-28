@@ -39,7 +39,7 @@ IF VDP_DATA >= 256
 ENDIF
 
 wrtloop:
-	ld	a,(de)
+    ld      a,(de)
     VDPOUT(VDP_DATA)
     inc     de
     dec     hl
