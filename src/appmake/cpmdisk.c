@@ -552,9 +552,15 @@ int disc_write_imd(disc_handle* h, const char* filename)
             *ptr++ = sector_size; // Size of sector
 
             // Write sector map
-            for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
-                *ptr++ = j  +  h->spec.first_sector_offset;
-            }
+			//if (h->spec.has_skew) {
+			//	for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
+			//		*ptr++ = h->spec.skew_tab[ j ] +  h->spec.first_sector_offset;
+			//	}
+			//} else {
+				for ( j = 0; j < h->spec.sectors_per_track; j++ ) {
+					*ptr++ = j  +  h->spec.first_sector_offset;
+				}
+			//}
 
             // And write the header
             fwrite(buffer, ptr - buffer, 1, fp);
@@ -669,7 +675,7 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
             direntry[15] = 0x80;
             extents_to_write = extents_per_entry;
         } else {
-            direntry[15] = ((len % (extents_per_entry * h->spec.extent_size)) / 128) + 1;
+            direntry[15] = (((len % (extents_per_entry * h->spec.extent_size))+ 127) / 128);
             extents_to_write = (num_extents - (i * extents_per_entry));
         }
         for (j = 0; j < extents_per_entry; j++) {
@@ -684,6 +690,11 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
                 current_extent++;
             }
         }
+		
+		// Wipe the directory entry if empty (no extents)
+		if (!direntry[16])
+	        memset(direntry, 0, sizeof(direntry));
+
         memcpy(h->image + directory_offset, direntry, 32);
         directory_offset += 32;
     }
