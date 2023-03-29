@@ -228,6 +228,20 @@ void disc_print_writers(FILE *fp)
 }
 
 
+// If necessary, apply the skew table
+int skew_sector(disc_handle* h, int j, int track)
+{
+    int sect; // TODO: fix skew on all the disk formats
+
+    if ( h->spec.has_skew && track + (track * h->spec.sides) >= h->spec.skew_track_start ) {
+        for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
+            if ( h->spec.skew_tab[sect] == j ) break;
+	    }
+    } else return (j);
+	
+	return (sect);
+}
+
 
 // Write a raw disk, no headers for tracks etc
 int disc_write_raw(disc_handle* h, const char* filename)
@@ -249,13 +263,7 @@ int disc_write_raw(disc_handle* h, const char* filename)
                 offs = track_length * ( 2* i + s);
             }
             for (j = 0; j < h->spec.sectors_per_track; j++) {
-                 int sect = j; // TODO: Skew
-                 if ( h->spec.has_skew && i + (i*h->spec.sides) >= h->spec.skew_track_start ) {
-                     for ( sect = 0; sect < h->spec.sectors_per_track; sect++ ) {
-                        if ( h->spec.skew_tab[sect] == j ) break;
-                     }
-                 }
-                 fwrite(h->image + offs + (sect * h->spec.sector_size), h->spec.sector_size, 1, fp);
+                 fwrite(h->image + offs + (skew_sector(h, j, i) * h->spec.sector_size), h->spec.sector_size, 1, fp);
             }
         }
     }
@@ -692,7 +700,7 @@ static void cpm_write_file(disc_handle* h, char *filename, void* data, size_t le
         }
 		
 		// Wipe the directory entry if empty (no extents)
-		if (!direntry[16])
+		if (!(direntry[16] | direntry[17]))
 	        memset(direntry, 0, sizeof(direntry));
 
         memcpy(h->image + directory_offset, direntry, 32);
