@@ -183,6 +183,7 @@ static disc_spec microbee_spec = {
 
 static disc_spec mbc1000_spec = {
     .name = "MBC-1000",
+    .disk_mode = MFM250,
     .sectors_per_track = 16,
     .tracks = 80,
     .sides = 1,
@@ -193,7 +194,7 @@ static disc_spec mbc1000_spec = {
     .directory_entries = 64,
     .extent_size = 2048,
     .byte_size_extents = 1,
-    .first_sector_offset = 0,
+    .first_sector_offset = 1,
     .has_skew = 1,
     .skew_tab = { 0,3,6,9,12,15,2,5,8,11,14,1,4,7,10,13 }
 };
@@ -201,6 +202,7 @@ static disc_spec mbc1000_spec = {
 
 static disc_spec mbc1200_spec = {
     .name = "MBC-1200",
+    .disk_mode = MFM250,
     .sectors_per_track = 16,
     .tracks = 80,
     .sides = 2,
@@ -211,7 +213,7 @@ static disc_spec mbc1200_spec = {
     .directory_entries = 128,
     .extent_size = 4096,
     .byte_size_extents = 1,
-    .first_sector_offset = 0,
+    .first_sector_offset = 1,
     .alternate_sides = 1,
     .has_skew = 1,
     .skew_tab = { 0,3,6,9,12,15,2,5,8,11,14,1,4,7,10,13 }
@@ -220,6 +222,7 @@ static disc_spec mbc1200_spec = {
   
 static disc_spec mbc2000_spec = {
     .name = "MBC-2000",
+    .disk_mode = MFM250,
     .sectors_per_track = 16,
     .tracks = 80,
     .sides = 1,
@@ -230,6 +233,7 @@ static disc_spec mbc2000_spec = {
     .directory_entries = 64,
     .extent_size = 2048,
     .byte_size_extents = 1,
+    .first_sector_offset = 1,
     .has_skew = 1,
     .skew_tab = { 0,5,10,15,4,9,14,3,8,13,2,7,12,1,6,11 }
 };
