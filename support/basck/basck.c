@@ -128,6 +128,9 @@ int mz800_prebyte3[]={14, 0xE5, 0x87, 0x6F, 0x26, 0, 1, CATCH, CATCH, 0x09, 0x7e
 /* Hudson Software HuBASIC detection */
 /*************************************/
 
+// Exclude false positives on MS BASIC compiled programs
+int bascom_skel[]={7, CATCH, 'B', 'A', 'S', 'L', 'I', 'B'};
+
 int hubas_skel[]={15, 0x7F,0x4C,0xCC,0xCC,0xCC,0xCC,0xCC,0xCD,0x81,0x55,0x55,0x55,0x55,0x55,CATCH};
 int hubas_ext_skel[]={13, 0x3E, CATCH, 0x21, 0x3E, SKIP, 0x21, 0x3E, SKIP, 0x21, 0x3E, SKIP, 0x21, 0x3E};
 int huproduct_skel[]={8, CATCH, 'H', 'u', 'B', 'A', 'S', 'I', 'C'};
@@ -3635,7 +3638,13 @@ int main(int argc, char *argv[])
 		res=find_skel(mz800basic_skel);
 
 	if (res>0) {
-		printf("\n# Hudson Software HuBASIC found\n");
+		res2=find_skel(bascom_skel);
+		if (res2>0)
+			printf("\n#  Hudson Software HuBASIC or MS BASIC compiled program\n");
+		else
+			printf("\n# Hudson Software HuBASIC found\n");
+
+		
 		res2=find_skel(huproduct_skel);
 		if (res2>0)
 			printf("#  HuBASIC name found\n\n");
@@ -3655,7 +3664,11 @@ int main(int argc, char *argv[])
 
 		brand=find_skel(hubas_ext_skel);
 		if (brand>0) {
-			printf("#  Extended HuBASIC version detected\n\n");
+			res2=find_skel(bascom_skel);
+			if (res2>0)
+				printf("#  Extended HuBASIC or MS BASIC compiled program\n\n");
+			else
+				printf("#  Extended HuBASIC version detected\n\n");
 			brand = HUBASIC_EXT;
 		} else
 			brand = HUBASIC_NEW;
@@ -4133,13 +4146,13 @@ int main(int argc, char *argv[])
 	}
 
 
-	/*****************************************/
-	/* Sanyo BASIC (on CP/M MBC-xxxx models) */
-	/*****************************************/
+	/****************************************************/
+	/* Sanyo BASIC (on CP/M MBC-xxxx 1981..1982 models) */
+	/****************************************************/
 
 	res=find_skel(sbasic_skel);
 	if (res>0) {
-		printf("\n# Sanyo BASIC found\n");
+		printf("\n# Sanyo Disk BASIC found\n");
 
 	}
 
