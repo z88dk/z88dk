@@ -139,15 +139,22 @@ extern int __LIB__ vdp_set_border(int border) __z88dk_fastcall;
 
 // Hardware sprite related functions
 
-// Set the sprite mode
-extern void __LIB__ vdp_set_sprite_mode(unsigned int mode);
-
 // Sprite modes
 enum sprite_mode {
-	sprite_default = 0,
-	sprite_scaled = 1,
-	sprite_large = 2
+    sprite_default = 0,
+    sprite_scaled = 1,
+    sprite_large = 2
 };
+
+// Set the sprite mode
+extern void __LIB__ vdp_set_sprite_mode(enum sprite_mode mode);
+
+
+
+// Read the status register. 
+//
+// The parameter only has an effect on a V9938
+extern int __LIB__ vdp_get_status(int status_register) __z88dk_fastcall;
 
 // Set the sprite handle with the shape from data (small size)
 extern void __LIB__ vdp_set_sprite_8(unsigned int handle, void* data) __smallc;

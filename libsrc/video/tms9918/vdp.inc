@@ -29,7 +29,7 @@ IF FORmsx
 	defc VDP_DATAIN  = $98
 	defc VDP_CMD     = $99
 	defc VDP_STATUS  = $99
-	defc VRAM_SIZE   = 16		; extended are able to get the right size
+	defc VRAM_SIZE   = 16
 	defc VDP_EXPORT_DIRECT = 1
 	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
@@ -40,9 +40,9 @@ IF FORmsx2
 	defc VDP_CMD     = $99
 	defc VDP_STATUS  = $99
     ; Additional ports for V9938
-	defc VDP_PORT2   = $9a
-	defc VDP_PORT3   = $9b
-	defc VRAM_SIZE   = 64		; extended are able to get the right size
+	defc VDP_PORT2   = $9a      ;Palette register
+	defc VDP_PORT3   = $9b      ;Register pointer
+	defc VRAM_SIZE   = 64
 	defc VDP_EXPORT_DIRECT = 1
 	defc VDP_EXPORT_GFX_DIRECT = 1
 	defc V9938 = 1
@@ -73,7 +73,7 @@ IF FORmtx
 	defc VDP_DATAIN  = 1
 	defc VDP_CMD     = 2
 	defc VDP_STATUS  = 2
-	defc VRAM_SIZE   = 16		; extended are able to get the right size
+	defc VRAM_SIZE   = 16
 	defc VDP_EXPORT_DIRECT = 1
 	defc VDP_EXPORT_GFX_DIRECT = 1
 ENDIF
