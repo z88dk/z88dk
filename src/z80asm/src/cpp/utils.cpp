@@ -259,7 +259,7 @@ static void expand_glob_1(set<fs::path>& result, const string& pattern) {
 	// split path in directory/file elements
 	fs::path full_path{ pattern };
 	vector<string> elems;
-	for (auto& elem : full_path) {
+	for (auto elem : full_path) {
 		elems.push_back(elem.generic_string());
 	}
 
