@@ -71,6 +71,10 @@ Z88DKTARGET_msx_rom = msx
 ZCFLAGS_msx_rom = -subtype=rom
 ZLDFLAGS_msx_rom = 
 
+Z88DKTARGET_msx2_rom = msx
+ZCFLAGS_msx2_rom = -subtype=rom2
+ZLDFLAGS_msx2_rom = 
+
 Z88DKTARGET_gl4000 = gl
 ZCFLAGS_gl4000 = -clib=gl4000
 ZLDFLAGS_gl4000 = 
@@ -130,7 +134,7 @@ ZLDFLAGS_zx_rom = -lndos
 
 
 # Setup the CP/M mappings to +cpm
-CPMSUBTYPES = aussie px pxansi px8 pxansi px4 px4ansi einstein attache osborne1 kaypro83 \
+CPMSUBTYPES = aussie px pxansi px8 pxansi px4 px4ansi einstein einstein256 attache osborne1 kaypro83 \
 	kaypro84 mz2500 microbee qc10 nascom tiki100 svi dmv adam smc777 pasopia \
 	msx bic excali64 lynx x1 rc700 fp1100 zxplus3 vector06c bondwell bw2  \
 	cpc pcw40 pcw80 corvette nabu
