@@ -633,7 +633,7 @@ int heirb(LVALUE* lval)
                         lval->offset = val;
                     } else if( lval->is_const ) {
                         /* Constant offset to cast to pointer constant */
-                        clearstage(before, 0);
+                        clearstage(before1, 0);
                         lval->const_val += (val - lval->offset);
                         lval->offset = 0;
                     } else {
@@ -730,7 +730,9 @@ int heirb(LVALUE* lval)
                 Type *str = lval->ltype;
                 Type *member_type;
                 int   name_result;
-
+    
+                if (lval->is_const)
+                   vconst(lval->const_val);
                 // If there's a cast active, then use the cast type
                 if ( lval->cast_type ) {
                     str = lval->cast_type;
@@ -789,7 +791,6 @@ int heirb(LVALUE* lval)
                     }
                 }
                 lval->flags = flags;
-
                 zadd_const(lval, member_type->offset);
                 lval->symbol = NULL;
                 lval->ltype = member_type;
