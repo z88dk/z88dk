@@ -1,0 +1,6 @@
+
+
+
+defc PSG_ADDR   = $a0
+defc PSG_DATA   = $a1
+defc PSG_DATAIN = $a1

@@ -1042,6 +1042,7 @@ bic.lib:
 	@echo '--- Building A5105 Library ---'
 	@echo ''
 	$(MAKE) -C video/upd7220 TARGET=bic
+	$(MAKE) -C psg TARGET=cpm SUBTYPE=bic
 	TARGET=bic TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORbic -x$(OUTPUT_DIRECTORY)/bic @$(TARGET_DIRECTORY)/bic/bic.lst
 
 # QX10 library
