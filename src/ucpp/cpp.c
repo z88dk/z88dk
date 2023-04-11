@@ -101,7 +101,7 @@ void ucpp_error(long line, char *fmt, ...)
 
 	va_start(ap, fmt);
 	if (line > 0)
-		fprintf(stderr, "%s: line %ld: ", current_filename, line);
+		fprintf(stderr, "%s:%ld: ", current_filename, line);
 	else if (line == 0) fprintf(stderr, "%s: ", current_filename);
 	vfprintf(stderr, fmt, ap);
 	fprintf(stderr, "\n");
@@ -127,7 +127,7 @@ void ucpp_warning(long line, char *fmt, ...)
 
 	va_start(ap, fmt);
 	if (line > 0)
-		fprintf(stderr, "%s: warning: line %ld: ",
+		fprintf(stderr, "%s:%ld: warning: ",
 			current_filename, line);
 	else if (line == 0)
 		fprintf(stderr, "%s: warning: ", current_filename);
@@ -1567,7 +1567,27 @@ static void handle_error(struct lexer_state *ls)
 		wan(buf, p, (unsigned char)c, lp);
 	}
 	wan(buf, p, 0, lp);
-	error(l, "#error%s", buf);
+	error(l, "error:%s", buf);
+	freemem(buf);
+}
+
+/*
+ * a #warning directive: we emit the message without any modification
+ * (except the usual backslash+newline and trigraphs)
+ */
+static void handle_warning(struct lexer_state *ls)
+{
+	int c;
+	size_t p = 0, lp = 128;
+	long l = ls->line;
+	unsigned char *buf = getmem(lp);
+
+	while ((c = grap_char(ls)) >= 0 && c != '\n') {
+		discard_char(ls);
+		wan(buf, p, (unsigned char)c, lp);
+	}
+	wan(buf, p, 0, lp);
+	warning(l, "%s", buf + 1);
 	freemem(buf);
 }
 
@@ -1886,6 +1906,10 @@ static int handle_cpp(struct lexer_state *ls, int sharp_type)
 			} else if (!strcmp(ls->ctok->name, "error")) {
 				ret = 1;
 				handle_error(ls);
+				goto handle_exit;
+			} else if (!strcmp(ls->ctok->name, "warning")) {
+				ret = 0;
+				handle_warning(ls);
 				goto handle_exit;
 			} else if (!strcmp(ls->ctok->name, "line")) {
 				ret = handle_line(ls, save_flags);
