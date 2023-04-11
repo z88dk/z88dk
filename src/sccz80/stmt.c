@@ -394,7 +394,8 @@ void dodo()
     postlabel(wq.loop);
     testresult = test(wq.exit, YES);
     if ( testresult == 0 ) { // False
-        // We don't need to do anything
+        // Post the exit label in case there were any breaks
+        postlabel(wq.exit);
     } else {
         gen_jp_label(top, 1);
         postlabel(wq.exit);
