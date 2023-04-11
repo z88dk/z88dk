@@ -53,10 +53,10 @@ extern void __LIB__ vdp_set_char(int c, void* form, void *attr, unsigned int col
 
 // Mangled screen sections (3 maps)
 enum screen_map {
-	place_1 = 1,
-	place_2 = 2,
-	place_3 = 4,
-	place_all = 255
+    place_1 = 1,
+    place_2 = 2,
+    place_3 = 4,
+    place_all = 255
 };
 
 
@@ -139,15 +139,22 @@ extern int __LIB__ vdp_set_border(int border) __z88dk_fastcall;
 
 // Hardware sprite related functions
 
-// Set the sprite mode
-extern void __LIB__ vdp_set_sprite_mode(unsigned int mode);
-
 // Sprite modes
 enum sprite_mode {
-	sprite_default = 0,
-	sprite_scaled = 1,
-	sprite_large = 2
+    sprite_default = 0,
+    sprite_scaled = 1,
+    sprite_large = 2
 };
+
+// Set the sprite mode
+extern void __LIB__ vdp_set_sprite_mode(enum sprite_mode mode);
+
+
+
+// Read the status register. 
+//
+// The parameter only has an effect on a V9938
+extern int __LIB__ vdp_get_status(int status_register) __z88dk_fastcall;
 
 // Set the sprite handle with the shape from data (small size)
 extern void __LIB__ vdp_set_sprite_8(unsigned int handle, void* data) __smallc;
@@ -175,8 +182,12 @@ typedef struct {
 // Detect the VRAM size (in KB)
 extern int __LIB__ vdp_vram(void);
 
-// Add a raster interrupt handler
-extern void __LIB__ add_raster_int(void *);
+#include <interrupt.h>
+
+// Blank the screen
+extern void __LIB__ vdp_blank(void);
+// Unblank the screen
+extern void __LIB__ vdp_noblank(void);
 
 
 // Surface (Blit) - Under Construction

@@ -90,6 +90,14 @@ int ldir_skel2[]={11, 17, CATCH, CATCH, 33, SKIP, SKIP, 1, SKIP, SKIP, 0xED, 0xB
 
 
 
+/***************/
+/* Sanyo BASIC */
+/***************/
+
+int sbasic_skel[]={11, CATCH, 0, 'U', 'N', 'P', 'A', 'C', 'K', '$', 0xC2, 0};
+
+
+
 /***************************/
 /* 'OMEGASOFT' SHARP BASIC */
 /***************************/
@@ -119,6 +127,9 @@ int mz800_prebyte3[]={14, 0xE5, 0x87, 0x6F, 0x26, 0, 1, CATCH, CATCH, 0x09, 0x7e
 /*************************************/
 /* Hudson Software HuBASIC detection */
 /*************************************/
+
+// Exclude false positives on MS BASIC compiled programs
+int bascom_skel[]={7, CATCH, 'B', 'A', 'S', 'L', 'I', 'B'};
 
 int hubas_skel[]={15, 0x7F,0x4C,0xCC,0xCC,0xCC,0xCC,0xCC,0xCD,0x81,0x55,0x55,0x55,0x55,0x55,CATCH};
 int hubas_ext_skel[]={13, 0x3E, CATCH, 0x21, 0x3E, SKIP, 0x21, 0x3E, SKIP, 0x21, 0x3E, SKIP, 0x21, 0x3E};
@@ -1438,7 +1449,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(tmpstr_skel);
 		if (res>0)
-			dlbl("TMPSTR", res, "Temporary string");
+			dlbl("TMPSTR", res, "aka DSCTMP, temporary string");
 
 		res=find_skel(curpos_skel);
 		if (res<0)
@@ -1466,7 +1477,7 @@ int main(int argc, char *argv[])
 		if (res<0)
 			res=find_skel(varend_skel2);
 		if (res>0)
-			dlbl("ARYTAB", res, "End of variables, begin of array aariables (a.k.a. VAREND)");
+			dlbl("ARYTAB", res, "End of variables, begin of array variables (a.k.a. VAREND)");
 
 		res=find_skel(arrend_skel);
 		if (res<0)
@@ -3627,7 +3638,13 @@ int main(int argc, char *argv[])
 		res=find_skel(mz800basic_skel);
 
 	if (res>0) {
-		printf("\n# Hudson Software HuBASIC found\n");
+		res2=find_skel(bascom_skel);
+		if (res2>0)
+			printf("\n#  Hudson Software HuBASIC or MS BASIC compiled program\n");
+		else
+			printf("\n# Hudson Software HuBASIC found\n");
+
+		
 		res2=find_skel(huproduct_skel);
 		if (res2>0)
 			printf("#  HuBASIC name found\n\n");
@@ -3647,7 +3664,11 @@ int main(int argc, char *argv[])
 
 		brand=find_skel(hubas_ext_skel);
 		if (brand>0) {
-			printf("#  Extended HuBASIC version detected\n\n");
+			res2=find_skel(bascom_skel);
+			if (res2>0)
+				printf("#  Extended HuBASIC or MS BASIC compiled program\n\n");
+			else
+				printf("#  Extended HuBASIC version detected\n\n");
 			brand = HUBASIC_EXT;
 		} else
 			brand = HUBASIC_NEW;
@@ -4122,6 +4143,17 @@ int main(int argc, char *argv[])
 			printf("#  'SHARP' signature found\n\n");
 		else
 			printf("#  'SHARP' signature not present\n\n");
+	}
+
+
+	/****************************************************/
+	/* Sanyo BASIC (on CP/M MBC-xxxx 1981..1982 models) */
+	/****************************************************/
+
+	res=find_skel(sbasic_skel);
+	if (res>0) {
+		printf("\n# Sanyo Disk BASIC found\n");
+
 	}
 
 

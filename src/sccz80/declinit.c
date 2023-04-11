@@ -265,7 +265,41 @@ static int init(Type *type, int dump)
         /* djm, catch label names in structures (for (*name)() initialisation */
         char sname[NAMESIZE];
         SYMBOL *ptr;
-        int gotref = cmatch('&');
+        int   gotref;
+
+        if ( rmatch2("sizeof") || rmatch2("__builtin_offsetof")) {
+            if ( constexpr(&value, &valtype, 1) ) {
+                goto constdecl;
+            }
+            errorfmt("Expecting a constant expression for static initialisation\n",1);
+        } 
+        
+        // Kill any casts
+        if (rcmatch('(') ) {
+            Type  *ctype;
+            int klptr = lptr;
+            lptr++;
+            if ( ch() && (ctype = parse_expr_type()) != NULL ) {
+                needchar(')');
+            } else {
+                lptr = klptr;
+            }
+        }
+
+        gotref = cmatch('&');
+
+        // Might be a cast afterwards as well
+        if (rcmatch('(') ) {
+            Type  *ctype;
+            int klptr = lptr;
+            lptr++;
+            if ( ch() && (ctype = parse_expr_type()) != NULL ) {
+                needchar(')');
+            } else {
+                lptr = klptr;
+            }
+        }
+
 
         if (symname(sname) ) {
             if ((ptr = findglb(sname))) {
@@ -329,22 +363,7 @@ static int init(Type *type, int dump)
                     errorfmt("Dodgy declaration (not pointer)", 0);
                     junk();
                 }
-            } else if ( strcmp(sname, "sizeof") == 0 ) {
-                LVALUE lval;
-                char *before, *start;
-                setstage(&before, &start);
-                size_of(&lval);
-                clearstage(before, 0);
-                value = lval.const_val;
-                goto constdecl;
-            } else if ( strcmp(sname, "__builtin_offsetof") == 0 ) {
-                LVALUE lval;
-                char *before, *start;
-                setstage(&before, &start);
-                offset_of(&lval);
-                clearstage(before, 0);
-                value = lval.const_val;
-                goto constdecl;
+
             } else {
                 errorfmt("Unknown symbol: %s", 1, sname);
                 junk();
@@ -360,7 +379,7 @@ constdecl:
             if (dump) {
                 /* struct member or array of pointer to char */
                 if ( type->kind == KIND_DOUBLE ) {
-					unsigned char  fa[MAX_MANTISSA_SIZE + 1] = { 0 };
+                    unsigned char  fa[MAX_MANTISSA_SIZE + 1] = { 0 };
                     int      i;
                     /* It was a float, lets parse the float and then dump it */
                     if ( c_double_strings ) { 
@@ -374,7 +393,7 @@ constdecl:
                         }
                     }
                 } else if (type->kind == KIND_FLOAT16) {
-					unsigned char  fa[MAX_MANTISSA_SIZE + 1] = { 0 };
+                    unsigned char  fa[MAX_MANTISSA_SIZE + 1] = { 0 };
                     dofloat(MATHS_IEEE16, value, fa);
                     defword();
                     outdec(fa[1] << 8 | fa[0]);

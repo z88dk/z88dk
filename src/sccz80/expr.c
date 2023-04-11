@@ -625,13 +625,17 @@ int heirb(LVALUE* lval)
                     }
                     cscale(lval->ltype, &val);
                     val += lval->offset;
-
                     if (ptr && ptr->storage == STKLOC && lval->ltype->kind == KIND_ARRAY && ptr->ctype->kind != KIND_PTR) {
                         /* constant offset to array on stack */
                         /* do all offsets at compile time */
                         clearstage(before1, 0);
                         lval->base_offset = getloc(ptr, val);
                         lval->offset = val;
+                    } else if( lval->is_const ) {
+                        /* Constant offset to cast to pointer constant */
+                        clearstage(before1, 0);
+                        lval->const_val += (val - lval->offset);
+                        lval->offset = 0;
                     } else {
                         /* add constant offset to address in primary */
                         clearstage(before, 0);
@@ -668,6 +672,7 @@ int heirb(LVALUE* lval)
                         zpop();
                     }
                     zadd(lval);
+                    lval->is_const = 0;   /* Can no longer be constant */
                 }
                 ptr = deref(lval, YES);
                 k = lval->ltype->kind == KIND_ARRAY ? 0 : 1;
@@ -725,7 +730,9 @@ int heirb(LVALUE* lval)
                 Type *str = lval->ltype;
                 Type *member_type;
                 int   name_result;
-
+    
+                if (lval->is_const)
+                   vconst(lval->const_val);
                 // If there's a cast active, then use the cast type
                 if ( lval->cast_type ) {
                     str = lval->cast_type;
@@ -784,7 +791,6 @@ int heirb(LVALUE* lval)
                     }
                 }
                 lval->flags = flags;
-
                 zadd_const(lval, member_type->offset);
                 lval->symbol = NULL;
                 lval->ltype = member_type;

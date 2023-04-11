@@ -559,6 +559,7 @@ void size_of(LVALUE* lval)
         deref++;
     }
     lval->ltype = type_int;
+    lval->ptr_type = KIND_NONE;
 
     if ( (type = parse_expr_type()) != NULL ) {
         if ( deref && type->kind != KIND_PTR ) {
@@ -662,6 +663,7 @@ void size_of(LVALUE* lval)
         needchar(')');
     lval->is_const = 1;
     lval->val_type = KIND_INT;
+    lval->ptr_type = KIND_NONE;
     vconst(lval->const_val);
 }
 

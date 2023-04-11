@@ -41,7 +41,8 @@ extern void __LIB__ sam_set_screenmode(int mode);
 extern void __LIB__ sam_set_fatpix(int enabled);
 
 // Add an interrupt handler on FRAME interrupt
-extern void __LIB__ add_raster_int(void *ptr);
+
+#include <interrupt.h>
 
 // Add and remove line ISR handlers. Setting up the line
 // the interrupt is executed can be achieved as follows:
@@ -49,8 +50,7 @@ extern void __LIB__ add_raster_int(void *ptr);
 // IO_INTERRUPT = n;
 //
 // Where n is the line number
-extern void __LIB__ sam_install_line_isr(void *ptr);
-extern void __LIB__ sam_uninstall_line_isr(void *ptr);
-
+extern void __LIB__ sam_install_line_isr(isr_t handler);
+extern void __LIB__ sam_uninstall_line_isr(isr_t handler);
 
 #endif

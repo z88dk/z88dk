@@ -22,20 +22,24 @@
 ;==============================================================
 .SETRD
 ._SETRD
-	call	l_tms9918_disable_interrupts
-	ld      a,l
-IF VDP_CMD < 0
-	ld	(-VDP_CMD),a
-ELSE
-	ld	bc,VDP_CMD
-	out	(c),a
+    call    l_tms9918_disable_interrupts
+IF VDP_CMD >= 256
+    ld      bc,VDP_CMD
 ENDIF
-	ld      a,h
-	and     $3F
-IF VDP_CMD < 0
-	ld	(-VDP_CMD),a
-ELSE
-	out	(c),a
+IFDEF V9938
+    ; High bit of address (bits 14,15,16)
+    ld      a,h
+    rlca
+    rlca
+    and     3           ;Ignoring bit 16
+    VDPOUT(VDP_CMD)
+    ld      a,14 + 0x80
+    VDPOUT(VDP_CMD)
 ENDIF
-	call	l_tms9918_enable_interrupts
-	ret
+    ld      a,l
+    VDPOUT(VDP_CMD)
+    ld      a,h
+    and     $3F
+    VDPOUT(VDP_CMD)
+    call    l_tms9918_enable_interrupts
+    ret

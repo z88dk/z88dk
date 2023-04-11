@@ -15,17 +15,13 @@ __tms9918_setup_mode2_pattern:
     call    l_tms9918_disable_interrupts
     ld      hl,(__tms9918_pattern_name)      ;pattern name
     call    SETWRT
-IF VDP_DATA >= 0
+IF VDP_DATA >= 256
     ld      bc,VDP_DATA
 ENDIF
     xor     a
     ld      e,3
 pattern:
-IF VDP_DATA < 0
-    ld      (-VDP_DATA),a
-ELSE
-    out     (c),a
-ENDIF
+    VDPOUT(VDP_DATA)
     inc     a
     jr      nz,pattern
     dec     e

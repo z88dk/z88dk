@@ -11,41 +11,52 @@
 ;        $Id: vdp_vpeek.asm,v 1.10 2016-06-16 19:30:25 dom Exp $
 ;
 
-        SECTION code_video_vdp
-        PUBLIC  vdp_vpeek
-        PUBLIC  _vdp_vpeek
-        EXTERN  l_tms9918_disable_interrupts
-        EXTERN  l_tms9918_enable_interrupts
-        
-        INCLUDE        "video/tms9918/vdp.inc"
+    SECTION code_video_vdp
+    PUBLIC  vdp_vpeek
+    PUBLIC  _vdp_vpeek
+    EXTERN  l_tms9918_disable_interrupts
+    EXTERN  l_tms9918_enable_interrupts
+    
+    INCLUDE        "video/tms9918/vdp.inc"
 
 
 vdp_vpeek:
 _vdp_vpeek:
-        ; (FASTCALL) -> HL = address
-        ; enter vdp address pointer
-        ld      a,l
-        call    l_tms9918_disable_interrupts
-		
-IF VDP_CMD < 0
-	ld	a,l
-	ld	(-VDP_CMD),a
-	ld	a,h
-	and	@00111111
-	ld	(-VDP_CMD),a
-	ld	a,(-VDP_DATAIN)
-ELSE
-        ld      bc,VDP_CMD
-        out     (c),l           ;LSB of video memory ptr
-        ld      a,h		; MSB of video mem ptr
-        and     @00111111	; masked with "write command" bits
-        out     (c),a
-        ld      bc,VDP_DATAIN
-        in      a,(c)
+    ; (FASTCALL) -> HL = address
+    ; enter vdp address pointer
+    ld      a,l
+    call    l_tms9918_disable_interrupts
+
+
+IF VDP_CMD >= 256
+    ld      bc,VDP_CMD
 ENDIF
-        
-        ld      h,0
-        ld      l,a
-        call    l_tms9918_enable_interrupts
-        ret
+
+IFDEF V9938
+    ; High bit of address (bits 14,15,16)
+    ld      a,h
+    rlca
+    rlca
+    and     3           ;Ignoring bit 16
+    VDPOUT(VDP_CMD)
+    ld      a,14 + 0x80
+    VDPOUT(VDP_CMD)
+ENDIF
+    ld      a,l
+    VDPOUT(VDP_CMD)
+    ld      a,h
+    and     @00111111
+    VDPOUT(VDP_CMD)
+    ; TODO: timing?
+
+IF VDP_DATAIN >= 256
+    ld      bc,VDP_DATAIN
+ENDIF
+    VDPIN(VDP_DATAIN)
+
+    
+    ld      h,0
+    ld      l,a
+    call    l_tms9918_enable_interrupts
+    ret
 

@@ -18,16 +18,12 @@ FILVRM:
     push    bc
     call    SETWRT
     pop     hl
-IF VDP_DATA > 0
+IF VDP_DATA >= 256
     ld      bc, VDP_DATA
 ENDIF
 loop:         
     pop     af
-IF VDP_DATA < 0
-    ld      (-VDP_DATA),a
-ELSE
-    out     (c),a
-ENDIF
+    VDPOUT(VDP_DATA)
     push    af
     dec     hl
     ld      a,h

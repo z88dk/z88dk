@@ -24,6 +24,7 @@ EXTERN  __tms9918_pattern_name
 EXTERN  __tms9918_sprite_attribute
 EXTERN  __tms9918_sprite_generator
 EXTERN  __tms9918_gencon_hook
+EXTERN  __tms9918_graphics_hook
 
 EXTERN  __console_w
 EXTERN  __tms9918_gfxw
@@ -40,13 +41,13 @@ __tms9918_set_tables:
     ld      (__tms9918_screen_mode),a
 
     ; Call the gencon hook to setup print/cls etc functions
-    ld      d,a
     push    hl
     ld      hl,(__tms9918_gencon_hook)
-    ld      a,h
-    or      l
-    ld      a,d
-    call    nz,l_dcal
+    call    l_dcal
+
+    ld      hl,(__tms9918_graphics_hook)
+    ld      a,(__tms9918_screen_mode)
+    call    l_dcal
     pop     hl
 
     ; Now copy other info about the mode
@@ -124,8 +125,8 @@ ENDIF
     srl     a
     srl     a
     srl     a
-    and     @00000111
-    call    VDPreg_Write        ;Register 5 - sprite generator
+    and     @00011111           ;Ignoring bit 16
+    call    VDPreg_Write        ;Register 6 - sprite generator
 
     ;; And any extra registers afterwards
 reg_loop:

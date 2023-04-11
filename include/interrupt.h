@@ -29,7 +29,7 @@ extern int __LIB__ nmi_install_isr(isr_t handler) ;
 // Deegister an NMI ISR
 extern int __LIB__ nmi_uninstall_isr(isr_t handler) ;
 
-// Register an ISR to run on frame sync
+// Register an ISR to run on frame sync - this is a portable shortcut 
 extern void __LIB__ add_raster_int(isr_t handler);
 
 

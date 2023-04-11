@@ -16,6 +16,7 @@
 	inc	hl
 	ld	(_var),hl
 	dec	hl
+.i_3
 	ret
 
 

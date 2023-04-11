@@ -42,7 +42,7 @@ TOCREATE += $(call check_target,coleco,coleco_clib.lib)
 TOCREATE += $(call check_target,cpc,cpc_clib.lib cpcfs.lib cpc_math.lib)
 TOCREATE += $(call check_target,cpm,$(CPMLIBS))
 TOCREATE += $(call check_target,dai,dai_clib.lib)
-TOCREATE += $(call check_target,einstein,einstein.lib $(CPMLIBS))
+TOCREATE += $(call check_target,einstein,einstein.lib einstein256.lib $(CPMLIBS))
 TOCREATE += $(call check_target,embedded,embedded_clib.lib)
 TOCREATE += $(call check_target,enterprise,enterprise_clib.lib gfxep.lib gfxephr.lib)
 TOCREATE += $(call check_target,excali64,excali64_clib.lib $(CPMLIBS))
@@ -999,6 +999,13 @@ einstein.lib:
 	$(MAKE) -C psg TARGET=cpm SUBTYPE=einstein
 	TARGET=einstein TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein -x$(OUTPUT_DIRECTORY)/einstein @$(TARGET_DIRECTORY)/einstein/einstein.lst
 
+einstein256.lib:
+	@echo ''
+	@echo '--- Building Einstein 256 video Library ---'
+	@echo ''
+	$(MAKE) -C video/tms9918 TARGET=cpm SUBTYPE=einstein256
+	TARGET=einstein256 TYPE=z80 DEVICE=nodevice $(LIBLINKER) -DSTANDARDESCAPECHARS -DFOReinstein256 -x$(OUTPUT_DIRECTORY)/einstein256 @$(TARGET_DIRECTORY)/einstein/einstein256.lst
+
 excali64_clib.lib:
 	@echo ''
 	@echo '--- Building Excalibur 64 Library ---'
@@ -1035,6 +1042,7 @@ bic.lib:
 	@echo '--- Building A5105 Library ---'
 	@echo ''
 	$(MAKE) -C video/upd7220 TARGET=bic
+	$(MAKE) -C psg TARGET=cpm SUBTYPE=bic
 	TARGET=bic TYPE=z80 $(LIBLINKER) -DSTANDARDESCAPECHARS -DFORbic -x$(OUTPUT_DIRECTORY)/bic @$(TARGET_DIRECTORY)/bic/bic.lst
 
 # QX10 library

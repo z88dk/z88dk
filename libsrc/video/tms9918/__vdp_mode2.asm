@@ -3,6 +3,8 @@ SECTION code_video_vdp
 
 PUBLIC  __vdp_mode2
 
+EXTERN  CONSOLE_COLUMNS
+
 
 INCLUDE  "video/tms9918/vdp.inc"
 
@@ -44,7 +46,7 @@ SECTION rodata_video_vdp
 
 ; Table adderesses
 mode2_addresses:
-    defb     32      ;columsn
+    defb     CONSOLE_COLUMNS      ;columns
     defb     24      ;rows
     defb     256-1   ;Graphics w
     defb     192-1   ;Graphic h

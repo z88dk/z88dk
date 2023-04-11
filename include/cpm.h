@@ -162,9 +162,49 @@ extern int __LIB__ bdosh(int func,int arg) __smallc;
 extern int __LIB__ bdosh_callee(int func,int arg) __smallc __z88dk_callee;
 #define bdosh(a,b)   bdosh_callee(a,b)
 
-/* Executes the BIOS function passing BC and DE as arguments, error status in A on exit */
+
+/* Known CPM BIOS functions */
+
+#define BIOS_BOOT       0     //  Cold start routine
+#define BIOS_WBOOT      1     //  Warm boot - reload command processor
+#define BIOS_CONST      2     //  Console status
+#define BIOS_CONIN      3     //  Console input
+#define BIOS_CONOUT     4     //  Console output
+#define BIOS_LIST       5     //  Printer output
+#define BIOS_PUNCH      6     //  Paper tape punch output
+#define BIOS_JMP        7     //  Paper tape reader input
+#define BIOS_HOME       8     //  Move disc head to track 0
+#define BIOS_SELDSK     9     //  Select disc drive
+#define BIOS_SETTRK    10     //  Set track number
+#define BIOS_SETSEC    11     //  Set sector number
+#define BIOS_SETDMA    12     //  Set DMA address
+#define BIOS_READ      13     //  Read a sector
+#define BIOS_WRITE     14     //  Write a sector
+
+// CP/M 2 and later
+#define BIOS_LISTST    15     //  Status of list device
+#define BIOS_SECTRAN   16     //  Sector translation for skewing
+
+// CP/M 3
+#define BIOS_CONOST    17     //  Status of console output
+#define BIOS_AUXIST    18     //  Status of auxiliary input
+#define BIOS_AUXOST    19     //  Status of auxiliary output
+#define BIOS_DEVTBL    20     //  Address of devices table
+#define BIOS_DEVINI    21     //  Initialise a device
+#define BIOS_DRVTBL    22     //  Address of discs table
+#define BIOS_MULTIO    23     //  Read/write multiple sectors
+#define BIOS_FLUSH     24     //  Flush host buffers
+#define BIOS_MOVE      25     //  Move a block of memory
+#define BIOS_TIME      26     //  Real time clock
+#define BIOS_SELMEM    27     //  Select memory bank
+#define BIOS_SETBNK    28     //  Select bank for DMA operation
+#define BIOS_XMOVE     29     //  Preload banks for MOVE
+#define BIOS_USERF     30     //  System-depedent functions
+
+
+/* Executes the BIOS function (1-85) passing BC and DE as arguments, error status in A on exit */
 extern int __LIB__ bios(int func,int arg,int arg2) __smallc;
-/* Executes the BIOS function passing BC and DE as arguments, gets the result value from HL on exit */
+/* Executes the BIOS function (1-85) passing BC and DE as arguments, gets the result value from HL on exit */
 extern int __LIB__ biosh(int func,int arg,int arg2) __smallc;
 
 
