@@ -714,6 +714,9 @@ int process(char *suffix, char *nextsuffix, char *processor, char *extraargs, en
     case filter:
         snprintf(buffer, sizeof(buffer), "%s %s < \"%s\" > \"%s\"", processor, extraargs, filelist[number], outname);
         break;
+    case filter_out:
+        snprintf(buffer, sizeof(buffer), "%s %s \"%s\" > \"%s\"", processor, extraargs, filelist[number], outname);
+        break;
     case filter_outspecified_flag:
         snprintf(buffer, sizeof(buffer), "%s %s < \"%s\" -o \"%s\"", processor, extraargs, filelist[number], outname);
         break;
@@ -804,7 +807,7 @@ int linkthem(char *linker)
 
         for (i = 0; i < nfiles; ++i)
         {
-            if (hassuffix(filelist[i], c_extension))
+            if (hassuffix(filelist[i], c_extension) || hassuffix(filelist[i],"obj"))
             {
                 fprintf(out, "%s\n", filelist[i]);
                 if (prj) fprintf(prj, "%s\n", original_filenames[i]);
@@ -835,7 +838,7 @@ int linkthem(char *linker)
 
         for (i = 0; i < nfiles; ++i)
         {
-            if (hassuffix(filelist[i], c_extension))
+            if (hassuffix(filelist[i], c_extension) )
             {
                 offs += snprintf(cmdline + offs, len - offs, " \"%s\"", filelist[i]);
                 if (prj) fprintf(prj, "%s\n", original_filenames[i]);
@@ -1544,6 +1547,9 @@ int main(int argc, char **argv)
                 exit(1);
             free(ptr);
             break;
+        case OBJFILE2:
+            if (process(".obj", c_extension, c_copycmd, "", filter_out, i, YES, YES))
+                exit(1);
         case OBJFILE:
             break;
         default:
@@ -2044,6 +2050,8 @@ int get_filetype_by_suffix(char *name)
         return ASMFILE;
     if (strcmp(ext, ".o") == 0)
         return OBJFILE;
+    if (strcmp(ext, ".obj") == 0)
+        return OBJFILE2;
     if (strcmp(ext, ".m4") == 0)
         return M4FILE;
     if (strcmp(ext, ".h") == 0)
