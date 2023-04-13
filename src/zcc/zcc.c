@@ -299,6 +299,9 @@ static char           *zcc_opt_def = "zcc_opt.def";
 
 static char           *defaultout = "a.bin";
 
+
+static char           *cfg_path = ".";
+
 #define AF_BOOL_TRUE      1
 #define AF_BOOL_FALSE     2
 #define AF_MORE           4
@@ -929,14 +932,15 @@ int main(int argc, char **argv)
     }
 
     if (strlen(configuration) == 0) {
-        fprintf(stderr, "A config file must be specified with +file as the first argument\n\n");
+        fprintf(stderr, "A config file must be specified with +file\n\n");
         print_help_text(argv[0]);
         exit(1);
     }
 
     find_zcc_config_fileFile(argv[0], configuration, config_filename, sizeof(config_filename));
+    cfg_path = zdirname(strdup(config_filename));
     parse_configfile(config_filename);
-
+    
 
     /* Now, parse the default options list */
     if (c_options != NULL) {
@@ -2626,19 +2630,47 @@ void parse_cmdline_arg(char *arg)
 void LoadConfigFile(arg_t *argument, char *arg)
 {
     char   buf[FILENAME_MAX+1];
+    struct stat sb;
     char  *cfgfile;
 
-    cfgfile = getenv("ZCCCFG");
-    if (cfgfile != NULL) {
-        if (strlen(cfgfile) > ( FILENAME_MAX - strlen(arg) - strlen("/") )) {
-            fprintf(stderr, "Possibly corrupt env variable ZCCCFG\n");
-            exit(1);
+
+    do {
+        // 1. Try a local file/absolute path
+        snprintf(buf,sizeof(buf), "%s",arg);
+        if ( stat(buf, &sb) == 0 ) {
+            break;
         }
-        /* Config file in config directory */
-        snprintf(buf, sizeof(buf), "%s/%s", cfgfile, arg);
-    } else {
+
+        // 2. Try in ZCCCFG
+        cfgfile = getenv("ZCCCFG");
+        if (cfgfile != NULL) {
+            if (strlen(cfgfile) > ( FILENAME_MAX - strlen(arg) - strlen("/") )) {
+                fprintf(stderr, "Possibly corrupt env variable ZCCCFG\n");
+                exit(1);
+            }
+            /* Config file in config directory */
+            snprintf(buf, sizeof(buf), "%s/%s", cfgfile, arg);
+            if ( stat(buf, &sb) == 0 ) {
+                break;
+            }
+        }
+
+        // 3. Try in cfg file path
+        snprintf(buf,sizeof(buf),"%s/%s",cfg_path,arg);
+        if ( stat(buf, &sb) == 0 ) {
+            break;
+        }
+
+        // 4. Try install dir
         snprintf(buf, sizeof(buf), "%s/lib/config/%s", c_install_dir, arg);
-    }
+        if ( stat(buf, &sb) == 0 ) {
+            break;
+        }
+
+        fprintf(stderr, "Can't open config file %s\n", arg);
+        exit(1);
+    } while (0);
+
     parse_configfile(buf);
 }
 
@@ -3152,7 +3184,7 @@ void find_zcc_config_fileFile(const char *program, char *arg, char *buf, size_t 
         return;
     }
     /* Without a config file, we should just print usage and then exit */
-    fprintf(stderr, "A config file must be specified with +file as the first argument\n\n");
+    fprintf(stderr, "A config file must be specified with +file\n\n");
     print_help_text(program);
     exit(1);
 }
