@@ -34,6 +34,17 @@
 #ifdef WIN32
 #include        <direct.h>
 #include        <process.h>
+
+#if !defined S_ISDIR
+    #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
+#endif
+
+#if !defined(S_ISREG) 
+    #define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
+#endif
+
+
+
 #else
 #include        <unistd.h>
 #endif
