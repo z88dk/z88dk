@@ -17,6 +17,7 @@ endif
 PREFIX ?= /usr/local
 
 prefix_share = $(PREFIX)/share/z88dk
+bin_dir = $(PREFIX)/bin
 git_rev ?= $(shell git rev-parse --short HEAD)
 git_count ?= $(shell git rev-list --count HEAD)
 version ?= $(shell date +%Y%m%d)
@@ -64,11 +65,13 @@ all: 	$(ALL) $(ALL_EXT)
 src/config.h:
 	$(shell if [ "${git_count}" != "" ]; then \
 		echo '#define PREFIX "${prefix_share}"' > src/config.h; \
+		echo '#define BINDIR "${bin_dir}"' >> src/config.h; \
 		echo '#define UNIX 1' >> src/config.h; \
 		echo '#define Z88DK_VERSION "${git_count}-${git_rev}-${version}"' >> src/config.h; \
 	fi)
 	$(shell if [ ! -f src/config.h ]; then \
 		echo '#define PREFIX "${prefix_share}"' > src/config.h; \
+		echo '#define BINDIR "${bin_dir}"' >> src/config.h; \
 		echo '#define UNIX 1' >> src/config.h; \
 		echo '#define Z88DK_VERSION "unknown-unknown-${version}"' >> src/config.h; \
 		fi)
