@@ -28,4 +28,4 @@ target/vg5k/games/bit_open_di
 target/vg5k/games/bit_close
 target/vg5k/games/bit_close_ei
 @games/games.lst
-
+target/vg5k/interrupts/add_raster_int

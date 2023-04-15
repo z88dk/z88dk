@@ -4275,7 +4275,7 @@
 // #define __HAVE_PSG_AY_ARKOS 0
 // #define __HAVE_PSG_SN76489 0
 // #define __HAVE_PSG_SAA1099 0
-// #define __HAVE_INTERRUPTS 0
+#define __HAVE_INTERRUPTS 1
 #define __NEED_INTERRUPT_INIT 0
 // #define __HAVE_RS232 0
 // #define __HAVE_FILEIO 0
