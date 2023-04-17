@@ -8,76 +8,77 @@ use Modern::Perl;
 # test IF
 #-------------------------------------------------------------------------------
 
+for my $H ("", "#") {
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		if
+		${H}if
 END_ASM
 $test.asm:1: error: syntax error in expression
-  ^---- if
+  ^---- ${H}if
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		if 1+
+		${H}if 1+
 END_ASM
 $test.asm:1: error: syntax error in expression
-  ^---- if 1+
+  ^---- ${H}if 1+
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		if 1,
+		${H}if 1,
 END_ASM
 $test.asm:1: error: syntax error
-  ^---- if 1,
+  ^---- ${H}if 1,
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		if 1
+		${H}if 1
 END_ASM
 $test.asm:2: error: unbalanced control structure started at: $test.asm:1
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		else
+		${H}else
 END_ASM
 $test.asm:1: error: unbalanced control structure
-  ^---- else
+  ^---- ${H}else
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		elif 1
+		${H}elif 1
 END_ASM
 $test.asm:1: error: unbalanced control structure
-  ^---- elif 1
+  ^---- ${H}elif 1
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		endif
+		${H}endif
 END_ASM
 $test.asm:1: error: unbalanced control structure
-  ^---- endif
+  ^---- ${H}endif
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		if 1
-		else
-		else
-		endif
+		${H}if 1
+		${H}else
+		${H}else
+		${H}endif
 END_ASM
 $test.asm:3: error: unbalanced control structure started at: $test.asm:1
-  ^---- else
+  ^---- ${H}else
 END_ERR
 
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		if 1
-		else
-		elif 2
-		endif
+		${H}if 1
+		${H}else
+		${H}elif 2
+		${H}endif
 END_ASM
 $test.asm:3: error: unbalanced control structure started at: $test.asm:1
-  ^---- elif 2
+  ^---- ${H}elif 2
 END_ERR
 
 spew("$test.inc", <<END_ASM);
-	if 1
+	${H}if 1
 END_ASM
 z80asm_nok("", "", <<END_ASM, <<END_ERR);
 		include "$test.inc"
@@ -86,30 +87,30 @@ $test.asm:2: error: unbalanced control structure started at: $test.inc:1
 END_ERR
 
 spew("$test.asm", <<END_ASM);
-		if X		
+		${H}if X		
 		  defb 1	
-		  if Y		
+		  ${H}if Y		
 			defb 2	
-		  else		
+		  ${H}else		
 			defb 3	
-		  endif		
-		else		
+		  ${H}endif		
+		${H}else		
 		  defb 4	
-		  if Y		
+		  ${H}if Y		
 			defb 5	
-		  else		
+		  ${H}else		
 			defb 6	
-		  endif		
-		endif
-		if X
+		  ${H}endif		
+		${H}endif
+		${H}if X
 		  defb 7
-		endif
-		if !X
+		${H}endif
+		${H}if !X
 		  defb 8
-		endif
-		if X|1
+		${H}endif
+		${H}if X|1
 		  defb 9
-		endif
+		${H}endif
 END_ASM
 
 capture_ok("z88dk-z80asm -b $test.asm", "");
@@ -130,19 +131,19 @@ check_bin_file("$test.bin", bytes(1, 2, 7, 9));
 
 # chained IF/ELSE IF
 spew("$test.asm", <<END_ASM);
-		if ONE
+		${H}if ONE
 			defb 1
-		else
-			if TWO
+		${H}else
+			${H}if TWO
 				defb 2
-			else
-				if THREE
+			${H}else
+				${H}if THREE
 					defb 3
-				else
+				${H}else
 					defb 0
-				endif
-			endif
-		endif
+				${H}endif
+			${H}endif
+		${H}endif
 END_ASM
 
 capture_ok("z88dk-z80asm -b $test.asm", "");
@@ -159,15 +160,15 @@ check_bin_file("$test.bin", bytes(3));
 
 # IF/ELIF
 spew("$test.asm", <<END_ASM);
-		if ONE
+		${H}if ONE
 			defb 1
-		elif TWO
+		${H}elif TWO
 			defb 2
-		elif THREE
+		${H}elif THREE
 			defb 3
-		else
+		${H}else
 			defb 0
-		endif
+		${H}endif
 END_ASM
 
 capture_ok("z88dk-z80asm -b $test.asm", "");
@@ -190,71 +191,71 @@ for my $ifdef (qw(ifdef ifndef)) {
 	ok 1, "Test $ifdef";
 	
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		$ifdef
+		${H}$ifdef
 END_ASM
 $test.asm:1: error: syntax error
-  ^---- $ifdef
+  ^---- ${H}$ifdef
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		el$ifdef
+		${H}el$ifdef
 END_ASM
 $test.asm:1: error: unbalanced control structure
-  ^---- el$ifdef
+  ^---- ${H}el$ifdef
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		$ifdef 1
+		${H}$ifdef 1
 END_ASM
 $test.asm:1: error: syntax error
-  ^---- $ifdef 1
+  ^---- ${H}$ifdef 1
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		$ifdef hello,
+		${H}$ifdef hello,
 END_ASM
 $test.asm:1: error: syntax error
-  ^---- $ifdef hello,
+  ^---- ${H}$ifdef hello,
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		$ifdef hello
+		${H}$ifdef hello
 END_ASM
 $test.asm:2: error: unbalanced control structure started at: $test.asm:1
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		el$ifdef hello
+		${H}el$ifdef hello
 END_ASM
 $test.asm:1: error: unbalanced control structure
-  ^---- el$ifdef hello
+  ^---- ${H}el$ifdef hello
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		$ifdef hello
-		else
-		else
-		endif
+		${H}$ifdef hello
+		${H}else
+		${H}else
+		${H}endif
 END_ASM
 $test.asm:3: error: unbalanced control structure started at: $test.asm:1
-  ^---- else
+  ^---- ${H}else
 END_ERR
 
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		$ifdef hello
-		else
-		el$ifdef hello
-		endif
+		${H}$ifdef hello
+		${H}else
+		${H}el$ifdef hello
+		${H}endif
 END_ASM
 $test.asm:3: error: unbalanced control structure started at: $test.asm:1
-  ^---- el$ifdef hello
+  ^---- ${H}el$ifdef hello
 END_ERR
 
 	spew("$test.inc", <<END_ASM);
-		$ifdef hello
+		${H}$ifdef hello
 END_ASM
 	z80asm_nok("", "", <<END_ASM, <<END_ERR);
-		include "$test.inc"
+		${H}include "$test.inc"
 END_ASM
 $test.asm:2: error: unbalanced control structure started at: $test.inc:1
 END_ERR
@@ -262,27 +263,27 @@ END_ERR
 }
 
 spew("$test.asm", <<END_ASM);
-		ifdef X		
+		${H}ifdef X		
 		  defb 1	
-		  ifdef Y		
+		  ${H}ifdef Y		
 			defb 2	
-		  else		
+		  ${H}else		
 			defb 3	
-		  endif		
-		else		
+		  ${H}endif		
+		${H}else		
 		  defb 4	
-		  ifdef Y		
+		  ${H}ifdef Y		
 			defb 5	
-		  else		
+		  ${H}else		
 			defb 6	
-		  endif		
-		endif
-		ifdef X
+		  ${H}endif		
+		${H}endif
+		${H}ifdef X
 		  defb 7
-		endif
-		ifndef X
+		${H}endif
+		${H}ifndef X
 		  defb 8
-		endif
+		${H}endif
 END_ASM
 
 capture_ok("z88dk-z80asm -b $test.asm", "");
@@ -303,19 +304,19 @@ check_bin_file("$test.bin", bytes(1, 2, 7));
 
 # chained IFDEF/ELSE IFDEF
 spew("$test.asm", <<END_ASM);
-		ifdef ONE
+		${H}ifdef ONE
 			defb 1
-		else
-			ifdef TWO
+		${H}else
+			${H}ifdef TWO
 				defb 2
-			else
-				ifdef THREE
+			${H}else
+				${H}ifdef THREE
 					defb 3
-				else
+				${H}else
 					defb 0
-				endif
-			endif
-		endif
+				${H}endif
+			${H}endif
+		${H}endif
 END_ASM
 
 capture_ok("z88dk-z80asm -b $test.asm", "");
@@ -332,15 +333,15 @@ check_bin_file("$test.bin", bytes(3));
 
 # IF/ELIFDEF
 spew("$test.asm", <<END_ASM);
-		ifdef ONE
+		${H}ifdef ONE
 			defb 1
-		elifdef TWO
+		${H}elifdef TWO
 			defb 2
-		elifdef THREE
+		${H}elifdef THREE
 			defb 3
-		else
+		${H}else
 			defb 0
-		endif
+		${H}endif
 END_ASM
 
 capture_ok("z88dk-z80asm -b $test.asm", "");
@@ -357,19 +358,19 @@ check_bin_file("$test.bin", bytes(3));
 
 # chained IFNDEF/ELSE IFNDEF
 spew("$test.asm", <<END_ASM);
-		ifndef ONE
+		${H}ifndef ONE
 			defb 1
-		else
-			ifndef TWO
+		${H}else
+			${H}ifndef TWO
 				defb 2
-			else
-				ifndef THREE
+			${H}else
+				${H}ifndef THREE
 					defb 3
-				else
+				${H}else
 					defb 0
-				endif
-			endif
-		endif
+				${H}endif
+			${H}endif
+		${H}endif
 END_ASM
 
 capture_ok("z88dk-z80asm -b -DONE -DTWO -DTHREE $test.asm", "");
@@ -386,15 +387,15 @@ check_bin_file("$test.bin", bytes(3));
 
 # IF/ELIFNDEF
 spew("$test.asm", <<END_ASM);
-		ifndef ONE
+		${H}ifndef ONE
 			defb 1
-		elifndef TWO
+		${H}elifndef TWO
 			defb 2
-		elifndef THREE
+		${H}elifndef THREE
 			defb 3
-		else
+		${H}else
 			defb 0
-		endif
+		${H}endif
 END_ASM
 
 capture_ok("z88dk-z80asm -b -DONE -DTWO -DTHREE $test.asm", "");
@@ -414,7 +415,7 @@ check_bin_file("$test.bin", bytes(3));
 #------------------------------------------------------------------------------
 
 spew("$test.1.asm", <<END_ASM);
-		if 1
+		${H}if 1
 END_ASM
 spew("$test.2.asm", <<END_ASM);
 		nop
@@ -562,6 +563,8 @@ check_bin_file("$test.bin", bytes(1, 9, 31));
 
 capture_ok("z88dk-z80asm -b -float=am9511 $test.asm", "");
 check_bin_file("$test.bin", bytes(1, 9, 32));
+
+}
 
 unlink_testfiles;
 done_testing;

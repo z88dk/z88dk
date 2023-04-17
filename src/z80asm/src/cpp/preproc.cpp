@@ -307,26 +307,25 @@ void Preproc::parse_line(const string& line) {
 	m_lexer.set(line);
 
 	// do these irrespective of ifs_active()
-	if (check_opcode(Keyword::IF, &Preproc::do_if)) return;
-	if (check_opcode(Keyword::ELSE, &Preproc::do_else)) return;
-	if (check_opcode(Keyword::ENDIF, &Preproc::do_endif)) return;
-	if (check_opcode(Keyword::IFDEF, &Preproc::do_ifdef)) return;
-	if (check_opcode(Keyword::IFNDEF, &Preproc::do_ifndef)) return;
-	if (check_opcode(Keyword::ELIF, &Preproc::do_elif)) return;
-	if (check_opcode(Keyword::ELIFDEF, &Preproc::do_elifdef)) return;
-	if (check_opcode(Keyword::ELIFNDEF, &Preproc::do_elifndef)) return;
+	if (check_opt_hash_opcode(Keyword::IF, &Preproc::do_if)) return;
+	if (check_opt_hash_opcode(Keyword::ELSE, &Preproc::do_else)) return;
+	if (check_opt_hash_opcode(Keyword::ENDIF, &Preproc::do_endif)) return;
+	if (check_opt_hash_opcode(Keyword::IFDEF, &Preproc::do_ifdef)) return;
+	if (check_opt_hash_opcode(Keyword::IFNDEF, &Preproc::do_ifndef)) return;
+	if (check_opt_hash_opcode(Keyword::ELIF, &Preproc::do_elif)) return;
+	if (check_opt_hash_opcode(Keyword::ELIFDEF, &Preproc::do_elifdef)) return;
+	if (check_opt_hash_opcode(Keyword::ELIFNDEF, &Preproc::do_elifndef)) return;
 
 	if (!ifs_active()) return;
 
 	// do these only if ifs_active()
 	if (check_hash_directive(Keyword::DEFINE, &Preproc::do_define)) return;
-	if (check_hash_directive(Keyword::INCLUDE, &Preproc::do_include)) return;
+	if (check_opt_hash_opcode(Keyword::INCLUDE, &Preproc::do_include)) return;
 	if (check_hash_directive(Keyword::UNDEF, &Preproc::do_undef)) return;
 	if (check_opcode(Keyword::BINARY, &Preproc::do_binary)) return;
 	if (check_opcode(Keyword::EXITM, &Preproc::do_exitm)) return;
 	if (check_opcode(Keyword::FLOAT, &Preproc::do_float)) return;
 	if (check_opcode(Keyword::INCBIN, &Preproc::do_binary)) return;
-	if (check_opcode(Keyword::INCLUDE, &Preproc::do_include)) return;
 	if (check_opcode(Keyword::LOCAL, &Preproc::do_local)) return;
 	if (check_opcode(Keyword::SETFLOAT, &Preproc::do_setfloat)) return;
 	if (check_defl()) return;
@@ -390,6 +389,15 @@ bool Preproc::check_hash_directive(Keyword keyword, void(Preproc::* do_action)()
 		((*this).*(do_action))();
 		return true;
 	}
+	else
+		return false;
+}
+
+bool Preproc::check_opt_hash_opcode(Keyword keyword, void(Preproc::* do_action)()) {
+	if (check_hash_directive(keyword, do_action))
+		return true;
+	else if (check_opcode(keyword, do_action))
+		return true;
 	else
 		return false;
 }
