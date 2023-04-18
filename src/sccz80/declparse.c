@@ -419,6 +419,9 @@ Type *parse_struct(Type *type, char isstruct)
             elem = dodeclare2(&base_type, MODE_NONE);
             
             if ( elem != NULL ) {
+                if ( !ispointer(elem) && elem->ptr && elem->ptr->tag && elem->ptr->tag->weak ) {
+	           errorfmt("Field '%s' has incomplete type", 1, elem->name);
+                }
                 if ( strlen(elem->name) == 0 && elem->kind != KIND_STRUCT ) {
                     if ( !rcmatch(':')) {
                         errorfmt("Member variables must be named",1);

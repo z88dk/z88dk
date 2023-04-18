@@ -165,7 +165,10 @@ int agg_init(Type *type, int isflexible)
         }
         if ( type->kind == KIND_ARRAY && type->ptr->kind == KIND_STRUCT ) {
             /* array of struct */
-            if  ( done == 0 ) {
+            if ( rcmatch('0') ) {
+                needchar('0');
+                if ( rcmatch('}') ) break;
+            } else if  ( done == 0 ) {
                 needchar('{');
             } else if ( cmatch('{') == 0 ) {
                 break;
