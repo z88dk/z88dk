@@ -97,9 +97,17 @@ void prtbrd(char b[64]) __z88dk_fastcall;
 int prtscr(char b[64]) __z88dk_fastcall;
 #endif
 
+
+#ifdef __SANYO__
+#define BLACK 151		// 132 on phc-25
+#define WHITE 150		// 133 on phc-25
+//#define EMPTY 149
+#define EMPTY '-'
+#else
 #define BLACK '*'
 #define WHITE 'O'
 #define EMPTY '-'
+#endif
 
 #ifdef __SPECTRUM__
 #define G_BLACK 128
@@ -476,7 +484,13 @@ void prtbrd(char b[64])
 #ifdef GRAPHICS
 #undef TEXT
 	clg();
+
+#ifdef __SANYO__
+	printf("%c",26);
+#else
 	printf("%c",12);
+#endif
+
 	for (i=0; i<8; i++) {
 		putsprite(spr_or,127+i*16,2,&numbers[(i+1)*7]);
 		putsprite(spr_or,112,16+i*16,&numbers[(i+1)*7]);
@@ -595,14 +609,29 @@ void prtbrd(char b[64])
 			putchar('\n');
 		 }
 	#else
+	#ifdef __SANYO__
+	printf("   %ct%c1 2 3 4 5 6 7 8%ct%c\n",27,2,27,0);
+	#else
 	printf("   1 2 3 4 5 6 7 8\n");
+	#endif
 	for (i=0; i<8; i++) {
+		#ifdef __SANYO__
+		printf(" %u%c",i+1,233);
+		#else
 		printf(" %u",i+1);
+		#endif
+
 		for (j=0; j<8; j++) {
 //#ifdef ANSITEXT
 //#endif
+			#ifdef __SANYO__
+			putchar(b[i*8+j]);
+			putchar(' ');
+			#else
 			putchar(' ');
 			putchar(b[i*8+j]);
+			#endif
+
 		 }
 		putchar('\n');
 	 }
@@ -946,12 +975,19 @@ int main()
 
 #endif
 
+#ifdef __SANYO__
+
+	printf("%c\nWelcome to the %ct%c OTHELLO %ct%c program!\n",26,27,6,27,0);
+	printf("\nNote: %ct%c BLACK ALWAYS GOES FIRST %ct%c     ...Good luck!!!\n\n\n",27,2,27,0);
+
+#else
 #ifdef ANSITEXT
 	printf("%c\nWelcome to the %c[7m OTHELLO %c[27m program!\n",12,27,27);
 	printf("\nNote: %c[4m BLACK ALWAYS GOES FIRST\n    %c[24m ...Good luck!!!\n\n\n",27,27);
 #else
 	printf("%c\nWelcome to the OTHELLO program!\n",12);
 	printf("\nNote: BLACK ALWAYS GOES FIRST\n     ...Good luck!!!\n\n\n");
+#endif
 #endif
 	printf("Do you want to go first? ");
 	if (toupper(getchar()) == 'Y') 
