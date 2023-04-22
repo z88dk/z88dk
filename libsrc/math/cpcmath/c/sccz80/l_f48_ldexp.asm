@@ -15,6 +15,11 @@
 ; Stack:     float value, ret
 ; Registers: a = amount to adjust exponent
 l_f48_ldexp:
-	add	(hl)
-	ld	(hl),a
-	ret
+        ld      hl,fa+5
+        ld      c,a
+        ld      a,(hl)
+        and     a
+        ret     z
+        add     c
+        ld      (hl),a
+        ret
