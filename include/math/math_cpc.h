@@ -104,7 +104,6 @@ extern void __LIB__ ftoa(double_t, int, char *) __smallc;
 extern void __LIB__ ftoe(double_t, int, char *) __smallc;
 
 /* CPC Only function */
-extern double_t __LIB__ pow10(int x);         /* pow(10,x) - CPC only */
 extern void __LIB__ deg();
 extern void __LIB__ rad();
 

@@ -105,15 +105,14 @@
         ld      (dsubc),hl
         ld      hl,CPCFP464_FLO_EXP
         ld      (expc),hl
-        ld      hl,CPCFP464_INT_2_FLO
+        ld      hl,CPCFP464_BIN_2_FLO
         ld      (floatc),hl
+        ld      (floorc2),hl
         ld      hl,CPCFP464_FLO_BINFIX
         ld      (floorc),hl
-        ld      hl,CPCFP464_BIN_2_FLO
-        ld      (floorc2),hl
         ld      hl,CPCFP464_FLO_RND
         ld      (fprandc),hl
-        ld      hl,CPCFP464_FLO_2_INT
+        ld      hl,CPCFP464_FLO_BINFIX2
         ld      (ifixc),hl
         ld      hl,CPCFP464_FLO_LOG10
         ld      (log10c),hl
@@ -158,15 +157,14 @@
         ld      (dsubc),hl
         ld      hl,CPCFP664_FLO_EXP
         ld      (expc),hl
-        ld      hl,CPCFP664_INT_2_FLO
+        ld      hl,CPCFP664_BIN_2_FLO
         ld      (floatc),hl
+        ld      (floorc2),hl
         ld      hl,CPCFP664_FLO_BINFIX
         ld      (floorc),hl
-        ld      hl,CPCFP664_BIN_2_FLO
-        ld      (floorc2),hl
         ld      hl,CPCFP664_FLO_RND
         ld      (fprandc),hl
-        ld      hl,CPCFP664_FLO_2_INT
+        ld      hl,CPCFP664_FLO_BINFIX2
         ld      (ifixc),hl
         ld      hl,CPCFP664_FLO_LOG10
         ld      (log10c),hl

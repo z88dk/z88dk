@@ -23,34 +23,24 @@
         EXTERN cpc_enable_fw_exx_set, cpc_enable_process_exx_set
  
  firmware:
- 
         di
-		
-		call cpc_enable_fw_exx_set
- 
         exx
-		
-		pop     hl               ; hl = return address
-		ld      e,(hl)
-		inc     hl
-		ld      d,(hl)
-		inc     hl
-		
-		push    hl               ; save return address
-		ld      hl,restore
-		push    hl
-		push    de               ; save firmware address
-		
-		exx
-		
-		ei
-		ret
+	pop     hl               ; hl = return address
+	ld      e,(hl)
+	inc     hl
+	ld      d,(hl)
+	inc     hl
+	push    hl               ; save return address
+	ld      hl,restore
+	push    hl
+	push    de               ; save firmware address
+	exx
+	call cpc_enable_fw_exx_set
+	ei
+	ret
 
 restore:
-
         di
-		
-		call    cpc_enable_process_exx_set
-		
-		ei
-		ret
+	call    cpc_enable_process_exx_set
+	ei
+	ret

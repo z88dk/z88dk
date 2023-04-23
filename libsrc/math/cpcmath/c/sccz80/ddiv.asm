@@ -17,7 +17,7 @@
 		EXTERN		stkequ
 		EXTERN		fa
 
-.ddiv						; (fa+1)=(fa+1)*(sp+3)
+.ddiv						; (fa+1)=(sp+3)/(fa+1)
 		call	fsetup
         call    firmware
 .ddivc	defw	CPCFP_FLO_DIV		; (hl)=(hl)/(de)
