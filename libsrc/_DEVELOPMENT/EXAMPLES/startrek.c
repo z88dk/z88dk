@@ -30,7 +30,6 @@
 // classic
 // zcc +cpm -clib=8085 -O2 startrek.c -o startrek --math-mbf32_8085 -create-app
 // zcc +rc2014 -SO2 -subtype=basic85 startrek.c -o startrek --math-mbf32_8085 -create-app
-// zcc +rc2014 -SO2 -subtype=basic85 startrek.c -o startrek --math-am9511_8085 -create-app
 
 // newlib
 // zcc +cpm -vn -SO3 -clib=sdcc_iy --max-allocs-per-node200000 --opt-code-size startrek.c -o startrek -lm -create-app
