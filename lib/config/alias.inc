@@ -20,7 +20,9 @@ ALIAS   --math-bbc              -Cc-fp-mode=z88     -lbbc_math
 ALIAS   --math-dai32            -Cc-fp-mode=am9511  -ldaimath32 -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_DAI32 -Ca-D__MATH_DAI32 -D__MATH_DAI32
 ALIAS   --math-dai32_8080       -Cc-fp-mode=am9511  -ldaimath32_8080 -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_DAI32 -Ca-D__MATH_DAI32 -D__MATH_DAI32
 ALIAS   --math-am9511_8085      -Cc-fp-mode=ieee    -lam9511_8085 -pragma-define:CLIB_32BIT_FLOATS=1 -Cc-D__MATH_AM9511 -Ca-D__MATH_AM9511 -D__MATH_AM9511
-ALIAS	--math-cpc		-Cc-fp-mode=z88     -lcpcz80_math -D__MATH_CPC
+ALIAS	--math-cpc		-Cc-fp-exponent-bias=128 -Cc-fp-mantissa-size=5     -lcpcz80_math -D__MATH_CPC
+
+
 
 #
 # Math library aliases (classic + newlib)
