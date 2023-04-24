@@ -1,7 +1,7 @@
 
     SECTION code_fp
 
-    PUBLIC  l_f48_ldexp
+    PUBLIC  ldexp
 
     EXTERN  dload
     EXTERN  fa
@@ -12,11 +12,14 @@
 ; Returns the result of multiplying x (the significand) by 2 
 ; raised to the power of exp (the exponent).
 
-; Stack:     float value, ret
-; Registers: a = amount to adjust exponent
-l_f48_ldexp:
+ldexp:
+    ld      hl,4
+    add     hl,sp
+    call    dload
+    ld      hl,2
+    add     hl,sp
+    ld      c,(hl)
     ld      hl,fa+5
-    ld      c,a
     ld      a,(hl)
     and     a
     ret     z

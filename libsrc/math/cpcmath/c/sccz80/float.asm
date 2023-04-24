@@ -7,8 +7,7 @@
 ;
 
     SECTION smc_fp
-    INCLUDE "target/cpc/def/cpcfp.def"
-    INCLUDE "target/cpc/def/cpcfirm.def"
+    INCLUDE "cpcmath.inc"
 
     PUBLIC float
     EXTERN int_inv_sgn
@@ -16,26 +15,26 @@
     EXTERN fa
     EXTERN asm_labs
 
-.float  ld      a,d
-	push	af
-	call	asm_labs
-	pop	af
-	push	de
-	push	de
-	push	hl
-	ld	hl,0
-	add	hl,sp
-	call	firmware
-floatc:
-	defw	CPCFP_BIN_2_FLO
-	ld	hl,0
-	add	hl,sp
-	ld	de,fa+1
-	ld	bc,5
-	ldir
-	pop	bc
-	pop	bc
-	pop	bc
-	ret
+.float
+    ld      a,d
+    push    af
+    call    asm_labs
+    pop     af
+    push    de
+    push    de
+    push    hl
+    ld      hl,0
+    add     hl,sp
+.floatc
+    FPCALL(CPCFP_BIN_2_FLO)
+    ld      hl,0
+    add     hl,sp
+    ld      de,fa+1
+    ld      bc,5
+    ldir
+    pop     bc
+    pop     bc
+    pop     bc
+    ret
 
 

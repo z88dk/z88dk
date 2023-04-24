@@ -7,8 +7,7 @@
 ;
 
     SECTION smc_fp
-    INCLUDE "target/cpc/def/cpcfirm.def"
-    INCLUDE "target/cpc/def/cpcfp.def"
+    INCLUDE "cpcmath.inc"
 
     PUBLIC  ifix
     PUBLIC  ifixc
@@ -17,9 +16,8 @@
 
 .ifix
     ld      hl,fa+1
-    call    firmware
-.ifixc	
-    defw	CPCFP_FLO_BINFIX2
+.ifixc
+    FPCALL(CPCFP_FLO_BINFIX2)
     ld      hl,(fa+1)
     ld      de,(fa+3)
     bit     7,b

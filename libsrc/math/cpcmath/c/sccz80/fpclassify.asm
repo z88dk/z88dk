@@ -12,9 +12,9 @@ EXTERN fa
 ;	 3 = infinite
 
 fpclassify:
-	ld	a,(fa+5)	;exponent
-	ld	hl,1
-	and	a
-	ret	z
-	dec	hl
-	ret
+    ld      a,(fa+5)	;exponent
+    ld      hl,1
+    and     a
+    ret     z
+    dec     hl
+    ret
