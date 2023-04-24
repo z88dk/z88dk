@@ -12,7 +12,7 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += -D__CPC__ -D__NATIVE_MATH__ -D__MATH_CPC
 
-all: dirs $(OUTPUT_DIRECTORY)/cpc_math.lib $(OUTPUT_DIRECTORY)/464_math.lib $(OUTPUT_DIRECTORY)/664_math.lib $(OUTPUT_DIRECTORY)/6128_math.lib $(OUTPUT_DIRECTORY)/cpcportable_math.lib
+all: dirs $(OUTPUT_DIRECTORY)/cpc_math.lib $(OUTPUT_DIRECTORY)/464_math.lib $(OUTPUT_DIRECTORY)/664_math.lib $(OUTPUT_DIRECTORY)/6128_math.lib $(OUTPUT_DIRECTORY)/cpcz80_math.lib
 
 
 $(OUTPUT_DIRECTORY)/cpc_math.lib: $(addprefix obj/cpc/, $(OBJECTS))
@@ -28,7 +28,7 @@ $(OUTPUT_DIRECTORY)/6128_math.lib: $(addprefix obj/6128/, $(OBJECTS))
 	TYPE=6128 $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/6128_math @cpcmath.lst
 
 $(OUTPUT_DIRECTORY)/cpcz80_math.lib: $(addprefix obj/portable/, $(OBJECTS))
-	TYPE=portable $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpcportable_math @cpcmath.lst
+	TYPE=portable $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/cpcz80_math @cpcmath.lst
 
 obj/cpc/%.o: %.asm
 	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC $^
