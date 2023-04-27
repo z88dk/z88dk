@@ -1,0 +1,6 @@
+target/mbc200/subcpu/mbc_sendchar
+target/mbc200/subcpu/mbc_getbyte
+target/mbc200/subcpu/mbc_getword
+target/mbc200/subcpu/mbc_rcv_rdy
+target/mbc200/subcpu/mbc_sub
+target/mbc200/subcpu/mbc_fade
