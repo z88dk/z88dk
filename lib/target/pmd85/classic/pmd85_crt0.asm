@@ -41,6 +41,9 @@ ENDIF
     EXTERN  asm_im1_handler
     defc    _z80_rst_38h = asm_im1_handler
 
+    defc    TAR__crt_enable_eidi = 0x02     ;Enable interrupts on start
+    defc    TAR__crt_on_exit = 0x8000       ;Just loop
+
     INCLUDE "crt/classic/crt_rules.inc"
 
     defc    CRT_ORG_CODE = 0x0000
@@ -63,13 +66,9 @@ program:
     ld      hl,0
     add     hl,sp
     ld      (exitsp),hl
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
-    ei
+    INCLUDE "crt/classic/crt_start_eidi.inc"
+    ld      bc,0
     push    bc	;argv
     push    bc	;argc
     call    _main
@@ -79,7 +78,7 @@ cleanup:
     push    hl
     call    crt0_exit
     pop     hl
-    jp      $8000
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 

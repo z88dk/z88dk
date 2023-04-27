@@ -79,6 +79,9 @@ ENDIF
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__no_ansifont = 1
     defc    TAR__clib_exit_stack_size = 0
+    defc    TAR__crt_on_exit = 0            ;Jump to 0 when finished
+    defc    TAR__crt_enable_eidi = $02      ;Enable ei on startup 
+
     INCLUDE "crt/classic/crt_rules.inc"
 
     org     CRT_ORG_CODE
@@ -91,23 +94,23 @@ ENDIF
 
     defb    'Y', 'E'        ;GL2000/4000 auto-start signature
 
-    jp      program
+    jp      start
 
 
 
-program:
+start:
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
     ld      (exitsp),sp
-    ei
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     call    asm_lcd_init
 IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
     call    _main
 cleanup:
-    rst     0
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 
 l_dcal:

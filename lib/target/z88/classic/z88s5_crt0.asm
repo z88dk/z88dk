@@ -2,30 +2,30 @@
 ;       Startup stub for z88 OZ5 shell
 ;
 
-        PUBLIC    cleanup               ;jp'd to by exit()
-        PUBLIC    l_dcal                ;jp(hl)
+    PUBLIC    cleanup               ;jp'd to by exit()
+    PUBLIC    l_dcal                ;jp(hl)
 
 
-        PUBLIC    processcmd    ;Processing <> commands
+    PUBLIC    processcmd    ;Processing <> commands
 
 
 
 
-        INCLUDE	"stdio.def"
-        INCLUDE "error.def"
+    INCLUDE	"stdio.def"
+    INCLUDE "error.def"
 
-        INCLUDE	"elf.def"
+    INCLUDE	"elf.def"
 
-        defc    TAR__clib_exit_stack_size = 32
-        defc    TAR__register_sp = -1
-        defc	CRT_KEY_DEL = 127
-        IF !DEFINED_CRT_ORG_CODE
-            defc    CRT_ORG_CODE = $2000
-        ENDIF
-        INCLUDE "crt/classic/crt_rules.inc"
+    defc    TAR__clib_exit_stack_size = 32
+    defc    TAR__register_sp = -1
+    defc	CRT_KEY_DEL = 127
+IF !DEFINED_CRT_ORG_CODE
+    defc    CRT_ORG_CODE = $2000
+ENDIF
+    INCLUDE "crt/classic/crt_rules.inc"
 
 
-        org	CRT_ORG_CODE
+    org	CRT_ORG_CODE
 
 ;-----------
 ; Code starts executing from here

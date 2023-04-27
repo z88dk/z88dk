@@ -17,6 +17,7 @@
 
 
 ; $Id: amalloc.def,v 1.4 2016-07-14 17:44:17 pauloscustodio Exp $
+IF DEFINED_USING_amalloc
 
 IF CRT_MAX_HEAP_ADDRESS
     ld      hl,CRT_MAX_HEAP_ADDRESS
@@ -124,3 +125,5 @@ ENDIF
     push    hl      ; area size
     EXTERN  sbrk_callee
     call    sbrk_callee
+
+ENDIF

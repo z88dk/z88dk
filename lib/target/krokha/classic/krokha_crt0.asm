@@ -40,6 +40,10 @@
 
     defc    CONSOLE_COLUMNS = 48
     defc    CONSOLE_ROWS = 32
+
+    defc    TAR__crt_enable_eidi = 0x02     ;Enable interrupts on start
+    defc    TAR__crt_on_exit = 0x0000       ;Jump to exit
+
     INCLUDE "crt/classic/crt_rules.inc"
 
 
@@ -51,27 +55,27 @@ if (ASMPC<>$0000)
     defs    CODE_ALIGNMENT_ERROR
 endif
 
-    jp      program
+    jp      start
     INCLUDE	"crt/classic/crt_z80_rsts.asm"
 ENDIF
 
-program:
+start:
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
     ld      hl,0
     add     hl,sp
     ld      (exitsp),hl
-    ei
-IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     ld      hl,0
     push    hl	;argv
     push    hl	;argc
     call    _main
 cleanup:
-    jp      0
+    call    crt0_exit
+    INCLUDE "crt/classic/crt_terminate.inc"
+
 
 l_dcal: jp      (hl)            ;Used for function pointer calls
 

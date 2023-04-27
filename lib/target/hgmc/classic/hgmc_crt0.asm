@@ -36,6 +36,9 @@
     EXTERN  asm_im1_handler
     defc    _z80_rst_38h = asm_im1_handler
 
+    defc    TAR__crt_on_exit = RESTART
+    defc    TAR__crt_enable_eidi = $02      ;Enable ei on startup 
+
     INCLUDE "crt/classic/crt_rules.inc"
 
     defc    CRT_ORG_CODE = 0x0000
@@ -47,21 +50,21 @@ if (ASMPC<>$0000)
     defs    CODE_ALIGNMENT_ERROR
 endif
 
-    jp      program
+    jp      start
 
     INCLUDE "crt/classic/crt_z80_rsts.asm"
 
-program:
+start:
     INCLUDE "crt/classic/crt_init_sp.asm"
     INCLUDE "crt/classic/crt_init_atexit.asm"
     call    crt0_init_bss
     ld      hl,0
     add     hl,sp
     ld      (exitsp),hl
-    ei
 IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
 ENDIF
+    INCLUDE "crt/classic/crt_start_eidi.inc"
     ld      hl,0
     push    hl	;argv
     push    hl	;argc
@@ -69,7 +72,7 @@ ENDIF
     pop     bc
     pop     bc
 cleanup:
-    jp      RESTART
+    INCLUDE "crt/classic/crt_terminate.inc"
 
 l_dcal:
     jp      (hl)            ;Used for function pointer calls

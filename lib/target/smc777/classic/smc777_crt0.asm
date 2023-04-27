@@ -23,7 +23,7 @@
     defc    TAR__fputc_cons_generic = 1
     defc    TAR__clib_exit_stack_size = 32
     defc    TAR__register_sp = $0000
-    defc    TAR__crt_enable_eidi = 0x01     ;Enable interrupts on start
+    defc    TAR__crt_enable_eidi = 0x02     ;Enable interrupts on start
     defc    TAR__crt_on_exit = 0x10001      ;Just loop
 
     defc    CRT_KEY_DEL = 127
@@ -71,12 +71,7 @@ program:
     ; Enable interrupts (by default)
     INCLUDE "crt/classic/crt_start_eidi.inc"
 
-; Optional definition for auto MALLOC init
-; it assumes we have free space between the end of
-; the compiled program and the stack pointer
-IF DEFINED_USING_amalloc
     INCLUDE "crt/classic/crt_init_amalloc.asm"
-ENDIF
     ld      hl,0
     push    hl      ;argv
     push    hl      ;argc
@@ -85,7 +80,6 @@ ENDIF
     pop     bc
 cleanup:
     call    crt0_exit
-
     INCLUDE "crt/classic/crt_terminate.inc"
 
 
