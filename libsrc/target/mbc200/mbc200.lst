@@ -23,3 +23,9 @@ gfx/wide/obj/${TARGET}/w_putsprite2
 gfx/wide/obj/${TARGET}/__generic_w_putsprite
 gfx/wide/obj/${TARGET}/__generic_w_stencil_render
 @gfx/wide/gfx_wide.lst
+target/mbc200/games/bit_open
+target/mbc200/games/bit_open_di
+target/mbc200/games/bit_close
+target/mbc200/games/bit_close_ei
+games/joystick
+@games/games.lst
