@@ -184,6 +184,7 @@ define buildcrt
 	$(MAKE) -C stdlib
 	$(MAKE) -C time
 	$(MAKE) -C z80_crt0s
+	$(MAKE) -C math/fix88
 endef
 
 #  short script to sort out ticalc dependencies
