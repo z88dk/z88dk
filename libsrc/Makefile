@@ -1086,6 +1086,7 @@ mbc200.lib:
 	@echo ''
 	$(call buildgeneric,cpm)
 	$(MAKE) -C gfx TARGET=cpm FLAVOUR="wide" SUBTYPE=mbc200
+	$(MAKE) -C games TARGET=cpm SUBTYPE=mbc200
 	TARGET=mbc200 TYPE=z80 $(LIBLINKER) -DFORmbc200 -DSTANDARDESCAPECHARS -x$(OUTPUT_DIRECTORY)/mbc200.lib @$(TARGET_DIRECTORY)/mbc200/mbc200.lst
 
 # MC-1000 library - Stefano
