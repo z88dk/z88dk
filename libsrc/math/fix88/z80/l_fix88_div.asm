@@ -19,7 +19,6 @@
 ;Outputs:
 ;     HL is the 8.8 Fixed Point result (rounded to the least significant bit)
 l_fix88_div:
-    ex      de,hl
     ld      bc,hl
 
 BC_Div_DE_88:
