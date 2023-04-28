@@ -222,6 +222,23 @@ IF FORpc88
         ;----
 ENDIF
 
+IF FORmbc200
+        defc SOUND_ONEBIT_port   = $E9
+        defc SOUND_ONEBIT_bit    = 1
+        defc SOUND_ONEBIT_mask   = 2
+        ;----
+        defc PLAY_DATA_LEAD    = 186   ; (164) Timing for the leading tone
+        defc PLAY_DATA_SYNC1   = 51    ; (47, 49) Sync bit / Tuned delay for switching to the next byte
+        defc PLAY_DATA_BIAS    = 5     ; Fine tuning the parameters
+        defc PLAY_DATA_SYNC2   = 62    ; (55, 59)
+        defc PLAY_DATA_BIT0    = 69    ; (62, 66) Delay for bit 1 uses both PLAY_DATA_BIT0 twice
+        defc LDR_DATA_TIMING   = 34
+        defc PLAY_MSXDATA_HI     = 12914    ; 1200 baud, High tone period
+        defc PLAY_MSXDATA_LO     = 26408    ; 1200 baud, Low tone period
+        defc PLAY_MSXDATA_HDR    = 15       ; 1200 baud, leading tone cycle count
+        ;----
+ENDIF
+
 IF FORti82
         defc SOUND_ONEBIT_port   = 0
         defc SOUND_ONEBIT_bit    = 2
