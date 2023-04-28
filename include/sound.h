@@ -222,6 +222,10 @@ extern void __LIB__ bit_tapin_bit(void);
   #define BEEP_TSTATES 500000.0  /* 4 Mhz */
 #endif
 
+#ifdef __SANYO__
+  #define BEEP_TSTATES 500000.0  /* 4 Mhz */
+#endif
+
 #ifdef __SPECTRUM__
   #define BEEP_TSTATES 437500.0  /* 3.5 Mhz; float value = CPU_CLOCK*125 */
 #endif
