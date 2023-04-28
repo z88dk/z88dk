@@ -418,9 +418,9 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		if(*(locn+temp2)==BUBB)
 		{
 #ifdef xsize
-			putsprite(spr_xor,x+(plusx*xsize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
+			putsprite(spr_and,x+(plusx*xsize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
 #else
-			putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
+			putsprite(spr_and,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * BUBB));
 #endif
 
 			#ifdef SOUND
@@ -435,12 +435,12 @@ void MovePiece(char *ptr, char plusx, char plusy)
 		*locn = 0;
 
  		/* remove old */
-		putsprite(spr_xor,x,y,sprites + (spritemem * temp));
+		putsprite(spr_and,x,y,sprites + (spritemem * temp));
 		/* put new */
 #ifdef xsize
-		putsprite(spr_xor,x+(plusx*xsize),y+(plusy*spritesize),sprites + (spritemem * temp));
+		putsprite(spr_or,x+(plusx*xsize),y+(plusy*spritesize),sprites + (spritemem * temp));
 #else
-		putsprite(spr_xor,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * temp));
+		putsprite(spr_or,x+(plusx*spritesize),y+(plusy*spritesize),sprites + (spritemem * temp));
 #endif
 		
 		#ifdef SOUND
