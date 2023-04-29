@@ -1,4 +1,5 @@
 #include <math/math_fix88.h>
+#include <stdlib.h>
 
 fix88_t fix88_exp(fix88_t fp) __z88dk_fastcall
 {

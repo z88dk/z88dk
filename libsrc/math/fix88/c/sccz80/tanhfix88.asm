@@ -2,20 +2,18 @@
 
     SECTION code_clib
 
-    PUBLIC  sqrtfix88
-    PUBLIC  _sqrtfix88
+    PUBLIC  tanhfix88
+    PUBLIC  _tanhfix88
+    EXTERN  asm_fix88_tanh
 
 
-    EXTERN  asm_fix88_sqrt
-
-
-sqrtfix88:
-_sqrtfix88:
+tanhfix88:
+_tanhfix88:
     ld      hl,2
     add     hl,sp
     ld      a,(hl)
     inc     hl
     ld      h,(hl)
     ld      l,a
-    jp      asm_fix88_sqrt
+    jp      asm_fix88_tanh
 

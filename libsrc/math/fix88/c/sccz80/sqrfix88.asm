@@ -2,20 +2,20 @@
 
     SECTION code_clib
 
-    PUBLIC  sqrtfix88
-    PUBLIC  _sqrtfix88
+    PUBLIC  sqrfix88
+    PUBLIC  _sqrfix88
 
 
-    EXTERN  asm_fix88_sqrt
+    EXTERN  asm_fix88_sqr
 
 
-sqrtfix88:
-_sqrtfix88:
+sqrfix88:
+_sqrfix88:
     ld      hl,2
     add     hl,sp
     ld      a,(hl)
     inc     hl
     ld      h,(hl)
     ld      l,a
-    jp      asm_fix88_sqrt
+    jp      asm_fix88_sqr
 

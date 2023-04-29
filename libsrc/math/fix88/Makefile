@@ -2,10 +2,9 @@
 
 include ../../Make.config
 
-vpath %.c ../cimpl/ cimpl/
 
 AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard z80/*asm)
-CFILES  = exp88.c
+CFILES  = $(wildcard cimpl/*.c)
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += 
@@ -21,7 +20,7 @@ obj/z80/%.o: %.asm
 	@mv $(^:.asm=.o) $@
 
 dirs:
-	@mkdir -p obj/z80/c/sccz80  obj/z80/z80
+	@mkdir -p obj/z80/c/sccz80  obj/z80/z80 obj/z80/cimpl
 
 clean:
 	$(RM) *.o* *.sym *.map *.err zcc_opt.def *.i *.opt
