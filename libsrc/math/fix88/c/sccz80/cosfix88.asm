@@ -4,8 +4,6 @@
 
     PUBLIC  cosfix88
     PUBLIC  _cosfix88
-    PUBLIC  cosfix88_fastcall
-    PUBLIC  _cosfix88_fastcall
 
     EXTERN  asm_fix88_cos
 
@@ -18,7 +16,5 @@ _cosfix88:
     inc     hl
     ld      h,(hl)
     ld      l,a
-cosfix88_fastcall:
-_cosfix88_fastcall:
     jp      asm_fix88_cos
 

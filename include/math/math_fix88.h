@@ -33,6 +33,7 @@ typedef int16_t fix88_t;
 extern fix88_t __LIB__ mulfix88(fix88_t x,fix88_t y) __smallc;
 extern fix88_t __LIB__ mulfix88_callee(fix88_t x,fix88_t y) __smallc __z88dk_callee;
 #define mulfix88(x,y) mulfix88_callee(x,y)
+
 extern fix88_t __LIB__ divfix88(fix88_t x,fix88_t y) __smallc;
 extern fix88_t __LIB__ divfix88_callee(fix88_t x,fix88_t y) __smallc __z88dk_callee;
 #define divfix88(x,y) divfix88_callee(x,y)
@@ -80,6 +81,16 @@ extern fix88_t __LIB__ atanhfix88_fastcall(fix88_t x) __z88dk_fastcall;
 
 
 /* Exponential, logarithmic and power functions */
+
+extern fix88_t __LIB__ powfix88(fix88_t x,fix88_t y) __smallc;
+extern fix88_t __LIB__ powfix88_callee(fix88_t x,fix88_t y) __smallc __z88dk_callee;
+#define powfix88(x,y) powfix88_callee(x,y)
+
+
+extern fix88_t __LIB__ pow2fix88 (fix88_t x);
+extern fix88_t __LIB__ pow2fix88_fastcall (fix88_t x) __z88dk_fastcall;
+#define pow2fix88(x) pow2fix88_fastcall(x)
+
 extern fix88_t __LIB__ expfix88 (fix88_t x);
 extern fix88_t __LIB__ expfix88_fastcall (fix88_t x) __z88dk_fastcall;
 #define expfix88(x) expfix88_fastcall(x)
