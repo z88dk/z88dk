@@ -12,10 +12,10 @@
 ;
 
     SECTION code_math
-    PUBLIC  l_fix88_log2
+    PUBLIC  asm_fix88_log2
 
 
-l_fix88_log2:
+asm_fix88_log2:
 
 Log_2_88_size:
 ;Inputs:

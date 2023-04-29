@@ -5,7 +5,7 @@
     PUBLIC  divfix88
     PUBLIC  _divfix88
 
-    EXTERN  l_fix88_div
+    EXTERN  asm_fix88_div
 
 
 divfix88:
@@ -21,5 +21,5 @@ _divfix88:
     ld      h,(hl)
     inc     hl
     ld      l,a
-    jp      l_fix88_div
+    jp      asm_fix88_div
 

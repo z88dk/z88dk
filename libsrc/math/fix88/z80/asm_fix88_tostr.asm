@@ -19,15 +19,15 @@
 
 
     SECTION code_math
-    PUBLIC  l_fix88_tostr
-    EXTERN  l_fix88_itoa8
+    PUBLIC  asm_fix88_tostr
+    EXTERN  asm_fix88_itoa8
 
 
 ;Written by Zeda.
 ;This converts a fixed-point number to a string.
 ;It displays up to 3 digits after the decimal.
 
-l_fix88_tostr:
+asm_fix88_tostr:
 fixed88_to_str:
 ;Inputs:
 ;   D.E is the fixed-point number
@@ -55,7 +55,7 @@ l0:
 
 ;Our adjusted number is in A.E
 ;Now we can print the integer part
-  call l_fix88_itoa8
+  call asm_fix88_itoa8
 
 ;Check if we need to print the fractional part
   xor a

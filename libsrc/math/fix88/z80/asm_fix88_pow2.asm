@@ -12,11 +12,11 @@
 ;
 
     SECTION code_math
-    PUBLIC  l_fix88_pow2
-    EXTERN  l_fix88_sqrt
+    PUBLIC  asm_fix88_pow2
+    EXTERN  asm_fix88_sqrt
 
 
-l_fix88_pow2:
+asm_fix88_pow2:
 pow2:
 ;Inputs:
 ;     HL is the 8.8 fixed point number 'x' for 2^x
@@ -35,7 +35,7 @@ loop0:
      ld hl,2*256
 powloop:
      push af
-     call   l_fix88_sqrt        ;returns in hl
+     call   asm_fix88_sqrt        ;returns in hl
      pop af
      srl a
      jr z,integerpow

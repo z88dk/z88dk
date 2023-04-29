@@ -12,11 +12,11 @@
 ;
 
     SECTION code_math
-    PUBLIC  l_fix88_mult
+    PUBLIC  asm_fix88_mult
 
     EXTERN  l_mulu_32_16x16
 
-l_fix88_mult:
+asm_fix88_mult:
 
 mulfixed_88:
 ;Multiplies H.L by D.E, stores the result in H.L

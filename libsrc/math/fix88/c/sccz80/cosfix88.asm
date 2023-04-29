@@ -7,7 +7,7 @@
     PUBLIC  cosfix88_fastcall
     PUBLIC  _cosfix88_fastcall
 
-    EXTERN  l_fix88_cos
+    EXTERN  asm_fix88_cos
 
 
 cosfix88:
@@ -20,5 +20,5 @@ _cosfix88:
     ld      l,a
 cosfix88_fastcall:
 _cosfix88_fastcall:
-    jp      l_fix88_cos
+    jp      asm_fix88_cos
 

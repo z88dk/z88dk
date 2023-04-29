@@ -12,12 +12,12 @@
 ;
 
     SECTION code_math
-    PUBLIC  l_fix88_sqrt
+    PUBLIC  asm_fix88_sqrt
 
 
 ; Entry: h.l = Q8.8 number
 ; Exit:  h.l = sqrt of it
-l_fix88_sqrt:
+asm_fix88_sqrt:
     ld      a,h
     ld      c,l
 

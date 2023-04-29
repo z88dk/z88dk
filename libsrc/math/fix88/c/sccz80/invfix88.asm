@@ -7,7 +7,7 @@
     PUBLIC  invfix88_fastcall
     PUBLIC  _invfix88_fastcall
 
-    EXTERN  l_fix88_inv
+    EXTERN  asm_fix88_inv
 
 
 invfix88:
@@ -20,5 +20,5 @@ _invfix88:
     ld      l,a
 invfix88_fastcall:
 _invfix88_fastcall:
-    jp      l_fix88_inv
+    jp      asm_fix88_inv
 

@@ -12,10 +12,10 @@
 ;
 
     SECTION code_math
-    PUBLIC  l_fix88_log
+    PUBLIC  asm_fix88_log
 
 
-l_fix88_log:
+asm_fix88_log:
 lognat:
 ;Input:  H.L needs to be on (0,128.0)
 ;Output: H.L if c flag set

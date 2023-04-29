@@ -19,13 +19,13 @@
 
 
     SECTION code_math
-    PUBLIC  l_fix88_itoa8
+    PUBLIC  asm_fix88_itoa8
 
 
 ;Written by Zeda
 ;Converts an 8-bit signed integer to a string
 
-l_fix88_itoa8:
+asm_fix88_itoa8:
 itoa_8:
 ;Input:
 ;   A is a signed integer

@@ -12,13 +12,13 @@
 ;
 
     SECTION code_math
-    PUBLIC  l_fix88_div
+    PUBLIC  asm_fix88_div
 
 ;Inputs:
 ;     hl,de are 8.8 Fixed Point numbers (hl/de)
 ;Outputs:
 ;     HL is the 8.8 Fixed Point result (rounded to the least significant bit)
-l_fix88_div:
+asm_fix88_div:
     ld      bc,hl
 
 BC_Div_DE_88:

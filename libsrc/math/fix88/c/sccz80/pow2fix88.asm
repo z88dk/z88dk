@@ -7,7 +7,7 @@
     PUBLIC  pow2fix88_fastcall
     PUBLIC  _pow2fix88_fastcall
 
-    EXTERN  l_fix88_pow2
+    EXTERN  asm_fix88_pow2
 
 
 pow2fix88:
@@ -20,5 +20,5 @@ _pow2fix88:
     ld      l,a
 pow2fix88_fastcall:
 _pow2fix88_fastcall:
-    jp      l_fix88_pow2
+    jp      asm_fix88_pow2
 

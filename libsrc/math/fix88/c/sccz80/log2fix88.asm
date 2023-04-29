@@ -7,7 +7,7 @@
     PUBLIC  log2fix88_fastcall
     PUBLIC  _log2fix88_fastcall
 
-    EXTERN  l_fix88_log2
+    EXTERN  asm_fix88_log2
 
 
 log2fix88:
@@ -20,5 +20,5 @@ _log2fix88:
     ld      l,a
 log2fix88_fastcall:
 _log2fix88_fastcall:
-    jp      l_fix88_log2
+    jp      asm_fix88_log2
 

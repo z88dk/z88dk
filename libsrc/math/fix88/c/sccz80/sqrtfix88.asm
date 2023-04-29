@@ -7,7 +7,7 @@
     PUBLIC  sqrtfix88_fastcall
     PUBLIC  _sqrtfix88_fastcall
 
-    EXTERN  l_fix88_sqrt
+    EXTERN  asm_fix88_sqrt
 
 
 sqrtfix88:
@@ -20,5 +20,5 @@ _sqrtfix88:
     ld      l,a
 sqrtfix88_fastcall:
 _sqrtfix88_fastcall:
-    jp      l_fix88_sqrt
+    jp      asm_fix88_sqrt
 

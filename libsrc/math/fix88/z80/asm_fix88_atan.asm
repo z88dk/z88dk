@@ -19,9 +19,9 @@
 
 
     SECTION code_math
-    PUBLIC  l_fix88_atan
+    PUBLIC  asm_fix88_atan
 
-l_fix88_atan:
+asm_fix88_atan:
     ex      de,hl
     call    arctan_88
     ex      de,hl

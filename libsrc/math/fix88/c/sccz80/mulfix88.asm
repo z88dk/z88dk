@@ -5,7 +5,7 @@
     PUBLIC  mulfix88
     PUBLIC  _mulfix88
 
-    EXTERN  l_fix88_mult
+    EXTERN  asm_fix88_mult
 
 
 mulfix88:
@@ -21,5 +21,5 @@ _mulfix88:
     ld      h,(hl)
     inc     hl
     ld      l,a
-    jp      l_fix88_mult
+    jp      asm_fix88_mult
 

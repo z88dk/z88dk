@@ -12,13 +12,13 @@
 ;
 
     SECTION code_math
-    PUBLIC  l_fix88_sin
-    PUBLIC  l_fix88_cos
+    PUBLIC  asm_fix88_sin
+    PUBLIC  asm_fix88_cos
 
     EXTERN  l_mulu_32_16x16
     EXTERN  l_div
 
-l_fix88_cos:
+asm_fix88_cos:
     ld      de,0x0192           ;halfpi
     add     hl,de
 
@@ -38,7 +38,7 @@ l_fix88_cos:
 ;
 
 ; Entry: h.l = number
-l_fix88_sin:
+asm_fix88_sin:
 ; Clamping ranges
     ld      a,h
     and     128

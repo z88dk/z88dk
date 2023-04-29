@@ -12,11 +12,11 @@
 ;
 
     SECTION code_math
-    PUBLIC  l_fix88_inv
+    PUBLIC  asm_fix88_inv
 
 ; Entry: h.l = number
 ;        h.l = 1 / number
-l_fix88_inv:
+asm_fix88_inv:
     ex      de,hl
 
 DEgt1_Inv:

@@ -7,7 +7,7 @@
     PUBLIC  tanfix88_fastcall
     PUBLIC  _tanfix88_fastcall
 
-    EXTERN  l_fix88_tan
+    EXTERN  asm_fix88_tan
 
 
 tanfix88:
@@ -20,5 +20,5 @@ _tanfix88:
     ld      l,a
 tanfix88_fastcall:
 _tanfix88_fastcall:
-    jp      l_fix88_tan
+    jp      asm_fix88_tan
 

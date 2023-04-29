@@ -7,7 +7,7 @@
     PUBLIC  sinfix88_fastcall
     PUBLIC  _sinfix88_fastcall
 
-    EXTERN  l_fix88_sin
+    EXTERN  asm_fix88_sin
 
 
 sinfix88:
@@ -20,5 +20,5 @@ _sinfix88:
     ld      l,a
 sinfix88_fastcall:
 _sinfix88_fastcall:
-    jp      l_fix88_sin
+    jp      asm_fix88_sin
 

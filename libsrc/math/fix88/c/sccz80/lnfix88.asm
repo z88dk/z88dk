@@ -7,7 +7,7 @@
     PUBLIC  lnfix88_fastcall
     PUBLIC  _lnfix88_fastcall
 
-    EXTERN  l_fix88_ln
+    EXTERN  asm_fix88_ln
 
 
 lnfix88:
@@ -20,5 +20,5 @@ _lnfix88:
     ld      l,a
 lnfix88_fastcall:
 _lnfix88_fastcall:
-    jp      l_fix88_ln
+    jp      asm_fix88_ln
 
