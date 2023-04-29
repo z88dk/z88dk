@@ -4,9 +4,6 @@
 
     PUBLIC  invfix88
     PUBLIC  _invfix88
-    PUBLIC  invfix88_fastcall
-    PUBLIC  _invfix88_fastcall
-
     EXTERN  asm_fix88_inv
 
 
@@ -18,7 +15,5 @@ _invfix88:
     inc     hl
     ld      h,(hl)
     ld      l,a
-invfix88_fastcall:
-_invfix88_fastcall:
     jp      asm_fix88_inv
 

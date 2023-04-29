@@ -7,7 +7,7 @@
 ;
 ; With the following licence:
 ;
-; 1. his License does not apply to any file with a separate License header.
+; 1. This License does not apply to any file with a separate License header.
 ; 2. Permission is granted, free of charge, to use, modify, and/or distribute any part of this software for any purpose.
 ;
 ; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 

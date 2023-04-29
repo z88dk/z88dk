@@ -2,19 +2,18 @@
 
     SECTION code_clib
 
-    PUBLIC  log2fix88
-    PUBLIC  _log2fix88
+    PUBLIC  expfix88
+    PUBLIC  _expfix88
+    EXTERN  asm_fix88_exp
 
-    EXTERN  asm_fix88_log2
 
-
-log2fix88:
-_log2fix88:
+expfix88:
+_expfix88:
     ld      hl,2
     add     hl,sp
     ld      a,(hl)
     inc     hl
     ld      h,(hl)
     ld      l,a
-    jp      asm_fix88_log2
+    jp      asm_fix88_exp
 

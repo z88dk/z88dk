@@ -5,8 +5,13 @@
     PUBLIC  absfix88
     PUBLIC  _absfix88
 
-    EXTERN  asm_fix88_mult
+    PUBLIC  absfix88_fastcall
+    PUBLIC  _absfix88_fastcall
 
+    EXTERN  asm_abs
+
+    defc    absfix88_fastcall = asm_abs
+    defc    _absfix88_fastcall = asm_abs
 
 absfix88:
 _absfix88:
@@ -17,7 +22,4 @@ _absfix88:
     ld      h,(hl)
     inc     hl
     ld      l,a
-absfix88_fastcall:
-_absfix88_fastcall:
-    res     7,h
-    ret
+    jp      asm_abs

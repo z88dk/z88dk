@@ -4,8 +4,6 @@
 
     PUBLIC  atanfix88
     PUBLIC  _atanfix88
-    PUBLIC  atanfix88_fastcall
-    PUBLIC  _atanfix88_fastcall
 
     EXTERN  asm_fix88_atan
 
@@ -18,7 +16,5 @@ _atanfix88:
     inc     hl
     ld      h,(hl)
     ld      l,a
-atanfix88_fastcall:
-_atanfix88_fastcall:
     jp      asm_fix88_atan
 

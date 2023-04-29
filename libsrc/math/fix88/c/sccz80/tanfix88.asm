@@ -4,8 +4,6 @@
 
     PUBLIC  tanfix88
     PUBLIC  _tanfix88
-    PUBLIC  tanfix88_fastcall
-    PUBLIC  _tanfix88_fastcall
 
     EXTERN  asm_fix88_tan
 
@@ -18,7 +16,5 @@ _tanfix88:
     inc     hl
     ld      h,(hl)
     ld      l,a
-tanfix88_fastcall:
-_tanfix88_fastcall:
     jp      asm_fix88_tan
 

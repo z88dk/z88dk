@@ -2,10 +2,10 @@
 
 include ../../Make.config
 
-vpath %.c ../cimpl/
+vpath %.c ../cimpl/ cimpl/
 
 AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard z80/*asm)
-CFILES  = 
+CFILES  = exp88.c
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
 CFLAGS += 
