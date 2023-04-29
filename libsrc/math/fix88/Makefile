@@ -10,12 +10,19 @@ OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 CFLAGS += 
 
 all: dirs $(addprefix obj/z80/, $(OBJECTS)) $(addprefix obj/r2k/, $(OBJECTS)) \
-	$(addprefix obj/ixiy/, $(OBJECTS))
+	$(addprefix obj/ixiy/, $(OBJECTS)) $(addprefix obj/z80n/, $(OBJECTS))
 
 obj/z80/%.o: %.c
 	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
 
 obj/z80/%.o: %.asm
+	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC  $^
+	@mv $(^:.asm=.o) $@
+
+obj/z80n/%.o: %.c
+	$(ZCC) +test -mz80 $(CFLAGS) -o $@  $^
+
+obj/z80n/%.o: %.asm
 	$(Q)$(ASSEMBLER) -I../ -I$(Z88DK_LIB) -mz80 -D__CLASSIC  $^
 	@mv $(^:.asm=.o) $@
 
@@ -36,6 +43,7 @@ obj/r2k/%.o: %.asm
 
 dirs:
 	@mkdir -p obj/z80/c/sccz80  obj/z80/z80 obj/z80/cimpl
+	@mkdir -p obj/z80n/c/sccz80  obj/z80n/z80 obj/z80n/cimpl
 	@mkdir -p obj/r2k/c/sccz80  obj/r2k/z80 obj/r2k/cimpl
 	@mkdir -p obj/ixiy/c/sccz80  obj/ixiy/z80 obj/ixiy/cimpl
 
