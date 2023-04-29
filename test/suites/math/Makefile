@@ -8,7 +8,7 @@ CFLAGS +=  -DNO_LOG_RUNNING -DNO_LOG_PASSED
 
 
 all: test_genmath.bin test_math48.bin test_math32.bin test_math16.bin test_daimath32.bin \
-	test_math48_rc2014_CODE.bin test_9511_rc2014_CODE.bin \
+	test_math48_rc2014_CODE.bin test_9511_rc2014_CODE.bin test_cpcmath.bin \
 	test_mbf32.bin test_mbf32_8080.bin test_mbf32_8085.bin test_mbf32_gbz80.bin \
 	test_9511_8085.bin
 
@@ -19,6 +19,10 @@ test_genmath.bin: $(SOURCES)
 
 test_mbf32.bin: $(SOURCES)
 	$(call compile, -DMBF32 --math-mbf32 -DMATH_LIBRARY="\"\\\"MBF32\\\"\"")
+	$(runtest)
+
+test_cpcmath.bin: $(SOURCES)
+	$(call compile, -DCPCMATH --math-cpc -DMATH_LIBRARY="\"\\\"CPC\\\"\"")
 	$(runtest)
 
 test_mbf32_8080.bin: $(SOURCES)
