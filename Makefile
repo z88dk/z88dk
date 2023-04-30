@@ -253,6 +253,7 @@ bins-clean:
 	$(MAKE) -C testsuite clean
 	$(MAKE) -C src/z88dk-lib clean
 	$(RM) -r $(SDCC_PATH)
+	$(RM) src/config.h
 ifdef BUILD_SDCC
 ifdef BUILD_SDCC_HTTP
 	$(RM) $(SDCC_DEPS)
