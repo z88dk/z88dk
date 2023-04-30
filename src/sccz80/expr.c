@@ -260,13 +260,13 @@ int heir1a(LVALUE* lval)
         if (heir1(lval))
             rvalue(lval);
         /* check types of expressions and widen if necessary */
-        if (kind_is_floating(lval2.val_type) && lval2.val_type != lval->val_type) {
-            zconvert_to_double(lval->val_type, lval2.val_type, lval->ltype->isunsigned);
+        if (kind_is_decimal(lval2.val_type) && lval2.val_type != lval->val_type) {
+            zconvert_to_decimal(lval->val_type, lval2.val_type, lval->ltype->isunsigned);
             postlabel(endlab);
-        } else if (lval2.val_type != lval->val_type && kind_is_floating(lval->val_type)) {
+        } else if (lval2.val_type != lval->val_type && kind_is_decimal(lval->val_type)) {
             gen_jp_label(skiplab = getlabel(),0);
             postlabel(endlab);
-            zconvert_to_double(lval2.val_type, lval->val_type, lval2.ltype->isunsigned);
+            zconvert_to_decimal(lval2.val_type, lval->val_type, lval2.ltype->isunsigned);
             postlabel(skiplab);
         } else if (lval2.val_type == KIND_LONG && lval->val_type != KIND_LONG) {
             widenintegers(&lval2, lval);

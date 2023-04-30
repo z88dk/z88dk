@@ -57,6 +57,8 @@ void load_constant(LVALUE *lval)
         vlongconst(lval->const_val);
     } else if (kind_is_floating(lval->val_type) ){
         gen_load_constant_as_float(lval->const_val, lval->val_type, 0);
+    } else if (kind_is_fixed(lval->val_type) ) {
+        load_fixed(lval);
     } else {
         vconst(lval->const_val);
     }
@@ -160,7 +162,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
              }
 
             if ( lval2->val_type != lval->val_type ) {  // TODO, always?
-                zconvert_to_double(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+                zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = lval->val_type;
                 lval2->ltype = lval->ltype;
             }
@@ -247,13 +249,13 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             lval->const_val = lval2->const_val; 
 
             /* djm, load double reg for long operators */
-            if (  kind_is_floating(lval2->val_type) || kind_is_floating(lval->val_type) ) {
+            if (  kind_is_decimal(lval2->val_type) || kind_is_decimal(lval->val_type) ) {
                  clearstage(before_constlval, NULL);
                  Zsp = beforesp;
                  stkcount = savestkcount;
                  // Convert to a float
                  if ( !kind_is_floating(lval->val_type) ) {
-                     zconvert_to_double(lval->val_type, lval2->val_type, lval->ltype->isunsigned);
+                     zconvert_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned);
                      lval->val_type = lval2->val_type;
                      lval->ltype = lval2->ltype;
                  }
@@ -282,7 +284,11 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 // Even if LHS is int, we promote to long. 
                 lval2->val_type = KIND_LONG;
                 lval2->ltype = lval2->ltype->isunsigned ? type_ulong : type_long;    
-                load_constant(lval2);            
+                load_constant(lval2);   
+            } else if ( kind_is_fixed(lval->val_type)) {
+                lval2->val_type = lval->val_type;
+                lval2->ltype = lval->ltype;
+                load_constant(lval2);         
             } else {
                 vconst(lval2->const_val);
             }
@@ -407,10 +413,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         if ( lval2->is_const && kind_is_integer(lval->val_type) ) {
             doconstoper = 1;
             if ( lval2->ltype->isunsigned ) {
-		if (lval2->ltype->kind == KIND_LONGLONG )
+                if (lval2->ltype->kind == KIND_LONGLONG )
                     const_val = (uint64_t)lval2->const_val;
-		else
-		    const_val = (uint64_t)(int64_t)lval2->const_val;
+                else
+                    const_val = (uint64_t)(int64_t)lval2->const_val;
             } else if (lval2->const_val > (long double)LLONG_MAX ) {
                     const_val = (int64_t)(uint64_t)lval2->const_val;
             } else {
@@ -425,10 +431,10 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             /* Handle the case that the constant was on the left */
             doconstoper = 1;
             if ( lval->ltype->isunsigned ) {
-		if (lval2->ltype->kind == KIND_LONGLONG )
-                    const_val = (uint64_t)lval->const_val;
-		else
-		    const_val = (uint64_t)(int64_t)lval->const_val;
+                if (lval2->ltype->kind == KIND_LONGLONG )
+                            const_val = (uint64_t)lval->const_val;
+                else
+                    const_val = (uint64_t)(int64_t)lval->const_val;
             } else if (lval->const_val > (long double)LLONG_MAX ) {
                     const_val = (int64_t)(uint64_t)lval->const_val;
             } else {
@@ -494,7 +500,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
             // Floatconstant +/- lvalue
             if ( lval2->val_type != lval->val_type ) {
-                zconvert_to_double(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+                zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = lval->val_type;
                 lval2->ltype = lval->ltype;
             }
@@ -661,10 +667,12 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         else
             lval->const_val = 0;
         // Promote as necessary
+        // TODO: ACCUM
         if ( kind_is_floating(lhs_val_type) || kind_is_floating(rhs_val_type) ) {
             lval->val_type = (lhs_val_type == KIND_DOUBLE || rhs_val_type == KIND_DOUBLE) ? KIND_DOUBLE : KIND_FLOAT16; 
             lval->ltype = get_float_type(lval->val_type);
         }
+        // TODO: ACCUM
         clearstage(before, 0);  // Wipe all of the code generated
         Zsp = oldsp;
     } else if (lval2->is_const == 0) {
@@ -683,7 +691,11 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             zdiv_const(lval,3);
         } else if (lval->ptr_type == KIND_LONG && lval2->ptr_type == KIND_LONG) {
             zdiv_const(lval,4); /* div by 4 */
+       } else if (lval->ptr_type == KIND_ACCUM32 && lval2->ptr_type == KIND_ACCUM32) {
+            zdiv_const(lval,4); /* div by 4 */
         } else if (lval->ptr_type == KIND_FLOAT16 && lval2->ptr_type == KIND_FLOAT16) {
+            zdiv_const(lval,2); /* div by 2 */
+       } else if (lval->ptr_type == KIND_ACCUM16 && lval2->ptr_type == KIND_ACCUM16) {
             zdiv_const(lval,2); /* div by 2 */
         } else if (lval->ptr_type == KIND_DOUBLE && lval2->ptr_type == KIND_DOUBLE) {
             zdiv_const(lval,c_fp_size); /* div by 6 */

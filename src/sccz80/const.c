@@ -141,7 +141,8 @@ int fnumber(LVALUE *lval)
             lval->val_type = KIND_FLOAT16;
             lval->ltype = type_float16;
         }
-    }
+    } 
+    // TODO: ACCUM
     for ( i = 0; i < buffer_fps_num; i++ ) 
         fprintf(buffer_fps[i], "%.*s", (int)(line+lptr-start), start);
 
@@ -1078,6 +1079,18 @@ void load_llong_into_acc(zdouble val)
     immedlit(elem->litlab,0);
     nl();
     callrts("l_i64_load");
+}
+
+
+void load_fixed(LVALUE *lval)
+{
+    if ( lval->val_type == KIND_ACCUM16) {
+        int16_t val = ((int16_t)((lval->const_val) / (1.0 / 256.0) + ((lval->const_val) >= 0 ? 0.5 : -0.5)));
+        vconst(val);
+    } else {
+        int32_t val = ((int32_t)((lval->const_val) / (1.0 / 65536.0) + ((lval->const_val) >= 0 ? 0.5 : -0.5))); 
+        vlongconst(val);
+    }
 }
 
 

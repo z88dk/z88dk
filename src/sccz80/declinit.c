@@ -440,6 +440,8 @@ constdecl:
                     outdec(((uint32_t)val % 65536UL) / 256);
                     outbyte(',');
                     outdec(((uint32_t)val / 65536UL) % 256);
+                } else if ( type->kind == KIND_ACCUM16 || type->kind == KIND_ACCUM32) {
+                    // TODO: otuput constant
                 } else {
                     if (type->kind == KIND_CHAR ) 
                         defbyte();

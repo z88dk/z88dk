@@ -75,42 +75,44 @@ struct _mapping {
     char     *fp_16bit;
     char     *fp_32bit;
     char     *fp_64bit;
+    char     *fix_16bit;
+    char     *fix_32bit;
 } mappings[] = {
-        { "dload","dload", "l_gint", "l_glong"  , "l_f64_load"  },
-        { "dstore","dstore","l_pint", "l_plong", "l_f64_store" },
-        { "fadd", "dadd", "l_f16_add", "l_f32_add", "l_f64_add" },
-        { "fsub", "dsub", "l_f16_sub", "l_f32_sub", "l_f64_sub" },
-        { "fmul", "dmul", "l_f16_mul", "l_f32_mul", "l_f64_mul" },
-        { "fdiv", "ddiv", "l_f16_div", "l_f32_div", "l_f64_div" },
-        { "fle",  "dleq", "l_f16_le", "l_f32_le",  "l_f64_le" },
-        { "flt",  "dlt",  "l_f16_lt", "l_f32_lt",  "l_f64_lt" },
-        { "fge",  "dge",  "l_f16_ge", "l_f32_ge",  "l_f64_ge" },
-        { "fgt",  "dgt",  "l_f16_gt", "l_f32_gt",  "l_f64_gt" },
-        { "feq",  "deq",  "l_f16_eq", "l_f32_eq",  "l_f64_eq" },
-        { "fne",  "dne",  "l_f16_ne", "l_f32_ne",  "l_f64_ne" },
-        { "schar2f", "l_int2long_s_float","l_f16_schar2f","l_f32_schar2f", "l_f64_schar2f" },
-        { "uchar2f", "l_int2long_u_float","l_f16_uchar2f","l_f32_uchar2f", "l_f64_uchar2f" },
-        { "sint2f", "l_int2long_s_float","l_f16_sint2f", "l_f32_sint2f",   "l_f64_sint2f" },
-        { "uint2f", "l_int2long_u_float","l_f16_uint2f", "l_f32_uint2f",   "l_f64_uint2f" },
-        { "slong2f", "float", "l_f16_slong2f", "l_f32_slong2f", "l_f64_slong2f" },
-        { "ulong2f", "ufloat","l_f16_ulong2f", "l_f32_ulong2f", "l_f64_ulong2f" },
-        { "sllong2f", "l_f48_sllong2f", "l_f16_sllong2f", "l_f32_sllong2f", "l_f64_sllong2f" },
-        { "ullong2f", "l_f48_ullong2f", "l_f16_ullong2f", "l_f32_ullong2f", "l_f64_ullong2f" },
-        { "f2sint",  "ifix",  "l_f16_f2sint",  "l_f32_f2sint",  "l_f64_f2sint" },
-        { "f2uint",  "ifix",  "l_f16_f2uint",  "l_f32_f2uint",  "l_f64_f2uint" },
-        { "f2slong", "ifix",  "l_f16_f2slong", "l_f32_f2slong", "l_f64_f2slong" },
-        { "f2ulong", "ifix",  "l_f16_f2ulong", "l_f32_f2ulong", "l_f64_f2ulong" },
-        { "f2slllong", "l_f48_f2sllong", "l_f16_f2sllong", "l_f32_f2sllong", "l_f64_f2sllong" },
-        { "f2ullong",  "l_f48_f2ullong", "l_f16_f2ullong", "l_f32_f2ullong", "l_f64_f2ullong" },
-        { "fpush",   "dpush",  NULL,            NULL, "l_f64_dpush" },
-        { "dpush_under_long", "dpush3", NULL, NULL, "l_f64_dpush3" }, // Inlined
-        { "dpush_under_int", "dpush2", NULL, NULL, "l_f64_dpush2" }, // Inlined
-        { "fswap", "dswap",   NULL, "l_f32_swap", "l_f64_swap" },
-        { "fnegate", "minusfa", "l_f16_negate", "l_f32_negate", "l_f64_negate" },
-        { "ldexp", "l_f48_ldexp", "l_f16_ldexp", "l_f32_ldexp", "l_f64_ldexp" },
-        { "f16tof", "l_f48_f16tof", "l_f16_f16tof", "l_f32_f16tof", "l_f64_f16tof" },
-        { "ftof16", "l_f48_ftof16", "l_f16_ftof16", "l_f32_ftof16", "l_f64_ftof16" },
-        { "inversef", NULL, "l_f16_invf", "l_f32_invf", NULL }, // Called only for IEEE mode
+        { "dload","dload", "l_gint", "l_glong"  , "l_f64_load", "l_gint", "l_glong" },
+        { "dstore","dstore","l_pint", "l_plong", "l_f64_store", "l_pint", "l_plong" },
+        { "fadd", "dadd", "l_f16_add", "l_f32_add", "l_f64_add", NULL, NULL },
+        { "fsub", "dsub", "l_f16_sub", "l_f32_sub", "l_f64_sub", NULL, NULL },
+        { "fmul", "dmul", "l_f16_mul", "l_f32_mul", "l_f64_mul", "l_fix16_mul", "l_fix32_mul" },
+        { "fdiv", "ddiv", "l_f16_div", "l_f32_div", "l_f64_div", "l_fix16_div", "l_fix32_div" },
+        { "fle",  "dleq", "l_f16_le", "l_f32_le",  "l_f64_le", NULL, NULL },
+        { "flt",  "dlt",  "l_f16_lt", "l_f32_lt",  "l_f64_lt", NULL, NULL },
+        { "fge",  "dge",  "l_f16_ge", "l_f32_ge",  "l_f64_ge", NULL, NULL  },
+        { "fgt",  "dgt",  "l_f16_gt", "l_f32_gt",  "l_f64_gt", NULL, NULL  },
+        { "feq",  "deq",  "l_f16_eq", "l_f32_eq",  "l_f64_eq", NULL, NULL  },
+        { "fne",  "dne",  "l_f16_ne", "l_f32_ne",  "l_f64_ne", NULL, NULL  },
+        { "schar2f", "l_int2long_s_float","l_f16_schar2f","l_f32_schar2f", "l_f64_schar2f", "l_fix16_schar2f", "l_fix32_schar2f" },
+        { "uchar2f", "l_int2long_u_float","l_f16_uchar2f","l_f32_uchar2f", "l_f64_uchar2f", "l_fix16_uchar2f", "l_fix32_uchar2f" },
+        { "sint2f", "l_int2long_s_float","l_f16_sint2f", "l_f32_sint2f",   "l_f64_sint2f",  "l_fix16_sint2f", "l_fix32_sint2f" },
+        { "uint2f", "l_int2long_u_float","l_f16_uint2f", "l_f32_uint2f",   "l_f64_uint2f",  "l_fix16_uint2f", "l_fix32_uint2f" },
+        { "slong2f", "float", "l_f16_slong2f", "l_f32_slong2f", "l_f64_slong2f",  "l_fix16_slong2f", "l_fix32_slong2f" },
+        { "ulong2f", "ufloat","l_f16_ulong2f", "l_f32_ulong2f", "l_f64_ulong2f", "l_fix16_ulong2f", "l_fix32_ulong2f" },
+        { "sllong2f", "l_f48_sllong2f", "l_f16_sllong2f", "l_f32_sllong2f", "l_f64_sllong2f", "l_fix16_sllong2f", "l_fix32_sllong2f" },
+        { "ullong2f", "l_f48_ullong2f", "l_f16_ullong2f", "l_f32_ullong2f", "l_f64_ullong2f", "l_fix16_ullong2f", "l_fix32_ullong2f" },
+        { "f2sint",  "ifix",  "l_f16_f2sint",  "l_f32_f2sint",  "l_f64_f2sint", "l_fix16_f2sint", "l_fix32_f2sint" },
+        { "f2uint",  "ifix",  "l_f16_f2uint",  "l_f32_f2uint",  "l_f64_f2uint", "l_fix16_f2uint", "l_fix32_f2uint" },
+        { "f2slong", "ifix",  "l_f16_f2slong", "l_f32_f2slong", "l_f64_f2slong", "l_fix16_f2slong", "l_fix32_f2slong" },
+        { "f2ulong", "ifix",  "l_f16_f2ulong", "l_f32_f2ulong", "l_f64_f2ulong", "l_fix16_f2ulong", "l_fix32_f2ulong" },
+        { "f2slllong", "l_f48_f2sllong", "l_f16_f2sllong", "l_f32_f2sllong", "l_f64_f2sllong", "l_fix16_f2sllong", "l_fix32_f2sllong" },
+        { "f2ullong",  "l_f48_f2ullong", "l_f16_f2ullong", "l_f32_f2ullong", "l_f64_f2ullong", "l_fix16_f2ullong", "l_fix32_f2ullong" },
+        { "fpush",   "dpush",  NULL,            NULL, "l_f64_dpush", NULL, NULL },
+        { "dpush_under_long", "dpush3", NULL, NULL, "l_f64_dpush3", NULL, NULL }, // Inlined
+        { "dpush_under_int", "dpush2", NULL, NULL, "l_f64_dpush2", NULL, NULL }, // Inlined
+        { "fswap", "dswap",   NULL, "l_f32_swap", "l_f64_swap", NULL, "l_fix32_swap" },
+        { "fnegate", "minusfa", "l_f16_negate", "l_f32_negate", "l_f64_negate", "l_fix16_negate", "l_fix32_negate" },
+        { "ldexp", "l_f48_ldexp", "l_f16_ldexp", "l_f32_ldexp", "l_f64_ldexp", NULL, NULL },
+        { "f16tof", "l_f48_f16tof", "l_f16_f16tof", "l_f32_f16tof", "l_f64_f16tof" }, // TODO
+        { "ftof16", "l_f48_ftof16", "l_f16_ftof16", "l_f32_ftof16", "l_f64_ftof16" }, // TODO
+        { "inversef", NULL, "l_f16_invf", "l_f32_invf", NULL, "l_fix16_inv", "l_fix32_inv" }, // Called only for IEEE mode
         { NULL }
 };
 
@@ -122,6 +124,10 @@ static const char *map_library_routine(const char *wanted, Kind to)
         if ( strcmp(wanted, map->opname) == 0) {
             if (to == KIND_FLOAT16 ) {
                 return map->fp_16bit;
+            } else if ( to == KIND_ACCUM16 ) {
+                return map->fix_16bit;
+            } else if ( to == KIND_ACCUM32 ) {
+                return map->fix_32bit;
             } else if ( c_fp_size == 4 ) {
                 return map->fp_32bit;
             } else if ( c_fp_size == 8 ) {
@@ -966,7 +972,7 @@ int gen_push_function_argument(Kind expr, Type *type, int push_sdccchar)
     } else if ( expr == KIND_LONGLONG ) {
         llpush();
         return 8;
-    } else if (expr == KIND_LONG || expr == KIND_CPTR) {
+    } else if (expr == KIND_LONG || expr == KIND_CPTR || expr == KIND_ACCUM32) {
         lpush();
         return 4;
     } else if ( expr == KIND_CHAR && push_sdccchar ) {
@@ -1397,10 +1403,12 @@ void gen_leave_function(Kind vartype, char type, int incritical)
             vartype = KIND_NONE;
             save = NO;
         }
-    } else if (vartype == KIND_FLOAT16 ) {
+    } else if (vartype == KIND_FLOAT16|| vartype == KIND_ACCUM16 ) {
         vartype = KIND_INT;
     } else if (vartype == KIND_LONGLONG) {
-        vartype = KIND_NONE;
+        vartype = KIND_NONE; 
+    } else if (vartype == KIND_ACCUM32) {
+        vartype = KIND_LONG;
     }
     modstk(0, vartype, NO,YES);
 
@@ -1577,6 +1585,10 @@ int modstk(int newsp, Kind save, int saveaf, int usebc)
         // For a 6/8 byte double the value is safely in the exx set or in FA
     } else if ( save == KIND_FLOAT16 ) {
         save = KIND_INT;
+    } else if ( save == KIND_ACCUM16 ) {
+        save = KIND_INT;
+    } else if ( save == KIND_ACCUM32 ) {
+        save = KIND_LONG;
     }
 
     if ( c_notaltreg ) {
@@ -1621,12 +1633,14 @@ void scale(Kind type, Type *tag)
     case KIND_INT:
     case KIND_PTR:
     case KIND_FLOAT16:
+    case KIND_ACCUM16:
         ol("add\thl,hl");
         break;
     case KIND_CPTR:
         threereg();
         break;
     case KIND_LONG:
+    case KIND_ACCUM32:
         ol("add\thl,hl");
         ol("add\thl,hl");
         break;
@@ -2594,8 +2608,13 @@ void mult(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_FLOAT16:
+    case KIND_ACCUM16:
         dcallrts("fmul",lval->val_type);
         Zsp += 2;
+        break;
+    case KIND_ACCUM32:
+        dcallrts("fmul",lval->val_type);
+        Zsp += 4;
         break;
     case KIND_DOUBLE:
         dcallrts("fmul",lval->val_type);
@@ -2698,8 +2717,13 @@ void zdiv(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_FLOAT16:
+    case KIND_ACCUM16:
         dcallrts("fdiv",lval->val_type);
         Zsp += 2;
+        break;
+    case KIND_ACCUM32:
+        dcallrts("fdiv",lval->val_type);
+        Zsp += 4;
         break;
     case KIND_DOUBLE:
         dcallrts("fdiv",lval->val_type);
@@ -2834,7 +2858,7 @@ void zdiv_const(LVALUE *lval, int64_t value64)
 int zdiv_dconst(LVALUE *lval, double value, int isrhs)
 {
     if ( isrhs == 0 && value == 1.0 &&
-        (c_maths_mode == MATHS_IEEE || lval->val_type == KIND_FLOAT16)) {
+        (c_maths_mode == MATHS_IEEE || lval->val_type == KIND_FLOAT16 || lval->val_type == KIND_ACCUM16 || lval->val_type == KIND_ACCUM32)) {
         dcallrts("inversef",lval->val_type);
         return 1;
     }
@@ -2866,7 +2890,7 @@ void zmod(LVALUE* lval)
             else
                 callrts("l_i64_mod");
             Zsp += 8;
-        } else if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
+        } else if (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
             if (ulvalue(lval))
                 callrts("l_long_mod_u");
             else
@@ -4036,6 +4060,12 @@ void inc(LVALUE* lval)
     case KIND_CPTR:
         callrts("l_inclong");
         break;
+    case KIND_ACCUM16:
+        ol("inc\th");
+        break;
+    case KIND_ACCUM32:
+        ol("inc\tde");
+        break;
     default:
         ol("inc\thl");
     }
@@ -4079,6 +4109,12 @@ void dec(LVALUE* lval)
     case KIND_LONG:
     case KIND_CPTR:
         callrts("l_declong");
+        break;
+    case KIND_ACCUM16:
+        ol("dec\th");
+        break;
+    case KIND_ACCUM32:
+        ol("dec\tde");
         break;
     default:
         ol("dec\thl");
@@ -4266,6 +4302,7 @@ void zeq(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
+    case KIND_ACCUM32:
         set_int(lval);
         callrts("l_long_eq");
         Zsp += 4;
@@ -4446,6 +4483,7 @@ void zne(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
+    case KIND_ACCUM32:
         set_int(lval);
         callrts("l_long_ne");
         Zsp += 4;
@@ -4607,6 +4645,7 @@ void zlt(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
+    case KIND_ACCUM32:
         if (ulvalue(lval))
             callrts("l_long_ult");
         else
@@ -4732,6 +4771,7 @@ void zle(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
+    case KIND_ACCUM32:
         if (ulvalue(lval))
             callrts("l_long_ule");
         else
@@ -4861,6 +4901,7 @@ void zgt(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
+    case KIND_ACCUM32:
         if (ulvalue(lval))
             callrts("l_long_ugt");
         else
@@ -4996,6 +5037,7 @@ void zge(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
+    case KIND_ACCUM32:
         if (ulvalue(lval))
             callrts("l_long_uge");
         else
@@ -5694,11 +5736,11 @@ void gen_load_constant_as_float(double val, Kind to, unsigned char isunsigned)
         if ( val >= INT16_MIN && val <= UINT16_MAX &&
             (c_speed_optimisation & OPT_DOUBLE_CONST) == 0 && fmod(val,1) == 0.0 ) {
             vconst(val);
-            zconvert_to_double(KIND_INT,to, isunsigned);
+            zconvert_to_decimal(KIND_INT,to, isunsigned);
         } else if ( val >= INT32_MIN && val <= UINT32_MAX &&
             (c_speed_optimisation & OPT_DOUBLE_CONST) == 0 && fmod(val,1) == 0.0) {
             vlongconst(val);
-            zconvert_to_double(KIND_LONG,to, isunsigned);
+            zconvert_to_decimal(KIND_LONG,to, isunsigned);
         } else {
             lval.val_type = to;
             lval.const_val = val;
@@ -5709,14 +5751,15 @@ void gen_load_constant_as_float(double val, Kind to, unsigned char isunsigned)
 
 // Convert the value that's on the stack to a double and restore stack to appropriate state
 // We have a float in the primary register
-void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned char isunsigned, int operator_is_commutative)
+void zconvert_stacked_to_decimal(Kind stacked_kind, Kind float_kind, unsigned char isunsigned, int operator_is_commutative)
 {
-    if ( float_kind == KIND_FLOAT16) {
+    // TODO: ACCUM16
+    if ( float_kind == KIND_FLOAT16 || float_kind == KIND_ACCUM16) {
         if ( stacked_kind == KIND_LONG ) {
             pop("de");      // LSW
             ol("ex\t(sp),hl");  // hl = MSW, stack = float
             ol("ex\tde,hl");
-            zconvert_to_double(stacked_kind, float_kind, isunsigned);
+            zconvert_to_decimal(stacked_kind, float_kind, isunsigned);
             if (!operator_is_commutative) ol("ex\t(sp),hl");
         } else if ( stacked_kind == KIND_LONGLONG) {
             /* Pop the longlong into the accumulator */
@@ -5727,12 +5770,12 @@ void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned cha
             /* Push the float */
             push("hl");
             /* And convert */
-            zconvert_to_double(stacked_kind, float_kind, isunsigned);
+            zconvert_to_decimal(stacked_kind, float_kind, isunsigned);
             if (!operator_is_commutative)  ol("ex\t(sp),hl");
         } else {
             // 2 bytes on stack
             ol("ex\t(sp),hl");  //
-            zconvert_to_double(stacked_kind, float_kind, isunsigned);
+            zconvert_to_decimal(stacked_kind, float_kind, isunsigned);
             if (!operator_is_commutative)  ol("ex\t(sp),hl");
         }
     } else if ( stacked_kind == KIND_LONGLONG ) {
@@ -5747,20 +5790,20 @@ void zconvert_stacked_to_double(Kind stacked_kind, Kind float_kind, unsigned cha
         /* Push the float */
         gen_push_float(float_kind);
         /* And convert the long */
-        zconvert_to_double(stacked_kind, float_kind, isunsigned);
+        zconvert_to_decimal(stacked_kind, float_kind, isunsigned);
         if (!operator_is_commutative) gen_swap_float(float_kind);
     } else {
         dpush_under(stacked_kind);
         pop("hl");
         if (stacked_kind == KIND_LONG)
             zpop();
-        zconvert_to_double(stacked_kind, float_kind, isunsigned);
+        zconvert_to_decimal(stacked_kind, float_kind, isunsigned);
         if (!operator_is_commutative) gen_swap_float(float_kind);
     }
 }
 
 
-void zconvert_to_double(Kind from, Kind to, unsigned char isunsigned)
+void zconvert_to_decimal(Kind from, Kind to, unsigned char isunsigned)
 {
    if ( from == to ) {
        return;

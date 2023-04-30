@@ -171,12 +171,12 @@ zdouble calc(
     Kind   right_kind,
     zdouble right, int is16bit)
 {
-    if ( !kind_is_floating(left_kind) && !kind_is_floating(right_kind)) {
+    if ( !kind_is_decimal(left_kind) && !kind_is_decimal(right_kind)) {
         left = truncl(left);
         right = truncl(right);
     }
     if (oper == zdiv && right != 0.0) {
-        if ( !kind_is_floating(left_kind) && !kind_is_floating(right_kind)) {
+        if ( !kind_is_decimal(left_kind) && !kind_is_decimal(right_kind)) {
             return ((int64_t)left / (int64_t)right);
         }
         return (left / right);
@@ -210,13 +210,13 @@ zdouble calcun(
     Kind   right_kind,
     zdouble right)
 {
-    if ( !kind_is_floating(left_kind) && !kind_is_floating(right_kind)) {
+    if ( !kind_is_decimal(left_kind) && !kind_is_decimal(right_kind)) {
         left = truncl(left);
         right = truncl(right);
     }
 
     if (oper == zdiv)   {
-        if ( !kind_is_floating(left_kind) && !kind_is_floating(right_kind)) {
+        if ( !kind_is_decimal(left_kind) && !kind_is_decimal(right_kind)) {
             return ((uint64_t)left / (uint64_t)right);
         }
         return (left / right);
@@ -293,10 +293,10 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
         t2 = KIND_INT;
     }
 
-    if (kind_is_floating(t1)) {
-        zconvert_to_double(t2, t1, isunsigned2);
+    if (kind_is_decimal(t1)) {
+        zconvert_to_decimal(t2, t1, isunsigned2);
     } else {
-        if (kind_is_floating(t2)) {
+        if (kind_is_decimal(t2)) {
             zconvert_from_double(t2, t1, isunsigned1);
             return;
         }
@@ -362,7 +362,7 @@ int widen_if_float(LVALUE* lval, LVALUE* lval2, int operator_is_commutative)
             // Both are floating but different types
             if ( lval->val_type == KIND_DOUBLE) {
                 // RHS is _Float16, LHS is double, promote RHS
-                zconvert_to_double(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+                zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = lval->val_type;
                 lval2->ltype = lval->ltype;
                 return 1;
@@ -371,13 +371,27 @@ int widen_if_float(LVALUE* lval, LVALUE* lval2, int operator_is_commutative)
             // Fall thrrough
         }
         if (lval->val_type != lval2->val_type ) {
-            zconvert_stacked_to_double(lval->val_type, lval2->val_type, lval->ltype->isunsigned,operator_is_commutative);
+            zconvert_stacked_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned,operator_is_commutative);
             lval->val_type = lval2->val_type; /* type of result */
             lval->ltype = lval2->ltype;
         }
         return 1;
     } else if (kind_is_floating(lval->val_type)) {
-        zconvert_to_double(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+        zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
+        lval2->val_type = lval->val_type;
+        lval2->ltype = lval->ltype;
+        return 1;
+    } else if ( kind_is_fixed(lval2->val_type) ) {
+        // TODO: ACCUM
+
+        if (lval->val_type != lval2->val_type ) {
+            zconvert_stacked_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned,operator_is_commutative);
+            lval->val_type = lval2->val_type; /* type of result */
+            lval->ltype = lval2->ltype;
+        }
+        return 1;
+    } else if ( kind_is_fixed(lval->val_type) ) {
+        zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
         lval2->val_type = lval->val_type;
         lval2->ltype = lval->ltype;
         return 1;
@@ -543,12 +557,14 @@ void prestep(
             zadd_const(lval, n * lval->ltype->ptr->tag->size);
             break;
         case KIND_LONG:
+        case KIND_ACCUM32:
             (*step)(lval);
         case KIND_CPTR:
             (*step)(lval);
         case KIND_INT:
         case KIND_FLOAT16:
         case KIND_PTR:
+        case KIND_ACCUM16:
             (*step)(lval);
         default:
             (*step)(lval);
@@ -587,6 +603,7 @@ void poststep(
             nstep(lval, n * lval->ltype->ptr->tag->size, unstep);
             break;
         case KIND_LONG:
+        case KIND_ACCUM32:
             nstep(lval, n * 4, unstep);
             break;
         case KIND_CPTR:
@@ -595,6 +612,7 @@ void poststep(
         case KIND_INT:
         case KIND_FLOAT16:
         case KIND_PTR:
+        case KIND_ACCUM16:
             (*step)(lval);
         default:
             (*step)(lval);
