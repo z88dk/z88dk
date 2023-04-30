@@ -24,8 +24,8 @@ typedef int16_t fix88_t;
 
 #define FIX88_TO_FLOAT(x) ((float) ((x)*(1.0 / 256.0)))
 
-// The following needs to rounded (+/- 0.5) away from 0 before conversion 
-#define FIX88_FROM_FLOAT(x) ((fix88_t)((x) / (1.0 / 256.0))) 
+// The following isn't evaluated to a constant with sccz80
+#define FIX88_FROM_FLOAT(x) ((fix88_t)((x) / (1.0 / 256.0) + ((x) >= 0 ? 0.5 : -0.5)))
 
 /* Arithmetic functions */
 #define addfix88(x,y) ((x) + (y))
