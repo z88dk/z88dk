@@ -24,6 +24,7 @@ struct profile_function_t
     debug_sym_function* function;
     struct profile_function_call_t* calls;
     uint64_t total_time;
+    uint32_t total_calls;
 
     UT_hash_handle hh;
 };
@@ -107,6 +108,7 @@ uint8_t profiler_check(uint16_t pc) {
             if (head) {
                 uint32_t spent = bk.time() - head->time;
                 f->total_time += spent;
+                f->total_calls++;
                 DL_DELETE(f->calls, head);
                 free(head);
             }
@@ -199,15 +201,16 @@ void profiler_stop() {
     HASH_SORT(profiling_functions, sort_functions);
 
     bk.console("Profiling results:\n");
-    bk.console("----------------------------------\n");
-    bk.console("    Time     Share    Function\n");
-    bk.console("----------------------------------\n");
+    bk.console("-----------------------------------------\n");
+    bk.console("   Calls   Time     Share    Function\n");
+    bk.console("-----------------------------------------\n");
 
     struct profile_function_t* f = profiling_functions;
     while (f) {
         double time_percent = (double)f->total_time / (double)total_total_time;
         int time_percent_int = (int)(time_percent * 100.0f);
-        bk.console("%*d %*d%%    %s\n", 8, f->total_time, 8, time_percent_int, f->function->function_name);
+        bk.console("%*d %*d %*d%%    %s\n", 6, f->total_calls, 8, f->total_time,
+                   8, time_percent_int, f->function->function_name);
 
         f = f->hh.next;
     }
@@ -226,9 +229,9 @@ void profiler_stop() {
         free(f);
     }
 
-    bk.console("----------------------------------\n"
+    bk.console("-----------------------------------------\n"
                "Total time: %d\n"
-               "----------------------------------\n", total_total_time);
+               "-----------------------------------------\n", total_total_time);
 
     profiler_enabled = 0;
 }
