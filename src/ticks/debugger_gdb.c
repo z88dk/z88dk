@@ -109,8 +109,8 @@ static const char* register_mapping_names[] = {
      * Some emulators would report this 16bit register pair, which could be used
      * to track ticks for profiling purposes
      */
-    "clockl_",
-    "clockh_",
+    "clockl",
+    "clockh",
 };
 
 static enum register_mapping_t register_mappings[32] = {0};
@@ -1045,7 +1045,7 @@ static uint8_t connect_to_gdbserver(const char* connect_host, int connect_port)
                 uint8_t found_mapping = 0;
 
                 for (int i = 0; i < REGISTER_MAPPING_MAX; i++) {
-                    if (strcmp(reg_name, register_mapping_names[i]) == 0) {
+                    if (strstr(reg_name, register_mapping_names[i]) == reg_name) {
                         register_mappings[register_mappings_count++] = i;
                         found_mapping = 1;
                         break;

@@ -9,6 +9,9 @@ static struct profile_function_t* profiling_functions = NULL;
 static int stack_level = 0;
 const char* within_function_only = NULL;
 static int profiling_iterations_limit = 0;
+static uint32_t loop_start_time = 0;
+static uint32_t loop_end_time = 0;
+static uint64_t total_total_time = 0;
 
 struct profile_function_call_t {
     uint32_t time;
@@ -21,6 +24,7 @@ struct profile_function_t
     debug_sym_function* function;
     struct profile_function_call_t* calls;
     uint64_t total_time;
+    uint32_t total_calls;
 
     UT_hash_handle hh;
 };
@@ -71,6 +75,12 @@ uint8_t profiler_check(uint16_t pc) {
 
         struct profile_function_call_t* call = calloc(1, sizeof(struct profile_function_call_t));
         call->time = bk.time();
+
+        if (stack_level == 0)
+        {
+            loop_start_time = call->time;
+        }
+
         DL_PREPEND(f->calls, call);
 
         debug_stack_frames_free(fp);
@@ -78,25 +88,6 @@ uint8_t profiler_check(uint16_t pc) {
 
         return 1;
     } else if (breakpoint_pop_frame->value == pc) {
-
-        if (stack_level) {
-            if (--stack_level == 0) {
-                // we've just reached an end of iteration
-                if (profiling_iterations_limit) {
-                    // we have a limit
-                    if (--profiling_iterations_limit == 0) {
-                        // it just completed
-                        debugger_active = 1;
-                        profiler_stop();
-                        return 0;
-                    }
-                }
-            }
-        } else {
-            // stack discrepancy, we don't care
-            return 1;
-        }
-
         uint16_t stack = bk.sp();
         struct debugger_regs_t regs;
         bk.get_regs(&regs);
@@ -117,9 +108,32 @@ uint8_t profiler_check(uint16_t pc) {
             if (head) {
                 uint32_t spent = bk.time() - head->time;
                 f->total_time += spent;
+                f->total_calls++;
                 DL_DELETE(f->calls, head);
                 free(head);
             }
+        }
+
+        if (stack_level) {
+            if (--stack_level == 0) {
+
+                loop_end_time = bk.time();
+                total_total_time += (loop_end_time - loop_start_time);
+
+                // we've just reached an end of iteration
+                if (profiling_iterations_limit) {
+                    // we have a limit
+                    if (--profiling_iterations_limit == 0) {
+                        // it just completed
+                        debugger_active = 1;
+                        profiler_stop();
+                        return 0;
+                    }
+                }
+            }
+        } else {
+            // stack discrepancy, we don't care
+            return 1;
         }
 
         return 1;
@@ -134,6 +148,9 @@ void profiler_start(const char* function, int iterations_limit) {
         return;
     }
 
+    total_total_time = 0;
+    loop_start_time = 0;
+    loop_end_time = 0;
     stack_level = 0;
     within_function_only = function;
     profiling_iterations_limit = iterations_limit;
@@ -183,24 +200,17 @@ void profiler_stop() {
 
     HASH_SORT(profiling_functions, sort_functions);
 
-    uint64_t total_total_time = 0;
+    bk.console("Profiling results:\n");
+    bk.console("-----------------------------------------\n");
+    bk.console("   Calls   Time     Share    Function\n");
+    bk.console("-----------------------------------------\n");
 
     struct profile_function_t* f = profiling_functions;
     while (f) {
-        total_total_time += f->total_time;
-        f = f->hh.next;
-    }
-
-    bk.console("Profiling results:\n");
-    bk.console("----------------------------------\n");
-    bk.console("    Time     Share    Function\n");
-    bk.console("----------------------------------\n");
-
-    f = profiling_functions;
-    while (f) {
         double time_percent = (double)f->total_time / (double)total_total_time;
         int time_percent_int = (int)(time_percent * 100.0f);
-        bk.console("%*d %*d%%    %s\n", 8, f->total_time, 8, time_percent_int, f->function->function_name);
+        bk.console("%*d %*d %*d%%    %s\n", 6, f->total_calls, 8, f->total_time,
+                   8, time_percent_int, f->function->function_name);
 
         f = f->hh.next;
     }
@@ -219,7 +229,9 @@ void profiler_stop() {
         free(f);
     }
 
-    bk.console("----------------------------------\n");
+    bk.console("-----------------------------------------\n"
+               "Total time: %d\n"
+               "-----------------------------------------\n", total_total_time);
 
     profiler_enabled = 0;
 }
