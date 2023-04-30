@@ -1,0 +1,153 @@
+
+
+
+
+
+	INCLUDE "z80_crt0.hdr"
+
+
+	SECTION	code_compiler
+
+._varassign_direct_nonconst
+	call	_testfunc
+	ld	de,0
+	ex	de,hl
+	call	l_gt
+	jp	nc,i_2	;
+	ld	hl,2	;const
+	jp	i_3	;
+.i_2
+	ld	hl,1	;const
+.i_3
+	push	hl
+	call	_blah
+	pop	bc
+	ret
+
+
+
+._varassign_direct_nonconst2
+	call	_testfunc
+	ld	a,h
+	or	l
+	jp	z,i_4	;
+	ld	hl,2	;const
+	jp	i_5	;
+.i_4
+	ld	hl,1	;const
+.i_5
+	push	hl
+	call	_blah
+	pop	bc
+	ret
+
+
+
+._varassign_direct_const_true
+	ld	hl,2	;const
+	push	hl
+	call	_blah
+	pop	bc
+	ret
+
+
+
+._varassign_direct_const_false
+	ld	hl,1	;const
+	push	hl
+	call	_blah
+	pop	bc
+	ret
+
+
+
+._varassign_direct_const_non_true
+	call	_testfunc
+	push	hl
+	call	_blah
+	pop	bc
+	ret
+
+
+
+._varassign_direct_const_non_false
+	call	_testfunc
+	push	hl
+	call	_blah
+	pop	bc
+	ret
+
+
+
+._call_const_true
+	ld	hl,2	;const
+	push	hl
+	call	_another
+	pop	bc
+	ret
+
+
+
+._call_const_false
+	ld	hl,1	;const
+	push	hl
+	call	_another
+	pop	bc
+	ret
+
+
+
+._varassign_indirect_const_true
+	push	bc
+	call	_blah
+	ld	hl,2	;const
+	pop	bc
+	push	hl
+	ld	hl,100	;const
+	push	hl
+	call	_another
+	pop	bc
+	pop	bc
+	ret
+
+
+
+._varassign_indirect_const_false
+	push	bc
+	call	_blah
+	ld	hl,1	;const
+	pop	bc
+	push	hl
+	ld	hl,100	;const
+	push	hl
+	call	_another
+	pop	bc
+	pop	bc
+	ret
+
+
+
+
+
+	SECTION	bss_compiler
+	SECTION	code_compiler
+
+
+
+	GLOBAL	_testfunc
+	GLOBAL	_blah
+	GLOBAL	_another
+	GLOBAL	_varassign_direct_nonconst
+	GLOBAL	_varassign_direct_nonconst2
+	GLOBAL	_varassign_direct_const_true
+	GLOBAL	_varassign_direct_const_false
+	GLOBAL	_varassign_direct_const_non_true
+	GLOBAL	_varassign_direct_const_non_false
+	GLOBAL	_call_const_true
+	GLOBAL	_call_const_false
+	GLOBAL	_varassign_indirect_const_true
+	GLOBAL	_varassign_indirect_const_false
+
+
+
+

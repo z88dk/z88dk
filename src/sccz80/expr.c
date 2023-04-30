@@ -194,18 +194,50 @@ int heir1(LVALUE* lval)
  */
 int heir1a(LVALUE* lval)
 {
+    char *before, *start;
     int falselab, endlab, skiplab;
     LVALUE lval2={0};
     int k;
 
     k = heir2a(lval);
     if (cmatch('?')) {
+        setstage(&before,&start);
         /* evaluate condition expression */
         if (k)
             rvalue(lval);
 
         if ( lval->is_const ) {
-            vconst(lval->const_val);
+
+            if ( lval->const_val ) {
+                // Only consider the true clause
+                /* evaluate 'true' expression */
+                if (heir1(lval))
+                    rvalue(lval);
+
+                if ( lval->is_const ) {
+                    clearstage(before, 0);
+                }
+                // Now we just need to swallow the false clause
+                setstage(&before,&start);
+                needchar(':');
+                /* evaluate 'false' expression */
+                if (heir1(&lval2))
+                    rvalue(&lval2);
+                clearstage(before, 0);
+            } else {
+                // Only need to consider the false claus
+                if (heir1(&lval2))
+                    rvalue(&lval2);
+                clearstage(before,0);  // Dump true stage
+                needchar(':');
+                /* evaluate 'false' expression */
+                if (heir1(lval))
+                    rvalue(lval);
+                if ( lval->is_const ) {
+                    clearstage(before, 0);
+                }
+            }
+            return k;
         }
 
         /* test condition, jump to false expression evaluation if necessary */
