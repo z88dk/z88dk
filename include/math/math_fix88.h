@@ -114,12 +114,18 @@ extern fix88_t __LIB__ sqrtfix88_fastcall(fix88_t x) __z88dk_fastcall;
 #define sqrtfix88(x) sqrtfix88_fastcall(x)
 
 /* Nearest integer, absolute value, and remainder functions */
+extern fix88_t __LIB__ fabsfix88 (fix88_t x) __z88dk_fastcall;
+extern fix88_t __LIB__ fabsfix88_fastcall (fix88_t x);
+#define fabsfix88(x) fabsfix88_fastcall(x)
+
+
 extern fix88_t __LIB__ ceilfix88 (fix88_t x);
 extern fix88_t __LIB__ ceilfix88_fastcall(fix88_t x) __z88dk_fastcall;
 #define ceilfix88(x) ceilfix88_fastcall(x)
 
 extern fix88_t __LIB__ floorfix88 (fix88_t x) __z88dk_fastcall;
 extern fix88_t __LIB__ floorfix88_fastcall (fix88_t x);
+
 
 #define truncfix88(a) (a>0?floorfix88(a):ceilfix88(a))
 #define roundfix88(a) (a>0?floorfix88(a+0x80):ceilfix88(a-0x80))
