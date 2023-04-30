@@ -5,7 +5,7 @@
     PUBLIC  fabsfix88
     PUBLIC  _fabsfix88
 
-    EXTERN  asm_fabs
+    EXTERN  asm_fix88_fabs
 
 fabsfix88:
 _fabsfix88:
@@ -16,4 +16,4 @@ _fabsfix88:
     ld      h,(hl)
     inc     hl
     ld      l,a
-    jp      asm_fabs
+    jp      asm_fix88_fabs
