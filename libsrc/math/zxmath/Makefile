@@ -19,6 +19,9 @@ all: dirs $(OUTPUT_DIRECTORY)/mzx.lib $(OUTPUT_DIRECTORY)/mzx_tiny.lib \
 # $(1) = flavour
 # $(2) = extra flags
 define build_lib
+$(1): $(OUTPUT_DIRECTORY)/$(1).lib
+.PHONY: $(1)
+
 
 $(OUTPUT_DIRECTORY)/$(1).lib: $(addprefix obj/$(1)/, $(OBJECTS))
 	TYPE=$(1) $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/$(1).lib @zxm.lst
