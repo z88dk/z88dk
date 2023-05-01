@@ -337,6 +337,10 @@
 	EXTERN	l_fix16_f2slond
 	EXTERN	l_fix16_f2uint
 	EXTERN	l_fix16_f2ulond
+        EXTERN  l_fix16_uint2f
+        EXTERN  l_fix16_ulong2f
+        EXTERN  l_fix16_sint2f
+        EXTERN  l_fix16_slong2f
 	EXTERN	l_fix16_inv
 	EXTERN	l_fix16_mul
 	EXTERN	l_fix16_negate

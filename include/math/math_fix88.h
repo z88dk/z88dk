@@ -12,7 +12,11 @@
 
 #include <stdint.h>
 
+#ifdef __SCCZ80
+typedef _Accum fix88_t;
+#else
 typedef int16_t fix88_t;
+#endif
 
 
 #define FIX88_ONE     0x0100
