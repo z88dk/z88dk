@@ -956,9 +956,9 @@ void zpush(void)
 
 void gen_push_float(Kind typeToPush)
 {
-    if ( typeToPush == KIND_FLOAT16 ) {
+    if ( typeToPush == KIND_FLOAT16 || typeToPush == KIND_ACCUM16 ) {
         push("hl");
-    } else if ( c_fp_size == 4 ) {
+    } else if ( c_fp_size == 4 || typeToPush == KIND_ACCUM32 ) {
         push("de");
         push("hl");
     } else {
@@ -2689,7 +2689,7 @@ int mult_dconst(LVALUE *lval, double value, int isrhs)
 
     if ( value == 1.0 ) {
         return 1;
-    } else if ( frexp(value, &exp) == 0.5 ) {
+    } else if ( kind_is_floating(lval->val_type) && frexp(value, &exp) == 0.5 ) {
         // It's a power of two so we can nobble the exponent
         loada(exp - 1);
         dcallrts("ldexp",lval->val_type);

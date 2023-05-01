@@ -154,8 +154,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
         lval->stage_add = stagenext;
         lval->stage_add_ltype = lval2->ltype;
-        if ( kind_is_floating(lval->val_type) && lval2->is_const == 0 ) { // FLOATCONST + lvalue
-            if ( kind_is_floating(lval2->val_type)) {
+        if ( kind_is_decimal(lval->val_type) && lval2->is_const == 0 ) { // FLOATCONST + lvalue
+            if ( kind_is_decimal(lval2->val_type)) {
                 // If the RHS (non constant) is a float, then use its type 
                 lval->val_type = lval2->val_type;
                 lval->ltype = lval2->ltype;
@@ -181,7 +181,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if ( !operator_is_commutative(oper) ) {
                 gen_swap_float(lval->val_type);
             }
-        } else if ( kind_is_floating(lval2->val_type) && lval2->is_const == 0 ) {  // INTCONST + floatlvalue
+        } else if ( kind_is_decimal(lval2->val_type) && lval2->is_const == 0 ) {  // INTCONST + floatlvalue
             /* On stack we've got the double, load the constant (which is an integral type) as a double */
             if ( dconstoper != NULL ) {
                 if ( dconstoper(lval2, lval->const_val, 0)) {
@@ -254,12 +254,12 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                  Zsp = beforesp;
                  stkcount = savestkcount;
                  // Convert to a float
-                 if ( !kind_is_floating(lval->val_type) ) {
+                 if ( !kind_is_decimal(lval->val_type) ) {
                      zconvert_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned);
                      lval->val_type = lval2->val_type;
                      lval->ltype = lval2->ltype;
                  }
-                 if ( doper == zdiv ) {
+                 if ( doper == zdiv && kind_is_floating(lval->val_type)) {
                      doper = mult;
                      dconstoper = mult_dconst;
                      lval2->const_val = 1. / lval2->const_val;
@@ -270,7 +270,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                      }
                  }
                  gen_push_float(lval->val_type);
-                 if ( kind_is_floating(lval->val_type)) {
+                 if ( kind_is_decimal(lval->val_type)) {
                      lval2->val_type = lval->val_type;
                      lval2->ltype = lval->ltype;
                  }
