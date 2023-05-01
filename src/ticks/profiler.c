@@ -6,6 +6,7 @@ int profiler_enabled = 0;
 static breakpoint* breakpoint_push_frame = NULL;
 static breakpoint* breakpoint_pop_frame = NULL;
 static struct profile_function_t* profiling_functions = NULL;
+static struct profile_function_on_stack_t* call_stack = NULL;
 static int stack_level = 0;
 const char* within_function_only = NULL;
 static int profiling_iterations_limit = 0;
@@ -23,10 +24,18 @@ struct profile_function_t
 {
     debug_sym_function* function;
     struct profile_function_call_t* calls;
+    uint64_t own_time;
     uint64_t total_time;
+    uint64_t sub_calls_time;
     uint32_t total_calls;
 
     UT_hash_handle hh;
+};
+
+struct profile_function_on_stack_t {
+    struct profile_function_t* profile_function;
+    struct profile_function_on_stack_t* next;
+    struct profile_function_on_stack_t* prev;
 };
 
 static struct profile_function_t* lookup_function(debug_sym_function* function, uint8_t allocate) {
@@ -83,6 +92,10 @@ uint8_t profiler_check(uint16_t pc) {
 
         DL_PREPEND(f->calls, call);
 
+        struct profile_function_on_stack_t* on_stack = calloc(1, sizeof(struct profile_function_on_stack_t));
+        on_stack->profile_function = f;
+        DL_PREPEND(call_stack, on_stack);
+
         debug_stack_frames_free(fp);
         stack_level++;
 
@@ -105,12 +118,26 @@ uint8_t profiler_check(uint16_t pc) {
 
         if (f) {
             struct profile_function_call_t* head = f->calls;
+            uint32_t spent;
             if (head) {
-                uint32_t spent = bk.time() - head->time;
+                spent = bk.time() - head->time;
                 f->total_time += spent;
                 f->total_calls++;
                 DL_DELETE(f->calls, head);
                 free(head);
+            }
+
+            struct profile_function_on_stack_t* call_stack_head = call_stack;
+            if (call_stack_head && call_stack_head->profile_function == f)
+            {
+                DL_DELETE(call_stack, call_stack_head);
+                free(call_stack_head);
+
+                // parent?
+                if (call_stack)
+                {
+                    call_stack->profile_function->sub_calls_time += spent;
+                }
             }
         }
 
@@ -186,6 +213,32 @@ int sort_functions(struct profile_function_t *a, struct profile_function_t *b) {
     return 0;
 }
 
+int sort_functions_self_time(struct profile_function_t *a, struct profile_function_t *b) {
+    if ((a->total_time - a->sub_calls_time) < (b->total_time - b->sub_calls_time)) {
+        return 1;
+    }
+    if ((a->total_time - a->sub_calls_time) > (b->total_time - b->sub_calls_time)) {
+        return -1;
+    }
+    return 0;
+}
+
+static void profiler_dump_function_calls()
+{
+    struct profile_function_t* f = profiling_functions;
+    while (f) {
+        uint32_t own_time = f->total_time - f->sub_calls_time;
+        double time_percent = (double)f->total_time / (double)total_total_time;
+        int time_percent_int = (int)(time_percent * 100.0f);
+        double own_time_percent = (double)own_time / (double)total_total_time;
+        int own_time_percent_int = (int)(own_time_percent * 100.0f);
+        bk.console("%*d %*d %*d %*d%% %*d%%    %s\n", 8, f->total_calls, 8, f->total_time, 8, own_time,
+                   8, time_percent_int, 8, own_time_percent_int, f->function->function_name);
+
+        f = f->hh.next;
+    }
+}
+
 void profiler_stop() {
     if (profiler_enabled == 0) {
         bk.console("Warning: profiler is not enabled.\n");
@@ -200,38 +253,53 @@ void profiler_stop() {
 
     HASH_SORT(profiling_functions, sort_functions);
 
-    bk.console("Profiling results:\n");
-    bk.console("-----------------------------------------\n");
-    bk.console("   Calls   Time     Share    Function\n");
-    bk.console("-----------------------------------------\n");
+    bk.console("------------------------------------------------------------\n");
+    bk.console("        Profiling results, sorted by Total Time:\n");
+    bk.console("------------------------------------------------------------\n");
+    bk.console("   Calls   Time     Own Time    Share   OwnShare  Function\n");
+    bk.console("------------------------------------------------------------\n");
 
-    struct profile_function_t* f = profiling_functions;
-    while (f) {
-        double time_percent = (double)f->total_time / (double)total_total_time;
-        int time_percent_int = (int)(time_percent * 100.0f);
-        bk.console("%*d %*d %*d%%    %s\n", 6, f->total_calls, 8, f->total_time,
-                   8, time_percent_int, f->function->function_name);
+    profiler_dump_function_calls();
 
-        f = f->hh.next;
-    }
+    HASH_SORT(profiling_functions, sort_functions_self_time);
 
-    struct profile_function_t* tmp;
-    HASH_ITER(hh, profiling_functions, f, tmp) {
+    bk.console("------------------------------------------------------------\n");
+    bk.console("                   Sorted by Own Time:\n");
+    bk.console("------------------------------------------------------------\n");
+    bk.console("   Calls   Time     Own Time    Share   OwnShare  Function\n");
+    bk.console("------------------------------------------------------------\n");
 
-        struct profile_function_call_t* el;
-        struct profile_function_call_t* tmp2;
-        DL_FOREACH_SAFE(f->calls, el, tmp2) {
-            DL_DELETE(f->calls, el);
+    profiler_dump_function_calls();
+
+    {
+        struct profile_function_on_stack_t* el;
+        struct profile_function_on_stack_t* tmp2;
+        DL_FOREACH_SAFE(call_stack, el, tmp2) {
+            DL_DELETE(call_stack, el);
             free(el);
         }
-
-        HASH_DEL(profiling_functions, f);
-        free(f);
     }
 
-    bk.console("-----------------------------------------\n"
+    struct profile_function_t* f = profiling_functions;
+    {
+        struct profile_function_t* tmp;
+        HASH_ITER(hh, profiling_functions, f, tmp) {
+
+            struct profile_function_call_t* el;
+            struct profile_function_call_t* tmp2;
+            DL_FOREACH_SAFE(f->calls, el, tmp2) {
+                DL_DELETE(f->calls, el);
+                free(el);
+            }
+
+            HASH_DEL(profiling_functions, f);
+            free(f);
+        }
+    }
+
+    bk.console("------------------------------------------------------------\n"
                "Total time: %d\n"
-               "-----------------------------------------\n", total_total_time);
+               "------------------------------------------------------------\n", total_total_time);
 
     profiler_enabled = 0;
 }
