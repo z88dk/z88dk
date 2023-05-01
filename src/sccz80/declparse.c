@@ -568,6 +568,11 @@ static Type *parse_type(void)
         if ( amatch("_Accum")) {
             type->kind = KIND_ACCUM16;
             type->size = 2;
+
+            if ( type->isunsigned ) {
+                warningfmt("unsupported-feature", "unsigned _Accum is not currently supported");
+                type->isunsigned = 0;
+            }
         } else {
             swallow("int");        
             type->kind = KIND_INT;
@@ -580,6 +585,10 @@ static Type *parse_type(void)
         } else if ( amatch("_Accum")) {
             type->kind = KIND_ACCUM32;
             type->size = 4;
+            if ( type->isunsigned ) {
+                warningfmt("unsupported-feature", "unsigned long _Accum is not currently supported");
+                type->isunsigned = 0;
+            }
         } else {
             type->kind = KIND_LONG;
             type->size = 4;
@@ -594,6 +603,10 @@ static Type *parse_type(void)
     } else if ( amatch("_Accum")) {
         type->kind = KIND_ACCUM16;
         type->size = 2;
+        if ( type->isunsigned ) {
+            warningfmt("unsupported-feature", "unsigned _Accum is not currently supported");
+            type->isunsigned = 0;
+        }
     } else if ( amatch("void")) {
         type->kind = KIND_VOID;
         type->size = 1;
