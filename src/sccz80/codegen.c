@@ -2967,7 +2967,7 @@ void zmod_const(LVALUE *lval, int64_t value64)
     else
         templval.ltype = type_int;
 
-    if ( lval->val_type == KIND_LONG ) {
+    if ( lval->val_type == KIND_LONG || lval->val_type == KIND_ACCUM32 ) {
         if ( value <= 256 && value > 0 ) {
             // Fall through to the logical and operation
         } else if ( value == 65536 && ulvalue(lval) ) {
@@ -3054,9 +3054,12 @@ void zor(LVALUE* lval )
         break;
     case KIND_LONG:
     case KIND_CPTR:
+    case KIND_ACCUM32:
         callrts("l_long_or");
         Zsp += 4;
         break;
+    case KIND_ACCUM16:
+        zpop();
     default:
         callrts("l_or");
     }
@@ -3157,7 +3160,7 @@ void zor_const(LVALUE *lval, int64_t value64)
         llpush();
         vllongconst(value64);
         zor(lval);
-    } else if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
+    } else if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR || lval->val_type == KIND_ACCUM32 ) {
         if ( zor_handle_pow2(value) ) {
             return;
         } else if ( (value & 0xFFFFFF00) == 0 ) {
@@ -3210,9 +3213,12 @@ void zxor(LVALUE *lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
+    case KIND_ACCUM32:
         callrts("l_long_xor");
         Zsp += 4;
         break;
+    case KIND_ACCUM16:
+        zpop();
     default:
         callrts("l_xor");
     }
@@ -3225,7 +3231,7 @@ void zxor_const(LVALUE *lval, int64_t value64)
         llpush();
         vllongconst(value64);
         zxor(lval);
-    } else if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
+    } else if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR || lval->val_type == KIND_ACCUM32) {
         if ( (value & 0xFFFFFF00) == 0 ) {
             ol("ld\ta,l");
             ot("xor\t"); outdec(value % 256); nl();
@@ -3279,9 +3285,12 @@ void zand(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
+    case KIND_ACCUM32:
         callrts("l_long_and");
         Zsp += 4;
         break;
+    case KIND_ACCUM16:
+        zpop();
     default:
         callrts("l_and");
     }
@@ -3294,7 +3303,7 @@ void zand_const(LVALUE *lval, int64_t value64)
         llpush();
         vllongconst(value64);
         zand(lval);
-    } else if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR) {
+    } else if ( lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR || lval->val_type == KIND_ACCUM32) {
         if ( value == 0 ) {
             vlongconst(0);
         } else if ( value == 0xff ) {  // 5
@@ -3392,12 +3401,15 @@ void asr(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
+    case KIND_ACCUM32:
         if (ulvalue(lval))
             callrts("l_long_asr_u");
         else
             callrts("l_long_asr");
         Zsp += 4;
         break;
+    case KIND_ACCUM16:
+        zpop();
     default:
         if (ulvalue(lval))
             callrts("l_asr_u");
@@ -3445,7 +3457,7 @@ void asr_const(LVALUE *lval, int64_t value64)
         }
     }
 
-    if  (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR ) {
+    if  (lval->val_type == KIND_LONG || lval->val_type == KIND_CPTR || lval->val_type == KIND_ACCUM32 ) {
         if ( value == 1 && !IS_808x() ) {
             if ( ulvalue(lval) ) { /* 8 bytes, 8 + 8 + 8 + 8 + 8 = 40T */
                 ol("srl\td");
@@ -3724,9 +3736,12 @@ void asl(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
+    case KIND_ACCUM32:
         callrts("l_long_asl");
         Zsp += 4;
         break;
+    case KIND_ACCUM16:
+        zpop();
     default:
         callrts("l_asl");
     }

@@ -253,8 +253,8 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                  clearstage(before_constlval, NULL);
                  Zsp = beforesp;
                  stkcount = savestkcount;
-                 // Convert to a float
-                 if ( !kind_is_decimal(lval->val_type) ) {
+                 // Convert to a float (if operator is valid for floats). fixed point allow more operators
+                 if ( !kind_is_decimal(lval->val_type) && doper != NULL ) {
                      zconvert_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned);
                      lval->val_type = lval2->val_type;
                      lval->ltype = lval2->ltype;
@@ -270,7 +270,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                      }
                  }
                  gen_push_float(lval->val_type);
-                 if ( kind_is_decimal(lval->val_type)) {
+                 if ( kind_is_decimal(lval->val_type) && doper != NULL) {
                      lval2->val_type = lval->val_type;
                      lval2->ltype = lval->ltype;
                  }
@@ -341,7 +341,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             Zsp = savesp;
             return;
         }
-        if (widen_if_float(lval, lval2, operator_is_commutative(oper))) {
+        if (doper != NULL && widen_if_float(lval, lval2, operator_is_commutative(oper))) {
             // We only end up in here if at least one of the operands is floating
             if ( doper == zmod ) {
                 errorfmt("Cannot apply operator %% to floating point",1);
