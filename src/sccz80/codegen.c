@@ -2279,6 +2279,7 @@ void zadd(LVALUE* lval)
         Zsp += 8;
         break;
     case KIND_LONG:
+    case KIND_ACCUM32:
     case KIND_CPTR:
         if ( c_speed_optimisation & OPT_ADD32 ) {
             if ( IS_808x() || IS_GBZ80() ) {
@@ -2312,6 +2313,9 @@ void zadd(LVALUE* lval)
         dcallrts("fadd",lval->val_type);
         Zsp += c_fp_size;
         break;
+    case KIND_ACCUM16:
+        zpop();
+        // Fall through
     default:
         ol("add\thl,de");           // 11T
     }
@@ -2516,6 +2520,7 @@ void zsub(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
+    case KIND_ACCUM32:
         if ( c_speed_optimisation & OPT_SUB32 ) {
             if ( IS_8085() ) {
                 ol("ld\tbc,hl");        /* 11 bytes: 8 + 10 + 10 + 10 + 6*4 = 62T */
@@ -2567,6 +2572,9 @@ void zsub(LVALUE* lval)
         dcallrts("fsub",lval->val_type);
         Zsp += c_fp_size;
         break;
+    case KIND_ACCUM16:
+        zpop();
+        // Fall through
     default:
         if ( c_speed_optimisation & OPT_SUB16 ) {
             if ( IS_8085() ) {
@@ -2612,6 +2620,9 @@ void mult(LVALUE* lval)
         Zsp += 4;
         break;
     case KIND_FLOAT16:
+        dcallrts("fmul",lval->val_type);
+        Zsp += 2;
+        break;
     case KIND_ACCUM16:
         dcallrts("fmul",lval->val_type);
         Zsp += 2;

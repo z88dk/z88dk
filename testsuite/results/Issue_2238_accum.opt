@@ -12,8 +12,8 @@
 	ld	hl,4	;const
 	call	l_gintspsp	;
 	call	l_gint4sp	;
+	pop	de
 	add	hl,de
-	pop	bc
 	ret
 
 
@@ -61,13 +61,9 @@
 
 ._func3a
 	ld	hl,2	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
+	call	l_gintspsp	;
 	ld	hl,640	;const
 	call	l_fix16_mul
-	push	bc
 	ret
 
 
@@ -92,13 +88,9 @@
 
 ._func3d
 	ld	hl,2	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
+	call	l_gintspsp	;
 	ld	hl,768	;const
 	call	l_fix16_mul
-	push	bc
 	ret
 
 
@@ -114,13 +106,9 @@
 
 ._func3f
 	ld	hl,2	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
+	call	l_gintspsp	;
 	ld	hl,512	;const
 	call	l_fix16_mul
-	push	bc
 	ret
 
 
@@ -138,13 +126,9 @@
 
 ._func4d
 	ld	hl,2	;const
-	add	hl,sp
-	ld	e,(hl)
-	inc	hl
-	ld	d,(hl)
+	call	l_gintspsp	;
 	ld	hl,768	;const
 	call	l_fix16_div
-	push	bc
 	ret
 
 
@@ -219,10 +203,8 @@
 	ld	hl,2	;const
 	call	l_gintspsp	;
 	call	l_gint6sp	;
-	pop	de
 	call	l_fix16_sint2f
 	call	l_fix16_mul
-	push	bc
 	ret
 
 
@@ -231,11 +213,9 @@
 	ld	hl,4	;const
 	call	l_gintspsp	;
 	call	l_gint4sp	;
-	pop	de
 	ex	(sp),hl
 	call	l_fix16_sint2f
 	call	l_fix16_mul
-	push	bc
 	ret
 
 
@@ -301,8 +281,8 @@
 	call	l_gintspsp	;
 	call	l_gint6sp	;
 	call	l_fix16_sint2f
+	pop	de
 	add	hl,de
-	pop	bc
 	ret
 
 
@@ -313,8 +293,8 @@
 	call	l_gint4sp	;
 	ex	(sp),hl
 	call	l_fix16_sint2f
+	pop	de
 	add	hl,de
-	pop	bc
 	ret
 
 
@@ -326,8 +306,8 @@
 	add	hl,sp
 	call	l_glong
 	call	l_fix16_slong2f
+	pop	de
 	add	hl,de
-	pop	bc
 	ret
 
 
@@ -341,8 +321,8 @@
 	ex	(sp),hl
 	ex	de,hl
 	call	l_fix16_slong2f
+	pop	de
 	add	hl,de
-	pop	bc
 	ret
 
 
