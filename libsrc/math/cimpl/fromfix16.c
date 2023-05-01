@@ -3,6 +3,11 @@
 #include <math.h>
 #include <math/math_fix88.h>
 
+#if FLOAT_IS_16BITS
+typedef _Float16 FLOAT;
+#else
+typedef double FLOAT;
+#endif
 
 static void wrapper() __naked
 {
@@ -24,7 +29,7 @@ l_f48_fix16tof = _convert
 }
 
 
-static double convert(fix88_t x) __z88dk_fastcall
+static FLOAT convert(fix88_t x) __z88dk_fastcall
 {
    return FIX88_TO_FLOAT(x);
 }

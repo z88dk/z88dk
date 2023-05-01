@@ -8,7 +8,7 @@ CFILES = fromfix16.c tofix16.c
 AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard z80/*.asm)
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
-CFLAGS += -D__MATH_MATH16
+CFLAGS += -D__MATH_MATH16 -DFLOAT_IS_16BITS
 
 all: dirs $(OUTPUT_DIRECTORY)/math16.lib $(OUTPUT_DIRECTORY)/math16_ixiy.lib
 
