@@ -361,7 +361,7 @@ int widen_if_float(LVALUE* lval, LVALUE* lval2, int operator_is_commutative)
         if ( kind_is_floating(lval->val_type)) {
             // Both are floating but different types
             if ( lval->val_type == KIND_DOUBLE) {
-                // RHS is _Float16, LHS is double, promote RHS
+                // RHS is _Float16 or fixed, LHS is double, promote RHS
                 zconvert_to_decimal(lval2->val_type, lval->val_type, lval2->ltype->isunsigned);
                 lval2->val_type = lval->val_type;
                 lval2->ltype = lval->ltype;

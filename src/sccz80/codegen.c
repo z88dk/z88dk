@@ -110,8 +110,12 @@ struct _mapping {
         { "fswap", "dswap",   NULL, "l_f32_swap", "l_f64_swap", NULL, "l_fix32_swap" },
         { "fnegate", "minusfa", "l_f16_negate", "l_f32_negate", "l_f64_negate", "l_fix16_negate", "l_fix32_negate" },
         { "ldexp", "l_f48_ldexp", "l_f16_ldexp", "l_f32_ldexp", "l_f64_ldexp", NULL, NULL },
-        { "f16tof", "l_f48_f16tof", "l_f16_f16tof", "l_f32_f16tof", "l_f64_f16tof" }, // TODO
-        { "ftof16", "l_f48_ftof16", "l_f16_ftof16", "l_f32_ftof16", "l_f64_ftof16" }, // TODO
+        { "f16tof", "l_f48_f16tof", "l_f16_f16tof", "l_f32_f16tof", "l_f64_f16tof", "l_fix16_f16tofix", "l_fix32_f16tofix" },
+        { "ftof16", "l_f48_ftof16", "l_f16_ftof16", "l_f32_ftof16", "l_f64_ftof16", "l_fix16_fixtof16", "l_fix32_fixtofi16" },
+        { "ftofix16", "l_f48_ftofix16", "l_f16_ftofix16", "l_f32_ftofix16", "l_f64_ftofix16", NULL, "l_fix32_ftofix16" },
+        { "fix16tof", "l_f48_fix16tof", "l_f16_fix16tof", "l_f32_fix16tof", "l_f64_fix16tof", "l_fix16_fix16tof", "l_fix32_fix16tof" },
+        { "ftofix32", "l_f48_ftofix32", "l_f16_ftofix32", "l_f32_ftofix32", "l_f64_ftofix32", "l_fix16_ftofix32", NULL },
+        { "fix32tof", "l_f48_fix32tof", "l_f16_fix32tof", "l_f32_fix32tof", "l_f64_fix32tof", "l_fix16_fix32tof", "l_fix32_fix32tof" },
         { "inversef", NULL, "l_f16_invf", "l_f32_invf", NULL, "l_fix16_inv", "l_fix32_inv" }, // Called only for IEEE mode
         { NULL }
 };
@@ -5826,7 +5830,24 @@ void zconvert_to_decimal(Kind from, Kind to, unsigned char isunsigned)
        dcallrts("f16tof",to);
        return;
    } else if ( from == KIND_DOUBLE ) {
-       dcallrts("ftof16", from);
+       switch ( to ) {
+       case KIND_ACCUM16:
+           dcallrts("ftofix16", from);
+           break;
+       case KIND_ACCUM32:
+           dcallrts("ftofix32", from);
+           break;
+       default:
+           dcallrts("ftof16", from);
+           break;
+       }
+       return;
+   } else if ( from == KIND_ACCUM16) {
+        dcallrts("fix16tof", to);
+       return;
+   } else if ( from == KIND_ACCUM32) {
+        // TODO: Fix16 to f16
+        dcallrts("fix32tof", to);
        return;
    }
    if ( isunsigned ) dcallrts("uint2f",to);
