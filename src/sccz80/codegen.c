@@ -5153,7 +5153,7 @@ void gen_conv_sint2long(void)
 /* Swap double positions on stack */
 void gen_swap_float(Kind type)
 {
-    if (type == KIND_FLOAT16) {
+    if (type == KIND_FLOAT16 || type == KIND_ACCUM16) {
         ol("ex\t(sp),hl");
     } else {
         callrts("fswap");

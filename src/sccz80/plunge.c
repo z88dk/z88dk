@@ -303,9 +303,9 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 return;
             }
         }
-        if ( !kind_is_floating(lval->val_type) && !kind_is_floating(lval2->val_type) && 
+        if ( !kind_is_decimal(lval->val_type) && !kind_is_decimal(lval2->val_type) && 
             lval->val_type != KIND_LONG && lval2->val_type != KIND_LONG && lval->val_type != KIND_CPTR && lval2->val_type != KIND_CPTR &&
-            lval->val_type != KIND_LONGLONG && lval2->val_type != KIND_LONGLONG && lval->val_type != KIND_ACCUM16) {
+            lval->val_type != KIND_LONGLONG && lval2->val_type != KIND_LONGLONG ) {
             /* Gets the LHS back again for 16 bit operands */
             zpop();
         }
