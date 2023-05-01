@@ -440,8 +440,20 @@ constdecl:
                     outdec(((uint32_t)val % 65536UL) / 256);
                     outbyte(',');
                     outdec(((uint32_t)val / 65536UL) % 256);
-                } else if ( type->kind == KIND_ACCUM16 || type->kind == KIND_ACCUM32) {
-                    // TODO: otuput constant
+                } else if ( type->kind == KIND_ACCUM16 ) {
+                    uint16_t val = ((int16_t)((value) / (1.0 / 256.0) + ((value) >= 0 ? 0.5 : -0.5)));
+                    defword();
+                    outdec(val);
+                } else if ( type->kind == KIND_ACCUM32) {
+                    uint32_t val = ((int32_t)((value) / (1.0 / 65536.0) + ((value) >= 0 ? 0.5 : -0.5)));
+                    defbyte();
+                    outdec(((uint32_t)val % 65536UL) % 256);
+                    outbyte(',');
+                    outdec(((uint32_t)val % 65536UL) / 256);
+                    outbyte(',');
+                    outdec(((uint32_t)val / 65536UL) % 256);
+                    outbyte(',');
+                    outdec(((uint32_t)val / 65536UL) / 256);
                 } else {
                     if (type->kind == KIND_CHAR ) 
                         defbyte();

@@ -24,7 +24,7 @@ l_f48_fix16tof = _convert
 }
 
 
-static fix88_t convert(double x)
+static double convert(fix88_t x) __z88dk_fastcall
 {
    return FIX88_TO_FLOAT(x);
 }

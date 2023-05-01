@@ -24,8 +24,8 @@
 
 void test_comparison()
 {
-     FIX a = 0x1000;        // 10
-     FIX b = 0xfe00;        // -2
+     FIX a = FIX88_FROM_INT(10);
+     FIX b = FIX88_FROM_INT(-2);
 
      Assert( a > b, "a > b");
      Assert( a >= b, "a >= b");
@@ -53,7 +53,6 @@ void test_integer_constant_operations()
 
 static int approx_equal(FIX a, FIX b, FIX epsilon)
 {
-
     FIX absa = FABS( a );
     FIX absb = FABS( b );
     FIX diff = FABS( a-b );
@@ -65,10 +64,10 @@ static int approx_equal(FIX a, FIX b, FIX epsilon)
         if ( a == 0 || b == 0 || ((absa + absb) < TINY_POSITIVE )) {
             /* a or b is zero or both are extremely close to it */
             /* relative error is less meaningful here           */
-            return diff < (epsilon * TINY_POSITIVE);
+            return diff < (mulfix88(epsilon,TINY_POSITIVE));
         } else {
             /* use relative error */
-            return diff/(absa + absb) < epsilon;
+            return divfix88(diff,(absa + absb)) < epsilon;
         }
     }
 }
@@ -117,7 +116,8 @@ void test_pow()
 {
     run_pow(FIX88_FROM_FLOAT(2.0), FIX88_FROM_FLOAT(2.0), FIX88_FROM_FLOAT(4.0));
     run_pow(FIX88_FROM_FLOAT(0.5), FIX88_FROM_FLOAT(2.0), FIX88_FROM_FLOAT(0.25));
-//    run_pow(FIX88_FROM_FLOAT(4.0), FIX88_FROM_FLOAT(3.0), FIX88_FROM_FLOAT(64.0));
+    run_pow(FIX88_FROM_FLOAT(2.0), FIX88_FROM_FLOAT(3.0), FIX88_FROM_FLOAT(8.0));
+    run_pow(FIX88_FROM_FLOAT(4.0), FIX88_FROM_FLOAT(3.0), FIX88_FROM_FLOAT(64.0));
     run_pow(FIX88_FROM_FLOAT(2.0), FIX88_FROM_FLOAT(0.5), FIX88_FROM_FLOAT(1.42));
 }
 

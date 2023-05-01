@@ -305,7 +305,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         }
         if ( !kind_is_floating(lval->val_type) && !kind_is_floating(lval2->val_type) && 
             lval->val_type != KIND_LONG && lval2->val_type != KIND_LONG && lval->val_type != KIND_CPTR && lval2->val_type != KIND_CPTR &&
-            lval->val_type != KIND_LONGLONG && lval2->val_type != KIND_LONGLONG) {
+            lval->val_type != KIND_LONGLONG && lval2->val_type != KIND_LONGLONG && lval->val_type != KIND_ACCUM16) {
             /* Gets the LHS back again for 16 bit operands */
             zpop();
         }
@@ -491,8 +491,8 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         // We'll use const operator if it's add and RHS is lvalue (implicitly LHS is const since we're here)
         doconst_oper = oper == zadd && lval2->is_const == 0;
         
-        if ( kind_is_floating(lval->val_type) && lval2->is_const == 0 ) {
-            if ( kind_is_floating(lval2->val_type)) {
+        if ( kind_is_decimal(lval->val_type) && lval2->is_const == 0 ) {
+            if ( kind_is_decimal(lval2->val_type)) {
                 // If the RHS (non constant) is a float, then use its type 
                 lval->val_type = lval2->val_type;
                 lval->ltype = lval2->ltype;
@@ -512,7 +512,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             if ( oper == zsub ) {
                 gen_swap_float(lval->val_type);
             }
-        } else if ( kind_is_floating(lval2->val_type) && lval2->is_const == 0 ) { 
+        } else if ( kind_is_decimal(lval2->val_type) && lval2->is_const == 0 ) { 
             // Constant +/- Floatinglvalue
             doconst_oper = 0; // No const operator for double
             /* FA holds the right hand side */
@@ -584,11 +584,11 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             /* constant on right */
             val = lval2->const_val;
             
-            if ( kind_is_floating(lval2->val_type) ) { 
+            if ( kind_is_decimal(lval2->val_type) ) { 
                 clearstage(before1, 0); // Get rid of primary on the stack
                 Zsp = savesp1;
 
-                if ( !kind_is_floating(lval->val_type)) {
+                if ( !kind_is_decimal(lval->val_type)) {
                     // Force the primary register to a float
                     force(lval2->val_type, lval->val_type, NO, lval->ltype->isunsigned, 0);
                     lval->val_type = lval2->val_type;
@@ -604,7 +604,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                 // And do it
                 (*oper)(lval);
                 return;
-            } else if ( kind_is_floating(lval->val_type) ) { 
+            } else if ( kind_is_decimal(lval->val_type) ) { 
                 /* On stack we've got the double, load the constant as a double */
                 lval2->val_type = lval->val_type;
                 lval2->ltype = lval->ltype;

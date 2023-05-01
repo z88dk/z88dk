@@ -297,7 +297,7 @@ void force(Kind t1, Kind t2, char isunsigned1, char isunsigned2, int isconst)
         zconvert_to_decimal(t2, t1, isunsigned2);
     } else {
         if (kind_is_decimal(t2)) {
-            zconvert_from_double(t2, t1, isunsigned1);
+            zconvert_from_decimal(t2, t1, isunsigned1);
             return;
         }
     }

@@ -87,8 +87,7 @@ typedef enum {
 #define kind_is_decimal(x)  ( kind_is_floating(x) || kind_is_fixed(x) )
 
 
-#define get_float_type(k) (k == KIND_DOUBLE || k == KIND_FLOAT) ? type_double : type_float16
-#define get_fixed_type(k) (k == KIND_ACCUM32 ) ? type_accum32 : type_accum16
+#define get_float_type(k) (k == KIND_ACCUM16 ? type_accum16 : k == KIND_ACCUM32 ? type_accum32  : (k == KIND_DOUBLE || k == KIND_FLOAT) ? type_double : type_float16)
 
 typedef struct {
     size_t    size;

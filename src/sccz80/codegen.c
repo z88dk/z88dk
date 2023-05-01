@@ -113,9 +113,9 @@ struct _mapping {
         { "f16tof", "l_f48_f16tof", "l_f16_f16tof", "l_f32_f16tof", "l_f64_f16tof", "l_fix16_f16tofix", "l_fix32_f16tofix" },
         { "ftof16", "l_f48_ftof16", "l_f16_ftof16", "l_f32_ftof16", "l_f64_ftof16", "l_fix16_fixtof16", "l_fix32_fixtofi16" },
         { "ftofix16", "l_f48_ftofix16", "l_f16_ftofix16", "l_f32_ftofix16", "l_f64_ftofix16", NULL, "l_fix32_ftofix16" },
-        { "fix16tof", "l_f48_fix16tof", "l_f16_fix16tof", "l_f32_fix16tof", "l_f64_fix16tof", "l_fix16_fix16tof", "l_fix32_fix16tof" },
+        { "fix16tof", "l_f48_fix16tof", "l_f16_fix16tof", "l_f32_fix16tof", "l_f64_fix16tof", NULL, "l_fix32_fix16tof" },
         { "ftofix32", "l_f48_ftofix32", "l_f16_ftofix32", "l_f32_ftofix32", "l_f64_ftofix32", "l_fix16_ftofix32", NULL },
-        { "fix32tof", "l_f48_fix32tof", "l_f16_fix32tof", "l_f32_fix32tof", "l_f64_fix32tof", "l_fix16_fix32tof", "l_fix32_fix32tof" },
+        { "fix32tof", "l_f48_fix32tof", "l_f16_fix32tof", "l_f32_fix32tof", "l_f64_fix32tof", "l_fix16_fix32tof", NULL },
         { "inversef", NULL, "l_f16_invf", "l_f32_invf", NULL, "l_fix16_inv", "l_fix32_inv" }, // Called only for IEEE mode
         { NULL }
 };
@@ -3964,7 +3964,7 @@ void lneg(LVALUE* lval)
         break;
     case KIND_DOUBLE:
     case KIND_FLOAT16:
-        zconvert_from_double(lval->val_type,KIND_INT, 0);
+        zconvert_from_decimal(lval->val_type,KIND_INT, 0);
     default:
         set_int(lval);
         callrts("l_lneg");
@@ -5705,7 +5705,7 @@ int zcriticaloffset(void)
 
 
 
-void zconvert_from_double(Kind from, Kind to, unsigned char isunsigned)
+void zconvert_from_decimal(Kind from, Kind to, unsigned char isunsigned)
 {
     if ( to == KIND_LONGLONG ) {
         if ( isunsigned ) dcallrts("f2ullong",from);

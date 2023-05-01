@@ -1,3 +1,11 @@
+/*
+ * <math/math_fix88.h> provides accessed a fixed point Q8.8 library
+ *
+ * Usage is similar to using regular floating points, however:
+ * 
+ * - multiplication and division should be performed using mulfix88() and divfix() functions.
+ * - conversion to and from types should be performed using the provided macros
+ */
 
 #ifndef MATH_MATH_FIX88_H
 #define MATH_MATH_FIX88_H
