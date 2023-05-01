@@ -7,10 +7,10 @@ vpath %.asm c/sccz80
 vpath %.asm z80
 
 AFILES  = $(notdir $(wildcard c/sccz80/*.asm)) $(notdir $(wildcard z80/*.asm))
-CFILES  = amax.c amin.c ceil.c fmod.c ftoa.c ftoe.c cosh.c sinh.c tanh.c atan2.c atof.c
+CFILES  = amax.c amin.c ceil.c fmod.c ftoa.c ftoe.c cosh.c sinh.c tanh.c atan2.c atof.c tofix16.c fromfix16.c
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 
-CFLAGS += -D__CPC__ -D__NATIVE_MATH__ -D__MATH_CPC
+CFLAGS += -D__CPC__ -D__NATIVE_MATH__ -D__MATH_CPC -DFLOAT_IS_48BITS
 
 all: dirs $(OUTPUT_DIRECTORY)/cpc_math.lib $(OUTPUT_DIRECTORY)/464_math.lib $(OUTPUT_DIRECTORY)/664_math.lib $(OUTPUT_DIRECTORY)/6128_math.lib $(OUTPUT_DIRECTORY)/cpcz80_math.lib
 

@@ -9,9 +9,10 @@ TARGET ?= test
 #NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/math/float/math48/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/c/sdcc_ix/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/lm/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/lm/c/sdcc_ix/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/lm/z80/*.asm" "$(NEWLIB_DIRECTORY)/math/float/math48/z80/*.asm"
 
 AFILES = $(wildcard *.asm)
-CFILES  = $(wildcard *.c)
+CFILES  = $(wildcard *.c) 
 OBJECTS = $(CFILES:.c=.o) $(AFILES:.asm=.o)
 
+CFLAGS += -DFLOAT_IS_48BITS
 
 all: dirs $(OUTPUT_DIRECTORY)/math48.lib $(OUTPUT_DIRECTORY)/math48_iy.lib
 
@@ -25,7 +26,7 @@ $(OUTPUT_DIRECTORY)/math48_iy.lib: $(addprefix obj/ixiy/, $(OBJECTS))
 	TYPE=ixiy $(LIBLINKER) -x$(OUTPUT_DIRECTORY)/math48_iy -IXIY @math48.lst
 
 dirs:
-	@mkdir -p obj/z80 obj/ixiy obj/r2k
+	@mkdir -p obj/z80 obj/ixiy obj/r2k obj/z80/cimpl
 
 .PHONY: dirs
 

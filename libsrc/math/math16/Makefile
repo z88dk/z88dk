@@ -2,6 +2,9 @@
 
 include ../../Make.config
 
+vpath %.c ../cimpl
+
+CFILES = fromfix16.c tofix16.c
 AFILES  = $(wildcard c/sccz80/*.asm) $(wildcard z80/*.asm)
 OBJECTS = $(AFILES:.asm=.o) $(CFILES:.c=.o)
 

@@ -7,7 +7,7 @@ vpath %.c ../cimpl
 
 
 CFILES  = $(notdir $(wildcard ../../_DEVELOPMENT/math/float/am9511/c/*.c)) atof.c ftoa.c ftoe.c
-CFILES  = atof.c ftoa.c ftoe.c
+CFILES  = atof.c ftoa.c ftoe.c fromfix16.c tofix16.c
 OBJECTS = $(CFILES:.c=.o)
 
 CFLAGS += -fp-mode=ieee
