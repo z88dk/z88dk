@@ -10,8 +10,8 @@ include ../Make.config
 
 GENOBJECTS = unbcd.o wcmatch.o getopt.o
 ASMFILES = $(wildcard *.asm)
-ASMFILES_8080 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *sort_s*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
-ASMFILES_GBZ80 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm *sort_s*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
+ASMFILES_8080 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
+ASMFILES_GBZ80 = $(filter-out $(wildcard *sqrt*.asm *inp*.asm *outp*.asm *extract*.asm) , $(wildcard *.asm)) $(wildcard 8080/*.asm)
 
 
 NEWLIBGLOBS := "$(NEWLIB_DIRECTORY)/stdlib/c/sccz80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/*.asm" "$(NEWLIB_DIRECTORY)/stdlib/z80/random/*.asm"

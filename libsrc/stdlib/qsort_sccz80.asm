@@ -1,19 +1,28 @@
 
 ;
-; $Id: qsort.asm,v 1.4 2016-03-04 23:48:13 dom Exp $
+; $Id: qsort.asm $
 ;
 
 
 SECTION code_clib
+
 PUBLIC qsort_sccz80
 PUBLIC _qsort_sccz80
 
 EXTERN qsort_sccz80_enter
+EXTERN l_setix
 
 .qsort_sccz80
 ._qsort_sccz80
 	pop	af
+
+IF __CPU_GBZ80__ || __CPU_INTEL__
+	pop	hl	; *compar
+    call l_setix
+ELSE
 	pop	ix	; *compar
+ENDIF
+
 	pop	hl	; width
 	pop de	; nel
 	pop bc	; base
@@ -22,7 +31,10 @@ EXTERN qsort_sccz80_enter
 	push bc
 	push de
 	push hl
-	push ix
+
+	push hl
+
 	push af
 
 	jp qsort_sccz80_enter
+
