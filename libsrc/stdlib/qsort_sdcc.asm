@@ -1,7 +1,11 @@
 
-;
-; $Id: qsort.asm,v 1.4 2016-03-04 23:48:13 dom Exp $
-;
+
+IF __CPU_GBZ80__ || __CPU_INTEL__
+;---------------------------------------------
+
+
+ELSE
+;---------------------------------------------
 
 SECTION code_clib
 
@@ -28,3 +32,5 @@ EXTERN qsort_sdcc_enter
 	push af
 
 	jp qsort_sdcc_enter
+
+ENDIF
