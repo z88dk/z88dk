@@ -33,11 +33,15 @@ typedef int16_t fix88_t;
 #define FIX88_TO_INT(x) ( (int)(x) )
 #define FIX88_TO_FLOAT(x) ((float) (x))
 #define FIX88_FROM_FLOAT(x)  ((fix88_t)(x))
+#define FIX88_TO_FLOAT16(x) ((_Float16) (x))
+#define FIX88_FROM_FLOAT16(x)  ((fix88_t)(x))
 #else
 #define FIX88_FROM_INT(x) ( ((fix88_t)x) << 8)
 #define FIX88_TO_INT(x) ( (x) >> 8)
 #define FIX88_TO_FLOAT(x) ((float) ((x)*(1.0 / 256.0)))
 #define FIX88_FROM_FLOAT(x) ((fix88_t)((x) / (1.0 / 256.0) + ((x) >= 0 ? 0.5 : -0.5)))
+#define FIX88_TO_FLOAT16(x) ((_Float16) ((x)*(1.0f16 / 256.0f16)))
+#define FIX88_FROM_FLOAT16(x) ((fix88_t)((x) / (1.0f16 / 256.0f16) + ((x) >= 0 ? 0.5f16 : -0.5f16)))
 #endif
 
 

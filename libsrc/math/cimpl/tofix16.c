@@ -1,5 +1,5 @@
 
-
+#define DISABLE_NATIVE_ACCUM 
 #include <math.h>
 #include <math/math_fix88.h>
 
@@ -31,5 +31,9 @@ l_f48_ftofix16 = _convert
 
 static fix88_t convert(FLOAT x) __z88dk_fastcall
 {
+#ifdef FLOAT_IS_16BITS
+   return FIX88_FROM_FLOAT16(x);
+#else
    return FIX88_FROM_FLOAT(x);
+#endif
 }
