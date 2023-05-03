@@ -5779,7 +5779,6 @@ void gen_load_constant_as_float(double val, Kind to, unsigned char isunsigned)
 // We have a float in the primary register
 void zconvert_stacked_to_decimal(Kind stacked_kind, Kind float_kind, unsigned char isunsigned, int operator_is_commutative)
 {
-    // TODO: ACCUM16
     if ( float_kind == KIND_FLOAT16 || float_kind == KIND_ACCUM16) {
         if ( stacked_kind == KIND_LONG ) {
             pop("de");      // LSW

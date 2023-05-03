@@ -524,7 +524,7 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
             // LHS is constant, lets load it (after converting to the right type)
             lval->val_type = lval2->val_type;
-            lval->ltype = get_float_type(lval->val_type);
+            lval->ltype = get_decimal_type(lval->val_type);
             load_constant(lval); 
     
             /* Subtraction isn't commutative so we need to swap over' */
@@ -671,12 +671,12 @@ void plnge2b(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
         else
             lval->const_val = 0;
         // Promote as necessary
-        // TODO: ACCUM
         if ( kind_is_floating(lhs_val_type) || kind_is_floating(rhs_val_type) ) {
-            lval->val_type = (lhs_val_type == KIND_DOUBLE || rhs_val_type == KIND_DOUBLE) ? KIND_DOUBLE : KIND_FLOAT16; 
-            lval->ltype = get_float_type(lval->val_type);
+            lval->val_type = (lhs_val_type == KIND_DOUBLE || rhs_val_type == KIND_DOUBLE) ? KIND_DOUBLE : 
+                             (lhs_val_type == KIND_FLOAT16 || rhs_val_type == KIND_FLOAT16) ? KIND_FLOAT16 : 
+                             (lhs_val_type == KIND_ACCUM32 || rhs_val_type == KIND_ACCUM32) ? KIND_ACCUM32 : KIND_ACCUM16;
+            lval->ltype = get_decimal_type(lval->val_type);
         }
-        // TODO: ACCUM
         clearstage(before, 0);  // Wipe all of the code generated
         Zsp = oldsp;
     } else if (lval2->is_const == 0) {

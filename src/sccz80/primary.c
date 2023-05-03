@@ -382,8 +382,6 @@ int widen_if_float(LVALUE* lval, LVALUE* lval2, int operator_is_commutative)
         lval2->ltype = lval->ltype;
         return 1;
     } else if ( kind_is_fixed(lval2->val_type) ) {
-        // TODO: ACCUM
-
         if (lval->val_type != lval2->val_type ) {
             zconvert_stacked_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned,operator_is_commutative);
             lval->val_type = lval2->val_type; /* type of result */
