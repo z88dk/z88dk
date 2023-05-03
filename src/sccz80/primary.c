@@ -277,8 +277,8 @@ zdouble CalcStand(
 /* Complains if an operand isn't int */
 int intcheck(LVALUE* lval, LVALUE* lval2)
 {
-    if ( kind_is_floating(lval->val_type)|| kind_is_floating(lval2->val_type) ) {
-        errorfmt("Operands must be int", 0);
+    if ( kind_is_decimal(lval->val_type)|| kind_is_decimal(lval2->val_type) ) {
+        errorfmt("Operands must be integer types", 0);
         return -1;
     }
     return 0;

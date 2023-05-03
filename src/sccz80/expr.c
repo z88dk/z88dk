@@ -537,7 +537,10 @@ int heira(LVALUE *lval)
     } else if (cmatch('~')) {
         if (heira(lval))
             rvalue(lval);
-        intcheck(lval, lval);
+        if ( kind_is_floating(lval->val_type) )
+            errorfmt("Unary ~ operator is not valid for floating point",1);
+        if ( kind_is_fixed(lval->val_type) )
+            errorfmt("Unary ~ operator is not valid for fixed point",1);
         com(lval);
         lval->const_val = (int64_t)~(uint64_t)lval->const_val;
         lval->stage_add = NULL;

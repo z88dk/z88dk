@@ -13,31 +13,43 @@
 #include <stdint.h>
 
 #ifdef __SCCZ80
+#ifndef DISABLE_NATIVE_ACCUM
+#define HAVE_NATIVE_ACCUM 1
+#endif
+#endif
+
+
+#ifdef HAVE_NATIVE_ACCUM
 typedef _Accum fix88_t;
 #else
 typedef int16_t fix88_t;
 #endif
 
 
-#define FIX88_ONE     0x0100
-#define FIX88_TWO     0x0200
-#define FIX88_HALF    0x0080
-#define FIX88_HALFPI  0x0192   
-#define FIX88_PI      0x0324		// 3.14159265358979323846
-#define FIX88_TWOPI   0x0648
-#define FIX88_EA      0x02b7   
-#define FIX88_LN2     0x00b1		// 0.69314718055994530942
-#define FIX88_INV_LN2 0x0171		// 1.4426950408889634074
-#define FIX88_E       0x02b8		// 2.7182818284590452354
 
 
-#define FIX88_FROM_INT(x) ( (x) << 8)
+#ifdef HAVE_NATIVE_ACCUM
+#define FIX88_FROM_INT(x)  ((fix88_t)x) 
+#define FIX88_TO_INT(x) ( (int)(x) )
+#define FIX88_TO_FLOAT(x) ((float) (x))
+#define FIX88_FROM_FLOAT(x)  ((fix88_t)(x))
+#else
+#define FIX88_FROM_INT(x) ( ((fix88_t)x) << 8)
 #define FIX88_TO_INT(x) ( (x) >> 8)
-
 #define FIX88_TO_FLOAT(x) ((float) ((x)*(1.0 / 256.0)))
-
-// The following isn't evaluated to a constant with sccz80
 #define FIX88_FROM_FLOAT(x) ((fix88_t)((x) / (1.0 / 256.0) + ((x) >= 0 ? 0.5 : -0.5)))
+#endif
+
+
+#define FIX88_ONE     FIX88_FROM_INT(1)
+#define FIX88_TWO     FIX88_FROM_INT(2)
+#define FIX88_HALF    FIX88_FROM_FLOAT(0.5)
+#define FIX88_HALFPI  FIX88_FROM_FLOAT(3.14159265358979323846 / 2.0)  
+#define FIX88_PI      FIX88_FROM_FLOAT(3.14159265358979323846)
+#define FIX88_TWOPI   FIX88_FROM_FLOAT(3.14159265358979323846 * 2.0)  
+#define FIX88_LN2     FIX88_FROM_FLOAT(0.69314718055994530942)
+#define FIX88_INV_LN2 FIX88_FROM_FLOAT(1.4426950408889634074)
+#define FIX88_E       FIX88_FROM_FLOAT(2.7182818284590452354)
 
 /* Arithmetic functions */
 #define addfix88(x,y) ((x) + (y))

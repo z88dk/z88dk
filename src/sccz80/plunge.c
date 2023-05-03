@@ -125,6 +125,7 @@ int operator_is_commutative(void (*oper)(LVALUE *lval))
     return 0;
 }
 
+
 /*
  * binary plunge to lower level (not for +/-)
  */
@@ -195,6 +196,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
 
             lval->val_type = lval2->val_type;
             lval->ltype = lval2->ltype;
+
             load_constant(lval);  
             /* division isn't commutative so we need to swap over' */
             if ( !operator_is_commutative(oper) ) {
@@ -253,12 +255,15 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                  clearstage(before_constlval, NULL);
                  Zsp = beforesp;
                  stkcount = savestkcount;
+
+
                  // Convert to a float (if operator is valid for floats). fixed point allow more operators
-                 if ( !kind_is_decimal(lval->val_type) && doper != NULL ) {
+                 if ( !kind_is_decimal(lval->val_type)) {
                      zconvert_to_decimal(lval->val_type, lval2->val_type, lval->ltype->isunsigned);
                      lval->val_type = lval2->val_type;
                      lval->ltype = lval2->ltype;
                  }
+
                  if ( doper == zdiv && kind_is_floating(lval->val_type)) {
                      doper = mult;
                      dconstoper = mult_dconst;
@@ -270,12 +275,12 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
                      }
                  }
                  gen_push_float(lval->val_type);
-                 if ( kind_is_decimal(lval->val_type) && doper != NULL) {
+                 if ( kind_is_decimal(lval->val_type) ) {
                      lval2->val_type = lval->val_type;
                      lval2->ltype = lval->ltype;
-                 }
+                 } 
                  load_constant(lval2);
-             } else if (lval->val_type == KIND_LONGLONG  || lval2->val_type == KIND_LONGLONG ) {
+            } else if (lval->val_type == KIND_LONGLONG  || lval2->val_type == KIND_LONGLONG ) {
                 // Even if LHS is int, we promote to longlong. 
                 lval2->val_type = KIND_LONGLONG;
                 lval2->ltype = lval2->ltype->isunsigned ? type_ulonglong : type_longlong;    
@@ -312,7 +317,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     }
     lval->is_const &= lval2->is_const;
 
-    if (  doper != NULL || intcheck(lval,lval2) == 0 ) {
+    if ( doper != NULL || intcheck(lval,lval2) == 0 ) {
         // Fold constants if we can
         if ( lval->is_const && lval2->is_const ) {
             int is16bit = lval->val_type == KIND_INT || lval->val_type == KIND_CHAR || lval2->val_type == KIND_INT || lval2->val_type == KIND_CHAR;
@@ -341,7 +346,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             Zsp = savesp;
             return;
         }
-        if (doper != NULL && widen_if_float(lval, lval2, operator_is_commutative(oper))) {
+        if (widen_if_float(lval, lval2, operator_is_commutative(oper))) {
             // We only end up in here if at least one of the operands is floating
             if ( doper == zmod ) {
                 errorfmt("Cannot apply operator %% to floating point",1);
@@ -359,7 +364,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
     // If we've got here then, one or more of operands was non-constant
 
     // Widen the integer types. If we knew what the result type was going to be
-    // we could choose not to do this
+    // we could choose not to do this 
     widenintegers(lval, lval2);
 
 
@@ -432,7 +437,7 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             doconstoper = 1;
             if ( lval->ltype->isunsigned ) {
                 if (lval2->ltype->kind == KIND_LONGLONG )
-                            const_val = (uint64_t)lval->const_val;
+                    const_val = (uint64_t)lval->const_val;
                 else
                     const_val = (uint64_t)(int64_t)lval->const_val;
             } else if (lval->const_val > (long double)LLONG_MAX ) {
@@ -443,7 +448,6 @@ void plnge2a(int (*heir)(LVALUE* lval), LVALUE* lval, LVALUE* lval2, void (*oper
             clearstage(before_constlval, 0);
             force(lhs_val_type, rhs_val_type, lval2->ltype->isunsigned, lval->ltype->isunsigned,1);
         }
-
         // If we should actually do the constant operation, do it
         if ( doconstoper ) {
             Zsp = savesp;  

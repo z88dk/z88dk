@@ -393,7 +393,7 @@ void gen_store_static(SYMBOL* sym)
         outname(sym->name, dopref(sym));
         outstr("\n");
         callrts("l_i64_store");
-    } else if (sym->ctype->kind == KIND_LONG || (sym->ctype->kind == KIND_DOUBLE && c_fp_size == 4) ) { // 4 byte doubles
+    } else if (sym->ctype->kind == KIND_LONG || sym->ctype->kind == KIND_ACCUM32 || (sym->ctype->kind == KIND_DOUBLE && c_fp_size == 4) ) { // 4 byte doubles
         if ( IS_GBZ80() ) {
             ot("ld\tbc,");
             outname(sym->name, dopref(sym));
@@ -454,6 +454,7 @@ void gen_store_to_tos(Kind typeobj)
         llpush();
         return;
     case KIND_LONG:
+    case KIND_ACCUM32:
         lpush();
         return;
     case KIND_CHAR:
@@ -476,6 +477,7 @@ void gen_store_to_tos(Kind typeobj)
         push("hl");
         Zsp--;
         return;
+    case KIND_ACCUM16:
     default:
         push("hl");
         return;
@@ -561,6 +563,7 @@ void putstk(LVALUE *lval)
             callrts("lp_i64_load");
             break;
         case KIND_LONG:
+        case KIND_ACCUM32:
             callrts("lp_plong");
             break;
         case KIND_CHAR:
@@ -644,6 +647,7 @@ void putstk(LVALUE *lval)
         callrts("l_i64_store");
         break;
     case KIND_LONG:
+    case KIND_ACCUM32:
         pop("bc");
         callrts("l_plong");
         break;
@@ -862,6 +866,7 @@ void gen_load_indirect(LVALUE* lval)
         callrts("l_i64_load");
         break;
     case KIND_LONG:
+    case KIND_ACCUM32:
         callrts("l_glong");
         break;
     case KIND_DOUBLE:
@@ -4305,8 +4310,8 @@ void zeq_const(LVALUE *lval, int64_t value64)
             set_carry(lval);
         } else if ( IS_808x() || IS_GBZ80() ) {
             const2(value & 0xffff);
-            callrts("l_eq");
             set_int(lval);
+            callrts("l_eq");
         } else {
             const2(value & 0xffff);  // 10 bytes
             ol("and\ta");
@@ -4361,6 +4366,8 @@ void zeq(LVALUE* lval)
             ol("scf");
             break;
         }
+    case KIND_ACCUM16:
+        zpop();
     default:
         if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_808x() && !IS_GBZ80() ) {
             ol("and\ta");
@@ -4486,8 +4493,8 @@ void zne_const(LVALUE *lval, int64_t value64)
             ol("scf");
         } else if ( IS_808x() || IS_GBZ80() ) {
             const2(value & 0xffff);
-            callrts("l_ne");
             set_int(lval);
+            callrts("l_ne");
         } else {
             const2(value & 0xffff);  // 10 bytes
             ol("and\ta");
@@ -4542,6 +4549,8 @@ void zne(LVALUE* lval)
             ol("scf");
             break;
         }
+    case KIND_ACCUM16:
+        zpop();
     default:
         if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_808x() && !IS_GBZ80() ) {
             ol("and\ta"); // 7 bytes
@@ -4709,6 +4718,8 @@ void zlt(LVALUE* lval)
             set_carry(lval);
             break;
         }
+    case KIND_ACCUM16:
+        zpop();
     default:
         if (ulvalue(lval)) {
             if ( IS_808x() || IS_GBZ80() ) {
@@ -4841,6 +4852,8 @@ void zle(LVALUE* lval)
             set_carry(lval);
             break;
         }
+    case KIND_ACCUM16:
+        zpop();
     default:
         if (ulvalue(lval)) {
             if ( IS_808x() || IS_GBZ80() ) {
@@ -4965,6 +4978,8 @@ void zgt(LVALUE* lval)
             set_carry(lval);
             break;
         }
+    case KIND_ACCUM16:
+        zpop();
     default:
         if (ulvalue(lval)) {
             if ( IS_808x() || IS_GBZ80() ) {
@@ -4981,8 +4996,8 @@ void zgt(LVALUE* lval)
             }
 //            callrts("l_ugt");
         } else {
-            callrts("l_gt");
             set_int(lval);
+            callrts("l_gt");
         }
     }
 }
@@ -5108,6 +5123,8 @@ void zge(LVALUE* lval)
             set_carry(lval);
             break;
         }
+    case KIND_ACCUM16:
+        zpop();
     default:
         if (ulvalue(lval)) {
             if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_808x() && !IS_GBZ80() ) {
