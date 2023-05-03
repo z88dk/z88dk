@@ -3059,12 +3059,9 @@ void zor(LVALUE* lval )
         break;
     case KIND_LONG:
     case KIND_CPTR:
-    case KIND_ACCUM32:
         callrts("l_long_or");
         Zsp += 4;
         break;
-    case KIND_ACCUM16:
-        zpop();
     default:
         callrts("l_or");
     }
@@ -3218,12 +3215,9 @@ void zxor(LVALUE *lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-    case KIND_ACCUM32:
         callrts("l_long_xor");
         Zsp += 4;
         break;
-    case KIND_ACCUM16:
-        zpop();
     default:
         callrts("l_xor");
     }
@@ -3290,12 +3284,9 @@ void zand(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-    case KIND_ACCUM32:
         callrts("l_long_and");
         Zsp += 4;
         break;
-    case KIND_ACCUM16:
-        zpop();
     default:
         callrts("l_and");
     }
@@ -3406,15 +3397,12 @@ void asr(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-    case KIND_ACCUM32:
         if (ulvalue(lval))
             callrts("l_long_asr_u");
         else
             callrts("l_long_asr");
         Zsp += 4;
         break;
-    case KIND_ACCUM16:
-        zpop();
     default:
         if (ulvalue(lval))
             callrts("l_asr_u");
@@ -3741,12 +3729,9 @@ void asl(LVALUE* lval)
         break;
     case KIND_LONG:
     case KIND_CPTR:
-    case KIND_ACCUM32:
         callrts("l_long_asl");
         Zsp += 4;
         break;
-    case KIND_ACCUM16:
-        zpop();
     default:
         callrts("l_asl");
     }
@@ -4365,10 +4350,9 @@ void zeq(LVALUE* lval)
             }
             ol("scf");
             break;
-        }
-    case KIND_ACCUM16:
-        zpop();
+        };
     default:
+        if ( lval->val_type == KIND_ACCUM16 ) zpop();
         if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_808x() && !IS_GBZ80() ) {
             ol("and\ta");
             ol("sbc\thl,de");
@@ -4549,9 +4533,8 @@ void zne(LVALUE* lval)
             ol("scf");
             break;
         }
-    case KIND_ACCUM16:
-        zpop();
     default:
+        if ( lval->val_type == KIND_ACCUM16 ) zpop();
         if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_808x() && !IS_GBZ80() ) {
             ol("and\ta"); // 7 bytes
             ol("sbc\thl,de");
@@ -4718,9 +4701,8 @@ void zlt(LVALUE* lval)
             set_carry(lval);
             break;
         }
-    case KIND_ACCUM16:
-        zpop();
     default:
+        if ( lval->val_type == KIND_ACCUM16 ) zpop();
         if (ulvalue(lval)) {
             if ( IS_808x() || IS_GBZ80() ) {
                 ol("ld\ta,e");
@@ -4852,9 +4834,8 @@ void zle(LVALUE* lval)
             set_carry(lval);
             break;
         }
-    case KIND_ACCUM16:
-        zpop();
     default:
+        if ( lval->val_type == KIND_ACCUM16 ) zpop();
         if (ulvalue(lval)) {
             if ( IS_808x() || IS_GBZ80() ) {
                 ol("ld\ta,l");
@@ -4978,9 +4959,8 @@ void zgt(LVALUE* lval)
             set_carry(lval);
             break;
         }
-    case KIND_ACCUM16:
-        zpop();
     default:
+        if ( lval->val_type == KIND_ACCUM16 ) zpop();
         if (ulvalue(lval)) {
             if ( IS_808x() || IS_GBZ80() ) {
                 outfmt("\tld\ta,e\n");
@@ -5123,9 +5103,8 @@ void zge(LVALUE* lval)
             set_carry(lval);
             break;
         }
-    case KIND_ACCUM16:
-        zpop();
     default:
+        if ( lval->val_type == KIND_ACCUM16 ) zpop();
         if (ulvalue(lval)) {
             if ( c_speed_optimisation & OPT_INT_COMPARE && !IS_808x() && !IS_GBZ80() ) {
                 swap();
