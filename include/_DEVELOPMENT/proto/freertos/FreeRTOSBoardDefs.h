@@ -101,6 +101,8 @@ include(__link__.m4)
 #define configISR_ORG                   0xFB00
 #define configISR_IVT                   0xFF06
 
+#ifdef __SCCZ80
+
 #define configINCREMENT_TICK()                                  \
     do{                                                         \
         __asm__(                                                \
@@ -126,6 +128,38 @@ include(__link__.m4)
             "call NC,vTaskSwitchContext                     \n" \
             );                                                  \
     }while(0)
+
+#endif
+
+#ifdef __SDCC
+
+#define configINCREMENT_TICK()                                  \
+    do{                                                         \
+        __asm__(                                                \
+            "EXTERN BBR                                     \n" \
+            "in0 a,(BBR)                                    \n" \
+            "xor 0xF0                ; BBR for user TPA     \n" \
+            "jr NZ,ASMPC+9                                  \n" \
+            "ld hl,0x0100                                   \n" \
+            "add hl,sp               ; Check SP < 0xFFnn    \n" \
+            "call NC,_xTaskIncrementTick                    \n" \
+            );                                                  \
+    }while(0)
+
+#define configSWITCH_CONTEXT()                                  \
+    do{                                                         \
+        __asm__(                                                \
+            "EXTERN BBR                                     \n" \
+            "in0 a,(BBR)                                    \n" \
+            "xor 0xF0                ; BBR for user TPA     \n" \
+            "jr NZ,ASMPC+9                                  \n" \
+            "ld hl,0x0100                                   \n" \
+            "add hl,sp               ; Check SP < 0xFFnn    \n" \
+            "call NC,_vTaskSwitchContext                    \n" \
+            );                                                  \
+    }while(0)
+
+#endif
 
 #define configSETUP_TIMER_INTERRUPT()                           \
     do{                                                         \
