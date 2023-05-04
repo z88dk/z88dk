@@ -38,13 +38,13 @@ _mbc_setcursorpos_callee:
 
 	; X
 	ld a,32
-	add d
+	add e
 	ld l,a
 	call mbc_sendchar
 
 	; Y
 	ld a,32
-	add e
+	add d
 	ld l,a
 	jp mbc_sendchar
 
